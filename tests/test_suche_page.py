@@ -110,7 +110,15 @@ def test_navigation_hat_fuenf_eintraege(tmp_path):
     Impressum darf keine Adresse entgegengenommen werden, Art. 13 DSGVO).
     Dieser Test rendert OHNE cfg und mit leerem Projekt; beide Schwellen
     sind dabei nicht erreicht, also bleiben es fuenf. Den anderen Zweig
-    misst `tests/test_newsletter_seite.py`."""
+    misst `tests/test_newsletter_seite.py`.
+
+    "Wettbewerbs-Radar" stand vom 08.09. bis zum 17.09.2026 als achter
+    Eintrag dabei und ist mit E3 gefallen (AUFTRAG_GERAETE_EINE_SEITE_V2
+    §1d): Der Radar ist der Reiter "Radar" der EINEN Geräteseite - ein
+    eigener Nav-Eintrag wäre eine zweite Adresse für dieselbe Antwort
+    (Antonio: „Geräte, Wettbewerbs-Radar, eine Unterseite"). Die Alt-URL
+    bleibt als Weiterleitung erreichbar; der Eintrag kommt nicht wieder,
+    solange es keine achte FRAGE gibt."""
     reports_dir = tmp_path / "data" / "reports"
     reports_dir.mkdir(parents=True)
     site_dir = tmp_path / "site"
@@ -130,7 +138,8 @@ def test_navigation_hat_fuenf_eintraege(tmp_path):
     # und die zwei unter der Schwelle ebenfalls nicht.
     for weg in ("bericht.html", "archive.html", "sources.html",
                 "protokoll.html", "wettbewerber.html", "suche.html",
-                "tarife.html", "lieferzeit.html", "newsletter.html"):
+                "tarife.html", "lieferzeit.html", "newsletter.html",
+                "wettbewerbsradar.html"):
         assert f'href="{weg}"' not in nav
 
 

@@ -623,8 +623,22 @@ def _seite(tmp_path: pathlib.Path) -> dict[str, str]:
     site = root / "site"
     render_site(site, reports)
     return {name: (site / name).read_text(encoding="utf-8")
-            for name in ("wettbewerbsradar.html", "geraete.html",
-                         "index.html")}
+            for name in ("geraete.html", "index.html",
+                         "wettbewerbsradar.html")}
+
+
+def _tafel(seiten: dict) -> str:
+    """Der Inhalt des Radar-Reiters (#tafel-radar) als HTML-String.
+
+    Seit E3 Schritt 3 (17.09.2026) ist der Radar der Reiter „Radar" der
+    EINEN Geräteseite; wettbewerbsradar.html ist eine Weiterleitung. Die
+    Seiten-Tests laufen gegen die Tafel, nicht gegen die ganze 1,4-MB-
+    Seite - sonst erfüllte irgendein anderer Reiter die Assertion
+    zufällig (CLAUDE.md §6: ein Test, der nichts trifft, ist grün)."""
+    suppe = BeautifulSoup(seiten["geraete.html"], "html.parser")
+    tafel = suppe.select_one("#tafel-radar")
+    assert tafel is not None, "#tafel-radar fehlt - Test prüft nichts"
+    return tafel.decode_contents()
 
 
 def test_im_gerenderten_radar_steht_kein_tco36(tmp_path):
@@ -632,8 +646,8 @@ def test_im_gerenderten_radar_steht_kein_tco36(tmp_path):
     36-Monate-Bezeichnung. TCO-24 muss dafuer VORKOMMEN, sonst pruefte die
     Abwesenheit nichts. (Der 24-Monats-Horizont der Zahlen selbst ist in
     `test_tco_model`/`test_geraete_tco_karten` genagelt, Ticket TCO24-1;
-    hier geht es um die Bezeichnung auf DIESER Seite.)"""
-    html = _seite(tmp_path)["wettbewerbsradar.html"]
+    hier geht es um die Bezeichnung auf DIESER Tafel.)"""
+    html = _tafel(_seite(tmp_path))
     assert "TCO-36" not in html
     assert "36 Monate" not in html
     assert "TCO-24" in html or "24 Monate" in html
@@ -651,27 +665,34 @@ def test_leerzustand_traegt_dieselben_schluessel_wie_die_ansicht():
 
 
 def test_die_seite_nennt_die_nicht_erhebbaren_haendler(tmp_path):
-    """(i) §8 auf der Seite: Amazon, MediaMarkt, expert und Euronics
+    """(i) §8 auf der Tafel: Amazon, MediaMarkt, expert und Euronics
     stehen mit Grund im eigenen Abschnitt - benannt, nicht weggelassen."""
-    suppe = BeautifulSoup(_seite(tmp_path)["wettbewerbsradar.html"],
-                          "html.parser")
+    suppe = BeautifulSoup(_tafel(_seite(tmp_path)), "html.parser")
     text = suppe.get_text(" ", strip=True)
     for name in ("Amazon", "MediaMarkt", "expert", "Euronics"):
-        assert name in text, f"{name} fehlt auf der Seite"
+        assert name in text, f"{name} fehlt auf der Tafel"
     assert "403" in text, "der Grund (HTTP 403) muss genannt sein"
     assert "PA-API" in text
 
 
 def test_auf_der_seite_fehlt_kein_netzbetreiber(tmp_path):
     """(j) B.2.5 im Artefakt: Telekom und 1&1 stehen als Zeilen ohne Zahl
-    in JEDER Gruppe - der Radar lässt keinen der drei Wettbeweber aus."""
-    suppe = BeautifulSoup(_seite(tmp_path)["wettbewerbsradar.html"],
-                          "html.parser")
-    gruppen = suppe.select(".wr-gruppe")
-    assert gruppen, "keine Gruppe gerendert - Test prueft nichts"
-    for g in gruppen:
-        namen = {z.select("td")[0].get_text(strip=True)
-                 for z in g.select(".wr-zeile")}
+    in JEDER Modell-Gruppe der Detailtabelle - der Radar lässt keinen der
+    drei Wettbeweber aus. (Bis E3 Schritt 3 prüfte das die Gruppen der
+    Schwesterseite `.wr-gruppe`; seit der Neustrukturierung nach S2 ist
+    die Modell-Liste mit ihren Aufklappzeilen der Ort - derselbe Test
+    auch in tests/test_geraete_radar_tafel.py.)"""
+    suppe = BeautifulSoup(_tafel(_seite(tmp_path)), "html.parser")
+    # `.gr-a-zeile` ist auf dieser Seite MEHRDEUTIG (Alarm- und Modell-
+    # Listen-Zeilen) - der Selektor steht im Kontext der Abweichungs-
+    # Sektion, sonst griffe er die Alarmtabelle (CLAUDE.md-Klassen-Falle).
+    gruppen = suppe.select("#wr-abweichung tr.gr-a-zeile[data-auf]")
+    assert gruppen, "keine Modell-Zeile gerendert - Test prueft nichts"
+    for z in gruppen:
+        auf = suppe.find(id=z.get("data-auf"))
+        assert auf is not None, "Modell-Zeile ohne Detailzeile"
+        namen = {det.select("td")[0].get_text(strip=True)
+                 for det in auf.select("tr") if det.select("td")}
         assert {"Telekom", "1&1", "o2"} <= namen, namen
 
 
@@ -680,12 +701,12 @@ def test_die_seite_zeigt_den_tarif_jeder_karte(tmp_path):
     stehen koennen, unterscheidet erst die Tarif-Spalte die Zeilen - sie
     muss im gerenderten Artefakt gefuellt sein, nicht nur im Dict (T1 des
     diff-reviewers: eine Dateneben-Pruefung alone beweist die Spalte
-    nicht)."""
-    suppe = BeautifulSoup(_seite(tmp_path)["wettbewerbsradar.html"],
-                          "html.parser")
-    zeilen = suppe.select(".wr-zeile")
-    assert zeilen, "keine Zeile gerendert - Test prueft nichts"
-    tarife = [z.select("td")[1].get_text(strip=True) for z in zeilen]
+    nicht). Seit E3 Schritt 3 steht die Spalte in der Detailzeile der
+    Modell-Liste (`.wr-tarif`)."""
+    suppe = BeautifulSoup(_tafel(_seite(tmp_path)), "html.parser")
+    zeilen = suppe.select(".wr-tarif")
+    assert zeilen, "keine Tarif-Zelle gerendert - Test prueft nichts"
+    tarife = [z.get_text(strip=True) for z in zeilen]
     assert "O2 Mobile S" in tarife, \
         "der Tarif der o2-Karte steht nicht in der Tarif-Spalte"
     # Zeilen ohne Karte tragen keinen Tarif - dort steht das Gedankenstrich-
@@ -693,19 +714,44 @@ def test_die_seite_zeigt_den_tarif_jeder_karte(tmp_path):
     assert all(t for t in tarife), "leere Tarif-Zelle gerendert"
 
 
+def test_die_alt_url_ist_eine_weiterleitung_auf_den_radar_reiter(tmp_path):
+    """E3 Schritt 3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d): wettbewerbsradar.
+    html hört auf zu existieren - der alte Dateiname steht in Lesezeichen
+    und Mails und wird deshalb als Meta-Refresh-Weiterleitung auf den
+    Radar-Reiter der EINEN Geräteseite gerendert (Muster:
+    docs/entwuerfe/geraete-eine-seite-2026-09-16/wettbewerbsradar.html).
+    Die Seite ist KEINE Vollausgabe mehr: kein `wr-sektion`-Inhalt, kein
+    base-Gerüst - nur die Weiterleitungsmechanik."""
+    html = _seite(tmp_path)["wettbewerbsradar.html"]
+    assert 'http-equiv="refresh"' in html
+    assert "geraete.html#tafel-radar" in html, \
+        "das Redirect-Ziel ist nicht der Radar-Reiter"
+    assert 'rel="canonical"' in html
+    assert "noindex" in html, "die Weiterleitung ist keine Index-Seite"
+    assert "Weiter zu geraete.html#tafel-radar" in html, \
+        "der sichtbare Link fehlt (ohne JS muss der Klick gehen)"
+    assert 'class="wr-sektion"' not in html, \
+        "die Alt-URL trägt noch Volcontent statt der Weiterleitung"
+
+
 def test_die_geraeteseite_traegt_den_fusslink(tmp_path):
-    """(k) RAD-1 Aufgabe 2: der Radar ist von geraete.html aus verlinkt,
-    sobald er vergleichbare Zeilen hat - und in der Navigation derselben
-    Seite."""
+    """(k) RAD-1 Aufgabe 2, E3-Fassung: der Radar ist von geraete.html aus
+    erreichbar - seit E3 Schritt 3 als In-Page-Sprung in den Radar-Reiter
+    (#tafel-radar; die Alt-URL ist Weiterleitung). In der NAVIGATION
+    derselben Seite steht er NICHT mehr: Der Radar ist ein Reiter der
+    Geräte-Seite, ein zweiter Nav-Eintrag wäre eine zweite Adresse für
+    dieselbe Antwort (Navigation 8 → 7)."""
     seiten = _seite(tmp_path)
     geraete = BeautifulSoup(seiten["geraete.html"], "html.parser")
     fusslinks = [a.get("href") for a in geraete.select("a")
-                 if a.get("href") == "wettbewerbsradar.html"]
-    assert fusslinks, "geraete.html verlinkt den Radar nicht"
+                 if a.get("href") == "#tafel-radar"]
+    assert fusslinks, "geraete.html springt nicht in den Radar-Reiter"
+    assert geraete.select_one("#tafel-radar") is not None
     index = BeautifulSoup(seiten["index.html"], "html.parser")
     navlinks = [a.get("href") for a in index.select("nav a")
                 if a.get("href") == "wettbewerbsradar.html"]
-    assert navlinks, "die Navigation verlinkt den Radar nicht"
+    assert not navlinks, \
+        "die Navigation verlinkt noch die Alt-URL statt des Reiters"
 
 
 # --------------------------------------------------------------------------

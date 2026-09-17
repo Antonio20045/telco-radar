@@ -80,9 +80,15 @@ def geraete(site) -> BeautifulSoup:
 
 @pytest.fixture(scope="module")
 def radar(site) -> BeautifulSoup:
-    return BeautifulSoup(
-        (site / "wettbewerbsradar.html").read_text(encoding="utf-8"),
-        "html.parser")
+    """Die Radar-TAFEL von geraete.html - seit E3 Schritt 3 (17.09.2026)
+    ist der Radar der Reiter „Radar" der EINEN Geräteseite; die Alt-URL
+    wettbewerbsradar.html ist eine Weiterleitung ohne Inhalt. Der Export-
+    Knopf des Radars steht im Kopf der Tafel."""
+    suppe = BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
+                          "html.parser")
+    tafel = suppe.select_one("#tafel-radar")
+    assert tafel is not None, "#tafel-radar fehlt - die Fixture prüft nichts"
+    return BeautifulSoup(str(tafel), "html.parser")
 
 
 @pytest.fixture(scope="module")
@@ -236,14 +242,17 @@ def test_die_prozentzahl_ist_die_der_seite(radar_csv, radar):
     """Die %-Spalte ist KONSUMENT derselben Rechnung: die Zahl der
     vergleichbaren Zeilen in der Datei ist die Zahl der vergleichbaren
     Zeilen auf der Seite (`wr-status--vergleichbar`) - keine zweite
-    Rechnung für dieselbe Zahl."""
+    Rechnung für dieselbe Zahl. Seit E3 Schritt 3 stehen die Zeilen in
+    den Detailzeilen der Modell-Liste (bis dahin in den `.wr-gruppe`-
+    Blöcken der Schwesterseite; die Klasse `.wr-zeile` tragen seit S2 nur
+    noch die Händler-Zeilen)."""
     kopf, zeilen = radar_csv
     idx = {name: i for i, name in enumerate(kopf)}
     datei = sum(1 for z in zeilen
                 if z[idx["Art"]] == "Netzbetreiber TCO-24"
                 and z[idx["Abweichung %"]])
-    seite = len(radar.select(".wr-zeile.wr-status--vergleichbar"))
-    assert seite > 0, "die Radar-Seite zeigt keine vergleichbare Zeile"
+    seite = len(radar.select("#wr-abweichung tr.wr-status--vergleichbar"))
+    assert seite > 0, "die Radar-Tafel zeigt keine vergleichbare Zeile"
     assert datei == seite, (
         f"{datei} Zeilen mit Abweichung in der Datei, {seite} auf der Seite")
 
@@ -299,9 +308,17 @@ def test_die_export_links_stehen_in_der_kopfzeile(geraete):
         "Export-Knöpfe stehen noch in einem Reiter")
 
 
-def test_der_radar_verlinkt_seinen_export_genau_einmal(radar):
-    links = [a.get("href") for a in radar.select("a[href^='exporte/']")]
+def test_der_radar_verlinkt_seinen_export_genau_einmal(geraete):
+    """Seit E3 Schritt 3 gehört der Radar-Export zur EINEN Geräteseite -
+    sein Knopf steht im Hero neben den drei anderen (bis dahin im Hero der
+    Schwesterseite). Genau ein Mal, nie zusätzlich in einem Reiter."""
+    links = [a.get("href") for a in geraete.select("a[href^='exporte/']")
+             if a.get("href") == "exporte/wettbewerbsradar.csv"]
     assert links == ["exporte/wettbewerbsradar.csv"], links
+    radar_tafel = geraete.select_one("#tafel-radar")
+    assert radar_tafel is not None
+    assert not radar_tafel.select("a[href^='exporte/']"), \
+        "der Radar-Export steht zusätzlich IN der Tafel (O4: eine Stelle)"
 
 
 def test_die_links_nennen_die_zeilenzahl(geraete):

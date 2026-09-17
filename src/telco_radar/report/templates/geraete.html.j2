@@ -40,8 +40,10 @@
    Radar als Quasi-Reiter (Link auf seine Seite), "Preisverlauf" (die
    Einzelgerät-Zeitreihe ist wieder erreichbar - O4 bindet dort die
    gekappte Barpreis-Zeitreihe an) und "Gerätekatalog". Die Portfolio-
-   Tafel ist GANZ weg - ihre Abschnitte stehen auf wettbewerbsradar.html
-   (Antonios Entscheidung, Strategie §5.2). G1 (der TCO-Balkenvergleich)
+   Tafel ist GANZ weg - ihre Abschnitte stehen seit E3 Schritt 3 als
+   Sektionen im Radar-Reiter DIESER Seite (bis dahin auf der abgeschalteten
+   Schwesterseite wettbewerbsradar.html, Antonios Entscheidung, Strategie
+   §5.2). G1 (der TCO-Balkenvergleich)
    bleibt aus DIESER Ansicht entfernt - Datenquelle und Rechnung
    (`geraete_tco_grafik.balken`, `m.svg`/`m.legende`) bleiben im Code,
    nur der Aufruf im Template ist geloescht.
@@ -52,10 +54,11 @@
 {% set active = 'geraete' %}
 {% block title %}Vodafone Product and Services Insights · Gerätepreise im Vergleich{% endblock %}
 
-{# O2 (STRATEGIE_GERAETE_OPTIK §3, 11.09.2026): die Alarmtabelle ist
-   AUS dieser Seite auf den Wettbewerbs-Radar gezogen (dorthin auch die
-   Macros `alarmzeile`/`alarmtafel` - `templates/wettbewerbsradar.html.j2`).
-   Die Radar-Seite sortiert Geräte nach Abweichung zu Vodafone; die
+{# O2 (STRATEGIE_GERAETE_OPTIK §3, 11.09.2026): die Alarmtabelle war
+   AUS dieser Seite auf den Wettbewerbs-Radar gezogen (seit E3 lebt sie
+   in der geteilten Teilvorlage `_geraete_alarme.html.j2` - der
+   Radar-Reiter dieser Seite rendert sie).
+   Die Radar-Tafel sortiert Geräte nach Abweichung zu Vodafone; die
    Alarmtabelle ist dieselbe Aussicht im Detail, und "Bei Wettbewerbern
    gelistet" ist dieselbe Frage über das Sortiment. Hier bleibt keins von
    beidem - nicht doppelt. #}
@@ -98,8 +101,10 @@
        zentral, hier in der Kopfzeile (Marke-Bereich wie im Entwurf), und
        nicht mehr auf jedem Reiter - dieselben Links dreimal auf einer
        Seite waren die Duplikate, die der Auftrag streicht. Der
-       Bündel-TCO-Export kommt hinzu; jede Datei genau ein Mal. Die
-       Schwesterseite verlinkt IHREN Export an ihrer eigenen Kopfzeile. #}
+       Bündel-TCO-Export kommt hinzu; jede Datei genau ein Mal. Der
+       Radar-Export steht seit E3 Schritt 3 (17.09.2026) ebenfalls HIER:
+       seine Schwesterseite ist eine Weiterleitung, ihr Hero-Knopf hätte
+       kein Ziel mehr - die EINE Seite führt jetzt alle vier Dateien. #}
     {% if geraete.export and geraete.export.aktuell.zeilen %}
     <span class="gr-export-knoepfe">
       <a class="gr-knopf" href="{{ geraete.export.aktuell.datei }}" download
@@ -108,6 +113,10 @@
         >Preishistorie ({{ geraete.export.historie.zeilen }})</a>
       <a class="gr-knopf" href="{{ geraete.export.tco.datei }}" download
         >Bündel-TCO ({{ geraete.export.tco.zeilen }})</a>
+      {% if geraete.export.radar and geraete.export.radar.zeilen %}
+      <a class="gr-knopf" href="{{ geraete.export.radar.datei }}" download
+        >Radar ({{ geraete.export.radar.zeilen }})</a>
+      {% endif %}
     </span>
     {% endif %}
   </div>
@@ -141,9 +150,9 @@
    als Seitenwechsel (O3). Antonios Wortlaut („Wieso kannst du nicht
    einfach Geräte-Unterseite, darunter dann verschiedene Unterseiten/
    Reiter … statt dass man 30 Minuten scrollt") dreht das um: der Radar
-   wird eine Tafel DIESER Seite, die Schwesterseite hört später auf zu
-   existieren (Redirect und Navigation zieht E5; der Fußlink unten
-   bleibt bis dahin der zweite Weg zu ihr).
+   ist eine Tafel DIESER Seite; die Schwesterseite ist seit E3 Schritt 3
+   (17.09.2026) eine Weiterleitung auf #tafel-radar, und der Navigationseintrag
+   ist gefallen (8 → 7).
 
    Bis O3 (BRIEF_FADEN, 05.09.2026) standen hier zwei Knöpfe:
    "Preis- und TCO-Historie" und "Portfolio" hatten ihren verloren, ihre
@@ -919,10 +928,12 @@
    Erklaersektionen fielen alle drei Links auf geraete-quellen.html - die
    Seite waere fertig, geprueft und fuer jeden Leser unauffindbar gewesen.
    Eine Zeile am Fuss, kein Absatz: sie nennt kein Wort, das die Seite
-   ueber sich selbst sagt. Der Radar-Link (RAD-1) steht seit O1 daneben. #}
+   ueber sich selbst sagt. Der Radar-Link ist seit E3 Schritt 3 kein
+   Seitenwechsel mehr, sondern der Sprung in den Radar-Reiter DIESER
+   Seite (#tafel-radar schaltet ihn auch per Hash). #}
 <p class="dz-foot"><a href="{{ prefix }}geraete-quellen.html">Welche
 Anbieter liefern Geräte, welche warum nicht</a>{% if
-wettbewerbsradar_verlinkt %} · <a href="{{ prefix }}wettbewerbsradar.html"
+wettbewerbsradar_verlinkt %} · <a href="#tafel-radar"
 >Wettbewerbs-Radar: alle Geräte nach Abweichung zu Vodafone</a>{% endif %}.</p>
 
 

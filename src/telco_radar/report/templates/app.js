@@ -850,15 +850,19 @@ var TelcoFrage = (function () {
    * und `#verlauf`, `#katalog`, `#tco` stehen als Sprungziele in Mails und
    * Lesezeichen. `#tafel-alarme` gibt es nicht mehr - ein solcher Link
    * landet jetzt auf der Hauptansicht statt auf einer Seite, die sich
-   * scheinbar nicht bewegt. Dasselbe gilt seit O3 für `#lifecycle`: die
-   * Portfolio-Tafel ist von der Geräteseite WEG (ihre Abschnitte stehen
-   * auf wettbewerbsradar.html) - ein Hash kann keine andere Seite laden,
-   * der Link bleibt deshalb auf der Hauptansicht, ohne Ziel-Tab. */
+   * scheinbar nicht bewegt.
+   * Seit E3 Schritt 3 (17.09.2026) lebt der ganze Radar IN dieser Seite:
+   * die Alt-URL wettbewerbsradar.html ist eine Weiterleitung auf
+   * #tafel-radar, deshalb schalten ALLE Hash-Ziele des Radars (seine
+   * Sektionen #wr-alarme/#wr-abweichung/#wr-haendler/#wr-bewegungen und
+   * das alte Sprungziel #lifecycle aus der Portfolio-Zeit) den
+   * Radar-Reiter - sonst spränge der Browser zu einem versteckten
+   * Element, ohne dass die Tafel sichtbar würde. */
   var ALT = {'tafel-alarme': 'tafel-tco', 'tco': 'tafel-tco',
              'katalog': 'tafel-katalog', 'verlauf': 'tafel-verlauf',
-             /* E3: #radar ist die section im Radar-Reiter - ein Hash-Link
-                dorthin schaltet den Reiter, nicht die Hauptansicht. */
-             'radar': 'tafel-radar'};
+             'radar': 'tafel-radar', 'lifecycle': 'tafel-radar',
+             'wr-alarme': 'tafel-radar', 'wr-abweichung': 'tafel-radar',
+             'wr-haendler': 'tafel-radar', 'wr-bewegungen': 'tafel-radar'};
   function ausHash() {
     var id = (location.hash || '').replace(/^#/, '');
     if (!id) return;

@@ -3178,12 +3178,24 @@ b,strong{font-weight:700}
    geraete.html - gleichwertig, jede mit derselben Trennlinie wie die
    Gruppen der Schwesterseite (S3: der Händler-Abschnitt ist kein "komischer
    unterer Abschnitt ganz unten", sondern die dritte von dreien). */
-.gr-r-sektion{padding-top:14px;border-top:1px solid var(--rule-2)}
+/* padding-top 10 (vor E3 Schritt 3: 14): die drei Sektionen teilen sich
+   das 11b-Budget EINER Seite, deren Kopf- und Fussbereich (~830 px) fix
+   ist - gemessen am Mitzug der Portfolio-Nachschlaege, s. u. */
+.gr-r-sektion{padding-top:10px;border-top:1px solid var(--rule-2)}
 .gr-r-sektion:first-of-type{padding-top:0;border-top:none}
 /* Drei Sektionen teilen sich das Hoehenbudget EINER Tafel (11b misst die
-   Seite): im Radar-Reiter strafft sich der Sektionsabstand, der ausserhalb
-   desselben unveraendert bleibt. */
-#tafel-radar .wr-sektion{margin-bottom:18px}
+   GANZE Seite, Kopf und Fuss ~830 px sind fix): im Radar-Reiter strafft
+   sich der Sektionsabstand, der ausserhalb desselben unveraendert bleibt. */
+#tafel-radar .wr-sektion{margin-bottom:12px}
+/* E3 Schritt 3: die PORTFOLIO-Nachschlag-Sektionen (Wochenkarte,
+   Lifecycle) - beide zugeklappt, beide nachgerueckt von der abgeschalteten
+   Schwesterseite. Ihr Abstand ist knapper als der der drei offenen
+   Sektionen: sie sind Nachfrage, kein Einstieg. Ohne diese Straffung mass
+   der Reiter 3033 px (Mitzug der Sektionen + alte 18er-Abstaende); alle
+   wachsenden Inhaltsmengen stehen hinter Deckeln oder Aufklappern, die
+   sichtbare Flaeche waechst mit dem Bestand nicht. */
+#tafel-radar .gr-nachschlag{margin-bottom:4px}
+#tafel-radar .gr-nachschlag:last-of-type{margin-bottom:0}
 /* Der Sprung je Modell-Zeile in den Graphen des Vergleichs-Reiters -
    derselbe Etikett-Stil wie der Querlink der Schwesterseite: ein Weg,
    kein Bedienelement der Tabelle. */

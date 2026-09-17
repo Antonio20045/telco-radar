@@ -52,9 +52,15 @@ def geraete(site) -> BeautifulSoup:
 
 @pytest.fixture(scope="module")
 def radar(site) -> BeautifulSoup:
-    return BeautifulSoup(
-        (site / "wettbewerbsradar.html").read_text(encoding="utf-8"),
-        "html.parser")
+    """Die Radar-TAFEL von geraete.html. Bis E3 Schritt 3 (17.09.2026) war
+    der Radar eine eigene Seite (wettbewerbsradar.html); seitdem ist er der
+    Reiter „Radar" der EINEN Geräteseite, und die Alt-URL ist eine
+    Weiterleitung ohne Inhalt."""
+    suppe = BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
+                          "html.parser")
+    tafel = suppe.select_one("#tafel-radar")
+    assert tafel is not None, "#tafel-radar fehlt - die Fixture prüft nichts"
+    return BeautifulSoup(str(tafel), "html.parser")
 
 
 # --------------------------------------------------------------------------
@@ -120,11 +126,18 @@ def test_der_verlaufs_reiter_fuehrt_auf_eine_lebendige_tafel(geraete):
 def test_tafel_portfolio_ist_weg(geraete):
     """B4: Die Portfolio-Tafel verlässt die Geräteseite GANZ — Container,
     Abschnitte und Macros. Ein leer stehender Tab-Body wäre die nächste
-    tote Tafel."""
+    tote Tafel. Die ABSCHNITTE selbst bleiben (seit E3 Schritt 3 als
+    zugeklappte Sektionen im Radar-Reiter, siehe den Test darunter) - weg
+    ist die tote Tafel, nicht der Inhalt."""
     assert geraete.select_one("#tafel-portfolio") is None
-    text = geraete.get_text(" ", strip=True)
-    assert "Wie lange ein Gerät im Markt lebt" not in text
-    assert "Was diese Woche auffällt" not in text
+    assert geraete.select_one(".gr-reiter [data-tafel='tafel-portfolio']") \
+        is None, "ein fünfter Reiter-Knopf auf die tote Portfolio-Tafel"
+    # Die Portfolio-Sektionen stehen IM Radar-Reiter, nirgendwo sonst.
+    for anker in ("#lifecycle", "#wr-bewegungen"):
+        treffer = geraete.select(anker)
+        assert len(treffer) == 1, f"{anker} steht {len(treffer)}x da"
+        assert any(el.get("id") == "tafel-radar" for el in
+                   treffer[0].parents), f"{anker} außerhalb des Radar-Reiters"
 
 
 def test_die_portfolio_abschnitte_stehen_auf_dem_radar(radar):
@@ -162,29 +175,37 @@ def test_was_diese_woche_auffaellt_steht_auf_dem_radar(radar):
 # --------------------------------------------------------------------------
 
 def test_je_radar_gruppe_ein_querlink_mit_deep_link(radar, geraete):
-    """B5: Jeder Geräteblock des Radars verlinkt auf DIESELBE Modell-ID,
-    die der Selektor der Geräteseite trägt — sonst landet der Deep-Link auf
-    dem Vorgabegerät und zeigt ein anderes Gerät, als der Link verspricht.
-    Die Gegenprobe ist Teil des Tests (CLAUDE.md §6: ein Lookup, der nichts
-    trifft, ist grün und prüft nichts)."""
+    """B5, E3-Fassung: Jede Modell-Zeile der Abweichungsliste verlinkt auf
+    DIESELBE Modell-ID, die der Selektor der Geräteseite trägt — sonst
+    landet der Deep-Link auf dem Vorgabegerät und zeigt ein anderes Gerät,
+    als der Link verspricht. (Bis E3 Schritt 3 hingen die Links an den
+    `.wr-gruppe`-Blöcken der Schwesterseite; seit S2 ist die Modell-Liste
+    mit ihren Zeilen der Ort.) Die Gegenprobe ist Teil des Tests
+    (CLAUDE.md §6: ein Lookup, der nichts trifft, ist grün und prüft
+    nichts)."""
     # E2: der Selektor ist das Suchfeld; wählbar ist, was der Zeitreihen-
     # Knoten als erlaubt traegt (derselben Quelle, aus der app.js waehlt).
     ids_selektor = set(json.loads(
         geraete.select_one("#gr-zeitreihe-daten").get_text())["erlaubt"])
-    links = radar.select("a[href^='geraete.html?modell=']")
-    assert links, "kein Querlink auf dem Radar"
-    assert "Dieses Gerät im Vergleich" in links[0].get_text(strip=True)
+    links = radar.select(
+        "#wr-abweichung a.gr-sprung[href^='geraete.html?modell=']")
+    assert links, "kein Sprung-Link in der Modell-Liste des Radars"
+    assert "im Graph ansehen" in links[0].get_text(strip=True)
+    # Das Band (&band=klein) gehört zum Link, nicht zur Modell-ID - vor dem
+    # Vergleich gegen den Selektor abgeschnitten, sonst träfe der Lookup
+    # nie zu und wäre grün, ohne etwas zu prüfen.
     fehlende = [a.get("href") for a in links
-                if (a.get("href").split("modell=", 1)[-1] not in ids_selektor)]
+                if a.get("href").split("modell=", 1)[-1].split("&", 1)[0]
+                not in ids_selektor]
     assert not fehlende, \
         f"Querlinks auf Modell-IDs außerhalb des Selektors: {fehlende[:5]}"
-    # Die Gruppen des Radars kommen aus denselben Modellen — jede sichtbare
-    # Gruppe trägt ihren Link (im Aufklapper der Restgruppen darf er fehlen).
-    gruppen = radar.select(".wr-gruppe")
-    mit_link = radar.select(
-        ".wr-gruppe a[href^='geraete.html?modell=']")
-    assert len(mit_link) >= min(len(gruppen), 1), \
-        f"{len(mit_link)} Querlinks für {len(gruppen)} Gruppen"
+    # JEDE Modell-Zeile trägt ihren Sprung - sichtbare wie die hinter dem
+    # Aufklapper (alle stehen im DOM, der Deckel kappt nur die Ansicht).
+    zeilen = radar.select("#wr-abweichung tr.gr-a-zeile[data-auf]")
+    assert zeilen, "keine Modell-Zeile im Radar - der Test prüft nichts"
+    ohne = [z.get("data-auf") for z in zeilen
+            if z.select_one("a.gr-sprung") is None]
+    assert not ohne, f"{len(ohne)} Modell-Zeilen ohne Sprung in den Graphen"
 
 
 # --------------------------------------------------------------------------
@@ -195,7 +216,7 @@ def test_tarife_ist_vom_radar_verlinkt(radar):
     """B6: die Tarifübersicht ist die Quelle der Bänder und Tarifbindungen
     — vom Radar (der in Bändern vergleicht) gehört ein Weg dorthin."""
     assert radar.select_one("a[href$='tarife.html']") is not None, \
-        "wettbewerbsradar.html verlinkt die Tarifübersicht nicht"
+        "der Radar-Reiter verlinkt die Tarifübersicht nicht"
 
 
 def test_tarife_bleibt_von_der_geraeteseite_verlinkt(geraete):

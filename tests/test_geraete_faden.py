@@ -198,9 +198,19 @@ def test_die_reiterleiste_traegt_vergleich_radar_verlauf_katalog(tmp_path):
 
 
 def test_die_portfolio_tafel_ist_weg(tmp_path):
-    """O3 (§5.2): die Portfolio-Tafel ist GANZ weg - Container und
-    Abschnitte stehen auf dem Wettbewerbs-Radar. Eine leer stehende
-    Tafel wäre die nächste Waise."""
+    """O3 (§5.2): die Portfolio-Tafel ist GANZ weg - ein leer stehender
+    Tab-Body wäre die nächste Waise. Die Abschnitte selbst leben weiter:
+    seit E3 Schritt 3 (17.09.2026) als zugeklappte Sektionen im Radar-
+    Reiter DIESER Seite (bis dahin auf der Schwesterseite, die seitdem
+    eine Weiterleitung ist) - geprüft wird die TAFEL, nicht der Inhalt."""
     s = _baue(tmp_path)
     assert s.select_one("#tafel-portfolio") is None
-    assert "Wie lange ein Gerät im Markt lebt" not in s.get_text()
+    assert s.select_one(".gr-reiter [data-tafel='tafel-portfolio']") is None
+    radar = s.select_one("#tafel-radar")
+    assert radar is not None, "#tafel-radar fehlt - der Test prüft nichts"
+    lifecycle = radar.select_one("#lifecycle")
+    if lifecycle is not None:
+        # Die Fixture kann einen Leerzustand rendern (kein Lifecycle-Satz);
+        # steht die Sektion, steht sie IM Radar-Reiter und zugeklappt.
+        details = lifecycle.select_one("details.gr-auf")
+        assert details is not None and not details.get("open")

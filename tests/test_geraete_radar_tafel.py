@@ -399,20 +399,32 @@ def test_die_alarmsektion_steht_im_radar_reiter(tmp_path):
         "Alarmzeilen stehen in der Vergleichsansicht"
 
 
-def test_die_alarmtabelle_ist_dieselbe_wie_auf_der_schwesterseite(tmp_path):
-    """Die Tabelle im Radar-Reiter ist keine zweite Kopie mit eigenem Leben:
-    beide Seiten rendern sie aus der geteilten Teilvorlage. Gemessen am
-    Zeichenbestand der ersten Zeile (die Fixture hat genau eine)."""
+def test_die_alt_url_ist_weiterleitung_und_der_lifecycle_ist_mitgezogen(tmp_path):
+    """E3 Schritt 3: die Schwesterseite wettbewerbsradar.html ist eine
+    Meta-Refresh-Weiterleitung auf #tafel-radar (Musterdatei im Entwurfs-
+    ordner). Der Vergleichstest gegen ihre Alarmtabelle ist damit gegen-
+    standslos - es gibt sie nicht mehr. Was er sicherte (EINE Quelle, kein
+    zweites Leben), sichert jetzt die Struktur: die Alt-URL trägt keine
+    Tabelle, und die Lifecycle-Sektion, die bis zur Abschaltung NUR dort
+    stand, ist MITGEZOGEN - zugeklappt im Radar-Reiter (Bauform des
+    genehmigten Prototyps), nicht gelöscht."""
     seiten = _seite(tmp_path)
-    import re
-    zeilen = []
-    for name in ("geraete.html", "wettbewerbsradar.html"):
-        fund = re.findall(
-            r'<tr class="gr-a-zeile"[^>]*data-auf="auf-1".*?</tr>',
-            seiten[name], re.S)
-        assert len(fund) == 1, (name, len(fund))
-        zeilen.append(fund[0])
-    assert zeilen[0].split("data-s-")[0] == zeilen[1].split("data-s-")[0]
+    alt = BeautifulSoup(seiten["wettbewerbsradar.html"], "html.parser")
+    assert alt.select_one('meta[http-equiv="refresh"]') is not None, \
+        "die Alt-URL ist keine Weiterleitung"
+    assert alt.select_one(".gr-a-zeile") is None, \
+        "die Alt-URL trägt noch Alarmzeilen"
+    geraete = BeautifulSoup(seiten["geraete.html"], "html.parser")
+    tafel = geraete.select_one("#tafel-radar")
+    lifecycle = tafel.select_one("#lifecycle")
+    assert lifecycle is not None, \
+        "die Lifecycle-Sektion fehlt im Radar-Reiter (Inhaltsverlust)"
+    details = lifecycle.select_one("details.gr-auf")
+    assert details is not None and "Wie lange ein Gerät im Markt lebt" \
+        in _text(details.select_one("summary")), \
+        "der Lifecycle ist kein zugeklappter Aufklapper (Prototyp-Bauform)"
+    assert not details.get("open", False), \
+        "der Lifecycle-Aufklapper steht offen und frisst das 11b-Budget"
 
 
 # --------------------------------------------------------------------------
