@@ -76,7 +76,7 @@
 {% from "_geraete_radar.html.j2" import radar_tafel with context %}
 
 {% block content %}
-<section class="page-hero wide">
+<section class="page-hero wide gr-hero-export">
   <div class="page-hero-row">
     <div>
       <p class="page-kicker">Deutschland · Geräte</p>
@@ -104,8 +104,22 @@
        Bündel-TCO-Export kommt hinzu; jede Datei genau ein Mal. Der
        Radar-Export steht seit E3 Schritt 3 (17.09.2026) ebenfalls HIER:
        seine Schwesterseite ist eine Weiterleitung, ihr Hero-Knopf hätte
-       kein Ziel mehr - die EINE Seite führt jetzt alle vier Dateien. #}
-    {% if geraete.export and geraete.export.aktuell.zeilen %}
+       kein Ziel mehr - die EINE Seite führt jetzt alle vier Dateien.
+
+       E5 (17.09.2026): die Reihe ist AUCH AUF DEM TELEFON sichtbar und
+       benutzbar - bis hierhin war sie unter 900 px weggeblendet (O4,
+       Falz-Begründung). Das Datum rückt dafür in die Kicker-Zeile
+       (Zeitungs-Datumszeile, siehe style.css @gr-hero-export), und die
+       Export-Reihe übernimmt den vertikalen Slot, den das Datum freigibt
+       - der Antwort-Satz der Zeitreihe bleibt über der Falz (Kriterium
+       11c), und die vier Knöpfe rollen in EINER Zeile waagerecht statt
+       vier Zeilen hoch zu stapeln.
+
+       Das Gatter fragt die DATEI ab, nicht die Zeilenzahl: auch ein
+       leerer Bestand nennt seine Null neben dem Link (Modulkopf
+       geraete_export: ein fehlender Download wäre die schlechtere
+       Auskunft als ein leerer). #}
+    {% if geraete.export and geraete.export.aktuell.datei %}
     <span class="gr-export-knoepfe">
       <a class="gr-knopf" href="{{ geraete.export.aktuell.datei }}" download
         >Alle exportieren ({{ geraete.export.aktuell.zeilen }} Zeilen)</a>
@@ -113,10 +127,8 @@
         >Preishistorie ({{ geraete.export.historie.zeilen }})</a>
       <a class="gr-knopf" href="{{ geraete.export.tco.datei }}" download
         >Bündel-TCO ({{ geraete.export.tco.zeilen }})</a>
-      {% if geraete.export.radar and geraete.export.radar.zeilen %}
       <a class="gr-knopf" href="{{ geraete.export.radar.datei }}" download
         >Radar ({{ geraete.export.radar.zeilen }})</a>
-      {% endif %}
     </span>
     {% endif %}
   </div>

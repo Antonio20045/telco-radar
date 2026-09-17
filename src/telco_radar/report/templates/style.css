@@ -2093,16 +2093,44 @@ b,strong{font-weight:700}
    neben dem Datum stehen statt es zu verdraengen; mobil umbricht die
    Zeile ohnehin (flex-wrap). */
 .page-hero-row .gr-export-knoepfe{flex:none;max-width:100%}
-/* AUF DEM TELEFON IST DIE GANZE KNOPFREIHE weggeblendet (O4, 15.09.2026) -
-   derselbe Praezedenz wie O3, das den UNTERTITEL komplett wegblendet: die
-   drei Knoepfe brauchen gewrappt 77 px, die erste Balkenzeile der
-   Leitzahl endete am echten Bestand bei 810 von 844 px Falz - mit
-   Knöpfen 887. Kriterium 11c (Leitantwort ueber der Falz) geht vor die
-   Platzierung des Entwurfs, der eine Desktop-Kopfzeile zeichnet. Der
-   CSV-Download ist ohnehin ein Excel-Workflow des Schreibtischs; die
-   Dateien bleiben unter ihrer URL erreichbar. */
+/* AUF DEM TELEFON TAUSCHEN DATUM UND EXPORT-ZEILE IHRE PLÄTZE (E5,
+   17.09.2026). Bis hierhin war die Knopfreihe unter 900 px KOMPLETT
+   weggeblendet (O4: gewrappt 77 px, die Leitzahl endete bei 810 von
+   844 px Falz). E5 (Strategie §7: "auch mobil; der Export ist Antonios
+   Werkzeug") löst den Konflikt anders: das Datum rückt neben den Kicker
+   (beides sind 10,5-px-Etiketten - zusammen eine Zeitungs-Datumszeile),
+   und die Export-Reihe übernimmt den vertikalen Slot, den das Datum
+   dabei freigibt. Gemessen am echten Bestand: der Kopf wächst um 3 px
+   statt um 43, der Antwort-Satz bleibt bei ~796 px (Falz 844,
+   Kriterium 11c). Die vier Knöpfe rollen in EINER waagerechten Zeile
+   (overflow-x), statt vier Zeilen hoch zu stapeln - dieselbe Roll-Regel
+   wie .gr-scroll für Tabellen.
+
+   display:contents hebt den Text-Block (Kicker + h1) auf, damit Kicker
+   und Datum ZWEI SPALTEN EINER GRID-ZEILE werden können, ohne die
+   Desktop-Vorlage zu ändern (die bleibt Flex, Datum rechts unten am
+   Grund). Gescoped auf .gr-hero-export - kein anderer Hero dieser Seite
+   trägt Export-Knöpfe. */
 @media (max-width:900px){
-  .page-hero-row .gr-export-knoepfe{display:none}
+  .gr-hero-export .page-hero-row{display:grid;
+    grid-template-columns:minmax(0,1fr) auto;column-gap:12px;row-gap:0;
+    align-items:baseline}
+  .gr-hero-export .page-hero-row>div:first-child{display:contents}
+  .gr-hero-export .page-kicker{grid-column:1;grid-row:1;min-width:0}
+  .gr-hero-export .page-date{grid-column:2;grid-row:1;justify-self:end;
+    padding-bottom:0}
+  .gr-hero-export h1{grid-column:1/-1;grid-row:2}
+  .gr-hero-export .gr-export-knoepfe{grid-column:1/-1;grid-row:3;
+    display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;
+    -webkit-overflow-scrolling:touch;margin-top:8px;
+    padding-bottom:2px;scrollbar-width:thin}
+  .gr-hero-export .gr-export-knoepfe .gr-knopf{white-space:nowrap;
+    flex:none}
+  /* Die Reiterleiste rückt 12 px nach (26 -> 14): der Platz dafür kommt
+     aus dem Slot, den das Datum geräumt hat - ohne diese Zeile endete der
+     Graphkopf der Zeitreihe bei 851 von 844 px Falz (11c, am echten
+     Bestand gemessen). Nur auf dem Telefon; der Desktop-Abstand bleibt. */
+  .gr-reiter{margin-top:14px}
 }
 
 /* Die TCO-Tafel ("Was kostet es"). Sie borgt sich die Typografie der
