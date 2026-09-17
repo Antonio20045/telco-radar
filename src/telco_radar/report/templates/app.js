@@ -855,7 +855,10 @@ var TelcoFrage = (function () {
    * auf wettbewerbsradar.html) - ein Hash kann keine andere Seite laden,
    * der Link bleibt deshalb auf der Hauptansicht, ohne Ziel-Tab. */
   var ALT = {'tafel-alarme': 'tafel-tco', 'tco': 'tafel-tco',
-             'katalog': 'tafel-katalog', 'verlauf': 'tafel-verlauf'};
+             'katalog': 'tafel-katalog', 'verlauf': 'tafel-verlauf',
+             /* E3: #radar ist die section im Radar-Reiter - ein Hash-Link
+                dorthin schaltet den Reiter, nicht die Hauptansicht. */
+             'radar': 'tafel-radar'};
   function ausHash() {
     var id = (location.hash || '').replace(/^#/, '');
     if (!id) return;
@@ -1286,6 +1289,28 @@ var TelcoFrage = (function () {
       });
     });
 
+  /* E3/S2: DER SPRUNG AUS DER RADAR-MODELLLISTE in den Graphen dieses
+     Reiters. Der Link trägt den Deep-Link (?modell=…&band=…) und
+     funktioniert auch ohne JavaScript als Seitenaufruf; hier wird er
+     in-page beantwortet: Reiter umschalten (der programmatische Klick auf
+     den vorhandenen Reiter-Knopf löst dessen Handler aus), Modell und
+     Band wählen, zum Graphen scrollen. Ein Modell ohne Zeitreihe
+     (`erlaubt` leer) wird dem Link überlassen - der Reload fällt laut
+     Deep-Link-Regel oben still aufs Startgerät zurück. */
+  document.addEventListener('click', function (ev) {
+    var a = ev.target.closest ? ev.target.closest('a.gr-sprung') : null;
+    if (!a) return;
+    var modell = a.getAttribute('data-modell');
+    if (!modell || !(daten.erlaubt[modell] || []).length) return;
+    ev.preventDefault();
+    var knopf = document.querySelector(
+      '.gr-reiter button[data-tafel="tafel-tco"]');
+    if (knopf) knopf.click();
+    waehle(modell, a.getAttribute('data-band'));
+    var ziel = document.getElementById('gr-zr-gruppe');
+    if (ziel) ziel.scrollIntoView({behavior: 'smooth', block: 'start'});
+  });
+
   /* Die Live-Vorschau: ab 2 Zeichen, hoechstens 8 Treffer, Praefix-Treffer
      auf Titel-Woertern - die Reihenfolge kommt fertig aus Python. */
   function trefferListe(eingabe) {
@@ -1645,6 +1670,15 @@ function grFilterleiste(tafelId, mehrId) {
    zurueck (Guard am Funktionskopf). */
 grFilterleiste('wr-alarme', 'gr-mehr');
 grFilterleiste('tafel-katalog', 'gr-kmehr');
+/* E3/S2: die MODELL-LISTE im Radar-Reiter (#wr-abweichung) - dieselbe
+ * Mechanik (Sortierung nach Rohwert, Deckel, Aufklappzeilen), derselbe
+ * Initialisierer. Auf der Schwesterseite existiert der Container nicht,
+ * der Aufruf kehrt sofort zurueck (Guard am Funktionskopf).
+ *
+ * #wr-alarme steht seit E3 AUCH im Radar-Reiter von geraete.html (neben
+ * der Schwesterseite) - der Aufruf darueber ist unveraendert; die IDs
+ * gr-mehr/gr-wmehr sind je Seite eindeutig (der Katalog nutzt gr-kmehr). */
+grFilterleiste('wr-abweichung', 'gr-wmehr');
 
 /* =========================================================================
    NEWSLETTER-ANMELDUNG

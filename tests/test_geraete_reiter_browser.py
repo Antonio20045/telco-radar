@@ -704,6 +704,16 @@ def test_ein_aktiver_filter_ist_rot_hinterlegt(_seite):
 
 def test_die_suche_grenzt_ein(_seite):
     _radar_frisch(_seite)
+    # E3 (17.09.2026): zuerst "alle anzeigen" - sonst misst der Test den
+    # DECKEL gegen die Treffer, nicht die Suche gegen den Bestand. Mit dem
+    # Alarm-Deckel bei 12 war "vorher" zufaellig groesser als die Treffer-
+    # zahl; seit E3 teilen sich drei Sektionen das Budget EINER Tafel und
+    # der Deckel steht bei 5 - Suche und Deckel lieferten dann gleich viele
+    # sichtbare Zeilen, und der Test pruefte nichts mehr.
+    mehr = _seite.query_selector("#gr-mehr")
+    if mehr:
+        mehr.click()
+        _seite.wait_for_timeout(60)
     vorher = _sichtbare_zeilen(_seite, "#wr-alarme")
     _seite.fill("#wr-alarme [data-filter='suche']", "medimax")
     _seite.wait_for_timeout(60)

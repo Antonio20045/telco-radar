@@ -1,0 +1,246 @@
+{# E3 Schritt 2 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d/S2/S3, 17.09.2026):
+   die Radar-Tafel im Radar-Reiter der EINEN Geräteseite.
+
+   DREI klar getrennte, gleichwertige Sektionen (Antonio: „Man sieht
+   erstmal die Warnungen, Alarme, okay. Dann dahinter Abweichung […]
+   Was ist denn Händler Gerätepreis? Das ist dann ohne Finanzierung
+   oder was. Okay, ist vielleicht auch ganz interessant. Aber das
+   sollte nicht auf so einem komischen unteren Abschnitt ganz unten
+   sein, weil das ist was ganz anderes."):
+
+     1. PREIS-ALARME   – Barpreis ohne Vertrag, vier Warnstufen
+     2. ABWEICHUNG     – DIE MODELL-LISTE (S2): je Modell die stärkste
+                         TCO-24-Abweichung zu Vodafone, alle Zeilen,
+                         sortierbar, mit Sprung in den Graphen
+     3. HÄNDLER        – Gerätepreis ohne Finanzierung als eigener,
+                         gleichwertiger Abschnitt
+
+   Jede Sektion erklärt in EINEM Satz ihre Frage (S3: „keine Sektion
+   ohne erkennbaren Zweck"). Der Sortiments-Aufklapper steht NICHT hier
+   - er wohnt im Gerätekatalog-Reiter (Komplementäraussage zu dessen
+   Tabelle, §4.6). Portfolio-Abschnitte bleiben auf der Schwesterseite,
+   bis E5 über deren Schicksal entscheidet.
+
+   Die Daten sind der `wettbewerbsradar`-Kontext - EINE Berechnung
+   (`radar()`), zwei Vorlagen. Die Alarmtabelle kommt aus der geteilten
+   Teilvorlage `_geraete_alarme.html.j2` ( dieselbe Tabelle wie auf der
+   Schwesterseite, kein Drift). #}
+{% from "_geraete_alarme.html.j2" import alarmtafel %}
+
+{# ==========================================================================
+   SEKTION 2: die Modell-Liste. EINE Hauptzeile je Modell (S2: „die ganzen
+   Modelle irgendwo aufgelistet") - die Zeile trägt die STÄRKSTE Abweichung
+   der Gruppe (negativste Prozentzahl zuerst, die Leseentscheidung des
+   Modulkopfs von `wettbewerbsradar.py`); der Klick auf die Zeile öffnet
+   ALLE Anbieter der Gruppe in der Detailzeile (B.2.5: Telekom und 1&1
+   stehen immer da, auch ohne Zahl). #}
+{% macro modellzeile(z, nr, rest=False) %}
+  {# Dieselbe Zeilenmechanik wie die Alarmtabelle: Sortierrohwerte als
+     data-s-* an der ZEILE (CLAUDE.md: "1.099,90 €" ist als Zeichenkette
+     kleiner als "199,00 €"), Aufklappzeile als Partner über data-auf.
+     Der Container-ID-Kontext ist #wr-abweichung - `grFilterleiste`
+     arbeitet je Container, und `.gr-a-zeile` ist auf dieser Seite
+     mehrdeutig (Katalog- UND Radar-Zeilen): Selektoren im JS stehen
+     deshalb IMMER im Kontext ihrer Tafel. #}
+  <tr class="gr-a-zeile{% if rest %} gr-a-rest{% endif %}" data-auf="mw-{{ nr }}"
+      data-s-geraet="{{ z.titel }} {{ z.speicher or '' }}"
+      data-s-anbieter="{{ z.anbieter }}"
+      data-s-prozent="{{ z.prozent if z.prozent is not none else '' }}"
+      data-s-gesamt="{{ z.gesamt if z.gesamt is not none else '' }}"
+      data-s-vf="{{ z.vf_gesamt if z.vf_gesamt is not none else '' }}"
+      data-s-abgerufen="{{ z.abgerufen_am }}" tabindex="0">
+    <td><span class="gr-a-modell">{{ z.titel }}</span>
+      {% if z.speicher_klein %}<span class="gr-a-klein">{{ z.speicher_klein }}</span>{% endif %}</td>
+    <td class="num">{% if z.prozent is not none %}
+      <span class="gr-a-prozent wr-prozent{{ ' wr-prozent--negativ' if z.prozent < 0 else ' wr-prozent--positiv' }}">{{ z.prozent_text }} %</span>
+      <span class="gr-a-euro">{{ z.euro_text }} €</span>
+      {% else %}<span class="gr-a-klein">{{ z.luecke }}</span>{% endif %}</td>
+    <td>{% if z.anbieter %}{{ z.anbieter }}
+      {% if z.tarif %}<span class="gr-a-klein">{{ z.tarif }}</span>{% endif %}
+      {% if z.band_label %}<span class="gr-a-klein">Band {{ z.band_label }}</span>{% endif %}
+      {% else %}–{% endif %}</td>
+    <td class="num">{% if z.gesamt is not none %}{{ z.gesamt | euro }}{% else %}–{% endif %}</td>
+    <td class="num">{% if z.vf_gesamt is not none %}{{ z.vf_gesamt | euro }}{% else %}–{% endif %}</td>
+    <td>{% if z.quelle_url %}<a class="gr-a-quelle" href="{{ z.quelle_url }}"
+        rel="noopener">{{ z.quelle_url | domain }}<span class="gr-a-pfeil"
+        aria-hidden="true">↗</span></a>{% if z.abgerufen_am %} <span
+        class="gr-a-klein gr-a-datum">{{ z.abgerufen_am | date_de }}</span>{%
+        endif %}{% else %}–{% endif %}</td>
+    {# Der Sprung in den Graphen des Vergleichs-Reiters. href trägt den
+       Deep-Link (?modell=…&band=…) und funktioniert damit auch ohne
+       JavaScript als Seitenaufruf; app.js fängt den Klick ab und springt
+       in-page (Reiter umschalten, Modell und Band wählen, zum Graphen
+       scrollen). Ohne vergleichbares Paar bleibt das Band weg - der Graph
+       wählt selbst sein erstes erlaubtes Band. #}
+    <td><a class="gr-sprung" href="geraete.html?modell={{ z.id }}{% if z.sprung_band %}&amp;band={{ z.sprung_band }}{% endif %}"
+           data-modell="{{ z.id }}"{% if z.sprung_band %} data-band="{{ z.sprung_band }}"{% endif %}
+           >im Graph ansehen&nbsp;→</a></td>
+  </tr>
+  <tr class="gr-a-auf{% if rest %} gr-a-rest{% endif %}" id="mw-{{ nr }}"><td colspan="7">
+    {# Die Detailzeile: die GANZE Gruppe - Vodafone-Basis und jede
+       Anbieter-Zeile aus `netzbetreiber_gruppen`, nichts weggedeckelt. #}
+    {% if z.vodafone %}
+    <p class="wr-basis">Vodafone-Basis: <b>{{ z.vodafone.gesamt | euro }}</b> TCO-24
+      ({{ z.vodafone.tarif }}, Band {{ z.vodafone.band_label }}{% if z.vodafone.naeherung %}, gerechnete Näherung{% endif %})</p>
+    {% else %}
+    <p class="wr-basis wr-basis--leer">{{ z.vodafone_grund }}</p>
+    {% endif %}
+    <div class="gr-scroll">
+    <table class="src-table wr-tabelle">
+      <thead><tr><th>Anbieter</th><th>Tarif</th><th class="num">TCO-24</th>
+        <th>Band</th><th class="num">Abweichung</th><th>Beleg</th></tr></thead>
+      <tbody>
+        {% for s in z.gruppe_zeilen %}
+        <tr class="wr-status--{{ s.status }}">
+          <td>{{ s.anbieter }}</td>
+          <td class="wr-tarif">{% if s.tarif %}{{ s.tarif }}{% else %}–{% endif %}</td>
+          <td class="num">{% if s.gesamt is not none %}{{ s.gesamt | euro }}{% else %}–{% endif %}</td>
+          <td>{{ s.band_label or '–' }}{% if s.status == 'vergleichbar' and s.vf_gesamt is not none %} · VF {{ s.vf_gesamt | euro }}{% endif %}</td>
+          <td class="num wr-prozent{% if s.prozent is not none %}{{ ' wr-prozent--negativ' if s.prozent < 0 else ' wr-prozent--positiv' }}{% endif %}">
+            {%- if s.prozent is not none -%}{{ '%+.1f'|format(s.prozent)|replace('.', ',') }} %
+            {%- elif s.grund %}<span class="wr-grund">{{ s.grund }}</span>
+            {%- else -%}–{%- endif -%}</td>
+          <td class="wr-beleg">{% if s.quelle_url %}<a href="{{ s.quelle_url }}"
+            rel="noopener">{{ s.quelle_url | domain }}</a>{% if s.abgerufen_am %} · {{ s.abgerufen_am }}{% endif %}
+            {% else %}–{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+  </td></tr>
+{% endmacro %}
+
+{% macro radar_tafel(wr) %}
+
+{# --- SEKTION 1: Preis-Alarme (Barpreis ohne Vertrag) ------------------- #}
+{% if wr.alarme.hat_daten or wr.alarme.kacheln %}
+<section class="wr-sektion gr-r-sektion" id="wr-alarme">
+  <h3 class="gr-unter">Preis-Alarme – Barpreis ohne Vertrag</h3>
+  <p class="gr-erklaer">Bei diesen Geräten liegt ein Wettbewerber im
+  Gerätepreis unter Vodafone – mit Abstand in Prozent und Euro, dem
+  günstigsten Anbieter mit Namen und dem Beleg dazu. Vier Stufen sortieren
+  die Meldungen.</p>
+  <ul class="gr-chips" aria-label="Preis-Alarme">
+    {% for k in wr.alarme.kacheln %}
+    <li class="gr-chip gr-chip--{{ k.schluessel }}"><b>{{ k.zahl }}</b>
+      <span>{{ k.name }}</span> <em>{{ k.schwelle }}</em></li>
+    {% endfor %}
+  </ul>
+  {{ alarmtafel(wr.alarme) }}
+</section>
+{% endif %}
+
+{# --- SEKTION 2: alle Modelle nach Abweichung (DIE Modell-Liste, S2) ----- #}
+{% if wr.hat_daten %}
+<section class="wr-sektion gr-r-sektion" id="wr-abweichung">
+  <h3 class="gr-unter">Alle Modelle nach Abweichung zu Vodafone</h3>
+  <p class="gr-erklaer">Gesamtkosten über 24 Monate (TCO-24): jede Zeile
+  ein Modell, gerechnet gegen Vodafone im selben Tarifband (Klein/Mittel/
+  Groß nach Datenvolumen). Oben stehen die Geräte, bei denen Vodafone am
+  stärksten zurückliegt; ein Klick auf eine Zeile zeigt alle Anbieter des
+  Modells. Welche Datenvolumen in welches Band fallen, steht in der
+  <a href="{{ prefix }}tarife.html">Tarifübersicht</a>.</p>
+  {% set ml = wr.modelliste %}
+  {% if ml.zeilen %}
+  <div class="gr-alarm-scroll">
+  <table class="gr-alarm wr-modelliste">
+    <thead><tr>
+      <th scope="col"><button type="button" class="gr-sort" data-sort="geraet"
+        data-art="text">Modell</button></th>
+      <th scope="col" class="num"><button type="button" class="gr-sort"
+        data-sort="prozent" data-art="zahl" data-vor="auf"
+        aria-sort="ascending">Abweichung</button></th>
+      <th scope="col"><button type="button" class="gr-sort"
+        data-sort="anbieter" data-art="text">Wettbewerber</button></th>
+      <th scope="col" class="num"><button type="button" class="gr-sort"
+        data-sort="gesamt" data-art="zahl">TCO-24</button></th>
+      <th scope="col" class="num"><button type="button" class="gr-sort"
+        data-sort="vf" data-art="zahl">Vodafone</button></th>
+      <th scope="col"><button type="button" class="gr-sort"
+        data-sort="abgerufen" data-art="text">Beleg</button></th>
+      <th scope="col"><span class="gr-s-th">Graph</span></th>
+    </tr></thead>
+    <tbody>
+      {% for z in ml.sichtbar %}{{ modellzeile(z, loop.index) }}{% endfor %}
+      {% for z in ml.rest %}{{ modellzeile(z, 'r' ~ loop.index, True) }}{% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% if ml.rest %}
+  <p class="gr-erklaer"><button type="button" class="gr-knopf" id="gr-wmehr"
+    >alle {{ ml.gesamt }} anzeigen</button></p>
+  {% endif %}
+  {% else %}
+  <p class="gr-erklaer">Noch keine Modelle mit Bündeldaten erhoben – die
+  Liste füllt sich mit dem nächsten Lauf.</p>
+  {% endif %}
+</section>
+{% endif %}
+
+{# --- SEKTION 3: Händler – Gerätepreis ohne Finanzierung -----------------
+   S3: ein EIGENER, gleichwertiger Abschnitt. Bis E3 standen diese Zeilen
+   auf der Schwesterseite unter den Portfolio-Listen - „auf so einem
+   komischen unteren Abschnitt ganz unten" (Antonio). Hier ist die
+   Sektion die dritte von dreien, mit demselben Kopf wie die beiden
+   anderen. #}
+<section class="wr-sektion gr-r-sektion" id="wr-haendler">
+  <h3 class="gr-unter">Händler – Gerätepreis ohne Finanzierung</h3>
+  <p class="gr-erklaer">Fachhändler verkaufen ohne eigenen Tarif – hier
+  zählt der reine Barpreis ohne Vertrag und ohne Tarif gegen Vodafones
+  Gerätepreis, dieselbe %-Formel wie bei den Netzbetreibern, aber nie
+  gegen eine TCO gerechnet. Welche Händler Preise liefern, steht in der
+  Tabelle; welche warum nicht, im Aufklapper darunter.</p>
+  {% if wr.haendler %}
+  <div class="gr-scroll">
+  <table class="src-table wr-tabelle">
+    <thead><tr><th>Gerät</th><th>Händler</th><th class="num">Vodafone</th>
+      <th class="num">Händler</th><th class="num">Abweichung</th><th>Beleg</th></tr></thead>
+    <tbody>
+      {% macro wr_haendler_zeile(h) %}
+      <tr class="wr-zeile">
+        <td>{{ h.hersteller }} {{ h.modell }}{% if h.speicher %} · {{ h.speicher }} GB{% endif %}</td>
+        <td>{{ h.anbieter }}</td>
+        <td class="num">{{ h.vodafone_preis | euro }}</td>
+        <td class="num">{{ h.preis | euro }}</td>
+        <td class="num wr-prozent{{ ' wr-prozent--negativ' if h.prozent < 0 else ' wr-prozent--positiv' }}">{{ '%+.1f'|format(h.prozent)|replace('.', ',') }} %</td>
+        <td class="wr-beleg">{% if h.url %}<a href="{{ h.url }}" rel="noopener">{{ h.url | domain }}</a>{% if h.abgerufen_am %} · {{ h.abgerufen_am }}{% endif %}{% else %}–{% endif %}</td>
+      </tr>
+      {% endmacro %}
+      {% for h in wr.haendler_sichtbar %}{{ wr_haendler_zeile(h) }}{% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% if wr.haendler_rest %}
+  <details class="gr-auf">
+    <summary>Alle {{ wr.haendler | length }} Händler-Zeilen anzeigen</summary>
+    <div class="gr-scroll">
+    <table class="src-table wr-tabelle">
+      <tbody>{% for h in wr.haendler_rest %}{{ wr_haendler_zeile(h) }}{% endfor %}</tbody>
+    </table>
+    </div>
+  </details>
+  {% endif %}
+  {% else %}
+  <p class="gr-erklaer">Zu keinem Gerät liegt bei Vodafone UND einem Händler
+  gleichzeitig ein belegter Gerätepreis vor.</p>
+  {% endif %}
+  {# Die Händler, die strukturell nichts liefern, gehören zu DIESEM
+     Abschnitt (nicht „ganz unten" als eigene Sektion): sie sind Teil des
+     Händler-Vergleichskreises - benannt, nie stillschweigend weggelassen. #}
+  {% if wr.nicht_erhebbar %}
+  <details class="gr-auf">
+    <summary>Welche Händler keine Daten liefern ({{ wr.nicht_erhebbar | length }})</summary>
+    <table class="src-table">
+      <thead><tr><th>Anbieter</th><th>Warum</th></tr></thead>
+      <tbody>
+        {% for a in wr.nicht_erhebbar %}
+        <tr><td>{{ a.anbieter }}</td><td>{{ a.grund }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </details>
+  {% endif %}
+</section>
+
+{% endmacro %}

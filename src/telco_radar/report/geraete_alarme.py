@@ -53,17 +53,15 @@ MITTEL_AB = 3.0
 # zusaetzliche Zeilen kippten den Abnahmetest, ohne dass sich eine Zeile Code
 # aendert.
 #
-# Die 12 sind GERECHNET, nicht gegriffen, und zwar am 30.08.2026 im echten
-# Chromium: eine Zeile misst 68 px, der Reiter ohne Tabelle 2102 px, das
-# Budget des Auftrags liegt bei 3000 px auf 1440 px Breite. Damit bleiben
-# 898 px fuer die Tabelle, also 13 Zeilen - eine weniger als Reserve, weil
-# ein laengerer Modellname eine Zeile zweizeilig macht.
-#
-# Der Auftrag nennt "hoechstens 15 Zeilen sichtbar". Mit 15 mass der Reiter
-# 3154 px und riss damit die andere Vorgabe desselben Auftrags. Von zwei
-# Zahlen desselben Absatzes gewinnt die, die der Leser merkt: drei
-# Bildschirme.
-SICHTBAR_MAX = 12
+# Bis zum 17.09.2026 stand sie auf 12 - gerechnet fuer eine Tafel, die die
+# Alarmtabelle ALLEINE trug (68 px je Zeile, 3000-px-Budget des Auftrags).
+# Seit E3 Schritt 2 steht die Tabelle als ERSTE von DREI Sektionen im
+# Radar-Reiter der EINEN Geräteseite (Alarme / Modell-Liste / Händler);
+# alle drei teilen sich dasselbe Budget EINER Tafel, und Kriterium 11b misst
+# die GANZE Seite. Am echten Bestand gemessen (17.09.2026): die Seite mass
+# mit 6 sichtbaren Zeilen 3216 px - mit 5 bleibt sie unter 3000 px. Der
+# Rest steht hinter dem Knopf "alle N anzeigen", nichts geht verloren.
+SICHTBAR_MAX = 5
 
 # Reihenfolge, Beschriftung und Farbe der vier Stufen. Die Farben stehen als
 # CSS-Variablen im Stylesheet; hier steht nur ihr Name, damit Kachel und

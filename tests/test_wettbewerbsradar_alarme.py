@@ -173,18 +173,29 @@ def test_jede_alarmzeile_traegt_quelle_und_abrufdatum(tmp_path):
 
 
 def test_die_geraeteseite_traegt_keine_alarmtabelle_mehr(tmp_path):
-    """Der Umzug, nicht die Kopie: auf geraete.html bleibt nichts von der
-    Tabelle - keine Zeile, keine Kacheln, kein Filter. (`.gr-a-zeile` wird
-    auf die VERGLEICHSANSicht geprüft: der Gerätekatalog derselben Seite
-    trägt die Klasse zu Recht - dieselbe Tabellenmechanik.)"""
+    """Der Umzug, nicht die Kopie. Bis O2 (11.09.2026) hieß das: auf
+    geraete.html bleibt NICHTS von der Tabelle. Seit E3 Schritt 2 (S3)
+    steht sie als erste Sektion IM RADAR-REITER derselben Seite - der Test
+    hält jetzt den E3-Zustand: GENAU EINMAL (#tafel-radar), nicht in der
+    Vergleichsansicht, nicht im Katalog. (`.gr-a-zeile` ist auf der Seite
+    mehrdeutig - Katalog- UND Radar-Zeilen tragen sie: geprüft wird je
+    TAFEL, nie die Klasse allein.)"""
     seiten = _seite(tmp_path)
     geraete = _suppe(seiten, "geraete.html")
-    for marker in ("#wr-alarme", ".gr-chips", "#gr-alarme"):
+    assert len(geraete.select("#wr-alarme")) == 1, \
+        "die Alarm-Sektion steht nicht genau einmal auf der Seite"
+    radar = geraete.select_one("#tafel-radar")
+    assert radar is not None and radar.select_one("#wr-alarme") is not None, \
+        "die Alarm-Sektion steht nicht im Radar-Reiter"
+    for marker in ("#gr-alarme",):
         assert geraete.select_one(marker) is None, marker
     tafel = geraete.select_one("#tafel-tco")
     assert tafel is not None
     assert tafel.select_one(".gr-a-zeile") is None, \
         "Alarmzeilen stehen noch in der Vergleichsansicht"
+    katalog = geraete.select_one("#tafel-katalog")
+    assert katalog is not None and katalog.select_one("#wr-alarme") is None, \
+        "die Alarm-Sektion steht im Katalog-Reiter"
 
 
 # --------------------------------------------------------------------------

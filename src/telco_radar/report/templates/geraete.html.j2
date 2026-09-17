@@ -68,6 +68,9 @@
 {% from "_geraete_buendel.html.j2" import buendelzeile, buendelgruppe %}
 {% from "_geraete_zeitreihe.html.j2" import paarblock %}
 {% from "_geraete_g0.html.j2" import g0block %}
+{# E3 Schritt 2: die Radar-Tafel - `with context`, weil das Makro den
+   `prefix` der Seite für den Tarifübersichts-Link braucht. #}
+{% from "_geraete_radar.html.j2" import radar_tafel with context %}
 
 {% block content %}
 <section class="page-hero wide">
@@ -433,35 +436,35 @@
 </div>
 
 {# --- Reiter 2: Radar ---------------------------------------------------
-   E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d/S2/S3): Platzhalter-Gerüst. Die
-   Tafel gehört zu VIER-Reiter-Gerüst derselben Seite; ihr INHALT baut
-   E3 Schritt 2 („Radar-Tafel") aus den Sektionen der bisherigen
-   Schwesterseite wettbewerbsradar.html:
+   E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d/S2/S3): die Tafel trägt die
+   Inhalte der bisherigen Schwesterseite wettbewerbsradar.html, NEU
+   strukturiert nach S3 - drei klar getrennte, gleichwertige Sektionen
+   (Alarme / Abweichung als MODELL-LISTE / Händler als eigener Abschnitt),
+   jede mit einem Satz, was sie misst. Die Struktur steht in der Teil-
+   vorlage `_geraete_radar.html.j2`.
 
-     * Abweichung TCO je Modell - DIE Modell-Liste (S2: klarer Titel
-       „Alle Modelle nach Abweichung zu Vodafone", alle Zeilen,
-       sortierbar, je Modell ein Sprung in die Zeitreihe des Vergleichs-
-       Reiters),
-     * Alarme (Barpreis ohne Vertrag, Warnstufen),
-     * Händler = Gerätepreis ohne Finanzierung als EIGENER, gleich-
-       wertiger Abschnitt (S3), mit je EINEM Satz, was er misst.
+   Der Kopf hier ist die FRAGE DES REITERS (S1: „Jeder Reiter beantwortet
+   EINE klar benannte Frage in seinem Titel + einem Satz"). Bis E3
+   Schritt 2 hieß er „Alle Modelle nach Abweichung zu Vodafone" - das ist
+   der Titel der MODELL-LISTE (S2) und steht jetzt AN deren Sektion; als
+   Tafelkopf hätte er die erste Sektion (Alarme) falsch beschriftet. Die
+   Frage selbst ist die des Modulkopfs von `wettbewerbsradar.py` -
+   dieselbe wie die h1 der Schwesterseite.
 
    Der Sortiments-Aufklapper „Bei Wettbewerbern gelistet, bei Vodafone
    nicht" steht NICHT hier - er wohnt seit E3 im Gerätekatalog (dieselbe
    Sortiments-Frage wie die Tabelle dort; eine zweite Kopie wäre §4.6).
    Der Datenkontext der Tafel heißt `wettbewerbsradar` (dasselbe Dict,
-   das auch die Schwesterseite rendert, von render_site übergeben).
-
-   Der h2 und der Satz darunter sind der BLEIBENDE Kopf der Tafel (S1:
-   jeder Reiter beantwortet EINE Frage in Titel und einem Satz) - der
-   Inhalt montiert UNTER ihnen in #gr-radar-inhalt. #}
+   das auch die Schwesterseite rendert, von render_site übergeben). #}
 <div class="gr-tafel gr-tafel--aus" id="tafel-radar" role="tabpanel">
 <section class="gr-radar" id="radar">
-  <h2 class="rubrik">Alle Modelle nach Abweichung zu Vodafone</h2>
-  <p class="gr-erklaer">Um wie viel jedes Modell über oder unter der
-  Vodafone-Referenz liegt – beim Gerätepreis ohne Vertrag und bei den
-  Gesamtkosten über 24 Monate (TCO-24).</p>
-  <div id="gr-radar-inhalt"></div>
+  <h2 class="rubrik">Bei welchem Gerät ist Vodafone teurer als der Wettbewerb?</h2>
+  <p class="gr-erklaer">Leitzahl ist die Abweichung in Prozent mit
+  Vorzeichen – negativ heißt: ein Wettbewerber ist günstiger. Die drei
+  Sektionen messen sie im Barpreis ohne Vertrag, in den Gesamtkosten
+  über 24 Monate (TCO-24) und im Gerätepreis der Händler ohne
+  Finanzierung.</p>
+  <div id="gr-radar-inhalt">{{ radar_tafel(wettbewerbsradar) }}</div>
 </section>
 </div>
 

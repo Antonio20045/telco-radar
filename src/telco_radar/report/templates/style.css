@@ -3174,6 +3174,24 @@ b,strong{font-weight:700}
 .wr-status--kein_buendel .wr-prozent,
 .wr-status--nicht_vergleichbar .wr-prozent{color:var(--ink-4);font-weight:400;
   font-style:italic}
+/* E3 (17.09.2026): die DREI Sektionen der Radar-Tafel im Radar-Reiter von
+   geraete.html - gleichwertig, jede mit derselben Trennlinie wie die
+   Gruppen der Schwesterseite (S3: der Händler-Abschnitt ist kein "komischer
+   unterer Abschnitt ganz unten", sondern die dritte von dreien). */
+.gr-r-sektion{padding-top:14px;border-top:1px solid var(--rule-2)}
+.gr-r-sektion:first-of-type{padding-top:0;border-top:none}
+/* Drei Sektionen teilen sich das Hoehenbudget EINER Tafel (11b misst die
+   Seite): im Radar-Reiter strafft sich der Sektionsabstand, der ausserhalb
+   desselben unveraendert bleibt. */
+#tafel-radar .wr-sektion{margin-bottom:18px}
+/* Der Sprung je Modell-Zeile in den Graphen des Vergleichs-Reiters -
+   derselbe Etikett-Stil wie der Querlink der Schwesterseite: ein Weg,
+   kein Bedienelement der Tabelle. */
+.gr-sprung{white-space:nowrap;font-family:var(--sans);font-size:12px;
+  color:var(--red);text-decoration:none;
+  border-bottom:1px solid rgba(230,0,0,.3)}
+.gr-sprung:hover{border-bottom-color:var(--red)}
+.gr-s-th{font-family:var(--sans);font-size:12px;letter-spacing:.08em}
 
 
 
