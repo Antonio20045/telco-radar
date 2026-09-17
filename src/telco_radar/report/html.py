@@ -1945,7 +1945,13 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         wettbewerbsradar_view["export"] = geraete["export"]["radar"]
 
     (site_dir / "geraete.html").write_text(
-        env.get_template("geraete.html.j2").render(prefix="", geraete=geraete),
+        # E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d): die Geräteseite ist EINE
+        # Seite mit vier Reitern; der Radar-Reiter und der Sortiments-
+        # Aufklapper des Katalog-Reiters lesen denselben `wettbewerbsradar`-
+        # Kontext wie die Schwesterseite - EINE Berechnung (`radar()`),
+        # zwei Vorlagen, keine zweite Rechnung für dieselbe Zahl.
+        env.get_template("geraete.html.j2").render(
+            prefix="", geraete=geraete, wettbewerbsradar=wettbewerbsradar_view),
         encoding="utf-8")
     # O3 (STRATEGIE_GERAETE_OPTIK §3, 15.09.2026): das Bündel-Fragment -
     # die Zeilen-Gruppe eines jeden NICHT-Vorgabemodells, aus DEMSELBEN
@@ -1986,10 +1992,14 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         env.get_template("geraete_quellen.html.j2").render(
             prefix="", geraete=geraete),
         encoding="utf-8")
-    (site_dir / "wettbewerbsradar.html").write_text(
-        env.get_template("wettbewerbsradar.html.j2").render(
-            prefix="", wettbewerbsradar=wettbewerbsradar_view),
-        encoding="utf-8")
+    # wettbewerbsradar.html wird NICHT mehr als eigene Seite gerendert -
+    # seit E3 Schritt 3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d, 17.09.2026)
+    # ist der Radar der Reiter "Radar" von geraete.html. Der alte
+    # Dateiname entsteht unten als Weiterleitung (Meta-Refresh auf
+    # geraete.html#tafel-radar) - derselbe Block wie fuer bericht.html
+    # & Co., denn er steht in Lesezeichen und Mails an die Fachabteilung.
+    # Die Aufbereitung `radar()` bleibt: der Reiter, der Fußlink und der
+    # Radar-Export lesen denselben Kontext.
 
     # ---- Transparenz: Laufprotokoll UND Quellenbestand auf einer Seite.
     # Beide beantworten dieselbe Frage ("kann ich dem Ding trauen?") und
@@ -2090,11 +2100,16 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # `suche.html` steht nicht mehr darunter: der Name ist seit dem 08.08.2026
     # wieder eine echte Seite - die Dossier-Suche. Ein Lesezeichen darauf
     # landet also dort, wo es immer hinwollte.
+    # `wettbewerbsradar.html` ist seit E3 Schritt 3 (17.09.2026) dabei: Der
+    # Radar ist der Reiter "Radar" der EINEN Geräteseite geworden, der Hash
+    # schaltet ihn (app.js). Die Seite selbst war vom 08.09. bis zum 17.09.
+    # eine eigene Ausgabe.
     for alt, ziel in (("bericht.html", "index.html"),
                       ("archive.html", "meldungen.html#archiv"),
                       ("protokoll.html", "transparenz.html"),
                       ("sources.html", "transparenz.html#bestand"),
-                      ("wettbewerber.html", "wettbewerb.html")):
+                      ("wettbewerber.html", "wettbewerb.html"),
+                      ("wettbewerbsradar.html", "geraete.html#tafel-radar")):
         (site_dir / alt).write_text(_redirect_html(ziel), encoding="utf-8")
 
     log.info("Site rendered: %d report(s) -> %s", len(reports), site_dir)

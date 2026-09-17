@@ -850,12 +850,19 @@ var TelcoFrage = (function () {
    * und `#verlauf`, `#katalog`, `#tco` stehen als Sprungziele in Mails und
    * Lesezeichen. `#tafel-alarme` gibt es nicht mehr - ein solcher Link
    * landet jetzt auf der Hauptansicht statt auf einer Seite, die sich
-   * scheinbar nicht bewegt. Dasselbe gilt seit O3 für `#lifecycle`: die
-   * Portfolio-Tafel ist von der Geräteseite WEG (ihre Abschnitte stehen
-   * auf wettbewerbsradar.html) - ein Hash kann keine andere Seite laden,
-   * der Link bleibt deshalb auf der Hauptansicht, ohne Ziel-Tab. */
+   * scheinbar nicht bewegt.
+   * Seit E3 Schritt 3 (17.09.2026) lebt der ganze Radar IN dieser Seite:
+   * die Alt-URL wettbewerbsradar.html ist eine Weiterleitung auf
+   * #tafel-radar, deshalb schalten ALLE Hash-Ziele des Radars (seine
+   * Sektionen #wr-alarme/#wr-abweichung/#wr-haendler/#wr-bewegungen und
+   * das alte Sprungziel #lifecycle aus der Portfolio-Zeit) den
+   * Radar-Reiter - sonst spränge der Browser zu einem versteckten
+   * Element, ohne dass die Tafel sichtbar würde. */
   var ALT = {'tafel-alarme': 'tafel-tco', 'tco': 'tafel-tco',
-             'katalog': 'tafel-katalog', 'verlauf': 'tafel-verlauf'};
+             'katalog': 'tafel-katalog', 'verlauf': 'tafel-verlauf',
+             'radar': 'tafel-radar', 'lifecycle': 'tafel-radar',
+             'wr-alarme': 'tafel-radar', 'wr-abweichung': 'tafel-radar',
+             'wr-haendler': 'tafel-radar', 'wr-bewegungen': 'tafel-radar'};
   function ausHash() {
     var id = (location.hash || '').replace(/^#/, '');
     if (!id) return;
@@ -923,9 +930,10 @@ var TelcoFrage = (function () {
 
   function element(id) { return document.getElementById(id); }
 
-  /* --- Deep-Link ?modell=&band= (bleibt: die 88 Querlinks des Radars
-     nutzen ?modell=). Eine unbekannte id faellt still aufs Startgeraet
-     zurueck - derselbe Grundsatz wie zuvor. */
+  /* --- Deep-Link ?modell=&band= (bleibt: die 88 Sprung-Links der
+     Abweichungstafel nutzen ?modell=, und Lesezeichen aus der Zeit der
+     eigenen Radar-Seite ebenso). Eine unbekannte id faellt still aufs
+     Startgeraet zurueck - derselbe Grundsatz wie zuvor. */
   try {
     var params = new URLSearchParams(location.search);
     var wunschM = params.get('modell');
@@ -998,23 +1006,21 @@ var TelcoFrage = (function () {
     });
   }
 
-  /* --- Die Buendel-Zeilen und der G0-Block folgen dem Modell (O3/O4,
-     unveraendert): Fragment, Klon des Anfangszustands, eigene Folgen. */
+  /* --- Die Buendel-Zeilen folgen dem Modell (O3, unveraendert): Fragment,
+     Klon des Anfangszustands, eigene Folgen. E3-Fix (QA 17.09.2026): der
+     G0-Block des Verlaufs-Reiters ist gefallen - er zeigte den Barpreis
+     des VERGLEICHS-Reiter-Modells neben der eigenen Auswahl desselben
+     Reiters (Doppel-Darstellung, §4.6/§4.8). */
   var fragmentLager = null;
   var fragmentVersprechen = null;
   var vorgabeGruppe = null;
-  var g0Lager = null;
-  var vorgabeG0 = null;
   var wechselFolge = 0;
-  var g0Folge = 0;
   var zuletztModell = null;
   var vorgabe = daten.vorgabe;
 
   (function () {
     var anfangsGruppe = element('gr-bnd-gruppe');
     if (anfangsGruppe) vorgabeGruppe = anfangsGruppe.cloneNode(true);
-    var anfangsG0 = element('gr-g0-lager');
-    if (anfangsG0) vorgabeG0 = anfangsG0.cloneNode(true);
   })();
 
   function holeFragment() {
@@ -1032,12 +1038,6 @@ var TelcoFrage = (function () {
             doc.querySelectorAll('.gr-bnd-lager[data-modell]'),
             function (l) {
               fragmentLager[l.getAttribute('data-modell')] = l;
-            });
-          g0Lager = {};
-          Array.prototype.forEach.call(
-            doc.querySelectorAll('.gr-g0-lager[data-modell]'),
-            function (l) {
-              g0Lager[l.getAttribute('data-modell')] = l;
             });
           return fragmentLager;
         });
@@ -1097,32 +1097,6 @@ var TelcoFrage = (function () {
     }, function () {
       if (meineFolge !== wechselFolge) return;
       fertig(null, true);
-    });
-  }
-
-  function fuelleG0(knotenB) {
-    var lager = element('gr-g0-lager');
-    if (!lager) return;
-    while (lager.firstChild) lager.removeChild(lager.firstChild);
-    if (knotenB) {
-      var klon = document.importNode(knotenB, true);
-      while (klon.firstChild) lager.appendChild(klon.firstChild);
-    }
-  }
-
-  function setzeG0(mid) {
-    if (!element('gr-g0-lager')) return;
-    if (mid === vorgabe) {
-      fuelleG0(vorgabeG0);
-      return;
-    }
-    var meineFolge = ++g0Folge;
-    holeFragment().then(function () {
-      if (meineFolge !== g0Folge) return;
-      fuelleG0(g0Lager ? g0Lager[mid] : null);
-    }, function () {
-      if (meineFolge !== g0Folge) return;
-      fuelleG0(null);
     });
   }
 
@@ -1260,7 +1234,6 @@ var TelcoFrage = (function () {
     if (zustand.modell !== zuletztModell) {
       zuletztModell = zustand.modell;
       setzeBuendel(zustand.modell, zustand.band);
-      setzeG0(zustand.modell);
     }
     try {
       history.replaceState(null, '',
@@ -1285,6 +1258,28 @@ var TelcoFrage = (function () {
         waehle(k.getAttribute('data-modell'), null);
       });
     });
+
+  /* E3/S2: DER SPRUNG AUS DER RADAR-MODELLLISTE in den Graphen dieses
+     Reiters. Der Link trägt den Deep-Link (?modell=…&band=…) und
+     funktioniert auch ohne JavaScript als Seitenaufruf; hier wird er
+     in-page beantwortet: Reiter umschalten (der programmatische Klick auf
+     den vorhandenen Reiter-Knopf löst dessen Handler aus), Modell und
+     Band wählen, zum Graphen scrollen. Ein Modell ohne Zeitreihe
+     (`erlaubt` leer) wird dem Link überlassen - der Reload fällt laut
+     Deep-Link-Regel oben still aufs Startgerät zurück. */
+  document.addEventListener('click', function (ev) {
+    var a = ev.target.closest ? ev.target.closest('a.gr-sprung') : null;
+    if (!a) return;
+    var modell = a.getAttribute('data-modell');
+    if (!modell || !(daten.erlaubt[modell] || []).length) return;
+    ev.preventDefault();
+    var knopf = document.querySelector(
+      '.gr-reiter button[data-tafel="tafel-tco"]');
+    if (knopf) knopf.click();
+    waehle(modell, a.getAttribute('data-band'));
+    var ziel = document.getElementById('gr-zr-gruppe');
+    if (ziel) ziel.scrollIntoView({behavior: 'smooth', block: 'start'});
+  });
 
   /* Die Live-Vorschau: ab 2 Zeichen, hoechstens 8 Treffer, Praefix-Treffer
      auf Titel-Woertern - die Reihenfolge kommt fertig aus Python. */
@@ -1645,6 +1640,15 @@ function grFilterleiste(tafelId, mehrId) {
    zurueck (Guard am Funktionskopf). */
 grFilterleiste('wr-alarme', 'gr-mehr');
 grFilterleiste('tafel-katalog', 'gr-kmehr');
+/* E3/S2: die MODELL-LISTE im Radar-Reiter (#wr-abweichung) - dieselbe
+ * Mechanik (Sortierung nach Rohwert, Deckel, Aufklappzeilen), derselbe
+ * Initialisierer. Auf der Schwesterseite existiert der Container nicht,
+ * der Aufruf kehrt sofort zurueck (Guard am Funktionskopf).
+ *
+ * #wr-alarme steht seit E3 AUCH im Radar-Reiter von geraete.html (neben
+ * der Schwesterseite) - der Aufruf darueber ist unveraendert; die IDs
+ * gr-mehr/gr-wmehr sind je Seite eindeutig (der Katalog nutzt gr-kmehr). */
+grFilterleiste('wr-abweichung', 'gr-wmehr');
 
 /* =========================================================================
    NEWSLETTER-ANMELDUNG

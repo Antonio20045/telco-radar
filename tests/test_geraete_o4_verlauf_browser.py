@@ -1,16 +1,23 @@
-"""O4 im echten Chromium: G0 im Verlaufs-Reiter folgt dem Modell-Umschalter.
+"""O4 im echten Chromium → E3-Fix (QA 17.09.2026): der Verlaufs-Reiter
+OHNE G0 - die eigene Auswahl steuert das EINZIGE Barpreis-Bild.
+
+Bis zum Fix trug der Reiter ZWEI Barpreis-Grafiken: der G0-Block oben
+folgte der Modellwahl des VERGLEICHS-Reiters, der große Graph unten der
+eigenen Suche (gr-vsuche). Der QA-Lauf vom 17.09. maß an genau dieser
+Fixture: Wahl von „Galaxy S26" im Verlaufs-Reiter wechselte den großen
+Graph, der G0-Titel blieb „APPLE IPHONE 17 PRO 256 GB" - zwei Bilder,
+widersprüchlicher Gerätezustand. Der Test hier hält beides fest: kein
+zweites Barpreis-Bild, und die eigene Wahl bleibt von der Modellwahl des
+anderen Reiters unberührt.
 
 Dieselbe Bauform wie `tests/test_geraete_o3_rollen_browser.py`: eigener
-Server auf 127.0.0.1 (das Fragment wird per fetch geladen), eigene Fixture
-mit PREISHISTORIE - denn G0 zeichnet nur, wo Listungen mit Barpreis und
-Messpunkte existieren:
+Server auf 127.0.0.1 (das Fragment wird per fetch geladen), eigene
+Fixture mit PREISHISTORIE:
 
   * apple-iphone-17-pro 256 (VORGABE): zwei Anbieter mit je zwei
-    Messpunkten -> SVG mit Linien,
-  * samsung-galaxy-s26 256: ein Anbieter mit einem Messpunkt -> SVG mit
-    einem Punkt, Wertetabelle sagt 'ein Messpunkt',
-  * google-pixel-11 128: Bündel, aber KEINE Listung -> ehrlicher
-    Leerzustand ohne SVG.
+    Messpunkten -> SVG mit Linien in der eigenen Auswahl,
+  * samsung-galaxy-s26 256: ein Anbieter mit einem Messpunkt,
+  * google-pixel-11 128: Bündel, aber KEINE Listung.
 """
 from __future__ import annotations
 
@@ -24,7 +31,7 @@ from telco_radar.report.html import render_site
 
 from test_geraete_browser_fixture import (
     HEUTE, _chromium, _KATALOG, _FARBEN, _listung, _QUELLEN, _server, _sku)
-from test_geraete_zeitreihe_browser import waehle_band, waehle_modell
+from test_geraete_zeitreihe_browser import waehle_modell
 
 # (device_id, speicher, anbieter, tarif_id, tarif, gb, rate)
 _BUENDEL = [
@@ -155,88 +162,56 @@ def _oeffne_verlauf(wurzel, seite, modell=None):
     return seite
 
 
-def test_der_verlaufs_reiter_zeigt_g0_des_vorgabemodells(lage):
+def test_kein_zweites_barpreisbild_und_die_eigene_wahl_zaehlt(lage):
+    """E3-Fix (QA 17.09.2026, B2): Der Reiter trug ZWEI Barpreis-Grafiken
+    desselben Geräts - G0 oben (folgte der Modellwahl des VERGLEICHS-
+    Reiters) und die eigene Auswahl unten. Gemessen hatte der QA-Lauf:
+    Wahl von Galaxy S26 hier ließ den G0-Titel oben auf APPLE IPHONE 17
+    PRO 256 GB stehen. Jetzt gibt es GENAU EIN Barpreis-Bild-System, und
+    die eigene Suche steuert es; die Modellwahl des anderen Reiters
+    lässt es unberührt."""
     wurzel, seite = lage
     _oeffne_verlauf(wurzel, seite)
-    box = seite.evaluate("""() => {
-      const lager = document.querySelector('#gr-g0-lager');
-      if (!lager) return null;
-      return {
-        svg: !!lager.querySelector('svg.gr-g0'),
-        titel: (lager.querySelector('.gr-g0-titel') || {}).textContent,
-        zeilen: document.querySelectorAll('#gr-g0-lager .gr-g0-werte tbody tr').length,
-        sichtbar: !!(lager.offsetParent || lager.getClientRects().length),
-      };
-    }""")
-    assert box, "#gr-g0-lager fehlt im Verlaufs-Reiter"
-    assert box["svg"], "G0-SVG fehlt für das Vorgabemodell"
-    assert "iPhone 17 Pro" in box["titel"], box["titel"]
-    assert box["zeilen"] == 2, (
-        f"zwei Anbieter mit Messpunkten erwartet, {box['zeilen']} Zeilen")
-
-
-def test_der_modellwechsel_tauscht_g0_aus(lage):
-    """S3-Regel, jetzt für G0: der Block zeigt das GEWÄHLTE Modell - aus
-    demselben Fragment wie die Bündel-Zeilen, ohne zweite Anfrage."""
-    wurzel, seite = lage
-    _oeffne_verlauf(wurzel, seite, modell="samsung-galaxy-s26-256")
-    box = seite.evaluate("""() => {
-      const lager = document.querySelector('#gr-g0-lager');
-      return {
-        titel: (lager.querySelector('.gr-g0-titel') || {}).textContent,
-        svg: !!lager.querySelector('svg.gr-g0'),
-        zeilen: document.querySelectorAll('#gr-g0-lager .gr-g0-werte tbody tr').length,
-        punkte: document.querySelectorAll('#gr-g0-lager svg.gr-g0 circle').length,
-      };
-    }""")
-    assert "Galaxy S26" in box["titel"], box["titel"]
-    assert box["svg"], "G0-SVG fehlt nach dem Modellwechsel"
-    assert box["zeilen"] == 1, box
-    assert box["punkte"] >= 1, "ein Messpunkt muss als Punkt da sein"
-
-
-def test_der_rueckwechsel_zeigt_das_vorgabemodell_wieder(lage):
-    """Die S2-Lektion von O3, angewandt auf G0: nach einem Wechsel zu einem
-    Fremdmodell zeigt der Rückweg die VORGABE-Zeilen, nicht die zuletzt
-    injizierten."""
-    wurzel, seite = lage
-    _oeffne_verlauf(wurzel, seite, modell="google-pixel-11-128")
+    # 1. Kein G0-Block mehr - auf der ganzen Seite, nicht nur unsichtbar.
+    assert seite.evaluate(
+        "() => document.querySelector('#gr-g0-lager')") is None, (
+        "der G0-Block steht noch im Verlaufs-Reiter (Doppel-Darstellung)")
+    # 2. Die eigene Auswahl wählt das VORGABEMODELL (iPhone 17 Pro 256):
+    #    zwei Anbieter, vier Messtage - der Graph entsteht.
+    seite.fill("#gr-vsuche", "iPhone 17 Pro")
+    seite.wait_for_timeout(150)
+    seite.click("#gr-vtreffer li:first-child")
+    seite.wait_for_timeout(250)
+    zustand = seite.evaluate("""() => ({
+      feld: document.getElementById('gr-vsuche').value,
+      svg: !!document.querySelector('#gr-vbild svg'),
+      g0: !!document.querySelector('#gr-g0-lager'),
+      kacheln: !document.getElementById('gr-vkacheln').hidden,
+    })""")
+    assert "iPhone 17 Pro" in zustand["feld"], zustand
+    assert zustand["svg"], "die eigene Auswahl zeichnet keinen Graphen"
+    assert not zustand["g0"], zustand
+    assert zustand["kacheln"], zustand
+    # 3. DER QA-FALL: Modellwechsel im VERGLEICHs-Reiter darf das Bild
+    #    dieses Reiters nicht mehr verstellen. Vor dem Fix zeigte G0
+    #    danach das Fremdmodell, während die Auswahl unten blieb, wo sie
+    #    war - zwei Bilder, widersprüchlicher Zustand.
     seite.click('.gr-reiter [data-tafel="tafel-tco"]')
     seite.wait_for_timeout(120)
-    waehle_modell(seite, "apple-iphone-17-pro-256")
+    waehle_modell(seite, "samsung-galaxy-s26-256")
     seite.wait_for_timeout(400)
     seite.click('.gr-reiter [data-tafel="tafel-verlauf"]')
-    seite.wait_for_timeout(120)
-    titel = seite.evaluate(
-        "() => document.querySelector('#gr-g0-lager .gr-g0-titel')"
-        ".textContent")
-    zeilen = seite.evaluate(
-        "() => document.querySelectorAll('#gr-g0-lager .gr-g0-werte tbody tr')"
-        ".length")
-    assert "iPhone 17 Pro" in titel, titel
-    assert zeilen == 2, f"Rückweg zeigt {zeilen} Zeilen statt 2"
-
-
-def test_ein_modell_ohne_messreihe_hat_den_ehrlichen_leerzustand(lage):
-    """Kein Diagramm unter der Messtag-Schwelle, kein herbeigelogener
-    Punkt: ein Modell ohne jeden Barpreis-Messpunkt zeigt den Satz, kein
-    SVG.
-
-    E2-Anmerkung: über die ModellWAHL ist dieser Block heute nicht mehr
-    erreichbar - die Wahl listet nur Modelle mit Bündel-Band, und das
-    band-lose Modell (Bündel ohne erhobenes Volumen) ist keins davon.
-    Geprüft wird der Fragment-Knoten, den app.js einsetzen würde (via HTTP
-    vom Server der Fixture - eine statische Datei braucht keinen zweiten
-    Browser-Kontext): selbes Makro, selbe Aussage."""
-    from urllib.request import urlopen
-    from bs4 import BeautifulSoup
-    wurzel, _seite = lage
-    roh = urlopen(f"{wurzel}/data/geraete-buendel.html", timeout=10) \
-        .read().decode("utf-8")
-    lager = BeautifulSoup(roh, "html.parser").select_one(
-        '.gr-g0-lager[data-modell="google-pixel-11-128"]')
-    assert lager is not None, "G0-Lager des bandlosen Modells fehlt"
-    assert lager.select_one("svg.gr-g0") is None, \
-        "SVG für ein Modell ohne Messpunkte"
-    text = " ".join(lager.get_text(" ", strip=True).split())
-    assert "keine Preishistorie" in text, text[:200]
+    seite.wait_for_timeout(150)
+    nachher = seite.evaluate("""() => ({
+      feld: document.getElementById('gr-vsuche').value,
+      svg: !!document.querySelector('#gr-vbild svg'),
+      g0: !!document.querySelector('#gr-g0-lager'),
+      g0_titel: (document.querySelector('#gr-g0-lager .gr-g0-titel')
+                 || {}).textContent || null,
+    })""")
+    assert nachher["g0"] is False and nachher["g0_titel"] is None, nachher
+    assert "iPhone 17 Pro" in nachher["feld"], (
+        "die Verlaufs-Auswahl wurde von der Modellwahl des Vergleichs-"
+        f"Reiters verstellt: {nachher}")
+    assert nachher["svg"], (
+        "der Graph der eigenen Auswahl ist nach dem Reiterwechsel weg")

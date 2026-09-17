@@ -38,6 +38,10 @@ Dazu das Kriterium des Geraeteradars (10.08.2026):
      Satz darunter. Sind noch keine Alarmzeilen erfasst, gilt das Kriterium
      als uebersprungen - die Seite steht dann unter ihrer
      Veroeffentlichungsschwelle.
+     Seit E3 Schritt 3 (17.09.2026) steht die Alarmtabelle im Radar-Reiter
+     von geraete.html (bis dahin eigene Seite wettbewerbsradar.html, heute
+     eine Weiterleitung) - Kriterium 11 liest sie von der EINEN Seite, und
+     11b misst deren ALLE Tafeln einschliesslich der Radar-Tafel.
 
      Bis zum 30.08.2026 vermass dieses Kriterium die Positionskarte und
      rechnete aus jeder Etikettenhoehe den Preis zurueck. Die Karte ist
@@ -688,20 +692,26 @@ def main() -> int:
             if gr.select(tot):
                 maengel.append(f"Reste der geloeschten Preisgrafik: {tot}")
 
-        # DREI TAFELN + EIN QUASI-REITER (O3, STRATEGIE_GERAETE_OPTIK §3):
-        # "Vergleich", "Preisverlauf" (die Einzelgerät-Zeitreihe ist wieder
-        # erreichbar - bis O3 war die Tafel da, aber unverknüpft) und
-        # "Gerätekatalog". Der Wettbewerbs-Radar steht als LINK in der
-        # Leiste, ohne data-tafel - er ist ein Seitenwechsel, kein Tab.
-        # Die Portfolio-Tafel ist GANZ weg (ihre Abschnitte stehen auf dem
-        # Radar); ein wiederauferstandenes #tafel-portfolio wäre die nächste
-        # tote Tafel.
+        # VIER TAFELN AUF EINER SEITE (E3, AUFTRAG_GERAETE_EINE_SEITE_V2
+        # §1d): "Vergleich", "Radar", "Preisverlauf" und "Gerätekatalog"
+        # sind Knöpfe DIESER Seite. Bis E3 stand der Radar als LINK in der
+        # Leiste (O3-Quasi-Reiter, Seitenwechsel auf wettbewerbsradar.
+        # html); E3 ersetzt ihn durch die Tafel - deshalb ist jetzt auch
+        # der Link verboten, sonst böte die Leiste neben der Tafel noch
+        # einen Seitenwechsel an. Die Portfolio-Tafel bleibt GANZ weg; ein
+        # wiederauferstandenes #tafel-portfolio wäre die nächste tote
+        # Tafel.
         reiter = [k.get("data-tafel") for k in gr.select(".gr-reiter [data-tafel]")]
-        erwartet = ["tafel-tco", "tafel-verlauf", "tafel-katalog"]
+        erwartet = ["tafel-tco", "tafel-radar", "tafel-verlauf",
+                    "tafel-katalog"]
         if reiter != erwartet:
             maengel.append(f"Reiter {reiter} statt {erwartet}")
-        if gr.select_one(".gr-reiter a[href$='wettbewerbsradar.html']") is None:
-            maengel.append("der Radar-Quasi-Reiter (Link) fehlt in der Leiste")
+        if gr.select_one(".gr-reiter a") is not None:
+            maengel.append("die Reiterleiste trägt noch einen Link statt "
+                           "der vier Tafeln (E3: der Radar ist ein Reiter)")
+        if gr.select_one("#tafel-radar") is None:
+            maengel.append("#tafel-radar fehlt - der Radar-Reiter ohne "
+                           "Tafel wäre ein toter Tab")
         if gr.select_one("#tafel-portfolio") is not None:
             maengel.append("#tafel-portfolio steht noch auf der Geräteseite "
                            "- seine Abschnitte gehören auf den Radar (O3)")
@@ -732,25 +742,20 @@ def main() -> int:
             # KEIN Mangel ohne Messreihen: unter zwei Messpunkten je Reihe
             # ist der ehrliche Leerzustand die richtige Ausgabe (C.2).
             maengel.append("G2 (Preis-/TCO-Historie) fehlt im Historie-Reiter")
-        # O4 (STRATEGIE_GERAETE_OPTIK §3, 15.09.2026): G0 ist SEIT O4 im
-        # Verlaufs-Reiter angebunden - serverseitig fuer das Vorgabemodell,
-        # per lazy Fragment fuer jedes andere. Erwartet wird der Block MIT
-        # Grafik oder mit seinem ehrlichen Leerzustand ("keine
-        # Preishistorie"); fehlt der Block GANZ, ist die Anbindung gerissen
-        # - derselbe Befund wie die unerreichbare Verlaufs-Tafel vor O3.
+        # E3-Fix (QA 17.09.2026): G0 ist aus dem Verlaufs-Reiter GEFALLEN.
+        # Der Reiter trug ZWEI Barpreis-Grafiken desselben Geräts - der
+        # G0-Block oben (gesteuert von der Modellwahl des VERGLEICHS-
+        # Reiters) und die eigene Geräteauswahl unten; wählte der Leser
+        # hier ein Gerät, zeigte der obere Block weiterhin das des anderen
+        # Reiters (Doppel-Darstellung und zweite Graph-Form, §4.6/§4.8).
+        # Das Kriterium kehrt die alte O4-Regel um: kehrt der Block zurück,
+        # ist die Doppel-Darstellung zurück.
         if verlaufflaeche is not None and \
-                verlaufflaeche.select_one("#gr-g0-lager") is not None:
-            lager = verlaufflaeche.select_one("#gr-g0-lager")
-            hat_g0 = (lager.select_one("svg.gr-g0") is not None
-                      or "keine Preishistorie" in lager.get_text(" ",
-                                                                 strip=True))
-            if not hat_g0:
-                maengel.append("G0 (Barpreis-Zeitreihe) fehlt im "
-                               "Verlaufs-Reiter - weder Grafik noch "
-                               "Leerzustand (O4)")
-        elif verlaufflaeche is not None and gr.select_one("#gr-graph-daten"):
-            maengel.append("der G0-Block (#gr-g0-lager) fehlt im "
-                           "Verlaufs-Reiter, obwohl Modelle existieren (O4)")
+                verlaufflaeche.select_one("#gr-g0-lager, svg.gr-g0") \
+                is not None:
+            maengel.append("der G0-Block ist im Verlaufs-Reiter "
+                           "zurückgekehrt - der Reiter trägt seine eigene "
+                           "Barpreis-Auswahl (Doppel-Darstellung, §4.6/4.8)")
 
         # Die Pflichtzeile aus A5.2 - Antonios Leitfrage, woertlich
         # beantwortet. Seit O2 (11.09.2026) steht sie im Rechenweg-Aufklapper
@@ -776,17 +781,13 @@ def main() -> int:
                 maengel.append("gedrehte Beschriftung im Dokument")
                 break
 
-        # O2 (11.09.2026): die Alarmtabelle steht auf dem WETTBEWERBS-RADAR
-        # - dieselbe Pruefung, der neue Ort. `gr` bleibt die Geraeteseite
-        # fuer alles Strukturelle daruber; die Beleg- und Kachel-Zaehlung
-        # liest die Radarseite.
-        radar_seite = None
-        radar_pfad = site / "wettbewerbsradar.html"
-        if radar_pfad.exists():
-            radar_seite = BeautifulSoup(radar_pfad.read_text("utf-8"),
-                                        "html.parser")
-        zeilen = (radar_seite.select("#wr-alarme .gr-a-zeile")
-                  if radar_seite is not None else [])
+        # O2 (11.09.2026) stand die Alarmtabelle auf dem WETTBEWERBS-RADAR;
+        # seit E3 Schritt 3 (17.09.2026) ist der Radar der Reiter "Radar"
+        # DIESER Seite - die Alt-URL ist eine Weiterleitung. Beleg- und
+        # Kachel-Zaehlung lesen deshalb dieselbe Suppe wie alles
+        # Strukturelle darueber: eine Seite, eine Quelle der Wahrheit.
+        radar_seite = gr
+        zeilen = radar_seite.select("#wr-alarme .gr-a-zeile")
         if not zeilen:
             # NICHT einfach ueberspringen: die strukturelle Haelfte dieses
             # Kriteriums - "die Grafik ist WEG" - gilt auch ohne Daten. Sie

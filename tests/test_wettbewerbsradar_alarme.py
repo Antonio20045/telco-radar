@@ -1,11 +1,14 @@
-"""O2 (STRATEGIE_GERAETE_OPTIK §3, 11.09.2026): die Alarmtabelle und der
-Aufklapper "Bei Wettbewerbern gelistet, bei Vodafone nicht" wandern von der
-Vergleichsansicht der Geräteseite auf den Wettbewerbs-Radar.
+"""O2 (STRATEGIE_GERAETE_OPTIK §3, 11.09.2026): die Alarmtabelle wandert
+von der Vergleichsansicht der Geräteseite auf den Wettbewerbs-Radar.
 
-Begründung des Auftrags: die Radar-Seite sortiert Geräte nach Abweichung zu
-Vodafone - die Alarmtabelle ist dieselbe Aussicht im Detail (Barpreis), und
-"Bei Wettbewerbern gelistet" ist dieselbe Frage über das Sortiment. Auf
-geraete.html bleibt keins von beidem (nicht doppelt).
+E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d, 17.09.2026) korrigiert den Ort des
+Sortiments-Aufklappers "Bei Wettbewerbern gelistet, bei Vodafone nicht":
+Er steht jetzt IM GERÄTEKATALOG-REITER der Geräteseite - im Vier-Reiter-
+Gerüst der EINEN Seite ist der Katalog der Sortiments-Reiter, und "nur bei
+Wettbewerbern im Regal" ist die Komplementäraussage zu dessen Tabelle
+(S1/S3), keine Radar-Frage. Auf der Schwesterseite bleibt er weg: umgezogen,
+nicht kopiert (§4.6). Die Alarmtabelle bleibt Radar-Inhalt (E3 Schritt 2
+montiert sie in den Radar-Reiter derselben Seite).
 
 Gemessen wird am gerenderten Paar (beide Seiten derselben Site), damit der
 Test auch den Umzug selbst hält: weg von der einen, da auf der anderen.
@@ -130,13 +133,16 @@ def _text(el) -> str:
 # --------------------------------------------------------------------------
 
 def test_die_alarmtabelle_steht_als_eigener_abschnitt_auf_dem_radar(tmp_path):
+    """E3 Schritt 3 (17.09.2026): die Alt-URL ist eine Weiterleitung -
+    „auf dem Radar" heißt seitdem: im Radar-REITER von geraete.html
+    (erster Abschnitt der Tafel, S3)."""
     seiten = _seite(tmp_path)
-    radar = _suppe(seiten, "wettbewerbsradar.html")
-    abschnitt = radar.select_one("#wr-alarme")
-    assert abschnitt is not None, "der Abschnitt fehlt auf dem Radar"
-    assert abschnitt.select_one("h2") is not None
+    geraete = _suppe(seiten, "geraete.html")
+    abschnitt = geraete.select_one("#tafel-radar #wr-alarme")
+    assert abschnitt is not None, "der Abschnitt fehlt im Radar-Reiter"
+    assert abschnitt.select_one("h3") is not None
     zeilen = abschnitt.select(".gr-a-zeile")
-    assert zeilen, "keine Alarmzeile auf dem Radar"
+    assert zeilen, "keine Alarmzeile im Radar-Reiter"
     # Der Inhalt ist der GANZE (kein Funktionsverlust): Filter, Suche,
     # Sortierung, Zeilenaufklapper und die vier Kacheln stehen mit da.
     assert abschnitt.select_one(".gr-chips") is not None
@@ -144,7 +150,7 @@ def test_die_alarmtabelle_steht_als_eigener_abschnitt_auf_dem_radar(tmp_path):
     assert abschnitt.select_one("[data-filter='suche']") is not None
     assert abschnitt.select(".gr-sort"), "keine sortierbare Spalte"
     for z in zeilen:
-        auf = radar.select_one("#" + z["data-auf"])
+        auf = geraete.select_one("#" + z["data-auf"])
         assert auf is not None, "Zeile ohne Aufklapper"
 
 
@@ -152,8 +158,8 @@ def test_die_alarmzeile_nennt_den_guenstigsten_mit_namen(tmp_path):
     """Die Anforderung der Tabelle selbst - nicht DASS jemand guenstiger
     ist, sondern BEI WEM - gilt am neuen Ort unveraendert."""
     seiten = _seite(tmp_path)
-    radar = _suppe(seiten, "wettbewerbsradar.html")
-    text = _text(radar.select_one("#wr-alarme"))
+    geraete = _suppe(seiten, "geraete.html")
+    text = _text(geraete.select_one("#tafel-radar #wr-alarme"))
     assert "Saturn" in text
     assert "679,90" in text
     assert "709,90" in text
@@ -161,50 +167,86 @@ def test_die_alarmzeile_nennt_den_guenstigsten_mit_namen(tmp_path):
 
 
 def test_jede_alarmzeile_traegt_quelle_und_abrufdatum(tmp_path):
+    """Belegzwang am neuen Ort. Der Lookup läuft gegen den Radar-Reiter
+    und ZAEHLT die Zeilen vorher - auf der Weiterleitungs-Alt-URL wäre die
+    Schleife leer und der Test grün, ohne etwas zu prüfen (CLAUDE.md §6)."""
     seiten = _seite(tmp_path)
-    radar = _suppe(seiten, "wettbewerbsradar.html")
-    for zeile in radar.select("#wr-alarme .gr-a-zeile"):
+    geraete = _suppe(seiten, "geraete.html")
+    zeilen = geraete.select("#tafel-radar #wr-alarme .gr-a-zeile")
+    assert zeilen, "keine Alarmzeile im Radar-Reiter - Test prüft nichts"
+    for zeile in zeilen:
         assert zeile.select_one("a.gr-a-quelle[href]"), \
             "Wettbewerber ohne Quelllink"
         assert zeile.select_one(".gr-a-datum"), "Zeile ohne Abrufdatum"
 
 
 def test_die_geraeteseite_traegt_keine_alarmtabelle_mehr(tmp_path):
-    """Der Umzug, nicht die Kopie: auf geraete.html bleibt nichts von der
-    Tabelle - keine Zeile, keine Kacheln, kein Filter. (`.gr-a-zeile` wird
-    auf die VERGLEICHSANSicht geprüft: der Gerätekatalog derselben Seite
-    trägt die Klasse zu Recht - dieselbe Tabellenmechanik.)"""
+    """Der Umzug, nicht die Kopie. Bis O2 (11.09.2026) hieß das: auf
+    geraete.html bleibt NICHTS von der Tabelle. Seit E3 Schritt 2 (S3)
+    steht sie als erste Sektion IM RADAR-REITER derselben Seite - der Test
+    hält jetzt den E3-Zustand: GENAU EINMAL (#tafel-radar), nicht in der
+    Vergleichsansicht, nicht im Katalog. (`.gr-a-zeile` ist auf der Seite
+    mehrdeutig - Katalog- UND Radar-Zeilen tragen sie: geprüft wird je
+    TAFEL, nie die Klasse allein.)"""
     seiten = _seite(tmp_path)
     geraete = _suppe(seiten, "geraete.html")
-    for marker in ("#wr-alarme", ".gr-chips", "#gr-alarme"):
+    assert len(geraete.select("#wr-alarme")) == 1, \
+        "die Alarm-Sektion steht nicht genau einmal auf der Seite"
+    radar = geraete.select_one("#tafel-radar")
+    assert radar is not None and radar.select_one("#wr-alarme") is not None, \
+        "die Alarm-Sektion steht nicht im Radar-Reiter"
+    for marker in ("#gr-alarme",):
         assert geraete.select_one(marker) is None, marker
     tafel = geraete.select_one("#tafel-tco")
     assert tafel is not None
     assert tafel.select_one(".gr-a-zeile") is None, \
         "Alarmzeilen stehen noch in der Vergleichsansicht"
+    katalog = geraete.select_one("#tafel-katalog")
+    assert katalog is not None and katalog.select_one("#wr-alarme") is None, \
+        "die Alarm-Sektion steht im Katalog-Reiter"
 
 
 # --------------------------------------------------------------------------
-# "Bei Wettbewerbern gelistet" auf dem Radar
+# "Bei Wettbewerbern gelistet" - E3: im Gerätekatalog-Reiter der EINEN Seite
 # --------------------------------------------------------------------------
 
-def test_bei_wettbewerbern_gelistet_steht_auf_dem_radar(tmp_path):
+def test_bei_wettbewerbern_gelistet_steht_im_geraetekatalog(tmp_path):
+    """E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d): EINE Seite, vier Reiter -
+    der Sortiments-Aufklapper steht im KATALOG-Reiter („nur bei
+    Wettbewerbern im Regal" ist die Komplementäraussage zu dessen
+    Tabelle) und nicht mehr auf der Schwesterseite: umgezogen, nicht
+    kopiert (§4.6)."""
     seiten = _seite(tmp_path)
-    radar = _suppe(seiten, "wettbewerbsradar.html")
-    abschnitt = radar.select_one(".gr-vergleich-luecke")
+    geraete = _suppe(seiten, "geraete.html")
+    abschnitt = geraete.select_one("#gr-sortiment")
     assert abschnitt is not None, "der Sortiments-Aufklapper fehlt"
+    assert geraete.select_one("#tafel-katalog #gr-sortiment") is not None, (
+        "der Aufklapper steht außerhalb des Katalog-Reiters")
     text = _text(abschnitt)
     assert "Bei Wettbewerbern gelistet, bei Vodafone nicht" in text
     assert "iPhone 15" in text, "das nur-wettbewerbliche Gerät fehlt"
     assert "829,00" in text, "ohne ab-Preis ist die Zeile keine Aussage"
-    assert abschnitt.select_one("a[href]"), "ohne Beleglink"
+    link = abschnitt.select_one("a[href]")
+    assert link, "ohne Beleglink"
+    assert "↗" in link.get_text(), "Beleglink ohne ↗ (E3/S4 Beleg-Stil)"
 
 
-def test_die_geraeteseite_traegt_den_aufklapper_nicht_mehr(tmp_path):
+def test_der_aufklapper_steht_nicht_zweite_mal_auf_dem_radar(tmp_path):
+    """E3: dieselbe Aussage an zwei Orten wäre die Doppel-Darstellung aus
+    §4.6. Bis E3 Schritt 3 prüfte das die Schwesterseite; seit sie eine
+    Weiterleitung ist, ist der Dopplungsschutz am NEUEN Ort: der Aufklapper
+    steht GENAU EINMAL auf der EINEN Geräteseite - im Katalog-Reiter, und
+    nicht zusätzlich im Radar-Reiter."""
     seiten = _seite(tmp_path)
     geraete = _suppe(seiten, "geraete.html")
-    assert geraete.select_one(".gr-vergleich-luecke") is None
-    assert "Bei Wettbewerbern gelistet" not in geraete.get_text(" ")
+    assert len(geraete.select("#gr-sortiment")) == 1, \
+        "der Sortiments-Aufklapper steht nicht genau einmal auf der Seite"
+    assert geraete.select_one("#tafel-radar #gr-sortiment") is None, \
+        "der Aufklapper steht zusätzlich im Radar-Reiter (Doppel-Darstellung)"
+    # Die Alt-URL ist Weiterleitung und trägt keine Tafel-Inhalte mehr.
+    alt = _suppe(seiten, "wettbewerbsradar.html")
+    assert alt.select_one("#gr-sortiment") is None
+    assert alt.select_one(".wr-sektion") is None
 
 
 # --------------------------------------------------------------------------

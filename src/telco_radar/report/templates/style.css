@@ -3080,24 +3080,10 @@ b,strong{font-weight:700}
 /* Die Sammelluecke: ein ruhiges Feld statt eines uebersehbaren Leerraums -
    sie darf nicht lauter sein als die Linien selbst. */
 .gr-g0-luecke{fill:var(--ink);opacity:.05}
-/* O4: der G0-Block im Verlaufs-Reiter - Titel in der Etiketten-
-   Typografie der Seite (Grotesk-Label, dieselbe Familie wie die
-   Rubrik-Zeile darunter), damit er nicht mit der Serifen-Rubrik
-   konkurriert. */
-.gr-g0-block{margin:0 0 20px}
-.gr-g0-titel{margin:0 0 8px;font-family:var(--sans);font-size:12px;
-  font-weight:800;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--ink-3)}
-.gr-g0-chrome{font-family:var(--sans);font-size:12px;color:var(--ink-4);
-  margin-top:6px}
-/* A-R3: die drei Haendler als Legenden-Eintrag OHNE Linie - dieselbe
-   Stimme wie eine leere Karte (`.gr-kk-luecke`), aber ausserhalb des
-   SVG, weil sie keinen Messpunkt tragen. */
-.gr-g0-haendler{list-style:none;margin:8px 0 0;padding:0;display:flex;
-  flex-wrap:wrap;gap:3px 16px;font-family:var(--sans);font-size:12px;
-  color:var(--ink-4)}
-.gr-g0-haendler-name{font-weight:700;margin-right:4px}
-.gr-g0-haendler-vermerk{font-style:italic}
+/* E3-Fix (QA 17.09.2026): der G0-Block des Verlaufs-Reiters ist gefallen
+   (.gr-g0-block/-titel/-chrome/-haendler* waren sein Markup; die
+   SVG-Klassen .gr-g0-linie/-punkt/-raster bleiben - sie stylen die
+   Zeitreihen-Grafik aus `geraete_tco_grafik.zeitreihe()`). */
 .gr-g1-gruppe{font-family:var(--sans);font-size:12px;letter-spacing:.08em;
   text-transform:uppercase;fill:var(--ink-3)}
 .gr-g1-anbieter{font-family:var(--sans);font-size:12.5px;font-weight:700;
@@ -3174,6 +3160,36 @@ b,strong{font-weight:700}
 .wr-status--kein_buendel .wr-prozent,
 .wr-status--nicht_vergleichbar .wr-prozent{color:var(--ink-4);font-weight:400;
   font-style:italic}
+/* E3 (17.09.2026): die DREI Sektionen der Radar-Tafel im Radar-Reiter von
+   geraete.html - gleichwertig, jede mit derselben Trennlinie wie die
+   Gruppen der Schwesterseite (S3: der Händler-Abschnitt ist kein "komischer
+   unterer Abschnitt ganz unten", sondern die dritte von dreien). */
+/* padding-top 10 (vor E3 Schritt 3: 14): die drei Sektionen teilen sich
+   das 11b-Budget EINER Seite, deren Kopf- und Fussbereich (~830 px) fix
+   ist - gemessen am Mitzug der Portfolio-Nachschlaege, s. u. */
+.gr-r-sektion{padding-top:10px;border-top:1px solid var(--rule-2)}
+.gr-r-sektion:first-of-type{padding-top:0;border-top:none}
+/* Drei Sektionen teilen sich das Hoehenbudget EINER Tafel (11b misst die
+   GANZE Seite, Kopf und Fuss ~830 px sind fix): im Radar-Reiter strafft
+   sich der Sektionsabstand, der ausserhalb desselben unveraendert bleibt. */
+#tafel-radar .wr-sektion{margin-bottom:12px}
+/* E3 Schritt 3: die PORTFOLIO-Nachschlag-Sektionen (Wochenkarte,
+   Lifecycle) - beide zugeklappt, beide nachgerueckt von der abgeschalteten
+   Schwesterseite. Ihr Abstand ist knapper als der der drei offenen
+   Sektionen: sie sind Nachfrage, kein Einstieg. Ohne diese Straffung mass
+   der Reiter 3033 px (Mitzug der Sektionen + alte 18er-Abstaende); alle
+   wachsenden Inhaltsmengen stehen hinter Deckeln oder Aufklappern, die
+   sichtbare Flaeche waechst mit dem Bestand nicht. */
+#tafel-radar .gr-nachschlag{margin-bottom:4px}
+#tafel-radar .gr-nachschlag:last-of-type{margin-bottom:0}
+/* Der Sprung je Modell-Zeile in den Graphen des Vergleichs-Reiters -
+   derselbe Etikett-Stil wie der Querlink der Schwesterseite: ein Weg,
+   kein Bedienelement der Tabelle. */
+.gr-sprung{white-space:nowrap;font-family:var(--sans);font-size:12px;
+  color:var(--red);text-decoration:none;
+  border-bottom:1px solid rgba(230,0,0,.3)}
+.gr-sprung:hover{border-bottom-color:var(--red)}
+.gr-s-th{font-family:var(--sans);font-size:12px;letter-spacing:.08em}
 
 
 

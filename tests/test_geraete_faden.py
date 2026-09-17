@@ -39,8 +39,9 @@ def test_der_eine_graph_ist_die_zeitreihe(tmp_path):
     Antonios ausdrueckliche Entscheidung (AUFTRAG_GERAETE_EINE_SEITE_V2
     §1a): der EINE Graph der Vergleichsansicht ist DIE TCO-ZEITREIHE, ein
     SVG-Koordinatensystem mit Punkten je Messung. Die Balkenform (O1) ist
-    ERSETZT: .gr-hgraph und .gr-bz sind Reste, G1 bleibt verboten; G0
-    wohnt weiter im Verlaufs-Reiter."""
+    ERSETZT: .gr-hgraph und .gr-bz sind Reste, G1 bleibt verboten; G0 ist
+    seit dem E3-Fix (QA 17.09.2026) ganz gefallen - der Verlaufs-Reiter
+    traegt seine eigene Barpreis-Auswahl, keine zweite Grafik daneben."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
     assert tafel.select("svg.gr-g1") == []
@@ -173,31 +174,44 @@ def test_haendler_ohne_preis_stehen_nicht_einzeln_da(tmp_path):
 
 
 # --------------------------------------------------------------------------
-# Kriterium 6: die Reiterleiste (O3: drei Tafeln + der Radar-Link)
+# Kriterium 6: die Reiterleiste (E3: vier echte Tafeln auf EINER Seite)
 # --------------------------------------------------------------------------
 
 def test_die_reiterleiste_traegt_vergleich_radar_verlauf_katalog(tmp_path):
-    """O3 (STRATEGIE_GERAETE_OPTIK §3): vier Einträge nach dem Entwurf -
-    drei echte Tafeln, der Radar als LINK (kein data-tafel: er wäre ein
-    toter Tab, der Umschalter fände kein Ziel-Element)."""
+    """E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d): vier echte Tafeln in der
+    Folge Vergleich · Radar · Preisverlauf · Gerätekatalog. Bis E3 war
+    der Radar ein Link auf wettbewerbsradar.html (O3-Quasi-Reiter); der
+    wird durch die Tafel DIESER Seite ersetzt - deshalb darf kein Link
+    mehr in der Leiste stehen (der Umschalter würde sonst neben der
+    Tafel noch einen Seitenwechsel anbieten)."""
     s = _baue(tmp_path)
     knoepfe = s.select(".gr-reiter button[data-tafel]")
     beschriftungen = [(k.get("data-tafel"), k.get_text(strip=True))
                       for k in knoepfe]
     assert beschriftungen == [
         ("tafel-tco", "Vergleich"),
+        ("tafel-radar", "Radar"),
         ("tafel-verlauf", "Preisverlauf"),
         ("tafel-katalog", "Gerätekatalog"),
     ]
-    link = s.select_one(".gr-reiter a[href$='wettbewerbsradar.html']")
-    assert link is not None
-    assert link.get("data-tafel") is None
+    assert s.select_one(".gr-reiter a") is None, \
+        "die Reiterleiste trägt noch einen Link (E3: vier Tafeln)"
 
 
 def test_die_portfolio_tafel_ist_weg(tmp_path):
-    """O3 (§5.2): die Portfolio-Tafel ist GANZ weg - Container und
-    Abschnitte stehen auf dem Wettbewerbs-Radar. Eine leer stehende
-    Tafel wäre die nächste Waise."""
+    """O3 (§5.2): die Portfolio-Tafel ist GANZ weg - ein leer stehender
+    Tab-Body wäre die nächste Waise. Die Abschnitte selbst leben weiter:
+    seit E3 Schritt 3 (17.09.2026) als zugeklappte Sektionen im Radar-
+    Reiter DIESER Seite (bis dahin auf der Schwesterseite, die seitdem
+    eine Weiterleitung ist) - geprüft wird die TAFEL, nicht der Inhalt."""
     s = _baue(tmp_path)
     assert s.select_one("#tafel-portfolio") is None
-    assert "Wie lange ein Gerät im Markt lebt" not in s.get_text()
+    assert s.select_one(".gr-reiter [data-tafel='tafel-portfolio']") is None
+    radar = s.select_one("#tafel-radar")
+    assert radar is not None, "#tafel-radar fehlt - der Test prüft nichts"
+    lifecycle = radar.select_one("#lifecycle")
+    if lifecycle is not None:
+        # Die Fixture kann einen Leerzustand rendern (kein Lifecycle-Satz);
+        # steht die Sektion, steht sie IM Radar-Reiter und zugeklappt.
+        details = lifecycle.select_one("details.gr-auf")
+        assert details is not None and not details.get("open")

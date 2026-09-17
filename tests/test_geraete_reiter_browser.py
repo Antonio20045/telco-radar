@@ -565,23 +565,21 @@ def test_der_reiter_blendet_ohne_neuladen_um(_seite):
         assert aktiv == [tid], "genau ein Reiter ist ausgewaehlt"
 
 
-def test_die_reiterleiste_traegt_drei_knoepfe_und_den_radar_link(_seite):
+def test_die_reiterleiste_traegt_vier_knoepfe_ohne_link(_seite):
+    """E3 (§1d): vier echte Tafeln - der O3-Quasi-Reiter (Link auf
+    wettbewerbsradar.html) ist der Tafel dieser Seite gewichen."""
     knoepfe = _seite.eval_on_selector_all(
         ".gr-reiter button[data-tafel]",
         "e => e.map(x => x.getAttribute('data-tafel'))")
-    assert knoepfe == ["tafel-tco", "tafel-verlauf", "tafel-katalog"]
+    assert knoepfe == ["tafel-tco", "tafel-radar", "tafel-verlauf",
+                       "tafel-katalog"]
     beschriftung = _seite.eval_on_selector_all(
         ".gr-reiter button", "e => e.map(x => x.textContent.trim())")
-    assert beschriftung == ["Vergleich", "Preisverlauf", "Gerätekatalog"]
-    # Der Quasi-Reiter: ein LINK auf eine andere Seite, deutlich als
-    # Seitenwechsel erkennbar (Pfeil), ohne data-tafel.
-    link = _seite.eval_on_selector(
-        ".gr-reiter a", "e => ({href: e.getAttribute('href'), "
-                        "pfeil: !!e.querySelector('.gr-reiter-pfeil'), "
-                        "tafel: e.getAttribute('data-tafel')})")
-    assert link["href"].endswith("wettbewerbsradar.html"), link
-    assert link["pfeil"], "der Radar-Reiter trägt keinen Pfeil"
-    assert link["tafel"] is None, "der Radar-Link darf kein Tab sein"
+    assert beschriftung == ["Vergleich", "Radar", "Preisverlauf",
+                            "Gerätekatalog"]
+    links = _seite.eval_on_selector_all(
+        ".gr-reiter a", "e => e.length")
+    assert links == 0, "die Reiterleiste trägt noch einen Link (E3: Tafel)"
     _zeige_tafel(_seite, "tafel-tco")
 
 
@@ -601,15 +599,14 @@ def test_die_portfolio_tafel_ist_weg_der_verlauf_ist_verknuepft(_seite):
     _zeige_tafel(_seite, "tafel-tco")
 
 
-@pytest.mark.parametrize("tid", ["tafel-tco", "tafel-katalog",
+@pytest.mark.parametrize("tid", ["tafel-tco", "tafel-radar", "tafel-katalog",
                                  "tafel-verlauf"])
 def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
     """Der Auftrag: unter 3.000 px auf 1440 px Breite. Die alte Seite war
     18.412 px hoch.
 
-    O3: "tafel-portfolio" ist weg (Radar-Seite); die Hoehenzusicherung gilt
-    fuer die drei Tafeln dieser Seite - der Radar misst seine eigene Hoehe
-    im wettbewerbsradar-Test."""
+    E3: die Radar-Tafel steht mit auf dieser Seite; ihr Platzhalter-
+    Gerüst ist bewusst klein (der Inhalt montiert E3 Schritt 2)."""
     _zeige_tafel(_seite, tid)
     _seite.wait_for_timeout(60)
     hoehe = _seite.evaluate("document.documentElement.scrollHeight")
@@ -621,9 +618,11 @@ def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
 # --------------------------------------------------------------------------
 
 def _radar_url(seite):
-    """Die Adresse der Radar-Seite desselben Servers - die Alarmtabelle
-    steht seit O2 (11.09.2026) dort, nicht mehr in der Vergleichsansicht."""
-    return seite.url.rsplit("/", 1)[0] + "/wettbewerbsradar.html"
+    """Die Adresse des Radar-REITERS derselben Seite. Bis E3 Schritt 3
+    (17.09.2026) war der Radar eine eigene Seite (wettbewerbsradar.html);
+    seitdem ist deren Alt-URL eine Meta-Refresh-Weiterleitung, und die
+    Tests gehen direkt aufs Ziel - der Hash schaltet den Reiter (app.js)."""
+    return seite.url.rsplit("/", 1)[0] + "/geraete.html#tafel-radar"
 
 
 def _frisch(seite):
@@ -643,10 +642,11 @@ def _frisch(seite):
 
 
 def _radar_frisch(seite):
-    """Dasselbe fuer die RADAR-Seite: die Alarmtabelle lebt seit O2 dort
-    (ausserhalb der Reiter-Mechanik - kein Klick noetig)."""
+    """Dasselbe fuer die RADAR-Tafel: die Alarmtabelle lebt seit E3 in
+    deren erster Sektion; der Hash in der Adresse schaltet den Reiter
+    (app.js `ausHash`), kein Klick noetig."""
     seite.goto(_radar_url(seite), wait_until="load")
-    seite.wait_for_timeout(60)
+    seite.wait_for_timeout(150)
 
 
 def test_ohne_filter_greift_der_zeilendeckel(_seite):
@@ -707,6 +707,16 @@ def test_ein_aktiver_filter_ist_rot_hinterlegt(_seite):
 
 def test_die_suche_grenzt_ein(_seite):
     _radar_frisch(_seite)
+    # E3 (17.09.2026): zuerst "alle anzeigen" - sonst misst der Test den
+    # DECKEL gegen die Treffer, nicht die Suche gegen den Bestand. Mit dem
+    # Alarm-Deckel bei 12 war "vorher" zufaellig groesser als die Treffer-
+    # zahl; seit E3 teilen sich drei Sektionen das Budget EINER Tafel und
+    # der Deckel steht bei 5 - Suche und Deckel lieferten dann gleich viele
+    # sichtbare Zeilen, und der Test pruefte nichts mehr.
+    mehr = _seite.query_selector("#gr-mehr")
+    if mehr:
+        mehr.click()
+        _seite.wait_for_timeout(60)
     vorher = _sichtbare_zeilen(_seite, "#wr-alarme")
     _seite.fill("#wr-alarme [data-filter='suche']", "medimax")
     _seite.wait_for_timeout(60)
@@ -880,14 +890,14 @@ def test_die_seite_traegt_das_echte_abrufdatum(_seite):
 
     Seit O2 (11.09.2026) leben die Datums an ZWEI Orten, und der Test
     haelt beide fest: die ALARMTABELLE (Listungs-Datum, in der Fixture der
-    11.08.) ist auf wettbewerbsradar.html umgezogen und traegt es weiterhin
-    SICHTBAR; die Buendel-Zeilen der Geraeteseite tragen ihres (4.09.) im
+    11.08.) traegt es weiterhin SICHTBAR (seit E3 Schritt 3 in der ersten
+    Sektion des Radar-Reiters); die Buendel-Zeilen tragen ihres (4.09.) im
     Rechenweg-Aufklapper - der Test oeffnet die Klappen dafuer und nimmt
     sie danach zurueck, denn die Fixture hat Modulgueltigkeit und ein
     anderer Test misst `details[open] == 0`.
     """
     _radar_frisch(_seite)
-    radar_text = _seite.eval_on_selector("body", "e => e.innerText")
+    radar_text = _seite.eval_on_selector("#tafel-radar", "e => e.innerText")
     assert "11. August 2026" in radar_text, (
         "das Abrufdatum der Listungen fehlt auf dem Wettbewerbs-Radar")
 
@@ -2273,3 +2283,33 @@ def test_die_buendelzeile_oeffnet_ohne_netzwerk(_seite):
         f"der Rechenweg hat nur {ergebnis['hoehe']} px Höhe"
     assert anfragen == [], \
         f"das Oeffnen hat Netzwerkanfragen ausgeloest: {anfragen}"
+
+
+def test_die_alt_url_landet_im_radar_reiter(_umgebung):
+    """E3 Schritt 3 (17.09.2026), im Ganzen gemessen: die Alt-URL
+    wettbewerbsradar.html ist ein Meta-Refresh auf geraete.html#tafel-
+    radar - ein Lesezeichen muss am Radar-Reiter ANKOMMEN, nicht nur auf
+    der richtigen Seite. app.js normalisiert die Adresse danach auf die
+    Deep-Link-Form (?modell=…&band=…); entscheidend ist der AKTIVE
+    Reiter, nicht der Hash in der Adresszeile."""
+    browser, adresse = _umgebung
+    # `_umgebung` traegt die VOLLE Adresse der Modulseite - inklusive des
+    # ?modell-Deep-Links, den app.js per replaceState hineingeschrieben
+    # hat. Als Basis einer neuen Adresse wuerde daraus ein Phantom-Pfad
+    # (.../geraete.html?modell=.../wettbewerbsradar.html), den der
+    # Testserver mit der UNVERANDERTEN Geräteseite beantwortet - der Test
+    # mässe dann den Deep-Link, nicht die Weiterleitung.
+    basis = adresse.rsplit("/", 1)[0]
+    seite = browser.new_page(viewport={"width": 1440, "height": 900})
+    try:
+        seite.goto(f"{basis}/wettbewerbsradar.html", wait_until="load")
+        seite.wait_for_timeout(1000)   # Meta-Refresh 0s + Reiter-Schaltung
+        assert "geraete.html" in seite.url, \
+            f"der Meta-Refresh hat nicht weitergeleitet: {seite.url}"
+        aktiv = seite.evaluate(
+            "() => document.querySelector(\".gr-reiter button[aria-selected='true']\")"
+            ".getAttribute('data-tafel')")
+        assert aktiv == "tafel-radar", \
+            f"die Alt-URL landet im Reiter {aktiv!r}, nicht im Radar-Reiter"
+    finally:
+        seite.close()

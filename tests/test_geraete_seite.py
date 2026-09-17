@@ -279,6 +279,22 @@ def _suppe(site: Path, name: str) -> BeautifulSoup:
     return BeautifulSoup((site / name).read_text(encoding="utf-8"), "html.parser")
 
 
+def _radar(site: Path) -> BeautifulSoup:
+    """Die Radar-TAFEL von geraete.html als eigene Suppe.
+
+    Seit E3 Schritt 3 (17.09.2026) ist der Radar der Reiter „Radar" der
+    EINEN Geräteseite; wettbewerbsradar.html ist eine Meta-Refresh-
+    Weiterleitung und trägt keinen Inhalt mehr. Die Tests dieser Datei,
+    die bis dahin die Alt-Seite lasen, laufen gegen die Tafel - nicht
+    gegen die ganze 1,4-MB-Seite: geraete.html trägt vier Reiter, und
+    eine Text-Assertion, die irgendein anderer Reiter zufällig erfüllt,
+    ist grün, ohne etwas zu prüfen (CLAUDE.md §6)."""
+    suppe = _suppe(site, "geraete.html")
+    tafel = suppe.select_one("#tafel-radar")
+    assert tafel is not None, "#tafel-radar fehlt - Test prueft nichts"
+    return BeautifulSoup(str(tafel), "html.parser")
+
+
 # --------------------------------------------------------------------------
 # Die Seite entsteht
 # --------------------------------------------------------------------------
@@ -512,7 +528,7 @@ def test_kennzahlen_stimmen_mit_den_daten_ueberein(tmp_path):
     die Aufbereitung gehalten.
     """
     site = _baue(tmp_path)
-    s = _suppe(site, "wettbewerbsradar.html")
+    s = _radar(site)
     kacheln = {k.find("span").get_text(strip=True): k.find("b").get_text(strip=True)
                for k in s.select(".gr-chips .gr-chip")}
     assert set(kacheln) == {"Kritisch", "Mittel", "Gering", "Bestpreis"}
@@ -542,7 +558,7 @@ def test_die_vier_kacheln_zaehlen_genau_die_verglichenen_geraete(tmp_path):
     Fehlertyp. Und ein Geraet ohne Wettbewerber ist NICHT unser Bestpreis -
     es ist gar nicht verglichen."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
-    s = _suppe(site, "wettbewerbsradar.html")
+    s = _radar(site)
     summe = sum(int(k.find("b").get_text(strip=True))
                 for k in s.select(".gr-chips .gr-chip"))
     abschnitt = " ".join(s.select_one("#wr-alarme").get_text(" ", strip=True).split())
@@ -806,7 +822,7 @@ def test_lifecycle_sagt_dass_die_datenbasis_duenn_ist(tmp_path):
     """Akzeptanzkriterium: unter der Schwelle kein Trend, sondern ein Satz,
     der das sagt."""
     site = _baue(tmp_path, db=_DB_DUENN, punkte=_PUNKTE_DUENN)
-    s = _suppe(site, "wettbewerbsradar.html")
+    s = _radar(site)
     basis = s.select_one(".gr-basis")
     assert basis is not None
     assert "dünn" in basis.get_text()
@@ -817,7 +833,7 @@ def test_lifecycle_sagt_dass_die_datenbasis_duenn_ist(tmp_path):
 
 def test_portfolio_tiefe_steht_auf_der_seite(tmp_path):
     site = _baue(tmp_path)
-    s = _suppe(site, "wettbewerbsradar.html")
+    s = _radar(site)
     balken = s.select(".gr-tiefe li")
     assert balken
     namen = {b.select_one(".dz-balken-name").get_text(strip=True) for b in balken}
@@ -928,7 +944,7 @@ def test_der_waechter_ist_fail_closed():
 def test_kein_satz_der_karte_nennt_eine_ungedeckte_zahl(tmp_path):
     """Die Sperre am echten Datensatz."""
     site = _baue(tmp_path)
-    s = _suppe(site, "wettbewerbsradar.html")
+    s = _radar(site)
     daten = {abs(p["preis_ohne_vertrag"]) for p in _PUNKTE}
     daten |= {100.0, 1.0, 2.0, 10.0}
     # Die Zahlen der Eigennamen gehoeren dazu - sonst prueft dieser Test
@@ -1136,14 +1152,14 @@ def test_alte_preisbewegung_steht_nicht_unter_diese_woche(tmp_path):
     root = tmp_path
     site = _baue(root)
     # Gegenprobe zuerst: mit frischen Punkten IST der Satz da.
-    assert _suppe(site, "wettbewerbsradar.html").select(".gr-saetze li")
+    assert _radar(site).select(".gr-saetze li")
 
     alt = [dict(p, datum="2026-03-02" if i == 0 else "2026-03-09")
            for i, p in enumerate(_PUNKTE)]
     (root / "data" / "state" / "geraete_preise.jsonl").write_text(
         "\n".join(json.dumps(p) for p in alt) + "\n", encoding="utf-8")
     render_site(site, root / "data" / "reports")
-    s = _suppe(site, "wettbewerbsradar.html")
+    s = _radar(site)
     # NUR der Abschnitt "Was diese Woche auffaellt" - so steht es im Namen
     # dieses Tests und in seiner Beschreibung. Bis zum 28.08.2026 suchte er
     # im GESAMTEN Seitentext; seit die Seite eine Vergleichssektion hat, die
@@ -1254,7 +1270,7 @@ def test_preisverfall_nennt_seine_preisart(tmp_path):
     (root / "data" / "state" / "geraete_db.json").write_text(
         json.dumps(daten), encoding="utf-8")
     render_site(site, root / "data" / "reports")
-    s = _suppe(site, "wettbewerbsradar.html")
+    s = _radar(site)
     zeilen = s.select(".gr-verfall .list-row")
     assert zeilen, "genug Messpunkte, aber kein Verfallsblock"
     for li in zeilen:
@@ -1289,7 +1305,7 @@ def test_die_seite_zeigt_keine_null_tage_zeilen(tmp_path):
         return re.search(rf"(?<!\d){re.escape(muster)}", text) is not None
 
     site = _baue(tmp_path, db=_DB_DUENN, punkte=_PUNKTE_DUENN)
-    s = _suppe(site, "wettbewerbsradar.html")
+    s = _radar(site)
     basis = s.select_one(".gr-basis")
     assert basis is not None
     # Die Klasse war im CSS angelegt und kam im HTML NULL Mal vor.
@@ -1335,7 +1351,7 @@ def test_ohne_vorlauf_sagt_die_wochenkarte_was_sie_zeigt(tmp_path):
                  "datum": "2026-08-11", "preis_ohne_vertrag": 1449.0,
                  "verfuegbarkeit": "lieferbar", "quelle_url": "https://example.de/p"}]
     site = _baue(tmp_path, db=frisch, punkte=erstlauf)
-    s = _suppe(site, "wettbewerbsradar.html")
+    s = _radar(site)
     abschnitt = s.select_one(".gr-auffaellig")
     assert abschnitt is not None, "die Sektion fehlt ganz"
     saetze = [li.get_text(" ", strip=True) for li in abschnitt.select(".gr-saetze li")]
@@ -1368,7 +1384,7 @@ def test_eine_lange_beobachtung_erscheint_sehr_wohl_auf_der_seite(tmp_path):
     Der Normalfall-Bestand laeuft seit dem 01.07.2026 bei vier Laeufen - das
     ist eine belastbare Verweildauer, und sie gehoert auf die Seite."""
     site = _baue(tmp_path)
-    s = _suppe(site, "wettbewerbsradar.html")
+    s = _radar(site)
     basis = s.select_one(".gr-basis")
     assert "gr-basis--duenn" not in (basis.get("class") or []), basis.get_text()
     zeilen = s.select(".gr-dauern li")
@@ -1409,7 +1425,7 @@ def test_die_alarmtabelle_nennt_den_guenstigsten_mit_namen(tmp_path):
     BEI WEM. Seit O2 (11.09.2026) steht die Tabelle auf dem Wettbewerbs-
     Radar - derselbe Inhalt, derselbe Satz."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
-    s = _suppe(site, "wettbewerbsradar.html")
+    s = _radar(site)
     abschnitt = s.select_one("#wr-alarme")
     assert abschnitt is not None, "der Alarm-Abschnitt fehlt auf dem Radar"
     text = abschnitt.get_text(" ", strip=True)
@@ -1423,7 +1439,7 @@ def test_der_prozentsatz_steht_groesser_als_der_eurobetrag(tmp_path):
     200-Euro-Geraet viel und bei einem 2000-Euro-Geraet nichts. Der
     Prozentsatz ist die vergleichbare Zahl, der Euro-Betrag ihr Beleg."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
-    s = _suppe(site, "wettbewerbsradar.html")
+    s = _radar(site)
     zeile = s.select_one("#wr-alarme .gr-a-zeile")
     assert zeile is not None, "keine einzige Alarmzeile"
     assert "%" in zeile.select_one(".gr-a-prozent").get_text(strip=True)
@@ -1434,7 +1450,7 @@ def test_jede_alarmzeile_traegt_quelle_und_abrufdatum(tmp_path):
     """"Kein Vergleich ohne beide Quelllinks und beide Abrufdaten." Auf der
     Seite gemessen, nicht nur in der Rechnung."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
-    s = _suppe(site, "wettbewerbsradar.html")
+    s = _radar(site)
     zeilen = s.select("#wr-alarme .gr-a-zeile")
     assert zeilen, "keine einzige Alarmzeile"
     for zeile in zeilen:
@@ -1452,7 +1468,7 @@ def test_der_aufklapper_listet_alle_anbieter_dieses_geraets(tmp_path):
     """Der Klick auf eine Zeile zeigt die ganze Lage, nicht nur den Sieger -
     unseren eigenen Preis eingeschlossen."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
-    s = _suppe(site, "wettbewerbsradar.html")
+    s = _radar(site)
     zeile = s.select_one("#wr-alarme .gr-a-zeile")
     auf = s.select_one("#" + zeile["data-auf"])
     namen = [li.find("span").get_text(strip=True) for li in auf.select(".gr-a-liste li")]
@@ -1470,7 +1486,7 @@ def test_die_zeile_ohne_guenstigeren_wettbewerber_steht_nicht_mehr_da(tmp_path):
     sagt dasselbe einmal.
     """
     site = _baue(tmp_path, db=_db_mit_vergleich())
-    radar = _suppe(site, "wettbewerbsradar.html")
+    radar = _radar(site)
     assert "niemand günstiger" not in radar.get_text(" ", strip=True)
 
     # Gegenprobe: der Fall tritt wirklich ein, sonst misst der Test nichts -
@@ -1481,21 +1497,23 @@ def test_die_zeile_ohne_guenstigeren_wettbewerber_steht_nicht_mehr_da(tmp_path):
 
 
 def test_was_vodafone_nicht_fuehrt_steht_als_eigener_befund(tmp_path):
-    """O2 (11.09.2026): der Aufklapper ist eine Sortiments-Aussage - dieselbe
-    Frage, die der Wettbewerbs-Radar stellt - und steht deshalb dort. Der
-    Pin hier verhindert die stille Rueckkehr auf die Geraeteseite."""
+    """E3 (17.09.2026): der Aufklapper ist eine Sortiments-Aussage - im
+    Vier-Reiter-Gerüst der EINEN Seite (§1d) gehört sie in den KATALOG-
+    Reiter der Geräteseite, als Komplement zur Tabelle darüber. Der Pin
+    hier verhindert die stille Rückkehr auf die Schwesterseite (bis E3
+    stand er dort, O2-Entscheidung) und zugleich jede zweite Kopie."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
-    radar = _suppe(site, "wettbewerbsradar.html")
-    luecke = radar.select_one(".gr-vergleich-luecke")
+    geraete = _suppe(site, "geraete.html")
+    luecke = geraete.select_one("#gr-sortiment")
     assert luecke is not None
     text = luecke.get_text(" ", strip=True)
     assert "Bei Wettbewerbern gelistet, bei Vodafone nicht" in text
     assert "Galaxy S25 Ultra" in text
-    assert any(el.get("id") == "wr-gelistet" for el in luecke.parents), (
-        "der Aufklapper steht nicht im Radar-Abschnitt 'wr-gelistet'")
-    geraete = _suppe(site, "geraete.html")
-    assert geraete.select_one(".gr-vergleich-luecke") is None, \
-        "der Aufklapper steht noch auf der Geraeteseite"
+    assert any(el.get("id") == "tafel-katalog" for el in luecke.parents), (
+        "der Aufklapper steht nicht im Katalog-Reiter")
+    radar = _radar(site)
+    assert radar.select_one(".gr-vergleich-luecke") is None, \
+        "der Aufklapper steht noch auf der Schwesterseite (E3: umgezogen)"
 
 
 def test_die_abrufdaten_stehen_deutsch_nicht_als_iso(tmp_path):
@@ -1503,7 +1521,7 @@ def test_die_abrufdaten_stehen_deutsch_nicht_als_iso(tmp_path):
     Portals schreibt deutsche Daten, diese Sektion tat es zuerst nicht.
     Beim ANSEHEN des Screenshots aufgefallen, nicht im Test."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
-    seiten = [_suppe(site, "geraete.html"), _suppe(site, "wettbewerbsradar.html")]
+    seiten = [_suppe(site, "geraete.html"), _radar(site)]
     gemessen = 0
     for s in seiten:
         for datum in s.select(".gr-a-klein, .gr-a-liste span, .gr-bnd-rw, "
@@ -1522,7 +1540,7 @@ def test_die_filterleiste_steht_bereit_und_zeigt_ihren_zuschnitt(tmp_path):
     Vertrag. Sie stehen deshalb als aktive Etiketten und nicht als
     Auswahlfelder: ein Bedienelement, das nichts aendern kann, ist keins."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
-    s = _suppe(site, "wettbewerbsradar.html")
+    s = _radar(site)
     felder = [f.get("data-filter") for f in s.select("#wr-alarme [data-filter]")]
     assert felder == ["marke", "modell", "speicher", "suche"]
 
@@ -1561,7 +1579,7 @@ def test_jede_zahl_der_wochenkarte_steht_so_im_datensatz(tmp_path):
     import re
 
     site = _baue(tmp_path)
-    s = _suppe(site, "wettbewerbsradar.html")
+    s = _radar(site)
     abschnitt = s.select_one(".gr-auffaellig")
     assert abschnitt is not None, "die Wochenkarte fehlt"
     saetze = [li.get_text(" ", strip=True)
@@ -1621,7 +1639,7 @@ def test_die_geraeteseite_entsteht_ohne_jeden_netz_oder_modellaufruf(tmp_path,
     site = _baue(tmp_path)
     # O3: die Wochenkarte steht auf dem RADAR, die Tafeln auf der Geräte-
     # seite - geprüft wird BEIDES (die Stufe rendert ohne Netz beide).
-    assert _suppe(site, "wettbewerbsradar.html").select_one(
+    assert _radar(site).select_one(
         ".gr-auffaellig .gr-saetze li") is not None
     assert _suppe(site, "geraete.html").select_one("#tafel-tco") is not None
 
@@ -1838,7 +1856,7 @@ def test_keine_geraetezahl_auf_der_seite_ist_groesser_als_der_bestand(tmp_path):
     # („wurden N Geräte erstmals erfasst") - der Scan liest beide Seiten,
     # sonst fände er keine einzige und misste nichts.
     text = (suppe.get_text(" ", strip=True) + " " +
-            _suppe(site, "wettbewerbsradar.html").get_text(" ", strip=True))
+            _radar(site).get_text(" ", strip=True))
     zeilen = len(geraete["vergleich"]["ohne_vertrag"]["zeilen"])
     assert zeilen > bestand, (
         f"{zeilen} Zeilen bei {bestand} Geraeten - die Fixture kann den Fall "
@@ -1946,7 +1964,7 @@ def test_zwei_zahlen_nebeneinander_tragen_ein_trennzeichen(tmp_path):
     bestand = geraete["bilanz"]["geraete"]
     assert bestand, "kein Bestand - dann prueft der Test nichts"
 
-    suppe = _suppe(site, "wettbewerbsradar.html")
+    suppe = _radar(site)
     zeilen = suppe.select(".gr-tiefe li")
     assert zeilen, "keine Portfolio-Zeile gerendert - der Test misst nichts"
 
@@ -1979,7 +1997,7 @@ def test_die_portfolio_zeile_nennt_generationen_und_modelle_getrennt(tmp_path):
         tmp_path / "data" / "state", lade_quellen(tmp_path),
         lade_katalog(tmp_path), heute="2026-08-11")
     varianten = geraete["bilanz"]["skus"]
-    suppe = _suppe(site, "wettbewerbsradar.html")
+    suppe = _radar(site)
 
     zeilen = suppe.select(".gr-tiefe li")
     assert zeilen, "keine Portfolio-Zeile gerendert"
@@ -2048,7 +2066,7 @@ def test_der_alarmreiter_traegt_keine_verfuegbarkeitsspalte(tmp_path):
 
     Geloescht ist die Auskunft nicht - der Katalog traegt sie weiter."""
     site = _baue(tmp_path, db=_db_mit(24, anbieter=_UEBER_DER_SCHWELLE))
-    suppe = _suppe(site, "wettbewerbsradar.html")
+    suppe = _radar(site)
 
     alarm = suppe.select_one("#wr-alarme .gr-alarm")
     assert alarm, "Alarmtabelle fehlt in der Fixture"
@@ -2103,7 +2121,7 @@ def test_die_spaltenkoepfe_sind_sortierbar(tmp_path):
     Sortierung, die es nur im Test gibt, sortiert keine Seite."""
     site = _baue(tmp_path, db=_db_mit(24, anbieter=_UEBER_DER_SCHWELLE))
     suppe = _suppe(site, "geraete.html")
-    radar = _suppe(site, "wettbewerbsradar.html")
+    radar = _radar(site)
 
     # O2: die Alarm-Tabelle steht auf dem Radar, der Katalog auf der
     # Geraeteseite - geprueft wird jede an ihrem Ort.
@@ -2171,7 +2189,7 @@ def test_unter_vier_wochen_vorlauf_zeigt_die_wochenkarte_keine_tabelle(tmp_path)
     assert not auf["ohne_vorlauf"], (
         "das ist der Erstlauf-Zweig, nicht der kurze Vorlauf")
 
-    abschnitt = _suppe(site, "wettbewerbsradar.html").select_one(".gr-auffaellig")
+    abschnitt = _radar(site).select_one(".gr-auffaellig")
     assert abschnitt is not None, "die Wochenkarte fehlt"
     saetze = [li.get_text(" ", strip=True) for li in abschnitt.select(".gr-saetze li")]
     assert saetze, "kein Satz in der Karte"
@@ -2209,7 +2227,7 @@ def test_ueber_vier_wochen_vorlauf_kommt_die_tabelle_zurueck(tmp_path):
     assert auf["bewegungen"], (
         "keine Bewegung im Datensatz - dann sagt der Test nichts darüber, "
         "ob die Tabelle zurückkommt")
-    abschnitt = _suppe(site, "wettbewerbsradar.html").select_one(".gr-auffaellig")
+    abschnitt = _radar(site).select_one(".gr-auffaellig")
     assert abschnitt.select_one("table") is not None, (
         "über der Schwelle gehört die Tabelle zurück")
 
@@ -2223,7 +2241,7 @@ def test_die_wochenkarte_schreibt_preise_mit_komma(tmp_path):
     import re
 
     site = _baue(tmp_path)
-    abschnitt = _suppe(site, "wettbewerbsradar.html").select_one(".gr-auffaellig")
+    abschnitt = _radar(site).select_one(".gr-auffaellig")
     text = " ".join(li.get_text(" ", strip=True)
                     for li in abschnitt.select(".gr-saetze li"))
     assert "€" in text, f"kein Betrag in der Karte: {text!r}"
@@ -2291,9 +2309,13 @@ def test_b1_leer_hinweis_nennt_die_echte_beobachtungsschwelle(tmp_path):
     assert "Messfenster" not in text
     assert "kam" not in text or "Katalog kennt" not in text
 
-    suppe = _suppe(site, "wettbewerbsradar.html")
+    suppe = _radar(site)
     abschnitt = suppe.select_one("#lifecycle")
-    ueberschrift = [h for h in abschnitt.select("h3.gr-unter")
+    # h4, nicht h3: seit E3 Schritt 3 ist der Lifecycle-Sektionstitel der
+    # summary des zugeklappten Aufklappers (Prototyp-Bauform), die
+    # Unterlisten eine Ebene tiefer - `#tafel-radar h3.gr-unter` gehören
+    # den drei S3-Sektionen (test_geraete_radar_tafel zählt sie).
+    ueberschrift = [h for h in abschnitt.select("h4.gr-unter")
                     if "Nachfolger" in h.get_text()]
     assert ueberschrift, "die Ueberschrift fehlt"
     absatz = ueberschrift[0].find_next_sibling("p")
@@ -2431,7 +2453,7 @@ def test_b2_spalte_zeigt_gemessenen_anteil_und_kollidiert_nicht_mit_verweildauer
     assert n["verweildauer_tage"] == 222, n       # 01.01. -> 11.08.2026
     assert n["beobachtet_tage"] == 47, n          # 25.06. -> 11.08.2026
 
-    suppe = _suppe(site, "wettbewerbsradar.html")
+    suppe = _radar(site)
     abschnitt = suppe.select_one("#lifecycle")
     tabelle = abschnitt.select_one("table.gr-nachfolger")
     assert tabelle is not None, "die Tabelle haette entstehen muessen"
@@ -2466,7 +2488,7 @@ def test_die_zustandsspalte_erscheint_nur_bei_mehr_als_einem_zustand(tmp_path):
     erzeugen kann - genau dafuer ist er hier."""
     # Fall 1: alle Zeilen "neu" (Standard von `_listung()`) - keine Spalte.
     site = _baue_mit_nachfolger(tmp_path / "einheitlich")
-    suppe = _suppe(site, "wettbewerbsradar.html")
+    suppe = _radar(site)
     tabelle = suppe.select_one("table.gr-nachfolger")
     assert "Zustand" not in tabelle.select_one("thead").get_text()
 
@@ -2497,7 +2519,7 @@ def test_die_zustandsspalte_erscheint_bei_einem_zweiten_zustand(tmp_path, monkey
     assert len(zustaende) == 2, (
         f"Gegenprobe: die Fixture muss zwei Zustaende liefern, hat {zustaende}")
 
-    suppe = _suppe(site, "wettbewerbsradar.html")
+    suppe = _radar(site)
     tabelle = suppe.select_one("table.gr-nachfolger")
     assert tabelle is not None
     assert "Zustand" in tabelle.select_one("thead").get_text()
@@ -2571,7 +2593,7 @@ def test_b4_die_tabelle_bleibt_unter_der_hoehengrenze_bei_vielen_zeilen(tmp_path
     assert len(eff) == n, (
         f"Gegenprobe: die Fixture muss {n} Nachfolger-Zeilen liefern, hat {len(eff)}")
 
-    suppe = _suppe(site, "wettbewerbsradar.html")
+    suppe = _radar(site)
     abschnitt = suppe.select_one("#lifecycle")
     tabellen = abschnitt.select("table.gr-nachfolger")
     # NACHFOLGER_SICHTBAR = 0: keine sichtbare Tabelle OBERHALB des
@@ -2617,7 +2639,7 @@ def test_die_zelle_uebersteht_fehlende_verweildauer_felder(tmp_path, monkeypatch
                         _ohne_die_neuen_felder)
 
     site = _baue_mit_nachfolger(tmp_path)
-    suppe = _suppe(site, "wettbewerbsradar.html")
+    suppe = _radar(site)
     tabelle = suppe.select_one("table.gr-nachfolger")
     assert tabelle is not None, "auch ohne die neuen Felder muss die Zeile stehen"
     zeile = tabelle.select("tbody tr")[0]
@@ -2649,7 +2671,7 @@ def test_die_zelle_uebersteht_kaputte_preis_und_datumsfelder(tmp_path, monkeypat
     monkeypatch.setattr(geraete_view.geraete_lifecycle, "auswertung",
                         _kaputte_felder)
     site = _baue_mit_nachfolger(tmp_path)
-    suppe = _suppe(site, "wettbewerbsradar.html")
+    suppe = _radar(site)
     tabelle = suppe.select_one("table.gr-nachfolger")
     assert tabelle is not None
     zeile = tabelle.select("tbody tr")[0]
@@ -2693,8 +2715,10 @@ def test_ein_ratengesamtbetrag_wird_auf_der_seite_als_solcher_gezeigt(tmp_path):
 
 def test_die_seite_behauptet_keinen_reinen_barpreisvergleich_mehr(tmp_path):
     """Solange o2 und Vodafone in derselben Spalte stehen, ist "ausschliesslich
-    Neugeraete ohne Vertrag" die Behauptung, die Befund A widerlegt hat."""
+    Neugeraete ohne Vertrag" die Behauptung, die Befund A widerlegt hat.
+    Seit E3 Schritt 3 steht der Satz in der Alarm-Sektion des Radar-Reiters
+    (geteilte Teilvorlage _geraete_alarme.html.j2)."""
     site = _baue(tmp_path)
-    text = (site / "wettbewerbsradar.html").read_text(encoding="utf-8")
+    text = _radar(site).get_text(" ", strip=True)
     assert "ausschließlich Neugeräte ohne Vertrag" not in text
     assert "nicht dasselbe wie ein Barpreis" in text

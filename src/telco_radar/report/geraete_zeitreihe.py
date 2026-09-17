@@ -274,9 +274,14 @@ def _antwort_html(modell: dict, band: str, zeilen: list,
             f"{_gb_teil(beste)})")
     eigen = next((z for z in zeilen if z["anbieter"] == EIGEN), None)
     if eigen is not None and eigen is not beste:
+        # E3-Fix (QA 17.09.2026, B1): Die Zeilen stehen AUFSTEIGEND, der
+        # Beste liegt also IMMER unter der Referenz, sobald Vodafone nicht
+        # selbst fuehrt - die Differenz ist sein Abstand nach UNTEN, und
+        # "ueber" war immer falsch gepolt. Dieselbe Richtungssprache wie
+        # die Buendel-Karten (S4): unter heisst guenstiger.
         satz += (f" — <b class='gr-zr-zahl'>"
                  f"{_euro(round(eigen['gesamt'] - beste['gesamt'], 2))}"
-                 f"</b> über der Vodafone-Referenz ({_euro(eigen['gesamt'])}"
+                 f"</b> unter der Vodafone-Referenz ({_euro(eigen['gesamt'])}"
                  f"{', Näherung' if eigen.get('naeherung') else ''}).")
     elif eigen is beste:
         zweit = zeilen[1] if len(zeilen) > 1 else None

@@ -123,7 +123,21 @@ STATUS_NICHT_VERGLEICHBAR = "nicht_vergleichbar"   # z. B. refurbished
 # erhebbare/unvergleichbare Zeilen duerfen nie verschwinden, auch nicht
 # hinter einer Kappung).
 SICHTBAR_MAX = 15
-HAENDLER_SICHTBAR_MAX = 20
+# E3/S3: 6 statt 20 - die Händler-Sektion ist seit E3 die DRITTE von drei
+# gleichwertigen Sektionen der Radar-Tafel und teilt deren 3000-px-Budget
+# (am echten Bestand: 20 Zeilen massen 993 px allein, die ganze Seite mit
+# 8 Zeilen 3216 px). Der Rest steht im Aufklapper "Alle N Händler-Zeilen",
+# nichts geht verloren.
+HAENDLER_SICHTBAR_MAX = 6
+
+# E3/S2: der Deckel der MODELL-LISTE im Radar-Reiter von geraete.html.
+# Dieselbe Bauform wie `SICHTBAR_MAX` (nichts geloescht, Rest hinter dem
+# Knopf "alle N anzeigen"), aber ein EIGENER Wert: die drei Sektionen des
+# Radar-Reiters teilen sich DAS Hoehenbudget EINER Tafel (Kriterium 11b
+# misst die Seite, nicht die Sektion). Am echten Bestand gemessen
+# (17.09.2026, 88 Modelle, Zeile ~78 px wegen der Δ-Zweizeiligkeit):
+# 6 Zeilen massen die Seite auf 3216 px - mit 5 bleibt sie unter 3000 px.
+MODELLISTE_SICHTBAR = 5
 
 _BAND_LABEL = {k: l for k, l, _ in geraete_tco_band.BAENDER}
 # Einfuegereihenfolge der Baender in einer Gruppe: die Ordnung aus
@@ -352,6 +366,114 @@ def netzbetreiber_gruppen(modelle: list, band_je_tarif: dict) -> list[dict]:
     return gruppen
 
 
+# E3/S2: das Lueckenwort je Gruppen-Status. Es benennt, WARUM keine Zahl
+# steht, statt eine leere Zelle zu zeigen - ein Modell ohne Vergleich ist
+# eine Aussage (und der Grund steht wortreich in der Detailzeile).
+_LUECKE_WORT = {
+    STATUS_BAND_MISMATCH: "kein gemeinsames Band",
+    STATUS_KEIN_BUENDEL: "kein Bündel erhoben",
+    STATUS_NICHT_VERGLEICHBAR: "nicht vergleichbar",
+}
+
+
+def _dvorzeichen(betrag: float, stellen: int = 2) -> str:
+    """Deutsche Schreibweise MIT Vorzeichen und Tausenderpunkt.
+
+    S4 (einheitliche Sprache): die Seite spricht deutsche Zahlen (Alarm-
+    tabelle, Buendelzeilen) - bis E3 standen in der Abweichungsspalte der
+    Schwesterseite Punktzahlen (Python-Format ungefiltert). Dasselbe
+    Vorzeichen wie ueberall: negativ = Wettbewerber guenstiger.
+    """
+    text = f"{betrag:+,.{stellen}f}"
+    return text.replace(",", "#").replace(".", ",").replace("#", ".")
+
+
+def modellliste(gruppen: list[dict]) -> dict:
+    """EINE Zeile je Modell - die Modell-Liste des Radar-Reiters (S2).
+
+    Antonio: „Ich musste auch irgendwo sehen können, die ganzen Modelle
+    irgendwo aufgelistet." Die Gruppen aus `netzbetreiber_gruppen` tragen
+    je Modell ALLE Anbieter-Zeilen (Paare, Mismatches, Platzhalter) - fuer
+    die Liste wird daraus EINE Hauptzeile je Modell:
+
+      * die STAERKSTE Abweichung (der `rang` der Gruppe - negativste
+        Prozentzahl zuerst, die bewusste Leseentscheidung des Modulkopfs),
+        getragen von dem Anbieter-Paar, das sie gerechnet hat,
+      * oder das Lueckenwort, wenn kein vergleichbares Paar steht,
+
+    und dazu alles, was die Detailzeile braucht (VF-Basis und ALLE
+    Anbieter-Zeilen der Gruppe - kein Anbieter wird weggedeckelt, B.2.5).
+    KEINE zweite Rechnung: Prozent und Euro-Betraege sind die Werte der
+    Paarzeile, ungekuerzt uebernommen.
+
+    `sichtbar`/`rest` kappen nur die ANSICHT (`MODELLISTE_SICHTBAR`,
+    Knopf „alle N anzeigen") - `zeilen` bleibt die vollstaendige Liste.
+    """
+    zeilen = []
+    for g in gruppen:
+        paar = next((z for z in g["zeilen"]
+                     if z["status"] == STATUS_VERGLEICHBAR), None)
+        luecke = ""
+        sprung_band = ""
+        if paar is None:
+            if g["vodafone"] is None:
+                luecke = "kein Vodafone-TCO-24 erhoben"
+            else:
+                # band_mismatch ist der AUSSAGEKRAEFTIGSTE Grund (es gibt
+                # Karten auf beiden Seiten, nur kein gemeinsames Band) -
+                # Platzhalter-kein_buendel-Zeilen stehen in fast jeder
+                # Gruppe daneben und wuerden ihn ueberdecken.
+                luecke = "kein Vergleich"
+                for status in (STATUS_BAND_MISMATCH,
+                               STATUS_NICHT_VERGLEICHBAR,
+                               STATUS_KEIN_BUENDEL):
+                    if any(z["status"] == status for z in g["zeilen"]):
+                        luecke = _LUECKE_WORT[status]
+                        break
+        else:
+            sprung_band = paar.get("band") or ""
+        zeilen.append({
+            "id": g["id"], "titel": g["titel"],
+            "hersteller": g["hersteller"], "speicher": g["speicher"],
+            # Der TITEL traegt die GB-Stufe meist schon („Xiaomi 17 512 GB")
+            # - die Klein-Zeile der Zeile wuerde sie ein zweites Mal setzen
+            # („512 GB 512 GB", dieselbe Fehlerklasse wie „2454 Modelle").
+            "speicher_klein": ("" if g["speicher"] and
+                               f"{g['speicher']} GB" in (g["titel"] or "")
+                               else (f"{g['speicher']} GB" if g["speicher"]
+                                     else "")),
+            "prozent": paar["prozent"] if paar else None,
+            "euro": (paar["gesamt"] - paar["vf_gesamt"]) if paar else None,
+            # Fertige deutsche Zeichenketten fuer die Zelle - die Vorlage
+            # formatiert keine Zahl (S4; und ein zweiter Formatierer im
+            # Template waere die zweite Stelle fuer dieselbe Zahl).
+            "prozent_text": (_dvorzeichen(paar["prozent"], 1)
+                             if paar else ""),
+            "euro_text": (_dvorzeichen(paar["gesamt"] - paar["vf_gesamt"])
+                          if paar else ""),
+            "anbieter": (paar or {}).get("anbieter", ""),
+            "tarif": (paar or {}).get("tarif", ""),
+            "band_label": (paar or {}).get("band_label", ""),
+            "gesamt": (paar or {}).get("gesamt"),
+            "vf_gesamt": (paar or {}).get("vf_gesamt"),
+            "quelle_url": (paar or {}).get("quelle_url", ""),
+            "abgerufen_am": (paar or {}).get("abgerufen_am", ""),
+            "luecke": luecke,
+            # Das Band des Paares - der Sprung in den Graphen landet direkt
+            # im Band, in dem die Abweichung gerechnet wurde (Deep-Link
+            # ?modell=…&band=…). Ohne Paar bleibt es leer und der Graph
+            # waehlt selbst sein erlaubtes Band.
+            "sprung_band": sprung_band,
+            "vodafone": g["vodafone"],
+            "vodafone_grund": g["vodafone_grund"],
+            "gruppe_zeilen": g["zeilen"],
+        })
+    return {"zeilen": zeilen,
+            "sichtbar": zeilen[:MODELLISTE_SICHTBAR],
+            "rest": zeilen[MODELLISTE_SICHTBAR:],
+            "gesamt": len(zeilen)}
+
+
 def haendler_zeilen(vergleich_ohne_vertrag: dict) -> list[dict]:
     """Der Händler-Abschnitt (Aufgabe: eigener, klar beschrifteter Bereich).
 
@@ -432,6 +554,9 @@ def radar(tco: dict, vergleich_ohne_vertrag: dict, quellenlage: dict,
         "gruppen": gruppen,
         "gruppen_sichtbar": gruppen[:SICHTBAR_MAX],
         "gruppen_rest": gruppen[SICHTBAR_MAX:],
+        # E3/S2: die Modell-Liste des Radar-Reiters - aus denselben Gruppen
+        # abgeleitet, keine zweite Rechnung.
+        "modelliste": modellliste(gruppen),
         "haendler": haendler,
         "haendler_sichtbar": haendler[:HAENDLER_SICHTBAR_MAX],
         "haendler_rest": haendler[HAENDLER_SICHTBAR_MAX:],
@@ -483,6 +608,8 @@ def _alarme_leer() -> dict:
 
 def leer() -> dict:
     return {"gruppen": [], "gruppen_sichtbar": [], "gruppen_rest": [],
+            "modelliste": {"zeilen": [], "sichtbar": [], "rest": [],
+                           "gesamt": 0},
             "haendler": [], "haendler_sichtbar": [], "haendler_rest": [],
             "nicht_erhebbar": [],
             "hat_daten": False, "hat_vergleichbare_zeilen": False,

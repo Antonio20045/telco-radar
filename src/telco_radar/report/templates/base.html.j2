@@ -85,15 +85,14 @@
       {% if geraete_verlinkt %}
       <a href="{{ prefix }}geraete.html" {% if active=='geraete' %}class="on"{% endif %}>Geräte</a>
       {% endif %}
-      {# "Wettbewerbs-Radar" (RAD-1, AUFTRAG_GERAETESEITE.md §2b) schaltet
-         sich nach derselben Mechanik selbst: verlinkt erst, wenn mindestens
-         eine vergleichbare %-Zeile existiert (`wettbewerbsradar.radar()`
-         rechnet die Schwelle in `render_site()`). Eine Abweichungsseite
-         ohne eine einzige Abweichung verspräche eine Antwort, die sie
-         nicht hat. #}
-      {% if wettbewerbsradar_verlinkt %}
-      <a href="{{ prefix }}wettbewerbsradar.html" {% if active=='wettbewerbsradar' %}class="on"{% endif %}>Wettbewerbs-Radar</a>
-      {% endif %}
+      {# "Wettbewerbs-Radar" stand hier vom 08.09. bis zum 17.09.2026 und
+         ist gefallen: Seit E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d) ist der
+         Radar der Reiter "Radar" der EINEN Geräteseite - ein zweiter
+         Eintrag wäre eine zweite Adresse für dieselbe Antwort (Antonio:
+         „Geräte, Wettbewerbsradar, eine Unterseite"). Die Alt-URL leitet
+         als Weiterleitung auf geraete.html#tafel-radar weiter; die
+         Schwelle `wettbewerbsradar_verlinkt` schaltet nur noch den
+         Fußlink der Geräteseite. #}
       {# "Lieferzeiten" und "Tarife" standen hier vom 08.08. bis zum
          09.08.2026 und sind wieder heraus. Nicht geloescht - beide Seiten
          werden weiter gebaut, getestet und sind ueber ihren direkten Link

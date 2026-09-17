@@ -259,20 +259,24 @@ def test_der_deep_link_oeffnet_das_angegebene_modell(ctx):
 
 
 def test_der_querlink_des_radars_deep_linket(ctx):
-    """B5 im Ganzen: der Querlink auf wettbewerbsradar.html trägt
-    ?modell=<id>, und der führt auf der Geräteseite zu genau dem Modell,
-    dessen Block ihn trägt."""
+    """B5 im Ganzen (E3-Fassung): der Sprung-Link je Modell-Zeile der
+    Abweichungsliste trägt ?modell=<id>, und der führt zu genau dem
+    Modell, dessen Zeile ihn trägt. Bis E3 Schritt 3 standen die Links auf
+    wettbewerbsradar.html (Seitenwechsel); der Radar ist jetzt der Reiter
+    - der Sprung bleibt ein Deep-Link, app.js wechselt nur in-page."""
     _site, wurzel, browser = ctx
     s = browser.new_page(viewport={"width": 1440, "height": 900})
     try:
-        s.goto(f"{wurzel}/wettbewerbsradar.html", wait_until="networkidle")
+        s.goto(f"{wurzel}/geraete.html#tafel-radar", wait_until="networkidle")
+        s.wait_for_timeout(150)
         links = s.eval_on_selector_all(
-            "a[href^='geraete.html?modell=']", "e => e.map(a => a.href)")
-        assert links, "der Radar trägt keinen Querlink"
+            "#wr-abweichung a.gr-sprung[href^='geraete.html?modell=']",
+            "e => e.map(a => a.href)")
+        assert links, "die Modell-Liste trägt keinen Sprung-Link"
         ziel = links[0]
         s.goto(ziel, wait_until="networkidle")
         s.wait_for_timeout(300)
-        gewollt = ziel.split("modell=", 1)[1]
+        gewollt = ziel.split("modell=", 1)[1].split("&", 1)[0]
         assert f"modell={gewollt}" in s.url
         # Der Antwort-Satz nennt das Geraet OHNE Hersteller-Praefix und
         # GB-Zahl ("iPhone 17 Pro") - die starke Aussage ist ohnehin die
@@ -375,15 +379,18 @@ def test_kein_querscroll_auf_dem_telefon_geraete(ctx):
 
 
 def test_kein_querscroll_auf_dem_telefon_radar(ctx):
+    """E3 Schritt 3: die Radar-Tafel ist der Reiter der EINEN Geräteseite -
+    gemessen wird sie dort (der Hash schaltet den Reiter), nicht auf der
+    Alt-URL, die nur noch weiterleitet."""
     _site, wurzel, browser = ctx
     s = browser.new_page(viewport={"width": 390, "height": 844})
     try:
-        s.goto(f"{wurzel}/wettbewerbsradar.html", wait_until="load")
+        s.goto(f"{wurzel}/geraete.html#tafel-radar", wait_until="load")
         s.wait_for_timeout(400)
         quer = s.evaluate(
             "Math.max(document.documentElement.scrollWidth,"
             "document.body.scrollWidth)")
-        assert quer <= 391, f"wettbewerbsradar.html rollt waagerecht: {quer} px"
+        assert quer <= 391, f"der Radar-Reiter rollt waagerecht: {quer} px"
     finally:
         s.close()
 
