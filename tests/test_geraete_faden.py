@@ -39,8 +39,9 @@ def test_der_eine_graph_ist_die_zeitreihe(tmp_path):
     Antonios ausdrueckliche Entscheidung (AUFTRAG_GERAETE_EINE_SEITE_V2
     §1a): der EINE Graph der Vergleichsansicht ist DIE TCO-ZEITREIHE, ein
     SVG-Koordinatensystem mit Punkten je Messung. Die Balkenform (O1) ist
-    ERSETZT: .gr-hgraph und .gr-bz sind Reste, G1 bleibt verboten; G0
-    wohnt weiter im Verlaufs-Reiter."""
+    ERSETZT: .gr-hgraph und .gr-bz sind Reste, G1 bleibt verboten; G0 ist
+    seit dem E3-Fix (QA 17.09.2026) ganz gefallen - der Verlaufs-Reiter
+    traegt seine eigene Barpreis-Auswahl, keine zweite Grafik daneben."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
     assert tafel.select("svg.gr-g1") == []

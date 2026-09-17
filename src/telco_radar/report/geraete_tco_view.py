@@ -47,7 +47,7 @@ from __future__ import annotations
 import logging
 
 from . import geraete_tco_band, geraete_tco_grafik, geraete_tco_karten
-from . import geraete_vergleich, geraete_verlauf
+from . import geraete_vergleich
 from ..geraete_model import (VERGLEICHBARE_ZUSTAENDE, Ratenzahlung,
                              normalisiere)
 from ..tarif_model import PREISTYP_LIVE_SHOP
@@ -720,10 +720,13 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
     modelle = geraete_tco_karten.modelle(buendel, eintraege, referenzen,
                                          tarife, katalog)
 
-    # DER ZEITREIHEN-BLOCK (BRIEF_ZEITREIHE, 05.09.2026) - der neue
-    # Hauptgraph ueber den Balkenbloecken. Er braucht die LISTUNGEN je
-    # Modell, nicht die Buendel - deshalb einmal vorab gruppiert, statt je
-    # Modell erneut ueber `eintraege` zu laufen.
+    # DIE LISTUNGEN JE MODELL, einmal vorab gruppiert: gebraucht fuer die
+    # Händler-Preise ohne Bündel (A-R3, weiter unten) - statt je Modell
+    # erneut ueber `eintraege` zu laufen. Bis zum E3-Fix (QA 17.09.2026)
+    # berechnete hier zudem der G0-Block des Verlaufs-Reiters seine
+    # Barpreis-Zeitreihe je Modell (`modell["zeitreihe"]` samt
+    # `ohne_barpreis`) - der Block ist mit seiner Doppel-Darstellung zur
+    # eigenen Geräteauswahl gefallen, die Rechnung mit ihm.
     listungen_je_modell: dict[str, list] = {}
     for e in eintraege:
         mid = geraete_tco_karten.modell_schluessel(e.get("device_id"),
@@ -747,20 +750,6 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         # Zahlen.
         modell["svg"] = geraete_tco_grafik.balken(modell)
         modell["legende"] = geraete_tco_grafik.legende(modell)
-        reihen = geraete_verlauf.reihen_fuer_listungen(
-            listungen_je_modell.get(modell["id"], []), historie
-        ) if historie is not None else []
-        modell["zeitreihe"] = geraete_tco_grafik.zeitreihe(reihen)
-        # O4: welcher Anbieter dieses Modells KEINE Barpreis-Reihe hat -
-        # der ehrliche Satz unter der G0-Grafik im Verlaufs-Reiter (Entwurf
-        # §2: "1&1 verkauft dieses Gerät nur im Bündel — kein Barpreis
-        # messbar"). Gemeint sind Anbieter mit ECHTEM Bündel (Karte mit
-        # SKU), die ohne Zeile dastehen - die Näherung ist kein Bündel,
-        # und ein Händler ohne Bündel ist keine Lücke.
-        mit_reihe = {l["anbieter"] for l in modell["zeitreihe"]["linien"]}
-        modell["ohne_barpreis"] = sorted(
-            {k["anbieter"] for k in modell["karten"]
-             if k.get("sku_id") and k["anbieter"] not in mit_reihe})
         # A-R3: Amazon, Expert und Saturn fuehren kein Tarifbuendel - sie
         # bekommen keine `tcokarte`. Sobald einer von ihnen fuer DIESES
         # Modell trotzdem einen reinen Geraetepreis liefert (Saturn seit

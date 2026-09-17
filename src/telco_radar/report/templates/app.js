@@ -1006,23 +1006,21 @@ var TelcoFrage = (function () {
     });
   }
 
-  /* --- Die Buendel-Zeilen und der G0-Block folgen dem Modell (O3/O4,
-     unveraendert): Fragment, Klon des Anfangszustands, eigene Folgen. */
+  /* --- Die Buendel-Zeilen folgen dem Modell (O3, unveraendert): Fragment,
+     Klon des Anfangszustands, eigene Folgen. E3-Fix (QA 17.09.2026): der
+     G0-Block des Verlaufs-Reiters ist gefallen - er zeigte den Barpreis
+     des VERGLEICHS-Reiter-Modells neben der eigenen Auswahl desselben
+     Reiters (Doppel-Darstellung, §4.6/§4.8). */
   var fragmentLager = null;
   var fragmentVersprechen = null;
   var vorgabeGruppe = null;
-  var g0Lager = null;
-  var vorgabeG0 = null;
   var wechselFolge = 0;
-  var g0Folge = 0;
   var zuletztModell = null;
   var vorgabe = daten.vorgabe;
 
   (function () {
     var anfangsGruppe = element('gr-bnd-gruppe');
     if (anfangsGruppe) vorgabeGruppe = anfangsGruppe.cloneNode(true);
-    var anfangsG0 = element('gr-g0-lager');
-    if (anfangsG0) vorgabeG0 = anfangsG0.cloneNode(true);
   })();
 
   function holeFragment() {
@@ -1040,12 +1038,6 @@ var TelcoFrage = (function () {
             doc.querySelectorAll('.gr-bnd-lager[data-modell]'),
             function (l) {
               fragmentLager[l.getAttribute('data-modell')] = l;
-            });
-          g0Lager = {};
-          Array.prototype.forEach.call(
-            doc.querySelectorAll('.gr-g0-lager[data-modell]'),
-            function (l) {
-              g0Lager[l.getAttribute('data-modell')] = l;
             });
           return fragmentLager;
         });
@@ -1105,32 +1097,6 @@ var TelcoFrage = (function () {
     }, function () {
       if (meineFolge !== wechselFolge) return;
       fertig(null, true);
-    });
-  }
-
-  function fuelleG0(knotenB) {
-    var lager = element('gr-g0-lager');
-    if (!lager) return;
-    while (lager.firstChild) lager.removeChild(lager.firstChild);
-    if (knotenB) {
-      var klon = document.importNode(knotenB, true);
-      while (klon.firstChild) lager.appendChild(klon.firstChild);
-    }
-  }
-
-  function setzeG0(mid) {
-    if (!element('gr-g0-lager')) return;
-    if (mid === vorgabe) {
-      fuelleG0(vorgabeG0);
-      return;
-    }
-    var meineFolge = ++g0Folge;
-    holeFragment().then(function () {
-      if (meineFolge !== g0Folge) return;
-      fuelleG0(g0Lager ? g0Lager[mid] : null);
-    }, function () {
-      if (meineFolge !== g0Folge) return;
-      fuelleG0(null);
     });
   }
 
@@ -1268,7 +1234,6 @@ var TelcoFrage = (function () {
     if (zustand.modell !== zuletztModell) {
       zuletztModell = zustand.modell;
       setzeBuendel(zustand.modell, zustand.band);
-      setzeG0(zustand.modell);
     }
     try {
       history.replaceState(null, '',

@@ -22,15 +22,11 @@
    Das VORGABEMODELL steht NICHT hierin - seine Zeilen rendert die Seite
    selbst (First Paint ohne jede Anfrage, lesbar ohne JavaScript).
 
-   O4 (15.09.2026) trägt dieselbe Datei zusätzlich den G0-Block je Modell
-   (`_geraete_g0.html.j2`, aus DEMSELBEN Makro wie der Server-Block der
-   Seite): der Modellwechsel tauscht die Barpreis-Zeitreihe im Verlaufs-
-   Reiter aus, ohne eine zweite Anfrage und ohne einen Client-Renderer.
-   ZWEI Lager-Knoten je Modell (`gr-bnd-lager` für die Zeilen der
-   Vergleichsansicht, `gr-g0-lager` für den Verlaufs-Reiter) statt einem
-   gemischten: die Montagepunkte auf der Seite sind zwei verschiedene. #}
+   E3-Fix (QA 17.09.2026): O4 trug diese Datei ZUSÄTZLICH den G0-Block je
+   Modell (`.gr-g0-lager`, zweiter Lager-Knoten je Modell für den Verlaufs-
+   Reiter). Der Block ist mit seiner Doppel-Darstellung gefallen (siehe den
+   Kommentar am Verlaufs-Reiter in `geraete.html.j2`) - das Fragment trägt
+   wieder NUR die Bündel-Zeilen. #}
 {% from "_geraete_buendel.html.j2" import buendelgruppe %}
-{% from "_geraete_g0.html.j2" import g0block %}
 {% for m in modelle %}{% if m.id != vorgabe %}<div class="gr-bnd-lager" data-modell="{{ m.id }}">{{ buendelgruppe(m) }}</div>
-<div class="gr-g0-lager" data-modell="{{ m.id }}">{{ g0block(m) }}</div>
 {% endif %}{% endfor %}

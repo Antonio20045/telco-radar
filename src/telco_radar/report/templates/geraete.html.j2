@@ -67,10 +67,10 @@
    `_geraete_buendel.html.j2` - dieselbe Quelle für die Seite (Vorgabe-
    modell, serverseitig) und das lazy Fragment `geraete_buendel_fragment
    .html.j2` (alle übrigen Modelle, siehe den Kommentar an `#gr-buendel`).
-   O4 (15.09.2026): derselbe Weg für den G0-Block des Verlaufs-Reiters. #}
+   E3-Fix (QA 17.09.2026): der G0-Block des Verlaufs-Reiters ist GEFALLEN
+   (Doppel-Darstellung zur eigenen Geräteauswahl, §4.6/§4.8). #}
 {% from "_geraete_buendel.html.j2" import buendelzeile, buendelgruppe %}
 {% from "_geraete_zeitreihe.html.j2" import paarblock %}
-{% from "_geraete_g0.html.j2" import g0block %}
 {# E3 Schritt 2: die Radar-Tafel - `with context`, weil das Makro den
    `prefix` der Seite für den Tarifübersichts-Link braucht. #}
 {% from "_geraete_radar.html.j2" import radar_tafel with context %}
@@ -713,11 +713,13 @@
    zu stellen, wäre Doppel-Darstellung (§4.6/4.8); der Reiter fragt
    deshalb bewusst ANDERS: Wie hat sich der BARPREIS eines Geräts
    entwickelt - ohne Tarif, ohne Bindung, reine Euro über der Zeit.
-   Seine Bausteine messen alle genau das (G0 = Barpreis je Modell, G2 =
-   Barpreis-Änderungen, die Auswahl unten = Barpreis je Gerät); der
-   TCO-Historie-Absatz, der eine Gesamtkosten-Kurve ANKÜNDIGTE, ist mit
-   der Umwidmung gefallen - die Kurve existiert seit E2, und ihre
-   Messtage nennt die Zeitreihe selbst.
+   Seine Bausteine messen alle genau das (G2 = Barpreis-Änderungen über
+   den Markt, die Auswahl unten = Barpreis je Gerät); der TCO-Historie-
+   Absatz, der eine Gesamtkosten-Kurve ANKÜNDIGTE, ist mit der Umwidmung
+   gefallen - die Kurve existiert seit E2, und ihre Messtage nennt die
+   Zeitreihe selbst. Der G0-Block (Barpreis je Modell, gesteuert vom
+   VERGLEICHS-Reiter) ist mit dem E3-Fix vom 17.09.2026 gefallen - siehe
+   den Kommentar am Reiter-Anfang.
 
    Die Reihenfolge von oben nach unten ist vorgegeben und nicht verhandelbar:
    Suchfeld -> Zeitraum -> vier Kacheln -> Diagramm -> Tabelle. Solange kein
@@ -726,27 +728,20 @@
    im Ausgangszustand ist an seiner Stelle nur ein Satz.                #}
 <div class="gr-tafel gr-tafel--aus" id="tafel-verlauf" role="tabpanel">
 
-{# --- O4: G0, die Barpreis-Zeitreihe des GEWÄHLTEN Modells -------------
-   Bis O1 stand diese Grafik in der Vergleichsansicht; O1 kappte den
-   Aufruf und lieess die Rechnung im Code. Hier ist sie wieder angebunden:
-   serverseitig fuer das VORGABEMODELL (First Paint ohne JavaScript), beim
-   Modellwechsel aus demselben Fragment wie die Bündel-Zeilen (`app.js`,
-   setzt fertiges Markup - kein zweiter Renderer). Der Montagepunkt ist
-   `#gr-g0-lager`; der Klon des Vorgabe-Zustands wird beim Laden gezogen
-   (die S2-Lektion von O3 gilt hier genauso). #}
-{% if geraete.tco.modelle %}
-{# E2: der First Paint des G0-Blocks folgt dem ZEITREIHEN-Startmodell -
-   nicht mehr der alten Bündel-Vorgabe. Der Modellwechsel kommt heute aus
-   der Zeitreihen-Wahl; zeigten Graph und G0 verschiedene Geräte, wäre
-   der Rückweg zum Startzustand der erste inkonsistente Klick. #}
-{% set g0_wahl = (geraete.zeitreihe.start.modell if geraete.zeitreihe.start
-  else geraete.tco.modell_vorgabe) %}
-{% set g0_modell = geraete.tco.modelle | selectattr('id', 'equalto',
-  g0_wahl) | first %}
-{% if g0_modell %}
-<div id="gr-g0-lager">{{ g0block(g0_modell) }}</div>
-{% endif %}
-{% endif %}
+{# --- E3-Fix (QA 17.09.2026): G0 IST GEFALLEN ----------------------------
+   Bis zu diesem Fix stand hier der G0-Block - die Barpreis-Zeitreihe des
+   Modells, das der VERGLEICHS-Reiter gewählt hat (serverseitig fürs
+   Vorgabemodell, per Fragment je Modellwechsel). Der Reiter trug damit
+   ZWEI Barpreis-Grafiken desselben Geräts über dieselbe Zeitachse: diesen
+   Block oben und die eigene Geräteauswahl unten - §4.6/§4.8 (keine
+   Doppel-Darstellung, keine zweite Graph-Form neben der Zeitreihe).
+   Verschärft hatte der QA-Lauf gemessen: Wählt der Leser im Verlaufs-
+   Suchfeld ein Gerät, folgte der obere Block NICHT (er hängt an der
+   Modellwahl des anderen Reiters) - zwei Bilder, widersprüchlicher
+   Gerätezustand. Die Barpreis-Frage des Reiters (E3/S1) antworten G2
+   (marktweite Änderungen) und die eigene Auswahl unten. Mitgefallen:
+   `_geraete_g0.html.j2`, der G0-Teil des Fragments und `app.js`-Montage
+   (`setzeG0`), die Rechnung `modell["zeitreihe"]` im View. #}
 
 <section class="gr-verlauf" id="verlauf">
   <h2 class="rubrik">Wie sich der Barpreis eines Geräts entwickelt hat</h2>
