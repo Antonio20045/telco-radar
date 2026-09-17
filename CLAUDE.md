@@ -1723,6 +1723,62 @@ bleiben die erste Instanz — die Referenz ergänzt sie, sie ersetzt sie nicht.
 
 ## 8a. Der nächste Auftrag
 
+> **Zuletzt erledigt (17.09.2026): EINE Geräteseite — die Phasen E2–E6.**
+> Auftragsgrundlage: `AUFTRAG_GERAETE_EINE_SEITE_V2.md`. Orchestrierung als
+> **Lean-Lead**: je Phase ein eigener Workflow, der Bau in schmale Agenten
+> zerlegt, frische Prüfer je Phase, dann Fix und Nachprüfung; Abnahme, Merge
+> und Live-Beweis machte der Lead. Merges: E2 `8941911`, E3 `414a3e4`, E4
+> `fd9c9c3`, E5 `90a0222` — jeder mit `deploy.yml` success und live
+> byte-identischer Seite (md5). Suite über die Session: **3094 → 3112 → 3140
+> → 3157 passed / 1 failed / 12 skipped** — das Rot ist durchgehend der
+> vorbestehende `test_geraete_lifecycle`-Nachtlauf-Test; `pruefe_portal.py`
+> durchgehend **18 bestanden / 0 durchgefallen**.
+>
+> | Phase | Merge | Die eine Regel, die sie trägt |
+> |---|---|---|
+> | **E2: TCO-Zeitreihe als Hauptansicht** | `8941911` | **Die genehmigte Zeitreihe, unverfälscht**: Y=€, X=echte Messtage, je Messung ein Punkt, nichts interpoliert; Vodafone rot als „unser Angebot", Beleg-Links (↗ + Datum) am Anbieter. Dazu Suchfeld mit Vorschau ab 2 Zeichen (max 8 Treffer), Band-Wahl, Kacheln, ein Antwort-Satz, der TCO-24 auflöst, EIN Lücken-Sammelsatz und genau DREI Rest-Aufklapper (Rechenschaft / Rechenweg / Maßstab & Datenlage). Neu: `report/geraete_zeitreihe.py` + Fragment `site/data/geraete-zeitreihe.html` — serverseitig, zwei SVG-Varianten per Mediaquery, kein Client-Rechnen. `pruefe_portal.py`-Kriterien 11/11c darauf umgestellt |
+> | **E3: EINE Seite, VIER Reiter** | `414a3e4` | Vergleich · Radar · Preisverlauf · Gerätekatalog. Die Radar-Tafel nach S2/S3: Alarme / „Alle Modelle nach Abweichung zu Vodafone" als Modell-Liste mit Sprung in den Graph / Händler-Barpreis als eigener Abschnitt. Der Preisverlauf-Reiter ist auf die BARPREIS-Frage umgewidmet (Begründung: der TCO-Verlauf ist seit E2 die Hauptansicht, §4.6); der Portfolio-Aufklapper liegt im Katalog (`#gr-sortiment`); `wettbewerbsradar.html` ist eine Meta-Refresh-Weiterleitung, Navigation 8 → 7, Querlinks umgestellt |
+> | **E4: Auto-Erkennung** | `fd9c9c3` | **Nur strukturierte Katalognamen** (Telekom `name`, o2 `description`, Vodafone `modelName`) — `collect/geraete/autoerkennung.py`; State `data/state/geraete_katalog_auto.json` + `geraete_unbekannt.jsonl`, beide im gezielten geraete.yml-Stand-Commit. Hand schlägt Auto (auch fuzzy); Sichtbarkeit in der Zeitreihen-Wahl ab 2 Messtagen, Listungen ab Tag 1; Marker `auto:<datum>`, `marktstart`/`vorgaenger` leer |
+> | **E5: Exporte zentral** | `90a0222` | Vier Export-Knöpfe in der Kopfzeile (mobil sichtbar, der Kopf wird zur Spalte); die Radar-CSV behält den Namen `wettbewerbsradar.csv` und schreibt die 48 Alarm-Zeilen zuerst — damit sind 4/4 Zahlensektionen exportierbar. Fünf Leer-Sicherungen als gerenderte, benannte Zustände (Zeitreihe ohne Bündel / Radar ohne Alarme / ohne Abweichungszeilen / Katalog leer / Export ohne Zeilen); toter Zwei-Seiten-Code weg (`grep wettbewerbsradar` → nur Redirect + Exportname); Anzeigename „Beim Xiaomi 17" statt „Beim 17" |
+>
+> **E6 — der Live-Beweis von Antonios Beispiel:** live „pixel 11" ins
+> Suchfeld → Vorschau mit 8 Treffern → Klick → Band „Mittel" → „o2 am
+> günstigsten: 1.060,75 € über 24 Monate (TCO-24) … 901,05 € unter der
+> Vodafone-Referenz"; Deep-Link `?modell=google-pixel-11-256&band=mittel`.
+>
+> **Was die Prüfer gefunden haben:** die E2-Abnahme fand als S1 einen
+> Doppelpunkt „).." in 133 von 169 Antwort-Sätzen — an der Ursache gefixt
+> (`bd8d4ba`). E3: Δ-Richtung verdreht (S2, doppelt) und die
+> G0-Doppelgrafik → gefixt (`10f670a`, `1b9be88`, `1c92be0`). E4: der
+> adversarische Prüfer fand als S1 Nennungs-Varianten mit/ohne „5G", die
+> zwei `device_id`s erzeugten → Fix `9a374ee`; der 15.09.-iPhone-18-Fall
+> lag als Fixture rot-vor-grün an. E5 brachte nur S4-Befunde. Der erste
+> echte Lauf (08:34 UTC, 17.09.) hat die E4-Dateien erzeugt: **284
+> Unbekannte persistiert, 0 Auto-Einträge** — kein iPhone-18-Titel kam an
+> (Telekom-202-Challenge in Actions).
+>
+> Nebenbei: das Strategie-Doc hat sein Änderungsprotokoll bekommen
+> (`d5a70c0`); ein API-429-Burst-Limit kostete den E4-Nachprüf-Agenten
+> (der Lead hat selbst verifiziert); die Operating-Regel „Lean Lead =
+> viele kleine Agenten" steht im Session-Gedächtnis.
+>
+> **OFFEN:**
+> 1. **Der iPhone-18-Live-Beweis steht aus** — er braucht einen Nachtlauf,
+>    in dem Telekom/o2/Vodafone das Modell strukturiert liefern; die
+>    Arbeitsliste ist `data/state/geraete_unbekannt.jsonl` (die iPad-Titel
+>    von Vodafone sind Anker-Lücken-Kandidaten).
+> 2. Die Sichtbarkeitsregel „ab 2 Messtagen" rechnet nur gegen die
+>    TCO-Historie (Bündelweg).
+> 3. Das Fragment `geraete-zeitreihe.html` wächst mit den Messtagen
+>    (~7 KB je Paar) — die Obergrenze dafür ist PM-6.
+> 4. S4-Rest: die Einheit in den Export-Knopfbeschriftungen ist
+>    inkonsistent, und 2 der 6 Leer-Tests wären an `main` schon grün
+>    gewesen.
+> 5. **Betrieb:** monatlich die fünf Sichttest-Fragen live gehen
+>    (pixel 11 / wo ist Vodafone am teuersten / Belege je Anbieter / die
+>    vier Reiter-Fragen / mobil ohne Querscroll) und drei Protokollzeilen
+>    lesen (Auto-Erkennung, Unbekannte, Fragmentgröße).
+>
 > **Zuletzt erledigt (05.09.2026, nachts): Phase R3 — die drei Befunde
 > der R2-Abnahme.** Auftragsgrundlage: `PHASE R3` (PM, 04.09.2026 ab 20:00)
 > auf Basis von `QA_BEFUND_R2_2026-09-04.md` (nicht im Repo). **Abschluss-
