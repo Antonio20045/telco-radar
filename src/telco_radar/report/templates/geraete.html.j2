@@ -42,7 +42,7 @@
    gekappte Barpreis-Zeitreihe an) und "Gerätekatalog". Die Portfolio-
    Tafel ist GANZ weg - ihre Abschnitte stehen seit E3 Schritt 3 als
    Sektionen im Radar-Reiter DIESER Seite (bis dahin auf der abgeschalteten
-   Schwesterseite wettbewerbsradar.html, Antonios Entscheidung, Strategie
+   Alt-Seite des Radars (heute Weiterleitung), Antonios Entscheidung, Strategie
    §5.2). G1 (der TCO-Balkenvergleich)
    bleibt aus DIESER Ansicht entfernt - Datenquelle und Rechnung
    (`geraete_tco_grafik.balken`, `m.svg`/`m.legende`) bleiben im Code,
@@ -76,7 +76,7 @@
 {% from "_geraete_radar.html.j2" import radar_tafel with context %}
 
 {% block content %}
-<section class="page-hero wide">
+<section class="page-hero wide gr-hero-export">
   <div class="page-hero-row">
     <div>
       <p class="page-kicker">Deutschland · Geräte</p>
@@ -104,8 +104,22 @@
        Bündel-TCO-Export kommt hinzu; jede Datei genau ein Mal. Der
        Radar-Export steht seit E3 Schritt 3 (17.09.2026) ebenfalls HIER:
        seine Schwesterseite ist eine Weiterleitung, ihr Hero-Knopf hätte
-       kein Ziel mehr - die EINE Seite führt jetzt alle vier Dateien. #}
-    {% if geraete.export and geraete.export.aktuell.zeilen %}
+       kein Ziel mehr - die EINE Seite führt jetzt alle vier Dateien.
+
+       E5 (17.09.2026): die Reihe ist AUCH AUF DEM TELEFON sichtbar und
+       benutzbar - bis hierhin war sie unter 900 px weggeblendet (O4,
+       Falz-Begründung). Auf dem Telefon wird der Kopf zur Spalte und das
+       Datum rückt rechtsbündig unter die Schlagzeile (Zeitungs-
+       Datumszeile, siehe style.css @gr-hero-export); die Export-Reihe
+       folgt als letzte Zeile. Der Antwort-Satz der Zeitreihe bleibt über
+       der Falz (Kriterium 11c), und die vier Knöpfe rollen in EINER
+       Zeile waagerecht statt vier Zeilen hoch zu stapeln.
+
+       Das Gatter fragt die DATEI ab, nicht die Zeilenzahl: auch ein
+       leerer Bestand nennt seine Null neben dem Link (Modulkopf
+       geraete_export: ein fehlender Download wäre die schlechtere
+       Auskunft als ein leerer). #}
+    {% if geraete.export and geraete.export.aktuell.datei %}
     <span class="gr-export-knoepfe">
       <a class="gr-knopf" href="{{ geraete.export.aktuell.datei }}" download
         >Alle exportieren ({{ geraete.export.aktuell.zeilen }} Zeilen)</a>
@@ -113,10 +127,8 @@
         >Preishistorie ({{ geraete.export.historie.zeilen }})</a>
       <a class="gr-knopf" href="{{ geraete.export.tco.datei }}" download
         >Bündel-TCO ({{ geraete.export.tco.zeilen }})</a>
-      {% if geraete.export.radar and geraete.export.radar.zeilen %}
       <a class="gr-knopf" href="{{ geraete.export.radar.datei }}" download
         >Radar ({{ geraete.export.radar.zeilen }})</a>
-      {% endif %}
     </span>
     {% endif %}
   </div>
@@ -146,7 +158,7 @@
 {# --- Reiterleiste ---------------------------------------------------- #}
 {# VIER REITER, VIER TAFELN, EINE SEITE (E3, AUFTRAG_GERAETE_EINE_SEITE_V2
    §1d): Vergleich · Radar · Preisverlauf · Gerätekatalog. Bis E3 war der
-   Radar ein QUASI-Reiter - ein Link auf wettbewerbsradar.html mit Pfeil
+   Radar ein QUASI-Reiter - ein Link auf die Radar-Alt-URL mit Pfeil
    als Seitenwechsel (O3). Antonios Wortlaut („Wieso kannst du nicht
    einfach Geräte-Unterseite, darunter dann verschiedene Unterseiten/
    Reiter … statt dass man 30 Minuten scrollt") dreht das um: der Radar
@@ -446,7 +458,7 @@
 
 {# --- Reiter 2: Radar ---------------------------------------------------
    E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d/S2/S3): die Tafel trägt die
-   Inhalte der bisherigen Schwesterseite wettbewerbsradar.html, NEU
+   Inhalte der bisherigen Radar-Alt-Seite (heute Weiterleitung), NEU
    strukturiert nach S3 - drei klar getrennte, gleichwertige Sektionen
    (Alarme / Abweichung als MODELL-LISTE / Händler als eigener Abschnitt),
    jede mit einem Satz, was sie misst. Die Struktur steht in der Teil-
@@ -457,14 +469,14 @@
    Schritt 2 hieß er „Alle Modelle nach Abweichung zu Vodafone" - das ist
    der Titel der MODELL-LISTE (S2) und steht jetzt AN deren Sektion; als
    Tafelkopf hätte er die erste Sektion (Alarme) falsch beschriftet. Die
-   Frage selbst ist die des Modulkopfs von `wettbewerbsradar.py` -
+   Frage selbst ist die des Modulkopfs von `geraete_radar.py` -
    dieselbe wie die h1 der Schwesterseite.
 
    Der Sortiments-Aufklapper „Bei Wettbewerbern gelistet, bei Vodafone
    nicht" steht NICHT hier - er wohnt seit E3 im Gerätekatalog (dieselbe
    Sortiments-Frage wie die Tabelle dort; eine zweite Kopie wäre §4.6).
-   Der Datenkontext der Tafel heißt `wettbewerbsradar` (dasselbe Dict,
-   das auch die Schwesterseite rendert, von render_site übergeben). #}
+   Der Datenkontext der Tafel heißt `radar` (dasselbe Dict, das auch
+   der Sortiments-Aufklapper liest, von render_site übergeben). #}
 <div class="gr-tafel gr-tafel--aus" id="tafel-radar" role="tabpanel">
 <section class="gr-radar" id="radar">
   <h2 class="rubrik">Bei welchem Gerät ist Vodafone teurer als der Wettbewerb?</h2>
@@ -482,7 +494,7 @@
   Wettbewerber ist günstiger. Die Preis-Alarme zeigen denselben Abstand
   als Betrag ohne Vorzeichen; jede Alarmzeile ist ein Fall, in dem ein
   Wettbewerber günstiger ist.</p>
-  <div id="gr-radar-inhalt">{{ radar_tafel(wettbewerbsradar) }}</div>
+  <div id="gr-radar-inhalt">{{ radar_tafel(radar) }}</div>
 </section>
 </div>
 
@@ -653,7 +665,13 @@
     </tbody>
   </table>
   </div>
-  <p class="gr-erklaer gr-a-leer" hidden>Zu dieser Auswahl steht keine Zeile im
+  {# Der Leer-Satz ist ein FILTER-Satz - aber bei NULL Zeilen im ganzen
+     Bestand ist er der benannte LeerZUSTAND und steht serverseitig offen
+     da (E5, Leer-Sicherung "Katalog leer"): eine Tafel, die nur aus
+     Spaltenköpfen besteht, ohne ein Wort dazu, liest sich als kaputte
+     Seite. app.js blendet ihn bei Filterung ein und aus, wie bisher. #}
+  <p class="gr-erklaer gr-a-leer"{% if geraete.katalogtabelle | length
+    %} hidden{% endif %}>Zu dieser Auswahl steht keine Zeile im
   Bestand.</p>
   {# P1 (dritte Nachbesserung, 31.08.2026): die Bedingung fragt jetzt
      `zeilen_rest` ab, nicht mehr nur die Gesamtzahl gegen den
@@ -667,7 +685,7 @@
   {% endif %}
 
   {# E3: DER SORTIMENTS-AUFKLAPPER wohnt im Katalog-Reiter. Er stand bis
-     E3 als eigene Sektion auf wettbewerbsradar.html (dorthin hatte ihn
+     E3 als eigene Sektion auf der Radar-Alt-Seite (dorthin hatte ihn
      O2 aus der damals gefallenen Portfolio-Tafel gezogen). Im Vier-
      Reiter-Gerüst der EINEN Seite (§1d) ist der Katalog der Sortiments-
      Reiter - „diese Geräte stehen NUR bei Wettbewerbern im Regal" ist
@@ -676,17 +694,17 @@
      zweite Kopie auf dem Radar wäre §4.6 - deshalb steht er HIER und
      nur hier. Der Anker heißt neu #gr-sortiment; #tafel-portfolio bleibt
      verboten (O3-Regel: keine wiederauferstandene, unverknüpfte Tafel).
-     Daten: derselbe `wettbewerbsradar`-Kontext wie auf der Schwester-
-     seite - EINE Berechnung (`radar()`), zwei Vorlagen. #}
-  {% if wettbewerbsradar.ohne_vodafone %}
+     Daten: derselbe `radar`-Kontext wie die Radar-Tafel - EINE
+     Berechnung (`radar()`), mehrere Vorlagenausschnitte. #}
+  {% if radar.ohne_vodafone %}
   <p class="gr-erklaer gr-sortiment-satz">Diese Geräte führen nur
   Wettbewerber im Regal, Vodafone keins von beiden – der ab-Preis nennt
   den günstigsten Anbieter, der sie führt.</p>
   <details class="gr-auf" id="gr-sortiment">
     <summary>Bei Wettbewerbern gelistet, bei Vodafone nicht
-      ({{ wettbewerbsradar.ohne_vodafone_gesamt }})</summary>
+      ({{ radar.ohne_vodafone_gesamt }})</summary>
     <ul class="gr-v-liste">
-      {% for l in wettbewerbsradar.ohne_vodafone %}
+      {% for l in radar.ohne_vodafone %}
       <li><span class="szl">{{ l.modell }}</span>
         {% if l.speicher %}<span class="gr-v-meta">{{ l.speicher }} GB</span>{% endif %}
         <span class="gr-v-prozent">ab {{ l.ab_preis | euro }}</span>
@@ -697,9 +715,9 @@
       </li>
       {% endfor %}
     </ul>
-    {% if wettbewerbsradar.ohne_vodafone_gesamt >
-       wettbewerbsradar.ohne_vodafone | length %}
-    <p class="gr-v-meta">{{ wettbewerbsradar.ohne_vodafone_gesamt }} insgesamt.</p>
+    {% if radar.ohne_vodafone_gesamt >
+       radar.ohne_vodafone | length %}
+    <p class="gr-v-meta">{{ radar.ohne_vodafone_gesamt }} insgesamt.</p>
     {% endif %}
   </details>
   {% endif %}
@@ -937,7 +955,7 @@
    Seite (#tafel-radar schaltet ihn auch per Hash). #}
 <p class="dz-foot"><a href="{{ prefix }}geraete-quellen.html">Welche
 Anbieter liefern Geräte, welche warum nicht</a>{% if
-wettbewerbsradar_verlinkt %} · <a href="#tafel-radar"
+radar_verlinkt %} · <a href="#tafel-radar"
 >Wettbewerbs-Radar: alle Geräte nach Abweichung zu Vodafone</a>{% endif %}.</p>
 
 

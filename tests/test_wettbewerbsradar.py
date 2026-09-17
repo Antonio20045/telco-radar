@@ -41,7 +41,7 @@ from telco_radar.geraete_config import lade_katalog, lade_quellen
 from telco_radar.report import geraete_tco_band as band
 from telco_radar.report import geraete_tco_karten as karten
 from telco_radar.report import geraete_view
-from telco_radar.report import wettbewerbsradar as wr
+from telco_radar.report import geraete_radar as wr
 from telco_radar.report.html import render_site
 from telco_radar.tco_model import Buendel, SimOnlyReferenz
 

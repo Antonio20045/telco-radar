@@ -357,6 +357,49 @@ def test_der_antwort_satz_endet_auf_genau_einem_punkt(ansicht):
         assert ").." not in text, schluessel
 
 
+# --- E5: der Antwort-Satz nennt den Hersteller aus dem Katalog ----------
+
+_ZEILE = {"anbieter": "o2", "gesamt": 1000.0, "tarif": "O2 Mobile M",
+          "schnitt_monat": 41.67, "band_gb_text": "30 GB"}
+
+
+def _text(html):
+    return __import__("re").sub(r"<[^>]+>", "", html)
+
+
+def test_der_antwort_satz_nennt_den_hersteller_wenn_der_katalog_ihn_kennt():
+    # Xiaomi 17: die Kachel-Logik (_kurz_name) schneidet den Hersteller ab
+    # und laesst "17" - im Fliesstext liest sich "Beim 17 im Band Mittel"
+    # als Zahl ohne Bezug. Der Satz praefigiert den Hersteller aus dem
+    # Katalog-Eintrag des Modells.
+    modell = {"id": "xiaomi-17", "titel": "Xiaomi 17",
+              "hersteller": "Xiaomi", "speicher": None}
+    html = geraete_zeitreihe._antwort_html(
+        modell, "mittel", [dict(_ZEILE)], {"label": "Mittel"})
+    assert "Beim Xiaomi 17 im Band Mittel" in _text(html), _text(html)
+
+
+def test_ohne_katalog_hersteller_bleibt_der_kurzname_geraten_wird_nichts():
+    # Fehlt der Hersteller im Eintrag, bleibt es beim Kurznamen - E5-Regel:
+    # Quelle ist der Katalog-/Auto-Eintrag, keine Vermutung.
+    modell = {"id": "17", "titel": "17", "hersteller": "", "speicher": None}
+    html = geraete_zeitreihe._antwort_html(
+        modell, "mittel", [dict(_ZEILE)], {"label": "Mittel"})
+    assert "Beim 17 im Band Mittel" in _text(html), _text(html)
+    assert "Beim  17" not in _text(html)
+
+
+def test_der_antwort_satz_mit_hersteller_die_kachel_ohne(ansicht):
+    # Die Trennung ist die Regel: der SATZ nennt "Apple iPhone 17 Pro",
+    # die KACHEL-Vorschau bleibt kurz ("iPhone 17 Pro") - dieselbe
+    # Aufbereitung, zwei Lesarten je Ort.
+    paar = _paar(ansicht, ("apple-iphone-17-pro-256", "klein"))
+    assert "Beim Apple iPhone 17 Pro im Band Klein" in _text(
+        paar["antwort_html"]), _text(paar["antwort_html"])
+    assert ansicht["daten"]["kurz"]["apple-iphone-17-pro-256"] == \
+        "iPhone 17 Pro"
+
+
 def test_die_messtagzeile_nennt_die_echte_spanne(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "klein"))
     assert paar["messtage_text"] == \

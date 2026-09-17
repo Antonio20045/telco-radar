@@ -93,7 +93,7 @@ STICHPROBE = 20
 
 
 VORSORTIERER_SYSTEM = """\
-Du bist die VORSORTIERUNG eines Wettbewerbsradars fuer einen deutschen
+Du bist die VORSORTIERUNG eines Wettbewerbs-Radar-Dienstes fuer einen deutschen
 Netzbetreiber. Du bewertest NICHTS und fasst NICHTS zusammen - du entscheidest
 nur, ob eine Meldung dem Analysten ueberhaupt vorgelegt wird.
 

@@ -29,7 +29,7 @@ import pathlib
 import yaml
 from bs4 import BeautifulSoup
 
-from telco_radar.report import wettbewerbsradar as wr
+from telco_radar.report import geraete_radar as wr
 from telco_radar.report.html import render_site
 
 HEUTE = "2026-09-17"

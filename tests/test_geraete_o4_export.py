@@ -230,12 +230,15 @@ def test_erneuerte_buendel_stehen_mit_ihrem_zustand_darin(tco_csv, store):
 # --------------------------------------------------------------------------
 
 def test_der_radar_export_traegt_tco_und_haendlerzeilen(radar_csv):
-    """EINE Datei, beide Abschnitte: Netzbetreiber (TCO-24) und Händler
-    (Gerätepreis) - getrennt über die Art-Spalte, nicht über zwei Dateien."""
+    """EINE Datei, alle Abschnitte: Preis-Alarme, Netzbetreiber (TCO-24)
+    und Händler (Gerätepreis) - getrennt über die Art-Spalte, nicht über
+    drei Dateien. E5 hat die Alarme dazu gebracht; vorher deckte die
+    Datei zwei der drei Sektionen des Radar-Reiters."""
     kopf, zeilen = radar_csv
     art_index = kopf.index("Art")
     arten = {z[art_index] for z in zeilen}
-    assert arten == {"Netzbetreiber TCO-24", "Händler Barpreis"}, arten
+    assert arten == {"Preis-Alarm", "Netzbetreiber TCO-24",
+                     "Händler Barpreis"}, arten
 
 
 def test_die_prozentzahl_ist_die_der_seite(radar_csv, radar):
@@ -280,6 +283,79 @@ def test_die_nicht_vergleichbaren_zeilen_stehen_mit_status_darin(
     assert ohne_zahl > 0
     statuswerte = {z[idx["Status"]] for z in zeilen}
     assert "band_mismatch" in statuswerte or "kein_buendel" in statuswerte
+
+
+def test_radar_export_enthaelt_auch_die_alarmtabelle(radar_csv, geraete):
+    """E5 (Strategie §7, O4-Evaluator S3): die vierte Zahlensektion ist
+    exportierbar - JEDE Alarmzeile der Seite steht in der Datei, Zahl für
+    Zahl dieselbe (Zeilenzahl == Seite, kein Lookup ins Leere: die
+    Zuordnung wird am Ende auf Vollständigkeit geprüft, CLAUDE.md §6).
+
+    Verglichen wird gegen die data-Attribute der GERENDERTEN Zeilen -
+    dieselben Rohwerte, aus denen die Zellen der Seite gesetzt werden -
+    und nicht gegen eine zweite Aufbereitung: die Datei ist Konsument
+    der Rechnung, nicht ihr zweiter Rechner."""
+    kopf, zeilen = radar_csv
+    idx = {name: i for i, name in enumerate(kopf)}
+    alarm_zeilen = [z for z in zeilen if z[idx["Art"]] == "Preis-Alarm"]
+    assert alarm_zeilen, "keine Preis-Alarm-Zeile im Radar-Export"
+
+    seite_zeilen = geraete.select("#wr-alarme tr.gr-a-zeile")
+    assert seite_zeilen, "die Alarmtabelle der Seite ist leer - der Test \
+würde an einer leeren Ausgabe grün vorbeigehen"
+
+    # (modell, speicher, prozent, wettbewerbspreis, unser preis) ist der
+    # Schluessel, unter dem eine Alarmzeile eindeutig ist - am echten
+    # Bestand teilen zwei Zeilen dieselbe Zahlenkombination, nur das
+    # Geraet unterscheidet sie. Der Laden steht daneben und wird
+    # mitgeprüft.
+    def _speicher(roh: str) -> str:
+        return str(int(float(roh))) if roh else ""
+
+    def _schluessel(z):
+        return (z[idx["Modell"]], _speicher(z[idx["Speicher GB"]]),
+                z[idx["Abweichung %"]], z[idx["Wettbewerber-Preis EUR"]],
+                z[idx["Vodafone-Preis EUR"]])
+
+    def _seitenschluessel(tr):
+        return (tr["data-modell"], _speicher(tr.get("data-speicher") or ""),
+                f"{float(tr['data-s-prozent']):.1f}".replace(".", ","),
+                f"{float(tr['data-s-fremd']):.2f}".replace(".", ","),
+                f"{float(tr['data-s-unser']):.2f}".replace(".", ","))
+
+    datei = {_schluessel(z): z for z in alarm_zeilen}
+    erwartet = {_seitenschluessel(tr): tr for tr in seite_zeilen}
+    assert len(datei) == len(alarm_zeilen), (
+        "doppelte Alarmzeile in der Datei")
+    assert len(erwartet) == len(seite_zeilen), (
+        "doppelte Alarmzeile auf der Seite")
+    assert set(datei) == set(erwartet), (
+        f"{len(datei)} Alarmzeilen in der Datei, {len(erwartet)} auf der "
+        f"Seite; nur in der Datei: {sorted(set(datei) - set(erwartet))[:3]}")
+
+    # Der Laden und die Stufe stehen NAMENTLICH in der Datei - dieselben
+    # Wörter wie die Zelle der Seite (S3: ein zweites Wort für dieselbe
+    # Sache wäre ein zweites Etikett).
+    for schluessel, tr in erwartet.items():
+        z = datei[schluessel]
+        assert z[idx["Anbieter"]] == tr["data-s-laden"], (z, tr)
+        stufe = tr.select_one(".gr-pille")
+        assert stufe is not None, "Alarmzeile ohne Einstufungs-Pille"
+        assert z[idx["Status"]] == stufe.get_text(strip=True), (z, stufe)
+        assert z[idx["Preisart"]] == "Gerätepreis ohne Vertrag", z
+        quelle = tr.select_one(".gr-a-quelle")
+        assert z[idx["Quelle"]] == (quelle.get("href") if quelle else ""), z
+
+
+def test_die_alarmzeilen_stehen_als_erster_abschnitt_der_datei(radar_csv):
+    """Die Reihenfolge der Arten in der Datei ist die der Sektionen auf
+    der Seite: Alarme, dann Abweichung (Netzbetreiber), dann Händler."""
+    kopf, zeilen = radar_csv
+    idx = kopf.index("Art")
+    arten_in_ordnung = [z[idx] for z in zeilen]
+    erste = {a: arten_in_ordnung.index(a) for a in set(arten_in_ordnung)}
+    assert erste["Preis-Alarm"] < erste["Netzbetreiber TCO-24"] < \
+        erste["Händler Barpreis"], erste
 
 
 # --------------------------------------------------------------------------

@@ -852,7 +852,7 @@ var TelcoFrage = (function () {
    * landet jetzt auf der Hauptansicht statt auf einer Seite, die sich
    * scheinbar nicht bewegt.
    * Seit E3 Schritt 3 (17.09.2026) lebt der ganze Radar IN dieser Seite:
-   * die Alt-URL wettbewerbsradar.html ist eine Weiterleitung auf
+   * die Alt-URL des Radars ist eine Weiterleitung auf
    * #tafel-radar, deshalb schalten ALLE Hash-Ziele des Radars (seine
    * Sektionen #wr-alarme/#wr-abweichung/#wr-haendler/#wr-bewegungen und
    * das alte Sprungziel #lifecycle aus der Portfolio-Zeit) den
