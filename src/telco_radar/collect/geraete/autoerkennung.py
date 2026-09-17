@@ -68,6 +68,29 @@ _MINDEST_MARKEN = 2
 # wird NICHT geschaelt: "Galaxy A57" ist der NAME, nicht 57 GB.
 _SPEICHER_SEGMENT = re.compile(r"\b\d{1,4}\s*(?:gb|tb)\b", re.IGNORECASE)
 
+# Funkfaehigkeits-Anhaengsel im NAMEN sind keine IDENTITAET (E4-P1): o2
+# schreibt den Zusatz in das description-Feld („Xiaomi Redmi Note 17 Pro
+# Max 5G", tests/fixtures/geraete/o2_katalog.json), Telekom `name` und
+# Vodafone `modelName` nennen dasselbe Geraet ohne. Sie wie das
+# Speichersegment zu schaelen haelt die device_id ueber Anbieter und
+# Naechte stabil - ohne diese Schaellung entstand der zweite Eintrag STILL
+# (ohne Meldung an die Arbeitsliste), sobald o2 zuerst angelegt hatte (der
+# Telekom-202-Ausfall in Actions ist dokumentierte Realitaet) und ein
+# spaeterer Anbieter das Geraet ohne Zusatz nannte. Zwei device_ids fuer
+# ein Geraet sind die Saegezahn-Klasse, gegen die die ganze ID-Regel
+# gebaut ist.
+_FUNK_WORTE = frozenset("5g 4g lte".split())
+_FUNK_ZUSATZ = re.compile(r"\b(?:" + "|".join(sorted(_FUNK_WORTE)) + r")\b",
+                          re.IGNORECASE)
+
+
+def ist_funkzusatz(wort: str) -> bool:
+    """Wortmarken-Zugang zu _FUNK_WORTE fuer den Kollisionswaechter -
+    dieselbe Liste wie die Schaellung, aus derselben Quelle (eine zweite
+    Kopie derselben Woerter wuerde driften, siehe ist_modellzusatz)."""
+    return (wort or "").strip().lower() in _FUNK_WORTE
+
+
 _ZAHL_AM_WORTENDE = re.compile(r"(\d+)\s*$")
 
 _STATE_DATEI = "geraete_katalog_auto.json"
@@ -99,7 +122,9 @@ def schale(name: str, katalog: Katalog) -> Optional[tuple]:
 
     Der Modellname wird aus dem ORIGINAL-String geschaelt (nicht aus den
     normalisierten Marken): er steht spaeter im Katalog und auf der Seite,
-    und dort schreibt sich das iPhone gross.
+    und dort schreibt sich das iPhone gross. Speichersegment und Funk-
+    anhaengsel fallen dabei weg - keins von beiden ist Identitaet (o2 nennt
+    „Redmi Note 18 Pro Max 5G", die Telekom „Redmi Note 18 Pro Max").
     """
     name = (name or "").strip()
     marken = wortmarken(name)
@@ -121,6 +146,7 @@ def schale(name: str, katalog: Katalog) -> Optional[tuple]:
         hersteller, rest = treffer, name
 
     rest = _SPEICHER_SEGMENT.sub(" ", rest)
+    rest = _FUNK_ZUSATZ.sub(" ", rest)
     rest = re.sub(r"\s{2,}", " ", rest).strip()
     if len(wortmarken(rest)) < _MINDEST_MARKEN:
         return None
@@ -148,12 +174,18 @@ def kollidiert_fuzzy(modell: str, katalog: Katalog) -> Optional[str]:
 
     Der Kandidat ist der STAMM eines HAND-gepflegten Eintrags (seine
     Wortmarken sind der Anfang der Wortmarken einer bestehenden
-    Schreibweise, und das naechste Wort dort ist ein Modellzusatz)? Dann
-    wird nichts angelegt: ein Live-Katalog, der nur den Stamm nennt,
-    verkuerzt den Namen moeglicherweise nur, und die Anlage waere ein
-    Phantom neben dem echten Geraet. Ob es den Stamm wirklich als eigenes
-    Geraet gibt, entscheidet die Hand-Pflege (der Verwurf steht im
-    Protokoll und der Titel in der Arbeitsliste).
+    Schreibweise, und das naechste Wort dort ist ein Modellzusatz oder ein
+    Funk-Anhaengsel)? Dann wird nichts angelegt: ein Live-Katalog, der nur
+    den Stamm nennt, verkuerzt den Namen moeglicherweise nur, und die
+    Anlage waere ein Phantom neben dem echten Geraet. Ob es den Stamm
+    wirklich als eigenes Geraet gibt, entscheidet die Hand-Pflege (der
+    Verwurf steht im Protokoll und der Titel in der Arbeitsliste).
+
+    Das Funk-Anhaengsel gehoert dazu (E4-P1): ist der Hand-Eintrag MIT
+    „5G" gepflegt („Galaxy A13 5G" ist real ein eigenes Geraet), legt eine
+    Nennung ohne Zusatz kein Duplikat daneben an - dieselbe Stamm-Richtung,
+    und die Schaellung allein haette genau diesen Konflikt gegen den
+    HAND-Katalog offen gelassen.
 
     NUR die Stamm-Richtung und NUR gegen Hand-Eintraege:
       * Die Gegenrichtung (Kandidat traegt den Zusatz, „iPhone 18 Pro Max"
@@ -175,7 +207,8 @@ def kollidiert_fuzzy(modell: str, katalog: Katalog) -> Optional[str]:
         for schreibweise in bestehend.schreibweisen:
             andere = wortmarken(schreibweise)
             if len(andere) > n and andere[:n] == marken \
-                    and ist_modellzusatz(andere[n]):
+                    and (ist_modellzusatz(andere[n])
+                         or ist_funkzusatz(andere[n])):
                 return f"{bestehend.hersteller} {bestehend.modell}"
     return None
 

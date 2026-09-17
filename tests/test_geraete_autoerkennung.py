@@ -25,7 +25,9 @@ from telco_radar.collect.geraete import (
 )
 from telco_radar.collect.geraete.robots import RobotsWaechter
 from telco_radar.geraete_config import Anbieter, Einstieg
-from telco_radar.geraete_model import Geraet, Katalog, device_id
+from telco_radar.geraete_model import (
+    Geraet, Katalog, device_id, erkenne_geraet,
+)
 
 _TELEKOM_URL = "https://www.telekom.de/shop/geraete/smartphones/ohne-vertrag"
 _HEUTE = "2026-09-15"
@@ -509,3 +511,153 @@ def test_lade_katalog_liefert_den_gemergten_katalog(tmp_path):
     eintrag = geladen.nach_id(device_id("Apple", "iPhone 18 Pro"))
     assert eintrag is not None and eintrag.auto == _HEUTE
     assert geladen.nach_id(device_id("Apple", "iPhone 17")).auto == ""
+
+
+# ==========================================================================
+# E4-P1: Funk-Anhaengsel - dieselbe Nennung mit und ohne „5G"
+# ==========================================================================
+# o2 schreibt die Funkfaehigkeit in das description-Feld („Xiaomi Redmi
+# Note 17 Pro Max 5G", tests/fixtures/geraete/o2_katalog.json); Telekom
+# `name` und Vodafone `modelName` nennen dasselbe Geraet ohne Zusatz
+# („Apple iPhone 17 Pro Max", „Google Pixel 11"). Im SELBEN Lauf schuetzt
+# heute die Config-Reihenfolge - der Bruch kam ueber NAECHEST Naechte: legt
+# o2 zuerst/allein an (der Telekom-202-Ausfall in Actions ist dokumentierte
+# Realitaet) und nennt ein spaeterer strukturierter Anbieter das Geraet
+# ohne Zusatz, entsteht der zweite Eintrag STILL, ohne Signal an die
+# Arbeitsliste. Zwei device_ids fuer ein Geraet sind die Saegezahn-Klasse,
+# gegen die die ganze ID-Regel gebaut ist.
+
+def test_funk_anhang_wird_aus_dem_modellnamen_geschaelt():
+    """Der Zusatz ist keine Identitaet: 5G/4G/LTE werden wie das
+    Speichersegment aus dem Modellnamen geschaelt - aus beiden Nennungen
+    wird dieselbe device_id, egal welcher Anbieter sie wie schreibt."""
+    katalog = _mini_katalog()
+    assert autoerkennung.schale("Xiaomi Redmi Note 18 Pro Max 5G", katalog) \
+        == ("Xiaomi", "Redmi Note 18 Pro Max")
+    assert autoerkennung.schale("Xiaomi Redmi Note 18 4G", katalog) \
+        == ("Xiaomi", "Redmi Note 18")
+    assert autoerkennung.schale("Xiaomi Redmi Note 18 LTE", katalog) \
+        == ("Xiaomi", "Redmi Note 18")
+    # Nennung OHNE Zusatz bleibt unberuehrt (Telekom `name`-Schreibweise).
+    assert autoerkennung.schale("Redmi Note 18 Pro Max", katalog) \
+        == ("Xiaomi", "Redmi Note 18 Pro Max")
+
+
+def test_funk_variante_legt_kein_zweites_geraet_an():
+    """Beide Richtungen der Naechte: legt o2 zuerst an und nennt ein
+    spaeterer Anbieter das Geraet ohne Zusatz - oder umgekehrt -, entsteht
+    EIN Eintrag, und die zweite Nacht erweitert die Speicherstufen
+    desselben (statt ein Duplikat mit eigener Preishistorie)."""
+    fuenf_g = "Xiaomi Redmi Note 18 Pro Max 5G"
+    stamm = "Redmi Note 18 Pro Max"
+    for erste, zweite in ((fuenf_g, stamm), (stamm, fuenf_g)):
+        katalog = _mini_katalog()
+        a = autoerkennung.lege_an(erste, katalog, "2026-09-17",
+                                  speicher_gb=256)
+        b = autoerkennung.lege_an(zweite, katalog, "2026-09-18",
+                                  speicher_gb=512)
+        assert a is not None and b is not None
+        assert a.device_id == b.device_id \
+            == device_id("Xiaomi", "Redmi Note 18 Pro Max")
+        assert len([g for g in katalog.geraete if g.auto]) == 1
+        assert sorted(a.speicher) == [256, 512]
+
+
+def test_titel_ohne_funkzusatz_trifft_den_aus_funknennung_entstandenen_eintrag():
+    """Solange nur der 5G-Eintrag existierte, matchte KEIN Haendlertitel
+    ohne „5G" die laengere Nadel - das Geraet waere nur bei o2 beobachtbar
+    gewesen, „Wer ist guenstiger" und Preisverlauf haetten gespalten."""
+    katalog = _mini_katalog()
+    autoerkennung.lege_an("Xiaomi Redmi Note 18 Pro Max 5G", katalog, _HEUTE,
+                          speicher_gb=256)
+    ohne = erkenne_geraet("Redmi Note 18 Pro Max 256 GB obsidian", katalog)
+    mit = erkenne_geraet("Xiaomi Redmi Note 18 Pro Max 5G 256 GB obsidian",
+                         katalog)
+    assert ohne is not None and mit is not None
+    assert ohne.device_id == mit.device_id \
+        == device_id("Xiaomi", "Redmi Note 18 Pro Max")
+
+
+_O2_URL = "https://www.o2online.de/e-shop/handy/"
+_NACHT1, _NACHT2 = "2026-09-17", "2026-09-18"
+
+
+def _o2_payload(description, slug, slug_gb, farbe, gid, preis):
+    """Nutzlast im Format der gespeicherten o2-Antwort: der strukturierte
+    Name steht in `description`, Speicher und Farbe im Angebotsslug (Muster
+    „privatkunden-google-pixel-11-pro-xl-256gb-canyon-24xhigh")."""
+    return json.dumps({"hardware": [{
+        "description": description,
+        "offerName": f"privatkunden-{slug}-{slug_gb}gb-{farbe}-24xhigh",
+        "externalId": gid,
+        "price": {"totalPrice": preis},
+    }]})
+
+
+
+
+
+def _sammle_anbieter_nacht(anbieter, payload, katalog, heute):
+    return sammle_anbieter(
+        anbieter, katalog, {}, _hole(payload), heute,
+        RobotsWaechter(hole=_hole(payload)),
+        datetime(2026, 9, 17, 3, tzinfo=timezone.utc))
+
+
+def test_o2_nacht_mit_5g_und_telekom_nacht_ohne_bleiben_ein_geraet():
+    """Der Beleg E2E (E4-P1, mit den echten Adaptern o2_katalog und
+    telekom_kategorie): Nacht 1 legt o2 aus `description` („… 5G") an,
+    Nacht 2 nennt die Telekom `name` ohne Zusatz. Beide Listungen laufen
+    auf dieselbe device_id - vorher entstand der zweite Eintrag still, und
+    unbekannte_titel blieb leer (kein Signal an die Arbeitsliste)."""
+    katalog = _mini_katalog()
+    o2_anbieter = Anbieter(
+        name="o2", typ="netzbetreiber", methode="o2_katalog",
+        basis_url="https://www.o2online.de",
+        einstiege=[Einstieg(url=_O2_URL)], rate_limit_sekunden=0)
+
+    nacht1 = _sammle_anbieter_nacht(
+        o2_anbieter,
+        _o2_payload("Xiaomi Redmi Note 18 Pro Max 5G",
+                    "xiaomi-redmi-note-18-pro-max", 256, "obsidian",
+                    "o2-note18pm", 899.0),
+        katalog, _NACHT1)
+    assert nacht1.status == "ok"
+    assert [l.device_id for l in nacht1.listungen] \
+        == [device_id("Xiaomi", "Redmi Note 18 Pro Max")]
+
+    html = _telekom_html(
+        _eintrags("Redmi Note 18 Pro Max", "obsidian-256-gb", 25.0, 900.0,
+                  "hw-note18pm"))
+    nacht2 = _sammle_anbieter_nacht(_anbieter(), html, katalog, _NACHT2)
+    assert nacht2.status == "ok"
+    assert [l.device_id for l in nacht2.listungen] \
+        == [device_id("Xiaomi", "Redmi Note 18 Pro Max")]
+    assert nacht2.unbekannte_titel == []
+
+    autos = [g for g in katalog.geraete if g.auto]
+    assert len(autos) == 1
+    assert autos[0].modell == "Redmi Note 18 Pro Max"
+    assert sorted(autos[0].speicher) == [256]
+
+
+def test_stamm_eines_hand_eintrags_mit_funkzusatz_wird_nicht_angelegt(caplog):
+    """Hand schlaegt Auto auch in der Funk-Variante: ist der Hand-Eintrag
+    MIT Zusatz gepflegt („Galaxy A13 5G" ist real ein eigenes Geraet),
+    legt eine Nennung ohne Zusatz kein Phantom daneben an - der Verwurf
+    steht im Protokoll, und die Katalog-Pflege entscheidet (dieselbe
+    Stamm-Richtung wie die Modellzusatz-Falle)."""
+    import logging
+    katalog = _mini_katalog()
+    katalog.ergaenze(Geraet(hersteller="Xiaomi", modell="Redmi Note 18 5G",
+                            generation=18))
+    vorher = len(katalog.geraete)
+
+    with caplog.at_level(logging.WARNING):
+        ergebnis = autoerkennung.lege_an("Xiaomi Redmi Note 18", katalog,
+                                         _HEUTE, speicher_gb=128)
+
+    assert ergebnis is None
+    assert len(katalog.geraete) == vorher
+    assert "Redmi Note 18 5G" in caplog.text
+    assert "nicht angelegt" in caplog.text
