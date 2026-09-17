@@ -16,8 +16,9 @@ test_geraete_zeitreihe_browser.py):
   - Die Falz-Kriterien von 11c bleiben erfüllt - die Sichtbarkeit darf
     nicht durch Falz-Bruch erkauft sein (deshalb steht die Messung hier
     ein zweites Mal, gekoppelt an die Reihe).
-  - Datum und Kicker teilen sich EINE Zeile - die Regel, die den Platz
-    freigibt; fällt sie weg, wächst der Kopf um die Höhe des Datums.
+  - Der Kicker bricht nicht um: der Kopf ist auf dem Telefon eine
+    SPALTE (Kicker, Schlagzeile, Datum, Export-Zeile) - die Regel, die
+    den Platz für die Reihe freigibt.
 """
 from __future__ import annotations
 
@@ -186,24 +187,34 @@ def test_am_telefon_bleibt_die_falz_von_11c_erfuellt(telefon):
         f"Graphkopf endet bei {r['kopf']} px")
 
 
-def test_datum_und_kicker_teilen_sich_die_zeile(telefon):
-    """Die Regel, die den Platz freigibt: Datum und Kicker stehen in
-    EINER Zeile - ihre Boxen überlappen sich senkrecht (baseline-gleich,
-    unterschiedliche Höhen sind erlaubt: beide sind 10,5-px-Etiketten).
-    Stapeln sie, wächst der Kopf um ~22 px und die Falz-Messung darüber
-    kippt beim nächsten Bestand."""
+def test_der_kicker_bricht_auf_dem_telefon_nicht_um(telefon):
+    """Die Regel, die den Platz freigibt: auf dem Telefon ist der Kopf
+    eine SPALTE (Kicker, Schlagzeile, Datum, Export-Zeile), und der
+    Kicker bleibt EINZEILIG. Ein Nebeneinander von Kicker und Datum ist
+    bei 390 px ausgeschlossen (Kicker 163 px + Datum 214 px gegen 334 px
+    Zeilenbreite) - die erste Fassung dieser Änderung brach den Kicker
+    mitten im Wort um, gefunden am Screenshot, nicht am Messwert."""
     box = telefon.evaluate("""() => {
       const k = document.querySelector('.gr-hero-export .page-kicker');
       const d = document.querySelector('.gr-hero-export .page-date');
       if (!k || !d) return null;
-      return {kt: k.getBoundingClientRect().top, kb: k.getBoundingClientRect().bottom,
-              dt: d.getBoundingClientRect().top, db: d.getBoundingClientRect().bottom};
+      return {kh: Math.round(k.getBoundingClientRect().height),
+              lh: Math.round(parseFloat(getComputedStyle(k).lineHeight)),
+              drechts: Math.round(
+                d.getBoundingClientRect().right),
+              breite: Math.round(
+                document.querySelector('.gr-hero-export').clientWidth)};
     }""")
     assert box is not None, "Kopf ohne Kicker oder Datum - Messung ins Leere"
-    assert box["dt"] < box["kb"] and box["kt"] < box["db"], (
-        f"Kicker {box['kt']:.0f}-{box['kb']:.0f} px, Datum "
-        f"{box['dt']:.0f}-{box['db']:.0f} px - beide stapeln statt eine "
-        "Datumszeile zu teilen")
+    assert box["kh"] <= box["lh"] + 2, (
+        f"der Kicker ist {box['kh']} px hoch bei {box['lh']} px Zeilenhöhe "
+        "- er bricht um")
+    # Das Datum endet rechtsbündig an derselben Kante wie der Kopf
+    # (Grid-Spalte, justify-self:end) - es steht UNTER der Schlagzeile,
+    # nicht mehr am Flex-Grund neben dem Text-Block.
+    assert box["breite"] - box["drechts"] <= 2, (
+        f"Datumszeile endet {box['breite'] - box['drechts']} px vor der "
+        "rechten Kopf-Kante")
 
 
 def test_die_vier_links_zielen_auf_vier_dateien(_browser_seite):
