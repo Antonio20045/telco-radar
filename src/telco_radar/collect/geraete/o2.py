@@ -178,6 +178,9 @@ def lies(text: str, url: str = "") -> list[dict]:
             "titel": " ".join(x for x in (modell,
                                           f"{speicher} GB" if speicher else "",
                                           farbe) if x),
+            # E4-Auto-Erkennung: der strukturierte NAME (Feld `description`),
+            # getrennt vom zusammengesetzten Titel.
+            "strukturierter_name": modell,
             "preis": preis,
             # Die Preisform, aus der Quelle gelesen - siehe Modulkopf.
             "anzahlung": anzahlung if laufzeit else None,
@@ -347,6 +350,7 @@ def _buendelsatz(h: dict) -> Optional[dict]:
         "titel": " ".join(x for x in (modell,
                                       f"{speicher} GB" if speicher else "",
                                       farbe) if x),
+        "strukturierter_name": modell,
         "farbe": farbe,
         "speicher_gb": speicher,
         "sku": str(h.get("externalId") or "").strip(),
