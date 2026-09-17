@@ -784,8 +784,11 @@ def test_auto_modell_mit_einem_mestag_steht_nicht_in_der_wahl(tmp_path):
     assert a["start"]["modell"] != "apple-iphone-18-pro-256"
 
     # Der KATALOG-Reiter zeigt ihn ab Tag 1 (Listung existiert ab Tag 1):
-    # eine Quelle der Wahrheit, zwei Sichtbarkeitsregeln.
-    assert any(z["modell"] == "iPhone 18 Pro" for z in g["katalogtabelle"])
+    # eine Quelle der Wahrheit, zwei Sichtbarkeitsregeln. Seit P3 ist der
+    # Katalog eine Zeile je Modell - der Listungs-Bestand lebt im
+    # Aufklapper derselben Modellzeile.
+    assert any(z["modell"] == "iPhone 18 Pro" and z["listungen"] >= 1
+               for z in g["katalog_modelle"])
 
     # Gegenprobe: ein HAND-Eintrag mit EINEM Messtag bleibt waehlbar -
     # die Regel gilt nur fuer Auto-Eintraege (Galaxy S26 hat hier genau

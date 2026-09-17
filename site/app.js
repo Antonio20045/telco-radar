@@ -886,6 +886,55 @@ var TelcoFrage = (function () {
   window.addEventListener('hashchange', ausHash);
 })();
 
+/* P3 (Strategie Geraete v3, 17.09.2026): der EINE Ansichts-Umschalter
+ * des Gerätekatalogs - Einzelgerätpreis <-> Gesamtkosten (TCO-24).
+ *
+ * Beide Ansichten stehen SERVERSEITIG fertig im Markup (eine Tabelle,
+ * zwei Spaltengruppen); hier wird nur eine Klasse an der Tabelle
+ * umgelegt, die die Spalten der jeweils anderen Ansicht ausblendet -
+ * kein Reload, kein Rechnen, keine zweite Formatierung. Dieselbe
+ * Bauform wie der Zeitraum- und der Band-Schalter der Seite
+ * (`gr-vknopf`, aktiv ROT, `aria-pressed`).
+ *
+ * Der Zustand steht BEWUSST NICHT in der URL (P3-Entscheidung): ein
+ * geteilter Link soll den Katalog in seiner Grundfrage zeigen, und ein
+ * zweiter URL-Parameter wäre eine zweite Stelle, die jemand pflegen
+ * muss. Default ist der Einzelgerätpreis - er steht so im Markup, dieser
+ * Block aendert ihn beim Laden nicht. */
+(function () {
+  var tafel = document.getElementById('tafel-katalog');
+  if (!tafel) return;
+  var tabelle = document.getElementById('gr-katalogtabelle');
+  var knoepfe = tafel.querySelectorAll('.gr-kansicht button[data-ansicht]');
+  if (!tabelle || !knoepfe.length) return;
+
+  function zeige(knopf) {
+    tabelle.classList.toggle('gr-katalog--tco',
+                             knopf.getAttribute('data-ansicht') === 'tco');
+    Array.prototype.forEach.call(knoepfe, function (k) {
+      var aktiv = k === knopf;
+      k.classList.toggle('is-aktiv', aktiv);
+      k.setAttribute('aria-pressed', aktiv ? 'true' : 'false');
+    });
+    /* P3-Fix (Sicht-Pruefung Wesentliches 1, 18.09.2026): die Sortierung
+       darf nicht an einer jetzt UNSICHTBAREN Spalte haengen bleiben.
+       Gemessen am Live-Stand: nach "Einzelgeraepreis" (ab) sortiert und
+       auf TCO umgeschaltet, standen die TCO-Werte unsortiert (3357.66 /
+       2705.66 / 2927.80 ...), und der Sortierpfeil war weg - seine
+       Kopfzelle war ausgeblendet. Der Filterblock der Tabelle
+       (`grFilterleiste` unten) hoert auf dieses Event und uebernimmt die
+       Sortierung fuer die neue Ansicht; hier wird nur gemeldet, nichts
+       entschieden. */
+    tabelle.dispatchEvent(new CustomEvent('gr-ansicht', {
+      detail: {ansicht: knopf.getAttribute('data-ansicht')}
+    }));
+  }
+
+  Array.prototype.forEach.call(knoepfe, function (knopf) {
+    knopf.addEventListener('click', function () { zeige(knopf); });
+  });
+})();
+
 /* O2 (STRATEGIE_GERAETE_OPTIK, 11.09.2026): die Bündel-Zeilen.
  *
  * Bis O2 sortierte dieser Block die Anbieterkarten der Klappe im Browser.
@@ -1774,6 +1823,60 @@ function grFilterleiste(tafelId, mehrId) {
                tabelle.querySelectorAll('.gr-a-zeile.gr-a-rest').length
              : 0;
 
+  /* P3-Fix (Sicht-Pruefung Wesentliches 1, 18.09.2026): die ANSICHT der
+     Katalog-Tabelle darf keine Sortierung an einer unsichtbaren Spalte
+     hinterlassen. Der Umschalter (`.gr-kansicht`, weiter oben im File)
+     meldet seinen Wechsel als 'gr-ansicht'-Event; dieser Block entscheidet:
+
+       * Kopf der neuen Ansicht sichtbar -> nichts zu tun.
+       * Hauptpreisspalte (Einzelgeraepreis <-> TCO-24) -> der Kopf der
+         GEMAPPTEN Spalte wird geklickt (Erstklick-Richtung, dieselbe wie
+         ein Klick von Hand).
+       * jede andere Spalte (Haendler/Spanne nur Barpreis, Ø/Delta nur
+         TCO) hat keine Entsprechung -> zurueck auf die SERVER-Ordnung,
+         die beim Laden hier einmal gesichert wird.
+
+     `ordnungZurueck()` setzt ausserdem `data-vor`/`aria-sort` aller
+     Koepfe zurueck - auch dann bleibt kein Pfeil ueber einer Spalte
+     stehen, nach der niemand sortiert hat. */
+  var anfangsordnung = [];
+  Array.prototype.forEach.call(
+      tabelle.querySelectorAll('.gr-a-zeile'), function (z) {
+        anfangsordnung.push(
+            {zeile: z,
+             auf: document.getElementById(z.getAttribute('data-auf'))});
+      });
+
+  function ordnungZurueck() {
+    var rumpf = tabelle.tBodies[0];
+    if (!rumpf) return;
+    Array.prototype.forEach.call(tabelle.querySelectorAll('.gr-sort'),
+        function (a) {
+          a.removeAttribute('data-vor');
+          a.removeAttribute('aria-sort');
+        });
+    anfangsordnung.forEach(function (p) {
+      rumpf.appendChild(p.zeile);
+      if (p.auf) rumpf.appendChild(p.auf);
+    });
+    anwenden();
+  }
+
+  tabelle.addEventListener('gr-ansicht', function (ev) {
+    var ansicht = ev.detail && ev.detail.ansicht;
+    if (ansicht !== 'tco' && ansicht !== 'barpreis') return;
+    var aktiv = tabelle.querySelector('thead .gr-sort[data-vor]');
+    if (!aktiv) return;
+    var spalte = aktiv.closest ? aktiv.closest('th') : null;
+    if (spalte && !spalte.classList.contains(
+            ansicht === 'tco' ? 'gr-sp--barpreis' : 'gr-sp--tco')) return;
+    var ziel = {preis: 'tco', tco: 'preis'}[aktiv.getAttribute('data-sort')];
+    var kopf = ziel && tabelle.querySelector(
+        'thead .gr-sort[data-sort="' + ziel + '"]');
+    if (kopf) kopf.click();
+    else ordnungZurueck();
+  });
+
   function anwenden() {
     var alleZeigen = tabelle.classList.contains('gr-alarm--alle');
     var wahl = {};
@@ -1903,8 +2006,20 @@ function grFilterleiste(tafelId, mehrId) {
     paare.sort(function (a, b) {
       if (art === 'zahl') {
         var x = parseFloat(a.wert), yy = parseFloat(b.wert);
-        if (isNaN(x)) x = -Infinity;
-        if (isNaN(yy)) yy = -Infinity;
+        /* P3 (17.09.2026): eine Zeile OHNE Wert in dieser Spalte faellt
+           ans ENDE - in BEIDEN Richtungen. Bis hierhin wurde NaN zu
+           -Infinity, und eine wertlose Zeile stand bei AUFSTEIGENDER
+           Sortierung ganz OBEN (der Kommentar des Wahrheitstests
+           `test_die_spaltenkoepfe_sind_sortierbar` beschreibt genau
+           diese Luecke). Der Katalog der Modell-Ebene hat sie regulaer:
+           62 Modelle ohne wesentliche Spanne, 19 ohne Bündel - das sind
+           benannte Leerzustaende, keine Extremwerte, und gehoeren unter
+           die Zeilen mit Zahl, nicht ueber sie. */
+        var ax = isNaN(x), ay = isNaN(yy);
+        if (ax || ay) {
+          if (ax && ay) return 0;
+          return ax ? 1 : -1;
+        }
         if (x !== yy) return (x - yy) * vz;
         return 0;
       }

@@ -68,6 +68,7 @@ from pathlib import Path
 from typing import Optional
 
 from .geraete_bereinigung import zustand_der_zeile
+from .geraete_tco_band import band_label
 
 # Mit BOM, damit Excel UTF-8 erkennt.
 KODIERUNG = "utf-8-sig"
@@ -124,6 +125,30 @@ SPALTEN_RADAR = [
     "Art", "Modell", "Hersteller", "Speicher GB", "Anbieter", "Tarif",
     "Tarifband", "Status", "Abweichung %", "Wettbewerber-Preis EUR",
     "Vodafone-Preis EUR", "Preisart", "Grund", "Abgerufen am", "Quelle",
+]
+
+# P3 (Strategie Geraete v3, 17.09.2026): der Katalog auf MODELL-Ebene hat
+# zwei Ansichten (Einzelgeraepreis / TCO) - jede bekommt IHRE Datei, kein
+# Formatmix. `geraete-aktuell.csv` bleibt der Listungs-Export (E5-Regel:
+# 4/4 Zahlensektionen bleiben exportierbar; die Modell-Tabelle kommt als
+# Ansichts-Export DAZU). Dieselbe Disziplin wie oben: die zwei Preisformen
+# der Barpreis-Ansicht stehen in EIGENEN Spalten ("Ab-Preis EUR" gegen
+# "Nur im Bündel ab EUR/Monat") und schließen einander je Zeile aus - eine
+# Rate steht nie in einer Preisspalte, die einen Kassenpreis nennt.
+SPALTEN_MODELL_BARPREIS = [
+    "Hersteller", "Modell", "Speicher GB", "Ab-Preis EUR",
+    "Anbieter (ab-Preis)", "Anbieterzahl", "Spanne von EUR", "Spanne bis EUR",
+    "Nur im Bündel ab EUR/Monat", "Bündel-Anbieter", "Abgerufen am", "Quelle",
+]
+
+# Die TCO-Ansicht: eine Zeile je Modell, die Leitzahl des besten
+# vergleichbaren Angebots. Eine Zeile ohne Zahl traegt ihren Grund in der
+# Statusspalte statt einer geratenen - dieselbe Sprache wie die
+# Radar-Datei. Abweichung nur mit Vodafone-Referenz (delta_kurz-Regel).
+SPALTEN_MODELL_TCO = [
+    "Hersteller", "Modell", "Speicher GB", "TCO ab EUR", "Bester Anbieter",
+    "Ø EUR/Monat", "Abweichung zu Vodafone EUR", "Abweichung %", "Tarifband",
+    "Status", "Abgerufen am", "Quelle",
 ]
 
 # Die drei Zeilenarten der Radar-Datei - dieselben Wörter, mit denen die
@@ -292,6 +317,65 @@ def radar_csv(view: dict) -> tuple[str, int]:
     return _schreibe(SPALTEN_RADAR, ausgabe), len(ausgabe)
 
 
+def modell_barpreis_csv(modelle: list) -> tuple[str, int]:
+    """Die Barpreis-Ansicht des Modell-Katalogs als CSV - eine Zeile je Modell.
+
+    `modelle` kommt aus `geraete_view.katalog_modellzeilen()`: WERTE sind
+    dort aufgeloöst (ab-Preis, Anbieter, Spanne, Bündel-Monatspreis mit
+    Beleg), hier entsteht nur FORM - Dezimalkomma, Semikolon, leere Zelle
+    fuer eine Luecke. Keine Zeile ohne Preisform: der Barpreis ODER der
+    benannte Bündel-Zustand ("nur im Bündel, ab X EUR/Monat") - die Spalte
+    `Ab-Preis EUR` bleibt leer, wenn er nicht gemessen ist, und die
+    Monatsangabe steht in ihrer eigenen.
+    """
+    ausgabe = []
+    for m in modelle or []:
+        beleg = m.get("ab_beleg") or {}
+        buendel = m.get("buendel_beleg") or {}
+        ausgabe.append([
+            m.get("hersteller", ""), m.get("modell", ""),
+            m.get("speicher") or "",
+            _zahl(m.get("ab_preis")), m.get("ab_anbieter") or "",
+            m.get("anbieterzahl") or 0,
+            _zahl((m.get("spanne") or [None, None])[0]),
+            _zahl((m.get("spanne") or [None, None])[1]),
+            _zahl(m.get("buendel_monat")), m.get("buendel_anbieter") or "",
+            (beleg.get("abgerufen_am") or buendel.get("abgerufen_am") or ""),
+            (beleg.get("quelle_url") or buendel.get("quelle_url") or ""),
+        ])
+    return _schreibe(SPALTEN_MODELL_BARPREIS, ausgabe), len(ausgabe)
+
+
+def modell_tco_csv(modelle: list) -> tuple[str, int]:
+    """Die TCO-Ansicht des Modell-Katalogs als CSV - eine Zeile je Modell.
+
+    Gelesen wird genau das, was die TCO-Spalte der Modellzeile traegt
+    (`_tco_spalte` in `geraete_view`): die Leitzahl des besten
+    vergleichbaren Angebots, sein Anbieter, sein Ø je Monat, die
+    Abweichung zur Vodafone-Referenz (nur wo eine existiert) und sein
+    Tarifband. Eine Zeile ohne Zahl traegt den benannten Grund in der
+    Statusspalte - gerechnet wird hier nichts.
+    """
+    ausgabe = []
+    for m in modelle or []:
+        beleg = m.get("tco_beleg") or {}
+        ausgabe.append([
+            m.get("hersteller", ""), m.get("modell", ""),
+            m.get("speicher") or "",
+            _zahl(m.get("tco_ab")), m.get("tco_anbieter") or "",
+            _zahl(m.get("tco_monat")), _zahl(m.get("tco_delta")),
+            # Klartext statt Rohschluessel (S4-1 der P3-Code-Pruefung):
+            # dieselbe Bezeichnung wie der Chip der Vergleichsansicht und
+            # die Band-Spalte des Katalogs - ein "klein" in der Spalte
+            # waere eine zweite Sprache fuer dieselbe Sache (O4-Regel).
+            _prozent(m.get("tco_delta_prozent")),
+            band_label(m.get("tco_band")),
+            m.get("tco_leer") or "",
+            beleg.get("abgerufen_am", ""), beleg.get("quelle_url", ""),
+        ])
+    return _schreibe(SPALTEN_MODELL_TCO, ausgabe), len(ausgabe)
+
+
 def aktuell_csv(eintraege: list, katalog) -> tuple[str, int]:
     """Der uebergebene Bestand, eine Zeile je Listung. (Inhalt, Zeilenzahl)
 
@@ -356,7 +440,8 @@ def historie_csv(punkte: list, eintraege: list, katalog) -> tuple[str, int]:
 
 def schreibe_exporte(site_dir: Path, eintraege: list, punkte: list, katalog,
                      stand: str = "", tco: dict | None = None,
-                     radar: dict | None = None) -> dict:
+                     radar: dict | None = None,
+                     modelle: list | None = None) -> dict:
     """Alle Export-Dateien nach `site/exporte/`. Gibt die Angaben fuer die Seite.
 
     `eintraege` ist der FERTIG gepruefte und bereinigte Bestand, also
@@ -371,6 +456,11 @@ def schreibe_exporte(site_dir: Path, eintraege: list, punkte: list, katalog,
     aus `radar` (die FERTIGE Radar-Aufbereitung - dieselbe Rechnung wie
     die Seite, hier nur formatiert). Beide duerfen leer sein: dann entstehen
     die Dateien mit Kopfzeile und Null Zeilen, wie bei allen anderen.
+
+    P3 (17.09.2026) kommen die zwei Ansichts-Dateien des Modell-Katalogs
+    dazu (`modelle` aus `geraete_view.katalog_modellzeilen`):
+    `geraete-modell-barpreis.csv` und `geraete-modell-tco.csv` - je Ansicht
+    eine Datei, kein Formatmix.
 
     Die Zeilenzahl steht NEBEN dem Link, nicht nur in der Datei: wer einen
     Export herunterlaedt, will vorher wissen, ob er sich lohnt - und ein
@@ -390,6 +480,16 @@ def schreibe_exporte(site_dir: Path, eintraege: list, punkte: list, katalog,
     (ordner / "wettbewerbsradar.csv").write_text(inhalt_r,
                                                  encoding=KODIERUNG)
 
+    # P3: die beiden Ansichten des Modell-Katalogs - je Ansicht EINE Datei
+    # (kein Formatmix, dieselbe Regel wie oben). Auch leer zulässig: dann
+    # entstehen sie mit Kopfzeile und Null Zeilen.
+    inhalt_mb, zeilen_mb = modell_barpreis_csv(modelle or [])
+    (ordner / "geraete-modell-barpreis.csv").write_text(inhalt_mb,
+                                                        encoding=KODIERUNG)
+    inhalt_mt, zeilen_mt = modell_tco_csv(modelle or [])
+    (ordner / "geraete-modell-tco.csv").write_text(inhalt_mt,
+                                                   encoding=KODIERUNG)
+
     return {
         "stand": stand,
         "aktuell": {"datei": "exporte/geraete-aktuell.csv", "zeilen": zeilen_a,
@@ -400,6 +500,12 @@ def schreibe_exporte(site_dir: Path, eintraege: list, punkte: list, katalog,
                 "bytes": len(inhalt_t.encode(KODIERUNG))},
         "radar": {"datei": "exporte/wettbewerbsradar.csv", "zeilen": zeilen_r,
                   "bytes": len(inhalt_r.encode(KODIERUNG))},
+        "modell_barpreis": {"datei": "exporte/geraete-modell-barpreis.csv",
+                            "zeilen": zeilen_mb,
+                            "bytes": len(inhalt_mb.encode(KODIERUNG))},
+        "modell_tco": {"datei": "exporte/geraete-modell-tco.csv",
+                       "zeilen": zeilen_mt,
+                       "bytes": len(inhalt_mt.encode(KODIERUNG))},
     }
 
 
@@ -408,4 +514,6 @@ def leer() -> dict:
             "aktuell": {"datei": "", "zeilen": 0, "bytes": 0},
             "historie": {"datei": "", "zeilen": 0, "bytes": 0},
             "tco": {"datei": "", "zeilen": 0, "bytes": 0},
-            "radar": {"datei": "", "zeilen": 0, "bytes": 0}}
+            "radar": {"datei": "", "zeilen": 0, "bytes": 0},
+            "modell_barpreis": {"datei": "", "zeilen": 0, "bytes": 0},
+            "modell_tco": {"datei": "", "zeilen": 0, "bytes": 0}}

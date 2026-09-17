@@ -61,7 +61,10 @@ _QUELLEN = {"anbieter": [
 
 SKU = "apple-iphone-15-128gb-schwarz"
 DATEIEN = ("geraete-aktuell.csv", "geraete-historie.csv", "geraete-tco.csv",
-           "wettbewerbsradar.csv")
+           "wettbewerbsradar.csv",
+           # P3: die zwei Modell-Exporte des Katalogs (je Ansicht eine
+           # Datei, eine Zeile je Modell)
+           "geraete-modell-barpreis.csv", "geraete-modell-tco.csv")
 
 
 def _listung(anbieter, sku, preis):
@@ -250,13 +253,15 @@ def test_katalog_leer_nennt_den_leerzustand(leer, ohne_alarm):
 # ---- 5. Export ohne Zeilen -------------------------------------------------
 
 def test_export_ohne_zeilen_nennt_die_null(leer):
-    """Vier Dateien mit Kopfspur und null Zeilen - und die SEITE nennt
-    die Null neben jedem Link, statt den Export still verschwinden zu
-    lassen (Modulkopf geraete_export: ein fehlender Download wäre die
-    schlechtere Auskunft als ein leerer)."""
+    """Alle Export-Dateien mit Kopfspur und null Zeilen - und die SEITE
+    nennt die Null neben jedem Link, statt den Export still verschwinden
+    zu lassen (Modulkopf geraete_export: ein fehlender Download wäre die
+    schlechtere Auskunft als ein leerer). Bis P3 waren es vier Dateien,
+    der Katalog auf Modellebene hat zwei weitere gebracht (eine je
+    Ansicht)."""
     links = leer.select("section.page-hero a[href^='exporte/']")
-    assert len(links) == 4, (
-        f"{len(links)} Export-Links im Leerzustand - vier Dateien "
+    assert len(links) == len(DATEIEN), (
+        f"{len(links)} Export-Links im Leerzustand - {len(DATEIEN)} Dateien "
         "gehören da hin")
     for a in links:
         assert "0" in a.get_text(), (

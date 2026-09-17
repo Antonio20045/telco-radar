@@ -1930,7 +1930,10 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             geraete.get("alle_punkte") or [], geraete.get("katalog_obj"),
             stand=geraete.get("stand", ""),
             tco=(geraete.get("tco") or {}).get("export"),
-            radar=radar_view)
+            radar=radar_view,
+            # P3: die Modell-Tabelle des Katalogs als Ansichts-Export -
+            # dieselbe Aufbereitung, die die Modellzeilen liefert.
+            modelle=geraete.get("katalog_modelle"))
     except Exception as exc:                      # noqa: BLE001
         # Wie beim Rest dieser Stufe: ein gescheiterter Export darf die
         # Seite nicht kosten - aber er verschwindet auch nicht still.

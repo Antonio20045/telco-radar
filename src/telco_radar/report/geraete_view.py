@@ -42,8 +42,8 @@ from typing import Optional
 
 from ..geraete_model import ratenhinweis_aus_eintrag, serie_aus_modell
 from . import (geraete_alarme, geraete_bereinigung, geraete_pruefung,
-               geraete_tco_view, geraete_vergleich, geraete_verlauf,
-               geraete_zeitreihe)
+               geraete_tco_karten, geraete_tco_view, geraete_vergleich,
+               geraete_verlauf, geraete_zeitreihe)
 from ..analyze import geraete_lifecycle
 from ..analyze.tco_store import TcoDB
 from ..tarif_bezug import Tarifbestand
@@ -693,21 +693,11 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
 #
 # Die Zahl steht hier und nicht in der Vorlage, damit ein Test sie gegen die
 # gemessene Hoehe halten kann.
+# Seit P3 zaehlt der Deckel MODELLZEILEN - `BLOCK_SICHTBAR` (zwei Zeilen je
+# Geraete-Block, P1 31.08.2026) ist mit der Listungs-Tabelle entfallen: ein
+# Modell IST jetzt eine Zeile, seine Farb- und Anbieter-Varianten stehen im
+# Zeilen-Aufklapper, und dort gibt es keinen sichtbaren Platz zu verteilen.
 KATALOG_SICHTBAR = 12
-
-# Wie viele Zeilen EIN Geraete-Block in der Standardansicht zeigt (P1,
-# dritte Nachbesserung 31.08.2026 - Coordinator-Entscheidung nach dem
-# zweiten Ruecklauf). Der Auftrag: "was haben die anderen im Regal" ist
-# mit sieben Farbvarianten DESSELBEN iPhones nicht beantwortet, mit drei
-# Herstellern schon. Gemessen an den echten Daten (`geraete_db.json`,
-# 31.08.2026): ein einzelner Block (iPhone 17 Pro, sieben Zeilen: drei
-# Vodafone-, drei mobilcom-debitel-, eine o2-Farbvariante) fuellte davor
-# mehr als die Haelfte der zwoelf sichtbaren Zeilen - zusammen mit dem
-# naechsten Block (Fairphone 6, fuenf Zeilen) blieben nur ZWEI Hersteller
-# sichtbar, obwohl mindestens drei gefordert sind. Der Block bleibt dabei
-# GANZ erhalten (B6) - dieser Deckel schneidet nur, was OHNE Klick auf
-# "alle anzeigen" sichtbar ist, nicht den Block selbst.
-BLOCK_SICHTBAR = 2
 
 
 def _katalog_betrag(z: dict):
@@ -774,218 +764,417 @@ def _katalog_block_schluessel(block: dict):
             block["speicher"] or 0)
 
 
-def _interleave_je_anbieter_im_block(zeilen: list) -> list:
-    """Reihum je Anbieter INNERHALB eines Geraete-Blocks (P1, dritte
-    Nachbesserung 31.08.2026) - dieselbe Technik wie
-    `_interleave_je_hersteller`, eine Ebene tiefer.
+def _katalog_zeile(e: dict, katalog) -> dict:
+    """EINE Listungs-Zeile des Katalogs - die Bauform, die Reiter 2 seit dem
+    30.08.2026 zeigt, als eigene Funktion seit P3 (17.09.2026).
 
-    Ohne sie fuellte der GUENSTIGSTE Anbieter mit seinen eigenen
-    Farbvarianten die beiden sichtbaren Zeilen dieses Blocks
-    (`BLOCK_SICHTBAR`) - gemessen am iPhone 17 Pro: drei Vodafone-Farben
-    waeren vor der ersten mobilcom-debitel-Zeile gestanden. Die Deckelung
-    braeuchte dann zwei Farben DESSELBEN Ladens statt zweier verschiedener
-    Laeden, und die Preisspalte vergliche nichts - "je Anbieter die
-    guenstigste" ist deshalb der fuehrende Schluessel: die Anbietergruppen
-    selbst sind nach ihrer je EIGENEN guenstigsten Zeile geordnet, und erst
-    dann wird reihum eine Zeile je Anbieter genommen.
+    Die Modell-Ebene (`katalog_modellzeilen`) braucht dieselben Zeilen fuer
+    ihren Aufklapper, aber OHNE Interleave und Zeilendeckel - beides ist
+    eine Entscheidung ueber die ANZEIGE der Liste und darf nicht an der
+    Zeile haengen, die der Aufklapper eines Modells wieder neu ordnet. Zwei
+    Kopien dieser Bauform waeren die Luecke, in der der Aufklapper eines
+    Tages eine andere Zustands-Ableitung zeigt als die Zeile davor.
     """
-    gruppen: dict[str, list] = {}
-    for z in sorted(zeilen, key=_katalog_zeile_schluessel):
-        gruppen.setdefault(z["anbieter"] or "", []).append(z)
-    geordnet = [gruppen[a] for a in
-                sorted(gruppen, key=lambda a: (_katalog_betrag(gruppen[a][0]), a))]
-    ergebnis: list = []
-    for runde in zip_longest(*geordnet):
-        ergebnis.extend(z for z in runde if z is not None)
-    return ergebnis
+    g = katalog.nach_id(e.get("device_id")) if katalog else None
+    preis = e.get("preis_ohne_vertrag")
+    # Der Zustand wird ABGELEITET, nicht aus dem Store uebernommen.
+    # Sonst steht in dieser Tabelle "space schwarz erneuert - Zustand
+    # neu", waehrend der Pruefbericht zwei Reiter weiter "refurbished"
+    # sagt: die Seite widerspraeche sich selbst, und der Store ist die
+    # schwaechere Quelle - er traegt seinen alten Wert bis zum naechsten
+    # erfolgreichen Crawl.
+    #
+    # Gerufen wird die EINE Ableitung (`geraete_bereinigung`), nicht eine
+    # eigene Fassung davon. Auf dem Bestand ist sie ohnehin schon
+    # gelaufen und hat ihr Ergebnis in die Kopie geschrieben - das ist
+    # der Grund, warum diese Zeile auch bei einer Farbe funktioniert,
+    # aus der das Kennzeichen gerade entfernt wurde.
+    zustand = geraete_bereinigung.zustand_der_zeile(e)
+    return {
+        "modell": g.modell if g else (e.get("device_id") or "?"),
+        "hersteller": g.hersteller if g else "",
+        # Nur fuer die Standardsortierung (Block/Baureihe/Segment) -
+        # keine eigene Spalte.
+        "generation": g.generation if g else None,
+        "serie": serie_aus_modell(g.modell) if g else "",
+        "segment": g.segment if g else "",
+        "speicher": e.get("speicher_gb"),
+        "farbe": e.get("farbe_normalisiert") or e.get("farbe_roh") or "",
+        "anbieter": e.get("anbieter"),
+        "anbieter_typ": e.get("anbieter_typ") or "",
+        "netz": e.get("netz") or "",
+        "zustand": zustand,
+        "preis": preis,
+        "ratenhinweis": ratenhinweis_aus_eintrag(e),
+        "zuzahlung": e.get("zuzahlung"),
+        "tarif": e.get("tarif_referenz") or "",
+        "verfuegbarkeit": e.get("verfuegbarkeit") or "unbekannt",
+        "url": e.get("quelle_url") or "",
+        "abgerufen_am": e.get("abgerufen_am") or "",
+        "sku_id": e.get("sku_id") or "",
+    }
 
 
-def _katalog_bloecke(zeilen: list) -> list:
-    """Fasst Zeilen zu Geraete-Bloecken zusammen: (Hersteller, Modell,
-    Speicher). Ein Block bleibt beim Mischen IMMER zusammen (B6, 31.08.2026
-    - siehe `_interleave_je_hersteller`) - "wer ein Geraet sucht, findet
-    seine Zeilen beieinander", der Zweck, den der Vorgaenger dieser Zeile
-    schon einmal trug und den die reine Herstellermischung ersatzlos
-    gestrichen hatte: 69 von 90 Geraeten standen in bis zu zwoelf Bloecken
-    ueber die ganze Tabelle verteilt.
+# --------------------------------------------------------------------------
+# P3 (Strategie Geraete v3, 17.09.2026): der Katalog auf MODELL-Ebene.
+#
+# `katalogzeilen()` - die flache LISTUNGS-Tabelle mit Bloecken, Interleave
+# je Anbieter im Block und `BLOCK_SICHTBAR` - ist mit P3/C3 (18.09.2026)
+# ersatzlos entfallen: der Reiter rendert `katalog_modellzeilen()`, und die
+# Listungs-Zeilen leben im Aufklapper JE MODELL (Bauform `_katalog_zeile`,
+# dort nach `_katalog_zeile_schluessel` sortiert). Die Sortier-Regeln, die
+# die alte Ebene trugen (B1/B5/B6/B9 der Zurueckweisung vom 31.08.2026),
+# stehen seit C1 in den Docstrings von `katalog_modellzeilen()` und
+# `_interleave_modelle_je_hersteller()` - eine Ebene hoeher, dort wo sie
+# heute gerechnet werden. Zweite Rechnung fuer dieselbe Tabelle waere
+# zwoelf Zeilen toter Kontext pro Rendern (E5-Regel).
+# --------------------------------------------------------------------------
 
-    JEDE Zeile traegt danach `block_rest`: True, wenn sie die
-    `BLOCK_SICHTBAR`-Grenze ihres eigenen Blocks ueberschreitet (P1, dritte
-    Nachbesserung, 31.08.2026). Das ist eine reine ANZEIGE-Markierung -
-    die Zeile bleibt im Block, an ihrer Stelle, sie wird nur in der
-    Standardansicht nicht gezeigt (siehe `app.js`, `anwenden()`). Ein Block
-    mit sieben Farbvarianten desselben Geraets fuellte sonst allein einen
-    Grossteil der zwoelf sichtbaren Zeilen der ganzen Tabelle - gemessen am
-    iPhone 17 Pro (sieben Zeilen) plus Fairphone 6 (fuenf): zusammen zwoelf
-    Zeilen, aber nur ZWEI Hersteller, obwohl mindestens drei gefordert
-    sind.
+
+# --------------------------------------------------------------------------
+# P3 (Strategie Geraete v3, 17.09.2026): der Katalog auf MODELL-Ebene
+# --------------------------------------------------------------------------
+
+# Die beiden benannten Leerzustaende der TCO-Spalte. sichtbarer Text traegt
+# Umlaute - nicht die ASCII-Umschrift der Kommentare (dieselbe Lehre wie
+# bei der Uebersetzungsseite).
+TCO_LEER_KEIN_BUNDEL = "kein Bündel gemessen"
+TCO_LEER_KEIN_VERGLEICHBARES = "kein vergleichbares Bündel gemessen"
+
+
+def _buendel_je_anbieter_modell(buendel: list, eintraege: list, katalog
+                                ) -> dict:
+    """(Anbieter, modell_schluessel) -> das guenstigste Bündel mit Monatspreis.
+
+    Die Monatsangabe "nur im Bündel, ab X EUR/Monat" braucht einen Beleg aus
+    `geraete_tco.json` - NICHT das `preis_mit_vertrag_ab` der Listung, denn
+    der Bündelstore traegt dazu Quelle und Abrufdatum (Belegzwang). Die
+    Aufloesung einer Bündel-SKU auf das Modell laeuft ueber den WEG von
+    `geraete_tco_karten.modelle()`: erst die Listung derselben SKU, dann der
+    Katalog (`geraet_aus_sku`) - eine zweite, eigene Aufloesung wuesste
+    bald etwas anderes als die TCO-Tafel ueber dasselbe Bündel.
+
+    Der Monatsbetrag ist die Angabe des ANBIETERS, nie eine Rechnung dieses
+    Projekts: `buendel_monatlich` (so verkauft 1&1, § 13.2) und nur wenn der
+    fehlt, die Summe aus Tarif- und Geraeterate - zwei Felder, die der
+    Anbieter selbst nebeneinander nennt.
     """
-    bloecke: dict[tuple, dict] = {}
-    for z in zeilen:
-        schluessel = (z["hersteller"], z["modell"], z["speicher"])
-        b = bloecke.get(schluessel)
-        if b is None:
-            b = {"hersteller": z["hersteller"], "modell": z["modell"],
-                 "speicher": z["speicher"], "generation": z.get("generation"),
-                 "serie": z.get("serie") or "", "segment": z.get("segment") or "",
-                 "zeilen": []}
-            bloecke[schluessel] = b
-        b["zeilen"].append(z)
-    for b in bloecke.values():
-        b["zeilen"] = _interleave_je_anbieter_im_block(b["zeilen"])
-        for i, z in enumerate(b["zeilen"]):
-            z["block_rest"] = i >= BLOCK_SICHTBAR
-    return sorted(bloecke.values(), key=_katalog_block_schluessel)
-
-
-def _interleave_je_hersteller(zeilen: list) -> list:
-    """Reihum je Hersteller statt Hersteller fuer Hersteller - auf
-    BLOCK-Ebene, nicht auf Zeilenebene (B6-Nachbesserung, 31.08.2026).
-
-    Dieselbe Technik wie `pipeline._interleave_by_source` fuer die
-    Analysten-Stapel: eine reine Gruppierung laesst den alphabetisch ersten
-    Hersteller den ganzen sichtbaren Bereich vor dem Deckel verbrauchen
-    (B5, 31.08.2026, an der Ausgabe vom 30.08. gemessen: zwoelf
-    o2-iPhone-14-Varianten vorn, Samsung/Google/Xiaomi erst nach Scrollen).
-    Gemischt wird aber je BLOCK: ein Geraet (Hersteller+Modell+Speicher)
-    ist die kleinste Einheit, die reihum weitergereicht wird, und alle
-    seine Zeilen wandern gemeinsam - sonst zerreisst dieselbe Mischung, die
-    B5 loest, genau das, was Reiter 2 seit seinem Bau verspricht (B6).
-
-    Die Herstellerreihenfolge selbst ist alphabetisch (deterministisch,
-    testbar) - mit EINER Ausnahme: ein Hersteller ohne Namen (kein
-    Katalogtreffer, `hersteller == ""`) faellt ans ENDE (B9, 31.08.2026).
-    `sorted()` stellt einen leeren String sonst an den Anfang, und genau
-    diese Gruppe eroeffnete dann das Reihum - die Docstring behauptete das
-    Gegenteil, ohne dass eine Zeile Code es einloeste.
-    """
-    bloecke = _katalog_bloecke(zeilen)
-    gruppen: dict[str, list] = {}
-    for b in bloecke:
-        gruppen.setdefault(b["hersteller"] or "", []).append(b)
-    geordnet = [gruppen[h] for h in sorted(gruppen, key=lambda h: (h == "", h))]
-    ergebnis: list = []
-    for runde in zip_longest(*geordnet):
-        for block in runde:
-            if block is not None:
-                ergebnis.extend(block["zeilen"])
-    return ergebnis
-
-
-def katalogzeilen(eintraege: list, katalog) -> list[dict]:
-    """Reiter 2 als FLACHE Tabelle: eine Zeile je (Geraet, Speicher, Farbe,
-    Anbieter).
-
-    Bis zum 30.08.2026 stand hier eine Matrix Modell x Anbieter plus 65
-    Aufklapper - eine Zelle sagte "3 Varianten, 799-899 EUR", und wer wissen
-    wollte, WELCHE, klappte zweimal auf. Der Auftrag verlangt stattdessen die
-    flache Form: jede Zeile traegt alles, was sie behauptet, und die
-    Filterleiste von Reiter 1 arbeitet darauf.
-
-    Gezeigt wird ALLES, auch refurbished und Zuzahlungen - anders als in
-    Vergleich und Diagramm. Dieser Reiter ist der Bestand, nicht die Aussage:
-    was aus dem Vergleich faellt, verschwindet nicht, es wird nur nicht gegen
-    etwas gerechnet, das es nicht ist.
-
-    DIE STANDARDANSICHT (B5, zurueckgewiesen und nachgebessert am
-    31.08.2026). Die Seite oeffnete auf zwoelf Apple-Zeilen bei o2 - die
-    Sortierung war rein alphabetisch (Hersteller, Modell), und "iPhone 14"
-    steht alphabetisch ganz vorn.
-
-    Die ERSTE Nachbesserung hatte einen globalen Schnitt "neu komplett vor
-    dem Rest" plus eine flache Herstellermischung - und geriet damit in
-    einen Zielkonflikt, den der zweite Pruefdurchgang aufgedeckt hat (B6):
-    dieselbe Mischung, die Herstellervielfalt herstellt, zerreisst die
-    Zeilen EINES Geraets ueber die ganze Tabelle (69 von 90 Geraeten in bis
-    zu zwoelf Bloecken). Und die flache Generation als Sortierschluessel
-    reproduzierte den Fehler vom 29.08.2026 eine Ebene hoeher (B1): eine
-    Galaxy A57 (Generation 57) schlug jede S- oder Z-Reihe, weil
-    `generation` nur innerhalb ihrer eigenen Baureihe eine Zahl ist.
-
-    Diese Fassung loest beides zugleich, indem sie auf BLOCK-Ebene mischt
-    (`_katalog_bloecke`, `_interleave_je_hersteller`) statt auf Zeilenebene:
-
-      1. Ein GERAET (Hersteller, Modell, Speicher) ist ein Block. Seine
-         Zeilen bleiben IMMER zusammen, sortiert "neu" vor Rest und danach
-         nach Betrag (`_katalog_zeile_schluessel`) - wer ein Geraet sucht,
-         findet seine Zeilen beieinander, der guenstigste Preis oben (B6).
-      2. Die Bloecke EINES Herstellers sind nach SEGMENT geordnet
-         (flagship vor premium vor mid vor entry), nicht nach roher
-         Generation - das ist das Feld, das ueber Baureihen hinweg
-         vergleichbar ist. Erst innerhalb derselben Baureihe zaehlt die
-         Generation absteigend (`_katalog_block_schluessel`, B1).
-      3. Die Bloecke MEHRERER Hersteller laufen reihum
-         (`_interleave_je_hersteller`) statt Hersteller fuer Hersteller -
-         sonst verbraucht der alphabetisch erste Hersteller den ganzen
-         sichtbaren Bereich vor dem Deckel (B5).
-
-    Ob "neu" wirklich vorn STEHT (nicht nur innerhalb seines eigenen
-    Blocks, sondern sichtbar ohne Scrollen), regelt seit der Nachbesserung
-    NICHT mehr diese Sortierung, sondern der Zustandsfilter zusammen mit
-    dem filterbewussten Deckel (`app.js`, `anwenden()`, B2/B3): eine
-    Umsortierung allein kann das nicht mehr leisten, sobald ein Geraet
-    sowohl neue als auch gebrauchte Zeilen hat - genau der Fall, den B6
-    zeigt. Diese Funktion filtert weiterhin NICHTS heraus: die Zeilenzahl
-    bleibt exakt der Bestand, Ueberschrift, Deckel und "alle anzeigen"
-    lesen dieselbe, vollstaendige Liste.
-    """
-    zeilen = []
+    modell_je_sku: dict[str, str] = {}
     for e in eintraege:
-        g = katalog.nach_id(e.get("device_id")) if katalog else None
-        preis = e.get("preis_ohne_vertrag")
-        # Der Zustand wird ABGELEITET, nicht aus dem Store uebernommen.
-        # Sonst steht in dieser Tabelle "space schwarz erneuert - Zustand
-        # neu", waehrend der Pruefbericht zwei Reiter weiter "refurbished"
-        # sagt: die Seite widerspraeche sich selbst, und der Store ist die
-        # schwaechere Quelle - er traegt seinen alten Wert bis zum naechsten
-        # erfolgreichen Crawl.
-        #
-        # Gerufen wird die EINE Ableitung (`geraete_bereinigung`), nicht eine
-        # eigene Fassung davon. Auf dem Bestand ist sie ohnehin schon
-        # gelaufen und hat ihr Ergebnis in die Kopie geschrieben - das ist
-        # der Grund, warum diese Zeile auch bei einer Farbe funktioniert,
-        # aus der das Kennzeichen gerade entfernt wurde.
-        zustand = geraete_bereinigung.zustand_der_zeile(e)
-        zeilen.append({
-            "modell": g.modell if g else (e.get("device_id") or "?"),
-            "hersteller": g.hersteller if g else "",
-            # Nur fuer die Standardsortierung (Block/Baureihe/Segment) -
-            # keine eigene Spalte.
-            "generation": g.generation if g else None,
-            "serie": serie_aus_modell(g.modell) if g else "",
-            "segment": g.segment if g else "",
-            "speicher": e.get("speicher_gb"),
-            "farbe": e.get("farbe_normalisiert") or e.get("farbe_roh") or "",
-            "anbieter": e.get("anbieter"),
-            "anbieter_typ": e.get("anbieter_typ") or "",
-            "netz": e.get("netz") or "",
-            "zustand": zustand,
-            "preis": preis,
-            "ratenhinweis": ratenhinweis_aus_eintrag(e),
-            "zuzahlung": e.get("zuzahlung"),
-            "tarif": e.get("tarif_referenz") or "",
-            "verfuegbarkeit": e.get("verfuegbarkeit") or "unbekannt",
-            "url": e.get("quelle_url") or "",
+        sku = e.get("sku_id") or ""
+        if sku:
+            modell_je_sku[sku] = geraete_tco_karten.modell_schluessel(
+                e.get("device_id"), e.get("speicher_gb"))
+    beste: dict = {}
+    for b in buendel or []:
+        sku = b.get("sku_id") or ""
+        mid = modell_je_sku.get(sku)
+        if not mid:
+            device_id, speicher = geraete_tco_karten.geraet_aus_sku(
+                sku, katalog)
+            if not device_id:
+                continue
+            mid = geraete_tco_karten.modell_schluessel(device_id, speicher)
+        monat = b.get("buendel_monatlich")
+        if monat is None:
+            tarif, rate = b.get("tarif_monatlich"), b.get("geraet_monatsrate")
+            if tarif is None or rate is None:
+                continue
+            monat = round(float(tarif) + float(rate), 2)
+        monat = float(monat)
+        schluessel = (geraete_tco_karten.normalisiere(b.get("anbieter", "")),
+                      mid)
+        bisher = beste.get(schluessel)
+        if bisher is None or monat < bisher["monat"]:
+            beste[schluessel] = {
+                "monat": monat,
+                "anbieter": b.get("anbieter", ""),
+                "tarif": (b.get("tarif_name") or "").strip(),
+                "quelle_url": b.get("quelle_url", ""),
+                "abgerufen_am": b.get("abgerufen_am", ""),
+            }
+    return beste
+
+
+def _buendel_aus_listungen(eintraege: list) -> list[dict]:
+    """Buendel-Saetze im Store-Format, gelesen aus den LISTUNGEN.
+
+    Nur fuer den Fall, dass `geraete_tco.json` UNLESBAR ist (abgebrochener
+    Schreibvorgang des Nachtlaufs): `TcoDB.buendel()` liefert dann still
+    `[]`, und der Katalog fiele auf "ohne Preis" zurueck - DIE P3-REGEL
+    gilt aber auch im Fehlerfall (S2-1 der P3-Code-Pruefung, 18.09.2026;
+    Fehlerklasse B6: eine kaputte Datei sieht aus wie eine leere
+    Datenlage). Die 1&1-Zeilen tragen ihren Buendel-Monatspreis selbst
+    (`preis_mit_vertrag_ab`, so verkauft 1&1, § 13.2) samt Tarif und
+    Beleg - genau die Felder, die der Store auch haette.
+
+    Die Saetze sehen aus wie Store-Saetze, damit
+    `_buendel_je_anbieter_modell` sie nicht unterscheiden muss. Gelesen
+    wird nur, was der Anbieter selbst nennt - nichts gerechnet, keine
+    Aufteilung erfunden.
+    """
+    saetze = []
+    for e in eintraege:
+        monat = e.get("preis_mit_vertrag_ab")
+        if monat is None:
+            continue
+        saetze.append({
+            "sku_id": e.get("sku_id") or "",
+            "anbieter": e.get("anbieter") or "",
+            "buendel_monatlich": monat,
+            "tarif_name": (e.get("tarif_referenz") or "").strip(),
+            "quelle_url": e.get("quelle_url") or "",
             "abgerufen_am": e.get("abgerufen_am") or "",
         })
+    return saetze
 
-    ergebnis = _interleave_je_hersteller(zeilen)
 
-    # `zeilen_rest` ist die EINE Zusicherung, die sowohl das SSR-Markup
-    # (kein JavaScript) als auch `app.js` beim ersten Laden lesen: eine
-    # Zeile bleibt in der Standardansicht verborgen, wenn sie ENTWEDER
-    # `block_rest` ist (ueber `BLOCK_SICHTBAR` ihres eigenen Blocks
-    # hinaus, P1) ODER die zwoelf sichtbaren Plaetze unter den nicht schon
-    # block-gedeckelten Zeilen bereits vergeben sind (`KATALOG_SICHTBAR`).
-    # Ohne diese Verrechnung saehe ein Leser OHNE JavaScript weiterhin
-    # sieben Farbvarianten desselben Geraets vor den ersten zwoelf
-    # Positionen - block_rest existiert serverseitig, wurde bis hierhin nur
-    # noch nicht mit dem Zeilendeckel verrechnet.
+def _tco_spalte(modell_tco: dict | None) -> dict:
+    """Die TCO-Felder EINER Modellzeile aus der TCO-Aufbereitung.
+
+    `modell_tco` ist ein Eintrag aus `geraete_tco_view.aufbereiten()
+    ["modelle"]` - dessen Karten tragen `delta_kurz` und `band` schon
+    fertig (beide werden dort NACH `modelle()` gesetzt). Hier wird nichts
+    gerechnet, nur das beste vergleichbare Angebot gewaehlt: DIE EINE REGEL
+    von P3 - zwei Rechnungen fuer dieselbe Zahl sind zwei Zahlen. Das
+    "beste" Angebot ist die guenstigste belastbare, vergleichbare Karte
+    ohne Naeherung; `delta_kurz` existiert nur mit Vodafone-Referenz und
+    wird unverändert durchgereicht.
+    """
+    if not modell_tco:
+        return {"tco_ab": None, "tco_anbieter": None, "tco_monat": None,
+                "tco_delta": None, "tco_delta_prozent": None,
+                "tco_delta_kurz": None, "tco_band": None, "tco_beleg": None,
+                "tco_leer": TCO_LEER_KEIN_BUNDEL}
+    kandidaten = [k for k in modell_tco.get("karten") or []
+                  if k.get("vergleichbar") and k.get("belastbar")
+                  and not k.get("naeherung") and k.get("gesamt") is not None]
+    if not kandidaten:
+        # Ein Bündel ohne vergleichbare Karte ist KEIN "kein Bündel": das
+        # Modell hat eines, nur keine belastbare Neu-Geraete-Rechnung
+        # (gemessener Fall: Galaxy S24 Ultra 512, einzige Karte erneuert).
+        # Zwei Leerzustaende statt einem - dieselbe Lehre wie "keine
+        # Angabe" gegen "nicht gemessen" bei den Tarifen.
+        return {"tco_ab": None, "tco_anbieter": None, "tco_monat": None,
+                "tco_delta": None, "tco_delta_prozent": None,
+                "tco_delta_kurz": None, "tco_band": None, "tco_beleg": None,
+                "tco_leer": TCO_LEER_KEIN_VERGLEICHBARES}
+    # Der Spaltenkopf der TCO-Ansicht sagt TCO-24. Ein Filter auf
+    # `karte["laufzeit"] == 24` ist hier bewusst NICHT gebaut: seit dem
+    # Ticket TCO24-1 ist die Laufzeit die Konstante 24 (Bestand am
+    # 17.09.2026: {24: 506, None: 188}), er waere heute wirkungslos und
+    # wuerde die 188 Karten ohne Laufzeitfeld still aus der Spalte
+    # werfen. Wird `laufzeit` je wieder variabel, MUSS an dieser Stelle
+    # auf 24 gefiltert werden - sonst stellt eine laengere Karte eine
+    # TCO-24 (S4-6 der P3-Code-Pruefung).
+    bester = min(kandidaten, key=lambda k: k["gesamt"])
+    delta = bester.get("delta") or {}
+    return {
+        "tco_ab": bester["gesamt"],
+        "tco_anbieter": bester.get("anbieter"),
+        "tco_monat": bester.get("schnitt_monat"),
+        "tco_delta": delta.get("betrag"),
+        "tco_delta_prozent": delta.get("prozent"),
+        "tco_delta_kurz": bester.get("delta_kurz"),
+        "tco_band": bester.get("band"),
+        "tco_beleg": {"quelle_url": bester.get("quelle_url", ""),
+                      "abgerufen_am": bester.get("abgerufen_am", "")},
+        "tco_leer": None,
+    }
+
+
+def _interleave_modelle_je_hersteller(modelle: list) -> list:
+    """Die Modellzeilen je Hersteller reihum - B5, eine Ebene hoeher.
+
+    Dieselbe Regel wie `_interleave_je_hersteller` fuer Listungszeilen,
+    aber auf der Modellebene von P3: innerhalb eines Herstellers zaehlt
+    der BLOCK-Schluessel (Segment vor Baureihe vor Generation, B1), die
+    Hersteller selbst laufen reihum, ein Hersteller ohne Namen ans Ende
+    (B9). NICHT wiederverwendet werden kann der Listungs-Interleave: sein
+    Zeilenschluessel liest `zustand` und `_katalog_betrag`, und eine
+    Modellzeile hat beides nicht - sie hat einen ab-Preis und einen
+    Aufklapper.
+    """
+    gruppen: dict[str, list] = {}
+    for m in modelle:
+        gruppen.setdefault(m["hersteller"] or "", []).append(m)
+    geordnet = [sorted(gruppen[h], key=_katalog_block_schluessel)
+                for h in sorted(gruppen, key=lambda h: (h == "", h))]
+    ergebnis: list = []
+    for runde in zip_longest(*geordnet):
+        ergebnis.extend(m for m in runde if m is not None)
+    return ergebnis
+
+
+def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
+                         buendel=None) -> list[dict]:
+    """Der Katalog auf MODELL-Ebene: eine Zeile je (Geraet, Speicher).
+
+    P3 (Strategie Geraete v3, 17.09.2026), Antonios Forderung 5 und 6: der
+    Katalog zeigte 566 Listungszeilen zu 111 Modellen, und 36 Zeilen
+    sagten "ohne Preis" - dabei war der Preis da, nur nicht auf dieser
+    Ebene gerechnet. Diese Funktion liefert die Datenquelle fuer EINE
+    Tabelle mit Umschalter Einzelgeraepreis/TCO; beide Ansichten teilen
+    `modell_schluessel` als Schluessel (geraete_tco_karten).
+
+    DIE EINE REGEL: keine Modellzeile sagt "ohne Preis". Jede Zeile traegt
+    einen Barpreis ("ab X EUR bei Y" = min ueber NEU-Listungen, Beleg mit
+    Betrag, Link und Datum aus `barpreise()`) ODER den benannten
+    Bündel-Zustand ("nur im Bündel, ab X EUR/Monat" aus geraete_tco.json)
+    - nie eine Rate als Barpreis (Hausregel: zwei Preisarten nie mischen).
+
+    Der ZUSTAND ist im Aggregations-Schluessel verankert, nicht erst im
+    Text: `barpreise()` laeuft nur ueber NEU-Listungen
+    (`VERGLEICHBARE_ZUSTAENDE`), ein refurbished Preis kann einen "ab"
+    -Preis also nie stellen (Hausregel B1). Die erneuerten Zeilen bleiben
+    im Aufklapper der Modellzeile stehen, mit Etikett.
+
+    Die Listungs-Details werden NICHT geloescht: `zeilen` je Modellzeile
+    traegt sie fuer den Zeilen-Aufklapper (die Vorlage baut ihn in P3/C2).
+    Eine 1&1-Zeile ohne Barpreis traegt dort ihre Bündel-Angabe
+    (`buendel_monat` samt Beleg) statt "ohne Preis".
+
+    `tco_modelle` ist `geraete_tco_view.aufbereiten()["modelle"]` - wird
+    nichts uebergeben, stehen die TCO-Felder auf ihrem benannten Leerzustand
+    (dieselbe Fehlertoleranz wie ueberall auf dieser Seite: ein kaputter
+    TCO-Store darf den Katalog nicht kosten).
+    """
+    belege = geraete_tco_karten.barpreise(eintraege)
+    buendel_je = _buendel_je_anbieter_modell(buendel, eintraege, katalog)
+    tco_je_id = {m.get("id"): m for m in (tco_modelle or [])}
+
+    # Schritt 1: Listungszeilen (dieselbe Bauform wie Reiter 2) je Modell
+    # gruppieren. Der Schluessel ist derselbe wie in der TCO-Ansicht -
+    # EINE Modellmenge, nicht 111 gegen 97 mit zwei Schluesseln.
+    gruppen: dict[str, dict] = {}
+    for e in eintraege:
+        zeile = _katalog_zeile(e, katalog)
+        mid = geraete_tco_karten.modell_schluessel(e.get("device_id"),
+                                                   e.get("speicher_gb"))
+        g = gruppen.get(mid)
+        if g is None:
+            g = {"schluessel": mid, "device_id": e.get("device_id") or "",
+                 "modell": zeile["modell"], "hersteller": zeile["hersteller"],
+                 "generation": zeile["generation"], "serie": zeile["serie"],
+                 "segment": zeile["segment"], "speicher": zeile["speicher"],
+                 "eintraege": [], "zeilen": []}
+            gruppen[mid] = g
+        g["eintraege"].append(e)
+        g["zeilen"].append(zeile)
+
+    ergebnis = []
+    for mid, gruppe in gruppen.items():
+        zeilen = sorted(gruppe["zeilen"], key=_katalog_zeile_schluessel)
+        eintraege_modell = gruppe["eintraege"]
+
+        # Schritt 2: der ab-Preis - min ueber die NEU-Barpreise je Anbieter.
+        # Je Anbieter zuerst das Minimum (fuenf Farben eines Ladens sind
+        # fuenfmal derselbe Preis, `_guenstigstes_je_laden`-Lehre), dann das
+        # Gesamt-Minimum MIT Beleg: Betrag, Link, Abrufdatum.
+        je_anbieter: dict[str, dict] = {}
+        for e in eintraege_modell:
+            sku = e.get("sku_id") or ""
+            for anbieter, beleg in belege.get(sku, {}).items():
+                bisher = je_anbieter.get(anbieter)
+                if bisher is None or beleg["betrag"] < bisher["betrag"]:
+                    je_anbieter[anbieter] = beleg
+        ab_beleg = (min(je_anbieter.values(), key=lambda b: b["betrag"])
+                    if je_anbieter else None)
+
+        # Schritt 3: die Spanne - nur wenn WESSENTLICH verschieden. Dieselbe
+        # Schwelle wie der Preisvergleich (ODER, nicht UND: bei 200 EUR sind
+        # 15 EUR viel und 3 Prozent wenig, bei 2000 umgekehrt). Ein
+        # Farbaufschlag von 5 EUR ist keine Spanne, die jemand lesen will.
+        spanne: list = []
+        if len(je_anbieter) >= 2 and ab_beleg is not None:
+            betraege = [b["betrag"] for b in je_anbieter.values()]
+            von, bis = min(betraege), max(betraege)
+            abstand = bis - von
+            if (abstand >= geraete_vergleich.WESENTLICH_EURO
+                    or (von > 0
+                        and abstand / von * 100 >=
+                        geraete_vergleich.WESENTLICH_PROZENT)):
+                spanne = [round(von, 2), round(bis, 2)]
+
+        # Schritt 4: die Bündel-Angabe an den Zeilen OHNE Preis (die 37
+        # 1&1-Zeilen). Der Monatspreis kommt aus dem Bündel-Store desselben
+        # Anbieters, derselben Modellmenge - nie aus der Listung allein,
+        # denn der Beleg (Quelle, Datum) haengt am Bündel.
+        anbieter_mit_buendel = {}
+        for z in zeilen:
+            if z["preis"] is not None or z["zuzahlung"] is not None:
+                continue
+            treffer = buendel_je.get(
+                (geraete_tco_karten.normalisiere(z["anbieter"] or ""), mid))
+            if treffer is None:
+                continue
+            z["buendel_monat"] = treffer["monat"]
+            z["buendel_tarif"] = treffer["tarif"]
+            z["buendel_url"] = treffer["quelle_url"]
+            z["buendel_abgerufen_am"] = treffer["abgerufen_am"]
+            anbieter_mit_buendel[treffer["anbieter"]] = treffer
+
+        # Schritt 5: der Bündel-Zustand der MODELLZEILE - nur wenn es
+        # keinen Barpreis gibt (gemessener Fall: Nothing Phone 4a Pro, nur
+        # 1&1). Ein Modell MIT Barpreis braucht ihn nicht: sein Preis steht
+        # da, das Bündel steht in der TCO-Ansicht.
+        buendel_angabe = None
+        if ab_beleg is None and anbieter_mit_buendel:
+            buendel_angabe = min(anbieter_mit_buendel.values(),
+                                 key=lambda b: b["monat"])
+
+        # Schritt 6: die TCO-Felder aus der TCO-Aufbereitung (nur Wahl des
+        # besten Angebots, keine Rechnung - siehe `_tco_spalte`).
+        name = gruppe["modell"]
+        if gruppe["speicher"]:
+            name = f"{name} {int(gruppe['speicher'])} GB"
+        tco_felder = _tco_spalte(tco_je_id.get(mid))
+
+        ergebnis.append({
+            "schluessel": mid,
+            "device_id": gruppe["device_id"],
+            "modell": gruppe["modell"],
+            "hersteller": gruppe["hersteller"],
+            "titel": geraete_tco_karten.titel(gruppe["hersteller"], name),
+            "generation": gruppe["generation"],
+            "serie": gruppe["serie"],
+            "segment": gruppe["segment"],
+            "speicher": gruppe["speicher"],
+            # ---- Ansicht Einzelgeraepreis ----
+            "ab_preis": ab_beleg["betrag"] if ab_beleg else None,
+            "ab_anbieter": ab_beleg["anbieter"] if ab_beleg else None,
+            "ab_beleg": ab_beleg,
+            "anbieterzahl": len({z["anbieter"] for z in zeilen
+                                 if z["anbieter"]}),
+            "anbieter": sorted({z["anbieter"] for z in zeilen
+                                if z["anbieter"]}),
+            "farben": sorted({z["farbe"] for z in zeilen if z["farbe"]}),
+            "spanne": spanne,
+            # ---- Bündel-Zustand (statt "ohne Preis") ----
+            "nur_buendel": buendel_angabe is not None,
+            "buendel_monat": buendel_angabe["monat"] if buendel_angabe else None,
+            "buendel_anbieter": (buendel_angabe["anbieter"]
+                                 if buendel_angabe else None),
+            "buendel_tarif": buendel_angabe["tarif"] if buendel_angabe else "",
+            "buendel_beleg": ({"quelle_url": buendel_angabe["quelle_url"],
+                               "abgerufen_am": buendel_angabe["abgerufen_am"]}
+                              if buendel_angabe else None),
+            # ---- Ansicht TCO ----
+            **tco_felder,
+            # ---- Aufklapper (Listungs-Ebene, nichts geloescht) ----
+            "zeilen": zeilen,
+            "listungen": len(zeilen),
+        })
+
+    # Schritt 7: Ordnung und Deckel - dieselben Regeln wie Reiter 2, nur
+    # eine Ebene hoeher: Modellzeilen je Hersteller reihum
+    # (`_interleave_modelle_je_hersteller`, B5), innerhalb des Herstellers
+    # nach Segment/Baureihe/Generation (`_katalog_block_schluessel`, B1).
+    # Der Zeilendeckel `KATALOG_SICHTBAR` zaehlt Modelle - eine Zeile je
+    # Modell, ein Block-Deckel darueber gibt es seit P3 nicht mehr.
+    ergebnis = _interleave_modelle_je_hersteller(ergebnis)
     sichtbar_zaehler = 0
     for z in ergebnis:
-        if z["block_rest"]:
-            z["zeilen_rest"] = True
-            continue
         z["zeilen_rest"] = sichtbar_zaehler >= KATALOG_SICHTBAR
         if not z["zeilen_rest"]:
             sichtbar_zaehler += 1
@@ -993,12 +1182,11 @@ def katalogzeilen(eintraege: list, katalog) -> list[dict]:
 
 
 # `_matrix()` ist am 30.08.2026 geloescht worden, mit der Sektion, die es
-# fuellte. Es rechnete Modell x Anbieter mit Variantenzahl und Preisspanne je
-# Zelle; Reiter 2 zeigt seitdem eine flache Tabelle, in der jede Zeile
-# traegt, was sie behauptet (`katalogzeilen`). Die Rechnung weiter laufen zu
-# lassen und von keiner Vorlage lesen zu lassen waere derselbe Befund wie
-# `UEBERSICHT_MAX_ZEILEN` beim Review davor: lebendig klingende Begruendung,
-# keine Wirkung.
+# fuellte; die flache Listungs-Tabelle (`katalogzeilen`, 30.08.-18.09.2026)
+# ist ihrerseits mit P3 der Modell-Tabelle gewichen. Eine Rechnung weiter
+# laufen zu lassen und von keiner Vorlage lesen zu lassen waere derselbe
+# Befund wie `UEBERSICHT_MAX_ZEILEN` beim Review davor: lebendig klingende
+# Begruendung, keine Wirkung.
 
 def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
     """Wer liefert, wer nicht - und warum nicht.
@@ -1132,7 +1320,7 @@ def leer(fehler: str = "") -> dict:
         "verlauf": geraete_verlauf.leer(),
         "tco": geraete_tco_view.leer(),
         "zeitreihe": geraete_zeitreihe.leer(),
-        "katalogtabelle": [],
+        "katalog_modelle": [],
         "katalog_sichtbar": KATALOG_SICHTBAR,
         "lifecycle_sichtbar": LIFECYCLE_SICHTBAR,
         "nachfolger_sichtbar": NACHFOLGER_SICHTBAR,
@@ -1440,11 +1628,22 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         # aus wie ein Preissturz. Am Galaxy S25 128 GB gemessen macht das
         # den Unterschied zwischen "577-899 EUR" und "850-899 EUR".
         "verlauf": geraete_verlauf.aufbereiten(belastbar, historie, katalog),
-        # Reiter 2 zeigt den BESTAND und nicht `belastbar`: eine refurbished
-        # Zeile gehoert nicht in den Vergleich, aber sehr wohl in den
-        # Katalog - und ebenso die zwei Haelften eines Doppelpreises. Genau
-        # das verspricht der Satz ueber der Tabelle.
-        "katalogtabelle": katalogzeilen(bestand, katalog),
+        # P3: der Katalog auf MODELL-Ebene - die Datenquelle fuer EINE
+        # Tabelle mit Umschalter Einzelgeraepreis/TCO. Er zeigt den
+        # BESTAND und nicht `belastbar`: eine refurbished Zeile gehoert
+        # nicht in den Vergleich, aber sehr wohl in den Aufklapper des
+        # Katalogs - und ebenso die zwei Haelften eines Doppelpreises.
+        # Er entsteht aus DEMSELBEN Bestand und DEMSELBEN TCO-Dict wie
+        # alles andere auf dieser Seite - keine zweite Rechnung, keine
+        # zweite Modellmenge. Ist der Bündel-Store UNLESBAR, liest die
+        # Bündel-Angabe die Listung selbst (S2-1 der P3-Code-Pruefung):
+        # `buendel()` wuerde still [] liefern, und die 1&1-Zeilen fielen
+        # auf "ohne Preis" zurueck - DIE P3-REGEL gilt auch im Fehlerfall
+        # (dieselbe Auffanglogik wie `lesbar=` zwei Aufrufe darueber).
+        "katalog_modelle": katalog_modellzeilen(
+            bestand, katalog, (tco or {}).get("modelle"),
+            tco_db.buendel() if tco_db.lesbar
+            else _buendel_aus_listungen(bestand)),
         "katalog_sichtbar": KATALOG_SICHTBAR,
         "lifecycle_sichtbar": LIFECYCLE_SICHTBAR,
         "nachfolger_sichtbar": NACHFOLGER_SICHTBAR,

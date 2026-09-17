@@ -326,9 +326,12 @@ def _bestandssatz(**kw):
 
 
 def test_die_katalogzeile_traegt_den_hinweis(katalog):
-    zeilen = geraete_view.katalogzeilen([_bestandssatz()], katalog)
-    assert zeilen[0]["preis"] == 721.0
-    assert zeilen[0]["ratenhinweis"] == "in 24 Raten (0 %)"
+    # Seit P3/C3 heisst die Listungs-Bauform `_katalog_zeile` - der
+    # Aufklapper der Modellzeile rendert genau sie (dieselbe Zustands-
+    # Ableitung, derselbe Ratenhinweis; `katalogzeilen()` ist entfallen).
+    zeile = geraete_view._katalog_zeile(_bestandssatz(), katalog)
+    assert zeile["preis"] == 721.0
+    assert zeile["ratenhinweis"] == "in 24 Raten (0 %)"
 
 
 def test_ein_barpreis_traegt_keinen_hinweis(katalog):
@@ -336,8 +339,8 @@ def test_ein_barpreis_traegt_keinen_hinweis(katalog):
                         preis_ohne_vertrag=949.0, anzahlung=None,
                         monatsrate=None, laufzeit_monate=None,
                         zins_effektiv=None)
-    zeilen = geraete_view.katalogzeilen([bar], katalog)
-    assert zeilen[0]["ratenhinweis"] == ""
+    zeile = geraete_view._katalog_zeile(bar, katalog)
+    assert zeile["ratenhinweis"] == ""
 
 
 def test_der_vergleich_stellt_die_zwei_formen_nebeneinander_gekennzeichnet(katalog):

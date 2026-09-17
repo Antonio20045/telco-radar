@@ -206,6 +206,24 @@ def _belastbare_ids(db=None) -> set:
     """
     return _bestand_ids(db) - _DOPPELPREIS
 
+
+def _modell_schluessel_fixture(db=None) -> set:
+    """Die MODELL-Ebene des Katalogs seit P3: eine Zeile je (Geraet,
+    Speicher) des Bestands.
+
+    Als ERWARTUNG ausgeschrieben (device_id + Speicher je Bestands-Listung),
+    nicht mit `modell_schluessel()` nachgerechnet - derselbe Grundsatz wie
+    bei `_bestand_ids()`: ein Test, der seine Erwartung aus der Funktion
+    holt, die er prueft, ist gruen, wenn beide falsch sind. Die Drei-Listen-
+    Fixture der _DB faellt auf FENF Modelle zusammen: iPhone 17 Pro Max in
+    zwei Speicherstufen, iPhone 16 Pro Max in zwei Speicherstufen (512 nur
+    mit der refurbisheten Zeile) und Galaxy S25 Ultra 256 mit drei
+    Anbietern/Farben in EINER Modellzeile.
+    """
+    return {(e["device_id"], e["speicher_gb"])
+            for e in (db or _DB)["listungen"]
+            if e["id"] in _bestand_ids(db)}
+
 _PUNKTE = [
     {"listung_id": "medimax--apple-iphone-16-pro-max-256gb-schwarz",
      "device_id": "apple-iphone-16-pro-max", "anbieter": "Medimax",
@@ -449,12 +467,24 @@ def test_der_export_zeigt_genau_den_bestand_der_seite(tmp_path):
         "der Export fuehrt das Doppelpreispaar nicht - es steht namentlich "
         "im Pruefbericht, und der verweist auf genau diese Datei")
 
-    # Die Seite zeigt dieselbe Menge. Zwei Zahlen fuer einen Bestand waeren
-    # der Fehlertyp aus CLAUDE.md §6 - und sie standen drei Zeilen
-    # auseinander: "Alle exportieren (358 Zeilen)" ueber einer Ueberschrift
-    # mit der Zahl 370.
+    # Die Seite zeigt denselben Markt, auf MODELL-Ebene (P3): der Katalog
+    # rendert eine Zeile je (Geraet, Speicher), der Export eine je Listung.
+    # Zwei Ebenen, EINE Menge darunter - zusammengehalten ueber die Zahl
+    # der Listungen je Modellzeile: ihre Summe muss exakt die Zeilenzahl
+    # der Datei treffen, sonst zeigt die Seite mehr oder weniger Regal,
+    # als der Export ausliefert. (Bis P3 stand hier der direkte Vergleich
+    # `len(.gr-k-zeile) == len(gefuehrt)` - Listung gegen Listung.)
     s = _suppe(site, "geraete.html")
-    assert len(s.select("#gr-katalogtabelle .gr-k-zeile")) == len(gefuehrt)
+    modellzeilen = s.select("#gr-katalogtabelle .gr-k-zeile")
+    assert modellzeilen, "keine Modellzeile im Katalog"
+    aufklappzeilen = s.select("#gr-katalogtabelle .gr-k-listungen tbody tr")
+    assert len(aufklappzeilen) == len(gefuehrt), (
+        f"{len(aufklappzeilen)} Listungszeilen in den Aufklappern, der "
+        f"Export fuehrt {len(gefuehrt)}")
+    assert len(modellzeilen) == len(_modell_schluessel_fixture()), (
+        f"{len(modellzeilen)} Modellzeilen zu "
+        f"{len(_modell_schluessel_fixture())} (Geraet, Speicher)-Paaren "
+        "des Bestands")
 
     # Und die zweite Datei fuehrt keine Kurve zu einer Listung, die in der
     # ersten fehlt - sonst steht dort ein Preis ohne Zeile dazu.
@@ -472,48 +502,47 @@ def test_jede_zahl_fuer_den_bestand_ist_dieselbe_zahl(tmp_path):
     Gemessen wird an der GERENDERTEN Seite, nicht an der Aufbereitung: der
     Fehler entstand zwischen `aufbereiten()` und der Vorlage, und genau da
     sieht ihn ein Test, der Dicts vergleicht, nicht.
+
+    Seit P3 zaehlt der Katalog MODELLZEILEN, der Export weiter LISTUNGEN -
+    zwei Ebenen ueber DEMSELBEN Bestand. Das sind zwei Zahlen, aber keine
+    zwei Maerkte: jede wird gegen ihre eigene Ebene gehalten, und die
+    Aufklapper der Modellzeilen summieren sich zur Export-Zahl zurueck.
     """
     site = _baue(tmp_path)
     s = _suppe(site, "geraete.html")
-    erwartet = len(_bestand_ids())
+    erwartet_listungen = len(_bestand_ids())
+    erwartet_modelle = len(_modell_schluessel_fixture())
 
+    # Ebene LISTUNG: der Export-Knopf (eine Zeile je Listung).
     knopf = s.select_one(".gr-export-knoepfe a").get_text(" ", strip=True)
-    assert knopf == f"Alle exportieren ({erwartet} Zeilen)", knopf
+    assert knopf == f"Alle exportieren ({erwartet_listungen} Zeilen)", knopf
+
+    # Ebene MODELL: Rubrik-Zahl, DOM-Zeilen und Aufklapper-Anzahl - drei
+    # Orte, die dieselbe Zahl nennen muessen (DOM-Zeilen und Aufklapper
+    # tragen PAARWEISE `gr-a-rest`, sie wandern bei Sortierung zusammen).
     assert s.select_one(".gr-katalog h2 .rubrik-zahl").get_text(
-        strip=True) == str(erwartet)
-    assert len(s.select("#gr-katalogtabelle .gr-k-zeile")) == erwartet
-    # Der Betriebszahlensatz am Fuss ist am 03.09.2026 mit der ganzen
-    # Sektion "Wie vollstaendig ist das" von der Seite gefallen - der
-    # Bestand steht jetzt nur noch an den drei Orten, die dieser Test
-    # kennt, und das ist einer weniger als vorher.
-    # Der dritte Ort ist der Knopf "alle N Zeilen zeigen". UMGEDREHT durch
-    # P1 (dritte Nachbesserung, 31.08.2026, Coordinator-Entscheidung): bis
-    # dahin erschien er erst, wenn die GESAMTZAHL ueber `KATALOG_SICHTBAR`
-    # lag - diese Fixture liegt mit sieben Zeilen darunter, der Knopf fehlte
-    # also. Seitdem deckelt die Standardansicht zusaetzlich JEDEN
-    # Geraete-Block auf `BLOCK_SICHTBAR` (2) Zeilen, unabhaengig von der
-    # Gesamtzahl - und genau diese Fixture traegt einen Block mit DREI
-    # Zeilen (Samsung Galaxy S25 Ultra 256GB: Vodafone plus das
-    # Doppelpreis-Paar "pistachio"/"pistachio bk", die BEIDE im Bestand
-    # bleiben, siehe Modulkopf von `geraete_bereinigung`). Der Knopf muss
-    # also erscheinen, obwohl die Gesamtzahl unter dem Deckel liegt - die
-    # alte Zusicherung war eine Aussage ueber die Gesamtzahl, die neue ist
-    # eine ueber jeden einzelnen Block.
-    assert erwartet <= geraete_view.KATALOG_SICHTBAR, (
-        "die Fixture ist ueber den Deckel gewachsen - jetzt gehoert der "
-        "Knopf mitgeprueft")
-    from collections import Counter
-    bloecke = Counter((r["data-marke"], r.select_one(".gr-a-modell").get_text(strip=True),
-                       r.get("data-speicher"))
-                      for r in s.select("#gr-katalogtabelle .gr-k-zeile"))
-    assert max(bloecke.values()) > geraete_view.BLOCK_SICHTBAR, (
-        "die Fixture hat keinen Block ueber BLOCK_SICHTBAR mehr - dann "
-        "prueft der Knopf-Teil dieses Tests nichts")
-    knopf_mehr = s.select_one("#gr-kmehr")
-    assert knopf_mehr is not None, (
-        "der Knopf fehlt, obwohl ein Block ueber BLOCK_SICHTBAR liegt")
-    knopf_text = " ".join(knopf_mehr.get_text(" ", strip=True).split())
-    assert knopf_text == f"alle {erwartet} Zeilen zeigen"
+        strip=True) == str(erwartet_modelle)
+    assert len(s.select("#gr-katalogtabelle .gr-k-zeile")) == erwartet_modelle
+    assert len(s.select("#gr-katalogtabelle .gr-a-auf")) == erwartet_modelle
+    # Und die Bruecke zurueck auf die Listungsebene: die Aufklapper
+    # fuehren zusammen genau den Bestand, den der Export ausliefert.
+    assert len(s.select(
+        "#gr-katalogtabelle .gr-k-listungen tbody tr")) == erwartet_listungen
+
+    # Der "alle N Zeilen zeigen"-Knopf ist eine Aussage ueber die
+    # GESAMTZAHL der Modellzeilen gegen `KATALOG_SICHTBAR` (seit P3 ohne
+    # den Block-Deckel - `BLOCK_SICHTBAR` ist entfallen). Diese Fixture
+    # liegt mit fuenf Modellen darunter: der Knopf darf dann NICHT auf
+    # der Seite stehen, sonst verspricht er eine Versteckung, die es
+    # nicht gibt. Der ueber-Deckel-Zweig steht in
+    # `test_geraete_reiter_browser.py::test_b3_alle_anzeigen_liefert_...`
+    # (28 Modelle der B5-Fixture).
+    assert erwartet_modelle <= geraete_view.KATALOG_SICHTBAR, (
+        "die Fixture ist ueber den Deckel gewachsen - dann gehoert der "
+        "Knopf-Teil dieses Tests dorthin, wo der Deckel greift")
+    assert s.select_one("#gr-kmehr") is None, (
+        "der Knopf 'alle ... Zeilen zeigen' steht auf der Seite, obwohl "
+        "alle Modellzeilen sichtbar sind")
 
 
 def test_kennzahlen_stimmen_mit_den_daten_ueberein(tmp_path):
@@ -603,16 +632,16 @@ def _b_zeile(hersteller, modell, zustand="neu", preis=1.0, anbieter="A",
             "verfuegbarkeit": "lieferbar", "quelle_url": "", "abgerufen_am": ""}
 
 
-def test_katalogzeilen_haelt_ein_geraet_in_einem_block_zusammen():
-    """B6 der Zurueckweisung vom 31.08.2026 (Runde 1 der Nachbesserung war
-    zurueckgewiesen worden, weil ihre reine Herstellermischung Zeilen
-    DESSELBEN Geraets ueber die ganze Tabelle verteilte - 69 von 90
-    Geraeten in bis zu zwoelf Bloecken. "Wer ein Geraet sucht, findet seine
-    Zeilen beieinander" ist der Zweck dieses Reiters seit seinem Bau.
+def test_modellzeilen_halten_alle_listungen_eines_geraets_im_aufklapper():
+    """B6 der Zurueckweisung vom 31.08.2026, auf die P3-Modellebene gehoben:
+    "wer ein Geraet sucht, findet seine Zeilen beieinander". Seit P3 ist
+    das Modell die ZEILE, seine Listungen stehen im Aufklapper DARUNTER -
+    die Zusicherung ist dadurch schaerfer geworden: keine Listung darf
+    ausserhalb des Aufklappers ihres Modells landen, und keine darf fehlen.
 
-    Die Fixture verteilt ABSICHTLICH sieben Zeilen desselben Geraets ueber
-    die Eingabe, dazwischen andere Hersteller - genau das Muster, an dem
-    die reine Zeilenmischung scheiterte.
+    Die Fixture verteilt ABSICHTLICH sieben Listungen desselben Geraets
+    ueber die Eingabe, dazwischen andere Hersteller - genau das Muster, an
+    dem die reine Zeilenmischung der ersten Nachbesserung scheiterte.
     """
     katalog = _b_katalog()
     eintraege = [
@@ -629,58 +658,43 @@ def test_katalogzeilen_haelt_ein_geraet_in_einem_block_zusammen():
         # Anbieter C ein zweites Mal, diesmal "neu" - deckt zwei Regeln
         # zugleich ab: `_katalog_zeile_schluessel` bevorzugt "neu"
         # INNERHALB desselben Anbieters unabhaengig vom Preis (C-neu/850
-        # steht vor C-refurbished/799, obwohl 799 < 850), und C ruecht mit
-        # seinem NEU-Preis (850) in die Gruppenreihenfolge ein, nicht mit
-        # seinem refurbished-Preis.
+        # steht vor C-refurbished/799, obwohl 799 < 850). Dieselbe Regel,
+        # die bis P3 die sichtbaren Bloecke ordnete, ordnet jetzt den
+        # Aufklapper.
         _b_zeile("Samsung", "Galaxy S26 Ultra", anbieter="C", zustand="neu", preis=850),
     ]
-    zeilen = geraete_view.katalogzeilen(eintraege, katalog)
-    assert len(zeilen) == len(eintraege), "eine Umsortierung darf keine Zeile verlieren"
+    modelle = geraete_view.katalog_modellzeilen(eintraege, katalog)
+    assert sum(m["listungen"] for m in modelle) == len(eintraege), (
+        "eine Aggregation darf keine Listung verlieren")
 
-    positionen = [i for i, z in enumerate(zeilen)
-                 if z["hersteller"] == "Samsung" and z["modell"] == "Galaxy S26 Ultra"]
-    assert positionen == list(range(positionen[0], positionen[0] + len(positionen))), (
-        f"die sieben S26-Ultra-Zeilen stehen nicht zusammenhaengend: {positionen}")
-
-    # Innerhalb des Blocks: REIHUM je Anbieter, dessen guenstigste Zeile
-    # zuerst (P1, dritte Nachbesserung, 31.08.2026 -
-    # `_interleave_je_anbieter_im_block`). Das ersetzt die fruehere
-    # Zusicherung "neu komplett vor dem Rest" - die haette dem guenstigsten
-    # ANBIETER erlaubt, mit seinen eigenen Farbvarianten allein die
-    # sichtbaren Plaetze zu fuellen, und genau das hat der Coordinator an
-    # den echten Daten gemessen (iPhone 17 Pro: 7 Zeilen, 3 Anbieter).
-    block = zeilen[positionen[0]:positionen[-1] + 1]
-    anbieter_je_zeile = [z["anbieter"] for z in block]
-    assert anbieter_je_zeile == ["F", "C", "B", "E", "D", "A", "C"], (
-        f"die Reihenfolge ist nicht reihum je Anbieter: {anbieter_je_zeile}")
-    zustaende_je_zeile = [z["zustand"] for z in block]
-    assert zustaende_je_zeile == ["refurbished", "neu", "neu", "neu", "neu",
-                                  "neu", "refurbished"], (
-        "C fuehrt nicht mit seiner NEU-Zeile trotz hoeherem Preis: "
-        f"{list(zip(anbieter_je_zeile, zustaende_je_zeile))}")
-    # Die ERSTEN BLOCK_SICHTBAR Zeilen sind zwei VERSCHIEDENE Anbieter (F,
-    # C) - der Zweck der Deckelung.
-    from telco_radar.report.geraete_view import BLOCK_SICHTBAR
-    sichtbare_anbieter = {z["anbieter"] for z in block[:BLOCK_SICHTBAR]}
-    assert len(sichtbare_anbieter) == BLOCK_SICHTBAR, (
-        f"die ersten {BLOCK_SICHTBAR} Zeilen sind nicht {BLOCK_SICHTBAR} "
-        f"verschiedene Anbieter: {sichtbare_anbieter}")
-    block_rest_flags = [z["block_rest"] for z in block]
-    assert block_rest_flags == [False, False, True, True, True, True, True], (
-        f"block_rest markiert nicht genau die ersten {BLOCK_SICHTBAR} als "
-        f"sichtbar: {block_rest_flags}")
+    s26 = [m for m in modelle if m["modell"] == "Galaxy S26 Ultra"]
+    assert len(s26) == 1, (
+        f"das Geraet steht in {len(s26)} Modellzeilen statt einer: "
+        f"{[m['schluessel'] for m in s26]}")
+    zeilen = s26[0]["zeilen"]
+    assert len(zeilen) == 7, len(zeilen)
+    # Innerhalb des Aufklappers: "neu" vor dem Rest, dann der Betrag
+    # AUFGEHEND (`_katalog_zeile_schluessel`) - der guenstigste Händler
+    # zuerst. Und C fuehrt mit seiner NEU-Zeile trotz hoeherem Preis als
+    # seiner refurbished (850 steht VOR 799, obwohl 799 < 850): der
+    # Zustand ist der fuehrende Schluessel.
+    anbieter_je_zeile = [z["anbieter"] for z in zeilen]
+    assert anbieter_je_zeile == ["C", "B", "E", "D", "A", "F", "C"], (
+        f"die Reihenfolge des Aufklappers ist nicht neu-vor-rest, dann "
+        f"Betrag aufgehend: {anbieter_je_zeile}")
+    zustaende = [z["zustand"] for z in zeilen]
+    assert zustaende == ["neu", "neu", "neu", "neu", "neu",
+                         "refurbished", "refurbished"], zustaende
 
 
-def test_katalogzeilen_ordnet_nach_segment_nicht_nach_roher_generation():
-    """B1 der Zurueckweisung vom 31.08.2026: die Nachbesserung sortierte
-    flach nach `-generation` UEBER den ganzen Hersteller und reproduzierte
-    damit den Fehler vom 29.08.2026 eine Ebene hoeher - eine Galaxy A57
-    (Generation 57) schlug jede S- oder Z-Reihe (Generation <= 26), weil
-    `generation` nur INNERHALB einer Baureihe eine Zahl ist.
+def test_modellzeilen_ordnen_nach_segment_nicht_nach_roher_generation():
+    """B1 der Zurueckweisung vom 31.08.2026: innerhalb eines Herstellers
+    zaehlt das SEGMENT vor der Generation - eine Galaxy A57 (Generation 57,
+    die hoechste Zahl der Fixture) steht hinter beiden flagship-Ultras,
+    obwohl `sorted(key=-generation)` sie nach vorn zoege.
 
-    `segment` ist das Feld, das ueber Baureihen hinweg vergleichbar ist -
-    diese Fixture haelt eine A57 (mid, Generation 57 - die hoechste Zahl
-    der Fixture) gegen zwei flagship-Ultra-Modelle (Generation 25/26).
+    `generation` ist nur INNERHALB einer Baureihe eine Zahl (Hausregel
+    seit dem 29.08.2026) - dieselbe Warnung, eine Ebene unveraendert.
     """
     katalog = _b_katalog()
     eintraege = [
@@ -688,40 +702,55 @@ def test_katalogzeilen_ordnet_nach_segment_nicht_nach_roher_generation():
         _b_zeile("Samsung", "Galaxy S25 Ultra"),
         _b_zeile("Samsung", "Galaxy S26 Ultra"),
     ]
-    zeilen = geraete_view.katalogzeilen(eintraege, katalog)
-    modelle = [z["modell"] for z in zeilen]
-    assert modelle.index("Galaxy A57") > modelle.index("Galaxy S26 Ultra"), (
-        f"die Mittelklasse A57 steht vor dem Flaggschiff: {modelle}")
+    modelle = geraete_view.katalog_modellzeilen(eintraege, katalog)
+    namen = [m["modell"] for m in modelle]
+    assert namen.index("Galaxy A57") > namen.index("Galaxy S26 Ultra"), (
+        f"die Mittelklasse A57 steht vor dem Flaggschiff: {namen}")
     # Innerhalb desselben Segments (flagship) zaehlt die Generation: S26
     # Ultra vor S25 Ultra.
-    assert modelle.index("Galaxy S26 Ultra") < modelle.index("Galaxy S25 Ultra"), modelle
+    assert namen.index("Galaxy S26 Ultra") < namen.index("Galaxy S25 Ultra"), namen
 
 
-def test_katalogzeilen_mischt_bloecke_reihum_je_hersteller():
-    """B5, jetzt auf BLOCK- statt Zeilenebene gemessen: unter den ersten
-    drei BLOECKEN (nicht Zeilen) stehen drei verschiedene Hersteller,
-    obwohl "Apple" in der Eingabe zuerst und mit den meisten Zeilen steht.
+def test_modellzeilen_mischen_modelle_reihum_je_hersteller():
+    """B5, auf Modellebene gemessen: unter den ersten drei MODELLZEILEN
+    stehen drei verschiedene Hersteller, obwohl Apple in der Eingabe zuerst
+    und mit den meisten Modellen steht. Die Fixture braucht dafuer drei
+    EIGENE Apple-Modelle - vier Listungen EINES Modells wuerden zu einer
+    Modellzeile aggregiert und den Fall nicht aufspannen.
     """
-    katalog = _b_katalog()
-    eintraege = ([_b_zeile("Apple", "Apple X")] * 4
-                + [_b_zeile("Samsung", "Galaxy S26 Ultra")]
-                + [_b_zeile("Google", "Pixel 11")])
-    zeilen = geraete_view.katalogzeilen(eintraege, katalog)
-    erste_drei_hersteller = []
-    for z in zeilen:
-        if z["hersteller"] not in erste_drei_hersteller:
-            erste_drei_hersteller.append(z["hersteller"])
-        if len(erste_drei_hersteller) == 3:
+    from telco_radar.geraete_model import Geraet, Katalog
+    katalog = Katalog(geraete=[
+        Geraet(hersteller="Apple", modell="Apple X", generation=1,
+               segment="flagship"),
+        Geraet(hersteller="Apple", modell="Apple Y", generation=2,
+               segment="flagship"),
+        Geraet(hersteller="Apple", modell="Apple Z", generation=3,
+               segment="flagship"),
+        Geraet(hersteller="Samsung", modell="Galaxy S26 Ultra",
+               generation=26, segment="flagship"),
+        Geraet(hersteller="Google", modell="Pixel 11", generation=11,
+               segment="flagship"),
+    ])
+    eintraege = ([_b_zeile("Apple", f"Apple {n}") for n in "XYZ"]
+                 + [_b_zeile("Samsung", "Galaxy S26 Ultra")]
+                 + [_b_zeile("Google", "Pixel 11")])
+    modelle = geraete_view.katalog_modellzeilen(eintraege, katalog)
+    erste_drei = []
+    for m in modelle:
+        if m["hersteller"] not in erste_drei:
+            erste_drei.append(m["hersteller"])
+        if len(erste_drei) == 3:
             break
-    assert set(erste_drei_hersteller) == {"Apple", "Samsung", "Google"}, zeilen
+    assert set(erste_drei) == {"Apple", "Samsung", "Google"}, (
+        [m["hersteller"] for m in modelle])
 
 
-def test_katalogzeilen_ist_deterministisch_bei_gleichstand():
+def test_modellzeilen_sind_deterministisch_bei_gleichstand():
     """B8 der Zurueckweisung: ohne Farbe als Tiebreak blieb die Reihenfolge
-    bei gleichem Betrag/Anbieter unterbestimmt und hing an der
-    Eingabereihenfolge - 18 von 30 Mischungen derselben Daten lieferten
-    eine andere Zeilenfolge. Zwei Zeilen desselben Geraets, derselbe
-    Anbieter, derselbe Preis, nur die Farbe unterscheidet sie."""
+    der AUFKLAPPER-Zeilen bei gleichem Betrag/Anbieter unterbestimmt und
+    hing an der Eingabereihenfolge. Zwei Listungen desselben Modells,
+    desselben Anbieters, desselben Preises - nur die Farbe unterscheidet
+    sie."""
     import random
     katalog = _b_katalog()
     eintraege = [
@@ -733,19 +762,19 @@ def test_katalogzeilen_ist_deterministisch_bei_gleichstand():
     for _ in range(20):
         gemischt = list(eintraege)
         random.shuffle(gemischt)
-        zeilen = geraete_view.katalogzeilen(gemischt, katalog)
-        farben = tuple(z["farbe"] for z in zeilen)
+        modelle = geraete_view.katalog_modellzeilen(gemischt, katalog)
+        farben = tuple(z["farbe"] for z in modelle[0]["zeilen"])
         if erwartet is None:
             erwartet = farben
         assert farben == erwartet, (
             f"die Reihenfolge haengt an der Eingabe: {farben} != {erwartet}")
 
 
-def test_katalogzeilen_stellt_einen_hersteller_ohne_katalogtreffer_ans_ende():
-    """B9 der Zurueckweisung: die Docstring behauptete, eine Zeile ohne
-    Katalogtreffer falle ans Ende ihrer Gruppe - `hersteller == ""` und
-    `sorted(gruppen)` stellten den leeren String aber an den ANFANG, ihre
-    Gruppe eroeffnete das Reihum."""
+def test_modellzeilen_stellen_einen_hersteller_ohne_katalogtreffer_ans_ende():
+    """B9 der Zurueckweisung: die Docstring behauptete, ein Hersteller ohne
+    Katalogtreffer falle ans Ende seiner Gruppe - `hersteller == ""` und
+    `sorted(gruppen)` stellten den leeren String aber an den ANFANG, seine
+    Modelle eroeffneten das Reihum. Auf Modellebene gilt dieselbe Regel."""
     katalog = _b_katalog()
     eintraege = [
         {"device_id": "unbekanntes-geraet", "anbieter": "A",
@@ -755,67 +784,96 @@ def test_katalogzeilen_stellt_einen_hersteller_ohne_katalogtreffer_ans_ende():
          "abgerufen_am": ""},
         _b_zeile("Apple", "Apple X"),
     ]
-    zeilen = geraete_view.katalogzeilen(eintraege, katalog)
-    assert zeilen[0]["hersteller"] == "Apple", (
+    modelle = geraete_view.katalog_modellzeilen(eintraege, katalog)
+    assert modelle[0]["hersteller"] == "Apple", (
         "der Hersteller ohne Katalogtreffer fuehrt das Reihum an: "
-        f"{[z['hersteller'] for z in zeilen]}")
+        f"{[m['hersteller'] for m in modelle]}")
 
 
-def test_der_katalog_ist_eine_flache_tabelle(tmp_path):
-    """Reiter 2 zeigt seit dem 30.08.2026 EINE Zeile je (Gerät, Speicher,
-    Farbe, Anbieter) statt einer Matrix mit 65 Aufklappern.
 
-    Der Unterschied ist nicht kosmetisch: eine Matrixzelle sagte "3
-    Varianten, 799-899 EUR", und wer wissen wollte WELCHE, klappte zweimal
-    auf. Jede Zeile trägt jetzt alles, was sie behauptet - Preis, Zustand,
-    Verfügbarkeit, Quelle und Abrufdatum.
+def test_der_katalog_ist_eine_tabelle_auf_modellebene(tmp_path):
+    """Reiter 2 zeigt seit P3 EINE Zeile je (Geraet, Speicher) - 566
+    Listungszeilen zu 111 Modellen waren der Befund, und jede dritte
+    Modellgruppe enthielt eine "ohne Preis"-Zeile, obwohl der Preis da war
+    (1&1-Listungen: nur im Buendel). Die Listungs-Details (Farbe, Zustand,
+    Bestand, Beleg) stehen im Aufklapper UNTER der Modellzeile.
+
+    Der Weg dorthin: Matrix (bis 30.08.2026) -> flache Listungs-Tabelle
+    (30.08.2026 bis 18.09.2026) -> Modell-Tabelle mit Umschalter (P3). Die
+    Vorlagen-ID `gr-katalogtabelle` blieb ueber alle drei Stufen dieselbe.
     """
     site = _baue(tmp_path)
     s = _suppe(site, "geraete.html")
+    # Kind-Selektor: die Aufklapper-Tabellen der Modellzeilen liegen im
+    # SELBEN tbody - ein Nachfahren-Selektor wuerde ihre Koepfe (Händler,
+    # Farbe, ...) mitzaehlen.
     kopf = [th.get_text(strip=True)
-            for th in s.select("#gr-katalogtabelle thead th")]
-    assert kopf == ["Gerät", "Farbe", "Anbieter", "Preis", "Zustand",
-                    "Verfügbar", "Abgerufen"], kopf
+            for th in s.select("#gr-katalogtabelle > thead th")]
+    assert kopf == ["Modell", "Einzelgerätepreis", "Händler", "Spanne",
+                    "TCO-24", "Ø €/Monat", "Δ zu Vodafone", "Band"], kopf
 
     zeilen = s.select("#gr-katalogtabelle .gr-k-zeile")
-    # Eine Zeile je Listung des BESTANDS, nicht je Gerät - das ist der ganze
-    # Punkt der flachen Form. Ausgelistete Bestände bleiben in der Datenbank
-    # (sie wird per Design nie geleert), gehören aber nicht ins Regal.
-    #
-    # Gezählt wird gegen `_bestand_ids()` und nicht gegen eine eigene
-    # Statusabfrage. Die alte Fassung fragte `status in ("aktiv",
-    # "beobachtet")` - "beobachtet" ist gar kein Status dieses Stores, und
-    # damit fiel die gealterte Zwillingshälfte hier zufällig heraus. Der Test
-    # hätte also gestimmt, ohne dass die Bereinigung überhaupt läuft.
-    assert len(_bestand_ids()) < len(_DB["listungen"]), (
-        "die Fixture hat weder eine ausgelistete Zeile noch einen Zwilling - "
-        "dann misst dieser Vergleich nicht, dass wirklich gefiltert wird")
-    assert len(zeilen) == len(_bestand_ids()), len(zeilen)
-    # (Die Zeilen tragen keine Listungskennung; dass es DIE Kennungen des
-    # Bestands sind, misst `test_der_export_zeigt_genau_den_bestand_der_seite`
-    # an der CSV, die aus derselben Menge entsteht.)
+    # Eine Zeile je MODELL des BESTANDS - das ist der ganze Punkt der
+    # P3-Form. Ausgelistete Bestaende bleiben in der Datenbank (sie wird
+    # per Design nie geleert), gehoeren aber nicht ins Regal; die gealterte
+    # Zwillingshaelfte des Bestands zaehlt ebensowenig. Gezaehlt wird gegen
+    # `_modell_schluessel_fixture()` (ausgeschriebene Erwartung, nicht
+    # `modell_schluessel()` nachgerechnet - dieselbe Regel wie bei den
+    # Listenmengen dieser Datei).
+    assert len(_modell_schluessel_fixture()) < len(_DB["listungen"]), (
+        "die Fixture aggregiert nichts - dann misst dieser Vergleich nicht, "
+        "dass wirklich auf Modellebene gruppiert wird")
+    assert len(zeilen) == len(_modell_schluessel_fixture()), len(zeilen)
+    # Jede Modellzeile traegt Modellnamen und eine PREIS-DARSTELLUNG:
+    # einen belegten "ab"-Preis (mit Abrufdatum), den Bündel-Zustand oder
+    # den benannten Leerzustand. Die Fixture spannt den Leerzustand auf -
+    # die refurbished-Zeile des iPhone 16 Pro Max 512 bleibt als Einzige
+    # ihres Modells ueber (B1: kein "ab" aus Gebraucht-Preisen), ohne
+    # Bündelstore sagt die Zeile "kein Preis gemessen" statt gar nichts.
     for z in zeilen:
         assert z.select_one(".gr-a-modell"), "Zeile ohne Modellnamen"
-        assert z.select_one(".gr-a-datum"), "Zeile ohne Abrufdatum"
-    # Die alte Matrix steht nicht mehr auf der Seite.
+        text = z.get_text(" ", strip=True)
+        if z.select_one(".gr-a-datum"):
+            continue  # belegter Preis, Datum steht dabei
+        assert ("nur im Bündel" in text
+                or "kein Preis gemessen" in text), (
+            f"Zeile ohne Preisdarstellung und ohne benannten Leerzustand: "
+            f"{text!r}")
+    # Und zu jeder Modellzeile gehoert GENAU EIN Aufklapper mit den
+    # Listungs-Details (paarweise `gr-a-rest`, gemeinsames `data-auf`).
+    aufklapp = s.select("#gr-katalogtabelle .gr-a-auf")
+    assert len(aufklapp) == len(zeilen), (
+        f"{len(aufklapp)} Aufklapper zu {len(zeilen)} Modellzeilen")
+    for z, a in zip(zeilen, aufklapp):
+        assert a.get("id") == z.get("data-auf"), (
+            f"Modellzeile {z.get('data-auf')} und Aufklapper {a.get('id')} "
+            "gehoeren nicht zusammen")
+        assert a.select_one(".gr-k-listungen"), "Aufklapper ohne Listungen"
+    # Die alte Matrix und die flache Listungs-Haupttabelle stehen nicht
+    # mehr auf der Seite.
     assert s.select_one(".gr-matrix-tabelle") is None
 
 
 def test_eine_unbekannte_verfuegbarkeit_ist_kein_alarm(tmp_path):
     """"unbekannt" heißt, dass die Quelle nichts gesagt hat - nicht, dass das
     Gerät fehlt. In Alarmrot gesetzt wäre bei o2 jede der 68 Zeilen rot,
-    ohne dass irgendetwas fehlt."""
+    ohne dass irgendetwas fehlt.
+
+    Seit P3 steht die Auskunft im ZEILEN-AUFKLAPPER des Modells, unter dem
+    Etikett "Bestand" (vorher: eigene "Verfügbar"-Spalte der Haupttabelle),
+    und die Pille heißt `gr-pille--unklar` (vorher `--unbekannt`, wofuer
+    es keine CSS-Regel gab - C2)."""
     db = json.loads(json.dumps(_DB))
     db["listungen"][0]["verfuegbarkeit"] = "unbekannt"
     site = _baue(tmp_path, db=db)
     s = _suppe(site, "geraete.html")
-    pillen = [p for p in s.select("#gr-katalogtabelle .gr-pille")
+    pillen = [p for p in s.select("#gr-katalogtabelle .gr-k-listungen .gr-pille")
               if "keine Angabe" in p.get_text()]
     assert pillen, "die Fixture spannt den Fall nicht auf"
     for p in pillen:
         klassen = p.get("class") or []
         assert "gr-pille--kritisch" not in klassen, klassen
-        assert "gr-pille--unbekannt" in klassen, klassen
+        assert "gr-pille--unklar" in klassen, klassen
 
 
 def test_lifecycle_sagt_dass_die_datenbasis_duenn_ist(tmp_path):
@@ -1734,25 +1792,25 @@ def test_der_pruefbericht_nennt_dieselben_zahlen_wie_die_pruefung(tmp_path):
 
 
 def test_die_katalogzeile_nennt_den_ABGELEITETEN_zustand(tmp_path):
-    """Der Katalog zeigt gebrauchte Geräte bewusst mit - dann muss die Zeile
-    auch „refurbished" sagen und nicht den Store-Wert.
+    """Der Katalog zeigt gebrauchte Geräte bewusst mit - dann muss die
+    Zeile auch „refurbished" sagen und nicht den Store-Wert.
 
-    Der Vorgänger dieses Tests hing an der gelöschten SKU-Matrix und prüfte,
-    dass deren Preisspanne keinen Gebrauchtpreis enthält. Die flache Tabelle
-    trifft eine andere, schärfere Zusicherung: sie zeigt die Zeile, sagt aber
-    dazu, was sie ist. Ohne die Ableitung stünde dort „space schwarz
-    erneuert · Zustand neu", während der Prüfbericht zwei Reiter weiter
-    „refurbished" meldet - die Seite widerspräche sich selbst.
+    Der Vorgänger dieses Tests hing an der gelöschten SKU-Matrix und prüfte
+    deren Preisspanne; danach an der flachen Listungs-Tabelle; seit P3
+    steht die Listungs-Zeile im AUFKLAPPER unter der Modellzeile. Die
+    Zusicherung ist ueber beide Umbauten dieselbe geblieben: zeigt der
+    Katalog die Zeile, sagt er dazu, was sie ist. Ohne die Ableitung
+    stuende dort „space schwarz erneuert · Zustand neu", während der
+    Pruefbericht zwei Reiter weiter „refurbished" meldet - die Seite
+    widerspraeche sich selbst.
 
-    GEÄNDERT AM 31.08.2026, und zwar am Suchkriterium, nicht an der
-    Zusicherung: der Reiter zeigt seit der Trennung der zwei Mengen den
-    BEREINIGTEN Bestand, und dort steht das Wort „erneuert" nicht mehr in
-    der Farbspalte - das ist der Zweck von `bereinige()`. Über den Text
-    gesucht fand der Test seine Zeile deshalb nicht mehr. Gesucht wird sie
-    jetzt über Gerät und Anbieter, und die Zusicherung ist dadurch schärfer
-    geworden: das Kennzeichen muss von der Farbspalte in die Zustandsspalte
-    GEWANDERT sein, nicht verschwunden. Genau das kann es: `bereinige()`
-    schreibt den abgeleiteten Zustand fest, bevor es die Farbe säubert.
+    GEÄNDERT AM 18.09.2026 (P3/C3) am SUCHWEG, nicht an der Zusicherung:
+    gesucht wird die Listungs-Zeile jetzt im Aufklapper ihres Modells
+    (Modellzeile per `data-s-geraet`, Aufklapper per `data-auf`), und das
+    Kennzeichen muss in der ZUSTANDS-Zelle der Aufklapper-Tabelle stehen -
+    die Hauptzeile aggregiert mehrere Anbieter und hat keine Zustandsspalte
+    mehr. Genau das kann es: `bereinige()` schreibt den abgeleiteten
+    Zustand fest, bevor es die Farbe säubert.
     """
     db = json.loads(json.dumps(_DB))
     # Der echte o2-Fall: das Kennzeichen steht NUR in der Farbe, der Store
@@ -1766,19 +1824,31 @@ def test_die_katalogzeile_nennt_den_ABGELEITETEN_zustand(tmp_path):
     site = _baue(tmp_path, db=db)
     s = _suppe(site, "geraete.html")
 
-    zeilen = s.select("#gr-katalogtabelle .gr-k-zeile")
-    treffer = [z for z in zeilen
-               if z.get("data-anbieter") == "Medimax"
-               and "iPhone 17 Pro Max" in (z.get("data-s-geraet") or "")
+    hauptzeilen = s.select("#gr-katalogtabelle .gr-k-zeile")
+    treffer = [z for z in hauptzeilen
+               if "iPhone 17 Pro Max" in (z.get("data-s-geraet") or "")
                and (z.get("data-speicher") or "") == "256"]
     assert treffer, "die Fixture spannt den Fall nicht auf"
     for z in treffer:
-        assert z.get("data-zustand") == "refurbished", z.get("data-zustand")
-        assert "refurbished" in z.get_text()
-        # Und das Wort steht nicht mehr zusätzlich in der Farbe - dieselbe
-        # Aussage zweimal, einmal an der falschen Stelle, war der Anlass
-        # für `geraete_bereinigung`.
-        assert "erneuert" not in (z.get("data-s-farbe") or "").lower()
+        auf = s.select_one(f"#{z['data-auf']} .gr-k-listungen")
+        assert auf is not None, "kein Aufklapper unter der Modellzeile"
+        # Die Zeile des Haendlers, der die Farbe mit Kennzeichen traegt.
+        # Gefiltert auf Zeilen MIT Zellen: der html.parser haengt die
+        # Kopfzeile des Aufklappers an denselben Selektor wie die
+        # Datenzeilen (getestet) - ohne den td-Filter crasht der Lookup
+        # auf der th-Zeile.
+        listung = [r for r in auf.select("tr")
+                   if r.select_one("td") is not None
+                   and "Medimax" in r.select_one("td").get_text()]
+        assert listung, "Medimax-Zeile fehlt im Aufklapper"
+        for r in listung:
+            zellen = r.select("td")
+            farbe, zustandszelle = zellen[1].get_text(), zellen[3].get_text()
+            assert "refurbished" in zustandszelle, zustandszelle
+            # Und das Wort steht nicht mehr zusätzlich in der Farbe -
+            # dieselbe Aussage zweimal, einmal an der falschen Stelle, war
+            # der Anlass für `geraete_bereinigung`.
+            assert "erneuert" not in farbe.lower(), farbe
 
 
 def test_die_geraetespalte_des_katalogs_bleibt_beim_scrollen_stehen(tmp_path):
@@ -2084,12 +2154,23 @@ def test_der_alarmreiter_traegt_keine_verfuegbarkeitsspalte(tmp_path):
     assert int(aufklapper["colspan"]) == len(koepfe), (
         f"colspan {aufklapper['colspan']} zu {len(koepfe)} Spalten")
 
-    # Der Katalog (auf der GERAETESEITE) behaelt sie - mit EINEM Wort je
-    # Zustand.
-    katalog = _suppe(site, "geraete.html").select_one("#gr-katalogtabelle")
-    assert katalog, "Katalogtabelle fehlt"
-    kkoepfe = [th.get_text(" ", strip=True).lower() for th in katalog.select("thead th")]
-    assert any("verfügbar" in k for k in kkoepfe), kkoepfe
+    # Der Katalog (auf der GERAETESEITE) behaelt die Auskunft - seit P3
+    # im ZEILEN-AUFKLAPPER unter dem Etikett "Bestand" (die alte
+    # "Verfügbar"-SPALTEN der Haupttabelle ist der Modell-Aggregation
+    # gewichen: die Hauptzeile fasst Anbieter zusammen, eine Liefer-
+    # auskunft ist eine Eigenschaft der EINZELNEN Listung). Mit EINEM Wort
+    # je Zustand.
+    katalog = _suppe(site, "geraete.html")
+    assert katalog.select_one("#gr-katalogtabelle"), "Katalogtabelle fehlt"
+    hauptkoepfe = [th.get_text(" ", strip=True).lower()
+                   for th in katalog.select("#gr-katalogtabelle > thead th")]
+    assert not any("verfügbar" in k for k in hauptkoepfe), (
+        f"die Haupttabelle hat eine Verfügbarkeitsspalte: {hauptkoepfe}")
+    aufklappkoepfe = [th.get_text(" ", strip=True).lower()
+                      for th in katalog.select(".gr-k-listungen th")]
+    assert aufklappkoepfe, "keine Aufklapper-Köpfe - der Test misst nichts"
+    assert "bestand" in aufklappkoepfe, (
+        f"der Aufklapper nennt das Bestand-Etikett nicht: {aufklappkoepfe}")
 
 
 def test_ein_zustand_hat_auf_der_ganzen_seite_ein_wort(tmp_path):
@@ -2115,10 +2196,20 @@ def test_die_spaltenkoepfe_sind_sortierbar(tmp_path):
     Prozent" die erste Frage vor dieser Tabelle.
 
     Geprueft wird hier die STATISCHE Voraussetzung: jeder Knopf nennt einen
-    Schluessel, und zu jedem Schluessel traegt jede Zeile einen Wert. Ob die
-    Sortierung dann richtig ordnet, misst
-    `tests/test_geraete_reiter_browser.py` im echten Chromium - eine
-    Sortierung, die es nur im Test gibt, sortiert keine Seite."""
+    Schluessel, und Zeile und Sortierwert passen zusammen. Ob die Sortierung
+    dann richtig ordnet, misst `tests/test_geraete_reiter_browser.py` im
+    echten Chromium - eine Sortierung, die es nur im Test gibt, sortiert
+    keine Seite.
+
+    Seit P3 gilt fuer den KATALOG eine andere Leer-Regel als fuer den
+    Radar: eine Modellzeile OHNE Spanne oder ohne Bündel ist der benannte
+    Normalzustand (49 von 111 Modellen ohne wesentliche Spanne, 19 ohne
+    Bündel), und ihr Sortierwert ist bewusst leer - die Zeile faellt ans
+    Ende, nicht nach oben. Statt eines Wertes in JEDEM Schluessel wird
+    deshalb geprueft, dass Wert und ZELLE nie auseinanderlaufen: eine
+    Zelle ohne Betrag hat keinen Sortierwert, und eine Zelle MIT Betrag
+    hat einen - sonst sortierte eine Zeile nach nichts, obwohl sie etwas
+    kostet (oder nach einem Preis, den sie nicht zeigt)."""
     site = _baue(tmp_path, db=_db_mit(24, anbieter=_UEBER_DER_SCHWELLE))
     suppe = _suppe(site, "geraete.html")
     radar = _radar(site)
@@ -2137,15 +2228,41 @@ def test_die_spaltenkoepfe_sind_sortierbar(tmp_path):
             schluessel = k.get("data-sort")
             assert schluessel, f"{tafel}: Knopf ohne data-sort"
             assert k.get("data-art") in ("zahl", "text"), schluessel
-            # LEER ist so schlecht wie fehlend: `parseFloat("")` ist NaN,
-            # und die Sortierung schiebt NaN absteigend ans Ende, aber
-            # aufsteigend an den ANFANG - eine Zeile ohne Wert stünde dann
-            # ganz oben. Deshalb wird auf einen echten Wert geprüft.
-            fehlend = [z for z in zeilen
-                       if not (z.get(f"data-s-{schluessel}") or "").strip()]
-            assert not fehlend, (
-                f"{tafel}: {len(fehlend)} Zeilen ohne Wert in "
-                f"data-s-{schluessel} - sie sortieren aufsteigend nach oben")
+            if tafel == "#wr-alarme":
+                # LEER ist so schlecht wie fehlend: `parseFloat("")` ist
+                # NaN, und die Sortierung schiebt NaN absteigend ans Ende,
+                # aber aufsteigend an den ANFANG - eine Zeile ohne Wert
+                # stuende dann ganz oben. Der Radar kennt keine benannten
+                # Leerzustaende, dort bleibt der harte Wert-Assert.
+                fehlend = [z for z in zeilen
+                           if not (z.get(f"data-s-{schluessel}") or "").strip()]
+                assert not fehlend, (
+                    f"{tafel}: {len(fehlend)} Zeilen ohne Wert in "
+                    f"data-s-{schluessel} - sie sortieren aufsteigend nach oben")
+                continue
+            # Katalog: Sortierwert und Zellinhalt decken sich. Die Zellen
+            # je Ansicht tragen ihre Klassen (`gr-sp--barpreis` / `gr-sp--
+            # tco`), die dritte Barpreis-Zelle ist die Spanne, die ersten
+            # drei TCO-Zellen sind TCO-24 / Ø €/Monat / Delta.
+            for z in zeilen:
+                barpreis_zellen = z.select("td.gr-sp--barpreis")
+                tco_zellen = z.select("td.gr-sp--tco")
+                assert len(barpreis_zellen) == 3 and len(tco_zellen) == 4, (
+                    f"{tafel}: Zeile ohne Ansichtsspalten: {z.get('data-auf')}")
+                paarung = [("preis", barpreis_zellen[0]),
+                           ("spanne", barpreis_zellen[2]),
+                           ("tco", tco_zellen[0]),
+                           ("monat", tco_zellen[1]),
+                           ("delta", tco_zellen[2])]
+                for schluessel_zelle, zelle in paarung:
+                    wert = (z.get(f"data-s-{schluessel_zelle}") or "").strip()
+                    hat_euro = "€" in zelle.get_text()
+                    assert bool(wert) == hat_euro or (
+                        schluessel_zelle == "preis" and not wert
+                        and "nur im Bündel" in z.get_text()), (
+                        f"{tafel} {z.get('data-auf')}: data-s-"
+                        f"{schluessel_zelle}={'leer' if not wert else wert!r}, "
+                        f"Zelle sagt {zelle.get_text(strip=True)!r}")
 
 
 def test_unter_vier_wochen_vorlauf_zeigt_die_wochenkarte_keine_tabelle(tmp_path):

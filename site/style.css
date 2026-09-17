@@ -2303,6 +2303,37 @@ b,strong{font-weight:700}
 .gr-a-liste a{color:var(--red);text-decoration:none}
 .gr-a-liste a:hover{text-decoration:underline}
 
+/* P3 (Strategie Geraete v3, 17.09.2026): die MODELL-Tabelle des
+   Gerätekatalogs und ihr EIN Ansichts-Umschalter.
+
+   Beide Ansichten (Einzelgerätpreis / Gesamtkosten) stehen fertig im
+   Markup - zwei Spaltengruppen an EINER Tabelle. `app.js` legt nur die
+   Klasse `gr-katalog--tco` an die Tabelle, diese drei Regeln blenden
+   die jeweils andere Gruppe aus. Kein hidden-Attribut an den Zellen
+   (also keine Konkurrenz zur `[hidden]`-Falle der Band-Spans), und
+   display:table-cell ist der Grundzustand einer th/td-Zelle - die
+   Regel gewinnt gegen ihn nur, weil sie SPEZIFISCHER ist (0-2-0 gegen
+   0-0-1 des Browsers).
+
+   Mobil gilt unverändert `.gr-alarm{min-width:700px}` plus
+   `gr-alarm-scroll`: die Tabelle rollt IN SICH (Rollbehaelter-Muster
+   der Seite), die Seite selbst laeuft nicht waagerecht. Je Ansicht
+   sind nur 4-5 der 8 Spalten sichtbar. */
+.gr-kansicht{margin:0 0 14px}
+.gr-katalog-mod .gr-sp--tco{display:none}
+.gr-katalog-mod.gr-katalog--tco .gr-sp--tco{display:table-cell}
+.gr-katalog-mod.gr-katalog--tco .gr-sp--barpreis{display:none}
+/* Die Zeile ist ein Aufklapper (Listungs-Details des Modells) - der
+   Zeiger sagt es, bevor P4 den Chevron nachliefert. */
+.gr-katalog-mod tbody .gr-a-zeile{cursor:pointer}
+/* Der ab-Preis bricht nicht zwischen Betrag und Waehrung. */
+.gr-k-ab{font-family:var(--serif);font-weight:600;white-space:nowrap}
+.gr-k-anzahl{font-family:var(--sans);font-weight:700;font-size:15px}
+.gr-k-band{white-space:nowrap}
+/* Die Listungs-Tabelle im Zeilen-Aufklapper: eine Stufe leiser als die
+   Haupttabelle - sie ist Nachschlage-Detail, nicht Aussage. */
+.gr-k-listungen{font-size:13px}
+
 @media (max-width:760px){
   .gr-kacheln{grid-template-columns:repeat(2,1fr)}
   .gr-kachel{border-bottom:1px solid var(--rule-2)}

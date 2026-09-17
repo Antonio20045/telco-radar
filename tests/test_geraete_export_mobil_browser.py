@@ -150,13 +150,15 @@ def _reihe(s):
 
 
 def test_am_telefon_ist_die_export_zeile_sichtbar_und_vollstaendig(telefon):
-    """Alle vier Dateien sind vom Telefon aus erreichbar - die Reihe steht
-    da (Hoehe > 0), jeder Knopf hat eine Box, und alle vier liegen in
-    EINER Zeile (die Reihe rollt in sich, sie stapelt nicht)."""
+    """Alle Export-Dateien sind vom Telefon aus erreichbar - die Reihe
+    steht da (Hoehe > 0), jeder Knopf hat eine Box, und alle liegen in
+    EINER Zeile (die Reihe rollt in sich, sie stapelt nicht). Bis P3
+    waren es vier Knöpfe, der Modell-Katalog hat zwei weitere gebracht
+    (eine Datei je Ansicht - E5-Regel)."""
     r = _reihe(telefon)
     assert r is not None, "keine Export-Reihe im Kopf der Seite"
     assert r["hoehe"] > 0, "die Export-Reihe ist auf 390 px unsichtbar"
-    assert r["sichtbar"] == r["knoepfe"] == 4, (r["sichtbar"], r["knoepfe"])
+    assert r["sichtbar"] == r["knoepfe"] == 6, (r["sichtbar"], r["knoepfe"])
     assert r["zeile"], "die Knöpfe stapeln statt in einer Zeile zu rollen"
     assert r["overflow"] == "auto", (
         f"overflow-x ist {r['overflow']} - die Reihe kann nicht in sich "
@@ -233,5 +235,5 @@ def test_am_schreibtisch_steht_die_reihe_noch_im_kopf(schreibtisch):
     Knöpfe sichtbar - das mobile Grid greift erst unter 900 px."""
     r = _reihe(schreibtisch)
     assert r is not None
-    assert r["sichtbar"] == 4
+    assert r["sichtbar"] == 6
     assert r["zeile"], "auch auf dem Schreibtisch stehen die Knöpfe versetzt"

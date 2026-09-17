@@ -129,6 +129,17 @@
         >Bündel-TCO ({{ geraete.export.tco.zeilen }})</a>
       <a class="gr-knopf" href="{{ geraete.export.radar.datei }}" download
         >Radar ({{ geraete.export.radar.zeilen }})</a>
+      {# P3: der Katalog auf Modellebene ist eine eigene ZAHLENSEKTION -
+         E5 "alle Zahlensektionen exportierbar" braucht je Ansicht EINEN
+         Knopf (eine Datei je Ansicht, kein Formatmix). Die Zeilenzahl
+         ist die MODELLZAHL - "Alle exportieren" nennt die Listungen. #}
+      {% if geraete.export.modell_barpreis.datei %}
+      <a class="gr-knopf" href="{{ geraete.export.modell_barpreis.datei }}"
+        download>Katalog Barpreis ({{ geraete.export.modell_barpreis.zeilen
+        }})</a>
+      <a class="gr-knopf" href="{{ geraete.export.modell_tco.datei }}"
+        download>Katalog TCO ({{ geraete.export.modell_tco.zeilen }})</a>
+      {% endif %}
     </span>
     {% endif %}
   </div>
@@ -526,190 +537,266 @@
 </section>
 </div>
 
-{# --- Reiter 3: Geraetekatalog ----------------------------------------
+{# --- Reiter 4: Gerätekatalog ----------------------------------------
    (Die CSV-Knoepfe standen bis O4 je Reiter oben in einem `gr-werkzeug`-
    DIV; sie stehen EINMAL in der Kopfzeile - siehe den Kommentar dort.) #}
 <div class="gr-tafel gr-tafel--aus" id="tafel-katalog" role="tabpanel">
 
-{# --- Der Bestand als FLACHE Tabelle ----------------------------------
-   Bis zum 30.08.2026 stand hier eine Matrix Modell x Anbieter plus 65
-   Aufklapper: eine Zelle sagte "3 Varianten, 799-899 EUR", und wer wissen
-   wollte WELCHE, klappte zweimal auf. Jetzt traegt jede Zeile alles, was
-   sie behauptet.                                                        #}
+{# --- P3 (Strategie Geraete v3, 17.09.2026): EINE Tabelle auf MODELL-
+   Ebene mit EINEM Umschalter Einzelgerätpreis / Gesamtkosten ----
+   Bis P3 stand hier die Listungs-Tabelle: 566 Zeilen zu 111 Modellen,
+   36 davon "ohne Preis" (alle 1&1, deren Bündelpreis längst im Store
+   lag), und dieselben Geräte als Farb-/Anbieter-Zeilen wiederholt.
+   Antonios Forderungen 5 und 6: der Preis muss da stehen - und statt
+   einer zweiten TCO-Liste gibt es EINEN Umschalter über EINER Tabelle.
+
+   DIE EINE REGEL (P3): keine Modellzeile sagt "ohne Preis". Jede Zeile
+   trägt einen Barpreis ("ab X bei Y") ODER den benannten Bündel-Zustand
+   ("nur im Bündel, ab X /Monat") - die Zahlen kommen fertig aus
+   `geraete_view.katalog_modellzeilen()` (C1), hier wird nichts gerechnet.
+   Die Listungs-Details (Farbe, Zustand, Beleg) sind NICHT gelöscht: sie
+   stehen im Zeilen-Aufklapper (dieselbe `data-auf`-Mechanik wie die
+   Radar-Modellliste; Klick auf die Zeile öffnet sie).
+
+   Beide Ansichten stehen SERVERSEITIG fertig im Markup - `app.js`
+   blendet nur um (Klasse an der Tabelle, kein Reload, kein Rechnen,
+   bewusst kein URL-Parameter). Default ist der Einzelgerätpreis: das
+   ist die Frage dieses Reiters, die Gesamtkosten sind die des
+   Vergleichs-Reiters. Der Umschalter teilt die Preisspalte, nicht die
+   Modellmenge: beide Ansichten laufen über denselben `modell_schluessel`
+   (C1, geteilt mit der TCO-Ansicht).
+
+   Sortierung weiterhin nach ROHWERT (`data-s-*`); eine Zeile ohne Zahl
+   in der sortierten Spalte trägt keinen Schlüssel und fällt ans Ende
+   (bestehende Regel). Der Deckel (`zeilen_rest` aus C1 - `KATALOG_SICHTBAR`
+   zählt MODELLE) und der filterbewusste Nachzähler in `app.js`
+   (`anwenden()`) bleiben unverändert in Geltung. Die Sortier- und
+   Interleave-Regeln, die bis P3 im Kommentar hier standen, leben seit C1
+   im Docstring von `katalog_modellzeilen()` - eine Ebene tiefer, dort wo
+   sie gerechnet werden. #}
 <section class="gr-katalog" id="katalog">
   <h2 class="rubrik">Was wo im Regal steht
-    <span class="rubrik-zahl">{{ geraete.katalogtabelle | length }}</span></h2>
-  <p class="gr-erklaer">Welche Geräte stehen bei wem im Regal: eine Zeile
-  je Gerät, Speichergröße, Farbe und Anbieter – mit Preis, Zustand,
-  Verfügbarkeit, Quelle und Abrufdatum.
-  Hier steht der ganze Bestand, auch gebrauchte Geräte und Zuzahlungen:
-  was aus dem Preisvergleich fällt, verschwindet nicht, es wird nur nicht
-  gegen etwas gerechnet, das es nicht ist. Zwei Schreibweisen derselben
-  Listung stehen dabei als eine Zeile.</p>
-  {# ZUSTAND=NEU VORBELEGT (B5, zweimal nachgebessert am 31.08.2026).
-
-     Runde 1 hatte diese Vorbelegung mit einer globalen Sortierregel
-     abgesichert ("neu" komplett vor dem Rest in `katalogzeilen()`), damit
-     die Vorbelegung serverseitig nie eine sichtbar gerenderte Zeile
-     versteckt (dieselbe Lehre wie Commit 79085f0: "neu" stand im <select>,
-     waehrend die Sortierung unveraendert alphabetisch blieb und der Deckel
-     die unfilterte Liste bei zwoelf abschnitt, bevor der Filter griff -
-     sichtbar weniger als der Deckel versprach).
-
-     Runde 2 (B6 der Zurueckweisung) hat genau diese globale Sortierregel
-     wieder entfernt: sie zerriss die Zeilen EINES Geraets ueber die ganze
-     Tabelle, sobald es sowohl neue als auch gebrauchte Listungen hatte -
-     69 von 90 Geraeten standen in bis zu zwoelf Bloecken verstreut, obwohl
-     "wer ein Geraet sucht, findet seine Zeilen beieinander" der Zweck
-     dieses Reiters seit seinem Bau ist. `katalogzeilen()` mischt seitdem
-     auf BLOCK-Ebene (ein Geraet bleibt IMMER zusammen), nicht mehr global
-     nach Zustand getrennt.
-
-     Dass die Vorbelegung trotzdem sicher ist, sorgt jetzt NICHT mehr die
-     Sortierung, sondern der DECKEL SELBST (`app.js`, `anwenden()`): er
-     zaehlt seit derselben Nachbesserung nur noch unter den TREFFERN des
-     aktiven Filters, nicht mehr nach roher Position - eine passende Zeile
-     kann also nie hinter einer unpassenden verschwinden, egal wie die
-     Grundsortierung aussieht. Ueberschrift, Deckel-Budget und Export lesen
-     weiterhin dieselbe, UNGEFILTERTE Gesamtzahl; nur "alle anzeigen"
-     verspricht seitdem die Zahl der TREFFER (siehe `app.js`), nicht mehr
-     die Gesamtzahl - sonst versprach der Knopf bei aktivem Filter mehr, als
-     ein Klick liefert. #}
+    <span class="rubrik-zahl">{{ geraete.katalog_modelle | length }}</span></h2>
+  {# 18 Woerter statt 33 (Sicht-Pruefung Kleineres 5, F1-Geist): der Satz
+     erklaert die EINEN zwei Dinge, die ein Leser nicht kennen kann -
+     Zeile je Modell und den Umschalter. Was in den Spalten steht, sagen
+     die Spaltenkoepfe; was im Aufklapper steht, sagt der Aufklapper. #}
+  <p class="gr-erklaer">Eine Zeile je Modell; der Umschalter darüber wählt
+  Einzelgerätpreis oder Gesamtkosten über 24 Monate (TCO-24). Alle
+  Listungen des Modells stehen unter der Zeile.</p>
 
   <div class="gr-filter" data-fuer="gr-katalogtabelle">
     <label class="gr-fbox"><span>Marke</span>
       <select data-filter="marke">
         <option value="">alle</option>
-        {% for m in geraete.katalogtabelle | map(attribute='hersteller')
+        {% for m in geraete.katalog_modelle | map(attribute='hersteller')
               | reject('equalto','') | unique | sort %}
         <option value="{{ m }}">{{ m }}</option>{% endfor %}
-      </select></label>
-    <label class="gr-fbox"><span>Anbieter</span>
-      <select data-filter="anbieter">
-        <option value="">alle</option>
-        {% for a in geraete.katalogtabelle | map(attribute='anbieter')
-              | reject('equalto','') | unique | sort %}
-        <option value="{{ a }}">{{ a }}</option>{% endfor %}
       </select></label>
     <label class="gr-fbox"><span>Speicher</span>
       <select data-filter="speicher">
         <option value="">alle</option>
-        {% for sp in geraete.katalogtabelle | map(attribute='speicher')
+        {% for sp in geraete.katalog_modelle | map(attribute='speicher')
               | select | unique | sort %}
         <option value="{{ sp }}">{{ sp }} GB</option>{% endfor %}
       </select></label>
-    <label class="gr-fbox"><span>Zustand</span>
-      <select data-filter="zustand">
-        <option value="">alle</option>
-        {% for z in geraete.katalogtabelle | map(attribute='zustand')
-              | unique | sort %}
-        <option value="{{ z }}"{{ ' selected' if z == 'neu' }}>{{ z }}</option>{% endfor %}
-      </select></label>
     <label class="gr-fbox gr-fbox--weit"><span>Suche</span>
-      <input type="search" data-filter="suche" placeholder="Modell, Farbe, Anbieter …"></label>
+      <input type="search" data-filter="suche" placeholder="Modell, Händler …"></label>
+  </div>
+
+  {# EIN Umschalter, gleiche Bauform wie der Zeitraum- und der Band-
+     Schalter der Seite (`gr-vgruppe`/`gr-vknopf`, aktiv ROT). Der
+     Zustand steht NICHT in der URL - bewusst (Keep it simple): ein
+     geteilter Link soll den Katalog in seiner Grundfrage zeigen. #}
+  <div class="gr-vgruppe gr-kansicht" role="group"
+       aria-label="Welcher Preis in der Tabelle steht">
+    <button type="button" class="gr-vknopf is-aktiv" data-ansicht="barpreis"
+            aria-pressed="true">Einzelgerätpreis</button>
+    <button type="button" class="gr-vknopf" data-ansicht="tco"
+            aria-pressed="false">Gesamtkosten (TCO-24)</button>
   </div>
 
   <div class="gr-alarm-scroll">
-  <table class="src-table gr-alarm" id="gr-katalogtabelle">
-    {# Dieselbe Sortiermechanik wie in Reiter 1 - `grFilterleiste` traegt
-       beide Tabellen, und der Katalog ist mit 352 Zeilen der laengere.
-       Die Preisspalte sortiert nach dem Rohwert; eine Zeile ohne Preis
-       traegt keinen Schluessel und faellt ans Ende. #}
+  <table class="src-table gr-alarm gr-katalog-mod" id="gr-katalogtabelle">
+    {# Dieselbe Sortiermechanik wie im Radar - `grFilterleiste` traegt
+       beide Tabellen. Sortiert wird nach dem ROHWERT (`data-s-*`); eine
+       Zeile ohne Zahl in der sortierten Spalte traegt keinen Schluessel
+       und faellt ans Ende (bestehende Regel). #}
     <thead><tr>
       <th scope="col"><button type="button" class="gr-sort" data-sort="geraet"
-        data-art="text">Gerät</button></th>
-      <th scope="col"><button type="button" class="gr-sort" data-sort="farbe"
-        data-art="text">Farbe</button></th>
-      <th scope="col"><button type="button" class="gr-sort" data-sort="anbieter"
-        data-art="text">Anbieter</button></th>
-      <th scope="col" class="num"><button type="button" class="gr-sort"
-        data-sort="preis" data-art="zahl">Preis</button></th>
-      <th scope="col"><button type="button" class="gr-sort" data-sort="zustand"
-        data-art="text">Zustand</button></th>
-      <th scope="col"><button type="button" class="gr-sort"
-        data-sort="verfuegbar" data-art="text">Verfügbar</button></th>
-      <th scope="col"><button type="button" class="gr-sort"
-        data-sort="abgerufen" data-art="text">Abgerufen</button></th>
+        data-art="text">Modell</button></th>
+      {# Ansicht Einzelgerätpreis: ab-Preis, Händler, Spanne. #}
+      <th scope="col" class="num gr-sp--barpreis"><button type="button"
+        class="gr-sort" data-sort="preis" data-art="zahl">Einzelgerätepreis</button></th>
+      <th scope="col" class="gr-sp--barpreis"><button type="button"
+        class="gr-sort" data-sort="anbieter" data-art="zahl">Händler</button></th>
+      <th scope="col" class="num gr-sp--barpreis"><button type="button"
+        class="gr-sort" data-sort="spanne" data-art="zahl">Spanne</button></th>
+      {# Ansicht Gesamtkosten: TCO-24 ab, Ø €/Monat, Δ zur Referenz, Band.
+         Die Band-Spalte trägt KEINEN Sortierknopf: "Groß/Klein/Mittel"
+         hat keine alphabetisch sinnvolle Ordnung, und ein Zahlen-Rang
+         dafür wäre eine zweite Abbildung derselben Auswahl. #}
+      <th scope="col" class="num gr-sp--tco"><button type="button"
+        class="gr-sort" data-sort="tco" data-art="zahl">TCO-24</button></th>
+      <th scope="col" class="num gr-sp--tco"><button type="button"
+        class="gr-sort" data-sort="monat" data-art="zahl">Ø €/Monat</button></th>
+      <th scope="col" class="gr-sp--tco"><button type="button"
+        class="gr-sort" data-sort="delta" data-art="zahl">Δ zu Vodafone</button></th>
+      <th scope="col" class="gr-sp--tco">Band</th>
     </tr></thead>
     <tbody>
-    {% for z in geraete.katalogtabelle %}
-      {# P1 (dritte Nachbesserung, 31.08.2026): `gr-a-rest` kommt aus
-         `z.zeilen_rest`, nicht mehr aus der rohen `loop.index0` - eine
-         Zeile bleibt in der Standardansicht verborgen, wenn sie ENTWEDER
-         `block_rest` ist (mehr als `BLOCK_SICHTBAR` Zeilen ihres eigenen
-         Geraete-Blocks) ODER die zwoelf Plaetze unter den nicht schon
-         block-gedeckelten Zeilen vergeben sind - beides ist bereits in
-         `katalogzeilen()` verrechnet, damit ein Leser OHNE JavaScript
-         dieselbe Standardansicht sieht wie mit. `data-blockrest` traegt
-         die block-eigene Haelfte zusaetzlich als Attribut: `app.js` muss
-         sie bei jeder Filteraenderung NEU anwenden koennen, waehrend die
-         Positionshaelfte (`KATALOG_SICHTBAR`) dort laengst filterbewusst
-         nachgerechnet wird (B2). #}
-      <tr class="gr-a-zeile gr-k-zeile{{ ' gr-a-rest' if z.zeilen_rest }}"
-          data-marke="{{ z.hersteller }}" data-anbieter="{{ z.anbieter }}"
-          data-blockrest="{{ '1' if z.block_rest else '' }}"
-          data-speicher="{{ z.speicher or '' }}" data-zustand="{{ z.zustand }}"
-          data-s-geraet="{{ z.modell }} {{ z.speicher or '' }}"
-          data-s-farbe="{{ z.farbe or '' }}"
-          data-s-anbieter="{{ z.anbieter }}"
-          data-s-preis="{{ z.preis if z.preis is not none else (z.zuzahlung if z.zuzahlung is not none else '') }}"
-          data-s-zustand="{{ z.zustand }}"
-          data-s-verfuegbar="{{ z.verfuegbarkeit }}"
-          data-s-abgerufen="{{ z.abgerufen_am }}">
-        <td><span class="gr-a-modell">{{ z.modell }}</span>
-          <span class="gr-a-klein">{% if z.speicher %}{{ z.speicher }} GB{% else
-            %}Speicher unbekannt{% endif %}</span></td>
-        <td>{{ z.farbe or '–' }}</td>
-        <td>{% if z.url %}<a class="gr-a-quelle" href="{{ z.url }}" rel="noopener"
-             title="Quelle bei {{ z.anbieter }} öffnen">{{ z.anbieter }}<span
-             class="gr-a-pfeil" aria-hidden="true">↗</span></a>
-          {% else %}{{ z.anbieter }}{% endif %}
-          {% if z.netz %} <span class="gr-a-klein">Netz {{ z.netz }}</span>{% endif %}</td>
-        <td class="num">{% if z.preis is not none
-          %}{{ z.preis | euro }}{% if z.ratenhinweis
-            %} <span class="gr-a-klein">{{ z.ratenhinweis }}</span>{% endif %}{% elif z.zuzahlung is not none
-          %}{{ z.zuzahlung | euro }}
-            <span class="gr-a-klein">Zuzahlung{% if z.tarif %}, {{ z.tarif }}{% endif %}</span>
-          {% else %}<span class="gr-a-klein">ohne Preis</span>{% endif %}</td>
-        <td><span class="gr-pille gr-pille--{{ 'bestpreis' if z.zustand == 'neu' else 'mittel' }}">{{ z.zustand }}</span></td>
-        {# DREI Zustaende, nicht zwei. "unbekannt" heisst, dass die Quelle
-           nichts gesagt hat - in Alarmrot gesetzt saehe das aus wie "nicht
-           lieferbar", und bei o2 traefe es 68 von 68 Zeilen. #}
-        {# EIN WORT JE ZUSTAND, auf der ganzen Seite (30.08.2026).
-           Derselbe Zustand hiess in der Alarmtabelle "unbekannt" und hier
-           "keine Angabe" - zwei Woerter fuer eine Sache lesen sich wie zwei
-           Sachen. Die Alarmtabelle traegt die Spalte nicht mehr; hier gilt
-           "keine Angabe", weil das die Quelle beschreibt und nicht den
-           Leser. #}
-        <td><span class="gr-pille gr-pille--{% if z.verfuegbarkeit == 'lieferbar'
-          %}gering{% elif z.verfuegbarkeit in ('unbekannt', '')
-          %}unbekannt{% else %}kritisch{% endif %}">{{
-          'Verfügbar' if z.verfuegbarkeit == 'lieferbar'
-          else ('keine Angabe' if z.verfuegbarkeit in ('unbekannt', '')
-                else z.verfuegbarkeit) }}</span></td>
-        <td><span class="gr-a-klein gr-a-datum">{{ z.abgerufen_am | date_de }}</span></td>
+    {% for m in geraete.katalog_modelle %}
+      {# `gr-a-rest` kommt aus `m.zeilen_rest` (C1): der Deckel zaehlt
+         MODELLE, `BLOCK_SICHTBAR` hat auf dieser Ebene keine Bedeutung.
+         Hauptzeile und Aufklappzeile tragen ihn PAARWEISE - die
+         Sortiermechanik verschiebt beide zusammen (`data-auf`). #}
+      <tr class="gr-a-zeile gr-k-zeile{{ ' gr-a-rest' if m.zeilen_rest }}"
+          data-auf="kz-{{ loop.index }}"
+          data-marke="{{ m.hersteller }}" data-speicher="{{ m.speicher or '' }}"
+          data-s-geraet="{{ m.titel }}"
+          data-s-preis="{{ m.ab_preis if m.ab_preis is not none else '' }}"
+          data-s-anbieter="{{ m.anbieterzahl }}"
+          data-s-spanne="{{ ((m.spanne[1] - m.spanne[0]) | round(2)) if m.spanne else '' }}"
+          data-s-tco="{{ m.tco_ab if m.tco_ab is not none else '' }}"
+          data-s-monat="{{ m.tco_monat if m.tco_monat is not none else '' }}"
+          data-s-delta="{{ m.tco_delta if m.tco_delta is not none else '' }}"
+          tabindex="0">
+        <td><span class="gr-a-modell">{{ m.titel }}</span></td>
+        {# --- Einzelgeraepreis: DIE EINE REGEL. Barpreis ("ab X bei Y",
+               Beleg verlinkt), sonst der benannte Buendel-Zustand mit
+               Monatspreis - nie eine Rate als Barpreis. Ein Modell ohne
+               beides kann nach C1 nicht vorkommen (0 Zeilen im Bestand);
+               der Zweig steht trotzdem da, weil die Regel lauter ist als
+               der heutige Bestand. #}
+        <td class="num gr-sp--barpreis">
+          {%- if m.ab_preis is not none %}
+          <span class="gr-k-ab">ab {{ m.ab_preis | euro }}</span>
+          {% if m.ab_beleg and m.ab_beleg.quelle_url %}<a
+            class="gr-a-quelle" href="{{ m.ab_beleg.quelle_url }}"
+            rel="noopener" title="Quelle bei {{ m.ab_anbieter }} öffnen">bei
+            {{ m.ab_anbieter }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>
+          {% else %}<span class="gr-a-klein">bei {{ m.ab_anbieter }}</span>{% endif %}
+          {% if m.ab_beleg and m.ab_beleg.abgerufen_am %} <span
+            class="gr-a-klein gr-a-datum">{{ m.ab_beleg.abgerufen_am | date_de }}</span>{% endif %}
+          {%- elif m.nur_buendel %}
+          <span class="gr-k-ab">nur im Bündel</span>
+          <span class="gr-a-klein">ab {{ m.buendel_monat | euro }}/Monat{% if m.buendel_anbieter %}
+            bei {{ m.buendel_anbieter }}{% endif %}{% if m.buendel_beleg and m.buendel_beleg.quelle_url %} · <a
+            class="gr-a-quelle" href="{{ m.buendel_beleg.quelle_url }}" rel="noopener"
+            title="Bündel beim Anbieter öffnen">Beleg<span class="gr-a-pfeil"
+            aria-hidden="true">↗</span></a>{% endif %}{% if m.buendel_tarif %} · {{ m.buendel_tarif }}{% endif %}</span>
+          {%- else %}<span class="gr-a-klein">kein Preis gemessen</span>
+          {%- endif %}</td>
+        {# Haendler: die ZAHL fuehrt (sortierbar nach Anzahl), die Namen
+           stehen klein dahinter - die Suche der Filterleiste durchsucht
+           den Zeilentext und findet damit auch Haendlernamen. #}
+        <td class="gr-sp--barpreis"><span class="gr-k-anzahl">{{
+          m.anbieterzahl }}</span>
+          <span class="gr-a-klein">{{ m.anbieter | join(' · ') }}</span></td>
+        {# Spanne: nur wenn WESSENTLICH verschieden (C1). Ein Modell mit
+           EINEM Händler hat gar keine zweite Zahl, die eine Spanne stellen
+           könnte - das sagt die Zelle selbst statt eines stummen "–"
+           (Sicht-Prüfung Kleineres 4); bei mehreren Händlern mit
+           unwesentlichem Abstand bleibt "–" (echte Spanne, nur klein). #}
+        <td class="num gr-sp--barpreis">{% if m.spanne %}{{ m.spanne[0] | euro
+          }} – {{ m.spanne[1] | euro }}{% elif m.anbieterzahl == 1 %}<span
+            class="gr-a-klein">ein Preis</span>{% else %}–{% endif %}</td>
+        {# --- Gesamtkosten: TCO-24 des besten vergleichbaren Angebots,
+               Ø €/Monat, delta_kurz (nur mit Vodafone-Referenz). OHNE
+               Referenz ist das "–" benannt (Sicht-Prüfung Wesentliches 3):
+               Vodafone listet das Modell nicht, also ist kein Abstand
+               berechenbar - 38 von 111 Zeilen am 18.09.2026. Ein Modell
+               ohne Bündel trägt "–" hier, weil seine TCO-Zelle den Grund
+               schon nennt ("kein Bündel gemessen"). #}
+        <td class="num gr-sp--tco">
+          {%- if m.tco_ab is not none %}
+          <span class="gr-k-ab">ab {{ m.tco_ab | euro }}</span>
+          {% if m.tco_beleg and m.tco_beleg.quelle_url %}<a
+            class="gr-a-quelle" href="{{ m.tco_beleg.quelle_url }}"
+            rel="noopener" title="Quelle bei {{ m.tco_anbieter }} öffnen">bei
+            {{ m.tco_anbieter }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>
+          {% else %}<span class="gr-a-klein">bei {{ m.tco_anbieter }}</span>{% endif %}
+          {% if m.tco_beleg and m.tco_beleg.abgerufen_am %} <span
+            class="gr-a-klein gr-a-datum">{{ m.tco_beleg.abgerufen_am | date_de }}</span>{% endif %}
+          {%- else %}<span class="gr-a-klein">{{ m.tco_leer }}</span>{%- endif %}</td>
+        <td class="num gr-sp--tco">{% if m.tco_monat is not none %}{{
+          m.tco_monat | euro }}{% else %}–{% endif %}</td>
+        <td class="gr-sp--tco">{% if m.tco_delta_kurz %}<span
+          class="gr-a-prozent wr-prozent{{ ' wr-prozent--negativ' if m.tco_delta is not none and m.tco_delta < 0 else ' wr-prozent--positiv' }}">{{
+          m.tco_delta_kurz }}</span>{% elif m.tco_ab is not none %}<span
+          class="gr-a-klein" title="Vodafone listet dieses Modell nicht - deshalb ist kein Abstand berechenbar (die Referenz fehlt)">keine Referenz</span>{% else %}–{% endif %}</td>
+        <td class="gr-sp--tco"><span class="gr-k-band">{{
+          {'klein': 'Klein', 'mittel': 'Mittel', 'gross': 'Groß'}.get(m.tco_band or '', '') or '–' }}</span></td>
       </tr>
+      {# --- Der Zeilen-Aufklapper: die Listungs-Details des Modells
+         (C1-Feld `zeilen`). Dieselbe Mechanik wie die Radar-Modellliste:
+         Klick/Enter auf der Hauptzeile toggelt `.gr-a-auf--an`. Die
+         Spalte hiess bis P3 "Verfügbar" und heisst jetzt "Bestand" - 98
+         von 636 Listungen sagen "keine Angabe", und "Verfügbar"
+         verspricht über der leeren Zelle eine Lieferauskunft, die die
+         Quelle meist nicht gibt (P3-Auftrag 4; P4 entscheidet weiter).
+         Eine 1&1-Zeile ohne Barpreis trägt hier ihre Bündel-Angabe
+         statt "ohne Preis" (C1). #}
+      <tr class="gr-a-auf{{ ' gr-a-rest' if m.zeilen_rest }}" id="kz-{{ loop.index }}"><td colspan="8">
+        <div class="gr-scroll">
+        <table class="src-table gr-k-listungen">
+          <thead><tr><th>Händler</th><th>Farbe</th>
+            <th class="num">Preis</th><th>Zustand</th><th>Bestand</th>
+            <th>Abgerufen</th></tr></thead>
+          <tbody>
+          {% for z in m.zeilen %}
+          <tr>
+            <td>{% if z.url %}<a class="gr-a-quelle" href="{{ z.url }}" rel="noopener"
+                 title="Quelle bei {{ z.anbieter }} öffnen">{{ z.anbieter }}<span
+                 class="gr-a-pfeil" aria-hidden="true">↗</span></a>
+              {% else %}{{ z.anbieter }}{% endif %}
+              {% if z.netz %} <span class="gr-a-klein">Netz {{ z.netz }}</span>{% endif %}</td>
+            <td>{{ z.farbe or '–' }}</td>
+            <td class="num">{% if z.preis is not none
+              %}{{ z.preis | euro }}{% if z.ratenhinweis %} <span
+                class="gr-a-klein">{{ z.ratenhinweis }}</span>{% endif %}{% elif z.zuzahlung is not none
+              %}{{ z.zuzahlung | euro }} <span class="gr-a-klein">Zuzahlung{% if z.tarif %},
+                {{ z.tarif }}{% endif %}</span>{% elif z.buendel_monat is defined and z.buendel_monat is not none
+              %}<span class="gr-a-klein">ab {{ z.buendel_monat | euro }}/Monat{% if z.buendel_tarif %},
+                {{ z.buendel_tarif }}{% endif %}{% if z.buendel_url %} · <a class="gr-a-quelle"
+                href="{{ z.buendel_url }}" rel="noopener">Beleg<span class="gr-a-pfeil"
+                aria-hidden="true">↗</span></a>{% endif %}</span>
+              {% else %}<span class="gr-a-klein">ohne Preis</span>{% endif %}</td>
+            <td><span class="gr-pille gr-pille--{{ 'bestpreis' if z.zustand == 'neu' else 'mittel' }}">{{ z.zustand }}</span></td>
+            {# EIN WORT JE ZUSTAND (30.08.2026): "keine Angabe", weil das
+               die QUELLE beschreibt und nicht den Leser. Die graue Pille
+               (`--unklar`; bis P3 stand hier der klassenlose Name
+               `--unbekannt`, fuer den es keine Regel gab) sagt nichts
+               ueber Lieferbarkeit - genau das ist der Unterschied. #}
+            <td><span class="gr-pille gr-pille--{% if z.verfuegbarkeit == 'lieferbar'
+              %}gering{% elif z.verfuegbarkeit in ('unbekannt', '')
+              %}unklar{% else %}kritisch{% endif %}">{{
+              'Verfügbar' if z.verfuegbarkeit == 'lieferbar'
+              else ('keine Angabe' if z.verfuegbarkeit in ('unbekannt', '')
+                    else ('nicht lieferbar' if z.verfuegbarkeit == 'nicht_lieferbar'
+                          else ('vorbestellbar' if z.verfuegbarkeit == 'vorbestellbar'
+                                else z.verfuegbarkeit))) }}</span></td>
+            <td><span class="gr-a-klein gr-a-datum">{{ z.abgerufen_am | date_de }}</span></td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        </div>
+      </td></tr>
     {% endfor %}
     </tbody>
   </table>
   </div>
-  {# Der Leer-Satz ist ein FILTER-Satz - aber bei NULL Zeilen im ganzen
+  {# Der Leer-Satz ist ein FILTER-Satz - aber bei NULL Modellen im ganzen
      Bestand ist er der benannte LeerZUSTAND und steht serverseitig offen
-     da (E5, Leer-Sicherung "Katalog leer"): eine Tafel, die nur aus
-     Spaltenköpfen besteht, ohne ein Wort dazu, liest sich als kaputte
-     Seite. app.js blendet ihn bei Filterung ein und aus, wie bisher. #}
-  <p class="gr-erklaer gr-a-leer"{% if geraete.katalogtabelle | length
+     da (E5, Leer-Sicherung "Katalog leer", von der Listungs-Tafel
+     uebernommen). app.js blendet ihn bei Filterung ein und aus. #}
+  <p class="gr-erklaer gr-a-leer"{% if geraete.katalog_modelle | length
     %} hidden{% endif %}>Zu dieser Auswahl steht keine Zeile im
   Bestand.</p>
-  {# P1 (dritte Nachbesserung, 31.08.2026): die Bedingung fragt jetzt
-     `zeilen_rest` ab, nicht mehr nur die Gesamtzahl gegen den
-     Positionsdeckel - sonst faehlt der Knopf ganz, wenn ausschliesslich
-     `block_rest`-Zeilen verborgen sind (wenige Bloecke, aber einer mit
-     mehr als `BLOCK_SICHTBAR` Zeilen), und ein Leser ohne JavaScript
-     koennte sie nie aufdecken. #}
-  {% if geraete.katalogtabelle | selectattr('zeilen_rest') | list %}
+  {% if geraete.katalog_modelle | selectattr('zeilen_rest') | list %}
   <p class="gr-erklaer"><button type="button" class="gr-mehr" id="gr-kmehr">alle
-    {{ geraete.katalogtabelle | length }} Zeilen zeigen</button></p>
+    {{ geraete.katalog_modelle | length }} Zeilen zeigen</button></p>
   {% endif %}
 
   {# E3: DER SORTIMENTS-AUFKLAPPER wohnt im Katalog-Reiter. Er stand bis

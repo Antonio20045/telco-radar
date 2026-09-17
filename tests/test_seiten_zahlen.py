@@ -2021,3 +2021,403 @@ def test_die_panel_posten_kommen_aus_der_aufbereitung(tmp_path):
             assert zahl in quelle, \
                 f"Zahl {zahl!r} im Rechenweg-Panel kommt nicht aus der " \
                 f"Aufbereitung (Vorlage gerechnet statt gesetzt?)"
+
+
+# ==========================================================================
+# P3 (Strategie Geraete v3, 18.09.2026): die Zahlen des GERÄTEKATALOGS
+# auf Modellebene. DIE EINE REGEL des Auftrags: keine Katalogzeile sagt
+# "ohne Preis" - jede Modellzeile trägt einen Barpreis ("ab X € bei Y")
+# oder den benannten Bündel-Zustand ("nur im Bündel, ab X €/Monat"), und
+# die 1&1-Listungszeilen tragen ihre Bündel-Angabe im Aufklapper.
+# Gemessen wird an der GERENDERTEN Seite gegen einen ZWEITEN Aufbereitungs-
+# lauf über denselben Bestand - Zahlen OHNE get_text-Trenner gelesen
+# (derselbe Fehlertyp wie "2454 Modelle", 30.08.2026).
+# ==========================================================================
+
+def _geraete_katalog_site(tmp_path):
+    """Eine Katalog-Seite, die ALLE Preisdarstellungen des P3-Katalogs
+    aufspannt: Barpreis mit Beleg, Spanne (wesentlich), Bündel-Modellzeile
+    (nur 1&1, ohne jeden Barpreis) und die 1&1-AUFKLAPPERZEILE mit
+    Bündel-Angabe - ohne den Bündelstore wuerde genau diese Zeile "ohne
+    Preis" sagen, deshalb spannt die Fixture den Fall wirklich auf."""
+    import yaml
+    from telco_radar.geraete_config import lade_katalog, lade_quellen
+    from telco_radar.report import geraete_view
+    root = tmp_path / "katalog"
+    (root / "config").mkdir(parents=True)
+    katalog = {"geraete": [
+        {"hersteller": "Apple", "modell": "Apple X", "generation": 1,
+         "speicher": [256], "segment": "flagship"},
+        {"hersteller": "Samsung", "modell": "Galaxy S26 Ultra",
+         "generation": 26, "speicher": [256], "segment": "flagship"},
+        {"hersteller": "Google", "modell": "Pixel 11", "generation": 11,
+         "speicher": [128], "segment": "flagship"},
+    ]}
+    quellen = {"anbieter": [
+        {"name": "A-Laden", "typ": "handel", "rang": 1, "methode": "ldjson",
+         "basis_url": "https://a.example", "einstiege": [
+             {"url": "https://a.example/liste"}]},
+        {"name": "B-Laden", "typ": "handel", "rang": 2, "methode": "ldjson",
+         "basis_url": "https://b.example", "einstiege": [
+             {"url": "https://b.example/liste"}]},
+        {"name": "1&1", "typ": "netzbetreiber", "rang": 3,
+         "methode": "ldjson", "basis_url": "https://1und1.example",
+         "einstiege": [{"url": "https://1und1.example/liste"}]},
+    ]}
+    for name, daten in (("geraete_katalog.yaml", katalog),
+                        ("farben.yaml", {"farben": {"schwarz": ["Schwarz"]}}),
+                        ("geraete_quellen.yaml", quellen)):
+        (root / "config" / name).write_text(
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
+            encoding="utf-8")
+
+    def _listung(anbieter, device, speicher, preis, **kw):
+        sku = f"{device}-{speicher}gb-{anbieter.lower().replace('&', '')}"
+        e = {"id": f"{anbieter.lower()}--{sku}", "sku_id": sku,
+             "device_id": device, "anbieter": anbieter,
+             "anbieter_typ": "handel", "speicher_gb": speicher,
+             "farbe_roh": "Schwarz", "farbe_normalisiert": "schwarz",
+             "zustand": "neu", "first_seen": "2026-09-01",
+             "last_verified": "2026-09-17", "status": "aktiv",
+             "missed_checks": 0, "preis_ohne_vertrag": preis,
+             "zuzahlung": None, "quelle_url": f"https://example.de/{sku}",
+             "abgerufen_am": "2026-09-17", "verfuegbarkeit": "lieferbar"}
+        e.update(kw)
+        return e
+
+    # Galaxy S26 Ultra NUR bei 1&1 und OHNE Barpreis - die Modellzeile
+    # muss "nur im Bündel" sagen, ihre Aufklapperzeile die Bündel-Angabe.
+    # Die 1&1-Listung traegt ihren Bündel-Monatspreis WIE IM ECHTEN
+    # BESTAND selbst (`preis_mit_vertrag_ab` + `tarif_referenz`, § 13.2):
+    # genau daraus liest der S2-1-Fallback, wenn der Bündel-Store
+    # unlesbar ist (siehe Test weiter unten).
+    listungen = [
+        _listung("A-Laden", "apple-x", 256, 1000.0),
+        _listung("B-Laden", "apple-x", 256, 1100.0),
+        _listung("1&1", "samsung-galaxy-s26-ultra", 256, None,
+                 anbieter_typ="netzbetreiber",
+                 tarif_referenz="1&1 All-Net-Flat S",
+                 preis_mit_vertrag_ab=32.99),
+        _listung("A-Laden", "google-pixel-11", 128, 799.0),
+    ]
+    state = root / "data" / "state"
+    state.mkdir(parents=True)
+    (state / "geraete_db.json").write_text(json.dumps(
+        {"updated": "2026-09-17",
+         "anbieter": {n: {"laeufe": 4} for n in
+                      ("A-Laden", "B-Laden", "1&1")},
+         "listungen": listungen}), encoding="utf-8")
+    (state / "geraete_preise.jsonl").write_text("", encoding="utf-8")
+
+    def _buendel(anbieter, device, speicher, tarif, monat, komplett):
+        sku = f"{device}-{speicher}gb-{anbieter.lower().replace('&', '')}"
+        # `komplett`: ein Bündel MIT Aufteilung in Tarifpreis und Geräte-
+        # rate (so rechnet die TCO-Ansicht Karten). Sonst nennt der Satz
+        # nur den Bündel-Monatspreis - 1&1-Regel § 13.2: EIN Betrag, und
+        # beides nebeneinander verwirft der TCO-Leser zu Recht.
+        b = {"id": f"buendel--{anbieter.lower()}--{sku}",
+             "sku_id": sku, "anbieter": anbieter, "tarif_name": tarif,
+             "tarif_id": f"{anbieter.lower()}:m", "tarif_id_guete": "hoch",
+             "buendel_monatlich": None, "tarif_monatlich": 20.0,
+             "geraet_zuzahlung": 1.0, "geraet_monatsrate": 12.99,
+             "laufzeit_monate": 24, "anschlusspreis": 0.0,
+             "zustand": "neu", "rabatte": [],
+             "quelle_url": f"https://example.de/{sku}/buendel",
+             "abgerufen_am": "2026-09-17",
+             "first_seen": "2026-09-17", "last_verified": "2026-09-17"}
+        if komplett:
+            return b
+        b["tarif_monatlich"] = None
+        b["geraet_monatsrate"] = None
+        b["buendel_monatlich"] = monat
+        return b
+
+    (state / "geraete_tco.json").write_text(json.dumps(
+        {"updated": "2026-09-17",
+         "buendel": [_buendel("1&1", "samsung-galaxy-s26-ultra", 256,
+                              "1&1 All-Net-Flat S", 32.99, komplett=False),
+                     _buendel("A-Laden", "apple-x", 256, "A M", 41.0,
+                              komplett=True)],
+         "sim_only": []}), encoding="utf-8")
+    (state / "geraete_tco_historie.jsonl").write_text("", encoding="utf-8")
+    tarife = [{"anbieter": b["anbieter"], "name": b["tarif_name"],
+               "tarif_id": b["tarif_id"], "tarif_id_guete": "hoch",
+               "grundgebuehr": b["tarif_monatlich"],
+               "mindestlaufzeit_monate": 24, "rabattphasen": [],
+               "quelle_url": b["quelle_url"],
+               "abgerufen_am": "2026-09-17"}
+              for b in (state / "geraete_tco.json").exists() and
+              json.loads((state / "geraete_tco.json").read_text())["buendel"]]
+    (state / "tarife.jsonl").write_text(
+        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
+
+    reports = root / "data" / "reports"
+    reports.mkdir(parents=True)
+    (reports / "2026-09-17.json").write_text(json.dumps(
+        {"date": "2026-09-17", "language": "de",
+         "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
+         "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / "2026-09-17.md").write_text("# B\n", encoding="utf-8")
+    site = root / "site"
+    # BEWUSST ohne cfg (S4-4 der P3-Code-Pruefung): geraete.html braucht
+    # keines - aber NUR hier. render_site() OHNE cfg rendert sonst eine
+    # still halbe Seite (CLAUDE.md §6: transparenz.html verliert seinen
+    # Quellenbestand, wettbewerb.html den halben Inhalt). Wer diese Zeile
+    # in eine Welt mit watchlist/news_sources KOPIERT, kopiert die Falle -
+    # dort `load_config(root)` mitgeben.
+    render_site(site, reports)
+    g = geraete_view.aufbereiten(state, lade_quellen(root),
+                                 lade_katalog(root), heute="2026-09-17")
+    return site, g
+
+
+def _katalog_suppe(site):
+    return BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
+                         "html.parser")
+
+
+def test_keine_katalogzeile_sagt_ohne_preis(tmp_path):
+    """DIE EINE REGEL des P3-Auftrags, an der gerenderten Seite: 36 Zeilen
+    sagten "ohne Preis", obwohl der Preis da war (1&1: nur im Bündel).
+    Die Fixture spannt genau den Fall auf - OHNE den Bündelstore wuerde die
+    1&1-Zeile das Wort rendern, der Test prueft also die Regel, nicht nur
+    den Glücksfall eines vollen Bestands."""
+    site, g = _geraete_katalog_site(tmp_path)
+    suppe = _katalog_suppe(site)
+    tafel = suppe.select_one("#tafel-katalog")
+    assert tafel, "Katalogtafel fehlt"
+    assert "ohne Preis" not in tafel.get_text(), (
+        'eine Zeile des Katalogs sagt "ohne Preis"')
+    # Gegenprobe im selben Test: die 1&1-Zeile ist DA und hat keinen
+    # Barpreis - der Zustand, der das Wort frueher ausgeloest hat.
+    ohne_barpreis = [m for m in g["katalog_modelle"]
+                     if m["ab_preis"] is None]
+    assert ohne_barpreis, "die Fixture spannt den Fall nicht auf"
+    nur_buendel = [m for m in ohne_barpreis if m["nur_buendel"]]
+    assert nur_buendel, "kein Modell im Bündel-Zustand - Test prüft nichts"
+
+
+def test_der_buendel_zustand_steht_wortlich_auf_der_seite(tmp_path):
+    """Die 1&1-Bündel-Angabe muss WORTLICH da stehen: "nur im Bündel" nebst
+    Monatspreis in der MODELLZEILE, "ab X €/Monat" mit Beleg-Link in der
+    AUFKLAPPERZEILE der Listung - jede Zahl gegen die Aufbereitung, nicht
+    gegen die Vorlage. Zahlen ohne get_text-Trenner gelesen."""
+    site, g = _geraete_katalog_site(tmp_path)
+    suppe = _katalog_suppe(site)
+    modell = next(m for m in g["katalog_modelle"] if m["nur_buendel"])
+    erwartet_monat = f"{modell['buendel_monat']:.2f}".replace(".", ",")
+    text_seite = suppe.select_one("#tafel-katalog").get_text()
+    assert "nur im Bündel" in text_seite
+    assert f"ab {erwartet_monat} €/Monat" in text_seite, (
+        f"der Bündel-Monatspreis {erwartet_monat} fehlt wortlich")
+    # Der Beleg der Modellzeile ist verlinkt (Belegzwang).
+    modellzeile = next(z for z in suppe.select("#gr-katalogtabelle .gr-k-zeile")
+                       if "Galaxy S26 Ultra" in (z.get("data-s-geraet") or ""))
+    links = [a.get("href") for a in modellzeile.select("a.gr-a-quelle")]
+    assert modell["buendel_beleg"]["quelle_url"] in links, (
+        f"der Bündel-Beleg fehlt unter den Links der Modellzeile: {links}")
+    # Und die AUFKLAPPERZEILE derselben 1&1-Listung traegt ihre Angabe
+    # samt Tarifnamen - dieselbe Zahl, derselbe Beleg.
+    auf = suppe.select_one(f"#{modellzeile['data-auf']}")
+    zeilen = [r for r in auf.select("tr") if r.select_one("td") is not None
+              and "1&1" in r.select_one("td").get_text()]
+    assert zeilen, "die 1&1-Listungszeile fehlt im Aufklapper"
+    text_auf = zeilen[0].get_text()
+    assert f"ab {erwartet_monat} €/Monat" in text_auf
+    assert modell["buendel_tarif"] in text_auf
+
+
+def test_jede_preisspalte_hat_genau_ein_format(tmp_path):
+    """Der Befund vor P3: drei Preisformate in EINER Spalte. Seit P3 hat
+    jede Spalte je Ansicht GENAU EIN Format - gemessen als EIN Regex, dem
+    JEDE Betragsangabe der Spalte folgen muss (deutsch: Punkt als
+    Tausender, Komma als Dezimal, zwei Stellen, Euro). Ein Betrag, der
+    dem Muster nicht folgt, ist der Fehlertyp "1.099,00 € neben 1.099 €".
+    """
+    import re as _re
+    site, _g = _geraete_katalog_site(tmp_path)
+    suppe = _katalog_suppe(site)
+    zeilen = suppe.select("#gr-katalogtabelle .gr-k-zeile")
+    assert len(zeilen) >= 3, "zu wenige Modellzeilen für einen Formatvergleich"
+    betrag = _re.compile(r"\d[\d.]*,\d\d €(?:/Monat)?")
+    ein_format = _re.compile(r"^\d{1,3}(?:\.\d{3})*,\d\d €$")
+
+    def _pruefe(zellen, name, kennwort_nötig=True):
+        texte = [z.get_text() for z in zellen]
+        preise = [b for t in texte for b in betrag.findall(t)]
+        assert preise, f"keine Beträge in {name}"
+        for z, t in zip(zellen, texte):
+            for b in betrag.findall(t):
+                if b.endswith("/Monat"):
+                    # Der Monatsbetrag ist die benannte Bündel-Angabe. In
+                    # der MODELL-Zelle braucht er sein Kennwort "nur im
+                    # Bündel" (sonst waere er ein nackter Preis unter
+                    # Einmalbeträgen); in der LISTUNGS-Zeile des Auf-
+                    # klappers steht er mit "ab"-Vorspann und Tarifnamen
+                    # - genau die 1&1-Regel des P3-Auftrags.
+                    if kennwort_nötig:
+                        assert "nur im Bündel" in t, (
+                            f"{name}: Monatsbetrag {b!r} ohne das "
+                            "Kennwort 'nur im Bündel' in der Zelle")
+                    assert ein_format.match(b[:-len("/Monat")]), (
+                        f"{name}: Bündel-Betrag {b!r} folgt nicht dem "
+                        "einen Format")
+                else:
+                    assert ein_format.match(b), (
+                        f"{name}: Betrag {b!r} folgt nicht dem einen "
+                        "Format (deutsch, zwei Dezimalstellen)")
+
+    # Ansicht Einzelgerätpreis: Modell-Preiszelle, Spannen-Zelle und die
+    # Listungs-Preiszellen des Aufklappers - je EIN Format. Die Spanne
+    # "X – Y" besteht aus zwei Beträgen, die JEDEM dem Muster folgen.
+    _pruefe([z.select("td.gr-sp--barpreis")[0] for z in zeilen],
+            "der Einzelgerätepreis-Spalte")
+    _pruefe([z.select("td.gr-sp--barpreis")[2] for z in zeilen
+             if "€" in z.select("td.gr-sp--barpreis")[2].get_text()],
+            "der Spannen-Spalte")
+    _pruefe([r.select("td")[2] for r in
+             suppe.select("#gr-katalogtabelle .gr-k-listungen tr")
+             if r.select_one("td") is not None
+             and "€" in r.select("td")[2].get_text()],
+            "der Aufklapper-Preisspalte", kennwort_nötig=False)
+    # Ansicht Gesamtkosten: TCO-24-Zelle und Ø €/Monat-Zelle. Der
+    # Monatsbetrag trägt seinen Zusatz "/Monat" - ein EINMALBETrag in der
+    # Monats-Spalte waere die schlimmere Vermischung.
+    _pruefe([z.select("td.gr-sp--tco")[0] for z in zeilen
+             if "€" in z.select("td.gr-sp--tco")[0].get_text()],
+            "der TCO-24-Spalte")
+    monat_zellen = [z.select("td.gr-sp--tco")[1] for z in zeilen
+                    if "€" in z.select("td.gr-sp--tco")[1].get_text()]
+    if monat_zellen:
+        _pruefe(monat_zellen, "der Ø €/Monat-Spalte", kennwort_nötig=False)
+        # EIN Format heisst auch: eine Einheiten-Schreibweise je Spalte.
+        # Die Ø-Spalte trägt ihre Einheit im KOPF ("Ø €/Monat") und ihre
+        # Beträge ohne Zusatz - gemischt waere der Fehlertyp.
+        schreibweisen = {b.endswith("/Monat")
+                         for z in monat_zellen
+                         for b in betrag.findall(z.get_text())}
+        assert len(schreibweisen) == 1, (
+            f"die Ø €/Monat-Spalte mischt Beträge mit und ohne /Monat: "
+            f"{schreibweisen}")
+
+
+def test_die_modellzahl_steht_an_allen_orten_derselben_zahl(tmp_path):
+    """Die Modellzahl der Rubrik, der DOM-Zeilen und der Aufklapper muss
+    der Aufbereitung entsprechen - gegen den ZWEITEN Lauf über denselben
+    Bestand. OHNE get_text-Trenner gelesen: der Trenner machte aus "24"
+    und "54 Modelle" einmal "2454"."""
+    site, g = _geraete_katalog_site(tmp_path)
+    suppe = _katalog_suppe(site)
+    modelle = g["katalog_modelle"]
+    assert len(modelle) >= 3, "zu wenige Modelle für einen Zahlenvergleich"
+    rubrik = suppe.select_one(".gr-katalog h2 .rubrik-zahl").get_text()
+    assert rubrik == str(len(modelle)), (
+        f"Rubrik sagt {rubrik}, Aufbereitung kennt {len(modelle)} Modelle")
+    assert len(suppe.select("#gr-katalogtabelle .gr-k-zeile")) == len(modelle)
+    assert len(supe := suppe.select("#gr-katalogtabelle .gr-a-auf")) == len(
+        modelle), "Aufklapperzahl != Modellzahl"
+    # Und die Listungen summieren zurück: jede Listung des Bestands steht
+    # GENAU EINMAL in einem Aufklapper.
+    aufklappzeilen = suppe.select("#gr-katalogtabelle .gr-k-listungen tr td")
+    anzahl_listungszeilen = sum(
+        1 for r in suppe.select("#gr-katalogtabelle .gr-k-listungen tr")
+        if r.select_one("td") is not None)
+    erwartet = sum(m["listungen"] for m in modelle)
+    assert anzahl_listungszeilen == erwartet, (
+        f"{anzahl_listungszeilen} Aufklapperzeilen, die Aufbereitung "
+        f"zählt {erwartet} Listungen")
+    assert aufklappzeilen, "keine Zellen im Aufklapper"
+
+
+def test_der_katalog_uebersteht_einen_unlesbaren_tco_store(tmp_path):
+    """S2-1 der P3-Code-Pruefung: ist `geraete_tco.json` unlesbar (z. B. ein
+    abgebrochener Schreibvorgang des Nachtlaufs), liefert `TcoDB.buendel()`
+    still [] - und der Katalog fiel auf "ohne Preis" zurueck, obwohl die
+    1&1-Listungen ihren Bündel-Monatspreis selbst tragen. DIE P3-REGEL gilt
+    auch im Fehlerfall: der Katalog liest die Bündel-Angabe dann aus der
+    Listung, mit deren Beleg. Fehlerklasse B6 - eine kaputte Datei sieht aus
+    wie eine leere Datenlage."""
+    site, g = _geraete_katalog_site(tmp_path)
+    root = site.parent
+    mit_store = next(m for m in g["katalog_modelle"] if m["nur_buendel"])
+    (root / "data" / "state" / "geraete_tco.json").write_text(
+        '{"updated": "2026-09-17", "buendel": [KAPUTT', encoding="utf-8")
+    render_site(site, root / "data" / "reports")
+    suppe = _katalog_suppe(site)
+    tafel = suppe.select_one("#tafel-katalog")
+    assert tafel, "Katalogtafel fehlt"
+    assert "ohne Preis" not in tafel.get_text(), (
+        'der unlesbare Store darf keine Zeile auf "ohne Preis" fallen lassen')
+    # Die Bündel-Angabe steht noch da - jetzt aus der LISTUNG gelesen:
+    # derselbe Monatspreis (die 1&1-Listung traegt ihn selbst), der Beleg
+    # ist der Quelllink DER LISTUNG statt des Stores.
+    text = tafel.get_text()
+    assert "nur im Bündel" in text
+    erwartet = f"{mit_store['buendel_monat']:.2f}".replace(".", ",")
+    assert f"ab {erwartet} €/Monat" in text, (
+        f"der Bündel-Monatspreis {erwartet} fehlt ohne Store")
+    zeile = next(z for z in suppe.select("#gr-katalogtabelle .gr-k-zeile")
+                 if "Galaxy S26 Ultra" in (z.get("data-s-geraet") or ""))
+    links = [a.get("href") for a in zeile.select("a.gr-a-quelle")]
+    assert any("/samsung-galaxy-s26-ultra" in h for h in links), (
+        f"der Beleg der Listung fehlt: {links}")
+
+
+def test_die_delta_spalte_benennt_ihren_leergrund(tmp_path):
+    """Sicht-Pruefung Wesentliches 3: 38 von 111 Zeilen der Live-Seite
+    zeigten ein stummes "–" in der Delta-Spalte - TCO da, aber keine
+    Vodafone-Referenz (Vodafone listet das Modell nicht). Das "–" ist
+    seit dem Fix BENANNT ("keine Referenz", Grund im title); ein Modell
+    OHNE Bündel behält das "–", weil seine TCO-Zelle den Grund schon
+    nennt ("kein Bündel gemessen") - zwei verschiedene Stummen, nur eine
+    braucht das Etikett."""
+    site, g = _geraete_katalog_site(tmp_path)
+    suppe = _katalog_suppe(site)
+    zeilen = suppe.select("#gr-katalogtabelle .gr-k-zeile")
+    je_modell = {z.get("data-s-geraet"): z for z in zeilen}
+    # apple-x: Bündel MIT Aufteilung -> TCO-Zahl, aber keine Referenz in
+    # der Fixture (kein Vodafone-Anbieter) -> "keine Referenz".
+    apple = je_modell["Apple X 256 GB"]
+    delta_apple = apple.select("td.gr-sp--tco")[2]
+    assert "keine Referenz" in delta_apple.get_text(), (
+        f"apple-x hat TCO ohne Referenz, die Zelle sagt stumm: "
+        f"{delta_apple.get_text()!r}")
+    assert delta_apple.select_one("[title]"), (
+        "der Grund steht nicht im title der Zelle")
+    # samsung: TCO aus dem 1&1-Monatspreis (32,99 × 24 + 1 Zuzahlung),
+    # ebenfalls ohne Referenz - dasselbe Etikett.
+    samsung = je_modell["Samsung Galaxy S26 Ultra 256 GB"]
+    assert "keine Referenz" in samsung.select(
+        "td.gr-sp--tco")[2].get_text()
+    # pixel: KEIN Bündel -> die TCO-Zelle nennt ihren eigenen Grund
+    # ("kein Bündel gemessen"), die Delta-Zelle bleibt "–" - zwei
+    # Stummen, aber nur eine braucht das Etikett.
+    pixel = je_modell["Google Pixel 11 128 GB"]
+    assert "kein Bündel gemessen" in pixel.select(
+        "td.gr-sp--tco")[0].get_text()
+    assert pixel.select("td.gr-sp--tco")[2].get_text().strip() == "–"
+    # Gegenprobe an der Aufbereitung: die Unterscheidung ist Datenlage,
+    # nicht Vorlage - apple traegt tco_ab ohne delta_kurz.
+    a = next(m for m in g["katalog_modelle"] if "Apple X" in m["titel"])
+    assert a["tco_ab"] is not None and a["tco_delta_kurz"] is None
+
+
+def test_ein_haendler_heisst_in_der_spanne_ein_preis(tmp_path):
+    """Sicht-Pruefung Kleineres 4: 62 von 111 Live-Modellen hatten kein
+    "–" als Spanne, weil es nur EINEN Preis gibt - die Zelle sagt das
+    jetzt selbst statt stumm zu bleiben. Ein Modell mit mehreren Händlern
+    und unwesentlichem Abstand behält "–" (echte Spanne, nur klein)."""
+    site, g = _geraete_katalog_site(tmp_path)
+    suppe = _katalog_suppe(site)
+    je_modell = {z.get("data-s-geraet"): z for z in
+                 suppe.select("#gr-katalogtabelle .gr-k-zeile")}
+    pixel = je_modell["Google Pixel 11 128 GB"]
+    assert pixel.select("td.gr-sp--barpreis")[2].get_text(
+    ).strip() == "ein Preis", "ein Händler, aber keine Aussage in der Zelle"
+    # Gegenprobe: Apple hat ZWEI Händler mit wesentlichem Abstand (1000
+    # gegen 1100) - dort steht die echte Spanne, nicht das Etikett.
+    apple = je_modell["Apple X 256 GB"]
+    spannen_text = apple.select("td.gr-sp--barpreis")[2].get_text()
+    assert "1.000,00 € – 1.100,00 €" in spannen_text, (
+        f"die Spanne fehlt: {spannen_text!r}")
+    assert "ein Preis" not in spannen_text

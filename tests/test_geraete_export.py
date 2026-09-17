@@ -382,3 +382,76 @@ def test_die_historie_fuehrt_nur_listungen_des_bestands(tmp_path):
     kopf = zeilen[0]
     gefuehrt = {z[kopf.index("Listungs-ID")] for z in zeilen[1:]}
     assert gefuehrt == {_e()["id"]}
+
+
+# ==========================================================================
+# P3 (18.09.2026): die beiden MODELL-Exporte des Katalogs - eine Datei je
+# Ansicht (Barpreis / TCO), eine Zeile je MODELL. E5-Regel: der Katalog
+# ist eine eigene Zahlensektion und damit exportierbar wie die anderen
+# vier; `geraete-aktuell.csv` bleibt der LISTUNGS-Export mit allen
+# Farben und Anbietern.
+# ==========================================================================
+
+def _modellzeilen(eintraege):
+    return geraete_view.katalog_modellzeilen(eintraege, _KATALOG)
+
+
+def test_die_modell_exports_nennen_die_modellzahl(tmp_path):
+    """Zwei Listungen EINES Modells sind im Listungs-Export zwei Zeilen
+    und im Modell-Export EINE - die Zeilenzahl neben dem Knopf ist die
+    Modellzahl, und sie stimmt mit der geschriebenen Datei ueberein."""
+    eintraege = [_e(), _e(anbieter="o2", id="o2--x",
+                          sku_id="apple-iphone-17-pro-max-256gb-anders")]
+    modelle = _modellzeilen(eintraege)
+    assert len(modelle) == 1, "die Fixture aggregiert nicht - Test misst nichts"
+    angaben = ex.schreibe_exporte(tmp_path, eintraege, [_p()], _KATALOG,
+                                  modelle=modelle)
+    assert angaben["aktuell"]["zeilen"] == len(eintraege), (
+        "der Listungs-Export hat nicht eine Zeile je Listung")
+    for schluessel, name in (("modell_barpreis", "geraete-modell-barpreis.csv"),
+                             ("modell_tco", "geraete-modell-tco.csv")):
+        text = (tmp_path / "exporte" / name).read_text(encoding="utf-8-sig")
+        echte = len(_lies(text)) - 1            # ohne Kopfzeile
+        assert angaben[schluessel]["zeilen"] == echte == len(modelle), (
+            f"{name}: Knopf nennt {angaben[schluessel]['zeilen']}, Datei "
+            f"hat {echte}, Modellzahl ist {len(modelle)}")
+
+
+def test_die_modell_exports_oeffnen_sich_in_deutschem_excel(tmp_path):
+    """Dieselben zwei Zusicherungen wie fuer den Listungs-Export, ohne die
+    eine Datei waere die andere benutzbar: BOM gegen den Umlaut-Fehler,
+    Semikolon gegen die Ein-Spalalte-Zeile, Dezimalkomma gegen den
+    Text-Betrag."""
+    eintraege = [_e(), _e(anbieter="o2", id="o2--x",
+                          sku_id="apple-iphone-17-pro-max-256gb-anders")]
+    ex.schreibe_exporte(tmp_path, eintraege, [_p()], _KATALOG,
+                        modelle=_modellzeilen(eintraege))
+    for name, spalten in (
+            ("geraete-modell-barpreis.csv", ex.SPALTEN_MODELL_BARPREIS),
+            ("geraete-modell-tco.csv", ex.SPALTEN_MODELL_TCO)):
+        roh = (tmp_path / "exporte" / name).read_bytes()
+        assert roh[:3] == b"\xef\xbb\xbf", f"{name} ohne BOM"
+        zeilen = _lies(roh.decode("utf-8-sig"))
+        assert zeilen[0] == spalten, name
+        assert all(len(z) == len(spalten) for z in zeilen), name
+    barpreis = _lies((tmp_path / "exporte" /
+                      "geraete-modell-barpreis.csv").read_text("utf-8-sig"))
+    spalte = ex.SPALTEN_MODELL_BARPREIS.index("Ab-Preis EUR")
+    assert barpreis[1][spalte] == "1349,90", (
+        f"Preis ohne Dezimalkomma: {barpreis[1][spalte]!r}")
+
+
+def test_ohne_modelle_bleiben_die_modell_dateien_korrektes_leer(tmp_path):
+    """Ohne das `modelle`-Argument (aeltere Aufrufer, leerer Bestand)
+    entstehen die Dateien mit Kopfzeile und Null Zeilen - dieselbe
+    Auskunft wie beim Listungs-Export: ein leerer Download ist besser
+    als ein fehlender."""
+    angaben = ex.schreibe_exporte(tmp_path, [_e()], [_p()], _KATALOG)
+    assert angaben["modell_barpreis"]["zeilen"] == 0
+    assert angaben["modell_tco"]["zeilen"] == 0
+    for name, spalten in (
+            ("geraete-modell-barpreis.csv", ex.SPALTEN_MODELL_BARPREIS),
+            ("geraete-modell-tco.csv", ex.SPALTEN_MODELL_TCO)):
+        zeilen = _lies((tmp_path / "exporte" / name).read_text("utf-8-sig"))
+        assert zeilen and zeilen[0] == spalten, name
+        assert len(zeilen) == 1, f"{name} hat Zeilen ohne Modell-Bestand"

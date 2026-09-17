@@ -1808,12 +1808,36 @@ def test_die_erste_bildschirmseite_zeigt_mindestens_drei_hersteller(_b5_seite):
         f"nur {len(set(marken))} Hersteller ohne Scrollen: {marken}")
 
 
-def test_der_zustandsfilter_steht_von_anfang_an_auf_neu(_b5_seite):
-    """Die Vorbelegung des <select> - sichtbar, ohne dass jemand klickt."""
+def test_der_ansichtsregler_steht_von_anfang_an_auf_barpreis(_b5_seite):
+    """P3-Nachfolger des Zustandsfilters ("steht von Anfang an auf neu"):
+    der Zustands-<select> ist mit der Listungs-Tabelle entfallen - seine
+    Zusicherung (die zuerst gezeigten Preise sind NEU-Preise) ist seit C1
+    in der AGGREGATION verankert (`barpreise()` laeuft nur ueber
+    VERGLEICHBARE_ZUSTAENDE, B1). Die Steuerung, die jetzt eine Vorbelegung
+    hat, ist der ANSICHTS-Umschalter: Einzelgerätpreis ist aktiv, ohne
+    dass jemand klickt - ein geteilter Link soll die Grundfrage zeigen."""
     seite = _b5_frisch(_b5_seite)
-    wert = seite.eval_on_selector(
-        "#tafel-katalog [data-filter='zustand']", "e => e.value")
-    assert wert == "neu", wert
+    zustaende = seite.eval_on_selector_all(
+        "#tafel-katalog .gr-kansicht button[data-ansicht]",
+        "e => e.map(k => ({ansicht: k.dataset.ansicht,"
+        "                  aktiv: k.classList.contains('is-aktiv'),"
+        "                  gedrueckt: k.getAttribute('aria-pressed')}))")
+    assert {z["ansicht"] for z in zustaende} == {"barpreis", "tco"}, zustaende
+    aktive = [z for z in zustaende if z["aktiv"]]
+    assert len(aktive) == 1 and aktive[0]["ansicht"] == "barpreis", zustaende
+    assert aktive[0]["gedrueckt"] == "true", zustaende
+    # Die Tabelle steht auf Barpreis: die Barpreis-Spalten sind sichtbar,
+    # die TCO-Spalten nicht (die Umschaltung passiert ueber die Klasse
+    # `gr-katalog--tco`, kein Reload, kein zweites Rendering). Gemessen an
+    # den ZELLEN der ersten Modellzeile (`z.cells`) - ein td-Selektor
+    # griffe auch in die geschlossenen Aufklapper-Tabellen hinein, deren
+    # Zellen tragen ihre eigene display-Eigenschaft weiter.
+    sichtbar = seite.eval_on_selector(
+        "#gr-katalogtabelle .gr-k-zeile",
+        "z => Array.from(z.cells)"
+        "      .map(c => getComputedStyle(c).display !== 'none')")
+    assert sichtbar[:4] == [True, True, True, True], sichtbar
+    assert not any(sichtbar[4:]), sichtbar
 
 
 def test_die_vorbelegung_versteckt_serverseitig_keine_zeile(_b5_seite):
@@ -1821,24 +1845,35 @@ def test_die_vorbelegung_versteckt_serverseitig_keine_zeile(_b5_seite):
     auseinander, weil eine Vorbelegung Zeilen per JS versteckte, die
     Ueberschrift und der "alle anzeigen"-Knopf aber weiterhin die volle
     Zahl nannten. Diese Fassung filtert serverseitig nichts heraus - die
-    Gegenprobe: die Zahl der ZEILEN IM DOM (versteckt oder nicht) ist exakt
-    der Bestand, unabhaengig von der Vorbelegung des Filters."""
+    Gegenprobe: die Zahl der MODELLZEILEN IM DOM (versteckt oder nicht)
+    ist exakt die Modellzahl des Bestands, unabhaengig von Filterwahl
+    oder Ansicht. (Bis P3 zaehlte dieser Test Listungszeilen.)"""
     seite = _b5_frisch(_b5_seite)
     anzahl = seite.eval_on_selector_all(
         "#gr-katalogtabelle .gr-k-zeile", "e => e.length")
-    assert anzahl == len(_B5_DB["listungen"])
+    assert anzahl == _b5_modellzahl(), (
+        f"{anzahl} Modellzeilen im DOM, erwartet {_b5_modellzahl()}")
     ueberschrift = seite.text_content(".gr-katalog h2 .rubrik-zahl").strip()
-    assert ueberschrift == str(len(_B5_DB["listungen"]))
+    assert ueberschrift == str(_b5_modellzahl()), ueberschrift
 
 
 # --------------------------------------------------------------------------
-# B2/B3 der Zurueckweisung (31.08.2026): der Deckel folgt jetzt dem Filter,
-# nicht mehr der Position. Beide Tests fahren die Reproduktion des Pruefers
-# selbst nach: zwei Klicks auf die Spalte "Zustand", danach "alle anzeigen".
+# B2/B3 der Zurueckweisung (31.08.2026): der Deckel folgt der Sortierung,
+# nicht der Position. Seit P3 wird nach der MODELLZEILE sortiert (Bis-P3:
+# Spalte "Zustand" der Listungstabelle) - der Reproduktionskern bleibt:
+# zwei Klicks auf einen Spaltenkopf, der Deckel darf nicht kollabieren,
+# und der "alle anzeigen"-Knopf liefert seine genannte Zahl.
 # --------------------------------------------------------------------------
 
-def _b5_treffer_neu() -> int:
-    return sum(1 for e in _B5_DB["listungen"] if e["zustand"] == "neu")
+def _b5_modellzahl() -> int:
+    """Die Modellzahl der B5-Fixture, ALS ERWARTUNG ausgeschrieben:
+
+    4 Hersteller x 7 Modelle = 28 (device, 256 GB)-Paare. Die drei
+    refurbished-Zeilen liegen auf drei schon vorhandenen Paaren (Modell 1
+    je Apple/Samsung/Xiaomi) und aendern die Modellzahl nicht - genau das
+    ist der Unterschied, den dieser Testsatz seit P3 gegen Listungs-
+    zaehlungen (31) haelt."""
+    return 28
 
 
 def test_b2_zwei_sortierklicks_lassen_den_deckel_nicht_kollabieren(_b5_seite):
@@ -1846,28 +1881,37 @@ def test_b2_zwei_sortierklicks_lassen_den_deckel_nicht_kollabieren(_b5_seite):
     nicht-passende Zeilen in den Deckel rutschen, waehrend die passenden
     dahinter verschwanden - sichtbar fiel von zwoelf auf eins.
 
+    Seit P3 heisst die (jetzt einzige) Preisspalte "Einzelgerätepreis"
+    (`data-sort="preis"`); sortiert wird die Modellzeile. Zwei Klicks
+    deckeln nicht: nach AUF- wie nach ABSTEIGEND bleibt die Zahl der
+    sichtbaren Zeilen genau der Deckel.
+
     Gegengeprueft per Hand: in `app.js` `deckel > 0 && !alleZeigen` durch
     `false` ersetzt (der Deckel greift nie), dieser Test faellt (sichtbar
     > deckel statt ==).
     """
     from telco_radar.report.geraete_view import KATALOG_SICHTBAR
     seite = _b5_frisch(_b5_seite)
-    seite.click('#gr-katalogtabelle .gr-sort[data-sort="zustand"]')
-    seite.wait_for_timeout(120)
-    seite.click('#gr-katalogtabelle .gr-sort[data-sort="zustand"]')
-    seite.wait_for_timeout(120)
-    sichtbar = seite.eval_on_selector_all(
-        "#gr-katalogtabelle .gr-a-zeile",
-        "e => e.filter(x => getComputedStyle(x).display !== 'none').length")
-    erwartet = min(KATALOG_SICHTBAR, _b5_treffer_neu())
-    assert sichtbar == erwartet, (
-        f"{sichtbar} sichtbar nach zwei Sortierklicks, erwartet {erwartet}")
+    for _ in range(2):
+        seite.click('#gr-katalogtabelle .gr-sort[data-sort="preis"]')
+        seite.wait_for_timeout(120)
+        sichtbar = seite.eval_on_selector_all(
+            "#gr-katalogtabelle .gr-a-zeile",
+            "e => e.filter(x => getComputedStyle(x).display !== 'none')"
+            "      .length")
+        erwartet = min(KATALOG_SICHTBAR, _b5_modellzahl())
+        assert sichtbar == erwartet, (
+            f"{sichtbar} sichtbar nach Sortierklicks, erwartet {erwartet}")
 
 
 def test_b3_alle_anzeigen_liefert_was_der_knopf_verspricht(_b5_seite):
     """B3: der Knopf versprach "alle 360 zeigen", lieferte 349 - die im
     Knopf genannte Zahl und die nach dem Klick sichtbare muessen
     uebereinstimmen, unabhaengig vom aktiven Filter.
+
+    Seit P3 verspricht der Knopf MODELLZEILEN (28), nicht Listungen (31)
+    - die drei refurbished-Zeilen stehen im AUFKLAPPER ihrer Modelle und
+    zaehlen nicht als eigene Zeilen.
 
     Gegengeprueft per Hand: `mehr.textContent = ...` in `app.js`
     entfernt (der Knopf behaelt seinen SSR-Text mit der Gesamtzahl), dieser
@@ -1884,9 +1928,10 @@ def test_b3_alle_anzeigen_liefert_was_der_knopf_verspricht(_b5_seite):
         "e => e.filter(x => getComputedStyle(x).display !== 'none').length")
     assert sichtbar == versprochen, (
         f"Knopf versprach {versprochen}, sichtbar sind {sichtbar}")
-    assert versprochen == _b5_treffer_neu(), (
-        "der Knopf verspricht nicht die Zahl der TREFFER unter dem "
-        f"aktiven Filter: {versprochen} != {_b5_treffer_neu()}")
+    assert versprochen == _b5_modellzahl(), (
+        "der Knopf verspricht nicht die Zahl der MODELLZEILEN: "
+        f"{versprochen} != {_b5_modellzahl()}")
+
 
 
 # --------------------------------------------------------------------------
@@ -1896,8 +1941,15 @@ def test_b3_alle_anzeigen_liefert_was_der_knopf_verspricht(_b5_seite):
 # Filterzustand und gelten fuer BEIDE Tabellen des echten Bestands.
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("tafel", ["wr-alarme", "tafel-katalog"])
-def test_b7_der_anbietername_liegt_im_anker(_seite, tafel):
+@pytest.mark.parametrize("tafel,anker", [
+    ("wr-alarme", "#wr-alarme .gr-a-quelle"),
+    # P3: die ANBIETERZELLE des Katalogs lebt im Zeilen-Aufklapper
+    # (`gr-k-listungen`) - in der Haupttabelle ist der Anker Teil der
+    # PREISzelle ("ab X € bei Y↗"), dort steht der Betrag vor dem Anker,
+    # was keine Rueckabwicklung ist (dafuer der eigene Test darunter).
+    ("tafel-katalog", "#tafel-katalog .gr-k-listungen .gr-a-quelle"),
+])
+def test_b7_der_anbietername_liegt_im_anker(_seite, tafel, anker):
     """B7 (Runde 2): fuenf neue Tests der ersten Nachbesserung waren alle
     B5-Tests - keiner hielt B7 selbst. Eine Rueckabwicklung (Name wieder
     als Text VOR dem Anker, wie vor der ersten Nachbesserung) liess keinen
@@ -1915,7 +1967,7 @@ def test_b7_der_anbietername_liegt_im_anker(_seite, tafel):
         _frisch(_seite)
         _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
         _seite.wait_for_timeout(80)
-    ergebnis = _seite.eval_on_selector(f"#{tafel} .gr-a-quelle", """
+    ergebnis = _seite.eval_on_selector(anker, """
       (a) => {
         var zelle = a.closest('td');
         var vorText = '';
@@ -1929,6 +1981,38 @@ def test_b7_der_anbietername_liegt_im_anker(_seite, tafel):
         f"{tafel}: Text VOR dem Anker in der Anbieterzelle: "
         f"{ergebnis['vorText']!r}")
     assert ergebnis["ankerText"], f"{tafel}: der Anker ist leer"
+
+
+def test_p3_der_anker_der_modellzeile_traegt_den_haendlernamen(_seite):
+    """B7 auf der MODELLZEILE des P3-Katalogs: dort steht der Anker in der
+    PREISzelle ("ab 1.179,00 € bei Saturn↗") - der Text davor ist der
+    BETRAG, und der Haendlername muss IM Anker stehen. Waere er unverbunden
+    daneben gesetzt ("ab X € Saturn↗-Link"), waere der Name wieder nur zum
+    Teil klickbar - derselbe Befund, eine Vorlage hoher."""
+    _frisch(_seite)
+    _seite.click(".gr-reiter button[data-tafel='tafel-katalog']")
+    _seite.wait_for_timeout(80)
+    ergebnisse = _seite.eval_on_selector_all(
+        "#gr-katalogtabelle .gr-k-zeile td .gr-a-quelle", """
+      (anker) => anker.map(a => ({
+        ankerText: a.textContent.trim(),
+        href: a.getAttribute('href'),
+        zelle: a.closest('td').textContent.trim()
+      }))
+    """)
+    assert ergebnisse, "keine belegten Modellzeilen-Anker in der Fixture"
+    for e in ergebnisse:
+        # Whitespace normalisieren: zwischen "bei" und dem Namen steht die
+        # Jinja-Einrueckung im Markup - fuer den LESER ist das ein Leer-
+        # zeichen, fuer textContent ein Zeilenumbruch.
+        anker = " ".join(e["ankerText"].split())
+        assert anker.startswith("bei ") and len(anker) > len("bei "), (
+            f"der Anker nennt den Haendler nicht beim Namen: {anker!r}")
+        assert e["href"] and e["href"] != "#", (
+            f"Modellzeilen-Anker ohne Ziel: {e!r}")
+        # Der BETRAG steht in derselben Zelle (vor dem Anker) - die Zeile
+        # zeigt Preis UND Haendler zusammen, beide belegt.
+        assert "€" in e["zelle"], e["zelle"]
 
 
 @pytest.mark.parametrize("tafel", ["wr-alarme", "tafel-katalog"])
@@ -2054,8 +2138,11 @@ def test_p1_die_erste_seite_zeigt_mindestens_drei_hersteller_an_echten_daten(
 
     ERST die Gegenprobe: die Datenlage muss den Fall ueberhaupt ausloesen
     koennen, sonst ist dieser Test wie die beiden vorigen grün, ohne etwas
-    zu pruefen. Gemessen wird direkt gegen `katalogzeilen()` auf dem echten
-    Bestand - keine Fixture, keine Erfindung.
+    zu pruefen. Gemessen wird direkt gegen `katalog_modellzeilen()` auf
+    dem echten Bestand - keine Fixture, keine Erfindung. Seit P3 ist der
+    Fall eine Aussage ueber die MODELLZAHL JE HERSTELLER: ohne das Reihum
+    wuerde der Hersteller mit den meisten Modellen die sichtbaren
+    Modellzeilen allein fuellen.
     """
     from telco_radar.geraete_config import lade_katalog
     from telco_radar.analyze.geraete_store import (
@@ -2070,17 +2157,17 @@ def test_p1_die_erste_seite_zeigt_mindestens_drei_hersteller_an_echten_daten(
                     if e.get("status") in (STATUS_AKTIV, STATUS_VERMUTLICH)]
     _pruefung, bestand, _belastbar = geraete_view.bestand_und_belastbar(
         sichtbar_roh, katalog)
-    zeilen = geraete_view.katalogzeilen(bestand, katalog)
+    modelle = geraete_view.katalog_modellzeilen(bestand, katalog)
 
     from collections import Counter
-    bloecke = Counter((z["hersteller"], z["modell"], z["speicher"]) for z in zeilen)
-    groesster_block = max(bloecke.values())
+    je_hersteller = Counter(m["hersteller"] for m in modelle)
+    groesster = max(je_hersteller.values())
     halbe_sichtflaeche = geraete_view.KATALOG_SICHTBAR / 2
-    assert groesster_block > halbe_sichtflaeche, (
-        f"die Datenlage kann den Fall nicht ausloesen - groesster Block "
-        f"hat {groesster_block} Zeilen, das sind nicht mehr als die Haelfte "
-        f"von {geraete_view.KATALOG_SICHTBAR} sichtbaren Zeilen. Dieser "
-        "Test misst nichts, solange das nicht stimmt."
+    assert groesster > halbe_sichtflaeche, (
+        f"die Datenlage kann den Fall nicht ausloesen - der staerkste "
+        f"Hersteller hat {groesster} Modelle, das sind nicht mehr als die "
+        f"Haelfte von {geraete_view.KATALOG_SICHTBAR} sichtbaren Zeilen. "
+        "Dieser Test misst nichts, solange das nicht stimmt."
     )
 
     # JETZT die eigentliche Zusicherung, im echten Chromium auf den echten
@@ -2096,24 +2183,160 @@ def test_p1_die_erste_seite_zeigt_mindestens_drei_hersteller_an_echten_daten(
         f"sichtbaren Zeilen an den echten Daten: {sorted(set(marken))}")
 
 
-def test_p1_kein_block_zeigt_mehr_als_zwei_zeilen_ohne_alle_anzeigen(_echte_seite):
-    """Die Kehrseite derselben Rueckweisung: der Deckel darf die B6-Gruppierung
-    nicht wieder aufloesen. Kein Geraet darf mehr als `BLOCK_SICHTBAR`
-    Zeilen zeigen, bevor "alle anzeigen" gedrueckt wurde - unabhaengig
-    davon, wie viele Farbvarianten es wirklich gibt."""
+def test_p1_der_deckel_zaehlt_modelle_ohne_alle_anzeigen(_echte_seite):
+    """P3-Nachfolger von "kein Block zeigt mehr als zwei Zeilen": der
+    BLOCK-Deckel (`BLOCK_SICHTBAR`) ist mit der Listungs-Tabelle entfallen
+    - ein Modell IST jetzt eine Zeile, seine Farb- und Anbieter-Varianten
+    stehen komplett im Aufklapper. Was bleibt, ist die Kehrseite des
+    Deckels an echten Daten: ohne "alle anzeigen" sind hoechstens
+    `KATALOG_SICHTBAR` MODELLZEILEN sichtbar - unabhaengig davon, wie
+    voll das Regal eines Herstellers ist (111 Modelle im echten Bestand)."""
     from telco_radar.report import geraete_view
-    from collections import Counter
 
     zeilen = _echte_seite.eval_on_selector_all(
         "#gr-katalogtabelle .gr-a-zeile",
         "e => e.filter(x => getComputedStyle(x).display !== 'none')"
         "      .map(x => x.dataset.sGeraet)")
-    verteilung = Counter(zeilen)
-    ueberschritten = {g: n for g, n in verteilung.items()
-                      if n > geraete_view.BLOCK_SICHTBAR}
-    assert not ueberschritten, (
-        f"Geraete mit mehr als {geraete_view.BLOCK_SICHTBAR} sichtbaren "
-        f"Zeilen ohne 'alle anzeigen': {ueberschritten}")
+    assert zeilen, "keine Zeile sichtbar - der Test misst nichts"
+    assert len(zeilen) <= geraete_view.KATALOG_SICHTBAR, (
+        f"{len(zeilen)} sichtbare Modellzeilen ohne 'alle anzeigen', "
+        f"Deckel ist {geraete_view.KATALOG_SICHTBAR}")
+    # Und es sind MODELLZEILEN, keine Listungen: kein Geraet-Speicher-Paar
+    # kommt zweimal vor (die 24 Zeilen des iPhone 17 Pro haetten bis P3
+    # als 24 Zeilen gezaehlt).
+    from collections import Counter
+    doppel = {g: n for g, n in Counter(zeilen).items() if n > 1}
+    assert not doppel, f"Modelle mit mehr als einer Zeile: {doppel}"
+
+
+def test_p3_wertlose_sortierung_steht_unten_nicht_oben(_seite):
+    """P3/C2-Empfehlung: der Katalog der Modellebene hat BENANNTE
+    Leerwerte (62 von 111 Modellen ohne wesentliche Spanne, 19 ohne
+    Bündel) - `parseFloat("")` ist NaN, und die Sortierung schob NaN
+    aufsteigend an den ANFANG. Eine Zeile OHNE Spanne steht seit dem
+    C2-Fix in BEIDEN Richtungen unter den Zeilen mit Wert.
+
+    Die `_seite`-Fixture spannt den Mix auf: ihre 20 Modelle haben
+    Abstaende von 5 bis rund 216 EUR - der kleinste liegt unter der
+    Wesentlichkeits-Schwelle (3 % / 15 EUR, ODER-Verknuepfung) und traegt
+    KEINE Spanne, die grossen eine. Die spannenlosen Modelle liegen hinten
+    und unterm Deckel - deshalb wird zuerst "alle anzeigen" geklickt,
+    sonst misst der Test nur die gefuellten. Sortiert wird die Spannen-
+    Spalte, auf- und absteigend."""
+    _frisch(_seite)
+    _seite.click(".gr-reiter button[data-tafel='tafel-katalog']")
+    _seite.wait_for_timeout(80)
+    _seite.click("#gr-kmehr")
+    _seite.wait_for_timeout(120)
+    for _ in range(2):  # 1. Klick: absteigend, 2. Klick: aufsteigend
+        _seite.click('#gr-katalogtabelle .gr-sort[data-sort="spanne"]')
+        _seite.wait_for_timeout(120)
+        lage = _seite.eval_on_selector_all(
+            "#gr-katalogtabelle .gr-a-zeile", """
+            (zeilen) => {
+              var sichtbar = zeilen.filter(
+                z => getComputedStyle(z).display !== 'none');
+              var werte = sichtbar.map(z => z.getAttribute('data-s-spanne'));
+              var erste_leere = werte.indexOf('');
+              var letzte_wert = -1;
+              werte.forEach(function (w, i) {
+                if (w !== '') letzte_wert = i;
+              });
+              return {werte: werte,
+                      erste_leere: erste_leere,
+                      letzte_wert: letzte_wert,
+                      anzahl_sichtbar: sichtbar.length};
+            }
+          """)
+        assert lage["anzahl_sichtbar"] > 0, "keine sichtbare Zeile"
+        assert "" in lage["werte"], (
+            "die Fixture spannt den Fall nicht auf - alle sichtbaren "
+            f"Zeilen haben eine Spanne: {lage['werte']}")
+        assert lage["letzte_wert"] < lage["erste_leere"], (
+            f"eine Zeile ohne Spanne steht ueber einer mit Wert "
+            f"(erste leere bei Index {lage['erste_leere']}, letzte mit "
+            f"Wert bei {lage['letzte_wert']}): {lage['werte']}")
+
+
+def test_p3_der_ansichtwechsel_nimmt_die_sortierung_mit(_seite):
+    """Sicht-Pruefung Wesentliches 1 (18.09.2026): nach "Einzelgeraepreis"
+    (ab) sortiert und auf TCO umgeschaltet, blieb die Sortierung an der
+    jetzt UNSICHTBAREN Spalte haengen - live gemessen standen die
+    TCO-Werte danach unsortiert (3357.66 / 2705.66 / 2927.80 Euro), und
+    der Sortierpfeil war weg, weil seine Kopfzelle ausgeblendet war.
+
+    Seit dem Fix (app.js 'gr-ansicht'-Event): die Hauptpreisspalte wird
+    GEMAPPT (Einzelgeraetepreis <-> TCO-24, Erstklick-Richtung wie von
+    Hand), jede andere Sortierung (Haendler/Spanne nur Barpreis,
+    Ø/Delta nur TCO) faellt auf die SERVER-Ordnung zurueck - gemessen
+    als: kein Kopf traegt data-vor mehr, und die Zeilen stehen wieder in
+    der Reihenfolge des gerenderten Dokuments."""
+    _frisch(_seite)
+    _seite.click(".gr-reiter button[data-tafel='tafel-katalog']")
+    _seite.wait_for_timeout(80)
+    _seite.click("#gr-kmehr")
+    _seite.wait_for_timeout(120)
+    # Achtung: das Attribut heisst data-s-GERAET - `dataset.geraet` laese
+    # sich still zu null auf JEDE Zeile auslesen, und der Vergleich unten
+    # vergliche zwei leere Listen (die "Test prueft nichts"-Falle).
+    anfangs = _seite.eval_on_selector_all(
+        "#gr-katalogtabelle .gr-a-zeile",
+        "z => z.map(r => r.getAttribute('data-s-geraet'))")
+    assert all(anfangs), "kein Modellname an den Zeilen - der Test misst nichts"
+
+    # --- Fall 1: Hauptpreisspalte wird gemappt (preis -> tco).
+    _seite.click('#gr-katalogtabelle .gr-sort[data-sort="preis"]')
+    _seite.wait_for_timeout(120)
+    _seite.click("#tafel-katalog .gr-kansicht button[data-ansicht='tco']")
+    _seite.wait_for_timeout(150)
+    lage = _seite.eval_on_selector_all(
+        "#gr-katalogtabelle .gr-a-zeile", """
+        (zeilen) => {
+          var sichtbar = zeilen.filter(
+            z => getComputedStyle(z).display !== 'none');
+          var werte = sichtbar.map(z => z.getAttribute('data-s-tco'));
+          var zahl = werte.map(w => w === '' ? null : parseFloat(w));
+          var mit = zahl.filter(v => v !== null);
+          return {werte: werte,
+                  monoton_fallend: mit.every(
+                    (v, i) => i === 0 || mit[i - 1] >= v),
+                  anzahl_mit_zahl: mit.length};
+        }
+      """)
+    # Der aktive Sortierkopf ist JETZT der TCO-Kopf - sichtbar und mit
+    # Pfeil - und die TCO-Werte stehen monoton (Erstklick = absteigend).
+    aktiv = _seite.eval_on_selector(
+        "#gr-katalogtabelle thead .gr-sort[data-vor]", """
+        k => ({spalte: k ? k.getAttribute('data-sort') : null,
+               richtung: k ? k.getAttribute('data-vor') : null})
+      """)
+    assert aktiv["spalte"] == "tco", (
+        f"nach dem Wechsel sortiert noch {aktiv} - die unsichtbare "
+        "Preisspalte hätte gemappt werden müssen")
+    assert aktiv["richtung"] == "ab"
+    assert lage["anzahl_mit_zahl"] >= 2, (
+        "die Fixture spannt keine sortierbare TCO-Spalte auf - der Test "
+        f"misst nichts: {lage['werte']}")
+    assert lage["monoton_fallend"], (
+        f"TCO-Werte nach dem Wechsel unsortiert: {lage['werte']}")
+
+    # --- Fall 2: eine Spalte OHNE Entsprechung (delta nur in der
+    # TCO-Ansicht) faellt auf die Server-Ordnung zurueck.
+    _seite.click('#gr-katalogtabelle .gr-sort[data-sort="delta"]')
+    _seite.wait_for_timeout(120)
+    _seite.click("#tafel-katalog .gr-kansicht button[data-ansicht='barpreis']")
+    _seite.wait_for_timeout(150)
+    ohne_pfeil = _seite.eval_on_selector_all(
+        "#gr-katalogtabelle thead .gr-sort[data-vor]", "k => k.length > 0")
+    jetzt = _seite.eval_on_selector_all(
+        "#gr-katalogtabelle .gr-a-zeile",
+        "z => z.map(r => r.getAttribute('data-s-geraet'))")
+    assert not ohne_pfeil, (
+        "ein Sortierpfeil haengt an einer Spalte, nach der niemand "
+        "sortieren konnte")
+    assert jetzt == anfangs, (
+        "nach dem Wechsel steht nicht die Server-Ordnung: "
+        f"{jetzt[:4]} statt {anfangs[:4]}")
 
 
 # --------------------------------------------------------------------------

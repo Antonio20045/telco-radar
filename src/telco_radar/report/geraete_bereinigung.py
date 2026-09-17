@@ -79,7 +79,8 @@ stehen (360 gegen 362 Zeilen), und zwar die zwei, bei denen die falsche
 Haelfte als NEUgeraet in den Preisvergleich ginge. `zustand_der_zeile()`
 leitet ihn
 deshalb aus Titel, Farbe und Adresse ab - dieselbe Rechnung wie in
-`geraete_view.katalogzeilen()`, aus demselben Grund: der Store ist die
+`geraete_view._katalog_zeile()` (bis P3 `katalogzeilen()`, jetzt die
+Bauform des Katalog-Aufklappers), aus demselben Grund: der Store ist die
 schwaechere Quelle.
 
 In der Auslieferung faengt `geraete_pruefung.pruefe()` diese zwei Zeilen
@@ -145,7 +146,7 @@ from ..geraete_model import (VERGLEICHBARE_ZUSTAENDE, farbschluessel,
 
 # Die zwei Felder, aus denen Anzeige und Export ihre Farbe bauen - beide mit
 # demselben Ausdruck `farbe_normalisiert or farbe_roh`
-# (`geraete_view.katalogzeilen()`, `geraete_export.aktuell_csv()`). Beide
+# (`geraete_view._katalog_zeile()`, `geraete_export.aktuell_csv()`). Beide
 # werden bereinigt, obwohl heute nur `farbe_roh` ein Zustandswort traegt:
 # fuellt der naechste Adapter das kanonische Feld mit "grau erneuert", stuende
 # das Wort ueber den Vorrang der ersten Haelfte sofort wieder auf der Seite,
@@ -166,9 +167,9 @@ def bereinige(eintraege: list[dict]) -> list[dict]:
     Preisverlauf auf null). Die Kopie ist flach.
 
     Die Reihenfolge der ueberlebenden Eintraege bleibt die der Eingabe. Wer
-    sortiert, sortiert selbst - `katalogzeilen()` und `aktuell_csv()` tun es
-    jeweils anders, und eine Sortierung hier waere eine dritte, die niemand
-    sieht.
+    sortiert, sortiert selbst - `katalog_modellzeilen()` und `aktuell_csv()`
+    tun es jeweils anders, und eine Sortierung hier waere eine dritte, die
+    niemand sieht.
     """
     sauber = [_mit_sauberer_farbe(e) for e in eintraege]
     return _ohne_zwillinge(sauber)
@@ -299,8 +300,9 @@ def _zwillingsschluessel(eintrag: dict) -> tuple:
 def zustand_der_zeile(eintrag: dict) -> str:
     """Der Zustand, wie ihn die heutige Regel liest. DIE EINE Ableitung.
 
-    Sie stand am 31.08.2026 in DREI Fassungen: hier, in
-    `geraete_view.katalogzeilen()` und - als schweigendes Vertrauen auf den
+    Sie stand am 31.08.2026 in DREI Fassungen: hier, in der Katalog-Zeile
+    (bis P3 `katalogzeilen()`, heute `_katalog_zeile()`) und - als
+    schweigendes Vertrauen auf den
     Store - im CSV-Export. Drei Fassungen einer Regel sind drei Regeln, und
     die dritte war die falsche: `geraete_export.aktuell_csv()` schrieb
     `eintrag["zustand"]` roh in die Spalte. Solange der Export die
