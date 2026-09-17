@@ -1105,6 +1105,12 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         name = _name(katalog, gruppe["device_id"], gruppe["speicher"],
                      rueckfall=mid)
         hersteller = _hersteller(katalog, gruppe["device_id"])
+        # E4: der Auto-Marker des Katalog-Eintrags - die Sichtbarkeitsregel
+        # der Zeitreihen-Wahl haengt daran (geraete_zeitreihe: Auto-Modelle
+        # erst ab 2 Messtagen waehlbar). Leer = Hand-Eintrag aus der Config
+        # (oder kein Katalog uebergeben, wie in den Karten-Tests).
+        katalog_eintrag = (katalog.nach_id(gruppe["device_id"])
+                           if katalog else None)
 
         # DIE EINE ANTWORTZEILE (BRIEF_FADEN, 05.09.2026): "Was kostet
         # dieses Geraet?" - zwei Zahlen, je mit ihrem Anbieter, sonst ist
@@ -1166,6 +1172,7 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
             "name": name,
             "hersteller": hersteller,
             "titel": titel(hersteller, name),
+            "auto": (katalog_eintrag.auto if katalog_eintrag else ""),
             "speicher": gruppe["speicher"],
             "karten": karten,
             "referenz": referenz,
