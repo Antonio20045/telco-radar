@@ -105,7 +105,7 @@ SPALTEN_TCO = [
 
 # O4: der Radar-Export - TCO-24 der Netzbetreiber UND Händler-Barpreis in
 # EINER Datei. Die Abweichungsspalte ist der KONSUMENT derselben Rechnung,
-# die die Radar-Seite zeigt (`report/wettbewerbsradar.py`): diese Datei
+# die der Radar-Reiter zeigt (`report/geraete_radar.py`): diese Datei
 # rechnet keine einzige Prozentzahl selbst, sie liest sie aus der
 # Aufbereitung, die auch die Seite rendert - zwei Rechnungen fuer dieselbe
 # Zahl sind zwei Zahlen (CLAUDE.md §6).
@@ -221,7 +221,7 @@ def tco_csv(zeilen: dict) -> tuple[str, int]:
 def _alarm_zeilen(alarme: dict) -> list[list[str]]:
     """Die Alarmzeilen der Radar-Aufbereitung als Tabellenzeilen.
 
-    `alarme` ist `wettbewerbsradar.radar()["alarme"]` - die Aufbereitung
+    `alarme` ist `geraete_radar.radar()["alarme"]` - die Aufbereitung
     aus `geraete_alarme.zeilen()`, VOLLSTAENDIG durchgereicht: `sichtbar`
     und `rest` sind zusammen die ganze Tabelle (der Deckel kappt nur die
     Ansicht). Gelesen wird genau das, was die Zeile der Seite trägt -
@@ -254,10 +254,10 @@ def _alarm_zeilen(alarme: dict) -> list[list[str]]:
 def radar_csv(view: dict) -> tuple[str, int]:
     """Der Wettbewerbs-Radar als CSV - Alarme, Netzbetreiber-TCO, Händlerpreis.
 
-    `view` ist die Aufbereitung aus `report/wettbewerbsradar.radar()` -
+    `view` ist die Aufbereitung aus `report/geraete_radar.radar()` -
     dieselbe, die die Seite rendert. Die Abweichungsspalte wird daraus
     GELESEN und nicht hier gerechnet: die eine Division steht in
-    `wettbewerbsradar._paar_zeile`/`_zeile_fuer_anbieter`/`haendler_zeilen`,
+    `geraete_radar._paar_zeile`/`_zeile_fuer_anbieter`/`haendler_zeilen`,
     und ein Export, der sie nachrechnet, kann von der Seite abweichen,
     ohne dass es ein Test sieht. Nicht vergleichbare Zeilen stehen mit
     ihrem STATUS statt einer Zahl - der Export schreibt den Bestand, die

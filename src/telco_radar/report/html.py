@@ -1280,7 +1280,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # Veroeffentlichungsschwelle-Disziplin wie bei "Geraete" selbst: eine
     # Seite ohne eine einzige vergleichbare Zeile ginge sonst in die
     # Navigation und behauptete eine Antwort, die sie nicht hat.
-    from . import wettbewerbsradar as _wettbewerbsradar_mod
+    from . import geraete_radar as _geraete_radar_mod
     try:
         # O3: die Portfolio-Abschnitte der Geräteseite (Lifecycle,
         # Wochenkarte) - dieselben Felder, die die alte Tafel
@@ -1292,16 +1292,16 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
             "nachfolger_sichtbar": geraete["nachfolger_sichtbar"],
             "fenster_tage": geraete["fenster_tage"],
         }
-        wettbewerbsradar_view = _wettbewerbsradar_mod.radar(
+        radar_view = _geraete_radar_mod.radar(
             geraete["tco"], geraete["vergleich"]["ohne_vertrag"],
             geraete["quellenlage"], alarme=geraete["alarme"],
             portfolio=_portfolio)
     except Exception as exc:  # noqa: BLE001
         log.error("Wettbewerbs-Radar nicht aufbereitbar: %s: %s",
                   type(exc).__name__, exc)
-        wettbewerbsradar_view = _wettbewerbsradar_mod.leer()
-    env.globals["wettbewerbsradar_verlinkt"] = bool(
-        wettbewerbsradar_view["hat_vergleichbare_zeilen"])
+        radar_view = _geraete_radar_mod.leer()
+    env.globals["radar_verlinkt"] = bool(
+        radar_view["hat_vergleichbare_zeilen"])
 
     # ---- Rechtstexte: aus demselben Grund HIER und nicht bei ihrer Seite.
     # Die Fusszeile steht in `base.html.j2`, also auf JEDER Seite - und die
@@ -1923,35 +1923,35 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         from . import geraete_export as _geraete_export
         # O4: dazu die TCO-Zeilen (aufgeloest in der View) und die FERTIGE
         # Radar-Aufbereitung - der Radar-Export liest seine Prozentzahlen
-        # aus derselben Rechnung, die wettbewerbsradar.html rendert, und
+        # aus derselben Rechnung, die der Radar-Reiter rendert, und
         # rechnet sie nicht ein zweites Mal.
         geraete["export"] = _geraete_export.schreibe_exporte(
             site_dir, geraete.get("bestand") or [],
             geraete.get("alle_punkte") or [], geraete.get("katalog_obj"),
             stand=geraete.get("stand", ""),
             tco=(geraete.get("tco") or {}).get("export"),
-            radar=wettbewerbsradar_view)
+            radar=radar_view)
     except Exception as exc:                      # noqa: BLE001
         # Wie beim Rest dieser Stufe: ein gescheiterter Export darf die
         # Seite nicht kosten - aber er verschwindet auch nicht still.
         log.error("Geraete-Export gescheitert: %s: %s", type(exc).__name__, exc)
         from . import geraete_export as _geraete_export
         geraete["export"] = _geraete_export.leer()
-        wettbewerbsradar_view["export"] = _geraete_export.leer()["radar"]
+        radar_view["export"] = _geraete_export.leer()["radar"]
     else:
         # Der Radar nennt Zeilenzahl und Groesse SEINER Datei an seinem
         # eigenen zentralen Ort (Kopfzeile) - dieselbe Zahl, die in der
         # Datei steht, nicht eine gerechnete.
-        wettbewerbsradar_view["export"] = geraete["export"]["radar"]
+        radar_view["export"] = geraete["export"]["radar"]
 
     (site_dir / "geraete.html").write_text(
         # E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d): die Geräteseite ist EINE
         # Seite mit vier Reitern; der Radar-Reiter und der Sortiments-
-        # Aufklapper des Katalog-Reiters lesen denselben `wettbewerbsradar`-
-        # Kontext wie die Schwesterseite - EINE Berechnung (`radar()`),
-        # zwei Vorlagen, keine zweite Rechnung für dieselbe Zahl.
+        # Aufklapper des Katalog-Reiters lesen denselben `radar`-Kontext
+        # - EINE Berechnung (`radar()`), zwei Vorlagenausschnitte,
+        # keine zweite Rechnung für dieselbe Zahl.
         env.get_template("geraete.html.j2").render(
-            prefix="", geraete=geraete, wettbewerbsradar=wettbewerbsradar_view),
+            prefix="", geraete=geraete, radar=radar_view),
         encoding="utf-8")
     # O3 (STRATEGIE_GERAETE_OPTIK §3, 15.09.2026): das Bündel-Fragment -
     # die Zeilen-Gruppe eines jeden NICHT-Vorgabemodells, aus DEMSELBEN
@@ -1992,14 +1992,6 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         env.get_template("geraete_quellen.html.j2").render(
             prefix="", geraete=geraete),
         encoding="utf-8")
-    # wettbewerbsradar.html wird NICHT mehr als eigene Seite gerendert -
-    # seit E3 Schritt 3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d, 17.09.2026)
-    # ist der Radar der Reiter "Radar" von geraete.html. Der alte
-    # Dateiname entsteht unten als Weiterleitung (Meta-Refresh auf
-    # geraete.html#tafel-radar) - derselbe Block wie fuer bericht.html
-    # & Co., denn er steht in Lesezeichen und Mails an die Fachabteilung.
-    # Die Aufbereitung `radar()` bleibt: der Reiter, der Fußlink und der
-    # Radar-Export lesen denselben Kontext.
 
     # ---- Transparenz: Laufprotokoll UND Quellenbestand auf einer Seite.
     # Beide beantworten dieselbe Frage ("kann ich dem Ding trauen?") und
@@ -2100,10 +2092,9 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # `suche.html` steht nicht mehr darunter: der Name ist seit dem 08.08.2026
     # wieder eine echte Seite - die Dossier-Suche. Ein Lesezeichen darauf
     # landet also dort, wo es immer hinwollte.
-    # `wettbewerbsradar.html` ist seit E3 Schritt 3 (17.09.2026) dabei: Der
-    # Radar ist der Reiter "Radar" der EINEN Geräteseite geworden, der Hash
-    # schaltet ihn (app.js). Die Seite selbst war vom 08.09. bis zum 17.09.
-    # eine eigene Ausgabe.
+    # `wettbewerbsradar.html` ist seit E3 Schritt 3 (17.09.2026) dabei: der
+    # Radar ist der Reiter "Radar" der EINEN Geräteseite, der Hash schaltet
+    # ihn (app.js) - die Alt-URL steht in Lesezeichen der Fachabteilung.
     for alt, ziel in (("bericht.html", "index.html"),
                       ("archive.html", "meldungen.html#archiv"),
                       ("protokoll.html", "transparenz.html"),

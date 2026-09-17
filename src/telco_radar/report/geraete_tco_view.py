@@ -943,7 +943,7 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         "baender_katalog": [{"key": k, "label": l, "bereich": b}
                             for k, l, b in geraete_tco_band.BAENDER],
         # RAD-1 (08.09.2026): derselbe Bandindex, den der Graph oben schon
-        # gerechnet hat - `report/wettbewerbsradar.py` braucht ihn fuer die
+        # gerechnet hat - `report/geraete_radar.py` braucht ihn fuer die
         # Vergleichbarkeitspruefung seiner %-Abweichung und rechnet ihn
         # deshalb nicht ein zweites Mal aus `tarife`.
         "band_je_tarif": band_je_tarif,

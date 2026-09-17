@@ -26,7 +26,7 @@ import yaml
 from bs4 import BeautifulSoup
 
 from telco_radar.geraete_config import lade_katalog, lade_quellen
-from telco_radar.report import geraete_view, wettbewerbsradar as wr
+from telco_radar.report import geraete_view, geraete_radar as wr
 from telco_radar.report.html import render_site
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]

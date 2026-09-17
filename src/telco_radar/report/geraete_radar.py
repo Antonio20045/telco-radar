@@ -526,7 +526,7 @@ def nicht_erhebbar(quellenlage: dict) -> list[dict]:
 
 def radar(tco: dict, vergleich_ohne_vertrag: dict, quellenlage: dict,
           alarme: dict | None = None, portfolio: dict | None = None) -> dict:
-    """Alles fuer wettbewerbsradar.html.
+    """Alles fuer die Radar-Tafel der EINEN Geräteseite (#tafel-radar).
 
     `gruppen`/`haendler` bleiben die VOLLSTAENDIGEN Listen (Test c: nichts
     wird entfernt); `gruppen_sichtbar`/`gruppen_rest` und
