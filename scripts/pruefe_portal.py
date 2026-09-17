@@ -38,6 +38,10 @@ Dazu das Kriterium des Geraeteradars (10.08.2026):
      Satz darunter. Sind noch keine Alarmzeilen erfasst, gilt das Kriterium
      als uebersprungen - die Seite steht dann unter ihrer
      Veroeffentlichungsschwelle.
+     Seit E3 Schritt 3 (17.09.2026) steht die Alarmtabelle im Radar-Reiter
+     von geraete.html (bis dahin eigene Seite wettbewerbsradar.html, heute
+     eine Weiterleitung) - Kriterium 11 liest sie von der EINEN Seite, und
+     11b misst deren ALLE Tafeln einschliesslich der Radar-Tafel.
 
      Bis zum 30.08.2026 vermass dieses Kriterium die Positionskarte und
      rechnete aus jeder Etikettenhoehe den Preis zurueck. Die Karte ist
@@ -782,17 +786,13 @@ def main() -> int:
                 maengel.append("gedrehte Beschriftung im Dokument")
                 break
 
-        # O2 (11.09.2026): die Alarmtabelle steht auf dem WETTBEWERBS-RADAR
-        # - dieselbe Pruefung, der neue Ort. `gr` bleibt die Geraeteseite
-        # fuer alles Strukturelle daruber; die Beleg- und Kachel-Zaehlung
-        # liest die Radarseite.
-        radar_seite = None
-        radar_pfad = site / "wettbewerbsradar.html"
-        if radar_pfad.exists():
-            radar_seite = BeautifulSoup(radar_pfad.read_text("utf-8"),
-                                        "html.parser")
-        zeilen = (radar_seite.select("#wr-alarme .gr-a-zeile")
-                  if radar_seite is not None else [])
+        # O2 (11.09.2026) stand die Alarmtabelle auf dem WETTBEWERBS-RADAR;
+        # seit E3 Schritt 3 (17.09.2026) ist der Radar der Reiter "Radar"
+        # DIESER Seite - die Alt-URL ist eine Weiterleitung. Beleg- und
+        # Kachel-Zaehlung lesen deshalb dieselbe Suppe wie alles
+        # Strukturelle darueber: eine Seite, eine Quelle der Wahrheit.
+        radar_seite = gr
+        zeilen = radar_seite.select("#wr-alarme .gr-a-zeile")
         if not zeilen:
             # NICHT einfach ueberspringen: die strukturelle Haelfte dieses
             # Kriteriums - "die Grafik ist WEG" - gilt auch ohne Daten. Sie
