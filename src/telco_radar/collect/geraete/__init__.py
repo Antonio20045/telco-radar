@@ -38,6 +38,7 @@ from urllib.parse import urljoin, urlparse
 from bs4 import BeautifulSoup
 
 from ...geraete_model import Katalog, lies_listung
+from . import autoerkennung
 from .robots import RobotsWaechter
 from .strukturdaten import ist_lockpreis, produkte_aus_html
 
@@ -168,6 +169,11 @@ class Anbieterbilanz:
     produkte_abgerufen: int = 0
     unbekannte_titel: list = field(default_factory=list)
     unbekannte_farben: list = field(default_factory=list)
+    # Dieselben Faelle MIT Kontext (art titel|farbe, wert, quelle des
+    # Feldes) - die Grundlage fuer data/state/geraete_unbekannt.jsonl.
+    # Die String-Listen darueber bleiben unberuehrt: das Protokoll liest
+    # sie, und der naechtliche Lauf gibt an niemanden zurueck.
+    unbekannt: list = field(default_factory=list)
     gedeckelt: list = field(default_factory=list)
     besucht: list = field(default_factory=list)
     nicht_verlinkt: list = field(default_factory=list)
@@ -712,6 +718,7 @@ def _uebernimm(rohsaetze, anbieter, einstieg, quelle_url: str, katalog: Katalog,
                farben: dict, heute: str, bilanz: Anbieterbilanz) -> None:
     bilanz.rohsaetze += len(rohsaetze or [])
     gelesen = []
+    quellen: dict = {}
     for satz in rohsaetze:
         if satz.get("waehrung") and satz["waehrung"] not in ("EUR", ""):
             continue          # ein Preis in fremder Waehrung ist kein Vergleichswert
@@ -719,10 +726,14 @@ def _uebernimm(rohsaetze, anbieter, einstieg, quelle_url: str, katalog: Katalog,
                                     katalog, farben, heute, bilanz)
         if listung is not None:
             gelesen.append(listung)
+            quellen[id(listung)] = satz.get("quelle") or ""
     for listung in _ohne_sammelknoten(gelesen):
         bilanz.listungen.append(listung)
         if listung.farbe_roh and listung.farbe_normalisiert is None:
             bilanz.unbekannte_farben.append(listung.farbe_roh)
+            bilanz.unbekannt.append(
+                {"art": "farbe", "wert": listung.farbe_roh,
+                 "quelle": quellen.get(id(listung), "")})
 
 
 def _mit_sku(rohsaetze, anbieter, einstieg, katalog: Katalog, farben: dict,
@@ -748,7 +759,7 @@ def _mit_sku(rohsaetze, anbieter, einstieg, katalog: Katalog, farben: dict,
     """
     out: list[dict] = []
     for satz in rohsaetze:
-        listung = lies_listung(
+        kwargs = dict(
             titel=satz.get("titel", ""), anbieter=anbieter.name,
             anbieter_typ=anbieter.typ, netz=anbieter.netz,
             quelle_url=urljoin(einstieg.url, satz.get("url") or "")
@@ -764,13 +775,29 @@ def _mit_sku(rohsaetze, anbieter, einstieg, katalog: Katalog, farben: dict,
             # Rohsaetze ohne das Feld aendern nichts (`or ""`).
             zustand_hinweis=satz.get("zustand_hinweis") or "",
             einstieg_url=einstieg.url)
+        listung = lies_listung(**kwargs)
+        if listung is None and (satz.get("strukturierter_name") or "").strip():
+            # E4-Auto-Erkennung, dieselbe Regel wie im Listungsweg: die
+            # Buendel brauchen die sku_id desselben (neuen) Geraets - sonst
+            # startete die Preishistorie auch hier erst beim zweiten Lauf.
+            if autoerkennung.lege_an(satz["strukturierter_name"], katalog,
+                                    heute,
+                                    speicher_gb=satz.get("speicher_gb")) \
+                    is not None:
+                listung = lies_listung(**kwargs)
         if listung is None:
             titel = (satz.get("titel") or "").strip()
             if titel:
                 bilanz.unbekannte_titel.append(titel)
+                bilanz.unbekannt.append(
+                    {"art": "titel", "wert": titel,
+                     "quelle": satz.get("quelle") or ""})
             continue
         if listung.farbe_roh and listung.farbe_normalisiert is None:
             bilanz.unbekannte_farben.append(listung.farbe_roh)
+            bilanz.unbekannt.append(
+                {"art": "farbe", "wert": listung.farbe_roh,
+                 "quelle": satz.get("quelle") or ""})
         # Der ZUSTAND reist mit - er ist dieselbe Erkennung wie die, aus
         # der die `-refurbished`-Strecke der SKU entsteht, und die
         # TCO-Tafel braucht ihn als Feld, nicht als Suffix (QA-Befund B1).
@@ -811,7 +838,7 @@ def _belegstufe(quelle: str) -> str:
 
 def _als_listung_satz(satz, anbieter, einstieg, quelle_url, katalog, farben,
                       heute, bilanz):
-    listung = lies_listung(
+    kwargs = dict(
         titel=satz.get("titel", ""), anbieter=anbieter.name,
         anbieter_typ=anbieter.typ, netz=anbieter.netz,
         quelle_url=urljoin(quelle_url, satz.get("url") or "") or quelle_url,
@@ -832,10 +859,25 @@ def _als_listung_satz(satz, anbieter, einstieg, quelle_url, katalog, farben,
         speicher_gb=satz.get("speicher_gb"),
         einstieg_url=einstieg.url,
         **_preisfelder(anbieter, satz))
+    listung = lies_listung(**kwargs)
+    if listung is None and (satz.get("strukturierter_name") or "").strip():
+        # E4-AUTO-ERKENNUNG: der Titel traf keinen Katalog-Eintrag, aber die
+        # Quelle nennt ihren Namen strukturiert (Telekom `name`, o2
+        # `description`, Vodafone `modelName`). ERST der Katalogabgleich,
+        # DANN die Anlage - der Hand-Eintrag samt Alias schlaegt die Auto-
+        # Anlage, und der Retry darunter trifft ihn. Ohne dieses Feld
+        # passiert genau wie bisher nichts (Titel-Heuristik bleibt
+        # verworfen).
+        if autoerkennung.lege_an(satz["strukturierter_name"], katalog, heute,
+                                speicher_gb=satz.get("speicher_gb")) is not None:
+            listung = lies_listung(**kwargs)
     if listung is None:
         titel = (satz.get("titel") or "").strip()
         if titel:
             bilanz.unbekannte_titel.append(titel)
+            bilanz.unbekannt.append(
+                {"art": "titel", "wert": titel,
+                 "quelle": satz.get("quelle") or ""})
     return listung
 
 
@@ -904,4 +946,9 @@ def sammle(quellen, katalog: Katalog, farben: dict, hole: Callable, heute: str,
         "listungen": [l for b in bilanzen for l in b.listungen],
         "abgefragt": sum(1 for b in bilanzen if b.status in ("ok", "leer", "frist")),
         "unbekannte_titel": sorted({t for b in bilanzen for t in b.unbekannte_titel}),
+        # Unbekannte Titel und Farben MIT Anbieter und Feldquelle - die
+        # Zeilen von data/state/geraete_unbekannt.jsonl (E4). Angelegt und
+        # gezaehlt vom Lauf, nie von Hand gepflegt.
+        "unbekannte": [{"anbieter": b.name, **e}
+                       for b in bilanzen for e in b.unbekannt],
     }

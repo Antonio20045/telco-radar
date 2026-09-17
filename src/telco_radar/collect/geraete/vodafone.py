@@ -217,6 +217,9 @@ def lies(text: str, url: str = "") -> list[dict]:
                                      farbe) if x)
         out.append({
             "titel": titel,
+            # E4-Auto-Erkennung: der strukturierte NAME (Feld `modelName`),
+            # getrennt vom zusammengesetzten Titel.
+            "strukturierter_name": modell,
             "preis": float(preis),
             "waehrung": "EUR",
             # `shippingInfo` nennt einen Liefertermin, wenn es einen gibt.
@@ -319,6 +322,7 @@ def _buendelsatz_aus_komposition(modell: str, hubpage: str, hardware_id: str,
 
     return {
         "titel": modell,
+        "strukturierter_name": modell,
         "farbe": farbe,
         "speicher_gb": speicher,
         # Vodafones `hardwareId` - der Schluessel, ueber den

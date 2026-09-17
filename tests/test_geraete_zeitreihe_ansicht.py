@@ -563,3 +563,101 @@ def test_die_schmalvariante_zeigt_dieselben_werte_weniger_labels(ansicht):
     assert len(schmal.select("text.gr-zr-xtick")) == \
         len(breit.select("text.gr-zr-xtick"))
     assert len(schmal.select(".gr-zr-wert--erst")) == 0
+
+
+# ==========================================================================
+# E4-Sichtbarkeit: Auto-Eintraege in der WAHL erst ab 2 Messtagen
+# (Bau 2). Der Katalog-Reiter zeigt sie ab Tag 1, die Listung existiert
+# ab Tag 1 - die Zeitreihe ist eine TCO-Aussage, und ein Messtag ist noch
+# keine (PM-Vorgabe E4; Bestaetigung ueber zwei Naechte, bevor ein Gerät
+# die Auswahl füllt).
+# ==========================================================================
+
+_AUTO_EINTRAG = {"hersteller": "Apple", "modell": "iPhone 18 Pro",
+                 "generation": 18, "speicher": [256], "auto": "2026-09-15"}
+
+
+def _baue_mit_auto(tmp_path: pathlib.Path, messtage: list[str]):
+    """_baue plus einem AUTO angelegten iPhone 18 Pro (State, nicht Config -
+    der Produktionsweg) mit o2-Buendel im Band klein und N Messtagen."""
+    root, state = _baue(tmp_path)
+
+    (state / "geraete_katalog_auto.json").write_text(
+        json.dumps({"geraete": [_AUTO_EINTRAG]}, ensure_ascii=False),
+        encoding="utf-8")
+
+    db = json.loads((state / "geraete_db.json").read_text(encoding="utf-8"))
+    gid, speicher = "apple-iphone-18-pro", 256
+    db["listungen"].append({
+        "id": f"o2--{_sku(gid, speicher)}", "sku_id": _sku(gid, speicher),
+        "device_id": gid, "anbieter": "o2", "anbieter_typ": "netzbetreiber",
+        "netz": "o2", "speicher_gb": speicher, "farbe_roh": "Schwarz",
+        "farbe_normalisiert": "schwarz", "zustand": "neu",
+        "first_seen": "2026-09-15", "last_verified": HEUTE, "status": "aktiv",
+        "missed_checks": 0, "preis_ohne_vertrag": 1199.00,
+        "erstpreis": 1199.00, "erstpreis_art": "ohne_vertrag",
+        "erstpreis_am": "2026-09-15",
+        "quelle_url": "https://example.de/o2/iphone-18-pro",
+        "abgerufen_am": HEUTE, "verfuegbarkeit": "lieferbar",
+        "confidence": "hoch", "einstiege": ["https://example.de/l"]})
+    (state / "geraete_db.json").write_text(json.dumps(db), encoding="utf-8")
+
+    tco = json.loads((state / "geraete_tco.json").read_text(encoding="utf-8"))
+    buendel_id = f"buendel--o2--{_sku(gid, speicher)}--o2:klein"
+    tco["buendel"].append({
+        "id": buendel_id, "sku_id": _sku(gid, speicher), "anbieter": "o2",
+        "tarif_name": "O2 Mobile Klein", "tarif_id": "o2:klein",
+        "tarif_id_guete": "hoch", "tarif_monatlich": 20.0,
+        "geraet_zuzahlung": 1.0, "geraet_monatsrate": 18.0,
+        "laufzeit_monate": 24, "anschlusspreis": 0.0, "zustand": "neu",
+        "rabatte": [], "quelle_url": "https://example.de/o2/18pro",
+        "abgerufen_am": HEUTE, "first_seen": "2026-09-15",
+        "last_verified": HEUTE})
+    (state / "geraete_tco.json").write_text(json.dumps(tco), encoding="utf-8")
+
+    zeilen = (state / "geraete_tco_historie.jsonl") \
+        .read_text(encoding="utf-8").splitlines()
+    for tag in messtage:
+        zeilen.append(json.dumps({
+            "id": buendel_id, "datum": tag, "tarif_id": "o2:klein",
+            "tarif_id_guete": "hoch", "tarif_monatlich": 20.0,
+            "geraet_zuzahlung": 1.0, "geraet_monatsrate": 18.0,
+            "laufzeit_monate": 24, "anschlusspreis": 0.0,
+            "quelle_url": "https://example.de/o2/18pro", "abgerufen_am": tag,
+            "zustand": "neu", "gesamt": 1600.00,
+            "sku_id": _sku(gid, speicher)}))
+    (state / "geraete_tco_historie.jsonl").write_text(
+        "\n".join(z for z in zeilen if z) + "\n", encoding="utf-8")
+    return root, state
+
+
+def test_auto_modell_mit_einem_mestag_steht_nicht_in_der_wahl(tmp_path):
+    root, state = _baue_mit_auto(tmp_path, ["2026-09-15"])
+    g = geraete_view.aufbereiten(state, lade_quellen(root),
+                                 lade_katalog(root), heute=HEUTE)
+    a = geraete_zeitreihe.aufbereiten(state, g["tco"])
+
+    ids = {m["id"] for m in a["suchindex"]}
+    assert "apple-iphone-18-pro-256" not in ids
+    assert all(p["modell"] != "apple-iphone-18-pro-256" for p in a["paare"])
+    assert all(k["id"] != "apple-iphone-18-pro-256" for k in a["kacheln"])
+    assert a["start"]["modell"] != "apple-iphone-18-pro-256"
+
+    # Der KATALOG-Reiter zeigt ihn ab Tag 1 (Listung existiert ab Tag 1):
+    # eine Quelle der Wahrheit, zwei Sichtbarkeitsregeln.
+    assert any(z["modell"] == "iPhone 18 Pro" for z in g["katalogtabelle"])
+
+    # Gegenprobe: ein HAND-Eintrag mit EINEM Messtag bleibt waehlbar -
+    # die Regel gilt nur fuer Auto-Eintraege (Galaxy S26 hat hier genau
+    # einen Messtag, 2026-09-12, und steht heute in der Wahl).
+    assert "samsung-galaxy-s26-256" in ids
+
+
+def test_auto_modell_mit_zwei_mestagen_steht_in_der_wahl(tmp_path):
+    root, state = _baue_mit_auto(tmp_path, ["2026-09-15", "2026-09-16"])
+    g = geraete_view.aufbereiten(state, lade_quellen(root),
+                                 lade_katalog(root), heute=HEUTE)
+    a = geraete_zeitreihe.aufbereiten(state, g["tco"])
+    ids = {m["id"] for m in a["suchindex"]}
+    assert "apple-iphone-18-pro-256" in ids
+    assert any(p["modell"] == "apple-iphone-18-pro-256" for p in a["paare"])

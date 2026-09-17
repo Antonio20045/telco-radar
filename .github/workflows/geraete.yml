@@ -117,9 +117,15 @@ jobs:
         run: |
           git config user.name "telco-radar-bot"
           git config user.email "actions@users.noreply.github.com"
-          # Gezielt nur die vier Dateien dieser Stufe. Kein `git add data/`:
-          # dieser Lauf hat mit dem Seen-Store und den Berichten nichts zu
-          # tun, und ein weiter Pfad wuerde fremde Aenderungen mitnehmen.
+          # Gezielt nur die Dateien dieser Stufe (Bestand, Preise, TCO plus
+          # die drei bedingten: TCO-Historie, Auto-Katalog, unbekannte
+          # Titel/Farben). Kein `git add data/`: dieser Lauf hat mit dem
+          # Seen-Store und den Berichten nichts zu tun, und ein weiter
+          # Pfad wuerde fremde Aenderungen mitnehmen. Die Config
+          # (config/geraete_katalog.yaml) gehoert NICHT hierher: Auto-
+          # Eintraege leben im STATE (geraete_katalog_auto.json), die
+          # Config bleibt Hand-Pflege - ein Lauf, der in die Config
+          # schriebe, mischte seine Zeilen unter die gepflegten.
           #
           # `geraete_tco.json` steht seit dem 04.09.2026 dabei. Ohne diese
           # Zeile schriebe der Lauf die SIM-only-Referenzen zwar in den
@@ -135,6 +141,17 @@ jobs:
             # Datei noch (erste Nacht ohne Buendel), darf das Add sie nicht
             # scheitern lassen und die drei oben mitziehen.
             git add data/state/geraete_tco_historie.jsonl
+          fi
+          if [ -f data/state/geraete_katalog_auto.json ]; then
+            # E4-Auto-Erkennung (17.09.2026): der Auto-Katalog und die
+            # Zaehlung unbekannter Titel/Farben sind STATE. Ohne diese
+            # Zeile schriebe der Lauf sie in den Runner, der naechste
+            # Checkout finge ohne sie an - gleiche Fehlerklasse wie der
+            # TCO-Fund oben: Messung geschrieben, nie angekommen.
+            git add data/state/geraete_katalog_auto.json
+          fi
+          if [ -f data/state/geraete_unbekannt.jsonl ]; then
+            git add data/state/geraete_unbekannt.jsonl
           fi
           if git diff --cached --quiet; then
             echo "Keine Aenderung am Geraetebestand."

@@ -640,6 +640,15 @@ class Geraet:
     segment: str = ""             # flagship | premium | mid | entry
     speicher: list = field(default_factory=list)
     aliase: list = field(default_factory=list)
+    # E4-Auto-Erkennung: ISO-Datum des Laufs, der diesen Eintrag aus einem
+    # STRUKTURIERTEN Live-Namen angelegt hat (Telekom `name`, o2
+    # `description`, Vodafone `modelName` - nie aus einem Haendlertitel).
+    # Leer = Hand-Eintrag aus config/geraete_katalog.yaml. Auto-Eintraege
+    # leben im STATE (data/state/geraete_katalog_auto.json); uebernimmt sie
+    # ein Mensch in die Config, schlaegt der Hand-Eintrag beim Laden. Die
+    # device_id bleibt darueber stabil - sie haengt an Hersteller+Modell,
+    # nicht am Weg des Eintrags in den Katalog.
+    auto: str = ""
 
     @property
     def device_id(self) -> str:
@@ -705,6 +714,59 @@ class Katalog:
     def nach_id(self, gid: str) -> Optional[Geraet]:
         return self._index.get(gid)
 
+    def ergaenze(self, geraet: Geraet) -> bool:
+        """Einen Eintrag zur LAUFZEIT anlegen (E4-Auto-Erkennung).
+
+        Gibt False zurueck, statt zu werfen, wenn die device_id schon
+        existiert oder eine Schreibweise nach der Normalisierung nicht von
+        einer bestehenden unterscheidbar ist - beides ist der
+        Kollisionswaechter: der Hand-Eintrag (oder der fruehere
+        Auto-Eintrag) schlaegt den neuen, und die Erkennung bleibt
+        eindeutig. `__post_init__` wirft bei derselben Lage beim LADEN -
+        hier darf nicht geworfen werden, weil der Lauf sonst an einem
+        neuem Shop-Namen stranden wuerde.
+        """
+        if geraet.device_id in self._index:
+            return False
+        belegt = {tuple(nadel): treffer for nadel, treffer in self._muster}
+        neu: list = []
+        for s in geraet.schreibweisen:
+            marken = wortmarken(s)
+            if not marken:
+                continue
+            schluessel = tuple(marken)
+            vorher = belegt.get(schluessel)
+            if vorher is not None and vorher is not geraet:
+                return False          # nicht unterscheidbar, siehe __post_init__
+            belegt[schluessel] = geraet
+            neu.append((marken, geraet))
+        self.geraete.append(geraet)
+        self._index[geraet.device_id] = geraet
+        self._muster.extend(neu)
+        self._muster.sort(key=lambda p: -len(p[0]))
+        return True
+
+    def ergaenze_speicher(self, gid: str, stufe) -> bool:
+        """Eine Speicherstufe an einen BESTEHENDEN Auto-Eintrag anhaengen.
+
+        Nur Auto-Eintraege: die speicher-Liste eines Hand-Eintrags ist die
+        gepflegte Filtermenge der Config, und ein Lauf ueberschreibt keine
+        Hand-Pflege (dieselbe Regel wie beim Anlegen). Gibt True zurueck,
+        wenn die Stufe neu war.
+        """
+        geraet = self._index.get(gid)
+        if geraet is None or not geraet.auto:
+            return False
+        try:
+            wert = int(stufe)
+        except (TypeError, ValueError):
+            return False
+        if wert in geraet.speicher:
+            return False
+        geraet.speicher.append(wert)
+        geraet.speicher.sort()
+        return True
+
     def vorgaenger_von(self, gid: str) -> Optional[Geraet]:
         g = self._index.get(gid)
         if not g or not g.vorgaenger_device_id:
@@ -744,6 +806,27 @@ def _ist_zubehoer(marken: list, ab: int = 0) -> bool:
     if any(m in _ZUBEHOER_IMMER for m in marken):
         return True
     return any(m in _ZUBEHOER_DAVOR for m in marken[:ab])
+
+
+def ist_zubehoer(marken: list, ab: int = 0) -> bool:
+    """Oeffentlicher Zugang zur Zubehoerpruefung fuer die Auto-Erkennung.
+
+    Dieselbe Tabelle wie in `erkennt_geraet` - eine zweite Liste derselben
+    Woerter waere eine Kopie, die driftet, und dann legte die Auto-Erkennung
+    eines Tages Zubehoer als Geraet an, das die Erkennung verwirft.
+    """
+    return _ist_zubehoer(marken, ab)
+
+
+def ist_modellzusatz(wort: str) -> bool:
+    """Oeffentlicher Zugang zur Modellzusatz-Tabelle fuer die Auto-Erkennung.
+
+    Dieselbe Liste wie in `erkennt_geraet` („Pixel 10 Pro Fold" ist nicht
+    „Pixel 10 Pro"): eine zweite Kopie derselben Woerter wuerde driften,
+    und dann pruefte der Kollisionswaechter der Auto-Anlage eines Tages mit
+    anderen Worten als die Zuordnung, die er schuetzen soll.
+    """
+    return (wort or "").strip().lower() in _MODELLZUSATZ
 
 
 def erkenne_geraet(titel: str, katalog: Katalog) -> Optional[Geraet]:

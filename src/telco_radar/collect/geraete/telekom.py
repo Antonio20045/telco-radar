@@ -285,6 +285,11 @@ def lies(text: str, url: str = "") -> list[dict]:
             "titel": " ".join(x for x in (name,
                                           f"{speicher} GB" if speicher else "",
                                           farbe) if x),
+            # Der strukturierte NAME (Feld `name`), unveraendert - die einzige
+            # Grundlage der E4-Auto-Erkennung. Der TITEL darueber ist
+            # zusammengesetzt (Name + Speicher + Farbe) und wuerde als
+            # Namensquelle Saegezahn-IDs erzeugen ("iPhone 18 Pro polar").
+            "strukturierter_name": name,
             "preis": form["gesamt"],
             "anzahlung": form["anzahlung"],
             "monatsrate": form["monatsrate"],
@@ -428,6 +433,7 @@ def lies_buendel(text: str, url: str = "") -> list[dict]:
             "titel": " ".join(x for x in (name,
                                           f"{speicher} GB" if speicher else "",
                                           farbe) if x),
+            "strukturierter_name": name,
             "farbe": farbe,
             "speicher_gb": speicher,
             "sku": str(eintrag.get("id") or "").strip(),

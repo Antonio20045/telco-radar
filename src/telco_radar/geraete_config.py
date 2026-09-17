@@ -173,7 +173,17 @@ class QuellenConfig:
 # --------------------------------------------------------------------------
 
 def lade_katalog(root: Path) -> Katalog:
-    """config/geraete_katalog.yaml -> Katalog.
+    """config/geraete_katalog.yaml -> Katalog, MIT den Auto-Eintraegen aus
+    dem STATE (data/state/geraete_katalog_auto.json, E4).
+
+    Das ist die EINE Quelle der Wahrheit: Pipeline und Seite (render_site
+    laedt ueber denselben Weg) sehen denselben gemergten Bestand. Ohne den
+    Merge an DIESER Stelle wuerde der Lauf Listungen zu einem Geraet
+    schreiben, das die Seite nie rendert - gebaut, geprüft, unsichtbar
+    (derselbe Fehlertyp wie der Navigationseintrag am 11.08.2026). Der
+    Hand-Eintrag schlaegt: gleiche device_id wird aus der Config genommen,
+    der State-Eintrag verworfen (autoerkennung.lade_auto_zusaetze samt
+    Kollisionswaechter und Protokoll).
 
     Ein Eintrag ohne `hersteller` oder `modell` wird verworfen und gemeldet;
     ein doppelter Eintrag laesst den Katalog werfen (Katalog.__post_init__) -
@@ -182,31 +192,38 @@ def lade_katalog(root: Path) -> Katalog:
     """
     path = Path(root) / "config" / "geraete_katalog.yaml"
     if not path.exists():
-        return Katalog(geraete=[])
-    with open(path, "r", encoding="utf-8") as fh:
-        raw = yaml.safe_load(fh) or {}
-    geraete = []
-    for g in (raw.get("geraete") or []):
-        if not isinstance(g, dict):
-            continue
-        hersteller = str(g.get("hersteller") or "").strip()
-        modell = str(g.get("modell") or "").strip()
-        if not hersteller or not modell:
-            log.warning("geraete_katalog: Eintrag ohne hersteller/modell verworfen: %r", g)
-            continue
-        generation = g.get("generation")
-        geraete.append(Geraet(
-            hersteller=hersteller,
-            modell=modell,
-            marktstart=str(g.get("marktstart") or "").strip(),
-            generation=int(generation) if str(generation or "").strip().isdigit() else None,
-            vorgaenger=str(g.get("vorgaenger") or "").strip(),
-            segment=str(g.get("segment") or "").strip(),
-            speicher=[int(s) for s in (g.get("speicher") or [])
-                      if str(s).strip().isdigit()],
-            aliase=[str(a).strip() for a in (g.get("aliase") or []) if str(a).strip()],
-        ))
-    return Katalog(geraete=geraete)
+        katalog = Katalog(geraete=[])
+    else:
+        with open(path, "r", encoding="utf-8") as fh:
+            raw = yaml.safe_load(fh) or {}
+        geraete = []
+        for g in (raw.get("geraete") or []):
+            if not isinstance(g, dict):
+                continue
+            hersteller = str(g.get("hersteller") or "").strip()
+            modell = str(g.get("modell") or "").strip()
+            if not hersteller or not modell:
+                log.warning("geraete_katalog: Eintrag ohne hersteller/modell verworfen: %r", g)
+                continue
+            generation = g.get("generation")
+            geraete.append(Geraet(
+                hersteller=hersteller,
+                modell=modell,
+                marktstart=str(g.get("marktstart") or "").strip(),
+                generation=int(generation) if str(generation or "").strip().isdigit() else None,
+                vorgaenger=str(g.get("vorgaenger") or "").strip(),
+                segment=str(g.get("segment") or "").strip(),
+                speicher=[int(s) for s in (g.get("speicher") or [])
+                          if str(s).strip().isdigit()],
+                aliase=[str(a).strip() for a in (g.get("aliase") or []) if str(a).strip()],
+            ))
+        katalog = Katalog(geraete=geraete)
+    # Lazy import: collect.geraete importiert seinerseits dieses Modul nicht,
+    # aber das Paket-__init__ zieht httpx/bs4 - das gehoert nicht an die
+    # Ladezeit dieser (leichtgewichtigen) Konfigurationsschicht.
+    from .collect.geraete import autoerkennung
+    autoerkennung.lade_auto_zusaetze(Path(root), katalog)
+    return katalog
 
 
 def lade_farben(root: Path) -> dict:

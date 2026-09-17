@@ -76,6 +76,11 @@ SCHMAL_W, SCHMAL_MIN_H = 358, 380
 # Geräte"); die Zahl ist eine Obergrenze, kein Soll.
 KACHELN_MAX = 6
 
+# E4-Sichtbarkeit: ein AUTO angelegtes Modell wird in der WAHL dieser
+# Ansicht erst ab dieser Zahl unterschiedlicher Messtage gefuehrt (der
+# Katalog-Reiter zeigt es ab Tag 1, die Listung existiert ab Tag 1).
+AUTO_SICHTBAR_AB_MESTAGEN = 2
+
 
 def _euro(betrag) -> str:
     """1.234,56 € - dieselbe Schreibweise wie ueberall auf der Seite."""
@@ -637,11 +642,36 @@ def aufbereiten(state_dir: Path, tco: dict) -> dict:
     band_katalog = {b["key"]: b for b in tco.get("baender_katalog") or []}
     serien_alle = _serien(state_dir, tco)
 
+    # E4-SICHTBARKEIT: ein AUTO angelegtes Modell steht in der WAHL (Such-
+    # index, Kacheln, Paare) erst ab 2 Messtagen. Die Listung existiert ab
+    # Tag 1 und der KATALOG-Reiter zeigt das Geraet ab Tag 1 - aber die
+    # Zeitreihe ist eine TCO-Aussage, und ein Messtag ist noch keine; zwei
+    # Naechte Bestand bestätigen ausserdem, dass der strukturierte Name kein
+    # Einmal-Fund war. Hand-Eintraege gelten unbegrenzt (der Mensch hat
+    # entschieden, dass das Geraet verfolgt wird). KEIN Deckel am Vorrat
+    # im Sinne von QA-B1: die Regel ist eine Sichtbarkeitsentscheidung aus
+    # der Messlage, keine Auswahl nach Listenposition.
+    messtage_je_modell: dict[str, set] = {}
+    for (mid, _band), anbieter_serien in serien_alle.items():
+        messtage_je_modell.setdefault(mid, set()).update(
+            _messtage(anbieter_serien))
+    wahl = [m for m in modelle
+            if not m.get("auto")
+            or len(messtage_je_modell.get(m["id"], ())) >=
+            AUTO_SICHTBAR_AB_MESTAGEN]
+    wahl_ids = {m["id"] for m in wahl}
+    verdeckt = sorted(m.get("titel") or m["id"] for m in modelle
+                      if m["id"] not in wahl_ids)
+    if verdeckt:
+        log.info("Zeitreihe: %d Auto-Modell(e) unter %d Messtagen - noch "
+                 "nicht waehlbar: %s", len(verdeckt),
+                 AUTO_SICHTBAR_AB_MESTAGEN, ", ".join(verdeckt))
+
     # Die Paare: jedes (Modell, Band) mit mindestens einer Zeile - auch
     # ohne Historie (dann mit dem ehrlichen Leer-Satz).
     paare: list[dict] = []
     erlaubt: dict[str, list[str]] = {}
-    for modell in modelle:
+    for modell in wahl:
         zeilen_je_band = _band_zeilen(modell)
         bands = [b for b, s in zeilen_je_band.items() if s["zeilen"]]
         erlaubt[modell["id"]] = bands
@@ -764,7 +794,11 @@ def aufbereiten(state_dir: Path, tco: dict) -> dict:
     daten = {
         "vorgabe": (start or {}).get("modell", ""),
         "start_band": (start or {}).get("band", ""),
-        "modelle_gesamt": tco.get("modelle_gesamt") or len(modelle),
+        # Die Trefferzahl des Suchfelds meint die WAHL-Menge - nicht die
+        # Modellzahl der Hauptansicht (tco.modelle_gesamt): ein Auto-Modell
+        # unter der Messtag-Schwelle ist nicht auffindbar und darf nicht
+        # mitgezaehlt werden (die Zahl meint die Menge, CLAUDE.md-Regel).
+        "modelle_gesamt": len(wahl),
         "suchindex": suchindex,
         "erlaubt": erlaubt,
         "titel": {m["id"]: m.get("titel") or m["id"] for m in modelle},

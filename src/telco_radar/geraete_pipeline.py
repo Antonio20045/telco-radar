@@ -39,6 +39,7 @@ from .analyze.tco_buendel import aus_rohsaetzen
 from .analyze.tco_store import TcoDB
 from .tarif_bezug import Tarifbestand
 from .collect.geraete import ADAPTER, sammle
+from .collect.geraete import autoerkennung
 from .collect.geraete.congstar import ergaenze_pib_slug
 from .collect.tarif_einsundeins_simonly import ANBIETER as SIMONLY_ANBIETER
 from .collect.tarif_einsundeins_simonly import sammle as sammle_simonly
@@ -122,6 +123,11 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
     root = Path(root)
 
     katalog = lade_katalog(root)
+    # E4-Auto-Erkennung: lade_katalog MERGED die Auto-Eintraege aus dem
+    # STATE dazu (eine Quelle der Wahrheit - die Seite laedt denselben
+    # Weg); der Hand-Eintrag schlaegt (gleiche device_id bleibt beim
+    # Config-Eintrag, der Rest faellt an den Kollisionswaechter).
+    auto_vorher = len([g for g in katalog.geraete if g.auto])
     farben = lade_farben(root)
     quellen = lade_quellen(root)
     if not quellen.anbieter or not katalog.geraete:
@@ -410,6 +416,27 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
                     len(kollisionen),
                     "; ".join(f"{lid} <- {titel!r}"
                               for lid, titel in kollisionen[:12]))
+
+    # E4-AUTO-ERKENNUNG: den gewachsenen Katalog und die unbekannten
+    # Titel/Farben persistieren. Beides ist STATE und wird vom Lauf
+    # geschrieben (geraete.yml committet ihn mit) - nie von Hand gepflegt.
+    auto_eintraege = [g for g in katalog.geraete if g.auto]
+    auto_neu = max(0, len(auto_eintraege) - auto_vorher)
+    if auto_eintraege:
+        autoerkennung.speichere_auto_zusaetze(root, katalog)
+    if auto_neu:
+        log.info("Geraeteradar: Auto-Erkennung hat %d neue Katalog-"
+                 "Eintraege angelegt (Auto-Bestand %d, Stand via data/state/"
+                 "geraete_katalog_auto.json): %s",
+                 auto_neu, len(auto_eintraege),
+                 " | ".join(f"{g.hersteller} {g.modell} (auto:{g.auto})"
+                            for g in auto_eintraege[-auto_neu:]))
+    unbekannte = ergebnis.get("unbekannte") or []
+    if unbekannte:
+        zeilen = autoerkennung.persistiere_unbekannte(root, unbekannte, heute)
+        log.info("Geraeteradar: %d unbekannte Titel/Farben in data/state/"
+                 "geraete_unbekannt.jsonl gezaehlt (%d Zeilen Bestand)",
+                 len(unbekannte), zeilen)
     bilanz = {
         "status": "ok",
         "anbieter": bilanzen,
@@ -432,6 +459,10 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
         "buendel_neu": neue_buendel,
         "buendel_ohne_tarif": buendelbilanz.ohne_tarif if buendelbilanz else 0,
         "kollisionen": len(kollisionen),
+        # E4-Auto-Erkennung: wie viele Katalog-Eintraege der Lauf selbst
+        # angelegt hat, und wie gross der Auto-Bestand danach ist.
+        "auto_neu": auto_neu,
+        "auto_eintraege": len(auto_eintraege),
         # Der Massstab aus dem Tarifbestand - in der Bilanz, damit ein
         # stiller Ausfall auffaellt. Steht hier 0, waehrend `tarife.jsonl`
         # gefuellt ist, hat der Schreibversuch geworfen.
