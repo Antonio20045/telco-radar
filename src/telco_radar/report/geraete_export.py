@@ -109,11 +109,29 @@ SPALTEN_TCO = [
 # rechnet keine einzige Prozentzahl selbst, sie liest sie aus der
 # Aufbereitung, die auch die Seite rendert - zwei Rechnungen fuer dieselbe
 # Zahl sind zwei Zahlen (CLAUDE.md §6).
+#
+# E5 (AUFTRAG_GERAETE_EINE_SEITE_V2 §7, 17.09.2026): die PREIS-ALARME
+# kommen als dritte Zeilenart dazu - der Radar-Reiter trägt seit E3 drei
+# Sektionen (Alarme / Abweichung / Händler), und eine Datei, die zwei von
+# dreien deckt, lässt die Frage "welcher Wettbewerb ist günstiger?" in der
+# anderen Beantwortung aus. Die Alarmzeilen stehen ERSTEN in der Datei,
+# dieselbe Reihenfolge wie die Sektionen der Seite. Ihre Abweichung ist
+# der BETRAG ohne Vorzeichen - dieselbe Sprache wie die Alarmtabelle
+# (E3-Fix B2: jede Alarmzeile ist per Definition ein Wettbewerber-Vorteil,
+# ein Minuszeichen trüge nichts bei); Status trägt die ALARM-STUFE
+# (Kritisch/Mittel/Gering), nicht den Vergleichsstatus der TCO-Zeilen.
 SPALTEN_RADAR = [
     "Art", "Modell", "Hersteller", "Speicher GB", "Anbieter", "Tarif",
     "Tarifband", "Status", "Abweichung %", "Wettbewerber-Preis EUR",
     "Vodafone-Preis EUR", "Preisart", "Grund", "Abgerufen am", "Quelle",
 ]
+
+# Die drei Zeilenarten der Radar-Datei - dieselben Wörter, mit denen die
+# Sektionen der Seite überschrieben sind (S3). Ein zweites Wort für dieselbe
+# Art wäre ein zweites Etikett für eine Sache.
+ART_ALARM = "Preis-Alarm"
+ART_NETZ = "Netzbetreiber TCO-24"
+ART_HAENDLER = "Händler Barpreis"
 
 
 def _zahl(wert) -> str:
@@ -200,8 +218,41 @@ def tco_csv(zeilen: dict) -> tuple[str, int]:
     return _schreibe(SPALTEN_TCO, ausgabe), len(ausgabe)
 
 
+def _alarm_zeilen(alarme: dict) -> list[list[str]]:
+    """Die Alarmzeilen der Radar-Aufbereitung als Tabellenzeilen.
+
+    `alarme` ist `wettbewerbsradar.radar()["alarme"]` - die Aufbereitung
+    aus `geraete_alarme.zeilen()`, VOLLSTAENDIG durchgereicht: `sichtbar`
+    und `rest` sind zusammen die ganze Tabelle (der Deckel kappt nur die
+    Ansicht). Gelesen wird genau das, was die Zeile der Seite trägt -
+    Prozent, beide Preise, Laden, Abrufdatum -, nichts wird hier gerechnet.
+
+    `bestimmt` markiert Ausreißer (`auffaellig` aus `geraete_pruefung`):
+    ein Ausreißer wird gemeldet statt gelöscht, und gemeldet heißt in
+    einer Datei: in der Grundspalte, am selben Ort, an dem die Seite ihn
+    neben die Zahl setzt.
+    """
+    alarme = alarme or {}
+    zeilen = list(alarme.get("sichtbar") or []) + list(alarme.get("rest") or [])
+    ausgabe = []
+    for z in zeilen:
+        bester = z.get("bester") or {}
+        unser = z.get("unser") or {}
+        ausgabe.append([
+            ART_ALARM, z.get("modell", ""), z.get("hersteller", ""),
+            z.get("speicher", "") or "", bester.get("laden", ""), "", "",
+            z.get("stufe_name", ""),
+            _prozent(z.get("prozent")), _zahl(bester.get("preis")),
+            _zahl(unser.get("preis")), "Gerätepreis ohne Vertrag",
+            ("ungewöhnlich großer Abstand – Quelle prüfen"
+             if z.get("auffaellig") else ""),
+            bester.get("abgerufen_am", ""), bester.get("url", ""),
+        ])
+    return ausgabe
+
+
 def radar_csv(view: dict) -> tuple[str, int]:
-    """Der Wettbewerbs-Radar als CSV - Netzbetreiber-TCO und Händlerpreis.
+    """Der Wettbewerbs-Radar als CSV - Alarme, Netzbetreiber-TCO, Händlerpreis.
 
     `view` ist die Aufbereitung aus `report/wettbewerbsradar.radar()` -
     dieselbe, die die Seite rendert. Die Abweichungsspalte wird daraus
@@ -211,12 +262,17 @@ def radar_csv(view: dict) -> tuple[str, int]:
     ohne dass es ein Test sieht. Nicht vergleichbare Zeilen stehen mit
     ihrem STATUS statt einer Zahl - der Export schreibt den Bestand, die
     Ansicht kappt ihn.
+
+    E5: die Alarmzeilen stehen ERSTEN - dieselbe Reihenfolge wie die drei
+    Sektionen des Radar-Reiters (Alarme / Abweichung / Händler). Wer die
+    Datei nach der Art spaltet, bekommt die Sektionen der Seite als
+    Filterwerte.
     """
-    ausgabe = []
+    ausgabe = _alarm_zeilen((view or {}).get("alarme"))
     for g in (view or {}).get("gruppen", []):
         for z in g.get("zeilen", []):
             ausgabe.append([
-                "Netzbetreiber TCO-24", g.get("titel", ""),
+                ART_NETZ, g.get("titel", ""),
                 g.get("hersteller", ""), g.get("speicher", "") or "",
                 z.get("anbieter", ""), z.get("tarif", ""),
                 z.get("band_label", ""), z.get("status", ""),
@@ -227,7 +283,7 @@ def radar_csv(view: dict) -> tuple[str, int]:
             ])
     for z in (view or {}).get("haendler", []):
         ausgabe.append([
-            "Händler Barpreis", z.get("modell", ""), z.get("hersteller", ""),
+            ART_HAENDLER, z.get("modell", ""), z.get("hersteller", ""),
             z.get("speicher", "") or "", z.get("anbieter", ""), "", "", "",
             _prozent(z.get("prozent")), _zahl(z.get("preis")),
             _zahl(z.get("vodafone_preis")), "Gerätepreis ohne Vertrag", "",
