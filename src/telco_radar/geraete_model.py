@@ -499,7 +499,7 @@ _ZUSTAND_TRENNER = r"[\s._\-]+"
 
 
 def _zustandsmuster(wort: str) -> str:
-    """Das Suchmuster fuer ein Kennzeichen der Wortliste.
+    r"""Das Suchmuster fuer ein Kennzeichen der Wortliste.
 
     Jedes Teilwort maskiert, die Teile mit `_ZUSTAND_TRENNER` verbunden -
     "b-ware" trifft damit "B-Ware", "B Ware" und "b.ware".
