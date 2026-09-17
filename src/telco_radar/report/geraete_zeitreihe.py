@@ -127,6 +127,24 @@ def _kurz_name(modell: dict) -> str:
     return titel
 
 
+def _satz_name(modell: dict) -> str:
+    """Der Name im Antwort-Satz: MIT Hersteller, wenn der Katalog ihn kennt.
+
+    `_kurz_name` schneidet den Hersteller fuer Kacheln und Vorschauen ab -
+    im Fliesstext liest sich „Beim 17 im Band Mittel" (Xiaomi 17) als Zahl
+    ohne Bezug. Der Satz nennt deshalb den Hersteller aus dem Katalog-/Auto-
+    Eintrag vor dem Kurznamen. Fehlt er im Eintrag, bleibt der Kurzname
+    stehen - geraten wird nichts (Antonios Regel: keine Vermutung, wo der
+    Katalog schweigt).
+    """
+    kurz = _kurz_name(modell)
+    hersteller = (modell.get("hersteller") or "").strip()
+    if not hersteller or kurz == hersteller or kurz.startswith(
+            hersteller + " "):
+        return kurz
+    return f"{hersteller} {kurz}"
+
+
 def _esc(text: str) -> str:
     return (str(text).replace("&", "&amp;").replace("<", "&lt;")
             .replace(">", "&gt;").replace('"', "&quot;"))
@@ -257,7 +275,7 @@ def _luecke_text(luecken: list, band_labels: dict) -> str | None:
 
 def _antwort_html(modell: dict, band: str, zeilen: list,
                   band_katalog: dict) -> str:
-    name = _esc(_kurz_name(modell))
+    name = _esc(_satz_name(modell))
     label = band_katalog.get("label", band)
     bereich = band_katalog.get("bereich") or ""
     klammer = f" ({bereich})" if bereich else ""
@@ -689,7 +707,7 @@ def aufbereiten(state_dir: Path, tco: dict) -> dict:
                 seit = tco.get("historie_lage") or {}
                 seit_text = (f"seit dem {_datum_de(seit['seit'])}"
                              if seit.get("seit") else "")
-                leer = (f"Für {_kurz_name(modell)} im Band "
+                leer = (f"Für {_satz_name(modell)} im Band "
                         f"{band_katalog.get(band, {}).get('label', band)} "
                         f"liegt noch keine Messreihe vor - die Zeitreihe "
                         f"beginnt {seit_text} und wächst mit jedem "
