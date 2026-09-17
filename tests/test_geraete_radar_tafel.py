@@ -274,6 +274,34 @@ def test_die_haendler_sektion_steht_nicht_mehr_ganz_unten_als_rest(tmp_path):
                                                 "wr-haendler"]
 
 
+def test_der_tafelkopf_polt_nur_die_sektionen_mit_vorzeichen(tmp_path):
+    """E3-Fix (QA 17.09.2026, B2): Der Tafelkopf sagte, die Leitzahl gelte
+    'mit Vorzeichen' für ALLE drei Sektionen - die Alarmtabelle zeigt
+    denselben Abstand aber als positiven BETRAG (Stufen, Sortierung und
+    Export der Alarme sind Betrags-Sprache: '41,3 %' heißt dort
+    Wettbewerber günstiger, in der Modellliste heißt dasselbe '−41,3 %').
+    Der Leser sah auf EINER Tafel −55,5 % und +41,3 % für dieselbe
+    Richtung der Aussage. Der Kopf muss die Wahrheit sagen: Vorzeichen in
+    Modellliste und Händlern, Betrag ohne Vorzeichen in den Preis-Alarmen
+    - und die Alarmtabelle bleibt Betrags-Tabelle (keine Zeile trägt ein
+    Minus, für das der Kopf keine Regel mehr nennt)."""
+    suppe = _suppe(tmp_path)
+    tafel = suppe.select_one("#tafel-radar")
+    kopf = _text(tafel.select_one("#radar > p.gr-erklaer"))
+    assert kopf, "der Erklärsatz des Tafelkopfs fehlt"
+    # Die Pauschalbehauptung ('mit Vorzeichen' für alle drei) ist weg …
+    assert "Die drei Sektionen messen sie" not in kopf, kopf
+    # … und die Alarme sind als BETRAG benannt, nicht als vorzeichen-
+    # behaftete Leitzahl:
+    assert "Betrag ohne Vorzeichen" in kopf, kopf
+    # Die Gegenseite der Zusicherung: die Alarmtabelle zeigt Beträge -
+    # jede sichtbare Prozentzahl ist positiv (Wettbewerber günstiger).
+    werte = [float(z.get("data-s-prozent"))
+             for z in tafel.select("#wr-alarme .gr-a-zeile[data-s-prozent]")]
+    assert werte, "Fixture ohne Alarmzeilen - der Test prüfte nichts"
+    assert all(w > 0 for w in werte), werte
+
+
 # --------------------------------------------------------------------------
 # S2: die Abweichungstabelle IST die Modell-Liste
 # --------------------------------------------------------------------------

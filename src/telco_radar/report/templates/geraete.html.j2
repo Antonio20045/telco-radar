@@ -468,11 +468,20 @@
 <div class="gr-tafel gr-tafel--aus" id="tafel-radar" role="tabpanel">
 <section class="gr-radar" id="radar">
   <h2 class="rubrik">Bei welchem Gerät ist Vodafone teurer als der Wettbewerb?</h2>
-  <p class="gr-erklaer">Leitzahl ist die Abweichung in Prozent mit
-  Vorzeichen – negativ heißt: ein Wettbewerber ist günstiger. Die drei
-  Sektionen messen sie im Barpreis ohne Vertrag, in den Gesamtkosten
-  über 24 Monate (TCO-24) und im Gerätepreis der Händler ohne
-  Finanzierung.</p>
+  {# E3-Fix (QA 17.09.2026, B2): Der Kopf behauptete die vorzeichenbehaftete
+     Leitzahl für ALLE drei Sektionen - die Alarmtabelle zeigt denselben
+     Abstand aber als positiven BETRAG (ihre Stufen, ihre Sortierung und
+     ihr Export sind Betrags-Sprache: jede ihrer Zeilen ist per Definition
+     ein Wettbewerber-Vorteil, ein Minuszeichen wäre in jeder Zeile dasselbe
+     und trüge nichts bei). Der Kopf nennt deshalb die Zeichenregel NUR für
+     die Sektionen, die sie tragen, und die Alarme als Betrag - sonst liest
+     der Leser −55,5 % (Modellliste) und +41,3 % (Alarme) als Widerspruch
+     auf einer Tafel. #}
+  <p class="gr-erklaer">Leitzahl ist die Abweichung zu Vodafone in Prozent.
+  Modellliste und Händler tragen sie mit Vorzeichen – negativ heißt: ein
+  Wettbewerber ist günstiger. Die Preis-Alarme zeigen denselben Abstand
+  als Betrag ohne Vorzeichen; jede Alarmzeile ist ein Fall, in dem ein
+  Wettbewerber günstiger ist.</p>
   <div id="gr-radar-inhalt">{{ radar_tafel(wettbewerbsradar) }}</div>
 </section>
 </div>
