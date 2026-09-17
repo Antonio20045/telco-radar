@@ -665,7 +665,13 @@
     </tbody>
   </table>
   </div>
-  <p class="gr-erklaer gr-a-leer" hidden>Zu dieser Auswahl steht keine Zeile im
+  {# Der Leer-Satz ist ein FILTER-Satz - aber bei NULL Zeilen im ganzen
+     Bestand ist er der benannte LeerZUSTAND und steht serverseitig offen
+     da (E5, Leer-Sicherung "Katalog leer"): eine Tafel, die nur aus
+     Spaltenköpfen besteht, ohne ein Wort dazu, liest sich als kaputte
+     Seite. app.js blendet ihn bei Filterung ein und aus, wie bisher. #}
+  <p class="gr-erklaer gr-a-leer"{% if geraete.katalogtabelle | length
+    %} hidden{% endif %}>Zu dieser Auswahl steht keine Zeile im
   Bestand.</p>
   {# P1 (dritte Nachbesserung, 31.08.2026): die Bedingung fragt jetzt
      `zeilen_rest` ab, nicht mehr nur die Gesamtzahl gegen den

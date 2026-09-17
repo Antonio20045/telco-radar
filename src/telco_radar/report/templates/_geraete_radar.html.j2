@@ -174,7 +174,12 @@
 {% endif %}
 
 {# --- SEKTION 2: alle Modelle nach Abweichung (DIE Modell-Liste, S2) ----- #}
-{% if wr.hat_daten %}
+{# E5 (17.09.2026): das hat_daten-Gatter ist GEFALLEN. Bis hierhin stand
+   die ganze Sektion nur da, wenn Bündel existieren - ohne Bündel fehlte
+   sie STILL (kein Satz, keine Überschrift), und genau das ist der
+   O4-Evaluator-Befund: ein toter Adapter stünde wochenlang als grüne
+   Leer-Tafel live. Jetzt rendert ihr benannter Leerzustand ("Noch keine
+   Modelle mit Bündeldaten erhoben"), sobald die Liste leer ist. #}
 <section class="wr-sektion gr-r-sektion" id="wr-abweichung">
   <h3 class="gr-unter">Alle Modelle nach Abweichung zu Vodafone</h3>
   <p class="gr-erklaer">Gesamtkosten über 24 Monate (TCO-24): jede Zeile
@@ -218,7 +223,6 @@
   Liste füllt sich mit dem nächsten Lauf.</p>
   {% endif %}
 </section>
-{% endif %}
 
 {# --- SEKTION 3: Händler – Gerätepreis ohne Finanzierung -----------------
    S3: ein EIGENER, gleichwertiger Abschnitt. Bis E3 standen diese Zeilen
