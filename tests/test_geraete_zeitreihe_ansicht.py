@@ -324,6 +324,20 @@ def test_der_antwort_satz_nennt_die_vodafone_referenz(ansicht):
     assert "Vodafone" in text and "1.105,00 €" in text
 
 
+def test_der_antwort_satz_polt_den_abstand_zur_referenz_richtig(ansicht):
+    """E3-Fix (QA 17.09.2026, B1): Der Anhang nannte den Abstand des
+    GÜNSTIGSTEN Angebots immer 'über der Vodafone-Referenz' - die Zeilen
+    stehen aufsteigend, die Differenz eigen − beste ist also IMMER positiv,
+    und der Beste liegt UNTER der Referenz, sobald ein Wettbewerber führt.
+    Dasselbe Δ-Vorzeichen wie die Bündel-Karte desselben Angebots (S4):
+    unter heißt günstiger. 1&1 (841,00 €) liegt 264,00 € UNTER der
+    Vodafone-Referenz (1.105,00 €) - die Karte darunter sagt genau das."""
+    paar = _paar(ansicht, ("apple-iphone-17-pro-256", "klein"))
+    text = __import__("re").sub(r"<[^>]+>", "", paar["antwort_html"])
+    assert "264,00 € unter der Vodafone-Referenz" in text, text
+    assert "über der Vodafone-Referenz" not in text, text
+
+
 def test_der_antwort_satz_endet_auf_genau_einem_punkt(ansicht):
     # Der Startzustand laeuft durch den Referenz-Zweig (1&1 am
     # guenstigsten, Vodafone-Referenz im selben Satz) - genau der
