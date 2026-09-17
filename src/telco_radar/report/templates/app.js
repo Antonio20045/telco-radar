@@ -930,9 +930,10 @@ var TelcoFrage = (function () {
 
   function element(id) { return document.getElementById(id); }
 
-  /* --- Deep-Link ?modell=&band= (bleibt: die 88 Querlinks des Radars
-     nutzen ?modell=). Eine unbekannte id faellt still aufs Startgeraet
-     zurueck - derselbe Grundsatz wie zuvor. */
+  /* --- Deep-Link ?modell=&band= (bleibt: die 88 Sprung-Links der
+     Abweichungstafel nutzen ?modell=, und Lesezeichen aus der Zeit der
+     eigenen Radar-Seite ebenso). Eine unbekannte id faellt still aufs
+     Startgeraet zurueck - derselbe Grundsatz wie zuvor. */
   try {
     var params = new URLSearchParams(location.search);
     var wunschM = params.get('modell');
