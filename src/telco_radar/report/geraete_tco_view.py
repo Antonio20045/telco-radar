@@ -620,7 +620,7 @@ def _export_zeilen(buendel: list, massstab: list, eintraege: list, katalog,
 
 def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
                 lesbar: bool = True, tarife: dict | None = None,
-                historie=None, anbieter_typen: dict | None = None,
+                anbieter_typen: dict | None = None,
                 tco_historie: dict | None = None) -> dict:
     """Alles, was der Reiter "Was kostet es" braucht.
 
@@ -817,9 +817,12 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         modell["band_leer"] = (None if modell["baender"]
                                else geraete_tco_band.BAND_LEER_TEXT)
 
-    reihen = (geraete_tco_karten.historienreihen(eintraege, historie, katalog)
-              if historie is not None else [])
-    g2 = geraete_tco_grafik.historie(reihen)
+    # P2 (Antonio F4, 17.09.2026): der G2-Leser ist GEFALLEN - die Markt-
+    # Historie (`geraete_tco_karten.historienreihen` +
+    # `geraete_tco_grafik.historie`) hatte keinen Vorlagen-Platz mehr und
+    # ist mit ihm geloescht. Der Parameter `historie` ist im P2-Fix mit
+    # gestrichen: die Wähler-Daten des Verlaufs-Reiters rechnet
+    # `geraete_verlauf.aufbereiten` (gleiche Preishistorie, eigener Weg).
 
     # ---- O1: der Balken-Datenknoten (seit E2 ohne Leser im Template) ---
     # E2-Anmerkung: der KNOTEN #gr-graph-daten ist mit der Balkenansicht
@@ -936,7 +939,6 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         # Grund (F-R2-3). Ein Slug als Geraetename war keins von beidem.
         "ohne_zuordnung": modelle["ohne_zuordnung"],
         "anbieter_erwartet": list(geraete_tco_karten.ANBIETER_REIHENFOLGE),
-        "g2": g2,
         # GRAPH-1: der feste Bandkatalog (§7) fuer die Tarifband-Auswahl -
         # EINMAL hier benannt, damit die Vorlage ihn nicht ein zweites Mal
         # aus der Konstante abschreibt (CLAUDE.md §6).
@@ -972,8 +974,6 @@ def leer() -> dict:
             "modelle_gesamt": 0, "ohne_zuordnung": [], "graph_daten": None,
             "haendler_seit": geraete_tco_band.HAENDLER_SEIT,
             "anbieter_erwartet": list(geraete_tco_karten.ANBIETER_REIHENFOLGE),
-            "g2": {"svg": "", "tabelle": [], "ereignisse": [], "reihen": 0,
-                   "reihen_gesamt": 0, "ausgelassen": []},
             "baender_katalog": [{"key": k, "label": l, "bereich": b}
                                 for k, l, b in geraete_tco_band.BAENDER],
             "band_je_tarif": {},

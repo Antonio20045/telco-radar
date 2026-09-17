@@ -640,8 +640,8 @@ def test_ein_kollidierender_satz_bekommt_keinen_historienpunkt(tmp_path):
     desselben Laufs auf einer ID - und die Pipeline schrieb seine Historie
     trotzdem. Bei ALDI TALK ("Galaxy A17 LTE + Starter Kit" und "Galaxy A17
     5G" auf EINER Listungs-ID) trug `geraete_preise.jsonl` deshalb je Tag
-    zwei Zeilen, und 13 von 15 Pfeilen in G2 zeigten eine Aenderung, die es
-    nie gab.
+    zwei Zeilen, und 13 von 15 Pfeilen in der (bis P2 existierenden) G2
+    zeigten eine Aenderung, die es nie gab.
 
     Hier: zwei Produktseiten, die auf dieselbe SKU treffen, mit zwei
     Preisen. Die Datenbank nimmt eine, die Historie bekommt EINE Zeile -

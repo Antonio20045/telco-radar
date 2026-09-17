@@ -938,20 +938,67 @@ def _waehle_geraet(seite, begriff="galaxy"):
     return True
 
 
-def test_ohne_auswahl_steht_kein_diagramm_da(_seite):
-    """"Solange kein Gerät gewählt ist, steht hier KEIN Diagramm. Auch kein
-    leeres." Ein leerer Rahmen sieht aus, als seien die Daten weg."""
+def test_ohne_klick_steht_das_diagramm_des_ersten_geraets_da(_seite):
+    """P2 (Antonio F4, 17.09.2026): Der Reiter beginnt mit einem Bild, nicht
+    mit einem Satz. Ohne jeden Klick ist das ERSTE Gerät der Liste gewählt
+    (nach Messtagen sortiert, das meistgemessene steht oben) - die alte
+    B4-Regel „ohne Auswahl kein Diagramm" ist bewusst gekippt; sie schützte
+    den Zustand, in dem über dem Wähler noch der feste G2-Marktgraph stand.
+    Der Leer-Satz lebt weiter als Rückbau-Zustand beim Suchfeld-Tippen
+    (siehe test_eine_neue_eingabe_raeumt_das_alte_diagramm_weg)."""
     _frisch(_seite)
     _zeige_tafel(_seite, "tafel-verlauf")
-    _seite.wait_for_timeout(80)
-    # GEMESSEN WIRD `#gr-vbild`, NICHT DER GANZE REITER. Seit Phase R
-    # steht im selben Reiter die servergerenderte Historie (G2) - sie ist
-    # keine Geraeteauswahl, sondern die Uebersicht ueber alle Reihen mit
-    # mindestens zwei Messpunkten, und sie steht bewusst ohne Klick da.
-    # Die Zusicherung dieses Tests gilt dem Diagramm ZUR AUSWAHL.
-    assert _seite.eval_on_selector_all("#gr-vbild svg", "e => e.length") == 0
+    _seite.wait_for_timeout(200)
+    assert _seite.eval_on_selector_all("#gr-vbild svg", "e => e.length") == 1
+    # Das vorausgewählte Gerät erreicht die Diagramm-Schwelle: die Fixture
+    # legt sechs Messtage an, das erste der Liste ist damit zeichnungsfähig.
+    punkte = _seite.eval_on_selector_all("#gr-vbild .gr-vpunkt", "e => e.length")
+    assert punkte >= 4, f"Auto-Auswahl zeichnet nur {punkte} Punkte"
+    # Das Suchfeld nennt das gezeichnete Gerät - sonst stünde ein Bild da,
+    # ohne dass der Leser wüsste, wessen Preis er sieht.
+    feldwert = _seite.eval_on_selector("#gr-vsuche", "e => e.value")
+    assert feldwert, "das Suchfeld nennt das vorausgewählte Gerät nicht"
     assert _seite.eval_on_selector(
-        "#gr-vleer", "e => getComputedStyle(e).display") != "none"
+        "#gr-vleer", "e => getComputedStyle(e).display") == "none", (
+        "mit Auto-Vorauswahl steht der Leer-Satz nicht im Ausgangszustand")
+
+
+def test_ein_deep_link_schlaegt_die_auto_vorauswahl(_seite):
+    """P2: `?modell=` hat Vorrang vor der Auto-Vorauswahl - der Deep-Link
+    der Abweichungstafel und die Auto-Auswahl dürfen nicht zwei Geräte
+    zeigen. Eine unbekannte id fällt still aufs erste Gerät zurück
+    (derselbe Grundsatz wie beim Deep-Link des Vergleichs-Reiters)."""
+    _frisch(_seite)
+    _zeige_tafel(_seite, "tafel-verlauf")
+    _seite.wait_for_timeout(150)
+    geraete = _seite.eval_on_selector(
+        "#gr-verlaufdaten",
+        "e => JSON.parse(e.textContent).map(g => ({id: g.id, label: g.label}))")
+    assert len(geraete) >= 2, "die Fixture braucht zwei waehlbare Geraete"
+    letztes = geraete[-1]
+    assert letztes["id"] != geraete[0]["id"], (
+        "die Fixture legt nur ein Geraet an - der Test prueft nichts")
+
+    _seite.goto(_seite.url.rsplit("/", 1)[0] +
+                f"/geraete.html?modell={letztes['id']}",
+                wait_until="load")
+    _zeige_tafel(_seite, "tafel-verlauf")
+    _seite.wait_for_timeout(200)
+    assert _seite.eval_on_selector("#gr-vsuche", "e => e.value") \
+        == letztes["label"], "der Deep-Link waehlt nicht sein Geraet"
+
+    # Unbekannte id: still aufs erste Geraet, kein Bruch.
+    _seite.goto(_seite.url.rsplit("/", 1)[0] +
+                "/geraete.html?modell=gibtesnicht-999",
+                wait_until="load")
+    _zeige_tafel(_seite, "tafel-verlauf")
+    _seite.wait_for_timeout(200)
+    assert _seite.eval_on_selector("#gr-vsuche", "e => e.value") \
+        == geraete[0]["label"], (
+        "eine unbekannte id muss still aufs erste Geraet fallen")
+    # Die module-weite Seite fuer die Folgetests zuruecklassen: ohne
+    # Parameter, Vergleichs-Reiter aktiv (Ladezustand).
+    _frisch(_seite)
 
 
 def test_nach_der_auswahl_steht_genau_ein_diagramm_fuer_ein_geraet(_seite):
@@ -1123,6 +1170,127 @@ def test_eine_neue_eingabe_raeumt_das_alte_diagramm_weg(_seite):
     assert _seite.eval_on_selector_all("#gr-vbild svg", "e => e.length") == 0
     assert _seite.eval_on_selector(
         "#gr-vleer", "e => getComputedStyle(e).display") != "none"
+
+
+def test_der_rueckbau_satz_steht_an_beiden_orten_gleich():
+    """P2-Fix (Code-Prüfung S3-1, 17.09.2026): Der Rückbau-Satz entsteht
+    ZWEIMAL - als initial hidden-Text der Vorlage und als `leer.textContent`
+    in `app.js`, wenn das Tippen im Suchfeld die Auswahl löst. Zwei
+    Umsetzungen derselben Sache laufen auseinander, ohne dass es ein Test
+    merkt - dasselbe Muster wie beim Übersetzungs-Link
+    (`test_die_beschriftung_ist_an_beiden_orten_dieselbe`). Der Text wird
+    aus der VORLAGE ausgelesen und im JS gesucht, nicht hier wiederholt:
+    eine dritte Kopie im Test wäre derselbe Fehler noch einmal."""
+    vorlagen = REPO / "src" / "telco_radar" / "report" / "templates"
+    template = (vorlagen / "geraete.html.j2").read_text(encoding="utf-8")
+    js = (vorlagen / "app.js").read_text(encoding="utf-8")
+    zeile = [z for z in template.splitlines() if 'id="gr-vleer"' in z]
+    assert len(zeile) == 1, "die Vorlage trägt nicht genau eine gr-vleer-Zeile"
+    treffer = re.search(r'id="gr-vleer"[^>]*>(.*?)</p>', zeile[0])
+    assert treffer, "der Rückbau-Satz ließ sich nicht aus der Vorlage auslesen"
+    text = treffer.group(1).strip()
+    assert text, "der Rückbau-Satz ist leer"
+    assert f"leer.textContent = '{text}'" in js, (
+        f"app.js schreibt einen anderen Rückbau-Satz als die Vorlage "
+        f"({text!r})")
+
+
+def test_die_kurve_beginnt_im_ersten_viewport(_umgebung):
+    """P2-Fix (Sicht-Prüfung 17.09.2026, der FAIL auf 390): Der Reiter soll
+    mit dem Diagramm aufgehen (Antonio F4: den Modell-Wahl-Graphen GANZ
+    OBEN). Vorher begann das SVG auf 390x844 bei 1008 px - 164 px unter der
+    Falz -, weil h2 zweizeilig, die Von/Bis-Gruppe gestapelt und die
+    Kacheln 2x2 standen. Messlatte wie beim Sicht-Prüfer: auf dem Telefon
+    beginnt das SVG im ersten Viewport; auf dem Schirm beginnt dort schon
+    die KURVE (Sicht-Prüfung 7.2: vorher 34 px Kurve, 866 px bei Falz 900).
+
+    Gemessen wird der unberührte Anfangszustand: Reiter umgeblendet, an den
+    Anfang gescrollt, keine weitere Eingabe."""
+    browser, wurzel = _umgebung
+    sichten = ((390, 844), (1440, 900))
+    ergebnis = {}
+    for breite, hoehe in sichten:
+        s = browser.new_page(viewport={"width": breite, "height": hoehe})
+        try:
+            s.goto(wurzel, wait_until="load")
+            s.wait_for_timeout(350)
+            _zeige_tafel(s, "tafel-verlauf")
+            s.wait_for_timeout(350)
+            s.evaluate("window.scrollTo(0, 0)")
+            ergebnis[breite] = s.evaluate("""() => {
+                const bild = document.getElementById('gr-vbild');
+                const svg = bild && bild.querySelector('svg');
+                const kurve = bild && bild.querySelector('path');
+                if (!svg || bild.hidden) return null;
+                const dok = e => Math.round(
+                    e.getBoundingClientRect().top + window.scrollY);
+                return { svg: dok(svg),
+                         kurve: kurve ? dok(kurve) : null,
+                         punkte: bild.querySelectorAll('.gr-vpunkt').length };
+            }""")
+        finally:
+            s.close()
+    for breite, hoehe in sichten:
+        mess = ergebnis[breite]
+        assert mess, (
+            f"{breite}: die Auto-Vorauswahl zeichnet kein Diagramm "
+            f"(Fixture prüfen)")
+        assert mess["punkte"] >= 4, f"{breite}: {mess}"
+        assert mess["svg"] <= hoehe, (
+            f"{breite}: das SVG beginnt {mess['svg'] - hoehe} px unter der "
+            f"Falz - der Reiter öffnet wieder mit Gerüst statt Kurve")
+        if breite == 1440:
+            assert mess["kurve"] is not None and mess["kurve"] < hoehe, (
+                f"1440: die erste Kurve beginnt erst bei {mess['kurve']} px "
+                f"- unter der Falz {hoehe}")
+
+
+def test_kein_kachelbetrag_bricht_um(_umgebung):
+    """P2-Fix (Sicht-Prüfung 17.09., im AUGE gefunden): Seit die Kachelreihe
+    NEBEN der Zeitraum-Steuer steht, ist eine Kachel auf dem Schirm 129 px
+    (mobil 87 px) breit - der laengste Betrag des Bestands ("1.171,00 €")
+    brach bei 24 px fett in die zweite Zeile und das "€" stand allein.
+    Regel: ein Kachelbetrag ist EINZEILIG - ein Geldbetrag, der umbricht,
+    ist keine Zahl mehr, sondern zwei Zeilen Text. Der Fall wird gestellt
+    (die Standard-Fixture haelt ihre Preise dicht beieinander), gerechnet
+    und gesetzt wird vom echten app.js."""
+    browser, wurzel = _umgebung
+    tage = list(_MESSTAGE)
+    geraet = {
+        "id": "probe", "label": "Probefall 128 GB", "hersteller": "Probe",
+        "speicher": 128, "suchtext": "probefall", "min": 919, "max": 1171,
+        "anbieter": 2, "messpunkte": 2 * len(tage), "messtermine": len(tage),
+        "tage": tage, "aktuell": [],
+        "reihen": [
+            {"anbieter": "mobilcom-debitel", "farbe": "#2b5bd7",
+             "eigen": False,
+             "punkte": [{"datum": t, "preis": 1171.0} for t in tage]},
+            {"anbieter": "Vodafone", "farbe": "#e60000", "eigen": True,
+             "punkte": [{"datum": t, "preis": 919.0} for t in tage]},
+        ]}
+    for breite, hoehe in ((1440, 900), (390, 844)):
+        s = browser.new_page(viewport={"width": breite, "height": hoehe})
+        try:
+            s.goto(wurzel, wait_until="load")
+            s.wait_for_timeout(250)
+            _stelle_daten(s, geraet)
+            s.wait_for_timeout(250)
+            lage = s.evaluate(
+                """() => Array.from(document.querySelectorAll('.gr-vkachel b'))
+                    .map(b => ({text: b.textContent,
+                                hoehe: Math.round(
+                                    b.getBoundingClientRect().height),
+                                fs: parseFloat(
+                                    getComputedStyle(b).fontSize)}))""")
+            assert lage and any("1.171,00" in b["text"] for b in lage), (
+                f"{breite}: der lange Betrag steht nicht in der Kachel: "
+                f"{lage}")
+            for b in lage:
+                assert b["hoehe"] <= b["fs"] * 1.6, (
+                    f"{breite}: {b['text']!r} ist {b['hoehe']} px hoch bei "
+                    f"{b['fs']} px Schrift - der Betrag bricht um")
+        finally:
+            s.close()
 
 
 
@@ -2130,10 +2298,25 @@ def test_jede_breite_tabelle_liegt_in_ihrem_rollbehaelter(_seite):
                                  drin: !!t.closest('.gr-scroll')}))""")
     # Ohne diese Zeile prueft der Test bei leerem Reiter nichts und ist
     # trotzdem gruen - dieselbe Falle wie der Lookup, der 0 von 7 traf.
-    assert len(tabellen) >= 4, (
+    # P2 (17.09.2026): es sind noch DREI Tabellen - die vierte war die
+    # G2-Tabelle des Verlaufs-Reiters und ist mit dem Block gefallen.
+    assert len(tabellen) >= 3, (
         f"die Fixture muss alle Tabellen des TCO-Reiters zeigen: {tabellen}")
     ohne = [t["klassen"] for t in tabellen if not t["drin"]]
     assert not ohne, f"Tabellen ohne Rollbehaelter: {ohne}"
+    # P2-Fix (Code-Prüfung S4-3): die dynamische Verlaufstabelle trägt nicht
+    # `gr-ttab` (sie rollt im eigenen Behälter `#gr-vtabelle`, nicht in
+    # `.gr-scroll`) - die REGEL gilt für sie genauso: jede breite Tabelle
+    # dieser Seite rollt in sich, nie die ganze Seite.
+    verlauf = _seite.evaluate(
+        """() => Array.from(document.querySelectorAll('#gr-vtabelle table'))
+                     .map(t => ({klassen: t.className,
+                                 drin: !!t.closest('.gr-vtabelle')}))""")
+    assert len(verlauf) >= 1, (
+        "die Auto-Vorauswahl muss die Verlaufstabelle füllen: "
+        f"{verlauf}")
+    ohne_v = [t["klassen"] for t in verlauf if not t["drin"]]
+    assert not ohne_v, f"Verlaufstabellen ohne Rollbehaelter: {ohne_v}"
 
 
 # ==========================================================================

@@ -107,19 +107,18 @@ def test_zwischen_kopf_und_wahl_leiste_steht_kein_absatz(geraete):
 
 def test_der_verlaufs_reiter_fuehrt_auf_eine_lebendige_tafel(geraete):
     """B2: Der Reiter existiert UND die Tafel hinter ihm ist nicht tot —
-    sie zeigt entweder die Einzelgerät-Zeitreihe (Suchfeld + JSON-Knoten,
-    G2-SVG) oder ihren ehrlichen Leerzustand. Strategie O3: „die zwei toten
-    Tafel-DIVs sind danach weg oder lebendig“. Ein leerer Tab-Body wäre die
-    nächste tote Tafel."""
+    sie zeigt die Geräteauswahl (Suchfeld + JSON-Knoten) oder ihren
+    ehrlichen Leerzustand. Strategie O3: „die zwei toten Tafel-DIVs sind
+    danach weg oder lebendig“. Ein leerer Tab-Body wäre die nächste tote
+    Tafel. (Bis P2 galt hier alternativ das G2-SVG; der feste Markt-Graph
+    ist am 17.09.2026 gefallen - Antonio F4.)"""
     tafel = geraete.select_one("#tafel-verlauf")
     assert tafel is not None, "#tafel-verlauf fehlt"
     assert geraete.select_one(
         ".gr-reiter [data-tafel='tafel-verlauf']") is not None, \
         "kein Reiter-Knopf auf #tafel-verlauf"
     lebendig = (tafel.select_one("#gr-verlaufdaten") is not None
-                or tafel.select_one("svg.gr-g2") is not None
-                or "liegen noch keine Messreihen vor" in tafel.get_text()
-                or "keine Reihe aus Gerät und Anbieter" in tafel.get_text())
+                or "liegen noch keine Messreihen vor" in tafel.get_text())
     assert lebendig, "die Verlaufs-Tafel ist tot: kein Inhalt, kein Leerzustand"
 
 

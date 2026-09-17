@@ -147,11 +147,12 @@ def messtage(saetze: list, feld: str = "preis_ohne_vertrag") -> tuple[dict, dict
     eine Listungs-ID; `geraete_preise.jsonl` trug je Tag zwei Zeilen, und
     13 von 15 Pfeilen der Historie zeigten eine Aenderung, die es nie gab.
 
-    Diese Funktion ist die EINE Quelle fuer beide Ansichten des Reiters -
-    die statische G2 (`geraete_tco_grafik.historie`) und die interaktive
-    Verlaufsgrafik (`gr-verlaufdaten`, ueber `_punkte`). Vorher las die
-    eine "den letzten Stand des Tages" und die andere "den niedrigsten",
-    und dieselbe Seite widersprach sich selbst (C.3).
+    Diese Funktion ist die EINE Quelle der Verlaufs-Ansichten des Reiters
+    - bis P2 las sie neben der interaktiven Verlaufsgrafik
+    (`gr-verlaufdaten`, ueber `_punkte`) auch die inzwischen gefallene
+    statische G2 (`geraete_tco_grafik.historie`). Vorher las die eine
+    "den letzten Stand des Tages" und die andere "den niedrigsten", und
+    dieselbe Seite widersprach sich selbst (C.3).
     """
     je_tag: dict = {}
     for satz in saetze or []:

@@ -1,4 +1,7 @@
-"""Die TCO-Hauptansicht: Karten, G1, G2 - gegen den ECHTEN Bestand.
+"""Die TCO-Hauptansicht: Karten, G1 - gegen den ECHTEN Bestand.
+
+(Die G2-Historie des Verlaufs-Reiters ist am 17.09.2026 mit P2 gefallen;
+ihre Tests sind mit dem Block entfernt - siehe den Kommentar unten.)
 
 Gerechnet wird gegen `data/state/geraete_tco.json`, `geraete_db.json` und
 `tarife.jsonl`, nicht gegen eine Fixture. Eine Fixture beweist, dass die
@@ -757,136 +760,11 @@ def test_ein_bonus_verkuerzt_den_balken_statt_ihn_zu_verlaengern():
     assert grafik.euro(950.0) in svg
 
 
-# --------------------------------------------------------------------------
-# G2
-# --------------------------------------------------------------------------
-
-def test_g2_zeichnet_nur_reihen_mit_zwei_messpunkten():
-    reihen = [
-        {"name": "A", "anbieter": "o2", "quelle_url": "https://example.invalid",
-         "punkte": [{"datum": "2026-08-29", "betrag": 500.0},
-                    {"datum": "2026-09-03", "betrag": 450.0}]},
-        {"name": "B", "anbieter": "congstar", "quelle_url": "",
-         "punkte": [{"datum": "2026-09-03", "betrag": 800.0}]},
-    ]
-    ergebnis = grafik.historie(reihen)
-    assert ergebnis["reihen"] == 1
-    assert [t["name"] for t in ergebnis["tabelle"]] == ["A"]
-    assert ergebnis["ereignisse"][0]["delta"] == -50.0
-    assert ergebnis["ereignisse"][0]["richtung"] == "runter"
-    assert "↓" in ergebnis["svg"]
-
-
-def test_g2_bleibt_ohne_zwei_messpunkte_leer():
-    """C.2: keine interpolierte Scheinkurve."""
-    ergebnis = grafik.historie([
-        {"name": "A", "anbieter": "o2", "punkte": [
-            {"datum": "2026-09-03", "betrag": 800.0}]}])
-    assert ergebnis["svg"] == "" and ergebnis["tabelle"] == []
-
-
-def test_g2_traegt_jede_zahl_auch_als_tabelle():
-    """C.2 verlangt die Tabelle unter der Grafik - auf dem Telefon rollt
-    keine Legende, und ein Screenreader liest keine Linie."""
-    reihen = [{"name": "A", "anbieter": "o2", "quelle_url": "https://x.invalid",
-               "punkte": [{"datum": "2026-08-29", "betrag": 500.0},
-                          {"datum": "2026-09-03", "betrag": 550.0}]}]
-    ergebnis = grafik.historie(reihen)
-    zeile = ergebnis["tabelle"][0]
-    assert zeile["von"] == 500.0 and zeile["bis"] == 550.0
-    assert zeile["delta"] == 50.0
-    assert len(zeile["punkte"]) == 2
-    assert "↑" in ergebnis["svg"]
-
-
-def _reihe(name, *betraege, anbieter="o2"):
-    """Eine G2-Reihe mit einem Messtag je Betrag, ab dem 29.08.2026."""
-    return {"name": name, "anbieter": anbieter,
-            "quelle_url": f"https://x.invalid/{name}",
-            "punkte": [{"datum": f"2026-08-{29 + i:02d}" if i < 3
-                        else f"2026-09-{i - 2:02d}", "betrag": float(b)}
-                       for i, b in enumerate(betraege)]}
-
-
-def test_g2_zeichnet_bewegte_reihen_vor_flachen():
-    """QA-Befund F-R2-1: bei Gleichstand in der Punktzahl brach das
-    ALPHABET - fuenf flache "Galaxy"-Linien standen im Bild, der groesste
-    Preissprung des Bestands (Pixel 10 Pro, +180 EUR) nicht. Sieben Reihen
-    mit je zwei Punkten, nur die zwei alphabetisch LETZTEN bewegen sich:
-    beide werden gezeichnet, die groessere Bewegung zuerst."""
-    reihen = [_reihe(n, 500, 500) for n in ("A", "B", "C", "D", "E")]
-    reihen += [_reihe("Y", 343, 379), _reihe("Z", 793, 973)]
-    ergebnis = grafik.historie(reihen)
-    namen = [z["name"] for z in ergebnis["tabelle"]]
-    assert ergebnis["reihen"] == grafik.MAX_REIHEN
-    assert ergebnis["reihen_gesamt"] == 7 and ergebnis["bewegt"] == 2
-    assert namen[:2] == ["Z", "Y"], namen
-    # Der Gegenfall stellt sich WIRKLICH: alphabetisch laegen Z und Y
-    # hinter dem Deckel.
-    assert sorted(r["name"] for r in reihen)[:grafik.MAX_REIHEN] == \
-        ["A", "B", "C", "D", "E"]
-    # Keine flache Reihe verdraengt eine bewegte.
-    ungezeichnet = {r["name"] for r in reihen} - set(namen)
-    assert all(r["punkte"][0]["betrag"] == r["punkte"][-1]["betrag"]
-               for r in reihen if r["name"] in ungezeichnet)
-
-
-def test_g2_nennt_die_ereignisse_der_grundmenge():
-    """Der Satz "Erhoehungen und Senkungen im Messzeitraum" ist ein Satz
-    ueber den Bestand, nicht ueber die fuenf gezeichneten Reihen. Sieben
-    bewegte Reihen: gezeichnet fuenf, benannt alle sieben - und die Marker
-    im Bild sind genau die Ereignisse der gezeichneten Reihen."""
-    reihen = [_reihe(f"R{i}", 500, 500 + 10 * (i + 1)) for i in range(7)]
-    ergebnis = grafik.historie(reihen)
-    assert ergebnis["reihen"] == 5 and ergebnis["reihen_gesamt"] == 7
-    assert len(ergebnis["ereignisse"]) == 7 and ergebnis["bewegt"] == 7
-    gezeichnet = {z["name"] for z in ergebnis["tabelle"]}
-    # Die zwei kleinsten Bewegungen fallen unter den Deckel ...
-    assert {"R0", "R1"}.isdisjoint(gezeichnet)
-    # ... und stehen trotzdem im Fliesstext.
-    assert {e["name"] for e in ergebnis["ereignisse"]} >= {"R0", "R1"}
-    marker = ergebnis["svg"].count("gr-g2-marker")
-    assert marker == sum(1 for e in ergebnis["ereignisse"]
-                         if e["name"] in gezeichnet) == 5
-
-
-def test_g2_rangfolge_haelt_am_echten_bestand():
-    """Am Bestand von heute: keine gezeichnete flache Reihe, solange eine
-    bewegte ungezeichnet ist, und jedes Ereignis der Grundmenge steht im
-    Fliesstext. Die Regel, nicht die Namen - der Bestand wandert jede
-    Nacht."""
-    from telco_radar.analyze.geraete_store import Preishistorie
-    pfad = ZUSTAND / "geraete_preise.jsonl"
-    if not pfad.exists():
-        pytest.skip("keine Preishistorie im Checkout")
-    db = json.loads((ZUSTAND / "geraete_db.json").read_text(encoding="utf-8"))
-    reihen = karten.historienreihen(db["listungen"], Preishistorie(pfad),
-                                    lade_katalog(WURZEL))
-    ergebnis = grafik.historie(reihen)
-    if ergebnis["reihen_gesamt"] <= ergebnis["reihen"]:
-        pytest.skip("der Deckel greift heute nicht - nichts zu verdraengen")
-    grundmenge = [r for r in reihen if len(r["punkte"]) >= grafik.MIND_PUNKTE]
-    assert len(ergebnis["ereignisse"]) == \
-        sum(len(grafik._ereignisse(r)) for r in grundmenge)
-    gezeichnet = {(z["name"], z["anbieter"]) for z in ergebnis["tabelle"]}
-    bewegt_ungezeichnet = [r for r in grundmenge if grafik._ereignisse(r)
-                           and (r["name"], r["anbieter"]) not in gezeichnet]
-    if bewegt_ungezeichnet:
-        assert all(z["delta"] != 0 or any(
-            e["name"] == z["name"] and e["anbieter"] == z["anbieter"]
-            for e in ergebnis["ereignisse"]) for z in ergebnis["tabelle"])
-
-
-def test_die_x_achse_traegt_ein_wochenraster():
-    """C.2: Wochenraster kurzfristig, Monatsraster ab drei Monaten."""
-    kurz = grafik.historie([{"name": "A", "anbieter": "o2", "punkte": [
-        {"datum": "2026-07-01", "betrag": 500.0},
-        {"datum": "2026-07-29", "betrag": 520.0}]}])
-    lang = grafik.historie([{"name": "A", "anbieter": "o2", "punkte": [
-        {"datum": "2026-01-01", "betrag": 500.0},
-        {"datum": "2026-09-01", "betrag": 520.0}]}])
-    assert kurz["svg"].count("gr-g2-raster--x") == 5      # 28 Tage / 7
-    assert lang["svg"].count("gr-g2-raster--x") == 9      # 243 Tage / 30
+# P2 (Antonio F4, 17.09.2026): Der G2-Abschnitt (7 Tests) ist MIT DEM
+# G2-Block gefallen - `geraete_tco_grafik.historie/_ereignisse/_reihenrang/
+# MAX_REIHEN` existieren nicht mehr. Bewusst: die Information "groesste
+# Bewegung des Markts" steht in der Radar-Tafel und im Modell-Waehler
+# (befunde/preisverlauf.md, Strategie P2).
 
 
 def test_die_anbieterfarbe_traegt_denselben_slug_ueberall(bestand):
@@ -894,10 +772,13 @@ def test_die_anbieterfarbe_traegt_denselben_slug_ueberall(bestand):
     karte = [k for k in _modell(bestand, "apple-iphone-17-pro-256")["karten"]
              if k["anbieter"] == "1&1"][0]
     assert karte["slug"] == grafik.anbieter_slug("1&1") == "1-1"
-    reihen = [{"name": "A", "anbieter": "1&1", "punkte": [
-        {"datum": "2026-08-29", "betrag": 500.0},
-        {"datum": "2026-09-03", "betrag": 450.0}]}]
-    assert "gr-anb--1-1" in grafik.historie(reihen)["svg"]
+    # Bis P2 lief der Graph-Beleg ueber die G2-Historie; seit ihrem Fall
+    # ueber die Zeitreihe (G0) - dieselbe Slug-Klasse am Linien-Pfad.
+    # (Reihen-Form wie `geraete_verlauf._reihen`: anbieter, farbe, punkte.)
+    reihen = [{"anbieter": "1&1", "farbe": "#00589e", "eigen": False,
+               "punkte": [{"datum": "2026-08-29", "preis": 500.0},
+                          {"datum": "2026-09-03", "preis": 450.0}]}]
+    assert "gr-anb--1-1" in grafik.zeitreihe(reihen)["svg"]
 
 
 # --------------------------------------------------------------------------

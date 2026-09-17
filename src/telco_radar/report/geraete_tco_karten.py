@@ -50,7 +50,6 @@ from typing import Optional
 from . import geraete_vergleich
 from .effektivpreis import phasensumme
 from .geraete_tco_grafik import anbieter_slug
-from .geraete_verlauf import messtage
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
 from ..tarif_model import Preisphase
 from ..tco_model import (POSTEN_ANSCHLUSS, POSTEN_BUENDEL, POSTEN_RATE,
@@ -335,7 +334,7 @@ def _geraetepreis(barpreis: Optional[dict], zuzahlung: Optional[float],
     „Zwei Zahlen, nie vermischt“. Sie heisst jetzt „Finanzierung gesamt“
     und wird aus der Gerätepreis-Antwort der Modelltafel ausgeschlossen.
 
-    Dieselbe Regel wie im Zeitreihen-Graph (G0/G2, `historienreihen`):
+    Dieselbe Regel wie im Zeitreihen-Graph (G0, bis P2 auch G2):
     zuerst der EIGENE Barpreis ohne Vertrag - ein FREMDER (der guenstigste
     Marktpreis eines anderen Anbieters, `_barpreis_fuer`s Rueckfall) zaehlt
     hier nicht, er ist ein anderes Angebot. Fehlt der eigene Barpreis, aber
@@ -1201,52 +1200,9 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
             "gesamt": len(fertig), "ohne_zuordnung": ohne_zuordnung}
 
 
-# --------------------------------------------------------------------------
-# Die Reihen fuer G2 - der Preisverlauf je Modell x Anbieter
-# --------------------------------------------------------------------------
-
-def historienreihen(eintraege: list, historie, katalog) -> list:
-    """Aus der Preishistorie werden Reihen fuer die Verlaufsgrafik.
-
-    Gezeigt wird ausschliesslich der **Barpreis ohne Vertrag**. Einen
-    Buendelmonatspreis in dieselbe Euro-Achse zu legen waere genau der
-    Befund, mit dem dieses Vorhaben angefangen hat: zwei Groessen unter
-    einer Ueberschrift (o2s 721 EUR Ratensumme neben freenets 949 EUR
-    Kassenpreis).
-
-    Einen TCO-VERLAUF gibt es hier noch nicht, und er wird auch nicht
-    gerechnet: `geraete_tco.json` kennt je Buendel genau einen Stand
-    (`first_seen == last_verified == 2026-09-04`). Eine Kurve daraus waere
-    interpoliert, und C.2 verbietet die interpolierte Scheinkurve
-    ausdruecklich.
-    """
-    je_sku: dict = {}
-    for e in eintraege:
-        if e.get("sku_id"):
-            je_sku.setdefault(e["sku_id"], (e.get("device_id") or "",
-                                            e.get("speicher_gb")))
-    reihen = []
-    for e in eintraege:
-        if e.get("zustand") not in _ZUSTAND:
-            continue
-        lid = e.get("id") or ""
-        # DIESELBE MESSTAG-REGEL WIE IN DER INTERAKTIVEN GRAFIK
-        # (`geraete_verlauf.messtage`): ein Tag mit zwei Preisen derselben
-        # Listung ist eine Messluecke. Er faellt aus der Kurve und steht in
-        # `mehrdeutig`, damit die Grafik ihn BENENNT statt ihn als Pfeil zu
-        # zeichnen (QA-Befund B2).
-        eindeutig, mehrdeutig = messtage(historie.reihe(lid))
-        punkte = [{"datum": t, "betrag": b} for t, b in sorted(eindeutig.items())]
-        if len(punkte) < 2 and not mehrdeutig:
-            continue
-        device_id, speicher = je_sku.get(e.get("sku_id", ""), ("", None))
-        reihen.append({
-            "name": _name(katalog, device_id, speicher,
-                          rueckfall=e.get("sku_id", "")),
-            "anbieter": e.get("anbieter", ""),
-            "modell_id": modell_schluessel(device_id, speicher),
-            "quelle_url": e.get("quelle_url", ""),
-            "punkte": punkte,
-            "mehrdeutig": [{"datum": t, "betraege": mehrdeutig[t]}
-                           for t in sorted(mehrdeutig)]})
-    return reihen
+# P2 (Antonio F4, 17.09.2026): der Abschnitt "Die Reihen fuer G2"
+# (`historienreihen`, 49 Zeilen) ist GEFALLEN - der feste Markt-Graph des
+# Verlaufs-Reiters wurde geloescht (siehe geraete.html.j2, Kommentar
+# "G2 IST GEFALLEN"); danach hatte die Funktion keinen Aufrufer mehr.
+# Der WAEHLER desselben Reiters rechnet seinen eigenen Weg:
+# `geraete_verlauf.reihen_fuer_listungen` + `messtage`.

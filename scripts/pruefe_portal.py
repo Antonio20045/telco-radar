@@ -736,12 +736,26 @@ def main() -> int:
                 if start.select(tot):
                     maengel.append(f"Rest der bis E2 ersetzten Form: {tot}")
         verlaufflaeche = gr.select_one("#tafel-verlauf")
+        # P2 (Antonio F4, 17.09.2026): G2 ist GEFALLEN - der feste Markt-
+        # Graph des Reiters zeigte in der heutigen Datenlage zwei echte
+        # Kurven von einem Anbieter unter fünf Linien, mit vier Text-
+        # blöcken daneben („mehr Text als Graf"); seine Frage beantworten
+        # der Modell-Wähler und die Radar-Tafel. Inhalt des Reiters ist
+        # der Wähler: sein Datenknoten muss dastehen - oder der ehrliche
+        # Leerzustand (KEIN Mangel ohne Messreihen, C.2).
         if verlaufflaeche is not None and \
-                verlaufflaeche.select_one("svg.gr-g2") is None and \
-                verlaufflaeche.select_one("#gr-verlaufdaten") is not None:
-            # KEIN Mangel ohne Messreihen: unter zwei Messpunkten je Reihe
-            # ist der ehrliche Leerzustand die richtige Ausgabe (C.2).
-            maengel.append("G2 (Preis-/TCO-Historie) fehlt im Historie-Reiter")
+                verlaufflaeche.select_one("#gr-verlaufdaten") is None and \
+                "liegen noch keine Messreihen vor" not in \
+                verlaufflaeche.get_text():
+            maengel.append("die Gerätedaten des Preisverlaufs "
+                           "(#gr-verlaufdaten) fehlen im Verlaufs-Reiter")
+        # Und kehrt der G2-Block zurück, ist die Doppel-Darstellung zurück
+        # (derselbe Schutz wie beim G0-Block darunter).
+        if verlaufflaeche is not None and \
+                verlaufflaeche.select_one("svg.gr-g2") is not None:
+            maengel.append("der G2-Block ist im Verlaufs-Reiter "
+                           "zurückgekehrt - der Reiter trägt den Modell-"
+                           "Wähler als alleinige Grafik (F4)")
         # E3-Fix (QA 17.09.2026): G0 ist aus dem Verlaufs-Reiter GEFALLEN.
         # Der Reiter trug ZWEI Barpreis-Grafiken desselben Geräts - der
         # G0-Block oben (gesteuert von der Modellwahl des VERGLEICHS-

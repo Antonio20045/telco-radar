@@ -13,8 +13,9 @@ APPLE IPHONE 17 PRO 256 GB, während der große Graph Galaxy S26 zeigte) -
 zwei Bilder, dieselbe Frage, widersprüchlicher Zustand.
 
 G0 ist deshalb GEFALLEN. Die Barpreis-Frage des Reiters (E3/S1: „Wie hat
-sich der BARPREIS eines Geräts entwickelt?") antworten G2 (marktweite
-Änderungen, servergerendert) und die eigene Auswahl unten. Der
+sich der BARPREIS eines Geräts entwickelt?") antwortet die eigene Auswahl
+unten - ebenso der mit P2 (17.09.2026, Antonio F4) gefallene feste
+Markt-Graph G2, der ihr vorher zur Seite stand. Der
 Rechenweg-`modell["zeitreihe"]` im View ist mitgefallen (tote Rechnung
 je Modell).
 

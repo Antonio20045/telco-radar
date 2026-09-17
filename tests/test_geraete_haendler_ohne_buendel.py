@@ -124,7 +124,7 @@ def modell(tmp_path):
          "abgerufen_am": "2026-09-05", "confidence": "hoch"},
     ]
     ergebnis = view.aufbereiten(buendel, referenzen, eintraege, _katalog(),
-                               tarife=tarife, historie=None)
+                               tarife=tarife)
     treffer = [m for m in ergebnis["modelle"] if m["id"].startswith("apple-iphone-15")]
     assert len(treffer) == 1, "Das Modell muss ueber sein o2-Buendel erscheinen"
     return treffer[0]
@@ -146,7 +146,7 @@ def test_ohne_saturn_listung_bleiben_alle_drei_offen(tmp_path):
     buendel = [_buendel(SKU_NEU, 20.0)]
     tarife = _tarifbestand(tmp_path).je_id
     ergebnis = view.aufbereiten(buendel, _referenzen(), [], _katalog(),
-                               tarife=tarife, historie=None)
+                               tarife=tarife)
     treffer = [m for m in ergebnis["modelle"] if m["id"].startswith("apple-iphone-15")][0]
     assert treffer["haendler_offen"] == list(HAENDLER_OHNE_BUENDEL)
     assert all(v is None for v in treffer["haendler_ohne_buendel"].values())

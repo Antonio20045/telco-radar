@@ -246,21 +246,6 @@
    woertlich von dort: `TCO-<Laufzeit>`, `Ø X €/Monat`, `monatlich X €`,
    `Gerät einmalig X €`, `eff. X €/M. ohne Gerät`, `ab Monat 25: X €`.
    Ein Synonym waere ein zweites Mass. #}
-{# EINE MESSLUECKE WIRD BENANNT, NICHT GEZEICHNET (QA-Befund B2): eine Reihe,
-   deren Listung an einem Tag zwei Preise trug, bekommt keinen Pfeil - und
-   eine Reihe, der danach keine zwei Punkte bleiben, steht hier mit Grund.
-   Die Betraege stehen dabei, damit die Luecke pruefbar ist. #}
-{% macro g2_ausgelassen(g2) %}
-  {% if g2.ausgelassen %}
-  <p class="gr-erklaer gr-basis--duenn gr-g2-ausgelassen">Nicht gezeichnet,
-  weil dieselbe Listung an einem Tag zwei Preise trug – eine Messlücke,
-  keine Preisbewegung: {% for a in g2.ausgelassen %}{{ a.name }} bei {{
-  a.anbieter }} ({{ a.tage | length }} {{ 'Messtag' if a.tage | length == 1
-  else 'Messtage' }}, zuletzt {{ a.tage[-1] | date_de }}: {{
-  a.betraege[a.tage[-1]] | map('euro') | join(' und ') }}){% if not loop.last
-  %}; {% endif %}{% endfor %}.</p>
-  {% endif %}
-{% endmacro %}
 
 <div class="gr-tafel" id="tafel-tco" role="tabpanel">
 
@@ -774,19 +759,27 @@
    zu stellen, wäre Doppel-Darstellung (§4.6/4.8); der Reiter fragt
    deshalb bewusst ANDERS: Wie hat sich der BARPREIS eines Geräts
    entwickelt - ohne Tarif, ohne Bindung, reine Euro über der Zeit.
-   Seine Bausteine messen alle genau das (G2 = Barpreis-Änderungen über
-   den Markt, die Auswahl unten = Barpreis je Gerät); der TCO-Historie-
-   Absatz, der eine Gesamtkosten-Kurve ANKÜNDIGTE, ist mit der Umwidmung
-   gefallen - die Kurve existiert seit E2, und ihre Messtage nennt die
-   Zeitreihe selbst. Der G0-Block (Barpreis je Modell, gesteuert vom
-   VERGLEICHS-Reiter) ist mit dem E3-Fix vom 17.09.2026 gefallen - siehe
-   den Kommentar am Reiter-Anfang.
+   Der TCO-Historie-Absatz, der eine Gesamtkosten-Kurve ANKÜNDIGTE, ist
+   mit der Umwidmung gefallen - die Kurve existiert seit E2, und ihre
+   Messtage nennt die Zeitreihe selbst. Der G0-Block (Barpreis je Modell,
+   gesteuert vom VERGLEICHS-Reiter) ist mit dem E3-Fix vom 17.09.2026
+   gefallen, der G2-Block (Barpreis-Änderungen über den Markt) am selben
+   Tag mit P2 - siehe die Kommentare direkt unter der h2.
 
    Die Reihenfolge von oben nach unten ist vorgegeben und nicht verhandelbar:
-   Suchfeld -> Zeitraum -> vier Kacheln -> Diagramm -> Tabelle. Solange kein
-   Geraet gewaehlt ist, steht hier KEIN Diagramm - auch kein leeres. Der
-   `<svg>`-Knoten wird von `app.js` erst erzeugt, wenn eine Auswahl steht;
-   im Ausgangszustand ist an seiner Stelle nur ein Satz.                #}
+   Suchfeld -> Zeitraum -> vier Kacheln -> Diagramm -> Tabelle. Seit P2
+   (Antonio F4, 17.09.2026) ist der Wähler der HAUPTINHALT des Reiters und
+   steht DIREKT unter der h2 - vor ihm steht kein Satz mehr. Ohne Klick ist
+   das ERSTE Gerät der Liste vorausgewählt (Sortierung nach Messtagen, das
+   meistgemessene steht oben): der Reiter zeigt sofort ein Diagramm. Das
+   kippt bewusst die alte B4-Regel „ohne Auswahl kein Diagramm" - sie galt
+   dem Zustand, in dem über dem Wähler noch der feste G2-Marktgraph stand;
+   mit seinem Fall (P2) wäre der Reiter sonst grafiklos. Der Satz
+   „Kein Gerät gefunden." lebt weiter als Rückbau-Zustand, während der
+   Leser im Suchfeld tippt (P2-Fix: der alte Sieben-Wort-Satz erklärte die
+   Bedienung - Hausregel - und stand doppelt im Code; ein Test hält beide
+   Stellen zusammen). Ein `?modell=`-Deep-Link schlägt die
+   Vorauswahl.                                                       #}
 <div class="gr-tafel gr-tafel--aus" id="tafel-verlauf" role="tabpanel">
 
 {# --- E3-Fix (QA 17.09.2026): G0 IST GEFALLEN ----------------------------
@@ -799,101 +792,47 @@
    Verschärft hatte der QA-Lauf gemessen: Wählt der Leser im Verlaufs-
    Suchfeld ein Gerät, folgte der obere Block NICHT (er hängt an der
    Modellwahl des anderen Reiters) - zwei Bilder, widersprüchlicher
-   Gerätezustand. Die Barpreis-Frage des Reiters (E3/S1) antworten G2
-   (marktweite Änderungen) und die eigene Auswahl unten. Mitgefallen:
+   Gerätezustand. Die Barpreis-Frage des Reiters (E3/S1) antwortet seither
+   die eigene Auswahl unten. Mitgefallen:
    `_geraete_g0.html.j2`, der G0-Teil des Fragments und `app.js`-Montage
    (`setzeG0`), die Rechnung `modell["zeitreihe"]` im View. #}
 
 <section class="gr-verlauf" id="verlauf">
-  <h2 class="rubrik">Wie sich der Barpreis eines Geräts entwickelt hat</h2>
+  {# P2-Fix (Sicht-Prüfung 17.09.): „Barpreis-Verlauf" statt „Wie sich der
+     Barpreis eines Geräts entwickelt hat". Auf dem Telefon brach die alte
+     h2 ZWEIZEILIG (129 px) und drückte die Kurve 164 px unter die Falz -
+     der Reiter soll aber mit dem Diagramm aufgehen (Antonio F4). Der
+     Kurztitel ist auf 390 UND 1440 einzeilig und sagt dieselbe Sache:
+     Barpreis (nicht TCO - die Grenze steht im Datenlage-Aufklapper),
+     Verlauf über die Zeit. #}
+  <h2 class="rubrik">Barpreis-Verlauf</h2>
 
-  {# Der Effektivpreis-Gedanke als ERKLAERUNG, nicht als Zahl. Handyhase und
-     Finanztip rechnen ihn aus Geraetepreis, Tarif und Boni zusammen - genau
-     die Posten, die diesem Radar heute fehlen. Eine eigene Zahl daraus waere
-     geraten; der Satz sagt stattdessen, was die Kurve NICHT zeigt, und
-     verweist auf die Tafel, die die Frage beantworten wird. Seit der E3-
-     Umwidmung benennt er zugleich die Grenze dieses Reiters: BARPREIS
-     hier, Gesamtkosten über 24 Monate (TCO-24) im Vergleichs-Reiter -
-     zwei Reiter, zwei Fragen (§4.6). #}
-  <p class="gr-erklaer">Die Kurve zeigt den Barpreis ohne Vertrag, nicht
-  die Gesamtkosten: wer das Gerät im Vertrag kauft, zahlt daneben Tarif
-  und Anschlusspreis. Die Gesamtkosten über 24 Monate (TCO-24) stehen im
-  Reiter „Vergleich“.</p>
+  {# P2 (Antonio F4, 17.09.2026): ZWISCHEN h2 UND SUCHFELD STEHT NICHTS
+     MEHR. Bis P2 stand hier der Erklaer-Satz zum Barpreis (31 Woerter) -
+     er sagt die Grenze dieses Reiters (Barpreis hier, TCO-24 im
+     Vergleichs-Reiter), aber er stand vor dem einzigen Bedienelement und
+     schob das Suchfeld auf dem Telefon aus dem ersten Viewport. Der Satz
+     lebt weiter im Aufklapper „Datenlage“ am Reiterende - dieselbe
+     Auskunft, ein Klick spaeter. #}
 
-  {# --- G2: die Historie, servergerendert ----------------------------- #}
-  {% if geraete.tco.g2.svg %}
-  <figure class="gr-grafik gr-grafik--g2">
-    {{ geraete.tco.g2.svg | safe }}
-    {# DIE AUSWAHL NENNT IHRE REGEL: wo der Deckel greift, sagt die
-       Unterschrift, dass die Reihen mit Preisaenderung zuerst gezeichnet
-       sind - sonst liest sich "5 von 8" als beliebige Stichprobe
-       (QA-Befund F-R2-1). #}
-    <figcaption>{% if geraete.tco.g2.reihen_gesamt > geraete.tco.g2.reihen
-    %}{{ geraete.tco.g2.reihen }} von {{ geraete.tco.g2.reihen_gesamt }} Reihen{%
-    else %}{{ geraete.tco.g2.reihen }} Reihen{% endif %} mit mindestens zwei
-    eindeutigen Messpunkten, {{ geraete.tco.g2.von | date_de }} bis {{
-    geraete.tco.g2.bis | date_de }}{% if geraete.tco.g2.reihen_gesamt >
-    geraete.tco.g2.reihen %} – Reihen mit Preisänderung zuerst{% endif %}.
-    Ein Pfeil steht für eine Änderung zwischen zwei Messungen; Datum und
-    Betrag stehen am Punkt und in der Tabelle darunter.</figcaption>
-  </figure>
-  {{ g2_ausgelassen(geraete.tco.g2) }}
-
-  {# DER SATZ RECHNET UEBER DIE GRUNDMENGE, nicht ueber die gezeichneten
-     Reihen (F-R2-1) - und sagt es, wo die zwei Mengen auseinanderfallen.
-     Ueber sechs Ereignisse wird nicht stumm gekappt, sondern gezaehlt. #}
-  {% if geraete.tco.g2.ereignisse %}
-  <p class="gr-erklaer gr-g2-ereignisse">Erhöhungen und Senkungen im
-  Messzeitraum{% if geraete.tco.g2.reihen_gesamt > geraete.tco.g2.reihen %},
-  über alle {{ geraete.tco.g2.reihen_gesamt }} Reihen{% endif %}:
-  {% for e in geraete.tco.g2.ereignisse[:6] %}{{ e.datum | date_de }}
-  {{ e.name }} bei {{ e.anbieter }} {{ '+' if e.delta > 0 else '−' }}{{
-  e.delta | abs | euro }}{% if not loop.last %}; {% endif %}{% endfor %}{%
-  if geraete.tco.g2.ereignisse | length > 6 %} und {{
-  geraete.tco.g2.ereignisse | length - 6 }} weitere{% endif %}.</p>
-  {% endif %}
-
-  {# DIE TABELLE UNTER DER GRAFIK ist keine Zugabe, sondern C.2: auf dem
-     Telefon rollt keine Legende, und ein Screenreader liest keine Linie.
-     Sie traegt dieselben Zahlen, aus derselben Quelle. #}
-  <details class="gr-auf" id="gr-g2-tabelle">
-    <summary>Daten dieser Kurven</summary>
-    <div class="gr-scroll">
-    <table class="gr-ttab gr-ttab--g2">
-      <thead><tr><th scope="col">Gerät und Anbieter</th>
-        <th scope="col">Messpunkte</th><th scope="col">erster</th>
-        <th scope="col">letzter</th><th scope="col">Unterschied</th>
-        <th scope="col">Beleg</th></tr></thead>
-      <tbody>
-      {% for r in geraete.tco.g2.tabelle %}
-      <tr><td><span class="gr-t-anbieter">{{ r.name }}</span>
-          <span class="gr-a-klein">{{ r.anbieter }}</span></td>
-        <td>{% for p in r.punkte %}{{ p.datum | date_de }} {{ p.betrag | euro
-          }}{% if not loop.last %} · {% endif %}{% endfor %}{% if r.mehrdeutig
-          %} <span class="gr-t-luecke">{{ r.mehrdeutig | length }} {{ 'Tag' if
-          r.mehrdeutig | length == 1 else 'Tage' }} mit zwei Preisen
-          ausgelassen</span>{% endif %}</td>
-        <td>{{ r.von | euro }}</td><td>{{ r.bis | euro }}</td>
-        <td>{{ r.delta | euro }}</td>
-        <td>{% if r.quelle_url %}<a href="{{ r.quelle_url }}"
-          rel="nofollow noopener" target="_blank">{{ r.quelle_url | domain
-          }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>{%
-          else %}<span class="gr-t-luecke">kein Beleg</span>{% endif %}</td>
-      </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-    </div>
-  </details>
-  {% else %}
-  {# Der ehrliche Leerzustand nach C.2 - keine interpolierte Scheinkurve. #}
-  {{ g2_ausgelassen(geraete.tco.g2) }}
-  <p class="gr-erklaer gr-basis--duenn">Für keine Reihe aus Gerät und
-  Anbieter liegen bisher zwei Messpunkte vor. Bis dahin steht hier keine
-  Linie: zwei Punkte ergeben eine Gerade, ein Punkt ergibt gar nichts, und
-  eine gezeichnete Verbindung dazwischen wäre erfunden. Der nächtliche
-  Lauf misst weiter; der nächste Punkt entsteht mit dem nächsten Lauf.</p>
-  {% endif %}
+  {# --- P2 (Antonio F4, 17.09.2026): G2 IST GEFALLEN ---------------------
+   Bis P2 stand hier der G2-Block - die servergerenderte Markt-Historie
+   (fuenf Reihen mit der groessten Preisbewegung, `geraete_tco_grafik.
+   historie`). Antonio: „Bei Preisverlauf der erste Graph, da sind mehr
+   Text als Graf … Ich sehe nur iPhone 17 Pro und Pro Max. Ich verstehe
+   nicht den Sinn. Das ist doch genau das gleiche wie unten, wo ich das
+   Modell aussuchen kann." Gemessen (befunde/preisverlauf.md, an der
+   gerenderten Seite): 5 gezeichnete Linien, aber nur 2 echte Kurven von
+   2 Geraeten - alle von mobilcom-debitel, weil eine G2-Reihe je LISTUNG
+   (Farbe) entsteht und die zwei groessten Bewegungen des Bestands damit
+   alle fuenf Deckelplaetze belegen. Dem Bild standen vier Textblöcke
+   gegenueber (Bildunterschrift, Ereignis-Satz, Ausgelassen-Hinweis,
+   Tabelle) - mehr Text als Graf. Dieselbe Datenlage liest die Auswahl
+   unten (gemeinsamer Weg `geraete_verlauf.messtage`), und „wo steht wer
+   im Preis" beantwortet die Radar-Tafel. Mitgefallen (E5-Regel, Praezedenz
+   G0): `geraete_tco_grafik.historie/_ereignisse/_reihenrang/MAX_REIHEN`,
+   `geraete_tco_karten.historienreihen`, das Macro `g2_ausgelassen` und
+   die vier G2-Textblöcke samt der Tabelle „Daten dieser Kurven". #}
 
   {# E3 (S1): DER TCO-HISTORIE-ABSATZ IST GEFALLEN. Bis E2 kündigte er
      hier eine Kurve der Gesamtkosten an („entsteht, sobald genügend
@@ -918,13 +857,19 @@
     <ul class="gr-vtreffer" id="gr-vtreffer" role="listbox" hidden></ul>
   </div>
 
+  {# P2-Fix (Sicht-Prüfung 17.09.): Steuer und Kacheln stehen auf dem
+     Schirm in EINER Reihe (Wrapper `.gr-vkopf`) - vorher belegten sie
+     zwei Blöcke übereinander und die erste Kurve begann auf 1440 erst
+     34 px vor der Falz. Mobil (unter der min-width der Kachelreihe)
+     bricht der Wrapper um und die Reihenfolge Steuer → Kacheln bleibt. #}
+  <div class="gr-vkopf">
   <div class="gr-vsteuer" hidden id="gr-vsteuer">
     <div class="gr-vgruppe" role="group" aria-label="Zeitraum">
       <button type="button" class="gr-vknopf is-aktiv" data-raster="woche">Wöchentlich</button>
       <button type="button" class="gr-vknopf" data-raster="monat">Monatlich</button>
       <button type="button" class="gr-vknopf" data-raster="quartal">Quartal</button>
     </div>
-    <div class="gr-vgruppe">
+    <div class="gr-vgruppe gr-vzeit">
       <label class="gr-vlabel" for="gr-vvon">Von</label>
       <input type="date" id="gr-vvon" class="gr-vdatum"
              min="{{ geraete.verlauf.seit }}" max="{{ geraete.verlauf.bis }}"
@@ -949,10 +894,19 @@
        gleichzeitig dasteht. #}
     <div class="gr-vkachel"><b id="gr-vpkt">–</b><span>Messtermine</span></div>
   </div>
+  </div>
 
-  {# Ohne Auswahl steht hier dieser Satz und sonst nichts. #}
-  <p class="gr-erklaer" id="gr-vleer">Wählen Sie oben ein Gerät – dann steht
-  hier sein Preisverlauf, mit einer Linie je Anbieter.</p>
+  {# Der Rueckbau-Satz: sichtbar nur, waehrend der Leser im Suchfeld tippt
+     und keine Treffer listet (P2-Auto-Vorauswahl hat den initialen
+     Leerzustand abgeloest - siehe `app.js`); bei offener Trefferliste
+     deckt ihn das Dropdown ab. Initial `hidden`, damit der Reiter ohne
+     Klick mit dem Diagramm des vorausgewaehlten Geraets beginnt.
+     P2-Fix (Sicht-Prüfung 17.09.): der Satz erklaerte die Bedienung
+     („Wählen Sie oben ein Gerät …", Hausregel: kein Satz erklärt die
+     Bedienung) - „Kein Gerät gefunden." sagt im Zwischenzustand
+     dasselbe. Der Text steht ZWEIMAL im Code (hier und in `app.js`)
+     und ein Test haelt beide zusammen. #}
+  <p class="gr-erklaer" id="gr-vleer" hidden>Kein Gerät gefunden.</p>
 
   {# Der Satz fuer den Fall, dass die Reihe fuer ein Diagramm zu kurz ist.
      Er steht im HTML und wird von `app.js` gefuellt und eingeblendet - der
@@ -963,24 +917,44 @@
   <div class="gr-vbild" id="gr-vbild" hidden></div>
   <p class="gr-vlegende" id="gr-vlegende" hidden></p>
 
-  {# EINE ZAHL ZUR ZEIT. Solange kein Geraet gewaehlt ist, spricht dieser
-     Satz ueber den ganzen Radar; sobald eine Auswahl steht, schreibt
-     `app.js` ihn auf das gewaehlte Geraet um. Vorher standen beide Zahlen
-     nebeneinander ("4 Messpunkte" / "5 Messtermine"), und der Leser konnte
-     nicht wissen, dass sie verschiedene Mengen zaehlen. #}
-  <p class="gr-erklaer gr-basis--duenn" id="gr-vstand"
-     data-alle="{{ geraete.verlauf.messtermine }}"
-     data-seit="{{ geraete.verlauf.seit | date_de }}"
-     data-wochen="{{ geraete.verlauf.belastbar_ab_wochen }}"
+  {# EINE ZAHL ZUR ZEIT. `app.js` schreibt diesen Satz bei einer Auswahl
+     auf das GEWAEHLTE Geraet um („… liegen 11 Messtermine vor, vom 10.8.
+     bis zum 16.9.“) und benennt hier die Messluecken. Vor P2 trug er
+     zusaetzlich den globalen Stand („wird seit dem … erfasst“) samt
+     Nachsatz - beide stehen jetzt im Aufklapper „Datenlage“ am
+     Reiterende, und der Satz hier spricht NUR noch über das eine
+     gezeichnete Geraet. Initial `hidden`: die Auto-Vorauswahl fuellt ihn
+     beim Laden. Die data-Attribute sind die zwei Schwellen aus
+     `geraete_verlauf.py`, die `app.js` am Knoten liest (AB_TERMINEN,
+     ABSTAND) - eine dritte Kopie einer Zahl waere die Fehlerklasse aus
+     CLAUDE.md 6 (Stichwort-Vorschau). #}
+  <p class="gr-erklaer gr-basis--duenn" id="gr-vstand" hidden
      data-abterminen="{{ geraete.verlauf.diagramm_ab_terminen }}"
-     data-abstand="{{ geraete.verlauf.linien_abstand }}">Preisverlauf
-  wird seit dem {{ geraete.verlauf.seit | date_de }} erfasst –
-  {{ geraete.verlauf.messtermine }}
-  {{ 'Messtermin' if geraete.verlauf.messtermine == 1 else 'Messtermine' }}.
-  Aussagen zu Preisverfall und Verweildauer ab etwa
-  {{ geraete.verlauf.belastbar_ab_wochen }} Wochen.</p>
+     data-abstand="{{ geraete.verlauf.linien_abstand }}"></p>
 
   <div class="gr-vtabelle" id="gr-vtabelle" hidden></div>
+
+  {# --- Der EINE Datenlage-Aufklapper am Reiterende (P2, Antonio F4). Alles
+     Erklarende dieses Reiters steht geschlossen HIER - auf dem Bildschirm,
+     der den Reiter oeffnet, steht vor dem Suchfeld nur die h2. Zwei Saetze:
+     die Grenze der Kurve (Barpreis, nicht Gesamtkosten - bis P2 stand der
+     Satz ueber dem Suchfeld) und der globale Stand samt Belastbarkeit
+     (bis P2 der Anfangszustand von #gr-vstand, den die Auto-Vorauswahl
+     sofort ueberschrieben haette). #}
+  <details class="gr-vdatenlage">
+    <summary>Datenlage</summary>
+    <div class="gr-vdatenlage-inhalt">
+      <p>Die Kurve zeigt den Barpreis ohne Vertrag, nicht die
+      Gesamtkosten: wer das Gerät im Vertrag kauft, zahlt daneben Tarif
+      und Anschlusspreis. Die Gesamtkosten über 24 Monate (TCO-24) stehen
+      im Reiter „Vergleich“.</p>
+      <p>Preisverlauf wird seit dem {{ geraete.verlauf.seit | date_de }}
+      erfasst – {{ geraete.verlauf.messtermine }}
+      {{ 'Messtermin' if geraete.verlauf.messtermine == 1
+         else 'Messtermine' }}. Aussagen zu Preisverfall und Verweildauer
+      ab etwa {{ geraete.verlauf.belastbar_ab_wochen }} Wochen.</p>
+    </div>
+  </details>
 
   <script type="application/json" id="gr-verlaufdaten">
     {{ geraete.verlauf.geraete | tojson }}

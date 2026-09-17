@@ -1,4 +1,16 @@
 /* Telco Radar - Explorer (Vanilla JS, kein Framework) */
+
+/* DIE ANKUNFTS-ADRESSE, EINMAL GESICHERT (P2, 17.09.2026). Die Zeitreihen-
+   Steuerung des Vergleichs-Reiters schreibt beim Laden ihren Startzustand
+   per history.replaceState in die URL ("?modell=...&band=...") - auch wenn
+   der Leser gar keinen Parameter mitbrachte. Wer die Adresse DANACH liest,
+   haelt interne Zustandsspeicherung fuer einen Leser-Wunsch: die Auto-
+   Vorauswahl des Preisverlaufs wuerde so immer das Vorgabemodell der
+   Zeitreihe zeigen statt des meistgemessenen Geraets. Die eine Zeile hier
+   friert die Suchzeichenfolge der ANKUNFT ein; fuer Leser-Wuensche gilt
+   nur sie. */
+var TR_ANKUNFT_SEARCH = location.search;
+
 (function () {
   'use strict';
 
@@ -2316,16 +2328,16 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     return n;
   }
 
-  /* EINE ZAHL ZUR ZEIT.
+  /* EINE ZAHL ZUR ZEIT - und zwar DIESES Geraets.
 
-     Ohne Auswahl spricht der Satz unter dem Diagramm ueber den ganzen Radar
-     ("seit dem 10. August, 5 Messtermine"). Sobald ein Geraet gewaehlt ist,
-     spricht er ueber DIESES Geraet - denn daneben steht dann die Kachel mit
-     genau dieser Zahl. Am 30.08.2026 standen beide gleichzeitig da, die
-     Kachel mit 4 und der Satz mit 5, und beide hatten recht: die eine
-     zaehlte die Termine dieses Geraets, die andere die aller Geraete. Zwei
-     richtige Zahlen fuer scheinbar dieselbe Sache sind fuer den Leser ein
-     Fehler der Seite. */
+     Der Satz unter dem Diagramm spricht seit P2 nur noch ueber das
+     gewaehlte Geraet ("liegen 11 Messtermine vor"). Bis P2 trug er ohne
+     Auswahl zusaechlich den globalen Stand ("seit dem 10. August, 20
+     Messtermine") samt Nachsatz zur Belastbarkeit - am 30.08.2026 standen
+     Kachel (4) und Satz (5) mit zwei richtigen Zahlen fuer scheinbar
+     dieselbe Sache nebeneinander. Die globalen Zahlen stehen jetzt als
+     zwei Saetze im Datenlage-Aufklapper der Vorlage; der dynamische Satz
+     hier gehoert ganz dem gezeichneten Geraet. */
   function termine(n) {
     return n === 1 ? 'liegt 1 Messtermin' : 'liegen ' + n + ' Messtermine';
   }
@@ -2355,15 +2367,12 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
 
   function satzFuer(g, tage, gezeichnet) {
     if (!stand) return;
-    var wochen = stand.dataset.wochen;
-    var nachsatz = ' Aussagen zu Preisverfall und Verweildauer ab etwa ' +
-                   wochen + ' Wochen.';
+    /* OHNE GEWAEHLTES GERAET SCHWEIGT DIESER SATZ. Der Zustand entsteht
+       seit der Auto-Vorauswahl nur noch beim Rueckbau (der Leser tippt im
+       Suchfeld); der globale Stand steht im Datenlage-Aufklapper - beide
+       gleichzeitig waeren wieder zwei Zahlen fuer dieselbe Sache. */
     if (!g || !tage || !tage.length) {
-      stand.hidden = false;
-      stand.textContent = 'Preisverlauf wird seit dem ' +
-        stand.dataset.seit + ' erfasst – ' + stand.dataset.alle + ' ' +
-        (stand.dataset.alle === '1' ? 'Messtermin' : 'Messtermine') + '.' +
-        nachsatz;
+      stand.hidden = true;
       return;
     }
     /* UNTER DEM GATTER SCHWEIGT DIESER SATZ. Der Hinweis an der Stelle des
@@ -2375,7 +2384,7 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     }
     stand.hidden = false;
     stand.textContent = punkt('Für dieses Gerät ' + termine(tage.length) +
-      ' vor, ' + spanne(tage)) + nachsatz + mehrdeutigSatz(g);
+      ' vor, ' + spanne(tage)) + mehrdeutigSatz(g);
   }
 
   function zeichne(g) {
@@ -2872,13 +2881,16 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
       bild.hidden = true; legende.hidden = true; tabelle.hidden = true;
       bild.innerHTML = ''; legende.innerHTML = ''; tabelle.innerHTML = '';
       leer.hidden = false;
-      leer.textContent = 'Wählen Sie oben ein Gerät – dann steht hier sein '
-        + 'Preisverlauf, mit einer Linie je Anbieter.';
-      // AUCH DIE ZWEI SAETZE. Ohne das stand unter "Wählen Sie oben ein
-      // Gerät" weiter "Für dieses Gerät liegen 2 Messtermine vor, vom 3.8.
-      // bis zum 4.8." - ein Satz ueber ein Geraet, das nicht mehr gewaehlt
-      // ist -, und die globale Zahl war von der Seite verschwunden, weil
-      // `satzFuer` sie beim Gattern ausgeblendet hatte.
+      // P2-Fix (Sicht-Prüfung 17.09.): „Kein Gerät gefunden." statt des
+      // sieben-Wort-Bedinungshinweises - kein Satz auf dieser Seite erklärt
+      // ihre Bedienung. Der Text steht ZWEIMAL im Code (hier und in der
+      // Vorlage) und ein Test hält beide zusammen.
+      leer.textContent = 'Kein Gerät gefunden.';
+      // AUCH DIE ZWEI SAETZE. Ohne das stand unter dem Rückbau-Satz weiter
+      // "Für dieses Gerät liegen 2 Messtermine vor, vom 3.8. bis zum 4.8."
+      // - ein Satz ueber ein Geraet, das nicht mehr gewaehlt ist -, und die
+      // globale Zahl war von der Seite verschwunden, weil `satzFuer` sie
+      // beim Gattern ausgeblendet hatte.
       if (zukurz) { zukurz.hidden = true; zukurz.textContent = ''; }
       satzFuer(null, null, 0);
     }
@@ -2895,8 +2907,9 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
       li.className = 'gr-vtreffer-zeile';
       li.setAttribute('role', 'option');
       li.tabIndex = 0;
-      li.textContent = g.label + ' · ' + g.anbieter +
-        (g.anbieter === 1 ? ' Anbieter' : ' Anbieter');
+      // P2-Fix (Sicht-Prüfung 17.09.): der Ternär hier hatte zwei
+      // IDENTISCHE Zweige (' Anbieter' : ' Anbieter') - toter Code.
+      li.textContent = g.label + ' · ' + g.anbieter + ' Anbieter';
       li.addEventListener('click', function () { waehle(g); });
       li.addEventListener('keydown', function (ev) {
         if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); waehle(g); }
@@ -2922,4 +2935,30 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
       if (gewaehlt) zeichne(gewaehlt);
     });
   });
+
+  /* AUTO-VORAUSWAHL (P2, Antonio F4, 17.09.2026). Bis P2 startete der
+     Reiter mit einem Satz statt einem Bild - die B4-Regel „ohne Auswahl
+     kein Diagramm". Sie schuetzte den Zustand, in dem ueber dem Wähler
+     noch der feste G2-Marktgraph stand; seit sein Fall (P2) waere der
+     Reiter sonst grafiklos aufgegangen. Ohne jeden Klick ist jetzt das
+     ERSTE Geraet der Liste gewaehlt - die Liste kommt nach Messtagen
+     sortiert aus `geraete_verlauf` (`-messpunkte`), das meistgemessene
+     steht also oben. Ein ?modell=-Deep-Link hat Vorrang, wenn dessen
+     Modell in dieser Liste liegt (der Schluesselraum ist derselbe wie
+     der der Zeitreihe); gelesen wird TR_ANKUNFT_SEARCH, nicht die
+     aktuelle Adresse - die Zeitreihe des Vergleichs-Reiters schreibt
+     beim Laden ihr eigenes ?modell= per replaceState hinein, und das
+     waere interne Zustandsspeicherung, kein Leser-Wunsch. Eine
+     unbekannte id faellt still auf das erste Geraet zurueck - derselbe
+     Grundsatz wie beim Deep-Link des Vergleichs-Reiters. */
+  var startGeraet = null;
+  try {
+    var wunschId = new URLSearchParams(TR_ANKUNFT_SEARCH).get('modell');
+    if (wunschId) {
+      for (var i = 0; i < GERAETE.length; i++) {
+        if (GERAETE[i].id === wunschId) { startGeraet = GERAETE[i]; break; }
+      }
+    }
+  } catch (e) { /* aeltere Browser: erstes Geraet */ }
+  waehle(startGeraet || GERAETE[0]);
 })();

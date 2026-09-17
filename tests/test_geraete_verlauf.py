@@ -1,10 +1,12 @@
 """Reiter 3: der Preisverlauf EINES Geraets (B4, 30.08.2026).
 
-Geprueft wird hier die RECHNUNG. Dass ohne Auswahl kein Diagramm dasteht,
-dass die Achse hoechstens acht waagerechte Marken traegt und dass keine
-Schrift unter 12 px faellt, misst `tests/test_geraete_reiter_browser.py` im
-echten Chromium - im gerenderten SVG, nicht im Quelltext. Ein statischer
-Test kann das nicht sehen, weil das SVG erst im Browser entsteht.
+Geprueft wird hier die RECHNUNG. Dass ohne Klick das erste Geraet der
+Liste vorausgewaehlt dasteht (P2, 17.09.2026 - die B4-Regel „ohne Auswahl
+kein Diagramm" ist damit gekippt), dass die Achse hoechstens acht
+waagerechte Marken traegt und dass keine Schrift unter 12 px faellt, misst
+`tests/test_geraete_reiter_browser.py` im echten Chromium - im gerenderten
+SVG, nicht im Quelltext. Ein statischer Test kann das nicht sehen, weil das
+SVG erst im Browser entsteht.
 """
 import pytest
 

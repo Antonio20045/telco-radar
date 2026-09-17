@@ -210,7 +210,8 @@ def test_zwei_verschiedene_geraete_ergeben_zwei_verschiedene_achsen():
 
 def test_eine_flache_reihe_bekommt_trotzdem_eine_spanne():
     """Liegt jeder Preis gleich (Minimum == Maximum), darf die Achse nicht
-    durch Null teilen - dieselbe Absicherung wie in G2."""
+    durch Null teilen - dieselbe Absicherung, die vorher in der (mit P2
+    gefallenen) G2 stand."""
     reihen = [_reihe("o2", [("2026-08-29", 999.0), ("2026-09-05", 999.0)])]
     ergebnis = grafik.zeitreihe(reihen)
     assert ergebnis["hat_daten"]

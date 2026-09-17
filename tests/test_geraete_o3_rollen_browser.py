@@ -347,21 +347,35 @@ def test_die_delta_sortierung_stellt_den_guenstigsten_nach_vorn(seite):
 # --------------------------------------------------------------------------
 
 def test_der_verlaufs_reiter_ist_erreichbar(seite):
-    """B2: Der Knopf existiert, die Tafel ist erreichbar und nicht tot —
-    hier der ehrliche Leerzustand (die Fixture trägt keine Messreihen)."""
+    """B2: Der Knopf existiert, die Tafel ist erreichbar und nicht tot.
+    P2 (Antonio F4): Der Reiter öffnet mit einer AUSWAHL statt eines
+    Leer-Satzes - die Auto-Vorauswahl wählt das erste Gerät der Liste.
+    Ob daraus ein Diagramm oder (unter der Diagramm-Schwelle) Kacheln und
+    Tabelle werden, entscheidet die Datenlage; geprüft wird die Regel:
+    Suchfeld nennt das ERSTE Gerät, die Tabelle steht. Ohne Messreihen
+    bleibt der ehrliche Leerzustand."""
     assert seite.eval_on_selector(
         ".gr-reiter [data-tafel='tafel-verlauf']", "e => !!e")
     seite.click(".gr-reiter [data-tafel='tafel-verlauf']")
-    seite.wait_for_timeout(120)
+    seite.wait_for_timeout(250)
     sichtbar = seite.eval_on_selector("#tafel-verlauf", "e => !e.classList"
                                       ".contains('gr-tafel--aus')")
     assert sichtbar
     inhalt = seite.eval_on_selector(
         "#tafel-verlauf", "e => e.innerText.slice(0, 2000)")
-    assert ("Wählen Sie oben ein Gerät" in inhalt
-            or "liegen noch keine Messreihen vor" in inhalt
-            or "keine Reihe aus Gerät und Anbieter" in inhalt), \
-        "die Verlaufs-Tafel ist leer ohne Auskunft"
+    if "liegen noch keine Messreihen vor" in inhalt:
+        return
+    erstes = seite.eval_on_selector(
+        "#gr-verlaufdaten",
+        "k => JSON.parse(k.textContent)[0].label")
+    assert erstes, "die Fixture legt kein waehlbares Geraet an"
+    feld = seite.eval_on_selector("#gr-vsuche", "e => e.value")
+    assert feld == erstes, (
+        f"Auto-Vorauswahl waehlt nicht das erste Geraet: {feld!r} "
+        f"statt {erstes!r}")
+    assert seite.eval_on_selector_all(
+        "#gr-vtabelle table", "e => e.length") >= 1, (
+        "die Verlaufs-Tafel öffnet ohne Diagramm und ohne Tabelle")
 
 
 def test_kein_querscroll_auf_dem_telefon_geraete(ctx):

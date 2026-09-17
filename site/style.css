@@ -47,9 +47,9 @@
      Google Fonts laedt; "Libre Franklin" wird ohnehin nur in 600/700/800
      geliefert, die 12-px-Beschriftungen liefen also schon auf dem
      Rueckfall. Angewandt auf die "Serie startet"-Annotationen, die
-     Spannen-Annotation der Y-Achse (F-4c) und die G2-Ereignispfeile (die
-     als einzige Graph-Klasse bisher gar keine Schriftregel trugen und
-     die Koerperserbe erbten). */
+     Spannen-Annotation der Y-Achse (F-4c) und - bis zu ihrem Fall mit P2 -
+     die G2-Ereignispfeile (die als einzige Graph-Klasse damals gar keine
+     Schriftregel trugen und die Koerperserbe erbten). */
   --sans-system:'Helvetica Neue','Liberation Sans',Helvetica,Arial,
                 system-ui,sans-serif;
   --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -2550,6 +2550,22 @@ b,strong{font-weight:700}
 .gr-vtreffer-zeile:hover,.gr-vtreffer-zeile:focus{background:var(--paper-3);
   outline:none}
 
+/* P2-Fix (Sicht-Prüfung 17.09.2026): Steuer und Kacheln teilen sich auf dem
+   Schirm EINE Reihe - vorher standen sie untereinander und die erste Kurve
+   begann auf 1440 erst 34 px vor der Falz. Unter der min-width der
+   Kachelreihe bricht der Wrapper um; die Leserichtung Steuer → Kacheln
+   bleibt in beiden Lagen (verbindliche Reihenfolge, Strategie P2). */
+.gr-vkopf{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;
+  margin:0 0 16px}
+.gr-vkopf .gr-vsteuer{margin:0}
+/* flex-basis 0 (statt auto): die Kachelreihe nimmt den RESTPLATZ, ihr
+   Umbruch entscheidet sich allein an der min-width - mit Basis auto mass
+   der Container ihre content-Breite (Grid 1fr), und die Reihe brach auch
+   bei 1184 px Container unter die Steuer um. Die Date-Inputs stehen auf
+   fester Breite, sonst treibt ihr Chromium-Standard (~144 px je Feld) die
+   Steuergruppe auf 605 px und frisst den Platz der Kacheln. */
+.gr-vkopf .gr-vkacheln{flex:1 1 0;min-width:min(480px,100%);margin:0}
+
 .gr-vsteuer{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;
   margin:0 0 16px}
 .gr-vgruppe{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}
@@ -2558,13 +2574,21 @@ b,strong{font-weight:700}
   color:var(--ink-2);cursor:pointer}
 .gr-vknopf.is-aktiv{background:var(--red);border-color:var(--red);color:#fff}
 .gr-vdatum{font-family:var(--sans);font-size:12px;padding:6px 8px;
-  border:1px solid var(--rule);background:var(--paper-2);color:var(--ink)}
+  border:1px solid var(--rule);background:var(--paper-2);color:var(--ink);
+  width:138px}
 
 .gr-vkacheln{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
   background:var(--rule-2);border-top:1px solid var(--rule-ink);
   border-bottom:1px solid var(--rule);margin:0 0 18px}
-.gr-vkachel{background:var(--paper);padding:12px 14px}
-.gr-vkachel b{display:block;font-family:var(--serif);font-size:24px;
+.gr-vkachel{background:var(--paper);padding:12px 10px}
+/* 20 px statt 24 (P2-Fix, 17.09.2026, im Browser nachgemessen): seit die
+   Kachelreihe NEBEN der Zeitraum-Steuer steht, ist eine Kachel 129 px
+   breit (109 px Inhalt) - der laengste Betrag des Bestands ("1.171,00 €")
+   braucht in fett 24 px aber ~110 px und BRACH in die zweite Zeile
+   (Kachelhoehe 100 px, "€" allein auf der Zeile). Bei 20 px (~92 px)
+   bleibt er einzeilig; kleiner als 20 px soll eine Zahl dieser Seite
+   neben ihrem Label ohnehin nicht sein. */
+.gr-vkachel b{display:block;font-family:var(--serif);font-size:20px;
   line-height:1.1;font-variant-numeric:lining-nums}
 .gr-vkachel span{display:block;font-family:var(--sans);font-size:12px;
   letter-spacing:.05em;color:var(--ink-3);margin:3px 0 0}
@@ -2595,11 +2619,68 @@ b,strong{font-weight:700}
   font-family:var(--sans);font-size:12px;color:var(--ink-2)}
 .gr-vlegende-teil{display:inline-flex;align-items:center;gap:6px}
 .gr-vlegende-punkt{width:11px;height:11px;border-radius:50%;display:inline-block}
+/* DIE TABELLE ROLLT IN SICH, NIE DIE GANZE SEITE - dieselbe Hausregel wie
+   an jeder breiten Tabelle dieses Portals. Vor P2 war die Tabelle im
+   Ausgangszustand unsichtbar (keine Auswahl, kein Zeilenbau); mit der
+   Auto-Vorauswahl steht sie gefuellt da, und ihre Zellen-Mindestbreite
+   (376 px) drueckte die Seite auf dem Telefon auf 418 px. */
+.gr-vtabelle{overflow-x:auto}
 .gr-vtabelle table{width:100%}
 .gr-veigen{background:var(--red-wash)}
 
+/* Der EINE Datenlage-Aufklapper am Reiterende (P2): alles Erklärende des
+   Preisverlaufs steht geschlossen hier, vor dem Suchfeld steht nur die h2.
+   cursor:pointer ist P4-Regel - ein summary ohne Zeiger sieht aus wie eine
+   Tabellenzeile (design.md: 20 von 22 Aufklappern). */
+.gr-vdatenlage{margin:22px 0 0;border-top:1px solid var(--rule)}
+.gr-vdatenlage>summary{list-style:none;cursor:pointer;display:flex;
+  align-items:baseline;gap:8px;padding:10px 0;font-family:var(--sans);
+  font-size:12px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-3)}
+.gr-vdatenlage>summary::-webkit-details-marker{display:none}
+.gr-vdatenlage>summary::after{content:"+";font-size:15px;color:var(--red);
+  line-height:1}
+.gr-vdatenlage[open]>summary::after{content:"–"}
+.gr-vdatenlage>summary:hover{color:var(--red)}
+.gr-vdatenlage-inhalt{padding:2px 0 14px;max-width:720px}
+.gr-vdatenlage-inhalt p{font-size:13.5px;line-height:1.6;color:var(--ink-2);
+  margin:0 0 10px}
+
 @media (max-width:760px){
-  .gr-vkacheln{grid-template-columns:repeat(2,1fr)}
+  /* P2-Fix (Sicht-Prüfung 17.09.2026): DIE KURVE GEHÖRT IN DEN ERSTEN
+     Viewport. Vorher begann das SVG auf 390 x 844 bei 1008 px - die Kurve
+     lag 164 px unter der Falz, und der Reiter, der mit einem Diagramm
+     aufgehen soll (Antonio F4), öffnete mit h2 (zweizeilig, 129 px),
+     Suchfeld und gestapelter Steuer. Drei Stellschrauben, gemessen an der
+     echten Seite: h2 ist durch den Kurztitel einzeilig (129 → 50 px), die
+     Von/Bis-Gruppe wird einzeilig (Grid statt Umbruch in der Gruppe), und
+     die Kacheln werden kompakt (139 → ~97 px, siehe unten). */
+  .gr-verlauf{margin:14px 0 0}
+  /* Die h2 trägt ihren Kurztitel auch mobil (einzeilig, 50 px) - mit dem
+     Standardabstand der Rubrikleiste (18 px) lag das SVG exakt AUF der
+     Falz (844,0 px); 12 px geben Luft, damit Rundung und Zoom das
+     Diagramm nicht wieder unter die Kante drücken. */
+  .gr-verlauf .rubrik{margin-bottom:12px}
+  .gr-vsuche{margin:0 0 6px}
+  .gr-vkopf{margin:0 0 6px}
+  .gr-vsteuer{gap:10px;margin:0}
+  /* Von/Bis EINZEILIG: Labels und Inputs als Gridspalten, die Inputs
+     teilen sich die Restbreite - vorher brach die Gruppe in zwei Zeilen
+     (113 px Steuerhöhe). */
+  .gr-vzeit{display:grid;grid-template-columns:auto 1fr auto 1fr;gap:6px;
+    align-items:center;width:100%}
+  .gr-vzeit .gr-vlabel{margin:0}
+  .gr-vzeit .gr-vdatum{width:100%;min-width:0;padding:6px 4px}
+  /* Kacheln 2x2 KOMPAKT statt 4er-Einzeile. Die 4er-Reihe (87 px je
+     Kachel) zwang den laengsten Betrag ("1.171,00 €", fett ~78 px) an
+     die 75-px-Innenbreite - er brach auch bei 14 px noch um, und die
+     Labels ("Niedrigster Preis") brachen mit. Die kompakte 2x2-Streckung
+     (~99 px) haelt Zahl UND Label einzeilig und bleibt damit unter der
+     Falz-Rechnung oben (SVG-Top 834 px von 844). */
+  .gr-vkacheln{grid-template-columns:repeat(2,1fr);margin:0}
+  .gr-vkachel{padding:5px 10px}
+  .gr-vkachel b{font-size:16px}
+  .gr-vkachel span{margin-top:2px}
 }
 
 /* Der dritte Verfuegbarkeitszustand. "unbekannt" heisst, dass die Quelle
@@ -2656,7 +2737,7 @@ b,strong{font-weight:700}
    PHASE R - die TCO-Hauptansicht der Geraeteseite (04.09.2026)
 
    Eine Anbieterfarbe, ueberall dieselbe (C.3): `gr-anb--<slug>` faerbt
-   die Karte, den Balken in G1 und die Linie in G2. Die Kostenart
+   die Karte, den Balken in G1 und die Linien der Zeitreihen. Die Kostenart
    unterscheidet sich in der DECKKRAFT, nicht in der Farbe - sonst
    braeuchte jede Kombination aus Anbieter und Posten einen eigenen Ton,
    und die Legende waere laenger als die Grafik.
@@ -3049,16 +3130,16 @@ b,strong{font-weight:700}
 .gr-kk-delta{margin:6px 0 6px;font-family:var(--sans);font-size:12.5px;
   font-weight:600;color:var(--al-kritisch)}
 .gr-kk-delta--unter{color:var(--al-bestpreis)}
-/* G1 und G2 */
+/* G1 und G0 (die G2-Regeln sind mit dem Block am 17.09.2026 gefallen, P2) */
 .gr-grafik{margin:0 0 18px;padding:0}
 .gr-grafik figcaption{font-family:var(--sans);font-size:12px;
   color:var(--ink-4);margin-top:6px;line-height:1.5}
-.gr-g1,.gr-g2,.gr-g0,.gr-tcoband{display:block;width:100%;height:auto}
+.gr-g1,.gr-g0,.gr-tcoband{display:block;width:100%;height:auto}
 
 /* G0 - die Zeitreihe im Hauptbild (BRIEF_ZEITREIHE, 05.09.2026). Dieselbe
-   Bauform wie G2 (Raster, Achse, Linie, Punkt, Legende); eigene Klassen,
-   weil G0 zusaetzlich eine Sammelluecke UND einzelne Punkte kennt, die G2
-   nicht zeichnet. */
+   Bauform wie die bis P2 existierende G2 (Raster, Achse, Linie, Punkt,
+   Legende); eigene Klassen, weil G0 zusaetzlich eine Sammelluecke UND
+   einzelne Punkte kennt. */
 .gr-g0-raster{stroke:var(--rule-2);stroke-width:1}
 .gr-g0-raster--x{stroke-dasharray:2 4}
 .gr-g0-achse{font-family:var(--sans);font-size:12px;fill:var(--ink-4)}
@@ -3127,17 +3208,6 @@ b,strong{font-weight:700}
 .gr-g1-seg{fill:var(--anb,#57534a)}
 .gr-g1-bonus{fill:none;stroke:var(--ink-3);stroke-width:1;
   stroke-dasharray:3 3}
-.gr-g2-raster{stroke:var(--rule-2);stroke-width:1}
-.gr-g2-raster--x{stroke-dasharray:2 4}
-.gr-g2-achse{font-family:var(--sans);font-size:12px;fill:var(--ink-4)}
-.gr-g2-linie{stroke:var(--anb,#57534a);stroke-width:2}
-.gr-g2-punkt{fill:var(--anb,#57534a)}
-/* F-4e (09.09.2026): die Ereignispfeile trugen ALS EINZIGE Graph-Klasse
-   keine Schriftregel und erbten die Koerperserbe des Portals - dieselbe
-   Sans-Schrift des Systems wie die uebrigen Graph-Beschriftungen. */
-.gr-g2-marker{font-family:var(--sans-system);font-size:12px;fill:var(--ink-3)}
-.gr-g2-legende{font-family:var(--sans);font-size:12px;
-  fill:var(--anb,#57534a)}
 
 /* KEINE SCHRIFT UNTER 12 PIXELN, auch nicht im SVG. Die Regel gilt auf
    dieser Seite seit dem 30.08.2026 und wird im echten Chromium gemessen:
@@ -3150,7 +3220,7 @@ b,strong{font-weight:700}
    (Befund vom 11.08.2026 zur geloeschten Positionskarte). */
 @media (max-width:900px){
   .gr-grafik{overflow-x:auto}
-  .gr-g1,.gr-g2,.gr-g0,.gr-tcoband{width:1180px;max-width:none}
+  .gr-g1,.gr-g0,.gr-tcoband{width:1180px;max-width:none}
 }
 
 /* Wettbewerbs-Radar (RAD-1, 08.09.2026). Reuse-first: `.src-table`,
