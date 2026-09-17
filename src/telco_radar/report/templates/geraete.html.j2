@@ -329,17 +329,52 @@
     </div>
   </div>
 
-  {# --- 1b. Die Geräte-Kacheln (§3.2): die häufigsten Geräte als
-         Schnelleingang, aus dem Bestand gerechnet (die meisten Anbieter,
-         dann Messpunkte - dasselbe Maß wie der Startzustand). Auf dem
-         Telefon bleibt die Zeile knapper als der Graph wichtig (11c). #}
+  {# --- 1b. Die MODELL-KARTEN (§3.2 + P1/F3): die häufigsten Geräte als
+         prominenter Schnelleingang - jede Karte trägt JE BAND (P1-Fix
+         Sicht-B2: die Karte reagiert auf den Band-Umschalter) ihren
+         ab-Preis (bestes echtes Angebot DES BANDES, groß), die Bewegung
+         seit dem ersten Messtag und die Anbieter der Zeitreihe als Punkte
+         in Hausfarben. Alle Zahlen kommen fertig aus geraete_zeitreihe
+         (Regel 1); die Reihung (Anbieter, dann Punkte) ist unverändert.
+         Zwei Klickwege: der Karten-Körper wählt das Modell
+         (waehle(modell, null)), die PREISZAHL öffnet zusätzlich den
+         Rechenweg dieses Preises (P1-Fix Sicht-A1 - app.js liest nur
+         fertige data-Attribute, kein Rechnen). Ein Band ohne echtes
+         Angebot zeigt „—" statt eines geratenen Preises. #}
   {% if zr.kacheln %}
+  {% set aktives_band = zr.start.band if zr.start else '' %}
   <div class="gr-zr-kacheln" id="gr-zr-kacheln" aria-label="Häufige Geräte">
     {% for k in zr.kacheln %}
     <button type="button" data-modell="{{ k.id }}"{% if k.id ==
-      start_modell %} aria-pressed="true"{% endif %}><span class="gr-zr-k-name">{{
-      k.kurz }}</span>{% if k.meta %}<span class="gr-zr-k-meta">{{ k.meta
-      }}</span>{% endif %}</button>
+      start_modell %} aria-pressed="true"{% endif %}>
+      <span class="gr-zr-k-kopf"><span class="gr-zr-k-name">{{ k.kurz
+        }}</span>{% for b, s in k.baender.items() %}<span class="gr-zr-k-punkte
+        gr-zr-k-band" data-band="{{ b }}"{% if b != aktives_band %}
+        hidden{% endif %}{% if s.anbieter_text %} role="img"
+        aria-label="Anbieter mit Messung: {{ s.anbieter_text }}"{% endif
+        %}>{{ s.punkte_html|safe }}</span>{% endfor %}</span>
+      {% for b, s in k.baender.items() %}
+      <span class="gr-zr-k-band" data-band="{{ b }}"{% if b != aktives_band %}
+        hidden{% endif %}{% if s.anb %} data-anb="{{ s.anb }}"{% endif %}>
+        {%- if s.ab %}<span class="gr-zr-k-preis"><small>ab</small><b>{{
+          s.ab }}</b>{% if s.ab_monat %}<span class="gr-zr-k-monat">{{
+          s.ab_monat }}</span>{% endif %}</span>
+        {%- else %}<span class="gr-zr-k-preis"><small class="gr-zr-k-leer"
+          title="kein Bündel-Angebot in diesem Band">—</small></span>{%- endif %}
+        {%- if s.delta_text %}<span class="gr-zr-k-delta{% if
+          s.delta_richtung %} gr-zr-k-delta--{{ s.delta_richtung }}{% endif
+          %}">{{ s.delta_text }}</span>{%- endif %}
+      </span>
+      {% endfor %}
+      {# Ein Band, das DIESE Karte nicht führt, lässt sie nicht leer
+         sterben: der Ersatz-Span steht auf und sagt „—" (dasselbe
+         Zeichen wie ein Band ohne echtes Angebot - ein benannter
+         Zustand, kein geratener Preis). #}
+      <span class="gr-zr-k-band gr-zr-k-band--kein" data-band="__ohne" hidden>
+        <span class="gr-zr-k-preis"><small class="gr-zr-k-leer"
+          title="dieses Gerät wird in diesem Band nicht geführt">—</small>
+      </span></span>
+    </button>
     {% endfor %}
   </div>
   {% endif %}
@@ -350,6 +385,14 @@
          `data/geraete-zeitreihe.html` (app.js montiert nur). #}
   {% if zr.start_block %}
   <div class="gr-zr-gruppe" id="gr-zr-gruppe">{{ paarblock(zr.start_block) }}</div>
+  {# P1/A2 (17.09.2026): EIN Klick-Panel unter dem Graph. app.js setzt hier
+     bei Klick auf einen Kurvenpunkt (unsichtbare Fläche .gr-zr-hit) oder die
+     PREISZAHL im Antwort-Satz das fertige <template> genau dieser Messung
+     ein (content.cloneNode - reine Montage, keine Client-Rechnung). Der
+     Container steht BEWUSST außerhalb des Montagepunkts #gr-zr-gruppe:
+     setzeGraph() leert die Gruppe bei jedem Modellwechsel, das Panel schließt
+     app.js dort selbst, statt mit dem Block verschwinden zu müssen. #}
+  <div class="gr-zr-panel" id="gr-zr-panel" hidden></div>
   {% elif m %}
   {# Paare ohne Serie: der ehrliche Leer-Satz an derselben Stelle. #}
   <div class="gr-zr-gruppe" id="gr-zr-gruppe"><p class="gr-zr-keine">Für dieses Gerät liegt

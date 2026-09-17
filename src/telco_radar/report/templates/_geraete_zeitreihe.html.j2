@@ -48,5 +48,13 @@
     {% if p.luecke_text %}
     <p class="gr-lueckenzeile" id="gr-zr-luecke">{{ p.luecke_text }}</p>
     {% endif %}
+    {# P1 (17.09.2026): der Rechenweg JE MESSUNG als <template>-Blöcke,
+       serverseitig fertig - unter dem SVG, im Fragment genauso wie im
+       Server-First-Paint (DEMSELBEN Makro). Der Container ist hidden;
+       app.js setzt bei Klick auf einen Punkt (data-anb/data-m) oder die
+       Preiszahl den passenden Block in EIN Panel - reine Montage,
+       keine Client-Rechnung (Regel 1). Format:
+       outputs/strategie-geraete-v3-2026-09-17/p1/schnittstelle-rechenweg.md #}
+    {% if p.rechenweg_html %}{{ p.rechenweg_html | safe }}{% endif %}
   </section>
 {% endmacro %}

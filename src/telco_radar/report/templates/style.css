@@ -3285,17 +3285,86 @@ b,strong{font-weight:700}
 .gr-zr-baender button[aria-pressed="true"] small{color:var(--paper-3)}
 .gr-zr-baender button:disabled{opacity:.38;cursor:default}
 .gr-zr-baender button:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
-.gr-zr-kacheln{display:flex;flex-wrap:wrap;gap:8px;padding-bottom:16px}
-.gr-zr-kacheln button{display:flex;align-items:baseline;gap:8px;
-  font-family:var(--serif);font-size:14.5px;padding:6px 12px;
+/* --- P1/F3 (A3, 17.09.2026): MODELL-KARTEN statt einzeiliger Chips ----
+   Der Schnelleingang ist kein Knopf-Reihen-Nachschub mehr, sondern die
+   erste Preisantwort der Tafel: Modellname (Etikett), ab-Preis GROSS
+   (Serif wie jede Preiszahl der Seite, >= 20 px - Messlatte der Abnahme),
+   darunter Bewegungs-Delta und Anbieter-Punkte in den Hausfarben des
+   Graphen. Linien statt Kaesten bleibt: 1-px-Rahmen, kein Schatten, kein
+   Radius.
+   P1-Fix (Sicht-B1/B2/B3/B4, 17.09.2026): die Werte stehen JE BAND als
+   eigene Spans (.gr-zr-k-band) - der Bandwechsel blendet nur um. Die
+   aktive Karte traegt ROT (Akzent, kein Ink mehr) mit 3 px PLUS Flaeche;
+   inaktive Karten unterstreichen ihren Modellnamen im Hover. Die
+   Bewegung ist die Story der Karte und steht eine Stufe groesser und
+   farbig (steigt rot / sinkt gruen; ±0 bleibt grau und klein - keine
+   Bewegung ist keine Story). */
+.gr-zr-kacheln{display:grid;grid-template-columns:repeat(auto-fit,
+  minmax(158px,1fr));gap:10px;padding-bottom:16px}
+.gr-zr-kacheln button{display:flex;flex-direction:column;align-items:flex-start;
+  gap:2px;min-width:0;padding:9px 12px 8px;
   border:1px solid var(--rule);background:var(--paper);color:var(--ink);
-  cursor:pointer}
-.gr-zr-kacheln button .gr-zr-k-meta{font-family:var(--sans);font-size:12px;
-  color:var(--ink-4)}
+  cursor:pointer;text-align:left;font-family:var(--serif)}
+.gr-zr-kacheln button .gr-zr-k-kopf{display:flex;align-items:center;
+  justify-content:space-between;gap:8px;width:100%;min-width:0}
+.gr-zr-kacheln button .gr-zr-k-name{font-family:var(--sans);font-size:12px;
+  font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--ink-3);min-width:0;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap}
+.gr-zr-kacheln button:hover .gr-zr-k-name,.gr-zr-kacheln button:focus-visible
+  .gr-zr-k-name{text-decoration:underline;text-underline-offset:2px}
+/* Die Band-Spans: EINE Sichtbarkeit-Regel mit eigener [hidden]-Zeile -
+   die Klasse allein (display:flex) wuerde das globale [hidden] schlagen
+   (gleiche Spezifitaet, spaetere Regel gewinnt) und der Umschalter
+   bliebe ohne Wirkung. Die [hidden]-Zeile ist absichtlich spezifischer
+   als jede Gestaltungsregel derselben Spans (die Punkte-Spans sind
+   Band-Span UND Reihe zugleich). */
+.gr-zr-k-band{display:flex;flex-direction:column;align-items:flex-start;
+  gap:1px;min-width:0}
+.gr-zr-kacheln .gr-zr-k-band[hidden]{display:none}
+.gr-zr-k-band .gr-zr-k-preis{display:flex;align-items:baseline;
+  flex-wrap:wrap;gap:4px;margin-top:2px}
+.gr-zr-k-band .gr-zr-k-preis small{font-family:var(--sans);
+  font-size:12px;color:var(--ink-4)}
+.gr-zr-k-band .gr-zr-k-preis small.gr-zr-k-leer{font-size:14px;
+  color:var(--ink-3);cursor:help}
+.gr-zr-k-band .gr-zr-k-preis b{font-family:var(--serif);font-size:21px;
+  font-weight:700;font-variant-numeric:lining-nums;letter-spacing:-.01em;
+  line-height:1.15;white-space:nowrap}
+.gr-zr-k-band .gr-zr-k-monat{font-family:var(--sans);font-size:12px;
+  color:var(--ink-4);white-space:nowrap}
+.gr-zr-k-band .gr-zr-k-delta{font-family:var(--sans);
+  font-weight:600;white-space:nowrap;margin-top:1px}
+/* Die Richtungsklassen muessen die Specificitaet der Basisregel
+   (.gr-zr-k-band .gr-zr-k-delta, Gewicht 600) schlagen - ein bloesses
+   .gr-zr-k-delta--steigt verlöre font-weight dagegen (gemessen). */
+.gr-zr-k-band .gr-zr-k-delta--steigt,.gr-zr-k-band .gr-zr-k-delta--sinkt{
+  font-size:13.5px;font-weight:700}
+.gr-zr-k-delta--steigt{color:var(--red)}
+.gr-zr-k-delta--sinkt{color:#2f6b3a}
+.gr-zr-k-delta--gleich{font-size:12px;color:var(--ink-4)}
+/* Die Punkte-Spalte ist selbst ein Band-Span (wechselt mit) - ihr
+   flex-direction MUSS hier ausdrücklich row stehen, sonst erbt sie die
+   column des Band-Koerpers und stapelt die Anbieterpunkte untereinander
+   (mobil mass das +36 px Kartenhoehe, 11c fiel auf 872 px). */
+.gr-zr-kacheln button .gr-zr-k-punkte{display:flex;flex-direction:row;
+  gap:4px;flex:none}
+.gr-zr-k-punkte i{width:10px;height:10px;border-radius:50%;display:block;
+  border:1px solid var(--paper)}
 .gr-zr-kacheln button:hover,.gr-zr-kacheln button:focus-visible{
   border-color:var(--ink-3)}
-.gr-zr-kacheln button[aria-pressed="true"]{border-color:var(--ink);
-  border-width:1.5px}
+.gr-zr-kacheln button[aria-pressed="true"]{border-color:var(--red);
+  border-width:3px;background:var(--paper-2)}
+/* P1-Fix (Sicht-A1): die Preiszahl der AKTIVEN Karte mit echtem Angebot
+   ist der dritte Eingang des Rechenweg-Panels - dieselbe gepunktete
+   rote Unterscheidung wie die Preiszahl des Antwort-Satzes. Das Styling
+   haengt am data-anb des Band-Koerpers (nur mit Anbieter, nie am
+   Leerzustand „-"). */
+.gr-zr-kacheln button[aria-pressed="true"] .gr-zr-k-band[data-anb]
+  .gr-zr-k-preis b{cursor:pointer;border-bottom:2px dotted var(--red)}
+.gr-zr-kacheln button[aria-pressed="true"] .gr-zr-k-band[data-anb]
+  .gr-zr-k-preis b:hover{color:var(--red);border-bottom-style:solid}
+/* --- Ende P1/F3 (A3): Modell-Karten --------------------------------- */
 .gr-zr-antwort{margin:0 0 10px;padding:12px 0 0;border-top:3px solid var(--ink);
   font-size:19px;line-height:1.42}
 .gr-zr-antwort .gr-zr-zahl{font-weight:700;font-variant-numeric:lining-nums}
@@ -3328,6 +3397,11 @@ b,strong{font-weight:700}
 .gr-zr-linie{fill:none;stroke-width:2.4;stroke-linejoin:round}
 .gr-zr-punkt{stroke:var(--paper-2);stroke-width:1.6}
 .gr-zr-ende{stroke-width:2.6}
+/* P1-Fix (Sicht 15): der Halo um einen Punkt, dessen Serie EINEN Messtag
+   hat - „erstmals gemessen". Ein nackter Punkt ohne Linie liest sich
+   sonst wie ein Fehler; der zweite Messtag macht die Serie zur Linie und
+   laesst den Halo verschwinden. */
+.gr-zr-halo{stroke-width:1.5;opacity:.5}
 .gr-zr-wert{font-family:var(--sans-system);font-size:13.5px;font-weight:700;
   fill:var(--ink)}
 .gr-zr-wert--erst{font-size:10.5px;font-weight:600;fill:var(--ink-4)}
@@ -3343,6 +3417,78 @@ b,strong{font-weight:700}
   margin:2px 0 0}
 .gr-zr-keine{font-family:var(--sans);font-size:13px;color:var(--ink-3);
   margin:6px 0 0}
+
+/* P1/A2 (17.09.2026): das Klick-Panel - der Rechenweg EINER Messung, unter
+   dem Graph. Linien statt Kaesten wie ueberall hier: 1-px-Trenner nach dem
+   Graph, Haarlinien zwischen den Posten, 2-px-Schlusslinie ueber der Summe.
+   Die Klassen gr-zr-rech & Co. kommen fertig aus dem serverseitigen
+   <template> (A1) - hier stehen nur ihre Formen.
+   P1-Fix (Sicht-A2, 17.09.2026): Quittungsformat - das Panel ist auf
+   780px begrenzt (vorher endete der Inhalt auf 1184px Breite bei ~575px,
+   die rechte Haelfte stand leer), und JEDE Postenzeile traegt einen
+   proportionalem Balken (Breite = Anteil an der Summe, als fertige
+   Prozentangabe aus dem Server-Markup - der Browser setzt nur ein). */
+.gr-zr-panel{position:relative;margin:4px 0 16px;border-top:1px solid var(--rule);
+  padding:10px 30px 12px 0;max-width:780px}
+.gr-zr-panel[hidden]{display:none}
+.gr-zr-zu{position:absolute;top:8px;right:0;width:30px;height:30px;padding:0;
+  font-family:var(--sans);font-size:17px;line-height:1;color:var(--ink-3);
+  background:transparent;border:1px solid var(--rule);cursor:pointer}
+.gr-zr-zu:hover,.gr-zr-zu:focus-visible{color:var(--red);border-color:var(--red)}
+.gr-zr-rech--leer{font-family:var(--sans);font-size:12.5px;color:var(--ink-3);
+  margin:0}
+.gr-zr-rkopf{font-family:var(--sans);font-size:12.5px;font-weight:700;
+  letter-spacing:.02em;margin:0 0 6px}
+/* P1-Fix (Sicht 12): der Kopf nennt den Anbieter mit dem FARBPUNKT seiner
+   Linie im Graphen - die Kopplung, die das Lesen des Charts lehrt. */
+.gr-zr-rpunkt{display:inline-block;width:10px;height:10px;border-radius:50%;
+  margin-right:7px;vertical-align:baseline}
+ul.gr-zr-posten{list-style:none;margin:0;padding:0}
+li.gr-zr-posten{display:flex;flex-wrap:wrap;justify-content:space-between;
+  align-items:center;gap:2px 14px;padding:5px 0;border-top:1px solid
+  var(--rule-2)}
+li.gr-zr-posten:first-child{border-top:0}
+.gr-zr-pn{font-family:var(--sans);font-size:12.5px;color:var(--ink-3);
+  flex:0 1 auto}
+.gr-zr-pbar{flex:1 1 90px;height:6px;min-width:40px;background:
+  var(--rule-2);overflow:hidden;align-self:center}
+.gr-zr-pbar i{display:block;height:100%;background:var(--ink-3)}
+.gr-zr-pr{text-align:right;min-width:0;overflow-wrap:anywhere;
+  font-variant-numeric:lining-nums;flex:0 0 auto}
+.gr-zr-pg{color:var(--ink-4);font-weight:600}
+/* P1-Fix (Code-S3-1/Sicht-A3): die Klammer erklaert den Faktor der
+   Rechnung („24 von 36 Raten") - ein LESSENDES Label, kein Meta-Etikett
+   der dokumentierten Ausnahme: 13 px (vorher 11, unter der 12-px-Regel,
+   von keinem Test erreichbar, weil Templates im DocumentFragment leben). */
+.gr-zr-pk{display:block;font-family:var(--sans);font-size:13px;
+  color:var(--ink-4)}
+.gr-zr-rsumme{margin:7px 0 0;border-top:2px solid var(--ink);padding-top:7px;
+  font-variant-numeric:lining-nums}
+.gr-zr-rsumme b{font-size:17px}
+.gr-zr-plabel{font-family:var(--sans);font-size:12px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--red);
+  margin-left:6px}
+/* P1-Fix (Sicht-A3): die Restschuld nach Monat 24 - die Zahl, die den
+   TCO-24 vergleichbar macht, steht da, wo gerechnet wird. */
+.gr-zr-roffen{font-family:var(--sans);font-size:12.5px;color:var(--ink-3);
+  margin:4px 0 0}
+.gr-zr-rbeleg{font-family:var(--sans);font-size:12px;color:var(--ink-4);
+  margin:6px 0 0;text-align:right}
+/* Die Eingaenge des Panels: die unsichtbare Trefferflaeche ueber dem
+   gezeichneten Kreis (r=12) und die PREISZAHL des Antwort-Satzes. Rot ist
+   Akzent - die Zahl traegt eine gepunktete Linie, kein Flaechen-Muster. */
+.gr-zr-hit{cursor:pointer}
+.gr-zr-hit:focus{outline:none}
+.gr-zr-hit:focus-visible{stroke:var(--red);stroke-width:2;
+  stroke-dasharray:3 3}
+/* Die Aktiv-Markierung des geklickten Punkts: ein dichter INK-Ring statt
+   Rot - Vodafones Serienfarbe ist Rot, ein roter Ring waere auf dem eigenen
+   Punkt unsichtbar (am 17.09.2026 im Screenshot nachgesehen). */
+circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
+.gr-zr-zahl--klick{cursor:pointer;border-bottom:2px dotted var(--red)}
+.gr-zr-zahl--klick:hover{color:var(--red);border-bottom-style:solid}
+.gr-zr-zahl--klick:focus-visible{outline:2px solid var(--red);
+  outline-offset:2px}
 
 /* Auf dem Telefon: die SCHMALE Variante (eigene Ränder, keine Erst-Werte-
    Labels im Bild - sie stehen als "ab"-Werte in der Legende). Verdichtet
@@ -3360,21 +3506,43 @@ b,strong{font-weight:700}
   .gr-zr-baender button{flex:1 1 0;padding:6px 2px;font-size:11.5px;
     text-align:center}
   .gr-zr-baender button small{font-size:8.5px}
-  .gr-zr-kacheln{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
-    padding-bottom:8px;gap:6px}
-  .gr-zr-kacheln button{flex:0 0 auto;white-space:nowrap}
+  /* P1/F3 (A3): die Karten rollen QUER (kein 2x3-Berg - der wuerde die
+     Antwort um ueber 100 px unter die 844-er-Falz druecken, Kriterium
+     11c geht vor). Alle Karten bleiben ohne vertikalen Berg erreichbar;
+     der Preis bleibt auch hier >= 20 px (Messlatte). P1-Fix (Sicht-B4):
+     das Bewegungs-Delta ist eine Stufe gewachsen (13,5 px) - die beiden
+     Karten-Paddings sind dafuer um denselben Betrag schmaler, 11c mass
+     846 statt 844. */
+  .gr-zr-kacheln{display:flex;flex-wrap:nowrap;overflow-x:auto;
+    -webkit-overflow-scrolling:touch;padding-bottom:4px;gap:6px}
+  .gr-zr-kacheln button{flex:0 0 auto;width:156px;gap:1px;padding:6px 10px 4px}
+  .gr-zr-kacheln button .gr-zr-k-preis{margin-top:1px}
+  .gr-zr-kacheln button .gr-zr-k-preis b{font-size:20px;line-height:1.1}
+  .gr-zr-kacheln button .gr-zr-k-delta{margin-top:0}
   /* 11c geht vor (§3.2): am echten Bestand mass der Graphkopf mit den
-     alten Abstaenden 854 von 844 px - diese vier Abstriche bringen ihn
-     auf 840. Gemessen, nicht geraten. */
-  .gr-zr-antwort{font-size:15.5px;line-height:1.4;padding-top:7px;margin-bottom:2px}
-  .gr-zr-rechnung{margin-bottom:4px}
-  .gr-zr-kopf{margin:0 0 2px}
+     alten Abstaenden 854 von 844 px - die Kartenzeile kostet jetzt mehr
+     Flaeche als die alten Chips, deshalb werden die gr-zr-eigenen
+     Abstaende STRAFFER (der Steuerblock selbst bleibt unangetastet).
+     Gemessen, nicht geraten: Kopfboden 841 von 844. */
+  .gr-zr-wahl{padding-bottom:3px}
+  .gr-zr-kacheln{padding-bottom:3px}
+  .gr-zr-antwort{font-size:14.5px;line-height:1.32;padding-top:3px;
+    margin-bottom:0}
+  .gr-zr-rechnung{margin-bottom:2px}
+  .gr-zr-rechnung>summary{font-size:11px;line-height:1.1}
+  .gr-zr-kopf{margin:0}
   .gr-zr-legende{font-size:10.5px;gap:3px 12px;margin-bottom:6px}
   .gr-zr-legende i{width:8px;height:8px}
   .gr-zr-messtage{font-size:10px}
   .gr-zr-bild svg.gr-zr--breit{display:none}
   .gr-zr-bild svg.gr-zr--schmal{display:block}
   .gr-zr-hinweis{font-size:10px}
+  .gr-zr-panel{margin-bottom:12px;padding-top:8px}
+  .gr-zr-zu{width:32px;height:32px;font-size:18px}
+  .gr-zr-rsumme b{font-size:15.5px}
+  .gr-zr-rkopf{font-size:11.5px}
+  li.gr-zr-posten{padding:4px 0}
+  .gr-zr-pn{font-size:11.5px}
 }
 /* Breit: das Bild zeigt die Werte (grosser letzter, kleiner erster), der
    Wert-Span der Legende weicht (eine Zahl steht je Ort genau EINMAL).

@@ -1883,3 +1883,141 @@ def test_belege_eines_ereignisses_stehen_unter_der_meldung(tmp_path):
     # Ein Link im Link waere ungueltiges HTML - die Belege muessen ausserhalb
     # des Meldungslinks stehen.
     assert belege.find_parent("a") is None
+
+
+# ==========================================================================
+# P1/F3 (A3, 17.09.2026): die Zahlen auf den MODELL-KARTEN des
+# Vergleichs-Reiters. Die Karte ist der Schnelleingang der Tafel und
+# traegt drei Zahlen (ab-Preis, Ø/Monat, Bewegungs-Delta) - jede wird
+# gegen einen ZWEITEN Aufbereitungs-Lauf ueber denselben Bestand gehalten
+# (Seite gegen Daten, nicht Vorlage gegen sich selbst). get_text OHNE
+# Trenner: der Trenner machte aus "24" und "54 Modelle" einmal "2454"
+# (30.08.2026) - derselbe Fehlertyp wie der Anlass dieser Datei.
+# ==========================================================================
+
+def _geraete_kartenzahl_site(tmp_path):
+    from telco_radar.geraete_config import lade_katalog, lade_quellen
+    from telco_radar.report import geraete_view, geraete_zeitreihe
+    from test_geraete_zeitreihe_ansicht import HEUTE as ZR_HEUTE, _baue
+    root, state = _baue(tmp_path)
+    reports = root / "data" / "reports"
+    reports.mkdir(parents=True, exist_ok=True)
+    (reports / f"{ZR_HEUTE}.json").write_text(json.dumps({
+        "date": ZR_HEUTE, "language": "de",
+        "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
+        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{ZR_HEUTE}.md").write_text("# B\n", encoding="utf-8")
+    site = root / "site"
+    render_site(site, reports)
+    g = geraete_view.aufbereiten(state, lade_quellen(root),
+                                 lade_katalog(root), heute=ZR_HEUTE)
+    aufbereitung = geraete_zeitreihe.aufbereiten(state, g["tco"])
+    return site, aufbereitung
+
+
+def test_die_kartenzahlen_stehen_wortlich_auf_der_seite(tmp_path):
+    site, aufbereitung = _geraete_kartenzahl_site(tmp_path)
+    soup = BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
+                         "html.parser")
+    karten = soup.select("#gr-zr-kacheln button[data-modell]")
+    assert karten, "die Modell-Karten fehlen auf der Geräteseite"
+    assert len(karten) == len(aufbereitung["kacheln"]), \
+        (f"{len(karten)} Karten auf der Seite, "
+         f"{len(aufbereitung['kacheln'])} in der Aufbereitung")
+    text_je_id = {k.get("data-modell"): k.get_text() for k in karten}
+    assert len(text_je_id) == len(aufbereitung["kacheln"]), \
+        "dieselbe Karte zweimal auf der Seite"
+    for k in aufbereitung["kacheln"]:
+        text = text_je_id[k["id"]]
+        assert k["kurz"] in text, f"Name fehlt auf der Karte {k['id']}"
+        # P1-Fix (Sicht-B2): die Zahlen stehen JE BAND auf der Karte - jede
+        # Bandlage muss wortlich da sein (get_text liest hidden mit).
+        assert set(k["baender"]), f"Karte {k['id']} ohne Band-Werte"
+        for band, s in k["baender"].items():
+            if s["ab"]:
+                assert s["ab"] in text, \
+                    f"ab-Preis {s['ab']} ({band}) fehlt auf {k['id']}"
+                if s["ab_monat"]:
+                    assert s["ab_monat"] in text, \
+                        f"Ø/Monat {s['ab_monat']} ({band}) fehlt auf {k['id']}"
+            if s["delta_text"]:
+                assert s["delta_text"] in text, \
+                    f"Bewegung {s['delta_text']} ({band}) fehlt auf {k['id']}"
+
+
+def test_keine_karte_zeigt_zahlen_die_die_aufbereitung_nicht_hat(
+        tmp_path):
+    """Gegenprobe: der Karten-Text der Seite besteht NUR aus Feldern der
+    Aufbereitung - kein Zahlfragment, das dort nicht herkommt (waere die
+    Vorlage auf eigene Rechnung gerechnet)."""
+    import re
+    site, aufbereitung = _geraete_kartenzahl_site(tmp_path)
+    soup = BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
+                         "html.parser")
+    erlaubt = set()
+    for k in aufbereitung["kacheln"]:
+        erlaubt |= {k["kurz"], "ab"}
+        for s in k["baender"].values():
+            erlaubt |= {s["ab"], s["ab_monat"], s["delta_text"],
+                        s["anbieter_text"]}
+    erlaubt |= {t for k in aufbereitung["kacheln"] for t in k["kurz"].split()}
+    erlaubt.discard(None)
+    for karte in soup.select("#gr-zr-kacheln button[data-modell]"):
+        for wort in re.findall(r"[\d.,]+ ?(?:€|€/Monat|Tag(?:en)?)",
+                               karte.get_text()):
+            assert wort in erlaubt or any(
+                wort in (f or "") for f in erlaubt if f), \
+                f"Zahl {wort!r} steht auf der Karte, aber nicht in der " \
+                f"Aufbereitung"
+
+
+# ==========================================================================
+# P1/F2 (A4, 17.09.2026): die Zahlen der RECHENWEG-VORLAGEN (Panel-Posten).
+# Jeder Kurvenpunkt und die Preiszahl oeffnen auf Klick die Rechung genau
+# dieser Messung; die Posten stehen serverseitig als <template> im First
+# Paint. Auch diese Zahlen gelten erst, wenn ein Test sie gegen die Daten
+# haelt: jede Zahl der Seite muss im ZWEITEN Aufbereitungs-Lauf ueber
+# denselben Bestand stehen (die Vorlage darf nichts selbst rechnen oder
+# formatieren). Dass die Posten die eingefrorene Leitzahl ergeben, hat
+# A1 in test_geraete_zeitreihe_rechenweg.py nachgerechnet (2562/2562 am
+# echten Bestand) - hier wird nur die SEITE gegen die Aufbereitung gehalten.
+# ==========================================================================
+
+def test_die_panel_posten_kommen_aus_der_aufbereitung(tmp_path):
+    import re as _re
+    site, aufbereitung = _geraete_kartenzahl_site(tmp_path)
+    soup = BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
+                         "html.parser")
+    first_paint = soup.select(
+        "#gr-zr-gruppe .gr-zr-rechnungen template[data-anb]")
+    assert first_paint, "die Rechenweg-Vorlagen fehlen im First Paint"
+    fragment = BeautifulSoup(
+        (site / "data" / "geraete-zeitreihe.html").read_text("utf-8"),
+        "html.parser").select("template[data-anb]")
+    assert fragment, "das Zeitreihen-Fragment traegt keine Vorlagen"
+    # Wächter (§6): der Lookup darf nicht teilweise treffen. Der First
+    # Paint traegt NUR das Startpaar, das Fragment ALLE Paare - beide
+    # Zahlen muessen gegen die Aufbereitung stimmen, sonst waere der
+    # Zahl-Vergleich darunter grün, ohne etwas zu prüfen.
+    start = aufbereitung["start_block"]
+    assert start is not None, "die Aufbereitung nennt kein Startpaar"
+    vorlagen_start = start["rechenweg_html"].count("<template")
+    vorlagen_alle = sum(p["rechenweg_html"].count("<template")
+                        for p in aufbereitung["paare"])
+    assert len(first_paint) == vorlagen_start, \
+        (f"{len(first_paint)} Vorlagen im First Paint, {vorlagen_start} "
+         f"beim Startpaar der Aufbereitung")
+    assert len(fragment) == vorlagen_alle, \
+        (f"{len(fragment)} Vorlagen im Fragment, {vorlagen_alle} in der "
+         f"Aufbereitung")
+    quelle = "\n".join(p["rechenweg_html"] for p in aufbereitung["paare"])
+    assert quelle, "die Aufbereitung liefert keine Rechenweg-Zeichen"
+    # Gegenprobe im selben Test (§6): eine Zusicherung, die nichts
+    # ausschließt, prüft nichts - ein erfundener Betrag darf nie
+    # durchgehen.
+    assert "999999,99 €" not in quelle
+    for t in list(first_paint) + list(fragment):
+        for zahl in _re.findall(r"[0-9][0-9.,]*", t.get_text(" ", strip=True)):
+            assert zahl in quelle, \
+                f"Zahl {zahl!r} im Rechenweg-Panel kommt nicht aus der " \
+                f"Aufbereitung (Vorlage gerechnet statt gesetzt?)"

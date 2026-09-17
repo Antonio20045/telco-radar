@@ -115,6 +115,36 @@ def test_die_wahl_leiste_traegt_suchfeld_band_und_kacheln(tafel):
     assert 1 <= len(kacheln) <= 6
 
 
+def test_jede_karte_traegt_preis_und_anbieter_punkte(tafel):
+    """P1/F3 (A3) + P1-Fix (Sicht-B2): die Karte ist die erste Preis-
+    antwort der Tafel - JE BAND ein eigener Satz Spans (Preis, Delta,
+    Punkte), genau eine Bandlage sichtbar. Ein Band ohne echtes Angebot
+    zeigt den benannten Leerzustand „—" statt eines geratenen Preises.
+    get_text OHNE Trenner (Hausregel aus dem 2454-Modelle-Befund)."""
+    karten = tafel.select("#gr-zr-kacheln button[data-modell]")
+    assert karten, "die Modell-Karten fehlen"
+    for k in karten:
+        bande = k.select(".gr-zr-k-band[data-band]")
+        assert bande, "Karte ohne Band-Spans"
+        sichtbar = [s for s in bande if not s.has_attr("hidden")]
+        assert sichtbar, "kein Band-Span sichtbar"
+        # Alle sichtbaren Preislagen zugleich: eine Karte zeigt EIN Band.
+        preise = k.select(".gr-zr-k-preis")
+        assert preise, "Karte ohne Preis-Gruppe"
+        if not k.select_one(".gr-zr-k-leer"):
+            preis = k.select_one(".gr-zr-k-preis b")
+            assert preis is not None, "Karte ohne ab-Preis"
+            assert "€" in preis.get_text()
+            assert k.select_one(".gr-zr-k-preis small").get_text() == "ab"
+            monat = k.select_one(".gr-zr-k-monat")
+            assert monat is not None and "€/Monat" in monat.get_text()
+        assert k.select(".gr-zr-k-punkte i"), "Karte ohne Anbieter-Punkte"
+        delta = k.select_one(".gr-zr-k-delta")
+        assert delta is None or ("€" in delta.get_text()
+                                 and "Tag" in delta.get_text())
+        assert "€" in k.get_text()
+
+
 def test_kein_weiterer_aufklapper_ueber_dem_graphen(tafel):
     """§3.1: zwischen Wahl-Leiste und Graph steht Hoechstens der EINE
     Rechenschafts-Aufklapper - der Balken-Graph trug bis E2 einen

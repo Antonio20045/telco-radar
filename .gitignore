@@ -7,3 +7,8 @@ venv/
 .DS_Store
 run.log
 validate.log
+
+# P1-Fix (Code-S3-5, 17.09.2026): Lauf-Artefakt eines Nachfuehr-Agenten -
+# kompletter Site-Snapshot, reproduzierbarer Render. Darf nie in einen
+# Commit geraten (git add -A haette es genommen).
+tmp_nachpruef/

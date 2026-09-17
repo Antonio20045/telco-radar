@@ -138,15 +138,72 @@ def test_am_telefon_steht_die_antwort_ueber_der_falz(telefon):
 
 
 def test_die_kachelzeile_drueckt_die_falz_nicht_unter_844(telefon):
-    """§3.2: 'mobil die Falz nachmessen - Kriterium 11c geht vor, notfalls
-    Kachelzeile knapper.' Die Messung steht hier, damit 'knapper' eine
-    Zahl ist."""
+    """§3.2 + P1/F3: die Karten sind kein Chip-Streifen mehr, aber 11c
+    geht weiter vor - die Kartenreihe bleibt im ersten Viewport und
+    drueckt weder sich selbst noch den Antwort-Satz unter die Falz."""
     s, _ = telefon
-    hoehe = s.evaluate("""() => {
+    box = s.evaluate("""() => {
       const k = document.querySelector('#tafel-tco .gr-zr-kacheln');
-      return k ? Math.round(k.getBoundingClientRect().height) : 0;
+      return {karten: k ? Math.round(k.getBoundingClientRect().bottom) : null,
+              hoehe: k ? Math.round(k.getBoundingClientRect().height) : 0};
     }""")
-    assert hoehe <= 96, f"Kachelzeile {hoehe} px hoch auf 390 px"
+    assert box["karten"] is not None, "die Kartenreihe fehlt"
+    assert box["karten"] <= 844, \
+        f"Kartenreihe endet bei {box['karten']} px (Falz 844)"
+
+
+def test_die_karten_preiszahl_ist_mindestens_20px(schreibtisch, telefon):
+    """P1/F3-Messlatte der Abnahme: die Preiszahl je Karte steht in
+    MINDESTENS 20 px - auf dem Schreibtisch UND auf dem Telefon (per
+    Playwright gezaehlt, nicht behauptet)."""
+    for s, _ in (schreibtisch, telefon):
+        groessen = s.evaluate(
+            """() => [...document.querySelectorAll(
+                 '#gr-zr-kacheln .gr-zr-k-preis b')]
+               .map(b => parseFloat(getComputedStyle(b).fontSize))""")
+        assert groessen, "keine Karte mit Preiszahl gefunden"
+        assert min(groessen) >= 20, \
+            f"kleinste Preiszahl {min(groessen)} px (< 20)"
+
+
+def test_alle_karten_im_ersten_viewport_beim_schreibtisch(schreibtisch):
+    """P1/F3-Messlatte: alle sechs Karten stehen IM ERSTEN Viewport
+    (1440x900) - der Schnelleingang ist kein Scroll-Fund."""
+    s, _ = schreibtisch
+    erg = s.evaluate("""() => {
+      const knoepfe = [...document.querySelectorAll(
+        '#gr-zr-kacheln button[data-modell]')];
+      return {n: knoepfe.length,
+              unten: Math.max(...knoepfe.map(
+                k => Math.round(k.getBoundingClientRect().bottom))),
+              rechts: Math.max(...knoepfe.map(
+                k => Math.round(k.getBoundingClientRect().right)))};
+    }""")
+    assert 1 <= erg["n"] <= 6
+    assert erg["unten"] <= 900, \
+        f"Karten enden bei {erg['unten']} px (Falz 900)"
+    assert erg["rechts"] <= 1440
+
+
+def test_die_aktive_karte_ist_deutlich_markiert(schreibtisch):
+    """P1/F3-Messlatte: die gewaehlte Karte hebt sich DEUTLICH ab - Rahmen
+    mindestens 2 px PLUS eine andere Flaeche als die inaktiven."""
+    s, _ = schreibtisch
+    karten = s.evaluate("""() => [...document.querySelectorAll(
+        '#gr-zr-kacheln button[data-modell]')].map(b => {
+      const st = getComputedStyle(b);
+      return {aktiv: b.getAttribute('aria-pressed') === 'true',
+              rand: parseFloat(st.borderWidth),
+              flaeche: st.backgroundColor};
+    })""")
+    aktive = [k for k in karten if k["aktiv"]]
+    inaktive = [k for k in karten if not k["aktiv"]]
+    assert aktive, "keine Karte als aktiv markiert (aria-pressed)"
+    assert inaktive, "alle Karten markiert - die Messung prueft nichts"
+    assert aktive[0]["rand"] >= 2, \
+        f"aktive Karte hat {aktive[0]['rand']} px Rahmen (< 2)"
+    assert aktive[0]["flaeche"] != inaktive[0]["flaeche"], \
+        "aktive Karte hat dieselbe Flaeche wie eine inaktive"
 
 
 # --------------------------------------------------------------------------

@@ -982,12 +982,34 @@ var TelcoFrage = (function () {
   }
 
   var zrFolge = 0;
+  /* P1-Fix (Sicht-A1, 17.09.2026): der Karten-Preis oeffnet den Rechenweg
+     DESSES Anbieters. Fuer eine NICHT aktive Karte muss erst das Paar
+     geladen werden - der Wunsch ueberlebt den asynchronen Ladevorgang und
+     wird nach dem Montieren des neuen Blocks bedient (oder still
+     verworfen, wenn der Anbieter dort keine Vorlage hat: der Klick hat
+     dann trotzdem Modell und Band gewechselt, nie ist er wirkungslos). */
+  var zrOeffneNach = null;
+  function zrWunschBedienen() {
+    if (!zrOeffneNach) return;
+    var wunsch = zrOeffneNach;
+    zrOeffneNach = null;
+    var serie = zrVorlagen(wunsch.anb);
+    if (serie.length) {
+      zrMessungOeffnen(wunsch.anb, serie[serie.length - 1]
+        .getAttribute('data-m'));
+    }
+  }
+
   function setzeGraph(modell, band) {
     var folge = ++zrFolge;
     holeZr().then(function (lager) {
       if (folge !== zrFolge) return;
       var block = lager && lager[modell + '::' + band];
       while (zrGruppe.firstChild) zrGruppe.removeChild(zrGruppe.firstChild);
+      /* P1/A2: ein offenes Panel gehoert zum PAAR, nicht zur Seite - sein
+         Inhalt waere die Messung des eben entfernten Graphen. Im Fehlerfall
+         (Fragment unerreichbar) bleibt der alte Block UND das Panel stehen. */
+      zrPanelSchliessen();
       if (block) {
         var klon = document.importNode(block, true);
         while (klon.firstChild) zrGruppe.appendChild(klon.firstChild);
@@ -999,10 +1021,241 @@ var TelcoFrage = (function () {
                         'Werte aller Anbieter.';
         zrGruppe.appendChild(p);
       }
+      zrEingaengeRuesten();
+      zrWunschBedienen();
     }, function () {
       if (folge !== zrFolge) return;
       /* Das Fragment ist unerreichbar: der SERVER-Startzustand bleibt
-         stehen, statt einer leeren Flaeche. */
+         stehen, statt einer leeren Flaeche. Ein bestellter Panel-Wunsch
+         (Karten-Preis) ist damit unbezahlbar - er darf nicht auf den
+         NAECHSTEN erfolgreichen Laden warten und dort ein fremdes Paar
+         oeffnen. */
+      zrOeffneNach = null;
+    });
+  }
+
+  /* P1/A2 (17.09.2026, STRATEGIE_GERAETE_V3): das Klick-Panel fuer den
+     RECHENWEG EINER Messung. Zwei Eingaenge, ein Ziel: der Klick auf den
+     Kurvenpunkt (die unsichtbare Trefferflaeche .gr-zr-hit, r=12, UEBER dem
+     gezeichneten Kreis) oder auf die PREISZAHL im Antwort-Satz setzt das
+     fertige <template> dieser Messung in EIN Panel unter dem Graph -
+     content.cloneNode, reine Montage. KEINE Zahl entsteht hier: kein
+     Rechenoperator, kein Formatieren, kein Zusammensetzen von Betraegen
+     (Regel 1 des Moduls; Schnittstelle
+     outputs/strategie-geraete-v3-2026-09-17/p1/schnittstelle-rechenweg.md).
+
+     Die Preiszahl nennt den besten Stand von HEUTE - zu "heute" gibt es kein
+     Template. Der Klick oeffnet deshalb den Rechenweg des LETZTEN Messtags
+     derselben Serie (DOM-last = juengste Messung; die Messtage je Serie sind
+     serverseitig ISO-sortiert). Derselbe Klick schliesst wieder; ein Klick
+     auf einen anderen Punkt wechselt die Messung; der aktive Punkt traegt
+     eine sichtbare Markierung (in BEIDEN SVG-Varianten, denn das eine ist
+     per CSS versteckt). */
+  var zrPanel = element('gr-zr-panel');
+  var zrMessung = null;           /* {anb, m} der offenen Messung */
+
+  function zrVorlagen(anb) {
+    var serie = [];
+    Array.prototype.forEach.call(
+      zrGruppe.querySelectorAll('.gr-zr-rechnungen template[data-anb]'),
+      function (t) {
+        if (t.getAttribute('data-anb') === anb) serie.push(t);
+      });
+    return serie;
+  }
+
+  function zrVorlage(anb, m) {
+    var serie = zrVorlagen(anb);
+    for (var i = 0; i < serie.length; i++) {
+      if (serie[i].getAttribute('data-m') === m) return serie[i];
+    }
+    return null;
+  }
+
+  /* Der Anbieter der Preiszahl steht im Wortlaut des Antwort-Satzes,
+     unmittelbar vor dem ersten fetten Betrag. Er wird nicht frei im Satz
+     gesucht, sondern gegen die ANBIETERSCHLUESSEL des eigenen Blocks
+     (data-anb der Vorlagen) in den drei festen Satzformen von
+     _antwort_html: "ist X am günstigsten:", "führt X:", "führt nur X:".
+     Der Browser-Test haelt Wortlaut und Klick zusammen. */
+  function zrAnbieterDerPreiszahl() {
+    var antwort = zrGruppe.querySelector('#gr-zr-antwort');
+    var zahl = antwort && antwort.querySelector('b.gr-zr-zahl');
+    if (!antwort || !zahl) return null;
+    var text = '';
+    for (var n = zahl.previousSibling; n && n.nodeType === 3;
+         n = n.previousSibling) {
+      text = n.data + text;
+    }
+    var treffer = [];
+    Array.prototype.forEach.call(
+      zrGruppe.querySelectorAll('.gr-zr-rechnungen template[data-anb]'),
+      function (t) {
+        var a = t.getAttribute('data-anb');
+        if (treffer.indexOf(a) > -1) return;
+        if (text.indexOf(a + ' am günstigsten:') > -1 ||
+            text.indexOf('führt ' + a + ':') > -1 ||
+            text.indexOf('führt nur ' + a + ':') > -1) treffer.push(a);
+      });
+    return treffer.length === 1 ? treffer[0] : null;
+  }
+
+  function zrPunkteMarkieren() {
+    Array.prototype.forEach.call(
+      zrGruppe.querySelectorAll('circle.gr-zr-punkt.gr-zr-aktiv'),
+      function (c) { c.classList.remove('gr-zr-aktiv'); });
+    if (!zrMessung) return;
+    Array.prototype.forEach.call(
+      zrGruppe.querySelectorAll('circle.gr-zr-punkt[data-anb]'),
+      function (c) {
+        if (c.getAttribute('data-anb') === zrMessung.anb &&
+            c.getAttribute('data-m') === zrMessung.m) {
+          c.classList.add('gr-zr-aktiv');
+        }
+      });
+  }
+
+  function zrPanelSchliessen() {
+    zrMessung = null;
+    if (zrPanel) {
+      zrPanel.textContent = '';
+      zrPanel.hidden = true;
+    }
+    zrPunkteMarkieren();
+  }
+
+  function zrPanelZeigen(vorlage) {
+    if (!zrPanel) return;
+    zrPanel.textContent = '';
+    zrPanel.appendChild(document.importNode(vorlage.content, true));
+    var zu = document.createElement('button');
+    zu.type = 'button';
+    zu.className = 'gr-zr-zu';
+    zu.setAttribute('aria-label', 'Rechenweg schließen');
+    zu.textContent = '×';
+    zrPanel.appendChild(zu);
+    zrPanel.hidden = false;
+    /* Unter dem Graph, nicht neben dem Punkt (mobil instabil) - aber im
+       Blickfeld des Klickenden, sobald der Graph hoeher als der Schirm
+       ist. Gescrollt wird auf das PANEL, nicht die Rechnung: die Panel-
+       Box traegt seit Sicht-A5 ein padding-bottom von 12 px - 'nearest'
+       auf die Rechnung richtete deren Unterkante exakt an die Viewport-
+       Kante (belegBottom == 844, null Luft, gemessen), 'nearest' auf das
+       Panel nimmt die Polsterbox und schafft die 12 px. */
+    try {
+      zrPanel.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+    } catch (e) { /* aeltere Browser: ohne Scroll ist das Panel trotzdem da */ }
+  }
+
+  function zrMessungOeffnen(anb, m) {
+    if (zrMessung && zrMessung.anb === anb && zrMessung.m === m) {
+      zrPanelSchliessen();        /* nochmals dieselbe Messung: zu */
+      return;
+    }
+    zrMessung = {anb: anb, m: m};
+    /* P1-Fix (Code-S3-2, 17.09.2026): die Vodafone-NAEHERUNG ist der
+       Leerzustand FUER VODAFONE-Zahlen - nicht fuer fremde Anbieter. Bis
+       hierher fiel ein o2-/Telekom-Punkt ohne Vorlage (Buendel unlesbar)
+       auf die „Vodafone · Referenzrechnung": eine falsche Antwort auf
+       „rechne MIR DIESE Messung vor". Fremde Messungen ohne Vorlage
+       bekommen den ehrlichen Leer-Hinweis; nur Vodafone darf auf seine
+       Naeherung fallen (deren Punkte haben keine Messung je Messtag,
+       ihr benannter Leerzustand kommt als fertiges Template). */
+    var vorlage = zrVorlage(anb, m);
+    if (!vorlage && anb === 'Vodafone') {
+      vorlage = zrVorlage('Vodafone', 'naeherung');
+    }
+    if (vorlage) {
+      zrPanelZeigen(vorlage);
+    } else if (zrPanel) {
+      zrPanel.textContent = '';
+      var p = document.createElement('p');
+      p.className = 'gr-zr-rech gr-zr-rech--leer';
+      p.textContent = 'Zu dieser Messung steht kein Rechenweg bereit.';
+      zrPanel.appendChild(p);
+      zrPanel.hidden = false;
+    }
+    zrPunkteMarkieren();
+  }
+
+  function zrPreiszahlOeffnen() {
+    var anb = zrAnbieterDerPreiszahl();
+    if (!anb) return;
+    var serie = zrVorlagen(anb);
+    if (!serie.length) return;
+    var letzte = serie[serie.length - 1];
+    zrMessungOeffnen(anb, letzte.getAttribute('data-m'));
+  }
+
+  /* Cursor, Fokus und Namen an den Eingaengen - die Flaeche selbst ist
+     serverseitig da (A1); nach jedem Blockwechsel (neuer Graph) erneut,
+     denn die Kreise sind dann neue Knoten.
+     P1-Fix (Code-S3-3): die PREISZAHL bekommt Cursor/Tabindex/Titel nur,
+     wenn der genannte Anbieter wirklich Vorlagen hat - ein fokussierbares,
+     geklicktes Element ohne Antwort ist dasselbe halbtote Bedienelement,
+     das B.3 bewusst nicht baute. Weggenommen wird die Ausstattung beim
+     Blockwechsel genauso, wie sie gesetzt wird. */
+  function zrEingaengeRuesten() {
+    Array.prototype.forEach.call(
+      zrGruppe.querySelectorAll('circle.gr-zr-hit[data-m]'),
+      function (c) {
+        if (c.getAttribute('tabindex') === '0') return;
+        c.setAttribute('tabindex', '0');
+        c.setAttribute('role', 'button');
+        c.setAttribute('aria-label', 'Rechenweg öffnen: ' +
+          c.getAttribute('data-anb') + ', Messung ' + c.getAttribute('data-m'));
+      });
+    var zahl = zrGruppe.querySelector('#gr-zr-antwort b.gr-zr-zahl');
+    var anb = zrAnbieterDerPreiszahl();
+    var hat = anb && zrVorlagen(anb).length > 0;
+    if (zahl && hat) {
+      zahl.classList.add('gr-zr-zahl--klick');
+      zahl.setAttribute('tabindex', '0');
+      zahl.setAttribute('title', 'Rechenweg dieser Messung öffnen');
+    } else if (zahl) {
+      zahl.classList.remove('gr-zr-zahl--klick');
+      zahl.removeAttribute('tabindex');
+      zahl.removeAttribute('title');
+    }
+  }
+
+  function zrKlickZiel(ziel) {
+    if (!ziel || !ziel.closest) return null;
+    var kreis = ziel.closest('circle.gr-zr-hit[data-m]');
+    if (kreis) return {anb: kreis.getAttribute('data-anb'),
+                       m: kreis.getAttribute('data-m')};
+    /* Nur die ERSTE Preiszahl des Satzes ist der Preis des genannten
+       Anbieters - Ø/Monat und Delta gehoeren anderen Aussagen. */
+    var erste = zrGruppe.querySelector('#gr-zr-antwort b.gr-zr-zahl');
+    if (erste && ziel.closest('#gr-zr-antwort b.gr-zr-zahl') === erste) {
+      return {preis: true};
+    }
+    return null;
+  }
+
+  zrGruppe.addEventListener('click', function (ev) {
+    var ziel = zrKlickZiel(ev.target);
+    if (!ziel) return;
+    ev.preventDefault();
+    if (ziel.preis) zrPreiszahlOeffnen();
+    else zrMessungOeffnen(ziel.anb, ziel.m);
+  });
+
+  zrGruppe.addEventListener('keydown', function (ev) {
+    if (ev.key !== 'Enter' && ev.key !== ' ' && ev.key !== 'Spacebar') return;
+    var ziel = zrKlickZiel(ev.target);
+    if (!ziel) return;
+    ev.preventDefault();
+    if (ziel.preis) zrPreiszahlOeffnen();
+    else zrMessungOeffnen(ziel.anb, ziel.m);
+  });
+
+  /* Der Schliessen-Knopf des Panels - als Delegation, denn der Knopf wird
+     mit jedem geoeffneten Rechenweg neu erzeugt. */
+  if (zrPanel) {
+    zrPanel.addEventListener('click', function (ev) {
+      if (ev.target && ev.target.closest &&
+          ev.target.closest('.gr-zr-zu')) zrPanelSchliessen();
     });
   }
 
@@ -1193,6 +1446,30 @@ var TelcoFrage = (function () {
       });
   }
 
+  /* P1-Fix (Sicht-B2, 17.09.2026): die Modell-Karten tragen ihre Werte JE
+     BAND als fertige Spans (serverseitig, Regel 1) - der Bandwechsel
+     blendet nur um (hidden, reine Attributmontage). Bis hierher zeigten
+     die Karten in jedem Band denselben bandunabhaengigen "ab"-Preis und
+     der Umschalter wirkte auf die prominenteste Ebene nicht. Eine Karte,
+     die das gewählte Band nicht führt, zeigt ihren Ersatz-Span („-"),
+     statt komplett leer zu stehen. */
+  function setzeKartenBand(band) {
+    Array.prototype.forEach.call(
+      document.querySelectorAll('#gr-zr-kacheln button[data-modell]'),
+      function (k) {
+        var traf = false;
+        Array.prototype.forEach.call(
+          k.querySelectorAll('.gr-zr-k-band[data-band]'),
+          function (s) {
+            var passt = s.getAttribute('data-band') === band;
+            s.hidden = !passt;
+            if (passt) traf = true;
+          });
+        var ersatz = k.querySelector('.gr-zr-k-band--kein');
+        if (ersatz) ersatz.hidden = traf;
+      });
+  }
+
   function setzeSuchfeld() {
     var feld = element('gr-zr-suche');
     if (feld) feld.value = daten.titel[zustand.modell] || '';
@@ -1217,6 +1494,9 @@ var TelcoFrage = (function () {
 
   function waehle(modell, band) {
     schliesseVorschau();
+    /* Ein Panel-Wunsch (Karten-Preis, Sicht-A1) ueberlebt keinen NEUEN
+       Wahlweg - nur den Ladevorgang des Paars, das er bestellt hat. */
+    zrOeffneNach = null;
     var erlaubt = daten.erlaubt[modell] || [];
     if (!erlaubt.length) return;
     zustand.modell = modell;
@@ -1227,6 +1507,7 @@ var TelcoFrage = (function () {
     }
     markiereBaender();
     markiereKacheln();
+    setzeKartenBand(zustand.band);
     setzeSuchfeld();
     setzeGraph(zustand.modell, zustand.band);
     setzeBndTitel(zustand.modell, zustand.band);
@@ -1254,8 +1535,29 @@ var TelcoFrage = (function () {
   Array.prototype.forEach.call(
     document.querySelectorAll('#gr-zr-kacheln button[data-modell]'),
     function (k) {
-      k.addEventListener('click', function () {
-        waehle(k.getAttribute('data-modell'), null);
+      k.addEventListener('click', function (ev) {
+        var modell = k.getAttribute('data-modell');
+        /* P1-Fix (Sicht-A1, 17.09.2026): Klick auf die PREISZAHL der
+           Karte oeffnet zusaetzlich den Rechenweg dieses Preises -
+           Antonios Geste ist „wenn man auf den Preis drueckt". Der
+           Band-Koerper traegt serverseitig data-anb (Anbieter des
+           ab-Preises); die Vorlagen des Paars stehen erst nach dessen
+           Wechsel im DOM, deshalb bestellt der Klick Modell UND Band und
+           hinterlasst einen Wunsch (zrOeffneNach), den der geladene Block
+           bedient. Ohne Anbieter ("-", Band ohne echtes Angebot) bleibt
+           der gewoehnliche Wahl-Klick - kein Bedienelement ohne Antwort.
+           Kein Zahlbetrag geht durch diese Hand: nur Attribute. */
+        var ziel = ev.target && ev.target.closest
+          ? ev.target : null;
+        var koerper = ziel && ziel.closest('.gr-zr-k-band[data-anb]');
+        if (koerper && ziel.closest('.gr-zr-k-preis')) {
+          var band = koerper.getAttribute('data-band');
+          zrOeffneNach = null;
+          waehle(modell, band);
+          zrOeffneNach = {anb: koerper.getAttribute('data-anb')};
+          return;
+        }
+        waehle(modell, null);
       });
     });
 
@@ -1376,11 +1678,17 @@ var TelcoFrage = (function () {
   }
 
   /* --- Start: der Server-Zustand steht da; dieser Aufruf setzt nur die
-     Markierungen und blendet die Zeilen des gewaehlten Bands ein. */
+     Markierungen und blendet die Zeilen des gewaehlten Bands ein. Ein
+     Deep-Link-Band, das vom Server-Start abweicht, schaltet auch die
+     Karten-Spans um (Sicht-B2) - der Server rendert sein Startband. */
   markiereBaender();
   markiereKacheln();
+  setzeKartenBand(zustand.band);
   setzeSuchfeld();
   stelleZeilen(zustand.band);
+  /* P1/A2: der First Paint steht serverseitig da (setzeGraph lief noch
+     nicht) - seine Kreise und die Preiszahl brauchen Cursor und Fokus. */
+  zrEingaengeRuesten();
   /* zuletztModell beschreibt, WAS IM DOM STEHT - und das ist am Anfang
      der SERVER-First-Paint, also das Startmodell (vorgabe), NICHT der
      Deep-Link-Wunsch. Stand es auf dem Wunsch, traf der erste waehle()-
