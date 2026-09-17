@@ -123,9 +123,11 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
     root = Path(root)
 
     katalog = lade_katalog(root)
-    # E4-Auto-Erkennung: Auto-Eintraege aus dem STATE dazuladen. Der
-    # Hand-Eintrag schlaegt (gleiche device_id bleibt beim Config-Eintrag).
-    auto_vorher = autoerkennung.lade_auto_zusaetze(root, katalog)
+    # E4-Auto-Erkennung: lade_katalog MERGED die Auto-Eintraege aus dem
+    # STATE dazu (eine Quelle der Wahrheit - die Seite laedt denselben
+    # Weg); der Hand-Eintrag schlaegt (gleiche device_id bleibt beim
+    # Config-Eintrag, der Rest faellt an den Kollisionswaechter).
+    auto_vorher = len([g for g in katalog.geraete if g.auto])
     farben = lade_farben(root)
     quellen = lade_quellen(root)
     if not quellen.anbieter or not katalog.geraete:

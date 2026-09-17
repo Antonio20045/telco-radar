@@ -34,6 +34,12 @@ INNERHALB der Baureihe, CLAUDE.md) - sonst None. marktstart und vorgaenger
 BLEIBEN leer: ein geratenes Datum waere schlimmer als ein fehlendes (ein
 leeres marktstart schaltet die Nachfolger-Analyse ab - ehrlich).
 
+KOLLISIONSWAECHTER (Hand schlaegt Auto, zweifach): die gleiche device_id
+bzw. eine nicht unterscheidbare Schreibweise verweigert `Katalog.ergaenze`
+- und `kollidiert_fuzzy` prueft zusaetzlich die MODELLZUSATZ-Falle in der
+Stamm-Richtung (der Kandidat ist der Stamm eines Hand-Eintrags MIT
+ZUSATZ). Jeder Verwurf steht im Protokoll.
+
 PERSISTENZ: Auto-Eintraege leben im STATE
 (data/state/geraete_katalog_auto.json), nicht in der Config; beim Laden
 schlaegt der Hand-Eintrag (gleiche device_id). Unbekannte Titel und Farben
@@ -47,8 +53,8 @@ from pathlib import Path
 from typing import Optional
 
 from ...geraete_model import (
-    Geraet, Katalog, device_id, ist_zubehoer, normalisiere, serie_aus_modell,
-    wortmarken,
+    Geraet, Katalog, device_id, ist_modellzusatz, ist_zubehoer, normalisiere,
+    serie_aus_modell, wortmarken,
 )
 
 log = logging.getLogger(__name__)
@@ -136,6 +142,44 @@ def _generation(modell: str, hersteller: str, katalog: Katalog) -> Optional[int]
     return None
 
 
+def kollidiert_fuzzy(modell: str, katalog: Katalog) -> Optional[str]:
+    """Die MODELLZUSATZ-Falle (CLAUDE.md: „Pixel 10 Pro Fold" gegen
+    „Pixel 10 Pro") - geprueft fuer die AUTO-ANLAGE.
+
+    Der Kandidat ist der STAMM eines HAND-gepflegten Eintrags (seine
+    Wortmarken sind der Anfang der Wortmarken einer bestehenden
+    Schreibweise, und das naechste Wort dort ist ein Modellzusatz)? Dann
+    wird nichts angelegt: ein Live-Katalog, der nur den Stamm nennt,
+    verkuerzt den Namen moeglicherweise nur, und die Anlage waere ein
+    Phantom neben dem echten Geraet. Ob es den Stamm wirklich als eigenes
+    Geraet gibt, entscheidet die Hand-Pflege (der Verwurf steht im
+    Protokoll und der Titel in der Arbeitsliste).
+
+    NUR die Stamm-Richtung und NUR gegen Hand-Eintraege:
+      * Die Gegenrichtung (Kandidat traegt den Zusatz, „iPhone 18 Pro Max"
+        neben gepflegtem „iPhone 18 Pro") ist der Belegfall des Auftrags -
+        ein Live-Katalog erweitert Namen nicht, er kuerzt allenfalls.
+      * Gegen AUTO-Eintraege wird nicht geprueft: „Pro" und „Pro Max"
+        erscheinen im selben Lauf, die Reihenfolge der Nutzlast ist nicht
+        garantiert, und hinge der Beleg an ihr, sperrte der Max zuerst
+        genannt den Stamm.
+    Gibt den Namen des kollidierenden Hand-Eintrags zurueck, sonst None.
+    """
+    marken = wortmarken(modell)
+    if not marken:
+        return None
+    n = len(marken)
+    for bestehend in katalog.geraete:
+        if bestehend.auto:
+            continue                 # nur der Hand-Katalog schlaegt
+        for schreibweise in bestehend.schreibweisen:
+            andere = wortmarken(schreibweise)
+            if len(andere) > n and andere[:n] == marken \
+                    and ist_modellzusatz(andere[n]):
+                return f"{bestehend.hersteller} {bestehend.modell}"
+    return None
+
+
 def lege_an(name: str, katalog: Katalog, heute: str,
             speicher_gb=None) -> Optional[Geraet]:
     """Aus einem strukturierten Namen einen Katalog-Eintrag anlegen.
@@ -156,6 +200,14 @@ def lege_an(name: str, katalog: Katalog, heute: str,
     if vorhanden is not None:
         katalog.ergaenze_speicher(gid, speicher_gb)
         return vorhanden
+
+    konflikt = kollidiert_fuzzy(modell, katalog)
+    if konflikt is not None:
+        log.warning("Auto-Erkennung: %r ist der Stamm des Hand-Eintrags "
+                    "%r (Modellzusatz-Falle, CLAUDE.md) - nicht angelegt; "
+                    "ob es den Stamm als eigenes Geraet gibt, entscheidet "
+                    "die Katalog-Pflege", name, konflikt)
+        return None
 
     stufen: list = []
     try:
@@ -184,9 +236,14 @@ def lege_an(name: str, katalog: Katalog, heute: str,
 def lade_auto_zusaetze(root: Path, katalog: Katalog) -> int:
     """Gespeicherte Auto-Eintraege in den Katalog mergen.
 
-    Hand schlaegt Auto: existiert die device_id schon (Config), wird die
-    State-Zeile verworfen - der Mensch hat den Eintrag uebernommen. Gibt
-    die Zahl der uebernommenen Eintraege zurueck.
+    Hand schlaegt Auto, zweifach: existiert die device_id schon (Config),
+    wird die State-Zeile verworfen - der Mensch hat den Eintrag
+    uebernommen. Und der Kollisionswaechter greift auch fuer die
+    MODELLZUSATZ-Falle: ist der State-Eintrag inzwischen der Stamm eines
+    gepflegten Hand-Eintrags MIT ZUSATZ, wird er ebenfalls verworfen.
+    Jeder Verwurf steht im Protokoll - ein stiller Verwurf waere beim
+    Nachvollzug des Auto-Bestands unsichtbar. Gibt die Zahl der
+    uebernommenen Eintraege zurueck.
     """
     pfad = Path(root) / "data" / "state" / _STATE_DATEI
     if not pfad.exists():
@@ -212,8 +269,20 @@ def lade_auto_zusaetze(root: Path, katalog: Katalog) -> int:
             if str(generation or "").strip().isdigit() else None,
             speicher=[int(s) for s in (eintrag.get("speicher") or [])
                       if str(s).strip().isdigit()])
-        if katalog.ergaenze(geraet):
-            uebernommen += 1
+        konflikt = kollidiert_fuzzy(modell, katalog)
+        if konflikt is not None:
+            log.info("Auto-Katalog: %s %s (auto:%s) verworfen - Stamm des "
+                     "Hand-Eintrags %s (Modellzusatz-Falle), der "
+                     "Hand-Eintrag schlaegt",
+                     hersteller, modell, auto, konflikt)
+            continue
+        if not katalog.ergaenze(geraet):
+            log.info("Auto-Katalog: %s %s (auto:%s) verworfen - der "
+                     "Hand-Eintrag schlaegt (gleiche device_id oder "
+                     "nicht unterscheidbare Schreibweise)",
+                     hersteller, modell, auto)
+            continue
+        uebernommen += 1
     return uebernommen
 
 

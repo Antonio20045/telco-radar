@@ -818,6 +818,17 @@ def ist_zubehoer(marken: list, ab: int = 0) -> bool:
     return _ist_zubehoer(marken, ab)
 
 
+def ist_modellzusatz(wort: str) -> bool:
+    """Oeffentlicher Zugang zur Modellzusatz-Tabelle fuer die Auto-Erkennung.
+
+    Dieselbe Liste wie in `erkennt_geraet` („Pixel 10 Pro Fold" ist nicht
+    „Pixel 10 Pro"): eine zweite Kopie derselben Woerter wuerde driften,
+    und dann pruefte der Kollisionswaechter der Auto-Anlage eines Tages mit
+    anderen Worten als die Zuordnung, die er schuetzen soll.
+    """
+    return (wort or "").strip().lower() in _MODELLZUSATZ
+
+
 def erkenne_geraet(titel: str, katalog: Katalog) -> Optional[Geraet]:
     """Welchen KATALOGEINTRAG trifft dieser Haendlertitel?
 

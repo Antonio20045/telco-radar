@@ -365,3 +365,147 @@ def test_die_drei_adapter_nennen_ihr_namensfeld():
                           }]})
     vf_saetze = vodafone.lies(vf_json, "https://api.vodafone.de/x")
     assert vf_saetze[0]["strukturierter_name"] == "APPLE IPHONE 18 PRO"
+
+
+# ==========================================================================
+# Kollisionswaechter: die Modellzusatz-Falle (E4-Regeln, Bau 2)
+# ==========================================================================
+
+def _katalog_mit_pixel() -> Katalog:
+    """_mini_katalog plus Google-Anker: die Serie „Pixel" ist damit als
+    Google-Serie bekannt, und die Schaellung eines Namens ohne
+    Hersteller-Praefix trifft sie."""
+    katalog = _mini_katalog()
+    katalog.ergaenze(Geraet(hersteller="Google", modell="Pixel 9",
+                            generation=9, speicher=[128]))
+    return katalog
+
+
+def test_stamm_eines_hand_eintrags_wird_nicht_angelegt(caplog):
+    """CLAUDE.md-Falle: „Pixel 10 Pro Fold" vs „Pixel 10 Pro". Ein
+    Live-Katalog, der den STAMM eines gepflegten Hand-Eintrags nennt,
+    verkuerzt den Namen moeglicherweise nur - genau dann waere die
+    Auto-Anlage ein Phantom neben dem echten Geraet. Verworfen und
+    protokolliert (der Verwurf ist die Katalog-Pflege-Aufgabe, nicht ein
+    stiller Fall in die Arbeitsliste)."""
+    import logging
+    katalog = _katalog_mit_pixel()
+    katalog.ergaenze(Geraet(hersteller="Google", modell="Pixel 10 Pro Fold",
+                            marktstart="2026-05-15", generation=10))
+    vorher = len(katalog.geraete)
+
+    with caplog.at_level(logging.WARNING):
+        ergebnis = autoerkennung.lege_an("Pixel 10 Pro", katalog, _HEUTE,
+                                         speicher_gb=256)
+
+    assert ergebnis is None
+    assert len(katalog.geraete) == vorher
+    assert "Pixel 10 Pro Fold" in caplog.text
+    assert "nicht angelegt" in caplog.text
+
+
+def test_zusatz_ueber_lebendem_hand_stamm_wird_angelegt():
+    """Die Gegenrichtung ist der Belegfall des Auftrags (15.09.:
+    „iPhone 18 Pro" UND „iPhone 18 Pro Max"): ein Live-Name, der einen
+    MODELLZUSATZ ueber einem bestehenden Eintrag traegt, ist ein eigenes
+    Geraet - ein Live-Katalog erweitert Namen nicht, er kuerzt allenfalls.
+    Die Sperre duerfte NUR in der Stamm-Richtung greifen."""
+    katalog = _mini_katalog()
+    katalog.ergaenze(Geraet(hersteller="Apple", modell="iPhone 18 Pro",
+                            generation=18, marktstart="2026-09-19"))
+    ergebnis = autoerkennung.lege_an("iPhone 18 Pro Max", katalog, _HEUTE,
+                                     speicher_gb=512)
+    assert ergebnis is not None and ergebnis.auto == _HEUTE
+    assert katalog.nach_id(device_id("Apple", "iPhone 18 Pro Max")) \
+        is not None
+
+
+def test_fuzzy_kollision_nur_gegen_hand_eintraege():
+    """Pro und Pro Max erscheinen im SELBEN Lauf, und die Reihenfolge der
+    Nutzlast ist nicht garantiert: laege die Sperre auch ueber
+    Auto-Eintraegen, hinge der 15.09.-Beleg an der Satzreihenfolge - der
+    Max zuerst genannt wuerde den Pro-Stamm sperren. Der Waechter prueft
+    deshalb gegen den HAND-Katalog (der Auftrag: ein Hand-Eintrag schlaegt
+    IMMER die Auto-Anlage), nicht gegen frisch Angelegte."""
+    katalog = _mini_katalog()
+    assert autoerkennung.lege_an("iPhone 18 Pro Max", katalog, _HEUTE,
+                                 speicher_gb=512) is not None
+    assert autoerkennung.lege_an("iPhone 18 Pro", katalog, _HEUTE,
+                                 speicher_gb=256) is not None
+    assert len([g for g in katalog.geraete if g.auto]) == 2
+
+
+def test_hand_schlaegt_auto_auch_fuzzy_beim_laden(tmp_path, caplog):
+    """Der Waechter gilt auch im MERGE: ein State-Auto-Eintrag, dessen Stamm
+    zwischenzeitlich als Hand-Eintrag MIT ZUSATZ gepflegt wurde, wird beim
+    Laden verworfen und protokolliert - der Mensch hat entschieden, dass
+    es dieses Stamms als eigenes Geraet (noch) nicht gibt."""
+    import logging
+    katalog = _katalog_mit_pixel()
+    assert autoerkennung.lege_an("Pixel 10", katalog, "2026-09-10",
+                                 speicher_gb=128) is not None
+    autoerkennung.speichere_auto_zusaetze(tmp_path, katalog)
+
+    hand = _katalog_mit_pixel()
+    hand.ergaenze(Geraet(hersteller="Google", modell="Pixel 10 Pro",
+                         generation=10))
+    with caplog.at_level(logging.INFO):
+        autoerkennung.lade_auto_zusaetze(tmp_path, hand)
+
+    assert [g for g in hand.geraete if g.auto] == []
+    assert hand.nach_id(device_id("Google", "Pixel 10 Pro")).marktstart == ""
+    assert "Pixel 10 Pro" in caplog.text
+
+
+def test_verwurf_gleicher_device_id_beim_laden_protokolliert(tmp_path, caplog):
+    """Auch der einfache Konflikt (gleiche device_id, Hand hat
+    uebernommen) steht im Protokoll - ein stiller Verwurf waere beim
+    Nachvollzug des Auto-Bestands unsichtbar."""
+    import logging
+    katalog = _mini_katalog()
+    autoerkennung.lege_an("iPhone 18 Pro", katalog, _HEUTE, speicher_gb=256)
+    autoerkennung.speichere_auto_zusaetze(tmp_path, katalog)
+
+    hand = _mini_katalog()
+    hand.ergaenze(Geraet(hersteller="Apple", modell="iPhone 18 Pro",
+                         marktstart="2026-09-19", generation=18))
+    with caplog.at_level(logging.INFO):
+        uebernommen = autoerkennung.lade_auto_zusaetze(tmp_path, hand)
+
+    assert uebernommen == 0
+    assert "iPhone 18 Pro" in caplog.text
+    assert len([g for g in hand.geraete if g.auto]) == 0
+
+
+# ==========================================================================
+# EINE Quelle der Wahrheit: lade_katalog merged die Auto-Eintraege
+# ==========================================================================
+
+def test_lade_katalog_liefert_den_gemergten_katalog(tmp_path):
+    """Der Render-Pfad (report/html.py) laedt den Katalog ueber
+    geraete_config.lade_katalog - ohne den Merge wuerde der Lauf Listungen
+    zu einem Geraet schreiben, das die Seite nie rendert (derselbe Fehler
+    wie der Navigationseintrag am 11.08.: gebaut, geprueft, unsichtbar).
+    Pipeline UND Seite sehen denselben Bestand."""
+    import yaml
+    root = tmp_path / "mitte"
+    (root / "config").mkdir(parents=True)
+    (root / "config" / "geraete_katalog.yaml").write_text(
+        yaml.safe_dump({"geraete": [
+            {"hersteller": "Apple", "modell": "iPhone 17",
+             "generation": 17, "speicher": [128]},
+            {"hersteller": "Xiaomi", "modell": "Redmi Note 17"},
+        ]}, allow_unicode=True), encoding="utf-8")
+
+    vorlage = Katalog(geraete=[
+        Geraet(hersteller="Apple", modell="iPhone 17", generation=17),
+        Geraet(hersteller="Xiaomi", modell="Redmi Note 17"),
+    ])
+    autoerkennung.lege_an("iPhone 18 Pro", vorlage, _HEUTE, speicher_gb=256)
+    autoerkennung.speichere_auto_zusaetze(root, vorlage)
+
+    from telco_radar.geraete_config import lade_katalog
+    geladen = lade_katalog(root)
+    eintrag = geladen.nach_id(device_id("Apple", "iPhone 18 Pro"))
+    assert eintrag is not None and eintrag.auto == _HEUTE
+    assert geladen.nach_id(device_id("Apple", "iPhone 17")).auto == ""
