@@ -57,6 +57,22 @@
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
+/* P4b-Fix (Re-Check 18.09.2026, S1): [hidden] gilt GANZHEITLICH.
+
+   Die Browser-Vorgabe `[hidden]{display:none}` verliert gegen JEDE
+   Autoren-Regel mit display - Ursprung schlaegt Spezifitaet nicht, aber
+   Autor schlaegt Browser. `.gr-leit{display:flex}` liess die Leitzahl des
+   Preisverlaufs im Leerzustand sichtbar stehen („919,00 EUR" neben
+   „Kein Geraet gefunden.", 81 px hoch - gemessen), `.gr-vkacheln{display:
+   grid}` ebenso die vier Kachelzahlen. Einzelne `[hidden]`-Zeilen weiter
+   unten (`.gr-buendel[hidden]`, `.gr-zr-panel[hidden]`, …) waren dieselbe
+   Reparatur je Fall; diese Zeile hier deckt die FehlerKLASSE ab, auch fuer
+   kuenftige display-Regeln. `!important` ist noetig: eine einfachere Regel
+   [hidden]{display:none} haette dieselbe Ursprungs-Schwaeche wie die
+   Browser-Vorgabe. Kein Element dieses Portals darf sichtbar sein, solange
+   es hidden traegt - geprüft gegen Print-Styles und app.js (kein Messen
+   an hidden-Elementen, keine Übergänge auf [hidden]). */
+[hidden]{display:none!important}
 body{
   margin:0;background:var(--paper);color:var(--ink);
   font-family:var(--serif);font-size:17px;line-height:1.55;
@@ -493,9 +509,16 @@ b,strong{font-weight:700}
 .page-kicker{margin:0 0 10px;color:var(--red);font-size:10.5px;font-weight:800;
   letter-spacing:.14em;text-transform:uppercase}
 /* Die Schlagzeile. Enge Durchschuss, negatives Sperren - so setzt eine
-   Zeitung, und nur so wirkt eine grosse Serife nicht wie ein Plakat. */
+   Zeitung, und nur so wirkt eine grosse Serife nicht wie ein Plakat.
+   P4-Fix (Sicht-Pruefung 18.09., Falz 390): die Untergrenze war 34 px -
+   am Telefon gewann damit auf ALLEN vier Reitern der Geräteseite der
+   h1 gegen die Leitzahl (clamp-Minimum 30 px), und die Regel "die
+   Antwort ist die groesste Zahl" galt ausgerechnet dort nirgends. 28 px
+   liegt knapp unter der Leitzahl; die Leitzahl selbst bleibt 30 px,
+   weil Kriterium 11c am echten Bestand nur 4 px Luft hat. Sprungfrei
+   ueber die clamp-Untergrenze statt einer zusaetzlichen @media-Regel. */
 .page-hero h1{margin:0;font-family:var(--serif);font-weight:700;
-  font-size:clamp(34px,5.2vw,58px);line-height:1.03;letter-spacing:-.022em;
+  font-size:clamp(28px,5.2vw,58px);line-height:1.03;letter-spacing:-.022em;
   color:var(--ink);max-width:16ch}
 .page-hero.wide h1{max-width:20ch}
 
@@ -2071,6 +2094,13 @@ b,strong{font-weight:700}
   align-items:center;border:1px solid var(--rule);padding:4px 8px}
 .gr-filter label.gr-filter--an{background:var(--red);border-color:var(--red);
   color:var(--paper-2)}
+/* P4/D1 (18.09.2026): der FESTE Zuschnitt der Alarmtabelle ("Zustand:
+   neu", "Preisart: ohne Vertrag") ist kein Bedienelement und darf den
+   AKTIV-Mark eines gesetzten Filters nicht tragen - bis P4 standen die
+   beiden Etiketten dauhaft rot flaechig (Rot als Flaeche, nicht als
+   Akzent). Grau hinterlegt sagt "gegeben", das rote `--an` bleibt dem
+   Zustand eines GESETZTEN Filters vorbehalten. */
+.gr-filter label.gr-filter--fest{background:var(--paper-3);color:var(--ink-3)}
 .gr-filter select{font-family:var(--sans);font-size:12px;color:var(--ink);
   background:var(--paper-2);border:0;padding:2px 4px;
   text-transform:none;letter-spacing:0}
@@ -2088,45 +2118,53 @@ b,strong{font-weight:700}
   display:inline-block}
 .gr-knopf:hover{color:var(--ink);border-color:var(--ink-3)}
 .gr-export-knoepfe{display:flex;gap:8px;flex-wrap:wrap}
-/* O4: die Export-Knoepfe in der Kopfzeile der Geraete- und der Radar-
-   Seite (page-hero-row, flex-end/space-between). flex:none, damit sie
-   neben dem Datum stehen statt es zu verdraengen; mobil umbricht die
-   Zeile ohnehin (flex-wrap). */
-.page-hero-row .gr-export-knoepfe{flex:none;max-width:100%}
+/* P4/D4 (STRATEGIE_GERAETE_V3, 18.09.2026): DIE EXPORT-FUSSZEILE - EINE
+   Zeile am Seitenende der Geräteseite (.gr-export-fuss in geraete.html).
+   Bis P4 standen die sechs Knöpfe in der Kopfzeile (O4 hatte sie dort
+   zentralisiert, E5 machte sie mobil sichtbar): am Telefon belegten sie
+   die Zeile ÜBER der Reiter-Steuerung - vor jedem ersten Datenelement -
+   und drückten Antwort-Satz und Graphkopf Richtung Falz (11c, gemessen
+   837 von 844 px). Am Fuß stören sie keine Falz mehr, bleiben in jedem
+   Reiter erreichbar und rollen am Telefon IN SICH (overflow-x, dieselbe
+   Roll-Regel wie .gr-scroll für Tabellen). EINE Stelle für alle Reiter
+   bleibt gewahrt (O4-Regel: nie einer je Reiter). */
+.gr-export-fuss{margin:26px 0 0;padding-top:12px;
+  border-top:1px solid var(--rule);display:flex;align-items:baseline;
+  gap:6px 14px;flex-wrap:wrap}
+.gr-export-fuss-titel{font-family:var(--sans);font-size:11px;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
 /* AUF DEM TELEFON WIRD DER KOPF ZU EINER SPALTE: Kicker, Schlagzeile,
-   Datum, Export-Zeile - und die Export-Zeile ist SICHTBAR (E5,
-   17.09.2026). Bis hierhin war die Knopfreihe unter 900 px KOMPLETT
-   weggeblendet (O4: gewrappt 77 px, die Leitzahl endete bei 810 von
-   844 px Falz; E5/Strategie §7: "auch mobil - der Export ist Antonios
-   Werkzeug").
-
-   Der Platz dafür kommt aus dem UMBRUCH des Datums: am Schreibtisch
-   steht es rechts UNTEN am Text-Block (Flex, align-items:flex-end, mit
-   24 px Gap); auf dem Telefon wird der Kopf zur Grid-Spalte, das Datum
-   rückt rechtsbündig UNTER die Schlagzeile (Zeitungs-Datumszeile), und
-   die Export-Reihe folgt als letzte Zeile. Ein Nebeneinander von Kicker
-   und Datum ist bei 390 px ausgeschlossen (gemessen: Kicker 163 px +
-   Datum 214 px gegen 334 px Zeilenbreite) - es hätte den Kicker umgebrochen.
-
-   Die vier Knöpfe rollen in EINER waagerechten Zeile IN SICH
-   (overflow-x), statt vier Zeilen hoch zu stapeln - dieselbe Roll-Regel
-   wie .gr-scroll für Tabellen. Gemessen am echten Bestand: Antwort-Satz
-   797 px, Graphkopf 837 px (Falz 844, Kriterium 11c). */
+   Datum (Zeitungs-Datumszeile; ein Nebeneinander von Kicker und Datum
+   ist bei 390 px ausgeschlossen - gemessen: Kicker 163 px + Datum
+   214 px gegen 334 px Zeilenbreite, es hätte den Kicker umgebrochen).
+   Die Export-Zeile, die bis P4 als letzte Kopfzeile hier stand, ist in
+   die Fußzeile gewandert (siehe .gr-export-fuss oben); die Reiterleiste
+   behält ihren knappen Abstand - die gewonnene Falz-Luft trägt seit P4
+   die LEITZAHL des Vergleichs-Reiters (.gr-zr-leit). */
 @media (max-width:900px){
   .gr-hero-export .page-hero-row{display:grid;
     grid-template-columns:minmax(0,1fr);row-gap:0}
   .gr-hero-export .page-date{justify-self:end;margin-top:2px;
     padding-bottom:0}
-  .gr-hero-export .gr-export-knoepfe{display:flex;flex-wrap:nowrap;
+  .gr-reiter{margin-top:8px}
+  /* Mobil ist die Falz das härtere Gebot als die maximale Zahl: die
+     Leitzahl clamp't auf 30 px (die h1 der Seite bleibt bei 34 px das
+     größte Element - Titel, keine Zahl; alle ZAHLEN der Tafel bleiben
+     unter der Leitzahl, der Karten-Preis bei 21 px), Label und Zeilen-
+     abstand gehen enger. Gemessen: Graphkopf am echten Bestand 840 von
+     844 px; ohne das Straffen 859 px (Browsertest-Fixture) - die
+     Leitzahl verbraucht die Luft, die der Export-Umzug in die Fußzeile
+     freigemacht hat, und keinen Pixel mehr. */
+  .gr-leit{gap:1px}
+  .gr-leit-label{font-size:11.5px;line-height:1.3}
+  /* Die REIHE rollt in sich (nicht die ganze Fußzeile): das Etikett
+     "Export" bleibt stehen, die Knöpfe laufen darunter weg - dieselbe
+     Roll-Regel, die die Reihe bis P4 im Kopf trug. */
+  .gr-export-fuss .gr-export-knoepfe{display:flex;flex-wrap:nowrap;
     gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;
-    margin-top:8px;padding-bottom:2px;scrollbar-width:thin}
-  .gr-hero-export .gr-export-knoepfe .gr-knopf{white-space:nowrap;
-    flex:none}
-  /* Die Reiterleiste rückt 12 px nach (26 -> 14): ohne diese Zeile
-     endete der Graphkopf der Zeitreihe bei 851 von 844 px Falz (11c,
-     am echten Bestand gemessen). Nur auf dem Telefon; der Desktop-
-     Abstand bleibt. */
-  .gr-reiter{margin-top:14px}
+    padding-bottom:2px;scrollbar-width:thin;min-width:0}
+  .gr-export-fuss .gr-knopf{white-space:nowrap;flex:none}
+  .gr-export-fuss-titel{flex:none}
 }
 
 /* Die TCO-Tafel ("Was kostet es"). Sie borgt sich die Typografie der
@@ -2149,6 +2187,22 @@ b,strong{font-weight:700}
    soll sie nicht fuer einen kleinen Preis halten. */
 .gr-t-luecke{font-family:var(--sans);font-size:12px;color:var(--ink-4)}
 .gr-tzeile--eigen .gr-t-anbieter{color:var(--red)}
+/* P4/D3 (18.09.2026): KLICKBARKEIT ZEIGT SICH - jedes <summary> der
+   Geräteseite trägt Zeiger und Aufklappzeichen. design.md (17.09.):
+   20 von 22 Aufklappern des Vergleichs-Reiters sahen aus wie Tabellen-
+   zeilen (cursor:auto, kein Chevron) - die Klickbarkeit war unsichtbar.
+   Die Regel gilt für die Tafel-Fläche (.gr-tafel), also alle vier
+   Reiter einschließlich der P3-Zeilen-Aufklapper und der nachgezogenen
+   Wochenkarte. Sie steht BEWUSST vor den spezifischen summary-Regeln
+   dieses Abschnitts: .gr-vdatenlage>summary::after weiter unten trägt
+   sein eigenes +/– und gewinnt bei gleicher Spezifität als die spätere
+   Regel - der Datenlage-Aufklapper behält seine Form. */
+.gr-tafel summary{cursor:pointer;list-style:none}
+.gr-tafel summary::-webkit-details-marker{display:none}
+.gr-tafel summary::marker{content:""}
+.gr-tafel summary::after{content:"▾";font-family:var(--sans);
+  font-size:10px;color:var(--red);margin-left:8px;white-space:nowrap}
+.gr-tafel details[open]>summary::after{content:"▴";color:var(--ink-4)}
 .gr-tdetail td{padding:0 0 11px;border-bottom:1px solid var(--rule-2)}
 .gr-tdetail summary{font-family:var(--sans);font-size:12px;
   letter-spacing:.06em;text-transform:uppercase;color:var(--ink-4);
@@ -2189,7 +2243,7 @@ b,strong{font-weight:700}
 /* Unser Preis rot, sobald jemand unterbietet - sonst neutral dunkel. */
 .gr-a-unser{font-family:var(--serif);font-size:15px;font-weight:600;
   color:var(--ink)}
-.gr-a-unser--zurueck{color:var(--red)}
+.gr-a-unser--zurueck{color:inherit}
 .gr-a-fremd{font-family:var(--serif);font-size:15px;font-weight:600;
   color:var(--al-gering)}
 /* Prozent gross, Euro klein: 15 Euro sind bei 200 Euro viel und bei 2000
@@ -2239,7 +2293,13 @@ b,strong{font-weight:700}
 .gr-pille{display:inline-block;font-family:var(--sans);font-size:12px;
   letter-spacing:.05em;text-transform:uppercase;padding:3px 9px;
   border-radius:11px;white-space:nowrap}
-.gr-pille--kritisch{background:var(--al-kritisch);color:var(--paper-2)}
+/* P4/D1 (18.09.2026), Rot-Deckel: "kritisch" ist die schärfste STUFE,
+   aber nicht mehr deren Farbe - 21 rote Pillen in einer Tabelle waren
+   Teppich (design.md Regel 4). Die Stufe liest das Wort; das Gewicht
+   der Pille (dunkelste Fläche der vier) traegt die Reihenfolge. ROT
+   bleibt genau der schärfsten Zeile (`--spitze`, vom Markup gesetzt). */
+.gr-pille--kritisch{background:var(--ink-2);color:var(--paper-2)}
+.gr-pille--spitze{background:var(--al-kritisch);color:var(--paper-2)}
 .gr-pille--mittel{background:var(--al-mittel-hell);color:var(--al-mittel)}
 .gr-pille--gering{background:var(--al-gering-hell);color:var(--al-gering)}
 .gr-pille--bestpreis{background:var(--al-gering-hell);color:var(--al-bestpreis)}
@@ -2299,7 +2359,11 @@ b,strong{font-weight:700}
 .gr-a-liste li{display:flex;flex-wrap:wrap;gap:4px 14px;padding:5px 0;
   border-bottom:1px solid var(--rule-2)}
 .gr-a-liste li:last-child{border-bottom:0}
-.gr-a-liste .gr-a-eigen{font-weight:600;color:var(--red)}
+/* P4/D1 (18.09.2026): "eigen" ist eine IDENTITAET (unser Preis in der
+   Anbieterliste), kein Alarm - Rot als Markierung wiederhole sich hier
+   bis zu 50-mal im DOM. Semibold ohne Farbe hebt die Zeile ebenso und
+   kostet kein Rot (Rot-Deckel, design.md Regel 4). */
+.gr-a-liste .gr-a-eigen{font-weight:700;color:var(--ink)}
 .gr-a-liste a{color:var(--red);text-decoration:none}
 .gr-a-liste a:hover{text-decoration:underline}
 
@@ -2320,6 +2384,28 @@ b,strong{font-weight:700}
    der Seite), die Seite selbst laeuft nicht waagerecht. Je Ansicht
    sind nur 4-5 der 8 Spalten sichtbar. */
 .gr-kansicht{margin:0 0 14px}
+/* P4/D4 (18.09.2026): der Umschalter bleibt am Telefon in EINER
+   Button-Reihe (Falz-Regel: vor dem ersten Datenelement höchstens EINE
+   Auswahlgruppe mit ≤ 2 Button-Reihen; mit der Reiterleiste darüber
+   waeren umgebrochene Knöpfe die dritte). Gemessen am echten Bestand:
+   "Gesamtkosten (TCO-24)" brach bei 390 px unter "Einzelgerätpreis"
+   (737/776 px, zwei Reihen). Die Knöpfe teilen sich jetzt die Zeile
+   (flex:1), der Text darf INNERHALB des Knopfs umbrechen - zwei Zeilen
+   im Knopf sind eine Reihe, zwei Knöpfe untereinander wären zwei. */
+@media (max-width:900px){
+  /* .gr-vgruppe.gr-kansicht (zwei Klassen) - die einklassige .gr-vgruppe-
+     Regel weiter unten setzt flex-wrap:wrap und wuerde bei gleicher
+     Spezifitaet als spaetere gewinnen; der Umschalter ist die EINE
+     Ausnahme, die am Telefon nicht umbrechen darf. Die Knöpfe werden
+     GLEICH HOCH bündig gestreckt (stretch + Text mittig): der zweite
+     Knopf bricht innerhalb zweizeilig um, und mit align-items:flex-end
+     stünden seine Oberkante 15 px tiefer - für jede Reihen-Messung zwei
+     Reihen, obwohl es eine ist. */
+  .gr-vgruppe.gr-kansicht{flex-wrap:nowrap;align-items:stretch}
+  .gr-kansicht .gr-vknopf{flex:1 1 0;white-space:normal;
+    padding-left:8px;padding-right:8px;min-width:0;
+    display:flex;align-items:center;justify-content:center}
+}
 .gr-katalog-mod .gr-sp--tco{display:none}
 .gr-katalog-mod.gr-katalog--tco .gr-sp--tco{display:table-cell}
 .gr-katalog-mod.gr-katalog--tco .gr-sp--barpreis{display:none}
@@ -2603,7 +2689,14 @@ b,strong{font-weight:700}
 .gr-vknopf{font-family:var(--sans);font-size:12px;letter-spacing:.04em;
   padding:7px 12px;border:1px solid var(--rule);background:var(--paper-2);
   color:var(--ink-2);cursor:pointer}
-.gr-vknopf.is-aktiv{background:var(--red);border-color:var(--red);color:#fff}
+/* P4-Fix (Sicht-Pruefung 18.09., Rot-Deckel): der aktive Knopf traegt
+   WASCH statt Flaeche - die Portal-Regel seit 06.08.2026 heisst "Rot ist
+   Akzent, keine Flaeche", und der aktive Band-/Raster-/Preisart-Knopf
+   war die letzte rote FLAECHE der Geräteseite (zaehlte in der Rot-
+   Messung je Tafel mit: Vergleich 19, Katalog 12 von <= 10). Rand rot,
+   Schrift dunkelrot - aktiv bleibt der deutlichste Zustand der Gruppe. */
+.gr-vknopf.is-aktiv{background:var(--red-wash);border-color:var(--red);
+  color:var(--red-deep)}
 .gr-vdatum{font-family:var(--sans);font-size:12px;padding:6px 8px;
   border:1px solid var(--rule);background:var(--paper-2);color:var(--ink);
   width:138px}
@@ -3117,7 +3210,10 @@ b,strong{font-weight:700}
   border:1px solid var(--rule);background:var(--paper-2)}
 .gr-chip b{font-family:var(--serif);font-size:16px;margin-right:4px}
 .gr-chip em{font-style:normal;color:var(--ink-4);margin-left:4px}
-.gr-chip--kritisch b{color:var(--al-kritisch)}
+/* P4/D1 (18.09.2026): die Chip-Zahl ist eine Menge, kein Befund - Rot
+   traegt nur der schaerfste Befund (Rot-Deckel, design.md Regel 4).
+   Die Stufe heisst das Wort daneben. */
+.gr-chip--kritisch b{color:inherit}
 .gr-chip--mittel b{color:var(--al-mittel)}
 .gr-chip--gering b{color:var(--al-gering)}
 .gr-chip--bestpreis b{color:var(--al-bestpreis)}
@@ -3269,14 +3365,24 @@ b,strong{font-weight:700}
 .wr-quer:hover{border-bottom-color:var(--red)}
 .wr-gruppenkopf{margin:0 0 6px;font-family:var(--serif);font-size:19px;
   font-weight:700}
-.wr-basis{margin:0 0 8px;font-family:var(--sans);font-size:12.5px;
-  color:var(--ink-3)}
-.wr-basis--leer{color:var(--ink-4);font-style:italic}
-.wr-basis a{color:var(--red)}
+/* P4/D1 (18.09.2026): die Vodafone-Basis-Zeile stand bis hierhin in
+   JEDER Modell-Detailzeile (48- bis 60-mal dieselbe Formel auf einer
+   Tafel). Sie ist EINE Legende ueber der Tabelle geworden - die Zeile
+   "· VF 1.949,80 €" der Detailtabelle traegt den Betrag selbst. */
+.wr-basis-legende{margin:0 0 10px;font-family:var(--sans);font-size:12px;
+  color:var(--ink-4)}
 .wr-tabelle td,.wr-tabelle th{font-size:12.5px}
 .wr-tarif{font-family:var(--sans);color:var(--ink-2)}
 .wr-prozent{font-variant-numeric:lining-nums;font-weight:700}
-.wr-prozent--negativ{color:var(--al-kritisch)}
+/* P4/D1 (STRATEGIE_GERAETE_V3, 18.09.2026) - ROT-DECKEL (design.md
+   Regel 4: "<= 10 rot eingefaerbte Elemente je Tafel, heute 727"):
+   Die VORZEICHEN-Klasse faerbt NICHT mehr rot. Bis P4 stand jede
+   negative Abweichung in Alarmfarbe - 192 DOM-Elemente der Tafel,
+   Rot war Teppich, kein Akzent. Richtung liest die Tabelle weiter
+   ueber das Vorzeichen und die Platzierung; ROT traegt seit P4 nur
+   noch der schaerfste Befund (`--spitze`, an genau einer Zeile). */
+.wr-prozent--negativ{color:inherit}
+.wr-prozent--spitze{color:var(--al-kritisch)}
 .wr-prozent--positiv{color:var(--al-bestpreis)}
 .wr-beleg{font-family:var(--sans);font-size:10.5px;color:var(--ink-4)}
 .wr-beleg a{color:var(--red)}
@@ -3294,6 +3400,36 @@ b,strong{font-weight:700}
    ist - gemessen am Mitzug der Portfolio-Nachschlaege, s. u. */
 .gr-r-sektion{padding-top:10px;border-top:1px solid var(--rule-2)}
 .gr-r-sektion:first-of-type{padding-top:0;border-top:none}
+/* P4/D1 (STRATEGIE_GERAETE_V3, 18.09.2026): DIE GRAFIK der Radar-Tafel -
+   "Wo sind wir teuer?" liest sich als Bild statt als 746-Zeilen-Wand
+   (design.md: Radar 100 % Tabelle, 0 % Grafik). Servergerendertes SVG
+   in zwei Varianten (schirm/mobil), dasselbe Umschalt-Mechanismus wie
+   die Zeitreihe `svg.gr-zr--breit/schmal`: beide stehen im DOM, das
+   Mediaquery zeigt genau eine. Balken <= 14 px dick, gerundete Aussen-
+   seite, eckige Basis an der Nulllinie; EINE Nulllinie mit EINEM
+   Etikett ("Vodafone"), kein Raster - jeder Balken traegt seinen Wert.
+   Farbe nach Richtung: Ink = Wettbewerber guenstiger (VF teuerer),
+   Blau (--al-bestpreis) = Vodafone guenstiger, Rot GENAU EIN Balken
+   (der groesste Abstand, `--spitze`). Palette-Validator: #e60000 gegen
+   #2b5bd7, CVD dE 29,4 protan / 36,3 tritan, Kontrast >= 3:1 - PASS. */
+.wr-grafik-bild{margin:2px 0 0}
+.wr-grafik-bild svg{display:block;width:100%;height:auto}
+.wr-grafik-bild svg.wr-gr--schmal{display:none}
+@media (max-width:700px){
+  .wr-grafik-bild svg.wr-gr--breit{display:none}
+  .wr-grafik-bild svg.wr-gr--schmal{display:block}
+}
+.wr-gr-null{stroke:var(--ink);stroke-width:1.5}
+.wr-gr-nulltext{font-family:var(--sans-system);font-size:11px;
+  letter-spacing:.07em;text-transform:uppercase;fill:var(--ink-3)}
+.wr-gr-name{font-family:var(--sans-system);font-size:12px;fill:var(--ink-2)}
+.wr-gr-name-zusatz{fill:var(--ink-4)}
+.wr-gr-wert{font-family:var(--sans-system);font-size:12.5px;font-weight:600;
+  fill:var(--ink);font-variant-numeric:tabular-nums}
+.wr-gr-laden{font-weight:400;fill:var(--ink-4)}
+.wr-gr-balken--teuer{fill:var(--ink-2)}
+.wr-gr-balken--gut{fill:var(--al-bestpreis)}
+.wr-gr-balken--spitze{fill:var(--al-kritisch)}
 /* Drei Sektionen teilen sich das Hoehenbudget EINER Tafel (11b misst die
    GANZE Seite, Kopf und Fuss ~830 px sind fix): im Radar-Reiter strafft
    sich der Sektionsabstand, der ausserhalb desselben unveraendert bleibt. */
@@ -3309,11 +3445,40 @@ b,strong{font-weight:700}
 #tafel-radar .gr-nachschlag:last-of-type{margin-bottom:0}
 /* Der Sprung je Modell-Zeile in den Graphen des Vergleichs-Reiters -
    derselbe Etikett-Stil wie der Querlink der Schwesterseite: ein Weg,
-   kein Bedienelement der Tabelle. */
-.gr-sprung{white-space:nowrap;font-family:var(--sans);font-size:12px;
-  color:var(--red);text-decoration:none;
-  border-bottom:1px solid rgba(230,0,0,.3)}
-.gr-sprung:hover{border-bottom-color:var(--red)}
+   kein Bedienelement der Tabelle. P4 Schritt 2c: gr-ksprung ist der
+   ZWEIFTE Sprung derselben Zeile (in die Katalog-Zeile desselben
+   Modells) - gleicher Stil, eigenes Ziel (siehe app.js).
+   P4-Fix (Sicht-Pruefung 18.09., Rot-Deckel): der Sprung-Link ist
+   NAVIGATION, kein Befund - 11 identische rote Links auf dem ersten
+   Katalog-Blick zaehlten wie elf Warnungen. Grau wie ein Etikett,
+   Rot erst im Hover; der Pfeil bleibt Teil des Textes. */
+.gr-sprung,.gr-ksprung{white-space:nowrap;font-family:var(--sans);
+  font-size:12px;color:var(--ink-2);text-decoration:none;
+  border-bottom:1px solid var(--rule)}
+/* P4b-Fix (Re-Check 18.09.2026, Katalog-Rot 12 > 10): DIESE Zeile war die
+   Luecke des P4-Fix. Die Katalog-Tabelle traegt `src-table`, und
+   `.src-table a{color:var(--red);…}` (0,1,1) schlug `.gr-sprung` (0,1,0) -
+   elf Sprung-Links standen VOLLROT da, waehrend dieselbe Klasse in der
+   Radar-Tafel (ohne src-table) grau war. Der Fix sitzt auf der
+   SPEZIFITAET, nicht auf einem weiteren Farbwort: (0,2,1) schlaegt
+   (0,1,1), und der Hover-Begleiter schlaegt diese Zeile zurueck. Der
+   Rot-Deckel je Tafel (<= 10 vollrot eingefaerbte Elemente, initial)
+   haelt ein Browser-Test fest - Farbwert aus var(--red) gelesen. */
+.src-table a.gr-sprung,.src-table a.gr-ksprung{color:var(--ink-2);
+  font-size:12px;font-weight:400;text-transform:none;letter-spacing:normal}
+.src-table a.gr-sprung:hover,.src-table a.gr-ksprung:hover{color:var(--red);
+  border-bottom-color:var(--red)}
+.gr-sprung:hover,.gr-ksprung:hover{color:var(--red);
+  border-bottom-color:var(--red)}
+/* Beide Sprünge stehen UNTER dem Modell-Namen (Radar-Zeile wie
+   Katalog-Zeile; `.gr-a-modell`/`.gr-a-klein` sind bereits block) - der
+   Link ist ein Weg der Zeile, kein Bestandteil des Titels. */
+td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
+/* P4 Schritt 2c: die MARKIERTE Katalog-Zeile nach einem Radar-Sprung -
+   Rot als Akzent (Design-Regel 4): genau EINE Zeile markiert, solange
+   bis ein anderer Sprung sie loest. */
+.gr-k-zeile.gr-k-ziel > td{border-top:2px solid var(--red);
+  border-bottom:2px solid var(--red)}
 .gr-s-th{font-family:var(--sans);font-size:12px;letter-spacing:.08em}
 
 
@@ -3382,8 +3547,11 @@ b,strong{font-weight:700}
 .gr-zr-baender button:last-child{border-right:0}
 .gr-zr-baender button small{display:block;font-weight:600;font-size:12px;
   color:var(--ink-4)}
-.gr-zr-baender button[aria-pressed="true"]{background:var(--red);color:var(--paper-2)}
-.gr-zr-baender button[aria-pressed="true"] small{color:var(--paper-3)}
+/* P4-Fix (Sicht-Pruefung 18.09., Rot-Deckel): aktives Band als WASH
+   statt roter Flaeche - dieselbe Regel wie .gr-vknopf.is-aktiv. */
+.gr-zr-baender button[aria-pressed="true"]{background:var(--red-wash);
+  color:var(--red-deep)}
+.gr-zr-baender button[aria-pressed="true"] small{color:var(--red-deep)}
 .gr-zr-baender button:disabled{opacity:.38;cursor:default}
 .gr-zr-baender button:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
 /* --- P1/F3 (A3, 17.09.2026): MODELL-KARTEN statt einzeiliger Chips ----
@@ -3408,10 +3576,16 @@ b,strong{font-weight:700}
   cursor:pointer;text-align:left;font-family:var(--serif)}
 .gr-zr-kacheln button .gr-zr-k-kopf{display:flex;align-items:center;
   justify-content:space-between;gap:8px;width:100%;min-width:0}
+/* P4-Fix (Sicht-Pruefung 18.09., Kleineres 8): der Kachelname bricht UM,
+   er wird nicht abgeschnitten. text-overflow:ellipsis kuerzte drei der
+   sechs Karten auf dasselbe "GALAXY S26 UL…" - die GB-Stufe (der Teil,
+   der die Zwillinge unterscheidet) fiel weg, und Regel 2 dieser Vorlage
+   ("keine mit '…' abgeschnittene Beschriftung") galt fuer die Karten
+   nicht. Der Umbruch kostet Hoehe nur bei mehrzeiligen Namen; die
+   GB-Stufe steht im gleichen String ("· 512 GB") und wandert mit. */
 .gr-zr-kacheln button .gr-zr-k-name{font-family:var(--sans);font-size:12px;
   font-weight:700;letter-spacing:.05em;text-transform:uppercase;
-  color:var(--ink-3);min-width:0;overflow:hidden;text-overflow:ellipsis;
-  white-space:nowrap}
+  color:var(--ink-3);min-width:0;overflow-wrap:break-word}
 .gr-zr-kacheln button:hover .gr-zr-k-name,.gr-zr-kacheln button:focus-visible
   .gr-zr-k-name{text-decoration:underline;text-underline-offset:2px}
 /* Die Band-Spans: EINE Sichtbarkeit-Regel mit eigener [hidden]-Zeile -
@@ -3454,7 +3628,14 @@ b,strong{font-weight:700}
   border:1px solid var(--paper)}
 .gr-zr-kacheln button:hover,.gr-zr-kacheln button:focus-visible{
   border-color:var(--ink-3)}
-.gr-zr-kacheln button[aria-pressed="true"]{border-color:var(--red);
+/* P4-Fix (Sicht-Pruefung 18.09., Rot-Deckel): die AKTIVE Karte traegt
+   INK statt Rot. Rot trug bis hierher vier Bedeutungen auf einer Tafel
+   (Marke, aktiv, Delta, Link) - aktiv ist keine Daten-, sondern eine
+   Auswahl-Bedeutung; ein schwarzer 3-px-Rand ist in der Zeitungssprache
+   derselben Seite die deutlichere Markierung und nimmt Rot die dritte
+   Bedeutung. P1-Messlatte unveraendert erfuellt: Rahmen 3 px >= 2 px
+   plus Flaechenaenderung (paper-2). */
+.gr-zr-kacheln button[aria-pressed="true"]{border-color:var(--ink);
   border-width:3px;background:var(--paper-2)}
 /* P1-Fix (Sicht-A1): die Preiszahl der AKTIVEN Karte mit echtem Angebot
    ist der dritte Eingang des Rechenweg-Panels - dieselbe gepunktete
@@ -3466,6 +3647,59 @@ b,strong{font-weight:700}
 .gr-zr-kacheln button[aria-pressed="true"] .gr-zr-k-band[data-anb]
   .gr-zr-k-preis b:hover{color:var(--red);border-bottom-style:solid}
 /* --- Ende P1/F3 (A3): Modell-Karten --------------------------------- */
+/* P4/D4 (STRATEGIE_GERAETE_V3, 18.09.2026): DIE ANTWORT IST DIE
+   GROESSTE ZAHL (design.md Regel 1). Vier Reiter, vier Leitzahlen -
+   Vergleich: das TCO-Delta zur Vodafone-Referenz (stand bis P4 als
+   19-px-Zahl mitten im Antwort-Satz); Radar: die staerkste Abweichung
+   (bis P4 die 13-px-Zelle einer 746-Zeilen-Tabelle); Preisverlauf: der
+   aktuelle Preis des gewaehlten Geraets (bis P4 eine Kachel unter vier
+   gleichgrossen); Katalog (P4-Fix, Sicht-Pruefung 18.09.): der guenstigste
+   Einzelgeraetepreis des Regals - der Katalog war der einzige Reiter
+   ohne Falz-Antwort, seine groesste Schrift war die h2; die Sicht-
+   Pruefung wertete das als FAIL, die Tabelle als Antwort reicht nicht,
+   wenn ihre groesste Zahl 16 px gross ist.
+
+   Typo im bestehenden Stil: dieselbe Serife wie der Fliesstext,
+   lining-nums, kein Neon, keine Flaeche. Die Groesse schlaegt die
+   Kopfzeile (h1: 58 px Schreibtisch / 28 px Telefon) - die Antwort ist
+   groesser als die Frage (design.md §4: die h1 "dekoriert die Frage,
+   statt die Antwort zu zeigen"). Mobil gilt die Grenze "kein Umbruch-
+   Chaos bei 390": clamp haelt die Zahl bei 30 px - das laengste Delta
+   des Bestands (~900 €) misst dabei ~140 px gegen 334 px Zeilenbreite,
+   einzeilig, das Label steht darunter (seit dem h1-Fix bleibt die
+   Leitzahl auch am Telefon das groesste Element - 30 gegen 28 px). */
+.gr-leit{display:flex;flex-direction:column;gap:2px;margin:0 0 4px}
+.gr-leit-zahl{font-family:var(--serif);font-weight:700;
+  font-variant-numeric:lining-nums;letter-spacing:-.015em;line-height:1.04;
+  font-size:clamp(30px,6.5vw,60px);color:var(--ink)}
+.gr-leit-label{font-family:var(--sans);font-size:12.5px;color:var(--ink-3);
+  line-height:1.35}
+/* Vergleich: die Leitzahl uebernimmt die 3-px-Trennlinie des Antwort-
+   Satzes (sie eroeffnet die Antwort-Einheit); der Satz darunter folgt
+   ohne eigene Linie. Ohne Leitzahl (Vodafone fuehrt selbst / hat im
+   Band kein Buendel) traegt der Satz die Linie wie bisher - dieselbe
+   Tafel sieht in beiden Faellen aus wie EINE Antwort-Einheit.
+   Die Abstaende sind FALZ-Geld: auf dem Telefon muss der Graphkopf
+   unter 844 px bleiben (11c), und die Leitzahl lebt von der Luft, die
+   der Export-Umzug in die Fusszeile freigemacht hat - deshalb so
+   knapp wie der Zeitungsstil es zulaesst. */
+.gr-zr-leit{margin:8px 0 4px;padding:10px 0 0;border-top:3px solid var(--ink)}
+.gr-zr-antwort--nach-leit{border-top:none;padding-top:2px}
+/* Radar: direkt unter der h2 (seit dem P4-Fix ohne Erklaersatz dazwischen
+   - die Zeichenregel traegt das Achslabel unter der Grafik). */
+.gr-leit--radar{margin:10px 0 8px}
+/* Preisverlauf: zwischen Kachelreihe und Kurve. */
+.gr-vleit{margin:4px 0 8px}
+/* Katalog (P4-Fix, Sicht-Pruefung 18.09.): unter der h2, ueber dem EINEN
+   Satz und der Filterleiste - dieselbe Falz-Position wie im Radar. */
+.gr-leit--katalog{margin:6px 0 10px}
+/* P4-Fix (Sicht-Pruefung 18.09., Kleineres 9): Achsenerklaerung als
+   LABEL unter einer Grafik - kleiner, grau, ohne Absatz-Abstand. Der
+   Radar-Satz war bis hierhin ein 13,5-px-Absatz zwischen Leitzahl und
+   Bild (design.md Regel 8: Kurvendaten gehoeren unters Bild, nicht in
+   Prosa ueber ihm). */
+.gr-achsenlabel{font-family:var(--sans);font-size:12px;color:var(--ink-3);
+  line-height:1.5;margin:3px 0 0}
 .gr-zr-antwort{margin:0 0 10px;padding:12px 0 0;border-top:3px solid var(--ink);
   font-size:19px;line-height:1.42}
 .gr-zr-antwort .gr-zr-zahl{font-weight:700;font-variant-numeric:lining-nums}
@@ -3624,9 +3858,20 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
      alten Abstaenden 854 von 844 px - die Kartenzeile kostet jetzt mehr
      Flaeche als die alten Chips, deshalb werden die gr-zr-eigenen
      Abstaende STRAFFER (der Steuerblock selbst bleibt unangetastet).
-     Gemessen, nicht geraten: Kopfboden 841 von 844. */
-  .gr-zr-wahl{padding-bottom:3px}
-  .gr-zr-kacheln{padding-bottom:3px}
+     Gemessen, nicht geraten: Kopfboden 841 von 844.
+     P4-Fix (Sicht-Pruefung 18.09.): der Kachelname bricht seit dem
+     Ende der Ellipse in eine zweite Zeile („Galaxy S26 Ultra · 512 GB"
+     passt nicht in 156 px) - die Kartenreihe wurde damit 17 px hoeher
+     und der Graphkopf rutschte auf 857. Diese dritte Runde Straffung
+     holt die Zeile zurueck (Karteninnenabstaende, Namendurchschuss,
+     Wahl- und Kartenboden); gemessen: Kopfboden 841 von 844. */
+  .gr-zr-wahl{padding-bottom:0}
+  .gr-zr-kacheln{padding-bottom:0}
+  .gr-zr-kacheln button{padding:4px 10px 2px}
+  .gr-zr-kacheln button .gr-zr-k-name{line-height:1.08}
+  .gr-zr-kacheln button .gr-zr-k-preis{margin-top:0}
+  .gr-zr-kacheln button .gr-zr-k-preis b{line-height:1.02}
+  .gr-zr-rechnung{margin-bottom:0}
   .gr-zr-antwort{font-size:14.5px;line-height:1.32;padding-top:3px;
     margin-bottom:0}
   .gr-zr-rechnung{margin-bottom:2px}
@@ -3644,6 +3889,32 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
   .gr-zr-rkopf{font-size:11.5px}
   li.gr-zr-posten{padding:4px 0}
   .gr-zr-pn{font-size:11.5px}
+  /* P4b-Fix (Re-Check 18.09.2026, mobile Kurve 921 px > Falz 844): die
+     LEGENDE stand zunaechst UEBER dem Bild und kostete mobil 74 px (drei
+     Zeilen) - der Graph begann 77 px unter der Falz, obwohl 11c (Antwort-
+     Satz und Graphkopf) gruen blieb. Auf dem Telefon steht sie jetzt
+     UNTER dem Bild (Reihenfolge per order, das Markup bleibt das des
+     genehmigten Prototyps); ihre "ab"-Werte braucht der Leser beim Lesen
+     der Kurve, nicht davor. Desktop unveraendert. */
+  .gr-zr-graph{display:flex;flex-direction:column}
+  .gr-zr-kopf{order:1;line-height:1.2}
+  .gr-zr-bild{order:2;margin-top:0}
+  .gr-zr-legende{order:3;margin:6px 0 0}
+  .gr-zr-hinweis{order:4}
+  .gr-lueckenzeile{order:5}
+  /* Dieselbe Straffungsrunde, zweiter Hebel: die KETTE ueber dem Bild
+     (Leitzahl-Aussenabstaende, Antwort-Durchschuss, Kopfboden, Karten-
+     Innenabstaende) gibt weitere px, damit nicht nur der Graphkopf,
+     sondern der erste KURVENPUNKT ueber der Falz steht. Schriftgroessen
+     unangetastet - Leitzahl 30 px > h1 28 px (Falz-Regel) und Kartenpreis
+     >= 20 px (Messlatte) gelten weiter. */
+  .gr-zr-leit{margin:2px 0 2px;padding-top:6px}
+  .gr-leit-zahl{line-height:1}
+  .gr-leit-label{line-height:1.25}
+  .gr-zr-antwort{line-height:1.26;padding-top:2px}
+  .gr-zr-messtage{line-height:1.2}
+  .gr-zr-kacheln button{padding-bottom:0}
+  .gr-zr-kacheln button .gr-zr-k-name{line-height:1.05}
 }
 /* Breit: das Bild zeigt die Werte (grosser letzter, kleiner erster), der
    Wert-Span der Legende weicht (eine Zahl steht je Ort genau EINMAL).

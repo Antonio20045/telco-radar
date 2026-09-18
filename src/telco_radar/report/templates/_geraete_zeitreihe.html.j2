@@ -17,7 +17,20 @@
    der Montagepunkt wird beim Wechsel geleert, bevor der neue Block
    eingehängt wird. #}
 {% macro paarblock(p) %}
-  <p class="gr-zr-antwort" id="gr-zr-antwort">{{ p.antwort_html | safe }}</p>
+  {# P4/D4 (STRATEGIE_GERAETE_V3, 18.09.2026): DIE LEITZAHL UEBER DEM SATZ.
+     Das TCO-Delta zur Vodafone-Referenz ist die Antwort dieses Reiters und
+     stand bis hierhin als 13-px-Zahl mitten im Antwort-Satz (design.md
+     Regel 1 und §4). Es steht jetzt als EIGENE Zeile mit der groessten
+     Schrift des ersten Viewports DARUEBER (Zahl gross, Label klein -
+     Typo im bestehenden Stil, .gr-leit-zahl). Der Satz darunter verliert
+     seinen Delta-Anhang dafuer: dieselbe Rechnung aus geraete_zeitreihe
+     (_leitzahl_html), keine Zahl zweimal am selben Ort. Kein Delta
+     (Vodafone fuehrt selbst / hat im Band kein Bündel): keine Zeile,
+     der Satz traegt die Antwort allein. #}
+  {% if p.leitzahl_html %}
+  <div class="gr-leit gr-zr-leit">{{ p.leitzahl_html | safe }}</div>
+  {% endif %}
+  <p class="gr-zr-antwort{% if p.leitzahl_html %} gr-zr-antwort--nach-leit{% endif %}" id="gr-zr-antwort">{{ p.antwort_html | safe }}</p>
   {# (a) Der Rechenschaftssatz - EINE Zeile unter dem Antwort-Satz, als
      Aufklapper (§3.1). Er nennt die Formel der Leitzahl und den Beleg des
      günstigsten Angebots mit Link und Abrufdatum - Antonios

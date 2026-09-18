@@ -289,6 +289,14 @@ def _luecke_text(luecken: list, band_labels: dict) -> str | None:
 
 def _antwort_html(modell: dict, band: str, zeilen: list,
                   band_katalog: dict) -> str:
+    """Der Antwort-Satz des Paar-Blocks.
+
+    Seit P4/D4 (STRATEGIE_GERAETE_V3, 18.09.2026) traegt er das
+    TCO-Delta zur Vodafone-Referenz NICHT mehr im Satz - es steht als
+    EIGENE Leitzahl-Zeile ueber ihm (`_leitzahl_html`, DIE ANTWORT IST
+    DIE GROESSTE ZAHL, design.md Regel 1). Dieselbe Rechnung, keine
+    zweite Stelle: Der Satz nennt Anbieter, TCO-24 und Ø je Monat, die
+    Leitzahl den Abstand zur Referenz."""
     name = _esc(_satz_name(modell))
     label = band_katalog.get("label", band)
     bereich = band_katalog.get("bereich") or ""
@@ -310,17 +318,7 @@ def _antwort_html(modell: dict, band: str, zeilen: list,
             f"{_schnitt(beste)}</b> ({_esc(beste.get('tarif') or '')}"
             f"{_gb_teil(beste)})")
     eigen = next((z for z in zeilen if z["anbieter"] == EIGEN), None)
-    if eigen is not None and eigen is not beste:
-        # E3-Fix (QA 17.09.2026, B1): Die Zeilen stehen AUFSTEIGEND, der
-        # Beste liegt also IMMER unter der Referenz, sobald Vodafone nicht
-        # selbst fuehrt - die Differenz ist sein Abstand nach UNTEN, und
-        # "ueber" war immer falsch gepolt. Dieselbe Richtungssprache wie
-        # die Buendel-Karten (S4): unter heisst guenstiger.
-        satz += (f" — <b class='gr-zr-zahl'>"
-                 f"{_euro(round(eigen['gesamt'] - beste['gesamt'], 2))}"
-                 f"</b> unter der Vodafone-Referenz ({_euro(eigen['gesamt'])}"
-                 f"{', Näherung' if eigen.get('naeherung') else ''}).")
-    elif eigen is beste:
+    if eigen is beste:
         zweit = zeilen[1] if len(zeilen) > 1 else None
         satz = (f"Beim {name} im Band {label}{klammer} führt Vodafone: "
                 f"<b class='gr-zr-zahl'>{_euro(beste['gesamt'])}</b> über "
@@ -332,11 +330,47 @@ def _antwort_html(modell: dict, band: str, zeilen: list,
                      f"({_euro(zweit['gesamt'])}).")
     elif eigen is None:
         satz += " — Vodafone führt in diesem Band kein Bündel."
+    # eigen ist nicht None und nicht beste: KEIN Anhang mehr - das Delta
+    # steht als Leitzahl ueber dem Satz (_leitzahl_html). Die Richtungs-
+    # sprache "unter" (E3-Fix B1: die Zeilen stehen aufsteigend, der
+    # Beste liegt IMMER unter der Referenz, sobald Vodafone nicht selbst
+    # fuehrt) lebt im Label der Leitzahl weiter.
     # Der Satzschlusspunkt gehoert GENAU HIERHER - die Anhaengsel oben
     # schliessen ihren Teil teils selbst mit ".". Er wird deshalb nur
     # gesetzt, wenn er nicht schon da ist; ein bedingungsloses "+ ".""
     # machte daraus ").." (Abnahme 17.09.: 133 von 169 Bloecken).
     return satz if satz.endswith(".") else satz + "."
+
+
+def _leitzahl_html(zeilen: list) -> str | None:
+    """P4/D4: das TCO-Delta als EIGENE Leitzahl-Zeile ueber dem Antwort-Satz.
+
+    Bis P4 stand der Abstand zur Vodafone-Referenz als 13-px-<b> mitten
+    im Satz (design.md §4: "Die wichtigste Zahl steht in 13 px mitten in
+    einem Satz") - die Antwort des Vergleichs-Reiters war damit die
+    KLEINSTE wichtigen Zahl der Tafel. Jetzt ist sie die groesste Schrift
+    des ersten Viewports (.gr-leit-zahl, clamp 32-60 px); der Satz
+    darunter traegt die Umstaende. Die Zahl selbst faellt aus dem SATZ
+    (keine Zahl zweimal am selben Ort), der Referenzbetrag steht in der
+    Klammer des Labels - unverändert derselbe Wert, keine zweite Rechnung.
+
+    None, wenn es kein Delta gibt: Vodafone fuehrt selbst, fuehrt im
+    Band kein Bündel oder ist allein auf der Tafel - dann gibt es keinen
+    Abstand, und der Antwort-Satz traegt die Antwort allein."""
+    if not zeilen:
+        return None
+    beste = zeilen[0]
+    eigen = next((z for z in zeilen if z["anbieter"] == EIGEN), None)
+    if eigen is None or eigen is beste:
+        return None
+    # E3-Fix (QA 17.09.2026, B1): Die Zeilen stehen AUFSTEIGEND, der
+    # Beste liegt also IMMER unter der Referenz, sobald Vodafone nicht
+    # selbst fuehrt - "unter" heisst guenstiger (Buendel-Karten S4).
+    delta = round(eigen["gesamt"] - beste["gesamt"], 2)
+    return (f"<b class='gr-leit-zahl'>{_euro(delta)}</b>"
+            f"<span class='gr-leit-label'>unter der Vodafone-Referenz "
+            f"({_euro(eigen['gesamt'])}"
+            f"{', Näherung' if eigen.get('naeherung') else ''})</span>")
 
 
 def _schnitt(karte: dict) -> str:
@@ -717,7 +751,17 @@ def _svg(anbieter_serien: dict, breit: bool,
     w = BREIT_W if breit else SCHMAL_W
     min_h = BREIT_MIN_H if breit else SCHMAL_MIN_H
     h = max(min_h, round(w * 0.42))
-    links, rechts, oben, unten = 58, (158 if breit else 96), 18, 46
+    # P4b (Re-Check 18.09.2026): der Kopffreiraum des SCHMALEN Bildes stand
+    # auf 18 wie der des breiten - auf dem Telefon kosteten ihn genau die
+    # Pixel, um die der erste Kurvenpunkt unter der 844-er-Falz lag (CSS
+    # allein brachte den SVG-Top auf 820, der Punkt sass bei 853). 10 statt
+    # 18 Einheiten: der hoechste Achsen-Wert steht bei y+4 Basislinie und
+    # braucht rund 11 Einheiten, der hoechste Wert-Label des Punktes liegt
+    # ~22 Einheiten ueber dem Punkt und bleibt innerhalb der Flaeche - der
+    # 12-Prozent-Massstabs-Freiraum (y1) bleibt unangetastet. Breit
+    # unveraendert: dort traegt das Bild die Erst-Wert-Labels selbst.
+    links, rechts, oben, unten = 58, (158 if breit else 96), \
+        (18 if breit else 10), 46
     pw, ph = w - links - rechts, h - oben - unten
 
     def x_v(iso: str) -> float:
@@ -1072,6 +1116,9 @@ def aufbereiten(state_dir: Path, tco: dict) -> dict:
                 "modell": modell["id"], "band": band,
                 "antwort_html": _antwort_html(
                     modell, band, zeilen, band_katalog.get(band, {})),
+                # P4/D4: das Delta als Leitzahl ueber dem Satz (None ohne
+                # Delta - dann gibt es keine Leitzahl-Zeile, s. Docstring).
+                "leitzahl_html": _leitzahl_html(zeilen),
                 "rechnung_html": _rechnung_html(zeilen),
                 "messtage_text": (f"Messtage: {_tag_monat(tage[0])} bis "
                                   f"{_tag_monat(tage[-1])} "

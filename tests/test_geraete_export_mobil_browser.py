@@ -1,24 +1,25 @@
-"""E5 (AUFTRAG_GERAETE_EINE_SEITE_V2 §7): die Export-Stelle auf dem
-Telefon - sichtbar, benutzbar, und die Falz bleibt, wo sie ist.
+"""E5 (AUFTRAG_GERAETE_EINE_SEITE_V2 §7) / P4-D4 (STRATEGIE_GERAETE_V3,
+18.09.2026): die Export-Stelle auf dem Telefon - sichtbar, benutzbar,
+und die Falz bleibt, wo sie ist.
 
-Bis E5 war die Knopfreihe unter 900 px WEGGEBLENDET (O4: der Platz über
-der Falz ging vor, "der CSV-Download ist ein Excel-Workflow des
-Schreibtischs"). E5 dreht das auf dieselbe Stelle um, an der sie auch auf
-dem Schreibtisch steht - die Strategie (§7 E5): "Export-Knöpfe mobil neu
-bewerten (Auftrag: 'der Export ist Antonios Werkzeug')". Der Platz dafür
-kommt aus der Kopfzeile selbst: das Datum rückt neben den Kicker
-(Zeitungs-Datumszeile), die Export-Reihe übernimmt den Slot.
+Bis P4/D4 stand die Knopfreihe in der KOPFZEILE (O4 zentral, E5 mobil
+sichtbar): am Telefon belegte sie dort die Zeile ÜBER der Reiter-
+Steuerung und drückte Antwort-Satz und Graphkopf Richtung Falz (11c,
+gemessen 837 von 844 px). P4/D4 verschiebt sie als EINE Fußzeile ans
+Seitenende (.gr-export-fuss) - dieselben sechs Dateien (P3 hat die
+beiden Katalog-Ansichten dazu gebracht), dieselben Ziele, EINE Stelle
+für alle Reiter bleibt gewahrt (O4-Regel gegen Reiter-Duplikate).
 
 Gemessen im echten Chromium (dieselbe Bauform wie
 test_geraete_zeitreihe_browser.py):
-  - 390x844: alle vier Knöpfe sichtbar (Box > 0) und in EINER Zeile,
+  - 390x844: alle sechs Knöpfe sichtbar (Box > 0) und in EINER Zeile,
     die IN SICH rollt (overflow-x:auto), nie die Seite quer.
-  - Die Falz-Kriterien von 11c bleiben erfüllt - die Sichtbarkeit darf
-    nicht durch Falz-Bruch erkauft sein (deshalb steht die Messung hier
-    ein zweites Mal, gekoppelt an die Reihe).
+  - Die Falz-Kriterien von 11c bleiben erfüllt - der Kopf ist ohne die
+    Reihe KÜRZER geworden und die neue LEITZAHL des Vergleichs-Reiters
+    (.gr-zr-leit, DIE ANTWORT IST DIE GROESSTE ZAHL) darf die gewonnene
+    Luft nicht wieder verbrauchen.
   - Der Kicker bricht nicht um: der Kopf ist auf dem Telefon eine
-    SPALTE (Kicker, Schlagzeile, Datum, Export-Zeile) - die Regel, die
-    den Platz für die Reihe freigibt.
+    SPALTE (Kicker, Schlagzeile, Datum).
 """
 from __future__ import annotations
 
@@ -120,7 +121,7 @@ def schreibtisch(_browser_seite):
 
 def _reihe(s):
     return s.evaluate("""() => {
-      const ex = document.querySelector('.page-hero-row .gr-export-knoepfe');
+      const ex = document.querySelector('.gr-export-fuss .gr-export-knoepfe');
       if (!ex) return null;
       const knoepfe = [...ex.querySelectorAll('a')];
       const st = getComputedStyle(ex);
@@ -154,9 +155,10 @@ def test_am_telefon_ist_die_export_zeile_sichtbar_und_vollstaendig(telefon):
     steht da (Hoehe > 0), jeder Knopf hat eine Box, und alle liegen in
     EINER Zeile (die Reihe rollt in sich, sie stapelt nicht). Bis P3
     waren es vier Knöpfe, der Modell-Katalog hat zwei weitere gebracht
-    (eine Datei je Ansicht - E5-Regel)."""
+    (eine Datei je Ansicht - E5-Regel). Seit P4/D4 steht die Reihe in
+    der FUSSZEILE (.gr-export-fuss), nicht mehr in der Kopfzeile."""
     r = _reihe(telefon)
-    assert r is not None, "keine Export-Reihe im Kopf der Seite"
+    assert r is not None, "keine Export-Reihe in der Fußzeile der Seite"
     assert r["hoehe"] > 0, "die Export-Reihe ist auf 390 px unsichtbar"
     assert r["sichtbar"] == r["knoepfe"] == 6, (r["sichtbar"], r["knoepfe"])
     assert r["zeile"], "die Knöpfe stapeln statt in einer Zeile zu rollen"
@@ -177,12 +179,14 @@ def test_am_telefon_rollt_die_seite_nicht_quer(telefon):
 
 
 def test_am_telefon_bleibt_die_falz_von_11c_erfuellt(telefon):
-    """Die Sichtbarkeit der Reihe ist an die Falz GEKOPPELT: Antwort-Satz
-    und Graphkopf bleiben über 844 px. Ohne diese Messung könnte jemand
-    die Reihe sichtbar machen, indem er 11c bricht - genau der Tausch,
-    den O4 seinerzeit mit dem Wegblenden beantwortet hat."""
+    """Die Fußzeile ist an die Falz GEKOPPELT: Antwort-Satz und Graphkopf
+    bleiben über 844 px. Bis P4/D4 war die Reihe der Grund, die Falz knapp
+    zu halten (sie stand im Kopf, gemessen 837 von 844 px); seit dem Umzug
+    ist es die LEITZAHL des Vergleichs-Reiters (.gr-zr-leit, DIE ANTWORT
+    IST DIE GROESSTE ZAHL) - der Kopf ist ohne die Reihe kürzer geworden,
+    und die gewonnene Luft gehört der Leitzahl, nicht neuem Inhalt."""
     r = _reihe(telefon)
-    assert r is not None
+    assert r is not None, "keine Export-Reihe in der Fußzeile der Seite"
     assert r["antwort"] is not None and r["antwort"] <= 844, (
         f"Antwort-Satz endet bei {r['antwort']} px")
     assert r["kopf"] is not None and r["kopf"] <= 844, (
@@ -190,12 +194,13 @@ def test_am_telefon_bleibt_die_falz_von_11c_erfuellt(telefon):
 
 
 def test_der_kicker_bricht_auf_dem_telefon_nicht_um(telefon):
-    """Die Regel, die den Platz freigibt: auf dem Telefon ist der Kopf
-    eine SPALTE (Kicker, Schlagzeile, Datum, Export-Zeile), und der
-    Kicker bleibt EINZEILIG. Ein Nebeneinander von Kicker und Datum ist
-    bei 390 px ausgeschlossen (Kicker 163 px + Datum 214 px gegen 334 px
-    Zeilenbreite) - die erste Fassung dieser Änderung brach den Kicker
-    mitten im Wort um, gefunden am Screenshot, nicht am Messwert."""
+    """Die Regel, die den Kopf trägt: auf dem Telefon ist der Kopf eine
+    SPALTE (Kicker, Schlagzeile, Datum - die Export-Zeile steht seit
+    P4/D4 in der Fußzeile), und der Kicker bleibt EINZEILIG. Ein
+    Nebeneinander von Kicker und Datum ist bei 390 px ausgeschlossen
+    (Kicker 163 px + Datum 214 px gegen 334 px Zeilenbreite) - die erste
+    Fassung dieser Änderung brach den Kicker mitten im Wort um, gefunden
+    am Screenshot, nicht am Messwert."""
     box = telefon.evaluate("""() => {
       const k = document.querySelector('.gr-hero-export .page-kicker');
       const d = document.querySelector('.gr-hero-export .page-date');
@@ -230,9 +235,11 @@ def test_die_vier_links_zielen_auf_vier_dateien(_browser_seite):
             f"exporte/{name} fehlt im gerenderten site/-Verzeichnis")
 
 
-def test_am_schreibtisch_steht_die_reihe_noch_im_kopf(schreibtisch):
-    """Der Desktop ist unangetastet: die Reihe steht im Hero, alle vier
-    Knöpfe sichtbar - das mobile Grid greift erst unter 900 px."""
+def test_am_schreibtisch_steht_die_reihe_in_der_fusszeile(schreibtisch):
+    """Der Desktop ist unangetastet: die Reihe steht - wie am Telefon -
+    in der FUSSZEILE, alle sechs Knöpfe sichtbar und in EINER Zeile
+    (unter 900 px rollt sie in sich, darüber wrappt sie). Bis P4/D4
+    stand sie im Hero; der Umbau ist derselbe an beiden Breiten."""
     r = _reihe(schreibtisch)
     assert r is not None
     assert r["sichtbar"] == 6

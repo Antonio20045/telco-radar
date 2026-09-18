@@ -865,16 +865,18 @@ var TelcoFrage = (function () {
    * scheinbar nicht bewegt.
    * Seit E3 Schritt 3 (17.09.2026) lebt der ganze Radar IN dieser Seite:
    * die Alt-URL des Radars ist eine Weiterleitung auf
-   * #tafel-radar, deshalb schalten ALLE Hash-Ziele des Radars (seine
-   * Sektionen #wr-alarme/#wr-abweichung/#wr-haendler/#wr-bewegungen und
-   * das alte Sprungziel #lifecycle aus der Portfolio-Zeit) den
-   * Radar-Reiter - sonst spränge der Browser zu einem versteckten
-   * Element, ohne dass die Tafel sichtbar würde. */
+   * #tafel-radar, deshalb schalten die Hash-Ziele des Radars (seine
+   * Sektionen #wr-alarme/#wr-abweichung/#wr-haendler und das alte
+   * Sprungziel #lifecycle aus der Portfolio-Zeit) den Radar-Reiter -
+   * sonst spränge der Browser zu einem versteckten Element, ohne dass
+   * die Tafel sichtbar würde. #wr-bewegungen (Wochenkarte) ist seit
+   * P4 Schritt 2a (18.09.2026) in den Preisverlauf-Reiter verschoben
+   * und schaltet seither DEN. */
   var ALT = {'tafel-alarme': 'tafel-tco', 'tco': 'tafel-tco',
              'katalog': 'tafel-katalog', 'verlauf': 'tafel-verlauf',
              'radar': 'tafel-radar', 'lifecycle': 'tafel-radar',
              'wr-alarme': 'tafel-radar', 'wr-abweichung': 'tafel-radar',
-             'wr-haendler': 'tafel-radar', 'wr-bewegungen': 'tafel-radar'};
+             'wr-haendler': 'tafel-radar', 'wr-bewegungen': 'tafel-verlauf'};
   function ausHash() {
     var id = (location.hash || '').replace(/^#/, '');
     if (!id) return;
@@ -896,17 +898,30 @@ var TelcoFrage = (function () {
  * Bauform wie der Zeitraum- und der Band-Schalter der Seite
  * (`gr-vknopf`, aktiv ROT, `aria-pressed`).
  *
- * Der Zustand steht BEWUSST NICHT in der URL (P3-Entscheidung): ein
- * geteilter Link soll den Katalog in seiner Grundfrage zeigen, und ein
- * zweiter URL-Parameter wäre eine zweite Stelle, die jemand pflegen
- * muss. Default ist der Einzelgerätpreis - er steht so im Markup, dieser
- * Block aendert ihn beim Laden nicht. */
+ * P4 Schritt 2c (18.09.2026): die Ansicht steht SEIT P4 in der URL
+ * (?ansicht=tco) - der P3-Rest aus der Strategie. Ein geteilter Link
+ * zeigt die angewählte Ansicht; der Parameter wird nur bei tco gesetzt
+ * (barpreis ist die Grundfrage des Reiters und bleibt die kurze URL).
+ * Der Zeitreihen-Block schreibt seine Parameter (?modell/&band) seit
+ * derselben Änderung parameterweise statt die URL neu aufzubauen - ein
+ * ansicht-Link überlebt damit jeden Modellwechsel. */
 (function () {
   var tafel = document.getElementById('tafel-katalog');
   if (!tafel) return;
   var tabelle = document.getElementById('gr-katalogtabelle');
   var knoepfe = tafel.querySelectorAll('.gr-kansicht button[data-ansicht]');
   if (!tabelle || !knoepfe.length) return;
+
+  function urlAnsicht(wert) {
+    try {
+      var p = new URLSearchParams(location.search);
+      if (wert === 'tco') p.set('ansicht', 'tco');
+      else p.delete('ansicht');
+      var qs = p.toString();
+      history.replaceState(null, '',
+        (qs ? '?' + qs : location.pathname) + location.hash);
+    } catch (e) { /* offline / file://: kein replaceState noetig */ }
+  }
 
   function zeige(knopf) {
     tabelle.classList.toggle('gr-katalog--tco',
@@ -916,6 +931,7 @@ var TelcoFrage = (function () {
       k.classList.toggle('is-aktiv', aktiv);
       k.setAttribute('aria-pressed', aktiv ? 'true' : 'false');
     });
+    urlAnsicht(knopf.getAttribute('data-ansicht'));
     /* P3-Fix (Sicht-Pruefung Wesentliches 1, 18.09.2026): die Sortierung
        darf nicht an einer jetzt UNSICHTBAREN Spalte haengen bleiben.
        Gemessen am Live-Stand: nach "Einzelgeraepreis" (ab) sortiert und
@@ -932,6 +948,67 @@ var TelcoFrage = (function () {
 
   Array.prototype.forEach.call(knoepfe, function (knopf) {
     knopf.addEventListener('click', function () { zeige(knopf); });
+  });
+
+  /* Der Deep-Link beim Laden. Er laeuft UEBER zeige() (Klasse, Knopf-
+     Markierung, Event) und nicht ueber einen nachgebauten Klick - ein
+     knopf.click() wuerde denselben Weg nehmen, aber ein unbekannter
+     Parameter bleibt ohne Folge (kein Fehler, kein Zurueckfallen). */
+  try {
+    var wunsch = new URLSearchParams(location.search).get('ansicht');
+    var ziel = wunsch && tafel.querySelector(
+      '.gr-kansicht button[data-ansicht="' + wunsch + '"]');
+    if (ziel) zeige(ziel);
+  } catch (e) { /* aeltere Browser: Grundansicht bleibt */ }
+})();
+
+/* P4 SCHRITT 2c (STRATEGIE_GERAETE_V3, 18.09.2026): DER SPRUNG VOM RADAR
+ * IN DEN KATALOG - die zweite Kante des roten Fadens zwischen den
+ * Reitern. Der Link `a.gr-ksprung` (Modell-Zeile der Radar-Abweichungs-
+ * liste) traegt denselben `modell_schluessel` wie die Katalog-Zeile
+ * (`tr.gr-k-zeile[data-modell=...]`); dieser Handler schaltet den
+ * Katalog-Reiter auf, legt die Zielzeile frei (aktive Filter werden
+ * leer zurueckgesetzt, der Zeilen-Deckel ueber "alle anzeigen"
+ * geoeffnet - sonst scrollte der Sprung an eine unsichtbare Zeile),
+ * markiert sie EINMAL (.gr-k-ziel) und scrollt sie in Sicht.
+ *
+ * Ohne Zielzeile (der Link duerfte so nicht gerendert sein) laeuft der
+ * Klick als gewoehnlicher Verweis: href ist der Reiter-Anker #katalog,
+ * dessen Hash-Map den Reiter auch nach einem Reload aufschaltet. */
+(function () {
+  document.addEventListener('click', function (ev) {
+    var a = ev.target.closest ? ev.target.closest('a.gr-ksprung') : null;
+    if (!a) return;
+    var modell = a.getAttribute('data-modell');
+    if (!modell) return;
+    var zeile = document.querySelector(
+      '#gr-katalogtabelle tr.gr-k-zeile[data-modell="' + modell + '"]');
+    if (!zeile) return;
+    ev.preventDefault();
+    var knopf = document.querySelector(
+      '.gr-reiter button[data-tafel="tafel-katalog"]');
+    if (knopf) knopf.click();
+    var tafel = document.getElementById('tafel-katalog');
+    if (tafel) {
+      Array.prototype.forEach.call(
+        tafel.querySelectorAll('[data-filter]'), function (f) {
+          if ((f.value || '') !== '') {
+            f.value = '';
+            f.dispatchEvent(new Event('change'));
+          }
+        });
+    }
+    if (zeile.classList.contains('gr-a-rest')) {
+      var mehr = document.getElementById('gr-kmehr');
+      if (mehr) mehr.click();
+    }
+    Array.prototype.forEach.call(
+      document.querySelectorAll('.gr-k-ziel'),
+      function (z) { z.classList.remove('gr-k-ziel'); });
+    zeile.classList.add('gr-k-ziel');
+    try {
+      zeile.scrollIntoView({behavior: 'smooth', block: 'center'});
+    } catch (e) { zeile.scrollIntoView(); }
   });
 })();
 
@@ -1578,9 +1655,13 @@ var TelcoFrage = (function () {
       setzeBuendel(zustand.modell, zustand.band);
     }
     try {
-      history.replaceState(null, '',
-        '?modell=' + encodeURIComponent(zustand.modell) +
-        '&band=' + zustand.band);
+      /* P4 Schritt 2c: parameterweise statt die URL neu aufzubauen -
+         ein ?ansicht=-Deep-Link des Katalogs ueberlebt so jeden
+         Modellwechsel (bis P4 loeschte dieser Neuaufbau alle Nachbarn). */
+      var p = new URLSearchParams(location.search);
+      p.set('modell', zustand.modell);
+      p.set('band', zustand.band);
+      history.replaceState(null, '', '?' + p.toString());
     } catch (e) { /* Datei-Offline: kein replaceState noetig */ }
   }
 
@@ -1643,6 +1724,43 @@ var TelcoFrage = (function () {
     var ziel = document.getElementById('gr-zr-gruppe');
     if (ziel) ziel.scrollIntoView({behavior: 'smooth', block: 'start'});
   });
+
+  /* P4-Fix (Sicht-Pruefung 18.09., Kriterium 13): der RECHENWEG der
+     Bündel-Zeilen steht im <template> neben dem Aufklapper und wird
+     ERST BEIM ÖFFNEN montiert - derselbe Weg wie der P1-Rechenweg-Pool
+     der Zeitreihe (FM 4: der Aufklapp-Text zaehlte 18 048 der
+     Fliesstext-Zeichen des Vergleichs-Reiters, der Deckel ist 6000).
+     Montage ist reines DOM-Verschieben: content.cloneNode, keine Zahl
+     wird hier gelesen oder gerechnet. Der click-Delegat greift fuer
+     Seite UND lazy-Fragment (beide entstehen aus demselben Makro);
+     das Oeffnen ist die Default-Aktion des summary-Klicks und laeuft
+     NACH diesem Handler - der Zielzustand ist das Gegenteil des
+     aktuellen. */
+  function montiereRechenweg(details) {
+    var zielDiv = details.querySelector('.gr-bnd-rw');
+    var vorlage = details.querySelector('template.gr-bnd-rw-vorlage');
+    if (!zielDiv || !vorlage || zielDiv.firstChild) return;
+    zielDiv.appendChild(vorlage.content.cloneNode(true));
+  }
+  document.addEventListener('click', function (ev) {
+    var s = ev.target && ev.target.closest
+      ? ev.target.closest('details.gr-bnd > summary') : null;
+    if (!s) return;
+    var d = s.parentNode;
+    if (d && d.tagName === 'DETAILS' && !d.hasAttribute('open')) {
+      montiereRechenweg(d);
+    }
+  });
+  /* Doppelter Weg, einfache Sicherung: toggle feuert (Capture faengt
+     das nicht-bubbelnde Event) auch fuer Oeffnungen ohne click-Handler -
+     beide Wege sind idempotent (montiereRechenweg prueft firstChild). */
+  document.addEventListener('toggle', function (ev) {
+    var d = ev.target;
+    if (d && d.tagName === 'DETAILS' && d.classList &&
+        d.classList.contains('gr-bnd') && d.open) {
+      montiereRechenweg(d);
+    }
+  }, true);
 
   /* Die Live-Vorschau: ab 2 Zeichen, hoechstens 8 Treffer, Praefix-Treffer
      auf Titel-Woertern - die Reihenfolge kommt fertig aus Python. */
@@ -1759,9 +1877,11 @@ var TelcoFrage = (function () {
      Startmodells unter einem s26-Deep-Link). */
   zuletztModell = vorgabe;
   try {
-    history.replaceState(null, '',
-      '?modell=' + encodeURIComponent(zustand.modell) +
-      '&band=' + zustand.band);
+    /* Dieselbe parameterweise Schreibweise wie in waehle() - siehe dort. */
+    var p0 = new URLSearchParams(location.search);
+    p0.set('modell', zustand.modell);
+    p0.set('band', zustand.band);
+    history.replaceState(null, '', '?' + p0.toString());
   } catch (e) { /* offline */ }
   /* Ein Deep-Link auf ein ANDERES Geraet als den Server-Startzustand
      braucht den ersten Fragmentabruf - sonst zeigten Graph und Tabelle
@@ -2488,6 +2608,16 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
        gleichzeitig waeren wieder zwei Zahlen fuer dieselbe Sache. */
     if (!g || !tage || !tage.length) {
       stand.hidden = true;
+      /* P4-Fix (Code-Pruefung 18.09., S2): ohne gewaehltes Geraet muss
+         auch die LEITZAHL weg. Beide Rueckbau-Pfade (leeres Zeitfenster
+         in `zeichne`, Suchfeld-Input) laufen HIER zusammen - vorher blieb
+         #gr-vleit mit dem Preis des VORHERIGEN Zustands stehen, waehrend
+         die Tafel daneben "Kein Geraet gefunden." sagte. Die groesste
+         Zahl der Tafel darf keine Zahl behaupten, die Tafel gar nicht
+         mehr hat. Der Gatter-Fall (kurze Reihe) versteckt sie NICHT -
+         dort ist die Leitzahl gerade die wichtigste Auskunft. */
+      var leitWeg = document.getElementById('gr-vleit');
+      if (leitWeg) leitWeg.hidden = true;
       return;
     }
     /* UNTER DEM GATTER SCHWEIGT DIESER SATZ. Der Hinweis an der Stelle des
@@ -2574,6 +2704,41 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
        "Messpunkte", waehrend zwei Zeilen tiefer eine andere Zahl unter
        "Messtermine" stand. */
     document.getElementById('gr-vpkt').textContent = rohTage.length;
+
+    /* P4/D4 (18.09.2026): DIE LEITZAHL DES REITERS - der AKTUELLE Preis
+       des gewaehlten Geraets, groesste Zahl der Tafel (.gr-leit-zahl).
+       Gerechnet aus denselben UNGEFASSTEN Rohpunkten, die auch die
+       Kacheln fuellen: der guenstigste Preis am LETZTEN Messtag einer
+       jeden Reihe. Keine zweite Datenquelle, kein Rastereinfluss:
+       "aktuell" ist der letzte Messpunkt, egal welches Zeitfenster die
+       Kurve gerade fasst. Kacheln und Satz darunter nennen weiter
+       min/max/Termine - keine Zahl doppelt. */
+    var leit = document.getElementById('gr-vleit');
+    if (leit) {
+      var aktuell = null;
+      gefiltert.forEach(function (r) {
+        if (!r.roh.length) return;
+        /* der SPAETESTE Punkt der Reihe (reduce statt [length-1]: die
+           Sortierung der Rohpunkte ist eine Annahme des Lieferanten,
+           keine dieser Stelle). */
+        var p = r.roh.reduce(function (a, b) {
+          return b.datum > a.datum ? b : a; });
+        if (!aktuell || p.preis < aktuell.p.preis) {
+          aktuell = { p: p, anbieter: r.anbieter };
+        }
+      });
+      if (aktuell) {
+        leit.hidden = false;
+        document.getElementById('gr-vaktuell').textContent =
+          euro(aktuell.p.preis);
+        document.getElementById('gr-vleit-label').textContent =
+          'aktuell · ' + (aktuell.anbieter || '') + ' · ' +
+          tagDE(aktuell.p.datum);
+      } else {
+        leit.hidden = true;
+      }
+    }
+
     satzFuer(g, rohTage, tageSort.length);
 
     /* GATTER: unter AB_TERMINEN Messterminen KEIN Diagramm.

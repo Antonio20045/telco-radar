@@ -8,8 +8,9 @@ der EINE zentrale Ort der Export-Links.
   * Radar-Export - TCO UND Händler-Barpreis in EINER Datei; die %-Spalte
     ist KONSUMENT derselben Rechnung aus `wettbewerbsradar.py`, keine
     zweite Rechnung für dieselbe Zahl (CLAUDE.md §6).
-  * Export-Links EINMAL zentral: Kopfzeile der Geräteseite plus Kopfzeile
-    der Radar-Seite. Die duplizierten Knopfpaare in den Reitern fallen.
+  * Export-Links EINMAL zentral: seit P4/D4 (18.09.2026) die FUSSZEILE der
+    Geräteseite (.gr-export-fuss) - bis P4 die Kopfzeile (O4), davor je
+    Reiter. Die duplizierten Knopfpaare in den Reitern bleiben gefallen.
 
 Doktrin (Modulkopf geraete_export.py): der Export filtert nicht selbst -
 er schreibt den Bestand. Diese Datei misst am ECHTEN Bestand.
@@ -83,7 +84,9 @@ def radar(site) -> BeautifulSoup:
     """Die Radar-TAFEL von geraete.html - seit E3 Schritt 3 (17.09.2026)
     ist der Radar der Reiter „Radar" der EINEN Geräteseite; die Alt-URL
     wettbewerbsradar.html ist eine Weiterleitung ohne Inhalt. Der Export-
-    Knopf des Radars steht im Kopf der Tafel."""
+    Knopf des Radars steht in der FUSSZEILE der Seite (P4/D4, 18.09.2026:
+    EINE Stelle für alle Reiter - bis dahin in der Kopfzeile, nie je
+    Reiter, und auch die Fußzeile nie ZUSÄTZLICH in einer Tafel)."""
     suppe = BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
                           "html.parser")
     tafel = suppe.select_one("#tafel-radar")
@@ -372,14 +375,23 @@ def test_geraete_verlinkt_jede_datei_genau_einmal(geraete):
     assert "exporte/geraete-tco.csv" in links
 
 
-def test_die_export_links_stehen_in_der_kopfzeile(geraete):
-    """Kopfzeile (Marke-Bereich) ist der EINE Ort - die Knopfpaare in den
-    Reitern (`gr-werkzeug`) sind gefallen."""
+def test_die_export_links_stehen_in_der_fusszeile(geraete):
+    """P4/D4 (18.09.2026): die FUSSZEILE (.gr-export-fuss) ist der EINE
+    Ort - bis P4 standen die Knöpfe in der Kopfzeile (O4), davor je
+    Reiter (`gr-werkzeug`), davor im Hero der Schwesterseite. Der Umzug
+    an den Seitenende nahm ihnen den Platz über der Reiter-Steuerung
+    (mobil: gequetscht vor jedem ersten Datenelement)."""
+    fuss = geraete.select_one("section.gr-export-fuss")
+    assert fuss is not None, "keine Export-Fußzeile auf der Geräteseite"
+    links = geraete.select("a[href^='exporte/']")
+    assert links, "kein Export-Link auf der Geräteseite"
+    for a in links:
+        assert fuss in a.parents, (
+            f"Export-Link außerhalb der Fußzeile: {a.get('href')}")
     hero = geraete.select_one("section.page-hero")
     assert hero is not None
-    for a in geraete.select("a[href^='exporte/']"):
-        assert hero in a.parents, (
-            f"Export-Link außerhalb der Kopfzeile: {a.get('href')}")
+    assert not hero.select("a[href^='exporte/']"), (
+        "Export-Knöpfe stehen noch in der Kopfzeile (P4/D4: Fußzeile)")
     assert not geraete.select(".gr-werkzeug a[href^='exporte/']"), (
         "Export-Knöpfe stehen noch in einem Reiter")
 
@@ -400,9 +412,9 @@ def test_der_radar_verlinkt_seinen_export_genau_einmal(geraete):
 def test_die_links_nennen_die_zeilenzahl(geraete):
     """Zeilenzahl NEBEN dem Link (Modulkopf geraete_export): ein leerer
     Download ist der teuerste Weg herauszufinden, dass er sich nicht
-    lohnt."""
-    links = geraete.select("section.page-hero a[href^='exporte/']")
-    assert links, "kein Export-Link in der Kopfzeile"
+    lohnt. Seit P4/D4 stehen die Links in der Fußzeile."""
+    links = geraete.select("section.gr-export-fuss a[href^='exporte/']")
+    assert links, "kein Export-Link in der Fußzeile"
     for a in links:
         assert re.search(r"\d+", a.get_text()), a.get_text()
 

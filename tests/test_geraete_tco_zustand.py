@@ -42,6 +42,21 @@ from telco_radar.tco_model import Buendel, SimOnlyReferenz
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 
+
+def vorlage_text(el) -> str:
+    """Text eines Elements, AUCH wenn es in einem <template> liegt.
+
+    BeautifulSoup (ab 4.13) behandelt <template>-Inhalt als versteckt:
+    get_text() liefert ihn nicht - auch nicht nach Re-Parse oder
+    Entpacken (get_text behaelt die Hidden-Markierung am String bei).
+    Der Rechenweg der Bündel-Zeilen liegt seit dem P4-Fix (template-Pool,
+    Montage per Klick) dort. find_all(string=True) sammelt die Textknoten
+    ohne Hidden-Filter; Join und split()-Normalisierung halten Interpunkt-
+    ion zusammen (ein strip-je-Knoten machte aus "TCO-24)" ein "TCO-24 )")
+    - am gerenderten HTML wird nichts veraendert."""
+    return " ".join("".join(el.find_all(string=True)).split())
+
+
 SKU_NEU = "apple-iphone-15-128gb-schwarz"
 SKU_ERNEUERT = "apple-iphone-15-128gb-schwarz-refurbished"
 HEUTE = "2026-09-04"
@@ -506,15 +521,21 @@ def test_jede_karte_mit_zahl_nennt_den_preis_nach_der_laufzeit_oder_die_luecke(t
         assert k.select_one(".gr-kk-nach") is not None, k["data-anbieter"]
 
     referenz = tafel.select_one('.gr-bnd[data-anbieter="Vodafone"]')
-    assert "ab Monat 25: 29,95 € Tarifgrundpreis" in " ".join(
-        referenz.select_one(".gr-kk-nach").get_text(" ", strip=True).split())
+    assert "ab Monat 25: 29,95 € Tarifgrundpreis" in vorlage_text(
+        referenz.select_one(".gr-kk-nach"))
     o2 = tafel.select_one('.gr-bnd[data-anbieter="o2"][data-zustand="neu"]')
     luecke = o2.select_one(".gr-kk-nach--luecke")
     assert luecke is not None
-    assert "ab Monat 25: nicht belegt" in " ".join(luecke.get_text(" ", strip=True).split())
+    assert "ab Monat 25: nicht belegt" in vorlage_text(luecke)
 
     # F1, Stufe 1: die Referenz spricht dem Anbieter nichts ab, das er
     # ausweist - sie nennt sich Naeherung und den Buendelpreis "nicht erhoben".
-    hinweis = " ".join(referenz.select_one(".gr-kk-hinweis").get_text(" ", strip=True).split())
+    hinweis = vorlage_text(referenz.select_one(".gr-kk-hinweis"))
     assert "noch nicht erhoben" in hinweis
-    assert "weist zu diesem Gerät keinen Bündelpreis aus" not in tafel.get_text(" ")
+    # Gegen seitenlangen Blindtest: seit dem P4-Fix (template-Pool) sieht
+    # get_text() den Rechenweg NICHT mehr - der "not in"-Check laeuft
+    # gegen den VORLAGEN-Text, sonst pruefte er einen leer gerenderten
+    # Baum (CLAUDE.md §6: ein Test, dessen Lookup ins Leere geht, ist
+    # gruen und prueft nichts).
+    assert "weist zu diesem Gerät keinen Bündelpreis aus" \
+        not in vorlage_text(tafel)

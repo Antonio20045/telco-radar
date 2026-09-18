@@ -644,9 +644,20 @@ def _frisch(seite):
 def _radar_frisch(seite):
     """Dasselbe fuer die RADAR-Tafel: die Alarmtabelle lebt seit E3 in
     deren erster Sektion; der Hash in der Adresse schaltet den Reiter
-    (app.js `ausHash`), kein Klick noetig."""
+    (app.js `ausHash`), kein Klick noetig.
+
+    P4/D1 (STRATEGIE_GERAETE_V3, 18.09.2026): die Alarmtabelle steht
+    seit dem Design-Durchlauf IM AUFKLAPPER unter der Balkengrafik (die
+    Frage des Reiters liest sich zuerst als Bild). Die Interaktions-
+    tests oeffnen ihn HIER - select_option/fill/click warten auf
+    sichtbare Felder, und der Aufklapper ist Teil des Lesewegs, kein
+    Sonderzustand."""
     seite.goto(_radar_url(seite), wait_until="load")
     seite.wait_for_timeout(150)
+    auf = seite.query_selector("#wr-alarme details.gr-auf:not([open])")
+    if auf:
+        auf.query_selector("summary").click()
+        seite.wait_for_timeout(60)
 
 
 def test_ohne_filter_greift_der_zeilendeckel(_seite):
@@ -961,6 +972,80 @@ def test_ohne_klick_steht_das_diagramm_des_ersten_geraets_da(_seite):
     assert _seite.eval_on_selector(
         "#gr-vleer", "e => getComputedStyle(e).display") == "none", (
         "mit Auto-Vorauswahl steht der Leer-Satz nicht im Ausgangszustand")
+
+
+# SICHTBARKEIT, NICHT DAS ATTRIBUT (P4b, Re-Check 18.09.2026): die erste
+# Fassung dieses Tests assertete `e.hidden` - und war gruen, waehrend die
+# Leitzahl sichtbar stehenblieb, weil `.gr-leit{display:flex}` das
+# Browser-[hidden] uebersteuerte. Ein Test, der die Zusicherung nicht
+# wirklich prueft, prueft nichts (CLAUDE.md 6). Gemessen wird computed
+# display UND Boxhoehe - das, was der Leser sieht.
+_LEERZUSTAND_MESSUNG = """() => {
+  const erg = {};
+  for (const id of ['gr-vleit', 'gr-vkacheln']) {
+    const e = document.getElementById(id);
+    if (!e) { erg[id] = null; continue; }
+    const st = getComputedStyle(e);
+    const r = e.getBoundingClientRect();
+    erg[id] = {display: st.display, hoehe: Math.round(r.height),
+               sichtbar: st.display !== 'none' && r.height > 0};
+  }
+  return erg;
+}"""
+
+
+def test_die_leitzahl_und_die_kacheln_schweigen_in_beiden_leerzustaenden(_seite):
+    """P4-Fix (Code-Prüfung 18.09., S2) + P4b (Re-Check, S1): die Leitzahl
+    (#gr-vleit) ist die größte Zahl der Tafel - im Leerfall behauptete sie
+    trotzdem weiter den Preis des VORHERIGEN Zustands („919,00 €" neben
+    „Kein Gerät gefunden.", 81 px hoch), und die vier Kachelzahlen
+    (Niedrigster/Höchster/Anbieter/Termine) standen ebenso da - fünf Zahlen
+    von gestern in einer Tafel, die sagt, dass sie nichts findet. Beide
+    Rückbau-Pfade (Suchfeld, leeres Zeitfenster) laufen in satzFuer(null)
+    zusammen; app.js setzt hidden, und die globale Regel
+    `[hidden]{display:none!important}` lässt es WIRKEN - deshalb misst
+    dieser Test die Sichtbarkeit, nicht das Attribut. Der Gatter-Fall
+    (kurze Reihe) bleibt dagegen SICHTBAR - gerade dort ist die Leitzahl
+    die wichtigste Auskunft (D4)."""
+    _frisch(_seite)
+    _zeige_tafel(_seite, "tafel-verlauf")
+    _seite.wait_for_timeout(200)
+    # Gegenprobe: mit Auto-Vorauswahl sind Leitzahl UND Kacheln DA (sonst
+    # misst der Test einen Leerzustand, der nie gefüllt war).
+    anfang = _seite.evaluate(_LEERZUSTAND_MESSUNG)
+    assert anfang["gr-vleit"] and anfang["gr-vleit"]["sichtbar"], (
+        "Fixture-Voraussetzung: die Leitzahl steht im Ausgangszustand")
+    assert anfang["gr-vkacheln"] and anfang["gr-vkacheln"]["sichtbar"], (
+        "Fixture-Voraussetzung: die Kachelreihe steht im Ausgangszustand")
+
+    # 1) Suchfeld ohne Treffer: Rückbau - Leitzahl und Kachelzahlen weg.
+    _seite.fill("#gr-vsuche", "zzzz")
+    _seite.wait_for_timeout(150)
+    assert "Kein Gerät gefunden." in _seite.inner_text("#tafel-verlauf")
+    weg = _seite.evaluate(_LEERZUSTAND_MESSUNG)
+    assert not weg["gr-vleit"]["sichtbar"], (
+        "unter 'Kein Gerät gefunden.' steht noch der Preis des vorherigen "
+        f"Geräts (display:{weg['gr-vleit']['display']}, "
+        f"{weg['gr-vleit']['hoehe']} px) - die größte Zahl der Tafel lügt")
+    assert not weg["gr-vkacheln"]["sichtbar"], (
+        "im Leerzustand stehen noch die Kachelzahlen des vorherigen "
+        f"Geräts (display:{weg['gr-vkacheln']['display']}) - leer heißt leer")
+
+    # 2) Leeres Zeitfenster: derselbe Rückbau über den anderen Pfad.
+    _frisch(_seite)
+    _zeige_tafel(_seite, "tafel-verlauf")
+    _seite.wait_for_timeout(200)
+    _seite.fill("#gr-vvon", "2027-01-01")
+    _seite.wait_for_timeout(200)
+    assert "keine Messpunkte" in _seite.inner_text("#tafel-verlauf")
+    weg2 = _seite.evaluate(_LEERZUSTAND_MESSUNG)
+    assert not weg2["gr-vleit"]["sichtbar"], (
+        "im leeren Zeitfenster steht noch der alte Preis "
+        f"(display:{weg2['gr-vleit']['display']}) - dieselbe Lüge über "
+        "den zweiten Pfad")
+    assert not weg2["gr-vkacheln"]["sichtbar"], (
+        "im leeren Zeitfenster stehen noch die Kachelzahlen von gestern "
+        f"(display:{weg2['gr-vkacheln']['display']})")
 
 
 def test_ein_deep_link_schlaegt_die_auto_vorauswahl(_seite):
@@ -1857,6 +1942,96 @@ def test_die_vorbelegung_versteckt_serverseitig_keine_zeile(_b5_seite):
     assert ueberschrift == str(_b5_modellzahl()), ueberschrift
 
 
+# Die MESSREGEL des Rot-Deckels (P4b, Re-Check 18.09.2026). Bis hierhin war
+# der Deckel nirgends als Regel genagelt - deshalb konnten fix.md („Katalog
+# 5") und die Realitaet (12 vollrote Elemente) auseinanderlaufen, ohne dass
+# ein Test es meldete. Die Ursache des Falls: `.src-table a{color:var(--red)}`
+# (Spezifitaet 0-1-1) schlug `.gr-sprung` (0-1-0) - elf Sprung-Links standen
+# VOLLROT da, obwohl die P4-Regel „grau, Rot erst im Hover" im Stylesheet
+# stand. Gezaehlt wird am GERENDERTEN Katalog (computed styles, echte
+# Chromium-Rechnung), der Farbwert aus der CSS-Konstante gelesen - ein
+# hardcoded rgb(230,0,0) wuerde mit einer Umbenennung der Konstanten still
+# verrosten.
+_ROT_ZAEHLER = """() => {
+  const probe = document.createElement('span');
+  probe.style.color = 'var(--red)';
+  document.body.appendChild(probe);
+  const rot = getComputedStyle(probe).color;
+  probe.remove();
+  const tafel = document.getElementById('tafel-katalog');
+  const vollrot = [];
+  for (const el of tafel.querySelectorAll('*')) {
+    if (el.closest('svg') || el.closest('template')) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width === 0 || r.height === 0) continue;
+    const st = getComputedStyle(el);
+    const eltern = el.parentElement ? getComputedStyle(el.parentElement) : null;
+    // EIGENES Rot: die Farbe weicht vom Elternelement ab - sonst zaehlte
+    // jedes Kind eines roten Links ein zweites Mal.
+    const farbe = st.color === rot && (!eltern || eltern.color !== rot);
+    const flaeche = st.backgroundColor === rot;
+    const rand = ['borderTopColor', 'borderBottomColor',
+                  'borderLeftColor', 'borderRightColor'].some(
+      p => st[p] === rot && parseFloat(st[p.replace('Color', 'Width')]) > 0);
+    if (farbe || flaeche || rand)
+      vollrot.push({tag: el.tagName, klasse: String(el.className).slice(0, 40),
+                    text: el.textContent.replace(/\\s+/g, ' ').trim().slice(0, 30)});
+  }
+  return {rot, n: vollrot.length, elemente: vollrot};
+}"""
+
+
+def test_der_rotdeckel_des_katalogs_ist_eine_messregel(_seite):
+    """Initial stehen HOECHSTENS ZEHN vollrot eingefaerbte Elemente im
+    Katalog (Re-Check 18.09.: 12 - elf rote Sprung-Links plus aktiver
+    Knopf). Die Regel: eigenes Rot in Farbe, Flaeche ODER Rand, Farbwert
+    aus var(--red) gelesen, ohne SVG (Vodafone-Datenfarbe zaehlt nicht),
+    ohne template, nur gerenderte Elemente, Links gezaehlt wie jedes
+    Element. Dazu die konkrete Entsättigung: die Sprung-Links sind
+    NAVIGATION, kein Befund - sie stehen grau, Rot erst im Hover."""
+    _frisch(_seite)
+    _zeige_tafel(_seite, "tafel-katalog")
+    _seite.wait_for_timeout(150)
+    # Fixture-Wache: ohne Sprung-Links pruefte der zweite Assert nichts
+    # (die Entsättigung ist an genau dieser Link-Klasse gebunden).
+    spruenge = _seite.eval_on_selector_all(
+        "#gr-katalogtabelle a.gr-sprung", "e => e.length")
+    assert spruenge >= 1, "kein gr-sprung im Katalog der Fixture"
+    # Gegenprobe des Zaehlers selbst: ein gestellt rotes Element muss
+    # gezaehlt werden - sonst zaehlte die Regel still nichts (derselbe
+    # Grundsatz wie beim Lookup ins Leere: gruen waere beweislos).
+    _seite.evaluate(
+        """() => {
+          const tafel = document.getElementById('tafel-katalog');
+          const k = document.createElement('span');
+          k.dataset.rotprobe = '1';
+          k.style.color = 'var(--red)';
+          k.textContent = 'gegenprobe';
+          tafel.appendChild(k);
+        }""")
+    mit_probe = _seite.evaluate(_ROT_ZAEHLER)
+    assert any(e["klasse"] == "" and "gegenprobe" in e["text"]
+               for e in mit_probe["elemente"]), (
+        "der Rot-Zaehler zaehlt kein gestellt rotes Element - er misst "
+        "nichts")
+    _seite.evaluate(
+        "() => document.querySelector('#tafel-katalog [data-rotprobe]')"
+        ".remove()")
+    # Die eigentlichen Zusicherungen (ohne das Gegenprobe-Element).
+    erg = _seite.evaluate(_ROT_ZAEHLER)
+    assert not any("gegenprobe" in e["text"] for e in erg["elemente"]), (
+        "die Gegenprobe klebt noch in der Tafel")
+    rot = _seite.eval_on_selector(
+        "#gr-katalogtabelle a.gr-sprung", "e => getComputedStyle(e).color")
+    assert rot != erg["rot"], (
+        f"Sprung-Link steht VOLLROT ({rot}) - Navigation ist kein Befund; "
+        "die P4-Regel 'grau, Rot erst im Hover' wird von .src-table a "
+        "uebersteuert")
+    assert erg["n"] <= 10, (
+        f"{erg['n']} vollrote Elemente im initialen Katalog (Deckel 10): "
+        f"{erg['elemente'][:6]}")
+
+
 # --------------------------------------------------------------------------
 # B2/B3 der Zurueckweisung (31.08.2026): der Deckel folgt der Sortierung,
 # nicht der Position. Seit P3 wird nach der MODELLZEILE sortiert (Bis-P3:
@@ -2670,7 +2845,11 @@ def test_die_buendelzeile_oeffnet_ohne_netzwerk(_seite):
         ergebnis = _seite.evaluate("""() => {
           const z = document.querySelector('#gr-bndliste .gr-bnd');
           if (!z) return null;
-          z.open = true;
+          // P4-Fix (Sicht-Pruefung 18.09.): Rechenweg-Montage beim
+          // OEFFNEN - summary.click() ist der Nutzerweg (Default-Action
+          // oeffnet synchron nach dem click-Dispatch, die Montage laeuft
+          // im Delegaten desselben Dispatches).
+          z.querySelector('summary').click();
           const rw = z.querySelector('.gr-bnd-rw');
           return {sichtbar: !!rw.offsetParent,
                   hoehe: Math.round(rw.getBoundingClientRect().height)};

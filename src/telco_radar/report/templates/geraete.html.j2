@@ -72,8 +72,10 @@
 {% from "_geraete_buendel.html.j2" import buendelzeile, buendelgruppe %}
 {% from "_geraete_zeitreihe.html.j2" import paarblock %}
 {# E3 Schritt 2: die Radar-Tafel - `with context`, weil das Makro den
-   `prefix` der Seite für den Tarifübersichts-Link braucht. #}
-{% from "_geraete_radar.html.j2" import radar_tafel with context %}
+   `prefix` der Seite für den Tarifübersichts-Link braucht. P4/2a dazu:
+   `wochenkarte` („Was diese Woche auffällt") - dieselbe Teilvorlage,
+   aber aufgerufen im REITER PREISVERLAUF (siehe den Kommentar dort). #}
+{% from "_geraete_radar.html.j2" import radar_tafel, wochenkarte with context %}
 
 {% block content %}
 <section class="page-hero wide gr-hero-export">
@@ -97,51 +99,17 @@
     {% if geraete.abgerufen_bis %}<span class="page-date">Preise vom {{
       geraete.abgerufen_bis | date_de }}</span>
     {% elif geraete.stand %}<span class="page-date">Stand {{ geraete.stand | date_de }}</span>{% endif %}
-    {# O4 (STRATEGIE_GERAETE_OPTIK §3): die Export-Knoepfe stehen EINMAL
-       zentral, hier in der Kopfzeile (Marke-Bereich wie im Entwurf), und
-       nicht mehr auf jedem Reiter - dieselben Links dreimal auf einer
-       Seite waren die Duplikate, die der Auftrag streicht. Der
-       Bündel-TCO-Export kommt hinzu; jede Datei genau ein Mal. Der
-       Radar-Export steht seit E3 Schritt 3 (17.09.2026) ebenfalls HIER:
-       seine Schwesterseite ist eine Weiterleitung, ihr Hero-Knopf hätte
-       kein Ziel mehr - die EINE Seite führt jetzt alle vier Dateien.
-
-       E5 (17.09.2026): die Reihe ist AUCH AUF DEM TELEFON sichtbar und
-       benutzbar - bis hierhin war sie unter 900 px weggeblendet (O4,
-       Falz-Begründung). Auf dem Telefon wird der Kopf zur Spalte und das
-       Datum rückt rechtsbündig unter die Schlagzeile (Zeitungs-
-       Datumszeile, siehe style.css @gr-hero-export); die Export-Reihe
-       folgt als letzte Zeile. Der Antwort-Satz der Zeitreihe bleibt über
-       der Falz (Kriterium 11c), und die vier Knöpfe rollen in EINER
-       Zeile waagerecht statt vier Zeilen hoch zu stapeln.
-
-       Das Gatter fragt die DATEI ab, nicht die Zeilenzahl: auch ein
-       leerer Bestand nennt seine Null neben dem Link (Modulkopf
-       geraete_export: ein fehlender Download wäre die schlechtere
-       Auskunft als ein leerer). #}
-    {% if geraete.export and geraete.export.aktuell.datei %}
-    <span class="gr-export-knoepfe">
-      <a class="gr-knopf" href="{{ geraete.export.aktuell.datei }}" download
-        >Alle exportieren ({{ geraete.export.aktuell.zeilen }} Zeilen)</a>
-      <a class="gr-knopf" href="{{ geraete.export.historie.datei }}" download
-        >Preishistorie ({{ geraete.export.historie.zeilen }})</a>
-      <a class="gr-knopf" href="{{ geraete.export.tco.datei }}" download
-        >Bündel-TCO ({{ geraete.export.tco.zeilen }})</a>
-      <a class="gr-knopf" href="{{ geraete.export.radar.datei }}" download
-        >Radar ({{ geraete.export.radar.zeilen }})</a>
-      {# P3: der Katalog auf Modellebene ist eine eigene ZAHLENSEKTION -
-         E5 "alle Zahlensektionen exportierbar" braucht je Ansicht EINEN
-         Knopf (eine Datei je Ansicht, kein Formatmix). Die Zeilenzahl
-         ist die MODELLZAHL - "Alle exportieren" nennt die Listungen. #}
-      {% if geraete.export.modell_barpreis.datei %}
-      <a class="gr-knopf" href="{{ geraete.export.modell_barpreis.datei }}"
-        download>Katalog Barpreis ({{ geraete.export.modell_barpreis.zeilen
-        }})</a>
-      <a class="gr-knopf" href="{{ geraete.export.modell_tco.datei }}"
-        download>Katalog TCO ({{ geraete.export.modell_tco.zeilen }})</a>
-      {% endif %}
-    </span>
-    {% endif %}
+    {# P4/D4 (STRATEGIE_GERAETE_V3, 18.09.2026): DIE EXPORT-KNOEPFE STEHEN
+       NICHT MEHR HIER. Bis P4 füllten sechs Knöpfe die Kopfzeile - am
+       Telefon standen sie gequetscht ÜBER der Reiter-Steuerung und
+       drückten Antwort-Satz und Graphkopf Richtung Falz (11c). Sie
+       stehen seit P4 als EINE Fußzeile am Seitenende (siehe
+       .gr-export-fuss unten) - dieselben sechs Dateien, dieselben
+       Ziele, dieselbe Zeilenzahl neben dem Link; EINE Stelle für alle
+       Reiter bleibt gewahrt (O4-Regel: nie einer je Reiter, keine
+       Dubletten). Das Gatter fragt weiter die DATEI ab, nicht die
+       Zeilenzahl: auch ein leerer Bestand nennt seine Null neben dem
+       Link (Modulkopf geraete_export). #}
   </div>
 </section>
 
@@ -271,15 +239,13 @@
      dazwischen (§4.2), die Bündel-Zeilen DARUNTER bleiben (§3.1b: der
      Rechenweg je Anbieterzeile). #}
 
-  {# EIN BUENDEL OHNE GERAETEZUORDNUNG STEHT HIER BEIM NAMEN (F-R2-3) -
-     vor dem Modellgatter, damit die Zeile auch dann steht, wenn KEIN
-     Buendel aufloest. #}
-  {% if geraete.tco.ohne_zuordnung %}
-  <p class="gr-erklaer gr-basis--duenn gr-tco-ohne-zuordnung">Nicht auf der
-  Tafel, weil kein Gerät zuzuordnen ist: {% for u in geraete.tco.ohne_zuordnung
-  %}{{ u.anbieter }}, <code>{{ u.sku_id }}</code> – {{ u.grund }}{% if not
-  loop.last %}; {% endif %}{% endfor %}.</p>
-  {% endif %}
+  {# EIN BUENDEL OHNE GERAETEZUORDNUNG STEHT HIER BEIM NAMEN (F-R2-3).
+     P4/D4 (18.09.2026): der Satz stand bis hierhin VOR der Wahl-Leiste
+     und war damit der Mini-Satz zwischen Kopf und Steuerung, den die
+     Falz-Regel streicht (vor dem ersten Datenelement höchstens EIN Satz
+     und EINE Auswahlgruppe). Er ist NACH UNTEN gezogen - direkt hinter
+     die Bündel-Sektion (dieselbe Tafel, weiterhin ohne Modellgatter,
+     also auch da, wenn kein Bündel auflöst). #}
 
   {% if geraete.tco.modelle %}
   {% set zr = geraete.zeitreihe %}
@@ -420,6 +386,17 @@
     <div id="gr-bnd-gruppe">{{ buendelgruppe(m, ids=true) }}</div>
   </section>
 
+  {# EIN BUENDEL OHNE GERAETEZUORDNUNG STEHT HIER BEIM NAMEN (F-R2-3) -
+     seit P4/D4 HINTER der Bündel-Sektion: vor der Wahl-Leiste war er der
+     Mini-Satz zwischen Kopf und Steuerung (Falz-Regel: höchstens EIN Satz
+     vor dem ersten Datenelement - das ist der Antwort-Satz der Zeitreihe). #}
+  {% if geraete.tco.ohne_zuordnung %}
+  <p class="gr-erklaer gr-basis--duenn gr-tco-ohne-zuordnung">Nicht auf der
+  Tafel, weil kein Gerät zuzuordnen ist: {% for u in geraete.tco.ohne_zuordnung
+  %}{{ u.anbieter }}, <code>{{ u.sku_id }}</code> – {{ u.grund }}{% if not
+  loop.last %}; {% endif %}{% endfor %}.</p>
+  {% endif %}
+
   {# --- 4. Der EINE Fuß-Aufklapper (c): „Maßstab & Datenlage" - bis E2
          waren es zwei eigene Aufklapper (der Tarifmaßstab und die
          Datenlage). §3.1: genau DREI Rest-Aufklapper auf der ganzen
@@ -511,28 +488,44 @@
    Frage selbst ist die des Modulkopfs von `geraete_radar.py` -
    dieselbe wie die h1 der Schwesterseite.
 
-   Der Sortiments-Aufklapper „Bei Wettbewerbern gelistet, bei Vodafone
-   nicht" steht NICHT hier - er wohnt seit E3 im Gerätekatalog (dieselbe
-   Sortiments-Frage wie die Tabelle dort; eine zweite Kopie wäre §4.6).
-   Der Datenkontext der Tafel heißt `radar` (dasselbe Dict, das auch
-   der Sortiments-Aufklapper liest, von render_site übergeben). #}
+   P4/D1 (18.09.2026): die Tafel führt mit der BALKENGRAFIK (erstes
+   `gr-r-sektion` der Teilvorlage); die beiden großen Tabellen stehen
+   als Aufklapper darunter. Der Sortiments-Aufklapper „Bei Wettbewerbern
+   gelistet, bei Vodafone nicht" steht SEIT P4 Schritt 2b HIER (unter
+   der Grafik) und nicht mehr im Katalog-Reiter - siehe den Kommentar
+   in der Teilvorlage. Der Datenkontext der Tafel heißt `radar` (dasselbe
+   Dict, das auch der Sortiments-Aufklapper liest, von render_site
+   übergeben). #}
 <div class="gr-tafel gr-tafel--aus" id="tafel-radar" role="tabpanel">
 <section class="gr-radar" id="radar">
   <h2 class="rubrik">Bei welchem Gerät ist Vodafone teurer als der Wettbewerb?</h2>
-  {# E3-Fix (QA 17.09.2026, B2): Der Kopf behauptete die vorzeichenbehaftete
-     Leitzahl für ALLE drei Sektionen - die Alarmtabelle zeigt denselben
-     Abstand aber als positiven BETRAG (ihre Stufen, ihre Sortierung und
-     ihr Export sind Betrags-Sprache: jede ihrer Zeilen ist per Definition
-     ein Wettbewerber-Vorteil, ein Minuszeichen wäre in jeder Zeile dasselbe
-     und trüge nichts bei). Der Kopf nennt deshalb die Zeichenregel NUR für
-     die Sektionen, die sie tragen, und die Alarme als Betrag - sonst liest
-     der Leser −55,5 % (Modellliste) und +41,3 % (Alarme) als Widerspruch
-     auf einer Tafel. #}
-  <p class="gr-erklaer">Leitzahl ist die Abweichung zu Vodafone in Prozent.
-  Modellliste und Händler tragen sie mit Vorzeichen – negativ heißt: ein
-  Wettbewerber ist günstiger. Die Preis-Alarme zeigen denselben Abstand
-  als Betrag ohne Vorzeichen; jede Alarmzeile ist ein Fall, in dem ein
-  Wettbewerber günstiger ist.</p>
+  {# P4/D4 (STRATEGIE_GERAETE_V3, 18.09.2026): DIE ANTWORT IST DIE
+     GROESSTE ZAHL. Der Reiter fragt nach der Abweichung zu Vodafone -
+     seine Antwort ist die STAERKSTE davon, und sie stand bis P4 nirgends:
+     746 Tabellenzeilen, keine einzige Zahl größer als 13 px (design.md:
+     0 % Grafik, der Reiter war „ein Excel-Export mit Überschriften").
+     Die Leitzahl-Zeile nennt sie als erste Schrift der Tafel (Zahl groß,
+     Label klein, .gr-leit) - Werte aus der ERSTEN Zeile der Modellliste
+     (`modellliste.zeilen[0]`, sortiert nach negativester Prozentzahl,
+     geraete_radar.py - dieselbe Rechnung wie die Liste, kein zweiter
+     Rechner). Ohne vergleichbare Zeile (leerer Bestand) gibt es keine
+     Leitzahl-Zeile - dann steht der Satz allein. #}
+  {% set spitze = radar.modelliste.zeilen[0] if radar.modelliste.zeilen
+    else none %}
+  {% if spitze and spitze.prozent is not none %}
+  <div class="gr-leit gr-leit--radar"><b class="gr-leit-zahl">{{
+    spitze.prozent_text }} %</b><span class="gr-leit-label">stärkste
+    Abweichung zu Vodafone: {{ spitze.titel }} bei {{ spitze.anbieter
+    }} · {{ spitze.euro_text }} € TCO-24</span></div>
+  {% endif %}
+  {# E3-Fix (QA 17.09.2026, B2) / P4-Fix (Sicht-Pruefung 18.09.): Der Kopf
+     behauptete die vorzeichenbehaftete Leitzahl für ALLE drei Sektionen -
+     die Alarmtabelle zeigt denselben Abstand aber als positiven BETRAG.
+     Die Zeichenregel (negativ = Wettbewerber günstiger) und die Betrags-
+     Regel der Alarme traegt jetzt das Achslabel UNTER der Balkengrafik
+     (siehe _geraete_radar.html.j2) - als Absatz zwischen Leitzahl und
+     Bild war sie der Rueckstand der Ruecke: der Reiter beginnt mit der
+     Leitzahl, dann kommt das Bild (Ruhe; Sicht-Prufer Kleineres 9). #}
   <div id="gr-radar-inhalt">{{ radar_tafel(radar) }}</div>
 </section>
 </div>
@@ -573,10 +566,35 @@
    (`anwenden()`) bleiben unverändert in Geltung. Die Sortier- und
    Interleave-Regeln, die bis P3 im Kommentar hier standen, leben seit C1
    im Docstring von `katalog_modellzeilen()` - eine Ebene tiefer, dort wo
-   sie gerechnet werden. #}
+   sie gerechnet werden.
+
+   P4 SCHRITT 2c (18.09.2026) - DER ROTE FADEN ZWISCHEN DEN REITERN: jede
+   Modellzeile trägt ihren `modell_schluessel` als `data-modell` (derselbe
+   EINE Schlüssel wie Radar-Liste und Zeitreihen-Wahl), und unter dem Titel
+   steht der Sprung in die ZEITREIHE des Vergleichs-Reiters ("im Graph
+   ansehen", dieselbe `gr-sprung`-Mechanik wie die Radar-Liste: href trägt
+   den Deep-Link, app.js schaltet Reiter, Modell und Band). Der Link steht
+   NUR, wo `m.zr` sagt, dass die Zeitreihe das Modell kennt (Wahl-Menge,
+   aus demselben Knoten gelesen, aus dem app.js waehlt) - ein Modell ohne
+   Bündel erhält keinen toten Link; seine TCO-Spalte nennt den Grund
+   ("kein Bündel gemessen"). Die Gegenrichtung (Radar -> Katalog) hängt an
+   `gr-ksprung` in `_geraete_radar.html.j2`. #}
 <section class="gr-katalog" id="katalog">
   <h2 class="rubrik">Was wo im Regal steht
     <span class="rubrik-zahl">{{ geraete.katalog_modelle | length }}</span></h2>
+  {# P4-Fix (Sicht-Pruefung 18.09., Falz 1): DIE LEITZAHL DES KATALOGS -
+     der guenstigste Einzelgeraetepreis des Regals als groesste Schrift
+     der Tafel. Der Katalog war der einzige der vier Reiter ohne Falz-
+     Antwort (groesste Schrift: die h2). Die Zahl kommt fertiggerechnet
+     aus geraete_view (`katalog_ab_preis`, min ueber die Modellzeilen -
+     dort steht die EINE Rechnung); ohne Barpreis im ganzen Regal gibt
+     es keine Leitzahl, dann traegt der Satz darunter die Antwort. #}
+  {% if geraete.katalog_ab_preis is not none %}
+  <div class="gr-leit gr-leit--katalog"><b class="gr-leit-zahl">{{
+    geraete.katalog_ab_preis | euro }}</b><span class="gr-leit-label">günstigster
+    Einzelgerätpreis im Regal · {{
+    geraete.katalog_modelle | length }} Modelle</span></div>
+  {% endif %}
   {# 18 Woerter statt 33 (Sicht-Pruefung Kleineres 5, F1-Geist): der Satz
      erklaert die EINEN zwei Dinge, die ein Leser nicht kennen kann -
      Zeile je Modell und den Umschalter. Was in den Spalten steht, sagen
@@ -652,6 +670,7 @@
          Sortiermechanik verschiebt beide zusammen (`data-auf`). #}
       <tr class="gr-a-zeile gr-k-zeile{{ ' gr-a-rest' if m.zeilen_rest }}"
           data-auf="kz-{{ loop.index }}"
+          data-modell="{{ m.schluessel }}"
           data-marke="{{ m.hersteller }}" data-speicher="{{ m.speicher or '' }}"
           data-s-geraet="{{ m.titel }}"
           data-s-preis="{{ m.ab_preis if m.ab_preis is not none else '' }}"
@@ -661,7 +680,18 @@
           data-s-monat="{{ m.tco_monat if m.tco_monat is not none else '' }}"
           data-s-delta="{{ m.tco_delta if m.tco_delta is not none else '' }}"
           tabindex="0">
-        <td><span class="gr-a-modell">{{ m.titel }}</span></td>
+        <td><span class="gr-a-modell">{{ m.titel }}</span>
+          {# P4 Schritt 2c: der Sprung in die Zeitreihe desselben Modells -
+             derselbe `modell_schluessel` wie data-modell dieser Zeile und
+             wie die Radar-Liste, EINE Modellmenge ueber die Reiter. Das
+             Band des Deep-Links ist das des besten TCO-Angebots (m.tco_band
+             aus derselben Karte, die die TCO-Spalte fuellt); ohne Band
+             waehlt der Graph selbst sein erstes erlaubtes. `m.zr` siehe
+             Kommentar oben - kein Link, wo der Sprung nicht trifft. #}
+          {% if m.zr %}<a class="gr-sprung"
+            href="geraete.html?modell={{ m.schluessel }}{% if m.tco_band %}&amp;band={{ m.tco_band }}{% endif %}"
+            data-modell="{{ m.schluessel }}"{% if m.tco_band %} data-band="{{ m.tco_band }}"{% endif %}
+            >im Graph ansehen&nbsp;→</a>{% endif %}</td>
         {# --- Einzelgeraepreis: DIE EINE REGEL. Barpreis ("ab X bei Y",
                Beleg verlinkt), sonst der benannte Buendel-Zustand mit
                Monatspreis - nie eine Rate als Barpreis. Ein Modell ohne
@@ -735,6 +765,10 @@
          von 636 Listungen sagen "keine Angabe", und "Verfügbar"
          verspricht über der leeren Zelle eine Lieferauskunft, die die
          Quelle meist nicht gibt (P3-Auftrag 4; P4 entscheidet weiter).
+         P4/D3 (18.09.2026): die WERTE folgen dem Etikett - der
+         lieferbare Zustand sagt "lieferbar" (klein, wie alle übrigen
+         Werte) statt "Verfügbar"; NICHT gelöscht, über die Spalte
+         selbst entscheidet P5 (Antonio).
          Eine 1&1-Zeile ohne Barpreis trägt hier ihre Bündel-Angabe
          statt "ohne Preis" (C1). #}
       <tr class="gr-a-auf{{ ' gr-a-rest' if m.zeilen_rest }}" id="kz-{{ loop.index }}"><td colspan="8">
@@ -763,19 +797,21 @@
                 aria-hidden="true">↗</span></a>{% endif %}</span>
               {% else %}<span class="gr-a-klein">ohne Preis</span>{% endif %}</td>
             <td><span class="gr-pille gr-pille--{{ 'bestpreis' if z.zustand == 'neu' else 'mittel' }}">{{ z.zustand }}</span></td>
-            {# EIN WORT JE ZUSTAND (30.08.2026): "keine Angabe", weil das
-               die QUELLE beschreibt und nicht den Leser. Die graue Pille
-               (`--unklar`; bis P3 stand hier der klassenlose Name
-               `--unbekannt`, fuer den es keine Regel gab) sagt nichts
-               ueber Lieferbarkeit - genau das ist der Unterschied. #}
-            <td><span class="gr-pille gr-pille--{% if z.verfuegbarkeit == 'lieferbar'
-              %}gering{% elif z.verfuegbarkeit in ('unbekannt', '')
-              %}unklar{% else %}kritisch{% endif %}">{{
-              'Verfügbar' if z.verfuegbarkeit == 'lieferbar'
-              else ('keine Angabe' if z.verfuegbarkeit in ('unbekannt', '')
-                    else ('nicht lieferbar' if z.verfuegbarkeit == 'nicht_lieferbar'
-                          else ('vorbestellbar' if z.verfuegbarkeit == 'vorbestellbar'
-                                else z.verfuegbarkeit))) }}</span></td>
+            {# P4-Fix (Sicht-Pruefung 18.09., Kleineres 10): die leere
+               Angabe ist STILL. "keine Angabe" stand als Text-Pille
+               166-mal auf der Tafel - Rauschen ohne Aussage; ein leises
+               "–" sagt in der Bestand-Spalte dasselbe (dieselbe Zeichen-
+               konvention wie in allen uebrigen Zellen). Echte Aussagen
+               (lieferbar, nicht lieferbar, vorbestellbar) bleiben Pille.
+               Die Spalte selbst bleibt - ueber sie entscheidet P5. #}
+            <td>{% if z.verfuegbarkeit in ('unbekannt', '') %}<span
+              class="gr-a-klein">–</span>{% else %}<span class="gr-pille
+              gr-pille--{% if z.verfuegbarkeit == 'lieferbar'
+              %}gering{% else %}kritisch{% endif %}">{{
+              'lieferbar' if z.verfuegbarkeit == 'lieferbar'
+              else ('nicht lieferbar' if z.verfuegbarkeit == 'nicht_lieferbar'
+                    else ('vorbestellbar' if z.verfuegbarkeit == 'vorbestellbar'
+                          else z.verfuegbarkeit)) }}</span>{% endif %}</td>
             <td><span class="gr-a-klein gr-a-datum">{{ z.abgerufen_am | date_de }}</span></td>
           </tr>
           {% endfor %}
@@ -799,43 +835,15 @@
     {{ geraete.katalog_modelle | length }} Zeilen zeigen</button></p>
   {% endif %}
 
-  {# E3: DER SORTIMENTS-AUFKLAPPER wohnt im Katalog-Reiter. Er stand bis
-     E3 als eigene Sektion auf der Radar-Alt-Seite (dorthin hatte ihn
-     O2 aus der damals gefallenen Portfolio-Tafel gezogen). Im Vier-
-     Reiter-Gerüst der EINEN Seite (§1d) ist der Katalog der Sortiments-
-     Reiter - „diese Geräte stehen NUR bei Wettbewerbern im Regal" ist
-     die Komplementäraussage zu der Tabelle darüber, keine Radar-Frage
-     (der Radar fragt nach Abweichungen zu Vodafone-PREISEN, S2/S3). Eine
-     zweite Kopie auf dem Radar wäre §4.6 - deshalb steht er HIER und
-     nur hier. Der Anker heißt neu #gr-sortiment; #tafel-portfolio bleibt
-     verboten (O3-Regel: keine wiederauferstandene, unverknüpfte Tafel).
-     Daten: derselbe `radar`-Kontext wie die Radar-Tafel - EINE
-     Berechnung (`radar()`), mehrere Vorlagenausschnitte. #}
-  {% if radar.ohne_vodafone %}
-  <p class="gr-erklaer gr-sortiment-satz">Diese Geräte führen nur
-  Wettbewerber im Regal, Vodafone keins von beiden – der ab-Preis nennt
-  den günstigsten Anbieter, der sie führt.</p>
-  <details class="gr-auf" id="gr-sortiment">
-    <summary>Bei Wettbewerbern gelistet, bei Vodafone nicht
-      ({{ radar.ohne_vodafone_gesamt }})</summary>
-    <ul class="gr-v-liste">
-      {% for l in radar.ohne_vodafone %}
-      <li><span class="szl">{{ l.modell }}</span>
-        {% if l.speicher %}<span class="gr-v-meta">{{ l.speicher }} GB</span>{% endif %}
-        <span class="gr-v-prozent">ab {{ l.ab_preis | euro }}</span>
-        <span class="gr-v-datum">{{ l.anzahl }} {{ 'Anbieter' if l.anzahl == 1
-          else 'Anbieter' }}</span>
-        <a href="{{ l.anbieter[0].url }}" rel="noopener">{{ l.anbieter[0].laden
-          }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>
-      </li>
-      {% endfor %}
-    </ul>
-    {% if radar.ohne_vodafone_gesamt >
-       radar.ohne_vodafone | length %}
-    <p class="gr-v-meta">{{ radar.ohne_vodafone_gesamt }} insgesamt.</p>
-    {% endif %}
-  </details>
-  {% endif %}
+  {# P4 Schritt 2b (STRATEGIE_GERAETE_V3, 18.09.2026): DER SORTIMENTS-
+     AUFKLAPPER ist in den RADAR-REITER gewandert (unter die Grafik,
+     eigener details-Block mit der unveränderten ID #gr-sortiment).
+     Er stand seit E3 hier im Katalog - design.md §3c dazu: „Katalogs
+     Aufklapper ‚Bei Wettbewerbern gelistet, bei Vodafone nicht (29)'
+     ist Radar-Material im Katalog". Der Katalog bleibt der Reiter der
+     EIGENEN Liste (was führen wir und wer sonst), die Lücken-Frage
+     gehört zur Radar-Frage nach dem Wettbewerb. Umgezogen, nicht
+     kopiert: er steht GENAU EINMAL auf der Seite. #}
 </section>
 </div>
 
@@ -1001,6 +1009,18 @@
      ab der ein Verlauf entsteht. #}
   <p class="gr-erklaer gr-basis--duenn" id="gr-vzukurz" hidden></p>
 
+  {# P4/D4 (18.09.2026): DIE LEITZAHL DES REITERS - der aktuelle Preis des
+     gewählten Geräts, direkt über der Kurve. app.js setzt sie beim
+     Zeichnen (guenstigster Preis am LETZTEN Messtag, aus den ungefassten
+     Rohpunkten derselben Reihen, die auch die Kacheln füllen - kein
+     zweiter Datenweg): Zahl groß (.gr-leit-zahl), Label klein. Die
+     Kacheln darüber nennen MIN und MAX über den Zeitraum - die Leitzahl
+     sagt, was das Gerät JETZT kostet; verschiedene Zahlen, keine
+     Doppelung. Hidden, solange keine Reihe gezeichnet wird. #}
+  <div class="gr-leit gr-vleit" id="gr-vleit" hidden><b
+    class="gr-leit-zahl" id="gr-vaktuell">–</b><span class="gr-leit-label"
+    id="gr-vleit-label"></span></div>
+
   <div class="gr-vbild" id="gr-vbild" hidden></div>
   <p class="gr-vlegende" id="gr-vlegende" hidden></p>
 
@@ -1047,8 +1067,27 @@
     {{ geraete.verlauf.geraete | tojson }}
   </script>
   {% endif %}
+
+  {# --- P4 Schritt 2a (STRATEGIE_GERAETE_V3, 18.09.2026): die WOCHENKARTE
+         der Preisbewegungen wohnt in DIESEM Reiter. Bis P4/2a stand sie
+         als vierte Sektion der Radar-Tafel; „letzte 14 Tage
+         Preisbewegungen" ist eine Verlaufs-Frage (design.md §3b) - im
+         Radar konkurrierte sie mit den Abweichungs-Sektionen um dieselbe
+         Aufmerksamkeit. NUR VERSCHOBEN: Markup, Klassen und die ID
+         #wr-bewegungen sind unveraendert (Makro `wochenkarte` in
+         _geraete_radar.html.j2, denselben Datenkontext `radar.portfolio`
+         wie vorher - keine zweite Berechnung).
+
+         Sie steht UNTER der Tabelle und dem Datenlage-Aufklapper, am
+         Reiterende: ihr Gatter ist das EIGENE (`auffaellig.hat_daten`),
+         unabhaengig vom hat_daten-Gatter des Verlaufs darueber - haenge
+         sie in dessen else-Zweig, wuerde sie im Verlaufs-Leerzustand
+         still verschwinden, obwohl sie vorher (im Radar) unabhaengig
+         stand. Zugeklappt bleibt sie Nachfrage, wie sie es im Radar war. #}
+  {{ wochenkarte(radar.portfolio) }}
 </section>
 </div>
+
 
 {# Der EINE Weg zur Quellenseite (B1 des Reviews vom 03.09.2026). Mit den
    Erklaersektionen fielen alle drei Links auf geraete-quellen.html - die
@@ -1085,6 +1124,48 @@ radar_verlinkt %} · <a href="#tafel-radar"
   aufgenommen. Welche Anbieter angebunden sind und welche warum nicht, steht
   auf <a href="{{ prefix }}geraete-quellen.html">der Quellenseite</a>.</p>
   {% endif %}
+</section>
+{% endif %}
+
+{# P4/D4 (STRATEGIE_GERAETE_V3, 18.09.2026): DIE EXPORT-FUSSZEILE.
+   Die sechs Knöpfe standen bis P4 in der Kopfzeile (O4/E5) - am Telefon
+   gequetscht ÜBER der Reiter-Steuerung, vor jedem ersten Datenelement
+   (design.md: „6 verschiedene Meta-Bedienelemente um die eigentliche
+   Tabelle"). Sie stehen jetzt als EINE Zeile am Seitenende: EINE Stelle
+   für alle Reiter bleibt gewahrt (O4-Regel: nie einer je Reiter -
+   `test_geraete_verlinkt_jede_datei_genau_einmal` hält dagegen), dieselben
+   sechs Dateien, dieselben Ziele, dieselbe Zeilenzahl neben dem Link.
+   Sie steht AUSSERHALB des hat_daten-Gatters: die E5-Leersicherung
+   „Export ohne Zeilen" verlangt die Null neben dem Link AUCH im
+   Leerzustand (Modulkopf geraete_export: ein fehlender Download wäre
+   die schlechtere Auskunft als ein leerer) - im hat_daten-Zweig wäre
+   sie im Ganz-Leer-Fall still verschwunden. Das Gatter fragt weiter
+   die DATEI ab: steht kein Dateiname (Export nicht schreibbar), gibt
+   es keine Fußzeile - fail closed. #}
+{% if geraete.export and geraete.export.aktuell.datei %}
+<section class="gr-export-fuss" aria-label="Exporte">
+  <span class="gr-export-fuss-titel">Export</span>
+  <span class="gr-export-knoepfe">
+    <a class="gr-knopf" href="{{ geraete.export.aktuell.datei }}" download
+      >Alle exportieren ({{ geraete.export.aktuell.zeilen }} Zeilen)</a>
+    <a class="gr-knopf" href="{{ geraete.export.historie.datei }}" download
+      >Preishistorie ({{ geraete.export.historie.zeilen }})</a>
+    <a class="gr-knopf" href="{{ geraete.export.tco.datei }}" download
+      >Bündel-TCO ({{ geraete.export.tco.zeilen }})</a>
+    <a class="gr-knopf" href="{{ geraete.export.radar.datei }}" download
+      >Radar ({{ geraete.export.radar.zeilen }})</a>
+    {# P3: der Katalog auf Modellebene ist eine eigene ZAHLENSEKTION -
+       E5 "alle Zahlensektionen exportierbar" braucht je Ansicht EINEN
+       Knopf (eine Datei je Ansicht, kein Formatmix). Die Zeilenzahl
+       ist die MODELLZAHL - "Alle exportieren" nennt die Listungen. #}
+    {% if geraete.export.modell_barpreis.datei %}
+    <a class="gr-knopf" href="{{ geraete.export.modell_barpreis.datei }}"
+      download>Katalog Barpreis ({{ geraete.export.modell_barpreis.zeilen
+      }})</a>
+    <a class="gr-knopf" href="{{ geraete.export.modell_tco.datei }}"
+      download>Katalog TCO ({{ geraete.export.modell_tco.zeilen }})</a>
+    {% endif %}
+  </span>
 </section>
 {% endif %}
 

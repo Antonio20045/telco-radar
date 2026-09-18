@@ -139,6 +139,18 @@ HAENDLER_SICHTBAR_MAX = 6
 # 6 Zeilen massen die Seite auf 3216 px - mit 5 bleibt sie unter 3000 px.
 MODELLISTE_SICHTBAR = 5
 
+# P4/D1 (STRATEGIE_GERAETE_V3, 18.09.2026): wie viele Balken die GRAFIK
+# der Radar-Tafel traegt. Der Deckel ist eine HOEHEN-Rechnung, keine
+# Daten-Grenze: 12 Reihen zu 30 px ergeben 360 px Plot plus Kopf - die
+# Grafik steht damit samt Ueberschrift ueber der Falz eines 900-px-
+# Schirms, und am Telefon (schmale Variante, 40 px je Reihe) bleibt sie
+# unter 500 px. Am echten Bestand (18.09.2026) haengt die Wahl nicht an
+# einem inhaltlichen Bruch: Die Plaetze 12 bis 16 tragen +150,90 € bis
+# +110,90 €, alle dieselbe Richtung - die 13. Zeile haette der Grafik
+# Laenge gegeben, keine Aussage. Der Rest steht in der Tabelle im
+# Aufklapper unter der Grafik (nichts streichen).
+GRAFIK_MAX = 12
+
 _BAND_LABEL = {k: l for k, l, _ in geraete_tco_band.BAENDER}
 # Einfuegereihenfolge der Baender in einer Gruppe: die Ordnung aus
 # `BAENDER` (Klein, Mittel, Gross) - alphabetisch waere "gross, klein,
@@ -474,6 +486,273 @@ def modellliste(gruppen: list[dict]) -> dict:
             "gesamt": len(zeilen)}
 
 
+# ---------------------------------------------------------------------------
+# P4/D1 (STRATEGIE_GERAETE_V3, 18.09.2026): die Balkengrafik der Radar-Tafel
+#
+# DIE FRAGE DES REITERS - "Bei welchem Geraet ist Vodafone teurer als der
+# Wettbewerb?" - liest sich bis P4 nur als 746-Zeilen-Wand (design.md:
+# "100 % Tabelle, 0 % Grafik, 727 rot eingefaerbte Elemente"). Die Grafik
+# zeigt dieselbe Zahl als BILD: EIN Balken je Modell(-Speicher)-Zeile,
+# Laenge = Abstand in Euro zum Vodafone-Preis, Nulllinie = Vodafone.
+#
+# Barpreis-Ebene wie die Alarmtabelle (nur vergleichbare Neugeraete, ohne
+# Vertrag): gelesen werden die fertigen `zeilen` aus
+# `geraete_vergleich.vergleich(..., preisart=OHNE_VERTRAG)` - KEINE zweite
+# Preisrechnung, nur die Auswahl des Gegenstuecks je Zeile:
+#   delta > 0 VF-Preis minus GUENSTIGSTEN Wettbewerber (VF teuerer),
+#   delta < 0 VF-Preis minus guenstigsten der TEUEREREN (VF guenstiger).
+# Preisgleichheit ist kein Abstand (STRIKT-Regel des Vergleichs) und
+# faellt heraus.
+#
+# FARBE NACH RICHTUNG (Rot-Deckel, design.md Regel 4): Balken Richtung
+# "Wettbewerber guenstiger" in Ink, Richtung "Vodafone guenstiger" in
+# Blau (--al-bestpreis, die Positiv-Farbe dieser Tafel); ROT traegt
+# genau EIN Balken - der groesste Abstand ZUUNGUNSTEN Vodafones (der
+# schaerfste Befund). Ist kein solcher Fall im Bestand, gibt es keinen
+# roten Balken - Rot ist Akzent, keine Flaeche. Die Farben prueft der
+# Palette-Validator: #e60000/#2b5bd7 gegen #f6f4ee, CVD dE 29,4 (protan),
+# Kontrast >= 3:1 (beide PASS, 18.09.2026).
+# ---------------------------------------------------------------------------
+
+def _x(text: object) -> str:
+    """XML-Escaping fuer SVG-Text (Modelle- und Ladennamen kommen aus dem
+    Bestand und duerfen & < > enthalten)."""
+    return (str(text or "").replace("&", "&amp;").replace("<", "&lt;")
+            .replace(">", "&gt;").replace('"', "&quot;"))
+
+
+def _euro0(betrag: float) -> str:
+    """Deutsche Schreibweise eines Betrags OHNE Vorzeichen ( fuer die
+    <title>-Tooltips der Grafik: beide Preise der Messung daneben)."""
+    text = f"{betrag:,.2f}".replace(",", "#").replace(".", ",")
+    return text.replace("#", ".") + " €"
+
+
+def grafik_zeilen(vergleich_ohne_vertrag: dict) -> list[dict]:
+    """Eine Grafik-Zeile je vergleichbarer Zeile des Barpreis-Vergleichs."""
+    zeilen = []
+    for z in (vergleich_ohne_vertrag or {}).get("zeilen", []):
+        vf = (z.get("vodafone") or {}).get("preis")
+        if vf is None:
+            continue
+        if z.get("guenstiger"):
+            gegen = z["guenstiger"][0]
+            delta = z.get("differenz")
+        elif z.get("teurer"):
+            gegen = z["teurer"][0]
+            delta = round(vf - gegen.get("preis"), 2)
+        else:
+            continue
+        if gegen is None or gegen.get("preis") is None or not delta:
+            continue
+        prozent = z.get("prozent")
+        if prozent is None:
+            prozent = round(delta / vf * 100.0, 1)
+        zeilen.append({
+            "device_id": z.get("device_id"), "speicher": z.get("speicher"),
+            "modell": z.get("modell") or "", "hersteller": z.get("hersteller"),
+            "delta": float(delta), "prozent": float(prozent),
+            "laden": gegen.get("laden") or gegen.get("anbieter", ""),
+            "vf_preis": vf, "gegen_preis": gegen.get("preis"),
+        })
+    return zeilen
+
+
+def _balken_pfad(x_null: float, y: float, laenge: float, hoehe: float,
+                 nach_rechts: bool) -> str:
+    """Ein Balken mit runder AUSSEN-Seite und eckiger Basis an der
+    Nulllinie (Markenspezifikation: Datenende gerundet, Basis quadrat) -
+    ein `<rect rx>` rundet beide Enden und stellte die Basis als eigener
+    Wert dar. Balken unter 8 px Länge bleiben eckig (kein Rundungszimmer
+    in einer Nische)."""
+    r = min(3.5, laenge / 2, hoehe / 2) if laenge >= 8 else 0
+    if nach_rechts:
+        xe = x_null + laenge
+        if not r:
+            return (f"M{x_null:.1f} {y:.1f}H{xe:.1f}V{y + hoehe:.1f}"
+                    f"H{x_null:.1f}Z")
+        return (f"M{x_null:.1f} {y:.1f}H{xe - r:.1f}Q{xe:.1f} {y:.1f} "
+                f"{xe:.1f} {y + r:.1f}V{y + hoehe - r:.1f}"
+                f"Q{xe:.1f} {y + hoehe:.1f} {xe - r:.1f} {y + hoehe:.1f}"
+                f"H{x_null:.1f}Z")
+    xe = x_null - laenge
+    if not r:
+        return (f"M{x_null:.1f} {y:.1f}H{xe:.1f}V{y + hoehe:.1f}"
+                f"H{x_null:.1f}Z")
+    return (f"M{x_null:.1f} {y:.1f}H{xe + r:.1f}Q{xe:.1f} {y:.1f} "
+            f"{xe:.1f} {y + r:.1f}V{y + hoehe - r:.1f}"
+            f"Q{xe:.1f} {y + hoehe:.1f} {xe + r:.1f} {y + hoehe:.1f}"
+            f"H{x_null:.1f}Z")
+
+
+def _grafik_svg(zeilen: list[dict], spitze_schluessel: tuple | None,
+                breit: bool) -> str:
+    """Das servergerenderte SVG in zwei Varianten (schirm/mobil) - kein
+    Client-Rechnen. Beide stehen im DOM, das Mediaquery zeigt eine
+    (derselbe Mechanismus wie die Zeitreihe `svg.gr-zr--breit/schmal`).
+
+    EINE Euro-Skala fuer beide Richtungen (eine Achse, keine zweite
+    Rechenvorschrift): der linke Arm ergibt sich aus dem groessten
+    Abstand nach links, derselbe Massstab wie rechts.
+    """
+    n = len(zeilen)
+    if breit:
+        w, name_breite, wert_raum, neg_raum = 1120, 158, 158, 96
+        reihen_hoehe, balken_hoehe, kopf, fuss = 30, 14, 30, 12
+    else:
+        w, name_breite, wert_raum, neg_raum = 350, 0, 78, 62
+        reihen_hoehe, balken_hoehe, kopf, fuss = 40, 12, 26, 8
+    h = kopf + n * reihen_hoehe + fuss
+    max_abs = max((abs(z["delta"]) for z in zeilen), default=1.0) or 1.0
+    neg_arm = max((abs(z["delta"]) for z in zeilen if z["delta"] < 0),
+                  default=0.0)
+    # Schmal beginnt die Nulllinie mit Einsatz (10 statt 2): eine 1,5-px-
+    # Haarlinie direkt an der Kante ist auf dem Telefon unsichtbar (am
+    # Screenshot vom 18.09.2026 nachgesehen), mit Einsatz liest sie sich
+    # als Achse. Breit steht sie ohnehin frei hinter der Namensspalte.
+    start = (2 if breit else 10) + neg_raum * (neg_arm > 0)
+    verfuegbar = w - 6 - wert_raum - start
+    if breit:
+        verfuegbar -= name_breite + 10
+        start += name_breite + 10
+    skala = verfuegbar / max_abs
+    x0 = start + neg_arm * skala
+
+    spitze = None
+    if spitze_schluessel is not None:
+        spitze = next((z for z in zeilen
+                       if (z["device_id"], z["speicher"]) == spitze_schluessel),
+                      None)
+    teile: list[str] = []
+    teile.append(
+        f"<svg class='wr-gr wr-gr--{'breit' if breit else 'schmal'}' "
+        f"viewBox='0 0 {w} {h}' role='img' "
+        f"aria-label='Abstand zum Vodafone-Preis in Euro, {n} Modelle"
+        + (f", größter Abstand {_dvorzeichen(spitze['delta'])} Euro "
+           f"bei {_x(spitze['modell'])}" if spitze else "")
+        + "'>")
+    # Die EINE Nulllinie mit dem EINEN Etikett (Auftrag P4/D1): kein
+    # Raster und keine zweite Achse - jeder Balken traegt seinen Wert
+    # selbst als Beschriftung, die Nulllinie ist die Referenz.
+    anker = " text-anchor='middle'" if breit else ""
+    teile.append(f"<line class='wr-gr-null' x1='{x0:.1f}' y1='{kopf - 8}' "
+                 f"x2='{x0:.1f}' y2='{h - 4:.1f}'/>")
+    teile.append(f"<text class='wr-gr-nulltext' x='{x0:.1f}' "
+                 f"y='{kopf - 13}'{anker}>Vodafone</text>")
+    for i, z in enumerate(zeilen):
+        ist_spitze = spitze is not None and spitze is z
+        klasse = "wr-gr-balken"
+        if ist_spitze:
+            klasse += " wr-gr-balken--spitze"
+        elif z["delta"] > 0:
+            klasse += " wr-gr-balken--teuer"
+        else:
+            klasse += " wr-gr-balken--gut"
+        laenge = abs(z["delta"]) * skala
+        wert = f"{_dvorzeichen(z['delta'])} €"
+        prozent = f"{z['prozent']:+.1f}".replace(".", ",") + " %"
+        titel = (f"{_x(z['modell'])}: {wert} ({prozent}) gegenüber "
+                 f"{_x(z['laden'])} – Vodafone {_euro0(z['vf_preis'])}, "
+                 f"{_x(z['laden'])} {_euro0(z['gegen_preis'])}")
+        if breit:
+            y = kopf + i * reihen_hoehe + (reihen_hoehe - balken_hoehe) / 2
+            ty = y + balken_hoehe / 2 + 4
+            speicher = ""
+            if z["speicher"]:
+                speicher = (f" <tspan class='wr-gr-name-zusatz'>· "
+                            f"{_x(z['speicher'])} GB</tspan>")
+            teile.append(f"<text class='wr-gr-name' x='{name_breite}' "
+                         f"y='{ty:.1f}' text-anchor='end'>{_x(z['modell'])}"
+                         f"{speicher}</text>")
+            teile.append(
+                f"<path class='{klasse}' d='"
+                f"{_balken_pfad(x0, y, laenge, balken_hoehe, z['delta'] > 0)}'>"
+                f"<title>{titel}</title></path>")
+            if z["delta"] > 0:
+                teile.append(
+                    f"<text class='wr-gr-wert' x='{x0 + laenge + 8:.1f}' "
+                    f"y='{ty:.1f}'>{wert}<tspan class='wr-gr-laden'> · "
+                    f"{_x(z['laden'])}</tspan></text>")
+            else:
+                teile.append(
+                    f"<text class='wr-gr-wert' x='{x0 - laenge - 8:.1f}' "
+                    f"y='{ty:.1f}' text-anchor='end'>{wert}</text>")
+        else:
+            ly = kopf + i * reihen_hoehe
+            y = ly + 19
+            name = _x(z["modell"])
+            if z["speicher"]:
+                name = (f"{name} <tspan class='wr-gr-name-zusatz'>· "
+                        f"{_x(z['speicher'])} GB</tspan>")
+            teile.append(f"<text class='wr-gr-name' x='2' y='{ly + 12:.1f}'>"
+                         f"{name}</text>")
+            teile.append(
+                f"<path class='{klasse}' d='"
+                f"{_balken_pfad(x0, y, laenge, balken_hoehe, z['delta'] > 0)}'>"
+                f"<title>{titel}</title></path>")
+            if z["delta"] > 0:
+                teile.append(f"<text class='wr-gr-wert' "
+                             f"x='{x0 + laenge + 6:.1f}' y='{y + 10:.1f}'>"
+                             f"{wert}</text>")
+            else:
+                teile.append(f"<text class='wr-gr-wert' "
+                             f"x='{x0 - laenge - 6:.1f}' y='{y + 10:.1f}' "
+                             f"text-anchor='end'>{wert}</text>")
+    teile.append("</svg>")
+    return "".join(teile)
+
+
+def grafik(vergleich_ohne_vertrag: dict, n: int = GRAFIK_MAX) -> dict:
+    """Die Balkengrafik-Daten fuer die Radar-Tafel: Top N nach ABSOLUTEM
+    Euro-Abstand, die Spitze (groesster Abstand zuungunsten Vodafones)
+    immer dabei - auch wenn sie es allein nach Platzierung nicht in die
+    Top N schaffte, sonst markierte Rot in der Tabelle ein Modell, das im
+    Bild fehlt (und die Alarm-Pille haette keinen Balken)."""
+    alle = grafik_zeilen(vergleich_ohne_vertrag)
+    if not alle:
+        return {"svg_breit": "", "svg_schmal": "", "zeilen": [],
+                "n": 0, "basis": 0, "spitze": None,
+                "leer_grund": ("Noch keine vergleichbaren Barpreise erhoben "
+                               "– die Grafik entsteht mit dem nächsten Lauf.")}
+    spitze_kandidat = max((z for z in alle if z["delta"] > 0),
+                          key=lambda z: z["delta"], default=None)
+    gewaehlt = sorted(alle, key=lambda z: -abs(z["delta"]))[:n]
+    if spitze_kandidat is not None:
+        schluessel = (spitze_kandidat["device_id"],
+                      spitze_kandidat["speicher"])
+        if not any((z["device_id"], z["speicher"]) == schluessel
+                   for z in gewaehlt):
+            # P4-Fix (Code-Pruefung S4): n<=0 (ein kuenftiger Aufrufer)
+            # wuerde `gewaehlt[-1]` auf einer LEEREN Liste lesen -
+            # IndexError statt Leerzustand. Produktion ruft ohne n
+            # (Bestand >= 1), aber die Spitze gehoert auch ins entleerte
+            # Bild: dann IST sie die einzige Zeile.
+            if gewaehlt:
+                gewaehlt[-1] = spitze_kandidat
+            else:
+                gewaehlt = [spitze_kandidat]
+            gewaehlt.sort(key=lambda z: -abs(z["delta"]))
+    spitze = None
+    if spitze_kandidat is not None:
+        spitze = {"device_id": spitze_kandidat["device_id"],
+                  "speicher": spitze_kandidat["speicher"],
+                  # Der Schluessel fuer die Vorlage: dieselbe Normalisierung
+                  # wie in der Alarm-Zeile (None -> ''), sonst traegt die
+                  # Spitzen-Markierung an einem Modell ohne Speicherangabe
+                  # vorbei ("...|None" trifft nie).
+                  "schluessel": (f"{spitze_kandidat['device_id'] or ''}|"
+                                 f"{spitze_kandidat['speicher'] or ''}"),
+                  "modell": spitze_kandidat["modell"],
+                  "delta": spitze_kandidat["delta"],
+                  "delta_text": f"{_dvorzeichen(spitze_kandidat['delta'])} €"}
+    schluessel = ((spitze["device_id"], spitze["speicher"])
+                  if spitze else None)
+    return {"svg_breit": _grafik_svg(gewaehlt, schluessel, True),
+            "svg_schmal": _grafik_svg(gewaehlt, schluessel, False),
+            "zeilen": gewaehlt, "n": len(gewaehlt), "basis": len(alle),
+            "spitze": spitze, "leer_grund": ""}
+
+
 def haendler_zeilen(vergleich_ohne_vertrag: dict) -> list[dict]:
     """Der Händler-Abschnitt (Aufgabe: eigener, klar beschrifteter Bereich).
 
@@ -557,6 +836,9 @@ def radar(tco: dict, vergleich_ohne_vertrag: dict, quellenlage: dict,
         # E3/S2: die Modell-Liste des Radar-Reiters - aus denselben Gruppen
         # abgeleitet, keine zweite Rechnung.
         "modelliste": modellliste(gruppen),
+        # P4/D1: die Balkengrafik - servergerendertes SVG ueber den
+        # Tabellen, aus denselben Vergleichszeilen wie die Alarmtabelle.
+        "grafik": grafik(vergleich_ohne_vertrag),
         "haendler": haendler,
         "haendler_sichtbar": haendler[:HAENDLER_SICHTBAR_MAX],
         "haendler_rest": haendler[HAENDLER_SICHTBAR_MAX:],
@@ -610,6 +892,7 @@ def leer() -> dict:
     return {"gruppen": [], "gruppen_sichtbar": [], "gruppen_rest": [],
             "modelliste": {"zeilen": [], "sichtbar": [], "rest": [],
                            "gesamt": 0},
+            "grafik": grafik({}),
             "haendler": [], "haendler_sichtbar": [], "haendler_rest": [],
             "nicht_erhebbar": [],
             "hat_daten": False, "hat_vergleichbare_zeilen": False,

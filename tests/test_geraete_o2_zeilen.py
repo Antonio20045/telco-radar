@@ -30,8 +30,7 @@ from bs4 import BeautifulSoup
 from telco_radar.geraete_config import lade_katalog, lade_quellen
 from telco_radar.report import geraete_view
 from telco_radar.report.html import render_site
-
-from test_geraete_tco_zustand import HEUTE, _baue
+from test_geraete_tco_zustand import HEUTE, _baue, vorlage_text
 
 
 def _zr_fragment(tmp_path: pathlib.Path) -> list:
@@ -201,7 +200,9 @@ def test_je_buendel_eine_zeile_mit_vier_kernangaben_und_aufklapper(tmp_path):
         assert "€" in tco.get_text(), "TCO-Zelle ohne Zahl"
         assert "TCO-24" in tco.get_text(), "TCO-Zelle ohne Laufzeit-Etikett"
         assert z.select_one(".gr-bnd-rw") is not None, \
-            "Zeile ohne Rechenweg-Aufklapper-Inhalt"
+            "Zeile ohne Rechenweg-Montageziel"
+        assert z.select_one("template.gr-bnd-rw-vorlage .gr-tposten li") \
+            is not None, "Zeile ohne Rechenweg im Vorlagen-Pool"
 
 
 def test_die_zeilen_stehen_nach_gesamtkosten_sortiert(tmp_path):
@@ -285,12 +286,17 @@ def test_jede_zeile_traegt_rechenweg_pflichtzeile_und_belege(tmp_path):
     zeilen = s.select("#tafel-tco .gr-bnd")
     assert zeilen
     for z in zeilen:
-        rw = z.select_one(".gr-bnd-rw")
+        # P4-Fix (Sicht-Pruefung 18.09.): der Inhalt steht im
+        # <template>-Pool und wird beim Oeffnen montiert - der Test liest
+        # die Vorlage (BS4 sieht template-Inhalt im Baum), nicht das
+        # (serverseitig leere) Montageziel.
+        rw = z.select_one("template.gr-bnd-rw-vorlage")
         assert rw is not None
         posten = rw.select(".gr-tposten li")
         assert posten, f"{z.get('data-anbieter')}: Rechenweg ohne Posten"
-        assert _text(rw).startswith("nach 24 Monaten gezahlt") or \
-            "nach 24 Monaten gezahlt" in _text(rw), (
+        # vorlage_text (nicht _text): BS4 versteckt template-Inhalt
+        # vor get_text - der Rechenweg liegt seit dem P4-Fix dort.
+        assert "nach 24 Monaten gezahlt" in vorlage_text(rw), (
             f"{z.get('data-anbieter')}: Pflichtzeile fehlt")
         assert rw.select_one("a[href]") is not None, \
             f"{z.get('data-anbieter')}: kein Beleglink im Rechenweg"
@@ -322,7 +328,7 @@ def test_die_referenz_nennt_ihre_naehrung_im_rechenweg(tmp_path):
     ref = tafel.select_one('.gr-bnd[data-anbieter="Vodafone"]')
     assert ref is not None
     assert "Referenzrechnung" in _text(ref.select_one(".gr-bnd-an"))
-    rw = _text(ref.select_one(".gr-bnd-rw"))
+    rw = vorlage_text(ref.select_one("template.gr-bnd-rw-vorlage"))
     assert "noch nicht erhoben" in rw
     assert "weist zu diesem Gerät keinen Bündelpreis aus" not in \
         tafel.get_text(" ")

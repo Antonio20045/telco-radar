@@ -329,9 +329,14 @@ def test_der_antwort_satz_nennt_geraet_band_anbieter_zahl_und_schnitt(
 
 
 def test_der_antwort_satz_nennt_die_vodafone_referenz(ansicht):
+    """P4/D4 (18.09.2026): das Delta zur Vodafone-Referenz steht nicht
+    mehr IM Satz, sondern als EIGENE Leitzahl ueber ihm (DIE ANTWORT IST
+    DIE GROESSTE ZAHL) - der Satz nennt Anbieter und TCO-24, die Leitzahl
+    den Abstand samt Referenzbetrag. Beides zusammen ist die Antwort."""
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "klein"))
     text = __import__("re").sub(r"<[^>]+>", "", paar["antwort_html"])
-    assert "Vodafone" in text and "1.105,00 €" in text
+    leit = __import__("re").sub(r"<[^>]+>", "", paar["leitzahl_html"] or "")
+    assert "Vodafone" in leit and "1.105,00 €" in leit, (text, leit)
 
 
 def test_der_antwort_satz_polt_den_abstand_zur_referenz_richtig(ansicht):
@@ -341,26 +346,36 @@ def test_der_antwort_satz_polt_den_abstand_zur_referenz_richtig(ansicht):
     und der Beste liegt UNTER der Referenz, sobald ein Wettbewerber führt.
     Dasselbe Δ-Vorzeichen wie die Bündel-Karte desselben Angebots (S4):
     unter heißt günstiger. 1&1 (841,00 €) liegt 264,00 € UNTER der
-    Vodafone-Referenz (1.105,00 €) - die Karte darunter sagt genau das."""
+    Vodafone-Referenz (1.105,00 €) - die Karte darunter sagt genau das.
+    P4/D4: der Abstand steht jetzt in der LEITZAHL ueber dem Satz -
+    Polarität und Wortlaut unveraendert, nur der Ort ist neu."""
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "klein"))
     text = __import__("re").sub(r"<[^>]+>", "", paar["antwort_html"])
-    assert "264,00 € unter der Vodafone-Referenz" in text, text
+    leit = __import__("re").sub(r"<[^>]+>", "", paar["leitzahl_html"] or "")
+    # Zahl und Richtung getrennt geprueft: Der Tag-Strip klebt das Ende
+    # der <b>-Zahl an den Anfang des Labels ("€unter") - ein schwacher
+    # Parser darf die Aussage nicht zerlegen (Lehre B6, 30.08.2026).
+    assert "264,00 €" in leit, (text, leit)
+    assert "unter der Vodafone-Referenz" in leit, (text, leit)
+    assert "über der Vodafone-Referenz" not in leit, leit
     assert "über der Vodafone-Referenz" not in text, text
 
 
 def test_der_antwort_satz_endet_auf_genau_einem_punkt(ansicht):
     # Der Startzustand laeuft durch den Referenz-Zweig (1&1 am
-    # guenstigsten, Vodafone-Referenz im selben Satz) - genau der
-    # Pfad, der live auf ").." endete: die Anhaengsel in
+    # guenstigsten, Vodafone-Referenz als LEITZAHL ueber dem Satz) -
+    # genau der Pfad, der live auf ").." endete: die Anhaengsel in
     # _antwort_html schliessen den Satz selbst, der Abschluss der
     # Funktion setzte einen ZWEITEN Punkt dahinter. Der Satzschluss-
     # punkt steht genau EINMAL, an keiner Stelle ein "..".
     saetze = {f"{p['modell']}/{p['band']}":
               __import__("re").sub(r"<[^>]+>", "", p["antwort_html"]).strip()
               for p in ansicht["paare"]}
-    # Scharfheits-Beweis: die Fixture enthaelt wirklich einen Satz
-    # mit Referenz-Anhaengsel (sonst pruefte der Test einen leeren Fall).
-    assert any("Vodafone-Referenz" in s for s in saetze.values())
+    # Scharfheits-Beweis (P4/D4): die Fixture enthaelt wirklich einen
+    # Fall mit Leitzahl (sonst pruefte der Test einen leeren Fall) - das
+    # Delta ist der Pfad mit den Anhaengseln, die den ".."-Fehler trugen.
+    assert any(p["leitzahl_html"] for p in ansicht["paare"]), (
+        "kein Paar mit Leitzahl - die Fixture prueft den Delta-Fall nicht")
     for schluessel, text in saetze.items():
         assert text.endswith("."), schluessel
         assert not text.endswith(".."), schluessel

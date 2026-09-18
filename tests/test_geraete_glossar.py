@@ -45,7 +45,7 @@ from __future__ import annotations
 import json
 import re
 
-from test_geraete_tco_zustand import _baue
+from test_geraete_tco_zustand import _baue, vorlage_text
 
 BEGRIFFE = {"TCO-24", "Tarifband", "Bündel",
             "Abweichungs-Vorzeichen (+/−) zu Vodafone"}
@@ -187,7 +187,7 @@ def test_jede_zeile_mit_zwei_preisen_traegt_die_paradox_zeile(tmp_path):
         assert paradox is not None, (
             f"Zeile {zeile.get('data-anbieter')}: zwei Preise ohne "
             "Erklaerzeile")
-        text = re.sub(r"\s+", " ", paradox.get_text(" ", strip=True))
+        text = re.sub(r"\s+", " ", vorlage_text(paradox))
         assert "Gerät" in text and "Tarif" in text, text
         # Die Zeile steht DIREKT unter den zwei Zahlen des Rechenwegs:
         # nach der Leitzeile (TCO gesamt), vor der Oe-Bindungszeile -
@@ -227,7 +227,7 @@ def test_die_paradox_zeile_nennt_den_zeitraum_ihres_labels(tmp_path):
             continue
         treffer = re.search(r"TCO-(\d+)", label.get_text())
         assert treffer, label.get_text()
-        fluss = re.sub(r"\s+", " ", paradox.get_text(" ", strip=True))
+        fluss = re.sub(r"\s+", " ", vorlage_text(paradox))
         assert f"{treffer.group(1)} Monate" in fluss \
             or f"{treffer.group(1)} Monatsraten" in fluss, (
             f"Zeile {zeile.get('data-anbieter')}: Label "

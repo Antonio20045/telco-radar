@@ -1971,6 +1971,35 @@ def test_keine_karte_zeigt_zahlen_die_die_aufbereitung_nicht_hat(
                 f"Aufbereitung"
 
 
+def test_die_katalog_leitzahl_ist_der_guenstigste_zeilenpreis(tmp_path):
+    """P4-Fix (Sicht-Pruefung 18.09., Falz 1): die Katalog-Leitzahl ist der
+    guenstigste Einzelgeraetepreis des Regals - gehalten gegen DIESELBEN
+    Zahlen, die in den Zeilen stehen (data-s-preis, der Rohwert der
+    ab-Preis-Spalte). Nicht gegen den View-Wert derselben Rechnung: das
+    waere zirkulaer; hier steht Zelle gegen Zelle (CLAUDE.md §6: eine Zahl
+    auf der Seite ist erst wahr, wenn ein Test sie gegen die Daten haelt).
+    Ohne Barpreis im ganzen Regal gibt es keine Leitzahl (Gatter)."""
+    import re
+    site, _aufbereitung = _geraete_kartenzahl_site(tmp_path)
+    soup = BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
+                         "html.parser")
+    zeilen = soup.select("#gr-katalogtabelle tr.gr-k-zeile")
+    assert zeilen, "keine Katalog-Modellzeile - der Test prueft nichts"
+    preise = [float(z["data-s-preis"]) for z in zeilen
+              if (z.get("data-s-preis") or "").strip()]
+    leit = soup.select_one("#tafel-katalog .gr-leit--katalog .gr-leit-zahl")
+    assert preise, "Fixture ohne einen einzigen ab-Preis - Gatterfall, " \
+                   "der Test braeuchte die andere Lage"
+    assert leit is not None, \
+        "Katalog ohne Leitzahl, obwohl Zeilen mit ab-Preis dastehen"
+    zahl = leit.get_text(" ", strip=True)
+    match = re.match(r"^([\d.]+,\d\d) €$", zahl)
+    assert match, f"Leitzahl ist kein Preis: {zahl!r}"
+    assert float(match.group(1).replace(".", "").replace(",", ".")) \
+        == min(preise), \
+        f"Leitzahl {zahl} != guenstigster Zeilenpreis {min(preise)}"
+
+
 # ==========================================================================
 # P1/F2 (A4, 17.09.2026): die Zahlen der RECHENWEG-VORLAGEN (Panel-Posten).
 # Jeder Kurvenpunkt und die Preiszahl oeffnen auf Klick die Rechung genau

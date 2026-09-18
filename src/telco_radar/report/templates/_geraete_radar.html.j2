@@ -8,24 +8,48 @@
    sollte nicht auf so einem komischen unteren Abschnitt ganz unten
    sein, weil das ist was ganz anderes."):
 
-     1. PREIS-ALARME   – Barpreis ohne Vertrag, vier Warnstufen
-     2. ABWEICHUNG     – DIE MODELL-LISTE (S2): je Modell die stärkste
+     1. GRAFIK         – P4/D1 (18.09.2026): die Leitzahl als BILD. Balken
+                         je Modell = Abstand in Euro zum Vodafone-Preis,
+                         Nulllinie = Vodafone, rot der schärfste Befund.
+                         Servergerendertes SVG aus `geraete_radar.grafik()`
+                         (Barpreis-Ebene wie die Alarmtabelle: nur
+                         vergleichbare Neugeräte, ohne Vertrag).
+     2. PREIS-ALARME   – Barpreis ohne Vertrag, vier Warnstufen
+     3. ABWEICHUNG     – DIE MODELL-LISTE (S2): je Modell die stärkste
                          TCO-24-Abweichung zu Vodafone, alle Zeilen,
                          sortierbar, mit Sprung in den Graphen
-     3. HÄNDLER        – Gerätepreis ohne Finanzierung als eigener,
+     4. HÄNDLER        – Gerätepreis ohne Finanzierung als eigener,
                          gleichwertiger Abschnitt
 
    Jede Sektion erklärt in EINEM Satz ihre Frage (S3: „keine Sektion
-   ohne erkennbaren Zweck"). Der Sortiments-Aufklapper steht NICHT hier
-   - er wohnt im Gerätekatalog-Reiter (Komplementäraussage zu dessen
-   Tabelle, §4.6). Danach die PORTFOLIO-Sektionen (Wochenkarte der
-   Preisbewegungen, Lifecycle): Sie standen bis E3 Schritt 3 auf der
-   Radar-Alt-Seite (heute Weiterleitung) und sind MIT DERREN ABSCHALTUNG
-   (Alt-URL wird Weiterleitung, 17.09.2026) hierher gezogen, nicht
-   kopiert - der genehmigte Prototyp entwurf-v2.html zeigt genau diese
-   Sektionen im Radar-Reiter. Ohne den Mitzug wäre die Weiterleitung
-   eine Inhaltsloeschung: Bewegungen und Lifecycle stehen auf keiner
+   ohne erkennbaren Zweck"). DIE BEIDEN GROSSEN TABELLEN (Alarme und
+   Modell-Liste) stehen seit P4/D1 als AUFKLAPPER unter der Grafik -
+   „Wo sind wir teuer?" liest sich zuerst als Bild (design.md: „Radar
+   100 % Tabelle, 0 % Grafik"); ihre Zeilen, Filter und Sortierungen
+   bleiben vollständig klick-bar, nichts ist gestrichen.
+
+   Der SORTIMENTS-AUFKLAPPER „Bei Wettbewerbern gelistet, bei Vodafone
+   nicht" steht SEIT P4 Schritt 2b (18.09.2026) HIER, unter der Grafik
+   - bis E3 wohnte er im Katalog-Reiter. design.md §3c: es „ist
+   Radar-Material im Katalog" - die Sortiments-Lücke gehört zur Frage
+   dieses Reiters (wo führt der Wettbewerb etwas, das wir nicht führen).
+   Umgezogen, nicht kopiert: er steht GENAU EINMAL auf der Seite.
+
+   Danach die LIFECYCLE-Sektion: Sie stand bis E3
+   Schritt 3 auf der Radar-Alt-Seite (heute Weiterleitung) und ist MIT
+   DERREN ABSCHALTUNG (Alt-URL wird Weiterleitung, 17.09.2026) hierher
+   gezogen, nicht kopiert - der genehmigte Prototyp entwurf-v2.html
+   zeigt genau diese Sektion im Radar-Reiter. Ohne den Mitzug wäre die
+   Weiterleitung eine Inhaltsloeschung: Lifecycle steht auf keiner
    anderen Seite.
+
+   Die WOCHENKARTE der Preisbewegungen („Was diese Woche auffällt")
+   stand bis P4 Schritt 2a (STRATEGIE_GERAETE_V3, 18.09.2026) als vierte
+   Sektion dieser Tafel. Sie ist ein PREISVERLAUF-Thema (design.md §3b)
+   und wohnt seitdem als Makro `wochenkarte` dieser Datei im Reiter
+   Preisverlauf - verschoben, nicht gestrichen; das Makro bleibt HIER,
+   weil seine Daten (`radar.portfolio`) derselben Berechnung
+   entstammen wie der Rest der Tafel (eine Berechnung, zwei Orte).
 
    Die Daten sind der `radar`-Kontext - EINE Berechnung
    (`radar()`), zwei Vorlagen. Die Alarmtabelle kommt aus der geteilten
@@ -39,8 +63,23 @@
    der Gruppe (negativste Prozentzahl zuerst, die Leseentscheidung des
    Modulkopfs von `geraete_radar.py`); der Klick auf die Zeile öffnet
    ALLE Anbieter der Gruppe in der Detailzeile (B.2.5: Telekom und 1&1
-   stehen immer da, auch ohne Zahl). #}
-{% macro modellzeile(z, nr, rest=False) %}
+   stehen immer da, auch ohne Zahl).
+
+   P4 SCHRITT 2c (18.09.2026) - EINE MODELL-MENGE STATT DREI: bis hierher
+   endete jede Zeile bei „im Graph ansehen" - der Katalog-Reiter zeigte
+   dieselben Geräte unter EINEM `modell_schluessel`, aber kein Sprung
+   führte hin, und die Modell-Mengen der Reiter (88/97 · 111) lasen sich
+   als drei Listen ohne Verbindung (katalog.md §4, der objektive Kern des
+   „Mischmasch"). Jede Zeile trägt jetzt ZWEI Ziele am SELBEN Schlüssel
+   `z.id` (= `modell_schluessel`): den Graphen des Vergleichs-Reiters
+   (gr-sprung, Deep-Link ?modell=…&band=…, unverändert) UND die Modell-
+   Zeile des Katalogs (gr-ksprung, data-modell - app.js schaltet den
+   Katalog-Reiter auf, legt Filter und Deckel frei und markiert die Zeile).
+   Ein Modell OHNE Katalog-Zeile (reines Bündel ohne Listung) bekommt den
+   Link nicht, sondern die benannte Zeile „nicht im Katalog" - die Lücke
+   ist die Aussage, kein toter Sprung. #}
+{% macro modellzeile(z, nr, rest=False, spitze=False, katalog_ids=(),
+                     zr_ids=()) %}
   {# Dieselbe Zeilenmechanik wie die Alarmtabelle: Sortierrohwerte als
      data-s-* an der ZEILE (CLAUDE.md: "1.099,90 €" ist als Zeichenkette
      kleiner als "199,00 €"), Aufklappzeile als Partner über data-auf.
@@ -56,9 +95,20 @@
       data-s-vf="{{ z.vf_gesamt if z.vf_gesamt is not none else '' }}"
       data-s-abgerufen="{{ z.abgerufen_am }}" tabindex="0">
     <td><span class="gr-a-modell">{{ z.titel }}</span>
-      {% if z.speicher_klein %}<span class="gr-a-klein">{{ z.speicher_klein }}</span>{% endif %}</td>
+      {% if z.speicher_klein %}<span class="gr-a-klein">{{ z.speicher_klein }}</span>{% endif %}
+      {# P4 Schritt 2c: der zweite Sprung desselben Modells - in dessen
+         KATALOG-Zeile (gleicher `modell_schluessel` wie data-modell des
+         Links). `gr-ksprung`, NICHT `gr-sprung`: der bestehende
+         gr-sprung-Delegat von app.js waehlt die ZEITREIHE - dieser Link
+         hat sein eigenes Ziel (tafel-katalog, Zeile freilegen, markieren).
+         Ohne Katalog-Zeile heisst die Zeile ehrlich „nicht im Katalog"
+         (reines Bündel-Modell ohne Listung). #}
+      {% if katalog_ids and z.id in katalog_ids %}
+      <a class="gr-ksprung" href="geraete.html#katalog" data-modell="{{ z.id }}"
+         >im Katalog&nbsp;→</a>
+      {% else %}<span class="gr-a-klein">nicht im Katalog</span>{% endif %}</td>
     <td class="num">{% if z.prozent is not none %}
-      <span class="gr-a-prozent wr-prozent{{ ' wr-prozent--negativ' if z.prozent < 0 else ' wr-prozent--positiv' }}">{{ z.prozent_text }} %</span>
+      <span class="gr-a-prozent wr-prozent{{ ' wr-prozent--negativ' if z.prozent < 0 else ' wr-prozent--positiv' }}{% if spitze %} wr-prozent--spitze{% endif %}">{{ z.prozent_text }} %</span>
       <span class="gr-a-euro">{{ z.euro_text }} €</span>
       {% else %}<span class="gr-a-klein">{{ z.luecke }}</span>{% endif %}</td>
     <td>{% if z.anbieter %}{{ z.anbieter }}
@@ -77,20 +127,36 @@
        JavaScript als Seitenaufruf; app.js fängt den Klick ab und springt
        in-page (Reiter umschalten, Modell und Band wählen, zum Graphen
        scrollen). Ohne vergleichbares Paar bleibt das Band weg - der Graph
-       wählt selbst sein erstes erlaubtes Band. #}
-    <td><a class="gr-sprung" href="geraete.html?modell={{ z.id }}{% if z.sprung_band %}&amp;band={{ z.sprung_band }}{% endif %}"
+       wählt selbst sein erstes erlaubtes Band.
+
+       P4-Fix (Sicht-Pruefung 18.09.): FAIL-CLOSED. Bis hierher stand der
+       Link auf JEDER Zeile - kennt die Zeitreihe das Modell nicht (10
+       iPhone-18-Zeilen am 18.09., unter der Auto-Messtag-Schwelle), fiel
+       der Deep-Link still auf das STARTGERAET zurueck: der Klick zeigte
+       die Zahlen eines ANDEREN Geraets, ohne Meldung. Der Link steht nur
+       noch, wo die Wahl-Menge der Zeitreihe das Modell kennt (derselbe
+       `erlaubt`-Knoten, aus dem app.js waehlt - keine zweite Menge);
+       sonst nennt die Zeile die Luecke: "noch keine Zeitreihe" ist die
+       Aussage, kein toter Sprung. #}
+    <td>{% if z.id in zr_ids %}<a class="gr-sprung"
+      href="geraete.html?modell={{ z.id }}{% if z.sprung_band %}&amp;band={{ z.sprung_band }}{% endif %}"
            data-modell="{{ z.id }}"{% if z.sprung_band %} data-band="{{ z.sprung_band }}"{% endif %}
-           >im Graph ansehen&nbsp;→</a></td>
+           >im Graph ansehen&nbsp;→</a>{% else %}<span class="gr-a-klein"
+      >noch keine Zeitreihe</span>{% endif %}</td>
   </tr>
   <tr class="gr-a-auf{% if rest %} gr-a-rest{% endif %}" id="mw-{{ nr }}"><td colspan="7">
-    {# Die Detailzeile: die GANZE Gruppe - Vodafone-Basis und jede
-       Anbieter-Zeile aus `netzbetreiber_gruppen`, nichts weggedeckelt. #}
-    {% if z.vodafone %}
-    <p class="wr-basis">Vodafone-Basis: <b>{{ z.vodafone.gesamt | euro }}</b> TCO-24
-      ({{ z.vodafone.tarif }}, Band {{ z.vodafone.band_label }}{% if z.vodafone.naeherung %}, gerechnete Näherung{% endif %})</p>
-    {% else %}
-    <p class="wr-basis wr-basis--leer">{{ z.vodafone_grund }}</p>
-    {% endif %}
+    {# Die Detailzeile: die GANZE Gruppe - jede Anbieter-Zeile aus
+       `netzbetreiber_gruppen`, nichts weggedeckelt.
+
+       P4/D1 (18.09.2026): die Vodafone-Basis-Zeile („Vodafone-Basis:
+       … TCO-24 (…, Band …)") stand bis hierhin in JEDER Detailzeile -
+       am echten Bestand 48- bis 60-mal dieselbe Formel auf einer Tafel.
+       Sie ist EINE Legende ueber der Tabelle geworden (siehe
+       `wr-basis-legende` in der Sektion): der VF-Betrag je Anbieter-
+       Zeile („Band Klein · VF 1.949,80 €") ist DIESELBE Zahl, die die
+       Abweichung dieser Zeile gerechnet hat - die Tabelle trug ihre
+       Basis bisher doppelt. Die NAeherungs-Kennzeichnung der Referenz
+       lebt im Vergleichs-Reiter (E2-Zeitreihe, „Barkauf + Tarif"). #}
     <div class="gr-scroll">
     <table class="src-table wr-tabelle">
       <thead><tr><th>Anbieter</th><th>Tarif</th><th class="num">TCO-24</th>
@@ -148,28 +214,182 @@
   </tr>
 {% endmacro %}
 
+{# --- Wochenkarte der Preisbewegungen --------------------------------------
+   P4 Schritt 2a (STRATEGIE_GERAETE_V3, 18.09.2026): VON der Radar-Tafel
+   (dort war sie bis hierhin SEKTION 4, von der Schwesterseite dorthin
+   gezogen am 17.09.2026) in den REITER PREISVERLAUF der EINEN Geräteseite
+   verschoben - „letzte 14 Tage Preisbewegungen" ist ein Verlaufs-Thema
+   (design.md §3b: „Radars ‚Was diese Woche auffällt' ist ein
+   Preisverlauf-Thema und gehört in den Verlauf"). NUR verschoben: Markup,
+   Klassen und die ID #wr-bewegungen sind unveraendert, das Gatter bleibt
+   das eigene (`port.auffaellig.hat_daten` - unabhaengig vom Verlaufs-
+   Gatter, so hing es auch an der Radar-Tafel), der Aufruf steht in
+   geraete.html.j2 unterhalb der Verlaufs-Tabelle.
+
+   BEWUSST ohne `gr-r-sektion` und bewusst ZUGEKLAPPT (unverändert seit
+   E3 Schritt 3): die Karte ist eine Nachfrage, kein Einstieg - am echten
+   Bestand 26/53 px. #}
+{% macro wochenkarte(port) %}
+{% if port and port.auffaellig and port.auffaellig.hat_daten %}
+<section class="wr-sektion gr-nachschlag gr-auffaellig" id="wr-bewegungen">
+  <details class="gr-auf">
+    <summary>Was diese Woche auffällt – letzte {{ port.fenster_tage }}
+      Tage ({{ port.auffaellig.bewegungen | length }}
+      {{ 'Bewegung' if port.auffaellig.bewegungen | length == 1
+         else 'Bewegungen' }})</summary>
+    <div class="gr-auffaellig-karte">
+      <ul class="gr-saetze">
+        {% for s in port.auffaellig.saetze %}<li class="szl">{{ s }}</li>{% endfor %}
+      </ul>
+    </div>
+    {% if port.auffaellig.bewegungen %}
+    <div class="gr-scroll">
+    <table class="src-table gr-tabelle">
+      <thead><tr><th>Gerät</th><th>Anbieter</th><th class="num">vorher</th>
+        <th class="num">jetzt</th><th class="num">Δ</th><th>seit</th>
+        <th>Beleg</th></tr></thead>
+      <tbody>
+        {% for b in port.auffaellig.bewegungen %}
+        <tr>
+          <td>{{ b.modell }}</td><td>{{ b.anbieter }}</td>
+          <td class="num">{{ b.von | euro }}</td>
+          <td class="num">{{ b.auf | euro }}</td>
+          <td class="num gr-delta{{ ' gr-delta--runter' if b.delta < 0 else ' gr-delta--rauf' }}">
+            {{ '%+.2f'|format(b.delta) }} €</td>
+          <td>{{ b.datum | date_de }}</td>
+          <td>{% if b.url %}<a href="{{ b.url }}" rel="noopener">{{ b.url | domain }}</a>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    {% endif %}
+  </details>
+</section>
+{% endif %}
+{% endmacro %}
+
 {% macro radar_tafel(wr) %}
+
+{# P4 Schritt 2c (18.09.2026): die Schluessel der Katalog-Modellzeilen,
+   gelesen aus demselben `geraete`-Kontext, der die Katalog-Tafel rendert
+   (with-context-Import) - reine Montage, es wird keine zweite Modellmenge
+   gerechnet. Die Liste entscheidet in jeder Modell-Zeile, ob der
+   Katalog-Sprung (gr-ksprung) steht oder die benannte Luecke. #}
+{% set katalog_ids = (geraete.katalog_modelle or []) | map(attribute='schluessel') | list %}
+
+{# P4-Fix (Sicht-Pruefung 18.09.): die WAHL-MENGE der Zeitreihe, aus
+   DEMSELBEN erlaubt-Knoten gelesen, aus dem app.js waehlt (derselbe
+   with-context-Zugriff wie katalog_ids eine Zeile darueber; ohne
+   Zeitreihe bleibt die Menge leer und JEDER Graph-Sprung wird zur
+   benannten Luecke - fail closed, nie ein toter Link). Modelle mit
+   LEERER Baender-Liste scheiden aus - dieselbe Regel wie `zr_erlaubt`
+   im Katalog (geraete_view) und `daten.erlaubt` in app.js: nicht
+   waehlbar heisst nicht anspringbar. #}
+{% set zr_ids = ((geraete.zeitreihe.daten.erlaubt or {}).items()
+                 | selectattr('1') | map(attribute='0') | list) %}
 
 {# Der Export-Knopf des Radars steht NICHT hier, sondern - wie alle
    Export-Knöpfe der EINEN Seite - in deren Kopfzeile (O4-Regel: eine
    Stelle, nicht einer je Reiter; bis zur Abschaltung der Schwesterseite
    stand er in deren Hero). #}
 
-{# --- SEKTION 1: Preis-Alarme (Barpreis ohne Vertrag) ------------------- #}
+{# --- SEKTION 0 (P4/D1, 18.09.2026): DIE GRAFIK ---------------------------
+   „Wo sind wir teuer?" liest sich als BILD statt als 746-Zeilen-Wand
+   (design.md: Radar 100 % Tabelle, 0 % Grafik, 727 rote Elemente).
+   Servergerendertes SVG aus `geraete_radar.grafik()` - zwei Varianten
+   (schirm/mobil), kein Client-Rechnen; Balken = Euro-Abstand zum
+   Vodafone-Preis, Nulllinie = Vodafone, ROT genau der schärfste
+   Befund. Barpreis-Ebene wie die Alarmtabelle (nur vergleichbare
+   Neugeräte, ohne Vertrag). #}
+<section class="wr-sektion gr-r-sektion" id="wr-grafik">
+  <h3 class="gr-unter">Die größten Abstände zu Vodafone</h3>
+  {% if wr.grafik and wr.grafik.svg_breit %}
+  <div class="wr-grafik-bild">{{ wr.grafik.svg_breit | safe
+    }}{{ wr.grafik.svg_schmal | safe }}</div>
+  {# P4-Fix (Sicht-Pruefung 18.09., Kleineres 9): der Achsensatz ist ein
+     LABEL unter der Grafik, kein Absatz zwischen Leitzahl und Bild. Er
+     tragt seit diesem Fix auch die BETRAGS-Regel der Preis-Alarme (E3-B2)
+     - der Tafelkopf-Satz, der sie bis hierhin allein trug, ist gefallen
+     (Ruhe: vor dem ersten Datenelement steht nur die Leitzahl). Unter
+     200 Zeichen (design.md Regel 8, pruefe_portal _MAX_ABSATZ_NACH_SVG). #}
+  <p class="gr-achsenlabel">Balkenlänge = Abstand in Euro zum Vodafone-Preis
+  (Neugeräte, ohne Vertrag); negativ heißt: der Wettbewerber ist günstiger.
+  Die Preis-Alarme zeigen denselben Abstand als Betrag. Alle {{
+  wr.grafik.basis }} Modelle stehen in den Tabellen darunter.</p>
+  {% else %}
+  <p class="gr-erklaer">{{ wr.grafik.leer_grund if wr.grafik else
+    'Noch keine vergleichbaren Barpreise erhoben.' }}</p>
+  {% endif %}
+</section>
+
+{# --- P4 Schritt 2b (18.09.2026): DER SORTIMENTS-AUFKLAPPER ---------------
+   Von der Katalog-Tafel HIERHER verschoben (design.md §3c: „Katalogs
+   Aufklapper ‚Bei Wettbewerbern gelistet, bei Vodafone nicht (29)' ist
+   Radar-Material im Katalog"). Umgezogen, nicht kopiert: Markup,
+   Klassen und die ID #gr-sortiment sind unverändert, er steht GENAU
+   EINMAL auf der Seite (der Dopplungsschutz-Test kehrt mit). Zugeklappt
+   bleibt er eine Nachfrage unter der Grafik - dieselbe Bauform wie der
+   Lifecycle-Nachschlag am Tafelende. #}
+{% if wr.ohne_vodafone %}
+<p class="gr-erklaer gr-sortiment-satz">Diese Geräte führen nur
+Wettbewerber im Regal, Vodafone keins von beiden – der ab-Preis nennt
+den günstigsten Anbieter, der sie führt.</p>
+<details class="gr-auf" id="gr-sortiment">
+  <summary>Bei Wettbewerbern gelistet, bei Vodafone nicht
+    ({{ wr.ohne_vodafone_gesamt }})</summary>
+  <ul class="gr-v-liste">
+    {% for l in wr.ohne_vodafone %}
+    <li><span class="szl">{{ l.modell }}</span>
+      {% if l.speicher %}<span class="gr-v-meta">{{ l.speicher }} GB</span>{% endif %}
+      <span class="gr-v-prozent">ab {{ l.ab_preis | euro }}</span>
+      <span class="gr-v-datum">{{ l.anzahl }} {{ 'Anbieter' if l.anzahl == 1
+        else 'Anbieter' }}</span>
+      <a href="{{ l.anbieter[0].url }}" rel="noopener">{{ l.anbieter[0].laden
+        }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% if wr.ohne_vodafone_gesamt > wr.ohne_vodafone | length %}
+  <p class="gr-v-meta">{{ wr.ohne_vodafone_gesamt }} insgesamt.</p>
+  {% endif %}
+</details>
+{% endif %}
+
+{# --- SEKTION 1: Preis-Alarme (Barpreis ohne Vertrag) -------------------
+   P4/D1: die TABELLE steht im AUFKLAPPER unter der Grafik - die vier
+   Stufen-Chips bleiben als Kennzahlen offen darüber. Nichts ist
+   gestrichen: Filter, Suche, Sortierung und alle Zeilen sind weiterhin
+   da, ein Klick weiter. Der Aufklapper ist OFFEN, wenn es keine
+   Alarmzeile gibt - der Leer-Satz ist die Aussage der Sektion und darf
+   nicht hinter einem Klick verschwinden. #}
+{# P4/D4 (STRATEGIE_GERAETE_V3, 18.09.2026): der Sektions-Erklärsatz ist
+   GEFALLEN. Er stand unmittelbar vor den Alarm-Chips - dem ERSTEN
+   Datenelement des Reiters - und war damit der zweite Satz nach dem
+   Tafelkopf (Falz-Regel: vor dem ersten Datenelement höchstens EIN Satz;
+   design.md zählt ihn als Streichkandidaten). Die h3 nennt die Frage
+   („Preis-Alarme – Barpreis ohne Vertrag"), die Stufen-Chips nennen ihre
+   Schwellen selbst, und die Spaltenköpfe der Tabelle nennen, was in den
+   Spalten steht. Der gekürzte Tafelkopf-Satz (geraete.html.j2) erklärt
+   die Betrags-Regel der Alarme weiterhin. #}
 {% if wr.alarme.hat_daten or wr.alarme.kacheln %}
 <section class="wr-sektion gr-r-sektion" id="wr-alarme">
   <h3 class="gr-unter">Preis-Alarme – Barpreis ohne Vertrag</h3>
-  <p class="gr-erklaer">Bei diesen Geräten liegt ein Wettbewerber im
-  Gerätepreis unter Vodafone – mit Abstand in Prozent und Euro, dem
-  günstigsten Anbieter mit Namen und dem Beleg dazu. Vier Stufen sortieren
-  die Meldungen.</p>
   <ul class="gr-chips" aria-label="Preis-Alarme">
     {% for k in wr.alarme.kacheln %}
     <li class="gr-chip gr-chip--{{ k.schluessel }}"><b>{{ k.zahl }}</b>
       <span>{{ k.name }}</span> <em>{{ k.schwelle }}</em></li>
     {% endfor %}
   </ul>
-  {{ alarmtafel(wr.alarme) }}
+  {% set spitze_key = wr.grafik.spitze.schluessel
+     if (wr.grafik and wr.grafik.spitze) else none %}
+  <details class="gr-auf"{% if not wr.alarme.gesamt %} open{% endif %}>
+    <summary>{% if wr.alarme.gesamt %}Alle {{ wr.alarme.gesamt }}
+      Alarm-Zeilen – filterbar, sortierbar, je Zeile der Beleg{% else
+      %}Die Alarm-Tabelle (leer – kein Wettbewerber ist günstiger){% endif
+      %}</summary>
+    {{ alarmtafel(wr.alarme, spitze_key) }}
+  </details>
 </section>
 {% endif %}
 
@@ -182,14 +402,35 @@
    Modelle mit Bündeldaten erhoben"), sobald die Liste leer ist. #}
 <section class="wr-sektion gr-r-sektion" id="wr-abweichung">
   <h3 class="gr-unter">Alle Modelle nach Abweichung zu Vodafone</h3>
-  <p class="gr-erklaer">Gesamtkosten über 24 Monate (TCO-24): jede Zeile
-  ein Modell, gerechnet gegen Vodafone im selben Tarifband (Klein/Mittel/
-  Groß nach Datenvolumen). Oben stehen die Geräte, bei denen Vodafone am
-  stärksten zurückliegt; ein Klick auf eine Zeile zeigt alle Anbieter des
-  Modells. Welche Datenvolumen in welches Band fallen, steht in der
-  <a href="{{ prefix }}tarife.html">Tarifübersicht</a>.</p>
+  {# P4/D1: die Modell-Liste steht im AUFKLAPPER unter der Grafik - die
+     Frage des Reiters beantwortet zuerst das Bild, die Tabelle ist die
+     Nachfrage. Erklärsatz UND Tabelle wandern gemeinsam hinein (kein
+     Satz, der eine Tabelle ankündigt, die man nicht sieht); offen steht
+     der Aufklapper im Leerzustand (E5-Regel: der benannte Leerzustand
+     ist die Aussage, kein Klickfall). #}
   {% set ml = wr.modelliste %}
   {% if ml.zeilen %}
+  {# ROT-DECKEL (design.md Regel 4): die Spitzen-Markierung traegt die
+     ERSTE vergleichbare Zeile - die Liste steht nach Abweichung
+     sortiert da, ihre erste Zahl IST der schärfste TCO-Befund. #}
+  {% set spitze_id = ml.sichtbar[0].id
+     if (ml.sichtbar and ml.sichtbar[0].prozent is not none) else '' %}
+  <details class="gr-auf">
+    <summary>Alle {{ ml.gesamt }} Modell-Zeilen öffnen (TCO-24)</summary>
+    <p class="gr-erklaer">Gesamtkosten über 24 Monate (TCO-24): jede Zeile
+    ein Modell, gerechnet gegen Vodafone im selben Tarifband (Klein/Mittel/
+    Groß nach Datenvolumen). Oben stehen die Geräte, bei denen Vodafone am
+    stärksten zurückliegt; ein Klick auf eine Zeile zeigt alle Anbieter des
+    Modells. Welche Datenvolumen in welches Band fallen, steht in der
+    <a href="{{ prefix }}tarife.html">Tarifübersicht</a>.</p>
+    {# P4/D1: DIE EINE Vodafone-Basis-Legende. Bis hierhin stand der Satz
+       „Vodafone-Basis: … TCO-24 (…, Band …)" als wr-basis-Absatz in
+       JEDER Detailzeile - 48- bis 60-mal dieselbe Formel. Der VF-Betrag
+       steht je Anbieter-Zeile selbst („Band Klein · VF 1.949,80 €"),
+       diese Legende sagt, was er bedeutet. #}
+    <p class="wr-basis-legende">Abweichung je Zeile = Wettbewerber-TCO-24
+    gegen die Vodafone-Karte im selben Tarifband; „VF" in den Detailzeilen
+    nennt diese Basis.</p>
   <div class="gr-alarm-scroll">
   <table class="gr-alarm wr-modelliste">
     <thead><tr>
@@ -209,8 +450,10 @@
       <th scope="col"><span class="gr-s-th">Graph</span></th>
     </tr></thead>
     <tbody>
-      {% for z in ml.sichtbar %}{{ modellzeile(z, loop.index) }}{% endfor %}
-      {% for z in ml.rest %}{{ modellzeile(z, 'r' ~ loop.index, True) }}{% endfor %}
+      {% for z in ml.sichtbar %}{{ modellzeile(z, loop.index, False,
+        z.id == spitze_id, katalog_ids=katalog_ids, zr_ids=zr_ids) }}{% endfor %}
+      {% for z in ml.rest %}{{ modellzeile(z, 'r' ~ loop.index, True,
+        katalog_ids=katalog_ids, zr_ids=zr_ids) }}{% endfor %}
     </tbody>
   </table>
   </div>
@@ -218,6 +461,7 @@
   <p class="gr-erklaer"><button type="button" class="gr-knopf" id="gr-wmehr"
     >alle {{ ml.gesamt }} anzeigen</button></p>
   {% endif %}
+  </details>
   {% else %}
   <p class="gr-erklaer">Noch keine Modelle mit Bündeldaten erhoben – die
   Liste füllt sich mit dem nächsten Lauf.</p>
@@ -289,52 +533,6 @@
   {% endif %}
 </section>
 
-{# --- SEKTION 4: Wochenkarte der Preisbewegungen --------------------------
-   E3 Schritt 3 (17.09.2026): von der abgeschalteten Schwesterseite
-   hierher gezogen. BEWUSST ohne `gr-r-sektion` und bewusst ZUGEKLAPPT:
-   die drei S3-Sektionen oben bleiben die sichtbaren Köpfe der Tafel
-   (Antonios „komischer unterer Abschnitt ganz unten" galt genau einer
-   Sektion ohne erkennbaren Rang); die Wochenkarte ist eine Nachfrage,
-   kein Einstieg - am echten Bestand 26/53 px. #}
-{% set port = wr.portfolio %}
-{% if port and port.auffaellig and port.auffaellig.hat_daten %}
-<section class="wr-sektion gr-nachschlag gr-auffaellig" id="wr-bewegungen">
-  <details class="gr-auf">
-    <summary>Was diese Woche auffällt – letzte {{ port.fenster_tage }}
-      Tage ({{ port.auffaellig.bewegungen | length }}
-      {{ 'Bewegung' if port.auffaellig.bewegungen | length == 1
-         else 'Bewegungen' }})</summary>
-    <div class="gr-auffaellig-karte">
-      <ul class="gr-saetze">
-        {% for s in port.auffaellig.saetze %}<li class="szl">{{ s }}</li>{% endfor %}
-      </ul>
-    </div>
-    {% if port.auffaellig.bewegungen %}
-    <div class="gr-scroll">
-    <table class="src-table gr-tabelle">
-      <thead><tr><th>Gerät</th><th>Anbieter</th><th class="num">vorher</th>
-        <th class="num">jetzt</th><th class="num">Δ</th><th>seit</th>
-        <th>Beleg</th></tr></thead>
-      <tbody>
-        {% for b in port.auffaellig.bewegungen %}
-        <tr>
-          <td>{{ b.modell }}</td><td>{{ b.anbieter }}</td>
-          <td class="num">{{ b.von | euro }}</td>
-          <td class="num">{{ b.auf | euro }}</td>
-          <td class="num gr-delta{{ ' gr-delta--runter' if b.delta < 0 else ' gr-delta--rauf' }}">
-            {{ '%+.2f'|format(b.delta) }} €</td>
-          <td>{{ b.datum | date_de }}</td>
-          <td>{% if b.url %}<a href="{{ b.url }}" rel="noopener">{{ b.url | domain }}</a>{% endif %}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    </div>
-    {% endif %}
-  </details>
-</section>
-{% endif %}
-
 {# --- SEKTION 5: Lifecycle ------------------------------------------------
    Ebenfalls von der Schwesterseite gezogen (O3 hatte die Portfolio-
    Tafel der Geräteseite dorthin verlegt; seit der Abschaltung ist
@@ -345,7 +543,15 @@
    das alte Sprungziel der Geräteseite und lebt hier weiter (app.js
    schaltet den Reiter). Die Deckel stehen im Modul
    (`geraete_view.LIFECYCLE_SICHTBAR` / `NACHFOLGER_SICHTBAR`), nicht
-   in der Vorlage. #}
+   in der Vorlage.
+
+   P4/2a: Das `{% set port %}` stand bis hierhin IM Kopf der (jetzt
+   verschobenen) Wochenkarten-Sektion; diese Sektion las es mit. Ohne
+   das set waere `port` undefiniert und der If-Zaehler darunter
+   schlaege STILL fehl - die ganze Lifecycle-Sektion verschwende ohne
+   Fehlermeldung. Deshalb steht es jetzt HIER, an der Sektion, die es
+   liest. #}
+{% set port = wr.portfolio %}
 {% if port and port.lifecycle and (port.lifecycle.hinweis or port.lifecycle.portfolio
                                   or port.lifecycle.dauern or port.lifecycle.trends
                                   or port.lifecycle.nachfolger) %}

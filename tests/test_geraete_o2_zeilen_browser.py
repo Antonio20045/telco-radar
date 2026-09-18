@@ -308,7 +308,11 @@ def test_der_zeilen_aufklapper_oeffnet_ohne_netzwerk(seite):
         ergebnis = seite.evaluate("""() => {
           const z = document.querySelector('#gr-bndliste .gr-bnd');
           if (!z) return null;
-          z.open = true;
+          // P4-Fix (Sicht-Pruefung 18.09.): Rechenweg-Montage beim
+          // OEFFNEN - summary.click() ist der Nutzerweg (die Montage
+          // laeuft im click-Delegaten, das Oeffnen ist die Default-
+          // Action desselben Klicks).
+          z.querySelector('summary').click();
           const rw = z.querySelector('.gr-bnd-rw');
           return {sichtbar: !!rw.offsetParent,
                   hoehe: Math.round(rw.getBoundingClientRect().height)};
@@ -325,6 +329,72 @@ def test_der_zeilen_aufklapper_oeffnet_ohne_netzwerk(seite):
         f"der Rechenweg hat nur {ergebnis['hoehe']} px Höhe"
     assert anfragen == [], \
         f"das Öffnen hat Netzwerkanfragen ausgelöst: {anfragen}"
+
+
+def test_der_rechenweg_wird_erst_beim_oeffnen_montiert(seite):
+    """P4-Fix (Sicht-Pruefung 18.09., Kriterium 13 / FM 4): der Aufklapp-
+    Inhalt der Bündel-Zeilen steht im <template> und wird ERST BEIM
+    ÖFFNEN montiert. Bis hierher zählte der Rechenweg-Text mit zum
+    Fließtext-Deckel des Vergleichs-Reiters (18 048 von 6000 erlaubten
+    Zeichen - der Deckel war das einzige rote Kriterium der Abnahme).
+    Drei Zusicherungen: (1) das Montageziel ist im Server-HTML LEER,
+    (2) die Vorlage trägt den Inhalt, (3) der summary-Klick füllt das
+    Ziel - reine Montage, keine Zahl entsteht im Client."""
+    vor = seite.evaluate("""() => {
+      // Eine Zeile mit NOCH LEEREM Montageziel suchen - die modulweite
+      // Fixture kann aus frueheren Tests schon montierte Zeilen tragen.
+      for (const k of document.querySelectorAll('#gr-bndliste .gr-bnd')) {
+        const rw = k.querySelector('.gr-bnd-rw');
+        if (rw && rw.textContent.trim() === '') {
+          const tpl = k.querySelector('template.gr-bnd-rw-vorlage');
+          return {idx: k.dataset.anbieter,
+                  vorlageZeichen: tpl
+                    ? tpl.content.textContent.trim().length : 0,
+                  offen: k.open};
+        }
+      }
+      return null;
+    }""")
+    if vor is None:
+        # Alle Zeilen bereits montiert (Modulzustand): frisch laden.
+        seite.reload(wait_until="load")
+        vor = seite.evaluate("""() => {
+          const k = document.querySelector('#gr-bndliste .gr-bnd');
+          if (!k) return null;
+          const rw = k.querySelector('.gr-bnd-rw');
+          const tpl = k.querySelector('template.gr-bnd-rw-vorlage');
+          return {idx: k.dataset.anbieter,
+                  vorlageZeichen: tpl
+                    ? tpl.content.textContent.trim().length : 0,
+                  offen: k.open};
+        }""")
+    assert vor is not None, "keine Bündelzeile - der Test prüft nichts"
+    assert not vor["offen"], "die gemessene Zeile steht schon offen"
+    assert vor["vorlageZeichen"] > 200, \
+        f"die Vorlage ist zu duenn ({vor['vorlageZeichen']} Z) - " \
+        "der Test misst einen leeren Rechenweg"
+
+    nach = seite.evaluate("""() => {
+      // Dieselbe Auswahl wie im vor-Schritt: erste Zeile mit leerem Ziel.
+      for (const k of document.querySelectorAll('#gr-bndliste .gr-bnd')) {
+        const rw = k.querySelector('.gr-bnd-rw');
+        if (rw && rw.textContent.trim() === '') {
+          k.querySelector('summary').click();
+          return {zeichen: rw.textContent.trim().length,
+                  offen: k.open,
+                  posten: rw.querySelectorAll('.gr-tposten li').length};
+        }
+      }
+      return null;
+    }""")
+    seite.evaluate(
+        "() => document.querySelectorAll('.gr-bnd')"
+        ".forEach(z => { z.open = false; })")
+    assert nach is not None, "keine unmontierte Zeile für den Klick"
+    assert nach["offen"], "der Klick hat die Zeile nicht geöffnet"
+    assert nach["zeichen"] > 200, \
+        f"nach dem Öffnen nur {nach['zeichen']} Z im Ziel - nicht montiert"
+    assert nach["posten"], "montierter Rechenweg ohne Postenliste"
 
 
 # --------------------------------------------------------------------------

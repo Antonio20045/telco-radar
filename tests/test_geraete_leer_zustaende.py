@@ -258,15 +258,16 @@ def test_export_ohne_zeilen_nennt_die_null(leer):
     zu lassen (Modulkopf geraete_export: ein fehlender Download wäre die
     schlechtere Auskunft als ein leerer). Bis P3 waren es vier Dateien,
     der Katalog auf Modellebene hat zwei weitere gebracht (eine je
-    Ansicht)."""
-    links = leer.select("section.page-hero a[href^='exporte/']")
+    Ansicht). Seit P4/D4 (18.09.2026) stehen die Links in der FUSSZEILE
+    (.gr-export-fuss), nicht mehr im Kopf - auch im Leerzustand."""
+    links = leer.select("section.gr-export-fuss a[href^='exporte/']")
     assert len(links) == len(DATEIEN), (
         f"{len(links)} Export-Links im Leerzustand - {len(DATEIEN)} Dateien "
         "gehören da hin")
     for a in links:
         assert "0" in a.get_text(), (
             f"Link ohne Null neben der Zeilenzahl: {a.get_text(strip=True)}")
-    # Vier Links, vier verschiedene Dateien - keine fehlt, keine doppelt.
+    # Sechs Links, sechs verschiedene Dateien - keine fehlt, keine doppelt.
     ziele = {a.get("href") for a in links}
     assert ziele == {f"exporte/{n}" for n in DATEIEN}, ziele
 

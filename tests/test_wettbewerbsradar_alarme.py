@@ -207,21 +207,30 @@ def test_die_geraeteseite_traegt_keine_alarmtabelle_mehr(tmp_path):
 
 
 # --------------------------------------------------------------------------
-# "Bei Wettbewerbern gelistet" - E3: im Gerätekatalog-Reiter der EINEN Seite
+# "Bei Wettbewerbern gelistet" - P4 Schritt 2b: im RADAR-Reiter der EINEN
+# Seite (bis E3: im Gerätekatalog-Reiter)
 # --------------------------------------------------------------------------
 
 def test_bei_wettbewerbern_gelistet_steht_im_geraetekatalog(tmp_path):
-    """E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d): EINE Seite, vier Reiter -
-    der Sortiments-Aufklapper steht im KATALOG-Reiter („nur bei
-    Wettbewerbern im Regal" ist die Komplementäraussage zu dessen
-    Tabelle) und nicht mehr auf der Schwesterseite: umgezogen, nicht
-    kopiert (§4.6)."""
+    """E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d) nagelte den Aufklapper auf
+    den KATALOG-Reiter. P4 Schritt 2b (STRATEGIE_GERAETE_V3, 18.09.2026)
+    kehrt diese Festnagelung BEWUSST: „Bei Wettbewerbern gelistet, bei
+    Vodafone nicht" ist Radar-Material (design.md §3c - der Katalog trug
+    die Lücken-Frage des Wettbewerb-Reiters) und steht seitdem unter der
+    Balkengrafik der RADAR-Tafel, gedeckt von Forderung 7 des Strategie-
+    Dokuments. Der Test war gegen den verschobenen Stand ROT
+    (Vorher-rot: Assert auf '#tafel-katalog #gr-sortiment' traf nicht
+    mehr) und dreht seither mit - der Funktionsname bleibt, damit die
+    Umbau-Genese lesbar bleibt."""
     seiten = _seite(tmp_path)
     geraete = _suppe(seiten, "geraete.html")
     abschnitt = geraete.select_one("#gr-sortiment")
     assert abschnitt is not None, "der Sortiments-Aufklapper fehlt"
-    assert geraete.select_one("#tafel-katalog #gr-sortiment") is not None, (
-        "der Aufklapper steht außerhalb des Katalog-Reiters")
+    assert geraete.select_one("#tafel-radar #gr-sortiment") is not None, (
+        "der Aufklapper steht außerhalb des Radar-Reiters (P4 Schritt 2b)")
+    assert geraete.select_one("#tafel-katalog #gr-sortiment") is None, (
+        "der Aufklapper steht noch im Katalog-Reiter - umgezogen, nicht "
+        "kopiert")
     text = _text(abschnitt)
     assert "Bei Wettbewerbern gelistet, bei Vodafone nicht" in text
     assert "iPhone 15" in text, "das nur-wettbewerbliche Gerät fehlt"
@@ -232,17 +241,20 @@ def test_bei_wettbewerbern_gelistet_steht_im_geraetekatalog(tmp_path):
 
 
 def test_der_aufklapper_steht_nicht_zweite_mal_auf_dem_radar(tmp_path):
-    """E3: dieselbe Aussage an zwei Orten wäre die Doppel-Darstellung aus
-    §4.6. Bis E3 Schritt 3 prüfte das die Schwesterseite; seit sie eine
-    Weiterleitung ist, ist der Dopplungsschutz am NEUEN Ort: der Aufklapper
-    steht GENAU EINMAL auf der EINEN Geräteseite - im Katalog-Reiter, und
-    nicht zusätzlich im Radar-Reiter."""
+    """Der Dopplungsschutz aus E3 kehrt mit dem Umzug (P4 Schritt 2b):
+    der Aufklapper steht GENAU EINMAL auf der EINEN Geräteseite - im
+    RADAR-Reiter, und nicht zusätzlich im Katalog-Reiter, der ihn bis
+    E3 trug. Bis P4 war dieser Test die Umkehrung (Radar verboten,
+    Katalog gefordert) und war gegen den verschobenen Stand ROT
+    (Vorher-rot dokumentiert)."""
     seiten = _seite(tmp_path)
     geraete = _suppe(seiten, "geraete.html")
     assert len(geraete.select("#gr-sortiment")) == 1, \
         "der Sortiments-Aufklapper steht nicht genau einmal auf der Seite"
-    assert geraete.select_one("#tafel-radar #gr-sortiment") is None, \
-        "der Aufklapper steht zusätzlich im Radar-Reiter (Doppel-Darstellung)"
+    assert geraete.select_one("#tafel-radar #gr-sortiment") is not None, \
+        "der Aufklapper fehlt im Radar-Reiter (P4 Schritt 2b)"
+    assert geraete.select_one("#tafel-katalog #gr-sortiment") is None, \
+        "der Aufklapper steht zusätzlich im Katalog-Reiter (Doppel-Darstellung)"
     # Die Alt-URL ist Weiterleitung und trägt keine Tafel-Inhalte mehr.
     alt = _suppe(seiten, "wettbewerbsradar.html")
     assert alt.select_one("#gr-sortiment") is None

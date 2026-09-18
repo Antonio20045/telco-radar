@@ -313,6 +313,20 @@ def _radar(site: Path) -> BeautifulSoup:
     return BeautifulSoup(str(tafel), "html.parser")
 
 
+def _verlauf(site: Path) -> BeautifulSoup:
+    """Die PREISVERLAUF-Tafel von geraete.html als eigene Suppe.
+
+    P4 Schritt 2a (STRATEGIE_GERAETE_V3, 18.09.2026): die Wochenkarte
+    „Was diese Woche auffällt" wohnt seit dem Verschieben in DIESEM
+    Reiter (zuvor vierte Sektion der Radar-Tafel). Dieselbe Bauform und
+    dieselbe Begruendung wie `_radar`: eine Text-Assertion gegen die
+    ganze Seite waere von jedem anderen Reiter zufaellig erfuellbar."""
+    suppe = _suppe(site, "geraete.html")
+    tafel = suppe.select_one("#tafel-verlauf")
+    assert tafel is not None, "#tafel-verlauf fehlt - Test prueft nichts"
+    return BeautifulSoup(str(tafel), "html.parser")
+
+
 # --------------------------------------------------------------------------
 # Die Seite entsteht
 # --------------------------------------------------------------------------
@@ -860,20 +874,28 @@ def test_eine_unbekannte_verfuegbarkeit_ist_kein_alarm(tmp_path):
     ohne dass irgendetwas fehlt.
 
     Seit P3 steht die Auskunft im ZEILEN-AUFKLAPPER des Modells, unter dem
-    Etikett "Bestand" (vorher: eigene "Verfügbar"-Spalte der Haupttabelle),
-    und die Pille heißt `gr-pille--unklar` (vorher `--unbekannt`, wofuer
-    es keine CSS-Regel gab - C2)."""
+    Etikett "Bestand". P4-Fix (Sicht-Prüfung 18.09., Kleineres 10): die
+    leere Angabe ist STILL - "keine Angabe" stand als Text-Pille 166-mal
+    auf der Tafel. Eine unbekannte Verfügbarkeit zeigt jetzt ein leises
+    "–" OHNE Pille (kein Alarm, kein Rauschen); eine ECHTE Aussage
+    (lieferbar, nicht lieferbar, vorbestellbar) bleibt Pille."""
     db = json.loads(json.dumps(_DB))
     db["listungen"][0]["verfuegbarkeit"] = "unbekannt"
     site = _baue(tmp_path, db=db)
     s = _suppe(site, "geraete.html")
-    pillen = [p for p in s.select("#gr-katalogtabelle .gr-k-listungen .gr-pille")
-              if "keine Angabe" in p.get_text()]
-    assert pillen, "die Fixture spannt den Fall nicht auf"
-    for p in pillen:
-        klassen = p.get("class") or []
-        assert "gr-pille--kritisch" not in klassen, klassen
-        assert "gr-pille--unklar" in klassen, klassen
+    zellen = [td for td in s.select(
+        "#gr-katalogtabelle .gr-k-listungen td")
+        if td.get_text(" ", strip=True) == "–"]
+    assert zellen, "die Fixture spannt den Fall nicht auf"
+    for td in zellen:
+        assert td.select_one(".gr-pille") is None, \
+            "die leere Bestands-Angabe ist keine Pille - sie alarmiert nicht"
+    # Gegenprobe am selben Bestand: eine BELEGTTE Verfügbarkeit bleibt
+    # Pille mit Wort (lieferbar) - die Stille trifft nur die Lücke.
+    pillen = [p.get_text(" ", strip=True) for p in s.select(
+        "#gr-katalogtabelle .gr-k-listungen .gr-pille")]
+    assert "lieferbar" in pillen, \
+        "Fixture ohne belegte Verfügbarkeit - die Gegenprobe misst nichts"
 
 
 def test_lifecycle_sagt_dass_die_datenbasis_duenn_ist(tmp_path):
@@ -1000,9 +1022,10 @@ def test_der_waechter_ist_fail_closed():
 
 
 def test_kein_satz_der_karte_nennt_eine_ungedeckte_zahl(tmp_path):
-    """Die Sperre am echten Datensatz."""
+    """Die Sperre am echten Datensatz. (P4/2a: Karte seit dem 18.09.2026
+    im Reiter Preisverlauf - greift dafuer ueber `_verlauf` zu.)"""
     site = _baue(tmp_path)
-    s = _radar(site)
+    s = _verlauf(site)
     daten = {abs(p["preis_ohne_vertrag"]) for p in _PUNKTE}
     daten |= {100.0, 1.0, 2.0, 10.0}
     # Die Zahlen der Eigennamen gehoeren dazu - sonst prueft dieser Test
@@ -1206,18 +1229,23 @@ def _punkt(preis, label="Modell · 256 GB", spalte="Apple", eigen=False,
 def test_alte_preisbewegung_steht_nicht_unter_diese_woche(tmp_path):
     """Befund 5: eine Änderung vom 9. März stand in der Augustausgabe unter
     „Was diese Woche auffällt" - und blieb dort, bis sich der Preis wieder
-    änderte."""
+    änderte.
+
+    P4 Schritt 2a (18.09.2026): Die Karte ist von der Radar-Tafel in den
+    REITER PREISVERLAUF verschoben - der Test griff sie bis dahin ueber
+    `_radar()` an und war gegen den verschobenen Stand ROT (Gegenprobe
+    leer), seither greift er sie ueber `_verlauf()` an."""
     root = tmp_path
     site = _baue(root)
     # Gegenprobe zuerst: mit frischen Punkten IST der Satz da.
-    assert _radar(site).select(".gr-saetze li")
+    assert _verlauf(site).select(".gr-saetze li")
 
     alt = [dict(p, datum="2026-03-02" if i == 0 else "2026-03-09")
            for i, p in enumerate(_PUNKTE)]
     (root / "data" / "state" / "geraete_preise.jsonl").write_text(
         "\n".join(json.dumps(p) for p in alt) + "\n", encoding="utf-8")
     render_site(site, root / "data" / "reports")
-    s = _radar(site)
+    s = _verlauf(site)
     # NUR der Abschnitt "Was diese Woche auffaellt" - so steht es im Namen
     # dieses Tests und in seiner Beschreibung. Bis zum 28.08.2026 suchte er
     # im GESAMTEN Seitentext; seit die Seite eine Vergleichssektion hat, die
@@ -1409,7 +1437,7 @@ def test_ohne_vorlauf_sagt_die_wochenkarte_was_sie_zeigt(tmp_path):
                  "datum": "2026-08-11", "preis_ohne_vertrag": 1449.0,
                  "verfuegbarkeit": "lieferbar", "quelle_url": "https://example.de/p"}]
     site = _baue(tmp_path, db=frisch, punkte=erstlauf)
-    s = _radar(site)
+    s = _verlauf(site)
     abschnitt = s.select_one(".gr-auffaellig")
     assert abschnitt is not None, "die Sektion fehlt ganz"
     saetze = [li.get_text(" ", strip=True) for li in abschnitt.select(".gr-saetze li")]
@@ -1555,11 +1583,15 @@ def test_die_zeile_ohne_guenstigeren_wettbewerber_steht_nicht_mehr_da(tmp_path):
 
 
 def test_was_vodafone_nicht_fuehrt_steht_als_eigener_befund(tmp_path):
-    """E3 (17.09.2026): der Aufklapper ist eine Sortiments-Aussage - im
-    Vier-Reiter-Gerüst der EINEN Seite (§1d) gehört sie in den KATALOG-
-    Reiter der Geräteseite, als Komplement zur Tabelle darüber. Der Pin
-    hier verhindert die stille Rückkehr auf die Schwesterseite (bis E3
-    stand er dort, O2-Entscheidung) und zugleich jede zweite Kopie."""
+    """E3 (17.09.2026): der Aufklapper ist eine Sortiments-Aussage.
+    P4 Schritt 2b (STRATEGIE_GERAETE_V3, 18.09.2026) zieht ihn in den
+    RADAR-Reiter unter die Balkengrafik - design.md §3c: „Katalogs
+    Aufklapper ‚Bei Wettbewerbern gelistet, bei Vodafone nicht (29)' ist
+    Radar-Material im Katalog". Der Pin hier (Nachfolger des Portfolio-
+    Pins vom 03.09., dann Katalog-Pins von E3) verhindert die stille
+    Rückkehr an jeden früheren Ort und zugleich jede zweite Kopie; er
+    war gegen den verschobenen Stand ROT (Vorher-rot: Eltern-Assert auf
+    #tafel-katalog) und dreht seitdem mit."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     geraete = _suppe(site, "geraete.html")
     luecke = geraete.select_one("#gr-sortiment")
@@ -1567,11 +1599,13 @@ def test_was_vodafone_nicht_fuehrt_steht_als_eigener_befund(tmp_path):
     text = luecke.get_text(" ", strip=True)
     assert "Bei Wettbewerbern gelistet, bei Vodafone nicht" in text
     assert "Galaxy S25 Ultra" in text
-    assert any(el.get("id") == "tafel-katalog" for el in luecke.parents), (
-        "der Aufklapper steht nicht im Katalog-Reiter")
-    radar = _radar(site)
-    assert radar.select_one(".gr-vergleich-luecke") is None, \
-        "der Aufklapper steht noch auf der Schwesterseite (E3: umgezogen)"
+    assert any(el.get("id") == "tafel-radar" for el in luecke.parents), (
+        "der Aufklapper steht nicht im Radar-Reiter (P4 Schritt 2b)")
+    assert not any(el.get("id") == "tafel-katalog" for el in luecke.parents), (
+        "der Aufklapper steht noch im Katalog-Reiter - umgezogen, nicht "
+        "kopiert")
+    assert geraete.select_one(".gr-vergleich-luecke") is None, \
+        "ein Rest der Schwesterseiten-Fassung steht noch auf der Seite"
 
 
 def test_die_abrufdaten_stehen_deutsch_nicht_als_iso(tmp_path):
@@ -1583,6 +1617,7 @@ def test_die_abrufdaten_stehen_deutsch_nicht_als_iso(tmp_path):
     gemessen = 0
     for s in seiten:
         for datum in s.select(".gr-a-klein, .gr-a-liste span, .gr-bnd-rw, "
+                              "template.gr-bnd-rw-vorlage, "
                               ".gr-haendlerzeile"):
             text = datum.get_text(strip=True)
             if not text or not text[0].isdigit():
@@ -1596,14 +1631,21 @@ def test_die_filterleiste_steht_bereit_und_zeigt_ihren_zuschnitt(tmp_path):
     """Marke, Modell und Speicher sind eine Auswahl; Zustand und Preisart
     sind es NICHT - der Vergleich zeigt ausschliesslich Neugeraete ohne
     Vertrag. Sie stehen deshalb als aktive Etiketten und nicht als
-    Auswahlfelder: ein Bedienelement, das nichts aendern kann, ist keins."""
+    Auswahlfelder: ein Bedienelement, das nichts aendern kann, ist keins.
+
+    P4/D1 (18.09.2026): die festen Etiketten tragen gr-filter--fest,
+    nicht mehr gr-filter--an - --an ist der AKTIV-Mark eines GESETZTEN
+    Filters (roter Hintergrund), und zwei dauerhaft rot flaechige
+    Etiketten waren Rot als Flaeche, kein Akzent (Rot-Deckel, design.md
+    Regel 4). Der Browser-Test des Aktiv-Marks
+    (test_ein_aktiver_filter_ist_rot_hinterlegt) bleibt unberuehrt."""
     site = _baue(tmp_path, db=_db_mit_vergleich())
     s = _radar(site)
     felder = [f.get("data-filter") for f in s.select("#wr-alarme [data-filter]")]
     assert felder == ["marke", "modell", "speicher", "suche"]
 
     fest = [e.get_text(" ", strip=True)
-            for e in s.select("#wr-alarme .gr-filter label.gr-filter--an")]
+            for e in s.select("#wr-alarme .gr-filter label.gr-filter--fest")]
     assert fest == ["Zustand: neu", "Preisart: ohne Vertrag"]
 
     # Jede Zeile traegt die Werte, nach denen gefiltert wird.
@@ -1637,7 +1679,7 @@ def test_jede_zahl_der_wochenkarte_steht_so_im_datensatz(tmp_path):
     import re
 
     site = _baue(tmp_path)
-    s = _radar(site)
+    s = _verlauf(site)
     abschnitt = s.select_one(".gr-auffaellig")
     assert abschnitt is not None, "die Wochenkarte fehlt"
     saetze = [li.get_text(" ", strip=True)
@@ -1695,9 +1737,10 @@ def test_die_geraeteseite_entsteht_ohne_jeden_netz_oder_modellaufruf(tmp_path,
     monkeypatch.setattr(httpx.Client, "request", _verboten, raising=False)
 
     site = _baue(tmp_path)
-    # O3: die Wochenkarte steht auf dem RADAR, die Tafeln auf der Geräte-
-    # seite - geprüft wird BEIDES (die Stufe rendert ohne Netz beide).
-    assert _radar(site).select_one(
+    # P4/2a: die Wochenkarte steht im REITER PREISVERLAUF (bis P4 auf dem
+    # Radar), die Tafeln auf der Geräteseite - geprüft wird BEIDES (die
+    # Stufe rendert ohne Netz beide).
+    assert _verlauf(site).select_one(
         ".gr-auffaellig .gr-saetze li") is not None
     assert _suppe(site, "geraete.html").select_one("#tafel-tco") is not None
 
@@ -2176,7 +2219,10 @@ def test_der_alarmreiter_traegt_keine_verfuegbarkeitsspalte(tmp_path):
 def test_ein_zustand_hat_auf_der_ganzen_seite_ein_wort(tmp_path):
     """Derselbe Zustand hiess in der Alarmtabelle „unbekannt" und im Katalog
     „keine Angabe". Zwei Woerter fuer eine Sache lesen sich wie zwei
-    Sachen."""
+    Sachen. P4-Fix (Sicht-Pruefung 18.09.): die unbekannte Verfuegbarkeit
+    ist jetzt UEBERALL stumm ("–", keine Pille) - ein Zustand, ein
+    Strich; Worte gibt es nur noch fuer belegte Aussagen, und die heissen
+    je Zustand genau einmal (lieferbar / nicht lieferbar / vorbestellbar)."""
     # Der Normalfall der Fixture ist "lieferbar" - dann gibt es die Pille
     # gar nicht, und der Test bewiese nichts.
     db = _db_mit(24, anbieter=_UEBER_DER_SCHWELLE)
@@ -2185,10 +2231,18 @@ def test_ein_zustand_hat_auf_der_ganzen_seite_ein_wort(tmp_path):
             listung["verfuegbarkeit"] = "unbekannt"
     site = _baue(tmp_path, db=db)
     suppe = _suppe(site, "geraete.html")
-    woerter = {p.get_text(" ", strip=True).lower()
-               for p in suppe.select(".gr-pille--unbekannt, .gr-pille--unklar")}
-    assert woerter, "keine Verfuegbarkeitspille gerendert - Test misst nichts"
-    assert len(woerter) == 1, f"zwei Woerter fuer einen Zustand: {woerter}"
+    # 1) Die unbekannte Verfuegbarkeit ist kein WORT mehr - nirgends.
+    assert "keine Angabe" not in suppe.get_text(" ", strip=True), \
+        "die leere Bestands-Angabe steht wieder als Wort da"
+    # 2) Jede sichtbare Verfuegbarkeits-Pille traegt EIN bekanntes Wort.
+    #    (Die ZUSTANDS-Pille derselben Tabelle - "neu" - ist eine andere
+    #    Spalte: --bestpreis/--mittel, nicht --gering/--kritisch/--unklar.)
+    woerter = {p.get_text(" ", strip=True).lower() for p in suppe.select(
+        ".gr-k-listungen .gr-pille--gering, .gr-k-listungen .gr-pille--kritisch"
+        ", .gr-k-listungen .gr-pille--unklar")}
+    assert woerter and woerter <= {"lieferbar", "nicht lieferbar",
+                                   "vorbestellbar"}, \
+        f"unbekanntes Wort in der Bestand-Spalte: {woerter}"
 
 
 def test_die_spaltenkoepfe_sind_sortierbar(tmp_path):
@@ -2306,7 +2360,7 @@ def test_unter_vier_wochen_vorlauf_zeigt_die_wochenkarte_keine_tabelle(tmp_path)
     assert not auf["ohne_vorlauf"], (
         "das ist der Erstlauf-Zweig, nicht der kurze Vorlauf")
 
-    abschnitt = _radar(site).select_one(".gr-auffaellig")
+    abschnitt = _verlauf(site).select_one(".gr-auffaellig")
     assert abschnitt is not None, "die Wochenkarte fehlt"
     saetze = [li.get_text(" ", strip=True) for li in abschnitt.select(".gr-saetze li")]
     assert saetze, "kein Satz in der Karte"
@@ -2344,7 +2398,7 @@ def test_ueber_vier_wochen_vorlauf_kommt_die_tabelle_zurueck(tmp_path):
     assert auf["bewegungen"], (
         "keine Bewegung im Datensatz - dann sagt der Test nichts darüber, "
         "ob die Tabelle zurückkommt")
-    abschnitt = _radar(site).select_one(".gr-auffaellig")
+    abschnitt = _verlauf(site).select_one(".gr-auffaellig")
     assert abschnitt.select_one("table") is not None, (
         "über der Schwelle gehört die Tabelle zurück")
 
@@ -2358,7 +2412,7 @@ def test_die_wochenkarte_schreibt_preise_mit_komma(tmp_path):
     import re
 
     site = _baue(tmp_path)
-    abschnitt = _radar(site).select_one(".gr-auffaellig")
+    abschnitt = _verlauf(site).select_one(".gr-auffaellig")
     text = " ".join(li.get_text(" ", strip=True)
                     for li in abschnitt.select(".gr-saetze li"))
     assert "€" in text, f"kein Betrag in der Karte: {text!r}"

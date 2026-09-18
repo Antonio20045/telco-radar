@@ -405,7 +405,11 @@ def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(_seite):
         "#gr-bndliste .gr-bnd[data-anbieter='congstar']"
         "[data-band='mittel']",
         """e => {
-          e.open = true;
+          // P4-Fix (Sicht-Pruefung 18.09.): der Rechenweg wird erst beim
+          // OEFFNEN aus dem <template> montiert - der SUMMARY-KLICK ist
+          // der Nutzerweg (programmatisches open=true traefe die Montage
+          // nur ueber das asynchrone toggle-Event).
+          e.querySelector('summary').click();
           const rw = e.querySelector('.gr-bnd-rw');
           return {
             bar: e.querySelector('.gr-bnd-bar').textContent,

@@ -71,9 +71,18 @@ def paar(tmp_path_factory):
 
 
 def _radar_zeigen(seite):
-    """Wie ein Klick auf den Reiter-Knopf - robust gegen Layout-Fragen."""
+    """Wie ein Klick auf den Reiter-Knopf - robust gegen Layout-Fragen.
+
+    P4/D1 (STRATEGIE_GERAETE_V3, 18.09.2026): die Modell-Liste steht
+    seit dem Design-Durchlauf IM AUFKLAPPER unter der Balkengrafik -
+    Sprung- und Zeilenklick-Tests oeffnen ihn hier, sonst wartet der
+    Klick auf eine unsichtbare Zeile."""
     seite.click('.gr-reiter button[data-tafel="tafel-radar"]')
     seite.wait_for_timeout(80)
+    auf = seite.query_selector("#wr-abweichung details.gr-auf:not([open])")
+    if auf:
+        auf.query_selector("summary").click()
+        seite.wait_for_timeout(60)
 
 
 def test_der_sprung_stellt_reiter_modell_und_band_ein(paar):
@@ -127,3 +136,107 @@ def test_alle_reiter_bleiben_ohne_js_fehler(paar):
     paar.click('.gr-reiter button[data-tafel="tafel-tco"]')
     paar.wait_for_timeout(80)
     assert not fehler, fehler
+
+
+# ==========================================================================
+# P4 SCHRITT 2c (STRATEGIE_GERAETE_V3, 18.09.2026): die ZWEITE Kante des
+# roten Fadens - Radar -> KATALOG -> Zeitreihe am EINEN Schluessel, und
+# der Ansichts-Deep-Link ?ansicht= (P3-Rest). Statische Haelfte:
+# tests/test_geraete_faden_schluessel.py.
+# ==========================================================================
+
+def test_der_katalog_sprung_legt_filter_und_zeile_frei(paar):
+    """Klick auf „im Katalog“ einer Radar-Modellzeile: der Katalog-Reiter
+    ist aktiv, die Zielzeile (derselbe `modell_schluessel` wie data-modell
+    des Links) ist SICHTBAR und markiert (.gr-k-ziel) - selbst unter
+    einem AKTIVEN Markenfilter, der sie sonst versteckt hätte. Der Sprung
+    legt Filter und Deckel frei, statt an einer unsichtbaren Zeile zu
+    enden."""
+    paar.goto(paar.url.split("#")[0].split("?")[0], wait_until="load")
+    # Filter am KATALOG setzen (Samsung), der Sprung zielt auf ein Apple-
+    # Modell - ohne Freilegen waere die Zeile versteckt.
+    paar.click('.gr-reiter button[data-tafel="tafel-katalog"]')
+    paar.select_option('#tafel-katalog select[data-filter="marke"]',
+                       label="Samsung")
+    _radar_zeigen(paar)
+    link = next(a for a in paar.query_selector_all(
+        "#wr-abweichung a.gr-ksprung[data-modell]")
+        if "apple" in a.get_attribute("data-modell"))
+    ziel = link.get_attribute("data-modell")
+    link.click()
+    paar.wait_for_timeout(250)
+    assert paar.eval_on_selector(
+        '.gr-reiter button[data-tafel="tafel-katalog"]',
+        "e => e.getAttribute('aria-selected')") == "true", \
+        "der Katalog-Reiter ist nach dem Sprung nicht aktiv"
+    sichtbar = paar.eval_on_selector(
+        f'#gr-katalogtabelle tr.gr-k-zeile[data-modell="{ziel}"]',
+        "e => !e.hidden && e.checkVisibility()")
+    assert sichtbar is True, \
+        f"Zielzeile {ziel} bleibt unter dem Filter unsichtbar"
+    markiert = paar.eval_on_selector(
+        f'#gr-katalogtabelle tr.gr-k-zeile[data-modell="{ziel}"]',
+        "e => e.classList.contains('gr-k-ziel')")
+    assert markiert is True, "die Zielzeile ist nicht markiert"
+    # Der Filter ist zurueckgesetzt - der Leser sieht, was die Tabelle
+    # gerade zeigt (dieselbe Regel wie der Filterleisten-Etikett-Satz).
+    wert = paar.eval_on_selector(
+        '#tafel-katalog select[data-filter="marke"]', "e => e.value")
+    assert wert == "", f"Markenfilter bleibt auf {wert!r} stehen"
+
+
+def test_der_katalog_graph_sprung_waehlt_das_modell(paar):
+    """Klick auf „im Graph ansehen“ an der KATALOG-Modellzeile: der
+    Vergleichs-Reiter ist aktiv und die URL traegt das GEWAEHLTE Modell -
+    der dritte Reiter der Kette am selben Schluessel."""
+    paar.goto(paar.url.split("#")[0].split("?")[0], wait_until="load")
+    paar.click('.gr-reiter button[data-tafel="tafel-katalog"]')
+    link = paar.query_selector(
+        "#gr-katalogtabelle tr.gr-k-zeile a.gr-sprung[data-modell]")
+    assert link is not None, \
+        "kein Graph-Sprung im Katalog der Fixture - der Test prueft nichts"
+    ziel = link.get_attribute("data-modell")
+    link.click()
+    paar.wait_for_timeout(400)
+    assert paar.eval_on_selector(
+        '.gr-reiter button[data-tafel="tafel-tco"]',
+        "e => e.getAttribute('aria-selected')") == "true", \
+        "der Vergleichs-Reiter ist nach dem Sprung nicht aktiv"
+    assert f"modell={ziel}" in paar.url, paar.url
+    # Das Suchfeld nennt das gewaehlte Modell (Kacheln sind nur
+    # Schnelleingang - das Ziel kann ausserhalb der 6 liegen).
+    feld = paar.eval_on_selector("#gr-zr-suche", "e => e.value")
+    assert feld and feld.strip(), "das Suchfeld nennt kein gewaehltes Modell"
+
+
+def test_ansicht_deep_link_schaltet_und_ueberlebt(paar):
+    """P3-Rest, P4 gebaut: ?ansicht=tco stellt die TCO-Ansicht beim Laden
+    her; der RUECKKnopf loescht den Parameter (barpreis ist die Grundfrage
+    und bleibt die kurze URL); ein Modellwechsel der Zeitreihe haelt ihn
+    stehen (bis P4 baute waehle() die URL neu auf und loeschte ihn)."""
+    basis = paar.url.split("/geraete.html")[0] + "/geraete.html"
+    paar.goto(basis + "?ansicht=tco", wait_until="load")
+    assert paar.eval_on_selector(
+        "#gr-katalogtabelle",
+        "e => e.classList.contains('gr-katalog--tco')") is True, \
+        "?ansicht=tco schaltet die TCO-Ansicht beim Laden nicht um"
+    assert paar.eval_on_selector(
+        '.gr-kansicht button[data-ansicht="tco"]',
+        "e => e.getAttribute('aria-pressed')") == "true"
+    paar.click('.gr-reiter button[data-tafel="tafel-katalog"]')
+    paar.click('.gr-kansicht button[data-ansicht="barpreis"]')
+    paar.wait_for_timeout(120)
+    assert "ansicht=" not in paar.url, \
+        f"ansicht-Parameter bleibt nach barpreis-Klick stehen: {paar.url}"
+    # Modellwechsel der Zeitreihe: modell/band kommen dazu, ansicht bleibt
+    paar.click('.gr-kansicht button[data-ansicht="tco"]')
+    paar.wait_for_timeout(80)
+    paar.click('.gr-reiter button[data-tafel="tafel-tco"]')
+    paar.wait_for_timeout(80)
+    paar.click("#gr-zr-baender button[data-band]:not([disabled])")
+    paar.wait_for_timeout(200)
+    assert "ansicht=tco" in paar.url, \
+        f"ansicht-Parameter geht beim Band-/Modellwechsel verloren: {paar.url}"
+    # Aufraeumen: URL ohne Parameter, damit nachfolgende Tests ein
+    # sauberes Startgeraett sehen (die Fixture hat Modulgueltigkeit).
+    paar.goto(basis, wait_until="load")

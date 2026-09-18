@@ -1007,7 +1007,7 @@ def _interleave_modelle_je_hersteller(modelle: list) -> list:
 
 
 def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
-                         buendel=None) -> list[dict]:
+                         buendel=None, zr_erlaubt: dict | None = None) -> list[dict]:
     """Der Katalog auf MODELL-Ebene: eine Zeile je (Geraet, Speicher).
 
     P3 (Strategie Geraete v3, 17.09.2026), Antonios Forderung 5 und 6: der
@@ -1038,6 +1038,16 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
     nichts uebergeben, stehen die TCO-Felder auf ihrem benannten Leerzustand
     (dieselbe Fehlertoleranz wie ueberall auf dieser Seite: ein kaputter
     TCO-Store darf den Katalog nicht kosten).
+
+    `zr_erlaubt` (P4 Schritt 2c, 18.09.2026) ist der `erlaubt`-Teil des
+    Zeitreihen-Knotens (`geraete_zeitreihe.aufbereiten()["daten"]
+    ["erlaubt"]`, gefiltert auf NICHT-LEERE Bänder-Listen) - dieselbe EINE
+    Quelle, aus der app.js waehlt. Sie entscheidet das Feld `zr` je Zeile:
+    True heisst "der Graph-Sprung der Zeitreihe trifft dieses Modell", und
+    nur dann rendert die Vorlage den Link. Der Katalog rechnet die
+    Erlaubnis NICHT selbst nach (zwei Rechnungen fuer dieselbe Menge
+    warden zwei Mengen, CLAUDE.md §6); ohne Parameter bleibt `zr` False -
+    fail-closed, ein fehlender Graph-Link ist ehrlicher als ein toter.
     """
     belege = geraete_tco_karten.barpreise(eintraege)
     buendel_je = _buendel_je_anbieter_modell(buendel, eintraege, katalog)
@@ -1132,6 +1142,13 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
 
         ergebnis.append({
             "schluessel": mid,
+            # P4 Schritt 2c: trifft der Graph-Sprung der Zeitreihe dieses
+            # Modell? (Siehe Docstring zu `zr_erlaubt` - gelesen, nie
+            # nachgerechnet.) Das Feld ist Teil des EINEN Schluesselraums:
+            # Katalog und Radar tragen denselben `modell_schluessel`, und
+            # `zr` sagt, ob der zweite Reiter (Vergleichs-Zeitreihe) zum
+            # selben Modell fuehrt.
+            "zr": bool(zr_erlaubt and zr_erlaubt.get(mid)),
             "device_id": gruppe["device_id"],
             "modell": gruppe["modell"],
             "hersteller": gruppe["hersteller"],
@@ -1321,6 +1338,11 @@ def leer(fehler: str = "") -> dict:
         "tco": geraete_tco_view.leer(),
         "zeitreihe": geraete_zeitreihe.leer(),
         "katalog_modelle": [],
+        # P4-Fix (Sicht-Pruefung 18.09.): die Katalog-Leitzahl auch im
+        # Notzustand - der Schluesselmengen-Test haelt Normal- und Not-
+        # zustand gegeneinander, und die Vorlage fragt das Feld bedingungs-
+        # los ab (None laesst die Leitzahl weg, der Leer-Satz traegt).
+        "katalog_ab_preis": None,
         "katalog_sichtbar": KATALOG_SICHTBAR,
         "lifecycle_sichtbar": LIFECYCLE_SICHTBAR,
         "nachfolger_sichtbar": NACHFOLGER_SICHTBAR,
@@ -1619,6 +1641,32 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
                   type(exc).__name__, exc)
         zeitreihe = geraete_zeitreihe.leer()
 
+    # P4 Schritt 2c (18.09.2026): die WAHL-Menge der Zeitreihe (Modell ->
+    # nicht-leere Bänder-Liste), gelesen aus DEMSELBEN Knoten, aus dem
+    # app.js waehlt - der Katalog-Graph-Sprung darf nur stehen, wo der
+    # Sprung auch trifft. Ein Modell ohne Bündel oder unter der Auto-
+    # Messtag-Schwelle ist dort nicht waehlbar; sein Link waere ein toter.
+    zr_erlaubt = {k: b for k, b in
+                  ((zeitreihe.get("daten") or {}).get("erlaubt") or {}).items()
+                  if b}
+
+    # P4-Fix (Sicht-Pruefung 18.09., Falz 1): die Leitzahl des KATALOGS -
+    # der guenstigste Einzelgeraetepreis des Regals, EINE Rechnung an
+    # EINER Stelle (hier, aus denselben Modellzeilen, die die Tabelle
+    # rendert - die Vorlage zeigt, sie aggregiert nicht). Der Katalog war
+    # der einzige Reiter ohne Falz-Antwort: die groesste Schrift seiner
+    # Tafel war die h2. Modelle ohne Barpreis (nur im Buendel, alle 1&1)
+    # scheiden aus dem Minimum aus - ihr Buendel-Monatspreis ist keine
+    # zweite Waehrung fuer ein "ab".
+    katalog_modelle = katalog_modellzeilen(
+        bestand, katalog, (tco or {}).get("modelle"),
+        tco_db.buendel() if tco_db.lesbar
+        else _buendel_aus_listungen(bestand),
+        zr_erlaubt=zr_erlaubt)
+    katalog_ab_preis = min(
+        (m["ab_preis"] for m in katalog_modelle
+         if m.get("ab_preis") is not None), default=None)
+
     return {
         "tco": tco,
         "zeitreihe": zeitreihe,
@@ -1640,10 +1688,8 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         # `buendel()` wuerde still [] liefern, und die 1&1-Zeilen fielen
         # auf "ohne Preis" zurueck - DIE P3-REGEL gilt auch im Fehlerfall
         # (dieselbe Auffanglogik wie `lesbar=` zwei Aufrufe darueber).
-        "katalog_modelle": katalog_modellzeilen(
-            bestand, katalog, (tco or {}).get("modelle"),
-            tco_db.buendel() if tco_db.lesbar
-            else _buendel_aus_listungen(bestand)),
+        "katalog_modelle": katalog_modelle,
+        "katalog_ab_preis": katalog_ab_preis,
         "katalog_sichtbar": KATALOG_SICHTBAR,
         "lifecycle_sichtbar": LIFECYCLE_SICHTBAR,
         "nachfolger_sichtbar": NACHFOLGER_SICHTBAR,

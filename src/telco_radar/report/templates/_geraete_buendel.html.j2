@@ -62,7 +62,17 @@
       %}–{% endif %}</span>
     <span class="gr-bnd-chev" aria-hidden="true"></span>
   </summary>
-  <div class="gr-bnd-rw">
+  {# P4-Fix (Sicht-Pruefung 18.09., Kriterium 13 / FM 4): der Aufklapp-
+     Inhalt steht im <template> und wird von app.js ERST BEIM OEFFNEN
+     montiert (cloneNode, derselbe Weg wie der P1-Rechenweg-Pool). Die
+     19 Rechenwege dieses Modells trugen bis hierhin rund 18 000 der
+     Fliesstext-Zeichen der Vergleichstafel - mehr als der sechsfache
+     Text-Deckel; unsichtbar im template zaehlen sie nicht (pruefe_
+     portal `fliesstext_zeichen`). Der Container .gr-bnd-rw bleibt als
+     Montageziel und Selektor der Tests stehen, das Markup aendert sich
+     nicht - nur sein Ort. #}
+  <div class="gr-bnd-rw"></div>
+  <template class="gr-bnd-rw-vorlage">
   {% if k.belastbar %}
     <p class="gr-bnd-rw-z">{{ k.label }} {{ k.gesamt | euro }} · Ø {{
       k.schnitt_monat | euro }}/Monat</p>
@@ -232,7 +242,7 @@
       if k.abgerufen_am %} · abgerufen {{ k.abgerufen_am | date_de }}{% endif
       %}</p>{% endif %}
   {% endif %}
-  </div>
+  </template>
 </details>
 {% endmacro %}
 

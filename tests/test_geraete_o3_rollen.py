@@ -131,12 +131,19 @@ def test_tafel_portfolio_ist_weg(geraete):
     assert geraete.select_one("#tafel-portfolio") is None
     assert geraete.select_one(".gr-reiter [data-tafel='tafel-portfolio']") \
         is None, "ein fünfter Reiter-Knopf auf die tote Portfolio-Tafel"
-    # Die Portfolio-Sektionen stehen IM Radar-Reiter, nirgendwo sonst.
-    for anker in ("#lifecycle", "#wr-bewegungen"):
+    # Die Portfolio-Sektionen stehen je an ihrem Ort, nirgendwo sonst:
+    # Lifecycle im Radar-Reiter; die Wochenkarte #wr-bewegungen seit
+    # P4 Schritt 2a (STRATEGIE_GERAETE_V3, 18.09.2026) im REITER
+    # PREISVERLAUF - „letzte 14 Tage Preisbewegungen" ist eine Verlaufs-
+    # frage. Ihr alter Assert schrieb ihr den Radar-Ort fest und war
+    # gegen den verschobenen Stand ROT (Vorher-rot bewiesen), seither
+    # dreht er mit.
+    erwartet = {"#lifecycle": "tafel-radar", "#wr-bewegungen": "tafel-verlauf"}
+    for anker, tafel in erwartet.items():
         treffer = geraete.select(anker)
         assert len(treffer) == 1, f"{anker} steht {len(treffer)}x da"
-        assert any(el.get("id") == "tafel-radar" for el in
-                   treffer[0].parents), f"{anker} außerhalb des Radar-Reiters"
+        assert any(el.get("id") == tafel for el in
+                   treffer[0].parents), f"{anker} außerhalb von #{tafel}"
 
 
 def test_die_portfolio_abschnitte_stehen_auf_dem_radar(radar):
@@ -162,10 +169,16 @@ def test_die_portfolio_abschnitte_stehen_auf_dem_radar(radar):
             "Preisverfall-Überschrift ohne eine einzige Zeile dahinter"
 
 
-def test_was_diese_woche_auffaellt_steht_auf_dem_radar(radar):
-    """B4: Auch die Wochenkarte der Preisbewegungen gehört zur Markt-
-    übersicht, nicht zur Einzelgerät-Seite."""
-    text = " ".join(radar.get_text(" ", strip=True).split())
+def test_was_diese_woche_auffaellt_steht_im_preisverlauf(geraete):
+    """B4, P4-Fassung (18.09.2026): Die Wochenkarte der Preisbewegungen
+    („letzte 14 Tage") ist eine VERLAUFS-Frage und steht seit P4
+    Schritt 2a im Reiter Preisverlauf - bis dahin war sie die vierte
+    Sektion der Radar-Tafel, und ihr damaliger Test hier schrieb ihr
+    genau DEN Ort fest (er war gegen den verschobenen Stand ROT,
+    Vorher-rot bewiesen)."""
+    tafel = geraete.select_one("#tafel-verlauf")
+    assert tafel is not None, "#tafel-verlauf fehlt - Test prüft nichts"
+    text = " ".join(tafel.get_text(" ", strip=True).split())
     assert "Was diese Woche auffällt" in text
 
 
@@ -198,13 +211,26 @@ def test_je_radar_gruppe_ein_querlink_mit_deep_link(radar, geraete):
                 not in ids_selektor]
     assert not fehlende, \
         f"Querlinks auf Modell-IDs außerhalb des Selektors: {fehlende[:5]}"
-    # JEDE Modell-Zeile trägt ihren Sprung - sichtbare wie die hinter dem
-    # Aufklapper (alle stehen im DOM, der Deckel kappt nur die Ansicht).
+    # JEDE Modell-Zeile trägt ihren Sprung ODER die benannte Luecke -
+    # sichtbare wie die hinter dem Aufklapper (alle stehen im DOM, der
+    # Deckel kappt nur die Ansicht).
+    #
+    # P4-Fix (Sicht-Pruefung 18.09.): bis hierher verlangte der Test einen
+    # Link auf JEDER Zeile - das war die Vor-P4-Welt, und sie WAR der
+    # vorbestehende Rot ("iPhone-18-Querlinks"): 10 Zeilen der echten
+    # Seite verlinkten Modelle ausserhalb des Selektors, der Deep-Link
+    # fiel still aufs Vorgabegeraet. Der Link steht seit dem Fix nur auf
+    # der Wahlmenge (der erste Assert dieses Tests), jede Zeile ausserhalb
+    # nennt die Luecke "noch keine Zeitreihe" - keinen dritten Zustand.
     zeilen = radar.select("#wr-abweichung tr.gr-a-zeile[data-auf]")
     assert zeilen, "keine Modell-Zeile im Radar - der Test prüft nichts"
     ohne = [z.get("data-auf") for z in zeilen
-            if z.select_one("a.gr-sprung") is None]
-    assert not ohne, f"{len(ohne)} Modell-Zeilen ohne Sprung in den Graphen"
+            if z.select_one("a.gr-sprung") is None
+            and "noch keine Zeitreihe" not in " ".join(
+                (z.select("td")[-1].get_text(" ", strip=True)
+                 if z.select("td") else "").split())]
+    assert not ohne, \
+        f"{len(ohne)} Modell-Zeilen ohne Sprung und ohne benannte Lücke"
 
 
 # --------------------------------------------------------------------------

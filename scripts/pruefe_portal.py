@@ -207,6 +207,122 @@ def _haeufigster_absender(site: Path) -> str:
 # 18.412 px hoch.
 _MAX_REITERHOEHE = 3000
 
+# ---- Fliessttext-Deckel je Reiter der Geraeteseite (P4/D3, 18.09.2026).
+# FM 4 der Strategie: "Text kriecht zurueck" - Antonio: "Ich will keinen
+# Text sehen. Alles so unruhig." Gezaehlt wird der Leerraum-normalisierte
+# Text aller <p> EINER Tafel, INKLUSIVE Aufklapp-Text (details, JS-
+# Aufklappzeilen): FM 4 sagt ausdruecklich, der Preis-Klick (P1) sei der
+# Haertetest - "geraet er zum Textblock, ist FM 4 sofort zurueck", und ein
+# Deckel, der nur den ersten Bildschirm misst, saehe genau diesen
+# Rueckschlag nicht. Nie sichtbar und nicht gezaehlt: <template>-Inhalte
+# (der Rechenweg-Pool von P1 wird erst per Klick zum DOM montiert).
+# Die Grenzen sind am Befund des 17.09. kalibriert (design.md mass mit
+# derselben Menge: Vergleich 18 388 Z, Radar 8 359 Z - der Vor-P4-Stand,
+# als die Reiter Erklaerprosa trugen):
+#   Radar 6000: faellt mit der P4-Balkengrafik, die die 48-fache
+#     "Vodafone-Basis"-Zeile zu EINER Legende macht (-6 300 Z), auf rund
+#     2 600 Z - knapp gruen, weitere Prosa kippt.
+#   Preisverlauf 2500: der mit P2 gefallene 1813-Zeichen-Datenblock allein
+#     haette diesen Deckel zu drei Vierteln gefuellt - genau die Grenze,
+#     die einen zweiten solchen Block verbeugt.
+#   Katalog 2500: eine Tabelle, keine Erzaehlung; der Stand vom 18.09.
+#     liegt bei 377 Z.
+#   Vergleich 6000: traegt heute 18 100 Z, fast alles in den 20 Tarif-
+#     Rechenweg-Aufklappern (je ~500 Z "Gerechnet ueber ..." plus Posten).
+#     Der Reiter wird erst gruen, wenn dieser Text dem P1-Panel-Weg als
+#     <template> folgt oder gekuerzt ist - der Deckel zeigt den Hebel,
+#     das ist seine Aufgabe (die Entscheidung steht beim Lead/P5, nicht
+#     in diesem Kriterium).
+_FLIESSTEXT_DECKEL = {
+    "tafel-tco": 6000,
+    "tafel-radar": 6000,
+    "tafel-verlauf": 2500,
+    "tafel-katalog": 2500,
+}
+_REITER_NAMEN = {
+    "tafel-tco": "Vergleich",
+    "tafel-radar": "Radar",
+    "tafel-verlauf": "Preisverlauf",
+    "tafel-katalog": "Katalog",
+}
+# design.md Regel 8: "Kein Fliesstblock unter Grafiken" - Kurvendaten
+# gehoeren in Tooltip/Legende, nicht in Text. Der 1813-Zeichen-Datenblock
+# unter dem (mit P2 gefallenen) G2-Graph war der Fall; 200 Zeichen lassen
+# eine Bildunterschrift zu, aber keinen Datenblock.
+_MAX_ABSATZ_NACH_SVG = 200
+
+
+def fliesstext_zeichen(tafel) -> int:
+    """Fliessttext-Zeichen einer Tafel: alle <p> inklusive Aufklapp-Text.
+
+    Nur <template>-Inhalte zaehen nicht - sie sind nie sichtbar, sondern
+    werden per Klick zum DOM montiert (P1-Rechenwege). Whitespace wird
+    auf ein Leerzeichen normalisiert, damit Einrueckungen im Quelltext
+    die Zahl nicht aufblasen (design.md mass am 17.09. dieselbe Menge:
+    18 388 Zeichen im Vergleichs-Reiter).
+    """
+    return sum(len(re.sub(r"\s+", " ", p.get_text(" ", strip=True)))
+               for p in tafel.find_all("p")
+               if p.get_text(strip=True) and p.find_parent("template") is None)
+
+
+def _sichtbar_initial(el) -> bool:
+    """Initialer Zustand ohne Nutzerklick: kein hidden-Attribut, kein
+    zugeklapptes <details>, keine JS-Aufklappzeile (.gr-a-auf ohne
+    --an), kein <template> - irgendwo in der Vorfahrenkette."""
+    knoten = el
+    while knoten is not None and getattr(knoten, "name", None):
+        if knoten.name == "template" or knoten.has_attr("hidden"):
+            return False
+        if knoten.name == "details" and not knoten.has_attr("open"):
+            return False
+        klassen = set(knoten.get("class") or [])
+        if "gr-a-auf" in klassen and "gr-a-auf--an" not in klassen:
+            return False
+        knoten = knoten.parent
+    return True
+
+
+def _vorheriges_element(el):
+    """Das naechste ELEMENT-Geschwister vor el (Textknoten uebersprungen).
+
+    previous_element_sibling alleine reicht nicht: unter html.parser ist
+    der Pointer nach einem inline-<svg> None, obwohl previous_siblings
+    das svg fuehrt - die Elementkette bricht am self-closing Tag. Wer
+    hier den Pointer fragt, misst "kein Absatz nach Grafik", wo einer
+    steht (gefunden am 18.09.2026 am Mini-Fall der pytest-Fixture).
+    """
+    for geschwister in el.previous_siblings:
+        if getattr(geschwister, "name", None):
+            return geschwister
+    return None
+
+
+def max_absatz_nach_svg(tafel) -> tuple[int, str]:
+    """Laengster initial sichtbarer <p>-Absatz, der einem <svg> folgt.
+
+    "Folgt" heisst: das vorherige Element-Geschwister ist ein <svg>, oder
+    der Absatz ist das erste Element seines Containers und der CONTAINER
+    folgt einem <svg> (Graph-Wrapper-Struktur: svg und Absatz stehen
+    Geschwister in einem div). Versteckte Absaetze (hidden, zugeklappt)
+    zaehen nicht - die Regel misst, was der Leser unter der Grafik sieht.
+    Rueckgabe (Zeichen, Anfang des Absatzes fuer die Fehlermeldung).
+    """
+    best, best_text = 0, ""
+    for p in tafel.find_all("p"):
+        if not p.get_text(strip=True) or not _sichtbar_initial(p):
+            continue
+        vorher = _vorheriges_element(p)
+        if vorher is None and p.parent is not None \
+                and p.parent.name not in ("td", "th", "li"):
+            vorher = _vorheriges_element(p.parent)
+        if vorher is None or vorher.name != "svg":
+            continue
+        text = re.sub(r"\s+", " ", p.get_text(" ", strip=True))
+        if len(text) > best:
+            best, best_text = len(text), text[:50]
+    return best, best_text
+
 
 def _reiterhoehen(seite, wurzel: str, b: Bilanz) -> None:
     """Jeder Reiter unter drei Bildschirmen - an der ECHTEN Seite gemessen.
@@ -275,6 +391,55 @@ def _reiterhoehen(seite, wurzel: str, b: Bilanz) -> None:
         mobil.close()
 
 
+def _summary_zeiger(seite, b: Bilanz) -> None:
+    """P4/D3, Kriterium 15: Klickbarkeit zeigt sich.
+
+    design.md (17.09.): 20 von 22 Aufklappern des Vergleichs-Reiters
+    sahen aus wie Tabellenzeilen - cursor:auto, kein Chevron. Gemessen
+    wird COMPUTED (das, was der Leser sieht), je Tafel der Geräteseite,
+    auch in zugeklappten details: die Regel von style.css gilt fuer die
+    ganze Tafel-Flaeche, nicht nur fuer den ersten Bildschirm. Ein
+    summary ohne Text ist keins - das Kriterium fragt dieselbe Menge ab,
+    die die Vorlage hervorbringt.
+    """
+    fehler: list[str] = []
+    gesamt = 0
+    for knopf in seite.query_selector_all(".gr-reiter [data-tafel]"):
+        tid = knopf.get_attribute("data-tafel")
+        knopf.click()
+        seite.wait_for_timeout(80)
+        daten = seite.evaluate(
+            """(tid) => {
+              const t = document.getElementById(tid);
+              if (!t) return null;
+              return [...t.querySelectorAll('summary')].map(s => ({
+                text: s.textContent.replace(/\\s+/g, ' ').trim().slice(0, 40),
+                pointer: getComputedStyle(s).cursor === 'pointer',
+                caret: (getComputedStyle(s, '::after').content || 'none')
+                       !== 'none',
+              }));
+            }""", tid)
+        if daten is None:
+            fehler.append(f"{tid} fehlt")
+            continue
+        gesamt += len(daten)
+        for d in daten:
+            why = []
+            if not d["pointer"]:
+                why.append("ohne Zeiger")
+            if not d["caret"]:
+                why.append("ohne Aufklappzeichen")
+            if why:
+                fehler.append(f"{tid}: „{d['text']}“ {', '.join(why)}")
+    if not gesamt and not fehler:
+        b.prueft(None, "15. Aufklappzeichen (Geräteseite ohne Aufklapper)")
+        return
+    b.prueft(not fehler,
+             f"15. Aufklappzeichen: {gesamt} summaries, alle mit Zeiger "
+             f"und Aufklappzeichen"
+             + (f" - FEHLEN: {'; '.join(fehler[:6])}" if fehler else ""))
+
+
 def _browser_messungen(site: Path, b: Bilanz) -> None:
     """Kriterium 1, 6, 7, 10 und 12 - alles, was eine Darstellung braucht."""
     try:
@@ -312,6 +477,9 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
             return
         seite = browser.new_page(viewport={"width": _BREITE, "height": _FALZ})
         _reiterhoehen(seite, wurzel, b)
+        seite.goto(f"{wurzel}/geraete.html", wait_until="load")
+        seite.wait_for_timeout(300)
+        _summary_zeiger(seite, b)
 
         def oeffne(name: str, warte: int = 600) -> None:
             """Seite laden und einmal durchscrollen.
@@ -864,6 +1032,43 @@ def main() -> int:
                      f"die TCO-Zeitreihe steht in der Hauptansicht"
                      if not maengel else
                      "11. Geraeteradar: " + "; ".join(maengel[:5]))
+
+        # ---- Kriterium 13: Fliessttext-Deckel je Reiter (P4/D3, FM 4).
+        # Messmenge und Kalibrierung stehen im Kommentar zu
+        # _FLIESSTEXT_DECKEL; gezaehlt wird statisch am gerenderten HTML,
+        # deterministisch und ohne Browser - dieselbe Zahl, gegen die der
+        # pytest tests/test_geraete_textdeckel.py die Zaehlfunktion haelt.
+        werte, zuviel = [], []
+        for tid, deckel in _FLIESSTEXT_DECKEL.items():
+            tafel = gr.select_one(f"#{tid}")
+            if tafel is None:
+                zuviel.append(f"{_REITER_NAMEN[tid]}: Tafel {tid} fehlt")
+                continue
+            n = fliesstext_zeichen(tafel)
+            werte.append(f"{_REITER_NAMEN[tid]} {n} Z (max {deckel})")
+            if n > deckel:
+                zuviel.append(f"{_REITER_NAMEN[tid]} {n} Z > {deckel}")
+        b.prueft(not zuviel,
+                 "13. Fliessttext-Deckel: " + ", ".join(werte)
+                 + (f" - ZU VIEL TEXT: {'; '.join(zuviel)}" if zuviel else ""))
+
+        # ---- Kriterium 14: kein Fliesstblock unter Grafiken
+        # (design.md Regel 8). Der 1813-Zeichen-Datenblock unter dem mit
+        # P2 gefallenen G2-Graph war der Fall; die Grenze haelt ihn draussen,
+        # sobald er zurueckkehrte - in welcher Tafel auch immer.
+        block_max, block_wo = 0, ""
+        for tid in _FLIESSTEXT_DECKEL:
+            tafel = gr.select_one(f"#{tid}")
+            if tafel is None:
+                continue
+            n, anfang = max_absatz_nach_svg(tafel)
+            if n > block_max:
+                block_max, block_wo = n, f"{_REITER_NAMEN[tid]}: {anfang}"
+        b.prueft(block_max <= _MAX_ABSATZ_NACH_SVG,
+                 f"14. Fliesstblock unter Grafik: laengster Absatz nach "
+                 f"<svg> {block_max} Z (max {_MAX_ABSATZ_NACH_SVG})"
+                 + (f" - {block_wo}" if block_max > _MAX_ABSATZ_NACH_SVG
+                    else ""))
 
     _browser_messungen(site, b)
 

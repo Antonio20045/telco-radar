@@ -12,7 +12,8 @@ from telco_radar.geraete_config import lade_katalog
 from telco_radar.report import geraete_tco_grafik as grafik
 from telco_radar.report import geraete_tco_karten as karten
 
-from test_geraete_tco_zustand import WURZEL, _baue, _modell
+from test_geraete_tco_zustand import WURZEL, _baue, _modell, \
+    vorlage_text
 
 
 def test_der_hersteller_steht_nicht_zweimal_im_titel():
@@ -55,7 +56,7 @@ def test_die_referenzzeile_behauptet_keine_36_monate(tmp_path):
     # Der Gerätepreis (A-R5) steht in der eigenen Spalte, getrennt (§3).
     assert "709,90 €" in ref.select_one(".gr-bnd-bar").get_text()
     assert ref["data-laufzeit"] == "24"
-    text = " ".join(ref.get_text(" ", strip=True).split())
+    text = vorlage_text(ref)
     assert "TCO-24 1.428,70 €" in text
     assert "36 Monate" not in text
     assert "TCO-36" not in text
@@ -67,7 +68,7 @@ def test_die_referenzzeile_behauptet_keine_36_monate(tmp_path):
     o2 = s.select_one('#tafel-tco .gr-bnd[data-anbieter="o2"][data-zustand="neu"]')
     assert "880,75 €" in o2.select_one(".gr-bnd-tco").get_text()
     assert "709,00 €" in o2.select_one(".gr-bnd-bar").get_text()
-    o2_text = " ".join(o2.get_text(" ", strip=True).split())
+    o2_text = vorlage_text(o2)
     assert "TCO-36" not in o2_text and "36 Monate Bindung" not in o2_text
     # S-Q4 (09.09.2026): "Gerechnet über 24 Monate Bindung" war derselbe
     # Widerspruch, nur als Satz - der Rechenweg sagt "Tarif bindet 24,
@@ -112,10 +113,13 @@ def test_die_tafel_spricht_katalog_d(tmp_path):
         assert "€" in text and "TCO-24" in text, text
     # Ratenzeile: "X € in 36 Raten" - die Summe aus der Kennzahl.
     o2 = tafel.select_one('.gr-bnd[data-anbieter="o2"][data-zustand="neu"]')
-    bau = " ".join(o2.select_one(".gr-kk-bau").get_text(" ", strip=True).split())
+    bau = vorlage_text(o2.select_one(".gr-kk-bau"))
     assert "720,00 € in 36 Raten à 20,00 €" in bau
-    # Kein "(0 %)" auf einer TCO-Zeile: der Zinssatz ist dort nicht gemessen.
-    assert "(0 %)" not in tafel.get_text(" ")
+    # Kein "(0 %)" auf einer TCO-Zeile: der Zinssatz ist dort nicht
+    # gemessen. Seit dem P4-Fix (template-Pool) sieht get_text() den
+    # Rechenweg nicht mehr - der Check laeuft gegen den VORLAGEN-Text
+    # (sonst pruefte er einen leer gerenderten Baum).
+    assert "(0 %)" not in vorlage_text(tafel)
 
 
 def test_die_buendelkarte_nennt_die_wahre_dauer_und_die_richtigen_raten(tmp_path):
@@ -131,16 +135,16 @@ def test_die_buendelkarte_nennt_die_wahre_dauer_und_die_richtigen_raten(tmp_path
     s = _baue(tmp_path, eins_und_eins=True)
     eins = s.select_one('#tafel-tco .gr-bnd[data-anbieter="1&1"]')
     assert eins is not None, "die Fixture muss die 1&1-Karte liefern"
-    bau = " ".join(eins.select_one(".gr-kk-bau").get_text(" ", strip=True).split())
+    bau = vorlage_text(eins.select_one(".gr-kk-bau"))
     assert bau == ("monatlich 44,99 € für Tarif und Gerät zusammen · "
                    "36 Monate (24 davon in der TCO-24)")
-    eins_text = " ".join(eins.get_text(" ", strip=True).split())
+    eins_text = vorlage_text(eins)
     assert "danach noch offen: 539,88 € (12 Monatsraten)" in eins_text
     assert "Geräteraten" not in eins_text
     # Die o2-Karte (tarif_monatlich + geraet_monatsrate getrennt erhoben)
     # behaelt "Geräteraten" - zwei Karten, zwei wahre Woerter.
     o2 = s.select_one('#tafel-tco .gr-bnd[data-anbieter="o2"][data-zustand="neu"]')
-    o2_text = " ".join(o2.get_text(" ", strip=True).split())
+    o2_text = vorlage_text(o2)
     assert "danach noch offen: 240,00 € (12 Geräteraten)" in o2_text
 
 
@@ -158,11 +162,11 @@ def test_die_buendelkarte_nennt_einmalzahlung_und_bereitstellung(tmp_path):
               einmalzahlung=360.0, anschlusspreis=39.9)
     eins = s.select_one('#tafel-tco .gr-bnd[data-anbieter="1&1"]')
     assert eins is not None, "die Fixture muss die 1&1-Karte liefern"
-    bau = " ".join(eins.select_one(".gr-kk-bau").get_text(" ", strip=True).split())
+    bau = vorlage_text(eins.select_one(".gr-kk-bau"))
     assert bau == ("monatlich 44,99 € für Tarif und Gerät zusammen · "
                    "36 Monate (24 davon in der TCO-24) · "
                    "Gerät einmalig 360,00 € · Anschlusspreis 39,90 €")
-    text = " ".join(eins.get_text(" ", strip=True).split())
+    text = vorlage_text(eins)
     assert "TCO-24 1.479,66 €" in text
     # Ohne die Felder druckt KEINER von beiden - die Alt-Zeile steht exakt
     # in test_die_buendelkarte_nennt_die_wahre_dauer_und_die_richtigen_raten

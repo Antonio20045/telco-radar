@@ -137,6 +137,50 @@ def test_am_telefon_steht_die_antwort_ueber_der_falz(telefon):
     assert box["quer"] <= 391, f"Seite {box['quer']} px breit"
 
 
+def test_am_telefon_beginnt_die_kurve_oberhalb_der_falz(telefon):
+    """P4b (Re-Check 18.09.2026): 11c misst Antwort-Satz und GraphKOPF -
+    die KURVE selbst begann auf 390x844 bei 921 px, 77 px unter der Falz,
+    weil die Legende (drei Zeilen, 74 px) zwischen Kopf und Bild stand.
+    Seither steht die Legende mobil UNTER dem Bild, und die Kette ueber
+    dem Bild ist gestrafft. Gemessen wird nicht der Kopf, sondern das
+    SVG selbst UND der oberste Kurvenpunkt (min ueber Punkte, Halos und
+    Linien) - mindestens 1 px Kurve muessen im ersten Viewport stehen,
+    sonst oeffnet der Reiter mit Geruest statt Antwort. Am echten Bestand
+    nach dem Fix: SVG-Top 813, Punkt 843 (Falz 844)."""
+    s, _ = telefon
+    mess = s.evaluate("""() => {
+      const svg = document.querySelector(
+        '#gr-zr-gruppe svg.gr-zr--schmal') ||
+        document.querySelector('#gr-zr-gruppe svg');
+      if (!svg) return null;
+      const top = sel => {
+        const e = [...svg.querySelectorAll(sel)];
+        return e.length ? Math.min(
+          ...e.map(x => Math.round(x.getBoundingClientRect().top))) : null;
+      };
+      return {svg: Math.round(svg.getBoundingClientRect().top),
+              punkt: top('circle.gr-zr-punkt'),
+              halo: top('circle.gr-zr-halo'),
+              linie: top('path'),
+              legendeUnten: (() => {
+                const l = document.querySelector('#gr-zr-gruppe .gr-zr-legende');
+                return l ? Math.round(l.getBoundingClientRect().top)
+                         > Math.round(svg.getBoundingClientRect().bottom)
+                         : null; })()};
+    }""")
+    assert mess, "die Zeitreihe zeichnet kein SVG (Fixture prüfen)"
+    assert mess["svg"] <= 844, (
+        f"das SVG beginnt bei {mess['svg']} px - {mess['svg'] - 844} px "
+        "unter der Falz 844")
+    kurve = min(p for p in (mess["punkt"], mess["halo"], mess["linie"])
+                if p is not None) if any(
+        p is not None for p in (mess["punkt"], mess["halo"], mess["linie"])) \
+        else None
+    assert kurve is not None and kurve <= 844, (
+        f"der oberste Kurvenpunkt liegt bei {kurve} px - die Kurve steht "
+        "komplett unter der Falz 844, der Reiter öffnet mit Gerüst")
+
+
 def test_die_kachelzeile_drueckt_die_falz_nicht_unter_844(telefon):
     """§3.2 + P1/F3: die Karten sind kein Chip-Streifen mehr, aber 11c
     geht weiter vor - die Kartenreihe bleibt im ersten Viewport und

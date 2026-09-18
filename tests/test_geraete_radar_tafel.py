@@ -223,26 +223,116 @@ def _text(el) -> str:
 
 def test_drei_sektionen_in_folge_jede_mit_ihrem_satz(tmp_path):
     """S3: Alarme / Abweichung als Modell-Liste / Händler als gleichwertiger
-    Abschnitt - in dieser Folge, jede mit einem Satz, was sie misst."""
+    Abschnitt - jede mit einem Satz, was sie misst.
+
+    P4/D1 (STRATEGIE_GERAETE_V3, 18.09.2026): VOR diesen dreien steht
+    seit dem Design-Durchlauf die GRAFIK-Sektion (#wr-grafik) - die
+    Frage des Reiters liest sich zuerst als Bild, die Tabellen sind
+    Aufklapper darunter (design.md: „Radar: Balken je Modell statt 746
+    Zeilen"). Der Test war gegen den Grafik-Stand ROT (3 Köpfe statt 4)
+    und hält jetzt VIER Sektionen in dieser Folge fest."""
     suppe = _suppe(tmp_path)
     tafel = suppe.select_one("#tafel-radar")
     assert tafel is not None, "#tafel-radar fehlt"
     koepfe = [_text(k) for k in tafel.select("h3.gr-unter")]
-    assert len(koepfe) == 3, f"drei Sektionen erwartet, steht da: {koepfe}"
-    assert koepfe[0].startswith("Preis-Alarme"), koepfe
-    assert koepfe[1].startswith("Alle Modelle nach Abweichung zu Vodafone"), \
+    assert len(koepfe) == 4, f"vier Sektionen erwartet, steht da: {koepfe}"
+    assert koepfe[0].startswith("Die größten Abstände zu Vodafone"), koepfe
+    assert koepfe[1].startswith("Preis-Alarme"), koepfe
+    assert koepfe[2].startswith("Alle Modelle nach Abweichung zu Vodafone"), \
         koepfe
-    assert koepfe[2].startswith("Händler"), koepfe
+    assert koepfe[3].startswith("Händler"), koepfe
     # Jede Sektion erklärt in einem Satz ihre Frage - keine ohne Zweck.
     for kopf in koepfe:
         sec = kopf and suppe.find(string=kopf)
         assert sec, kopf
 
 
+# --------------------------------------------------------------------------
+# P4/D1 (STRATEGIE_GERAETE_V3, 18.09.2026): die Grafik, die Legende, der
+# Rot-Deckel
+# --------------------------------------------------------------------------
+
+def test_die_radar_tafel_traegt_eine_balkengrafik(tmp_path):
+    """design.md Regel 3: kein Reiter ohne Grafik - die Frage des Radars
+    ("wo sind wir teuer?") liest sich zuerst als BILD. Servergerendertes
+    SVG in ZWEI Varianten (schirm/mobil, dasselbe Umschalten wie die
+    Zeitreihe), je Balken der Wert an der Spitze, die Nulllinie mit GENAU
+    EINEM Etikett ("Vodafone" - die Referenz, nicht 48-mal wiederholt)."""
+    suppe = _suppe(tmp_path)
+    tafel = suppe.select_one("#tafel-radar")
+    assert tafel is not None
+    svgs = tafel.select("svg.wr-gr")
+    varianten = {v for s in svgs for v in s.get("class", [])}
+    assert {"wr-gr--breit", "wr-gr--schmal"} <= varianten, \
+        "die Grafik fehlt oder steht nur in einer Breite da"
+    breit = tafel.select_one("svg.wr-gr--breit")
+    balken = breit.select("path.wr-gr-balken")
+    assert balken, "die Grafik trägt keinen Balken - der Test prüft nichts"
+    # Ein Balken trägt beide Zahlen selbst (Wert an der Spitze); der
+    # <title> nennt beide Preise der Messung (Nachprüfbarkeit).
+    assert breit.select("text.wr-gr-wert"), "kein Balken trägt seinen Wert"
+    titel = balken[0].select_one("title")
+    assert titel is not None and "€" in titel.get_text(), \
+        "der Balken nennt seine Messung nicht (Belegzwang)"
+    etiketten = [e.get_text(strip=True)
+                 for e in breit.select("text.wr-gr-nulltext")]
+    assert etiketten == ["Vodafone"], etiketten
+
+
+def test_die_grafik_traegt_genau_einen_roten_balken(tmp_path):
+    """Rot-Deckel (design.md Regel 4): in der Grafik trägt ROT genau der
+    schärfste Befund - der größte Abstand ZUUNGUNSTEN Vodafones. Ist kein
+    solcher Fall im Bestand, gibt es keinen roten Balken (die Fixture
+    trägt genau einen: iPhone 15, VF 709,90 € gegen Saturn 679,90 €)."""
+    suppe = _suppe(tmp_path)
+    tafel = suppe.select_one("#tafel-radar")
+    for variante in ("wr-gr--breit", "wr-gr--schmal"):
+        svg = tafel.select_one(f"svg.{variante}")
+        assert svg is not None
+        rot = svg.select("path.wr-gr-balken--spitze")
+        assert len(rot) == 1, \
+            f"{variante}: {len(rot)} rote Balken statt genau einem"
+        assert rot[0].select_one("title").get_text().startswith("iPhone 15")
+
+
+def test_die_vodafone_basis_steht_als_eine_legende(tmp_path):
+    """P4/D1: die Zeile 'Vodafone-Basis: … TCO-24 (…, Band …)' stand in
+    JEDER Modell-Detailzeile (am echten Bestand 48- bis 60-mal dieselbe
+    Formel). Seit P4 gibt es EINE Legende über der Tabelle - der
+    VF-Betrag steht je Anbieter-Zeile selbst ('Band · VF x €')."""
+    suppe = _suppe(tmp_path)
+    tafel = suppe.select_one("#tafel-radar")
+    assert tafel.select_one(".wr-basis-legende") is not None, \
+        "die Vodafone-Basis-Legende fehlt"
+    assert len(tafel.select(".wr-basis-legende")) == 1, \
+        "die Legende steht mehrfach da - wiederholte Formel"
+    assert not tafel.select(".wr-basis"), \
+        "eine alte Vodafone-Basis-Zeile steht noch in einer Detailzeile"
+
+
+def test_rot_ist_akzent_nicht_teppich(tmp_path):
+    """Rot-Deckel (design.md Regel 4, messbar): maximal ZEHN rot
+    eingefärbte Datenelemente je Tafel. Als DOM-Stellvertreter zählt der
+    Test die Elemente, die eine Rot-Klasse tragen ('--spitze' sowie das
+    rote Eigen-Markierung des Lifecycle), denn die Farbe sitzt im
+    Stylesheet - am echten Bestand gemessen (Playwright, 18.09.2026):
+    vorher 40 sichtbare Daten-Rot-Elemente, nachher 1."""
+    suppe = _suppe(tmp_path)
+    tafel = suppe.select_one("#tafel-radar")
+    rot = tafel.select("[class*='--spitze'], .gr-eigen")
+    assert len(rot) <= 10, \
+        f"{len(rot)} Elemente tragen Rot-Klassen - Rot ist Fläche geworden"
+
+
 def test_jede_sektion_traegt_einen_frage_satz(tmp_path):
     suppe = _suppe(tmp_path)
     for sec in suppe.select("#tafel-radar .gr-r-sektion"):
-        satz = sec.select_one("h3.gr-unter ~ p.gr-erklaer, p.gr-erklaer")
+        # P4-Fix (Sicht-Pruefung 18.09.): die Grafik-Sektion traegt ihren
+        # Satz als ACHSLABEL unter dem Bild (p.gr-achsenlabel) - dieselbe
+        # Pflicht, andere Bauform: der Satz erklaert die Achse, nicht die
+        # Sektion.
+        satz = sec.select_one("h3.gr-unter ~ p.gr-erklaer, p.gr-erklaer, "
+                              "p.gr-achsenlabel")
         assert satz is not None and len(_text(satz)) > 30, \
             f"Sektion ohne Frage-Satz: {_text(sec)[:60]}"
 
@@ -265,12 +355,17 @@ def test_die_haendler_sektion_sagt_was_sie_misst(tmp_path):
 
 def test_die_haendler_sektion_steht_nicht_mehr_ganz_unten_als_rest(tmp_path):
     """Antonios Wortlaut: 'das sollte nicht auf so einem komischen unteren
-    Abschnitt ganz unten sein' - die Händler-Sektion ist die DRITTE von
-    DREI gleichwertigen Sektionen, nicht ein Rest unter dem Rest (bis E3
-    stand sie auf der Schwesterseite unter den Portfolio-Listen)."""
+    Abschnitt ganz unten sein' - die Händler-Sektion ist die LETZTE der
+    gleichwertigen Sektionen, kein Rest unter dem Rest (bis E3 stand sie
+    auf der Schwesterseite unter den Portfolio-Listen).
+
+    P4/D1 (18.09.2026): die Grafik-Sektion (#wr-grafik) steht seit dem
+    Design-Durchlauf VOR den dreien - dieselbe Liste, ein Kopf mehr. Der
+    Test war gegen den Grafik-Stand ROT und dreht seitdem mit."""
     suppe = _suppe(tmp_path)
     sektionen = suppe.select("#tafel-radar .gr-r-sektion")
-    assert [s.get("id") for s in sektionen] == ["wr-alarme", "wr-abweichung",
+    assert [s.get("id") for s in sektionen] == ["wr-grafik", "wr-alarme",
+                                                "wr-abweichung",
                                                 "wr-haendler"]
 
 
@@ -281,19 +376,26 @@ def test_der_tafelkopf_polt_nur_die_sektionen_mit_vorzeichen(tmp_path):
     Export der Alarme sind Betrags-Sprache: '41,3 %' heißt dort
     Wettbewerber günstiger, in der Modellliste heißt dasselbe '−41,3 %').
     Der Leser sah auf EINER Tafel −55,5 % und +41,3 % für dieselbe
-    Richtung der Aussage. Der Kopf muss die Wahrheit sagen: Vorzeichen in
-    Modellliste und Händlern, Betrag ohne Vorzeichen in den Preis-Alarmen
-    - und die Alarmtabelle bleibt Betrags-Tabelle (keine Zeile trägt ein
-    Minus, für das der Kopf keine Regel mehr nennt)."""
+    Richtung der Aussage. Die Zeichenregel muss irgendwo die Wahrheit
+    sagen: Vorzeichen in Modellliste und Händlern, Betrag ohne Vorzeichen
+    in den Preis-Alarmen - und die Alarmtabelle bleibt Betrags-Tabelle
+    (keine Zeile trägt ein Minus, für die keine Regel mehr gilt).
+    P4-Fix (Sicht-Prüfung 18.09.): der Regel-Satz steht seit dem Design-
+    Durchlauf nicht mehr als Absatz zwischen Leitzahl und Grafik
+    (Tafelkopf), sondern als Achslabel UNTER der Balkengrafik - der
+    Locator ist mitgezogen, die AUSSAGE unverändert."""
     suppe = _suppe(tmp_path)
     tafel = suppe.select_one("#tafel-radar")
-    kopf = _text(tafel.select_one("#radar > p.gr-erklaer"))
-    assert kopf, "der Erklärsatz des Tafelkopfs fehlt"
+    kopf = _text(tafel.select_one("#wr-grafik .gr-achsenlabel"))
+    assert kopf, "das Achslabel unter der Balkengrafik fehlt"
     # Die Pauschalbehauptung ('mit Vorzeichen' für alle drei) ist weg …
     assert "Die drei Sektionen messen sie" not in kopf, kopf
     # … und die Alarme sind als BETRAG benannt, nicht als vorzeichen-
-    # behaftete Leitzahl:
-    assert "Betrag ohne Vorzeichen" in kopf, kopf
+    # behaftete Leitzahl. P4/D4 (18.09.2026) hat den Kopf von drei
+    # Sätzen auf EINEN gestrafft (Falz-Regel: vor dem ersten Datenelement
+    # höchstens EIN Satz - die Leitzahl darüber sagt die Richtung ohne
+    # Worte); der Test hält die AUSSAGE, nicht den alten Wortlaut.
+    assert "als Betrag" in kopf, kopf
     # Die Gegenseite der Zusicherung: die Alarmtabelle zeigt Beträge -
     # jede sichtbare Prozentzahl ist positiv (Wettbewerber günstiger).
     werte = [float(z.get("data-s-prozent"))

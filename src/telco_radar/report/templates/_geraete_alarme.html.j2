@@ -16,7 +16,7 @@
    klein darunter: 15 Euro sind bei einem 200-Euro-Geraet viel und bei einem
    2000-Euro-Geraet nichts. Die Pille ersetzt jede Legende - die Zeile sagt
    selbst, wie schlimm sie ist. #}
-{% macro alarmzeile(z, nr, rest=False) %}
+{% macro alarmzeile(z, nr, rest=False, spitze=None) %}
   {# Die Sortierschluessel stehen als Zahl an der ZEILE, nicht im Zelltext.
      "1.099,90 €" ist als Zeichenkette kleiner als "199,00 €", und ein
      Sortierer, der das aus der Zelle liest, ordnet den teuersten Preis nach
@@ -56,7 +56,10 @@
     <td class="num"><span class="gr-a-prozent">{{
       '%.1f'|format(z.prozent)|replace('.', ',') }} %</span>
       <span class="gr-a-euro">{{ z.euro | euro }}</span></td>
-    <td><span class="gr-pille gr-pille--{{ z.stufe }}">{{ z.stufe_name }}</span></td>
+    <td><span class="gr-pille gr-pille--{{ z.stufe }}{% if spitze and
+      (z.device_id or '') ~ '|' ~ (z.speicher or '') == spitze
+      %} gr-pille--spitze{% endif
+      %}">{{ z.stufe_name }}</span></td>
     {# KEINE VERFUEGBARKEITSSPALTE (30.08.2026): sie sagte an der echten
        Ausgabe in 12 von 13 Zeilen "unbekannt". Geloescht ist sie nicht -
        der Geraetekatalog der Geraeteseite traegt sie weiter. #}
@@ -79,7 +82,7 @@
   </td></tr>
 {% endmacro %}
 
-{% macro alarmtafel(al) %}
+{% macro alarmtafel(al, spitze=None) %}
   {# DIE VIER KENNZAHLEN STEHEN OBEN ALS CHIPS und nicht ein zweites Mal
      hier: eine Zahl steht je Ort genau EINMAL (Beruhigungsregel vom
      07.08.2026). Bis zum 04.09.2026 standen sie wortgleich in beiden
@@ -101,8 +104,8 @@
     <label>Speicher <select data-filter="speicher"><option value="">alle</option>
       {% for s in al.speicher %}<option value="{{ s }}">{{ s }} GB</option>{% endfor %}
     </select></label>
-    <label class="gr-filter--an">Zustand: neu</label>
-    <label class="gr-filter--an">Preisart: ohne Vertrag</label>
+    <label class="gr-filter--fest">Zustand: neu</label>
+    <label class="gr-filter--fest">Preisart: ohne Vertrag</label>
   </div>
 
   <div class="gr-werkzeug">
@@ -155,8 +158,8 @@
         data-sort="abgerufen" data-art="text">abgerufen</button></th>
     </tr></thead>
     <tbody>
-      {% for z in al.sichtbar %}{{ alarmzeile(z, loop.index) }}{% endfor %}
-      {% for z in al.rest %}{{ alarmzeile(z, 'r' ~ loop.index, True) }}{% endfor %}
+      {% for z in al.sichtbar %}{{ alarmzeile(z, loop.index, False, spitze) }}{% endfor %}
+      {% for z in al.rest %}{{ alarmzeile(z, 'r' ~ loop.index, True, spitze) }}{% endfor %}
     </tbody>
   </table>
   </div>
