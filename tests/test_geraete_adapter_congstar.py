@@ -270,6 +270,54 @@ def test_quelllink_ist_die_absolut_abgerufene_menschenseite(dateiname):
 # Verfuegbarkeit
 # ==========================================================================
 
+def _push_seite(variante: dict) -> str:
+    """Eine Next.js-Flight-Seite mit EINER Variante - der Form, die
+    congstars self.__next_f-Fragmente wirklich haben (json.dumps liefert
+    die innere Escapung, die _PUSH_RE erwartet)."""
+    import json as _json
+    # Innen compact (keine Leerzeichen): _VARIANTE_START_RE sucht
+    # {"id":1,"gtin":" wortwoertlich; aussen ebenso (_PUSH_RE, Komma).
+    return ('<script>self.__next_f.push('
+            + _json.dumps([1, _json.dumps(variante, separators=(",", ":"))],
+                          separators=(",", ":")) + ')</script>')
+
+
+def _tb_variante() -> dict:
+    """Apples 1-TB-Schreibweise: `size` traegt die Zahl OHNE Einheit,
+    `referenceGB` die in GB (Modulkopf congstar.py, Galaxy S26 Ultra)."""
+    return {"id": 1, "gtin": "0123456789012",
+            "title": "Apple iPhone 18 Pro 1 TB",
+            "memory": {"size": 1, "referenceGB": 1024},
+            "color": {"name": "schwarz"},
+            "availability": {"status": "IN_STOCK"},
+            "prices": {"paymentVariants": [
+                {"type": "ONE_TIME_PURCHASE", "contractDuration": 0,
+                 "oneTime": {"listed": 2199.0}}]}}
+
+
+def test_listung_eines_1_tb_geraetes_traegt_1024_gb():
+    """R1 der P5-Live-Pruefung (18.09.2026): congstar listet das iPhone
+    18 Pro 1 TB; der LISTUNGSpfad las bis dahin `memory.size` allein -
+    speicher_gb=1 erzeugte die Phantom-Modellzeile 'Apple iPhone 18 Pro
+    1 GB' in Katalog und beiden Modell-Exporten. Derselbe Helfer wie im
+    Buendelpfad: referenceGB vor size."""
+    saetze = congstar.lies(_push_seite(_tb_variante()))
+    assert len(saetze) == 1
+    assert saetze[0]["speicher_gb"] == 1024
+    assert saetze[0]["titel"] == "Apple iPhone 18 Pro 1 TB"
+
+
+def test_ohne_referenceGB_waere_dieselbe_listung_1_gb():
+    """Gegenprobe im selben Lauf (CLAUDE.md): ohne referenceGB ist size=1
+    alles, was die Antwort traegt - der Wert 1 GB tritt dann wirklich
+    ein, sonst bewiese der Test oben nichts."""
+    variante = _tb_variante()
+    del variante["memory"]["referenceGB"]
+    saetze = congstar.lies(_push_seite(variante))
+    assert len(saetze) == 1
+    assert saetze[0]["speicher_gb"] == 1
+
+
 def test_verfuegbarkeit_wird_uebersetzt():
     """PRE_MARKETING (iPhone 17, mit Ankuendigung "wieder lieferbar in 5-6
     Wochen") -> nicht_lieferbar; IN_STOCK (die drei anderen) -> lieferbar."""

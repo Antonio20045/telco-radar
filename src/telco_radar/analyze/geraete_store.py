@@ -47,6 +47,21 @@ STATUS_AUSGELISTET = "ausgelistet"
 # ohne dass jemand es merkt.
 _LAEUFE_BIS_SIM_ONLY = 3
 
+# FM-2-ALARM (Strategie v3, P5-Auftrag 2): ab so vielen beobachteten Tagen
+# mit null Funden IN FOLGE meldet der Lauf den Anbieter als still. Sieben,
+# nicht drei - drei ist die SIM-only-Schwelle, und die beiden sagen
+# Verschiedenes: "vermarktet keine Hardware" ist eine Aussage ueber den
+# Anbieter, "sieben Tage 0 Saetze" eine ueber seine QUELLE. Der Alarm
+# selbst altert und loest nichts aus (er ist Meldung, siehe
+# `ausfall_alarme`).
+AUSFALL_TAGE = 7
+
+# Wie viele Tage die Fund-Historie je Anbieter behaelt: die Schwelle plus
+# Diagnose-Rand nach hinten. Gemessen: 30 Eintraege kosten rund 986 Byte
+# im State-JSON (~33 Byte je Eintrag), ueber alle neun Anbieter also
+# unter 10 KB - ein Bruchteil einer einzigen Listung.
+_FUND_HISTORIE_TAGE = 30
+
 # Die Felder, deren Aenderung einen neuen Historienpunkt rechtfertigt.
 _HISTORIENFELDER = ("preis_ohne_vertrag", "uvp", "preis_mit_vertrag_ab",
                     "zuzahlung", "tarif_referenz", "verfuegbarkeit")
@@ -397,8 +412,82 @@ class GeraeteDB:
             termine = b.setdefault("termine", [])
             if today not in termine:
                 termine.append(today)
+            # FM-2: die Fundzahl JE TAG. Ohne sie ist "sieben Tage 0 Saetze"
+            # nicht zaehlbar - `letzte_funde` kennt nur den letzten Lauf,
+            # `funde_gesamt` nur die Summe. Gleicher Tag ersetzt seinen
+            # Eintrag (idempotent, dieselbe Regel wie die TCO-Historie),
+            # ein neuer Tag haengt an; gedeckelt auf den Diagnose-Rand.
+            historie = [[str(t), int(f)] for t, f in
+                        (b.get("funde_nach_tag") or []) if str(t) != today]
+            historie.append([today, int(funde)])
+            b["funde_nach_tag"] = historie[-_FUND_HISTORIE_TAGE:]
         if funde:
             b["letzter_fund"] = today
+
+    def stille_tage(self, anbieter: str) -> int:
+        """Wie viele BEOBACHTETE Tage in Folge dieser Anbieter 0 Funde
+        geliefert hat - die Zahl hinter dem FM-2-Alarm.
+
+        Gezaehlt werden Tage mit echter Beobachtung, nicht Kalendertage: ein
+        Anbieter, der laut robots.txt nur nachts im Besuchszeitfenster dran
+        ist, wird tagsueber garnicht angefasst - ein ausgelassener Tag ist
+        keine Aussage und zaehlt weder fuer noch gegen den Anbieter.
+
+        Zwei Quellen, eine Wahrheit:
+          * `funde_nach_tag` (seit dem FM-2-Auftrag): die Fundzahl je Tag.
+          * der ALTBESTAND davor: `letzter_fund` ist per Definition ein Tag
+            MIT Funden, und jeder `termine`-Eintrag DANACH ist ein Lauf mit
+            null Funden - sonst stuende er als `letzter_fund` darin. Das ist
+            Ableitung aus gespeicherten Beobachtungen, keine Erfindung; ohne
+            `letzter_fund` (sehr alter Bestand) wird nichts abgeleitet.
+        """
+        b = self._anbieter.get(anbieter) or {}
+        if int(b.get("funde_gesamt", 0)) <= 0:
+            # Nie geliefert: das ist der SIM-only-Fall von
+            # `hardware_vermarktung`, kein Quellentod.
+            return 0
+        paare: dict[str, int] = {}
+        for eintrag in (b.get("funde_nach_tag") or []):
+            try:
+                paare[str(eintrag[0])] = int(eintrag[1])
+            except (TypeError, ValueError, IndexError):
+                continue
+        letzter_fund = str(b.get("letzter_fund") or "")
+        if letzter_fund and letzter_fund not in paare:
+            paare[letzter_fund] = 1              # per Definition > 0
+        if letzter_fund:
+            for t in (b.get("termine") or []):
+                t = str(t)
+                if t > letzter_fund and t not in paare:
+                    paare[t] = 0
+        tage = 0
+        for tag in sorted(paare, reverse=True):
+            if paare[tag] > 0:
+                break
+            tage += 1
+        return tage
+
+    def ausfall_alarme(self, nur: Optional[Iterable[str]] = None) -> list:
+        """Anbieter, die `AUSFALL_TAGE` beobachtete Tage in Folge 0 Funde
+        geliefert haben: [(name, tage), ...], absteigend sortiert.
+
+        NUR MELDUNG, KEIN GRIFF - der Rueckgabewert wird protokolliert
+        (`geraete_pipeline.melde_ausfall`), kein Anbieter wird gealtert,
+        geloescht oder sonstwie angefasst. Ein Alarm, der Datenloescht,
+        waere schlimmer als die Blindheit, die er ersetzt.
+
+        `nur` grenzt auf die Anbieter DIESES Laufs ein: ein Anbieter, der
+        aus der Konfiguration gefallen ist, wird nicht mehr beobachtet -
+        sein eingefrorener Zaehlerstand darf keine Ewigkeitsmeldung geben.
+        """
+        alarme = []
+        for name, b in self._anbieter.items():
+            if nur is not None and name not in set(nur):
+                continue
+            tage = self.stille_tage(name)
+            if tage >= AUSFALL_TAGE:
+                alarme.append((name, tage))
+        return sorted(alarme, key=lambda x: (-x[1], x[0]))
 
     def messtermine(self, anbieter: str) -> list:
         """Alle Tage, an denen Listungen dieses Anbieters wirklich geprueft

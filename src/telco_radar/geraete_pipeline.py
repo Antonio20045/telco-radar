@@ -43,6 +43,9 @@ from .collect.geraete import autoerkennung
 from .collect.geraete.congstar import ergaenze_pib_slug
 from .collect.tarif_einsundeins_simonly import ANBIETER as SIMONLY_ANBIETER
 from .collect.tarif_einsundeins_simonly import sammle as sammle_simonly
+# PM-6 (P5): nur fuer die Protokollzeile 'Fragmentgroesse:' - rein lesend,
+# kein eigener Importpfad in die Collector/Store-Schichten.
+from . import geraete_fragment
 from .geraete_config import lade_farben, lade_katalog, lade_quellen
 
 log = logging.getLogger(__name__)
@@ -99,6 +102,67 @@ def _hole_fabrik(http_cfg: dict) -> Callable:
         return (antwort.status_code, antwort.text)
 
     return hole
+
+
+# --------------------------------------------------------------------------
+# FM-2: Quellentod darf nicht still bleiben (Strategie v3, P5-Auftrag 2)
+# --------------------------------------------------------------------------
+# Zwei Protokollzeilen, beide nur MELDUNG - kein Anbieter wird gealtert,
+# geloescht oder angefasst, und nichts geht per Mail/Teams hinaus (bewusst
+# nicht gebaut). Der Ausfall-Alarm zaehlt Tage ohne Funde aus der
+# Laufhistorie (`GeraeteDB.ausfall_alarme`), die Provider-Probe zaehlt je
+# Abruf, wie viele der erwarteten Saetze ihre Feldebenen noch tragen
+# (Praezedenz Phase S: metric3+metric2 == monthlyPrice, damals 66/66).
+
+def melde_ausfall(alarme: list) -> None:
+    """Je stiller Anbieter EINE Zeile, mit fester Wortform.
+
+    Der Wortlaut ist Testvertrag (`tests/test_geraete_ausfall_alarm.py`)
+    - die Zeile ist der Alarm, und ein Alarm, dessen Wortlaut driftet,
+    ist nicht mehr grepbar im Actions-Log.
+    """
+    for name, tage in alarme:
+        log.warning("Geraeteradar-Ausfall: %s liefert %d Tage 0 Saetze "
+                    "(Quelle pruefen: geraete-quellen.html)", name, tage)
+
+
+def melde_proben(bilanzen: list) -> None:
+    """Je Anbieter MIT Feld-Proben eine Zeile - die Existenz-Schwelle.
+
+    100 % sind eine Info-Zeile, darunter eine Warnung mit den gescheiterten
+    Feldebenen: genau der Fall, in dem die Nutzlast einer Schnittstelle
+    sich geaendert hat, ohne dass ein Abruf fehlschlaegt (FM 2). Der
+    TOTALTOD des Referenzfeldes zaehlt als gescheiterte Probe (Ebene
+    "monthlyPrice"), nicht als Stille - sonst wuerde der Fall an der
+    Buendelzeile ("0 von 0", Info) und am Ausfallalarm (o2 liefert seine
+    LISTUNGEN weiter, Funde bleiben > 0) vorbeigehen (S2-1 der
+    P5-Codepruefung). Ohne Kandidaten (Probe lief nicht - kein Bündel-
+    zweig, nur Zubehör- und tariflose Sätze) steht keine Zeile: dafuer
+    sind die Buendel- und Ausfallzeile da.
+    """
+    for satz in bilanzen:
+        proben = satz.get("proben") or {}
+        erwartete = int(proben.get("kandidaten", 0))
+        if not erwartete:
+            continue
+        bestanden = int(proben.get("bestanden", 0))
+        # Abrunden, NICHT runden: nur exakt bestanden == erwartete heisst
+        # "100 %" - bei 199 von 200 als "100 %" zu melden waere Perfektion
+        # fuer einen Einzelfehler (S3 der P5-Codepruefung).
+        prozent = int(100.0 * bestanden / erwartete)
+        ebenen = ", ".join(f"{wert}x {name}"
+                           for name, wert in sorted(proben.items())
+                           if name not in ("kandidaten", "bestanden")
+                           and int(wert) > 0)
+        if prozent >= 100:
+            log.info("Geraeteradar-Probe: %s liefert %d von %d erwarteten "
+                     "Saetzen noch ihre Felder (%d %%)",
+                     satz["anbieter"], bestanden, erwartete, prozent)
+        else:
+            log.warning("Geraeteradar-Probe: %s liefert %d von %d erwarteten "
+                        "Saetzen noch ihre Felder (%d %%) - gescheitert an: %s",
+                        satz["anbieter"], bestanden, erwartete, prozent,
+                        ebenen or "unbekannt")
 
 
 def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
@@ -195,6 +259,9 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
             "gelesen": len(bilanz.gelesene_einstiege),
             "produkte_abgerufen": bilanz.produkte_abgerufen,
             "rohsaetze": bilanz.rohsaetze,
+            # FM-2: die Zaehler der Provider-Probe (leer, wenn der Adapter
+            # keine kennt) - gemeldet wird sie unten, siehe `melde_proben`.
+            "proben": dict(bilanz.proben),
             "gedeckelt": bilanz.gedeckelt,
             "vollstaendig": bilanz.vollstaendig,
             "nicht_verlinkt": bilanz.nicht_verlinkt,
@@ -485,6 +552,15 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
                      satz["anbieter"], satz["status"], satz["listungen"],
                      satz["produkte_abgerufen"], satz["rohsaetze"],
                      satz["grund"][:160])
+    # FM-2: Quellentod darf nicht still bleiben. Beide Meldungen sind reine
+    # Protokollzeilen - der Alarm altert und loest nichts (die Auslistung
+    # bleibt allein an `vollstaendig` gebunden), die Probe greift in nichts
+    # ein. `nur` begrenzt auf DIESEN Lauf: ein nicht mehr konfigurierter
+    # Anbieter wird nicht mehr beobachtet und darf keine Ewigkeitsmeldung
+    # geben.
+    melde_ausfall(db.ausfall_alarme(
+        nur={satz["anbieter"] for satz in bilanzen}))
+    melde_proben(bilanzen)
     if bilanz["unbekannte_titel"]:
         # Die Arbeitsliste fuer config/geraete_katalog.yaml. Sie stand bisher
         # nur in der Rueckgabe - und der naechtliche Lauf gibt an niemanden
@@ -519,6 +595,21 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
         log.warning("Geraeteradar: Vorgaenger-Bezug ohne Katalogziel in "
                     "config/geraete_katalog.yaml: %s",
                     " | ".join(ohn_kette[:25]))
+    # PM-6 / P5 Auftrag 4 (18.09.2026): die taegliche Fragmentgroesse als
+    # EINE einzeilige Protokollzeile - die drei Zahlen (Messtage, Messpaare,
+    # Fragment-KB), aus EINER Quelle wie das Skript
+    # (scripts/geraete_fragment_wachstum.py liest dieselbe Funktion). Sie
+    # ist der Fruehindikator aus Premortem FM 3: das Zeitreihen-Fragment
+    # waechst mit jedem Messtag, und die Deckel-Entscheidung vom 01.10.
+    # braucht die Reihe, nicht einen einzelnen Schaetzwert. Bewusst ans ENDE
+    # und bewusst NUR LESEND: die Historie ist zu diesem Punkt frisch
+    # geschrieben, die Fragmente auf Platt stammen vom letzten Render (der
+    # Render-Schritt des Workflows laeuft NACH diesem Schritt) - die Zeile
+    # nennt das selbst. Fehlt die Historie, bleibt die Zeile weg (kein
+    # Messpunkt 0/0/0).
+    zeile = geraete_fragment.protokoll_zeile(root)
+    if zeile:
+        log.info("%s", zeile)
     return bilanz
 
 

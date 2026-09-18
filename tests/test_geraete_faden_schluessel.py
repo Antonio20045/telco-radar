@@ -162,39 +162,62 @@ def test_jede_radarzeile_hat_link_oder_benannte_luecke(tmp_path):
         f"{len(mit_luecke)} Luecke - es gibt einen stummen dritten Zustand"
 
 
-def test_reines_buendel_ohne_listung_heisst_nicht_im_katalog(tmp_path):
-    """Der Differenzfall aus dem Auftrag: ein Modell MIT Bündel (Radar-
-    Zeile), OHNE Listung (keine Katalog-Zeile) - der Katalog-Sprung darf
-    nicht als toter Link stehen, die Luecke heisst beim Namen. Fixture:
-    `graphloses_modell` haengt ein iPhone-16-Pro-Max-Buendel ohne Listung
-    an (BRIEF_RAHMEN2_R3, derselbe Fall wie im Bestand).
+def test_reines_buendel_ohne_listung_steht_im_katalog(tmp_path):
+    """P5-AUFTRAG 1 (STRATEGIE_GERAETE_V3, 18.09.2026) - DIE REGEL GEDREHT:
+    „Sichtbarkeit folgt den Daten, nicht dem Weg - Buendel ODER Listung
+    genuegt." Bis P5 zaehlte der Katalog nur Listungen; ein reines
+    Buendel-Modell (Radar-Zeile, keine Katalog-Zeile) hiess „nicht im
+    Katalog" - der WEG entschied ueber die Sichtbarkeit. Genau das pruefte
+    dieser Test bis P5 (Vorher-rot bewiesen: seine Fixture-Voraussetzung
+    `ziel not in katalog_ids` fiel als ERSTE an der neuen Regel, noch
+    bevor er umgestellt wurde). Jetzt: das Modell MIT Buendel und OHNE
+    Listung HAT seine Katalog-Zeile - mit der Buendel-Angabe in der
+    Preiszelle statt eines Barpreises - und der Radar-Sprung „im Katalog
+    ->" trifft sie.
 
-    P4-Fix (Sicht-Pruefung 18.09.): der Graph-Sprung derselben Zeile ist
-    mitgefallen - das Bündel loest auf KEIN Band auf (`erlaubt` leer,
-    nachgemessen an der Fixture), der Deep-Link waere auf das Startgeraet
-    gefallen. Der Test findet die Zeile deshalb ueber die MODELLZELLE
-    (ueber den Link ginge sie seit dem Fix nicht mehr) und haelt BEIDE
-    Luecken fest: 'nicht im Katalog' und 'noch keine Zeitreihe'."""
+    Der Graph-Sprung bleibt fail-closed (P4-Fix, Sicht-Pruefung 18.09.):
+    das Buendel der Fixture loest auf KEIN Band auf (`erlaubt` leer,
+    nachgemessen), der Deep-Link faelle auf das Startgeraet - die Luecke
+    heisst weiterhin 'noch keine Zeitreihe'."""
     s = _baue_zustand(tmp_path, graphloses_modell=True)
     katalog_ids = {z.get("data-modell") for z in
                    s.select("#gr-katalogtabelle tr.gr-k-zeile")}
     ziel = "apple-iphone-16-pro-max-256"
-    assert ziel not in katalog_ids, \
-        "Fixture-Voraussetzung: das Modell hat keine Katalog-Zeile"
+    assert ziel in katalog_ids, \
+        "Buendel ohne Listung ohne Katalog-Zeile - die P5-Regel greift nicht"
     erlaubt = _erlaubt(s)
     assert ziel not in erlaubt, \
         "Fixture-Voraussetzung: das Modell ist nicht waehlbar " \
         f"(erlaubt enthaelt {ziel})"
+
+    # Die Katalog-Zeile selbst: Buendel-Angabe statt Barpreis (die P3-Regel
+    # „keine Modellzeile sagt ohne Preis" gilt seit P5 auch fuer den
+    # Buendel-weg) und die benannte Luecke am Graph-Sprung.
+    kzeile = next(z for z in s.select("#gr-katalogtabelle tr.gr-k-zeile")
+                  if z.get("data-modell") == ziel)
+    ktext = _text(kzeile)
+    assert "nur im Bündel" in ktext, \
+        f"Katalog-Zeile ohne Buendel-Angabe: {ktext[:200]}"
+    assert "€/Monat" in ktext, "Buendel-Angabe ohne Monatspreis"
+    assert kzeile.select_one("a.gr-sprung") is None, \
+        "Graph-Sprung auf ein nicht waehlbares Modell (toter Deep-Link)"
+    assert "noch keine Zeitreihe" in ktext
+
+    # Die Radar-Zeile: der Katalog-Sprung trifft jetzt (bis P5 stand hier
+    # die benannte Luecke 'nicht im Katalog'), der Graph-Sprung bleibt
+    # draussen.
     zeile = next(z for z in s.select("#wr-abweichung tr.gr-a-zeile")
                  if "iPhone 16 Pro Max" in _text(z.select_one("td")))
     assert zeile is not None, "Radar-Zeile des Modells fehlt"
-    assert zeile.select_one("a.gr-ksprung") is None, \
-        "Katalog-Sprung auf ein Modell ohne Katalog-Zeile"
+    sprung = zeile.select_one("a.gr-ksprung")
+    assert sprung is not None and sprung.get("data-modell") == ziel, \
+        "Katalog-Sprung fehlt auf ein Modell MIT Katalog-Zeile"
     assert zeile.select_one("a.gr-sprung") is None, \
         "Graph-Sprung auf ein nicht waehlbares Modell (toter Deep-Link)"
     kleins = [" ".join(sp.get_text(" ", strip=True).split())
               for sp in zeile.select("span.gr-a-klein")]
-    assert "nicht im Katalog" in kleins
+    assert "nicht im Katalog" not in kleins, \
+        "die alte Luecke steht neben einer existierenden Katalog-Zeile"
     assert "noch keine Zeitreihe" in kleins
 
 

@@ -117,6 +117,51 @@ def _serien_anker(katalog: Katalog) -> dict:
             if len(h) == 1}
 
 
+# FESTE FAMILIEN-ANKER (P5/E3, gemessen 17.09.2026): Vodafone nennt seine
+# iPads im strukturierten Namen OHNE Hersteller-Praefix - `modelName` ist
+# „iPad Pro 11 (2025)", „iPad (2025)", „iPad Pro 11 2024" (data/state/
+# geraete_unbekannt.jsonl vom 17.09., quelle vodafone_buendel/vodafone_api).
+# Die Serie „iPad" stand in KEINEM Katalog-Eintrag (Hand wie Auto - der
+# Hand-Katalog verfolgte bewusst keine Tablets), also griff der Serien-Anker
+# nie: die Anker-Luecke aus auto-doku.md. Diese Familien sind keine Raterei,
+# sondern Markennamen EINES Herstellers: iPad, Watch und AirPods sind
+# Apple-Serien. Watch- und AirPods-Nennungen MIT Praefix liefen ohnehin ueber
+# den Praefix-Pfad (17.09.: Watch S12, AirPods 5, auto-angelegt); der
+# Familien-Anker traegt nur den Namen OHNE Praefix nach - kuenftige iPads
+# („iPad Air", „iPad mini", „iPad Pro 14") werden damit automatisch
+# Katalog-Eintraege, ohne dass jemand den Katalog anfasst.
+_FESTE_FAMILIEN = {
+    "ipad": "Apple",
+    "watch": "Apple",
+    "airpods": "Apple",
+}
+
+
+def _anker_treffer(serie: Optional[str], anker: dict,
+                   katalog: Katalog) -> Optional[str]:
+    """Hersteller fuer eine normalisierte Baureihe: der Katalog-Anker
+    zuerst, der feste Familien-Anker nur als Lueckenfueller.
+
+    Kennt der Katalog die Reihe - EINDEUTIG oder WIDERSPRUECHLICH -,
+    entscheidet er allein: der eindeutige Fall steht im Anker, der
+    widerspruechliche bleibt absichtlich ohne Hersteller (nichts geraten),
+    und genau dann darf der Familien-Anker nicht eingreifen - sonst ebnete
+    er eine gepflegte Zuordnung ein (Hand schlaegt Auto, in beide
+    Richtungen). Er greift nur fuer eine Reihe, die in KEINEM Katalog-
+    Eintrag vorkommt, und prueft das gegen den Katalog selbst, nicht gegen
+    das Anker-Diktat darueber.
+    """
+    if not serie:
+        return None
+    treffer = anker.get(serie)
+    if treffer is not None:
+        return treffer
+    if any(normalisiere(serie_aus_modell(g.modell)) == serie
+           for g in katalog.geraete):
+        return None          # der Katalog kennt die Reihe - er entscheidet
+    return _FESTE_FAMILIEN.get(serie.split("-")[0])
+
+
 def schale(name: str, katalog: Katalog) -> Optional[tuple]:
     """Strukturierter Name -> (Hersteller, Modell) oder None.
 
@@ -140,7 +185,7 @@ def schale(name: str, katalog: Katalog) -> Optional[tuple]:
     if hersteller is None:
         anker = _serien_anker(katalog)
         serie = normalisiere(serie_aus_modell(name))
-        treffer = anker.get(serie) if serie else None
+        treffer = _anker_treffer(serie, anker, katalog)
         if treffer is None:
             return None                    # kein Hersteller, nichts geraten
         hersteller, rest = treffer, name
@@ -159,7 +204,7 @@ def _generation(modell: str, hersteller: str, katalog: Katalog) -> Optional[int]
     `generation`). Eine unbekannte Serie bekommt None, nie eine Rate-Zahl."""
     anker = _serien_anker(katalog)
     serie = normalisiere(serie_aus_modell(modell))
-    if not serie or anker.get(serie) != hersteller:
+    if not serie or _anker_treffer(serie, anker, katalog) != hersteller:
         return None
     for wort in re.split(r"[\s\-]+", modell):
         treffer = _ZAHL_AM_WORTENDE.search(wort)
@@ -342,11 +387,57 @@ def speichere_auto_zusaetze(root: Path, katalog: Katalog) -> int:
 # Persistenz unbekannter Titel und Farben
 # --------------------------------------------------------------------------
 
+# Tarif-Rauschen in der Arbeitsliste (P5/E3, gemessen 17.09.2026): ALDI TALK
+# liefert je Lauf drei Tarifpakete als „Geraet" in den strukturierten Daten
+# mit - „Tarif S", „Tarif M", „Tarif L" (quelle microdata). In der Liste vom
+# 17.09. stehen sie als 3 Zeilen mit Haeufigkeitssumme 87 von 284 und machen
+# den Fruehindikator aus FM 1 taub: wer die Liste nach Anker-Luecken liest
+# (iPad-Titel, „HMD Fusion X1"), sortiert erst an 29-mal demselben Tarifnamen
+# vorbei. Ein Titel ist Rauschen, wenn er das Wort „Tarif" traegt UND keine
+# Ziffer - jedes Geraet benennt sich ueber Modellnummer, Speicher, Jahr oder
+# Groesse; „Tarif S" hat nichts davon. Der einzige ziffernlose GERAETEtitel
+# des Bestands („Oakley Meta - HSTN Prizm Polarized (AI Glasses)") traegt das
+# Wort „Tarif" nicht - die UND-Verknuepfung haelt ihn raus. Zusammengesetzte
+# Tarifnamen („Tarifpaket M") bleiben bewusst stehen: das Wort grenzt nicht,
+# und lieber bleibt Rauschen stehen, als dass ein Geraet verschwindet.
+_TARIF_WORT = re.compile(r"\btarif\b", re.IGNORECASE)
+
+
+def ist_tarif_titel(titel: str) -> bool:
+    """Benennt dieser Titel ein TARIFPAKET statt eines Geraets?
+
+    Die Regel ist eine UND-Verknuepfung aus dem gemessenen Muster (nur
+    „Tarif S/M/L", alles andere waere geraten): Wort „Tarif" vorhanden,
+    keine Ziffer im Titel. Gilt nur fuer Titel - eine Farbe namens „Tarif"
+    gibt es nicht, und die Regel schaut gar nicht erst hin.
+    """
+    t = (titel or "").strip()
+    if not t:
+        return False
+    return bool(_TARIF_WORT.search(t)) and not re.search(r"\d", t)
+
+
+def _ist_tarif_eintrag(eintrag: dict) -> bool:
+    """Ein `unbekannt`-Satz ist Tarif-Rauschen, wenn er ein TITEL-Satz mit
+    Tarifnamen ist - die gemeinsame Formel fuer neue Eintraege und fuer
+    Bestandszeilen (eine zweite Kopie derselben Bedingung wuerde driften)."""
+    return eintrag.get("art") == "titel" \
+        and ist_tarif_titel(str(eintrag.get("wert") or ""))
+
+
 def persistiere_unbekannte(root: Path, eintraege: list, heute: str) -> int:
     """data/state/geraete_unbekannt.jsonl fuehren: eine Zeile je unbekanntem
     Titel bzw. Farbe, mit Anbieter, Quelle des Feldes, Datum und Haeufigkeit
     - Upsert auf (art, wert, anbieter), damit ein wiederkehrender Titel
-    zaehlt statt jede Nacht eine neue Zeile zu machen."""
+    zaehlt statt jede Nacht eine neue Zeile zu machen.
+
+    Tarif-Rauschen (`ist_tarif_titel`) wird beim SCHREIBEN gefiltert: neue
+    Tarif-Titel kommen nicht hinein, und bestehende Rausch-Zeilen fallen beim
+    Neuschreiben weg. Die Bereinigung des heutigen Bestands (3 Zeilen,
+    Haeufigkeitssumme 87) macht damit der NAECHSTE Lauf mit mindestens einem
+    Eintrag - data/state wird nur vom Lauf geschrieben, nie von Hand
+    (Hausregel). Farb-Zeilen sind von der Regel unberuehrt.
+    """
     if not eintraege:
         return 0
     pfad = Path(root) / "data" / "state" / _UNBEKANNT_DATEI
@@ -360,9 +451,18 @@ def persistiere_unbekannte(root: Path, eintraege: list, heute: str) -> int:
             zeilen = []            # kaputte Datei: neu anfangen ist besser
             # als stehenbleiben - die Haeufigkeit ist eine Zaehlung, keine
             # Buchfuehrung mit Rechtsfolge.
+    bereinigt = sum(1 for z in zeilen if _ist_tarif_eintrag(z))
+    zeilen = [z for z in zeilen if not _ist_tarif_eintrag(z)]
+    neue = [e for e in eintraege if not _ist_tarif_eintrag(e)]
+    verworfen = bereinigt + (len(eintraege) - len(neue))
+    if verworfen:
+        log.info("Auto-Erkennung: %d Tarif-Titel aus der Arbeitsliste "
+                 "gefiltert (%d alte Zeilen bereinigt, %d neue verworfen) - "
+                 "die Liste bleibt Fruehindikator fuer Anker-Luecken (P5/E3)",
+                 verworfen, bereinigt, len(eintraege) - len(neue))
     index = {(z.get("art"), z.get("wert"), z.get("anbieter")): i
              for i, z in enumerate(zeilen)}
-    for eintrag in eintraege:
+    for eintrag in neue:
         schluessel = (eintrag.get("art"), eintrag.get("wert"),
                       eintrag.get("anbieter"))
         i = index.get(schluessel)

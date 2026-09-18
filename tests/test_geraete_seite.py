@@ -1133,7 +1133,8 @@ def _chromium():
     import glob
     for muster in ("/opt/pw-browsers/chromium-*/chrome-linux/chrome",
                    str(Path.home() / ".cache/ms-playwright"
-                       / "chromium*/chrome-linux*/chrome")):
+                       / "chromium*/chrome-linux*/chrome"),
+                   "/Applications/Chromium.app/Contents/MacOS/Chromium"):
         treffer = sorted(glob.glob(muster))
         if treffer:
             return treffer[-1]

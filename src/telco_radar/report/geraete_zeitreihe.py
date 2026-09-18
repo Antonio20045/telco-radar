@@ -78,9 +78,17 @@ SCHMAL_W, SCHMAL_MIN_H = 358, 380
 # Geräte"); die Zahl ist eine Obergrenze, kein Soll.
 KACHELN_MAX = 6
 
-# E4-Sichtbarkeit: ein AUTO angelegtes Modell wird in der WAHL dieser
-# Ansicht erst ab dieser Zahl unterschiedlicher Messtage gefuehrt (der
-# Katalog-Reiter zeigt es ab Tag 1, die Listung existiert ab Tag 1).
+# E4/P5-Sichtbarkeit - DIE EINE REGEL: Sichtbarkeit folgt den DATEN, nicht
+# dem Weg - Bündel ODER Listung genuegt. Zwei Orte, zwei Schwellen:
+#   KATALOG       ab der ERSTEN Listung (Tag 1) ODER ab dem ersten Bündel
+#                 (`geraete_view.katalog_modellzeilen`, P5-Auftrag 1)
+#   ZEITREIHEN-WAHL (hier) erst ab dieser Zahl unterschiedlicher Bündel-
+#                 MESSTAGE - ein Messtag ist noch keine Reihe, und zwei
+#                 Nächte bestätigen, dass der strukturierte Name kein
+#                 Einmal-Fund war. Modelle OHNE Bündel (Watches, Tabs,
+#                 AirPods als Auto-Eintrag mit Listung) stehen deshalb im
+#                 Katalog und NICHT hier: ein Wahl-Eintrag ohne zwei
+#                 Messungen wäre ein unsichtbarer (FM 6.4).
 AUTO_SICHTBAR_AB_MESTAGEN = 2
 
 # P1 (STRATEGIE_GERAETE_V3, 17.09.2026): der Rechenweg je Messung. Der
@@ -1029,12 +1037,13 @@ def aufbereiten(state_dir: Path, tco: dict) -> dict:
             len(saetze) for pa_ in messungen_alle.values()
             for saetze in pa_.values()))
 
-    # E4-SICHTBARKEIT: ein AUTO angelegtes Modell steht in der WAHL (Such-
-    # index, Kacheln, Paare) erst ab 2 Messtagen. Die Listung existiert ab
-    # Tag 1 und der KATALOG-Reiter zeigt das Geraet ab Tag 1 - aber die
-    # Zeitreihe ist eine TCO-Aussage, und ein Messtag ist noch keine; zwei
-    # Naechte Bestand bestätigen ausserdem, dass der strukturierte Name kein
-    # Einmal-Fund war. Hand-Eintraege gelten unbegrenzt (der Mensch hat
+    # E4/P5-SICHTBARKEIT: ein AUTO angelegtes Modell steht in der WAHL (Such-
+    # index, Kacheln, Paare) erst ab AUTO_SICHTBAR_AB_MESTAGEN Bündel-
+    # Messtagen. Der KATALOG-Reiter zeigt es unabhaengig davon ab der ersten
+    # Listung ODER dem ersten Bündel (`geraete_view.katalog_modellzeilen`)
+    # - die Zeitreihe ist eine TCO-Aussage, und ein Messtag ist noch keine;
+    # zwei Naechte Bestand bestätigen ausserdem, dass der strukturierte Name
+    # kein Einmal-Fund war. Hand-Eintraege gelten unbegrenzt (der Mensch hat
     # entschieden, dass das Geraet verfolgt wird). KEIN Deckel am Vorrat
     # im Sinne von QA-B1: die Regel ist eine Sichtbarkeitsentscheidung aus
     # der Messlage, keine Auswahl nach Listenposition.

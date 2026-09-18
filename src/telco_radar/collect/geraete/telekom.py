@@ -371,7 +371,11 @@ def _plan_preise(plan: dict) -> tuple[Optional[float], Optional[float]]:
     return anschluss, monatlich
 
 
-def lies_buendel(text: str, url: str = "") -> list[dict]:
+# `proben` ist die Schnittstelle der Provider-Probe (FM-2, P5 - siehe
+# Adapter-Docstring in collect/geraete/__init__.py); dieser Adapter
+# traegt keine Feld-Proben hinein.
+def lies_buendel(text: str, url: str = "",
+                 proben: Optional[dict] = None) -> list[dict]:
     """Die Kategorieseite MIT Tariffilter in Buendel-Rohsaetze zerlegen.
 
     Sie IST die Nutzlast (`kind: buendel`-Einstieg, kein `ernte`, keine

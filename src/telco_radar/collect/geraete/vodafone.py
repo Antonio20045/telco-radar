@@ -342,7 +342,11 @@ def _buendelsatz_aus_komposition(modell: str, hubpage: str, hardware_id: str,
     }
 
 
-def lies_buendel(text: str, url: str = "") -> list[dict]:
+# `proben` ist die Schnittstelle der Provider-Probe (FM-2, P5 - siehe
+# Adapter-Docstring in collect/geraete/__init__.py); dieser Adapter
+# traegt keine Feld-Proben hinein.
+def lies_buendel(text: str, url: str = "",
+                 proben: Optional[dict] = None) -> list[dict]:
     """Aus DERSELBEN Detailnutzlast, die `lies()` liest, die Buendelsaetze.
 
     Kein eigener Abruf: `text` ist exakt die Antwort, die der Sammler fuer

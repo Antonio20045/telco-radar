@@ -1,5 +1,5 @@
 {
-  "zweck": "Messrunde 31.08.2026: rohe, unveraenderte HTTP-Antworten als Beleg je Anbieter. Dateien ueber 250 kB liegen gzip-komprimiert (byteidentisch, nur verpackt) - sha256_roh gilt fuer den ENTPACKTEN Inhalt. ERGAENZT AM 04.09.2026 um Telekom (Kategorieseite) und 1&1 (Kategorie- und Produktseite): dieselbe Regel, aber mit dem ehrlichen Absender TelcoRadar/1.0 abgerufen und nicht mit einer Browser-Kennung. ERGAENZT AM 05.09.2026 um Saturn (zwei Markenseiten, /de/brand/apple/iphone/...): ld+json-ItemList UND window.__PRELOADED_STATE__ (Apollo-Cache) derselben Antwort, ehrlicher Absender TelcoRadar/1.0.",
+  "zweck": "Messrunde 31.08.2026: rohe, unveraenderte HTTP-Antworten als Beleg je Anbieter. Dateien ueber 250 kB liegen gzip-komprimiert (byteidentisch, nur verpackt) - sha256_roh gilt fuer den ENTPACKTEN Inhalt. ERGAENZT AM 04.09.2026 um Telekom (Kategorieseite) und 1&1 (Kategorie- und Produktseite): dieselbe Regel, aber mit dem ehrlichen Absender TelcoRadar/1.0 abgerufen und nicht mit einer Browser-Kennung. ERGAENZT AM 05.09.2026 um Saturn (zwei Markenseiten, /de/brand/apple/iphone/...): ld+json-ItemList UND window.__PRELOADED_STATE__ (Apollo-Cache) derselben Antwort, ehrlicher Absender TelcoRadar/1.0. ERGAENZT AM 18.09.2026 (P5/E3) um die Titel-Zeilen von data/state/geraete_unbekannt.jsonl (Stand 17.09., Bot-Commit 1dd48d4): kein HTTP-Abruf, sondern ein Auszug aus dem Lauf-State - alle 145 art=titel-Zeilen unveraendert; Basis der Tarif-Rauschen-Regel und ihrer Tests.",
   "eintraege": [
     {
       "datei": "1und1_produkt_iphone17.html.gz",
@@ -339,6 +339,16 @@
       "gzip": true,
       "absender": "TelcoRadar/1.0",
       "bytes_abgelegt": 138642
+    },
+    {
+      "datei": "unbekannte_titel_2026-09-17.jsonl",
+      "url": "data/state/geraete_unbekannt.jsonl (Repo-State, kein Abruf)",
+      "abgerufen_am": "2026-09-17",
+      "bytes_roh": 23653,
+      "sha256_roh": "3a66c789d39328fdf0a6f2409e34c54d6c52c510f948ad34d832de0c2e2d09b0",
+      "gzip": false,
+      "absender": "TelcoRadar/1.0",
+      "bytes_abgelegt": 23653
     }
   ]
 }

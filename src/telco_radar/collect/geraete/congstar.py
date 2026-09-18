@@ -338,11 +338,12 @@ def lies(text: str, url: str = "") -> list[dict]:
         if preis is None:
             continue                  # keine Einmalkauf-Zahlweise ohne Vertrag
 
-        speicher = (v.get("memory") or {}).get("size")
-        try:
-            speicher_gb = int(speicher) if speicher is not None else None
-        except (TypeError, ValueError):
-            speicher_gb = None
+        # Derselbe Helfer wie im Buendel-Pfad (`_speicher_gb`: referenceGB
+        # vor size): das 1-TB-Geraet traegt size=1, und size allein waere
+        # "1 GB" - live gemessen als Phantom-Modellzeile "Apple iPhone 18
+        # Pro 1 GB" in Katalog und beiden Modell-Exporten (P5-Live-
+        # Pruefung, Rest R1, 18.09.2026).
+        speicher_gb = _speicher_gb(v.get("memory"))
 
         farbe = str((v.get("color") or {}).get("name") or "").strip()
         status = str((v.get("availability") or {}).get("status") or "").strip().upper()
@@ -466,7 +467,11 @@ def _speicher_gb(memory) -> Optional[int]:
     return None
 
 
-def lies_buendel(text: str, url: str = "") -> list[dict]:
+# `proben` ist die Schnittstelle der Provider-Probe (FM-2, P5 - siehe
+# Adapter-Docstring in collect/geraete/__init__.py); dieser Adapter
+# traegt keine Feld-Proben hinein.
+def lies_buendel(text: str, url: str = "",
+                 proben: Optional[dict] = None) -> list[dict]:
     """Aus einer Tarifseite je (PlanVariant x Geraet x Speicher) einen
     Buendel-Rohsatz (`kind: buendel`-Einstieg, keine Ernte, keine
     Produktseite wird nachgeladen - die Seite IST die Nutzlast).

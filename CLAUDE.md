@@ -296,9 +296,10 @@ Geschichten oberhalb der Falz). Wer eine Schlagzeile ergänzt und die Klasse
 vergisst, fällt aus allen dreien heraus.
 
 **Acht feste Seiten plus temporäre Themenseiten**, geschnitten nach der
-Frage des Lesers — davon **fünf in der Navigation**; `suche.html`,
-`lieferzeit.html` und `tarife.html` sind gebaut und über ihren direkten
-Link erreichbar, aber nicht verlinkt (Stand 09.08.2026):
+Frage des Lesers — davon **sieben in der Navigation** (Stand 18.09.2026,
+nachgezählt; bis August waren es fünf); `suche.html`, `lieferzeit.html`
+und `tarife.html` sind gebaut und über ihren direkten
+Link erreichbar, aber nicht verlinkt:
 
 | Seite | Frage | Inhalt |
 |---|---|---|
@@ -310,11 +311,7 @@ Link erreichbar, aber nicht verlinkt (Stand 09.08.2026):
 | `lieferzeit.html` **Lieferzeiten** (nicht verlinkt) | „Wie lange lassen die anderen ihre Kunden warten?“ | Matrix Anbieter × Produkt aus einem FESTEN Warenkorb, je Zelle mit Originaltext, Methode, Belegstufe und Messzeitpunkt; darunter die Grenzen der Messung. Es gibt keine öffentliche Studie, gegen die jemand diese Zahlen prüfen könnte — also liefert die Seite ihre eigene Gegenprobe mit |
 | `tarife.html` **Tarife** (nicht verlinkt) | „Was kostet was wirklich?" | Effektivpreis über 24 Monate (phasengewichtet), Preis je GB, Qualitätsmerkmale, dazu die Positionskarte als **gerechnetes SVG** mit Fair-Value-Linie. Speist sich aus `data/state/tarife.jsonl`, also aus den Produktinformationsblättern — der einzigen Quelle dieses Marktes, die rechtlich wahrheitsbewehrt ist. Die Vollständigkeitsangabe steht OBEN, nicht als Fußnote |
 | `folien/<datum>.html` | „Ich brauche drei Folien für Montag" | Vier Folien im Vodafone-Design aus der Ausgabe. Feste Vorlage, feste Platzhalter, harte Zeichengrenzen; die Quellenfolie hat keinen Schalter. Kein Nav-Eintrag — verlinkt am **Fuß des Wochenberichts** (bis 09.08.2026 über der Titelseite; dort kostete die Zeile drei Geschichten oberhalb der Falz) |
-| `geraete.html` **Geräte** — **TCO-first seit 04.09.2026** | „Was zahlt der Kunde über 24 Monate gesamt?" Vier Reiter: TCO-Vergleich (Hauptansicht, ohne Klick aktiv) · Gerätekatalog · Preis- und TCO-Historie · Portfolio. Je Modell vier Anbieterkarten mit `TCO-<Bindung>`, `Ø €/Monat`, „nach 24 Monaten gezahlt", Rechenweg — oder mit benanntem Leerzustand. Dazu G1 (Balkenvergleich je Anbieter, zwei Laufzeitgruppen) und G2 (Preisverlauf), beide servergerendertes SVG. Einzelheiten in §8a |
-| `geraete.html` — der Stand DAVOR (bis 04.09.2026) | „Was haben die anderen im Regal, und was kostet es?" | Preis-Positionskarte als **gerechnetes SVG** mit ZWEI Umschaltern (Ansicht: Spalten = Hersteller / = Anbieter · Darstellung: Preisbänder / Punkte), alle vier Flächen vorgerechnet, kein Reload; darunter dieselben Zahlen als aufklappbare Tabelle. Dazu SKU-Matrix Modell × Anbieter, Lifecycle (Verweildauer, Preisverfall, Nachfolger-Effekt, Portfolio-Tiefe). Speist sich aus `data/state/geraete_db.json` + `geraete_preise.jsonl` |
-| `geraete.html` — **Preiswahrheit und Kuerzung** (29.08.2026, abends) | „Kann ich der Zahl trauen, und finde ich sie?" | Die Seite ist **5254 statt 18299 px** lang. Der Vergleich zeigt nur Zeilen mit ≥ 3 % **oder** ≥ 15 € Abstand (ODER, nicht UND: bei 200 € sind 15 € viel und 3 % wenig, bei 2000 € umgekehrt), alles Uebrige steht hinter Aufklappern — SKU-Matrix, 65 Varianten, Ausfallgruende, Vollansicht. Die Grafik zeigt hoechstens **12 Baender je Spalte** und als Standard nur die aktuelle Generation JE BAUREIHE. Nichts ist geloescht |
-| `geraete.html` — **Vergleich und Export** (29.08.2026) | „Wer ist günstiger als Vodafone, und wie hole ich alles am Stück?" | Zwei Sektionen unter der Preisgrafik. **„Wer ist günstiger als Vodafone?"** (`report/geraete_vergleich.py`): je (Modell, Speicher, Zustand) der eigene Preis, der günstigste Wettbewerber MIT NAMEN, Differenz absolut und in Prozent, Aufklapper mit ALLEN darunter, Filter nach Anbietertyp. Vier Regeln: kein Vergleich ohne BEIDE Belege, die zwei Preisarten nie gegeneinander, der Zustand im Schlüssel, verglichen werden LÄDEN statt Marken. **„Alles als Tabelle"** (`report/geraete_export.py` → `site/exporte/`): zwei CSV, UTF-8 **mit BOM**, Semikolon, Dezimalkomma — alle drei, damit Excel im deutschen Gebietsschema per Doppelklick öffnet; die Preisart steht in einer eigenen Spalte |
-| `geraete.html` — **Leseseite ohne Erklaersektionen** (03.09.2026) | „Zeig mir die Regale, nicht deine Datenpflege." | Antonio hat die Erklaer- und Kommentarabschnitte kassiert: der Einleitungssatz ueber die Preisbasis, die Sektion „Wie vollstaendig ist das" (Betriebszahlen am Fuss) und die ganze Sektion „Datenbasis und Luecken" („Warum diese N nichts liefern", „Ohne Hardware-Vermarktung beobachtet", Marktstart-Satz, Farbbericht) sind GELÖSCHT. Ueberlebt und in den Portfolio-Reiter gezogen hat nur der Aufklapper „Bei Wettbewerbern gelistet, bei Vodafone nicht" — eine Sortiments-Aussage, kein Kommentar; ein Test nagelt ihn auf `#tafel-portfolio` fest. Die Arbeitslisten stehen im Protokoll des naechtlichen Laufs (Farben/Titel standen dort ohnehin; Marktstart- und Vorgaenger-Luecken loggt `geraete_pipeline` seitdem mit), das „warum liefert wer nichts" steht auf `geraete-quellen.html` — erreichbar ueber EINEN Fusslink, weil mit den Sektionen alle drei bisherigen Links fielen (Review-Befund B1: sonst waere die Quellenseite fertig und unauffindbar). `geraete_view` berechnet `farbbericht`/`katalog`-Luecken/`ohne_katalog` nicht mehr; `quellenlage` und `bilanz` bleiben (Quellenseite bzw. Navigationsschwelle lesen sie) |
+| `geraete.html` **Geräte** — Stand 18.09.2026 (Strategie v3, P1–P5; Historie in `outputs/strategie-geraete-v3-2026-09-17/` und git) | „Was zahlt der Kunde über 24 Monate gesamt — und wer ist am günstigsten?" | VIER Reiter: **Vergleich** (Hauptansicht: TCO-Zeitreihe, Y=€ / X=echte Messtage, je Messung ein Punkt, nichts interpoliert; Suchfeld mit Vorschau ab 2 Zeichen, Band-Wahl, Modell-Karten — **jede Preiszahl ist klickbar** und öffnet den serverseitigen Rechenweg mit Posten-Balken und Restschuld-Zeile) · **Radar** (Abweichung zu Vodafone als **Balken-Grafik** je Anbieter; Alarm-Tabelle und Händler-Barpreis im Aufklapper) · **Preisverlauf** (Modell-Wähler OBEN mit Auto-Vorauswahl nach Messpunkten, Wochenkarte „Was diese Woche auffällt") · **Gerätekatalog** (Modellebene, ein Preis je Zeile, **Umschalter Barpreis/TCO ohne Reload**). **Die Leitzahl (€) ist die größte Schrift jedes Reiters**, Rot ist Akzent mit Messregel-Deckel, Sprungkette Radar → Katalog → Zeitreihe über EINEN `modell_schluessel`; Text-Deckel und Ruhe als **Kriterien 13/14/15 in `pruefe_portal.py`**; sechs Export-Knöpfe am Fuß (`site/exporte/`, BOM/Semikolon/Dezimalkomma, darunter die zwei Katalog-Ansichts-CSVs Barpreis/TCO); EIN Fußlink auf `geraete-quellen.html`. Speist sich aus `data/state/geraete_db.json` + `geraete_tco.json` + `geraete_tco_historie.jsonl` |
 | `geraete-quellen.html` (nicht verlinkt) | „Wer liefert, wer nicht, warum?" | Jeder der 23 konfigurierten Anbieter mit Ebene, Beschaffungsmethode, Stand und Grund. Marken ohne Hardware-Vermarktung stehen als EINE Zeile, nicht als leere Kachel |
 | `uebersetzung/<id>.html` (nicht verlinkt) | „Was steht da eigentlich?" | Die **vollständige** deutsche Fassung eines fremdsprachigen Artikels. Kein Nav-Eintrag: erreichbar über den roten Link der Meldungskarte. Oben und ohne Scrollen: „Maschinelle Übersetzung", die Ausgangssprache und der Link zum Original — die Übersetzung tritt NEBEN das Original, nicht an seine Stelle. Dateiname ist die `Item.id` (SHA-256 über die normalisierte URL), damit ein Archivbericht in einem Jahr noch trifft |
 | `transparenz.html` | „Kann ich dem Ding trauen?" | Laufprotokoll **und** Quellenbestand, dazu die Erklärung der CTM-Stufen und der Sicherheitsskala; seit 11.08.2026 der **Newsletter-Abschnitt** (nur Zahlen, Warnung ab 80 % des Tageskontingents) |
@@ -323,38 +320,18 @@ Link erreichbar, aber nicht verlinkt (Stand 09.08.2026):
 | `impressum.html` / `datenschutz.html` | „Wer ist das, und was passiert mit meiner Adresse?" | Aus `content/legal/*.md` über `report/rechtstexte.py`. Eine offene Stelle im Text (`{{ANSCHRIFT}}`) steht sichtbar OBEN auf der Seite und hält die Newsletter-Schwelle geschlossen |
 | `thema/<slug>.html` (temporär) | „Was ist an diesem Ereignis dran?" | Highlight-Themenseiten, siehe unten |
 
-**Die Positionskarte des Geräteradars ist am 11.08.2026 neu gebaut worden**
-(`report/geraete_karte.py`). Die erste Fassung stapelte Etiketten je Spalte
-sequenziell mit 14 px Mindestabstand nach unten, während der Punkt auf seinem
-Preis blieb: gemessen **181 px** Versatz in der Hersteller- und **235 px** in
-der Anbieteransicht, 87 von 94 Etiketten weiter als drei Prozent daneben. Wer
-die Grafik las, wie man Grafiken liest, las um den Faktor sieben falsch.
-Dahinter der tiefere Fehler: **60 der 85 Kreise lagen deckungsgleich**, weil je
-FARBVARIANTE ein Punkt gezeichnet wurde — es gab 25 unterschiedliche
-Koordinaten. Drei Regeln tragen die Neufassung:
-
-| Regel | Warum |
-|---|---|
-| **Die Y-Achse gehört dem Preis.** Ausgewichen wird nur nach RECHTS; passt ein Etikett nicht in `MAX_VERSATZ` (12 px), wird es weggelassen | Es gibt keinen Codepfad mehr, der `label_y` unabhängig von `cy` setzt. Eine Lücke ist ehrlich, eine Verschiebung ist eine Falschaussage |
-| **Gezeichnet werden Preispunkte, keine SKUs**: (Modell, Speicher, Laden, **Zustand**) | Farbe ist keine Preisdimension. Der ZUSTAND muss in den Schlüssel: sonst schluckt ein refurbished-Preis den Neupreis desselben Geräts |
-| **Was im Zeichenbereich steht, trägt eine Preisaussage** (`gr-etikett`); was unter der Achse steht, nicht (`gr-bandname`) | Daran hängt der Abnahmetest. BEIDSEITIG geprüft, sonst wäre die Ausnahme ein Schlupfloch |
-
-**Zwei Darstellungsformen, Preisbänder als Standard** — aus 38 Apple-Punkten
-werden fünf Bänder. Der Formschalter ist eine zweite Schachtelungsachse
-(`.gr-flaeche`) mit EIGENER Klasse: mit derselben zählte
-`test_beide_ansichten_stehen_fertig_im_html` vier ausgeblendete Ansichten
-statt einer und fiel aus dem falschen Grund. Der dritte Schalter (ohne/mit
-Vertrag) braucht dadurch keine Zeile JavaScript, nur ein weiteres Attribut.
-
-**Breite vor Höhe:** 1180 statt 980 px (die Seite gibt 1184 her). Das hebt die
-Chipbahnen je Spalte von drei auf vier und spart 360 px Höhe. Mobil wird
-**gerollt statt gestaucht** — die alte Regel `.gr-etikett{font-size:8px}` ergab
-auf einem 390-px-Telefon real 2,7 CSS-Pixel.
-
-**mobilcom-debitel und freenet sind derselbe Laden** (`shop`/`anzeige` in
-`geraete_quellen.yaml`). Als zwei Spalten verglich die Karte einen Laden mit
-sich selbst; die Veröffentlichungsschwelle zählt deshalb **Läden, nicht
-Marken**.
+**Die Positionskarte des Geräteradars ist Geschichte — ihre Lehren nicht.**
+`report/geraete_karte.py` wurde am 30.08.2026 beim Neubau der Seite gelöscht
+(davor maß das Zurückrechnen des Preises aus der Etikettenhöhe **181/235 px**
+Versatz, 87 von 94 Etiketten weiter als drei Prozent daneben). Zwei Regeln
+leben in der heutigen Zeitreihe weiter: **die Y-Achse gehört dem Preis** —
+ausgewichen wird nie nach oben oder unten, eine weggelassene Marke ist
+ehrlicher als eine verschobene —, und **gezeichnet werden Preispunkte, keine
+SKUs**: der Zustand gehört in den Schlüssel, sonst schluckt ein
+refurbished-Preis den Neupreis desselben Geräts. Und: mobilcom-debitel und
+freenet sind derselbe Laden (`shop`/`anzeige` in `geraete_quellen.yaml`) —
+die Veröffentlichungsschwelle zählt deshalb **Läden, nicht Marken**. Die
+ganze Baugeschichte steht in `outputs/` und git.
 
 **Die Wettbewerbsseite ist am 08.08.2026 auf die halbe Höhe gebracht worden**
 (6777 → 4169 px), weil Antonio drei Bildschirme scrollen musste, bevor der
@@ -719,12 +696,17 @@ Zeilen, jede mit Sprungziel; gibt es nichts Neues, steht dort wieder nur der
 Stand. Ein Test hält jedes Sprungziel gegen die IDs der Seite.
 
 **Die Navigation hat FÜNF feste Einträge** (Diese Woche, Meldungen,
-Differenzierung, Wettbewerb, Quellen) **plus „Geräte", sobald die Daten die
-Schwelle nehmen**. `tests/test_suche_page.py` nagelt die fünf fest — eine
-Navigation wächst sonst zurück, und genau davon kam dieses Projekt.
+Differenzierung, Wettbewerb, Quellen) **plus zwei selbstschaltende:
+„Geräte" (Datenlage, Schwelle seit Ende August 2026 erreicht) und
+„Newsletter" (Rechtstexte)** — **Stand 18.09.2026 sind es sieben Einträge**
+(nachgezählt; der achte, „Wettbewerbs-Radar", stand vom 08.09. bis 17.09.
+dabei und ist mit E3 gefallen). `tests/test_suche_page.py` nagelt die fünf
+fest — eine Navigation wächst sonst zurück, und genau davon kam dieses
+Projekt.
 
-**Der sechste Eintrag schaltet sich selbst** (11.08.2026) — und ist im
-Moment AUS, weil nur zwei Läden liefern. Genau das ist der Punkt der
+**Der sechste Eintrag schaltet sich selbst** (11.08.2026) — und war bis
+Ende August AUS, weil nur zwei Läden lieferten (seit die Schwelle kippte,
+ist er dauerhaft drin). Genau das ist der Punkt der
 Mechanik: die Entscheidung steht als Zahl im Code, nicht als Handgriff in der
 Vorlage, und sobald ein dritter Laden liefert, trägt sich die Seite selbst
 wieder ein. Bis dahin stand
@@ -766,7 +748,8 @@ ihren direkten Link erreichbar; sie stehen nur nicht in der Navigation.
 > AN**: Antonio hat die ladungsfähige Anschrift geliefert (`c/o Vodafone
 > GmbH, Ferdinand-Braun-Platz 1, D-40549 Düsseldorf`, unter seinem Namen —
 > er bleibt Anbieter, das Portal bleibt privat betrieben). Die Navigation
-> hat damit **sechs** Einträge.
+> hatte damit **sechs** Einträge — mit „Geräte", dessen Schwelle Ende August
+> kippte, sind es heute **sieben** (Stand 18.09.2026, nachgezählt).
 >
 > **Die Schwelle rechnet aber nur die Rechtstexte, nicht den Dienst** — und
 > das ist Absicht (Art. 13 DSGVO, nicht Aussagekraft). Solange
@@ -778,8 +761,8 @@ ihren direkten Link erreichbar; sie stehen nur nicht in der Navigation.
 > Filtern, der E-Mail-Adresse und der abgehakten Einwilligung. Solange die
 > Seite unverlinkt war, fand sie ohnehin niemand; mit dem
 > Navigationseintrag wird der Weg begangen.
-> **Geräteseite:** **drei** Anbieter mit Daten, zwei Hersteller in der
-> Positionskarte, zwanzig SKUs — und sie ist die einzige, deren Schwelle der
+> **Geräteseite:** **drei** Anbieter mit Daten, zwei Hersteller im
+> Katalog, zwanzig SKUs — und sie ist die einzige, deren Schwelle der
 > CODE rechnet (`geraete_view.SCHWELLE_*` und `schwelle_erreicht()`), nicht
 > nur ein Test. Zwei Tests messen beide Zweige: unterhalb nicht verlinkt,
 > oberhalb auf JEDER Seite verlinkt.
@@ -1681,6 +1664,35 @@ Website spricht.
   **undatierte Meldungen sortieren ans Ende**. Eine Quelle ohne erkanntes
   Datum ist damit faktisch unsichtbar — bei jeder neuen Quelle zuerst prüfen,
   ob `published` gesetzt ist, nicht nur ob Items ankommen.
+- **`[hidden]` versteckt nichts, wenn eine `display`-Regel greift** (P4b,
+  18.09.2026). Die Leerzustands-Leitzahl „919,00 €" stand sichtbar neben
+  „Kein Gerät gefunden." — `.gr-leit{display:flex}` übersteuerte das
+  Browser-`[hidden]`, 81 px hoch, an beiden Pfaden (Suche „zzzz", Von-Datum
+  2027). Tests müssen SICHTBARKEIT messen (computed `display` + Boxhöhe,
+  MIT Gegenprobe am Ausgangszustand), nie das Attribut; die Sicherung steht
+  inzwischen global (`[hidden]{display:none!important}` in `style.css`) —
+  der Test darf sich darauf nicht ausruhen.
+- **Ein Zähler, der nichts findet, meldet „bestanden"** (P4, 18.09.2026).
+  Der Rot-Deckel des Katalogs stand mit „5" im Fix-Dokument, real waren es
+  12 Vollrot-Links — keine Messregel, kein Test meldete die Differenz.
+  Dieselbe Klasse wie die `len(zugeordnet) == len(erwartet)`-Regel: ein
+  ZÄHLER braucht zusätzlich eine Gegenprobe mit gestelltem Treffer (P4b:
+  ein bewusst rot gesetztes Element muss gezählt werden), sonst ist grün
+  nur „nichts gefunden". Der P4b-S1 war die Nachbarinstanz derselben Falle:
+  Assert auf das Attribut (`e.hidden`) statt auf die Sichtbarkeit.
+- **CSS-Spezifität schlägt die Absicht** (P4b, 18.09.2026). `.src-table a`
+  übersteuerte `.gr-sprung`: elf Katalog-Sprünge „im Graph ansehen →"
+  standen Vollrot statt grau. Eine Akzentfarbe ist erst eine Regel, wenn ein
+  Test den Farbwert MISST — computed color gegen den konkreten rgb-Wert aus
+  `var(--red)`, gezählt initial sichtbar, ohne SVG und ohne die
+  Datenfarben der Anbieter (Vodafone-Rot, Orange, Pink sind Daten, kein
+  Befund).
+- **Screenshots an den Lead: als CDN-Link, mit Messung daneben** (P1–P4,
+  18.09.2026). Der Lead-Kontext kann lokale Bildpfade nicht lesen — Pics
+  werden als CDN-Link geliefert und vom Lead per Vision-Analyse gegenlesen
+  (die nur Remote-URLs nimmt). In dieselbe Übergabe gehört die Formel, was
+  auf dem Bild zu sehen sein MUSS („Leerzustand: Leitzahl 0 px hoch"),
+  sonst ist der Screenshot eine unbelegte Behauptung.
 
 ## 7. Lokal arbeiten & testen
 
@@ -1723,6 +1735,71 @@ bleiben die erste Instanz — die Referenz ergänzt sie, sie ersetzt sie nicht.
 
 ## 8a. Der nächste Auftrag
 
+> **Zuletzt erledigt (18.09.2026): Strategie Geraete v3 — die Phasen
+> P1–P5.** Auftragsgrundlage: `STRATEGIE_GERAETE_V3.md` (Befunde:
+> `outputs/strategie-geraete-v3-2026-09-17/befunde/`; Messzahlen und
+> Re-Checks je Phase: `outputs/strategie-geraete-v3-2026-09-17/p1..p5/`).
+> Orchestrierung wie bei E2–E6 als Lean-Lead: ein Strategie-Workflow, dann
+> je Phase ein eigener Workflow mit 3–6 Bau-Agenten, je einem frischen
+> Prüfer, Fix-Runde und Re-Check; Abnahme, Merge und Live-Beweis machte der
+> Lead. Merges: P1 `63e693c`, P2 `64a8f2a`, P3 `6a37ceb`, P4+P4b `f006660`;
+> P5 lief am 18.09. parallel im Arbeitsbaum. Suite am Ende von P4b:
+> `-k geraete` **1460 passed / 2 failed (beide vorbestehend) / 6 skipped**;
+> nach P5 (E1, kombinierter Baum) volle Suite **3303 passed / 0 failed /
+> 12 skipped**; `pruefe_portal.py` **21 bestanden / 0 durchgefallen** —
+> drei neue Kriterien 13 (Fließtext-Deckel je Reiter), 14 (kein
+> Fließtextblock unter Grafiken), 15 (Klickbarkeit).
+>
+> | Phase | Merge | Die eine Regel, die sie trägt |
+> |---|---|---|
+> | **P1: Preis-Klick-Rechenweg** | `63e693c` | **Jede Preiszahl — Karte UND Punkt — öffnet den serverseitigen Rechenweg**: Panel im Quittungsformat mit proportionalem Balken je Posten (der Browser setzt nur `width`, keine Zahl entsteht im JS), Restschuld-Zeile („danach noch offen: 12 × 48,50 € = 582,00 €"), ×-Knopf 32 px; o2-Lücken sind benannt („Kein Bündel in diesem Band: o2 (groß 1.356,76 €)"); Zeitreihen-JS ohne Rechenoperatoren; Fragment +2,4 MB (→ PM-6/P5) |
+> | **P2: Modell-Wähler oben** | `64a8f2a` | Der G2-Chart ist gelöscht; der Verlauf wählt über einen Modell-Wähler am Kopf mit **Auto-Vorauswahl nach Messpunkten** — `?modell=` hat Vorrang via `TR_ANKUNFT_SEARCH` (sonst kaperte die Zeitreihen-Vorgabe die Auswahl), unbekannte ID fällt aufs erste Gerät |
+> | **P3: Katalog auf Modellebene** | `6a37ceb` | Ein Preis je Zeile, ein Format je Spalte je Ansicht, **Umschalter Barpreis/TCO ohne Reload** — 0× „ohne Preis" (vorher 36×), 111 Modellzeilen, Stichproben 6/6 auf den Cent; beide Ansichts-CSVs (BOM/Semikolon/Dezimalkomma) |
+> | **P4/P4b: Design-Durchlauf** | `f006660` | **Radar wird Grafik** (Balken je Anbieter, Alarm-Tabelle im Aufklapper), **Leitzahl wird größte Schrift** (60 px Desktop / 30 px mobil, 4/4 Reiter — auch mobil), Text-Deckel als Kriterium, **ein roter Faden**: Radar → Katalog → Zeitreihe über EINEN `modell_schluessel` (92 Radar→Katalog-Links, 0 tot; `?ansicht=`-Deep-Link); Export-Knöpfe aus dem Kopf in den Fuß (6 Knöpfe, mobil y 372 → Fuß) |
+> | **P5: Automatik & Betrieb** | (Arbeitsbaum, 18.09.) | **Sichtbarkeit folgt den Daten, nicht dem Weg** — Bündel ODER Listung genügt (Katalog ab Tag 1, Zeitreihen-Wahl ab 2 Bündel-Messtagen; 111→116 Modellzeilen, Radar „nicht im Katalog" 5→0, `-k geraete` 1505/0); FM-2-Ausfall-Alarm („7 Tage 0 Sätze", beobachtete Tage, nie Kalender) + o2-Provider-Proben (66/66) als Protokollzeilen; Unbekannte entrauscht (ALDI-Tarif-Titel: 284→281 Zeilen) + Familien-Anker ipad/watch/airpods → Apple; Fragment-Wachstum täglich gemessen (`scripts/geraete_fragment_wachstum.py`); CLAUDE.md konsolidiert |
+>
+> **OFFEN:**
+> 1. **URL-Sync im Verlauf** (P2-Rest, konzeptive Lead-Entscheidung):
+>    `?modell=` gehört dem Vergleichs-Reiter (`TR_ANKUNFT_SEARCH`); wer im
+>    Preisverlauf wählt und die URL teilt, teilt den Zustand eines anderen
+>    Reiters. Eigenem Parameter/Fragment steht nichts im Weg — offen.
+> 2. **Der Rot-Deckel-Test deckt nur den Katalog** (P4b):
+>    `test_der_rotdeckel_des_katalogs_ist_eine_messregel` zählt mit
+>    Gegenprobe; Radar, Vergleich und Preisverlauf haben keine eigene
+>    Messregel-Verankerung (P4b-Zählung vom 18.09.: Radar 0, Vergleich 2
+>    echte + Datenpunkte, Verlauf 1 — veraltet mit jedem Stand).
+> 3. **PM-6-Deckel-Entscheidung** — und sie eilt: das Zeitreihen-Fragment
+>    wächst um **~580 KB je Messtag** (1.391 B je Messpaar, gemessen — die
+>    hier lange stehenden „~7 KB je Paar" waren 5× zu hoch); die 5-MB-Grenze
+>    je Fragment fällt rechnerisch am **20.09.2026**, die datenbasierte
+>    Entscheidung ist auf den 01.10. gelegt und liegt damit NACH dem
+>    Umkippen (gzip liegt bei 4–5 %: die Grenze schützt Repo/Parsing, nicht
+>    die Leitung). Messskript + tägliche Protokollzeile stehen.
+> 4. **Telekom-202 = Antonios Entscheidung** (R3 in
+>    `STRATEGY_GERAETE_TCO.md`): aus dem Actions-IP-Bereich weiterhin
+>    HTTP-202-Challenge; Telekom-Daten kommen nur über das lokale
+>    `scripts/lokallauf_telekom.py` (manueller Nebenpfad, Commits
+>    „telekom: Tageslauf"). Kein Bau ohne seine Entscheidung.
+> 5. **iPad-Titel-Anker — effektive Wirkung nach dem nächsten Nachtlauf**
+>    (P5/E3): Familien-Anker gebaut und gegen alle 145 echten Titel gemessen
+>    (genau die 3 ALDI-Tarif-Zeilen gefiltert); die Live-Datei
+>    `geraete_unbekannt.jsonl` bereinigt und ergänzt erst der nächste
+>    Nachtlauf — dann die Anker-Ausbeute nachzählen.
+> 6. **Disjunkter Deep-Link** (P2, S3-2): `?modell=` auf eines der 6
+>    disjunkten Geräte (Zeitreihen-Wahl erlaubt, Verlaufsliste nicht) fällt
+>    im Verlauf still aufs erste Gerät — ein Link, zwei Reiter, zwei
+>    Geräte. Strategiegedeckt, aber unschön.
+> 7. **Betrieb** (Strategie §6): monatlich die Sichttest-Fragen live gehen
+>    (pixel 11 / wo ist Vodafone am teuersten / Belege klickbar / die vier
+>    Reiter je ein Satz / mobil ohne Querscroll / neuestes Gerät drin?) und
+>    die 3+1 Protokollzeilen lesen (Auto-Anlage, Unbekannte, Fragmentgröße,
+>    Ausfall-Schwelle — `Auto: 0` an zwei Folgetagen ist ein Alarm). Nach
+>    jedem bekannten Launch der Tag-2-Sichttest (iPhone 18: mit dem nächsten
+>    Nachtlauf steht der 2. Messtag).
+> 8. **S4-Rest Kosmetik** (aus E5, hierher gezogen): die Einheit in den
+>    Export-Knopfbeschriftungen ist inkonsistent, und 2 der 6 Leer-Tests
+>    wären an `main` schon grün gewesen.
+>
 > **Zuletzt erledigt (17.09.2026): EINE Geräteseite — die Phasen E2–E6.**
 > Auftragsgrundlage: `AUFTRAG_GERAETE_EINE_SEITE_V2.md`. Orchestrierung als
 > **Lean-Lead**: je Phase ein eigener Workflow, der Bau in schmale Agenten
@@ -1755,29 +1832,20 @@ bleiben die erste Instanz — die Referenz ergänzt sie, sie ersetzt sie nicht.
 > lag als Fixture rot-vor-grün an. E5 brachte nur S4-Befunde. Der erste
 > echte Lauf (08:34 UTC, 17.09.) hat die E4-Dateien erzeugt: **284
 > Unbekannte persistiert, 0 Auto-Einträge** — kein iPhone-18-Titel kam an
-> (Telekom-202-Challenge in Actions).
+> (Telekom-202-Challenge in Actions). (Korrigiert am 18.09.: der Bot-Commit
+> 11:59 UTC lag vor dem CLAUDE.md-Commit 13:05 — der Nachtlauf vom 17.09.
+> legte **16 Auto-Einträge** an, u. a. iPhone 18 Pro/Pro Max; s.
+> `outputs/strategie-geraete-v3-2026-09-17/befunde/auto-doku.md`.)
 >
 > Nebenbei: das Strategie-Doc hat sein Änderungsprotokoll bekommen
 > (`d5a70c0`); ein API-429-Burst-Limit kostete den E4-Nachprüf-Agenten
 > (der Lead hat selbst verifiziert); die Operating-Regel „Lean Lead =
 > viele kleine Agenten" steht im Session-Gedächtnis.
 >
-> **OFFEN:**
-> 1. **Der iPhone-18-Live-Beweis steht aus** — er braucht einen Nachtlauf,
->    in dem Telekom/o2/Vodafone das Modell strukturiert liefern; die
->    Arbeitsliste ist `data/state/geraete_unbekannt.jsonl` (die iPad-Titel
->    von Vodafone sind Anker-Lücken-Kandidaten).
-> 2. Die Sichtbarkeitsregel „ab 2 Messtagen" rechnet nur gegen die
->    TCO-Historie (Bündelweg).
-> 3. Das Fragment `geraete-zeitreihe.html` wächst mit den Messtagen
->    (~7 KB je Paar) — die Obergrenze dafür ist PM-6.
-> 4. S4-Rest: die Einheit in den Export-Knopfbeschriftungen ist
->    inkonsistent, und 2 der 6 Leer-Tests wären an `main` schon grün
->    gewesen.
-> 5. **Betrieb:** monatlich die fünf Sichttest-Fragen live gehen
->    (pixel 11 / wo ist Vodafone am teuersten / Belege je Anbieter / die
->    vier Reiter-Fragen / mobil ohne Querscroll) und drei Protokollzeilen
->    lesen (Auto-Erkennung, Unbekannte, Fragmentgröße).
+> (Die OFFEN-Liste dieses Blocks ist mit P5 oben ersetzt: Punkte 1 und 2
+> sind dort erledigt bzw. überführt, Punkt 3 mit der gemessenen Rate
+> korrigiert — 1.391 B je Paar statt „~7 KB" —, Punkt 4 war Kosmetik und
+> steht als OFFEN-Punkt 8 dort, Punkt 5 steht als Betrieb dort.)
 >
 > **Zuletzt erledigt (05.09.2026, nachts): Phase R3 — die drei Befunde
 > der R2-Abnahme.** Auftragsgrundlage: `PHASE R3` (PM, 04.09.2026 ab 20:00)

@@ -44,6 +44,8 @@ from ..geraete_model import ratenhinweis_aus_eintrag, serie_aus_modell
 from . import (geraete_alarme, geraete_bereinigung, geraete_pruefung,
                geraete_tco_karten, geraete_tco_view, geraete_vergleich,
                geraete_verlauf, geraete_zeitreihe)
+# MonatNamen der Katalog-Datumsformatierung - keine zweite Tabelle (driftet).
+from .geraete_tco_band import _MONATE
 from ..analyze import geraete_lifecycle
 from ..analyze.tco_store import TcoDB
 from ..tarif_bezug import Tarifbestand
@@ -272,6 +274,19 @@ def pruefe_zahlen(text: str, erlaubt: set) -> bool:
     pruefen laesst, erscheint nicht.
     """
     return zahlen_im_text(text).issubset({round(float(z), 2) for z in erlaubt})
+
+
+def _neu_seit(iso: str) -> str:
+    """„17. September" - Tag und Monat fuer den Neu-Hinweis am Zeitreihen-
+    Suchfeld (R3 der P5-Live-Pruefung). MonatNamen aus derselben Tabelle,
+    die die Katalog-Zeile formatiert (`geraete_tco_band._MONATE` - eine
+    zweite Kopie der zwolf Namen wuerde driften); ein unlesbares Datum
+    steht roh im Satz statt geraten zu werden."""
+    try:
+        jahr, monat, tag = (int(x) for x in iso.split("-"))
+        return f"{tag}. {_MONATE[monat - 1]}"
+    except (AttributeError, ValueError, IndexError):
+        return iso or ""
 
 
 def _im_fenster(datum: str, heute: str, tage: int = FENSTER_TAGE) -> bool:
@@ -843,13 +858,21 @@ TCO_LEER_KEIN_VERGLEICHBARES = "kein vergleichbares Bündel gemessen"
 
 
 def _buendel_je_anbieter_modell(buendel: list, eintraege: list, katalog
-                                ) -> dict:
-    """(Anbieter, modell_schluessel) -> das guenstigste Bündel mit Monatspreis.
+                                ) -> tuple[dict, dict]:
+    """Zwei Lesarten derselben Bündel-Aufloesung.
 
-    Die Monatsangabe "nur im Bündel, ab X EUR/Monat" braucht einen Beleg aus
-    `geraete_tco.json` - NICHT das `preis_mit_vertrag_ab` der Listung, denn
-    der Bündelstore traegt dazu Quelle und Abrufdatum (Belegzwang). Die
-    Aufloesung einer Bündel-SKU auf das Modell laeuft ueber den WEG von
+    1. `(Anbieter, modell_schluessel) -> das guenstigste Bündel mit
+       Monatspreis` - die Monatsangabe "nur im Bündel, ab X EUR/Monat"
+       braucht einen Beleg aus `geraete_tco.json`, NICHT das
+       `preis_mit_vertrag_ab` der Listung, denn der Bündelstore traegt dazu
+       Quelle und Abrufdatum (Belegzwang).
+    2. `modell_schluessel -> {device_id, speicher}` für JEDES Bündel, dessen
+       SKU auf ein Geraet aufloest - unabhaengig vom Monatspreis (P5-Auftrag
+       1, 18.09.2026: Sichtbarkeit folgt den Daten, nicht dem Weg - schon
+       EIN Bündel ohne Listung stellt die Katalog-Zeile, auch wenn aus ihm
+       noch keine Monatsangabe lesbar ist).
+
+    Die Aufloesung einer Bündel-SKU auf das Modell laeuft ueber den WEG von
     `geraete_tco_karten.modelle()`: erst die Listung derselben SKU, dann der
     Katalog (`geraet_aus_sku`) - eine zweite, eigene Aufloesung wuesste
     bald etwas anderes als die TCO-Tafel ueber dasselbe Bündel.
@@ -860,21 +883,32 @@ def _buendel_je_anbieter_modell(buendel: list, eintraege: list, katalog
     Anbieter selbst nebeneinander nennt.
     """
     modell_je_sku: dict[str, str] = {}
+    geraet_je_sku: dict[str, tuple] = {}
     for e in eintraege:
         sku = e.get("sku_id") or ""
         if sku:
             modell_je_sku[sku] = geraete_tco_karten.modell_schluessel(
                 e.get("device_id"), e.get("speicher_gb"))
+            geraet_je_sku[sku] = (e.get("device_id") or "",
+                                  e.get("speicher_gb"))
     beste: dict = {}
+    geraet_je_mid: dict[str, dict] = {}
     for b in buendel or []:
         sku = b.get("sku_id") or ""
         mid = modell_je_sku.get(sku)
-        if not mid:
-            device_id, speicher = geraete_tco_karten.geraet_aus_sku(
-                sku, katalog)
-            if not device_id:
+        if mid:
+            geraet = geraet_je_sku.get(sku, ("", None))
+        else:
+            geraet = geraete_tco_karten.geraet_aus_sku(sku, katalog)
+            if not geraet[0]:
                 continue
-            mid = geraete_tco_karten.modell_schluessel(device_id, speicher)
+            mid = geraete_tco_karten.modell_schluessel(*geraet)
+        # JEDES aufloesbare Bündel traegt sein Geraet bei - auch eines, dessen
+        # SKU eine Listung hat: `hat_buendel` der Katalog-Zeile haengt an
+        # dieser Menge (iPhone 18 am 17.09.: 58 Listungen UND 105 Bündel
+        # auf denselben SKUs, unter der Auto-Messtag-Schwelle der Wahl).
+        geraet_je_mid.setdefault(mid, {"device_id": geraet[0],
+                                       "speicher": geraet[1]})
         monat = b.get("buendel_monatlich")
         if monat is None:
             tarif, rate = b.get("tarif_monatlich"), b.get("geraet_monatsrate")
@@ -893,7 +927,7 @@ def _buendel_je_anbieter_modell(buendel: list, eintraege: list, katalog
                 "quelle_url": b.get("quelle_url", ""),
                 "abgerufen_am": b.get("abgerufen_am", ""),
             }
-    return beste
+    return beste, geraet_je_mid
 
 
 def _buendel_aus_listungen(eintraege: list) -> list[dict]:
@@ -1048,9 +1082,19 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
     Erlaubnis NICHT selbst nach (zwei Rechnungen fuer dieselbe Menge
     warden zwei Mengen, CLAUDE.md §6); ohne Parameter bleibt `zr` False -
     fail-closed, ein fehlender Graph-Link ist ehrlicher als ein toter.
+
+    P5-AUFTRAG 1 (STRATEGIE_GERAETE_V3, 18.09.2026): SICHTBARKEIT FOLGT DEN
+    DATEN, NICHT DEM WEG - Bündel ODER Listung genuegt. Neben den Gruppen
+    aus dem Listungs-Bestand entsteht eine Zeile fuer jedes Modell, das
+    NUR im Bündel-Store steht (`buendel`-Parameter); `hat_buendel` traegt
+    jede Zeile, ob mit oder ohne Listung, und entscheidet in der Vorlage
+    die Luecke "noch keine Zeitreihe" (Bündel vorhanden, aber noch nicht
+    waehlbar - die Wahl der Zeitreihe greift erst ab 2 Bündel-Messtagen,
+    `geraete_zeitreihe.AUTO_SICHTBAR_AB_MESTAGEN`).
     """
     belege = geraete_tco_karten.barpreise(eintraege)
-    buendel_je = _buendel_je_anbieter_modell(buendel, eintraege, katalog)
+    buendel_je, buendel_geraete = _buendel_je_anbieter_modell(
+        buendel, eintraege, katalog)
     tco_je_id = {m.get("id"): m for m in (tco_modelle or [])}
 
     # Schritt 1: Listungszeilen (dieselbe Bauform wie Reiter 2) je Modell
@@ -1071,6 +1115,33 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
             gruppen[mid] = g
         g["eintraege"].append(e)
         g["zeilen"].append(zeile)
+
+    # P5-AUFTRAG 1 (STRATEGIE_GERAETE_V3, 18.09.2026): SICHTBARKEIT FOLGT DEN
+    # DATEN, NICHT DEM WEG - Buendel ODER Listung genuegt. Ein Geraet, das
+    # nur im Buendel verkauft wird (gemessener Fall: das iPhone 18 kam am
+    # 17.09. mit 105 Buendeln an, die erste Listung stand noch nicht; die
+    # iPad-Titel stehen heute noch in der Unbekannten-Liste), bekam KEINE
+    # Katalog-Zeile - der Radar nannte es "nicht im Katalog", obwohl der
+    # Bestand es laengst trug. Diese Modelle bekommen ihre Gruppe aus dem
+    # Bündel-Store: Felder, die nur eine Listung fuellen kann (ab-Preis,
+    # Farben, Listungs-Aufklapper), bleiben ehrlich leer, und die
+    # Preiszelle traegt die Bündel-Angabe ("nur im Bündel", derselbe Zweig
+    # wie die 1&1-Zeilen). Ein Modell OHNE Listung UND OHNE Bündel bleibt
+    # draussen - ohne Daten keine Zeile, das ist dieselbe Regel in der
+    # anderen Richtung.
+    for mid, geraet in buendel_geraete.items():
+        if mid in gruppen:
+            continue
+        g = katalog.nach_id(geraet["device_id"]) if katalog else None
+        gruppen[mid] = {
+            "schluessel": mid, "device_id": geraet["device_id"],
+            "modell": g.modell if g else geraet["device_id"],
+            "hersteller": g.hersteller if g else "",
+            "generation": g.generation if g else None,
+            "serie": serie_aus_modell(g.modell) if g else "",
+            "segment": g.segment if g else "",
+            "speicher": geraet["speicher"],
+            "eintraege": [], "zeilen": []}
 
     ergebnis = []
     for mid, gruppe in gruppen.items():
@@ -1127,11 +1198,18 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
         # Schritt 5: der Bündel-Zustand der MODELLZEILE - nur wenn es
         # keinen Barpreis gibt (gemessener Fall: Nothing Phone 4a Pro, nur
         # 1&1). Ein Modell MIT Barpreis braucht ihn nicht: sein Preis steht
-        # da, das Bündel steht in der TCO-Ansicht.
+        # da, das Bündel steht in der TCO-Ansicht. P5-Auftrag 1: bei einem
+        # Modell OHNE Listung gibt es keine zeilen ohne Preis, denen man
+        # die Angabe anhaengen koennte - der Pool kommt dann direkt aus
+        # dem Bündel-Store desselben Modells.
         buendel_angabe = None
-        if ab_beleg is None and anbieter_mit_buendel:
-            buendel_angabe = min(anbieter_mit_buendel.values(),
-                                 key=lambda b: b["monat"])
+        if ab_beleg is None:
+            pool = (list(anbieter_mit_buendel.values())
+                    if anbieter_mit_buendel
+                    else [v for (_, m), v in buendel_je.items()
+                          if m == mid])
+            if pool:
+                buendel_angabe = min(pool, key=lambda b: b["monat"])
 
         # Schritt 6: die TCO-Felder aus der TCO-Aufbereitung (nur Wahl des
         # besten Angebots, keine Rechnung - siehe `_tco_spalte`).
@@ -1139,6 +1217,16 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
         if gruppe["speicher"]:
             name = f"{name} {int(gruppe['speicher'])} GB"
         tco_felder = _tco_spalte(tco_je_id.get(mid))
+
+        # Die Händler-Spalte zaehlt, WER das Geraet fuehrt. Ohne Listung
+        # (P5-Auftrag 1) sind das die Bündel-Anbieter - "0 Händler" neben
+        # "nur im Bündel bei congstar" widerspraeche der eigenen Zelle.
+        listen_anbieter = sorted({z["anbieter"] for z in zeilen
+                                  if z["anbieter"]})
+        if not listen_anbieter:
+            listen_anbieter = sorted({v["anbieter"]
+                                      for (_, m), v in buendel_je.items()
+                                      if m == mid})
 
         ergebnis.append({
             "schluessel": mid,
@@ -1149,6 +1237,14 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
             # `zr` sagt, ob der zweite Reiter (Vergleichs-Zeitreihe) zum
             # selben Modell fuehrt.
             "zr": bool(zr_erlaubt and zr_erlaubt.get(mid)),
+            # P5-Auftrag 1: hat dieses Modell ein Bündel (gleich welcher
+            # SKU)? Die Vorlage entscheidet daran die Luecke "noch keine
+            # Zeitreihe" - ein Modell MIT Bündel, das (noch) nicht waehlbar
+            # ist, hat eine Zeitreihe, die MIT DEM NAECHSTEN Messtag
+            # beginnt; eines ohne Bündel nennt die TCO-Spalte den Grund
+            # ("kein Bündel gemessen"), dort waere der Satz die zweite
+            # Aussage fuer dieselbe Tatsache.
+            "hat_buendel": mid in buendel_geraete,
             "device_id": gruppe["device_id"],
             "modell": gruppe["modell"],
             "hersteller": gruppe["hersteller"],
@@ -1161,10 +1257,8 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
             "ab_preis": ab_beleg["betrag"] if ab_beleg else None,
             "ab_anbieter": ab_beleg["anbieter"] if ab_beleg else None,
             "ab_beleg": ab_beleg,
-            "anbieterzahl": len({z["anbieter"] for z in zeilen
-                                 if z["anbieter"]}),
-            "anbieter": sorted({z["anbieter"] for z in zeilen
-                                if z["anbieter"]}),
+            "anbieterzahl": len(listen_anbieter),
+            "anbieter": listen_anbieter,
             "farben": sorted({z["farbe"] for z in zeilen if z["farbe"]}),
             "spanne": spanne,
             # ---- Bündel-Zustand (statt "ohne Preis") ----
@@ -1666,6 +1760,30 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     katalog_ab_preis = min(
         (m["ab_preis"] for m in katalog_modelle
          if m.get("ab_preis") is not None), default=None)
+
+    # P5-LIVE-PRUEFUNG R3 (18.09.2026): Wer im Zeitreihen-Suchfeld nach
+    # einem Modell sucht, das der Katalog kennt, die WAHL aber noch nicht
+    # (Bündel mit erst einem Messtag - der iPhone-18-Fall des 17.09.),
+    # bekam "kein Treffer" ohne ein Wort. Der Grund steht an der Katalog-
+    # zeile, aber der Leser steht am Suchfeld. Der Wahl-Knoten traegt
+    # deshalb dieselben "noch keine Zeitreihe"-Modelle (hat_buendel und
+    # nicht zr - GELESEN aus denselben Zeilen, nicht nachgerechnet) mit
+    # Titel und fruehestem Belegdatum; app.js zeigt daraus EINE Zeile,
+    # nur bei 0 Treffern und Katalog-Treffer fuer denselben Begriff.
+    katalog_neu = []
+    for m in katalog_modelle:
+        if not m.get("hat_buendel") or m.get("zr"):
+            continue
+        belege = sorted(
+            b.get("abgerufen_am") for b in
+            (m.get("ab_beleg"), m.get("buendel_beleg"))
+            if b and b.get("abgerufen_am"))
+        katalog_neu.append({
+            "id": m["schluessel"], "titel": m["titel"],
+            "datum": _neu_seit(belege[0]) if belege else "",
+            "iso": belege[0] if belege else ""})
+    if isinstance((zeitreihe or {}).get("daten"), dict):
+        zeitreihe["daten"]["katalog_neu"] = katalog_neu
 
     return {
         "tco": tco,

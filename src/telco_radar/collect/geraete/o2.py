@@ -297,8 +297,20 @@ def _gleich(a: Optional[float], b: Optional[float]) -> bool:
     return abs(float(a) - float(b)) < 0.005
 
 
-def _buendelsatz(h: dict) -> Optional[dict]:
-    """Ein Katalogeintrag wird ein Buendel-Rohsatz - oder nichts."""
+def _buendelsatz(h: dict, proben: Optional[dict] = None) -> Optional[dict]:
+    """Ein Katalogeintrag wird ein Buendel-Rohsatz - oder nichts.
+
+    `proben` ist der Zaehler der PROVIDER-PROBE (FM-2, P5-Auftrag 2): er
+    wird VOR jedem Verwurf erhoeht, solange der Satz die Felder UEBERHAUPT
+    tragen sollte (kein Zubehoer, Tarifname da). So misst der Lauf jede
+    Nacht, ob die Feldstruktur der Antwort noch stimmt - auch wenn am Ende
+    kein Satz uebrig bleibt. Auch der TOTALTOD des Referenzfeldes ist eine
+    GESCHEITERTE Probe (monthlyPrice komplett weg - P5-Codepruefung S2-1):
+    die drei metric-Ebenen haengen an dieser Referenz, ohne sie waere
+    "kein Kandidat" die Meldung "Schnittstelle umbau, niemand sieht eine
+    Zeile". Die drei Proben selbst sind unveraendert Bedingung, nicht
+    Protokoll.
+    """
     modell = str(h.get("description") or "").strip()
     angebot = str(h.get("offerName") or "").strip()
     if not modell:
@@ -319,6 +331,43 @@ def _buendelsatz(h: dict) -> Optional[dict]:
     anzahlung = _preis(preisblock.get("oneTimePrice"))
     anschluss = _preis(preisblock.get("activationFee"))
 
+    werte = (h.get("ecommerceProductValue") or {}).get("attributes") or {}
+    geraet_rate = _preis(werte.get("metric3"))
+    tarif_rate = _preis(werte.get("metric2"))
+
+    # DIE PROVIDER-PROBE - Existenz-Schwelle ueber die Feldstruktur. Sie
+    # zaehlt JE Kandidat, ob die drei Feldebenen noch da sind und
+    # zusammenpassen; ein fehlender Referenzbetrag (oneTimePrice weg,
+    # activationFee weg) ist dabei eine GESCHEITERTE Probe, kein
+    # ungeeigneter Kandidat - genau das Verschwinden soll sie ja melden.
+    # Dasselbe gilt fuer monthlyPrice SELBST (S2-1 der P5-Codepruefung):
+    # fehlt die Referenz, entfaellt der Satz als "monthlyPrice"-Ebene -
+    # die metric-Vergleiche sind ohne Referenz nicht pruefbar und werden
+    # nicht zusätzlich als gescheitert gezaehlt (die Ebene, die weg ist,
+    # heisst der Grund). Zaehlung VOR der Laufzeitprobe: die Probe misst
+    # die Felder, nicht die Satzannahme (dafuer steht die Buendelzeile
+    # der Pipeline).
+    if proben is not None:
+        proben["kandidaten"] = int(proben.get("kandidaten", 0)) + 1
+        fehlend: list[str] = []
+        if monatlich is None:
+            fehlend.append("monthlyPrice")
+        else:
+            if geraet_rate is None or tarif_rate is None \
+                    or not _gleich(geraet_rate + tarif_rate, monatlich):
+                fehlend.append("metric3+metric2")
+            if anzahlung is None or not _gleich(_preis(werte.get("metric5")),
+                                                anzahlung):
+                fehlend.append("metric5")
+            if anschluss is None or not _gleich(_preis(werte.get("metric4")),
+                                                anschluss):
+                fehlend.append("metric4")
+        if fehlend:
+            for name in fehlend:
+                proben[name] = int(proben.get(name, 0)) + 1
+        else:
+            proben["bestanden"] = int(proben.get("bestanden", 0)) + 1
+
     dauer = _DAUER_RE.search(str(h.get("rateDurationValue") or ""))
     laufzeit = int(dauer.group(1)) if dauer else None
     if laufzeit is None or not probe_geht_auf(anzahlung, monatlich,
@@ -328,9 +377,6 @@ def _buendelsatz(h: dict) -> Optional[dict]:
         # und ohne Laufzeit ist eine Monatszahl keine Aussage.
         return None
 
-    werte = (h.get("ecommerceProductValue") or {}).get("attributes") or {}
-    geraet_rate = _preis(werte.get("metric3"))
-    tarif_rate = _preis(werte.get("metric2"))
     if geraet_rate is None or tarif_rate is None:
         return None
     # Die drei Proben aus dem Modulkopf. Sie sind Bedingung, nicht Protokoll.
@@ -369,7 +415,8 @@ def _buendelsatz(h: dict) -> Optional[dict]:
     }
 
 
-def lies_buendel(text: str, url: str = "") -> list[dict]:
+def lies_buendel(text: str, url: str = "",
+                 proben: Optional[dict] = None) -> list[dict]:
     """Den Buendelkatalog in Rohsaetze zerlegen.
 
     Wirft, wenn die Antwort gar keine Buendelantwort ist. Das ist NICHT
@@ -378,6 +425,9 @@ def lies_buendel(text: str, url: str = "") -> list[dict]:
     hat, und ihre Geraete als Buendel zu lesen ergaebe 95 Saetze ohne
     Tarif. Ein leeres Ergebnis waere dafuer die falsche Meldung - dieselbe
     Unterscheidung wie bei `GeraeteAbrufFehler` ueberall sonst.
+
+    `proben` (optional, FM-2) sammelt die Existenz-Schwelle der
+    Feldebenen fuer diesen Abruf - siehe `_buendelsatz`.
     """
     try:
         daten = json.loads(text or "")
@@ -398,7 +448,7 @@ def lies_buendel(text: str, url: str = "") -> list[dict]:
     for h in (daten.get("hardware") or []):
         if not isinstance(h, dict):
             continue
-        satz = _buendelsatz(h)
+        satz = _buendelsatz(h, proben)
         if satz is not None:
             out.append(satz)
     return out

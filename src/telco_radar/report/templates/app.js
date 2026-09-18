@@ -1786,6 +1786,36 @@ var TelcoFrage = (function () {
         : 'kein Treffer';
     }
     box.textContent = '';
+    /* P5-Live-Pruefung R3: 0 Treffer, aber der KATALOG kennt den Begriff -
+     * das Modell ist zu neu fuer die Wahl (Bündel mit erst einem Messtag).
+     * EINE Zeile mit dem fruehesten Belegdatum, als gr-ksprung auf die
+     * Katalog-Zeile (derselbe Handler wie die Radar-Liste: Reiter auf,
+     * Deckel oeffnen, Zeile markieren). Ohne Katalog-Treffer bleibt die
+     * Box leer - "kein Treffer" braucht keinen Zusatz. */
+    if (!liste.length) {
+      var tokens = wert.trim().toLowerCase().split(/\s+/).filter(Boolean);
+      var neu = (daten.katalog_neu || []).filter(function (s) {
+        var worte = (s.titel || '').toLowerCase().split(/[\s·]+/)
+          .filter(Boolean);
+        return tokens.every(function (t) {
+          return worte.some(function (w) { return w.indexOf(t) === 0; });
+        });
+      });
+      if (neu.length) {
+        var a = document.createElement('a');
+        var aelteste = neu[0];
+        neu.forEach(function (s) {
+          if (s.iso && (!aelteste.iso || s.iso < aelteste.iso)) aelteste = s;
+        });
+        a.className = 'gr-ksprung gr-zr-v-neu';
+        a.href = '#katalog';
+        a.setAttribute('data-modell', aelteste.id);
+        a.textContent = 'Neu seit ' + (aelteste.datum || 'kurzem') +
+          ' – im Katalog ansehen';
+        box.appendChild(a);
+      }
+      return;
+    }
     liste.forEach(function (s) {
       var b = document.createElement('button');
       b.type = 'button';

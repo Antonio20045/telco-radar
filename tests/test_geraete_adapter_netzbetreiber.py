@@ -260,13 +260,47 @@ def test_die_live_namen_treffen_den_richtigen_katalogeintrag(titel, erwartet, ka
     assert g.device_id == erwartet
 
 
-def test_tablets_und_router_bleiben_draussen(katalog):
-    """Der Katalog verfolgt Smartphones. Ein iPad in der Preiskarte wuerde
-    die Preisachse strecken, ohne eine Frage zu beantworten."""
-    for titel in ("iPad Pro 13 (2025)", "Vodafone GigaCube 5G",
-                  "Samsung Galaxy Tab S11 Ultra",
-                  "ZTE U60 Pro 5G MiFi-Router"):
+def test_die_erkennung_folgt_dem_katalog_nicht_der_geraeteklasse(katalog):
+    """P5-AUFTRAG 1 (STRATEGIE_GERAETE_V3, 18.09.2026) - DIE REGEL GEDREHT:
+    „Sichtbarkeit folgt den Daten, nicht dem Weg - Bündel ODER Listung
+    genügt." Bis P5 galt hier die ALTE Regel „Der Katalog verfolgt
+    Smartphones. Ein iPad in der Preiskarte würde die Preisachse
+    strecken" - begründet mit der PREISKARTE, die es seit dem 30.08.2026
+    nicht mehr gibt (`geraete_karte.py` gelöscht). Seit E4 legt die
+    Auto-Erkennung auch Tablets, Watches und AirPods an (strukturierter
+    Name mit Hersteller-Präfix), seit P5 stehen sie im KATALOG-Reiter und
+    NICHT in der Zeitreihen-Wahl (FM 6.4 - keine unsichtbaren
+    Wahl-Einträge). Der Stand-Commit vom 17.09. trägt „Samsung Galaxy Tab
+    S11 Ultra" als Auto-Eintrag, und genau dieser Fall war VORHER ROT:
+    `erkenne_geraet` erkannte das Gerät zu Recht, der Test verlangte None.
+
+    Jetzt gilt: WAS IM KATALOG STEHT, wird erkannt - egal welche
+    Geräteklasse. Was NICHT drinsteht, bleibt draußen; die Router tragen
+    keinen Eintrag (keine Listung, kein Bündel). Und ohne Eintrag fällt
+    ein iPad-Titel auf KEIN iPhone: die Erkennung rät nie fuzzig auf ein
+    anderes Gerät."""
+    # Der Stand-Commit-Fall: der Auto-Eintrag wird erkannt (Vorher-rot:
+    # derselbe Titel stand in der alten None-Liste dieses Tests).
+    tab = erkenne_geraet("Samsung Galaxy Tab S11 Ultra", katalog)
+    assert tab is not None, \
+        "Auto-Eintrag Galaxy Tab S11 Ultra wird nicht erkannt"
+    assert tab.device_id == "samsung-galaxy-tab-s11-ultra", tab.device_id
+    assert tab.auto, "der Stand-Commit-Fall ist ein Auto-Eintrag"
+
+    # Router bleiben draußen - kein Katalog-Eintrag, nichts, was sie
+    # stellen könnte.
+    for titel in ("Vodafone GigaCube 5G", "ZTE U60 Pro 5G MiFi-Router"):
         assert erkenne_geraet(titel, katalog) is None, titel
+
+    # Ohne eigenen Eintrag trifft ein iPad-Titel NICHT ein iPhone - die
+    # Erkennung fällt nie fuzzig auf ein anderes Gerät. (Das iPad selbst
+    # steht heute in der Unbekannten-Liste; sein Anker ist P5-Auftrag 3.
+    # Sobald er landet, ist die Zeile einfach erfüllt - der Test pinnt
+    # die Lücke bewusst NICHT fest.)
+    for titel in ("iPad Pro 13 (2025)", "Apple iPad (2025)"):
+        treffer = erkenne_geraet(titel, katalog)
+        assert treffer is None or "ipad" in treffer.device_id, \
+            f"{titel!r} fiel fuzzig auf {treffer.device_id}"
 
 
 # ==========================================================================

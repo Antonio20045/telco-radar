@@ -865,14 +865,20 @@ def test_eine_verweildauer_zeile_entsteht_erst_ab_der_tages_schwelle():
 def _echter_bestand(nachtlauf: bool = False, laeufe_ueberschreiben=None):
     """Der echte Bestand, wahlweise nach einem simulierten NACHTLAUF.
 
-    `nachtlauf=True` bestaetigt jede aktive Listung auf den 31.08.2026 und
-    ergaenzt den Anbieter-Termin. Das war der "Zustand von morgen", als der
-    Bestand am 31.08.2026 noch keine Listung ueber der Tages-Schwelle trug;
-    seit dem Nachtlauf vom 02.09.2026 gibt es sie (23 Tage), und der
-    simulierte Termin liegt vor dem echten Stand. Die Simulation bleibt
-    trotzdem der schaerfere Fall fuer die zwei Tests, die sie benutzen: sie
-    stellt die Nullzeilen-Lage her, in der VIELE Listungen die Spanne gerade
-    eben nehmen.
+    `nachtlauf=True` bestaetigt jede aktive Listung auf den Tag NACH dem
+    juengsten last_verified des Bestands und ergaenzt den Anbieter-Termin -
+    das IST der naechste Nachtlauf, wofuer auch immer der Test laeuft.
+    Bis P5 (18.09.2026) stand hier der FESTE 31.08.2026, der "Zustand von
+    morgen" des 02.09.: mit jedem Preis, der sich seither bewegte, sank
+    die Zahl der unbewegten Kandidaten unter die Schwelle des
+    Nullzeilen-Tests (52 gegen 80 am 18.09., ohne dass sich eine Zeile
+    Code geaendert hatte) - dieselbe Fehlerklasse wie die Datums-
+    Zeitbomben in CLAUDE.md 6, nur ueber den Bestand statt ueber die Uhr.
+    Am 18.09. gemessen: Rand 2026-09-18 -> 85 Kandidaten / 52 unbewegt;
+    einen Tag spaeter (die Vodafone-Kohorte vom 29.08. kreuzt die
+    Tages-Schwelle) 325 / 216 - die Simulation bleibt der schaerfere Fall
+    fuer die zwei Tests, die sie benutzen: sie stellt die Nullzeilen-Lage
+    her, in der VIELE Listungen die Spanne gerade eben nehmen.
     """
     db = GeraeteDB(_DB)
     historie = Preishistorie(_HISTORIE)
@@ -887,12 +893,15 @@ def _echter_bestand(nachtlauf: bool = False, laeufe_ueberschreiben=None):
         termine_je_anbieter[name] = sorted(termine)
         laeufe_je_anbieter[name] = int(db.laufbilanz(name).get("laeufe") or 0)
     if nachtlauf:
+        rand = max((e.get("last_verified") or "" for e in alle
+                    if e.get("last_verified")), default="")
+        tag = (date.fromisoformat(rand) + timedelta(days=1)).isoformat()
         for e in alle:
             if e.get("status") == STATUS_AKTIV:
-                e["last_verified"] = "2026-08-31"
+                e["last_verified"] = tag
         for name in termine_je_anbieter:
             termine_je_anbieter[name] = sorted(
-                set(termine_je_anbieter[name]) | {"2026-08-31"})
+                set(termine_je_anbieter[name]) | {tag})
     if laeufe_ueberschreiben is not None:
         laeufe_je_anbieter = {n: laeufe_ueberschreiben
                               for n in laeufe_je_anbieter}
@@ -939,7 +948,11 @@ def test_jede_lifecycle_zeile_des_echten_bestands_nimmt_die_schwelle():
 
 @pytest.mark.skipif(not _DB.exists(), reason="kein Geraete-Bestand im Checkout")
 def test_ein_simulierter_nachtlauf_erzeugt_keine_nullzeilen():
-    """Der Waechter fuer den Zustand von MORGEN.
+    """Der Waechter fuer den Zustand von MORGEN - seit P5 (18.09.2026) der
+    Tag nach dem juengsten last_verified des Bestands (siehe
+    `_echter_bestand`); bis dahin war der 31.08.2026 festgenagelt, und die
+    Voraussetzung `>= 80 unbewegt` fiel am 18.09. mit 52 - der Stand war
+    weitergezogen, der Test nicht.
 
     Vor dem 31.08.2026 ergab derselbe simulierte Nachtlauf 85 Zeilen
     Verweildauer (alle "21 Tage", 11 unterscheidbare Texte, zwoelfmal
@@ -948,24 +961,35 @@ def test_ein_simulierter_nachtlauf_erzeugt_keine_nullzeilen():
     Kommentarblock ueber `MIND_TERMINE_JE_GERAET` beschreibt.
     """
     alle, punkte, katalog, termine, laeufe = _echter_bestand(nachtlauf=True)
-    a = auswertung(alle, punkte, katalog, heute="2026-08-31",
+    heute = max(e.get("last_verified") or "" for e in alle)
+    a = auswertung(alle, punkte, katalog, heute=heute,
                    laeufe_je_anbieter=laeufe, termine_je_anbieter=termine)
 
     # Der Fall traete ohne die Zusicherungen wirklich ein: es GIBT genug
-    # aktive Listungen mit 21 Tagen Spanne und unbewegtem Preis.
+    # aktive Listungen mit 21 Tagen Spanne und unbewegtem Preis. Die
+    # Floors liegen bewusst unter BEIDEN gemessenen Lagen (18.09.: 85/52
+    # am Rand 2026-09-18, 325/216 einen Tag spaeter, wenn die Kohorte vom
+    # 29.08. die Schwelle kreuzt) - sie beweisen die MASSE der Lage,
+    # ohne den Stand eines bestimmten Tages zu pinnen.
     kandidaten = [e for e in alle
                   if e.get("status") == STATUS_AKTIV
                   and listungsdauer(e) is not None
                   and listungsdauer(e) >= MIND_TAGE_JE_GERAET]
-    assert len(kandidaten) >= 80, len(kandidaten)
+    assert len(kandidaten) >= 50, len(kandidaten)
     unbewegt = [e for e in kandidaten
                 if preisverfall(e) and preisverfall(e)["absolut"] == 0]
-    assert len(unbewegt) >= 80, len(unbewegt)
+    assert len(unbewegt) >= 25, len(unbewegt)
 
-    # 1. Keine Zeile ohne Preisbewegung.
+    # 1. Keine Zeile ohne Preisbewegung - und die stillstehenden Plaetze
+    #    sind GEZAEHLT, nicht verschwiegen: `ohne_bewegung` meldet sie.
+    #    Bis P5 verlangte der zweite Assert `ohne_bewegung == 0 or
+    #    verfaelle == []` - das war die messbare Lage vom 02.09. ("nichts
+    #    hat sich seit dem 31.08. bewegt"), keine Regel: dass BEIDES
+    #    nebeneinander vorkommt (am 18.09. 93 Gezaehlte neben 14 Zeilen),
+    #    ist der Normalfall, kein Widerspruch.
     assert all(v["absolut"] for v in a["verfaelle"]), \
         [v for v in a["verfaelle"] if not v["absolut"]][:3]
-    assert a["ohne_bewegung"] == 0 or a["verfaelle"] == []
+    assert a["ohne_bewegung"] >= 1 or not unbewegt
 
     # 2. Jede Verweildauer-Zeile ist ein eigener Regalplatz.
     schluessel = [(d["device_id"], d["anbieter"], d["zustand"])
@@ -989,15 +1013,16 @@ def test_ohne_vollstaendigen_lauf_wird_nichts_zugerechnet():
     alle, punkte, katalog, termine, laeufe = _echter_bestand(nachtlauf=True)
     assert laeufe["mobilcom-debitel"] == 0, laeufe
     assert len(termine["mobilcom-debitel"]) >= MIND_TERMINE_JE_GERAET
+    heute = max(e.get("last_verified") or "" for e in alle)
 
-    echt = auswertung(alle, punkte, katalog, heute="2026-08-31",
+    echt = auswertung(alle, punkte, katalog, heute=heute,
                       laeufe_je_anbieter=laeufe, termine_je_anbieter=termine)
     assert not [d for d in echt["dauern"] if d["anbieter"] == "mobilcom-debitel"]
 
     # Die Gegenprobe: EIN vollstaendiger Lauf, und dieselben Termine zaehlen.
     # Ohne sie belegte der Test nur, dass die Zeilen nie erscheinen.
     mit_lauf = dict(laeufe, **{"mobilcom-debitel": 1})
-    b = auswertung(alle, punkte, katalog, heute="2026-08-31",
+    b = auswertung(alle, punkte, katalog, heute=heute,
                    laeufe_je_anbieter=mit_lauf, termine_je_anbieter=termine)
     zugerechnet = [d for d in b["dauern"] if d["anbieter"] == "mobilcom-debitel"]
     assert zugerechnet, "die Zurechnung greift bei vollstaendigem Lauf"

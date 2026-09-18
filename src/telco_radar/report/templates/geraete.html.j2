@@ -668,7 +668,7 @@
          MODELLE, `BLOCK_SICHTBAR` hat auf dieser Ebene keine Bedeutung.
          Hauptzeile und Aufklappzeile tragen ihn PAARWEISE - die
          Sortiermechanik verschiebt beide zusammen (`data-auf`). #}
-      <tr class="gr-a-zeile gr-k-zeile{{ ' gr-a-rest' if m.zeilen_rest }}"
+      <tr class="gr-a-zeile gr-k-zeile{{ ' gr-a-rest' if m.zeilen_rest }}{{ ' gr-k--ohne-details' if not m.zeilen }}"
           data-auf="kz-{{ loop.index }}"
           data-modell="{{ m.schluessel }}"
           data-marke="{{ m.hersteller }}" data-speicher="{{ m.speicher or '' }}"
@@ -691,7 +691,18 @@
           {% if m.zr %}<a class="gr-sprung"
             href="geraete.html?modell={{ m.schluessel }}{% if m.tco_band %}&amp;band={{ m.tco_band }}{% endif %}"
             data-modell="{{ m.schluessel }}"{% if m.tco_band %} data-band="{{ m.tco_band }}"{% endif %}
-            >im Graph ansehen&nbsp;→</a>{% endif %}</td>
+            >im Graph ansehen&nbsp;→</a>
+          {# P5-Auftrag 1 (18.09.): ein Modell MIT Bündel, das (noch) nicht
+             waehlbar ist - Auto-Eintrag unter der Messtag-Schwelle der Wahl
+             (`AUTO_SICHTBAR_AB_MESTAGEN`, gegen Bündel-Messtage gerechnet).
+             Die Zeitreihe BEGINNT mit dem nächsten Messtag, die Lücke heisst
+             beim Namen wie im Radar - kein toter Deep-Link, kein Stummsein.
+             Ein Modell OHNE Bündel nennt die TCO-Spalte den Grund ("kein
+             Bündel gemessen"); derselbe Satz hier waere die zweite Aussage
+             fuer dieselbe Tatsache (Beruhigungsregel: eine Zahl/Aussage je
+             Ort genau EINMAL). #}
+          {% elif m.hat_buendel %}<span class="gr-a-klein">noch keine
+            Zeitreihe</span>{% endif %}</td>
         {# --- Einzelgeraepreis: DIE EINE REGEL. Barpreis ("ab X bei Y",
                Beleg verlinkt), sonst der benannte Buendel-Zustand mit
                Monatspreis - nie eine Rate als Barpreis. Ein Modell ohne
@@ -770,7 +781,14 @@
          Werte) statt "Verfügbar"; NICHT gelöscht, über die Spalte
          selbst entscheidet P5 (Antonio).
          Eine 1&1-Zeile ohne Barpreis trägt hier ihre Bündel-Angabe
-         statt "ohne Preis" (C1). #}
+         statt "ohne Preis" (C1).
+         P5-Auftrag 1 (18.09.): ein Modell ohne Listung (nur im Bündel)
+         hat KEINE Detailzeile - es gibt keine Listungs-Details, und die
+         Bündel-Angebote stehen bereits im Vergleichs-Reiter und im
+         Radar (keine Doppel-Darstellung). app.js verschiebt die Paare
+         mit `if (p.auf)` - eine Zeile ohne Aufklapper ist dort
+         ausdrücklich vorgesehen. #}
+      {% if m.zeilen %}
       <tr class="gr-a-auf{{ ' gr-a-rest' if m.zeilen_rest }}" id="kz-{{ loop.index }}"><td colspan="8">
         <div class="gr-scroll">
         <table class="src-table gr-k-listungen">
@@ -819,6 +837,7 @@
         </table>
         </div>
       </td></tr>
+      {% endif %}
     {% endfor %}
     </tbody>
   </table>

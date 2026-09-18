@@ -19,6 +19,7 @@ Vodafone `modelName` setzen.
 """
 import json
 from datetime import datetime, timezone
+from pathlib import Path
 
 from telco_radar.collect.geraete import (
     autoerkennung, o2, sammle_anbieter, telekom, vodafone,
@@ -31,6 +32,7 @@ from telco_radar.geraete_model import (
 
 _TELEKOM_URL = "https://www.telekom.de/shop/geraete/smartphones/ohne-vertrag"
 _HEUTE = "2026-09-15"
+_FIX = Path(__file__).parent / "fixtures" / "geraete"
 
 
 def _eintrags(name, slug, rate, gesamt, gid):
@@ -661,3 +663,216 @@ def test_stamm_eines_hand_eintrags_mit_funkzusatz_wird_nicht_angelegt(caplog):
     assert len(katalog.geraete) == vorher
     assert "Redmi Note 18 5G" in caplog.text
     assert "nicht angelegt" in caplog.text
+
+
+# ==========================================================================
+# P5/E3: Tarif-Rauschen aus der Arbeitsliste (FM 1 - Fruehindikator)
+# ==========================================================================
+# ALDI TALK liefert je Lauf drei Tarifpakete als „Geraet" in den strukturierten
+# Daten mit („Tarif S", „Tarif M", „Tarif L", quelle microdata). Am 17.09.2026
+# standen sie als 3 Zeilen mit Haeufigkeitssumme 87 von 284 in
+# data/state/geraete_unbekannt.jsonl (je 29 Zaehlungen - der Auftrag nennt
+# „87 von 284 Zeilen" und meint diese Vorkommen). Die Liste ist der
+# Fruehindikator fuer Anker-Luecken (FM 1); Rauschen macht sie taub. Alle
+# Titel dieser Sektion sind die gespeicherten ECHTEN der Datei vom 17.09. -
+# einzeln hierher kopiert und als Ganzes als Fixture
+# tests/fixtures/geraete/unbekannte_titel_2026-09-17.jsonl (145 Titel-Zeilen,
+# Herkunft in _herkunft.json). NICHTS ist erfunden.
+
+def test_tarif_titel_erkennen():
+    """Die Regel selbst, an den echten Werten: Wort ‚Tarif' UND keine Ziffer.
+    Der einzige ziffernlose Geraetetitel des Bestands (Oakley, ld+json von
+    mobilcom-debitel) traegt das Wort ‚Tarif' nicht - die UND-Verknuepfung
+    haelt ihn drin."""
+    assert autoerkennung.ist_tarif_titel("Tarif S")
+    assert autoerkennung.ist_tarif_titel("Tarif M")
+    assert autoerkennung.ist_tarif_titel("Tarif L")
+    # Echte Geraetetitel der selben Liste bleiben stehen - auch die von
+    # ALDI TALK selbst (derselbe Anbieter wie das Rauschen).
+    assert not autoerkennung.ist_tarif_titel(
+        "MOTOROLA moto g86 5G, 256 GB, Spellbound (XT2527-2)")
+    assert not autoerkennung.ist_tarif_titel(
+        "Oakley Meta - HSTN Prizm Polarized (AI Glasses)")
+    assert not autoerkennung.ist_tarif_titel("Samsung Galaxy A36 5G")
+    assert not autoerkennung.ist_tarif_titel("")
+    assert not autoerkennung.ist_tarif_titel(None)
+
+
+def test_tarif_titel_werden_nicht_gespeichert(tmp_path):
+    """Neue Tarif-Titel kommen nicht in die Arbeitsliste - Geraetetitel und
+    Farben desselben Laufs sehr wohl (echte Werte des ALDI-TALK-Kontingents
+    vom 17.09.)."""
+    eintraege = [
+        {"art": "titel", "wert": "Tarif S", "anbieter": "ALDI TALK",
+         "quelle": "microdata"},
+        {"art": "titel", "wert": "Tarif M", "anbieter": "ALDI TALK",
+         "quelle": "microdata"},
+        {"art": "titel", "wert": "Tarif L", "anbieter": "ALDI TALK",
+         "quelle": "microdata"},
+        {"art": "titel",
+         "wert": "MOTOROLA moto g86 5G, 256 GB, Spellbound (XT2527-2)",
+         "anbieter": "ALDI TALK", "quelle": "microdata"},
+        {"art": "titel", "wert": "SONIM XP400, 128 GB, Schwarz",
+         "anbieter": "ALDI TALK", "quelle": "microdata"},
+        {"art": "farbe", "wert": "Glacier Blue", "anbieter": "ALDI TALK",
+         "quelle": "microdata"},
+    ]
+    zeilen_gesamt = autoerkennung.persistiere_unbekannte(
+        tmp_path, eintraege, "2026-09-18")
+
+    datei = tmp_path / "data" / "state" / "geraete_unbekannt.jsonl"
+    zeilen = [json.loads(z) for z in datei.read_text().splitlines() if z]
+    assert zeilen_gesamt == 3 == len(zeilen)
+    assert {z["wert"] for z in zeilen} == {
+        "MOTOROLA moto g86 5G, 256 GB, Spellbound (XT2527-2)",
+        "SONIM XP400, 128 GB, Schwarz", "Glacier Blue"}
+    # Kein Tarifname steht irgendwo in der Liste.
+    assert all("Tarif" not in z["wert"] for z in zeilen)
+
+
+def test_bestaende_werden_beim_naechsten_schreiben_bereinigt(tmp_path):
+    """Die Regel wirkt im CODE, die Bereinigung macht der NAECHSTE Lauf:
+    data/state wird nie von Hand angefasst (Hausregel). Der Bestand vom
+    17.09. - 3 Tarif-Zeilen mit Haeufigkeit 29 je, echte Geraetetitel und
+    eine echte Farbe daneben - wird beim naechsten Schreiben einer EINZEN
+    neuen Farbe um genau die 3 Rausch-Zeilen kleiner."""
+    bestand = [
+        {"art": "titel", "wert": "Tarif S", "anbieter": "ALDI TALK",
+         "quelle": "microdata", "datum": "2026-09-17", "haeufigkeit": 29},
+        {"art": "titel", "wert": "Tarif M", "anbieter": "ALDI TALK",
+         "quelle": "microdata", "datum": "2026-09-17", "haeufigkeit": 29},
+        {"art": "titel", "wert": "Tarif L", "anbieter": "ALDI TALK",
+         "quelle": "microdata", "datum": "2026-09-17", "haeufigkeit": 29},
+        {"art": "titel", "wert": "iPad Pro 11 (2025)", "anbieter": "Vodafone",
+         "quelle": "vodafone_buendel", "datum": "2026-09-17",
+         "haeufigkeit": 2},
+        {"art": "farbe", "wert": "Burgunder", "anbieter": "Vodafone",
+         "quelle": "vodafone_api", "datum": "2026-09-17", "haeufigkeit": 40},
+    ]
+    pfad = tmp_path / "data" / "state" / "geraete_unbekannt.jsonl"
+    pfad.parent.mkdir(parents=True)
+    pfad.write_text("".join(json.dumps(z, ensure_ascii=False) + "\n"
+                            for z in bestand), encoding="utf-8")
+
+    # Der naechste Lauf meldet EINE neue echte Farbe (Polar, iPhone 18).
+    autoerkennung.persistiere_unbekannte(
+        tmp_path,
+        [{"art": "farbe", "wert": "Polar", "anbieter": "Vodafone",
+          "quelle": "vodafone_api"}],
+        "2026-09-18")
+
+    zeilen = [json.loads(z) for z in pfad.read_text().splitlines() if z]
+    assert len(zeilen) == 3
+    assert {z["wert"] for z in zeilen} \
+        == {"iPad Pro 11 (2025)", "Burgunder", "Polar"}
+    # Die gezaehlte Haeufigkeit der Rausch-Zeilen (29 je, Summe 87) verhindert
+    # nicht ihr Verschwinden - sie war eine Zaehlung, keine Buchfuehrung.
+    assert all("Tarif" not in z["wert"] for z in zeilen)
+
+
+def test_ueber_den_ganzen_echten_bestand_vom_17_09():
+    """Die Wahrheitsprobe gegen ALLE 145 echten Titel-Zeilen des 17.09.
+    (Fixture, s. _herkunft.json): die Regel trifft GENAU die drei ALDI-Tarife
+    und keinen einzigen Geraetetitel - auch nicht die ziffernlosen."""
+    zeilen = [json.loads(z) for z in
+              (_FIX / "unbekannte_titel_2026-09-17.jsonl")
+              .read_text(encoding="utf-8").splitlines() if z.strip()]
+    assert len(zeilen) == 145          # die Fixture ist der ganze Bestand
+
+    rauschen = [z for z in zeilen if autoerkennung.ist_tarif_titel(z["wert"])]
+    assert sorted(z["wert"] for z in rauschen) == ["Tarif L", "Tarif M",
+                                                   "Tarif S"]
+    assert {z["anbieter"] for z in rauschen} == {"ALDI TALK"}
+    assert sum(z.get("haeufigkeit", 0) for z in rauschen) == 87
+
+    # Jeder andere Titel bleibt stehen - 142 von 145.
+    assert len(zeilen) - len(rauschen) == 142
+    # Die ziffernlosen Geraetetitel des Bestands tragen kein ‚Tarif' und
+    # fallen nicht durch die UND-Regel:
+    for titel in ("Oakley Meta - HSTN Prizm Polarized (AI Glasses)",
+                  "motorola edge 70"):
+        assert any(z["wert"] == titel for z in zeilen)
+        assert not autoerkennung.ist_tarif_titel(titel)
+
+
+# ==========================================================================
+# P5/E3: Feste Familien-Anker - iPad, Watch, AirPods ohne Praefix
+# ==========================================================================
+# Vodafone nennt seine iPads im strukturierten Namen OHNE Hersteller-Praefix
+# (`modelName`: „iPad Pro 11 (2025)", „iPad (2025)", „iPad Pro 11 2024" -
+# data/state/geraete_unbekannt.jsonl vom 17.09.). Die Serie „iPad" stand in
+# keinem Katalog-Eintrag, also griff der Serien-Anker nie: die Anker-Luecke
+# aus auto-doku.md. iPad, Watch und AirPods sind Apple-Serien - der feste
+# Familien-Anker ist Markennamen-Fakt, keine Raterei, und greift NUR, wo der
+# Katalog die Reihe nicht kennt (Hand schlaegt Auto bleibt).
+
+def test_ipad_ohne_hersteller_praefix_wird_ueber_familien_anker_angelegt():
+    """Die echten Vodafone-modelNames vom 17.09. werden von _mini_katalog
+    (der Katalog kennt KEIN iPad) aus Apple geschält - kuenftige iPads
+    („iPad Air", „iPad mini", „iPad Pro 14") ebenso, ohne Katalog-Pflege."""
+    for name in ("iPad Pro 11 (2025)", "iPad (2025)", "iPad Pro 11 2024"):
+        assert autoerkennung.schale(name, _mini_katalog()) == ("Apple", name)
+
+    eintrag = autoerkennung.lege_an("iPad Pro 11 (2025)", _mini_katalog(),
+                                    "2026-09-18", speicher_gb=256)
+    assert eintrag is not None
+    assert eintrag.hersteller == "Apple"
+    assert eintrag.modell == "iPad Pro 11 (2025)"
+    assert eintrag.device_id == device_id("Apple", "iPad Pro 11 (2025)")
+    assert eintrag.auto == "2026-09-18"
+    # Auto-Regeln unveraendert: marktstart und vorgaenger bleiben leer.
+    assert eintrag.marktstart == "" and eintrag.vorgaenger == ""
+
+
+def test_vodafone_ipad_titel_trifft_den_auto_eintrag():
+    """Die Launch-Kette bis zur Listung: nach der Anlage aus dem strukturierten
+    Namen trifft der ZUSAMMENGESETZTE Vodafone-Titel (echt aus der Liste vom
+    17.09., mit Speicher und Farbe) den Eintrag - derselbe Retry, den der
+    Listungsweg macht."""
+    katalog = _mini_katalog()
+    autoerkennung.lege_an("iPad Pro 11 (2025)", katalog, "2026-09-18",
+                          speicher_gb=256)
+    treffer = erkenne_geraet("iPad Pro 11 (2025) 256 GB Silber", katalog)
+    assert treffer is not None
+    assert treffer.device_id == device_id("Apple", "iPad Pro 11 (2025)")
+
+
+def test_watch_und_airpods_ohne_praefix_werden_angelegt():
+    """Dieselben Familien in den Benennformen des Bestands: Watch-Modellnamen
+    (so stehen sie seit dem 17.09. im Auto-Katalog) und die AirPods-Titel
+    congstars. Mit Praefix liefen sie ueber den Praefix-Pfad - der Anker
+    traegt die Nennung OHNE nach."""
+    katalog = _mini_katalog()
+    for name in ("Watch Ultra 4", "Watch Series 12 46 Aluminium",
+                 "AirPods 5", "AirPods Max 2", "AirPods Pro (3. Gen.)"):
+        assert autoerkennung.schale(name, katalog) == ("Apple", name)
+
+
+def test_familien_anker_schlaegt_nicht_den_katalog():
+    """Hand schlaegt Auto, in beide Richtungen: kennt der Katalog die Reihe
+    EINDEUTIG - auch von einem ANDEREN Hersteller -, entscheidet er; kennt er
+    sie WIDERSPRUECHLICH, bleibt es beim Verwurf (nichts geraten). Der feste
+    Apple-Anker darf beides nicht ueberschreiben."""
+    eindeutig_samsung = Katalog(geraete=[
+        Geraet(hersteller="Samsung", modell="Watch 7", generation=7)])
+    assert autoerkennung.schale("Watch 8", eindeutig_samsung) \
+        == ("Samsung", "Watch 8")
+
+    zweideutig = Katalog(geraete=[
+        Geraet(hersteller="Samsung", modell="Watch 7", generation=7),
+        Geraet(hersteller="Apple", modell="Watch 9", generation=9)])
+    assert autoerkennung.schale("Watch 8", zweideutig) is None
+    assert autoerkennung.lege_an("Watch 8", zweideutig, _HEUTE) is None
+
+
+def test_hmd_und_router_bleiben_anker_luecken():
+    """Der Fruehindikator bleibt ehrlich: „HMD Fusion X1" (echter Vodafone-
+    Titel, Hersteller ohne jeden Katalogbezug) und „Vodafone GigaCube 5G"
+    (Router - der Hand-Katalog verfolgt sie bewusst nicht) werden NICHT
+    angelegt. Nicht jede unbekannte Benennform wird ein Eintrag; diese
+    bleiben Arbeitsliste."""
+    katalog = _mini_katalog()
+    for name in ("HMD Fusion X1", "GigaCube 5G", "Vodafone GigaCube 5G"):
+        assert autoerkennung.schale(name, katalog) is None
+    assert autoerkennung.lege_an("HMD Fusion X1", katalog, _HEUTE) is None
+    assert [g for g in katalog.geraete if g.auto] == []

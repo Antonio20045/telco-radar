@@ -117,6 +117,15 @@ class Adapter:
     werfen. Ein Adapter mit eigenen Buendel-Einstiegen setzt die Flagge
     auf False - die Einstiege selbst rufen `lies_buendel` natuerlich
     weiterhin.
+
+    `lies_buendel(text, url, proben=None)` - der dritte Parameter ist die
+    PROVIDER-PROBE (FM-2, P5-Auftrag 2): der Collector reicht die Bilanz-
+    Zaehler des Anbieters hinein, und ein Adapter, der Feld-Proben kennt
+    (o2: metric3+metric2 == monthlyPrice usw., Praezedenz Phase S),
+    zaehlt hinein, wie viele der erwarteten Saetze ihre Feldebenen noch
+    tragen. Adapter ohne Proben ignorieren ihn. Der Zaehler steht danach
+    in `Anbieterbilanz.proben` und wird protokolliert - er loest nichts
+    aus, er meldet.
     """
     name: str
     lies: Callable
@@ -186,6 +195,13 @@ class Anbieterbilanz:
     # offen - 20 abgerufene Produktseiten, 0 Listungen, und das Protokoll
     # sagte nicht, an welcher der beiden Stufen es lag.
     rohsaetze: int = 0
+    # PROVIDER-PROBE (FM-2, P5-Auftrag 2): Existenz-Schwelle der Feld-
+    # ebenen, gefuellt vom Adapter selbst (`lies_buendel(..., proben=...)`,
+    # heute nur o2 mit den drei Proben aus Phase S). Zaehlungen:
+    # `kandidaten`, `bestanden` und je gescheiterter Feldebene eine eigene
+    # (z. B. `metric3+metric2`). Leer heisst "kein Adapter mit Proben" -
+    # kein Lautwerden, denn es gibt keine Erwartung.
+    proben: dict = field(default_factory=dict)
 
     @property
     def vollstaendig(self) -> bool:
@@ -575,7 +591,8 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
                                f"Buendellesart")
                 continue
             try:
-                roh = adapter.lies_buendel(inhalt, einstieg.url) or []
+                roh = adapter.lies_buendel(inhalt, einstieg.url,
+                                           proben=bilanz.proben) or []
                 bilanz.buendel.extend(
                     _mit_sku(roh, anbieter, einstieg, katalog, farben,
                              heute, bilanz))
@@ -668,7 +685,8 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
                 # Produktseiten tragen keinen Plan, der Aufruf wuerde auf
                 # jeder von ihnen werfen).
                 try:
-                    roh_buendel = adapter.lies_buendel(seite, url) or []
+                    roh_buendel = adapter.lies_buendel(seite, url,
+                                                       proben=bilanz.proben) or []
                 except GeraeteAbrufFehler as exc:
                     log.info("%s: %s Buendel unlesbar (%s)",
                             anbieter.name, url, exc)

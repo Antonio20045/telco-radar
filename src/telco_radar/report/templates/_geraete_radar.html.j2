@@ -101,8 +101,11 @@
          Links). `gr-ksprung`, NICHT `gr-sprung`: der bestehende
          gr-sprung-Delegat von app.js waehlt die ZEITREIHE - dieser Link
          hat sein eigenes Ziel (tafel-katalog, Zeile freilegen, markieren).
-         Ohne Katalog-Zeile heisst die Zeile ehrlich „nicht im Katalog"
-         (reines Bündel-Modell ohne Listung). #}
+         Ohne Katalog-Zeile heisst die Zeile ehrlich „nicht im Katalog".
+         P5-Auftrag 1 (18.09.): seit der Katalog Bündel-Modelle ohne
+         Listung als Zeile zeigt, ist das nur noch der fail-closed-Rest
+         (Katalog unlesbar / Bündel ohne auflösbare SKU) - der Regelfall
+         „reines Bündel-Modell" hat seine Zeile. #}
       {% if katalog_ids and z.id in katalog_ids %}
       <a class="gr-ksprung" href="geraete.html#katalog" data-modell="{{ z.id }}"
          >im Katalog&nbsp;→</a>

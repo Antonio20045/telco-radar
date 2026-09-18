@@ -405,7 +405,11 @@ def _tarifname(text: str) -> str:
     return ""
 
 
-def lies_buendel(text: str, url: str = "") -> list[dict]:
+# `proben` ist die Schnittstelle der Provider-Probe (FM-2, P5 - siehe
+# Adapter-Docstring in collect/geraete/__init__.py); dieser Adapter
+# traegt keine Feld-Proben hinein.
+def lies_buendel(text: str, url: str = "",
+                 proben: Optional[dict] = None) -> list[dict]:
     """Aus einer Geräteseite je SPEICHERGROESSE einen Bündel-Rohsatz.
 
     Die Karte preist den Default-Tarif der Seite (gemessen an zehn Seiten:

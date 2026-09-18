@@ -2410,8 +2410,11 @@ b,strong{font-weight:700}
 .gr-katalog-mod.gr-katalog--tco .gr-sp--tco{display:table-cell}
 .gr-katalog-mod.gr-katalog--tco .gr-sp--barpreis{display:none}
 /* Die Zeile ist ein Aufklapper (Listungs-Details des Modells) - der
-   Zeiger sagt es, bevor P4 den Chevron nachliefert. */
+   Zeiger sagt es, bevor P4 den Chevron nachliefert. Eine Zeile OHNE
+   Details (P5: nur im Bündel, keine Listung) klappt nichts auf und
+   zeigt keinen Zeiger. */
 .gr-katalog-mod tbody .gr-a-zeile{cursor:pointer}
+.gr-katalog-mod tbody .gr-a-zeile.gr-k--ohne-details{cursor:auto}
 /* Der ab-Preis bricht nicht zwischen Betrag und Waehrung. */
 .gr-k-ab{font-family:var(--serif);font-weight:600;white-space:nowrap}
 .gr-k-anzahl{font-family:var(--sans);font-weight:700;font-size:15px}
@@ -3540,6 +3543,15 @@ td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
 .gr-zr-vorschau .gr-zr-v-titel{font-weight:600}
 .gr-zr-vorschau .gr-zr-v-meta{font-family:var(--sans);font-size:12px;
   color:var(--ink-3);white-space:nowrap}
+/* Der Neu-Hinweis (R3 der P5-Live-Pruefung): ein SATZ als Link, kein
+   Auswahl-Button - dieselbe Flaeche wie die Treffer, aber ohne die
+   Zwei-Spalten-Form, weil er keine Titel-/Meta-Zeile hat. */
+.gr-zr-vorschau a.gr-zr-v-neu{display:block;font:inherit;
+  font-family:var(--serif);font-size:14px;padding:8px 12px;
+  border-bottom:1px solid var(--rule-2);color:var(--ink);
+  text-decoration:underline;text-underline-offset:2px}
+.gr-zr-vorschau a.gr-zr-v-neu:hover,.gr-zr-vorschau a.gr-zr-v-neu:focus-visible{
+  background:var(--paper-3)}
 .gr-zr-baender{display:flex;border:1px solid var(--rule)}
 .gr-zr-baender button{font-family:var(--sans);font-size:12.5px;font-weight:700;
   letter-spacing:.02em;padding:8px 14px;border:0;border-right:1px solid var(--rule);
