@@ -123,6 +123,42 @@
    "generation": 12,
    "speicher": [],
    "auto": "2026-09-17"
+  },
+  {
+   "hersteller": "Apple",
+   "modell": "iPad Pro 11 (2025)",
+   "generation": 11,
+   "speicher": [
+    256
+   ],
+   "auto": "2026-09-19"
+  },
+  {
+   "hersteller": "Apple",
+   "modell": "iPad Pro 13 (2025)",
+   "generation": 13,
+   "speicher": [
+    256
+   ],
+   "auto": "2026-09-19"
+  },
+  {
+   "hersteller": "Apple",
+   "modell": "iPad Pro 11 2024",
+   "generation": 11,
+   "speicher": [
+    512
+   ],
+   "auto": "2026-09-19"
+  },
+  {
+   "hersteller": "Apple",
+   "modell": "iPad (2025)",
+   "generation": null,
+   "speicher": [
+    128
+   ],
+   "auto": "2026-09-19"
   }
  ]
 }
