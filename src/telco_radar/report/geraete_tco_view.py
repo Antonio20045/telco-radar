@@ -512,17 +512,23 @@ def _referenztabelle(referenzen: list) -> list[dict]:
             continue
         if r.tarif_sim_only_monatlich is None:
             continue
+        # A4 (20.09.2026): die Horizontzahl ist `tco_24` ueber
+        # `als_buendel()` - INKLUSIVE Anschlusspreis, wie jede
+        # Bündel-Leitzahl und wie die Differenz `geraeteanteil()`, die
+        # diesen Weg schon ging. Bis A4 stand hier tarif * 24: zwei
+        # Rechnungen fuer dieselbe Zahl (Clean Code 1), und Tafel wie
+        # TCO-Export erbten die unvollstaendige. Gerechnet wird sie hier
+        # und nicht im Template - ein Renderer, der multipliziert, ist
+        # eine zweite Rechnung.
+        kennzahl = tco_24(r.als_buendel())
         zeilen.append({
             "anbieter": r.anbieter,
             "eigen": _eigen(r.anbieter),
             "tarif": r.tarif_name,
             "tarif_id": r.tarif_id,
             "monatlich": r.tarif_sim_only_monatlich,
-            # Ueber den Horizont gerechnet, damit die Zahl in derselben
-            # Einheit steht wie die Leitzahl der Tabelle darueber. Gerechnet
-            # wird sie hier und nicht im Template - ein Renderer, der
-            # multipliziert, ist eine zweite Rechnung.
-            "ueber_horizont": round(r.tarif_sim_only_monatlich * TCO_HORIZONT, 2),
+            "ueber_horizont": (kennzahl.gesamt
+                               if kennzahl.belastbar else None),
             "anschlusspreis": r.anschlusspreis,
             "quelle_url": r.quelle_url,
             "abgerufen_am": r.abgerufen_am,
@@ -555,9 +561,16 @@ def _export_zeilen(buendel: list, massstab: list, eintraege: list, katalog,
     dieselbe Funktion wie Karte, Graph und Radar. Diese Funktion liefert
     ZAHLEN; Dezimalkomma und Semikolon macht `geraete_export.tco_csv`.
 
+    Die `sku_id` steht als EIGENE Spalte (A4, 20.09.2026): Modell,
+    Speicher und alle Preise sind je Farbvariante gleich, und ohne die
+    SKU kollabierten Vodafone-Varianten zu byte-identischen
+    Exportzeilen (live: 156). Sie ist Teil des Bündelschluessels und
+    trennt deshalb JEDES Paar, nicht nur das heutige.
+
     Die SIM-only-Zeilen sind DERSELBE Massstab, den die Tafel zeigt
     (`_referenztabelle`), inklusive `ueber_horizont` als ihrer TCO-24 -
-    gerechnet wurde das schon, hier wird es nur gelesen.
+    `tco_24` ueber `als_buendel()`, inklusive Anschlusspreis, gerechnet
+    an derselben Stelle wie die Leitzahl der Bündel.
     """
     # geraet_je_sku: derselbe Aufbau wie in `geraete_tco_karten.modelle()`
     # - Liste der Listungen, ergaenzt um den Katalog (F-R2-3). Die Funktion
@@ -601,6 +614,10 @@ def _export_zeilen(buendel: list, massstab: list, eintraege: list, katalog,
             "tco24": kennzahl.gesamt if kennzahl.belastbar else None,
             "abgerufen_am": b.abgerufen_am,
             "quelle_url": b.quelle_url,
+            # A4: das Unterscheidungsmerkmal der Farbvarianten - siehe
+            # Docstring. Ein Bündel ohne Gerät trägt sie leer, nicht
+            # geraten.
+            "sku_id": b.sku_id or "",
         })
     sim = []
     for r in massstab:

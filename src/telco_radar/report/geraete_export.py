@@ -97,11 +97,18 @@ SPALTEN_HISTORIE = [
 #     Gerät (§ 13.2 der Strategie). Ihn auf Tarif/Monat oder Geräterate
 #     zu verteilen wäre eine Rechnung dieses Projekts und keine Angabe
 #     des Anbieters; ohne die Spalte wäre die Zeile stumm.
+#   * "SKU-ID" (A4, 20.09.2026) - ohne sie kollabierten Vodafone-Farb-
+#     varianten zu byte-identischen Zeilen (live: 156): Modell, Speicher
+#     und alle Preise sind je Farbe gleich, nur die SKU trennt sie. Sie
+#     steht LETZT, am selben Ort wie in SPALTEN_AKTUELL - dort sind die
+#     IDs auch am Ende - und ist Teil des Bündelschlüssels, trennt also
+#     JEDES Paar, nicht nur das heutige. "Eine Zeile je Bündel" bleibt:
+#     der Export filtert nicht selbst.
 SPALTEN_TCO = [
     "Art", "Modell", "Speicher GB", "Anbieter", "Anbietertyp", "Tarif",
     "Band", "Zustand", "Zuzahlung EUR", "Tarif/Monat EUR", "Geräterate EUR",
     "Bündel/Monat EUR", "Laufzeit Monate", "Anschlusspreis EUR",
-    "Kosten über 24 Monate EUR", "Abgerufen am", "Quelle",
+    "Kosten über 24 Monate EUR", "Abgerufen am", "Quelle", "SKU-ID",
 ]
 
 # O4: der Radar-Export - TCO-24 der Netzbetreiber UND Händler-Barpreis in
@@ -214,9 +221,12 @@ def tco_csv(zeilen: dict) -> tuple[str, int]:
     `zeilen` kommt aus `geraete_tco_view.aufbereiten()["export"]`: WERTE
     (Modellname, Band, TCO-24 aus `tco_24`) sind dort aufgelöst, hier wird
     nur FORM gemacht - Dezimalkomma, Semikolon, leere Zelle fuer eine
-    Lücke. Die SIM-only-Zeilen tragen ihre TCO-24 als `ueber_horizont`
-    (Tarif × 24), gerechnet in derselben Funktion, die auch die Tafel
-    fuettert.
+    Lücke. Die SIM-only-Zeilen tragen ihre TCO-24 als `ueber_horizont` -
+    seit A4 dieselbe Rechnung wie die Bündel (`tco_24` ueber
+    `als_buendel()`, inklusive Anschlusspreis), gerechnet in derselben
+    Funktion, die auch die Tafel fuettert. Die letzte Spalte ist die
+    SKU-ID (A4): ohne sie kollabieren Farbvarianten zu byte-identischen
+    Zeilen - SIM-only-Zeilen tragen sie leer, sie haben kein Gerät.
     """
     ausgabe = []
     for z in (zeilen or {}).get("buendel", []):
@@ -230,7 +240,7 @@ def tco_csv(zeilen: dict) -> tuple[str, int]:
             _zahl(z.get("buendel_monatlich")),
             z.get("laufzeit", "") or "", _zahl(z.get("anschlusspreis")),
             _zahl(z.get("tco24")), z.get("abgerufen_am", ""),
-            z.get("quelle_url", ""),
+            z.get("quelle_url", ""), z.get("sku_id", ""),
         ])
     for z in (zeilen or {}).get("sim_only", []):
         ausgabe.append([
@@ -238,7 +248,7 @@ def tco_csv(zeilen: dict) -> tuple[str, int]:
             z.get("anbieter_typ", ""), z.get("tarif", ""), z.get("band", ""),
             "", "", _zahl(z.get("tarif_monatlich")), "", "", "",
             _zahl(z.get("anschlusspreis")), _zahl(z.get("tco24")),
-            z.get("abgerufen_am", ""), z.get("quelle_url", ""),
+            z.get("abgerufen_am", ""), z.get("quelle_url", ""), "",
         ])
     return _schreibe(SPALTEN_TCO, ausgabe), len(ausgabe)
 

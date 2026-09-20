@@ -36,11 +36,17 @@ WURZEL = pathlib.Path(__file__).resolve().parents[1]
 # ist (B1) und 1&1 einen EINEN Monatsbetrag nennt, der nicht in
 # Tarif/Monat gehört (§ 13.2 der Strategie). Die Leitzahl-Spalte heißt
 # seit A1 wie auf der Seite "Kosten über 24 Monate" (vorher "TCO-24").
+# "SKU-ID" steht als LETZTE Spalte, am selben Ort wie in
+# geraete-aktuell.csv (die IDs stehen dort auch am Ende): ohne sie
+# kollabierten Vodafones Farbvarianten zu byte-identischen Zeilen
+# (A4, 20.09.2026: 156 in der Live-Datei) - Modell, Speicher und alle
+# Preise sind je Farbe gleich, nur die SKU (Teil des Bündelschlüssels)
+# trennt sie. Die Reihenfolge dieser Liste ist die der Datei.
 SPALTEN_TCO = [
     "Art", "Modell", "Speicher GB", "Anbieter", "Anbietertyp", "Tarif",
     "Band", "Zustand", "Zuzahlung EUR", "Tarif/Monat EUR", "Geräterate EUR",
     "Bündel/Monat EUR", "Laufzeit Monate", "Anschlusspreis EUR",
-    "Kosten über 24 Monate EUR", "Abgerufen am", "Quelle",
+    "Kosten über 24 Monate EUR", "Abgerufen am", "Quelle", "SKU-ID",
 ]
 
 
@@ -147,6 +153,28 @@ def test_die_sim_only_referenzen_stehen_darin(tco_csv, store):
         f"{len(sim)} SIM-only-Zeilen, Bestand {len(store['sim_only'])}")
 
 
+def test_die_datei_zaehlt_buendel_plus_sim_only(tco_csv, store):
+    """A4-Gegenprobe: die Datei ist die SUMME ihrer zwei Arten - jede
+    Zeile ist ein Bündel ODER eine Referenz, nichts fällt zusammen und
+    nichts kommt dazu (der Export filtert nicht selbst)."""
+    _, zeilen = tco_csv
+    assert len(zeilen) == len(store["buendel"]) + len(store["sim_only"]), (
+        f"{len(zeilen)} Zeilen, Bestand {len(store['buendel'])} Bündel "
+        f"+ {len(store['sim_only'])} SIM-only")
+
+
+def test_keine_zwei_datenzeilen_sind_identisch(tco_csv):
+    """A4: ohne die SKU-Spalte kollabierten Vodafones Farbvarianten zu
+    byte-identischen Zeilen (live am 20.09.2026: 156 Stück) - in Excel
+    sieht eine doppelte Zeile aus wie ein Fehler der Datei, und Sortieren
+    oder Pivotieren verschiebt sie still. Verglichen wird die GANZE
+    Zeile als Tupel; identische Tupel sind byte-identisch."""
+    _, zeilen = tco_csv
+    tuples = [tuple(z) for z in zeilen]
+    assert len(set(tuples)) == len(tuples), (
+        f"{len(tuples) - len(set(tuples))} byte-identische Datenzeilen")
+
+
 def test_die_band_spalte_ist_gefuellt_wo_ein_band_ist(tco_csv, store):
     """Band kommt aus demselben Tarifbestand wie die Seite
     (`geraete_tco_band.tarif_baender`) - dieselbe Quelle, keine zweite
@@ -212,6 +240,129 @@ def test_die_tco24_einer_zeile_ist_gerechnet_nach_geraten(tco_csv, store):
                  .replace(",", ".")) == pytest.approx(
         werte.pop(), abs=0.005), (
         f"Leitzahl der Stichprobe {probe} stimmt nicht mit tco_24() überein")
+
+
+def test_die_tco24_einer_simonly_zeile_ist_gerechnet_nach_geraten(
+        tco_csv, store):
+    """A4: derselbe Kreuzcheck wie bei den Bündeln, fuer die zweite
+    Zeilenart - die Leitzahl einer SIM-only-Zeile ist `tco_24` ueber
+    `SimOnlyReferenz.als_buendel()` (Clean Code 1: EINE Rechnung), nicht
+    tarif * 24. Bis A4 fehlte der Anschlusspreis in der Zelle; am
+    Bestand vom 20.09.2026 tragen 19 von 45 Referenzen einen, die Probe
+    waehlt deshalb eine MIT Anschlusspreis - nur dort unterscheiden sich
+    alte und neue Rechnung ueberhaupt."""
+    from telco_radar.tco_model import SimOnlyReferenz, tco_24
+    kopf, zeilen = tco_csv
+    idx = {name: i for i, name in enumerate(kopf)}
+
+    def _zahl(zelle: str):
+        return (float(zelle.replace(".", "").replace(",", "."))
+                if zelle else None)
+
+    satz = next((s for s in store["sim_only"]
+                 if s.get("anschlusspreis") is not None
+                 and s.get("tarif_sim_only_monatlich") is not None), None)
+    assert satz is not None, (
+        "keine Referenz mit Anschlusspreis im Bestand - der Test prueft "
+        "nichts")
+
+    # Die Zeile, die zu ALLEN Beträgen dieses Satzes passt - dieselbe
+    # Zuordnung wie beim Bündel-Kreuzcheck; mehrere Referenzen mit
+    # denselben Beträgen muessen dieselbe Leitzahl rechnen.
+    kandidaten = [s for s in store["sim_only"]
+                  if s["anbieter"] == satz["anbieter"]
+                  and s["tarif_name"] == satz["tarif_name"]
+                  and s.get("tarif_sim_only_monatlich")
+                  == satz["tarif_sim_only_monatlich"]
+                  and s.get("anschlusspreis") == satz["anschlusspreis"]]
+    assert kandidaten, "Stichprobe trifft keinen Satz des Stores"
+    probe = next(z for z in zeilen
+                 if z[0] == "SIM-only"
+                 and z[idx["Anbieter"]] == satz["anbieter"]
+                 and z[idx["Tarif"]] == satz["tarif_name"]
+                 and _zahl(z[idx["Tarif/Monat EUR"]])
+                 == satz["tarif_sim_only_monatlich"]
+                 and _zahl(z[idx["Anschlusspreis EUR"]])
+                 == satz["anschlusspreis"])
+    werte = set()
+    for s in kandidaten:
+        ref = SimOnlyReferenz(**{
+            k: v for k, v in s.items()
+            if k in SimOnlyReferenz.__dataclass_fields__})
+        erg = tco_24(ref.als_buendel())
+        assert erg.belastbar, (
+            f"Stichprobe {probe} trägt eine Zahl, obwohl tco_24 "
+            "unbelastbar ist")
+        werte.add(erg.gesamt)
+    assert len(werte) == 1, (
+        f"Kandidaten der Stichprobe rechnen verschiedene TCO: {werte}")
+    assert float(probe[idx["Kosten über 24 Monate EUR"]].replace(".", "")
+                 .replace(",", ".")) == pytest.approx(
+        werte.pop(), abs=0.005), (
+        f"Leitzahl der SIM-only-Stichprobe {probe} stimmt nicht mit "
+        "tco_24() überein")
+
+
+def test_zwei_farbvarianten_bleiben_zwei_zeilen():
+    """A4 am GESTELLTEN Bestand - dieselbe Kollision wie live: zwei
+    Vodafone-Bündel, die sich in keiner exportierten Spalte unterscheiden
+    bis auf die SKU (Farbvariante), plus eine SIM-only-Referenz MIT
+    Anschlusspreis. Ohne die SKU-Spalte kollabierte das Paar zu einer
+    byte-identischen Doppelzeile; die SIM-only-Leitzahl stand ohne
+    Anschlusspreis in der Datei. Fixtures setzen ihr Datum selbst
+    (harte Regel 11)."""
+    from telco_radar.geraete_model import Geraet, Katalog
+    from telco_radar.report.geraete_export import tco_csv
+    from telco_radar.report.geraete_tco_view import aufbereiten
+    from telco_radar.tco_model import Buendel, SimOnlyReferenz
+
+    def _buendel(sku: str) -> Buendel:
+        return Buendel(
+            sku_id=sku, anbieter="Vodafone", tarif_name="Mobil M",
+            tarif_monatlich=51.95, geraet_zuzahlung=1.0,
+            geraet_monatsrate=43.5, laufzeit_monate=24,
+            anschlusspreis=0.0,
+            quelle_url="https://www.vodafone.de/privat/handys/x.html",
+            abgerufen_am="2026-09-20")
+
+    blau = _buendel("apple-iphone-air-256gb-himmelblau")
+    weiss = _buendel("apple-iphone-air-256gb-weiss")
+    referenz = SimOnlyReferenz(
+        anbieter="Vodafone", tarif_name="Mobil M",
+        tarif_sim_only_monatlich=39.99, anschlusspreis=29.99,
+        quelle_url="https://www.vodafone.de/mobil-m",
+        abgerufen_am="2026-09-20")
+    # Der Katalog bildet BEIDE SKUs auf dasselbe Modell ab - nur so ist
+    # die Modellspalte fuer das Paar identisch und die SKU das einzige
+    # Unterscheidungsmerkmal (live ist das bei jeder Farbvariante so).
+    katalog = Katalog([Geraet(hersteller="Apple", modell="iPhone Air")])
+
+    d = aufbereiten([blau, weiss], [referenz], [], katalog)
+    inhalt, zahl = tco_csv(d["export"])
+
+    # Anzahl Zeilen == Anzahl Bündel + SIM-only im Testbestand.
+    assert zahl == 3, zahl
+    zeilen = list(csv.reader(io.StringIO(inhalt), delimiter=";"))[1:]
+    assert len(zeilen) == 3, zeilen
+    # Gegenprobe: keine zwei Datenzeilen identisch.
+    assert len({tuple(z) for z in zeilen}) == 3, zeilen
+
+    idx = {name: i for i, name in enumerate(SPALTEN_TCO)}
+    pa = [z for z in zeilen if z[0] == "Bündel"]
+    assert len(pa) == 2, zeilen
+    assert {z[idx["SKU-ID"]] for z in pa} == {blau.sku_id, weiss.sku_id}
+    # Alle ÜBRIGEN Spalten sind identisch - die SKU ist das einzige
+    # Unterscheidungsmerkmal, genau die Live-Lage der Farbvarianten.
+    ohne_sku = [tuple(c for i, c in enumerate(z) if i != idx["SKU-ID"])
+                for z in pa]
+    assert ohne_sku[0] == ohne_sku[1], ohne_sku
+
+    # SIM-only über dieselbe Rechnung wie die Bündel-Leitzahl:
+    # 39,99 EUR/Monat * 24 + 29,99 EUR Anschlusspreis = 989,75 EUR
+    # (die alte Exportzahl ohne Anschlusspreis: 959,76 EUR).
+    sim = next(z for z in zeilen if z[0] == "SIM-only")
+    assert sim[idx["Kosten über 24 Monate EUR"]] == "989,75", sim
+    assert sim[idx["SKU-ID"]] == "", sim
 
 
 def test_erneuerte_buendel_stehen_mit_ihrem_zustand_darin(tco_csv, store):

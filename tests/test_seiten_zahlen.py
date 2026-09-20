@@ -3019,11 +3019,11 @@ def test_geraete_tco_csv_gegen_die_eigene_rechnung(gw_seite):
     aus ihren eigenen Postenspalten nachgerechnet (Zuzahlung + 24 × Tarif
     + Rate × Laufzeit + Anschluss; Bündelform: Bündelbetrag × Laufzeit +
     Zuzahlung + Anschluss). SIM-only-Zeilen prüft der EIGENE Test mit dem
-    fachlichen Soll inklusive Anschlusspreis (P0.8/A4, dort xfail strict,
-    bis A4 gemergt ist) - hier stehen sie nicht, damit dieser Test nur
-    die Bündel scharf hält. Und der heutige Stand zusaetzlich gegen den
-    Store: jedes Bündel mit abgerufen_am == tco.updated muss als CSV-Zeile
-    mit genau diesen Posten stehen und auf dieselbe Zahl rechnen."""
+    fachlichen Soll inklusive Anschlusspreis (P0.8/A4) - hier stehen sie
+    nicht, damit dieser Test nur die Bündel scharf hält. Und der heutige
+    Stand zusaetzlich gegen den Store: jedes Bündel mit
+    abgerufen_am == tco.updated muss als CSV-Zeile mit genau diesen
+    Posten stehen und auf dieselbe Zahl rechnen."""
     tco, blaetter, _db = _gw_rohdaten()
     zeilen = list(_gw_csv.DictReader(
         gw_seite["csv"].open(encoding="utf-8-sig"), delimiter=";"))
@@ -3134,9 +3134,6 @@ def test_geraete_tco_csv_gegen_die_eigene_rechnung(gw_seite):
         "Store-Abgleich greift nicht mehr")
 
 
-@pytest.mark.xfail(strict=True,
-                   reason="P0-A4 offen: SIM-only-Leitzahl ohne "
-                          "Anschlusspreis (Auftrag P0.8)")
 def test_geraete_tco_csv_simonly_mit_anschlusspreis(gw_seite):
     """Der FACHLICHE Soll der SIM-only-Zeilen: 24 × Tarif PLUS
     Anschlusspreis, wo die Zeile ihn trägt (A4, 20.09.2026: die
@@ -3149,14 +3146,9 @@ def test_geraete_tco_csv_simonly_mit_anschlusspreis(gw_seite):
     Bündel-Zweig oben. Zuzahlung und Geräterate werden in SIM-only-Zeilen
     nicht erhoben und stehen leer.
 
-    Auftrag P0.8: "Im SIM-only-Export fehlt der Anschlusspreis" - am
-    Bestand vom 2026-09-20 trägt die Spalte ihn bereits (16 der 45
-    Zeilen, alle 1&1, je 19,90 EUR), die Kennzahl rechnet ihn noch nicht
-    ein. Paket A4 behebt die Produktionsseite; bis dahin schlägt dieser
-    Test erwartungsrot. strict=True: sobald A4 die Zeilen richtig
-    rechnen, wird der Lauf XPASS und damit ROT - der Marker gehört dann
-    entfernt, nicht der Soll angepasst. Kein Skip: ein Skip verhöhe den
-    offenen Fehler still.
+    Auftrag P0.8: "Im SIM-only-Export fehlt der Anschlusspreis" - bis
+    P0-A4 (2026-09-20) rechnete die Kennzahl ihn nicht ein; seither ist
+    die SIM-only-Leitzahl dieselbe Rechnung wie die der Bündel.
     """
     zeilen = [r for r in _gw_csv.DictReader(
         gw_seite["csv"].open(encoding="utf-8-sig"), delimiter=";")

@@ -509,6 +509,26 @@ def test_die_tafel_zeigt_den_tarifpreis_auch_ohne_ein_einziges_buendel():
     assert zeile["quelle_url"]
 
 
+def test_der_massstab_rechnet_wie_die_buendelleitzahl():
+    """A4 (20.09.2026): die Horizontzahl der Tafel ist `tco_24` ueber
+    `SimOnlyReferenz.als_buendel()` - INKLUSIVE Anschlusspreis, wie jede
+    Buendel-Leitzahl und wie die Differenz `geraeteanteil()`, die diesen
+    Weg schon ging.
+
+    Bis A4 multiplizierte die Tafel tarif * 24 und liess den
+    Anschlusspreis weg: zwei Rechnungen fuer dieselbe Zahl (Clean Code 1),
+    und die SIM-only-Zeile des TCO-Exports erbte die unvollstaendige."""
+    ref = _ref(anschlusspreis=39.99)
+    d = aufbereiten([], [ref], [], None)
+    zeile = d["referenzen"][0]
+    erwartet = tco_24(ref.als_buendel())
+    assert zeile["ueber_horizont"] == erwartet.gesamt
+    # 59,95 EUR/Monat * 24 Monate + 39,99 EUR Anschlusspreis = 1478,79 EUR
+    # (die alte Tafelzahl ohne Anschlusspreis: 1438,80 EUR).
+    assert zeile["ueber_horizont"] == round(
+        59.95 * TCO_HORIZONT + 39.99, 2)
+
+
 def test_die_referenztabelle_beschriftet_ihren_beleg_nach_der_quellenart():
     """S-Q1/T3 (Review 05.09.2026): ein Beleglink, der eine Shop-Seite
     "Produktinformationsblatt" nennt, ist selbst eine Falschangabe.
