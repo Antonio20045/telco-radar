@@ -2,10 +2,11 @@
 
 WAS DIESE TESTS FESTHALTEN
 --------------------------
-TCO-24 ist die Leitzahl (Entscheidung E2 vom 03.09.2026): Gesamtkosten ueber
-24 Monate, Ø/Monat daneben. Sie wird GERECHNET, nie gespeichert, sie rechnet
-keinen Rabatt ein, und was jenseits des Horizonts liegt, faellt nicht unter
-den Tisch, sondern steht als offener Restbetrag daneben.
+Die Leitzahl heisst "Kosten ueber 24 Monate" (A1 vom 20.09.2026, vorher
+TCO-24, Entscheidung E2 vom 03.09.2026): Gesamtkosten ueber 24 Monate,
+Ø/Monat daneben. Sie wird GERECHNET, nie gespeichert, sie rechnet keinen
+Rabatt ein, und was nach Monat 24 noch geschuldet ist, bleibt IN der Zahl
+und steht zusaetzlich als offener Restbetrag daneben.
 
 Die Zahlen stammen aus dem Live-Abruf des o2-Katalogs vom 03.09.2026, zitiert
 in `docs/STRATEGY_GERAETE_TCO.md`: `oneTimePrice: 1`, `monthlyPrice: 30.0`,
@@ -25,9 +26,11 @@ from telco_radar.analyze.geraete_store import GeraeteDB
 from telco_radar.analyze.tco_store import TcoDB
 from telco_radar.geraete_model import (Ratenzahlung, listung_id,
                                        probe_geht_auf)
+from telco_radar.tarif_model import Preisphase
 from telco_radar.tco_model import (Buendel, Geraeteanteil, Rabatt,
-                                   SimOnlyReferenz, TCO_HORIZONT, buendel_id,
-                                   geraeteanteil, sim_only_id, tco_24)
+                                   SimOnlyReferenz, TCO_HORIZONT,
+                                   buendel_id, geraeteanteil, phasensumme,
+                                   sim_only_id, tco_24)
 
 _WURZEL = Path(__file__).parent.parent
 
@@ -119,7 +122,7 @@ def test_die_tco_summiert_tarif_geraet_und_anschluss():
     assert ergebnis.bestandteile == {
         "Tarif über 24 Monate": 719.76,
         "Gerätezuzahlung": 1.0,
-        "Geräteraten (24 von 24)": 720.0,
+        "Geräteraten über 24 Monate": 720.0,
         "Anschlusspreis": 39.99,
     }
     assert ergebnis.gesamt == 1480.75
@@ -131,7 +134,7 @@ def test_nur_die_geraeteseite_ergibt_die_721_euro_des_auftrags():
     """`1 € + 24 x 30 € = 721 €`, nachvollziehbar in den Bestandteilen."""
     ergebnis = tco_24(_buendel(tarif_monatlich=None, anschlusspreis=None))
     assert ergebnis.bestandteile["Gerätezuzahlung"] == _ANZAHLUNG
-    assert ergebnis.bestandteile["Geräteraten (24 von 24)"] == 720.0
+    assert ergebnis.bestandteile["Geräteraten über 24 Monate"] == 720.0
     assert ergebnis.gesamt == _GESAMT
     assert ergebnis.luecken == ["Tarifgrundpreis", "Anschlusspreis",
                                 "Boni und Rabatte"]
@@ -156,37 +159,20 @@ def test_ein_fehlender_anschlusspreis_ist_nicht_kostenlos():
     assert ergebnis.gesamt == 1440.76
 
 
-def test_36_raten_werden_gekappt_und_der_rest_steht_daneben():
-    """Der Ueberhang aus § 6.3: eine 24-Monats-Zahl darf zwoelf offene Raten
-    nicht verschweigen - sonst belohnt sie, wer am weitesten streckt."""
+def test_36_raten_zaehlen_alle_und_der_rest_steht_daneben():
+    """§ 6.3 und A1: Wer 36 Raten schuldet, hat nach 24 Monaten noch zwoelf
+    offen - und auch die bleiben Kosten. Die Leitzahl rechnet ALLE 36 in
+    die Zahl, der offene Teil steht zusaetzlich daneben."""
     ergebnis = tco_24(_buendel(laufzeit_monate=36))
-    assert ergebnis.bestandteile["Geräteraten (24 von 36)"] == 720.0
+    assert ergebnis.bestandteile["Geräteraten über 36 Monate"] == 1080.0
     assert ergebnis.restbetrag == 360.0, "12 offene Raten a 30 EUR"
-    assert ergebnis.gesamt == 1480.75, "die Leitzahl bleibt der 24er-Horizont"
+    assert ergebnis.gesamt == 1840.75, "alle Raten in der Leitzahl"
 
 
 def test_eine_kuerzere_ratenlaufzeit_hat_keinen_rest():
     ergebnis = tco_24(_buendel(laufzeit_monate=12))
-    assert ergebnis.bestandteile["Geräteraten (12 von 12)"] == 360.0
+    assert ergebnis.bestandteile["Geräteraten über 12 Monate"] == 360.0
     assert ergebnis.restbetrag == 0.0
-
-
-def test_ein_buendelmonatspreis_wird_wie_eine_rate_auf_24_gekappt():
-    """1&1 nennt EINEN Monatsbetrag fuer Tarif und Geraet (§ 13.2) - er wird
-    genauso auf 24 Monate gekappt wie eine Geraterate, der Rest steht als
-    Restbetrag daneben (Ticket TCO24-1)."""
-    b = Buendel(sku_id="apple-iphone-14-128gb-mitternacht", anbieter="1&1",
-               tarif_name="1&1 Allnet Flat", tarif_id="einsundeins:allnet",
-               tarif_id_guete="hoch", buendel_monatlich=44.99,
-               laufzeit_monate=36, quelle_url="https://www.1und1.de/x",
-               abgerufen_am="2026-09-03")
-    ergebnis = tco_24(b)
-    assert ergebnis.bestandteile == {
-        "Bündelpreis (Tarif und Gerät zusammen) (24 von 36)": 1079.76,
-    }
-    assert ergebnis.gesamt == 1079.76
-    assert ergebnis.restbetrag == 539.88, "12 offene Monate a 44,99 EUR"
-    assert ergebnis.belastbar is True
 
 
 def test_ein_buendelmonatspreis_binnen_24_monaten_hat_keinen_rest():
@@ -197,7 +183,7 @@ def test_ein_buendelmonatspreis_binnen_24_monaten_hat_keinen_rest():
                abgerufen_am="2026-09-03")
     ergebnis = tco_24(b)
     assert ergebnis.bestandteile == {
-        "Bündelpreis (Tarif und Gerät zusammen) (24 von 24)": 1079.76,
+        "Bündelpreis (Tarif und Gerät zusammen) über 24 Monate": 1079.76,
     }
     assert ergebnis.restbetrag == 0.0
 
@@ -247,6 +233,93 @@ def test_geld_wird_auf_zwei_stellen_gerundet():
     assert ergebnis.bestandteile["Tarif über 24 Monate"] == 480.0
     assert ergebnis.gesamt == 480.24
     assert ergebnis.monatlich == 20.01
+
+
+# --------------------------------------------------------------------------
+# A1 (20.09.2026): die Leitzahl heisst "Kosten ueber 24 Monate" und rechnet
+# ALLE Geräteraten hinein - auch die Restschuld nach Monat 24.
+#
+#   Kosten über 24 Monate = Anzahlung + 24 Monate Tarif (phasengewichtet,
+#   wenn das Pflichtdokument Preisphasen nennt) + alle Geräteraten der
+#   eigenen Laufzeit + Anschlusspreis
+#
+# Bis dahin kappte `tco_24` die Raten bei 24 Monaten - der CHECK24-Vorwurf
+# aus § 5.4 der Strategie, nur mit einem Ausweis daneben. Die Restschuld
+# ist keine Fussnote mehr, sondern Teil der Zahl: wer 36 Raten schuldet,
+# hat nach 24 Monaten noch 12 offen, und auch die gehoeren in die Kosten
+# ueber 24 Monate (als noch GESCHULDETER Betrag, siehe `restbetrag`).
+# --------------------------------------------------------------------------
+
+def test_der_pflichtfall_des_auftrags_congstar_xs_ergibt_1459_euro():
+    """A1, wortgerecht: congstar Allnet Flat XS zum iPhone 17 Pro 256 GB -
+    1 € Anzahlung, 15 € Tarif, 36 Raten à 30,50 €, kein Anschlusspreis.
+
+        1 + 24 × 15,00 + 36 × 30,50 + 0 = 1.459,00 €
+
+    Der bis dahin gueltige Wert 1.093,00 € (24 statt 36 Raten gerechnet)
+    darf nie wieder als Leitzahl auftauchen - er stand als "günstig mit
+    Tarif" in der Antwortzeile und unterbot damit jedes echte Angebot."""
+    b = _buendel(anbieter="congstar", tarif_name="Allnet Flat XS",
+                 tarif_id="congstar:allnet-flat-xs", tarif_monatlich=15.0,
+                 geraet_zuzahlung=1.0, geraet_monatsrate=30.5,
+                 laufzeit_monate=36, anschlusspreis=0.0,
+                 sku_id="apple-iphone-17-pro-256gb-cosmic-orange")
+    ergebnis = tco_24(b)
+    assert ergebnis.gesamt == 1459.0
+    assert ergebnis.bestandteile == {
+        "Tarif über 24 Monate": 360.0,
+        "Gerätezuzahlung": 1.0,
+        "Geräteraten über 36 Monate": 1098.0,
+        "Anschlusspreis": 0.0,
+    }
+    # Die Restschuld ist IN der Leitzahl und zusaetzlich ausgewiesen:
+    # 12 Raten à 30,50 € sind nach Monat 24 noch zu zahlen.
+    assert ergebnis.restbetrag == 366.0
+    assert round(ergebnis.gesamt - ergebnis.restbetrag, 2) == 1093.0
+    assert ergebnis.monatlich == 60.79          # 1.459,00 / 24
+
+
+def test_tarifphasen_werden_phasengewichtet_gerechnet():
+    """Ein Tarif mit Preisphasen ("12 Monate 10 €, danach 20 €") wird
+    phasengewichtet gerechnet: 12 × 10 + 12 × 20 = 360 € statt flach
+    24 × 20 = 480 €. Die Phase ist die Aussage des Pflichtdokuments, die
+    flat-Multiplikation waere unsere Erfindung dagegen."""
+    phasen = [Preisphase(von_monat=1, bis_monat=12, betrag=10.0),
+              Preisphase(von_monat=13, bis_monat=None, betrag=20.0)]
+    ergebnis = tco_24(_buendel(tarif_monatlich=20.0, tarif_phasen=phasen))
+    assert ergebnis.bestandteile["Tarif über 24 Monate"] == 360.0
+    assert ergebnis.gesamt == 1120.99          # 1 + 360 + 720 + 39,99
+    # Ohne Phasen gilt derselbe Tarifpreis flach - die Gegenprobe.
+    flat = tco_24(_buendel(tarif_monatlich=20.0))
+    assert flat.bestandteile["Tarif über 24 Monate"] == 480.0
+
+
+def test_ein_buendelmonatspreis_zaehlt_alle_laufzeitmonate():
+    """1&1 nennt EINEN Monatsbetrag fuer Tarif und Geraet (§ 13.2) - auch
+    er laeuft 36 Monate, und alle 36 zaehlen: 36 × 44,99 = 1.619,64 €.
+    Die Kappung auf 24 (1.079,76 €) waere wieder die CHECK24-Zahl."""
+    b = Buendel(sku_id="apple-iphone-14-128gb-mitternacht", anbieter="1&1",
+                tarif_name="1&1 Allnet Flat", tarif_id="einsundeins:allnet",
+                tarif_id_guete="hoch", buendel_monatlich=44.99,
+                laufzeit_monate=36, quelle_url="https://www.1und1.de/x",
+                abgerufen_am="2026-09-03")
+    ergebnis = tco_24(b)
+    assert ergebnis.bestandteile == {
+        "Bündelpreis (Tarif und Gerät zusammen) über 36 Monate": 1619.64,
+    }
+    assert ergebnis.gesamt == 1619.64
+    assert ergebnis.restbetrag == 539.88, "12 Monate à 44,99 laufen weiter"
+
+
+def test_phasensumme_wohnt_im_modul_der_leitzahl():
+    """A1: `phasensumme` ist aus `report/effektivpreis.py` hierher gezogen
+    - die Leitzahl und der Effektivpreis teilen EINE phasengewichtete
+    Summe, sonst rechneten zwei Stellen dasselbe Blatt verschieden."""
+    assert phasensumme([Preisphase(1, 12, 10.0),
+                        Preisphase(13, None, 20.0)], 24) == 360.0
+    assert phasensumme([Preisphase(1, 6, 9.99)], 24) == \
+        round(6 * 9.99 + 18 * 9.99, 2)
+    assert phasensumme([], 24) is None
 
 
 # --------------------------------------------------------------------------

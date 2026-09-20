@@ -70,7 +70,9 @@ def test_die_balkenliste_und_die_alten_graphformen_sind_weg(tafel):
 def test_die_antwort_leitzeile_ist_durch_den_antwort_satz_ersetzt(tafel):
     antwort = tafel.select_one(".gr-zr-antwort")
     assert antwort is not None
-    assert "TCO-24" in antwort.get_text(" ", strip=True)
+    text = antwort.get_text(" ", strip=True)
+    assert "Kosten über 24 Monate" in text
+    assert "TCO-24" not in text
 
 
 def test_der_glossar_und_wie_gerechnet_sind_weg(suppe, tafel):

@@ -325,7 +325,8 @@ def netzbetreiber_gruppen(modelle: list, band_je_tarif: dict) -> list[dict]:
                 "id": modell["id"], "titel": modell["titel"],
                 "hersteller": modell["hersteller"], "speicher": modell["speicher"],
                 "vodafone": None,
-                "vodafone_grund": ("Kein Vodafone-TCO-24 für dieses Gerät "
+                "vodafone_grund": ("Keine Vodafone-Kosten über 24 Monate "
+                                  "für dieses Gerät "
                                   "erhoben – kein Bündel und kein eigener "
                                   "Barpreis."),
                 "zeilen": zeilen, "rang": float("inf"),
@@ -429,7 +430,7 @@ def modellliste(gruppen: list[dict]) -> dict:
         sprung_band = ""
         if paar is None:
             if g["vodafone"] is None:
-                luecke = "kein Vodafone-TCO-24 erhoben"
+                luecke = "keine Vodafone-Kosten über 24 Monate erhoben"
             else:
                 # band_mismatch ist der AUSSAGEKRAEFTIGSTE Grund (es gibt
                 # Karten auf beiden Seiten, nur kein gemeinsames Band) -

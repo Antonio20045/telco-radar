@@ -681,6 +681,36 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
     geraete_tco_karten.ergaenze_geraete_aus_katalog(geraet_je_sku, buendel,
                                                     katalog)
 
+    # ---- Phase R: die Hauptansicht -------------------------------------
+    #
+    # DIE TARIFBINDUNG STEHT NICHT IN DER GERAETENUTZLAST. o2 bindet den
+    # Tarif 24 Monate und finanziert das Geraet ueber 36; die 24 stehen im
+    # Tarifbestand (`tarife.jsonl`, ueber `tarif_id`). Ohne sie ist keine
+    # Karte rechenbar - deshalb wird sie HIER gesetzt und nicht in der
+    # Kennzahl geraten (A5.5).
+    #
+    # A1 (20.09.2026): derselbe Durchlauf reichert die PREISPHASEN des
+    # Tarifs an (`phasen_fuer_buendel`, dieselbe Stelle wie die
+    # Vodafone-Referenz) - die Leitzahl rechnet den Tarifanteil seit A1
+    # phasengewichtet. Der Block steht VOR dem zeilen-Bau und vor
+    # `modelle()`: Zeilen, Karten und Export lesen dieselben angereicherten
+    # Objekte, sonst rechnete jede Ansicht ihren eigenen Stamm.
+    tarife = tarife or {}
+    for b in buendel:
+        if isinstance(b, Buendel) and b.tarif_id:
+            satz = tarife.get(b.tarif_id) or {}
+            laufzeit = satz.get("laufzeit_monate")
+            if laufzeit:
+                b.tarif_bindung_monate = int(laufzeit)
+            # QA-Fix (20.09.2026, Prüfer "hoch"): Phasen nur OHNE
+            # Widerspruch zur Messung - das Blatt nennt den Tarif ohne
+            # Smartphone-Zuschlag (Mobil XS: 29,95 EUR), die Karte zeigt
+            # die gemessene Bündel-Rate (31,95 EUR). Still zugunsten des
+            # Blatts zu entscheiden machte 473 Vodafone-Bündel um 48,00 EUR
+            # zu niedrig und die Leitzahl mit der eigenen Karte unrechenbar.
+            b.tarif_phasen = geraete_tco_karten.phasen_fuer_buendel(
+                satz, b.tarif_monatlich)
+
     zeilen = []
     for b in buendel:
         if not isinstance(b, Buendel) or b.ohne_geraet:
@@ -701,21 +731,6 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
                               z["gesamt"] or 0.0, z["geraet"]))
     bereit = _bereitschaft(eintraege)
     massstab = _referenztabelle(referenzen)
-
-    # ---- Phase R: die Hauptansicht -------------------------------------
-    #
-    # DIE TARIFBINDUNG STEHT NICHT IN DER GERAETENUTZLAST. o2 bindet den
-    # Tarif 24 Monate und finanziert das Geraet ueber 36; die 24 stehen im
-    # Tarifbestand (`tarife.jsonl`, ueber `tarif_id`). Ohne sie ist keine
-    # Karte rechenbar - deshalb wird sie HIER gesetzt und nicht in der
-    # Kennzahl geraten (A5.5).
-    tarife = tarife or {}
-    for b in buendel:
-        if isinstance(b, Buendel) and b.tarif_id:
-            satz = tarife.get(b.tarif_id) or {}
-            laufzeit = satz.get("laufzeit_monate")
-            if laufzeit:
-                b.tarif_bindung_monate = int(laufzeit)
 
     modelle = geraete_tco_karten.modelle(buendel, eintraege, referenzen,
                                          tarife, katalog)

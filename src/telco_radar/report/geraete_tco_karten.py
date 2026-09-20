@@ -48,28 +48,27 @@ import re
 from typing import Optional
 
 from . import geraete_vergleich
-from .effektivpreis import phasensumme
 from .geraete_tco_grafik import anbieter_slug
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
 from ..tarif_model import Preisphase
 from ..tco_model import (POSTEN_ANSCHLUSS, POSTEN_BUENDEL, POSTEN_RATE,
                          POSTEN_TARIF, POSTEN_ZUZAHLUNG, TCO_HORIZONT,
-                         Buendel, tco_24)
+                         Buendel, phasensumme, tco_24)
 
-# Ticket TCO24-1 (08.09.2026): die Leitzahl der Seite ist IMMER TCO-24
-# (AUFTRAG_GERAETESEITE.md §3 - "Immer 24 Monate", verbindlich). Bis dahin
-# fuehrte diese Tafel `tco_bindung()` - eine Kennzahl ueber die eigene
-# Bindung des Buendels (24 ODER 36 Monate), sichtbar als "TCO-36". Das war
-# der deklarierte Fehler: 324 sichtbare "TCO-36" auf der Live-Seite, gegen
-# eine Norm, die genau das ausschliesst. Ersetzt durch `tco_24()` - dieselbe
-# Bibliotheksfunktion, die `test_tco_model.py` seit E2 (03.09.2026) haelt.
-# Raten jenseits 24 Monate stehen als `Tco.restbetrag` daneben, nie in der
-# Leitzahl.
+# Ticket TCO24-1 (08.09.2026) stellte die Tafel auf `tco_24()` und den
+# festen 24-Monats-Horizont; A1 (20.09.2026) hat dieselbe Funktion auf die
+# vollstaendige Rechnung umgestellt - ALLE Geräteraten (auch die Restschuld
+# nach Monat 24, in der Zahl UND daneben ausgewiesen) und den Tarif
+# PHASENGEWICHTET, wo der Tarifbestand Preisphasen nennt.
 
 # Die Laufzeit, mit der JEDE Karte und die Referenz rechnen - keine
 # Variable mehr, seit die Norm "Immer 24 Monate" sagt.
 LAUFZEIT = TCO_HORIZONT
-LABEL = f"TCO-{TCO_HORIZONT}"
+# A1 (20.09.2026): das Etikett der Leitzahl ist der deutsche Satz statt
+# der Kurzform - "Kosten über 24 Monate" sagt einem Manager ohne
+# Technik-Hintergrund, was die Zahl bedeutet; "TCO-24" sagt es nur denen,
+# die die Abkürzung bereits kennen.
+LABEL = "Kosten über 24 Monate"
 # "ab Monat 25" - der erste Monat NACH dem festen Horizont. F5, Katalog D.
 AB_MONAT = TCO_HORIZONT + 1
 
@@ -558,15 +557,19 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
         "belastbar": kennzahl.belastbar,
         "gesamt": kennzahl.gesamt if kennzahl.belastbar else None,
         "schnitt_monat": kennzahl.monatlich if kennzahl.belastbar else None,
-        # A5.2, Pflichtzeile, jetzt woertlich statt gerechnet: die Leitzahl
-        # IST der 24-Monats-Betrag, "gezahlt nach 24 Monaten" ist deshalb
-        # `gesamt` selbst. "Danach noch offen" ist der Restbetrag aus
-        # `tco_model` - er veraendert weder TCO-24 noch deren Sortierung
-        # (Abnahmekriterium 2).
-        "gezahlt_nach_24": kennzahl.gesamt if kennzahl.belastbar else None,
+        # A5.2, Pflichtzeile: seit A1 ist "gezahlt nach 24 Monaten" die
+        # Leitzahl MINUS die Restschuld - die Leitzahl rechnet alle Raten,
+        # und der Teil, der nach Monat 24 noch laeuft, steht als
+        # `offen_nach_24` daneben (IN der Zahl UND ausgewiesen).
+        # `is not None` und nicht Truthiness: eine gemessene 0.0 ist die
+        # Aussage "nichts offen", kein fehlender Wert (CLAUDE.md Clean
+        # Code 3).
+        "gezahlt_nach_24": (round(kennzahl.gesamt - (kennzahl.restbetrag
+                                or 0.0), 2)
+                            if kennzahl.belastbar else None),
         "offen_nach_24": (kennzahl.restbetrag
-                          if kennzahl.belastbar and kennzahl.restbetrag
-                          else None),
+                          if kennzahl.belastbar
+                          and kennzahl.restbetrag is not None else None),
         "offene_raten": (max(0, (b.laufzeit_monate or 0) - TCO_HORIZONT)
                          if b.geraet_monatsrate is not None
                          or b.buendel_monatlich is not None else 0),
@@ -661,6 +664,60 @@ def _leere_karte(anbieter: str, grund: str = "") -> dict:
 # Die Vodafone-Referenz: gemessene Summanden, gerechnete Summe
 # --------------------------------------------------------------------------
 
+def phasen_aus_tarifsatz(tarif: Optional[dict]) -> list:
+    """Die Preisphasen aus einem Tarifsatz des Bestands (`tarife.jsonl`).
+
+    A1 (20.09.2026): die EINE Stelle, an der ein Tarif-Dict zu Preisphasen
+    wird. `_vodafone_referenz`, die Bündel-Anreicherung
+    (`geraete_tco_view.aufbereiten`) und die Zeitreihe lesen dieselben
+    Phasen - sonst rechneten drei Stellen denselben Tarif-Stamm verschieden.
+    Ein Betrag ohne Wert ist keine Phase (None heisst hier "nicht im
+    Blatt", nicht "0 EUR"); ohne Phasen bleibt eine leere Liste, und die
+    Rechnung faellt auf den flachen Grundpreis zurueck.
+    """
+    return [Preisphase(von_monat=p.get("von_monat") or 1,
+                       bis_monat=p.get("bis_monat"),
+                       betrag=p.get("betrag"))
+            for p in ((tarif or {}).get("preisphasen") or [])
+            if p.get("betrag") is not None]
+
+
+# Die Spanne, innerhalb derer eine gemessene Monatsrate als "im Blatt
+# befindlich" gilt - zwei auf Cent gerundete Werte duerfen um ein Rundungs-
+# rest voneinander abweichen, ohne schon ein anderes Preisniveau zu sein.
+_PREIS_TOLERANZ = 0.005
+
+
+def phasen_fuer_buendel(tarif: Optional[dict],
+                        tarif_monatlich: Optional[float]) -> list:
+    """Phasen des Blatts - nur, wenn sie zur MESSUNG am Bündel passen.
+
+    QA-Fix (20.09.2026, Prüfer-Befund "hoch"): das Blatt beschreibt den
+    Tarif OHNE den geräteabhängigen Zuschlag - Vodafone Mobil XS steht mit
+    29,95 EUR im Blatt, das Bündel mit Premium-Smartphone misst 31,95 EUR
+    (alle drei Mobil-Tarife, 473 Bündel). Die Anreicherung hob die Messung
+    still auf: die Karte sagte "monatlich 31,95 EUR", die Postenliste
+    rechnete 24 x 29,95 EUR, und die Leitzahl war mit der eigenen Karte
+    nicht mehr nachrechenbar.
+
+    Die Regel: Die Phasen beschreiben das Bündel nur, wenn die gemessene
+    Monatsrate in ihrer Preisspanne liegt (einschließlich - der Shop nennt
+    bei "12 Monate 10 EUR, danach 20 EUR" den Rabatt- oder den Normalpreis,
+    je nach Seite). Liegt die Messung darüber oder darunter, spricht das
+    Blatt von einem anderen Angebot, und die MESSUNG gewinnt flach - nie
+    umgekehrt. Ohne Messung (None) gibt es keinen Widerspruch, dann gelten
+    die Phasen; ohne Phasen bleibt es bei der leeren Liste.
+    """
+    phasen = phasen_aus_tarifsatz(tarif)
+    if not phasen or tarif_monatlich is None:
+        return phasen
+    betraege = [p.betrag for p in phasen]
+    if (min(betraege) - _PREIS_TOLERANZ <= tarif_monatlich
+            <= max(betraege) + _PREIS_TOLERANZ):
+        return phasen
+    return []
+
+
 def _vodafone_referenz(referenzen: list, tarife: dict,
                        barpreise_der_sku: dict) -> Optional[dict]:
     """Tarif ohne Geraet + eigener Barpreis, ueber den festen 24-Monats-
@@ -677,10 +734,11 @@ def _vodafone_referenz(referenzen: list, tarife: dict,
     dann, wenn jemand einen anderen Vodafone-Tarif fuer den passenderen
     haelt.
 
-    Der Tarifbetrag ist phasengewichtet (`effektivpreis.phasensumme`) -
-    dieselbe Rechnung wie auf der Tarifseite und an EINER Stelle. Steht im
-    Blatt eine Phase fuer Monat 25 und danach, wird sie gelesen; steht
-    keine, gilt der Grundpreis fort, und die Karte sagt es.
+    Der Tarifbetrag ist phasengewichtet (`tco_model.phasensumme`, seit A1
+    Teil des Moduls der Leitzahl) - dieselbe Rechnung wie auf der
+    Tarifseite und an EINER Stelle. Steht im Blatt eine Phase fuer Monat 25
+    und danach, wird sie gelesen; steht keine, gilt der Grundpreis fort,
+    und die Karte sagt es.
     """
     vodafone = [r for r in referenzen
                 if _eigen(getattr(r, "anbieter", ""))
@@ -690,11 +748,11 @@ def _vodafone_referenz(referenzen: list, tarife: dict,
         return None
     referenz = min(vodafone, key=lambda r: r.tarif_sim_only_monatlich)
     tarif = tarife.get(referenz.tarif_id) or {}
-    phasen = [Preisphase(von_monat=p.get("von_monat") or 1,
-                         bis_monat=p.get("bis_monat"),
-                         betrag=p.get("betrag"))
-              for p in (tarif.get("preisphasen") or [])
-              if p.get("betrag") is not None]
+    # QA-Fix 20.09.2026: dieselbe Rangfolge wie am Bündel - widerspricht
+    # die gemessene SIM-only-Rate den Phasen des Blatts, gewinnt die
+    # Messung (flach). Am Bestand stimmen beide ueberein (29,95 EUR); die
+    # Regel steht hier, damit sie an KEINER Stelle des Blatts fehlt.
+    phasen = phasen_fuer_buendel(tarif, referenz.tarif_sim_only_monatlich)
 
     summe = phasensumme(phasen, TCO_HORIZONT) if phasen else None
     # "Fortgeschrieben" heisst: das Blatt sagt zu einem Teil der 24 Monate
@@ -811,11 +869,15 @@ def _referenzkarte(ref: dict) -> dict:
         # man den Barpreis laengst gezahlt und den Tarif fuer 24 Monate.
         # Das Geraet ist am ersten Tag bezahlt, der Tarif laeuft seine
         # Mindestlaufzeit - nach 24 Monaten ist damit alles gezahlt, was
-        # geschuldet ist. Vorher stand hier "davon noch offen: 359,40 €"
-        # fuer ein bar gekauftes Geraet auf einem 24-Monats-Tarif.
-        "gezahlt_nach_24": round(
-            ref["geraet_betrag"]
-            + ref["monatlich"] * min(TCO_HORIZONT, ref["tarif_monate"]), 2),
+        # geschuldet ist.
+        #
+        # A1 (20.09.2026): `gezahlt_nach_24` ist SEITHER die `gesamt` der
+        # Referenz selbst. Die fruehere Formel (Barpreis + flacher
+        # Tarifgrundpreis × 24) rechnete eine ZWEITE Summe - und gegen die
+        # phasengewichtete `gesamt` ein NEGATIVES `offen_nach_24`, sobald
+        # das Blatt Rabattphaen nennt. Die Referenz schuldet nach Monat 24
+        # nichts: 0.0 ist die Aussage, nicht ein fehlender Wert.
+        "gezahlt_nach_24": ref["gesamt"],
         "tarif_bindung": ref["tarif_monate"],
         "nach_bindung": ref.get("nach_bindung"),
         "bestandteile": [
@@ -831,7 +893,7 @@ def _referenzkarte(ref: dict) -> dict:
         "tarif_quelle_url": ref["tarif_quelle_url"],
         "referenz": ref,
     })
-    karte["offen_nach_24"] = round(karte["gesamt"] - karte["gezahlt_nach_24"], 2)
+    karte["offen_nach_24"] = 0.0
     return karte
 
 

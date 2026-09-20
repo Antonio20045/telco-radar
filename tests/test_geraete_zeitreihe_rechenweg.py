@@ -7,9 +7,9 @@ dann steht da 70 Euro mal 24"). Diese Tests messen die serverseitige
 Hälfte (Variante V1 aus vergleich.md):
 
   - je Messung eine POSTENLISTE (Zuzahlung, Anschlusspreis, Tarif ×
-    Monate, Rate × Monate = gesamt) - nachgebaut aus der Historien-Zeile,
-    deren eingefrorene Leitzahl in 2562/2562 Fällen des echten Bestands
-    genau diese Summe ist;
+    Monate, Rate × Monate = gesamt) - die HEUTIGE Rechnung (A1: alle
+    Raten der eigenen Laufzeit, Tarif phasengewichtet ueber den
+    Tarifbestand), nicht das eingefrorene `gesamt` der Historie;
   - je Serie/Messung ein `<template data-m=...>` unter dem SVG, inklusive
     `data-anb`/`data-m` an den Kreisen und eine unsichtbare Trefferfläche
     (`gr-zr-hit`, r=12 - NICHT `gr-zr-treffer`, die Klasse gehört der
@@ -76,11 +76,15 @@ def _messung(satz, *, anbieter="o2", tarif="O2 Mobile on Demand M Plus"):
 # Die Postenliste - nachgebaut aus der Zeile, Summe == eingefrorene Zahl
 # --------------------------------------------------------------------------
 
-def test_die_posten_der_o2_messung_ergeben_die_eingefrorene_summe():
+def test_die_posten_der_o2_messung_ergeben_die_heutige_summe():
+    """A1: das Panel zerlegt die HEUTIGE Rechnung - alle 36 Raten -
+    und geht mit ihr auf (37 + 39,99 + 24 × 14,99 + 36 × 19,00)."""
     r = zr._rechung(_messung(O2_MESSUNG))
     assert r is not None
-    assert round(sum(p["betrag"] for p in r["posten"]), 2) == 892.75
-    assert r["gesamt"] == 892.75
+    assert round(sum(p["betrag"] for p in r["posten"]), 2) == 1120.75
+    assert r["gesamt"] == 1120.75
+    # Gegenprobe: die eingefrorene 892,75 der Kappungsformel ist es NICHT.
+    assert r["gesamt"] != O2_MESSUNG["gesamt"]
 
 
 def test_die_posten_stehen_in_der_reihenfolge_der_aufgabe():
@@ -89,29 +93,31 @@ def test_die_posten_stehen_in_der_reihenfolge_der_aufgabe():
         ["Gerätezuzahlung", "Anschlusspreis", "Tarif", "Geräterate"]
 
 
-def test_die_gekappte_rate_nennt_ihren_anteil_an_der_laufzeit():
-    """36 Raten laufen, gerechnet werden 24 (TCO-24) - die Kappung ist
-    eine Aussage und steht im Posten („24 von 36 Raten"), nicht still."""
+def test_die_rate_zaehlt_alle_laufzeitmonate():
+    """A1: 36 Raten laufen, gerechnet werden ALLE 36 - die Laufzeit steht
+    im Faktor (36 × 19,00 = 684,00), die Kappungsklammer ist gefallen."""
     r = zr._rechung(_messung(O2_MESSUNG))
     rate = next(p for p in r["posten"] if p["label"] == "Geräterate")
-    assert rate["anzahl"] == 24 and rate["einzeln"] == 19.0
-    assert rate["betrag"] == 456.0
-    assert rate["klammer"] == "24 von 36 Raten"
+    assert rate["anzahl"] == 36 and rate["einzeln"] == 19.0
+    assert rate["betrag"] == 684.0
+    assert rate["klammer"] == ""
 
 
 def test_die_zusammenform_hat_einen_buendelposten_und_erfindet_keine_teile():
     """1&1 nennt EINEN Monatsbetrag für Tarif und Gerät - ihn in zwei
     Hälften zu zerlegen wäre unsere Rechnung (§ 13.2). Der Posten heißt
-    Bündelpreis; Tarif und Geräterate erscheinen NICHT."""
+    Bündelpreis; Tarif und Geräterate erscheinen NICHT. A1: alle 36
+    Laufzeitmonate zaehlen (36 × 49,99 = 1.799,64)."""
     r = zr._rechung(_messung(EINS_EINS_MESSUNG, anbieter="1&1",
                              tarif="1&1 All-Net-Flat S"))
-    assert round(sum(p["betrag"] for p in r["posten"]), 2) == 1659.66
+    assert round(sum(p["betrag"] for p in r["posten"]), 2) == 2259.54
     labels = [p["label"] for p in r["posten"]]
     assert labels == ["Gerätezuzahlung", "Anschlusspreis",
                       "Bündelpreis (Tarif und Gerät zusammen)"]
     buendel = r["posten"][2]
-    assert buendel["anzahl"] == 24 and buendel["einzeln"] == 49.99
-    assert buendel["klammer"] == "24 von 36 Monaten"
+    assert buendel["anzahl"] == 36 and buendel["einzeln"] == 49.99
+    assert buendel["betrag"] == round(36 * 49.99, 2)
+    assert buendel["klammer"] == ""
 
 
 def test_kein_anschlusspreis_ist_eine_luecke_und_null_null_ein_betrag():
@@ -136,18 +142,82 @@ def test_boni_erscheinen_nicht_die_historie_hat_keine():
 
 
 # --------------------------------------------------------------------------
+# A1 (20.09.2026): der GRAPH haengt am Stand des Markts, nicht am Stand der
+# Formel. Die Historie traegt eingefrorene `gesamt`-Werte der ALTEN (auf 24
+# Monate gekappten) Rechnung - die Punkte und die Auswahl des guenstigsten
+# Bündels je Tag werden mit der HEUTIGEN Leitzahl neu gerechnet:
+#
+#   o2:   37 + 39,99 + 24 × 14,99 + 36 × 19,00 = 1.120,75 (statt 892,75)
+#   1&1:  420 + 39,90 + 36 × 49,99          = 2.259,54 (statt 1.659,66)
+#
+# Der eingefrorene Wert bleibt unangetastet (Historie wird nie umge-
+# schrieben); nur die Anzeige rechnet neu.
+# --------------------------------------------------------------------------
+
+def test_die_serie_rechnet_die_punkte_mit_der_heutigen_leitzahl():
+    """Der Punkt der o2-Messung ist die NEU gerechnete 1.120,75 - nicht die
+    eingefrorene 892,75 der gekappten Rechnung."""
+    messungen = {("m", "b"): {"o2": {"2026-09-12": _messung(O2_MESSUNG)}}}
+    assert zr._serien_aus(messungen) == \
+        {("m", "b"): {"o2": [("2026-09-12", 1120.75)]}}
+
+
+def test_die_zusammenform_rechnet_ebenfalls_alle_laufzeitmonate():
+    messungen = {("m", "b"): {"1&1": {"2026-09-12": _messung(
+        EINS_EINS_MESSUNG, anbieter="1&1", tarif="1&1 All-Net-Flat S")}}}
+    assert zr._serien_aus(messungen) == \
+        {("m", "b"): {"1&1": [("2026-09-12", 2259.54)]}}
+
+
+def test_die_auswahl_des_guenstigsten_buendels_je_tag_rechnet_neu(tmp_path):
+    """Zwei Bündel desselben Anbieters am selben Tag - die eingefrorenen
+    Werte sagen A ist günstiger (892,75 < 919,75), die heutige Leitzahl
+    sagt B (979,75 < 1.120,75, weil B die kürzere Rate hat). Gewählt wird
+    nach der HEUTIGEN Rechnung - sonst klänge der Graph von einer Formel,
+    die es nicht mehr gibt."""
+    # B: 400 + 39,99 + 24 × 14,99 + 24 × 5,00 = 919,75 (alt eingefroren),
+    #    heute: 400 + 39,99 + 24 × 14,99 + 36 × 5,00 = 979,75
+    b_satz = dict(O2_MESSUNG, id="buendel--o2--samsung-galaxy-s23-128gb-rosa--b",
+                  geraet_zuzahlung=400.0, geraet_monatsrate=5.0, gesamt=919.75)
+    (tmp_path / "geraete_tco_historie.jsonl").write_text(
+        json.dumps(O2_MESSUNG) + "\n" + json.dumps(b_satz) + "\n",
+        encoding="utf-8")
+    roh = {"buendel": [
+        {"id": O2_MESSUNG["id"], "sku_id": "samsung-galaxy-s23-128gb-rosa",
+         "anbieter": "o2", "tarif_id": O2_MESSUNG["tarif_id"],
+         "tarif_name": "O2 Mobile on Demand M Plus"},
+        {"id": b_satz["id"], "sku_id": "samsung-galaxy-s23-128gb-rosa",
+         "anbieter": "o2", "tarif_id": b_satz["tarif_id"],
+         "tarif_name": "O2 Mobile on Demand M Plus"}]}
+    (tmp_path / "geraete_tco.json").write_text(json.dumps(roh), encoding="utf-8")
+    tco = {"modelle": [{"id": "m", "karten": [
+        {"sku_id": "samsung-galaxy-s23-128gb-rosa"}]}],
+        "band_je_tarif": {O2_MESSUNG["tarif_id"]: "b"}}
+    messungen = zr._messungen(tmp_path, tco)
+    assert zr._serien_aus(messungen) == \
+        {("m", "b"): {"o2": [("2026-09-12", 979.75)]}}
+    # Gegenprobe: die eingefrorene Zahl bleibt in der Historien-Zeile
+    # stehen - nichts wird umgeschrieben, nur die Anzeige rechnet neu.
+    zeilen = [json.loads(z) for z in
+              (tmp_path / "geraete_tco_historie.jsonl").read_text(
+                  encoding="utf-8").splitlines()]
+    assert sorted(z["gesamt"] for z in zeilen) == [892.75, 919.75]
+
+
+# --------------------------------------------------------------------------
 # Der Template-Block - die gesetzte Rechung als Markup
 # --------------------------------------------------------------------------
 
 def test_der_block_zeigt_das_mal_muster_und_die_summe():
     """design.md Regel 6: die Rechung ist GESETZT („70,00 € × 24 =
     1 680 €"), keine prose Erklärung - und die Werte genau dieser
-    Messung."""
+    Messung. A1: alle 36 Raten, Summe mit dem Etikett der Leitzahl."""
     html = zr._rechung_html("o2", _messung(O2_MESSUNG))
     assert "24 × 14,99 €" in html and "= 359,76 €" in html
-    assert "24 × 19,00 €" in html and "= 456,00 €" in html
-    assert "= <b>892,75 €</b>" in html
-    assert "TCO-24" in html
+    assert "36 × 19,00 €" in html and "= 684,00 €" in html
+    assert "= <b>1.120,75 €</b>" in html
+    assert "Kosten über 24 Monate" in html
+    assert "TCO-24" not in html
 
 
 # --------------------------------------------------------------------------
@@ -178,14 +248,16 @@ def test_jeder_posten_traegt_seinen_anteil_als_balken():
 
 
 def test_die_restschuld_steht_in_der_rechnung_wenn_die_rate_laenger_laeuft():
-    """Sicht-A3: „danach noch offen" - die Zahl, die den TCO-24 ver-
-    gleichbar macht (o2: 36 Raten, 24 gerechnet, 12 × 19,00 € offen).
-    Bei 24 Monaten Laufzeit gibt es keine Restschuld (None, keine Zeile)
-    - „nichts offen" ist eine Aussage, aber keine Zeile wert."""
+    """Sicht-A3, seit A1 „davon nach Monat 24 noch zu zahlen" - die Rest-
+    schuld IST in der Summe und wird zusaetzlich ausgewiesen (o2: 36
+    Raten, 12 × 19,00 € laufen nach Monat 24 weiter). Bei 24 Monaten
+    Laufzeit gibt es keine Restschuld (None, keine Zeile) - „nichts
+    offen" ist eine Aussage, aber keine Zeile wert."""
     r = zr._rechung(_messung(O2_MESSUNG))
     assert r["offen"] == {"anzahl": 12, "einzeln": 19.0, "betrag": 228.0}
     html = zr._rechung_html("o2", _messung(O2_MESSUNG))
-    assert "danach noch offen: 12 × 19,00 € = 228,00 €" in html
+    assert "davon nach Monat 24 noch zu zahlen: 12 × 19,00 €" in html
+    assert "= 228,00 €" in html
     # zusammen-Form (1&1): der Bündelbetrag laeuft weiter, derselbe Satz
     r11 = zr._rechung(_messung(EINS_EINS_MESSUNG, anbieter="1&1",
                                tarif="1&1 All-Net-Flat S"))
@@ -193,13 +265,14 @@ def test_die_restschuld_steht_in_der_rechnung_wenn_die_rate_laenger_laeuft():
                             "betrag": round(12 * 49.99, 2)}
     html11 = zr._rechung_html("1&1", _messung(
         EINS_EINS_MESSUNG, anbieter="1&1", tarif="1&1 All-Net-Flat S"))
-    assert "danach noch offen: 12 × 49,99 € = 599,88 €" in html11
+    assert "davon nach Monat 24 noch zu zahlen: 12 × 49,99 € = 599,88 €" \
+        in html11
     # 24 Monate: keine Zeile
     kurz = dict(O2_MESSUNG, laufzeit_monate=24, gesamt=round(
         37.0 + 39.99 + 24 * 14.99 + 24 * 19.0, 2))
     rk = zr._rechung(_messung(kurz))
     assert rk["offen"] is None
-    assert "danach noch offen" not in zr._rechung_html("o2", _messung(kurz))
+    assert "davon nach Monat 24" not in zr._rechung_html("o2", _messung(kurz))
 
 
 def test_der_rechnungskopf_traegt_den_farbpunkt_des_anbieters():

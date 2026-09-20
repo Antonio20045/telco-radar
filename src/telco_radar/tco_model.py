@@ -1,4 +1,4 @@
-"""Was ein Buendel aus Geraet und Tarif wirklich kostet - TCO ueber 24 Monate.
+"""Was ein Buendel aus Geraet und Tarif wirklich kostet - die Kosten ueber 24 Monate.
 
 Warum es dieses Modul gibt
 --------------------------
@@ -9,18 +9,24 @@ Monaten ausgelaufen ist. Wer davon EINE Zahl in eine Preisspalte schreibt,
 schreibt eine Meinung. Dieses Modul haelt die Bestandteile getrennt und
 rechnet die Kennzahl daraus - jedes Mal neu.
 
-    TCO-24 =   Geraetezuzahlung
-             + min(24, Ratenlaufzeit) x Geraeterate
-             + 24 x Tarifgrundpreis
-             + Anschlusspreis
+    Kosten über 24 Monate =   Geraetezuzahlung (Anzahlung)
+                            + 24 Monate Tarifgrundpreis - phasengewichtet,
+                              wenn das Pflichtdokument Preisphasen nennt
+                            + ALLE Geraeteraten der eigenen Laufzeit, auch
+                              die Restschuld nach Monat 24 (Raten 25-36)
+                            + Anschlusspreis
 
-Die Leitzahl ist TCO-24 (Entscheidung E2 vom 03.09.2026), daneben steht
-Ø/Monat als greifbare Zweitzahl. Das ist der Horizont der Tarifbindung, nicht
-der der Geraetefinanzierung - und der Unterschied ist der Grund fuer
-`Tco.restbetrag`: wer 36 Raten waehlt, hat nach 24 Monaten noch zwoelf offen.
-Diese Raten fallen NICHT unter den Tisch, sie stehen als eigene Zahl neben
-der Kennzahl. Eine auf 24 Monate gekappte Zahl ohne diesen Ausweis waere die
-CHECK24-Methodik, die § 5.4 des Strategiedokuments ausdruecklich verwirft.
+Die Leitzahl ist "Kosten über 24 Monate" (A1 vom 20.09.2026; vorher TCO-24,
+Entscheidung E2 vom 03.09.2026), daneben steht Ø/Monat als greifbare
+Zweitzahl. Der Horizont von 24 Monaten ist der der Tarifbindung, nicht der
+der Geraetefinanzierung - wer 36 Raten waehlt, hat nach 24 Monaten noch
+zwoelf offen, und diese Restschuld bleibt GESCHULDET: Sie steht IN der
+Kennzahl und zusaetzlich als eigene Zahl daneben (`Tco.restbetrag`).
+Bis A1 kappte die Rechnung die Raten bei 24 Monaten und stellte den Rest
+daneben - das war die CHECK24-Methodik mit Ausweis, die § 5.4 des
+Strategiedokuments verwirft; am echten Bestand vom 20.09.2026 lag dadurch
+jedes der 88 scheinbar unter dem Barpreis subventionierten Bündel nur um
+seine eigene Restschuld zu niedrig (Messung im Orakel-Test).
 
 Die drei Regeln, die dieses Modul tragen
 ----------------------------------------
@@ -51,6 +57,16 @@ Die Felder eines Buendels
                       keinen Tarifnamen); bis dahin IST der Name der
                       Schluessel.
     tarif_monatlich   Grundpreis je Monat, ohne Geraeteanteil
+    tarif_phasen      Preisphasen des Tarifs, aus dem Tarifbestand
+                      (`tarife.jsonl`) angereichert - wo sie vorliegen,
+                      wird der Tarifanteil PHASENGEWICHTET gerechnet statt
+                      flach multipliziert. Sie stehen am Objekt und nicht
+                      im Store, weil sie zur Tarif-Stammdaten gehoeren und
+                      nicht zur Messung des Bündels (A1, 20.09.2026).
+                      Anzureichern ist nur ein Blatt OHNE Widerspruch zur
+                      Messung (`phasen_fuer_buendel`, QA-Fix 20.09.2026):
+                      das Blatt nennt den Tarif ohne Geraetezuschlag,
+                      die Karte die gemessene Bündel-Rate.
     geraet_zuzahlung  einmalig bei Vertragsschluss
     geraet_monatsrate die Geraeterate je Monat, NEBEN dem Tarif
     laufzeit_monate   ueber wie viele Monate die Geraeterate laeuft
@@ -79,7 +95,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from .geraete_model import Ratenzahlung, normalisiere
-from .tarif_model import PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP
+from .tarif_model import (PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP, Preisphase)
 
 # Der Horizont der Leitzahl: 24 Monate, die uebliche Tarifmindestlaufzeit.
 # Entscheidung E2 vom 03.09.2026 - dieselbe Zahl und dieselbe Begruendung
@@ -278,6 +294,13 @@ class Buendel:
     # gilt als `unbekannt`, nie als neu (`geraete_tco_karten.zustand_des_
     # buendels`).
     zustand: str = ""
+    # Die Preisphasen des Tarifs (A1, 20.09.2026): angereichert aus dem
+    # Tarifbestand ueber `tarif_id` (dieselbe Stelle wie
+    # `tarif_bindung_monate`). Sie gehoeren zum Tarif-Stamm, nicht zur
+    # Bündel-Messung, und werden deshalb NICHT in `geraete_tco.json`
+    # gespeichert - der Store bleibt bei seinen Messfeldern, und die
+    # Rechnung liest den Stamm bei jedem Lauf neu.
+    tarif_phasen: list[Preisphase] = field(default_factory=list)
 
     def __post_init__(self):
         if not (self.anbieter or "").strip():
@@ -447,17 +470,50 @@ class SimOnlyReferenz:
 # Die Rechnung
 # --------------------------------------------------------------------------
 
+def phasensumme(phasen: list[Preisphase], horizont: int) -> Optional[float]:
+    """Die Summe der Monatsentgelte ueber den Horizont - phasengewichtet.
+
+    Der Kern der Tarif-Rechnung, seit A1 (20.09.2026) Teil des Moduls der
+    Leitzahl: Leitzahl und Effektivpreis teilen EINE phasengewichtete Summe,
+    sonst rechneten zwei Stellen dasselbe Blatt verschieden
+    (`report/effektivpreis.py` re-exportiert sie). Eine Phase ohne Ende
+    laeuft bis zum Horizont; eine Phase, die darueber hinausreicht, wird
+    gekappt; Monate nach der letzten Phase laufen zum letzten bekannten
+    Preis weiter - die vorsichtige Annahme: der letzte Preis eines Tarifs
+    ist der Normalpreis, nicht der Rabattpreis.
+    """
+    if not phasen:
+        return None
+    summe = 0.0
+    abgedeckt = 0
+    for phase in sorted(phasen, key=lambda p: p.von_monat):
+        monate = phase.monate(horizont)
+        if monate <= 0:
+            continue
+        summe += monate * phase.betrag
+        abgedeckt += monate
+    if abgedeckt <= 0:
+        return None
+    if abgedeckt < horizont:
+        letzter = sorted(phasen, key=lambda p: p.von_monat)[-1]
+        summe += (horizont - abgedeckt) * letzter.betrag
+    return round(summe, 2)
+
+
 @dataclass
 class Tco:
     """Das Ergebnis einer TCO-Rechnung - mit allem, was ihr fehlt.
 
     Felder:
       gesamt        die Leitzahl ueber den Horizont, None ohne jeden Posten
+                    (seit A1 INKLUSIVE Restschuld, siehe `restbetrag`)
       horizont      ueber wie viele Monate gerechnet wurde (24, E2)
       monatlich     Ø/Monat - die Zweitzahl der Seite
       bestandteile  Posten -> Betrag, in der Reihenfolge der Rechnung
       luecken       benannte fehlende Komponenten (§ 6.4)
-      restbetrag    offene Geraeteraten JENSEITS des Horizonts
+      restbetrag    der Anteil der Leitzahl, der nach Monat 24 noch faellig
+                    bleibt (Raten 25-36; 0.0 bei Laufzeit <= 24 ist eine
+                    gemessene Aussage, kein fehlender Wert)
       rabatte_offen was an benannten Nachlaessen NICHT abgezogen wurde
     """
 
@@ -482,36 +538,46 @@ class Tco:
 
 
 def tco_24(buendel: Buendel) -> Tco:
-    """Die Leitzahl eines Buendels: Gesamtkosten ueber 24 Monate.
+    """Die Leitzahl eines Buendels: Kosten ueber 24 Monate.
 
     Eine REINE Funktion - gleiche Posten, gleiches Ergebnis, kein Zustand,
     nichts gespeichert. Der Horizont steht fest (E2); die Ratenlaufzeit des
-    Geraets darf davon abweichen, und was jenseits liegt, steht in
-    `restbetrag` statt in der Kennzahl.
+    Geraets darf davon abweichen, und was jenseits liegt, bleibt geschuldet:
+    Es steht IN der Kennzahl und zusaetzlich in `restbetrag` ausgewiesen
+    (A1, 20.09.2026).
 
-    Zwei Preisformen, eine Kappung bei 24 Monaten
-    ----------------------------------------------
+    Zwei Preisformen, eine Rechnung
+    -------------------------------
     * **aufgeteilt** (o2 u.a.): Tarifgrundpreis und Geraeterate stehen
-      getrennt und werden je fuer sich auf den Horizont gekappt.
+      getrennt. Der Tarif zaehlt 24 Monate - PHASENGEWICHTET, wenn das
+      Bündel Preisphasen traegt ("12 Monate 10 EUR, danach 20 EUR"), sonst
+      flach. Die Rate zaehlt ALLE Monate ihrer eigenen Laufzeit, auch die
+      nach Monat 24. Wer die Phasen anreichert, sorgt dafuer, dass sie
+      die gemessene Monatsrate nicht ueberstimmen (`phasen_fuer_buendel`,
+      QA-Fix 20.09.2026): diese Funktion vertraut ihrem Feld.
     * **zusammen** (1&1, `buendel_monatlich`): der Anbieter nennt EINEN
       Monatsbetrag fuer Tarif und Geraet (§ 13.2 der Strategie - ihn
       aufzuteilen waere eine Rechnung dieses Projekts). Er wird als EIN
-      Posten gefuehrt und genauso auf 24 Monate gekappt wie eine Rate; was
-      jenseits liegt, steht ebenso in `restbetrag`. Die GERAETEZUZAHLUNG
+      Posten ueber seine ganze Laufzeit gefuehrt. Die GERAETEZUZAHLUNG
       steht daneben als ihr eigener Posten (S2-C, 09.09.2026: 1&1 nennt
-      sie je Variante in `hwdVariantsOneOffPaymentFees`); bis dahin fiel
-      sie in dieser Preisform unter den Tisch, weil sie nur in der
-      aufgeteilten vorkam.
+      sie je Variante in `hwdVariantsOneOffPaymentFees`).
+
+    Der Pflichtfall des Auftrags (A1): congstar Allnet Flat XS zum iPhone
+    17 Pro 256 GB - 1 + 24 × 15,00 + 36 × 30,50 + 0 = 1.459,00 EUR. Die
+    bis zum 20.09.2026 gueltige gekappte Zahl (1.093,00 EUR) ist genau um
+    die Restschuld (366,00 EUR) zu niedrig und darf nie wieder als
+    Leitzahl auftauchen (`tests/test_geraete_tco_orakel.py` haelt das am
+    echten Bestand fest).
     """
     ergebnis = Tco(horizont=TCO_HORIZONT)
+    offen_monate = max(0, buendel.laufzeit_monate - TCO_HORIZONT)
 
     if buendel.buendel_monatlich is not None:
-        im_horizont = min(buendel.laufzeit_monate, TCO_HORIZONT)
-        ergebnis.bestandteile[f"{POSTEN_BUENDEL} ({im_horizont} von "
-                              f"{buendel.laufzeit_monate})"] = \
-            round(buendel.buendel_monatlich * im_horizont, 2)
-        offen = max(0, buendel.laufzeit_monate - TCO_HORIZONT)
-        ergebnis.restbetrag = round(buendel.buendel_monatlich * offen, 2)
+        ergebnis.bestandteile[f"{POSTEN_BUENDEL} über "
+                              f"{buendel.laufzeit_monate} Monate"] = \
+            round(buendel.buendel_monatlich * buendel.laufzeit_monate, 2)
+        ergebnis.restbetrag = round(buendel.buendel_monatlich * offen_monate,
+                                    2)
         # Ein Bündel mit Monatsbetrag traegt immer ein Geraet - ein Satz
         # ohne SKU wirft schon `Buendel.__post_init__`. Dieselbe Regel wie
         # in der aufgeteilten Form: None ist eine LUECKE, 0.0 ein
@@ -521,7 +587,12 @@ def tco_24(buendel: Buendel) -> Tco:
         else:
             ergebnis.luecken.append(POSTEN_ZUZAHLUNG)
     else:
-        if buendel.tarif_monatlich is not None:
+        tarif_summe = phasensumme(buendel.tarif_phasen, TCO_HORIZONT) \
+            if buendel.tarif_phasen else None
+        if tarif_summe is not None:
+            ergebnis.bestandteile[f"Tarif über {TCO_HORIZONT} Monate"] = \
+                tarif_summe
+        elif buendel.tarif_monatlich is not None:
             ergebnis.bestandteile[f"Tarif über {TCO_HORIZONT} Monate"] = \
                 round(buendel.tarif_monatlich * TCO_HORIZONT, 2)
         else:
@@ -538,13 +609,15 @@ def tco_24(buendel: Buendel) -> Tco:
                 ergebnis.luecken.append(POSTEN_ZUZAHLUNG)
 
             if buendel.geraet_monatsrate is not None:
-                im_horizont = min(buendel.laufzeit_monate, TCO_HORIZONT)
-                ergebnis.bestandteile[f"Geräteraten ({im_horizont} von "
-                                      f"{buendel.laufzeit_monate})"] = \
-                    round(buendel.geraet_monatsrate * im_horizont, 2)
-                offen = max(0, buendel.laufzeit_monate - TCO_HORIZONT)
-                ergebnis.restbetrag = round(buendel.geraet_monatsrate * offen,
-                                            2)
+                ergebnis.bestandteile[f"Geräteraten über "
+                                      f"{buendel.laufzeit_monate} Monate"] = \
+                    round(buendel.geraet_monatsrate
+                          * buendel.laufzeit_monate, 2)
+                # Die Restschuld nach Monat 24 - IN der Leitzahl und
+                # zusaetzlich ausgewiesen: 0.0 bei Laufzeit <= 24 ist die
+                # gemessene Aussage "nichts offen", nie ein fehlender Wert.
+                ergebnis.restbetrag = round(
+                    buendel.geraet_monatsrate * offen_monate, 2)
             else:
                 ergebnis.luecken.append(POSTEN_RATE)
 

@@ -376,8 +376,8 @@
       <span><button type="button" class="gr-bsort" data-bsort="anbieter"
         >Anbieter</button></span><span>Tarif · Volumen</span><span><button
         type="button" class="gr-bsort" data-bsort="tco" aria-label=
-        "nach Gesamtkosten über 24 Monate (TCO-24) sortieren"
-        >TCO-24</button></span><span><button type="button" class="gr-bsort"
+        "nach Kosten über 24 Monate sortieren"
+        >Kosten über 24 Monate</button></span><span><button type="button" class="gr-bsort"
         data-bsort="delta" aria-label=
         "nach Abstand über oder unter der Vodafone-Referenz sortieren"
         >Δ zu Vodafone</button></span><span>Gerät ohne
@@ -516,7 +516,7 @@
   <div class="gr-leit gr-leit--radar"><b class="gr-leit-zahl">{{
     spitze.prozent_text }} %</b><span class="gr-leit-label">stärkste
     Abweichung zu Vodafone: {{ spitze.titel }} bei {{ spitze.anbieter
-    }} · {{ spitze.euro_text }} € TCO-24</span></div>
+    }} · {{ spitze.euro_text }} € Kosten über 24 Monate</span></div>
   {% endif %}
   {# E3-Fix (QA 17.09.2026, B2) / P4-Fix (Sicht-Pruefung 18.09.): Der Kopf
      behauptete die vorzeichenbehaftete Leitzahl für ALLE drei Sektionen -
@@ -600,7 +600,7 @@
      Zeile je Modell und den Umschalter. Was in den Spalten steht, sagen
      die Spaltenkoepfe; was im Aufklapper steht, sagt der Aufklapper. #}
   <p class="gr-erklaer">Eine Zeile je Modell; der Umschalter darüber wählt
-  Einzelgerätpreis oder Gesamtkosten über 24 Monate (TCO-24). Alle
+  Einzelgerätpreis oder Kosten über 24 Monate. Alle
   Listungen des Modells stehen unter der Zeile.</p>
 
   <div class="gr-filter" data-fuer="gr-katalogtabelle">
@@ -631,7 +631,7 @@
     <button type="button" class="gr-vknopf is-aktiv" data-ansicht="barpreis"
             aria-pressed="true">Einzelgerätpreis</button>
     <button type="button" class="gr-vknopf" data-ansicht="tco"
-            aria-pressed="false">Gesamtkosten (TCO-24)</button>
+            aria-pressed="false">Kosten über 24 Monate</button>
   </div>
 
   <div class="gr-alarm-scroll">
@@ -655,7 +655,8 @@
          hat keine alphabetisch sinnvolle Ordnung, und ein Zahlen-Rang
          dafür wäre eine zweite Abbildung derselben Auswahl. #}
       <th scope="col" class="num gr-sp--tco"><button type="button"
-        class="gr-sort" data-sort="tco" data-art="zahl">TCO-24</button></th>
+        class="gr-sort" data-sort="tco" data-art="zahl">Kosten über
+        24 Monate</button></th>
       <th scope="col" class="num gr-sp--tco"><button type="button"
         class="gr-sort" data-sort="monat" data-art="zahl">Ø €/Monat</button></th>
       <th scope="col" class="gr-sp--tco"><button type="button"
@@ -1072,7 +1073,7 @@
     <div class="gr-vdatenlage-inhalt">
       <p>Die Kurve zeigt den Barpreis ohne Vertrag, nicht die
       Gesamtkosten: wer das Gerät im Vertrag kauft, zahlt daneben Tarif
-      und Anschlusspreis. Die Gesamtkosten über 24 Monate (TCO-24) stehen
+      und Anschlusspreis. Die Kosten über 24 Monate stehen
       im Reiter „Vergleich“.</p>
       <p>Preisverlauf wird seit dem {{ geraete.verlauf.seit | date_de }}
       erfasst – {{ geraete.verlauf.messtermine }}

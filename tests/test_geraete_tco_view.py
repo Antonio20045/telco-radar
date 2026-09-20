@@ -15,6 +15,7 @@ vom 03.09.2026 (1 EUR Anzahlung, 24 x 30 EUR Rate = 721 EUR).
 KEIN NETZ, KEINE UHR, KEIN gemeinsamer Zustand zwischen den Tests.
 """
 from telco_radar.geraete_model import Geraet, Katalog, VERGLEICHBARE_ZUSTAENDE
+from telco_radar.report import geraete_tco_karten as karten
 from telco_radar.report.geraete_tco_view import (REFERENZEN_SICHTBAR,
                                                 aufbereiten, leer)
 from telco_radar.tco_model import (POSTEN_ANSCHLUSS, POSTEN_RABATTE,
@@ -658,10 +659,11 @@ def test_der_massstab_wird_ueber_den_tarif_id_gefunden():
     daten = aufbereiten([_o2_buendel()], [_o2_referenz()], _o2_listung(),
                         katalog=None)
     zeile = daten["zeilen"][0]
-    # 1,00 + 24 x 34,00 + 24 x 14,99 + 39,99 = 1216,75
-    # SIM-only: 24 x 19,99 + 39,99 = 519,75  ->  Differenz 697,00
-    assert abs(zeile["gesamt"] - 1216.75) < 0.005
-    assert abs(zeile["geraeteanteil"] - 697.0) < 0.005
+    # A1 (alle Raten der eigenen Laufzeit):
+    # 1,00 + 24 x 14,99 Tarif + 36 x 34,00 Geräteraten + 39,99 = 1624,75
+    # SIM-only: 24 x 19,99 + 39,99 = 519,75  ->  Differenz 1105,00
+    assert abs(zeile["gesamt"] - 1624.75) < 0.005
+    assert abs(zeile["geraeteanteil"] - 1105.0) < 0.005
 
     ohne = aufbereiten([_o2_buendel(tarif_id="")], [_o2_referenz()],
                        _o2_listung(), katalog=None)
@@ -696,5 +698,102 @@ def test_der_name_schlaegt_den_fremdschluessel():
         tarif_sim_only_monatlich=9.99)
     daten = aufbereiten([_o2_buendel()], [gleichnamig, _o2_referenz()],
                         _o2_listung(), katalog=None)
-    # Ueber den Namen: SIM-only 24 x 9,99 + 39,99 = 279,75 -> 937,00
-    assert abs(daten["zeilen"][0]["geraeteanteil"] - 937.0) < 0.005
+    # Ueber den Namen: SIM-only 24 x 9,99 + 39,99 = 279,75 -> 1345,00
+    # (1624,75 laut Rechnung im Schluessel-Test, A1 mit allen 36 Raten)
+    assert abs(daten["zeilen"][0]["geraeteanteil"] - 1345.0) < 0.005
+
+
+# --------------------------------------------------------------------------
+# QA-Fix 20.09.2026 (Pruefer-Befund "hoch"): Blatt gegen Messung
+# --------------------------------------------------------------------------
+
+_PIB_MOBIL_XS = {
+    "anbieter": "Vodafone", "name": "Vodafone Mobil XS",
+    "tarif_id": "vodafone:vodafone-mobil-xs", "grundgebuehr": 29.95,
+    "laufzeit_monate": 24, "datenvolumen_gb": 18.0,
+    "preisphasen": [{"von_monat": 1, "bis_monat": 24, "betrag": 29.95},
+                    {"von_monat": 25, "bis_monat": None, "betrag": 29.95}],
+    "dokument_url": "https://example.de/pib/mobil-xs",
+    "abgerufen_am": "2026-09-16", "confidence": {}, "fundstellen": {},
+}
+
+
+def _fold8_xs() -> dict:
+    """Die Bündel-Messung des Befunds: Samsung Galaxy Z Fold8 256 an
+    Vodafone Mobil XS - 31,95 EUR Tarif im Shop (das Blatt nennt 29,95 EUR
+    ohne Smartphone-Zuschlag), 36 Raten à 42,50 EUR, 0,99 EUR Anzahlung."""
+    return {
+        "id": "buendel--vodafone--samsung-galaxy-z-fold8-256gb-cream--mobil-xs",
+        "sku_id": "samsung-galaxy-z-fold8-256gb-cream",
+        "anbieter": "Vodafone", "tarif_name": "Mobil XS",
+        "tarif_id": "vodafone:vodafone-mobil-xs", "tarif_id_guete": "hoch",
+        "tarif_monatlich": 31.95, "geraet_zuzahlung": 0.99,
+        "geraet_monatsrate": 42.5, "laufzeit_monate": 36,
+        "anschlusspreis": 0.0, "zustand": "neu", "rabatte": [],
+        "quelle_url": "https://www.vodafone.de/privat/handys/"
+                      "samsung-galaxy-z-fold8.html",
+        "abgerufen_am": "2026-09-16", "first_seen": "2026-09-12",
+        "last_verified": "2026-09-16",
+    }
+
+
+def test_widerspruch_zwischen_blatt_und_messung_entscheidet_die_messung():
+    """0,99 + 24 x 31,95 + 36 x 42,50 + 0 = 2.297,79 EUR - nicht 2.249,79.
+
+    Das Blatt beschreibt den Tarif OHNE den geräteabhängigen Zuschlag,
+    die Messung am Bündel den Preis, den der Kunde zahlt. Bis zum Fix
+    reicherte die Tafel die Phasen des Blatts an und liess sie der Messung
+    vorgehen: die Karte sagte 'monatlich 31,95 EUR', die Postenliste
+    rechnete 24 x 29,95 = 718,80 EUR - die Leitzahl war mit der eigenen
+    Karte nicht nachrechenbar (473 Vodafone-Bündel, um je 48,00 EUR zu
+    niedrig, samt Delta zur Vodafone-Referenz)."""
+    zeile = aufbereiten([_fold8_xs()], [], [], katalog=None,
+                        tarife={"vodafone:vodafone-mobil-xs": _PIB_MOBIL_XS}
+                        )["zeilen"][0]
+    assert zeile["belastbar"] is True
+    posten = {p["name"]: p["betrag"] for p in zeile["bestandteile"]}
+    assert posten["Tarif über 24 Monate"] == 766.8      # 24 x 31,95
+    assert zeile["gesamt"] == 2297.79
+    assert zeile["gesamt"] != 2249.79
+
+
+def test_phasen_innerhalb_der_preisspanne_bleiben_phasengewichtet():
+    """Ein echter Rabatt bleibt: '12 Monate 21,95 EUR, danach 31,95 EUR'
+    bei einer Messung von 31,95 EUR - die Messung liegt IN der Preisspanne
+    des Blatts, also beschreibt das Blatt dieses Angebot:
+    12 x 21,95 + 12 x 31,95 = 646,80 EUR statt flach 766,80 EUR. Der
+    Widerspruchs-Fix darf die Phasen nicht pauschal mitnehmen."""
+    satz = dict(_PIB_MOBIL_XS, preisphasen=[
+        {"von_monat": 1, "bis_monat": 12, "betrag": 21.95},
+        {"von_monat": 13, "bis_monat": None, "betrag": 31.95}])
+    zeile = aufbereiten([_fold8_xs()], [], [], katalog=None,
+                        tarife={"vodafone:vodafone-mobil-xs": satz}
+                        )["zeilen"][0]
+    posten = {p["name"]: p["betrag"] for p in zeile["bestandteile"]}
+    assert posten["Tarif über 24 Monate"] == 646.8
+    assert zeile["gesamt"] == round(0.99 + 646.8 + 36 * 42.5, 2)
+
+
+def test_phasen_ohne_messung_gelten_weiterhin():
+    """Keine Messung, kein Widerspruch: das Blatt allein traegt die Phasen
+    (24 x 29,95 = 718,80 EUR) - derselbe Zustand wie vor dem Fix."""
+    b = _fold8_xs()
+    b["tarif_monatlich"] = None
+    zeile = aufbereiten([b], [], [], katalog=None,
+                        tarife={"vodafone:vodafone-mobil-xs": _PIB_MOBIL_XS}
+                        )["zeilen"][0]
+    posten = {p["name"]: p["betrag"] for p in zeile["bestandteile"]}
+    assert posten["Tarif über 24 Monate"] == 718.8
+
+
+def test_phasen_fuer_buendel_entscheidet_nur_bei_widerspruch():
+    """Die EINE Stelle der Rangfolge Blatt/Messung: liegt die Messung
+    ausserhalb der Preisspanne des Blatts, gibt es keine Phasen (flach);
+    liegt sie innerhalb, gelten sie; ohne Messung gibt es keinen
+    Widerspruch; ohne Blatt keine Phasen."""
+    phasen = karten.phasen_aus_tarifsatz(_PIB_MOBIL_XS)
+    assert phasen, "Gegenprobe: das Blatt hat Phasen"
+    assert karten.phasen_fuer_buendel(_PIB_MOBIL_XS, 31.95) == []
+    assert karten.phasen_fuer_buendel(_PIB_MOBIL_XS, 29.95) == phasen
+    assert karten.phasen_fuer_buendel(_PIB_MOBIL_XS, None) == phasen
+    assert karten.phasen_fuer_buendel({}, 31.95) == []

@@ -98,12 +98,16 @@ def _buendel(anbieter, tarif_id, tarif_name, *, tarif, rate,
             "last_verified": HEUTE}
 
 
-def _tarif(anbieter, tarif_id, tarif_name, gb):
+def _tarif(anbieter, tarif_id, tarif_name, gb, betrag):
+    # A1: Liegt eine Preisphase vor, rechnet die Leitzahl PHASENGEWICHTET
+    # und ignoriert tarif_monatlich des Buendels - deshalb traegt jede
+    # Phase denselben Betrag wie ihr Buendel-Tarif, sonst waere jede Zahl
+    # dieser Fixture nur ueber die Phase erklaerbar.
     return {"anbieter": anbieter, "name": tarif_name, "tarif_id": tarif_id,
-            "art": "mobilfunk", "grundgebuehr": 24.99, "laufzeit_monate": 24,
-            "datenvolumen_gb": gb,
+            "art": "mobilfunk", "grundgebuehr": betrag,
+            "laufzeit_monate": 24, "datenvolumen_gb": gb,
             "preisphasen": [{"von_monat": 1, "bis_monat": None,
-                             "betrag": 24.99}],
+                             "betrag": betrag}],
             "dokument_url": f"https://example.de/pib/{tarif_id}",
             "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}}
 
@@ -133,7 +137,8 @@ def _baue(tmp_path: pathlib.Path):
         _buendel("Vodafone", "vodafone:mittel", "Vodafone Mittel",
                  tarif=26.99, rate=15.0),
         # 36 Monate Raten, keine eigene Listung -> Finanzierungssumme
-        # 1,00 + 36 x 25,00 = 901,00 €; TCO-24 = 1 + 24x24 + 24x25 = 1.177,00 €
+        # 1,00 + 36 x 25,00 = 901,00 EUR; Kosten über 24 Monate (A1, alle
+        # Raten der eigenen Laufzeit) = 1 + 24x24 + 36x25 = 1.477,00 EUR
         _buendel("congstar", "congstar:allnet-m", "Allnet Flat M",
                  tarif=24.00, rate=25.0, laufzeit=36),
         _buendel("o2", "o2:unlimited", "O2 Unlimited",
@@ -145,12 +150,12 @@ def _baue(tmp_path: pathlib.Path):
         "updated": HEUTE, "buendel": buendel, "sim_only": []}),
         encoding="utf-8")
     tarife = [
-        _tarif("o2", "o2:klein", "O2 Mobile Klein", 18.0),
-        _tarif("Vodafone", "vodafone:mittel", "Vodafone Mittel", 40.0),
+        _tarif("o2", "o2:klein", "O2 Mobile Klein", 18.0, 24.99),
+        _tarif("Vodafone", "vodafone:mittel", "Vodafone Mittel", 40.0, 26.99),
         # Unbegrenzt liegt außerhalb aller Bänder (§7) - json schreibt dafuer
         # Infinity, genau wie der echte Tarifbestand.
-        _tarif("o2", "o2:unlimited", "O2 Unlimited", math.inf),
-        _tarif("congstar", "congstar:allnet-m", "Allnet Flat M", 25.0),
+        _tarif("o2", "o2:unlimited", "O2 Unlimited", math.inf, 34.99),
+        _tarif("congstar", "congstar:allnet-m", "Allnet Flat M", 25.0, 24.00),
     ]
     (state / "tarife.jsonl").write_text(
         "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
@@ -334,7 +339,9 @@ def test_die_tco_werte_des_bands_stehen_ohne_hover_im_dom(_seite):
     waehle_band(_seite, "mittel")
     _seite.wait_for_timeout(250)
     tafel = _seite.eval_on_selector("#tafel-tco", "e => e.innerText")
-    assert "1.008,76" in tafel and "1.177,00" in tafel, tafel[:200]
+    # Vodafone: 1 + 24x26,99 + 24x15 = 1.008,76 - congstar (A1, 36 Raten):
+    # 1 + 24x24 + 36x25 = 1.477,00
+    assert "1.008,76" in tafel and "1.477,00" in tafel, tafel[:200]
 
 
 def test_der_antwort_satz_nennt_die_zahl_der_guenstigsten_zeile(_seite):
@@ -429,8 +436,10 @@ def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(_seite):
     # Lücke steht im Rechenweg benannt da.
     assert "nicht erhoben" in congstar["rw"], (
         "der Rechenweg nennt die Lücke beim Gerätepreis ohne Vertrag nicht")
-    # Die TCO-24 bleibt die zweite, getrennte Zahl.
-    assert "TCO-24" in congstar["summary"] and "1.177,00" in congstar["summary"]
+    # Die Leitzahl („Kosten über 24 Monate", alle 36 Raten) bleibt die
+    # zweite, getrennte Zahl: 1 + 24x24 Tarif + 36x25 Raten = 1.477,00.
+    assert "Kosten über 24 Monate" in congstar["summary"] \
+        and "1.477,00" in congstar["summary"]
 
 
 def test_ein_gemessener_barpreis_fuehrt_weiter_als_geraetepreis(_seite):
@@ -453,13 +462,14 @@ def test_ein_gemessener_barpreis_fuehrt_weiter_als_geraetepreis(_seite):
 def test_der_antwort_satz_nennt_keine_finanzierungssumme_als_geraetepreis(
         _seite):
     """Dieselbe Trennung eine Ebene höher, E2-Fassung: der Antwort-Satz
-    nennt die Finanzierungssumme nur als das, was sie ist - eine TCO über
+    nennt die Finanzierungssumme nur als das, was sie ist - Kosten über
     24 Monate. Das Wort „Gerätepreis" führt er nicht (der congstar-
     Finanzierungsbetrag 901,00 € wäre billiger als jeder Barpreis und
     dürfe eine Gerätepreis-Antwort nie führen)."""
     satz = _seite.eval_on_selector("#tafel-tco .gr-zr-antwort",
                                    "e => e.innerText")
-    assert "über 24 Monate (TCO-24)" in satz, satz
+    assert "Kosten über 24 Monate" in satz, satz
+    assert "TCO-24" not in satz, satz
     assert "gerätepreis" not in satz.lower(), satz
     assert "901,00" not in satz, (
         f"die Finanzierungssumme führt den Antwort-Satz: {satz}")

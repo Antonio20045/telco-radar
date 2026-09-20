@@ -96,25 +96,26 @@
        Begriffe selber erklärt die Antwortzeile über dem Graph schon
        ohne Klick. #}
     {% if k.geraetepreis is not none and k.geraetepreis_art == 'finanzierung' %}
-    <p class="gr-kk-paradox">„mit Tarif“ = {{ k.laufzeit }} Monatsraten für
-    Tarif und Gerät zusammen – deshalb ein anderer Betrag als die
+    <p class="gr-kk-paradox">„mit Tarif“ = alle {{ k.raten_laufzeit or
+      k.laufzeit }} Geräteraten plus {{ k.laufzeit }} Monate
+    Tarif – deshalb ein anderer Betrag als die
     Finanzierung gesamt</p>
     {% elif k.geraetepreis is not none %}
     <p class="gr-kk-paradox">„mit Tarif“ = Gerät + {{ k.laufzeit }} Monate
     Tarif – deshalb ein anderer Betrag als der Gerätepreis allein</p>
     {% endif %}
     {# WORAUS DAS Ø BESTEHT, steht daneben - sonst vergleicht jemand zwei
-       Ø-Werte, in denen verschieden viele Tarifmonate stecken. #}
+       Ø-Werte, in denen verschieden viele Tarifmonate stecken. Seit A1
+       rechnet die Leitzahl IMMER {{ k.laufzeit }} Monate Tarif; bindet der
+       Tarif laenger, sagt das diese Zeile. #}
     {% if k.tarif_bindung and k.laufzeit and k.tarif_bindung != k.laufzeit %}
-    <p class="gr-kk-basis">darin {{ k.tarif_bindung }} von {{ k.laufzeit }}
-    Monaten Tarif – so lange bindet er</p>
+    <p class="gr-kk-basis">der Tarif bindet {{ k.tarif_bindung }} Monate –
+    gerechnet sind {{ k.laufzeit }} Monate Tarif</p>
     {% endif %}
 
     <p class="gr-kk-bau">{% if k.buendel_monatlich is not none %}monatlich {{
       k.buendel_monatlich | euro }} für Tarif und Gerät zusammen · {{
-      k.raten_laufzeit or k.laufzeit }} Monate{% if k.raten_laufzeit and
-      k.raten_laufzeit > k.laufzeit %} ({{ k.laufzeit }} davon in der
-      TCO-{{ k.laufzeit }}){% endif %}{% if k.zuzahlung is not none %} · Gerät
+      k.raten_laufzeit or k.laufzeit }} Monate{% if k.zuzahlung is not none %} · Gerät
       einmalig {{ k.zuzahlung | euro }}{% endif %}{% if k.anschlusspreis is not
       none %} · Anschlusspreis {{ k.anschlusspreis | euro }}{% endif %}{% else
       %}monatlich {{ k.monatlich | euro }}{% if k.zuzahlung is not none %} ·
@@ -215,14 +216,21 @@
     Tarifbindung; nicht enthalten sind Versand, Nutzungsentgelte über den
     Tarif hinaus und jeder Bonus, der hier nicht beim Namen steht.</p>
     {% else %}
-    {# S-Q4: "Bindung" nennt nur noch, was der Vertrag bindet. #}
+    {# S-Q4: "Bindung" nennt nur noch, was der Vertrag bindet. A1: enthalten
+       sind ALLE Raten der eigenen Laufzeit - die nach Monat 24 stehen
+       als offener Betrag auf der Zeile (Pflichtzeile oben). Das Raten-Wort
+       ist dasselbe wie in der Pflichtzeile: zusammengelegte Bündelpreise
+       (1&1) zahlen Tarif und Gerät in EINER Monatsrate. #}
+    {% set raten_wort = 'Monatsraten' if k.buendel_monatlich is not none
+       else 'Geräteraten' %}
     <p class="gr-basis--duenn">Gerechnet über {{ k.laufzeit }} Monate{% if
       k.tarif_bindung and k.raten_laufzeit and k.tarif_bindung !=
       k.raten_laufzeit %} – der Tarif bindet {{ k.tarif_bindung }} Monate, die
-      Geräteraten laufen {{ k.raten_laufzeit }}{% endif %}. Enthalten sind alle
-      fest anfallenden Kosten der ersten {{ k.laufzeit }} Monate{% if
-      k.offen_nach_24 %}; was danach noch läuft, steht als offener Betrag auf
-      der Zeile{% endif %}. Nicht enthalten sind Versand,
+      {{ raten_wort }} laufen {{ k.raten_laufzeit }}{% endif %}. Enthalten sind
+      alle fest anfallenden Kosten, auch alle {{ raten_wort }} der eigenen
+      Laufzeit{% if
+      k.offen_nach_24 %}; die Raten nach Monat {{ k.laufzeit }} stehen als
+      offener Betrag auf der Zeile{% endif %}. Nicht enthalten sind Versand,
       Nutzungsentgelte über den Tarif hinaus und jeder Bonus, der hier nicht
       beim Namen steht.</p>
     {% endif %}
@@ -278,7 +286,8 @@
         ohne erhobenes Datenvolumen gehören zu keinem der drei Bänder
         (§ 7) – sie stehen hier, nicht heimlich in einem Band.</p>
         <div class="gr-bnd-kopf gr-bnd-kopf--ohne" aria-hidden="true">
-          <span>Anbieter</span><span>Tarif · Volumen</span><span>TCO-24</span>
+          <span>Anbieter</span><span>Tarif · Volumen</span><span>Kosten über
+          24 Monate</span>
           <span>Δ zu Vodafone</span><span>Gerät ohne Vertrag</span><span></span>
         </div>
         <div class="gr-bndliste">

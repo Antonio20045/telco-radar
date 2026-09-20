@@ -101,7 +101,7 @@ SPALTEN_TCO = [
     "Art", "Modell", "Speicher GB", "Anbieter", "Anbietertyp", "Tarif",
     "Band", "Zustand", "Zuzahlung EUR", "Tarif/Monat EUR", "Geräterate EUR",
     "Bündel/Monat EUR", "Laufzeit Monate", "Anschlusspreis EUR",
-    "TCO-24 EUR", "Abgerufen am", "Quelle",
+    "Kosten über 24 Monate EUR", "Abgerufen am", "Quelle",
 ]
 
 # O4: der Radar-Export - TCO-24 der Netzbetreiber UND Händler-Barpreis in
@@ -155,7 +155,7 @@ SPALTEN_MODELL_TCO = [
 # Sektionen der Seite überschrieben sind (S3). Ein zweites Wort für dieselbe
 # Art wäre ein zweites Etikett für eine Sache.
 ART_ALARM = "Preis-Alarm"
-ART_NETZ = "Netzbetreiber TCO-24"
+ART_NETZ = "Netzbetreiber Kosten über 24 Monate"
 ART_HAENDLER = "Händler Barpreis"
 
 
@@ -302,7 +302,7 @@ def radar_csv(view: dict) -> tuple[str, int]:
                 z.get("anbieter", ""), z.get("tarif", ""),
                 z.get("band_label", ""), z.get("status", ""),
                 _prozent(z.get("prozent")), _zahl(z.get("gesamt")),
-                _zahl(z.get("vf_gesamt")), "TCO-24",
+                _zahl(z.get("vf_gesamt")), "Kosten über 24 Monate",
                 z.get("grund", ""), z.get("abgerufen_am", ""),
                 z.get("quelle_url", ""),
             ])

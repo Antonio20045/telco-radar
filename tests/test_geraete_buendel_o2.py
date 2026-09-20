@@ -294,16 +294,17 @@ def test_ein_unmoeglicher_posten_kostet_nicht_die_uebrigen():
 def test_die_rechenprobe_der_tco_am_echten_satz():
     """Die Zahl, die am Ende auf der Seite steht - von Hand nachgerechnet.
 
-    1,00 EUR Zuzahlung + 24 x 34,00 EUR Geraeterate + 24 x 14,99 EUR Tarif
-    + 39,99 EUR Anschlusspreis = 1216,75 EUR. Offen bleiben nach 24 Monaten
-    zwoelf Geraeteraten = 408,00 EUR - sie fallen NICHT unter den Tisch.
+    A1 (alle Raten der eigenen Laufzeit): 1,00 EUR Zuzahlung + 24 x 14,99
+    EUR Tarif + 36 x 34,00 EUR Geraeteraten + 39,99 EUR Anschlusspreis
+    = 1624,75 EUR. Die zwoelf Raten nach Monat 24 (= 408,00 EUR) sind IN
+    der Summe enthalten und zusaetzlich als offener Betrag ausgewiesen.
     """
     buendel = aus_rohsaetzen([_rohsatz()], _bestand(), "2026-09-04").buendel[0]
     tco = tco_24(buendel)
     assert tco.belastbar
-    assert tco.gesamt == pytest.approx(1.0 + TCO_HORIZONT * (34.0 + 14.99)
+    assert tco.gesamt == pytest.approx(1.0 + TCO_HORIZONT * 14.99 + 36 * 34.0
                                        + 39.99, abs=0.005)
-    assert tco.gesamt == pytest.approx(1216.75, abs=0.005)
+    assert tco.gesamt == pytest.approx(1624.75, abs=0.005)
     assert tco.restbetrag == pytest.approx(408.0, abs=0.005)
 
 

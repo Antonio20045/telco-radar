@@ -1729,7 +1729,12 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         anbieter_typen={a.name: a.typ for a in quellen.anbieter},
         tco_historie=tco_db.historie_lage())
     try:
-        zeitreihe = geraete_zeitreihe.aufbereiten(state_dir, tco)
+        # A1: derselbe Tarifbestand wie die Tafel - die Punkte der Historie
+        # rechnet die Zeitreihe mit der HEUTIGEN Leitzahl, phasengewichtet
+        # ueber dieselben Phasen (`phasen_fuer_buendel`, ohne Widerspruch
+        # zur Messung).
+        zeitreihe = geraete_zeitreihe.aufbereiten(state_dir, tco,
+                                                  tarife=tarifbestand.je_id)
     except Exception as exc:                       # noqa: BLE001
         log.error("Zeitreihen-Aufbereitung gescheitert: %s: %s",
                   type(exc).__name__, exc)

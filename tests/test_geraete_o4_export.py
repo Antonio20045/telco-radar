@@ -34,12 +34,13 @@ WURZEL = pathlib.Path(__file__).resolve().parents[1]
 # davor, weil die Datei Bündel- UND SIM-only-Zeilen trägt; "Zustand" und
 # "Bündel/Monat" kommen dazu, weil ein erneuertes Gerät ein anderer Preis
 # ist (B1) und 1&1 einen EINEN Monatsbetrag nennt, der nicht in
-# Tarif/Monat gehört (§ 13.2 der Strategie).
+# Tarif/Monat gehört (§ 13.2 der Strategie). Die Leitzahl-Spalte heißt
+# seit A1 wie auf der Seite "Kosten über 24 Monate" (vorher "TCO-24").
 SPALTEN_TCO = [
     "Art", "Modell", "Speicher GB", "Anbieter", "Anbietertyp", "Tarif",
     "Band", "Zustand", "Zuzahlung EUR", "Tarif/Monat EUR", "Geräterate EUR",
     "Bündel/Monat EUR", "Laufzeit Monate", "Anschlusspreis EUR",
-    "TCO-24 EUR", "Abgerufen am", "Quelle",
+    "Kosten über 24 Monate EUR", "Abgerufen am", "Quelle",
 ]
 
 
@@ -117,9 +118,10 @@ def test_jede_zeile_hat_alle_spalten(tco_csv):
 
 def test_preise_tragen_ein_dezimalkomma(tco_csv):
     _, zeilen = tco_csv
-    idx = {"TCO-24 EUR": 14, "Zuzahlung EUR": 8}
-    werte = [z[idx["TCO-24 EUR"]] for z in zeilen if z[idx["TCO-24 EUR"]]]
-    assert werte, "keine einzige TCO-24 in der Datei"
+    idx = {"Kosten über 24 Monate EUR": 14, "Zuzahlung EUR": 8}
+    werte = [z[idx["Kosten über 24 Monate EUR"]] for z in zeilen
+             if z[idx["Kosten über 24 Monate EUR"]]]
+    assert werte, "keine einzige Leitzahl in der Datei"
     for w in werte:
         assert re.fullmatch(r"-?\d+,\d{2}", w), w
 
@@ -165,13 +167,13 @@ def test_die_band_spalte_ist_gefuellt_wo_ein_band_ist(tco_csv, store):
 
 
 def test_die_tco24_einer_zeile_ist_gerechnet_nach_geraten(tco_csv, store):
-    """Stichprobe: die TCO-24-Spalte trägt `tco_model.tco_24()` - dieselbe
+    """Stichprobe: die Leitzahl-Spalte trägt `tco_model.tco_24()` - dieselbe
     Funktion wie Karte, Graph und Radar, keine Export-Sonderrechnung."""
     from telco_radar.tco_model import Buendel, tco_24
     kopf, zeilen = tco_csv
     idx = {name: i for i, name in enumerate(kopf)}
     probe = next(z for z in zeilen
-                 if z[0] == "Bündel" and z[idx["TCO-24 EUR"]])
+                 if z[0] == "Bündel" and z[idx["Kosten über 24 Monate EUR"]])
 
     def _zahl(zelle: str):
         return (float(zelle.replace(".", "").replace(",", "."))
@@ -206,10 +208,10 @@ def test_die_tco24_einer_zeile_ist_gerechnet_nach_geraten(tco_csv, store):
         werte.add(erg.gesamt)
     assert len(werte) == 1, (
         f"Kandidaten der Stichprobe rechnen verschiedene TCO: {werte}")
-    assert float(probe[idx["TCO-24 EUR"]].replace(".", "")
+    assert float(probe[idx["Kosten über 24 Monate EUR"]].replace(".", "")
                  .replace(",", ".")) == pytest.approx(
         werte.pop(), abs=0.005), (
-        f"TCO-24 der Stichprobe {probe} stimmt nicht mit tco_24() überein")
+        f"Leitzahl der Stichprobe {probe} stimmt nicht mit tco_24() überein")
 
 
 def test_erneuerte_buendel_stehen_mit_ihrem_zustand_darin(tco_csv, store):
@@ -233,14 +235,14 @@ def test_erneuerte_buendel_stehen_mit_ihrem_zustand_darin(tco_csv, store):
 # --------------------------------------------------------------------------
 
 def test_der_radar_export_traegt_tco_und_haendlerzeilen(radar_csv):
-    """EINE Datei, alle Abschnitte: Preis-Alarme, Netzbetreiber (TCO-24)
-    und Händler (Gerätepreis) - getrennt über die Art-Spalte, nicht über
-    drei Dateien. E5 hat die Alarme dazu gebracht; vorher deckte die
-    Datei zwei der drei Sektionen des Radar-Reiters."""
+    """EINE Datei, alle Abschnitte: Preis-Alarme, Netzbetreiber (Kosten
+    über 24 Monate) und Händler (Gerätepreis) - getrennt über die Art-
+    Spalte, nicht über drei Dateien. E5 hat die Alarme dazu gebracht;
+    vorher deckte die Datei zwei der drei Sektionen des Radar-Reiters."""
     kopf, zeilen = radar_csv
     art_index = kopf.index("Art")
     arten = {z[art_index] for z in zeilen}
-    assert arten == {"Preis-Alarm", "Netzbetreiber TCO-24",
+    assert arten == {"Preis-Alarm", "Netzbetreiber Kosten über 24 Monate",
                      "Händler Barpreis"}, arten
 
 
@@ -255,7 +257,7 @@ def test_die_prozentzahl_ist_die_der_seite(radar_csv, radar):
     kopf, zeilen = radar_csv
     idx = {name: i for i, name in enumerate(kopf)}
     datei = sum(1 for z in zeilen
-                if z[idx["Art"]] == "Netzbetreiber TCO-24"
+                if z[idx["Art"]] == "Netzbetreiber Kosten über 24 Monate"
                 and z[idx["Abweichung %"]])
     seite = len(radar.select("#wr-abweichung tr.wr-status--vergleichbar"))
     assert seite > 0, "die Radar-Tafel zeigt keine vergleichbare Zeile"
@@ -281,7 +283,7 @@ def test_die_nicht_vergleichbaren_zeilen_stehen_mit_status_darin(
     kopf, zeilen = radar_csv
     idx = {name: i for i, name in enumerate(kopf)}
     ohne_zahl = sum(1 for z in zeilen
-                    if z[idx["Art"]] == "Netzbetreiber TCO-24"
+                    if z[idx["Art"]] == "Netzbetreiber Kosten über 24 Monate"
                     and not z[idx["Abweichung %"]])
     assert ohne_zahl > 0
     statuswerte = {z[idx["Status"]] for z in zeilen}
@@ -357,8 +359,9 @@ def test_die_alarmzeilen_stehen_als_erster_abschnitt_der_datei(radar_csv):
     idx = kopf.index("Art")
     arten_in_ordnung = [z[idx] for z in zeilen]
     erste = {a: arten_in_ordnung.index(a) for a in set(arten_in_ordnung)}
-    assert erste["Preis-Alarm"] < erste["Netzbetreiber TCO-24"] < \
-        erste["Händler Barpreis"], erste
+    assert erste["Preis-Alarm"] < erste[
+        "Netzbetreiber Kosten über 24 Monate"] < erste["Händler Barpreis"], \
+        erste
 
 
 # --------------------------------------------------------------------------

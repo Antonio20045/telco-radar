@@ -215,23 +215,43 @@ def test_jede_zeile_mit_zwei_preisen_traegt_die_paradox_zeile(tmp_path):
             "1&1-Zeile ohne Geraetepreis traegt eine Paradox-Zeile"
 
 
-def test_die_paradox_zeile_nennt_den_zeitraum_ihres_labels(tmp_path):
-    """Der Zeitraum in der Erklaerzeile ist der des TCO-Labels derselben
-    Zeile (`k.laufzeit`), keine feste Zahl - sonst logen TCO-36-Zeilen
-    ihre Erklaerzeile in die eigene Zukunft."""
+def test_die_paradox_zeile_nennt_den_zeitraum_ihrer_raten(tmp_path):
+    """Der Zeitraum in der Erklaerzeile nennt die Raten DERSELBEN Zeile,
+    keine feste Zahl. Bis A1 log das Label "TCO-36" einer Zeile die
+    Erklearzeile in die eigene Zukunft und die Kappungstropee "24
+    Monatsraten"; seit A1 ist die Pruefung zweigeteilt wie die Erklearzeile
+    selbst: der Finanzierungszweig nennt "alle N Raten plus M Monate Tarif"
+    (N = Ratenzahl des Bau-Satzes), der Barpreis-Zweig nennt "Gerät + M
+    Monate Tarif" (M = der Horizont des Labels "Kosten über 24 Monate")."""
     s = _baue(tmp_path)
+    geprueft = 0
     for zeile in _zeilen_mit_zwei_preisen(s):
         label = zeile.select_one(".gr-bnd-label")
         paradox = zeile.select_one(".gr-kk-paradox")
-        if label is None or paradox is None:
+        bau = zeile.select_one(".gr-kk-bau")
+        if label is None or paradox is None or bau is None:
             continue
-        treffer = re.search(r"TCO-(\d+)", label.get_text())
-        assert treffer, label.get_text()
         fluss = re.sub(r"\s+", " ", vorlage_text(paradox))
-        assert f"{treffer.group(1)} Monate" in fluss \
-            or f"{treffer.group(1)} Monatsraten" in fluss, (
-            f"Zeile {zeile.get('data-anbieter')}: Label "
-            f"{treffer.group(0)}, aber Erklaerzeile {fluss!r}")
+        bau_fluss = re.sub(r"\s+", " ", vorlage_text(bau))
+        raten = re.search(r"in (\d+) Raten", bau_fluss)
+        label_monate = re.search(r"über (\d+) Monate",
+                                 label.get_text(" ", strip=True))
+        assert label_monate, label.get_text(" ", strip=True)
+        monate = label_monate.group(1)
+        if "Geräteraten plus" in fluss:
+            geprueft += 1
+            assert raten, f"Bau-Satz ohne Ratenzahl: {bau_fluss!r}"
+            assert f"alle {raten.group(1)} Geräteraten" in fluss \
+                and f"{monate} Monate Tarif" in fluss, (
+                f"Zeile {zeile.get('data-anbieter')}: Bau sagt "
+                f"{raten.group(1)} Raten, Label {monate} Monate, "
+                f"Erklaerzeile {fluss!r}")
+        else:
+            geprueft += 1
+            assert f"Gerät + {monate} Monate Tarif" in fluss, (
+                f"Zeile {zeile.get('data-anbieter')}: Label "
+                f"{label_monate.group(0)}, aber Erklaerzeile {fluss!r}")
+    assert geprueft, "keine Zeile mit Erklearzeile - der Test prueft nichts"
 
 
 # --------------------------------------------------------------------------
@@ -256,13 +276,14 @@ def test_das_glossar_ist_endgueltig_weg(tmp_path):
 
 def test_der_antwort_satz_und_die_wahl_leiste_erklaeren_die_begriffe(
         tmp_path):
-    """Was das Glossar trug, steht jetzt am ORT seiner Zahl: TCO-24 im
-    Antwort-Satz aufgeloest, das Tarifband mit GB-Spanne an der Wahl -
-    keine zweite Definition derselben Worte auf der Seite."""
+    """Was das Glossar trug, steht jetzt am ORT seiner Zahl: die Leitzahl
+    mit ihrem Namen im Antwort-Satz (seit A1 "Kosten über 24 Monate" -
+    der Name ist seine eigene Aufloesung), das Tarifband mit GB-Spanne an
+    der Wahl - keine zweite Definition derselben Worte auf der Seite."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
     antwort = tafel.select_one(".gr-zr-antwort").get_text(" ", strip=True)
-    assert "über 24 Monate (TCO-24)" in antwort
+    assert "Kosten über 24 Monate" in antwort
     knoepfe = {k.get_text(" ", strip=True): k
                for k in tafel.select("#gr-zr-baender button")}
     assert any("20 GB" in text for text in knoepfe), \

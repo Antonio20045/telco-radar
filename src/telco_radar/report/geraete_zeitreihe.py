@@ -48,6 +48,7 @@ from pathlib import Path
 from ..tco_model import (Buendel, POSTEN_ANSCHLUSS, POSTEN_BUENDEL,
                          POSTEN_RATE, POSTEN_ZUZAHLUNG, TCO_HORIZONT, tco_24)
 from .geraete_tco_band import ERWARTETE_ANBIETER
+from .geraete_tco_karten import phasen_fuer_buendel
 
 log = logging.getLogger(__name__)
 
@@ -315,22 +316,22 @@ def _antwort_html(modell: dict, band: str, zeilen: list,
     beste = zeilen[0]
     if len(zeilen) == 1 and beste["anbieter"] == EIGEN:
         return (f"Beim {name} im Band {label}{klammer} führt nur Vodafone: "
-                f"<b class='gr-zr-zahl'>{_euro(beste['gesamt'])}</b> über "
-                f"24 Monate (TCO-24), Ø <b class='gr-zr-zahl'>"
+                f"<b class='gr-zr-zahl'>{_euro(beste['gesamt'])}</b> Kosten "
+                f"über 24 Monate, Ø <b class='gr-zr-zahl'>"
                 f"{_schnitt(beste)}</b> ({_esc(beste.get('tarif') or '')}"
                 f"{_gb_teil(beste)}).")
     satz = (f"Beim {name} im Band {label}{klammer} ist "
             f"{_esc(beste['anbieter'])} am günstigsten: "
-            f"<b class='gr-zr-zahl'>{_euro(beste['gesamt'])}</b> über "
-            f"24 Monate (TCO-24), Ø <b class='gr-zr-zahl'>"
+            f"<b class='gr-zr-zahl'>{_euro(beste['gesamt'])}</b> Kosten "
+            f"über 24 Monate, Ø <b class='gr-zr-zahl'>"
             f"{_schnitt(beste)}</b> ({_esc(beste.get('tarif') or '')}"
             f"{_gb_teil(beste)})")
     eigen = next((z for z in zeilen if z["anbieter"] == EIGEN), None)
     if eigen is beste:
         zweit = zeilen[1] if len(zeilen) > 1 else None
         satz = (f"Beim {name} im Band {label}{klammer} führt Vodafone: "
-                f"<b class='gr-zr-zahl'>{_euro(beste['gesamt'])}</b> über "
-                f"24 Monate (TCO-24), Ø <b class='gr-zr-zahl'>"
+                f"<b class='gr-zr-zahl'>{_euro(beste['gesamt'])}</b> Kosten "
+                f"über 24 Monate, Ø <b class='gr-zr-zahl'>"
                 f"{_schnitt(beste)}</b> ({_esc(beste.get('tarif') or '')}"
                 f"{_gb_teil(beste)})")
         if zweit is not None:
@@ -411,33 +412,28 @@ def _rechnung_html(zeilen: list) -> str:
             else _esc(beste["anbieter"]))
     datum = beste.get("abgerufen_am") or ""
     datum_teil = f", abgerufen am {_datum_de(datum)}" if datum else ""
-    return (f"So gerechnet: <code>TCO-24 = Zuzahlung + Anschlusspreis + "
-            f"24 × Tarifgrundpreis + Geräteraten bis Monat 24</code> — "
-            f"Boni bleiben außerhalb. Beleg des günstigsten Angebots: "
-            f"{link}{datum_teil}.")
+    return (f"So gerechnet: <code>Kosten über 24 Monate = Anzahlung + "
+            f"24 × Tarifgrundpreis + alle Geräteraten + "
+            f"Anschlusspreis</code> — Boni bleiben außerhalb. Beleg des "
+            f"günstigsten Angebots: {link}{datum_teil}.")
 
 
 # --------------------------------------------------------------------------
 # P1: der Rechenweg EINER Messung - Postenliste und <template>-Bloecke
 # --------------------------------------------------------------------------
 
-def _rechung(messung: dict) -> dict | None:
-    """Die Postenliste EINER Messung aus der Historien-Zeile.
+def _buendel_aus_messung(messung: dict, tarife: dict | None = None) \
+        -> Buendel | None:
+    """Das Buendel EINER Messung - aus Historien-Zeile und Stand.
 
-    Die Rechnung selbst ist `tco_24` - dieselbe reine Funktion, deren
-    Ergebnis der Sammellauf als `gesamt` eingefroren hat (alle 2562
-    Zeilen des Bestands ergeben sie als reine Summe, nachgerechnet in
-    vergleich.md und hier gegen jeden echten Testfall). Dieses Modul
-    ZERLEGT sie nur fuer die Anzeige: der `betrag` je Posten kommt aus
-    `Tco.bestandteile`, nichts wird hier neu addiert. Es gibt genau zwei
-    Preisformen (aufgeteilt: Tarif und Rate getrennt; zusammen: 1&1 nennt
-    EINEN Bündelmonatspreis) - Boni und Geraeteanteil stehen nicht in der
-    Historie und erscheinen deshalb nicht (kein Posten wird erfunden).
-
-    Die Schluessel von `bestandteile` werden EXAKT konstruiert, wie
-    `tco_24` sie schreibt - ein startswith-Praefix wuede eine stille
-    Umbenennung dort ueberhoeren; hier fehlt der Posten und die Summe
-    geht nicht auf, was der Summen-Test meldet.
+    A1 (20.09.2026): die EINE Baustelle dafuer. `_rechung` (das Panel) und
+    `_messungen` (Punkte und Auswahl) bauen denselben Satz - zwei Bauten
+    waeren zwei Rechnungen. Die Preisphasen des Tarifs kommen aus dem
+    Tarifbestand dazu (`phasen_fuer_buendel`, dieselbe Stelle wie die
+    Vodafone-Referenz und die Bündel-Anreicherung der Hauptansicht) - nur
+    ohne Widerspruch zur gemessenen Monatsrate (QA-Fix 20.09.2026), sonst
+    rechnete die Zeitreihe andere Punkte als die Karte daneben sagt.
+    None, wenn sich die Zeile nicht als Buendel lesen laesst.
     """
     satz, stand = messung["satz"], messung["stand"]
     try:
@@ -457,15 +453,60 @@ def _rechung(messung: dict) -> dict | None:
             quelle_url=satz.get("quelle_url") or "",
             abgerufen_am=satz.get("abgerufen_am") or "")
     except (ValueError, TypeError) as exc:
-        log.warning("Rechenweg: Messung %s am %s nicht als Buendel lesbar "
-                    "(%s) - kein Panel fuer diesen Punkt.",
+        log.warning("Zeitreihe: Messung %s am %s nicht als Buendel lesbar "
+                    "(%s) - kein Punkt, kein Panel.",
                     satz.get("id"), satz.get("datum"), exc)
+        return None
+    if b.tarif_id:
+        b.tarif_phasen = phasen_fuer_buendel(
+            (tarife or {}).get(b.tarif_id) or {}, b.tarif_monatlich)
+    return b
+
+
+def _wert_aus_messung(messung: dict, tarife: dict | None = None) \
+        -> float | None:
+    """Die HEUTIGE Leitzahl einer Messung - oder None, wenn sie keine hat.
+
+    A1 (20.09.2026): der Graph haengt am Stand des MARKTS, nicht am Stand
+    der Formel. Das eingefrorene `gesamt` der Historie ist die Rechnung
+    des Tages, an dem der Sammellauf sie schrieb (bis zum 20.09.2026 die
+    auf 24 Monate gekappte); Punkte, Auswahl und Panel rechnen mit der
+    Formel von HEUTE neu. Der eingefrorene Wert bleibt unangetastet in
+    der Historie stehen - Historie wird nie umgeschrieben.
+    """
+    b = _buendel_aus_messung(messung, tarife)
+    if b is None:
+        return None
+    t = tco_24(b)
+    return t.gesamt if t.belastbar else None
+
+
+def _rechung(messung: dict, tarife: dict | None = None) -> dict | None:
+    """Die Postenliste EINER Messung aus der Historien-Zeile.
+
+    Die Rechnung selbst ist `tco_24` - seit A1 die vollstaendige: alle
+    Geräteraten der eigenen Laufzeit (inklusive Restschuld nach Monat 24)
+    und den Tarif phasengewichtet, wo der Tarifbestand Phasen nennt.
+    Dieses Modul ZERLEGT sie nur fuer die Anzeige: der `betrag` je Posten
+    kommt aus `Tco.bestandteile`, nichts wird hier neu addiert. Es gibt
+    genau zwei Preisformen (aufgeteilt: Tarif und Rate getrennt; zusammen:
+    1&1 nennt EINEN Bündelmonatspreis) - Boni und Geraeteanteil stehen
+    nicht in der Historie und erscheinen deshalb nicht (kein Posten wird
+    erfunden).
+
+    Die Schluessel von `bestandteile` werden EXAKT konstruiert, wie
+    `tco_24` sie schreibt - ein startswith-Praefix wuede eine stille
+    Umbenennung dort ueberhoeren; hier fehlt der Posten und die Summe
+    geht nicht auf, was der Summen-Test meldet.
+    """
+    satz = messung["satz"]
+    b = _buendel_aus_messung(messung, tarife)
+    if b is None:
         return None
     t = tco_24(b)
     if t.gesamt is None:
         return None
     lz = b.laufzeit_monate
-    im = min(lz, TCO_HORIZONT)
 
     posten: list[dict] = []
 
@@ -479,35 +520,33 @@ def _rechung(messung: dict) -> dict | None:
     _posten(POSTEN_ANSCHLUSS, t.bestandteile.get(POSTEN_ANSCHLUSS))
     if b.buendel_monatlich is not None:
         _posten(POSTEN_BUENDEL,
-                t.bestandteile.get(f"{POSTEN_BUENDEL} ({im} von {lz})"),
-                anzahl=im, einzeln=b.buendel_monatlich,
-                klammer=f"{im} von {lz} Monaten" if lz != im else "")
+                t.bestandteile.get(f"{POSTEN_BUENDEL} über {lz} Monate"),
+                anzahl=lz, einzeln=b.buendel_monatlich)
     else:
         _posten("Tarif", t.bestandteile.get(
                     f"Tarif über {TCO_HORIZONT} Monate"),
-                anzahl=TCO_HORIZONT, einzeln=b.tarif_monatlich)
+                anzahl=TCO_HORIZONT, einzeln=b.tarif_monatlich,
+                klammer="phasengewichtet" if b.tarif_phasen else "")
         _posten(POSTEN_RATE, t.bestandteile.get(
-                    f"Geräteraten ({im} von {lz})"),
-                anzahl=im, einzeln=b.geraet_monatsrate,
-                klammer=f"{im} von {lz} Raten" if lz != im else "")
+                    f"Geräteraten über {lz} Monate"),
+                anzahl=lz, einzeln=b.geraet_monatsrate)
 
-    # Die Gegenprobe: die Posten muessen die eingefrorene Leitzahl ergeben.
-    # Tun sie es nicht, ist der DATENSATZ inkonsistent - das Protokoll
-    # sagt es, das Panel zeigt trotzdem die Zerlegung dieser einen
-    # Rechnung (nichts wird zurechtgebogen).
+    # Die Gegenprobe (A1): die Posten muessen die EIGENE Nachrechnung
+    # ergeben - nicht mehr das eingefrorene `gesamt` der Historie. Das ist
+    # der Bestand der ALTEN (gekappten) Formel und weicht seither erwartbar
+    # ab; gegen ihn geprueft, meldete der Rechenweg bei jeder aelteren
+    # Zeile einen Scheinkonflikt. Das Panel zeigt die Zerlegung der
+    # HEUTIGEN Rechnung, und die muss mit sich selbst aufgehen.
     summe = round(sum(p["betrag"] for p in posten), 2)
-    if summe != round(float(satz.get("gesamt")), 2):
-        log.warning("Rechenweg: Posten von %s am %s ergeben %s, eingefroren "
-                    "ist %s - der Punkt und das Panel weichen ab.",
-                    satz.get("id"), satz.get("datum"), summe,
-                    satz.get("gesamt"))
-    # P1-Fix (Sicht-A3, 17.09.2026): die Restschuld nach Monat 24 - die
-    # Zahl, die den TCO-24 vergleichbar macht. Sie ist KEIN neuer Posten
-    # und zaehlt NICHT in die Summe: sie verlaengert dieselbe Rate ueber
-    # den Horizont hinaus (lz - 24 Monate), dieselbe Zerlegung wie tco_24,
-    # nur den Rest der Laufzeit betraffend. Bei 24 Monaten gibt es sie
-    # nicht (None heisst: nichts offen - eine ehrliche Aussage, kein
-    # fehlender Wert).
+    if summe != t.gesamt:
+        log.warning("Rechenweg: Posten von %s am %s ergeben %s, gerechnet "
+                    "ist %s - die Zerlegung weicht von ihrer Rechnung ab.",
+                    satz.get("id"), satz.get("datum"), summe, t.gesamt)
+    # Die Restschuld nach Monat 24 (P1-Fix, Sicht-A3): sie ist IN der
+    # Summe enthalten und wird zusaetzlich ausgewiesen - "davon nach
+    # Monat 24 noch zu zahlen". Bei 24 Monaten Laufzeit gibt es sie nicht
+    # (None heisst: nichts offen - eine ehrliche Aussage, kein fehlender
+    # Wert).
     offen = None
     monatlich = (b.geraet_monatsrate if b.buendel_monatlich is None
                  else b.buendel_monatlich)
@@ -520,7 +559,8 @@ def _rechung(messung: dict) -> dict | None:
             "abgerufen_am": satz.get("abgerufen_am") or ""}
 
 
-def _rechung_html(anbieter: str, messung: dict) -> str:
+def _rechung_html(anbieter: str, messung: dict,
+                  tarife: dict | None = None) -> str:
     """EINE Messung als fertiger Block - die gesetzte Rechung.
 
     Struktur (fuer das Klick-Panel, siehe schnittstelle-rechenweg.md):
@@ -532,8 +572,12 @@ def _rechung_html(anbieter: str, messung: dict) -> str:
     Summe mit dem Label der Leitzahl, die Restschuld nach Monat 24
     (Sicht-A3) und den Beleg mit Abrufdatum DIESES Messtags (nicht von
     heute - das ist der Unterschied zum statischen „So gerechnet"-Satz).
+
+    `tarife` reicht der Tarifbestand durch dieselbe wie die Punkte: auch
+    das Panel rechnet die HEUTIGE Leitzahl, phasengewichtet wo der Stamm
+    Phasen nennt (A1).
     """
-    r = _rechung(messung)
+    r = _rechung(messung, tarife)
     if r is None or not r["posten"]:
         return ""
     a = _esc(anbieter)
@@ -563,9 +607,11 @@ def _rechung_html(anbieter: str, messung: dict) -> str:
                      f"</li>")
     teile.append("</ul>")
     teile.append(f"<p class='gr-zr-rsumme'>= <b>{_euro(r['gesamt'])}</b> "
-                 f"<span class='gr-zr-plabel'>TCO-{TCO_HORIZONT}</span></p>")
+                 f"<span class='gr-zr-plabel'>Kosten über "
+                 f"{TCO_HORIZONT} Monate</span></p>")
     if r["offen"] is not None:
-        teile.append(f"<p class='gr-zr-roffen'>danach noch offen: "
+        teile.append(f"<p class='gr-zr-roffen'>davon nach Monat "
+                     f"{TCO_HORIZONT} noch zu zahlen: "
                      f"{r['offen']['anzahl']} × {_euro(r['offen']['einzeln'])}"
                      f" = {_euro(r['offen']['betrag'])}</p>")
     url = r["quelle_url"]
@@ -597,7 +643,8 @@ def _naeherung_html() -> str:
             f"{_esc(_NAEHERUNG_KEIN_WEG)}</p></div>")
 
 
-def _rechenwege_html(messungen_paar: dict, zeilen: list) -> str:
+def _rechenwege_html(messungen_paar: dict, zeilen: list,
+                     tarife: dict | None = None) -> str:
     """Je Serie/Messung ein <template data-m=...> unter dem SVG (V1).
 
     Der Server liefert die fertige Rechung JE MESSUNG als inerte Vorlage;
@@ -613,7 +660,7 @@ def _rechenwege_html(messungen_paar: dict, zeilen: list) -> str:
         if not saetze:
             continue
         for datum in sorted(saetze):
-            inhalt = _rechung_html(anbieter, saetze[datum])
+            inhalt = _rechung_html(anbieter, saetze[datum], tarife)
             if inhalt:
                 bloecke.append(f"<template data-anb='{_esc(anbieter)}' "
                                f"data-m='{_esc(datum)}'>{inhalt}</template>")
@@ -630,18 +677,19 @@ def _rechenwege_html(messungen_paar: dict, zeilen: list) -> str:
 # Die Zeitreihe selbst - Serien und SVG
 # --------------------------------------------------------------------------
 
-def _messungen(state_dir: Path, tco: dict) -> dict:
+def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
     """{(modell, band): {anbieter: {datum: MESSUNG}}} aus der Historie.
 
     Eine MESSUNG ist das dict `{"satz": <Historien-Zeile>, "stand":
-    <Buendel-Eintrag aus geraete_tco.json>}`. Die eingefrorene Leitzahl
-    `gesamt` je (buendel_id, datum) ist der Punkt; je (Modell, Band,
-    Anbieter, Tag) zaehlt das GUENSTIGSTE Buendel (Farben sind Preis-
-    dimensionen). Ein fehlender Tag bleibt fehlend.
+    <Buendel-Eintrag aus geraete_tco.json>, "wert": <Leitzahl von HEUTE>}`.
+    Je (Modell, Band, Anbieter, Tag) zaehlt das GUENSTIGSTE Buendel (Farben
+    sind Preisdimensionen) - seit A1 nach der HEUTIGEN Rechnung (`wert`,
+    nicht dem eingefrorenen `gesamt` der Historie). Ein fehlender Tag
+    bleibt fehlend.
 
     P1 (17.09.2026): die Zeile wird GANZ behalten, nicht nur ihr `gesamt` -
     aus ihren Messfeldern baut `_rechung` die Postenliste. Bei gleichem
-    `gesamt` gewinnt die ZEILE, die zuerst gelesen wurde (strikt `<`),
+    `wert` gewinnt die ZEILE, die zuerst gelesen wurde (strikt `<`),
     exakt dieselbe Regel wie vorher nur mit dem Wert.
     """
     sku_modell: dict[str, str] = {}
@@ -685,33 +733,48 @@ def _messungen(state_dir: Path, tco: dict) -> dict:
         datum, gesamt = satz.get("datum"), satz.get("gesamt")
         if not datum or gesamt is None:
             continue
+        wert = _wert_aus_messung({"satz": satz, "stand": b}, tarife)
+        if wert is None:
+            # Die Zeile hat Posten, aber die heutige Rechnung kommt fuer
+            # sie auf keine belastbare Zahl (z. B. Tarifgrundpreis fehlt) -
+            # ein Punkt dafuer waere eine erfundene Hoehe.
+            continue
         slot = (messungen.setdefault((modell, band), {})
                 .setdefault(b.get("anbieter") or "?", {}))
         alt = slot.get(datum)
-        if alt is None or float(gesamt) < float(alt["satz"]["gesamt"]):
-            slot[datum] = {"satz": satz, "stand": b}
+        if alt is None or wert < alt["wert"]:
+            slot[datum] = {"satz": satz, "stand": b, "wert": wert}
     return messungen
 
 
-def _serien_aus(messungen: dict) -> dict:
+def _serien_aus(messungen: dict, tarife: dict | None = None) -> dict:
     """{(modell, band): {anbieter: [[iso, wert], ...]}} - die Punktliste.
 
-    Die reine Ableitung aus `_messungen`: je Datum der eingefrorene Wert.
-    Beide Formen entstehen aus EINER Lesung der Historie - zwei Lesungen
-    waeren zwei Zeitreihen, sollte die Datei zwischen ihnen wachsen.
+    Die reine Ableitung aus `_messungen`: je Datum die HEUTIGE Leitzahl
+    (`wert`; wird sie nicht mitgegeben, rechnet diese Funktion selbst -
+    derselbe Weg ueber `_wert_aus_messung`, keine zweite Formel). Beide
+    Formen entstehen aus EINER Lesung der Historie - zwei Lesungen waeren
+    zwei Zeitreihen, sollte die Datei zwischen ihnen wachsen.
     """
     fertig: dict[tuple, dict] = {}
     for schluessel, anbieter_ in messungen.items():
-        fertig[schluessel] = {
-            an: sorted((d, float(m["satz"]["gesamt"]))
-                       for d, m in werte.items())
-            for an, werte in anbieter_.items()}
+        punkte = {}
+        for an, werte in anbieter_.items():
+            reihe = []
+            for d, m in sorted(werte.items()):
+                wert = m.get("wert")
+                if wert is None:
+                    wert = _wert_aus_messung(m, tarife)
+                if wert is not None:
+                    reihe.append((d, wert))
+            punkte[an] = sorted(reihe)
+        fertig[schluessel] = punkte
     return fertig
 
 
-def _serien(state_dir: Path, tco: dict) -> dict:
+def _serien(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
     """Die Serien in der Form, die der Graph liest (siehe `_serien_aus`)."""
-    return _serien_aus(_messungen(state_dir, tco))
+    return _serien_aus(_messungen(state_dir, tco, tarife), tarife)
 
 
 def _messtage(anbieter_serien: dict) -> list[str]:
@@ -788,8 +851,8 @@ def _svg(anbieter_serien: dict, breit: bool,
     teile: list[str] = []
     teile.append(
         f"<svg class='gr-zr gr-zr--{'breit' if breit else 'schmal'}' "
-        f"viewBox='0 0 {w} {h}' role='img' aria-label='TCO-24 je Messtag "
-        f"und Anbieter: {_esc(', '.join(anbieter))}'>")
+        f"viewBox='0 0 {w} {h}' role='img' aria-label='Kosten über 24 Monate "
+        f"je Messtag und Anbieter: {_esc(', '.join(anbieter))}'>")
     schritt = _nice_step((y1 - y0) / 4)
     wert = math.ceil(y0 / schritt) * schritt
     while wert <= y1 + 0.01:
@@ -1018,7 +1081,7 @@ def _legende_html(anbieter_serien: dict) -> str:
 # Der Einstieg
 # --------------------------------------------------------------------------
 
-def aufbereiten(state_dir: Path, tco: dict) -> dict:
+def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
     """Alles, was die Hauptansicht braucht.
 
     `tco` ist die Rueckgabe von `geraete_tco_view.aufbereiten()` - dieselben
@@ -1026,12 +1089,18 @@ def aufbereiten(state_dir: Path, tco: dict) -> dict:
     Seite tragen. Dieses Modul liest ZUSAETZZLICH die rohe Historie
     (`geraete_tco_historie.jsonl`) und die Buendel-Liste
     (`geraete_tco.json`) - reine Lesearbeit, kein Schreibzugriff.
+
+    `tarife` (A1, 20.09.2026) ist der Tarifbestand (`je_id`): die Punkte
+    der Historie werden mit der HEUTIGEN Leitzahl gerechnet, und deren
+    Tarifanteil ist phasengewichtet, wo der Stamm Phasen nennt - dieselben
+    Phasen wie auf der Tafel (`phasen_fuer_buendel`, ohne Widerspruch zur
+    Messung).
     """
     state_dir = Path(state_dir)
     modelle = tco.get("modelle") or []
     band_katalog = {b["key"]: b for b in tco.get("baender_katalog") or []}
-    messungen_alle = _messungen(state_dir, tco)
-    serien_alle = _serien_aus(messungen_alle)
+    messungen_alle = _messungen(state_dir, tco, tarife)
+    serien_alle = _serien_aus(messungen_alle, tarife)
     if messungen_alle:
         log.info("Zeitreihe: %d Messungen gelesen.", sum(
             len(saetze) for pa_ in messungen_alle.values()
@@ -1140,7 +1209,7 @@ def aufbereiten(state_dir: Path, tco: dict) -> dict:
                 "svg_schmal": _svg(serien, False, beleg_je),
                 # P1: die fertige Rechung je Messung als <template>-Blöcke
                 # unter dem SVG - der Client montiert sie nur noch.
-                "rechenweg_html": _rechenwege_html(mess, zeilen),
+                "rechenweg_html": _rechenwege_html(mess, zeilen, tarife),
                 "luecke_text": _luecke_text(luecken, band_katalog),
                 "leer_text": leer,
                 "anbieter": [a for a in ANBIETER_FOLGE if serien.get(a)],

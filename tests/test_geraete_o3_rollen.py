@@ -301,16 +301,18 @@ def test_jede_belastbare_fragment_zeile_traegt_die_pflichtzeile(site):
 
 
 def test_die_sortierkoepfe_stehen_ueber_der_bandliste(geraete):
-    """C: Die Spaltenköpfe TCO-24, Δ und Anbieter der Bündeltabelle sind
-    Knöpfe — sortierbar ohne Reload; die Server-Vorsortierung nach TCO-24
-    (O2) bleibt der Ausgangszustand."""
+    """C: Die Spaltenköpfe der Bündeltabelle (Leitzahl, Δ und Anbieter)
+    sind Knöpfe — sortierbar ohne Reload; die Server-Vorsortierung nach
+    der Leitzahl (O2) bleibt der Ausgangszustand. Das Leitzahl-Etikett
+    heißt seit A1 "Kosten über 24 Monate"."""
     kopf = geraete.select_one("#gr-buendel .gr-bnd-kopf")
     assert kopf is not None
     beschriftungen = " ".join(kopf.get_text(" ", strip=True).split())
     knoepfe = kopf.select("button[data-bsort]")
     arten = {b.get("data-bsort") for b in knoepfe}
     assert arten == {"tco", "delta", "anbieter"}, arten
-    assert "TCO-24" in beschriftungen and "Anbieter" in beschriftungen
+    assert "Kosten über 24 Monate" in beschriftungen \
+        and "Anbieter" in beschriftungen
 
 
 # --------------------------------------------------------------------------

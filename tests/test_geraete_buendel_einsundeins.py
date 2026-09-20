@@ -134,10 +134,12 @@ def test_tarifname_slug_und_laufen_kommen_aus_der_antwort():
 
 
 def test_der_iphone_satz_nach_rechnung():
-    """44,99 €/Monat über 36 Monate: TCO-24 = 24 × 44,99 = 1.079,76 €,
-    danach noch offen 12 × 44,99 = 539,88 €. `tco_24()` und Handrechnung
-    müssen exakt gleich sein - die zusammen-Formel ist der Bewährungsfall
-    aus TCO24-1, hier an einem echten Satz des Bestands."""
+    """44,99 €/Monat über 36 Monate: Kosten über 24 Monate = ALLE 36 Raten
+    = 36 × 44,99 = 1.619,64 €, davon nach Monat 24 noch offen 12 × 44,99 =
+    539,88 €. `tco_24()` und Handrechnung müssen exakt gleich sein - die
+    zusammen-Formel ist der Bewährungsfall aus TCO24-1, hier an einem
+    echten Satz des Bestands. Bis A1 (20.09.2026) kappte die Rechnung bei
+    24 Raten (1.079,76) und stellte den Rest daneben."""
     s = next(x for x in _saetze() if x["speicher_gb"] == 256)
     b = Buendel(sku_id="apple-iphone-17-pro-256gb-cosmic-orange",
                 anbieter="1&1", tarif_name=s["tarif_name"],
@@ -145,9 +147,11 @@ def test_der_iphone_satz_nach_rechnung():
                 laufzeit_monate=s["laufzeit_monate"])
     tco = tco_24(b)
     assert s["buendel_monatlich"] == 44.99
-    assert tco.gesamt == pytest.approx(24 * 44.99)
+    assert tco.gesamt == pytest.approx(36 * 44.99)
     assert tco.restbetrag == pytest.approx(12 * 44.99)
-    assert tco.monatlich == pytest.approx(44.99)
+    # Ø/Monat teilt die VOLLRE Summe durch den 24-Monats-Horizont -
+    # nicht der Bündelbetrag selbst (das waere eine zweite Rechnung).
+    assert tco.monatlich == pytest.approx(round(36 * 44.99 / 24, 2))
     assert tco.belastbar
 
 
@@ -251,15 +255,16 @@ def test_die_einmalzahlung_gilt_nur_fuer_die_eigene_variante():
 
 def test_die_einmalzahlung_steht_in_der_leitzahl():
     """S2-C, Kriterium 3: die Leitzahl rechnet die Einmalzahlung MIT -
-    24 x 44,99 + 360 + 39,90 = 1.479,66 €. Ohne sie steht sie als LÜCKE
-    da (`tco_24`), nicht als 0,00 - dieselbe Regel wie beim
-    Anschlusspreis. Ohne BEIDE bleibt die Zahl, die der Anbieter nennt."""
+    A1: ALLE 36 Raten, also 36 x 44,99 + 360 + 39,90 = 2.019,54 €. Ohne
+    die Einmalzahlung steht sie als LÜCKE da (`tco_24`), nicht als 0,00 -
+    dieselbe Regel wie beim Anschlusspreis. Ohne BEIDE bleibt die Zahl,
+    die der Anbieter nennt."""
     komplett = Buendel(
         sku_id="apple-iphone-17-pro-256gb-cosmic-orange", anbieter="1&1",
         tarif_name="1&1 All-Net-Flat S", buendel_monatlich=44.99,
         geraet_zuzahlung=360.0, anschlusspreis=39.9, laufzeit_monate=36)
     tco = tco_24(komplett)
-    assert tco.gesamt == pytest.approx(24 * 44.99 + 360.0 + 39.9)
+    assert tco.gesamt == pytest.approx(36 * 44.99 + 360.0 + 39.9)
     assert POSTEN_ZUZAHLUNG not in tco.luecken
     ohne_zuzahlung = Buendel(
         sku_id="apple-iphone-17-pro-256gb-cosmic-orange", anbieter="1&1",
@@ -267,7 +272,7 @@ def test_die_einmalzahlung_steht_in_der_leitzahl():
         anschlusspreis=39.9, laufzeit_monate=36)
     tco_offen = tco_24(ohne_zuzahlung)
     assert POSTEN_ZUZAHLUNG in tco_offen.luecken
-    assert tco_offen.gesamt == pytest.approx(24 * 44.99 + 39.9)
+    assert tco_offen.gesamt == pytest.approx(36 * 44.99 + 39.9)
 
 
 # ==========================================================================
@@ -488,7 +493,8 @@ def test_aus_rohsaetzen_reicht_buendel_monatlich_durch():
     }], bestand, "2026-09-08")
     assert len(bilanz.buendel) == 1
     assert bilanz.buendel[0].buendel_monatlich == 44.99
-    assert tco_24(bilanz.buendel[0]).gesamt == pytest.approx(1079.76)
+    # A1: alle 36 Bündelraten zaehlen - 36 x 44,99 (vorher 24 x 44,99).
+    assert tco_24(bilanz.buendel[0]).gesamt == pytest.approx(1619.64)
 
 
 def test_der_zustand_kommt_als_neu_aus_dem_titelweg(katalog, farben):

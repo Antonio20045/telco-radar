@@ -75,16 +75,19 @@ def test_antwortzeile_steht_zwischen_auswahl_und_graph(tmp_path):
         text.index('class="gr-zr-graph"')
 
 
-def test_der_antwort_satz_nennt_anbieter_und_loest_tco24_auf(tmp_path):
+def test_der_antwort_satz_nennt_anbieter_und_die_leitzahl(tmp_path):
     """E2 ersetzt die zwei Leitzahlen der alten Antwortzeile durch den
     EINEN Antwort-Satz des Prototyps: Geraet, Band, bester Anbieter,
-    TCO-24 - und das Wort TCO-24 wird im Satz selbst aufgeloest (§4.9).
+    Leitzahl - deren Name im Satz selbst steht (§4.9). Seit A1 heisst die
+    Leitzahl "Kosten über 24 Monate" und braucht keine Auflösung mehr:
+    das Kuerzel TCO-24 darf im Satz nicht auftauchen.
     Der Geraetepreis ohne Vertrag steht weiterhin auf jeder Bündel-Zeile."""
     s = _baue(tmp_path)
     satz = s.select_one("#tafel-tco .gr-zr-antwort")
     assert satz is not None, "der Antwort-Satz fehlt"
     text = " ".join(satz.get_text(" ", strip=True).split())
-    assert "über 24 Monate (TCO-24)" in text, text
+    assert "Kosten über 24 Monate" in text, text
+    assert "TCO-24" not in text, text
     assert "€" in text
     assert any(a in text for a in ("o2", "Vodafone", "1&1", "congstar")), \
         f"kein Anbieter im Antwort-Satz: {text}"

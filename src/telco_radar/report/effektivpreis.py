@@ -44,6 +44,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from ..tarif_model import Preisphase, Tarif
+from ..tco_model import phasensumme as _phasensumme
 
 # Der gemeinsame Nenner jedes Vergleichs. Siehe Modul-Docstring.
 VERGLEICHSMONATE = 24
@@ -77,28 +78,12 @@ class Effektivpreis:
 def phasensumme(phasen: list[Preisphase], horizont: int) -> Optional[float]:
     """Die Summe der Monatsentgelte ueber den Horizont.
 
-    Der Kern der Rechnung. Eine Phase ohne Ende laeuft bis zum Horizont;
-    eine Phase, die darueber hinausreicht, wird gekappt.
+    A1 (20.09.2026): die Implementierung ist ins Modul der LEITZAHL gezogen
+    (`tco_model.phasensumme`) - Leitzahl und Effektivpreis teilen EINE
+    phasengewichtete Summe, sonst rechneten zwei Stellen dasselbe Blatt
+    verschieden. Diese Stelle ist der kompatible Aufrufer.
     """
-    if not phasen:
-        return None
-    summe = 0.0
-    abgedeckt = 0
-    for phase in sorted(phasen, key=lambda p: p.von_monat):
-        monate = phase.monate(horizont)
-        if monate <= 0:
-            continue
-        summe += monate * phase.betrag
-        abgedeckt += monate
-    if abgedeckt <= 0:
-        return None
-    if abgedeckt < horizont:
-        # Der Rest laeuft zum letzten bekannten Preis weiter. Das ist die
-        # vorsichtige Annahme: der letzte Preis eines Tarifs ist der
-        # Normalpreis, nicht der Rabattpreis.
-        letzter = sorted(phasen, key=lambda p: p.von_monat)[-1]
-        summe += (horizont - abgedeckt) * letzter.betrag
-    return round(summe, 2)
+    return _phasensumme(phasen, horizont)
 
 
 def _flags(tarif: Tarif) -> list[Qualitaetsflag]:

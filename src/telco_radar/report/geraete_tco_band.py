@@ -483,7 +483,8 @@ def baender_fuer_modell(modell: dict, band_je_tarif: dict,
         ergebnis.append({
             "key": key, "label": label, "bereich": bereich,
             "grafik": geraete_tco_grafik.zeitreihe(
-                reihen, messgroesse="TCO-24", klasse="gr-tcoband"),
+                reihen, messgroesse="Kosten über 24 Monate",
+                klasse="gr-tcoband"),
             "fehlend": fehlend,
             "werte": [{
                 "anbieter": anbieter,

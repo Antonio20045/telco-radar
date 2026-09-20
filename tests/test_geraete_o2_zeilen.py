@@ -180,8 +180,10 @@ def _text(el) -> str:
 
 def test_je_buendel_eine_zeile_mit_vier_kernangaben_und_aufklapper(tmp_path):
     """Jedes Bündel des Vorgabemodells ist EINE Zeile: Anbieter, Tarif mit
-    Volumen, TCO-24, Δ zur Vodafone-Referenz, Gerät ohne Vertrag - und je
-    Zeile EIN schmaler Rechenweg-Aufklapper (Entwurf `.bnd`)."""
+    Volumen, Kosten über 24 Monate, Δ zur Vodafone-Referenz, Gerät ohne
+    Vertrag - und je Zeile EIN schmaler Rechenweg-Aufklapper (Entwurf
+    `.bnd`). Das Etikett der Leitzahl heisst seit A1 "Kosten über
+    24 Monate" (vorher "TCO-24")."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
     zeilen = tafel.select("#gr-bndliste .gr-bnd")
@@ -195,10 +197,12 @@ def test_je_buendel_eine_zeile_mit_vier_kernangaben_und_aufklapper(tmp_path):
         delta = summary.select_one(".gr-bnd-delta")
         bar = summary.select_one(".gr-bnd-bar")
         for zelle, name in ((an, "Anbieter"), (tarif, "Tarif"),
-                            (tco, "TCO-24"), (delta, "Δ"), (bar, "Gerät")):
+                            (tco, "Kosten über 24 Monate"), (delta, "Δ"),
+                            (bar, "Gerät")):
             assert zelle is not None, f"Zeile ohne {name}-Zelle"
         assert "€" in tco.get_text(), "TCO-Zelle ohne Zahl"
-        assert "TCO-24" in tco.get_text(), "TCO-Zelle ohne Laufzeit-Etikett"
+        assert "Kosten über 24 Monate" in tco.get_text(), \
+            "TCO-Zelle ohne Leitzahl-Etikett"
         assert z.select_one(".gr-bnd-rw") is not None, \
             "Zeile ohne Rechenweg-Montageziel"
         assert z.select_one("template.gr-bnd-rw-vorlage .gr-tposten li") \

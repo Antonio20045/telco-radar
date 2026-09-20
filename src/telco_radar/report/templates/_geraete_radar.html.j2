@@ -16,7 +16,8 @@
                          vergleichbare Neugeräte, ohne Vertrag).
      2. PREIS-ALARME   – Barpreis ohne Vertrag, vier Warnstufen
      3. ABWEICHUNG     – DIE MODELL-LISTE (S2): je Modell die stärkste
-                         TCO-24-Abweichung zu Vodafone, alle Zeilen,
+                         Abweichung der Kosten über 24 Monate zu
+                         Vodafone, alle Zeilen,
                          sortierbar, mit Sprung in den Graphen
      4. HÄNDLER        – Gerätepreis ohne Finanzierung als eigener,
                          gleichwertiger Abschnitt
@@ -162,7 +163,8 @@
        lebt im Vergleichs-Reiter (E2-Zeitreihe, „Barkauf + Tarif"). #}
     <div class="gr-scroll">
     <table class="src-table wr-tabelle">
-      <thead><tr><th>Anbieter</th><th>Tarif</th><th class="num">TCO-24</th>
+      <thead><tr><th>Anbieter</th><th>Tarif</th><th class="num">Kosten über
+        24 Monate</th>
         <th>Band</th><th class="num">Abweichung</th><th>Beleg</th></tr></thead>
       <tbody>
         {% for s in z.gruppe_zeilen %}
@@ -419,8 +421,9 @@ den günstigsten Anbieter, der sie führt.</p>
   {% set spitze_id = ml.sichtbar[0].id
      if (ml.sichtbar and ml.sichtbar[0].prozent is not none) else '' %}
   <details class="gr-auf">
-    <summary>Alle {{ ml.gesamt }} Modell-Zeilen öffnen (TCO-24)</summary>
-    <p class="gr-erklaer">Gesamtkosten über 24 Monate (TCO-24): jede Zeile
+    <summary>Alle {{ ml.gesamt }} Modell-Zeilen öffnen (Kosten über
+      24 Monate)</summary>
+    <p class="gr-erklaer">Kosten über 24 Monate: jede Zeile
     ein Modell, gerechnet gegen Vodafone im selben Tarifband (Klein/Mittel/
     Groß nach Datenvolumen). Oben stehen die Geräte, bei denen Vodafone am
     stärksten zurückliegt; ein Klick auf eine Zeile zeigt alle Anbieter des
@@ -431,7 +434,8 @@ den günstigsten Anbieter, der sie führt.</p>
        JEDER Detailzeile - 48- bis 60-mal dieselbe Formel. Der VF-Betrag
        steht je Anbieter-Zeile selbst („Band Klein · VF 1.949,80 €"),
        diese Legende sagt, was er bedeutet. #}
-    <p class="wr-basis-legende">Abweichung je Zeile = Wettbewerber-TCO-24
+    <p class="wr-basis-legende">Abweichung je Zeile = Wettbewerber-Kosten
+    über 24 Monate
     gegen die Vodafone-Karte im selben Tarifband; „VF" in den Detailzeilen
     nennt diese Basis.</p>
   <div class="gr-alarm-scroll">
@@ -445,7 +449,7 @@ den günstigsten Anbieter, der sie führt.</p>
       <th scope="col"><button type="button" class="gr-sort"
         data-sort="anbieter" data-art="text">Wettbewerber</button></th>
       <th scope="col" class="num"><button type="button" class="gr-sort"
-        data-sort="gesamt" data-art="zahl">TCO-24</button></th>
+        data-sort="gesamt" data-art="zahl">Kosten über 24 Monate</button></th>
       <th scope="col" class="num"><button type="button" class="gr-sort"
         data-sort="vf" data-art="zahl">Vodafone</button></th>
       <th scope="col"><button type="button" class="gr-sort"

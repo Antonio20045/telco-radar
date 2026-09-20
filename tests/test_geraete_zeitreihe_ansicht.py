@@ -12,8 +12,9 @@ entwurf-v2.html, DOM-bewiesen) als SERVERSEITIGE Produktion:
     mit Etikett "unser Angebot"; Beleg-Link je Anbieter am Linienende.
   - Startzustand = Modell x Band mit den meisten Anbietern, dann Punkten -
     AUS DEN DATEN gerechnet, nichts hardcodiert.
-  - Antwort-Satz loest "TCO-24" selbst auf; EIN Lueckensatz mit Namen und
-    Alternativ-Baendern samt Betrag (Antonio 9b.7 / §4.5).
+  - Antwort-Satz nennt die Leitzahl beim Namen („Kosten über 24 Monate");
+    EIN Lueckensatz mit Namen und Alternativ-Baendern samt Betrag
+    (Antonio 9b.7 / §4.5).
 
 Alle Zahlen entstehen in Python; der Client setzt nur fertige Knoten.
 """
@@ -66,25 +67,31 @@ _BUENDEL = [
     ("samsung-galaxy-s26", 256, "Telekom", "tk:klein", "MagentaMobil S", 10, 19.0),
 ]
 
-# (buendel-index aus _BUENDEL, farb-suffix, tag, gesamt) - die Historie.
+# (buendel-index aus _BUENDEL, farb-suffix, tag, geräterate) - die Historie.
 # o2 traegt an 2026-09-13 ZWEI Saetze (Farben) - das guenstigste gewinnt.
+# Seit A1 rechnet die Zeitreihe jeden Punkt mit der HEUTIGEN Formel aus den
+# Rohfeldern der Zeile neu; die Fixture schreibt deshalb JEDE Zeile mit
+# ihrer eigenen Rate, und `gesamt` entsteht aus derselben Formel wie die
+# Aufbereitung sie rechnet (1 EUR Zuzahlung + 24x20 EUR Tarif + 24x Rate).
+# Wuerden alle Zeilen dieselbe Rate tragen, kollabierte jede Serie auf
+# EINEN Betrag und Minimum, Front und Delta praegten nichts mehr.
 _HISTORIE = [
-    (0, "", "2026-09-12", 1200.00),
-    (0, "", "2026-09-13", 1210.00),
-    (0, "-blau", "2026-09-13", 1190.00),   # zweite Farbe: Minimum 1190.00
-    (0, "", "2026-09-14", 1180.00),
-    (1, "", "2026-09-12", 1250.00),
+    (0, "", "2026-09-12", 18.0),
+    (0, "", "2026-09-13", 17.0),
+    (0, "-blau", "2026-09-13", 19.0),   # zweite Farbe: verworfen (937,00)
+    (0, "", "2026-09-14", 18.0),
+    (1, "", "2026-09-12", 22.0),
     # congstar fehlt am 13. UND 14. nicht - aber der 13. fehlt: Luecke.
-    (1, "", "2026-09-14", 1240.00),
-    (1, "", "2026-09-15", 1230.00),
-    (2, "", "2026-09-12", 1300.00),
-    (2, "", "2026-09-13", 1290.00),
-    (2, "", "2026-09-14", 1295.00),
+    (1, "", "2026-09-14", 22.0),
+    (1, "", "2026-09-15", 22.0),
+    (2, "", "2026-09-12", 26.0),
+    (2, "", "2026-09-13", 25.5),
+    (2, "", "2026-09-14", 25.75),
     # 1&1: nur EIN Messtag - ein Punkt, keine Linie.
-    (3, "", "2026-09-12", 1100.00),
-    (4, "", "2026-09-12", 1350.00),
-    (4, "", "2026-09-13", 1345.00),
-    (5, "", "2026-09-12", 1400.00),
+    (3, "", "2026-09-12", 15.0),
+    (4, "", "2026-09-12", 20.0),
+    (4, "", "2026-09-13", 19.5),
+    (5, "", "2026-09-12", 15.0),
 ]
 
 
@@ -150,16 +157,17 @@ def _baue(tmp_path: pathlib.Path):
         encoding="utf-8")
 
     zeilen = []
-    for idx, suffix, tag, gesamt in _HISTORIE:
+    for idx, suffix, tag, rate in _HISTORIE:
         b = buendel[idx]
         farbe = "schwarz" + suffix
         zeilen.append({"id": b["id"] + suffix, "datum": tag,
                        "tarif_id": b["tarif_id"],
                        "tarif_id_guete": "hoch", "tarif_monatlich": 20.0,
-                       "geraet_zuzahlung": 1.0, "geraet_monatsrate": 15.0,
+                       "geraet_zuzahlung": 1.0, "geraet_monatsrate": rate,
                        "laufzeit_monate": 24, "anschlusspreis": 0.0,
                        "quelle_url": b["quelle_url"], "abgerufen_am": tag,
-                       "zustand": "neu", "gesamt": gesamt,
+                       "zustand": "neu",
+                       "gesamt": round(1.0 + 24 * 20.0 + 24 * rate, 2),
                        "sku_id": b["sku_id"].replace("schwarz", farbe)})
     (state / "geraete_tco_historie.jsonl").write_text(
         "\n".join(json.dumps(z) for z in zeilen) + "\n", encoding="utf-8")
@@ -243,13 +251,21 @@ def test_zwei_buendel_desselben_tages_zaehlen_das_minimum(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "klein"))
     svg = paar["svg_breit"]
     suppe = __import__("bs4").BeautifulSoup(svg, "html.parser")
-    # o2 am 13.9.: 1190.00 statt 1210.00 - der Punkt sitzt auf der hoeheren
-    # Y-Koordinate (kleinerer Betrag), und der Wert des LETZTEN Punkts
-    # (1180.00 am 14.9.) steht als Label.
+    # o2 am 13.9. in ZWEI Farbsaetzen: 17 EUR Rate (889,00 EUR) und 19 EUR
+    # (937,00 EUR) - das guenstigste gewinnt. Der 13.9.-Punkt sitzt damit
+    # WEITER UNTEN im Bild als der vom 12.9. (18 EUR = 913,00 EUR), hat
+    # also die GROESSERE Y-Koordinate; haette der 937,00-er Satz gewonnen,
+    # laege er darueber. Der verworfene Betrag steht nie als Label, der
+    # des LETZTEN Punkts (913,00 am 14.9.) steht als Label.
     werte = {t.get_text(strip=True)
              for t in suppe.select("text.gr-zr-wert")}
-    assert "1.180 €" in werte
-    assert "1.210 €" not in werte
+    assert "913 €" in werte
+    assert "937 €" not in werte
+    o2 = sorted((float(c["cx"]), float(c["cy"]))
+                for c in suppe.select("circle.gr-zr-punkt")
+                if c.get("fill") == "#0019a5")
+    assert len(o2) == 3, "o2 traegt drei Messtage - sonst prueft der Test nichts"
+    assert o2[1][1] > o2[0][1], o2
 
 
 def test_unter_zwei_punkten_gibt_es_keinen_linienzug(ansicht):
@@ -313,9 +329,14 @@ def test_die_y_achse_traegt_betraege_als_ticks(ansicht):
 # Antwort-Satz, Messtag-Zeile, Lueckensatz
 # --------------------------------------------------------------------------
 
-def test_der_antwort_satz_loest_tco24_selbst_auf(ansicht):
+def test_der_antwort_satz_nennt_die_leitzahl_beim_namen(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "klein"))
-    assert "über 24 Monate (TCO-24)" in paar["antwort_html"]
+    text = __import__("re").sub(r"<[^>]+>", "", paar["antwort_html"])
+    # Seit A1 ist der Name der Leitzahl seine eigene Aufloesung: „Kosten
+    # über 24 Monate" steht im Satz, das Kuerzel TCO-24 taucht nirgends
+    # mehr auf der Seite auf.
+    assert "Kosten über 24 Monate" in text, text
+    assert "TCO-24" not in text, text
 
 
 def test_der_antwort_satz_nennt_geraet_band_anbieter_zahl_und_schnitt(
@@ -634,13 +655,16 @@ def test_die_karte_traegt_preis_und_anbieter_punkte(ansicht):
     assert mittel["ab"] == "961,00 €"
     assert mittel["punkte_html"].count("<i") == 1
     assert mittel["anbieter_text"] == "congstar"
-    assert mittel["delta_text"] == "↓ −5 € in 1 Tag"
+    assert mittel["delta_text"] == "↓ −12 € in 1 Tag"
 
 
 def test_das_karten_delta_ist_die_preisfront_der_historie(ansicht_state):
     """Gegenrechnung aus der ROHEN Historie (nicht aus der Aufbereitung):
     die Front des Bandes klein ist am 12.9. das Minimum ueber alle Anbieter
-    (1&1: 1100) und am 15.9. congstar 1230 - also +130 in 3 Tagen."""
+    (1&1: 841) und am 15.9. congstar 1009 - also +168 in 3 Tagen. Die
+    Fixture schreibt ihr eingefrorenes `gesamt` in derselben Formel, mit
+    der die Aufbereitung die Punkte neu rechnet (A1) - darum stimmen rohe
+    Gegenrechnung und Karte ohne Ausnahme ueberein."""
     ansicht, state = ansicht_state
     k = ansicht["kacheln"][0]
     assert k["id"] == "apple-iphone-17-pro-256"
@@ -655,9 +679,9 @@ def test_das_karten_delta_ist_die_preisfront_der_historie(ansicht_state):
             front[datum] = satz["gesamt"]
     tage = sorted(front)
     delta = round(front[tage[-1]] - front[tage[0]], 2)
-    assert delta == 130.0 and (tage[-1] == "2026-09-15"
+    assert delta == 168.0 and (tage[-1] == "2026-09-15"
                                and tage[0] == "2026-09-12")
-    assert k["baender"]["klein"]["delta_text"] == "↑ +130 € in 3 Tagen"
+    assert k["baender"]["klein"]["delta_text"] == "↑ +168 € in 3 Tagen"
     assert k["baender"]["klein"]["delta_richtung"] == "steigt"
 
 

@@ -80,9 +80,10 @@ def _naeherungs_modell():
     - siehe Handover) - eine echte Naeherungskarte (`naeherung: True`) gibt
     es dort also nicht mehr. Ohne diese gestellte Fixture wuerde die
     Naeherungsrechnung selbst gar nicht mehr geprueft. Zahlen von Hand
-    nachgerechnet (siehe outputs/phase-tco24-1-2026-09-08.md):
-        o2:       1,00 Zuzahlung + 24×30,00 Rate + 24×24,99 Tarif = 1.320,76
-                  (Rest: 12×30,00 = 360,00, weil 36 Raten laufen)
+    nachgerechnet (siehe outputs/phase-tco24-1-2026-09-08.md);
+    A1 (20.09.2026) rechnet alle 36 Raten in die Leitzahl:
+        o2:       1,00 Zuzahlung + 36×30,00 Rate + 24×24,99 Tarif = 1.680,76
+                  (offen nach Monat 24: 12×30,00 = 360,00)
         Vodafone: 899,90 Barpreis + 24×19,99 Tarif (Mobil XS, guenstigster
                   von zwei Tarifen) = 1.379,66 - GERECHNET, kein Angebot
     """
@@ -221,12 +222,19 @@ def test_antwortzeile_nennt_je_metrik_die_guenstigste_zahl_mit_anbieter(bestand)
     congstars 1.093,00 EUR (unveraendert, eigene Messung) fuehren. Genau
     dafuer ist dieser Ticket da: die unvollstaendige Zahl unterbot
     vorher ein echtes Angebot.
+
+    A1 (20.09.2026): die Kappung ist zurueckgenommen - ALLE Geräteraten
+    der eigenen Laufzeit stehen in der Leitzahl. congstars Pflichtfall
+    (Allnet Flat XS zum iPhone 17 Pro: 1 + 24×15,00 + 36×30,50 + 0)
+    fuehrt jetzt mit 1.459,00 EUR, 1&1 liegt bei 36×44,99 + 360 + 39,90
+    = 2.019,54 EUR. Der bis dahin gueltige congstar-Wert 1.093,00 EUR
+    (24 statt 36 Raten) ist genau die Zahl, die nie wieder fuehren darf.
     """
     modell = _modell(bestand, "apple-iphone-17-pro-256")
     antwort = modell["antwort"]
     assert antwort["geraetepreis"] == 1179.0
     assert antwort["geraetepreis_anbieter"] == "Saturn"
-    assert antwort["tarif_gesamt"] == 1093.0
+    assert antwort["tarif_gesamt"] == 1459.0
     assert antwort["tarif_anbieter"] == "congstar"
     # Gegenprobe: die zwei Gewinner sind wirklich verschiedene Anbieter -
     # sonst prueft der Test nur eine Zahl, nicht die Unabhaengigkeit der
@@ -318,16 +326,17 @@ def test_antwortzeile_der_tarifgewinner_ist_kein_naeherungsangebot(bestand):
 def test_die_rechenprobe_steht_auf_der_karte(bestand):
     """iPhone 17 Pro 256 GB bei o2 - dieselben Betraege wie im Rechenkern.
 
-    TICKET TCO24-1 (08.09.2026): die Leitzahl ist IMMER TCO-24
-    (AUFTRAG_GERAETESEITE.md §3). o2s Geraeteraten laufen 36 Monate; die
-    Leitzahl `gesamt` kappt sie auf 24 (720,00 statt 1.080,00 EUR
-    Ratenanteil), der Rest steht als `offen_nach_24` daneben und veraendert
-    weder `gesamt` noch die Sortierung."""
+    A1 (20.09.2026): die Leitzahl heisst "Kosten über 24 Monate" und
+    rechnet ALLE Geräteraten der eigenen Laufzeit. o2s Raten laufen 36
+    Monate: 1.080,00 statt 720,00 EUR Ratenanteil, `gesamt` steigt auf
+    1.794,76 EUR; die 12 Raten nach Monat 24 (438,00 EUR) stehen als
+    `offen_nach_24` daneben und `gezahlt_nach_24` traegt die alte
+    24-Monates-Summe weiter."""
     karte = [k for k in _modell(bestand, "apple-iphone-17-pro-256")["karten"]
              if k["anbieter"] == "o2"][0]
-    assert karte["label"] == "TCO-24"
-    assert karte["gesamt"] == 1356.76
-    assert karte["schnitt_monat"] == 56.53
+    assert karte["label"] == "Kosten über 24 Monate"
+    assert karte["gesamt"] == 1794.76
+    assert karte["schnitt_monat"] == 74.78
     assert karte["gezahlt_nach_24"] == 1356.76
     assert karte["offen_nach_24"] == 438.00
     assert karte["offene_raten"] == 12
@@ -446,7 +455,7 @@ def test_die_referenzkarte_traegt_ihre_eigene_bindung():
     modell = _naeherungs_modell()
     karte = [k for k in modell["karten"] if k["naeherung"]][0]
     ref = modell["referenz"]
-    assert karte["label"] == "TCO-24"
+    assert karte["label"] == "Kosten über 24 Monate"
     assert karte["laufzeit"] == karte["tarif_bindung"] == ref["tarif_monate"] == 24
     assert karte["fenster"] == ref["monate"] == 24
     assert not any("36" in p["name"] for p in karte["bestandteile"])
@@ -465,9 +474,12 @@ def test_die_spanne_des_bandes_ist_die_der_angebote():
     ref = [k for k in modell["karten"] if k["naeherung"]][0]
     angebote = [k["gesamt"] for k in modell["karten"]
                 if k["belastbar"] and not k["naeherung"] and k["vergleichbar"]]
-    assert modell["spanne"] == [min(angebote), max(angebote)] == [1320.76, 1320.76]
-    # Der Gegenfall tritt ein: die Referenz laege ausserhalb der Spanne.
-    assert ref["gesamt"] > max(angebote)
+    assert modell["spanne"] == [min(angebote), max(angebote)] == [1680.76, 1680.76]
+    # A1: die Referenz (1.379,66, Barkauf plus Tarif) liegt seit der
+    # Vollrechnung UNTER dem einzigen Angebot (1.680,76) - und taucht
+    # trotzdem nicht in der Spanne auf. Vorher lag sie darueber; beide
+    # Lagen beweisen denselben Satz: die Spanne meint die Angebote.
+    assert ref["gesamt"] < max(angebote)
 
 
 def test_die_beschriftung_der_referenz_aendert_kein_delta(bestand):
@@ -487,12 +499,16 @@ def test_die_beschriftung_der_referenz_aendert_kein_delta(bestand):
 
     TICKET TCO24-1 (08.09.2026): mit der Kappung auf 24 Monate sind auch
     die Deltas selbst neu gemessen (o2s Geraeteraten stecken jetzt nur noch
-    mit 24 statt 36 Monaten in `gesamt`)."""
+    mit 24 statt 36 Monaten in `gesamt`).
+
+    A1 (20.09.2026): die Kappung ist zurueckgenommen - die Deltas rechnen
+    wieder mit ALLEN Geraeteraten (und Referenz-Buendeln ihrer eigenen
+    Laufzeit), beide Werte sind neu gemessen."""
     def delta(mid, anbieter):
         return [k["delta"] for k in _modell(bestand, mid)["karten"]
                 if k["anbieter"] == anbieter and k["zustand"] == "neu"][0]
-    assert delta("apple-iphone-17-pro-256", "o2")["betrag"] == -203.04
-    assert delta("apple-iphone-15-128", "o2")["betrag"] == -355.05
+    assert delta("apple-iphone-17-pro-256", "o2")["betrag"] == -161.04
+    assert delta("apple-iphone-15-128", "o2")["betrag"] == -349.05
     for modell in bestand["modelle"]:
         ref = modell["referenz"]
         if not ref or ref.get("aus_buendel"):
@@ -549,16 +565,18 @@ def test_kein_g1_zeigt_eine_36_monats_bindungsgruppe(bestand):
     assert geprueft, "kein Modell mit G1-Grafik - der Test prueft nichts"
 
 
-def test_jede_belastbare_karte_traegt_das_label_tco24(bestand):
-    """Abnahmekriterium 1: die einzige TCO-Hauptkennzahl ist TCO-24 - auf
-    JEDER Karte des echten Bestands, nicht nur am Vorgabemodell."""
+def test_jede_belastbare_karte_traegt_das_label_der_leitzahl(bestand):
+    """Abnahmekriterium 1: die einzige TCO-Hauptkennzahl ist die Leitzahl
+    "Kosten über 24 Monate" - auf JEDER Karte des echten Bestands, nicht
+    nur am Vorgabemodell. (Bis A1 hiess dasselbe Etikett "TCO-24" - der
+    Funktionsname ist mit dem Etikett gewandert.)"""
     geprueft = 0
     for modell in bestand["modelle"]:
         for karte in modell["karten"]:
             if not karte["belastbar"]:
                 continue
             geprueft += 1
-            assert karte["label"] == "TCO-24", \
+            assert karte["label"] == "Kosten über 24 Monate", \
                 f"{modell['id']}/{karte['anbieter']}: {karte['label']!r}"
             assert karte["laufzeit"] == 24
     assert geprueft, "kein belastbares Angebot - der Test prueft nichts"
@@ -839,7 +857,7 @@ def test_ein_buendel_ohne_listung_steht_unter_seinem_katalognamen():
     assert modell["titel"] == "Apple iPhone 16 Pro Max 256 GB"
     assert modell["hersteller"] == "Apple"
     o2 = [k for k in modell["karten"] if k["anbieter"] == "o2"][0]
-    assert o2["belastbar"] and o2["label"] == "TCO-24"
+    assert o2["belastbar"] and o2["label"] == "Kosten über 24 Monate"
     assert o2["zustand"] == "unbekannt", "keine Listung belegt keinen Zustand"
 
 

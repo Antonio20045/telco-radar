@@ -147,8 +147,8 @@ def balken(modell: dict) -> str:
     teile = [
         f'<svg class="gr-g1" viewBox="0 0 {BREITE} {hoehe}" '
         f'width="100%" height="{hoehe}" role="img" '
-        f'aria-label="TCO für {_t(name)} je Anbieter">',
-        f'<title>TCO für {_t(name)} je Anbieter</title>',
+        f'aria-label="Kosten über 24 Monate für {_t(name)} je Anbieter">',
+        f'<title>Kosten über 24 Monate für {_t(name)} je Anbieter</title>',
     ]
 
     y = 0.0

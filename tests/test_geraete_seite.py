@@ -820,11 +820,14 @@ def test_der_katalog_ist_eine_tabelle_auf_modellebene(tmp_path):
     s = _suppe(site, "geraete.html")
     # Kind-Selektor: die Aufklapper-Tabellen der Modellzeilen liegen im
     # SELBEN tbody - ein Nachfahren-Selektor wuerde ihre Koepfe (Händler,
-    # Farbe, ...) mitzaehlen.
-    kopf = [th.get_text(strip=True)
+    # Farbe, ...) mitzaehlen. Das Leitzahl-Etikett bricht die Vorlage in
+    # zwei Zeilen ("Kosten über / 24 Monate") - gezaehlt wird der
+    # normalisierte Text, nicht der Umbruch.
+    kopf = [" ".join(th.get_text(" ", strip=True).split())
             for th in s.select("#gr-katalogtabelle > thead th")]
     assert kopf == ["Modell", "Einzelgerätepreis", "Händler", "Spanne",
-                    "TCO-24", "Ø €/Monat", "Δ zu Vodafone", "Band"], kopf
+                    "Kosten über 24 Monate", "Ø €/Monat", "Δ zu Vodafone",
+                    "Band"], kopf
 
     zeilen = s.select("#gr-katalogtabelle .gr-k-zeile")
     # Eine Zeile je MODELL des BESTANDS - das ist der ganze Punkt der

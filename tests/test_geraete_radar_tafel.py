@@ -487,10 +487,11 @@ def test_je_modellzeile_ein_sprung_in_den_graphen(tmp_path):
 
 def test_lueckenzeilen_sagen_ihren_grund(tmp_path):
     """Eine Zeile ohne Zahl ist keine leere Zeile: sie sagt, WARUM kein
-    Vergleich steht (kein Vodafone-TCO, kein gemeinsames Band)."""
+    Vergleich steht (keine Vodafone-Kosten über 24 Monate erhoben, kein
+    gemeinsames Band)."""
     suppe = _suppe(tmp_path)
     text = _text(suppe.select_one("#wr-abweichung"))
-    assert "kein Vodafone-TCO" in text, \
+    assert "keine Vodafone-Kosten über 24 Monate erhoben" in text, \
         "der Fall Xiaomi (nur o2) nennt keinen Grund"
     assert "kein gemeinsames Band" in text, \
         "der Fall Pixel (VF klein, o2 gross) nennt keinen Grund"
