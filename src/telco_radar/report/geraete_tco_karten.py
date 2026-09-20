@@ -43,6 +43,7 @@ verglichen ausser `Ø/Monat` (A5.3).
 """
 from __future__ import annotations
 
+import datetime as _dt
 import logging
 import re
 from datetime import date as _datum
@@ -82,6 +83,92 @@ log = logging.getLogger(__name__)
 ANBIETER_REIHENFOLGE = ("Telekom", "1&1", "o2", "Vodafone")
 
 EIGEN = "vodafone"
+
+# A3 (STRATEGIE GERAETE V4, 20.09.2026): Wann ein Bündel als ALT gilt.
+# Ein Angebot, dessen `abgerufen_am` älter als diese Zahl Tage ist, fällt
+# aus „ab“-Preis, Delta und Ranking - die Zeile bleibt, ausgegraut, mit
+# Abrufdatum sichtbar (harte Regel 9). Der Deckel ist eine benannte
+# Konstante hier im Modul (Clean Code 8) und wird nie als Zahl in eine
+# Vorlage geschrieben.
+#
+# AUFTRAG (Antonio, 20.09.2026): 3 Tage - „älter als 3 Tage fällt aus
+# ab-Preis, Delta und Ranking; Tag-3-Grenzfall bleibt drin“. Die
+# Gegenargumente aus der Datenlage stehen hier, weil sie weiter gelten
+# (data/state/geraete_db.json, `anbieter.*.termine`, Stand 20.09.2026):
+# der Telekom-Leser misst im 4-6-Tage-Rhythmus (05./06./08./09./15.09.),
+# ElectronicPartner und Medimax im Wochenrhythmus (06. -> 12. -> 19.09.)
+# - ihre Bündel gelten mit 3 Tagen regelmäßig als alt. Das ist keine
+# Fehlmessung der Grenze, sondern der ANTRIEB für P1: Telekom soll
+# täglich gelesen werden. Bis dahin ist der ausgegraute Stand mit Datum
+# die ehrliche Aussage (Regel 9), kein falscher Tagespreis.
+ALT_AB_TAGEN = 3
+
+
+def alter_in_tagen(abgerufen_am: str, heute: str) -> Optional[int]:
+    """Tage zwischen Abruf und heute - oder None, wenn eins der beiden
+    Daten fehlt oder unlesbar ist.
+
+    Vergleichsbasis ist `abgerufen_am` JE BÜNDEL. Das Datum wird nie
+    geraten (Clean Code 4): fehlt es, ist das Alter „unbekannt“ und
+    fällt aus jedem Vergleich heraus - `ist_frisch` behandelt unbekannt
+    wie alt, niemals wie frisch.
+    """
+    if not abgerufen_am or not heute:
+        return None
+    try:
+        return (_dt.date.fromisoformat(heute)
+                - _dt.date.fromisoformat(abgerufen_am)).days
+    except ValueError:
+        return None
+
+
+def ist_frisch(abgerufen_am: str, heute: str) -> bool:
+    """DIE EINE Definition von „frisch“ (Clean Code 7).
+
+    Anzeige (Marke, Ausgrauung), Auswahl (Antwortzeile, Spanne, Bänder,
+    Zeitreihe, Katalog) und Sortierung lesen alle diese Funktion - eine
+    zweite Frische-Liste wäre zwei Listen, die auseinanderlaufen.
+    Ohne `heute` (leerer String) altert nichts: das ist der Modus der
+    Tests ohne Datum und jeder Aufruf, der bewusst nicht altert.
+    """
+    if not heute:
+        return True
+    alter = alter_in_tagen(abgerufen_am, heute)
+    return alter is not None and alter <= ALT_AB_TAGEN
+
+
+def kurz_datum(iso: str) -> str:
+    """„2026-09-16“ -> „16.09.2026“; „“, wenn kein lesbares Datum steht.
+
+    Das kurze Format (kein Monatsname) ist bewusst: `strftime('%B')`
+    hinge an der Locale des Rechners und würde in Actions englische
+    Monate schreiben. `html._fmt_date_de` umgeht das mit einer Tabelle -
+    für die Marken und Hinweise der Alterung reicht die Ziffernform.
+
+    S3b (Diff-Prüfung 21.09.2026): `None` (JSON-null aus einem halben
+    Schreibvorgang des Stores) ist KEIN Crash, sondern „unlesbar“ - ein
+    fehlender Wert wird nie geraten und wirft die Seite nicht in den
+    Notzustand.
+    """
+    try:
+        d = _dt.date.fromisoformat(str(iso or ""))
+    except (ValueError, TypeError):
+        return ""
+    return f"{d.day:02d}.{d.month:02d}.{d.year}"
+
+
+def alt_marke_fuer(abgerufen_am: str) -> str:
+    """Der Chip an der alten Zeile: „kein aktueller Stand seit …“.
+
+    Ohne lesbares Datum heißt es „unbekannt“ - nie heute, nie geraten.
+    Öffentlich, weil dieselbe Marke seit der A3-Nachbesserung auch der
+    Katalog an seinen ab-Preis hängt (Clean Code 1: ein Satz, eine
+    Stelle) - der Bündelzeile und der Katalogzeile steht derselbe Text.
+    """
+    kurz = kurz_datum(abgerufen_am)
+    if kurz:
+        return f"kein aktueller Stand seit {kurz}"
+    return "kein aktueller Stand – Abrufdatum unbekannt"
 
 # Das Geraet der Leitfrage aus dem Lastenheft (Abschnitt A). Es ist die
 # Vorgabe des Auswahlfeldes, solange es mit zwei Anbietern rechenbar ist.
@@ -479,7 +566,8 @@ def _bestandteile_mit_kategorie(kennzahl) -> list:
 
 
 def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
-           katalog, geraet_je_sku: dict, zustand: str = "unbekannt") -> dict:
+           katalog, geraet_je_sku: dict, zustand: str = "unbekannt",
+           heute: str = "") -> dict:
     """Aus einem Buendel wird eine Karte - gerechnet wird in `tco_model`.
 
     Diese Funktion addiert keinen Euro. Sie holt die Kennzahl, haengt die
@@ -489,7 +577,11 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
     (AUFTRAG_GERAETESEITE.md §3). Bis dahin fuehrte diese Funktion
     `tco_bindung()`, eine Kennzahl ueber die eigene Bindung des Buendels -
     sichtbar als "TCO-36", der deklarierte Fehler dieses Tickets.
+
+    A3: `heute` entscheidet über die Frische der Karte (`ist_frisch`,
+    dieselbe Definition wie jede Auswahl). Ohne das Datum altert nichts.
     """
+    frisch = ist_frisch(b.abgerufen_am, heute)
     kennzahl = tco_24(b)
     device_id, speicher = geraet_je_sku.get(b.sku_id, ("", None))
     # "ab Monat 25: X EUR" - die Grundgebuehr nach dem festen 24-Monats-
@@ -524,6 +616,12 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
         "zustand": zustand,
         "zustand_etikett": ZUSTAND_ETIKETT.get(zustand, zustand),
         "vergleichbar": zustand in _ZUSTAND,
+        # A3: die Frische DIESER Karte - eine boolesche Aussage über die
+        # Messung, keine über die Rechnung. `alt_marke` ist der fertige
+        # Chip-Text (das Datum ist Teil der Marke, nicht der Vorlage -
+        # dort stünde sonst eine zweite Formatierung derselben Zahl).
+        "frisch": frisch,
+        "alt_marke": ("" if frisch else alt_marke_fuer(b.abgerufen_am)),
         # Dieselbe Klasse auf Karte, Balken und Legende - C.3 verlangt die
         # Anbieterfarbe konsistent ueber ALLE Grafiken und Tabellen.
         "slug": anbieter_slug(b.anbieter),
@@ -655,6 +753,12 @@ def _leere_karte(anbieter: str, grund: str = "") -> dict:
             "abgerufen_am": "", "tarif_quelle_url": "", "naeherung": False,
             "leer_grund": grund or LEER_GRUND.get(anbieter, ""),
             "ab_preis": False,
+            # A3: eine Leerkarte ist keine Bündel-Messung - sie altert
+            # nicht. Die NÄHERUNGSKARTE, die auf dieser Bauform aufsetzt,
+            # überschreibt beide Felder mit dem Stand ihrer Belege
+            # (`_referenzkarte`, S2-1) - dieser Default gilt nur für
+            # Karten ohne jede Messung.
+            "frisch": True, "alt_marke": "",
             "zustand": "", "zustand_etikett": "", "vergleichbar": False,
             "sku_id": "", "modell_id": "", "geraet": "", "tarif_id": "",
             "tarif_id_guete": "", "tarif_bindung": None,
@@ -825,8 +929,52 @@ def _referenz_aus_buendel(karte: dict) -> dict:
     }
 
 
-def _referenzkarte(ref: dict) -> dict:
-    """Die Referenzrechnung als Karte - sichtbar als Naeherung markiert."""
+def referenz_ist_frisch(ref: Optional[dict], heute: str) -> bool:
+    """Die Frische der REFERENZ - aus ihren Belegen, nicht aus der Uhr.
+
+    S2-1 (Diff-Prüfung 21.09.2026): Eine Referenz aus einem echten
+    eigenen Bündel ist so frisch wie ihre Quelle - `modelle()` wählt sie
+    nur aus frischen eigenen Karten (A3). Die NÄHERUNG hat zwei
+    GEMESSENE Summanden mit eigenen Abrufdaten, Tarifblatt und Barpreis;
+    sie gilt nur als frisch, wenn BEIDE frisch sind. Eine Näherung aus
+    einem Blatt von heute und einem Barpreis vom 08.09. ist keine Zahl
+    von heute (der Prüfer-Repro: 999,00 € Barpreis, 12 Tage alt, ohne
+    Altkennzeichnung in der Antwortzeile). Ohne `heute` altert nichts -
+    der Kompatibilitätsmodus wie überall.
+    """
+    if not ref:
+        return False
+    if ref.get("aus_buendel"):
+        return True
+    return (ist_frisch(ref.get("tarif_abgerufen_am") or "", heute)
+            and ist_frisch(ref.get("geraet_abgerufen_am") or "", heute))
+
+
+def _referenz_stand(ref: dict) -> str:
+    """Das Datum der Marke einer alten Näherung - ISO oder „“.
+
+    Der späteste Tag, an dem noch BEIDE Summanden gestimmt haben, ist
+    der ÄLTERE der zwei Abrufdaten. Ist eines unlesbar, ist der Stand
+    unbekannt („seit <Datum>“ hieße, der andere Summand hätte noch
+    gestimmt - geraten wird nichts, Clean Code 4).
+    """
+    daten = [ref.get("tarif_abgerufen_am") or "",
+             ref.get("geraet_abgerufen_am") or ""]
+    try:
+        return str(min(_dt.date.fromisoformat(d) for d in daten))
+    except ValueError:
+        return ""
+
+
+def _referenzkarte(ref: dict, heute: str = "") -> dict:
+    """Die Referenzrechnung als Karte - sichtbar als Naeherung markiert.
+
+    S2-1 (Diff-Prüfung 21.09.2026): die Frische der Karte kommt aus den
+    BEIDEN Belegen der Näherung (`referenz_ist_frisch`), nicht mehr aus
+    dem pauschalen Default der Leerkarte. Eine alte Näherung bleibt
+    stehen (Regel 9) - ausgegraut, mit Marke - und fällt aus Antwort-
+    zeile und jedem Delta-Bezug (dort filtert `frisch` sie heraus).
+    """
     karte = _leere_karte("Vodafone")
     karte.update({
         # KEIN Leergrund: diese Karte traegt eine Zahl. Der Vorbehalt steht
@@ -895,6 +1043,13 @@ def _referenzkarte(ref: dict) -> dict:
         "referenz": ref,
     })
     karte["offen_nach_24"] = 0.0
+    # S2-1: die Frische ÜBERSCHREIBT den Default der Leerkarte - die
+    # Näherung ist eine gerechnete Summe aus zwei gemessenen Belegen,
+    # und ihr Stand ist der der Belege (siehe `_referenz_stand`).
+    frisch = referenz_ist_frisch(ref, heute)
+    karte["frisch"] = frisch
+    karte["alt_marke"] = ("" if frisch
+                          else alt_marke_fuer(_referenz_stand(ref)))
     return karte
 
 
@@ -926,6 +1081,12 @@ def _delta(karte: dict, referenz: Optional[dict]) -> Optional[dict]:
     if referenz is None or not karte["belastbar"] or karte["naeherung"]:
         return None
     if karte["gesamt"] is None or not karte["laufzeit"]:
+        return None
+    if not karte.get("frisch", True):
+        # A3: ein altes Angebot ist kein Abstand zur Gegenwart. Sein Delta
+        # gegen die heutige Referenz waere eine Zahl, die an keinem Tag
+        # beide Seiten gleichzeitig gegolten hat - dieselbe Fehlerklasse
+        # wie die Mischung zweier Messungen in einer Summe (tco_store).
         return None
     if not karte.get("vergleichbar", True):
         # Ein erneuertes Geraet ist kein Konkurrent des Neugeraets (H5).
@@ -989,10 +1150,11 @@ def _rang(karte: dict) -> tuple:
 
     Das ist das einzige Mass, das 24- und 36-Monats-Angebote in EINER
     Rangfolge fuehren darf. Karten ohne Zahl stehen hinten - sie sind kein
-    guenstigstes Angebot, sondern eine Luecke.
+    guenstigstes Angebot, sondern eine Luecke. Dasselbe gilt seit A3 für
+    ALTE Angebote: die Zeile bleibt, aber hinter jeder frischen.
     """
     return (not karte["belastbar"], not karte.get("vergleichbar", True),
-            karte["naeherung"],
+            karte["naeherung"], not karte.get("frisch", True),
             karte["schnitt_monat"] if karte["schnitt_monat"] is not None
             else 9e9, karte["anbieter"])
 
@@ -1027,8 +1189,17 @@ def _angebot_rang(karte: dict) -> tuple:
     256 GB: 0,99/26,00 vom 06.09. gegen 1,00/30,00 vom 20.09.) und dann
     als billigste eigene Karte die Referenz stellen. Erst bei gleichem
     Datum - oder gleich unbekanntem - entscheidet wieder der Preis.
+
+    A3 darüber (20.09.2026): FRISCHE vor Quelle und Datum - ein Angebot
+    jenseits von ALT_AB_TAGEN verliert die Dedupe an eine frische Listung
+    desselben Angebots, statt weiter als aktuelle Karte zu stehen. A2
+    bleibt der Tiebreaker INNERHALB der Frische - und ihr einziger
+    Anker im Kompatibilitätsmodus `heute=""`, in dem nichts altert und
+    alle Karten gleich frisch sind: dort entscheidet weiter das
+    aktuellste Datum vor dem Preis.
     """
-    return (1 if karte.get("aus_listung") else 0,
+    return (not karte.get("frisch", True),
+            1 if karte.get("aus_listung") else 0,
             -_neuigkeit(karte),
             karte["schnitt_monat"] if karte["schnitt_monat"] is not None
             else 9e9)
@@ -1061,7 +1232,7 @@ def _vorgabe(modelle: list) -> str:
 
 
 def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
-            katalog) -> dict:
+            katalog, heute: str = "") -> dict:
     """Alle Modelle mit mindestens einem Buendel, je Modell vier Anbieter.
 
     Rueckgabe:
@@ -1070,6 +1241,11 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         vorgabe         die ID des Modells, das ohne Klick sichtbar ist
         ohne_zuordnung  Buendel, deren SKU weder eine Listung noch ein
                         Katalogeintrag aufloest - mit Grund, nie als Modell
+
+    A3: `heute` (Datum der Ausgabe, "YYYY-MM-DD") schaltet die Alterung
+    ein - `ist_frisch` entscheidet dann je Bündel über „ab“-Preis, Delta
+    und Ranking. Ohne das Datum (leerer String) altert nichts; die Seite
+    rendert in Production immer mit dem Datum des Berichts.
     """
     geraet_je_sku: dict = {}
     for e in listungen:
@@ -1120,7 +1296,8 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         karte = _karte(b, tarif, _barpreis_fuer(belege.get(b.sku_id, {}),
                                                 b.anbieter),
                        katalog, geraet_je_sku,
-                       zustand=zustand_des_buendels(b, zustaende))
+                       zustand=zustand_des_buendels(b, zustaende),
+                       heute=heute)
         if id(b) in listung_ids:
             karte["aus_listung"] = True
         gruppen.setdefault(mid, {"id": mid, "device_id": device_id,
@@ -1170,8 +1347,13 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         # ... und nur ein NEUGERAET: ein erneuertes eigenes Buendel als
         # Massstab fuer neue Wettbewerbergeraete waere derselbe Fehler mit
         # umgekehrtem Vorzeichen.
+        # A3: ... und nur ein FRISCHES. Ein altes eigenes Buendel ist kein
+        # Massstab von heute; die Referenz faellt dann auf die gerechnete
+        # Naeherung zurueck (deren Karte aber NICHT mit dazu - Vodafone
+        # steht je Modell genau einmal, siehe unten).
         eigene = [k for k in karten
-                  if k["eigen"] and k["belastbar"] and k["vergleichbar"]]
+                  if k["eigen"] and k["belastbar"] and k["vergleichbar"]
+                  and k["frisch"]]
         naeherung = None
         if eigene:
             referenz = _referenz_aus_buendel(
@@ -1182,12 +1364,24 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
             # den Karten dieses Modells leiht.
             referenz = _vodafone_referenz(referenzen, tarife, belege_modell)
             naeherung = referenz
+        # S2-1 (Diff-Prüfung 21.09.2026): eine ALTERTE Referenz ist kein
+        # Maßstab von heute. Deltas gegen sie wären Zahlen, die an keinem
+        # Tag beide Seiten gleichzeitig gegolten haben - dieselbe
+        # Fehlerklasse wie ein altes Angebot selbst (siehe `_delta`).
+        # Die Referenz bleibt am Modell (Regel 9: die Karte zeigt den
+        # letzten Stand), aber der Delta-Bezug bekommt sie nicht.
+        referenz_aktuell = referenz_ist_frisch(referenz, heute)
         for k in karten:
-            k["delta"] = _delta(k, referenz)
+            k["delta"] = _delta(k, referenz if referenz_aktuell else None)
 
         vorhanden = {k["anbieter"] for k in karten}
-        if naeherung is not None:
-            karten.append(_referenzkarte(naeherung))
+        # A3: die Naeherungs-Karte nur, wo Vodafone nicht schon (etwa als
+        # altes eigenes Buendel) eine Zeile hat - sonst stuenden zwei
+        # Vodafone-Zeilen nebeneinander, und der Leser muesste raten,
+        # welche "unser Preis" ist (derselbe Einwand wie in
+        # `test_ein_eigenes_buendel_verdraengt_die_naeherung`).
+        if naeherung is not None and not any(k["eigen"] for k in karten):
+            karten.append(_referenzkarte(naeherung, heute))
             vorhanden.add("Vodafone")
         for anbieter in ANBIETER_REIHENFOLGE:
             if anbieter not in vorhanden:
@@ -1204,7 +1398,8 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         # einer TCO-24-Zahl als Obergrenze. Dieselbe Fehlerklasse wie das
         # Etikett selbst, eine Zeile weiter oben auf der Seite.
         betraege = [k["gesamt"] for k in angebote
-                    if k["vergleichbar"] and k["gesamt"] is not None]
+                    if k["vergleichbar"] and k["frisch"]
+                    and k["gesamt"] is not None]
         name = _name(katalog, gruppe["device_id"], gruppe["speicher"],
                      rueckfall=mid)
         hersteller = _hersteller(katalog, gruppe["device_id"])
@@ -1239,7 +1434,8 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         # Barpreise; ist keiner gemessen, fehlt die Zahl ehrlich.
         geraetepreise = [k for k in vergleichbar_alle
                          if k["geraetepreis"] is not None
-                         and k.get("geraetepreis_art") != "finanzierung"]
+                         and k.get("geraetepreis_art") != "finanzierung"
+                         and k.get("frisch", True)]
         # F-4a' (PM, 05.09.2026, 19:xx): das Minimum gilt auch ueber die
         # Haendler OHNE Tarifbuendel (Amazon/Expert/Saturn) - sie tragen
         # keine Karte in `karten` (kein Buendel, siehe oben), stehen aber
@@ -1249,14 +1445,23 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         # Leitzahl widersprach ihrer eigenen Nachbarkarte.
         for haendler, eintrag in _haendler_geraetepreise(
                 listungen_je_modell.get(mid, [])).items():
-            if eintrag is not None:
+            # A3-Nachbesserung (Prüfer 20.09.2026, "hoch"): DIESELBE
+            # Frische-Definition wie an jeder anderen Stelle der Antwort-
+            # zeile (`ist_frisch`, Clean Code 7) - ein alter Händlerpreis
+            # ist kein „günstigster Gerätepreis“ von heute (im Bestand
+            # stehen Saturn-Preise mit 11-15 Tagen). Die HändlerKARTE
+            # zeigt den Preis weiter, mit Datum - nur die Auswahl der
+            # Antwortzeile liest frisch.
+            if eintrag is not None and ist_frisch(
+                    eintrag.get("abgerufen_am", ""), heute):
                 geraetepreise.append({"anbieter": haendler,
                                       "geraetepreis": eintrag["preis"]})
         guenstigstes_geraet = (min(geraetepreise,
                                    key=lambda k: k["geraetepreis"])
                                if geraetepreise else None)
         tarifangebote = [k for k in angebote
-                         if k["vergleichbar"] and k["gesamt"] is not None]
+                         if k["vergleichbar"] and k["frisch"]
+                         and k["gesamt"] is not None]
         guenstigster_tarif = (min(tarifangebote, key=lambda k: k["gesamt"])
                               if tarifangebote else None)
         antwort = {
@@ -1269,6 +1474,30 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
             "tarif_anbieter": (guenstigster_tarif["anbieter"]
                                if guenstigster_tarif else None),
         }
+
+        # A3: „alles alt“ am ganzen Modell. Ein Modell, dessen letzte
+        # Bündel-Messung älter als ALT_AB_TAGEN ist, zeigt das ÜBER den
+        # Zeilen (harte Regel 9: kein „nichts gefunden“ vortäuschen) -
+        # `alt_seit` ist der SPÄTESTE Abruf der alten Bündel (ISO), das
+        # Datum des letzten Standes. Ein unbekanntes Datum stellt keinen
+        # Stand; die Naeherung ist keine Bündel-Messung und zaehlt nicht
+        # mit.
+        alte = [k for k in karten if k.get("sku_id") and not k["frisch"]]
+        alt_seit = max(
+            (k.get("abgerufen_am") or "" for k in alte
+             if kurz_datum(k.get("abgerufen_am") or "")), default="")
+        alles_alt = bool(alte) and not any(
+            k["frisch"] for k in karten if k.get("sku_id"))
+        if alles_alt and alt_seit:
+            alt_hinweis = (f"Kein aktueller Bündel-Stand seit dem "
+                           f"{kurz_datum(alt_seit)} – alle Zeilen dieses "
+                           f"Modells sind älter als {ALT_AB_TAGEN} Tage.")
+        elif alles_alt:
+            alt_hinweis = ("Kein aktueller Bündel-Stand – das Abrufdatum "
+                           "dieser Bündel ist unbekannt, ihre Werte zählen "
+                           "nicht in den Vergleich.")
+        else:
+            alt_hinweis = ""
 
         fertig.append({
             "id": mid,
@@ -1290,7 +1519,15 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
             "spanne": ([min(betraege), max(betraege)] if betraege else []),
             # F-5: NICHT die "Anbieter"-Zahl der Seite (siehe Docstring
             # oben) - nur der Sortier-/Vorgabe-Schluessel dieser Funktion.
-            "bundle_anbieter": sorted({k["anbieter"] for k in angebote}),
+            # A3: nur FRISCHE Angebote - ein alter Anbieter ist keines,
+            # das die Seite heute beantworten kann.
+            "bundle_anbieter": sorted({k["anbieter"] for k in angebote
+                                       if k["frisch"]}),
+            # A3: der benannte Zustand des ganzen Modells, wenn kein
+            # frisches Bündel mehr steht (siehe Block oben).
+            "alles_alt": alles_alt,
+            "alt_seit": alt_seit,
+            "alt_hinweis": alt_hinweis,
             "antwort": antwort,
         })
 

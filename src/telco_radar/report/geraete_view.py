@@ -317,6 +317,22 @@ def _tag(wert):
         return None
 
 
+def _spaeterer_tag(erster: str, zweiter: str) -> str:
+    """Der spaetere von zwei ISO-Tagen - oder "", wenn keiner lesbar ist.
+
+    Ein unlesbarer Wert zaehlt nicht (Clean Code 4): er wird nie geraten
+    und nie still durch den anderen ersetzt. Der lesbare gewinnt allein.
+    """
+    a, b = _tag(erster), _tag(zweiter)
+    if a is None and b is None:
+        return ""
+    if a is None:
+        return zweiter
+    if b is None:
+        return erster
+    return zweiter if b > a else erster
+
+
 # --------------------------------------------------------------------------
 # Der Hinweis, wenn "Was der Nachfolger mit dem Preis macht" leer ist
 # --------------------------------------------------------------------------
@@ -855,6 +871,11 @@ def _katalog_zeile(e: dict, katalog) -> dict:
 # bei der Uebersetzungsseite).
 TCO_LEER_KEIN_BUNDEL = "kein Bündel gemessen"
 TCO_LEER_KEIN_VERGLEICHBARES = "kein vergleichbares Bündel gemessen"
+# A3 (STRATEGIE GERAETE V4, 20.09.2026): der dritte Zustand - Bündel gibt
+# es, aber keines mit aktuellem Abruf. „kein Bündel gemessen“ waere hier
+# gelogen (harte Regel 9), und der alte Preis darf nicht als heutiger
+# stehen.
+TCO_LEER_NUR_ALT = "kein aktueller Bündel-Stand"
 
 # Die benannten Leerzustaende der DELTA-Zelle (A2-Nachbesserung,
 # Pruef-Befund 20.09.2026). Zwei verschiedene Stummen, zwei Etiketten:
@@ -1009,18 +1030,29 @@ def _tco_spalte(modell_tco: dict | None) -> dict:
         return {"tco_ab": None, "tco_anbieter": None, "tco_monat": None,
                 "tco_band": None, "tco_beleg": None,
                 "tco_leer": TCO_LEER_KEIN_BUNDEL, **leer_delta}
-    kandidaten = [k for k in modell_tco.get("karten") or []
-                  if k.get("vergleichbar") and k.get("belastbar")
-                  and not k.get("naeherung") and k.get("gesamt") is not None]
+    # A3: NUR FRISCHE Karten stellen die Spalte (`frisch`, dieselbe
+    # Definition wie die Tafel - Clean Code 7). Der Pool OHNE die
+    # Frische entscheidet danach, ob die Lücke "kein vergleichbares
+    # Bündel" oder "kein aktueller Stand" heißt. EINE Filterreihe, aus
+    # der die andere ABGELEITET ist (S3e, Diff-Prüfung 21.09.2026): zwei
+    # nebeneinander geschriebene Listen mit denselben Feldern driften
+    # auseinander, sobald eine ein Feld mehr bekommt.
+    pool = [k for k in modell_tco.get("karten") or []
+            if k.get("vergleichbar") and k.get("belastbar")
+            and not k.get("naeherung") and k.get("gesamt") is not None]
+    kandidaten = [k for k in pool if k.get("frisch", True)]
     if not kandidaten:
         # Ein Bündel ohne vergleichbare Karte ist KEIN "kein Bündel": das
         # Modell hat eines, nur keine belastbare Neu-Geraete-Rechnung
         # (gemessener Fall: Galaxy S24 Ultra 512, einzige Karte erneuert).
         # Zwei Leerzustaende statt einem - dieselbe Lehre wie "keine
-        # Angabe" gegen "nicht gemessen" bei den Tarifen.
+        # Angabe" gegen "nicht gemessen" bei den Tarifen. Und seit A3 ein
+        # dritter: alles da, nur alt - dann heißt die Lücke beim Stand,
+        # nicht beim Bestand.
+        leer = (TCO_LEER_NUR_ALT if pool else TCO_LEER_KEIN_VERGLEICHBARES)
         return {"tco_ab": None, "tco_anbieter": None, "tco_monat": None,
                 "tco_band": None, "tco_beleg": None,
-                "tco_leer": TCO_LEER_KEIN_VERGLEICHBARES, **leer_delta}
+                "tco_leer": leer, **leer_delta}
     # Der Spaltenkopf der TCO-Ansicht sagt TCO-24. Ein Filter auf
     # `karte["laufzeit"] == 24` ist hier bewusst NICHT gebaut: seit dem
     # Ticket TCO24-1 ist die Laufzeit die Konstante 24 (Bestand am
@@ -1096,8 +1128,24 @@ def _interleave_modelle_je_hersteller(modelle: list) -> list:
     return ergebnis
 
 
+def katalog_leitzahl(katalog_modelle: list) -> float | None:
+    """Der guenstigste AKTUELLE Einzelgeraetepreis des Regals.
+
+    EINE Rechnung an EINER Stelle fuer die grosse Zahl ueber der Katalog-
+    tafel - die Vorlage zeigt sie, sie aggregiert nicht (Clean Code 1).
+    A3: ein "ab" ohne frischen Beleg (`ab_alt`, der letzte Stand mit
+    Marke) zaehlt nicht hinein: die Leitzahl sagt "günstigster Stand von
+    heute", und dafuer reicht kein Abruf, der aelter ist als jeder
+    Leser-Rhythmus (`geraete_tco_karten.ALT_AB_TAGEN`).
+    """
+    return min((m["ab_preis"] for m in katalog_modelle
+                if m.get("ab_preis") is not None
+                and not m.get("ab_alt")), default=None)
+
+
 def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
-                         buendel=None, zr_erlaubt: dict | None = None) -> list[dict]:
+                         buendel=None, zr_erlaubt: dict | None = None,
+                         heute: str = "") -> list[dict]:
     """Der Katalog auf MODELL-Ebene: eine Zeile je (Geraet, Speicher).
 
     P3 (Strategie Geraete v3, 17.09.2026), Antonios Forderung 5 und 6: der
@@ -1138,6 +1186,16 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
     Erlaubnis NICHT selbst nach (zwei Rechnungen fuer dieselbe Menge
     warden zwei Mengen, CLAUDE.md §6); ohne Parameter bleibt `zr` False -
     fail-closed, ein fehlender Graph-Link ist ehrlicher als ein toter.
+
+    A3-Nachbesserung (Pruefer 20.09.2026, "hoch"): `heute` stellt die Uhr
+    fuer den ab-Preis. DIESELBE Frische-Definition wie an der Tafel
+    (`geraete_tco_karten.ist_frisch`, Clean Code 7) entscheidet, welcher
+    Beleg "ab" stellt und in die Spanne zaehlt - ein alter Barpreis ist
+    kein "ab" von heute (gemessener Fall: "ab 1.299 EUR bei
+    mobilcom-debitel" vom 14.08., 37 Tage; "ab 289 EUR bei Medimax" vom
+    06.09. unterbot das frische ElectronicPartner-Angebot vom 19.09.).
+    Ohne `heute` (leerer String) altert nichts - der Modus der alten
+    Aufrufer und Tests.
 
     P5-AUFTRAG 1 (STRATEGIE_GERAETE_V3, 18.09.2026): SICHTBARKEIT FOLGT DEN
     DATEN, NICHT DEM WEG - Bündel ODER Listung genuegt. Neben den Gruppen
@@ -1208,23 +1266,46 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
         # Je Anbieter zuerst das Minimum (fuenf Farben eines Ladens sind
         # fuenfmal derselbe Preis, `_guenstigstes_je_laden`-Lehre), dann das
         # Gesamt-Minimum MIT Beleg: Betrag, Link, Abrufdatum.
+        #
+        # A3: FRISCHE Belege zuerst - `ist_frisch`, dieselbe Definition
+        # wie die Tafel (Clean Code 7). Ein alter Beleg stellt kein "ab"
+        # und keine Spanne von heute. Nur wenn GAR kein frischer Beleg
+        # existiert, faellt die Zeile nicht auf "ohne Preis" zurueck,
+        # sondern zeigt den letzten Stand MIT Marke (`ab_alt`, harte
+        # Regel 9: es IST ein Preis da, nur kein aktueller) - die
+        # Bündel-Angabe (Schritt 5) greift dann nicht, denn es gibt
+        # Barpreis-Belege, nur keine frischen.
         je_anbieter: dict[str, dict] = {}
+        je_anbieter_alt: dict[str, dict] = {}
         for e in eintraege_modell:
             sku = e.get("sku_id") or ""
             for anbieter, beleg in belege.get(sku, {}).items():
-                bisher = je_anbieter.get(anbieter)
+                ziel = (je_anbieter_alt
+                        if not geraete_tco_karten.ist_frisch(
+                            beleg.get("abgerufen_am", ""), heute)
+                        else je_anbieter)
+                bisher = ziel.get(anbieter)
                 if bisher is None or beleg["betrag"] < bisher["betrag"]:
-                    je_anbieter[anbieter] = beleg
-        ab_beleg = (min(je_anbieter.values(), key=lambda b: b["betrag"])
-                    if je_anbieter else None)
+                    ziel[anbieter] = beleg
+        auswahl = je_anbieter or je_anbieter_alt
+        ab_beleg = (min(auswahl.values(), key=lambda b: b["betrag"])
+                    if auswahl else None)
+        # Der benannte Zustand "nichts aktuelles, aber ein letzter Stand":
+        # die Vorlage graut den ab-Preis aus und haengt die Marke daran
+        # (`geraete_tco_karten.alt_marke_fuer` - derselbe Satz wie an der
+        # Bündelzeile, eine Stelle).
+        ab_alt = bool(je_anbieter_alt) and not je_anbieter
 
         # Schritt 3: die Spanne - nur wenn WESSENTLICH verschieden. Dieselbe
         # Schwelle wie der Preisvergleich (ODER, nicht UND: bei 200 EUR sind
         # 15 EUR viel und 3 Prozent wenig, bei 2000 umgekehrt). Ein
         # Farbaufschlag von 5 EUR ist keine Spanne, die jemand lesen will.
+        # A3: gerechnet ueber DIESELBE Auswahl wie der ab-Preis (`auswahl`)
+        # - ein alter Anbieter stand sonst als Spannengrenze da, obwohl
+        # sein "ab" schon herausgefallen ist.
         spanne: list = []
-        if len(je_anbieter) >= 2 and ab_beleg is not None:
-            betraege = [b["betrag"] for b in je_anbieter.values()]
+        if len(auswahl) >= 2 and ab_beleg is not None:
+            betraege = [b["betrag"] for b in auswahl.values()]
             von, bis = min(betraege), max(betraege)
             abstand = bis - von
             if (abstand >= geraete_vergleich.WESENTLICH_EURO
@@ -1313,6 +1394,14 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
             "ab_preis": ab_beleg["betrag"] if ab_beleg else None,
             "ab_anbieter": ab_beleg["anbieter"] if ab_beleg else None,
             "ab_beleg": ab_beleg,
+            # A3: der ab-Preis dieses Modells ist ein LETZTER STAND, kein
+            # aktueller (kein frischer Beleg seit ALT_AB_TAGEN). Die
+            # Zeile bleibt mit Preis, Anbieter und Datum - ausgegraut,
+            # mit Marke - und zaehlt nicht in die Leitzahl des Katalogs.
+            "ab_alt": ab_alt,
+            "ab_alt_marke": (geraete_tco_karten.alt_marke_fuer(
+                ab_beleg.get("abgerufen_am", ""))
+                if ab_alt and ab_beleg else ""),
             "anbieterzahl": len(listen_anbieter),
             "anbieter": listen_anbieter,
             "farben": sorted({z["farbe"] for z in zeilen if z["farbe"]}),
@@ -1776,6 +1865,28 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # Rechnung für dieselben Zahlen), eigener Fehlertopf: ein kaputter
     # Graph darf die GERAETESEITE nicht kosten, die übrigen Reiter bleiben
     # lesbar (dieselbe Auffanglogik wie beim Export weiter unten).
+    #
+    # A3-Nachbesserung (Pruefer 20.09.2026, "hoch"): Der Bezug der
+    # Alterung ist der SPAETERE zweier Uhren, nicht der Berichtstag.
+    # `heute` kommt aus `render_site` und ist das Datum des juengsten
+    # RADAR-Berichts (Mi/Fr) - aber die Geräteseite rendert TAEGLICH
+    # (`geraete.yml`, 03:10 UTC) und fasst die Berichte nicht an. Am
+    # 20.09.2026 stand der juengste Bericht auf dem 16.09.: mit ihm als
+    # `heute` waren alle sechs Telekom-Buendel vom 15.09. "einen Tag alt"
+    # und fuehrten frisch Antwortzeile und Spanne - die 3-Tage-Regel war
+    # regelmäßig (So-Mi) wirkungslos. Der Buendel-Store schreibt bei
+    # JEDEM nächtlichen Lauf sein eigenes `updated`; derselbe Gedanke wie
+    # in `_auffaellig` ("Als Bezug gilt deshalb der spaetere der beiden
+    # Tage"). Ohne `heute` (lokaler Aufruf, alte Tests) altert weiter
+    # nichts - der Berichtstag bleibt die einzige Uhr, die der Aufruf
+    # stellt.
+    tco_heute = _spaeterer_tag(heute, tco_db.updated) if heute else ""
+    # A3-Nachbesserung (Pruefer 20.09.2026, "hoch"): dieselbe Uhrregel fuer
+    # den KATALOG - sein "ab" liest LISTUNGEN, und deren Store
+    # (geraete_db.json) schreibt sein eigenes `updated` bei jedem
+    # naechtlichen Lauf. Der spaetere von Berichtstag und Bestands-Stand
+    # stellt die Uhr fuer die Frische der ab-Auswahl.
+    bestand_heute = _spaeterer_tag(heute, db.updated) if heute else ""
     tco = geraete_tco_view.aufbereiten(
         tco_db.buendel(), tco_db.referenzen(), belastbar, katalog,
         lesbar=tco_db.lesbar, tarife=tarifbestand.je_id,
@@ -1783,7 +1894,10 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         # Store traegt ihn nicht) und die Lage der Buendel-Historie
         # fuer den ehrlichen Satz im Verlaufs-Reiter.
         anbieter_typen={a.name: a.typ for a in quellen.anbieter},
-        tco_historie=tco_db.historie_lage())
+        tco_historie=tco_db.historie_lage(),
+        # A3: der Bezugstag schaltet die Alterung ein - ohne ihn altert
+        # nichts (`geraete_tco_karten.ist_frisch`).
+        heute=tco_heute)
     try:
         # A1: derselbe Tarifbestand wie die Tafel - die Punkte der Historie
         # rechnet die Zeitreihe mit der HEUTIGEN Leitzahl, phasengewichtet
@@ -1807,20 +1921,19 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
 
     # P4-Fix (Sicht-Pruefung 18.09., Falz 1): die Leitzahl des KATALOGS -
     # der guenstigste Einzelgeraetepreis des Regals, EINE Rechnung an
-    # EINER Stelle (hier, aus denselben Modellzeilen, die die Tabelle
-    # rendert - die Vorlage zeigt, sie aggregiert nicht). Der Katalog war
-    # der einzige Reiter ohne Falz-Antwort: die groesste Schrift seiner
-    # Tafel war die h2. Modelle ohne Barpreis (nur im Buendel, alle 1&1)
-    # scheiden aus dem Minimum aus - ihr Buendel-Monatspreis ist keine
-    # zweite Waehrung fuer ein "ab".
+    # EINER Stelle (`katalog_leitzahl`, aus denselben Modellzeilen, die
+    # die Tabelle rendert - die Vorlage zeigt, sie aggregiert nicht). Der
+    # Katalog war der einzige Reiter ohne Falz-Antwort: die groesste
+    # Schrift seiner Tafel war die h2.
     katalog_modelle = katalog_modellzeilen(
         bestand, katalog, (tco or {}).get("modelle"),
         tco_db.buendel() if tco_db.lesbar
         else _buendel_aus_listungen(bestand),
-        zr_erlaubt=zr_erlaubt)
-    katalog_ab_preis = min(
-        (m["ab_preis"] for m in katalog_modelle
-         if m.get("ab_preis") is not None), default=None)
+        zr_erlaubt=zr_erlaubt,
+        # A3: die Uhr der ab-Auswahl - der spaetere von Berichtstag und
+        # Bestands-Stand (siehe `bestand_heute` oben).
+        heute=bestand_heute)
+    katalog_ab_preis = katalog_leitzahl(katalog_modelle)
 
     # P5-LIVE-PRUEFUNG R3 (18.09.2026): Wer im Zeitreihen-Suchfeld nach
     # einem Modell sucht, das der Katalog kennt, die WAHL aber noch nicht

@@ -184,10 +184,12 @@ def alle_karten_je_band(modell: dict,
     im Band Klein), hat auch ZWEI Vergleichspaare, nicht eines.
     """
     # Nur ECHTE Buendel (Regel 2 des Modulkopfs) - die Naeherungskarte ist
-    # kein Angebot.
+    # kein Angebot. Und seit A3 nur FRISCHE: Balken-JSON und Radar lesen
+    # hier ihre guenstigste Karte je Anbieter, und ein altes Angebot ist
+    # keine Zahl von heute (`geraete_tco_karten.ist_frisch`, Clean Code 7).
     echte = [k for k in (modell.get("karten") or [])
              if k.get("belastbar") and not k.get("naeherung")
-             and k.get("gesamt") is not None]
+             and k.get("gesamt") is not None and k.get("frisch", True)]
 
     je_band: dict[str, dict[str, list]] = {}
     for k in echte:

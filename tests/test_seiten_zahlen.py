@@ -2484,6 +2484,16 @@ def test_ein_haendler_heisst_in_der_spanne_ein_preis(tmp_path):
 #   ueber Python round, also half-even; der Test akzeptiert half-even UND
 #   half-up, da sie sich nur bei exakt einem halben Cent unterscheiden).
 #
+# Auswahl (A3, 20.09.2026): nur FRISCHE Bündel stellen Antwort-Satz und
+# Referenz - "frisch" heisst hoechstens drei Tage zwischen `abgerufen_am`
+# und dem Bezugstag, und der Bezugstag ist der SPAETERE von juengstem
+# Bericht (reports/) und tco.updated (die Seite reicht den Berichtstag
+# durch, render_site -> aufbereiten, und nimmt die spaetere Uhr; hier
+# eigenstaendig nachgebaut in _gw_heute/_gw_frisch, nicht importiert).
+# Gemessener Fall 20.09.: congstar Allnet Flat S vom 12.09. unterbot die
+# frischen Vodafone-Bündel des iPhone 17 - ohne die Frische behauptete
+# dieser Test einen Sieger, den die Seite zu Recht nicht mehr fuehrt.
+#
 # Mutationsnachweis (Pflicht des Auftrags, siehe
 # test_mutation_eines_euros_am_pflichtfall_schlaegt_aus): einmal vor-
 # gefuehrt am 20.09.2026 - Ergebnis im Kommentar dieses Tests.
@@ -2503,6 +2513,7 @@ _GW_HORIZONT = 24
 # kontinuierlich bis 20 GB klein, bis 60 GB mittel, darueber gross;
 # FEHLEND und UNBEGRENZT sind kein Band (siehe _gw_band).
 import math as _gw_math
+import datetime as _gw_dt
 
 
 def _gw_cent(wert) -> int:
@@ -2640,15 +2651,64 @@ def _gw_band(buendel: dict, blaetter: dict) -> str | None:
     return "gross"
 
 
+# Welche Stells ein Berichtsdatum sind - dieselbe Form, nach der
+# `html._load_reports` filtert; hier eigenständig nachgebaut (der Orakel-
+# Grundsatz dieses Abschnitts: nichts importieren, alles nachrechnen).
+_GW_DATUM_STEM = re.compile(r"\d{4}-\d{2}-\d{2}")
+
+
+def _gw_heute(tco: dict) -> str:
+    """Der Bezugstag der Auswahl - EIGEN gerechnet, nicht importiert.
+
+    Der SPAETERE von jüngstem Bericht (Stammname in reports/ - das
+    Datum, das `render_site` als `heute` durchreicht) und dem `updated`
+    des TCO-Stores. ISO-Tage vergleichen lexikographisch korrekt.
+
+    S3a (Diff-Prüfung 21.09.2026): Die Uhr spiegelt die Seiten-Semantik.
+    Gezaehlt werden nur Stems, die ein DATUM sind (ein Stray-JSON wie
+    "entwurf.json" sortiert lexikalisch hinter jedem Datum und gewann
+    vorher das max()), samt der .md-Faelle - deren Berichtsdatum ist der
+    Stamm. Und ein unlesbares `updated` zaehlt nicht: Die Seite verwirft
+    es ueber `_spaeterer_tag`, der Orakel tut dasselbe, sonst stellte er
+    eine Uhr, die die Seite nie hat."""
+    bericht = max((p.stem for p in
+                   (_GW_WURZEL / "data" / "reports").glob("*")
+                   if p.suffix in (".json", ".md")
+                   and _GW_DATUM_STEM.fullmatch(p.stem)),
+                  default="")
+    aktualisiert = str(tco.get("updated") or "")
+    if not _GW_DATUM_STEM.fullmatch(aktualisiert):
+        aktualisiert = ""
+    return max(bericht, aktualisiert)
+
+
+def _gw_frisch(buendel: dict, heute: str) -> bool:
+    """EIGENE Frische-Regel der Auswahl (A3): älter als drei Tage
+    (dokumentiert in geraete_tco_karten.ALT_AB_TAGEN) führt kein Bündel
+    mehr. Ein fehlendes oder unlesbares `abgerufen_am` ist „unbekannt“
+    und zählt wie alt (Clean Code 4); ohne Bezugstag altert nichts."""
+    if not heute:
+        return True
+    try:
+        alter = (_gw_dt.date.fromisoformat(heute)
+                 - _gw_dt.date.fromisoformat(
+                     buendel.get("abgerufen_am") or "")).days
+    except ValueError:
+        return False
+    return alter <= 3
+
+
 def _gw_min_buendel(tco: dict, blaetter: dict, sku_präfix: str, band: str,
                     anbieter: str = ""):
     """Günstigstes neu-Bündel des Modells im Band nach EIGENER Rechnung.
 
-    Auswahlmenge wie die Seite: Zustand neu (vergleichbar) und eine
-    belastbare Zahl (ohne Tarifgrundpreis zaehlt ein Bündel nicht). Mit
-    `anbieter` auf dessen Bündel beschraenkt - die Vodafone-Referenz ist
-    das Minimum UNTER DEN EIGENEN Bündeln, nicht der Sieger des Bandes.
+    Auswahlmenge wie die Seite: Zustand neu (vergleichbar), eine
+    belastbare Zahl (ohne Tarifgrundpreis zaehlt ein Bündel nicht) und -
+    seit A3 - FRISCHE (`_gw_frisch`). Mit `anbieter` auf dessen Bündel
+    beschraenkt - die Vodafone-Referenz ist das Minimum UNTER DEN
+    EIGENEN frischen Bündeln, nicht der Sieger des Bandes.
     """
+    heute = _gw_heute(tco)
     beste = None
     for b in tco["buendel"]:
         if b.get("zustand") != "neu":
@@ -2659,12 +2719,39 @@ def _gw_min_buendel(tco: dict, blaetter: dict, sku_präfix: str, band: str,
             continue
         if _gw_band(b, blaetter) != band:
             continue
+        if not _gw_frisch(b, heute):
+            continue
         gesamt, _rest = _gw_leitzahl(b, blaetter)
         if gesamt is None:
             continue
         if beste is None or gesamt < beste[0]:
             beste = (gesamt, b)
     return beste
+
+
+def test_gw_heute_liest_nur_datums_stems_und_lesbare_uhren(tmp_path,
+                                                           monkeypatch):
+    """S3a (Diff-Prüfung 21.09.2026): die Orakel-Uhr spiegelt die
+    Seiten-Semantik von `render_site` - nur Stems, die ein Datum sind
+    (wie `html._load_reports` filtert, hier eigenständig nachgebaut),
+    SAMT der .md-Fälle (deren Datum der Stamm ist), und ein unlesbares
+    `updated` zählt nicht (die Seite verwirft es über `_spaeterer_tag`).
+    Vor dem Fix gewann ein Stray-JSON ("entwurf.json") das max() über
+    die Stems, und ein unlesbares `updated` ("kaputt") die Endsumme -
+    die Uhr des Orakels stellte dann ein Datum, das die Seite nie hat."""
+    import sys as _gw_sys
+    reports = tmp_path / "data" / "reports"
+    reports.mkdir(parents=True)
+    (reports / "entwurf.json").write_text("{}", encoding="utf-8")
+    (reports / "2026-09-16.json").write_text("{}", encoding="utf-8")
+    (reports / "2026-09-18.md").write_text("# B\n", encoding="utf-8")
+    monkeypatch.setattr(_gw_sys.modules[__name__], "_GW_WURZEL", tmp_path)
+    # Der jüngste DATUMS-Stem ist der .md- vom 18.09.; "kaputt" und
+    # "entwurf" zählen nicht.
+    assert _gw_heute({"updated": "kaputt"}) == "2026-09-18"
+    # Ein lesbares `updated` JÜNGER als jeder Bericht gewinnt (der
+    # tägliche Lauf schreibt seinen eigenen Stand).
+    assert _gw_heute({"updated": "2026-09-20"}) == "2026-09-20"
 
 
 # ---- Extraktion aus der gerenderten Seite (nur Lesen, nichts mutieren) ----

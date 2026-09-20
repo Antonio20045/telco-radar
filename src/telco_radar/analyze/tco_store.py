@@ -40,9 +40,15 @@ ist keine Messung dieses Laufs.
 
 Was hier bewusst NICHT steht
 ----------------------------
-Keine Zwei-Stufen-Auslistung (`mark_stale`) - eine Alterungslogik ohne
-einen einzigen Lauf waere gegen nichts gemessen. Bis dahin wird nichts
-geloescht.
+Keine Loesch- oder Alterungslogik fuer BUENDEL. Die Alterung alter Werte
+ist seit A3 (STRATEGIE_GERAETE_V4, 20.09.2026) eine ENTSCHEIDUNG DER
+ANSICHT, nicht des Bestands: `report/geraete_tco_karten.ist_frisch`
+(gegen `ALT_AB_TAGEN`) faellt ein Angebot aus ab-Preis, Delta und
+Ranking, die Zeile bleibt ausgegraut mit Abrufdatum stehen. Der Store
+haelt die Messung unveraendert bereit - zurueck in den Vergleich kommt
+ein Angebot allein durch einen neuen Lauf, nie durch Loeschen.
+`mark_stale` bleibt fuer LISTUNGEN reserviert (`geraete_pipeline`):
+"Nicht gelesen" ist nicht "leer" (CLAUDE.md, Fallstricke).
 
 Die Preishistorie steht hier sehr wohl - seit P2 (11.09.2026)
 -------------------------------------------------------------

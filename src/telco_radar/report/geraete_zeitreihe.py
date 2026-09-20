@@ -48,7 +48,7 @@ from pathlib import Path
 from ..tco_model import (Buendel, POSTEN_ANSCHLUSS, POSTEN_BUENDEL,
                          POSTEN_RATE, POSTEN_ZUZAHLUNG, TCO_HORIZONT, tco_24)
 from .geraete_tco_band import ERWARTETE_ANBIETER
-from .geraete_tco_karten import phasen_fuer_buendel
+from .geraete_tco_karten import kurz_datum, phasen_fuer_buendel
 
 log = logging.getLogger(__name__)
 
@@ -184,6 +184,12 @@ def _band_zeilen(modell: dict) -> dict:
     belastbare Karten, aufsteigend nach TCO-24, je Anbieter die beste -
     die Vodafone-Näherung ergänzt ein Band, in dem kein eigenes Bündel
     steht. Die Naeherung ist KEIN Angebot, aber der Massstab des Bandes.
+
+    A3 (STRATEGIE GERAETE V4): ALTE Angebote sind keine Zeilen mehr, aber
+    auch nicht weg - sie stehen in `alt` (beste je Anbieter, dieselbe
+    Wahl), und der Antwort-Satz nennt ihren letzten Stand. Ein altes
+    Angebot verdraengt kein frisches, auch nicht beim selben Anbieter:
+    die frischen kommen zuerst an die Reihe.
     """
     baender: dict[str, dict] = {}
     karten = modell.get("karten") or []
@@ -195,24 +201,30 @@ def _band_zeilen(modell: dict) -> dict:
 
     fertig: dict[str, dict] = {}
     for band, satz in baender.items():
-        zeilen, gesehen = [], set()
         kandidaten = sorted(
             (k for k in satz["karten"]
              if k.get("vergleichbar") and k.get("belastbar")
              and k.get("gesamt") is not None),
             key=lambda k: k["gesamt"])
-        for karte in kandidaten:
+        zeilen, alt, gesehen = [], [], set()
+        for karte in (k for k in kandidaten if k.get("frisch", True)):
             if karte["anbieter"] in gesehen:
                 continue
             gesehen.add(karte["anbieter"])
             zeilen.append(karte)
+        for karte in (k for k in kandidaten if not k.get("frisch", True)):
+            if karte["anbieter"] in gesehen:
+                continue
+            gesehen.add(karte["anbieter"])
+            alt.append(karte)
         naeherung = next((k for k in satz["karten"] if k.get("naeherung")
                           and k.get("gesamt") is not None), None)
         if naeherung is not None and EIGEN not in gesehen:
             zeilen.append(naeherung)
             gesehen.add(EIGEN)
         zeilen.sort(key=lambda k: k["gesamt"])
-        fertig[band] = {"zeilen": zeilen, "karten": satz["karten"]}
+        fertig[band] = {"zeilen": zeilen, "karten": satz["karten"],
+                        "alt": alt}
     return fertig
 
 
@@ -223,11 +235,15 @@ def _alternativen(karten: list, band: str, anbieter: str) -> list[dict]:
     in Klammern" - der Leser sieht nicht nur DASS einer fehlt, sondern wo
     er steht. Nur ECHTE Karten (Bündel mit SKU oder die Näherung) sagen
     etwas darüber, wo ein Anbieter steht; die Leerkarte der Festanbieter
-    ist kein Angebot.
+    ist kein Angebot. Und seit A3 nur FRISCHE: ein altes Angebot ist keine
+    Alternative von heute (`geraete_tco_karten.ist_frisch`, Clean Code 7 -
+    dieselbe Definition wie Zeilen und Kacheln).
     """
     beste: dict[str, float] = {}
     for karte in karten:
         if karte.get("anbieter") != anbieter:
+            continue
+        if not karte.get("frisch", True):
             continue
         if not (karte.get("sku_id") or karte.get("naeherung")):
             continue
@@ -247,6 +263,21 @@ def _luecken(zeilen: list, karten: list, band: str) -> list[dict]:
     Antonio 9b.7: „Wenn es nichts gibt, dann brauchst du es nicht
     anzuzeigen von den jeweiligen Anbietern" - die Namen stehen im SAMMEL-
     satz, nie als eigene Zeile mit leerem Inhalt.
+
+    Seit A3 gibt es einen VIERten Grund: der Anbieter führt ein Bündel,
+    aber nur mit altem Abruf - „kein Bündel in diesem Band" waere gelogen
+    (harte Regel 9), der alte Preis darf aber auch nicht als heutiger
+    Alternative-Betrag stehen.
+
+    S2-3 (Diff-Prüfung 21.09.2026): gefragt ist DIESES Band - die
+    Frische-Prüfung muss die Karten DES BANDES meinen, nicht alle Karten
+    des Anbieters. Vorher gewann der Anbieter-Weitblick: Telekom mit
+    einem alten Klein-Bündel (720,76 EUR vom 15.09.) und einem frischen
+    Groß-Bündel bekam im Band klein „kein-belastbares" - die Seite sagte
+    „Kein Bündel in diesem Band: Telekom", obwohl die alte Klein-Karte
+    als alt-Zeile direkt darüber steht. Reihenfolge jetzt: gar kein
+    Bündel - kein Bündel in DIESEM Band - nur alter Stand in diesem
+    Band - frisch im Band, aber nicht belastbar.
     """
     gesehen = {z["anbieter"] for z in zeilen}
     luecken = []
@@ -257,10 +288,13 @@ def _luecken(zeilen: list, karten: list, band: str) -> list[dict]:
                   and (k.get("sku_id") or k.get("naeherung"))]
         if not eigene:
             grund = "gar-kein-buendel"
-        elif any(k.get("band") == band for k in eigene):
-            grund = "kein-belastbares"
-        else:
+        elif not any(k.get("band") == band for k in eigene):
             grund = "anderes-band"
+        elif not any(k.get("frisch", True)
+                     for k in eigene if k.get("band") == band):
+            grund = "nur-alte"
+        else:
+            grund = "kein-belastbares"
         luecken.append({"anbieter": anbieter, "grund": grund,
                         "alternativ": _alternativen(karten, band, anbieter)})
     return luecken
@@ -270,7 +304,7 @@ def _luecke_text(luecken: list, band_labels: dict) -> str | None:
     if not luecken:
         return None
     band_wort = {"klein": "klein", "mittel": "mittel", "gross": "groß"}
-    anderes, gar_nicht = [], []
+    anderes, gar_nicht, nur_alt = [], [], []
     for l in luecken:
         name = l["anbieter"]
         if l["alternativ"]:
@@ -279,12 +313,16 @@ def _luecke_text(luecken: list, band_labels: dict) -> str | None:
             name += f" ({alt})"
         if l["grund"] == "gar-kein-buendel":
             gar_nicht.append(name)
+        elif l["grund"] == "nur-alte":
+            nur_alt.append(name)
         else:
             anderes.append(name)
     teile = []
     if anderes:
         teile.append("Kein Bündel in diesem Band: " + ", ".join(anderes)
                      + ".")
+    if nur_alt:
+        teile.append("Kein aktueller Stand: " + ", ".join(nur_alt) + ".")
     if gar_nicht:
         teile.append(", ".join(gar_nicht) + " "
                      + ("führt" if len(gar_nicht) == 1 else "führen")
@@ -297,7 +335,7 @@ def _luecke_text(luecken: list, band_labels: dict) -> str | None:
 # --------------------------------------------------------------------------
 
 def _antwort_html(modell: dict, band: str, zeilen: list,
-                  band_katalog: dict) -> str:
+                  band_katalog: dict, alte: list | None = None) -> str:
     """Der Antwort-Satz des Paar-Blocks.
 
     Seit P4/D4 (STRATEGIE_GERAETE_V3, 18.09.2026) traegt er das
@@ -305,12 +343,31 @@ def _antwort_html(modell: dict, band: str, zeilen: list,
     EIGENE Leitzahl-Zeile ueber ihm (`_leitzahl_html`, DIE ANTWORT IST
     DIE GROESSTE ZAHL, design.md Regel 1). Dieselbe Rechnung, keine
     zweite Stelle: Der Satz nennt Anbieter, TCO-24 und Ø je Monat, die
-    Leitzahl den Abstand zur Referenz."""
+    Leitzahl den Abstand zur Referenz.
+
+    A3 (STRATEGIE_GERAETE_V4, 20.09.2026): steht in einem Band KEIN
+    frisches Angebot, aber ein altes, sagt der Satz den letzten Stand
+    MIT DATUM - „führt kein Anbieter ein Bündel" waere gelogen (harte
+    Regel 9), und ein Datum wird nie geraten: keines lesbar heisst
+    „unbekannt" (Clean Code 4).
+    """
     name = _esc(_satz_name(modell))
     label = band_katalog.get("label", band)
     bereich = band_katalog.get("bereich") or ""
     klammer = f" ({bereich})" if bereich else ""
     if not zeilen:
+        alte = alte or []
+        alt_seit = max((k.get("abgerufen_am") or "" for k in alte
+                        if kurz_datum(k.get("abgerufen_am") or "")),
+                       default="")
+        if alte and alt_seit:
+            return (f"Beim {name} im Band {label}{klammer} liegt kein "
+                    f"aktueller Stand vor – die letzte Messung ist vom "
+                    f"{kurz_datum(alt_seit)}.")
+        if alte:
+            return (f"Beim {name} im Band {label}{klammer} liegt kein "
+                    f"aktueller Stand vor – das Abrufdatum der letzten "
+                    f"Bündel ist unbekannt.")
         return (f"Beim {name} im Band {label}{klammer} führt kein Anbieter "
                 f"ein Bündel.")
     beste = zeilen[0]
@@ -1164,22 +1221,40 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
     karten_baender: dict[str, dict[str, dict]] = {}
     for modell in wahl:
         zeilen_je_band = _band_zeilen(modell)
-        bands = [b for b, s in zeilen_je_band.items() if s["zeilen"]]
+        # A3: ein Band mit NUR alten Angeboten bleibt waehlbar (harte
+        # Regel 9) - der Antwort-Satz nennt den letzten Stand statt
+        # „führt kein Anbieter ein Bündel" zu behaupten. Die Auswahl
+        # folgt damit der Menge der Angebote, nicht der der Messungen
+        # von heute.
+        bands = [b for b, s in zeilen_je_band.items()
+                 if s["zeilen"] or s.get("alt")]
         erlaubt[modell["id"]] = bands
         for band in bands:
             satz = zeilen_je_band[band]
             zeilen = satz["zeilen"]
+            alte = satz.get("alt") or []
             serien = serien_alle.get((modell["id"], band), {})
             punkte = sum(len(v) for v in serien.values())
             eintrag = {"ab": None, "ab_monat": None, "anb": None,
                        "delta_text": None, "delta_richtung": None,
-                       "punkte_html": "", "anbieter_text": ""}
+                       "punkte_html": "", "anbieter_text": "",
+                       "alt_text": None}
             echt = next((z for z in zeilen if not z.get("naeherung")
                          and z.get("gesamt") is not None), None)
             if echt is not None:
                 eintrag["ab"] = _euro(echt["gesamt"])
                 eintrag["ab_monat"] = _schnitt(echt)
                 eintrag["anb"] = echt["anbieter"]
+            elif alte:
+                # Der benannte Leerzustand der Kachel: kein „—" ohne
+                # Wort, sondern der alte Stand MIT Datum - nie geraten
+                # (kein lesbares Datum heisst „kein aktueller Stand").
+                alt_seit = max(
+                    (k.get("abgerufen_am") or "" for k in alte
+                     if kurz_datum(k.get("abgerufen_am") or "")), default="")
+                eintrag["alt_text"] = (
+                    f"kein aktueller Stand seit {kurz_datum(alt_seit)}"
+                    if alt_seit else "kein aktueller Stand")
             if serien:
                 band_anbieter = [a for a in ANBIETER_FOLGE if serien.get(a)]
                 eintrag["punkte_html"] = _anbieter_punkte(band_anbieter)
@@ -1208,7 +1283,8 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
             paare.append({
                 "modell": modell["id"], "band": band,
                 "antwort_html": _antwort_html(
-                    modell, band, zeilen, band_katalog.get(band, {})),
+                    modell, band, zeilen, band_katalog.get(band, {}),
+                    alte=satz.get("alt")),
                 # P4/D4: das Delta als Leitzahl ueber dem Satz (None ohne
                 # Delta - dann gibt es keine Leitzahl-Zeile, s. Docstring).
                 "leitzahl_html": _leitzahl_html(zeilen),
@@ -1230,8 +1306,10 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
                 "anbieter": [a for a in ANBIETER_FOLGE if serien.get(a)],
                 "punkte": punkte,
             })
-        # Bänder OHNE Zeile kommen nicht in die Auswahl - die Band-Wahl
-        # deaktiviert sie (Angebot, nicht Existenz der Option).
+        # Bänder OHNE Angebot - weder frisch noch alt - kommen nicht in
+        # die Auswahl; die Band-Wahl deaktiviert sie (Angebot, nicht
+        # Existenz der Option). Ein Band mit NUR altem Angebot bleibt
+        # dagegen waehlbar (siehe `bands` oben, A3).
 
     # DER STARTZUSTAND: die meisten Anbieter, dann die meisten Punkte -
     # aus den Serien gerechnet, nichts hardcodiert (der Bestand wächst).

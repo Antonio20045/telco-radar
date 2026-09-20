@@ -321,6 +321,14 @@
         {%- if s.ab %}<span class="gr-zr-k-preis"><small>ab</small><b>{{
           s.ab }}</b>{% if s.ab_monat %}<span class="gr-zr-k-monat">{{
           s.ab_monat }}</span>{% endif %}</span>
+        {# A3: ein Band mit nur alten Angeboten zeigt den benannten alten
+           Stand (`alt_text`, in Python gebaut, MIT Abrufdatum) statt
+           „—" - harte Regel 9; der Titel nennt denselben Sachverhalt
+           für Maus und Touch. #}
+        {%- elif s.alt_text %}<span class="gr-zr-k-preis"><small
+          class="gr-zr-k-leer gr-zr-k-alt"
+          title="kein aktueller Bündel-Stand">{{
+          s.alt_text }}</small></span>
         {%- else %}<span class="gr-zr-k-preis"><small class="gr-zr-k-leer"
           title="kein Bündel-Angebot in diesem Band">—</small></span>{%- endif %}
         {%- if s.delta_text %}<span class="gr-zr-k-delta{% if
@@ -712,7 +720,11 @@
                der heutige Bestand. #}
         <td class="num gr-sp--barpreis">
           {%- if m.ab_preis is not none %}
-          <span class="gr-k-ab">ab {{ m.ab_preis | euro }}</span>
+          {# A3: ein "ab" ohne frischen Beleg ist der LETZTE STAND, kein
+             aktueller - ausgegraut, mit Marke samt Abrufdatum (derselbe
+             Satz wie an der Bündelzeile, gebaut in Python). #}
+          <span class="gr-k-ab{% if m.ab_alt %} gr-k-ab--alt{% endif %}">ab {{
+            m.ab_preis | euro }}</span>
           {% if m.ab_beleg and m.ab_beleg.quelle_url %}<a
             class="gr-a-quelle" href="{{ m.ab_beleg.quelle_url }}"
             rel="noopener" title="Quelle bei {{ m.ab_anbieter }} öffnen">bei
@@ -720,6 +732,8 @@
           {% else %}<span class="gr-a-klein">bei {{ m.ab_anbieter }}</span>{% endif %}
           {% if m.ab_beleg and m.ab_beleg.abgerufen_am %} <span
             class="gr-a-klein gr-a-datum">{{ m.ab_beleg.abgerufen_am | date_de }}</span>{% endif %}
+          {% if m.ab_alt %} <span class="gr-kk-marke gr-kk-marke--alt">{{
+            m.ab_alt_marke }}</span>{% endif %}
           {%- elif m.nur_buendel %}
           <span class="gr-k-ab">nur im Bündel</span>
           <span class="gr-a-klein">ab {{ m.buendel_monat | euro }}/Monat{% if m.buendel_anbieter %}

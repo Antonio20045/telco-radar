@@ -204,6 +204,29 @@ def _zeile_fuer_anbieter(anbieter: str, karte: Optional[dict],
                 "band_label": "", "grund": grund or
                 f"Für dieses Modell ist bei {anbieter} kein Bündel erhoben.",
                 **_beleg("", "")}
+    # A3-Nachbesserung (Pruefer 20.09.2026, "hoch"): Eine ALTE Karte ist
+    # keine Zahl von heute - sie darf als BELEG neben der Zeile stehen
+    # (mit Quelle und Abrufdatum), aber weder Prozent noch Vergleichspaar
+    # tragen. Dieser Zweig ist der Weg, auf dem eine alte Karte den Radar
+    # erreicht: `alle_karten_je_band` filtert frisch, `uebrig` (die
+    # guenstigste Karte je Anbieter fuer den Band-Mismatch-Beleg) nicht.
+    # Am echten Bestand 20.09. zeichnete der Radar so sieben Telekom-
+    # Paarzeilen aus fuenf Tage alten Karten, obwohl deren frische
+    # Auswahl leer war. Gelesen wird das `frisch`-Feld der Karte - DIE
+    # eine Definition aus `geraete_tco_karten.ist_frisch` (Clean Code 7),
+    # hier wird nichts zweitgerechnet.
+    if karte.get("frisch") is False:
+        return {"anbieter": anbieter, "status": STATUS_NICHT_VERGLEICHBAR,
+                "prozent": None, "gesamt": karte["gesamt"],
+                "tarif": karte.get("tarif", ""), "band": None,
+                "band_label": "",
+                # S3e (Diff-Prüfung 21.09.2026): der or-Fallback war tot -
+                # `alt_marke_fuer` liefert für ein unlesbares Datum
+                # selbst den „unbekannt"-Satz, es gibt keinen Produktions-
+                # pfad, der hier einen leeren String hinterlegt.
+                "grund": karte.get("alt_marke", ""),
+                **_beleg(karte.get("quelle_url", ""),
+                         karte.get("abgerufen_am", ""))}
     if not karte.get("vergleichbar", True):
         return {"anbieter": anbieter, "status": STATUS_NICHT_VERGLEICHBAR,
                 "prozent": None, "gesamt": karte["gesamt"], "tarif": karte.get("tarif", ""),
@@ -270,7 +293,14 @@ def _paar_zeile(anbieter: str, band: str, wb_karte: dict,
 def _guenstigste_echte_karte_je_anbieter(modell: dict) -> dict[str, dict]:
     """Je Wettbewerber seine GUENSTIGSTE echte Karte (Band egal) - die
     Belegzeile fuer einen Band-Mismatch. Dieselbe Auswahlregel wie
-    `geraete_tco_band.karten_je_band`, nur ohne die Bandtrennung."""
+    `geraete_tco_band.karten_je_band`, nur ohne die Bandtrennung.
+
+    S2-2 (Diff-Prüfung 21.09.2026): FRISCHE vor Preis - dieselbe
+    Ordnung wie `_angebot_rang` in den Karten. Vorher gewann hier das
+    Minimum über frische UND alte Karten, und ein altes Billig-Angebot
+    (Prüfer-Repro: Telekom 720,76 EUR vom 15.09.) verdraengte die
+    frische Karte desselben Anbieters (1.440,76 EUR vom 19.09.) als
+    Beleg - die frische war im Radar unsichtbar."""
     beste: dict[str, dict] = {}
     for k in (modell.get("karten") or []):
         a = k["anbieter"]
@@ -279,7 +309,10 @@ def _guenstigste_echte_karte_je_anbieter(modell: dict) -> dict[str, dict]:
         if not (k.get("belastbar") and not k.get("naeherung")
                 and k.get("gesamt") is not None):
             continue
-        if a not in beste or k["gesamt"] < beste[a]["gesamt"]:
+        rang = (not k.get("frisch", True), k["gesamt"])
+        if (a not in beste
+                or rang < (not beste[a].get("frisch", True),
+                           beste[a]["gesamt"])):
             beste[a] = k
     return beste
 

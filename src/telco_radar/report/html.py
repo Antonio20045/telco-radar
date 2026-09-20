@@ -241,9 +241,19 @@ def _load_reports(reports_dir: Path) -> list[dict]:
         if not _DATE_RE.fullmatch(f.stem):
             continue
         try:
-            reports[f.stem] = json.loads(f.read_text(encoding="utf-8"))
+            satz = json.loads(f.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             log.warning("Skipping corrupt report json: %s", f)
+            continue
+        # S3c (Diff-Prüfung 21.09.2026): das Datum eines Berichts steht
+        # im STELLT-Namen (regex-geprüft oben) - genau so liest es der
+        # .md-Fallback eine Schleife weiter. Ein gültiges JSON ohne
+        # "date" (Rest eines abgebrochenen Schreibvorgangs) ließ vorher
+        # erst die Geräteseite in ihren Notzustand fallen und brach dann
+        # das Rendering am Archiv ab (`archive` liest r["date"] ungefangen).
+        if not satz.get("date"):
+            satz["date"] = f.stem
+        reports[f.stem] = satz
     for f in sorted(reports_dir.glob("*.md")):
         if _DATE_RE.fullmatch(f.stem) and f.stem not in reports:
             reports[f.stem] = {"date": f.stem, "generated_with_llm": False,
@@ -1263,9 +1273,22 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     from . import geraete_view as geraete_view_mod
     _wurzel = getattr(cfg, "root", None) or reports_dir.parent.parent
     try:
+        # `heute` ist der Berichtstag (radar.yml, Mi/Fr) - NICHT die Uhr der
+        # Geräteseite: geraete.yml rendert täglich und fasst die Berichte
+        # nicht an. Die Alterung der Bündel rechnet deshalb in `aufbereiten`
+        # gegen den SPÄTEREN von Berichtstag und dem `updated` des Bündel-
+        # Stores (Prüfer-Befund vom 20.09.2026: Bericht 16.09., Stand 20.09.,
+        # Telekom-Bündel vom 15.09. blieben frisch). `reports[0]` ist der
+        # JÜNGSTE Bericht (`_load_reports` sortiert absteigend). Ohne
+        # Berichte bleibt `heute` leer - der dokumentierte Kompatibilitäts-
+        # modus, in dem nichts altert (`ist_frisch`); ein Render ohne
+        # Bericht darf hier nicht crashen. `.get`: `_load_reports` schreibt
+        # jedem Bericht das Datum seines Stamms, das `.get` ist die zweite
+        # Wand (S3c) - ein KeyError hier würde die Geräteseite in ihren
+        # Notzustand werfen, obwohl die Seite längst alles hat.
         geraete = geraete_view_mod.aufbereiten(
             state_dir, _lade_geraetequellen(_wurzel), lade_katalog(_wurzel),
-            heute=reports[0]["date"] if reports else "")
+            heute=reports[0].get("date", "") if reports else "")
     except Exception as exc:  # noqa: BLE001
         log.error("Geraetedaten nicht aufbereitbar: %s: %s",
                   type(exc).__name__, exc)

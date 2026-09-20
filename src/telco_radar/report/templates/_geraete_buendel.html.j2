@@ -8,9 +8,16 @@
 
    Die Zeile selbst ist seit O2 unverändert: Fünf Kernangaben offen, ALLES
    weitere im EINEN Rechenweg-Aufklapper (A6: kein Datenverlust). O3 fügt
-   NUR den numerischen Δ-Sortierschlüssel hinzu (`data-delta`, Punkt C). #}
+   NUR den numerischen Δ-Sortierschlüssel hinzu (`data-delta`, Punkt C).
+
+   A3 (STRATEGIE_GERAETE_V4, 20.09.2026): eine ALTE Zeile (Abruf älter
+   als `geraete_tco_karten.ALT_AB_TAGEN`, gegen das Datum der Ausgabe)
+   bleibt stehen, ausgegraut (`gr-bnd--alt`), mit Marke und Abrufdatum
+   (`gr-kk-marke--alt`, Text aus `alt_marke` - die Zahl steht in Python,
+   nie in der Vorlage, Clean Code 8). `frisch` fehlt keiner Karte, die
+   `modelle()` baut; `is defined` haelt den Rueckfall auf frisch. #}
 {% macro buendelzeile(k) %}
-<details class="gr-bnd{% if not k.belastbar %} gr-bnd--leer{% endif %}"
+<details class="gr-bnd{% if not k.belastbar %} gr-bnd--leer{% endif %}{% if k.sku_id and k.frisch is defined and not k.frisch %} gr-bnd--alt{% endif %}"
          data-anbieter="{{ k.anbieter }}"
          {% if k.band %}data-band="{{ k.band }}"{% endif %}
          data-zustand="{{ k.zustand }}"
@@ -31,6 +38,8 @@
     <span class="gr-bnd-an"><span class="gr-bnd-name">{{ k.anbieter }}</span>{%
       if k.zustand_etikett %} <span class="gr-kk-marke gr-kk-marke--zustand">{{
       k.zustand_etikett }}</span>{% endif %}{%
+      if k.alt_marke %} <span class="gr-kk-marke gr-kk-marke--alt">{{
+      k.alt_marke }}</span>{% endif %}{%
       if k.naeherung %} <span class="gr-kk-marke">Referenzrechnung</span>{%
       elif k.eigen and k.belastbar %} <span class="gr-kk-marke">unser Angebot</span>{%
       endif %}</span>
@@ -271,6 +280,12 @@
    Dokument, und der Modellwechsel adressiert seine Knoten über
    `#gr-bnd-gruppe`. #}
 {% macro buendelgruppe(m, ids=false) %}
+      {# A3: „alles alt“ steht als EIN Satz über den Zeilen des Modells
+         (`alt_hinweis`, in Python gebaut, mit Datum und Grenze) - nicht
+         an jeder Zeile einzeln, und nur wenn wirklich KEINE frische
+         Karte mehr steht (harte Regel 9). #}
+      {% if m.alt_hinweis %}<p class="gr-erklaer gr-basis--duenn">{{
+        m.alt_hinweis }}</p>{% endif %}
       <div class="gr-bndliste"{% if ids %} id="gr-bndliste"{% endif %}>
         {% for k in m.zeilen_band %}{{ buendelzeile(k) }}{% endfor %}
       </div>

@@ -903,9 +903,11 @@ def test_am_echten_bestand_fuehrt_jeder_mismatch_die_guenstigste_karte(echt):
                             and k.get("gesamt") is not None]
             assert karten_davon, \
                 f"{g['id']}/{z['anbieter']}: Mismatch ohne jede echte Karte"
-            guenstigste = min(karten_davon, key=lambda k: k["gesamt"])
+            guenstigste = min(karten_davon,
+                              key=lambda k: (not k.get("frisch", True), k["gesamt"]))
             assert z["gesamt"] == guenstigste["gesamt"], \
-                f"{g['id']}/{z['anbieter']}: Beleg ist nicht die guenstigste"
+                f"{g['id']}/{z['anbieter']}: Beleg ist nicht die guenstigste " \
+                "FRISCHE Karte (A3: alt vor billig verliert)"
     assert treffer, "kein Band-Mismatch im Bestand - die Invariantenpruefung " \
         "traefe einen leeren Fall (Datenlage ggf. neu ansehen)"
 

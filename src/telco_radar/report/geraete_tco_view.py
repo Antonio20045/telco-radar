@@ -200,9 +200,12 @@ def _vergleichbar(zeile: dict) -> bool:
 # (sie sind kein Angebot, sondern eine Lücke), die Näherung hinter den
 # echten Angeboten desselben Preises - dieselbe Rangfolge-Idee wie
 # `geraete_tco_karten._rang`, nur auf das eine Mass der Zeilen gebracht.
+# A3: alte Zeilen hinter allen frischen - sie bleiben sichtbar, aber
+# kein frisches Angebot steht unter einem alten.
 def _zeilen_rang(karte: dict) -> tuple:
     return (not karte["belastbar"],
             karte["naeherung"],
+            not karte.get("frisch", True),
             karte["gesamt"] if karte["gesamt"] is not None else 9e9,
             karte["anbieter"])
 
@@ -638,7 +641,8 @@ def _export_zeilen(buendel: list, massstab: list, eintraege: list, katalog,
 def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
                 lesbar: bool = True, tarife: dict | None = None,
                 anbieter_typen: dict | None = None,
-                tco_historie: dict | None = None) -> dict:
+                tco_historie: dict | None = None,
+                heute: str = "") -> dict:
     """Alles, was der Reiter "Was kostet es" braucht.
 
     `buendel` und `referenzen` sind die Datensaetze aus
@@ -653,6 +657,8 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
     `tco_historie` (O4) ist `TcoDB.historie_lage()` - der ehrliche Satz
     über die Bündel-Historie im Verlaufs-Reiter nennt ihr ECHTES
     Startdatum, nicht das des Entwurfstages.
+    `heute` (A3, "YYYY-MM-DD") schaltet die Alterung ein - ohne das
+    Datum (Default) altert nichts (`geraete_tco_karten.ist_frisch`).
     """
     buendel = _aus_speicher(buendel, Buendel, _BUENDEL_FELDER)
     referenzen = _aus_speicher(referenzen, SimOnlyReferenz, _REFERENZ_FELDER)
@@ -750,7 +756,7 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
     massstab = _referenztabelle(referenzen)
 
     modelle = geraete_tco_karten.modelle(buendel, eintraege, referenzen,
-                                         tarife, katalog)
+                                         tarife, katalog, heute=heute)
 
     # DIE LISTUNGEN JE MODELL, einmal vorab gruppiert: gebraucht fuer die
     # Händler-Preise ohne Bündel (A-R3, weiter unten) - statt je Modell
