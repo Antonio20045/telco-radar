@@ -352,9 +352,11 @@ def modell_tco_csv(modelle: list) -> tuple[str, int]:
     Gelesen wird genau das, was die TCO-Spalte der Modellzeile traegt
     (`_tco_spalte` in `geraete_view`): die Leitzahl des besten
     vergleichbaren Angebots, sein Anbieter, sein Ø je Monat, die
-    Abweichung zur Vodafone-Referenz (nur wo eine existiert) und sein
-    Tarifband. Eine Zeile ohne Zahl traegt den benannten Grund in der
-    Statusspalte - gerechnet wird hier nichts.
+    Abweichung des guenstigen Wettbewerber-Angebots zur
+    Vodafone-Referenz (wo Vodafone selbst fuehrt, der Abstand des
+    naechsten Wettbewerbers) und sein Tarifband. Eine Zeile ohne Zahl
+    oder ohne Abstand traegt den benannten Grund in der Statusspalte -
+    gerechnet wird hier nichts.
     """
     ausgabe = []
     for m in modelle or []:
@@ -370,7 +372,10 @@ def modell_tco_csv(modelle: list) -> tuple[str, int]:
             # waere eine zweite Sprache fuer dieselbe Sache (O4-Regel).
             _prozent(m.get("tco_delta_prozent")),
             band_label(m.get("tco_band")),
-            m.get("tco_leer") or "",
+            # Zwei sich ausschliessende Leergruende, EINE Statusspalte:
+            # tco_leer steht nur ohne Leitzahl, tco_delta_leer nur mit
+            # Leitzahl (A2-Nachbesserung 20.09.2026).
+            m.get("tco_leer") or m.get("tco_delta_leer") or "",
             beleg.get("abgerufen_am", ""), beleg.get("quelle_url", ""),
         ])
     return _schreibe(SPALTEN_MODELL_TCO, ausgabe), len(ausgabe)

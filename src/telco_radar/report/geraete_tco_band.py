@@ -266,7 +266,8 @@ def _datum_de(iso: str) -> str:
         return iso
 
 
-def delta_text(euro: Optional[float], prozent: Optional[float]) -> Optional[str]:
+def delta_text(euro: Optional[float], prozent: Optional[float],
+               ungefaehr: bool = False) -> Optional[str]:
     """"−466,80 € · −29,9 %" - EINE Stelle für dieses Format.
 
     Diese Zeichenkette entsteht hier in Python und wird von Vorlage UND
@@ -277,9 +278,17 @@ def delta_text(euro: Optional[float], prozent: Optional[float]) -> Optional[str]
     ansicht (`geraete_tco_view` haengt sie als `delta_kurz` an die Karte):
     Graph und Zeile tragen dieselbe Zeichenkette, nicht zwei Formate fuer
     dieselbe Differenz. Deshalb ist sie kein `_`-Privatweg mehr.
+
+    A2 (20.09.2026): `ungefaehr` fuer einen Abstand UNTER der Wesentlich-
+    keits-Schwelle - "≈ ±X €" mit dem echten Betrag statt des Strichs,
+    der "kein Angebot" heisst. Ohne Prozentanteil: Zehntel-Prozent an
+    einer Annäherung waeren Scheingenaugkeit. Exakt null heisst "±".
     """
     if euro is None:
         return None
+    if ungefaehr:
+        zeichen = "±" if not euro else ("−" if euro < 0 else "+")
+        return f"≈ {zeichen}{_minus(euro)} €"
     zeichen = "−" if euro < 0 else "+"
     text = f"{zeichen}{_minus(euro)} €"
     if prozent is not None:

@@ -62,16 +62,17 @@ def _buendel(anbieter, hersteller, modell, sku_suffix, monat,
     return b
 
 
-def _tco_modell(mid, karten):
-    return {"id": mid, "titel": mid, "karten": karten}
+def _tco_modell(mid, karten, referenz=None):
+    return {"id": mid, "titel": mid, "karten": karten, "referenz": referenz}
 
 
 def _karte(anbieter, gesamt, monat=41.0, zustand="neu", vergleichbar=True,
-           belastbar=True, delta=None, delta_kurz=None, band="klein"):
+           belastbar=True, delta=None, delta_kurz=None, band="klein",
+           eigen=False):
     return {"anbieter": anbieter, "gesamt": gesamt, "schnitt_monat": monat,
             "zustand": zustand, "vergleichbar": vergleichbar,
             "belastbar": belastbar, "naeherung": False, "delta": delta,
-            "delta_kurz": delta_kurz, "band": band,
+            "delta_kurz": delta_kurz, "band": band, "eigen": eigen,
             "quelle_url": f"https://example.de/{anbieter}", "sku_id": "s",
             "abgerufen_am": "2026-09-17"}
 
@@ -308,6 +309,96 @@ def test_tco_delta_nur_mit_referenz():
     assert zeilen[0]["tco_ab"] == 1000.0
 
 
+# ---------------------------------------------------------------------------
+# Der TRAEGER des Deltas (A2-Nachbesserung, Pruef-Befund 20.09.2026):
+# Gewann das EIGENE Buendel das Minimum der Zeile, behauptete die Delta-
+# Zelle "keine Referenz" - obwohl die TCO-Zelle derselben Zeile "bei
+# Vodafone" sagte. 20 von 48 "keine Referenz"-Zeilen des Bestands waren
+# eigene Marktfuehrung, kein Referenzmangel (Galaxy A57 256: Vodafone
+# 1.199,80 EUR vor 1&1 1.207,54 EUR, Abstand +7,74 als Annaeherung).
+# ---------------------------------------------------------------------------
+
+def test_unser_angebot_fuehrt_der_delta_traegt_der_wettbewerber():
+    mid = modell_schluessel(device_id("Apple", "Apple X"), 256)
+    tco = [_tco_modell(mid, karten=[
+        # Das eigene Buendel IST die Referenz: _delta liefert dafuer None
+        # (B4) - trotzdem stellt es die Leitzahl der Zeile.
+        _karte("Vodafone", 1100.0, eigen=True, delta=None, delta_kurz=None),
+        _karte("1&1", 1107.74,
+               delta={"betrag": 7.74, "prozent": None, "ungefaehr": True},
+               delta_kurz="≈ +7,74 €"),
+    ], referenz={"gesamt": 1100.0, "monate": 24})]
+    eintraege = [_listung("A", "Apple", "Apple X", "256gb-a", 1000.0)]
+    zeilen = geraete_view.katalog_modellzeilen(eintraege, _katalog(),
+                                               tco_modelle=tco)
+    (zeile,) = zeilen
+    assert zeile["tco_ab"] == 1100.0, "das eigene Angebot stellt die Leitzahl"
+    assert zeile["tco_anbieter"] == "Vodafone"
+    # Der Abstand der Zelle gehoert dem guenstigsten FREMDEN Angebot.
+    assert zeile["tco_delta"] == 7.74
+    assert zeile["tco_delta_kurz"] == "≈ +7,74 €"
+    assert zeile["tco_delta_anbieter"] == "1&1", (
+        "der title der Zelle muss den Traeger des Abstands nennen")
+    assert zeile["tco_delta_leer"] is None
+
+
+def test_nur_unser_angebot_heisst_die_luecke_beim_wettbewerber():
+    """Der Rand desselben Bestands (4 Modelle am 20.09.): Vodafone fuehrt,
+    und KEIN Wettbewerber hat ein vergleichbares Buendel. 'keine Referenz'
+    waere die falsche Aussage - die Referenz ist das eigene Angebot; die
+    Luecke liegt beim Wettbewerb."""
+    mid = modell_schluessel(device_id("Apple", "Apple X"), 256)
+    tco = [_tco_modell(mid, karten=[
+        _karte("Vodafone", 1100.0, eigen=True, delta=None, delta_kurz=None),
+    ], referenz={"gesamt": 1100.0, "monate": 24})]
+    eintraege = [_listung("A", "Apple", "Apple X", "256gb-a", 1000.0)]
+    zeilen = geraete_view.katalog_modellzeilen(eintraege, _katalog(),
+                                               tco_modelle=tco)
+    (zeile,) = zeilen
+    assert zeile["tco_ab"] == 1100.0
+    assert zeile["tco_delta_kurz"] is None
+    assert zeile["tco_delta_leer"] == "kein Wettbewerber-Angebot"
+    assert zeile["tco_delta_anbieter"] is None
+
+
+def test_ohne_eigenes_angebot_bleibt_es_bei_keine_referenz():
+    """Gegenprobe: die 28 Zeilen des Bestands ohne jede Vodafone-Karte
+    behalten ihr Etikett - 'keine Referenz' bleibt die Aussage DAFUER,
+    dass Vodafone das Modell nicht listet."""
+    mid = modell_schluessel(device_id("Apple", "Apple X"), 256)
+    tco = [_tco_modell(mid, karten=[_karte("o2", 1000.0, delta=None,
+                                           delta_kurz=None)])]
+    eintraege = [_listung("A", "Apple", "Apple X", "256gb-a", 1000.0)]
+    zeilen = geraete_view.katalog_modellzeilen(eintraege, _katalog(),
+                                               tco_modelle=tco)
+    (zeile,) = zeilen
+    assert zeile["tco_delta_leer"] == "keine Referenz"
+    assert zeile["tco_delta_leer_grund"] == (
+        "Vodafone listet dieses Modell nicht - deshalb ist kein Abstand "
+        "berechenbar (die Referenz fehlt)")
+    assert zeile["tco_delta_anbieter"] is None
+
+
+def test_wettbewerber_ohne_euro_abstand_bekommt_den_strich():
+    """Ein Wettbewerber-Angebot ohne Euro-Abstand (andere Laufzeit, A5.4):
+    die Zelle zeigt den Strich wie die Buendelzeile - und NICHT 'keine
+    Referenz', denn die Referenz existiert."""
+    mid = modell_schluessel(device_id("Apple", "Apple X"), 256)
+    tco = [_tco_modell(mid, karten=[
+        _karte("Vodafone", 1100.0, eigen=True, delta=None, delta_kurz=None),
+        _karte("1&1", 1400.0, delta={"betrag": None, "monatlich": 12.5},
+               delta_kurz=None),
+    ], referenz={"gesamt": 1100.0, "monate": 24})]
+    eintraege = [_listung("A", "Apple", "Apple X", "256gb-a", 1000.0)]
+    zeilen = geraete_view.katalog_modellzeilen(eintraege, _katalog(),
+                                               tco_modelle=tco)
+    (zeile,) = zeilen
+    assert zeile["tco_delta"] is None
+    assert zeile["tco_delta_kurz"] is None
+    assert zeile["tco_delta_leer"] is None, (
+        "kein Etikett - die Referenz existiert, der Abstand fehlt")
+
+
 def test_tco_leerzustaende_benannt():
     eintraege = [
         _listung("A", "Apple", "Apple X", "256gb-a", 1000.0),
@@ -405,6 +496,44 @@ def test_modell_tco_csv_traegt_den_grund_statt_einer_luecke(tmp_path):
     assert apple[kopf.index("Status")] == ""
     assert pixel[kopf.index("TCO ab EUR")] == ""
     assert pixel[kopf.index("Status")] == "kein Bündel gemessen"
+
+
+def test_modell_tco_csv_nennt_den_delta_leergrund(tmp_path):
+    """A2-Nachbesserung: die Statusspalte traegt auch die Abstand-Luecken
+    - "kein Wettbewerber-Angebot", wo das eigene Angebot fuehrt, und den
+    Abstand des Wettbewerbres, wo er existiert. Zwei Zeilen, zwei
+    Traeger: Leitzahl bei Vodafone, Abstand beim Wettbewerber."""
+    mid = modell_schluessel(device_id("Samsung", "Galaxy S26 Ultra"), 256)
+    tco = [_tco_modell(mid, karten=[
+        _karte("Vodafone", 1100.0, eigen=True, delta=None, delta_kurz=None),
+        _karte("1&1", 1107.74,
+               delta={"betrag": 7.74, "prozent": None, "ungefaehr": True},
+               delta_kurz="≈ +7,74 €"),
+    ], referenz={"gesamt": 1100.0, "monate": 24})]
+    eintraege = [_listung("A", "Samsung", "Galaxy S26 Ultra", "256gb-a",
+                          1000.0)]
+    modelle = geraete_view.katalog_modellzeilen(eintraege, _katalog(),
+                                                tco_modelle=tco)
+    inhalt, _ = ex.modell_tco_csv(modelle)
+    (daten,) = [z.split(";") for z in inhalt.split("\r\n") if z][1:]
+    kopf = ex.SPALTEN_MODELL_TCO
+    assert daten[kopf.index("TCO ab EUR")] == "1100,00"
+    assert daten[kopf.index("Bester Anbieter")] == "Vodafone"
+    assert daten[kopf.index("Abweichung zu Vodafone EUR")] == "7,74"
+    assert daten[kopf.index("Status")] == ""
+
+    # Und die Luecke ohne Wettbewerb: Leitzahl da, Abstand ohne Etikett
+    # waere stumm - der Grund heisst beim Wettbewerb, nicht bei der
+    # Referenz.
+    tco_allein = [_tco_modell(mid, karten=[
+        _karte("Vodafone", 1100.0, eigen=True, delta=None, delta_kurz=None),
+    ], referenz={"gesamt": 1100.0, "monate": 24})]
+    modelle = geraete_view.katalog_modellzeilen(eintraege, _katalog(),
+                                                tco_modelle=tco_allein)
+    inhalt, _ = ex.modell_tco_csv(modelle)
+    (daten,) = [z.split(";") for z in inhalt.split("\r\n") if z][1:]
+    assert daten[kopf.index("Abweichung zu Vodafone EUR")] == ""
+    assert daten[kopf.index("Status")] == "kein Wettbewerber-Angebot"
 
 
 def test_schreibe_exporte_legt_beide_ansichten_an(tmp_path):

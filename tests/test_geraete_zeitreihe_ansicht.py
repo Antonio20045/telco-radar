@@ -658,31 +658,45 @@ def test_die_karte_traegt_preis_und_anbieter_punkte(ansicht):
     assert mittel["delta_text"] == "↓ −12 € in 1 Tag"
 
 
-def test_das_karten_delta_ist_die_preisfront_der_historie(ansicht_state):
-    """Gegenrechnung aus der ROHEN Historie (nicht aus der Aufbereitung):
-    die Front des Bandes klein ist am 12.9. das Minimum ueber alle Anbieter
-    (1&1: 841) und am 15.9. congstar 1009 - also +168 in 3 Tagen. Die
-    Fixture schreibt ihr eingefrorenes `gesamt` in derselben Formel, mit
-    der die Aufbereitung die Punkte neu rechnet (A1) - darum stimmen rohe
-    Gegenrechnung und Karte ohne Ausnahme ueberein."""
+def test_das_karten_delta_ist_die_bewegung_des_fuehrenden_anbieters(ansicht_state):
+    """Gegenrechnung aus der ROHEN Historie (nicht aus der Aufbereitung),
+    JE ANBIETER (A2, 20.09.2026): fuehrend am letzten Messtag des Bandes
+    klein ist congstar - die EINZIGE Messung am 15.9. (1.009 EUR) -, und
+    congstar stand auch am ersten Messtag (12.9.) bei 1.009 EUR. Die
+    Bewegung der Karte ist congstars EIGENE (±0 in 3 Tagen). Die bis A2
+    gerechnete Front haette 1&1s 841 EUR (12.9.) gegen congstars 1.009 EUR
+    (15.9.) gestellt und "+168 in 3 Tagen" gemeldet - zwei VERSCHIEDENE
+    Angebote gegeneinander, ohne dass ein Anbieter seinen Preis geaendert
+    hat."""
     ansicht, state = ansicht_state
     k = ansicht["kacheln"][0]
     assert k["id"] == "apple-iphone-17-pro-256"
-    front: dict[str, float] = {}
+    tco = json.loads((pathlib.Path(state) / "geraete_tco.json")
+                     .read_text(encoding="utf-8"))
+    anbieter_je_id = {b["id"]: b["anbieter"] for b in tco["buendel"]}
+    je_anbieter: dict[str, dict[str, float]] = {}
     pfad = pathlib.Path(state) / "geraete_tco_historie.jsonl"
     for zeile in pfad.read_text(encoding="utf-8").splitlines():
         satz = json.loads(zeile)
         if not satz["tarif_id"].endswith(":klein"):
             continue                       # die Karte zeigt Band klein
-        datum = satz["datum"]
-        if datum not in front or satz["gesamt"] < front[datum]:
-            front[datum] = satz["gesamt"]
-    tage = sorted(front)
-    delta = round(front[tage[-1]] - front[tage[0]], 2)
-    assert delta == 168.0 and (tage[-1] == "2026-09-15"
-                               and tage[0] == "2026-09-12")
-    assert k["baender"]["klein"]["delta_text"] == "↑ +168 € in 3 Tagen"
-    assert k["baender"]["klein"]["delta_richtung"] == "steigt"
+        if satz["id"] not in anbieter_je_id:
+            continue                       # Farbdublette ohne Store-Satz
+        je = je_anbieter.setdefault(anbieter_je_id[satz["id"]], {})
+        if satz["datum"] not in je or satz["gesamt"] < je[satz["datum"]]:
+            je[satz["datum"]] = satz["gesamt"]
+    tage = sorted({d for je in je_anbieter.values() for d in je})
+    assert (tage[0], tage[-1]) == ("2026-09-12", "2026-09-15")
+    fuehrend = min((a for a in je_anbieter if tage[-1] in je_anbieter[a]),
+                   key=lambda a: (je_anbieter[a][tage[-1]], a))
+    assert fuehrend == "congstar"
+    assert tage[0] in je_anbieter[fuehrend], \
+        "ohne Messung am ersten Tag gaebe es keine Bewegung (A2)"
+    delta = round(je_anbieter[fuehrend][tage[-1]]
+                  - je_anbieter[fuehrend][tage[0]], 2)
+    assert delta == 0.0
+    assert k["baender"]["klein"]["delta_text"] == "±0 € in 3 Tagen"
+    assert k["baender"]["klein"]["delta_richtung"] == "gleich"
 
 
 def test_ohne_zwei_messtage_gibt_es_kein_delta(ansicht):
@@ -697,8 +711,9 @@ def test_ohne_zwei_messtage_gibt_es_kein_delta(ansicht):
 
 def test_bewegung_traegt_alle_richtungen():
     """Die Richtungs-Sprache der Karte: steigen rot, sinken gruen,
-    unverändert grau - und die Front ist das MINIMUM je Messtag, nie der
-    Wert des ersten Anbieters der Schleife."""
+    unverändert grau - und gemessen wird die Reihe DES ANBIETERS, der am
+    letzten Messtag fuehrt, nie der Wert des ersten Anbieters der
+    Schleife."""
     steigt = geraete_zeitreihe._bewegung(
         {"a": [["2026-09-12", 100.0], ["2026-09-14", 120.0]]})
     assert steigt == {"text": "↑ +20 € in 2 Tagen", "richtung": "steigt"}
@@ -708,14 +723,61 @@ def test_bewegung_traegt_alle_richtungen():
     gleich = geraete_zeitreihe._bewegung(
         {"a": [["2026-09-12", 100.0], ["2026-09-13", 100.0]]})
     assert gleich == {"text": "±0 € in 1 Tag", "richtung": "gleich"}
-    # Die Front: am letzten Tag lieg b (90) unter a (110) - das Minimum
-    # gewinnt, nicht die erste Serie.
+    # A2: fuehrt am letzten Tag ein Anbieter, der am ersten FEHLT (b: 90),
+    # gibt es KEINE Bewegung. Die Front haette b (90) gegen a (100)
+    # gestellt - zwei Angebote gegeneinander, keine Preisaenderung.
     front = geraete_zeitreihe._bewegung(
         {"a": [["2026-09-12", 100.0], ["2026-09-13", 110.0]],
          "b": [["2026-09-13", 90.0]]})
-    assert front == {"text": "↓ −10 € in 1 Tag", "richtung": "sinkt"}
+    assert front is None
     assert geraete_zeitreihe._bewegung(
         {"a": [["2026-09-12", 100.0]]}) is None
+
+
+def test_wechselt_der_guenstigste_anbieter_ohne_preisaenderung_gibt_es_keine_bewegung():
+    """A2 (20.09.2026), der Befund am iPhone 17 Pro, Band klein: congstar
+    am 12.9., 1&1 am 18.9. - KEIN Anbieter hat seinen Preis geaendert, und
+    die Karte meldete "+387 EUR in 6 Tagen". Bewegung ist anzeigepflichtig
+    nur je ANBIETER: der Fuehrende am letzten Messtag (1&1) fehlt am
+    ersten, also gibt es fuer ihn keine Bewegung - keinesfalls die
+    Differenz der zwei Angebote."""
+    # Der Produktionsfall in Zahlen: congstar 1.009 EUR (12.9.),
+    # 1&1 1.396 EUR (18.9.) - 387 EUR Front-Differenz, null Preisaenderung.
+    assert geraete_zeitreihe._bewegung(
+        {"congstar": [["2026-09-12", 1009.0]],
+         "1&1": [["2026-09-18", 1396.0]]}) is None
+    # Dieselbe Fehlerklasse, andersherum: der bisher Fuehrende bleibt
+    # weiter gemessen und unveraendert, ein NOCH guenstigerer Anbieter
+    # kommt hinzu - die Front faellt, kein Preis hat sich bewegt.
+    assert geraete_zeitreihe._bewegung(
+        {"congstar": [["2026-09-12", 1009.0], ["2026-09-18", 1009.0]],
+         "1&1": [["2026-09-18", 900.0]]}) is None
+
+
+def test_die_bewegung_misst_den_fuehrenden_anbieter_an_beiden_endtagen():
+    """Wer am letzten Messtag fuehrt, dessen EIGENE Reihe zwischen erstem
+    und letztem Messtag ist die Bewegung - inklusive Gleichstand und
+    Gleichstands-Tie-break ueber die Anbieterfolge (deterministisch, kein
+    Wuerfeln je Rendern)."""
+    # b fuehrt am letzten Tag (94 < 95) und stand am ersten bei 90: +4.
+    steigt = geraete_zeitreihe._bewegung(
+        {"a": [["2026-09-12", 100.0], ["2026-09-13", 95.0]],
+         "b": [["2026-09-12", 90.0], ["2026-09-13", 94.0]]})
+    assert steigt == {"text": "↑ +4 € in 1 Tag", "richtung": "steigt"}
+    # o2 ist am letzten Tag die einzige (und damit fuehrende) Messung;
+    # 1&1 war am ersten guenstiger, fehlt aber am letzten - o2s eigene
+    # Reihe ist unveraendert: ±0, nicht 1&1s niedrigerer alter Preis.
+    gleich = geraete_zeitreihe._bewegung(
+        {"o2": [["2026-09-12", 100.0], ["2026-09-13", 100.0]],
+         "1&1": [["2026-09-12", 80.0]]})
+    assert gleich == {"text": "±0 € in 1 Tag", "richtung": "gleich"}
+    # Gleichstand am letzten Tag (beide 100): die ANBIETER_FOLGE bricht
+    # den Tie - o2 (Position 3) vor 1&1 (Position 4). Die Bewegung ist
+    # o2s eigene (120 -> 100), nicht 1&1s (80 -> 100).
+    tie = geraete_zeitreihe._bewegung(
+        {"1&1": [["2026-09-12", 80.0], ["2026-09-13", 100.0]],
+         "o2": [["2026-09-12", 120.0], ["2026-09-13", 100.0]]})
+    assert tie == {"text": "↓ −20 € in 1 Tag", "richtung": "sinkt"}
 
 
 def test_ohne_historie_gibt_es_den_ehrlichen_leersatz(tmp_path):

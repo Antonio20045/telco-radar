@@ -44,10 +44,11 @@
     {# `gr-bnd-delta--wert` nur für ZAHLEN-Werte: mobil ist der Spaltenkopf
        versteckt, und eine nackter zweiter Euro-Betrag neben „Gerät ohne
        Vertrag" wäre mehrdeutig - das Δ-Präfix (CSS, mobil) erklärt die
-       Zahl mit einem Zeichen. Vor „Referenz" und „–" stünde es falsch
-       (O3-Evaluation S4). #}
+       Zahl mit einem Zeichen. Vor „Referenz", „–" und „≈" stünde es falsch
+       (O3-Evaluation S4; A2: die Annäherung trägt ihr eigenes Zeichen). #}
     <span class="gr-bnd-delta{% if not k.naeherung and not (k.eigen and
-      k.belastbar) and k.delta_kurz %} gr-bnd-delta--wert{% endif %}">{% if
+      k.belastbar) and k.delta_kurz and not (k.delta and k.delta.ungefaehr)
+      %} gr-bnd-delta--wert{% endif %}">{% if
       k.naeherung %}Referenz{% elif
       k.eigen and k.belastbar %}Referenz{% elif k.delta_kurz %}{{ k.delta_kurz
       }}{% else %}–{% endif %}</span>
@@ -168,13 +169,19 @@
        darüber trägt nur das kompakte Δ (derselbe Text wie der Graph).
        E3/S4: dieselbe Richtungssprache wie der Antwort-Satz der Zeitreihe
        („X € unter der Vodafone-Referenz", sobald ein Wettbewerber führt) -
-       unter heißt günstiger, über heißt teurer, auf der ganzen Seite. #}
+       unter heißt günstiger, über heißt teurer, auf der ganzen Seite.
+       A2 (20.09.2026): ein Abstand unter der Wesentlichkeits-Schwelle ist
+       eine ANNÄHERUNG - „≈ X €" ohne Prozentanteil; auf gleicher Höhe
+       entspricht das Angebot der Referenz ganz. #}
     <p class="gr-kk-delta{% if k.delta.guenstiger %} gr-kk-delta--unter{% endif %}">{%
       if k.zustand_etikett %}{{ k.zustand_etikett }}: {% endif %}{%
-      if k.delta.betrag is not none %}{{ k.delta.abstand | euro }}{% if
+      if k.delta.ungefaehr and not k.delta.abstand %}entspricht{% elif
+      k.delta.ungefaehr %}≈ {{ k.delta.abstand | euro }}{% elif
+      k.delta.betrag is not none %}{{ k.delta.abstand | euro }}{% if
       k.delta.prozent %} ({{ '%.1f'|format(k.delta.prozent)|replace('.', ',') }} %){%
       endif %}{% else %}{{ k.delta.abstand | euro }} je Monat{% endif %}
-      {{ 'unter' if k.delta.guenstiger else 'über' }} der
+      {{ '' if k.delta.ungefaehr and not k.delta.abstand else
+         ('unter' if k.delta.guenstiger else 'über') }} der
       Vodafone-Referenz ({{ k.delta.referenz_tarif }}{% if k.delta.referenz_datum
       %}, Stand {{ k.delta.referenz_datum | date_de }}{% endif %})</p>
     {% endif %}

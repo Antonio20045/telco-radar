@@ -254,8 +254,13 @@ def balken(modell: dict) -> str:
             delta_text = ""
             if delta.get("betrag") is not None:
                 zeichen = "−" if delta.get("guenstiger") else "+"
+                # A2 (20.09.2026): ein Abstand unter der Wesentlichkeits-
+                # schwelle ist eine Annäherung - "≈" davor, derselbe echte
+                # Betrag. Der Strich blieb dem "kein Angebot" vorbehalten.
+                ungefaehr = "≈ " if delta.get("ungefaehr") else ""
                 delta_text = (f' <tspan class="gr-g1-delta">'
-                              f'{zeichen}{_t(euro(delta["abstand"]))}</tspan>')
+                              f'{ungefaehr}{zeichen}'
+                              f'{_t(euro(delta["abstand"]))}</tspan>')
             teile.append(
                 f'<text class="gr-g1-betrag" x="{x + 8:.1f}" '
                 f'y="{y + 18:.0f}">{_t(euro(karte["gesamt"]))}{delta_text}</text>')

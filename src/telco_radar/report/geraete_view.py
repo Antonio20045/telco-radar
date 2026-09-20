@@ -856,6 +856,21 @@ def _katalog_zeile(e: dict, katalog) -> dict:
 TCO_LEER_KEIN_BUNDEL = "kein Bündel gemessen"
 TCO_LEER_KEIN_VERGLEICHBARES = "kein vergleichbares Bündel gemessen"
 
+# Die benannten Leerzustaende der DELTA-Zelle (A2-Nachbesserung,
+# Pruef-Befund 20.09.2026). Zwei verschiedene Stummen, zwei Etiketten:
+# fehlt VODAFONE, fehlt die Referenz; fehlt nur der WETTBEWERBER neben
+# einem eigenen Angebot, liegt die Luecke beim Wettbewerb - die Referenz
+# ist dann das eigene Angebot selbst (derselbe Fehlertyp wie die beiden
+# TCO-Leerzustaende: eine Ursache, ein Name).
+TCO_DELTA_LEER_KEINE_REFERENZ = "keine Referenz"
+TCO_DELTA_GRUND_KEINE_REFERENZ = (
+    "Vodafone listet dieses Modell nicht - deshalb ist kein Abstand "
+    "berechenbar (die Referenz fehlt)")
+TCO_DELTA_LEER_KEIN_WETTBEWERBER = "kein Wettbewerber-Angebot"
+TCO_DELTA_GRUND_KEIN_WETTBEWERBER = (
+    "Vodafone listet dieses Modell, aber kein Wettbewerber-Angebot ist "
+    "vergleichbar erhoben - deshalb ist kein Abstand berechenbar")
+
 
 def _buendel_je_anbieter_modell(buendel: list, eintraege: list, katalog
                                 ) -> tuple[dict, dict]:
@@ -974,12 +989,26 @@ def _tco_spalte(modell_tco: dict | None) -> dict:
     "beste" Angebot ist die guenstigste belastbare, vergleichbare Karte
     ohne Naeherung; `delta_kurz` existiert nur mit Vodafone-Referenz und
     wird unverändert durchgereicht.
+
+    A2-Nachbesserung (Pruef-Befund 20.09.2026, schwer: hoch): die Leitzahl
+    und der Abstand haben SEITDEM ZWEI TRAEGER. Gewann das EIGENE Buendel
+    das Minimum (20 von 48 "keine Referenz"-Zeilen des Bestands, z. B.
+    Galaxy A57 256: Vodafone 1.199,80 vor 1&1 1.207,54), lieferte `_delta`
+    fuer die eigene Karte None (B4) - und die Delta-Zelle behauptete die
+    fehlende Referenz, obwohl die TCO-Zelle derselben Zeile "bei Vodafone"
+    sagte. Jetzt stellt das eigene Angebot weiterhin die Leitzahl; der
+    Abstand gehoert dem guenstigsten FREMDEN Angebot (der Wert, den die
+    Wr-Zeile desselben Modells schon zeigt). Ist kein fremdes Angebot
+    vergleichbar, heisst die Luecke "kein Wettbewerber-Angebot" - nicht
+    "keine Referenz", denn die Referenz ist das eigene Angebot selbst.
     """
+    leer_delta = {"tco_delta": None, "tco_delta_prozent": None,
+                  "tco_delta_kurz": None, "tco_delta_anbieter": None,
+                  "tco_delta_leer": None, "tco_delta_leer_grund": None}
     if not modell_tco:
         return {"tco_ab": None, "tco_anbieter": None, "tco_monat": None,
-                "tco_delta": None, "tco_delta_prozent": None,
-                "tco_delta_kurz": None, "tco_band": None, "tco_beleg": None,
-                "tco_leer": TCO_LEER_KEIN_BUNDEL}
+                "tco_band": None, "tco_beleg": None,
+                "tco_leer": TCO_LEER_KEIN_BUNDEL, **leer_delta}
     kandidaten = [k for k in modell_tco.get("karten") or []
                   if k.get("vergleichbar") and k.get("belastbar")
                   and not k.get("naeherung") and k.get("gesamt") is not None]
@@ -990,9 +1019,8 @@ def _tco_spalte(modell_tco: dict | None) -> dict:
         # Zwei Leerzustaende statt einem - dieselbe Lehre wie "keine
         # Angabe" gegen "nicht gemessen" bei den Tarifen.
         return {"tco_ab": None, "tco_anbieter": None, "tco_monat": None,
-                "tco_delta": None, "tco_delta_prozent": None,
-                "tco_delta_kurz": None, "tco_band": None, "tco_beleg": None,
-                "tco_leer": TCO_LEER_KEIN_VERGLEICHBARES}
+                "tco_band": None, "tco_beleg": None,
+                "tco_leer": TCO_LEER_KEIN_VERGLEICHBARES, **leer_delta}
     # Der Spaltenkopf der TCO-Ansicht sagt TCO-24. Ein Filter auf
     # `karte["laufzeit"] == 24` ist hier bewusst NICHT gebaut: seit dem
     # Ticket TCO24-1 ist die Laufzeit die Konstante 24 (Bestand am
@@ -1002,14 +1030,42 @@ def _tco_spalte(modell_tco: dict | None) -> dict:
     # auf 24 gefiltert werden - sonst stellt eine laengere Karte eine
     # TCO-24 (S4-6 der P3-Code-Pruefung).
     bester = min(kandidaten, key=lambda k: k["gesamt"])
-    delta = bester.get("delta") or {}
+    # Der TRAEGER des Abstands: das guenstigste FREMDE Angebot. Nur wo
+    # der Wettbewerb selbst fuehrt, ist der Traeger zugleich das beste
+    # Angebot - dann sind Leitzahl und Abstand eine Karte wie bisher.
+    fremde = [k for k in kandidaten if not k.get("eigen")]
+    traeger = bester if not bester.get("eigen") else (
+        min(fremde, key=lambda k: k["gesamt"]) if fremde else None)
+    if traeger is not None and traeger.get("delta_kurz"):
+        delta_leer, delta_leer_grund = None, None
+    elif traeger is None:
+        # Vodafone fuehrt, und KEIN Wettbewerber ist vergleichbar erhoben
+        # (4 Zeilen des Bestands am 20.09.) - die Referenz existiert, die
+        # Luecke liegt beim Wettbewerb.
+        delta_leer = TCO_DELTA_LEER_KEIN_WETTBEWERBER
+        delta_leer_grund = TCO_DELTA_GRUND_KEIN_WETTBEWERBER
+    elif modell_tco.get("referenz") is None:
+        delta_leer = TCO_DELTA_LEER_KEINE_REFERENZ
+        delta_leer_grund = TCO_DELTA_GRUND_KEINE_REFERENZ
+    else:
+        # Ein fremdes Angebot ohne Euro-Abstand (andere Laufzeit, A5.4):
+        # Strich wie die Buendelzeile - die Referenz existiert.
+        delta_leer, delta_leer_grund = None, None
+    delta = (traeger or {}).get("delta") or {}
     return {
         "tco_ab": bester["gesamt"],
         "tco_anbieter": bester.get("anbieter"),
         "tco_monat": bester.get("schnitt_monat"),
         "tco_delta": delta.get("betrag"),
         "tco_delta_prozent": delta.get("prozent"),
-        "tco_delta_kurz": bester.get("delta_kurz"),
+        "tco_delta_kurz": (traeger or {}).get("delta_kurz"),
+        # Der Traeger des Abstands, wo er ein ANDERES Angebot ist als das
+        # der Leitzahl - der title der Zelle nennt ihn.
+        "tco_delta_anbieter": (traeger.get("anbieter")
+                               if bester.get("eigen") and traeger is not None
+                               else None),
+        "tco_delta_leer": delta_leer,
+        "tco_delta_leer_grund": delta_leer_grund,
         "tco_band": bester.get("band"),
         "tco_beleg": {"quelle_url": bester.get("quelle_url", ""),
                       "abgerufen_am": bester.get("abgerufen_am", "")},

@@ -744,12 +744,19 @@
           }} – {{ m.spanne[1] | euro }}{% elif m.anbieterzahl == 1 %}<span
             class="gr-a-klein">ein Preis</span>{% else %}–{% endif %}</td>
         {# --- Gesamtkosten: TCO-24 des besten vergleichbaren Angebots,
-               Ø €/Monat, delta_kurz (nur mit Vodafone-Referenz). OHNE
-               Referenz ist das "–" benannt (Sicht-Prüfung Wesentliches 3):
-               Vodafone listet das Modell nicht, also ist kein Abstand
-               berechenbar - 38 von 111 Zeilen am 18.09.2026. Ein Modell
-               ohne Bündel trägt "–" hier, weil seine TCO-Zelle den Grund
-               schon nennt ("kein Bündel gemessen"). #}
+               Ø €/Monat, Abstand zur Vodafone-Referenz. Der TRAEGER des
+               Abstands ist das guenstigste WETTBEWERBER-Angebot: fuehrt
+               Vodafone selbst, stellt das eigene Angebot die Leitzahl und
+               die Delta-Zelle den Abstand des naechsten Wettbewerbres
+               (A2-Nachbesserung 20.09.2026 - vorher behauptete die Zelle
+               "keine Referenz", obwohl die TCO-Zelle derselben Zeile
+               "bei Vodafone" sagte). Die Leergruende sind benannt
+               (Sicht-Prüfung Wesentliches 3): "keine Referenz", wo
+               Vodafone das Modell nicht listet; "kein
+               Wettbewerber-Angebot", wo nur das eigene Angebot
+               vergleichbar ist. Ein Modell ohne Bündel trägt "–" hier,
+               weil seine TCO-Zelle den Grund schon nennt ("kein Bündel
+               gemessen"). #}
         <td class="num gr-sp--tco">
           {%- if m.tco_ab is not none %}
           <span class="gr-k-ab">ab {{ m.tco_ab | euro }}</span>
@@ -764,9 +771,10 @@
         <td class="num gr-sp--tco">{% if m.tco_monat is not none %}{{
           m.tco_monat | euro }}{% else %}–{% endif %}</td>
         <td class="gr-sp--tco">{% if m.tco_delta_kurz %}<span
-          class="gr-a-prozent wr-prozent{{ ' wr-prozent--negativ' if m.tco_delta is not none and m.tco_delta < 0 else ' wr-prozent--positiv' }}">{{
-          m.tco_delta_kurz }}</span>{% elif m.tco_ab is not none %}<span
-          class="gr-a-klein" title="Vodafone listet dieses Modell nicht - deshalb ist kein Abstand berechenbar (die Referenz fehlt)">keine Referenz</span>{% else %}–{% endif %}</td>
+          class="gr-a-prozent wr-prozent{{ ' wr-prozent--negativ' if m.tco_delta is not none and m.tco_delta < 0 else ' wr-prozent--positiv' }}"{%
+          if m.tco_delta_anbieter %} title="Vodafone ist am günstigsten – Δ ist der Abstand des günstigsten Wettbewerber-Angebots ({{ m.tco_delta_anbieter }}) zur Vodafone-Referenz"{% endif %}>{{
+          m.tco_delta_kurz }}</span>{% elif m.tco_delta_leer %}<span
+            class="gr-a-klein" title="{{ m.tco_delta_leer_grund }}">{{ m.tco_delta_leer }}</span>{% else %}–{% endif %}</td>
         <td class="gr-sp--tco"><span class="gr-k-band">{{
           {'klein': 'Klein', 'mittel': 'Mittel', 'gross': 'Groß'}.get(m.tco_band or '', '') or '–' }}</span></td>
       </tr>

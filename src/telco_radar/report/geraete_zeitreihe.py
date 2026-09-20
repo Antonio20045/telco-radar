@@ -1019,15 +1019,21 @@ def _anbieter_punkte(anbieter: list) -> str:
 
 
 def _bewegung(serien: dict) -> dict | None:
-    """P1/F3 (A3): das Bewegungs-Delta der Karte - PREIS-FRONT am ersten
-    gegen letzten Messtag des Leit-Paares.
+    """A2 (20.09.2026): das Bewegungs-Delta der Karte - die EIGENE Reihe
+    des fuehrenden Anbieters zwischen erstem und letztem Messtag.
 
-    Die Front ist der guenstigste Wert je Messtag (Minimum ueber alle
-    Anbieter mit Messung an diesem Tag) - dasselbe Mass, das den ab-Preis
-    der Karte bestimmt, nur auf Anfang und Ende der Reihe bezogen. Beide
-    Betraege stehen eingefroren in der Historie; nichts wird interpoliert
-    (Regel 2). Unter zwei Messtagen gibt es keine Bewegung - dann ist das
-    Feld None und die Karte zeigt keins."""
+    Bewegung ist anzeigepflichtig nur JE ANBIETER. Die bis A2 gerechnete
+    PREIS-FRONT (Minimum ueber alle Anbieter je Messtag) stellte am
+    letzten Messtag das Angebot des einen gegen das eines ANDEREN am
+    ersten: am iPhone 17 Pro, Band Klein, meldete die Karte "+387 EUR in
+    6 Tagen", ohne dass ein Anbieter seinen Preis geaendert hatte
+    (congstar am 12.9., 1&1 am 18.9.). Fuehrend ist, wer am LETZTEN
+    Messtag den kleinsten Wert hat - Gleichstand bricht die
+    ANBIETER_FOLGE, dann der Name (deterministisch, kein Wuerfeln je
+    Rendern). Fehlt dem Fuehrenden eine Messung am ERSTEN Messtag, gibt
+    es keine Bewegung: die Differenz zweier Angebote ist keine
+    Preisaenderung. Unter zwei Messtagen ebenso - das Feld ist None und
+    die Karte zeigt keins."""
     tage = _messtage(serien)
     if len(tage) < 2:
         return None
@@ -1036,11 +1042,20 @@ def _bewegung(serien: dict) -> dict | None:
     if spanne < 1:
         return None
 
-    def _front(tag: str) -> float:
-        return min(w for punkte in serien.values()
-                   for d, w in punkte if d == tag)
+    def _wert(anbieter: str, tag: str) -> float:
+        return min(w for d, w in serien[anbieter] if d == tag)
 
-    delta = round(_front(tage[-1]) - _front(tage[0]), 2)
+    letzte, erste = tage[-1], tage[0]
+    kandidaten = [a for a, punkte in serien.items()
+                  if any(d == letzte for d, _ in punkte)]
+    fuehrend = min(
+        kandidaten,
+        key=lambda a: (_wert(a, letzte),
+                       ANBIETER_FOLGE.index(a) if a in ANBIETER_FOLGE
+                       else len(ANBIETER_FOLGE), a))
+    if not any(d == erste for d, _ in serien[fuehrend]):
+        return None
+    delta = round(_wert(fuehrend, letzte) - _wert(fuehrend, erste), 2)
     zeit = f"in {spanne} Tag" if spanne == 1 else f"in {spanne} Tagen"
     if delta > 0:
         return {"text": f"↑ +{_euro0(delta)} {zeit}",

@@ -45,6 +45,7 @@ from __future__ import annotations
 
 import logging
 import re
+from datetime import date as _datum
 from typing import Optional
 
 from . import geraete_vergleich
@@ -916,6 +917,11 @@ def _delta(karte: dict, referenz: Optional[dict]) -> Optional[dict]:
     36 Monate bindet und die Referenz 24 rechnet, waere die Differenz die
     Laufzeit und nicht der Preis; dann steht nur der Abstand im
     Quervergleichsmass `Ø/Monat` (A5.3).
+
+    Ein Abstand unter der Wesentlichkeits-Schwelle ist eine ANNAEHERUNG
+    (`ungefaehr`, A2 20.09.2026), kein fehlendes Delta: der Strich der
+    Δ-Spalte heisst "kein Angebot", und ein gemessenes, das nur knapp
+    daneben liegt, ist sehr wohl eines.
     """
     if referenz is None or not karte["belastbar"] or karte["naeherung"]:
         return None
@@ -944,11 +950,25 @@ def _delta(karte: dict, referenz: Optional[dict]) -> Optional[dict]:
     # "0,00 € teurer als die Vodafone-Referenz".
     massstab = referenz["gesamt"] if betrag is not None \
         else referenz["schnitt_monat"]
-    if not _wesentlich(bezug, massstab):
-        return None
+    # FIX 2 (A2, 20.09.2026): ein Abstand UNTER der Wesentlichkeits-
+    # schwelle ist kein fehlendes Angebot. Bis A2 kehrte diese Stelle
+    # hier None zurueck, und die Δ-Spalte zeigte den Strich, der
+    # "kein Angebot" heisst - fuer ein gemessenes, das nur knapp daneben
+    # liegt. Der Abstand steht seitdem als ANNAEHERUNG im Feld
+    # (`ungefaehr`), und `delta_text` setzt das "≈" davor; ein Prozent-
+    # anteil gehoert nicht dazu (Zehntel-Prozent an einer Annäherung
+    # waeren Scheingenaugigkeit), also ist `prozent` dort None.
+    # S1 der Diff-Pruefung: "≈" traegt KEINEN Monatsbezug - deshalb nur
+    # bei gleicher Laufzeit (betrag). Ueber Laufzeiten hinweg ist der
+    # Ø/Monat-Abstand das einzige Mass, und der Delta-Satz der Vorlage
+    # sagt "je Monat" dazu; ungefaehr wuerde ihm das Wort nehmen und
+    # "≈ 0,04 €" wie einen Gesamtabstand lesen lassen.
+    ungefaehr = (betrag is not None and not _wesentlich(bezug, massstab))
     return {
+        "ungefaehr": ungefaehr,
         "betrag": betrag,
-        "prozent": (round(abs(betrag) / referenz["gesamt"] * 100, 1)
+        "prozent": (None if ungefaehr else
+                    round(abs(betrag) / referenz["gesamt"] * 100, 1)
                     if betrag is not None and referenz["gesamt"] else None),
         "monatlich": monatlich,
         "guenstiger": bezug < 0,
@@ -977,17 +997,39 @@ def _rang(karte: dict) -> tuple:
             else 9e9, karte["anbieter"])
 
 
+def _neuigkeit(karte: dict) -> int:
+    """`abgerufen_am` als ordnungsfeste Zahl, absteigend verglichen.
+
+    Ein unlesbares oder leeres Datum zaehlt als aelteste Messung (0): eine
+    Karte ohne Datum gewinnt den Slot nie, sie verliert ihn nur - ein
+    fehlender Wert ist keine Aussage ueber die Aktualitaet (Clean Code 3).
+    """
+    try:
+        return _datum.fromisoformat(
+            (karte.get("abgerufen_am") or "").strip()).toordinal()
+    except ValueError:
+        return 0
+
+
 def _angebot_rang(karte: dict) -> tuple:
-    """Die Angebots-Dedupe in `modelle()`: QUELLE vor Preis (S2-C).
+    """Die Angebots-Dedupe in `modelle()`: QUELLE vor DATUM vor Preis.
 
     Einem Anbieter mit Bündel-Adapter steht dasselbe Angebot ZWEIMAL im
     Bestand - als Listung (nur der Monatsbetrag) und als gemessenes Bündel
     (mit Einmalzahlung, Bereitstellungsgebühr und tarif_id). Die Listung
     kann die billigere Karte sein, weil ihr Posten FEHLEN; sie darf das
-    gemessene Angebot deshalb nicht verdraengen. Erst wenn BEIDE Karten
-    aus derselben Quelle kommen, entscheidet der Preis.
+    gemessene Angebot deshalb nicht verdraengen.
+
+    A2 (20.09.2026), die Stufe dahinter: das AKTUELLSTE Datum vor dem
+    Preis. Der Store überschreibt Bündel und löscht keins - eine Messung,
+    die seit vierzehn Läufen nie wieder bestätigt wurde, kann im selben
+    Slot billiger sein als die täglich gemessenen Farben (iPhone 17
+    256 GB: 0,99/26,00 vom 06.09. gegen 1,00/30,00 vom 20.09.) und dann
+    als billigste eigene Karte die Referenz stellen. Erst bei gleichem
+    Datum - oder gleich unbekanntem - entscheidet wieder der Preis.
     """
     return (1 if karte.get("aus_listung") else 0,
+            -_neuigkeit(karte),
             karte["schnitt_monat"] if karte["schnitt_monat"] is not None
             else 9e9)
 

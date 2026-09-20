@@ -797,7 +797,8 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
             # Rechenweg-Aufklapper der Zeile.
             k["delta_kurz"] = (
                 geraete_tco_band.delta_text(
-                    k["delta"].get("betrag"), k["delta"].get("prozent"))
+                    k["delta"].get("betrag"), k["delta"].get("prozent"),
+                    ungefaehr=bool(k["delta"].get("ungefaehr")))
                 if k.get("delta") else None)
         # O2: die Zeilen der Tabelle - serverseitig sortiert (nach TCO-24
         # aufsteigend, wie der Entwurf), Karten ohne Zahl hinten. Die

@@ -889,6 +889,53 @@ def test_kein_slug_als_geraetename_am_echten_bestand(bestand):
     assert treffer[0]["titel"] == "Apple iPhone 16 Pro Max 256 GB"
 
 
+def test_die_referenz_des_iphone_17_ist_die_aktuelle_messung(bestand):
+    """A2 (20.09.2026): das iPhone 17 256 GB zeigte ein Delta von −442,79 EUR
+    gegen eine Vodafone-Zahl, die keines aktuellen Angebots mehr war. Die
+    Ursache sitzt in der Angebots-Dedupe: das Bündel `...weiss--mobil-xs`
+    (0,99 EUR Anzahlung, 26,00 EUR Rate, Stand 06.09.2026) wurde seit 14
+    nächtlichen Läufen nie wieder bestätigt, unterbietet aber die vier
+    täglich gemessenen Farben (1,00 + 30,00, Stand 16./20.09.2026) im
+    selben Slot (Vodafone, Mobil XS, 36 Monate, neu) - und stellte als
+    billigste eigene Karte die Referenz. Seit A2 gewinnt im Slot die
+    AKTUELLSTE Messung; die Referenz ist das frische Angebot:
+
+        1,00 + 24 × 31,95 Tarif + 36 × 30,00 Raten + 0,00 = 1.847,80 EUR
+
+    (31,95 ist die gemessene Bündel-Rate; das Blatt nennt 29,95 ohne
+    Smartphone-Zuschlag - Widerspruch, also flach gerechnet.) Die Zahl des
+    Live-Befunds (1.391,79 bzw. korrekt 1.487,80 EUR vor A1) war dieselbe
+    Geist-Messung, noch mit 24 statt 36 Raten."""
+    modell = _modell(bestand, "apple-iphone-17-256")
+    ref = modell["referenz"]
+    assert ref["tarif"] == "Mobil XS"
+    assert ref["gesamt"] == 1847.8
+    # Datumlos (Regel 11): die Referenz ist die NEUESTE eigene Messung -
+    # ihr Datum ist das Maximum ueber die Vodafone-Karten des Modells und
+    # wandert mit dem Bot-Stand mit; der 20.09. waere beim naechsten
+    # Stand rot gewesen.
+    assert ref["tarif_abgerufen_am"] == max(
+        k["abgerufen_am"] for k in modell["karten"]
+        if k["anbieter"] == "Vodafone" and k.get("abgerufen_am"))
+
+    xs = [k for k in modell["karten"]
+          if k["anbieter"] == "Vodafone" and k["tarif"] == "Mobil XS"]
+    assert len(xs) == 1, "vier Farben, ein Slot: eine Karte"
+    assert xs[0]["gesamt"] == 1847.8
+    # Die Karte des Slots traegt dieselbe Messung wie das Blatt des
+    # Modells - ohne festes Datum, dieselbe Begruendung.
+    assert xs[0]["abgerufen_am"] == ref["tarif_abgerufen_am"]
+    # Gegenprobe 1: die Geist-Messung vom 06.09. verdraengt KEIN aktuelles
+    # Angebot mehr (ihre Zahl taucht auf keiner Vodafone-Karte des Modells).
+    assert all(k.get("abgerufen_am") != "2026-09-06"
+               for k in modell["karten"] if k["anbieter"] == "Vodafone")
+    # Gegenprobe 2: die Referenz ist die guenstigste EIGENE Karte - das
+    # Blatt des Modells sagt dasselbe wie die Karten darunter.
+    eigene = [k["gesamt"] for k in modell["karten"]
+              if k["anbieter"] == "Vodafone" and k["belastbar"]]
+    assert ref["gesamt"] == min(eigene)
+
+
 def test_ein_eigenes_buendel_verdraengt_die_naeherung():
     """Vodafone steht je Modell EINMAL - als Angebot oder als Rechnung.
 

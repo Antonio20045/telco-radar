@@ -317,7 +317,8 @@ def _baue(tmp_path: pathlib.Path, erneuert: bool = True,
           graphloses_modell: bool = False,
           eins_und_eins: bool = False,
           einmalzahlung: float | None = None,
-          anschlusspreis: float | None = None) -> BeautifulSoup:
+          anschlusspreis: float | None = None,
+          ungefaehr_delta: bool = False) -> BeautifulSoup:
     """`punkte` ersetzt die Preishistorie - `test_geraete_preis_mehrdeutig`
     stellt darueber Tage mit zwei Preisen derselben Listung.
 
@@ -338,7 +339,12 @@ def _baue(tmp_path: pathlib.Path, erneuert: bool = True,
     neuen 1&1-Felder auf genau dieser Karte - beide None (Default) lassen
     jeden bestehenden Aufrufer unveraendert. Die Werte sind die echten
     der iPhone-Fixture (360,00/39,90), siehe test_geraete_buendel_
-    einsundeins."""
+    einsundeins.
+
+    `ungefaehr_delta` (A2, 20.09.2026) haengt eine Vodafone-Mobil-XS-
+    Referenz aus einem ECHTEN Buendel (1.799,80) und ein o2-Angebot
+    knapp darueber (1.810,80 = +11,00) an - der Fall der ≈-Spalte am
+    gerenderten Blatt (Fix 2)."""
     root = tmp_path / ("mit" if erneuert else "ohne")
     (root / "config").mkdir(parents=True)
     katalog = _KATALOG
@@ -397,6 +403,10 @@ def _baue(tmp_path: pathlib.Path, erneuert: bool = True,
             geraet_zuzahlung=einmalzahlung, anschlusspreis=anschlusspreis,
             quelle_url="https://example.de/einsundeins/" + SKU_NEU,
             abgerufen_am=HEUTE))
+    if ungefaehr_delta:
+        buendel.append(_xs_buendel(SKU_NEU, 30.0, HEUTE,
+                                   tarif_monatlich=29.95))
+        buendel.append(_knapp_o2(30.25, 2.0))
     (state / "geraete_tco.json").write_text(json.dumps({
         "updated": HEUTE, "buendel": [_speicherform(b) for b in buendel],
         "sim_only": [{"id": r.id, "anbieter": r.anbieter,
@@ -539,3 +549,267 @@ def test_jede_karte_mit_zahl_nennt_den_preis_nach_der_laufzeit_oder_die_luecke(t
     # gruen und prueft nichts).
     assert "weist zu diesem Gerät keinen Bündelpreis aus" \
         not in vorlage_text(tafel)
+
+
+# --------------------------------------------------------------------------
+# A2 (20.09.2026): die Geist-Messung in der Angebots-Dedupe, das kleine
+# Delta mit ≈ statt Strich
+# --------------------------------------------------------------------------
+
+def _xs_buendel(sku, rate, tag, zuzahlung=1.0, anschluss=0.0,
+                tarif_monatlich=31.95):
+    """Vodafone Mobil XS zum iPhone 15 128 GB - die Bauform des echten
+    Bestands: 36 Raten, gemessene Buendel-Rate ueber dem Blatt-Preis
+    (29,95 im Pflichtdokument, mit Smartphone-Zuschlag 31,95 am Bündel)."""
+    return Buendel(sku_id=sku, anbieter="Vodafone",
+                   tarif_name="Vodafone Mobil XS", tarif_id="vf:xs",
+                   tarif_id_guete="hoch", tarif_monatlich=tarif_monatlich,
+                   tarif_bindung_monate=24, geraet_zuzahlung=zuzahlung,
+                   geraet_monatsrate=rate, laufzeit_monate=36,
+                   anschlusspreis=anschluss, zustand="neu",
+                   quelle_url=f"https://example.de/vodafone/{sku}",
+                   abgerufen_am=tag)
+
+
+def test_eine_veraltete_messung_verdraengt_kein_aktuelles_angebot():
+    """A2 (20.09.2026), der Befund am iPhone 17 256 GB: ein Bündel, das
+    seit 14 nächtlichen Läufen nie wieder bestätigt wurde, unterbietet im
+    selben Angebots-Slot die täglich gemessenen Farben und stellte als
+    billigste eigene Karte die Vodafone-Referenz. Der Store überschreibt
+    Bündel (AUFFRISCHEN, nie löschen) - die Auswahl muss deshalb die
+    AKTUELLSTE Messung des Slots nehmen, nicht die billigste Geist-Zahl.
+
+    Frisch (schwarz, 20.09.): 1,00 + 24×31,95 + 36×30,00 + 0,00
+                             = 1.847,80 EUR
+    Geist (weiss, 06.09.):   0,99 + 24×31,95 + 36×26,00
+                             = 1.703,79 EUR - billiger, aber alt."""
+    tarife = {t["tarif_id"]: t for t in _tarife()}
+    frisch = _xs_buendel(SKU_NEU, 30.0, "2026-09-20")
+    geist = _xs_buendel("apple-iphone-15-128gb-weiss", 26.0, "2026-09-06",
+                        zuzahlung=0.99)
+    modell = karten.modelle([frisch, geist], _listungen(), _referenzen(),
+                            tarife, lade_katalog(WURZEL))["modelle"][0]
+    xs = [k for k in modell["karten"] if k["anbieter"] == "Vodafone"]
+    assert len(xs) == 1, "mehrere Farben, ein Slot: eine Karte"
+    assert xs[0]["abgerufen_am"] == "2026-09-20"
+    assert xs[0]["gesamt"] == 1847.8
+    assert all(k.get("abgerufen_am") != "2026-09-06"
+               for k in modell["karten"]), \
+        "die Geist-Messung vom 06.09. steht noch auf einer Karte"
+    ref = modell["referenz"]
+    assert ref["aus_buendel"] is True
+    assert ref["tarif"] == "Vodafone Mobil XS"
+    assert ref["gesamt"] == 1847.8
+    assert ref["tarif_abgerufen_am"] == "2026-09-20"
+
+    # Gegenprobe 1: die Geist-Messung ALLEIN bleibt eine Karte mit ihrer
+    # eigenen Zahl - die Neuigkeits-Stufe stellt keine Weiche, sie bricht
+    # nur den Gleichstand verschiedener Messungen desselben Slots.
+    allein = karten.modelle([geist], _listungen(), _referenzen(), tarife,
+                            lade_katalog(WURZEL))["modelle"][0]
+    geist_karte = [k for k in allein["karten"]
+                   if k["anbieter"] == "Vodafone"][0]
+    assert geist_karte["abgerufen_am"] == "2026-09-06"
+    assert geist_karte["gesamt"] == 1703.79
+
+    # Gegenprobe 2: gleich alt, verschieden teuer - dann entscheidet
+    # wieder der Preis (blau 28 statt gruen 30: 1.775,80 EUR).
+    gleich_alt = karten.modelle(
+        [_xs_buendel("apple-iphone-15-128gb-blau", 28.0, "2026-09-20"),
+         _xs_buendel("apple-iphone-15-128gb-gruen", 30.0, "2026-09-20")],
+        _listungen(), _referenzen(), tarife, lade_katalog(WURZEL)
+    )["modelle"][0]
+    assert [k for k in gleich_alt["karten"]
+            if k["anbieter"] == "Vodafone"][0]["gesamt"] == 1775.8
+
+
+def _knapp_o2(rate, anschluss):
+    """Ein o2-Bündel mit DEMSELBEN gemessenen Tarifpreis wie die Referenz
+    (29,95) - der Abstand zur Referenz steckt allein in Rate und
+    Anschlusspreis, damit die Schwelle (15 EUR / 3 %) gezielt unter-
+    und überschritten wird. Der Tarifname unterscheidet sich vom
+    Standard-o2-Bündel der Fixture, damit die Angebots-Dedupe die zwei
+    Karten nicht in einen Slot legt."""
+    return Buendel(sku_id=SKU_NEU, anbieter="o2",
+                   tarif_name="O2 Mobile on Demand M",
+                   tarif_id="o2:on-demand-m", tarif_id_guete="hoch",
+                   tarif_monatlich=29.95, tarif_bindung_monate=24,
+                   geraet_zuzahlung=1.0, geraet_monatsrate=rate,
+                   laufzeit_monate=36, anschlusspreis=anschluss,
+                   zustand="neu",
+                   quelle_url=f"https://example.de/o2/knapp",
+                   abgerufen_am=HEUTE)
+
+
+def test_ein_kleiner_abstand_erscheint_als_ungefaehr_statt_strich():
+    """Fix 2 (A2): der Strich in der Δ-Spalte bedeutet "kein Angebot" -
+    bis A2 bedeutete er auch "Abstand unter 15 EUR / 3 %", und ein
+    gemessenes Angebot stand da wie ein fehlendes. Referenz (Vodafone
+    Mobil XS, 29,95 gemessen): 1,00 + 24×29,95 + 36×30,00 + 0,00
+    = 1.799,80 EUR. Knapp daneben (Rate 30,25, Anschluss 2,00):
+    1.810,80 EUR - exakt +11,00 EUR, 0,6 %."""
+    tarife = {t["tarif_id"]: t for t in _tarife()}
+    referenz = _xs_buendel(SKU_NEU, 30.0, HEUTE, tarif_monatlich=29.95)
+    modell = karten.modelle([referenz, _knapp_o2(30.25, 2.0)],
+                            _listungen(), _referenzen(), tarife,
+                            lade_katalog(WURZEL))["modelle"][0]
+    o2 = [k for k in modell["karten"] if k["anbieter"] == "o2"][0]
+    assert o2["gesamt"] == 1810.8
+    d = o2["delta"]
+    assert d["ungefaehr"] is True
+    assert d["betrag"] == 11.0 and d["abstand"] == 11.0
+    assert d["guenstiger"] is False
+    assert d["prozent"] is None, \
+        "an einer Annäherung gibt es kein Prozentmaß (Scheingenaugkeit)"
+
+    # Auf gleicher Hoehe: 1.799,80 EUR - "≈ ±0,00 €", keine Richtung.
+    gleich = karten.modelle([referenz, _knapp_o2(30.0, 0.0)],
+                            _listungen(), _referenzen(), tarife,
+                            lade_katalog(WURZEL))["modelle"][0]
+    d0 = [k for k in gleich["karten"] if k["anbieter"] == "o2"][0]["delta"]
+    assert d0["ungefaehr"] is True
+    assert d0["betrag"] == 0.0 and d0["abstand"] == 0.0
+    assert d0["guenstiger"] is False
+
+    # Gegenprobe: ein echter Abstand (Anschluss 40,00 -> +40,00 EUR) ist
+    # keine Annäherung - die Schwelle sortiert, sie streicht nicht.
+    deutlich = karten.modelle([referenz, _knapp_o2(30.0, 40.0)],
+                              _listungen(), _referenzen(), tarife,
+                              lade_katalog(WURZEL))["modelle"][0]
+    dw = [k for k in deutlich["karten"] if k["anbieter"] == "o2"][0]["delta"]
+    assert dw["ungefaehr"] is False
+    assert dw["betrag"] == 40.0 and dw["prozent"] == 2.2
+
+    # Gegenprobe Strich: ohne Vodafone-Bündel und ohne eigenen Barpreis
+    # gibt es keine Referenz - KEIN Delta (None), und der Strich der
+    # Zeile meint "kein Angebot zum Vergleich", nicht "Abstand zu klein".
+    ohne_vodafone = [l for l in _listungen() if l["anbieter"] != "Vodafone"]
+    ohne = karten.modelle([_knapp_o2(30.25, 2.0)], ohne_vodafone,
+                          _referenzen(), tarife,
+                          lade_katalog(WURZEL))["modelle"][0]
+    assert [k for k in ohne["karten"]
+            if k["anbieter"] == "o2"][0]["delta"] is None
+
+
+def test_delta_kurz_und_der_graph_traegen_das_ungefaehr():
+    """Fix 2 (A2), die Anzeige: Zeile (delta_kurz) und Balken (G1-tspan)
+    tragen "≈ +11,00 €" - dasselbe Format an beiden Orten, ohne Prozent
+    (eine Annäherung mit auf die Zehntel gerundetem Prozent waere
+    Scheingenaugkeit). Die delta_text-Einheit selbst haelt beide Welten:
+    ungefaehr OHNE Prozentanteil, wesentlich MIT - unverändert."""
+    tarife = {t["tarif_id"]: t for t in _tarife()}
+    referenz = _xs_buendel(SKU_NEU, 30.0, HEUTE, tarif_monatlich=29.95)
+    ergebnis = view.aufbereiten([_speicherform(referenz),
+                                 _speicherform(_knapp_o2(30.25, 2.0))],
+                                [], _listungen(), lade_katalog(WURZEL),
+                                tarife=tarife)
+    o2 = next(k for m in ergebnis["modelle"] for k in m["karten"]
+              if k["anbieter"] == "o2")
+    assert o2["delta_kurz"] == "≈ +11,00 €"
+    assert "≈ +11,00 €" in grafik.balken(ergebnis["modelle"][0])
+
+    from telco_radar.report import geraete_tco_band as tco_band
+    assert tco_band.delta_text(11.0, 0.6, ungefaehr=True) == "≈ +11,00 €"
+    assert tco_band.delta_text(-11.0, 0.6, ungefaehr=True) == "≈ −11,00 €"
+    assert tco_band.delta_text(0.0, 0.0, ungefaehr=True) == "≈ ±0,00 €"
+    assert tco_band.delta_text(None, None, ungefaehr=True) is None
+    # Unveraendert: das wesentliche Delta mit Prozent (Band-Graph und
+    # Antwort-Satz rechnen weiter darueber). Das Prozent kommt als
+    # ABSOLUTER Wert - das Vorzeichen liefert der Euro-Betrag.
+    assert tco_band.delta_text(-100.0, 9.1) == "−100,00 € · −9,1 %"
+
+
+def test_die_gerenderte_zeile_zeigt_kleine_abstaende_mit_ungefaehr(tmp_path):
+    """Fix 2 (A2) am gerenderten Blatt: die Δ-Spalte zeigt "≈ +11,00 €"
+    und OHNE die Δ-Präfix-Klasse (mobil wuerde sonst "Δ ≈" stehen), der
+    Delta-Satz im Rechenweg "≈ 11,00 € über der Vodafone-Referenz" ohne
+    Prozent. Gegenproben am selben Blatt: das wesentliche o2-Delta
+    (−679,05 € · −37,7 %) behält Prozent UND Präfix-Klasse, und das
+    erneuerte Geraet zeigt weiterhin den Strich - "kein Angebot"."""
+    s = _baue(tmp_path, ungefaehr_delta=True)
+    tafel = s.select_one("#tafel-tco")
+    o2_zeilen = tafel.select('.gr-bnd[data-anbieter="o2"]')
+    assert len(o2_zeilen) == 3, "o2 neu, o2 knapp daneben, o2 erneuert"
+
+    knapp = next(z for z in o2_zeilen
+                 if "≈" in (z.select_one(".gr-bnd-delta").get_text() or ""))
+    zelle = knapp.select_one(".gr-bnd-delta")
+    assert zelle.get_text(strip=True) == "≈ +11,00 €"
+    assert "gr-bnd-delta--wert" not in (zelle.get("class") or [])
+    satz = vorlage_text(knapp.select_one(".gr-kk-delta"))
+    assert "≈ 11,00 € über der Vodafone-Referenz" in satz, satz
+    assert "%" not in satz and "unter" not in satz, satz
+
+    deutlich = next(z for z in o2_zeilen
+                    if z.get("data-zustand") == "neu" and z is not knapp)
+    dzelle = deutlich.select_one(".gr-bnd-delta")
+    assert dzelle.get_text(strip=True) == "−679,05 € · −37,7 %"
+    assert "gr-bnd-delta--wert" in (dzelle.get("class") or [])
+    dsatz = vorlage_text(deutlich.select_one(".gr-kk-delta"))
+    assert "679,05 € (37,7 %) unter der Vodafone-Referenz" in dsatz, dsatz
+
+    erneuert_zeile = tafel.select_one(
+        '.gr-bnd[data-anbieter="o2"][data-zustand="refurbished"]')
+    assert erneuert_zeile.select_one(".gr-bnd-delta").get_text(
+        strip=True) == "–"
+
+
+def test_annaeherung_nur_bei_gleicher_laufzeit_der_satz_sagt_je_monat():
+    """S1 der Diff-Pruefung (A2, 20.09.2026): das "≈" der Annaeherung
+    traegt KEINEN Monatsbezug. Bei verschiedener Laufzeit ist der Ø/Monat
+    der einzige Abstand (A5.3/A5.4), und der Delta-Satz der Vorlage sagt
+    "je Monat" dazu - bis zum Fix griff die Wesentlichkeits-Rechnung auch
+    dort (bezug = monatlich) und setzte `ungefaehr`: der ≈-Zweig steht in
+    der Vorlage vor dem je-Monat-Zweig, also stand "≈ 0,04 € über der
+    Vodafone-Referenz" - 4 Cent im MONAT, gelesen als 4 Cent gesamt.
+
+    Der Fall ist heute latent (`LAUFZEIT` ist die Konstante 24, jede
+    Referenz meldet `monate = LAUFZEIT`); P0-B legt die Laufzeit in den
+    Buendelschluessel und macht sie wieder verschieden. Deshalb wird die
+    Referenz eines 36-Monats-Buendels hier per `monate` simuliert, und
+    der Satz am ECHTEN Makro gerendert - nicht an einer Textkopie.
+
+    Referenz (Vodafone Mobil XS, 36 Monate): 1.799,80 EUR, Ø/Monat 74,99.
+    o2 mit 24 Monaten: 1,00 + 24×29,95 + 24×45,04 = 1.800,76 EUR,
+    Ø/Monat 75,03 - vier Cent darueber, im Monat."""
+    tarife = {t["tarif_id"]: t for t in _tarife()}
+    referenz = _xs_buendel(SKU_NEU, 30.0, HEUTE, tarif_monatlich=29.95)
+    o2_24 = Buendel(sku_id=SKU_NEU, anbieter="o2",
+                    tarif_name="O2 Mobile on Demand M (24 Mon.)",
+                    tarif_id="o2:on-demand-m", tarif_monatlich=29.95,
+                    tarif_bindung_monate=24, geraet_zuzahlung=1.0,
+                    geraet_monatsrate=45.04, laufzeit_monate=24,
+                    anschlusspreis=0.0, zustand="neu",
+                    quelle_url="https://example.de/o2/l24",
+                    abgerufen_am=HEUTE)
+    modell = karten.modelle([referenz, o2_24], _listungen(), _referenzen(),
+                            tarife, lade_katalog(WURZEL))["modelle"][0]
+    karte = next(k for k in modell["karten"] if k["anbieter"] == "o2")
+    # P0-B simuliert: die Referenz eines 36-Monats-Buendels meldet ihre
+    # eigene Laufzeit (siehe Docstring).
+    ref36 = {**modell["referenz"], "monate": 36}
+    d = karten._delta(karte, ref36)
+    assert d["gleiche_laufzeit"] is False
+    assert d["betrag"] is None, "ueber Laufzeiten gibt es kein Euro-Delta"
+    assert d["monatlich"] == 0.04 and d["abstand"] == 0.04
+    assert d["ungefaehr"] is False, \
+        "≈ ohne Monatsbezug: 4 Cent im Monat, gelesen als 4 Cent gesamt"
+
+    # Gegenprobe: GLEICHE Laufzeit, kleiner Abstand - die Annaeherung
+    # bleibt, Fix 2 unveraendert fuer den Fall, fuer den er gebaut war.
+    d24 = karten._delta(karte, modell["referenz"])
+    assert d24["gleiche_laufzeit"] is True and d24["betrag"] == 0.96
+    assert d24["ungefaehr"] is True
+
+    # Der Satz am echten Makro: "je Monat" traegt den Abstand, kein "≈".
+    from telco_radar.report import geraete_tco_band as tco_band
+    from telco_radar.report import html as html_mod
+    karte["delta"] = d
+    karte["delta_kurz"] = tco_band.delta_text(
+        d["betrag"], d["prozent"], ungefaehr=d["ungefaehr"])
+    zeile = BeautifulSoup(html_mod._env().from_string(
+        '{% from "_geraete_buendel.html.j2" import buendelzeile %}'
+        "{{ buendelzeile(k) }}").render(k=karte), "html.parser")
+    satz = vorlage_text(zeile.select_one(".gr-kk-delta"))
+    assert "0,04 € je Monat über der Vodafone-Referenz" in satz, satz
+    assert "≈" not in satz, satz
