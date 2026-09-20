@@ -90,6 +90,7 @@ from telco_radar.report.html import render_site; render_site(Path('/tmp/site'), 
 14. 401/403 bedeutet Autorisierung, 402 fehlendes Guthaben, 429/503/529 Provider-Last. Ein Timeout ist kein falscher Schlüssel.
 15. Actions laufen mit Python 3.11. Keine Syntax, die erst ab 3.12 geht (z. B. Zeilenumbrüche oder gleiche Anführungszeichen in f-String-Feldern). Ein Render, der lokal mit 3.12 klappt, kann in Actions still scheitern.
 16. Ist ein Wert bei allen Anbietern gleich (etwa nur 36-Monats-Raten), ist das zuerst ein Verdacht auf eine Erfassungslücke. Vor jeder Aussage darüber an der Anbieterseite prüfen.
+17. `wip(auto)`-Commits des Stop-Hooks werden nie gemergt, gerebased oder gepusht. Worktree-Branches werden nach dem Übernehmen der Änderungen gelöscht.
 
 ## Clean Code
 
