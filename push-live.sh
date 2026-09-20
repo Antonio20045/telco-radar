@@ -3,7 +3,7 @@
 #
 # Bewusst NICHT automatisch mit eingecheckt: data/state/, data/reports/,
 # site/. Das sind Produktionsdaten/State, die der GitHub-Actions-Lauf
-# pflegt (siehe TELCO_RADAR_HANDOVER.md Abschnitt 8: "Ein vollständiger
+# pflegt (siehe docs/archiv/TELCO_RADAR_HANDOVER.md Abschnitt 8: "Ein vollständiger
 # lokaler Pipeline-Lauf ... Diese Artefakte nicht aus einem lokalen
 # Testlauf committen."). Liegen dort Änderungen, warnt das Skript nur und
 # lässt sie unangetastet — so kann dieses Skript nie versehentlich das
@@ -59,7 +59,7 @@ echo
 
 if [ -n "$GUARDED_DIRTY" ]; then
   echo "Hinweis: Änderungen in$GUARDED_DIRTY werden NICHT mit committet"
-  echo "(Produktionsdaten - siehe TELCO_RADAR_HANDOVER.md)."
+  echo "(Produktionsdaten - siehe docs/archiv/TELCO_RADAR_HANDOVER.md)."
   echo
 fi
 

@@ -72,7 +72,7 @@ def main() -> int:
               + ", ".join(sorted(blind)))
     print("\nHinweis: EMPTY/FAIL bei 'js'-Quellen kann Bot-Schutz oder ein "
           "geaendertes Seitenlayout bedeuten - nicht automatisch die Quelle "
-          "entfernen, siehe TELCO_RADAR_HANDOVER.md Abschnitt zu Quellen.")
+          "entfernen, siehe docs/archiv/TELCO_RADAR_HANDOVER.md Abschnitt zu Quellen.")
     return 0
 
 

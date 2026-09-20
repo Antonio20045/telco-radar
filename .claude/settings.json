@@ -29,12 +29,12 @@
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Edit",
+        "matcher": "Edit|Write",
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"$CLAUDE_PROJECT_DIR\" && PYTHONPATH=src python -m pytest -q 2>&1 | tail -15",
-            "timeout": 180
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && python3 scripts/hook_gezielte_tests.py",
+            "timeout": 120
           }
         ]
       }

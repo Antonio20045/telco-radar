@@ -1132,8 +1132,8 @@ def aufbereiten(state_dir: Path, tco: dict) -> dict:
                 "messtage_text": (f"Messtage: {_tag_monat(tage[0])} bis "
                                   f"{_tag_monat(tage[-1])} "
                                   f"({len(tage)}"
-                                  f"{' Messung' if len(tage) == 1
-                                     else ' Messungen'})")
+                                  + (" Messung)" if len(tage) == 1
+                                     else " Messungen)"))
                 if (tage := _messtage(serien)) else "",
                 "legende_html": _legende_html(serien),
                 "svg_breit": _svg(serien, True, beleg_je),
