@@ -2450,3 +2450,773 @@ def test_ein_haendler_heisst_in_der_spanne_ein_preis(tmp_path):
     assert "1.000,00 € – 1.100,00 €" in spannen_text, (
         f"die Spanne fehlt: {spannen_text!r}")
     assert "ein Preis" not in spannen_text
+
+
+# ==========================================================================
+# v4-P0 (20.09.2026, seiten-pruefer): die LEITZAHL der Geraeteseite am
+# GEFRORENEN Bestand. Die Abschnitte darueber (P1/F3, P1/F2, P3) halten
+# die Seite gegen einen ZWEITEN Aufbereitungs-Lauf ueber Fixture-Bestaende;
+# dieser Abschnitt haelt sie gegen den Bestand im Repo und gegen eine
+# ZWEITE, UNABHAENGIGE RECHNUNG, die keinen Baustein des Bauern importiert
+# (kein tco_model.tco_24, kein geraete_tco_karten, kein geraete_view):
+# gerendert wird ueber render_site() in einen Wegwerfordner gegen
+# data/reports des Repos (wie die Fixture in test_geraete_anbieterzaehlung.
+# py:48), und jede gepruefte Zahl entsteht hier aus data/state/*.json und
+# *.jsonl - nur lesend.
+#
+# Die Rechnung (Soll-Definition aus dem v4-Auftrag, Arithmetik in Cent mit
+# decimal/ROUND_HALF_UP auf ganze Cent, Rundungsregeln offen benannt):
+#
+#   Leitzahl = Anzahlung
+#            + Tarifsumme ueber 24 Monate - phasengewichtet, wenn das
+#              Tarifblatt Preisphasen nennt, die zur MESSUNG am Buendel
+#              passen; liegt die gemessene Monatsrate ausserhalb der
+#              Phasenspanne (+/- 0,005 EUR), spricht das Blatt von einem
+#              anderen Angebot und die MESSUNG gewinnt flach (dokumentierte
+#              Regel geraete_tco_karten.phasen_fuer_buendel, QA-Fix vom
+#              20.09.2026 - hier eigenstaendig nachgebaut, nicht importiert)
+#            + alle Geraeteraten der eigenen Laufzeit, auch die nach
+#              Monat 24 (Restschuld bleibt IN der Kennzahl)
+#            + Anschlusspreis.
+#   Buendelform (1&1, ein Monatsbetrag): Bündelbetrag x Laufzeit +
+#   Zuzahlung + Anschlusspreis.
+#   O/Monat = Leitzahl / 24, auf Cent gerundet (die Seite rundet flach
+#   ueber Python round, also half-even; der Test akzeptiert half-even UND
+#   half-up, da sie sich nur bei exakt einem halben Cent unterscheiden).
+#
+# Mutationsnachweis (Pflicht des Auftrags, siehe
+# test_mutation_eines_euros_am_pflichtfall_schlaegt_aus): einmal vor-
+# gefuehrt am 20.09.2026 - Ergebnis im Kommentar dieses Tests.
+#
+# Kein heutiges Datum: der "aktuelle Stand" ist tco.updated aus den Daten,
+# nie datetime.today(). Fehlt ein Geraet/Band im Bestand, skippt der Test
+# mit benannter Luecke - geraten wird nichts.
+# ==========================================================================
+import csv as _gw_csv
+from decimal import Decimal as _gw_Dez
+from decimal import ROUND_HALF_EVEN as _gw_HEVEN
+from decimal import ROUND_HALF_UP as _gw_HUP
+
+_GW_WURZEL = Path(__file__).resolve().parents[1]
+_GW_HORIZONT = 24
+# Die Bandgrenzen der Vergleichsansicht (report/geraete_tco_band.py):
+# kontinuierlich bis 20 GB klein, bis 60 GB mittel, darueber gross;
+# FEHLEND und UNBEGRENZT sind kein Band (siehe _gw_band).
+import math as _gw_math
+
+
+def _gw_cent(wert) -> int:
+    """Euro (float/str) -> ganze Cent, kaufmaennisch (HALF_UP)."""
+    return int((_gw_Dez(str(wert)) * 100).quantize(_gw_Dez("1"),
+                                                   rounding=_gw_HUP))
+
+
+def _gw_dezimal(text: str) -> "_gw_Dez":
+    """'1.459,00' -> Decimal('1459.00') (deutsches Zahlenformat der Seite)."""
+    return _gw_Dez(text.replace(".", "").replace(",", "."))
+
+
+def _gw_rohdaten() -> tuple[dict, dict, dict]:
+    """(tco-store, tarifblaetter je id, geraete_db) - nur lesend."""
+    tco = json.loads((_GW_WURZEL / "data" / "state" / "geraete_tco.json")
+                     .read_text(encoding="utf-8"))
+    # JE ID KOENNEN MEHRERE BLAETTER STEHEN (Lesarten und Staende) -
+    # Phasen und Volumen nimmt der Test wie die Vorlage vom ersten Blatt,
+    # das sie nennt.
+    blaetter: dict[str, list] = {}
+    for zeile in (_GW_WURZEL / "data" / "state" / "tarife.jsonl") \
+            .read_text(encoding="utf-8").splitlines():
+        if zeile.strip():
+            blatt = json.loads(zeile)
+            blaetter.setdefault(blatt["tarif_id"], []).append(blatt)
+    db = json.loads((_GW_WURZEL / "data" / "state" / "geraete_db.json")
+                    .read_text(encoding="utf-8"))
+    return tco, blaetter, db
+
+
+def _gw_phasen(buendel: dict, blaetter: dict) -> list[dict]:
+    """Blatt-Phasen des Bündels - nur ohne Widerspruch zur Messung.
+
+    Die Messung (tarif_monatlich) muss in der Preisspanne der Phasen
+    liegen (einschliesslich, Toleranz ein halber Cent); sonst gewinnt die
+    Messung flach und die Phasen gelten nicht. Ohne Messung gibt es keinen
+    Widerspruch. Eigenbau nach der dokumentierten Regel, nicht importiert.
+    """
+    phasen = []
+    for blatt in blaetter.get(buendel.get("tarif_id") or "", []):
+        phasen = [p for p in (blatt.get("preisphasen") or [])
+                  if p.get("betrag") is not None]
+        if phasen:
+            break
+    messung = buendel.get("tarif_monatlich")
+    if not phasen or messung is None:
+        return phasen
+    betraege = [_gw_Dez(str(p["betrag"])) for p in phasen]
+    toleranz = _gw_Dez("0.005")
+    if min(betraege) - toleranz <= _gw_Dez(str(messung)) <= max(betraege) \
+            + toleranz:
+        return phasen
+    return []
+
+
+def _gw_phasensumme(phasen: list[dict], horizont: int) -> int:
+    """Monatsentgelte ueber den Horizont, phasengewichtet, in Cent.
+
+    Phase ohne Ende laeuft bis zum Horizont, darueber hinausreichende
+    werden gekappt, Monate nach der letzten Phase laufen zum letzten
+    bekannten Preis weiter (der letzte Preis eines Tarifs ist der
+    Normalpreis, nicht der Rabattpreis).
+    """
+    summe = abgedeckt = 0
+    for phase in sorted(phasen, key=lambda p: p["von_monat"]):
+        bis = horizont if phase.get("bis_monat") is None \
+            else min(int(phase["bis_monat"]), horizont)
+        monate = max(0, bis - int(phase["von_monat"]) + 1)
+        if monate <= 0:
+            continue
+        summe += monate * _gw_cent(phase["betrag"])
+        abgedeckt += monate
+    if abgedeckt < horizont:
+        letzter = max(phasen, key=lambda p: p["von_monat"])
+        summe += (horizont - abgedeckt) * _gw_cent(letzter["betrag"])
+    return summe
+
+
+def _gw_leitzahl(buendel: dict, blaetter: dict) -> tuple:
+    """(gesamt_cent, rest_cent) der Soll-Definition; None = Luecke."""
+    laufzeit = int(buendel["laufzeit_monate"])
+    offen = max(0, laufzeit - _GW_HORIZONT)
+    if buendel.get("buendel_monatlich") is not None:
+        monat = _gw_cent(buendel["buendel_monatlich"])
+        teile = [monat * laufzeit, _gw_cent(buendel["geraet_zuzahlung"]),
+                 _gw_cent(buendel["anschlusspreis"])]
+        rest = monat * offen
+    else:
+        phasen = _gw_phasen(buendel, blaetter)
+        tarif24 = _gw_phasensumme(phasen, _GW_HORIZONT) if phasen else None
+        if tarif24 is None:
+            if buendel.get("tarif_monatlich") is None:
+                return None, None        # Tarifluecke: keine belastbare Zahl
+            tarif24 = _gw_cent(buendel["tarif_monatlich"]) * _GW_HORIZONT
+        rate = buendel.get("geraet_monatsrate")
+        if rate is None:
+            return None, None            # Ratenluecke
+        rate_c = _gw_cent(rate)
+        teile = [_gw_cent(buendel["geraet_zuzahlung"]), tarif24,
+                 rate_c * laufzeit, _gw_cent(buendel["anschlusspreis"])]
+        rest = rate_c * offen
+    if any(t is None for t in teile):
+        return None, None
+    return sum(teile), rest
+
+
+def _gw_band(buendel: dict, blaetter: dict) -> str | None:
+    """Band aus dem Datenvolumen des Blatts - kontinuierlich, wie die Seite.
+
+    bis 20 GB klein, bis 60 GB mittel, darueber gross. FEHLEND und
+    UNBEGRENZT sind kein Band (`None`) - dieselbe Regel wie
+    `geraete_tco_band.band_von_gb`: unbegrenzt ist eine Markierung am
+    Tarif und keine Vergleichsstufe, und ein Tarif ohne Volumenangabe in
+    "gross" waere eine erfundene Aussage. Kein 21/61-Raster: 20,5 GB
+    liegt im Band mittel, nicht zwischen den Baendern.
+    """
+    gb = None
+    for blatt in blaetter.get(buendel.get("tarif_id") or "", []):
+        if blatt.get("datenvolumen_gb") is not None:
+            gb = blatt["datenvolumen_gb"]
+            break
+    if gb is None:
+        return None
+    try:
+        gb = float(gb)
+    except (TypeError, ValueError):
+        return None                     # 'unbegrenzt' o. a. ist kein Band
+    if _gw_math.isnan(gb) or _gw_math.isinf(gb):
+        return None
+    if gb <= 20:
+        return "klein"
+    if gb <= 60:
+        return "mittel"
+    return "gross"
+
+
+def _gw_min_buendel(tco: dict, blaetter: dict, sku_präfix: str, band: str,
+                    anbieter: str = ""):
+    """Günstigstes neu-Bündel des Modells im Band nach EIGENER Rechnung.
+
+    Auswahlmenge wie die Seite: Zustand neu (vergleichbar) und eine
+    belastbare Zahl (ohne Tarifgrundpreis zaehlt ein Bündel nicht). Mit
+    `anbieter` auf dessen Bündel beschraenkt - die Vodafone-Referenz ist
+    das Minimum UNTER DEN EIGENEN Bündeln, nicht der Sieger des Bandes.
+    """
+    beste = None
+    for b in tco["buendel"]:
+        if b.get("zustand") != "neu":
+            continue
+        if anbieter and b["anbieter"] != anbieter:
+            continue
+        if not b["sku_id"].startswith(sku_präfix):
+            continue
+        if _gw_band(b, blaetter) != band:
+            continue
+        gesamt, _rest = _gw_leitzahl(b, blaetter)
+        if gesamt is None:
+            continue
+        if beste is None or gesamt < beste[0]:
+            beste = (gesamt, b)
+    return beste
+
+
+# ---- Extraktion aus der gerenderten Seite (nur Lesen, nichts mutieren) ----
+_GW_ANTWORT_MUSTER = re.compile(
+    r"(?:ist (?P<anb1>[^:<]+?) am günstigsten|führt nur (?P<anb2>[^:<]+?))"
+    r": <b class='gr-zr-zahl'>(?P<gesamt>[\d.,]+) €</b> "
+    r"Kosten über 24 Monate, Ø "
+    # greedy bis zur LETZTEN schliessenden Klammer: o2-Tarifnamen tragen
+    # selbst Klammern ("... mit 50 GB+ (24 Mon.)").
+    r"<b class='gr-zr-zahl'>(?P<o>[\d.,]+) €/Monat</b> \((?P<klammer>.*)\)")
+
+_GW_LEIT_MUSTER = re.compile(
+    r"<b class='gr-leit-zahl'>([\d.,]+) €</b>"
+    r"<span class='gr-leit-label'>[^()]*\(([\d.,]+) €(?:, Näherung)?\)"
+    r"</span>")
+
+
+def _gw_paar_block(fragment: str, modell: str, band: str) -> str | None:
+    """Der div.gr-zr-lager-Block eines (Modell, Band)-Paars."""
+    assert fragment, "Fragment ist leer - der Render hat keine Zeitreihe"
+    anfang = f'<div class="gr-zr-lager" data-modell="{modell}" ' \
+             f'data-band="{band}"'
+    i = fragment.find(anfang)
+    if i < 0:
+        return None
+    j = fragment.find('<div class="gr-zr-lager"', i + 10)
+    return fragment[i:j if j > 0 else len(fragment)]
+
+
+def _gw_antwort(block: str) -> dict | None:
+    assert block, "Paar-Block ist leer - Antwort-Satz nicht lesbar"
+    m = _GW_ANTWORT_MUSTER.search(block)
+    if not m:
+        return None
+    return {"anb": (m.group("anb1") or m.group("anb2")).strip(),
+            "gesamt": _gw_dezimal(m.group("gesamt")),
+            "o": _gw_dezimal(m.group("o")),
+            "klammer": m.group("klammer")}
+
+
+def _gw_neueste_vorlage(block: str, anbieter: str) -> tuple:
+    """(messtag, inhalt) der neuesten Rechenweg-Vorlage eines Anbieters -
+    der Block traegt JEDE Historien-Messung, und aeltere Raten duerfen
+    andere sein (gemessen: congstar 29,70 vor dem 30,50 von heute)."""
+    vorlagen = re.findall(
+        r"<template data-anb='([^']+)' data-m='([^']+)'[^>]*>(.*?)</template>",
+        block, re.S)
+    assert block, "Paar-Block ist leer - kein Rechenweg lesbar"
+    eigene = [(m, inhalt) for a, m, inhalt in vorlagen if a == anbieter]
+    assert eigene, (f"kein {anbieter}-Rechenweg im Paar-Block - ohne ihn "
+                    "prueft die Restschuld nichts")
+    return max(eigene, key=lambda v: v[0])
+
+
+def _gw_vergleiche(ist: "_gw_Dez", soll_cent: int, kontext: str) -> None:
+    """Der eine Vergleich dieses Abschnitts - Seite gegen eigene Rechnung."""
+    assert ist == _gw_Dez(soll_cent) / 100, (
+        f"{kontext}: Seite zeigt {ist} €, die eigene Rechnung aus den "
+        f"Rohdaten ergibt {_gw_Dez(soll_cent) / 100} €")
+
+
+def _gw_o_monat(soll_cent: int) -> set:
+    """O/Monat auf Cent gerundet - half-even (Python round der Seite) und
+    half-up (kaufmaennisch) als akzeptierte Menge."""
+    genau = _gw_Dez(soll_cent) / 2400
+    return {genau.quantize(_gw_Dez("0.01"), rounding=_gw_HEVEN),
+            genau.quantize(_gw_Dez("0.01"), rounding=_gw_HUP)}
+
+
+@pytest.fixture(scope="module")
+def gw_seite(tmp_path_factory) -> dict:
+    """Ein Render gegen den gefrorenen Bestand des Repos, mit cfg.
+
+    render_site() leitet den State ueber reports.parent.parent her - data/
+    reports des Repos zeigt auf data/state des Repos. Wegwerfordner, nie
+    site/ im Repo (harte Regel 1)."""
+    from telco_radar.config import load_config
+
+    site = tmp_path_factory.mktemp("v4-p0-leitzahl") / "site"
+    render_site(site, _GW_WURZEL / "data" / "reports",
+                load_config(_GW_WURZEL))
+    return {
+        "geraete": (site / "geraete.html").read_text(encoding="utf-8"),
+        "fragment": (site / "data" / "geraete-zeitreihe.html")
+        .read_text(encoding="utf-8"),
+        "csv": site / "exporte" / "geraete-tco.csv",
+        "stand": json.loads((_GW_WURZEL / "data" / "state" / "geraete_tco.json")
+                            .read_text(encoding="utf-8"))["updated"],
+    }
+
+
+# Der Pflichtfall des Auftrags: congstar Allnet Flat XS zum iPhone 17 Pro
+# 256 GB - 1 + 24 x 15,00 + 36 x 30,50 + 0 = 1.459,00 EUR.
+_GW_PFLICHT_SKU = "apple-iphone-17-pro-256gb"
+_GW_PFLICHT_ANBIETER = "congstar"
+_GW_PFLICHT_TARIF = "Allnet Flat XS"
+
+
+def _gw_pflichtbuendel(tco: dict, blaetter: dict) -> tuple:
+    """(soll_cent, ein Bündel, {Abruftage}) - alle Farben rechnen gleich."""
+    kandidaten = [b for b in tco["buendel"]
+                  if b["sku_id"].startswith(_GW_PFLICHT_SKU)
+                  and b["anbieter"] == _GW_PFLICHT_ANBIETER
+                  and b["tarif_name"] == _GW_PFLICHT_TARIF
+                  and b.get("zustand") == "neu"]
+    assert kandidaten, \
+        ("Pflichtfall fehlt im Bestand (benannte Lücke, nicht raten): "
+         f"kein neu-Bündel {_GW_PFLICHT_ANBIETER}/{_GW_PFLICHT_TARIF} "
+         f"zu {_GW_PFLICHT_SKU}")
+    werte = {_gw_leitzahl(b, blaetter)[0] for b in kandidaten}
+    assert None not in werte and len(werte) == 1, (
+        f"Farben des Pflichtfalls rechnen verschieden: {werte}")
+    tage = {b.get("abgerufen_am", "") for b in kandidaten}
+    return werte.pop(), kandidaten[0], tage
+
+
+def test_leitzahl_congstar_xs_iphone17pro256_am_bestand(gw_seite):
+    """Der Pflichtfall, in allen Lagen, in denen die Seite ihn trägt:
+    Antwort-Satz und Rechenweg im (Modell, Band)-Paar des Fragments -
+    das Fragment gehört zum selben Render und trägt ALLE Paare - und,
+    wenn der Server-First-Paint gerade mit diesem Paar startet, auch
+    dessen Antwort-Satz und Bündelzeile."""
+    tco, blaetter, _db = _gw_rohdaten()
+    soll_cent, buendel, _tage = _gw_pflichtbuendel(tco, blaetter)
+
+    # 1) Der Anker: der Pflichtwert aus dem Auftrag. Bei einem Bot-Commit,
+    #    der die congstar-Posten ändert, wird DIESER Assert bewusst rot -
+    #    dann ist der neue Sollwert nachzurechnen und hier neu zu verankern
+    #    (er verhindert, dass jemand Rechnung oder Seite still verbiegt,
+    #    ohne dass der Pflichtfall es meldet).
+    assert soll_cent == 145900, (
+        f"Pflichtfall-Rechnung ergibt {soll_cent / 100} € - Verankerung "
+        "1.459,00 € (1 + 24 × 15,00 + 36 × 30,50 + 0) stimmt nicht mehr")
+
+    # 2) Das Paar im Fragment: Antwort-Satz mit Leitzahl und O/Monat.
+    block = _gw_paar_block(gw_seite["fragment"],
+                           "apple-iphone-17-pro-256", "klein")
+    assert block, "Paar apple-iphone-17-pro-256/klein fehlt im Fragment"
+    antwort = _gw_antwort(block)
+    assert antwort, f"Paar ohne Antwort-Satz: {block[:200]!r}"
+    assert antwort["anb"] == _GW_PFLICHT_ANBIETER, (
+        f"Antwort nennt {antwort['anb']!r}, erwartet congstar")
+    _gw_vergleiche(antwort["gesamt"], soll_cent,
+                   "Pflichtfall, Antwort-Satz im Paar klein")
+    assert _GW_PFLICHT_TARIF in antwort["klammer"], antwort["klammer"]
+    assert antwort["o"] in _gw_o_monat(soll_cent), (
+        f"Ø/Monat im Satz: {antwort['o']} €, erwartet "
+        f"{_gw_o_monat(soll_cent)}")
+
+    # 3) Der Rechenweg der neuesten congstar-Messung im selben Paar: die
+    #    Posten des Panels gegen SICH SELBST (24 × Tarif, Laufzeit × Rate,
+    #    Summe) UND gegen die eigene Store-Rechnung - zwei Rechnungen, die
+    #    nichts voneinander wissen.
+    messtag, inhalt = _gw_neueste_vorlage(block, _GW_PFLICHT_ANBIETER)
+    posten = {}
+    for m in re.finditer(
+            r"<span class='gr-zr-pn'>([^<]+)</span>.*?"
+            r"<span class='gr-zr-pr'>(.*?)</span></li>", inhalt, re.S):
+        name = m.group(1)
+        text = " ".join(re.sub(r"<[^>]+>", " ", m.group(2)).split())
+        mal = re.search(r"(\d+) × ([\d.,]+) €\s*=\s*([\d.,]+) €", text)
+        posten[name] = (_gw_dezimal(mal.group(3)),
+                        int(mal.group(1)), _gw_dezimal(mal.group(2))) if mal \
+            else (_gw_dezimal(re.search(r"([\d.,]+) €", text).group(1)),
+                  None, None)
+    summe = _gw_dezimal(re.search(
+        r"gr-zr-rsumme'>= <b>([\d.,]+) €</b>", inhalt).group(1))
+    teile = [_gw_dezimal("0")]
+    for _name, (betrag, n, einzeln) in posten.items():
+        teile.append(betrag)
+        if n is not None:      # "N × einzeln = betrag" muss aufgehen
+            assert einzeln * n == betrag, (
+                f"Posten {_name}: {n} × {einzeln} != {betrag}")
+    assert sum(teile) == summe, (
+        f"Rechenweg-Summe {summe} != Summe der Posten {sum(teile)}")
+    _gw_vergleiche(summe, soll_cent,
+                   f"Pflichtfall, Rechenweg-Summe (Messung {messtag})")
+    # Tarif-Posten: 24 Monate, zum gemessenen Tarifpreis
+    assert posten["Tarif"][1] == 24 and \
+        posten["Tarif"][2] == _gw_Dez(str(buendel["tarif_monatlich"]))
+    assert posten["Geräterate"][1] == buendel["laufzeit_monate"] and \
+        posten["Geräterate"][2] == _gw_Dez(str(buendel["geraet_monatsrate"]))
+
+    # 4) First Paint: der Server-Startblock - derselbe Pflichtfall wie im
+    #    Fragment. Der Start fällt aus den Daten und darf wechseln; damit
+    #    der Wechsel die Prüfungen nicht STILL überspringt, zählt der
+    #    Zweig sich (fp_geprueft) und der Test meldet sich laut.
+    titel = re.search(r'class="gr-bnd-titel"[^>]*>([^<]+)<',
+                      gw_seite["geraete"])
+    fp_geprueft = 0
+    if titel and "Apple iPhone 17 Pro 256 GB" in titel.group(1):
+        fp_geprueft += 1
+        fp_antwort = _gw_antwort(gw_seite["geraete"])
+        assert fp_antwort and fp_antwort["anb"] == _GW_PFLICHT_ANBIETER
+        _gw_vergleiche(fp_antwort["gesamt"], soll_cent,
+                       "Pflichtfall, Antwort-Satz im First Paint")
+        zeile = re.search(
+            r'<details class="gr-bnd"[^>]*data-anbieter="congstar"'
+            r'[^>]*data-band="klein"[^>]*>(.*?)</details>',
+            gw_seite["geraete"], re.S)
+        assert zeile, "Bündelzeile congstar/klein fehlt im First Paint"
+        kopf = re.search(r"<summary>(.*?)</summary>", zeile.group(1), re.S)
+        assert kopf and _GW_PFLICHT_TARIF in kopf.group(1), \
+            "Bündelzeile nennt nicht den Pflichttarif"
+        attrs = re.search(r'<details class="gr-bnd"([^>]*)>', zeile.group(0))
+        gesamt_attr = re.search(r'data-gesamt="([\d.]+)"', attrs.group(1))
+        schnitt_attr = re.search(r'data-schnitt="([\d.]+)"', attrs.group(1))
+        assert gesamt_attr and _gw_Dez(gesamt_attr.group(1)) \
+            == _gw_Dez(soll_cent) / 100, gesamt_attr and gesamt_attr.group(1)
+        assert schnitt_attr and \
+            _gw_Dez(schnitt_attr.group(1)) in _gw_o_monat(soll_cent)
+        text = " ".join(re.sub(r"<[^>]+>", " ", zeile.group(1)).split())
+        assert "1.459,00 €" in text, "Leitzahl fehlt wortlich in der Zeile"
+    assert fp_geprueft >= 1, (
+        "Server-First-Paint startet nicht mit dem Pflichtpaar - Antwor- und "
+        "Bündelzeilen-Prüfungen wären still übersprungen. Der Start folgt "
+        "dem Bestand (meiste Anbieter); bei einem Wechsel diesen Zweig "
+        "bewusst neu verankern oder auf ein anderes Fragment-Paar heben.")
+
+
+def test_monatsschnitt_und_restschuld_des_pflichtfalls_am_bestand(gw_seite):
+    """Die Zweitzahl (Ø/Monat) und die Restschuld-Ausweisungen: 'davon
+    nach Monat 24 noch zu zahlen' im Rechenweg und 'danach noch offen' in
+    der Bündelkarte - plus die gekappte Zahl 'nach 24 Monaten gezahlt',
+    die seit A1 NUR noch unter diesem Label stehen darf (die alte,
+    1.093,00 €-Leitzahl war genau um die Restschuld zu niedrig)."""
+    tco, blaetter, _db = _gw_rohdaten()
+    soll_cent, buendel, _tage = _gw_pflichtbuendel(tco, blaetter)
+    rest_c = _gw_cent(buendel["geraet_monatsrate"]) * max(
+        0, buendel["laufzeit_monate"] - _GW_HORIZONT)
+    gezahlt_c = soll_cent - rest_c
+    assert (soll_cent, rest_c, gezahlt_c) == (145900, 36600, 109300)
+
+    block = _gw_paar_block(gw_seite["fragment"],
+                           "apple-iphone-17-pro-256", "klein")
+    _messtag, inhalt = _gw_neueste_vorlage(block, _GW_PFLICHT_ANBIETER)
+    offen = re.search(
+        r"davon nach Monat 24 noch zu zahlen: (\d+) × ([\d.,]+) € "
+        r"= ([\d.,]+) €", inhalt)
+    assert offen, "Rechenweg nennt die Restschuld nicht"
+    assert int(offen.group(1)) == buendel["laufzeit_monate"] - 24
+    assert _gw_dezimal(offen.group(2)) \
+        == _gw_Dez(str(buendel["geraet_monatsrate"]))
+    _gw_vergleiche(_gw_dezimal(offen.group(3)), rest_c,
+                   "Restschuld im Rechenweg des Pflichtfalls")
+
+    # First Paint (Karte): der Startblock - mit Zaehler, damit ein
+    # anderes Startpaar die Ausweisungs-Prüfung nicht still überspringt.
+    # Fragment-Gegenstück: der offen-Satz im Rechenweg OBEN - der ist
+    # paarungebunden geprüft und fällt nicht mit dem Startfall um.
+    titel = re.search(r'class="gr-bnd-titel"[^>]*>([^<]+)<',
+                      gw_seite["geraete"])
+    fp_geprueft = 0
+    if titel and "Apple iPhone 17 Pro 256 GB" in titel.group(1):
+        fp_geprueft += 1
+        zeile = re.search(
+            r'<details class="gr-bnd"[^>]*data-anbieter="congstar"'
+            r'[^>]*data-band="klein"[^>]*>(.*?)</details>',
+            gw_seite["geraete"], re.S)
+        text = " ".join(re.sub(r"<[^>]+>", " ", zeile.group(1)).split())
+        m = re.search(r"nach 24 Monaten gezahlt: ([\d.,]+) € · "
+                      r"danach noch offen: ([\d.,]+) € \((\d+) Geräteraten\)",
+                      text)
+        assert m, f"Bündelkarte ohne Ausweisung: {text[:160]!r}"
+        _gw_vergleiche(_gw_dezimal(m.group(1)), gezahlt_c,
+                       "'nach 24 Monaten gezahlt'")
+        _gw_vergleiche(_gw_dezimal(m.group(2)), rest_c,
+                       "'danach noch offen'")
+        assert int(m.group(3)) == buendel["laufzeit_monate"] - 24
+        # Die gekappte Zahl darf nicht mehr als Leitzahl herhalten: ihr
+        # Label muss das Kappen benennen (A1-Regel).
+        assert "nach 24 Monaten gezahlt" in text
+    assert fp_geprueft >= 1, (
+        "Server-First-Paint startet nicht mit dem Pflichtpaar - die "
+        "Ausweisung 'nach 24 Monaten gezahlt / danach noch offen' wäre "
+        "still übersprungen (Fragment-Gegenstück: der offen-Satz im "
+        "Rechenweg oben).")
+
+
+# Die vier Tor-Geräte des Auftrags, je zwei Bänder (Band-IDs der Paare).
+_GW_TOR_FAELLE = [
+    ("apple-iphone-17-pro-256", "klein"), ("apple-iphone-17-pro-256", "mittel"),
+    ("apple-iphone-17-256", "klein"), ("apple-iphone-17-256", "mittel"),
+    ("samsung-galaxy-s26-ultra-256", "klein"),
+    ("samsung-galaxy-s26-ultra-256", "mittel"),
+    ("google-pixel-10-pro-128", "klein"), ("google-pixel-10-pro-128", "mittel"),
+]
+
+
+@pytest.mark.parametrize("modell,band", _GW_TOR_FAELLE)
+def test_tor_geraete_leitzahl_je_band_am_bestand(gw_seite, modell, band):
+    """Je eine Leitzahl der vier Tor-Geräte, je zwei Bänder: die Zahl des
+    Antwort-Satzes gegen die EIGENE Minimumsrechnung über alle neu-Bündel
+    des Modells im Band - und die Guenstigkeitsbehauptung des Satzes
+    ('ist X am guenstigsten' / 'fuehrt nur X') gegen dasselbe Minimum."""
+    tco, blaetter, _db = _gw_rohdaten()
+    block = _gw_paar_block(gw_seite["fragment"], modell, band)
+    if block is None:
+        pytest.skip(f"benannte Lücke: Paar {modell}/{band} fehlt im "
+                    f"Fragment (Bestand vom {gw_seite['stand']})")
+    antwort = _gw_antwort(block)
+    if antwort is None:
+        pytest.skip(f"benannte Lücke: Paar {modell}/{band} ohne Antwort-Satz")
+    min_cent, min_buendel = _gw_min_buendel(tco, blaetter, f"{modell}gb",
+                                            band)
+    if min_buendel is None:
+        pytest.skip(f"benannte Lücke: kein neu-Bündel von {modell} im Band "
+                    f"{band} in der Auswahlmenge (Bestand {gw_seite['stand']})")
+    _gw_vergleiche(antwort["gesamt"], min_cent,
+                   f"{modell} Band {band}: Leitzahl des Antwort-Satzes")
+    assert antwort["anb"] == min_buendel["anbieter"], (
+        f"{modell} Band {band}: Satz nennt {antwort['anb']!r} am günstigsten, "
+        f"die eigene Rechnung findet {min_buendel['anbieter']!r} "
+        f"mit {_gw_Dez(min_cent) / 100} €")
+    assert min_buendel["tarif_name"] in antwort["klammer"], (
+        f"Satz nennt Tarif {antwort['klammer']!r}, die Rechnung rechnet "
+        f"{min_buendel['tarif_name']!r}")
+    assert antwort["o"] in _gw_o_monat(min_cent), (
+        f"{modell} Band {band}: Ø/Monat {antwort['o']} € != "
+        f"{_gw_o_monat(min_cent)}")
+
+
+def test_vodafone_referenz_und_delta_des_pflichtfalls_am_bestand(gw_seite):
+    """Die Leit-Zeile 'X € unter der Vodafone-Referenz (Y €)': die Referenz
+    ist die guenstigste EIGENE Karte im selben Band (eine echte Vodafone-
+    Bündel-Leitzahl, NICHT die SIM-only-Naeherung aus Blatt und Barpreis).
+    Hier nur fuer den Pflichtfall geprueft, und nur wo Vodafone wirklich
+    ein neu-Bündel im Band hat - sonst rechnet die Seite eine Naeherung,
+    und das ist eine andere Rechnung als diese (benannte Grenze)."""
+    tco, blaetter, _db = _gw_rohdaten()
+    vf = _gw_min_buendel(tco, blaetter, _GW_PFLICHT_SKU, "klein",
+                         anbieter="Vodafone")
+    if vf is None:
+        pytest.skip("benannte Lücke: Vodafone ohne neu-Bündel des "
+                    "Pflichtfalls im Band klein - die Seite rechnet dann "
+                    "eine Näherung, dieser Test prüft die Bündel-Referenz")
+    beste_c, _b, _t = _gw_pflichtbuendel(tco, blaetter)
+    soll_ref, soll_delta = vf[0], vf[0] - beste_c
+
+    block = _gw_paar_block(gw_seite["fragment"],
+                           "apple-iphone-17-pro-256", "klein")
+    leit = _GW_LEIT_MUSTER.search(block or "")
+    assert leit, "Leit-Zeile fehlt im Paar des Pflichtfalls"
+    _gw_vergleiche(_gw_dezimal(leit.group(1)), soll_delta,
+                   "Delta zur Vodafone-Referenz")
+    _gw_vergleiche(_gw_dezimal(leit.group(2)), soll_ref,
+                   "Vodafone-Referenz der Leit-Zeile")
+
+
+def test_geraete_tco_csv_gegen_die_eigene_rechnung(gw_seite):
+    """site/exporte/geraete-tco.csv desselben Renders: Jede Bündel-Zeile
+    aus ihren eigenen Postenspalten nachgerechnet (Zuzahlung + 24 × Tarif
+    + Rate × Laufzeit + Anschluss; Bündelform: Bündelbetrag × Laufzeit +
+    Zuzahlung + Anschluss). SIM-only-Zeilen prüft der EIGENE Test mit dem
+    fachlichen Soll inklusive Anschlusspreis (P0.8/A4, dort xfail strict,
+    bis A4 gemergt ist) - hier stehen sie nicht, damit dieser Test nur
+    die Bündel scharf hält. Und der heutige Stand zusaetzlich gegen den
+    Store: jedes Bündel mit abgerufen_am == tco.updated muss als CSV-Zeile
+    mit genau diesen Posten stehen und auf dieselbe Zahl rechnen."""
+    tco, blaetter, _db = _gw_rohdaten()
+    zeilen = list(_gw_csv.DictReader(
+        gw_seite["csv"].open(encoding="utf-8-sig"), delimiter=";"))
+    assert zeilen, "Export ohne Zeilen"
+
+    def _n(s):
+        return None if s in (None, "") else _gw_Dez(s.replace(",", "."))
+
+    abweich, geprueft = [], 0
+    for r in zeilen:
+        zu, tarif = _n(r["Zuzahlung EUR"]), _n(r["Tarif/Monat EUR"])
+        rate = _n(r["Geräterate EUR"])
+        buendel = _n(r["Bündel/Monat EUR"])
+        anschluss = _n(r["Anschlusspreis EUR"])
+        lz = r["Laufzeit Monate"]
+        if r["Art"] == "SIM-only":
+            # P0.8/A4: SIM-only hat seinen EIGENEN Test mit dem fachlichen
+            # Soll (24 × Tarif + Anschlusspreis, xfail strict) - hier steht
+            # der Zweig nicht, damit dieser Test nur die Bündel scharf
+            # hält und der offene Fehler genau EIN Gesicht hat.
+            continue
+        if buendel is not None:
+            soll = buendel * int(lz) + (zu or 0) + (anschluss or 0)
+        elif lz and tarif is not None and rate is not None:
+            soll = (zu or 0) + tarif * 24 + rate * int(lz) + (anschluss or 0)
+        else:
+            soll = None                  # Luecke in der Zeile selbst
+        ist = _n(r["Kosten über 24 Monate EUR"])
+        if soll is None or ist is None:
+            continue
+        geprueft += 1
+        if soll != ist:
+            abweich.append((r["Art"], r["Anbieter"], r["Modell"], r["Tarif"],
+                            float(ist), float(soll)))
+    assert geprueft >= 400, (
+        f"nur {geprueft} von {len(zeilen)} Zeilen nachgerechnet - der Test "
+        "greift nicht mehr")
+    assert not abweich, f"{len(abweich)} CSV-Zeilen widersprechen ihren " \
+                        f"eigenen Posten: {abweich[:5]}"
+
+    # Der Pflichtfall als Zeile(n) seines Abruftags - der Export traegt
+    # JEDE Historien-Messung, und der Abruftag des Bündels ist der
+    # Schlüssel, nicht der Stand des Stores (Anbieter werden an
+    # verschiedenen Tagen gemessen; am Stand vom 2026-09-20 war congstar
+    # zuletzt am 2026-09-16 dran).
+    _soll, _pflichtbuendel, tage = _gw_pflichtbuendel(tco, blaetter)
+    pflicht = [r for r in zeilen if r["Anbieter"] == _GW_PFLICHT_ANBIETER
+               and r["Tarif"] == _GW_PFLICHT_TARIF
+               and r["Speicher GB"] == "256"
+               and "iphone-17-pro" in r["Modell"].lower().replace(" ", "-")
+               and r["Abgerufen am"] in tage]
+    assert pflicht, "Pflichtfall fehlt im Export (Stand " \
+                    f"{gw_seite['stand']})"
+    for zeile in pflicht:
+        _gw_vergleiche(_n(zeile["Kosten über 24 Monate EUR"]),
+                       _soll, "Pflichtfall im CSV-Export")
+
+    # Store-Abgleich: jedes heute gemessene Bündel steht mit seinen Posten
+    # im Export und rechnet dort auf dieselbe Zahl.
+    stand_zeilen = {(r["Anbieter"], r["Tarif"], r["Modell"], r["Speicher GB"],
+                     r["Laufzeit Monate"], r["Zustand"],
+                     r["Zuzahlung EUR"], r["Tarif/Monat EUR"],
+                     r["Geräterate EUR"], r["Bündel/Monat EUR"],
+                     r["Anschlusspreis EUR"],
+                     r["Kosten über 24 Monate EUR"]): r for r in zeilen}
+    treffer = 0
+    for b in tco["buendel"]:
+        if b.get("abgerufen_am") != gw_seite["stand"] \
+                or not b["sku_id"] or b.get("zustand", "neu") != "neu":
+            continue
+        g, _rest = _gw_leitzahl(b, blaetter)
+        if g is None:
+            continue
+        slug = re.sub(r"[^a-z0-9]+", "-", b["sku_id"]).strip("-")
+        # sku: hersteller-modell-speicher-farbe -> Modell + Speicher daraus
+        # (das CSV nennt das Modell OHNE Hersteller: "iPhone 17 Pro")
+        teile = slug.split("-")
+        speicher = next((t for t in teile if t.endswith("gb")
+                         and t[:-2].isdigit()), None)
+        if speicher is None:
+            continue                     # Speicherstufe nicht slug-faehig
+        modell = "-".join(teile[1:teile.index(speicher)])
+        # DIE POSTEN GEHOEREN IN DEN MATCH: Farben desselben Geraets tragen
+        # verschiedene Raten (gemessen: iPhone 16 rosa 23,00 / blau 27,00),
+        # und nur die Zeile MIT den Posten dieses Buendels rechnet seine Zahl.
+        def _eur(wert):
+            return "" if wert is None else f"{float(wert):.2f}".replace(".", ",")
+        posten = (_eur(b.get("geraet_zuzahlung")), _eur(b.get("tarif_monatlich")),
+                  _eur(b.get("geraet_monatsrate")), _eur(b.get("buendel_monatlich")),
+                  _eur(b.get("anschlusspreis")))
+        gefunden = [schluessel for schluessel in stand_zeilen
+                    if schluessel[0] == b["anbieter"]
+                    and schluessel[1] == b["tarif_name"]
+                    and schluessel[2].lower().replace(" ", "-") == modell
+                    and schluessel[3] == speicher[:-2]
+                    and schluessel[4] == str(b["laufzeit_monate"])
+                    and schluessel[6:11] == posten]
+        if not gefunden:
+            continue                     # Modellname im CSV nicht slug-faehig
+        for schluessel in gefunden:
+            ist = _n(schluessel[11])
+            assert ist == _gw_Dez(g) / 100, (
+                f"CSV-Zeile {schluessel[:4]}: {ist} €, Store-Rechnung "
+                f"{_gw_Dez(g) / 100} € (Posten {schluessel[6:11]})")
+            treffer += 1
+    assert treffer >= 200, (
+        f"nur {treffer} heute gemessene Bündel im CSV nachgerechnet - der "
+        "Store-Abgleich greift nicht mehr")
+
+
+@pytest.mark.xfail(strict=True,
+                   reason="P0-A4 offen: SIM-only-Leitzahl ohne "
+                          "Anschlusspreis (Auftrag P0.8)")
+def test_geraete_tco_csv_simonly_mit_anschlusspreis(gw_seite):
+    """Der FACHLICHE Soll der SIM-only-Zeilen: 24 × Tarif PLUS
+    Anschlusspreis, wo die Zeile ihn trägt (A4, 20.09.2026: die
+    SIM-only-Leitzahl ist dieselbe Rechnung wie die der Bündel - Soll-
+    Definition der Leitzahl und Konsistenz zu geraeteanteil(), das
+    tco_24(als_buendel()) schon immer so rechnete; bis A4 rechnete der
+    Export ohne ihn, und der Orakel-Soll war der Bug). Eine LEERE Zelle
+    ist die Lücke des Modells (unbekannt ist nicht kostenlos), der
+    Orakel-Soll rechnet dann ohne ihn - dieselbe Konvention wie beim
+    Bündel-Zweig oben. Zuzahlung und Geräterate werden in SIM-only-Zeilen
+    nicht erhoben und stehen leer.
+
+    Auftrag P0.8: "Im SIM-only-Export fehlt der Anschlusspreis" - am
+    Bestand vom 2026-09-20 trägt die Spalte ihn bereits (16 der 45
+    Zeilen, alle 1&1, je 19,90 EUR), die Kennzahl rechnet ihn noch nicht
+    ein. Paket A4 behebt die Produktionsseite; bis dahin schlägt dieser
+    Test erwartungsrot. strict=True: sobald A4 die Zeilen richtig
+    rechnen, wird der Lauf XPASS und damit ROT - der Marker gehört dann
+    entfernt, nicht der Soll angepasst. Kein Skip: ein Skip verhöhe den
+    offenen Fehler still.
+    """
+    zeilen = [r for r in _gw_csv.DictReader(
+        gw_seite["csv"].open(encoding="utf-8-sig"), delimiter=";")
+        if r["Art"] == "SIM-only"]
+    assert zeilen, "Export ohne SIM-only-Zeilen"
+
+    def _z(s):
+        return None if s in (None, "") else _gw_Dez(s.replace(",", "."))
+
+    abweich, geprueft, mit_anschluss = [], 0, 0
+    for r in zeilen:
+        tarif, ist = _z(r["Tarif/Monat EUR"]), _z(
+            r["Kosten über 24 Monate EUR"])
+        anschluss = _z(r["Anschlusspreis EUR"])
+        if tarif is None or ist is None:
+            continue                     # Lücke in der Zeile selbst
+        soll = tarif * 24 + (anschluss if anschluss is not None
+                             else _gw_Dez(0))
+        if anschluss is not None:
+            mit_anschluss += 1
+        geprueft += 1
+        if ist != soll:
+            abweich.append((r["Anbieter"], r["Tarif"], float(ist),
+                            float(soll)))
+    assert geprueft >= 40, (
+        f"nur {geprueft} von {len(zeilen)} SIM-only-Zeilen nachgerechnet - "
+        "der Test greift nicht mehr")
+    assert mit_anschluss >= 5, (
+        f"nur {mit_anschluss} SIM-only-Zeilen mit erhobenem Anschlusspreis "
+        "- der Soll-Zweig prüfte ins Leere (am Bestand vom 2026-09-20: 16)")
+    assert not abweich, (
+        f"{len(abweich)} SIM-only-Zeilen ohne ihren Anschlusspreis "
+        f"(P0.8/A4): {abweich[:5]}")
+
+
+def test_mutation_eines_euros_am_pflichtfall_schlaegt_aus(gw_seite):
+    """Schärfen-Nachweis des Auftrags: Wird die angezeigte Zahl um 1 €
+    verdreht (an der EXTRAHIERTEN Zahl, nicht an den Daten), muss der
+    Vergleich dieses Abschnitts rot werden. Ein Test, dessen Lookup ins
+    Leere läuft, ist grün und prüft nichts - hier ist die Gegenprobe als
+    eigener Test, sie läuft bei jedem Lauf mit.
+
+    Was was belegt: Der AUTOMATISMUS unten (pytest.raises um
+    _gw_vergleiche) weist nur nach, dass der VERGLEICH bei einer um 1 €
+    verdrehten Zahl rot wird - nicht, dass die Extraktion sie findet.
+    Die EXTRAKTIONSKETTE (Paar-Block-Wahl, Antwort-Regex, Wahl der
+    neuesten Vorlage) belegt der manuelle Nachweis vom 20.09.2026: gegen
+    den Render in /tmp wurde die Antwort-Zahl im gerenderten Text selbst
+    auf 1.460,00 gesetzt und dieselbe Kette liefen lassen - rot mit
+    'Mutation +1: Seite zeigt 1460.00 €, die eigene Rechnung aus den
+    Rohdaten ergibt 1459 €' (und '1458.00 €' bei −1 €); unverändert lief
+    derselbe Aufruf ohne Fehler."""
+    tco, blaetter, _db = _gw_rohdaten()
+    soll_cent, _b, _t = _gw_pflichtbuendel(tco, blaetter)
+    block = _gw_paar_block(gw_seite["fragment"],
+                           "apple-iphone-17-pro-256", "klein")
+    antwort = _gw_antwort(block)
+    assert antwort, "ohne Antwort-Satz prüft die Mutation nichts"
+    for mutation in (antwort["gesamt"] + 1, antwort["gesamt"] - 1):
+        with pytest.raises(AssertionError):
+            _gw_vergleiche(_gw_Dez(mutation), soll_cent, "Mutation")
+    # Gegenprobe: unverändert schlägt der Vergleich NICHT an.
+    _gw_vergleiche(antwort["gesamt"], soll_cent, "Gegenprobe unverändert")
