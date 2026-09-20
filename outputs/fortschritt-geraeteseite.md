@@ -624,3 +624,40 @@ nicht überschritten) — und die Redaktionsstufe hat trotzdem keinen Bericht
 geliefert. CLAUDE.md nennt den Prosabericht „das Herzstück". **Das gehört als
 erstes in die nächste Sitzung**, und es ist keine Geldfrage: 0,22 $ von 1,50 $
 Budget.
+
+---
+
+## v4 — TCO-Radar, das man im Meeting zitieren kann (ab 20.09.2026)
+
+Auftrag: P0 Vertrauen (falsche Zahlen) → P1 Telekom täglich + Ausfall-Alarm →
+P2 Darstellung ohne Erklärtexte → P3 Vodafone-Tarifleiter, Aktionen → P4 Push.
+Plan: `outputs/strategie-geraete-v4-2026-09-20/plan.md`. Arbeitsweise: je Phase
+ein Dynamic Workflow (Bauer je Paket im eigenen Worktree, adversarialer
+`seiten-pruefer`, max. 2 Nachbesserungen), Tore misst der Lead selbst an der
+gerenderten Seite und am Live-HTML.
+
+### Schritt 0 (20.09., gemessen)
+
+| | |
+|---|---|
+| CLAUDE.md | Regel 17 ergänzt (wip(auto) nie mergen/rebasen/pushen; Worktree-Branches nach Übernehmen löschen), 180 Zeilen/16,8 kB, Größenregel grün, diff-reviewer PASS, `d3f009d` auf main, ci.yml **success** |
+| Stop-Hook | gelesen: wirkt NUR in Worktrees, committet wip(auto), pusht nie; Hauptcheckout no-op. Behalten (Antonio), Absicherung Regel 17 |
+| commit-sicher | pusht auf aktuellen Branch → auf main korrekt, unverändert |
+| seiten-pruefer | `.claude/agents/seiten-pruefer.md` angelegt (opus; adversarial, eigene Rechnung, ändert keinen Code) |
+| Live-Basis | Vorher: Live = Stand 18.9., Renderfix `8133b02` lief durch keinen Actions-Lauf. Manueller `geraete.yml`-Lauf `35518497506`: **success**, „Seite neu gebaut 2026-09-20" (`0e1a75d`), Live-HTML trägt „20. September" (1072 Fundstellen) — **Gegenprobe bestanden** |
+
+**Korrekturen an der Auftragsannahme (Erkundung, 20.09.):** ALDI-Scheinsprung ist
+die am 03.09. dokumentierte Doppelbelegung einer `sku_id` (LTE SM-A175F 129 € /
+5G SM-A176B 155→159 €), zusätzlich leakt o2 „5g schwarz" in den Farb-Slug
+(zwei SKU-Töpfe desselben Geräts). `--al-*` in `style.css` sind Alarmstufen,
+keine Anbieterfarben (bleiben). Die −15/−18 € sind 1&1 (dort als unbewiesen
+abgelehnt), o2s Fall ist −5 €. Ausfall-Alarm existiert (7 Null-Tage,
+log-only). Vodafone `_periode0()` ignoriert die niedrigere Rate ab Monat 25
+(Messfehler).
+
+### P0 — läuft
+
+Workflow `p0-bau` gestartet, zuerst nur Paket A1 (Leitzahl „Kosten über
+24 Monate", opus) als Skript-Bewährung; A2–A4 (Bewegung/Δ/Referenz, Altern,
+Exporte) danach. P0-B (Laufzeiten in den Bündelschlüssel, Collectoren,
+Telekom-Tarifsätze) anschließend. Tor offen.
