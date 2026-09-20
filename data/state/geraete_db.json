@@ -2,8 +2,8 @@
  "updated": "2026-09-20",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 29,
-   "funde_gesamt": 129,
+   "laeufe": 30,
+   "funde_gesamt": 134,
    "letzter_lauf": "2026-09-20",
    "letzte_funde": 5,
    "letzter_fund": "2026-09-20",
@@ -43,8 +43,8 @@
    ]
   },
   "Vodafone": {
-   "laeufe": 28,
-   "funde_gesamt": 4275,
+   "laeufe": 29,
+   "funde_gesamt": 4459,
    "letzter_lauf": "2026-09-20",
    "letzte_funde": 184,
    "termine": [
@@ -84,8 +84,8 @@
    ]
   },
   "o2": {
-   "laeufe": 27,
-   "funde_gesamt": 1781,
+   "laeufe": 28,
+   "funde_gesamt": 1849,
    "letzter_lauf": "2026-09-20",
    "letzte_funde": 68,
    "termine": [
@@ -126,7 +126,7 @@
   },
   "mobilcom-debitel": {
    "laeufe": 0,
-   "funde_gesamt": 3528,
+   "funde_gesamt": 3661,
    "letzte_funde": 133,
    "termine": [
     "2026-08-29",
@@ -209,8 +209,8 @@
    ]
   },
   "congstar": {
-   "laeufe": 15,
-   "funde_gesamt": 2709,
+   "laeufe": 16,
+   "funde_gesamt": 2855,
    "letzter_lauf": "2026-09-20",
    "letzte_funde": 146,
    "termine": [
@@ -244,8 +244,8 @@
    ]
   },
   "1&1": {
-   "laeufe": 19,
-   "funde_gesamt": 673,
+   "laeufe": 20,
+   "funde_gesamt": 710,
    "letzter_lauf": "2026-09-20",
    "letzte_funde": 37,
    "termine": [
@@ -293,10 +293,10 @@
    "letzter_fund": "2026-09-15"
   },
   "Saturn": {
-   "laeufe": 15,
-   "funde_gesamt": 308,
+   "laeufe": 16,
+   "funde_gesamt": 334,
    "letzter_lauf": "2026-09-20",
-   "letzte_funde": 23,
+   "letzte_funde": 26,
    "termine": [
     "2026-09-05",
     "2026-09-06",
@@ -322,7 +322,7 @@
     ],
     [
      "2026-09-20",
-     23
+     26
     ]
    ]
   }
@@ -2476,6 +2476,36 @@
    "ended_since": "2026-09-12"
   },
   {
+   "id": "saturn--apple-iphone-17-pro-512gb-cosmic-orange",
+   "sku_id": "apple-iphone-17-pro-512gb-cosmic-orange",
+   "device_id": "apple-iphone-17-pro",
+   "anbieter": "Saturn",
+   "anbieter_typ": "handel",
+   "netz": "",
+   "speicher_gb": 512,
+   "farbe_roh": "Cosmic Orange",
+   "farbe_normalisiert": null,
+   "ean": "",
+   "zustand": "neu",
+   "first_seen": "2026-09-20",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "erstpreis": 1419.0,
+   "erstpreis_art": "ohne_vertrag",
+   "erstpreis_am": "2026-09-20",
+   "last_verified": "2026-09-20",
+   "letzter_check": "2026-09-20",
+   "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17-pro-5g-512-gb-cosmic-orange-dual-sim-3013589.html",
+   "abgerufen_am": "2026-09-20",
+   "verfuegbarkeit": "unbekannt",
+   "confidence": "hoch",
+   "einstiege": [
+    "https://www.saturn.de/de/brand/apple/iphone/iphone-17-pro"
+   ],
+   "titel_roh": "APPLE iPhone 17 Pro 5G 512 GB Cosmic Orange Dual SIM",
+   "preis_ohne_vertrag": 1419.0
+  },
+  {
    "id": "saturn--apple-iphone-17-pro-512gb-silber",
    "sku_id": "apple-iphone-17-pro-512gb-silber",
    "device_id": "apple-iphone-17-pro",
@@ -2580,23 +2610,22 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-18",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1569.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-18",
-   "last_verified": "2026-09-19",
+   "last_verified": "2026-09-20",
    "letzter_check": "2026-09-20",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17-pro-max-5g-512-gb-silber-dual-sim-3013597.html",
-   "abgerufen_am": "2026-09-19",
+   "abgerufen_am": "2026-09-20",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
     "https://www.saturn.de/de/brand/apple/iphone/iphone-17-pro"
    ],
    "titel_roh": "APPLE iPhone 17 Pro Max 5G 512 GB Silber Dual SIM",
-   "preis_ohne_vertrag": 1569.0,
-   "stale_since": "2026-09-20"
+   "preis_ohne_vertrag": 1569.0
   },
   {
    "id": "saturn--apple-iphone-17e-256gb-hellrosa",
@@ -2857,15 +2886,15 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-05",
-   "status": "ausgelistet",
-   "missed_checks": 2,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 909.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-05",
-   "last_verified": "2026-09-18",
+   "last_verified": "2026-09-20",
    "letzter_check": "2026-09-20",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-air-5g-256-gb-himmelblau-dual-sim-3013609.html",
-   "abgerufen_am": "2026-09-18",
+   "abgerufen_am": "2026-09-20",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
@@ -2873,8 +2902,7 @@
    ],
    "titel_roh": "APPLE iPhone Air 5G 256 GB Himmelblau",
    "preis_ohne_vertrag": 909.0,
-   "ended_since": "2026-09-20",
-   "stale_since": "2026-09-19"
+   "ended_since": "2026-09-20"
   },
   {
    "id": "saturn--apple-iphone-air-256gb-lichtgold",
