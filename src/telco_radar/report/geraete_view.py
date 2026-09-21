@@ -48,6 +48,10 @@ from . import (geraete_alarme, geraete_bereinigung, geraete_pruefung,
 from .geraete_tco_band import _MONATE
 from ..analyze import geraete_lifecycle
 from ..analyze.tco_store import TcoDB
+# Der Zeitraum der TCO-Spalte und DIE EINE Regel, ob zwei Leitzahlen
+# gegeneinander gestellt werden duerfen (P0-B-h1) - der Katalog leitet
+# beides nicht ab, er liest es.
+from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
 from ..tarif_bezug import Tarifbestand
 from ..analyze.geraete_store import (
     GeraeteDB,
@@ -876,6 +880,14 @@ TCO_LEER_KEIN_VERGLEICHBARES = "kein vergleichbares Bündel gemessen"
 # gelogen (harte Regel 9), und der alte Preis darf nicht als heutiger
 # stehen.
 TCO_LEER_NUR_ALT = "kein aktueller Bündel-Stand"
+# P0-B-h2: der vierte Zustand - Bündel gibt es, aktuell und vergleichbar,
+# aber KEINES ueber den Zeitraum dieser Spalte. Gemessen am Bestand vom
+# 21.09.2026: acht Modelle (z. B. Apple iPhone 15 256 GB, Nothing Phone
+# (4a) Pro 128 GB) haben nur ein 1&1-Buendel, dessen Leitzahl 36 Monate
+# traegt. Bis hierher stand deren 36-Monats-Summe unter dem Kopf "Kosten
+# über 24 Monate" und sortierte gegen echte 24-Monats-Zahlen; sie ist
+# richtig gerechnet, aber sie ist keine Zahl dieser Spalte.
+TCO_LEER_ANDERE_LAUFZEIT = f"kein Bündel über {TCO_HORIZONT} Monate"
 
 # Die benannten Leerzustaende der DELTA-Zelle (A2-Nachbesserung,
 # Pruef-Befund 20.09.2026). Zwei verschiedene Stummen, zwei Etiketten:
@@ -891,6 +903,42 @@ TCO_DELTA_LEER_KEIN_WETTBEWERBER = "kein Wettbewerber-Angebot"
 TCO_DELTA_GRUND_KEIN_WETTBEWERBER = (
     "Vodafone listet dieses Modell, aber kein Wettbewerber-Angebot ist "
     "vergleichbar erhoben - deshalb ist kein Abstand berechenbar")
+# P0-B-h2: der dritte Stumme dieser Zelle war der STRICH - und der heisst
+# auf dieser Seite "kein Angebot" (A2). Ein Wettbewerber-Angebot, dessen
+# Leitzahl einen anderen Zeitraum traegt als die Referenz, ist kein
+# fehlendes Angebot: es ist gemessen und unvergleichbar. Die Buendelzeile
+# sagt dazu seit P0-B-fix2 "andere Laufzeit" samt Satz
+# (`geraete_tco_karten.delta_zustand`) - DIESE Zelle sagt jetzt dasselbe,
+# aus derselben Definition (Clean Code 7), statt zu schweigen. Das WORT
+# steht deshalb nicht hier, sondern in `DELTA_ANDERE_LAUFZEIT` dort.
+# Gemessen am Bestand vom 21.09.2026: 25 stumme Zellen, davon 23 mit
+# genau diesem Zustand (z. B. Apple iPhone 17 Pro Max 512 GB, dessen
+# Zelle bis P0-B-fix2 "+341,74 € · +14,5 %" behauptete).
+# Der Rueckfalltext unten gilt nur, wo die Karte ihren Satz nicht
+# mitbringt - stumm bleibt die Zelle nie (harte Regel 9).
+TCO_DELTA_GRUND_ANDERE_LAUFZEIT = (
+    "Das günstigste Wettbewerber-Angebot trägt einen anderen Zeitraum als "
+    "die Vodafone-Referenz - über zwei Laufzeiten gibt es keinen Abstand")
+# Der vierte Stumme, beim Messen von P0-B-h2 gefunden: die Referenz
+# EXISTIERT, ist aber nicht aktuell erhoben - `geraete_tco_karten.modelle`
+# gibt sie dann keiner Karte als Massstab (S2-1), und keine Karte des
+# Modells traegt ein Delta. Gemessen am 21.09.2026: Google Pixel 11 Pro
+# Fold 256 GB (o2 2.380,75 EUR, Vodafone-Naeherung aus altem Barpreis).
+# "kein Wettbewerber-Angebot" waere dort falsch (o2 und 1&1 stehen da),
+# "keine Referenz" auch. Dieselbe Sprache wie `TCO_LEER_NUR_ALT`: die
+# Luecke liegt beim STAND, nicht beim Bestand.
+TCO_DELTA_LEER_ALTE_REFERENZ = "kein aktueller Referenz-Stand"
+TCO_DELTA_GRUND_ALTE_REFERENZ = (
+    "Die Vodafone-Referenz ist nicht aktuell erhoben - ein Abstand gegen "
+    "sie wäre kein Abstand von heute")
+# Die zweite Wand (S3c): ein Traeger MIT dem Zeitraum der Spalte, dem
+# trotzdem kein Abstand anhaengt. Nach dem Filter unten kann das nicht
+# mehr vorkommen - und WENN doch, steht der Zustand als Wort in der Zelle
+# und nicht als Strich.
+TCO_DELTA_LEER_UNBESTIMMT = "Abstand unbestimmt"
+TCO_DELTA_GRUND_UNBESTIMMT = (
+    "Zu diesem Wettbewerber-Angebot ist kein Abstand zur Vodafone-Referenz "
+    "gerechnet")
 
 
 def _buendel_je_anbieter_modell(buendel: list, eintraege: list, katalog
@@ -999,7 +1047,7 @@ def _buendel_aus_listungen(eintraege: list) -> list[dict]:
     return saetze
 
 
-def _tco_spalte(modell_tco: dict | None) -> dict:
+def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
     """Die TCO-Felder EINER Modellzeile aus der TCO-Aufbereitung.
 
     `modell_tco` ist ein Eintrag aus `geraete_tco_view.aufbereiten()
@@ -1022,6 +1070,21 @@ def _tco_spalte(modell_tco: dict | None) -> dict:
     Wr-Zeile desselben Modells schon zeigt). Ist kein fremdes Angebot
     vergleichbar, heisst die Luecke "kein Wettbewerber-Angebot" - nicht
     "keine Referenz", denn die Referenz ist das eigene Angebot selbst.
+
+    P0-B-h2: DIE SPALTE HAT EINEN ZEITRAUM, und nur Zahlen dieses
+    Zeitraums stehen darin (`TCO_HORIZONT`, derselbe Wert, den ihr Kopf
+    nennt und den die Vodafone-Referenz traegt). Seit P0-B-fix2/h1 nennt
+    jede Karte den Zeitraum, den ihre Leitzahl wirklich traegt
+    (`leitzahl_monate`) - damit ist die Vorbedingung eingetreten, die im
+    Kommentar unten stand ("Wird `laufzeit` je wieder variabel, MUSS an
+    dieser Stelle auf 24 gefiltert werden"). Ohne den Filter stellten 16
+    Modellzeilen eine 36-Monats-Summe unter den 24-Monats-Kopf, mit einem
+    Ø/Monat und einem Sortierschluessel gegen echte 24-Monats-Zahlen; und
+    schon die Wahl des Minimums verglich zwei Zeitraeume. Die anderen
+    Zahlen verschwinden nicht, sie werden BENANNT: die Zeile sagt "kein
+    Bündel über 24 Monate", die Δ-Zelle "andere Laufzeit" - dieselben
+    Worte wie die Buendelzeile derselben Karte, und das ganze Buendel
+    steht mit eigenem Etikett in der Vergleichsansicht.
     """
     leer_delta = {"tco_delta": None, "tco_delta_prozent": None,
                   "tco_delta_kurz": None, "tco_delta_anbieter": None,
@@ -1053,36 +1116,94 @@ def _tco_spalte(modell_tco: dict | None) -> dict:
         return {"tco_ab": None, "tco_anbieter": None, "tco_monat": None,
                 "tco_band": None, "tco_beleg": None,
                 "tco_leer": leer, **leer_delta}
-    # Der Spaltenkopf der TCO-Ansicht sagt TCO-24. Ein Filter auf
-    # `karte["laufzeit"] == 24` ist hier bewusst NICHT gebaut: seit dem
-    # Ticket TCO24-1 ist die Laufzeit die Konstante 24 (Bestand am
-    # 17.09.2026: {24: 506, None: 188}), er waere heute wirkungslos und
-    # wuerde die 188 Karten ohne Laufzeitfeld still aus der Spalte
-    # werfen. Wird `laufzeit` je wieder variabel, MUSS an dieser Stelle
-    # auf 24 gefiltert werden - sonst stellt eine laengere Karte eine
-    # TCO-24 (S4-6 der P3-Code-Pruefung).
-    bester = min(kandidaten, key=lambda k: k["gesamt"])
+    # DER ZEITRAUM DER SPALTE (P0-B-h2). Hier stand der Kommentar "ein
+    # Filter auf `karte['laufzeit'] == 24` ist bewusst NICHT gebaut ...
+    # wird `laufzeit` je wieder variabel, MUSS an dieser Stelle auf 24
+    # gefiltert werden". Genau das ist eingetreten - nur nicht an
+    # `laufzeit` (der Tariflaufzeit der Rechnung, weiter konstant 24),
+    # sondern am ZEITRAUM DER LEITZAHL: `leitzahl_monate` ist seit
+    # P0-B-h1 die eine Zahl, die sagt, was `gesamt` traegt, und sie ist
+    # bei einem zusammengelegten Buendelmonatspreis 36. Gefiltert wird
+    # mit der EINEN Vergleichsregel des Projekts
+    # (`tco_model.zeitraum_vergleichbar`): ein unbekannter Zeitraum ist
+    # NIE gleich und faellt heraus, statt als 24 zu gelten.
+    vergleichbare = [k for k in kandidaten
+                     if zeitraum_vergleichbar(k.get("leitzahl_monate"),
+                                              TCO_HORIZONT)]
+    if not vergleichbare:
+        # Gemessene, aktuelle Buendel - aber keines ueber den Zeitraum
+        # dieser Spalte (8 Modelle am 21.09.2026, alle nur mit einem
+        # 1&1-Buendel ueber 36 Monate). Die Zahl steht mit ihrem eigenen
+        # Etikett in der Vergleichsansicht; HIER waere sie eine
+        # 36-Monats-Summe unter einem 24-Monats-Kopf.
+        return {"tco_ab": None, "tco_anbieter": None, "tco_monat": None,
+                "tco_band": None, "tco_beleg": None,
+                "tco_leer": TCO_LEER_ANDERE_LAUFZEIT, **leer_delta}
+    bester = min(vergleichbare, key=lambda k: k["gesamt"])
     # Der TRAEGER des Abstands: das guenstigste FREMDE Angebot. Nur wo
     # der Wettbewerb selbst fuehrt, ist der Traeger zugleich das beste
     # Angebot - dann sind Leitzahl und Abstand eine Karte wie bisher.
-    fremde = [k for k in kandidaten if not k.get("eigen")]
+    fremde = [k for k in vergleichbare if not k.get("eigen")]
     traeger = bester if not bester.get("eigen") else (
         min(fremde, key=lambda k: k["gesamt"]) if fremde else None)
+    # Die fremden Angebote, die der Zeitraum der Spalte ausschliesst -
+    # aus DERSELBEN Kandidatenmenge, nur die andere Seite des Filters
+    # (Clean Code 7: eine Definition, zwei Lesarten). Sie sind der Grund,
+    # aus dem die Δ-Zelle leer bleibt, und deshalb steht ihr Zustand
+    # darin statt eines Strichs.
+    im_zeitraum = {id(k) for k in vergleichbare}
+    andere_laufzeit = [k for k in kandidaten
+                       if not k.get("eigen") and id(k) not in im_zeitraum]
+    referenz = modell_tco.get("referenz")
     if traeger is not None and traeger.get("delta_kurz"):
         delta_leer, delta_leer_grund = None, None
+    elif referenz is None:
+        # OHNE Referenz gibt es keinen Abstand, gleich wie viele
+        # Wettbewerber-Angebote daneben stehen - das ist die Bedingung,
+        # die `TCO_DELTA_GRUND_KEIN_WETTBEWERBER` unten voraussetzt
+        # ("Vodafone listet dieses Modell, aber ..."). Deshalb steht die
+        # Frage seit P0-B-h2 VOR den beiden Wettbewerber-Zustaenden.
+        delta_leer = TCO_DELTA_LEER_KEINE_REFERENZ
+        delta_leer_grund = TCO_DELTA_GRUND_KEINE_REFERENZ
+    elif not geraete_tco_karten.referenz_ist_frisch(referenz, heute):
+        # GELESEN, nicht nachgerechnet: dieselbe Funktion, mit der
+        # `geraete_tco_karten.modelle` entscheidet, ob die Referenz
+        # ueberhaupt Massstab eines Deltas sein darf (S2-1). Ist sie es
+        # nicht, traegt KEINE Karte des Modells ein Delta - und der Grund
+        # ist der Stand der Referenz, nicht der Wettbewerb.
+        delta_leer = TCO_DELTA_LEER_ALTE_REFERENZ
+        delta_leer_grund = TCO_DELTA_GRUND_ALTE_REFERENZ
+    elif traeger is None and andere_laufzeit:
+        # Ein Wettbewerber-Angebot GIBT es - nur nicht ueber den Zeitraum
+        # der Referenz. Der Strich hiess hier "kein Angebot" (A2) und war
+        # damit die falsche Aussage (P0-B-h2, Befund 2). Kurz und Satz
+        # kommen aus der Karte selbst, also aus derselben Definition, die
+        # die Buendelzeile beschriftet (`geraete_tco_karten.delta_zustand`)
+        # - zwei Formulierungen fuer denselben Zustand waeren zwei
+        # Zustaende.
+        zustand = (min(andere_laufzeit, key=lambda k: k["gesamt"])
+                   .get("delta_zustand") or {})
+        delta_leer = (zustand.get("kurz")
+                      or geraete_tco_karten.DELTA_ANDERE_LAUFZEIT)
+        delta_leer_grund = (zustand.get("satz")
+                            or TCO_DELTA_GRUND_ANDERE_LAUFZEIT)
     elif traeger is None:
         # Vodafone fuehrt, und KEIN Wettbewerber ist vergleichbar erhoben
         # (4 Zeilen des Bestands am 20.09.) - die Referenz existiert, die
         # Luecke liegt beim Wettbewerb.
         delta_leer = TCO_DELTA_LEER_KEIN_WETTBEWERBER
         delta_leer_grund = TCO_DELTA_GRUND_KEIN_WETTBEWERBER
-    elif modell_tco.get("referenz") is None:
-        delta_leer = TCO_DELTA_LEER_KEINE_REFERENZ
-        delta_leer_grund = TCO_DELTA_GRUND_KEINE_REFERENZ
     else:
-        # Ein fremdes Angebot ohne Euro-Abstand (andere Laufzeit, A5.4):
-        # Strich wie die Buendelzeile - die Referenz existiert.
-        delta_leer, delta_leer_grund = None, None
+        # Ein Traeger MIT dem Zeitraum der Spalte und ohne Abstand: seit
+        # dem Filter oben tragen Traeger und Referenz denselben Zeitraum,
+        # und damit rechnet `geraete_tco_karten._delta` einen Betrag (auch
+        # eine Annaeherung ist einer). Bleibt die Zelle doch leer, steht
+        # der Zustand der Karte darin - und wenn sie keinen nennt, dieser
+        # Name. Ein Strich waere hier "kein Angebot" (A2) und damit
+        # wieder die falsche Aussage.
+        zustand = traeger.get("delta_zustand") or {}
+        delta_leer = zustand.get("kurz") or TCO_DELTA_LEER_UNBESTIMMT
+        delta_leer_grund = zustand.get("satz") or TCO_DELTA_GRUND_UNBESTIMMT
     delta = (traeger or {}).get("delta") or {}
     return {
         "tco_ab": bester["gesamt"],
@@ -1353,7 +1474,9 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
         name = gruppe["modell"]
         if gruppe["speicher"]:
             name = f"{name} {int(gruppe['speicher'])} GB"
-        tco_felder = _tco_spalte(tco_je_id.get(mid))
+        # `heute` ist die Uhr dieser Zeile (A3) - dieselbe, mit der oben
+        # die Frische der Listungen und der Karten gemessen wird.
+        tco_felder = _tco_spalte(tco_je_id.get(mid), heute)
 
         # Die Händler-Spalte zaehlt, WER das Geraet fuehrt. Ohne Listung
         # (P5-Auftrag 1) sind das die Bündel-Anbieter - "0 Händler" neben

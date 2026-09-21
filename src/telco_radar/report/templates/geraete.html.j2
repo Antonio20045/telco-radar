@@ -638,8 +638,10 @@
        aria-label="Welcher Preis in der Tabelle steht">
     <button type="button" class="gr-vknopf is-aktiv" data-ansicht="barpreis"
             aria-pressed="true">Einzelgerätpreis</button>
+    {# Derselbe Zeitraum wie der Spaltenkopf und der Filter der Spalte
+       (P0-B-h2) - der Umschalter benennt die Spalte, die er einschaltet. #}
     <button type="button" class="gr-vknopf" data-ansicht="tco"
-            aria-pressed="false">Kosten über 24 Monate</button>
+            aria-pressed="false">Kosten über {{ geraete.tco.horizont }} Monate</button>
   </div>
 
   <div class="gr-alarm-scroll">
@@ -661,10 +663,17 @@
       {# Ansicht Gesamtkosten: TCO-24 ab, Ø €/Monat, Δ zur Referenz, Band.
          Die Band-Spalte trägt KEINEN Sortierknopf: "Groß/Klein/Mittel"
          hat keine alphabetisch sinnvolle Ordnung, und ein Zahlen-Rang
-         dafür wäre eine zweite Abbildung derselben Auswahl. #}
+         dafür wäre eine zweite Abbildung derselben Auswahl.
+
+         P0-B-h2: der Zeitraum IM KOPF ist derselbe Wert, auf den
+         `geraete_view._tco_spalte` die Zeilen filtert
+         (`tco_model.TCO_HORIZONT`, hier als `geraete.tco.horizont`
+         durchgereicht). Eine feste 24 in der Vorlage konnte gegen den
+         Inhalt der Spalte laufen - genau das war der Befund: 16 Zeilen
+         trugen eine 36-Monats-Summe unter diesem Kopf. #}
       <th scope="col" class="num gr-sp--tco"><button type="button"
         class="gr-sort" data-sort="tco" data-art="zahl">Kosten über
-        24 Monate</button></th>
+        {{ geraete.tco.horizont }} Monate</button></th>
       <th scope="col" class="num gr-sp--tco"><button type="button"
         class="gr-sort" data-sort="monat" data-art="zahl">Ø €/Monat</button></th>
       <th scope="col" class="gr-sp--tco"><button type="button"
