@@ -567,16 +567,27 @@ def test_kein_g1_zeigt_eine_36_monats_bindungsgruppe(bestand):
 
 def test_jede_belastbare_karte_traegt_das_label_der_leitzahl(bestand):
     """Abnahmekriterium 1: die einzige TCO-Hauptkennzahl ist die Leitzahl
-    "Kosten über 24 Monate" - auf JEDER Karte des echten Bestands, nicht
+    "Kosten über N Monate" - auf JEDER Karte des echten Bestands, nicht
     nur am Vorgabemodell. (Bis A1 hiess dasselbe Etikett "TCO-24" - der
-    Funktionsname ist mit dem Etikett gewandert.)"""
+    Funktionsname ist mit dem Etikett gewandert.)
+
+    P0-B-fix2 (Befund 3): N IST NICHT IMMER 24. Bis hierher stand hier
+    `label == "Kosten über 24 Monate"` fuer jede Karte - auch fuer 1&1s
+    Buendelmonatspreis, dessen Zahl 36 Monatsraten fuer Tarif UND Geraet
+    enthaelt (1.927,54 EUR = 340,00 + 36 × 42,99 + 39,90). Das Etikett
+    nennt jetzt den Zeitraum, den die Zahl WIRKLICH traegt
+    (`leitzahl_monate`); die Tariflaufzeit der Rechnung und der Teiler des
+    Ø/Monat bleiben die Konstante 24 (`laufzeit`)."""
     geprueft = 0
     for modell in bestand["modelle"]:
         for karte in modell["karten"]:
             if not karte["belastbar"]:
                 continue
             geprueft += 1
-            assert karte["label"] == "Kosten über 24 Monate", \
+            monate = karte["leitzahl_monate"]
+            assert monate is not None, \
+                f"{modell['id']}/{karte['anbieter']}: belastbar ohne Zeitraum"
+            assert karte["label"] == f"Kosten über {monate} Monate", \
                 f"{modell['id']}/{karte['anbieter']}: {karte['label']!r}"
             assert karte["laufzeit"] == 24
     assert geprueft, "kein belastbares Angebot - der Test prueft nichts"

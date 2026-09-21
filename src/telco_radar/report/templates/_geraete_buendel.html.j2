@@ -55,12 +55,19 @@
        Vertrag" wäre mehrdeutig - das Δ-Präfix (CSS, mobil) erklärt die
        Zahl mit einem Zeichen. Vor „Referenz", „–" und „≈" stünde es falsch
        (O3-Evaluation S4; A2: die Annäherung trägt ihr eigenes Zeichen). #}
+    {# P0-B-fix2: `delta_zustand.kurz` ist der BENANNTE Zustand einer
+       Zeile, deren Zahl einen anderen Zeitraum traegt als die Referenz
+       (1&1: 36 Monate Tarif und Gerät in EINER Rate gegen 24 Tarifmonate
+       plus Barpreis). Er steht VOR dem Strich, denn der Strich heisst
+       "kein Angebot" - und ohne ihn stand dort bis P0-B-fix2 ein
+       Euro-Delta, dessen Vorzeichen nicht belegt war. Kein Zahlenwert,
+       also auch kein Δ-Präfix (`--wert`). #}
     <span class="gr-bnd-delta{% if not k.naeherung and not (k.eigen and
       k.belastbar) and k.delta_kurz and not (k.delta and k.delta.ungefaehr)
       %} gr-bnd-delta--wert{% endif %}">{% if
       k.naeherung %}Referenz{% elif
       k.eigen and k.belastbar %}Referenz{% elif k.delta_kurz %}{{ k.delta_kurz
-      }}{% else %}–{% endif %}</span>
+      }}{% elif k.delta_zustand %}{{ k.delta_zustand.kurz }}{% else %}–{% endif %}</span>
     {# Der Gerätepreis ohne Vertrag ist die ZWEITE Zahl (§3): nur der eigene
        Barpreis heisst "Gerätepreis", die tarifabhängige Summe aus Zuzahlung
        und allen Raten heisst "Finanzierung gesamt" (P1/TCO-1) - die Spalte
@@ -111,8 +118,11 @@
     Tarif – deshalb ein anderer Betrag als die
     Finanzierung gesamt</p>
     {% elif k.geraetepreis is not none %}
-    <p class="gr-kk-paradox">„mit Tarif“ = Gerät + {{ k.laufzeit }} Monate
-    Tarif – deshalb ein anderer Betrag als der Gerätepreis allein</p>
+    {# P0-B-fix2: der Zeitraum, den die Zahl traegt (`leitzahl_monate`) -
+       bei einem zusammengelegten Buendelmonatspreis ueber 36 Monate sind
+       in "mit Tarif" 36 Monate Tarif enthalten, nicht 24. #}
+    <p class="gr-kk-paradox">„mit Tarif“ = Gerät + {{ k.leitzahl_monate }}
+    Monate Tarif – deshalb ein anderer Betrag als der Gerätepreis allein</p>
     {% endif %}
     {# WORAUS DAS Ø BESTEHT, steht daneben - sonst vergleicht jemand zwei
        Ø-Werte, in denen verschieden viele Tarifmonate stecken. Seit A1
@@ -193,6 +203,14 @@
          ('unter' if k.delta.guenstiger else 'über') }} der
       Vodafone-Referenz ({{ k.delta.referenz_tarif }}{% if k.delta.referenz_datum
       %}, Stand {{ k.delta.referenz_datum | date_de }}{% endif %})</p>
+    {% elif k.delta_zustand %}
+    {# P0-B-fix2: der Abstand, den es NICHT gibt, steht als EIN Satz da -
+       der Satz kommt fertig aus `geraete_tco_karten.delta_zustand`, hier
+       wird kein Text gebaut. `gr-kk-luecke` und NICHT `gr-kk-delta`:
+       dessen Fettschrift in Alarmfarbe heisst "teurer als die Referenz",
+       und genau das ist hier nicht belegt - eine benannte Luecke ist
+       zurueckgenommen (kursiv, grau), nicht laut. #}
+    <p class="gr-kk-luecke">{{ k.delta_zustand.satz }}</p>
     {% endif %}
 
     {# Der Rechenweg. Jede Zahl der Zeile ist hier nachlesbar, samt dem, was
@@ -239,7 +257,12 @@
        (1&1) zahlen Tarif und Gerät in EINER Monatsrate. #}
     {% set raten_wort = 'Monatsraten' if k.buendel_monatlich is not none
        else 'Geräteraten' %}
-    <p class="gr-basis--duenn">Gerechnet über {{ k.laufzeit }} Monate{% if
+    {# P0-B-fix2: „Gerechnet über N Monate“ nennt den Zeitraum, den die
+       LEITZAHL traegt (`leitzahl_monate`) - 24 bei getrenntem Tarif und
+       Rate, die eigene Laufzeit bei einem zusammengelegten
+       Buendelmonatspreis. Der Schnitt bei Monat 24 (gezahlt/offen) bleibt
+       davon unberuehrt. #}
+    <p class="gr-basis--duenn">Gerechnet über {{ k.leitzahl_monate }} Monate{% if
       k.tarif_bindung and k.raten_laufzeit and k.tarif_bindung !=
       k.raten_laufzeit %} – der Tarif bindet {{ k.tarif_bindung }} Monate, die
       {{ raten_wort }} laufen {{ k.raten_laufzeit }}{% endif %}. Enthalten sind

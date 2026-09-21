@@ -505,7 +505,17 @@ def _buendel_aus_messung(messung: dict, tarife: dict | None = None) \
             buendel_monatlich=satz.get("buendel_monatlich"),
             geraet_zuzahlung=satz.get("geraet_zuzahlung"),
             geraet_monatsrate=satz.get("geraet_monatsrate"),
-            laufzeit_monate=int(satz.get("laufzeit_monate") or 24),
+            # DIE GEMESSENE RATENLAUFZEIT, ungeraten (P0-B-fix2, gleiche
+            # Regel und gleiche Stelle wie P0-B-fix1 im Rechenkern):
+            # bis hierher stand `int(... or 24)` - eine Historienzeile ohne
+            # `laufzeit_monate` bekam im Graphen und im Rechenweg-Panel
+            # eine geratene 24, und der Punkt stand auf einer Hoehe, die
+            # niemand gemessen hat. Jetzt geht der Wert durch, wie er ist:
+            # `None` macht die Kennzahl unbelastbar (`POSTEN_LAUFZEIT` in
+            # `tco_24`), die Messung bekommt keinen Punkt und wird unten
+            # als `ohne_wert` gezaehlt; eine unmoegliche Zahl wirft in
+            # `Buendel.__post_init__` und landet im `except` darunter.
+            laufzeit_monate=satz.get("laufzeit_monate"),
             anschlusspreis=satz.get("anschlusspreis"),
             zustand=satz.get("zustand") or "",
             quelle_url=satz.get("quelle_url") or "",
@@ -735,6 +745,41 @@ def _rechenwege_html(messungen_paar: dict, zeilen: list,
 # Die Zeitreihe selbst - Serien und SVG
 # --------------------------------------------------------------------------
 
+def buendel_schluessel(satz: dict) -> str | None:
+    """Der Schluessel, unter dem Stand und Historie einander finden.
+
+    DIE EINE STELLE dafuer (Clean Code 1/7): der Stand-Index und die
+    Historien-Lesung in `_messungen` rufen diese Funktion, damit beide
+    Seiten denselben Schluessel bilden - zwei eigene Zuordnungen waeren
+    zwei Wahrheiten ueber dieselbe ID.
+
+    Zuerst die Lesemigration B1 (`tco_store.id_aus_satz`): eine ID von vor
+    B1 (vier Segmente) wird unter ihrer heutigen Form (fuenf Segmente)
+    gefuehrt, damit Altbestand und heutige Zeilen zusammenfallen.
+
+    EINE UNBEKANNTE ID-FORM IST KEIN VERLUST (P0-B-fix2). Bis hierher gab
+    `id_aus_satz` fuer jede andere Segmentzahl `None`, und beide Seiten
+    verwarfen den Satz per `continue`: ein Buendel mit der ID
+    `buendel--o2-1` fiel aus Stand UND Historie, die Zeitreihe des Modells
+    verschwand ersatzlos, und der einzige Hinweis war eine Protokollzeile
+    (belegt an `tests/test_geraete_reiter_browser.py::test_die_start-
+    ansicht_traegt_genau_die_pflichtgrafik`). Eine ID ist ein OPAKER
+    Schluessel: wer ihre Form nicht kennt, verwendet sie UNVERAENDERT
+    weiter - sie gruppiert sich korrekt mit sich selbst, Stand und
+    Historie treffen sich also weiter, und aus "unbekannte Form" wird kein
+    leerer Graph. Der Fall wird gezaehlt und protokolliert, nicht
+    verschwiegen (Clean Code 5).
+
+    `None` heisst nur noch: der Satz traegt ueberhaupt keine ID. Dann gibt
+    es nichts, womit er sich gruppieren liesse.
+    """
+    migriert = id_aus_satz(satz)
+    if migriert is not None:
+        return migriert
+    roh = str(satz.get("id") or "").strip() if isinstance(satz, dict) else ""
+    return roh or None
+
+
 def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
     """{(modell, band): {anbieter: {datum: MESSUNG}}} aus der Historie.
 
@@ -764,14 +809,21 @@ def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
     # B1; wer hier stur auf das gespeicherte Feld schluesselte, traefe mit
     # einer migrierten Historien-ID keinen Stand-Eintrag mehr - neun
     # Messtage fielen still aus dem Graphen.
+    #
+    # P0-B-fix2: eine ID, deren Form weder die alte noch die heutige ist,
+    # wird UNVERAENDERT als Schluessel genommen (`buendel_schluessel`) -
+    # ein Stand-Eintrag ohne bekannte Form fiel bis hierher aus dem Index,
+    # und die Historienzeile dazu fand keinen Stamm mehr.
     buendel: dict[str, dict] = {}
     buendel_basis: dict[str, dict] = {}
+    stand_ohne_id = 0
     if tco_datei.exists():
         try:
             roh = json.loads(tco_datei.read_text(encoding="utf-8"))
             for b in roh.get("buendel") or []:
-                bid = id_aus_satz(b)
+                bid = buendel_schluessel(b)
                 if bid is None:
+                    stand_ohne_id += 1
                     continue
                 buendel[bid] = b
                 basis = basis_aus_satz(b)
@@ -788,7 +840,7 @@ def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
     # Benannte Zaehler statt stiller `continue`: eine Zeile, die keinen
     # Stamm findet, ist eine ENTSCHEIDUNG dieses Laufs und gehoert ins
     # Protokoll (CLAUDE.md, Clean Code 5).
-    ohne_form = ohne_stand = ueber_basis = 0
+    ohne_id = ohne_stand = ueber_basis = ohne_wert = 0
     for zeile in historie.read_text(encoding="utf-8").splitlines():
         if not zeile.strip():
             continue
@@ -796,9 +848,11 @@ def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
             satz = json.loads(zeile)
         except json.JSONDecodeError:
             continue
-        hid = id_aus_satz(satz)
+        hid = buendel_schluessel(satz)
         if hid is None:
-            ohne_form += 1
+            # Nur noch eine Zeile OHNE JEDE ID landet hier: eine unbekannte
+            # ID-FORM wird weiterverwendet (`buendel_schluessel`).
+            ohne_id += 1
             continue
         b = buendel.get(hid)
         if b is None:
@@ -825,19 +879,23 @@ def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
         wert = _wert_aus_messung({"satz": satz, "stand": b}, tarife)
         if wert is None:
             # Die Zeile hat Posten, aber die heutige Rechnung kommt fuer
-            # sie auf keine belastbare Zahl (z. B. Tarifgrundpreis fehlt) -
-            # ein Punkt dafuer waere eine erfundene Hoehe.
+            # sie auf keine belastbare Zahl (Tarifgrundpreis oder - seit
+            # P0-B-fix1/fix2 - die Ratenlaufzeit nicht gemessen) - ein
+            # Punkt dafuer waere eine erfundene Hoehe. Gezaehlt statt
+            # still uebersprungen (Clean Code 5).
+            ohne_wert += 1
             continue
         slot = (messungen.setdefault((modell, band), {})
                 .setdefault(b.get("anbieter") or "?", {}))
         alt = slot.get(datum)
         if alt is None or wert < alt["wert"]:
             slot[datum] = {"satz": satz, "stand": b, "wert": wert}
-    if ohne_form or ohne_stand or ueber_basis:
-        log.info("Zeitreihe: %d Historienzeile(n) ohne zuordenbare ID, "
-                 "%d ohne Buendel im heutigen Stand, %d ueber den "
-                 "laufzeitfreien Schluessel zugeordnet.",
-                 ohne_form, ohne_stand, ueber_basis)
+    if ohne_id or ohne_stand or ueber_basis or ohne_wert or stand_ohne_id:
+        log.info("Zeitreihe: %d Historienzeile(n) ohne jede ID, %d ohne "
+                 "Buendel im heutigen Stand, %d ueber den laufzeitfreien "
+                 "Schluessel zugeordnet, %d ohne belastbare Leitzahl "
+                 "(kein Punkt); %d Stand-Eintrag/Eintraege ohne ID.",
+                 ohne_id, ohne_stand, ueber_basis, ohne_wert, stand_ohne_id)
     return messungen
 
 
