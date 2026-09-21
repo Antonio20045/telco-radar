@@ -905,3 +905,117 @@ def test_auto_modell_mit_zwei_mestagen_steht_in_der_wahl(tmp_path):
     ids = {m["id"] for m in a["suchindex"]}
     assert "apple-iphone-18-pro-256" in ids
     assert any(p["modell"] == "apple-iphone-18-pro-256" for p in a["paare"])
+
+
+# ==========================================================================
+# P0-B-h3 (21.09.2026, Befund 3): EIN GRAPH, EIN ZEITRAUM
+#
+# Der Graph traegt EINE Y-Achse und die Beschriftung "Kosten über 24
+# Monate je Messtag und Anbieter" - und fuehrte darin die 1&1-Serie mit
+# rund 2.020 EUR als 36-Monats-Summe (ein Monatsbetrag fuer Tarif UND
+# Geraet, § 13.2). Auf einer Achse ist das keine teurere Zahl, sondern
+# eine laengere Laufzeit: dieselbe Aussage, die derselbe Stand an der
+# Buendelzeile als unbelegt aussortiert.
+#
+# Die Sprache ist die der Buendelzeile: die Zahl verschwindet nicht, sie
+# steht BENANNT daneben (harte Regel 9, A2 - der Strich heisst "kein
+# Angebot"). Ein zweiter Graph waere keine Loesung: die Startansicht
+# traegt genau EIN svg.gr-zr (test_geraete_reiter_browser).
+# ==========================================================================
+
+def _h3_karte(anbieter, gesamt, monate, band="klein", frisch=True):
+    """Eine Kartenzeile in der Form, die `_band_zeilen` liest."""
+    return {"anbieter": anbieter, "gesamt": gesamt, "schnitt_monat":
+            round(gesamt / monate, 2), "leitzahl_monate": monate,
+            "tarif": f"{anbieter} Tarif", "band": band,
+            "band_gb_text": "15 GB", "vergleichbar": True,
+            "belastbar": True, "frisch": frisch, "sku_id": f"sku-{anbieter}",
+            "naeherung": False, "quelle_url": f"https://x.invalid/{anbieter}",
+            "abgerufen_am": HEUTE}
+
+
+def test_h3_eine_36_monats_karte_ist_keine_zeile_dieser_tafel():
+    """Rot gegen den alten Stand: dort stand 1&1 mit 1.299,54 EUR (36
+    Monate) als GUENSTIGSTE Zeile vor Vodafones 1.433,80 EUR (24 Monate)
+    - der Antwort-Satz nannte sie "Kosten über 24 Monate", und
+    `_leitzahl_html` zog die zwei Zahlen voneinander ab."""
+    modell = {"id": "m", "titel": "Testgerät", "hersteller": "Test",
+              "speicher": 256,
+              "karten": [_h3_karte("1&1", 1299.54, 36),
+                         _h3_karte("Vodafone", 1433.80, 24)]}
+    satz = geraete_zeitreihe._band_zeilen(modell)["klein"]
+    assert [z["anbieter"] for z in satz["zeilen"]] == ["Vodafone"]
+    # Sie ist nicht weg, sie liegt im eigenen Eimer - MIT ihrem Zeitraum.
+    assert [(k["anbieter"], k["leitzahl_monate"]) for k in satz["fremd"]] \
+        == [("1&1", 36)]
+    # Kein Delta ueber zwei Zeitraeume: Vodafone fuehrt selbst, also gibt
+    # es keine Leitzahl-Zeile (vorher: 1.433,80 - 1.299,54 = 134,26 EUR).
+    assert geraete_zeitreihe._leitzahl_html(satz["zeilen"]) is None
+    text = _text(geraete_zeitreihe._antwort_html(
+        modell, "klein", satz["zeilen"], {"label": "Klein"},
+        fremd=satz["fremd"]))
+    assert "führt nur Vodafone" in text and "1.433,80 €" in text
+    assert "1.299,54" not in text
+
+
+def test_h3_der_luecken_satz_nennt_anbieter_und_zeitraum():
+    """Der Anbieter faellt aus den Zeilen - und wird GENANNT. "Kein
+    Bündel in diesem Band" waere gelogen (harte Regel 9)."""
+    modell = {"id": "m", "titel": "Testgerät", "hersteller": "Test",
+              "speicher": 256,
+              "karten": [_h3_karte("1&1", 1299.54, 36),
+                         _h3_karte("Vodafone", 1433.80, 24)]}
+    satz = geraete_zeitreihe._band_zeilen(modell)["klein"]
+    luecken = geraete_zeitreihe._luecken(
+        satz["zeilen"], modell["karten"], "klein", fremd=satz["fremd"])
+    eins = next(l for l in luecken if l["anbieter"] == "1&1")
+    assert (eins["grund"], eins["monate"]) == ("anderer-zeitraum", 36)
+    text = geraete_zeitreihe._luecke_text(luecken, {})
+    assert "Nur über eine andere Laufzeit, nicht über 24 Monate: " \
+        "1&1 (36 Monate)" in text, text
+    assert "Kein Bündel in diesem Band: 1&1" not in text
+
+
+def test_h3_ein_band_mit_nur_fremdem_zeitraum_verschwindet_nicht():
+    """Der stille Verlust, den das Tor sonst verursacht: ein Band, dessen
+    EINZIGES Angebot 36 Monate traegt, hat keine Zeile - "führt kein
+    Anbieter ein Bündel" waere falsch, und das Band ganz aus der Auswahl
+    zu nehmen waere ein gemessenes Angebot ohne ein Wort."""
+    modell = {"id": "m", "titel": "Testgerät", "hersteller": "Test",
+              "speicher": 256, "karten": [_h3_karte("1&1", 2019.54, 36)]}
+    satz = geraete_zeitreihe._band_zeilen(modell)["klein"]
+    assert satz["zeilen"] == [] and satz["alt"] == []
+    assert satz["fremd"], "das Angebot ist verloren gegangen"
+    text = _text(geraete_zeitreihe._antwort_html(
+        modell, "klein", satz["zeilen"], {"label": "Klein"},
+        alte=satz["alt"], fremd=satz["fremd"]))
+    assert "führt kein Anbieter ein Bündel" not in text
+    assert "führt nur 1&amp;1" in text and "nur über 36 Monate" in text
+    assert "2.019,54 €" in text, text
+
+
+def test_h3_kein_anbieter_steht_im_graphen_und_im_luecken_satz(ansicht):
+    """Graph und Text derselben Tafel sagen dasselbe.
+
+    Ein Anbieter, dessen Angebot "nur über eine andere Laufzeit" gilt,
+    darf keine Kurve im Graphen tragen - sonst behauptet dieselbe Tafel
+    zweierlei ueber dasselbe Angebot (genau der Befund an der
+    Radarzeile). Und die Beschriftung nennt den Zeitraum, den die
+    Punkte tragen.
+    """
+    paare = ansicht["paare"]
+    assert paare, "keine Paare - der Test prueft nichts"
+    mit_svg = 0
+    for p in paare:
+        if not p["svg_breit"]:
+            continue
+        mit_svg += 1
+        assert "aria-label='Kosten über 24 Monate je Messtag und " \
+            "Anbieter" in p["svg_breit"], (p["modell"], p["band"])
+        satz = p["luecke_text"] or ""
+        _, _, fremd_teil = satz.partition("Nur über eine andere Laufzeit")
+        for anbieter in p["anbieter"]:
+            assert anbieter not in fremd_teil.split(".")[0], (
+                f"{p['modell']}/{p['band']}: {anbieter} traegt eine Kurve "
+                f"UND steht im Luecken-Satz: {satz!r}")
+    assert mit_svg, "kein Graph im Bestand - der Test prueft nichts"

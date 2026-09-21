@@ -31,6 +31,7 @@ from bs4 import BeautifulSoup
 
 from telco_radar.geraete_config import lade_katalog, lade_quellen
 from telco_radar.report import geraete_zeitreihe as zr
+from telco_radar.tco_model import tco_24
 from telco_radar.report.html import render_site
 
 from test_geraete_zeitreihe_ansicht import HEUTE, _baue
@@ -162,11 +163,41 @@ def test_die_serie_rechnet_die_punkte_mit_der_heutigen_leitzahl():
         {("m", "b"): {"o2": [("2026-09-12", 1120.75)]}}
 
 
-def test_die_zusammenform_rechnet_ebenfalls_alle_laufzeitmonate():
-    messungen = {("m", "b"): {"1&1": {"2026-09-12": _messung(
-        EINS_EINS_MESSUNG, anbieter="1&1", tarif="1&1 All-Net-Flat S")}}}
-    assert zr._serien_aus(messungen) == \
-        {("m", "b"): {"1&1": [("2026-09-12", 2259.54)]}}
+def test_die_zusammenform_bekommt_keinen_punkt_auf_der_24_monats_achse():
+    """P0-B-h3 (Befund 3): die 36-Monats-Summe steht NICHT in der Kurve.
+
+    Bis hierher hielt dieser Test den Befund als Soll fest: die
+    Zusammenform (ein Bündelmonatspreis für Tarif UND Gerät, § 13.2)
+    rechnet alle 36 Ratenmonate - 420 + 39,90 + 36 × 49,99 = 2.259,54 -
+    und dieser Punkt stand in einem Graphen, dessen aria-label "Kosten
+    über 24 Monate je Messtag und Anbieter" sagt. Auf EINER Y-Achse ist
+    das keine teurere Zahl, sondern eine längere Laufzeit.
+
+    Die Rechnung selbst bleibt unangetastet (sie ist die Vertragswahrheit
+    und wird unten gegengerechnet) - sie bekommt nur keinen Punkt auf
+    dieser Achse, und `_messwert` NENNT den Zeitraum, statt zu
+    schweigen.
+    """
+    m = _messung(EINS_EINS_MESSUNG, anbieter="1&1",
+                 tarif="1&1 All-Net-Flat S")
+    messungen = {("m", "b"): {"1&1": {"2026-09-12": m}}}
+    assert zr._serien_aus(messungen) == {("m", "b"): {"1&1": []}}
+    # Der benannte Ausfall: kein Wert, aber der gemessene Zeitraum.
+    assert zr._messwert(m) == (None, 36)
+    # Gegenrechnung, dass hier keine Zahl verloren geht: die Kennzahl
+    # selbst ist unveraendert 2.259,54 EUR ueber 36 Monate.
+    kennzahl = tco_24(zr._buendel_aus_messung(m))
+    assert (kennzahl.gesamt, kennzahl.leitzahl_monate) == (2259.54, 36)
+    assert kennzahl.gesamt == round(420.0 + 39.90 + 36 * 49.99, 2)
+
+
+def test_die_aufgeteilte_form_bekommt_ihren_punkt_weiter():
+    """Die Gegenprobe zum Test darueber - das Tor sperrt nur den fremden
+    Zeitraum. o2 rechnet 24 Tarifmonate plus alle Raten: die Leitzahl
+    traegt 24 Monate und steht in der Kurve."""
+    m = _messung(O2_MESSUNG)
+    assert zr._messwert(m) == (1120.75, None)
+    assert tco_24(zr._buendel_aus_messung(m)).leitzahl_monate == 24
 
 
 def test_die_auswahl_des_guenstigsten_buendels_je_tag_rechnet_neu(tmp_path):

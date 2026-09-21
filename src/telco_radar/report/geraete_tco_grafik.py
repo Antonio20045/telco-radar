@@ -16,6 +16,9 @@ Die drei Regeln, die dieses Modul tragen
    Zahlen (CLAUDE.md § 6).
 2. **Zwei Laufzeiten, zwei Nulllinien** (A5.4). Ein gemeinsamer Balkenrang
    ueber 24 und 36 Monate vergliche die Laufzeit und nennte es Preis.
+   Getrennt wird am ZEITRAUM DER LEITZAHL (`Tco.leitzahl_monate`), nicht
+   an der Tariflaufzeit der Rechnung - die ist seit TCO24-1 auf jeder
+   Karte 24, und die Trennung fiel damit still aus (P0-B-h3).
 3. **Jeder Balken traegt seine Aussage im `<title>`.** Eine Grafik ohne
    Textfassung ist auf einem Screenreader eine leere Flaeche - und beim
    Nachmessen eine Behauptung ohne Beleg.
@@ -32,6 +35,11 @@ import math
 from datetime import date, timedelta
 from typing import Optional
 from xml.sax.saxutils import escape
+
+# DIE EINE Regel, ob zwei Leitzahlen ueber denselben Zeitraum laufen
+# (P0-B-h1). Diese Datei rechnet Geometrie und leitet keine Regel ab -
+# sie fragt dieselbe Funktion wie Buendelzeile, Katalog und Radar.
+from ..tco_model import zeitraum_vergleichbar
 
 # Die Zeichenflaeche. 1180 px ist die Breite, die die Seite hergibt
 # (1184 px Satzspiegel) - dieselbe Zahl wie bei der geloeschten
@@ -87,22 +95,57 @@ def _t(text) -> str:
 # --------------------------------------------------------------------------
 
 def _gruppen(karten: list) -> list:
-    """Die Karten nach Bindungsdauer, laengste Gruppe zuerst gefuellt.
+    """Die Karten nach dem ZEITRAUM IHRER LEITZAHL, kuerzeste Gruppe zuerst.
 
     Eine Gruppe entsteht nur, wenn sie eine belastbare Zahl hat - eine
     Ueberschrift "24 Monate" ueber einer leeren Flaeche ist keine Auskunft.
+
+    P0-B-h3 (Befund 2): gruppiert wird an `leitzahl_monate` - dem
+    Zeitraum, den die Summe WIRKLICH traegt (`tco_model.Tco`, P0-B-h1) -
+    und nicht mehr an `laufzeit`, der Tariflaufzeit der Rechnung. Die ist
+    seit TCO24-1 die Konstante 24: alle Karten landeten damit in EINER
+    Gruppe mit dem Kopf "gerechnet über 24 Monate", auch 1&1s
+    Buendelmonatspreis, dessen Balken 36 Monate Tarif UND Geraet traegt.
+    Ein gemeinsamer Balkenrang ueber zwei Zeitraeume vergleicht die
+    Laufzeit und nennt es Preis (Regel 2 des Modulkopfs, A5.4) - genau
+    die Aussage, die derselbe Stand an der Buendelzeile als unbelegt
+    aussortiert. Jede Laufzeit bekommt ihre eigene Gruppe mit eigenem
+    Kopf, eigener Nulllinie und eigenem Rang.
+
+    OHNE gemessenen Zeitraum gibt es keine Gruppe: eine Ueberschrift
+    braucht eine Zahl, und eine geratene 24 waere die Ueberschrift, die
+    dieser Befund ist. Am echten Bestand kann der Fall nicht auftreten
+    (`Tco.belastbar` verlangt die gemessene Ratenlaufzeit); der
+    Leerzustand gehoert ohnehin in die Karte, wo sein Grund danebensteht
+    (Modulkopf).
     """
-    nach_laufzeit: dict = {}
+    nach_zeitraum: dict = {}
     for k in karten:
         if not k.get("belastbar") or k.get("gesamt") is None:
             continue
-        nach_laufzeit.setdefault(k["laufzeit"], []).append(k)
+        if k.get("leitzahl_monate") is None:
+            continue
+        nach_zeitraum.setdefault(k["leitzahl_monate"], []).append(k)
     gruppen = []
-    for laufzeit in sorted(nach_laufzeit):
-        zeilen = sorted(nach_laufzeit[laufzeit],
+    for monate in sorted(nach_zeitraum):
+        zeilen = sorted(nach_zeitraum[monate],
                         key=lambda k: k["gesamt"])
-        gruppen.append({"laufzeit": laufzeit, "karten": zeilen})
+        gruppen.append({"monate": monate, "karten": zeilen})
     return gruppen
+
+
+def _monate_wort(gruppen: list) -> str:
+    """"24" oder "24 und 36" - die Zeitraeume, die die Balken TRAGEN.
+
+    Fuer die Ueberschrift der Grafik (P0-B-h3). Sie kommt aus den
+    Gruppen und nennt damit genau die Zeitraeume, die gezeichnet werden -
+    eine feste 24 ueber einem 36-Monats-Balken war Befund 2.
+    """
+    monate = [g["monate"] for g in gruppen]
+    if len(monate) == 1:
+        return str(monate[0])
+    return " und ".join([", ".join(str(m) for m in monate[:-1]),
+                         str(monate[-1])])
 
 
 def _skala(betrag: float, hoechst: float) -> float:
@@ -113,7 +156,9 @@ def _skala(betrag: float, hoechst: float) -> float:
 
 
 def balken(modell: dict) -> str:
-    """G1: gestapelte Balken je Anbieter, getrennt nach Laufzeit.
+    """G1: gestapelte Balken je Anbieter, getrennt nach dem ZEITRAUM ihrer
+    Leitzahl (`leitzahl_monate`, P0-B-h1/h3 - nicht nach der
+    Tariflaufzeit der Rechnung, die auf jeder Karte 24 ist).
 
     Rueckgabe ist fertiges SVG-Markup oder ein leerer String - dann zeigt
     die Vorlage ihre Texttafel (C.1: "Wenn <2 Anbieter mit gueltigem TCO:
@@ -144,21 +189,34 @@ def balken(modell: dict) -> str:
     hoehe = int(hoehe)
 
     name = modell.get("name") or ""
+    # DIE UEBERSCHRIFT NENNT DIE ZEITRAEUME, DIE DIE BALKEN TRAGEN
+    # (P0-B-h3, Befund 2). Bis hierher stand hier die feste 24, waehrend
+    # ein Balken derselben Grafik 36 Monate Tarif und Geraet fuehrte -
+    # fuer einen Screenreader war das die GANZE Grafik in einem falschen
+    # Satz. Die Zeitraeume kommen aus den Gruppen, also aus den Zahlen
+    # selbst; jede Gruppe nennt ihren eigenen darunter noch einmal.
+    titel = (f'Kosten über {_monate_wort(gruppen)} Monate für {_t(name)} '
+             f'je Anbieter')
     teile = [
         f'<svg class="gr-g1" viewBox="0 0 {BREITE} {hoehe}" '
         f'width="100%" height="{hoehe}" role="img" '
-        f'aria-label="Kosten über 24 Monate für {_t(name)} je Anbieter">',
-        f'<title>Kosten über 24 Monate für {_t(name)} je Anbieter</title>',
+        f'aria-label="{titel}">',
+        f'<title>{titel}</title>',
     ]
 
     y = 0.0
     for gruppe in gruppen:
-        laufzeit = gruppe["laufzeit"]
-        # S-Q4: der Gruppenkopf nennt den RECHNUNGSHORONT ("gerechnet über
-        # N Monate"), keine Bindung - die Karten daneben nennen die
-        # Bindungen selbst (Tarif bindet 24, Geräteraten laufen 36), und
-        # seit TCO24-1 ist der Horizont immer 24. "{N} Monate Bindung"
-        # waere derselbe Widerspruch, nur in der Grafik.
+        laufzeit = gruppe["monate"]
+        # S-Q4: der Gruppenkopf nennt den ZEITRAUM DER ZAHLEN DIESER
+        # GRUPPE ("gerechnet über N Monate"), keine Bindung - die Karten
+        # daneben nennen die Bindungen selbst (Tarif bindet 24,
+        # Geräteraten laufen 36). "{N} Monate Bindung" waere derselbe
+        # Widerspruch, nur in der Grafik.
+        #
+        # P0-B-h3: N ist wieder eine echte Unterscheidung. Seit TCO24-1
+        # war es fuer jede Karte die 24 der Rechnung; jetzt ist es
+        # `leitzahl_monate`, und der Kopf trennt die Zeitraeume wirklich
+        # (Regel 2 des Modulkopfs).
         teile.append(
             f'<text class="gr-g1-gruppe" x="0" y="{y + 20:.0f}">'
             f'gerechnet über {laufzeit} Monate</text>')
@@ -170,8 +228,15 @@ def balken(modell: dict) -> str:
                      f'x2="{LINKS}" y2="{unten:.0f}" />')
         y += GRUPPE_KOPF
 
-        # Die Referenzlinie - nur in der Gruppe, deren Laufzeit sie rechnet.
-        if referenz and referenz.get("monate") == laufzeit:
+        # Die Referenzlinie - nur in der Gruppe, deren Zeitraum sie
+        # traegt. Gefragt wird mit DER EINEN Regel des Projekts
+        # (`tco_model.zeitraum_vergleichbar`, P0-B-h1/h3): ein unbekannter
+        # Zeitraum ist nie gleich, und eine Nulllinie quer zu ihrer
+        # Gruppe waere genau der Massstab, den Befund 2 meint. Verglichen
+        # wird der Zeitraum der REFERENZZAHL gegen den der Gruppe - bis
+        # hierher stand rechts die Tariflaufzeit der Karten (konstant 24).
+        if referenz and zeitraum_vergleichbar(referenz.get("monate"),
+                                              laufzeit):
             x = LINKS + _skala(referenz["gesamt"], hoechst)
             # DAS ETIKETT KIPPT NACH LINKS, wenn es sonst aus dem Bild
             # liefe. Die Referenz ist regelmaessig der teuerste Balken -

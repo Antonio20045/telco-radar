@@ -674,13 +674,20 @@ def test_radar_zeigt_alte_karte_als_beleg_nicht_als_paar():
     weiterhin Zeile, Preis und Beleg (Regel 9), aber weder Status
     „vergleichbar" noch Prozent (Vorgabe 1: aus jeder Bewertung)."""
     from telco_radar.report import geraete_radar as radar_modul
+    # `leitzahl_monate` an der Karte und `monate` an der Basis wie am
+    # echten Bestand (P0-B-h1/h3): der Radar vergleicht seit P0-B-h3 nur
+    # ueber denselben Zeitraum, und ein unbekannter Zeitraum ist nie
+    # gleich - eine Fixture ohne die zwei Felder pruefte das Tor, nicht
+    # die Frische.
     karte = {"belastbar": True, "gesamt": 1080.76,
              "tarif": "MagentaMobil M", "tarif_id": "tk:m",
+             "leitzahl_monate": 24,
              "vergleichbar": True, "frisch": False,
              "alt_marke": "kein aktueller Stand seit 15.09.2026",
              "quelle_url": "https://t.invalid/x",
              "abgerufen_am": "2026-09-15"}
     basis = {"gesamt": 1320.76, "tarif": "Mobil M", "naeherung": False,
+             "monate": 24,
              "band": "mittel", "band_label": "Mittel (21 bis 60 GB)",
              "quelle_url": "", "abgerufen_am": "",
              "tarif_quelle_url": "", "tarif_abgerufen_am": ""}

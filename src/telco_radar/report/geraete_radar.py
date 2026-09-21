@@ -98,6 +98,11 @@ from __future__ import annotations
 from typing import Optional
 
 from . import geraete_tco_band, geraete_tco_karten
+# DIE EINE REGEL, ob zwei Leitzahlen gegeneinander gestellt werden duerfen
+# (P0-B-h1). Dieses Modul leitet sie nicht ab, es liest sie - genau wie
+# der Katalog (`geraete_view`) und die Buendelzeile
+# (`geraete_tco_karten.gleicher_horizont`).
+from ..tco_model import zeitraum_vergleichbar
 
 # Die drei Netzbetreiber-Wettbewerber - dieselbe Menge, die
 # `geraete_tco_karten.modelle()` ohnehin immer (mit oder ohne Zahl) neben
@@ -116,7 +121,32 @@ ALLE_WETTBEWERBER = NETZ_WETTBEWERBER + ZWEITMARKEN_MIT_BUENDEL
 STATUS_VERGLEICHBAR = "vergleichbar"
 STATUS_BAND_MISMATCH = "band_mismatch"
 STATUS_KEIN_BUENDEL = "kein_buendel"
-STATUS_NICHT_VERGLEICHBAR = "nicht_vergleichbar"   # z. B. refurbished
+# "nicht vergleichbar" heisst: eine Zahl IST gemessen, sie darf aber nicht
+# gegen die Vodafone-Zahl gestellt werden. Bis P0-B-h3 war das nur der
+# erneuerte Zustand (refurbished); seither faellt auch eine Zahl mit
+# ANDEREM ZEITRAUM darunter - der Grund je Zeile sagt, welcher der zwei
+# Faelle vorliegt. EIN Status, weil die Ansicht ihn ueberall gleich
+# behandelt (grau, kein Vorzeichen, kein Rang) und Seite, Aufklapper und
+# CSV dieselbe Menge lesen (Clean Code 7).
+STATUS_NICHT_VERGLEICHBAR = "nicht_vergleichbar"
+
+def _grund_anderer_zeitraum(anbieter: str, monate: Optional[int],
+                            vf_monate: Optional[int]) -> str:
+    """Der Satz, der eine Zahl mit fremdem Zeitraum benennt (P0-B-h3).
+
+    Er nennt BEIDE Zeitraeume - "nicht vergleichbar" allein liest sich
+    wie ein Mangel des Angebots, und der Strich der Prozentspalte hiesse
+    "kein Angebot" (A2). Dieselbe Aussage wie an der Buendelzeile
+    (`geraete_tco_karten.delta_zustand`), nur an dieser Tabelle in einem
+    Satz statt in zwei Feldern. Ein unbekannter Zeitraum wird benannt,
+    nicht als 24 geraten (Clean Code 3/4).
+    """
+    dieses = (f"{monate} Monate" if monate is not None
+              else "eine nicht gemessene Laufzeit")
+    gegen = (f"{vf_monate} Monate" if vf_monate is not None
+             else "eine nicht gemessene Laufzeit")
+    return (f"Die Zahl von {anbieter} trägt {dieses}, die Vodafone-Zahl "
+            f"{gegen} – über zwei Laufzeiten gibt es keinen Abstand.")
 
 # Wie viele Geraete-Gruppen ohne Aufklappen sichtbar sind. NICHTS wird
 # geloescht - der Rest steht im DOM hinter einem <details> (Test c: nicht
@@ -182,6 +212,12 @@ def _vodafone_basis(modell: dict, band_je_tarif: dict) -> Optional[dict]:
     band = band_je_tarif.get(ref.get("tarif_id") or "")
     return {
         "gesamt": ref["gesamt"],
+        # DER ZEITRAUM, DEN DIE BASISZAHL TRAEGT (P0-B-h1/h3) - gelesen,
+        # nicht abgeleitet: `_referenz_aus_buendel` setzt ihn aus
+        # `Tco.leitzahl_monate` des eigenen Buendels, `_vodafone_referenz`
+        # aus ihren Tarifmonaten. Ohne ihn koennte diese Datei kein
+        # Vorzeichen verantworten (siehe `_zeile_fuer_anbieter`).
+        "monate": ref.get("monate"),
         "tarif": ref.get("tarif", ""),
         "naeherung": not bool(ref.get("aus_buendel")),
         "band": band,
@@ -248,6 +284,30 @@ def _zeile_fuer_anbieter(anbieter: str, karte: Optional[dict],
                 "tarif": karte.get("tarif", ""), "band": band,
                 "band_label": wb_band, "grund": grund,
                 **_beleg(karte.get("quelle_url", ""), karte.get("abgerufen_am", ""))}
+
+    # DAS HORIZONT-TOR, aus derselben Quelle wie an der Buendelzeile
+    # (P0-B-h3, Befund 1). Bis hierher rechnete die naechste Zeile das
+    # Prozent ohne jeden Blick auf den Zeitraum: 1&1s Buendelzahl traegt
+    # 36 Monate Tarif UND Geraet, die Vodafone-Basis 24 - gemessen am
+    # Bestand vom 21.09.2026 trugen 26 Radarzeilen ein Vorzeichen gegen
+    # eine Zahl, deren eigene Buendelzeile daneben "andere Laufzeit"
+    # sagte (Samsung Galaxy A17 128 GB: -24,7 % / 727,54 gegen 965,80).
+    # Allein die zwoelf Tarifmonate jenseits des Horizonts sind groesser
+    # als jedes hier ausgewiesene Delta. Die Zahl BLEIBT stehen (sie ist
+    # richtig gemessen), nur Vorzeichen und Rang fallen weg - mit
+    # benanntem Grund, nie als stille Null.
+    if not zeitraum_vergleichbar(karte.get("leitzahl_monate"),
+                                 basis.get("monate")):
+        return {"anbieter": anbieter, "status": STATUS_NICHT_VERGLEICHBAR,
+                "prozent": None, "gesamt": karte["gesamt"],
+                "vf_gesamt": basis["gesamt"],
+                "tarif": karte.get("tarif", ""), "band": band,
+                "band_label": _band_label(band),
+                "grund": _grund_anderer_zeitraum(
+                    anbieter, karte.get("leitzahl_monate"),
+                    basis.get("monate")),
+                **_beleg(karte.get("quelle_url", ""),
+                         karte.get("abgerufen_am", ""))}
     prozent = round((karte["gesamt"] - basis["gesamt"]) / basis["gesamt"] * 100, 1)
     return {"anbieter": anbieter, "status": STATUS_VERGLEICHBAR,
             "prozent": prozent, "gesamt": karte["gesamt"],
@@ -277,6 +337,23 @@ def _paar_zeile(anbieter: str, band: str, wb_karte: dict,
                 "grund": (f"{anbieter} führt für dieses Gerät nur ein "
                           f"{wb_karte.get('zustand_etikett') or 'nicht neues'} "
                           "Gerät – kein Vergleich gegen ein Neugerät."),
+                **_beleg(wb_karte.get("quelle_url", ""),
+                         wb_karte.get("abgerufen_am", ""))}
+    # DASSELBE TOR wie in `_zeile_fuer_anbieter` und an der Buendelzeile
+    # (P0-B-h3): hier stehen ZWEI Karten gegeneinander, gelesen werden
+    # also zwei `leitzahl_monate` - die Regel dazu ist dieselbe eine
+    # (`tco_model.zeitraum_vergleichbar`). Ein Paar im selben Tarifband
+    # ist noch kein Paar ueber denselben Zeitraum.
+    if not zeitraum_vergleichbar(wb_karte.get("leitzahl_monate"),
+                                 vf_karte.get("leitzahl_monate")):
+        return {"anbieter": anbieter, "status": STATUS_NICHT_VERGLEICHBAR,
+                "prozent": None, "gesamt": wb_karte["gesamt"],
+                "vf_gesamt": vf_karte["gesamt"],
+                "tarif": wb_karte.get("tarif", ""), "band": band,
+                "band_label": _band_label(band),
+                "grund": _grund_anderer_zeitraum(
+                    anbieter, wb_karte.get("leitzahl_monate"),
+                    vf_karte.get("leitzahl_monate")),
                 **_beleg(wb_karte.get("quelle_url", ""),
                          wb_karte.get("abgerufen_am", ""))}
     prozent = round((wb_karte["gesamt"] - vf_karte["gesamt"])
@@ -465,13 +542,26 @@ def modellliste(gruppen: list[dict]) -> dict:
             if g["vodafone"] is None:
                 luecke = "keine Vodafone-Kosten über 24 Monate erhoben"
             else:
-                # band_mismatch ist der AUSSAGEKRAEFTIGSTE Grund (es gibt
-                # Karten auf beiden Seiten, nur kein gemeinsames Band) -
-                # Platzhalter-kein_buendel-Zeilen stehen in fast jeder
-                # Gruppe daneben und wuerden ihn ueberdecken.
+                # DER SPEZIFISCHSTE Grund gewinnt - Platzhalter-
+                # kein_buendel-Zeilen stehen in fast jeder Gruppe daneben
+                # und wuerden jeden anderen ueberdecken.
+                #
+                # P0-B-h3: `nicht_vergleichbar` steht jetzt VOR
+                # `band_mismatch`. Es ist der engste der drei Faelle: es
+                # gibt eine gemessene Karte IM gemeinsamen Band, nur darf
+                # sie nicht gegen die Vodafone-Zahl gestellt werden
+                # (anderer Zeitraum, erneuertes Geraet, alter Stand).
+                # "kein gemeinsames Band" waere daneben wahr, aber es
+                # meint einen ANDEREN Anbieter derselben Gruppe. Am
+                # Bestand vom 21.09.2026 gemessen: mit der alten
+                # Reihenfolge trugen 22 der 26 neu benannten Zeilen
+                # "nicht vergleichbar" und 5 "kein gemeinsames Band";
+                # mit dieser Reihenfolge 28 und 3 (die 4. war schon
+                # vorher eine Mismatch-Zeile mit einer unvergleichbaren
+                # Karte daneben).
                 luecke = "kein Vergleich"
-                for status in (STATUS_BAND_MISMATCH,
-                               STATUS_NICHT_VERGLEICHBAR,
+                for status in (STATUS_NICHT_VERGLEICHBAR,
+                               STATUS_BAND_MISMATCH,
                                STATUS_KEIN_BUENDEL):
                     if any(z["status"] == status for z in g["zeilen"]):
                         luecke = _LUECKE_WORT[status]

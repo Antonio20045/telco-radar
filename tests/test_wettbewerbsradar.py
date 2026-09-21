@@ -43,7 +43,8 @@ from telco_radar.report import geraete_tco_karten as karten
 from telco_radar.report import geraete_view
 from telco_radar.report import geraete_radar as wr
 from telco_radar.report.html import render_site
-from telco_radar.tco_model import Buendel, SimOnlyReferenz
+from telco_radar.tco_model import (Buendel, SimOnlyReferenz,
+                                   zeitraum_vergleichbar)
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 ZUSTAND = WURZEL / "data" / "state"
@@ -824,10 +825,19 @@ def test_am_echten_bestand_steht_jedes_band_paar_auf_der_seite(echt):
 
     Seit B3 zaehlt der Kreis auch die Zweitmarken (congstar): ihre Paare
     entstehen nach derselben Regel, und wo keine Karte steht, liefert die
-    Zaehlung leer - die Invariante bleibt fuer beide Kreise dieselbe."""
+    Zaehlung leer - die Invariante bleibt fuer beide Kreise dieselbe.
+
+    P0-B-h3: ein Paar im selben Band ist noch kein Paar ueber denselben
+    ZEITRAUM. Diese Zaehlung fragt deshalb dieselbe EINE Regel wie die
+    Seite (`tco_model.zeitraum_vergleichbar`) - eine zweite Definition
+    von "vergleichbares Paar" waere genau der Riss, aus dem der Befund
+    entstand. Die gesperrten Paare verschwinden nicht: sie werden unten
+    als benannte Zeilen mitgezaehlt."""
     by_id = {m["id"]: m for m in echt["modelle"]}
     paare = 0
     gezeichnet = 0
+    fremder_zeitraum = 0
+    benannt = 0
     for g in echt["radar"]["gruppen"]:
         modell = by_id[g["id"]]
         alle_je_band = band.alle_karten_je_band(modell, echt["band_je_tarif"])
@@ -836,16 +846,34 @@ def test_am_echten_bestand_steht_jedes_band_paar_auf_der_seite(echt):
                         and je["Vodafone"][0].get("vergleichbar", True)}
         for a in wr.ALLE_WETTBEWERBER:
             for b in vf_gemeinsam:
-                karten = alle_je_band[b].get(a) or []
-                paare += len([k for k in karten
-                              if k.get("vergleichbar", True)])
+                vf = alle_je_band[b]["Vodafone"][0]
+                for k in (alle_je_band[b].get(a) or []):
+                    if not k.get("vergleichbar", True):
+                        continue
+                    if zeitraum_vergleichbar(k.get("leitzahl_monate"),
+                                             vf.get("leitzahl_monate")):
+                        paare += 1
+                    else:
+                        fremder_zeitraum += 1
             gezeichnet += len([z for z in g["zeilen"]
                                if z["anbieter"] == a
                                and z["status"] == wr.STATUS_VERGLEICHBAR
                                and z["band"] in vf_gemeinsam])
+            benannt += len([z for z in g["zeilen"]
+                            if z["anbieter"] == a
+                            and z["status"] == wr.STATUS_NICHT_VERGLEICHBAR
+                            and z["band"] in vf_gemeinsam
+                            and "Laufzeit" in (z["grund"] or "")])
     assert paare, "kein Paar im Bestand - Datenlage gemaess Brief geprueft?"
     assert gezeichnet == paare, \
         f"{paare - gezeichnet} Paare im Bestand fehlen auf der Seite"
+    # Gegenprobe zur Sperre: jede gesperrte Karte steht MIT GRUND da -
+    # ein stiller Verlust waere derselbe Befund mit anderem Vorzeichen.
+    assert fremder_zeitraum, (
+        "keine Karte mit fremdem Zeitraum im Bestand - die Gegenprobe "
+        "prueft nichts")
+    assert benannt == fremder_zeitraum, \
+        f"{fremder_zeitraum - benannt} gesperrte Karten ohne benannten Grund"
 
 
 def test_am_echten_bestand_ist_jede_zahl_gegen_die_vf_zahl_im_selben_band(echt):
@@ -933,3 +961,139 @@ def test_am_echten_bestand_stehen_die_vier_nicht_erhebbaren(echt):
     assert {"Amazon", "MediaMarkt", "expert", "Euronics"} <= namen, namen
     for f in echt["radar"]["nicht_erhebbar"]:
         assert f["grund"], f"{f['anbieter']} ohne Grund"
+
+
+# ==========================================================================
+# P0-B-h3 (21.09.2026, Befund 1): DAS HORIZONT-TOR IM RADAR
+#
+# `_zeile_fuer_anbieter` und `_paar_zeile` bildeten `prozent` ohne einen
+# Blick auf den Zeitraum der zwei Zahlen. Gemessen am gerenderten Bestand
+# vom 21.09.2026: 26 Radarzeilen trugen ein Vorzeichen fuer ein Angebot,
+# dessen Buendelzeile auf DERSELBEN Seite "andere Laufzeit" sagte -
+# darunter Google Pixel 11 512 GB mit data-s-prozent="-0.7" bei
+# data-s-gesamt="1835.54" (1&1, 36 Monate) gegen data-s-vf="1847.8"
+# (Vodafone, 24 Monate). Allein die zwoelf Tarifmonate jenseits des
+# Horizonts sind groesser als dieses Delta.
+#
+# Gefragt wird DIE EINE Regel (`tco_model.zeitraum_vergleichbar`) - kein
+# zweites Tor daneben.
+# ==========================================================================
+
+def _h3_karte(anbieter, gesamt, monate, tarif_id="o2:k"):
+    """Eine Kartenzeile in der Form, die der Radar liest."""
+    return {"anbieter": anbieter, "belastbar": True, "gesamt": gesamt,
+            "leitzahl_monate": monate, "tarif": f"{anbieter} Tarif",
+            "tarif_id": tarif_id, "vergleichbar": True, "frisch": True,
+            "quelle_url": f"https://example.de/{anbieter}",
+            "abgerufen_am": HEUTE}
+
+
+def _h3_basis(gesamt, monate, band="klein"):
+    return {"gesamt": gesamt, "monate": monate, "tarif": "Vodafone Mobil XS",
+            "naeherung": False, "band": band, "band_label": "Klein",
+            "quelle_url": "", "abgerufen_am": "",
+            "tarif_quelle_url": "", "tarif_abgerufen_am": ""}
+
+
+def test_h3_kein_vorzeichen_gegen_eine_basis_mit_anderem_zeitraum():
+    """Die Referenz-Pfad-Zeile (`_zeile_fuer_anbieter`).
+
+    Rot gegen den alten Stand: dort stand `prozent == -0.7` fuer genau
+    diese zwei Zahlen (1.835,54 EUR ueber 36 Monate gegen 1.847,80 EUR
+    ueber 24) - die gemessene Zeile des Bestands.
+    """
+    karte = _h3_karte("1&1", 1835.54, 36)
+    zeile = wr._zeile_fuer_anbieter("1&1", karte, _h3_basis(1847.80, 24),
+                                    {"o2:k": "klein"})
+    assert zeile["prozent"] is None, \
+        "ueber zwei Zeitraeume gibt es kein Vorzeichen"
+    assert zeile["status"] == wr.STATUS_NICHT_VERGLEICHBAR
+    # Der Strich heisst auf dieser Seite "kein Angebot" (A2) - hier IST
+    # ein Angebot, und die Zahl bleibt mit Beleg stehen.
+    assert zeile["gesamt"] == 1835.54 and zeile["vf_gesamt"] == 1847.80
+    assert zeile["quelle_url"] and zeile["abgerufen_am"]
+    # Der Grund NENNT beide Zeitraeume (nie eine stille Null).
+    assert "36 Monate" in zeile["grund"] and "24 Monate" in zeile["grund"]
+    # Gegenprobe: dieselben Zahlen ueber denselben Zeitraum sind ein Paar.
+    gleich = wr._zeile_fuer_anbieter("1&1", _h3_karte("1&1", 1835.54, 24),
+                                     _h3_basis(1847.80, 24),
+                                     {"o2:k": "klein"})
+    assert gleich["status"] == wr.STATUS_VERGLEICHBAR
+    assert gleich["prozent"] == -0.7
+
+
+def test_h3_kein_vorzeichen_zwischen_zwei_karten_mit_anderem_zeitraum():
+    """Die Band-Paar-Zeile (`_paar_zeile`) - dasselbe Tor, zwei Karten.
+
+    Rot gegen den alten Stand: dort stand `prozent == -9.4` (1.299,54
+    ueber 36 Monate gegen 1.433,80 ueber 24 - die gemessene
+    1&1-All-Net-Flat-S-Zeile des Bestands).
+    """
+    wb = _h3_karte("1&1", 1299.54, 36)
+    vf = _h3_karte("Vodafone", 1433.80, 24, tarif_id="vf:xs")
+    zeile = wr._paar_zeile("1&1", "klein", wb, vf)
+    assert zeile["prozent"] is None
+    assert zeile["status"] == wr.STATUS_NICHT_VERGLEICHBAR
+    assert "36 Monate" in zeile["grund"] and "24 Monate" in zeile["grund"]
+    # Gegenprobe: gleicher Zeitraum, dasselbe Zahlenpaar -> Vorzeichen.
+    gleich = wr._paar_zeile("1&1", "klein", _h3_karte("1&1", 1299.54, 24), vf)
+    assert gleich["status"] == wr.STATUS_VERGLEICHBAR
+    assert gleich["prozent"] == -9.4
+
+
+def test_h3_ein_fremder_zeitraum_faellt_aus_der_rangfolge():
+    """Die Modell-Liste rangiert nach Abweichung - eine Zeile ohne
+    Vorzeichen darf sie nicht anfuehren, und ihre Zelle traegt ein WORT
+    statt des Strichs (A2)."""
+    gruppe = {"id": "m", "titel": "Testgerät", "hersteller": "X",
+              "speicher": 128,
+              "vodafone": _h3_basis(1847.80, 24), "vodafone_grund": "",
+              "zeilen": [wr._paar_zeile(
+                  "1&1", "klein", _h3_karte("1&1", 1835.54, 36),
+                  _h3_karte("Vodafone", 1847.80, 24, tarif_id="vf:xs"))],
+              "rang": float("inf")}
+    liste = wr.modellliste([gruppe])
+    zeile = liste["zeilen"][0]
+    assert zeile["prozent"] is None and zeile["prozent_text"] == ""
+    assert zeile["euro"] is None, \
+        "auch kein Euro-Abstand ueber zwei Zeitraeume"
+    assert zeile["luecke"] == "nicht vergleichbar"
+    # Der Grund steht in der Aufklappzeile - vollstaendig, nicht gekappt.
+    assert "36 Monate" in zeile["gruppe_zeilen"][0]["grund"]
+
+
+def test_h3_am_echten_bestand_traegt_keine_prozentzahl_zwei_zeitraeume(echt):
+    """Die Invariante ueber den GANZEN Bestand: wo ein Vorzeichen steht,
+    tragen beide Zahlen denselben Zeitraum. Gemessen wird gegen die
+    Karten des Modells, nicht gegen die Zeile selbst (sonst prueft die
+    Zeile sich selbst)."""
+    by_id = {m["id"]: m for m in echt["modelle"]}
+    geprueft = 0
+    for g in echt["radar"]["gruppen"]:
+        modell = by_id[g["id"]]
+        for z in g["zeilen"]:
+            if z["prozent"] is None:
+                continue
+            treffer = [k for k in modell["karten"]
+                       if k["anbieter"] == z["anbieter"]
+                       and k.get("gesamt") == z["gesamt"]]
+            assert treffer, (
+                f"{g['id']}/{z['anbieter']}: keine Karte zu {z['gesamt']} - "
+                "der Lookup greift ins Leere")
+            # Die Vodafone-Gegenzahl der Zeile, gesucht ueber ihren Betrag:
+            # entweder eine eigene Karte (Paar-Pfad) oder die Basis des
+            # Modells (Referenz-Pfad).
+            vf = [k for k in modell["karten"]
+                  if k["anbieter"] == "Vodafone"
+                  and k.get("gesamt") == z["vf_gesamt"]]
+            vf_monate = ([k.get("leitzahl_monate") for k in vf] or
+                         [(g["vodafone"] or {}).get("monate")])
+            geprueft += 1
+            for k in treffer:
+                assert any(zeitraum_vergleichbar(k.get("leitzahl_monate"), m)
+                           for m in vf_monate), (
+                    f"{g['id']}/{z['anbieter']}: Vorzeichen "
+                    f"{z['prozent']} % fuer eine Zahl ueber "
+                    f"{k.get('leitzahl_monate')} Monate gegen "
+                    f"{vf_monate} Monate")
+    assert geprueft, "keine Prozentzahl im Bestand - der Test prueft nichts"
