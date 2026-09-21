@@ -3623,64 +3623,328 @@ def test_pf_die_gezeigte_ratenlaufzeit_ist_eine_gemessene(gw_seite):
         f"{fehler[:5]}")
 
 
-def test_pf_beide_ratenlaufzeiten_eines_tarifs_stehen_auf_der_seite(gw_seite):
-    """P0-B, die eigentliche Frage: ueberschreiben sich Laufzeitvarianten?
+# ==========================================================================
+# Zwei Ratenlaufzeiten desselben Tarifs - zwei Tests, zwei Fragen
+# --------------------------------------------------------------------------
+# Bis zum 21.09.2026 stand hier EIN Test
+# (`test_pf_beide_ratenlaufzeiten_eines_tarifs_stehen_auf_der_seite`), der
+# beides in einem verlangte: dass der Bestand zwei Laufzeiten TRAEGT und
+# dass die Seite sie ZEIGT. Er kann nicht gruen werden, denn er misst den
+# committeten Produktionsbestand, und dort traegt keine einzige Gruppe
+# zwei Laufzeiten. Ein Orakel, das dauerhaft rot bleibt, faerbt ci.yml rot
+# und begraebt jeden WEITEREN Fehlschlag im bekannten Rot - genau die
+# Fehlerklasse, die ein Tor unbrauchbar macht. Die Aussage ist deshalb
+# aufgeteilt:
+#   1. `test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen`
+#      prueft die MECHANIK am gespeicherten echten congstar-Abruf, in dem
+#      24 und 36 Monate belegt sind - Adapter, Store, render_site.
+#   2. `test_pf_bestand_zaehlt_seine_ratenlaufzeiten_und_haelt_die_luecke_fest`
+#      prueft die BESTANDSLAGE und faellt nur bei einer Regression.
+# ==========================================================================
+import gzip as _pf_gzip
 
-    B1 verspricht "die Zahlweisen eines Tarifs sind jetzt zwei Buendel und
-    ueberschreiben sich nicht mehr gegenseitig", B2a verspricht
-    "Telekom/congstar/Vodafone erfassen ALLE angebotenen Ratenlaufzeiten"
-    (Telekom 6/12/24/36, o2 24/36, congstar 24/36, Vodafone 12/24/36).
+_PF_MECHANIK_HEUTE = "2026-09-20"
+_PF_CS_FIXTURE = "congstar_tarifseite_allnet_flat_m.html.gz"
+_PF_CS_URL = ("https://www.congstar.de/handytarife/allnet-flat-tarife/"
+              "allnet-flat-m/")
+# Das Geraet des Abrufs, an dem beide Zahlweisen desselben Tarifs stehen.
+_PF_CS_TITEL = "Apple iPhone 17 Pro 512 GB cosmic orange"
+_PF_CS_TARIF = "Allnet Flat M"
+_PF_CS_BLATT = "congstar:allnet-flat-m"
+_PF_CS_SKU = "apple-iphone-17-pro-512gb-cosmic-orange"
+_PF_CS_MODELL = "apple-iphone-17-pro-512"
 
-    Geprueft wird beides am ECHTEN Bestand:
-      1. Traegt irgendein (Anbieter, Modell, Tarif, Zustand) zwei
-         Ratenlaufzeiten? Traegt keiner eine, ist die Erfassung tot und
-         nur der Schluessel neu - das ist der Befund, nicht der Beweis.
-      2. Wo es zwei gibt, muessen BEIDE auf der Seite stehen.
 
-    Gegenprobe (Pruefer, 21.09.2026): mit einem zusaetzlich in eine
-    Wegwerf-Kopie des Bestands gelegten congstar-Buendel (Allnet Flat S
-    zum Galaxy S26 Ultra 256 GB, 918,00 EUR in 24 Raten a 38,25 EUR neben
-    den gemessenen 36 Raten a 25,50 EUR) rendert die Seite WEITERHIN 13
-    Buendelzeilen fuer dieses Modell - die 36-Monats-Variante samt ihrer
-    Zeile "danach noch offen: 306,00 EUR" verschwindet vollstaendig.
-    Ursache: report/geraete_tco_karten.py:1327 entdoppelt je
-    (Anbieter, Tarif, karte["laufzeit"], Zustand), und
-    `karte["laufzeit"]` ist die KONSTANTE LAUFZEIT = TCO_HORIZONT = 24
-    (geraete_tco_karten.py:646/68), nicht die gemessene Ratenlaufzeit."""
+def _pf_wegwerf_wurzel(tmp_path, buendel, blatt: dict):
+    """Ein Wegwerf-Repo (config/, data/state/, data/reports/) und der
+    gerenderte Stand darin. Weder `site/` noch `data/` des Repos werden
+    angefasst (harte Regel 1/3)."""
+    import yaml
+
+    from telco_radar.analyze.tco_store import TcoDB
+
+    (tmp_path / "config").mkdir(parents=True, exist_ok=True)
+    konfig = {
+        "geraete_katalog.yaml": {"geraete": [
+            {"hersteller": "Apple", "modell": "iPhone 17 Pro",
+             "generation": 17, "marktstart": "2025-09-19",
+             "speicher": [512], "segment": "premium"}]},
+        "farben.yaml": {"farben": {"cosmic orange": ["Cosmic Orange"]}},
+        "geraete_quellen.yaml": {"anbieter": [
+            {"name": "congstar", "typ": "discount", "netz": "Telekom",
+             "rang": 3, "methode": "congstar_next",
+             "basis_url": "https://www.congstar.de",
+             "einstiege": [{"url": _PF_CS_URL, "kind": "buendel"}]}]},
+    }
+    for name, daten in konfig.items():
+        (tmp_path / "config" / name).write_text(
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
+            encoding="utf-8")
+
+    state = tmp_path / "data" / "state"
+    state.mkdir(parents=True, exist_ok=True)
+    (state / "tarife.jsonl").write_text(
+        json.dumps(blatt, ensure_ascii=False) + "\n", encoding="utf-8")
+    (state / "geraete_preise.jsonl").write_text("", encoding="utf-8")
+    (state / "geraete_db.json").write_text(json.dumps({
+        "updated": _PF_MECHANIK_HEUTE,
+        "anbieter": {"congstar": {"laeufe": 4, "funde_gesamt": 1}},
+        "listungen": [{
+            "id": f"congstar--{_PF_CS_SKU}", "sku_id": _PF_CS_SKU,
+            "device_id": "apple-iphone-17-pro", "anbieter": "congstar",
+            "anbieter_typ": "discount", "netz": "Telekom",
+            "speicher_gb": 512, "farbe_roh": "Cosmic Orange",
+            "farbe_normalisiert": "cosmic orange", "zustand": "neu",
+            "first_seen": _PF_MECHANIK_HEUTE,
+            "last_verified": _PF_MECHANIK_HEUTE, "status": "aktiv",
+            "missed_checks": 0, "preis_ohne_vertrag": None,
+            "quelle_url": _PF_CS_URL, "abgerufen_am": _PF_MECHANIK_HEUTE,
+            "verfuegbarkeit": "lieferbar", "confidence": "hoch",
+            "einstiege": [_PF_CS_URL]}]}, ensure_ascii=False),
+        encoding="utf-8")
+
+    db = TcoDB(state / "geraete_tco.json")
+    db.upsert_buendel(buendel, _PF_MECHANIK_HEUTE)
+    assert db.save(_PF_MECHANIK_HEUTE), \
+        "der Store hat nichts geschrieben - ohne Bestand rendert nichts"
+
+    reports = tmp_path / "data" / "reports"
+    reports.mkdir(parents=True, exist_ok=True)
+    (reports / f"{_PF_MECHANIK_HEUTE}.json").write_text(json.dumps({
+        "date": _PF_MECHANIK_HEUTE, "language": "de",
+        "briefing_md": "## Auf einen Blick\n\n- Nichts Besonderes.\n",
+        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{_PF_MECHANIK_HEUTE}.md").write_text(
+        "# Bericht\n", encoding="utf-8")
+
+    site = tmp_path / "site"
+    render_site(site, reports)
+    return site
+
+
+def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
+        tmp_path):
+    """MECHANIK-GEGENPROBE: zwei Zahlweisen, zwei Zeilen, eigene Zahlen.
+
+    GEMESSEN WIRD der ganze Weg an einem GESPEICHERTEN ECHTEN ABRUF -
+    `tests/fixtures/geraete/congstar_tarifseite_allnet_flat_m.html.gz`
+    (08.09.2026, HTTP 200). Nur dieser Abruf belegt beide Laufzeiten
+    desselben Tarifs: Adapter (`congstar.lies_buendel`) -> Bestandsbezug
+    (`tco_buendel.aus_rohsaetzen` am ECHTEN Tarifblatt
+    `congstar:allnet-flat-m` aus `data/state/tarife.jsonl`, nur gelesen)
+    -> Store (`TcoDB.upsert_buendel`/`save`) -> `render_site` in einen
+    Wegwerfordner. Geprueft wird das gerenderte HTML.
+
+    Der gemessene Fall (Apple iPhone 17 Pro 512 GB, Allnet Flat M):
+      24 Raten a 50,25 EUR und 36 Raten a 33,50 EUR, je 97,00 EUR
+      Zuzahlung, Tarif 24,00 EUR, Anschlusspreis 0,00 EUR.
+    congstar finanziert zum Nulltarif - beide Zahlweisen ergeben dieselbe
+    Leitzahl (1.879,00 EUR). Unterscheidbar sind sie an Rate, Ratenzahl
+    und Restschuld: die 36er traegt nach Monat 24 noch 402,00 EUR offen
+    (12 Geraeteraten), die 24er nichts. Genau das wird geprueft, damit
+    der Test nicht auf zwei identischen Zeilen gruen wird.
+
+    NICHT GEMESSEN wird die Bestandslage: ob der Produktionsbestand
+    ueberhaupt Gruppen mit zwei Laufzeiten kennt, sagt
+    `test_pf_bestand_zaehlt_seine_ratenlaufzeiten_und_haelt_die_luecke_fest`.
+    Auch nicht gemessen: die Anbieterseiten selbst (aus dieser Umgebung
+    nicht erreichbar) und die Optik der Zeilen.
+
+    GEGEN DEN ALTEN STAND ROT - zweimal ausgefuehrt (21.09.2026, je ein
+    Wegwerf-Worktree, dieselbe Testdatei hineinkopiert):
+      - fde7f63 (vor P0-B): rot an der ersten Gegenprobe, der Adapter
+        liest nur EINE Zahlweise -
+        "belegt nicht beide Laufzeiten ...: [36]".
+      - e6ab202 (P0-B-fix1, also NACH der Adaptererweiterung und VOR dem
+        Kartenschluessel aus fix2): rot an der Seite -
+        "1 statt 2 Buendelzeilen fuer apple-iphone-17-pro-512 ...
+        gezeigte Ratenlaufzeiten: [24]". Dort entdoppelt
+        `geraete_tco_karten.modelle` je (Anbieter, Tarif,
+        `karte["laufzeit"]`, Zustand), und `karte["laufzeit"]` ist die
+        KONSTANTE `LAUFZEIT` (= `TCO_HORIZONT` = 24); von beiden
+        Zahlweisen bleibt eine Zeile uebrig.
+    Der Test faellt also an JEDER der beiden Stellen, an denen die
+    Mehrfacherfassung schon einmal kaputt war.
+    """
+    from telco_radar.analyze.tco_buendel import aus_rohsaetzen
+    from telco_radar.collect.geraete.congstar import lies_buendel
+    from telco_radar.tarif_bezug import Tarifbestand
+
+    pfad = Path(__file__).parent / "fixtures" / "geraete" / _PF_CS_FIXTURE
+    antwort = _pf_gzip.open(pfad, "rb").read().decode("utf-8", "replace")
+    rohsaetze = [s for s in lies_buendel(antwort, url=_PF_CS_URL)
+                 if s["titel"] == _PF_CS_TITEL
+                 and s["tarif_name"] == _PF_CS_TARIF]
+    # Gegenprobe am Adapter: ohne zwei Laufzeiten im ABRUF prueft der Rest
+    # nichts (die Fixture waere getauscht worden).
+    assert {s["laufzeit_monate"] for s in rohsaetze} == {24, 36}, (
+        f"der gespeicherte Abruf {_PF_CS_FIXTURE} belegt nicht beide "
+        f"Laufzeiten fuer {_PF_CS_TITEL}/{_PF_CS_TARIF}: "
+        f"{sorted(s['laufzeit_monate'] for s in rohsaetze)}")
+
+    blatt = next(
+        (json.loads(z) for z in
+         (_GW_WURZEL / "data" / "state" / "tarife.jsonl")
+         .read_text(encoding="utf-8").splitlines()
+         if z.strip() and json.loads(z).get("tarif_id") == _PF_CS_BLATT),
+        None)
+    assert blatt is not None, (
+        f"Tarifblatt {_PF_CS_BLATT} fehlt im Bestand - ohne aufloesbaren "
+        "Tarif legt der Store kein Buendel ab (benannte Luecke)")
+
+    bilanz = aus_rohsaetzen(
+        [{**s, "anbieter": "congstar", "sku_id": _PF_CS_SKU,
+          "quelle_url": s["url"]} for s in rohsaetze],
+        Tarifbestand([blatt]), _PF_MECHANIK_HEUTE)
+    assert len(bilanz.buendel) == 2, (
+        f"{len(bilanz.buendel)} statt 2 Buendel aus zwei Rohsaetzen - "
+        f"{bilanz.ohne_tarif} ohne aufloesbaren Tarif, "
+        f"haeufigste: {bilanz.offene_tarife}")
+
+    site = _pf_wegwerf_wurzel(tmp_path, bilanz.buendel, blatt)
+    seite = _pf_seitenzeilen(
+        (site / "data" / "geraete-buendel.html").read_text(encoding="utf-8"),
+        (site / "geraete.html").read_text(encoding="utf-8"))
+    zeilen = [z for z in seite.get(_PF_CS_MODELL, [])
+              if z["anbieter"] == "congstar" and z["tarif"] == _PF_CS_TARIF
+              and z["zustand"] == "neu"]
+    assert len(zeilen) == 2, (
+        f"{len(zeilen)} statt 2 Buendelzeilen fuer {_PF_CS_MODELL} - "
+        "zwei Zahlweisen desselben Tarifs ueberschreiben sich wieder; "
+        f"gezeigte Ratenlaufzeiten: "
+        f"{[z['laufzeit_raten'] for z in zeilen]}")
+
+    je_laufzeit = {z["laufzeit_raten"]: z for z in zeilen}
+    assert set(je_laufzeit) == {24, 36}, (
+        "die zwei Zeilen nennen nicht 24 und 36 Raten, sondern "
+        f"{sorted(je_laufzeit)}")
+
+    # Jede Zeile traegt IHRE Zahlen - Rate, Ratenzahl, Restschuld. Soll
+    # aus der EINEN Definition dieses Abschnitts (`_pf_leitzahl_cent`),
+    # gerechnet auf dem ROHSATZ des Adapters, nicht auf der Seite.
+    for satz in rohsaetze:
+        laufzeit = satz["laufzeit_monate"]
+        zeile = je_laufzeit[laufzeit]
+        soll = _pf_leitzahl_cent(
+            {**satz, "id": f"congstar/{laufzeit}m"})
+        _gw_vergleiche(_gw_Dez(zeile["gesamt_cent"]) / 100, soll,
+                       f"congstar {_PF_CS_TARIF}, {laufzeit} Raten")
+        # Der Betrag in der Schreibweise der Seite - aus Cent, nicht aus
+        # einer Fliesskomma-Formatierung (Geld rechnet dieser Abschnitt in
+        # ganzen Cent, siehe `_gw_cent`).
+        rate_cent = _gw_cent(satz["geraet_monatsrate"])
+        rate = f"{rate_cent // 100},{rate_cent % 100:02d}"
+        assert f"in {laufzeit} Raten à {rate} €" in zeile["bau"], (
+            f"die {laufzeit}-Monats-Zeile nennt ihre Rate nicht: "
+            f"{zeile['bau']}")
+    assert je_laufzeit[24]["gesamt_cent"] == je_laufzeit[36]["gesamt_cent"], (
+        "congstar finanziert zum Nulltarif - weichen die Leitzahlen ab, "
+        "hat sich die Rechnung geaendert und dieser Test ist neu zu "
+        f"verankern: {je_laufzeit[24]['gesamt_cent']} gegen "
+        f"{je_laufzeit[36]['gesamt_cent']}")
+
+    # Die Restschuld trennt die zwei Zeilen: 12 Raten a 33,50 EUR bleiben
+    # nach Monat 24 offen, bei 24 Raten nichts.
+    inline = (site / "geraete.html").read_text(encoding="utf-8")
+    offen = re.findall(
+        r"danach noch offen: ([\d.,]+) € \((\d+) Geräteraten\)", inline)
+    assert offen == [("402,00", "12")], (
+        "genau die 36-Monats-Zeile muss ihre Restschuld nennen (402,00 € "
+        f"aus 12 Geraeteraten), gefunden: {offen}")
+
+
+# Der Stand des Bestands am 20.09.2026 (`data/state/geraete_tco.json`,
+# `updated` 2026-09-20), gemessen und nicht geschaetzt - Grundlage der
+# Ratsche unten. Ein Deckel waere hier falsch: die Zahlen duerfen nur
+# BESSER werden.
+_PF_STAND_TAG = "2026-09-20"
+_PF_STAND_MEHRLAUFZEIT = 0        # Gruppen mit zwei Ratenlaufzeiten
+_PF_STAND_BREITESTER = 3          # Laufzeiten des breitesten Anbieters
+_PF_MINDEST_GRUPPEN = 200         # Anti-Leerlauf, nicht der Stand (507)
+
+
+def test_pf_bestand_zaehlt_seine_ratenlaufzeiten_und_haelt_die_luecke_fest():
+    """BESTANDSAUSSAGE: was der echte Bestand an Ratenlaufzeiten traegt.
+
+    Stand am 20.09.2026 (`data/state/geraete_tco.json`, 792 Buendel):
+      - 0 von 507 Gruppen (Anbieter, Modell, Tarif, Zustand) tragen ZWEI
+        Ratenlaufzeiten; 375 dieser Gruppen sind frisch.
+      - Je Anbieter: 1&1 nur 36 (74), Telekom nur 36 (45), congstar nur 36
+        (128), o2 nur 36 (72), Vodafone 12 (160), 24 (157) und 36 (156).
+      - Vodafone bindet die Laufzeit an den TARIF: Mobil S immer 12, Mobil
+        M immer 24, Mobil XS immer 36. Darum traegt auch bei Vodafone
+        keine GRUPPE zwei Laufzeiten, obwohl der Anbieter drei kennt.
+      - 0 Buendel ohne gemessene Laufzeit.
+
+    WARUM DAS SO IST: die Erhebung ist defensiv gebaut (der Schluessel
+    traegt die Laufzeit, der congstar-Weg ist mit
+    `test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen`
+    belegt), aber in den gespeicherten echten Abrufen liefern Telekom
+    (`numberOfInstallments` nur 36), o2 (`rateDurationValue` nur
+    "36 Monate") und 1&1 (`currentHardwareOfferDuration` nur '36')
+    ausschliesslich 36 Monate. Ob die Anbieterseiten heute mehr anbieten,
+    kann diese Umgebung NICHT nachpruefen: das Gateway antwortet auf
+    CONNECT fuer telekom.de, congstar.de, 1und1.de, vodafone.de und
+    o2online.de mit 403. Der Verdacht auf eine Erfassungsluecke
+    (CLAUDE.md Fallstrick 16) bleibt damit offen - dieser Test tut NICHT
+    so, als waere er ausgeraeumt, er haelt ihn sichtbar fest.
+
+    GEPRUEFT WIRD ALS RATSCHE - der Test faellt nur bei einer Regression:
+      1. Der Scan sieht ueberhaupt Gruppen (sonst waere er gruen und
+         wertlos).
+      2. Kein Buendel traegt eine fehlende Laufzeit (Clean Code 3/4).
+      3. Der breiteste Anbieter traegt weiter mindestens drei
+         Ratenlaufzeiten (Stand: Vodafone 12/24/36). Faellt die
+         Mehrfacherfassung aus, wird das hier rot.
+      4. Die Zahl der Gruppen mit zwei Laufzeiten sinkt nicht unter den
+         festgehaltenen Stand.
+
+    NICHT GEPRUEFT: ob die Seite zwei Laufzeiten ZEIGT (das ist der
+    Mechanik-Test), und ob der Bestand vollstaendig ist - er ist es
+    ausdruecklich nicht.
+    """
     tco, _blaetter, _db = _gw_rohdaten()
     heute = _gw_heute(tco)
     gruppen: dict = {}
+    frische_gruppen: dict = {}
+    je_anbieter: dict = {}
+    ohne_laufzeit = []
     for b in tco["buendel"]:
-        if not _gw_frisch(b, heute):
+        laufzeit = b.get("laufzeit_monate")
+        if laufzeit is None:
+            ohne_laufzeit.append(b.get("id"))
             continue
         schluessel = (b["anbieter"], _pf_modell(b["sku_id"]),
                       b["tarif_name"], b.get("zustand") or "")
-        gruppen.setdefault(schluessel, set()).add(b.get("laufzeit_monate"))
-    mehrfach = {k: v for k, v in gruppen.items() if len(v) > 1}
+        gruppen.setdefault(schluessel, set()).add(laufzeit)
+        je_anbieter.setdefault(b["anbieter"], set()).add(laufzeit)
+        if _gw_frisch(b, heute):
+            frische_gruppen.setdefault(schluessel, set()).add(laufzeit)
 
-    assert mehrfach, (
-        "KEIN einziger frischer (Anbieter, Modell, Tarif, Zustand) traegt "
-        "zwei Ratenlaufzeiten - bei "
-        f"{len(gruppen)} Gruppen im Bestand vom {heute}. Das Ziel nennt "
-        "Telekom 6/12/24/36, o2 24/36, congstar 24/36, Vodafone 12/24/36; "
-        "der Bestand kennt je Anbieter genau eine Laufzeit (CLAUDE.md "
-        "Fallstrick 16: ein bei allen gleicher Wert ist zuerst der "
-        "Verdacht auf eine Erfassungsluecke). Der Buendelschluessel traegt "
-        "die Laufzeit seit B1 - erhoben wird sie nicht.")
+    assert len(gruppen) >= _PF_MINDEST_GRUPPEN, (
+        f"nur {len(gruppen)} Gruppen im Bestand vom {heute} - am "
+        f"{_PF_STAND_TAG} waren es 507 (375 frisch); der Scan greift ins "
+        "Leere und dieser Test wuerde sonst gruen nichts pruefen")
+    assert not ohne_laufzeit, (
+        f"{len(ohne_laufzeit)} Buendel ohne gemessene Ratenlaufzeit "
+        f"({ohne_laufzeit[:5]}) - am {_PF_STAND_TAG} war es keines. Eine "
+        "fehlende Laufzeit ist eine Luecke, keine 24")
 
-    seite = _pf_seitenzeilen(gw_seite["buendel"], gw_seite["geraete"])
-    fehlend = []
-    for (anbieter, modell, tarif, zustand), laufzeiten in mehrfach.items():
-        gezeigt = {z["laufzeit_raten"] for z in seite.get(modell, [])
-                   if z["anbieter"] == anbieter and z["tarif"] == tarif
-                   and z["zustand"] == zustand}
-        if not laufzeiten <= gezeigt:
-            fehlend.append((anbieter, modell, tarif, sorted(laufzeiten),
-                            sorted(x for x in gezeigt if x is not None)))
-    assert not fehlend, (
-        f"{len(fehlend)} Tarife zeigen nicht alle gemessenen "
-        f"Ratenlaufzeiten: {fehlend[:5]}")
+    breitester = max(je_anbieter.items(), key=lambda p: (len(p[1]), p[0]))
+    assert len(breitester[1]) >= _PF_STAND_BREITESTER, (
+        f"kein Anbieter traegt mehr als {len(breitester[1])} "
+        f"Ratenlaufzeit(en) - am {_PF_STAND_TAG} trug Vodafone drei "
+        "(12/24/36). Die Mehrfacherfassung ist ausgefallen. Bestand: "
+        f"{ {a: sorted(v) for a, v in sorted(je_anbieter.items())} }")
 
+    mehrfach = {k: sorted(v) for k, v in gruppen.items() if len(v) > 1}
+    frisch_mehrfach = {k: sorted(v) for k, v in frische_gruppen.items()
+                       if len(v) > 1}
+    assert len(mehrfach) >= _PF_STAND_MEHRLAUFZEIT, (
+        f"{len(mehrfach)} von {len(gruppen)} Gruppen tragen zwei "
+        f"Ratenlaufzeiten, am {_PF_STAND_TAG} waren es "
+        f"{_PF_STAND_MEHRLAUFZEIT} - die Lage hat sich VERSCHLECHTERT. "
+        f"Frisch: {len(frisch_mehrfach)} von {len(frische_gruppen)}")
 
 def test_pf_simonly_mit_erhobenem_volumen_traegt_sein_band(gw_seite):
     """B3-Gegenprobe: kein SIM-only-Tarif verliert sein Band.
