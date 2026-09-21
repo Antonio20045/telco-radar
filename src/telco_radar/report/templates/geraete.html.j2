@@ -329,6 +329,13 @@
           class="gr-zr-k-leer gr-zr-k-alt"
           title="kein aktueller Bündel-Stand">{{
           s.alt_text }}</small></span>
+        {# P0-B-z1: der fremde Zeitraum ist sein EIGENER Zustand
+           (`fremd_text`) - das Angebot ist von heute, nur seine Laufzeit
+           ist eine andere. Der Titel des alten Stands wäre hier falsch. #}
+        {%- elif s.fremd_text %}<span class="gr-zr-k-preis"><small
+          class="gr-zr-k-leer gr-zr-k-alt gr-zr-k-fremd"
+          title="Bündel-Angebot nur über eine andere Laufzeit">{{
+          s.fremd_text }}</small></span>
         {%- else %}<span class="gr-zr-k-preis"><small class="gr-zr-k-leer"
           title="kein Bündel-Angebot in diesem Band">—</small></span>{%- endif %}
         {%- if s.delta_text %}<span class="gr-zr-k-delta{% if
