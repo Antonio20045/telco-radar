@@ -263,6 +263,33 @@ def test_je_id_aktuell_ohne_zweite_lesart_bleibt_der_satz_selbst():
     assert aktuell is satz
 
 
+def test_je_id_aktuell_ist_auch_unter_dem_eigenen_schluessel_erreichbar():
+    """FIX4-Regression (B3, 21.09.2026): die Live-Shop-ID selbst muss auch treffen.
+
+    `analyze/tarif_referenzen.py` fuehrt die `tarif_id` einer SIM-only-
+    Referenz genau so weiter, wie der Bestand sie schreibt - bei den fuenf
+    betroffenen Referenzen also MIT `#live_shop`-Zusatz, nicht bar. Vor
+    diesem Fix stand `je_id_aktuell` ausschliesslich unter dem baren
+    Schluessel; ein Nachschlag mit der eigenen ID der Referenz ging ins
+    Leere, obwohl `je_id_aktuell` fuer denselben Vertrag laengst die
+    Live-Shop-Lesart trug."""
+    pib = _satz("Telekom", "MagentaMobil S", 39.95, datenvolumen_gb=6.0,
+                versionsstand="21.11.2021", abgerufen_am="2026-09-15")
+    kachel = _satz("Telekom", "MagentaMobil S", 39.95, datenvolumen_gb=30.0,
+                   preistyp="live_shop", abgerufen_am="2026-09-15")
+    kachel["tarif_id"] += "#live_shop"
+
+    bestand = Tarifbestand([pib, kachel])
+    bare = tarif_id("Telekom", "MagentaMobil S")
+    eigen = f"{bare}#live_shop"
+
+    # Dieselbe gewinnende Lesart, ob unter der baren oder der eigenen ID
+    # nachgeschlagen - keine zweite Wahrheit, nur ein zweiter Zugang.
+    assert bestand.je_id_aktuell[eigen] is bestand.je_id_aktuell[bare]
+    assert bestand.je_id_aktuell[eigen]["datenvolumen_gb"] == 30.0
+    assert bestand.je_id_aktuell[eigen]["preistyp"] == "live_shop"
+
+
 def test_je_id_aktuell_am_echten_bestand_telekom_s_m_l():
     """Die Gegenprobe gegen `data/state/tarife.jsonl`: vorher/nachher.
 

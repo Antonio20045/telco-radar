@@ -165,12 +165,22 @@ class Tarifbestand:
                     wird geloescht, CLAUDE.md § 2 gilt sinngemaess auch fuer
                     dieses In-Memory-Abbild).
     `je_id_aktuell` je Vertrag (`tarif_model.zeitreihen_basis`) NUR der Satz,
-                    der nach `_aktuelle_lesart` gerade gilt - unter dem
-                    BARE-Schluessel, unter dem ein Buendel seinen Tarif
-                    nachschlaegt (`tarif_id()` traegt nie einen
-                    `#live_shop`-Zusatz). Wer die aktuelle Aussage ueber
-                    einen Tarif braucht (Laufzeit, Datenvolumen, Phasen),
-                    liest `je_id_aktuell` - nicht `je_id`.
+                    der nach `_aktuelle_lesart` gerade gilt - unter ZWEI
+                    Schluesseln erreichbar (B3-Regression, FIX4,
+                    21.09.2026): dem BAREN, unter dem ein Buendel seinen
+                    Tarif nachschlaegt (`tarif_id()` traegt nie einen
+                    `#live_shop`-Zusatz), UND dem eigenen `tarif_id`, den
+                    der gewinnende Satz selbst traegt (z. B.
+                    `telekom:magentamobil-s#live_shop`) - eine SIM-only-
+                    Referenz aus `analyze/tarif_referenzen.py` fuehrt ihre
+                    `tarif_id` naemlich genau so weiter, wie der Bestand
+                    sie schreibt, nicht in ihrer baren Form. Beide
+                    Schluessel zeigen auf DASSELBE Satz-Objekt - es bleibt
+                    eine Auswahl der aktuellen Lesart, nur zweifach
+                    adressiert; keine zweite Wahrheit. Wer die aktuelle
+                    Aussage ueber einen Tarif braucht (Laufzeit,
+                    Datenvolumen, Phasen), liest `je_id_aktuell` - nicht
+                    `je_id`.
     """
 
     def __init__(self, saetze: list[dict]) -> None:
@@ -184,6 +194,14 @@ class Tarifbestand:
             kern = zeitreihen_basis(tid)
             self.je_id_aktuell[kern] = _aktuelle_lesart(
                 self.je_id_aktuell.get(kern), satz)
+        # Zweite Passe (FIX4): dieselbe gewaehlte Lesart je Vertrag auch
+        # unter JEDER Zeitreihen-ID erreichbar machen, die zu ihrem baren
+        # Schluessel gehoert - nicht nur unter dem baren selbst. Ohne sie
+        # ging jeder Nachschlag mit einer `#live_shop`-tarif_id (die fuenf
+        # SIM-only-Referenzen aus B3) ins Leere, obwohl `je_id_aktuell`
+        # fuer denselben Vertrag laengst die richtige Lesart trug.
+        for tid in self.je_id:
+            self.je_id_aktuell[tid] = self.je_id_aktuell[zeitreihen_basis(tid)]
 
     @classmethod
     def aus_datei(cls, pfad: Path) -> "Tarifbestand":
