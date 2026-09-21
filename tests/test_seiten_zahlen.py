@@ -4300,3 +4300,186 @@ def test_pr_eine_verschwundene_abweichung_traegt_ihren_grund(gw_seite):
     assert not stumm, (
         f"{len(stumm)} Modellzeilen mit Leitzahl, aber ohne Abweichung UND "
         f"ohne Grund in der Statusspalte: {stumm[:6]}")
+
+
+# ==========================================================================
+# PRUEFER P0-B (21.09.2026) - die zweite, unabhaengige Rechnung
+# --------------------------------------------------------------------------
+# Diese drei Tests stammen vom Pruefer, nicht vom Bauer. Sie importieren
+# `telco_radar.tco_model` NICHT: die Leitzahl wird hier aus den Rohfeldern
+# von `data/state/geraete_tco.json` mit `decimal` neu gerechnet, nach der
+# Definition aus CLAUDE.md ("Kosten über 24 Monate = Anzahlung + 24 Monate
+# Tarif + alle Geraeteraten inklusive Restschuld nach Monat 24 +
+# Anschlusspreis"; bei einem zusammengelegten Monatsbetrag ueber die ganze
+# eigene Laufzeit). Rundung: HALF_UP auf zwei Stellen, einmal am Ende -
+# dieselbe Regel, die die Seite fuer Euro-Betraege verwendet.
+# ==========================================================================
+
+_PZ_TOLERANZ = _gw_Dez("0.01")     # ein Cent je Monat auf dem O/Monat
+
+
+def _pz_soll(b: dict) -> tuple:
+    """(Leitzahl, Zeitraum) aus den ROHFELDERN - oder (None, None).
+
+    Zwei Formen, genau wie die Anbieter sie ausweisen:
+      * zusammengelegter Monatsbetrag (`buendel_monatlich`, 1&1): Tarif und
+        Geraet in EINER Rate, der Zeitraum ist die eigene Laufzeit.
+      * getrennt (`tarif_monatlich` + `geraet_monatsrate`): 24 Tarifmonate,
+        dazu ALLE Geraeteraten der eigenen Laufzeit - der Zeitraum dieser
+        Zahl ist 24.
+    Ohne gemessene Laufzeit gibt es keine Summe und keinen Zeitraum (None,
+    nie 0, nie geraten).
+    """
+    def dez(wert):
+        return None if wert is None else _gw_Dez(str(wert))
+
+    zu = dez(b.get("geraet_zuzahlung")) or _gw_Dez("0")
+    anschluss = dez(b.get("anschlusspreis")) or _gw_Dez("0")
+    laufzeit = b.get("laufzeit_monate")
+    zusammen = dez(b.get("buendel_monatlich"))
+    tarif = dez(b.get("tarif_monatlich"))
+    rate = dez(b.get("geraet_monatsrate"))
+    if zusammen is not None:
+        if laufzeit is None:
+            return None, None
+        summe = zu + zusammen * laufzeit + anschluss
+        return summe.quantize(_gw_Dez("0.01"), rounding=_gw_HUP), laufzeit
+    if tarif is None:
+        return None, None
+    summe = zu + tarif * _GW_HORIZONT + anschluss
+    if rate is not None:
+        if laufzeit is None:
+            return None, None
+        summe = summe + rate * laufzeit
+    return summe.quantize(_gw_Dez("0.01"), rounding=_gw_HUP), _GW_HORIZONT
+
+
+def _pz_zeilen(html: str) -> list[dict]:
+    """Die Buendelzeilen eines Dokuments - Attribute und Etikett je Zeile."""
+    zeilen = []
+    for block in html.split('<details class="gr-bnd')[1:]:
+        kopf = block[:block.find("</summary>")]
+
+        def feld(muster, quelle=kopf):
+            treffer = re.search(muster, quelle, re.S)
+            return treffer.group(1) if treffer else None
+
+        zeilen.append({
+            "anbieter": (feld(r'gr-bnd-name">([^<]*)<') or "")
+            .replace("&amp;", "&").strip(),
+            "gesamt": feld(r'data-gesamt="([^"]*)"'),
+            "schnitt": feld(r'data-schnitt="([^"]*)"'),
+            "laufzeit_attr": feld(r'data-laufzeit="([^"]*)"'),
+            "etikett": feld(r"Kosten über (\d+) Monate"),
+        })
+    return zeilen
+
+
+def test_pruefer_jede_leitzahl_der_seite_gegen_eine_eigene_rechnung(gw_seite):
+    """Leitzahl, Zeitraum und O/Monat JEDER Buendelzeile, neu gerechnet.
+
+    Gegenprobe gegen einen Test, dessen Lookup ins Leere laeuft: jede
+    gerenderte Zeile MUSS im unabhaengig gerechneten Bestand einen
+    Betragspartner finden (`ohne_partner` ist ein Fehlschlag, kein
+    Ueberspringen), es muessen mehr als 400 Zeilen geprueft werden, und
+    beide Zeitraeume des Bestands (24 UND 36) muessen vorkommen - sonst
+    prueft der Test die interessante Haelfte nicht.
+    """
+    stand = json.loads((_GW_WURZEL / "data" / "state" / "geraete_tco.json")
+                       .read_text(encoding="utf-8"))
+    # (Anbieter, Leitzahl) -> die Zeitraeume, die diese Summe tragen kann.
+    soll: dict[tuple, set] = {}
+    for b in stand["buendel"]:
+        betrag, monate = _pz_soll(b)
+        if betrag is None:
+            continue
+        soll.setdefault((b["anbieter"], betrag), set()).add(monate)
+    assert len(soll) > 200, \
+        f"nur {len(soll)} eigene Leitzahlen gerechnet - Rohdaten leer?"
+
+    zeilen = (_pz_zeilen(gw_seite["buendel"])
+              + _pz_zeilen(gw_seite["geraete"]))
+    geprueft = 0
+    zeitraeume: set = set()
+    ohne_partner, falsches_etikett, falscher_schnitt = [], [], []
+    for z in zeilen:
+        if not z["gesamt"] or not z["etikett"]:
+            continue
+        betrag = _gw_Dez(z["gesamt"]).quantize(_gw_Dez("0.01"))
+        moeglich = soll.get((z["anbieter"], betrag))
+        if not moeglich:
+            ohne_partner.append((z["anbieter"], z["gesamt"]))
+            continue
+        geprueft += 1
+        monate = int(z["etikett"])
+        zeitraeume.add(monate)
+        if monate not in moeglich:
+            falsches_etikett.append((z["anbieter"], str(betrag), monate,
+                                     sorted(moeglich)))
+        schnitt = _gw_Dez(z["schnitt"] or "0")
+        if abs(schnitt * monate - betrag) > _PZ_TOLERANZ * monate:
+            falscher_schnitt.append((z["anbieter"], str(betrag), monate,
+                                     z["schnitt"]))
+    assert not ohne_partner, (
+        f"{len(ohne_partner)} Buendelzeilen mit einer Summe, die die eigene "
+        f"Rechnung nicht kennt: {ohne_partner[:6]}")
+    assert geprueft > 400, \
+        f"nur {geprueft} Zeilen geprueft - der Lookup greift nicht"
+    assert {24, 36} <= zeitraeume, \
+        f"nur die Zeitraeume {sorted(zeitraeume)} geprueft, nicht 24 UND 36"
+    assert not falsches_etikett, (
+        "Etikett nennt einen Zeitraum, den die Summe nicht tragen kann: "
+        f"{falsches_etikett[:6]}")
+    assert not falscher_schnitt, (
+        "O/Monat x Etikett-Zeitraum != Leitzahl: "
+        f"{falscher_schnitt[:6]}")
+
+
+def test_pruefer_kein_spaltenkopf_behauptet_24_ueber_einer_36_monats_zahl(
+        gw_seite):
+    """Der Spaltenkopf IST eine Aussage ueber jede Zahl unter ihm.
+
+    Geprueft wird die Buendeltafel des Startmodells: steht unter dem Kopf
+    "Kosten über 24 Monate" eine Zeile mit dem Etikett "Kosten über 36
+    Monate", widersprechen sich Kopf und Zelle in derselben Spalte - und
+    der Sortierknopf dieses Kopfes (`data-bsort="tco"`, app.js liest
+    `data-gesamt`) stellt beide Summen in EINEN Rang.
+    """
+    seite = gw_seite["geraete"]
+    koepfe = re.findall(r'data-bsort="tco"[^>]*aria-label=\s*"([^"]*)"',
+                        seite)
+    assert koepfe, "Sortierkopf der TCO-Spalte nicht gefunden - Lookup leer"
+    fremde = sorted({int(z["etikett"]) for z in _pz_zeilen(seite)
+                     if z["etikett"] and int(z["etikett"]) != _GW_HORIZONT})
+    behauptet = sorted({int(m) for kopf in koepfe
+                        for m in re.findall(r"(\d+) Monate", kopf)})
+    assert not (fremde and behauptet == [_GW_HORIZONT]), (
+        f"Spaltenkopf {koepfe[0]!r} behauptet {behauptet} Monate, in "
+        f"derselben Spalte stehen Zeilen mit {fremde} Monaten - und "
+        "derselbe Knopf sortiert sie gemeinsam nach data-gesamt")
+
+
+def test_pruefer_der_csv_kopf_widerspricht_nicht_seiner_zeitraum_spalte(
+        gw_seite):
+    """`geraete-tco.csv`: Kopf und Zeitraum-Spalte derselben Zeile.
+
+    P0-B-h4 hat die Spalte "Leitzahl-Zeitraum Monate" ergaenzt, den Kopf
+    der Wertspalte aber stehen gelassen. Eine Zeile, deren Zeitraum 36
+    sagt, traegt ihre Summe damit unter "Kosten über 24 Monate EUR" -
+    zwei Zahlen zum selben Zeitraum in derselben Zeile.
+    """
+    zeilen = list(_gw_csv.DictReader(
+        gw_seite["csv"].read_text(encoding="utf-8-sig").splitlines(),
+        delimiter=";"))
+    assert zeilen, "geraete-tco.csv ist leer - Lookup greift nicht"
+    kopf = next(k for k in zeilen[0] if k.startswith("Kosten über"))
+    kopf_monate = int(re.search(r"(\d+)", kopf).group(1))
+    fremd = [(z["Anbieter"], z["Leitzahl-Zeitraum Monate"], z[kopf])
+             for z in zeilen
+             if (z["Leitzahl-Zeitraum Monate"] or "").strip()
+             and int(z["Leitzahl-Zeitraum Monate"]) != kopf_monate
+             and (z[kopf] or "").strip()]
+    assert not fremd, (
+        f"{len(fremd)} Zeilen tragen ihre Summe unter dem Kopf {kopf!r}, "
+        f"obwohl ihre eigene Zeitraum-Spalte einen anderen Wert nennt: "
+        f"{fremd[:4]}")
