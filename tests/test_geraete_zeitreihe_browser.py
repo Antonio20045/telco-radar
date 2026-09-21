@@ -27,6 +27,7 @@ import pytest
 
 from telco_radar.report.html import render_site
 
+from browser_konsole import konsole_sammeln
 from test_geraete_zeitreihe_ansicht import HEUTE, _baue
 
 
@@ -87,15 +88,12 @@ def _browser_seite(tmp_path_factory):
 @contextlib.contextmanager
 def _ansicht(_browser_seite, breite=1440, hoehe=900, touch=False):
     browser, basis = _browser_seite
-    fehler = []
     # touch=True (E2-F3): erst ein Kontext mit has_touch kann tap() senden -
     # die Mobil-Tests gehen den echten Fingerweg, nicht den Mausklick.
     context = browser.new_context(viewport={"width": breite, "height": hoehe},
                                   has_touch=touch)
     s = context.new_page()
-    s.on("console", lambda m: fehler.append(m.text) if m.type == "error"
-         else None)
-    s.on("pageerror", lambda e: fehler.append(str(e)))
+    fehler = konsole_sammeln(s)
     s.goto(f"{basis}/geraete.html", wait_until="load")
     s.wait_for_timeout(250)
     try:

@@ -24,6 +24,7 @@ import threading
 
 import pytest
 
+from browser_konsole import konsole_sammeln
 from test_geraete_zeitreihe_browser import _baue_site
 
 
@@ -128,9 +129,7 @@ def test_der_zeilenklick_oeffnet_die_detailzeile(paar):
 def test_alle_reiter_bleiben_ohne_js_fehler(paar):
     """Der Radar-Reiter bringt neuen DOM und neuen Handler - kein
     Konsolenfehler beim Öffnen, Springen und Zurückkehren."""
-    fehler = []
-    paar.on("console", lambda m: fehler.append(m.text)
-            if m.type == "error" else None)
+    fehler = konsole_sammeln(paar)
     paar.goto(paar.url.split("#")[0].split("?")[0], wait_until="load")
     _radar_zeigen(paar)
     paar.click('.gr-reiter button[data-tafel="tafel-tco"]')

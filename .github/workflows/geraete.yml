@@ -167,9 +167,17 @@ jobs:
           exit 1
 
       - name: Render site
-        # `continue-on-error`, weil der Bestand oben schon sicher ist: ein
-        # Fehler hier kostet einen Seitenaufbau, keinen Messtag.
-        continue-on-error: true
+        # OHNE `continue-on-error` (P0-B, 21.09.2026). Bis hierher hiess die
+        # Begruendung: der Bestand ist oben schon committet, ein Fehler
+        # kostet einen Seitenaufbau, keinen Messtag. Das erste stimmt weiter
+        # - "Commit state" steht davor, der Messtag ist gesichert. Das
+        # zweite war der Fehler: ein gescheitertes `render_site()` lief
+        # weiter in "Commit site" und in den Render-Hook, und der Lauf
+        # endete GRUEN. Die Seite blieb auf dem Stand des Vortags, ohne dass
+        # es irgendwo stand - dieselbe Klasse wie der Navigationseintrag vom
+        # 11.08.: gebaut, geprueft, committet und fuer jeden Leser nicht da.
+        # Ein Renderfehler ist ab jetzt ein roter Lauf. Er kostet nur noch
+        # den Seitenaufbau, aber er kostet ihn SICHTBAR.
         env:
           PYTHONPATH: src
         # MIT `cfg`, nie ohne: `render_site(site, reports)` ohne den dritten
@@ -187,7 +195,13 @@ jobs:
           "
 
       - name: Commit site
-        continue-on-error: true
+        # Ebenfalls ohne `continue-on-error` (P0-B, 21.09.2026). Der
+        # Aufgeben-Weg dieses Schritts endet selbst mit exit 0 und der
+        # Zeile "Seite konnte nicht gepusht werden" - ein verlorenes Rennen
+        # gegen einen anderen Lauf bleibt also weiterhin gruen, und das ist
+        # richtig so. Was `continue-on-error` zusaetzlich verschluckt hat,
+        # ist alles UNERWARTETE: ein fehlgeschlagenes `git add`, ein
+        # kaputter Index, ein Fehler im Neuaufbau. Genau das soll auffallen.
         run: |
           git config user.name "telco-radar-bot"
           git config user.email "actions@users.noreply.github.com"
@@ -215,7 +229,7 @@ jobs:
           from telco_radar.report.html import render_site
           root = Path('.')
           render_site(root / 'site', root / 'data' / 'reports', load_config(root))
-          " || exit 0
+          " || { echo "Neuaufbau nach dem Zuruecksetzen gescheitert"; exit 1; }
             git add site
             git diff --cached --quiet && exit 0
             git commit -m "geraeteradar: Seite neu gebaut $(date -u +%Y-%m-%d)"

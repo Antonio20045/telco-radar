@@ -105,3 +105,77 @@ def test_der_nachtlauf_committet_alle_vier_zustandsdateien():
     for datei in ("geraete_db.json", "geraete_preise.jsonl",
                   "geraete_tco.json", "geraete_tco_historie.jsonl"):
         assert datei in block, datei
+
+
+# ==========================================================================
+# P0-B (21.09.2026): EIN GESCHEITERTER SEITENAUFBAU IST EIN ROTER LAUF
+# ==========================================================================
+#
+# Bis zum 21.09.2026 trugen "Render site" und "Commit site"
+# `continue-on-error: true`. Die Begruendung stand daneben und stimmte zur
+# Haelfte: der Bestand ist oben schon committet, ein Fehler hier kostet
+# keinen Messtag. Die andere Haelfte war der Fehler - ein gescheitertes
+# `render_site()` lief weiter in "Commit site" und in den Render-Hook, und
+# der Lauf endete GRUEN. Gemessen am 21.09.2026: fuenfzig Laeufe von
+# geraete.yml, alle "success", darunter sechs Tage ohne eine einzige
+# Telekom-Listung.
+#
+# Diese Tests halten die Umkehrung fest. Sie sind Texttests auf dem
+# Workflow, wie ihre Nachbarn oben - ein Workflow laeuft in der Suite
+# nicht, also wird das Einzige geprueft, was hier pruefbar ist: dass die
+# Griffe, die den Lauf still machen, nicht zurueckkommen.
+
+def _geraete_workflow() -> dict:
+    return yaml.safe_load((Path(__file__).resolve().parents[1]
+                           / ".github" / "workflows" / "geraete.yml")
+                          .read_text(encoding="utf-8"))
+
+
+def _schritt(name: str) -> dict:
+    schritte = _geraete_workflow()["jobs"]["geraete"]["steps"]
+    treffer = [s for s in schritte if s.get("name") == name]
+    assert len(treffer) == 1, f"Schritt {name!r} nicht genau einmal gefunden"
+    return treffer[0]
+
+
+def test_seitenaufbau_und_seitencommit_schlucken_keinen_fehler():
+    """Ein Renderfehler faellt auf, statt einen gruenen Lauf zu melden."""
+    for name in ("Commit state", "Render site", "Commit site"):
+        assert _schritt(name).get("continue-on-error") in (None, False), name
+
+
+def test_der_render_hook_darf_weiter_scheitern():
+    """Die Gegenprobe, damit der Test oben nicht einfach "nirgendwo
+    continue-on-error" behauptet: der Hook-Aufruf ist die EINE Stelle, an
+    der ein Fehlschlag folgenlos bleiben soll - Render zieht sich den
+    Stand beim naechsten Deploy ohnehin.
+    """
+    assert _schritt("Trigger Render deploy").get("continue-on-error") is True
+
+
+def test_der_neuaufbau_im_wiederholungsweg_bricht_laut_ab():
+    """Der Weg NACH einem verlorenen Push-Rennen.
+
+    Dort wird `git reset --hard origin/$BRANCH` gefahren und die Seite neu
+    gebaut - gegen den `data/`-Stand von origin, nicht den des Runners.
+    Genau dieser Neuaufbau trug bis zum 21.09.2026 ein `|| exit 0`: warf
+    `render_site()` hier, war der Schritt gruen, der Job gruen, und der
+    Render-Hook veroeffentlichte den Vortagsstand. Nicht einmal die Zeile
+    "Seite konnte nicht gepusht werden" wurde erreicht.
+    """
+    rumpf = _schritt("Commit site")["run"]
+    assert "reset --hard" in rumpf, "der Wiederholungsweg ist weg"
+    assert "|| exit 0" not in rumpf, \
+        "der Neuaufbau verschluckt wieder einen Renderfehler"
+    assert "exit 1" in rumpf, \
+        "der Neuaufbau bricht nicht mehr laut ab"
+
+
+def test_das_verlorene_push_rennen_bleibt_gruen():
+    """Und die andere Richtung: ein Lauf, der nur das Rennen gegen einen
+    zweiten Lauf verliert, ist kein Fehler. Der Bestand ist committet, die
+    Seite baut der naechste Lauf.
+    """
+    rumpf = _schritt("Commit site")["run"]
+    assert "Seite konnte nicht gepusht werden" in rumpf
+    assert rumpf.rstrip().splitlines()[-1].strip().startswith("echo ")
