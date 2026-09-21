@@ -27,10 +27,11 @@ from telco_radar.analyze.tco_store import TcoDB
 from telco_radar.geraete_model import (Ratenzahlung, listung_id,
                                        probe_geht_auf)
 from telco_radar.tarif_model import Preisphase
-from telco_radar.tco_model import (Buendel, Geraeteanteil, Rabatt,
-                                   SimOnlyReferenz, TCO_HORIZONT,
-                                   buendel_id, geraeteanteil, phasensumme,
-                                   sim_only_id, tco_24)
+from telco_radar.tco_model import (Buendel, Geraeteanteil, LAUFZEIT_LUECKE,
+                                   Rabatt, SimOnlyReferenz, TCO_HORIZONT,
+                                   buendel_id, buendel_id_aktuell,
+                                   buendel_id_ohne_laufzeit, geraeteanteil,
+                                   phasensumme, sim_only_id, tco_24)
 
 _WURZEL = Path(__file__).parent.parent
 
@@ -498,26 +499,80 @@ def test_das_buendel_hat_kein_feld_fuer_einen_barpreis():
 
 def test_die_ids_sagen_im_klartext_was_sie_sind():
     assert buendel_id("apple-iphone-14-128gb-mitternacht", "o2",
-                      "o2 Mobile M") == \
-        "buendel--o2--apple-iphone-14-128gb-mitternacht--o2-mobile-m"
+                      "o2 Mobile M", 36) == \
+        "buendel--o2--apple-iphone-14-128gb-mitternacht--o2-mobile-m--36m"
     assert sim_only_id("o2", "o2 Mobile M") == "simonly--o2--o2-mobile-m"
 
 
 def test_eine_fehlende_angabe_steht_offen_in_der_id():
-    assert buendel_id("", "o2", "o2 Mobile M").split("--")[2] == "ohne-geraet"
+    assert buendel_id("", "o2", "o2 Mobile M",
+                      24).split("--")[2] == "ohne-geraet"
     assert sim_only_id("o2", "").endswith("--ohne-tarif")
+
+
+def test_eine_fehlende_laufzeit_steht_offen_in_der_id():
+    """B1: die Laufzeit gehoert in den Schluessel - fehlt sie, sagt die ID
+    das, statt `STANDARD_LAUFZEIT` zu raten. Eine geratene 24 verschmolze
+    ein Angebot unbekannter Laufzeit mit dem echten 24-Monats-Angebot."""
+    ohne = buendel_id("apple-iphone-14-128gb-mitternacht", "o2",
+                      "o2 Mobile M", None)
+    assert ohne.endswith("--" + LAUFZEIT_LUECKE)
+    assert ohne != buendel_id("apple-iphone-14-128gb-mitternacht", "o2",
+                              "o2 Mobile M", 24)
+    # Auch eine unmoegliche Laufzeit wird benannt, nicht gerundet.
+    assert buendel_id("x", "o2", "M", 0).endswith("--" + LAUFZEIT_LUECKE)
+
+
+def test_zwei_ratenlaufzeiten_zum_selben_tarif_sind_zwei_buendel():
+    """B1, der Kern: Telekom finanziert 6/12/24/36, o2 und congstar 24/36.
+    Ohne die Laufzeit im Schluessel ueberschrieben sich diese Varianten
+    gegenseitig - der Bestand zeigte willkuerlich eine von ihnen."""
+    sku = "apple-iphone-17-256gb-schwarz"
+    kurz = Buendel(sku_id=sku, anbieter="congstar",
+                   tarif_name="Allnet Flat M", tarif_id="congstar:m",
+                   tarif_monatlich=22.0, geraet_zuzahlung=97.0,
+                   geraet_monatsrate=50.25, laufzeit_monate=24)
+    lang = Buendel(sku_id=sku, anbieter="congstar",
+                   tarif_name="Allnet Flat M", tarif_id="congstar:m",
+                   tarif_monatlich=22.0, geraet_zuzahlung=97.0,
+                   geraet_monatsrate=33.50, laufzeit_monate=36)
+    assert kurz.id != lang.id
+    assert kurz.id.endswith("--24m") and lang.id.endswith("--36m")
+    # Und der laufzeitfreie Teil ist derselbe: es ist DASSELBE Angebot in
+    # zwei Zahlweisen.
+    assert buendel_id_ohne_laufzeit(kurz.id) == \
+        buendel_id_ohne_laufzeit(lang.id)
+
+
+def test_die_lesemigration_haelt_eine_alte_id_am_selben_buendel():
+    """Der Altbestand (vier Segmente) wird beim LESEN zugeordnet, nicht
+    umgeschrieben - ueber `laufzeit_monate`, das jede Zeile traegt."""
+    alt = "buendel--o2--apple-iphone-14-128gb-mitternacht--o2-mobile-m"
+    assert buendel_id_aktuell(alt, 36) == \
+        buendel_id("apple-iphone-14-128gb-mitternacht", "o2",
+                   "o2 Mobile M", 36)
+    # Eine ID, die das Segment schon traegt, bleibt unveraendert.
+    heute = buendel_id("apple-iphone-14-128gb-mitternacht", "o2",
+                       "o2 Mobile M", 36)
+    assert buendel_id_aktuell(heute, 36) == heute
+    # Eine fehlende Laufzeit am Altsatz wird benannt, nicht geraten.
+    assert buendel_id_aktuell(alt, None).endswith("--" + LAUFZEIT_LUECKE)
+    # Und eine Form, die weder alt noch neu ist, wird NICHT erfunden.
+    assert buendel_id_aktuell("o2--apple-iphone-14", 24) is None
+    assert buendel_id_aktuell("", 24) is None
 
 
 def test_keine_neue_id_kann_eine_listung_id_treffen():
     """Nicht dem Zufall ueberlassen, sondern der Form: eine `listung_id` hat
-    zwei Bestandteile, ein Buendel vier, eine Referenz drei - auch bei einem
-    Anbieter, der wirklich "Buendel" hiesse."""
+    zwei Bestandteile, ein Buendel seit B1 fuenf (vorher vier), eine
+    Referenz drei - auch bei einem Anbieter, der wirklich "Buendel" hiesse."""
     sku = "apple-iphone-14-128gb-mitternacht"
     ids = [listung_id(sku, "o2"), listung_id(sku, "Buendel"),
-           listung_id(sku, "SIM only"), buendel_id(sku, "o2", "o2 Mobile M"),
+           listung_id(sku, "SIM only"),
+           buendel_id(sku, "o2", "o2 Mobile M", 36),
            sim_only_id("o2", "o2 Mobile M")]
     assert len(set(ids)) == len(ids)
-    assert [len(i.split("--")) for i in ids] == [2, 2, 2, 4, 3]
+    assert [len(i.split("--")) for i in ids] == [2, 2, 2, 5, 3]
 
 
 # --------------------------------------------------------------------------

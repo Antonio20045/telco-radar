@@ -45,6 +45,7 @@ import math
 from datetime import date
 from pathlib import Path
 
+from ..analyze.tco_store import basis_aus_satz, id_aus_satz
 from ..tco_model import (Buendel, POSTEN_ANSCHLUSS, POSTEN_BUENDEL,
                          POSTEN_RATE, POSTEN_ZUZAHLUNG, TCO_HORIZONT, tco_24)
 from .geraete_tco_band import ERWARTETE_ANBIETER
@@ -757,11 +758,25 @@ def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
 
     band_je_tarif = tco.get("band_je_tarif") or {}
     tco_datei = state_dir / "geraete_tco.json"
+    # B1 (21.09.2026): der Stand wird unter der HEUTIGEN Buendel-ID
+    # indiziert (`tco_store.id_aus_satz`, die Lesemigration), und daneben
+    # unter dem laufzeitfreien Teil. Beide Dateien tragen noch IDs von vor
+    # B1; wer hier stur auf das gespeicherte Feld schluesselte, traefe mit
+    # einer migrierten Historien-ID keinen Stand-Eintrag mehr - neun
+    # Messtage fielen still aus dem Graphen.
     buendel: dict[str, dict] = {}
+    buendel_basis: dict[str, dict] = {}
     if tco_datei.exists():
         try:
             roh = json.loads(tco_datei.read_text(encoding="utf-8"))
-            buendel = {b.get("id"): b for b in roh.get("buendel") or []}
+            for b in roh.get("buendel") or []:
+                bid = id_aus_satz(b)
+                if bid is None:
+                    continue
+                buendel[bid] = b
+                basis = basis_aus_satz(b)
+                if basis:
+                    buendel_basis.setdefault(basis, b)
         except (json.JSONDecodeError, OSError) as exc:
             log.warning("geraete_tco.json unlesbar fuer die Zeitreihe: %s",
                         exc)
@@ -770,6 +785,10 @@ def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
     historie = state_dir / "geraete_tco_historie.jsonl"
     if not historie.exists():
         return {}
+    # Benannte Zaehler statt stiller `continue`: eine Zeile, die keinen
+    # Stamm findet, ist eine ENTSCHEIDUNG dieses Laufs und gehoert ins
+    # Protokoll (CLAUDE.md, Clean Code 5).
+    ohne_form = ohne_stand = ueber_basis = 0
     for zeile in historie.read_text(encoding="utf-8").splitlines():
         if not zeile.strip():
             continue
@@ -777,9 +796,22 @@ def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
             satz = json.loads(zeile)
         except json.JSONDecodeError:
             continue
-        b = buendel.get(satz.get("id"))
-        if b is None:
+        hid = id_aus_satz(satz)
+        if hid is None:
+            ohne_form += 1
             continue
+        b = buendel.get(hid)
+        if b is None:
+            # Die gemessene Laufzeit steht im heutigen Stand nicht mehr
+            # (der Anbieter finanziert anders als am Messtag). Anbieter,
+            # SKU und Tarifname haengen nicht an ihr - der Punkt bleibt,
+            # der Notweg ist gezaehlt.
+            basis = basis_aus_satz(satz)
+            b = buendel_basis.get(basis) if basis else None
+            if b is None:
+                ohne_stand += 1
+                continue
+            ueber_basis += 1
         modell = sku_modell.get(b.get("sku_id"))
         if modell is None:
             continue
@@ -801,6 +833,11 @@ def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
         alt = slot.get(datum)
         if alt is None or wert < alt["wert"]:
             slot[datum] = {"satz": satz, "stand": b, "wert": wert}
+    if ohne_form or ohne_stand or ueber_basis:
+        log.info("Zeitreihe: %d Historienzeile(n) ohne zuordenbare ID, "
+                 "%d ohne Buendel im heutigen Stand, %d ueber den "
+                 "laufzeitfreien Schluessel zugeordnet.",
+                 ohne_form, ohne_stand, ueber_basis)
     return messungen
 
 

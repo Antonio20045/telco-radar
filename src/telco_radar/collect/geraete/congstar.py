@@ -150,14 +150,20 @@ ZWEI ZAHLWEISEN, EIN SAETZ
 --------------------------
 Je Variante stehen ZWEI Ratenlaeufen nebeneinander (24 und 36 Monate, beide
 gleiches `total` - congstar finanziert zum Nulltarif, kuerzer heisst hoehere
-Rate) und dazu eine TRADE_IN-Zahlweise, die ein Altgerat voraussetzt. Der
-Bestandsschluessel eines Buendels ist (SKU x Anbieter x Tarif) OHNE Laufzeit
-(`tco_model.buendel_id`); beide Laeufe zu liefern wuerde still einer den
-anderen ueberschreiben. Erhoben wird die 36-Monats-Finanzierung - o2 und
-Telekom fuehren ihre Buendel ebenfalls als 36-Raten-Vertrag bei 24 Monaten
-Tarifbindung, und A5.5 (Phase R) setzt die laengere Laufzeit als die, die
-die Karte fuehrt. Die 24er-Zahlweise ist dadurch kein Datenverlust: sie
-rechnet sich aus demselben `total` (kuerzere Laufzeit, hoehere Rate).
+Rate) und dazu eine TRADE_IN-Zahlweise, die ein Altgerat voraussetzt.
+Erhoben wird die 36-Monats-Finanzierung - o2 und Telekom fuehren ihre
+Buendel ebenfalls als 36-Raten-Vertrag bei 24 Monaten Tarifbindung, und
+A5.5 (Phase R) setzt die laengere Laufzeit als die, die die Karte fuehrt.
+Die 24er-Zahlweise ist dadurch kein Datenverlust: sie rechnet sich aus
+demselben `total` (kuerzere Laufzeit, hoehere Rate).
+
+Bis zum 21.09.2026 war das auch ein Zwang: der Bestandsschluessel kannte
+die Laufzeit nicht, und beide Laeufe zu liefern haette still einer den
+anderen ueberschrieben. Seit B1 traegt `tco_model.buendel_id` die
+Ratenlaufzeit - zwei Zahlweisen sind jetzt zwei Buendel und koennten
+beide abgelegt werden. DIESER ADAPTER LIEFERT WEITERHIN NUR DIE 36ER:
+welche Zahlweisen erhoben und wie sie auf der Karte gezeigt werden, ist
+nicht Sache des Schluessels.
 
 DER SLUG IST DIE NUMMER DES PFLICHTBLATTS
 -----------------------------------------

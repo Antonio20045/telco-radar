@@ -91,11 +91,14 @@ eine Differenz zweier verschiedener Fragen.
 """
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from typing import Optional
 
 from .geraete_model import Ratenzahlung, normalisiere
 from .tarif_model import (PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP, Preisphase)
+
+log = logging.getLogger(__name__)
 
 # Der Horizont der Leitzahl: 24 Monate, die uebliche Tarifmindestlaufzeit.
 # Entscheidung E2 vom 03.09.2026 - dieselbe Zahl und dieselbe Begruendung
@@ -112,6 +115,18 @@ STANDARD_LAUFZEIT = 24
 # Der Trenner der IDs dieses Moduls, wie in `geraete_model.listung_id`: er
 # kommt in keinem Slug vor, die ID bleibt also eindeutig zerlegbar.
 _TRENNER = "--"
+
+# Die Segmentzahl der Buendel-ID - seit B1 (21.09.2026) FUENF, weil die
+# Ratenlaufzeit dazugekommen ist. Die alte Zahl bleibt benannt stehen: sie
+# ist das Erkennungsmerkmal des Altbestands in der Lesemigration
+# (`buendel_id_aktuell`), nicht Geschichte.
+BUENDEL_SEGMENTE = 5
+BUENDEL_SEGMENTE_VOR_B1 = 4
+
+# Das Laufzeitsegment einer ID, deren Laufzeit die Quelle nicht nennt.
+# Es steht in der Reihe von "ohne-geraet" und "ohne-tarif": die Luecke
+# wird benannt, nicht weggelassen und nicht geraten.
+LAUFZEIT_LUECKE = "ohne-laufzeit"
 
 # Die Namen der Posten einer TCO. Eine LUECKE traegt den Namen dessen, was
 # fehlt - deshalb dieselbe Konstante fuer beides. Sie stehen hier, weil sie
@@ -135,8 +150,38 @@ _LUECKEN_OHNE_EINFLUSS_AUF_DIE_DIFFERENZ = (POSTEN_RABATTE,)
 # IDs - eine eigene Namensmenge, die keine bestehende beruehrt
 # --------------------------------------------------------------------------
 
-def buendel_id(sku_id: str, anbieter: str, tarif_name: str) -> str:
-    """`buendel--<anbieter>--<sku>--<tarif>`.
+def laufzeit_segment(laufzeit_monate: Optional[int]) -> str:
+    """Das Laufzeitsegment der Buendel-ID: `36m` - oder `ohne-laufzeit`.
+
+    Eine fehlende Laufzeit wird BENANNT und nicht durch `STANDARD_LAUFZEIT`
+    ersetzt: eine geratene 24 im Schluessel wuerde ein Angebot, dessen
+    Laufzeit die Quelle nicht nennt, mit dem echten 24-Monats-Angebot
+    desselben Tarifs verschmelzen. Ein nicht bestimmbarer Zustand heisst
+    `unbekannt` und wird nie als der Regelfall angenommen (CLAUDE.md,
+    Clean Code 4).
+
+    Eine Zahl, die keine Laufzeit sein kann (0, negativ, kein Ganzes),
+    wird protokolliert und ebenfalls benannt - still zu einer 24 zu
+    runden waere eine Erfindung.
+    """
+    if laufzeit_monate is None:
+        return LAUFZEIT_LUECKE
+    try:
+        monate = int(laufzeit_monate)
+    except (TypeError, ValueError):
+        log.warning("Laufzeit %r ist keine Monatszahl - ID-Segment '%s'",
+                    laufzeit_monate, LAUFZEIT_LUECKE)
+        return LAUFZEIT_LUECKE
+    if monate <= 0:
+        log.warning("Laufzeit %r ist keine Ratenlaufzeit - ID-Segment '%s'",
+                    laufzeit_monate, LAUFZEIT_LUECKE)
+        return LAUFZEIT_LUECKE
+    return f"{monate}m"
+
+
+def buendel_id(sku_id: str, anbieter: str, tarif_name: str,
+               laufzeit_monate: Optional[int]) -> str:
+    """`buendel--<anbieter>--<sku>--<tarif>--<laufzeit>`.
 
     Ein Buendel ist ein NEUER Datensatz und bekommt eine neue ID. Das ist
     die Lehre aus dem Farbschluessel (`geraete_model.farbe_aus_titel`): eine
@@ -144,18 +189,85 @@ def buendel_id(sku_id: str, anbieter: str, tarif_name: str) -> str:
     als ausgelistet erscheinen und ihn daneben neu entstehen - der Verlauf
     zerfaellt, ohne dass ein Fehler sichtbar wird.
 
+    DIE RATENLAUFZEIT IST SEIT B1 (21.09.2026) TEIL DES SCHLUESSELS. Die
+    Anbieter bieten zum SELBEN Tarif mehrere Ratenlaeufe an (Telekom
+    6/12/24/36, o2 24/36, congstar 24/36, Vodafone 12/24/36, 1&1 "24+12"
+    mit Schlusszahlung). Ohne die Laufzeit im Schluessel ueberschreiben
+    sich diese Varianten gegenseitig, und der Bestand zeigt willkuerlich
+    eine von ihnen - genau der Grund, aus dem der congstar-Adapter bis
+    heute nur die 36er-Zahlweise liefert (`collect/geraete/congstar`).
+
+    Der Altbestand von VOR B1 traegt IDs ohne dieses Segment. Er wird
+    nicht umgeschrieben, sondern BEIM LESEN zugeordnet
+    (`buendel_id_aktuell`, aufgerufen im Store) - dieselbe Lehre wie oben,
+    nur von der anderen Seite.
+
     Die Namensmengen koennen sich nicht ueberschneiden, und zwar an der
     Form, nicht am Zufall: eine `listung_id` hat ZWEI Bestandteile
-    (`o2--apple-iphone-14-128gb-schwarz`), diese hier VIER. Ein Anbieter,
-    der wirklich "Buendel" hiesse, ergaebe `buendel--<sku>` - zwei Teile,
-    also weiterhin kein Treffer.
+    (`o2--apple-iphone-14-128gb-schwarz`), eine Referenz DREI, ein Buendel
+    seit B1 FUENF (vorher vier - beides bleibt eindeutig gegen die
+    anderen beiden Mengen). Ein Anbieter, der wirklich "Buendel" hiesse,
+    ergaebe `buendel--<sku>` - zwei Teile, also weiterhin kein Treffer.
 
-    Fehlt ein Teil, sagt die ID das offen ("ohne-geraet", "ohne-tarif"),
-    statt ihn wegzulassen - dieselbe Regel wie in `sku_id`.
+    Fehlt ein Teil, sagt die ID das offen ("ohne-geraet", "ohne-tarif",
+    "ohne-laufzeit"), statt ihn wegzulassen - dieselbe Regel wie in
+    `sku_id`. Eine ID mit weggelassenem Segment waere kuerzer und damit
+    aus der Form gefallen.
     """
     return _TRENNER.join(("buendel", normalisiere(anbieter) or "ohne-anbieter",
                           sku_id or "ohne-geraet",
-                          normalisiere(tarif_name) or "ohne-tarif"))
+                          normalisiere(tarif_name) or "ohne-tarif",
+                          laufzeit_segment(laufzeit_monate)))
+
+
+def buendel_id_aktuell(gespeicherte_id: str,
+                       laufzeit_monate: Optional[int]) -> Optional[str]:
+    """Die heutige Buendel-ID eines GESPEICHERTEN Satzes - Lesemigration B1.
+
+    `data/state/geraete_tco.json` und `geraete_tco_historie.jsonl` tragen
+    IDs aus der Zeit vor B1: vier Segmente, ohne Laufzeit. Beide Dateien
+    werden NICHT umgeschrieben (CLAUDE.md, harte Regeln 2 und 3) - der
+    Altbestand wird beim Lesen demselben Buendel zugeordnet, und zwar aus
+    dem Feld, das jede dieser Zeilen ohnehin traegt: `laufzeit_monate`.
+
+    Ohne diese Zuordnung waere jede Zeile von vor B1 einem Buendel
+    zugeordnet, das es im Stand nicht mehr gibt: der Altbestand gaelte als
+    ausgelistet, entstuende daneben neu, und rund neun Messtage Verlauf
+    fielen aus dem Graphen, ohne dass ein Fehler sichtbar wird.
+
+    Gibt `None`, wenn die ID weder die alte noch die neue Form hat - der
+    Aufrufer protokolliert sie benannt und verwirft sie nicht still.
+    """
+    roh = (gespeicherte_id or "").strip()
+    if not roh:
+        return None
+    teile = roh.split(_TRENNER)
+    if len(teile) == BUENDEL_SEGMENTE:
+        return roh
+    if len(teile) != BUENDEL_SEGMENTE_VOR_B1:
+        return None
+    return _TRENNER.join(teile + [laufzeit_segment(laufzeit_monate)])
+
+
+def buendel_id_ohne_laufzeit(buendel_id_: str) -> Optional[str]:
+    """Die vier Segmente OHNE die Laufzeit - (Anbieter x SKU x Tarif).
+
+    Der gemeinsame Teil aller Laufzeitvarianten eines Angebots. Er ist
+    KEIN Bestandsschluessel (zwei Laufzeiten sind zwei Preise, also zwei
+    Buendel), sondern nur der Weg zu den laufzeitUNabhaengigen Angaben
+    eines Buendels - Anbieter, SKU, Tarifname. Die Zeitreihe braucht ihn,
+    wenn eine gemessene Laufzeit im heutigen Stand nicht mehr steht:
+    lieber der Punkt mit dem Stamm der Schwestervariante als ein
+    verschwiegener Messtag (CLAUDE.md, Fallstricke: "Meldungen werden nie
+    gekappt").
+    """
+    roh = (buendel_id_ or "").strip()
+    if not roh:
+        return None
+    teile = roh.split(_TRENNER)
+    if len(teile) not in (BUENDEL_SEGMENTE_VOR_B1, BUENDEL_SEGMENTE):
+        return None
+    return _TRENNER.join(teile[:BUENDEL_SEGMENTE_VOR_B1])
 
 
 def sim_only_id(anbieter: str, tarif_name: str) -> str:
@@ -237,9 +349,12 @@ class Rabatt:
 class Buendel:
     """EIN Angebot aus Geraet und Tarif bei EINEM Anbieter.
 
-    Der Schluessel ist (SKU x Anbieter x Tarif) - dasselbe Geraet beim
-    selben Anbieter zu zwei Tarifen sind zwei Buendel, weil es zwei Preise
-    sind. Die Feldbedeutungen stehen im Modulkopf.
+    Der Schluessel ist (SKU x Anbieter x Tarif x Ratenlaufzeit) - dasselbe
+    Geraet beim selben Anbieter zu zwei Tarifen sind zwei Buendel, weil es
+    zwei Preise sind, und derselbe Tarif in zwei Zahlweisen (24 und 36
+    Raten) ebenfalls. Die Laufzeit steht seit B1 im Schluessel
+    (`buendel_id`); vorher ueberschrieben sich die Zahlweisen still. Die
+    Feldbedeutungen stehen im Modulkopf.
 
     Es gibt hier bewusst KEIN `preis_ohne_vertrag`. Der Gesamtbetrag der
     Geraeteraten ist eine Ratenzahlung und keine Kassenzahl; ihn in dasselbe
@@ -351,7 +466,8 @@ class Buendel:
 
     @property
     def id(self) -> str:
-        return buendel_id(self.sku_id, self.anbieter, self.tarif_name)
+        return buendel_id(self.sku_id, self.anbieter, self.tarif_name,
+                          self.laufzeit_monate)
 
     @property
     def ohne_geraet(self) -> bool:
