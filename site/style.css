@@ -3234,6 +3234,22 @@ b,strong{font-weight:700}
    damit "erneuert" nicht wie ein Tarifzusatz liest (QA-Befund B1). */
 .gr-kk-marke--zustand{color:var(--red,#e60000);border-color:currentColor;
   font-weight:700}
+/* A3 (STRATEGIE_GERAETE_V4, 20.09.2026): die ALTE Bündelzeile - Abruf
+   älter als `geraete_tco_karten.ALT_AB_TAGEN`. Die Zeile bleibt stehen
+   (harte Regel 9), aber ausgegraut: TCO, Delta und Tarif verlieren ihr
+   Gewicht, der Anbietername seine Hausfarbe, der Rand seine Marke. Die
+   Marke `--alt` nennt Abrufdatum bzw. „unbekannt" auf der Zeile selbst;
+   der Text dafür steht in Python (`alt_marke`), nie hier. */
+.gr-kk-marke--alt{color:var(--ink-3);border-color:currentColor}
+.gr-bnd--alt{border-left-color:var(--rule-2)}
+.gr-bnd--alt summary{color:var(--ink-3)}
+.gr-bnd--alt summary .gr-bnd-name{color:var(--ink-3)}
+.gr-bnd--alt summary .gr-bnd-tco,.gr-bnd--alt summary .gr-bnd-delta,
+.gr-bnd--alt summary .gr-bnd-bar{color:var(--ink-3)}
+/* A3-Nachbesserung: der "ab"-Preis des Katalogs ohne frischen Beleg -
+   derselbe letzte Stand wie an der Bündelzeile, also derselbe Grauton
+   (die Marke daneben nennt das Datum, der Quelllink bleibt klickbar). */
+.gr-k-ab--alt{color:var(--ink-3)}
 /* 12 px, nicht 11: kein Text unter zwoelf Pixeln (Hausregel seit dem
    30.08.2026, `test_keine_beschriftung_unter_zwoelf_pixeln`). */
 .gr-g1-delta{font-family:var(--sans);font-size:12px;fill:var(--ink-4)}
@@ -3615,6 +3631,10 @@ td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
   font-size:12px;color:var(--ink-4)}
 .gr-zr-k-band .gr-zr-k-preis small.gr-zr-k-leer{font-size:14px;
   color:var(--ink-3);cursor:help}
+/* A3: der alte Stand der Kachel ist ein SATZ mit Datum, kein „—" - er
+   darf umbrechen (der ab-Preis bleibt nowrap, das Wort nicht). */
+.gr-zr-k-band .gr-zr-k-preis small.gr-zr-k-alt{white-space:normal;
+  line-height:1.35}
 .gr-zr-k-band .gr-zr-k-preis b{font-family:var(--serif);font-size:21px;
   font-weight:700;font-variant-numeric:lining-nums;letter-spacing:-.01em;
   line-height:1.15;white-space:nowrap}
