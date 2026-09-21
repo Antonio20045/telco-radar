@@ -12,3 +12,11 @@ validate.log
 # kompletter Site-Snapshot, reproduzierbarer Render. Darf nie in einen
 # Commit geraten (git add -A haette es genommen).
 tmp_nachpruef/
+
+# P0-B (21.09.2026): Worktrees der Dynamic Workflows. Der Harness legt sie
+# INNERHALB des Repos ab (.claude/worktrees/<lauf-id>/), und jeder ist ein
+# vollstaendiger zweiter Checkout - ein `git add` darauf naehme das ganze
+# Repo doppelt mit, inklusive site/ und data/state/ (harte Regeln 2/3).
+# CLAUDE.md Regel 17 loescht diese Zweige nach dem Uebernehmen der
+# Aenderungen; sie sind Wegwerfstaende und gehoeren nie in einen Commit.
+.claude/worktrees/
