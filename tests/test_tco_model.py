@@ -30,6 +30,7 @@ from telco_radar.tarif_model import Preisphase
 from telco_radar.tco_model import (Buendel, Geraeteanteil, LAUFZEIT_LUECKE,
                                    POSTEN_LAUFZEIT, POSTEN_RATE, Rabatt,
                                    SimOnlyReferenz, TCO_HORIZONT,
+                                   UNGLEICHER_ZEITRAUM,
                                    buendel_id, buendel_id_aktuell,
                                    buendel_id_ohne_laufzeit, geraeteanteil,
                                    laufzeit_in_monaten, laufzeit_segment,
@@ -130,8 +131,49 @@ def test_die_tco_summiert_tarif_geraet_und_anschluss():
         "Anschlusspreis": 39.99,
     }
     assert ergebnis.gesamt == 1480.75
+    assert ergebnis.leitzahl_monate == 24
     assert ergebnis.monatlich == 61.7          # 1480,75 / 24, kaufmaennisch
     assert ergebnis.restbetrag == 0.0
+
+
+def test_der_monatsschnitt_teilt_durch_den_zeitraum_der_eigenen_summe():
+    """P0-B-h1: Ø/Monat teilt die Summe durch die Monate, die sie TRAEGT.
+
+    Der echte 1&1-Satz vom 21.09.2026 (iPhone 17 Pro 256 GB, All-Net-Flat
+    S): 360,00 Zuzahlung + 36 x 44,99 Buendelpreis + 39,90 Anschlusspreis
+    = 2.019,54 EUR. Der EINE Monatsbetrag traegt Tarif und Geraet (§ 13.2)
+    und laeuft 36 Mal - der Zeitraum der Zahl ist damit 36 und nicht der
+    24-Monats-Tarifhorizont.
+
+    ROT GEGEN DEN ALTEN STAND: bis hierher rechnete `tco_24`
+    `gesamt / TCO_HORIZONT` = 2.019,54 / 24 = 84,15 EUR. Die Seite zeigte
+    "Kosten über 36 Monate 2.019,54 € · Ø 84,15 €/Monat", und 84,15 x 36
+    = 3.029,40 EUR folgt aus keiner Definition dieser Seite.
+    """
+    ergebnis = tco_24(_buendel(tarif_monatlich=None, geraet_monatsrate=None,
+                               buendel_monatlich=44.99, laufzeit_monate=36,
+                               geraet_zuzahlung=360.0, anschlusspreis=39.9))
+    assert ergebnis.gesamt == 2019.54
+    # DER ZEITRAUM STEHT AM DATENSATZ - jeder Leser nimmt ihn von hier.
+    assert ergebnis.leitzahl_monate == 36
+    assert ergebnis.monatlich == 56.1          # 2.019,54 / 36
+    assert ergebnis.monatlich != 84.15, "das ist 2.019,54 / 24 (der Befund)"
+    # Die Gegenrechnung, die auf JEDER Zeile aufgehen muss: Ø x Zeitraum
+    # ist die Summe (eine Cent-Rundung je Monat erlaubt).
+    assert abs(ergebnis.monatlich * ergebnis.leitzahl_monate
+               - ergebnis.gesamt) <= ergebnis.leitzahl_monate * 0.01
+
+
+def test_ohne_gemessene_laufzeit_gibt_es_keinen_monatsschnitt():
+    """Ein Teiler 24 waere geraten (Clean Code 3): ohne Laufzeit bleiben
+    Zeitraum UND Ø/Monat `None`, und die Kennzahl ist unbelastbar."""
+    ergebnis = tco_24(_buendel(tarif_monatlich=None, geraet_monatsrate=None,
+                               buendel_monatlich=44.99,
+                               laufzeit_monate=None))
+    assert POSTEN_LAUFZEIT in ergebnis.luecken
+    assert ergebnis.leitzahl_monate is None
+    assert ergebnis.monatlich is None
+    assert ergebnis.belastbar is False
 
 
 def test_nur_die_geraeteseite_ergibt_die_721_euro_des_auftrags():
@@ -357,6 +399,31 @@ def test_ohne_sim_only_grundpreis_ist_die_differenz_nicht_belastbar():
     ergebnis = geraeteanteil(_buendel(),
                              _referenz(tarif_sim_only_monatlich=None))
     assert "Tarifgrundpreis" in ergebnis.luecken
+    assert ergebnis.belastbar is False
+
+
+def test_keine_differenz_ueber_zwei_verschiedene_zeitraeume():
+    """P0-B-h1: dasselbe Tor wie jeder andere Vergleich.
+
+    Ein Buendelmonatspreis ueber 36 Monate gegen eine SIM-only-Referenz
+    ueber 24 Monate: die Differenz waere zum Teil der Laufzeitunterschied
+    und nicht der Geraetepreis. Sie bleibt `None`, der Grund steht
+    benannt daneben.
+
+    ROT GEGEN DEN ALTEN STAND: bis hierher zog `geraeteanteil` die zwei
+    Summen ohne Tor voneinander ab. Am Bestand vom 21.09.2026 traf das 74
+    Buendel (1&1 All-Net-Flat S, iPhone 15 128 GB: 1.447,54 - 379,66 =
+    1.067,88 EUR "Geraeteanteil", darin zwoelf Tarifmonate).
+    """
+    ergebnis = geraeteanteil(
+        _buendel(tarif_monatlich=None, geraet_monatsrate=None,
+                 buendel_monatlich=44.99, laufzeit_monate=36,
+                 geraet_zuzahlung=360.0),
+        _referenz())
+    assert ergebnis.tco_buendel == 2019.63     # 360 + 36 x 44,99 + 39,99
+    assert ergebnis.tco_sim_only == 519.75     # 24 x 19,99 + 39,99
+    assert UNGLEICHER_ZEITRAUM in ergebnis.luecken
+    assert ergebnis.betrag is None
     assert ergebnis.belastbar is False
 
 

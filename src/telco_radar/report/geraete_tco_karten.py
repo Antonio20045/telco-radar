@@ -55,7 +55,8 @@ from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
 from ..tarif_model import Preisphase
 from ..tco_model import (POSTEN_ANSCHLUSS, POSTEN_BUENDEL, POSTEN_LAUFZEIT,
                          POSTEN_RATE, POSTEN_TARIF, POSTEN_ZUZAHLUNG,
-                         TCO_HORIZONT, Buendel, phasensumme, tco_24)
+                         TCO_HORIZONT, Buendel, monatsschnitt, phasensumme,
+                         tco_24, zeitraum_vergleichbar)
 
 # Ticket TCO24-1 (08.09.2026) stellte die Tafel auf `tco_24()` und den
 # festen 24-Monats-Horizont; A1 (20.09.2026) hat dieselbe Funktion auf die
@@ -63,12 +64,14 @@ from ..tco_model import (POSTEN_ANSCHLUSS, POSTEN_BUENDEL, POSTEN_LAUFZEIT,
 # nach Monat 24, in der Zahl UND daneben ausgewiesen) und den Tarif
 # PHASENGEWICHTET, wo der Tarifbestand Preisphasen nennt.
 
-# Die TARIFLAUFZEIT der Rechnung und der Teiler des Ø/Monat - keine
-# Variable mehr, seit die Norm "Immer 24 Monate" sagt. Sie ist NICHT
-# automatisch der Zeitraum, den die Leitzahl traegt: bei einem
-# zusammengelegten Buendelmonatspreis (1&1) laeuft dieser EINE Betrag
-# ueber seine eigene Laufzeit und traegt Tarif und Geraet zusammen - was
-# `leitzahl_monate()` unten entscheidet.
+# Die TARIFLAUFZEIT der Rechnung - keine Variable mehr, seit die Norm
+# "Immer 24 Monate" sagt. Sie ist NICHT der Zeitraum, den die Leitzahl
+# traegt, und seit P0-B-h1 auch nicht mehr der Teiler des Ø/Monat: bei
+# einem zusammengelegten Buendelmonatspreis (1&1) laeuft dieser EINE
+# Betrag ueber seine eigene Laufzeit und traegt Tarif und Geraet
+# zusammen. Diesen Zeitraum bestimmt `tco_model.tco_24` an der Stelle,
+# die die Monate zaehlt, und liefert ihn als `Tco.leitzahl_monate` - die
+# Kartenschicht LIEST ihn und rechnet ihn nie nach.
 LAUFZEIT = TCO_HORIZONT
 # A1 (20.09.2026): das Etikett der Leitzahl ist der deutsche Satz statt
 # der Kurzform - "Kosten über 24 Monate" sagt einem Manager ohne
@@ -602,33 +605,14 @@ def _bestandteile_mit_kategorie(kennzahl) -> list:
     return posten
 
 
-def leitzahl_monate(b: Buendel) -> Optional[int]:
-    """Der Zeitraum, den die Leitzahl DIESES Buendels wirklich traegt.
-
-    DIE EINE STELLE dafuer (Clean Code 1): das Etikett der Zeile
-    (`label_der_leitzahl`) und die Frage, ob die Zeile gegen die Referenz
-    gestellt werden darf (`gleicher_horizont`), lesen dasselbe Ergebnis.
-
-    * **aufgeteilt** (Tarif und Geraeterate getrennt): `TCO_HORIZONT`.
-      `tco_24` rechnet genau 24 Tarifmonate; die Geraeteraten jenseits
-      davon stehen IN der Zahl und daneben als Restschuld - der Zeitraum
-      des TARIFS ist der Zeitraum der Zahl, und ueber ihn ist sie mit der
-      Referenz (24 Tarifmonate + Barpreis) vergleichbar.
-    * **zusammen** (1&1, `buendel_monatlich`): der EINE Monatsbetrag
-      traegt Tarif UND Geraet (§ 13.2), und `tco_24` zaehlt ihn ueber
-      seine ganze Laufzeit. 36 Raten sind damit 36 Tarifmonate: die Zahl
-      traegt `laufzeit_monate` und nicht 24. Genau das hat 1&1s
-      iPhone 17 256 GB als "1.927,54 EUR Kosten über 24 Monate" auf die
-      Seite gebracht, obwohl in der Summe 36 × 42,99 EUR stecken
-      (P0-B-fix2, Befund 3).
-
-    `None`, wenn die Laufzeit eines zusammengelegten Betrags nicht
-    gemessen ist - dann ist die Kennzahl ohnehin unbelastbar
-    (`tco_model.POSTEN_LAUFZEIT`), und die Zeile zeigt die Luecke.
-    """
-    if b.buendel_monatlich is None:
-        return TCO_HORIZONT
-    return b.laufzeit_monate
+# P0-B-h1: HIER STAND `leitzahl_monate(b: Buendel)` und leitete den
+# Zeitraum der Leitzahl ein ZWEITES Mal aus dem Buendel ab ("kein
+# Buendelmonatspreis -> 24, sonst die Laufzeit") - dieselbe Regel, die
+# `tco_model.tco_24` beim Zaehlen der Monate schon anwendet. Genau diese
+# zwei Stellen sind auseinandergelaufen: das Etikett nannte 36 Monate,
+# waehrend derselbe Datensatz seinen Ø/Monat durch 24 teilte. Der
+# Zeitraum kommt seither aus `Tco.leitzahl_monate`, also aus der
+# Rechnung selbst, und jeder Leser hier liest dieses Feld.
 
 
 def label_der_leitzahl(monate: Optional[int]) -> str:
@@ -636,8 +620,9 @@ def label_der_leitzahl(monate: Optional[int]) -> str:
 
     Ein Etikett, das 24 sagt, wo die Zahl 36 Monate traegt, ist keine
     Formulierungsfrage: es macht aus einer richtigen Summe eine falsche
-    Aussage. Der Zeitraum kommt aus `leitzahl_monate` - dieselbe Zahl, die
-    auch ueber den Δ-Vergleich entscheidet (Clean Code 7).
+    Aussage. Der Zeitraum kommt aus `Tco.leitzahl_monate` - dieselbe
+    Zahl, die den Ø/Monat teilt und ueber den Δ-Vergleich entscheidet
+    (Clean Code 7).
     """
     if monate is None:
         return LABEL_OHNE_LAUFZEIT
@@ -662,9 +647,11 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
     """
     frisch = ist_frisch(b.abgerufen_am, heute)
     kennzahl = tco_24(b)
-    # Der Zeitraum, den die Leitzahl dieser Zeile traegt - Etikett und
-    # Δ-Vergleich lesen ihn aus DIESER einen Stelle (P0-B-fix2).
-    monate = leitzahl_monate(b)
+    # Der Zeitraum, den die Leitzahl dieser Zeile traegt - GELESEN, nicht
+    # abgeleitet: er kommt aus der Rechnung, die die Monate gezaehlt hat
+    # (`tco_model.Tco.leitzahl_monate`, P0-B-h1). Etikett, Ø/Monat und
+    # Δ-Vergleich lesen dieselbe Zahl.
+    monate = kennzahl.leitzahl_monate
     device_id, speicher = geraet_je_sku.get(b.sku_id, ("", None))
     # "ab Monat 25: X EUR" - die Grundgebuehr nach dem festen 24-Monats-
     # Horizont, aus den PREISPHASEN des Pflichtdokuments. Sie ist die
@@ -673,8 +660,13 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
     nach_bindung = _phase_ab(tarif, AB_MONAT) if tarif else None
 
     eff = None
-    if barpreis is not None and kennzahl.belastbar:
-        eff = round(kennzahl.monatlich - barpreis["betrag"] / TCO_HORIZONT, 2)
+    if barpreis is not None and kennzahl.belastbar and monate:
+        # BEIDE Seiten dieser Differenz laufen ueber DENSELBEN Zeitraum
+        # (P0-B-h1). Bis hierher stand hier `/ TCO_HORIZONT`: bei einem
+        # 36-Monats-Buendel zog das einen auf 24 Monate verteilten
+        # Barpreis von einem Ø/Monat ab, der 36 Monate traegt - die
+        # Differenz war dann weder ein Tarifpreis noch sonst etwas.
+        eff = round(kennzahl.monatlich - barpreis["betrag"] / monate, 2)
     # Katalog D: "X € in 36 Raten" - die volle Ratensumme (nicht auf 24
     # Monate gekappt), dieselbe Zahl traegt auch die Geraetepreis-Leitzahl
     # (A-R5), einmal gerechnet statt zweimal.
@@ -979,18 +971,21 @@ def _vodafone_referenz(referenzen: list, tarife: dict,
     # Regel steht hier, damit sie an KEINER Stelle des Blatts fehlt.
     phasen = phasen_fuer_buendel(tarif, referenz.tarif_sim_only_monatlich)
 
-    summe = phasensumme(phasen, TCO_HORIZONT) if phasen else None
+    # Der Zeitraum, ueber den diese Naeherung rechnet - EIN Wert, aus dem
+    # unten Summe, Ø/Monat, Etikett und Δ-Tor lesen (P0-B-h1).
+    monate = TCO_HORIZONT
+    summe = phasensumme(phasen, monate) if phasen else None
     # "Fortgeschrieben" heisst: das Blatt sagt zu einem Teil der 24 Monate
     # nichts, und es gilt der zuletzt belegte Preis weiter. Das ist die
     # vorsichtige Annahme (dieselbe wie in `phasensumme`), aber sie ist
     # eine Annahme - deshalb steht sie auf der Karte und nicht nur im Code.
     abgedeckt = 0
     for phase in phasen:
-        abgedeckt = max(abgedeckt, TCO_HORIZONT if phase.bis_monat is None
+        abgedeckt = max(abgedeckt, monate if phase.bis_monat is None
                         else phase.bis_monat)
-    fortgeschrieben = abgedeckt < TCO_HORIZONT
+    fortgeschrieben = abgedeckt < monate
     if summe is None:
-        summe = round(referenz.tarif_sim_only_monatlich * TCO_HORIZONT, 2)
+        summe = round(referenz.tarif_sim_only_monatlich * monate, 2)
         fortgeschrieben = fortgeschrieben or not phasen
     gesamt = round(summe + geraet["betrag"], 2)
     return {
@@ -1009,10 +1004,17 @@ def _vodafone_referenz(referenzen: list, tarife: dict,
         "geraet_art": "barpreis",
         "geraet_quelle_url": geraet.get("quelle_url", ""),
         "geraet_abgerufen_am": geraet.get("abgerufen_am", ""),
-        "monate": TCO_HORIZONT,
-        "tarif_monate": TCO_HORIZONT,
+        # Der Zeitraum dieser Zahl, an EINER Stelle: die Naeherung ist
+        # `monate` Tarifmonate plus Barpreis, also traegt sie genau
+        # diesen Zeitraum. `tarif_monate` ist derselbe Wert unter dem
+        # Namen, den `geraete_tco_grafik` und die Referenzkarte lesen -
+        # und er wird hier nicht ein zweites Mal hingeschrieben.
+        "monate": monate,
+        "tarif_monate": monate,
         "gesamt": gesamt,
-        "schnitt_monat": round(gesamt / TCO_HORIZONT, 2),
+        # Dieselbe Division wie auf jeder Buendelzeile, aus derselben
+        # Funktion (`tco_model.monatsschnitt`, P0-B-h1).
+        "schnitt_monat": monatsschnitt(gesamt, monate),
         "fortgeschrieben": fortgeschrieben,
     }
 
@@ -1231,21 +1233,26 @@ def _delta_faellig(karte: dict, referenz: Optional[dict]) -> bool:
 
 
 def gleicher_horizont(karte: dict, referenz: Optional[dict]) -> bool:
-    """Tragen Zeile und Referenz denselben Zeitraum? DIE EINE Pruefung.
+    """Tragen Zeile und Referenz denselben Zeitraum? DAS EINE TOR.
+
+    Der ganze Weg zu einem Delta laeuft hier durch - Euro-Delta
+    (`_delta`), benannter Ersatzzustand (`delta_zustand`) und jeder
+    Leser, der eine Kartenzeile gegen die Referenz stellt (Radar, Alarm,
+    Export): wer ein Vorzeichen zeigen will, fragt DIESE Funktion. Sie
+    liest die zwei Felder und wendet die Regel nicht selbst an - die
+    steht in `tco_model.zeitraum_vergleichbar`, neben der Rechnung, die
+    die Zeitraeume bestimmt (P0-B-h1).
 
     Verglichen werden die Zeitraeume, die die zwei ZAHLEN tragen
     (`leitzahl_monate` gegen `referenz["monate"]`) - nicht die
     Tariflaufzeit der Rechnung, die auf jeder Karte 24 ist. Genau diese
     Verwechslung hat 1&1s 36-Monats-Buendel ein Euro-Delta gegen eine
     24-Monats-Referenz gegeben (P0-B-fix2, Befund 3).
-
-    Ein unbekannter Zeitraum (`None`) ist NIE gleich - er faellt aus dem
-    Vergleich heraus (Clean Code 4).
     """
     if referenz is None:
         return False
-    monate = karte.get("leitzahl_monate")
-    return monate is not None and monate == referenz.get("monate")
+    return zeitraum_vergleichbar(karte.get("leitzahl_monate"),
+                                 referenz.get("monate"))
 
 
 def delta_zustand(karte: dict, referenz: Optional[dict]) -> Optional[dict]:

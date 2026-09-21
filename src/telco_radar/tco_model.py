@@ -158,6 +158,17 @@ POSTEN_RABATTE = "Boni und Rabatte"
 # steht auf der Seite, statt sich als kleine Zahl zu tarnen.
 POSTEN_LAUFZEIT = "Ratenlaufzeit"
 
+# Der benannte Ausfall einer Differenz, deren zwei Summen verschiedene
+# Zeitraeume tragen (P0-B-h1). Keine Messluecke - beide Zahlen sind
+# gemessen - sondern ein nicht bestimmbarer Zustand: die Differenz waere
+# zum Teil der Laufzeitunterschied und nicht der Geraetepreis. Gemessen am
+# Bestand vom 21.09.2026: 74 Buendel mit Buendelmonatspreis fanden ihre
+# SIM-only-Referenz, und jede Differenz zog eine 24-Monats-Tarifsumme von
+# einer 36-Monats-Summe ab (1&1 All-Net-Flat S, iPhone 15 128 GB:
+# 1.447,54 - 379,66 = 1.067,88 EUR "Geraeteanteil", darin zwoelf
+# Tarifmonate von mindestens 12 x 14,99 = 179,88 EUR).
+UNGLEICHER_ZEITRAUM = "Ungleicher Vergleichszeitraum"
+
 # Luecken, die eine DIFFERENZ zweier TCO nicht verzerren: Rabatte gehen auf
 # keiner der beiden Seiten in die Rechnung ein, ihr Fehlen kuerzt sich also
 # heraus. Jede andere Luecke steht nur auf einer Seite und verschiebt den
@@ -659,6 +670,49 @@ class SimOnlyReferenz:
 # Die Rechnung
 # --------------------------------------------------------------------------
 
+def monatsschnitt(gesamt: Optional[float],
+                  monate: Optional[int]) -> Optional[float]:
+    """Ø/Monat: eine Summe geteilt durch IHREN eigenen Zeitraum.
+
+    DIE EINE STELLE dieser Division (P0-B-h1, Clean Code 1). Bis hierher
+    teilte `tco_24` fest durch `TCO_HORIZONT` - auch die Summe eines
+    zusammengelegten Buendelmonatspreises, die 36 Monate traegt. Auf der
+    Seite stand daraufhin "Kosten über 36 Monate 2.019,54 € · Ø 84,15
+    €/Monat"; 84,15 × 36 = 3.029,40 EUR, eine Zahl, die aus keiner
+    Definition dieser Seite folgt. Der Schnitt ueber den ausgewiesenen
+    Zeitraum ist 2.019,54 / 36 = 56,10 EUR.
+
+    Die Gegenrechnung, die nach dieser Funktion auf JEDER Zeile aufgeht:
+    `Ø × Zeitraum == Summe` (bis auf einen Cent Rundung je Monat).
+
+    `None` ohne Summe und ohne gemessenen Zeitraum - ein Ø ohne bekannte
+    Zahl von Monaten ist nicht bestimmbar, und ein Teiler 24 waere
+    geraten (Clean Code 3). `monate <= 0` ist kein Zeitraum.
+    """
+    if gesamt is None or monate is None or monate <= 0:
+        return None
+    return round(gesamt / monate, 2)
+
+
+def zeitraum_vergleichbar(monate: Optional[int],
+                          andere: Optional[int]) -> bool:
+    """Duerfen zwei Leitzahlen gegeneinander gestellt werden?
+
+    Nur bei GLEICHEM Zeitraum. Eine 36-Monats-Summe gegen eine
+    24-Monats-Summe ist ein Laufzeitunterschied und kein Preisabstand;
+    allein die zwoelf Tarifmonate jenseits des Horizonts (mindestens
+    12 × 14,99 = 179,88 EUR nach dem Tarifstamm) sind groesser als jedes
+    bisher ausgewiesene Delta.
+
+    Ein unbekannter Zeitraum (`None`) ist NIE gleich - er faellt aus dem
+    Vergleich heraus (Clean Code 4). Die EINE Regel dazu: die
+    Kartenschicht (`report/geraete_tco_karten.gleicher_horizont`) liest
+    die zwei Felder und fragt hier, statt die Regel zu wiederholen.
+    """
+    return (monate is not None and andere is not None
+            and monate == andere)
+
+
 def phasensumme(phasen: list[Preisphase], horizont: int) -> Optional[float]:
     """Die Summe der Monatsentgelte ueber den Horizont - phasengewichtet.
 
@@ -696,8 +750,22 @@ class Tco:
     Felder:
       gesamt        die Leitzahl ueber den Horizont, None ohne jeden Posten
                     (seit A1 INKLUSIVE Restschuld, siehe `restbetrag`)
-      horizont      ueber wie viele Monate gerechnet wurde (24, E2)
-      monatlich     Ø/Monat - die Zweitzahl der Seite
+      horizont      der TARIFHORIZONT der Rechnung (24, E2) - wie viele
+                    Tarifmonate gezaehlt wurden, nicht der Zeitraum der
+                    Leitzahl
+      leitzahl_monate
+                    DER ZEITRAUM, DEN `gesamt` WIRKLICH TRAEGT, und der
+                    Teiler von `monatlich` (P0-B-h1). Bei der aufgeteilten
+                    Preisform ist das der Tarifhorizont; bei einem
+                    zusammengelegten Buendelmonatspreis (1&1) dessen ganze
+                    Laufzeit, weil dieser EINE Betrag Tarif und Geraet
+                    ueber alle seine Monate traegt. `None`, wenn die
+                    Laufzeit nicht gemessen ist - dann ist die Kennzahl
+                    ohnehin unbelastbar (`POSTEN_LAUFZEIT`). Jeder Leser -
+                    Etikett, Ø/Monat, Δ-Tor, Export - nimmt den Zeitraum
+                    aus DIESEM Feld und rechnet ihn nie nach.
+      monatlich     Ø/Monat - die Zweitzahl der Seite, `gesamt` geteilt
+                    durch `leitzahl_monate` (`monatsschnitt`)
       bestandteile  Posten -> Betrag, in der Reihenfolge der Rechnung
       luecken       benannte fehlende Komponenten (§ 6.4)
       restbetrag    der Anteil der Leitzahl, der nach Monat 24 noch faellig
@@ -708,6 +776,7 @@ class Tco:
 
     gesamt: Optional[float] = None
     horizont: int = TCO_HORIZONT
+    leitzahl_monate: Optional[int] = None
     monatlich: Optional[float] = None
     bestandteile: dict = field(default_factory=dict)
     luecken: list[str] = field(default_factory=list)
@@ -755,9 +824,11 @@ def tco_24(buendel: Buendel) -> Tco:
     * **zusammen** (1&1, `buendel_monatlich`): der Anbieter nennt EINEN
       Monatsbetrag fuer Tarif und Geraet (§ 13.2 der Strategie - ihn
       aufzuteilen waere eine Rechnung dieses Projekts). Er wird als EIN
-      Posten ueber seine ganze Laufzeit gefuehrt. Die GERAETEZUZAHLUNG
-      steht daneben als ihr eigener Posten (S2-C, 09.09.2026: 1&1 nennt
-      sie je Variante in `hwdVariantsOneOffPaymentFees`).
+      Posten ueber seine ganze Laufzeit gefuehrt - und damit traegt die
+      Leitzahl DIESEN Zeitraum (`leitzahl_monate`, P0-B-h1) und nicht die
+      24 Monate des Tarifhorizonts. Die GERAETEZUZAHLUNG steht daneben
+      als ihr eigener Posten (S2-C, 09.09.2026: 1&1 nennt sie je Variante
+      in `hwdVariantsOneOffPaymentFees`).
 
     Der Pflichtfall des Auftrags (A1): congstar Allnet Flat XS zum iPhone
     17 Pro 256 GB - 1 + 24 × 15,00 + 36 × 30,50 + 0 = 1.459,00 EUR. Die
@@ -776,6 +847,12 @@ def tco_24(buendel: Buendel) -> Tco:
                     else max(0, laufzeit - TCO_HORIZONT))
 
     if buendel.buendel_monatlich is not None:
+        # DER ZEITRAUM DER LEITZAHL WIRD HIER BESTIMMT, an der Stelle, die
+        # die Monate auch zaehlt (P0-B-h1): der EINE Betrag traegt Tarif
+        # UND Geraet (§ 13.2) und laeuft alle seine Monate - 36 Raten sind
+        # damit 36 Tarifmonate. Ohne gemessene Laufzeit bleibt der
+        # Zeitraum `None` und wird nirgends geraten.
+        ergebnis.leitzahl_monate = laufzeit
         if laufzeit is None:
             # Der Buendelmonatspreis steht ANSTELLE von Tarif und Rate
             # (§ 13.2): ohne seine Laufzeit fehlt der gesamte Monatsblock.
@@ -795,6 +872,12 @@ def tco_24(buendel: Buendel) -> Tco:
         else:
             ergebnis.luecken.append(POSTEN_ZUZAHLUNG)
     else:
+        # Die aufgeteilte Form zaehlt genau `TCO_HORIZONT` Tarifmonate;
+        # die Geraeteraten jenseits davon stehen IN der Zahl und daneben
+        # als Restschuld. Der Zeitraum des TARIFS ist damit der Zeitraum
+        # der Zahl - ueber ihn ist sie mit der Vodafone-Referenz
+        # (24 Tarifmonate + Barpreis) vergleichbar.
+        ergebnis.leitzahl_monate = TCO_HORIZONT
         tarif_summe = phasensumme(buendel.tarif_phasen, TCO_HORIZONT) \
             if buendel.tarif_phasen else None
         if tarif_summe is not None:
@@ -853,7 +936,11 @@ def tco_24(buendel: Buendel) -> Tco:
 
     if ergebnis.bestandteile:
         ergebnis.gesamt = round(sum(ergebnis.bestandteile.values()), 2)
-        ergebnis.monatlich = round(ergebnis.gesamt / TCO_HORIZONT, 2)
+        # Geteilt wird durch den Zeitraum, den die Summe TRAEGT, nicht
+        # durch den Tarifhorizont (P0-B-h1) - und nur an dieser einen
+        # Stelle (`monatsschnitt`).
+        ergebnis.monatlich = monatsschnitt(ergebnis.gesamt,
+                                           ergebnis.leitzahl_monate)
     return ergebnis
 
 
@@ -877,7 +964,11 @@ class Geraeteanteil:
     def belastbar(self) -> bool:
         """Nur eine auf BEIDEN Seiten vollstaendige Rechnung ergibt einen
         Geraetepreis. Fehlt der SIM-only-Grundpreis, enthaelt die Differenz
-        den ganzen Tarif und ist um Hunderte Euro zu hoch."""
+        den ganzen Tarif und ist um Hunderte Euro zu hoch.
+
+        Dasselbe gilt fuer zwei verschiedene Zeitraeume
+        (`UNGLEICHER_ZEITRAUM`, P0-B-h1): die Luecke steht in der Liste
+        und macht die Differenz unbelastbar."""
         return self.betrag is not None and not [
             l for l in self.luecken
             if l not in _LUECKEN_OHNE_EINFLUSS_AUF_DIE_DIFFERENZ]
@@ -955,9 +1046,22 @@ def geraeteanteil(buendel: Buendel, referenz: SimOnlyReferenz) -> Geraeteanteil:
     luecken = list(mit.luecken)
     luecken += [l for l in ohne.luecken if l not in luecken]
 
+    # DASSELBE TOR WIE JEDER ANDERE VERGLEICH (P0-B-h1): zwei Leitzahlen
+    # werden nur voneinander abgezogen, wenn sie denselben Zeitraum
+    # tragen. Beide Zeitraeume kommen aus den zwei Rechnungen selbst
+    # (`Tco.leitzahl_monate`) und werden hier nicht nachgerechnet. Bei
+    # einem Buendelmonatspreis ueber 36 Monate gegen eine SIM-only-
+    # Referenz ueber 24 waere die Differenz zum Teil der
+    # Laufzeitunterschied - sie bleibt `None` und der Grund steht benannt
+    # in `luecken` (Clean Code 4 und 5, nie eine stille Zahl).
+    vergleichbar = zeitraum_vergleichbar(mit.leitzahl_monate,
+                                         ohne.leitzahl_monate)
+    if not vergleichbar:
+        luecken.append(UNGLEICHER_ZEITRAUM)
+
     ergebnis = Geraeteanteil(horizont=TCO_HORIZONT, tco_buendel=mit.gesamt,
                              tco_sim_only=ohne.gesamt, luecken=luecken)
-    if mit.gesamt is not None and ohne.gesamt is not None:
+    if vergleichbar and mit.gesamt is not None and ohne.gesamt is not None:
         ergebnis.betrag = round(mit.gesamt - ohne.gesamt, 2)
     return ergebnis
 
@@ -1214,8 +1318,10 @@ def tco_bindung(buendel: Buendel) -> TcoBindung:
         return e
 
     e.gesamt = round(sum(p["betrag"] for p in e.bestandteile), 2)
-    if e.bindung:
-        e.schnitt_monat = round(e.gesamt / e.bindung, 2)
+    # Dieselbe Division wie in `tco_24`, aus derselben Funktion: eine
+    # Summe geteilt durch ihren eigenen Zeitraum (P0-B-h1). Hier ist
+    # dieser Zeitraum die Bindung der Kennzahl.
+    e.schnitt_monat = monatsschnitt(e.gesamt, e.bindung)
 
     # ---- Antonios Leitfrage, woertlich (A5.2) ---------------------------
     # Gezahlt hat der Kunde nach 24 Monaten: alle Einmalposten, den Tarif
