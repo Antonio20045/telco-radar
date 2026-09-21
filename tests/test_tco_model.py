@@ -28,10 +28,13 @@ from telco_radar.geraete_model import (Ratenzahlung, listung_id,
                                        probe_geht_auf)
 from telco_radar.tarif_model import Preisphase
 from telco_radar.tco_model import (Buendel, Geraeteanteil, LAUFZEIT_LUECKE,
-                                   Rabatt, SimOnlyReferenz, TCO_HORIZONT,
+                                   POSTEN_LAUFZEIT, POSTEN_RATE, Rabatt,
+                                   SimOnlyReferenz, TCO_HORIZONT,
                                    buendel_id, buendel_id_aktuell,
                                    buendel_id_ohne_laufzeit, geraeteanteil,
-                                   phasensumme, sim_only_id, tco_24)
+                                   laufzeit_in_monaten, laufzeit_segment,
+                                   phasensumme, sim_only_id, tco_24,
+                                   tco_bindung)
 
 _WURZEL = Path(__file__).parent.parent
 
@@ -512,7 +515,7 @@ def test_eine_fehlende_angabe_steht_offen_in_der_id():
 
 def test_eine_fehlende_laufzeit_steht_offen_in_der_id():
     """B1: die Laufzeit gehoert in den Schluessel - fehlt sie, sagt die ID
-    das, statt `STANDARD_LAUFZEIT` zu raten. Eine geratene 24 verschmolze
+    das, statt eine 24 zu raten. Eine geratene 24 verschmolze
     ein Angebot unbekannter Laufzeit mit dem echten 24-Monats-Angebot."""
     ohne = buendel_id("apple-iphone-14-128gb-mitternacht", "o2",
                       "o2 Mobile M", None)
@@ -521,6 +524,116 @@ def test_eine_fehlende_laufzeit_steht_offen_in_der_id():
                               "o2 Mobile M", 24)
     # Auch eine unmoegliche Laufzeit wird benannt, nicht gerundet.
     assert buendel_id("x", "o2", "M", 0).endswith("--" + LAUFZEIT_LUECKE)
+
+
+@pytest.mark.parametrize("wert", [24.5, "24,5", 23.9, -3, 0, "ohne Angabe",
+                                  True, None])
+def test_was_keine_ganze_monatszahl_ist_wird_benannt_nicht_gerundet(wert):
+    """Befund 3 (P0-B-fix1): Docstring und Code decken sich wieder.
+
+    `laufzeit_segment` kuendigt seit B1 an, eine Zahl, die keine Laufzeit
+    sein kann - "0, negativ, kein Ganzes" -, werde benannt. Fuer 0 und
+    negativ traf das zu; fuer "kein Ganzes" nicht: `int(24.5)` schnitt
+    still auf 24 ab, und ein Angebot mit 24,5 Monaten Ratenlauf landete
+    damit auf dem Schluessel des echten 24-Monats-Angebots - genau der
+    Schaden, den das Segment verhindern soll.
+    """
+    assert laufzeit_in_monaten(wert) is None
+    assert laufzeit_segment(wert) == LAUFZEIT_LUECKE
+    assert buendel_id("x", "o2", "M", wert).endswith("--" + LAUFZEIT_LUECKE)
+    assert buendel_id("x", "o2", "M", wert) != buendel_id("x", "o2", "M", 24)
+
+
+@pytest.mark.parametrize("wert,monate", [(24, 24), (36, 36), ("12", 12),
+                                         (24.0, 24), (1, 1)])
+def test_eine_ganze_monatszahl_bleibt_die_laufzeit(wert, monate):
+    """Die Gegenprobe: was eine Laufzeit IST, wird nicht zur Luecke.
+
+    Ohne diese Zeilen waere die Pruefung oben auch mit einer Funktion
+    gruen, die jede Eingabe verwirft."""
+    assert laufzeit_in_monaten(wert) == monate
+    assert laufzeit_segment(wert) == f"{monate}m"
+
+
+def test_ein_buendel_ohne_laufzeit_traegt_die_luecke_statt_einer_zahl():
+    """Befund 2 (P0-B-fix1) am Datensatz: keine Vorgabe von 24 mehr.
+
+    `Buendel.laufzeit_monate` hatte bis hierher den Vorgabewert
+    `STANDARD_LAUFZEIT = 24`. Ein Satz, dessen Quelle die Dauer nicht
+    nennt (1&1, wenn die Produktseite sie weglaesst), bekam damit eine
+    geratene Laufzeit - im Schluessel UND in der Kennzahl: 24 x 34,00 EUR
+    = 816,00 EUR Geraeteraten, die niemand gemessen hat.
+
+    Jetzt fehlt der Posten als BENANNTE Luecke, die Kennzahl ist
+    unbelastbar, und die Karte sagt das (Regel 9).
+    """
+    ohne = Buendel(sku_id="apple-iphone-17-256gb-schwarz", anbieter="1&1",
+                   tarif_name="Allnet Flat M", tarif_id="einsundeins:m",
+                   tarif_monatlich=20.0, geraet_zuzahlung=0.0,
+                   geraet_monatsrate=34.0, anschlusspreis=39.99)
+    assert ohne.laufzeit_monate is None
+    assert ohne.id.endswith("--" + LAUFZEIT_LUECKE)
+    # Die Ratenzahlung ist ohne ihre Monatszahl kein Ratengeschaeft.
+    assert ohne.geraeteraten is None
+
+    tco = tco_24(ohne)
+    assert POSTEN_LAUFZEIT in tco.luecken
+    # Die RATE ist gemessen - benannt wird deshalb die Laufzeit, nicht sie.
+    assert POSTEN_RATE not in tco.luecken
+    assert not tco.belastbar
+    assert tco.restbetrag is None
+    assert all("Geräteraten" not in name for name in tco.bestandteile)
+    # 20,00 x 24 Tarif + 0,00 Zuzahlung + 39,99 Anschluss = 519,99 EUR;
+    # die 816,00 EUR geratener Raten sind NICHT darin.
+    assert tco.gesamt == pytest.approx(519.99, abs=0.005)
+
+    kennzahl = tco_bindung(ohne)
+    assert POSTEN_LAUFZEIT in kennzahl.luecken
+    assert not kennzahl.belastbar
+    assert kennzahl.raten_laufzeit is None
+
+
+def test_ein_buendelmonatspreis_ohne_laufzeit_ergibt_keine_summe():
+    """Dieselbe Regel in der 1&1-Form: EIN Monatsbetrag, keine Monatszahl.
+
+    Hier haengt der GANZE Monatsblock an der Laufzeit - der Buendelpreis
+    steht anstelle von Tarif UND Rate. Mit der geratenen 24 stand
+    44,99 x 24 = 1079,76 EUR in der Leitzahl; uebrig bleiben ohne sie nur
+    Zuzahlung und Anschlusspreis, und die duerfen nicht als "Kosten über
+    24 Monate" durchgehen.
+    """
+    ohne = Buendel(sku_id="apple-iphone-17-256gb-schwarz", anbieter="1&1",
+                   tarif_name="Allnet Flat M", tarif_id="einsundeins:m",
+                   buendel_monatlich=44.99, geraet_zuzahlung=360.0,
+                   anschlusspreis=39.99)
+    tco = tco_24(ohne)
+    assert POSTEN_LAUFZEIT in tco.luecken
+    assert not tco.belastbar
+    assert tco.gesamt == pytest.approx(399.99, abs=0.005)
+    assert tco.restbetrag is None
+    kennzahl = tco_bindung(ohne)
+    assert POSTEN_LAUFZEIT in kennzahl.luecken
+    assert not kennzahl.belastbar
+    assert kennzahl.bindung is None
+    # `tco_bindung` fuehrt die Zuzahlung der Buendelform nicht als Posten
+    # (eigener Befund, nicht dieser hier) - uebrig bleibt der
+    # Anschlusspreis. Entscheidend ist, dass die 1079,76 EUR der
+    # geratenen 24 Monate NICHT darin stehen.
+    assert kennzahl.gezahlt_nach_24 == pytest.approx(39.99, abs=0.005)
+
+
+@pytest.mark.parametrize("wert", [0, -12, 24.5, "ohne Angabe"])
+def test_eine_unmoegliche_laufzeit_wirft_statt_zur_luecke_zu_werden(wert):
+    """FEHLT ist eine Luecke, UNMOEGLICH ist ein Nutzlastfehler.
+
+    `aus_rohsaetzen` faengt die Ausnahme, zaehlt den Satz als `ungueltig`
+    und protokolliert ihn - sie stumm zur Luecke zu machen waere ein
+    `except` ohne Weitergabe (CLAUDE.md, Clean Code 5). Bis P0-B-fix1
+    wurde 24,5 hier still auf 24 abgeschnitten.
+    """
+    with pytest.raises(ValueError, match="laufzeit_monate"):
+        Buendel(sku_id="x", anbieter="o2", tarif_name="M",
+                tarif_monatlich=20.0, laufzeit_monate=wert)
 
 
 def test_zwei_ratenlaufzeiten_zum_selben_tarif_sind_zwei_buendel():

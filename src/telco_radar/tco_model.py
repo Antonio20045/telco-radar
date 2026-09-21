@@ -69,8 +69,12 @@ Die Felder eines Buendels
                       die Karte die gemessene Bündel-Rate.
     geraet_zuzahlung  einmalig bei Vertragsschluss
     geraet_monatsrate die Geraeterate je Monat, NEBEN dem Tarif
-    laufzeit_monate   ueber wie viele Monate die Geraeterate laeuft
-                      (Standard 24; 12, 36 und 37 kommen vor)
+    laufzeit_monate   ueber wie viele Monate die Geraeterate laeuft (12,
+                      24, 36 und 37 kommen vor) - und `None`, wenn die
+                      Quelle das nicht sagt. Es gibt hier KEINE Vorgabe
+                      von 24 (P0-B-fix1): die Laufzeit steht im
+                      Schluessel, eine geratene verschmilzt den Satz mit
+                      dem echten 24-Monats-Angebot
     anschlusspreis    Bereitstellungsentgelt, einmalig
     rabatte           benannt, befristet, separat - nie eingerechnet
     quelle_url        die Seite, auf der DIESE Zahlen stehen
@@ -109,9 +113,16 @@ log = logging.getLogger(__name__)
 # beiden verschiebt, soll nicht ungewollt die andere verschieben.
 TCO_HORIZONT = 24
 
-# Die uebliche Ratenlaufzeit, wenn die Quelle keine nennt. Sie ist eine
-# Vorgabe, keine Messung - wo eine Quelle 12 oder 36 ausweist, gilt die.
-STANDARD_LAUFZEIT = 24
+# ES GIBT KEINE VORGABE-RATENLAUFZEIT (P0-B-fix1, 21.09.2026). Bis hierher
+# stand `STANDARD_LAUFZEIT = 24` und war der Vorgabewert von
+# `Buendel.laufzeit_monate`. Ein Rohsatz ohne Laufzeit - 1&1 liefert ihn,
+# wenn die Produktseite die Dauer nicht nennt
+# (`collect/geraete/einsundeins.laufzeit_monate` gibt dort None) - bekam
+# damit still die ID `...--24m` und verschmolz mit dem ECHTEN
+# 24-Monats-Angebot desselben Tarifs. Genau den Schaden soll
+# `laufzeit_segment` verhindern; die geratene 24 machte seine benannte
+# Luecke zu unerreichbarem Code. Eine fehlende Laufzeit ist seither `None`
+# und wird benannt (`LAUFZEIT_LUECKE`, `POSTEN_LAUFZEIT`).
 
 # Der Trenner der IDs dieses Moduls, wie in `geraete_model.listung_id`: er
 # kommt in keinem Slug vor, die ID bleibt also eindeutig zerlegbar.
@@ -139,6 +150,13 @@ POSTEN_ZUZAHLUNG = "Gerätezuzahlung"
 POSTEN_RATE = "Geräterate"
 POSTEN_ANSCHLUSS = "Anschlusspreis"
 POSTEN_RABATTE = "Boni und Rabatte"
+# Die Luecke, die kein Posten ist, sondern seine LAENGE: eine Monatsrate
+# ohne die Zahl ihrer Monate ergibt keine Summe. Sie macht die Kennzahl
+# unbelastbar (`Tco.belastbar`, `TcoBindung.belastbar`) und erscheint auf
+# der Karte als "Die Rechnung ist unvollständig: Ratenlaufzeit nicht
+# gemessen" (`report/geraete_tco_karten._grund`) - Regel 9: ein Ausfall
+# steht auf der Seite, statt sich als kleine Zahl zu tarnen.
+POSTEN_LAUFZEIT = "Ratenlaufzeit"
 
 # Luecken, die eine DIFFERENZ zweier TCO nicht verzerren: Rabatte gehen auf
 # keiner der beiden Seiten in die Rechnung ein, ihr Fehlen kuerzt sich also
@@ -151,33 +169,68 @@ _LUECKEN_OHNE_EINFLUSS_AUF_DIE_DIFFERENZ = (POSTEN_RABATTE,)
 # IDs - eine eigene Namensmenge, die keine bestehende beruehrt
 # --------------------------------------------------------------------------
 
+def laufzeit_in_monaten(laufzeit_monate) -> Optional[int]:
+    """Die Ratenlaufzeit als ganze Monatszahl - oder `None` als Luecke.
+
+    DIE EINE STELLE, an der entschieden wird, ob ein Rohwert eine
+    Ratenlaufzeit IST (Clean Code 1). `laufzeit_segment` (die ID) und
+    `Buendel.__post_init__` (der Datensatz) lesen dasselbe Ergebnis; zwei
+    eigene Pruefungen waeren zwei Definitionen derselben Zahl.
+
+    `None` heisst hier immer "keine Ratenlaufzeit", nie "24":
+      * fehlt (`None`) - die Quelle nennt keine Dauer,
+      * keine Zahl ("ohne Angabe"),
+      * kein Ganzes (24,5 Monate gibt es nicht - `int()` hat das bis
+        P0-B-fix1 still auf 24 abgeschnitten, und damit war die
+        angekuendigte Pruefung "kein Ganzes" eine leere Zusage),
+      * null oder negativ - eine Laufzeit von null Monaten ist keine
+        Zahlweise,
+      * ein Wahrheitswert - `int(True)` waere 1 Monat, und "ja" ist keine
+        Dauer.
+    Jeder Fall ausser `None` wird protokolliert: ein Rohwert, der keine
+    Laufzeit ist, ist eine Nutzlastaenderung und keine Lappalie.
+    """
+    if laufzeit_monate is None:
+        return None
+    if isinstance(laufzeit_monate, bool):
+        log.warning("Laufzeit %r ist ein Wahrheitswert, keine Monatszahl - "
+                    "gilt als nicht gemessen", laufzeit_monate)
+        return None
+    try:
+        monate = int(laufzeit_monate)
+        if monate != float(laufzeit_monate):
+            raise ValueError("keine ganze Monatszahl")
+    except (TypeError, ValueError):
+        log.warning("Laufzeit %r ist keine ganze Monatszahl - gilt als "
+                    "nicht gemessen", laufzeit_monate)
+        return None
+    if monate <= 0:
+        log.warning("Laufzeit %r ist keine Ratenlaufzeit - gilt als nicht "
+                    "gemessen", laufzeit_monate)
+        return None
+    return monate
+
+
 def laufzeit_segment(laufzeit_monate: Optional[int]) -> str:
     """Das Laufzeitsegment der Buendel-ID: `36m` - oder `ohne-laufzeit`.
 
-    Eine fehlende Laufzeit wird BENANNT und nicht durch `STANDARD_LAUFZEIT`
-    ersetzt: eine geratene 24 im Schluessel wuerde ein Angebot, dessen
-    Laufzeit die Quelle nicht nennt, mit dem echten 24-Monats-Angebot
-    desselben Tarifs verschmelzen. Ein nicht bestimmbarer Zustand heisst
-    `unbekannt` und wird nie als der Regelfall angenommen (CLAUDE.md,
-    Clean Code 4).
+    Eine fehlende Laufzeit wird BENANNT und nie durch eine 24 ersetzt: eine
+    geratene 24 im Schluessel wuerde ein Angebot, dessen Laufzeit die
+    Quelle nicht nennt, mit dem echten 24-Monats-Angebot desselben Tarifs
+    verschmelzen. Ein nicht bestimmbarer Zustand heisst `unbekannt` und
+    wird nie als der Regelfall angenommen (CLAUDE.md, Clean Code 4).
 
-    Eine Zahl, die keine Laufzeit sein kann (0, negativ, kein Ganzes),
-    wird protokolliert und ebenfalls benannt - still zu einer 24 zu
-    runden waere eine Erfindung.
+    Was eine Laufzeit sein kann, entscheidet `laufzeit_in_monaten` - hier
+    wird nur noch benannt. Diese Funktion WIRFT nicht, auch nicht bei einer
+    unmoeglichen Zahl: sie bedient ausser `buendel_id` auch die
+    Lesemigration gespeicherter IDs (`buendel_id_aktuell`), und dort darf
+    eine einzelne kaputte Altzeile nicht die ganze Zeitreihe kosten. Der
+    DATENSATZ ist strenger - `Buendel.__post_init__` weist eine unmoegliche
+    Laufzeit als Nutzlastfehler zurueck, statt sie stumm zur Luecke zu
+    machen.
     """
-    if laufzeit_monate is None:
-        return LAUFZEIT_LUECKE
-    try:
-        monate = int(laufzeit_monate)
-    except (TypeError, ValueError):
-        log.warning("Laufzeit %r ist keine Monatszahl - ID-Segment '%s'",
-                    laufzeit_monate, LAUFZEIT_LUECKE)
-        return LAUFZEIT_LUECKE
-    if monate <= 0:
-        log.warning("Laufzeit %r ist keine Ratenlaufzeit - ID-Segment '%s'",
-                    laufzeit_monate, LAUFZEIT_LUECKE)
-        return LAUFZEIT_LUECKE
-    return f"{monate}m"
+    monate = laufzeit_in_monaten(laufzeit_monate)
+    return LAUFZEIT_LUECKE if monate is None else f"{monate}m"
 
 
 def buendel_id(sku_id: str, anbieter: str, tarif_name: str,
@@ -393,7 +446,14 @@ class Buendel:
     buendel_monatlich: Optional[float] = None
     geraet_zuzahlung: Optional[float] = None
     geraet_monatsrate: Optional[float] = None
-    laufzeit_monate: int = STANDARD_LAUFZEIT
+    # DIE RATENLAUFZEIT DES GERAETS, in Monaten - und `None`, wenn die
+    # Quelle sie nicht nennt. Es gibt hier KEINEN Vorgabewert (P0-B-fix1):
+    # eine geratene 24 landete im Schluessel (`buendel_id`) und verschmolz
+    # den Satz mit dem echten 24-Monats-Angebot. Fehlt sie, ist die Summe
+    # der Raten nicht rechenbar - `tco_24` und `tco_bindung` fuehren
+    # `POSTEN_LAUFZEIT` als benannte Luecke und die Kennzahl als
+    # unbelastbar.
+    laufzeit_monate: Optional[int] = None
     anschlusspreis: Optional[float] = None
     rabatte: list[Rabatt] = field(default_factory=list)
     quelle_url: str = ""
@@ -452,10 +512,18 @@ class Buendel:
             if self.tarif_bindung_monate < 0:
                 raise ValueError("negative Tarifbindung: "
                                  f"{self.tarif_bindung_monate}")
-        self.laufzeit_monate = int(self.laufzeit_monate)
-        if self.laufzeit_monate <= 0:
-            raise ValueError(f"laufzeit_monate muss positiv sein: "
-                             f"{self.laufzeit_monate}")
+        if self.laufzeit_monate is not None:
+            # FEHLT (`None`) ist die benannte Luecke; eine Zahl, die keine
+            # Laufzeit sein KANN (0, negativ, 24,5), ist dagegen ein
+            # Nutzlastfehler und wirft - `tco_buendel.aus_rohsaetzen` faengt
+            # das, zaehlt den Satz als `ungueltig` und protokolliert ihn.
+            # Sie stumm zur Luecke zu machen waere ein `except` ohne
+            # Weitergabe (CLAUDE.md, Clean Code 5).
+            monate = laufzeit_in_monaten(self.laufzeit_monate)
+            if monate is None:
+                raise ValueError("laufzeit_monate ist keine Ratenlaufzeit: "
+                                 f"{self.laufzeit_monate!r}")
+            self.laufzeit_monate = monate
         if not self.sku_id and (self.geraet_zuzahlung is not None
                                 or self.geraet_monatsrate is not None
                                 or self.buendel_monatlich is not None):
@@ -485,7 +553,11 @@ class Buendel:
         kennt das Buendel den vollen Geraetepreis (`.gesamt`) und seine
         Rechenprobe, ohne beides ein zweites Mal zu rechnen.
         """
-        if self.geraet_zuzahlung is None or self.geraet_monatsrate is None:
+        if (self.geraet_zuzahlung is None or self.geraet_monatsrate is None
+                or self.laufzeit_monate is None):
+            # Ohne die Zahl der Monate ist eine Rate kein Ratengeschaeft,
+            # sondern ein Betrag - `Ratenzahlung` wuerde die Luecke ohnehin
+            # zurueckweisen (`laufzeit_monate muss positiv sein`).
             return None
         return Ratenzahlung(anzahlung=self.geraet_zuzahlung,
                             monatsrate=self.geraet_monatsrate,
@@ -650,8 +722,16 @@ class Tco:
         uebrigen Luecken machen die Zahl unvollstaendig, diese eine macht
         sie sinnlos. Eine unbelastbare TCO wird nie gegen eine andere
         gestellt.
+
+        Die fehlende RATENLAUFZEIT wirkt genauso (P0-B-fix1): ohne sie
+        fehlt der ganze Monatsblock - beim Buendelmonatspreis der Tarif
+        MITSAMT Geraet, bei der aufgeteilten Form die Ratensumme. Was
+        uebrig bliebe, waeren Zuzahlung und Anschlusspreis, und die saehen
+        als "Kosten über 24 Monate" nach einem sehr guenstigen Angebot aus.
         """
-        return self.gesamt is not None and POSTEN_TARIF not in self.luecken
+        return (self.gesamt is not None
+                and POSTEN_TARIF not in self.luecken
+                and POSTEN_LAUFZEIT not in self.luecken)
 
 
 def tco_24(buendel: Buendel) -> Tco:
@@ -687,14 +767,25 @@ def tco_24(buendel: Buendel) -> Tco:
     echten Bestand fest).
     """
     ergebnis = Tco(horizont=TCO_HORIZONT)
-    offen_monate = max(0, buendel.laufzeit_monate - TCO_HORIZONT)
+    # Ohne gemessene Ratenlaufzeit gibt es keine Monatszahl, mit der sich
+    # ein Monatsbetrag multiplizieren laesst - und keine Restschuld
+    # (`None` heisst hier "nicht bestimmbar", 0,00 EUR hiesse "nichts
+    # offen", und das waere eine Aussage, die niemand gemessen hat).
+    laufzeit = buendel.laufzeit_monate
+    offen_monate = (None if laufzeit is None
+                    else max(0, laufzeit - TCO_HORIZONT))
 
     if buendel.buendel_monatlich is not None:
-        ergebnis.bestandteile[f"{POSTEN_BUENDEL} über "
-                              f"{buendel.laufzeit_monate} Monate"] = \
-            round(buendel.buendel_monatlich * buendel.laufzeit_monate, 2)
-        ergebnis.restbetrag = round(buendel.buendel_monatlich * offen_monate,
-                                    2)
+        if laufzeit is None:
+            # Der Buendelmonatspreis steht ANSTELLE von Tarif und Rate
+            # (§ 13.2): ohne seine Laufzeit fehlt der gesamte Monatsblock.
+            ergebnis.luecken.append(POSTEN_LAUFZEIT)
+        else:
+            ergebnis.bestandteile[f"{POSTEN_BUENDEL} über "
+                                  f"{laufzeit} Monate"] = \
+                round(buendel.buendel_monatlich * laufzeit, 2)
+            ergebnis.restbetrag = round(
+                buendel.buendel_monatlich * offen_monate, 2)
         # Ein Bündel mit Monatsbetrag traegt immer ein Geraet - ein Satz
         # ohne SKU wirft schon `Buendel.__post_init__`. Dieselbe Regel wie
         # in der aufgeteilten Form: None ist eine LUECKE, 0.0 ein
@@ -725,18 +816,23 @@ def tco_24(buendel: Buendel) -> Tco:
             else:
                 ergebnis.luecken.append(POSTEN_ZUZAHLUNG)
 
-            if buendel.geraet_monatsrate is not None:
+            if buendel.geraet_monatsrate is None:
+                ergebnis.luecken.append(POSTEN_RATE)
+            elif laufzeit is None:
+                # Die Rate ist gemessen, die Zahl ihrer Monate nicht - die
+                # Ratensumme ist damit nicht bestimmbar. Benannt wird
+                # deshalb die LAUFZEIT und nicht die Rate: "Geräterate
+                # nicht gemessen" waere an diesem Satz falsch.
+                ergebnis.luecken.append(POSTEN_LAUFZEIT)
+            else:
                 ergebnis.bestandteile[f"Geräteraten über "
-                                      f"{buendel.laufzeit_monate} Monate"] = \
-                    round(buendel.geraet_monatsrate
-                          * buendel.laufzeit_monate, 2)
+                                      f"{laufzeit} Monate"] = \
+                    round(buendel.geraet_monatsrate * laufzeit, 2)
                 # Die Restschuld nach Monat 24 - IN der Leitzahl und
                 # zusaetzlich ausgewiesen: 0.0 bei Laufzeit <= 24 ist die
                 # gemessene Aussage "nichts offen", nie ein fehlender Wert.
                 ergebnis.restbetrag = round(
                     buendel.geraet_monatsrate * offen_monate, 2)
-            else:
-                ergebnis.luecken.append(POSTEN_RATE)
 
     if buendel.anschlusspreis is not None:
         ergebnis.bestandteile[POSTEN_ANSCHLUSS] = buendel.anschlusspreis
@@ -983,7 +1079,11 @@ class TcoBindung:
                 # Dasselbe gilt fuer einen Flextarif, nur aus dem
                 # umgekehrten Grund: dort ist der Betrag nicht geschuldet.
                 and POSTEN_TARIFBINDUNG not in self.luecken
-                and POSTEN_TARIF_FLEX not in self.luecken)
+                and POSTEN_TARIF_FLEX not in self.luecken
+                # Und ohne Ratenlaufzeit fehlt der Monatsblock des
+                # Geraets (P0-B-fix1) - dieselbe Schwelle wie in
+                # `Tco.belastbar`.
+                and POSTEN_LAUFZEIT not in self.luecken)
 
     @property
     def label(self) -> str:
@@ -1032,7 +1132,11 @@ def tco_bindung(buendel: Buendel) -> TcoBindung:
         e.bindung = max(laengen) if laengen else None
 
     # ---- Tarif ----------------------------------------------------------
-    if zusammen:
+    if zusammen and buendel.laufzeit_monate is None:
+        # Ein Monatsbetrag ohne die Zahl seiner Monate ergibt keinen Posten
+        # (P0-B-fix1). Benannt, nicht mit 24 geraten.
+        e.luecken.append(POSTEN_LAUFZEIT)
+    elif zusammen:
         e.bestandteile.append({
             "name": f"{POSTEN_BUENDEL} · {buendel.laufzeit_monate} × "
                     f"{buendel.buendel_monatlich:.2f} €".replace(".", ","),
@@ -1066,15 +1170,18 @@ def tco_bindung(buendel: Buendel) -> TcoBindung:
                                    "kategorie": KAT_EINMALIG})
         else:
             e.luecken.append(POSTEN_ZUZAHLUNG)
-        if buendel.geraet_monatsrate is not None:
+        if buendel.geraet_monatsrate is None:
+            e.luecken.append(POSTEN_RATE)
+        elif buendel.laufzeit_monate is None:
+            # Rate gemessen, Monatszahl nicht - benannt wird die Laufzeit.
+            e.luecken.append(POSTEN_LAUFZEIT)
+        else:
             e.bestandteile.append({
                 "name": f"Geräteraten · {buendel.laufzeit_monate} × "
                         f"{buendel.geraet_monatsrate:.2f} €".replace(".", ","),
                 "betrag": round(buendel.geraet_monatsrate
                                 * buendel.laufzeit_monate, 2),
                 "kategorie": KAT_RATEN})
-        else:
-            e.luecken.append(POSTEN_RATE)
 
     # ---- Anschluss ------------------------------------------------------
     if buendel.anschlusspreis is not None:
@@ -1120,13 +1227,16 @@ def tco_bindung(buendel: Buendel) -> TcoBindung:
         if p["kategorie"] == KAT_EINMALIG:
             gezahlt += p["betrag"]
     if zusammen:
-        gezahlt += round(buendel.buendel_monatlich
-                         * min(LEITFRAGE_MONATE, buendel.laufzeit_monate), 2)
+        if buendel.laufzeit_monate is not None:
+            gezahlt += round(buendel.buendel_monatlich
+                             * min(LEITFRAGE_MONATE,
+                                   buendel.laufzeit_monate), 2)
     else:
         if buendel.tarif_monatlich is not None and e.tarif_bindung:
             gezahlt += round(buendel.tarif_monatlich
                              * min(LEITFRAGE_MONATE, e.tarif_bindung), 2)
-        if buendel.geraet_monatsrate is not None:
+        if (buendel.geraet_monatsrate is not None
+                and buendel.laufzeit_monate is not None):
             gezahlt += round(buendel.geraet_monatsrate
                              * min(LEITFRAGE_MONATE,
                                    buendel.laufzeit_monate), 2)

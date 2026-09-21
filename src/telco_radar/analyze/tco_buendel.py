@@ -35,57 +35,59 @@ sind verschiedene Zeichenketten. Was die zwei verbindet, ist der Slug
 (`tarif_bezug.ueber_slug`). Ein Rohsatz ohne `tarif_slug` geht deshalb
 nicht leer aus: `loese()` versucht weiterhin zuerst den Namen.
 
-DIE RABATT-BASIS - EINHEITLICH, UND NUR WO BELEGT (B2b, 21.09.2026)
---------------------------------------------------------------------
-Bis zum 20.09.2026 stand hier, kein Betrag werde umgerechnet: der
-Tarifbetrag des Buendels sei der, den der Anbieter FUER DIESES BUENDEL
-nennt - bei o2 14,99 EUR, waehrend derselbe Tarif ohne Geraet 19,99 EUR
-kostet, und die Differenz zu einem `Rabatt` zu erklaeren sei eine Deutung,
-die keine Quelle so ausspricht.
+KEIN BETRAG WIRD UMGERECHNET (zurueckgenommen mit P0-B-fix1, 21.09.2026)
+-------------------------------------------------------------------------
+Der Tarifbetrag eines Buendels ist der, den der Anbieter FUER DIESES
+BUENDEL nennt. Er wird hier nicht ersetzt, nicht hochgerechnet und nicht
+gegen die SIM-only-Kachel desselben Tarifs getauscht.
 
-Fuer o2 spricht seither eine Quelle genau das aus: die Produktseite nennt
-den niedrigeren Buendel-Tarifpreis woertlich einen "attraktiven
-monatlichen Rabatt auf deinen Tarif" (`collect/geraete/o2.py`,
-Modulkopf). Ein ANBIETER, der seinen eigenen Nachlass so nennt, bekommt
-`tco_model.Rabatt` - Clean Code 3 gilt hier andersherum: ein Rabatt, der
-in den gespeicherten Monatspreis gebacken ist, ist die versteckte Luecke.
+Am 21.09.2026 stand fuer einen Tag das Gegenteil hier: o2s Produktseite
+nennt den niedrigeren Buendel-Tarifpreis selbst einen "attraktiven
+monatlichen Rabatt auf deinen Tarif" (`collect/geraete/o2.py`, Modulkopf),
+und daraus wurde die Regel, den gemessenen Betrag durch die
+SIM-only-Grundgebuehr zu ersetzen und die Differenz als `tco_model.Rabatt`
+daneben zu legen. Ein Rabatt wird per Definition NICHT eingerechnet - die
+Leitzahl stieg damit fuer ALLE 72 o2-Buendel um 120,00 bis 276,00 EUR,
+ohne dass sich ein o2-Preis geaendert hatte. Gemessen am Bestand vom
+20.09.2026: Galaxy S26 Ultra 256 GB zu "O2 Mobile Unlimited M Plus" von
+1.758,76 auf 2.034,76 EUR; ueber alle 72 Buendel von 98.768,16 auf
+108.956,16 EUR. Auf der Karte stuende ein Betrag, den mit diesem
+Ratenplan niemand zahlt, und der Ausgleich waere unsichtbar
+(`report/geraete_tco_karten` setzt `"boni": []` hart, `boni_abzug`
+kommt in keiner Vorlage vor). Die Zeitreihe bekaeme obendrein am
+Umstellungstag eine Stufe von +120 EUR und `_bewegung` meldete "+120 EUR
+in N Tagen" fuer einen Anbieter, der nichts geaendert hat - genau der
+Fehler, den Paket A2 behoben hat.
 
-**Die Regel ist deshalb EINHEITLICH (eine Rechnung, eine Stelle) und NICHT
-automatisch fuer jeden Anbieter:** ein Rohsatz muss `tarif_rabatt_beleg`
-setzen (nur o2 tut das, mit Verweis auf seine eigene Quelle im Modulkopf),
-UND der Tarifbezug muss ueber Name oder Slug aufgeloest sein (`guete ==
-HOCH`) - ein ueber den Betrag gefundener Bezug (`guete == MITTEL`) waere
-zirkulaer: er wurde ja gerade ueber Gleichheit der Betraege gefunden.
-Trifft beides zu und liegt der SIM-only-Grundpreis DESSELBEN Tarifs
-(`Tarifbestand.je_id[bezug.tarif_id]["grundgebuehr"]`) hoeher als der
-gemessene Buendelbetrag, wird die Differenz ein `Rabatt` (benannt, mit
-Beleg-URL, NICHT eingerechnet - `tco_model.Rabatt.wert()`), und der
-GESPEICHERTE `tarif_monatlich` wird der SIM-only-Grundpreis: die Leitzahl
-zeigt damit den Preis OHNE den bedingten Nachlass, der Nachlass steht
-daneben.
+Der Denkfehler war die Gleichsetzung von "der Anbieter sagt Rabatt" mit
+"bedingter Nachlass". o2s -5 EUR sind KEIN bedingter Nachlass, sie sind
+der Preis: die Strategie sagt es selbst - "o2 backt -5 EUR in den
+Buendelpreis" (19,99 statt 24,99 SIM-only). Der gemessene Buendelpreis IST
+die Basis der Leitzahl. Ein `Rabatt`, der schon im gemessenen Preis
+steckt, wuerde daneben eine Ersparnis ausweisen, die niemand mehr holen
+kann - und zugleich die echte Luecke `POSTEN_RABATTE` ("kein Bonus
+erfasst") zudecken.
 
-Die 1&1-Aufspaltung (`collect/geraete/einsundeins.py`, "Hardware-Rate
-45,00 plus Tarif 14,99 waere 59,99, das Buendel kostet aber 44,99")
-bekommt KEIN Rabatt-Feld: 1&1 traegt keinen `tarif_monatlich` (nur
-`buendel_monatlich`, siehe `tco_model.Buendel`), das Flag fehlt, und die
-15,00/18,00 EUR Differenz ist ohne eigene Anbieteraussage ein
-unbenannter Nachlass - eine Aufspaltung ohne Beleg bleibt eine Erfindung.
+Was der SIM-only-Preis desselben Tarifs leistet, leistet er anderswo: als
+MASSSTAB in `analyze/tarif_referenzen.py` und als Geraeteanteil in
+`tco_model.geraeteanteil()` - dort steht die Differenz als Differenz und
+nicht als Abzug.
+
+Dasselbe gilt fuer die 1&1-Aufspaltung (`collect/geraete/einsundeins.py`,
+"Hardware-Rate 45,00 plus Tarif 14,99 waere 59,99, das Buendel kostet aber
+44,99"): 1&1 traegt keinen `tarif_monatlich`, nur `buendel_monatlich`
+(siehe `tco_model.Buendel`), und eine Aufspaltung ohne Beleg bleibt eine
+Erfindung.
 """
 from __future__ import annotations
 
 import logging
 from dataclasses import dataclass, field
-from typing import Optional
 
-from ..tarif_bezug import Bezug, Tarifbestand
-from ..tarif_model import HOCH
-from ..tco_model import Buendel, Rabatt
+from ..tarif_bezug import Tarifbestand
+from ..tco_model import Buendel
 
 log = logging.getLogger(__name__)
-
-# Ein Cent ist kein Rabatt, sondern ein Rundungsrest - dieselbe Toleranz
-# wie in den Adaptern (`o2._gleich` u.a.).
-_RABATT_TOLERANZ = 0.005
 
 
 @dataclass
@@ -112,44 +114,6 @@ class Buendelbilanz:
 # Wie viele verschiedene unaufloesbare Tarifnamen im Protokoll stehen. Der
 # Deckel gilt der LISTE, nicht der Zahl - `offene_tarife` zaehlt weiter.
 _BEISPIELE = 8
-
-
-def _tarif_und_rabatt(satz: dict, bezug: Optional[Bezug],
-                      bestand: Tarifbestand
-                      ) -> tuple[Optional[float], list[Rabatt]]:
-    """Der Tarifbetrag, der in die Leitzahl geht - und ein belegter Rabatt.
-
-    Ohne Beleg (`tarif_rabatt_beleg` fehlt am Rohsatz) oder ohne einen
-    ueber Name/Slug aufgeloesten Bezug (`guete == HOCH`) bleibt der
-    gemessene Buendelbetrag unangetastet - dieselbe Rueckgabe wie vor
-    B2b. Siehe Modulkopf "DIE RABATT-BASIS".
-    """
-    gemessen = satz.get("tarif_monatlich")
-    if gemessen is None or not satz.get("tarif_rabatt_beleg"):
-        return gemessen, []
-    if bezug is None or bezug.guete != HOCH:
-        return gemessen, []
-    stamm = bestand.je_id.get(bezug.tarif_id) or {}
-    grundgebuehr = stamm.get("grundgebuehr")
-    if grundgebuehr is None:
-        return gemessen, []
-    try:
-        grundgebuehr = float(grundgebuehr)
-        gemessen = float(gemessen)
-    except (TypeError, ValueError):
-        return satz.get("tarif_monatlich"), []
-    differenz = round(grundgebuehr - gemessen, 2)
-    if differenz <= _RABATT_TOLERANZ:
-        # Kein Nachlass (oder das Buendel ist teurer als die Kachel) -
-        # dann ist die Kachel nicht die richtige Vergleichsbasis und der
-        # gemessene Betrag bleibt stehen.
-        return gemessen, []
-    rabatt = Rabatt(
-        name=(f"Tarifrabatt im Gerätebündel (SIM-only "
-              f"{grundgebuehr:.2f} € statt {gemessen:.2f} €)"),
-        betrag_monatlich=differenz,
-        beleg_url=str(satz.get("quelle_url") or ""))
-    return grundgebuehr, [rabatt]
 
 
 def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str
@@ -180,8 +144,6 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str
                 bilanz.offene_tarife.get(schluessel, 0) + 1
             continue
 
-        tarif_monatlich, rabatte = _tarif_und_rabatt(satz, bezug, bestand)
-
         try:
             bilanz.buendel.append(Buendel(
                 sku_id=sku, anbieter=anbieter,
@@ -191,10 +153,11 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str
                 # (`tco_model.Buendel`).
                 tarif_name=tarif_name,
                 tarif_id=bezug.tarif_id, tarif_id_guete=bezug.guete,
-                # Der Preis OHNE bedingten Rabatt (B2b) - ein belegter
-                # Nachlass steht daneben in `rabatte`, nie eingerechnet.
-                tarif_monatlich=tarif_monatlich,
-                rabatte=rabatte,
+                # DER GEMESSENE BETRAG DIESES BUENDELS, unveraendert. Kein
+                # Tausch gegen die SIM-only-Kachel desselben Tarifs, kein
+                # Rabatt daneben - siehe Modulkopf "KEIN BETRAG WIRD
+                # UMGERECHNET".
+                tarif_monatlich=satz.get("tarif_monatlich"),
                 # DER KOMBINIERTE MONATSBETRAG (§ 13.2, 1&1 seit B4): er
                 # tritt AN DIE STELLE von `tarif_monatlich` und `geraet_
                 # monatsrate`, und `Buendel.__post_init__` erzwingt genau
@@ -206,7 +169,17 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str
                 buendel_monatlich=satz.get("buendel_monatlich"),
                 geraet_zuzahlung=satz.get("geraet_zuzahlung"),
                 geraet_monatsrate=satz.get("geraet_monatsrate"),
-                laufzeit_monate=int(satz.get("laufzeit_monate") or 0) or 24,
+                # DIE GEMESSENE RATENLAUFZEIT, ungeraten (P0-B-fix1).
+                # Bis hierher stand `int(... or 0) or 24`: ein Rohsatz ohne
+                # Laufzeit - 1&1 liefert ihn, wenn die Produktseite keine
+                # Dauer nennt - bekam still die ID `...--24m` und verschmolz
+                # mit dem ECHTEN 24-Monats-Angebot desselben Tarifs. Jetzt
+                # geht der Wert durch, wie er ist: `None` wird zur benannten
+                # Luecke (`tco_model.LAUFZEIT_LUECKE` in der ID,
+                # `POSTEN_LAUFZEIT` in der Kennzahl), eine unmoegliche Zahl
+                # (0, negativ, 24,5) wirft in `Buendel.__post_init__` und
+                # landet unten als `ungueltig` im Protokoll.
+                laufzeit_monate=satz.get("laufzeit_monate"),
                 anschlusspreis=satz.get("anschlusspreis"),
                 zustand=str(satz.get("zustand") or ""),
                 quelle_url=str(satz.get("quelle_url") or ""),

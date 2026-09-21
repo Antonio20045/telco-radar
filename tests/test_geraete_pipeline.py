@@ -568,14 +568,15 @@ def test_ein_buendel_einstieg_schreibt_die_tco_datei_und_keine_listung(tmp_path)
     assert satz["tarif_id"] == "o2:o2-mobile-on-demand-m"
     assert satz["geraet_zuzahlung"] == 1.0
     assert satz["geraet_monatsrate"] == 34.0
-    # B2b (21.09.2026): o2 nennt die 14,99 EUR im Buendel selbst einen
-    # Rabatt auf den SIM-only-Grundpreis (19,99 EUR, `_O2_TARIFE` oben) -
-    # gespeichert wird seither der Preis OHNE diesen bedingten Nachlass,
-    # er steht stattdessen benannt in `rabatte`
-    # (`tco_buendel._tarif_und_rabatt`).
-    assert satz["tarif_monatlich"] == 19.99
-    assert len(satz["rabatte"]) == 1
-    assert satz["rabatte"][0]["betrag_monatlich"] == 5.0
+    # DER GEMESSENE BUENDELTARIFPREIS, unveraendert (P0-B-fix1). B2b hatte
+    # ihn fuer einen Tag durch die SIM-only-Grundgebuehr desselben Tarifs
+    # (19,99 EUR, `_O2_TARIFE` oben) ersetzt und die Differenz als nicht
+    # eingerechneten Rabatt daneben gelegt - die Leitzahl aller 72
+    # o2-Buendel stieg dadurch um 120,00 bis 276,00 EUR, ohne dass sich
+    # ein o2-Preis geaendert hatte. o2s -5 EUR sind kein bedingter
+    # Nachlass, sondern der Preis (Modulkopf `analyze/tco_buendel.py`).
+    assert satz["tarif_monatlich"] == 14.99
+    assert satz["rabatte"] == []
     assert satz["anschlusspreis"] == 39.99
     assert satz["laufzeit_monate"] == 36
     # Kein Geraet in `geraete_db.json`: der Buendelbetrag hat in der
