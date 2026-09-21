@@ -3739,3 +3739,300 @@ def test_pf_simonly_mit_erhobenem_volumen_traegt_sein_band(gw_seite):
     assert not ohne_band, (
         f"{len(ohne_band)} SIM-only-Zeilen mit erhobenem Datenvolumen ohne "
         f"Band: {ohne_band[:6]}")
+
+
+# ==========================================================================
+# ZWEITE RECHNUNG DES PRUEFERS - Behebungsrunde P0-B (21.09.2026)
+# ==========================================================================
+# Geschrieben vom PRUEFER, nicht vom Bauer. Gelesen wird das GERENDERTE
+# HTML und die gerenderte CSV, gerechnet wird mit `decimal` aus
+# `data/state/geraete_tco_historie.jsonl` - kein Import aus
+# `telco_radar.tco_model`, `report.geraete_tco_karten` oder
+# `report.geraete_radar`.
+#
+# Jeder Lookup ist scharf: wo nichts gefunden wird, wirft der Test statt
+# gruen durchzulaufen (CLAUDE.md Regel 10).
+#
+# DREI DIESER TESTS SIND ABSICHTLICH ROT - sie halten die Befunde der
+# Pruefung fest. Wer sie gruen macht, hat den Befund behoben; wer sie
+# loescht, hat ihn versteckt.
+
+import html as _pr_html
+
+_PR_DETAIL_RE = re.compile(r'<details class="gr-bnd"(.*?)</details>', re.S)
+_PR_ATTR_RE = re.compile(r'data-([a-z]+)="([^"]*)"')
+_PR_LABEL_RE = re.compile(r'gr-bnd-label">([^<]*)<')
+_PR_RWZ_RE = re.compile(r'gr-bnd-rw-z">(.*?)</p>', re.S)
+_PR_NAME_RE = re.compile(r'gr-bnd-name">([^<]*)<')
+_PR_TARIF_RE = re.compile(r'gr-bnd-tarif">(.*?)</span>', re.S)
+_PR_MONATE_RE = re.compile(r"Kosten über (\d+) Monate")
+_PR_SCHNITT_RE = re.compile(r"Ø ([\d.]+,\d\d) €/Monat")
+_PR_ALARM_RE = re.compile(r'<tr class="gr-a-zeile.*?</tr>', re.S)
+_PR_KATALOG_RE = re.compile(r'<tr[^>]*data-modell="([^"]+)"(.*?)</tr>', re.S)
+
+
+def _pr_betrag_cent(text: str) -> int:
+    """„1.835,54 €" -> 183554. Eigene Zerlegung, keine Formatierhilfe."""
+    roh = (text or "").replace("−", "-").replace("\xa0", " ")
+    treffer = re.search(r"-?[\d.]+,\d\d", roh)
+    assert treffer, f"kein Betrag in {text!r}"
+    zahl = treffer.group(0).replace(".", "").replace(",", ".")
+    return int((_gw_Dez(zahl) * 100).to_integral_value(rounding=_gw_HUP))
+
+
+def _pr_abschnitte(gw_seite: dict) -> list[tuple]:
+    """[(modell, quelle, html)] - je Modell der Block mit seinen Zeilen.
+
+    Das Startgeraet steht inline in `geraete.html` (seine ID steht dort im
+    JSON-Block als `vorgabe`), alle anderen Modelle in je einem
+    `gr-bnd-lager`-Block des Nachladefragments. Der Block wird MIT seinem
+    Modell gefuehrt und nicht hinterher ueber den Betrag gesucht: zwei
+    Modelle koennen denselben Betrag tragen, und eine Suche nach dem
+    ersten Treffer haengt die Zeile dann an das falsche Geraet (eigener
+    Fehler, gemessen am 21.09.2026: congstar/Allnet Flat S landete mit
+    1.615,00 EUR am Galaxy S26 Ultra)."""
+    vorgabe = re.search(r'"vorgabe":\s*"([^"]+)"', gw_seite["geraete"])
+    assert vorgabe, "kein `vorgabe`-Modell in geraete.html gefunden"
+    stelle = gw_seite["geraete"].find('id="gr-bndliste"')
+    assert stelle > 0, "keine Inline-Buendelliste in geraete.html"
+    abschnitte = [(vorgabe.group(1), "geraete.html",
+                   gw_seite["geraete"][stelle:])]
+    for block in re.split(r'<div class="gr-bnd-lager" data-modell="',
+                          gw_seite["buendel"])[1:]:
+        abschnitte.append((block[:block.index('"')],
+                           "data/geraete-buendel.html", block))
+    assert len(abschnitte) >= 90, (
+        f"nur {len(abschnitte)} Modellbloecke gelesen - der Parser greift "
+        "ins Leere")
+    return abschnitte
+
+
+def _pr_buendelzeilen(gw_seite: dict) -> list[dict]:
+    """Alle Buendelzeilen BEIDER Dokumente, je mit ihrem Modell."""
+    zeilen = []
+    for modell, quelle, text in _pr_abschnitte(gw_seite):
+        for treffer in _PR_DETAIL_RE.finditer(text):
+            block = treffer.group(1)
+            attribute = dict(_PR_ATTR_RE.findall(block))
+            etikett = _PR_LABEL_RE.search(block)
+            rechenweg = _PR_RWZ_RE.search(block)
+            name = _PR_NAME_RE.search(block)
+            tarif = _PR_TARIF_RE.search(block)
+            zeilen.append({
+                "quelle": quelle,
+                "modell": modell,
+                "attribute": attribute,
+                "etikett": (etikett.group(1) if etikett else ""),
+                "rechenweg": re.sub(
+                    r"\s+", " ",
+                    re.sub("<[^>]+>", "", rechenweg.group(1))
+                ).strip() if rechenweg else "",
+                "anbieter": (name.group(1) if name else ""),
+                "tarif": re.sub(r"\s+", " ",
+                                re.sub("<[^>]+>", " ", tarif.group(1))
+                                ).strip() if tarif else "",
+            })
+    assert len(zeilen) >= 300, (
+        f"nur {len(zeilen)} Buendelzeilen gelesen - am 21.09.2026 waren es "
+        "375; der Parser greift ins Leere")
+    return zeilen
+
+
+def test_pr_fuenf_leitzahlen_gegen_die_historie_nachgerechnet(gw_seite):
+    """Fuenf Zahlen der Seite, EIGENE Rechnung aus der Historie.
+
+    Definition (Auftrag): Anzahlung + 24 Monate Tarif + ALLE Geraeteraten
+    einschliesslich der Restschuld nach Monat 24 + Anschlusspreis. Bei
+    einem zusammengelegten Buendelmonatspreis (1&1) tritt dieser Betrag
+    ueber seine eigene Laufzeit an die Stelle von Tarif UND Rate.
+
+    Rundung offen benannt: jeder Monatsbetrag wird als ganze Cent gelesen
+    und danach multipliziert (eine Rate von 30,50 EUR ist 3050 Cent), die
+    Summe bleibt exakt - keine Gleitkommatoleranz.
+
+    Nachgerechnet am 21.09.2026 (Pruefer), Seite == Soll:
+      congstar / iPhone 17 Pro 256 / Allnet Flat XS   1.459,00 EUR
+      o2       / iPhone 17 Pro 256 / Unlimited M Plus 1.794,76 EUR
+      Vodafone / iPhone 17 Pro 256 / Mobil XS         1.955,80 EUR
+      1&1      / iPhone 17 Pro 256 / All-Net-Flat S   2.019,54 EUR
+      congstar / Galaxy S26 Ultra 256 / Allnet Flat S 1.399,00 EUR
+    """
+    historie = _pf_historie()
+    faelle = (
+        ("apple-iphone-17-pro-256", "congstar", "allnet-flat-xs", 145900),
+        ("apple-iphone-17-pro-256", "o2",
+         "o2-mobile-unlimited-m-plus-mit-100-mbit-s-24-mon", 179476),
+        ("apple-iphone-17-pro-256", "vodafone", "mobil-xs", 195580),
+        ("apple-iphone-17-pro-256", "1-1", "1-1-all-net-flat-s", 201954),
+        ("samsung-galaxy-s26-ultra-256", "congstar", "allnet-flat-s", 139900),
+    )
+    zeilen = _pr_buendelzeilen(gw_seite)
+    geprueft, fehler = 0, []
+    for modell, slug, tarifteil, verankert in faelle:
+        satz = _pf_letzte_messung(historie, modell, slug, tarifteil)
+        soll = _pf_leitzahl_cent(satz)
+        # Der Anker aus der Pruefung vom 21.09.2026: aendert ein Bot-Commit
+        # die Posten, wird DIESER Assert rot - dann ist der neue Sollwert
+        # nachzurechnen, nicht der Test zu loeschen.
+        assert soll == verankert, (
+            f"{slug}/{tarifteil} zu {modell}: eigene Rechnung "
+            f"{soll / 100} EUR gegen verankerte {verankert / 100} EUR")
+        treffer = [z for z in zeilen
+                   if _pr_anbieter_slug(z["anbieter"]) == slug
+                   and _pr_tarifteil(z["tarif"]) == tarifteil
+                   and z["attribute"].get("zustand") == "neu"
+                   and z["attribute"].get("gesamt")
+                   and z["modell"] == modell]
+        assert treffer, (
+            f"keine Buendelzeile {slug}/{tarifteil} zu {modell} auf der "
+            "Seite - der Lookup greift ins Leere und dieser Test wuerde "
+            "sonst gruen nichts pruefen")
+        for zeile in treffer:
+            geprueft += 1
+            ist = int((_gw_Dez(zeile["attribute"]["gesamt"]) * 100)
+                      .to_integral_value(rounding=_gw_HUP))
+            if ist != soll:
+                fehler.append((modell, slug, tarifteil, ist, soll))
+    assert geprueft >= len(faelle), (
+        f"nur {geprueft} Zeilen geprueft - erwartet mindestens "
+        f"{len(faelle)}")
+    assert not fehler, f"Seite gegen eigene Rechnung: {fehler}"
+
+
+def _pr_anbieter_slug(anbieter: str) -> str:
+    """„1&1" -> `1-1`, „Vodafone" -> `vodafone` - wie das ID-Segment.
+
+    Die Entities werden ZUERST aufgeloest: `1&amp;1` ergibt sonst
+    `1-amp-1`, und der Vergleich zweier Tabellen faellt still ins Leere -
+    genau der gruene Test, der nichts prueft."""
+    roh = _pr_html.unescape(anbieter or "")
+    return re.sub(r"[^a-z0-9]+", "-", roh.lower()).strip("-")
+
+
+def _pr_tarifteil(tarif: str) -> str:
+    """Der Tarifname der Zeile als ID-Segment (ohne „ · 15 GB")."""
+    name = _pr_html.unescape(tarif or "").split("·")[0]
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+
+
+def test_pr_kein_monatsschnitt_teilt_eine_36_monats_summe_durch_24(gw_seite):
+    """BEFUND (hoch): Ø/Monat rechnet 36-Monats-Summe / 24 Monate.
+
+    Seit P0-B-fix2 nennt das Etikett den Zeitraum der Zahl
+    ("Kosten über 36 Monate"). Der Ø/Monat DERSELBEN Zeile teilt
+    weiterhin durch 24 (`tco_model.Tco.monatlich`). Gerendert am
+    21.09.2026, 1&1 / iPhone 17 Pro 256 GB:
+
+        "Kosten über 36 Monate 2.019,54 € · Ø 84,15 €/Monat"
+
+    84,15 x 36 = 3.029,40 EUR - die Zeile widerspricht sich selbst. Der
+    Monatsbetrag des Angebots ist 44,99 EUR, die Summe ueber ihren
+    eigenen Zeitraum ergibt 56,10 EUR je Monat. Betroffen sind 70 Zeilen
+    (Seite plus Fragment).
+
+    Geprueft wird die Identitaet, die auf JEDER Zeile gelten muss:
+    gezeigter Ø x gezeigte Monate == gezeigte Leitzahl (eine Cent-
+    Rundungsspanne je Monat erlaubt)."""
+    zeilen = _pr_buendelzeilen(gw_seite)
+    geprueft, fehler = 0, []
+    for zeile in zeilen:
+        monate = _PR_MONATE_RE.search(zeile["etikett"])
+        schnitt = _PR_SCHNITT_RE.search(zeile["rechenweg"])
+        if monate is None or schnitt is None:
+            continue
+        geprueft += 1
+        n = int(monate.group(1))
+        gezeigt = _pr_betrag_cent(schnitt.group(1))
+        summe = _pr_betrag_cent(zeile["rechenweg"])
+        if abs(gezeigt * n - summe) > n:
+            fehler.append((zeile["anbieter"], zeile["tarif"], n,
+                           summe / 100, gezeigt / 100,
+                           round(summe / n / 100, 2)))
+    assert geprueft >= 300, (
+        f"nur {geprueft} Zeilen mit Etikett UND Ø gelesen - der Parser "
+        "greift ins Leere")
+    assert not fehler, (
+        f"{len(fehler)} Zeilen, deren Ø/Monat nicht zu ihrem eigenen "
+        f"Zeitraum passt (Anbieter, Tarif, Monate, Summe, Ø gezeigt, "
+        f"Ø soll): {fehler[:4]}")
+
+
+def test_pr_kein_vorzeichen_gegen_vodafone_ueber_zwei_zeitraeume(gw_seite):
+    """BEFUND (kritisch): das Delta ist nur in der Buendelzeile entschaerft.
+
+    P0-B-fix2 nimmt der Buendelzeile eines 1&1-Angebots das Euro- und
+    Prozent-Delta ("andere Laufzeit", "Kein Abstand zur
+    Vodafone-Referenz: diese Zahl trägt 36 Monate, die Referenz 24
+    Monate"). Die Alarm-/Radarzeilen desselben Angebots auf derselben
+    Seite tragen ihr Vorzeichen weiter (`report/geraete_radar.py:251`
+    und `:282` rechnen `prozent` ohne Horizont-Tor), ebenso
+    `exporte/wettbewerbsradar.csv` (Status `vergleichbar`, Preisart
+    "Kosten über 24 Monate") - gemessen am 21.09.2026: 26 Alarmzeilen mit
+    1&1-Prozentzahl, darunter iPhone 17 Pro 256 GB mit +3,3 % gegen eine
+    Referenz von 1.955,80 EUR.
+
+    Die 1&1-Zahlen tragen 36 Monate Tarif UND Geraet in EINEM Betrag;
+    allein die zwoelf Tarifmonate jenseits des Horizonts (12 x 14,99 EUR
+    nach `tarife.jsonl` = 179,88 EUR) sind groesser als jedes hier
+    ausgewiesene Delta. Geprueft wird: kein Vorzeichen fuer ein Angebot,
+    dessen Buendelzeile den Zeitraum 36 nennt."""
+    zeilen = _pr_buendelzeilen(gw_seite)
+    andere_laufzeit = {
+        (_pr_anbieter_slug(z["anbieter"]), z["attribute"].get("gesamt"))
+        for z in zeilen
+        if (_PR_MONATE_RE.search(z["etikett"]) or [None, "24"])[1] != "24"}
+    assert andere_laufzeit, (
+        "keine Zeile mit abweichendem Zeitraum auf der Seite - der Test "
+        "wuerde sonst gruen nichts pruefen")
+
+    mit_vorzeichen = []
+    for treffer in _PR_ALARM_RE.finditer(gw_seite["geraete"]):
+        block = treffer.group(0)
+        attribute = dict(re.findall(r'data-s-([a-z]+)="([^"]*)"', block))
+        anbieter = _pr_anbieter_slug(
+            (attribute.get("anbieter") or "").replace("&amp;", "&"))
+        gesamt = attribute.get("gesamt")
+        if not attribute.get("prozent"):
+            continue
+        if (anbieter, gesamt) in andere_laufzeit:
+            mit_vorzeichen.append((attribute.get("geraet"), anbieter, gesamt,
+                                   attribute.get("prozent")))
+    assert not mit_vorzeichen, (
+        f"{len(mit_vorzeichen)} Alarm-/Radarzeilen tragen ein Delta-"
+        "Vorzeichen fuer eine Zahl, deren eigene Buendelzeile einen "
+        f"anderen Zeitraum nennt: {mit_vorzeichen[:4]}")
+
+
+def test_pr_eine_verschwundene_abweichung_traegt_ihren_grund(gw_seite):
+    """BEFUND (hoch): 22 Abweichungen sind zum Strich geworden, ohne Grund.
+
+    `report/geraete_view.py:1084` laesst die Luecke der Delta-Spalte
+    ausdruecklich leer ("Strich wie die Buendelzeile - die Referenz
+    existiert"). Seit P0-B-fix2 trifft das nicht mehr zu: die
+    Buendelzeile zeigt dort "andere Laufzeit", die Katalogzeile den
+    Strich, und der Strich heisst auf dieser Seite "kein Angebot" (A2).
+
+    Gemessen am 21.09.2026 (gleicher Bestand, zwei Codestaende):
+    `exporte/geraete-modell-tco.csv` verlor 22 von 57 Abweichungen
+    (2aa7dbd -> ac80e83), und KEINE der 22 Zeilen traegt einen Grund in
+    der Statusspalte - z. B. Apple iPhone 17 Pro Max 512 GB (Vodafone
+    2.351,80 EUR): vorher "+341,74 € · +14,5 %", jetzt "–".
+
+    Geprueft wird die Zusicherung des Exports selbst
+    (`geraete_export.modell_tco_csv`): "Eine Zeile ohne Zahl ODER OHNE
+    ABSTAND traegt den benannten Grund in der Statusspalte."""
+    pfad = Path(gw_seite["csv"]).parent / "geraete-modell-tco.csv"
+    assert pfad.exists(), f"{pfad} fehlt - der Export wurde nicht gerendert"
+    zeilen = list(_gw_csv.DictReader(
+        pfad.read_text(encoding="utf-8-sig").splitlines(), delimiter=";"))
+    assert len(zeilen) >= 100, (
+        f"nur {len(zeilen)} Modellzeilen im Export - der Lookup greift ins "
+        "Leere")
+    stumm = [(z["Hersteller"], z["Modell"], z["Speicher GB"],
+              z["Bester Anbieter"], z["TCO ab EUR"])
+             for z in zeilen
+             if z["TCO ab EUR"].strip() and not z["Abweichung %"].strip()
+             and not (z["Status"] or "").strip()]
+    assert not stumm, (
+        f"{len(stumm)} Modellzeilen mit Leitzahl, aber ohne Abweichung UND "
+        f"ohne Grund in der Statusspalte: {stumm[:6]}")
