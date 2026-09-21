@@ -91,22 +91,24 @@ def farben():
 # lies_buendel(): Struktur der Sätze
 # ==========================================================================
 
-def test_achtzehn_saetze_aus_zwei_planvarianten_und_neun_speichern():
+def test_achtunddreissig_saetze_aus_zwei_planvarianten_neun_speichern_zwei_laufzeiten():
     """Je PlanVariant (M und M Flex) 4 Geräte mit zusammen 9
     Speichergrößen - Farbvarianten sind dedupliziert, wie der Auftrag es
     verlangt: die Zahlweise ist bei jeder Farbe derselben Größe identisch
-    (gemessen an beiden Fixtures)."""
+    (gemessen an beiden Fixtures). Seit P0-B2a kommt jede Speichergröße
+    ZWEIMAL vor - einmal je erhobener Laufzeit (24 und 36 Monate)."""
     saetze = _saetze()
-    assert len(saetze) == 18
+    assert len(saetze) == 36
     je_tarif = {}
     for s in saetze:
         je_tarif.setdefault(s["tarif_name"], []).append(s)
     assert set(je_tarif) == {"Allnet Flat M", "Allnet Flat M Flex"}
-    assert all(len(v) == 9 for v in je_tarif.values())
-    # Keine Dublette je (Tarif, Variante): 4 Geräte mit zusammen 9
-    # Speichergrößen (256/512/1024 kommen je bei mehreren Geräten vor).
+    assert all(len(v) == 18 for v in je_tarif.values())
+    # Keine Dublette je (Tarif, Variante, Laufzeit): 4 Geräte mit zusammen
+    # 9 Speichergrößen (256/512/1024 kommen je bei mehreren Geräten vor).
     for v in je_tarif.values():
         assert len({s["sku"] for s in v}) == 9
+        assert len({(s["sku"], s["laufzeit_monate"]) for s in v}) == 18
 
 
 def test_tarifname_slug_und_preise_kommen_aus_der_antwort():
@@ -124,7 +126,7 @@ def test_tarifname_slug_und_preise_kommen_aus_der_antwort():
         assert s["tarif_slug"] == "548"
         assert s["tarif_monatlich"] == 24.0
         assert s["anschlusspreis"] == 0.0
-    assert all(s["laufzeit_monate"] == 36 for s in saetze)
+    assert {s["laufzeit_monate"] for s in saetze} == {24, 36}
     assert all(s["url"] == _M_URL for s in saetze)
 
 
@@ -133,7 +135,8 @@ def test_der_iphone_satz_nach_rechnung():
     512 GB, Allnet Flat M - 97 € Zuzahlung + 36 × 33,50 € Rate = 1303 €
     Ratengesamtbetrag (mit Rabatt), dazu 24 €/Monat Tarif."""
     s = next(x for x in _saetze() if "iPhone 17 Pro 512 GB" in x["titel"]
-             and x["tarif_name"] == "Allnet Flat M")
+             and x["tarif_name"] == "Allnet Flat M"
+             and x["laufzeit_monate"] == 36)
     assert s["geraet_zuzahlung"] == 97.0
     assert s["geraet_monatsrate"] == 33.5
     assert s["geraet_zuzahlung"] + 36 * s["geraet_monatsrate"] == \
@@ -147,17 +150,18 @@ def test_im_buendel_gilt_discounted_nicht_listed():
     Rate 33,50 € (discounted), nicht 40,00 € (listed - der Preis ohne die
     Tarifbindung). Umgekehrt zur Geräteseite, wo `listed` richtig ist."""
     s = next(x for x in _saetze() if "iPhone 17 Pro 512 GB" in x["titel"]
-             and x["tarif_name"] == "Allnet Flat M")
+             and x["tarif_name"] == "Allnet Flat M"
+             and x["laufzeit_monate"] == 36)
     assert s["geraet_monatsrate"] == 33.5
     assert s["geraet_monatsrate"] != 40.0
 
 
 def test_jede_ratenform_geht_gegen_die_rohantwort_auf():
-    """Die Probe ist Bedingung: je Satz muss Zuzahlung + 36 × Rate dem
-    `total` DERSELBEN Variante in der Rohantwort entsprechen - hier
-    nachgelesen über die Varianten-ID (sku), nicht dem gefilterten Satz
-    geglaubt. Dazu die Gegenprobe auf discounted: `total` ist der
-    Gesamtbetrag MIT Rabatten."""
+    """Die Probe ist Bedingung: je Satz muss Zuzahlung + Laufzeit × Rate
+    dem `total` DERSELBEN Variante UND DERSELBEN Laufzeit in der
+    Rohantwort entsprechen - hier nachgelesen über die Varianten-ID (sku),
+    nicht dem gefilterten Satz geglaubt. Dazu die Gegenprobe auf
+    discounted: `total` ist der Gesamtbetrag MIT Rabatten."""
     from telco_radar.collect.geraete.congstar import _nutzlast, _planvarianten
     text = _fixture("congstar_tarifseite_allnet_flat_m.html.gz")
     # Der Lookup Schluessel ist (Plan, Variante): dieselbe Variante steht in
@@ -173,14 +177,14 @@ def test_jede_ratenform_geht_gegen_die_rohantwort_auf():
     assert len(roh_je_plan_sku) >= 58, "Varianten-Lookup leer - Test prüft nichts"
 
     saetze = _saetze()
-    assert len(saetze) == 18                # die Lookup-Zeile
+    assert len(saetze) == 36                # die Lookup-Zeile
     for s in saetze:
         variante = roh_je_plan_sku[(s["tarif_slug"], s["sku"])]
         zahlweise = next(
             z for z in variante["prices"]["paymentVariants"]
             if z.get("type") == "INSTALLMENT_PLAN"
             and z.get("subtype") == "UNSPECIFIED"
-            and z.get("contractDuration") == 36)
+            and z.get("contractDuration") == s["laufzeit_monate"])
         assert s["geraet_zuzahlung"] + \
             s["laufzeit_monate"] * s["geraet_monatsrate"] == \
             pytest.approx(float(zahlweise["total"]), abs=0.005)
@@ -224,19 +228,56 @@ def test_die_geraeteseite_ist_keine_buendelantwort():
                      url="https://www.congstar.de/geraete/apple/apple-iphone-17/")
 
 
-def test_nur_die_36_monats_zahlweise_wird_erhoben():
-    """Je Variante stehen 24- und 36-Monats-Zahlweisen nebeneinander. Erhoben
-    ist die 36-Monats-Finanzierung (o2- und Telekom-kongruent, siehe
-    Modulkopf). Wird die 36er aus der Antwort entfernt - hier durch eine
-    Textersetzung am ECHTEN Abruf, sonst kein Byte veraendert -, gibt es
-    keinen Satz mehr."""
+def test_beide_ratenlaufzeiten_werden_erhoben():
+    """P0-B2a: Je Variante stehen 24- und 36-Monats-Zahlweisen nebeneinander
+    - seit der Bestandsschluessel die Laufzeit traegt (`tco_model.
+    buendel_id`, B1), werden BEIDE erhoben, nicht nur die 36er. 18 Saetze
+    (Modulkopf: 2 PlanVarianten x 9 Speichergroessen) werden zu 36 - jeder
+    doppelt, einmal je Laufzeit."""
+    saetze = _saetze()
+    assert len(saetze) == 36
+    laufzeiten = {s["laufzeit_monate"] for s in saetze}
+    assert laufzeiten == {24, 36}
+    je_sku_tarif: dict = {}
+    for s in saetze:
+        je_sku_tarif.setdefault((s["sku"], s["tarif_name"]), set()).add(
+            s["laufzeit_monate"])
+    assert len(je_sku_tarif) == 18
+    assert all(v == {24, 36} for v in je_sku_tarif.values())
+
+
+def test_die_24_monats_rate_ist_hoeher_als_die_36_monats_rate():
+    """congstar finanziert zum Nulltarif: kuerzere Laufzeit heisst hoehere
+    Rate, beide zum selben `total` (iPhone 17 Pro 512 GB, Allnet Flat M:
+    1 + 97 + 36 x 33,50 = 1303 = 97 + 24 x 50,25)."""
+    saetze = [s for s in _saetze() if "iPhone 17 Pro 512 GB" in s["titel"]
+              and s["tarif_name"] == "Allnet Flat M"]
+    nach_laufzeit = {s["laufzeit_monate"]: s for s in saetze}
+    assert set(nach_laufzeit) == {24, 36}
+    assert nach_laufzeit[36]["geraet_monatsrate"] == 33.5
+    assert nach_laufzeit[24]["geraet_monatsrate"] == 50.25
+    assert nach_laufzeit[36]["geraet_zuzahlung"] == \
+        nach_laufzeit[24]["geraet_zuzahlung"] == 97.0
+    for s in nach_laufzeit.values():
+        assert s["geraet_zuzahlung"] + \
+            s["laufzeit_monate"] * s["geraet_monatsrate"] == \
+            pytest.approx(1303.0, abs=0.005)
+
+
+def test_wird_eine_laufzeit_aus_der_antwort_entfernt_bleibt_die_andere():
+    """Wird die 36-Monats-Zahlweise auf eine nicht erhobene Laufzeit
+    gedreht - hier durch eine Textersetzung am ECHTEN Abruf, sonst kein
+    Byte veraendert -, bleibt die 24-Monats-Zahlweise trotzdem ein Satz:
+    eine kaputte oder fehlende Laufzeit verwirft nur sich selbst, nicht
+    die andere."""
     roh = _fixture("congstar_tarifseite_allnet_flat_m.html.gz")
     assert '\\"contractDuration\\":36' in roh, \
         "die Fixture muss 36-Monats-Zahlweisen tragen, sonst prüft der Test nichts"
     ohne_36 = roh.replace('\\"contractDuration\\":36',
-                          '\\"contractDuration\\":24')
+                          '\\"contractDuration\\":48')
     saetze = lies_buendel(ohne_36, url=_M_URL)
-    assert saetze == []
+    assert len(saetze) == 18
+    assert all(s["laufzeit_monate"] == 24 for s in saetze)
 
 
 def test_trade_in_wird_nicht_als_normaler_kauf_gehoben():
@@ -332,16 +373,16 @@ def test_gesetzte_slugs_und_fremde_anbieter_bleiben_unberuehrt():
 
 
 def test_der_ganze_weg_bis_zum_buendel_mit_echtem_bestand():
-    """Ende zu Ende gegen den echten tarife.jsonl-Bestand: die 18 Sätze
-    der M-Fixture lösen nach der Brücke alle auf (M und M Flex über den
-    Namen, die Brücke stört das nicht)."""
+    """Ende zu Ende gegen den echten tarife.jsonl-Bestand: die 36 Sätze
+    der M-Fixture (P0-B2a: 18 × 2 Laufzeiten) lösen nach der Brücke alle
+    auf (M und M Flex über den Namen, die Brücke stört das nicht)."""
     bestand = Tarifbestand.aus_datei(_WURZEL / "data" / "state" / "tarife.jsonl")
     ergaenze_pib_slug(bestand)
     rohsaetze = [{**s, "anbieter": "congstar",
                   "sku_id": f"sku-{i}", "quelle_url": s["url"]}
                  for i, s in enumerate(_saetze())]
     bilanz = aus_rohsaetzen(rohsaetze, bestand, "2026-09-08")
-    assert len(bilanz.buendel) == 18, (
+    assert len(bilanz.buendel) == 36, (
         f"{bilanz.ohne_tarif} ohne auflösbaren Tarif, "
         f"häufigste: {bilanz.offene_tarife}")
     assert all(b.tarif_id.startswith("congstar:") for b in bilanz.buendel)
@@ -381,7 +422,7 @@ def test_sammle_anbieter_liefert_buendel_und_keine_listungen(katalog, farben):
                              "2026-09-08", waechter)
     assert bilanz.status == "ok"
     assert bilanz.listungen == []
-    assert len(bilanz.buendel) == 18
+    assert len(bilanz.buendel) == 36
     b = bilanz.buendel[0]
     assert b["anbieter"] == "congstar"
     assert b["sku_id"]

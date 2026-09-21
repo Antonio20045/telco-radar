@@ -1889,7 +1889,13 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     bestand_heute = _spaeterer_tag(heute, db.updated) if heute else ""
     tco = geraete_tco_view.aufbereiten(
         tco_db.buendel(), tco_db.referenzen(), belastbar, katalog,
-        lesbar=tco_db.lesbar, tarife=tarifbestand.je_id,
+        # B3 (21.09.2026): `je_id_aktuell`, nicht `je_id` - ein Buendel
+        # loest immer auf den BARE `tarif_id` auf, und der bare Schluessel
+        # gehoert oft dem Pflichtdokument (Bestandsschutz der Zeitreihe,
+        # `tarif_bezug.Tarifbestand`). `je_id_aktuell` traegt dort die
+        # Live-Shop-Lesart, wo es sie gibt - dieselbe Regel wie fuer die
+        # SIM-only-Referenz nebenan.
+        lesbar=tco_db.lesbar, tarife=tarifbestand.je_id_aktuell,
         # O4: der Anbietertyp fuer die Spalte des TCO-Exports (der
         # Store traegt ihn nicht) und die Lage der Buendel-Historie
         # fuer den ehrlichen Satz im Verlaufs-Reiter.
@@ -1903,8 +1909,8 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         # rechnet die Zeitreihe mit der HEUTIGEN Leitzahl, phasengewichtet
         # ueber dieselben Phasen (`phasen_fuer_buendel`, ohne Widerspruch
         # zur Messung).
-        zeitreihe = geraete_zeitreihe.aufbereiten(state_dir, tco,
-                                                  tarife=tarifbestand.je_id)
+        zeitreihe = geraete_zeitreihe.aufbereiten(
+            state_dir, tco, tarife=tarifbestand.je_id_aktuell)
     except Exception as exc:                       # noqa: BLE001
         log.error("Zeitreihen-Aufbereitung gescheitert: %s: %s",
                   type(exc).__name__, exc)

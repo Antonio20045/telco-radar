@@ -96,7 +96,8 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from .geraete_model import Ratenzahlung, normalisiere
-from .tarif_model import (PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP, Preisphase)
+from .tarif_model import (PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP, Preisphase,
+                          zeitreihen_basis)
 
 log = logging.getLogger(__name__)
 
@@ -786,19 +787,13 @@ class Geraeteanteil:
             if l not in _LUECKEN_OHNE_EINFLUSS_AUF_DIE_DIFFERENZ]
 
 
-def _zeitreihen_basis(tid: str) -> str:
-    """Die Tarif-ID ohne den `#live_shop`-Lesart-Zusatz.
-
-    ZWEI LESARTEN SIND ZWEI ZEITREIHEN, ABER EIN TARIF (B2, 08.09.2026):
-    der PIB-Eintrag `telekom:magentamobil-l` und die Shop-Kachel
-    `telekom:magentamobil-l#live_shop` sind derselbe Vertrag - der Zusatz
-    ist der PREISTYP und wird in `tarif_crawler.uebernimm_stand` genau
-    deshalb als konstanter Zusatz gesetzt. Gestrichen wird NUR er: ein
-    HASH-Zusatz (zwei gleichnamige, verschiedene Produkte wie o2-home-l-
-    flex und -175-flex) bleibt stehen und trennt weiterhin.
-    """
-    zusatz = f"#{PREISTYP_LIVE_SHOP}"
-    return tid[: -len(zusatz)] if tid.endswith(zusatz) else tid
+# B3 (21.09.2026): die Kuerzung selbst wohnt jetzt in `tarif_model.
+# zeitreihen_basis` - `tarif_bezug.Tarifbestand` braucht sie fuer dieselbe
+# Frage ("welche Lesart gilt fuer diesen Vertrag"), und zwei Kopien derselben
+# ID-Umformung waeren zwei Stellen, die auseinanderlaufen koennten. Der Name
+# bleibt hier als lokaler Alias stehen, weil `geraeteanteil()` unten ihn so
+# nennt und ein Umbenennen an dieser Stelle keinen Wert haette.
+_zeitreihen_basis = zeitreihen_basis
 
 
 def geraeteanteil(buendel: Buendel, referenz: SimOnlyReferenz) -> Geraeteanteil:

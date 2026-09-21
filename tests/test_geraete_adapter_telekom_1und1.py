@@ -27,6 +27,7 @@ nach (Challenge-Antwort, kaputtes JSON, fehlender Tarifname), die man nicht
 ehrlich herbeimessen kann.
 """
 import gzip
+import json
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -161,6 +162,67 @@ def test_telekom_gesamtbetrag_der_nicht_aufgeht_wird_verworfen():
             '"price": {"upfrontPrice": 99, "installments": [{"numberOfInstallments": 36, '
             '"recurringPrice": 30.5, "totalPrice": 1500}]}}]}};</script>')
     assert telekom.lies(html, _TELEKOM_URL) == []
+
+
+def test_telekom_mehrere_ratenplaene_werden_je_ein_eigener_satz(telekom_html):
+    """P0-B2a: `installments` ist eine Liste - bietet ein Eintrag mehrere
+    Laufzeiten nebeneinander an, wird JEDE ein eigener Satz mit eigener
+    `laufzeit_monate`, nicht nur `installments[0]`.
+
+    Kein gespeicherter echter Abruf zeigt bislang mehr als einen Plan je
+    Gerät (siehe Modulkopf von `telekom.py`); dieser Test ergänzt am
+    ECHTEN iPhone-17-Pro-Eintrag der Kategorieseite EINEN zweiten,
+    rechnerisch selbst konsistenten 24-Monats-Plan (99 + 24 × 44,00 =
+    1155,00) - derselbe Ansatz wie die anderen synthetischen Fälle in
+    diesem Modul (Modulkopf: "keine Messungen, sondern nachgestellte
+    Ausfälle/Varianten").
+    """
+    daten = telekom.zustand(telekom_html)
+    geraete = daten["productList"]["data"]
+    pro = next(e for e in geraete
+               if str(e.get("variantSlug") or "") == "tiefblau-256-gb")
+    assert pro["price"]["installments"][0]["numberOfInstallments"] == 36
+    zweiter_plan = {"numberOfInstallments": 24, "recurringPrice": 44.0,
+                    "totalPrice": 1155.0}
+    pro["price"]["installments"] = [pro["price"]["installments"][0],
+                                    zweiter_plan]
+    geaendert = f'<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>'
+
+    saetze = [s for s in telekom.lies(geaendert, _TELEKOM_URL)
+              if s["titel"].startswith("Apple iPhone 17 Pro 256")]
+    assert len(saetze) == 2
+    laufzeiten = {s["laufzeit_monate"] for s in saetze}
+    assert laufzeiten == {36, 24}
+    nach_laufzeit = {s["laufzeit_monate"]: s for s in saetze}
+    assert nach_laufzeit[36]["preis"] == 1197.0
+    assert nach_laufzeit[24]["preis"] == 1155.0
+    assert nach_laufzeit[24]["monatsrate"] == 44.0
+    # Beide Saetze bleiben sonst identisch (dasselbe Geraet, dieselbe SKU).
+    assert nach_laufzeit[36]["sku"] == nach_laufzeit[24]["sku"]
+    assert nach_laufzeit[36]["farbe"] == nach_laufzeit[24]["farbe"]
+
+
+def test_telekom_ein_nicht_aufgehender_plan_faellt_einzeln(telekom_html, caplog):
+    """Zwei Plaene, einer davon rechnerisch falsch (99 + 24 × 44,00 ist
+    nicht 999,00): NUR der kaputte Plan faellt, der aufgehende bleibt -
+    nicht der ganze Eintrag wie vor P0-B2a."""
+    daten = telekom.zustand(telekom_html)
+    geraete = daten["productList"]["data"]
+    pro = next(e for e in geraete
+               if str(e.get("variantSlug") or "") == "tiefblau-256-gb")
+    kaputter_plan = {"numberOfInstallments": 24, "recurringPrice": 44.0,
+                     "totalPrice": 999.0}
+    pro["price"]["installments"] = [pro["price"]["installments"][0],
+                                    kaputter_plan]
+    geaendert = f'<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>'
+
+    with caplog.at_level("INFO"):
+        saetze = [s for s in telekom.lies(geaendert, _TELEKOM_URL)
+                  if s["titel"].startswith("Apple iPhone 17 Pro 256")]
+    assert len(saetze) == 1
+    assert saetze[0]["laufzeit_monate"] == 36
+    assert saetze[0]["preis"] == 1197.0
+    assert any("Ratenplan" in m and "24" in m for m in caplog.messages)
 
 
 def test_telekom_eintrag_ganz_ohne_ratenform_wird_verworfen():

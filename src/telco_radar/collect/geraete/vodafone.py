@@ -68,6 +68,30 @@ eine separate Geraeterate gibt es nicht. Deshalb probiert
 Rechnungen aufgeht. Das haengt nicht am Namen `financingType`, der koennte
 sich aendern; es haengt an der Zahl.
 
+ALLE LAUFZEITEN SIND SCHON ERFASST - GEMESSEN, NICHT VERMUTET (P0-B2a)
+------------------------------------------------------------------------
+`lies_buendel()` iteriert bereits ueber JEDE Komposition in
+`prices.composition` (2-4 je Variante) und legt fuer jede einen eigenen
+Rohsatz an - 12/24/36 Monate UND `sub` kommen alle vier als eigene Buendel
+heraus (gemessen am Musterbuendel: 3 Varianten x 4 Kompositionen = 12
+Saetze, `test_zwoelf_buendel_aus_drei_varianten_und_vier_kompositionen`).
+Anders als bei Telekom/congstar musste hier also keine Auswahl aufgehoben
+werden.
+
+Eine ZWEITE Phase in `totalMonthlyRatePrice` (36-Monats-Finanzierung: Monate
+1-24 Tarif+Geraet, 25-36 nur noch Geraet) ist KEIN verlorener Messpunkt:
+`geraet_monatsrate` kommt nicht aus `_periode0()`, sondern flach aus
+`priceByComponent.hardware.priceByType.rate.month`, das schon die GANZE
+Ratenlaufzeit abdeckt (`recurrenceEnd == financingDuration`). Nachgerechnet
+an allen drei Ratenfaellen der Fixture (12/24/36 Monate):
+Zuzahlung + Laufzeit x Rate trifft `priceByComponent.hardware...total.
+onetime.withoutDiscounts.gross` auf den Cent genau
+(`test_alle_phasen_ergeben_den_richtigen_geraete_gesamtpreis`). Nur der
+LAUFZEIT-Fallback fuer den `sub`-Fall ohne eigene `financingDuration` las
+bis zum 21.09.2026 ausschliesslich Phase 0; er liest jetzt das Ende der
+LETZTEN Phase - defensiv, denn kein gespeicherter Abruf zeigt bislang
+einen `sub`-Fall mit mehr als einer Phase.
+
 DIE OFFENE TARIFNAMEN-FRAGE IST GEKLAERT: JA, ES GIBT EINEN ENDPUNKT
 ----------------------------------------------------------------------
 `prices.composition[].offerCoreHash` nennt keinen Klarnamen - aber
@@ -256,18 +280,33 @@ def _gleich(a: Optional[float], b: Optional[float]) -> bool:
     return abs(float(a) - float(b)) < 0.005
 
 
-def _periode0(komposition: dict) -> Optional[dict]:
-    """Die ERSTE Phase von `totalMonthlyRatePrice` - die, gegen die die
-    Komponentenbetraege (`recurrenceStart: 1`) nachgerechnet werden. Eine
-    Ratenlaufzeit ueber 24 Monate hinaus (financingDuration 36) traegt eine
-    ZWEITE, niedrigere Phase (nur noch die Geraeterate) - die zaehlt hier
-    nicht mit, sie ist keine zusaetzliche Messung, sondern derselbe Vertrag
-    in seinem zweiten Abschnitt."""
+def _perioden(komposition: dict) -> list[dict]:
+    """ALLE Phasen von `totalMonthlyRatePrice.withoutDiscounts` - eine
+    Ratenlaufzeit ueber 24 Monate hinaus (financingDuration 36) traegt
+    zwei (Monate 1-24 Tarif+Geraet, 25-36 nur noch die Geraeterate)."""
     perioden = _pfad(komposition, "totalMonthlyRatePrice", "withoutDiscounts")
-    if not isinstance(perioden, list) or not perioden:
-        return None
-    erste = perioden[0]
-    return erste if isinstance(erste, dict) else None
+    if not isinstance(perioden, list):
+        return []
+    return [p for p in perioden if isinstance(p, dict)]
+
+
+def _periode0(komposition: dict) -> Optional[dict]:
+    """Die ERSTE Phase - die, gegen die die Komponentenbetraege
+    (`recurrenceStart: 1`) nachgerechnet werden.
+
+    Die ZWEITE Phase (falls vorhanden) zaehlt fuer DIESE Probe nicht mit -
+    sie ist keine zusaetzliche Messung, sondern derselbe Vertrag in seinem
+    zweiten Abschnitt. Die Geraeterate selbst kommt nicht von hier: sie
+    steht flach fuer die GANZE Ratenlaufzeit unter
+    `priceByComponent.hardware.priceByType.rate.month` (gemessen an allen
+    12/24/36-Kompositionen der Fixture `vodafone_virtualitem.json`:
+    Zuzahlung + Laufzeit x Rate ergibt dort exakt
+    `priceByComponent.hardware...total.onetime.withoutDiscounts.gross` -
+    kein Phasenwechsel noetig). Nur der LAUFZEIT-Fallback ohne eigene
+    `financingDuration` (der "sub"-Fall) braucht mehr als Phase 0, siehe
+    `_buendelsatz_aus_komposition`."""
+    perioden = _perioden(komposition)
+    return perioden[0] if perioden else None
 
 
 def _buendelsatz_aus_komposition(modell: str, hubpage: str, hardware_id: str,
@@ -310,9 +349,13 @@ def _buendelsatz_aus_komposition(modell: str, hubpage: str, hardware_id: str,
     except (TypeError, ValueError):
         laufzeit = None
     if not laufzeit:
-        # Ohne eigene Ratenlaufzeit (financingType "sub") gilt die Phase,
-        # fuer die dieser Preis genannt wird - die Vertragsmindestlaufzeit.
-        ende = (periode or {}).get("recurrenceEnd")
+        # Ohne eigene Ratenlaufzeit (financingType "sub") gilt die
+        # Vertragsmindestlaufzeit - das Ende der LETZTEN Phase, nicht nur
+        # der ersten (P0-B2a: "erfasse ALLE Phasen"). Kein Beleg zeigt
+        # bislang einen "sub"-Fall mit mehr als einer Phase, aber Phase 0
+        # allein waere hier zu kurz gemessen, sollte es einen geben.
+        perioden = _perioden(komposition)
+        ende = perioden[-1].get("recurrenceEnd") if perioden else None
         try:
             laufzeit = int(ende)
         except (TypeError, ValueError):

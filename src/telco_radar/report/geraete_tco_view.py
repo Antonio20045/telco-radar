@@ -710,7 +710,11 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
     # Tarif 24 Monate und finanziert das Geraet ueber 36; die 24 stehen im
     # Tarifbestand (`tarife.jsonl`, ueber `tarif_id`). Ohne sie ist keine
     # Karte rechenbar - deshalb wird sie HIER gesetzt und nicht in der
-    # Kennzahl geraten (A5.5).
+    # Kennzahl geraten (A5.5). `tarife` ist seit B3 (21.09.2026) die
+    # AKTUELLE Lesart je Vertrag (`Tarifbestand.je_id_aktuell` - der
+    # Aufrufer reicht sie durch), nicht die rohe Zeitreihe: sonst traegt
+    # ein Buendel bei zwei Lesarten (Pflichtdokument/Live-Shop) die
+    # stillgelegte.
     #
     # A1 (20.09.2026): derselbe Durchlauf reichert die PREISPHASEN des
     # Tarifs an (`phasen_fuer_buendel`, dieselbe Stelle wie die

@@ -1199,11 +1199,12 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
     (`geraete_tco_historie.jsonl`) und die Buendel-Liste
     (`geraete_tco.json`) - reine Lesearbeit, kein Schreibzugriff.
 
-    `tarife` (A1, 20.09.2026) ist der Tarifbestand (`je_id`): die Punkte
-    der Historie werden mit der HEUTIGEN Leitzahl gerechnet, und deren
-    Tarifanteil ist phasengewichtet, wo der Stamm Phasen nennt - dieselben
-    Phasen wie auf der Tafel (`phasen_fuer_buendel`, ohne Widerspruch zur
-    Messung).
+    `tarife` (A1, 20.09.2026) ist der Tarifbestand (`Tarifbestand.
+    je_id_aktuell`, B3 21.09.2026 - nicht `je_id`, sonst rechnet die
+    Historie mit einer stillgelegten Lesart): die Punkte der Historie
+    werden mit der HEUTIGEN Leitzahl gerechnet, und deren Tarifanteil ist
+    phasengewichtet, wo der Stamm Phasen nennt - dieselben Phasen wie auf
+    der Tafel (`phasen_fuer_buendel`, ohne Widerspruch zur Messung).
     """
     state_dir = Path(state_dir)
     modelle = tco.get("modelle") or []

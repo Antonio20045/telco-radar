@@ -146,24 +146,22 @@ etwa weil ein Rabatt nur fuer einen Teil der Raten gilt -, wird der Satz
 verworfen: ein Gesamtbetrag, der seinen eigenen Bestandteilen widerspricht,
 ist keine Messung.
 
-ZWEI ZAHLWEISEN, EIN SAETZ
---------------------------
+ZWEI ZAHLWEISEN, ZWEI SAETZE (P0-B2a, 21.09.2026)
+--------------------------------------------------
 Je Variante stehen ZWEI Ratenlaeufen nebeneinander (24 und 36 Monate, beide
 gleiches `total` - congstar finanziert zum Nulltarif, kuerzer heisst hoehere
 Rate) und dazu eine TRADE_IN-Zahlweise, die ein Altgerat voraussetzt.
-Erhoben wird die 36-Monats-Finanzierung - o2 und Telekom fuehren ihre
-Buendel ebenfalls als 36-Raten-Vertrag bei 24 Monaten Tarifbindung, und
-A5.5 (Phase R) setzt die laengere Laufzeit als die, die die Karte fuehrt.
-Die 24er-Zahlweise ist dadurch kein Datenverlust: sie rechnet sich aus
-demselben `total` (kuerzere Laufzeit, hoehere Rate).
 
-Bis zum 21.09.2026 war das auch ein Zwang: der Bestandsschluessel kannte
-die Laufzeit nicht, und beide Laeufe zu liefern haette still einer den
-anderen ueberschrieben. Seit B1 traegt `tco_model.buendel_id` die
-Ratenlaufzeit - zwei Zahlweisen sind jetzt zwei Buendel und koennten
-beide abgelegt werden. DIESER ADAPTER LIEFERT WEITERHIN NUR DIE 36ER:
-welche Zahlweisen erhoben und wie sie auf der Karte gezeigt werden, ist
-nicht Sache des Schluessels.
+Bis zum 21.09.2026 war das ein Zwang: der Bestandsschluessel kannte die
+Laufzeit nicht, und beide Laeufe zu liefern haette still einer den anderen
+ueberschrieben - erhoben wurde deshalb nur die 36-Monats-Finanzierung.
+Seit B1 traegt `tco_model.buendel_id` die Ratenlaufzeit im Schluessel:
+zwei Zahlweisen sind jetzt zwei Buendel und werden auch beide abgelegt.
+`_buendelzahlweisen()` liest jede Zahlweise, deren `contractDuration` in
+`_RATENLAUFZEITEN` (24, 36) steht, `lies_buendel()` legt fuer jede
+gefundene Laufzeit einen eigenen Satz an. Die TRADE_IN-Zahlweise bleibt
+aussen vor - sie setzt die Einnahme eines Altgeraets voraus und ist damit
+kein Preis fuer einen Neuabschluss ohne Eintausch.
 
 DER SLUG IST DIE NUMMER DES PFLICHTBLATTS
 -----------------------------------------
@@ -391,9 +389,9 @@ _PLAN_START_RE = re.compile(r'\{"id":\d+,"type":"POSTPAID","title":"')
 # dieselbe Lehre wie beim congstar-Block in `config/tarif_quellen.yaml`.
 _PIB_NR_RE = re.compile(r"Produktinformationsblatt_(\d+)\.pdf")
 
-# Die Ratenlaufzeit der erhobenen Zahlweise - siehe Modulkopf
-# ("ZWEI ZAHLWEISEN, EIN SAETZ").
-_RATENLAUFZEIT = 36
+# Die Ratenlaufzeiten, die erhoben werden - siehe Modulkopf
+# ("ZWEI ZAHLWEISEN, EIN SAETZ", P0-B2a: beide, nicht mehr nur eine).
+_RATENLAUFZEITEN = (24, 36)
 
 
 def _preis(wert) -> Optional[float]:
@@ -439,9 +437,16 @@ def _pib_nummer(plan: dict) -> str:
     return treffer.group(1)
 
 
-def _buendelzahlweise(variante: dict) -> Optional[dict]:
-    """Zuzahlung und Rate der 36-Monats-Zahlweise - nur wenn die Probe
-    aufgeht (Modulkopf: die Nachrechnung ist Bedingung, nicht Protokoll)."""
+def _buendelzahlweisen(variante: dict) -> dict:
+    """Zuzahlung und Rate JEDER erlaubten Zahlweise (`_RATENLAUFZEITEN`) -
+    nur wenn ihre Probe aufgeht (Modulkopf: die Nachrechnung ist
+    Bedingung, nicht Protokoll). Eine Zahlweise, deren Probe nicht
+    aufgeht, faellt fuer sich - die anderen bleiben.
+
+    Ergebnis: `{laufzeit_monate: {"zuzahlung":.., "rate":..}}`, hoechstens
+    ein Eintrag je Laufzeit (die erste lesbare gewinnt, falls eine Antwort
+    dieselbe Laufzeit doppelt nennen sollte)."""
+    gefunden: dict = {}
     for zahlweise in (variante.get("prices") or {}).get("paymentVariants") or []:
         if not isinstance(zahlweise, dict):
             continue
@@ -449,17 +454,20 @@ def _buendelzahlweise(variante: dict) -> Optional[dict]:
             continue          # ONE_TIME_PURCHASE ist der Barpreis (lies, oben)
         if str(zahlweise.get("subtype") or "").upper() != "UNSPECIFIED":
             continue          # TRADE_IN setzt die Einnahme eines Altgeraets voraus
-        if zahlweise.get("contractDuration") != _RATENLAUFZEIT:
+        dauer = zahlweise.get("contractDuration")
+        if dauer not in _RATENLAUFZEITEN or dauer in gefunden:
             continue
         anzahlung = _preis((zahlweise.get("oneTime") or {}).get("discounted"))
         rate = _preis((zahlweise.get("recurring") or {}).get("discounted"))
         gesamt = _preis(zahlweise.get("total"))
         if anzahlung is None or rate is None or gesamt is None:
             continue
-        if not probe_geht_auf(anzahlung, rate, _RATENLAUFZEIT, gesamt):
+        if not probe_geht_auf(anzahlung, rate, dauer, gesamt):
+            log.info("congstar-Buendel: %s-Monats-Zahlweise ohne "
+                     "aufgehende Rechenprobe - verworfen", dauer)
             continue
-        return {"zuzahlung": anzahlung, "rate": rate}
-    return None
+        gefunden[dauer] = {"zuzahlung": anzahlung, "rate": rate}
+    return gefunden
 
 
 def _speicher_gb(memory) -> Optional[int]:
@@ -530,38 +538,49 @@ def lies_buendel(text: str, url: str = "",
                 zustand = str(variante.get("condition") or "").strip().upper()
                 if (speicher, zustand) in gesehen:
                     continue
-                form = _buendelzahlweise(variante)
-                if form is None:
+                formen = _buendelzahlweisen(variante)
+                if not formen:
                     continue
                 titel = str(variante.get("title") or "").strip()
                 if not titel:
                     continue
                 gesehen.add((speicher, zustand))
-                out.append({
-                    "titel": titel,
-                    "farbe": str((variante.get("color") or {})
-                                 .get("name") or "").strip(),
-                    "speicher_gb": speicher,
-                    "sku": str(variante.get("id") or "").strip(),
-                    "ean": str(variante.get("gtin") or "").strip(),
-                    # Dasselbe rohe `condition`-Feld wie im Listungsweg -
-                    # die Einordnung leistet `zustand_aus_feldern` ueber
-                    # `lies_listung`, siehe Docstring von `lies()`.
-                    "zustand_hinweis": str(variante.get("condition") or ""),
-                    "tarif_name": tarif_name,
-                    # Die Pflichtblattnummer, siehe Modulkopf ("DER SLUG
-                    # IST DIE NUMMER DES PFLICHTBLATTS").
-                    "tarif_slug": tarif_slug,
-                    "tarif_monatlich": tarif_monatlich,
-                    "geraet_zuzahlung": form["zuzahlung"],
-                    "geraet_monatsrate": form["rate"],
-                    "anschlusspreis": anschluss,
-                    "laufzeit_monate": _RATENLAUFZEIT,
-                    # Die Tarifseite ist die Seite, auf der diese Zahlen
-                    # stehen - dieselbe Regel wie bei der Telekom-Kategorie.
-                    "url": url,
-                    "quelle": "congstar_tarifseite",
-                })
+                farbe = str((variante.get("color") or {})
+                           .get("name") or "").strip()
+                sku = str(variante.get("id") or "").strip()
+                ean = str(variante.get("gtin") or "").strip()
+                zustand_hinweis = str(variante.get("condition") or "")
+                # JEDE erlaubte Zahlweise (24 UND 36 Monate) wird ein
+                # eigener Satz mit eigener `laufzeit_monate` - der
+                # Bestandsschluessel traegt seit B1 die Laufzeit
+                # (`tco_model.buendel_id`), die Zahlweisen ueberschreiben
+                # sich also nicht mehr.
+                for laufzeit in sorted(formen):
+                    form = formen[laufzeit]
+                    out.append({
+                        "titel": titel,
+                        "farbe": farbe,
+                        "speicher_gb": speicher,
+                        "sku": sku,
+                        "ean": ean,
+                        # Dasselbe rohe `condition`-Feld wie im Listungsweg -
+                        # die Einordnung leistet `zustand_aus_feldern` ueber
+                        # `lies_listung`, siehe Docstring von `lies()`.
+                        "zustand_hinweis": zustand_hinweis,
+                        "tarif_name": tarif_name,
+                        # Die Pflichtblattnummer, siehe Modulkopf ("DER SLUG
+                        # IST DIE NUMMER DES PFLICHTBLATTS").
+                        "tarif_slug": tarif_slug,
+                        "tarif_monatlich": tarif_monatlich,
+                        "geraet_zuzahlung": form["zuzahlung"],
+                        "geraet_monatsrate": form["rate"],
+                        "anschlusspreis": anschluss,
+                        "laufzeit_monate": laufzeit,
+                        # Die Tarifseite ist die Seite, auf der diese Zahlen
+                        # stehen - dieselbe Regel wie bei der Telekom-Kategorie.
+                        "url": url,
+                        "quelle": "congstar_tarifseite",
+                    })
     return out
 
 

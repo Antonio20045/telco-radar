@@ -33,11 +33,11 @@ from pathlib import Path
 
 import pytest
 
-from telco_radar.analyze.tco_buendel import aus_rohsaetzen
+from telco_radar.analyze.tco_buendel import _tarif_und_rabatt, aus_rohsaetzen
 from telco_radar.collect.geraete import GeraeteAbrufFehler
 from telco_radar.collect.geraete.o2 import lies_buendel
-from telco_radar.tarif_bezug import Tarifbestand
-from telco_radar.tarif_model import HOCH
+from telco_radar.tarif_bezug import Bezug, Tarifbestand
+from telco_radar.tarif_model import HOCH, MITTEL
 from telco_radar.tco_model import TCO_HORIZONT, tco_24
 
 _FIX = Path(__file__).parent / "fixtures" / "geraete"
@@ -243,7 +243,12 @@ def _rohsatz(**kw):
             "tarif_monatlich": 14.99, "geraet_zuzahlung": 1.0,
             "geraet_monatsrate": 34.0, "anschlusspreis": 39.99,
             "laufzeit_monate": 36,
-            "quelle_url": "https://www.o2online.de/e-shop/apple/x-details"}
+            "quelle_url": "https://www.o2online.de/e-shop/apple/x-details",
+            # B2b: `lies_buendel` setzt dieses Flag auf JEDEM echten
+            # Rohsatz (o2 nennt den Nachlass selbst einen Rabatt) - der
+            # Standard hier bildet das nach, damit die Tests an der
+            # tatsaechlichen Form messen.
+            "tarif_rabatt_beleg": True}
     satz.update(kw)
     return satz
 
@@ -294,18 +299,80 @@ def test_ein_unmoeglicher_posten_kostet_nicht_die_uebrigen():
 def test_die_rechenprobe_der_tco_am_echten_satz():
     """Die Zahl, die am Ende auf der Seite steht - von Hand nachgerechnet.
 
-    A1 (alle Raten der eigenen Laufzeit): 1,00 EUR Zuzahlung + 24 x 14,99
+    B2b (21.09.2026): der gespeicherte Tarifpreis ist seither der OHNE
+    den bedingten Buendel-Rabatt (19,99 EUR, die SIM-only-Kachel von
+    "O2 Mobile on Demand M" in `_bestand()`) - nicht mehr die im Buendel
+    gemessenen 14,99 EUR. Vor B2b stand hier 1624,75 EUR (mit den
+    ungerechneten 14,99); die Differenz von 120,00 EUR ist genau der
+    Rabatt (5,00 EUR x 24 Monate), jetzt sichtbar in `tco.rabatte_offen`
+    statt in der Leitzahl versteckt.
+
+    A1 (alle Raten der eigenen Laufzeit): 1,00 EUR Zuzahlung + 24 x 19,99
     EUR Tarif + 36 x 34,00 EUR Geraeteraten + 39,99 EUR Anschlusspreis
-    = 1624,75 EUR. Die zwoelf Raten nach Monat 24 (= 408,00 EUR) sind IN
+    = 1744,75 EUR. Die zwoelf Raten nach Monat 24 (= 408,00 EUR) sind IN
     der Summe enthalten und zusaetzlich als offener Betrag ausgewiesen.
     """
     buendel = aus_rohsaetzen([_rohsatz()], _bestand(), "2026-09-04").buendel[0]
+    assert buendel.tarif_monatlich == pytest.approx(19.99, abs=0.005)
     tco = tco_24(buendel)
     assert tco.belastbar
-    assert tco.gesamt == pytest.approx(1.0 + TCO_HORIZONT * 14.99 + 36 * 34.0
+    assert tco.gesamt == pytest.approx(1.0 + TCO_HORIZONT * 19.99 + 36 * 34.0
                                        + 39.99, abs=0.005)
-    assert tco.gesamt == pytest.approx(1624.75, abs=0.005)
+    assert tco.gesamt == pytest.approx(1744.75, abs=0.005)
     assert tco.restbetrag == pytest.approx(408.0, abs=0.005)
+    # Der Rabatt steht daneben, benannt und mit Beleg-URL - und zaehlt
+    # NICHT in `tco.gesamt` (`tco_model.Rabatt.wert()`).
+    assert tco.rabatte_offen == pytest.approx(5.0 * TCO_HORIZONT, abs=0.005)
+
+
+def test_der_rabatt_ist_benannt_und_traegt_die_quelle():
+    """`tarif_rabatt_beleg` verwandelt die Differenz in einen `Rabatt`.
+
+    Ohne das Flag (Vodafone, Telekom, congstar - keiner setzt es) bleibt
+    der gemessene Buendelbetrag stehen und es entsteht kein Rabatt: die
+    Regel gilt einheitlich ueber `_tarif_und_rabatt`, aber nur, wo ein
+    Anbieter selbst einen Rabatt ausspricht (Modulkopf `tco_buendel.py`).
+    """
+    buendel = aus_rohsaetzen([_rohsatz()], _bestand(), "2026-09-04").buendel[0]
+    assert len(buendel.rabatte) == 1
+    rabatt = buendel.rabatte[0]
+    assert rabatt.betrag_monatlich == pytest.approx(5.0, abs=0.005)
+    assert rabatt.beleg_url == "https://www.o2online.de/e-shop/apple/x-details"
+    assert "19,99" in rabatt.name.replace(".", ",") or "19.99" in rabatt.name
+
+    ohne_beleg = aus_rohsaetzen(
+        [_rohsatz(tarif_rabatt_beleg=False)], _bestand(), "2026-09-04"
+    ).buendel[0]
+    assert ohne_beleg.rabatte == []
+    assert ohne_beleg.tarif_monatlich == pytest.approx(14.99, abs=0.005)
+
+
+def test_ein_ueber_den_betrag_geloester_bezug_bekommt_keinen_rabatt():
+    """`guete == MITTEL` waere zirkulaer: der Bezug wurde ueber Gleichheit
+    der Betraege gefunden, eine Differenz zu sich selbst gibt es dann per
+    Konstruktion nicht - und ein Rabatt gegen einen ERRATENEN Tarif waere
+    keine Messung.
+
+    `aus_rohsaetzen` uebergibt `loese()` heute keinen Betrag (der
+    MITTEL-Weg ist an dieser Stelle also gar nicht erreichbar) - geprueft
+    wird die Gate-Funktion deshalb direkt mit einem MITTEL-Bezug.
+    """
+    bezug = Bezug(tarif_id="o2:o2-mobile-on-demand-m",
+                  tarif_name="O2 Mobile on Demand M", guete=MITTEL,
+                  grund="Betrag trifft genau einen Tarif")
+    tarif, rabatte = _tarif_und_rabatt(_rohsatz(), bezug, _bestand())
+    assert rabatte == []
+    assert tarif == pytest.approx(14.99, abs=0.005)
+
+
+def test_ein_buendel_teurer_als_die_kachel_bekommt_keinen_rabatt():
+    """Ein "Rabatt" mit negativem Vorzeichen waere keiner - dann ist die
+    Kachel schlicht die falsche Vergleichsbasis fuer dieses Buendel."""
+    buendel = aus_rohsaetzen(
+        [_rohsatz(tarif_monatlich=25.0)], _bestand(), "2026-09-04"
+    ).buendel[0]
+    assert buendel.rabatte == []
+    assert buendel.tarif_monatlich == pytest.approx(25.0, abs=0.005)
 
 
 def test_der_ganze_weg_an_der_echten_antwort():

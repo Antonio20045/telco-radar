@@ -48,6 +48,20 @@ aus, und `None` heisst "unbekannt", nicht "null Prozent" - o2 bekommt seine
 0.0 nur, weil die Produktseite sie woertlich als gesetzlichen
 Finanzierungshinweis nennt.
 
+MEHRERE RATENPLAENE JE GERAET (P0-B2a, 21.09.2026)
+---------------------------------------------------
+`installments` ist im Beispiel oben eine Liste mit EINEM Eintrag - das
+Ziel-Bild in CLAUDE.md nennt fuer Telekom aber 6/12/24/36 Monate
+nebeneinander. `_preisformen()` liest deshalb ALLE Eintraege der Liste,
+nicht nur `installments[0]`, und jeder Plan bekommt seine eigene
+Rechenprobe; ein Plan, der nicht aufgeht, faellt nur fuer sich. GEMESSEN
+an den beiden gespeicherten echten Abrufen (Kategorieseite 04.09.2026,
+Buendelseite MagentaMobil S 08.09.2026) traegt aber JEDES der zehn bzw.
+neun Geraete genau EINEN 36-Monats-Plan - kein Beleg zeigt bislang
+mehrere Laufzeiten in derselben Antwort (CLAUDE.md § 16: das ist der
+Verdacht auf eine Erfassungsluecke, keine bestaetigte Vollstaendigkeit;
+ein neuer Abruf mit mehreren Plaenen ist noch zu beschaffen).
+
 DIE ADRESSE KOMMT AUS DEM HTML, NICHT AUS DEM SLUG
 --------------------------------------------------
 Aus `brandSlug`, `productSlug` und `variantSlug` liesse sich eine
@@ -114,9 +128,10 @@ Tarifpreis, den DIESE Seite fuer DIESEN Tarif nennt (id
        - sonst widerspricht die Antwort sich selbst; gemessen am 08.09.2026
        gehen beide bei 9 von 9 Geraeten auf.
 
-Dazu kommt die Ratenprobe, die `lies()` schon kennt (`_preisform`:
-upfrontPrice + numberOfInstallments x recurringPrice == totalPrice) - auch
-fuer Buendel gilt: geht sie nicht auf, wird der Satz verworfen.
+Dazu kommt die Ratenprobe, die `lies()` schon kennt (`_preisformen`:
+upfrontPrice + numberOfInstallments x recurringPrice == totalPrice, JE
+Ratenplan) - auch fuer Buendel gilt: ein Plan, der nicht aufgeht, faellt
+fuer sich, nicht der ganze Eintrag.
 
 Eine Antwort OHNE selectedPlan (die ohne-vertrag-Seite traegt `null`)
 ist keine Buendelantwort, und das ist kein Fehler sondern Auskunft:
@@ -233,25 +248,48 @@ def _variante(slug: str) -> tuple[str, Optional[int]]:
     return farbe, gb
 
 
-def _preisform(preis: dict) -> Optional[dict]:
-    """Anzahlung, Rate, Laufzeit und Gesamtbetrag - nur wenn sie aufgehen."""
+def _preisformen(preis: dict) -> list[dict]:
+    """ALLE Ratenplaene, die die Rechenprobe bestehen - nicht nur der erste.
+
+    `installments` ist eine LISTE: die Kategorieseite kann mehrere
+    Ratenplaene (verschiedene Laufzeiten desselben Geraets) nebeneinander
+    fuehren. Jeder Plan wird EINZELN geprueft und benannt verworfen, wenn
+    er nicht aufgeht - ein einzelner kaputter Plan kostet nicht die
+    uebrigen, dieselbe Disziplin wie beim Gesamtbetrag selbst.
+
+    Gemessen an den beiden gespeicherten echten Abrufen (Kategorieseite
+    vom 04.09.2026, Buendelseite MagentaMobil S vom 08.09.2026) traegt
+    JEDER Eintrag genau einen 36-Monats-Plan - kein Beleg zeigt bislang
+    mehrere Plaene nebeneinander. Diese Funktion bleibt trotzdem defensiv:
+    sie liest die ganze Liste, nicht nur `installments[0]`.
+    """
     raten = preis.get("installments") or []
     if not isinstance(raten, list) or not raten:
-        return None
-    erste = raten[0]
-    if not isinstance(erste, dict):
-        return None
+        return []
     try:
         anzahlung = float(preis.get("upfrontPrice"))
-        monatsrate = float(erste.get("recurringPrice"))
-        laufzeit = int(erste.get("numberOfInstallments"))
-        gesamt = float(erste.get("totalPrice"))
     except (TypeError, ValueError):
-        return None
-    if not probe_geht_auf(anzahlung, monatsrate, laufzeit, gesamt):
-        return None
-    return {"anzahlung": anzahlung, "monatsrate": monatsrate,
-            "laufzeit_monate": laufzeit, "gesamt": gesamt}
+        return []
+    formen: list[dict] = []
+    for plan in raten:
+        if not isinstance(plan, dict):
+            continue
+        try:
+            monatsrate = float(plan.get("recurringPrice"))
+            laufzeit = int(plan.get("numberOfInstallments"))
+            gesamt = float(plan.get("totalPrice"))
+        except (TypeError, ValueError):
+            continue
+        if not probe_geht_auf(anzahlung, monatsrate, laufzeit, gesamt):
+            log.info(
+                "Telekom: Ratenplan ueber %r Monate ohne aufgehende "
+                "Rechenprobe (Anzahlung %s, Rate %s, Gesamt %s) - "
+                "verworfen", plan.get("numberOfInstallments"), anzahlung,
+                plan.get("recurringPrice"), plan.get("totalPrice"))
+            continue
+        formen.append({"anzahlung": anzahlung, "monatsrate": monatsrate,
+                       "laufzeit_monate": laufzeit, "gesamt": gesamt})
+    return formen
 
 
 def lies(text: str, url: str = "") -> list[dict]:
@@ -271,8 +309,8 @@ def lies(text: str, url: str = "") -> list[dict]:
                    or "").strip()
         if not name:
             continue
-        form = _preisform(eintrag.get("price") or {})
-        if form is None:
+        formen = _preisformen(eintrag.get("price") or {})
+        if not formen:
             # Kein Etikett heisst hier: kein Satz. Anders als bei o2, wo
             # eine unetikettierte Zahl immer noch ein `totalPrice` ist,
             # gibt es bei der Telekom NUR den Ratengesamtbetrag - ohne
@@ -281,33 +319,41 @@ def lies(text: str, url: str = "") -> list[dict]:
                      name)
             continue
         farbe, speicher = _variante(str(eintrag.get("variantSlug") or ""))
-        out.append({
-            "titel": " ".join(x for x in (name,
-                                          f"{speicher} GB" if speicher else "",
-                                          farbe) if x),
-            # Der strukturierte NAME (Feld `name`), unveraendert - die einzige
-            # Grundlage der E4-Auto-Erkennung. Der TITEL darueber ist
-            # zusammengesetzt (Name + Speicher + Farbe) und wuerde als
-            # Namensquelle Saegezahn-IDs erzeugen ("iPhone 18 Pro polar").
-            "strukturierter_name": name,
-            "preis": form["gesamt"],
-            "anzahlung": form["anzahlung"],
-            "monatsrate": form["monatsrate"],
-            "laufzeit_monate": form["laufzeit_monate"],
-            # Die Seite nennt keinen Zinssatz. `None` heisst unbekannt.
-            "zins_effektiv": None,
-            "waehrung": "EUR",
-            "verfuegbarkeit": ("lieferbar"
-                               if str(eintrag.get("availabilityStatus")
-                                      or "").upper() == "IN_STOCK"
-                               else "unbekannt"),
-            "sku": str(eintrag.get("id") or "").strip(),
-            "ean": "",
-            "farbe": farbe,
-            "speicher_gb": speicher,
-            "url": _passende_adresse(eintrag, links),
-            "quelle": "telekom_kategorie",
-        })
+        titel = " ".join(x for x in (name,
+                                     f"{speicher} GB" if speicher else "",
+                                     farbe) if x)
+        adresse = _passende_adresse(eintrag, links)
+        sku = str(eintrag.get("id") or "").strip()
+        # JEDER Ratenplan wird ein EIGENER Satz mit eigener
+        # `laufzeit_monate` - die Kategorieseite kann mehrere Laufzeiten
+        # desselben Geraets nebeneinander fuehren (siehe `_preisformen`).
+        for form in formen:
+            out.append({
+                "titel": titel,
+                # Der strukturierte NAME (Feld `name`), unveraendert - die
+                # einzige Grundlage der E4-Auto-Erkennung. Der TITEL darueber
+                # ist zusammengesetzt (Name + Speicher + Farbe) und wuerde
+                # als Namensquelle Saegezahn-IDs erzeugen ("iPhone 18 Pro
+                # polar").
+                "strukturierter_name": name,
+                "preis": form["gesamt"],
+                "anzahlung": form["anzahlung"],
+                "monatsrate": form["monatsrate"],
+                "laufzeit_monate": form["laufzeit_monate"],
+                # Die Seite nennt keinen Zinssatz. `None` heisst unbekannt.
+                "zins_effektiv": None,
+                "waehrung": "EUR",
+                "verfuegbarkeit": ("lieferbar"
+                                   if str(eintrag.get("availabilityStatus")
+                                          or "").upper() == "IN_STOCK"
+                                   else "unbekannt"),
+                "sku": sku,
+                "ean": "",
+                "farbe": farbe,
+                "speicher_gb": speicher,
+                "url": adresse,
+                "quelle": "telekom_kategorie",
+            })
     return out
 
 
@@ -409,8 +455,8 @@ def lies_buendel(text: str, url: str = "",
         if not name:
             continue                      # Werbekachel, siehe Modulkopf
 
-        form = _preisform(eintrag.get("price") or {})
-        if form is None:
+        formen = _preisformen(eintrag.get("price") or {})
+        if not formen:
             log.info("Telekom-Buendel: %r ohne nachrechenbare Ratenform - "
                      "verworfen", name)
             continue
@@ -433,24 +479,32 @@ def lies_buendel(text: str, url: str = "",
             continue
 
         farbe, speicher = _variante(str(eintrag.get("variantSlug") or ""))
-        out.append({
-            "titel": " ".join(x for x in (name,
-                                          f"{speicher} GB" if speicher else "",
-                                          farbe) if x),
-            "strukturierter_name": name,
-            "farbe": farbe,
-            "speicher_gb": speicher,
-            "sku": str(eintrag.get("id") or "").strip(),
-            "tarif_name": tarif_name,
-            # Die MF-ID des Tarifs - die Ordnung des Anbieters, siehe
-            # Modulkopf ("WAS DER SLUG HIER IST").
-            "tarif_slug": tarif_id,
-            "tarif_monatlich": tarif_monatlich,
-            "geraet_zuzahlung": form["anzahlung"],
-            "geraet_monatsrate": form["monatsrate"],
-            "anschlusspreis": anschluss,
-            "laufzeit_monate": form["laufzeit_monate"],
-            "url": _passende_adresse(eintrag, links),
-            "quelle": "telekom_buendel",
-        })
+        titel = " ".join(x for x in (name,
+                                     f"{speicher} GB" if speicher else "",
+                                     farbe) if x)
+        adresse = _passende_adresse(eintrag, links)
+        sku = str(eintrag.get("id") or "").strip()
+        # JEDER Ratenplan wird ein EIGENES Buendel mit eigener
+        # `laufzeit_monate` - `tco_model.buendel_id()` traegt die Laufzeit
+        # im Schluessel, die Zahlweisen ueberschreiben sich also nicht mehr
+        # gegenseitig (B1).
+        for form in formen:
+            out.append({
+                "titel": titel,
+                "strukturierter_name": name,
+                "farbe": farbe,
+                "speicher_gb": speicher,
+                "sku": sku,
+                "tarif_name": tarif_name,
+                # Die MF-ID des Tarifs - die Ordnung des Anbieters, siehe
+                # Modulkopf ("WAS DER SLUG HIER IST").
+                "tarif_slug": tarif_id,
+                "tarif_monatlich": tarif_monatlich,
+                "geraet_zuzahlung": form["anzahlung"],
+                "geraet_monatsrate": form["monatsrate"],
+                "anschlusspreis": anschluss,
+                "laufzeit_monate": form["laufzeit_monate"],
+                "url": adresse,
+                "quelle": "telekom_buendel",
+            })
     return out

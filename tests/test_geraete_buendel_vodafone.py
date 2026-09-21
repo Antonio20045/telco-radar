@@ -187,6 +187,55 @@ def test_ohne_ratenlaufzeit_und_ohne_periode_faellt():
     assert lies_buendel(json.dumps(roh)) == []
 
 
+def test_alle_phasen_ergeben_den_richtigen_geraete_gesamtpreis():
+    """P0-B2a: keine Phase geht verloren. `geraet_monatsrate` kommt flach
+    aus `priceByComponent.hardware.month` (deckt die GANZE Ratenlaufzeit
+    ab, nicht nur Phase 0 von `totalMonthlyRatePrice`) - nachgerechnet
+    gegen den unabhaengigen Gesamtpreis derselben Komponente
+    (`...total.onetime.withoutDiscounts.gross`), fuer alle drei
+    Ratenfaelle (12/24/36 Monate) der Fixture."""
+    roh = json.loads(_fixture("vodafone_virtualitem.json"))
+    je_hash = {}
+    for atom in roh["data"]["atomics"]:
+        for k in atom["prices"]["composition"]:
+            je_hash[k["offerCoreHash"]] = k
+
+    rate = [s for s in _saetze() if s["geraet_monatsrate"] is not None]
+    assert len(rate) == 9                  # 3 Varianten x 3 Ratenfaelle
+    for s in rate:
+        k = je_hash[s["tarif_slug"]]
+        hardware_gesamt = k["priceByComponent"]["hardware"]["priceByType"] \
+            ["total"]["onetime"]["withoutDiscounts"]["gross"]
+        # `totalMonthlyRatePrice` traegt bei 12 und 36 Monaten ZWEI Phasen
+        # (Modulkopf) - die Gegenprobe laeuft trotzdem auf.
+        assert len(k["totalMonthlyRatePrice"]["withoutDiscounts"]) == \
+            (1 if s["laufzeit_monate"] == 24 else 2)
+        assert s["geraet_zuzahlung"] + \
+            s["laufzeit_monate"] * s["geraet_monatsrate"] == \
+            pytest.approx(hardware_gesamt, abs=0.005)
+
+
+def test_sub_ohne_financingduration_nimmt_das_ende_der_letzten_phase():
+    """P0-B2a: der Laufzeit-Fallback fuer den `sub`-Fall (keine eigene
+    `financingDuration`) liest das Ende der LETZTEN Phase, nicht nur der
+    ersten - eine zweite, spaeter endende Phase (hier synthetisch ergaenzt,
+    kein Beleg zeigt das fuer den `sub`-Fall) darf die Laufzeit nicht
+    verkuerzen."""
+    roh = _nur_erstes_atom(json.loads(_fixture("vodafone_virtualitem.json")))
+    atom = roh["data"]["atomics"][0]
+    sub = json.loads(json.dumps(atom["prices"]["composition"][0]))  # "sub"
+    erste_phase = sub["totalMonthlyRatePrice"]["withoutDiscounts"][0]
+    assert erste_phase["recurrenceEnd"] == 24
+    zweite_phase = {**erste_phase, "recurrenceStart": 25,
+                    "recurrenceEnd": 30, "gross": erste_phase["gross"]}
+    sub["totalMonthlyRatePrice"]["withoutDiscounts"] = [erste_phase,
+                                                        zweite_phase]
+    atom["prices"]["composition"] = [sub]
+    saetze = lies_buendel(json.dumps(roh))
+    assert len(saetze) == 1
+    assert saetze[0]["laufzeit_monate"] == 30
+
+
 # ==========================================================================
 # Die Tarifnamen-Aufloesung - die offene Frage des Auftrags
 # ==========================================================================

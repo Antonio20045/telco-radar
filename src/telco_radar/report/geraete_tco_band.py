@@ -101,8 +101,10 @@ def tarif_baender(tarife: dict) -> dict:
     """tarif_id -> Band, aus dem ERHOBENEN Datenvolumen von `tarife.jsonl`.
 
     `tarife` ist derselbe Bestand, den `geraete_tco_view.aufbereiten` schon
-    fuer die Tarifbindung liest (`Tarifbestand.je_id`) - keine zweite
-    Datenquelle, nur eine zweite Lesart derselben Datei.
+    fuer die Tarifbindung liest (`Tarifbestand.je_id_aktuell`, B3
+    21.09.2026 - nicht `je_id`, sonst traegt die Bandkarte bei Telekom das
+    Datenvolumen des Pflichtdokuments statt der aktuellen Lesart) - keine
+    zweite Datenquelle, nur eine zweite Lesart derselben Datei.
     """
     out: dict = {}
     for tarif_id, tarif in (tarife or {}).items():
