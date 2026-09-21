@@ -345,6 +345,43 @@ def test_next_f_nutzlast_ohne_variantenobjekte_wirft():
         congstar.lies(kaputt)
 
 
+def test_contractduration_als_zeichenkette_bleibt_ohne_vertrag():
+    """FIX3: `contractDuration` wird als ZAHL gelesen, nicht am JSON-Typ
+    gemessen - `"0"` ist dieselbe Aussage ("ohne Vertrag") wie `0`.
+
+    Der strikte Vergleich gegen die Zahl 0 liess die Barpreis-Zahlweise
+    sonst durchfallen, und mit ihr die GANZE Seite: gemessen an der
+    echten Produktseite 7 Rohsaetze gegen 0. Textersetzung am echten
+    Abruf, sonst kein Byte veraendert.
+    """
+    roh = _fixture("congstar_produkt_iphone17.html.gz")
+    assert '\\"contractDuration\\":0' in roh
+    als_text = roh.replace('\\"contractDuration\\":0',
+                           '\\"contractDuration\\":\\"0\\"')
+    url = _PRODUKTE["congstar_produkt_iphone17.html.gz"]["url"]
+    vorher = congstar.lies(roh, url=url)
+    nachher = congstar.lies(als_text, url=url)
+    assert len(vorher) == 7
+    assert [s["preis"] for s in nachher] == [s["preis"] for s in vorher]
+
+
+def test_eine_variante_ohne_barpreis_wird_benannt(caplog):
+    """FIX3: faellt die Einmalkauf-Zahlweise aus, ist das kein leeres
+    Ergebnis, sondern eine benannte Luecke - sonst verliert diese Seite
+    lautlos alle Saetze."""
+    roh = _fixture("congstar_produkt_iphone17.html.gz")
+    ohne = roh.replace('\\"type\\":\\"ONE_TIME_PURCHASE\\"',
+                       '\\"type\\":\\"RATENKAUF_NEU\\"')
+    url = _PRODUKTE["congstar_produkt_iphone17.html.gz"]["url"]
+    with caplog.at_level("INFO",
+                         logger="telco_radar.collect.geraete.congstar"):
+        saetze = congstar.lies(ohne, url=url)
+    assert saetze == []
+    benannt = [m for m in caplog.messages
+               if "ohne Einmalkauf-Zahlweise" in m]
+    assert len(benannt) == 7, caplog.messages
+
+
 # ==========================================================================
 # Konfiguration: die Methode ist registriert und aktiv
 # ==========================================================================

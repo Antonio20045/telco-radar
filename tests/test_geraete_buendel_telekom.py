@@ -224,22 +224,40 @@ def test_mehrere_ratenplaene_ergeben_je_ein_eigenes_buendel():
     assert nach_laufzeit[36]["sku"] == nach_laufzeit[24]["sku"]
 
 
-def test_ein_nicht_aufgehender_plan_faellt_einzeln_im_buendel():
-    """Zwei Plaene, einer rechnerisch falsch: nur der kaputte faellt."""
+def test_ein_nicht_aufgehender_plan_faellt_einzeln_im_buendel(caplog):
+    """Zwei Plaene, einer rechnerisch falsch: nur der kaputte faellt.
+
+    FIX3: der kaputte Plan steht hier ZUERST. Mit ihm an Position 2 war
+    dieser Test gegen den Stand vor P0-B2a (fde7f63) gruen - der las
+    ohnehin nur `installments[0]`, fand dort den gesunden Plan und lieferte
+    dasselbe Ergebnis. An Position 1 verlor der alte Stand das Geraet
+    KOMPLETT (0 Saetze), waehrend jetzt der gesunde 24-Monats-Plan bleibt
+    und der Verlust des ersten benannt wird.
+    """
     html = _fixture("telekom_kategorie_buendel_magentamobil_s.html.gz")
     daten = _zustand(html)
     geraete = [e for e in daten["productList"]["data"]
                if isinstance(e, dict) and e.get("name")]
-    erster = geraete[0]["price"]["installments"][0]
-    kaputter_plan = {"numberOfInstallments": 24, "recurringPrice": 42.4,
+    echter = geraete[0]["price"]["installments"][0]
+    assert echter["numberOfInstallments"] == 36
+    kaputter_plan = {"numberOfInstallments": 36, "recurringPrice": 42.4,
                      "totalPrice": 1.0}
-    geraete[0]["price"]["installments"] = [erster, kaputter_plan]
+    # Selbst konsistent nachgerechnet: dieselbe Anzahlung, 24 Monate.
+    anzahlung = geraete[0]["price"]["upfrontPrice"]
+    gesunder_plan = {"numberOfInstallments": 24, "recurringPrice": 42.4,
+                     "totalPrice": round(anzahlung + 24 * 42.4, 2)}
+    geraete[0]["price"]["installments"] = [kaputter_plan, gesunder_plan]
     daten["productList"]["data"] = geraete[:1]
     geaendert = f'<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>'
 
-    saetze = lies_buendel(geaendert)
+    with caplog.at_level("INFO"):
+        saetze = lies_buendel(geaendert)
     assert len(saetze) == 1
-    assert saetze[0]["laufzeit_monate"] == 36
+    assert saetze[0]["laufzeit_monate"] == 24
+    assert saetze[0]["geraet_monatsrate"] == pytest.approx(42.4)
+    # Der kaputte Plan ist nicht still verschwunden.
+    assert any("ohne aufgehende" in m and "Rechenprobe" in m
+               for m in caplog.messages), caplog.messages
 
 
 def test_eine_ratenform_die_nicht_aufgeht_faellt():

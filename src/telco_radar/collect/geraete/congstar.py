@@ -163,6 +163,21 @@ gefundene Laufzeit einen eigenen Satz an. Die TRADE_IN-Zahlweise bleibt
 aussen vor - sie setzt die Einnahme eines Altgeraets voraus und ist damit
 kein Preis fuer einen Neuabschluss ohne Eintausch.
 
+`_RATENLAUFZEITEN` ist eine POSITIVLISTE, und sie sagt das laut (FIX3,
+21.09.2026): eine Zahlweise mit anderer Dauer - 12 oder 48 Monate, oder
+eine Dauer, die diese Antwort ueberhaupt nicht als Zahl nennt - fiel bis
+dahin OHNE Protokoll heraus. Jetzt nennt `_buendelzahlweisen()` jede
+uebergangene Zahlweise samt Grund, und eine Dauer, die als Zeichenkette
+kommt ("36"), wird gelesen statt verworfen: die Positivliste gilt fuer
+LAUFZEITEN, nicht fuer JSON-Typen.
+
+Was die Liste kostet, ist gemessen und nicht geschaetzt: dreht man die
+36er der gespeicherten Tarifseite auf 48, bleiben 18 statt 36 Saetze -
+die 18 fehlenden stehen als 18 Protokollzeilen da und nicht auf der
+Seite. Die Liste bleibt trotzdem eine Liste: eine Laufzeit, die kein
+gespeicherter Abruf zeigt, soll auffallen und geprueft werden, bevor sie
+in den Bestand wandert (CLAUDE.md Fallstrick 16).
+
 DER SLUG IST DIE NUMMER DES PFLICHTBLATTS
 -----------------------------------------
 congstar nummeriert Tarif und Pflichtblatt mit derselben Zahl: die
@@ -199,6 +214,9 @@ from typing import Optional
 
 from . import GeraeteAbrufFehler
 from ...geraete_model import probe_geht_auf
+# DIE EINE STELLE, die entscheidet, ob ein Rohwert eine Ratenlaufzeit IST
+# (Clean Code 1): dieselbe Pruefung, die `buendel_id` und `Buendel` lesen.
+from ...tco_model import laufzeit_in_monaten
 
 log = logging.getLogger(__name__)
 
@@ -295,6 +313,28 @@ def _varianten(nutzlast: str) -> list[dict]:
     return out
 
 
+def _ist_ohne_vertrag(zahlweise: dict) -> bool:
+    """Traegt diese Zahlweise `contractDuration == 0`, also "ohne Vertrag"?
+
+    Keine zweite Laufzeit-Lesart: gefragt ist nicht, WIE LANG der Vertrag
+    laeuft, sondern ob es gar keinen gibt. Deshalb hier nicht
+    `laufzeit_in_monaten` - das macht aus einer 0 ein None, und an DIESER
+    Stelle ist die 0 eine Aussage (CLAUDE.md Clean Code 3).
+
+    Gelesen wird die ZAHL, nicht ihr JSON-Typ: `"0"` ist dieselbe Aussage
+    wie `0`. Der strikte Vergleich gegen die Zahl 0 liess die
+    Barpreis-Zahlweise sonst durchfallen und mit ihr die ganze Seite
+    (FIX3, gemessen an der echten Produktseite: 7 Rohsaetze gegen 0).
+    """
+    wert = zahlweise.get("contractDuration")
+    if isinstance(wert, bool):
+        return False                      # "ja" ist keine Dauer
+    try:
+        return float(wert) == 0.0
+    except (TypeError, ValueError):
+        return False
+
+
 def _einmalpreis(variante: dict) -> Optional[float]:
     """Der Geraetepreis ohne Vertrag - `oneTime.listed` der Zahlweise
     `ONE_TIME_PURCHASE` mit `contractDuration == 0`. Siehe Modulkopf: NIE
@@ -305,7 +345,7 @@ def _einmalpreis(variante: dict) -> Optional[float]:
             continue
         if zahlweise.get("type") != "ONE_TIME_PURCHASE":
             continue
-        if zahlweise.get("contractDuration") != 0:
+        if not _ist_ohne_vertrag(zahlweise):
             continue
         wert = (zahlweise.get("oneTime") or {}).get("listed")
         try:
@@ -340,7 +380,13 @@ def lies(text: str, url: str = "") -> list[dict]:
             continue
         preis = _einmalpreis(v)
         if preis is None:
-            continue                  # keine Einmalkauf-Zahlweise ohne Vertrag
+            # Keine Einmalkauf-Zahlweise ohne Vertrag - BENANNT, nicht
+            # still: faellt das Feld `contractDuration` oder sein Typ
+            # einmal aus, verliert diese Seite sonst lautlos alle Saetze.
+            log.info("congstar: Variante %r ohne Einmalkauf-Zahlweise "
+                     "(ONE_TIME_PURCHASE mit contractDuration 0) - kein "
+                     "Satz", titel)
+            continue
 
         # Derselbe Helfer wie im Buendel-Pfad (`_speicher_gb`: referenceGB
         # vor size): das 1-TB-Geraet traegt size=1, und size allein waere
@@ -391,6 +437,10 @@ _PIB_NR_RE = re.compile(r"Produktinformationsblatt_(\d+)\.pdf")
 
 # Die Ratenlaufzeiten, die erhoben werden - siehe Modulkopf
 # ("ZWEI ZAHLWEISEN, EIN SAETZ", P0-B2a: beide, nicht mehr nur eine).
+# GEMESSEN an der gespeicherten Tarifseite: genau diese zwei stehen dort.
+# Es ist eine Positivliste, und `_buendelzahlweisen()` protokolliert jede
+# Dauer, die sie nicht enthaelt - eine 12- oder 48-Monats-Zahlweise soll
+# auffallen und nicht lautlos fehlen (FIX3).
 _RATENLAUFZEITEN = (24, 36)
 
 
@@ -445,7 +495,12 @@ def _buendelzahlweisen(variante: dict) -> dict:
 
     Ergebnis: `{laufzeit_monate: {"zuzahlung":.., "rate":..}}`, hoechstens
     ein Eintrag je Laufzeit (die erste lesbare gewinnt, falls eine Antwort
-    dieselbe Laufzeit doppelt nennen sollte)."""
+    dieselbe Laufzeit doppelt nennen sollte).
+
+    JEDE uebergangene Zahlweise wird benannt: unlesbare Dauer, Dauer
+    ausserhalb von `_RATENLAUFZEITEN`, Dauer schon vorhanden, unvollstaendige
+    Betraege, Probe geht nicht auf. Die Positivliste ist damit sichtbar und
+    nicht mehr still (FIX3, 21.09.2026)."""
     gefunden: dict = {}
     for zahlweise in (variante.get("prices") or {}).get("paymentVariants") or []:
         if not isinstance(zahlweise, dict):
@@ -454,13 +509,31 @@ def _buendelzahlweisen(variante: dict) -> dict:
             continue          # ONE_TIME_PURCHASE ist der Barpreis (lies, oben)
         if str(zahlweise.get("subtype") or "").upper() != "UNSPECIFIED":
             continue          # TRADE_IN setzt die Einnahme eines Altgeraets voraus
-        dauer = zahlweise.get("contractDuration")
-        if dauer not in _RATENLAUFZEITEN or dauer in gefunden:
+        # Die Dauer wird als ZAHL gelesen, nicht am JSON-Typ gemessen:
+        # "36" ist dieselbe Laufzeit wie 36 (Modulkopf, FIX3).
+        dauer = laufzeit_in_monaten(zahlweise.get("contractDuration"))
+        if dauer is None:
+            log.info("congstar-Buendel: Zahlweise ohne lesbare "
+                     "contractDuration (%r) - uebergangen",
+                     zahlweise.get("contractDuration"))
+            continue
+        if dauer not in _RATENLAUFZEITEN:
+            log.info("congstar-Buendel: Zahlweise ueber %d Monate steht "
+                     "nicht in den erhobenen Ratenlaufzeiten %s - "
+                     "uebergangen", dauer, list(_RATENLAUFZEITEN))
+            continue
+        if dauer in gefunden:
+            log.info("congstar-Buendel: zweite Zahlweise ueber %d Monate - "
+                     "die erste lesbare gilt, diese uebergangen", dauer)
             continue
         anzahlung = _preis((zahlweise.get("oneTime") or {}).get("discounted"))
         rate = _preis((zahlweise.get("recurring") or {}).get("discounted"))
         gesamt = _preis(zahlweise.get("total"))
         if anzahlung is None or rate is None or gesamt is None:
+            log.info("congstar-Buendel: %d-Monats-Zahlweise ohne "
+                     "vollstaendige Betraege (Zuzahlung %r, Rate %r, "
+                     "Gesamt %r) - uebergangen", dauer, anzahlung, rate,
+                     gesamt)
             continue
         if not probe_geht_auf(anzahlung, rate, dauer, gesamt):
             log.info("congstar-Buendel: %s-Monats-Zahlweise ohne "

@@ -264,20 +264,53 @@ def test_die_24_monats_rate_ist_hoeher_als_die_36_monats_rate():
             pytest.approx(1303.0, abs=0.005)
 
 
-def test_wird_eine_laufzeit_aus_der_antwort_entfernt_bleibt_die_andere():
+def test_wird_eine_laufzeit_aus_der_antwort_entfernt_bleibt_die_andere(caplog):
     """Wird die 36-Monats-Zahlweise auf eine nicht erhobene Laufzeit
     gedreht - hier durch eine Textersetzung am ECHTEN Abruf, sonst kein
     Byte veraendert -, bleibt die 24-Monats-Zahlweise trotzdem ein Satz:
     eine kaputte oder fehlende Laufzeit verwirft nur sich selbst, nicht
-    die andere."""
+    die andere.
+
+    FIX3: und sie verschwindet nicht STILL. `_RATENLAUFZEITEN` ist eine
+    Positivliste; eine 48-Monats-Zahlweise fiel bis zum 21.09.2026 ohne
+    ein Wort heraus. Jetzt nennt das Protokoll sie samt Liste."""
     roh = _fixture("congstar_tarifseite_allnet_flat_m.html.gz")
     assert '\\"contractDuration\\":36' in roh, \
         "die Fixture muss 36-Monats-Zahlweisen tragen, sonst prüft der Test nichts"
     ohne_36 = roh.replace('\\"contractDuration\\":36',
                           '\\"contractDuration\\":48')
-    saetze = lies_buendel(ohne_36, url=_M_URL)
+    with caplog.at_level("INFO",
+                         logger="telco_radar.collect.geraete.congstar"):
+        saetze = lies_buendel(ohne_36, url=_M_URL)
     assert len(saetze) == 18
     assert all(s["laufzeit_monate"] == 24 for s in saetze)
+    uebergangen = [m for m in caplog.messages
+                   if "48 Monate" in m and "uebergangen" in m]
+    assert uebergangen, caplog.messages
+    assert "[24, 36]" in uebergangen[0]
+
+
+def test_eine_laufzeit_als_zeichenkette_ist_dieselbe_laufzeit(caplog):
+    """FIX3: die Positivliste gilt fuer LAUFZEITEN, nicht fuer JSON-Typen.
+
+    Kommt `contractDuration` als `"36"` statt als `36` - dieselbe Aussage,
+    eine andere Schreibweise -, fiel die Zahlweise vorher stumm aus der
+    Positivliste: 18 statt 36 Saetze, ohne Protokoll. Textersetzung am
+    ECHTEN Abruf, sonst kein Byte veraendert."""
+    roh = _fixture("congstar_tarifseite_allnet_flat_m.html.gz")
+    assert '\\"contractDuration\\":36' in roh
+    als_text = roh.replace('\\"contractDuration\\":36',
+                           '\\"contractDuration\\":\\"36\\"')
+    with caplog.at_level("INFO",
+                         logger="telco_radar.collect.geraete.congstar"):
+        saetze = lies_buendel(als_text, url=_M_URL)
+    assert len(saetze) == 36
+    assert {s["laufzeit_monate"] for s in saetze} == {24, 36}
+    # Und die Laufzeit steht als ZAHL im Satz, nicht als Zeichenkette -
+    # `buendel_id` und die Etiketten rechnen mit ihr.
+    assert all(isinstance(s["laufzeit_monate"], int) for s in saetze)
+    assert not [m for m in caplog.messages if "uebergangen" in m], \
+        caplog.messages
 
 
 def test_trade_in_wird_nicht_als_normaler_kauf_gehoben():
