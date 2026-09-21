@@ -88,15 +88,41 @@ nach Sortierung). Die `listung_id` zu erweitern waere eine
 Datenwanderung - der ganze Altbestand gaelte als ausgelistet und entstuende
 neu -, deshalb loest `_listungsplan()` es auf der Listungsseite:
 
-    Ein Geraet, eine Listung. Sie traegt den Plan mit der LAENGSTEN
-    Ratenlaufzeit (bei Gleichstand den mit dem hoeheren Gesamtbetrag).
+    Ein Geraet, eine Listung. Sie traegt den Plan mit dem HOECHSTEN
+    Gesamtbetrag (bei Gleichstand den mit der laengeren Ratenlaufzeit).
 
-Zwei Gruende, beide nachpruefbar: die Regel ist reihenfolgeunabhaengig,
-und sie trifft in beiden gespeicherten echten Abrufen genau den einzigen
-vorhandenen Plan (36 Monate) - der Bestand wandert also nicht. Welcher
-von zwei ECHTEN Plaenen der richtige Traeger ist, ist damit nicht
-bewiesen, sondern DEFINIERT; deshalb steht die Regel an genau einer
-Stelle (`_LISTUNGSPLAN_REGEL`) und jede Anwendung im Protokoll.
+DIE REGEL IST EINE WAHL UND KEINE MESSUNG (korrigiert P0-B-h5)
+---------------------------------------------------------------
+Welcher von zwei ECHTEN Plaenen der "richtige" Traeger ist, steht in der
+Nutzlast nicht: sie markiert keinen als Standardangebot. Die Regel ist
+also DEFINIERT, nicht belegt - und weil sie eine Wahl ist, braucht sie
+einen Grund, der sich nachlesen laesst. Er ist zweiteilig:
+
+1. Sie sortiert nach der Zahl, die sie entscheidet. Die Auswahl bestimmt
+   `preis_ohne_vertrag`, und das IST `gesamt`. Bis P0-B-h5 sortierte sie
+   nach der LAUFZEIT und nur bei Gleichstand nach dem Betrag - ein
+   Kriterium neben dem entschiedenen. Das ist kein Schoenheitsfehler: die
+   zwei koennen auseinanderlaufen. 24 Monate zu 1.203,00 EUR gegen 36
+   Monate zu 1.197,00 EUR ergab nach der alten Regel die 1.197,00 - also
+   ausgerechnet den NIEDRIGEREN Betrag, entgegen der Begruendung, mit der
+   die Regel angetreten war.
+2. Ein zu NIEDRIGER Preis ist der schaedlichere Fehler. CLAUDE.md sagt
+   "Der niedrigste Preis ist der wahrscheinlichste Fehler", und auf dieser
+   Seite gewinnt eine zu niedrige Zahl Vergleiche und Rangfolgen, die ihr
+   nicht gehoeren. Die Wahl des hoechsten belegten Gesamtbetrags kann die
+   Listung deshalb nicht unter den teuersten dokumentierten Kaufweg des
+   Anbieters druecken.
+
+Reihenfolgeunabhaengig ist sie weiterhin: `max()` ueber `(gesamt,
+laufzeit)`, und ein Gleichstand in BEIDEN bedeutet gleiche Betraege - die
+Rechenprobe nagelt dann auch die Rate fest. Deshalb steht die Regel an
+genau einer Stelle (`_LISTUNGSPLAN_REGEL`) und jede Anwendung mit allen
+Betraegen im Protokoll.
+
+Am gemessenen Bestand aendert die Korrektur nichts: beide gespeicherten
+echten Abrufe fuehren je Eintrag GENAU EINEN Plan, alte und neue Regel
+treffen denselben. Nachgemessen in P0-B-h5, 10 von 10 bzw. 9 von 9
+Eintraegen identisch.
 
 WAS DIESE REGEL KOSTET - UND WO SIE NICHT REICHT
 -------------------------------------------------
@@ -104,15 +130,39 @@ Im BUENDEL-Pfad ist die Laufzeit kein Problem: `tco_model.buendel_id()`
 traegt sie seit B1 im Schluessel, `lies_buendel()` legt je Plan ein
 eigenes Buendel an, nichts geht verloren.
 
-Auf der Seite, die `lies()` liest, gilt das NICHT. Die Konfiguration gibt
-Telekom einen `kind: static`-Einstieg (`/ohne-vertrag`) und fuenf
-`kind: buendel`-Einstiege; die "ohne Vertrag"-Nutzlast erreicht
-`lies_buendel()` nie (sie traegt keinen `selectedPlan` und waere dort
-ein Fehler). Ein zweiter Ratenplan DORT ist also nicht "woanders
-abgelegt", er ist NUR im Protokoll - eine benannte Luecke, keine
-Erfassung. Sie aufzuheben heisst, die Preisform einer Listung mehrfach
-fuehren zu koennen; das ist eine Aenderung an `Listung` und an der Seite
-und gehoert nicht in einen Adapter.
+Auf der Seite, die `lies()` liest, gilt das NICHT - und der Buendelpfad
+kann dort nicht einspringen. Die Konfiguration gibt Telekom einen
+`kind: static`-Einstieg (`/ohne-vertrag`) und fuenf `kind: buendel`-
+Einstiege; die "ohne Vertrag"-Nutzlast erreicht `lies_buendel()` nie (sie
+traegt keinen `selectedPlan` und waere dort ein Fehler). Sie KANN ihn auch
+nicht erreichen: ein Buendel ist Geraet PLUS Tarif - `tco_model.buendel_id`
+traegt den Tarifnamen im Schluessel, und `tco_buendel.aus_rohsaetzen`
+verwirft einen Rohsatz, dessen Tarif sich nicht auf eine `tarif_id`
+aufloesen laesst. Ein Geraet OHNE Vertrag hat keinen. Der zweite Ratenplan
+eines vertragsfreien Geraets ist also nicht "woanders abgelegt" - er ist
+fort.
+
+OFFEN GEGEN REGEL 9: DAS PROTOKOLL IST NICHT DIE SEITE
+-------------------------------------------------------
+`_listungsplan()` nennt den uebergangenen Plan mit Anzahlung, Rate,
+Laufzeit und Gesamtbetrag, sodass der erste echte Mehrplan-Fall
+nachrechenbar ist. Das Log ist aber kein Leser der Website: auf der
+Geraeteseite steht davon kein Wort, und CLAUDE.md Regel 9 verlangt, dass
+ein Ausfall SICHTBAR wird statt still zu bleiben.
+
+Ein Adapter kann das nicht heilen. `Listung` traegt genau eine Preisform
+(`anzahlung`, `monatsrate`, `laufzeit_monate`), und die Sammelbilanz hat
+fuer so eine Meldung keinen Kanal auf die Seite: `Anbieterbilanz.proben`
+endet in `geraete_pipeline.melde_proben()` im Log, `unbekannt` in
+`data/state/geraete_unbekannt.jsonl`. Beides erreicht keine Vorlage
+(nachgemessen in P0-B-h5). Die Luecke gehoert damit nach `Listung`, in
+die Bilanz und auf die Geraeteseite - drei Dateien, die diesem Modul
+nicht gehoeren - und ist als Befund gemeldet, nicht hier behoben.
+
+Was am gemessenen Bestand heute davon abhaengt: nichts. Kein Eintrag der
+beiden echten Abrufe traegt zwei Plaene, die Luecke ist also eine
+VORBEREITUNGS-Luecke und kein laufender Datenverlust. Sie steht hier,
+damit sie beim ersten echten Fall nicht neu entdeckt werden muss.
 
 DIE ADRESSE KOMMT AUS DEM HTML, NICHT AUS DEM SLUG
 --------------------------------------------------
@@ -364,8 +414,25 @@ def _preisformen(preis: dict) -> list[dict]:
 
 # Die Regel aus dem Modulkopf ("EINE LISTUNG IST DAS GERAET") - EINMAL
 # formuliert, damit Protokoll und Auswahl nicht auseinanderlaufen koennen.
-_LISTUNGSPLAN_REGEL = ("laengste Ratenlaufzeit, bei Gleichstand hoeherer "
-                       "Gesamtbetrag")
+# Sie sortiert nach dem GESAMTBETRAG, weil der Gesamtbetrag die Zahl ist,
+# die diese Auswahl bestimmt (`preis_ohne_vertrag`); die Laufzeit ist nur
+# der Gleichstandsbrecher. Bis P0-B-h5 stand es umgekehrt - siehe
+# Modulkopf "DIE REGEL IST EINE WAHL".
+_LISTUNGSPLAN_REGEL = ("hoechster Gesamtbetrag, bei Gleichstand laengste "
+                       "Ratenlaufzeit")
+
+
+def _plan_text(form: dict) -> str:
+    """Ein Ratenplan mit ALLEN gemessenen Betraegen, fuer das Protokoll.
+
+    Ohne die Betraege ist ein uebergangener Plan im Protokoll nur eine
+    Laufzeit: die Messung selbst waere verloren, und der erste echte
+    Mehrplan-Fall liesse sich aus dem Log nicht nachrechnen. Mit ihnen
+    steht die Rechenprobe (`anzahlung + n x rate = gesamt`) in der Zeile.
+    """
+    return (f"{form['laufzeit_monate']} Monate: "
+            f"{form['anzahlung']:.2f} + {form['laufzeit_monate']} x "
+            f"{form['monatsrate']:.2f} = {form['gesamt']:.2f} EUR")
 
 
 def _listungsplan(formen: list[dict], name: str) -> dict:
@@ -374,22 +441,28 @@ def _listungsplan(formen: list[dict], name: str) -> dict:
     Eine Listung ist das Geraet bei einem Anbieter (`listung_id` =
     Anbieter + SKU, ohne Laufzeit); mehrere Plaene ergeben deshalb nicht
     mehrere Listungen, sondern eine mit einer benannten Auswahl - siehe
-    Modulkopf fuer die Begruendung. `max()` statt "der erste in der
-    Liste": die Reihenfolge der Nutzlast entscheidet nichts.
+    Modulkopf fuer die Begruendung und dafuer, dass die Regel eine WAHL
+    ist und keine Messung. `max()` statt "der erste in der Liste": die
+    Reihenfolge der Nutzlast entscheidet nichts.
 
-    Die uebergangenen Plaene werden GENANNT, und das Protokoll sagt
-    ausdruecklich, dass sie NICHT erfasst sind - eine Listung kann nur
-    eine Preisform tragen (Modulkopf: "wo sie nicht reicht").
+    Die uebergangenen Plaene werden mit ihren BETRAEGEN genannt, und das
+    Protokoll sagt ausdruecklich, dass sie nirgends erfasst sind - eine
+    Listung kann nur eine Preisform tragen (Modulkopf: "wo sie nicht
+    reicht"). Das Protokoll ist dabei NICHT die Seite: dass ein Plan
+    fehlt, steht heute nur im Log (Modulkopf, offene Luecke zu Regel 9).
     """
-    traeger = max(formen, key=lambda f: (f["laufzeit_monate"], f["gesamt"]))
-    if len(formen) > 1:
+    traeger = max(formen, key=lambda f: (f["gesamt"], f["laufzeit_monate"]))
+    # `is not`, nicht `!=`: zwei Plaene mit gleichen Betraegen sind zwei
+    # Plaene. Ein Vergleich auf Gleichheit schluckte den zweiten aus dem
+    # Protokoll - genau das Verschwinden, das diese Zeile verhindern soll.
+    uebergangen = [f for f in formen if f is not traeger]
+    if uebergangen:
         log.info(
-            "Telekom: %r nennt %d Ratenplaene (%s Monate) - die LISTUNG "
-            "traegt den Plan ueber %d Monate (Regel: %s); die uebrigen "
-            "Plaene werden auf dieser Seite NICHT erfasst",
-            name, len(formen),
-            "/".join(str(f["laufzeit_monate"]) for f in formen),
-            traeger["laufzeit_monate"], _LISTUNGSPLAN_REGEL)
+            "Telekom: %r nennt %d Ratenplaene - die LISTUNG traegt %s "
+            "(Regel: %s, eine WAHL und keine Messung); NICHT erfasst, "
+            "auch nicht im Buendelpfad: %s",
+            name, len(formen), _plan_text(traeger), _LISTUNGSPLAN_REGEL,
+            "; ".join(_plan_text(f) for f in uebergangen))
     return traeger
 
 

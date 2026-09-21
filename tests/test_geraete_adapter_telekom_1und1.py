@@ -166,7 +166,8 @@ def test_telekom_gesamtbetrag_der_nicht_aufgeht_wird_verworfen():
     assert telekom.lies(html, _TELEKOM_URL) == []
 
 
-def _telekom_mit_zweitem_plan(telekom_html: str, zuerst_36: bool = True) -> str:
+def _telekom_mit_zweitem_plan(telekom_html: str, zuerst_36: bool = True,
+                              zweiter_plan=None) -> str:
     """Die ECHTE Kategorieseite, am iPhone-17-Pro-Eintrag um EINEN
     zweiten, rechnerisch selbst konsistenten 24-Monats-Plan ergänzt
     (99 + 24 × 44,00 = 1155,00).
@@ -178,17 +179,31 @@ def _telekom_mit_zweitem_plan(telekom_html: str, zuerst_36: bool = True) -> str:
 
     `zuerst_36` dreht die Reihenfolge in `installments`: sie darf nicht
     entscheiden, welcher Plan die Listung trägt.
+
+    `zweiter_plan` ersetzt den Standard-Zweitplan - gebraucht für den
+    einen Fall, in dem längste Laufzeit und höchster Gesamtbetrag NICHT
+    dasselbe Angebot meinen (P0-B-h5).
     """
     daten = telekom.zustand(telekom_html)
     pro = next(e for e in daten["productList"]["data"]
                if str(e.get("variantSlug") or "") == "tiefblau-256-gb")
     assert pro["price"]["installments"][0]["numberOfInstallments"] == 36
     echter = pro["price"]["installments"][0]
-    zweiter_plan = {"numberOfInstallments": 24, "recurringPrice": 44.0,
-                    "totalPrice": 1155.0}
+    if zweiter_plan is None:
+        zweiter_plan = {"numberOfInstallments": 24, "recurringPrice": 44.0,
+                        "totalPrice": 1155.0}
     pro["price"]["installments"] = ([echter, zweiter_plan] if zuerst_36
                                     else [zweiter_plan, echter])
     return f'<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>'
+
+
+# Der EINE Fall, der die alte Auswahlregel von der neuen trennt: ein
+# 24-Monats-Plan, der TEURER ist als der echte 36er (99 + 24 × 46,00 =
+# 1203,00 gegen 99 + 36 × 30,50 = 1197,00). "Längste Laufzeit zuerst"
+# wählte hier 1197,00 - den NIEDRIGEREN Betrag. Synthetisch, und das
+# sagt es: kein echter Abruf trägt zwei Pläne.
+_TEURER_24ER = {"numberOfInstallments": 24, "recurringPrice": 46.0,
+                "totalPrice": 1203.0}
 
 
 @pytest.mark.parametrize("zuerst_36", [True, False])
@@ -224,6 +239,114 @@ def test_telekom_mehrere_ratenplaene_ergeben_genau_eine_listung(telekom_html,
     assert "36 Monate" in protokoll[0]
     assert telekom._LISTUNGSPLAN_REGEL in protokoll[0]
     assert "NICHT erfasst" in protokoll[0]
+    with pytest.raises(GeraeteAbrufFehler):
+        telekom.lies_buendel(geaendert, _TELEKOM_URL)
+
+
+@pytest.mark.parametrize("zuerst_36", [True, False])
+def test_telekom_beide_ratenplaene_werden_gemessen_bevor_einer_gewaehlt_wird(
+        telekom_html, zuerst_36):
+    """GEGENPROBE zu den zwei Tests darunter - sie ist gegen JEDEN Stand
+    grün und muss es sein.
+
+    Wenn `_preisformen` nur einen Plan zurückgäbe, wären eine Auswahlregel
+    und ein Protokoll über "den übergangenen Plan" gegenstandslos, und
+    beide Tests darunter prüften ins Leere (CLAUDE.md Regel 10: ein Test,
+    dessen Lookup ins Leere läuft, ist grün und prüft nichts). Hier steht
+    deshalb die Zusicherung, die P0-B-fix3 aus diesem Modul entfernt hat -
+    an der Schicht, an der sie wahr IST: GEMESSEN werden beide Pläne mit
+    allen Beträgen, gewählt wird erst danach.
+    """
+    geaendert = _telekom_mit_zweitem_plan(telekom_html, zuerst_36)
+    daten = telekom.zustand(geaendert)
+    pro = next(e for e in daten["productList"]["data"]
+               if str(e.get("variantSlug") or "") == "tiefblau-256-gb")
+
+    formen = telekom._preisformen(pro["price"])
+    assert len(formen) == 2
+    nach_laufzeit = {f["laufzeit_monate"]: f for f in formen}
+    assert set(nach_laufzeit) == {36, 24}
+    assert nach_laufzeit[36]["gesamt"] == 1197.0
+    assert nach_laufzeit[24]["gesamt"] == 1155.0
+    assert nach_laufzeit[24]["monatsrate"] == 44.0
+    # Beide gehen rechnerisch auf - sonst wäre der eine kein übergangener
+    # Plan, sondern ein verworfener (anderer Zweig, anderes Protokoll).
+    for f in formen:
+        assert probe_geht_auf(f["anzahlung"], f["monatsrate"],
+                              f["laufzeit_monate"], f["gesamt"])
+
+
+@pytest.mark.parametrize("zuerst_36", [True, False])
+def test_telekom_die_listung_traegt_den_hoechsten_gesamtbetrag(telekom_html,
+                                                               zuerst_36):
+    """P0-B-h5: die Auswahlregel sortiert nach der Zahl, die sie bestimmt.
+
+    P0-B-fix3 wählte "längste Ratenlaufzeit, bei Gleichstand höherer
+    Gesamtbetrag". Die zwei Kriterien können auseinanderlaufen, und dann
+    gewann das falsche: 24 Monate zu 1.203,00 € gegen 36 Monate zu
+    1.197,00 € ergab 1.197,00 € - ausgerechnet den NIEDRIGEREN Betrag,
+    entgegen der Begründung, mit der die Regel angetreten war.
+
+    Die Auswahl bestimmt `preis_ohne_vertrag`, und das IST der
+    Gesamtbetrag; danach wird sortiert, die Laufzeit bricht nur den
+    Gleichstand. CLAUDE.md: "Der niedrigste Preis ist der
+    wahrscheinlichste Fehler" - eine zu niedrige Zahl gewinnt auf dieser
+    Seite Vergleiche und Rangfolgen, die ihr nicht gehören.
+
+    Die Regel bleibt eine WAHL und keine Messung (Modulkopf "DIE REGEL IST
+    EINE WAHL"): die Nutzlast markiert keinen Plan als Standardangebot.
+    """
+    geaendert = _telekom_mit_zweitem_plan(telekom_html, zuerst_36,
+                                          zweiter_plan=_TEURER_24ER)
+    saetze = [s for s in telekom.lies(geaendert, _TELEKOM_URL)
+              if s["titel"].startswith("Apple iPhone 17 Pro 256")]
+    assert len(saetze) == 1
+    assert saetze[0]["preis"] == 1203.0
+    assert saetze[0]["laufzeit_monate"] == 24
+    assert saetze[0]["monatsrate"] == 46.0
+    assert saetze[0]["anzahlung"] == 99.0
+    # Und die Regel steht an EINER Stelle, in der Reihenfolge, in der sie
+    # rechnet - sonst sagt das Protokoll etwas anderes als die Auswahl.
+    assert telekom._LISTUNGSPLAN_REGEL.startswith("hoechster Gesamtbetrag")
+
+
+def test_telekom_der_uebergangene_plan_steht_mit_seinen_betraegen_im_protokoll(
+        telekom_html, caplog):
+    """P0-B-h5: der übergangene Plan darf nicht still verschwinden.
+
+    P0-B-fix3 nannte im Protokoll nur die LAUFZEITEN ("36/24 Monate").
+    Damit war die Messung selbst weg: Anzahlung, Rate und Gesamtbetrag des
+    übergangenen Plans standen nirgends, und der erste echte
+    Mehrplan-Fall wäre aus dem Log nicht nachrechenbar gewesen. Eine
+    Listung trägt nur eine Preisform - was sie nicht trägt, muss
+    wenigstens vollständig protokolliert sein.
+
+    Der Buendelpfad kann hier nicht einspringen: ein Bündel ist Gerät PLUS
+    Tarif, und die "ohne Vertrag"-Nutzlast hat keinen - `lies_buendel`
+    wirft auf ihr (unten mitgeprüft). Dass die Geräteseite davon kein Wort
+    sagt, bleibt die offene Lücke gegen Regel 9; sie ist im Modulkopf
+    benannt und als Befund gemeldet, nicht hier geheilt.
+    """
+    geaendert = _telekom_mit_zweitem_plan(telekom_html,
+                                          zweiter_plan=_TEURER_24ER)
+    with caplog.at_level("INFO"):
+        saetze = [s for s in telekom.lies(geaendert, _TELEKOM_URL)
+                  if s["titel"].startswith("Apple iPhone 17 Pro 256")]
+    assert len(saetze) == 1
+
+    zeilen = [m for m in caplog.messages if "Ratenplaene" in m]
+    assert len(zeilen) == 1, caplog.messages
+    zeile = zeilen[0]
+    # Der TRÄGER mit seinen Beträgen (der 24er zu 1.203,00 €).
+    assert "24 Monate: 99.00 + 24 x 46.00 = 1203.00 EUR" in zeile, zeile
+    # Und der ÜBERGANGENE mit seinen - die Zahlen, die sonst verloren sind.
+    assert "36 Monate: 99.00 + 36 x 30.50 = 1197.00 EUR" in zeile, zeile
+    # Samt Regel, und samt der Aussage, dass die Regel eine Wahl ist.
+    assert telekom._LISTUNGSPLAN_REGEL in zeile
+    assert "eine WAHL und keine Messung" in zeile
+    # Das Protokoll behauptet NICHT, der Plan sei woanders erfasst.
+    assert "NICHT erfasst" in zeile
+    assert "auch nicht im Buendelpfad" in zeile
     with pytest.raises(GeraeteAbrufFehler):
         telekom.lies_buendel(geaendert, _TELEKOM_URL)
 
