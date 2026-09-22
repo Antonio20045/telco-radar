@@ -723,3 +723,47 @@ Kurvenetiketten und zugänglichem Namen, und beide CSV-Exporte.
 5. Δ im Block „Ohne Tarifband" vergleicht einen Unlimited-Tarif gegen Vodafone
    Mobil XS 18 GB (P3). Mobil: X-Achsenlabels überlappen, Alterungs-Abzeichen
    bricht in Einzelkästchen, Reiter abgeschnitten, drei Erklärsätze stehen (P2).
+
+### Sitzung 22.09. — P0 auf main, Netzlage gemessen
+
+**Gebaut:** nichts Neues. Diese Sitzung hat den P0-Stand von
+`claude/festive-goodall-cs669e` (25 Commits) nach `main` gemergt — konfliktfrei,
+ohne `data/`- oder `site/`-Datei. Antonio hat das Arbeiten auf `main` freigegeben
+(Regel 6); damit ist offener Punkt 8 („kein Live-Nachweis") erledigt.
+
+**Gemessen:**
+
+| | |
+|---|---|
+| Geräte-Suite auf gemergtem main | 1677 grün / 1 übersprungen / 0 rot |
+| Orakel `test_seiten_zahlen.py` | 133 grün / 0 rot |
+| Volle Suite (wie `ci.yml`) | 3589 grün / 4 übersprungen / 0 rot, 11:46 |
+| Umgebung | Container war leer; `requirements.txt` neu installiert, Python 3.11.15 |
+| Live vor dem Push | Live-`geraete.html` md5-identisch mit `site/geraete.html`, „21. September 2026" |
+
+**Netzsperre aufgehoben — aber nicht überall.** Der dokumentierte `curl`-Test
+liefert kein `000` mehr: o2online.de, congstar.de und 1und1.de antworten mit 200
+und echtem Inhalt. **telekom.de antwortet 202** (`x-amzn-waf-action: challenge`,
+CloudFront), **vodafone.de 403** (Incapsula). Beides ist Bot-Schutz beim Anbieter,
+keine Sandbox-Grenze, und wird nach Regel 7 nicht umgangen.
+
+**Offener Punkt 1 (Telekom-Laufzeit-Parameter) ist beantwortet: es gibt ihn nicht.**
+Belegt in `outputs/befund-telekom-laufzeit-2026-09-22.md` an beiden Fixtures und
+allen acht `beleg-telekom-*.json`: `numberOfInstallments` 19× von 19 auf 36,
+`installments` nie länger als 1, die Auswahl 6/12/24/36 nur im Rechtstext des
+Konfigurators, dessen Zustandsfelder leer vom Server kommen; Listenfilter laufen
+nicht über Query-Parameter und kennen keinen Laufzeitfilter. Nicht entscheidbar
+bleibt der BFF (`/shop/api/eshop/bff-de`) — seine Parameternamen liegen in
+externen JS-Bündeln hinter der Challenge. **Die Annahme des Auftrags („hol den
+Parameternamen, dann liefert der Collector alle Pläne") ist damit widerlegt.**
+
+**Offener Punkt 3 (congstar „Allnet Flat XL mit Upgrade-Versprechen") ist
+beantwortet: kein Tarif.** Das heutige Portfolio ist XS/S/M/L mit 15/50/125/200 GB;
+„Upgrade-Versprechen" ist eine Zusicherung auf M und L, kein Tarifname. 25 GB bei
+35 € gibt es nicht — die Zeilen 31/32 in `tarife.jsonl` stammen aus PIB 546/550
+(16.09.) und sind ungültig. Einschränkung: die Grundpreise waren **nicht**
+belegbar, congstar lädt sie per JavaScript nach; belegt sind Volumina und Zusage.
+
+**Offen:** Punkt 2 (Telekom-Tarifsätze am Netz belegen) bleibt hinter der
+Challenge; die Hälfte davon — schlägt die Vorrangregel aus `tarif_bezug.py` bis in
+die Bündelkarten durch? — ist ohne Netz prüfbar. Punkte 4–7, 9, 10 unverändert.
