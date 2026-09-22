@@ -164,16 +164,28 @@ def test_altbestand_ohne_letzter_fund_wird_nicht_geraten(tmp_path):
 def test_gleicher_tag_ersetzt_seinen_eintrag(tmp_path):
     """Zwei Laeufe am selben Tag sind EIN Messtag (dieselbe Regel wie die
     TCO-Historie): der spaetere Stand gewinnt, es entsteht keine doppelte
-    Zeile - und der Speicherzyklus behaelt die Historie."""
+    Zeile - und der Speicherzyklus behaelt die Historie.
+
+    DIE EINTRAGSFORM steht hier woertlich, weil sie ein gespeichertes
+    Format ist und keine Innerei. Seit dem 22.09.2026 traegt sie zwei
+    weitere Felder: [Tag, Funde, Zustand, Buendel, versuchte
+    Produktadressen, tote davon]. `0` versuchte Adressen und `None` tote
+    sind hier die richtige Auskunft - dieser Lauf kam aus
+    `protokolliere_lauf` ohne Adresszahlen, hat also keine gemessen
+    (Clean Code 3), und genau damit faellt der Tag aus dem
+    Erosionsvergleich heraus.
+    """
+    erwartet = [["2026-09-01", 0, GELESEN, 0, 0, None]]
     db = _db(tmp_path)
     db.protokolliere_lauf("o2", "2026-09-01", funde=3, vollstaendig=True)
     db.protokolliere_lauf("o2", "2026-09-01", funde=0, vollstaendig=True)
-    assert db.laufbilanz("o2")["funde_nach_tag"] == \
-        [["2026-09-01", 0, GELESEN, 0]]
+    assert db.laufbilanz("o2")["funde_nach_tag"] == erwartet
     # Der ersetzte Tag zaehlt als EIN stiller Tag, nicht als zwei - und
     # `letzter_fund` (09-01, aus dem ersten Lauf) bleibt der Anker.
     assert db.stille_tage("o2") == 1
     db.save("2026-09-01")
     wieder = GeraeteDB(tmp_path / "geraete_db.json")
-    assert wieder.laufbilanz("o2")["funde_nach_tag"] == \
-        [["2026-09-01", 0, GELESEN, 0]]
+    assert wieder.laufbilanz("o2")["funde_nach_tag"] == erwartet
+    # Und der wieder eingelesene Tag sagt nichts ueber Adressen - keine 0,
+    # sondern eine benannte Luecke.
+    assert wieder.messtage("o2")[-1].gelesene_adressen is None

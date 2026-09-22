@@ -163,6 +163,28 @@ def _abdeckungszustand(bilanz) -> str:
         ein Leseversuch, der nicht durchkam. Der zaehlt als Ausfall, denn
         genau dafuer gibt es diesen Waechter.
 
+    WARUM TOTE PRODUKTADRESSEN HIER NICHT VORKOMMEN (22.09.2026). Eine
+    Quelle, deren Sitemap veraltete Adressen fuehrt, liefert einen Lauf
+    mit Luecken - und trotzdem GELESEN, nicht TEILGELESEN. Das ist kein
+    zweiter Teilzustand neben dem des Waechters, sondern ausdruecklich ein
+    anderer Fall, und der Unterschied ist der Grund fuer beide Zustaende:
+    TEILGELESEN heisst "der Lauf wurde ABGEBROCHEN, was durchkam ist nicht
+    das Sortiment" - deshalb taugt so ein Tag nicht als Vergleichsbasis
+    (`Messtag.vergleichsbasis`). Bei einer toten Adresse ist nichts
+    abgebrochen: jede Adresse, die der Anbieter nennt, wurde versucht, und
+    die fehlenden hat er selbst als nicht mehr vorhanden beantwortet. Da
+    ist nichts mehr zu lesen - das IST das Sortiment, und der Tag ist eine
+    taugliche Basis. Waere er TEILGELESEN, haette mobilcom-debitel nie
+    wieder einen vollstaendigen Vergleichstag und liefe nach
+    `_OHNE_BASIS_TAGE` dauerhaft in `ALARM_OHNE_BASIS` - genau die
+    Blindheit, gegen die S2-1 gebaut wurde. Wie viele tote Adressen ein
+    Lauf vertraegt, entscheidet allein
+    `collect.geraete._MINDESTANTEIL_GELESENER_PRODUKTSEITEN`; reisst er
+    die Schwelle, ist `vollstaendig` False und der Tag hier LESEFEHLER.
+    Dass diese Schwelle je Nacht rechnet und eine langsame Erosion
+    darunter durchginge, faengt nicht dieser Zustand ab, sondern der
+    Verlauf: `geraete_store.ALARM_EROSION`, gespeist aus `_adressbilanz`.
+
     Erkannt wird die Besuchszeit am Flag der Bilanz
     (`ausserhalb_besuchszeit`), nicht am Grundtext - ein Waechter, der
     zwei Zustaende an einem String auseinanderhaelt, kippt bei der ersten
@@ -178,6 +200,27 @@ def _abdeckungszustand(bilanz) -> str:
                    or bilanz.buendel)
         return TEILGELESEN if gelesen else NICHT_GELESEN
     return GELESEN if bilanz.vollstaendig else LESEFEHLER
+
+
+def _adressbilanz(bilanz) -> tuple:
+    """Die zwei ADRESSZAHLEN eines Laufs - oder zweimal `None`.
+
+    `(produkte_versucht, tote_adressen)`. "Keine Produktadresse versucht"
+    ist KEINE Null: ein uebersprungener Anbieter, ein toter Einstieg und
+    ein Adapter ohne Produktseiten haben nichts gemessen, und eine 0
+    daneben waere die Entwarnung "versucht, keine war tot" - genau die,
+    die `test_ein_lauf_ohne_produktseiten_bucht_keine_null` fuer den
+    Bestand verbietet und die bis zum 22.09.2026 trotzdem im
+    Protokoll-JSON stand (CLAUDE.md Clean Code 3).
+
+    EINE Rechnung fuer beide Kanaele - Bestand und Protokoll -, damit die
+    Seite nicht etwas anderes zaehlt als das Log (Clean Code 7). Aus dem
+    Bestand wird daraus die Reihe, an der `geraete_store.ALARM_EROSION`
+    eine ueber Tage wegbroeselnde Quelle erkennt.
+    """
+    if bilanz.produkte_versucht <= 0:
+        return (None, None)
+    return (bilanz.produkte_versucht, len(bilanz.tote_adressen))
 
 
 def melde_ausfall(alarme: list) -> None:
@@ -439,11 +482,14 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
         # Vortag nicht zu unterscheiden. `laeufe` und `termine` bleiben an
         # ihre alten Bedingungen gebunden (im Store), nur das Journal
         # bekommt jeden Tag.
+        versucht, tote = _adressbilanz(bilanz)
         db.protokolliere_lauf(bilanz.name, heute,
                               funde=len(bilanz.listungen),
                               vollstaendig=bilanz.vollstaendig,
                               zustand=_abdeckungszustand(bilanz),
-                              buendel=len(bilanz.buendel))
+                              buendel=len(bilanz.buendel),
+                              tote_adressen=tote,
+                              produkte_versucht=versucht)
         bilanzen.append({
             "anbieter": bilanz.name,
             "status": bilanz.status,
@@ -460,6 +506,14 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
             "gedeckelt": bilanz.gedeckelt,
             "vollstaendig": bilanz.vollstaendig,
             "nicht_verlinkt": bilanz.nicht_verlinkt,
+            # Die tote-Adressen-Zahl gehoert ins Protokoll und nicht nur
+            # ins Log: sie ist der Grund, warum ein Lauf mit Luecken
+            # trotzdem vollstaendig heisst, und ohne sie sieht eine
+            # veraltete Sitemap wie ein sauberer Lauf aus. Dieselben zwei
+            # Werte wie im Bestand, aus derselben Rechnung - zwei
+            # Ausdruecke waeren zwei Wahrheiten (Clean Code 7).
+            "produkte_versucht": versucht,
+            "tote_adressen": tote,
         })
 
     historie.save()
@@ -722,6 +776,19 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
                      satz["anbieter"], satz["status"], satz["listungen"],
                      satz["produkte_abgerufen"], satz["rohsaetze"],
                      satz["grund"][:160])
+        if satz["tote_adressen"]:
+            # EIGENE ZEILE, und zwar auch fuer einen Anbieter mit Status
+            # "ok": genau dort steht sie sonst nirgends. Ein Lauf, der als
+            # vollstaendig gebucht wird, obwohl ein Teil seiner Quelle ins
+            # Leere zeigt, muss das sagen - sonst waechst die Luecke still,
+            # bis sie die Schwelle reisst und der Anbieter ueber Nacht als
+            # Ausfall dasteht.
+            log.info("Geraeteradar: %s -> %d von %d Produktadressen tot "
+                     "(HTTP 404/410, von der Quelle selbst verlinkt), %d "
+                     "Produktseiten gelesen, Lauf %s",
+                     satz["anbieter"], satz["tote_adressen"],
+                     satz["produkte_versucht"], satz["produkte_abgerufen"],
+                     "vollständig" if satz["vollstaendig"] else "unvollständig")
     # FM-2 / P1-C2: Quellentod darf nicht still bleiben. Beide Meldungen
     # greifen in nichts ein - der Alarm altert nicht und loest nichts (die
     # Auslistung bleibt allein an `vollstaendig` gebunden), die Probe

@@ -24,10 +24,15 @@ VIER REGELN, DIE HIER ERZWUNGEN WERDEN
    Zeitanteil eines Anbieters mit Fenster endet spaetestens mit diesem
    (`_fensterfrist`). Wer draussen steht, wird uebersprungen - nicht
    gealtert, auch wenn die Tuer erst mitten im Lauf zugegangen ist.
-3. **Eine Einstiegsseite gilt erst als GELESEN, wenn alle ihre Produkte
-   abgerufen wurden.** Nur dann darf die Auslistungslogik ihre Geraete
-   altern. Ein Zeitbudget, das mitten in der Seite zuschlaegt, macht aus
-   einem halben Abruf sonst eine halbe Auslistung.
+3. **Eine Einstiegsseite gilt erst als GELESEN, wenn ihre Produktseiten
+   abgerufen wurden** - und zwar alle bis auf die, die der Anbieter selbst
+   als nicht mehr vorhanden beantwortet (HTTP 404/410), und auch die nur
+   bis zu `_MINDESTANTEIL_GELESENER_PRODUKTSEITEN`. Nur eine gelesene Seite
+   darf die Auslistungslogik ihre Geraete altern lassen. Ein Zeitbudget,
+   ein Deckel oder ein Netzfehler mitten in der Seite macht aus einem halben
+   Abruf sonst eine halbe Auslistung; eine veraltete Sitemap dagegen ist die
+   erwartbare Lage und kein Ausfall (siehe den Abschnitt zu
+   `_einstieg_gelesen`).
 4. **Ein gescheiterter Abruf ist nicht "nichts gefunden".** Er wirft bzw.
    setzt `status: fehler`, und der Anbieter kommt nicht in die Menge der
    gelesenen. Dieselbe Unterscheidung wie `PromoExtractionError` im
@@ -164,7 +169,21 @@ def umgesetzte_methoden() -> tuple:
 class GeraeteAbrufFehler(RuntimeError):
     """Der Abruf ist gescheitert - das ist NICHT dasselbe wie "keine Geraete
     auf der Seite". Eigene Klasse, damit der Aufrufer die Seite als ungelesen
-    fuehren kann und `mark_stale` ihre Geraete in Ruhe laesst."""
+    fuehren kann und `mark_stale` ihre Geraete in Ruhe laesst.
+
+    `status` ist der HTTP-Statuscode, WENN der Abruf bis zu einer Antwort
+    kam - sonst `None`. Der Unterschied traegt die Unterscheidung zwischen
+    einer TOTEN ADRESSE (der Anbieter antwortet "gibt es nicht") und einem
+    ungelesenen Abruf (robots-Sperre, Besuchszeit, Netzfehler - keine
+    Antwort, keine Aussage). `None` und nicht 0: 0 waere hier ein erfundener
+    Statuscode, und geraten wird nichts (CLAUDE.md Clean Code 3). Der
+    Aufrufer fragt das Feld ab, NICHT den Meldungstext - ein Zustand, den
+    man an einem String erkennt, kippt bei der ersten Umformulierung.
+    """
+
+    def __init__(self, *args, status: Optional[int] = None):
+        super().__init__(*args)
+        self.status = status
 
 
 @dataclass
@@ -210,6 +229,18 @@ class Anbieterbilanz:
     # (z. B. `metric3+metric2`). Leer heisst "kein Adapter mit Proben" -
     # kein Lautwerden, denn es gibt keine Erwartung.
     proben: dict = field(default_factory=dict)
+    # Produktadressen, die der Anbieter selbst nennt, die es aber nicht
+    # mehr gibt (HTTP 404/410). Eine BENANNTE LUECKE und kein Ausfall:
+    # freenets eigene Sitemap fuehrt veraltete Produktseiten, und neun
+    # davon haben am 21.09.2026 einen Lauf mit 36 gelesenen Seiten und 133
+    # Listungen auf `fehler` gekippt. Als Liste und nicht als blosse Zahl,
+    # damit die naechste Sitzung sieht, WELCHE Adresse tot ist.
+    tote_adressen: list = field(default_factory=list)
+    # Wie viele Produktseiten ueberhaupt versucht wurden - der Nenner, gegen
+    # den `_MINDESTANTEIL_GELESENER_PRODUKTSEITEN` rechnet. Ohne ihn ist
+    # `produkte_abgerufen` eine Zahl ohne Bezugsgroesse: 36 gelesene Seiten
+    # sind bei 45 versuchten ein guter Lauf und bei 450 ein Ausfall.
+    produkte_versucht: int = 0
     # Hat die Besuchszeit aus der robots.txt diesen Abruf verhindert?
     # STRUKTURELL festgehalten und nicht am Grundtext erkannt: fuer den
     # Abdeckungswaechter (P1/C2) ist das der Unterschied zwischen "nicht
@@ -220,8 +251,89 @@ class Anbieterbilanz:
 
     @property
     def vollstaendig(self) -> bool:
-        """Darf die Auslistungslogik fuer diesen Anbieter ueberhaupt laufen?"""
+        """Darf die Auslistungslogik fuer diesen Anbieter ueberhaupt laufen?
+
+        Gefragt ist der EINSTIEG, nicht jede einzelne Produktadresse: was
+        als gelesener Einstieg zaehlt, entscheidet `_einstieg_gelesen()`.
+        """
         return self.status in ("ok", "leer") and bool(self.gelesene_einstiege)
+
+
+# --------------------------------------------------------------------------
+# WANN GILT EINE EINSTIEGSSEITE ALS GELESEN? (22.09.2026)
+# --------------------------------------------------------------------------
+# Bis hierher: nur dann, wenn JEDE ihrer Produktadressen durchkam. Gemessen
+# an der Wirklichkeit war das zu streng, und der Preis war hoch.
+# mobilcom-debitel stand seit dem 29.08.2026 mit NULL vollstaendigen Laeufen
+# im Bestand (`letzter_lauf` fehlte ganz), obwohl es an 23 Tagen je 133
+# Listungen lieferte: freenets eigene sitemap.xml fuehrt veraltete
+# Produktadressen, neun davon antworteten am 21.09.2026 mit HTTP 404 - und
+# neun tote Adressen kippten einen Lauf, der 36 von 45 Seiten gelesen hatte,
+# auf `fehler`. Ein substanziell erfolgreicher Lauf wurde als Totalausfall
+# verbucht; der Ausfall-Alarm hat ihn deshalb nie gemeldet, und sein Bestand
+# alterte nie sauber.
+#
+# ZWEI DINGE, DIE NICHT VERWECHSELT WERDEN DUERFEN:
+#   * TOTE ADRESSE: der Anbieter antwortet, und seine Antwort lautet "diese
+#     Seite gibt es nicht" (404) bzw. "gibt es nicht mehr" (410). Das ist
+#     eine AUSKUNFT ueber die Adresse, kein gescheiterter Leseversuch - eine
+#     veraltete Sitemap ist die erwartbare Lage, nicht der Ausnahmefall. Sie
+#     wird gezaehlt und als benannte Luecke gefuehrt (`tote_adressen`).
+#   * NICHT GELESEN: robots-Sperre, Besuchszeit, Zeitbudget, Deckel,
+#     Netzfehler, 5xx, unlesbare Nutzlast. Da steht etwas, das wir nicht
+#     gesehen haben - "nicht gelesen ist nicht leer" (CLAUDE.md Clean Code
+#     6). EIN solcher Fall macht die Seite weiterhin unvollstaendig.
+_TOTE_STATUS = (404, 410)
+
+# Wie viel einer Einstiegsseite gelesen sein muss, damit sie als gelesen
+# zaehlt - und damit `mark_stale` ihre Geraete altern darf.
+#
+# DIE EINHEIT ZUERST, sonst begruendet man sich in die Irre. Diese Schwelle
+# rechnet in ADRESSEN. Der Abdeckungswaechter rechnet in ZEILEN, also in
+# Listungen plus Buendelsaetzen (`geraete_store.Messtag.zeilen`). Das sind
+# zwei Groessen und nicht zwei Schreibweisen derselben: am 21.09.2026
+# trugen 45 Adressen 133 Listungen, im Schnitt drei je Seite und ungleich
+# verteilt. `geraete_store.ABDECKUNG_RUECKGANG` kann diese Schwelle
+# deshalb WEDER nach unten begruenden NOCH nach oben decken - elf tote
+# Adressen (24 %) koennen 50 Zeilen (37 %) kosten, und derselbe Tag ist
+# dann zugleich "vollstaendig gelesen" und ein Rueckgangsbefund. Das ist
+# kein Widerspruch, sondern die richtige Auskunft aus zwei Blickwinkeln:
+# gealtert wird, was wirklich weg ist, gemeldet wird, DASS es weg ist.
+#
+# WAS DIE 0,75 TRAEGT - und mehr behauptet sie nicht:
+#   * GEMESSEN: der Fall, um den es geht, liegt bei 36 von 45 = 0,80.
+#     0,75 laesst ihn durch und haette Luft fuer zwei weitere tote
+#     Adressen; eine Sitemap-Pflege, die hinterherhinkt, kippt den Lauf
+#     damit nicht mehr.
+#   * NACH OBEN begrenzt sie der Zweck: ein ECHTER Ausfall - Seite weg,
+#     Adapter kaputt, Domain umgezogen, robots zu - trifft nicht jede
+#     vierte Adresse, sondern praktisch alle. Zwischen 0,80 (Sitemap-Pflege
+#     laeuft hinterher) und den 0,0-0,1 eines echten Ausfalls liegt diese
+#     Schwelle mit Abstand nach beiden Seiten.
+#   * NACH UNTEN haelt sie NICHT allein, und das ist keine Schwaeche der
+#     Zahl, sondern ihre Bauart: eine Schwelle je Nacht sieht immer nur
+#     diese eine Nacht. Ein Anbieter, der Nacht fuer Nacht knapp darunter
+#     bleibt, broeselt unter ihr weg, ohne sie je zu reissen. Dagegen
+#     steht der VERLAUF und nicht die Schwelle -
+#     `geraete_store.ALARM_EROSION` vergleicht die GELESENEN ADRESSEN
+#     (dieselbe Einheit, deshalb traegt der Vergleich) gegen den
+#     aeltesten Messtag im Fenster und meldet, bevor der Anbieter leer
+#     ist.
+_MINDESTANTEIL_GELESENER_PRODUKTSEITEN = 0.75
+
+
+def _einstieg_gelesen(versucht: int, tot: int) -> bool:
+    """Reicht das Gelesene dieser Einstiegsseite fuer "gelesen"?
+
+    `versucht` sind die Produktadressen, an denen dieser Lauf wirklich war,
+    `tot` die davon, die der Anbieter selbst als nicht mehr vorhanden
+    beantwortet hat. Eine Einstiegsseite ganz ohne Produktadressen ist
+    gelesen - es gab nichts nachzuladen; das ist "gelesen, nichts
+    gefunden" und damit eine Aussage, kein Ausfall.
+    """
+    if versucht <= 0:
+        return True
+    return (versucht - tot) >= _MINDESTANTEIL_GELESENER_PRODUKTSEITEN * versucht
 
 
 # --------------------------------------------------------------------------
@@ -757,7 +869,7 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
             kwargs["user_agent"] = user_agent
         status, text = hole(url, **kwargs) if kwargs else hole(url)
         if not (200 <= int(status) < 300):
-            raise GeraeteAbrufFehler(f"HTTP {status}")
+            raise GeraeteAbrufFehler(f"HTTP {status}", status=int(status))
         return text
 
     for einstieg in anbieter.crawled_einstiege:
@@ -826,6 +938,8 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
                                 einstieg.kind)
         erlaubt.update(links)
         vollstaendig = True
+        versucht_hier = 0
+        tot_hier = 0
         if len(links) > anbieter.max_produkte:
             # Eine abgeschnittene Seite ist KEINE gelesene Seite. Ohne diese
             # Zeile gilt sie als vollstaendig, und `mark_stale` altert alles
@@ -845,9 +959,23 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
                 frist_erreicht = True
                 vollstaendig = False
                 break
+            versucht_hier += 1
+            bilanz.produkte_versucht += 1
             try:
                 seite = _hole(url)
             except GeraeteAbrufFehler as exc:
+                if exc.status in _TOTE_STATUS:
+                    # TOTE ADRESSE, kein Leseversuch: der Anbieter hat
+                    # geantwortet, und seine Antwort ist "gibt es nicht".
+                    # Gezaehlt und benannt, nicht als Ausfall gewertet -
+                    # die Schwelle unten entscheidet, ob davon zu viele
+                    # zusammenkommen.
+                    tot_hier += 1
+                    bilanz.tote_adressen.append(f"{url}: {exc}")
+                    log.info("%s: %s tot (%s) - Adresse steht in der Quelle, "
+                             "die Seite gibt es nicht mehr",
+                             anbieter.name, url, exc)
+                    continue
                 log.info("%s: %s uebersprungen (%s)", anbieter.name, url, exc)
                 vollstaendig = False
                 continue
@@ -887,6 +1015,19 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
                     bilanz.buendel.extend(
                         _mit_sku(roh_buendel, anbieter, einstieg, katalog,
                                 farben, heute, bilanz))
+        if vollstaendig and not _einstieg_gelesen(versucht_hier, tot_hier):
+            # Zu viele tote Adressen auf einmal. Das ist keine hinterher-
+            # hinkende Sitemap mehr, sondern ein Umbau der Quelle - und der
+            # darf nicht dazu fuehren, dass `mark_stale` ein halbes
+            # Sortiment altert.
+            vollstaendig = False
+            gruende.append(
+                f"{einstieg.url}: {tot_hier} von {versucht_hier} "
+                f"Produktadressen tot, gelesen wurden weniger als "
+                f"{round(_MINDESTANTEIL_GELESENER_PRODUKTSEITEN * 100)} %")
+            log.warning("%s: %s - %d von %d Produktadressen tot, die Seite "
+                        "gilt als unvollstaendig gelesen",
+                        anbieter.name, einstieg.url, tot_hier, versucht_hier)
         if vollstaendig:
             bilanz.gelesene_einstiege.add(einstieg.url)
 

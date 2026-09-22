@@ -2509,6 +2509,9 @@ b,strong{font-weight:700}
   color:var(--ink-4);margin-top:4px}
 .gr-einstiege a{color:var(--ink-3);text-decoration:none}
 .gr-einstiege a:hover{text-decoration:underline}
+/* Die benannte Luecke einer Quelle (tote Produktadressen): eine Angabe,
+   kein Alarm - deshalb gedaempft und nicht rot. */
+.gr-luecke{display:block;color:var(--ink-3);margin-top:2px}
 .gr-tiefe .gr-eigen .dz-balken-fuell{background:var(--red)}
 .gr-basis--duenn{color:var(--r4)}
 

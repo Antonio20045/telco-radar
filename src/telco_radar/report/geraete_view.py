@@ -1626,6 +1626,28 @@ def _heute_satz(bilanz: dict) -> str:
     return "bisher kein vollständiger Lauf"
 
 
+def _tote_satz(bilanz: dict) -> str:
+    """Wie viele Adressen dieser Quelle ins Leere zeigen - oder nichts.
+
+    Die Zahl steht auf der Seite und nicht nur im Log, weil sie die
+    einzige Erklaerung dafuer ist, dass ein Anbieter mit Luecken trotzdem
+    als vollstaendig gelesen gilt (`collect.geraete._einstieg_gelesen`).
+    Der Satz entsteht HIER und nicht in der Vorlage - dieselbe Regel wie
+    beim Alarm (Clean Code 7).
+
+    `None` heisst "in diesem Lauf wurde keine Produktseite versucht" und 0
+    heisst "versucht, keine war tot". Beide sagen nichts Meldenswertes und
+    ergeben deshalb keinen Satz; eine Null auf der Seite waere eine
+    Angabe, die niemand braucht (Antonios Stil: wenig Text).
+    """
+    tote = bilanz.get("tote_adressen")
+    if not tote:
+        return ""
+    if int(tote) == 1:
+        return "1 verlinkte Produktseite gibt es nicht mehr"
+    return f"{int(tote)} verlinkte Produktseiten gibt es nicht mehr"
+
+
 def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
     """Wer liefert, wer nicht - und warum nicht.
 
@@ -1681,6 +1703,9 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
             # Der Satz zum dritten Zustand: "heute nicht gelesen" allein
             # laesst die naechste Frage offen - seit wann?
             "heute_satz": _heute_satz(db.laufbilanz(a.name)),
+            # Die benannte Luecke der Quelle: tote Produktadressen aus der
+            # Sitemap bzw. Kategorieseite des Anbieters.
+            "tote_satz": _tote_satz(db.laufbilanz(a.name)),
             # Der Alarm ODER `None` - nie ein leeres dict: "kein Alarm"
             # heisst hier "keine Aussage", und eine leere Huelle in der
             # Vorlage sieht aus wie eine Entwarnung (Clean Code 3).
@@ -1730,6 +1755,7 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
             "zustand": "liefert",
             "bilanz": db.laufbilanz(name),
             "heute_satz": _heute_satz(db.laufbilanz(name)),
+            "tote_satz": _tote_satz(db.laufbilanz(name)),
             "abdeckung": alarme.get(name),
         }
         fremd["liefert_heute"] = _liefert_heute(fremd)

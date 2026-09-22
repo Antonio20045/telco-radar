@@ -372,6 +372,16 @@ anbieter:
       # Crawl-Abstand des Zeitbudgets kosten. Genau diese Streuung (Tablets,
       # Watches, Router) hat den Nachtlauf so lange gemacht, dass ALDI TALK
       # ab dem 15.08. verhungerte.
+      #
+      # DIESE SITEMAP FUEHRT TOTE ADRESSEN, und das ist der Normalzustand.
+      # Gemessen am 22.09.2026: 383 <loc>, davon 45 Treffer beider Muster,
+      # davon 9 mit HTTP 404 (nachgeprueft an
+      # .../google-pixel-10-pro-fold-ohne-vertrag/p/P-M-4234460 und
+      # .../xiaomi-17-ultra-ohne-vertrag/p/P-M-4466942 - beide 404 nach zwei
+      # Weiterleitungen, beide trotzdem in der Sitemap). Der Collector
+      # zaehlt sie als benannte Luecke und laesst den Lauf vollstaendig
+      # sein, solange der gelesene Anteil die Schwelle haelt (siehe
+      # collect/geraete/__init__.py, _MINDESTANTEIL_GELESENER_PRODUKTSEITEN).
       - url: https://www.freenet.de/sitemap.xml
         label: Sitemap (Smartphones ohne Vertrag)
         kind: sitemap

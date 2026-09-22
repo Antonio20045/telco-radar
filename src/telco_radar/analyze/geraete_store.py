@@ -101,6 +101,18 @@ ALARM_RUECKGANG = "rueckgang"      # heute deutlich weniger Zeilen
 # `_FUND_HISTORIE_TAGE` Tagen keine Basis mehr, und ein echter
 # Totalausfall danach loeste nichts mehr aus.
 ALARM_OHNE_BASIS = "ohne_basis"    # seit Tagen kein vollstaendiger Tag
+# DIE VIERTE ART (S2-2, 22.09.2026). Seit tote Produktadressen eine
+# benannte Luecke sind und keinen Lauf mehr kippen
+# (`collect.geraete._MINDESTANTEIL_GELESENER_PRODUKTSEITEN`), kann ein
+# Anbieter Nacht fuer Nacht knapp unter der Schwelle bleiben und trotzdem
+# verschwinden: 24 % tote Adressen je Nacht reissen weder die Schwelle
+# (sie laesst jede vierte zu) noch `ABDECKUNG_RUECKGANG` (der vergleicht
+# mit GESTERN, und 24 % sind weniger als 30 %). Nach fuenf Naechten sind
+# 0,76^5 = 24 % des Sortiments uebrig, und kein Kanal hat angeschlagen -
+# laut wuerde es erst bei null Zeilen (`ALARM_AUSFALL`), also als Nachruf.
+# Diese Art meldet deshalb den VERLAUF: nicht "heute weniger als gestern",
+# sondern "seit dem aeltesten Messtag im Fenster ist zu viel weg".
+ALARM_EROSION = "erosion"          # Sortiment broeselt ueber Tage weg
 
 # Ab welchem ANTEIL Rueckgang gegenueber dem letzten Liefertag gemeldet
 # wird. 0.30 und ECHT groesser: Sortiments- und Verfuegbarkeitsrauschen
@@ -124,6 +136,21 @@ _ALARM_WIEDERHOLUNG_TAGE = 7
 # Regelfall an einem Besuchsfenster und noch keine Luecke - drei
 # beobachtete Tage ohne vollstaendigen Abruf sind eine.
 _OHNE_BASIS_TAGE = 3
+
+# Ueber wie viele MESSTAGE MIT ADRESSAUSKUNFT der Erosionsalarm zurueck
+# vergleicht. Sieben, weil der Job taeglich laeuft: eine Woche ist der
+# Horizont, in dem die Frage "seit wann eigentlich" noch beantwortbar ist,
+# und derselbe Abstand, in dem ein bleibender Befund erneut gemeldet wird
+# (`_ALARM_WIEDERHOLUNG_TAGE`). Gezaehlt werden Tage MIT Auskunft und nicht
+# Kalendertage: ein Anbieter, der drei Naechte an seinem Besuchsfenster
+# haengt, verliert dadurch seine Vergleichsbasis nicht.
+#
+# Gemessen an der Schwelle: bei 25 % toten Adressen je Nacht - genau dem,
+# was `_MINDESTANTEIL_GELESENER_PRODUKTSEITEN` gerade noch durchlaesst -
+# ist nach zwei Naechten mehr als `ABDECKUNG_RUECKGANG` weg. Das Fenster
+# ist also nicht die Nachweisgrenze, sondern der Rand, bis zu dem auch
+# eine LANGSAMERE Erosion (ab rund 5 % je Nacht) noch auffaellt.
+_EROSION_FENSTER_TAGE = 7
 
 # Wie viele Tage die Fund-Historie je Anbieter behaelt. Der Waechter
 # vergleicht mit dem Vortag und braucht davon genau einen; der Rest traegt
@@ -177,10 +204,43 @@ class Messtag:
     funde: int
     buendel: int
     zustand: str
+    # Die zwei ADRESSZAHLEN dieses Tages - die Groesse, in der die
+    # Leseschwelle der Sammelstufe rechnet
+    # (`collect.geraete._MINDESTANTEIL_GELESENER_PRODUKTSEITEN`), und
+    # deshalb die einzige, in der sich ihr Verlauf ehrlich vergleichen
+    # laesst. `versucht` sind die Produktadressen, an denen der Lauf
+    # wirklich war, `tote` die davon, die der Anbieter selbst als nicht
+    # mehr vorhanden beantwortet hat (HTTP 404/410).
+    #
+    # `tote is None` heisst "dieser Tag sagt dazu nichts" - ein Altbestand
+    # ohne die Felder, ein uebersprungener Anbieter, ein Adapter ohne
+    # Produktseiten. Keine 0: eine 0 waere die Auskunft "versucht, keine
+    # war tot" und damit eine Entwarnung, die niemand gemessen hat
+    # (CLAUDE.md Clean Code 3).
+    versucht: int = 0
+    tote: Optional[int] = None
 
     @property
     def zeilen(self) -> int:
         return self.funde + self.buendel
+
+    @property
+    def gelesene_adressen(self) -> Optional[int]:
+        """Wie viele Produktadressen an diesem Tag wirklich gelesen wurden -
+        oder `None`, wenn der Tag dazu nichts sagt.
+
+        Die EINE Definition, aus der der Erosionsalarm seine Zahlenreihe
+        baut (Clean Code 7: keine zweite Liste). `None` bei drei Lagen, und
+        alle drei sind "keine Aussage" und nicht "null Adressen":
+          * der Tag wurde nicht zu Ende gelesen (`zustand != GELESEN`) -
+            dann ist die Zahl abgeschnitten, nicht gemessen, genau wie bei
+            `vergleichsbasis`;
+          * es wurde keine Produktadresse versucht;
+          * der Tag stammt aus dem Altbestand und kennt die Felder nicht.
+        """
+        if self.zustand != GELESEN or self.versucht <= 0 or self.tote is None:
+            return None
+        return self.versucht - self.tote
 
     @property
     def beobachtet(self) -> bool:
@@ -245,11 +305,24 @@ class Abdeckungsalarm:
     # immer gefuellt.
     vortag: Optional[str]
     zeilen_vortag: Optional[int]
-    rueckgang: Optional[float]     # Anteil 0..1
+    # Anteil 0..1, und zwar der Groesse, die DIESE Alarmart misst: bei
+    # `ALARM_AUSFALL`/`ALARM_RUECKGANG` die Zeilen, bei `ALARM_EROSION`
+    # die gelesenen Produktadressen. Welche gemeint ist, sagt `satz` mit
+    # Worten - hier steht nur die Zahl, damit `prozent` und die Sortierung
+    # eine einzige Rechnung haben.
+    rueckgang: Optional[float]
     stille_tage: int
     # Wie viele beobachtete Tage in Folge ohne einen einzigen vollstaendig
     # gelesenen Tag - nur bei `ALARM_OHNE_BASIS` eine Aussage.
     ohne_basis_tage: int = 0
+    # Die gelesenen PRODUKTADRESSEN heute und am Bezugstag - nur bei
+    # `ALARM_EROSION` eine Aussage, sonst `None`. Eigene Felder und nicht
+    # `zeilen`/`zeilen_vortag` mitbenutzt: Adressen und Zeilen sind zwei
+    # Groessen (45 Adressen trugen 133 Listungen), und ein Feld, das mal
+    # das eine und mal das andere bedeutet, ist genau die Verwechslung,
+    # gegen die diese Alarmart gebaut wurde.
+    adressen: Optional[int] = None
+    adressen_vortag: Optional[int] = None
 
     @property
     def prozent(self) -> Optional[int]:
@@ -264,6 +337,8 @@ class Abdeckungsalarm:
             return "heute nicht erfasst"
         if self.art == ALARM_OHNE_BASIS:
             return "ohne vollständigen Abruf"
+        if self.art == ALARM_EROSION:
+            return "immer weniger Produktseiten"
         return "heute unvollständig erfasst"
 
     @property
@@ -277,6 +352,12 @@ class Abdeckungsalarm:
             return (f"{self.anbieter}: {self.kurz} – 0 Zeilen, am "
                     f"{tag_de(self.vortag)} waren es {self.zeilen_vortag} "
                     f"(Zustand {self.zustand}).")
+        if self.art == ALARM_EROSION:
+            return (f"{self.anbieter}: {self.kurz} – von "
+                    f"{self.adressen_vortag} gelesenen Produktseiten am "
+                    f"{tag_de(self.vortag)} sind heute {self.adressen} übrig "
+                    f"({self.prozent} % weniger), aktuell {self.zeilen} "
+                    f"Zeilen.")
         return (f"{self.anbieter}: {self.kurz} – {self.zeilen} Zeilen, am "
                 f"{tag_de(self.vortag)} waren es {self.zeilen_vortag} "
                 f"({self.prozent} % weniger).")
@@ -292,6 +373,8 @@ class Abdeckungsalarm:
                 "vortag": self.vortag, "zeilen_vortag": self.zeilen_vortag,
                 "prozent": self.prozent, "stille_tage": self.stille_tage,
                 "ohne_basis_tage": self.ohne_basis_tage,
+                "adressen": self.adressen,
+                "adressen_vortag": self.adressen_vortag,
                 "kurz": self.kurz, "satz": self.satz}
 
 
@@ -652,7 +735,9 @@ class GeraeteDB:
     def protokolliere_lauf(self, anbieter: str, today: str, funde: int,
                            vollstaendig: bool = True,
                            zustand: Optional[str] = None,
-                           buendel: int = 0) -> None:
+                           buendel: int = 0,
+                           tote_adressen: Optional[int] = None,
+                           produkte_versucht: Optional[int] = None) -> None:
         """Buch darueber, wie oft ein Anbieter abgefragt wurde und was dabei
         herauskam. Grundlage von `hardware_vermarktung()` und `messtermine()`.
 
@@ -679,7 +764,21 @@ class GeraeteDB:
         `buendel` sind die Buendelsaetze desselben Tages. Sie zaehlen NICHT
         auf `funde`/`funde_gesamt` (dort geht es um Listungen und damit um
         die Frage, ob ein Anbieter ueberhaupt Hardware vermarktet), sondern
-        nur in die Abdeckung - siehe `Messtag`."""
+        nur in die Abdeckung - siehe `Messtag`.
+
+        `tote_adressen` sind die Produktadressen dieses Laufs, die die
+        Quelle selbst nennt und die es nicht mehr gibt (HTTP 404/410). Sie
+        sind eine BENANNTE LUECKE und kein Ausfall - der Lauf kann damit
+        vollstaendig sein (siehe `collect.geraete._einstieg_gelesen`).
+        `None` heisst "in diesem Lauf wurde keine Produktseite versucht",
+        also keine Aussage; 0 heisst "versucht, keine war tot" und ist
+        selbst eine Aussage (CLAUDE.md Clean Code 3).
+
+        `produkte_versucht` ist der NENNER dazu. Beide gehoeren in den
+        Messtag und nicht nur in die Laufbilanz: die Laufbilanz kennt nur
+        den letzten Stand, der Erosionsalarm braucht die Reihe
+        (`ALARM_EROSION`). Auch hier ist `None` "nicht versucht" und
+        niemals 0."""
         b = self._anbieter.setdefault(anbieter, {"laeufe": 0, "funde_gesamt": 0})
         if zustand is None:
             zustand = GELESEN if vollstaendig else LESEFEHLER
@@ -707,8 +806,23 @@ class GeraeteDB:
         historie = [list(e) for e in (b.get("funde_nach_tag") or [])
                     if not (isinstance(e, (list, tuple)) and e
                             and str(e[0]) == today)]
-        historie.append([today, int(funde), zustand, int(buendel)])
+        versucht = 0 if produkte_versucht is None else int(produkte_versucht)
+        tote = None if tote_adressen is None else int(tote_adressen)
+        historie.append([today, int(funde), zustand, int(buendel), versucht,
+                         tote])
         b["funde_nach_tag"] = historie[-_FUND_HISTORIE_TAGE:]
+        # DIE LETZTE MESSUNG WIRD NICHT VON EINER NICHT-MESSUNG GELOESCHT
+        # (S3, 22.09.2026). Vorher stand hier eine unbedingte Zuweisung:
+        # eine Nacht ausserhalb der Besuchszeit schrieb `None` und raeumte
+        # damit die gestern gemessenen neun toten Adressen von der
+        # Quellenseite ab, obwohl die Luecke unveraendert bestand. "Nicht
+        # gemessen" darf eine Messung nicht ueberschreiben (Clean Code 6);
+        # der Schluessel wird trotzdem angelegt, damit "noch nie gemessen"
+        # als benannte Luecke dasteht und nicht als fehlendes Feld.
+        if tote is None:
+            b.setdefault("tote_adressen", None)
+        else:
+            b["tote_adressen"] = tote
         if funde:
             b["letzter_fund"] = today
 
@@ -762,7 +876,13 @@ class GeraeteDB:
 
         Liest die drei Eintragsformen, die es im Bestand gibt, ohne zu
         raten:
-          * `[tag, funde, zustand, buendel]` - seit dem 22.09.2026.
+          * `[tag, funde, zustand, buendel, versucht, tote]` - seit dem
+            22.09.2026. `tote` darf `null` sein: "keine Produktseite
+            versucht" ist keine 0 (Clean Code 3).
+          * `[tag, funde, zustand, buendel]` - die Form eines halben Tages
+            davor. Adresszahlen kannte sie nicht; sie bleiben `0`/`None`
+            und fallen damit aus dem Erosionsvergleich heraus, statt als
+            "null Adressen gelesen" einen Einbruch vorzutaeuschen.
           * `[tag, funde]` - der Altbestand. Er entstand AUSSCHLIESSLICH
             fuer vollstaendige Laeufe ODER Laeufe mit Funden, also genau
             fuer BEOBACHTETE Tage; `GELESEN` ist deshalb eine Ableitung
@@ -789,12 +909,16 @@ class GeraeteDB:
                 tag, funde = str(eintrag[0]), int(eintrag[1])
                 zustand = str(eintrag[2]) if len(eintrag) > 2 else GELESEN
                 buendel = int(eintrag[3]) if len(eintrag) > 3 else 0
+                versucht = int(eintrag[4]) if len(eintrag) > 4 else 0
+                roh_tote = eintrag[5] if len(eintrag) > 5 else None
+                tote = None if roh_tote is None else int(roh_tote)
             except (TypeError, ValueError):
                 log.warning("Geraeteradar: unlesbarer Messtag bei %s (%r) - "
                             "uebergangen", anbieter, eintrag)
                 continue
             journal.append(Messtag(tag=tag, funde=funde, buendel=buendel,
-                                   zustand=zustand))
+                                   zustand=zustand, versucht=versucht,
+                                   tote=tote))
         return sorted(journal, key=lambda m: m.tag)
 
     def letzter_messtag(self) -> Optional[str]:
@@ -851,6 +975,11 @@ class GeraeteDB:
           3. Der Vortag hat geliefert. Hat er selbst schon nichts
              geliefert, ist heute kein NEUER Ausfall - die anhaltende
              Stille traegt `stille_tage` und die Quellenseite.
+          4. Und wenn nach alledem heute nichts auffaellt: broeselt das
+             Sortiment ueber TAGE weg (`_erosionsbefund`)? Dieses Tor
+             steht zuletzt, weil es das leiseste ist - ein Ausfall oder
+             ein Einbruch von gestern auf heute ist dringender und soll
+             den Satz stellen.
         """
         if heute.zustand == NICHT_GELESEN:
             return None
@@ -867,20 +996,77 @@ class GeraeteDB:
                 stille_tage=self.stille_tage(anbieter),
                 ohne_basis_tage=len(beobachtet))
         vortag = vortage[-1]
-        if vortag.zeilen <= 0:
+        if vortag.zeilen > 0:
+            rueckgang = (vortag.zeilen - heute.zeilen) / vortag.zeilen
+            art = None
+            if heute.zeilen <= 0:
+                art = ALARM_AUSFALL
+            elif rueckgang > ABDECKUNG_RUECKGANG:
+                art = ALARM_RUECKGANG
+            if art is not None:
+                return Abdeckungsalarm(
+                    anbieter=anbieter, art=art, tag=heute.tag,
+                    zeilen=heute.zeilen, zustand=heute.zustand,
+                    vortag=vortag.tag, zeilen_vortag=vortag.zeilen,
+                    rueckgang=rueckgang,
+                    stille_tage=self.stille_tage(anbieter))
+        return self._erosionsbefund(anbieter, journal, heute)
+
+    def _erosionsbefund(self, anbieter: str, journal: list,
+                        heute: Messtag) -> Optional[Abdeckungsalarm]:
+        """Broeselt das Sortiment dieses Anbieters ueber TAGE weg?
+
+        DIE LUECKE, DIE DAS SCHLIESST (22.09.2026). Tote Produktadressen
+        kippen seit diesem Tag keinen Lauf mehr - bis zu jeder vierten
+        darf fehlen (`collect.geraete._MINDESTANTEIL_GELESENER_PRODUKTSEITEN`).
+        Damit ist eine LANGSAME Erosion durch jedes Tor gerutscht: 24 %
+        tote Adressen je Nacht reissen die Schwelle nicht, und der
+        Vortagsvergleich oben sieht nur 24 % weniger Zeilen, also weniger
+        als `ABDECKUNG_RUECKGANG`. Nach fuenf Naechten war ein Viertel des
+        Sortiments uebrig, der Lauf jeden Tag `ok` und `vollstaendig`, und
+        `mark_stale` hat die fehlenden Listungen brav ausgelistet. Laut
+        geworden waere es erst bei null Zeilen - als Nachruf.
+
+        WOGEGEN VERGLICHEN WIRD: gegen den AELTESTEN Messtag im Fenster,
+        der ueberhaupt eine Adressauskunft hat, nicht gegen gestern. Genau
+        darin liegt der Unterschied zu den drei Toren oben - eine Erosion
+        ist je Einzelschritt unauffaellig und nur als Verlauf zu sehen.
+
+        WORIN GERECHNET WIRD: in GELESENEN PRODUKTADRESSEN
+        (`Messtag.gelesene_adressen`) und nicht in Zeilen. Dieselbe
+        Einheit wie die Schwelle, die die Luecke durchlaesst - ein
+        Waechter, der in einer anderen Groesse rechnet als die Regel, die
+        er absichern soll, begruendet nichts (das war S2-1). Tage ohne
+        Adressauskunft fallen heraus, statt als 0 einen Einbruch
+        vorzutaeuschen.
+
+        WARUM EINE STABILE LUECKE SCHWEIGT: mobilcom-debitels Sitemap
+        fuehrt Nacht fuer Nacht dieselben neun toten Adressen. Gelesen
+        werden dabei jede Nacht 36 Seiten - der Vergleich ergibt 0 %, und
+        genau so soll es sein. Gemeldet wird die BEWEGUNG, nicht die
+        Luecke; die Luecke steht als Zahl auf der Quellenseite.
+        """
+        gemessen = [m for m in journal
+                    if m.tag <= heute.tag and m.gelesene_adressen is not None]
+        fenster = gemessen[-_EROSION_FENSTER_TAGE:]
+        if len(fenster) < 2 or fenster[-1].tag != heute.tag:
             return None
-        rueckgang = (vortag.zeilen - heute.zeilen) / vortag.zeilen
-        if heute.zeilen <= 0:
-            art = ALARM_AUSFALL
-        elif rueckgang > ABDECKUNG_RUECKGANG:
-            art = ALARM_RUECKGANG
-        else:
+        basis = fenster[0]
+        if basis.gelesene_adressen <= 0:
+            # Kein Nenner, kein Anteil - und aus einem Anbieter, der schon
+            # damals nichts gelesen hat, wird kein Einbruch konstruiert.
+            return None
+        schwund = ((basis.gelesene_adressen - heute.gelesene_adressen)
+                   / basis.gelesene_adressen)
+        if schwund <= ABDECKUNG_RUECKGANG:
             return None
         return Abdeckungsalarm(
-            anbieter=anbieter, art=art, tag=heute.tag, zeilen=heute.zeilen,
-            zustand=heute.zustand, vortag=vortag.tag,
-            zeilen_vortag=vortag.zeilen, rueckgang=rueckgang,
-            stille_tage=self.stille_tage(anbieter))
+            anbieter=anbieter, art=ALARM_EROSION, tag=heute.tag,
+            zeilen=heute.zeilen, zustand=heute.zustand, vortag=basis.tag,
+            zeilen_vortag=basis.zeilen, rueckgang=schwund,
+            stille_tage=self.stille_tage(anbieter),
+            adressen=heute.gelesene_adressen,
+            adressen_vortag=basis.gelesene_adressen)
 
     def abdeckungsalarm(self, anbieter: str,
                         tag: str) -> Optional[Abdeckungsalarm]:

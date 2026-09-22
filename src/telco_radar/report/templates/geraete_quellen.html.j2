@@ -46,6 +46,11 @@
     {# Wer heute nicht gelesen wurde, sagt seit wann - sonst steht in der
        Stand-Spalte ein Befund, zu dem die Warum-Spalte schweigt. #}
     {% if z.heute_luecke and not z.abdeckung %}<b>{{ z.heute_satz }}</b>{% endif %}
+    {# Die benannte Luecke der Quelle selbst: Adressen, die der Anbieter
+       verlinkt und die es nicht mehr gibt. Sie erklaert, warum ein Lauf
+       mit Luecken trotzdem vollstaendig heisst - der Satz kommt fertig
+       aus `_tote_satz`, die Vorlage rechnet nichts. #}
+    {% if z.tote_satz %}<span class="gr-luecke">{{ z.tote_satz }}</span>{% endif %}
     {% if z.liefert %}{{ z.hinweis }}{% else %}{{ z.grund or z.hinweis }}{% endif %}
     {% if z.einstiege %}
     <span class="gr-einstiege">{% for e in z.einstiege %}<a href="{{ e.url }}" rel="noopener">{{ e.label or e.url | domain }}</a>{% if not loop.last %} · {% endif %}{% endfor %}</span>

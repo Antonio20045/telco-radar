@@ -61,7 +61,18 @@ def _root(tmp_path: Path) -> Path:
     return tmp_path
 
 
-def _hole(seiten=None, protokoll=None):
+def _hole(seiten=None, protokoll=None, serverfehler=()):
+    """`hole(url) -> (status, text)` fuer die Fixtures dieser Datei.
+
+    `serverfehler` nennt Adressen, die mit HTTP 500 antworten. Das ist
+    NICHT dasselbe wie eine unbekannte Adresse (404), und seit dem
+    22.09.2026 ist der Unterschied sichtbar: ein 404 ist eine TOTE ADRESSE
+    (der Anbieter sagt "gibt es nicht") und kippt den Lauf nicht mehr, ein
+    500 heisst "wir wissen nicht, was auf dieser Seite steht" und bleibt
+    ein ungelesener Abruf (CLAUDE.md Clean Code 6). Wer einen AUSFALL
+    nachstellen will, braucht deshalb 500 - mit 404 misst er nur noch die
+    Schwelle `_MINDESTANTEIL_GELESENER_PRODUKTSEITEN`.
+    """
     seiten = _SEITEN if seiten is None else seiten
 
     def hole(url):
@@ -69,6 +80,8 @@ def _hole(seiten=None, protokoll=None):
             protokoll.append(url)
         if url.endswith("/robots.txt"):
             return (200, "User-agent: *\nDisallow: /cart\n")
+        if url in serverfehler:
+            return (500, "")
         return (200, seiten[url]) if url in seiten else (404, "")
     return hole
 
@@ -239,12 +252,19 @@ def test_protokoll_nennt_die_listungen_eines_gescheiterten_anbieters(tmp_path,
     """Ein Anbieter, der 84 Listungen liefert und trotzdem "fehler" heisst,
     ist erklaerbar - aber nur, wenn die Zeile die 84 nennt. Im ersten echten
     Lauf stand dort bloss "mobilcom-debitel -> fehler (kein Einstieg
-    lesbar)", und das Gegenteil war wahr."""
-    seiten = dict(_SEITEN)
-    del seiten["https://www.medimax.de/p/1518897/galaxy-a57-5g-a576b-128gb"]
+    lesbar)", und das Gegenteil war wahr.
+
+    DIE PRODUKTSEITE FAELLT MIT HTTP 500 AUS und nicht mit 404 (korrigiert
+    am 22.09.2026): ein 404 ist seit dem tote-Adressen-Paket eine benannte
+    Luecke und kein Ausfall. Dieser Test bestand danach nur noch, weil 2
+    von 3 Seiten unter der Leseschwelle liegen - mit einer vierten Seite
+    im Fixture waere er gruen gewesen und haette etwas anderes geprueft,
+    als sein Text behauptet."""
+    kaputt = "https://www.medimax.de/p/1518897/galaxy-a57-5g-a576b-128gb"
     with caplog.at_level("INFO", logger="telco_radar.geraete_pipeline"):
         bilanz = run_geraete_stage(_root(tmp_path), {}, "2026-08-11",
-                                   jetzt=_jetzt(), hole=_hole(seiten))
+                                   jetzt=_jetzt(),
+                                   hole=_hole(serverfehler={kaputt}))
     medimax = [a for a in bilanz["anbieter"] if a["anbieter"] == "Medimax"][0]
     assert medimax["status"] == "fehler" and medimax["listungen"] == 1
     assert "Medimax -> fehler, 1 Listungen aus 2 Produktseiten" in caplog.text
@@ -268,11 +288,15 @@ def test_teillauf_mit_listungen_landet_in_der_messtermin_buchfuehrung(tmp_path):
     muss als Messtermin verbucht werden, ohne als vollstaendiger Lauf zu
     zaehlen."""
     root = _root(tmp_path)
-    # Eine der Produktseiten faellt aus - der Einstieg gilt damit als
-    # unvollstaendig gelesen (status fehler), genau die mobilcom-Lage.
-    seiten = dict(_SEITEN)
-    del seiten["https://www.medimax.de/p/1514200/huelle-iphone-17"]
-    run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole(seiten))
+    # Eine der Produktseiten faellt AUS - HTTP 500, also "nicht gelesen"
+    # und nicht "gibt es nicht". Der Einstieg gilt damit als unvollstaendig
+    # gelesen (status fehler), genau die mobilcom-Lage. Mit 404 waere es
+    # seit dem 22.09.2026 eine tote Adresse und damit eine benannte
+    # Luecke - der Test haette dann die Leseschwelle gemessen statt des
+    # Teillaufs, um den es hier geht.
+    kaputt = "https://www.medimax.de/p/1514200/huelle-iphone-17"
+    run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(),
+                      hole=_hole(serverfehler={kaputt}))
 
     from telco_radar.analyze.geraete_store import GeraeteDB
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
