@@ -791,3 +791,42 @@ Produktionslauf mit P0-B.
 Nebenbefund zum Betrieb: am 22.09. war um 08:13 UTC noch kein `geraete.yml`-Lauf
 gestartet (letzter: 21.09., 08:50 UTC). Der 03:10-Cron ist damit erneut über
 fünf Stunden im Verzug — der P1-Befund aus dem Auftragsdokument bestätigt sich.
+
+### P1 — abgeschlossen 22.09., alles auf main
+
+**Gebaut:** drei Arbeiten, vier Review-Runden, zwölf blockierende Befunde behoben.
+
+| | |
+|---|---|
+| Cron | 03:10 → **02:17 UTC**. Der Workflow existiert nur wegen `Visit-time: 0200-0800` von medimax/ep; an elf Tagen lag der Start 4 h 41 bis 5 h 40 hinter dem Termin, am 22.09. erneut bestätigt (Termin 03:10, Start 08:27 = 5 h 17). Sechs Fundstellen nachgezogen |
+| Visit-time | gilt **je Abruf** statt einmal beim Lauf-Start (`_laufuhr` über `time.monotonic`), Sammelfrist gegen das Fensterende gedeckelt. Mitbehoben: die Nachbearbeitungs-Haken von Vodafone und 1&1 riefen `hole()` am Robots-Wächter vorbei — jetzt dieselbe `Abrufschleuse` |
+| Abdeckungswächter | Vortagsvergleich statt 7 Null-Tage, −30 %-Schwelle, „heute nicht erfasst" auf der Quellenseite, Mail. Teilgelesen ≠ nicht angefasst. Wiederholungssperre und `ALARM_OHNE_BASIS` |
+| mobilcom-debitel | 9 tote Adressen in **freenets eigener Sitemap** kippten einen Lauf, der 36/45 Seiten las. Jetzt gezählt statt gekippt, Schwelle 0,75, plus `ALARM_EROSION` |
+| Suite | **3683 grün / 4 übersprungen / 0 rot** (vorher 3589) |
+
+**Das Tor „Telekom liefert an 5 Tagen" ist nicht erfüllbar.** telekom.de antwortet
+uns **und GitHub Actions** mit AWS-WAF-Challenge (202), dokumentiert seit dem
+08.09. in `telekom.py:258`. Der Auftrag lässt dafür „eine dokumentierte Messung,
+warum nicht" zu — die liegt vor. Regel 7: wird nicht umgangen.
+
+**Was der Review gefunden hat und ohne ihn live gegangen wäre:** ein Wächter,
+der ausgerechnet für medimax und ep blind ist; ein Wächter, der nach 30 Tagen
+dauerhaft verstummt; ein Mutant (`trocken=True`), der den Mailkanal abschaltet,
+während alle 41 Tests grün bleiben; und — der teuerste — ein mcd-Fix, der eine
+**schleichende Erosion unsichtbarer** gemacht hätte als der kaputte Zustand
+davor (24 % Schwund je Nacht reißen keine Schwelle; nach fünf Nächten 24 % des
+Sortiments übrig, kein Alarm).
+
+**Zwei eigene Fehler, festgehalten damit sie sich nicht wiederholen:**
+1. Suite gemessen, **danach** rebased, dann gepusht — main war eine halbe Stunde
+   rot. Richtige Reihenfolge: `git fetch`, Abgleich, messen, pushen.
+2. Veralteter Bytecode aus einer Agenten-Repokopie im Scratchpad zeigte vier
+   grüne Tests rot; meine erste Mutationsprobe lief gegen genau diesen Cache und
+   war wertlos. **Vor jeder Abnahmemessung `__pycache__` leeren.**
+
+**Offen für P2:** zwei Befunde des `seiten-pruefer` — zugeklappt sind zwei
+congstar-Bündelzeilen wortgleich (`congstar · Allnet Flat XS · 15 GB ·
+1.459,00 € · −496,80 € · −25,4 %`), der Unterschied 24 vs. 36 Raten steht erst
+im aufgeklappten Rumpf; und der Rechenweg der jüngsten Messung verliert die
+Restschuld-Zeile (dokumentierte Regel, kein Rechenfehler, aber 366,00 € offene
+Schuld verschwinden über die Zeit aus den Panels).
