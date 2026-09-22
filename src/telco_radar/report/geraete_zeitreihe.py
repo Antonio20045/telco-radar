@@ -1774,6 +1774,25 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
                                      else " Messungen)"))
                 if (tage := _messtage(serien)) else "",
                 "legende_html": _legende_html(serien, zeitraeume),
+                # P0-B (22.09.2026, LEAD): der zugaengliche Name der
+                # GRAFIK-SEKTION stand bis hierher fest in der Vorlage
+                # ("Kosten über 24 Monate je Messtag und Anbieter") -
+                # auch dann, wenn im Bild eine 36-Monats-Kurve lag. z1 hat
+                # das aria-label IM Bild dynamisch gemacht und die Sektion
+                # darueber nicht gesehen; fuer einen Screenreader
+                # behauptete die Seite damit weiter genau das, was diese
+                # Phase abgeschafft hat. Gelesen wird DIESELBE Wortregel
+                # wie am Kurvenende (`_zeitraum_wort`), nicht eine zweite.
+                # `zeitraeume` ist {anbieter: [Monate, ...]} - die Liste,
+                # weil ein Anbieter seine Ratenlaufzeit zwischen zwei
+                # Messtagen wechseln kann. Hier zaehlt die Vereinigung
+                # ueber alle Kurven des Bildes.
+                "graph_beschriftung": (
+                    f"Kosten über {wort} je Messtag und Anbieter"
+                    if (wort := _zeitraum_wort(
+                        sorted({m for liste in zeitraeume.values()
+                                for m in (liste or [])})))
+                    else "Kosten je Messtag und Anbieter"),
                 "svg_breit": _svg(serien, True, beleg_je, zeitraeume),
                 "svg_schmal": _svg(serien, False, beleg_je, zeitraeume),
                 # P1: die fertige Rechung je Messung als <template>-Blöcke

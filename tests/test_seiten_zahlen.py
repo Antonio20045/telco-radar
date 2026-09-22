@@ -4686,3 +4686,42 @@ def test_pruefer_der_csv_kopf_widerspricht_nicht_seiner_zeitraum_spalte(
     assert not doppelt, (
         f"{len(doppelt)} Zeilen tragen dieselbe Summe unter zwei Koepfen "
         f"mit verschiedenem Zeitraum: {doppelt[:4]}")
+
+
+def test_der_name_der_grafik_nennt_die_zeitraeume_die_darin_liegen(gw_seite):
+    """Der zugaengliche Name der Grafik-Sektion gegen ihre Kurven.
+
+    P0-B (22.09.2026): `_geraete_zeitreihe.html.j2` trug den Namen FEST -
+    "Kosten über 24 Monate je Messtag und Anbieter" -, auch wenn im Bild
+    eine 36-Monats-Kurve lag. Paket z1 hatte das aria-label IM SVG
+    dynamisch gemacht und die Sektion darueber nicht gesehen: wer die
+    Seite sieht, las am Kurvenende "36 Mon.", wer sie hoert, bekam "Kosten
+    über 24 Monate" - dieselbe Grafik, zwei Aussagen (Clean Code 7).
+
+    Geprueft wird die Uebereinstimmung, nicht eine Zahl: welche Zeitraeume
+    das Bild traegt, sagen seine Kurvenetiketten (`gr-zr-mon`); der Name
+    der Sektion muss genau diese nennen. Der Test driftet damit nicht mit
+    dem Bestand - er faellt, wenn Name und Bild auseinanderlaufen.
+
+    Gegenprobe eingebaut: das Bild MUSS mindestens zwei verschiedene
+    Zeitraeume tragen, sonst prueft der Test nur den einfachen Fall. Am
+    22.09.2026 traegt die Startansicht (Apple iPhone 17 Pro 256 GB, Band
+    Klein) vier Kurven - congstar, Telekom, Vodafone mit 24 Monaten und
+    1&1 mit 36.
+    """
+    seite = gw_seite["geraete"]
+    name = re.search(r'gr-zr-graph"\s+aria-label="([^"]*)"', seite, re.S)
+    assert name, "keine Grafik-Sektion mit zugaenglichem Namen gefunden"
+    genannt = {int(z) for z in re.findall(r"\d+", name.group(1))}
+
+    im_bild = {int(z) for z in re.findall(r">(\d+) Mon\.?<", seite)}
+    assert len(im_bild) >= 2, (
+        f"die Startansicht traegt nur die Zeitraeume {im_bild} - dann "
+        "prueft dieser Test nur den einfachen Fall. Am 22.09.2026 waren "
+        "es 24 und 36 (1&1 mit Buendelbetrag ueber 36 Monate). Anker mit "
+        "Begruendung neu setzen, nicht aufweichen")
+
+    assert genannt == im_bild, (
+        f"der Name der Grafik nennt {sorted(genannt)} Monate, die Kurven "
+        f"darin tragen {sorted(im_bild)}: "
+        f"{' '.join(name.group(1).split())!r}")
