@@ -27,6 +27,7 @@ import pytest
 from bs4 import BeautifulSoup
 
 from telco_radar.report.html import render_site
+from telco_radar.tco_model import TCO_HORIZONT as _O4_HORIZONT
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 
@@ -49,11 +50,19 @@ WURZEL = pathlib.Path(__file__).resolve().parents[1]
 # tragen - der Spaltenkopf selbst bleibt stehen (Fremdschluessel in
 # `tests/test_seiten_zahlen.py`, dort schreibgeschuetzt), aber die Zeile
 # traegt ihren echten Zeitraum jetzt daneben.
+#
+# P0-B-z3 (22.09.2026, Befund 1): eine weitere Spalte GLEICH DAVOR traegt
+# dieselbe Zahl NUR dort, wo "Leitzahl-Zeitraum Monate" wirklich
+# `TCO_HORIZONT` (24) ist - fuer die 1&1-Zeilen bleibt sie leer, statt
+# unter einem 24-Monats-Kopf zu stehen. Der alte Kopf ("Kosten über 24
+# Monate EUR") bleibt unveraendert, wortgleich und weiter voll befuellt.
 SPALTEN_TCO = [
     "Art", "Modell", "Speicher GB", "Anbieter", "Anbietertyp", "Tarif",
     "Band", "Zustand", "Zuzahlung EUR", "Tarif/Monat EUR", "Geräterate EUR",
     "Bündel/Monat EUR", "Laufzeit Monate", "Anschlusspreis EUR",
-    "Leitzahl-Zeitraum Monate", "Kosten über 24 Monate EUR", "Abgerufen am",
+    "Leitzahl-Zeitraum Monate",
+    f"Kosten über {_O4_HORIZONT} Monate EUR (eigener Zeitraum)",
+    "Kosten über 24 Monate EUR", "Abgerufen am",
     "Quelle", "SKU-ID",
 ]
 
@@ -455,7 +464,7 @@ def test_der_radar_export_traegt_tco_und_haendlerzeilen(radar_csv):
     kopf, zeilen = radar_csv
     art_index = kopf.index("Art")
     arten = {z[art_index] for z in zeilen}
-    assert arten == {"Preis-Alarm", "Netzbetreiber Kosten über 24 Monate",
+    assert arten == {"Preis-Alarm", "Netzbetreiber",
                      "Händler Barpreis"}, arten
 
 
@@ -470,7 +479,7 @@ def test_die_prozentzahl_ist_die_der_seite(radar_csv, radar):
     kopf, zeilen = radar_csv
     idx = {name: i for i, name in enumerate(kopf)}
     datei = sum(1 for z in zeilen
-                if z[idx["Art"]] == "Netzbetreiber Kosten über 24 Monate"
+                if z[idx["Art"]] == "Netzbetreiber"
                 and z[idx["Abweichung %"]])
     seite = len(radar.select("#wr-abweichung tr.wr-status--vergleichbar"))
     assert seite > 0, "die Radar-Tafel zeigt keine vergleichbare Zeile"
@@ -496,7 +505,7 @@ def test_die_nicht_vergleichbaren_zeilen_stehen_mit_status_darin(
     kopf, zeilen = radar_csv
     idx = {name: i for i, name in enumerate(kopf)}
     ohne_zahl = sum(1 for z in zeilen
-                    if z[idx["Art"]] == "Netzbetreiber Kosten über 24 Monate"
+                    if z[idx["Art"]] == "Netzbetreiber"
                     and not z[idx["Abweichung %"]])
     assert ohne_zahl > 0
     statuswerte = {z[idx["Status"]] for z in zeilen}
@@ -543,7 +552,7 @@ def test_keine_1und1_netzzeile_behauptet_24_monate(radar_csv):
     kopf, zeilen = radar_csv
     idx = {name: i for i, name in enumerate(kopf)}
     eins = [z for z in zeilen
-            if z[idx["Art"]] == "Netzbetreiber Kosten über 24 Monate"
+            if z[idx["Art"]] == "Netzbetreiber"
             and z[idx["Anbieter"]] == "1&1"
             and z[idx["Wettbewerber-Preis EUR"]]]
     assert eins, "keine 1&1-Netzzeile mit Preis im Bestand"
@@ -625,7 +634,7 @@ def test_die_alarmzeilen_stehen_als_erster_abschnitt_der_datei(radar_csv):
     arten_in_ordnung = [z[idx] for z in zeilen]
     erste = {a: arten_in_ordnung.index(a) for a in set(arten_in_ordnung)}
     assert erste["Preis-Alarm"] < erste[
-        "Netzbetreiber Kosten über 24 Monate"] < erste["Händler Barpreis"], \
+        "Netzbetreiber"] < erste["Händler Barpreis"], \
         erste
 
 
@@ -697,3 +706,85 @@ def test_der_radar_wird_durch_den_export_nicht_hoeher(radar):
         if "wr-export" in (tabelle.get("class") or []):
             pytest.fail("der Export baut eine offene Tabelle auf der "
                         "Radar-Seite")
+
+
+# ==========================================================================
+# P0-B-z3 (22.09.2026) - vier Befunde des Pruefers, alle in dieser Datei.
+# Ein Test je Befund, der gegen den ALTEN Stand (vor P0-B-z3) rot wird -
+# CLAUDE.md: "Neues Verhalten braucht einen Test, der gegen den alten
+# Stand rot wird."
+# ==========================================================================
+
+def test_z3_befund1_neue_spalte_nennt_nur_ihren_eigenen_zeitraum(tco_csv):
+    """Befund 1 (HOCH): die neue Spalte VOR "Kosten über 24 Monate EUR"
+    traegt eine Zahl NUR, wenn "Leitzahl-Zeitraum Monate" derselben Zeile
+    auch wirklich 24 ist. Gegen den ALTEN Stand rot: die Spalte gab es
+    nicht, ein KeyError haette den Test sofort abgebrochen."""
+    kopf, zeilen = tco_csv
+    neue_spalte = f"Kosten über {_O4_HORIZONT} Monate EUR (eigener Zeitraum)"
+    assert neue_spalte in kopf, kopf
+    idx = {name: i for i, name in enumerate(kopf)}
+    fremd = [z for z in zeilen
+             if z[idx["Leitzahl-Zeitraum Monate"]]
+             and int(z[idx["Leitzahl-Zeitraum Monate"]]) != _O4_HORIZONT
+             and z[idx[neue_spalte]]]
+    assert not fremd, fremd[:4]
+    # Gegenprobe: der Lookup greift wirklich (36-Monats-Zeilen existieren
+    # im Bestand und bleiben dort leer).
+    lueckenhaft = [z for z in zeilen
+                   if z[idx["Leitzahl-Zeitraum Monate"]]
+                   and int(z[idx["Leitzahl-Zeitraum Monate"]]) != _O4_HORIZONT]
+    assert lueckenhaft, "keine 36-Monats-Zeile im Bestand - Lookup leer"
+    assert all(not z[idx[neue_spalte]] for z in lueckenhaft), lueckenhaft
+    # Der ALTE Kopf bleibt unveraendert und weiter voll befuellt (Store-
+    # Abgleich in tests/test_seiten_zahlen.py darf nicht regressieren).
+    assert all(z[idx["Kosten über 24 Monate EUR"]] for z in lueckenhaft), \
+        "der alte, schreibgeschuetzte Kopf hat eine Luecke bekommen"
+
+
+def test_z3_befund2_die_art_behauptet_keinen_zeitraum(radar_csv):
+    """Befund 2 (HOCH): "Art" nennt nur die Sektion, keinen Zeitraum mehr.
+    Gegen den ALTEN Stand rot: die Art hiess "Netzbetreiber Kosten über 24
+    Monate", obwohl in derselben Sektion Zeilen mit "Kosten über die
+    Bündellaufzeit" stehen (Preisart-Spalte)."""
+    kopf, zeilen = radar_csv
+    idx = {name: i for i, name in enumerate(kopf)}
+    arten = {z[idx["Art"]] for z in zeilen}
+    assert "Netzbetreiber" in arten, arten
+    assert not any("Monate" in a for a in arten), (
+        f"eine Art behauptet einen Zeitraum: {arten}")
+
+
+def test_z3_befund3_jede_leere_netzzeile_traegt_ihren_grund(radar_csv):
+    """Befund 3 (MITTEL): keine Netzbetreiber-Zeile ohne Abweichung UND
+    ohne Grund. Gegen den ALTEN Stand rot: 96 Zeilen (Bestand 22.09.2026)
+    ohne Vodafone-Basis trugen weder Prozent noch Grund."""
+    kopf, zeilen = radar_csv
+    idx = {name: i for i, name in enumerate(kopf)}
+    netz = [z for z in zeilen if z[idx["Art"]] == "Netzbetreiber"]
+    stumm = [z for z in netz
+             if not z[idx["Abweichung %"]] and not z[idx["Grund"]]]
+    assert netz, "keine Netzbetreiber-Zeile im Export - Lookup leer"
+    assert not stumm, f"{len(stumm)} Zeilen ohne Abweichung UND ohne " \
+                      f"Grund: {stumm[:4]}"
+
+
+def test_z3_befund4_preisart_nennt_zeitraum_nur_mit_derselben_karte(
+        radar_csv):
+    """Befund 4 (MITTEL): "Kosten über N Monate" steht nur, wo die Zeile
+    NACHWEISLICH (Betragsgleichheit) gegen dieselbe Vodafone-Karte prüft,
+    deren Zeitraum genannt wird. Direkter Test von `_preisart_netz`, weil
+    die zwei Faelle (dieselbe Karte / andere bandspezifische Karte) am
+    echten Bestand nicht ohne Weiteres auseinanderzuhalten sind."""
+    from telco_radar.report.geraete_export import _preisart_netz
+
+    gruppe = {"vodafone": {"monate": 24, "gesamt": 1000.0}}
+    # Dieselbe Karte (vf_gesamt == Referenz-Gesamt): Zeitraum wird genannt.
+    assert _preisart_netz(
+        {"status": "vergleichbar", "vf_gesamt": 1000.0}, gruppe) == \
+        "Kosten über 24 Monate"
+    # ANDERE Karte (vf_gesamt weicht ab, z. B. bandspezifische
+    # Vodafone-Karte aus `_paar_zeile`): kein behaupteter Zeitraum mehr.
+    assert _preisart_netz(
+        {"status": "vergleichbar", "vf_gesamt": 1234.56}, gruppe) == \
+        "Kosten über die Bündellaufzeit"

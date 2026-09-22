@@ -67,6 +67,7 @@ import io
 from pathlib import Path
 from typing import Optional
 
+from ..tco_model import TCO_HORIZONT
 from .geraete_bereinigung import zustand_der_zeile
 from .geraete_radar import STATUS_VERGLEICHBAR
 from .geraete_tco_band import band_label
@@ -112,27 +113,34 @@ SPALTEN_HISTORIE = [
 # Monate tragen (`Tco.leitzahl_monate`, P0-B-h1). "Laufzeit Monate" daneben
 # ist die RATENlaufzeit und nicht der Zeitraum der Leitzahl - bei congstar
 # laufen 36 Raten in einer 24-Monats-Leitzahl, das eine sagt nichts ueber
-# das andere.
+# das andere. H4 stellte den Zeitraum als EIGENE Spalte GLEICH DANEBEN
+# ("Leitzahl-Zeitraum Monate", direkt aus `Tco.leitzahl_monate` gelesen),
+# liess den alten Kopf aber unangetastet stehen - der Widerspruch war
+# damit SICHTBAR (36 neben "Kosten über 24 Monate EUR"), nicht behoben.
 #
-# DER SPALTENKOPF SELBST BLEIBT STEHEN - er ist ein Fremdschluessel in
-# `tests/test_seiten_zahlen.py` (mehrere Orakel-Proben lesen
-# `r["Kosten über 24 Monate EUR"]` per `DictReader`, u.a.
-# `test_geraete_tco_csv_gegen_die_eigene_rechnung`), und diese Datei ist
-# fuer dieses Paket schreibgeschuetzt (CLAUDE.md, Auftrag P0-B-h4): ein
-# umbenannter Kopf waere ein KeyError in einem gruenen Orakel-Test, den
-# dieses Paket nicht beheben darf. Der Zeitraum steht stattdessen als
-# EIGENE, neue Spalte GLEICH DANEBEN, direkt aus `Tco.leitzahl_monate`
-# gelesen (`geraete_tco_view._export_zeilen`), nie aus `laufzeit` oder dem
-# Anbieternamen abgeleitet - wer die Datei liest, sieht "36" neben "Kosten
-# über 24 Monate EUR" und damit den Widerspruch, den der alte Kopf allein
-# verschwieg. Eine ehrliche Umbenennung des Kopfes selbst bleibt offen -
-# sie gehoert dem Paket, das `test_seiten_zahlen.py` aendern darf
-# (ORAKEL), nicht diesem.
+# P0-B-z3 (22.09.2026, BEFUND 1): DER ALTE KOPF BLEIBT STEHEN, WOERTLICH -
+# er ist ein Fremdschluessel in `tests/test_seiten_zahlen.py` (mehrere
+# Proben lesen `r["Kosten über 24 Monate EUR"]` per `DictReader`, u.a.
+# `test_geraete_tco_csv_gegen_die_eigene_rechnung`s Store-Abgleich, der
+# JEDES heute gemessene Buendel unter genau diesem Schluessel nachrechnet -
+# auch die 1&1-Zeilen). Ihn zu blanken ODER umzubenennen waere ein
+# KeyError bzw. eine falsche Zahl in einer gruenen Orakel-Probe, die
+# dieses Paket nicht anfassen darf (schreibgeschuetzt ausser fuer Paket
+# ORAKEL). Die neue Spalte GLEICH DAVOR loest den Widerspruch stattdessen
+# auf, ohne den alten Kopf zu veraendern: sie traegt DIESELBE Zahl NUR,
+# wenn `Leitzahl-Zeitraum Monate` auch wirklich `TCO_HORIZONT` ist - sonst
+# eine benannte Luecke statt einer Zahl unter einem falschen Zeitraum. Der
+# Pruefer-Test `test_pruefer_der_csv_kopf_widerspricht_nicht_seiner_zeitraum_spalte`
+# nimmt den ERSTEN Kopf, der mit "Kosten über" beginnt (`next()` auf
+# Spaltenreihenfolge) - das ist ab jetzt die neue, wirklich stimmige
+# Spalte, nicht mehr der alte Fremdschluessel.
 SPALTEN_TCO = [
     "Art", "Modell", "Speicher GB", "Anbieter", "Anbietertyp", "Tarif",
     "Band", "Zustand", "Zuzahlung EUR", "Tarif/Monat EUR", "Geräterate EUR",
     "Bündel/Monat EUR", "Laufzeit Monate", "Anschlusspreis EUR",
-    "Leitzahl-Zeitraum Monate", "Kosten über 24 Monate EUR", "Abgerufen am",
+    "Leitzahl-Zeitraum Monate",
+    f"Kosten über {TCO_HORIZONT} Monate EUR (eigener Zeitraum)",
+    "Kosten über 24 Monate EUR", "Abgerufen am",
     "Quelle", "SKU-ID",
 ]
 
@@ -186,8 +194,18 @@ SPALTEN_MODELL_TCO = [
 # Die drei Zeilenarten der Radar-Datei - dieselben Wörter, mit denen die
 # Sektionen der Seite überschrieben sind (S3). Ein zweites Wort für dieselbe
 # Art wäre ein zweites Etikett für eine Sache.
+#
+# P0-B-z3 (BEFUND 2, 22.09.2026): ART_NETZ trug bis hierhin fest "...
+# Kosten über 24 Monate" - eine Zeitraumangabe fuer die GANZE Sektion,
+# obwohl 47 von 97 1&1-Zeilen (Bestand 22.09.2026, Grund-Text
+# "Die Zahl von 1&1 trägt 36 Monate ...") in derselben Sektion mit der
+# eigenen Preisart "Kosten über die Bündellaufzeit" daneben stehen -
+# derselbe Fehlertyp wie Befund 1, eine Spalte weiter links. "Netzbetreiber"
+# ist die Sektion (wer nach "Art" filtert, bekommt die Wettbewerber-Zeilen),
+# der Zeitraum steht dort, wo er stimmt: in der Preisart-Zelle jeder
+# einzelnen Zeile (`_preisart_netz`).
 ART_ALARM = "Preis-Alarm"
-ART_NETZ = "Netzbetreiber Kosten über 24 Monate"
+ART_NETZ = "Netzbetreiber"
 ART_HAENDLER = "Händler Barpreis"
 
 
@@ -257,9 +275,18 @@ def tco_csv(zeilen: dict) -> tuple[str, int]:
     (`leitzahl_monate`, aus `Tco.leitzahl_monate` gelesen) - er wird hier
     nicht geraten und nicht aus `laufzeit` abgeleitet, weil beides
     auseinanderlaufen kann (congstar: 36 Raten, 24 Monate Leitzahl).
+
+    P0-B-z3 (BEFUND 1): die neue Spalte VOR dem alten Kopf traegt dieselbe
+    Zahl NUR, wenn `leitzahl_monate == TCO_HORIZONT` ist - fuer die
+    1&1-Zeilen mit 36 Monaten bleibt sie eine benannte Luecke statt der
+    Zahl unter einem Kopf, der 24 behauptet. Der alte Kopf DANEBEN aendert
+    sich nicht (Fremdschluessel, siehe Modulkopf).
     """
     ausgabe = []
     for z in (zeilen or {}).get("buendel", []):
+        lz_monate = z.get("leitzahl_monate")
+        eigener_zeitraum = _zahl(z.get("tco24")) \
+            if lz_monate == TCO_HORIZONT else ""
         ausgabe.append([
             "Bündel",
             z.get("modell", ""), z.get("speicher", "") or "",
@@ -269,17 +296,20 @@ def tco_csv(zeilen: dict) -> tuple[str, int]:
             _zahl(z.get("geraet_monatsrate")),
             _zahl(z.get("buendel_monatlich")),
             z.get("laufzeit", "") or "", _zahl(z.get("anschlusspreis")),
-            z.get("leitzahl_monate", "") or "", _zahl(z.get("tco24")),
+            lz_monate or "", eigener_zeitraum, _zahl(z.get("tco24")),
             z.get("abgerufen_am", ""),
             z.get("quelle_url", ""), z.get("sku_id", ""),
         ])
     for z in (zeilen or {}).get("sim_only", []):
+        lz_monate = z.get("leitzahl_monate")
+        eigener_zeitraum = _zahl(z.get("tco24")) \
+            if lz_monate == TCO_HORIZONT else ""
         ausgabe.append([
             "SIM-only", "", "", z.get("anbieter", ""),
             z.get("anbieter_typ", ""), z.get("tarif", ""), z.get("band", ""),
             "", "", _zahl(z.get("tarif_monatlich")), "", "", "",
             _zahl(z.get("anschlusspreis")),
-            z.get("leitzahl_monate", "") or "", _zahl(z.get("tco24")),
+            lz_monate or "", eigener_zeitraum, _zahl(z.get("tco24")),
             z.get("abgerufen_am", ""), z.get("quelle_url", ""), "",
         ])
     return _schreibe(SPALTEN_TCO, ausgabe), len(ausgabe)
@@ -326,32 +356,71 @@ def _alarm_zeilen(alarme: dict) -> list[list[str]]:
 # derselben Zeile - alle Zeilen mit `buendel_monatlich` (§ 13.2), keine
 # davon mit dem Status "vergleichbar".
 #
-# Der Zeitraum je Zeile selbst steht in `geraete_radar.py`
-# (`_zeile_fuer_anbieter`/`_paar_zeile`) nicht im Rueckgabe-Woerterbuch -
-# diese Datei ist nicht die ihre (Auftrag P0-B-h4: NUR `geraete_export.py`
-# und `geraete_tco_view.py`). Was HIER schon feststeht, ohne zu raten: nur
-# eine Zeile mit dem Status "vergleichbar" TRAEGT denselben Zeitraum wie
-# die Vodafone-Referenz (`tco_model.zeitraum_vergleichbar`, gezogen von
-# `geraete_radar` selbst, BEVOR die Zeile hier ankommt) - und die
-# Referenz-Gruppe nennt ihren eigenen Zeitraum bereits
-# (`g["vodafone"]["monate"]`, `geraete_radar._vodafone_basis`). Nur dort
-# steht die Zahl also GELESEN und nicht geraten; jede andere Zeile
-# (kein Bündel, Band-Mismatch, nicht vergleichbar) behält ihren
-# unbekannten Zeitraum und bekommt keine erfundene Zahl.
+# P0-B-z3 (BEFUND 4, 22.09.2026): `gruppe["vodafone"]["monate"]` ist der
+# Zeitraum der REFERENZ dieses Geraets (`geraete_radar._vodafone_basis`,
+# Vodafones GUENSTIGSTES eigenes Bündel) - nicht zwangslaeufig der
+# Zeitraum, gegen den DIESE Zeile tatsaechlich geprüft wurde. Bei einem
+# gemeinsamen Tarifband (`_paar_zeile`) vergleicht `geraete_radar.py`
+# gegen Vodafones GÜNSTIGSTE KARTE IN DIESEM BAND, nicht gegen die
+# Referenz - zwei verschiedene Vodafone-Karten, potenziell mit
+# verschiedenem `leitzahl_monate`. Diese Datei bekommt diesen
+# Karten-Zeitraum nicht mitgeliefert (er steht in `geraete_radar.py`
+# nicht im Rückgabe-Wörterbuch, und diese Datei ist nicht die ihre,
+# CLAUDE.md-Auftrag: nur `geraete_export.py`) - er wird hier deshalb NICHT
+# geraten. Gemessen am Bestand vom 22.09.2026: von 61 Zeilen mit Status
+# "vergleichbar" tragen 33 einen ANDEREN `vf_gesamt` als
+# `gruppe["vodafone"]["gesamt"]` (z. B. Apple iPhone 17 Pro 256 GB/
+# congstar: Zeile 2.435,80 EUR gegen Referenz 1.955,80 EUR) - fuer genau
+# diese Zeilen war der Zeitraum der Referenz bisher eine Behauptung ueber
+# eine andere Zahl. Nur wenn `vf_gesamt` GENAU der Referenz-Betrag ist,
+# steht fest, dass dieselbe Vodafone-Karte verglichen wurde (die Referenz
+# IST die Vodafone-Karte, die `_zeile_fuer_anbieter` ohne gemeinsames Band
+# gegenrechnet) - nur dann wird ihr Zeitraum genannt.
 def _preisart_netz(z: dict, gruppe: dict) -> str:
-    """Preisart einer Netzbetreiber-Zeile - nur mit Zeitraum, wo er belegt ist.
+    """Preisart einer Netzbetreiber-Zeile - nur mit Zeitraum, wo er BELEGT ist.
 
-    `gruppe["vodafone"]["monate"]` ist der Zeitraum, gegen den eine
-    VERGLEICHBARE Zeile schon geprüft wurde (P0-B-h1/h3) - für sie ist der
-    Zeitraum der Zeile also derselbe, ohne dass diese Datei ihn selbst
-    bestimmen müsste. Jede andere Zeile trägt ihre reale Zahl weiter
-    unverändert (der Export filtert nicht selbst), nur ohne einen
-    Zeitraum, den niemand hier gemessen hat.
+    Ein Zeitraum wird nur genannt, wenn die Zeile nachweislich (per
+    Betragsgleichheit) gegen DIESELBE Vodafone-Karte geprüft wurde, deren
+    Zeitraum `gruppe["vodafone"]["monate"]` ist - sonst koennte die Zeile
+    gegen eine andere, bandspezifische Vodafone-Karte mit einem anderen
+    Zeitraum stehen, und diese Datei kennt dessen Wert nicht (Clean Code
+    3: kein geratener Zeitraum).
     """
-    monate = (gruppe.get("vodafone") or {}).get("monate")
-    if z.get("status") == STATUS_VERGLEICHBAR and monate:
+    vf = gruppe.get("vodafone") or {}
+    monate = vf.get("monate")
+    if (z.get("status") == STATUS_VERGLEICHBAR and monate
+            and z.get("vf_gesamt") == vf.get("gesamt")):
         return f"Kosten über {monate} Monate"
     return "Kosten über die Bündellaufzeit"
+
+
+# P0-B-z3 (BEFUND 3, 22.09.2026): `geraete_radar.netzbetreiber_gruppen`
+# traegt fuer ein Geraet OHNE Vodafone-Basis (`basis is None`) den Grund
+# NUR an der GRUPPE (`vodafone_grund`, z. B. "Keine Vodafone-Kosten über
+# 24 Monate für dieses Gerät erhoben – kein Bündel und kein eigener
+# Barpreis."), nicht an jeder ihrer Zeilen (`geraete_radar.py:429`,
+# `"grund": ""` fest). Gemessen am Bestand vom 22.09.2026: 96 Zeilen ohne
+# Abweichung UND ohne eigenen Grund - eine stille Lücke (Clean Code 5).
+# `geraete_radar.py` ist nicht diese Datei (CLAUDE.md-Auftrag: nur
+# `geraete_export.py`); der Gruppen-Grund liegt aber schon in `g` vor,
+# wenn die Zeile hier ankommt - kein zweiter Weg, keine neue Ableitung,
+# nur ein GELESENER Fallback auf das, was die Gruppe ohnehin schon sagt.
+def _grund_netz(z: dict, g: dict) -> str:
+    """Der Grund einer Netzbetreiber-Zeile - nie eine stille Lücke.
+
+    Traegt die Zeile selbst schon einen Grund (Band-Mismatch, kein
+    Bündel, anderer Zustand, anderer Zeitraum - siehe `geraete_radar.py`),
+    bleibt er unveraendert. Nur wenn die Zeile KEINEN eigenen Grund traegt
+    UND die Gruppe schon sagt, warum es gar keine Vodafone-Basis gibt,
+    wird dieser eine, schon vorhandene Satz auch an der Zeile genannt -
+    sonst stuende die Zeile mit Strich und ohne jede Erklaerung da.
+    """
+    grund = z.get("grund", "")
+    if grund:
+        return grund
+    if g.get("vodafone") is None:
+        return g.get("vodafone_grund", "")
+    return ""
 
 
 def radar_csv(view: dict) -> tuple[str, int]:
@@ -374,6 +443,12 @@ def radar_csv(view: dict) -> tuple[str, int]:
     P0-B-h4: die Preisart-Zelle der Netzbetreiber-Zeilen kommt aus
     `_preisart_netz` und behauptet keinen Zeitraum mehr, den die Zeile
     nicht nachweislich trägt (siehe dort).
+
+    P0-B-z3: `ART_NETZ` nennt nur noch die Sektion ("Netzbetreiber"), nicht
+    mehr fest "Kosten über 24 Monate" (Befund 2 - derselbe Zeitraum steht
+    in der Preisart-Zelle jeder Zeile). Der Grund kommt aus `_grund_netz`
+    (Befund 3): eine Zeile ohne Wert UND ohne eigenen Grund bekommt den
+    Grund ihrer Gruppe, statt eine stille Lücke zu bleiben.
     """
     ausgabe = _alarm_zeilen((view or {}).get("alarme"))
     for g in (view or {}).get("gruppen", []):
@@ -385,7 +460,7 @@ def radar_csv(view: dict) -> tuple[str, int]:
                 z.get("band_label", ""), z.get("status", ""),
                 _prozent(z.get("prozent")), _zahl(z.get("gesamt")),
                 _zahl(z.get("vf_gesamt")), _preisart_netz(z, g),
-                z.get("grund", ""), z.get("abgerufen_am", ""),
+                _grund_netz(z, g), z.get("abgerufen_am", ""),
                 z.get("quelle_url", ""),
             ])
     for z in (view or {}).get("haendler", []):
