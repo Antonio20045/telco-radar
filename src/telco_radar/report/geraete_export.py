@@ -118,29 +118,80 @@ SPALTEN_HISTORIE = [
 # liess den alten Kopf aber unangetastet stehen - der Widerspruch war
 # damit SICHTBAR (36 neben "Kosten über 24 Monate EUR"), nicht behoben.
 #
-# P0-B-z3 (22.09.2026, BEFUND 1): DER ALTE KOPF BLEIBT STEHEN, WOERTLICH -
-# er ist ein Fremdschluessel in `tests/test_seiten_zahlen.py` (mehrere
-# Proben lesen `r["Kosten über 24 Monate EUR"]` per `DictReader`, u.a.
-# `test_geraete_tco_csv_gegen_die_eigene_rechnung`s Store-Abgleich, der
-# JEDES heute gemessene Buendel unter genau diesem Schluessel nachrechnet -
-# auch die 1&1-Zeilen). Ihn zu blanken ODER umzubenennen waere ein
-# KeyError bzw. eine falsche Zahl in einer gruenen Orakel-Probe, die
-# dieses Paket nicht anfassen darf (schreibgeschuetzt ausser fuer Paket
-# ORAKEL). Die neue Spalte GLEICH DAVOR loest den Widerspruch stattdessen
-# auf, ohne den alten Kopf zu veraendern: sie traegt DIESELBE Zahl NUR,
-# wenn `Leitzahl-Zeitraum Monate` auch wirklich `TCO_HORIZONT` ist - sonst
-# eine benannte Luecke statt einer Zahl unter einem falschen Zeitraum. Der
-# Pruefer-Test `test_pruefer_der_csv_kopf_widerspricht_nicht_seiner_zeitraum_spalte`
-# nimmt den ERSTEN Kopf, der mit "Kosten über" beginnt (`next()` auf
-# Spaltenreihenfolge) - das ist ab jetzt die neue, wirklich stimmige
-# Spalte, nicht mehr der alte Fremdschluessel.
+# P0-B (22.09.2026, LEAD): ZWEI KOEPFE, EIN WERT - und jeder Kopf ist fuer
+# jede Zahl unter ihm WAHR. "Kosten über 24 Monate EUR" traegt eine Zahl nur
+# noch, wenn ihr Zeitraum auch 24 Monate ist; alle anderen stehen unter
+# "Kosten über die Bündellaufzeit EUR", daneben ihr Zeitraum in
+# "Leitzahl-Zeitraum Monate". Der alte Kopf behaelt damit seinen Namen als
+# Fremdschluessel und bekommt eine ENGERE, dafuer richtige Bedeutung; keine
+# Zeile verliert ihren Wert (`_leitzahl_spalten`).
+#
+# Der Weg dorthin ist dokumentiert, weil er zweimal falsch abgebogen ist:
+# H4 stellte den Zeitraum nur DANEBEN und liess den Kopf luegen; z3 baute
+# eine zweite Wertspalte, nannte sie "Kosten über 24 Monate EUR (eigener
+# Zeitraum)" - ein Name, der sich selbst widerspricht - und fuellte sie
+# genau fuer die 74 Zeilen NICHT, fuer die sie gedacht war, waehrend der
+# alte Kopf den 36-Monats-Betrag weitertrug. Die damalige Begruendung war
+# richtig beobachtet und falsch gefolgert. Richtig war: der alte Kopf ist
+# ein Fremdschluessel, den zwoelf Proben in tests/test_geraete_o4_export.py
+# und tests/test_seiten_zahlen.py per `DictReader` lesen. Falsch war der
+# Schluss, ihn deshalb luegen zu lassen - ein Kopf, der seine Zahlen falsch
+# beschreibt, ist kein Fremdschluessel, sondern eine Falle. Er behaelt jetzt
+# seinen NAMEN und bekommt eine engere Bedeutung, und die Leser bekommen
+# EINEN gemeinsamen Leseweg (`leitzahl_aus_zeile`), statt den Spaltennamen
+# zwoelfmal abzuschreiben.
+#
+# Die zwei Koepfe als Namen, damit kein Leser sie abschreibt. Ein Test, der
+# "Kosten über 24 Monate EUR" als Zeichenkette in sich traegt, ist eine
+# zweite Definition derselben Spalte (Clean Code 7) - und genau daran ist
+# diese Spalte zweimal falsch abgebogen.
+SPALTE_UEBER_24 = "Kosten über 24 Monate EUR"
+SPALTE_UEBER_LAUFZEIT = "Kosten über die Bündellaufzeit EUR"
+
+
+def leitzahl_aus_zeile(zeile):
+    """Die Leitzahl einer TCO-Exportzeile, egal unter welchem Kopf sie steht.
+
+    DER EINE Leseweg fuer beide Spalten. Wer nur `SPALTE_UEBER_24` liest,
+    bekommt fuer die 74 Buendel mit kombiniertem Monatsbetrag (1&1) eine
+    leere Zelle und haelt sie fuer eine fehlende Messung - sie steht aber
+    unter `SPALTE_UEBER_LAUFZEIT`, weil ihr Zeitraum nicht 24 Monate ist.
+
+    `zeile` ist ein dict aus `csv.DictReader`. Rueckgabe ist die
+    Zeichenkette, wie sie in der Datei steht (deutsches Dezimalkomma), oder
+    "" wenn die Zeile keine Leitzahl traegt - dann ist sie wirklich leer.
+    """
+    return (zeile.get(SPALTE_UEBER_24)
+            or zeile.get(SPALTE_UEBER_LAUFZEIT) or "")
+
+
+def _leitzahl_spalten(tco24, leitzahl_monate):
+    """Die Leitzahl in die Spalte, deren Kopf fuer sie WAHR ist.
+
+    Zwei Koepfe, ein Wert: eine Zahl steht unter "Kosten über 24 Monate
+    EUR", wenn ihr Zeitraum 24 Monate ist, und sonst unter "Kosten über
+    die Buendellaufzeit EUR". Keine Zeile verliert ihren Wert, und kein
+    Kopf traegt eine Zahl, die er falsch beschreibt.
+
+    Der Zeitraum wird hier nicht bestimmt, sondern gelesen
+    (`Tco.leitzahl_monate`, P0-B-h1) - es gibt genau eine Stelle, die ihn
+    festlegt. Fehlt er, ist er eine Luecke und keine 24: dann steht die
+    Zahl in der Laufzeitspalte, weil die 24 nicht belegt ist.
+    """
+    wert = _zahl(tco24)
+    if not wert:
+        return "", ""
+    if leitzahl_monate == TCO_HORIZONT:
+        return wert, ""
+    return "", wert
+
+
 SPALTEN_TCO = [
     "Art", "Modell", "Speicher GB", "Anbieter", "Anbietertyp", "Tarif",
     "Band", "Zustand", "Zuzahlung EUR", "Tarif/Monat EUR", "Geräterate EUR",
     "Bündel/Monat EUR", "Laufzeit Monate", "Anschlusspreis EUR",
     "Leitzahl-Zeitraum Monate",
-    f"Kosten über {TCO_HORIZONT} Monate EUR (eigener Zeitraum)",
-    "Kosten über 24 Monate EUR", "Abgerufen am",
+    SPALTE_UEBER_24, SPALTE_UEBER_LAUFZEIT, "Abgerufen am",
     "Quelle", "SKU-ID",
 ]
 
@@ -285,8 +336,8 @@ def tco_csv(zeilen: dict) -> tuple[str, int]:
     ausgabe = []
     for z in (zeilen or {}).get("buendel", []):
         lz_monate = z.get("leitzahl_monate")
-        eigener_zeitraum = _zahl(z.get("tco24")) \
-            if lz_monate == TCO_HORIZONT else ""
+        ueber_24, ueber_laufzeit = _leitzahl_spalten(z.get("tco24"),
+                                                    lz_monate)
         ausgabe.append([
             "Bündel",
             z.get("modell", ""), z.get("speicher", "") or "",
@@ -296,20 +347,20 @@ def tco_csv(zeilen: dict) -> tuple[str, int]:
             _zahl(z.get("geraet_monatsrate")),
             _zahl(z.get("buendel_monatlich")),
             z.get("laufzeit", "") or "", _zahl(z.get("anschlusspreis")),
-            lz_monate or "", eigener_zeitraum, _zahl(z.get("tco24")),
+            lz_monate or "", ueber_24, ueber_laufzeit,
             z.get("abgerufen_am", ""),
             z.get("quelle_url", ""), z.get("sku_id", ""),
         ])
     for z in (zeilen or {}).get("sim_only", []):
         lz_monate = z.get("leitzahl_monate")
-        eigener_zeitraum = _zahl(z.get("tco24")) \
-            if lz_monate == TCO_HORIZONT else ""
+        ueber_24, ueber_laufzeit = _leitzahl_spalten(z.get("tco24"),
+                                                    lz_monate)
         ausgabe.append([
             "SIM-only", "", "", z.get("anbieter", ""),
             z.get("anbieter_typ", ""), z.get("tarif", ""), z.get("band", ""),
             "", "", _zahl(z.get("tarif_monatlich")), "", "", "",
             _zahl(z.get("anschlusspreis")),
-            lz_monate or "", eigener_zeitraum, _zahl(z.get("tco24")),
+            lz_monate or "", ueber_24, ueber_laufzeit,
             z.get("abgerufen_am", ""), z.get("quelle_url", ""), "",
         ])
     return _schreibe(SPALTEN_TCO, ausgabe), len(ausgabe)

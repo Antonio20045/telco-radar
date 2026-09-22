@@ -26,6 +26,8 @@ from pathlib import Path
 import pytest
 from bs4 import BeautifulSoup
 
+from telco_radar.report.geraete_export import (
+    SPALTE_UEBER_24, SPALTE_UEBER_LAUFZEIT, leitzahl_aus_zeile)
 from telco_radar.report.html import render_site
 
 
@@ -3146,7 +3148,7 @@ def test_geraete_tco_csv_gegen_die_eigene_rechnung(gw_seite):
             soll = (zu or 0) + tarif * 24 + rate * int(lz) + (anschluss or 0)
         else:
             soll = None                  # Luecke in der Zeile selbst
-        ist = _n(r["Kosten über 24 Monate EUR"])
+        ist = _n(leitzahl_aus_zeile(r))
         if soll is None or ist is None:
             continue
         geprueft += 1
@@ -3173,7 +3175,7 @@ def test_geraete_tco_csv_gegen_die_eigene_rechnung(gw_seite):
     assert pflicht, "Pflichtfall fehlt im Export (Stand " \
                     f"{gw_seite['stand']})"
     for zeile in pflicht:
-        _gw_vergleiche(_n(zeile["Kosten über 24 Monate EUR"]),
+        _gw_vergleiche(_n(leitzahl_aus_zeile(zeile)),
                        _soll, "Pflichtfall im CSV-Export")
 
     # Store-Abgleich: jedes heute gemessene Bündel steht mit seinen Posten
@@ -3183,7 +3185,7 @@ def test_geraete_tco_csv_gegen_die_eigene_rechnung(gw_seite):
                      r["Zuzahlung EUR"], r["Tarif/Monat EUR"],
                      r["Geräterate EUR"], r["Bündel/Monat EUR"],
                      r["Anschlusspreis EUR"],
-                     r["Kosten über 24 Monate EUR"]): r for r in zeilen}
+                     leitzahl_aus_zeile(r)): r for r in zeilen}
     treffer = 0
     for b in tco["buendel"]:
         if b.get("abgerufen_am") != gw_seite["stand"] \
@@ -3256,7 +3258,7 @@ def test_geraete_tco_csv_simonly_mit_anschlusspreis(gw_seite):
     abweich, geprueft, mit_anschluss = [], 0, 0
     for r in zeilen:
         tarif, ist = _z(r["Tarif/Monat EUR"]), _z(
-            r["Kosten über 24 Monate EUR"])
+            leitzahl_aus_zeile(r))
         anschluss = _z(r["Anschlusspreis EUR"])
         if tarif is None or ist is None:
             continue                     # Lücke in der Zeile selbst
@@ -3855,49 +3857,97 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
 
 # Der Stand des Bestands am 20.09.2026 (`data/state/geraete_tco.json`,
 # `updated` 2026-09-20), gemessen und nicht geschaetzt - Grundlage der
-# Ratsche unten. Ein Deckel waere hier falsch: die Zahlen duerfen nur
-# BESSER werden.
+# Aussage unten.
+#
+# KEINE UNTERGRENZEN. Eine Untergrenze auf einer Zahl, die heute schon am
+# Boden steht, ist keine Zusicherung: `len(mehrfach) >= 0` ist fuer jede
+# Menge wahr und kann nie fallen (CLAUDE.md Regel 10 - ein Test, dessen
+# Lookup ins Leere laeuft, ist gruen und prueft nichts). Die Zahlen unten
+# sind deshalb EXAKTE ANKER: sie fallen in BEIDE Richtungen, und ein
+# Fallen ist die Meldung dieses Tests, kein Fehler (siehe Docstring).
 _PF_STAND_TAG = "2026-09-20"
-_PF_STAND_MEHRLAUFZEIT = 0        # Gruppen mit zwei Ratenlaufzeiten
-_PF_STAND_BREITESTER = 3          # Laufzeiten des breitesten Anbieters
+_PF_STAND_MEHRLAUFZEIT = 0        # Gruppen mit ZWEI Ratenlaufzeiten
+# Die Ratenlaufzeiten JE ANBIETER - der eigentliche Befund. Telekom, o2,
+# congstar und 1&1 tragen ausnahmslos 36 Monate; nur Vodafone kennt drei,
+# bindet sie aber je Tarifname an genau eine (Mobil S 12, Mobil M 24,
+# Mobil XS 36). Darum traegt trotz dreier Laufzeiten keine GRUPPE zwei.
+_PF_STAND_LAUFZEITEN = {
+    "1&1": [36], "Telekom": [36], "Vodafone": [12, 24, 36],
+    "congstar": [36], "o2": [36],
+}
 _PF_MINDEST_GRUPPEN = 200         # Anti-Leerlauf, nicht der Stand (507)
 
 
 def test_pf_bestand_zaehlt_seine_ratenlaufzeiten_und_haelt_die_luecke_fest():
     """BESTANDSAUSSAGE: was der echte Bestand an Ratenlaufzeiten traegt.
 
-    Stand am 20.09.2026 (`data/state/geraete_tco.json`, 792 Buendel):
+    Stand am 20.09.2026 (`data/state/geraete_tco.json`, `updated`
+    2026-09-20, 792 Buendel), jede Zahl gemessen:
       - 0 von 507 Gruppen (Anbieter, Modell, Tarif, Zustand) tragen ZWEI
         Ratenlaufzeiten; 375 dieser Gruppen sind frisch.
-      - Je Anbieter: 1&1 nur 36 (74), Telekom nur 36 (45), congstar nur 36
-        (128), o2 nur 36 (72), Vodafone 12 (160), 24 (157) und 36 (156).
-      - Vodafone bindet die Laufzeit an den TARIF: Mobil S immer 12, Mobil
-        M immer 24, Mobil XS immer 36. Darum traegt auch bei Vodafone
-        keine GRUPPE zwei Laufzeiten, obwohl der Anbieter drei kennt.
+      - Je Anbieter: 1&1 nur 36 (74 Buendel), Telekom nur 36 (45),
+        congstar nur 36 (128), o2 nur 36 (72), Vodafone 12 (160), 24
+        (157) und 36 (156).
+      - Vodafone bindet die Laufzeit an den TARIF: Mobil S immer 12
+        (160 von 160), Mobil M immer 24 (157 von 157), Mobil XS immer 36
+        (156 von 156). Das sind nicht drei Angebote, das ist EINE
+        Laufzeit je Tarif - darum traegt auch bei Vodafone keine GRUPPE
+        zwei Laufzeiten, obwohl der Anbieter drei kennt.
       - 0 Buendel ohne gemessene Laufzeit.
+      - Die Historie sagt dasselbe ueber die Zeit: 3854 Zeilen, davon
+        1539 fuer 1&1 (586), o2 (518), congstar (400) und Telekom (35) -
+        AUSNAHMSLOS 36 Monate; Vodafone 2315 Zeilen, Mobil XS 36 in 741
+        von 741, Mobil S 12 in 819 von 819, Mobil M 24 in 755 von 755.
+        720 Historiengruppen, davon 0 mit zwei Laufzeiten.
 
     WARUM DAS SO IST: die Erhebung ist defensiv gebaut (der Schluessel
     traegt die Laufzeit, der congstar-Weg ist mit
     `test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen`
-    belegt), aber in den gespeicherten echten Abrufen liefern Telekom
-    (`numberOfInstallments` nur 36), o2 (`rateDurationValue` nur
-    "36 Monate") und 1&1 (`currentHardwareOfferDuration` nur '36')
-    ausschliesslich 36 Monate. Ob die Anbieterseiten heute mehr anbieten,
-    kann diese Umgebung NICHT nachpruefen: das Gateway antwortet auf
-    CONNECT fuer telekom.de, congstar.de, 1und1.de, vodafone.de und
-    o2online.de mit 403. Der Verdacht auf eine Erfassungsluecke
-    (CLAUDE.md Fallstrick 16) bleibt damit offen - dieser Test tut NICHT
-    so, als waere er ausgeraeumt, er haelt ihn sichtbar fest.
+    belegt), aber in den GESPEICHERTEN ECHTEN ABRUFEN liefern drei von
+    fuenf Anbietern nur eine Laufzeit: Telekom
+    (`telekom_kategorie_buendel_magentamobil_s.html.gz`,
+    `numberOfInstallments":36` 9x und nichts anderes), o2
+    (`o2_katalog_buendel.json.gz`, `rateDurationValue" : "36 Monate"`
+    88x) und 1&1 (`currentHardwareOfferDuration = '36'` in allen vier
+    Produktseiten-Fixtures). Zwei Laufzeiten sind nur bei congstar
+    belegt (`congstar_tarifseite_allnet_flat_m.html.gz`:
+    INSTALLMENT_PLAN/UNSPECIFIED/24 58x und /36 58x, TRADE_IN/24 56x und
+    /36 58x; Allnet Flat S identisch) und bei Vodafone
+    (`financingDuration` 12/24/36, je 5x in `vodafone_tarif_hardware.json`
+    und je 3x in `vodafone_virtualitem.json`).
 
-    GEPRUEFT WIRD ALS RATSCHE - der Test faellt nur bei einer Regression:
-      1. Der Scan sieht ueberhaupt Gruppen (sonst waere er gruen und
-         wertlos).
+    Ob die Anbieterseiten heute mehr anbieten, kann diese Umgebung NICHT
+    nachpruefen: das Gateway antwortet auf CONNECT fuer telekom.de,
+    congstar.de, 1und1.de, vodafone.de und o2online.de mit 403. CLAUDE.md
+    Fallstrick 16 verlangt genau diese Gegenprobe an der Anbieterseite,
+    und sie ist hier nicht zu leisten. Der Verdacht auf eine
+    Erfassungsluecke bleibt damit OFFEN. Dieser Test tut NICHT so, als
+    waere er ausgeraeumt - er haelt ihn als Zahl sichtbar fest.
+
+    GEPRUEFT WIRD MIT EXAKTEN ANKERN, NICHT MIT UNTERGRENZEN:
+      1. Der Scan sieht ueberhaupt Gruppen (Anti-Leerlauf; hier steht
+         bewusst eine Untergrenze, denn sie kann fallen - der Stand liegt
+         mit 507 weit darueber).
       2. Kein Buendel traegt eine fehlende Laufzeit (Clean Code 3/4).
-      3. Der breiteste Anbieter traegt weiter mindestens drei
-         Ratenlaufzeiten (Stand: Vodafone 12/24/36). Faellt die
-         Mehrfacherfassung aus, wird das hier rot.
-      4. Die Zahl der Gruppen mit zwei Laufzeiten sinkt nicht unter den
-         festgehaltenen Stand.
+      3. Die Ratenlaufzeiten JE ANBIETER sind genau
+         `_PF_STAND_LAUFZEITEN`.
+      4. Die Zahl der Gruppen mit zwei Laufzeiten ist genau
+         `_PF_STAND_MEHRLAUFZEIT` (= 0).
+
+    WAS ZU TUN IST, WENN DIESER TEST FAELLT - er faellt in BEIDE
+    Richtungen, und beide Richtungen sind eine Meldung, kein Fehler:
+      * BESSER (3. oder 4. nennt MEHR Laufzeiten, etwa Telekom 24 und 36,
+        oder eine Gruppe traegt zwei): die Erfassungsluecke schliesst
+        sich. Anker hochsetzen, mit Datum und der neuen Messung in diesem
+        Docstring, und pruefen, ob die Seite die zweite Laufzeit auch
+        ZEIGT - dafuer ist der Mechanik-Test daneben da.
+      * SCHLECHTER (3. oder 4. nennt WENIGER, ein Anbieter fehlt ganz,
+        oder 1./2. fallen): die Mehrfacherfassung oder der Scan ist
+        kaputt. Das ist ein echter Fehler und wird behoben, nicht
+        umgeschrieben.
+      In keinem Fall wird der Anker auf eine Untergrenze aufgeweicht.
+      Genau das war der Befund vom 22.09.2026: `>= _PF_STAND_MEHRLAUFZEIT`
+      mit dem Anker 0 war eine gruene Zeile ohne Aussage.
 
     NICHT GEPRUEFT: ob die Seite zwei Laufzeiten ZEIGT (das ist der
     Mechanik-Test), und ob der Bestand vollstaendig ist - er ist es
@@ -3930,21 +3980,32 @@ def test_pf_bestand_zaehlt_seine_ratenlaufzeiten_und_haelt_die_luecke_fest():
         f"({ohne_laufzeit[:5]}) - am {_PF_STAND_TAG} war es keines. Eine "
         "fehlende Laufzeit ist eine Luecke, keine 24")
 
-    breitester = max(je_anbieter.items(), key=lambda p: (len(p[1]), p[0]))
-    assert len(breitester[1]) >= _PF_STAND_BREITESTER, (
-        f"kein Anbieter traegt mehr als {len(breitester[1])} "
-        f"Ratenlaufzeit(en) - am {_PF_STAND_TAG} trug Vodafone drei "
-        "(12/24/36). Die Mehrfacherfassung ist ausgefallen. Bestand: "
-        f"{ {a: sorted(v) for a, v in sorted(je_anbieter.items())} }")
+    # EXAKT, nicht ">=": ein `>=` auf einer Zahl, die schon am Boden
+    # steht, kann nicht fallen. Dieser Assert faellt, wenn ein Anbieter
+    # eine Laufzeit DAZUGEWINNT (gute Nachricht, Anker nachziehen) UND
+    # wenn er eine verliert oder ganz ausfaellt (Fehler, beheben).
+    ist_laufzeiten = {a: sorted(v) for a, v in je_anbieter.items()}
+    assert ist_laufzeiten == _PF_STAND_LAUFZEITEN, (
+        f"die Ratenlaufzeiten je Anbieter sind {ist_laufzeiten}, am "
+        f"{_PF_STAND_TAG} waren es {_PF_STAND_LAUFZEITEN}. MEHR Laufzeiten "
+        "oder ein neuer Anbieter: die Erfassungsluecke schliesst sich - "
+        "Anker samt Datum im Docstring nachziehen und pruefen, ob die "
+        "Seite die zweite Laufzeit zeigt. WENIGER Laufzeiten oder ein "
+        "fehlender Anbieter: die Mehrfacherfassung ist ausgefallen - das "
+        "ist ein Fehler und wird behoben, nicht umgeschrieben.")
 
     mehrfach = {k: sorted(v) for k, v in gruppen.items() if len(v) > 1}
     frisch_mehrfach = {k: sorted(v) for k, v in frische_gruppen.items()
                        if len(v) > 1}
-    assert len(mehrfach) >= _PF_STAND_MEHRLAUFZEIT, (
+    assert len(mehrfach) == _PF_STAND_MEHRLAUFZEIT, (
         f"{len(mehrfach)} von {len(gruppen)} Gruppen tragen zwei "
-        f"Ratenlaufzeiten, am {_PF_STAND_TAG} waren es "
-        f"{_PF_STAND_MEHRLAUFZEIT} - die Lage hat sich VERSCHLECHTERT. "
-        f"Frisch: {len(frisch_mehrfach)} von {len(frische_gruppen)}")
+        f"Ratenlaufzeiten, am {_PF_STAND_TAG} waren es genau "
+        f"{_PF_STAND_MEHRLAUFZEIT} (von 507). MEHR: die Erfassungsluecke "
+        "schliesst sich - Anker mit Datum und Messung hochsetzen. "
+        "WENIGER: eine Gruppe hat ihre zweite Laufzeit verloren, das ist "
+        f"ein Fehler. Frisch: {len(frisch_mehrfach)} von "
+        f"{len(frische_gruppen)}; Beispiele: "
+        f"{sorted(mehrfach.items())[:4]}")
 
 def test_pf_simonly_mit_erhobenem_volumen_traegt_sein_band(gw_seite):
     """B3-Gegenprobe: kein SIM-only-Tarif verliert sein Band.
@@ -4317,6 +4378,14 @@ def test_pr_eine_verschwundene_abweichung_traegt_ihren_grund(gw_seite):
 
 _PZ_TOLERANZ = _gw_Dez("0.01")     # ein Cent je Monat auf dem O/Monat
 
+# Die Spalte, deren Kopf P0-B-z3 WISSENTLICH stehen gelassen hat: sie ist
+# ein Fremdschluessel fuer `test_geraete_tco_csv_gegen_die_eigene_rechnung`
+# und traegt ihre Summe fuer JEDE Zeile, auch fuer die, deren eigener
+# Zeitraum 36 ist. Der Widerspruch ist damit sichtbar gemacht, nicht
+# behoben - und wird hier als Zahl festgehalten, statt uebersehen zu
+# werden (Befund vom 22.09.2026, siehe Docstring unten).
+_PZ_CSV_ZEITRAUM = "Leitzahl-Zeitraum Monate"
+
 
 def _pz_soll(b: dict) -> tuple:
     """(Leitzahl, Zeitraum) aus den ROHFELDERN - oder (None, None).
@@ -4439,24 +4508,75 @@ def test_pruefer_kein_spaltenkopf_behauptet_24_ueber_einer_36_monats_zahl(
         gw_seite):
     """Der Spaltenkopf IST eine Aussage ueber jede Zahl unter ihm.
 
-    Geprueft wird die Buendeltafel des Startmodells: steht unter dem Kopf
-    "Kosten über 24 Monate" eine Zeile mit dem Etikett "Kosten über 36
-    Monate", widersprechen sich Kopf und Zelle in derselben Spalte - und
-    der Sortierknopf dieses Kopfes (`data-bsort="tco"`, app.js liest
-    `data-gesamt`) stellt beide Summen in EINEN Rang.
+    Geprueft wird die Buendeltafel des Startmodells: nennt der Kopf der
+    TCO-Spalte eine Monatszahl, dann muss JEDE Zeile unter ihm genau
+    diesen Zeitraum tragen. Der Sortierknopf dieses Kopfes
+    (`data-bsort="tco"`, app.js liest `data-gesamt`) stellt alle Summen
+    der Spalte in EINEN Rang - ein Kopf, der einen Zeitraum behauptet,
+    behauptet ihn damit fuer den ganzen Rang.
+
+    GEMESSEN am 22.09.2026 (echter Render gegen den Bestand vom
+    20.09.2026): 19 Buendelzeilen inline, alle 19 mit `data-gesamt` UND
+    eigenem Etikett, 18 ueber 24 Monate und 1 ueber 36 (die 1&1-Zeile mit
+    `buendel_monatlich`). Der Kopf lautet "nach den Kosten mit Tarif
+    sortieren, getrennt nach Zeitraum" und nennt KEINE Monatszahl - das
+    ist der Stand nach P0-B-z2 und der gewollte Zustand: der Kopf nennt
+    die Spalte, die Zeile ihren Zeitraum.
+
+    WARUM DIE PRUEFUNG SO GEBAUT IST (Befund vom 22.09.2026): vorher
+    stand hier `assert not (fremde and behauptet == [_GW_HORIZONT])`.
+    Nach z2 ist `behauptet` leer, also ist `behauptet == [24]` fuer immer
+    falsch und der Assert konnte nicht mehr fallen - egal was in der
+    Spalte steht. Er war ausserdem nur auf die eine Richtung gefasst:
+    ein Kopf, der "36 Monate" ueber 24-Monats-Zeilen behauptet, kam
+    durch. Geprueft wird jetzt die Aussage selbst, in beide Richtungen,
+    mit zwei Gegenproben, die verhindern, dass sie gruen ins Leere
+    laeuft: die Spalte muss Zeilen MIT Etikett haben, und sie muss
+    MEHRERE Zeitraeume tragen (sonst koennte eine Monatszahl im Kopf
+    ueberhaupt nicht widersprechen und der Test prueft nichts).
     """
     seite = gw_seite["geraete"]
     koepfe = re.findall(r'data-bsort="tco"[^>]*aria-label=\s*"([^"]*)"',
                         seite)
     assert koepfe, "Sortierkopf der TCO-Spalte nicht gefunden - Lookup leer"
-    fremde = sorted({int(z["etikett"]) for z in _pz_zeilen(seite)
-                     if z["etikett"] and int(z["etikett"]) != _GW_HORIZONT})
-    behauptet = sorted({int(m) for kopf in koepfe
-                        for m in re.findall(r"(\d+) Monate", kopf)})
-    assert not (fremde and behauptet == [_GW_HORIZONT]), (
-        f"Spaltenkopf {koepfe[0]!r} behauptet {behauptet} Monate, in "
-        f"derselben Spalte stehen Zeilen mit {fremde} Monaten - und "
-        "derselbe Knopf sortiert sie gemeinsam nach data-gesamt")
+
+    spaltenzeilen = [z for z in _pz_zeilen(seite) if z["gesamt"]]
+    assert spaltenzeilen, (
+        "keine Buendelzeile mit data-gesamt in der Startansicht - der "
+        "Lookup greift ins Leere und dieser Test wuerde sonst gruen "
+        "nichts pruefen")
+    # Die Haelfte von z2, die traegt: JEDE Zahl nennt ihren eigenen
+    # Zeitraum. Ohne Etikett waere der Kopf die einzige Angabe, und der
+    # Widerspruch unten waere gar nicht messbar.
+    ohne_etikett = [(z["anbieter"], z["gesamt"]) for z in spaltenzeilen
+                    if not z["etikett"]]
+    assert not ohne_etikett, (
+        f"{len(ohne_etikett)} von {len(spaltenzeilen)} Zeilen tragen eine "
+        f"Summe ohne eigenen Zeitraum: {ohne_etikett[:6]} - am 22.09.2026 "
+        "trugen alle 19 ihr Etikett. Ohne Etikett gilt wieder der Kopf "
+        "fuer alle")
+
+    etiketten = {int(z["etikett"]) for z in spaltenzeilen}
+    # Gegenprobe: bei nur EINEM Zeitraum in der Spalte koennte kein Kopf
+    # widersprechen - der Assert unten waere dann gruen ohne Aussage.
+    assert len(etiketten) > 1, (
+        f"die Spalte traegt nur den Zeitraum {sorted(etiketten)}; am "
+        "22.09.2026 standen dort 24 UND 36 Monate (18 zu 1). Mit einem "
+        "einzigen Zeitraum kann ein Spaltenkopf nicht widersprechen und "
+        "dieser Test prueft nichts - die Startansicht ist neu zu waehlen "
+        "oder der Anker neu zu setzen, nicht der Assert aufzuweichen")
+
+    behauptet = {int(m) for kopf in koepfe
+                 for m in re.findall(r"(\d+) Monate", kopf)}
+    # Ein Kopf ohne Monatszahl behauptet nichts und kann nicht
+    # widersprechen (Stand nach z2). Nennt er eine, muss sie der Zeitraum
+    # JEDER Zeile darunter sein.
+    widerspruch = sorted(etiketten - behauptet) if behauptet else []
+    assert not widerspruch, (
+        f"Spaltenkopf {koepfe[0]!r} behauptet {sorted(behauptet)} Monate, "
+        f"in derselben Spalte stehen Zeilen mit {widerspruch} Monaten - "
+        "und derselbe Knopf sortiert sie gemeinsam nach data-gesamt. Der "
+        "Zeitraum gehoert an die Zeile, nicht an den Kopf")
 
 
 def test_pruefer_der_csv_kopf_widerspricht_nicht_seiner_zeitraum_spalte(
@@ -4467,19 +4587,102 @@ def test_pruefer_der_csv_kopf_widerspricht_nicht_seiner_zeitraum_spalte(
     der Wertspalte aber stehen gelassen. Eine Zeile, deren Zeitraum 36
     sagt, traegt ihre Summe damit unter "Kosten über 24 Monate EUR" -
     zwei Zahlen zum selben Zeitraum in derselben Zeile.
+
+    GEPRUEFT WERDEN ALLE "Kosten über"-Spalten, nicht eine.
+
+    Befund vom 22.09.2026: vorher nahm dieser Test
+    `next(k for k in zeilen[0] if k.startswith("Kosten über"))` - also die
+    ERSTE solche Spalte in Spaltenreihenfolge. Seit z3 gibt es ZWEI:
+      * "Kosten über 24 Monate EUR (eigener Zeitraum)" - gefuellt nur
+        dort, wo der eigene Zeitraum wirklich 24 ist (763 von 837),
+        sonst eine benannte Luecke (74). Diese Spalte ist stimmig.
+      * "Kosten über 24 Monate EUR" - fuer JEDE der 837 Zeilen gefuellt,
+        auch fuer die 74 mit eigenem Zeitraum 36. z3 hat sie wortgleich
+        stehen gelassen, weil `test_geraete_tco_csv_gegen_die_eigene_
+        rechnung` sie als Fremdschluessel liest.
+    Weil die neue Spalte in der Reihenfolge davor stand, pruefte `next()`
+    ab z3 nur noch die stimmige und meldete 0 Widersprueche - waehrend
+    dieselbe Datei 74 trug. Ein Lookup, der an der Spaltenreihenfolge
+    haengt und am Fehler vorbeigreift, ist kein Nachweis; deshalb pruefen
+    wir jetzt JEDE solche Spalte.
+
+    SEIT DEM 22.09.2026 (Lead) gibt es die widersprechende Spalte nicht
+    mehr. Der Export legt jede Summe in den Kopf, der fuer sie WAHR ist:
+    "Kosten über 24 Monate EUR" nur bei Zeitraum 24 (763 von 837),
+    "Kosten über die Bündellaufzeit EUR" bei jedem anderen (74), daneben
+    "Leitzahl-Zeitraum Monate". Der Sonderzweig, der den bekannten
+    Widerspruch als exakte Gleichheit festhielt, ist damit entfallen -
+    genau so, wie er es selbst vorgesehen hatte.
+
+    ZWEI RICHTUNGEN, weil eine allein billig zu erfuellen waere:
+      * Kein Kopf, der eine Monatszahl nennt, traegt eine Zahl mit
+        anderem Zeitraum.
+      * Keine Zeile verliert dabei ihren Wert, und keine traegt ihn unter
+        zwei Koepfen. Ohne das waere der erste Punkt auch mit einem
+        Export gruen, der die 74 Zahlen einfach weglaesst.
+
+    WAS ZU TUN IST, WENN DIESER TEST FAELLT: Es ist ein Fehler im Export,
+    kein Anker, der nachgezogen werden muss. Die Meldung nennt Anbieter
+    und Zeitraum der betroffenen Zeilen.
     """
     zeilen = list(_gw_csv.DictReader(
         gw_seite["csv"].read_text(encoding="utf-8-sig").splitlines(),
         delimiter=";"))
     assert zeilen, "geraete-tco.csv ist leer - Lookup greift nicht"
-    kopf = next(k for k in zeilen[0] if k.startswith("Kosten über"))
-    kopf_monate = int(re.search(r"(\d+)", kopf).group(1))
-    fremd = [(z["Anbieter"], z["Leitzahl-Zeitraum Monate"], z[kopf])
-             for z in zeilen
-             if (z["Leitzahl-Zeitraum Monate"] or "").strip()
-             and int(z["Leitzahl-Zeitraum Monate"]) != kopf_monate
-             and (z[kopf] or "").strip()]
-    assert not fremd, (
-        f"{len(fremd)} Zeilen tragen ihre Summe unter dem Kopf {kopf!r}, "
-        f"obwohl ihre eigene Zeitraum-Spalte einen anderen Wert nennt: "
-        f"{fremd[:4]}")
+    spalten = [k for k in zeilen[0] if k.startswith("Kosten über")]
+    assert spalten, (
+        f"keine 'Kosten über'-Spalte in {sorted(zeilen[0])} - der Lookup "
+        "greift ins Leere und dieser Test wuerde sonst gruen nichts "
+        "pruefen")
+    assert _PZ_CSV_ZEITRAUM in zeilen[0], (
+        f"Spalte {_PZ_CSV_ZEITRAUM!r} fehlt - ohne den Zeitraum JE ZEILE "
+        "ist kein Widerspruch zum Kopf messbar")
+
+    # Gegenprobe: ohne Zeile mit fremdem Zeitraum kann kein Kopf
+    # widersprechen, und alles darunter waere gruen ohne Aussage.
+    fremde_zeilen = [z for z in zeilen
+                     if (z[_PZ_CSV_ZEITRAUM] or "").strip()
+                     and int(z[_PZ_CSV_ZEITRAUM]) != _GW_HORIZONT]
+    assert fremde_zeilen, (
+        f"keine der {len(zeilen)} Zeilen traegt einen Zeitraum ungleich "
+        f"{_GW_HORIZONT}; am 22.09.2026 waren es 74 von 837 (1&1, "
+        "Buendelbetrag ueber 36 Monate). Ohne sie prueft dieser Test "
+        "nichts - Anker mit Begruendung neu setzen, nicht aufweichen")
+
+    # Ein Kopf, der eine MONATSZAHL nennt, behauptet einen Zeitraum und
+    # kann ihm widersprechen. Ein Kopf, der keine nennt ("Kosten über die
+    # Bündellaufzeit EUR"), behauptet keinen festen Zeitraum - bei ihm
+    # steht der Zeitraum in der Zeile, und es gibt nichts zu widerlegen.
+    # Diese Unterscheidung ist die Loesung des Befunds, nicht seine
+    # Umgehung: dass jede Zeile IHREN Wert behaelt, prueft die
+    # Gegenrichtung unten.
+    mit_zahl_im_kopf = [k for k in spalten if re.search(r"\d", k)]
+    assert mit_zahl_im_kopf, (
+        f"keine 'Kosten über'-Spalte nennt eine Monatszahl ({spalten}) - "
+        "dann prueft die Schleife nichts; Anker mit Begruendung neu setzen")
+    for kopf in mit_zahl_im_kopf:
+        kopf_monate = int(re.search(r"(\d+)", kopf).group(1))
+        fremd = [(z["Anbieter"], z[_PZ_CSV_ZEITRAUM], z[kopf])
+                 for z in zeilen
+                 if (z[_PZ_CSV_ZEITRAUM] or "").strip()
+                 and int(z[_PZ_CSV_ZEITRAUM]) != kopf_monate
+                 and (z[kopf] or "").strip()]
+        assert not fremd, (
+            f"{len(fremd)} Zeilen tragen ihre Summe unter dem Kopf "
+            f"{kopf!r}, obwohl ihre eigene Zeitraum-Spalte einen anderen "
+            f"Wert nennt: {fremd[:4]}")
+
+    # Die andere Haelfte: kein Kopf luegen zu lassen ist billig, wenn man
+    # die Zahl einfach weglaesst. Jede Zeile mit einem gemessenen Zeitraum
+    # traegt ihre Summe in GENAU EINER der Spalten - nie in keiner.
+    stumm = [(z["Anbieter"], z[_PZ_CSV_ZEITRAUM]) for z in zeilen
+             if (z[_PZ_CSV_ZEITRAUM] or "").strip()
+             and not any((z[k] or "").strip() for k in spalten)]
+    assert not stumm, (
+        f"{len(stumm)} Zeilen tragen einen Zeitraum, aber in keiner "
+        f"'Kosten über'-Spalte eine Zahl: {stumm[:4]}")
+    doppelt = [(z["Anbieter"], z[_PZ_CSV_ZEITRAUM]) for z in zeilen
+               if sum(1 for k in spalten if (z[k] or "").strip()) > 1]
+    assert not doppelt, (
+        f"{len(doppelt)} Zeilen tragen dieselbe Summe unter zwei Koepfen "
+        f"mit verschiedenem Zeitraum: {doppelt[:4]}")

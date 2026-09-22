@@ -27,6 +27,8 @@ import pytest
 from bs4 import BeautifulSoup
 
 from telco_radar.report.html import render_site
+from telco_radar.report.geraete_export import (SPALTE_UEBER_24,
+                                               SPALTE_UEBER_LAUFZEIT)
 from telco_radar.tco_model import TCO_HORIZONT as _O4_HORIZONT
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
@@ -56,13 +58,22 @@ WURZEL = pathlib.Path(__file__).resolve().parents[1]
 # `TCO_HORIZONT` (24) ist - fuer die 1&1-Zeilen bleibt sie leer, statt
 # unter einem 24-Monats-Kopf zu stehen. Der alte Kopf ("Kosten über 24
 # Monate EUR") bleibt unveraendert, wortgleich und weiter voll befuellt.
+# P0-B (22.09.2026): die Leitzahl steht in EINER von ZWEI Spalten - unter
+# "Kosten über 24 Monate EUR", wenn ihr Zeitraum 24 Monate ist, sonst unter
+# "Kosten über die Bündellaufzeit EUR". Kein Test schreibt einen der beiden
+# Namen ab (Clean Code 7): die Namen kommen aus dem Modul, das sie schreibt,
+# und gelesen wird ueber DIESEN einen Weg.
+def _o4_leitzahl(zeile, idx):
+    return (zeile[idx[SPALTE_UEBER_24]]
+            or zeile[idx[SPALTE_UEBER_LAUFZEIT]])
+
+
 SPALTEN_TCO = [
     "Art", "Modell", "Speicher GB", "Anbieter", "Anbietertyp", "Tarif",
     "Band", "Zustand", "Zuzahlung EUR", "Tarif/Monat EUR", "Geräterate EUR",
     "Bündel/Monat EUR", "Laufzeit Monate", "Anschlusspreis EUR",
     "Leitzahl-Zeitraum Monate",
-    f"Kosten über {_O4_HORIZONT} Monate EUR (eigener Zeitraum)",
-    "Kosten über 24 Monate EUR", "Abgerufen am",
+    SPALTE_UEBER_24, SPALTE_UEBER_LAUFZEIT, "Abgerufen am",
     "Quelle", "SKU-ID",
 ]
 
@@ -142,8 +153,8 @@ def test_jede_zeile_hat_alle_spalten(tco_csv):
 def test_preise_tragen_ein_dezimalkomma(tco_csv):
     kopf, zeilen = tco_csv
     idx = {name: i for i, name in enumerate(kopf)}
-    werte = [z[idx["Kosten über 24 Monate EUR"]] for z in zeilen
-             if z[idx["Kosten über 24 Monate EUR"]]]
+    werte = [_o4_leitzahl(z, idx) for z in zeilen
+             if _o4_leitzahl(z, idx)]
     assert werte, "keine einzige Leitzahl in der Datei"
     for w in werte:
         assert re.fullmatch(r"-?\d+,\d{2}", w), w
@@ -164,7 +175,7 @@ def test_die_leitzahl_zeitraum_spalte_ist_die_von_tco_24(tco_csv):
     kopf, zeilen = tco_csv
     idx = {name: i for i, name in enumerate(kopf)}
     buendel = [z for z in zeilen if z[0] == "Bündel"
-               and z[idx["Kosten über 24 Monate EUR"]]]
+               and _o4_leitzahl(z, idx)]
     assert buendel, "keine belastbare Bündel-Zeile im Export"
 
     mit_buendelpreis = [z for z in buendel if z[idx["Bündel/Monat EUR"]]]
@@ -197,7 +208,7 @@ def test_die_sim_only_leitzahl_traegt_immer_den_horizont(tco_csv):
     kopf, zeilen = tco_csv
     idx = {name: i for i, name in enumerate(kopf)}
     sim = [z for z in zeilen if z[0] == "SIM-only"
-           and z[idx["Kosten über 24 Monate EUR"]]]
+           and _o4_leitzahl(z, idx)]
     assert sim, "keine SIM-only-Zeile mit Leitzahl im Export"
     for z in sim:
         assert z[idx["Leitzahl-Zeitraum Monate"]] == str(TCO_HORIZONT), z
@@ -272,7 +283,7 @@ def test_die_tco24_einer_zeile_ist_gerechnet_nach_geraten(tco_csv, store):
     kopf, zeilen = tco_csv
     idx = {name: i for i, name in enumerate(kopf)}
     probe = next(z for z in zeilen
-                 if z[0] == "Bündel" and z[idx["Kosten über 24 Monate EUR"]])
+                 if z[0] == "Bündel" and _o4_leitzahl(z, idx))
 
     def _zahl(zelle: str):
         return (float(zelle.replace(".", "").replace(",", "."))
@@ -307,7 +318,7 @@ def test_die_tco24_einer_zeile_ist_gerechnet_nach_geraten(tco_csv, store):
         werte.add(erg.gesamt)
     assert len(werte) == 1, (
         f"Kandidaten der Stichprobe rechnen verschiedene TCO: {werte}")
-    assert float(probe[idx["Kosten über 24 Monate EUR"]].replace(".", "")
+    assert float(_o4_leitzahl(probe, idx).replace(".", "")
                  .replace(",", ".")) == pytest.approx(
         werte.pop(), abs=0.005), (
         f"Leitzahl der Stichprobe {probe} stimmt nicht mit tco_24() überein")
@@ -367,7 +378,7 @@ def test_die_tco24_einer_simonly_zeile_ist_gerechnet_nach_geraten(
         werte.add(erg.gesamt)
     assert len(werte) == 1, (
         f"Kandidaten der Stichprobe rechnen verschiedene TCO: {werte}")
-    assert float(probe[idx["Kosten über 24 Monate EUR"]].replace(".", "")
+    assert float(_o4_leitzahl(probe, idx).replace(".", "")
                  .replace(",", ".")) == pytest.approx(
         werte.pop(), abs=0.005), (
         f"Leitzahl der SIM-only-Stichprobe {probe} stimmt nicht mit "
@@ -432,7 +443,7 @@ def test_zwei_farbvarianten_bleiben_zwei_zeilen():
     # 39,99 EUR/Monat * 24 + 29,99 EUR Anschlusspreis = 989,75 EUR
     # (die alte Exportzahl ohne Anschlusspreis: 959,76 EUR).
     sim = next(z for z in zeilen if z[0] == "SIM-only")
-    assert sim[idx["Kosten über 24 Monate EUR"]] == "989,75", sim
+    assert _o4_leitzahl(sim, idx) == "989,75", sim
     assert sim[idx["SKU-ID"]] == "", sim
 
 
@@ -715,31 +726,58 @@ def test_der_radar_wird_durch_den_export_nicht_hoeher(radar):
 # Stand rot wird."
 # ==========================================================================
 
-def test_z3_befund1_neue_spalte_nennt_nur_ihren_eigenen_zeitraum(tco_csv):
-    """Befund 1 (HOCH): die neue Spalte VOR "Kosten über 24 Monate EUR"
-    traegt eine Zahl NUR, wenn "Leitzahl-Zeitraum Monate" derselben Zeile
-    auch wirklich 24 ist. Gegen den ALTEN Stand rot: die Spalte gab es
-    nicht, ein KeyError haette den Test sofort abgebrochen."""
+def test_jeder_kopf_traegt_nur_zahlen_die_er_richtig_beschreibt(tco_csv):
+    """P0-B (22.09.2026): zwei Koepfe, ein Wert - und keine stumme Zeile.
+
+    Der Befund war ein Kopf, der log: "Kosten über 24 Monate EUR" stand
+    fest ueber JEDER Zeile, auch ueber den 74 Buendeln mit kombiniertem
+    Monatsbetrag (1&1), deren Summe 36 Monate traegt. Der erste
+    Behebungsversuch (h4) stellte den Zeitraum nur DANEBEN; der zweite
+    (z3) baute eine zweite Wertspalte "Kosten über 24 Monate EUR (eigener
+    Zeitraum)" - ein Name, der sich selbst widerspricht - und liess sie
+    fuer genau diese 74 Zeilen LEER, waehrend der alte Kopf den
+    36-Monats-Betrag weitertrug.
+
+    Jetzt gilt: eine Zahl steht unter dem Kopf, der sie richtig
+    beschreibt, und jede Zeile mit einer Leitzahl hat GENAU EINEN der
+    beiden gefuellt. Das sind drei Zusicherungen, und jede kann fallen:
+    keine falsch beschriftete Zahl, keine stumme Zeile, kein
+    Doppeleintrag.
+    """
     kopf, zeilen = tco_csv
-    neue_spalte = f"Kosten über {_O4_HORIZONT} Monate EUR (eigener Zeitraum)"
-    assert neue_spalte in kopf, kopf
     idx = {name: i for i, name in enumerate(kopf)}
-    fremd = [z for z in zeilen
-             if z[idx["Leitzahl-Zeitraum Monate"]]
-             and int(z[idx["Leitzahl-Zeitraum Monate"]]) != _O4_HORIZONT
-             and z[idx[neue_spalte]]]
-    assert not fremd, fremd[:4]
-    # Gegenprobe: der Lookup greift wirklich (36-Monats-Zeilen existieren
-    # im Bestand und bleiben dort leer).
-    lueckenhaft = [z for z in zeilen
-                   if z[idx["Leitzahl-Zeitraum Monate"]]
-                   and int(z[idx["Leitzahl-Zeitraum Monate"]]) != _O4_HORIZONT]
-    assert lueckenhaft, "keine 36-Monats-Zeile im Bestand - Lookup leer"
-    assert all(not z[idx[neue_spalte]] for z in lueckenhaft), lueckenhaft
-    # Der ALTE Kopf bleibt unveraendert und weiter voll befuellt (Store-
-    # Abgleich in tests/test_seiten_zahlen.py darf nicht regressieren).
-    assert all(z[idx["Kosten über 24 Monate EUR"]] for z in lueckenhaft), \
-        "der alte, schreibgeschuetzte Kopf hat eine Luecke bekommen"
+    assert SPALTE_UEBER_24 in kopf and SPALTE_UEBER_LAUFZEIT in kopf, kopf
+    zeitraum = idx["Leitzahl-Zeitraum Monate"]
+
+    mit_zahl = [z for z in zeilen if _o4_leitzahl(z, idx)]
+    assert mit_zahl, "keine einzige Leitzahl in der Datei"
+
+    # 1) Unter dem 24-Monats-Kopf steht nur, was 24 Monate traegt.
+    falsch = [z for z in mit_zahl
+              if z[idx[SPALTE_UEBER_24]]
+              and z[zeitraum] and int(z[zeitraum]) != _O4_HORIZONT]
+    assert not falsch, falsch[:4]
+
+    # 2) Und umgekehrt: was 24 Monate traegt, steht nicht in der
+    #    Laufzeitspalte. Ohne diese Haelfte waere Punkt 1 auch mit einer
+    #    Datei gruen, die ALLES in die Laufzeitspalte schreibt.
+    verrutscht = [z for z in mit_zahl
+                  if z[idx[SPALTE_UEBER_LAUFZEIT]]
+                  and z[zeitraum] and int(z[zeitraum]) == _O4_HORIZONT]
+    assert not verrutscht, verrutscht[:4]
+
+    # 3) Genau EINER der zwei Koepfe ist gefuellt - nie beide, nie keiner.
+    doppelt = [z for z in mit_zahl
+               if z[idx[SPALTE_UEBER_24]] and z[idx[SPALTE_UEBER_LAUFZEIT]]]
+    assert not doppelt, doppelt[:4]
+
+    # Gegenprobe, dass der Lookup nicht ins Leere greift: die Fixture
+    # traegt beide Faelle wirklich.
+    zeitraeume = {int(z[zeitraum]) for z in mit_zahl if z[zeitraum]}
+    assert _O4_HORIZONT in zeitraeume, zeitraeume
+    assert zeitraeume - {_O4_HORIZONT}, (
+        "keine Zeile mit abweichendem Zeitraum - der Test prueft dann nur "
+        "die halbe Aussage")
 
 
 def test_z3_befund2_die_art_behauptet_keinen_zeitraum(radar_csv):
