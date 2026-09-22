@@ -26,6 +26,8 @@ from pathlib import Path
 import pytest
 from bs4 import BeautifulSoup
 
+from telco_radar.report.geraete_export import (
+    SPALTE_UEBER_24, SPALTE_UEBER_LAUFZEIT, leitzahl_aus_zeile)
 from telco_radar.report.html import render_site
 
 
@@ -2837,6 +2839,14 @@ def gw_seite(tmp_path_factory) -> dict:
         "geraete": (site / "geraete.html").read_text(encoding="utf-8"),
         "fragment": (site / "data" / "geraete-zeitreihe.html")
         .read_text(encoding="utf-8"),
+        # P0-B-Pruefung (21.09.2026): die Buendelliste JE MODELL liegt
+        # nicht in geraete.html, sondern in diesem Nachladefragment - nur
+        # das Startmodell steht inline. Wer nur geraete.html liest, prueft
+        # 12 von 375 Buendeln und haelt das fuer die Seite. Die zwei
+        # Dokumente bleiben GETRENNT: aneinandergehaengt fielen die
+        # Inline-Buendel des Startmodells in den letzten Lager-Block.
+        "buendel": (site / "data" / "geraete-buendel.html")
+        .read_text(encoding="utf-8"),
         "csv": site / "exporte" / "geraete-tco.csv",
         "stand": json.loads((_GW_WURZEL / "data" / "state" / "geraete_tco.json")
                             .read_text(encoding="utf-8"))["updated"],
@@ -3138,7 +3148,7 @@ def test_geraete_tco_csv_gegen_die_eigene_rechnung(gw_seite):
             soll = (zu or 0) + tarif * 24 + rate * int(lz) + (anschluss or 0)
         else:
             soll = None                  # Luecke in der Zeile selbst
-        ist = _n(r["Kosten über 24 Monate EUR"])
+        ist = _n(leitzahl_aus_zeile(r))
         if soll is None or ist is None:
             continue
         geprueft += 1
@@ -3165,7 +3175,7 @@ def test_geraete_tco_csv_gegen_die_eigene_rechnung(gw_seite):
     assert pflicht, "Pflichtfall fehlt im Export (Stand " \
                     f"{gw_seite['stand']})"
     for zeile in pflicht:
-        _gw_vergleiche(_n(zeile["Kosten über 24 Monate EUR"]),
+        _gw_vergleiche(_n(leitzahl_aus_zeile(zeile)),
                        _soll, "Pflichtfall im CSV-Export")
 
     # Store-Abgleich: jedes heute gemessene Bündel steht mit seinen Posten
@@ -3175,7 +3185,7 @@ def test_geraete_tco_csv_gegen_die_eigene_rechnung(gw_seite):
                      r["Zuzahlung EUR"], r["Tarif/Monat EUR"],
                      r["Geräterate EUR"], r["Bündel/Monat EUR"],
                      r["Anschlusspreis EUR"],
-                     r["Kosten über 24 Monate EUR"]): r for r in zeilen}
+                     leitzahl_aus_zeile(r)): r for r in zeilen}
     treffer = 0
     for b in tco["buendel"]:
         if b.get("abgerufen_am") != gw_seite["stand"] \
@@ -3248,7 +3258,7 @@ def test_geraete_tco_csv_simonly_mit_anschlusspreis(gw_seite):
     abweich, geprueft, mit_anschluss = [], 0, 0
     for r in zeilen:
         tarif, ist = _z(r["Tarif/Monat EUR"]), _z(
-            r["Kosten über 24 Monate EUR"])
+            leitzahl_aus_zeile(r))
         anschluss = _z(r["Anschlusspreis EUR"])
         if tarif is None or ist is None:
             continue                     # Lücke in der Zeile selbst
@@ -3299,3 +3309,1419 @@ def test_mutation_eines_euros_am_pflichtfall_schlaegt_aus(gw_seite):
             _gw_vergleiche(_gw_Dez(mutation), soll_cent, "Mutation")
     # Gegenprobe: unverändert schlägt der Vergleich NICHT an.
     _gw_vergleiche(antwort["gesamt"], soll_cent, "Gegenprobe unverändert")
+
+
+# ==========================================================================
+# PRUEFER P0-B (21.09.2026): DIE ZWEITE RECHNUNG FUER DIE RATENLAUFZEIT
+# ==========================================================================
+# Geschrieben vom PRUEFER, nicht vom Bauer. Alles hier liest nur
+# `data/state/geraete_tco_historie.jsonl`, `geraete_tco.json` und
+# `tarife.jsonl` und rechnet selbst in Cent (decimal, HALF_UP) - kein
+# `telco_radar.tco_model`, kein `geraete_tco_karten`, kein `geraete_view`.
+#
+# Soll-Definition (CLAUDE.md, Abschnitt "Geraeteseite: Leitzahl"):
+#   Kosten ueber 24 Monate = Anzahlung
+#                          + 24 Monate Tarif
+#                          + ALLE Geraeteraten der eigenen Laufzeit,
+#                            einschliesslich der Restschuld nach Monat 24
+#                          + Anschlusspreis
+#   Buendelform (ein Monatsbetrag fuer Tarif und Geraet zusammen, 1&1):
+#   Anzahlung + Laufzeit x Buendelbetrag + Anschlusspreis.
+#
+# Warum gegen die HISTORIE und nicht gegen den Stand: die Seite zeichnet
+# ihre Zeitreihe aus der Historie, und nur dort steht je Messtag, welche
+# Ratenlaufzeit an dem Tag gemessen wurde. Das Feld `gesamt` der Historie
+# wird hier ABSICHTLICH NICHT gelesen - es traegt am Bestand vom
+# 20.09.2026 noch die alte, bei Monat 24 gekappte Rechnung (congstar
+# Allnet Flat XS zum iPhone 17 Pro: 1093,00 gespeichert gegen 1459,00 als
+# Leitzahl). Gelesen werden nur die POSTEN.
+#
+# Jeder Lookup ist scharf: findet er nichts, ist das ein AssertionError,
+# kein stilles Weiterlaufen. `_PF_MINDESTFAELLE` haelt zusaetzlich fest,
+# wie viele Faelle wirklich durchgerechnet wurden.
+
+_PF_MODELL_RE = re.compile(r"^(?P<basis>.+)-(?P<gb>\d+)gb(?:-.*)?$")
+_PF_LAGER_RE = re.compile(r'<div class="gr-bnd-lager" data-modell="')
+_PF_DETAIL_RE = re.compile(r'<details class="gr-bnd"(.*?)</details>', re.S)
+_PF_ATTR_RE = re.compile(r'data-([a-z]+)="([^"]*)"')
+_PF_TARIF_RE = re.compile(r'gr-bnd-tarif">(.*?)</span>', re.S)
+_PF_BAU_RE = re.compile(r'gr-kk-bau">(.*?)</p>', re.S)
+_PF_RATEN_RE = re.compile(r"in (\d+) Raten")
+_PF_BMONATE_RE = re.compile(r"zusammen · (\d+) Monate")
+
+# Die vier Leitgeraete des Pruefauftrags, je Anbieter ein Buendel. Die
+# Sollwerte stehen NICHT hier - sie werden unten aus den Rohdaten
+# gerechnet; hier stehen nur die Zeilen, die auf der Seite gesucht werden.
+_PF_FAELLE = (
+    ("apple-iphone-17-pro-256", "congstar", "Allnet Flat XS"),
+    ("apple-iphone-17-pro-256", "Vodafone", "Mobil XS"),
+    ("apple-iphone-17-256", "Vodafone", "Mobil XS"),
+    ("apple-iphone-17-256", "Vodafone", "Mobil M"),
+    ("apple-iphone-17-256", "1&1", "1&1 All-Net-Flat S"),
+    ("samsung-galaxy-s26-ultra-256", "congstar", "Allnet Flat S"),
+    ("samsung-galaxy-s26-ultra-256", "Vodafone", "Mobil S"),
+    ("samsung-galaxy-s26-ultra-256", "o2",
+     "O2 Mobile Unlimited M Plus mit 100 MBit/s (24 Mon.)"),
+    ("google-pixel-10-pro-128", "Vodafone", "Mobil XS"),
+    ("google-pixel-10-pro-128", "o2",
+     "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)"),
+)
+_PF_MINDESTFAELLE = len(_PF_FAELLE)
+
+
+def _pf_modell(sku_id: str) -> str:
+    """`apple-iphone-17-pro-256gb-silber` -> `apple-iphone-17-pro-256`.
+
+    Dieselbe Form, die die Seite als `data-modell` traegt - eigenstaendig
+    aus der SKU gebildet, nicht aus `geraete_model` importiert."""
+    treffer = _PF_MODELL_RE.match(sku_id or "")
+    if treffer is None:
+        return ""
+    return f"{treffer.group('basis')}-{treffer.group('gb')}"
+
+
+def _pf_historie() -> list[dict]:
+    """Alle Zeilen der TCO-Historie - nur lesend, keine Umschreibung."""
+    pfad = _GW_WURZEL / "data" / "state" / "geraete_tco_historie.jsonl"
+    zeilen = [json.loads(z) for z in
+              pfad.read_text(encoding="utf-8").splitlines() if z.strip()]
+    assert len(zeilen) >= 3000, (
+        f"nur {len(zeilen)} Historienzeilen gelesen - der Bestand ist "
+        "kleiner als am 21.09.2026 (3854), der Test greift nicht mehr")
+    return zeilen
+
+
+def _pf_anbieter_segment(satz_id: str) -> str:
+    """Das Anbietersegment einer Buendel-ID (`buendel--o2--...`)."""
+    teile = (satz_id or "").split("--")
+    return teile[1] if len(teile) > 2 else ""
+
+
+def _pf_letzte_messung(historie: list[dict], modell: str, anbieter_slug: str,
+                       tarif_teil: str) -> dict:
+    """Die JUENGSTE Historienzeile zu (Modell, Anbieter, Tarifsegment).
+
+    Der Tarif steckt im letzten ID-Segment, nicht in einem eigenen Feld -
+    verglichen wird deshalb auf dem ID-Segment. Mehrere Farben rechnen
+    gleich; genommen wird die juengste Messung, bei Gleichstand die mit
+    der lexikalisch kleinsten ID (stabil, nie zufaellig)."""
+    treffer = []
+    for satz in historie:
+        satz_id = satz.get("id") or ""
+        teile = satz_id.split("--")
+        if len(teile) < 4:
+            continue
+        if _pf_anbieter_segment(satz_id) != anbieter_slug:
+            continue
+        if _pf_modell(teile[2]) != modell:
+            continue
+        if teile[3] != tarif_teil:
+            continue
+        treffer.append(satz)
+    assert treffer, (
+        "kein Messpunkt in der Historie fuer "
+        f"{anbieter_slug}/{tarif_teil} zu {modell} - der Lookup greift ins "
+        "Leere und dieser Test wuerde sonst gruen nichts pruefen")
+    return sorted(treffer, key=lambda s: (s.get("datum", ""),
+                                          s.get("id", "")))[-1]
+
+
+def _pf_leitzahl_cent(satz: dict) -> int:
+    """Die Soll-Leitzahl in Cent - EIGENE Rechnung aus den Posten.
+
+    Rundung: jeder Posten wird einzeln auf ganze Cent gebracht (HALF_UP),
+    dann summiert. Multiplikation nach der Rundung, weil die Quellen
+    Monatsbetraege in Cent nennen - eine Rate von 30,50 EUR ist 3050
+    Cent, nicht 30,4999.
+
+    Eine Luecke ist eine Luecke: fehlt ein Posten, wirft diese Funktion.
+    Keine 0, kein `or`-Vorgabewert (CLAUDE.md Clean Code 3)."""
+    for feld in ("geraet_zuzahlung", "anschlusspreis", "laufzeit_monate"):
+        assert satz.get(feld) is not None, (
+            f"Posten {feld} fehlt in {satz.get('id')} - eine Leitzahl "
+            "daraus waere geraten")
+    laufzeit = int(satz["laufzeit_monate"])
+    zuzahlung = _gw_cent(satz["geraet_zuzahlung"])
+    anschluss = _gw_cent(satz["anschlusspreis"])
+    buendelbetrag = satz.get("buendel_monatlich")
+    rate = satz.get("geraet_monatsrate")
+    tarif = satz.get("tarif_monatlich")
+    if buendelbetrag is not None:
+        assert tarif is None and rate is None, (
+            f"{satz.get('id')} traegt Buendelbetrag UND getrennte Posten - "
+            "welcher gilt, ist dann eine Meinung")
+        return (zuzahlung + _gw_cent(buendelbetrag) * laufzeit + anschluss)
+    assert tarif is not None and rate is not None, (
+        f"{satz.get('id')} hat weder Buendelbetrag noch Tarif+Rate")
+    return (zuzahlung + _gw_cent(tarif) * _GW_HORIZONT
+            + _gw_cent(rate) * laufzeit + anschluss)
+
+
+def _pf_seitenzeilen(fragment: str, geraete_html: str = "") -> dict:
+    """{modell: [{anbieter, tarif, gesamt_cent, laufzeit_raten, ...}]}
+
+    Gelesen wird das GERENDERTE HTML, nie ein Python-Objekt. Die
+    Buendelliste steht je Modell in einem `gr-bnd-lager`-Block des
+    Nachladefragments; das STARTMODELL bringt keinen Lager-Block mit -
+    seine zwoelf Zeilen stehen inline in geraete.html, und seine Modell-ID
+    steht dort als `vorgabe` im JSON-Block `gr-zeitreihe-daten`. Ohne
+    diesen Zweig fehlt genau das Geraet, das die Seite zuerst zeigt."""
+    zeilen: dict = {}
+    for block in _PF_LAGER_RE.split(fragment)[1:]:
+        modell = block[:block.index('"')]
+        zeilen.setdefault(modell, []).extend(_pf_zeilen_aus_block(block))
+    if not geraete_html:
+        return zeilen
+    daten = re.search(
+        r'<script type="application/json" id="gr-zeitreihe-daten">(.*?)'
+        r"</script>", geraete_html, re.S)
+    assert daten is not None, (
+        "geraete.html ohne JSON-Block gr-zeitreihe-daten - die Modell-ID "
+        "der Startansicht ist damit nicht bestimmbar")
+    start = json.loads(daten.group(1)).get("vorgabe") or ""
+    assert start, "kein `vorgabe`-Modell im JSON-Block der Startansicht"
+    inline = _pf_zeilen_aus_block(geraete_html)
+    assert inline, (
+        f"die Startansicht ({start}) rendert keine einzige Buendelzeile - "
+        "der Lookup greift ins Leere")
+    zeilen.setdefault(start, []).extend(inline)
+    return zeilen
+
+
+def _pf_zeilen_aus_block(block: str) -> list:
+    out = []
+    for roh in _PF_DETAIL_RE.findall(block):
+        attr = dict(_PF_ATTR_RE.findall(roh))
+        if "gesamt" not in attr or not attr["gesamt"]:
+            continue
+        tarif = _PF_TARIF_RE.search(roh)
+        bau = _PF_BAU_RE.search(roh)
+        text = " ".join(_gw_text(bau.group(1)).split()) if bau else ""
+        raten = _PF_RATEN_RE.search(text) or _PF_BMONATE_RE.search(text)
+        out.append({
+            "anbieter": _gw_text(attr.get("anbieter", "")),
+            "zustand": attr.get("zustand", ""),
+            "tarif": " ".join(_gw_text(
+                tarif.group(1)).split()).split(" · ")[0] if tarif else "",
+            "gesamt_cent": _gw_cent(attr["gesamt"]),
+            "laufzeit_raten": int(raten.group(1)) if raten else None,
+            "bau": text,
+        })
+    return out
+
+
+def _gw_text(roh: str) -> str:
+    """HTML-Fragment -> Text (Tags weg, Entities aufgeloest)."""
+    import html as _h
+    return _h.unescape(re.sub(r"<[^>]+>", " ", roh))
+
+
+def test_pf_leitzahl_von_zehn_buendeln_gegen_die_historie(gw_seite):
+    """Die zweite Rechnung: zehn Leitzahlen der gerenderten Seite gegen
+    eine EIGENE Cent-Rechnung aus `geraete_tco_historie.jsonl`.
+
+    Vier Geraete (iPhone 17 Pro 256, iPhone 17 256, Galaxy S26 Ultra 256,
+    Pixel 10 Pro 128) x je Anbieter ein Buendel. Gerechnet wird
+    Anzahlung + 24 x Tarif + Laufzeit x Rate + Anschlusspreis, bei 1&1
+    Anzahlung + Laufzeit x Buendelbetrag + Anschlusspreis.
+
+    Greift ein Lookup ins Leere (Modell nicht gerendert, Tarif nicht in
+    der Historie), ist das rot - nicht uebersprungen."""
+    historie = _pf_historie()
+    seite = _pf_seitenzeilen(gw_seite["buendel"], gw_seite["geraete"])
+    assert seite, "kein einziger Buendelblock im gerenderten HTML"
+
+    # Anbietername der Seite -> Anbietersegment der Buendel-ID.
+    slug = {"congstar": "congstar", "Vodafone": "vodafone", "o2": "o2",
+            "Telekom": "telekom", "1&1": "1-1"}
+    geprueft = []
+    for modell, anbieter, tarif in _PF_FAELLE:
+        kandidaten = [z for z in seite.get(modell, [])
+                      if z["anbieter"] == anbieter and z["tarif"] == tarif
+                      and z["zustand"] == "neu"]
+        assert kandidaten, (
+            f"Die Seite fuehrt kein neu-Buendel {anbieter}/{tarif} zu "
+            f"{modell} - Lookup ins Leere, der Test prueft sonst nichts")
+        satz = _pf_letzte_messung(
+            historie, modell, slug[anbieter],
+            # Das Tarifsegment der ID ist der normalisierte Tarifname.
+            re.sub(r"[^a-z0-9]+", "-", tarif.lower()).strip("-"))
+        soll = _pf_leitzahl_cent(satz)
+        ist = min(z["gesamt_cent"] for z in kandidaten)
+        assert ist == soll, (
+            f"{modell} / {anbieter} / {tarif}: Seite zeigt "
+            f"{ist / 100:.2f} EUR, die eigene Rechnung aus "
+            f"{satz['id']} (Messung {satz['datum']}, Laufzeit "
+            f"{satz['laufzeit_monate']} Monate) ergibt {soll / 100:.2f} EUR")
+        # Mutationsprobe: ein Euro daneben MUSS auffallen.
+        assert ist + 100 != soll and ist - 100 != soll
+        geprueft.append((modell, anbieter, tarif))
+
+    assert len(geprueft) >= _PF_MINDESTFAELLE, (
+        f"nur {len(geprueft)} von {_PF_MINDESTFAELLE} Faellen "
+        "nachgerechnet - der Test greift nicht mehr")
+
+
+def test_pf_die_gezeigte_ratenlaufzeit_ist_eine_gemessene(gw_seite):
+    """Jede Laufzeit im Rechenweg der Seite muss im Bestand stehen.
+
+    Die Seite schreibt "1.098,00 EUR in 36 Raten a 30,50 EUR". Diese 36
+    muss die GEMESSENE `laufzeit_monate` eines Buendels desselben
+    (Anbieter, Modell, Tarif, Zustand) sein - eine geratene
+    Standardlaufzeit im Rechenweg waere eine erfundene Aussage
+    (CLAUDE.md Clean Code 3/4).
+
+    Gegenprobe gegen einen leeren Lauf: der Test zaehlt die gepruefte
+    Menge und wird rot, wenn sie unter den Stand vom 21.09.2026 faellt."""
+    # Geprueft wird gegen die HISTORIE, nicht gegen den Stand: Seite und
+    # Stand lesen dieselbe Datei, ein Vergleich der zwei kann per
+    # Konstruktion nicht auseinanderfallen. Die Historie ist die zweite,
+    # unabhaengig geschriebene Quelle derselben Messung.
+    historie = _pf_historie()
+    slug_zu_name = {"congstar": "congstar", "vodafone": "Vodafone",
+                    "o2": "o2", "telekom": "Telekom", "1-1": "1&1"}
+    gemessen: dict = {}
+    for satz in historie:
+        teile = (satz.get("id") or "").split("--")
+        if len(teile) < 4:
+            continue
+        anbieter = slug_zu_name.get(_pf_anbieter_segment(satz["id"]))
+        if anbieter is None:
+            continue
+        schluessel = (anbieter, _pf_modell(teile[2]), teile[3],
+                      satz.get("zustand") or "")
+        gemessen.setdefault(schluessel, set()).add(
+            satz.get("laufzeit_monate"))
+
+    seite = _pf_seitenzeilen(gw_seite["buendel"], gw_seite["geraete"])
+    geprueft, fehler, ohne_historie = 0, [], 0
+    for modell, zeilen in seite.items():
+        for z in zeilen:
+            if z["laufzeit_raten"] is None:
+                continue
+            tarifteil = re.sub(r"[^a-z0-9]+", "-",
+                               z["tarif"].lower()).strip("-")
+            treffer = gemessen.get((z["anbieter"], modell, tarifteil,
+                                    z["zustand"]))
+            if not treffer:
+                # Ein Buendel, das erst heute zum ersten Mal gesehen wurde,
+                # hat noch keine Historienzeile - das ist keine Abweichung,
+                # aber es wird gezaehlt, damit die Menge nicht still kippt.
+                ohne_historie += 1
+                continue
+            geprueft += 1
+            if z["laufzeit_raten"] not in treffer:
+                fehler.append((modell, z["anbieter"], z["tarif"],
+                               f"Seite {z['laufzeit_raten']}, in der "
+                               f"Historie {sorted(treffer)}"))
+    assert ohne_historie <= 20, (
+        f"{ohne_historie} gerenderte Buendel ohne jede Historienzeile - "
+        "die Zuordnung Seite/Historie greift nicht mehr")
+    assert geprueft >= 300, (
+        f"nur {geprueft} Rechenwege gegen die Historie gehalten - am "
+        "21.09.2026 waren es 362; der Lookup greift ins Leere")
+    assert not fehler, (
+        f"{len(fehler)} Rechenwege mit nicht gemessener Laufzeit: "
+        f"{fehler[:5]}")
+
+
+# ==========================================================================
+# Zwei Ratenlaufzeiten desselben Tarifs - zwei Tests, zwei Fragen
+# --------------------------------------------------------------------------
+# Bis zum 21.09.2026 stand hier EIN Test
+# (`test_pf_beide_ratenlaufzeiten_eines_tarifs_stehen_auf_der_seite`), der
+# beides in einem verlangte: dass der Bestand zwei Laufzeiten TRAEGT und
+# dass die Seite sie ZEIGT. Er kann nicht gruen werden, denn er misst den
+# committeten Produktionsbestand, und dort traegt keine einzige Gruppe
+# zwei Laufzeiten. Ein Orakel, das dauerhaft rot bleibt, faerbt ci.yml rot
+# und begraebt jeden WEITEREN Fehlschlag im bekannten Rot - genau die
+# Fehlerklasse, die ein Tor unbrauchbar macht. Die Aussage ist deshalb
+# aufgeteilt:
+#   1. `test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen`
+#      prueft die MECHANIK am gespeicherten echten congstar-Abruf, in dem
+#      24 und 36 Monate belegt sind - Adapter, Store, render_site.
+#   2. `test_pf_bestand_zaehlt_seine_ratenlaufzeiten_und_haelt_die_luecke_fest`
+#      prueft die BESTANDSLAGE und faellt nur bei einer Regression.
+# ==========================================================================
+import gzip as _pf_gzip
+
+_PF_MECHANIK_HEUTE = "2026-09-20"
+_PF_CS_FIXTURE = "congstar_tarifseite_allnet_flat_m.html.gz"
+_PF_CS_URL = ("https://www.congstar.de/handytarife/allnet-flat-tarife/"
+              "allnet-flat-m/")
+# Das Geraet des Abrufs, an dem beide Zahlweisen desselben Tarifs stehen.
+_PF_CS_TITEL = "Apple iPhone 17 Pro 512 GB cosmic orange"
+_PF_CS_TARIF = "Allnet Flat M"
+_PF_CS_BLATT = "congstar:allnet-flat-m"
+_PF_CS_SKU = "apple-iphone-17-pro-512gb-cosmic-orange"
+_PF_CS_MODELL = "apple-iphone-17-pro-512"
+
+
+def _pf_wegwerf_wurzel(tmp_path, buendel, blatt: dict):
+    """Ein Wegwerf-Repo (config/, data/state/, data/reports/) und der
+    gerenderte Stand darin. Weder `site/` noch `data/` des Repos werden
+    angefasst (harte Regel 1/3)."""
+    import yaml
+
+    from telco_radar.analyze.tco_store import TcoDB
+
+    (tmp_path / "config").mkdir(parents=True, exist_ok=True)
+    konfig = {
+        "geraete_katalog.yaml": {"geraete": [
+            {"hersteller": "Apple", "modell": "iPhone 17 Pro",
+             "generation": 17, "marktstart": "2025-09-19",
+             "speicher": [512], "segment": "premium"}]},
+        "farben.yaml": {"farben": {"cosmic orange": ["Cosmic Orange"]}},
+        "geraete_quellen.yaml": {"anbieter": [
+            {"name": "congstar", "typ": "discount", "netz": "Telekom",
+             "rang": 3, "methode": "congstar_next",
+             "basis_url": "https://www.congstar.de",
+             "einstiege": [{"url": _PF_CS_URL, "kind": "buendel"}]}]},
+    }
+    for name, daten in konfig.items():
+        (tmp_path / "config" / name).write_text(
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
+            encoding="utf-8")
+
+    state = tmp_path / "data" / "state"
+    state.mkdir(parents=True, exist_ok=True)
+    (state / "tarife.jsonl").write_text(
+        json.dumps(blatt, ensure_ascii=False) + "\n", encoding="utf-8")
+    (state / "geraete_preise.jsonl").write_text("", encoding="utf-8")
+    (state / "geraete_db.json").write_text(json.dumps({
+        "updated": _PF_MECHANIK_HEUTE,
+        "anbieter": {"congstar": {"laeufe": 4, "funde_gesamt": 1}},
+        "listungen": [{
+            "id": f"congstar--{_PF_CS_SKU}", "sku_id": _PF_CS_SKU,
+            "device_id": "apple-iphone-17-pro", "anbieter": "congstar",
+            "anbieter_typ": "discount", "netz": "Telekom",
+            "speicher_gb": 512, "farbe_roh": "Cosmic Orange",
+            "farbe_normalisiert": "cosmic orange", "zustand": "neu",
+            "first_seen": _PF_MECHANIK_HEUTE,
+            "last_verified": _PF_MECHANIK_HEUTE, "status": "aktiv",
+            "missed_checks": 0, "preis_ohne_vertrag": None,
+            "quelle_url": _PF_CS_URL, "abgerufen_am": _PF_MECHANIK_HEUTE,
+            "verfuegbarkeit": "lieferbar", "confidence": "hoch",
+            "einstiege": [_PF_CS_URL]}]}, ensure_ascii=False),
+        encoding="utf-8")
+
+    db = TcoDB(state / "geraete_tco.json")
+    db.upsert_buendel(buendel, _PF_MECHANIK_HEUTE)
+    assert db.save(_PF_MECHANIK_HEUTE), \
+        "der Store hat nichts geschrieben - ohne Bestand rendert nichts"
+
+    reports = tmp_path / "data" / "reports"
+    reports.mkdir(parents=True, exist_ok=True)
+    (reports / f"{_PF_MECHANIK_HEUTE}.json").write_text(json.dumps({
+        "date": _PF_MECHANIK_HEUTE, "language": "de",
+        "briefing_md": "## Auf einen Blick\n\n- Nichts Besonderes.\n",
+        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{_PF_MECHANIK_HEUTE}.md").write_text(
+        "# Bericht\n", encoding="utf-8")
+
+    site = tmp_path / "site"
+    render_site(site, reports)
+    return site
+
+
+def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
+        tmp_path):
+    """MECHANIK-GEGENPROBE: zwei Zahlweisen, zwei Zeilen, eigene Zahlen.
+
+    GEMESSEN WIRD der ganze Weg an einem GESPEICHERTEN ECHTEN ABRUF -
+    `tests/fixtures/geraete/congstar_tarifseite_allnet_flat_m.html.gz`
+    (08.09.2026, HTTP 200). Nur dieser Abruf belegt beide Laufzeiten
+    desselben Tarifs: Adapter (`congstar.lies_buendel`) -> Bestandsbezug
+    (`tco_buendel.aus_rohsaetzen` am ECHTEN Tarifblatt
+    `congstar:allnet-flat-m` aus `data/state/tarife.jsonl`, nur gelesen)
+    -> Store (`TcoDB.upsert_buendel`/`save`) -> `render_site` in einen
+    Wegwerfordner. Geprueft wird das gerenderte HTML.
+
+    Der gemessene Fall (Apple iPhone 17 Pro 512 GB, Allnet Flat M):
+      24 Raten a 50,25 EUR und 36 Raten a 33,50 EUR, je 97,00 EUR
+      Zuzahlung, Tarif 24,00 EUR, Anschlusspreis 0,00 EUR.
+    congstar finanziert zum Nulltarif - beide Zahlweisen ergeben dieselbe
+    Leitzahl (1.879,00 EUR). Unterscheidbar sind sie an Rate, Ratenzahl
+    und Restschuld: die 36er traegt nach Monat 24 noch 402,00 EUR offen
+    (12 Geraeteraten), die 24er nichts. Genau das wird geprueft, damit
+    der Test nicht auf zwei identischen Zeilen gruen wird.
+
+    NICHT GEMESSEN wird die Bestandslage: ob der Produktionsbestand
+    ueberhaupt Gruppen mit zwei Laufzeiten kennt, sagt
+    `test_pf_bestand_zaehlt_seine_ratenlaufzeiten_und_haelt_die_luecke_fest`.
+    Auch nicht gemessen: die Anbieterseiten selbst (aus dieser Umgebung
+    nicht erreichbar) und die Optik der Zeilen.
+
+    GEGEN DEN ALTEN STAND ROT - zweimal ausgefuehrt (21.09.2026, je ein
+    Wegwerf-Worktree, dieselbe Testdatei hineinkopiert):
+      - fde7f63 (vor P0-B): rot an der ersten Gegenprobe, der Adapter
+        liest nur EINE Zahlweise -
+        "belegt nicht beide Laufzeiten ...: [36]".
+      - e6ab202 (P0-B-fix1, also NACH der Adaptererweiterung und VOR dem
+        Kartenschluessel aus fix2): rot an der Seite -
+        "1 statt 2 Buendelzeilen fuer apple-iphone-17-pro-512 ...
+        gezeigte Ratenlaufzeiten: [24]". Dort entdoppelt
+        `geraete_tco_karten.modelle` je (Anbieter, Tarif,
+        `karte["laufzeit"]`, Zustand), und `karte["laufzeit"]` ist die
+        KONSTANTE `LAUFZEIT` (= `TCO_HORIZONT` = 24); von beiden
+        Zahlweisen bleibt eine Zeile uebrig.
+    Der Test faellt also an JEDER der beiden Stellen, an denen die
+    Mehrfacherfassung schon einmal kaputt war.
+    """
+    from telco_radar.analyze.tco_buendel import aus_rohsaetzen
+    from telco_radar.collect.geraete.congstar import lies_buendel
+    from telco_radar.tarif_bezug import Tarifbestand
+
+    pfad = Path(__file__).parent / "fixtures" / "geraete" / _PF_CS_FIXTURE
+    antwort = _pf_gzip.open(pfad, "rb").read().decode("utf-8", "replace")
+    rohsaetze = [s for s in lies_buendel(antwort, url=_PF_CS_URL)
+                 if s["titel"] == _PF_CS_TITEL
+                 and s["tarif_name"] == _PF_CS_TARIF]
+    # Gegenprobe am Adapter: ohne zwei Laufzeiten im ABRUF prueft der Rest
+    # nichts (die Fixture waere getauscht worden).
+    assert {s["laufzeit_monate"] for s in rohsaetze} == {24, 36}, (
+        f"der gespeicherte Abruf {_PF_CS_FIXTURE} belegt nicht beide "
+        f"Laufzeiten fuer {_PF_CS_TITEL}/{_PF_CS_TARIF}: "
+        f"{sorted(s['laufzeit_monate'] for s in rohsaetze)}")
+
+    blatt = next(
+        (json.loads(z) for z in
+         (_GW_WURZEL / "data" / "state" / "tarife.jsonl")
+         .read_text(encoding="utf-8").splitlines()
+         if z.strip() and json.loads(z).get("tarif_id") == _PF_CS_BLATT),
+        None)
+    assert blatt is not None, (
+        f"Tarifblatt {_PF_CS_BLATT} fehlt im Bestand - ohne aufloesbaren "
+        "Tarif legt der Store kein Buendel ab (benannte Luecke)")
+
+    bilanz = aus_rohsaetzen(
+        [{**s, "anbieter": "congstar", "sku_id": _PF_CS_SKU,
+          "quelle_url": s["url"]} for s in rohsaetze],
+        Tarifbestand([blatt]), _PF_MECHANIK_HEUTE)
+    assert len(bilanz.buendel) == 2, (
+        f"{len(bilanz.buendel)} statt 2 Buendel aus zwei Rohsaetzen - "
+        f"{bilanz.ohne_tarif} ohne aufloesbaren Tarif, "
+        f"haeufigste: {bilanz.offene_tarife}")
+
+    site = _pf_wegwerf_wurzel(tmp_path, bilanz.buendel, blatt)
+    seite = _pf_seitenzeilen(
+        (site / "data" / "geraete-buendel.html").read_text(encoding="utf-8"),
+        (site / "geraete.html").read_text(encoding="utf-8"))
+    zeilen = [z for z in seite.get(_PF_CS_MODELL, [])
+              if z["anbieter"] == "congstar" and z["tarif"] == _PF_CS_TARIF
+              and z["zustand"] == "neu"]
+    assert len(zeilen) == 2, (
+        f"{len(zeilen)} statt 2 Buendelzeilen fuer {_PF_CS_MODELL} - "
+        "zwei Zahlweisen desselben Tarifs ueberschreiben sich wieder; "
+        f"gezeigte Ratenlaufzeiten: "
+        f"{[z['laufzeit_raten'] for z in zeilen]}")
+
+    je_laufzeit = {z["laufzeit_raten"]: z for z in zeilen}
+    assert set(je_laufzeit) == {24, 36}, (
+        "die zwei Zeilen nennen nicht 24 und 36 Raten, sondern "
+        f"{sorted(je_laufzeit)}")
+
+    # Jede Zeile traegt IHRE Zahlen - Rate, Ratenzahl, Restschuld. Soll
+    # aus der EINEN Definition dieses Abschnitts (`_pf_leitzahl_cent`),
+    # gerechnet auf dem ROHSATZ des Adapters, nicht auf der Seite.
+    for satz in rohsaetze:
+        laufzeit = satz["laufzeit_monate"]
+        zeile = je_laufzeit[laufzeit]
+        soll = _pf_leitzahl_cent(
+            {**satz, "id": f"congstar/{laufzeit}m"})
+        _gw_vergleiche(_gw_Dez(zeile["gesamt_cent"]) / 100, soll,
+                       f"congstar {_PF_CS_TARIF}, {laufzeit} Raten")
+        # Der Betrag in der Schreibweise der Seite - aus Cent, nicht aus
+        # einer Fliesskomma-Formatierung (Geld rechnet dieser Abschnitt in
+        # ganzen Cent, siehe `_gw_cent`).
+        rate_cent = _gw_cent(satz["geraet_monatsrate"])
+        rate = f"{rate_cent // 100},{rate_cent % 100:02d}"
+        assert f"in {laufzeit} Raten à {rate} €" in zeile["bau"], (
+            f"die {laufzeit}-Monats-Zeile nennt ihre Rate nicht: "
+            f"{zeile['bau']}")
+    assert je_laufzeit[24]["gesamt_cent"] == je_laufzeit[36]["gesamt_cent"], (
+        "congstar finanziert zum Nulltarif - weichen die Leitzahlen ab, "
+        "hat sich die Rechnung geaendert und dieser Test ist neu zu "
+        f"verankern: {je_laufzeit[24]['gesamt_cent']} gegen "
+        f"{je_laufzeit[36]['gesamt_cent']}")
+
+    # Die Restschuld trennt die zwei Zeilen: 12 Raten a 33,50 EUR bleiben
+    # nach Monat 24 offen, bei 24 Raten nichts.
+    inline = (site / "geraete.html").read_text(encoding="utf-8")
+    offen = re.findall(
+        r"danach noch offen: ([\d.,]+) € \((\d+) Geräteraten\)", inline)
+    assert offen == [("402,00", "12")], (
+        "genau die 36-Monats-Zeile muss ihre Restschuld nennen (402,00 € "
+        f"aus 12 Geraeteraten), gefunden: {offen}")
+
+
+# Der Stand des Bestands am 20.09.2026 (`data/state/geraete_tco.json`,
+# `updated` 2026-09-20), gemessen und nicht geschaetzt - Grundlage der
+# Aussage unten.
+#
+# KEINE UNTERGRENZEN. Eine Untergrenze auf einer Zahl, die heute schon am
+# Boden steht, ist keine Zusicherung: `len(mehrfach) >= 0` ist fuer jede
+# Menge wahr und kann nie fallen (CLAUDE.md Regel 10 - ein Test, dessen
+# Lookup ins Leere laeuft, ist gruen und prueft nichts). Die Zahlen unten
+# sind deshalb EXAKTE ANKER: sie fallen in BEIDE Richtungen, und ein
+# Fallen ist die Meldung dieses Tests, kein Fehler (siehe Docstring).
+_PF_STAND_TAG = "2026-09-20"
+_PF_STAND_MEHRLAUFZEIT = 0        # Gruppen mit ZWEI Ratenlaufzeiten
+# Die Ratenlaufzeiten JE ANBIETER - der eigentliche Befund. Telekom, o2,
+# congstar und 1&1 tragen ausnahmslos 36 Monate; nur Vodafone kennt drei,
+# bindet sie aber je Tarifname an genau eine (Mobil S 12, Mobil M 24,
+# Mobil XS 36). Darum traegt trotz dreier Laufzeiten keine GRUPPE zwei.
+_PF_STAND_LAUFZEITEN = {
+    "1&1": [36], "Telekom": [36], "Vodafone": [12, 24, 36],
+    "congstar": [36], "o2": [36],
+}
+_PF_MINDEST_GRUPPEN = 200         # Anti-Leerlauf, nicht der Stand (507)
+
+
+def test_pf_bestand_zaehlt_seine_ratenlaufzeiten_und_haelt_die_luecke_fest():
+    """BESTANDSAUSSAGE: was der echte Bestand an Ratenlaufzeiten traegt.
+
+    Stand am 20.09.2026 (`data/state/geraete_tco.json`, `updated`
+    2026-09-20, 792 Buendel), jede Zahl gemessen:
+      - 0 von 507 Gruppen (Anbieter, Modell, Tarif, Zustand) tragen ZWEI
+        Ratenlaufzeiten; 375 dieser Gruppen sind frisch.
+      - Je Anbieter: 1&1 nur 36 (74 Buendel), Telekom nur 36 (45),
+        congstar nur 36 (128), o2 nur 36 (72), Vodafone 12 (160), 24
+        (157) und 36 (156).
+      - Vodafone bindet die Laufzeit an den TARIF: Mobil S immer 12
+        (160 von 160), Mobil M immer 24 (157 von 157), Mobil XS immer 36
+        (156 von 156). Das sind nicht drei Angebote, das ist EINE
+        Laufzeit je Tarif - darum traegt auch bei Vodafone keine GRUPPE
+        zwei Laufzeiten, obwohl der Anbieter drei kennt.
+      - 0 Buendel ohne gemessene Laufzeit.
+      - Die Historie sagt dasselbe ueber die Zeit: 3854 Zeilen, davon
+        1539 fuer 1&1 (586), o2 (518), congstar (400) und Telekom (35) -
+        AUSNAHMSLOS 36 Monate; Vodafone 2315 Zeilen, Mobil XS 36 in 741
+        von 741, Mobil S 12 in 819 von 819, Mobil M 24 in 755 von 755.
+        720 Historiengruppen, davon 0 mit zwei Laufzeiten.
+
+    WARUM DAS SO IST: die Erhebung ist defensiv gebaut (der Schluessel
+    traegt die Laufzeit, der congstar-Weg ist mit
+    `test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen`
+    belegt), aber in den GESPEICHERTEN ECHTEN ABRUFEN liefern drei von
+    fuenf Anbietern nur eine Laufzeit: Telekom
+    (`telekom_kategorie_buendel_magentamobil_s.html.gz`,
+    `numberOfInstallments":36` 9x und nichts anderes), o2
+    (`o2_katalog_buendel.json.gz`, `rateDurationValue" : "36 Monate"`
+    88x) und 1&1 (`currentHardwareOfferDuration = '36'` in allen vier
+    Produktseiten-Fixtures). Zwei Laufzeiten sind nur bei congstar
+    belegt (`congstar_tarifseite_allnet_flat_m.html.gz`:
+    INSTALLMENT_PLAN/UNSPECIFIED/24 58x und /36 58x, TRADE_IN/24 56x und
+    /36 58x; Allnet Flat S identisch) und bei Vodafone
+    (`financingDuration` 12/24/36, je 5x in `vodafone_tarif_hardware.json`
+    und je 3x in `vodafone_virtualitem.json`).
+
+    Ob die Anbieterseiten heute mehr anbieten, kann diese Umgebung NICHT
+    nachpruefen: das Gateway antwortet auf CONNECT fuer telekom.de,
+    congstar.de, 1und1.de, vodafone.de und o2online.de mit 403. CLAUDE.md
+    Fallstrick 16 verlangt genau diese Gegenprobe an der Anbieterseite,
+    und sie ist hier nicht zu leisten. Der Verdacht auf eine
+    Erfassungsluecke bleibt damit OFFEN. Dieser Test tut NICHT so, als
+    waere er ausgeraeumt - er haelt ihn als Zahl sichtbar fest.
+
+    GEPRUEFT WIRD MIT EXAKTEN ANKERN, NICHT MIT UNTERGRENZEN:
+      1. Der Scan sieht ueberhaupt Gruppen (Anti-Leerlauf; hier steht
+         bewusst eine Untergrenze, denn sie kann fallen - der Stand liegt
+         mit 507 weit darueber).
+      2. Kein Buendel traegt eine fehlende Laufzeit (Clean Code 3/4).
+      3. Die Ratenlaufzeiten JE ANBIETER sind genau
+         `_PF_STAND_LAUFZEITEN`.
+      4. Die Zahl der Gruppen mit zwei Laufzeiten ist genau
+         `_PF_STAND_MEHRLAUFZEIT` (= 0).
+
+    WAS ZU TUN IST, WENN DIESER TEST FAELLT - er faellt in BEIDE
+    Richtungen, und beide Richtungen sind eine Meldung, kein Fehler:
+      * BESSER (3. oder 4. nennt MEHR Laufzeiten, etwa Telekom 24 und 36,
+        oder eine Gruppe traegt zwei): die Erfassungsluecke schliesst
+        sich. Anker hochsetzen, mit Datum und der neuen Messung in diesem
+        Docstring, und pruefen, ob die Seite die zweite Laufzeit auch
+        ZEIGT - dafuer ist der Mechanik-Test daneben da.
+      * SCHLECHTER (3. oder 4. nennt WENIGER, ein Anbieter fehlt ganz,
+        oder 1./2. fallen): die Mehrfacherfassung oder der Scan ist
+        kaputt. Das ist ein echter Fehler und wird behoben, nicht
+        umgeschrieben.
+      In keinem Fall wird der Anker auf eine Untergrenze aufgeweicht.
+      Genau das war der Befund vom 22.09.2026: `>= _PF_STAND_MEHRLAUFZEIT`
+      mit dem Anker 0 war eine gruene Zeile ohne Aussage.
+
+    NICHT GEPRUEFT: ob die Seite zwei Laufzeiten ZEIGT (das ist der
+    Mechanik-Test), und ob der Bestand vollstaendig ist - er ist es
+    ausdruecklich nicht.
+    """
+    tco, _blaetter, _db = _gw_rohdaten()
+    heute = _gw_heute(tco)
+    gruppen: dict = {}
+    frische_gruppen: dict = {}
+    je_anbieter: dict = {}
+    ohne_laufzeit = []
+    for b in tco["buendel"]:
+        laufzeit = b.get("laufzeit_monate")
+        if laufzeit is None:
+            ohne_laufzeit.append(b.get("id"))
+            continue
+        schluessel = (b["anbieter"], _pf_modell(b["sku_id"]),
+                      b["tarif_name"], b.get("zustand") or "")
+        gruppen.setdefault(schluessel, set()).add(laufzeit)
+        je_anbieter.setdefault(b["anbieter"], set()).add(laufzeit)
+        if _gw_frisch(b, heute):
+            frische_gruppen.setdefault(schluessel, set()).add(laufzeit)
+
+    assert len(gruppen) >= _PF_MINDEST_GRUPPEN, (
+        f"nur {len(gruppen)} Gruppen im Bestand vom {heute} - am "
+        f"{_PF_STAND_TAG} waren es 507 (375 frisch); der Scan greift ins "
+        "Leere und dieser Test wuerde sonst gruen nichts pruefen")
+    assert not ohne_laufzeit, (
+        f"{len(ohne_laufzeit)} Buendel ohne gemessene Ratenlaufzeit "
+        f"({ohne_laufzeit[:5]}) - am {_PF_STAND_TAG} war es keines. Eine "
+        "fehlende Laufzeit ist eine Luecke, keine 24")
+
+    # EXAKT, nicht ">=": ein `>=` auf einer Zahl, die schon am Boden
+    # steht, kann nicht fallen. Dieser Assert faellt, wenn ein Anbieter
+    # eine Laufzeit DAZUGEWINNT (gute Nachricht, Anker nachziehen) UND
+    # wenn er eine verliert oder ganz ausfaellt (Fehler, beheben).
+    ist_laufzeiten = {a: sorted(v) for a, v in je_anbieter.items()}
+    assert ist_laufzeiten == _PF_STAND_LAUFZEITEN, (
+        f"die Ratenlaufzeiten je Anbieter sind {ist_laufzeiten}, am "
+        f"{_PF_STAND_TAG} waren es {_PF_STAND_LAUFZEITEN}. MEHR Laufzeiten "
+        "oder ein neuer Anbieter: die Erfassungsluecke schliesst sich - "
+        "Anker samt Datum im Docstring nachziehen und pruefen, ob die "
+        "Seite die zweite Laufzeit zeigt. WENIGER Laufzeiten oder ein "
+        "fehlender Anbieter: die Mehrfacherfassung ist ausgefallen - das "
+        "ist ein Fehler und wird behoben, nicht umgeschrieben.")
+
+    mehrfach = {k: sorted(v) for k, v in gruppen.items() if len(v) > 1}
+    frisch_mehrfach = {k: sorted(v) for k, v in frische_gruppen.items()
+                       if len(v) > 1}
+    assert len(mehrfach) == _PF_STAND_MEHRLAUFZEIT, (
+        f"{len(mehrfach)} von {len(gruppen)} Gruppen tragen zwei "
+        f"Ratenlaufzeiten, am {_PF_STAND_TAG} waren es genau "
+        f"{_PF_STAND_MEHRLAUFZEIT} (von 507). MEHR: die Erfassungsluecke "
+        "schliesst sich - Anker mit Datum und Messung hochsetzen. "
+        "WENIGER: eine Gruppe hat ihre zweite Laufzeit verloren, das ist "
+        f"ein Fehler. Frisch: {len(frisch_mehrfach)} von "
+        f"{len(frische_gruppen)}; Beispiele: "
+        f"{sorted(mehrfach.items())[:4]}")
+
+def test_pf_simonly_mit_erhobenem_volumen_traegt_sein_band(gw_seite):
+    """B3-Gegenprobe: kein SIM-only-Tarif verliert sein Band.
+
+    `tarif_bezug.Tarifbestand.je_id_aktuell` ist AUSSCHLIESSLICH auf den
+    baren Schluessel (`tarif_model.zeitreihen_basis`) gefasst. Fuenf
+    SIM-only-Referenzen des Bestands tragen aber die Lesart im eigenen
+    `tarif_id` (`telekom:magentamobil-l#live_shop`, ebenso s/m/xl und
+    `o2:o2-mobile-unlimited-m-flex#live_shop`); ihr Nachschlagen geht
+    seit B3 ins Leere. Vorher (HEAD 9999658) stand im TCO-Export
+    "MagentaMobil L; Gross", "MagentaMobil M; Mittel", "MagentaMobil S;
+    Mittel" - jetzt steht dort nichts.
+
+    Ein erhobener Wert, der zur Luecke wird, ist ein Datenverlust; die
+    Zeile faellt zugleich aus jedem Bandraster der Vergleichsansicht."""
+    _tco, blaetter, _db = _gw_rohdaten()
+
+    def volumen(tarif_id: str):
+        for blatt in blaetter.get(tarif_id, []):
+            gb = blatt.get("datenvolumen_gb")
+            if gb is None:
+                continue
+            try:
+                wert = float(gb)
+            except (TypeError, ValueError):
+                continue
+            if _gw_math.isnan(wert) or _gw_math.isinf(wert):
+                continue
+            return wert
+        return None
+
+    with gw_seite["csv"].open(encoding="utf-8-sig", newline="") as f:
+        zeilen = [r for r in _gw_csv.DictReader(f, delimiter=";")
+                  if r.get("Art") == "SIM-only"]
+    assert zeilen, "Export ohne SIM-only-Zeilen"
+
+    stand = json.loads((_GW_WURZEL / "data" / "state" / "geraete_tco.json")
+                       .read_text(encoding="utf-8"))
+    tarif_je_name = {(r["anbieter"], r["tarif_name"]): r.get("tarif_id") or ""
+                     for r in stand["sim_only"]}
+
+    ohne_band, geprueft = [], 0
+    for r in zeilen:
+        tarif_id = tarif_je_name.get((r["Anbieter"], r["Tarif"]))
+        if not tarif_id:
+            continue
+        gb = volumen(tarif_id)
+        if gb is None:
+            continue                 # kein erhobenes Volumen: kein Band
+        geprueft += 1
+        if not (r.get("Band") or "").strip():
+            ohne_band.append((r["Anbieter"], r["Tarif"], tarif_id, gb))
+    assert geprueft >= 20, (
+        f"nur {geprueft} SIM-only-Zeilen mit erhobenem Datenvolumen "
+        "geprueft - der Lookup greift ins Leere")
+    assert not ohne_band, (
+        f"{len(ohne_band)} SIM-only-Zeilen mit erhobenem Datenvolumen ohne "
+        f"Band: {ohne_band[:6]}")
+
+
+# ==========================================================================
+# ZWEITE RECHNUNG DES PRUEFERS - Behebungsrunde P0-B (21.09.2026)
+# ==========================================================================
+# Geschrieben vom PRUEFER, nicht vom Bauer. Gelesen wird das GERENDERTE
+# HTML und die gerenderte CSV, gerechnet wird mit `decimal` aus
+# `data/state/geraete_tco_historie.jsonl` - kein Import aus
+# `telco_radar.tco_model`, `report.geraete_tco_karten` oder
+# `report.geraete_radar`.
+#
+# Jeder Lookup ist scharf: wo nichts gefunden wird, wirft der Test statt
+# gruen durchzulaufen (CLAUDE.md Regel 10).
+#
+# DREI DIESER TESTS SIND ABSICHTLICH ROT - sie halten die Befunde der
+# Pruefung fest. Wer sie gruen macht, hat den Befund behoben; wer sie
+# loescht, hat ihn versteckt.
+
+import html as _pr_html
+
+_PR_DETAIL_RE = re.compile(r'<details class="gr-bnd"(.*?)</details>', re.S)
+_PR_ATTR_RE = re.compile(r'data-([a-z]+)="([^"]*)"')
+_PR_LABEL_RE = re.compile(r'gr-bnd-label">([^<]*)<')
+_PR_RWZ_RE = re.compile(r'gr-bnd-rw-z">(.*?)</p>', re.S)
+_PR_NAME_RE = re.compile(r'gr-bnd-name">([^<]*)<')
+_PR_TARIF_RE = re.compile(r'gr-bnd-tarif">(.*?)</span>', re.S)
+_PR_MONATE_RE = re.compile(r"Kosten über (\d+) Monate")
+_PR_SCHNITT_RE = re.compile(r"Ø ([\d.]+,\d\d) €/Monat")
+_PR_ALARM_RE = re.compile(r'<tr class="gr-a-zeile.*?</tr>', re.S)
+_PR_KATALOG_RE = re.compile(r'<tr[^>]*data-modell="([^"]+)"(.*?)</tr>', re.S)
+
+
+def _pr_betrag_cent(text: str) -> int:
+    """„1.835,54 €" -> 183554. Eigene Zerlegung, keine Formatierhilfe."""
+    roh = (text or "").replace("−", "-").replace("\xa0", " ")
+    treffer = re.search(r"-?[\d.]+,\d\d", roh)
+    assert treffer, f"kein Betrag in {text!r}"
+    zahl = treffer.group(0).replace(".", "").replace(",", ".")
+    return int((_gw_Dez(zahl) * 100).to_integral_value(rounding=_gw_HUP))
+
+
+def _pr_abschnitte(gw_seite: dict) -> list[tuple]:
+    """[(modell, quelle, html)] - je Modell der Block mit seinen Zeilen.
+
+    Das Startgeraet steht inline in `geraete.html` (seine ID steht dort im
+    JSON-Block als `vorgabe`), alle anderen Modelle in je einem
+    `gr-bnd-lager`-Block des Nachladefragments. Der Block wird MIT seinem
+    Modell gefuehrt und nicht hinterher ueber den Betrag gesucht: zwei
+    Modelle koennen denselben Betrag tragen, und eine Suche nach dem
+    ersten Treffer haengt die Zeile dann an das falsche Geraet (eigener
+    Fehler, gemessen am 21.09.2026: congstar/Allnet Flat S landete mit
+    1.615,00 EUR am Galaxy S26 Ultra)."""
+    vorgabe = re.search(r'"vorgabe":\s*"([^"]+)"', gw_seite["geraete"])
+    assert vorgabe, "kein `vorgabe`-Modell in geraete.html gefunden"
+    stelle = gw_seite["geraete"].find('id="gr-bndliste"')
+    assert stelle > 0, "keine Inline-Buendelliste in geraete.html"
+    abschnitte = [(vorgabe.group(1), "geraete.html",
+                   gw_seite["geraete"][stelle:])]
+    for block in re.split(r'<div class="gr-bnd-lager" data-modell="',
+                          gw_seite["buendel"])[1:]:
+        abschnitte.append((block[:block.index('"')],
+                           "data/geraete-buendel.html", block))
+    assert len(abschnitte) >= 90, (
+        f"nur {len(abschnitte)} Modellbloecke gelesen - der Parser greift "
+        "ins Leere")
+    return abschnitte
+
+
+def _pr_buendelzeilen(gw_seite: dict) -> list[dict]:
+    """Alle Buendelzeilen BEIDER Dokumente, je mit ihrem Modell."""
+    zeilen = []
+    for modell, quelle, text in _pr_abschnitte(gw_seite):
+        for treffer in _PR_DETAIL_RE.finditer(text):
+            block = treffer.group(1)
+            attribute = dict(_PR_ATTR_RE.findall(block))
+            etikett = _PR_LABEL_RE.search(block)
+            rechenweg = _PR_RWZ_RE.search(block)
+            name = _PR_NAME_RE.search(block)
+            tarif = _PR_TARIF_RE.search(block)
+            zeilen.append({
+                "quelle": quelle,
+                "modell": modell,
+                "attribute": attribute,
+                "etikett": (etikett.group(1) if etikett else ""),
+                "rechenweg": re.sub(
+                    r"\s+", " ",
+                    re.sub("<[^>]+>", "", rechenweg.group(1))
+                ).strip() if rechenweg else "",
+                "anbieter": (name.group(1) if name else ""),
+                "tarif": re.sub(r"\s+", " ",
+                                re.sub("<[^>]+>", " ", tarif.group(1))
+                                ).strip() if tarif else "",
+            })
+    assert len(zeilen) >= 300, (
+        f"nur {len(zeilen)} Buendelzeilen gelesen - am 21.09.2026 waren es "
+        "375; der Parser greift ins Leere")
+    return zeilen
+
+
+def test_pr_fuenf_leitzahlen_gegen_die_historie_nachgerechnet(gw_seite):
+    """Fuenf Zahlen der Seite, EIGENE Rechnung aus der Historie.
+
+    Definition (Auftrag): Anzahlung + 24 Monate Tarif + ALLE Geraeteraten
+    einschliesslich der Restschuld nach Monat 24 + Anschlusspreis. Bei
+    einem zusammengelegten Buendelmonatspreis (1&1) tritt dieser Betrag
+    ueber seine eigene Laufzeit an die Stelle von Tarif UND Rate.
+
+    Rundung offen benannt: jeder Monatsbetrag wird als ganze Cent gelesen
+    und danach multipliziert (eine Rate von 30,50 EUR ist 3050 Cent), die
+    Summe bleibt exakt - keine Gleitkommatoleranz.
+
+    Nachgerechnet am 21.09.2026 (Pruefer), Seite == Soll:
+      congstar / iPhone 17 Pro 256 / Allnet Flat XS   1.459,00 EUR
+      o2       / iPhone 17 Pro 256 / Unlimited M Plus 1.794,76 EUR
+      Vodafone / iPhone 17 Pro 256 / Mobil XS         1.955,80 EUR
+      1&1      / iPhone 17 Pro 256 / All-Net-Flat S   2.019,54 EUR
+      congstar / Galaxy S26 Ultra 256 / Allnet Flat S 1.399,00 EUR
+    """
+    historie = _pf_historie()
+    faelle = (
+        ("apple-iphone-17-pro-256", "congstar", "allnet-flat-xs", 145900),
+        ("apple-iphone-17-pro-256", "o2",
+         "o2-mobile-unlimited-m-plus-mit-100-mbit-s-24-mon", 179476),
+        ("apple-iphone-17-pro-256", "vodafone", "mobil-xs", 195580),
+        ("apple-iphone-17-pro-256", "1-1", "1-1-all-net-flat-s", 201954),
+        ("samsung-galaxy-s26-ultra-256", "congstar", "allnet-flat-s", 139900),
+    )
+    zeilen = _pr_buendelzeilen(gw_seite)
+    geprueft, fehler = 0, []
+    for modell, slug, tarifteil, verankert in faelle:
+        satz = _pf_letzte_messung(historie, modell, slug, tarifteil)
+        soll = _pf_leitzahl_cent(satz)
+        # Der Anker aus der Pruefung vom 21.09.2026: aendert ein Bot-Commit
+        # die Posten, wird DIESER Assert rot - dann ist der neue Sollwert
+        # nachzurechnen, nicht der Test zu loeschen.
+        assert soll == verankert, (
+            f"{slug}/{tarifteil} zu {modell}: eigene Rechnung "
+            f"{soll / 100} EUR gegen verankerte {verankert / 100} EUR")
+        treffer = [z for z in zeilen
+                   if _pr_anbieter_slug(z["anbieter"]) == slug
+                   and _pr_tarifteil(z["tarif"]) == tarifteil
+                   and z["attribute"].get("zustand") == "neu"
+                   and z["attribute"].get("gesamt")
+                   and z["modell"] == modell]
+        assert treffer, (
+            f"keine Buendelzeile {slug}/{tarifteil} zu {modell} auf der "
+            "Seite - der Lookup greift ins Leere und dieser Test wuerde "
+            "sonst gruen nichts pruefen")
+        for zeile in treffer:
+            geprueft += 1
+            ist = int((_gw_Dez(zeile["attribute"]["gesamt"]) * 100)
+                      .to_integral_value(rounding=_gw_HUP))
+            if ist != soll:
+                fehler.append((modell, slug, tarifteil, ist, soll))
+    assert geprueft >= len(faelle), (
+        f"nur {geprueft} Zeilen geprueft - erwartet mindestens "
+        f"{len(faelle)}")
+    assert not fehler, f"Seite gegen eigene Rechnung: {fehler}"
+
+
+def _pr_anbieter_slug(anbieter: str) -> str:
+    """„1&1" -> `1-1`, „Vodafone" -> `vodafone` - wie das ID-Segment.
+
+    Die Entities werden ZUERST aufgeloest: `1&amp;1` ergibt sonst
+    `1-amp-1`, und der Vergleich zweier Tabellen faellt still ins Leere -
+    genau der gruene Test, der nichts prueft."""
+    roh = _pr_html.unescape(anbieter or "")
+    return re.sub(r"[^a-z0-9]+", "-", roh.lower()).strip("-")
+
+
+def _pr_tarifteil(tarif: str) -> str:
+    """Der Tarifname der Zeile als ID-Segment (ohne „ · 15 GB")."""
+    name = _pr_html.unescape(tarif or "").split("·")[0]
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+
+
+def test_pr_kein_monatsschnitt_teilt_eine_36_monats_summe_durch_24(gw_seite):
+    """BEFUND (hoch): Ø/Monat rechnet 36-Monats-Summe / 24 Monate.
+
+    Seit P0-B-fix2 nennt das Etikett den Zeitraum der Zahl
+    ("Kosten über 36 Monate"). Der Ø/Monat DERSELBEN Zeile teilt
+    weiterhin durch 24 (`tco_model.Tco.monatlich`). Gerendert am
+    21.09.2026, 1&1 / iPhone 17 Pro 256 GB:
+
+        "Kosten über 36 Monate 2.019,54 € · Ø 84,15 €/Monat"
+
+    84,15 x 36 = 3.029,40 EUR - die Zeile widerspricht sich selbst. Der
+    Monatsbetrag des Angebots ist 44,99 EUR, die Summe ueber ihren
+    eigenen Zeitraum ergibt 56,10 EUR je Monat. Betroffen sind 70 Zeilen
+    (Seite plus Fragment).
+
+    Geprueft wird die Identitaet, die auf JEDER Zeile gelten muss:
+    gezeigter Ø x gezeigte Monate == gezeigte Leitzahl (eine Cent-
+    Rundungsspanne je Monat erlaubt)."""
+    zeilen = _pr_buendelzeilen(gw_seite)
+    geprueft, fehler = 0, []
+    for zeile in zeilen:
+        monate = _PR_MONATE_RE.search(zeile["etikett"])
+        schnitt = _PR_SCHNITT_RE.search(zeile["rechenweg"])
+        if monate is None or schnitt is None:
+            continue
+        geprueft += 1
+        n = int(monate.group(1))
+        gezeigt = _pr_betrag_cent(schnitt.group(1))
+        summe = _pr_betrag_cent(zeile["rechenweg"])
+        if abs(gezeigt * n - summe) > n:
+            fehler.append((zeile["anbieter"], zeile["tarif"], n,
+                           summe / 100, gezeigt / 100,
+                           round(summe / n / 100, 2)))
+    assert geprueft >= 300, (
+        f"nur {geprueft} Zeilen mit Etikett UND Ø gelesen - der Parser "
+        "greift ins Leere")
+    assert not fehler, (
+        f"{len(fehler)} Zeilen, deren Ø/Monat nicht zu ihrem eigenen "
+        f"Zeitraum passt (Anbieter, Tarif, Monate, Summe, Ø gezeigt, "
+        f"Ø soll): {fehler[:4]}")
+
+
+def test_pr_kein_vorzeichen_gegen_vodafone_ueber_zwei_zeitraeume(gw_seite):
+    """BEFUND (kritisch): das Delta ist nur in der Buendelzeile entschaerft.
+
+    P0-B-fix2 nimmt der Buendelzeile eines 1&1-Angebots das Euro- und
+    Prozent-Delta ("andere Laufzeit", "Kein Abstand zur
+    Vodafone-Referenz: diese Zahl trägt 36 Monate, die Referenz 24
+    Monate"). Die Alarm-/Radarzeilen desselben Angebots auf derselben
+    Seite tragen ihr Vorzeichen weiter (`report/geraete_radar.py:251`
+    und `:282` rechnen `prozent` ohne Horizont-Tor), ebenso
+    `exporte/wettbewerbsradar.csv` (Status `vergleichbar`, Preisart
+    "Kosten über 24 Monate") - gemessen am 21.09.2026: 26 Alarmzeilen mit
+    1&1-Prozentzahl, darunter iPhone 17 Pro 256 GB mit +3,3 % gegen eine
+    Referenz von 1.955,80 EUR.
+
+    Die 1&1-Zahlen tragen 36 Monate Tarif UND Geraet in EINEM Betrag;
+    allein die zwoelf Tarifmonate jenseits des Horizonts (12 x 14,99 EUR
+    nach `tarife.jsonl` = 179,88 EUR) sind groesser als jedes hier
+    ausgewiesene Delta. Geprueft wird: kein Vorzeichen fuer ein Angebot,
+    dessen Buendelzeile den Zeitraum 36 nennt."""
+    zeilen = _pr_buendelzeilen(gw_seite)
+    andere_laufzeit = {
+        (_pr_anbieter_slug(z["anbieter"]), z["attribute"].get("gesamt"))
+        for z in zeilen
+        if (_PR_MONATE_RE.search(z["etikett"]) or [None, "24"])[1] != "24"}
+    assert andere_laufzeit, (
+        "keine Zeile mit abweichendem Zeitraum auf der Seite - der Test "
+        "wuerde sonst gruen nichts pruefen")
+
+    mit_vorzeichen = []
+    for treffer in _PR_ALARM_RE.finditer(gw_seite["geraete"]):
+        block = treffer.group(0)
+        attribute = dict(re.findall(r'data-s-([a-z]+)="([^"]*)"', block))
+        anbieter = _pr_anbieter_slug(
+            (attribute.get("anbieter") or "").replace("&amp;", "&"))
+        gesamt = attribute.get("gesamt")
+        if not attribute.get("prozent"):
+            continue
+        if (anbieter, gesamt) in andere_laufzeit:
+            mit_vorzeichen.append((attribute.get("geraet"), anbieter, gesamt,
+                                   attribute.get("prozent")))
+    assert not mit_vorzeichen, (
+        f"{len(mit_vorzeichen)} Alarm-/Radarzeilen tragen ein Delta-"
+        "Vorzeichen fuer eine Zahl, deren eigene Buendelzeile einen "
+        f"anderen Zeitraum nennt: {mit_vorzeichen[:4]}")
+
+
+def test_pr_eine_verschwundene_abweichung_traegt_ihren_grund(gw_seite):
+    """BEFUND (hoch): 22 Abweichungen sind zum Strich geworden, ohne Grund.
+
+    `report/geraete_view.py:1084` laesst die Luecke der Delta-Spalte
+    ausdruecklich leer ("Strich wie die Buendelzeile - die Referenz
+    existiert"). Seit P0-B-fix2 trifft das nicht mehr zu: die
+    Buendelzeile zeigt dort "andere Laufzeit", die Katalogzeile den
+    Strich, und der Strich heisst auf dieser Seite "kein Angebot" (A2).
+
+    Gemessen am 21.09.2026 (gleicher Bestand, zwei Codestaende):
+    `exporte/geraete-modell-tco.csv` verlor 22 von 57 Abweichungen
+    (2aa7dbd -> ac80e83), und KEINE der 22 Zeilen traegt einen Grund in
+    der Statusspalte - z. B. Apple iPhone 17 Pro Max 512 GB (Vodafone
+    2.351,80 EUR): vorher "+341,74 € · +14,5 %", jetzt "–".
+
+    Geprueft wird die Zusicherung des Exports selbst
+    (`geraete_export.modell_tco_csv`): "Eine Zeile ohne Zahl ODER OHNE
+    ABSTAND traegt den benannten Grund in der Statusspalte."""
+    pfad = Path(gw_seite["csv"]).parent / "geraete-modell-tco.csv"
+    assert pfad.exists(), f"{pfad} fehlt - der Export wurde nicht gerendert"
+    zeilen = list(_gw_csv.DictReader(
+        pfad.read_text(encoding="utf-8-sig").splitlines(), delimiter=";"))
+    assert len(zeilen) >= 100, (
+        f"nur {len(zeilen)} Modellzeilen im Export - der Lookup greift ins "
+        "Leere")
+    stumm = [(z["Hersteller"], z["Modell"], z["Speicher GB"],
+              z["Bester Anbieter"], z["TCO ab EUR"])
+             for z in zeilen
+             if z["TCO ab EUR"].strip() and not z["Abweichung %"].strip()
+             and not (z["Status"] or "").strip()]
+    assert not stumm, (
+        f"{len(stumm)} Modellzeilen mit Leitzahl, aber ohne Abweichung UND "
+        f"ohne Grund in der Statusspalte: {stumm[:6]}")
+
+
+# ==========================================================================
+# PRUEFER P0-B (21.09.2026) - die zweite, unabhaengige Rechnung
+# --------------------------------------------------------------------------
+# Diese drei Tests stammen vom Pruefer, nicht vom Bauer. Sie importieren
+# `telco_radar.tco_model` NICHT: die Leitzahl wird hier aus den Rohfeldern
+# von `data/state/geraete_tco.json` mit `decimal` neu gerechnet, nach der
+# Definition aus CLAUDE.md ("Kosten über 24 Monate = Anzahlung + 24 Monate
+# Tarif + alle Geraeteraten inklusive Restschuld nach Monat 24 +
+# Anschlusspreis"; bei einem zusammengelegten Monatsbetrag ueber die ganze
+# eigene Laufzeit). Rundung: HALF_UP auf zwei Stellen, einmal am Ende -
+# dieselbe Regel, die die Seite fuer Euro-Betraege verwendet.
+# ==========================================================================
+
+_PZ_TOLERANZ = _gw_Dez("0.01")     # ein Cent je Monat auf dem O/Monat
+
+# Die Spalte, deren Kopf P0-B-z3 WISSENTLICH stehen gelassen hat: sie ist
+# ein Fremdschluessel fuer `test_geraete_tco_csv_gegen_die_eigene_rechnung`
+# und traegt ihre Summe fuer JEDE Zeile, auch fuer die, deren eigener
+# Zeitraum 36 ist. Der Widerspruch ist damit sichtbar gemacht, nicht
+# behoben - und wird hier als Zahl festgehalten, statt uebersehen zu
+# werden (Befund vom 22.09.2026, siehe Docstring unten).
+_PZ_CSV_ZEITRAUM = "Leitzahl-Zeitraum Monate"
+
+
+def _pz_soll(b: dict) -> tuple:
+    """(Leitzahl, Zeitraum) aus den ROHFELDERN - oder (None, None).
+
+    Zwei Formen, genau wie die Anbieter sie ausweisen:
+      * zusammengelegter Monatsbetrag (`buendel_monatlich`, 1&1): Tarif und
+        Geraet in EINER Rate, der Zeitraum ist die eigene Laufzeit.
+      * getrennt (`tarif_monatlich` + `geraet_monatsrate`): 24 Tarifmonate,
+        dazu ALLE Geraeteraten der eigenen Laufzeit - der Zeitraum dieser
+        Zahl ist 24.
+    Ohne gemessene Laufzeit gibt es keine Summe und keinen Zeitraum (None,
+    nie 0, nie geraten).
+    """
+    def dez(wert):
+        return None if wert is None else _gw_Dez(str(wert))
+
+    zu = dez(b.get("geraet_zuzahlung")) or _gw_Dez("0")
+    anschluss = dez(b.get("anschlusspreis")) or _gw_Dez("0")
+    laufzeit = b.get("laufzeit_monate")
+    zusammen = dez(b.get("buendel_monatlich"))
+    tarif = dez(b.get("tarif_monatlich"))
+    rate = dez(b.get("geraet_monatsrate"))
+    if zusammen is not None:
+        if laufzeit is None:
+            return None, None
+        summe = zu + zusammen * laufzeit + anschluss
+        return summe.quantize(_gw_Dez("0.01"), rounding=_gw_HUP), laufzeit
+    if tarif is None:
+        return None, None
+    summe = zu + tarif * _GW_HORIZONT + anschluss
+    if rate is not None:
+        if laufzeit is None:
+            return None, None
+        summe = summe + rate * laufzeit
+    return summe.quantize(_gw_Dez("0.01"), rounding=_gw_HUP), _GW_HORIZONT
+
+
+def _pz_zeilen(html: str) -> list[dict]:
+    """Die Buendelzeilen eines Dokuments - Attribute und Etikett je Zeile."""
+    zeilen = []
+    for block in html.split('<details class="gr-bnd')[1:]:
+        kopf = block[:block.find("</summary>")]
+
+        def feld(muster, quelle=kopf):
+            treffer = re.search(muster, quelle, re.S)
+            return treffer.group(1) if treffer else None
+
+        zeilen.append({
+            "anbieter": (feld(r'gr-bnd-name">([^<]*)<') or "")
+            .replace("&amp;", "&").strip(),
+            "gesamt": feld(r'data-gesamt="([^"]*)"'),
+            "schnitt": feld(r'data-schnitt="([^"]*)"'),
+            "laufzeit_attr": feld(r'data-laufzeit="([^"]*)"'),
+            "etikett": feld(r"Kosten über (\d+) Monate"),
+        })
+    return zeilen
+
+
+def test_pruefer_jede_leitzahl_der_seite_gegen_eine_eigene_rechnung(gw_seite):
+    """Leitzahl, Zeitraum und O/Monat JEDER Buendelzeile, neu gerechnet.
+
+    Gegenprobe gegen einen Test, dessen Lookup ins Leere laeuft: jede
+    gerenderte Zeile MUSS im unabhaengig gerechneten Bestand einen
+    Betragspartner finden (`ohne_partner` ist ein Fehlschlag, kein
+    Ueberspringen), es muessen mehr als 400 Zeilen geprueft werden, und
+    beide Zeitraeume des Bestands (24 UND 36) muessen vorkommen - sonst
+    prueft der Test die interessante Haelfte nicht.
+    """
+    stand = json.loads((_GW_WURZEL / "data" / "state" / "geraete_tco.json")
+                       .read_text(encoding="utf-8"))
+    # (Anbieter, Leitzahl) -> die Zeitraeume, die diese Summe tragen kann.
+    soll: dict[tuple, set] = {}
+    for b in stand["buendel"]:
+        betrag, monate = _pz_soll(b)
+        if betrag is None:
+            continue
+        soll.setdefault((b["anbieter"], betrag), set()).add(monate)
+    assert len(soll) > 200, \
+        f"nur {len(soll)} eigene Leitzahlen gerechnet - Rohdaten leer?"
+
+    zeilen = (_pz_zeilen(gw_seite["buendel"])
+              + _pz_zeilen(gw_seite["geraete"]))
+    geprueft = 0
+    zeitraeume: set = set()
+    ohne_partner, falsches_etikett, falscher_schnitt = [], [], []
+    for z in zeilen:
+        if not z["gesamt"] or not z["etikett"]:
+            continue
+        betrag = _gw_Dez(z["gesamt"]).quantize(_gw_Dez("0.01"))
+        moeglich = soll.get((z["anbieter"], betrag))
+        if not moeglich:
+            ohne_partner.append((z["anbieter"], z["gesamt"]))
+            continue
+        geprueft += 1
+        monate = int(z["etikett"])
+        zeitraeume.add(monate)
+        if monate not in moeglich:
+            falsches_etikett.append((z["anbieter"], str(betrag), monate,
+                                     sorted(moeglich)))
+        schnitt = _gw_Dez(z["schnitt"] or "0")
+        if abs(schnitt * monate - betrag) > _PZ_TOLERANZ * monate:
+            falscher_schnitt.append((z["anbieter"], str(betrag), monate,
+                                     z["schnitt"]))
+    assert not ohne_partner, (
+        f"{len(ohne_partner)} Buendelzeilen mit einer Summe, die die eigene "
+        f"Rechnung nicht kennt: {ohne_partner[:6]}")
+    assert geprueft > 400, \
+        f"nur {geprueft} Zeilen geprueft - der Lookup greift nicht"
+    assert {24, 36} <= zeitraeume, \
+        f"nur die Zeitraeume {sorted(zeitraeume)} geprueft, nicht 24 UND 36"
+    assert not falsches_etikett, (
+        "Etikett nennt einen Zeitraum, den die Summe nicht tragen kann: "
+        f"{falsches_etikett[:6]}")
+    assert not falscher_schnitt, (
+        "O/Monat x Etikett-Zeitraum != Leitzahl: "
+        f"{falscher_schnitt[:6]}")
+
+
+def test_pruefer_kein_spaltenkopf_behauptet_24_ueber_einer_36_monats_zahl(
+        gw_seite):
+    """Der Spaltenkopf IST eine Aussage ueber jede Zahl unter ihm.
+
+    Geprueft wird die Buendeltafel des Startmodells: nennt der Kopf der
+    TCO-Spalte eine Monatszahl, dann muss JEDE Zeile unter ihm genau
+    diesen Zeitraum tragen. Der Sortierknopf dieses Kopfes
+    (`data-bsort="tco"`, app.js liest `data-gesamt`) stellt alle Summen
+    der Spalte in EINEN Rang - ein Kopf, der einen Zeitraum behauptet,
+    behauptet ihn damit fuer den ganzen Rang.
+
+    GEMESSEN am 22.09.2026 (echter Render gegen den Bestand vom
+    20.09.2026): 19 Buendelzeilen inline, alle 19 mit `data-gesamt` UND
+    eigenem Etikett, 18 ueber 24 Monate und 1 ueber 36 (die 1&1-Zeile mit
+    `buendel_monatlich`). Der Kopf lautet "nach den Kosten mit Tarif
+    sortieren, getrennt nach Zeitraum" und nennt KEINE Monatszahl - das
+    ist der Stand nach P0-B-z2 und der gewollte Zustand: der Kopf nennt
+    die Spalte, die Zeile ihren Zeitraum.
+
+    WARUM DIE PRUEFUNG SO GEBAUT IST (Befund vom 22.09.2026): vorher
+    stand hier `assert not (fremde and behauptet == [_GW_HORIZONT])`.
+    Nach z2 ist `behauptet` leer, also ist `behauptet == [24]` fuer immer
+    falsch und der Assert konnte nicht mehr fallen - egal was in der
+    Spalte steht. Er war ausserdem nur auf die eine Richtung gefasst:
+    ein Kopf, der "36 Monate" ueber 24-Monats-Zeilen behauptet, kam
+    durch. Geprueft wird jetzt die Aussage selbst, in beide Richtungen,
+    mit zwei Gegenproben, die verhindern, dass sie gruen ins Leere
+    laeuft: die Spalte muss Zeilen MIT Etikett haben, und sie muss
+    MEHRERE Zeitraeume tragen (sonst koennte eine Monatszahl im Kopf
+    ueberhaupt nicht widersprechen und der Test prueft nichts).
+    """
+    seite = gw_seite["geraete"]
+    koepfe = re.findall(r'data-bsort="tco"[^>]*aria-label=\s*"([^"]*)"',
+                        seite)
+    assert koepfe, "Sortierkopf der TCO-Spalte nicht gefunden - Lookup leer"
+
+    spaltenzeilen = [z for z in _pz_zeilen(seite) if z["gesamt"]]
+    assert spaltenzeilen, (
+        "keine Buendelzeile mit data-gesamt in der Startansicht - der "
+        "Lookup greift ins Leere und dieser Test wuerde sonst gruen "
+        "nichts pruefen")
+    # Die Haelfte von z2, die traegt: JEDE Zahl nennt ihren eigenen
+    # Zeitraum. Ohne Etikett waere der Kopf die einzige Angabe, und der
+    # Widerspruch unten waere gar nicht messbar.
+    ohne_etikett = [(z["anbieter"], z["gesamt"]) for z in spaltenzeilen
+                    if not z["etikett"]]
+    assert not ohne_etikett, (
+        f"{len(ohne_etikett)} von {len(spaltenzeilen)} Zeilen tragen eine "
+        f"Summe ohne eigenen Zeitraum: {ohne_etikett[:6]} - am 22.09.2026 "
+        "trugen alle 19 ihr Etikett. Ohne Etikett gilt wieder der Kopf "
+        "fuer alle")
+
+    etiketten = {int(z["etikett"]) for z in spaltenzeilen}
+    # Gegenprobe: bei nur EINEM Zeitraum in der Spalte koennte kein Kopf
+    # widersprechen - der Assert unten waere dann gruen ohne Aussage.
+    assert len(etiketten) > 1, (
+        f"die Spalte traegt nur den Zeitraum {sorted(etiketten)}; am "
+        "22.09.2026 standen dort 24 UND 36 Monate (18 zu 1). Mit einem "
+        "einzigen Zeitraum kann ein Spaltenkopf nicht widersprechen und "
+        "dieser Test prueft nichts - die Startansicht ist neu zu waehlen "
+        "oder der Anker neu zu setzen, nicht der Assert aufzuweichen")
+
+    behauptet = {int(m) for kopf in koepfe
+                 for m in re.findall(r"(\d+) Monate", kopf)}
+    # Ein Kopf ohne Monatszahl behauptet nichts und kann nicht
+    # widersprechen (Stand nach z2). Nennt er eine, muss sie der Zeitraum
+    # JEDER Zeile darunter sein.
+    widerspruch = sorted(etiketten - behauptet) if behauptet else []
+    assert not widerspruch, (
+        f"Spaltenkopf {koepfe[0]!r} behauptet {sorted(behauptet)} Monate, "
+        f"in derselben Spalte stehen Zeilen mit {widerspruch} Monaten - "
+        "und derselbe Knopf sortiert sie gemeinsam nach data-gesamt. Der "
+        "Zeitraum gehoert an die Zeile, nicht an den Kopf")
+
+
+def test_pruefer_der_csv_kopf_widerspricht_nicht_seiner_zeitraum_spalte(
+        gw_seite):
+    """`geraete-tco.csv`: Kopf und Zeitraum-Spalte derselben Zeile.
+
+    P0-B-h4 hat die Spalte "Leitzahl-Zeitraum Monate" ergaenzt, den Kopf
+    der Wertspalte aber stehen gelassen. Eine Zeile, deren Zeitraum 36
+    sagt, traegt ihre Summe damit unter "Kosten über 24 Monate EUR" -
+    zwei Zahlen zum selben Zeitraum in derselben Zeile.
+
+    GEPRUEFT WERDEN ALLE "Kosten über"-Spalten, nicht eine.
+
+    Befund vom 22.09.2026: vorher nahm dieser Test
+    `next(k for k in zeilen[0] if k.startswith("Kosten über"))` - also die
+    ERSTE solche Spalte in Spaltenreihenfolge. Seit z3 gibt es ZWEI:
+      * "Kosten über 24 Monate EUR (eigener Zeitraum)" - gefuellt nur
+        dort, wo der eigene Zeitraum wirklich 24 ist (763 von 837),
+        sonst eine benannte Luecke (74). Diese Spalte ist stimmig.
+      * "Kosten über 24 Monate EUR" - fuer JEDE der 837 Zeilen gefuellt,
+        auch fuer die 74 mit eigenem Zeitraum 36. z3 hat sie wortgleich
+        stehen gelassen, weil `test_geraete_tco_csv_gegen_die_eigene_
+        rechnung` sie als Fremdschluessel liest.
+    Weil die neue Spalte in der Reihenfolge davor stand, pruefte `next()`
+    ab z3 nur noch die stimmige und meldete 0 Widersprueche - waehrend
+    dieselbe Datei 74 trug. Ein Lookup, der an der Spaltenreihenfolge
+    haengt und am Fehler vorbeigreift, ist kein Nachweis; deshalb pruefen
+    wir jetzt JEDE solche Spalte.
+
+    SEIT DEM 22.09.2026 (Lead) gibt es die widersprechende Spalte nicht
+    mehr. Der Export legt jede Summe in den Kopf, der fuer sie WAHR ist:
+    "Kosten über 24 Monate EUR" nur bei Zeitraum 24 (763 von 837),
+    "Kosten über die Bündellaufzeit EUR" bei jedem anderen (74), daneben
+    "Leitzahl-Zeitraum Monate". Der Sonderzweig, der den bekannten
+    Widerspruch als exakte Gleichheit festhielt, ist damit entfallen -
+    genau so, wie er es selbst vorgesehen hatte.
+
+    ZWEI RICHTUNGEN, weil eine allein billig zu erfuellen waere:
+      * Kein Kopf, der eine Monatszahl nennt, traegt eine Zahl mit
+        anderem Zeitraum.
+      * Keine Zeile verliert dabei ihren Wert, und keine traegt ihn unter
+        zwei Koepfen. Ohne das waere der erste Punkt auch mit einem
+        Export gruen, der die 74 Zahlen einfach weglaesst.
+
+    WAS ZU TUN IST, WENN DIESER TEST FAELLT: Es ist ein Fehler im Export,
+    kein Anker, der nachgezogen werden muss. Die Meldung nennt Anbieter
+    und Zeitraum der betroffenen Zeilen.
+    """
+    zeilen = list(_gw_csv.DictReader(
+        gw_seite["csv"].read_text(encoding="utf-8-sig").splitlines(),
+        delimiter=";"))
+    assert zeilen, "geraete-tco.csv ist leer - Lookup greift nicht"
+    spalten = [k for k in zeilen[0] if k.startswith("Kosten über")]
+    assert spalten, (
+        f"keine 'Kosten über'-Spalte in {sorted(zeilen[0])} - der Lookup "
+        "greift ins Leere und dieser Test wuerde sonst gruen nichts "
+        "pruefen")
+    assert _PZ_CSV_ZEITRAUM in zeilen[0], (
+        f"Spalte {_PZ_CSV_ZEITRAUM!r} fehlt - ohne den Zeitraum JE ZEILE "
+        "ist kein Widerspruch zum Kopf messbar")
+
+    # Gegenprobe: ohne Zeile mit fremdem Zeitraum kann kein Kopf
+    # widersprechen, und alles darunter waere gruen ohne Aussage.
+    fremde_zeilen = [z for z in zeilen
+                     if (z[_PZ_CSV_ZEITRAUM] or "").strip()
+                     and int(z[_PZ_CSV_ZEITRAUM]) != _GW_HORIZONT]
+    assert fremde_zeilen, (
+        f"keine der {len(zeilen)} Zeilen traegt einen Zeitraum ungleich "
+        f"{_GW_HORIZONT}; am 22.09.2026 waren es 74 von 837 (1&1, "
+        "Buendelbetrag ueber 36 Monate). Ohne sie prueft dieser Test "
+        "nichts - Anker mit Begruendung neu setzen, nicht aufweichen")
+
+    # Ein Kopf, der eine MONATSZAHL nennt, behauptet einen Zeitraum und
+    # kann ihm widersprechen. Ein Kopf, der keine nennt ("Kosten über die
+    # Bündellaufzeit EUR"), behauptet keinen festen Zeitraum - bei ihm
+    # steht der Zeitraum in der Zeile, und es gibt nichts zu widerlegen.
+    # Diese Unterscheidung ist die Loesung des Befunds, nicht seine
+    # Umgehung: dass jede Zeile IHREN Wert behaelt, prueft die
+    # Gegenrichtung unten.
+    mit_zahl_im_kopf = [k for k in spalten if re.search(r"\d", k)]
+    assert mit_zahl_im_kopf, (
+        f"keine 'Kosten über'-Spalte nennt eine Monatszahl ({spalten}) - "
+        "dann prueft die Schleife nichts; Anker mit Begruendung neu setzen")
+    for kopf in mit_zahl_im_kopf:
+        kopf_monate = int(re.search(r"(\d+)", kopf).group(1))
+        fremd = [(z["Anbieter"], z[_PZ_CSV_ZEITRAUM], z[kopf])
+                 for z in zeilen
+                 if (z[_PZ_CSV_ZEITRAUM] or "").strip()
+                 and int(z[_PZ_CSV_ZEITRAUM]) != kopf_monate
+                 and (z[kopf] or "").strip()]
+        assert not fremd, (
+            f"{len(fremd)} Zeilen tragen ihre Summe unter dem Kopf "
+            f"{kopf!r}, obwohl ihre eigene Zeitraum-Spalte einen anderen "
+            f"Wert nennt: {fremd[:4]}")
+
+    # Die andere Haelfte: kein Kopf luegen zu lassen ist billig, wenn man
+    # die Zahl einfach weglaesst. Jede Zeile mit einem gemessenen Zeitraum
+    # traegt ihre Summe in GENAU EINER der Spalten - nie in keiner.
+    stumm = [(z["Anbieter"], z[_PZ_CSV_ZEITRAUM]) for z in zeilen
+             if (z[_PZ_CSV_ZEITRAUM] or "").strip()
+             and not any((z[k] or "").strip() for k in spalten)]
+    assert not stumm, (
+        f"{len(stumm)} Zeilen tragen einen Zeitraum, aber in keiner "
+        f"'Kosten über'-Spalte eine Zahl: {stumm[:4]}")
+    doppelt = [(z["Anbieter"], z[_PZ_CSV_ZEITRAUM]) for z in zeilen
+               if sum(1 for k in spalten if (z[k] or "").strip()) > 1]
+    assert not doppelt, (
+        f"{len(doppelt)} Zeilen tragen dieselbe Summe unter zwei Koepfen "
+        f"mit verschiedenem Zeitraum: {doppelt[:4]}")
+
+
+def test_der_name_der_grafik_nennt_die_zeitraeume_die_darin_liegen(gw_seite):
+    """Der zugaengliche Name der Grafik-Sektion gegen ihre Kurven.
+
+    P0-B (22.09.2026): `_geraete_zeitreihe.html.j2` trug den Namen FEST -
+    "Kosten über 24 Monate je Messtag und Anbieter" -, auch wenn im Bild
+    eine 36-Monats-Kurve lag. Paket z1 hatte das aria-label IM SVG
+    dynamisch gemacht und die Sektion darueber nicht gesehen: wer die
+    Seite sieht, las am Kurvenende "36 Mon.", wer sie hoert, bekam "Kosten
+    über 24 Monate" - dieselbe Grafik, zwei Aussagen (Clean Code 7).
+
+    Geprueft wird die Uebereinstimmung, nicht eine Zahl: welche Zeitraeume
+    das Bild traegt, sagen seine Kurvenetiketten (`gr-zr-mon`); der Name
+    der Sektion muss genau diese nennen. Der Test driftet damit nicht mit
+    dem Bestand - er faellt, wenn Name und Bild auseinanderlaufen.
+
+    Gegenprobe eingebaut: das Bild MUSS mindestens zwei verschiedene
+    Zeitraeume tragen, sonst prueft der Test nur den einfachen Fall. Am
+    22.09.2026 traegt die Startansicht (Apple iPhone 17 Pro 256 GB, Band
+    Klein) vier Kurven - congstar, Telekom, Vodafone mit 24 Monaten und
+    1&1 mit 36.
+    """
+    seite = gw_seite["geraete"]
+    name = re.search(r'gr-zr-graph"\s+aria-label="([^"]*)"', seite, re.S)
+    assert name, "keine Grafik-Sektion mit zugaenglichem Namen gefunden"
+    genannt = {int(z) for z in re.findall(r"\d+", name.group(1))}
+
+    im_bild = {int(z) for z in re.findall(r">(\d+) Mon\.?<", seite)}
+    assert len(im_bild) >= 2, (
+        f"die Startansicht traegt nur die Zeitraeume {im_bild} - dann "
+        "prueft dieser Test nur den einfachen Fall. Am 22.09.2026 waren "
+        "es 24 und 36 (1&1 mit Buendelbetrag ueber 36 Monate). Anker mit "
+        "Begruendung neu setzen, nicht aufweichen")
+
+    assert genannt == im_bild, (
+        f"der Name der Grafik nennt {sorted(genannt)} Monate, die Kurven "
+        f"darin tragen {sorted(im_bild)}: "
+        f"{' '.join(name.group(1).split())!r}")

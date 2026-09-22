@@ -63,7 +63,7 @@ from pathlib import Path
 from typing import Optional
 
 from .collect.tarif_crawler import tarif_id
-from .tarif_model import HOCH, MITTEL
+from .tarif_model import HOCH, MITTEL, PREISTYP_LIVE_SHOP, zeitreihen_basis
 
 log = logging.getLogger(__name__)
 
@@ -113,6 +113,42 @@ class Bezug:
         return self.guete == HOCH
 
 
+def _aktuelle_lesart(bisher: Optional[dict], satz: dict) -> dict:
+    """Die BENANNTE REGEL bei einem Widerspruch zwischen zwei Lesarten.
+
+    B3 (21.09.2026), Beleg dieser Sitzung: die Telekom fuehrt MagentaMobil
+    S/M/L/XL je zweimal im Bestand - einmal als Pflichtdokument
+    (`versionsstand` 21.11.2021 bis 01.08.2024) und einmal als Live-Shop-
+    Kachel (`abgerufen_am` 2026-09-15), mit demselben Grundpreis, aber
+    unterschiedlichem Datenvolumen (S: 6 GB im Blatt gegen 30 GB in der
+    Kachel; M: 12 gegen 50; L: 80 gegen 100). Der gleiche Grundpreis in
+    beiden Lesarten schliesst eine Erfassungsluecke aus (CLAUDE.md § 16
+    verlangt genau diese Gegenprobe) - es sind zwei echte Lesarten
+    desselben Vertrags, keine zwei Tarife.
+
+    DIE LIVE-SHOP-LESART GEWINNT. Nicht weil sie zeitlich juenger waere -
+    `abgerufen_am` wandert bei JEDEM Lauf, auf beiden Seiten, das sagt
+    nichts ueber Aktualitaet. Sie gewinnt, weil das Pflichtdokument bei
+    einem Anbieter wie der Telekom ueber Jahre nur erneut ANGESEHEN wird,
+    nie neu AUSGESTELLT (`versionsstand` bleibt stehen, waehrend
+    `abgerufen_am` wandert) - eine Live-Shop-Kachel dagegen MISST den
+    Vertrag bei jedem Lauf neu. Dieselbe Regel entscheidet bereits die
+    SIM-only-Referenz in `analyze/tarif_referenzen._bevorzugt_live`; hier
+    gilt sie zusaetzlich fuer jeden anderen Blick auf denselben Bestand
+    (Tarifbindung, Datenvolumen, Preisphasen), der bisher am BARE
+    `tarif_id` vorbei auf das Pflichtdokument traf, weil
+    `tarif_crawler.uebernimm_stand` dem ZUERST gesehenen Preistyp den
+    kurzen Schluessel laesst (Bestandsschutz der Zeitreihe, keine
+    Aussage ueber Aktualitaet).
+    """
+    if bisher is None:
+        return satz
+    if (bisher.get("preistyp") != PREISTYP_LIVE_SHOP
+            and satz.get("preistyp") == PREISTYP_LIVE_SHOP):
+        return satz
+    return bisher
+
+
 class Tarifbestand:
     """Die letzten bekannten Staende aus `data/state/tarife.jsonl`.
 
@@ -121,6 +157,30 @@ class Tarifbestand:
     Fassung eines Tarifs ist kein zweiter Tarif. Gelesen wird deshalb von
     vorn nach hinten und ueberschrieben, genau wie `TarifSpeicher.letzter`
     es einzeln tut.
+
+    ZWEI SICHTEN AUF DENSELBEN BESTAND (B3, 21.09.2026)
+    ----------------------------------------------------
+    `je_id`         JEDE Zeitreihe unter ihrem eigenen Schluessel, unveraendert
+                    - auch die STILLGELEGTE Lesart bleibt hier stehen (nichts
+                    wird geloescht, CLAUDE.md § 2 gilt sinngemaess auch fuer
+                    dieses In-Memory-Abbild).
+    `je_id_aktuell` je Vertrag (`tarif_model.zeitreihen_basis`) NUR der Satz,
+                    der nach `_aktuelle_lesart` gerade gilt - unter ZWEI
+                    Schluesseln erreichbar (B3-Regression, FIX4,
+                    21.09.2026): dem BAREN, unter dem ein Buendel seinen
+                    Tarif nachschlaegt (`tarif_id()` traegt nie einen
+                    `#live_shop`-Zusatz), UND dem eigenen `tarif_id`, den
+                    der gewinnende Satz selbst traegt (z. B.
+                    `telekom:magentamobil-s#live_shop`) - eine SIM-only-
+                    Referenz aus `analyze/tarif_referenzen.py` fuehrt ihre
+                    `tarif_id` naemlich genau so weiter, wie der Bestand
+                    sie schreibt, nicht in ihrer baren Form. Beide
+                    Schluessel zeigen auf DASSELBE Satz-Objekt - es bleibt
+                    eine Auswahl der aktuellen Lesart, nur zweifach
+                    adressiert; keine zweite Wahrheit. Wer die aktuelle
+                    Aussage ueber einen Tarif braucht (Laufzeit,
+                    Datenvolumen, Phasen), liest `je_id_aktuell` - nicht
+                    `je_id`.
     """
 
     def __init__(self, saetze: list[dict]) -> None:
@@ -128,6 +188,20 @@ class Tarifbestand:
         for satz in saetze:
             if isinstance(satz, dict) and satz.get("tarif_id"):
                 self.je_id[satz["tarif_id"]] = satz
+
+        self.je_id_aktuell: dict[str, dict] = {}
+        for tid, satz in self.je_id.items():
+            kern = zeitreihen_basis(tid)
+            self.je_id_aktuell[kern] = _aktuelle_lesart(
+                self.je_id_aktuell.get(kern), satz)
+        # Zweite Passe (FIX4): dieselbe gewaehlte Lesart je Vertrag auch
+        # unter JEDER Zeitreihen-ID erreichbar machen, die zu ihrem baren
+        # Schluessel gehoert - nicht nur unter dem baren selbst. Ohne sie
+        # ging jeder Nachschlag mit einer `#live_shop`-tarif_id (die fuenf
+        # SIM-only-Referenzen aus B3) ins Leere, obwohl `je_id_aktuell`
+        # fuer denselben Vertrag laengst die richtige Lesart trug.
+        for tid in self.je_id:
+            self.je_id_aktuell[tid] = self.je_id_aktuell[zeitreihen_basis(tid)]
 
     @classmethod
     def aus_datei(cls, pfad: Path) -> "Tarifbestand":

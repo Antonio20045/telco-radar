@@ -532,6 +532,15 @@ def _referenztabelle(referenzen: list) -> list[dict]:
             "monatlich": r.tarif_sim_only_monatlich,
             "ueber_horizont": (kennzahl.gesamt
                                if kennzahl.belastbar else None),
+            # P0-B-h4: DER ZEITRAUM, DEN `ueber_horizont` TRAEGT - gelesen
+            # aus derselben Rechnung (`Tco.leitzahl_monate`, P0-B-h1), nie
+            # nachgerechnet. Eine SIM-only-Referenz laeuft immer ueber
+            # `als_buendel()` OHNE `buendel_monatlich` und traegt deshalb
+            # immer `TCO_HORIZONT` - aber DAS zu wissen ist die Aufgabe
+            # dieser Rechnung, nicht dieser Zeile: ein Leser, der 24
+            # hinschriebe, haette dieselbe Annahme gemacht, die bei den
+            # Buendeln 70 Zeilen falsch beschriftet hat.
+            "leitzahl_monate": kennzahl.leitzahl_monate,
             "anschlusspreis": r.anschlusspreis,
             "quelle_url": r.quelle_url,
             "abgerufen_am": r.abgerufen_am,
@@ -569,6 +578,15 @@ def _export_zeilen(buendel: list, massstab: list, eintraege: list, katalog,
     SKU kollabierten Vodafone-Varianten zu byte-identischen
     Exportzeilen (live: 156). Sie ist Teil des Bündelschluessels und
     trennt deshalb JEDES Paar, nicht nur das heutige.
+
+    P0-B-h4 (BEFUND HOCH, 21.09.2026): der Spaltenkopf `geraete_export.
+    SPALTEN_TCO` behauptete "Kosten über 24 Monate EUR" fuer JEDE Zeile,
+    obwohl 74 Buendel des Bestands (`buendel_monatlich`, 1&1) ihre Summe
+    ueber 36 Monate tragen (`Tco.leitzahl_monate`, P0-B-h1). Diese Funktion
+    reicht den Zeitraum deshalb als EIGENES Feld durch (`leitzahl_monate`,
+    aus `kennzahl.leitzahl_monate` bzw. derselben Rechnung fuer die
+    SIM-only-Referenz) - der Export liest ihn, statt eine feste Zahl in den
+    Kopf zu schreiben.
 
     Die SIM-only-Zeilen sind DERSELBE Massstab, den die Tafel zeigt
     (`_referenztabelle`), inklusive `ueber_horizont` als ihrer TCO-24 -
@@ -615,6 +633,17 @@ def _export_zeilen(buendel: list, massstab: list, eintraege: list, katalog,
             "laufzeit": b.laufzeit_monate,
             "anschlusspreis": b.anschlusspreis,
             "tco24": kennzahl.gesamt if kennzahl.belastbar else None,
+            # P0-B-h4: DER ZEITRAUM DER LEITZAHL, GELESEN aus derselben
+            # Rechnung (`Tco.leitzahl_monate`, P0-B-h1) - nie aus
+            # `laufzeit` abgeleitet. Bei einem zusammengelegten
+            # Buendelmonatspreis (1&1) ist das die Ratenlaufzeit selbst
+            # (36 bei 74 Buendeln des Bestands vom 21.09.2026), bei der
+            # aufgeteilten Form immer `TCO_HORIZONT` (24) - unabhaengig
+            # von einer laengeren Ratenlaufzeit der Geraeterate (congstar:
+            # 36 Raten, 24 Monate Leitzahl). Dasselbe Feld, das Karte,
+            # Ø/Monat und Δ-Tor lesen - der Export liest es jetzt auch,
+            # statt den Spaltenkopf pauschal "24 Monate" sagen zu lassen.
+            "leitzahl_monate": kennzahl.leitzahl_monate,
             "abgerufen_am": b.abgerufen_am,
             "quelle_url": b.quelle_url,
             # A4: das Unterscheidungsmerkmal der Farbvarianten - siehe
@@ -632,6 +661,9 @@ def _export_zeilen(buendel: list, massstab: list, eintraege: list, katalog,
             "tarif_monatlich": r["monatlich"],
             "anschlusspreis": r["anschlusspreis"],
             "tco24": r["ueber_horizont"],
+            # P0-B-h4: derselbe Zeitraum, GELESEN aus `_referenztabelle`
+            # (`Tco.leitzahl_monate` ueber `als_buendel()`) - siehe dort.
+            "leitzahl_monate": r["leitzahl_monate"],
             "abgerufen_am": r["abgerufen_am"],
             "quelle_url": r["quelle_url"],
         })
@@ -710,7 +742,11 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
     # Tarif 24 Monate und finanziert das Geraet ueber 36; die 24 stehen im
     # Tarifbestand (`tarife.jsonl`, ueber `tarif_id`). Ohne sie ist keine
     # Karte rechenbar - deshalb wird sie HIER gesetzt und nicht in der
-    # Kennzahl geraten (A5.5).
+    # Kennzahl geraten (A5.5). `tarife` ist seit B3 (21.09.2026) die
+    # AKTUELLE Lesart je Vertrag (`Tarifbestand.je_id_aktuell` - der
+    # Aufrufer reicht sie durch), nicht die rohe Zeitreihe: sonst traegt
+    # ein Buendel bei zwei Lesarten (Pflichtdokument/Live-Shop) die
+    # stillgelegte.
     #
     # A1 (20.09.2026): derselbe Durchlauf reichert die PREISPHASEN des
     # Tarifs an (`phasen_fuer_buendel`, dieselbe Stelle wie die

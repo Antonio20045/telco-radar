@@ -146,18 +146,37 @@ etwa weil ein Rabatt nur fuer einen Teil der Raten gilt -, wird der Satz
 verworfen: ein Gesamtbetrag, der seinen eigenen Bestandteilen widerspricht,
 ist keine Messung.
 
-ZWEI ZAHLWEISEN, EIN SAETZ
---------------------------
+ZWEI ZAHLWEISEN, ZWEI SAETZE (P0-B2a, 21.09.2026)
+--------------------------------------------------
 Je Variante stehen ZWEI Ratenlaeufen nebeneinander (24 und 36 Monate, beide
 gleiches `total` - congstar finanziert zum Nulltarif, kuerzer heisst hoehere
-Rate) und dazu eine TRADE_IN-Zahlweise, die ein Altgerat voraussetzt. Der
-Bestandsschluessel eines Buendels ist (SKU x Anbieter x Tarif) OHNE Laufzeit
-(`tco_model.buendel_id`); beide Laeufe zu liefern wuerde still einer den
-anderen ueberschreiben. Erhoben wird die 36-Monats-Finanzierung - o2 und
-Telekom fuehren ihre Buendel ebenfalls als 36-Raten-Vertrag bei 24 Monaten
-Tarifbindung, und A5.5 (Phase R) setzt die laengere Laufzeit als die, die
-die Karte fuehrt. Die 24er-Zahlweise ist dadurch kein Datenverlust: sie
-rechnet sich aus demselben `total` (kuerzere Laufzeit, hoehere Rate).
+Rate) und dazu eine TRADE_IN-Zahlweise, die ein Altgerat voraussetzt.
+
+Bis zum 21.09.2026 war das ein Zwang: der Bestandsschluessel kannte die
+Laufzeit nicht, und beide Laeufe zu liefern haette still einer den anderen
+ueberschrieben - erhoben wurde deshalb nur die 36-Monats-Finanzierung.
+Seit B1 traegt `tco_model.buendel_id` die Ratenlaufzeit im Schluessel:
+zwei Zahlweisen sind jetzt zwei Buendel und werden auch beide abgelegt.
+`_buendelzahlweisen()` liest jede Zahlweise, deren `contractDuration` in
+`_RATENLAUFZEITEN` (24, 36) steht, `lies_buendel()` legt fuer jede
+gefundene Laufzeit einen eigenen Satz an. Die TRADE_IN-Zahlweise bleibt
+aussen vor - sie setzt die Einnahme eines Altgeraets voraus und ist damit
+kein Preis fuer einen Neuabschluss ohne Eintausch.
+
+`_RATENLAUFZEITEN` ist eine POSITIVLISTE, und sie sagt das laut (FIX3,
+21.09.2026): eine Zahlweise mit anderer Dauer - 12 oder 48 Monate, oder
+eine Dauer, die diese Antwort ueberhaupt nicht als Zahl nennt - fiel bis
+dahin OHNE Protokoll heraus. Jetzt nennt `_buendelzahlweisen()` jede
+uebergangene Zahlweise samt Grund, und eine Dauer, die als Zeichenkette
+kommt ("36"), wird gelesen statt verworfen: die Positivliste gilt fuer
+LAUFZEITEN, nicht fuer JSON-Typen.
+
+Was die Liste kostet, ist gemessen und nicht geschaetzt: dreht man die
+36er der gespeicherten Tarifseite auf 48, bleiben 18 statt 36 Saetze -
+die 18 fehlenden stehen als 18 Protokollzeilen da und nicht auf der
+Seite. Die Liste bleibt trotzdem eine Liste: eine Laufzeit, die kein
+gespeicherter Abruf zeigt, soll auffallen und geprueft werden, bevor sie
+in den Bestand wandert (CLAUDE.md Fallstrick 16).
 
 DER SLUG IST DIE NUMMER DES PFLICHTBLATTS
 -----------------------------------------
@@ -195,6 +214,9 @@ from typing import Optional
 
 from . import GeraeteAbrufFehler
 from ...geraete_model import probe_geht_auf
+# DIE EINE STELLE, die entscheidet, ob ein Rohwert eine Ratenlaufzeit IST
+# (Clean Code 1): dieselbe Pruefung, die `buendel_id` und `Buendel` lesen.
+from ...tco_model import laufzeit_in_monaten
 
 log = logging.getLogger(__name__)
 
@@ -291,6 +313,28 @@ def _varianten(nutzlast: str) -> list[dict]:
     return out
 
 
+def _ist_ohne_vertrag(zahlweise: dict) -> bool:
+    """Traegt diese Zahlweise `contractDuration == 0`, also "ohne Vertrag"?
+
+    Keine zweite Laufzeit-Lesart: gefragt ist nicht, WIE LANG der Vertrag
+    laeuft, sondern ob es gar keinen gibt. Deshalb hier nicht
+    `laufzeit_in_monaten` - das macht aus einer 0 ein None, und an DIESER
+    Stelle ist die 0 eine Aussage (CLAUDE.md Clean Code 3).
+
+    Gelesen wird die ZAHL, nicht ihr JSON-Typ: `"0"` ist dieselbe Aussage
+    wie `0`. Der strikte Vergleich gegen die Zahl 0 liess die
+    Barpreis-Zahlweise sonst durchfallen und mit ihr die ganze Seite
+    (FIX3, gemessen an der echten Produktseite: 7 Rohsaetze gegen 0).
+    """
+    wert = zahlweise.get("contractDuration")
+    if isinstance(wert, bool):
+        return False                      # "ja" ist keine Dauer
+    try:
+        return float(wert) == 0.0
+    except (TypeError, ValueError):
+        return False
+
+
 def _einmalpreis(variante: dict) -> Optional[float]:
     """Der Geraetepreis ohne Vertrag - `oneTime.listed` der Zahlweise
     `ONE_TIME_PURCHASE` mit `contractDuration == 0`. Siehe Modulkopf: NIE
@@ -301,7 +345,7 @@ def _einmalpreis(variante: dict) -> Optional[float]:
             continue
         if zahlweise.get("type") != "ONE_TIME_PURCHASE":
             continue
-        if zahlweise.get("contractDuration") != 0:
+        if not _ist_ohne_vertrag(zahlweise):
             continue
         wert = (zahlweise.get("oneTime") or {}).get("listed")
         try:
@@ -336,7 +380,13 @@ def lies(text: str, url: str = "") -> list[dict]:
             continue
         preis = _einmalpreis(v)
         if preis is None:
-            continue                  # keine Einmalkauf-Zahlweise ohne Vertrag
+            # Keine Einmalkauf-Zahlweise ohne Vertrag - BENANNT, nicht
+            # still: faellt das Feld `contractDuration` oder sein Typ
+            # einmal aus, verliert diese Seite sonst lautlos alle Saetze.
+            log.info("congstar: Variante %r ohne Einmalkauf-Zahlweise "
+                     "(ONE_TIME_PURCHASE mit contractDuration 0) - kein "
+                     "Satz", titel)
+            continue
 
         # Derselbe Helfer wie im Buendel-Pfad (`_speicher_gb`: referenceGB
         # vor size): das 1-TB-Geraet traegt size=1, und size allein waere
@@ -385,9 +435,13 @@ _PLAN_START_RE = re.compile(r'\{"id":\d+,"type":"POSTPAID","title":"')
 # dieselbe Lehre wie beim congstar-Block in `config/tarif_quellen.yaml`.
 _PIB_NR_RE = re.compile(r"Produktinformationsblatt_(\d+)\.pdf")
 
-# Die Ratenlaufzeit der erhobenen Zahlweise - siehe Modulkopf
-# ("ZWEI ZAHLWEISEN, EIN SAETZ").
-_RATENLAUFZEIT = 36
+# Die Ratenlaufzeiten, die erhoben werden - siehe Modulkopf
+# ("ZWEI ZAHLWEISEN, EIN SAETZ", P0-B2a: beide, nicht mehr nur eine).
+# GEMESSEN an der gespeicherten Tarifseite: genau diese zwei stehen dort.
+# Es ist eine Positivliste, und `_buendelzahlweisen()` protokolliert jede
+# Dauer, die sie nicht enthaelt - eine 12- oder 48-Monats-Zahlweise soll
+# auffallen und nicht lautlos fehlen (FIX3).
+_RATENLAUFZEITEN = (24, 36)
 
 
 def _preis(wert) -> Optional[float]:
@@ -433,9 +487,21 @@ def _pib_nummer(plan: dict) -> str:
     return treffer.group(1)
 
 
-def _buendelzahlweise(variante: dict) -> Optional[dict]:
-    """Zuzahlung und Rate der 36-Monats-Zahlweise - nur wenn die Probe
-    aufgeht (Modulkopf: die Nachrechnung ist Bedingung, nicht Protokoll)."""
+def _buendelzahlweisen(variante: dict) -> dict:
+    """Zuzahlung und Rate JEDER erlaubten Zahlweise (`_RATENLAUFZEITEN`) -
+    nur wenn ihre Probe aufgeht (Modulkopf: die Nachrechnung ist
+    Bedingung, nicht Protokoll). Eine Zahlweise, deren Probe nicht
+    aufgeht, faellt fuer sich - die anderen bleiben.
+
+    Ergebnis: `{laufzeit_monate: {"zuzahlung":.., "rate":..}}`, hoechstens
+    ein Eintrag je Laufzeit (die erste lesbare gewinnt, falls eine Antwort
+    dieselbe Laufzeit doppelt nennen sollte).
+
+    JEDE uebergangene Zahlweise wird benannt: unlesbare Dauer, Dauer
+    ausserhalb von `_RATENLAUFZEITEN`, Dauer schon vorhanden, unvollstaendige
+    Betraege, Probe geht nicht auf. Die Positivliste ist damit sichtbar und
+    nicht mehr still (FIX3, 21.09.2026)."""
+    gefunden: dict = {}
     for zahlweise in (variante.get("prices") or {}).get("paymentVariants") or []:
         if not isinstance(zahlweise, dict):
             continue
@@ -443,17 +509,38 @@ def _buendelzahlweise(variante: dict) -> Optional[dict]:
             continue          # ONE_TIME_PURCHASE ist der Barpreis (lies, oben)
         if str(zahlweise.get("subtype") or "").upper() != "UNSPECIFIED":
             continue          # TRADE_IN setzt die Einnahme eines Altgeraets voraus
-        if zahlweise.get("contractDuration") != _RATENLAUFZEIT:
+        # Die Dauer wird als ZAHL gelesen, nicht am JSON-Typ gemessen:
+        # "36" ist dieselbe Laufzeit wie 36 (Modulkopf, FIX3).
+        dauer = laufzeit_in_monaten(zahlweise.get("contractDuration"))
+        if dauer is None:
+            log.info("congstar-Buendel: Zahlweise ohne lesbare "
+                     "contractDuration (%r) - uebergangen",
+                     zahlweise.get("contractDuration"))
+            continue
+        if dauer not in _RATENLAUFZEITEN:
+            log.info("congstar-Buendel: Zahlweise ueber %d Monate steht "
+                     "nicht in den erhobenen Ratenlaufzeiten %s - "
+                     "uebergangen", dauer, list(_RATENLAUFZEITEN))
+            continue
+        if dauer in gefunden:
+            log.info("congstar-Buendel: zweite Zahlweise ueber %d Monate - "
+                     "die erste lesbare gilt, diese uebergangen", dauer)
             continue
         anzahlung = _preis((zahlweise.get("oneTime") or {}).get("discounted"))
         rate = _preis((zahlweise.get("recurring") or {}).get("discounted"))
         gesamt = _preis(zahlweise.get("total"))
         if anzahlung is None or rate is None or gesamt is None:
+            log.info("congstar-Buendel: %d-Monats-Zahlweise ohne "
+                     "vollstaendige Betraege (Zuzahlung %r, Rate %r, "
+                     "Gesamt %r) - uebergangen", dauer, anzahlung, rate,
+                     gesamt)
             continue
-        if not probe_geht_auf(anzahlung, rate, _RATENLAUFZEIT, gesamt):
+        if not probe_geht_auf(anzahlung, rate, dauer, gesamt):
+            log.info("congstar-Buendel: %s-Monats-Zahlweise ohne "
+                     "aufgehende Rechenprobe - verworfen", dauer)
             continue
-        return {"zuzahlung": anzahlung, "rate": rate}
-    return None
+        gefunden[dauer] = {"zuzahlung": anzahlung, "rate": rate}
+    return gefunden
 
 
 def _speicher_gb(memory) -> Optional[int]:
@@ -524,38 +611,49 @@ def lies_buendel(text: str, url: str = "",
                 zustand = str(variante.get("condition") or "").strip().upper()
                 if (speicher, zustand) in gesehen:
                     continue
-                form = _buendelzahlweise(variante)
-                if form is None:
+                formen = _buendelzahlweisen(variante)
+                if not formen:
                     continue
                 titel = str(variante.get("title") or "").strip()
                 if not titel:
                     continue
                 gesehen.add((speicher, zustand))
-                out.append({
-                    "titel": titel,
-                    "farbe": str((variante.get("color") or {})
-                                 .get("name") or "").strip(),
-                    "speicher_gb": speicher,
-                    "sku": str(variante.get("id") or "").strip(),
-                    "ean": str(variante.get("gtin") or "").strip(),
-                    # Dasselbe rohe `condition`-Feld wie im Listungsweg -
-                    # die Einordnung leistet `zustand_aus_feldern` ueber
-                    # `lies_listung`, siehe Docstring von `lies()`.
-                    "zustand_hinweis": str(variante.get("condition") or ""),
-                    "tarif_name": tarif_name,
-                    # Die Pflichtblattnummer, siehe Modulkopf ("DER SLUG
-                    # IST DIE NUMMER DES PFLICHTBLATTS").
-                    "tarif_slug": tarif_slug,
-                    "tarif_monatlich": tarif_monatlich,
-                    "geraet_zuzahlung": form["zuzahlung"],
-                    "geraet_monatsrate": form["rate"],
-                    "anschlusspreis": anschluss,
-                    "laufzeit_monate": _RATENLAUFZEIT,
-                    # Die Tarifseite ist die Seite, auf der diese Zahlen
-                    # stehen - dieselbe Regel wie bei der Telekom-Kategorie.
-                    "url": url,
-                    "quelle": "congstar_tarifseite",
-                })
+                farbe = str((variante.get("color") or {})
+                           .get("name") or "").strip()
+                sku = str(variante.get("id") or "").strip()
+                ean = str(variante.get("gtin") or "").strip()
+                zustand_hinweis = str(variante.get("condition") or "")
+                # JEDE erlaubte Zahlweise (24 UND 36 Monate) wird ein
+                # eigener Satz mit eigener `laufzeit_monate` - der
+                # Bestandsschluessel traegt seit B1 die Laufzeit
+                # (`tco_model.buendel_id`), die Zahlweisen ueberschreiben
+                # sich also nicht mehr.
+                for laufzeit in sorted(formen):
+                    form = formen[laufzeit]
+                    out.append({
+                        "titel": titel,
+                        "farbe": farbe,
+                        "speicher_gb": speicher,
+                        "sku": sku,
+                        "ean": ean,
+                        # Dasselbe rohe `condition`-Feld wie im Listungsweg -
+                        # die Einordnung leistet `zustand_aus_feldern` ueber
+                        # `lies_listung`, siehe Docstring von `lies()`.
+                        "zustand_hinweis": zustand_hinweis,
+                        "tarif_name": tarif_name,
+                        # Die Pflichtblattnummer, siehe Modulkopf ("DER SLUG
+                        # IST DIE NUMMER DES PFLICHTBLATTS").
+                        "tarif_slug": tarif_slug,
+                        "tarif_monatlich": tarif_monatlich,
+                        "geraet_zuzahlung": form["zuzahlung"],
+                        "geraet_monatsrate": form["rate"],
+                        "anschlusspreis": anschluss,
+                        "laufzeit_monate": laufzeit,
+                        # Die Tarifseite ist die Seite, auf der diese Zahlen
+                        # stehen - dieselbe Regel wie bei der Telekom-Kategorie.
+                        "url": url,
+                        "quelle": "congstar_tarifseite",
+                    })
     return out
 
 

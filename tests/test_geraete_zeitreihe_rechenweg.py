@@ -31,6 +31,7 @@ from bs4 import BeautifulSoup
 
 from telco_radar.geraete_config import lade_katalog, lade_quellen
 from telco_radar.report import geraete_zeitreihe as zr
+from telco_radar.tco_model import tco_24
 from telco_radar.report.html import render_site
 
 from test_geraete_zeitreihe_ansicht import HEUTE, _baue
@@ -162,11 +163,60 @@ def test_die_serie_rechnet_die_punkte_mit_der_heutigen_leitzahl():
         {("m", "b"): {"o2": [("2026-09-12", 1120.75)]}}
 
 
-def test_die_zusammenform_rechnet_ebenfalls_alle_laufzeitmonate():
-    messungen = {("m", "b"): {"1&1": {"2026-09-12": _messung(
-        EINS_EINS_MESSUNG, anbieter="1&1", tarif="1&1 All-Net-Flat S")}}}
+def test_die_zusammenform_behaelt_ihre_kurve_und_nennt_ihren_zeitraum():
+    """P0-B-z1 (21.09.2026): die 36-Monats-Summe BEHAELT ihre Kurve.
+
+    ROT gegen den vorigen Stand (P0-B-h3): dort gab `_messwert` hier
+    `(None, 36)` zurueck und `_serien_aus` eine LEERE Reihe - das
+    gemessene Angebot verschwand aus dem Bild, die Tafel zaehlte einen
+    Anbieter weniger, und der Leser verlor die Information, dass dieser
+    Anbieter das Gerät überhaupt führt. Ein verschwiegenes Angebot ist
+    schlimmer als ein beschriftetes (CLAUDE.md: Meldungen werden nie
+    gekappt, harte Regel 9).
+
+    Die Kurve steht also - und der Zeitraum, den sie trägt, wird GELESEN
+    (`Tco.leitzahl_monate`) und ans Kurvenende geschrieben (`_svg`). Das
+    Tor wirkt weiter am Vorzeichen und an der Rangfolge (`_bewegung`,
+    `_band_zeilen`), nicht an der Sichtbarkeit.
+    """
+    m = _messung(EINS_EINS_MESSUNG, anbieter="1&1",
+                 tarif="1&1 All-Net-Flat S")
+    messungen = {("m", "b"): {"1&1": {"2026-09-12": m}}}
+    assert zr._messwert(m) == (2259.54, 36)
     assert zr._serien_aus(messungen) == \
         {("m", "b"): {"1&1": [("2026-09-12", 2259.54)]}}
+    # Der Zeitraum JE KURVE - aus derselben Lesung, nicht nachgerechnet.
+    assert zr._zeitraeume_aus(messungen) == {("m", "b"): {"1&1": [36]}}
+    # Gegenrechnung, dass keine Zahl verbogen wird: die Kennzahl selbst
+    # ist unveraendert 2.259,54 EUR ueber 36 Monate.
+    kennzahl = tco_24(zr._buendel_aus_messung(m))
+    assert (kennzahl.gesamt, kennzahl.leitzahl_monate) == (2259.54, 36)
+    assert kennzahl.gesamt == round(420.0 + 39.90 + 36 * 49.99, 2)
+
+
+def test_die_aufgeteilte_form_nennt_ihre_24_monate_genauso():
+    """Die Gegenprobe: o2 rechnet 24 Tarifmonate plus alle Raten - die
+    Leitzahl traegt 24 Monate, und `_messwert` NENNT sie. Dass der
+    Zeitraum immer mitkommt, ist genau der Unterschied zum alten Stand,
+    an dem `None` zweierlei hiess ("passt auf die Achse" und "nicht
+    gemessen")."""
+    m = _messung(O2_MESSUNG)
+    assert zr._messwert(m) == (1120.75, 24)
+    assert tco_24(zr._buendel_aus_messung(m)).leitzahl_monate == 24
+
+
+def test_ohne_belastbare_zahl_gibt_es_weiter_keinen_punkt():
+    """Die Grenze des neuen Verhaltens: ein fremder Zeitraum ist KEIN
+    Ausfall, eine fehlende Ratenlaufzeit schon. Ohne `laufzeit_monate`
+    fehlt der ganze Monatsblock der Zusammenform - kein Punkt, keine
+    geratene Hoehe (Clean Code 3)."""
+    m = _messung(dict(EINS_EINS_MESSUNG, laufzeit_monate=None),
+                 anbieter="1&1", tarif="1&1 All-Net-Flat S")
+    assert zr._messwert(m) == (None, None)
+    assert zr._serien_aus({("m", "b"): {"1&1": {"2026-09-12": m}}}) == \
+        {("m", "b"): {"1&1": []}}
+    assert zr._zeitraeume_aus({("m", "b"): {"1&1": {"2026-09-12": m}}}) == \
+        {("m", "b"): {"1&1": []}}
 
 
 def test_die_auswahl_des_guenstigsten_buendels_je_tag_rechnet_neu(tmp_path):
@@ -407,6 +457,50 @@ def test_jeder_punkt_traegt_eine_hover_vorschau():
         "o2 · 12.9. · 893 €": ("o2", "2026-09-12"),
         "o2 · 13.9. · 890 €": ("o2", "2026-09-13"),
     }
+
+
+def test_zwei_zeitraeume_stehen_an_den_kurven_und_in_der_beschriftung():
+    """P0-B-z1: das Bild trägt zwei Laufzeiten - und sagt das.
+
+    ROT gegen den vorigen Stand zweifach: `_svg` kannte den vierten
+    Parameter nicht (die Kurve des fremden Zeitraums war schon vorher
+    weggenommen), und das aria-label behauptete fest "Kosten über 24
+    Monate" über jeder Kurve im Bild. Jetzt nennt die Beschriftung beide
+    Zeitraeume, und JEDE Kurve trägt ihren am Ende - einer allein liest
+    sich, als gelte er auch fuer die anderen.
+    """
+    serien = {"o2": [["2026-09-12", 892.75], ["2026-09-13", 890.0]],
+              "1&1": [["2026-09-12", 2019.54], ["2026-09-13", 2019.54]]}
+    svg = zr._svg(serien, True, {"o2": ("https://b", "2026-09-13")},
+                  {"o2": [24], "1&1": [36]})
+    assert ("aria-label='Kosten über 24 und 36 Monate je Messtag und "
+            "Anbieter: o2, 1&amp;1'") in svg, svg[:400]
+    suppe = BeautifulSoup(svg, "html.parser")
+    etiketten = [t.get_text(strip=True)
+                 for t in suppe.select("text.gr-zr-mon")]
+    assert sorted(etiketten) == ["24 Mon.", "36 Mon."], etiketten
+    # Die Kurve selbst ist da: zwei Punkte je Anbieter.
+    assert len(suppe.select("circle.gr-zr-punkt[data-anb='1&1']")) == 2
+
+
+def test_ein_einziger_zeitraum_steht_nur_in_der_beschriftung():
+    """Die Gegenprobe zu Antonios „wenig Text": gilt EIN Zeitraum fuer
+    alle Kurven, sagt ihn die Beschriftung - und keine Kurve wiederholt
+    ihn (eine Angabe je Ort)."""
+    svg = zr._svg(_serien(), True, {"o2": ("https://b", "2026-09-13")},
+                  {"o2": [24]})
+    assert "aria-label='Kosten über 24 Monate je Messtag und " \
+        "Anbieter: o2'" in svg
+    assert "gr-zr-mon" not in svg
+
+
+def test_ohne_gelesenen_zeitraum_behauptet_die_beschriftung_keinen():
+    """Clean Code 3/4: ist kein Zeitraum gelesen, steht keiner da - eine
+    angenommene 24 waere genau die falsche Beschriftung, die P0-B-z1
+    abstellt."""
+    svg = zr._svg(_serien(), True, {"o2": ("https://b", "2026-09-13")}, {})
+    assert "aria-label='Kosten je Messtag und Anbieter: o2'" in svg
+    assert "Monate" not in svg
 
 
 def test_ein_einzelmesstag_traegt_einen_halo_und_heisst_erstmals():

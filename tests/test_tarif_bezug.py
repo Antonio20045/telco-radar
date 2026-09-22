@@ -209,6 +209,111 @@ def test_eine_fehlende_datei_ist_ein_leerer_bestand(tmp_path):
 
 
 # --------------------------------------------------------------------------
+# `je_id_aktuell`: welche Lesart bei Widerspruch gilt (B3, 21.09.2026)
+# --------------------------------------------------------------------------
+# Beleg dieser Sitzung: Telekom MagentaMobil S/M/L/XL stehen je zweimal im
+# Bestand - als Pflichtdokument (2021-2024) und als Live-Shop-Kachel
+# (15.09.2026), mit demselben Grundpreis, aber verschiedenem Datenvolumen
+# (S 6 vs. 30 GB, M 12 vs. 50 GB, L 80 vs. 100 GB). Der Bug, den diese
+# Tests rot machen (Stand vor B3): `tarif_crawler.uebernimm_stand` laesst
+# dem ZUERST gesehenen Preistyp den BARE `tarif_id` - bei der Telekom ist
+# das seit Jahren das Pflichtdokument. Ein Buendel loest aber immer auf
+# den BARE `tarif_id` auf (`tarif_id()` haengt nie `#live_shop` an), und
+# `report/geraete_view.py` reichte bisher `Tarifbestand.je_id` (die rohe
+# Zeitreihe) an die Geraeteseite durch - die Karte zeigte deshalb IMMER
+# das Pflichtdokument, auch wenn eine aktuellere Live-Shop-Lesart vorlag.
+
+def test_je_id_aktuell_zeigt_die_live_shop_lesart_am_bare_schluessel():
+    """Die Karte soll das GB der Live-Shop-Kachel sehen, nicht des Blatts."""
+    pib = _satz("Telekom", "MagentaMobil S", 39.95, datenvolumen_gb=6.0,
+                versionsstand="21.11.2021", abgerufen_am="2026-09-15")
+    kachel = _satz("Telekom", "MagentaMobil S", 39.95, datenvolumen_gb=30.0,
+                   preistyp="live_shop", abgerufen_am="2026-09-15")
+    kachel["tarif_id"] += "#live_shop"       # so trennt sie der Speicher
+
+    bestand = Tarifbestand([pib, kachel])
+    bare = tarif_id("Telekom", "MagentaMobil S")
+
+    # DIE ROHE ZEITREIHE BLEIBT VOLLSTAENDIG - nichts wird geloescht.
+    assert bestand.je_id[bare]["datenvolumen_gb"] == 6.0
+    assert bestand.je_id[f"{bare}#live_shop"]["datenvolumen_gb"] == 30.0
+
+    # DIE AKTUELLE LESART steht unter dem BARE Schluessel, unter dem ein
+    # Buendel seinen Tarif nachschlaegt.
+    assert bestand.je_id_aktuell[bare]["datenvolumen_gb"] == 30.0
+    assert bestand.je_id_aktuell[bare]["preistyp"] == "live_shop"
+
+
+def test_je_id_aktuell_ist_unabhaengig_von_der_reihenfolge():
+    pib = _satz("Telekom", "MagentaMobil M", 49.95, datenvolumen_gb=12.0)
+    kachel = _satz("Telekom", "MagentaMobil M", 49.95, datenvolumen_gb=50.0,
+                   preistyp="live_shop")
+    kachel["tarif_id"] += "#live_shop"
+    bare = tarif_id("Telekom", "MagentaMobil M")
+
+    for reihenfolge in ([pib, kachel], [kachel, pib]):
+        aktuell = Tarifbestand(reihenfolge).je_id_aktuell[bare]
+        assert aktuell["datenvolumen_gb"] == 50.0
+
+
+def test_je_id_aktuell_ohne_zweite_lesart_bleibt_der_satz_selbst():
+    """Ein Tarif ohne Widerspruch braucht keine Regel - er bleibt, wie er ist."""
+    satz = _satz("o2", "O2 Mobile M", 39.99, datenvolumen_gb=20.0)
+    aktuell = Tarifbestand([satz]).je_id_aktuell[tarif_id("o2", "O2 Mobile M")]
+    assert aktuell is satz
+
+
+def test_je_id_aktuell_ist_auch_unter_dem_eigenen_schluessel_erreichbar():
+    """FIX4-Regression (B3, 21.09.2026): die Live-Shop-ID selbst muss auch treffen.
+
+    `analyze/tarif_referenzen.py` fuehrt die `tarif_id` einer SIM-only-
+    Referenz genau so weiter, wie der Bestand sie schreibt - bei den fuenf
+    betroffenen Referenzen also MIT `#live_shop`-Zusatz, nicht bar. Vor
+    diesem Fix stand `je_id_aktuell` ausschliesslich unter dem baren
+    Schluessel; ein Nachschlag mit der eigenen ID der Referenz ging ins
+    Leere, obwohl `je_id_aktuell` fuer denselben Vertrag laengst die
+    Live-Shop-Lesart trug."""
+    pib = _satz("Telekom", "MagentaMobil S", 39.95, datenvolumen_gb=6.0,
+                versionsstand="21.11.2021", abgerufen_am="2026-09-15")
+    kachel = _satz("Telekom", "MagentaMobil S", 39.95, datenvolumen_gb=30.0,
+                   preistyp="live_shop", abgerufen_am="2026-09-15")
+    kachel["tarif_id"] += "#live_shop"
+
+    bestand = Tarifbestand([pib, kachel])
+    bare = tarif_id("Telekom", "MagentaMobil S")
+    eigen = f"{bare}#live_shop"
+
+    # Dieselbe gewinnende Lesart, ob unter der baren oder der eigenen ID
+    # nachgeschlagen - keine zweite Wahrheit, nur ein zweiter Zugang.
+    assert bestand.je_id_aktuell[eigen] is bestand.je_id_aktuell[bare]
+    assert bestand.je_id_aktuell[eigen]["datenvolumen_gb"] == 30.0
+    assert bestand.je_id_aktuell[eigen]["preistyp"] == "live_shop"
+
+
+def test_je_id_aktuell_am_echten_bestand_telekom_s_m_l():
+    """Die Gegenprobe gegen `data/state/tarife.jsonl`: vorher/nachher.
+
+    Der Bestand traegt fuer S/M/L/XL je eine Pflichtdokument- und eine
+    Live-Shop-Lesart (gemessen 21.09.2026). `je_id` (roh) liefert am BARE
+    Schluessel weiterhin das PIB-Volumen - `je_id_aktuell` das der Kachel.
+    """
+    bestand = Tarifbestand.aus_datei(_BESTAND)
+    erwartet = {
+        "telekom:magentamobil-s": (6.0, 30.0),
+        "telekom:magentamobil-m": (12.0, 50.0),
+        "telekom:magentamobil-l": (80.0, 100.0),
+    }
+    for bare, (alt_gb, neu_gb) in erwartet.items():
+        assert bestand.je_id[bare]["datenvolumen_gb"] == alt_gb, bare
+        assert bestand.je_id_aktuell[bare]["datenvolumen_gb"] == neu_gb, bare
+        assert bestand.je_id_aktuell[bare]["preistyp"] == "live_shop", bare
+        # Derselbe Grundpreis in beiden Lesarten - kein Verdacht auf eine
+        # Erfassungsluecke (CLAUDE.md § 16), sondern zwei echte Lesarten.
+        assert (bestand.je_id[bare]["grundgebuehr"]
+                == bestand.je_id_aktuell[bare]["grundgebuehr"])
+
+
+# --------------------------------------------------------------------------
 # Die SIM-only-Referenzen aus dem Bestand
 # --------------------------------------------------------------------------
 

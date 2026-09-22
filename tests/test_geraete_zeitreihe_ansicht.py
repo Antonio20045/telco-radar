@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import json
 import pathlib
+import re
 
 import pytest
 import yaml
@@ -905,3 +906,208 @@ def test_auto_modell_mit_zwei_mestagen_steht_in_der_wahl(tmp_path):
     ids = {m["id"] for m in a["suchindex"]}
     assert "apple-iphone-18-pro-256" in ids
     assert any(p["modell"] == "apple-iphone-18-pro-256" for p in a["paare"])
+
+
+# ==========================================================================
+# P0-B-h3 (21.09.2026, Befund 3): EIN GRAPH, EIN ZEITRAUM
+#
+# Der Graph traegt EINE Y-Achse und die Beschriftung "Kosten über 24
+# Monate je Messtag und Anbieter" - und fuehrte darin die 1&1-Serie mit
+# rund 2.020 EUR als 36-Monats-Summe (ein Monatsbetrag fuer Tarif UND
+# Geraet, § 13.2). Auf einer Achse ist das keine teurere Zahl, sondern
+# eine laengere Laufzeit: dieselbe Aussage, die derselbe Stand an der
+# Buendelzeile als unbelegt aussortiert.
+#
+# Die Sprache ist die der Buendelzeile: die Zahl verschwindet nicht, sie
+# steht BENANNT daneben (harte Regel 9, A2 - der Strich heisst "kein
+# Angebot"). Ein zweiter Graph waere keine Loesung: die Startansicht
+# traegt genau EIN svg.gr-zr (test_geraete_reiter_browser).
+# ==========================================================================
+
+def _h3_karte(anbieter, gesamt, monate, band="klein", frisch=True):
+    """Eine Kartenzeile in der Form, die `_band_zeilen` liest."""
+    return {"anbieter": anbieter, "gesamt": gesamt, "schnitt_monat":
+            round(gesamt / monate, 2), "leitzahl_monate": monate,
+            "tarif": f"{anbieter} Tarif", "band": band,
+            "band_gb_text": "15 GB", "vergleichbar": True,
+            "belastbar": True, "frisch": frisch, "sku_id": f"sku-{anbieter}",
+            "naeherung": False, "quelle_url": f"https://x.invalid/{anbieter}",
+            "abgerufen_am": HEUTE}
+
+
+def test_h3_eine_36_monats_karte_ist_keine_zeile_dieser_tafel():
+    """Rot gegen den alten Stand: dort stand 1&1 mit 1.299,54 EUR (36
+    Monate) als GUENSTIGSTE Zeile vor Vodafones 1.433,80 EUR (24 Monate)
+    - der Antwort-Satz nannte sie "Kosten über 24 Monate", und
+    `_leitzahl_html` zog die zwei Zahlen voneinander ab."""
+    modell = {"id": "m", "titel": "Testgerät", "hersteller": "Test",
+              "speicher": 256,
+              "karten": [_h3_karte("1&1", 1299.54, 36),
+                         _h3_karte("Vodafone", 1433.80, 24)]}
+    satz = geraete_zeitreihe._band_zeilen(modell)["klein"]
+    assert [z["anbieter"] for z in satz["zeilen"]] == ["Vodafone"]
+    # Sie ist nicht weg, sie liegt im eigenen Eimer - MIT ihrem Zeitraum.
+    assert [(k["anbieter"], k["leitzahl_monate"]) for k in satz["fremd"]] \
+        == [("1&1", 36)]
+    # Kein Delta ueber zwei Zeitraeume: Vodafone fuehrt selbst, also gibt
+    # es keine Leitzahl-Zeile (vorher: 1.433,80 - 1.299,54 = 134,26 EUR).
+    assert geraete_zeitreihe._leitzahl_html(satz["zeilen"]) is None
+    text = _text(geraete_zeitreihe._antwort_html(
+        modell, "klein", satz["zeilen"], {"label": "Klein"},
+        fremd=satz["fremd"]))
+    assert "führt nur Vodafone" in text and "1.433,80 €" in text
+    assert "1.299,54" not in text
+
+
+def test_h3_der_luecken_satz_nennt_anbieter_und_zeitraum():
+    """Der Anbieter faellt aus den Zeilen - und wird GENANNT. "Kein
+    Bündel in diesem Band" waere gelogen (harte Regel 9)."""
+    modell = {"id": "m", "titel": "Testgerät", "hersteller": "Test",
+              "speicher": 256,
+              "karten": [_h3_karte("1&1", 1299.54, 36),
+                         _h3_karte("Vodafone", 1433.80, 24)]}
+    satz = geraete_zeitreihe._band_zeilen(modell)["klein"]
+    luecken = geraete_zeitreihe._luecken(
+        satz["zeilen"], modell["karten"], "klein", fremd=satz["fremd"])
+    eins = next(l for l in luecken if l["anbieter"] == "1&1")
+    assert (eins["grund"], eins["monate"]) == ("anderer-zeitraum", 36)
+    text = geraete_zeitreihe._luecke_text(luecken, {})
+    assert "Nur über eine andere Laufzeit, nicht über 24 Monate: " \
+        "1&1 (36 Monate)" in text, text
+    assert "Kein Bündel in diesem Band: 1&1" not in text
+
+
+def test_h3_ein_band_mit_nur_fremdem_zeitraum_verschwindet_nicht():
+    """Der stille Verlust, den das Tor sonst verursacht: ein Band, dessen
+    EINZIGES Angebot 36 Monate traegt, hat keine Zeile - "führt kein
+    Anbieter ein Bündel" waere falsch, und das Band ganz aus der Auswahl
+    zu nehmen waere ein gemessenes Angebot ohne ein Wort."""
+    modell = {"id": "m", "titel": "Testgerät", "hersteller": "Test",
+              "speicher": 256, "karten": [_h3_karte("1&1", 2019.54, 36)]}
+    satz = geraete_zeitreihe._band_zeilen(modell)["klein"]
+    assert satz["zeilen"] == [] and satz["alt"] == []
+    assert satz["fremd"], "das Angebot ist verloren gegangen"
+    text = _text(geraete_zeitreihe._antwort_html(
+        modell, "klein", satz["zeilen"], {"label": "Klein"},
+        alte=satz["alt"], fremd=satz["fremd"]))
+    assert "führt kein Anbieter ein Bündel" not in text
+    assert "führt nur 1&amp;1" in text and "nur über 36 Monate" in text
+    assert "2.019,54 €" in text, text
+
+
+def test_z1_die_beschriftung_behauptet_nur_zeitraeume_die_im_bild_stehen(
+        ansicht):
+    """P0-B-z1: Graph und Beschriftung sagen dasselbe - ohne Kappung.
+
+    ROT gegen den vorigen Stand (P0-B-h3): der verlangte hier, dass ein
+    Anbieter mit fremdem Zeitraum KEINE Kurve traegt, und liess die
+    Beschriftung dafuer fest "Kosten über 24 Monate" sagen. Das nahm dem
+    Leser ein gemessenes Angebot (harte Regel 9). Jetzt gilt die
+    Selbstauskunft des Bildes: nennt die Beschriftung EINEN Zeitraum,
+    wiederholt ihn keine Kurve; nennt sie mehrere, traegt JEDE Kurve
+    ihren eigenen am Ende.
+    """
+    paare = ansicht["paare"]
+    assert paare, "keine Paare - der Test prueft nichts"
+    mit_svg = 0
+    for p in paare:
+        for bild in (p["svg_breit"], p["svg_schmal"]):
+            if not bild:
+                continue
+            mit_svg += 1
+            kopf = re.search(r"aria-label='([^']*)'", bild).group(1)
+            kopf = kopf.split(" je Messtag")[0]
+            assert kopf.startswith("Kosten"), kopf
+            monate = re.findall(r"gr-zr-mon'[^>]*>([^<]*)<", bild)
+            kurven = len(set(re.findall(r"data-anb='([^']*)'", bild)))
+            if " und " in kopf:
+                assert len(monate) == kurven, (
+                    f"{p['modell']}/{p['band']}: {kopf!r} nennt mehrere "
+                    f"Zeitraeume, aber nur {len(monate)} von {kurven} "
+                    f"Kurven tragen ihren")
+            else:
+                assert not monate, (
+                    f"{p['modell']}/{p['band']}: {kopf!r} gilt fuer alle "
+                    f"Kurven - das Etikett {monate} steht doppelt")
+    assert mit_svg, "kein Graph im Bestand - der Test prueft nichts"
+
+
+def test_z1_der_alternativ_betrag_nennt_seinen_abweichenden_zeitraum():
+    """MITNEHMEN (:371): die Luecken-Zeile nannte einen 36-Monats-Betrag
+    als Alternative OHNE seinen Zeitraum - mitten in einem Satz, der von
+    24 Monaten spricht. ROT gegen den alten Stand: dort stand nur
+    "mittel 2.019,54 €"."""
+    karten = [_h3_karte("1&1", 2019.54, 36, band="mittel"),
+              _h3_karte("Vodafone", 1433.80, 24, band="klein")]
+    alternativen = geraete_zeitreihe._alternativen(karten, "klein", "1&1")
+    assert alternativen == [{"band": "mittel", "tco": 2019.54,
+                             "monate": 36}]
+    luecken = geraete_zeitreihe._luecken(
+        [{"anbieter": "Vodafone"}], karten, "klein")
+    text = geraete_zeitreihe._luecke_text(luecken, {})
+    assert "1&1 (mittel 2.019,54 € über 36 Monate)" in text, text
+    # Gegenprobe: beim Zeitraum des Satzes selbst bleibt die Angabe weg -
+    # eine 24 hinter jeder Zahl waere dieselbe Aussage zweimal.
+    karten24 = [_h3_karte("1&1", 1700.00, 24, band="mittel"),
+                _h3_karte("Vodafone", 1433.80, 24, band="klein")]
+    text24 = geraete_zeitreihe._luecke_text(
+        geraete_zeitreihe._luecken([{"anbieter": "Vodafone"}], karten24,
+                                   "klein"), {})
+    assert "1&1 (mittel 1.700,00 €)" in text24, text24
+
+
+def test_z1_die_alternative_vergleicht_nur_innerhalb_eines_zeitraums():
+    """Clean Code 1 / Tor: die guenstigste Alternative EINES Bandes darf
+    nicht ueber zwei Laufzeiten gewaehlt werden. ROT gegen den alten
+    Stand: dort gewann das Minimum (1.200,00 € über 36 Monate) gegen die
+    vergleichbare 24-Monats-Zahl."""
+    karten = [_h3_karte("1&1", 1200.00, 36, band="mittel"),
+              _h3_karte("1&1", 1500.00, 24, band="mittel"),
+              _h3_karte("Vodafone", 1433.80, 24, band="klein")]
+    assert geraete_zeitreihe._alternativen(karten, "klein", "1&1") == \
+        [{"band": "mittel", "tco": 1500.00, "monate": 24}]
+
+
+def test_z1_die_bewegung_geht_nie_ueber_zwei_zeitraeume():
+    """Das Tor sitzt am VORZEICHEN, nicht an der Sichtbarkeit (P0-B-z1).
+
+    congstar rechnet ueber 24 Monate und sinkt um 50 €; 1&1s Summe ist
+    ZAHLENMAESSIG kleiner, traegt aber 36 Monate. ROT gegen den alten
+    Stand: dort waehlte `_bewegung` den Fuehrenden ueber beide Zeitraeume
+    (1&1) und meldete dessen ±0 als Bewegung des Bandes.
+    """
+    serien = {"congstar": [("2026-09-12", 1459.0), ("2026-09-15", 1409.0)],
+              "1&1": [("2026-09-12", 1299.54), ("2026-09-15", 1299.54)]}
+    zeitraeume = {"congstar": [24], "1&1": [36]}
+    assert geraete_zeitreihe._bewegung(serien, zeitraeume) == \
+        {"text": "↓ −50 € in 3 Tagen", "richtung": "sinkt"}
+    # Gegenprobe, dass der Unterschied am Tor haengt und nicht an den
+    # Zahlen: OHNE Zeitraum-Wissen fuehrt 1&1 - genau die Rangfolge, die
+    # der alte Stand gemeldet hat.
+    assert geraete_zeitreihe._bewegung(serien) == \
+        {"text": "±0 € in 3 Tagen", "richtung": "gleich"}
+    # Und wechselt der Fuehrende selbst die Laufzeit, ist die Stufe in
+    # seiner Kurve keine Preisaenderung: kein Delta (Clean Code 4).
+    assert geraete_zeitreihe._bewegung(
+        {"1&1": [("2026-09-12", 1000.0), ("2026-09-15", 1500.0)]},
+        {"1&1": [24, 36]}) is None
+
+
+def test_z1_der_fremde_zeitraum_hat_sein_eigenes_kachel_feld(tmp_path):
+    """MITNEHMEN (:1521): der Zustand lag in `alt_text` - dem Feld des
+    ALTEN Stands - und bekam in der Vorlage dessen Beschriftung ("kein
+    aktueller Bündel-Stand") ueber einem heute gemessenen Angebot. ROT
+    gegen den alten Stand: dort war `alt_text` gesetzt und `fremd_text`
+    gab es nicht.
+    """
+    tco = {"modelle": [{"id": "m", "titel": "Testgerät 256 GB",
+                        "hersteller": "Test", "speicher": 256,
+                        "karten": [_h3_karte("1&1", 2019.54, 36)]}],
+           "baender_katalog": [{"key": "klein", "label": "Klein"}],
+           "band_je_tarif": {}, "historie_lage": {}}
+    a = geraete_zeitreihe.aufbereiten(tmp_path, tco)
+    kachel = a["kacheln"][0]["baender"]["klein"]
+    assert kachel["fremd_text"] == "nur über 36 Monate"
+    assert kachel["alt_text"] is None, \
+        "der fremde Zeitraum ist kein alter Stand"
+    assert kachel["ab"] is None, "kein Betrag ohne vergleichbaren Zeitraum"

@@ -260,16 +260,38 @@ def lies(text: str, url: str = "") -> list[dict]:
 # abgerufen: 66 Seiten a rund 950 KB waeren 63 MB je Nacht fuer eine
 # Aufteilung, die schon in der einen Katalogantwort steht.
 #
-# WAS DER TARIFBETRAG IST - UND WAS NICHT
-# ---------------------------------------
-# 19,99 EUR ist der Tarifpreis IN DIESEM BUENDEL. Die SIM-only-Kachel
-# desselben Tarifs nennt 24,99 EUR; o2 sagt auf der Produktseite selbst,
-# dass es zum Geraeteratenplan "einen attraktiven monatlichen Rabatt auf
-# deinen Tarif" gibt. Beide Zahlen stehen im Bestand, und die Differenz ist
-# genau die Auskunft, um die es geht - `Geraeteanteil` zieht die eine TCO
-# von der anderen ab. Hier wird deshalb NICHT der Kachelpreis eingesetzt
-# und auch kein Rabatt daraus gerechnet: gespeichert wird, was fuer dieses
-# Buendel zu zahlen ist.
+# WAS DER TARIFBETRAG IST - UND WAS NICHT (Stand P0-B-h5, 21.09.2026)
+# ------------------------------------------------------------------------
+# 19,99 EUR (Beispiel "O2 Mobile on Demand M Plus") ist der Tarifpreis IN
+# DIESEM BUENDEL. Die SIM-only-Kachel DESSELBEN Tarifs (aufgeloest ueber
+# den Slug, siehe `tco_buendel.py`) nennt je Geraet 19,99/24,99/... EUR,
+# und o2 nennt die Differenz auf der Produktseite selbst "einen
+# attraktiven monatlichen Rabatt auf deinen Tarif". Der Betrag ist
+# gemessen: bei diesem Geraeteratenplan 19,99 statt 24,99 SIM-only, also
+# -5,00 EUR im Monat.
+#
+# DIESE DIFFERENZ IST DER PREIS UND KEIN ABZUG. Das ist die Lesart seit
+# P0-B-fix1 und sie steht ausgeschrieben in `analyze/tco_buendel.py`
+# ("KEIN BETRAG WIRD UMGERECHNET"): "der Anbieter sagt Rabatt" ist nicht
+# dasselbe wie "bedingter Nachlass". Wer die -5,00 EUR als
+# `tco_model.Rabatt` neben den Betrag legt, weist eine Ersparnis aus, die
+# mit diesem Ratenplan niemand mehr holen kann, und hebt die Leitzahl
+# aller 72 o2-Buendel um 120,00 bis 276,00 EUR, ohne dass sich ein
+# o2-Preis geaendert hat. Genau das war fuer einen Tag eingebaut und ist
+# zurueckgenommen.
+#
+# Dieser Adapter speichert deshalb den GEMESSENEN Buendelbetrag
+# (`tarif_monatlich`, das, was fuer DIESES Buendel zu zahlen ist) und
+# rechnet nichts um. Er fuehrt dazu auch KEIN Deutungsflag mehr: bis
+# P0-B-h5 hing an jedem Rohsatz ein `tarif_rabatt_beleg=True`, dessen
+# einziger Leser mit der Ruecknahme entfallen war. Ein Feld ohne Leser,
+# dessen Beschreibung eine Vertragsstelle nennt, die es nicht mehr gibt,
+# ist die Bauanleitung fuer denselben Fehler - der BETRAG gehoert
+# dokumentiert (oben), die Deutung nicht in ein Datenfeld.
+#
+# Was der SIM-only-Preis desselben Tarifs leistet, leistet er anderswo:
+# als Massstab in `analyze/tarif_referenzen.py` und als Geraeteanteil in
+# `tco_model.geraeteanteil()` - dort steht die Differenz als Differenz.
 #
 # Die Zubehoerbuendel werden mit derselben Regel verworfen wie im
 # Geraetekatalog (` mit ` in Beschreibung oder Angebotsname): 22 der 88.
@@ -412,6 +434,10 @@ def _buendelsatz(h: dict, proben: Optional[dict] = None) -> Optional[dict]:
         "laufzeit_monate": laufzeit,
         "url": str(ziel.get("uri") or "").strip(),
         "quelle": "o2_buendel",
+        # Kein Deutungsflag zum Tarifbetrag - siehe Modulkopf "WAS DER
+        # TARIFBETRAG IST - UND WAS NICHT". `tarif_monatlich` oben IST der
+        # Preis dieses Buendels; die -5,00 EUR gegenueber der
+        # SIM-only-Kachel sind Teil davon und kein Abzug daneben.
     }
 
 

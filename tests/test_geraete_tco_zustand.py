@@ -754,24 +754,32 @@ def test_die_gerenderte_zeile_zeigt_kleine_abstaende_mit_ungefaehr(tmp_path):
         strip=True) == "–"
 
 
-def test_annaeherung_nur_bei_gleicher_laufzeit_der_satz_sagt_je_monat():
-    """S1 der Diff-Pruefung (A2, 20.09.2026): das "≈" der Annaeherung
-    traegt KEINEN Monatsbezug. Bei verschiedener Laufzeit ist der Ø/Monat
-    der einzige Abstand (A5.3/A5.4), und der Delta-Satz der Vorlage sagt
-    "je Monat" dazu - bis zum Fix griff die Wesentlichkeits-Rechnung auch
-    dort (bezug = monatlich) und setzte `ungefaehr`: der ≈-Zweig steht in
-    der Vorlage vor dem je-Monat-Zweig, also stand "≈ 0,04 € über der
-    Vodafone-Referenz" - 4 Cent im MONAT, gelesen als 4 Cent gesamt.
+def test_ueber_zwei_zeitraeume_steht_kein_betrag_sondern_der_zustand():
+    """P0-B-fix2 (Befund 3b): ueber zwei Zeitraeume gibt es KEINE Zahl.
 
-    Der Fall ist heute latent (`LAUFZEIT` ist die Konstante 24, jede
-    Referenz meldet `monate = LAUFZEIT`); P0-B legt die Laufzeit in den
-    Buendelschluessel und macht sie wieder verschieden. Deshalb wird die
-    Referenz eines 36-Monats-Buendels hier per `monate` simuliert, und
-    der Satz am ECHTEN Makro gerendert - nicht an einer Textkopie.
+    Bis hierher hiess dieser Test `test_annaeherung_nur_bei_gleicher_
+    laufzeit_der_satz_sagt_je_monat` und hielt fest, dass bei
+    verschiedener Laufzeit der Ø/Monat-Abstand danebensteht ("0,04 € je
+    Monat über der Vodafone-Referenz", ohne "≈" - S1 der Diff-Pruefung
+    vom 20.09.2026).
 
-    Referenz (Vodafone Mobil XS, 36 Monate): 1.799,80 EUR, Ø/Monat 74,99.
-    o2 mit 24 Monaten: 1,00 + 24×29,95 + 24×45,04 = 1.800,76 EUR,
-    Ø/Monat 75,03 - vier Cent darueber, im Monat."""
+    Dieser Abstand ist selbst nicht belegt: `tco_model.Tco.monatlich`
+    teilt JEDE Summe durch dieselben 24 Monate, eine 36-Monats-Summe
+    durch 24 ist also kein Monatspreis, und das Vorzeichen des
+    Vergleichs haengt an Tarifmonaten, die in der einen Zahl stecken und
+    in der anderen nicht (1&1, Befund 3: 12 × 42,99 EUR jenseits des
+    Horizonts gegen ein ausgewiesenes Delta von 79,74 EUR). Die Zeile
+    traegt deshalb den BENANNTEN Zustand statt einer Zahl - und keinen
+    numerischen Δ-Sortierschluessel (`data-delta` bleibt leer, die Zeile
+    faellt aus der Rangfolge nach Δ).
+
+    Der S1-Befund selbst bleibt geprueft: es steht KEIN "≈" und kein
+    Euro-Betrag mehr da, wo der Bezug fehlt.
+
+    Referenz (Vodafone Mobil XS, als 36-Monats-Zahl simuliert):
+    1.799,80 EUR. o2 mit 24 Monaten: 1,00 + 24×29,95 + 24×45,04 =
+    1.800,76 EUR - vier Cent im Monat darueber, aber nicht ueber
+    denselben Zeitraum."""
     tarife = {t["tarif_id"]: t for t in _tarife()}
     referenz = _xs_buendel(SKU_NEU, 30.0, HEUTE, tarif_monatlich=29.95)
     o2_24 = Buendel(sku_id=SKU_NEU, anbieter="o2",
@@ -785,31 +793,41 @@ def test_annaeherung_nur_bei_gleicher_laufzeit_der_satz_sagt_je_monat():
     modell = karten.modelle([referenz, o2_24], _listungen(), _referenzen(),
                             tarife, lade_katalog(WURZEL))["modelle"][0]
     karte = next(k for k in modell["karten"] if k["anbieter"] == "o2")
-    # P0-B simuliert: die Referenz eines 36-Monats-Buendels meldet ihre
-    # eigene Laufzeit (siehe Docstring).
+    # Eine Referenz, deren Zahl 36 Monate traegt (1&1s Bauform) - hier
+    # per `monate` simuliert, weil Vodafone im Bestand kein
+    # zusammengelegtes Buendel verkauft.
     ref36 = {**modell["referenz"], "monate": 36}
-    d = karten._delta(karte, ref36)
-    assert d["gleiche_laufzeit"] is False
-    assert d["betrag"] is None, "ueber Laufzeiten gibt es kein Euro-Delta"
-    assert d["monatlich"] == 0.04 and d["abstand"] == 0.04
-    assert d["ungefaehr"] is False, \
-        "≈ ohne Monatsbezug: 4 Cent im Monat, gelesen als 4 Cent gesamt"
+    assert karten._delta(karte, ref36) is None, \
+        "ueber zwei Zeitraeume gibt es keinen Betrag - auch keinen je Monat"
+    zustand = karten.delta_zustand(karte, ref36)
+    assert zustand["kurz"] == "andere Laufzeit"
+    assert zustand["satz"] == ("Kein Abstand zur Vodafone-Referenz: diese "
+                               "Zahl trägt 24 Monate, die Referenz 36 "
+                               "Monate.")
 
-    # Gegenprobe: GLEICHE Laufzeit, kleiner Abstand - die Annaeherung
-    # bleibt, Fix 2 unveraendert fuer den Fall, fuer den er gebaut war.
+    # Gegenprobe: GLEICHER Zeitraum, kleiner Abstand - die Annaeherung
+    # bleibt, Fix 2 (A2) unveraendert fuer den Fall, fuer den er gebaut
+    # war, und KEIN benannter Zustand daneben.
     d24 = karten._delta(karte, modell["referenz"])
     assert d24["gleiche_laufzeit"] is True and d24["betrag"] == 0.96
     assert d24["ungefaehr"] is True
+    assert karten.delta_zustand(karte, modell["referenz"]) is None
 
-    # Der Satz am echten Makro: "je Monat" traegt den Abstand, kein "≈".
-    from telco_radar.report import geraete_tco_band as tco_band
+    # Am ECHTEN Makro: der Zustand steht in der Δ-Spalte und als Satz im
+    # Rechenweg, `data-delta` ist leer - kein "≈", kein Euro-Betrag.
     from telco_radar.report import html as html_mod
-    karte["delta"] = d
-    karte["delta_kurz"] = tco_band.delta_text(
-        d["betrag"], d["prozent"], ungefaehr=d["ungefaehr"])
+    karte["delta"] = None
+    karte["delta_kurz"] = None
+    karte["delta_zustand"] = zustand
     zeile = BeautifulSoup(html_mod._env().from_string(
         '{% from "_geraete_buendel.html.j2" import buendelzeile %}'
         "{{ buendelzeile(k) }}").render(k=karte), "html.parser")
-    satz = vorlage_text(zeile.select_one(".gr-kk-delta"))
-    assert "0,04 € je Monat über der Vodafone-Referenz" in satz, satz
-    assert "≈" not in satz, satz
+    zelle = zeile.select_one(".gr-bnd-delta")
+    assert zelle.get_text(strip=True) == "andere Laufzeit"
+    assert "gr-bnd-delta--wert" not in (zelle.get("class") or [])
+    assert zeile.select_one(".gr-bnd")["data-delta"] == ""
+    assert zeile.select_one(".gr-kk-delta") is None, \
+        "der laute Delta-Satz in Alarmfarbe steht hier nicht"
+    satz = vorlage_text(zeile.select_one(".gr-kk-luecke"))
+    assert satz == zustand["satz"], satz
+    assert "≈" not in satz and "€" not in satz, satz

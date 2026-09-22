@@ -567,16 +567,27 @@ def test_kein_g1_zeigt_eine_36_monats_bindungsgruppe(bestand):
 
 def test_jede_belastbare_karte_traegt_das_label_der_leitzahl(bestand):
     """Abnahmekriterium 1: die einzige TCO-Hauptkennzahl ist die Leitzahl
-    "Kosten über 24 Monate" - auf JEDER Karte des echten Bestands, nicht
+    "Kosten über N Monate" - auf JEDER Karte des echten Bestands, nicht
     nur am Vorgabemodell. (Bis A1 hiess dasselbe Etikett "TCO-24" - der
-    Funktionsname ist mit dem Etikett gewandert.)"""
+    Funktionsname ist mit dem Etikett gewandert.)
+
+    P0-B-fix2 (Befund 3): N IST NICHT IMMER 24. Bis hierher stand hier
+    `label == "Kosten über 24 Monate"` fuer jede Karte - auch fuer 1&1s
+    Buendelmonatspreis, dessen Zahl 36 Monatsraten fuer Tarif UND Geraet
+    enthaelt (1.927,54 EUR = 340,00 + 36 × 42,99 + 39,90). Das Etikett
+    nennt jetzt den Zeitraum, den die Zahl WIRKLICH traegt
+    (`leitzahl_monate`); die Tariflaufzeit der Rechnung und der Teiler des
+    Ø/Monat bleiben die Konstante 24 (`laufzeit`)."""
     geprueft = 0
     for modell in bestand["modelle"]:
         for karte in modell["karten"]:
             if not karte["belastbar"]:
                 continue
             geprueft += 1
-            assert karte["label"] == "Kosten über 24 Monate", \
+            monate = karte["leitzahl_monate"]
+            assert monate is not None, \
+                f"{modell['id']}/{karte['anbieter']}: belastbar ohne Zeitraum"
+            assert karte["label"] == f"Kosten über {monate} Monate", \
                 f"{modell['id']}/{karte['anbieter']}: {karte['label']!r}"
             assert karte["laufzeit"] == 24
     assert geprueft, "kein belastbares Angebot - der Test prueft nichts"
@@ -664,12 +675,19 @@ def test_g1_zeichnet_keine_karte_ohne_zahl(bestand):
 
 
 def test_g1_trennt_die_laufzeiten_mit_eigener_nulllinie():
-    """A5.4 - der Fall existiert im Bestand heute nicht (alle Buendel binden
-    36 Monate), deshalb wird er hier gestellt. Ohne diesen Test faellt die
-    Trennung beim ersten 24-Monats-Angebot lautlos aus."""
-    def karte(anbieter, laufzeit, gesamt):
-        return {"anbieter": anbieter, "tarif": f"Tarif {laufzeit}",
-                "belastbar": True, "gesamt": gesamt, "laufzeit": laufzeit,
+    """A5.4 - die Trennung der Zeitraeume, an einer gestellten Karte.
+
+    P0-B-h3: getrennt wird am ZEITRAUM DER LEITZAHL (`leitzahl_monate`),
+    nicht mehr an `laufzeit` - das ist seit TCO24-1 auf JEDER echten
+    Karte die Konstante 24, und die Grafik hatte deshalb nur noch eine
+    Gruppe (Befund 2: 1&1s 36-Monats-Balken stand unter dem Kopf
+    "gerechnet über 24 Monate"). Die Fixture traegt beide Felder wie eine
+    echte Karte: `laufzeit` konstant, `leitzahl_monate` je Angebot.
+    """
+    def karte(anbieter, monate, gesamt):
+        return {"anbieter": anbieter, "tarif": f"Tarif {monate}",
+                "belastbar": True, "gesamt": gesamt, "laufzeit": 24,
+                "leitzahl_monate": monate,
                 "naeherung": False, "boni": [],
                 "bestandteile": [{"name": "Tarif", "betrag": gesamt,
                                   "kategorie": "tarif"}]}
@@ -679,6 +697,74 @@ def test_g1_trennt_die_laufzeiten_mit_eigener_nulllinie():
     assert svg.count("gr-g1-null") == 2, "je Laufzeitgruppe eine Nulllinie"
     assert "gerechnet über 24 Monate" in svg \
         and "gerechnet über 36 Monate" in svg
+    # Die Ueberschrift der GANZEN Grafik nennt beide Zeitraeume - eine
+    # feste 24 ueber einem 36-Monats-Balken war Befund 2.
+    assert 'aria-label="Kosten über 24 und 36 Monate für Testgerät ' \
+        'je Anbieter"' in svg
+
+
+def test_g1_gruppiert_am_zeitraum_der_leitzahl_nicht_an_der_tariflaufzeit(bestand):
+    """P0-B-h3 (Befund 2), am ECHTEN Bestand: kein Balken steht unter
+    einem Gruppenkopf, der einen anderen Zeitraum nennt als seine Zahl.
+
+    Rot gegen den alten Stand: dort gruppierte `_gruppen()` an `laufzeit`
+    - seit TCO24-1 auf jeder Karte die Konstante 24. Alle Balken standen
+    damit unter EINEM Kopf "gerechnet über 24 Monate", auch 1&1s
+    Buendelmonatspreis, dessen Zahl 36 Monate Tarif UND Geraet traegt
+    (gemessen am 21.09.2026: 70 Buendelzeilen mit Zeitraum 36). Genau
+    diese Aussage sortiert derselbe Stand an der Buendelzeile als
+    unbelegt aus.
+    """
+    geprueft = gruppen_mit_36 = 0
+    for modell in bestand["modelle"]:
+        gruppen = grafik._gruppen(modell["karten"])
+        if not gruppen:
+            continue
+        for g in gruppen:
+            geprueft += 1
+            # `g.get(...)` mit dem alten Schluessel als Rueckfall: gegen
+            # den alten Stand soll dieser Test an der AUSSAGE scheitern
+            # (Balken ueber 36 Monate unter dem Kopf 24), nicht an einem
+            # umbenannten Feld.
+            monate = g.get("monate", g.get("laufzeit"))
+            if monate != 24:
+                gruppen_mit_36 += 1
+            for k in g["karten"]:
+                assert k["leitzahl_monate"] == monate, (
+                    f"{modell['id']}/{k['anbieter']}: Balken ueber "
+                    f"{k['leitzahl_monate']} Monate in der Gruppe "
+                    f"{monate}")
+    assert geprueft, "keine G1-Gruppe im Bestand - der Test prueft nichts"
+    assert gruppen_mit_36, (
+        "keine Gruppe mit abweichendem Zeitraum im Bestand - die "
+        "Trennung waere gruen ohne Fall (Datenlage ansehen)")
+
+
+def test_g1_nennt_in_ueberschrift_und_gruppenkopf_den_echten_zeitraum(bestand):
+    """Jeder Zeitraum, der in einem Balken steckt, steht auch im Text -
+    Ueberschrift (aria-label/<title>) und Gruppenkopf. Eine Grafik, deren
+    Ueberschrift 24 sagt und deren Balken 36 Monate traegt, ist auf einem
+    Screenreader die GANZE Grafik in einem falschen Satz."""
+    geprueft = 0
+    for modell in bestand["modelle"]:
+        svg = grafik.balken(modell)
+        if not svg:
+            continue
+        # Die Zeitraeume, die die BALKEN tragen - aus den Karten, nicht
+        # aus der Gruppierung (die ist der Prueflaufgegenstand).
+        monate = sorted({k["leitzahl_monate"] for k in modell["karten"]
+                         if k["belastbar"] and k["gesamt"] is not None
+                         and k["leitzahl_monate"] is not None})
+        geprueft += 1
+        label = re.search(r'aria-label="([^"]+)"', svg).group(1)
+        for m in monate:
+            assert f"gerechnet über {m} Monate" in svg, \
+                f"{modell['id']}: Gruppenkopf fuer {m} Monate fehlt"
+            assert str(m) in label, f"{modell['id']}: {label!r} ohne {m}"
+        wort = " und ".join(str(m) for m in monate)
+        assert label == (f"Kosten über {wort} Monate für "
+                         f"{modell.get('name') or ''} je Anbieter"), label
+    assert geprueft, "kein Modell mit G1-Grafik - der Test prueft nichts"
 
 
 def test_jeder_balken_traegt_seine_aussage_als_text(bestand):
@@ -766,8 +852,11 @@ def test_ein_bonus_verkuerzt_den_balken_statt_ihn_zu_verlaengern():
             b["betrag"] for b in boni), "kategorie": "tarif"}]
         posten += [{"name": f"Bonus · {b['name']}", "betrag": -b["betrag"],
                     "kategorie": "bonus"} for b in boni]
+        # `leitzahl_monate` wie auf einer echten Karte (P0-B-h1) - die
+        # Grafik gruppiert daran (P0-B-h3).
         return {"anbieter": name, "tarif": "T", "belastbar": True,
-                "gesamt": gesamt, "laufzeit": 24, "naeherung": False,
+                "gesamt": gesamt, "laufzeit": 24, "leitzahl_monate": 24,
+                "naeherung": False,
                 "boni": boni, "bestandteile": posten}
     modell = {"name": "X", "referenz": None,
               "karten": [karte("o2", 950.0, [{"name": "Wechselbonus",

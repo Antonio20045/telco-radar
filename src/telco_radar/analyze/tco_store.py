@@ -5,7 +5,8 @@ Warum eine EIGENE Datei
 `data/state/geraete_db.json` traegt seit dem 10.08.2026 die Listungen, also
 was ein Anbieter fuer ein GERAET verlangt. Ein Buendel ist ein anderer
 Sachverhalt: es kommt von einer Tarifseite, hat einen anderen Lebenszyklus
-und eine andere Identitaet (SKU x Anbieter x Tarif statt SKU x Anbieter).
+und eine andere Identitaet (SKU x Anbieter x Tarif x Ratenlaufzeit
+statt SKU x Anbieter).
 Es steht deshalb in
 
     data/state/geraete_tco.json    Buendel und SIM-only-Referenzen
@@ -21,7 +22,15 @@ nicht: dieses Modul oeffnet die andere gar nicht.
 
 Die IDs koennen sich ebenfalls nicht ueberschneiden, und zwar an ihrer Form
 (`tco_model.buendel_id`): eine `listung_id` hat zwei Bestandteile, ein
-Buendel vier, eine Referenz drei.
+Buendel seit B1 fuenf (die Ratenlaufzeit ist dazugekommen; vorher vier),
+eine Referenz drei.
+
+Der Altbestand traegt weiterhin die vierteilige ID - beide Dateien dieses
+Moduls werden NICHT umgeschrieben (harte Regeln 2 und 3). Ein Alt-Satz wird
+beim LESEN dem heutigen Buendel zugeordnet (`id_aus_satz` unten, ueber
+`laufzeit_monate`); die neue Form entsteht in der Stand-Datei erst durch
+das naechste regulaere `save()`, und in der Historie ueberhaupt nicht -
+eine geschriebene Zeile bleibt, wie sie war.
 
 Die eine Regel, die dieses Modul von `geraete_store` unterscheidet
 ------------------------------------------------------------------
@@ -80,7 +89,8 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Optional
 
-from ..tco_model import Buendel, SimOnlyReferenz, sim_only_id, tco_24
+from ..tco_model import (Buendel, SimOnlyReferenz, buendel_id_aktuell,
+                         buendel_id_ohne_laufzeit, sim_only_id, tco_24)
 
 log = logging.getLogger(__name__)
 
@@ -114,6 +124,49 @@ _REFERENZ_MESSFELDER = ("tarif_id", "tarif_id_guete",
 # Modulkopf. Ihr Name ist fest, weil der naechtliche Lauf sie namentlich
 # committet (.github/workflows/geraete.yml).
 _HISTORIE_NAME = "geraete_tco_historie.jsonl"
+
+
+def id_aus_satz(satz: dict) -> Optional[str]:
+    """Die heutige Buendel-ID eines GESPEICHERTEN Satzes - die Lesemigration.
+
+    Nimmt einen Stand-Eintrag aus `geraete_tco.json` ODER eine Zeile aus
+    `geraete_tco_historie.jsonl` - beide tragen `id` und `laufzeit_monate`,
+    und genau diese zwei Felder braucht `tco_model.buendel_id_aktuell`, um
+    eine ID von VOR B1 (vier Segmente, ohne Laufzeit) demselben Buendel
+    zuzuordnen wie die Zeilen von heute.
+
+    Die Zuordnung steht HIER und nicht beim Lesen der Datei, weil beide
+    Dateien diesem Modul gehoeren: eine zweite Migration in der Ansicht
+    waere eine zweite Wahrheit ueber denselben Schluessel.
+
+    `None` heisst "nicht zuordenbar" und ist protokolliert - der Aufrufer
+    zaehlt solche Saetze und nennt sie, statt sie still fallen zu lassen.
+    """
+    if not isinstance(satz, dict):
+        log.warning("Lesemigration B1: Satz ist kein Woerterbuch (%s)",
+                    type(satz).__name__)
+        return None
+    neu_ = buendel_id_aktuell(satz.get("id") or "",
+                              satz.get("laufzeit_monate"))
+    if neu_ is None:
+        log.warning("Lesemigration B1: ID %r hat weder die alte noch die "
+                    "heutige Form - nicht zuordenbar",
+                    satz.get("id"))
+    return neu_
+
+
+def basis_aus_satz(satz: dict) -> Optional[str]:
+    """Der laufzeitfreie Teil der ID eines gespeicherten Satzes.
+
+    Der Notweg der Zeitreihe: eine gemessene Laufzeit, die im heutigen
+    Stand nicht mehr steht, findet ueber ihn wenigstens Anbieter, SKU und
+    Tarifnamen ihrer Schwestervariante - alles Angaben, die von der
+    Laufzeit nicht abhaengen. Ein Messtag wird nicht verschwiegen, weil
+    ein Anbieter seine Ratenlaufzeit geaendert hat.
+    """
+    if not isinstance(satz, dict):
+        return None
+    return buendel_id_ohne_laufzeit(satz.get("id") or "")
 
 
 class TcoDB:
@@ -151,9 +204,33 @@ class TcoDB:
             self.lesbar = False
             return
         self.updated = roh.get("updated", "")
+        # LESEMIGRATION B1: ein Eintrag von vor dem 21.09.2026 traegt eine
+        # ID ohne Laufzeitsegment. Er wird unter seiner HEUTIGEN ID
+        # weitergefuehrt (`id_aus_satz`) und behaelt damit sein
+        # `first_seen`; ohne das entstuende derselbe Bestand beim naechsten
+        # Lauf ein zweites Mal daneben, und die Tafel zeigte jedes Angebot
+        # doppelt. Die DATEI wird davon nicht angefasst - sie bekommt die
+        # neuen IDs erst durch das naechste regulaere `save()`.
+        migriert = 0
         for eintrag in (roh.get("buendel") or []):
-            if eintrag.get("id"):
-                self._buendel[eintrag["id"]] = eintrag
+            bid = id_aus_satz(eintrag)
+            if bid is None:
+                # Nicht zuordenbar: der Eintrag bleibt unter seiner
+                # gespeicherten ID im Bestand stehen (verworfen wird er
+                # nicht - "Scheitern ist kein leeres Ergebnis"), und
+                # `id_aus_satz` hat ihn benannt protokolliert.
+                if eintrag.get("id"):
+                    self._buendel[eintrag["id"]] = eintrag
+                continue
+            if bid != eintrag.get("id"):
+                migriert += 1
+                eintrag["id"] = bid
+            self._buendel[bid] = eintrag
+        if migriert:
+            log.info("Lesemigration B1: %d von %d Buendel-Eintraegen auf "
+                     "die Laufzeit-ID gehoben (%s bleibt bis zum naechsten "
+                     "save() unveraendert)", migriert, len(self._buendel),
+                     self.path.name)
         for eintrag in (roh.get("sim_only") or []):
             if eintrag.get("id"):
                 self._referenzen[eintrag["id"]] = eintrag
@@ -205,7 +282,13 @@ class TcoDB:
                     continue
                 if satz.get("datum"):
                     tage.add(str(satz["datum"]))
-                if satz.get("id"):
+                # Dieselbe Lesemigration wie im Stand: eine Zeile von vor
+                # B1 und eine von heute sind DASSELBE Buendel und duerfen
+                # die Zahl im Verlaufs-Reiter nicht verdoppeln.
+                bid = id_aus_satz(satz) if satz.get("id") else None
+                if bid:
+                    ids.add(bid)
+                elif satz.get("id"):
                     ids.add(str(satz["id"]))
         return {"messtage": len(tage), "seit": min(tage) if tage else "",
                 "buendel": len(ids)}

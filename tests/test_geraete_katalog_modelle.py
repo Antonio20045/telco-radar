@@ -14,8 +14,10 @@ from pathlib import Path
 
 from telco_radar.geraete_model import Geraet, Katalog, device_id
 from telco_radar.report import geraete_export as ex
+from telco_radar.report import geraete_tco_karten
 from telco_radar.report import geraete_view
 from telco_radar.report.geraete_tco_karten import modell_schluessel
+from telco_radar.tco_model import TCO_HORIZONT
 
 
 def _katalog():
@@ -68,11 +70,22 @@ def _tco_modell(mid, karten, referenz=None):
 
 def _karte(anbieter, gesamt, monat=41.0, zustand="neu", vergleichbar=True,
            belastbar=True, delta=None, delta_kurz=None, band="klein",
-           eigen=False):
+           eigen=False, leitzahl_monate=TCO_HORIZONT, delta_zustand=None):
+    # `leitzahl_monate` ist der ZEITRAUM, den `gesamt` traegt (P0-B-h1) -
+    # jede echte Karte aus `geraete_tco_karten.modelle()` traegt ihn, und
+    # die TCO-Spalte des Katalogs filtert darauf (P0-B-h2). Vorgabe ist
+    # der Zeitraum der Spalte; eine Karte mit 36 setzt ihn selbst.
     return {"anbieter": anbieter, "gesamt": gesamt, "schnitt_monat": monat,
             "zustand": zustand, "vergleichbar": vergleichbar,
             "belastbar": belastbar, "naeherung": False, "delta": delta,
             "delta_kurz": delta_kurz, "band": band, "eigen": eigen,
+            "leitzahl_monate": leitzahl_monate,
+            "delta_zustand": delta_zustand,
+            # Die TARIFLAUFZEIT der Rechnung (auf jeder echten Karte 24,
+            # `geraete_tco_karten.LAUFZEIT`) - nicht der Zeitraum der
+            # Leitzahl. `_delta_faellig` liest sie, damit die Tests den
+            # benannten Zustand aus der EINEN Definition holen koennen.
+            "laufzeit": TCO_HORIZONT, "frisch": True,
             "quelle_url": f"https://example.de/{anbieter}", "sku_id": "s",
             "abgerufen_am": "2026-09-17"}
 
@@ -379,24 +392,152 @@ def test_ohne_eigenes_angebot_bleibt_es_bei_keine_referenz():
     assert zeile["tco_delta_anbieter"] is None
 
 
-def test_wettbewerber_ohne_euro_abstand_bekommt_den_strich():
-    """Ein Wettbewerber-Angebot ohne Euro-Abstand (andere Laufzeit, A5.4):
-    die Zelle zeigt den Strich wie die Buendelzeile - und NICHT 'keine
-    Referenz', denn die Referenz existiert."""
+def _referenz(gesamt=1100.0, monate=TCO_HORIZONT):
+    return {"gesamt": gesamt, "monate": monate, "tarif": "Mobil M",
+            "tarif_abgerufen_am": "2026-09-17", "schnitt_monat": 45.83}
+
+
+def test_wettbewerber_mit_anderer_laufzeit_wird_benannt_statt_still():
+    """P0-B-h2, Befund 2: der Strich heisst "kein Angebot" (A2) - ein
+    gemessenes Wettbewerber-Angebot, dessen Leitzahl 36 Monate traegt,
+    ist aber vorhanden und nur unvergleichbar.
+
+    Bis P0-B-fix2 stand in dieser Zelle eine Zahl ("+341,74 € · +14,5 %"
+    am iPhone 17 Pro Max 512 GB), danach der Strich - 24 Zellen wurden am
+    21.09.2026 stumm. Jetzt steht der BENANNTE Zustand darin, und zwar
+    derselbe, den die Buendelzeile derselben Karte zeigt: Kurztext und
+    Satz kommen aus `geraete_tco_karten.delta_zustand`, nicht aus einer
+    zweiten Formulierung (Clean Code 7).
+
+    Dieser Test wird gegen den Stand vor P0-B-h2 ROT: dort war
+    `tco_delta_leer` None und die Zelle zeigte den Strich."""
     mid = modell_schluessel(device_id("Apple", "Apple X"), 256)
+    referenz = _referenz()
+    # Das echte Gegenstueck: 1&1 nennt EINEN Monatsbetrag fuer Tarif und
+    # Geraet, ueber 36 Monate - die Karte traegt deshalb 36 und bekommt
+    # von `_delta` keinen Betrag mehr.
+    fremd = _karte("1&1", 1400.0, leitzahl_monate=36, delta=None,
+                   delta_kurz=None)
+    fremd["delta_zustand"] = geraete_tco_karten.delta_zustand(fremd, referenz)
+    assert fremd["delta_zustand"], (
+        "die EINE Definition muss diesen Zustand liefern - sonst prueft "
+        "der Test nichts")
     tco = [_tco_modell(mid, karten=[
         _karte("Vodafone", 1100.0, eigen=True, delta=None, delta_kurz=None),
-        _karte("1&1", 1400.0, delta={"betrag": None, "monatlich": 12.5},
-               delta_kurz=None),
-    ], referenz={"gesamt": 1100.0, "monate": 24})]
+        fremd,
+    ], referenz=referenz)]
     eintraege = [_listung("A", "Apple", "Apple X", "256gb-a", 1000.0)]
     zeilen = geraete_view.katalog_modellzeilen(eintraege, _katalog(),
                                                tco_modelle=tco)
     (zeile,) = zeilen
+    # Die Leitzahl bleibt die 24-Monats-Zahl des eigenen Angebots.
+    assert zeile["tco_ab"] == 1100.0
     assert zeile["tco_delta"] is None
     assert zeile["tco_delta_kurz"] is None
-    assert zeile["tco_delta_leer"] is None, (
-        "kein Etikett - die Referenz existiert, der Abstand fehlt")
+    # ... und die Zelle ist nicht stumm.
+    assert zeile["tco_delta_leer"] == "andere Laufzeit"
+    assert zeile["tco_delta_leer"] == fremd["delta_zustand"]["kurz"], (
+        "dieselben Worte wie die Buendelzeile, EINE Definition")
+    assert zeile["tco_delta_leer_grund"] == fremd["delta_zustand"]["satz"]
+    assert "36 Monate" in zeile["tco_delta_leer_grund"]
+
+
+def test_36_monats_summe_steht_nicht_unter_dem_24_monats_kopf():
+    """P0-B-h2, Befund 1: die Spalte "Kosten über 24 Monate" fuehrt nur
+    Zahlen dieses Zeitraums.
+
+    Gemessen am 21.09.2026 trugen 16 Katalogzeilen eine 36-Monats-Summe
+    in dieser Spalte, mit einem Ø/Monat = Summe/24 und einem
+    Sortierschluessel gegen echte 24-Monats-Zahlen (z. B. Nothing Phone
+    (4a) Pro 128 GB: 1.115,54 EUR aus 36 Monaten 1&1). Acht Modelle haben
+    NUR ein solches Buendel - ihre Zeile nennt die Luecke statt eine
+    Zahl aus einem anderen Zeitraum zu zeigen.
+
+    Gegen den Stand vor P0-B-h2 ROT: dort stand `tco_ab == 1115.54` und
+    `tco_monat == 46.48` unter dem 24-Monats-Kopf."""
+    mid = modell_schluessel(device_id("Apple", "Apple X"), 256)
+    tco = [_tco_modell(mid, karten=[
+        _karte("1&1", 1115.54, monat=30.99, leitzahl_monate=36,
+               delta=None, delta_kurz=None),
+    ], referenz=None)]
+    eintraege = [_listung("A", "Apple", "Apple X", "256gb-a", 1000.0)]
+    zeilen = geraete_view.katalog_modellzeilen(eintraege, _katalog(),
+                                               tco_modelle=tco)
+    (zeile,) = zeilen
+    assert zeile["tco_ab"] is None
+    assert zeile["tco_monat"] is None
+    assert zeile["tco_anbieter"] is None
+    assert zeile["tco_band"] is None
+    assert zeile["tco_leer"] == "kein Bündel über 24 Monate"
+
+
+def test_gegenprobe_die_24_monats_karte_stellt_die_spalte():
+    """Die Gegenprobe zum Filter (harte Regel 10): steht neben dem
+    36-Monats-Buendel eine echte 24-Monats-Karte, fuehrt DIESE die
+    Spalte - auch wenn ihre Summe hoeher ist. Acht der 16 Zeilen des
+    Bestands sind dieser Fall.
+
+    Ohne die Gegenprobe wuerde der Test oben auch dann gruen bleiben,
+    wenn der Filter die ganze Spalte leerraeumt."""
+    mid = modell_schluessel(device_id("Apple", "Apple X"), 256)
+    referenz = _referenz(gesamt=1300.0)
+    tco = [_tco_modell(mid, karten=[
+        # Die kleinere Summe traegt 36 Monate - sie ist keine Zahl dieser
+        # Spalte und darf ihr Minimum nicht stellen.
+        _karte("1&1", 1115.54, monat=30.99, leitzahl_monate=36,
+               delta=None, delta_kurz=None),
+        _karte("o2", 1250.00, monat=52.08, leitzahl_monate=TCO_HORIZONT,
+               delta={"betrag": -50.0, "prozent": 3.8, "ungefaehr": False},
+               delta_kurz="−50,00 € · −3,8 %"),
+    ], referenz=referenz)]
+    eintraege = [_listung("A", "Apple", "Apple X", "256gb-a", 1000.0)]
+    zeilen = geraete_view.katalog_modellzeilen(eintraege, _katalog(),
+                                               tco_modelle=tco)
+    (zeile,) = zeilen
+    assert zeile["tco_ab"] == 1250.00, (
+        "die 24-Monats-Karte stellt die Spalte, nicht die kleinere "
+        "36-Monats-Summe")
+    assert zeile["tco_anbieter"] == "o2"
+    assert zeile["tco_monat"] == 52.08
+    assert zeile["tco_leer"] is None
+    # Der Abstand gehoert derselben Karte - und er bleibt eine Zahl.
+    assert zeile["tco_delta"] == -50.0
+    assert zeile["tco_delta_kurz"] == "−50,00 € · −3,8 %"
+    assert zeile["tco_delta_leer"] is None
+
+
+def test_alte_referenz_traegt_ihren_eigenen_grund():
+    """Beim Messen von P0-B-h2 gefunden: die Referenz EXISTIERT, ist aber
+    nicht aktuell erhoben - dann gibt `geraete_tco_karten.modelle` sie
+    keiner Karte als Massstab (S2-1), und keine Karte traegt ein Delta.
+    Die Zelle sagt das, statt einen Strich zu zeigen.
+
+    Gemessener Fall am 21.09.2026: Google Pixel 11 Pro Fold 256 GB (o2
+    2.380,75 EUR, Vodafone-Naeherung aus einem alten Barpreis) - die
+    einzige der 25 stummen Zellen mit diesem Grund. "kein
+    Wettbewerber-Angebot" waere dort falsch (o2 und 1&1 stehen da),
+    "keine Referenz" auch.
+
+    Gegen den Stand vor P0-B-h2 ROT: dort war `tco_delta_leer` None."""
+    mid = modell_schluessel(device_id("Apple", "Apple X"), 256)
+    # Die Naeherung ist nur frisch, wenn BEIDE Belege frisch sind - hier
+    # sind beide vom 01.08., der Bestand vom 17.09.
+    referenz = {"gesamt": 1300.0, "monate": TCO_HORIZONT,
+                "tarif_abgerufen_am": "2026-08-01",
+                "geraet_abgerufen_am": "2026-08-01"}
+    assert not geraete_tco_karten.referenz_ist_frisch(referenz, "2026-09-17")
+    tco = [_tco_modell(mid, karten=[
+        _karte("o2", 1250.0, delta=None, delta_kurz=None),
+    ], referenz=referenz)]
+    eintraege = [_listung("A", "Apple", "Apple X", "256gb-a", 1000.0)]
+    zeilen = geraete_view.katalog_modellzeilen(eintraege, _katalog(),
+                                               tco_modelle=tco,
+                                               heute="2026-09-17")
+    (zeile,) = zeilen
+    assert zeile["tco_ab"] == 1250.0
+    assert zeile["tco_delta_kurz"] is None
+    assert zeile["tco_delta_leer"] == "kein aktueller Referenz-Stand"
+    assert "nicht aktuell erhoben" in zeile["tco_delta_leer_grund"]
 
 
 def test_tco_leerzustaende_benannt():

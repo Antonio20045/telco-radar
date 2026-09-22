@@ -177,7 +177,13 @@ def test_die_buendelkarte_nennt_einmalzahlung_und_bereitstellung(tmp_path):
                    "36 Monate · "
                    "Gerät einmalig 360,00 € · Anschlusspreis 39,90 €")
     text = vorlage_text(eins)
-    assert "Kosten über 24 Monate 2.019,54 €" in text
+    # P0-B-fix2 (Befund 3): das Etikett NENNT den Zeitraum der Zahl. Bis
+    # hierher stand hier "Kosten über 24 Monate 2.019,54 €" - in dieser
+    # Summe stecken 36 × 44,99 EUR fuer Tarif UND Geraet, also 36
+    # Tarifmonate und nicht 24.
+    assert "2.019,54 € Kosten über 36 Monate" in text
+    assert "Kosten über 24 Monate" not in text, \
+        "das alte Etikett behauptete 24 Monate fuer eine 36-Monats-Summe"
     # Ohne die Felder druckt KEINER von beiden - die Alt-Zeile steht exakt
     # in test_die_buendelkarte_nennt_die_wahre_dauer_und_die_richtigen_raten
     # (derselbe _baue-Aufruf ohne die zwei Parameter); die offene

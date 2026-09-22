@@ -178,6 +178,25 @@ def test_eine_summe_die_nicht_aufgeht_faellt():
     assert lies_buendel(json.dumps(roh)) == []
 
 
+def _sub_mit_phasen(phasen: list[dict]) -> str:
+    """Die `sub`-Komposition (ohne `financingDuration`) der echten Fixture
+    mit ausgetauschten Phasen - die Phasen sind synthetisch und sagen das,
+    alles andere an der Komposition ist der gespeicherte echte Abruf."""
+    roh = _nur_erstes_atom(json.loads(_fixture("vodafone_virtualitem.json")))
+    atom = roh["data"]["atomics"][0]
+    sub = json.loads(json.dumps(atom["prices"]["composition"][0]))
+    assert sub["financingType"] == "sub"
+    assert sub.get("financingDuration") is None
+    sub["totalMonthlyRatePrice"]["withoutDiscounts"] = phasen
+    atom["prices"]["composition"] = [sub]
+    return json.dumps(roh)
+
+
+def _sub_phase(start: int, ende, gross: float = 69.99) -> dict:
+    return {"recurrenceUnit": "month", "recurrenceStart": start,
+            "recurrenceEnd": ende, "gross": gross, "net": 58.82}
+
+
 def test_ohne_ratenlaufzeit_und_ohne_periode_faellt():
     roh = _nur_erstes_atom(json.loads(_fixture("vodafone_virtualitem.json")))
     atom = roh["data"]["atomics"][0]
@@ -185,6 +204,155 @@ def test_ohne_ratenlaufzeit_und_ohne_periode_faellt():
     kaputt["totalMonthlyRatePrice"]["withoutDiscounts"][0]["recurrenceEnd"] = None
     atom["prices"]["composition"] = [kaputt]
     assert lies_buendel(json.dumps(roh)) == []
+
+
+def test_eine_offene_anschlussphase_verliert_das_buendel_nicht():
+    """FIX3-Befund: eine Phase OHNE Ende ist eine offene Anschlussphase
+    ("ab Monat 25", `recurrenceEnd: null`) und keine Laufzeit.
+
+    Der Rueckfall auf `perioden[-1]["recurrenceEnd"]` machte daraus
+    `int(None)`, die Laufzeit blieb None und das GANZE Buendel fiel ohne
+    Protokoll heraus. Gemessen am HEAD-Stand c6bd8a5: 0 Saetze statt 1.
+    Die Vertragsmindestlaufzeit - die spaeteste GENANNTE Endgrenze -
+    bleibt der Rueckfall.
+    """
+    saetze = lies_buendel(_sub_mit_phasen([_sub_phase(1, 24),
+                                           _sub_phase(25, None)]))
+    assert len(saetze) == 1
+    assert saetze[0]["laufzeit_monate"] == 24
+    # Der `sub`-Fall hat keine separate Geraeterate (Modulkopf) - die
+    # Gegenprobe, dass hier wirklich der Subventionsfall gemessen wurde.
+    assert saetze[0]["geraet_monatsrate"] is None
+
+
+def test_die_geraeterate_nennt_ihr_eigenes_ende_und_es_ist_die_laufzeit():
+    """Die Gegenprobe zur zweiten Quelle in `_laufzeit()`: in JEDER
+    Ratenkomposition der Fixture ist
+    `priceByComponent.hardware...rate.month.withoutDiscounts.recurrenceEnd`
+    exakt `financingDuration`. Nur deshalb darf sie der Rueckfall sein."""
+    roh = json.loads(_fixture("vodafone_virtualitem.json"))
+    gemessen = 0
+    for atom in roh["data"]["atomics"]:
+        for k in atom["prices"]["composition"]:
+            dauer = k.get("financingDuration")
+            if dauer is None:
+                continue                  # der "sub"-Fall, siehe unten
+            ende = (k["priceByComponent"]["hardware"]["priceByType"]["rate"]
+                    ["month"]["withoutDiscounts"]["recurrenceEnd"])
+            assert ende == dauer, (k["offerCoreHash"], dauer, ende)
+            gemessen += 1
+    assert gemessen == 9                   # 3 Varianten x 3 Ratenfaelle
+
+
+def test_ohne_financingduration_gilt_das_ende_der_geraeterate_nicht_der_phasen():
+    """FIX3-Befund des Pruefers: die Phasen von `totalMonthlyRatePrice`
+    beschreiben den GANZEN Vertrag und laufen laenger als die
+    Geraetefinanzierung.
+
+    Genommen wird an der ECHTEN 12-Monats-Komposition, der nur die
+    `financingDuration` entfernt wird: mit dem Phasen-Rueckfall ergaben
+    64,50 EUR ueber 24 statt 12 Monate 1549,00 EUR statt der in derselben
+    Nutzlast belegten 775,00 EUR - die Geraetekosten waeren verdoppelt in
+    den Bestand gegangen.
+    """
+    roh = _nur_erstes_atom(json.loads(_fixture("vodafone_virtualitem.json")))
+    atom = roh["data"]["atomics"][0]
+    rate12 = json.loads(json.dumps(atom["prices"]["composition"][1]))
+    assert rate12["financingType"] == "rate"
+    assert rate12["financingDuration"] == 12
+    hardware = rate12["priceByComponent"]["hardware"]["priceByType"]
+    belegt = hardware["total"]["onetime"]["withoutDiscounts"]["gross"]
+    assert belegt == 775.0
+    # Die Phasen des Vertrags enden bei 24 - die Finanzierung nicht.
+    assert [p["recurrenceEnd"]
+            for p in rate12["totalMonthlyRatePrice"]["withoutDiscounts"]] \
+        == [12, 24]
+    rate12["financingDuration"] = None
+    atom["prices"]["composition"] = [rate12]
+
+    saetze = lies_buendel(json.dumps(roh))
+    assert len(saetze) == 1
+    assert saetze[0]["laufzeit_monate"] == 12
+    assert saetze[0]["geraet_zuzahlung"] + \
+        saetze[0]["laufzeit_monate"] * saetze[0]["geraet_monatsrate"] == \
+        pytest.approx(belegt, abs=0.005)
+
+
+def test_gar_keine_bestimmbare_laufzeit_steht_im_protokoll(caplog):
+    """Nur offene Phasen: nichts ist bestimmbar - und der Verlust wird
+    BENANNT, nicht verschluckt (keine 0, keine geratene Laufzeit)."""
+    with caplog.at_level("INFO", logger="telco_radar.collect.geraete.vodafone"):
+        saetze = lies_buendel(_sub_mit_phasen([_sub_phase(1, None),
+                                               _sub_phase(25, None)]))
+    assert saetze == []
+    meldungen = [r.getMessage() for r in caplog.records]
+    assert any("ohne bestimmbare Ratenlaufzeit" in m for m in meldungen), \
+        meldungen
+    assert any(_HASH_SUB in m for m in meldungen), meldungen
+
+
+def test_alle_phasen_ergeben_den_richtigen_geraete_gesamtpreis():
+    """P0-B2a: keine Phase geht verloren. `geraet_monatsrate` kommt flach
+    aus `priceByComponent.hardware.month` (deckt die GANZE Ratenlaufzeit
+    ab, nicht nur Phase 0 von `totalMonthlyRatePrice`) - nachgerechnet
+    gegen den unabhaengigen Gesamtpreis derselben Komponente
+    (`...total.onetime.withoutDiscounts.gross`), fuer alle drei
+    Ratenfaelle (12/24/36 Monate) der Fixture.
+
+    FIX3: der erste Teil dieses Tests war gegen den Stand VOR P0-B2a
+    (fde7f63) gruen - er beschrieb eine Eigenschaft, die schon vorher
+    stimmte, und pruefte damit kein neues Verhalten. Der zweite Teil
+    unten ist die scharfe Gegenprobe auf "keine Phase geht verloren":
+    sie laeuft ueber eine Komposition, deren ERSTE Phase kein Ende nennt
+    und deren zweite eines hat. Der alte Stand las ausschliesslich Phase
+    0, bekam `int(None)` und verwarf das Buendel (0 Saetze).
+    """
+    roh = json.loads(_fixture("vodafone_virtualitem.json"))
+    je_hash = {}
+    for atom in roh["data"]["atomics"]:
+        for k in atom["prices"]["composition"]:
+            je_hash[k["offerCoreHash"]] = k
+
+    rate = [s for s in _saetze() if s["geraet_monatsrate"] is not None]
+    assert len(rate) == 9                  # 3 Varianten x 3 Ratenfaelle
+    for s in rate:
+        k = je_hash[s["tarif_slug"]]
+        hardware_gesamt = k["priceByComponent"]["hardware"]["priceByType"] \
+            ["total"]["onetime"]["withoutDiscounts"]["gross"]
+        # `totalMonthlyRatePrice` traegt bei 12 und 36 Monaten ZWEI Phasen
+        # (Modulkopf) - die Gegenprobe laeuft trotzdem auf.
+        assert len(k["totalMonthlyRatePrice"]["withoutDiscounts"]) == \
+            (1 if s["laufzeit_monate"] == 24 else 2)
+        assert s["geraet_zuzahlung"] + \
+            s["laufzeit_monate"] * s["geraet_monatsrate"] == \
+            pytest.approx(hardware_gesamt, abs=0.005)
+
+    # Die scharfe Gegenprobe (siehe Docstring): Phase 0 ohne Ende, Phase 1
+    # mit Ende 24. Wer nur Phase 0 liest, verliert das ganze Buendel.
+    scharf = lies_buendel(_sub_mit_phasen([_sub_phase(1, None),
+                                           _sub_phase(2, 24)]))
+    assert [s["laufzeit_monate"] for s in scharf] == [24]
+
+
+def test_sub_ohne_financingduration_nimmt_das_ende_der_letzten_phase():
+    """P0-B2a: der Laufzeit-Fallback fuer den `sub`-Fall (keine eigene
+    `financingDuration`) liest nicht nur Phase 0, sondern die spaeteste
+    GENANNTE Endgrenze - eine zweite, spaeter endende Phase (hier
+    synthetisch ergaenzt, kein Beleg zeigt das fuer den `sub`-Fall) darf
+    die Laufzeit nicht verkuerzen."""
+    roh = _nur_erstes_atom(json.loads(_fixture("vodafone_virtualitem.json")))
+    atom = roh["data"]["atomics"][0]
+    sub = json.loads(json.dumps(atom["prices"]["composition"][0]))  # "sub"
+    erste_phase = sub["totalMonthlyRatePrice"]["withoutDiscounts"][0]
+    assert erste_phase["recurrenceEnd"] == 24
+    zweite_phase = {**erste_phase, "recurrenceStart": 25,
+                    "recurrenceEnd": 30, "gross": erste_phase["gross"]}
+    sub["totalMonthlyRatePrice"]["withoutDiscounts"] = [erste_phase,
+                                                        zweite_phase]
+    atom["prices"]["composition"] = [sub]
+    saetze = lies_buendel(json.dumps(roh))
+    assert len(saetze) == 1
+    assert saetze[0]["laufzeit_monate"] == 30
 
 
 # ==========================================================================

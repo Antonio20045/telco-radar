@@ -48,6 +48,122 @@ aus, und `None` heisst "unbekannt", nicht "null Prozent" - o2 bekommt seine
 0.0 nur, weil die Produktseite sie woertlich als gesetzlichen
 Finanzierungshinweis nennt.
 
+MEHRERE RATENPLAENE JE GERAET: WAS GEMESSEN IST (FIX3, 21.09.2026)
+-------------------------------------------------------------------
+GEMESSEN an den beiden gespeicherten echten Abrufen - Kategorieseite
+"ohne Vertrag" vom 04.09.2026 und Buendelseite MagentaMobil S vom
+08.09.2026 - traegt `installments` bei JEDEM Eintrag GENAU EINEN Plan,
+und `numberOfInstallments` traegt darin AUSSCHLIESSLICH 36 (10 von 10
+bzw. 9 von 9 Eintraegen, je ein Plan). Dasselbe Bild im Bestand: die
+Buendelhistorie `data/state/geraete_tco_historie.jsonl` fuehrt fuer
+Telekom, o2, congstar und 1&1 in 1539 Zeilen ausnahmslos 36 Monate;
+mehrere Laufzeiten nebeneinander stehen dort nur bei Vodafone (12/24/36).
+
+Das ZIEL in CLAUDE.md nennt fuer Telekom 6/12/24/36 Monate nebeneinander.
+Dieses Ziel ist NICHT erreicht und dieser Adapter behauptet es nicht: er
+ist nur darauf VORBEREITET. `_preisformen()` liest die ganze Liste statt
+`installments[0]`, und jeder Plan bekommt seine eigene Rechenprobe; ein
+Plan, der nicht aufgeht, faellt nur fuer sich. Belegt ist diese
+Vorbereitung an keinem echten Abruf - nur an synthetisch ergaenzten
+zweiten Plaenen in den Tests, die sich als solche ausweisen.
+
+CLAUDE.md Fallstrick 16 gilt damit unverkuerzt: dass ALLE Anbieter
+ausnahmslos 36 Monate zeigen, ist zuerst ein Verdacht auf eine
+ERFASSUNGSLUECKE und erst danach eine Aussage ueber den Markt. Gegenprobe
+waere die Anbieterseite selbst. Aus dieser Umgebung ist sie nicht
+erreichbar (gemessen 21.09.2026: `CONNECT tunnel failed, response 403`
+fuer telekom.de und congstar.de). Der Verdacht bleibt deshalb OFFEN und
+steht hier - er ist nicht ausgeraeumt.
+
+EINE LISTUNG IST DAS GERAET, KEIN RATENPLAN (FIX3)
+---------------------------------------------------
+`geraete_model.listung_id` ist (Anbieter, SKU) und kennt keine Laufzeit.
+Ein eigener LISTUNGS-Satz je Ratenplan kollidiert deshalb in
+`GeraeteDB.upsert`: der zweite Satz wird mit der Begruendung "zwei Artikel
+nicht unterscheidbar (etwa zwei Farben)" uebergangen, was fuer zwei
+Laufzeiten desselben Geraets unwahr ist - und welcher Plan im Bestand
+landet, entschied die REIHENFOLGE in `installments` (gemessen am zweiten,
+selbstkonsistenten 24-Monats-Plan: Geraetepreis 1197 oder 1155 EUR, je
+nach Sortierung). Die `listung_id` zu erweitern waere eine
+Datenwanderung - der ganze Altbestand gaelte als ausgelistet und entstuende
+neu -, deshalb loest `_listungsplan()` es auf der Listungsseite:
+
+    Ein Geraet, eine Listung. Sie traegt den Plan mit dem HOECHSTEN
+    Gesamtbetrag (bei Gleichstand den mit der laengeren Ratenlaufzeit).
+
+DIE REGEL IST EINE WAHL UND KEINE MESSUNG (korrigiert P0-B-h5)
+---------------------------------------------------------------
+Welcher von zwei ECHTEN Plaenen der "richtige" Traeger ist, steht in der
+Nutzlast nicht: sie markiert keinen als Standardangebot. Die Regel ist
+also DEFINIERT, nicht belegt - und weil sie eine Wahl ist, braucht sie
+einen Grund, der sich nachlesen laesst. Er ist zweiteilig:
+
+1. Sie sortiert nach der Zahl, die sie entscheidet. Die Auswahl bestimmt
+   `preis_ohne_vertrag`, und das IST `gesamt`. Bis P0-B-h5 sortierte sie
+   nach der LAUFZEIT und nur bei Gleichstand nach dem Betrag - ein
+   Kriterium neben dem entschiedenen. Das ist kein Schoenheitsfehler: die
+   zwei koennen auseinanderlaufen. 24 Monate zu 1.203,00 EUR gegen 36
+   Monate zu 1.197,00 EUR ergab nach der alten Regel die 1.197,00 - also
+   ausgerechnet den NIEDRIGEREN Betrag, entgegen der Begruendung, mit der
+   die Regel angetreten war.
+2. Ein zu NIEDRIGER Preis ist der schaedlichere Fehler. CLAUDE.md sagt
+   "Der niedrigste Preis ist der wahrscheinlichste Fehler", und auf dieser
+   Seite gewinnt eine zu niedrige Zahl Vergleiche und Rangfolgen, die ihr
+   nicht gehoeren. Die Wahl des hoechsten belegten Gesamtbetrags kann die
+   Listung deshalb nicht unter den teuersten dokumentierten Kaufweg des
+   Anbieters druecken.
+
+Reihenfolgeunabhaengig ist sie weiterhin: `max()` ueber `(gesamt,
+laufzeit)`, und ein Gleichstand in BEIDEN bedeutet gleiche Betraege - die
+Rechenprobe nagelt dann auch die Rate fest. Deshalb steht die Regel an
+genau einer Stelle (`_LISTUNGSPLAN_REGEL`) und jede Anwendung mit allen
+Betraegen im Protokoll.
+
+Am gemessenen Bestand aendert die Korrektur nichts: beide gespeicherten
+echten Abrufe fuehren je Eintrag GENAU EINEN Plan, alte und neue Regel
+treffen denselben. Nachgemessen in P0-B-h5, 10 von 10 bzw. 9 von 9
+Eintraegen identisch.
+
+WAS DIESE REGEL KOSTET - UND WO SIE NICHT REICHT
+-------------------------------------------------
+Im BUENDEL-Pfad ist die Laufzeit kein Problem: `tco_model.buendel_id()`
+traegt sie seit B1 im Schluessel, `lies_buendel()` legt je Plan ein
+eigenes Buendel an, nichts geht verloren.
+
+Auf der Seite, die `lies()` liest, gilt das NICHT - und der Buendelpfad
+kann dort nicht einspringen. Die Konfiguration gibt Telekom einen
+`kind: static`-Einstieg (`/ohne-vertrag`) und fuenf `kind: buendel`-
+Einstiege; die "ohne Vertrag"-Nutzlast erreicht `lies_buendel()` nie (sie
+traegt keinen `selectedPlan` und waere dort ein Fehler). Sie KANN ihn auch
+nicht erreichen: ein Buendel ist Geraet PLUS Tarif - `tco_model.buendel_id`
+traegt den Tarifnamen im Schluessel, und `tco_buendel.aus_rohsaetzen`
+verwirft einen Rohsatz, dessen Tarif sich nicht auf eine `tarif_id`
+aufloesen laesst. Ein Geraet OHNE Vertrag hat keinen. Der zweite Ratenplan
+eines vertragsfreien Geraets ist also nicht "woanders abgelegt" - er ist
+fort.
+
+OFFEN GEGEN REGEL 9: DAS PROTOKOLL IST NICHT DIE SEITE
+-------------------------------------------------------
+`_listungsplan()` nennt den uebergangenen Plan mit Anzahlung, Rate,
+Laufzeit und Gesamtbetrag, sodass der erste echte Mehrplan-Fall
+nachrechenbar ist. Das Log ist aber kein Leser der Website: auf der
+Geraeteseite steht davon kein Wort, und CLAUDE.md Regel 9 verlangt, dass
+ein Ausfall SICHTBAR wird statt still zu bleiben.
+
+Ein Adapter kann das nicht heilen. `Listung` traegt genau eine Preisform
+(`anzahlung`, `monatsrate`, `laufzeit_monate`), und die Sammelbilanz hat
+fuer so eine Meldung keinen Kanal auf die Seite: `Anbieterbilanz.proben`
+endet in `geraete_pipeline.melde_proben()` im Log, `unbekannt` in
+`data/state/geraete_unbekannt.jsonl`. Beides erreicht keine Vorlage
+(nachgemessen in P0-B-h5). Die Luecke gehoert damit nach `Listung`, in
+die Bilanz und auf die Geraeteseite - drei Dateien, die diesem Modul
+nicht gehoeren - und ist als Befund gemeldet, nicht hier behoben.
+
+Was am gemessenen Bestand heute davon abhaengt: nichts. Kein Eintrag der
+beiden echten Abrufe traegt zwei Plaene, die Luecke ist also eine
+VORBEREITUNGS-Luecke und kein laufender Datenverlust. Sie steht hier,
+damit sie beim ersten echten Fall nicht neu entdeckt werden muss.
+
 DIE ADRESSE KOMMT AUS DEM HTML, NICHT AUS DEM SLUG
 --------------------------------------------------
 Aus `brandSlug`, `productSlug` und `variantSlug` liesse sich eine
@@ -114,9 +230,10 @@ Tarifpreis, den DIESE Seite fuer DIESEN Tarif nennt (id
        - sonst widerspricht die Antwort sich selbst; gemessen am 08.09.2026
        gehen beide bei 9 von 9 Geraeten auf.
 
-Dazu kommt die Ratenprobe, die `lies()` schon kennt (`_preisform`:
-upfrontPrice + numberOfInstallments x recurringPrice == totalPrice) - auch
-fuer Buendel gilt: geht sie nicht auf, wird der Satz verworfen.
+Dazu kommt die Ratenprobe, die `lies()` schon kennt (`_preisformen`:
+upfrontPrice + numberOfInstallments x recurringPrice == totalPrice, JE
+Ratenplan) - auch fuer Buendel gilt: ein Plan, der nicht aufgeht, faellt
+fuer sich, nicht der ganze Eintrag.
 
 Eine Antwort OHNE selectedPlan (die ohne-vertrag-Seite traegt `null`)
 ist keine Buendelantwort, und das ist kein Fehler sondern Auskunft:
@@ -157,6 +274,9 @@ from bs4 import BeautifulSoup
 
 from . import GeraeteAbrufFehler
 from ...geraete_model import probe_geht_auf
+# DIE EINE STELLE, die entscheidet, ob ein Rohwert eine Ratenlaufzeit IST
+# (Clean Code 1): dieselbe Pruefung, die `buendel_id` und `Buendel` lesen.
+from ...tco_model import laufzeit_in_monaten
 
 log = logging.getLogger(__name__)
 
@@ -233,25 +353,117 @@ def _variante(slug: str) -> tuple[str, Optional[int]]:
     return farbe, gb
 
 
-def _preisform(preis: dict) -> Optional[dict]:
-    """Anzahlung, Rate, Laufzeit und Gesamtbetrag - nur wenn sie aufgehen."""
+def _preisformen(preis: dict) -> list[dict]:
+    """ALLE Ratenplaene, die die Rechenprobe bestehen - nicht nur der erste.
+
+    `installments` ist eine LISTE: die Kategorieseite kann mehrere
+    Ratenplaene (verschiedene Laufzeiten desselben Geraets) nebeneinander
+    fuehren. Jeder Plan wird EINZELN geprueft und benannt verworfen, wenn
+    er nicht aufgeht - ein einzelner kaputter Plan kostet nicht die
+    uebrigen, dieselbe Disziplin wie beim Gesamtbetrag selbst.
+
+    Gemessen an den beiden gespeicherten echten Abrufen (Kategorieseite
+    vom 04.09.2026, Buendelseite MagentaMobil S vom 08.09.2026) traegt
+    JEDER Eintrag genau einen 36-Monats-Plan - kein Beleg zeigt bislang
+    mehrere Plaene nebeneinander (Modulkopf: der Verdacht auf eine
+    Erfassungsluecke bleibt offen). Diese Funktion bleibt trotzdem
+    defensiv: sie liest die ganze Liste, nicht nur `installments[0]`.
+    """
     raten = preis.get("installments") or []
     if not isinstance(raten, list) or not raten:
-        return None
-    erste = raten[0]
-    if not isinstance(erste, dict):
-        return None
+        return []
     try:
         anzahlung = float(preis.get("upfrontPrice"))
-        monatsrate = float(erste.get("recurringPrice"))
-        laufzeit = int(erste.get("numberOfInstallments"))
-        gesamt = float(erste.get("totalPrice"))
     except (TypeError, ValueError):
-        return None
-    if not probe_geht_auf(anzahlung, monatsrate, laufzeit, gesamt):
-        return None
-    return {"anzahlung": anzahlung, "monatsrate": monatsrate,
-            "laufzeit_monate": laufzeit, "gesamt": gesamt}
+        return []
+    formen: list[dict] = []
+    for plan in raten:
+        if not isinstance(plan, dict):
+            log.info("Telekom: Eintrag in installments ist kein Objekt "
+                     "(%r) - uebergangen", plan)
+            continue
+        # `laufzeit_in_monaten` ist DIE EINE STELLE, die entscheidet, ob ein
+        # Rohwert eine Ratenlaufzeit IST (Clean Code 1) - eine eigene
+        # `int()`-Zeile schnitte 24,5 still auf 24 ab.
+        laufzeit = laufzeit_in_monaten(plan.get("numberOfInstallments"))
+        try:
+            monatsrate = float(plan.get("recurringPrice"))
+            gesamt = float(plan.get("totalPrice"))
+        except (TypeError, ValueError):
+            monatsrate = gesamt = None
+        if laufzeit is None or monatsrate is None or gesamt is None:
+            # BENANNT, nicht still: die Listung waehlt ihren Traeger aus
+            # `formen` (siehe `_listungsplan`), ein lautlos verlorener Plan
+            # verschoebe also Preis und Laufzeit der Listung.
+            log.info("Telekom: Ratenplan ohne lesbare Bestandteile "
+                     "(Raten %r, Rate %r, Gesamt %r) - uebergangen",
+                     plan.get("numberOfInstallments"),
+                     plan.get("recurringPrice"), plan.get("totalPrice"))
+            continue
+        if not probe_geht_auf(anzahlung, monatsrate, laufzeit, gesamt):
+            log.info(
+                "Telekom: Ratenplan ueber %r Monate ohne aufgehende "
+                "Rechenprobe (Anzahlung %s, Rate %s, Gesamt %s) - "
+                "verworfen", plan.get("numberOfInstallments"), anzahlung,
+                plan.get("recurringPrice"), plan.get("totalPrice"))
+            continue
+        formen.append({"anzahlung": anzahlung, "monatsrate": monatsrate,
+                       "laufzeit_monate": laufzeit, "gesamt": gesamt})
+    return formen
+
+
+# Die Regel aus dem Modulkopf ("EINE LISTUNG IST DAS GERAET") - EINMAL
+# formuliert, damit Protokoll und Auswahl nicht auseinanderlaufen koennen.
+# Sie sortiert nach dem GESAMTBETRAG, weil der Gesamtbetrag die Zahl ist,
+# die diese Auswahl bestimmt (`preis_ohne_vertrag`); die Laufzeit ist nur
+# der Gleichstandsbrecher. Bis P0-B-h5 stand es umgekehrt - siehe
+# Modulkopf "DIE REGEL IST EINE WAHL".
+_LISTUNGSPLAN_REGEL = ("hoechster Gesamtbetrag, bei Gleichstand laengste "
+                       "Ratenlaufzeit")
+
+
+def _plan_text(form: dict) -> str:
+    """Ein Ratenplan mit ALLEN gemessenen Betraegen, fuer das Protokoll.
+
+    Ohne die Betraege ist ein uebergangener Plan im Protokoll nur eine
+    Laufzeit: die Messung selbst waere verloren, und der erste echte
+    Mehrplan-Fall liesse sich aus dem Log nicht nachrechnen. Mit ihnen
+    steht die Rechenprobe (`anzahlung + n x rate = gesamt`) in der Zeile.
+    """
+    return (f"{form['laufzeit_monate']} Monate: "
+            f"{form['anzahlung']:.2f} + {form['laufzeit_monate']} x "
+            f"{form['monatsrate']:.2f} = {form['gesamt']:.2f} EUR")
+
+
+def _listungsplan(formen: list[dict], name: str) -> dict:
+    """Welcher Ratenplan die LISTUNG dieses Geraets traegt.
+
+    Eine Listung ist das Geraet bei einem Anbieter (`listung_id` =
+    Anbieter + SKU, ohne Laufzeit); mehrere Plaene ergeben deshalb nicht
+    mehrere Listungen, sondern eine mit einer benannten Auswahl - siehe
+    Modulkopf fuer die Begruendung und dafuer, dass die Regel eine WAHL
+    ist und keine Messung. `max()` statt "der erste in der Liste": die
+    Reihenfolge der Nutzlast entscheidet nichts.
+
+    Die uebergangenen Plaene werden mit ihren BETRAEGEN genannt, und das
+    Protokoll sagt ausdruecklich, dass sie nirgends erfasst sind - eine
+    Listung kann nur eine Preisform tragen (Modulkopf: "wo sie nicht
+    reicht"). Das Protokoll ist dabei NICHT die Seite: dass ein Plan
+    fehlt, steht heute nur im Log (Modulkopf, offene Luecke zu Regel 9).
+    """
+    traeger = max(formen, key=lambda f: (f["gesamt"], f["laufzeit_monate"]))
+    # `is not`, nicht `!=`: zwei Plaene mit gleichen Betraegen sind zwei
+    # Plaene. Ein Vergleich auf Gleichheit schluckte den zweiten aus dem
+    # Protokoll - genau das Verschwinden, das diese Zeile verhindern soll.
+    uebergangen = [f for f in formen if f is not traeger]
+    if uebergangen:
+        log.info(
+            "Telekom: %r nennt %d Ratenplaene - die LISTUNG traegt %s "
+            "(Regel: %s, eine WAHL und keine Messung); NICHT erfasst, "
+            "auch nicht im Buendelpfad: %s",
+            name, len(formen), _plan_text(traeger), _LISTUNGSPLAN_REGEL,
+            "; ".join(_plan_text(f) for f in uebergangen))
+    return traeger
 
 
 def lies(text: str, url: str = "") -> list[dict]:
@@ -271,8 +483,8 @@ def lies(text: str, url: str = "") -> list[dict]:
                    or "").strip()
         if not name:
             continue
-        form = _preisform(eintrag.get("price") or {})
-        if form is None:
+        formen = _preisformen(eintrag.get("price") or {})
+        if not formen:
             # Kein Etikett heisst hier: kein Satz. Anders als bei o2, wo
             # eine unetikettierte Zahl immer noch ein `totalPrice` ist,
             # gibt es bei der Telekom NUR den Ratengesamtbetrag - ohne
@@ -281,14 +493,23 @@ def lies(text: str, url: str = "") -> list[dict]:
                      name)
             continue
         farbe, speicher = _variante(str(eintrag.get("variantSlug") or ""))
+        titel = " ".join(x for x in (name,
+                                     f"{speicher} GB" if speicher else "",
+                                     farbe) if x)
+        adresse = _passende_adresse(eintrag, links)
+        sku = str(eintrag.get("id") or "").strip()
+        # EIN Geraet, EINE Listung - und der Plan, der sie traegt, wird
+        # benannt ausgewaehlt statt von der Reihenfolge bestimmt (siehe
+        # `_listungsplan` und Modulkopf). Ein eigener Satz je Plan
+        # kollidierte in `GeraeteDB.upsert` unter derselben `listung_id`.
+        form = _listungsplan(formen, name)
         out.append({
-            "titel": " ".join(x for x in (name,
-                                          f"{speicher} GB" if speicher else "",
-                                          farbe) if x),
-            # Der strukturierte NAME (Feld `name`), unveraendert - die einzige
-            # Grundlage der E4-Auto-Erkennung. Der TITEL darueber ist
-            # zusammengesetzt (Name + Speicher + Farbe) und wuerde als
-            # Namensquelle Saegezahn-IDs erzeugen ("iPhone 18 Pro polar").
+            "titel": titel,
+            # Der strukturierte NAME (Feld `name`), unveraendert - die
+            # einzige Grundlage der E4-Auto-Erkennung. Der TITEL darueber
+            # ist zusammengesetzt (Name + Speicher + Farbe) und wuerde
+            # als Namensquelle Saegezahn-IDs erzeugen ("iPhone 18 Pro
+            # polar").
             "strukturierter_name": name,
             "preis": form["gesamt"],
             "anzahlung": form["anzahlung"],
@@ -301,11 +522,11 @@ def lies(text: str, url: str = "") -> list[dict]:
                                if str(eintrag.get("availabilityStatus")
                                       or "").upper() == "IN_STOCK"
                                else "unbekannt"),
-            "sku": str(eintrag.get("id") or "").strip(),
+            "sku": sku,
             "ean": "",
             "farbe": farbe,
             "speicher_gb": speicher,
-            "url": _passende_adresse(eintrag, links),
+            "url": adresse,
             "quelle": "telekom_kategorie",
         })
     return out
@@ -409,8 +630,8 @@ def lies_buendel(text: str, url: str = "",
         if not name:
             continue                      # Werbekachel, siehe Modulkopf
 
-        form = _preisform(eintrag.get("price") or {})
-        if form is None:
+        formen = _preisformen(eintrag.get("price") or {})
+        if not formen:
             log.info("Telekom-Buendel: %r ohne nachrechenbare Ratenform - "
                      "verworfen", name)
             continue
@@ -433,24 +654,32 @@ def lies_buendel(text: str, url: str = "",
             continue
 
         farbe, speicher = _variante(str(eintrag.get("variantSlug") or ""))
-        out.append({
-            "titel": " ".join(x for x in (name,
-                                          f"{speicher} GB" if speicher else "",
-                                          farbe) if x),
-            "strukturierter_name": name,
-            "farbe": farbe,
-            "speicher_gb": speicher,
-            "sku": str(eintrag.get("id") or "").strip(),
-            "tarif_name": tarif_name,
-            # Die MF-ID des Tarifs - die Ordnung des Anbieters, siehe
-            # Modulkopf ("WAS DER SLUG HIER IST").
-            "tarif_slug": tarif_id,
-            "tarif_monatlich": tarif_monatlich,
-            "geraet_zuzahlung": form["anzahlung"],
-            "geraet_monatsrate": form["monatsrate"],
-            "anschlusspreis": anschluss,
-            "laufzeit_monate": form["laufzeit_monate"],
-            "url": _passende_adresse(eintrag, links),
-            "quelle": "telekom_buendel",
-        })
+        titel = " ".join(x for x in (name,
+                                     f"{speicher} GB" if speicher else "",
+                                     farbe) if x)
+        adresse = _passende_adresse(eintrag, links)
+        sku = str(eintrag.get("id") or "").strip()
+        # JEDER Ratenplan wird ein EIGENES Buendel mit eigener
+        # `laufzeit_monate` - `tco_model.buendel_id()` traegt die Laufzeit
+        # im Schluessel, die Zahlweisen ueberschreiben sich also nicht mehr
+        # gegenseitig (B1).
+        for form in formen:
+            out.append({
+                "titel": titel,
+                "strukturierter_name": name,
+                "farbe": farbe,
+                "speicher_gb": speicher,
+                "sku": sku,
+                "tarif_name": tarif_name,
+                # Die MF-ID des Tarifs - die Ordnung des Anbieters, siehe
+                # Modulkopf ("WAS DER SLUG HIER IST").
+                "tarif_slug": tarif_id,
+                "tarif_monatlich": tarif_monatlich,
+                "geraet_zuzahlung": form["anzahlung"],
+                "geraet_monatsrate": form["monatsrate"],
+                "anschlusspreis": anschluss,
+                "laufzeit_monate": form["laufzeit_monate"],
+                "url": adresse,
+                "quelle": "telekom_buendel",
+            })
     return out

@@ -71,6 +71,31 @@ PREISTYP_LIVE_SHOP = "live_shop"
 PREISTYPEN = (PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP)
 
 
+def zeitreihen_basis(tid: str) -> str:
+    """Eine Tarif-ID ohne den `#live_shop`-Lesart-Zusatz.
+
+    ZWEI LESARTEN SIND ZWEI ZEITREIHEN, ABER EIN TARIF (B2, 08.09.2026):
+    der PIB-Eintrag `telekom:magentamobil-l` und die Shop-Kachel
+    `telekom:magentamobil-l#live_shop` sind derselbe Vertrag - der Zusatz
+    ist der PREISTYP der Fassung, die `collect.tarif_crawler.uebernimm_stand`
+    als ZWEITE fuer denselben Namen sieht, angehaengt genau deshalb, damit
+    sich zwei unterschiedliche Lesarten nicht gegenseitig als
+    Tarifaenderung melden. Gestrichen wird NUR er: ein Hash-Zusatz (zwei
+    gleichnamige, verschiedene Produkte wie o2-home-l-flex und
+    -175-flex) bleibt stehen und trennt weiterhin zwei echte Tarife.
+
+    EINE STELLE FUER ZWEI VERWENDER (B3, 21.09.2026): `tco_model.
+    geraeteanteil()` vergleicht darueber Buendel und SIM-only-Referenz,
+    `tarif_bezug.Tarifbestand` darueber, welcher der zwei Saetze zu
+    welchem Vertrag gehoert, wenn er entscheidet, welche Lesart als
+    AKTUELL gilt. Vorher stand dieselbe Kuerzung zweimal im Code (einmal
+    hier, einmal privat in `tco_model.py`) - zwei Kopien einer
+    ID-Umformung laufen sonst irgendwann auseinander.
+    """
+    zusatz = f"#{PREISTYP_LIVE_SHOP}"
+    return tid[: -len(zusatz)] if tid.endswith(zusatz) else tid
+
+
 @dataclass
 class Preisphase:
     """Ein Abschnitt der Laufzeit mit gleichbleibendem Monatspreis.

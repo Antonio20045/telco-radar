@@ -149,9 +149,15 @@ def test_der_iphone_satz_nach_rechnung():
     assert s["buendel_monatlich"] == 44.99
     assert tco.gesamt == pytest.approx(36 * 44.99)
     assert tco.restbetrag == pytest.approx(12 * 44.99)
-    # Ø/Monat teilt die VOLLRE Summe durch den 24-Monats-Horizont -
-    # nicht der Bündelbetrag selbst (das waere eine zweite Rechnung).
-    assert tco.monatlich == pytest.approx(round(36 * 44.99 / 24, 2))
+    # P0-B-h1: Ø/Monat teilt die Summe durch den Zeitraum, den sie
+    # TRAEGT - hier 36 Monate, denn der eine Bündelbetrag laeuft 36 Mal.
+    # Bis hierher stand hier `round(36 * 44.99 / 24, 2)` = 67,48 € und
+    # damit die Rechnung des Befunds: 67,48 × 36 = 2.429,28 €, eine Zahl
+    # aus keiner Definition. Der Zeitraum steht am Datensatz.
+    assert tco.leitzahl_monate == 36
+    assert tco.monatlich == pytest.approx(round(36 * 44.99 / 36, 2))
+    # Die Gegenrechnung, die auf jeder Zeile aufgehen muss.
+    assert tco.monatlich * tco.leitzahl_monate == pytest.approx(tco.gesamt)
     assert tco.belastbar
 
 

@@ -661,3 +661,65 @@ Workflow `p0-bau` gestartet, zuerst nur Paket A1 (Leitzahl „Kosten über
 24 Monate", opus) als Skript-Bewährung; A2–A4 (Bewegung/Δ/Referenz, Altern,
 Exporte) danach. P0-B (Laufzeiten in den Bündelschlüssel, Collectoren,
 Telekom-Tarifsätze) anschließend. Tor offen.
+
+---
+
+## P0 — Vertrauen, abgeschlossen 22.09.2026
+
+**Gebaut.** A1–A4 (Leitzahl mit Restschuld, Bewegung je Anbieter, Alterung,
+eindeutiger Export) lagen vor. Dazu B1 (Ratenlaufzeit im Bündelschlüssel plus
+Lesemigration), B2a/B2b/B3 (Laufzeiterfassung, o2-Härtung, Telekom-Tarifsätze
+über `tarif_bezug.py`), vier Behebungspakete und sechs Horizont-Pakete. Der
+eigentliche Befund der Phase stand nicht im Auftrag: **die Seite trug zwei
+verschiedene Zeiträume unter einer Beschriftung.** Ein Bündel mit kombiniertem
+Monatsbetrag (1&1, `buendel_monatlich`) rechnet über seine ganze Ratenlaufzeit
+— 36 Monate —, alle anderen über 24. Der Zeitraum wird jetzt an einer Stelle
+bestimmt (`tco_model.monatsschnitt`, `zeitraum_vergleichbar`, Feld
+`Tco.leitzahl_monate`) und von jedem Leser gelesen: Etikett, Ø/Monat, Δ-Tor,
+Kartenschlüssel, Katalogspalte, Radar, Balkengrafik, Zeitreihe samt
+Kurvenetiketten und zugänglichem Namen, und beide CSV-Exporte.
+
+**Gemessen.**
+- 81 von 81 Bündeln der vier Tor-Geräte (iPhone 17 Pro 256, iPhone 17 256,
+  Galaxy S26 Ultra 256, Pixel 10 Pro), alle Bänder, alle Anbieter: eigene
+  Rechnung direkt aus `geraete_tco_historie.jsonl` ohne `tco_model`, jede Zahl
+  auf der Seite gefunden. Pflichtfall congstar XS · iPhone 17 Pro 256 =
+  1 + 24×15 + 36×30,50 = **1.459,00 €**, Ø 60,79 €/Monat.
+- 506 gerenderte Zeilen „Kosten über N Monate X € · Ø Y €/Monat", **null** mit
+  Ø × Zeitraum ≠ Summe. „84,15" (Summe/24 bei 36 Monaten) kommt nicht mehr vor.
+- o2-Rücknahme exakt: Summe der Leitzahl der 72 o2-Bündel 98.768,16 € wie vor
+  P0-B, Differenz je Bündel `Counter({0.0: 72})`. Zwischenstand P0-B waren
+  108.956,16 € — +120 bis +276 € je Bündel ohne Preisänderung.
+- Historie nicht gerissen: 305 Reihen / 2064 Punkte / 9 Messtage vorher =
+  nachher. Ohne B1s Lesemigration: 0 von 3854 Zeilen zuordenbar.
+- Export `geraete-tco.csv`: 837 Zeilen, 763 unter „Kosten über 24 Monate EUR"
+  (ausschließlich Zeitraum 24), 74 unter „Kosten über die Bündellaufzeit EUR",
+  0 ohne Wert, 0 Zahlen unter falschem Kopf.
+- Geräte-Suite **1677 grün / 1 übersprungen / 0 rot** (Start der Sitzung: 1588
+  grün / 4 rot). Orakel `test_seiten_zahlen.py` 133 grün / 0 rot.
+- `pruefe_portal.py` 21 von 21. Screenshots 1440 px und 390 px angesehen.
+
+**Offen.**
+1. **Kein Netz zu den Anbieterseiten** (Egress-Policy dieser Umgebung, Gateway
+   403 auf CONNECT für telekom.de, congstar.de, 1und1.de, vodafone.de,
+   o2online.de). Deshalb unbestätigt: welcher Telekom-Tarifsatz gilt (PIB
+   2021–2024 sagt S=6/M=12/L=80 GB, `live_shop` 15.09. sagt 30/50/100 GB — die
+   Vorrangregel ist gebaut, der Wert nicht belegt) und was congstars
+   „Upgrade-Versprechen" ist.
+2. **Erfassungslücke bleibt benannt, nicht behoben** (CLAUDE.md Fallstrick 16).
+   0 von 792 Gruppen (Anbieter, SKU, Tarif) tragen zwei Ratenlaufzeiten.
+   Telekom, o2, congstar und 1&1 ausnahmslos 36 Monate. In den gespeicherten
+   echten Abrufen belegt: congstar 24+36, Vodafone 12/24/36. NICHT belegt:
+   Telekom (nur 36), o2 Bündel (nur 36), 1&1 (nur 36). Die Plan-Annahme
+   „1&1 24+12 mit Schlusszahlung" ist **widerlegt** — null Treffer für
+   Schlusszahlung/Restzahlung/„24+12" über 374 kB gespeicherte Seiten.
+3. **Ein gescheiterter Zeitreihen-Aufbau bleibt unsichtbar.** Ein TypeError in
+   `geraete_view` rendert die Seite OHNE Hauptgrafik weiter; sichtbar ist nur
+   `ERROR … Zeitreihen-Aufbereitung gescheitert`. Verstoß gegen Regel 9,
+   vorbestehend, eigenes Paket.
+4. **Kein Live-Nachweis.** Diese Sitzung arbeitet auf
+   `claude/festive-goodall-cs669e`, `geraete.yml` läuft auf `main`. Der Merge
+   ist Antonios Entscheidung.
+5. Δ im Block „Ohne Tarifband" vergleicht einen Unlimited-Tarif gegen Vodafone
+   Mobil XS 18 GB (P3). Mobil: X-Achsenlabels überlappen, Alterungs-Abzeichen
+   bricht in Einzelkästchen, Reiter abgeschnitten, drei Erklärsätze stehen (P2).

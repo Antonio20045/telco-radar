@@ -68,6 +68,58 @@ eine separate Geraeterate gibt es nicht. Deshalb probiert
 Rechnungen aufgeht. Das haengt nicht am Namen `financingType`, der koennte
 sich aendern; es haengt an der Zahl.
 
+ALLE LAUFZEITEN SIND SCHON ERFASST - GEMESSEN, NICHT VERMUTET (P0-B2a)
+------------------------------------------------------------------------
+`lies_buendel()` iteriert bereits ueber JEDE Komposition in
+`prices.composition` (2-4 je Variante) und legt fuer jede einen eigenen
+Rohsatz an - 12/24/36 Monate UND `sub` kommen alle vier als eigene Buendel
+heraus (gemessen am Musterbuendel: 3 Varianten x 4 Kompositionen = 12
+Saetze, `test_zwoelf_buendel_aus_drei_varianten_und_vier_kompositionen`).
+Anders als bei Telekom/congstar musste hier also keine Auswahl aufgehoben
+werden.
+
+Eine ZWEITE Phase in `totalMonthlyRatePrice` (36-Monats-Finanzierung: Monate
+1-24 Tarif+Geraet, 25-36 nur noch Geraet) ist KEIN verlorener Messpunkt:
+`geraet_monatsrate` kommt nicht aus `_periode0()`, sondern flach aus
+`priceByComponent.hardware.priceByType.rate.month`, das schon die GANZE
+Ratenlaufzeit abdeckt (`recurrenceEnd == financingDuration`). Nachgerechnet
+an allen drei Ratenfaellen der Fixture (12/24/36 Monate):
+Zuzahlung + Laufzeit x Rate trifft `priceByComponent.hardware...total.
+onetime.withoutDiscounts.gross` auf den Cent genau
+(`test_alle_phasen_ergeben_den_richtigen_geraete_gesamtpreis`).
+
+WOHER DIE LAUFZEIT KOMMT - DREI QUELLEN, KEINE VERMISCHUNG (FIX3)
+------------------------------------------------------------------
+`_laufzeit()` nimmt `financingDuration`; fehlt sie, das ENDE DER
+GERAETERATE (`priceByComponent.hardware...rate.month.withoutDiscounts.
+recurrenceEnd`, gemessen in allen 9 Ratenkompositionen der Fixture exakt
+gleich `financingDuration`); und nur wenn es gar keine Geraeterate gibt -
+der `sub`-Fall -, die Vertragsmindestlaufzeit aus den Phasen von
+`totalMonthlyRatePrice` (`_letztes_phasenende`).
+
+Die Phasen beschreiben den GANZEN VERTRAG und laufen laenger als die
+Finanzierung. Sie auch im Ratenfall als Rueckfall zu nehmen, verdoppelte
+die Geraetekosten: gemessen an der echten 12-Monats-Komposition ohne
+`financingDuration` ergaben 64,50 EUR ueber 24 statt 12 Monate 1549,00 EUR
+statt der in derselben Nutzlast belegten 775,00 EUR.
+
+EINE OFFENE PHASE IST KEINE LAUFZEIT (FIX3, 21.09.2026)
+--------------------------------------------------------
+Die erste Fassung dieses Rueckfalls las `perioden[-1]["recurrenceEnd"]`
+und verlor damit ein ganzes Buendel STILL: traegt die letzte Phase kein
+Ende (`recurrenceEnd: null`, die uebliche Form einer offenen
+Anschlussphase "ab Monat 25"), wurde `int(None)` zum TypeError, die
+Laufzeit blieb None und der Satz fiel ohne Protokoll heraus. Kein
+gespeicherter Abruf zeigt so eine Phase im `sub`-Fall - alle DREI
+`sub`-Kompositionen der Fixture tragen genau `(1, 24)`, und
+`recurrenceEnd: null` kommt in der Datei nicht vor; gemessen ist der
+Verlust an der Fixture mit einer IM TEST ergaenzten zweiten Phase
+`{recurrenceStart: 25, recurrenceEnd: null}`: 0 Saetze statt 1. Seither
+gilt: eine Phase ohne Ende ist eine offene Anschlussphase und traegt keine
+Laufzeit, die Vertragsmindestlaufzeit bleibt der Rueckfall - und wenn gar
+keine Laufzeit bestimmbar ist, nennt das Protokoll Hash, Geraeterate und
+Phasenenden, statt das Angebot lautlos zu verschlucken.
+
 DIE OFFENE TARIFNAMEN-FRAGE IST GEKLAERT: JA, ES GIBT EINEN ENDPUNKT
 ----------------------------------------------------------------------
 `prices.composition[].offerCoreHash` nennt keinen Klarnamen - aber
@@ -95,12 +147,20 @@ nachdem alle Anbieter gesammelt sind, ueber den generischen Adapter-Haken
 from __future__ import annotations
 
 import json
+import logging
 import re
 import time
 from typing import Callable, Optional
 from urllib.parse import urlsplit
 
 from . import GeraeteAbrufFehler
+# DIE EINE STELLE, die entscheidet, ob ein Rohwert eine Ratenlaufzeit IST
+# (Clean Code 1) - dieselbe Pruefung, die `buendel_id` und `Buendel` lesen.
+# Eine eigene `int()`-Zeile hier waere eine zweite, schwaechere Definition:
+# sie wuerde 24,5 still auf 24 abschneiden.
+from ...tco_model import laufzeit_in_monaten
+
+log = logging.getLogger(__name__)
 
 # Die zwei Pflichtparameter. Ohne sie antwortet die Schnittstelle mit
 # HTTP 400 und nennt das fehlende Feld beim Namen - beide Werte stammen aus
@@ -256,18 +316,97 @@ def _gleich(a: Optional[float], b: Optional[float]) -> bool:
     return abs(float(a) - float(b)) < 0.005
 
 
-def _periode0(komposition: dict) -> Optional[dict]:
-    """Die ERSTE Phase von `totalMonthlyRatePrice` - die, gegen die die
-    Komponentenbetraege (`recurrenceStart: 1`) nachgerechnet werden. Eine
-    Ratenlaufzeit ueber 24 Monate hinaus (financingDuration 36) traegt eine
-    ZWEITE, niedrigere Phase (nur noch die Geraeterate) - die zaehlt hier
-    nicht mit, sie ist keine zusaetzliche Messung, sondern derselbe Vertrag
-    in seinem zweiten Abschnitt."""
+def _perioden(komposition: dict) -> list[dict]:
+    """ALLE Phasen von `totalMonthlyRatePrice.withoutDiscounts` - eine
+    Ratenlaufzeit ueber 24 Monate hinaus (financingDuration 36) traegt
+    zwei (Monate 1-24 Tarif+Geraet, 25-36 nur noch die Geraeterate)."""
     perioden = _pfad(komposition, "totalMonthlyRatePrice", "withoutDiscounts")
-    if not isinstance(perioden, list) or not perioden:
-        return None
-    erste = perioden[0]
-    return erste if isinstance(erste, dict) else None
+    if not isinstance(perioden, list):
+        return []
+    return [p for p in perioden if isinstance(p, dict)]
+
+
+def _periode0(komposition: dict) -> Optional[dict]:
+    """Die ERSTE Phase - die, gegen die die Komponentenbetraege
+    (`recurrenceStart: 1`) nachgerechnet werden.
+
+    Die ZWEITE Phase (falls vorhanden) zaehlt fuer DIESE Probe nicht mit -
+    sie ist keine zusaetzliche Messung, sondern derselbe Vertrag in seinem
+    zweiten Abschnitt. Die Geraeterate selbst kommt nicht von hier: sie
+    steht flach fuer die GANZE Ratenlaufzeit unter
+    `priceByComponent.hardware.priceByType.rate.month` (gemessen an allen
+    12/24/36-Kompositionen der Fixture `vodafone_virtualitem.json`:
+    Zuzahlung + Laufzeit x Rate ergibt dort exakt
+    `priceByComponent.hardware...total.onetime.withoutDiscounts.gross` -
+    kein Phasenwechsel noetig). Nur der LAUFZEIT-Fallback ohne eigene
+    `financingDuration` (der "sub"-Fall) braucht mehr als Phase 0, siehe
+    `_buendelsatz_aus_komposition`."""
+    perioden = _perioden(komposition)
+    return perioden[0] if perioden else None
+
+
+def _letztes_phasenende(komposition: dict) -> Optional[int]:
+    """Das ENDE DER LETZTEN BEPREISTEN PHASE des Vertrags - oder None.
+
+    In der gemessenen Form ist das die Vertragsmindestlaufzeit: der
+    `sub`-Fall der Fixture traegt genau eine Phase (1 bis 24). Traegt eine
+    Antwort mehrere bepreiste Abschnitte, gilt der spaeteste - weiter
+    reicht diese Zahl nicht, und sie heisst deshalb nach dem, was sie
+    misst, nicht nach dem, wofuer sie verwendet wird.
+
+    `totalMonthlyRatePrice` beschreibt den GANZEN Vertrag, nicht die
+    Geraetefinanzierung - diese Zahl gilt deshalb nur im `sub`-Fall, in
+    dem es gar keine Geraeterate gibt (siehe `_laufzeit`).
+
+    EINE PHASE OHNE `recurrenceEnd` IST KEINE LAUFZEIT. `recurrenceEnd:
+    null` ist die uebliche Form einer offenen Anschlussphase ("ab Monat
+    25, bis auf Weiteres") - sie endet nicht und kann deshalb keine
+    Mindestlaufzeit tragen. Genommen wird die spaeteste Endgrenze, die
+    ueberhaupt genannt ist (in den gemessenen Kompositionen laufen die
+    Phasen aufsteigend, dort ist das die letzte mit einem Ende).
+
+    Der Rueckfall auf `perioden[-1]["recurrenceEnd"]` (21.09.2026, P0-B2a)
+    hat genau daran ein GANZES Buendel verloren: die offene Anschlussphase
+    machte `int(None)` zum TypeError, die Laufzeit blieb None und der Satz
+    fiel ohne Protokoll heraus (Behebung FIX3).
+    """
+    enden = [ende for ende in (laufzeit_in_monaten(p.get("recurrenceEnd"))
+                               for p in _perioden(komposition))
+             if ende is not None]         # None = offene Phase, kein Ende
+    return max(enden) if enden else None
+
+
+def _laufzeit(komposition: dict,
+              geraet_monatsrate: Optional[float]) -> Optional[int]:
+    """Die Ratenlaufzeit dieser Komposition - oder None als Luecke.
+
+    DREI QUELLEN, IN DIESER ORDNUNG, UND KEINE VERMISCHUNG:
+
+    1. `financingDuration` - die Laufzeit, die die Nutzlast selbst nennt.
+    2. Fehlt sie und gibt es eine GERAETERATE, nennt die Rate ihr eigenes
+       Ende: `priceByComponent.hardware...rate.month.withoutDiscounts.
+       recurrenceEnd`. Gemessen an allen drei Ratenfaellen der Fixture ist
+       das exakt `financingDuration` (12/24/36) - dieselbe Zahl, zweite
+       Stelle.
+    3. Gibt es KEINE Geraeterate (der `sub`-Fall), gibt es auch keine
+       Finanzierung; dann gilt die Vertragsmindestlaufzeit aus den Phasen
+       (`_letztes_phasenende`).
+
+    Die Phasen von `totalMonthlyRatePrice` beschreiben den ganzen Vertrag
+    und koennen LAENGER laufen als die Geraetefinanzierung. Sie als
+    Rueckfall auch fuer den Ratenfall zu nehmen, verdoppelte die
+    Geraetekosten: gemessen an der echten 12-Monats-Komposition ohne
+    `financingDuration` ergab die Rate 64,50 EUR ueber 24 statt 12 Monate
+    1549,00 EUR statt der belegten 775,00 EUR (FIX3).
+    """
+    laufzeit = laufzeit_in_monaten(komposition.get("financingDuration"))
+    if laufzeit is not None:
+        return laufzeit
+    if geraet_monatsrate is not None:
+        return laufzeit_in_monaten(
+            _pfad(komposition, "priceByComponent", "hardware", "priceByType",
+                  "rate", "month", "withoutDiscounts", "recurrenceEnd"))
+    return _letztes_phasenende(komposition)
 
 
 def _buendelsatz_aus_komposition(modell: str, hubpage: str, hardware_id: str,
@@ -277,11 +416,19 @@ def _buendelsatz_aus_komposition(modell: str, hubpage: str, hardware_id: str,
     Modulkopf (die Rechenprobe entscheidet, nicht `financingType`)."""
     hash_ = str(komposition.get("offerCoreHash") or "").strip()
     if not hash_:
+        # Ohne `offerCoreHash` gibt es keinen Schluessel, ueber den
+        # `loese_tarifnamen()` je einen Tarifnamen findet - der Satz waere
+        # ein Buendel ohne benennbaren Tarif.
+        log.info("Vodafone-Buendel: Komposition ohne offerCoreHash "
+                 "(financingType %r) - verworfen",
+                 komposition.get("financingType"))
         return None
 
     periode = _periode0(komposition)
     gesamt = _preis((periode or {}).get("gross")) if periode else None
     if gesamt is None:
+        log.info("Vodafone-Buendel: Komposition %s ohne Gesamtrate in "
+                 "totalMonthlyRatePrice - verworfen", hash_)
         return None
 
     tarif = _pfad(komposition, "priceByComponent", "tariff",
@@ -293,7 +440,11 @@ def _buendelsatz_aus_komposition(modell: str, hubpage: str, hardware_id: str,
     h_monat = _preis(_pfad(hardware, "month", "withoutDiscounts", "gross"))
     h_einmalig = _preis(_pfad(hardware, "onetime", "withoutDiscounts", "gross"))
     if t_monat is None:
-        return None                       # ohne Tarifrate keine Buendelaussage
+        # Ohne Tarifrate keine Buendelaussage - und der Ausfall wird
+        # benannt, nicht verschluckt.
+        log.info("Vodafone-Buendel: Komposition %s ohne Tarif-Monatsrate "
+                 "- verworfen", hash_)
+        return None
 
     if h_monat is not None and _gleich(t_monat + h_monat, gesamt):
         geraet_monatsrate = h_monat
@@ -302,22 +453,24 @@ def _buendelsatz_aus_komposition(modell: str, hubpage: str, hardware_id: str,
         # Tarifpreis, eine separate Rate wird nicht berechnet (Modulkopf).
         geraet_monatsrate = None
     else:
+        log.info("Vodafone-Buendel: Komposition %s geht nicht auf "
+                 "(Tarif %s + Geraet %s gegen Gesamtrate %s) - verworfen",
+                 hash_, t_monat, h_monat, gesamt)
         return None                       # Summe geht nicht auf - verwerfen
 
-    laufzeit = komposition.get("financingDuration")
-    try:
-        laufzeit = int(laufzeit)
-    except (TypeError, ValueError):
-        laufzeit = None
-    if not laufzeit:
-        # Ohne eigene Ratenlaufzeit (financingType "sub") gilt die Phase,
-        # fuer die dieser Preis genannt wird - die Vertragsmindestlaufzeit.
-        ende = (periode or {}).get("recurrenceEnd")
-        try:
-            laufzeit = int(ende)
-        except (TypeError, ValueError):
-            laufzeit = None
-    if not laufzeit or laufzeit <= 0:
+    laufzeit = _laufzeit(komposition, geraet_monatsrate)
+    if laufzeit is None:
+        # BENANNTE LUECKE statt stillem Verlust: hier verschwindet ein
+        # gemessenes Angebot, und der Grund steht im Protokoll.
+        log.info("Vodafone-Buendel: Komposition %s ohne bestimmbare "
+                 "Ratenlaufzeit (financingDuration %r, Geraeterate %r, "
+                 "Ende der Geraeterate %r, Phasenenden %r) - verworfen",
+                 hash_, komposition.get("financingDuration"),
+                 geraet_monatsrate,
+                 _pfad(komposition, "priceByComponent", "hardware",
+                       "priceByType", "rate", "month", "withoutDiscounts",
+                       "recurrenceEnd"),
+                 [p.get("recurrenceEnd") for p in _perioden(komposition)])
         return None
 
     return {

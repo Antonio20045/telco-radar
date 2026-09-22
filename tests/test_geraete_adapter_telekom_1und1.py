@@ -27,11 +27,14 @@ nach (Challenge-Antwort, kaputtes JSON, fehlender Tarifname), die man nicht
 ehrlich herbeimessen kann.
 """
 import gzip
+import json
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
 
+from telco_radar.analyze.geraete_store import GeraeteDB
 from telco_radar.collect.geraete import (
     GeraeteAbrufFehler, einsundeins, sammle_anbieter, telekom,
 )
@@ -161,6 +164,291 @@ def test_telekom_gesamtbetrag_der_nicht_aufgeht_wird_verworfen():
             '"price": {"upfrontPrice": 99, "installments": [{"numberOfInstallments": 36, '
             '"recurringPrice": 30.5, "totalPrice": 1500}]}}]}};</script>')
     assert telekom.lies(html, _TELEKOM_URL) == []
+
+
+def _telekom_mit_zweitem_plan(telekom_html: str, zuerst_36: bool = True,
+                              zweiter_plan=None) -> str:
+    """Die ECHTE Kategorieseite, am iPhone-17-Pro-Eintrag um EINEN
+    zweiten, rechnerisch selbst konsistenten 24-Monats-Plan ergänzt
+    (99 + 24 × 44,00 = 1155,00).
+
+    Kein gespeicherter echter Abruf zeigt mehr als einen Plan je Gerät
+    (Modulkopf von `telekom.py`: `numberOfInstallments` trägt in beiden
+    Abrufen ausschließlich 36) - dieser Plan ist synthetisch und sagt das,
+    derselbe Ansatz wie die anderen nachgestellten Fälle dieses Moduls.
+
+    `zuerst_36` dreht die Reihenfolge in `installments`: sie darf nicht
+    entscheiden, welcher Plan die Listung trägt.
+
+    `zweiter_plan` ersetzt den Standard-Zweitplan - gebraucht für den
+    einen Fall, in dem längste Laufzeit und höchster Gesamtbetrag NICHT
+    dasselbe Angebot meinen (P0-B-h5).
+    """
+    daten = telekom.zustand(telekom_html)
+    pro = next(e for e in daten["productList"]["data"]
+               if str(e.get("variantSlug") or "") == "tiefblau-256-gb")
+    assert pro["price"]["installments"][0]["numberOfInstallments"] == 36
+    echter = pro["price"]["installments"][0]
+    if zweiter_plan is None:
+        zweiter_plan = {"numberOfInstallments": 24, "recurringPrice": 44.0,
+                        "totalPrice": 1155.0}
+    pro["price"]["installments"] = ([echter, zweiter_plan] if zuerst_36
+                                    else [zweiter_plan, echter])
+    return f'<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>'
+
+
+# Der EINE Fall, der die alte Auswahlregel von der neuen trennt: ein
+# 24-Monats-Plan, der TEURER ist als der echte 36er (99 + 24 × 46,00 =
+# 1203,00 gegen 99 + 36 × 30,50 = 1197,00). "Längste Laufzeit zuerst"
+# wählte hier 1197,00 - den NIEDRIGEREN Betrag. Synthetisch, und das
+# sagt es: kein echter Abruf trägt zwei Pläne.
+_TEURER_24ER = {"numberOfInstallments": 24, "recurringPrice": 46.0,
+                "totalPrice": 1203.0}
+
+
+@pytest.mark.parametrize("zuerst_36", [True, False])
+def test_telekom_mehrere_ratenplaene_ergeben_genau_eine_listung(telekom_html,
+                                                                caplog,
+                                                                zuerst_36):
+    """FIX3: eine LISTUNG ist das Gerät bei einem Anbieter, kein Ratenplan.
+
+    `geraete_model.listung_id` ist (Anbieter, SKU) und kennt keine
+    Laufzeit; je Plan ein eigener Listungssatz kollidierte deshalb in
+    `GeraeteDB.upsert`, und die REIHENFOLGE in `installments` entschied,
+    welcher Plan im Bestand landet (1197,00 € oder 1155,00 €). Die
+    Listung trägt jetzt nach benannter Regel den längsten Plan - in
+    beiden Sortierungen denselben -, und der übergangene wird im
+    Protokoll GENANNT statt still zu verschwinden.
+    """
+    geaendert = _telekom_mit_zweitem_plan(telekom_html, zuerst_36)
+    with caplog.at_level("INFO"):
+        saetze = [s for s in telekom.lies(geaendert, _TELEKOM_URL)
+                  if s["titel"].startswith("Apple iPhone 17 Pro 256")]
+    assert len(saetze) == 1
+    assert saetze[0]["laufzeit_monate"] == 36
+    assert saetze[0]["preis"] == 1197.0
+    assert saetze[0]["monatsrate"] == 30.5
+    assert saetze[0]["anzahlung"] == 99.0
+    # Der übergangene Plan steht im Protokoll, samt Regel - und das
+    # Protokoll behauptet nicht, er sei woanders erfasst: auf DIESER Seite
+    # ist er es nicht (`lies_buendel` sieht die "ohne Vertrag"-Nutzlast
+    # nie, sie trägt keinen `selectedPlan`).
+    protokoll = [m for m in caplog.messages if "Ratenplaene" in m]
+    assert len(protokoll) == 1, caplog.messages
+    assert "2 Ratenplaene" in protokoll[0]
+    assert "36 Monate" in protokoll[0]
+    assert telekom._LISTUNGSPLAN_REGEL in protokoll[0]
+    assert "NICHT erfasst" in protokoll[0]
+    with pytest.raises(GeraeteAbrufFehler):
+        telekom.lies_buendel(geaendert, _TELEKOM_URL)
+
+
+@pytest.mark.parametrize("zuerst_36", [True, False])
+def test_telekom_beide_ratenplaene_werden_gemessen_bevor_einer_gewaehlt_wird(
+        telekom_html, zuerst_36):
+    """GEGENPROBE zu den zwei Tests darunter - sie ist gegen JEDEN Stand
+    grün und muss es sein.
+
+    Wenn `_preisformen` nur einen Plan zurückgäbe, wären eine Auswahlregel
+    und ein Protokoll über "den übergangenen Plan" gegenstandslos, und
+    beide Tests darunter prüften ins Leere (CLAUDE.md Regel 10: ein Test,
+    dessen Lookup ins Leere läuft, ist grün und prüft nichts). Hier steht
+    deshalb die Zusicherung, die P0-B-fix3 aus diesem Modul entfernt hat -
+    an der Schicht, an der sie wahr IST: GEMESSEN werden beide Pläne mit
+    allen Beträgen, gewählt wird erst danach.
+    """
+    geaendert = _telekom_mit_zweitem_plan(telekom_html, zuerst_36)
+    daten = telekom.zustand(geaendert)
+    pro = next(e for e in daten["productList"]["data"]
+               if str(e.get("variantSlug") or "") == "tiefblau-256-gb")
+
+    formen = telekom._preisformen(pro["price"])
+    assert len(formen) == 2
+    nach_laufzeit = {f["laufzeit_monate"]: f for f in formen}
+    assert set(nach_laufzeit) == {36, 24}
+    assert nach_laufzeit[36]["gesamt"] == 1197.0
+    assert nach_laufzeit[24]["gesamt"] == 1155.0
+    assert nach_laufzeit[24]["monatsrate"] == 44.0
+    # Beide gehen rechnerisch auf - sonst wäre der eine kein übergangener
+    # Plan, sondern ein verworfener (anderer Zweig, anderes Protokoll).
+    for f in formen:
+        assert probe_geht_auf(f["anzahlung"], f["monatsrate"],
+                              f["laufzeit_monate"], f["gesamt"])
+
+
+@pytest.mark.parametrize("zuerst_36", [True, False])
+def test_telekom_die_listung_traegt_den_hoechsten_gesamtbetrag(telekom_html,
+                                                               zuerst_36):
+    """P0-B-h5: die Auswahlregel sortiert nach der Zahl, die sie bestimmt.
+
+    P0-B-fix3 wählte "längste Ratenlaufzeit, bei Gleichstand höherer
+    Gesamtbetrag". Die zwei Kriterien können auseinanderlaufen, und dann
+    gewann das falsche: 24 Monate zu 1.203,00 € gegen 36 Monate zu
+    1.197,00 € ergab 1.197,00 € - ausgerechnet den NIEDRIGEREN Betrag,
+    entgegen der Begründung, mit der die Regel angetreten war.
+
+    Die Auswahl bestimmt `preis_ohne_vertrag`, und das IST der
+    Gesamtbetrag; danach wird sortiert, die Laufzeit bricht nur den
+    Gleichstand. CLAUDE.md: "Der niedrigste Preis ist der
+    wahrscheinlichste Fehler" - eine zu niedrige Zahl gewinnt auf dieser
+    Seite Vergleiche und Rangfolgen, die ihr nicht gehören.
+
+    Die Regel bleibt eine WAHL und keine Messung (Modulkopf "DIE REGEL IST
+    EINE WAHL"): die Nutzlast markiert keinen Plan als Standardangebot.
+    """
+    geaendert = _telekom_mit_zweitem_plan(telekom_html, zuerst_36,
+                                          zweiter_plan=_TEURER_24ER)
+    saetze = [s for s in telekom.lies(geaendert, _TELEKOM_URL)
+              if s["titel"].startswith("Apple iPhone 17 Pro 256")]
+    assert len(saetze) == 1
+    assert saetze[0]["preis"] == 1203.0
+    assert saetze[0]["laufzeit_monate"] == 24
+    assert saetze[0]["monatsrate"] == 46.0
+    assert saetze[0]["anzahlung"] == 99.0
+    # Und die Regel steht an EINER Stelle, in der Reihenfolge, in der sie
+    # rechnet - sonst sagt das Protokoll etwas anderes als die Auswahl.
+    assert telekom._LISTUNGSPLAN_REGEL.startswith("hoechster Gesamtbetrag")
+
+
+def test_telekom_der_uebergangene_plan_steht_mit_seinen_betraegen_im_protokoll(
+        telekom_html, caplog):
+    """P0-B-h5: der übergangene Plan darf nicht still verschwinden.
+
+    P0-B-fix3 nannte im Protokoll nur die LAUFZEITEN ("36/24 Monate").
+    Damit war die Messung selbst weg: Anzahlung, Rate und Gesamtbetrag des
+    übergangenen Plans standen nirgends, und der erste echte
+    Mehrplan-Fall wäre aus dem Log nicht nachrechenbar gewesen. Eine
+    Listung trägt nur eine Preisform - was sie nicht trägt, muss
+    wenigstens vollständig protokolliert sein.
+
+    Der Buendelpfad kann hier nicht einspringen: ein Bündel ist Gerät PLUS
+    Tarif, und die "ohne Vertrag"-Nutzlast hat keinen - `lies_buendel`
+    wirft auf ihr (unten mitgeprüft). Dass die Geräteseite davon kein Wort
+    sagt, bleibt die offene Lücke gegen Regel 9; sie ist im Modulkopf
+    benannt und als Befund gemeldet, nicht hier geheilt.
+    """
+    geaendert = _telekom_mit_zweitem_plan(telekom_html,
+                                          zweiter_plan=_TEURER_24ER)
+    with caplog.at_level("INFO"):
+        saetze = [s for s in telekom.lies(geaendert, _TELEKOM_URL)
+                  if s["titel"].startswith("Apple iPhone 17 Pro 256")]
+    assert len(saetze) == 1
+
+    zeilen = [m for m in caplog.messages if "Ratenplaene" in m]
+    assert len(zeilen) == 1, caplog.messages
+    zeile = zeilen[0]
+    # Der TRÄGER mit seinen Beträgen (der 24er zu 1.203,00 €).
+    assert "24 Monate: 99.00 + 24 x 46.00 = 1203.00 EUR" in zeile, zeile
+    # Und der ÜBERGANGENE mit seinen - die Zahlen, die sonst verloren sind.
+    assert "36 Monate: 99.00 + 36 x 30.50 = 1197.00 EUR" in zeile, zeile
+    # Samt Regel, und samt der Aussage, dass die Regel eine Wahl ist.
+    assert telekom._LISTUNGSPLAN_REGEL in zeile
+    assert "eine WAHL und keine Messung" in zeile
+    # Das Protokoll behauptet NICHT, der Plan sei woanders erfasst.
+    assert "NICHT erfasst" in zeile
+    assert "auch nicht im Buendelpfad" in zeile
+    with pytest.raises(GeraeteAbrufFehler):
+        telekom.lies_buendel(geaendert, _TELEKOM_URL)
+
+
+def test_telekom_zwei_plaene_kollidieren_nicht_mehr_im_bestand(katalog, farben,
+                                                               telekom_html):
+    """Die Gegenprobe eine Stufe weiter: derselbe zweite Plan, aber bis in
+    `GeraeteDB.upsert` hinein.
+
+    Vor FIX3 kamen dort zwei Sätze mit derselben `listung_id` an; der
+    zweite wurde als Kollision übergangen ("zwei Artikel nicht
+    unterscheidbar (etwa zwei Farben)") - eine Begründung, die für zwei
+    Laufzeiten desselben Geräts unwahr ist. Jetzt gibt es nur eine
+    Listung, keine Kollision und keinen übergangenen Satz.
+    """
+    geaendert = _telekom_mit_zweitem_plan(telekom_html)
+
+    def hole(url, kopfzeilen=None, user_agent=None):
+        if url.endswith("/robots.txt"):
+            return (200, "User-agent: *\nDisallow: /is-bin/\n")
+        return (200, geaendert)
+
+    anbieter = Anbieter(
+        name="Telekom", typ="netzbetreiber", methode="telekom_kategorie",
+        basis_url="https://www.telekom.de", rate_limit_sekunden=0,
+        einstiege=[Einstieg(url=_TELEKOM_URL, label="ohne Vertrag",
+                            kind="static")])
+    bilanz = sammle_anbieter(anbieter, katalog, farben, hole, "2026-09-21",
+                             RobotsWaechter(hole=hole),
+                             datetime(2026, 9, 21, 3, tzinfo=timezone.utc))
+    assert bilanz.status == "ok"
+    pro = [l for l in bilanz.listungen
+           if l.sku_id.startswith("apple-iphone-17-pro-256gb")]
+    assert len(pro) == 1
+    assert len({l.listung_id for l in bilanz.listungen}) == len(bilanz.listungen)
+
+    with tempfile.TemporaryDirectory() as tmp:
+        db = GeraeteDB(Path(tmp) / "geraete_db.json")
+        neu, _ = db.upsert(bilanz.listungen, "2026-09-21")
+        assert db.kollisionen == []
+        assert db.uebergangen == []
+        assert neu == len(bilanz.listungen)
+    assert pro[0].preis_ohne_vertrag == 1197.0
+    assert pro[0].laufzeit_monate == 36
+
+
+def test_telekom_ein_nicht_aufgehender_plan_faellt_einzeln(telekom_html, caplog):
+    """Zwei Plaene, einer davon rechnerisch falsch (99 + 24 × 44,00 ist
+    nicht 999,00): NUR der kaputte Plan faellt, der aufgehende bleibt -
+    nicht der ganze Eintrag wie vor P0-B2a."""
+    daten = telekom.zustand(telekom_html)
+    geraete = daten["productList"]["data"]
+    pro = next(e for e in geraete
+               if str(e.get("variantSlug") or "") == "tiefblau-256-gb")
+    kaputter_plan = {"numberOfInstallments": 24, "recurringPrice": 44.0,
+                     "totalPrice": 999.0}
+    pro["price"]["installments"] = [pro["price"]["installments"][0],
+                                    kaputter_plan]
+    geaendert = f'<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>'
+
+    with caplog.at_level("INFO"):
+        saetze = [s for s in telekom.lies(geaendert, _TELEKOM_URL)
+                  if s["titel"].startswith("Apple iPhone 17 Pro 256")]
+    assert len(saetze) == 1
+    assert saetze[0]["laufzeit_monate"] == 36
+    assert saetze[0]["preis"] == 1197.0
+    assert any("Ratenplan" in m and "24" in m for m in caplog.messages)
+
+
+def test_telekom_ein_unlesbarer_ratenplan_wird_benannt(telekom_html, caplog):
+    """FIX3: ein Plan, dessen Bestandteile keine Zahlen sind, fällt - aber
+    BENANNT. Weil die Listung ihren Träger aus den geprüften Plänen wählt
+    (`_listungsplan`), verschöbe ein lautlos verlorener Plan Preis und
+    Laufzeit der Listung, ohne dass es irgendwo steht.
+
+    "24,5 Raten" ist dabei keine Laufzeit: `laufzeit_in_monaten` (die eine
+    Stelle) schneidet nicht auf 24 ab.
+    """
+    daten = telekom.zustand(telekom_html)
+    pro = next(e for e in daten["productList"]["data"]
+               if str(e.get("variantSlug") or "") == "tiefblau-256-gb")
+    echter = pro["price"]["installments"][0]
+    pro["price"]["installments"] = [
+        {"numberOfInstallments": 24.5, "recurringPrice": 44.0,
+         "totalPrice": 1155.0},
+        {"numberOfInstallments": 24, "recurringPrice": "auf Anfrage",
+         "totalPrice": 1155.0},
+        echter,
+    ]
+    daten["productList"]["data"] = [pro]
+    geaendert = f'<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>'
+
+    with caplog.at_level("INFO"):
+        saetze = telekom.lies(geaendert, _TELEKOM_URL)
+    assert len(saetze) == 1
+    assert saetze[0]["laufzeit_monate"] == 36
+    assert saetze[0]["preis"] == 1197.0
+    unlesbar = [m for m in caplog.messages
+                if "ohne lesbare Bestandteile" in m]
+    assert len(unlesbar) == 2, caplog.messages
+    assert any("24.5" in m for m in unlesbar), unlesbar
+    assert any("auf Anfrage" in m for m in unlesbar), unlesbar
 
 
 def test_telekom_eintrag_ganz_ohne_ratenform_wird_verworfen():
