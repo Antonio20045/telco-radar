@@ -303,16 +303,24 @@ def test_jede_belastbare_fragment_zeile_traegt_die_pflichtzeile(site):
 def test_die_sortierkoepfe_stehen_ueber_der_bandliste(geraete):
     """C: Die Spaltenköpfe der Bündeltabelle (Leitzahl, Δ und Anbieter)
     sind Knöpfe — sortierbar ohne Reload; die Server-Vorsortierung nach
-    der Leitzahl (O2) bleibt der Ausgangszustand. Das Leitzahl-Etikett
-    heißt seit A1 "Kosten über 24 Monate"."""
+    der Leitzahl (O2) bleibt der Ausgangszustand.
+
+    P0-B-z2: der Kopf nennt die SPALTE, nicht den Zeitraum. Bis hierhin
+    stand dort fest "Kosten über 24 Monate" — über der einen Tafel, in der
+    beide Zeiträume der Leitzahl gemischt stehen (1&1 trägt 36). Der
+    Zeitraum steht seither am Etikett JEDER Zeile
+    (`geraete_tco_karten.label_der_leitzahl`, die eine Beschriftungsregel);
+    `tests/test_geraete_buendel_kopf_zeitraum.py` hält beides zusammen.
+    """
     kopf = geraete.select_one("#gr-buendel .gr-bnd-kopf")
     assert kopf is not None
     beschriftungen = " ".join(kopf.get_text(" ", strip=True).split())
     knoepfe = kopf.select("button[data-bsort]")
     arten = {b.get("data-bsort") for b in knoepfe}
     assert arten == {"tco", "delta", "anbieter"}, arten
-    assert "Kosten über 24 Monate" in beschriftungen \
+    assert "Kosten mit Tarif" in beschriftungen \
         and "Anbieter" in beschriftungen
+    assert "Monate" not in beschriftungen, beschriftungen
 
 
 # --------------------------------------------------------------------------

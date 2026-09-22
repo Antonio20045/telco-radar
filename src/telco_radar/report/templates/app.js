@@ -1491,7 +1491,25 @@ var TelcoFrage = (function () {
     });
   }
 
-  /* O2/C: die sortierbare Buendeltabelle - unveraendert. */
+  /* O2/C: die sortierbare Buendeltabelle.
+
+     P0-B-z2: DER RANG GILT NUR INNERHALB EINES ZEITRAUMS. Ein Klick auf
+     den Kopf sortierte nach `data-gesamt` allein - damit rangierte die
+     36-Monats-Summe von 1&1 (2.019,54 EUR) zwischen den 24-Monats-Summen
+     derselben Liste, also als waere sie teurer als eine Zahl, mit der sie
+     nicht vergleichbar ist. Beide Ausgaenge waeren falsch gewesen: die
+     Zeile stillschweigend mitsortieren ODER sie aus der Liste nehmen
+     (Meldungen werden nie gekappt).
+     Deshalb sortiert der TCO-Rang jetzt ZWEISTUFIG: erst der Zeitraum
+     (`data-leitzahl-monate`, aus `Tco.leitzahl_monate` - gelesen, nicht
+     gerechnet), dann der Betrag INNERHALB dieses Zeitraums. Die
+     Zeitraeume selbst stehen immer aufsteigend (kuerzerer zuerst) und
+     drehen mit der Richtung NICHT mit: der Zeitraum ist kein Wert, der
+     rangiert, sondern der Rahmen, in dem ueberhaupt rangiert wird. Jede
+     Zeile nennt ihren Rahmen selbst - das Etikett an ihrer Summe.
+     Die Δ-Spalte braucht das nicht: ein Δ ueber zwei Zeitraeume gibt es
+     nicht (`geraete_tco_karten.delta_zustand`), diese Zeilen tragen
+     `data-delta=""` und stehen schon am Ende. */
   var sortierung = {key: null, richtung: 1};
   var sortierKnoepfe = document.querySelectorAll('#gr-buendel .gr-bsort');
 
@@ -1503,6 +1521,17 @@ var TelcoFrage = (function () {
     var roh = z.getAttribute(attr);
     if (roh === null || roh === '') return null;
     var zahl = parseFloat(roh);
+    return isNaN(zahl) ? null : zahl;
+  }
+
+  /* Der Zeitraum, den die Summe dieser Zeile traegt - GELESEN aus dem
+     Attribut, das die Vorlage aus `leitzahl_monate` schreibt. Ohne
+     gemessenen Zeitraum `null`: diese Zeilen tragen auch keine belastbare
+     Summe und stehen hinter allen Zeitraeumen. */
+  function zeitraumVon(z) {
+    var roh = z.getAttribute('data-leitzahl-monate');
+    if (roh === null || roh === '') return null;
+    var zahl = parseInt(roh, 10);
     return isNaN(zahl) ? null : zahl;
   }
 
@@ -1518,6 +1547,14 @@ var TelcoFrage = (function () {
             return k.classList && k.classList.contains('gr-bnd');
           });
         zeilen.sort(function (x, y) {
+          if (sortierung.key === 'tco') {
+            var zx = zeitraumVon(x), zy = zeitraumVon(y);
+            if (zx !== zy) {
+              if (zx === null) return 1;
+              if (zy === null) return -1;
+              return zx - zy;
+            }
+          }
           var kx = sortierWert(x), ky = sortierWert(y);
           if (kx === null && ky === null) return 0;
           if (kx === null) return 1;

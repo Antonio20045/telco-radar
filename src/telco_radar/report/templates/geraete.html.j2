@@ -387,12 +387,25 @@
     <h3 class="gr-bnd-titel" id="gr-bnd-titel">{% if m and m.baender and zr.start %}Alle Bündel
     im Band {{ zr.baender[zr.start.band].label if zr.start.band in zr.baender else m.baender[0].label }} – {{
     m.titel }}{% elif m %}Alle Bündel – {{ m.titel }}{% endif %}</h3>
+    {# P0-B-z2: DER KOPF NENNT DIE SPALTE, DIE ZEILE NENNT IHREN ZEITRAUM.
+       Hier stand fest „Kosten über 24 Monate" - ausgerechnet über der
+       EINEN Tafel, in der beide Zeiträume wirklich gemischt stehen (iPhone
+       17 Pro 256 GB, Band Klein: drei 24-Monats-Summen und 1&1 mit
+       2.019,54 € über 36 Monate). Der Zeitraum steht AN DER ZAHL, als
+       Etikett jeder Zeile (`k.label`, gebaut aus
+       `geraete_tco_karten.label_der_leitzahl` - das ist DIE eine
+       Beschriftungsregel für diesen Zeitraum). Ein Kopf, der ihn ein
+       zweites Mal behauptet, ist deshalb keine Beschriftung mehr, sondern
+       eine zweite Regel - und genau die lief hier gegen den Inhalt.
+       „Kosten mit Tarif" ist das Gegenstück zu „Gerät ohne Vertrag"
+       daneben und dasselbe Wort, mit dem der Rechenweg jeder Zeile die
+       Zahl schon erklärt. #}
     <div class="gr-bnd-kopf">
       <span><button type="button" class="gr-bsort" data-bsort="anbieter"
         >Anbieter</button></span><span>Tarif · Volumen</span><span><button
         type="button" class="gr-bsort" data-bsort="tco" aria-label=
-        "nach Kosten über 24 Monate sortieren"
-        >Kosten über 24 Monate</button></span><span><button type="button" class="gr-bsort"
+        "nach den Kosten mit Tarif sortieren, getrennt nach Zeitraum"
+        >Kosten mit Tarif</button></span><span><button type="button" class="gr-bsort"
         data-bsort="delta" aria-label=
         "nach Abstand über oder unter der Vodafone-Referenz sortieren"
         >Δ zu Vodafone</button></span><span>Gerät ohne

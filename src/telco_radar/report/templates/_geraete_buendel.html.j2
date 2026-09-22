@@ -22,6 +22,15 @@
          {% if k.band %}data-band="{{ k.band }}"{% endif %}
          data-zustand="{{ k.zustand }}"
          data-laufzeit="{{ k.laufzeit or 0 }}"
+         {# P0-B-z2: DER ZEITRAUM, DEN DIE SUMME DIESER ZEILE TRÄGT -
+            gelesen aus `leitzahl_monate` (`Tco.leitzahl_monate`, P0-B-h1),
+            demselben Feld, aus dem `k.label` seinen Text baut. `data-
+            laufzeit` daneben ist die TARIFlaufzeit der Rechnung und für
+            jede Zeile 24, auch für die 36-Monats-Summe von 1&1 - als
+            Sortiergruppe wäre sie falsch. app.js rechnet den Zeitraum
+            nicht nach, es liest dieses Attribut (Clean Code 1). Ohne
+            gemessenen Zeitraum bleibt es LEER - nie 24. #}
+         data-leitzahl-monate="{{ k.leitzahl_monate if k.leitzahl_monate is not none else '' }}"
          data-schnitt="{{ k.schnitt_monat if k.schnitt_monat is not none else '' }}"
          data-gesamt="{{ k.gesamt if k.gesamt is not none else '' }}"
          {# C: Δ als ZAHL mit Vorzeichen (negativ = günstiger als die
@@ -112,9 +121,19 @@
        Kernangaben offen und ALLES weitere im EINEN Rechenweg (A6) - die
        Begriffe selber erklärt die Antwortzeile über dem Graph schon
        ohne Klick. #}
+    {# P0-B-z2, MITNEHMEN: hier stand `k.raten_laufzeit or k.laufzeit` -
+       ein Rückfall auf die Konstante 24 (`karten.LAUFZEIT`) genau dort, wo
+       die Ratenzahl fehlt. Eine Referenzrechnung aus einem fremden
+       Finanzierungs-Bündel (`_referenzkarte`, `geraetepreis_art` aus dem
+       Quellbündel) trägt `raten_laufzeit = None` und behauptete damit „alle
+       24 Geräteraten", die niemand gemessen hat. Die Lücke wird jetzt
+       BENANNT (Clean Code 3) - der Satz bleibt wahr, die Zahl fehlt
+       sichtbar. #}
     {% if k.geraetepreis is not none and k.geraetepreis_art == 'finanzierung' %}
-    <p class="gr-kk-paradox">„mit Tarif“ = alle {{ k.raten_laufzeit or
-      k.laufzeit }} Geräteraten plus {{ k.laufzeit }} Monate
+    <p class="gr-kk-paradox">„mit Tarif“ = alle {% if k.raten_laufzeit
+      %}{{ k.raten_laufzeit }} Geräteraten{% else %}Geräteraten (<span
+      class="gr-t-luecke">Anzahl nicht gemessen</span>){% endif %}
+    plus {{ k.laufzeit }} Monate
     Tarif – deshalb ein anderer Betrag als die
     Finanzierung gesamt</p>
     {% elif k.geraetepreis is not none %}
@@ -133,9 +152,19 @@
     gerechnet sind {{ k.laufzeit }} Monate Tarif</p>
     {% endif %}
 
+    {# P0-B-z2, MITNEHMEN: auch hier fiel die Laufzeit des EINEN
+       Monatsbetrags auf die Konstante 24 zurück. Sie ist in diesem Zweig
+       gemessen - ein Bündelmonatspreis setzt `raten_laufzeit`
+       (`geraete_tco_karten._karte`), und eine ungemessene Ratenlaufzeit
+       macht die Kennzahl unbelastbar (`tco_model.POSTEN_LAUFZEIT`), also
+       steht dieser Rechenweg dann gar nicht. Der Rückfall konnte darum nur
+       noch eine falsche Zahl liefern, nie eine fehlende ersetzen - und die
+       Lücke heißt hier wie oben beim Namen, statt als 24 oder als „None"
+       zu erscheinen. #}
     <p class="gr-kk-bau">{% if k.buendel_monatlich is not none %}monatlich {{
-      k.buendel_monatlich | euro }} für Tarif und Gerät zusammen · {{
-      k.raten_laufzeit or k.laufzeit }} Monate{% if k.zuzahlung is not none %} · Gerät
+      k.buendel_monatlich | euro }} für Tarif und Gerät zusammen · {% if
+      k.raten_laufzeit %}{{ k.raten_laufzeit }} Monate{% else %}<span
+      class="gr-t-luecke">Laufzeit nicht gemessen</span>{% endif %}{% if k.zuzahlung is not none %} · Gerät
       einmalig {{ k.zuzahlung | euro }}{% endif %}{% if k.anschlusspreis is not
       none %} · Anschlusspreis {{ k.anschlusspreis | euro }}{% endif %}{% else
       %}monatlich {{ k.monatlich | euro }}{% if k.zuzahlung is not none %} ·
@@ -330,9 +359,13 @@
         <p class="gr-erklaer gr-basis--duenn">Unbegrenzte Tarife und Tarife
         ohne erhobenes Datenvolumen gehören zu keinem der drei Bänder
         (§ 7) – sie stehen hier, nicht heimlich in einem Band.</p>
+        {# P0-B-z2: derselbe Spaltenname wie über der Bandliste (siehe
+           `geraete.html.j2`) - der Zeitraum steht am Etikett JEDER Zeile,
+           nicht im Kopf. Zwei Köpfe mit zwei Texten wären die nächste
+           Stelle, an der Tafel und Gruppe auseinanderlaufen. #}
         <div class="gr-bnd-kopf gr-bnd-kopf--ohne" aria-hidden="true">
-          <span>Anbieter</span><span>Tarif · Volumen</span><span>Kosten über
-          24 Monate</span>
+          <span>Anbieter</span><span>Tarif · Volumen</span><span>Kosten mit
+          Tarif</span>
           <span>Δ zu Vodafone</span><span>Gerät ohne Vertrag</span><span></span>
         </div>
         <div class="gr-bndliste">
