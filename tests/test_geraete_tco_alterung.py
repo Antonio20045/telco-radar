@@ -453,7 +453,7 @@ def test_die_gruppe_nennt_den_alten_stand_ueber_den_zeilen():
 # Die VERDRAHTUNG (Prüfer-Befund "hoch", 20.09.2026): Der Bezugstag darf
 # nicht der Berichtstag sein. `render_site` gibt das Datum des jüngsten
 # RADAR-Berichts als `heute` weiter (Mi/Fr) - aber die Geräteseite rendert
-# TÄGLICH (`geraete.yml`, 03:10 UTC) und fasst die Berichte nicht an.
+# TÄGLICH (`geraete.yml`, 02:17 UTC) und fasst die Berichte nicht an.
 # Produktionsbeweis 20.09.: Bestand `updated=2026-09-20`, jüngster Bericht
 # 16.09. - mit ihm als `heute` waren die Telekom-Bündel vom 15.09. "einen
 # Tag alt" und führten frisch Antwortzeile und Spanne; die 3-Tage-Regel

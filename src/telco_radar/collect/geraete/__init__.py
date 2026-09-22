@@ -15,7 +15,15 @@ VIER REGELN, DIE HIER ERZWUNGEN WERDEN
    fuehrt darueber Buch, ein Test stellt eine erreichbare, aber unverlinkte
    Falle auf.
 2. **robots.txt gilt**, und zwar mit Crawl-delay und Besuchszeit
-   (`robots.py`). Wer draussen steht, wird uebersprungen - nicht gealtert.
+   (`robots.py`), und sie gilt JE ABRUF - fuer jeden Abruf der Sammelphase
+   UND fuer die Nachbearbeitungs-Haken der Adapter, die nach ihr noch
+   einmal abrufen (`hole_mit_robots`, gerufen aus
+   `geraete_pipeline.nachsammle_buendel`). Beide gehen durch dieselbe
+   `Abrufschleuse`. Ein Lauf, der im Fenster startet, steht eine halbe
+   Stunde spaeter davor - die Uhr laeuft mit (`_laufuhr`), und der
+   Zeitanteil eines Anbieters mit Fenster endet spaetestens mit diesem
+   (`_fensterfrist`). Wer draussen steht, wird uebersprungen - nicht
+   gealtert, auch wenn die Tuer erst mitten im Lauf zugegangen ist.
 3. **Eine Einstiegsseite gilt erst als GELESEN, wenn alle ihre Produkte
    abgerufen wurden.** Nur dann darf die Auslistungslogik ihre Geraete
    altern. Ein Zeitbudget, das mitten in der Seite zuschlaegt, macht aus
@@ -31,7 +39,7 @@ import logging
 import re
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Callable, Optional
 from urllib.parse import urljoin, urlparse
 
@@ -202,6 +210,13 @@ class Anbieterbilanz:
     # (z. B. `metric3+metric2`). Leer heisst "kein Adapter mit Proben" -
     # kein Lautwerden, denn es gibt keine Erwartung.
     proben: dict = field(default_factory=dict)
+    # Hat die Besuchszeit aus der robots.txt diesen Abruf verhindert?
+    # STRUKTURELL festgehalten und nicht am Grundtext erkannt: fuer den
+    # Abdeckungswaechter (P1/C2) ist das der Unterschied zwischen "nicht
+    # gelesen" (keine Aussage) und "gelesen, nichts gefunden" (Ausfall),
+    # und ein Waechter, der diese zwei an einem String auseinanderhaelt,
+    # kippt bei der ersten Umformulierung.
+    ausserhalb_besuchszeit: bool = False
 
     @property
     def vollstaendig(self) -> bool:
@@ -487,19 +502,184 @@ def _preisfelder(anbieter, satz: dict) -> dict:
             "zins_effektiv": satz.get("zins_effektiv")}
 
 
+# --------------------------------------------------------------------------
+# Die Uhr des Laufs
+# --------------------------------------------------------------------------
+# Bis zum 22.09.2026 reichte die Pipeline EINEN eingefrorenen Zeitstempel bis
+# an jeden einzelnen Abruf durch (`waechter.darf(url, jetzt)`). Ein Lauf, der
+# um 07:57 UTC startet, fragte damit um 08:20 immer noch mit 07:57 - und bekam
+# "im Fenster", obwohl das Fenster von medimax.de und ep.de (Visit-time
+# 0200-0800) laengst zu war. Der Crawl darf planmaessig bis zu `--frist`
+# Sekunden dauern, und genau diese zwei Anbieter stehen weit hinten in der
+# Reihenfolge; der Verstoss war also der Regelfall, nicht der Ausnahmefall.
+#
+# ZWEI UHREN, DIE NICHT VERWECHSELT WERDEN DUERFEN:
+#   * `heute` (der Datumsstempel der Messung) bleibt eingefroren. Er steht an
+#     jeder Listung, in `geraete_preise.jsonl` und in der Laufhistorie; ein
+#     Lauf, der um 23:59 beginnt, muss seine Zeilen alle auf denselben Tag
+#     schreiben, sonst zerfaellt eine Messung in zwei Messtermine.
+#   * das Besuchsfenster laeuft mit. Es ist eine Aussage ueber DEN AUGENBLICK
+#     DES ABRUFS, nicht ueber den Lauf.
+# `jetzt` ist deshalb ab hier der BEGINN des Laufs und nichts weiter - die
+# Zeit eines Abrufs kommt aus `uhr()`.
+
+
+def _laufuhr(beginn: datetime) -> Callable[[], datetime]:
+    """Die mitlaufende Uhr EINES Laufs: Beginn plus verstrichene Zeit.
+
+    Nicht schlicht `datetime.now(timezone.utc)`, aus zwei Gruenden. Erstens
+    muss der Aufrufer den Startpunkt einspeisen koennen - ein Test, der vom
+    heutigen Datum abhinge, waere nach CLAUDE.md Regel 11 keiner. Zweitens
+    kommt die verstrichene Zeit aus `time.monotonic()`: eine Systemuhr, die
+    mitten im Lauf springt (NTP-Korrektur), verschoebe sonst das
+    Besuchsfenster.
+    """
+    start = time.monotonic()
+    return lambda: beginn + timedelta(seconds=time.monotonic() - start)
+
+
+# Sicherheitsabstand zum Ende eines Besuchsfensters. Der Deckel greift so
+# viele Sekunden VOR dem Fensterende, damit der letzte Abruf, der noch
+# hineinpasst, auch drinnen fertig wird. Zehn Sekunden sind genau der
+# Crawl-delay, den medimax.de und ep.de selbst verlangen - kuerzer kann der
+# Abstand zum naechsten Abruf dort ohnehin nicht sein.
+_FENSTER_PUFFER_SEKUNDEN = 10.0
+
+# Was im Protokoll und in der Bilanz steht, wenn das ZEITBUDGET eines
+# Anteils abgelaufen ist. Der zweite Grund - "Tuer zu" - braucht keine
+# Konstante: sein Satz nennt das gemessene Fenster und entsteht deshalb erst
+# an der Fundstelle (siehe unten, `frist_vom_fenster`). Unterschieden werden
+# die beiden trotzdem nicht am Text, sondern am Flag `ausserhalb_besuchszeit`
+# - der Abdeckungswaechter der Pipeline liest dieses Flag.
+_FRIST_GRUND_BUDGET = "Zeitbudget des Geraetezweigs erschoepft"
+
+
+def _fensterfrist(waechter: RobotsWaechter, url: str,
+                  jetzt: datetime) -> Optional[float]:
+    """Der monotone Zeitpunkt, zu dem das Besuchsfenster dieses Hosts zugeht.
+
+    `None` heisst "dieser Host hat kein Fenster" - dann deckelt nichts. Ein
+    bereits geschlossenes Fenster ergibt einen Zeitpunkt in der
+    Vergangenheit; die Produktschleife bricht dann sofort ab, statt sich
+    durch Dutzende Adressen zu arbeiten, die der Waechter ohnehin
+    zurueckweist.
+    """
+    restzeit = waechter.restzeit_im_fenster(url, jetzt)
+    if restzeit is None:
+        return None
+    return time.monotonic() + restzeit - _FENSTER_PUFFER_SEKUNDEN
+
+
+class Abrufschleuse:
+    """Das robots-Tor vor JEDEM Abruf gegen einen Anbieter.
+
+    Eine Schleuse je Abruffolge. Sie haelt die zwei Dinge, die ein
+    einzelner Aufruf nicht wissen kann: wann der letzte Abruf hinausging
+    (fuer den Crawl-delay) und ob die Besuchszeit im Weg stand.
+
+    ERST DIE WARTEZEIT RECHNEN, DANN DAS FENSTER PRUEFEN. Der Abruf geht
+    nach dem Crawl-delay hinaus, nicht jetzt: bei zehn Sekunden Abstand
+    ist der Unterschied klein, an der Kante eines Fensters entscheidet er
+    darueber, ob wir die Tuer von innen oder von aussen sehen. Gewartet
+    wird trotzdem erst NACH der Pruefung - eine abgelehnte Adresse soll
+    keine Sekunde kosten.
+
+    Der Abstand kommt je Adresse vom Waechter (`abstand()`, der groessere
+    Wert aus Crawl-delay des Hosts und eigener Konfiguration). Je Adresse
+    und nicht einmal je Anbieter, weil ein Anbieter Adressen auf mehreren
+    Hosts hat (o2 und Vodafone lesen ihre Buendel ueber eine eigene
+    Schnittstelle) - und die robots.txt des Zielhosts ist die, die gilt.
+    Einen zusaetzlichen Abruf kostet das nicht: `darf()` holt die Regeln
+    desselben Hosts ohnehin in denselben Cache.
+    """
+
+    def __init__(self, waechter: RobotsWaechter, uhr: Callable[[], datetime],
+                 rate_limit_sekunden: float = 0.0):
+        self._waechter = waechter
+        self._uhr = uhr
+        self._rate_limit = float(rate_limit_sekunden or 0.0)
+        self._letzter_abruf = 0.0
+        # Hat die BESUCHSZEIT einen Abruf verhindert (und nicht ein
+        # Disallow oder eine unlesbare robots.txt)? Die Bilanz braucht
+        # diesen Unterschied fuer den Abdeckungswaechter.
+        self.ausserhalb_besuchszeit = False
+
+    def passiere(self, url: str) -> None:
+        """Laesst den Abruf durch - oder wirft `GeraeteAbrufFehler`.
+
+        Kehrt erst zurueck, wenn der Crawl-delay abgewartet ist; der
+        Aufrufer darf danach sofort abrufen.
+        """
+        abstand = self._waechter.abstand(url, self._rate_limit)
+        noch_kein_abruf = self._letzter_abruf == 0.0
+        warte = (0.0 if noch_kein_abruf else
+                 max(0.0, abstand - (time.monotonic() - self._letzter_abruf)))
+        zeitpunkt = self._uhr() + timedelta(seconds=warte)
+        darf, grund = self._waechter.darf(url, zeitpunkt)
+        if not darf:
+            # Die Regeln liegen hier bereits im Cache des Waechters - der
+            # Fenstertest kostet keinen zweiten Abruf.
+            if not self._waechter.regeln(url).im_fenster(zeitpunkt):
+                self.ausserhalb_besuchszeit = True
+            raise GeraeteAbrufFehler(grund)
+        if warte > 0:
+            time.sleep(warte)
+        self._letzter_abruf = time.monotonic()
+
+
+def hole_mit_robots(hole: Callable, waechter: RobotsWaechter,
+                    rate_limit_sekunden: float = 0.0,
+                    uhr: Optional[Callable[[], datetime]] = None) -> Callable:
+    """`hole` MIT robots-Pruefung - fuer Abrufe AUSSERHALB von `sammle()`.
+
+    Die Nachbearbeitungs-Haken der Adapter (`loese_tarifnamen`,
+    `ergaenze_buendel`) rufen nach der Sammelphase selbst ab. Bis zum
+    22.09.2026 bekamen sie das rohe `hole` - ohne Disallow, ohne
+    Crawl-delay, ohne Fensterpruefung, und das an der Stelle, an der der
+    Lauf am weitesten fortgeschritten ist (die Zusage "JE ABRUF" oben im
+    Modul und in `geraete.yml` galt damit fuer sie nicht). Sie gehen jetzt
+    durch dieselbe `Abrufschleuse` wie die Sammelphase.
+
+    Der Rueckgabewert hat den Vertrag von `hole` (`(status, text)`) und
+    reicht jedes weitere Argument durch; eine verbotene Adresse wirft
+    `GeraeteAbrufFehler` - die Haken fangen das je Adresse ab und lassen
+    das Feld offen, statt zu raten.
+    """
+    schleuse = Abrufschleuse(waechter, uhr or (lambda: datetime.now(timezone.utc)),
+                             rate_limit_sekunden)
+
+    def gebremst(url: str, *args, **kwargs):
+        schleuse.passiere(url)
+        return hole(url, *args, **kwargs)
+
+    return gebremst
+
+
 def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
                     heute: str, waechter: RobotsWaechter,
                     jetzt: Optional[datetime] = None,
-                    frist_bis: Optional[float] = None) -> Anbieterbilanz:
+                    frist_bis: Optional[float] = None,
+                    uhr: Optional[Callable[[], datetime]] = None
+                    ) -> Anbieterbilanz:
     """Einen Anbieter abarbeiten. Wirft nie - Fehler stehen in der Bilanz.
 
     `hole(url) -> (status, text)`. Der Status wird gebraucht und nicht
     weggeworfen: eine fehlende robots.txt (404) heisst "keine Regeln", eine
     verweigerte (403) heisst "nicht anfassen" - wer beides auf eine
     Ausnahme abbildet, verwechselt die zwei.
+
+    `jetzt` ist der BEGINN des Laufs, nicht der Zeitpunkt eines Abrufs.
+    `uhr()` liefert die Zeit des naechsten Abrufs; wer sie nicht mitgibt,
+    bekommt `_laufuhr(jetzt)`. `sammle()` reicht EINE Uhr ueber alle
+    Anbieter durch - eine je Anbieter neu gestellte Uhr faenge bei jedem
+    wieder bei null an und waere derselbe eingefrorene Zeitstempel wie
+    vorher, nur feiner verteilt.
     """
     bilanz = Anbieterbilanz(name=anbieter.name)
-    jetzt = jetzt or datetime.now(timezone.utc)
+    if jetzt is None:
+        jetzt = datetime.now(timezone.utc)
+    if uhr is None:
+        uhr = _laufuhr(jetzt)
 
     if not anbieter.crawlbar:
         bilanz.status = "uebersprungen"
@@ -542,20 +722,33 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
         waechter = RobotsWaechter(
             hole=lambda url: hole(url, user_agent=user_agent))
 
-    abstand = waechter.abstand(anbieter.basis_url or anbieter.einstiege[0].url,
-                               anbieter.rate_limit_sekunden)
-    letzter_abruf = [0.0]
+    leitadresse = anbieter.basis_url or anbieter.einstiege[0].url
+
+    # DER ANTEIL EINES ANBIETERS ENDET SPAETESTENS MIT SEINEM FENSTER.
+    # Ohne diesen Deckel bekaeme medimax.de um 07:55 noch die vollen
+    # Minuten des Budgets zugeteilt und verbraechte sie ab 08:00 damit,
+    # sich durch Adressen zu arbeiten, die der Waechter eine nach der
+    # anderen zurueckweist - Zeit, die dem naechsten Anbieter fehlt.
+    fensterfrist = _fensterfrist(waechter, leitadresse, uhr())
+    frist_vom_fenster = (fensterfrist is not None
+                         and (frist_bis is None or fensterfrist < frist_bis))
+    if frist_vom_fenster:
+        frist_bis = fensterfrist
+
+    schleuse = Abrufschleuse(waechter, uhr, anbieter.rate_limit_sekunden)
     gruende: list[str] = []
     frist_erreicht = False
 
     def _hole(url: str) -> str:
-        darf, grund = waechter.darf(url, jetzt)
-        if not darf:
-            raise GeraeteAbrufFehler(grund)
-        warte = abstand - (time.monotonic() - letzter_abruf[0])
-        if letzter_abruf[0] and warte > 0:
-            time.sleep(warte)
-        letzter_abruf[0] = time.monotonic()
+        try:
+            schleuse.passiere(url)
+        except GeraeteAbrufFehler:
+            # Die Schleuse weiss, WARUM sie zu war; die Bilanz traegt den
+            # einen Unterschied weiter, auf den es dem Abdeckungswaechter
+            # ankommt (Besuchszeit gegen alles andere).
+            if schleuse.ausserhalb_besuchszeit:
+                bilanz.ausserhalb_besuchszeit = True
+            raise
         bilanz.besucht.append(url)
         kwargs = {}
         if kopfzeilen:
@@ -699,7 +892,17 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
 
     if frist_erreicht:
         bilanz.status = "frist"
-        bilanz.grund = "Zeitbudget des Geraetezweigs erschoepft"
+        if frist_vom_fenster:
+            # NICHT "Budget alle": die Tuer ist zugegangen. Der Unterschied
+            # ist keine Formulierung, sondern die Auskunft, die der
+            # Abdeckungswaechter braucht - ein Anbieter ausserhalb seiner
+            # Besuchszeit ist eine Luecke, kein Ausfall.
+            bilanz.ausserhalb_besuchszeit = True
+            fenster = waechter.regeln(leitadresse).fenster_text
+            bilanz.grund = ("ausserhalb der Besuchszeit laut robots.txt "
+                            f"({fenster})")
+        else:
+            bilanz.grund = _FRIST_GRUND_BUDGET
     elif bilanz.gelesene_einstiege:
         # BUENDEL ZAEHLEN MIT (B2, 08.09.2026): Bis hier sagte "leer" auch
         # einem Anbieter, der NUR Buendel geliefert hat - ein `kind:
@@ -913,7 +1116,8 @@ _MINDEST_JE_ANBIETER = 120.0
 
 def sammle(quellen, katalog: Katalog, farben: dict, hole: Callable, heute: str,
            jetzt: Optional[datetime] = None,
-           frist_sekunden: Optional[float] = None) -> dict:
+           frist_sekunden: Optional[float] = None,
+           uhr: Optional[Callable[[], datetime]] = None) -> dict:
     """Den ganzen Beobachtungsraum abarbeiten.
 
     Sequenziell, nicht nebenlaeufig: die Bremse ist ohnehin der Abstand je
@@ -926,8 +1130,16 @@ def sammle(quellen, katalog: Katalog, farben: dict, hole: Callable, heute: str,
     Sekunden bleiben. Gezaehlt werden dabei nur Anbieter, die wirklich
     crawlen werden (aktiv, crawlbar, Adapter vorhanden) - ein uebersprungener
     kostet nichts und reserviert nichts.
+
+    `jetzt` ist der Beginn des Laufs. Die daraus gestellte Uhr wird EINMAL
+    gebaut und an jeden Anbieter durchgereicht: der vierte Anbieter soll
+    sehen, dass seit dem Start eine halbe Stunde vergangen ist, und nicht
+    wieder bei null anfangen.
     """
-    jetzt = jetzt or datetime.now(timezone.utc)
+    if jetzt is None:
+        jetzt = datetime.now(timezone.utc)
+    if uhr is None:
+        uhr = _laufuhr(jetzt)
     waechter = RobotsWaechter(hole=hole)
     frist_bis = (time.monotonic() + frist_sekunden) if frist_sekunden else None
 
@@ -958,7 +1170,7 @@ def sammle(quellen, katalog: Katalog, farben: dict, hole: Callable, heute: str,
                                      rest - nach_mir * _MINDEST_JE_ANBIETER))
         bilanzen.append(sammle_anbieter(
             anbieter, katalog, farben, hole, heute, waechter, jetzt,
-            eigene_frist))
+            eigene_frist, uhr=uhr))
     return {
         "anbieter": bilanzen,
         "listungen": [l for b in bilanzen for l in b.listungen],

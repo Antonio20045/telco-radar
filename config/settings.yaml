@@ -472,7 +472,7 @@ promo_enabled: true
 
 # Geraete- und Preisradar: im WOCHENLAUF AUS. Nicht, weil die Stufe etwas
 # taugt oder nicht - sie hat einen eigenen taeglichen Job
-# (.github/workflows/geraete.yml, 03:10 UTC), und der ist der bessere Ort:
+# (.github/workflows/geraete.yml, 02:17 UTC), und der ist der bessere Ort:
 # er faellt in das Besuchsfenster von medimax.de und ep.de (02:00-08:00 UTC
 # laut deren robots.txt), er hat sein eigenes Zeitbudget, und er kann den
 # Wochenbericht nicht aufhalten.

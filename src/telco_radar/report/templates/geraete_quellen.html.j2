@@ -18,11 +18,34 @@
   <td>{{ z.typ }}{% if z.netz %} · {{ z.netz }}-Netz{% endif %}</td>
   <td><code>{{ z.methode }}</code></td>
   <td>
-    <span class="sdot {{ 'ok' if z.liefert else ('empty' if z.crawlbar else 'quarantaene') }}"></span>
-    {% if z.liefert %}liefert{% elif z.crawlbar %}angebunden, ohne Fund{% else %}nicht angebunden{% endif %}
+    {# Drei Stufen, in dieser Reihenfolge - und die Reihenfolge ist die
+       Aussage: erst der ALARM (heute eingebrochen), dann "heute nicht
+       gelesen" (keine Aussage, hohler Punkt), erst zuletzt der
+       Dauerzustand aus dem Bestand. Ohne die mittlere Stufe bekam ein
+       Anbieter ausserhalb seiner Besuchszeit den gruenen Punkt und das
+       Wort "liefert" - eine Entwarnung, die niemand gemessen hat (S2-2).
+       Die mittlere Stufe greift NUR dort, wo der Bestand etwas Gruenes
+       behauptet: "nicht angebunden" und "angebunden, ohne Fund" sind
+       gemessene Dauerzustaende und sagen mehr als ein Tagesbefund.
+       Gerechnet wird hier nichts: Wortform und Satz kommen fertig aus dem
+       Alarm, `heute_luecke` als fertige Entscheidung aus derselben
+       Definition, die der Waechter benutzt. Die Vorlage waehlt daraus nur
+       Punktklasse und Reihenfolge. `liefert_heute` ist dieselbe fertige
+       Entscheidung, aus der die Kennzahl "N liefern Geräte" ihre Zahl
+       zaehlt - eine Definition, nicht zwei (S2-A). #}
+    {% if z.abdeckung %}<span class="sdot fail"></span> {{ z.abdeckung.kurz }}
+    {% elif z.heute_luecke %}<span class="sdot unbekannt"></span> heute nicht gelesen
+    {% else %}
+    <span class="sdot {{ 'ok' if z.liefert_heute else ('empty' if z.crawlbar else 'quarantaene') }}"></span>
+    {% if z.liefert_heute %}liefert{% elif z.crawlbar %}angebunden, ohne Fund{% else %}nicht angebunden{% endif %}
+    {% endif %}
   </td>
   <td class="num">{{ z.geraete }}</td>
   <td class="gr-grund">
+    {% if z.abdeckung %}<b>{{ z.abdeckung.satz }}</b>{% endif %}
+    {# Wer heute nicht gelesen wurde, sagt seit wann - sonst steht in der
+       Stand-Spalte ein Befund, zu dem die Warum-Spalte schweigt. #}
+    {% if z.heute_luecke and not z.abdeckung %}<b>{{ z.heute_satz }}</b>{% endif %}
     {% if z.liefert %}{{ z.hinweis }}{% else %}{{ z.grund or z.hinweis }}{% endif %}
     {% if z.einstiege %}
     <span class="gr-einstiege">{% for e in z.einstiege %}<a href="{{ e.url }}" rel="noopener">{{ e.label or e.url | domain }}</a>{% if not loop.last %} · {% endif %}{% endfor %}</span>

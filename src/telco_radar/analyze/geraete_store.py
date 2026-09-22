@@ -29,6 +29,8 @@ from __future__ import annotations
 
 import json
 import logging
+from dataclasses import dataclass
+from datetime import date
 from pathlib import Path
 from typing import Iterable, Optional
 
@@ -47,19 +49,90 @@ STATUS_AUSGELISTET = "ausgelistet"
 # ohne dass jemand es merkt.
 _LAEUFE_BIS_SIM_ONLY = 3
 
-# FM-2-ALARM (Strategie v3, P5-Auftrag 2): ab so vielen beobachteten Tagen
-# mit null Funden IN FOLGE meldet der Lauf den Anbieter als still. Sieben,
-# nicht drei - drei ist die SIM-only-Schwelle, und die beiden sagen
-# Verschiedenes: "vermarktet keine Hardware" ist eine Aussage ueber den
-# Anbieter, "sieben Tage 0 Saetze" eine ueber seine QUELLE. Der Alarm
-# selbst altert und loest nichts aus (er ist Meldung, siehe
-# `ausfall_alarme`).
-AUSFALL_TAGE = 7
+# --------------------------------------------------------------------------
+# ABDECKUNGSWAECHTER (P1/C2, 22.09.2026)
+# --------------------------------------------------------------------------
+# Die Schwelle hiess bis heute AUSFALL_TAGE = 7: ein Anbieter galt als
+# still, wenn er SIEBEN beobachtete Tage lang nichts lieferte. Gemessen an
+# der Wirklichkeit war das zu langsam und zu grob - 50 Laeufe von
+# `geraete.yml` waren gruen, darunter die sechs Tage, an denen die Telekom
+# nichts geliefert hat. Ein Ausfall, der erst nach einer Woche laut wird,
+# ist kein Waechter, sondern ein Nachruf. Verglichen wird deshalb mit dem
+# VORTAG (genauer: mit dem letzten Messtag davor, siehe
+# `GeraeteDB.ausfall_alarme`).
+#
+# Die vier Lesezustaende stehen im Bestand, weil die Zeilenzahl allein die
+# entscheidende Frage nicht beantwortet: 0 Zeilen heisst entweder "gelesen,
+# nichts gefunden" - das ist ein Ausfall - oder "gar nicht angefasst" - und
+# das ist keine Aussage, sondern eine Luecke (CLAUDE.md Clean Code 4 und 6).
+GELESEN = "gelesen"                # Einstieg vollstaendig gelesen
+NICHT_GELESEN = "nicht gelesen"    # nicht angefasst: Besuchszeit, nicht
+                                   # crawlbar, kein Adapter
+LESEFEHLER = "lesefehler"          # Leseversuch gescheitert oder abgebrochen
 
-# Wie viele Tage die Fund-Historie je Anbieter behaelt: die Schwelle plus
-# Diagnose-Rand nach hinten. Gemessen: 30 Eintraege kosten rund 986 Byte
-# im State-JSON (~33 Byte je Eintrag), ueber alle neun Anbieter also
-# unter 10 KB - ein Bruchteil einer einzigen Listung.
+# DER VIERTE ZUSTAND (S2-1, 22.09.2026). Bis hierher machte EIN einziger am
+# Besuchsfenster abgewiesener Abruf den GANZEN Anbieter zu NICHT_GELESEN -
+# auch den, der vier Produktseiten gelesen und drei Listungen geliefert
+# hatte. Damit fiel er ganz aus dem Vergleich, und der Waechter war fuer
+# medimax.de und ep.de im REGELFALL blind: genau diese zwei haengen jede
+# Nacht an ihrem Fenster. "Gar nicht angefasst" und "teilweise gelesen,
+# dann ging die Tuer zu" sind zwei Auskuenfte. Der Teiltag bleibt im
+# Vergleich (er kann heute ausfallen wie jeder andere), taugt aber nicht
+# als VERGLEICHSBASIS: was bis zum Fensterende durchkam, ist nicht das
+# Sortiment (siehe `Messtag.vergleichsbasis`).
+#
+# DER PREIS DIESER REGEL, damit ihn niemand suchen muss: haengt ein
+# Anbieter MEHRERE Tage hintereinander an seinem Fenster, bleibt er jeden
+# dieser Tage ein Befund (die Basis ist ja der letzte vollstaendige Tag).
+# Das ist gewollt - ein halb gelesener Anbieter ist eine halbe Abdeckung,
+# und die gehoert gemeldet. GEMELDET wird sie deshalb trotzdem nicht
+# taeglich: dafuer sorgt die Wiederholungssperre in
+# `GeraeteDB.abdeckungsalarm` (S2-B).
+TEILGELESEN = "teilweise gelesen"
+
+# Die drei Alarmarten. Alle sind MELDUNG und greifen in nichts ein.
+ALARM_AUSFALL = "ausfall"          # gestern Zeilen, heute keine
+ALARM_RUECKGANG = "rueckgang"      # heute deutlich weniger Zeilen
+# DIE DRITTE ART (S2-B, 22.09.2026). Ein Vergleich, der keine Basis mehr
+# hat, ist kein ruhiger Tag - er ist ein blinder Waechter, und das ist
+# selbst eine meldepflichtige Lage. Ohne diese Art verstummte der Kanal
+# dauerhaft, sobald der letzte vollstaendig gelesene Tag aus dem Journal
+# fiel: ein Anbieter, der nur noch Teiltage liefert, hat nach
+# `_FUND_HISTORIE_TAGE` Tagen keine Basis mehr, und ein echter
+# Totalausfall danach loeste nichts mehr aus.
+ALARM_OHNE_BASIS = "ohne_basis"    # seit Tagen kein vollstaendiger Tag
+
+# Ab welchem ANTEIL Rueckgang gegenueber dem letzten Liefertag gemeldet
+# wird. 0.30 und ECHT groesser: Sortiments- und Verfuegbarkeitsrauschen
+# liegt darunter, der Verlust einer Kategorieseite darueber.
+ABDECKUNG_RUECKGANG = 0.30
+
+# IN WELCHEM ABSTAND EIN BLEIBENDER BEFUND ERNEUT GEMELDET WIRD (S2-B,
+# 22.09.2026). Gemessen ueber 45 simulierte Tage: ein vollstaendiger Tag,
+# danach nur Teiltage - der Waechter meldete denselben Satz an 29 Tagen
+# hintereinander, jeden mit eigener Mail. Ein Kanal, der das tut, ist nach
+# der dritten Mail ein Postfachfilter und damit so stumm wie einer, der
+# nie meldet. Gemeldet wird deshalb beim ZUSTANDSWECHSEL und sonst an
+# jedem siebten KALENDERTAG (`_ist_wiederholungstag`). Sieben, weil der
+# Job taeglich laeuft: eine Woche unveraenderter Lage ist die naechste
+# Nachfrage wert, ein Tag nicht.
+_ALARM_WIEDERHOLUNG_TAGE = 7
+
+# Ab wie vielen BEOBACHTETEN Tagen ohne einen einzigen vollstaendig
+# gelesenen Tag die fehlende Vergleichsbasis selbst gemeldet wird
+# (`ALARM_OHNE_BASIS`). Drei, nicht einer: ein einzelner Teiltag ist der
+# Regelfall an einem Besuchsfenster und noch keine Luecke - drei
+# beobachtete Tage ohne vollstaendigen Abruf sind eine.
+_OHNE_BASIS_TAGE = 3
+
+# Wie viele Tage die Fund-Historie je Anbieter behaelt. Der Waechter
+# vergleicht mit dem Vortag und braucht davon genau einen; der Rest traegt
+# die Wiederholungssperre, die fehlende Vergleichsbasis und den
+# Diagnose-Rand nach hinten (`stille_tage`, die Frage "seit wann eigentlich").
+# Gemessen am geschriebenen State (`indent=1`, Eintragsform
+# [Tag, Funde, Zustand, Buendel]): 30 Eintraege kosten rund 1,6 kB je
+# Anbieter (~53 Byte je Eintrag), ueber alle neun Anbieter also unter
+# 20 kB - ein Bruchteil einer einzigen Listung.
 _FUND_HISTORIE_TAGE = 30
 
 # Die Felder, deren Aenderung einen neuen Historienpunkt rechtfertigt.
@@ -77,6 +150,195 @@ _PREISFELDER = ("preis_ohne_vertrag", "uvp", "preis_mit_vertrag_ab", "zuzahlung"
 # siehe `GeraeteDB.upsert`.
 _PREISFORMFELDER = ("anzahlung", "monatsrate", "laufzeit_monate",
                     "zins_effektiv")
+
+
+def tag_de(iso: str) -> str:
+    """2026-09-21 -> 21.09.2026. Ein unbrauchbares Datum bleibt, wie es ist -
+    lieber roh als falsch."""
+    teile = str(iso or "").split("-")
+    if len(teile) != 3 or not all(teile):
+        return str(iso or "")
+    return f"{teile[2]}.{teile[1]}.{teile[0]}"
+
+
+@dataclass(frozen=True)
+class Messtag:
+    """Was ein Anbieter an EINEM Tag ergeben hat - und ob er gelesen wurde.
+
+    `funde` sind Listungen (die Zahl, an der `stille_tage` und
+    `hardware_vermarktung` haengen), `buendel` die Buendelsaetze desselben
+    Tages. Der Waechter fragt nach der ABDECKUNG, und die ist beides
+    zusammen: die Telekom liefert ausschliesslich Buendel - an ihren
+    Listungen gemessen waere sie jeden Tag still, und genau ihr Ausfall
+    war der Anlass dieses Waechters. Die Summe steht deshalb an genau
+    EINER Stelle, hier.
+    """
+    tag: str
+    funde: int
+    buendel: int
+    zustand: str
+
+    @property
+    def zeilen(self) -> int:
+        return self.funde + self.buendel
+
+    @property
+    def beobachtet(self) -> bool:
+        """Ist dieser Tag eine Aussage ueber die ABDECKUNG des Anbieters?
+
+        Ein vollstaendig gelesener Tag ist es immer - auch mit null Zeilen.
+        Ein nicht (oder nicht zu Ende) gelesener Tag nur dann, wenn er
+        trotzdem etwas hergegeben hat: was da ist, ist gesehen worden.
+        """
+        return self.zustand == GELESEN or self.zeilen > 0
+
+    @property
+    def vergleichsbasis(self) -> bool:
+        """Darf dieser Tag der VORTAG eines Vergleichs sein?
+
+        Ein Teiltag nicht. Seine Zeilen sind das, was bis zum Fensterende
+        durchkam - keine Aussage ueber die Abdeckung des Anbieters. Als
+        Basis genommen senkte er die Messlatte auf seinen eigenen kleinen
+        Wert: der echte Totalausfall am Folgetag faende dann nichts mehr,
+        wogegen er auffallen koennte (bei 0 Zeilen am Teiltag gar keinen
+        Alarm, siehe das dritte Tor in `GeraeteDB._befund`). Verglichen
+        wird deshalb mit dem letzten VOLLSTAENDIG gelesenen Tag.
+
+        Bleibt eine solche Basis ganz aus, ist DAS der Befund
+        (`ALARM_OHNE_BASIS`) - ein Waechter ohne Vergleich schweigt
+        nicht, er meldet seine Blindheit.
+        """
+        return self.beobachtet and self.zustand != TEILGELESEN
+
+    @property
+    def fundtag(self) -> bool:
+        """Dieselbe Frage fuer LISTUNGEN statt Zeilen - die Menge, auf der
+        `stille_tage` zaehlt.
+
+        Der Unterschied ist genau ein Fall: ein abgebrochener Lauf, der nur
+        Buendel mitbrachte. Fuer die Abdeckung ist das ein Lebenszeichen,
+        fuer die Frage "wie lange findet dieser Anbieter schon keine
+        Geraete mehr" keine Beobachtung - dort zaehlte er auch vor dem
+        22.09.2026 nicht mit, weil er gar nicht erst geschrieben wurde.
+        """
+        return self.zustand == GELESEN or self.funde > 0
+
+
+@dataclass(frozen=True)
+class Abdeckungsalarm:
+    """Ein Anbieter, dessen Abdeckung eingebrochen ist - oder fuer den es
+    keinen Vergleich mehr gibt (`ALARM_OHNE_BASIS`).
+
+    NUR MELDUNG, KEIN GRIFF: der Alarm altert nichts, loescht nichts und
+    schaltet keine Navigation. Er steht im Protokoll, auf der Quellenseite
+    und in der Mail - drei Kanaele, EIN Satz (`satz`), damit die Seite nicht
+    etwas anderes behauptet als das Log.
+    """
+    anbieter: str
+    art: str
+    tag: str
+    zeilen: int
+    zustand: str
+    # Die drei Vergleichsfelder sind `None`, wenn es KEINE Vergleichsbasis
+    # gibt (`ALARM_OHNE_BASIS`) - eine benannte Luecke, keine 0 und kein
+    # erfundener Tag (Clean Code 3). Bei den beiden anderen Arten sind sie
+    # immer gefuellt.
+    vortag: Optional[str]
+    zeilen_vortag: Optional[int]
+    rueckgang: Optional[float]     # Anteil 0..1
+    stille_tage: int
+    # Wie viele beobachtete Tage in Folge ohne einen einzigen vollstaendig
+    # gelesenen Tag - nur bei `ALARM_OHNE_BASIS` eine Aussage.
+    ohne_basis_tage: int = 0
+
+    @property
+    def prozent(self) -> Optional[int]:
+        if self.rueckgang is None:
+            return None
+        return int(round(self.rueckgang * 100))
+
+    @property
+    def kurz(self) -> str:
+        """Das Etikett am Anbieter - die Wortform, die auf der Seite steht."""
+        if self.art == ALARM_AUSFALL:
+            return "heute nicht erfasst"
+        if self.art == ALARM_OHNE_BASIS:
+            return "ohne vollständigen Abruf"
+        return "heute unvollständig erfasst"
+
+    @property
+    def satz(self) -> str:
+        if self.art == ALARM_OHNE_BASIS:
+            return (f"{self.anbieter}: {self.kurz} – {self.zeilen} Zeilen, "
+                    f"seit {self.ohne_basis_tage} beobachteten Tagen kein "
+                    f"vollständig gelesener Tag; der Vergleich hat keine "
+                    f"Basis (Zustand {self.zustand}).")
+        if self.art == ALARM_AUSFALL:
+            return (f"{self.anbieter}: {self.kurz} – 0 Zeilen, am "
+                    f"{tag_de(self.vortag)} waren es {self.zeilen_vortag} "
+                    f"(Zustand {self.zustand}).")
+        return (f"{self.anbieter}: {self.kurz} – {self.zeilen} Zeilen, am "
+                f"{tag_de(self.vortag)} waren es {self.zeilen_vortag} "
+                f"({self.prozent} % weniger).")
+
+    def als_dict(self) -> dict:
+        """Fuer die Seite: die Felder plus die zwei abgeleiteten Saetze.
+
+        Die Vorlage bekommt fertige Wortformen und rechnet nichts - sonst
+        stuenden Pruefung und Anzeige auf zwei Definitionen (Clean Code 7).
+        """
+        return {"anbieter": self.anbieter, "art": self.art, "tag": self.tag,
+                "zeilen": self.zeilen, "zustand": self.zustand,
+                "vortag": self.vortag, "zeilen_vortag": self.zeilen_vortag,
+                "prozent": self.prozent, "stille_tage": self.stille_tage,
+                "ohne_basis_tage": self.ohne_basis_tage,
+                "kurz": self.kurz, "satz": self.satz}
+
+
+def _befundschluessel(alarm: Abdeckungsalarm) -> tuple:
+    """Woran sich erkennen laesst, ob die Lage DIESELBE ist wie gestern.
+
+    Drei Stuecke, mehr nicht: die Alarmart, der Lesezustand und ob
+    ueberhaupt Zeilen kamen. Die Zeilenzahl selbst gehoert NICHT dazu -
+    sie schwankt taeglich, und jede Schwankung waere sonst ein
+    "Zustandswechsel", der die Wiederholungssperre aushebelt.
+    """
+    return (alarm.art, alarm.zustand, alarm.zeilen > 0)
+
+
+def _ist_wiederholungstag(tag: str) -> bool:
+    """Ist heute der Tag, an dem ein BLEIBENDER Befund erneut gemeldet
+    wird?
+
+    Gezaehlt wird am KALENDER und nicht im Journal. Das Journal ist auf
+    `_FUND_HISTORIE_TAGE` gedeckelt; jede Zaehlung darin verschiebt sich
+    Tag fuer Tag mit seinem Rand, der Wiederholungstag waere dadurch nie
+    der heutige, und der Waechter verstummte genau dort, wo er laut sein
+    muss. Am Kalender trifft er verlaesslich einen Tag je Woche - egal,
+    wie lange die Lage schon dauert und wie oft das Journal schon
+    umgebrochen ist.
+
+    Ein unlesbares Datum gilt als Wiederholungstag: lieber einmal zu viel
+    gemeldet als einmal zu wenig.
+    """
+    try:
+        ordnungszahl = date.fromisoformat(str(tag)).toordinal()
+    except (TypeError, ValueError):
+        return True
+    return ordnungszahl % _ALARM_WIEDERHOLUNG_TAGE == 0
+
+
+def _alarm_reihenfolge(alarm: Abdeckungsalarm) -> tuple:
+    """Groesster Einbruch zuerst - und ganz vorn der Anbieter, fuer den es
+    gar keinen Vergleich mehr gibt.
+
+    Ein Alarm ohne Vergleichsbasis hat keinen messbaren Rueckgang. Ihn mit
+    0 zu sortieren machte ihn zur leichtesten Lage; er ist die schwerste,
+    denn dort ist der Waechter blind (Clean Code 3: kein erfundener Wert).
+    """
+    if alarm.rueckgang is None:
+        return (0, 0.0, alarm.anbieter)
+    return (1, -alarm.rueckgang, alarm.anbieter)
 
 
 def _ist_ausfall(feld: str, wert) -> bool:
@@ -388,7 +650,9 @@ class GeraeteDB:
     # ------------------------------------------------- Hardware-Vermarktung
 
     def protokolliere_lauf(self, anbieter: str, today: str, funde: int,
-                           vollstaendig: bool = True) -> None:
+                           vollstaendig: bool = True,
+                           zustand: Optional[str] = None,
+                           buendel: int = 0) -> None:
         """Buch darueber, wie oft ein Anbieter abgefragt wurde und was dabei
         herauskam. Grundlage von `hardware_vermarktung()` und `messtermine()`.
 
@@ -401,8 +665,24 @@ class GeraeteDB:
         84 Listungen bestaetigt und nur nie fertig wird, als nie gemessen.
         Genau das war der Befund vom 28.08.2026: mobilcom-debitel fehlte
         komplett in dieser Bilanz, und `_oft_genug` sperrte 84 von 85
-        Listungen aus der Auswertung."""
+        Listungen aus der Auswertung.
+
+        `zustand` ist der LESEZUSTAND dieses Tages (GELESEN, LESEFEHLER,
+        NICHT_GELESEN) und traegt den Abdeckungswaechter. Ohne Angabe wird
+        er aus `vollstaendig` abgeleitet - das ist keine Vermutung, sondern
+        dieselbe Aussage in anderen Worten: was nicht vollstaendig gelesen
+        wurde, ist ein Leseversuch, der nicht durchkam. Ein Anbieter, den
+        der Lauf gar nicht angefasst hat (Besuchszeit, nicht crawlbar),
+        muss NICHT_GELESEN ausdruecklich mitgeben; er ist sonst nicht von
+        einem Fehlschlag zu unterscheiden.
+
+        `buendel` sind die Buendelsaetze desselben Tages. Sie zaehlen NICHT
+        auf `funde`/`funde_gesamt` (dort geht es um Listungen und damit um
+        die Frage, ob ein Anbieter ueberhaupt Hardware vermarktet), sondern
+        nur in die Abdeckung - siehe `Messtag`."""
         b = self._anbieter.setdefault(anbieter, {"laeufe": 0, "funde_gesamt": 0})
+        if zustand is None:
+            zustand = GELESEN if vollstaendig else LESEFEHLER
         if vollstaendig:
             b["laeufe"] = int(b.get("laeufe", 0)) + 1
             b["letzter_lauf"] = today
@@ -412,15 +692,23 @@ class GeraeteDB:
             termine = b.setdefault("termine", [])
             if today not in termine:
                 termine.append(today)
-            # FM-2: die Fundzahl JE TAG. Ohne sie ist "sieben Tage 0 Saetze"
-            # nicht zaehlbar - `letzte_funde` kennt nur den letzten Lauf,
-            # `funde_gesamt` nur die Summe. Gleicher Tag ersetzt seinen
-            # Eintrag (idempotent, dieselbe Regel wie die TCO-Historie),
-            # ein neuer Tag haengt an; gedeckelt auf den Diagnose-Rand.
-            historie = [[str(t), int(f)] for t, f in
-                        (b.get("funde_nach_tag") or []) if str(t) != today]
-            historie.append([today, int(funde)])
-            b["funde_nach_tag"] = historie[-_FUND_HISTORIE_TAGE:]
+        # DER MESSTAG-JOURNAL, und zwar fuer JEDEN Tag - auch fuer einen,
+        # an dem nichts gelesen wurde. Das ist der Unterschied zum Stand
+        # vor dem 22.09.2026: damals stand ein Tag nur dann im Bestand,
+        # wenn er vollstaendig war oder Funde hatte, und ein Anbieter, der
+        # gar nichts lieferte, hinterliess keine Spur. Genau diese Spur
+        # braucht der Vortagsvergleich, und sie muss den LESEZUSTAND
+        # tragen: ohne ihn ist "heute nicht erfasst" nicht von "heute
+        # ausserhalb der Besuchszeit" zu unterscheiden.
+        #
+        # Gleicher Tag ersetzt seinen Eintrag (idempotent, dieselbe Regel
+        # wie die TCO-Historie), ein neuer Tag haengt an; gedeckelt auf den
+        # Diagnose-Rand. Eintragsform: [Tag, Funde, Zustand, Buendel].
+        historie = [list(e) for e in (b.get("funde_nach_tag") or [])
+                    if not (isinstance(e, (list, tuple)) and e
+                            and str(e[0]) == today)]
+        historie.append([today, int(funde), zustand, int(buendel)])
+        b["funde_nach_tag"] = historie[-_FUND_HISTORIE_TAGE:]
         if funde:
             b["letzter_fund"] = today
 
@@ -446,12 +734,12 @@ class GeraeteDB:
             # Nie geliefert: das ist der SIM-only-Fall von
             # `hardware_vermarktung`, kein Quellentod.
             return 0
-        paare: dict[str, int] = {}
-        for eintrag in (b.get("funde_nach_tag") or []):
-            try:
-                paare[str(eintrag[0])] = int(eintrag[1])
-            except (TypeError, ValueError, IndexError):
-                continue
+        # Nur BEOBACHTETE Tage. Seit dem 22.09.2026 stehen auch die nicht
+        # gelesenen im Journal (der Abdeckungswaechter braucht sie); sie
+        # sind hier so unsichtbar wie vorher, als sie gar nicht erst
+        # geschrieben wurden - "nicht gelesen" ist nicht "leer".
+        paare: dict[str, int] = {m.tag: m.funde for m in self.messtage(anbieter)
+                                 if m.fundtag}
         letzter_fund = str(b.get("letzter_fund") or "")
         if letzter_fund and letzter_fund not in paare:
             paare[letzter_fund] = 1              # per Definition > 0
@@ -467,27 +755,209 @@ class GeraeteDB:
             tage += 1
         return tage
 
-    def ausfall_alarme(self, nur: Optional[Iterable[str]] = None) -> list:
-        """Anbieter, die `AUSFALL_TAGE` beobachtete Tage in Folge 0 Funde
-        geliefert haben: [(name, tage), ...], absteigend sortiert.
+    # ----------------------------------------------- Abdeckung (P1/C2)
 
-        NUR MELDUNG, KEIN GRIFF - der Rueckgabewert wird protokolliert
-        (`geraete_pipeline.melde_ausfall`), kein Anbieter wird gealtert,
-        geloescht oder sonstwie angefasst. Ein Alarm, der Datenloescht,
-        waere schlimmer als die Blindheit, die er ersetzt.
+    def messtage(self, anbieter: str) -> list:
+        """Das Journal eines Anbieters als `Messtag`-Liste, aufsteigend.
+
+        Liest die drei Eintragsformen, die es im Bestand gibt, ohne zu
+        raten:
+          * `[tag, funde, zustand, buendel]` - seit dem 22.09.2026.
+          * `[tag, funde]` - der Altbestand. Er entstand AUSSCHLIESSLICH
+            fuer vollstaendige Laeufe ODER Laeufe mit Funden, also genau
+            fuer BEOBACHTETE Tage; `GELESEN` ist deshalb eine Ableitung
+            aus der damaligen Schreibregel, keine Annahme. Ein alter
+            Eintrag mit Funden koennte auch ein Teillauf gewesen sein -
+            fuer den Waechter macht das keinen Unterschied, er fragt den
+            Zustand nur am BEZUGSTAG, und der wird immer frisch
+            geschrieben. Buendel kannte diese Form nicht: 0.
+        Ein Eintrag, der nicht lesbar ist, faellt LAUT heraus - er wird
+        nicht durch einen erfundenen ersetzt. Die Form wird dafuer
+        ausdruecklich geprueft und nicht bloss indiziert: ein String
+        "2026-09-01" liess sich klaglos zeichenweise lesen ([0] -> Tag
+        "2", [1] -> Funde 0) und ergab einen Messtag, den es nie gab -
+        still erzeugter Muell statt eines Protokolleintrags (Clean Code 5).
+        """
+        journal = []
+        for eintrag in (self._anbieter.get(anbieter, {}).get("funde_nach_tag")
+                        or []):
+            if not isinstance(eintrag, (list, tuple)) or len(eintrag) < 2:
+                log.warning("Geraeteradar: unlesbarer Messtag bei %s (%r) - "
+                            "uebergangen", anbieter, eintrag)
+                continue
+            try:
+                tag, funde = str(eintrag[0]), int(eintrag[1])
+                zustand = str(eintrag[2]) if len(eintrag) > 2 else GELESEN
+                buendel = int(eintrag[3]) if len(eintrag) > 3 else 0
+            except (TypeError, ValueError):
+                log.warning("Geraeteradar: unlesbarer Messtag bei %s (%r) - "
+                            "uebergangen", anbieter, eintrag)
+                continue
+            journal.append(Messtag(tag=tag, funde=funde, buendel=buendel,
+                                   zustand=zustand))
+        return sorted(journal, key=lambda m: m.tag)
+
+    def letzter_messtag(self) -> Optional[str]:
+        """Der juengste Tag, an dem IRGENDEIN Anbieter gemessen wurde -
+        oder `None`, wenn der Bestand keinen kennt. Nie "" und nie heute:
+        ein fehlender Wert ist eine Luecke, kein Datum (Clean Code 3)."""
+        tage = [m.tag for name in self._anbieter for m in self.messtage(name)]
+        return max(tage) if tage else None
+
+    def lesezustand(self, anbieter: str,
+                    tag: Optional[str] = None) -> Optional[str]:
+        """Der LESEZUSTAND eines Anbieters am Bezugstag - oder `None`.
+
+        Dieselbe Auskunft, aus der auch `abdeckungsalarm` seine Tore baut,
+        und damit die EINE Definition, die die Quellenseite fuer ihren
+        dritten Zustand braucht (Clean Code 7: keine zweite Liste). `None`
+        heisst "dieser Anbieter hat an diesem Tag keinen Messtag" - er war
+        nicht an der Reihe, und das ist keine Entwarnung.
+
+        Ohne `tag` gilt der letzte Messtag des Bestands, wie bei
+        `ausfall_alarme` - Lauf und Seite fragen so denselben Tag.
+        """
+        bezug = tag if tag else self.letzter_messtag()
+        if not bezug:
+            return None
+        heutige = [m for m in self.messtage(anbieter) if m.tag == bezug]
+        return heutige[-1].zustand if heutige else None
+
+    def _befund(self, anbieter: str, journal: list,
+                heute: Messtag) -> Optional[Abdeckungsalarm]:
+        """Die LAGE eines Anbieters an EINEM Tag - noch ohne die Frage, ob
+        sie an diesem Tag auch gemeldet wird (das entscheidet
+        `_alarmlauf`).
+
+        `None` heisst "kein Befund" und NICHT "in Ordnung": ein Anbieter
+        ohne Vortagsdaten, ein Anbieter ausserhalb seiner Besuchszeit und
+        ein Anbieter, der heute gar nicht an der Reihe war, sind
+        unbekannt - und Unbekanntes faellt aus dem Vergleich heraus, statt
+        als "geliefert" durchzugehen (Clean Code 4).
+
+        Die Tore, in dieser Reihenfolge:
+          1. Heute wurde ueberhaupt etwas gelesen. `NICHT_GELESEN` (gar
+             nicht angefasst: Besuchszeit, nicht crawlbar, kein Adapter)
+             ist kein Ausfall - "nicht gelesen" ist nicht "leer" (Clean
+             Code 6). Ein TEILGELESEN-Tag faellt hier NICHT heraus: an ihm
+             ist gelesen worden, er kann also ausfallen wie jeder andere.
+          2. Es gibt einen Vortag, der als Basis taugt
+             (`Messtag.vergleichsbasis` - beobachtet und kein Teiltag).
+             Gibt es KEINEN, ist das ab `_OHNE_BASIS_TAGE` beobachteten
+             Tagen selbst der Befund (`ALARM_OHNE_BASIS`): ein Waechter
+             ohne Vergleich ist blind, und Blindheit ist keine
+             Entwarnung. Vorher - ein einzelner uebersprungener oder
+             halber Tag - ist es nur eine Luecke.
+          3. Der Vortag hat geliefert. Hat er selbst schon nichts
+             geliefert, ist heute kein NEUER Ausfall - die anhaltende
+             Stille traegt `stille_tage` und die Quellenseite.
+        """
+        if heute.zustand == NICHT_GELESEN:
+            return None
+        vorher = [m for m in journal if m.tag < heute.tag]
+        vortage = [m for m in vorher if m.vergleichsbasis]
+        if not vortage:
+            beobachtet = [m for m in vorher if m.beobachtet]
+            if len(beobachtet) < _OHNE_BASIS_TAGE:
+                return None
+            return Abdeckungsalarm(
+                anbieter=anbieter, art=ALARM_OHNE_BASIS, tag=heute.tag,
+                zeilen=heute.zeilen, zustand=heute.zustand, vortag=None,
+                zeilen_vortag=None, rueckgang=None,
+                stille_tage=self.stille_tage(anbieter),
+                ohne_basis_tage=len(beobachtet))
+        vortag = vortage[-1]
+        if vortag.zeilen <= 0:
+            return None
+        rueckgang = (vortag.zeilen - heute.zeilen) / vortag.zeilen
+        if heute.zeilen <= 0:
+            art = ALARM_AUSFALL
+        elif rueckgang > ABDECKUNG_RUECKGANG:
+            art = ALARM_RUECKGANG
+        else:
+            return None
+        return Abdeckungsalarm(
+            anbieter=anbieter, art=art, tag=heute.tag, zeilen=heute.zeilen,
+            zustand=heute.zustand, vortag=vortag.tag,
+            zeilen_vortag=vortag.zeilen, rueckgang=rueckgang,
+            stille_tage=self.stille_tage(anbieter))
+
+    def abdeckungsalarm(self, anbieter: str,
+                        tag: str) -> Optional[Abdeckungsalarm]:
+        """Der Alarm EINES Anbieters an EINEM Tag - oder `None`.
+
+        `None` heisst "heute nichts zu melden" und nie "in Ordnung":
+        entweder gibt es keinen Befund (`_befund`), oder es ist derselbe
+        wie gestern und heute kein Wiederholungstag.
+
+        DIE WIEDERHOLUNGSSPERRE (S2-B). Gemeldet wird, wenn sich die Lage
+        GEAENDERT hat - Alarmart, Lesezustand oder ob ueberhaupt Zeilen
+        kamen -, und sonst an jedem `_ist_wiederholungstag`. Ohne diese
+        Sperre meldete der Waechter dieselbe Teillage an 29 Tagen
+        hintereinander, jeden mit eigener Mail; nach der dritten ist so
+        ein Kanal ein Postfachfilter und damit so stumm wie einer, der
+        schweigt. Der WECHSEL bleibt laut: wer von "drei Zeilen, Teiltag"
+        auf "null Zeilen, Lesefehler" faellt, meldet sofort.
+
+        DIE GRENZE DIESER SPERRE, damit sie niemand suchen muss: der
+        Vortagsbefund wird mit dem HEUTIGEN Journal nachgerechnet. Faellt
+        die Vergleichsbasis gerade aus dem gedeckelten Journal, sieht
+        auch der Vortag schon keine Basis mehr - der Wechsel von
+        `ALARM_RUECKGANG` zu `ALARM_OHNE_BASIS` faellt dann nicht als
+        Wechsel auf und wird erst am naechsten Wiederholungstag gemeldet.
+        Laenger als `_ALARM_WIEDERHOLUNG_TAGE` Tage bleibt nichts liegen,
+        und jede Aenderung an den MESSDATEN (Zeilen, Lesezustand) wird
+        sofort laut.
+        """
+        journal = self.messtage(anbieter)
+        heutige = [m for m in journal if m.tag == tag]
+        if not heutige:
+            return None
+        befund = self._befund(anbieter, journal, heutige[-1])
+        if befund is None:
+            return None
+        vorherige = [m for m in journal if m.tag < tag]
+        if not vorherige or _ist_wiederholungstag(tag):
+            return befund
+        gestern = self._befund(anbieter, journal, vorherige[-1])
+        if gestern is not None and _befundschluessel(gestern) == \
+                _befundschluessel(befund):
+            return None
+        return befund
+
+    def ausfall_alarme(self, nur: Optional[Iterable[str]] = None,
+                       heute: Optional[str] = None) -> list:
+        """Alle Anbieter, deren Abdeckung heute gegenueber dem Vortag
+        eingebrochen ist: `[Abdeckungsalarm, ...]`, groesster Rueckgang
+        zuerst.
+
+        NUR MELDUNG, KEIN GRIFF - der Rueckgabewert geht ins Protokoll
+        (`geraete_pipeline.melde_ausfall`), in die Mail und auf die
+        Quellenseite; kein Anbieter wird gealtert, geloescht oder sonstwie
+        angefasst. Ein Alarm, der Daten loescht, waere schlimmer als die
+        Blindheit, die er ersetzt.
+
+        `heute` ist der Bezugstag. Der Lauf uebergibt seinen eigenen; die
+        Seite laesst ihn weg und bekommt den letzten Messtag des Bestands.
+        Beide rechnen damit ueber DIESELBE Funktion - zwei Definitionen
+        waeren zwei Wahrheiten (Clean Code 7).
 
         `nur` grenzt auf die Anbieter DIESES Laufs ein: ein Anbieter, der
         aus der Konfiguration gefallen ist, wird nicht mehr beobachtet -
         sein eingefrorener Zaehlerstand darf keine Ewigkeitsmeldung geben.
         """
+        tag = heute if heute else self.letzter_messtag()
+        if not tag:
+            return []
+        erlaubt = None if nur is None else set(nur)
         alarme = []
-        for name, b in self._anbieter.items():
-            if nur is not None and name not in set(nur):
+        for name in sorted(self._anbieter):
+            if erlaubt is not None and name not in erlaubt:
                 continue
-            tage = self.stille_tage(name)
-            if tage >= AUSFALL_TAGE:
-                alarme.append((name, tage))
-        return sorted(alarme, key=lambda x: (-x[1], x[0]))
+            alarm = self.abdeckungsalarm(name, tag)
+            if alarm is not None:
+                alarme.append(alarm)
+        return sorted(alarme, key=_alarm_reihenfolge)
 
     def messtermine(self, anbieter: str) -> list:
         """Alle Tage, an denen Listungen dieses Anbieters wirklich geprueft

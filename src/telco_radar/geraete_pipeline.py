@@ -16,7 +16,7 @@ WARUM ES AUSSERDEM EINEN EIGENEN NAECHTLICHEN LAUF GIBT
 medimax.de und ep.de erlauben Abrufe laut eigener robots.txt nur zwischen
 02:00 und 08:00 UTC. Der Wochenlauf startet um 08:30. Im Tageslauf werden sie
 deshalb uebersprungen - und, das ist der wichtigere Teil, NICHT gealtert.
-`.github/workflows/geraete.yml` holt sie um 03:10 UTC nach.
+`.github/workflows/geraete.yml` holt sie um 02:17 UTC nach.
 
 DIE REGEL, DIE DIESE DATEI TRAEGT
 ---------------------------------
@@ -30,15 +30,26 @@ from __future__ import annotations
 import logging
 import time
 from datetime import datetime, timezone
+from html import escape
 from pathlib import Path
 from typing import Callable, Optional
 
-from .analyze.geraete_store import GeraeteDB, Preishistorie
+from . import versand
+from .analyze.geraete_store import (
+    GELESEN,
+    GeraeteDB,
+    LESEFEHLER,
+    NICHT_GELESEN,
+    Preishistorie,
+    TEILGELESEN,
+    tag_de,
+)
 from .analyze.tarif_referenzen import aus_bestand
 from .analyze.tco_buendel import aus_rohsaetzen
 from .analyze.tco_store import TcoDB
 from .tarif_bezug import Tarifbestand
-from .collect.geraete import ADAPTER, sammle
+from .collect.geraete import ADAPTER, hole_mit_robots, sammle
+from .collect.geraete.robots import RobotsWaechter
 from .collect.geraete import autoerkennung
 from .collect.geraete.congstar import ergaenze_pib_slug
 from .collect.tarif_einsundeins_simonly import ANBIETER as SIMONLY_ANBIETER
@@ -105,25 +116,125 @@ def _hole_fabrik(http_cfg: dict) -> Callable:
 
 
 # --------------------------------------------------------------------------
-# FM-2: Quellentod darf nicht still bleiben (Strategie v3, P5-Auftrag 2)
+# FM-2 / P1-C2: Quellentod darf nicht still bleiben
 # --------------------------------------------------------------------------
-# Zwei Protokollzeilen, beide nur MELDUNG - kein Anbieter wird gealtert,
-# geloescht oder angefasst, und nichts geht per Mail/Teams hinaus (bewusst
-# nicht gebaut). Der Ausfall-Alarm zaehlt Tage ohne Funde aus der
-# Laufhistorie (`GeraeteDB.ausfall_alarme`), die Provider-Probe zaehlt je
-# Abruf, wie viele der erwarteten Saetze ihre Feldebenen noch tragen
-# (Praezedenz Phase S: metric3+metric2 == monthlyPrice, damals 66/66).
+# Zwei Meldungen, beide ohne Nebenwirkung - kein Anbieter wird gealtert,
+# geloescht oder angefasst. Der Abdeckungswaechter vergleicht die Zeilen
+# jedes Anbieters mit seinem Vortag (`GeraeteDB.ausfall_alarme`), die
+# Provider-Probe zaehlt je Abruf, wie viele der erwarteten Saetze ihre
+# Feldebenen noch tragen (Praezedenz Phase S: metric3+metric2 ==
+# monthlyPrice, damals 66/66).
+#
+# DREI KANAELE STATT EINEM (22.09.2026). Bis hierher stand der Alarm nur
+# im Actions-Log, und das Log liest niemand: 50 Laeufe waren gruen,
+# darunter die sechs Tage ohne eine einzige Telekom-Zeile. Der Alarm geht
+# jetzt zusaetzlich auf die Quellenseite (`report/geraete_view.py`) und
+# per Mail hinaus (`sende_alarm_mail`, Versandschritt in geraete.yml).
+# Alle drei sagen denselben Satz - er entsteht einmal, im Alarmobjekt.
+
+def _abdeckungszustand(bilanz) -> str:
+    """Wie ist dieser Anbieter heute gelesen worden? EINE Definition.
+
+    Sie steht hier und nicht im Store, weil nur diese Schicht beide Seiten
+    kennt: den Sammelstatus des Collectors und den Bestand, der ihn
+    aufnimmt. Vier Faelle, und die zwei mittleren sind die teuren:
+
+      * `uebersprungen` / `nicht_umgesetzt`: der Lauf hat den Anbieter gar
+        nicht angefasst (nicht crawlbar, kein Adapter).
+      * AUSSERHALB DER BESUCHSZEIT, OHNE EINE EINZIGE GELESENE SEITE:
+        robots.txt erlaubt den Abruf zu dieser Stunde nicht, und zwar von
+        Anfang an. Das ist KEIN Ausfall, sondern eine Luecke: der Fall,
+        den medimax.de und ep.de an jedem Tag erzeugen, an dem der Lauf
+        ganz hinter 08:00 UTC liegt. Der PREIS dieser Regel steht hier,
+        damit ihn niemand suchen muss: ueber einen Anbieter, der gar
+        nicht erreichbar war, kann der Waechter nichts sagen. Das ist die
+        ehrliche Luecke; die falsche Alternative waere ein taeglicher
+        Alarm, den nach einer Woche niemand mehr liest.
+      * AUSSERHALB DER BESUCHSZEIT, ABER MIT GELESENEM: die Tuer ging
+        MITTEN im Lauf zu. Bis zum 22.09.2026 galt dieser Anbieter
+        ebenfalls als "nicht angefasst" - auch mit vier gelesenen
+        Produktseiten und drei Listungen (S2-1). Weil genau medimax.de und
+        ep.de jede Nacht an ihrem Fenster haengen, war der Waechter fuer
+        sie im REGELFALL blind. Was gelesen wurde, ist gesehen worden: der
+        Teiltag bleibt im Vergleich, taugt aber nicht als Vergleichsbasis
+        (`Messtag.vergleichsbasis`).
+      * sonst `vollstaendig`: gelesen. Und alles andere - Zeitbudget,
+        HTTP-Fehler, tote Einstiegsseite, abgeschalteter Collector - ist
+        ein Leseversuch, der nicht durchkam. Der zaehlt als Ausfall, denn
+        genau dafuer gibt es diesen Waechter.
+
+    Erkannt wird die Besuchszeit am Flag der Bilanz
+    (`ausserhalb_besuchszeit`), nicht am Grundtext - ein Waechter, der
+    zwei Zustaende an einem String auseinanderhaelt, kippt bei der ersten
+    Umformulierung.
+    """
+    if bilanz.status in ("uebersprungen", "nicht_umgesetzt"):
+        return NICHT_GELESEN
+    if getattr(bilanz, "ausserhalb_besuchszeit", False):
+        # "Gar nicht angefasst" heisst: keine gelesene Einstiegsseite,
+        # keine Listung, kein Buendelsatz. Alles drei, nicht nur die
+        # Listungen - die Telekom liefert ausschliesslich Buendel.
+        gelesen = (bilanz.gelesene_einstiege or bilanz.listungen
+                   or bilanz.buendel)
+        return TEILGELESEN if gelesen else NICHT_GELESEN
+    return GELESEN if bilanz.vollstaendig else LESEFEHLER
+
 
 def melde_ausfall(alarme: list) -> None:
-    """Je stiller Anbieter EINE Zeile, mit fester Wortform.
+    """Je eingebrochenem Anbieter EINE Zeile, mit fester Wortform.
 
-    Der Wortlaut ist Testvertrag (`tests/test_geraete_ausfall_alarm.py`)
-    - die Zeile ist der Alarm, und ein Alarm, dessen Wortlaut driftet,
-    ist nicht mehr grepbar im Actions-Log.
+    Der Wortlaut ist Testvertrag (`tests/test_geraete_abdeckung.py`) - die
+    Zeile ist der Alarm, und ein Alarm, dessen Wortlaut driftet, ist im
+    Actions-Log nicht mehr grepbar. Der Satz selbst kommt aus dem
+    Alarmobjekt: Protokoll, Mail und Quellenseite sagen damit wortgleich
+    dasselbe (Clean Code 7).
     """
-    for name, tage in alarme:
-        log.warning("Geraeteradar-Ausfall: %s liefert %d Tage 0 Saetze "
-                    "(Quelle pruefen: geraete-quellen.html)", name, tage)
+    for alarm in alarme:
+        log.warning("Geraeteradar-Abdeckung: %s (Quelle pruefen: "
+                    "geraete-quellen.html)", alarm.satz)
+
+
+def baue_alarm_mail(alarme: list, tag: str) -> tuple:
+    """(Betreff, Text, HTML) fuer die Abdeckungsmail. Ohne Netz, ohne
+    Zustellung - damit der Inhalt pruefbar ist, ohne einen Mailserver zu
+    brauchen.
+
+    Der Inhalt ist EIN Satz je Anbieter, derselbe wie im Protokoll und auf
+    der Quellenseite. Keine Zusammenfassung, keine Empfehlung: die Mail
+    sagt, was fehlt, und verlinkt die Seite, auf der es nachzusehen ist.
+    """
+    datum = tag_de(tag)
+    seite = f"{versand.SITE_URL}/geraete-quellen.html"
+    betreff = (f"Geräteradar {datum}: {len(alarme)} Anbieter heute nicht "
+               f"vollständig erfasst")
+    zeilen = [a.satz for a in alarme]
+    text = "\n".join([f"Stand {datum}", ""] + [f"- {z}" for z in zeilen]
+                     + ["", f"Quellenseite: {seite}"])
+    inhalt = (f"<html><body><p>Stand {escape(datum)}</p><ul>"
+              + "".join(f"<li>{escape(z)}</li>" for z in zeilen)
+              + f'</ul><p><a href="{seite}">Quellenseite</a></p></body></html>')
+    return betreff, text, inhalt
+
+
+def sende_alarm_mail(alarme: list, tag: str, *, trocken: bool = False) -> str:
+    """Verschickt die Abdeckungsmail und gibt die Bilanzzeile zurueck.
+
+    Ohne Alarme wird NICHTS verschickt - eine taegliche "alles in Ordnung"-
+    Mail ist nach zwei Wochen ein Filter im Postfach, und ein
+    stummgeschalteter Kanal ist schlimmer als keiner (`versand.py`).
+
+    Ein Zustellfehler wird NICHT geschluckt: `VersandFehler` geht an den
+    Aufrufer weiter (der Workflow-Schritt faellt damit rot aus). Ein
+    Alarmkanal, der still nicht zustellt, ist genau die Fehlerklasse, gegen
+    die dieser Waechter gebaut ist.
+    """
+    if not alarme:
+        return "keine Abdeckungsalarme - keine Mail"
+    betreff, text, html = baue_alarm_mail(alarme, tag)
+    ergebnis = versand.sende_mail(betreff, text, html, trocken=trocken)
+    log.warning("Geraeteradar-Abdeckung: %d Alarme per Mail (%s)",
+                len(alarme), ergebnis)
+    return ergebnis
 
 
 def melde_proben(bilanzen: list) -> None:
@@ -165,6 +276,74 @@ def melde_proben(bilanzen: list) -> None:
                         ebenen or "unbekannt")
 
 
+def nachsammle_buendel(bilanzen: list, quellen, hole: Callable,
+                       uhr: Optional[Callable[[], datetime]] = None) -> None:
+    """Die Nachbearbeitungs-Haken der Adapter ueber die Buendel laufen
+    lassen. Wirft nie - ein Fehler hier darf den Bestand nicht kosten,
+    er ist an dieser Stelle laengst gespeichert.
+
+    ROBOTS GILT AUCH HIER (S2-3, 22.09.2026). Die Haken rufen selbst ab
+    (`vodafone.loese_tarifnamen`, `einsundeins.ergaenze_buendel`) und
+    bekamen bis hierher das ROHE `hole`: ohne Disallow, ohne Crawl-delay,
+    ohne Fensterpruefung - und das ausgerechnet nach der Sammelphase, also
+    an der spaetesten Stelle des Laufs, an der ein Besuchsfenster am
+    ehesten zu ist. Die Zusage "die Fensterpruefung gilt JE ABRUF"
+    (Collector-Modulkopf, `geraete.yml`) hielt fuer sie nicht. Jeder Haken
+    bekommt deshalb ein `hole`, das durch dieselbe `Abrufschleuse` geht
+    wie die Sammelphase - je Anbieter eine eigene, wie dort.
+
+    `uhr()` ist die Zeit des NAECHSTEN Abrufs, nicht der Start des Laufs.
+    Ohne Angabe die echte Uhr: diese Stufe laeuft in Echtzeit, und ein
+    eingefrorener Zeitstempel waere genau der Fehler, den die Fensterprobe
+    verhindern soll.
+    """
+    for bilanz in bilanzen:
+        if not bilanz.buendel:
+            continue
+        anbieter = quellen.nach_name(bilanz.name)
+        adapter = ADAPTER.get(anbieter.methode) if anbieter else None
+        if adapter is None:
+            continue
+        # Ein Waechter je Anbieter: er fragt jede robots.txt genau einmal
+        # und haelt sie fuer die Dauer dieser Haken im Cache. Der
+        # robots-Abruf traegt den Absender DIESES Anbieters, wenn er einen
+        # eigenen hat (B2, 08.09.2026 - dieselbe Regel wie im Collector;
+        # 1&1 ist genau so ein Anbieter UND traegt einen Haken). Was der
+        # Haken danach selbst abruft, geht weiter mit den Kopfzeilen
+        # hinaus, die er bisher schon gesetzt hat - hier wird der
+        # Torwaechter nachgeruestet, nicht die Anfrage umgebaut.
+        user_agent = (getattr(anbieter, "user_agent", "") or "").strip()
+        # `ua=user_agent` bindet den Wert DIESES Durchlaufs - eine
+        # Lambda, die die Schleifenvariable liest, traegt sonst den
+        # Absender des letzten Anbieters.
+        waechter = RobotsWaechter(
+            hole=(lambda url, ua=user_agent: hole(url, user_agent=ua))
+            if user_agent else hole)
+        gebremst = hole_mit_robots(
+            hole, waechter,
+            getattr(anbieter, "rate_limit_sekunden", 0.0) or 0.0, uhr)
+        for haken, meldung in (
+                (adapter.loese_tarifnamen,
+                 "%s: %d von %d Buendel-Tarifnamen ueber die "
+                 "Tarifschnittstelle aufgeloest"),
+                (adapter.ergaenze_buendel,
+                 "%s: %d Buendel-Saetze um die Bereitstellungsgebuehr "
+                 "ergaenzt (%d Rohsaetze)")):
+            if haken is None:
+                continue
+            try:
+                gesetzt = haken(
+                    gebremst,
+                    dict(getattr(anbieter, "kopfzeilen", None) or {}),
+                    bilanz.buendel)
+                if gesetzt:
+                    log.info(meldung, bilanz.name, gesetzt,
+                             len(bilanz.buendel))
+            except Exception as exc:                      # noqa: BLE001
+                log.warning("%s: Buendel-Nachsammeln gescheitert (%s)",
+                            bilanz.name, exc)
+
+
 def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
                       jetzt: Optional[datetime] = None,
                       frist_sekunden: Optional[float] = FRIST_STANDARD,
@@ -183,7 +362,13 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
     und 1&1 abgerufen (Befund Runde 2, outputs/telekom-taeglich-2026-09-15.md).
     """
     beginn = time.monotonic()
-    jetzt = jetzt or datetime.now(timezone.utc)
+    # `x or y` ist hier verboten (Clean Code 3): ein aufrufender Test, der
+    # den Laufbeginn bewusst auf Mitternacht UTC legt, uebergibt einen
+    # datetime, der falsy sein KANN - und bekaeme dann still die echte
+    # Uhr. Seit die Uhr je Abruf gegen das Besuchsfenster rechnet, waere
+    # das kein Schoenheitsfehler mehr, sondern eine falsche Fensterprobe.
+    if jetzt is None:
+        jetzt = datetime.now(timezone.utc)
     root = Path(root)
 
     katalog = lade_katalog(root)
@@ -245,10 +430,20 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
         # wirklich gesehen wurden, auch in einem Teillauf). mobilcom-debitel
         # bestaetigte jede Nacht seine Listungen, wurde am Zeitbudget aber
         # nie fertig - und fehlte deshalb komplett in der Bilanz.
-        if bilanz.vollstaendig or bilanz.listungen:
-            db.protokolliere_lauf(bilanz.name, heute,
-                                  funde=len(bilanz.listungen),
-                                  vollstaendig=bilanz.vollstaendig)
+        #
+        # SEIT DEM 22.09.2026 OHNE VORBEDINGUNG (P1/C2): protokolliert wird
+        # JEDER Anbieter, auch der, der nichts geliefert hat. Die alte
+        # Bedingung `vollstaendig or listungen` liess genau den Fall
+        # spurlos, um den es beim Abdeckungswaechter geht - ein Anbieter,
+        # der heute ausfaellt, hinterliess keinen Messtag und war vom
+        # Vortag nicht zu unterscheiden. `laeufe` und `termine` bleiben an
+        # ihre alten Bedingungen gebunden (im Store), nur das Journal
+        # bekommt jeden Tag.
+        db.protokolliere_lauf(bilanz.name, heute,
+                              funde=len(bilanz.listungen),
+                              vollstaendig=bilanz.vollstaendig,
+                              zustand=_abdeckungszustand(bilanz),
+                              buendel=len(bilanz.buendel))
         bilanzen.append({
             "anbieter": bilanz.name,
             "status": bilanz.status,
@@ -304,32 +499,7 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
     # Bereitstellungsgebuehr steht erst im Tarifdetails-Iframe). Beide
     # Haken laufen NACH dem Sammeln und VOR `aus_rohsaetzen` - was sie
     # an die Rohsaetze schreiben, landet im selben Zug im Bestand.
-    for bilanz in ergebnis["anbieter"]:
-        if not bilanz.buendel:
-            continue
-        anbieter = quellen.nach_name(bilanz.name)
-        adapter = ADAPTER.get(anbieter.methode) if anbieter else None
-        if adapter is None:
-            continue
-        for haken, meldung in (
-                (adapter.loese_tarifnamen,
-                 "%s: %d von %d Buendel-Tarifnamen ueber die "
-                 "Tarifschnittstelle aufgeloest"),
-                (adapter.ergaenze_buendel,
-                 "%s: %d Buendel-Saetze um die Bereitstellungsgebuehr "
-                 "ergaenzt (%d Rohsaetze)")):
-            if haken is None:
-                continue
-            try:
-                gesetzt = haken(
-                    hole, dict(getattr(anbieter, "kopfzeilen", None) or {}),
-                    bilanz.buendel)
-                if gesetzt:
-                    log.info(meldung, bilanz.name, gesetzt,
-                             len(bilanz.buendel))
-            except Exception as exc:                      # noqa: BLE001
-                log.warning("%s: Buendel-Nachsammeln gescheitert (%s)",
-                            bilanz.name, exc)
+    nachsammle_buendel(ergebnis["anbieter"], quellen, hole)
 
     rohbuendel = [b for bilanz in ergebnis["anbieter"]
                   for b in getattr(bilanz, "buendel", [])]
@@ -552,14 +722,25 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
                      satz["anbieter"], satz["status"], satz["listungen"],
                      satz["produkte_abgerufen"], satz["rohsaetze"],
                      satz["grund"][:160])
-    # FM-2: Quellentod darf nicht still bleiben. Beide Meldungen sind reine
-    # Protokollzeilen - der Alarm altert und loest nichts (die Auslistung
-    # bleibt allein an `vollstaendig` gebunden), die Probe greift in nichts
-    # ein. `nur` begrenzt auf DIESEN Lauf: ein nicht mehr konfigurierter
-    # Anbieter wird nicht mehr beobachtet und darf keine Ewigkeitsmeldung
-    # geben.
-    melde_ausfall(db.ausfall_alarme(
-        nur={satz["anbieter"] for satz in bilanzen}))
+    # FM-2 / P1-C2: Quellentod darf nicht still bleiben. Beide Meldungen
+    # greifen in nichts ein - der Alarm altert nicht und loest nichts (die
+    # Auslistung bleibt allein an `vollstaendig` gebunden), die Probe
+    # ebensowenig. `nur` begrenzt auf DIESEN Lauf: ein nicht mehr
+    # konfigurierter Anbieter wird nicht mehr beobachtet und darf keine
+    # Ewigkeitsmeldung geben.
+    #
+    # `heute` wird ausdruecklich uebergeben: der Lauf fragt nach SEINEM
+    # Tag, nicht nach dem juengsten im Bestand. Ein Lauf, der einen
+    # nachgereichten aelteren Tag schreibt, soll auch dessen Abdeckung
+    # beurteilen.
+    alarme = db.ausfall_alarme(nur={satz["anbieter"] for satz in bilanzen},
+                               heute=heute)
+    melde_ausfall(alarme)
+    # In die Bilanz, nicht nur ins Log: der Tageslauf gibt sie an
+    # `run_geraete_stage`s Aufrufer zurueck (der Wochenlauf legt sie in
+    # `stats` ab), und ein Alarm, der nur im Log steht, ist beim naechsten
+    # Blick auf die Seite nicht mehr da.
+    bilanz["abdeckung_alarme"] = [a.als_dict() for a in alarme]
     melde_proben(bilanzen)
     if bilanz["unbekannte_titel"]:
         # Die Arbeitsliste fuer config/geraete_katalog.yaml. Sie stand bisher

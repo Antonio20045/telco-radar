@@ -54,11 +54,14 @@ from ..analyze.tco_store import TcoDB
 from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
 from ..tarif_bezug import Tarifbestand
 from ..analyze.geraete_store import (
+    GELESEN,
     GeraeteDB,
     Preishistorie,
     STATUS_AKTIV,
     STATUS_AUSGELISTET,
     STATUS_VERMUTLICH,
+    TEILGELESEN,
+    tag_de,
 )
 
 log = logging.getLogger(__name__)
@@ -1567,6 +1570,62 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
 # Befund wie `UEBERSICHT_MAX_ZEILEN` beim Review davor: lebendig klingende
 # Begruendung, keine Wirkung.
 
+def _heute_luecke(db: GeraeteDB, name: str, bezugstag, liefert: bool) -> bool:
+    """Behauptet der Bestand etwas Gruenes, das heute niemand gemessen hat?
+
+    Zwei Haelften, und beide gehoeren hierher und nicht in die Vorlage -
+    sonst steht dieselbe Entscheidung an zwei Stellen (Clean Code 7):
+
+      * WURDE HEUTE GELESEN? Aus derselben Definition, die der Waechter
+        benutzt (`GeraeteDB.lesezustand` am Bezugstag). Ein Teillauf
+        zaehlt mit - was da ist, ist gesehen worden; ein Lesefehler und
+        ein nicht angefasster Anbieter nicht, und ein Anbieter ohne
+        Messtag am Bezugstag erst recht nicht.
+      * BEHAUPTET DIE ZEILE SONST ETWAS GRUENES? Nur dann ersetzt der
+        dritte Zustand sie. "Nicht angebunden" und "angebunden, ohne
+        Fund" sind gemessene Dauerzustaende und sagen mehr als ein
+        Tagesbefund; ein gruener Punkt fuer einen Anbieter, den der Lauf
+        heute nicht erreicht hat, ist dagegen eine Entwarnung, die
+        niemand gemessen hat (S2-2).
+    """
+    if not liefert:
+        return False
+    return db.lesezustand(name, bezugstag) not in (GELESEN, TEILGELESEN)
+
+
+def _liefert_heute(satz: dict) -> bool:
+    """Steht in der Stand-Spalte dieser Zeile der GRUENE Punkt?
+
+    Die EINE Definition (Clean Code 7), aus der die Vorlage ihren Punkt
+    und die Kennzahl "N liefern Geräte" ihre Zahl nimmt. Vorher zaehlte
+    die Kennzahl aus dem BESTAND (`liefert`): ueber genau den Zeilen, die
+    "heute nicht gelesen" tragen, stand als groesste Zahl des Bereichs
+    "10 liefern Geräte" - die Entwarnung, die der Punkt nicht mehr gibt,
+    gab die Kennzahl.
+
+    Drei Stufen, dieselbe Reihenfolge wie in der Vorlage: ein Alarm und
+    eine heute nicht gemessene Zeile sind kein "liefert".
+    """
+    if satz.get("abdeckung") or satz.get("heute_luecke"):
+        return False
+    return bool(satz.get("liefert"))
+
+
+def _heute_satz(bilanz: dict) -> str:
+    """Warum steht in der Stand-Spalte kein gruener Punkt?
+
+    Die gemessene Auskunft und kein Wort mehr: der letzte VOLLSTAENDIGE
+    Lauf dieses Anbieters. Er steht da, weil "heute nicht gelesen" allein
+    die naechste Frage offen laesst - seit wann? Genau diese Zahl war der
+    Befund, mit dem der Waechter angefangen hat (Telekom: letzter
+    vollstaendiger Lauf am 15.09., Seite trotzdem gruen).
+    """
+    letzter = str(bilanz.get("letzter_lauf") or "")
+    if letzter:
+        return f"zuletzt vollständig gelesen am {tag_de(letzter)}"
+    return "bisher kein vollständiger Lauf"
+
+
 def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
     """Wer liefert, wer nicht - und warum nicht.
 
@@ -1584,6 +1643,23 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
     """
     mit_daten = {e.get("anbieter") for e in eintraege}
     bekannt = {a.name for a in quellen.anbieter}
+    # DER ABDECKUNGSWAECHTER (P1/C2) - dieselbe Funktion, die der Lauf
+    # fuer Protokoll und Mail ruft. Die Seite rechnet nichts nach und
+    # fuehrt keine zweite Liste; sie zeigt, was der Waechter sagt
+    # (Clean Code 7). OHNE `heute`: Bezug ist der letzte MESSTAG des
+    # Bestands, nicht das Berichtsdatum der Seite - die Geraetedaten sind
+    # regelmaessig neuer als der juengste Bericht (siehe `_bewegung`), und
+    # ein Alarm, der am Berichtsdatum haengt, verschwaende genau an dem
+    # Tag, an dem er entsteht.
+    alarme = {a.anbieter: a.als_dict() for a in db.ausfall_alarme()}
+    # DER DRITTE SEITENZUSTAND (S2-2). `liefert` kommt aus dem BESTAND und
+    # sagt nichts darueber, ob der Lauf den Anbieter HEUTE erreicht hat -
+    # ein Anbieter ausserhalb seiner Besuchszeit bekam so einen gruenen
+    # Punkt und das Wort "liefert", eine Entwarnung, die niemand gemessen
+    # hat. Gefragt wird derselbe Bezugstag wie oben und dieselbe
+    # Definition, die der Waechter benutzt (`GeraeteDB.lesezustand`, keine
+    # zweite Liste - Clean Code 7).
+    bezugstag = db.letzter_messtag()
     zeilen, ohne_hardware = [], []
     for a in sorted(quellen.anbieter, key=lambda x: (x.rang, x.name)):
         vermarktung = db.hardware_vermarktung(a.name)
@@ -1598,9 +1674,21 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
                           for e in a.crawled_einstiege],
             "geraete": sum(1 for e in eintraege if e.get("anbieter") == a.name),
             "liefert": a.name in mit_daten,
+            "heute_luecke": _heute_luecke(db, a.name, bezugstag,
+                                          a.name in mit_daten),
             "hardware_vermarktung": vermarktung,
             "bilanz": db.laufbilanz(a.name),
+            # Der Satz zum dritten Zustand: "heute nicht gelesen" allein
+            # laesst die naechste Frage offen - seit wann?
+            "heute_satz": _heute_satz(db.laufbilanz(a.name)),
+            # Der Alarm ODER `None` - nie ein leeres dict: "kein Alarm"
+            # heisst hier "keine Aussage", und eine leere Huelle in der
+            # Vorlage sieht aus wie eine Entwarnung (Clean Code 3).
+            "abdeckung": alarme.get(a.name),
         }
+        # Der gruene Punkt als FERTIGE Entscheidung - Vorlage und Kennzahl
+        # lesen dasselbe Feld, statt die Reihenfolge je zweimal zu bauen.
+        satz["liefert_heute"] = _liefert_heute(satz)
         # GENAU DREI ZUSTAENDE, und keiner davon heisst "gemessen, aber ohne
         # Adapter". Diese vierte Kategorie ist am 30.08.2026 abgeschafft
         # worden, weil sie nichts aussagte: sie stand fuer "koennte man
@@ -1627,7 +1715,7 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
     # Design nie, also bleibt er da - und faellt sonst genau unter dem Satz
     # durch, der verspricht, dass kein Anbieter stillschweigend fehlt.
     for name in sorted(n for n in mit_daten if n and n not in bekannt):
-        zeilen.append({
+        fremd = {
             "name": name, "typ": "", "netz": "", "gruppe": "", "rang": 999,
             "methode": "nicht konfiguriert", "eigen": False, "aktiv": False,
             "crawlbar": False,
@@ -1638,14 +1726,23 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
             "hinweis": "", "einstiege": [],
             "geraete": sum(1 for e in eintraege if e.get("anbieter") == name),
             "liefert": True, "hardware_vermarktung": "ja",
+            "heute_luecke": _heute_luecke(db, name, bezugstag, True),
             "zustand": "liefert",
             "bilanz": db.laufbilanz(name),
-        })
+            "heute_satz": _heute_satz(db.laufbilanz(name)),
+            "abdeckung": alarme.get(name),
+        }
+        fremd["liefert_heute"] = _liefert_heute(fremd)
+        zeilen.append(fremd)
 
     return {
         "zeilen": zeilen,
         "ohne_hardware": ohne_hardware,
-        "liefernd": sum(1 for z in zeilen if z["liefert"]),
+        # Die groesste Zahl des Bereichs, und sie liest denselben
+        # Lesezustand wie Punkt und Waechter (`_liefert_heute`) - aus dem
+        # Bestand gezaehlt stand sie als Entwarnung ueber Zeilen, die
+        # "heute nicht gelesen" tragen (S2-A).
+        "liefernd": sum(1 for z in zeilen if z["liefert_heute"]),
         # Der Nenner der Zeile "N von M liefern Daten" muss zu den ZEILEN
         # passen, die darunter stehen - sonst steht ueber 21 Zeilen die Zahl
         # 23 (der Fehlertyp aus CLAUDE.md §6).
@@ -1993,7 +2090,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # Alterung ist der SPAETERE zweier Uhren, nicht der Berichtstag.
     # `heute` kommt aus `render_site` und ist das Datum des juengsten
     # RADAR-Berichts (Mi/Fr) - aber die Geräteseite rendert TAEGLICH
-    # (`geraete.yml`, 03:10 UTC) und fasst die Berichte nicht an. Am
+    # (`geraete.yml`, 02:17 UTC) und fasst die Berichte nicht an. Am
     # 20.09.2026 stand der juengste Bericht auf dem 16.09.: mit ihm als
     # `heute` waren alle sechs Telekom-Buendel vom 15.09. "einen Tag alt"
     # und fuehrten frisch Antwortzeile und Spanne - die 3-Tage-Regel war

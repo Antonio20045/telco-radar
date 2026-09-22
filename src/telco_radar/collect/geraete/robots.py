@@ -26,6 +26,16 @@ Die zweite Haelfte der Regel steht nicht hier, sondern beim Aufrufer: ein
 Anbieter, der wegen seines Besuchsfensters uebersprungen wurde, darf NICHT
 gealtert werden. Sonst schoebe jeder Tageslauf seine Geraete einen Schritt
 Richtung "ausgelistet", und das Protokoll saehe dabei normal aus.
+
+DAS FENSTER GILT JE ABRUF, NICHT JE LAUF
+----------------------------------------
+`im_fenster()` und `darf()` bekommen den Zeitpunkt EINES Abrufs. Ein Lauf,
+der um 07:57 UTC startet und planmaessig bis zu 25 Minuten laeuft, steht bei
+seinem vierten Anbieter um 08:20 vor derselben Tuer - und die ist dann zu.
+Wer hier die Startzeit einfriert, bekommt fuer jeden spaeteren Abruf ein
+"im Fenster", das nicht stimmt. `restzeit_im_fenster()` sagt zusaetzlich,
+wie lange die Tuer noch offen ist, damit der Collector den Zeitanteil eines
+solchen Anbieters gar nicht erst ueber das Fensterende hinaus plant.
 """
 from __future__ import annotations
 
@@ -39,6 +49,13 @@ from urllib.parse import urlparse
 log = logging.getLogger(__name__)
 
 _VISIT_RE = re.compile(r"^\s*(\d{4})\s*-\s*(\d{4})\s*$")
+
+# Zeitrechnung des Besuchsfensters. `Visit-time` steht in Minuten seit
+# Mitternacht UTC, die Frist des Collectors in Sekunden - die Umrechnung
+# gehoert an genau eine Stelle und traegt einen Namen (Clean Code 8).
+_SEKUNDEN_JE_MINUTE = 60.0
+_MINUTEN_JE_STUNDE = 60
+_MINUTEN_JE_TAG = 24 * _MINUTEN_JE_STUNDE
 
 
 def host_von(url: str) -> str:
@@ -94,11 +111,40 @@ class Regelwerk:
     def im_fenster(self, jetzt: datetime) -> bool:
         if self.visit_von is None or self.visit_bis is None:
             return True
-        minute = jetzt.hour * 60 + jetzt.minute
+        minute = jetzt.hour * _MINUTEN_JE_STUNDE + jetzt.minute
         if self.visit_von <= self.visit_bis:
             return self.visit_von <= minute < self.visit_bis
         # ueber Mitternacht, z.B. 2200-0600
         return minute >= self.visit_von or minute < self.visit_bis
+
+    def restzeit_im_fenster(self, jetzt: datetime) -> Optional[float]:
+        """Wie viele Sekunden das Besuchsfenster von `jetzt` an noch offen ist.
+
+        DREI ANTWORTEN, UND ZWEI DAVON WERDEN GERN VERWECHSELT (Clean Code 3
+        und 4):
+
+          * `None` - dieser Host hat gar kein Fenster. Das ist KEIN Wert und
+            keine Null: es gibt nichts zu deckeln.
+          * `0.0` - das Fenster ist zu. Hier ist die Null eine Aussage
+            ("keine Sekunde mehr"), deshalb steht sie da.
+          * sonst die Sekunden bis zum Fensterende.
+
+        Gerechnet wird auf die Sekunde genau, nicht auf die Minute: ein
+        Deckel, der eine Minute zu spaet zuschlaegt, laesst genau den Abruf
+        hinaus, den dieses Fenster verbietet.
+        """
+        if self.visit_von is None or self.visit_bis is None:
+            return None
+        if not self.im_fenster(jetzt):
+            return 0.0
+        minute_jetzt = (jetzt.hour * _MINUTEN_JE_STUNDE + jetzt.minute
+                        + jetzt.second / _SEKUNDEN_JE_MINUTE)
+        bis = float(self.visit_bis)
+        if bis <= minute_jetzt:
+            # Fenster ueber Mitternacht (z.B. 2200-0600) und wir stehen im
+            # Abendteil: das Ende liegt am naechsten Tag.
+            bis += _MINUTEN_JE_TAG
+        return (bis - minute_jetzt) * _SEKUNDEN_JE_MINUTE
 
     @property
     def fenster_text(self) -> str:
@@ -206,8 +252,14 @@ class RobotsWaechter:
 
     def darf(self, url: str, jetzt: Optional[datetime] = None) -> tuple[bool, str]:
         """(darf abgerufen werden, Grund). Der Grund steht auf der
-        Quellenseite - er ist kein Log-Text, sondern Anzeige."""
-        jetzt = jetzt or datetime.now(timezone.utc)
+        Quellenseite - er ist kein Log-Text, sondern Anzeige.
+
+        `jetzt` ist der Zeitpunkt DIESES Abrufs, nicht der eines Laufs. Wer
+        hier den Startzeitpunkt eines stundenlangen Laufs einsetzt, prueft
+        ein Fenster, das laengst zu sein kann (siehe `_laufuhr` im Collector).
+        """
+        if jetzt is None:
+            jetzt = datetime.now(timezone.utc)
         regeln = self.regeln(url)
         if not regeln.abrufbar:
             return (False, regeln.fehler or "robots.txt nicht lesbar")
@@ -215,9 +267,19 @@ class RobotsWaechter:
             return (False, f"per robots.txt gesperrt: {_pfad_von(url)}")
         if not regeln.im_fenster(jetzt):
             return (False, "ausserhalb der Besuchszeit laut robots.txt "
-                           f"({regeln.fenster_text}, Lauf um "
+                           f"({regeln.fenster_text}, Abruf um "
                            f"{jetzt.hour:02d}:{jetzt.minute:02d} UTC)")
         return (True, "")
+
+    def restzeit_im_fenster(self, url: str,
+                            jetzt: datetime) -> Optional[float]:
+        """Restzeit des Besuchsfensters dieses Hosts - `None` ohne Fenster.
+
+        Der Collector fragt den Waechter und nicht das Regelwerk hinter ihm
+        (Law of Demeter, G36); die robots.txt liegt an dieser Stelle laengst
+        im Cache, der Deckel kostet also keinen zweiten Abruf.
+        """
+        return self.regeln(url).restzeit_im_fenster(jetzt)
 
     def abstand(self, url: str, mindestens: float = 0.0) -> float:
         """Der einzuhaltende Abstand zweier Abrufe: der GROESSERE Wert aus

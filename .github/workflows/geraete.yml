@@ -38,9 +38,37 @@ name: Geraete- und Preisradar
 
 on:
   schedule:
-    # 03:10 UTC, taeglich. Mitten im Besuchsfenster und weit weg von der
-    # vollen Stunde, zu der halb GitHub seine Cronjobs startet.
-    - cron: "10 3 * * *"
+    # 02:17 UTC, taeglich - NICHT 03:10 (geaendert 22.09.2026, P1).
+    #
+    # Der Termin ist eine Bitte, kein Versprechen: GitHub startet geplante
+    # Laeufe verspaetet, wenn die Warteschlange voll ist. An elf gemessenen
+    # Tagen lag dieser Lauf zwischen 4 h 41 und 5 h 40 hinter seinem
+    # Termin und startete damit zwischen 07:51 und 08:50 UTC - also fast
+    # immer HINTER dem Besuchsfenster 02:00-08:00, fuer das dieser
+    # Workflow ueberhaupt existiert. Das ist der Grund, warum medimax.de
+    # und ep.de nur an einer Handvoll Tage Daten haben: an genau den
+    # Tagen, an denen der Lauf ausnahmsweise vor 08:00 begann.
+    #
+    # 02:17 ist so gewaehlt, dass der gemessene Verzug den START ins
+    # Fenster legt: ohne Verzug 02:17, mit dem groessten gemessenen
+    # Verzug 07:57. Die krumme Minute meidet zusaetzlich die volle
+    # Stunde, zu der halb GitHub seine Cronjobs startet.
+    #
+    # DER TERMIN ALLEIN REICHT NICHT, und das steht hier, damit es
+    # niemand fuer erledigt haelt: der Lauf crawlt nach dem Start noch
+    # bis zu `--frist` Sekunden weiter, und medimax/ep kommen erst an
+    # Position 4 und 5 der Anbieterreihenfolge. Verzug (340 min) plus
+    # Crawlfrist (25 min) sind 365 min - breiter als das Fenster selbst
+    # (360 min). Es gibt also KEINEN Cron-Wert, der allein garantiert,
+    # dass auch der letzte Abruf noch vor 08:00 liegt.
+    #
+    # Getragen wird die Zusage deshalb vom Code, nicht von diesem
+    # Termin: die Fensterpruefung gilt je Abruf - in der Sammelphase
+    # (`collect/geraete/__init__.py`, `Abrufschleuse`) ebenso wie in den
+    # Nachbearbeitungs-Haken danach (`nachsammle_buendel`) -, und die
+    # Sammelfrist wird gegen das Fensterende gedeckelt. Wer hier etwas
+    # verschiebt, prueft beides mit.
+    - cron: "17 2 * * *"
   workflow_dispatch:
     inputs:
       frist:
@@ -274,3 +302,40 @@ jobs:
             sleep 30
           done
           echo "Render hook nicht erreichbar - die Seite liegt im Repo, nur nicht live."
+
+      # DER ABDECKUNGSWAECHTER MELDET SICH (P1/C2, 22.09.2026).
+      #
+      # Er steht GANZ AM ENDE, hinter Bestand, Seite und Deploy-Hook, und
+      # das ist dieselbe Reihenfolge-Lehre wie bei "Commit state": ein
+      # Mailserver, der nicht antwortet, darf keinen Messtag und keine
+      # Seite kosten. Die Alarme selbst sind zu diesem Zeitpunkt laengst
+      # im Bestand - der Schritt rechnet nichts nach, er liest
+      # `GeraeteDB.ausfall_alarme()`, dieselbe Funktion, die Lauf und
+      # Quellenseite lesen.
+      #
+      # OHNE `continue-on-error`: ein Alarmkanal, der still nicht
+      # zustellt, ist genau die Fehlerklasse, gegen die dieser Waechter
+      # gebaut ist ("50 Laeufe gruen, sechs Tage ohne Telekom-Zeile").
+      # Fehlen die SMTP-Secrets, faellt der Schritt rot aus und sagt
+      # warum. Ohne Alarm geht keine Mail hinaus - eine taegliche "alles
+      # in Ordnung"-Mail ist nach zwei Wochen ein Postfachfilter.
+      #
+      # Die Zugangsdaten stehen NUR hier in der Umgebung: die Sammelstufe,
+      # die gegen fremde Hosts spricht, sieht sie nie.
+      #
+      # `if: always()` - und das ist keine Kosmetik: ohne diese Zeile fiele
+      # die Abdeckungsmail genau an dem Tag aus, an dem ein Schritt davor
+      # scheitert. Das ist der Tag, an dem sie am noetigsten ist. Der
+      # Schritt liest nur den Bestand; scheitert er selbst (kein Messtag,
+      # Zustellfehler), faellt der Job weiterhin rot aus.
+      - name: Abdeckungsalarme melden
+        if: always()
+        env:
+          PYTHONPATH: src
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+        run: python scripts/geraete_abdeckung_mail.py --root .

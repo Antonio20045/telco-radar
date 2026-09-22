@@ -17,7 +17,7 @@ Telco Radar ist ein automatisches Competitive-Intelligence-System für Vodafone-
 - Website: https://telco-radar.onrender.com (Render Static Site, Publish-Verzeichnis `site/`).
 - Repo: https://github.com/Antonio20045/telco-radar (öffentlich).
 - `radar.yml` läuft Mi und Fr 11:00 UTC sowie manuell, committet `data/` und `site/` und löst den Render-Deploy-Hook aus.
-- `geraete.yml` läuft täglich 03:10 UTC und pflegt den Gerätestand.
+- `geraete.yml` läuft täglich 02:17 UTC und pflegt den Gerätestand.
 - `ci.yml` führt bei jedem Push auf `main` und bei Pull Requests `pytest -q` aus.
 - Ein Push auf `main` ist kein Deploy; erst Bot-Commit plus Render-Hook bringen einen neuen Live-Stand.
 - Den Live-Stand bestätigt nur das ausgelieferte HTML (`curl -L -sS …/index.html`), nicht ein grüner Actions-Status.

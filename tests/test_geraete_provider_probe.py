@@ -24,13 +24,13 @@ ZWEI ALARME, ZWEI FÄLLE (S2-1: welcher greift wann)
 ---------------------------------------------------
 - Preisblock tot, Antwort da (monthlyPrice komplett weg): o2 liefert
   seine LISTUNGEN ueber den hwOnly-Pfad weiter, `funde` bleibt > 0 -
-  der 7-Tage-Ausfallalarm (`test_geraete_ausfall_alarm.py`) bleibt
-  dauerhaft stumm. DIESE Probe ist der einzige Kanal, der den Fall
-  meldet (Test unten: 0 % WARNING mit Ebene "monthlyPrice").
+  der Abdeckungswaechter (`test_geraete_abdeckung.py`) bleibt dauerhaft
+  stumm. DIESE Probe ist der einzige Kanal, der den Fall meldet (Test
+  unten: 0 % WARNING mit Ebene "monthlyPrice").
 - GAR keine Antwort mehr: auch die Listungen bleiben aus -> Funde 0 ->
-  ab dem 7. beobachteten Tag loest der Ausfallalarm aus
-  (`test_geraete_ausfall_alarm.py::test_sieben_tage_null_funde_loesen_
-  den_alarm_aus` deckt genau diesen Weg).
+  der Vortagsvergleich schlaegt am naechsten Tag an
+  (`test_geraete_abdeckung.py::test_wer_gestern_lieferte_und_heute_
+  nichts_liefert_alarmiert` deckt genau diesen Weg).
 """
 import json
 import logging
