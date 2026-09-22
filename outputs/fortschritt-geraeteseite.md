@@ -767,3 +767,27 @@ belegbar, congstar lädt sie per JavaScript nach; belegt sind Volumina und Zusag
 **Offen:** Punkt 2 (Telekom-Tarifsätze am Netz belegen) bleibt hinter der
 Challenge; die Hälfte davon — schlägt die Vorrangregel aus `tarif_bezug.py` bis in
 die Bündelkarten durch? — ist ohne Netz prüfbar. Punkte 4–7, 9, 10 unverändert.
+
+**Nachtrag 22.09.: auch Punkt 2 und Punkt 6 sind kein Defekt, sondern ein
+fehlender Lauf.** Beide zeigten dasselbe Muster, und beide sind gemessen:
+
+- Punkt 6: alle 4353 Zeilen in `geraete_tco_historie.jsonl` tragen vier
+  Segmente ohne Laufzeit; die heutige Kette erzeugt fünf
+  (`buendel--congstar--304327--allnet-flat-m--24m` gegen `--36m`). Adapter
+  liefert beide Laufzeiten (echte SKUs aus der Fixture), `_mit_sku()` ist 1:1,
+  `laufzeit_segment` unterscheidet, der Store hält beide.
+- Punkt 2: dieselben Daten, nur anderer Code. `site/geraete.html` (gerendert
+  am 21.09.) zeigt „MagentaMobil S · 6 GB"; derselbe Bestand mit dem heutigen
+  Code in einen Wegwerfordner gerendert zeigt „MagentaMobil S · 30 GB". Die
+  Vorrangregel aus `tarif_bezug.py:146–148` wirkt; behoben hat es der
+  P0-B-Commit `ac80e83` („je_id_aktuell auch unter der eigenen tarif_id
+  erreichbar").
+
+Gemeinsame Ursache: P0-B lag bis heute nicht auf main, und `geraete.yml` hat
+seit dem Merge nicht gelaufen. **Wer diese Punkte als Defekt baut, baut einen
+intakten Weg um.** Die Messung, die beide abschließt, ist der erste
+Produktionslauf mit P0-B.
+
+Nebenbefund zum Betrieb: am 22.09. war um 08:13 UTC noch kein `geraete.yml`-Lauf
+gestartet (letzter: 21.09., 08:50 UTC). Der 03:10-Cron ist damit erneut über
+fünf Stunden im Verzug — der P1-Befund aus dem Auftragsdokument bestätigt sich.
