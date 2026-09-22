@@ -2854,14 +2854,34 @@ def gw_seite(tmp_path_factory) -> dict:
 
 
 # Der Pflichtfall des Auftrags: congstar Allnet Flat XS zum iPhone 17 Pro
-# 256 GB - 1 + 24 x 15,00 + 36 x 30,50 + 0 = 1.459,00 EUR.
+# 256 GB - Finanzierung 1.098,00 EUR, Zuzahlung 1,00 EUR, Tarif 15,00 EUR,
+# Anschlusspreis 0,00 EUR: 1 + 24 x 15,00 + 1.098,00 = 1.459,00 EUR.
+#
+# NACHGEZOGEN AM 22.09.2026 (Bot-Commit b78c0fa, Lauf 51 mit P0-B): der
+# Pflichtfall traegt seither ZWEI Zahlweisen desselben Tarifs. Die
+# Leitzahl aendert sich dadurch NICHT - congstar finanziert zum Nulltarif,
+# 24 x 45,75 EUR und 36 x 30,50 EUR sind beide 1.098,00 EUR -, wohl aber
+# die Restschuld: die 24er traegt nach Monat 24 nichts mehr offen, die
+# 36er 12 x 30,50 = 366,00 EUR. Deshalb liefert dieser Helfer nicht mehr
+# "irgendein Buendel" (`kandidaten[0]`, dessen Laufzeit von der Reihen-
+# folge des Stores abhing), sondern die Buendel JE LAUFZEIT.
 _GW_PFLICHT_SKU = "apple-iphone-17-pro-256gb"
 _GW_PFLICHT_ANBIETER = "congstar"
 _GW_PFLICHT_TARIF = "Allnet Flat XS"
+# EXAKTE ANKER, keine Untergrenzen: Ratenzahl -> Monatsrate IN CENT
+# (Geld rechnet dieser Abschnitt in ganzen Cent, siehe `_gw_cent`; ein
+# Vergleich auf der float-Schreibweise haette 30.5 gegen "30.50"
+# gestellt). Eigene Rechnung aus `data/state/geraete_tco_historie.jsonl`
+# (Messung 2026-09-22): 24 x 45,75 = 1.098,00 und 36 x 30,50 = 1.098,00.
+# Faellt eine der beiden weg, faellt dieser Anker - das ist die Meldung.
+_GW_PFLICHT_RATEN = {24: 4575, 36: 3050}
 
 
 def _gw_pflichtbuendel(tco: dict, blaetter: dict) -> tuple:
-    """(soll_cent, ein Bündel, {Abruftage}) - alle Farben rechnen gleich."""
+    """(soll_cent, {Laufzeit: Bündel}, {Abruftage}).
+
+    Alle Farben UND alle Zahlweisen rechnen auf dieselbe Leitzahl; das
+    wird hier geprüft, nicht vorausgesetzt."""
     kandidaten = [b for b in tco["buendel"]
                   if b["sku_id"].startswith(_GW_PFLICHT_SKU)
                   and b["anbieter"] == _GW_PFLICHT_ANBIETER
@@ -2874,8 +2894,23 @@ def _gw_pflichtbuendel(tco: dict, blaetter: dict) -> tuple:
     werte = {_gw_leitzahl(b, blaetter)[0] for b in kandidaten}
     assert None not in werte and len(werte) == 1, (
         f"Farben des Pflichtfalls rechnen verschieden: {werte}")
+    je_laufzeit: dict = {}
+    for b in kandidaten:
+        vorher = je_laufzeit.setdefault(b["laufzeit_monate"], b)
+        assert _gw_cent(vorher["geraet_monatsrate"]) \
+            == _gw_cent(b["geraet_monatsrate"]), (
+            f"zwei Raten für dieselbe Laufzeit {b['laufzeit_monate']}: "
+            f"{vorher['geraet_monatsrate']} gegen {b['geraet_monatsrate']}")
+    ist_raten = {n: _gw_cent(b["geraet_monatsrate"])
+                 for n, b in sorted(je_laufzeit.items())}
+    assert ist_raten == _GW_PFLICHT_RATEN, (
+        f"Zahlweisen des Pflichtfalls sind {ist_raten}, verankert ist "
+        f"{_GW_PFLICHT_RATEN} (gemessen 22.09.2026). MEHR: die "
+        "Erfassungslücke schliesst sich weiter - nachrechnen und den "
+        "Anker samt Datum nachziehen. WENIGER: eine Zahlweise ist "
+        "verlorengegangen, das ist ein Fehler und wird behoben.")
     tage = {b.get("abgerufen_am", "") for b in kandidaten}
-    return werte.pop(), kandidaten[0], tage
+    return werte.pop(), je_laufzeit, tage
 
 
 def test_leitzahl_congstar_xs_iphone17pro256_am_bestand(gw_seite):
@@ -2883,9 +2918,19 @@ def test_leitzahl_congstar_xs_iphone17pro256_am_bestand(gw_seite):
     Antwort-Satz und Rechenweg im (Modell, Band)-Paar des Fragments -
     das Fragment gehört zum selben Render und trägt ALLE Paare - und,
     wenn der Server-First-Paint gerade mit diesem Paar startet, auch
-    dessen Antwort-Satz und Bündelzeile."""
+    dessen Antwort-Satz und Bündelzeile.
+
+    NACHGEZOGEN AM 22.09.2026: der Pflichtfall trägt seit Lauf 51 zwei
+    Zahlweisen (24 x 45,75 EUR und 36 x 30,50 EUR). Die Leitzahl bleibt
+    1.459,00 EUR - congstar finanziert zum Nulltarif, beide Wege summieren
+    auf dieselben 1.098,00 EUR Finanzierung. Geändert hat sich NUR, welche
+    Zahlweise der Rechenweg der jüngsten Messung nennt: die Zeitreihe führt
+    je (Anbieter, Tag) ein Bündel, und bei zwei Zeiträumen am selben Tag
+    gewinnt der des Horizonts (24). Vorher verglich dieser Test gegen
+    `kandidaten[0]` - ein Bündel, dessen Laufzeit die Store-Reihenfolge
+    bestimmte; das war eine Wette, kein Anker."""
     tco, blaetter, _db = _gw_rohdaten()
-    soll_cent, buendel, _tage = _gw_pflichtbuendel(tco, blaetter)
+    soll_cent, je_laufzeit, _tage = _gw_pflichtbuendel(tco, blaetter)
 
     # 1) Der Anker: der Pflichtwert aus dem Auftrag. Bei einem Bot-Commit,
     #    der die congstar-Posten ändert, wird DIESER Assert bewusst rot -
@@ -2939,11 +2984,58 @@ def test_leitzahl_congstar_xs_iphone17pro256_am_bestand(gw_seite):
         f"Rechenweg-Summe {summe} != Summe der Posten {sum(teile)}")
     _gw_vergleiche(summe, soll_cent,
                    f"Pflichtfall, Rechenweg-Summe (Messung {messtag})")
+    # Die Zahlweise, die der Rechenweg nennt, muss eine SEIN, die der
+    # Bestand trägt - Ratenzahl UND Rate, nicht nur die Summe. Eine
+    # erfundene Rate fällt hier auf, auch wenn sie sich zu 1.098,00 EUR
+    # aufaddiert.
+    n_raten = posten["Geräterate"][1]
+    assert n_raten in je_laufzeit, (
+        f"Rechenweg nennt {n_raten} Geräteraten - der Bestand kennt zum "
+        f"Pflichtfall nur {sorted(je_laufzeit)}")
+    buendel = je_laufzeit[n_raten]
     # Tarif-Posten: 24 Monate, zum gemessenen Tarifpreis
     assert posten["Tarif"][1] == 24 and \
         posten["Tarif"][2] == _gw_Dez(str(buendel["tarif_monatlich"]))
-    assert posten["Geräterate"][1] == buendel["laufzeit_monate"] and \
-        posten["Geräterate"][2] == _gw_Dez(str(buendel["geraet_monatsrate"]))
+    assert posten["Geräterate"][2] \
+        == _gw_Dez(str(buendel["geraet_monatsrate"])), (
+        f"Rechenweg rechnet mit {posten['Geräterate'][2]} € je Rate, der "
+        f"Bestand misst {buendel['geraet_monatsrate']} € für "
+        f"{n_raten} Raten")
+    # ANKER (22.09.2026): bei zwei Zahlweisen am selben Tag führt die
+    # Zeitreihe die des Horizonts (`geraete_zeitreihe`: "Bei zwei
+    # Zeitraeumen am selben Tag gewinnt der des Horizonts"). Der
+    # Pflichtfall trägt seit Lauf 51 beide, also muss hier 24 stehen.
+    # Fällt der Bestand auf eine Zahlweise zurück, fällt schon
+    # `_GW_PFLICHT_RATEN` - dieser Assert bleibt dann stumm und fängt
+    # nur den Fall ab, dass die Auswahl selbst kippt.
+    assert n_raten == _GW_HORIZONT, (
+        f"Rechenweg der jüngsten Messung nennt {n_raten} Raten; bei zwei "
+        f"Zahlweisen führt die Zeitreihe die über {_GW_HORIZONT} Monate")
+
+    # 3b) Die ZWEITE Zahlweise darf nicht still verschwinden: beide
+    #     Ratenlaufzeiten des Pflichtfalls stehen als eigene Bündelzeile
+    #     auf der Seite, jede mit IHRER Rate und derselben Leitzahl.
+    #     (Das verlangt `test_pf_bestand_zaehlt_seine_ratenlaufzeiten_...`
+    #     ausdrücklich, seit der Bestand zwei Laufzeiten trägt.)
+    #     Die zwei Dokumente bleiben GETRENNT durchsucht (Warnung der
+    #     Fixture): aneinandergehaengt verschoeben sich Blockgrenzen.
+    gezeigt = {}
+    for dok in (gw_seite["geraete"], gw_seite["buendel"]):
+        for roh in re.findall(
+                r'<details class="gr-bnd"[^>]*data-anbieter="congstar"'
+                r'[^>]*data-band="klein"[^>]*>(.*?)</details>', dok, re.S):
+            klar = " ".join(re.sub(r"<[^>]+>", " ", roh).split())
+            if f"{_GW_PFLICHT_TARIF} ·" not in klar \
+                    or "1.459,00 €" not in klar:
+                continue
+            for n, rate in re.findall(
+                    r"in (\d+) Raten à ([\d.,]+) €", klar):
+                gezeigt[int(n)] = _gw_dezimal(rate)
+    assert gezeigt == {n: _gw_Dez(c) / 100
+                       for n, c in _GW_PFLICHT_RATEN.items()}, (
+        f"die Seite zeigt zum Pflichtfall die Zahlweisen {gezeigt}, der "
+        f"Bestand trägt {_GW_PFLICHT_RATEN}. Eine Zahlweise, die der "
+        "Bestand misst und die Seite verschweigt, ist ein Datenverlust")
 
     # 4) First Paint: der Server-Startblock - derselbe Pflichtfall wie im
     #    Fragment. Der Start fällt aus den Daten und darf wechseln; damit
@@ -2987,26 +3079,86 @@ def test_monatsschnitt_und_restschuld_des_pflichtfalls_am_bestand(gw_seite):
     nach Monat 24 noch zu zahlen' im Rechenweg und 'danach noch offen' in
     der Bündelkarte - plus die gekappte Zahl 'nach 24 Monaten gezahlt',
     die seit A1 NUR noch unter diesem Label stehen darf (die alte,
-    1.093,00 €-Leitzahl war genau um die Restschuld zu niedrig)."""
+    1.093,00 €-Leitzahl war genau um die Restschuld zu niedrig).
+
+    NACHGEZOGEN AM 22.09.2026: der Pflichtfall trägt seit Lauf 51 zwei
+    Zahlweisen, und die Restschuld ist die EINZIGE Zahl, die sie
+    unterscheidet - 36 x 30,50 lassen nach Monat 24 noch 366,00 € offen,
+    24 x 45,75 nichts. Die Leitzahl (1.459,00 €) und der Ø/Monat sind in
+    beiden Fällen dieselben. Der Test verankert deshalb BEIDE Rechnungen
+    und verlangt die Restschuld genau dort, wo es eine gibt: ein "davon
+    nach Monat 24 noch zu zahlen" unter einer 24-Raten-Zahlweise wäre
+    eine erfundene Schuld, sein Fehlen unter 36 Raten ein Datenverlust."""
     tco, blaetter, _db = _gw_rohdaten()
-    soll_cent, buendel, _tage = _gw_pflichtbuendel(tco, blaetter)
-    rest_c = _gw_cent(buendel["geraet_monatsrate"]) * max(
-        0, buendel["laufzeit_monate"] - _GW_HORIZONT)
-    gezahlt_c = soll_cent - rest_c
-    assert (soll_cent, rest_c, gezahlt_c) == (145900, 36600, 109300)
+    soll_cent, je_laufzeit, _tage = _gw_pflichtbuendel(tco, blaetter)
+
+    def _rest(n: int) -> int:
+        return _gw_cent(je_laufzeit[n]["geraet_monatsrate"]) \
+            * max(0, n - _GW_HORIZONT)
+
+    # EXAKTE ANKER je Zahlweise: (Leitzahl, Restschuld, bis Monat 24
+    # gezahlt) - eigene Rechnung aus den Rohdaten, nicht von der Seite.
+    assert {n: (soll_cent, _rest(n), soll_cent - _rest(n))
+            for n in sorted(je_laufzeit)} == {
+        24: (145900, 0, 145900), 36: (145900, 36600, 109300)}
 
     block = _gw_paar_block(gw_seite["fragment"],
                            "apple-iphone-17-pro-256", "klein")
     _messtag, inhalt = _gw_neueste_vorlage(block, _GW_PFLICHT_ANBIETER)
+    n_raten = int(re.search(
+        r"<span class='gr-zr-pn'>Geräterate</span>.*?(\d+) × ",
+        inhalt, re.S).group(1))
+    assert n_raten in je_laufzeit, (
+        f"Rechenweg nennt {n_raten} Geräteraten, der Bestand kennt "
+        f"{sorted(je_laufzeit)}")
+    buendel = je_laufzeit[n_raten]
+    rest_c = _rest(n_raten)
+    gezahlt_c = soll_cent - rest_c
     offen = re.search(
         r"davon nach Monat 24 noch zu zahlen: (\d+) × ([\d.,]+) € "
         r"= ([\d.,]+) €", inhalt)
-    assert offen, "Rechenweg nennt die Restschuld nicht"
-    assert int(offen.group(1)) == buendel["laufzeit_monate"] - 24
-    assert _gw_dezimal(offen.group(2)) \
-        == _gw_Dez(str(buendel["geraet_monatsrate"]))
-    _gw_vergleiche(_gw_dezimal(offen.group(3)), rest_c,
-                   "Restschuld im Rechenweg des Pflichtfalls")
+    if rest_c:
+        assert offen, (
+            f"Rechenweg der {n_raten}-Raten-Zahlweise nennt die "
+            f"Restschuld nicht - offen sind {rest_c / 100} €")
+        assert int(offen.group(1)) == n_raten - _GW_HORIZONT
+        assert _gw_dezimal(offen.group(2)) \
+            == _gw_Dez(str(buendel["geraet_monatsrate"]))
+        _gw_vergleiche(_gw_dezimal(offen.group(3)), rest_c,
+                       "Restschuld im Rechenweg des Pflichtfalls")
+    else:
+        assert offen is None, (
+            f"Rechenweg nennt eine Restschuld ({offen.group(3)} €), "
+            f"obwohl {n_raten} Raten in {_GW_HORIZONT} Monaten bezahlt "
+            "sind - eine erfundene Schuld")
+
+    # Die ANDERE Zahlweise darf ihre Restschuld nicht verlieren: sie
+    # steht im Rechenweg ihres letzten eigenen Messtags. Ohne diesen
+    # Zweig prüfte der Test seit dem 22.09. keine Restschuld mehr.
+    rest_geprueft = 0
+    for n in sorted(je_laufzeit):
+        if n == n_raten or not _rest(n):
+            continue
+        muster = (f"Geräterate</span>", f"{n} × ")
+        for _anb, _m, roh in re.findall(
+                r"<template data-anb='([^']+)' data-m='([^']+)'[^>]*>"
+                r"(.*?)</template>", block, re.S):
+            if _anb != _GW_PFLICHT_ANBIETER or not all(
+                    t in roh for t in muster):
+                continue
+            treffer = re.search(
+                r"davon nach Monat 24 noch zu zahlen: (\d+) × "
+                r"([\d.,]+) € = ([\d.,]+) €", roh)
+            assert treffer, (
+                f"Rechenweg vom {_m} nennt {n} Raten, aber keine "
+                f"Restschuld - {_rest(n) / 100} € fallen unter den Tisch")
+            _gw_vergleiche(_gw_dezimal(treffer.group(3)), _rest(n),
+                           f"Restschuld der {n}-Raten-Zahlweise ({_m})")
+            rest_geprueft += 1
+    assert rest_geprueft >= 1, (
+        "keine Restschuld geprüft - trägt der Bestand nur noch die "
+        f"{n_raten}-Raten-Zahlweise, fällt schon `_GW_PFLICHT_RATEN`; "
+        "sonst hat das Fragment seine älteren Messungen verloren")
 
     # First Paint (Karte): der Startblock - mit Zaehler, damit ein
     # anderes Startpaar die Ausweisungs-Prüfung nicht still überspringt.
@@ -3014,26 +3166,54 @@ def test_monatsschnitt_und_restschuld_des_pflichtfalls_am_bestand(gw_seite):
     # paarungebunden geprüft und fällt nicht mit dem Startfall um.
     titel = re.search(r'class="gr-bnd-titel"[^>]*>([^<]+)<',
                       gw_seite["geraete"])
+    # Seit dem 22.09. trägt der Startblock ZWEI congstar/klein-Zeilen je
+    # Tarif (24 und 36 Raten). Geprüft wird JEDE Pflichttarif-Zeile
+    # gegen die Rechnung IHRER Ratenzahl - `re.search` nahm die erste
+    # und hätte die zweite still übersprungen.
     fp_geprueft = 0
     if titel and "Apple iPhone 17 Pro 256 GB" in titel.group(1):
-        fp_geprueft += 1
-        zeile = re.search(
-            r'<details class="gr-bnd"[^>]*data-anbieter="congstar"'
-            r'[^>]*data-band="klein"[^>]*>(.*?)</details>',
-            gw_seite["geraete"], re.S)
-        text = " ".join(re.sub(r"<[^>]+>", " ", zeile.group(1)).split())
-        m = re.search(r"nach 24 Monaten gezahlt: ([\d.,]+) € · "
-                      r"danach noch offen: ([\d.,]+) € \((\d+) Geräteraten\)",
-                      text)
-        assert m, f"Bündelkarte ohne Ausweisung: {text[:160]!r}"
-        _gw_vergleiche(_gw_dezimal(m.group(1)), gezahlt_c,
-                       "'nach 24 Monaten gezahlt'")
-        _gw_vergleiche(_gw_dezimal(m.group(2)), rest_c,
-                       "'danach noch offen'")
-        assert int(m.group(3)) == buendel["laufzeit_monate"] - 24
-        # Die gekappte Zahl darf nicht mehr als Leitzahl herhalten: ihr
-        # Label muss das Kappen benennen (A1-Regel).
-        assert "nach 24 Monaten gezahlt" in text
+        for roh in re.findall(
+                r'<details class="gr-bnd"[^>]*data-anbieter="congstar"'
+                r'[^>]*data-band="klein"[^>]*>(.*?)</details>',
+                gw_seite["geraete"], re.S):
+            text = " ".join(re.sub(r"<[^>]+>", " ", roh).split())
+            raten = re.search(r"in (\d+) Raten à ([\d.,]+) €", text)
+            if f"{_GW_PFLICHT_TARIF} ·" not in text or not raten:
+                continue
+            n = int(raten.group(1))
+            if n not in je_laufzeit:
+                continue
+            fp_geprueft += 1
+            assert _gw_dezimal(raten.group(2)) \
+                == _gw_Dez(_GW_PFLICHT_RATEN[n]) / 100, (
+                f"Bündelzeile nennt {raten.group(2)} € je Rate, verankert "
+                f"sind {_GW_PFLICHT_RATEN[n]} Cent")
+            m = re.search(r"nach 24 Monaten gezahlt: ([\d.,]+) € · "
+                          r"danach noch offen: ([\d.,]+) € "
+                          r"\((\d+) Geräteraten\)", text)
+            if _rest(n):
+                assert m, f"Bündelkarte ohne Ausweisung: {text[:160]!r}"
+                _gw_vergleiche(_gw_dezimal(m.group(1)),
+                               soll_cent - _rest(n),
+                               f"'nach 24 Monaten gezahlt' ({n} Raten)")
+                _gw_vergleiche(_gw_dezimal(m.group(2)), _rest(n),
+                               f"'danach noch offen' ({n} Raten)")
+                assert int(m.group(3)) == n - _GW_HORIZONT
+            else:
+                assert m is None, (
+                    f"Bündelkarte weist {m.group(2)} € als offen aus, "
+                    f"obwohl {n} Raten in {_GW_HORIZONT} Monaten bezahlt "
+                    "sind")
+                assert re.search(r"nach 24 Monaten gezahlt: ([\d.,]+) €",
+                                 text), (
+                    "auch die voll bezahlte Zahlweise nennt die gekappte "
+                    f"Zahl unter ihrem Label: {text[:160]!r}")
+            # Die gekappte Zahl darf nicht mehr als Leitzahl herhalten:
+            # ihr Label muss das Kappen benennen (A1-Regel).
+            assert "nach 24 Monaten gezahlt" in text
+        assert fp_geprueft == len(je_laufzeit), (
+            f"{fp_geprueft} von {len(je_laufzeit)} Zahlweisen im First "
+            "Paint geprüft - eine Bündelzeile des Pflichttarifs fehlt")
     assert fp_geprueft >= 1, (
         "Server-First-Paint startet nicht mit dem Pflichtpaar - die "
         "Ausweisung 'nach 24 Monaten gezahlt / danach noch offen' wäre "
@@ -3855,9 +4035,20 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
         f"aus 12 Geraeteraten), gefunden: {offen}")
 
 
-# Der Stand des Bestands am 20.09.2026 (`data/state/geraete_tco.json`,
-# `updated` 2026-09-20), gemessen und nicht geschaetzt - Grundlage der
+# Der Stand des Bestands am 22.09.2026 (`data/state/geraete_tco.json`,
+# `updated` 2026-09-22), gemessen und nicht geschaetzt - Grundlage der
 # Aussage unten.
+#
+# NACHGEZOGEN AM 22.09.2026 (vorher: Stand 2026-09-20, congstar [36],
+# 0 Mehrlaufzeit-Gruppen). Grund: Lauf 51 vom 22.09. war der erste
+# Produktionslauf MIT P0-B - der congstar-Adapter liest seither beide
+# Zahlweisen desselben Tarifs, und der Buendelschluessel traegt die
+# Laufzeit (`...--allnet-flat-xs--24m` / `--36m`). Nachgerechnet, nicht
+# abgeschrieben: die 80 neuen 24-Monats-Buendel summieren auf DIESELBE
+# Leitzahl wie ihre 36-Monats-Geschwister (congstar finanziert zum
+# Nulltarif, Beispiel Pflichtfall 24 x 45,75 = 36 x 30,50 = 1.098,00 EUR),
+# und die Zahl der congstar-SKUs ist mit 10 unveraendert - es ist eine
+# zweite Zahlweise dazugekommen, kein Datensatz verlorengegangen.
 #
 # KEINE UNTERGRENZEN. Eine Untergrenze auf einer Zahl, die heute schon am
 # Boden steht, ist keine Zusicherung: `len(mehrfach) >= 0` ist fuer jede
@@ -3865,40 +4056,71 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
 # Lookup ins Leere laeuft, ist gruen und prueft nichts). Die Zahlen unten
 # sind deshalb EXAKTE ANKER: sie fallen in BEIDE Richtungen, und ein
 # Fallen ist die Meldung dieses Tests, kein Fehler (siehe Docstring).
-_PF_STAND_TAG = "2026-09-20"
-_PF_STAND_MEHRLAUFZEIT = 0        # Gruppen mit ZWEI Ratenlaufzeiten
-# Die Ratenlaufzeiten JE ANBIETER - der eigentliche Befund. Telekom, o2,
-# congstar und 1&1 tragen ausnahmslos 36 Monate; nur Vodafone kennt drei,
-# bindet sie aber je Tarifname an genau eine (Mobil S 12, Mobil M 24,
-# Mobil XS 36). Darum traegt trotz dreier Laufzeiten keine GRUPPE zwei.
+_PF_STAND_TAG = "2026-09-22"
+_PF_STAND_MEHRLAUFZEIT = 80       # Gruppen mit ZWEI Ratenlaufzeiten
+# Die Ratenlaufzeiten JE ANBIETER - der eigentliche Befund. Telekom, o2
+# und 1&1 tragen weiterhin ausnahmslos 36 Monate; congstar traegt seit
+# dem 22.09. 24 UND 36; Vodafone kennt drei, bindet sie aber je Tarifname
+# an genau eine (Mobil S 12, Mobil M 24, Mobil XS 36) - darum traegt trotz
+# dreier Laufzeiten keine VODAFONE-Gruppe zwei. Alle 80
+# Mehrlaufzeit-Gruppen sind congstar-Gruppen.
 _PF_STAND_LAUFZEITEN = {
     "1&1": [36], "Telekom": [36], "Vodafone": [12, 24, 36],
-    "congstar": [36], "o2": [36],
+    "congstar": [24, 36], "o2": [36],
 }
-_PF_MINDEST_GRUPPEN = 200         # Anti-Leerlauf, nicht der Stand (507)
+_PF_MINDEST_GRUPPEN = 200         # Anti-Leerlauf, nicht der Stand (509)
 
 
 def test_pf_bestand_zaehlt_seine_ratenlaufzeiten_und_haelt_die_luecke_fest():
     """BESTANDSAUSSAGE: was der echte Bestand an Ratenlaufzeiten traegt.
 
-    Stand am 20.09.2026 (`data/state/geraete_tco.json`, `updated`
-    2026-09-20, 792 Buendel), jede Zahl gemessen:
-      - 0 von 507 Gruppen (Anbieter, Modell, Tarif, Zustand) tragen ZWEI
-        Ratenlaufzeiten; 375 dieser Gruppen sind frisch.
+    Stand am 22.09.2026 (`data/state/geraete_tco.json`, `updated`
+    2026-09-22, 906 Buendel), jede Zahl gemessen (vorher 20.09.2026,
+    792 Buendel, 0 Mehrlaufzeit-Gruppen - siehe "WAS SICH GEAENDERT HAT"):
+      - 80 von 509 Gruppen (Anbieter, Modell, Tarif, Zustand) tragen ZWEI
+        Ratenlaufzeiten; alle 80 sind congstar und alle 80 sind frisch
+        (390 Gruppen sind frisch).
       - Je Anbieter: 1&1 nur 36 (74 Buendel), Telekom nur 36 (45),
-        congstar nur 36 (128), o2 nur 36 (72), Vodafone 12 (160), 24
-        (157) und 36 (156).
-      - Vodafone bindet die Laufzeit an den TARIF: Mobil S immer 12
-        (160 von 160), Mobil M immer 24 (157 von 157), Mobil XS immer 36
-        (156 von 156). Das sind nicht drei Angebote, das ist EINE
-        Laufzeit je Tarif - darum traegt auch bei Vodafone keine GRUPPE
+        o2 nur 36 (73), congstar 36 (136) UND 24 (80), Vodafone 12 (169),
+        24 (166) und 36 (163).
+      - congstar traegt die zweite Zahlweise ueber alle acht Tarife
+        gleichmaessig: Allnet Flat XS/S/M/L und ihre Flex-Varianten je
+        17 Buendel ueber 36 Monate und 10 ueber 24.
+      - Vodafone bindet die Laufzeit weiterhin an den TARIF: Mobil S
+        immer 12 (169 von 169), Mobil M immer 24 (166 von 166), Mobil XS
+        immer 36 (163 von 163). Das sind nicht drei Angebote, das ist
+        EINE Laufzeit je Tarif - darum traegt bei Vodafone keine GRUPPE
         zwei Laufzeiten, obwohl der Anbieter drei kennt.
       - 0 Buendel ohne gemessene Laufzeit.
-      - Die Historie sagt dasselbe ueber die Zeit: 3854 Zeilen, davon
-        1539 fuer 1&1 (586), o2 (518), congstar (400) und Telekom (35) -
-        AUSNAHMSLOS 36 Monate; Vodafone 2315 Zeilen, Mobil XS 36 in 741
-        von 741, Mobil S 12 in 819 von 819, Mobil M 24 in 755 von 755.
-        720 Historiengruppen, davon 0 mit zwei Laufzeiten.
+      - Die Historie sagt dasselbe ueber die Zeit: 4936 Zeilen, davon
+        1-1 (726), o2 (634) und Telekom (35) AUSNAHMSLOS 36 Monate;
+        congstar 560 Zeilen ueber 36 und 80 ueber 24 (alle 80 vom
+        22.09.2026); Vodafone 2901 Zeilen, 12/24/36 je an ihren Tarif
+        gebunden. 482 Historiengruppen, davon 80 mit zwei Laufzeiten -
+        auch hier ausschliesslich congstar.
+
+    WAS SICH GEAENDERT HAT (22.09.2026, Lauf 51 - der erste
+    Produktionslauf mit P0-B): congstar liefert seither beide Zahlweisen
+    desselben Tarifs, und der Buendelschluessel traegt die Laufzeit. Der
+    Test faellt damit in seine GUTE Richtung; nachgerechnet wurde, bevor
+    der Anker nachgezogen wurde:
+      - Die Zahl der congstar-SKUs ist mit 10 unveraendert (17.09.: 11,
+        20./21.09.: 10) - die 160 Historienzeilen vom 22.09. sind
+        10 SKUs x 8 Tarife x 2 Zahlweisen. Es ist nichts verlorengegangen.
+      - Die Leitzahl aendert sich NICHT: congstar finanziert zum
+        Nulltarif, der Finanzierungsbetrag ist in beiden Zahlweisen
+        derselbe (Pflichtfall iPhone 17 Pro 256 GB / Allnet Flat XS:
+        24 x 45,75 = 36 x 30,50 = 1.098,00 EUR; mit 1,00 EUR Zuzahlung,
+        24 x 15,00 EUR Tarif und 0,00 EUR Anschlusspreis in beiden
+        Faellen 1.459,00 EUR).
+      - Die Seite ZEIGT beide: der Server-First-Paint fuehrt zum
+        Startpaar (Apple iPhone 17 Pro 256 GB, Band klein) zwei
+        congstar-Buendelzeilen je Tarif, "1.098,00 EUR in 36 Raten a
+        30,50 EUR" und "1.098,00 EUR in 24 Raten a 45,75 EUR", beide mit
+        1.459,00 EUR Leitzahl. Geprueft wird das in
+        `test_leitzahl_congstar_xs_iphone17pro256_am_bestand` (Schritt 3b)
+        und `test_monatsschnitt_und_restschuld_des_pflichtfalls_am_bestand`
+        (First Paint, beide Zahlweisen).
 
     WARUM DAS SO IST: die Erhebung ist defensiv gebaut (der Schluessel
     traegt die Laufzeit, der congstar-Weg ist mit
@@ -3973,7 +4195,7 @@ def test_pf_bestand_zaehlt_seine_ratenlaufzeiten_und_haelt_die_luecke_fest():
 
     assert len(gruppen) >= _PF_MINDEST_GRUPPEN, (
         f"nur {len(gruppen)} Gruppen im Bestand vom {heute} - am "
-        f"{_PF_STAND_TAG} waren es 507 (375 frisch); der Scan greift ins "
+        f"{_PF_STAND_TAG} waren es 509 (390 frisch); der Scan greift ins "
         "Leere und dieser Test wuerde sonst gruen nichts pruefen")
     assert not ohne_laufzeit, (
         f"{len(ohne_laufzeit)} Buendel ohne gemessene Ratenlaufzeit "
@@ -4000,7 +4222,8 @@ def test_pf_bestand_zaehlt_seine_ratenlaufzeiten_und_haelt_die_luecke_fest():
     assert len(mehrfach) == _PF_STAND_MEHRLAUFZEIT, (
         f"{len(mehrfach)} von {len(gruppen)} Gruppen tragen zwei "
         f"Ratenlaufzeiten, am {_PF_STAND_TAG} waren es genau "
-        f"{_PF_STAND_MEHRLAUFZEIT} (von 507). MEHR: die Erfassungsluecke "
+        f"{_PF_STAND_MEHRLAUFZEIT} (von 509, alle congstar). MEHR: die "
+        "Erfassungsluecke "
         "schliesst sich - Anker mit Datum und Messung hochsetzen. "
         "WENIGER: eine Gruppe hat ihre zweite Laufzeit verloren, das ist "
         f"ein Fehler. Frisch: {len(frisch_mehrfach)} von "
