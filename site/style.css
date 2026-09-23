@@ -674,6 +674,9 @@ b,strong{font-weight:700}
 .sdot{width:8px;height:8px;display:inline-block;border-radius:50%}
 .sdot.ok{background:#1a7f4b}.sdot.empty{background:var(--r4)}
 .sdot.fail{background:var(--r5)}.sdot.quarantaene{background:var(--ink-4)}
+/* Keine Aussage: heute nicht gelesen. Hohl statt gefuellt - ein
+   grauer Vollpunkt saehe aus wie ein gemessener Dauerzustand. */
+.sdot.unbekannt{background:transparent;box-shadow:inset 0 0 0 2px var(--ink-4)}
 /* Die "neu"-Marke. Bis zum 08.08.2026 ein gefuellter Farbblock - Rot (und
    erst recht zwoelf Hebelfarben) als Flaeche widerspricht der Designsprache
    (CLAUDE.md §5). Jetzt eine Haarlinien-Kontur in Rot. */
@@ -2506,6 +2509,9 @@ b,strong{font-weight:700}
   color:var(--ink-4);margin-top:4px}
 .gr-einstiege a{color:var(--ink-3);text-decoration:none}
 .gr-einstiege a:hover{text-decoration:underline}
+/* Die benannte Luecke einer Quelle (tote Produktadressen): eine Angabe,
+   kein Alarm - deshalb gedaempft und nicht rot. */
+.gr-luecke{display:block;color:var(--ink-3);margin-top:2px}
 .gr-tiefe .gr-eigen .dz-balken-fuell{background:var(--red)}
 .gr-basis--duenn{color:var(--r4)}
 
