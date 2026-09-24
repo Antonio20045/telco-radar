@@ -49,7 +49,7 @@ import re
 from datetime import date as _datum
 from typing import Optional
 
-from . import geraete_vergleich
+from . import anbieter_farben, geraete_vergleich
 from .geraete_tco_grafik import anbieter_slug
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
 from ..tarif_model import Preisphase
@@ -605,6 +605,79 @@ def _bestandteile_mit_kategorie(kennzahl) -> list:
     return posten
 
 
+# D3 (Phase P2, Zerlegungsbalken der Bündelzeile): die Segmente kommen
+# AUSSCHLIESSLICH aus `_bestandteile_mit_kategorie()` und `Tco.restbetrag`
+# (Clean Code 1 - keine zweite Rechnung). `restbetrag` ist in `tco_24()`
+# kein eigener Posten, sondern der Anteil EINES vorhandenen Postens
+# (Geräteraten oder Bündelbetrag), der erst nach Monat 24 fällig wird -
+# der Balken teilt genau dieses eine Segment in einen fälligen und einen
+# offenen (schraffierten) Teil. Jedes andere Segment bleibt ganz. Die
+# Summe der Segmentbeträge ist dadurch immer exakt `kennzahl.gesamt`:
+# `faellig + offen == betrag` per Konstruktion, und kein Segment wird neu
+# addiert.
+_ZERLEGUNG_RATENKATEGORIEN = ("raten", "buendel")
+LABEL_RESTSCHULD = "Restschuld nach Monat 24"
+
+
+def zerlegung_balken(bestandteile: list, restbetrag: Optional[float],
+                     gesamt: Optional[float]) -> list:
+    """Die Segmente des Zerlegungsbalkens, mit ihrem Breitenanteil `pct`.
+
+    Ohne `gesamt` (die Kennzahl ist nicht belastbar) oder ohne einen
+    einzigen Posten gibt es keinen Balken - eine leere Liste, kein Balken
+    aus Teilbeträgen ohne Summe (Regel 9: eine Lücke bleibt eine Lücke).
+
+    Review-Fix S3 (mitgenommen): ein Segment mit Betrag exakt 0,00 EUR
+    (eine gemessene "keine Zuzahlung"/"kein Anschlusspreis", Clean Code 3
+    - 0 ist hier eine Aussage, kein fehlender Wert) bekommt keinen
+    eigenen Balkenteil. Der Posten steht textlich ohnehin schon im
+    Rechenweg darunter; ein Nullbreiten-Segment wuerde nur durch die
+    optische Mindestbreite (D3-CSS-Block) als Phantomstreifen sichtbar.
+    """
+    if gesamt is None or not bestandteile:
+        return []
+    # `None` heisst "Restschuld nicht bestimmbar" (kein Split - dieselbe
+    # Zeile bliebe dann unbelastbar und käme hier ohnehin nicht an,
+    # `tco_model.tco_24`), 0,00 EUR heisst "nichts offen" (ebenfalls kein
+    # Split, aber eine GEMESSENE Aussage). Truthiness (`if restbetrag`)
+    # behandelte beide gleich, aber aus Zufall: eine echte, ungemessene
+    # Restschuld naeher an 0 als 0,005 EUR waere sonst als "kein Split"
+    # verschwunden, ohne dass "nicht bestimmbar" das je gesagt hat.
+    rest = round(restbetrag, 2) if restbetrag is not None else 0.0
+    segmente = []
+    gesplittet = False
+    for posten in bestandteile:
+        name, betrag = posten["name"], posten["betrag"]
+        kategorie = posten["kategorie"]
+        if rest and not gesplittet and kategorie in _ZERLEGUNG_RATENKATEGORIEN:
+            faellig = round(betrag - rest, 2)
+            # Ausfall (Clean Code 5), kein stilles negatives Segment: eine
+            # Restschuld, die groesser ist als der Posten, aus dem sie
+            # kommt, ist ein widerspruechlicher Bestand (z. B. eine falsch
+            # zugeordnete Restschuld aus einer anderen Laufzeit) - der
+            # Balken bleibt UNGEZEICHNET (leere Liste, dieselbe
+            # Bedeutung wie "kein `gesamt`" oben), nie ein Balken mit
+            # einer erfundenen Breite unter 0 %.
+            if faellig < 0:
+                log.warning(
+                    "zerlegung_balken: restbetrag %.2f EUR groesser als "
+                    "der Posten %r (%.2f EUR) - Balken bleibt "
+                    "ungezeichnet", rest, name, betrag)
+                return []
+            if faellig:
+                segmente.append({"name": name, "betrag": faellig,
+                                 "kategorie": kategorie, "offen": False})
+            segmente.append({"name": LABEL_RESTSCHULD, "betrag": rest,
+                             "kategorie": "restschuld", "offen": True})
+            gesplittet = True
+        elif betrag:
+            segmente.append({"name": name, "betrag": betrag,
+                             "kategorie": kategorie, "offen": False})
+    for seg in segmente:
+        seg["pct"] = round(seg["betrag"] / gesamt * 100, 3) if gesamt else 0.0
+    return segmente
+
+
 # P0-B-h1: HIER STAND `leitzahl_monate(b: Buendel)` und leitete den
 # Zeitraum der Leitzahl ein ZWEITES Mal aus dem Buendel ab ("kein
 # Buendelmonatspreis -> 24, sonst die Laufzeit") - dieselbe Regel, die
@@ -695,6 +768,11 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
         offene_raten = max(0, b.laufzeit_monate - TCO_HORIZONT)
     geraetepreis, geraetepreis_art = _geraetepreis(
         barpreis, b.geraet_zuzahlung, raten_summe)
+    # D3: EINMAL berechnet, zweimal gelesen (Clean Code 1) - die
+    # textliche Postenliste (`bestandteile`) und der Zerlegungsbalken
+    # (`zerlegung`) lesen dieselbe Liste, keine zweite Ableitung aus
+    # `kennzahl`.
+    bestandteile = _bestandteile_mit_kategorie(kennzahl)
     return {
         # B.2.5 GILT AUCH HIER. Eine Karte ohne Zahl braucht ihren Grund -
         # `_leere_karte` fuellt ihn, diese Funktion tat es nicht, und die
@@ -720,6 +798,16 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
         # Dieselbe Klasse auf Karte, Balken und Legende - C.3 verlangt die
         # Anbieterfarbe konsistent ueber ALLE Grafiken und Tabellen.
         "slug": anbieter_slug(b.anbieter),
+        # D3: DIE EINE Quelle der Anbieterfarbe ist `anbieter_farben.py`
+        # (CLAUDE.md, DATEIGRENZE) - `slug` oben ist ein anderer, aelterer
+        # Schluessel (`geraete_tco_grafik.anbieter_slug`, fuer SVG und
+        # Filter) und faellt fuer unbekannte Anbieter NICHT auf die
+        # benannte Luecke zurueck. Die Bündelzeile traegt die Farbe als
+        # Custom-Property-WERT (`style="--anb:…"` in der Vorlage), nicht
+        # als `gr-anb--<slug>`-Klasse: der Wahrheits-Orakeltest
+        # (`tests/test_seiten_zahlen.py`) sucht an dieser Zeile woertlich
+        # `class="gr-bnd"` ohne Zusatz.
+        "anb_farbe": anbieter_farben.farbe_fuer(b.anbieter),
         "geraet": _name(katalog, device_id, speicher, rueckfall=b.sku_id),
         "anbieter": b.anbieter,
         "eigen": _eigen(b.anbieter),
@@ -783,7 +871,12 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
         "nach_bindung": nach_bindung,
         "eff_ohne_geraet": eff,
         "eff_basis": barpreis,
-        "bestandteile": _bestandteile_mit_kategorie(kennzahl),
+        "bestandteile": bestandteile,
+        # D3: der Zerlegungsbalken der Leitzahl - liest `bestandteile` und
+        # `restbetrag` dieser Kennzahl, rechnet keinen Euro neu.
+        "zerlegung": zerlegung_balken(bestandteile, kennzahl.restbetrag,
+                                      kennzahl.gesamt if kennzahl.belastbar
+                                      else None),
         "luecken": kennzahl.luecken,
         # Rabatte werden nie in die Leitzahl gerechnet (tco_model Regel 3,
         # AUFTRAG_GERAETESEITE §3: "Prämien, Cashback [...] bleiben
@@ -852,6 +945,7 @@ def _leere_karte(anbieter: str, grund: str = "") -> dict:
     """Ein Anbieter ohne Zahl - mit Namen und mit Begruendung (B.2.5)."""
     return {"anbieter": anbieter, "eigen": _eigen(anbieter), "tarif": "",
             "slug": anbieter_slug(anbieter),
+            "anb_farbe": anbieter_farben.farbe_fuer(anbieter),
             "geraetepreis": None, "geraetepreis_art": None,
             "label": "", "laufzeit": None, "leitzahl_monate": None,
             "ab_monat": None, "belastbar": False,
@@ -861,6 +955,7 @@ def _leere_karte(anbieter: str, grund: str = "") -> dict:
             "raten_summe": None,
             "anschlusspreis": None, "nach_bindung": None,
             "eff_ohne_geraet": None, "eff_basis": None, "bestandteile": [],
+            "zerlegung": [],
             "luecken": [], "boni": [], "boni_abzug": 0.0, "quelle_url": "",
             "abgerufen_am": "", "tarif_quelle_url": "", "naeherung": False,
             "leer_grund": grund or LEER_GRUND.get(anbieter, ""),
@@ -1177,6 +1272,11 @@ def _referenzkarte(ref: dict, heute: str = "") -> dict:
         "referenz": ref,
     })
     karte["offen_nach_24"] = 0.0
+    # D3: die Näherung schuldet nach Monat 24 nichts (siehe oben) - ihr
+    # Balken hat deshalb nie ein schraffiertes Segment, aber denselben
+    # Aufbau wie jede andere Zeile (aus ihren EIGENEN `bestandteile`).
+    karte["zerlegung"] = zerlegung_balken(karte["bestandteile"], 0.0,
+                                          karte["gesamt"])
     # S2-1: die Frische ÜBERSCHREIBT den Default der Leerkarte - die
     # Näherung ist eine gerechnete Summe aus zwei gemessenen Belegen,
     # und ihr Stand ist der der Belege (siehe `_referenz_stand`).

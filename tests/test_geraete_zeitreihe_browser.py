@@ -517,3 +517,173 @@ def waehle_modell(s, mid: str) -> None:
 def waehle_band(s, band: str) -> None:
     s.click(f"#gr-zr-baender button[data-band='{band}']")
     s.wait_for_timeout(500)
+
+
+# --------------------------------------------------------------------------
+# P2/D2: Endlabels statt Legende - auf breit ersetzen die Namen am
+# Linienende die HTML-Legende ganz (dieselbe Aussage nicht zweimal); auf
+# schmal bleibt sie stehen, sie traegt dort die "ab/zuletzt"-Werte, die
+# das schmale Bild selbst nicht zeigt.
+# --------------------------------------------------------------------------
+
+def test_die_legende_weicht_den_endlabels_auf_dem_schreibtisch(schreibtisch):
+    s, _ = schreibtisch
+    anzeige = s.eval_on_selector(
+        "#tafel-tco .gr-zr-legende",
+        "el => getComputedStyle(el).display")
+    assert anzeige == "none", f"Legende zeigt sich trotz Endlabels: {anzeige}"
+    # Die Endlabels selbst stehen im SVG - die Aussage bleibt sichtbar,
+    # nur nicht zweimal.
+    namen = s.eval_on_selector_all(
+        "#tafel-tco svg.gr-zr--breit text.gr-zr-name",
+        "els => els.length")
+    assert namen and namen > 0
+
+
+def test_die_legende_bleibt_auf_dem_telefon(telefon):
+    s, _ = telefon
+    anzeige = s.eval_on_selector(
+        "#tafel-tco .gr-zr-legende",
+        "el => getComputedStyle(el).display")
+    assert anzeige != "none", "Legende fehlt mobil - dort traegt sie ab/zuletzt"
+
+
+# P2/D4b: der aktive Navigationseintrag ("Geräte") steht auf dem Telefon
+# beim Laden im Bild - vorher stand er bei x=536-620 komplett ausserhalb
+# des 390-px-Viewports, und "Differenzierung" davor war 20 px abgeschnitten.
+# Diese kleine Test-Fixture rendert den Eintrag "Geräte" selbst NICHT (die
+# `geraete_verlinkt`-Sichtbarkeitsschwelle greift nicht), deshalb steht die
+# Messung dafuer eigenstaendig in `test_navigation_aktiver_eintrag_browser.
+# py` - hier nur der Scroll-Hinweis der Reiterleiste dieser Seite selbst.
+
+def test_die_reiterleiste_braucht_keinen_scroll_mehr(telefon):
+    """QA-Fix 24.09.2026: die Leiste ROLLTE bis zu diesem Fix in sich
+    (`test_kein_reitertext_wird_abgeschnitten` hielt fest, dass das am
+    390-px-Telefon den letzten Reiter abschnitt statt ihn scrollbar zu
+    machen). Mit nur noch vier Reitern bricht sie stattdessen um
+    (`flex-wrap:wrap`, Basisregel) - sie braucht darum keinen Scroll-
+    Hinweis mehr, weil sie gar nicht mehr innerlich scrollt: ihre
+    scrollWidth darf ihre clientWidth nicht mehr uebersteigen."""
+    s, _ = telefon
+    breiten = s.eval_on_selector(
+        "#tafel-tco .gr-reiter, .gr-reiter",
+        "e => ({sw: e.scrollWidth, cw: e.clientWidth})")
+    assert breiten["sw"] <= breiten["cw"] + 1, (
+        f"die Reiterleiste rollt noch innerlich: scrollWidth {breiten['sw']} "
+        f"> clientWidth {breiten['cw']}")
+
+
+# --------------------------------------------------------------------------
+# C4 (QA-Fix 24.09.2026): DAS ENDLABEL RAGT NICHT AUS DEM SVG. Mobil (390 px)
+# lief "UNSER ANGEBOT" (und jedes andere Endlabel) rechts aus dem SVG-
+# Rechteck - der Fix (`geraete_zeitreihe._svg`) haengt jedes Endlabel
+# rechtsbuendig an einem FESTEN X (`ENDLABEL_RAND` vom rechten Bildrand),
+# statt am Linienende zu beginnen und mit der Textbreite nach rechts zu
+# wachsen: die rechte Kante bleibt im SVG, unabhaengig von der Glyphenbreite.
+# --------------------------------------------------------------------------
+
+_ENDLABEL_SEL = ('.gr-zr-name, .gr-zr-chip, .gr-zr-datum, .gr-zr-mon')
+
+
+def _endlabel_lage(s):
+    """{svg, labels: [{text, links, rechts}]} des SICHTBAREN SVG - misst nur
+    das Bild, das die aktuelle Bildschirmbreite per Mediaquery zeigt
+    (`display:none` nimmt das andere aus dem Layout, `getBoundingClientRect`
+    liefert dafuer ein Nullrechteck)."""
+    return s.evaluate("""() => {
+      const svg = [...document.querySelectorAll('#tafel-tco svg.gr-zr')]
+        .find(e => e.getBoundingClientRect().width > 0);
+      if (!svg) return null;
+      const sr = svg.getBoundingClientRect();
+      const labels = [...svg.querySelectorAll('""" + _ENDLABEL_SEL + """')]
+        .map(e => {
+          const r = e.getBoundingClientRect();
+          return { text: e.textContent, links: r.left, rechts: r.right };
+        });
+      return { svgLinks: sr.left, svgRechts: sr.right, labels };
+    }""")
+
+
+def test_jedes_endlabel_liegt_vollstaendig_im_svg(schreibtisch, telefon):
+    """C4: jedes Endlabel-Rechteck liegt GANZ im SVG-Rechteck - gemessen mit
+    `getBoundingClientRect()`, nicht am Quelltext. Auf 1440 UND 390 px."""
+    for s, _ in (schreibtisch, telefon):
+        lage = _endlabel_lage(s)
+        assert lage, "kein sichtbares SVG mit Endlabels gefunden"
+        assert lage["labels"], "keine Endlabels im sichtbaren SVG gefunden"
+        for l in lage["labels"]:
+            assert l["links"] >= lage["svgLinks"] - 0.5, (
+                f"Endlabel {l['text']!r} beginnt links vor dem SVG: {l} "
+                f"gegen SVG-links {lage['svgLinks']}")
+            assert l["rechts"] <= lage["svgRechts"] + 0.5, (
+                f"Endlabel {l['text']!r} ragt rechts aus dem SVG: {l} "
+                f"gegen SVG-rechts {lage['svgRechts']}")
+
+
+def test_endlabel_bleibt_im_svg_auch_bei_verbreitertem_text(telefon):
+    """Google Fonts laden in der Sandbox nicht (CLAUDE.md-Fallstrick) - die
+    Rueckfallschrift kann schmaler sein als die echte. Mit kuenstlich
+    vergroessertem `letter-spacing` auf den Endlabel-Klassen (eigenschafts-
+    basiert, keine Pixelzahl behauptet) bleibt die rechte Kante trotzdem im
+    SVG, weil `text-anchor='end'` an einem FESTEN X verankert ist - der
+    Text waechst nach LINKS, unabhaengig von der Glyphenbreite."""
+    s, _ = telefon
+    s.evaluate("""() => {
+      const style = document.createElement('style');
+      style.textContent = '.gr-zr-name, .gr-zr-chip, .gr-zr-datum, ' +
+        '.gr-zr-mon { letter-spacing: 6px !important; }';
+      document.head.appendChild(style);
+    }""")
+    lage = _endlabel_lage(s)
+    assert lage and lage["labels"], "kein sichtbares SVG mit Endlabels"
+    for l in lage["labels"]:
+        assert l["rechts"] <= lage["svgRechts"] + 0.5, (
+            f"Endlabel {l['text']!r} ragt bei verbreitertem Text rechts "
+            f"aus dem SVG: {l} gegen SVG-rechts {lage['svgRechts']}")
+
+
+# --------------------------------------------------------------------------
+# C5 (QA-Fix 24.09.2026): KEIN REITER WIRD ABGESCHNITTEN. Mobil (390 px) war
+# "GERÄTEKATALOG" als "GERÄTEKATAL" zu sehen. `.gr-reiter button` ist
+# `flex:0 0 auto` mit `white-space:nowrap` (style.css) - jeder Reiter ist so
+# breit wie sein Text, die Leiste selbst rollt (`overflow-x:auto`), statt den
+# Text zu kappen. Gemessen im echten Chromium, nicht am Quelltext.
+# --------------------------------------------------------------------------
+
+def test_kein_reitertext_wird_abgeschnitten(telefon):
+    """QA-Fix 24.09.2026: die alte Fassung mass `scrollWidth` gegen
+    `clientWidth` DES KNOPFS - das haelt nur fest, dass der TEXT nicht im
+    Knopf selbst umbricht, nicht, dass der Knopf in die Leiste passt. Am
+    390-px-Telefon gemessen reichte "Gerätekatalog" bis x=393, die Leiste
+    endete bei x=362 - der alte Test blieb gruen, weil scrollWidth ==
+    clientWidth am Knopf selbst war (der Text brach nicht, der KNOPF lief
+    nur aus der Leiste). Gemessen wird jetzt die Geometrie: jedes
+    Reiterknopf-Rechteck muss vollstaendig im sichtbaren Rechteck der
+    Leiste liegen, ohne dass gescrollt wird."""
+    s, _ = telefon
+    daten = s.evaluate("""() => {
+      const leiste = document.querySelector('.gr-reiter');
+      const lr = leiste.getBoundingClientRect();
+      return {
+        leiste: { left: lr.left, right: lr.right },
+        knoepfe: [...leiste.querySelectorAll('button')].map(b => {
+          const r = b.getBoundingClientRect();
+          return { text: b.textContent.trim(), left: r.left, right: r.right };
+        }),
+      };
+    }""")
+    assert daten["knoepfe"], "keine Reiter gefunden"
+    for k in daten["knoepfe"]:
+        assert k["left"] >= daten["leiste"]["left"] - 1, (
+            f"Reiter {k['text']!r} beginnt links ausserhalb der Leiste: "
+            f"{k['left']} < {daten['leiste']['left']}")
+        assert k["right"] <= daten["leiste"]["right"] + 1, (
+            f"Reiter {k['text']!r} ist abgeschnitten: rechte Kante "
+            f"{k['right']} > Leiste {daten['leiste']['right']}")
+
+
+def test_die_reiterleiste_verursacht_keinen_seitenweiten_querscroll(telefon):
+    s, _ = telefon
+    breite = s.evaluate("() => Math.max(document.documentElement.scrollWidth,"
+                        " document.body.scrollWidth)")
+    assert breite <= 391, f"die Seite ist {breite} px breit (Telefon 390 px)"

@@ -40,6 +40,7 @@ Woche bei fuenf, sagt die Seite fuenf, ohne dass jemand eine Zeile aendert.
 from __future__ import annotations
 
 from .anbieter_farben import stil_fuer
+from .geraete_zeitreihe import LUECKE_TAGE_SCHWELLE
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE
 
 # Hoechstens acht Linien. Mehr Anbieter als das kann ein Mensch in einem
@@ -75,6 +76,17 @@ BELASTBAR_AB_WOCHEN = 12
 # darueber.
 DIAGRAMM_AB_TERMINEN = 4
 
+# Ab wie vielen MESSTERMINEN der Satz unter dem Diagramm ("liegen 16
+# Messtermine vor, vom 10.8. bis zum 24.9.") SCHWEIGT (QA-Fix 24.09.2026).
+#
+# Unterhalb dieser Zahl nennt er eine Auskunft, die die Kachel
+# "Messtermine" nicht hat - die SPANNE - und ist bei einer noch duennen
+# Reihe die richtige Ergaenzung. Darueber (am iPhone 17 256 GB standen 16
+# Messtermine) doppelt er nur noch wortgleich die Kachel-Zahl, ohne neue
+# Auskunft. Der Wert liegt ueber DIAGRAMM_AB_TERMINEN: zwischen vier und
+# hier ist die Reihe kurz genug, dass die Spanne selbst noch etwas sagt.
+VERLAUF_SATZ_MAX_TERMINE = 8
+
 # Wie nah zwei Linien beieinander liegen duerfen, bevor die verdeckte
 # eigens sichtbar gemacht wird - als Anteil der gezeichneten Preisspanne.
 #
@@ -84,6 +96,15 @@ DIAGRAMM_AB_TERMINEN = 4
 # in der Legende und war im Bild nicht vorhanden. Eine Linie, die die
 # Legende nennt und das Bild nicht zeigt, ist schlimmer als keine Legende.
 LINIEN_ABSTAND = 0.02
+
+# A/E (QA-Fix 24.09.2026): DIE MESSLUECKEN-SCHWELLE DES SERVER-CHARTS
+# (TCO-Zeitreihe, `geraete_zeitreihe.LUECKE_TAGE_SCHWELLE`) IST HIER
+# GELESEN, NICHT NEU GESETZT - derselbe Grund wie bei `LINIEN_ABSTAND`
+# zwei Zeilen oben: eine zweite Zahl fuer dieselbe Regel waere die
+# Fehlerklasse aus CLAUDE.md 6. Der Barpreis-Verlauf dieses Reiters
+# zeichnet ueber eine Luecke jenseits dieser Schwelle GENAUSO gepunktet
+# wie der TCO-Server-Chart, statt eine schraege durchgezogene Linie ueber
+# stille Tage zu behaupten.
 
 # Die Farbe kommt aus der EINEN Quelle (P2/D1, `anbieter_farben.py`), nicht
 # mehr aus einer Hash-Palette. Die alte Fassung vergab sie nach
@@ -367,8 +388,10 @@ def aufbereiten(eintraege: list, historie, katalog) -> dict:
         "belastbar_ab_wochen": BELASTBAR_AB_WOCHEN,
         "diagramm_ab_terminen": DIAGRAMM_AB_TERMINEN,
         "linien_abstand": LINIEN_ABSTAND,
+        "luecke_tage_schwelle": LUECKE_TAGE_SCHWELLE,
         "max_linien": MAX_LINIEN,
         "max_datumsmarken": MAX_DATUMSMARKEN,
+        "verlauf_satz_max_termine": VERLAUF_SATZ_MAX_TERMINE,
     }
 
 
@@ -377,4 +400,6 @@ def leer() -> dict:
             "messtermine": 0, "belastbar_ab_wochen": BELASTBAR_AB_WOCHEN,
             "diagramm_ab_terminen": DIAGRAMM_AB_TERMINEN,
             "linien_abstand": LINIEN_ABSTAND,
-            "max_linien": MAX_LINIEN, "max_datumsmarken": MAX_DATUMSMARKEN}
+            "luecke_tage_schwelle": LUECKE_TAGE_SCHWELLE,
+            "max_linien": MAX_LINIEN, "max_datumsmarken": MAX_DATUMSMARKEN,
+            "verlauf_satz_max_termine": VERLAUF_SATZ_MAX_TERMINE}

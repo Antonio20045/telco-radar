@@ -483,11 +483,53 @@ def test_jede_linie_endet_in_einem_beleglink_mit_datum(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "klein"))
     suppe = __import__("bs4").BeautifulSoup(paar["svg_breit"], "html.parser")
     links = suppe.select("a.gr-zr-link")
-    assert len(links) == 4          # ein Link je Anbieter mit Serie
+    # B-Fix (Review 24.09.2026, S1): JEDER Anbieter bekommt ein Endlabel -
+    # auch 1&1 mit genau EINEM Messtag hier (siehe
+    # `test_auch_ein_punkt_anbieter_bekommt_ein_endlabel`). Vier Anbieter,
+    # vier Beleg-Links.
+    assert len(links) == 4
     for a in links:
         href = a.get("href") or ""
         assert href.startswith("https://")
         assert "↗" in a.get_text()
+
+
+def test_auch_ein_punkt_anbieter_bekommt_ein_endlabel(ansicht):
+    """B-Fix (Review 24.09.2026, S1 - ROT vor dem Fix): bis zu diesem Fix
+    bekam ein Anbieter mit nur EINEM Messtag KEIN Endlabel - auf dem
+    Desktop (>= 701 px, Legende per CSS ausgeblendet) stand sein Punkt
+    dann unbeschriftet da (gemessen: Telekom, ein Messtag 15.09., als
+    unbeschrifteter magenta Punkt). 1&1 hat hier genau EINEN Messtag und
+    ist trotzdem beschriftet - Name, Beleg-Link UND der Punkt (plus Halo)
+    bleiben."""
+    paar = _paar(ansicht, ("apple-iphone-17-pro-256", "klein"))
+    suppe = __import__("bs4").BeautifulSoup(paar["svg_breit"], "html.parser")
+    namen = {t.get_text(strip=True).rstrip("↗ ") for t in
+             suppe.select("text.gr-zr-name")}
+    assert "1&1" in namen
+    einundeins = [c for c in suppe.select("circle.gr-zr-punkt")
+                  if c.get("fill") == "#2f7fd1"]
+    assert len(einundeins) == 1
+    assert suppe.select("circle.gr-zr-halo")
+    link = next(a for a in suppe.select("a.gr-zr-link")
+               if a.get_text(strip=True).startswith("1&1"))
+    assert (link.get("href") or "").startswith("https://")
+
+
+def test_ein_geraet_mit_nur_ein_punkt_serien_ist_trotzdem_beschriftet(
+        ansicht):
+    """Das explizite Kriterium des Befunds: ein Modell/Band, dessen
+    EINZIGER Anbieter nur einen Messtag traegt (Galaxy S26, Band klein:
+    ausschliesslich 1&1, ein Messtag), bekommt trotzdem ein sichtbares
+    Endlabel - keine Legende, kein Punkt ohne Namen."""
+    paar = _paar(ansicht, ("samsung-galaxy-s26-256", "klein"))
+    assert paar is not None
+    suppe = __import__("bs4").BeautifulSoup(paar["svg_breit"], "html.parser")
+    namen = {t.get_text(strip=True).rstrip("↗ ") for t in
+             suppe.select("text.gr-zr-name")}
+    assert namen == {"1&1"}
+    assert suppe.select("circle.gr-zr-punkt")
+    assert suppe.select("circle.gr-zr-halo")
 
 
 def test_vodafone_ist_rot_und_traegt_unser_angebot(ansicht):
@@ -1111,3 +1153,102 @@ def test_z1_der_fremde_zeitraum_hat_sein_eigenes_kachel_feld(tmp_path):
     assert kachel["alt_text"] is None, \
         "der fremde Zeitraum ist kein alter Stand"
     assert kachel["ab"] is None, "kein Betrag ohne vergleichbaren Zeitraum"
+
+
+# ==========================================================================
+# P1-Fix (Review 24.09.2026, Punkt D): Gleichstand zweier Ratenlaufzeiten
+# verliert die zweite Zahlweise nicht mehr still.
+# ==========================================================================
+
+def _p1_zeile(bid, datum, laufzeit, rate):
+    return {"id": bid, "datum": datum, "tarif_id": "tarif-x",
+            "tarif_monatlich": 20.0, "geraet_zuzahlung": 0.0,
+            "geraet_monatsrate": rate, "laufzeit_monate": laufzeit,
+            "anschlusspreis": 0.0,
+            # 24 Monate x 30 EUR == 36 Monate x 20 EUR == 720 EUR
+            # Geraeteanteil; TCO-24 (Tarif 24x20 + Geraet) ist fuer beide
+            # Zahlweisen also 1.200,00 EUR - genau der Gleichstand, den der
+            # Befund beschreibt (congstar: 24 UND 36 Raten zum selben
+            # `gesamt`).
+            "gesamt": 1200.0, "quelle_url": "https://example.de/congstar",
+            "abgerufen_am": datum}
+
+
+def _p1_buendel(bid, laufzeit, rate):
+    return {"id": bid, "sku_id": "sku-x", "anbieter": "congstar",
+            "tarif_name": "Allnet Flat XS", "tarif_id": "tarif-x",
+            "tarif_id_guete": "hoch", "tarif_monatlich": 20.0,
+            "geraet_zuzahlung": 0.0, "geraet_monatsrate": rate,
+            "laufzeit_monate": laufzeit, "anschlusspreis": 0.0,
+            "zustand": "neu", "quelle_url": "https://example.de/congstar",
+            "abgerufen_am": "2026-09-22"}
+
+
+def _p1_state(tmp_path):
+    state = tmp_path / "state"
+    state.mkdir()
+    id24 = "buendel--congstar--sku-x--tarif-x--24"
+    id36 = "buendel--congstar--sku-x--tarif-x--36"
+    (state / "geraete_tco.json").write_text(json.dumps({
+        "buendel": [_p1_buendel(id24, 24, 30.0),
+                    _p1_buendel(id36, 36, 20.0)]}), encoding="utf-8")
+    zeilen = [_p1_zeile(id24, "2026-09-22", 24, 30.0),
+             _p1_zeile(id36, "2026-09-22", 36, 20.0)]
+    (state / "geraete_tco_historie.jsonl").write_text(
+        "\n".join(json.dumps(z) for z in zeilen) + "\n", encoding="utf-8")
+    # DIESELBE Karte dient beiden Zwecken: `_messungen` findet ueber ihre
+    # `sku_id` das Modell, `_band_zeilen`/`_luecken` brauchen dieselbe
+    # Karte vollstaendig (Anbieter, Band, Betrag) fuer eine echte
+    # Bandzeile - sonst bleibt "klein" unwaehlbar und `aufbereiten()` baut
+    # kein Paar.
+    karte = _h3_karte("congstar", 1200.0, 24)
+    karte["sku_id"] = "sku-x"
+    tco = {"modelle": [{"id": "modell-x", "karten": [karte]}],
+           "band_je_tarif": {"tarif-x": "klein"},
+           "baender_katalog": [{"key": "klein", "label": "Klein"}]}
+    return state, tco
+
+
+def test_p1_gleichstand_zweier_ratenlaufzeiten_verliert_die_zweite_nicht(
+        tmp_path):
+    """ROT vor dem Fix: `besser = wert < alt["wert"]` (strikt) verwarf die
+    zweite Zeile still, sobald beide denselben `wert` trugen - welche der
+    beiden ueberlebte, entschied nur die Dateireihenfolge, und die
+    verworfene Zahlweise (hier: 36 Monate mit Restschuld) verschwand ganz.
+    """
+    state, tco = _p1_state(tmp_path)
+    messungen = geraete_zeitreihe._messungen(state, tco)
+    slot = messungen[("modell-x", "klein")]["congstar"]["2026-09-22"]
+    # Die KUERZERE Ratenlaufzeit gewinnt den Punkt - sie hat keine
+    # Restschuld nach TCO_HORIZONT.
+    assert slot["laufzeit"] == 24
+    assert slot["wert"] == 1200.0
+    # Die 36er-Zahlweise wird NICHT verschwiegen.
+    assert slot["weitere_laufzeiten"] == [36]
+
+
+def test_p1_der_rechenweg_nennt_die_zweite_zahlweise(tmp_path):
+    state, tco = _p1_state(tmp_path)
+    a = geraete_zeitreihe.aufbereiten(state, tco)
+    paar = _paar(a, ("modell-x", "klein"))
+    assert paar is not None
+    assert "Zum selben Betrag auch über 36 Monate" in paar["rechenweg_html"]
+    assert "Restschuld" in paar["rechenweg_html"]
+
+
+def test_p1_bei_reihenfolgetausch_bleibt_dieselbe_zahlweise_gewinnen(
+        tmp_path):
+    """Die Regel ist FEST (kuerzere Laufzeit gewinnt), nicht von der
+    Dateireihenfolge abhaengig - dieselbe Pruefung mit vertauschten Zeilen
+    muss dasselbe Ergebnis liefern."""
+    state, tco = _p1_state(tmp_path)
+    id24 = "buendel--congstar--sku-x--tarif-x--24"
+    id36 = "buendel--congstar--sku-x--tarif-x--36"
+    zeilen = [_p1_zeile(id36, "2026-09-22", 36, 20.0),
+             _p1_zeile(id24, "2026-09-22", 24, 30.0)]
+    (state / "geraete_tco_historie.jsonl").write_text(
+        "\n".join(json.dumps(z) for z in zeilen) + "\n", encoding="utf-8")
+    messungen = geraete_zeitreihe._messungen(state, tco)
+    slot = messungen[("modell-x", "klein")]["congstar"]["2026-09-22"]
+    assert slot["laufzeit"] == 24
+    assert slot["weitere_laufzeiten"] == [36]

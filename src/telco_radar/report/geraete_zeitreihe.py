@@ -49,7 +49,7 @@ from ..analyze.tco_store import basis_aus_satz, id_aus_satz
 from ..tco_model import (Buendel, POSTEN_ANSCHLUSS, POSTEN_BUENDEL,
                          POSTEN_RATE, POSTEN_ZUZAHLUNG, TCO_HORIZONT, tco_24,
                          zeitraum_vergleichbar)
-from .anbieter_farben import stil_fuer
+from .anbieter_farben import STRICHMUSTER, stil_fuer
 from .geraete_tco_band import ERWARTETE_ANBIETER
 from .geraete_tco_karten import kurz_datum, phasen_fuer_buendel
 
@@ -97,6 +97,49 @@ SCHMAL_W, SCHMAL_MIN_H = 358, 380
 # Hoechstens so viele Kacheln als Schnelleingang (§3.2: „4–6 häufigste
 # Geräte"); die Zahl ist eine Obergrenze, kein Soll.
 KACHELN_MAX = 6
+
+# P2/D2: DIE X-ACHSE ZEIGT JEDEN MESSTAG ALS STRICH, ABER NICHT JEDEN ALS
+# TEXT. Antonio wollte "die verschiedenen Messtage immer sehen" - das
+# bleibt die Rasterlinie (eine je echtem Messtag). Die BESCHRIFTUNG ist
+# eine andere Frage: bei taeglichen Messungen standen auf 358 Einheiten
+# Breite (schmal) bis zu neun Text-Labels 25,5 Einheiten auseinander -
+# "12.9." ist bei der Achsenschrift (12,5 px) selbst schon rund 28-30 px
+# breit, die Labels liefen ineinander ("12.913.914.9..."). Gewaehlt wird
+# deshalb je Bild eine TEILMENGE der Messtage, deren Text-Marken diesen
+# Mindestabstand einhalten - erster und letzter Messtag bleiben immer
+# beschriftet (siehe `_x_marken`). Dieselbe Regel (Mindestabstand, erster/
+# letzter fest, dazwischen ausduennen) traegt `app.js` `beschriftung()` fuer
+# den Preisverlauf-Reiter - dort ueber eine feste Hoechstzahl (MAX_MARKEN),
+# hier ueber die Pixelbreite, weil das SVG-Koordinatensystem sie kennt.
+MIN_XTICK_ABSTAND = 34
+
+# P2/D2: DER ACHSENBRUCH. Liegt die ECHTE Preisspanne (nicht die um 12%
+# gepolsterte Bild-Spanne) unter dieser Quote des hoechsten Werts, zoomt
+# die Y-Achse so stark, dass zwei nahe Preise weit auseinander wirken -
+# das Bild braucht dann ein sichtbares Zeichen, dass sie NICHT bei 0 EUR
+# beginnt.
+ACHSENBRUCH_ANTEIL = 0.10
+
+# C4 (QA-Fix 24.09.2026): DER RECHTE RAND DES ENDLABELS. Bis zu diesem Fix
+# begann jedes Endlabel (Name, "unser Angebot", Datum) am Linienende plus
+# 12 Einheiten und wuchs mit der Textbreite nach RECHTS - auf dem
+# schmalen Bild (390 px, `rechts`=96) lief ein langer Text (z. B. "unser
+# Angebot") dann aus dem SVG. Statt die Breite eines Textes zu schaetzen
+# (die echte Glyphenbreite kennt nur der Browser, und Google Fonts laden
+# in der Sandbox nicht - Fallstrick oben), steht das Endlabel jetzt
+# RECHTSBUENDIG an einem FESTEN X nahe dem rechten Bildrand
+# (`text-anchor='end'`): der Text waechst nach LINKS, egal wie breit die
+# Schrift ihn macht, und die rechte Kante bleibt immer an derselben
+# Stelle im SVG - unabhaengig von Font und Zeichenzahl.
+ENDLABEL_RAND = 6
+
+# P2/D2: EINE MESSLUECKE eines Anbieters (kein Messtag ueber mehr als
+# diese Zahl Tage) wird GEPUNKTET verbunden statt durchgezogen - eine
+# schraege durchgezogene Linie ueber viele stille Tage behauptet eine
+# beobachtete Entwicklung, die es nicht gab. Die Website crawlt Mi/Fr
+# (radar.yml) - mehr als zehn Tage sind mehr als ein verpasster
+# Sammel-Zyklus, keine normale Crawl-Luecke.
+LUECKE_TAGE_SCHWELLE = 10
 
 # E4/P5-Sichtbarkeit - DIE EINE REGEL: Sichtbarkeit folgt den DATEN, nicht
 # dem Weg - Bündel ODER Listung genuegt. Zwei Orte, zwei Schwellen:
@@ -849,7 +892,11 @@ def _rechung(messung: dict, tarife: dict | None = None) -> dict | None:
     return {"posten": posten, "gesamt": t.gesamt, "offen": offen,
             "datum": satz.get("datum") or "",
             "quelle_url": satz.get("quelle_url") or "",
-            "abgerufen_am": satz.get("abgerufen_am") or ""}
+            "abgerufen_am": satz.get("abgerufen_am") or "",
+            # P1-Fix (Datenverlust-Befund): weitere Ratenlaufzeiten, die am
+            # selben Tag denselben `gesamt` tragen (`_messungen`) - gelesen,
+            # nicht hier ermittelt. Leer, wenn es keinen Gleichstand gibt.
+            "weitere_laufzeiten": messung.get("weitere_laufzeiten") or []}
 
 
 def _rechung_html(anbieter: str, messung: dict,
@@ -907,6 +954,15 @@ def _rechung_html(anbieter: str, messung: dict,
                      f"{TCO_HORIZONT} noch zu zahlen: "
                      f"{r['offen']['anzahl']} × {_euro(r['offen']['einzeln'])}"
                      f" = {_euro(r['offen']['betrag'])}</p>")
+    # P1-Fix (Datenverlust-Befund, 24.09.2026): eine zweite Zahlweise zum
+    # selben Betrag wird NICHT still verworfen - sie steht hier, mit der
+    # Restschuld, die sie (anders als die gezeigte, kuerzere Laufzeit)
+    # nach TCO_HORIZONT noch offenlaesst.
+    if r["weitere_laufzeiten"]:
+        teile.append(f"<p class='gr-zr-rweitere'>Zum selben Betrag auch "
+                     f"über {_zeitraum_wort(r['weitere_laufzeiten'])} "
+                     f"erhältlich – dabei bleibt nach Monat {TCO_HORIZONT} "
+                     f"eine Restschuld offen.</p>")
     url = r["quelle_url"]
     link = (f"<a href='{_esc(url)}' target='_blank' rel='noopener'>{a}"
             f"&nbsp;↗</a>" if url else a)
@@ -1122,6 +1178,33 @@ def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
         slot = (messungen.setdefault((modell, band), {})
                 .setdefault(b.get("anbieter") or "?", {}))
         alt = slot.get(datum)
+        # DIE GEMESSENE RATENLAUFZEIT dieser Zeile (P1-Fix, Datenverlust-
+        # Befund vom 24.09.2026): congstar bot am selben Tag 24 UND 36
+        # Raten zum selben `wert` (1.459,00 EUR) - eine 36er-Rate wird erst
+        # NACH Monat TCO_HORIZONT teurer (Restschuld), die TCO-24-Summe
+        # selbst kann zufaellig gleich hoch sein. `wert` allein
+        # unterscheidet die zwei Zahlweisen dann nicht mehr.
+        laufzeit = satz.get("laufzeit_monate")
+
+        def _gleichstand(kandidat):
+            # Sind BEIDE Ratenlaufzeiten `None` (nicht gemessen, z. B.
+            # eine Zeile ohne eigenen Geraeteraten-Posten), ist
+            # `laufzeit != kandidat.get("laufzeit")` `False` - kein
+            # Gleichstand zweier Zahlweisen, sondern "kein Unterschied
+            # bekannt". Das verwirft die zweite Zeile NICHT still: ohne
+            # eine bekannte Laufzeit haette `weitere_laufzeiten` unten
+            # (`if alt.get("laufzeit") is not None`) sie ohnehin nie
+            # aufgenommen, und `besser` bliebe wegen `laufzeit is not
+            # None` in der Gleichstand-Regel ebenfalls `False` - der
+            # Punkt der ersten Zeile bleibt also so oder so stehen. Ein
+            # `None == None`-Gleichstand wuerde daher keine Zahlweise
+            # zusaetzlich sichtbar machen, siehe `tests/
+            # test_geraete_zeitreihe_rechenweg.py::
+            # test_zwei_messungen_ohne_laufzeit_am_selben_tag_verlieren_keine_zahlweise`.
+            return (kandidat is not None and kandidat["wert"] == wert
+                    and zeitraum_vergleichbar(monate, kandidat["monate"])
+                    and laufzeit != kandidat.get("laufzeit"))
+
         # Je (Anbieter, Tag) das GUENSTIGSTE Buendel - aber nur INNERHALB
         # eines Zeitraums (P0-B-z1): "guenstiger" ueber zwei Laufzeiten
         # ist keine Aussage (`zeitraum_vergleichbar`). Bei zwei
@@ -1130,12 +1213,38 @@ def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
         if alt is None:
             besser = True
         elif zeitraum_vergleichbar(monate, alt["monate"]):
-            besser = wert < alt["wert"]
+            if wert < alt["wert"]:
+                besser = True
+            elif _gleichstand(alt):
+                # GLEICHSTAND, ZWEI ZAHLWEISEN: bis hierhin gewann
+                # stillschweigend die Zeile, die zuerst in der Datei stand
+                # - keine Regel, nur Dateireihenfolge, und die verworfene
+                # Zahlweise (oft die mit Restschuld) verschwand ganz aus
+                # Punkt UND Rechenweg. Die FESTE, dokumentierte Regel: die
+                # KUERZERE Ratenlaufzeit gewinnt den Punkt - sie ist die
+                # einzige der beiden, die nach TCO_HORIZONT nichts mehr
+                # offenlaesst. Die andere Zahlweise wird NICHT verschwiegen:
+                # sie steht als `weitere_laufzeiten` an der Messung, und
+                # `_rechung_html` nennt sie im Panel.
+                besser = (laufzeit is not None
+                          and (alt.get("laufzeit") is None
+                               or laufzeit < alt["laufzeit"]))
+            else:
+                besser = False
         else:
             besser = zeitraum_vergleichbar(monate, TCO_HORIZONT)
         if besser:
+            weitere = set(alt.get("weitere_laufzeiten") or []) \
+                if _gleichstand(alt) else set()
+            if _gleichstand(alt) and alt.get("laufzeit") is not None:
+                weitere.add(alt["laufzeit"])
             slot[datum] = {"satz": satz, "stand": b, "wert": wert,
-                           "monate": monate}
+                           "monate": monate, "laufzeit": laufzeit,
+                           "weitere_laufzeiten": sorted(weitere)}
+        elif _gleichstand(alt) and laufzeit is not None:
+            bekannt = set(alt.get("weitere_laufzeiten") or [])
+            bekannt.add(laufzeit)
+            alt["weitere_laufzeiten"] = sorted(bekannt)
     if (ohne_id or ohne_stand or ueber_basis or ohne_wert or stand_ohne_id
             or fremder_zeitraum):
         log.info("Zeitreihe: %d Historienzeile(n) ohne jede ID, %d ohne "
@@ -1230,12 +1339,173 @@ def _nice_step(spanne: float) -> float:
     return stufe * potenz
 
 
+# Die "runden" Vervielfacher eines Y-Achsen-Schritts - dieselbe Stufung wie
+# `_nice_step`, hier ueber mehrere Zehnerdekaden durchsucht.
+_NICE_VIELFACH = (1, 2, 2.5, 5, 10)
+
+
+def _y_schritt(y0: float, y1: float) -> float:
+    """Der Y-Achsen-Schritt mit 4-5 RUNDEN Werten.
+
+    `_nice_step((y1-y0)/4)` allein kann kollabieren: bei y0=752/y1=1248
+    (Spanne 496) rundet Spanne/4=124 auf die naechste Stufe 200 - und von
+    752 bis 1248 passen dann nur DREI Vielfache von 200 (800/1000/1200),
+    nicht vier bis fuenf. Diese Funktion sucht stattdessen unter allen
+    runden Schritten mehrerer Dekaden denjenigen, dessen TICKZAHL wirklich
+    in [4, 5] faellt (bei Gleichstand der naechste an 5 dran) - nur wenn
+    keiner der runden Schritte das trifft (seltene Randspannen), faellt
+    sie auf die Zahl zurueck, die der Tickzahl 4,5 am naechsten kommt."""
+    spanne = y1 - y0
+    if spanne <= 0:
+        return max(abs(y1), 1.0)
+    basis = spanne / 4
+    basis_potenz = 10 ** math.floor(math.log10(basis))
+    kandidaten = sorted({round(m * basis_potenz * (10 ** dek), 8)
+                         for dek in range(-3, 4) for m in _NICE_VIELFACH
+                         if m * basis_potenz * (10 ** dek) > 0})
+    beste_rang, bester_schritt = None, None
+    for schritt in kandidaten:
+        erster = math.ceil(y0 / schritt) * schritt
+        n, wert = 0, erster
+        while wert <= y1 + 0.01 and n < 60:
+            n += 1
+            wert += schritt
+        if n < 2:
+            continue
+        rang = (0 if 4 <= n <= 5 else 1, abs(n - 4.5))
+        if beste_rang is None or rang < beste_rang:
+            beste_rang, bester_schritt = rang, schritt
+    return bester_schritt if bester_schritt else _nice_step(spanne / 4)
+
+
 def _xtick_x(iso: str, t0: date, t1: date, links: float, breite: float,
              tage: list[str]) -> float:
     if t1 == t0:
         return links + breite / 2
     tag = date.fromisoformat(iso)
     return links + (tag - t0).days / max(1, (t1 - t0).days) * breite
+
+
+def _x_marken(tage: list[str], x_v, mindestabstand: float = MIN_XTICK_ABSTAND
+              ) -> set[str]:
+    """Welche Messtage eine X-Achsen-BESCHRIFTUNG bekommen (`MIN_XTICK_ABSTAND`).
+
+    Gierig von links: der erste Tag ist immer dabei, jeder weitere nur,
+    wenn er `mindestabstand` Einheiten vom zuletzt beschrifteten Tag
+    entfernt liegt; der letzte Tag ersetzt noetigenfalls den zuletzt
+    gewaehlten, statt zusaetzlich zu kollidieren - eine Achse ohne
+    Enddatum sagt nicht, bis wann sie reicht. Die RASTERLINIE bekommt
+    trotzdem JEDER Messtag (siehe `_svg`) - nur die Textmarke wird
+    ausgeduennt."""
+    if len(tage) <= 1:
+        return set(tage)
+    behalten = [tage[0]]
+    letzte_x = x_v(tage[0])
+    for tag in tage[1:-1]:
+        x = x_v(tag)
+        if x - letzte_x >= mindestabstand:
+            behalten.append(tag)
+            letzte_x = x
+    letzter = tage[-1]
+    if x_v(letzter) - letzte_x < mindestabstand and len(behalten) > 1:
+        behalten[-1] = letzter
+    else:
+        behalten.append(letzter)
+    return set(behalten)
+
+
+def _stufenpfad(punkte: list[tuple[float, float, float]]) -> str:
+    """Der Pfad einer STUFENLINIE (»step-after«) durch die gegebenen
+    (x, y, wert)-Punkte: waagerecht zum naechsten X, dann senkrecht zu
+    seinem Y. Ein Preis gilt vom Messtag an - er GLEITET nicht zum
+    naechsten, er SPRINGT dort, genau am naechsten Messtag."""
+    if not punkte:
+        return ""
+    teile = [f"M{punkte[0][0]:.1f} {punkte[0][1]:.1f}"]
+    for i in range(1, len(punkte)):
+        y0 = punkte[i - 1][1]
+        x1, y1, _wert = punkte[i]
+        teile.append(f"L{x1:.1f} {y0:.1f}")
+        if y1 != y0:
+            teile.append(f"L{x1:.1f} {y1:.1f}")
+    return " ".join(teile)
+
+
+def _linien_laeufe(punkte: list[tuple[float, float, float]], tage: list[str],
+                    schwelle_tage: int = LUECKE_TAGE_SCHWELLE
+                    ) -> list[tuple[list[tuple[float, float, float]], bool]]:
+    """Zerlegt eine Punktreihe in (Teilstrecke, ist_luecke)-Laeufe.
+
+    `tage` sind die ECHTEN Messtage (isoformat) parallel zu `punkte` -
+    Grundlage der Tagesdifferenz. Ueberschreitet der Abstand zweier
+    aufeinanderfolgender Punkte `schwelle_tage`, ist die Verbindung
+    ZWISCHEN ihnen eine eigene, gepunktete Zweipunkt-Teilstrecke
+    (`ist_luecke=True`); alle anderen aufeinanderfolgenden Punkte ohne
+    grosse Luecke bilden EINE durchgezogene Teilstrecke. So bleibt jeder
+    Lauf entweder ganz durchgezogen oder (bei genau zwei Punkten) ganz
+    gepunktet - nie beides im selben `<path>`, dessen `stroke-dasharray`
+    nur EIN Muster kennt."""
+    if len(punkte) < 2:
+        return [(punkte, False)] if punkte else []
+    laeufe: list[tuple[list[tuple[float, float, float]], bool]] = []
+    lauf: list[tuple[float, float, float]] = [punkte[0]]
+    for i in range(1, len(punkte)):
+        tag_davor = date.fromisoformat(tage[i - 1])
+        tag = date.fromisoformat(tage[i])
+        if (tag - tag_davor).days > schwelle_tage:
+            if len(lauf) > 1:
+                laeufe.append((lauf, False))
+            laeufe.append(([punkte[i - 1], punkte[i]], True))
+            lauf = [punkte[i]]
+        else:
+            lauf.append(punkte[i])
+    if len(lauf) > 1:
+        laeufe.append((lauf, False))
+    return laeufe
+
+
+def _form_pfad(marker: str, x: float, y: float, r: float) -> str | None:
+    """Die Zusatzform eines Markers - ODER `None` fuer den Kreis (der
+    Punkt TRAEGT die Form schon: `<circle class='gr-zr-punkt'>`) und fuer
+    unbekannte Formen. Gezeichnet als OFFENER Umriss (fill='none') UM den
+    bestehenden Kreis - keine Kreis-Selektoren aus Tests und `app.js`
+    aendern sich damit (D1 hatte das deshalb offen gelassen); die Form
+    ist eine reine Zusatzauskunft fuer Farbfehlsicht und Schwarzweiss."""
+    if marker in ("kreis", "") or marker not in (
+            "quadrat", "dreieck", "dreieck--runter", "raute", "sechseck",
+            "ring", "kreuz"):
+        return None
+    if marker == "quadrat":
+        s = r * 0.86
+        return (f"<rect x='{x - s:.1f}' y='{y - s:.1f}' width='{2 * s:.1f}' "
+                f"height='{2 * s:.1f}'/>")
+    if marker == "raute":
+        s = r * 1.15
+        pkte = (f"{x:.1f},{y - s:.1f} {x + s:.1f},{y:.1f} "
+                f"{x:.1f},{y + s:.1f} {x - s:.1f},{y:.1f}")
+        return f"<polygon points='{pkte}'/>"
+    if marker in ("dreieck", "dreieck--runter"):
+        s = r * 1.2
+        if marker == "dreieck":
+            pkte = (f"{x:.1f},{y - s:.1f} {x + s:.1f},{y + s * 0.85:.1f} "
+                    f"{x - s:.1f},{y + s * 0.85:.1f}")
+        else:
+            pkte = (f"{x:.1f},{y + s:.1f} {x + s:.1f},{y - s * 0.85:.1f} "
+                    f"{x - s:.1f},{y - s * 0.85:.1f}")
+        return f"<polygon points='{pkte}'/>"
+    if marker == "sechseck":
+        pkte = " ".join(
+            f"{x + r * 1.1 * math.cos(math.radians(60 * i - 30)):.1f},"
+            f"{y + r * 1.1 * math.sin(math.radians(60 * i - 30)):.1f}"
+            for i in range(6))
+        return f"<polygon points='{pkte}'/>"
+    if marker == "ring":
+        return f"<circle cx='{x:.1f}' cy='{y:.1f}' r='{r * 1.4:.1f}'/>"
+    if marker == "kreuz":
+        s = r * 1.15
+        return (f"<path d='M{x - s:.1f} {y:.1f}L{x + s:.1f} {y:.1f} "
+                f"M{x:.1f} {y - s:.1f}L{x:.1f} {y + s:.1f}'/>")
+    return None
 
 
 def _svg(anbieter_serien: dict, breit: bool,
@@ -1312,7 +1582,7 @@ def _svg(anbieter_serien: dict, breit: bool,
         f"<svg class='gr-zr gr-zr--{'breit' if breit else 'schmal'}' "
         f"viewBox='0 0 {w} {h}' role='img' aria-label='{_esc(kopf)} "
         f"je Messtag und Anbieter: {_esc(', '.join(anbieter))}'>")
-    schritt = _nice_step((y1 - y0) / 4)
+    schritt = _y_schritt(y0, y1)
     wert = math.ceil(y0 / schritt) * schritt
     while wert <= y1 + 0.01:
         y = y_v(wert)
@@ -1322,11 +1592,29 @@ def _svg(anbieter_serien: dict, breit: bool,
                      f"y='{y + 4:.1f}' text-anchor='end'>"
                      f"{_euro0(round(wert))}</text>")
         wert += schritt
+    # P2/D2: DER ACHSENBRUCH. Die ECHTE Preisspanne (ymax-ymin, nicht die
+    # um 12% gepolsterte Bild-Spanne y1-y0) klein gegen den hoechsten Wert
+    # heisst: die Achse zoomt stark, kleine Unterschiede wirken gross - ein
+    # Achsenbruch-Zeichen an der Y-Achse sagt sichtbar "sie beginnt nicht
+    # bei 0 EUR". Bei y0==0 (die Achse beginnt wirklich bei 0) gibt es
+    # nichts zu brechen.
+    if y0 > 0 and ymax > 0 and (ymax - ymin) < ACHSENBRUCH_ANTEIL * ymax:
+        by = oben + ph - 9
+        teile.append(
+            f"<g class='gr-zr-achsenbruch' transform='translate({links},"
+            f"{by:.1f})' aria-hidden='true'>"
+            f"<rect x='-9' y='-9' width='18' height='18'/>"
+            f"<path d='M-5 8 L-1 -4 L2 5 L6 -8'/></g>")
     for tag in tage:
         x = x_v(tag)
         teile.append(f"<line class='gr-zr-raster' x1='{x:.1f}' y1='{oben}' "
-                     f"x2='{x:.1f}' y2='{oben + ph}'/>"
-                     f"<text class='gr-zr-xtick' x='{x:.1f}' "
+                     f"x2='{x:.1f}' y2='{oben + ph}'/>")
+    beschriftet = _x_marken(tage, x_v)
+    for tag in tage:
+        if tag not in beschriftet:
+            continue
+        x = x_v(tag)
+        teile.append(f"<text class='gr-zr-xtick' x='{x:.1f}' "
                      f"y='{h - unten + 22}' text-anchor='end'>"
                      f"{_tag_monat(tag)}</text>")
 
@@ -1337,26 +1625,35 @@ def _svg(anbieter_serien: dict, breit: bool,
     # keinen Pfad (Luecken sind Informationen, nichts wird interpoliert).
     for a in anbieter:
         punkte = _punkte(anbieter_serien[a])
-        stil = stil_fuer(a)
-        farbe, marker = stil.farbe, stil.marker_farbe
-        if len(punkte) > 1:
-            pfad = " ".join(f"{'M' if i == 0 else 'L'}{x:.1f} {y:.1f}"
-                            for i, (x, y, _p) in enumerate(punkte))
-            # P2/D1: die Strichart traegt dieselbe Unterscheidung wie die
-            # Farbe (anbieter_farben.py) - Vodafone/Telekom sind das
-            # schwierigste Farbpaar der Seite (ΔE 11,5 unter normalem
-            # Sehen, gemessen mit dem dataviz-Validator), Farbe allein
-            # reicht nicht. "none" bleibt ohne Attribut - eine leere
-            # dasharray waere dieselbe Aussage wie keine.
-            muster = f" stroke-dasharray='{stil.muster}'" \
-                if stil.muster != "none" else ""
-            teile.append(f"<path class='gr-zr-linie' d='{pfad}' "
-                         f"stroke='{farbe}'{muster}/>")
         serie = anbieter_serien[a]
+        stil = stil_fuer(a)
+        farbe, marker_farbe = stil.farbe, stil.marker_farbe
+        if len(punkte) > 1:
+            tage_a = [d for d, _p in serie]
+            # P2/D2: STUFENLINIE statt Gerade - ein Preis gilt vom Messtag
+            # an, er GLEITET nicht zum naechsten. Jeder Lauf ohne grosse
+            # Messluecke ist EIN <path> im gewohnten Anbieter-Muster; eine
+            # Luecke ueber `LUECKE_TAGE_SCHWELLE` Tage ist ein eigener,
+            # GEPUNKTETER Zweipunkt-Lauf - schraeg durchgezogen wuerde eine
+            # beobachtete Entwicklung behaupten, die es in der stillen Zeit
+            # nicht gab.
+            for lauf, ist_luecke in _linien_laeufe(punkte, tage_a):
+                pfad = _stufenpfad(lauf)
+                if ist_luecke:
+                    luecken_muster = STRICHMUSTER["gepunktet"]
+                    muster = f" stroke-dasharray='{luecken_muster}'"
+                    klasse = "gr-zr-linie gr-zr-linie--luecke"
+                else:
+                    muster = (f" stroke-dasharray='{stil.muster}'"
+                              if stil.muster != "none" else "")
+                    klasse = "gr-zr-linie"
+                teile.append(f"<path class='{klasse}' d='{pfad}' "
+                             f"stroke='{farbe}'{muster}/>")
         for i, (d, wert) in enumerate(serie):
             x, y = x_v(d), y_v(wert)
             ende = i == len(serie) - 1
             einzeln = len(serie) == 1
+            r = 6 if ende else 4.5
             # P1: jeder Punkt traegt Anbieter und Messtag - der Rechenweg
             # dieser EINEN Messung steht als <template> unter dem SVG.
             daten = f" data-anb='{_esc(a)}' data-m='{_esc(d)}'"
@@ -1369,12 +1666,25 @@ def _svg(anbieter_serien: dict, breit: bool,
             if einzeln:
                 teile.append(f"<circle class='gr-zr-halo' cx='{x:.1f}' "
                              f"cy='{y:.1f}' r='9.5' fill='none' "
-                             f"stroke='{marker}'/>")
+                             f"stroke='{marker_farbe}'/>")
             teile.append(
                 f"<circle class='gr-zr-punkt"
                 f"{' gr-zr-ende' if ende else ''}' cx='{x:.1f}' "
-                f"cy='{y:.1f}' r='{6 if ende else 4.5}' fill='{marker}'"
+                f"cy='{y:.1f}' r='{r}' fill='{marker_farbe}'"
                 f"{daten}/>")
+            # P2/D2: DIE MARKERFORM aus `Anbieterstil.marker` - ein offener
+            # Umriss UM den Kreis (Quadrat/Dreieck/Raute/...), damit Farbe
+            # nicht die einzige Unterscheidung zweier Kurven ist (siehe
+            # `anbieter_farben.py`). Additiv statt ersetzend: der Kreis
+            # bleibt exakt der bisherige `circle.gr-zr-punkt` - bestehende
+            # Kreis-Selektoren aus Tests und die Aktiv-Markierung in
+            # `app.js` (`.gr-zr-aktiv` auf dem Kreis) aendern sich nicht.
+            form = _form_pfad(stil.marker, x, y, r)
+            if form:
+                teile.append(
+                    f"<g class='gr-zr-form gr-zr-form--{stil.marker}' "
+                    f"fill='none' stroke='{marker_farbe}' "
+                    f"stroke-width='1.4'>{form}</g>")
             # ... und eine unsichtbare Trefferflaeche darueber (r=12 statt
             # 4,5 - Strategie P1): ein 4,5-px-Kreis ist auf dem Telefon
             # nicht zu treffen. `gr-zr-hit`, NICHT `gr-zr-treffer` - die
@@ -1420,25 +1730,48 @@ def _svg(anbieter_serien: dict, breit: bool,
                          f"{_euro0(text)}</text>")
 
     # _punkte liefert (x, y, wert) - der LETZTE Punkt je Serie traegt
-    # seinen Wert, der ERSTE den Anfangsbetrag. Beide NUR auf dem BREITEN
-    # Bild: am schmalen kollidierten die Werte mit der Endnamen-Kette (am
-    # echten Bestand 4-5 Anbieter, dreifach gemessen: "1.560 EUR" gegen
-    # "Telekom ↗" und "15.09.2026"). Dort tragen die Werte die LEGENDE
-    # ("ab X · zuletzt Y", per CSS eingeblendet) - eine Zahl je Ort, keine
-    # Pixel-Flickschusterei.
+    # seinen Wert. NUR auf dem BREITEN Bild: am schmalen kollidierte er mit
+    # der Endnamen-Kette (am echten Bestand 4-5 Anbieter, dreifach
+    # gemessen: "1.560 EUR" gegen "Telekom ↗" und "15.09.2026"). Dort
+    # traegt die LEGENDE den Wert ("ab X · zuletzt Y", per CSS
+    # eingeblendet) - eine Zahl je Ort, keine Pixel-Flickschusterei.
+    #
+    # C3-Fix (Review 24.09.2026): DER ERSTWERT (klein, am Linienanfang) IST
+    # GEFALLEN. Er nannte denselben Startbetrag, den die Legende schon als
+    # "ab X" traegt ("ab" = der erste Messbetrag, siehe `_legende_html`) -
+    # eine Zahl an zwei Orten desselben Bildes, obwohl sie auf breit
+    # SICHTBAR ist (anders als die Legende, die dort per CSS ausgeblendet
+    # ist: siehe `.gr-zr-legende` in style.css, `@media(min-width:701px)`)
+    # und die Legende selbst schweigt. Verdoppelt gemessen am echten
+    # Bestand: "2.020 €"/"1.956 €"/"1.459 €" standen links UND (als
+    # groesseres Endlabel) rechts derselben drei Kurven.
     if breit:
         letzte = [_punkte(anbieter_serien[a])[-1] for a in anbieter]
         _label(letzte, "gr-zr-wert", -10, "end")
-        mehrere = [a for a in anbieter if len(anbieter_serien[a]) > 1]
-        _label([_punkte(anbieter_serien[a])[0] for a in mehrere],
-               "gr-zr-wert gr-zr-wert--erst", 10, "start")
 
     # Die Endnamen: je Anbieter ein Beleg-Link (↗ + Abrufdatum), Vodafone
     # mit „unser Angebot" - untereinander kollisionsfrei, vom teuersten
     # Ende nach unten geordnet (die Reihenfolge des Prototyps: nach y).
+    #
+    # B-Fix (Review 24.09.2026, S1): AUCH EIN-PUNKT-ANBIETER BEKOMMEN EIN
+    # ENDLABEL. Bis zu diesem Fix bekam nur eine echte Kurve (>= 2 Punkte)
+    # ein Endlabel - die Begruendung war, ein Name+Beleg+Datum-Block neben
+    # einer einzelnen Erhebung lese sich wie ein Verlauf, den es nicht
+    # gibt. Das war richtig UEBERLEGT, aber es machte einen Punkt
+    # UNBESCHRIFTET: die Legende (`_legende_html`, sie NENNT jeden
+    # Anbieter mit Serie, auch mit einem Punkt) ist ab 701 px per CSS
+    # ausgeblendet (`.gr-zr-legende{display:none}`,
+    # `@media(min-width:701px)`) - genau DORT, wo das breite Bild steht.
+    # Gemessen am echten Bestand: Telekom mit genau EINER Messung (15.09.)
+    # stand auf dem Desktop als unbeschrifteter magenta Punkt da - kein
+    # Name, kein Beleg, keine Zuordnung. Jeder SICHTBARE Punkt braucht
+    # eine sichtbare Zuordnung; der Halo (oben, „erstmals gemessen")
+    # bleibt der Hinweis, dass es (noch) keine Kurve ist - das Endlabel
+    # sagt nur noch, WESSEN Punkt das ist.
     enden = sorted(((_punkte(anbieter_serien[a])[-1][0],
                      _punkte(anbieter_serien[a])[-1][1], a)
-                    for a in anbieter), key=lambda e: e[1])
+                    for a in anbieter),
+                   key=lambda e: e[1])
     letzte_y = -99.0
     for x, y, a in enden:
         # Der Stapelabstand richtet sich nach dem BEDARF des Eintrags:
@@ -1460,18 +1793,22 @@ def _svg(anbieter_serien: dict, breit: bool,
         letzte_y = ty
         farbe = _zr_farbe(a)
         url, datum = beleg_je.get(a, ("", ""))
+        # C4: rechtsbuendig an einem festen X (`ENDLABEL_RAND` vom
+        # rechten Bildrand) - der Text waechst nach links, die rechte
+        # Kante bleibt im SVG, egal wie breit die Schrift den Text macht.
+        lx = w - ENDLABEL_RAND
         name_html = f"{_esc(a)}<tspan class='gr-zr-pfeil'> ↗</tspan>"
         if url:
             teile.append(
                 f"<a class='gr-zr-link' href='{_esc(url)}' "
                 f"target='_blank' rel='noopener' aria-label='Beleg bei "
                 f"{_esc(a)} öffnen'><text class='gr-zr-name' "
-                f"x='{x + 12:.1f}' y='{ty + 4:.1f}' fill='{farbe}'>"
-                f"{name_html}</text></a>")
+                f"x='{lx:.1f}' y='{ty + 4:.1f}' text-anchor='end' "
+                f"fill='{farbe}'>{name_html}</text></a>")
         else:
-            teile.append(f"<text class='gr-zr-name' x='{x + 12:.1f}' "
-                         f"y='{ty + 4:.1f}' fill='{farbe}'>{_esc(a)}"
-                         f"</text>")
+            teile.append(f"<text class='gr-zr-name' x='{lx:.1f}' "
+                         f"y='{ty + 4:.1f}' text-anchor='end' "
+                         f"fill='{farbe}'>{_esc(a)}</text>")
         # Der ZEITRAUM steht unmittelbar unter dem Namen - am Ende DER
         # Kurve, zu der er gehoert (P0-B-z1). `gr-zr-mon` ist sein
         # eigener Name; die Optik (10,5 px, gedeckt) ist die des
@@ -1479,16 +1816,17 @@ def _svg(anbieter_serien: dict, breit: bool,
         mon = 13 if mon_text else 0
         if mon_text:
             teile.append(f"<text class='gr-zr-datum gr-zr-mon' "
-                         f"x='{x + 12:.1f}' y='{ty + 17:.1f}'>"
-                         f"{_esc(mon_text)}</text>")
+                         f"x='{lx:.1f}' y='{ty + 17:.1f}' "
+                         f"text-anchor='end'>{_esc(mon_text)}</text>")
         chip = 13 if a == EIGEN else 0
         if a == EIGEN:
-            teile.append(f"<text class='gr-zr-chip' x='{x + 12:.1f}' "
-                         f"y='{ty + 17 + mon:.1f}'>unser Angebot</text>")
+            teile.append(f"<text class='gr-zr-chip' x='{lx:.1f}' "
+                         f"y='{ty + 17 + mon:.1f}' text-anchor='end'>"
+                         f"unser Angebot</text>")
         if datum:
-            teile.append(f"<text class='gr-zr-datum' x='{x + 12:.1f}' "
-                         f"y='{ty + 17 + mon + chip:.1f}'>"
-                         f"{_datum_kurz(datum)}</text>")
+            teile.append(f"<text class='gr-zr-datum' x='{lx:.1f}' "
+                         f"y='{ty + 17 + mon + chip:.1f}' "
+                         f"text-anchor='end'>{_datum_kurz(datum)}</text>")
     teile.append("</svg>")
     return "".join(teile)
 

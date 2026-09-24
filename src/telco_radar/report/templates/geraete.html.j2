@@ -1106,7 +1106,16 @@
      CLAUDE.md 6 (Stichwort-Vorschau). #}
   <p class="gr-erklaer gr-basis--duenn" id="gr-vstand" hidden
      data-abterminen="{{ geraete.verlauf.diagramm_ab_terminen }}"
-     data-abstand="{{ geraete.verlauf.linien_abstand }}"></p>
+     data-abstand="{{ geraete.verlauf.linien_abstand }}"
+     {# A/E (QA-Fix 24.09.2026): dieselbe EINE Schwelle wie der
+        TCO-Server-Chart (`geraete_zeitreihe.LUECKE_TAGE_SCHWELLE`), nur
+        gelesen - kein zweiter Wert in app.js. #}
+     data-luecke-tage="{{ geraete.verlauf.luecke_tage_schwelle }}"
+     {# I2 (QA-Fix 24.09.2026): ab wie vielen Messterminen dieser Satz
+        schweigt, weil er sonst nur noch die Kachel "Messtermine"
+        doppelt - dieselbe EINE Zahl wie oben, aus
+        `geraete_verlauf.VERLAUF_SATZ_MAX_TERMINE`. #}
+     data-satzmaxtermine="{{ geraete.verlauf.verlauf_satz_max_termine }}"></p>
 
   <div class="gr-vtabelle" id="gr-vtabelle" hidden></div>
 
@@ -1216,30 +1225,46 @@ radar_verlinkt %} · <a href="#tafel-radar"
    sie im Ganz-Leer-Fall still verschwunden. Das Gatter fragt weiter
    die DATEI ab: steht kein Dateiname (Export nicht schreibbar), gibt
    es keine Fußzeile - fail closed. #}
+{# P2/D4b (24.09.2026): SECHS Knoepfe -> EIN "Export ▾"-Menue. Gemessen
+   auf dem Telefon standen sechs `.gr-knopf`-Elemente in einer Zeile, die
+   zwar IN SICH rollte (kein Querscroll der Seite), aber sechs
+   Bedienelemente vor jeder Zahl der Seite waren am Fuss noch immer
+   sechs Bedienelemente zu viel - "Export" ist EINE Handlung mit sechs
+   ZIELEN, kein Bedienfeld mit sechs Handlungen. `<details>`/`<summary>`
+   statt eigenem JS: zugeklappt zeigt die Fusszeile GENAU EINEN Knopf
+   ("Export ▾"), aufgeklappt dieselben sechs Ziele in derselben rollenden
+   Zeile wie zuvor - Tastatur und Screenreader bekommen das Verhalten
+   kostenlos vom nativen Element. Der äussere `<section class="gr-export-
+   fuss">` bleibt (Tests und `test_geraete_verlinkt_jede_datei_genau_
+   einmal` suchen `section.gr-export-fuss`), nur ihr Inhalt ist jetzt
+   EIN Aufklapper statt einer offenen Knopfreihe. #}
 {% if geraete.export and geraete.export.aktuell.datei %}
 <section class="gr-export-fuss" aria-label="Exporte">
-  <span class="gr-export-fuss-titel">Export</span>
-  <span class="gr-export-knoepfe">
-    <a class="gr-knopf" href="{{ geraete.export.aktuell.datei }}" download
-      >Alle exportieren ({{ geraete.export.aktuell.zeilen }} Zeilen)</a>
-    <a class="gr-knopf" href="{{ geraete.export.historie.datei }}" download
-      >Preishistorie ({{ geraete.export.historie.zeilen }})</a>
-    <a class="gr-knopf" href="{{ geraete.export.tco.datei }}" download
-      >Bündel-TCO ({{ geraete.export.tco.zeilen }})</a>
-    <a class="gr-knopf" href="{{ geraete.export.radar.datei }}" download
-      >Radar ({{ geraete.export.radar.zeilen }})</a>
-    {# P3: der Katalog auf Modellebene ist eine eigene ZAHLENSEKTION -
-       E5 "alle Zahlensektionen exportierbar" braucht je Ansicht EINEN
-       Knopf (eine Datei je Ansicht, kein Formatmix). Die Zeilenzahl
-       ist die MODELLZAHL - "Alle exportieren" nennt die Listungen. #}
-    {% if geraete.export.modell_barpreis.datei %}
-    <a class="gr-knopf" href="{{ geraete.export.modell_barpreis.datei }}"
-      download>Katalog Barpreis ({{ geraete.export.modell_barpreis.zeilen
-      }})</a>
-    <a class="gr-knopf" href="{{ geraete.export.modell_tco.datei }}"
-      download>Katalog TCO ({{ geraete.export.modell_tco.zeilen }})</a>
-    {% endif %}
-  </span>
+  <details class="gr-export-menu">
+    <summary class="gr-knopf gr-export-oeffner">Export <span
+      class="gr-export-pfeil" aria-hidden="true">▾</span></summary>
+    <span class="gr-export-knoepfe">
+      <a class="gr-knopf" href="{{ geraete.export.aktuell.datei }}" download
+        >Alle exportieren ({{ geraete.export.aktuell.zeilen }} Zeilen)</a>
+      <a class="gr-knopf" href="{{ geraete.export.historie.datei }}" download
+        >Preishistorie ({{ geraete.export.historie.zeilen }})</a>
+      <a class="gr-knopf" href="{{ geraete.export.tco.datei }}" download
+        >Bündel-TCO ({{ geraete.export.tco.zeilen }})</a>
+      <a class="gr-knopf" href="{{ geraete.export.radar.datei }}" download
+        >Radar ({{ geraete.export.radar.zeilen }})</a>
+      {# P3: der Katalog auf Modellebene ist eine eigene ZAHLENSEKTION -
+         E5 "alle Zahlensektionen exportierbar" braucht je Ansicht EINEN
+         Knopf (eine Datei je Ansicht, kein Formatmix). Die Zeilenzahl
+         ist die MODELLZAHL - "Alle exportieren" nennt die Listungen. #}
+      {% if geraete.export.modell_barpreis.datei %}
+      <a class="gr-knopf" href="{{ geraete.export.modell_barpreis.datei }}"
+        download>Katalog Barpreis ({{ geraete.export.modell_barpreis.zeilen
+        }})</a>
+      <a class="gr-knopf" href="{{ geraete.export.modell_tco.datei }}"
+        download>Katalog TCO ({{ geraete.export.modell_tco.zeilen }})</a>
+      {% endif %}
+    </span>
+  </details>
 </section>
 {% endif %}
 

@@ -254,6 +254,44 @@ def test_die_auswahl_des_guenstigsten_buendels_je_tag_rechnet_neu(tmp_path):
     assert sorted(z["gesamt"] for z in zeilen) == [892.75, 919.75]
 
 
+def test_zwei_messungen_ohne_laufzeit_am_selben_tag_verlieren_keine_zahlweise(
+        tmp_path):
+    """`_gleichstand()`: sind BEIDE Ratenlaufzeiten `None` (keine
+    gemessene Geraeterate, hier ueber `geraet_monatsrate=None` gebaut -
+    ohne sie ist `laufzeit_monate` fuer die Leitzahl belanglos, siehe
+    `tco_model.tco_24`), verwirft die Auswahl die zweite, wertgleiche
+    Zeile still. Das ist KEIN Datenverlust: ohne eine gemessene Laufzeit
+    gibt es keine zweite Zahlweise, die `weitere_laufzeiten` zeigen
+    koennte - Gegenprobe zum congstar-24/36-Fall (`test_geraete_buendel_
+    zeilenkopf_d3.py`), wo BEIDE Laufzeiten bekannt sind und die zweite
+    Zeile sehr wohl sichtbar bleibt. Der Punkt der ERSTEN Zeile bleibt
+    stehen (Dateireihenfolge), `weitere_laufzeiten` bleibt leer."""
+    basis = dict(O2_MESSUNG, laufzeit_monate=None, geraet_monatsrate=None)
+    a = dict(basis, id=basis["id"] + "--a")
+    b = dict(basis, id=basis["id"] + "--b")
+    (tmp_path / "geraete_tco_historie.jsonl").write_text(
+        json.dumps(a) + "\n" + json.dumps(b) + "\n", encoding="utf-8")
+    roh = {"buendel": [
+        {"id": a["id"], "sku_id": "samsung-galaxy-s23-128gb-rosa",
+         "anbieter": "o2", "tarif_id": a["tarif_id"],
+         "tarif_name": "O2 Mobile on Demand M Plus"},
+        {"id": b["id"], "sku_id": "samsung-galaxy-s23-128gb-rosa",
+         "anbieter": "o2", "tarif_id": b["tarif_id"],
+         "tarif_name": "O2 Mobile on Demand M Plus"}]}
+    (tmp_path / "geraete_tco.json").write_text(json.dumps(roh),
+                                               encoding="utf-8")
+    tco = {"modelle": [{"id": "m", "karten": [
+        {"sku_id": "samsung-galaxy-s23-128gb-rosa"}]}],
+        "band_je_tarif": {a["tarif_id"]: "b"}}
+    messungen = zr._messungen(tmp_path, tco)
+    eintrag = messungen[("m", "b")]["o2"][a["datum"]]
+    assert eintrag["satz"]["id"] == a["id"], (
+        "die erste Zeile bleibt stehen - kein stiller Tausch")
+    assert eintrag["weitere_laufzeiten"] == [], (
+        "eine erfundene weitere Laufzeit ohne Messgrundlage: "
+        f"{eintrag['weitere_laufzeiten']}")
+
+
 # --------------------------------------------------------------------------
 # Der Template-Block - die gesetzte Rechung als Markup
 # --------------------------------------------------------------------------
