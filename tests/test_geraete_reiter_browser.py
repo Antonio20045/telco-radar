@@ -1474,7 +1474,7 @@ def test_eine_verdeckte_linie_wird_sichtbar_gemacht(_eigene_seite):
     exakt auf der Hoehe - am iPhone 17 256 GB lag "mobilcom-debitel
     1.099,00 €" direkt AUF der eigenen gestrichelten Linie und ihren
     Endpunkt-Kreisen, der Text wirkte durchgestrichen. Das Etikett traegt
-    seither einen senkrechten Versatz (`ENDLABEL_Y_VERSATZ`, ~14 Einheiten)
+    seither einen senkrechten Versatz (`ENDLABEL_Y_VERSATZ`, 22 Einheiten)
     und einen Halo (`.gr-vetikett` `paint-order:stroke`, style.css) - beide
     zusammen halten es lesbar, ohne es beliebig weit vom Punkt zu schieben.
 
@@ -1536,7 +1536,7 @@ def test_eine_verdeckte_linie_wird_sichtbar_gemacht(_eigene_seite):
     # Ueberschneidung mit einem Punkt-Kreis.
     assert 6 < lage["abstand"] <= 26, (
         f"das Etikett steht {lage['abstand']} px vom eigenen Punkt - "
-        f"erwartet ein bewusster Versatz (~14 px), keine 0 und keine 235")
+        f"erwartet ein bewusster Versatz (22 px), keine 0 und keine 235")
     assert not lage["schneidetKreis"], (
         "das Etikett-Rechteck schneidet einen Punkt-Kreis")
     assert "stroke" in lage["halo"], (

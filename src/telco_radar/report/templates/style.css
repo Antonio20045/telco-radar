@@ -3155,7 +3155,15 @@ b,strong{font-weight:700}
      rund 75 px) - lesbar auf ein bis zwei statt drei bis vier Zeilen. */
   .gr-bnd-an .gr-kk-marke{display:block;width:100%;box-sizing:border-box;
     margin:3px 0 0}
-  .gr-bnd-tco{grid-area:tco;text-align:right;align-self:start}
+  /* justify-self:end schrumpft die tco-Box auf den Inhalt und richtet sie
+     an der rechten Kante der Zeile aus (dieselbe Kante bei jeder Zeile,
+     da die Zeile selbst immer volle Breite hat) - die Box beginnt damit
+     rechts vom Anbieternamen (`.gr-bnd-an`, beginnt bei 0), auch wenn
+     beide in eigenen, vollen Zeilen stehen. Ohne das strecken sich beide
+     Grid-Areas ueber die volle Zeilenbreite und ihre Boxen beginnen an
+     derselben Stelle. */
+  .gr-bnd-tco{grid-area:tco;text-align:right;align-self:start;
+    justify-self:end;width:max-content;max-width:100%}
   .gr-bnd-tarif{grid-area:tar}
   .gr-bnd-bar{grid-area:bar;text-align:right}
   .gr-bnd-delta{grid-area:dl}

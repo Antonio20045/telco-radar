@@ -19,6 +19,8 @@ from __future__ import annotations
 
 import contextlib
 import json
+import re
+from pathlib import Path
 
 import pytest
 import yaml
@@ -123,17 +125,27 @@ def _browser_ctx(tmp_path_factory):
 
 
 @pytest.fixture(scope="module")
-def seite(tmp_path_factory):
+def _browser_paar(tmp_path_factory):
+    # EIN sync_playwright()-Kontext je Modul: ein zweiter, gleichzeitig
+    # offener stoesst auf "Sync API inside the asyncio loop" (siehe
+    # `test_ohne_attribut_keine_ausnahme_und_keine_luecken_punktierung`).
     with _browser_ctx(tmp_path_factory) as (wurzel, browser):
-        s = browser.new_page()
-        s.goto(f"{wurzel}/geraete.html", wait_until="networkidle")
-        s.click('.gr-reiter [data-tafel="tafel-verlauf"]')
-        s.wait_for_timeout(120)
-        s.fill("#gr-vsuche", "iPhone 17 Pro")
-        s.wait_for_timeout(150)
-        s.click("#gr-vtreffer li:first-child")
-        s.wait_for_timeout(300)
-        yield s
+        yield wurzel, browser
+
+
+@pytest.fixture
+def seite(_browser_paar):
+    wurzel, browser = _browser_paar
+    s = browser.new_page()
+    s.goto(f"{wurzel}/geraete.html", wait_until="networkidle")
+    s.click('.gr-reiter [data-tafel="tafel-verlauf"]')
+    s.wait_for_timeout(120)
+    s.fill("#gr-vsuche", "iPhone 17 Pro")
+    s.wait_for_timeout(150)
+    s.click("#gr-vtreffer li:first-child")
+    s.wait_for_timeout(300)
+    yield s
+    s.close()
 
 
 def test_das_data_attribut_traegt_den_python_wert(seite):
@@ -224,6 +236,53 @@ def test_der_abschnitt_ueber_der_schwelle_ist_gepunktet_der_andere_nicht(
     # deshalb wird hier nur die KLASSE geprueft, nicht das Muster selbst).
     for p in durchgezogen:
         assert not p["luecke"], p
+
+
+def test_app_js_traegt_kein_rueckfall_literal_fuer_die_schwellen():
+    """CLAUDE.md Clean Code 3: ein fehlender Wert ist eine benannte Luecke,
+    nie ein geratener Wert - `app.js` darf `LUECKE_TAGE`/`SATZ_MAX_TERMINE`
+    nicht still mit 10/8 ausfuellen, falls das data-Attribut fehlt."""
+    quelltext = (Path(__file__).parent.parent / "src" / "telco_radar"
+                 / "report" / "templates" / "app.js").read_text("utf-8")
+    assert "|| '10'" not in quelltext and "|| \"10\"" not in quelltext
+    assert "|| '8'" not in quelltext and "|| \"8\"" not in quelltext
+
+
+def test_ohne_attribut_keine_ausnahme_und_keine_luecken_punktierung(
+        _browser_paar):
+    """Fehlt `data-luecke-tage`/`data-satzmaxtermine` am Knoten (Route
+    entfernt beide VOR dem Laden, denn `app.js` liest sie einmalig beim
+    Modul-Start), darf der Client weder eine Ausnahme werfen noch heimlich
+    mit 10/8 weiterrechnen: kein Abschnitt gilt dann je als Luecke
+    (Vergleich gegen NaN ist immer false), und der Stand-Satz schweigt."""
+    wurzel, browser = _browser_paar
+    ctx = browser.new_context()
+    ctx.route("**/geraete.html", lambda route: route.fulfill(
+        body=re.sub(
+            r' data-(luecke-tage|satzmaxtermine)="\d+"', "",
+            route.fetch().text()),
+        content_type="text/html"))
+    s = ctx.new_page()
+    fehler = []
+    s.on("pageerror", lambda e: fehler.append(str(e)))
+    s.goto(f"{wurzel}/geraete.html", wait_until="networkidle")
+    s.click('.gr-reiter [data-tafel="tafel-verlauf"]')
+    s.wait_for_timeout(120)
+    s.fill("#gr-vsuche", "iPhone 17 Pro")
+    s.wait_for_timeout(150)
+    s.click("#gr-vtreffer li:first-child")
+    s.wait_for_timeout(300)
+    attribut_weg = s.eval_on_selector(
+        "#gr-vstand", "e => e.getAttribute('data-luecke-tage')")
+    assert attribut_weg is None, "die Route hat das Attribut nicht entfernt"
+    pfade = _pfade(s)
+    assert pfade, "kein gezeichneter Pfad - der Test prüft nichts"
+    assert all(not p["luecke"] for p in pfade), (
+        f"ohne Schwelle gilt trotzdem ein Abschnitt als Lücke: {pfade}")
+    assert s.eval_on_selector("#gr-vstand", "e => e.hidden") is True, (
+        "der Stand-Satz erscheint auch ohne data-satzmaxtermine")
+    ctx.close()
+    assert fehler == [], f"Ausnahmen im Client: {fehler}"
 
 
 def test_grenzfall_zehn_tage_gegenprobe_am_python_wert():

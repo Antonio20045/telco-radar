@@ -2603,17 +2603,30 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
   /* A/E (QA-Fix 24.09.2026): dieselbe Messluecken-Schwelle wie der
      TCO-Server-Chart (`geraete_zeitreihe.LUECKE_TAGE_SCHWELLE`) - aus
      `report/geraete_verlauf.py` durchgereicht, NICHT hier hartkodiert
-     (derselbe Grund wie AB_TERMINEN/ABSTAND zwei Zeilen oben). */
-  var LUECKE_TAGE = parseInt(
-    (stand && stand.dataset.lueckeTage) || '10', 10);
+     (derselbe Grund wie AB_TERMINEN/ABSTAND zwei Zeilen oben). KEIN
+     Rueckfall-Literal: fehlt das Attribut, bleibt LUECKE_TAGE NaN. Jeder
+     Vergleich `tage > NaN` ist dann false - keine Zeile gilt je als
+     Luecke, statt eine geratene Schwelle zu benutzen (CLAUDE.md
+     "Clean Code" 3: ein fehlender Wert ist eine benannte Luecke, nie ein
+     geratener Wert). */
+  var LUECKE_TAGE = stand && stand.dataset.lueckeTage
+    ? parseInt(stand.dataset.lueckeTage, 10)
+    : (console.error(
+        'gr-vstand: data-luecke-tage fehlt - Messluecken werden nicht ' +
+        'erkannt statt mit einer geratenen Schwelle gerechnet.'), NaN);
   /* I2 (QA-Fix 24.09.2026): AB WIE VIELEN MESSTERMINEN DER SATZ SCHWEIGT.
      Aus `report/geraete_verlauf.py` (`VERLAUF_SATZ_MAX_TERMINE`), nicht
      hier hartkodiert - derselbe Grund wie bei AB_TERMINEN/ABSTAND/
      LUECKE_TAGE. Unterhalb der Schwelle nennt der Satz eine Auskunft, die
      die Kachel "Messtermine" nicht hat (die SPANNE, "vom … bis zum …");
-     darueber doppelt er nur noch deren Zahl. */
-  var SATZ_MAX_TERMINE = parseInt(
-    (stand && stand.dataset.satzmaxtermine) || '8', 10);
+     darueber doppelt er nur noch deren Zahl. KEIN Rueckfall-Literal:
+     fehlt das Attribut, schweigt der Satz ganz (siehe `satz()`) statt
+     mit einer geratenen Schwelle zu erscheinen. */
+  var SATZ_MAX_TERMINE = stand && stand.dataset.satzmaxtermine
+    ? parseInt(stand.dataset.satzmaxtermine, 10)
+    : (console.error(
+        'gr-vstand: data-satzmaxtermine fehlt - der Stand-Satz bleibt ' +
+        'stumm statt mit einer geratenen Schwelle zu erscheinen.'), NaN);
   /* H2 (QA-Fix 24.09.2026): Mindestabstand zweier X-Achsen-Beschriftungen
      im SVG-Koordinatensystem (1080 breit) - siehe `xMarkenOhneUeberlappung`
      weiter unten. */
@@ -2766,7 +2779,11 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
        16 schon zeigte, ohne neue Auskunft ausser der Spanne). Unterhalb
        der Schwelle bleibt er stehen - dort ist die Spanne selbst eine
        Auskunft ueber eine noch duenne Datenlage. */
-    if (tage.length > SATZ_MAX_TERMINE) {
+    /* Fehlt die Schwelle (data-satzmaxtermine, siehe oben), ist der
+       Vergleich `> NaN` immer false und der Satz erschiene ungeprueft -
+       darum hier die eigene, benannte Ausfallpruefung statt eines
+       geratenen Werts. */
+    if (isNaN(SATZ_MAX_TERMINE) || tage.length > SATZ_MAX_TERMINE) {
       stand.hidden = true; return;
     }
     stand.hidden = false;
