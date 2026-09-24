@@ -133,9 +133,9 @@
       <th scope="col"><button type="button" class="gr-sort" data-sort="laden"
         data-art="text">günstigster Wettbewerber</button></th>
       <th scope="col" class="num"><button type="button" class="gr-sort"
-        data-sort="unser" data-art="zahl">unser Preis</button></th>
+        data-sort="unser" data-art="zahl" title="Neugerät ohne Vertrag, günstigster Preis je Laden; bietet ein Anbieter nur gegen Ratenzahlung, steht hier der Gesamtbetrag der Raten – erkennbar an der Ratenzahl, kein Barpreis">unser Preis</button></th>
       <th scope="col" class="num"><button type="button" class="gr-sort"
-        data-sort="fremd" data-art="zahl">Wettbewerbspreis</button></th>
+        data-sort="fremd" data-art="zahl" title="Neugerät ohne Vertrag, günstigster Preis je Laden; bietet ein Anbieter nur gegen Ratenzahlung, steht hier der Gesamtbetrag der Raten – erkennbar an der Ratenzahl, kein Barpreis">Wettbewerbspreis</button></th>
       {# EINE Spalte, ZWEI Sortierungen. Die Zelle darunter traegt beide
          Zahlen (Prozent gross, Euro klein) - das ist die Entscheidung vom
          30.08.2026 und sie bleibt. Zwei Spalten daraus zu machen hiesse,
@@ -179,13 +179,18 @@
   {# "Geraete" waere hier falsch, und ein Test haelt das fest: gezaehlt
      werden Modell-Speicher-Kombinationen, und davon gibt es mehr als
      Geraete. Genau diese Verwechslung stand schon einmal auf der Seite
-     ("62 Geraete im Vergleich" bei 59 beobachteten). #}
-  <p class="gr-erklaer">{{ al.verglichen }} Modelle mit ihren Speichergrößen
+     ("62 Geraete im Vergleich" bei 59 beobachteten).
+     D4a (24.09.2026): der zweite Halbsatz („Verglichen werden ausschließ-
+     lich Neugeräte … kein Barpreis") ist GEFALLEN - eine Lesehilfe zu den
+     Spalten „unser Preis"/„Wettbewerbspreis". Er steht als `title` an
+     DIESEM Satz (unconditional, anders als die Tabellen-Köpfe: die
+     Tabelle selbst fehlt ganz, solange es keine Alarmzeile gibt) UND an
+     den Spaltenköpfen, wenn die Tabelle steht; dieselbe Auskunft
+     zusätzlich auf der Methodik-Seite. Der Datenstand bleibt als
+     sichtbarer Satz stehen. #}
+  <p class="gr-erklaer" title="Verglichen werden ausschließlich Neugeräte ohne Tarifvertrag, jeweils der günstigste Preis je Laden. Wo ein Anbieter das Gerät nur gegen Ratenzahlung abgibt, steht der Gesamtbetrag der Raten in der Spalte – erkennbar an der Ratenzahl, kein Barpreis.">{{ al.verglichen }} Modelle mit ihren Speichergrößen
   stehen einem Wettbewerber gegenüber{% if al.ohne_wettbewerber %}; bei
   weiteren {{ al.ohne_wettbewerber }} führt kein beobachteter Anbieter
   dieselbe Kombination aus Modell und Speichergröße, sie sind deshalb in
-  keiner der vier Kacheln gezählt{% endif %}. Verglichen werden ausschließlich Neugeräte ohne Tarifvertrag, jeweils
-  der günstigste Preis je Laden. Wo ein Anbieter das Gerät nur gegen
-  Ratenzahlung abgibt, steht der Gesamtbetrag der Raten in der Spalte — er
-  ist an der Ratenzahl erkennbar und nicht dasselbe wie ein Barpreis.</p>
+  keiner der vier Kacheln gezählt{% endif %}.</p>
 {% endmacro %}

@@ -53,11 +53,13 @@
     </div>
     {% if p.svg_breit %}
     {{ p.legende_html | safe }}
-    <div class="gr-zr-bild" id="gr-zr-bild">{{ p.svg_breit | safe }}{{
+    {# D4a (24.09.2026): der Lesehilfe-Satz „Ein fehlender Punkt heißt …"
+       ist GEFALLEN (Antonios Regel: keine Erklär-Unterzeile unter einer
+       Grafik). Dieselbe Auskunft steht jetzt als `title` am Graphen selbst
+       (Tooltip) und auf der Methodik-Seite (geraete-quellen.html#methodik)
+       - nichts verloren, nur umgezogen. #}
+    <div class="gr-zr-bild" id="gr-zr-bild" title="Ein fehlender Punkt heißt: dieser Anbieter hatte an dem Tag kein Bündel in diesem Band — Linien verbinden nur echte Messungen.">{{ p.svg_breit | safe }}{{
       p.svg_schmal | safe }}</div>
-    <p class="gr-zr-hinweis">Ein fehlender Punkt heißt: dieser Anbieter
-    hatte an dem Tag kein Bündel in diesem Band — Linien verbinden nur
-    echte Messungen.</p>
     {% else %}
     {# Der ehrliche Leer-Satz: Historie und Karten sind zwei Zeitreihen,
        und eine Kurve aus einem Stand wäre erfunden. #}

@@ -104,6 +104,71 @@
   {% endif %}
 </section>
 
+{# D4a (24.09.2026, Erklärtext-Inventur der Geräteseite): DIE METHODIK-
+   SEKTION. Bis hierhin standen diese Sätze als Erklär-Unterzeilen unter
+   Überschriften, Grafiken und Zahlen auf geraete.html - gegen Antonios
+   Regel ("Keine Erklär-Unterzeilen unter Überschriften, Grafiken oder
+   Zahlen"). Nichts ist gestrichen: jeder Satz steht hier wörtlich oder
+   sinngleich, und der Fußzeilen-Link "Methodik" auf geraete.html führt
+   genau hierher (#methodik). Was auf der Geräteseite blieb, sind die
+   DATEN - Zahlen, Daten, Quellenlinks, benannte Lücken (CLAUDE.md Clean
+   Code 3, Regel 9); was hier steht, ist nur noch, WIE gerechnet und
+   gruppiert wird. #}
+<section class="gr-methode" id="methodik">
+  <h2 class="rubrik">Wie die Geräteseite rechnet und gruppiert</h2>
+  <ul class="list-card gr-methodenliste">
+    <li class="list-row"><span class="list-row-date">Zeitreihe</span>
+      <span>Ein fehlender Punkt heißt: dieser Anbieter hatte an dem Tag
+      kein Bündel in diesem Band – Linien verbinden nur echte
+      Messungen.</span></li>
+    <li class="list-row"><span class="list-row-date">Ohne Tarifband</span>
+      <span>Unbegrenzte Tarife und Tarife ohne erhobenes Datenvolumen
+      gehören zu keinem der drei Bänder – sie stehen als eigene Gruppe
+      unter der Bandliste, nicht heimlich in einem Band.</span></li>
+    <li class="list-row"><span class="list-row-date">Radar-Grafik</span>
+      <span>Balkenlänge = Abstand in Euro zum Vodafone-Preis (Neugeräte,
+      ohne Vertrag); negativ heißt, der Wettbewerber ist günstiger. Die
+      Preis-Alarme zeigen denselben Abstand als Betrag.</span></li>
+    <li class="list-row"><span class="list-row-date">Modell-Liste</span>
+      <span>Kosten über 24 Monate: jede Zeile ein Modell, gerechnet gegen
+      Vodafone im selben Tarifband (Klein/Mittel/Groß nach Datenvolumen,
+      siehe <a href="{{ prefix }}tarife.html">Tarifübersicht</a>). Oben
+      stehen die Geräte, bei denen Vodafone am stärksten zurückliegt; ein
+      Klick auf eine Zeile zeigt alle Anbieter des Modells. Abweichung je
+      Zeile = Wettbewerber-Kosten über 24 Monate gegen die Vodafone-Karte
+      im selben Tarifband; „VF" in den Detailzeilen nennt dieselbe
+      Vodafone-Kosten-Basis im selben Band.</span></li>
+    <li class="list-row"><span class="list-row-date">Ab-Preis</span>
+      <span>Der „ab"-Preis bei Geräten, die nur Wettbewerber führen,
+      nennt den günstigsten Anbieter, der das Gerät führt.</span></li>
+    <li class="list-row"><span class="list-row-date">Händler</span>
+      <span>Fachhändler verkaufen ohne eigenen Tarif – gezählt wird der
+      reine Barpreis ohne Vertrag und ohne Tarif gegen Vodafones
+      Gerätepreis, dieselbe %-Formel wie bei den Netzbetreibern, aber nie
+      gegen eine TCO gerechnet.</span></li>
+    <li class="list-row"><span class="list-row-date">Generationen</span>
+      <span>Ein Wettbewerber, der das Vorjahresmodell im Regal lässt, hat
+      einen Preiseinstieg, ohne den Preis des neuen Geräts anzufassen.
+      Gezählt werden Jahrgänge, nicht Varianten: iPhone 17, 17 Pro und 17
+      Pro Max sind ein Jahrgang, acht Farben eines Modells sind ein
+      Regalplatz.</span></li>
+    <li class="list-row"><span class="list-row-date">Seit dem Nachfolger</span>
+      <span>Zählt die Tage seit dem Marktstart des Nachfolgers. Wo die
+      eigene Beobachtung erst später begann, ist ein Teil dieser Tage
+      eine Annahme aus dem Katalogdatum, keine Messung.</span></li>
+    <li class="list-row"><span class="list-row-date">Preis-Alarme</span>
+      <span>Verglichen werden ausschließlich Neugeräte ohne
+      Tarifvertrag, jeweils der günstigste Preis je Laden. Wo ein
+      Anbieter das Gerät nur gegen Ratenzahlung abgibt, steht der
+      Gesamtbetrag der Raten in der Spalte – erkennbar an der Ratenzahl,
+      kein Barpreis.</span></li>
+    <li class="list-row"><span class="list-row-date">Katalog</span>
+      <span>Eine Zeile je Modell; der Umschalter darüber wählt
+      Einzelgerätpreis oder Kosten über 24 Monate. Alle Listungen des
+      Modells stehen unter der Zeile.</span></li>
+  </ul>
+</section>
+
 <section class="gr-methode">
   <h2 class="rubrik">Wie beschafft wird</h2>
   <ul class="list-card gr-methodenliste">

@@ -1003,20 +1003,28 @@ def test_ein_simulierter_nachtlauf_erzeugt_keine_nullzeilen():
 
 @pytest.mark.skipif(not _DB.exists(), reason="kein Geraete-Bestand im Checkout")
 def test_ohne_vollstaendigen_lauf_wird_nichts_zugerechnet():
-    """B2 am echten Bestand: mobilcom-debitel steht bei `laeufe: 0`.
+    """B2 am echten Bestand: ein Anbieter ohne vollstaendigen Lauf.
 
     `mark_stale` laeuft nur `if bilanz.vollstaendig` - aus dem Ausbleiben der
-    Alterung folgt fuer diesen Anbieter nichts. Seine Prueftage vom 14. und
-    21.08. stammen aus den Feldern ANDERER Listungen; der Lauf war gedeckelt,
-    und ein Deckel ist kein Blick.
+    Alterung folgt fuer einen solchen Anbieter nichts. Seine Prueftage stammen
+    aus den Feldern ANDERER Listungen; ein gedeckelter Lauf ist kein Blick.
+
+    Die Vorbedingung `laeufe == 0` wird hier GESETZT, nicht aus dem Bestand
+    erhofft. Bis zum 22.09.2026 stand mobilcom-debitel dort tatsaechlich bei
+    0 - neun tote Adressen in freenets eigener Sitemap kippten jeden Lauf.
+    Seit P1 zaehlen tote Adressen, statt den Lauf zu kippen, und der Lauf vom
+    23.09. war der erste vollstaendige. Ein Test, der den kaputten Zustand
+    als Bestand voraussetzt, faellt genau dann, wenn der Fehler behoben ist;
+    der Mechanismus haengt aber nicht davon ab, welcher Anbieter gerade bei
+    0 steht. Die echten Termine und Listungen bleiben der Pruefgegenstand.
     """
     alle, punkte, katalog, termine, laeufe = _echter_bestand(nachtlauf=True)
-    assert laeufe["mobilcom-debitel"] == 0, laeufe
     assert len(termine["mobilcom-debitel"]) >= MIND_TERMINE_JE_GERAET
     heute = max(e.get("last_verified") or "" for e in alle)
 
+    ohne_lauf = dict(laeufe, **{"mobilcom-debitel": 0})
     echt = auswertung(alle, punkte, katalog, heute=heute,
-                      laeufe_je_anbieter=laeufe, termine_je_anbieter=termine)
+                      laeufe_je_anbieter=ohne_lauf, termine_je_anbieter=termine)
     assert not [d for d in echt["dauern"] if d["anbieter"] == "mobilcom-debitel"]
 
     # Die Gegenprobe: EIN vollstaendiger Lauf, und dieselben Termine zaehlen.

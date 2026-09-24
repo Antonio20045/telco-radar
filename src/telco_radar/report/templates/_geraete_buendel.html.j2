@@ -355,10 +355,10 @@
         | selectattr('1') | list %}
       {% if m.zeilen_ohne_band or haendler_mit_preis %}
       <div class="gr-ohneband"{% if ids %} id="gr-ohneband"{% endif %}>
-        <h4 class="gr-ohneband-kopf">Ohne Tarifband</h4>
-        <p class="gr-erklaer gr-basis--duenn">Unbegrenzte Tarife und Tarife
-        ohne erhobenes Datenvolumen gehören zu keinem der drei Bänder
-        (§ 7) – sie stehen hier, nicht heimlich in einem Band.</p>
+        {# D4a (24.09.2026): der Erklärsatz („Unbegrenzte Tarife … § 7")
+           ist GEFALLEN - dieselbe Auskunft steht als `title` an der
+           Zwischenüberschrift (Tooltip) und auf der Methodik-Seite. #}
+        <h4 class="gr-ohneband-kopf" title="Unbegrenzte Tarife und Tarife ohne erhobenes Datenvolumen gehören zu keinem der drei Bänder – sie stehen hier, nicht heimlich in einem Band.">Ohne Tarifband</h4>
         {# P0-B-z2: derselbe Spaltenname wie über der Bandliste (siehe
            `geraete.html.j2`) - der Zeitraum steht am Etikett JEDER Zeile,
            nicht im Kopf. Zwei Köpfe mit zwei Texten wären die nächste

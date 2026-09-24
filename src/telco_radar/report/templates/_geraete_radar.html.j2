@@ -310,18 +310,18 @@
 <section class="wr-sektion gr-r-sektion" id="wr-grafik">
   <h3 class="gr-unter">Die größten Abstände zu Vodafone</h3>
   {% if wr.grafik and wr.grafik.svg_breit %}
-  <div class="wr-grafik-bild">{{ wr.grafik.svg_breit | safe
+  {# D4a (24.09.2026): das Achslabel („Balkenlänge = … negativ heißt …")
+     ist als sichtbarer Satz GEFALLEN - eine Erklär-Unterzeile direkt
+     unter der Grafik (Antonios Regel). Dieselbe Auskunft, samt der
+     Betrags-Regel der Preis-Alarme (E3-B2), steht jetzt als `title` an
+     der Grafik selbst und auf der Methodik-Seite. #}
+  {# D4a-Fix (Review): die gezählte Basis (`wr.grafik.basis`, echte Zahl
+     aus geraete_radar.grafik(), len(alle)) war beim Kürzen des Achslabels
+     NIRGENDS mehr sichtbar - weder als Text noch als title. Sie kommt
+     zurück als knappe Zahl, ohne Lesehilfe-Satz. #}
+  <p class="gr-v-meta">{{ wr.grafik.basis }} Modelle</p>
+  <div class="wr-grafik-bild" title="Balkenlänge = Abstand in Euro zum Vodafone-Preis (Neugeräte, ohne Vertrag); negativ heißt, der Wettbewerber ist günstiger. Die Preis-Alarme zeigen denselben Abstand als Betrag.">{{ wr.grafik.svg_breit | safe
     }}{{ wr.grafik.svg_schmal | safe }}</div>
-  {# P4-Fix (Sicht-Pruefung 18.09., Kleineres 9): der Achsensatz ist ein
-     LABEL unter der Grafik, kein Absatz zwischen Leitzahl und Bild. Er
-     tragt seit diesem Fix auch die BETRAGS-Regel der Preis-Alarme (E3-B2)
-     - der Tafelkopf-Satz, der sie bis hierhin allein trug, ist gefallen
-     (Ruhe: vor dem ersten Datenelement steht nur die Leitzahl). Unter
-     200 Zeichen (design.md Regel 8, pruefe_portal _MAX_ABSATZ_NACH_SVG). #}
-  <p class="gr-achsenlabel">Balkenlänge = Abstand in Euro zum Vodafone-Preis
-  (Neugeräte, ohne Vertrag); negativ heißt: der Wettbewerber ist günstiger.
-  Die Preis-Alarme zeigen denselben Abstand als Betrag. Alle {{
-  wr.grafik.basis }} Modelle stehen in den Tabellen darunter.</p>
   {% else %}
   <p class="gr-erklaer">{{ wr.grafik.leer_grund if wr.grafik else
     'Noch keine vergleichbaren Barpreise erhoben.' }}</p>
@@ -337,9 +337,10 @@
    bleibt er eine Nachfrage unter der Grafik - dieselbe Bauform wie der
    Lifecycle-Nachschlag am Tafelende. #}
 {% if wr.ohne_vodafone %}
-<p class="gr-erklaer gr-sortiment-satz">Diese Geräte führen nur
-Wettbewerber im Regal, Vodafone keins von beiden – der ab-Preis nennt
-den günstigsten Anbieter, der sie führt.</p>
+{# D4a (24.09.2026): der Ankündigungssatz vor dem Aufklapper ist
+   GEFALLEN - er wiederholte nur, was die Summary schon sagt ("Bei
+   Wettbewerbern gelistet, bei Vodafone nicht"). Die Bedeutung des
+   ab-Preises steht jetzt als `title` an der Zahl selbst. #}
 <details class="gr-auf" id="gr-sortiment">
   <summary>Bei Wettbewerbern gelistet, bei Vodafone nicht
     ({{ wr.ohne_vodafone_gesamt }})</summary>
@@ -347,7 +348,7 @@ den günstigsten Anbieter, der sie führt.</p>
     {% for l in wr.ohne_vodafone %}
     <li><span class="szl">{{ l.modell }}</span>
       {% if l.speicher %}<span class="gr-v-meta">{{ l.speicher }} GB</span>{% endif %}
-      <span class="gr-v-prozent">ab {{ l.ab_preis | euro }}</span>
+      <span class="gr-v-prozent" title="günstigster Preis eines Anbieters, der dieses Gerät führt">ab {{ l.ab_preis | euro }}</span>
       <span class="gr-v-datum">{{ l.anzahl }} {{ 'Anbieter' if l.anzahl == 1
         else 'Anbieter' }}</span>
       <a href="{{ l.anbieter[0].url }}" rel="noopener">{{ l.anbieter[0].laden
@@ -423,21 +424,19 @@ den günstigsten Anbieter, der sie führt.</p>
   <details class="gr-auf">
     <summary>Alle {{ ml.gesamt }} Modell-Zeilen öffnen (Kosten über
       24 Monate)</summary>
-    <p class="gr-erklaer">Kosten über 24 Monate: jede Zeile
-    ein Modell, gerechnet gegen Vodafone im selben Tarifband (Klein/Mittel/
-    Groß nach Datenvolumen). Oben stehen die Geräte, bei denen Vodafone am
-    stärksten zurückliegt; ein Klick auf eine Zeile zeigt alle Anbieter des
-    Modells. Welche Datenvolumen in welches Band fallen, steht in der
-    <a href="{{ prefix }}tarife.html">Tarifübersicht</a>.</p>
+    {# D4a (24.09.2026): der Erklärsatz vor der Tabelle ist GEFALLEN
+       („jede Zeile ein Modell, gerechnet gegen … Oben stehen …" - eine
+       Lesehilfe, keine Daten-Aussage). Die Spaltenköpfe tragen ihre
+       eigene Bedeutung jetzt als `title`; die Formel und der Link auf
+       die Tarifübersicht stehen vollständig auf der Methodik-Seite. #}
     {# P4/D1: DIE EINE Vodafone-Basis-Legende. Bis hierhin stand der Satz
        „Vodafone-Basis: … TCO-24 (…, Band …)" als wr-basis-Absatz in
        JEDER Detailzeile - 48- bis 60-mal dieselbe Formel. Der VF-Betrag
-       steht je Anbieter-Zeile selbst („Band Klein · VF 1.949,80 €"),
-       diese Legende sagt, was er bedeutet. #}
-    <p class="wr-basis-legende">Abweichung je Zeile = Wettbewerber-Kosten
-    über 24 Monate
-    gegen die Vodafone-Karte im selben Tarifband; „VF" in den Detailzeilen
-    nennt diese Basis.</p>
+       steht je Anbieter-Zeile selbst („Band Klein · VF 1.949,80 €"). D4a:
+       die Erklärung dieses Kürzels steht jetzt als `title` an der
+       Legende, ihr sichtbarer Text bleibt so kurz wie die Formel selbst. #}
+    <p class="wr-basis-legende" title="Abweichung je Zeile = Wettbewerber-Kosten über 24 Monate gegen die Vodafone-Karte im selben Tarifband.">„VF" in den Detailzeilen = Vodafone-Kosten im selben Band ·
+    <a href="{{ prefix }}tarife.html">Tarifübersicht</a></p>
   <div class="gr-alarm-scroll">
   <table class="gr-alarm wr-modelliste">
     <thead><tr>
@@ -445,7 +444,7 @@ den günstigsten Anbieter, der sie führt.</p>
         data-art="text">Modell</button></th>
       <th scope="col" class="num"><button type="button" class="gr-sort"
         data-sort="prozent" data-art="zahl" data-vor="auf"
-        aria-sort="ascending">Abweichung</button></th>
+        aria-sort="ascending" title="Wettbewerber-Kosten über 24 Monate gegen Vodafone im selben Tarifband (Klein/Mittel/Groß nach Datenvolumen); oben stehen die Geräte, bei denen Vodafone am stärksten zurückliegt">Abweichung</button></th>
       <th scope="col"><button type="button" class="gr-sort"
         data-sort="anbieter" data-art="text">Wettbewerber</button></th>
       <th scope="col" class="num"><button type="button" class="gr-sort"
@@ -481,13 +480,13 @@ den günstigsten Anbieter, der sie führt.</p>
    komischen unteren Abschnitt ganz unten" (Antonio). Hier ist die
    Sektion die dritte von dreien, mit demselben Kopf wie die beiden
    anderen. #}
+{# D4a (24.09.2026): der Erklärsatz unter der Überschrift ist GEFALLEN
+   (Antonios Regel). Dieselbe Auskunft - Barpreis ohne Vertrag/Tarif,
+   dieselbe %-Formel wie bei den Netzbetreibern, nie gegen eine TCO
+   gerechnet - steht jetzt als `title` an der Überschrift und auf der
+   Methodik-Seite. #}
 <section class="wr-sektion gr-r-sektion" id="wr-haendler">
-  <h3 class="gr-unter">Händler – Gerätepreis ohne Finanzierung</h3>
-  <p class="gr-erklaer">Fachhändler verkaufen ohne eigenen Tarif – hier
-  zählt der reine Barpreis ohne Vertrag und ohne Tarif gegen Vodafones
-  Gerätepreis, dieselbe %-Formel wie bei den Netzbetreibern, aber nie
-  gegen eine TCO gerechnet. Welche Händler Preise liefern, steht in der
-  Tabelle; welche warum nicht, im Aufklapper darunter.</p>
+  <h3 class="gr-unter" title="Fachhändler verkaufen ohne eigenen Tarif – hier zählt der reine Barpreis ohne Vertrag und ohne Tarif gegen Vodafones Gerätepreis, dieselbe %-Formel wie bei den Netzbetreibern, aber nie gegen eine TCO gerechnet.">Händler – Gerätepreis ohne Finanzierung</h3>
   {% if wr.haendler %}
   <div class="gr-scroll">
   <table class="src-table wr-tabelle">
@@ -568,11 +567,12 @@ den günstigsten Anbieter, der sie führt.</p>
     <p class="gr-basis{{ ' gr-basis--duenn' if port.lifecycle.duenn }}">{{ port.lifecycle.hinweis }}</p>
 
   {% if port.lifecycle.portfolio %}
-  <h4 class="gr-unter">Wie viele Generationen ein Anbieter gleichzeitig führt</h4>
-  <p class="gr-erklaer">Ein Wettbewerber, der das Vorjahresmodell im Regal
-  lässt, hat einen Preiseinstieg, ohne den Preis des neuen Geräts anzufassen.
-  Gezählt werden Jahrgänge, nicht Varianten: iPhone 17, 17 Pro und 17 Pro Max
-  sind ein Jahrgang, acht Farben eines Modells sind ein Regalplatz.</p>
+  {# D4a (24.09.2026): der Erklärsatz unter der Überschrift ist GEFALLEN.
+     Dieselbe Auskunft - ein Wettbewerber mit Vorjahresmodell im Regal hat
+     einen Preiseinstieg ohne den Neupreis anzufassen; gezählt werden
+     Jahrgänge, nicht Varianten - steht als `title` an der Überschrift
+     und auf der Methodik-Seite. #}
+  <h4 class="gr-unter" title="Ein Wettbewerber, der das Vorjahresmodell im Regal lässt, hat einen Preiseinstieg, ohne den Preis des neuen Geräts anzufassen. Gezählt werden Jahrgänge, nicht Varianten: iPhone 17, 17 Pro und 17 Pro Max sind ein Jahrgang, acht Farben eines Modells sind ein Regalplatz.">Wie viele Generationen ein Anbieter gleichzeitig führt</h4>
   {# BEIDE ZAHLEN TRAGEN IHR WORT und zwischen ihnen steht ein sichtbares
      Trennzeichen - bis zum 30.08.2026 verschmolzen sie im Browser zu
      „2454 Modelle" (26-px-Rasterspalte, keine Flex); die ganze Geschichte
@@ -644,13 +644,11 @@ den günstigsten Anbieter, der sie führt.</p>
      war unbelegt und vom eigenen Bestand widerlegt. Die Spalte heisst
      bewusst NICHT „Verweildauer" - die Liste darüber misst LISTUNGSDAUER,
      diese Zelle die Zeit SEIT EINEM KATALOGDATUM; beide können um den
-     Faktor 30 auseinanderliegen. #}
-  <p class="gr-erklaer">Bleibt ein Vorjahresmodell nach dem Start seines
-  Nachfolgers als günstiger Einstieg im Regal, oder wird es ersetzt – bei
-  uns wie beim Wettbewerb? Die Spalte „Seit dem Nachfolger“ zählt die Tage
-  seit dessen Marktstart. Wo die eigene Beobachtung erst später begann,
-  steht daneben, wie viele dieser Tage wirklich gemessen sind – der Rest ist
-  eine Annahme aus dem Katalogdatum, keine Messung.</p>
+     Faktor 30 auseinanderliegen.
+     D4a (24.09.2026): der Erklärsatz darunter ist GEFALLEN - die Spalten-
+     bedeutung („Seit dem Nachfolger" zählt Tage seit dessen Marktstart,
+     teils gemessen/teils Annahme aus dem Katalogdatum) steht jetzt als
+     `title` am Spaltenkopf und auf der Methodik-Seite. #}
   {# DER DECKEL STEHT IM MODUL (`geraete_view.NACHFOLGER_SICHTBAR` = 0):
      die GESAMTE Tabelle steht in EINEM Aufklapper; ist `sichtbar` groesser
      als der Bestand, entfaellt der Aufklapper (derselbe Codepfad traegt
@@ -665,7 +663,7 @@ den günstigsten Anbieter, der sie führt.</p>
     <thead><tr><th>Gerät</th><th>Anbieter</th>{% if zustand_spalte %}<th>Zustand</th>{% endif %}
       <th>Nachfolger ab</th><th class="num">vorher</th>
       <th class="num">+30 Tage</th><th class="num">+60</th><th class="num">+90</th>
-      <th>Seit dem Nachfolger</th></tr></thead>
+      <th title="Tage seit dem Marktstart des Nachfolgers; begann die eigene Beobachtung erst später, steht daneben, wie viele Tage wirklich gemessen sind – der Rest ist eine Annahme aus dem Katalogdatum, keine Messung">Seit dem Nachfolger</th></tr></thead>
     <tbody>
       {% for n in zeilen %}{{ nachfolgerzeile(n, zustand_spalte) }}{% endfor %}
     </tbody>

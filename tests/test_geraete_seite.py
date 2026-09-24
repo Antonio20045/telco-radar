@@ -2891,9 +2891,17 @@ def test_ein_ratengesamtbetrag_wird_auf_der_seite_als_solcher_gezeigt(tmp_path):
 def test_die_seite_behauptet_keinen_reinen_barpreisvergleich_mehr(tmp_path):
     """Solange o2 und Vodafone in derselben Spalte stehen, ist "ausschliesslich
     Neugeraete ohne Vertrag" die Behauptung, die Befund A widerlegt hat.
-    Seit E3 Schritt 3 steht der Satz in der Alarm-Sektion des Radar-Reiters
-    (geteilte Teilvorlage _geraete_alarme.html.j2)."""
+    Seit E3 Schritt 3 stand der Satz in der Alarm-Sektion des Radar-Reiters
+    (geteilte Teilvorlage _geraete_alarme.html.j2). D4a (24.09.2026,
+    Erklärtext-Inventur): der Satz ist als sichtbarer Text GEFALLEN (Antonios
+    Regel: keine Erklär-Unterzeile) - dieselbe Zusicherung steht seither als
+    `title` am Datensatz-Absatz der Sektion (der auch ohne Alarmzeilen im
+    DOM steht)."""
     site = _baue(tmp_path)
-    text = _radar(site).get_text(" ", strip=True)
+    radar = _radar(site)
+    text = radar.get_text(" ", strip=True)
     assert "ausschließlich Neugeräte ohne Vertrag" not in text
-    assert "nicht dasselbe wie ein Barpreis" in text
+    absatz = radar.select_one("#wr-alarme p.gr-erklaer[title]")
+    assert absatz is not None, "der Datensatz-Absatz der Alarm-Sektion fehlt"
+    titel = absatz.get("title") or ""
+    assert "kein Barpreis" in titel, f"Absatz ohne Ratenzahl-Hinweis: {titel!r}"

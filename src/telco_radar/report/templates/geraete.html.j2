@@ -623,13 +623,11 @@
     Einzelgerätpreis im Regal · {{
     geraete.katalog_modelle | length }} Modelle</span></div>
   {% endif %}
-  {# 18 Woerter statt 33 (Sicht-Pruefung Kleineres 5, F1-Geist): der Satz
-     erklaert die EINEN zwei Dinge, die ein Leser nicht kennen kann -
-     Zeile je Modell und den Umschalter. Was in den Spalten steht, sagen
-     die Spaltenkoepfe; was im Aufklapper steht, sagt der Aufklapper. #}
-  <p class="gr-erklaer">Eine Zeile je Modell; der Umschalter darüber wählt
-  Einzelgerätpreis oder Kosten über 24 Monate. Alle
-  Listungen des Modells stehen unter der Zeile.</p>
+  {# D4a (24.09.2026): der Erklärsatz ist GEFALLEN (Antonios Regel: keine
+     Erklär-Unterzeile unter einer Überschrift). Dieselbe Auskunft - eine
+     Zeile je Modell, der Umschalter wählt Einzelgerätpreis oder Kosten
+     über 24 Monate - steht jetzt als `title` an den Umschalter-Knöpfen
+     selbst. #}
 
   <div class="gr-filter" data-fuer="gr-katalogtabelle">
     <label class="gr-fbox"><span>Marke</span>
@@ -657,11 +655,11 @@
   <div class="gr-vgruppe gr-kansicht" role="group"
        aria-label="Welcher Preis in der Tabelle steht">
     <button type="button" class="gr-vknopf is-aktiv" data-ansicht="barpreis"
-            aria-pressed="true">Einzelgerätpreis</button>
+            aria-pressed="true" title="eine Zeile je Modell, alle Listungen darunter">Einzelgerätpreis</button>
     {# Derselbe Zeitraum wie der Spaltenkopf und der Filter der Spalte
        (P0-B-h2) - der Umschalter benennt die Spalte, die er einschaltet. #}
     <button type="button" class="gr-vknopf" data-ansicht="tco"
-            aria-pressed="false">Kosten über {{ geraete.tco.horizont }} Monate</button>
+            aria-pressed="false" title="eine Zeile je Modell, alle Listungen darunter">Kosten über {{ geraete.tco.horizont }} Monate</button>
   </div>
 
   <div class="gr-alarm-scroll">
@@ -1167,10 +1165,15 @@
    ueber sich selbst sagt. Der Radar-Link ist seit E3 Schritt 3 kein
    Seitenwechsel mehr, sondern der Sprung in den Radar-Reiter DIESER
    Seite (#tafel-radar schaltet ihn auch per Hash). #}
+{# D4a (24.09.2026): der EINE Fußzeilen-Link auf die Methodik - alle
+   Lesehilfen, die bis hierhin als Sätze unter Überschriften, Grafiken und
+   Zahlen standen, sind hierher gezogen (geraete-quellen.html#methodik),
+   nicht gestrichen. #}
 <p class="dz-foot"><a href="{{ prefix }}geraete-quellen.html">Welche
 Anbieter liefern Geräte, welche warum nicht</a>{% if
 radar_verlinkt %} · <a href="#tafel-radar"
->Wettbewerbs-Radar: alle Geräte nach Abweichung zu Vodafone</a>{% endif %}.</p>
+>Wettbewerbs-Radar: alle Geräte nach Abweichung zu Vodafone</a>{% endif %}
+· <a href="{{ prefix }}geraete-quellen.html#methodik">Methodik</a>.</p>
 
 
 {% else %}

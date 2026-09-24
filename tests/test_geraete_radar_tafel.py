@@ -324,31 +324,36 @@ def test_rot_ist_akzent_nicht_teppich(tmp_path):
         f"{len(rot)} Elemente tragen Rot-Klassen - Rot ist Fläche geworden"
 
 
-def test_jede_sektion_traegt_einen_frage_satz(tmp_path):
+def test_jede_sektion_traegt_eine_aussagekraeftige_ueberschrift(tmp_path):
+    """D4a (24.09.2026, Erklärtext-Inventur): der Erklärsatz je Sektion ist
+    GEFALLEN - Antonios Regel ('keine Erklär-Unterzeile unter Überschriften,
+    Grafiken oder Zahlen') gilt jetzt auch hier. Jede Sektion bleibt an
+    ihrer eigenen Überschrift erkennbar; die Methodik, die bis hierhin als
+    Satz darunter stand, trägt jetzt der `title` von Überschrift oder
+    Spaltenkopf (siehe test_geraete_methodik_umzug.py)."""
     suppe = _suppe(tmp_path)
     for sec in suppe.select("#tafel-radar .gr-r-sektion"):
-        # P4-Fix (Sicht-Pruefung 18.09.): die Grafik-Sektion traegt ihren
-        # Satz als ACHSLABEL unter dem Bild (p.gr-achsenlabel) - dieselbe
-        # Pflicht, andere Bauform: der Satz erklaert die Achse, nicht die
-        # Sektion.
-        satz = sec.select_one("h3.gr-unter ~ p.gr-erklaer, p.gr-erklaer, "
-                              "p.gr-achsenlabel")
-        assert satz is not None and len(_text(satz)) > 30, \
-            f"Sektion ohne Frage-Satz: {_text(sec)[:60]}"
+        kopf = sec.select_one("h3.gr-unter")
+        assert kopf is not None and len(_text(kopf)) > 5, \
+            f"Sektion ohne Überschrift: {_text(sec)[:60]}"
 
 
 def test_die_haendler_sektion_sagt_was_sie_misst(tmp_path):
     """S3: 'Händler = Gerätepreis ohne Finanzierung […] mit einem Satz, was
-    er misst (Barpreis ohne Vertrag/Tarif)'."""
+    er misst (Barpreis ohne Vertrag/Tarif)'. D4a: der Satz steht seit der
+    Erklärtext-Inventur nicht mehr sichtbar, sondern als `title` an der
+    Überschrift - dieselbe Zusicherung, andere Bauform."""
     suppe = _suppe(tmp_path)
     sec = suppe.select_one("#wr-haendler")
     assert sec is not None, "die Händler-Sektion fehlt"
-    text = _text(sec)
-    assert "ohne Finanzierung" in _text(sec.select_one("h3")), text
-    assert "Barpreis" in text and "ohne Vertrag" in text, \
-        "der Satz nennt nicht das Maß (Barpreis ohne Vertrag/Tarif)"
+    kopf = sec.select_one("h3")
+    assert "ohne Finanzierung" in _text(kopf)
+    titel = kopf.get("title") or ""
+    assert "Barpreis" in titel and "ohne Vertrag" in titel, \
+        "der title-Hinweis nennt nicht das Maß (Barpreis ohne Vertrag/Tarif)"
     # Der Händler steht MIT Namen und Abweichung da - dieselbe %-Logik,
     # nie gegen eine TCO gerechnet.
+    text = _text(sec)
     assert "Saturn" in text
     assert "%" in text
 
@@ -380,14 +385,16 @@ def test_der_tafelkopf_polt_nur_die_sektionen_mit_vorzeichen(tmp_path):
     sagen: Vorzeichen in Modellliste und Händlern, Betrag ohne Vorzeichen
     in den Preis-Alarmen - und die Alarmtabelle bleibt Betrags-Tabelle
     (keine Zeile trägt ein Minus, für die keine Regel mehr gilt).
-    P4-Fix (Sicht-Prüfung 18.09.): der Regel-Satz steht seit dem Design-
-    Durchlauf nicht mehr als Absatz zwischen Leitzahl und Grafik
-    (Tafelkopf), sondern als Achslabel UNTER der Balkengrafik - der
-    Locator ist mitgezogen, die AUSSAGE unverändert."""
+    P4-Fix (Sicht-Prüfung 18.09.): der Regel-Satz stand seit dem Design-
+    Durchlauf als Achslabel UNTER der Balkengrafik. D4a (24.09.2026,
+    Erklärtext-Inventur): das sichtbare Achslabel ist GEFALLEN (Antonios
+    Regel: keine Erklär-Unterzeile unter einer Grafik) - dieselbe Aussage
+    steht jetzt als `title` an der Grafik selbst, der Locator ist
+    mitgezogen."""
     suppe = _suppe(tmp_path)
     tafel = suppe.select_one("#tafel-radar")
-    kopf = _text(tafel.select_one("#wr-grafik .gr-achsenlabel"))
-    assert kopf, "das Achslabel unter der Balkengrafik fehlt"
+    kopf = tafel.select_one("#wr-grafik .wr-grafik-bild").get("title") or ""
+    assert kopf, "der Titel-Hinweis an der Balkengrafik fehlt"
     # Die Pauschalbehauptung ('mit Vorzeichen' für alle drei) ist weg …
     assert "Die drei Sektionen messen sie" not in kopf, kopf
     # … und die Alarme sind als BETRAG benannt, nicht als vorzeichen-
