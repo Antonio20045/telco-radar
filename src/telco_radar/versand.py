@@ -63,6 +63,19 @@ class VersandFehler(RuntimeError):
     Mailserver nicht antwortet), muss sie aber unterscheiden koennen."""
 
 
+class VersandNichtEingerichtet(VersandFehler):
+    """Der Kanal wurde nie versucht - die noetigen Umgebungsvariablen
+    fehlen. Eine UNTERKLASSE von `VersandFehler` (P1/S2-4, 24.09.2026):
+    jeder Aufrufer, der bisher `except VersandFehler` faengt, faengt das
+    hier weiterhin mit - nur wer den Unterschied braucht (siehe
+    `scripts/geraete_abdeckung_mail.py`), fragt gezielt danach.
+
+    Der Unterschied ist keine Spitzfindigkeit: ein Repo OHNE SMTP-Secrets
+    (wie dieses, solange niemand sie eintraegt) darf nicht jeden Tag rot
+    laufen - ein Signal, das IMMER an ist, ist keins mehr, und ein echter
+    Zustellfehler waere davon nicht mehr zu unterscheiden."""
+
+
 # --------------------------------------------------------------- Gedaechtnis
 
 class Zustellbuch:
@@ -237,7 +250,7 @@ def sende_mail(betreff: str, text: str, html: str, *, trocken: bool = False
     empfaenger = [e.strip() for e in
                   os.environ.get("MAIL_TO", "").split(",") if e.strip()]
     if not (host and absender and empfaenger):
-        raise VersandFehler(
+        raise VersandNichtEingerichtet(
             "SMTP_HOST, MAIL_FROM oder MAIL_TO fehlen - keine Mail verschickt")
 
     nachricht = EmailMessage()

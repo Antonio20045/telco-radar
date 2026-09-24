@@ -150,6 +150,58 @@ def test_ein_zustellfehler_faellt_mit_rueckgabecode_zwei(tmp_path, monkeypatch,
     assert "SMTP_HOST fehlt" in caplog.text
 
 
+# --------------------------------------------------------------------------
+# Fall 3b: der Kanal ist gar nicht erst eingerichtet (P1/C2-Nachtrag,
+# 24.09.2026) - NICHT dieselbe Fehlerklasse wie Fall 3 oben.
+# --------------------------------------------------------------------------
+
+def test_fehlende_smtp_secrets_faellen_nur_als_warnung_nicht_rot(
+        tmp_path, monkeypatch, capsys, caplog):
+    """Solange dieses Repo keine SMTP-Secrets traegt, ist JEDER Lauf
+    betroffen - ein Schritt, der dafuer rot ausfaellt, ist ein Signal, das
+    immer an ist und deshalb keins mehr (dieselbe Fehlerklasse wie "50
+    Laeufe gruen ohne Daten", nur umgekehrt). Der Alarm bleibt trotzdem
+    sichtbar: Protokollzeile UND GitHub-Annotation, nur der Rueckgabecode
+    wird 0."""
+    root = _bestand(tmp_path, mit_alarm=True)
+
+    def _nicht_eingerichtet(*a, **k):
+        raise versand.VersandNichtEingerichtet(
+            "SMTP_HOST, MAIL_FROM oder MAIL_TO fehlen - keine Mail verschickt")
+
+    monkeypatch.setattr(versand, "sende_mail", _nicht_eingerichtet)
+    with caplog.at_level(logging.WARNING, logger="geraete_abdeckung_mail"):
+        code = mail.main(["--root", str(root)])
+    assert code == 0
+    assert code == mail.EXIT_OK
+    # Die GitHub-Annotation steht auf stdout, nicht nur im Log.
+    ausgabe = capsys.readouterr().out
+    assert "::warning::" in ausgabe
+    assert "NICHT zugestellt" in ausgabe
+    assert "NICHT zugestellt" in caplog.text
+    assert "nicht eingerichtet" in caplog.text
+
+
+def test_ein_echter_zustellfehler_bleibt_von_der_warnung_unterscheidbar(
+        tmp_path, monkeypatch, caplog):
+    """Gegenprobe zu Fall 3 und 3b zusammen: nur `VersandNichtEingerichtet`
+    wird zur Warnung - ein gewoehnlicher `VersandFehler` (Kanal
+    eingerichtet, SMTP antwortet trotzdem nicht) bleibt Exit 2 und rot,
+    wie test_ein_zustellfehler_faellt_mit_rueckgabecode_zwei es bereits
+    zeigt. Diese zweite Probe haelt zusaetzlich fest, dass die neue
+    Ausnahmeklasse dafuer NICHT greift."""
+    root = _bestand(tmp_path, mit_alarm=True)
+
+    def _smtp_antwortet_nicht(*a, **k):
+        raise versand.VersandFehler("SMTP: [Errno 110] Connection timed out")
+
+    monkeypatch.setattr(versand, "sende_mail", _smtp_antwortet_nicht)
+    with caplog.at_level(logging.ERROR, logger="geraete_abdeckung_mail"):
+        code = mail.main(["--root", str(root)])
+    assert code == mail.EXIT_NICHT_ZUGESTELLT
+    assert "Connection timed out" in caplog.text
+
+
 def test_mit_trocken_wird_nichts_verschickt(tmp_path, monkeypatch):
     """Die andere Haelfte desselben Schalters: `--trocken` baut die Mail
     und stellt sie NICHT zu. Beide Tests zusammen nageln den Wert fest -

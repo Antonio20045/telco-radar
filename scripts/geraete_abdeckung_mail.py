@@ -19,9 +19,18 @@ ein Postfachfilter.
 
 RUECKGABECODES (der Workflow-Schritt haengt daran):
 
-    0  gelaufen - entweder keine Alarme oder Mail zugestellt
+    0  gelaufen - keine Alarme, Mail zugestellt, ODER der Mailkanal ist
+       nicht eingerichtet (EXIT_OK). Der letzte Fall ist eine WARNUNG
+       (GitHub-Annotation plus Protokollzeile), kein Fehler: solange die
+       SMTP-Secrets in diesem Repo fehlen, waere jeder Lauf sonst rot -
+       ein Signal, das immer an ist, unterscheidet einen echten
+       Zustellfehler nicht mehr von einem nicht eingerichteten Kanal
+       (dieselbe Fehlerklasse wie "50 Laeufe gruen ohne Daten", nur
+       umgekehrt). Der Alarm selbst steht trotzdem im Protokoll und auf
+       der Quellenseite - nichts wird verschwiegen.
     1  der Bestand kennt keinen Messtag (EXIT_KEIN_MESSTAG)
-    2  Alarme da, Zustellung gescheitert (EXIT_NICHT_ZUGESTELLT)
+    2  der Kanal IST eingerichtet, die Zustellung ist trotzdem gescheitert
+       (EXIT_NICHT_ZUGESTELLT) - z. B. ein SMTP-Fehler.
 """
 from __future__ import annotations
 
@@ -38,15 +47,22 @@ from telco_radar.geraete_pipeline import (                       # noqa: E402
     melde_ausfall,
     sende_alarm_mail,
 )
-from telco_radar.versand import VersandFehler                    # noqa: E402
+from telco_radar.versand import VersandFehler, VersandNichtEingerichtet  # noqa: E402
 
 log = logging.getLogger("geraete_abdeckung_mail")
 
 # Die Rueckgabecodes dieses Schritts. Sie sind benannt, weil der Workflow
 # an ihnen haengt und ein Test sie festnagelt - eine nackte 2 mitten im
 # Code sagt nicht, wofuer sie steht.
+EXIT_OK = 0                  # siehe RUECKGABECODES oben - deckt auch die
+                              # Warnung "Mailkanal nicht eingerichtet" ab
 EXIT_KEIN_MESSTAG = 1        # der Bestand kennt keinen einzigen Messtag
-EXIT_NICHT_ZUGESTELLT = 2    # Alarme da, Zustellung gescheitert
+EXIT_NICHT_ZUGESTELLT = 2    # Kanal eingerichtet, Zustellung dennoch gescheitert
+
+# GitHub-Actions-Annotation (https://docs.github.com/actions/...#setting-a-warning-message):
+# auf stdout erscheint sie im Log UND in der Job-Zusammenfassung als
+# Warnung - ohne den Schritt rot zu faerben, anders als ein `log.error`.
+_GITHUB_WARNUNG_PRAEFIX = "::warning::"
 
 
 def main(argv=None) -> int:
@@ -83,14 +99,28 @@ def main(argv=None) -> int:
     melde_ausfall(alarme)
     try:
         log.info("%s", sende_alarm_mail(alarme, tag, trocken=args.trocken))
+    except VersandNichtEingerichtet as exc:
+        # NICHT dieselbe Fehlerklasse wie ein SMTP-Fehler (P1/C2-Nachtrag,
+        # 24.09.2026): der Kanal wurde nie VERSUCHT, weil die Secrets in
+        # diesem Repo fehlen. Ein rot ausfallender Schritt an JEDEM Tag
+        # traegt keine Information mehr - der Alarm bleibt trotzdem
+        # sichtbar (Protokollzeile, `melde_ausfall` oben, Quellenseite),
+        # nur die Zustellung selbst wird nur noch als Warnung gemeldet.
+        meldung = (f"Geraeteradar-Abdeckung: {len(alarme)} Alarme NICHT "
+                  f"zugestellt ({exc}) - der Mailkanal ist in diesem "
+                  "Repo nicht eingerichtet, kein Zustellfehler")
+        print(f"{_GITHUB_WARNUNG_PRAEFIX} {meldung}")
+        log.warning(meldung)
+        return EXIT_OK
     except VersandFehler as exc:
-        # Weitergeben, nicht schlucken: ein Alarmkanal, der still nicht
-        # zustellt, ist genau die Fehlerklasse, gegen die dieser Waechter
-        # gebaut ist. Der Workflow-Schritt faellt damit rot aus.
+        # Weitergeben, nicht schlucken: ein EINGERICHTETER Alarmkanal, der
+        # still nicht zustellt, ist genau die Fehlerklasse, gegen die
+        # dieser Waechter gebaut ist. Der Workflow-Schritt faellt damit rot
+        # aus.
         log.error("Geraeteradar-Abdeckung: %d Alarme NICHT zugestellt (%s)",
                   len(alarme), exc)
         return EXIT_NICHT_ZUGESTELLT
-    return 0
+    return EXIT_OK
 
 
 if __name__ == "__main__":       # pragma: no cover
