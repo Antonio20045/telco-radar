@@ -556,16 +556,21 @@ def test_die_legende_bleibt_auf_dem_telefon(telefon):
 # Messung dafuer eigenstaendig in `test_navigation_aktiver_eintrag_browser.
 # py` - hier nur der Scroll-Hinweis der Reiterleiste dieser Seite selbst.
 
-def test_die_reiterleiste_zeigt_einen_scroll_hinweis(telefon):
-    """'Reiter... müssen erkennbar scrollbar sein' - derselbe weiche Rand
-    wie an der Rubrikleiste (`.subbar`), nicht nur `overflow-x:auto` ohne
-    sichtbaren Hinweis."""
+def test_die_reiterleiste_braucht_keinen_scroll_mehr(telefon):
+    """QA-Fix 24.09.2026: die Leiste ROLLTE bis zu diesem Fix in sich
+    (`test_kein_reitertext_wird_abgeschnitten` hielt fest, dass das am
+    390-px-Telefon den letzten Reiter abschnitt statt ihn scrollbar zu
+    machen). Mit nur noch vier Reitern bricht sie stattdessen um
+    (`flex-wrap:wrap`, Basisregel) - sie braucht darum keinen Scroll-
+    Hinweis mehr, weil sie gar nicht mehr innerlich scrollt: ihre
+    scrollWidth darf ihre clientWidth nicht mehr uebersteigen."""
     s, _ = telefon
-    hintergrund = s.eval_on_selector(
+    breiten = s.eval_on_selector(
         "#tafel-tco .gr-reiter, .gr-reiter",
-        "e => getComputedStyle(e).backgroundImage")
-    assert hintergrund and hintergrund != "none", (
-        "die Reiterleiste zeigt keinen Scroll-Hinweis (background-image)")
+        "e => ({sw: e.scrollWidth, cw: e.clientWidth})")
+    assert breiten["sw"] <= breiten["cw"] + 1, (
+        f"die Reiterleiste rollt noch innerlich: scrollWidth {breiten['sw']} "
+        f"> clientWidth {breiten['cw']}")
 
 
 # --------------------------------------------------------------------------
@@ -646,16 +651,35 @@ def test_endlabel_bleibt_im_svg_auch_bei_verbreitertem_text(telefon):
 # --------------------------------------------------------------------------
 
 def test_kein_reitertext_wird_abgeschnitten(telefon):
+    """QA-Fix 24.09.2026: die alte Fassung mass `scrollWidth` gegen
+    `clientWidth` DES KNOPFS - das haelt nur fest, dass der TEXT nicht im
+    Knopf selbst umbricht, nicht, dass der Knopf in die Leiste passt. Am
+    390-px-Telefon gemessen reichte "Gerätekatalog" bis x=393, die Leiste
+    endete bei x=362 - der alte Test blieb gruen, weil scrollWidth ==
+    clientWidth am Knopf selbst war (der Text brach nicht, der KNOPF lief
+    nur aus der Leiste). Gemessen wird jetzt die Geometrie: jedes
+    Reiterknopf-Rechteck muss vollstaendig im sichtbaren Rechteck der
+    Leiste liegen, ohne dass gescrollt wird."""
     s, _ = telefon
-    knoepfe = s.eval_on_selector_all(
-        ".gr-reiter button",
-        "es => es.map(e => ({text: e.textContent.trim(), "
-        "sw: e.scrollWidth, cw: e.clientWidth}))")
-    assert knoepfe, "keine Reiter gefunden"
-    for k in knoepfe:
-        assert k["sw"] <= k["cw"] + 1, (
-            f"Reiter {k['text']!r} ist abgeschnitten: scrollWidth "
-            f"{k['sw']} > clientWidth {k['cw']}")
+    daten = s.evaluate("""() => {
+      const leiste = document.querySelector('.gr-reiter');
+      const lr = leiste.getBoundingClientRect();
+      return {
+        leiste: { left: lr.left, right: lr.right },
+        knoepfe: [...leiste.querySelectorAll('button')].map(b => {
+          const r = b.getBoundingClientRect();
+          return { text: b.textContent.trim(), left: r.left, right: r.right };
+        }),
+      };
+    }""")
+    assert daten["knoepfe"], "keine Reiter gefunden"
+    for k in daten["knoepfe"]:
+        assert k["left"] >= daten["leiste"]["left"] - 1, (
+            f"Reiter {k['text']!r} beginnt links ausserhalb der Leiste: "
+            f"{k['left']} < {daten['leiste']['left']}")
+        assert k["right"] <= daten["leiste"]["right"] + 1, (
+            f"Reiter {k['text']!r} ist abgeschnitten: rechte Kante "
+            f"{k['right']} > Leiste {daten['leiste']['right']}")
 
 
 def test_die_reiterleiste_verursacht_keinen_seitenweiten_querscroll(telefon):

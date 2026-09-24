@@ -1110,7 +1110,12 @@
      {# A/E (QA-Fix 24.09.2026): dieselbe EINE Schwelle wie der
         TCO-Server-Chart (`geraete_zeitreihe.LUECKE_TAGE_SCHWELLE`), nur
         gelesen - kein zweiter Wert in app.js. #}
-     data-luecke-tage="{{ geraete.verlauf.luecke_tage_schwelle }}"></p>
+     data-luecke-tage="{{ geraete.verlauf.luecke_tage_schwelle }}"
+     {# I2 (QA-Fix 24.09.2026): ab wie vielen Messterminen dieser Satz
+        schweigt, weil er sonst nur noch die Kachel "Messtermine"
+        doppelt - dieselbe EINE Zahl wie oben, aus
+        `geraete_verlauf.VERLAUF_SATZ_MAX_TERMINE`. #}
+     data-satzmaxtermine="{{ geraete.verlauf.verlauf_satz_max_termine }}"></p>
 
   <div class="gr-vtabelle" id="gr-vtabelle" hidden></div>
 

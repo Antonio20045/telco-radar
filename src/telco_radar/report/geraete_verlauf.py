@@ -76,6 +76,17 @@ BELASTBAR_AB_WOCHEN = 12
 # darueber.
 DIAGRAMM_AB_TERMINEN = 4
 
+# Ab wie vielen MESSTERMINEN der Satz unter dem Diagramm ("liegen 16
+# Messtermine vor, vom 10.8. bis zum 24.9.") SCHWEIGT (QA-Fix 24.09.2026).
+#
+# Unterhalb dieser Zahl nennt er eine Auskunft, die die Kachel
+# "Messtermine" nicht hat - die SPANNE - und ist bei einer noch duennen
+# Reihe die richtige Ergaenzung. Darueber (am iPhone 17 256 GB standen 16
+# Messtermine) doppelt er nur noch wortgleich die Kachel-Zahl, ohne neue
+# Auskunft. Der Wert liegt ueber DIAGRAMM_AB_TERMINEN: zwischen vier und
+# hier ist die Reihe kurz genug, dass die Spanne selbst noch etwas sagt.
+VERLAUF_SATZ_MAX_TERMINE = 8
+
 # Wie nah zwei Linien beieinander liegen duerfen, bevor die verdeckte
 # eigens sichtbar gemacht wird - als Anteil der gezeichneten Preisspanne.
 #
@@ -380,6 +391,7 @@ def aufbereiten(eintraege: list, historie, katalog) -> dict:
         "luecke_tage_schwelle": LUECKE_TAGE_SCHWELLE,
         "max_linien": MAX_LINIEN,
         "max_datumsmarken": MAX_DATUMSMARKEN,
+        "verlauf_satz_max_termine": VERLAUF_SATZ_MAX_TERMINE,
     }
 
 
@@ -389,4 +401,5 @@ def leer() -> dict:
             "diagramm_ab_terminen": DIAGRAMM_AB_TERMINEN,
             "linien_abstand": LINIEN_ABSTAND,
             "luecke_tage_schwelle": LUECKE_TAGE_SCHWELLE,
-            "max_linien": MAX_LINIEN, "max_datumsmarken": MAX_DATUMSMARKEN}
+            "max_linien": MAX_LINIEN, "max_datumsmarken": MAX_DATUMSMARKEN,
+            "verlauf_satz_max_termine": VERLAUF_SATZ_MAX_TERMINE}

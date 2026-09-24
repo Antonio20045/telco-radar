@@ -111,11 +111,17 @@ def test_das_abzeichen_bleibt_ein_zusammenhaengender_rahmen(tmp_path):
                 ".gr-kk-marke--alt", "e => getComputedStyle(e).display")
         finally:
             browser.close()
-    assert anzeige == "inline-block", anzeige
+    # QA-Fix 24.09.2026 (Punkt 7): INNERHALB `.gr-bnd-an` ist das Abzeichen
+    # jetzt `block` statt `inline-block` (volle Zeilenbreite, siehe
+    # `test_geraete_buendel_mobil_abzeichen_browser.py`) - beide sind
+    # NICHT `inline`, und beide zeichnen den Rahmen EINMAL um den ganzen
+    # Inhalt. Die eigentliche Regel bleibt darum die Rechteckzahl unten,
+    # nicht der konkrete display-Wert.
+    assert anzeige in ("inline-block", "block"), anzeige
     # EIN Rechteck, auch wenn der Text selbst innerhalb der Box mehrzeilig
-    # umbricht (inline-block zeichnet den Rahmen einmal UM den ganzen
-    # Inhalt) - "inline" zeichnet bei mehrzeiligem Text einen Rahmen JE
-    # ZEILE (der gemeldete "Stapel Einzelkaestchen").
+    # umbricht (block/inline-block zeichnen den Rahmen einmal UM den
+    # ganzen Inhalt) - "inline" zeichnet bei mehrzeiligem Text einen
+    # Rahmen JE ZEILE (der gemeldete "Stapel Einzelkaestchen").
     assert rechtecke == 1, (
         f"das Abzeichen zerfaellt in {rechtecke} Rahmen-Rechtecke statt "
         "eines zusammenhaengenden")

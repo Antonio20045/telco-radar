@@ -870,7 +870,16 @@ var TelcoFrage = (function () {
       var ziel = document.getElementById(k.getAttribute('data-tafel'));
       var aktiv = k === knopf;
       k.setAttribute('aria-selected', aktiv ? 'true' : 'false');
-      if (ziel) ziel.classList.toggle('gr-tafel--aus', !aktiv);
+      if (ziel) {
+        ziel.classList.toggle('gr-tafel--aus', !aktiv);
+        /* K (QA-Fix 24.09.2026): EIN EVENT FUER "JETZT SICHTBAR". Der
+           Preisverlauf-Reiter zeichnet sein SVG mit der REALEN
+           Containerbreite (`zeichne()` dort) - die ist an einer noch
+           verborgenen Tafel 0. Statt dass dieser Umschalter etwas ueber
+           den Chart-Code weiss, meldet er nur "diese Tafel ist jetzt
+           aktiv"; wer davon abhaengt, hoert selbst zu. */
+        if (aktiv) ziel.dispatchEvent(new CustomEvent('gr-tafel-sichtbar'));
+      }
     });
   }
 
@@ -2544,9 +2553,23 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
   if (!GERAETE.length) return;
 
   var NS = 'http://www.w3.org/2000/svg';
-  var BREITE = 1080, HOEHE = 340;
+  /* K (QA-Fix 24.09.2026): BREITE/HOEHE sind ab jetzt die GEMESSENE
+     Containerbreite in CSS-Pixeln, nicht mehr eine feste Zeichenflaeche,
+     die der Browser per `viewBox` auf die Containerbreite HERUNTERSKALIERT.
+     Bei einer festen `BREITE=1080` und `width:100%` skalierte das ganze
+     Koordinatensystem samt Schrift mit - am Telefon (~340 px Container)
+     blieben von 12 px Schrift rund 3,8 px uebrig, unlesbar. `zeichne()`
+     setzt beide Werte bei JEDEM Aufruf aus der REALEN Breite von `#gr-
+     vbild` neu (siehe dort); die BASIS-Werte bleiben nur der Startwert
+     UND das Seitenverhaeltnis (HOEHE_BASIS/BREITE_BASIS), mit dem HOEHE
+     aus der gemessenen Breite folgt. */
+  var BREITE_BASIS = 1080, HOEHE_BASIS = 340;
+  var BREITE = BREITE_BASIS, HOEHE = HOEHE_BASIS;
   var RAND = { oben: 18, rechts: 20, unten: 46, links: 74 };
   var MAX_MARKEN = 8;
+  /* K: derselbe rechte Rand wie `ENDLABEL_RAND` im Server-Chart
+     (`geraete_zeitreihe.py`) fuer das Verdeckt-Endlabel weiter unten. */
+  var ENDLABEL_RAND = 6;
 
   var treffer = document.getElementById('gr-vtreffer');
   var steuer = document.getElementById('gr-vsteuer');
@@ -2579,6 +2602,18 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
      (derselbe Grund wie AB_TERMINEN/ABSTAND zwei Zeilen oben). */
   var LUECKE_TAGE = parseInt(
     (stand && stand.dataset.lueckeTage) || '10', 10);
+  /* I2 (QA-Fix 24.09.2026): AB WIE VIELEN MESSTERMINEN DER SATZ SCHWEIGT.
+     Aus `report/geraete_verlauf.py` (`VERLAUF_SATZ_MAX_TERMINE`), nicht
+     hier hartkodiert - derselbe Grund wie bei AB_TERMINEN/ABSTAND/
+     LUECKE_TAGE. Unterhalb der Schwelle nennt der Satz eine Auskunft, die
+     die Kachel "Messtermine" nicht hat (die SPANNE, "vom … bis zum …");
+     darueber doppelt er nur noch deren Zahl. */
+  var SATZ_MAX_TERMINE = parseInt(
+    (stand && stand.dataset.satzmaxtermine) || '8', 10);
+  /* H2 (QA-Fix 24.09.2026): Mindestabstand zweier X-Achsen-Beschriftungen
+     im SVG-Koordinatensystem (1080 breit) - siehe `xMarkenOhneUeberlappung`
+     weiter unten. */
+  var X_MARKEN_LUECKE = 6;
   var von = document.getElementById('gr-vvon');
   var bis = document.getElementById('gr-vbis');
   var gewaehlt = null, raster = 'woche';
@@ -2721,12 +2756,40 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     if (tage.length < AB_TERMINEN || gezeichnet < AB_TERMINEN) {
       stand.hidden = true; return;
     }
+    /* I2: AB SATZ_MAX_TERMINE SCHWEIGT DER SATZ AUCH HIER - er doppelte
+       sonst wortgleich die Kachel "Messtermine" (QA-Befund, 24.09.2026:
+       "liegen 16 Messtermine vor" stand neben einer Kachel, die dieselbe
+       16 schon zeigte, ohne neue Auskunft ausser der Spanne). Unterhalb
+       der Schwelle bleibt er stehen - dort ist die Spanne selbst eine
+       Auskunft ueber eine noch duenne Datenlage. */
+    if (tage.length > SATZ_MAX_TERMINE) {
+      stand.hidden = true; return;
+    }
     stand.hidden = false;
     stand.textContent = punkt('Für dieses Gerät ' + termine(tage.length) +
       ' vor, ' + spanne(tage)) + mehrdeutigSatz(g);
   }
 
   function zeichne(g) {
+    /* K: BREITE AUS DEM CONTAINER MESSEN - VOR jeder anderen Rechnung,
+       denn `x()`/`y()`/die viewBox haengen daran. Ist `#gr-vbild` gerade
+       verborgen (Reiterwechsel `display:none`, `.gr-tafel--aus`), liefert
+       `getBoundingClientRect()` eine Breite von 0 - kein falscher Wert,
+       nur unbrauchbar; dann bleibt die BASIS-Breite der Startwert, und
+       der Redraw beim Sichtbarwerden (`gr-tafel-sichtbar`, siehe unten)
+       holt die echte Zahl nach. */
+    var gemessen = bild ? Math.round(bild.getBoundingClientRect().width) : 0;
+    BREITE = gemessen > 0 ? gemessen : BREITE_BASIS;
+    /* HOEHE BLEIBT FEST, SKALIERT NICHT MIT DER BREITE. Ein Seiten-
+       verhaeltnis wie bei der Desktop-Flaeche (1080x340) haette am
+       Telefon (~306 px breit) nur 96 px Hoehe gelassen - die absoluten
+       Raender (RAND.oben/unten: 18/46 px) und vier Preis-Hilfslinien
+       passen in 96 px nicht auseinandergehalten hinein, selbst bei
+       echten 12 px Schrift wirkte das Bild dadurch gestaucht und
+       unlesbar (QA-Fix 24.09.2026, zweiter Befund). Die senkrechte
+       Zeichenflaeche bleibt darum bei JEDER Breite `HOEHE_BASIS` - nur
+       die Breite ist responsiv, die Hoehe des Diagramms nicht. */
+    HOEHE = HOEHE_BASIS;
     var vonT = von.value, bisT = bis.value;
     /* EIN MESSTERMIN IST EIN TAG, AN DEM GEMESSEN WURDE - unabhaengig
        davon, welches Raster gerade gewaehlt ist.
@@ -2941,11 +3004,18 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
       r.verdeckt = verdeckt;
     });
 
-    /* Nur wenn wirklich ein Etikett gesetzt wird, kostet es Zeichenflaeche.
-       Sonst bleibt die Kurve so breit wie bisher. */
-    var mitEtikett = reihen.some(function (r) { return r.verdeckt; });
-    var randRechts = mitEtikett ? 210 : RAND.rechts;
-    var innenB = BREITE - RAND.links - randRechts;
+    /* K (QA-Fix 24.09.2026): KEINE RESERVIERTE ZEICHENFLAECHE MEHR FUER
+       DAS ENDLABEL. Die alte Fassung reservierte pauschal 210 Einheiten
+       rechten Rand, sobald ein Etikett noetig war - bei einer festen
+       Zeichenflaeche von 1080 Einheiten Breite ein Sechstel, auf dem
+       Telefon (jetzt real ~306-390 Einheiten, siehe BREITE oben) blieben
+       davon nur rund 20 Einheiten fuer die GANZE Zeitachse: die Kurve
+       stand als senkrechter Strich. Das Etikett braucht diese Reserve
+       nicht mehr - es haengt jetzt an einem FESTEN X nahe dem rechten
+       Bildrand (`ENDLABEL_RAND`, dieselbe Loesung wie der Server-Chart
+       `geraete_zeitreihe.py`, dortiger C4-Fix), waechst mit
+       `text-anchor='end'` nach LINKS und braucht darum keine Reserve. */
+    var innenB = BREITE - RAND.links - RAND.rechts;
 
     // ZEITPROPORTIONAL, nicht ordinal. Die erste Fassung bildete auf
     // `tageSort.indexOf(datum)` ab: bei Messungen am 10.8., 21.8. und 29.8.
@@ -3019,18 +3089,24 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
                          text));
     });
 
-    // Datumsachse - waagerecht, hoechstens acht Marken.
+    // Datumsachse - waagerecht, hoechstens acht Marken (beschriftung()).
+    // Alle Kandidaten werden zunaechst gezeichnet - welche STEHEN BLEIBEN,
+    // entscheidet `xMarkenOhneUeberlappung` weiter unten, ERST NACHDEM
+    // das SVG im Dokument haengt (siehe deren Kommentar).
     var marken = beschriftung(tageSort);
     var gesehen = {};
+    var achsenmarken = [];
     marken.forEach(function (t) {
       var text = markeDE(t, raster);
       // Im Monats- und Quartalsraster koennen zwei Tage dieselbe Marke
       // ergeben. Zweimal "Q3 2026" nebeneinander ist keine Achse.
       if (gesehen[text]) return;
       gesehen[text] = 1;
-      svg.appendChild(el('text', { x: x(t), y: HOEHE - RAND.unten + 22,
-                                   class: 'gr-vachse', 'text-anchor': 'middle' },
-                         text));
+      var knoten = el('text', { x: x(t), y: HOEHE - RAND.unten + 22,
+                                class: 'gr-vachse', 'text-anchor': 'middle' },
+                      text);
+      svg.appendChild(knoten);
+      achsenmarken.push({ knoten: knoten, x: x(t) });
     });
 
     /* A/E (QA-Fix 24.09.2026): STUFENLINIE STATT SCHRAEGER GERADE, UND
@@ -3129,12 +3205,31 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
       });
       /* Das Endpunkt-Etikett bekommt NUR die verdeckte Linie. An jeder Linie
          waere es die Legende ein zweites Mal, und der rechte Rand reicht fuer
-         zwei Namen nebeneinander nicht. */
+         zwei Namen nebeneinander nicht.
+
+         J (QA-Fix 24.09.2026, Entscheidung): am iPhone 17 256 GB traegt
+         GENAU EIN Anbieter (mobilcom-debitel, die verdeckte Linie hinter
+         Vodafone) ein Endlabel, die anderen fuenf nicht - das ist keine
+         Luecke, sondern die Regel oben: das Etikett loest eine ECHTE
+         Mehrdeutigkeit (zwei Linien auf derselben Hoehe), es ist keine
+         zweite Beschriftung jeder Linie. Ein Etikett je Anbieter braeuchte
+         eigene Kollisionsvermeidung UND mehr rechten Rand fuer bis zu
+         sechs Namen - gegen Antonios Regel "wenig Text" auf einer Seite,
+         die schon eine Legende mit JEDEM Anbieter UND seiner Hausfarbe
+         hat (`anbieter_farben.py`, dort auch Telekom-Magenta). Die Legende
+         bleibt die eine Stelle, an der jeder Anbieter benannt ist -
+         siehe `tests/test_geraete_verlauf_legende_browser.py`. */
       if (r.verdeckt) {
         var letzt = r.punkte[r.punkte.length - 1];
+        /* K (QA-Fix 24.09.2026): FESTES X NAHE DEM RECHTEN RAND,
+           `text-anchor='end'` - dasselbe Muster wie `ENDLABEL_RAND` im
+           Server-Chart (`geraete_zeitreihe.py`, C4-Fix). Der Text waechst
+           nach LINKS, unabhaengig von Schriftfallback oder Zeichenzahl,
+           und braucht keine reservierte Zeichenflaeche mehr (siehe
+           `innenB` oben). */
         svg.appendChild(el('text', {
-          x: Math.min(x(letzt.datum) + 9, BREITE - 6), y: y(letzt.preis) + 4,
-          class: 'gr-vetikett', fill: r.farbe, 'text-anchor': 'start'
+          x: BREITE - ENDLABEL_RAND, y: y(letzt.preis) + 4,
+          class: 'gr-vetikett', fill: r.farbe, 'text-anchor': 'end'
         }, r.anbieter + ' ' + euro(letzt.preis)));
       }
     });
@@ -3200,6 +3295,49 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     }
     bild.appendChild(svg);
 
+    /* H2 (QA-Fix 24.09.2026): DATUMSMARKEN OHNE UEBERLAPPUNG - ERST JETZT,
+       aus demselben Grund wie `bestMarke` gleich darunter:
+       `getComputedTextLength()` braucht den Knoten IM Dokument.
+
+       Dieselbe Regel wie der Server-Chart (`geraete_zeitreihe._x_marken`):
+       gierig von links, der ERSTE Tag bleibt immer, jede weitere Marke nur
+       ohne Ueberlappung mit der zuletzt behaltenen, die LETZTE ersetzt
+       noetigenfalls die vorletzte statt zusaetzlich zu kollidieren - eine
+       Achse ohne Enddatum sagt nicht, bis wann sie reicht. Der Server
+       misst dort einen FESTEN Mindestabstand (Python kennt keine
+       Glyphenbreite); hier steht der echte Browser bereit, gemessen wird
+       deshalb die TATSAECHLICHE Breite, nicht geschaetzt - am 24.09.2026
+       im Chromium gemessen ueberlappten "11.9." und "12.9." (text-anchor
+       middle) um 5 px, eine feste Zeichenbreite haette das je nach
+       Schriftfallback verfehlt (Sandbox ohne Google Fonts, siehe
+       CLAUDE.md Fallstricke). */
+    if (achsenmarken.length > 1) {
+      achsenmarken.forEach(function (m) {
+        var breite = m.knoten.getComputedTextLength ?
+                     m.knoten.getComputedTextLength() : 0;
+        m.links = m.x - breite / 2; m.rechts = m.x + breite / 2;
+      });
+      var behaltenMarken = [achsenmarken[0]];
+      for (var mi = 1; mi < achsenmarken.length - 1; mi++) {
+        var kandidat = achsenmarken[mi];
+        var letzteMarke = behaltenMarken[behaltenMarken.length - 1];
+        if (kandidat.links - letzteMarke.rechts >= X_MARKEN_LUECKE) {
+          behaltenMarken.push(kandidat);
+        } else {
+          svg.removeChild(kandidat.knoten);
+        }
+      }
+      var letzteAchsenmarke = achsenmarken[achsenmarken.length - 1];
+      var vorletzteMarke = behaltenMarken[behaltenMarken.length - 1];
+      if (behaltenMarken.length > 1 && letzteAchsenmarke.links -
+          vorletzteMarke.rechts < X_MARKEN_LUECKE) {
+        svg.removeChild(vorletzteMarke.knoten);
+        behaltenMarken[behaltenMarken.length - 1] = letzteAchsenmarke;
+      } else if (letzteAchsenmarke !== vorletzteMarke) {
+        behaltenMarken.push(letzteAchsenmarke);
+      }
+    }
+
     /* ERST JETZT MESSEN. `getComputedTextLength()` gibt an einem Knoten
        ausserhalb des Dokuments 0 zurueck - der Zweig kippte dann nie, und
        der Test fand das Etikett 112 px ausserhalb der viewBox. Der Baum
@@ -3208,10 +3346,29 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     if (bestMarke) {
       var breit = bestMarke.getComputedTextLength ?
                   bestMarke.getComputedTextLength() : 0;
-      if (bestX + 14 + breit > BREITE - 6) {
-        bestMarke.setAttribute('x', bestX - 14);
-        bestMarke.setAttribute('text-anchor', 'end');
+      var bmX = bestX + 14, bmAnchorEnd = false;
+      if (bmX + breit > BREITE - 6) {
+        bmX = bestX - 14;
+        bmAnchorEnd = true;
       }
+      /* K (QA-Fix 24.09.2026): DIE ZWEITE KANTE - links. Der Kipp-Zweig
+         oben hilft gegen den RECHTEN Bildrand; auf einer schmalen
+         Zeichenflaeche (Telefon, `BREITE` jetzt die echte Containerbreite,
+         siehe oben) kann dieselbe Etikettbreite (110 px bei "billigster
+         Stand 3.9.", unveraendert seit die Schrift echte 12 px hat) nach
+         dem Kippen selbst ueber den LINKEN Rand hinaus in die Y-Achsen-
+         Beschriftung laufen - beide enden gemessen an der Achse, das
+         Etikett darueber. Die linke Kante bleibt deshalb nie vor
+         `RAND.links`, unabhaengig von der Ankerrichtung; noetigenfalls
+         ueberlappt das Etikett dann eher die Kurve als die Achse - die
+         Kurve traegt seit diesem Fix ohnehin einen Halo (`.gr-vbestmarke`
+         `paint-order:stroke`), die Achsenzahl nicht. */
+      var linkeKante = bmAnchorEnd ? bmX - breit : bmX;
+      if (linkeKante < RAND.links) {
+        bmX = bmAnchorEnd ? RAND.links + breit : RAND.links;
+      }
+      bestMarke.setAttribute('x', bmX);
+      if (bmAnchorEnd) bestMarke.setAttribute('text-anchor', 'end');
     }
 
     reihen.forEach(function (r) {
@@ -3395,4 +3552,36 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     }
   } catch (e) { /* aeltere Browser: erstes Geraet */ }
   waehle(startGeraet || GERAETE[0]);
+
+  /* K (QA-Fix 24.09.2026): NEU ZEICHNEN, WENN DER REITER SICHTBAR WIRD.
+     Die Auto-Vorauswahl zwei Zeilen oben zeichnet oft VOR dem ersten Klick
+     auf "Preisverlauf" - der Reiter ist zu dem Zeitpunkt noch
+     `.gr-tafel--aus` (`display:none`), und die Breitenmessung in
+     `zeichne()` faellt auf die Basisbreite zurueck; dieselbe Ursache, aus
+     der `getComputedTextLength()` an einem unsichtbaren Knoten 0
+     zurueckgibt (Kommentar an der X-Achsen-Ausduennung oben) - beide
+     Effekte trafen bis zu diesem Fix denselben ersten, verdeckten
+     Zeichenvorgang. Der Tab-Umschalter weiter oben in dieser Datei feuert
+     `gr-tafel-sichtbar` auf der Tafel, sobald sie aktiv wird - hier reicht
+     das, um mit der jetzt echten Containerbreite neu zu zeichnen. */
+  var tafel = document.getElementById('tafel-verlauf');
+  if (tafel) {
+    tafel.addEventListener('gr-tafel-sichtbar', function () {
+      if (gewaehlt) zeichne(gewaehlt);
+    });
+  }
+
+  /* RESIZE, ENTPRELLT: dieselbe gemessene Breite aendert sich mit dem
+     Fenster (Drehen, Splitscreen, DevTools). Nur zeichnen, wenn die Tafel
+     gerade sichtbar ist UND ein Geraet gewaehlt wurde - sonst gibt es
+     nichts neu zu messen. */
+  var resizeZeitgeber = null;
+  window.addEventListener('resize', function () {
+    if (resizeZeitgeber) clearTimeout(resizeZeitgeber);
+    resizeZeitgeber = setTimeout(function () {
+      if (gewaehlt && tafel && !tafel.classList.contains('gr-tafel--aus')) {
+        zeichne(gewaehlt);
+      }
+    }, 150);
+  });
 })();

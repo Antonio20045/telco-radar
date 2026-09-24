@@ -2744,8 +2744,16 @@ b,strong{font-weight:700}
 .gr-vkachel span{display:block;font-family:var(--sans);font-size:12px;
   letter-spacing:.05em;color:var(--ink-3);margin:3px 0 0}
 
+/* B/F (QA-Fix 24.09.2026): KEIN `min-width` mehr am SVG - die Regel war
+   aus `.gr-matrix-tabelle` kopiert (einer TABELLE, die absichtlich in
+   sich rollt), aber ein SVG mit `viewBox` skaliert von selbst auf die
+   Containerbreite. Mit 640 px Mindestbreite stand am Telefon (390 px)
+   nur der Anfang der Kurve im sichtbaren Bereich - der Rest lag hinter
+   dem rechten Rand, ohne erkennbaren Scroll-Hinweis. `overflow-x` bleibt
+   als Ruecksicherung stehen, greift jetzt aber nicht mehr: die volle
+   Breite passt immer in den Container. */
 .gr-vbild{margin:0 0 10px;overflow-x:auto}
-.gr-vsvg{width:100%;min-width:640px;height:auto;display:block}
+.gr-vsvg{width:100%;height:auto;display:block}
 .gr-vraster{stroke:var(--rule-2);stroke-width:1}
 .gr-vachse{font-family:var(--sans);font-size:12px;fill:var(--ink-3)}
 .gr-vlinie{stroke-linejoin:round;stroke-linecap:round}
@@ -2766,6 +2774,13 @@ b,strong{font-weight:700}
    von `pruefe_portal.py` misst sie im GERENDERTEN SVG, nicht im Quelltext. */
 .gr-vbest{stroke-width:1.5;stroke-dasharray:3 3;fill:none}
 .gr-vbestmarke{font-family:var(--sans);font-size:12px;font-weight:600}
+/* G (QA-Fix 24.09.2026): HALO IN PAPIERFARBE, statt den Kurven- oder
+   Rasterlinien unter dem Text hindurchlaufen zu lassen - der Stempel
+   sitzt oft AUF einer Hilfslinie oder der gepunkteten Referenzlinie, und
+   ohne Halo wirkt "billigster Stand 3.9." durchgestrichen. Dasselbe
+   Muster wie `.gr-g1-betrag`. */
+.gr-vbestmarke{paint-order:stroke;stroke:var(--paper);stroke-width:4px;
+  stroke-linejoin:round}
 .gr-vlegende{display:flex;flex-wrap:wrap;gap:16px;margin:0 0 18px;
   font-family:var(--sans);font-size:12px;color:var(--ink-2)}
 .gr-vlegende-teil{display:inline-flex;align-items:center;gap:6px}
@@ -3103,11 +3118,36 @@ b,strong{font-weight:700}
 @media (max-width:900px){
   .gr-bnd-kopf{display:none}
   .gr-bnd{border-left-width:3px}
+  /* L (QA-Fix 24.09.2026, Nachtrag zu Punkt 7): AN UND TCO BEKOMMEN JEDE
+     IHRE EIGENE, VOLLE ZEILE statt sich eine Zeile mit `1fr auto` zu
+     teilen. Mit `1fr auto` bestimmte der INHALT der `tco`-Zelle (Preis
+     plus Zeitraum-Etikett, je nach Ziffern- und Textlaenge) die Breite
+     der `auto`-Spur - unterschiedlich je Zeile, und die `an`-Spur bekam
+     jeweils nur den Rest. Gemessen an derselben Seite (iPhone 17 Pro
+     256 GB, Band Klein, 390 px): Vodafone bekam eine 202 px breite
+     `tco`-Spur (Preis und Etikett blieben einzeilig), congstar nur
+     147 px (das Etikett brach in eine zweite Zeile) - beide Zeilen sahen
+     dadurch verschieden aus, obwohl beide denselben Bauplan haben. Mit
+     `an`/`tco` je auf einer eigenen, VOLLEN Zeile ist die Aufteilung fuer
+     JEDE Zeile IDENTISCH (nicht mehr vom Inhalt abhaengig): derselbe
+     Abstand zum Namen, dieselbe rechte Kante, dasselbe Umbruchverhalten -
+     und das Abzeichen (na"chste Regel) bekommt die GANZE Zeilenbreite
+     statt nur die halbe. */
   .gr-bnd summary{
     grid-template-columns:1fr auto;row-gap:3px;
-    grid-template-areas:"an tco" "tar bar" "dl chev"}
+    grid-template-areas:"an an" "tco tco" "tar bar" "dl chev"}
   .gr-bnd-an{grid-area:an;min-width:0}
-  .gr-bnd-tco{grid-area:tco;text-align:right}
+  /* I (QA-Fix 24.09.2026): DAS ABZEICHEN BEKOMMT DIE VOLLE ZEILENBREITE.
+     Als `inline-block` (Basisregel `.gr-kk-marke`) war seine Breite
+     `max-content` - am Telekom-Buendel gemessen eine rund 90 px schmale
+     Box, in der "kein aktueller Stand seit 09.09.2026" auf drei enge
+     Zeilen umbrach, waehrend die TARIF-Zeile darunter aus demselben
+     Grund vierfach umbrach. `display:block;width:100%` gibt ihm die
+     volle Breite der an-Zelle (jetzt die volle Zeile, rund 280 px statt
+     rund 75 px) - lesbar auf ein bis zwei statt drei bis vier Zeilen. */
+  .gr-bnd-an .gr-kk-marke{display:block;width:100%;box-sizing:border-box;
+    margin:3px 0 0}
+  .gr-bnd-tco{grid-area:tco;text-align:right;align-self:start}
   .gr-bnd-tarif{grid-area:tar}
   .gr-bnd-bar{grid-area:bar;text-align:right}
   .gr-bnd-delta{grid-area:dl}
@@ -3547,28 +3587,24 @@ td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
    Schwesterseiten-Satz - ein halber Satz wäre schlimmer als keiner. Was
    mobil bleibt, ist der Weg zum Radar als Quasi-Reiter; WAS die Seite
    misst, steht am Telefon im „Wie gerechnet?"-Aufklapper unter dem
-   Graphen (dort steht die Formel samt Begriff). Die Reiterleiste rollt IN SICH statt zu umbrechen
-   (dieselbe Hausregel wie `.gr-scroll`: zwei Zeilen kosteten 42 px).
-   Basis zum Vergleich: erste Balkenzeile bei 812 px. */
+   Graphen (dort steht die Formel samt Begriff).
+
+   H (QA-Fix 24.09.2026): DIE LEISTE UMBRICHT WIEDER, STATT ZU ROLLEN.
+   Bis zu diesem Fix rollte sie IN SICH (nowrap + overflow-x), aus einer
+   Zeit mit mehr als vier Reitern. Am 390-px-Telefon gemessen reichte der
+   letzte Knopf ("Gerätekatalog", rechte Kante 393 px) ueber die sichtbare
+   Leiste (rechte Kante 362 px) hinaus, ohne dass ein Scroll-Antippen das
+   nahelegte - abgeschnitten, nicht rollbar erkennbar. Mit nur noch VIER
+   Reitern passt jeder einzelne (der breiteste rund 117 px) klar unter die
+   Containerbreite; `flex-wrap:wrap` (Basisregel oben) faengt jeden Knopf,
+   der nicht mehr in die Zeile passt, in eine zweite - kein Knopf kann
+   dabei abgeschnitten werden, weil keiner allein breiter ist als die
+   Leiste. Der Scroll-Randhinweis (Gradient) ist mit dem Rollen gefallen. */
 @media (max-width:700px){
   .gr-untertitel{display:none}
-  .gr-reiter{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .gr-reiter{row-gap:2px}
   .gr-reiter button,.gr-reiter .gr-reiter-seite{font-size:10.5px;
-    padding:9px 10px;letter-spacing:.04em;white-space:nowrap;flex:0 0 auto}
-  /* P2/D4b: derselbe weiche Scroll-Rand wie `.subbar` (Zeile ~157) - ohne
-     ihn ist "die Leiste rollt in sich" nur am Antasten zu erraten, nicht
-     zu sehen. "Erkennbar scrollbar" heisst: das Bild selbst sagt es. */
-  .gr-reiter{
-    background-image:
-      linear-gradient(to right, var(--paper), var(--paper)),
-      linear-gradient(to left, var(--paper), var(--paper)),
-      linear-gradient(to right, rgba(20,18,15,.16), rgba(20,18,15,0)),
-      linear-gradient(to left, rgba(20,18,15,.16), rgba(20,18,15,0));
-    background-position:left center,right center,left center,right center;
-    background-repeat:no-repeat;
-    background-size:16px 100%,16px 100%,10px 100%,10px 100%;
-    background-attachment:local,local,scroll,scroll;
-  }
+    padding:8px 8px;letter-spacing:.02em;white-space:nowrap;flex:0 0 auto}
 }
 
 /* =====================================================================
