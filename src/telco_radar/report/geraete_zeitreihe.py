@@ -120,6 +120,19 @@ MIN_XTICK_ABSTAND = 34
 # beginnt.
 ACHSENBRUCH_ANTEIL = 0.10
 
+# C4 (QA-Fix 24.09.2026): DER RECHTE RAND DES ENDLABELS. Bis zu diesem Fix
+# begann jedes Endlabel (Name, "unser Angebot", Datum) am Linienende plus
+# 12 Einheiten und wuchs mit der Textbreite nach RECHTS - auf dem
+# schmalen Bild (390 px, `rechts`=96) lief ein langer Text (z. B. "unser
+# Angebot") dann aus dem SVG. Statt die Breite eines Textes zu schaetzen
+# (die echte Glyphenbreite kennt nur der Browser, und Google Fonts laden
+# in der Sandbox nicht - Fallstrick oben), steht das Endlabel jetzt
+# RECHTSBUENDIG an einem FESTEN X nahe dem rechten Bildrand
+# (`text-anchor='end'`): der Text waechst nach LINKS, egal wie breit die
+# Schrift ihn macht, und die rechte Kante bleibt immer an derselben
+# Stelle im SVG - unabhaengig von Font und Zeichenzahl.
+ENDLABEL_RAND = 6
+
 # P2/D2: EINE MESSLUECKE eines Anbieters (kein Messtag ueber mehr als
 # diese Zahl Tage) wird GEPUNKTET verbunden statt durchgezogen - eine
 # schraege durchgezogene Linie ueber viele stille Tage behauptet eine
@@ -1174,6 +1187,20 @@ def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
         laufzeit = satz.get("laufzeit_monate")
 
         def _gleichstand(kandidat):
+            # Sind BEIDE Ratenlaufzeiten `None` (nicht gemessen, z. B.
+            # eine Zeile ohne eigenen Geraeteraten-Posten), ist
+            # `laufzeit != kandidat.get("laufzeit")` `False` - kein
+            # Gleichstand zweier Zahlweisen, sondern "kein Unterschied
+            # bekannt". Das verwirft die zweite Zeile NICHT still: ohne
+            # eine bekannte Laufzeit haette `weitere_laufzeiten` unten
+            # (`if alt.get("laufzeit") is not None`) sie ohnehin nie
+            # aufgenommen, und `besser` bliebe wegen `laufzeit is not
+            # None` in der Gleichstand-Regel ebenfalls `False` - der
+            # Punkt der ersten Zeile bleibt also so oder so stehen. Ein
+            # `None == None`-Gleichstand wuerde daher keine Zahlweise
+            # zusaetzlich sichtbar machen, siehe `tests/
+            # test_geraete_zeitreihe_rechenweg.py::
+            # test_zwei_messungen_ohne_laufzeit_am_selben_tag_verlieren_keine_zahlweise`.
             return (kandidat is not None and kandidat["wert"] == wert
                     and zeitraum_vergleichbar(monate, kandidat["monate"])
                     and laufzeit != kandidat.get("laufzeit"))
@@ -1766,18 +1793,22 @@ def _svg(anbieter_serien: dict, breit: bool,
         letzte_y = ty
         farbe = _zr_farbe(a)
         url, datum = beleg_je.get(a, ("", ""))
+        # C4: rechtsbuendig an einem festen X (`ENDLABEL_RAND` vom
+        # rechten Bildrand) - der Text waechst nach links, die rechte
+        # Kante bleibt im SVG, egal wie breit die Schrift den Text macht.
+        lx = w - ENDLABEL_RAND
         name_html = f"{_esc(a)}<tspan class='gr-zr-pfeil'> ↗</tspan>"
         if url:
             teile.append(
                 f"<a class='gr-zr-link' href='{_esc(url)}' "
                 f"target='_blank' rel='noopener' aria-label='Beleg bei "
                 f"{_esc(a)} öffnen'><text class='gr-zr-name' "
-                f"x='{x + 12:.1f}' y='{ty + 4:.1f}' fill='{farbe}'>"
-                f"{name_html}</text></a>")
+                f"x='{lx:.1f}' y='{ty + 4:.1f}' text-anchor='end' "
+                f"fill='{farbe}'>{name_html}</text></a>")
         else:
-            teile.append(f"<text class='gr-zr-name' x='{x + 12:.1f}' "
-                         f"y='{ty + 4:.1f}' fill='{farbe}'>{_esc(a)}"
-                         f"</text>")
+            teile.append(f"<text class='gr-zr-name' x='{lx:.1f}' "
+                         f"y='{ty + 4:.1f}' text-anchor='end' "
+                         f"fill='{farbe}'>{_esc(a)}</text>")
         # Der ZEITRAUM steht unmittelbar unter dem Namen - am Ende DER
         # Kurve, zu der er gehoert (P0-B-z1). `gr-zr-mon` ist sein
         # eigener Name; die Optik (10,5 px, gedeckt) ist die des
@@ -1785,16 +1816,17 @@ def _svg(anbieter_serien: dict, breit: bool,
         mon = 13 if mon_text else 0
         if mon_text:
             teile.append(f"<text class='gr-zr-datum gr-zr-mon' "
-                         f"x='{x + 12:.1f}' y='{ty + 17:.1f}'>"
-                         f"{_esc(mon_text)}</text>")
+                         f"x='{lx:.1f}' y='{ty + 17:.1f}' "
+                         f"text-anchor='end'>{_esc(mon_text)}</text>")
         chip = 13 if a == EIGEN else 0
         if a == EIGEN:
-            teile.append(f"<text class='gr-zr-chip' x='{x + 12:.1f}' "
-                         f"y='{ty + 17 + mon:.1f}'>unser Angebot</text>")
+            teile.append(f"<text class='gr-zr-chip' x='{lx:.1f}' "
+                         f"y='{ty + 17 + mon:.1f}' text-anchor='end'>"
+                         f"unser Angebot</text>")
         if datum:
-            teile.append(f"<text class='gr-zr-datum' x='{x + 12:.1f}' "
-                         f"y='{ty + 17 + mon + chip:.1f}'>"
-                         f"{_datum_kurz(datum)}</text>")
+            teile.append(f"<text class='gr-zr-datum' x='{lx:.1f}' "
+                         f"y='{ty + 17 + mon + chip:.1f}' "
+                         f"text-anchor='end'>{_datum_kurz(datum)}</text>")
     teile.append("</svg>")
     return "".join(teile)
 

@@ -2573,6 +2573,12 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
      Fehlerklasse, die der Kommentar zu AB_TERMINEN zwei Zeilen weiter oben
      vermeidet (CLAUDE.md §6, Stichwort-Vorschau). */
   var ABSTAND = parseFloat((stand && stand.dataset.abstand) || '0.02');
+  /* A/E (QA-Fix 24.09.2026): dieselbe Messluecken-Schwelle wie der
+     TCO-Server-Chart (`geraete_zeitreihe.LUECKE_TAGE_SCHWELLE`) - aus
+     `report/geraete_verlauf.py` durchgereicht, NICHT hier hartkodiert
+     (derselbe Grund wie AB_TERMINEN/ABSTAND zwei Zeilen oben). */
+  var LUECKE_TAGE = parseInt(
+    (stand && stand.dataset.lueckeTage) || '10', 10);
   var von = document.getElementById('gr-vvon');
   var bis = document.getElementById('gr-vbis');
   var gewaehlt = null, raster = 'woche';
@@ -3027,10 +3033,44 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
                          text));
     });
 
+    /* A/E (QA-Fix 24.09.2026): STUFENLINIE STATT SCHRAEGER GERADE, UND
+       LUECKEN GEPUNKTET - dieselben zwei Regeln wie der TCO-Server-Chart
+       (`geraete_zeitreihe._stufenpfad`/`_linien_laeufe`), hier im Client
+       gebaut, weil diese Kurve erst im Browser aus den Rohdaten entsteht
+       (Zeitraum-/Raster-Umschalter). Ein Preis gilt vom Messtag an - die
+       Linie SPRINGT am naechsten Messtag, sie GLEITET nicht dorthin; eine
+       schraege durchgezogene Linie ueber eine Messluecke behauptet eine
+       beobachtete Entwicklung, die es in der stillen Zeit nicht gab. */
+    function stufenpfad(pkte) {
+      var teile = ['M' + pkte[0].x.toFixed(1) + ' ' + pkte[0].y.toFixed(1)];
+      for (var i = 1; i < pkte.length; i++) {
+        var y0 = pkte[i - 1].y, x1 = pkte[i].x, y1 = pkte[i].y;
+        teile.push('L' + x1.toFixed(1) + ' ' + y0.toFixed(1));
+        if (y1 !== y0) teile.push('L' + x1.toFixed(1) + ' ' + y1.toFixed(1));
+      }
+      return teile.join(' ');
+    }
+    function linienLaeufe(pkte) {
+      if (pkte.length < 2) return [];
+      var laeufe = [], lauf = [pkte[0]];
+      for (var i = 1; i < pkte.length; i++) {
+        var tage = tagNr(pkte[i].datum) - tagNr(pkte[i - 1].datum);
+        if (tage > LUECKE_TAGE) {
+          if (lauf.length > 1) laeufe.push({ pkte: lauf, luecke: false });
+          laeufe.push({ pkte: [pkte[i - 1], pkte[i]], luecke: true });
+          lauf = [pkte[i]];
+        } else {
+          lauf.push(pkte[i]);
+        }
+      }
+      if (lauf.length > 1) laeufe.push({ pkte: lauf, luecke: false });
+      return laeufe;
+    }
+
     reihen.forEach(function (r) {
-      var d = r.punkte.map(function (p, i) {
-        return (i ? 'L' : 'M') + x(p.datum).toFixed(1) + ' ' + y(p.preis).toFixed(1);
-      }).join(' ');
+      var pkte = r.punkte.map(function (p) {
+        return { x: x(p.datum), y: y(p.preis), datum: p.datum };
+      });
       if (r.punkte.length > 1) {
         /* P2/D1: die Anbieterklasse (`gr-anb--<slug>`) traegt die
            Strichart aus derselben EINEN Quelle wie die Farbe
@@ -3041,8 +3081,6 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
            ersetzt), sonst verliert ausgerechnet die ueberdeckte Linie
            ihre Markenkennzeichnung. */
         var klasse = 'gr-vlinie' + (r.slug ? ' gr-anb--' + r.slug : '');
-        var attrs = { d: d, fill: 'none', stroke: r.farbe,
-                      'stroke-width': r.eigen ? 3 : 2, class: klasse };
         if (r.verdeckt) {
           /* MEHR LUECKE ALS STRICH. Mit "7 5" deckte die obenliegende Linie
              immer noch 58 Prozent der Laenge ab; am Pixelbild gemessen
@@ -3053,11 +3091,26 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
              verschoben. Die `--anb-strich`-Regel in style.css gilt
              ausdruecklich nur `:not(.gr-vlinie--verdeckt)` - sie tritt der
              Verdeckungs-Markierung hier nicht in den Weg, das INLINE-
-             Attribut bleibt die einzige Quelle des Strichmusters. */
-          attrs['stroke-dasharray'] = '4 8';
-          attrs.class = klasse + ' gr-vlinie--verdeckt';
+             Attribut bleibt die einzige Quelle des Strichmusters. Diese
+             Markierung gilt der GANZEN Linie (verdeckt bleibt verdeckt,
+             Luecke hin oder her) - sie ist eine eigene, staerkere Aussage
+             als die Messluecke. */
+          svg.appendChild(el('path', {
+            d: stufenpfad(pkte), fill: 'none', stroke: r.farbe,
+            'stroke-width': r.eigen ? 3 : 2, 'stroke-dasharray': '4 8',
+            class: klasse + ' gr-vlinie--verdeckt' }));
+        } else {
+          linienLaeufe(pkte).forEach(function (lauf) {
+            var attrs = { d: stufenpfad(lauf.pkte), fill: 'none',
+                          stroke: r.farbe, 'stroke-width': r.eigen ? 3 : 2,
+                          class: klasse };
+            if (lauf.luecke) {
+              attrs['stroke-dasharray'] = '2 4';
+              attrs.class = klasse + ' gr-vlinie--luecke';
+            }
+            svg.appendChild(el('path', attrs));
+          });
         }
-        svg.appendChild(el('path', attrs));
       }
       r.punkte.forEach(function (p) {
         /* Der Punkt der obenliegenden Linie wird ein RING, wenn er auf einem

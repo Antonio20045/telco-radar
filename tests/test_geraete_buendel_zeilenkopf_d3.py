@@ -32,6 +32,7 @@ import re
 
 import pytest
 import yaml
+from bs4 import BeautifulSoup
 
 from telco_radar.report.html import render_site
 
@@ -148,6 +149,16 @@ def _congstar_zeilen(html: str) -> dict:
     return out
 
 
+def test_gr_bnd_subjekt_kommt_nicht_mehr_vor(site):
+    """C1 (QA-Fix 24.09.2026): die verdoppelte Hauptzahl unter der Zeile
+    ("congstar 496,80 € unter Vodafone") ist entfernt - die Δ-Spalte
+    bleibt die einzige Stelle mit diesem Betrag. Geprueft am ganzen
+    Dokument (nicht nur an der congstar-Zeile dieser Fixture), damit auch
+    ein wieder eingeschlichenes CSS-Selektor-Fossil auffaellt."""
+    html = (site / "geraete.html").read_text(encoding="utf-8")
+    assert "gr-bnd-subjekt" not in html
+
+
 def test_lookup_greift(site):
     """Gegenprobe: der Lookup findet wirklich beide Zahlweisen - sonst
     wären alle folgenden Tests grün, ohne etwas zu prüfen (CLAUDE.md
@@ -204,13 +215,21 @@ def _congstar_xs_summarys(html: str) -> list:
     return texte
 
 
-def test_punkt1_rot_gegen_den_alten_stand(tmp_path, monkeypatch):
-    """Beweis, dass der Kerntest gegen den ALTEN Stand rot ist: dieselbe
-    Fixture, aber mit der Vorlage von VOR diesem Auftrag
-    (`git show HEAD:...`, HEAD trägt die Fassung vor diesem Paket) -
-    dort sind die 24er- und die 36er-Zeile zugeklappt wortgleich."""
-    import subprocess
+# Wortgetreue Kopie der Vorlage von VOR Paket D3 (Commit 58446de, siehe
+# Dateikopf der Fixture) - eingefroren im Repo, statt per `git show HEAD:...`
+# gelesen. Ein `git show HEAD:...` wird nach dem Commit dieses Fixes selbst
+# zum NEUEN Stand und der Test würde grün werden, ohne dass sich am
+# geprüften Verhalten etwas ändert (CLAUDE.md: ein Test darf nicht vom
+# Git-Stand abhängen). Die Datei wird nie nachgeführt.
+_ALTE_VORLAGE = WURZEL / "tests" / "fixtures" / "geraete_buendel_vor_d3.html.j2"
 
+
+def test_punkt1_rot_gegen_den_alten_stand(tmp_path, monkeypatch):
+    """Beweis, dass der Kerntest gegen den ALTEN Stand (vor Paket D3,
+    eingefroren in `_ALTE_VORLAGE`) rot ist: dort sind die 24er- und die
+    36er-Zeile zugeklappt wortgleich - genau der Befund, den D3 behebt.
+    Stabil gegen künftige Commits: die Fixture ändert sich nie, es wird
+    kein `git show` mehr zur Laufzeit gelesen."""
     import telco_radar.report.html as html_mod
 
     alt_dir = tmp_path / "alte_vorlagen"
@@ -222,12 +241,8 @@ def test_punkt1_rot_gegen_den_alten_stand(tmp_path, monkeypatch):
     for datei in live.iterdir():
         if datei.is_file():
             (alt_dir / datei.name).write_bytes(datei.read_bytes())
-    alt_inhalt = subprocess.run(
-        ["git", "show", "HEAD:src/telco_radar/report/templates/"
-                        "_geraete_buendel.html.j2"],
-        cwd=WURZEL, capture_output=True, check=True, text=True).stdout
-    (alt_dir / "_geraete_buendel.html.j2").write_text(alt_inhalt,
-                                                       encoding="utf-8")
+    (alt_dir / "_geraete_buendel.html.j2").write_bytes(
+        _ALTE_VORLAGE.read_bytes())
     monkeypatch.setattr(html_mod, "_TEMPLATES", alt_dir)
 
     alt_site = _baue(tmp_path / "alt", _bestand())
@@ -236,43 +251,44 @@ def test_punkt1_rot_gegen_den_alten_stand(tmp_path, monkeypatch):
     assert len(texte) == 2, (
         f"Fixture greift auch gegen den alten Stand nicht: {texte}")
 
-    # DIE KERNASSERTION GEGEN DEN ALTEN STAND - hier ABSICHTLICH in
-    # `pytest.raises` gefangen: sie ist rot, das ist der Beweis.
-    with pytest.raises(AssertionError) as exc:
-        assert texte[0] != texte[1], (
-            "beide Zahlweisen sind zugeklappt wortgleich:\n"
-            f"  Zeile 1: {texte[0]!r}\n  Zeile 2: {texte[1]!r}")
-    # Die WOERTLICHE rote Ausgabe steht damit im Testprotokoll (repr der
-    # AssertionError-Nachricht) - `pytest -rA`/`-v` druckt sie.
-    print("ROTE AUSGABE GEGEN DEN ALTEN STAND:\n", str(exc.value))
-    assert "wortgleich" in str(exc.value)
+    # DIE KERNASSERTION GEGEN DEN ALTEN STAND: dort SIND beide Zeilen
+    # zugeklappt wortgleich - das ist der eingefrorene Befund, kein
+    # `pytest.raises`-Umweg mehr nötig, weil die Fixture nie wieder den
+    # neuen (gefixten) Text tragen kann.
+    assert texte[0] == texte[1], (
+        "die Fixture (Stand vor D3) ist entgegen der Annahme nicht mehr "
+        f"wortgleich - stimmt _ALTE_VORLAGE wirklich mit Commit 58446de "
+        f"überein?\n  Zeile 1: {texte[0]!r}\n  Zeile 2: {texte[1]!r}")
 
 
-def test_punkt2_hauptzahl_nennt_ihr_subjekt(site):
-    """Die Hauptzahl der Zeile ist "congstar 462,00 € unter Vodafone" -
-    kein nackter Betrag - und sie ist die groesste Schrift der Zeile
-    (Antonios Stil). Der Abstand ist deutlich ueber der Wesentlichkeits-
-    Schwelle (Δ > 15 € UND > 3 %, siehe `_vodafone_buendel`) - GEGENPROBE
-    zum Review-Fix S2: ein wesentlicher Abstand zeigt weiterhin die feste
-    Zahl, kein "≈"."""
+def test_punkt2_delta_spalte_traegt_die_feste_zahl(site):
+    """C1 (QA-Fix 24.09.2026): `.gr-bnd-subjekt` ist gefallen - die
+    Δ-Spalte (`.gr-bnd-delta`) ist jetzt die EINZIGE Stelle, die den
+    Abstand zu Vodafone nennt. Der Abstand liegt deutlich ueber der
+    Wesentlichkeits-Schwelle (Δ > 15 € UND > 3 %, siehe
+    `_vodafone_buendel`) - GEGENPROBE zur "≈"-Regel: ein wesentlicher
+    Abstand zeigt die feste Zahl, kein "≈", und traegt die
+    `gr-bnd-delta--wert`-Klasse (Δ-Praefix mobil)."""
     html = (site / "geraete.html").read_text(encoding="utf-8")
     zeilen = _congstar_zeilen(html)
     delta = round(SOLL_GESAMT - (1 + 24 * 26.0 + 24 * 54.0), 2)
     assert delta < 0
-    soll_text = (f"congstar {abs(delta):,.2f} € unter Vodafone"
-                .replace(",", "#").replace(".", ",").replace("#", "."))
+    betrag_text = (f"{abs(delta):,.2f} €"
+                  .replace(",", "#").replace(".", ",").replace("#", "."))
     for n in (24, 36):
-        _klassen, text, block = zeilen[n]
-        assert "≈" not in text, (
+        _klassen, _text, block = zeilen[n]
+        soup = BeautifulSoup(block, "html.parser")
+        zelle = soup.select_one(".gr-bnd-delta")
+        assert zelle is not None, f"{n} Raten: keine Δ-Spalte im Markup"
+        delta_text = zelle.get_text(strip=True)
+        assert "≈" not in delta_text, (
             f"{n} Raten: ein wesentlicher Abstand traegt ein '≈' - "
-            f"{text!r}")
-        assert soll_text in text, (
-            f"{n} Raten: Hauptzahl fehlt oder falsch - {text!r}, "
-            f"erwartet {soll_text!r}")
-        subjekt = re.search(r'<strong class="gr-bnd-subjekt">([^<]*)</strong>',
-                            block)
-        assert subjekt, f"{n} Raten: kein gr-bnd-subjekt im Markup"
-        assert subjekt.group(1).strip() == soll_text
+            f"{delta_text!r}")
+        assert betrag_text in delta_text, (
+            f"{n} Raten: Δ-Betrag fehlt oder falsch - {delta_text!r}, "
+            f"erwartet {betrag_text!r}")
+        assert "gr-bnd-delta--wert" in (zelle.get("class") or []), (
+            f"{n} Raten: gr-bnd-delta--wert fehlt an einem echten Δ-Wert")
 
 
 def test_punkt3_anbieterfarbe_steht_an_der_zeile(site):
@@ -392,16 +408,6 @@ def test_mutationsprobe_punkt4_erkennt_falsche_segmentsumme():
     assert round(sum(s["betrag"] for s in kaputt), 2) != pytest.approx(1459.0)
 
 
-def test_mutationsprobe_punkt2_erkennt_falsches_vorzeichen():
-    """Die Subjekt-Zeile MUSS "unter" und "über" unterscheiden - eine
-    Mutationsprobe, dass ein Vorzeichenfehler den Text sichtbar aendert."""
-    anbieter, betrag = "congstar", 462.00
-    guenstiger_satz = f"{anbieter} {betrag:.2f} unter Vodafone".replace(
-        ".", ",")
-    teurer_satz = f"{anbieter} {betrag:.2f} über Vodafone".replace(".", ",")
-    assert guenstiger_satz != teurer_satz
-
-
 # --------------------------------------------------------------------------
 # REVIEW-FIX S2 (blockierend): die Hauptzahl ignorierte die Wesentlich-
 # keits-Schwelle. Eine EIGENE, kleine Fixture mit einem Abstand UNTER der
@@ -481,115 +487,31 @@ def test_review_fix_s2_gegenprobe_wesentlich_bleibt_fest():
         < geraete_vergleich.WESENTLICH_PROZENT
 
 
-def test_review_fix_s2_ungefaehr_subjekt_behauptet_keine_fuehrerschaft(
+def test_review_fix_s2_delta_spalte_behauptet_keine_fuehrerschaft(
         site_ungefaehr):
-    """DER BLOCKIERENDE BEFUND: unter der Wesentlichkeits-Schwelle darf
-    die Hauptzahl der Zeile keine feste Führerschaft mehr behaupten
-    ("congstar 8,00 € unter Vodafone", fett) - derselbe Fall zeigt im
-    Rechenweg der eigenen Zeile (der ≈-Zweig, A2 20.09.2026) bewusst
-    "≈ 8,00 €". Die groesste Schrift der Zeile widerspricht sonst ihrer
-    eigenen Nachbarzeile (CLAUDE.md: die wichtigste Zahl ist die groesste
-    Schrift ihres Bereichs - deshalb muss sie besonders stimmen)."""
+    """C1 (QA-Fix 24.09.2026): `.gr-bnd-subjekt` ist gefallen - der
+    urspruengliche Review-Fix S2 gilt jetzt der Δ-Spalte selbst
+    (`.gr-bnd-delta`), der einzigen verbliebenen Stelle des Betrags.
+    Unter der Wesentlichkeits-Schwelle darf sie keine feste Fuehrerschaft
+    mehr behaupten ("8,00 €" ohne "≈"), sondern zeigt "≈ 8,00 €" - und
+    dabei NICHT die `gr-bnd-delta--wert`-Klasse (das Δ-Praefix ist nur
+    fuer feste Werte gedacht, siehe die Vorlage)."""
     html = (site_ungefaehr / "geraete.html").read_text(encoding="utf-8")
     treffer = _ZEILE_RE.findall(html)
     assert len(treffer) == 1, (
         f"erwartet genau eine congstar-Zeile, gefunden {len(treffer)}")
     block = treffer[0][1]
-
-    subjekt = re.search(r'<strong class="gr-bnd-subjekt">([^<]*)</strong>',
-                        block)
-    assert subjekt, "kein gr-bnd-subjekt im Markup der Annäherungs-Zeile"
-    text = subjekt.group(1).strip()
-    soll_text = f"congstar ≈ {SOLL_ABSTAND_U:,.2f} € unter Vodafone".replace(
+    soup = BeautifulSoup(block, "html.parser")
+    zelle = soup.select_one(".gr-bnd-delta")
+    assert zelle is not None, "keine Δ-Spalte im Markup der Annäherungs-Zeile"
+    text = zelle.get_text(strip=True)
+    soll_text = f"≈ −{SOLL_ABSTAND_U:,.2f} €".replace(
         ",", "#").replace(".", ",").replace("#", ".")
     assert text == soll_text, (
-        f"Hauptzahl der Annäherungs-Zeile: {text!r}, erwartet {soll_text!r}")
-
-    # GEGENPROBE: dieselbe "≈"-Sprache wie die Nachbarzeile im Rechenweg
-    # (`gr-kk-delta`, A2 20.09.2026) - kein zweiter, unbeabsichtigter Text.
-    platt = " ".join(re.sub(r"<[^>]+>", " ", block).split())
-    naeherung_text = f"≈ {SOLL_ABSTAND_U:,.2f} €".replace(
-        ",", "#").replace(".", ",").replace("#", ".")
-    assert platt.count(naeherung_text) >= 2, (
-        f"die Annäherungs-Sprache {naeherung_text!r} fehlt in Subjekt "
-        f"oder Rechenweg: {platt!r}")
-
-
-def test_review_fix_s2_rot_gegen_den_alten_stand(tmp_path, monkeypatch):
-    """Beweis, dass der Review-Fix S2 gegen den ALTEN Stand (vor diesem
-    Fix) rot ist: dieselbe Annäherungs-Fixture, aber mit dem Subjekt-Block
-    von VOR dem Fix - der pruefte nur `k.delta.betrag is not none`, nicht
-    `k.delta.ungefaehr`, und behauptete darum auch unter der Schwelle eine
-    feste Zahl.
-
-    Anders als `test_punkt1_rot_gegen_den_alten_stand` NICHT ueber
-    `git show HEAD:...`: HEAD traegt noch gar kein Paket D3 (alle
-    Dateien des Pakets sind uncommittet), ein Checkout von HEAD haette
-    also gar kein `gr-bnd-subjekt` und wuerde nichts beweisen. Der alte
-    Block wird darum gezielt an der EINEN Stelle zurueckgetauscht, die
-    dieser Fix aendert (`neuer_block`/`alter_block`), am selben, sonst
-    unveraenderten, aktuellen Stand."""
-    import telco_radar.report.html as html_mod
-
-    live = pathlib.Path(html_mod._TEMPLATES)
-    aktuell = (live / "_geraete_buendel.html.j2").read_text(encoding="utf-8")
-
-    anfang = aktuell.index('<strong class="gr-bnd-subjekt">')
-    ende = aktuell.index("</strong>", anfang) + len("</strong>")
-    neuer_block = aktuell[anfang:ende]
-    # Der Subjekt-Block VOR Review-Fix S2 (wortgleich mit dem Stand zu
-    # Beginn dieses Fixes): kein "≈", keine Klammer-Prozent - eine feste
-    # Zahl fuer JEDEN Δ, auch unter der Wesentlichkeits-Schwelle.
-    alter_block = (
-        '<strong class="gr-bnd-subjekt">{{ k.anbieter }}{% if k.delta.ungefaehr\n'
-        "      and not k.delta.abstand %} entspricht Vodafone{% else %} {{\n"
-        "      k.delta.abstand | euro }} {{ 'unter' if k.delta.guenstiger else\n"
-        "      'über' }} Vodafone{% endif %}</strong>"
-    )
-    assert neuer_block != alter_block, (
-        "der aktuelle Block ist wortgleich mit dem alten - der Fix steht "
-        "nicht mehr im Stand, dieser Test wuerde nichts beweisen")
-    alt_inhalt = aktuell.replace(neuer_block, alter_block)
-    assert alt_inhalt != aktuell, "Marker fuer den Subjekt-Block nicht gefunden"
-
-    alt_dir = tmp_path / "alte_vorlagen_s2"
-    alt_dir.mkdir()
-    for datei in live.iterdir():
-        if datei.is_file():
-            ziel = alt_dir / datei.name
-            if datei.name == "_geraete_buendel.html.j2":
-                ziel.write_text(alt_inhalt, encoding="utf-8")
-            else:
-                ziel.write_bytes(datei.read_bytes())
-    monkeypatch.setattr(html_mod, "_TEMPLATES", alt_dir)
-
-    alt_site = _baue(tmp_path / "alt_s2", _bestand_ungefaehr())
-    html = (alt_site / "geraete.html").read_text(encoding="utf-8")
-    treffer = _ZEILE_RE.findall(html)
-    assert len(treffer) == 1, (
-        f"Fixture greift auch gegen den alten Stand nicht: {len(treffer)} "
-        "congstar-Zeilen")
-    block = treffer[0][1]
-    subjekt = re.search(r'<strong class="gr-bnd-subjekt">([^<]*)</strong>',
-                        block)
-    assert subjekt, "kein gr-bnd-subjekt im alten Stand"
-    text = subjekt.group(1).strip()
-    soll_text = f"congstar ≈ {SOLL_ABSTAND_U:,.2f} € unter Vodafone".replace(
-        ",", "#").replace(".", ",").replace("#", ".")
-
-    # DIE KERNASSERTION GEGEN DEN ALTEN STAND - hier ABSICHTLICH in
-    # `pytest.raises` gefangen: sie ist rot, das ist der Beweis.
-    with pytest.raises(AssertionError) as exc:
-        assert text == soll_text, (
-            "die Hauptzahl behauptet eine feste Führerschaft unter der "
-            f"Wesentlichkeits-Schwelle: {text!r}, erwartet {soll_text!r}")
-    print("ROTE AUSGABE GEGEN DEN ALTEN STAND (S2):\n", str(exc.value))
-    assert "feste Führerschaft" in str(exc.value)
-    # Der ALTE, FALSCHE Text ist genau der Befund aus dem Review.
-    alter_falscher_text = (
-        f"congstar {SOLL_ABSTAND_U:,.2f} € unter Vodafone".replace(
-            ",", "#").replace(".", ",").replace("#", "."))
-    assert text == alter_falscher_text, f"unerwarteter alter Text: {text!r}"
+        f"Δ-Spalte der Annäherungs-Zeile: {text!r}, erwartet {soll_text!r}")
+    assert "gr-bnd-delta--wert" not in (zelle.get("class") or []), (
+        "die Annäherung traegt das Δ-Praefix, obwohl sie kein fester "
+        "Wert ist")
 
 
 # --------------------------------------------------------------------------
@@ -651,6 +573,35 @@ def test_review_fix_s3_2_nullbetrag_posten_ohne_balkenteil():
         "Geräteraten über 24 Monate" in namen, (
         f"ein echter Posten fehlt: {seg}")
     assert round(sum(s["betrag"] for s in seg), 2) == pytest.approx(1360.0)
+
+
+def test_ausfall_restbetrag_groesser_als_posten_zeichnet_keinen_balken(
+        caplog):
+    """S3-Nachtrag (gemessen): eine Restschuld, die groesser ist als der
+    Posten, aus dem sie stammt (ein widerspruechlicher Bestand), darf
+    NIE ein negatives Balkensegment erzeugen (Clean Code 5) - der alte
+    Stand rechnete `betrag - rest` ungeprueft und haengte das Ergebnis
+    ungeprueft an; das war hier -100.0. Der Ausfall ist benannt: ein
+    Protokolleintrag (`logging.warning`) und eine leere Liste als
+    Kennzeichen "kein Balken", dieselbe Bedeutung wie ein fehlendes
+    `gesamt` oben in der Funktion - die Vorlage laesst den Balken bei
+    einer leeren `k.zerlegung` ohnehin schon weg (`{% if k.zerlegung %}`
+    in `_geraete_buendel.html.j2`)."""
+    from telco_radar.report.geraete_tco_karten import zerlegung_balken
+
+    bestandteile = [
+        {"name": "Geräteraten über 36 Monate", "betrag": 400.0,
+         "kategorie": "raten"},
+    ]
+    with caplog.at_level("WARNING"):
+        seg = zerlegung_balken(bestandteile, restbetrag=500.0, gesamt=400.0)
+    assert seg == [], (
+        f"eine Restschuld ueber dem Posten erzeugt trotzdem einen "
+        f"Balken: {seg}")
+    assert any("restbetrag" in r.message and "500" in r.message
+              for r in caplog.records), (
+        "kein Protokolleintrag zum Ausfall - Regel 5 verlangt ein "
+        "Protokoll, kein stilles leeres Ergebnis ohne Spur")
 
 
 def test_review_fix_s3_2_voll_offene_raten_ohne_faelliges_nullsegment():

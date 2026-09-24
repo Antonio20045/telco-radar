@@ -651,6 +651,19 @@ def zerlegung_balken(bestandteile: list, restbetrag: Optional[float],
         kategorie = posten["kategorie"]
         if rest and not gesplittet and kategorie in _ZERLEGUNG_RATENKATEGORIEN:
             faellig = round(betrag - rest, 2)
+            # Ausfall (Clean Code 5), kein stilles negatives Segment: eine
+            # Restschuld, die groesser ist als der Posten, aus dem sie
+            # kommt, ist ein widerspruechlicher Bestand (z. B. eine falsch
+            # zugeordnete Restschuld aus einer anderen Laufzeit) - der
+            # Balken bleibt UNGEZEICHNET (leere Liste, dieselbe
+            # Bedeutung wie "kein `gesamt`" oben), nie ein Balken mit
+            # einer erfundenen Breite unter 0 %.
+            if faellig < 0:
+                log.warning(
+                    "zerlegung_balken: restbetrag %.2f EUR groesser als "
+                    "der Posten %r (%.2f EUR) - Balken bleibt "
+                    "ungezeichnet", rest, name, betrag)
+                return []
             if faellig:
                 segmente.append({"name": name, "betrag": faellig,
                                  "kategorie": kategorie, "offen": False})

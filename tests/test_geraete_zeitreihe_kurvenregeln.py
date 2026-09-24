@@ -34,7 +34,7 @@ def test_stufenpfad_springt_statt_zu_gleiten():
     assert pfad == "M0.0 100.0 L50.0 100.0 L50.0 60.0 L100.0 60.0"
 
 
-def test_die_linie_im_svg_ist_eine_stufe_kein_direkter_sprung(tmp_path=None):
+def test_die_linie_im_svg_ist_eine_stufe_kein_direkter_sprung():
     tage = _tage("2026-09-12", 3)
     serien = {"Vodafone": [(tage[0], 900.0), (tage[1], 950.0),
                            (tage[2], 950.0)]}
@@ -67,6 +67,35 @@ def test_grosse_luecke_wird_gepunktet_nicht_schraeg_verbunden():
         r"stroke='[^']+' stroke-dasharray='([^']+)'", svg)
     assert luecken_pfad is not None
     assert luecken_pfad.group(1) == gz.STRICHMUSTER["gepunktet"]
+
+
+def test_grenzfall_genau_schwelle_tage_bleibt_durchgezogen():
+    """E (QA-Fix 24.09.2026): eine Luecke von GENAU
+    `LUECKE_TAGE_SCHWELLE` (10) Tagen ist NICHT groesser als die
+    Schwelle (`>`, nicht `>=`, siehe `_linien_laeufe`) - der Zug bleibt
+    EIN durchgezogener Lauf, keine gepunktete Teilstrecke."""
+    assert gz.LUECKE_TAGE_SCHWELLE == 10, (
+        "dieser Grenzfalltest nimmt 10 an - die Konstante hat sich "
+        f"geaendert ({gz.LUECKE_TAGE_SCHWELLE})")
+    tage = ["2026-09-12", "2026-09-22"]  # exakt 10 Tage Abstand
+    serien = {"Vodafone": [(t, 900.0 + i * 5) for i, t in enumerate(tage)]}
+    svg = gz._svg(serien, True, _BELEG, None)
+    pfade = re.findall(r"<path class='([^']+)'", svg)
+    linien = [p for p in pfade if p.startswith("gr-zr-linie")]
+    assert linien == ["gr-zr-linie"], (
+        f"eine 10-Tage-Luecke (== Schwelle) wurde gepunktet: {linien}")
+
+
+def test_grenzfall_ein_tag_ueber_der_schwelle_wird_gepunktet():
+    """E (QA-Fix 24.09.2026): Gegenprobe - EIN Tag mehr (11) ueberschreitet
+    die Schwelle und wird zur eigenen, gepunkteten Teilstrecke."""
+    tage = ["2026-09-12", "2026-09-23"]  # exakt 11 Tage Abstand
+    serien = {"Vodafone": [(t, 900.0 + i * 5) for i, t in enumerate(tage)]}
+    svg = gz._svg(serien, True, _BELEG, None)
+    pfade = re.findall(r"<path class='([^']+)'", svg)
+    linien = [p for p in pfade if p.startswith("gr-zr-linie")]
+    assert linien == ["gr-zr-linie gr-zr-linie--luecke"], (
+        f"eine 11-Tage-Luecke (> Schwelle) blieb durchgezogen: {linien}")
 
 
 def test_kleine_luecke_bleibt_durchgezogen():

@@ -1106,7 +1106,11 @@
      CLAUDE.md 6 (Stichwort-Vorschau). #}
   <p class="gr-erklaer gr-basis--duenn" id="gr-vstand" hidden
      data-abterminen="{{ geraete.verlauf.diagramm_ab_terminen }}"
-     data-abstand="{{ geraete.verlauf.linien_abstand }}"></p>
+     data-abstand="{{ geraete.verlauf.linien_abstand }}"
+     {# A/E (QA-Fix 24.09.2026): dieselbe EINE Schwelle wie der
+        TCO-Server-Chart (`geraete_zeitreihe.LUECKE_TAGE_SCHWELLE`), nur
+        gelesen - kein zweiter Wert in app.js. #}
+     data-luecke-tage="{{ geraete.verlauf.luecke_tage_schwelle }}"></p>
 
   <div class="gr-vtabelle" id="gr-vtabelle" hidden></div>
 

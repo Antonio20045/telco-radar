@@ -40,6 +40,7 @@ Woche bei fuenf, sagt die Seite fuenf, ohne dass jemand eine Zeile aendert.
 from __future__ import annotations
 
 from .anbieter_farben import stil_fuer
+from .geraete_zeitreihe import LUECKE_TAGE_SCHWELLE
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE
 
 # Hoechstens acht Linien. Mehr Anbieter als das kann ein Mensch in einem
@@ -84,6 +85,15 @@ DIAGRAMM_AB_TERMINEN = 4
 # in der Legende und war im Bild nicht vorhanden. Eine Linie, die die
 # Legende nennt und das Bild nicht zeigt, ist schlimmer als keine Legende.
 LINIEN_ABSTAND = 0.02
+
+# A/E (QA-Fix 24.09.2026): DIE MESSLUECKEN-SCHWELLE DES SERVER-CHARTS
+# (TCO-Zeitreihe, `geraete_zeitreihe.LUECKE_TAGE_SCHWELLE`) IST HIER
+# GELESEN, NICHT NEU GESETZT - derselbe Grund wie bei `LINIEN_ABSTAND`
+# zwei Zeilen oben: eine zweite Zahl fuer dieselbe Regel waere die
+# Fehlerklasse aus CLAUDE.md 6. Der Barpreis-Verlauf dieses Reiters
+# zeichnet ueber eine Luecke jenseits dieser Schwelle GENAUSO gepunktet
+# wie der TCO-Server-Chart, statt eine schraege durchgezogene Linie ueber
+# stille Tage zu behaupten.
 
 # Die Farbe kommt aus der EINEN Quelle (P2/D1, `anbieter_farben.py`), nicht
 # mehr aus einer Hash-Palette. Die alte Fassung vergab sie nach
@@ -367,6 +377,7 @@ def aufbereiten(eintraege: list, historie, katalog) -> dict:
         "belastbar_ab_wochen": BELASTBAR_AB_WOCHEN,
         "diagramm_ab_terminen": DIAGRAMM_AB_TERMINEN,
         "linien_abstand": LINIEN_ABSTAND,
+        "luecke_tage_schwelle": LUECKE_TAGE_SCHWELLE,
         "max_linien": MAX_LINIEN,
         "max_datumsmarken": MAX_DATUMSMARKEN,
     }
@@ -377,4 +388,5 @@ def leer() -> dict:
             "messtermine": 0, "belastbar_ab_wochen": BELASTBAR_AB_WOCHEN,
             "diagramm_ab_terminen": DIAGRAMM_AB_TERMINEN,
             "linien_abstand": LINIEN_ABSTAND,
+            "luecke_tage_schwelle": LUECKE_TAGE_SCHWELLE,
             "max_linien": MAX_LINIEN, "max_datumsmarken": MAX_DATUMSMARKEN}

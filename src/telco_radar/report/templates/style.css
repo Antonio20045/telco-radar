@@ -2904,8 +2904,13 @@ b,strong{font-weight:700}
    unterscheidet Vodafone und Telekom nicht sicher (report/anbieter_farben.py).
    Nur bei NICHT verdeckten Linien: die Verdeckungs-Markierung von app.js
    setzt `stroke-dasharray` selbst als Attribut und gewinnt gegen jede
-   Klassenregel - siehe test_eine_verdeckte_linie_wird_sichtbar_gemacht. */
-.gr-vlinie:not(.gr-vlinie--verdeckt){stroke-dasharray:var(--anb-strich,none)}
+   Klassenregel - siehe test_eine_verdeckte_linie_wird_sichtbar_gemacht.
+   A/E (QA-Fix 24.09.2026): dieselbe Ausnahme fuer `--luecke` - der
+   gepunktete Messluecken-Abschnitt setzt `stroke-dasharray` ebenfalls
+   als Attribut (`app.js` `linienLaeufe`), diese Regel darf ihn nicht
+   ueberschreiben. */
+.gr-vlinie:not(.gr-vlinie--verdeckt):not(.gr-vlinie--luecke)
+  {stroke-dasharray:var(--anb-strich,none)}
 
 /* Modell-Selector und Ergebnisband */
 .gr-msel{display:flex;flex-wrap:wrap;gap:10px;align-items:center;
@@ -4037,20 +4042,6 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
    nicht erst im Rechenweg. */
 .gr-bnd-raten{color:var(--ink-4);font-family:var(--sans);font-size:12px;
   font-variant-numeric:tabular-nums;white-space:nowrap}
-
-/* PUNKT 2: die Hauptzahl der Zeile nennt ihr Subjekt ("congstar 467 €
-   unter Vodafone") statt eines nackten Betrags. `grid-column:1/-1`
-   haengt sie unter die sechs Spalten von `.gr-bnd summary`
-   (`display:grid`, keine `grid-template-areas` auf dem Desktop - ein
-   zusaetzliches Kind ohne eigene Platzanweisung faellt automatisch in
-   die naechste freie Zeile; auf dem Telefon ebenso, nach den drei
-   benannten Bereichen "an/tco", "tar/bar", "dl/chev"). Groesser als
-   `.gr-bnd-tco` (15px): der Abstand zu Vodafone ist der Grund, warum die
-   Tabelle existiert - Antonios Stil, die wichtigste Zahl traegt die
-   groesste Schrift ihres Bereichs. */
-.gr-bnd-subjekt{grid-column:1/-1;display:block;margin:3px 0 0;
-  font-family:var(--serif);font-size:16px;font-weight:700;
-  color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.3}
 
 /* PUNKT 4: der Zerlegungsbalken der Leitzahl, im Rechenweg-Aufklapper.
    Volle Breite, dieselbe Anbieterfarbe wie Name und Randstreifen
