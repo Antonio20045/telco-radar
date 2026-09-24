@@ -10,6 +10,8 @@ Ein Timeout ist in GitHub ausserdem ein "cancelled", kein "failed".
 Ein eigenes Zeitbudget schuetzt also nur, wenn es gegen die verbleibende
 JOBZEIT gerechnet wird. Das ist die Regel, die diese Datei festnagelt.
 """
+import re
+
 import yaml
 from pathlib import Path
 
@@ -179,3 +181,64 @@ def test_das_verlorene_push_rennen_bleibt_gruen():
     rumpf = _schritt("Commit site")["run"]
     assert "Seite konnte nicht gepusht werden" in rumpf
     assert rumpf.rstrip().splitlines()[-1].strip().startswith("echo ")
+
+
+# ==========================================================================
+# FRIST UND TIMEOUT VON geraete.yml (Befund Lauf 52/53, 24.09.2026)
+# ==========================================================================
+#
+# Bis hierher testete diese Datei nur die Kopplung von `job_frist_sekunden`
+# (settings.yaml) an `radar.yml` - die Geraetestufe INNERHALB des
+# Wochenlaufs. `geraete.yml` ist ein ANDERER, taeglicher Job mit einem
+# eigenen `--frist`-Kommandozeilenwert, den keiner dieser Tests bisher
+# gegen sein eigenes `timeout-minutes` hielt. Lauf 53 (24.09.2026) zeigte,
+# warum das noetig ist: congstar verhungerte am Ende der Sammelphase, weil
+# ElectronicPartner und Medimax seit dem Cron-Fix real crawlen statt
+# uebersprungen zu werden - siehe tests/test_geraete_zeitbilanz_lauf53.py
+# fuer den Nachbau der Zeitbilanz und die Abhilfe (Reihenfolge). Diese
+# Tests halten den ZWEITEN Teil der Abhilfe (mehr Budget) gegen das
+# Job-Timeout fest.
+
+# Namentliche Obergrenzen aus dem Befund (siehe die Kommentare bei
+# `timeout-minutes` in geraete.yml). GEMESSEN an Lauf 53: "Run geraete
+# stage" endete nach 1882,9s bei `--frist 1500`, davon ~7-8 min
+# Nachbearbeitung NACH der Sammelphase - der Rest war Setup und Sammelfrist.
+_GERAETE_YML_SETUP_OBERGRENZE_SEKUNDEN = 60
+_GERAETE_YML_NACHBEARBEITUNG_OBERGRENZE_SEKUNDEN = 8 * 60
+_GERAETE_YML_DEPLOY_UND_MAIL_OBERGRENZE_SEKUNDEN = 5 * 60
+# CLAUDE.md Regel 12: "mit Abstand" - kein Nachweis auf den letzten Drueckern.
+_GERAETE_YML_MINDESTABSTAND_SEKUNDEN = 10 * 60
+
+
+def _geraete_yml_text() -> str:
+    return (Path(__file__).resolve().parents[1] / ".github" / "workflows"
+           / "geraete.yml").read_text(encoding="utf-8")
+
+
+def _geraete_yml_cron_frist() -> float:
+    """Der Wert, den ein CRON-ausgeloester Lauf tatsaechlich bekommt -
+    `github.event.inputs.frist` ist bei einem Schedule-Trigger leer, also
+    zaehlt der Fallback in der `run:`-Zeile, nicht der Vorgabewert des
+    `workflow_dispatch`-Inputs. Genau dieser Pfad lief in Lauf 52 und 53."""
+    treffer = re.search(
+        r"--frist\s+\"\$\{\{\s*github\.event\.inputs\.frist\s*\|\|\s*(\d+)\s*\}\}\"",
+        _geraete_yml_text())
+    assert treffer, "geraete.yml: die Frist-Fallback-Zeile fehlt oder hat sich geaendert"
+    return float(treffer.group(1))
+
+
+def _geraete_yml_dispatch_frist_default() -> float:
+    treffer = re.search(r'frist:\s*\n(?:.*\n)*?\s*default:\s*"(\d+)"',
+                        _geraete_yml_text())
+    assert treffer, "geraete.yml: workflow_dispatch-Vorgabewert fuer frist fehlt"
+    return float(treffer.group(1))
+
+
+def test_der_workflow_dispatch_vorgabewert_und_der_cron_fallback_laufen_nicht_auseinander():
+    """Zwei Stellen tragen denselben Wert (G5, Duplizierung) - ein
+    manueller Testlauf ueber die GitHub-UI soll dasselbe Budget bekommen
+    wie der taegliche Cron-Lauf, sonst ist eine Abnahme ueber
+    `workflow_dispatch` keine Abnahme des echten Laufs."""
+    assert _geraete_yml_dispatch_frist_default() == _geraete_yml_cron_frist()
+
+

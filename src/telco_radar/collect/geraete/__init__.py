@@ -1284,7 +1284,11 @@ def sammle(quellen, katalog: Katalog, farben: dict, hole: Callable, heute: str,
     waechter = RobotsWaechter(hole=hole)
     frist_bis = (time.monotonic() + frist_sekunden) if frist_sekunden else None
 
-    sortiert = sorted(quellen.anbieter, key=lambda a: (a.rang, a.name))
+    # `crawl_rang`, NICHT `rang` (P1/S2-4, 24.09.2026 - Befund Lauf 52/53):
+    # `rang` ist die Anzeige-Reihenfolge auf der Seite und bleibt davon
+    # unberuehrt. `crawl_rang` faellt ohne eigenen `sammelrang` auf `rang`
+    # zurueck - fuer die meisten Anbieter aendert sich dadurch nichts.
+    sortiert = sorted(quellen.anbieter, key=lambda a: (a.crawl_rang, a.name))
     crawlt = [a.name for a in sortiert
               if a.crawlbar and ADAPTER.get(a.methode) is not None]
 

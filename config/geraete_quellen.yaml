@@ -25,6 +25,15 @@
 #   rang          gepflegt, nicht gerechnet - die Reihenfolge auf der Seite.
 #                 Dieselbe Regel wie `rang` in promo_sources.yaml: Marktgewicht
 #                 steht in keiner Zahl dieses Projekts.
+#   sammelrang    OPTIONAL, eigenes Feld fuer die ABRUFREIHENFOLGE
+#                 (`collect/geraete/__init__.py`, `sammle()`) - nicht die
+#                 Anzeige. Leer heisst "wie `rang`". Befund Lauf 52/53
+#                 (24.09.2026): `rang` diente bis dahin BEIDEM, Anzeige UND
+#                 Abruf, und congstar (rang 10, "Kernwettbewerber") stand
+#                 damit hinter jedem Haendler mit rang 1-4 - inklusive
+#                 mobilcom-debitel, das erst NACH ihm crawlen soll. Wer
+#                 dieses Feld aendert, aendert NICHT die Position auf der
+#                 Seite.
 #   eigen         true nur für Vodafone: eigene Referenz, kein Wettbewerber
 #   methode       Der Name des ADAPTERS, der diesen Anbieter liest - oder
 #                 eine Diagnose ohne Adapter. Die gültige Liste steht in
@@ -700,6 +709,17 @@ anbieter:
     netz: Telekom
     gruppe: Deutsche Telekom
     rang: 10
+    # `sammelrang: 4` (Befund Lauf 52/53, 24.09.2026): crawlt jetzt gleich
+    # NACH den Netzbetreibern (Telekom/Vodafone/o2/1&1, selbst rang 1-4),
+    # aber VOR mobilcom-debitel (Haendler, ebenfalls rang 4) - der
+    # alphabetische Tiebreak "1&1" < "congstar" < "mobilcom-debitel" sorgt
+    # dafuer ohne einen weiteren Wert. ElectronicPartner und Medimax
+    # (rang 3, eigenes Besuchsfenster 02:00-08:00 UTC) bleiben UNVERAENDERT
+    # an ihrer Stelle - sie liefen am 23./24.09. bereits innerhalb des
+    # Fensters, und ein Vorziehen der Netzbetreiber vor sie haette das bei
+    # spaetem Laufstart (gemessen 07:45 UTC) gefaehrdet. `rang: 10` bleibt
+    # die Anzeige-Position auf der Seite (unveraendert).
+    sammelrang: 4
     methode: congstar_next
     aktiv: true
     # `grund` ist gestrichen (B3, 08.09.2026): das Feld beantwortet "warum

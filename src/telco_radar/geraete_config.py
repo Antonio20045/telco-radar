@@ -16,6 +16,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Optional
 from urllib.parse import urljoin
 
 import yaml
@@ -88,6 +89,16 @@ class Anbieter:
     gruppe: str = ""
     netz: str = ""                # nur bei typ=discount: in wessen Netz
     rang: int = 99                # gepflegt, nicht gerechnet (wie promo rang)
+    # `rang` ist DIE REIHENFOLGE AUF DER SEITE (Marktgewicht, s.o.) - der
+    # Sammler sortierte bis zum 24.09.2026 trotzdem danach, und das war die
+    # zweite Ursache des Verhungerns von Lauf 52/53 (siehe collect/geraete/
+    # __init__.py, `sammle()`): eine Aenderung an der Anzeige-Reihenfolge
+    # haette ungewollt die Crawl-Reihenfolge mitgezogen und umgekehrt - zwei
+    # Zustaendigkeiten in einem Feld (vgl. Clean-Code-Referenz P2/G17).
+    # `sammelrang` ist die Trennung: LEER (Vorgabe) heisst "wie `rang`", nur
+    # congstar hat bisher einen eigenen Wert (siehe die YAML-Datei und den
+    # Befund zu Lauf 52/53).
+    sammelrang: Optional[int] = None
     methode: str = "ldjson"
     aktiv: bool = True
     grund: str = ""               # WARUM nicht aktiv - steht auf der Quellenseite
@@ -132,6 +143,13 @@ class Anbieter:
     @property
     def schluessel(self) -> str:
         return normalisiere(self.name)
+
+    @property
+    def crawl_rang(self) -> int:
+        """Die Abrufreihenfolge - NICHT `rang` (die Anzeigereihenfolge auf
+        der Seite). Genau eine Stelle berechnet das (Clean Code 1); jeder
+        Aufrufer, der die Abrufreihenfolge braucht, liest dieses Feld."""
+        return self.sammelrang if self.sammelrang is not None else self.rang
 
     @property
     def crawlbar(self) -> bool:
@@ -360,6 +378,8 @@ def lade_quellen(root: Path) -> QuellenConfig:
             gruppe=str(a.get("gruppe") or "").strip(),
             netz=str(a.get("netz") or "").strip(),
             rang=int(a["rang"]) if str(a.get("rang", "")).strip().isdigit() else 99,
+            sammelrang=(int(a["sammelrang"])
+                        if str(a.get("sammelrang", "")).strip().isdigit() else None),
             methode=methode, aktiv=aktiv, grund=grund,
             eigen=bool(a.get("eigen", False)),
             shop=str(a.get("shop") or "").strip() or name,
