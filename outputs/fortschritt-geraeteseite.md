@@ -830,3 +830,20 @@ congstar-Bündelzeilen wortgleich (`congstar · Allnet Flat XS · 15 GB ·
 im aufgeklappten Rumpf; und der Rechenweg der jüngsten Messung verliert die
 Restschuld-Zeile (dokumentierte Regel, kein Rechenfehler, aber 366,00 € offene
 Schuld verschwinden über die Zeit aus den Panels).
+
+### Sitzung 22.–24.09. — Ende: P0 live, P1 live, P2 zur Hälfte
+
+**Übergabe für die nächste Sitzung: `outputs/uebergabe-p2-p4.md` (auf main).**
+
+- **Auf main und live:** P0, P1, congstar-Reihenfolge (`sammelrang`), Mailschritt als
+  Warnung statt rot, P2-D1 Anbieterfarben, P2-D4a Erklärtexte → Methodik-Sektion.
+- **Auf `claude/bold-sagan-5craam`, UNGEPRÜFT (`d599ff2`):** P2-D2 Chart/Mobil, P2-D3
+  Bündeltabelle, Teile der Abschlussrunde. Ein S1 offen: der Client-Chart im Reiter
+  „Preisverlauf" widerspricht dem Server-Chart (schräge Linien gegen Stufen).
+- **Erste zwei Produktionsläufe mit P1 gemessen (23./24.09.):** Wächter feuerte echt
+  („mobilcom-debitel … 31 % weniger"), mobilcom-debitel erstmals vollständig; congstar
+  verhungerte am Budget, weil Medimax/EP jetzt in ihrem Fenster crawlen — behoben.
+- **Neue Leitplanken** stehen im Übergabedokument, u. a.: ein Prüfagent hat mit
+  `git checkout --` ungesicherte Arbeit vernichtet (per gesichertem Patch
+  wiederhergestellt); veralteter Bytecode zeigte grüne Tests rot; Bot-Commits lösen
+  keine CI aus und können main still rot machen.
