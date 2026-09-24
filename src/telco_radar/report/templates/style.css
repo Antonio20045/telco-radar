@@ -2770,6 +2770,14 @@ b,strong{font-weight:700}
    Linien. Die Schriftgroesse ist dieselbe wie an der Achse - Kriterium 11
    von `pruefe_portal.py` laesst nichts unter 12 px zu. */
 .gr-vetikett{font-family:var(--sans);font-size:12px;font-weight:600}
+/* M (QA-Fix 24.09.2026): DERSELBE HALO WIE DIE BESTMARKE. Das Verdeckt-
+   Endlabel steht am rechten Rand oft genau ueber der eigenen (gestrichelt
+   gezeichneten) Linie UND ueber deren Endpunkten - am iPhone 17 256 GB
+   gemessen lag "1.099,00 €" unter dem Vodafone-Punkt, durchgestrichen.
+   Derselbe Halo wie `.gr-vbestmarke` (siehe dort) haelt die Schrift
+   lesbar, auch wenn eine Linie oder ein Punkt darunter liegt. */
+.gr-vetikett{paint-order:stroke;stroke:var(--paper);stroke-width:4px;
+  stroke-linejoin:round}
 /* Der Bestpreis-Stempel. 12 px ist die Untergrenze der Seite - Kriterium 11
    von `pruefe_portal.py` misst sie im GERENDERTEN SVG, nicht im Quelltext. */
 .gr-vbest{stroke-width:1.5;stroke-dasharray:3 3;fill:none}

@@ -2570,6 +2570,10 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
   /* K: derselbe rechte Rand wie `ENDLABEL_RAND` im Server-Chart
      (`geraete_zeitreihe.py`) fuer das Verdeckt-Endlabel weiter unten. */
   var ENDLABEL_RAND = 6;
+  /* M: senkrechter Abstand des Verdeckt-Endlabels zu SEINER eigenen
+     Linie/seinem Punkt (die auf derselben Hoehe y(preis) liegen) - siehe
+     `endlabelListe` in `zeichne()`. */
+  var ENDLABEL_Y_VERSATZ = 22;
 
   var treffer = document.getElementById('gr-vtreffer');
   var steuer = document.getElementById('gr-vsteuer');
@@ -3143,6 +3147,9 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
       return laeufe;
     }
 
+    /* M (QA-Fix 24.09.2026): siehe Kommentar an `endlabelListe.push(...)`
+       weiter unten - gesammelt hier, gezeichnet NACH der ganzen Schleife. */
+    var endlabelListe = [];
     reihen.forEach(function (r) {
       var pkte = r.punkte.map(function (p) {
         return { x: x(p.datum), y: y(p.preis), datum: p.datum };
@@ -3221,17 +3228,34 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
          siehe `tests/test_geraete_verlauf_legende_browser.py`. */
       if (r.verdeckt) {
         var letzt = r.punkte[r.punkte.length - 1];
-        /* K (QA-Fix 24.09.2026): FESTES X NAHE DEM RECHTEN RAND,
-           `text-anchor='end'` - dasselbe Muster wie `ENDLABEL_RAND` im
-           Server-Chart (`geraete_zeitreihe.py`, C4-Fix). Der Text waechst
-           nach LINKS, unabhaengig von Schriftfallback oder Zeichenzahl,
-           und braucht keine reservierte Zeichenflaeche mehr (siehe
-           `innenB` oben). */
-        svg.appendChild(el('text', {
-          x: BREITE - ENDLABEL_RAND, y: y(letzt.preis) + 4,
-          class: 'gr-vetikett', fill: r.farbe, 'text-anchor': 'end'
-        }, r.anbieter + ' ' + euro(letzt.preis)));
+        /* M (QA-Fix 24.09.2026): NICHT HIER EINHAENGEN. Diese Schleife
+           haengt Linien und Punkte JE REIHE an, in Reihenfolge - ein
+           Endlabel, das HIER angehaengt wird, kann von der PUNKT (oder
+           LINIE) der NAECHSTEN Reihe wieder ueberdeckt werden. Die
+           Etiketten werden deshalb gesammelt und ERST NACH dieser
+           gesamten Schleife gezeichnet (`endlabelListe` unten) - zuletzt
+           im SVG, also zuoberst gezeichnet, ueber jeder Linie und jedem
+           Punkt. */
+        endlabelListe.push({ r: r, letzt: letzt });
       }
+    });
+
+    /* M (QA-Fix 24.09.2026): DIE VERDECKT-ENDLABEL - ZULETZT GEZEICHNET
+       (siehe Kommentar oben) UND MIT Y-VERSATZ. Am iPhone 17 256 GB lag
+       "mobilcom-debitel 1.099,00 €" auf x≈1290 direkt auf der roten
+       gestrichelten Vodafone-Linie UND ihren Endpunkten - beide enden
+       auf y(letzt.preis), derselben Hoehe wie das unversetzte Etikett.
+       ENDLABEL_Y_VERSATZ schiebt es senkrecht weg: nach OBEN, ausser das
+       liefe ueber den oberen Rand hinaus (RAND.oben) - dann nach UNTEN.
+       Der Halo (`.gr-vetikett`, style.css) haelt den Rest lesbar, falls
+       trotzdem eine andere Linie im Weg liegt. */
+    endlabelListe.forEach(function (e) {
+      var yy = y(e.letzt.preis) - ENDLABEL_Y_VERSATZ;
+      if (yy < RAND.oben + 6) yy = y(e.letzt.preis) + ENDLABEL_Y_VERSATZ;
+      svg.appendChild(el('text', {
+        x: BREITE - ENDLABEL_RAND, y: yy,
+        class: 'gr-vetikett', fill: e.r.farbe, 'text-anchor': 'end'
+      }, e.r.anbieter + ' ' + euro(e.letzt.preis)));
     });
 
     /* DER BESTPREIS-STEMPEL (idealo-Muster, 04.09.2026).

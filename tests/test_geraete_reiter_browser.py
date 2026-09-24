@@ -1466,9 +1466,17 @@ def test_eine_verdeckte_linie_wird_sichtbar_gemacht(_eigene_seite):
     steht Vodafone, im Bild ist es nicht."
 
     Sie wird gestrichelt gezeichnet und bekommt ein Etikett an ihrem Ende -
-    beides auf ihrer WAHREN Hoehe. VERSCHOBEN WIRD NICHTS: die Y-Achse
-    gehoert dem Preis, das ist die Lehre aus der geloeschten Positionskarte,
-    deren Etiketten bis zu 235 px neben ihrem Punkt standen.
+    NAHE ihrer wahren Hoehe (die Y-Achse gehoert dem Preis, das ist die
+    Lehre aus der geloeschten Positionskarte, deren Etiketten bis zu
+    235 px neben ihrem Punkt standen).
+
+    M (QA-Fix 24.09.2026, Nachtrag): "nahe" heisst seither NICHT mehr
+    exakt auf der Hoehe - am iPhone 17 256 GB lag "mobilcom-debitel
+    1.099,00 €" direkt AUF der eigenen gestrichelten Linie und ihren
+    Endpunkt-Kreisen, der Text wirkte durchgestrichen. Das Etikett traegt
+    seither einen senkrechten Versatz (`ENDLABEL_Y_VERSATZ`, ~14 Einheiten)
+    und einen Halo (`.gr-vetikett` `paint-order:stroke`, style.css) - beide
+    zusammen halten es lesbar, ohne es beliebig weit vom Punkt zu schieben.
 
     Der Fall wird gestellt - die Fixture haelt ihre Preise bewusst weit
     auseinander. Gerechnet wird trotzdem vom echten `app.js`."""
@@ -1504,17 +1512,35 @@ def test_eine_verdeckte_linie_wird_sichtbar_gemacht(_eigene_seite):
         const svg = document.querySelector('#gr-vbild svg');
         const t = svg.querySelector('.gr-vetikett');
         const kasten = t.getBBox();
-        const kreise = [...svg.querySelectorAll('circle')]
-            .map(c => +c.getAttribute('cy'));
+        const kreise = [...svg.querySelectorAll('circle')];
+        const cys = kreise.map(c => +c.getAttribute('cy'));
         const y = +t.getAttribute('y');
-        return { abstand: Math.min(...kreise.map(cy => Math.abs(cy - y))),
+        const tr = t.getBoundingClientRect();
+        // SCHNEIDET das Etikett-Rechteck irgendeinen Punkt-Kreis? Grobe,
+        // aber ausreichende Pruefung: Kreis-Mittelpunkt plus Radius gegen
+        // die Rechteck-Kanten (Rendering-Koordinaten, nicht SVG-Einheiten).
+        const schneidet = kreise.some(function (k) {
+            const kr = k.getBoundingClientRect();
+            return !(kr.right < tr.left || kr.left > tr.right ||
+                     kr.bottom < tr.top || kr.top > tr.bottom);
+        });
+        return { abstand: Math.min(...cys.map(cy => Math.abs(cy - y))),
                  rechts: kasten.x + kasten.width,
                  breite: svg.viewBox.baseVal.width,
-                 groesse: parseFloat(getComputedStyle(t).fontSize) };
+                 groesse: parseFloat(getComputedStyle(t).fontSize),
+                 schneidetKreis: schneidet,
+                 halo: getComputedStyle(t).paintOrder };
     }""")
-    assert lage["abstand"] <= 6, (
-        f"das Etikett steht {lage['abstand']} px neben jedem Punkt - genau "
-        f"der Fehler der geloeschten Positionskarte")
+    # M: NAHE, nicht exakt auf der Hoehe - ein Versatz (nicht der Fehler
+    # der geloeschten Positionskarte, der bis zu 235 px betrug) UND keine
+    # Ueberschneidung mit einem Punkt-Kreis.
+    assert 6 < lage["abstand"] <= 26, (
+        f"das Etikett steht {lage['abstand']} px vom eigenen Punkt - "
+        f"erwartet ein bewusster Versatz (~14 px), keine 0 und keine 235")
+    assert not lage["schneidetKreis"], (
+        "das Etikett-Rechteck schneidet einen Punkt-Kreis")
+    assert "stroke" in lage["halo"], (
+        f"das Etikett traegt keinen Halo: {lage['halo']!r}")
     assert lage["rechts"] <= lage["breite"], (
         f"das Etikett laeuft aus dem Bild: {lage['rechts']} > {lage['breite']}")
     assert lage["groesse"] >= MIN_SCHRIFT, lage["groesse"]

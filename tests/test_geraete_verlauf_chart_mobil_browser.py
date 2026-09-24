@@ -188,6 +188,9 @@ def _messen(seite):
         .map(t => t.getBoundingClientRect());
       const ersteAchsenmarke = svg.querySelector('text.gr-vachse');
       const bestmarke = svg.querySelector('text.gr-vbestmarke');
+      const endlabel = svg.querySelector('text.gr-vetikett');
+      const alleKreise = [...svg.querySelectorAll('circle')]
+        .map(c => c.getBoundingClientRect());
       return {
         svg: { left: sr.left, right: sr.right, top: sr.top, bottom: sr.bottom },
         bild: { left: br.left, right: br.right, top: br.top, bottom: br.bottom },
@@ -205,6 +208,18 @@ def _messen(seite):
           const p = document.getElementById('gr-vstand');
           return p ? { hidden: p.hidden, text: p.textContent } : null;
         })(),
+        endlabel: endlabel ? (() => {
+          const er = endlabel.getBoundingClientRect();
+          const schneidet = alleKreise.some(function (kr) {
+            return !(kr.right < er.left || kr.left > er.right ||
+                     kr.bottom < er.top || kr.top > er.bottom);
+          });
+          return {
+            text: endlabel.textContent,
+            paintOrder: getComputedStyle(endlabel).paintOrder,
+            schneidetKreis: schneidet,
+          };
+        })() : null,
       };
     }""")
 
@@ -287,3 +302,23 @@ def test_die_schwelle_ist_eine_zahl_aus_python():
     ueber `data-satzmaxtermine` gereicht - kein zweiter Wert in app.js."""
     assert geraete_verlauf.VERLAUF_SATZ_MAX_TERMINE == 8
     assert 16 > geraete_verlauf.VERLAUF_SATZ_MAX_TERMINE
+
+
+@pytest.mark.parametrize("breite", [390, 1440])
+def test_das_verdeckt_endlabel_schneidet_keinen_punkt_und_hat_einen_halo(
+        _wurzel_browser, breite):
+    """Lead-Befund 24.09.2026 (Nachtrag): "mobilcom-debitel 1.099,00 €"
+    lag auf 1440 UND 390 px direkt auf der eigenen gestrichelten
+    Vodafone-Linie und ihren Endpunkt-Kreisen - durchgestrichen. Der
+    Klickweg ist derselbe wie bei den anderen Tests dieser Datei (Laden
+    mit Standardreiter, dann Tab-Klick)."""
+    wurzel, browser = _wurzel_browser
+    s = _oeffne(browser, wurzel, breite)
+    m = _messen(s)
+    s.context.close()
+    assert m["endlabel"], f"kein Verdeckt-Endlabel gezeichnet ({breite} px)"
+    assert not m["endlabel"]["schneidetKreis"], (
+        f"das Endlabel schneidet einen Punkt-Kreis bei {breite} px: "
+        f"{m['endlabel']}")
+    assert "stroke" in m["endlabel"]["paintOrder"], (
+        f"das Endlabel traegt keinen Halo bei {breite} px: {m['endlabel']}")
