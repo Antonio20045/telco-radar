@@ -11,6 +11,7 @@ SVG erst im Browser entsteht.
 import pytest
 
 from telco_radar.geraete_model import Geraet, Katalog
+from telco_radar.report import anbieter_farben as farben
 from telco_radar.report import geraete_verlauf as v
 
 _KATALOG = Katalog(geraete=[
@@ -135,18 +136,54 @@ def test_der_eigene_anbieter_ist_rot_und_die_uebrigen_nicht():
     g = _eins(v.geraete_mit_verlauf(
         [_l("vf", "Vodafone", 849.9), _l("o", "o2", 883.0)],
         _Historie(), _KATALOG))
-    farben = {r["anbieter"]: r["farbe"] for r in g["reihen"]}
-    assert farben["Vodafone"] == v.EIGEN_FARBE
-    assert farben["o2"] != v.EIGEN_FARBE
+    eigen_farbe = farben.ANBIETER_FARBE["vodafone"].farbe
+    farbe_je_anbieter = {r["anbieter"]: r["farbe"] for r in g["reihen"]}
+    assert farbe_je_anbieter["Vodafone"] == eigen_farbe
+    assert farbe_je_anbieter["o2"] != eigen_farbe
     assert [r["eigen"] for r in g["reihen"]] == [True, False]
 
 
-def test_die_farben_der_wettbewerber_sind_verschieden():
-    listungen = [_l(f"a{i}", f"Anbieter {i}", 800.0 + i)
-                 for i in range(len(v.FARBEN))]
+def test_die_netzbetreiber_farben_sind_verschieden():
+    """P2/D1: Vodafone, Telekom, o2, 1&1 und congstar tragen je eine
+    EIGENE Markenfarbe aus der einen Quelle (`anbieter_farben.py`).
+    Service-Provider und Haendler teilen bewusst eine Kategorie-Farbe
+    (grau) - das ist keine Kollision, sondern der Auftrag: sie fuehren
+    kein eigenes Netz und sollen keine eigene Marke im Bild vortaeuschen.
+    """
+    listungen = [_l("vf", "Vodafone", 800.0), _l("t", "Telekom", 801.0),
+                 _l("o", "o2", 802.0), _l("e", "1&1", 803.0),
+                 _l("c", "congstar", 804.0)]
     g = _eins(v.geraete_mit_verlauf(listungen, _Historie(), _KATALOG))
-    farben = [r["farbe"] for r in g["reihen"]]
-    assert len(set(farben)) == len(farben), farben
+    farbwerte = [r["farbe"] for r in g["reihen"]]
+    assert len(set(farbwerte)) == len(farbwerte), farbwerte
+
+
+def test_unbekannte_anbieter_teilen_die_benannte_luecke():
+    """Die HASH-PALETTE gab zwei unbekannten Namen so gut wie immer
+    verschiedene Farben - eine geratene Unterscheidung, die es nicht
+    gibt. `anbieter_farben.py` zeichnet einen unbekannten Anbieter als
+    die eine benannte Luecke (Clean Code 3/4): dieselbe Farbe, derselbe
+    Strich, derselbe Marker, `bekannt=False` - nie eine Erfindung."""
+    listungen = [_l("a", "Erfundener Anbieter Eins", 800.0),
+                 _l("b", "Erfundener Anbieter Zwei", 801.0)]
+    g = _eins(v.geraete_mit_verlauf(listungen, _Historie(), _KATALOG))
+    farbwerte = {r["farbe"] for r in g["reihen"]}
+    assert farbwerte == {farben.LUECKE_FARBE}
+    assert all(not r["bekannt"] for r in g["reihen"])
+
+
+def test_die_telekom_farbe_ist_magenta_nicht_gruen():
+    """DER gemessene Befund von P2/D1: die alte Hash-Palette
+    (`md5('telekom') % 7`) traf auf `#217a3c` (Gruen) - die Telekom stand
+    gruen im Preisverlauf, waehrend sie in der TCO-Zeitreihe
+    (`geraete_zeitreihe.ANB_FARBE`) magenta war. Beide lesen jetzt aus
+    derselben Quelle."""
+    g = _eins(v.geraete_mit_verlauf(
+        [_l("t", "Telekom", 900.0), _l("vf", "Vodafone", 899.0)],
+        _Historie(), _KATALOG))
+    telekom = next(r for r in g["reihen"] if r["anbieter"] == "Telekom")
+    assert telekom["farbe"] == "#e20074"
+    assert telekom["farbe"] != "#217a3c", "das ist die alte Hash-Gruen-Farbe"
 
 
 # --------------------------------------------------------------------------
@@ -237,18 +274,41 @@ def test_ein_anbieter_behaelt_seine_farbe_ueber_geraete_hinweg():
     assert von(a, "freenet") == von(b, "freenet")
 
 
-def test_zwei_anbieter_eines_diagramms_teilen_nie_eine_farbe():
-    """Der Hash kann kollidieren - im selben Bild darf er es nicht. Genau
-    dieser Fall trat mit der Zeichenquersumme bei o2 und mobilcom-debitel
-    ein, und die zwei stehen bei fast jedem Geraet nebeneinander."""
+def test_zwei_bekannte_anbieter_eines_diagramms_sehen_nie_gleich_aus():
+    """P2/D1 loest diese Zusicherung anders ein als die alte Hash-Palette:
+    nicht mehr JEDE Farbe einzeln verschieden (Service-Provider teilen
+    bewusst ein Grau, Haendler ein anderes - das ist der Auftrag, keine
+    Kollision), sondern die volle Kombination aus Farbe, Strichart und
+    Markerform. Innerhalb einer Kategorie (hier: die drei Service-Provider
+    ALDI TALK/freenet/mobilcom-debitel) traegt allein die MARKERFORM die
+    Unterscheidung - farbe_fuer() allein reicht dort bewusst nicht."""
     namen = ["o2", "mobilcom-debitel", "ALDI TALK", "freenet", "Medimax",
-             "expert", "congstar", "Vodafone"]
+             "congstar", "Vodafone"]
     g = _eins(v.geraete_mit_verlauf(
         [_l(f"l{i}", n, 800.0 + i) for i, n in enumerate(namen)],
         _Historie(), _KATALOG))
-    farben = [r["farbe"] for r in g["reihen"]]
-    assert len(set(farben)) == len(farben), list(zip(
-        [r["anbieter"] for r in g["reihen"]], farben))
+    stile = [(r["farbe"], r["strich"], r["marker"]) for r in g["reihen"]]
+    assert len(set(stile)) == len(stile), list(zip(
+        [r["anbieter"] for r in g["reihen"]], stile))
+    # Gegenprobe: die drei Service-Provider TEILEN wirklich eine Farbe -
+    # sonst prueft der Test oben nichts an der Stelle, an der es zaehlt.
+    service_farben = {r["farbe"] for r in g["reihen"]
+                      if r["anbieter"].lower() in
+                      ("mobilcom-debitel", "aldi talk", "freenet")}
+    assert service_farben == {farben.GRAU_SERVICE}
+
+
+def test_ein_unbekannter_anbieter_im_diagramm_bekommt_keine_geratene_farbe():
+    """Der frueher hier getestete Fall (Name 'expert', keine Markenfarbe
+    hinterlegt) bekommt jetzt die benannte Luecke statt eine geratene
+    Ausweichfarbe."""
+    namen = ["Vodafone", "expert"]
+    g = _eins(v.geraete_mit_verlauf(
+        [_l(f"l{i}", n, 800.0 + i) for i, n in enumerate(namen)],
+        _Historie(), _KATALOG))
+    expert = next(r for r in g["reihen"] if r["anbieter"] == "expert")
+    assert expert["farbe"] == farben.LUECKE_FARBE
+    assert not expert["bekannt"]
 
 
 def test_zwei_preise_an_einem_tag_sind_eine_messluecke_kein_punkt():

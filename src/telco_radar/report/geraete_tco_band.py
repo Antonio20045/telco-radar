@@ -45,9 +45,9 @@ import math
 from typing import Optional
 
 from . import geraete_tco_grafik
+from .anbieter_farben import farbe_fuer
 from .geraete_tco_karten import (ANBIETER_REIHENFOLGE,
                                  HAENDLER_OHNE_BUENDEL)
-from .geraete_verlauf import farbe_fuer
 
 # Die drei Baender aus AUFTRAG_GERAETESEITE.md §7 - entschieden am
 # 05.09.2026 aus 56 erhobenen Tarifsaetzen (o2 15, Telekom 14, Vodafone 10,

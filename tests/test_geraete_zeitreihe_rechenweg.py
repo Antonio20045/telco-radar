@@ -333,7 +333,7 @@ def test_der_rechnungskopf_traegt_den_farbpunkt_des_anbieters():
     html11 = zr._rechung_html("1&1", _messung(EINS_EINS_MESSUNG,
                                               anbieter="1&1",
                                               tarif="1&1 All-Net-Flat S"))
-    assert "background:#00589e" in html11
+    assert "background:#2f7fd1" in html11
 
 
 def test_der_klammer_text_und_das_label_erfuellen_die_12_px_regel():

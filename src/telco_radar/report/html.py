@@ -14,6 +14,7 @@ import markdown as md
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from bs4 import BeautifulSoup
 
+from . import anbieter_farben as _anbieter_farben
 from . import bilder as report_bilder
 from . import diff_bilder
 from . import differenzierung_bericht
@@ -1182,8 +1183,16 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     folien_dir.mkdir(exist_ok=True)
     (site_dir / ".nojekyll").write_text("")
     for asset in ("style.css", "app.js"):
-        (site_dir / asset).write_text(
-            (_TEMPLATES / asset).read_text(encoding="utf-8"), encoding="utf-8")
+        inhalt = (_TEMPLATES / asset).read_text(encoding="utf-8")
+        # Die EINE Quelle der Anbieterfarben setzt ihren Block an die
+        # Stelle des Platzhalters (report/anbieter_farben.py) - der
+        # Platzhalter im Repo bleibt lesbar, die Zeilen im Site-Output
+        # sind erzeugt. Fehlt der Platzhalter, wirft das laut
+        # (`AnbieterfarbenFehlen`), statt still ohne Anbieterfarben zu
+        # rendern.
+        if asset == "style.css":
+            inhalt = _anbieter_farben.in_stylesheet(inhalt)
+        (site_dir / asset).write_text(inhalt, encoding="utf-8")
     for binasset in ("logo.png",):
         src = _TEMPLATES / binasset
         if src.exists():

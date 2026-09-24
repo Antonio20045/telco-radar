@@ -1520,6 +1520,53 @@ def test_eine_verdeckte_linie_wird_sichtbar_gemacht(_eigene_seite):
     assert lage["groesse"] >= MIN_SCHRIFT, lage["groesse"]
 
 
+def test_telekom_farbe_kommt_aus_der_einen_quelle_und_ist_magenta(
+        _eigene_seite):
+    """P2/D1, BEFUND: die alte HASH-PALETTE in `geraete_verlauf.py`
+    (`md5(anbietername) % 7`) traf fuer 'Telekom' auf `#217a3c` (Gruen) -
+    die Telekom stand gruen im Preisverlauf, waehrend dieselbe Telekom in
+    der TCO-Zeitreihe (`geraete_zeitreihe.ANB_FARBE`) magenta war.
+
+    Die Farbe der REIHEN kommt hier aus der ECHTEN Funktion
+    (`geraete_verlauf._reihen`, die jetzt `anbieter_farben.stil_fuer()`
+    liest) - kein Wert wird in diesem Test von Hand behauptet. Gemessen
+    wird die COMPUTED color im echten Chromium, nicht die Zeichenkette im
+    Quelltext: eine computed color kann durch eine CSS-Regel ueberschrieben
+    sein, die ein reiner String-Vergleich nie saehe. Der Selektor
+    `.gr-anb--telekom` prueft zugleich, dass `app.js` die Anbieterklasse
+    wirklich an die Linie haengt (P2/D1 in `app.js`)."""
+    from telco_radar.report import geraete_verlauf as verlauf
+
+    tage = list(_MESSTAGE)
+    punkte = []
+    for i, t in enumerate(tage):
+        punkte.append({"datum": t, "anbieter": "Telekom",
+                       "preis": 600.0 + i, "art": "gemessen"})
+        punkte.append({"datum": t, "anbieter": "Vodafone",
+                       "preis": 650.0 - i, "art": "gemessen"})
+    reihen = verlauf._reihen(punkte)
+    telekom = next(r for r in reihen if r["anbieter"] == "Telekom")
+    assert telekom["farbe"] == "#e20074", (
+        "die EINE Quelle liefert nicht die erwartete Markenfarbe: "
+        + telekom["farbe"])
+    assert telekom["slug"] == "telekom"
+
+    seite = _eigene_seite
+    _stelle_daten(seite, {
+        "id": "probe-telekom", "label": "Farbprobe 128 GB",
+        "hersteller": "Probe", "speicher": 128, "suchtext": "farbprobe",
+        "min": 500, "max": 700, "anbieter": len(reihen),
+        "messpunkte": len(punkte), "messtermine": len(tage),
+        "tage": tage, "aktuell": [], "reihen": reihen})
+
+    farbe = seite.eval_on_selector(
+        "#gr-vbild path.gr-vlinie.gr-anb--telekom",
+        "e => getComputedStyle(e).stroke")
+    assert farbe == "rgb(226, 0, 116)", farbe
+    assert farbe != "rgb(33, 122, 60)", (
+        "das ist die alte Hash-Gruen-Farbe #217a3c - der Bug ist zurueck")
+
+
 def test_unter_vier_messterminen_steht_kein_diagramm(_seite):
     """Antonios Befund: "Bei Pixel 10 Pro 128 GB zwei Datumsmarken (10.8. und
     30.8.), dazwischen nichts."

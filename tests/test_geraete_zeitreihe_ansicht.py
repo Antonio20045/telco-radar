@@ -275,7 +275,7 @@ def test_unter_zwei_punkten_gibt_es_keinen_linienzug(ansicht):
     # 1&1 hat genau einen Messtag (12.9.): ein Kreis, kein Pfad - Luecken
     # sind Informationen, nichts wird interpoliert.
     punkte_1u1 = [c for c in suppe.select("circle.gr-zr-punkt")
-                  if c.get("fill") == "#00589e"]
+                  if c.get("fill") == "#2f7fd1"]
     pfade = suppe.select("path.gr-zr-linie")
     assert len(punkte_1u1) == 1
     # 4 Anbieter, aber nur 3 mit >= 2 Punkten -> hoechstens 3 Linien.
@@ -286,12 +286,12 @@ def test_der_fehlende_messtag_bleibt_punktlos(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "klein"))
     suppe = __import__("bs4").BeautifulSoup(paar["svg_breit"], "html.parser")
     # congstar fehlt am 13.9. - an der X-Position des 13.9. steht kein
-    # congstar-Punkt (gelb #f5a800).
+    # congstar-Punkt (gelber Marker #ffed00 auf der schwarzen Linie).
     xticks = {t.get_text(strip=True): float(t["x"])
               for t in suppe.select("text.gr-zr-xtick")}
     x13 = xticks["13.9."]
     congstar = [c for c in suppe.select("circle.gr-zr-punkt")
-                if c.get("fill") == "#f5a800"]
+                if c.get("fill") == "#ffed00"]
     assert all(abs(float(c["cx"]) - x13) > 0.5 for c in congstar)
 
 

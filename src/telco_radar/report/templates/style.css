@@ -2875,21 +2875,19 @@ b,strong{font-weight:700}
    braeuchte jede Kombination aus Anbieter und Posten einen eigenen Ton,
    und die Legende waere laenger als die Grafik.
    =================================================================== */
-.gr-anb--o2{--anb:#0019a5}
-.gr-anb--1-1{--anb:#00589e}
-.gr-anb--telekom{--anb:#e20074}
-.gr-anb--vodafone{--anb:#e60000}
-.gr-anb--congstar{--anb:#f5a800}
-.gr-anb--mobilcom-debitel{--anb:#6b4f9e}
-.gr-anb--freenet{--anb:#6b4f9e}
-.gr-anb--aldi-talk{--anb:#00447c}
-.gr-anb--medimax{--anb:#8a8f00}
-.gr-anb--electronicpartner{--anb:#00736b}
+/* @@ANBIETER-FARBEN@@ */
 /* KEIN `--anb`-Vorgabewert AUF diesen Elementen: sie tragen die
    Anbieterklasse selbst, beide Regeln haetten dieselbe Spezifitaet, und
    die spaetere gewaenne - alle Balken standen damit grau da, obwohl die
    Anbieterfarbe definiert war. Der Rueckfall gehoert deshalb in das
    `var()` an der Verwendungsstelle. */
+/* Die Linie eines Anbieters traegt ausserdem STRICHART und STAERKE aus
+   derselben Quelle (`--anb-strich`, `--anb-breite`) - Farbe allein
+   unterscheidet Vodafone und Telekom nicht sicher (report/anbieter_farben.py).
+   Nur bei NICHT verdeckten Linien: die Verdeckungs-Markierung von app.js
+   setzt `stroke-dasharray` selbst als Attribut und gewinnt gegen jede
+   Klassenregel - siehe test_eine_verdeckte_linie_wird_sichtbar_gemacht. */
+.gr-vlinie:not(.gr-vlinie--verdeckt){stroke-dasharray:var(--anb-strich,none)}
 
 /* Modell-Selector und Ergebnisband */
 .gr-msel{display:flex;flex-wrap:wrap;gap:10px;align-items:center;

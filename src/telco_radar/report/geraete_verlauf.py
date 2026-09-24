@@ -39,8 +39,7 @@ Woche bei fuenf, sagt die Seite fuenf, ohne dass jemand eine Zeile aendert.
 """
 from __future__ import annotations
 
-import hashlib
-
+from .anbieter_farben import stil_fuer
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE
 
 # Hoechstens acht Linien. Mehr Anbieter als das kann ein Mensch in einem
@@ -86,43 +85,19 @@ DIAGRAMM_AB_TERMINEN = 4
 # Legende nennt und das Bild nicht zeigt, ist schlimmer als keine Legende.
 LINIEN_ABSTAND = 0.02
 
-# Vodafone ist rot, alle anderen neutral und unterscheidbar. Die Reihenfolge
-# ist fest, damit derselbe Anbieter ueber zwei Ausgaben dieselbe Farbe
-# behaelt - eine Farbe, die je Auswahl wechselt, ist keine Kennzeichnung.
-EIGEN_FARBE = "#e60000"
-FARBEN = ("#2b5bd7", "#217a3c", "#8a5a00", "#6b3fa0",
-          "#0d7c8c", "#a3123a", "#4a5568")
+# Die Farbe kommt aus der EINEN Quelle (P2/D1, `anbieter_farben.py`), nicht
+# mehr aus einer Hash-Palette. Die alte Fassung vergab sie nach
+# `md5(anbietername) % 7` aus sieben neutralen Toenen - die Telekom bekam
+# damit `#217a3c` (Gruen) und stand GRUEN im Preisverlauf, waehrend dieselbe
+# Telekom in der TCO-Zeitreihe (`geraete_zeitreihe.py`) MAGENTA war: eine
+# Hash-Palette kennt keine Marke, sie raet eine Farbe (Clean Code 3
+# verbietet genau das). `stil_fuer()` liefert jetzt Farbe, Strichart und
+# Markerform fuer denselben Anbieter ueberall gleich; ein unbekannter
+# Anbieter bekommt die benannte Luecke, nie eine geratene Farbe.
 
 
 def _eigen(anbieter: str) -> bool:
-    return (anbieter or "").strip().lower() == "vodafone"
-
-
-def farbe_fuer(anbieter: str) -> str:
-    """Die Farbe eines Anbieters - stabil ueber alle Geraete.
-
-    Die erste Fassung vergab sie nach der SORTIERPOSITION innerhalb eines
-    Geraets. Ueber die 89 waehlbaren Geraete gemessen hatte o2 damit drei
-    verschiedene Farben, und `#2b5bd7` hiess beim einen Geraet "o2" und beim
-    naechsten "mobilcom-debitel". Wer zwei Geraete hintereinander ansieht,
-    liest die Farbe falsch - und der Kommentar darueber versprach genau das
-    Gegenteil.
-
-    Der Name traegt die Farbe jetzt selbst. Zwei Anbieter koennen dieselbe
-    bekommen; das ist der Preis einer festen Zuordnung ohne Namensliste und
-    faellt nur auf, wenn beide im selben Diagramm stehen - dort sind es
-    hoechstens acht von sieben Farben plus Rot.
-    """
-    if _eigen(anbieter):
-        return EIGEN_FARBE
-    # md5 und nicht die Quersumme der Zeichen: die verteilt schlecht, und
-    # zwar genau dort, wo es wehtut - "o2" und "mobilcom-debitel" fielen auf
-    # denselben Wert, und die zwei stehen bei fast jedem Geraet nebeneinander.
-    # Ueber die vier liefernden Anbieter gemessen: Quersumme 3 von 4
-    # verschieden, md5 4 von 4. Der Hash muss nicht kryptografisch sein, nur
-    # gleichmaessig und ueber Laeufe hinweg stabil - `hash()` waere es nicht.
-    stelle = int(hashlib.md5((anbieter or "").encode("utf-8")).hexdigest()[:8], 16)
-    return FARBEN[stelle % len(FARBEN)]
+    return stil_fuer(anbieter).eigen
 
 
 def _label(geraet, speicher) -> str:
@@ -260,24 +235,19 @@ def _reihen(punkte: list) -> list[dict]:
 
     geordnet = sorted(je_anbieter.items(),
                       key=lambda kv: (not _eigen(kv[0]), -len(kv[1]), kv[0]))
-    # Erst die stabile Farbe am Namen, dann die Kollisionsaufloesung IN
-    # diesem Diagramm. Beides zusammen ist noetig: der Name allein gab o2 und
-    # mobilcom-debitel dieselbe Farbe, und die zwei stehen bei fast jedem
-    # Geraet nebeneinander. Die Sortierposition allein gab o2 drei
-    # verschiedene Farben ueber die 89 Geraete.
-    #
-    # Verschoben wird der SPAETERE (die Reihenfolge ist deterministisch), und
-    # der eigene Anbieter nie - Rot bleibt Rot.
-    reihen, vergeben = [], set()
+    # Die Farbe haengt jetzt fest am NAMEN (`anbieter_farben.ANBIETER_FARBE`,
+    # zehn Marken mit je einer eigenen Farbe) - eine Kollisionsaufloesung wie
+    # zu Hash-Palette-Zeiten braucht es nicht mehr: zwei bekannte Anbieter
+    # bekommen nie dieselbe Farbe, und zwei UNBEKANNTE teilen sich bewusst
+    # dieselbe benannte Luecke (Clean Code 3/4) statt eine geratene eigene.
+    reihen = []
     for name, ps in geordnet[:MAX_LINIEN]:
-        f = farbe_fuer(name)
-        if not _eigen(name) and f in vergeben:
-            frei = [c for c in FARBEN if c not in vergeben]
-            if frei:
-                f = frei[0]
-        vergeben.add(f)
+        stil = stil_fuer(name)
         reihen.append({
-            "anbieter": name, "farbe": f, "eigen": _eigen(name),
+            "anbieter": name, "farbe": stil.farbe, "eigen": stil.eigen,
+            "slug": stil.slug, "marker_farbe": stil.marker_farbe,
+            "marker_rand": stil.marker_rand, "marker": stil.marker,
+            "strich": stil.strich, "bekannt": stil.bekannt,
             "punkte": [{"datum": p["datum"], "preis": p["preis"]} for p in ps],
         })
     return reihen

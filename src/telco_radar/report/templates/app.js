@@ -2716,6 +2716,7 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
        auf den zusammengefassten Punkten. */
     var gefiltert = g.reihen.map(function (r) {
       return { anbieter: r.anbieter, farbe: r.farbe, eigen: r.eigen,
+               slug: r.slug,
                roh: r.punkte.filter(function (p) {
                  return (!vonT || p.datum >= vonT) && (!bisT || p.datum <= bisT);
                }) };
@@ -2728,7 +2729,7 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
 
     var reihen = gefiltert.map(function (r) {
       return { anbieter: r.anbieter, farbe: r.farbe, eigen: r.eigen,
-               punkte: fassen(r.roh, raster) };
+               slug: r.slug, punkte: fassen(r.roh, raster) };
     }).filter(function (r) { return r.punkte.length; });
 
     bild.innerHTML = '';
@@ -3010,8 +3011,17 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
         return (i ? 'L' : 'M') + x(p.datum).toFixed(1) + ' ' + y(p.preis).toFixed(1);
       }).join(' ');
       if (r.punkte.length > 1) {
+        /* P2/D1: die Anbieterklasse (`gr-anb--<slug>`) traegt die
+           Strichart aus derselben EINEN Quelle wie die Farbe
+           (report/anbieter_farben.py, ueber style.css `--anb-strich`) -
+           Farbe allein unterscheidet Vodafone und Telekom nicht sicher
+           (ΔE 11,5 unter normalem Sehen, dataviz-Validator). Die Klasse
+           bleibt auch im "verdeckt"-Zweig stehen (angehaengt, nicht
+           ersetzt), sonst verliert ausgerechnet die ueberdeckte Linie
+           ihre Markenkennzeichnung. */
+        var klasse = 'gr-vlinie' + (r.slug ? ' gr-anb--' + r.slug : '');
         var attrs = { d: d, fill: 'none', stroke: r.farbe,
-                      'stroke-width': r.eigen ? 3 : 2, class: 'gr-vlinie' };
+                      'stroke-width': r.eigen ? 3 : 2, class: klasse };
         if (r.verdeckt) {
           /* MEHR LUECKE ALS STRICH. Mit "7 5" deckte die obenliegende Linie
              immer noch 58 Prozent der Laenge ab; am Pixelbild gemessen
@@ -3019,9 +3029,12 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
              uebrig, und die eigene (3 px) ueberdeckte die fremde (2 px)
              vollstaendig. Mit "4 8" liegt zwei Dritteln der Strecke die
              untere Linie frei - beide sind zu sehen, und keine ist
-             verschoben. */
+             verschoben. Die `--anb-strich`-Regel in style.css gilt
+             ausdruecklich nur `:not(.gr-vlinie--verdeckt)` - sie tritt der
+             Verdeckungs-Markierung hier nicht in den Weg, das INLINE-
+             Attribut bleibt die einzige Quelle des Strichmusters. */
           attrs['stroke-dasharray'] = '4 8';
-          attrs.class = 'gr-vlinie gr-vlinie--verdeckt';
+          attrs.class = klasse + ' gr-vlinie--verdeckt';
         }
         svg.appendChild(el('path', attrs));
       }

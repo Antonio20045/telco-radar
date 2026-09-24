@@ -49,6 +49,7 @@ from ..analyze.tco_store import basis_aus_satz, id_aus_satz
 from ..tco_model import (Buendel, POSTEN_ANSCHLUSS, POSTEN_BUENDEL,
                          POSTEN_RATE, POSTEN_ZUZAHLUNG, TCO_HORIZONT, tco_24,
                          zeitraum_vergleichbar)
+from .anbieter_farben import stil_fuer
 from .geraete_tco_band import ERWARTETE_ANBIETER
 from .geraete_tco_karten import kurz_datum, phasen_fuer_buendel
 
@@ -59,11 +60,27 @@ log = logging.getLogger(__name__)
 # genehmigte Prototyp (prototyp.js ANB_REIHENFOLGE).
 ANBIETER_FOLGE = ("Telekom", "Vodafone", "o2", "1&1", "congstar")
 
-# Dieselben Werte wie --anb in style.css (dort .gr-anb--<slug>): die Farbe
-# ist KEINE Grafikentscheidung, sondern die des Anbieters auf der ganzen
-# Seite (C.3 der Optik-Strategie).
-ANB_FARBE = {"Telekom": "#e20074", "Vodafone": "#e60000", "o2": "#0019a5",
-             "1&1": "#00589e", "congstar": "#f5a800"}
+# P2/D1: die Farbe kommt aus der EINEN Quelle (`anbieter_farben.py`), nicht
+# mehr aus einer eigenen Tabelle. Die alte `ANB_FARBE` hier behauptete "wie
+# --anb in style.css", war es aber nur teilweise (1&1 stand hier auf
+# `#00589e`, nicht auf der Markenfarbe `#2f7fd1`). `_zr_farbe`/`_zr_marker`
+# lesen `stil_fuer()`; ein Anbieter ausserhalb der ANBIETER_FOLGE bekommt
+# die benannte Luecke (nie eine geratene Farbe), damit dieses Modul nie
+# einen KeyError wirft, wo frueher `ANB_FARBE[anbieter]` einen erzwungen
+# haette.
+
+
+def _zr_farbe(anbieter: str) -> str:
+    """Die Linienfarbe - fuer Pfad, Achsen-Name und `_anbieter_punkte`."""
+    return stil_fuer(anbieter).farbe
+
+
+def _zr_marker_farbe(anbieter: str) -> str:
+    """Die PUNKTfarbe - bei congstar bewusst nicht die Linienfarbe (gelber
+    Marker auf schwarzer Linie, sonst waere das Gelb auf hellem Papier die
+    einzige Spur des Anbieters)."""
+    return stil_fuer(anbieter).marker_farbe
+
 
 EIGEN = "Vodafone"
 
@@ -858,7 +875,7 @@ def _rechung_html(anbieter: str, messung: dict,
         return ""
     a = _esc(anbieter)
     punkt = (f"<i class='gr-zr-rpunkt' style='background:"
-             f"{ANB_FARBE.get(anbieter, '#333333')}' aria-hidden='true'>"
+             f"{_zr_marker_farbe(anbieter)}' aria-hidden='true'>"
              f"</i>")
     teile = ["<div class='gr-zr-rech'>",
              f"<p class='gr-zr-rkopf'>{punkt}<strong>{a}</strong> · Messung "
@@ -1320,12 +1337,21 @@ def _svg(anbieter_serien: dict, breit: bool,
     # keinen Pfad (Luecken sind Informationen, nichts wird interpoliert).
     for a in anbieter:
         punkte = _punkte(anbieter_serien[a])
-        farbe = ANB_FARBE.get(a, "#333333")
+        stil = stil_fuer(a)
+        farbe, marker = stil.farbe, stil.marker_farbe
         if len(punkte) > 1:
             pfad = " ".join(f"{'M' if i == 0 else 'L'}{x:.1f} {y:.1f}"
                             for i, (x, y, _p) in enumerate(punkte))
+            # P2/D1: die Strichart traegt dieselbe Unterscheidung wie die
+            # Farbe (anbieter_farben.py) - Vodafone/Telekom sind das
+            # schwierigste Farbpaar der Seite (ΔE 11,5 unter normalem
+            # Sehen, gemessen mit dem dataviz-Validator), Farbe allein
+            # reicht nicht. "none" bleibt ohne Attribut - eine leere
+            # dasharray waere dieselbe Aussage wie keine.
+            muster = f" stroke-dasharray='{stil.muster}'" \
+                if stil.muster != "none" else ""
             teile.append(f"<path class='gr-zr-linie' d='{pfad}' "
-                         f"stroke='{farbe}'/>")
+                         f"stroke='{farbe}'{muster}/>")
         serie = anbieter_serien[a]
         for i, (d, wert) in enumerate(serie):
             x, y = x_v(d), y_v(wert)
@@ -1343,11 +1369,11 @@ def _svg(anbieter_serien: dict, breit: bool,
             if einzeln:
                 teile.append(f"<circle class='gr-zr-halo' cx='{x:.1f}' "
                              f"cy='{y:.1f}' r='9.5' fill='none' "
-                             f"stroke='{farbe}'/>")
+                             f"stroke='{marker}'/>")
             teile.append(
                 f"<circle class='gr-zr-punkt"
                 f"{' gr-zr-ende' if ende else ''}' cx='{x:.1f}' "
-                f"cy='{y:.1f}' r='{6 if ende else 4.5}' fill='{farbe}'"
+                f"cy='{y:.1f}' r='{6 if ende else 4.5}' fill='{marker}'"
                 f"{daten}/>")
             # ... und eine unsichtbare Trefferflaeche darueber (r=12 statt
             # 4,5 - Strategie P1): ein 4,5-px-Kreis ist auf dem Telefon
@@ -1432,7 +1458,7 @@ def _svg(anbieter_serien: dict, breit: bool,
             bedarf += 13
         ty = max(y, letzte_y + bedarf)
         letzte_y = ty
-        farbe = ANB_FARBE.get(a, "#333333")
+        farbe = _zr_farbe(a)
         url, datum = beleg_je.get(a, ("", ""))
         name_html = f"{_esc(a)}<tspan class='gr-zr-pfeil'> ↗</tspan>"
         if url:
@@ -1469,12 +1495,12 @@ def _svg(anbieter_serien: dict, breit: bool,
 
 def _anbieter_punkte(anbieter: list) -> str:
     """P1/F3 (A3): die Punkte-Reihe der Modell-Karte - je Anbieter der
-    Zeitreihe EIN Punkt in seiner Hausfarbe (ANB_FARBE, dieselbe Farbe wie
-    seine Linie im Graphen). Die Punkte SIND die Anbieterzahl der Karte;
-    ein zusaetzlicher Text \"N Anbieter\" waere dieselbe Zahl ein zweites
-    Mal am selben Ort (Beruhigungsregel)."""
+    Zeitreihe EIN Punkt in seiner Hausfarbe (`anbieter_farben.py`,
+    dieselbe Markerfarbe wie seine Punkte im Graphen). Die Punkte SIND
+    die Anbieterzahl der Karte; ein zusaetzlicher Text \"N Anbieter\"
+    waere dieselbe Zahl ein zweites Mal am selben Ort (Beruhigungsregel)."""
     return "".join(
-        f"<i style='background:{ANB_FARBE.get(a, '#333333')}' "
+        f"<i style='background:{_zr_marker_farbe(a)}' "
         f"title='{_esc(a)}'></i>" for a in anbieter)
 
 
@@ -1586,7 +1612,7 @@ def _legende_html(anbieter_serien: dict, zeitraeume: dict | None = None) -> str:
         if anbieter == EIGEN:
             zusatz += " <span class='gr-zr-leg-ab'>· unser Angebot</span>"
         eintraege.append(
-            f"<span><i style='background:{ANB_FARBE[anbieter]}'></i>"
+            f"<span><i style='background:{_zr_marker_farbe(anbieter)}'></i>"
             f"{_esc(anbieter)}{zusatz}</span>")
     if not eintraege:
         return ""
