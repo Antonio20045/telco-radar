@@ -1290,7 +1290,19 @@ def test_die_kurve_beginnt_im_ersten_viewport(_umgebung):
     die KURVE (Sicht-Prüfung 7.2: vorher 34 px Kurve, 866 px bei Falz 900).
 
     Gemessen wird der unberührte Anfangszustand: Reiter umgeblendet, an den
-    Anfang gescrollt, keine weitere Eingabe."""
+    Anfang gescrollt, keine weitere Eingabe.
+
+    CI-Fallstrick (24.09.2026, CI-Lauf #36045494184): lokal laedt die
+    Rueckfallschrift (Google Fonts erreichen die Sandbox nicht, CLAUDE.md-
+    Fallstrick), in CI die echte, etwas breitere Schrift - die Reiterleiste
+    bricht dort zweizeilig um und drueckt den Graphen unter die Falz,
+    obwohl dieser Test mit der Rueckfallschrift gruen bliebe. Simuliert wird
+    das EIGENSCHAFTSBASIERT mit `letter-spacing` auf den Reiterknoepfen (wie
+    test_marke.py und die Falz-Tests der Zeitreihe), nicht mit einer
+    bestimmten Schriftart; zusaetzlich wird die Zeilenzahl der Leiste selbst
+    gemessen, weil ein zusaetzlicher Umbruch dort die eigentliche Ursache
+    ist, auch wenn er (je nach Randabstand) nicht immer bis unter die Falz
+    reicht."""
     browser, wurzel = _umgebung
     sichten = ((390, 844), (1440, 900))
     ergebnis = {}
@@ -1298,7 +1310,9 @@ def test_die_kurve_beginnt_im_ersten_viewport(_umgebung):
         s = browser.new_page(viewport={"width": breite, "height": hoehe})
         try:
             s.goto(wurzel, wait_until="load")
-            s.wait_for_timeout(350)
+            s.add_style_tag(content=(
+                ".gr-reiter button,.gr-reiter .gr-reiter-seite"
+                "{letter-spacing:1px !important}"))
             _zeige_tafel(s, "tafel-verlauf")
             s.wait_for_timeout(350)
             s.evaluate("window.scrollTo(0, 0)")
@@ -1306,12 +1320,18 @@ def test_die_kurve_beginnt_im_ersten_viewport(_umgebung):
                 const bild = document.getElementById('gr-vbild');
                 const svg = bild && bild.querySelector('svg');
                 const kurve = bild && bild.querySelector('path');
+                const leiste = document.querySelector('.gr-reiter');
+                const zeilen = leiste ? new Set(
+                    [...leiste.querySelectorAll('button')].map(
+                        b => Math.round(b.getBoundingClientRect().top))
+                    ).size : null;
                 if (!svg || bild.hidden) return null;
                 const dok = e => Math.round(
                     e.getBoundingClientRect().top + window.scrollY);
                 return { svg: dok(svg),
                          kurve: kurve ? dok(kurve) : null,
-                         punkte: bild.querySelectorAll('.gr-vpunkt').length };
+                         punkte: bild.querySelectorAll('.gr-vpunkt').length,
+                         reiterZeilen: zeilen };
             }""")
         finally:
             s.close()
@@ -1321,6 +1341,10 @@ def test_die_kurve_beginnt_im_ersten_viewport(_umgebung):
             f"{breite}: die Auto-Vorauswahl zeichnet kein Diagramm "
             f"(Fixture prüfen)")
         assert mess["punkte"] >= 4, f"{breite}: {mess}"
+        assert mess["reiterZeilen"] == 1, (
+            f"{breite}: die Reiterleiste bricht in "
+            f"{mess['reiterZeilen']} Zeilen um - das drueckt den Graphen "
+            "unter die Falz")
         assert mess["svg"] <= hoehe, (
             f"{breite}: das SVG beginnt {mess['svg'] - hoehe} px unter der "
             f"Falz - der Reiter öffnet wieder mit Gerüst statt Kurve")

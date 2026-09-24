@@ -3615,12 +3615,41 @@ td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
    Containerbreite; `flex-wrap:wrap` (Basisregel oben) faengt jeden Knopf,
    der nicht mehr in die Zeile passt, in eine zweite - kein Knopf kann
    dabei abgeschnitten werden, weil keiner allein breiter ist als die
-   Leiste. Der Scroll-Randhinweis (Gradient) ist mit dem Rollen gefallen. */
+   Leiste. Der Scroll-Randhinweis (Gradient) ist mit dem Rollen gefallen.
+
+   I (Hotfix 24.09.2026, CI-Lauf #36045494184): DIE LEISTE BRACH MIT DER
+   ECHTEN SCHRIFT DOCH IN ZWEI ZEILEN UM. Fix H maß nur mit der Rueckfall-
+   schrift der Sandbox (Google Fonts erreichen sie nicht, CLAUDE.md-
+   Fallstrick) - der Rand war dort schon unter 2 px knapp. Mit der echten,
+   etwas breiteren Schrift aus CI brach die Leiste zweizeilig um und
+   druckte den Graphen unter die Falz (Kriterium 11c). `flex-wrap:wrap`
+   bleibt als Netz fuer noch schmalere Geraete, aber Schriftgroesse,
+   Innenabstand und Buchstabensperrung der Knoepfe sind jetzt so knapp
+   bemessen, dass alle vier Reiter auf 390 UND 360 px auch bei deutlich
+   breiterer Schrift (eigenschaftsbasiert mit `letter-spacing` gemessen,
+   siehe tests/test_geraete_zeitreihe_browser.py und
+   tests/test_geraete_reiter_browser.py) in einer Zeile bleiben.
+
+   I2 (QA-Nachbesserung 24.09.2026, gleicher CI-Lauf): der Fix aus I
+   stand mit Knopf an Knopf da - `flex:0 0 auto` ließ die Knoepfe direkt
+   nebeneinander stehen ("VERGLEICH RADAR PREISVERLAUF GERÄTEKATALOG"
+   wie eine Wortkette, rechts blieben ~96 px ungenutzt). `justify-
+   content:space-between` auf der Leiste verteilt die vier Knoepfe (mit
+   ihrer natuerlichen Breite, `flex:0 1 auto`) jetzt ueber die volle
+   Breite; der Abstand zwischen den Reiterworten ist damit ueberall
+   gleich groß statt am rechten Rand leer. Die Schriftgroesse ist so
+   groß gewaehlt, wie es die 360-px-Falzrechnung mit dem simulierten
+   Schriftaufschlag noch zulaesst (8,8 statt vormals 9 px, mit etwas
+   Sicherheitsabstand statt am absoluten Limit) - `letter-spacing:0`
+   statt eines positiven Wertes gewinnt den Rest der noetigen Breite.
+   Getestet: tests/test_geraete_zeitreihe_browser.py::
+   test_kein_reitertext_wird_abgeschnitten prueft jetzt zusaetzlich den
+   Mindestabstand zwischen benachbarten Reiterworten (>= 8 px). */
 @media (max-width:700px){
   .gr-untertitel{display:none}
-  .gr-reiter{row-gap:2px}
-  .gr-reiter button,.gr-reiter .gr-reiter-seite{font-size:10.5px;
-    padding:8px 8px;letter-spacing:.02em;white-space:nowrap;flex:0 0 auto}
+  .gr-reiter{row-gap:2px;justify-content:space-between}
+  .gr-reiter button,.gr-reiter .gr-reiter-seite{font-size:8.8px;
+    padding:8px 4px;letter-spacing:0;white-space:nowrap;flex:0 1 auto}
 }
 
 /* =====================================================================

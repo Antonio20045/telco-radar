@@ -144,8 +144,22 @@ def test_am_telefon_beginnt_die_kurve_oberhalb_der_falz(telefon):
     SVG selbst UND der oberste Kurvenpunkt (min ueber Punkte, Halos und
     Linien) - mindestens 1 px Kurve muessen im ersten Viewport stehen,
     sonst oeffnet der Reiter mit Geruest statt Antwort. Am echten Bestand
-    nach dem Fix: SVG-Top 813, Punkt 843 (Falz 844)."""
+    nach dem Fix: SVG-Top 813, Punkt 843 (Falz 844).
+
+    CI-Fallstrick (24.09.2026, CI-Lauf #36045494184): lokal laedt die
+    Rueckfallschrift (Google Fonts erreichen die Sandbox nicht, CLAUDE.md-
+    Fallstrick), in CI die echte, etwas breitere Schrift - die Reiterleiste
+    bricht dort in zwei Zeilen um und drueckt den Graphen unter die Falz,
+    obwohl der Test lokal gruen bleibt. Simuliert wird das EIGENSCHAFTS-
+    basiert mit `letter-spacing` auf den Reiterknoepfen (wie
+    `test_endlabel_bleibt_im_svg_auch_bei_verbreitertem_text` weiter unten
+    und `test_der_kopf_laeuft_auch_mit_breiterer_schrift_nicht_aus_dem_bild`
+    in test_marke.py), nicht mit einer bestimmten Schriftart."""
     s, _ = telefon
+    s.add_style_tag(content=(
+        ".gr-reiter button,.gr-reiter .gr-reiter-seite"
+        "{letter-spacing:1px !important}"))
+    s.wait_for_timeout(120)
     mess = s.evaluate("""() => {
       const svg = document.querySelector(
         '#gr-zr-gruppe svg.gr-zr--schmal') ||
@@ -156,10 +170,15 @@ def test_am_telefon_beginnt_die_kurve_oberhalb_der_falz(telefon):
         return e.length ? Math.min(
           ...e.map(x => Math.round(x.getBoundingClientRect().top))) : null;
       };
+      const leiste = document.querySelector('.gr-reiter');
+      const reiterZeilen = leiste ? new Set(
+        [...leiste.querySelectorAll('button')].map(
+          b => Math.round(b.getBoundingClientRect().top))).size : null;
       return {svg: Math.round(svg.getBoundingClientRect().top),
               punkt: top('circle.gr-zr-punkt'),
               halo: top('circle.gr-zr-halo'),
               linie: top('path'),
+              reiterZeilen: reiterZeilen,
               legendeUnten: (() => {
                 const l = document.querySelector('#gr-zr-gruppe .gr-zr-legende');
                 return l ? Math.round(l.getBoundingClientRect().top)
@@ -167,6 +186,9 @@ def test_am_telefon_beginnt_die_kurve_oberhalb_der_falz(telefon):
                          : null; })()};
     }""")
     assert mess, "die Zeitreihe zeichnet kein SVG (Fixture prüfen)"
+    assert mess["reiterZeilen"] == 1, (
+        f"die Reiterleiste bricht in {mess['reiterZeilen']} Zeilen um - "
+        "das drueckt den Graphen unter die Falz")
     assert mess["svg"] <= 844, (
         f"das SVG beginnt bei {mess['svg']} px - {mess['svg'] - 844} px "
         "unter der Falz 844")
@@ -659,20 +681,57 @@ def test_kein_reitertext_wird_abgeschnitten(telefon):
     clientWidth am Knopf selbst war (der Text brach nicht, der KNOPF lief
     nur aus der Leiste). Gemessen wird jetzt die Geometrie: jedes
     Reiterknopf-Rechteck muss vollstaendig im sichtbaren Rechteck der
-    Leiste liegen, ohne dass gescrollt wird."""
+    Leiste liegen, ohne dass gescrollt wird.
+
+    CI-Fallstrick (24.09.2026, CI-Lauf #36045494184): die Leiste bricht mit
+    der echten (in CI geladenen) Schrift zweizeilig um - jeder Knopf bleibt
+    dabei zwar innerhalb der Leiste (der urspruengliche Test dieser Datei
+    bliebe gruen), aber die zusaetzliche Zeile drueckt den Graphen unter
+    die Falz. Simuliert mit `letter-spacing` wie oben; zusaetzlich
+    geprueft: alle Knoepfe bleiben in EINER Zeile.
+
+    QA-Nachbesserung (24.09.2026, gleicher CI-Lauf): die erste Fassung des
+    Hotfix (`flex:0 0 auto`) liess die Knoepfe zwar einzeilig, aber OHNE
+    Abstand aneinanderstossen - eine Wortkette statt vier Tippflaechen,
+    rechts blieb Platz ungenutzt. Gemessen wird deshalb nicht nur die
+    Knopf-Huelle, sondern der TEXT selbst (per `Range` auf dem Textknoten,
+    unabhaengig vom Innenabstand des Knopfs): zwischen zwei benachbarten
+    Reiterworten muessen mindestens 8 px Luft bleiben."""
     s, _ = telefon
+    s.add_style_tag(content=(
+        ".gr-reiter button,.gr-reiter .gr-reiter-seite"
+        "{letter-spacing:1px !important}"))
+    s.wait_for_timeout(120)
     daten = s.evaluate("""() => {
       const leiste = document.querySelector('.gr-reiter');
       const lr = leiste.getBoundingClientRect();
+      const textRect = knopf => {
+        const textknoten = [...knopf.childNodes].find(
+          n => n.nodeType === 3 && n.textContent.trim());
+        if (!textknoten) return null;
+        const bereich = document.createRange();
+        bereich.selectNodeContents(textknoten);
+        return bereich.getBoundingClientRect();
+      };
+      const knoepfe = [...leiste.querySelectorAll('button')];
       return {
         leiste: { left: lr.left, right: lr.right },
-        knoepfe: [...leiste.querySelectorAll('button')].map(b => {
+        zeilen: new Set(knoepfe.map(
+          b => Math.round(b.getBoundingClientRect().top))).size,
+        knoepfe: knoepfe.map(b => {
           const r = b.getBoundingClientRect();
           return { text: b.textContent.trim(), left: r.left, right: r.right };
+        }),
+        textRechtecke: knoepfe.map(b => {
+          const t = textRect(b);
+          return t ? { links: t.left, rechts: t.right } : null;
         }),
       };
     }""")
     assert daten["knoepfe"], "keine Reiter gefunden"
+    assert daten["zeilen"] == 1, (
+        f"die Reiterleiste bricht in {daten['zeilen']} Zeilen um - das "
+        "drueckt den Graphen unter die Falz")
     for k in daten["knoepfe"]:
         assert k["left"] >= daten["leiste"]["left"] - 1, (
             f"Reiter {k['text']!r} beginnt links ausserhalb der Leiste: "
@@ -680,6 +739,13 @@ def test_kein_reitertext_wird_abgeschnitten(telefon):
         assert k["right"] <= daten["leiste"]["right"] + 1, (
             f"Reiter {k['text']!r} ist abgeschnitten: rechte Kante "
             f"{k['right']} > Leiste {daten['leiste']['right']}")
+    texte = daten["textRechtecke"]
+    assert all(texte), "der Reiter-Text liess sich nicht per Range messen"
+    for vorher, nachher in zip(texte, texte[1:]):
+        luecke = nachher["links"] - vorher["rechts"]
+        assert luecke >= 8, (
+            f"nur {luecke:.1f} px Abstand zwischen zwei Reiterworten - "
+            "sie stossen fast aneinander (mind. 8 px verlangt)")
 
 
 def test_die_reiterleiste_verursacht_keinen_seitenweiten_querscroll(telefon):
