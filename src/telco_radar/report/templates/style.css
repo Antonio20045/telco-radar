@@ -2134,8 +2134,27 @@ b,strong{font-weight:700}
 .gr-export-fuss{margin:26px 0 0;padding-top:12px;
   border-top:1px solid var(--rule);display:flex;align-items:baseline;
   gap:6px 14px;flex-wrap:wrap}
-.gr-export-fuss-titel{font-family:var(--sans);font-size:11px;
-  letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+/* P2/D4b: der Aufklapper ersetzt die frueher immer offene Knopfreihe -
+   zugeklappt EIN Knopf ("Export ▾"), aufgeklappt dieselbe rollende
+   Zeile wie zuvor. `list-style:none`/kein `::marker`: der Pfeil im
+   Knopftext (`.gr-export-pfeil`) ist die einzige Aufklapp-Andeutung,
+   das native Browser-Dreieck vor `<summary>` waere eine zweite. */
+.gr-export-menu{width:100%}
+.gr-export-menu summary{list-style:none;cursor:pointer}
+.gr-export-menu summary::-webkit-details-marker{display:none}
+.gr-export-oeffner{display:inline-flex;align-items:center;gap:5px}
+.gr-export-menu[open] .gr-export-oeffner{color:var(--ink);
+  border-color:var(--ink-3)}
+.gr-export-pfeil{font-size:10px;transition:transform .15s ease}
+.gr-export-menu[open] .gr-export-pfeil{transform:rotate(180deg)}
+.gr-export-menu .gr-export-knoepfe{margin-top:10px}
+/* `.gr-export-knoepfe{display:flex}` (oben) traegt mehr Spezifitaet als
+   die UA-Regel `details:not([open]) > *{display:none}` (Klassen- vs.
+   Typ-Selektor) und schlug sie - zugeklappt stand die Zeile trotzdem im
+   Bild, gemessen: `open:false`, Zeile trotzdem 36,6 px hoch sichtbar.
+   Diese Regel gewinnt wieder: dieselbe Spezifitaet, aber nach der
+   Grundregel notiert. */
+.gr-export-menu:not([open]) .gr-export-knoepfe{display:none}
 /* AUF DEM TELEFON WIRD DER KOPF ZU EINER SPALTE: Kicker, Schlagzeile,
    Datum (Zeitungs-Datumszeile; ein Nebeneinander von Kicker und Datum
    ist bei 390 px ausgeschlossen - gemessen: Kicker 163 px + Datum
@@ -2160,14 +2179,13 @@ b,strong{font-weight:700}
      freigemacht hat, und keinen Pixel mehr. */
   .gr-leit{gap:1px}
   .gr-leit-label{font-size:11.5px;line-height:1.3}
-  /* Die REIHE rollt in sich (nicht die ganze Fußzeile): das Etikett
-     "Export" bleibt stehen, die Knöpfe laufen darunter weg - dieselbe
-     Roll-Regel, die die Reihe bis P4 im Kopf trug. */
+  /* Die REIHE rollt in sich (nicht die ganze Fußzeile) - dieselbe
+     Roll-Regel, die die Reihe bis P4 im Kopf trug; seit P2/D4b steht sie
+     nur noch NACH dem Aufklappen des "Export ▾"-Knopfs im Bild. */
   .gr-export-fuss .gr-export-knoepfe{display:flex;flex-wrap:nowrap;
     gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;
     padding-bottom:2px;scrollbar-width:thin;min-width:0}
   .gr-export-fuss .gr-knopf{white-space:nowrap;flex:none}
-  .gr-export-fuss-titel{flex:none}
 }
 
 /* Die TCO-Tafel ("Was kostet es"). Sie borgt sich die Typografie der
@@ -3232,8 +3250,17 @@ b,strong{font-weight:700}
    auf EINER Zeile, die min-content-Breite war 1346 px, und die Seite
    lief auf dem Telefon 1389 px breit statt 390. Im HTML war davon nichts
    zu sehen; gemessen wurde es im Browser. */
-.gr-kk-marke{font-size:12px;letter-spacing:.08em;color:var(--ink-4);
-  border:1px solid var(--rule);padding:1px 5px;margin-left:4px}
+/* P2/D4b: `inline-block` statt `inline` - ein `inline`-Element mit
+   Rahmen zeichnet bei jedem Zeilenumbruch einen EIGENEN Rahmen um jedes
+   Textfragment ("kein aktueller Stand seit 15.09.2026" brach in der
+   engen Anbieterspalte des Buendel-Kopfs in bis zu drei Zeilen, jede mit
+   eigener Box - ein "Stapel Einzelkaestchen" statt EINER Marke). Als
+   `inline-block` bleibt der Rahmen EIN zusammenhaengendes Rechteck, auch
+   wenn der Text darin mehrzeilig umbricht - dieselbe Klasse, an jedem
+   Ort, an dem sie steht (Katalogzeile UND Buendel-Kopf). */
+.gr-kk-marke{display:inline-block;font-size:12px;letter-spacing:.08em;
+  color:var(--ink-4);border:1px solid var(--rule);padding:1px 5px;
+  margin-left:4px}
 /* Der Geraetezustand ist eine Preisdimension - das Etikett steht in Rot,
    damit "erneuert" nicht wie ein Tarifzusatz liest (QA-Befund B1). */
 .gr-kk-marke--zustand{color:var(--red,#e60000);border-color:currentColor;
@@ -3523,6 +3550,20 @@ td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
   .gr-reiter{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch}
   .gr-reiter button,.gr-reiter .gr-reiter-seite{font-size:10.5px;
     padding:9px 10px;letter-spacing:.04em;white-space:nowrap;flex:0 0 auto}
+  /* P2/D4b: derselbe weiche Scroll-Rand wie `.subbar` (Zeile ~157) - ohne
+     ihn ist "die Leiste rollt in sich" nur am Antasten zu erraten, nicht
+     zu sehen. "Erkennbar scrollbar" heisst: das Bild selbst sagt es. */
+  .gr-reiter{
+    background-image:
+      linear-gradient(to right, var(--paper), var(--paper)),
+      linear-gradient(to left, var(--paper), var(--paper)),
+      linear-gradient(to right, rgba(20,18,15,.16), rgba(20,18,15,0)),
+      linear-gradient(to left, rgba(20,18,15,.16), rgba(20,18,15,0));
+    background-position:left center,right center,left center,right center;
+    background-repeat:no-repeat;
+    background-size:16px 100%,16px 100%,10px 100%,10px 100%;
+    background-attachment:local,local,scroll,scroll;
+  }
 }
 
 /* =====================================================================
@@ -3768,6 +3809,19 @@ td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
 .gr-zr-linie{fill:none;stroke-width:2.4;stroke-linejoin:round}
 .gr-zr-punkt{stroke:var(--paper-2);stroke-width:1.6}
 .gr-zr-ende{stroke-width:2.6}
+/* P2/D2: die Markerform - ein offener Umriss UM den bestehenden Kreis
+   (`_form_pfad` in geraete_zeitreihe.py), Farbe kommt inline vom Anbieter.
+   `pointer-events:none`: die Trefferflaeche (.gr-zr-hit) bleibt allein
+   fuer Klicks zustaendig, die Form darf ihr nie im Weg stehen. */
+.gr-zr-form{pointer-events:none}
+/* P2/D2: der Achsenbruch - eine kleine "gebrochene" Zickzacklinie auf
+   einem deckenden Kasten, direkt auf der Y-Achse. Erscheint nur, wenn die
+   echte Preisspanne unter 10% des Hoechstwerts liegt (`ACHSENBRUCH_
+   ANTEIL`) - dann zoomt die Achse stark, und das Zeichen sagt sichtbar
+   "sie beginnt nicht bei 0 EUR". */
+.gr-zr-achsenbruch rect{fill:var(--paper-2);stroke:none}
+.gr-zr-achsenbruch path{fill:none;stroke:var(--ink-3);stroke-width:1.4;
+  stroke-linecap:round;stroke-linejoin:round}
 /* P1-Fix (Sicht 15): der Halo um einen Punkt, dessen Serie EINEN Messtag
    hat - „erstmals gemessen". Ein nackter Punkt ohne Linie liest sich
    sonst wie ein Fehler; der zweite Messtag macht die Serie zur Linie und
@@ -3775,7 +3829,6 @@ td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
 .gr-zr-halo{stroke-width:1.5;opacity:.5}
 .gr-zr-wert{font-family:var(--sans-system);font-size:13.5px;font-weight:700;
   fill:var(--ink)}
-.gr-zr-wert--erst{font-size:10.5px;font-weight:600;fill:var(--ink-4)}
 .gr-zr-name{font-family:var(--sans-system);font-size:15px;font-weight:700}
 .gr-zr-chip{font-family:var(--sans-system);font-size:10px;font-weight:700;
   letter-spacing:.06em;text-transform:uppercase;fill:var(--red)}
@@ -3842,6 +3895,10 @@ li.gr-zr-posten:first-child{border-top:0}
 /* P1-Fix (Sicht-A3): die Restschuld nach Monat 24 - die Zahl, die den
    TCO-24 vergleichbar macht, steht da, wo gerechnet wird. */
 .gr-zr-roffen{font-family:var(--sans);font-size:12.5px;color:var(--ink-3);
+  margin:4px 0 0}
+/* P1-Fix (Datenverlust-Befund, 24.09.2026): die zweite Zahlweise zum
+   selben Betrag - derselbe Ton wie die Restschuld-Zeile daneben. */
+.gr-zr-rweitere{font-family:var(--sans);font-size:12.5px;color:var(--ink-3);
   margin:4px 0 0}
 .gr-zr-rbeleg{font-family:var(--sans);font-size:12px;color:var(--ink-4);
   margin:6px 0 0;text-align:right}
@@ -3952,11 +4009,67 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
   .gr-zr-kacheln button{padding-bottom:0}
   .gr-zr-kacheln button .gr-zr-k-name{line-height:1.05}
 }
-/* Breit: das Bild zeigt die Werte (grosser letzter, kleiner erster), der
-   Wert-Span der Legende weicht (eine Zahl steht je Ort genau EINMAL).
-   Schmal: umgekehrt - das Bild bleibt kollisionsfrei, die Legende traegt
-   "ab/zuletzt" (siehe geraete_zeitreihe._svg). */
+/* P2/D2: ENDLABELS STATT LEGENDE. Auf breit traegt jede Kurve ihr
+   Endlabel im Bild (Name, Beleg-Link, Datum - `geraete_zeitreihe._svg`
+   `enden`-Schleife) UND die Werte (groesster letzter, kleiner erster
+   Punkt). Die HTML-Legende darunter nannte denselben Namen ein zweites
+   Mal - eine Aussage je Ort (Beruhigungsregel), deshalb verschwindet sie
+   dort ganz. Schmal bleibt sie: dort verzichtet das SVG auf die Werte
+   (Kollisionsgefahr mit der Endnamen-Kette), und die Legende traegt sie
+   als "ab/zuletzt" nach (siehe geraete_zeitreihe._svg). */
 .gr-zr-leg-wert{color:var(--ink-4);font-weight:600}
 @media (min-width:701px){
-  .gr-zr-leg-wert{display:none}
+  .gr-zr-legende{display:none}
 }
+
+/* === D3 Tabelle === */
+/* Phase P2, Paket D3 (24.09.2026): drei rein additive Bausteine der
+   Bündelzeile (`_geraete_buendel.html.j2`) - nichts oberhalb dieses
+   Blocks wird geaendert (DATEIGRENZE). Farben ausschliesslich aus den
+   vorhandenen Variablen (`--anb`, `--ink*`, `--paper*`); `--anb` ist
+   die EINE Quelle der Anbieterfarbe (`report/anbieter_farben.py`), hier
+   wird keine neue definiert - dieselbe Regel wie am Graphen. */
+
+/* PUNKT 1 (gemessen, hoechste Prioritaet): die kompakte Ratenlaufzeit in
+   der Tarifspalte - zurueckhaltend, sie ergaenzt den Tarifnamen. Damit
+   sind zwei Zahlweisen DESSELBEN Tarifs zugeklappt am Text
+   unterscheidbar ("24 Raten" gegen "36 Raten · Restschuld 366,00 €"),
+   nicht erst im Rechenweg. */
+.gr-bnd-raten{color:var(--ink-4);font-family:var(--sans);font-size:12px;
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* PUNKT 2: die Hauptzahl der Zeile nennt ihr Subjekt ("congstar 467 €
+   unter Vodafone") statt eines nackten Betrags. `grid-column:1/-1`
+   haengt sie unter die sechs Spalten von `.gr-bnd summary`
+   (`display:grid`, keine `grid-template-areas` auf dem Desktop - ein
+   zusaetzliches Kind ohne eigene Platzanweisung faellt automatisch in
+   die naechste freie Zeile; auf dem Telefon ebenso, nach den drei
+   benannten Bereichen "an/tco", "tar/bar", "dl/chev"). Groesser als
+   `.gr-bnd-tco` (15px): der Abstand zu Vodafone ist der Grund, warum die
+   Tabelle existiert - Antonios Stil, die wichtigste Zahl traegt die
+   groesste Schrift ihres Bereichs. */
+.gr-bnd-subjekt{grid-column:1/-1;display:block;margin:3px 0 0;
+  font-family:var(--serif);font-size:16px;font-weight:700;
+  color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.3}
+
+/* PUNKT 4: der Zerlegungsbalken der Leitzahl, im Rechenweg-Aufklapper.
+   Volle Breite, dieselbe Anbieterfarbe wie Name und Randstreifen
+   (`var(--anb)`); die Segmentgrenzen sind ein 2px-Oberflaechen-Spalt
+   statt einer gezeichneten Linie (Skill `dataviz`). Die Restschuld
+   traegt ein schraeges Streifenmuster statt der vollen Flaeche -
+   sichtbar UNTERSCHIEDEN (Kontrast- und Druck-faehig), nicht nur
+   heller gefaerbt: sie ist erst nach Monat 24 faellig, aber Teil der
+   Summe. */
+.gr-bnd-zerl{display:flex;width:100%;height:14px;margin:6px 0 10px;
+  border-radius:2px;overflow:hidden;background:var(--paper-2)}
+/* Review-Fix S3 (mitgenommen): `min-width` gilt fuer ECHTE, sehr kleine
+   Segmente (ein Cent-Betrag bliebe sonst unsichtbar/untappbar) - ein
+   Betrag von exakt 0,00 EUR bekommt gar kein Segment mehr
+   (`geraete_tco_karten.zerlegung_balken` liefert es nicht mehr), sonst
+   waere `min-width` hier ein 2px-Phantomstreifen ohne Aussage gewesen. */
+.gr-bnd-zerl-seg{display:block;height:100%;min-width:2px;
+  background:var(--anb,#57534a);border-right:2px solid var(--paper)}
+.gr-bnd-zerl-seg:last-child{border-right:0}
+.gr-bnd-zerl-seg--offen{background-color:var(--paper);
+  background-image:repeating-linear-gradient(45deg,var(--anb,#57534a) 0
+  3px,var(--paper) 3px 6px)}

@@ -119,6 +119,14 @@ def schreibtisch(_browser_seite):
         yield s
 
 
+def _oeffne_export(s):
+    """P2/D4b: die sechs Knöpfe stehen seit diesem Paket hinter EINEM
+    "Export ▾"-Aufklapper (`<details class="gr-export-menu">`) - wer die
+    Zeile misst, muss sie erst öffnen."""
+    s.click(".gr-export-fuss .gr-export-oeffner")
+    s.wait_for_timeout(100)
+
+
 def _reihe(s):
     return s.evaluate("""() => {
       const ex = document.querySelector('.gr-export-fuss .gr-export-knoepfe');
@@ -150,13 +158,44 @@ def _reihe(s):
     }""")
 
 
-def test_am_telefon_ist_die_export_zeile_sichtbar_und_vollstaendig(telefon):
-    """Alle Export-Dateien sind vom Telefon aus erreichbar - die Reihe
-    steht da (Hoehe > 0), jeder Knopf hat eine Box, und alle liegen in
-    EINER Zeile (die Reihe rollt in sich, sie stapelt nicht). Bis P3
-    waren es vier Knöpfe, der Modell-Katalog hat zwei weitere gebracht
-    (eine Datei je Ansicht - E5-Regel). Seit P4/D4 steht die Reihe in
-    der FUSSZEILE (.gr-export-fuss), nicht mehr in der Kopfzeile."""
+def test_am_telefon_ist_das_export_menue_zugeklappt_ein_knopf(telefon):
+    """P2/D4b: SECHS Knöpfe standen bis hierhin immer offen in einer Zeile
+    - jetzt steht am Fuß GENAU EIN Knopf ("Export ▾"), die sechs Ziele
+    stehen dahinter. Ohne Klick ist die Reihe (`.gr-export-knoepfe`)
+    unsichtbar (Höhe 0) - der Öffner selbst hat eine Box."""
+    zustand = telefon.evaluate("""() => {
+      const menu = document.querySelector('.gr-export-fuss .gr-export-menu');
+      const oeffner = document.querySelector(
+        '.gr-export-fuss .gr-export-oeffner');
+      const knoepfe = document.querySelector(
+        '.gr-export-fuss .gr-export-knoepfe');
+      return {
+        offen: menu ? menu.hasAttribute('open') : null,
+        oeffnerBox: oeffner ? Math.round(
+          oeffner.getBoundingClientRect().height) : 0,
+        knoepfeBox: knoepfe ? Math.round(
+          knoepfe.getBoundingClientRect().height) : null,
+        sichtbareKnoepfeAusserhalb: document.querySelectorAll(
+          '.gr-hero-export a[href^="exporte/"], '
+          + '.gr-werkzeug a[href^="exporte/"]').length,
+      };
+    }""")
+    assert zustand["offen"] is False, "das Export-Menü ist ungefragt offen"
+    assert zustand["oeffnerBox"] > 0, "der 'Export ▾'-Knopf ist unsichtbar"
+    assert zustand["knoepfeBox"] == 0, (
+        f"die sechs Ziele stehen schon vor dem Klick im Bild "
+        f"({zustand['knoepfeBox']} px hoch)")
+    assert zustand["sichtbareKnoepfeAusserhalb"] == 0
+
+
+def test_am_telefon_ist_die_export_zeile_nach_dem_oeffnen_vollstaendig(
+        telefon):
+    """Alle Export-Dateien sind vom Telefon aus erreichbar, sobald das
+    Menü offen ist - die Reihe steht da (Hoehe > 0), jeder Knopf hat eine
+    Box, und alle liegen in EINER Zeile (die Reihe rollt in sich, sie
+    stapelt nicht). Bis P3 waren es vier Knöpfe, der Modell-Katalog hat
+    zwei weitere gebracht (eine Datei je Ansicht - E5-Regel)."""
+    _oeffne_export(telefon)
     r = _reihe(telefon)
     assert r is not None, "keine Export-Reihe in der Fußzeile der Seite"
     assert r["hoehe"] > 0, "die Export-Reihe ist auf 390 px unsichtbar"
@@ -168,7 +207,8 @@ def test_am_telefon_ist_die_export_zeile_sichtbar_und_vollstaendig(telefon):
         "quer")
 
 
-def test_am_telefon_rollt_die_seite_nicht_quer(telefon):
+def test_am_telefon_rollt_die_geoeffnete_seite_nicht_quer(telefon):
+    _oeffne_export(telefon)
     r = _reihe(telefon)
     assert r is not None
     assert r["quer"] <= 391, (
@@ -180,11 +220,12 @@ def test_am_telefon_rollt_die_seite_nicht_quer(telefon):
 
 def test_am_telefon_bleibt_die_falz_von_11c_erfuellt(telefon):
     """Die Fußzeile ist an die Falz GEKOPPELT: Antwort-Satz und Graphkopf
-    bleiben über 844 px. Bis P4/D4 war die Reihe der Grund, die Falz knapp
-    zu halten (sie stand im Kopf, gemessen 837 von 844 px); seit dem Umzug
-    ist es die LEITZAHL des Vergleichs-Reiters (.gr-zr-leit, DIE ANTWORT
-    IST DIE GROESSTE ZAHL) - der Kopf ist ohne die Reihe kürzer geworden,
-    und die gewonnene Luft gehört der Leitzahl, nicht neuem Inhalt."""
+    bleiben über 844 px - gemessen im ZUGEKLAPPTEN Ausgangszustand (P2/
+    D4b: die Fußzeile ist jetzt noch kürzer als zu P4/D4, ein einzelner
+    "Export ▾"-Knopf statt einer offenen Sechserreihe. Die LEITZAHL des
+    Vergleichs-Reiters (.gr-zr-leit, DIE ANTWORT IST DIE GROESSTE ZAHL)
+    bleibt die groesste Zahl der Tafel, der Kopf bekommt keinen neuen
+    Inhalt."""
     r = _reihe(telefon)
     assert r is not None, "keine Export-Reihe in der Fußzeile der Seite"
     assert r["antwort"] is not None and r["antwort"] <= 844, (
@@ -235,12 +276,15 @@ def test_die_vier_links_zielen_auf_vier_dateien(_browser_seite):
             f"exporte/{name} fehlt im gerenderten site/-Verzeichnis")
 
 
-def test_am_schreibtisch_steht_die_reihe_in_der_fusszeile(schreibtisch):
-    """Der Desktop ist unangetastet: die Reihe steht - wie am Telefon -
-    in der FUSSZEILE, alle sechs Knöpfe sichtbar und in EINER Zeile
-    (unter 900 px rollt sie in sich, darüber wrappt sie). Bis P4/D4
-    stand sie im Hero; der Umbau ist derselbe an beiden Breiten."""
+def test_am_schreibtisch_steht_die_reihe_nach_dem_oeffnen_in_der_fusszeile(
+        schreibtisch):
+    """Der Desktop verhält sich wie das Telefon: EIN "Export ▾"-Knopf am
+    Fuß, nach dem Öffnen dieselben sechs Ziele in EINER Zeile. Bis P4/D4
+    stand die Reihe im Hero, bis P2/D4b immer offen in der Fußzeile."""
     r = _reihe(schreibtisch)
     assert r is not None
+    assert r["sichtbar"] == 0, "die Reihe steht schon vor dem Klick offen"
+    _oeffne_export(schreibtisch)
+    r = _reihe(schreibtisch)
     assert r["sichtbar"] == 6
     assert r["zeile"], "auch auf dem Schreibtisch stehen die Knöpfe versetzt"

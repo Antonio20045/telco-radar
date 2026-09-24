@@ -11,6 +11,27 @@
    nur sie. */
 var TR_ANKUNFT_SEARCH = location.search;
 
+/* P2/D4b: DER AKTIVE NAVIGATIONSEINTRAG STEHT IM BILD - auf jeder Seite.
+ * `.subbar.subnav` (base.html.j2) rollt seit dem 08.08.2026 seitlich statt
+ * umzubrechen, mit einem weichen Rand als Scroll-Hinweis - der Rand sagt
+ * "hier geht es weiter", er bringt aber die eigene Seite nicht ins Bild.
+ * Gemessen auf geraete.html bei 390 px: der Eintrag "Geräte" (aktiv, class
+ * "on") stand bei x=536-620, KOMPLETT ausserhalb des 390-px-Viewports -
+ * ein Leser sah beim Landen weder, dass er auf "Geräte" steht, noch (weil
+ * der Eintrag davor faellt) den vollstaendigen Text von "Differenzierung"
+ * (bis x=410, 20 px abgeschnitten). Dieselbe Leiste blieb aber FUNKTIONAL
+ * erreichbar - `overflow-x:auto` scrollt, nur ohne dass beim Laden je
+ * dorthin gescrollt wurde. Diese eine Zeile holt den aktiven Eintrag beim
+ * Laden mittig ins Bild, wie es ein Klick auf einen Reiter-Knopf der
+ * Geräteseite ueber den nativen Fokus-Scroll ohnehin schon tut. */
+(function () {
+  try {
+    var aktiv = document.querySelector('.subbar.subnav a.on');
+    if (aktiv) aktiv.scrollIntoView({ inline: 'center', block: 'nearest' });
+  } catch (e) { /* scrollIntoView mit Optionen fehlt: Leiste bleibt am
+                   Anfang, aber weiterhin nutzbar (kein Crash). */ }
+})();
+
 (function () {
   'use strict';
 

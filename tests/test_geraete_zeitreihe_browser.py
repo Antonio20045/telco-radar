@@ -517,3 +517,52 @@ def waehle_modell(s, mid: str) -> None:
 def waehle_band(s, band: str) -> None:
     s.click(f"#gr-zr-baender button[data-band='{band}']")
     s.wait_for_timeout(500)
+
+
+# --------------------------------------------------------------------------
+# P2/D2: Endlabels statt Legende - auf breit ersetzen die Namen am
+# Linienende die HTML-Legende ganz (dieselbe Aussage nicht zweimal); auf
+# schmal bleibt sie stehen, sie traegt dort die "ab/zuletzt"-Werte, die
+# das schmale Bild selbst nicht zeigt.
+# --------------------------------------------------------------------------
+
+def test_die_legende_weicht_den_endlabels_auf_dem_schreibtisch(schreibtisch):
+    s, _ = schreibtisch
+    anzeige = s.eval_on_selector(
+        "#tafel-tco .gr-zr-legende",
+        "el => getComputedStyle(el).display")
+    assert anzeige == "none", f"Legende zeigt sich trotz Endlabels: {anzeige}"
+    # Die Endlabels selbst stehen im SVG - die Aussage bleibt sichtbar,
+    # nur nicht zweimal.
+    namen = s.eval_on_selector_all(
+        "#tafel-tco svg.gr-zr--breit text.gr-zr-name",
+        "els => els.length")
+    assert namen and namen > 0
+
+
+def test_die_legende_bleibt_auf_dem_telefon(telefon):
+    s, _ = telefon
+    anzeige = s.eval_on_selector(
+        "#tafel-tco .gr-zr-legende",
+        "el => getComputedStyle(el).display")
+    assert anzeige != "none", "Legende fehlt mobil - dort traegt sie ab/zuletzt"
+
+
+# P2/D4b: der aktive Navigationseintrag ("Geräte") steht auf dem Telefon
+# beim Laden im Bild - vorher stand er bei x=536-620 komplett ausserhalb
+# des 390-px-Viewports, und "Differenzierung" davor war 20 px abgeschnitten.
+# Diese kleine Test-Fixture rendert den Eintrag "Geräte" selbst NICHT (die
+# `geraete_verlinkt`-Sichtbarkeitsschwelle greift nicht), deshalb steht die
+# Messung dafuer eigenstaendig in `test_navigation_aktiver_eintrag_browser.
+# py` - hier nur der Scroll-Hinweis der Reiterleiste dieser Seite selbst.
+
+def test_die_reiterleiste_zeigt_einen_scroll_hinweis(telefon):
+    """'Reiter... müssen erkennbar scrollbar sein' - derselbe weiche Rand
+    wie an der Rubrikleiste (`.subbar`), nicht nur `overflow-x:auto` ohne
+    sichtbaren Hinweis."""
+    s, _ = telefon
+    hintergrund = s.eval_on_selector(
+        "#tafel-tco .gr-reiter, .gr-reiter",
+        "e => getComputedStyle(e).backgroundImage")
+    assert hintergrund and hintergrund != "none", (
+        "die Reiterleiste zeigt keinen Scroll-Hinweis (background-image)")

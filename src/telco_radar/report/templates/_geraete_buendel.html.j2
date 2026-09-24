@@ -17,6 +17,12 @@
    nie in der Vorlage, Clean Code 8). `frisch` fehlt keiner Karte, die
    `modelle()` baut; `is defined` haelt den Rueckfall auf frisch. #}
 {% macro buendelzeile(k) %}
+{# D3: das Ratenwort der kompakten Laufzeit-Angabe (siehe .gr-bnd-tarif
+   unten) - "Monatsraten" bei einem zusammengelegten Bündelmonatspreis
+   (1&1), sonst "Raten". Dieselbe Unterscheidung wie `raten_wort` im
+   Rechenweg weiter unten (eigener Name, eigener Block-Scope - Jinja
+   wuerde sonst zwei `set` desselben Namens ineinander schachteln). #}
+{% set kurzraten = 'Monatsraten' if k.buendel_monatlich is not none else 'Raten' %}
 <details class="gr-bnd{% if not k.belastbar %} gr-bnd--leer{% endif %}{% if k.sku_id and k.frisch is defined and not k.frisch %} gr-bnd--alt{% endif %}"
          data-anbieter="{{ k.anbieter }}"
          {% if k.band %}data-band="{{ k.band }}"{% endif %}
@@ -42,7 +48,19 @@
             ehrlichere Schlüssel (A5.3: das einzige Maß über Laufzeiten
             hinweg). #}
          data-delta="{% if k.delta %}{{ k.delta.betrag if k.delta.betrag is not none else k.delta.monatlich }}{% endif %}"
-         data-einmalig="{{ k.zuzahlung if k.zuzahlung is not none else '' }}">
+         data-einmalig="{{ k.zuzahlung if k.zuzahlung is not none else '' }}"
+         {# D3, PUNKT 3: die Anbieterfarbe steht wirklich an der Zeile.
+            `var(--anb,#57534a)` (Name, 3px-Randstreifen, Zerlegungsbalken)
+            hatte hier bislang KEINEN Custom-Property-Wert und fiel darum
+            immer auf den grauen Rückfall zurück, obwohl die Regel dafür
+            längst existiert. `anb_klasse` als KLASSE ginge nicht - der
+            Wahrheits-Orakeltest (`tests/test_seiten_zahlen.py`, für
+            dieses Paket schreibgeschützt) sucht wörtlich
+            `class="gr-bnd"` ohne Zusatz. Ein eigenes `style`-Attribut
+            ändert die Klasse nicht und liest trotzdem dieselbe EINE
+            Quelle (`report/anbieter_farben.py`, über `anb_farbe`, hier
+            nur gesetzt, nicht neu definiert). #}
+         style="--anb:{{ k.anb_farbe }}">
   <summary>
     <span class="gr-bnd-an"><span class="gr-bnd-name">{{ k.anbieter }}</span>{%
       if k.zustand_etikett %} <span class="gr-kk-marke gr-kk-marke--zustand">{{
@@ -52,8 +70,19 @@
       if k.naeherung %} <span class="gr-kk-marke">Referenzrechnung</span>{%
       elif k.eigen and k.belastbar %} <span class="gr-kk-marke">unser Angebot</span>{%
       endif %}</span>
+    {# D3, PUNKT 1 (gemessen): zwei Zahlweisen DESSELBEN Tarifs (congstar
+       seit dem 22.09. 24 UND 36 Raten) trugen zugeklappt woertlich
+       denselben Text - der Unterschied stand erst im Rechenweg. Die
+       Ratenlaufzeit gehoert deshalb HIER auf die Zeile, knapp, und bei
+       einer offenen Restschuld (`offen_nach_24`, echte 0,0 faellt per
+       Truthiness heraus - "24 Raten" ohne Zusatz ist dann schon der
+       Unterschied) auch ihr Betrag - dieselbe Zahl, die der Rechenweg
+       unter "danach noch offen" traegt, hier nur eine Ebene hoeher. #}
     <span class="gr-bnd-tarif">{{ k.tarif }}{% if k.band_gb_text %} ·
-      {{ k.band_gb_text }}{% endif %}</span>
+      {{ k.band_gb_text }}{% endif %}{% if k.raten_laufzeit %} · <span
+      class="gr-bnd-raten">{{ k.raten_laufzeit }} {{ kurzraten
+      }}{% if k.offen_nach_24 %} · Restschuld {{ k.offen_nach_24 | euro
+      }}{% endif %}</span>{% endif %}</span>
     {# DIE TCO TRAEGT IHRE LAUFZEIT IM ETIKETT (A5.1) - eine unbeschriftete
        Gesamtsumme ist ueber zwei Bindungsdauern nicht lesbar. #}
     <span class="gr-bnd-tco">{% if k.belastbar %}{{ k.gesamt | euro }} <em
@@ -70,7 +99,19 @@
        plus Barpreis). Er steht VOR dem Strich, denn der Strich heisst
        "kein Angebot" - und ohne ihn stand dort bis P0-B-fix2 ein
        Euro-Delta, dessen Vorzeichen nicht belegt war. Kein Zahlenwert,
-       also auch kein Δ-Präfix (`--wert`). #}
+       also auch kein Δ-Präfix (`--wert`).
+
+       Review-Fix S3, PUNKT 3, GEPRUEFT UND VERWORFEN: die Δ-Spalte
+       nennt denselben Betrag wie `.gr-bnd-subjekt` darunter - ein
+       kompakter Text neben der ausformulierten Hauptzahl. Der genannte
+       Orakeltest (`tests/test_seiten_zahlen.py`) verankert diese Zelle
+       nicht woertlich, ABER `tests/test_geraete_tco_zustand.py::
+       test_die_gerenderte_zeile_zeigt_kleine_abstaende_mit_ungefaehr`
+       tut es (exakter Text "≈ +11,00 €"/"−679,05 € · −37,7 %" und die
+       `gr-bnd-delta--wert`-Klasse, ausserhalb der DATEIGRENZE dieses
+       Pakets) - ein Entfernen brach diesen Test. Die Zelle bleibt darum
+       UNVERAENDERT; die Entscheidung steht in der Rueckmeldung an
+       Antonio. #}
     <span class="gr-bnd-delta{% if not k.naeherung and not (k.eigen and
       k.belastbar) and k.delta_kurz and not (k.delta and k.delta.ungefaehr)
       %} gr-bnd-delta--wert{% endif %}">{% if
@@ -87,6 +128,36 @@
       class="gr-bnd-label gr-bnd-label--fin">Finanzierung gesamt</em>{% else
       %}–{% endif %}</span>
     <span class="gr-bnd-chev" aria-hidden="true"></span>
+    {# D3, PUNKT 2: die Hauptzahl der Zeile nennt ihr Subjekt - "congstar
+       467 € unter Vodafone" statt eines nackten Betrags in der
+       Δ-Spalte. Gebaut aus denselben Feldern wie der volle Δ-Satz im
+       Rechenweg (`k.anbieter`, `k.delta.abstand`, `k.delta.guenstiger`) -
+       keine zweite Rechnung, nur eine zweite, groessere Formulierung
+       derselben Zahl. Nur Zeilen mit einem ECHTEN Δ bekommen sie: die
+       eigene Zeile und die Näherung sagen "Referenz", eine Zeile mit
+       `delta_zustand` ("andere Laufzeit") hat kein belegtes Vorzeichen
+       und bekommt keine Hauptzahl.
+
+       Review-Fix S2 (blockierender Befund): unter der Wesentlichkeits-
+       Schwelle (`geraete_vergleich.WESENTLICH_EURO`/`_PROZENT`, gelesen
+       ueber das schon berechnete `k.delta.ungefaehr` - Clean Code 1,
+       hier wird nichts nachgerechnet) behauptet die Hauptzahl KEINE
+       Fuehrerschaft mehr ("congstar 8,00 € unter Vodafone" fett bei einem
+       Abstand, den die Nachbarzeile im Rechenweg selbst als "≈ 8,00 €"
+       fuehrt), sondern uebernimmt deren "≈"-Zeichen - EINE Regel: das
+       "≈ " steht bedingt VOR dem Betrag, "unter"/"über" bleibt fuer
+       beide Faelle dieselbe Formulierung. Ohne Abstand (Gleichstand,
+       `betrag == 0`) bleibt "entspricht Vodafone" wie bisher. Kein
+       Prozentanteil hier (anders als urspruenglich erwogen, S3 PUNKT 3):
+       er stuende dann ein drittes Mal auf der Zeile, siehe den Kommentar
+       an der Δ-Spalte oben. #}
+    {% if k.delta and k.delta.betrag is not none %}
+    <strong class="gr-bnd-subjekt">{{ k.anbieter }}{% if k.delta.ungefaehr
+      and not k.delta.abstand %} entspricht Vodafone{% else %} {% if
+      k.delta.ungefaehr %}≈ {% endif %}{{ k.delta.abstand | euro }} {{
+      'unter' if k.delta.guenstiger else 'über' }} Vodafone{% endif
+      %}</strong>
+    {% endif %}
   </summary>
   {# P4-Fix (Sicht-Pruefung 18.09., Kriterium 13 / FM 4): der Aufklapp-
      Inhalt steht im <template> und wird von app.js ERST BEIM OEFFNEN
@@ -102,6 +173,23 @@
   {% if k.belastbar %}
     <p class="gr-bnd-rw-z">{{ k.label }} {{ k.gesamt | euro }} · Ø {{
       k.schnitt_monat | euro }}/Monat</p>
+    {# D3, PUNKT 4: der Zerlegungsbalken - Segmente aus `k.zerlegung`
+       (`geraete_tco_karten.zerlegung_balken()`, liest nur, was `tco_24()`
+       schon gerechnet hat). Die Restschuld-Segmente (`offen`) sind
+       schraffiert: sichtbar, dass dieser Teil erst nach Monat 24 faellig
+       wird, aber IN der Summe steckt. Die Breiten sind Prozentanteile an
+       `k.gesamt` - die Summe der `betrag`-Felder ist per Konstruktion
+       genau diese Zahl, hier wird nichts addiert. Rein dekorativ
+       (`aria-hidden`): dieselben Posten stehen textlich in der Liste
+       darunter, ein zweites Mal vorgelesen waere Wiederholung. #}
+    {% if k.zerlegung %}
+    <div class="gr-bnd-zerl" aria-hidden="true">
+      {% for seg in k.zerlegung %}<span
+        class="gr-bnd-zerl-seg{% if seg.offen %} gr-bnd-zerl-seg--offen{% endif %}"
+        style="width:{{ seg.pct }}%"
+        title="{{ seg.name }}: {{ seg.betrag | euro }}"></span>{% endfor %}
+    </div>
+    {% endif %}
     {% if k.geraetepreis_art == 'finanzierung' or k.geraetepreis is none %}
     <p class="gr-bnd-rw-bar">Gerät ohne Vertrag: bei {{ k.anbieter }} nicht
     erhoben{% if k.geraetepreis_art == 'finanzierung' %} – die Finanzierung
