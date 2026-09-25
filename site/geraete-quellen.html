@@ -86,7 +86,7 @@
   <h2 class="rubrik">Alle beobachteten Anbieter
     <span class="rubrik-zahl">21</span></h2>
   <div class="t-bilanz-reihe">
-    <div class="t-kennzahl"><b>5</b><span>liefern Geräte</span></div>
+    <div class="t-kennzahl"><b>8</b><span>liefern Geräte</span></div>
     <div class="t-kennzahl"><b>36</b><span>abgefragte Einstiegsseiten</span></div>
     <div class="t-kennzahl"><b>2</b><span>ohne Hardware-Vermarktung</span></div>
   </div>
@@ -197,7 +197,7 @@
     liefert
     
   </td>
-  <td class="num">26</td>
+  <td class="num">28</td>
   <td class="gr-grund">
     
     
@@ -250,14 +250,16 @@
   <td><code>ldjson</code></td>
   <td>
     
-    <span class="sdot unbekannt"></span> heute nicht gelesen
+    
+    <span class="sdot ok"></span>
+    liefert
     
   </td>
   <td class="num">2</td>
   <td class="gr-grund">
     
     
-    <b>zuletzt vollständig gelesen am 12.09.2026</b>
+    
     
     
     Derselbe Shop-Betreiber wie Medimax - gleiche Sitemap-Struktur, gleiche Kategorie-IDs, gleiches ld+json-Schema, gleiche Besuchszeit. Ihre Preise sind kein unabhängiger zweiter Marktpunkt.
@@ -365,7 +367,7 @@
     liefert
     
   </td>
-  <td class="num">69</td>
+  <td class="num">70</td>
   <td class="gr-grund">
     
     
@@ -418,16 +420,18 @@
   <td><code>ldjson</code></td>
   <td>
     
-    <span class="sdot fail"></span> heute unvollständig erfasst
+    
+    <span class="sdot ok"></span>
+    liefert
     
   </td>
-  <td class="num">149</td>
+  <td class="num">133</td>
   <td class="gr-grund">
-    <b>mobilcom-debitel: heute unvollständig erfasst – 92 Zeilen, am 23.09.2026 waren es 133 (31 % weniger).</b>
     
     
     
-    <span class="gr-luecke">7 verlinkte Produktseiten gibt es nicht mehr</span>
+    
+    <span class="gr-luecke">9 verlinkte Produktseiten gibt es nicht mehr</span>
     mobilcom-debitel.de leitet vollständig auf freenet.de - es ist derselbe Shop. Die Produktseite trägt neben dem Hauptangebot bis zu sieben Varianten mit eigenem Preis und eigener Farbe unter isSimilarTo, also genau die Granularität, die ein SKU-Radar braucht.
     
     <span class="gr-einstiege"><a href="https://www.freenet.de/sitemap.xml" rel="noopener">Sitemap (Smartphones ohne Vertrag)</a></span>
@@ -445,14 +449,16 @@
   <td><code>congstar_next</code></td>
   <td>
     
-    <span class="sdot unbekannt"></span> heute nicht gelesen
+    
+    <span class="sdot ok"></span>
+    liefert
     
   </td>
   <td class="num">163</td>
   <td class="gr-grund">
     
     
-    <b>zuletzt vollständig gelesen am 22.09.2026</b>
+    
     
     
     Messrunde 31.08.2026: DER EINE Discount-Anbieter im Telekom-Netz mit belegbarem Preis ohne Vertrag - die Telekom selbst steht nicht in dieser Datenbank, weil ihr Gerätepreis nur als Ratenzahlung ausgewiesen wird (nicht, wie hier bis zum 03.09.2026 stand, wegen ihrer AWS-WAF: die ist zwar vorhanden, blockiert den Abruf aber nicht - siehe Eintrag beim Anbieter Telekom). congstar trifft Apple, Samsung, Google UND Xiaomi (Google fehlte bisher ganz). Der Befund vom 30.08.2026 (ld+json traegt nur den Einmalpreis IM TARIFBUENDEL, ohne Speichergroesse) bleibt fuer das ld+json richtig - dieser Adapter liest es deshalb NICHT. Der Geraetepreis ohne Vertrag steht stattdessen im Next.js-Flight-Payload der Produktseite (`self.__next_f.push([1,&#34;…&#34;])`), je Variante unter `prices.paymentVariants[]`, im Eintrag mit `type == &#34;ONE_TIME_PURCHASE&#34;` UND `contractDuration == 0`, dessen Wert `oneTime.listed`. DIE FALLE: derselbe Knoten traegt auch `oneTime.discounted` - einen Rabatt, der laut der Fussnote &#34;bei Abschluss der ANF M&#34; entsteht, also an einen TARIFABSCHLUSS gebunden ist. Gemessen an vier Belegdateien: iPhone 17 256GB listed 919,00 EUR (discounted waere 811), Galaxy S25 128GB 699,00 (519), Pixel 11 256GB 991,00 (757), Redmi Note 17 Pro 256GB 477,00 (225) - Abstand bis 252 EUR, discounted haette congstar in jedem der vier Faelle faelschlich als Preisfuehrer gezeigt. OFFEN: dass das Geraet auch WIRKLICH ganz ohne SIM-Vertrag zu diesem Preis zu haben ist, ist nicht statisch bewiesen - die Kauflabels rendert React im Browser nach. Belegt ist `contractDuration: 0`, `recurring.listed: 0`, und der Marktvergleich stuetzt es (919/699/ 991/477 gegen Vodafones 949,90/849,90/999,90/499,90 fuer dieselben Geraete - dieselbe Groessenordnung, nicht der Sprung, den ein versteckter Tarifzwang verursachen wuerde). BUENDEL SEIT B3 (08.09.2026): Die Geraet-x-Tarif-Kombinatorik steht NICHT auf der Geräteseite (deren Zahlweisen tragen nur die Hardware), sondern auf den vier Tarifseiten unter /handytarife/allnet-flat-tarife/ - serverseitig im selben Flight-Payload unter prefetchedPlan.variants[] mit Tarifpreis, Bereitstellungspreis und je Geraet den Ratenzahlweisen. Die vier Adressen nennt congstar selbst in der sitemap pages.xml; eine Postpaid-Seite allnet-flat-xl existiert dort nicht (XL laeuft nur als Pflichtblatt) - das ist eine Messgrenze, keine Luecke. Im Buendel gilt der Rabatt (`discounted`), fuer den Barpreis gilt `listed` - beides mit Begründung im Modulkopf von congstar.py. Der Tarifbezug läuft ueber die Nummer des Pflichtblatts (PlanVariant 540 verlinkt Produktinformationsblatt_540.pdf, der Bestandssatz dieselbe Adresse) - das Pendant zum &#34;Handy hinzufügen&#34;-Slug der o2-Kachel. robots.txt gemessen 08.09.2026: offen, kein Crawl-delay, keine Besuchszeit.
@@ -706,6 +712,62 @@
   
 </section>
 
+
+<section class="gr-methode" id="methodik">
+  <h2 class="rubrik">Wie die Geräteseite rechnet und gruppiert</h2>
+  <ul class="list-card gr-methodenliste">
+    <li class="list-row"><span class="list-row-date">Zeitreihe</span>
+      <span>Ein fehlender Punkt heißt: dieser Anbieter hatte an dem Tag
+      kein Bündel in diesem Band – Linien verbinden nur echte
+      Messungen.</span></li>
+    <li class="list-row"><span class="list-row-date">Ohne Tarifband</span>
+      <span>Unbegrenzte Tarife und Tarife ohne erhobenes Datenvolumen
+      gehören zu keinem der drei Bänder – sie stehen als eigene Gruppe
+      unter der Bandliste, nicht heimlich in einem Band.</span></li>
+    <li class="list-row"><span class="list-row-date">Radar-Grafik</span>
+      <span>Balkenlänge = Abstand in Euro zum Vodafone-Preis (Neugeräte,
+      ohne Vertrag); negativ heißt, der Wettbewerber ist günstiger. Die
+      Preis-Alarme zeigen denselben Abstand als Betrag.</span></li>
+    <li class="list-row"><span class="list-row-date">Modell-Liste</span>
+      <span>Kosten über 24 Monate: jede Zeile ein Modell, gerechnet gegen
+      Vodafone im selben Tarifband (Klein/Mittel/Groß nach Datenvolumen,
+      siehe <a href="tarife.html">Tarifübersicht</a>). Oben
+      stehen die Geräte, bei denen Vodafone am stärksten zurückliegt; ein
+      Klick auf eine Zeile zeigt alle Anbieter des Modells. Abweichung je
+      Zeile = Wettbewerber-Kosten über 24 Monate gegen die Vodafone-Karte
+      im selben Tarifband; „VF" in den Detailzeilen nennt dieselbe
+      Vodafone-Kosten-Basis im selben Band.</span></li>
+    <li class="list-row"><span class="list-row-date">Ab-Preis</span>
+      <span>Der „ab"-Preis bei Geräten, die nur Wettbewerber führen,
+      nennt den günstigsten Anbieter, der das Gerät führt.</span></li>
+    <li class="list-row"><span class="list-row-date">Händler</span>
+      <span>Fachhändler verkaufen ohne eigenen Tarif – gezählt wird der
+      reine Barpreis ohne Vertrag und ohne Tarif gegen Vodafones
+      Gerätepreis, dieselbe %-Formel wie bei den Netzbetreibern, aber nie
+      gegen eine TCO gerechnet.</span></li>
+    <li class="list-row"><span class="list-row-date">Generationen</span>
+      <span>Ein Wettbewerber, der das Vorjahresmodell im Regal lässt, hat
+      einen Preiseinstieg, ohne den Preis des neuen Geräts anzufassen.
+      Gezählt werden Jahrgänge, nicht Varianten: iPhone 17, 17 Pro und 17
+      Pro Max sind ein Jahrgang, acht Farben eines Modells sind ein
+      Regalplatz.</span></li>
+    <li class="list-row"><span class="list-row-date">Seit dem Nachfolger</span>
+      <span>Zählt die Tage seit dem Marktstart des Nachfolgers. Wo die
+      eigene Beobachtung erst später begann, ist ein Teil dieser Tage
+      eine Annahme aus dem Katalogdatum, keine Messung.</span></li>
+    <li class="list-row"><span class="list-row-date">Preis-Alarme</span>
+      <span>Verglichen werden ausschließlich Neugeräte ohne
+      Tarifvertrag, jeweils der günstigste Preis je Laden. Wo ein
+      Anbieter das Gerät nur gegen Ratenzahlung abgibt, steht der
+      Gesamtbetrag der Raten in der Spalte – erkennbar an der Ratenzahl,
+      kein Barpreis.</span></li>
+    <li class="list-row"><span class="list-row-date">Katalog</span>
+      <span>Eine Zeile je Modell; der Umschalter darüber wählt
+      Einzelgerätpreis oder Kosten über 24 Monate. Alle Listungen des
+      Modells stehen unter der Zeile.</span></li>
+  </ul>
+</section>
+
 <section class="gr-methode">
   <h2 class="rubrik">Wie beschafft wird</h2>
   <ul class="list-card gr-methodenliste">
@@ -748,7 +810,7 @@
   Gerätekatalog und in der CSV-Tabelle – beide zeigen den Bestand, nicht die
   geprüfte Auswahl. Ein Preis, der sich nicht belegen lässt, verschwindet
   nicht; er wird nur nicht gegen einen anderen gerechnet.</p>
-  <p class="gr-erklaer">601 Preiszeilen geprüft,
+  <p class="gr-erklaer">588 Preiszeilen geprüft,
   25 aus dem Vergleich genommen,
   5 Auffälligkeiten notiert.</p>
   
