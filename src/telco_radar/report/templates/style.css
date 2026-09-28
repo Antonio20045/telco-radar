@@ -3068,9 +3068,16 @@ b,strong{font-weight:700}
 .gr-bnd-delta,.gr-bnd-bar{text-align:right;font-family:var(--sans);
   font-size:13px;color:var(--ink-2)}
 .gr-bnd-delta{white-space:nowrap}
-.gr-bnd-chev{text-align:right;color:var(--ink-4);font-family:var(--sans)}
-.gr-bnd:not([open]) .gr-bnd-chev::before{content:"+"}
-.gr-bnd[open] .gr-bnd-chev::before{content:"−"}
+/* EIN Aufklappzeichen je Bündelzeile (28.09.2026): bis hierhin trug die
+   Zeile das „+" der Chevron-Zelle UND das rote „▾" der Tafel-Regel
+   (`.gr-tafel summary::after`), das als eigenes Grid-Element in eine
+   neue Zeile unter den Anbieternamen rutschte. Jetzt IST das ::after das
+   Zeichen und sitzt in der Chevron-Spalte; die leere `.gr-bnd-chev`
+   bleibt im Markup (Fixtures kennen sie), nimmt aber keinen Platz. */
+.gr-bnd-chev{display:none}
+.gr-tafel .gr-bnd>summary::after{content:"+";grid-column:6;grid-row:1;
+  justify-self:end;margin:0;font-size:inherit;color:var(--ink-4)}
+.gr-tafel .gr-bnd[open]>summary::after{content:"−"}
 .gr-bnd-rw{margin:0 6px 12px;padding:10px 14px;background:var(--paper-2);
   border-left:1px solid var(--rule-2);border-right:1px solid var(--rule-2);
   border-bottom:1px solid var(--rule-2);font-size:13px;color:var(--ink-2);
@@ -3101,9 +3108,8 @@ b,strong{font-weight:700}
 .gr-haendlerzeile b{color:var(--ink);font-weight:700}
 
 /* Auf dem Telefon werden die Zeilen GESTAPELT, nicht gequetscht (derselbe
-   Grundsatz wie am Graphen): Anbieter und TCO oben, Tarif und Gerät darunter,
-   Delta und Chevron in der dritten Reihe. Die Zahlenspalten richten sich
-   rechts aus, weil sie unten rechts im Stapel landen. */
+   Grundsatz wie am Graphen): Anbieter und TCO je eine Reihe, dann Tarif
+   und Gerätepreis, zuletzt Delta (links) und Aufklappzeichen (rechts). */
 @media (max-width:900px){
   .gr-bnd-kopf{display:none}
   .gr-bnd{border-left-width:3px}
@@ -3123,7 +3129,7 @@ b,strong{font-weight:700}
      und das Abzeichen (na"chste Regel) bekommt die GANZE Zeilenbreite
      statt nur die halbe. */
   .gr-bnd summary{
-    grid-template-columns:1fr auto;row-gap:3px;
+    grid-template-columns:minmax(0,1fr) auto;row-gap:3px;
     grid-template-areas:"an an" "tco tco" "tar bar" "dl chev"}
   .gr-bnd-an{grid-area:an;min-width:0}
   /* I (QA-Fix 24.09.2026): DAS ABZEICHEN BEKOMMT DIE VOLLE ZEILENBREITE.
@@ -3155,7 +3161,17 @@ b,strong{font-weight:700}
      vor "Referenz" und "–" steht es nicht, die Klasse setzt das Makro. */
   .gr-bnd-delta--wert::before{content:"Δ ";font-family:var(--sans);
     color:var(--ink-4)}
-  .gr-bnd-chev{grid-area:chev}
+  .gr-tafel .gr-bnd>summary::after{grid-area:chev}
+  /* Der zweite Euro-Betrag der Zeile ist der Gerätepreis ohne Vertrag -
+     mobil fehlt der Spaltenkopf, also steht sein Name davor (wie das
+     Δ-Praefix eine Zeile darunter). Nur vor einer Zahl, nicht vor „–". */
+  .gr-bnd-delta{text-align:left}
+  /* Eigene Zeile über der Zahl: inline stand „ohne Vertrag 1.225,00 €"
+     ungebrochen ~140 px breit neben dem Tarif und schob die Zeile bei
+     360 px über den Rand. */
+  .gr-bnd-bar--wert{white-space:nowrap}
+  .gr-bnd-bar--wert::before{content:"ohne Vertrag";display:block;
+    font-family:var(--sans);font-size:12px;color:var(--ink-4)}
   .gr-bnd-rw{margin:0 0 12px;padding:10px 12px}
 }
 /* Der Leer-Satz der Antwortzeile steht INNERHALB von .gr-antwort, die

@@ -189,3 +189,19 @@ def test_die_buendelkarte_nennt_einmalzahlung_und_bereitstellung(tmp_path):
     # (derselbe _baue-Aufruf ohne die zwei Parameter); die offene
     # Einmalzahlung steht als benannte Luecke im Rechenweg, nicht als 0,00
     # in der Finanzzeile.
+
+
+def test_nur_der_barpreis_traegt_das_ohne_vertrag_etikett(tmp_path):
+    """28.09.2026: mobil fehlt der Spaltenkopf, deshalb steht vor dem
+    Gerätepreis ohne Vertrag sein Name (CSS an `gr-bnd-bar--wert`). Eine
+    Finanzierungssumme darf diese Klasse nicht tragen, sonst läse man
+    „ohne Vertrag 613,00 € Finanzierung gesamt"."""
+    s = _baue(tmp_path)
+    zellen = s.select("#tafel-tco .gr-bnd .gr-bnd-bar")
+    fin = [z for z in zellen if "Finanzierung gesamt" in z.get_text()]
+    bar = [z for z in zellen if "Finanzierung gesamt" not in z.get_text()
+           and z.get_text(strip=True).endswith("€")]
+    # Gegenprobe: die Fixture hat beide Arten.
+    assert fin and bar, [z.get_text(" ", strip=True) for z in zellen]
+    assert all("gr-bnd-bar--wert" not in z["class"] for z in fin)
+    assert all("gr-bnd-bar--wert" in z["class"] for z in bar)
