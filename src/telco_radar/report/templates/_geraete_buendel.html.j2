@@ -128,8 +128,10 @@
        Barpreis heisst "Gerätepreis", die tarifabhängige Summe aus Zuzahlung
        und allen Raten heisst "Finanzierung gesamt" (P1/TCO-1) - die Spalte
        sagt die Zahl beim Namen, statt beide "Gerät" zu nennen. #}
-    <span class="gr-bnd-bar">{% if k.geraetepreis is not none and
-      k.geraetepreis_art == 'barpreis' %}{{ k.geraetepreis | euro }}{% elif
+    {% set ist_barpreis = k.geraetepreis is not none and
+      k.geraetepreis_art == 'barpreis' %}
+    <span class="gr-bnd-bar{% if ist_barpreis %} gr-bnd-bar--wert{% endif
+      %}">{% if ist_barpreis %}{{ k.geraetepreis | euro }}{% elif
       k.geraetepreis is not none %}{{ k.geraetepreis | euro }} <em
       class="gr-bnd-label gr-bnd-label--fin">Finanzierung gesamt</em>{% else
       %}–{% endif %}</span>

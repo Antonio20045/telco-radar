@@ -487,6 +487,91 @@ def test_die_balkenwerte_links_laufen_nicht_in_die_modellnamen(ctx):
     finally:
         s.close()
 
+
+@pytest.mark.parametrize("breite", [1440, 390])
+def test_jede_buendelzeile_traegt_genau_ein_aufklappzeichen(ctx, breite):
+    """28.09.2026: jede Bündelzeile trug zwei Aufklappzeichen - das „+"
+    der Chevron-Zelle und das rote „▾" der Tafel-Regel, das als eigenes
+    Grid-Element in eine neue Zeile unter den Anbieternamen rutschte.
+    Gemessen: das ::after der Zeile IST das „+"/„−" und sitzt in der
+    Chevron-Spalte, die Chevron-Zelle nimmt keinen Platz; geöffnet steht
+    „−" (nicht das „▴" der Tafel-Regel), wieder zu „+"."""
+    _site, wurzel, browser = ctx
+    s = browser.new_page(viewport={"width": breite, "height": 900})
+    try:
+        s.goto(f"{wurzel}/geraete.html", wait_until="load")
+        s.wait_for_timeout(300)
+        lies = """() => [...document.querySelectorAll(
+            '#tafel-tco details.gr-bnd')].filter(d => d.offsetParent)
+          .map(d => {
+            const su = d.querySelector(':scope>summary');
+            const nach = getComputedStyle(su, '::after');
+            const chev = d.querySelector('.gr-bnd-chev');
+            return {inhalt: nach.content, spalte: nach.gridColumnStart,
+                    zeile: nach.gridRowStart,
+                    chev: chev ? getComputedStyle(chev).display : 'none'};
+          })"""
+        m = s.evaluate(lies)
+        # Gegenprobe: es gibt sichtbare Bündelzeilen.
+        assert m, "keine sichtbare Bündelzeile"
+        for z in m:
+            assert z["inhalt"] == '"+"', z
+            assert z["chev"] == "none", z
+            if breite > 900:
+                assert z["spalte"] == "6" and z["zeile"] == "1", z
+            else:
+                assert z["spalte"] == "chev", z
+        erste = s.locator("#tafel-tco details.gr-bnd > summary").first
+        erste.click()
+        s.wait_for_timeout(150)
+        assert s.evaluate(lies)[0]["inhalt"] == '"−"'
+        erste.click()
+        s.wait_for_timeout(150)
+        assert s.evaluate(lies)[0]["inhalt"] == '"+"'
+    finally:
+        s.close()
+
+
+@pytest.mark.parametrize("breite", [390, 360, 320])
+def test_der_zweite_preis_der_buendelzeile_ist_am_telefon_benannt(ctx, breite):
+    """Mobil fehlt der Spaltenkopf „Gerät ohne Vertrag" - der zweite
+    Euro-Betrag der Zeile stand nackt neben dem Tarif. Jetzt steht sein
+    Name als eigene Zeile darüber, vor „–" steht nichts. Die Zeile läuft auch bei 320 px nicht über, und
+    das Δ steht links wie sein Präfix."""
+    _site, wurzel, browser = ctx
+    s = browser.new_page(viewport={"width": breite, "height": 844})
+    try:
+        s.goto(f"{wurzel}/geraete.html", wait_until="load")
+        s.wait_for_timeout(300)
+        m = s.evaluate("""() => [...document.querySelectorAll(
+            '#tafel-tco details.gr-bnd')].filter(d => d.offsetParent)
+          .map(d => {
+            const su = d.querySelector(':scope>summary');
+            const bar = su.querySelector('.gr-bnd-bar');
+            const dl = su.querySelector('.gr-bnd-delta');
+            const rechts = Math.max(...[...su.querySelectorAll('*')]
+              .map(e => e.getBoundingClientRect().right));
+            return {text: bar.textContent.trim(),
+                    vor: getComputedStyle(bar, '::before').content,
+                    ausrichtung: getComputedStyle(dl).textAlign,
+                    ueber: rechts - su.getBoundingClientRect().right};
+          })""")
+        quer = s.evaluate("document.documentElement.scrollWidth")
+        assert quer <= breite, f"die Seite rollt waagerecht: {quer} px"
+        zahlen = [z for z in m if z["text"].endswith("€")]
+        # Gegenprobe: es gibt Barpreis-Zeilen (die Finanzierungs-Variante
+        # hält test_geraete_tco_terminologie am Markup fest).
+        assert zahlen, m
+        for z in m:
+            assert z["ueber"] <= 1, z
+            assert z["ausrichtung"] in ("left", "start"), z
+            if z["text"].endswith("€"):
+                assert z["vor"] == '"ohne Vertrag"', z
+            else:
+                assert z["vor"] in ("none", "normal"), z
+    finally:
+        s.close()
+
 def test_die_erste_balkenzeile_bleibt_ueber_der_telefon_falz(ctx):
     """11c am eigenen Maß: Untertitel + vierter Reiter kosten Höhe über
     der ersten Balkenzeile — die Leitantwort (A1) geht vor. Der Entwurfs-
