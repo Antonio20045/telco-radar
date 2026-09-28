@@ -152,8 +152,10 @@ def _reihe(s):
           const a = document.querySelector('#tafel-tco .gr-zr-antwort');
           return a ? Math.round(a.getBoundingClientRect().bottom) : null;})(),
         kopf: (() => {
-          const k = document.querySelector('#tafel-tco .gr-zr-messtage');
-          return k ? Math.round(k.getBoundingClientRect().bottom) : null;})(),
+          // Graphkopf = Oberkante des Graph-Abschnitts (die Messtag-Zeile
+          // ist am 28.09.2026 gefallen, die Achse traegt die Tage).
+          const k = document.querySelector('#tafel-tco .gr-zr-graph');
+          return k ? Math.round(k.getBoundingClientRect().top) : null;})(),
       };
     }""")
 

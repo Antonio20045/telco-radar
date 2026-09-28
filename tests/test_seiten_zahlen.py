@@ -1942,9 +1942,14 @@ def test_die_kartenzahlen_stehen_wortlich_auf_der_seite(tmp_path):
                 if s["ab_monat"]:
                     assert s["ab_monat"] in text, \
                         f"Ø/Monat {s['ab_monat']} ({band}) fehlt auf {k['id']}"
-            if s["delta_text"]:
+            # 28.09.2026: die Bewegung steht nur noch, wenn sich wirklich
+            # etwas bewegt hat; „±0 € in N Tagen" bleibt von der Karte weg.
+            if s["delta_text"] and s["delta_richtung"] != "gleich":
                 assert s["delta_text"] in text, \
                     f"Bewegung {s['delta_text']} ({band}) fehlt auf {k['id']}"
+            elif s["delta_text"]:
+                assert s["delta_text"] not in text, \
+                    f"Stillstand {s['delta_text']} ({band}) steht auf {k['id']}"
 
 
 def test_keine_karte_zeigt_zahlen_die_die_aufbereitung_nicht_hat(

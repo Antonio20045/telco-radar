@@ -367,10 +367,12 @@ def _reiterhoehen(seite, wurzel: str, b: Bilanz) -> None:
         mobil.wait_for_timeout(300)
         box = mobil.evaluate("""() => {
           const a = document.querySelector('#tafel-tco .gr-zr-antwort');
-          const k = document.querySelector('#tafel-tco .gr-zr-messtage');
+          // Graphkopf = Oberkante des Graph-Abschnitts (die Messtag-Zeile
+          // ist am 28.09.2026 gefallen, die Datumsachse traegt die Tage).
+          const k = document.querySelector('#tafel-tco .gr-zr-graph');
           if (!a) return null;
           return {antwort: Math.round(a.getBoundingClientRect().bottom),
-                  kopf: k ? Math.round(k.getBoundingClientRect().bottom) : null,
+                  kopf: k ? Math.round(k.getBoundingClientRect().top) : null,
                   quer: Math.max(document.documentElement.scrollWidth,
                                  document.body.scrollWidth)};
         }""")
@@ -870,7 +872,9 @@ def main() -> int:
         # wiederauferstandenes #tafel-portfolio wäre die nächste tote
         # Tafel.
         reiter = [k.get("data-tafel") for k in gr.select(".gr-reiter [data-tafel]")]
-        erwartet = ["tafel-tco", "tafel-radar", "tafel-verlauf",
+        # 28.09.2026: die zwei Ein-Geraet-Reiter („Mit Tarif", „Ohne
+        # Vertrag") stehen nebeneinander, danach Übersicht und Katalog.
+        erwartet = ["tafel-tco", "tafel-verlauf", "tafel-radar",
                     "tafel-katalog"]
         if reiter != erwartet:
             maengel.append(f"Reiter {reiter} statt {erwartet}")

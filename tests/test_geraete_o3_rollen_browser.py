@@ -442,8 +442,12 @@ def test_details_ueber_der_falz_bleibt_es_hoechstens_einer(ctx):
         try:
             s.goto(f"{wurzel}/geraete.html", wait_until="load")
             s.wait_for_timeout(400)
+            # Buendelzeilen (`details.gr-bnd`) sind Tabellenzeilen, keine
+            # Aufklapper: seit die Kopfzeilen kuerzer sind (28.09.2026),
+            # rueckt die erste Zeile der Buendeltafel an 1440 px in die
+            # Falz. Gezaehlt werden die Aufklapper fuer Erklaerung/Datenlage.
             zahl = s.evaluate(
-                "[...document.querySelectorAll('details')]"
+                "[...document.querySelectorAll('details:not(.gr-bnd)')]"
                 ".filter(d => { const r = d.getBoundingClientRect();"
                 "              return r.top < 844 && r.bottom > 0; }).length")
             assert zahl <= 1, \

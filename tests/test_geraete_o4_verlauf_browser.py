@@ -73,6 +73,10 @@ def _baue(tmp_path):
         _listung("Vodafone", "apple-iphone-17-pro", 256, 1199.90),
         _listung("o2", "apple-iphone-17-pro", 256, 1099.00),
         _listung("1&1", "samsung-galaxy-s26", 256, 1049.00),
+        # Ein Barpreis OHNE Buendel in einem Tarifband (Pixel 11 hat nur
+        # den o2-Tarif ohne erhobenes Volumen) - der Fall des Deep-Link-
+        # Tests unten.
+        _listung("o2", "google-pixel-11", 128, 899.00),
     ]
     (state / "geraete_db.json").write_text(json.dumps({
         "updated": HEUTE,
@@ -195,10 +199,11 @@ def test_kein_zweites_barpreisbild_und_die_eigene_wahl_zaehlt(lage):
     assert zustand["svg"], "die eigene Auswahl zeichnet keinen Graphen"
     assert not zustand["g0"], zustand
     assert zustand["kacheln"], zustand
-    # 3. DER QA-FALL: Modellwechsel im VERGLEICHs-Reiter darf das Bild
-    #    dieses Reiters nicht mehr verstellen. Vor dem Fix zeigte G0
-    #    danach das Fremdmodell, während die Auswahl unten blieb, wo sie
-    #    war - zwei Bilder, widersprüchlicher Zustand.
+    # 3. EIN GERAET FUER BEIDE REITER (28.09.2026, Antonio: „ich verstehe
+    #    den Unterschied zwischen Vergleich und Preisverlauf nicht"). Der
+    #    QA-Fall von E3 bleibt ausgeschlossen - es gibt weiter nur EIN
+    #    Barpreis-Bild -, aber die Wahl im Reiter „Mit Tarif" gilt jetzt
+    #    auch hier: wer dort ein Geraet waehlt, sieht es hier ohne Vertrag.
     seite.click('.gr-reiter [data-tafel="tafel-tco"]')
     seite.wait_for_timeout(120)
     waehle_modell(seite, "samsung-galaxy-s26-256")
@@ -207,14 +212,70 @@ def test_kein_zweites_barpreisbild_und_die_eigene_wahl_zaehlt(lage):
     seite.wait_for_timeout(150)
     nachher = seite.evaluate("""() => ({
       feld: document.getElementById('gr-vsuche').value,
-      svg: !!document.querySelector('#gr-vbild svg'),
       g0: !!document.querySelector('#gr-g0-lager'),
-      g0_titel: (document.querySelector('#gr-g0-lager .gr-g0-titel')
-                 || {}).textContent || null,
+      bilder: document.querySelectorAll('#tafel-verlauf svg').length,
+      zukurz: !document.getElementById('gr-vzukurz').hidden,
     })""")
-    assert nachher["g0"] is False and nachher["g0_titel"] is None, nachher
-    assert "iPhone 17 Pro" in nachher["feld"], (
-        "die Verlaufs-Auswahl wurde von der Modellwahl des Vergleichs-"
-        f"Reiters verstellt: {nachher}")
-    assert nachher["svg"], (
-        "der Graph der eigenen Auswahl ist nach dem Reiterwechsel weg")
+    assert nachher["g0"] is False, nachher
+    assert "Galaxy S26" in nachher["feld"], (
+        'der Reiter „Ohne Vertrag" zeigt nicht das Geraet aus „Mit Tarif": '
+        f"{nachher}")
+    # Genau EIN Bild - oder, bei zu wenigen Messterminen, der benannte
+    # Satz statt eines Bildes; nie beides, nie keins von beiden.
+    assert (nachher["bilder"] == 1) != nachher["zukurz"], nachher
+
+
+def test_die_wahl_ohne_vertrag_gilt_auch_mit_tarif(lage):
+    """Gegenrichtung zu oben: ein Geraet, das in „Ohne Vertrag" gewaehlt
+    wird, steht beim Wechsel nach „Mit Tarif" dort ebenso gewaehlt - und
+    das Vorgabemodell kehrt nicht still zurueck."""
+    wurzel, seite = lage
+    _oeffne_verlauf(wurzel, seite)
+    seite.fill("#gr-vsuche", "Galaxy S26")
+    seite.wait_for_timeout(150)
+    seite.click("#gr-vtreffer li:first-child")
+    seite.wait_for_timeout(200)
+    gewaehlt = seite.evaluate(
+        "() => document.getElementById('gr-vsuche').value")
+    assert "Galaxy S26" in gewaehlt, gewaehlt
+    seite.click('.gr-reiter [data-tafel="tafel-tco"]')
+    seite.wait_for_timeout(400)
+    zustand = seite.evaluate("""() => ({
+      feld: document.getElementById('gr-zr-suche').value,
+      url: location.search,
+    })""")
+    assert "Galaxy S26" in zustand["feld"], zustand
+    assert "modell=samsung-galaxy-s26-256" in zustand["url"], zustand
+
+
+def test_ein_deep_link_ohne_buendel_bleibt_ohne_vertrag_stehen(lage):
+    """Review-Befund (28.09.2026): „Mit Tarif" schreibt beim Laden sein
+    Startgeraet in die Adresse, wenn das verlinkte Geraet dort keine
+    Buendel hat. Das ist interne Zustandsspeicherung - „Ohne Vertrag" darf
+    den Deep-Link deshalb nicht gegen dieses Startgeraet tauschen, auch
+    nicht nach einem Hin und Zurueck ueber „Mit Tarif"."""
+    wurzel, seite = lage
+    seite.goto(f"{wurzel}/geraete.html", wait_until="load")
+    seite.wait_for_timeout(300)
+    ohne = seite.evaluate("""() => {
+      const tco = JSON.parse(document.getElementById(
+        'gr-zeitreihe-daten').textContent).erlaubt;
+      const vl = JSON.parse(document.getElementById(
+        'gr-verlaufdaten').textContent);
+      const g = vl.find(x => !(tco[x.id] || []).length);
+      return g ? {id: g.id, label: g.label} : null;
+    }""")
+    assert ohne is not None, (
+        "die Fixture hat kein Geraet mit Barpreis, aber ohne Buendel - "
+        "der Test liefe ins Leere")
+    seite.goto(f"{wurzel}/geraete.html?modell={ohne['id']}",
+               wait_until="load")
+    seite.wait_for_timeout(300)
+    seite.click('.gr-reiter [data-tafel="tafel-verlauf"]')
+    seite.wait_for_timeout(200)
+    assert seite.input_value("#gr-vsuche") == ohne["label"]
+    seite.click('.gr-reiter [data-tafel="tafel-tco"]')
+    seite.wait_for_timeout(200)
+    seite.click('.gr-reiter [data-tafel="tafel-verlauf"]')
+    seite.wait_for_timeout(200)
+    assert seite.input_value("#gr-vsuche") == ohne["label"]

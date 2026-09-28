@@ -122,9 +122,11 @@ def test_am_telefon_steht_die_antwort_ueber_der_falz(telefon):
     s, _ = telefon
     box = s.evaluate("""() => {
       const a = document.querySelector('#tafel-tco .gr-zr-antwort');
-      const m = document.querySelector('#tafel-tco .gr-zr-messtage');
+      // Seit dem Wegfall der Messtag-Zeile (28.09.2026, Achse traegt die
+      // Tage) ist der Graphkopf die Oberkante des Graph-Abschnitts.
+      const m = document.querySelector('#tafel-tco .gr-zr-graph');
       return {antwort: a ? Math.round(a.getBoundingClientRect().bottom) : null,
-              kopf: m ? Math.round(m.getBoundingClientRect().bottom) : null,
+              kopf: m ? Math.round(m.getBoundingClientRect().top) : null,
               quer: Math.max(document.documentElement.scrollWidth,
                              document.body.scrollWidth)};
     }""")

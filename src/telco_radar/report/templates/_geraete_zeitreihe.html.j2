@@ -48,9 +48,6 @@
      eine 36-Monats-Kurve liegt. #}
   <section class="gr-zr-graph" aria-label="{{ p.graph_beschriftung
       or 'Kosten je Messtag und Anbieter' }}">
-    <div class="gr-zr-kopf">
-      <span class="gr-zr-messtage" id="gr-zr-messtag">{{ p.messtage_text }}</span>
-    </div>
     {% if p.svg_breit %}
     {{ p.legende_html | safe }}
     {# D4a (24.09.2026): der Lesehilfe-Satz „Ein fehlender Punkt heißt …"

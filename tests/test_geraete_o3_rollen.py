@@ -78,10 +78,10 @@ def test_die_reiterfolge_ist_vergleich_radar_verlauf_katalog(geraete):
     rollen = [(e.get("data-tafel"), e.get_text(strip=True))
               for e in eintraege if e.name == "button"]
     assert rollen == [
-        ("tafel-tco", "Vergleich"),
-        ("tafel-radar", "Radar"),
-        ("tafel-verlauf", "Preisverlauf"),
-        ("tafel-katalog", "Gerätekatalog"),
+        ("tafel-tco", "Mit Tarif"),
+        ("tafel-verlauf", "Ohne Vertrag"),
+        ("tafel-radar", "Übersicht"),
+        ("tafel-katalog", "Katalog"),
     ], rollen
     assert geraete.select_one(".gr-reiter a") is None, \
         "die Reiterleiste trägt noch einen Link statt der vier Tafeln"

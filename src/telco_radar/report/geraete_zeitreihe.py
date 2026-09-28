@@ -669,7 +669,7 @@ def _leitzahl_html(zeilen: list) -> str | None:
     # selbst fuehrt - "unter" heisst guenstiger (Buendel-Karten S4).
     delta = round(eigen["gesamt"] - beste["gesamt"], 2)
     return (f"<b class='gr-leit-zahl'>{_euro(delta)}</b>"
-            f"<span class='gr-leit-label'>unter der Vodafone-Referenz "
+            f"<span class='gr-leit-label'>unter Vodafone "
             f"({_euro(eigen['gesamt'])}"
             f"{', Näherung' if eigen.get('naeherung') else ''})</span>")
 
@@ -1756,7 +1756,7 @@ def _svg(anbieter_serien: dict, breit: bool,
         _label(letzte, "gr-zr-wert", -10, "end")
 
     # Die Endnamen: je Anbieter ein Beleg-Link (↗ + Abrufdatum), Vodafone
-    # mit „unser Angebot" - untereinander kollisionsfrei, vom teuersten
+    # in Rot - untereinander kollisionsfrei, vom teuersten
     # Ende nach unten geordnet (die Reihenfolge des Prototyps: nach y).
     #
     # B-Fix (Review 24.09.2026, S1): AUCH EIN-PUNKT-ANBIETER BEKOMMEN EIN
@@ -1781,11 +1781,9 @@ def _svg(anbieter_serien: dict, breit: bool,
     letzte_y = -99.0
     for x, y, a in enden:
         # Der Stapelabstand richtet sich nach dem BEDARF des Eintrags:
-        # Vodafone traegt Name, "unser Angebot" und Datum (drei Zeilen),
-        # die anderen Name und Datum (zwei) - am schmalen Bild ohne
-        # Wert-Labels ist der Grundabstand etwas enger.
-        bedarf = ((56 if not breit else 46) if a == EIGEN else
-                  (44 if not breit else 46))
+        # Jeder Eintrag traegt Name und Datum (zwei Zeilen) - am
+        # schmalen Bild ohne Wert-Labels ist der Grundabstand etwas enger.
+        bedarf = 44 if not breit else 46
         # P0-B-z1: die Zeitraum-Zeile braucht ihre eigenen Einheiten im
         # Stapel - sonst schiebt sie sich unter das Abrufdatum. Sie
         # steht bei ALLEN Kurven des Bildes oder bei keiner (siehe
@@ -1824,14 +1822,9 @@ def _svg(anbieter_serien: dict, breit: bool,
             teile.append(f"<text class='gr-zr-datum gr-zr-mon' "
                          f"x='{lx:.1f}' y='{ty + 17:.1f}' "
                          f"text-anchor='end'>{_esc(mon_text)}</text>")
-        chip = 13 if a == EIGEN else 0
-        if a == EIGEN:
-            teile.append(f"<text class='gr-zr-chip' x='{lx:.1f}' "
-                         f"y='{ty + 17 + mon:.1f}' text-anchor='end'>"
-                         f"unser Angebot</text>")
         if datum:
             teile.append(f"<text class='gr-zr-datum' x='{lx:.1f}' "
-                         f"y='{ty + 17 + mon + chip:.1f}' "
+                         f"y='{ty + 17 + mon:.1f}' "
                          f"text-anchor='end'>{_datum_kurz(datum)}</text>")
     teile.append("</svg>")
     return "".join(teile)
@@ -1953,8 +1946,6 @@ def _legende_html(anbieter_serien: dict, zeitraeume: dict | None = None) -> str:
         if mon_text:
             zusatz += (f" <span class='gr-zr-leg-ab gr-zr-leg-mon'>· "
                        f"{_esc(mon_text)}</span>")
-        if anbieter == EIGEN:
-            zusatz += " <span class='gr-zr-leg-ab'>· unser Angebot</span>"
         eintraege.append(
             f"<span><i style='background:{_zr_marker_farbe(anbieter)}'></i>"
             f"{_esc(anbieter)}{zusatz}</span>")
@@ -2137,12 +2128,6 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
                 # Delta - dann gibt es keine Leitzahl-Zeile, s. Docstring).
                 "leitzahl_html": _leitzahl_html(zeilen),
                 "rechnung_html": _rechnung_html(zeilen),
-                "messtage_text": (f"Messtage: {_tag_monat(tage[0])} bis "
-                                  f"{_tag_monat(tage[-1])} "
-                                  f"({len(tage)}"
-                                  + (" Messung)" if len(tage) == 1
-                                     else " Messungen)"))
-                if (tage := _messtage(serien)) else "",
                 "legende_html": _legende_html(serien, zeitraeume),
                 # P0-B (22.09.2026, LEAD): der zugaengliche Name der
                 # GRAFIK-SEKTION stand bis hierher fest in der Vorlage

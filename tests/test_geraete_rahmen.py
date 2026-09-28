@@ -184,6 +184,8 @@ def test_die_grafik_nennt_nur_buendel_anbieter(tmp_path):
 # BRIEF_FADEN (05.09.2026, PM/Seneca): die Frage-Ueberschrift aus
 # BRIEF_RAHMEN ist gescheitert (Antonio: "Digga, spinnst du?" - flapsig,
 # "ich" mehrdeutig) und weicht der sachlichen "Gerätepreise im Vergleich".
+# Seit 28.09.2026 nur noch "Gerätepreise": "Vergleich" war zugleich der Name
+# eines Reiters (Antonio fand keinen roten Faden).
 # Dieser Test hielt bis dahin die AELTERE Entscheidung fest; er haelt jetzt
 # die neuere - derselbe Vorgang wie bei jeder umgekehrten Regel dieses
 # Projekts (CLAUDE.md §6: "eine falsche Vorgabe kassiert").
@@ -192,8 +194,8 @@ def test_die_grafik_nennt_nur_buendel_anbieter(tmp_path):
 def test_die_ueberschrift_ist_sachlich_nicht_die_gescheiterte_frage(tmp_path):
     s = _baue(tmp_path)
     h1 = s.select_one("h1")
-    assert h1.get_text(strip=True) == "Gerätepreise im Vergleich"
+    assert h1.get_text(strip=True) == "Gerätepreise"
     titel = s.select_one("title").get_text(strip=True)
-    assert "Gerätepreise im Vergleich" in titel
+    assert titel.endswith("· Gerätepreise")
     assert "Dieses Gerät" not in str(s)
     assert "wo kaufe ich es am günstigsten" not in str(s)

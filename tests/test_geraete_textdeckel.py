@@ -215,19 +215,3 @@ def test_je_summary_der_geraeteseite_zeiger_und_caret(seite):
     # Und das nackte summary außerhalb bleibt, wie es war - die Regel
     # greift nur innerhalb der Geräteseiten-Tafeln.
     assert ergebnis["nackt"]["caret"] is False, ergebnis
-
-
-def test_datenlage_behaelt_ihr_eigenes_aufklappzeichen(seite):
-    """Die +/–-Regel von .gr-vdatenlage steht SPAETER im Stylesheet und
-    gewinnt bei gleicher Spezifität - der Datenlage-Aufklapper behält
-    seine Form, statt ▾ und + gleichzeitig zu tragen. Ein ::after gibt es
-    nur einmal: verliert die Regel hier, stünde ▾ statt + da."""
-    html = f"""<!doctype html><html><head><style>{_style()}</style></head>
-    <body><div class="gr-tafel"><details class="gr-vdatenlage">
-      <summary>Datenlage</summary><p>x</p></details></div></body></html>"""
-    seite.set_content(html)
-    inhalt = seite.evaluate(
-        """() => getComputedStyle(
-              document.querySelector('.gr-vdatenlage>summary'),
-              '::after').content""")
-    assert inhalt.strip('"\'') == "+", inhalt

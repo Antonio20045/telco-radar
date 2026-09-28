@@ -256,7 +256,7 @@ def test_das_abzeichen_steht_auf_einer_zeile(zeilen):
     passt auf EINE Zeile (Rechteckhoehe ~ eine Zeilenhoehe), nicht auf
     zwei bis vier enge Zeilen gestapelt."""
     mit_marke = [z for z in zeilen if z["marke"]]
-    assert len(mit_marke) == 2, zeilen  # Vodafone + Telekom
+    assert len(mit_marke) == 1, zeilen  # Telekom (Vodafones „unser Angebot" ist am 28.09.2026 gefallen)
     for z in mit_marke:
         assert z["markeHoehe"] <= z["zeilenhoehe"] * 1.5, (
             f"das Abzeichen steht nicht auf einer Zeile: {z}")

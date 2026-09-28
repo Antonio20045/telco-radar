@@ -2215,9 +2215,7 @@ b,strong{font-weight:700}
    Die Regel gilt für die Tafel-Fläche (.gr-tafel), also alle vier
    Reiter einschließlich der P3-Zeilen-Aufklapper und der nachgezogenen
    Wochenkarte. Sie steht BEWUSST vor den spezifischen summary-Regeln
-   dieses Abschnitts: .gr-vdatenlage>summary::after weiter unten trägt
-   sein eigenes +/– und gewinnt bei gleicher Spezifität als die spätere
-   Regel - der Datenlage-Aufklapper behält seine Form. */
+   dieses Abschnitts. */
 .gr-tafel summary{cursor:pointer;list-style:none}
 .gr-tafel summary::-webkit-details-marker{display:none}
 .gr-tafel summary::marker{content:""}
@@ -2802,23 +2800,6 @@ b,strong{font-weight:700}
 .gr-vtabelle table{width:100%}
 .gr-veigen{background:var(--red-wash)}
 
-/* Der EINE Datenlage-Aufklapper am Reiterende (P2): alles Erklärende des
-   Preisverlaufs steht geschlossen hier, vor dem Suchfeld steht nur die h2.
-   cursor:pointer ist P4-Regel - ein summary ohne Zeiger sieht aus wie eine
-   Tabellenzeile (design.md: 20 von 22 Aufklappern). */
-.gr-vdatenlage{margin:22px 0 0;border-top:1px solid var(--rule)}
-.gr-vdatenlage>summary{list-style:none;cursor:pointer;display:flex;
-  align-items:baseline;gap:8px;padding:10px 0;font-family:var(--sans);
-  font-size:12px;font-weight:600;letter-spacing:.06em;
-  text-transform:uppercase;color:var(--ink-3)}
-.gr-vdatenlage>summary::-webkit-details-marker{display:none}
-.gr-vdatenlage>summary::after{content:"+";font-size:15px;color:var(--red);
-  line-height:1}
-.gr-vdatenlage[open]>summary::after{content:"–"}
-.gr-vdatenlage>summary:hover{color:var(--red)}
-.gr-vdatenlage-inhalt{padding:2px 0 14px;max-width:720px}
-.gr-vdatenlage-inhalt p{font-size:13.5px;line-height:1.6;color:var(--ink-2);
-  margin:0 0 10px}
 
 @media (max-width:760px){
   /* P2-Fix (Sicht-Prüfung 17.09.2026): DIE KURVE GEHÖRT IN DEN ERSTEN
@@ -3780,7 +3761,6 @@ td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
   font-size:13.5px;font-weight:700}
 .gr-zr-k-delta--steigt{color:var(--red)}
 .gr-zr-k-delta--sinkt{color:#2f6b3a}
-.gr-zr-k-delta--gleich{font-size:12px;color:var(--ink-4)}
 /* Die Punkte-Spalte ist selbst ein Band-Span (wechselt mit) - ihr
    flex-direction MUSS hier ausdrücklich row stehen, sonst erbt sie die
    column des Band-Koerpers und stapelt die Anbieterpunkte untereinander
@@ -3869,10 +3849,6 @@ td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
 .gr-zr-rechnung{margin:0 0 12px}
 .gr-zr-rechnung>summary{font-family:var(--sans);font-size:12px;
   letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
-.gr-zr-kopf{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;
-  margin:0 0 6px}
-.gr-zr-messtage{font-family:var(--sans);font-size:12px;font-weight:600;
-  letter-spacing:.04em;color:var(--ink-3)}
 .gr-zr-legende{display:flex;flex-wrap:wrap;gap:5px 18px;margin:2px 0 10px;
   font-family:var(--sans);font-size:12px;color:var(--ink-2)}
 .gr-zr-legende span{display:inline-flex;align-items:center;gap:6px;
@@ -3916,8 +3892,6 @@ td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
 .gr-zr-wert{font-family:var(--sans-system);font-size:13.5px;font-weight:700;
   fill:var(--ink)}
 .gr-zr-name{font-family:var(--sans-system);font-size:15px;font-weight:700}
-.gr-zr-chip{font-family:var(--sans-system);font-size:10px;font-weight:700;
-  letter-spacing:.06em;text-transform:uppercase;fill:var(--red)}
 .gr-zr-datum{font-family:var(--sans-system);font-size:10.5px;fill:var(--ink-4)}
 .gr-zr-pfeil{fill:var(--ink-4)}
 .gr-zr-bild svg a{cursor:pointer}
@@ -4055,10 +4029,8 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
     margin-bottom:0}
   .gr-zr-rechnung{margin-bottom:2px}
   .gr-zr-rechnung>summary{font-size:11px;line-height:1.1}
-  .gr-zr-kopf{margin:0}
   .gr-zr-legende{font-size:10.5px;gap:3px 12px;margin-bottom:6px}
   .gr-zr-legende i{width:8px;height:8px}
-  .gr-zr-messtage{font-size:10px}
   .gr-zr-bild svg.gr-zr--breit{display:none}
   .gr-zr-bild svg.gr-zr--schmal{display:block}
   .gr-zr-hinweis{font-size:10px}
@@ -4076,7 +4048,6 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
      genehmigten Prototyps); ihre "ab"-Werte braucht der Leser beim Lesen
      der Kurve, nicht davor. Desktop unveraendert. */
   .gr-zr-graph{display:flex;flex-direction:column}
-  .gr-zr-kopf{order:1;line-height:1.2}
   .gr-zr-bild{order:2;margin-top:0}
   .gr-zr-legende{order:3;margin:6px 0 0}
   .gr-zr-hinweis{order:4}
@@ -4091,7 +4062,6 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
   .gr-leit-zahl{line-height:1}
   .gr-leit-label{line-height:1.25}
   .gr-zr-antwort{line-height:1.26;padding-top:2px}
-  .gr-zr-messtage{line-height:1.2}
   .gr-zr-kacheln button{padding-bottom:0}
   .gr-zr-kacheln button .gr-zr-k-name{line-height:1.05}
 }

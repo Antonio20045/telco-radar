@@ -117,9 +117,11 @@ def test_der_beginn_der_tco_historie_ist_der_echte(geraete):
                 tage.add(json.loads(zeile).get("datum"))
     # Der Reiter fragt nach dem Barpreis - im Titel (S1) und ohne jeden
     # TCO-Historie-Absatz mehr.
-    titel = verlauf.select_one("h2.rubrik")
-    assert titel is not None
-    assert "Barpreis" in titel.get_text(" ", strip=True), (
+    # Seit 28.09.2026 benennt der REITER die Frage („Ohne Vertrag"); die
+    # zweite Ueberschrift darunter („Barpreis-Verlauf") ist gefallen.
+    knopf = geraete.select_one('.gr-reiter [data-tafel="tafel-verlauf"]')
+    assert knopf is not None
+    assert knopf.get_text(" ", strip=True) == "Ohne Vertrag", (
         "der Verlaufs-Reiter benennt nicht die Barpreis-Frage (E3/S1)")
     assert "TCO-24-Historie" not in text, (
         "der TCO-Historie-Absatz ist zurückgekehrt (E3/S1: Doppel-"
@@ -127,15 +129,16 @@ def test_der_beginn_der_tco_historie_ist_der_echte(geraete):
     if not tage:
         pytest.skip("keine TCO-Historie im Bestand")
     seit = min(tage)
-    # Dasselbe KURZ-Format wie die Messtag-Zeile der Zeitreihe
-    # („12.9." - `geraete_zeitreihe._tag_monat`): Der Beginn der Historie
-    # steht seit dem Wegfall des Absatzes DORT, nicht mehr hier.
+    # Dasselbe KURZ-Format wie die Datumsachse der Zeitreihe („12.9.");
+    # die Messtag-Zeile darueber ist am 28.09.2026 gefallen, die erste
+    # Achsenbeschriftung nennt den Beginn.
     _y, m, d = seit.split("-")
     erwartet = f"{int(d)}.{int(m)}."
     vergleich = geraete.select_one("#tafel-tco")
     assert vergleich is not None
-    assert erwartet in " ".join(
-        vergleich.get_text(" ", strip=True).split()), (
+    achse = [t.get_text(strip=True)
+             for t in vergleich.select(".gr-zr-xtick")]
+    assert erwartet in achse, (
         f"Der Vergleichs-Reiter nennt nicht den echten Beginn {seit} "
         f"der TCO-Historie ({erwartet!r} fehlt in der Messtag-Zeile)")
 

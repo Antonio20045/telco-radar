@@ -755,9 +755,10 @@ def test_die_geraeteseite_traegt_den_fusslink(tmp_path):
     dieselbe Antwort (Navigation 8 → 7)."""
     seiten = _seite(tmp_path)
     geraete = BeautifulSoup(seiten["geraete.html"], "html.parser")
-    fusslinks = [a.get("href") for a in geraete.select("a")
-                 if a.get("href") == "#tafel-radar"]
-    assert fusslinks, "geraete.html springt nicht in den Radar-Reiter"
+    # Seit 28.09.2026 traegt der Reiter „Übersicht" den Weg selbst; der
+    # doppelte Fusslink auf dieselbe Tafel ist gefallen.
+    knopf = geraete.select_one('.gr-reiter button[data-tafel="tafel-radar"]')
+    assert knopf is not None, "geraete.html springt nicht in den Radar-Reiter"
     assert geraete.select_one("#tafel-radar") is not None
     index = BeautifulSoup(seiten["index.html"], "html.parser")
     navlinks = [a.get("href") for a in index.select("nav a")
