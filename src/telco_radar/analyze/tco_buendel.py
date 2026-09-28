@@ -85,7 +85,7 @@ import logging
 from dataclasses import dataclass, field
 
 from ..tarif_bezug import Tarifbestand
-from ..tco_model import Buendel
+from ..tco_model import Buendel, aktionen_aus
 
 log = logging.getLogger(__name__)
 
@@ -181,6 +181,9 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str
                 # landet unten als `ungueltig` im Protokoll.
                 laufzeit_monate=satz.get("laufzeit_monate"),
                 anschlusspreis=satz.get("anschlusspreis"),
+                # P3-E3: benannte Vorteile mit Bedingung und Quelle - von
+                # keiner Kennzahl verrechnet (`tco_model.Aktion`).
+                aktionen=aktionen_aus(satz.get("aktionen")),
                 zustand=str(satz.get("zustand") or ""),
                 quelle_url=str(satz.get("quelle_url") or ""),
                 abgerufen_am=heute))

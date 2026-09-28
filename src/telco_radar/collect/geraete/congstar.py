@@ -161,7 +161,11 @@ zwei Zahlweisen sind jetzt zwei Buendel und werden auch beide abgelegt.
 `_RATENLAUFZEITEN` (24, 36) steht, `lies_buendel()` legt fuer jede
 gefundene Laufzeit einen eigenen Satz an. Die TRADE_IN-Zahlweise bleibt
 aussen vor - sie setzt die Einnahme eines Altgeraets voraus und ist damit
-kein Preis fuer einen Neuabschluss ohne Eintausch.
+kein Preis fuer einen Neuabschluss ohne Eintausch. Seit P3-E3 (28.09.2026)
+haengt sie als AKTION am Satz derselben Laufzeit (`_trade_in_aktion`,
+nicht eingerechnet), zusammen mit den Nachlaessen, die im Preis schon
+stecken (`_rabatt_aktionen`: Geraeterabatt, Grundpreisnachlass,
+geschenkter Bereitstellungspreis - jeweils mit Fussnote als Bedingung).
 
 `_RATENLAUFZEITEN` ist eine POSITIVLISTE, und sie sagt das laut (FIX3,
 21.09.2026): eine Zahlweise mit anderer Dauer - 12 oder 48 Monate, oder
@@ -216,7 +220,9 @@ from . import GeraeteAbrufFehler
 from ...geraete_model import probe_geht_auf
 # DIE EINE STELLE, die entscheidet, ob ein Rohwert eine Ratenlaufzeit IST
 # (Clean Code 1): dieselbe Pruefung, die `buendel_id` und `Buendel` lesen.
-from ...tco_model import laufzeit_in_monaten
+from ...tco_model import (AKTION_ANSCHLUSS_ERLASSEN, AKTION_GERAETERABATT,
+                          AKTION_TARIFRABATT, AKTION_TRADE_IN,
+                          laufzeit_in_monaten)
 
 log = logging.getLogger(__name__)
 
@@ -487,7 +493,93 @@ def _pib_nummer(plan: dict) -> str:
     return treffer.group(1)
 
 
-def _buendelzahlweisen(variante: dict) -> dict:
+# "... bis zum 29.09.2026 ..." -> das Aktionsende. Nur ein Datum, das der
+# Anbieter selbst nennt; eines, das so weit weg liegt, dass es keins ist
+# ("30.12.2050"), bleibt trotzdem stehen - geraten wird hier nichts.
+_BIS_ZUM_RE = re.compile(r"bis zum (\d{1,2})\.(\d{1,2})\.(\d{4})")
+
+# Die Bedingung der TRADE_IN-Zahlweise. congstar nennt sie in der Nutzlast
+# nur als `subtype`, ohne Fussnote - der Satz beschreibt den Subtyp und
+# behauptet nichts darueber hinaus (auch nicht, was `penaltyAmount` heisst).
+TRADE_IN_BEDINGUNG = "nur mit Eintausch eines Altgeräts"
+
+# Rundungsspielraum der Trade-in-Probe: unter einem halben Cent ist eine
+# Differenz Gleitkomma, kein anderer Betrag.
+_TRADE_IN_TOLERANZ_EUR = 0.005
+
+
+def _gueltig_bis(text: str) -> str:
+    treffer = _BIS_ZUM_RE.search(text or "")
+    if not treffer:
+        return ""
+    tag, monat, jahr = (int(t) for t in treffer.groups())
+    return f"{jahr:04d}-{monat:02d}-{tag:02d}"
+
+
+def _rabatt_aktionen(preis: dict, art: str, url: str) -> list[dict]:
+    """Die `discounts[]` eines congstar-Preisknotens als Aktions-Rohsaetze
+    (P3-E3). Jeder Nachlass mit Fussnote wird eine Aktion - ohne Fussnote
+    fehlt die Bedingung, und eine Aktion ohne Bedingung ist nicht
+    nachpruefbar (`tco_model.Aktion`).
+
+    Betrag: LIMITED ueber `iterations` Monate = amount x iterations (die
+    Summe ueber die Laufzeit); ONGOING ("dauerhaft") = amount je Monat.
+    `eingerechnet` folgt `ignoreForPriceCalculation`: der Adapter speichert
+    `discounted`, und darin steckt jeder Nachlass, den congstar nicht
+    ausdruecklich von der Preisrechnung ausnimmt."""
+    out: list[dict] = []
+    for rabatt in (preis or {}).get("discounts") or []:
+        if not isinstance(rabatt, dict):
+            continue
+        bedingung = str(rabatt.get("footnoteText") or "").strip()
+        betrag = _preis(rabatt.get("amount"))
+        if not bedingung or betrag is None or betrag <= 0:
+            log.info("congstar-Aktion ohne Fussnote oder Betrag - "
+                     "uebergangen: %r", rabatt)
+            continue
+        satz = {"art": art, "bedingung": bedingung, "quelle_url": url,
+                "eingerechnet": not rabatt.get("ignoreForPriceCalculation"),
+                "gueltig_bis": _gueltig_bis(bedingung)}
+        typ = str(rabatt.get("iterationType") or "").upper()
+        if typ == "ONGOING":
+            satz["betrag_monatlich"] = betrag
+        elif (typ == "LIMITED" and (wiederholungen := laufzeit_in_monaten(
+                rabatt.get("iterations"))) is not None):
+            satz["betrag"] = round(betrag * wiederholungen, 2)
+        else:
+            log.info("congstar-Aktion mit unbekannter Dauer (%r, %r) - "
+                     "uebergangen", typ, rabatt.get("iterations"))
+            continue
+        out.append(satz)
+    return out
+
+
+def _trade_in_aktion(trade_in: dict, gesamt_ohne: float,
+                     url: str) -> Optional[dict]:
+    """Die TRADE_IN-Zahlweise als Aktion (P3-E3) - NICHT eingerechnet, sie
+    setzt die Einnahme eines Altgeraets voraus.
+
+    Der Vorteil ist `benefit.amount`, und er gilt nur, wenn er sich selbst
+    traegt: Gesamtbetrag ohne Eintausch minus Gesamtbetrag mit Eintausch
+    muss genau dieser Betrag sein (iPhone 17 Pro 512 GB, ANF M, 36 Raten:
+    1303 - 1033 = 270). Geht die Probe nicht auf, ist der Satz keine
+    Messung - dieselbe Regel wie fuer die Zahlweise selbst (Modulkopf)."""
+    vorteil = _preis((trade_in.get("benefit") or {}).get("amount"))
+    gesamt_mit = _preis(trade_in.get("total"))
+    if vorteil is None or vorteil <= 0 or gesamt_mit is None:
+        log.info("congstar-Trade-in ohne Vorteil oder Gesamtbetrag - "
+                 "uebergangen")
+        return None
+    if abs((gesamt_ohne - gesamt_mit) - vorteil) > _TRADE_IN_TOLERANZ_EUR:
+        log.info("congstar-Trade-in: %.2f - %.2f ist nicht der genannte "
+                 "Vorteil %.2f - verworfen", gesamt_ohne, gesamt_mit, vorteil)
+        return None
+    return {"art": AKTION_TRADE_IN, "bedingung": TRADE_IN_BEDINGUNG,
+            "quelle_url": url, "betrag": vorteil, "eingerechnet": False,
+            "gueltig_bis": ""}
+
+
+def _buendelzahlweisen(variante: dict, url: str = "") -> dict:
     """Zuzahlung und Rate JEDER erlaubten Zahlweise (`_RATENLAUFZEITEN`) -
     nur wenn ihre Probe aufgeht (Modulkopf: die Nachrechnung ist
     Bedingung, nicht Protokoll). Eine Zahlweise, deren Probe nicht
@@ -502,12 +594,20 @@ def _buendelzahlweisen(variante: dict) -> dict:
     Betraege, Probe geht nicht auf. Die Positivliste ist damit sichtbar und
     nicht mehr still (FIX3, 21.09.2026)."""
     gefunden: dict = {}
+    # TRADE_IN wird kein eigener Satz, aber seine Aktion haengt am Satz
+    # derselben Laufzeit (P3-E3) - deshalb hier nach Dauer gemerkt.
+    trade_in: dict = {}
     for zahlweise in (variante.get("prices") or {}).get("paymentVariants") or []:
         if not isinstance(zahlweise, dict):
             continue
         if zahlweise.get("type") != "INSTALLMENT_PLAN":
             continue          # ONE_TIME_PURCHASE ist der Barpreis (lies, oben)
-        if str(zahlweise.get("subtype") or "").upper() != "UNSPECIFIED":
+        subtyp = str(zahlweise.get("subtype") or "").upper()
+        if subtyp == "TRADE_IN":
+            dauer_ti = laufzeit_in_monaten(zahlweise.get("contractDuration"))
+            if dauer_ti is not None:
+                trade_in.setdefault(dauer_ti, zahlweise)
+        if subtyp != "UNSPECIFIED":
             continue          # TRADE_IN setzt die Einnahme eines Altgeraets voraus
         # Die Dauer wird als ZAHL gelesen, nicht am JSON-Typ gemessen:
         # "36" ist dieselbe Laufzeit wie 36 (Modulkopf, FIX3).
@@ -539,7 +639,17 @@ def _buendelzahlweisen(variante: dict) -> dict:
             log.info("congstar-Buendel: %s-Monats-Zahlweise ohne "
                      "aufgehende Rechenprobe - verworfen", dauer)
             continue
-        gefunden[dauer] = {"zuzahlung": anzahlung, "rate": rate}
+        aktionen = (_rabatt_aktionen(zahlweise.get("oneTime"),
+                                     AKTION_GERAETERABATT, url)
+                    + _rabatt_aktionen(zahlweise.get("recurring"),
+                                       AKTION_GERAETERABATT, url))
+        gefunden[dauer] = {"zuzahlung": anzahlung, "rate": rate,
+                           "gesamt": gesamt, "aktionen": aktionen}
+    for dauer, form in gefunden.items():
+        if dauer in trade_in:
+            aktion = _trade_in_aktion(trade_in[dauer], form["gesamt"], url)
+            if aktion is not None:
+                form["aktionen"].append(aktion)
     return gefunden
 
 
@@ -595,6 +705,13 @@ def lies_buendel(text: str, url: str = "",
             continue
         anschluss = _preis((preise.get("activation") or {}).get("discounted"))
         tarif_slug = _pib_nummer(plan)
+        # Die Aktionen des TARIFS (P3-E3): Grundpreisnachlass und
+        # geschenkter Bereitstellungspreis - beide in `discounted` schon
+        # enthalten, also `eingerechnet`.
+        tarif_aktionen = (_rabatt_aktionen(preise.get("recurring"),
+                                           AKTION_TARIFRABATT, url)
+                          + _rabatt_aktionen(preise.get("activation"),
+                                             AKTION_ANSCHLUSS_ERLASSEN, url))
 
         for geraet in (plan.get("devices") or []):
             if not isinstance(geraet, dict):
@@ -611,7 +728,7 @@ def lies_buendel(text: str, url: str = "",
                 zustand = str(variante.get("condition") or "").strip().upper()
                 if (speicher, zustand) in gesehen:
                     continue
-                formen = _buendelzahlweisen(variante)
+                formen = _buendelzahlweisen(variante, url)
                 if not formen:
                     continue
                 titel = str(variante.get("title") or "").strip()
@@ -649,6 +766,10 @@ def lies_buendel(text: str, url: str = "",
                         "geraet_monatsrate": form["rate"],
                         "anschlusspreis": anschluss,
                         "laufzeit_monate": laufzeit,
+                        # P3-E3: was an diesem Preis haengt (Tarif und
+                        # Geraet) und was er mit Eintausch noch wird.
+                        "aktionen": [dict(a) for a in
+                                     tarif_aktionen + form["aktionen"]],
                         # Die Tarifseite ist die Seite, auf der diese Zahlen
                         # stehen - dieselbe Regel wie bei der Telekom-Kategorie.
                         "url": url,

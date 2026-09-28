@@ -410,6 +410,109 @@ class Rabatt:
         return round(summe, 2)
 
 
+# Die Arten einer Aktion (P3-E3). Eine POSITIVLISTE: eine Art, die hier
+# fehlt, wirft im Konstruktor, statt als freier Text auf der Seite zu landen.
+AKTION_TRADE_IN = "trade_in"
+AKTION_GERAETERABATT = "geraeterabatt"
+AKTION_TARIFRABATT = "tarifrabatt"
+AKTION_ANSCHLUSS_ERLASSEN = "anschluss_erlassen"
+AKTION_WECHSELBONUS = "wechselbonus"
+AKTION_ONLINE_VORTEIL = "online_vorteil"
+AKTION_ARTEN = (AKTION_TRADE_IN, AKTION_GERAETERABATT, AKTION_TARIFRABATT,
+                AKTION_ANSCHLUSS_ERLASSEN, AKTION_WECHSELBONUS,
+                AKTION_ONLINE_VORTEIL)
+
+
+@dataclass
+class Aktion:
+    """Ein Angebotsvorteil mit Bedingung und Quelle (P3-E3).
+
+    Anders als `Rabatt` beschreibt eine Aktion, WORAUS ein Preis besteht
+    oder WAS er unter einer Bedingung noch werden kann - sie wird von
+    keiner Kennzahl dieses Moduls verrechnet (`tco_24` und `tco_bindung`
+    lesen sie nicht):
+
+      eingerechnet=True   der Vorteil steckt schon im gemessenen Preis
+                          (congstar: "Bei Abschluss der ANF M ... reduziert
+                          sich die monatliche Rate der Hardware"). Er steht
+                          hier, damit die Seite sagen kann, woran der Preis
+                          haengt - abgezogen wird er kein zweites Mal.
+      eingerechnet=False  der Vorteil gilt nur, wenn der Kunde mehr tut als
+                          abzuschliessen (Altgeraet eintauschen, Rufnummer
+                          mitnehmen). Er bleibt ausserhalb der Leitzahl und
+                          erscheint als "bis −X €" daneben.
+
+    Felder:
+      art               eine aus `AKTION_ARTEN`
+      bedingung         woran der Vorteil haengt, moeglichst im Wortlaut
+                        des Anbieters - Pflicht, ohne Bedingung ist es keine
+                        pruefbare Aussage
+      quelle_url        die Seite, auf der sie steht - Pflicht
+      betrag            Vorteil in EUR ueber die ganze Ratenlaufzeit bzw.
+                        einmalig; `None` = nicht beziffert
+      betrag_monatlich  Vorteil je Monat, wo der Anbieter ihn so nennt
+                        (dauerhafter Grundpreisnachlass)
+      eingerechnet      siehe oben
+      gueltig_bis       ISO-Datum des Aktionsendes, "" = nicht genannt
+    """
+
+    art: str
+    bedingung: str
+    quelle_url: str
+    betrag: Optional[float] = None
+    betrag_monatlich: Optional[float] = None
+    eingerechnet: bool = False
+    gueltig_bis: str = ""
+
+    def __post_init__(self):
+        if self.art not in AKTION_ARTEN:
+            raise ValueError(f"unbekannte Aktionsart: {self.art!r}")
+        self.bedingung = (self.bedingung or "").strip()
+        if not self.bedingung:
+            raise ValueError("eine Aktion ohne Bedingung ist nicht "
+                             "nachpruefbar")
+        self.quelle_url = (self.quelle_url or "").strip()
+        if not self.quelle_url:
+            raise ValueError("eine Aktion ohne Quelle ist nicht nachpruefbar")
+        for feld in ("betrag", "betrag_monatlich"):
+            wert = getattr(self, feld)
+            if wert is None:
+                continue
+            wert = float(wert)
+            if wert < 0:
+                raise ValueError(f"negativer Vorteil in {feld}: {wert} - "
+                                 f"eine Aktion wird als positiver Betrag "
+                                 f"geschrieben")
+            setattr(self, feld, round(wert, 2))
+        self.eingerechnet = bool(self.eingerechnet)
+        self.gueltig_bis = (self.gueltig_bis or "").strip()
+
+    def gilt_am(self, heute: str) -> bool:
+        """Laeuft die Aktion am Tag `heute` ("YYYY-MM-DD") noch? Ohne
+        genanntes Ende oder ohne Datum gilt sie - abgelaufen ist nur, was
+        der Anbieter selbst befristet hat."""
+        return not (self.gueltig_bis and heute and self.gueltig_bis < heute)
+
+
+def aktionen_aus(rohsaetze) -> list[Aktion]:
+    """Aktions-Rohsaetze (dicts aus Adapter oder Speicher) in `Aktion`en.
+
+    Eine kaputte Aktion faellt mit Protokoll weg, die uebrigen und das
+    Buendel bleiben - ein unlesbarer Vorteil darf keinen gemessenen Preis
+    kosten. Dieselbe Funktion fuer den Sammel- und den Leseweg, damit beide
+    dieselben Aktionen als gueltig ansehen."""
+    fertig: list[Aktion] = []
+    for roh in rohsaetze or []:
+        if isinstance(roh, Aktion):
+            fertig.append(roh)
+            continue
+        try:
+            fertig.append(Aktion(**roh))
+        except (TypeError, ValueError) as exc:
+            log.warning("Aktion uebergangen: %s (%r)", exc, roh)
+    return fertig
+
+
 @dataclass
 class Buendel:
     """EIN Angebot aus Geraet und Tarif bei EINEM Anbieter.
@@ -467,6 +570,9 @@ class Buendel:
     laufzeit_monate: Optional[int] = None
     anschlusspreis: Optional[float] = None
     rabatte: list[Rabatt] = field(default_factory=list)
+    # Angebotsvorteile mit Bedingung und Quelle (P3-E3, `Aktion`) - von
+    # keiner Kennzahl verrechnet, nur benannt.
+    aktionen: list[Aktion] = field(default_factory=list)
     quelle_url: str = ""
     abgerufen_am: str = ""
     # DER GERAETEZUSTAND, wie ihn die Listung derselben SKU traegt

@@ -53,10 +53,14 @@ from . import anbieter_farben, geraete_vergleich
 from .geraete_tco_grafik import anbieter_slug
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
 from ..tarif_model import Preisphase
-from ..tco_model import (POSTEN_ANSCHLUSS, POSTEN_BUENDEL, POSTEN_LAUFZEIT,
-                         POSTEN_RATE, POSTEN_TARIF, POSTEN_ZUZAHLUNG,
-                         TCO_HORIZONT, Buendel, monatsschnitt, phasensumme,
-                         tco_24, zeitraum_vergleichbar)
+from ..tco_model import (AKTION_ANSCHLUSS_ERLASSEN, AKTION_GERAETERABATT,
+                         AKTION_ONLINE_VORTEIL, AKTION_TARIFRABATT,
+                         AKTION_TRADE_IN, AKTION_WECHSELBONUS,
+                         POSTEN_ANSCHLUSS, POSTEN_BUENDEL, POSTEN_LAUFZEIT,
+                         POSTEN_RABATTE, POSTEN_RATE, POSTEN_TARIF,
+                         POSTEN_ZUZAHLUNG, TCO_HORIZONT, Buendel,
+                         monatsschnitt, phasensumme, tco_24,
+                         zeitraum_vergleichbar)
 
 # Ticket TCO24-1 (08.09.2026) stellte die Tafel auf `tco_24()` und den
 # festen 24-Monats-Horizont; A1 (20.09.2026) hat dieselbe Funktion auf die
@@ -702,6 +706,54 @@ def label_der_leitzahl(monate: Optional[int]) -> str:
     return f"Kosten über {monate} Monate"
 
 
+# P3-E3: wie eine Aktionsart auf der Seite heisst, und - fuer den Ueberhang
+# an der Zeile ("bis −270 € mit Altgerät") - woran sie kurz gesagt haengt.
+AKTION_NAME = {
+    AKTION_TRADE_IN: "Trade-in",
+    AKTION_GERAETERABATT: "Geräterabatt im Tarif",
+    AKTION_TARIFRABATT: "Grundpreisnachlass",
+    AKTION_ANSCHLUSS_ERLASSEN: "Anschlusspreis erlassen",
+    AKTION_WECHSELBONUS: "Wechselbonus",
+    AKTION_ONLINE_VORTEIL: "Online-Vorteil",
+}
+AKTION_KURZ = {
+    AKTION_TRADE_IN: "mit Altgerät",
+    AKTION_WECHSELBONUS: "mit Rufnummernmitnahme",
+    AKTION_ONLINE_VORTEIL: "bei Online-Bestellung",
+}
+
+
+def aktionen_der_karte(b: Buendel, heute: str = "") -> tuple[list, Optional[dict]]:
+    """Die laufenden Aktionen eines Buendels fuer die Seite - und der eine
+    Ueberhang, der an der Zeile steht.
+
+    Abgelaufene Aktionen (`Aktion.gilt_am`) fallen weg: ein Nachlass "bis
+    zum 29.09." ist am 30.09. keine Auskunft mehr, sondern eine falsche.
+    Der Ueberhang ist die groesste NICHT eingerechnete Aktion mit Betrag -
+    die Zahl, um die das Angebot unter einer Bedingung noch sinkt. Eine
+    eingerechnete Aktion hat keinen Ueberhang: sie steckt schon in der
+    Leitzahl."""
+    liste = []
+    for a in b.aktionen:
+        if not a.gilt_am(heute):
+            continue
+        liste.append({"art": a.art, "name": AKTION_NAME.get(a.art, a.art),
+                      "betrag": a.betrag,
+                      "betrag_monatlich": a.betrag_monatlich,
+                      "bedingung": a.bedingung,
+                      "eingerechnet": a.eingerechnet,
+                      "gueltig_bis": a.gueltig_bis,
+                      "quelle_url": a.quelle_url})
+    offen = [a for a in liste if not a["eingerechnet"] and a["betrag"]]
+    ueberhang = None
+    if offen:
+        groesste = max(offen, key=lambda a: a["betrag"])
+        ueberhang = {"betrag": groesste["betrag"],
+                     "kurz": AKTION_KURZ.get(groesste["art"],
+                                             groesste["name"])}
+    return liste, ueberhang
+
+
 def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
            katalog, geraet_je_sku: dict, zustand: str = "unbekannt",
            heute: str = "") -> dict:
@@ -720,6 +772,7 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
     """
     frisch = ist_frisch(b.abgerufen_am, heute)
     kennzahl = tco_24(b)
+    aktionen, aktion_ueberhang = aktionen_der_karte(b, heute)
     # Der Zeitraum, den die Leitzahl dieser Zeile traegt - GELESEN, nicht
     # abgeleitet: er kommt aus der Rechnung, die die Monate gezaehlt hat
     # (`tco_model.Tco.leitzahl_monate`, P0-B-h1). Etikett, Ø/Monat und
@@ -877,13 +930,19 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
         "zerlegung": zerlegung_balken(bestandteile, kennzahl.restbetrag,
                                       kennzahl.gesamt if kennzahl.belastbar
                                       else None),
-        "luecken": kennzahl.luecken,
+        # P3-E3: "Boni und Rabatte - nicht gemessen" ist falsch, sobald die
+        # Aktionen dieses Buendels erhoben sind; sie stehen dann einzeln im
+        # Rechenweg. In der Leitzahl steht keine von beiden Arten.
+        "luecken": [l for l in kennzahl.luecken
+                    if not (l == POSTEN_RABATTE and aktionen)],
         # Rabatte werden nie in die Leitzahl gerechnet (tco_model Regel 3,
         # AUFTRAG_GERAETESEITE §3: "Prämien, Cashback [...] bleiben
         # außerhalb der TCO-24"); `tco_24` fuehrt sie deshalb nicht mehr
         # einzeln ab, nur ihre Summe steht als Auskunft in `rabatte_offen`.
         "boni": [],
         "boni_abzug": kennzahl.rabatte_offen,
+        "aktionen": aktionen,
+        "aktion_ueberhang": aktion_ueberhang,
         "quelle_url": b.quelle_url,
         "abgerufen_am": b.abgerufen_am,
         "tarif_quelle_url": (tarif or {}).get("dokument_url", ""),
@@ -1506,6 +1565,55 @@ def _angebot_rang(karte: dict) -> tuple:
             else 9e9)
 
 
+# P3-E2: die Ratenlaufzeit, die der Laufzeit-Filter der Bündeltabelle ohne
+# Klick zeigt - die Tarifbindung von 24 Monaten. Ein 36-Monats-Angebot
+# bleibt trotzdem fair vergleichbar, weil seine Leitzahl die Restschuld
+# nach Monat 24 enthaelt (A1).
+LAUFZEIT_STANDARD = 24
+
+
+def laufzeit_wahl(karten: list) -> Optional[dict]:
+    """Der Laufzeit-Filter eines Modells (P3-E2) - und je Karte, unter
+    welcher Wahl sie sichtbar ist (`k["laufzeit_sichtbar"]`).
+
+    Die Wahl blendet nicht stumpf alles aus, was nicht passt: dann
+    verschwaenden bei "24 Monate" Telekom, o2 und 1&1, die heute nur
+    36 Raten anbieten (Fallstrick 16: gemessen, keine Erfassungsluecke -
+    und selbst wenn, waere Ausblenden die falsche Antwort). Stattdessen
+    gilt je Angebot (Anbieter, Tarif, Zustand): die gewaehlte Laufzeit,
+    wenn es sie gibt, sonst die naechstgelegene (bei Gleichstand die
+    kuerzere). Jede Zeile nennt ihre Ratenzahl selbst.
+
+    Karten ohne Ratenlaufzeit (Referenzrechnung, Barpreis-Angebote,
+    Platzhalter) gehoeren zu keiner Wahl und bleiben immer sichtbar
+    (`laufzeit_sichtbar` leer). Rueckgabe `None`, wenn das Modell keine
+    zwei Laufzeiten fuehrt - dann gibt es nichts zu waehlen.
+    """
+    optionen = sorted({k["raten_laufzeit"] for k in karten
+                       if k.get("raten_laufzeit")})
+    for k in karten:
+        k["laufzeit_sichtbar"] = ""
+    if len(optionen) < 2:
+        return None
+    gruppen: dict = {}
+    for k in karten:
+        if k.get("raten_laufzeit"):
+            schluessel = (k["anbieter"], k.get("tarif"), k.get("zustand"))
+            gruppen.setdefault(schluessel, []).append(k)
+    for gruppe in gruppen.values():
+        vorhanden = sorted({k["raten_laufzeit"] for k in gruppe})
+        sichtbar: dict = {lz: [] for lz in vorhanden}
+        for wahl in optionen:
+            passend = min(vorhanden, key=lambda lz: (abs(lz - wahl), lz))
+            sichtbar[passend].append(str(wahl))
+        for k in gruppe:
+            k["laufzeit_sichtbar"] = " ".join(sichtbar[k["raten_laufzeit"]])
+    start = (LAUFZEIT_STANDARD if LAUFZEIT_STANDARD in optionen
+             else min(optionen, key=lambda lz: (abs(lz - LAUFZEIT_STANDARD),
+                                                lz)))
+    return {"optionen": optionen, "start": start}
+
+
 def _vorgabe(modelle: list) -> str:
     """Welches Modell ohne Klick sichtbar ist.
 
@@ -1834,6 +1942,7 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
             "karten": karten,
             "referenz": referenz,
             "laufzeiten": laufzeiten,
+            "laufzeit_wahl": laufzeit_wahl(karten),
             "angebote": len(angebote),
             # Wie viele der Angebote NICHT im Vergleich stehen, je Grund -
             # das Band sagt "davon 1 erneuert", nicht "3 Angebote" allein.
