@@ -250,8 +250,11 @@ def _send(tmp_path, *extra, env=None):
     bericht = tmp_path / "bericht.json"
     bericht.write_text(json.dumps(BERICHT, ensure_ascii=False))
     store = tmp_path / "store.jsonl"
+    # Ohne GITHUB_ACTIONS: dort gibt das Skript `::add-mask::` aus (eigener
+    # Test unten), und der Test haengt nicht davon ab, wo er laeuft.
     umgebung = {k: v for k, v in os.environ.items()
-                if k not in ("TEST_EMPFAENGER", "BREVO_API_KEY")}
+                if k not in ("TEST_EMPFAENGER", "BREVO_API_KEY",
+                             "GITHUB_ACTIONS")}
     umgebung.update(env or {}, PYTHONPATH=str(WURZEL / "src"))
     return subprocess.run(
         [sys.executable, str(WURZEL / "scripts/newsletter/send_digest.py"),
@@ -294,3 +297,15 @@ def test_der_testversand_rechnet_den_block_fuer_alte_berichte(tmp_path):
     assert lauf.returncode == 0, lauf.stderr[-2000:]
     text = (tmp_path / "aus" / "test.txt").read_text(encoding="utf-8")
     assert "GERÄTE: ABSTAND ZU VODAFONE" in text
+
+
+def test_in_actions_steht_die_adresse_nur_in_der_maskenzeile(tmp_path):
+    """Actions verbirgt den Wert einer `::add-mask::`-Zeile in jedem
+    spaeteren Protokoll; die Zeile selbst wird nicht angezeigt."""
+    lauf = _send(tmp_path, "--dry-run",
+                 env={"TEST_EMPFAENGER": "test@example.invalid",
+                      "GITHUB_ACTIONS": "true"})
+    assert lauf.returncode == 0, lauf.stderr
+    zeilen = [z for z in (lauf.stdout + lauf.stderr).splitlines()
+              if "test@example.invalid" in z]
+    assert zeilen == ["::add-mask::test@example.invalid"]
