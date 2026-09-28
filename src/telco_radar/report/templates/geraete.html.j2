@@ -673,6 +673,11 @@
   </div>
 
   <div class="gr-alarm-scroll">
+  {# Spaltennamen EINMAL: der Kopf und am Telefon das `data-k`-Etikett
+     jeder Zelle (dort fehlt der Kopf, die Zeile steht als Karte). #}
+  {% set spalten = {'anbieter': 'Händler', 'spanne': 'Spanne',
+    'tco': 'Kosten über ' ~ geraete.tco.horizont ~ ' Monate',
+    'monat': 'Ø €/Monat', 'delta': 'Δ zu Vodafone', 'band': 'Band'} %}
   <table class="src-table gr-alarm gr-katalog-mod" id="gr-katalogtabelle">
     {# Dieselbe Sortiermechanik wie im Radar - `grFilterleiste` traegt
        beide Tabellen. Sortiert wird nach dem ROHWERT (`data-s-*`); eine
@@ -685,9 +690,9 @@
       <th scope="col" class="num gr-sp--barpreis"><button type="button"
         class="gr-sort" data-sort="preis" data-art="zahl">Einzelgerätepreis</button></th>
       <th scope="col" class="gr-sp--barpreis"><button type="button"
-        class="gr-sort" data-sort="anbieter" data-art="zahl">Händler</button></th>
+        class="gr-sort" data-sort="anbieter" data-art="zahl">{{ spalten.anbieter }}</button></th>
       <th scope="col" class="num gr-sp--barpreis"><button type="button"
-        class="gr-sort" data-sort="spanne" data-art="zahl">Spanne</button></th>
+        class="gr-sort" data-sort="spanne" data-art="zahl">{{ spalten.spanne }}</button></th>
       {# Ansicht Gesamtkosten: TCO-24 ab, Ø €/Monat, Δ zur Referenz, Band.
          Die Band-Spalte trägt KEINEN Sortierknopf: "Groß/Klein/Mittel"
          hat keine alphabetisch sinnvolle Ordnung, und ein Zahlen-Rang
@@ -700,13 +705,12 @@
          Inhalt der Spalte laufen - genau das war der Befund: 16 Zeilen
          trugen eine 36-Monats-Summe unter diesem Kopf. #}
       <th scope="col" class="num gr-sp--tco"><button type="button"
-        class="gr-sort" data-sort="tco" data-art="zahl">Kosten über
-        {{ geraete.tco.horizont }} Monate</button></th>
+        class="gr-sort" data-sort="tco" data-art="zahl">{{ spalten.tco }}</button></th>
       <th scope="col" class="num gr-sp--tco"><button type="button"
-        class="gr-sort" data-sort="monat" data-art="zahl">Ø €/Monat</button></th>
+        class="gr-sort" data-sort="monat" data-art="zahl">{{ spalten.monat }}</button></th>
       <th scope="col" class="gr-sp--tco"><button type="button"
-        class="gr-sort" data-sort="delta" data-art="zahl">Δ zu Vodafone</button></th>
-      <th scope="col" class="gr-sp--tco">Band</th>
+        class="gr-sort" data-sort="delta" data-art="zahl">{{ spalten.delta }}</button></th>
+      <th scope="col" class="gr-sp--tco">{{ spalten.band }}</th>
     </tr></thead>
     <tbody>
     {% for m in geraete.katalog_modelle %}
@@ -769,7 +773,7 @@
           {% else %}<span class="gr-a-klein">bei {{ m.ab_anbieter }}</span>{% endif %}
           {% if m.ab_beleg and m.ab_beleg.abgerufen_am %} <span
             class="gr-a-klein gr-a-datum">{{ m.ab_beleg.abgerufen_am | date_de }}</span>{% endif %}
-          {% if m.ab_alt %} <span class="gr-kk-marke gr-kk-marke--alt">{{
+          {% if m.ab_alt %} <span class="gr-spalten-marke gr-spalten-marke--alt">{{
             m.ab_alt_marke }}</span>{% endif %}
           {%- elif m.nur_buendel %}
           <span class="gr-k-ab">nur im Bündel</span>
@@ -783,7 +787,7 @@
         {# Haendler: die ZAHL fuehrt (sortierbar nach Anzahl), die Namen
            stehen klein dahinter - die Suche der Filterleiste durchsucht
            den Zeilentext und findet damit auch Haendlernamen. #}
-        <td class="gr-sp--barpreis"><span class="gr-k-anzahl">{{
+        <td class="gr-sp--barpreis" data-k="{{ spalten.anbieter }}"><span class="gr-k-anzahl">{{
           m.anbieterzahl }}</span>
           <span class="gr-a-klein">{{ m.anbieter | join(' · ') }}</span></td>
         {# Spanne: nur wenn WESSENTLICH verschieden (C1). Ein Modell mit
@@ -791,7 +795,7 @@
            könnte - das sagt die Zelle selbst statt eines stummen "–"
            (Sicht-Prüfung Kleineres 4); bei mehreren Händlern mit
            unwesentlichem Abstand bleibt "–" (echte Spanne, nur klein). #}
-        <td class="num gr-sp--barpreis">{% if m.spanne %}{{ m.spanne[0] | euro
+        <td class="num gr-sp--barpreis" data-k="{{ spalten.spanne }}">{% if m.spanne %}{{ m.spanne[0] | euro
           }} – {{ m.spanne[1] | euro }}{% elif m.anbieterzahl == 1 %}<span
             class="gr-a-klein">ein Preis</span>{% else %}–{% endif %}</td>
         {# --- Gesamtkosten: TCO-24 des besten vergleichbaren Angebots,
@@ -808,7 +812,7 @@
                vergleichbar ist. Ein Modell ohne Bündel trägt "–" hier,
                weil seine TCO-Zelle den Grund schon nennt ("kein Bündel
                gemessen"). #}
-        <td class="num gr-sp--tco">
+        <td class="num gr-sp--tco" data-k="{{ spalten.tco }}">
           {%- if m.tco_ab is not none %}
           <span class="gr-k-ab">ab {{ m.tco_ab | euro }}</span>
           {% if m.tco_beleg and m.tco_beleg.quelle_url %}<a
@@ -819,14 +823,14 @@
           {% if m.tco_beleg and m.tco_beleg.abgerufen_am %} <span
             class="gr-a-klein gr-a-datum">{{ m.tco_beleg.abgerufen_am | date_de }}</span>{% endif %}
           {%- else %}<span class="gr-a-klein">{{ m.tco_leer }}</span>{%- endif %}</td>
-        <td class="num gr-sp--tco">{% if m.tco_monat is not none %}{{
+        <td class="num gr-sp--tco" data-k="{{ spalten.monat }}">{% if m.tco_monat is not none %}{{
           m.tco_monat | euro }}{% else %}–{% endif %}</td>
-        <td class="gr-sp--tco">{% if m.tco_delta_kurz %}<span
+        <td class="gr-sp--tco" data-k="{{ spalten.delta }}">{% if m.tco_delta_kurz %}<span
           class="gr-a-prozent wr-prozent{{ ' wr-prozent--negativ' if m.tco_delta is not none and m.tco_delta < 0 else ' wr-prozent--positiv' }}"{%
           if m.tco_delta_anbieter %} title="Vodafone ist am günstigsten – Δ ist der Abstand des günstigsten Wettbewerber-Angebots ({{ m.tco_delta_anbieter }}) zur Vodafone-Referenz"{% endif %}>{{
           m.tco_delta_kurz }}</span>{% elif m.tco_delta_leer %}<span
             class="gr-a-klein" title="{{ m.tco_delta_leer_grund }}">{{ m.tco_delta_leer }}</span>{% else %}–{% endif %}</td>
-        <td class="gr-sp--tco"><span class="gr-k-band">{{
+        <td class="gr-sp--tco" data-k="{{ spalten.band }}"><span class="gr-k-band">{{
           m.tco_band_label or '–' }}</span></td>
       </tr>
       {# --- Der Zeilen-Aufklapper: die Listungs-Details des Modells

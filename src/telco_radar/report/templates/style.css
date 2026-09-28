@@ -2398,10 +2398,8 @@ b,strong{font-weight:700}
    Regel gewinnt gegen ihn nur, weil sie SPEZIFISCHER ist (0-2-0 gegen
    0-0-1 des Browsers).
 
-   Mobil gilt unverändert `.gr-alarm{min-width:700px}` plus
-   `gr-alarm-scroll`: die Tabelle rollt IN SICH (Rollbehaelter-Muster
-   der Seite), die Seite selbst laeuft nicht waagerecht. Je Ansicht
-   sind nur 4-5 der 8 Spalten sichtbar. */
+   Mobil steht jede Modellzeile als Karte (Block „Katalog am Telefon“
+   weiter unten); nur die Listungen im Aufklapper rollen in sich. */
 .gr-kansicht{margin:0 0 14px}
 /* P4/D4 (18.09.2026): der Umschalter bleibt am Telefon in EINER
    Button-Reihe (Falz-Regel: vor dem ersten Datenelement höchstens EINE
@@ -2434,6 +2432,46 @@ b,strong{font-weight:700}
    zeigt keinen Zeiger. */
 .gr-katalog-mod tbody .gr-a-zeile{cursor:pointer}
 .gr-katalog-mod tbody .gr-a-zeile.gr-k--ohne-details{cursor:auto}
+/* Katalog am Telefon (28.09.2026): KARTEN statt Rolltabelle. Bei 390 px
+   zeigte der Rollbehaelter nur Modell und einen angeschnittenen Preis,
+   der Rest lag rechts ausserhalb. Nur die Zellen der Modellzeile werden
+   Block: der Browser fasst sie in EINE anonyme Zelle, die Zeile bleibt
+   eine Tabellenzeile. Zeilen- und Aufklapper-Sichtbarkeit ([hidden],
+   `gr-a-rest`, `gr-a-auf--an`) gelten damit unveraendert aus den Regeln
+   oben, und die display:none-Regeln der anderen Ansicht auch. Der
+   Spaltenkopf fehlt, also nennt `data-k` den Namen der Zelle. */
+@media (max-width:700px){
+  .gr-alarm.gr-katalog-mod{min-width:0}
+  /* width:0 plus min-width:100%: die breite Listungstabelle eines
+     geoeffneten Aufklappers traegt nichts zur Spaltenbreite bei und rollt
+     in ihrer `gr-scroll`, statt die ganze Tabelle aufzuschieben. */
+  .gr-katalog-mod>tbody>tr.gr-a-auf>td>.gr-scroll{width:0;min-width:100%}
+  /* Betrag und € bleiben zusammen; die Kleinschrift darunter bricht. */
+  .gr-katalog-mod .gr-k-listungen td.num{white-space:nowrap}
+  .gr-katalog-mod .gr-k-listungen td.num .gr-a-klein{white-space:normal}
+  .gr-katalog-mod>thead{display:none}
+  .gr-katalog-mod:not(.gr-katalog--tco)>tbody>tr.gr-a-zeile>td:not(.gr-sp--tco),
+  .gr-katalog-mod.gr-katalog--tco>tbody>tr.gr-a-zeile>td:not(.gr-sp--barpreis){
+    display:block}
+  /* Bewusst niedrig gewichtet, damit Luft und Zielmarke darunter greifen. */
+  .gr-katalog-mod>tbody>tr.gr-a-zeile>td{border:0;padding:1px 0;text-align:left}
+  /* Trennlinie an der Zeile (border-collapse), Luft an der ersten und
+     der letzten SICHTBAREN Zelle der Ansicht. */
+  .gr-katalog-mod>tbody>tr.gr-a-zeile{border-bottom:1px solid var(--rule-2)}
+  .gr-katalog-mod>tbody>tr.gr-a-zeile>td:first-child{padding-top:11px}
+  .gr-katalog-mod:not(.gr-katalog--tco)>tbody>tr.gr-a-zeile>td:not(.gr-sp--tco):has(+td.gr-sp--tco),
+  .gr-katalog-mod.gr-katalog--tco>tbody>tr.gr-a-zeile>td:last-child{padding-bottom:11px}
+  .gr-katalog-mod>tbody>tr.gr-a-zeile>td[data-k]::before{content:attr(data-k) " ";
+    font-family:var(--sans);font-size:12px;color:var(--ink-4)}
+  .gr-katalog-mod>tbody>tr.gr-a-zeile>td .gr-a-klein{display:inline}
+  /* Die Leitzahl der Karte ist ihre groesste Schrift, nicht das Δ. */
+  .gr-katalog-mod>tbody>tr.gr-a-zeile .gr-k-ab{font-size:18px}
+  .gr-katalog-mod>tbody>tr.gr-a-zeile .gr-a-prozent{font-size:15px}
+  /* Der Radar-Sprung markiert die Zielkarte: der rote Rahmen der
+     Tabellenzeile laege als Linie zwischen jeder gestapelten Zelle. */
+  .gr-katalog-mod>tbody>tr.gr-k-zeile.gr-k-ziel>td{
+    box-shadow:inset 3px 0 0 var(--red);padding-left:10px}
+}
 /* Der ab-Preis bricht nicht zwischen Betrag und Waehrung. */
 .gr-k-ab{font-family:var(--serif);font-weight:600;white-space:nowrap}
 .gr-k-anzahl{font-family:var(--sans);font-weight:700;font-size:15px}
