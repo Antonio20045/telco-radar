@@ -1620,13 +1620,51 @@ var TelcoFrage = (function () {
     });
   });
 
+  /* P3-E2: der Laufzeit-Filter. Welche Zeile unter welcher Wahl steht,
+     entscheidet Python (`data-lz`, geraete_tco_karten.laufzeit_wahl);
+     hier wird nur geblendet. Die Wahl des Nutzers ueberlebt den
+     Modellwechsel, solange das neue Modell sie fuehrt - sonst gilt
+     dessen `data-start`. */
+  var laufzeitWahl = null;
+
+  function aktiveLaufzeit() {
+    var leiste = document.querySelector('#gr-bnd-gruppe .gr-bnd-lz');
+    if (!leiste) return null;
+    var knoepfe = leiste.querySelectorAll('button[data-lz]');
+    var wahl = leiste.getAttribute('data-start');
+    Array.prototype.forEach.call(knoepfe, function (k) {
+      if (k.getAttribute('data-lz') === laufzeitWahl) wahl = laufzeitWahl;
+    });
+    Array.prototype.forEach.call(knoepfe, function (k) {
+      k.setAttribute('aria-pressed',
+                     k.getAttribute('data-lz') === wahl ? 'true' : 'false');
+    });
+    return wahl;
+  }
+
   function stelleZeilen(band) {
-    var zeilen = document.querySelectorAll(
-      '#gr-bnd-gruppe .gr-bnd[data-band]');
+    var lz = aktiveLaufzeit();
+    var zeilen = document.querySelectorAll('#gr-bnd-gruppe .gr-bnd');
     Array.prototype.forEach.call(zeilen, function (z) {
-      z.hidden = !!band && z.getAttribute('data-band') !== band;
+      var bandAus = !!band && z.hasAttribute('data-band')
+        && z.getAttribute('data-band') !== band;
+      var lzAus = !!lz && lz !== 'alle' && z.hasAttribute('data-lz')
+        && (' ' + z.getAttribute('data-lz') + ' ').indexOf(' ' + lz + ' ')
+           === -1;
+      z.hidden = bandAus || lzAus;
     });
   }
+
+  (function () {
+    var gruppe = element('gr-bnd-gruppe');
+    if (!gruppe) return;
+    gruppe.addEventListener('click', function (ev) {
+      var knopf = ev.target.closest ? ev.target.closest('.gr-bnd-lz button[data-lz]') : null;
+      if (!knopf) return;
+      laufzeitWahl = knopf.getAttribute('data-lz');
+      stelleZeilen(zustand.band);
+    });
+  })();
 
   /* --- Die Wahl: Band-Knoepfe, Kacheln, Suchfeld --------------------- */
   function markiereBaender() {
