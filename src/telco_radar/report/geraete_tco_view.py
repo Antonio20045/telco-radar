@@ -54,7 +54,8 @@ from ..tarif_model import PREISTYP_LIVE_SHOP
 from ..tco_model import (POSTEN_ANSCHLUSS, POSTEN_RABATTE, POSTEN_RATE,
                          POSTEN_TARIF, POSTEN_ZUZAHLUNG, TCO_HORIZONT,
                          _LUECKEN_OHNE_EINFLUSS_AUF_DIE_DIFFERENZ, Buendel,
-                         Rabatt, SimOnlyReferenz, geraeteanteil, sim_only_id,
+                         Rabatt, SimOnlyReferenz, aktionen_aus,
+                         geraeteanteil, sim_only_id,
                          tco_24)
 
 log = logging.getLogger(__name__)
@@ -428,6 +429,9 @@ def _aus_speicher(eintraege: list, typ, felder: tuple) -> list:
             fertig.append(e)
             continue
         werte = {f: e.get(f) for f in felder if e.get(f) is not None}
+        if typ is Buendel:
+            # P3-E3: nur das Buendel traegt Aktionen, die Referenz nicht.
+            werte["aktionen"] = aktionen_aus(e.get("aktionen"))
         try:
             satz = typ(**werte, rabatte=_rabatte(e))
         except (TypeError, ValueError) as exc:

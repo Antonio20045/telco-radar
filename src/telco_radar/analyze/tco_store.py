@@ -347,6 +347,10 @@ class TcoDB:
             gesehen.add(bid)
             self._schreibe_messung(eintrag, satz, _MESSFELDER)
             eintrag["rabatte"] = [asdict(r) for r in satz.rabatte]
+            # P3-E3: die Aktionen gehoeren zur Messung dieses Tages und
+            # werden wie `rabatte` jedes Mal ganz ersetzt - eine Aktion, die
+            # heute nicht mehr auf der Seite steht, steht auch hier nicht.
+            eintrag["aktionen"] = [asdict(a) for a in satz.aktionen]
             eintrag["last_verified"] = today
             # Dieselbe Messung auch fuer die Historie vormerken - am `today`
             # dieses Aufrufs, nicht am `save()`-Datum: die Zeile gehoert dem

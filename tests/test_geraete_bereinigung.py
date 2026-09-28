@@ -541,6 +541,17 @@ def test_am_echten_bestand_ueberleben_die_vodafone_farbvarianten():
 def test_am_echten_bestand_bleibt_die_klammerfarbe_unversehrt():
     """Die Gegenprobe zu B1 an echten Daten: `.strip(" -,;/()[]")` lief bis
     zum 31.08.2026 unbedingt und haette diese Zeile verstuemmelt
-    ausgeliefert."""
-    farben = {e.get("farbe_roh") for e in bereinige(_echter_bestand())}
+    ausgeliefert.
+
+    Die Zeile wird aus dem GANZEN Bestand geholt, nicht nur aus dem
+    sichtbaren: am 27.09.2026 hat der Nachtlauf sie auf "ausgelistet"
+    gesetzt, und der Test fiel, ohne dass `bereinige` sich geaendert hatte
+    (Leitplanke: Tests, die den Bestand verankern, fallen mit neuen Daten).
+    Die Behauptung ist dieselbe - `bereinige` laesst die Klammerfarbe
+    stehen -, nur haengt sie nicht mehr am Listungsstatus."""
+    db = json.loads((_WURZEL / "data" / "state" / "geraete_db.json").read_text())
+    zeile = [e for e in db["listungen"]
+             if e.get("farbe_roh") == "Silver Shadow (Enterprise Edition)"]
+    assert zeile, "die Klammerfarbe steht nicht mehr im Bestand - Test prueft nichts"
+    farben = {e.get("farbe_roh") for e in bereinige(zeile)}
     assert "Silver Shadow (Enterprise Edition)" in farben

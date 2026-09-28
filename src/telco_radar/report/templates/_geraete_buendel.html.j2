@@ -28,6 +28,10 @@
          {% if k.band %}data-band="{{ k.band }}"{% endif %}
          data-zustand="{{ k.zustand }}"
          data-laufzeit="{{ k.laufzeit or 0 }}"
+         {# P3-E2: unter welcher Wahl des Laufzeit-Filters diese Zeile
+            steht (`geraete_tco_karten.laufzeit_wahl`, Python entscheidet,
+            app.js blendet nur). Ohne Attribut: immer sichtbar. #}
+         {% if k.laufzeit_sichtbar %}data-lz="{{ k.laufzeit_sichtbar }}"{% endif %}
          {# P0-B-z2: DER ZEITRAUM, DEN DIE SUMME DIESER ZEILE TRÄGT -
             gelesen aus `leitzahl_monate` (`Tco.leitzahl_monate`, P0-B-h1),
             demselben Feld, aus dem `k.label` seinen Text baut. `data-
@@ -85,8 +89,13 @@
       }}{% endif %}</span>{% endif %}</span>
     {# DIE TCO TRAEGT IHRE LAUFZEIT IM ETIKETT (A5.1) - eine unbeschriftete
        Gesamtsumme ist ueber zwei Bindungsdauern nicht lesbar. #}
+    {# P3-E3: der UEBERHANG - die groesste nicht eingerechnete Aktion
+       (`geraete_tco_karten.aktionen_der_karte`), unter der Leitzahl und
+       ausdruecklich nicht in ihr. #}
     <span class="gr-bnd-tco">{% if k.belastbar %}{{ k.gesamt | euro }} <em
-      class="gr-bnd-label">{{ k.label }}</em>{% else %}<span class="gr-t-luecke"
+      class="gr-bnd-label">{{ k.label }}</em>{% if k.aktion_ueberhang %} <span
+      class="gr-bnd-aktion">bis −{{ k.aktion_ueberhang.betrag | euro }} {{
+      k.aktion_ueberhang.kurz }}</span>{% endif %}{% else %}<span class="gr-t-luecke"
       >keine belastbare Zahl</span>{% endif %}</span>
     {# `gr-bnd-delta--wert` nur für ZAHLEN-Werte: mobil ist der Spaltenkopf
        versteckt, und eine nackter zweiter Euro-Betrag neben „Gerät ohne
@@ -267,6 +276,17 @@
     {% for b in k.boni %}
     <p class="gr-kk-bonus">Bonus −{{ b.betrag | euro }} ({{ b.name }})</p>
     {% endfor %}
+    {# P3-E3: jede laufende Aktion mit Betrag, Bedingung und Beleg - die
+       eingerechneten sagen, woran der Preis haengt, die anderen, was er
+       unter ihrer Bedingung noch wird. #}
+    {% for a in k.aktionen %}
+    <p class="gr-kk-aktion"><b>{{ a.name }}</b>{% if a.betrag is not none %}
+      −{{ a.betrag | euro }}{% elif a.betrag_monatlich is not none %}
+      −{{ a.betrag_monatlich | euro }}/Monat{% endif %} · {{
+      'im Preis enthalten' if a.eingerechnet else 'nicht eingerechnet' }} ·
+      {{ a.bedingung }} · <a href="{{ a.quelle_url }}" rel="nofollow noopener"
+      target="_blank">Beleg</a></p>
+    {% endfor %}
 
     {% if k.delta %}
     {# Der VOLLSTÄNDIGE Delta-Satz mit Referenz-Tarif und -Datum - die Zeile
@@ -394,6 +414,19 @@
          Karte mehr steht (harte Regel 9). #}
       {% if m.alt_hinweis %}<p class="gr-erklaer gr-basis--duenn">{{
         m.alt_hinweis }}</p>{% endif %}
+      {# P3-E2: der Laufzeit-Filter - im Makro, damit jedes Modell (auch
+         aus dem Fragment) seine eigenen Laufzeiten mitbringt. `data-start`
+         ist `LAUFZEIT_STANDARD` oder die naechste vorhandene. #}
+      {% if m.laufzeit_wahl %}
+      <div class="gr-bnd-lz" role="group" aria-label="Ratenlaufzeit"
+           data-start="{{ m.laufzeit_wahl.start }}">
+        <span class="gr-bnd-lz-kopf">Raten in Monaten</span>
+        {% for lz in m.laufzeit_wahl.optionen %}<button type="button"
+          data-lz="{{ lz }}" aria-pressed="{{ 'true' if lz == m.laufzeit_wahl.start
+          else 'false' }}">{{ lz }}</button>{% endfor %}<button
+          type="button" data-lz="alle" aria-pressed="false">alle</button>
+      </div>
+      {% endif %}
       <div class="gr-bndliste"{% if ids %} id="gr-bndliste"{% endif %}>
         {% for k in m.zeilen_band %}{{ buendelzeile(k) }}{% endfor %}
       </div>
