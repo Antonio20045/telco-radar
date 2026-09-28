@@ -51,7 +51,7 @@ from ..tco_model import (Buendel, POSTEN_ANSCHLUSS, POSTEN_BUENDEL,
                          zeitraum_vergleichbar)
 from . import geraete_bewegung
 from .anbieter_farben import STRICHMUSTER, stil_fuer
-from .geraete_tco_band import ERWARTETE_ANBIETER
+from .geraete_tco_band import ERWARTETE_ANBIETER, band_label
 from .geraete_tco_karten import kurz_datum, phasen_fuer_buendel
 
 log = logging.getLogger(__name__)
@@ -489,10 +489,14 @@ def _alt_zeitraum(monate) -> str:
     return f" über {_zeitraum_wort([monate])}"
 
 
+def _stufe(band_labels: dict, band: str) -> str:
+    """Der Name der Stufe ("XS") aus dem Katalog, sonst aus dem Schluessel."""
+    return (band_labels.get(band) or {}).get("label") or band_label(band)
+
+
 def _luecke_text(luecken: list, band_labels: dict) -> str | None:
     if not luecken:
         return None
-    band_wort = {"klein": "klein", "mittel": "mittel", "gross": "groß"}
     anderes, gar_nicht, nur_alt, fremd = [], [], [], []
     for l in luecken:
         name = l["anbieter"]
@@ -502,7 +506,8 @@ def _luecke_text(luecken: list, band_labels: dict) -> str | None:
             # 2.019,54 € (36 Monate)". Beim Horizont selbst bleibt er
             # weg: er steht schon im Satz darum (eine Angabe je Ort).
             alt = " · ".join(
-                f"{band_wort.get(a['band'], a['band'])} {_euro(a['tco'])}"
+                f"{_stufe(band_labels, a['band'])} "
+                f"{_euro(a['tco'])}"
                 f"{_alt_zeitraum(a.get('monate'))}"
                 for a in l["alternativ"])
             name += f" ({alt})"
@@ -2184,7 +2189,11 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
                   for p in paare]
     start = None
     if kandidaten:
-        kandidaten.sort(key=lambda k: (-k[2], -k[3], k[0], k[1]))
+        # Gleichstand bricht die Leiterfolge (XS vor M), nicht das
+        # Alphabet - sonst stuende "m" vor "xs".
+        rang = {b: i for i, b in enumerate(band_katalog)}
+        kandidaten.sort(key=lambda k: (-k[2], -k[3], k[0],
+                                       rang.get(k[1], len(rang)), k[1]))
         start = {"modell": kandidaten[0][0], "band": kandidaten[0][1]}
     start_block = next((p for p in paare if start and
                         p["modell"] == start["modell"]
@@ -2256,11 +2265,10 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
         kacheln.append({
             "id": mid, "kurz": _kachel_name(mid),
             "titel": titel_je[mid].get("titel") or mid,
-            # Reihenfolge wie die Band-Knoepfe (klein, mittel, gross) -
-            # nie alphabetisch; band_folge ist unten definiert, deshalb
-            # erst nach ihm sortiert (Band-Katalog ist die Quelle).
+            # Reihenfolge wie die Band-Knoepfe (die Tarifleiter, XS bis
+            # XL) - nie alphabetisch; der Band-Katalog ist die Quelle.
             "baender": {b: karten_baender.get(mid, {}).get(b)
-                        for b in ("klein", "mittel", "gross")
+                        for b in band_katalog
                         if karten_baender.get(mid, {}).get(b)},
         })
 
@@ -2270,6 +2278,9 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
     daten = {
         "vorgabe": (start or {}).get("modell", ""),
         "start_band": (start or {}).get("band", ""),
+        # Die Stufen der Tarifleiter in ihrer Folge - app.js liest sie hier
+        # statt eines eigenen Katalogs.
+        "band_folge": list(band_katalog),
         # Die Trefferzahl des Suchfelds meint die WAHL-Menge - nicht die
         # Modellzahl der Hauptansicht (tco.modelle_gesamt): ein Auto-Modell
         # unter der Messtag-Schwelle ist nicht auffindbar und darf nicht
@@ -2304,10 +2315,9 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
         "paare": paare,
         "kacheln": kacheln,
         "baender": band_katalog,
-        # Die feste Reihenfolge der Band-Knoepfe: klein, mittel, gross -
-        # nie alphabetisch (da stuende "gross" zuerst).
-        "band_folge": [b for b in ("klein", "mittel", "gross")
-                       if b in band_katalog],
+        # Die Reihenfolge der Band-Knoepfe ist die der Tarifleiter (XS bis
+        # XL) - nie alphabetisch (da stuende "l" vor "xs").
+        "band_folge": list(band_katalog),
         "suchindex": suchindex,
         "daten": daten,
         "bewegung_woche": bewegung_woche,

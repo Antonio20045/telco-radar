@@ -28,6 +28,8 @@ import json
 import pathlib
 
 import pytest
+
+from tarifleiter_testbestand import mit_leiter
 import yaml
 from bs4 import BeautifulSoup
 
@@ -120,6 +122,7 @@ def _baue(tmp_path: pathlib.Path) -> pathlib.Path:
         for a, tid, t, gb in
         [(a, tid, t, gb) for a, tid, t, gb, _r in _RATEN]
         + [(_ZUSAMMEN[0], _ZUSAMMEN[1], _ZUSAMMEN[2], _ZUSAMMEN[3])]]
+    tarife = mit_leiter(tarife)
     (state / "tarife.jsonl").write_text(
         "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
     reports = root / "data" / "reports"
@@ -262,7 +265,7 @@ def test_ohne_gemessenen_zeitraum_bleibt_die_sortiergruppe_leer():
             "delta": None, "delta_kurz": "", "delta_zustand": None,
             "sku_id": "", "quelle_url": "", "abgerufen_am": "",
             "leer_grund": "Kein Bündel erhoben", "alt_marke": "",
-            "frisch": True, "band": "klein", "band_gb_text": ""}
+            "frisch": True, "band": "xs", "band_gb_text": ""}
     zeile = BeautifulSoup(_env().from_string(
         '{% from "_geraete_buendel.html.j2" import buendelzeile %}'
         "{{ buendelzeile(k) }}").render(k=leer),
@@ -430,7 +433,7 @@ def _finanzierungskarte(raten_laufzeit) -> dict:
             "delta_kurz": "", "delta_zustand": None, "naeherung": False,
             "eigen": True, "frisch": True, "alt_marke": "", "sku_id": "x",
             "quelle_url": "", "abgerufen_am": "", "tarif_quelle_url": "",
-            "band": "klein", "band_gb_text": "", "ab_preis": False,
+            "band": "xs", "band_gb_text": "", "ab_preis": False,
             "leer_grund": ""}
 
 

@@ -30,6 +30,7 @@ import pathlib
 import yaml
 from bs4 import BeautifulSoup
 
+from tarifleiter_testbestand import mit_leiter
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
 from telco_radar.analyze.tco_store import TcoDB
 from telco_radar.geraete_config import lade_katalog
@@ -426,6 +427,7 @@ def _baue(tmp_path: pathlib.Path, erneuert: bool = True,
                 "dokument_url": "https://example.de/pib/o2-flex",
                 "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}}
         tarife.append(ohne)
+    tarife = mit_leiter(tarife)
     (state / "tarife.jsonl").write_text(
         "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
     # E2 (16.09.2026): die TCO-HISTORIE - ohne sie haette die Hauptansicht

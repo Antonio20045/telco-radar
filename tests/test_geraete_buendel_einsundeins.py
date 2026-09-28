@@ -464,7 +464,7 @@ def test_der_ganze_weg_bis_zum_buendel_mit_echtem_bestand():
     Seite („1&1 All-Net-Flat S") löst mit Güte HOCH auf - der Vorbefund
     „1&1-tarif_id löst nie auf ein Datenvolumen auf" traf die Listung ohne
     tarif_id, nicht diesen Weg. Der aufgelöste Tarif trägt 10 GB und damit
-    das Band Klein: die Voraussetzung für Radar-Paare."""
+    das Band XS: die Voraussetzung für Radar-Paare."""
     bestand = Tarifbestand.aus_datei(_WURZEL / "data" / "state" / "tarife.jsonl")
     rohsaetze = [{**s, "anbieter": "1&1",
                   "sku_id": f"sku-{i}", "quelle_url": s["url"]}
@@ -476,7 +476,7 @@ def test_der_ganze_weg_bis_zum_buendel_mit_echtem_bestand():
     assert all(b.tarif_id == "11:1-1-all-net-flat-s" for b in bilanz.buendel)
     assert all(b.tarif_id_guete == "hoch" for b in bilanz.buendel)
     baender = tarif_baender(bestand.je_id)
-    assert baender["11:1-1-all-net-flat-s"] == "klein"
+    assert baender["11:1-1-all-net-flat-s"] == "xs"
     b = next(x for x in bilanz.buendel if x.sku_id == "sku-0")
     assert b.buendel_monatlich == 44.99
     assert b.laufzeit_monate == 36

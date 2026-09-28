@@ -46,7 +46,7 @@ _TARIF_ID, _TARIF = "o2:klein", "O2 Mobile Klein"
 
 def _baue_buendel_modell(tmp_path: pathlib.Path, messtage: list[str],
                          mit_listung: bool = False):
-    """Ein AUTO-Modell mit o2-Bündel im Band klein, N Bündel-Messtagen und
+    """Ein AUTO-Modell mit o2-Bündel im Band XS, N Bündel-Messtagen und
     (wahlweise) OHNE jede Listung - der gemessene iPhone-18-Weg vom 17.09.:
     die Bündel kamen an, die Listung stand noch nicht."""
     root, state = _baue(tmp_path)

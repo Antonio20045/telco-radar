@@ -204,7 +204,20 @@ quellen:
     # Begruendung bei Vodafone.
     bevorzugt:
       - "congstar allnet flat"
-    max_dokumente: 10
+    # Gemessen 28.09.2026: die Blattseite verlinkt ohne Datumszusatz auch
+    # "Allnet Flat XL/XXL mit Upgrade-Versprechen" (Blatt 546/550 und
+    # 547/551: 25 GB fuer 35,00 EUR, 50 GB fuer 49,00 EUR). Verkauft
+    # werden sie nicht mehr: congstar.de/handytarife nennt nur XS/S/M/L
+    # (15/50/125/200 GB), und ein XL mit weniger Volumen als M zum
+    # hoeheren Preis ist ein Altprodukt, keine Stufe der heutigen Leiter.
+    # Bis dahin standen beide als aktuelle Tarife im Bestand.
+    ausschliessen:
+      - "allnet flat xl"
+      - "allnet flat xxl"
+    # Acht Blaetter sind die heutige Leiter (XS/S/M/L, je mit und ohne
+    # Flex). Mehr holt nur Doppel derselben Tarife unter einer zweiten
+    # Pfadvariante (`/PIBs/2026/…_541.pdf` neben `…_543.pdf`).
+    max_dokumente: 8
 
   - anbieter: o2
     # Die PDFs liegen auf static2.o9.de unter Blob-IDs. Verlinkt sind sie

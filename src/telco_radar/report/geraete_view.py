@@ -45,7 +45,7 @@ from . import (geraete_alarme, geraete_bereinigung, geraete_pruefung,
                geraete_tco_karten, geraete_tco_view, geraete_vergleich,
                geraete_verlauf, geraete_zeitreihe)
 # MonatNamen der Katalog-Datumsformatierung - keine zweite Tabelle (driftet).
-from .geraete_tco_band import _MONATE
+from .geraete_tco_band import _MONATE, band_label
 from ..analyze import geraete_lifecycle
 from ..analyze.tco_store import TcoDB
 # Der Zeitraum der TCO-Spalte und DIE EINE Regel, ob zwei Leitzahlen
@@ -1094,7 +1094,7 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
                   "tco_delta_leer": None, "tco_delta_leer_grund": None}
     if not modell_tco:
         return {"tco_ab": None, "tco_anbieter": None, "tco_monat": None,
-                "tco_band": None, "tco_beleg": None,
+                "tco_band": None, "tco_band_label": "", "tco_beleg": None,
                 "tco_leer": TCO_LEER_KEIN_BUNDEL, **leer_delta}
     # A3: NUR FRISCHE Karten stellen die Spalte (`frisch`, dieselbe
     # Definition wie die Tafel - Clean Code 7). Der Pool OHNE die
@@ -1117,7 +1117,7 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
         # nicht beim Bestand.
         leer = (TCO_LEER_NUR_ALT if pool else TCO_LEER_KEIN_VERGLEICHBARES)
         return {"tco_ab": None, "tco_anbieter": None, "tco_monat": None,
-                "tco_band": None, "tco_beleg": None,
+                "tco_band": None, "tco_band_label": "", "tco_beleg": None,
                 "tco_leer": leer, **leer_delta}
     # DER ZEITRAUM DER SPALTE (P0-B-h2). Hier stand der Kommentar "ein
     # Filter auf `karte['laufzeit'] == 24` ist bewusst NICHT gebaut ...
@@ -1140,7 +1140,7 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
         # Etikett in der Vergleichsansicht; HIER waere sie eine
         # 36-Monats-Summe unter einem 24-Monats-Kopf.
         return {"tco_ab": None, "tco_anbieter": None, "tco_monat": None,
-                "tco_band": None, "tco_beleg": None,
+                "tco_band": None, "tco_band_label": "", "tco_beleg": None,
                 "tco_leer": TCO_LEER_ANDERE_LAUFZEIT, **leer_delta}
     bester = min(vergleichbare, key=lambda k: k["gesamt"])
     # Der TRAEGER des Abstands: das guenstigste FREMDE Angebot. Nur wo
@@ -1223,6 +1223,9 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
         "tco_delta_leer": delta_leer,
         "tco_delta_leer_grund": delta_leer_grund,
         "tco_band": bester.get("band"),
+        # Der Name der Stufe ("XS") aus derselben Ableitung wie Chip und
+        # Export - die Vorlage formatiert ihn nicht selbst.
+        "tco_band_label": band_label(bester.get("band")),
         "tco_beleg": {"quelle_url": bester.get("quelle_url", ""),
                       "abgerufen_am": bester.get("abgerufen_am", "")},
         "tco_leer": None,

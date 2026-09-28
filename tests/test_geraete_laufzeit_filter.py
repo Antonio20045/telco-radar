@@ -21,6 +21,7 @@ from telco_radar.report.html import render_site
 
 from test_geraete_browser_fixture import (
     HEUTE, _chromium, _KATALOG, _FARBEN, _listung, _QUELLEN, _server, _sku)
+from tarifleiter_testbestand import mit_leiter
 from test_geraete_zeitreihe_browser import waehle_band
 
 
@@ -130,13 +131,15 @@ def _baue(tmp_path):
         "updated": HEUTE, "buendel": buendel, "sim_only": []}),
         encoding="utf-8")
     tarife = {tid: (a, tarif) for a, tid, tarif, *_ in _BUENDEL}
-    (state / "tarife.jsonl").write_text("\n".join(json.dumps({
+    # P3-E1: die Testleiter (XS 5 / M 36 / L 85 GB) legt 15 GB in XS.
+    (state / "tarife.jsonl").write_text("\n".join(json.dumps(t) for t in mit_leiter([{
         "anbieter": a, "name": tarif, "tarif_id": tid, "art": "mobilfunk",
         "grundgebuehr": 24.0, "laufzeit_monate": 24, "datenvolumen_gb": 15,
         "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": 24.0}],
         "dokument_url": f"https://example.de/pib/{tid}",
-        "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}})
-        for tid, (a, tarif) in tarife.items()) + "\n", encoding="utf-8")
+        "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}}
+        for tid, (a, tarif) in tarife.items()], HEUTE)) + "\n",
+        encoding="utf-8")
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
     (reports / f"{HEUTE}.json").write_text(json.dumps({
@@ -214,7 +217,7 @@ def test_die_wahl_36_tauscht_nur_die_congstar_zeile(seite):
 
 def test_die_laufzeitwahl_ueberlebt_den_bandwechsel(seite):
     _waehle(seite, "36")
-    waehle_band(seite, "klein")
+    waehle_band(seite, "xs")
     assert seite.evaluate(_SICHTBAR) == ["Vodafone 24", "congstar 36", "o2 36"]
 
 

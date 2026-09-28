@@ -303,7 +303,7 @@ def test_der_modellwechsel_schliesst_das_panel(schreibtisch):
     assert _panel_offen(seite)
     # Bandwechsel laedt einen anderen Graphen - das Panel der ALTEN Messung
     # darf nicht unter dem neuen stehen bleiben.
-    seite.locator("#gr-zr-baender button[data-band='mittel']").click()
+    seite.locator("#gr-zr-baender button[data-band='m']").click()
     seite.wait_for_timeout(500)
     assert not _panel_offen(seite)
 
@@ -413,14 +413,14 @@ def test_der_bandwechsel_stellt_auch_die_karten_um(schreibtisch):
     aktiv = seite.locator(
         "#gr-zr-kacheln button[aria-pressed='true']").first
     vorher = _sichtbarer_preis(aktiv)
-    seite.locator("#gr-zr-baender button[data-band='mittel']").click()
+    seite.locator("#gr-zr-baender button[data-band='m']").click()
     seite.wait_for_timeout(600)
     nachher = _sichtbarer_preis(aktiv)
     assert vorher != nachher, \
         f"die Karte zeigt nach dem Bandwechsel denselben Preis ({vorher})"
     # Die Bandlage der Karte ist die gewaehlte
     band = aktiv.locator(".gr-zr-k-band:not([hidden])").first
-    assert band.get_attribute("data-band") == "mittel"
+    assert band.get_attribute("data-band") == "m"
 
 
 def test_fremder_punkt_ohne_vorlage_bekommt_den_leerhinweis(schreibtisch):

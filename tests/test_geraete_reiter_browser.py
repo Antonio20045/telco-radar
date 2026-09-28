@@ -37,6 +37,7 @@ from pathlib import Path
 
 import pytest
 
+from tarifleiter_testbestand import mit_leiter
 from test_geraete_zeitreihe_browser import waehle_modell
 import yaml
 
@@ -394,7 +395,8 @@ def _seite(tmp_path_factory):
         "\n".join(json.dumps(z) for z in _tco_historie) + "\n",
         encoding="utf-8")
     (state / "tarife.jsonl").write_text(
-        "\n".join(json.dumps(t) for t in _TARIFE) + "\n", encoding="utf-8")
+        "\n".join(json.dumps(t) for t in mit_leiter(_TARIFE)) + "\n",
+        encoding="utf-8")
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
     site = root / "site"

@@ -608,9 +608,9 @@ def _export_zeilen(buendel: list, massstab: list, eintraege: list, katalog,
     geraete_tco_karten.ergaenze_geraete_aus_katalog(geraet_je_sku, buendel,
                                                     katalog)
     typen = anbieter_typen or {}
-    # Das Band als LESEBARES Wort (Klein/Mittel/Groß) - `band_label()` ist
+    # Die Stufe als LESEBARER Name (XS bis XL) - `band_label()` ist
     # dieselbe Ableitung, die der Chip der Vergleichsansicht trägt; ein
-    # Schlüssel ("klein") in der Spalte wäre eine zweite Sprache für
+    # Schlüssel ("xs") in der Spalte wäre eine zweite Sprache für
     # dieselbe Sache.
     band_von = geraete_tco_band.band_label
 
@@ -814,7 +814,11 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
     # GRAPH-1 (08.09.2026): der Tarifband-Index steht EINMAL fuer alle
     # Modelle - er kommt aus demselben Tarifbestand wie die Tarifbindung
     # oben, nur mit einer anderen Lesart (Datenvolumen statt Laufzeit).
-    band_je_tarif = geraete_tco_band.tarif_baender(tarife)
+    # P3-E1 (28.09.2026): die Stufen sind die Vodafone-Tarifleiter aus
+    # demselben Bestand - einmal abgeleitet, von Index, Graph, Katalog und
+    # Radar gelesen.
+    leiter = geraete_tco_band.tarifleiter(tarife)
+    band_je_tarif = geraete_tco_band.tarif_baender(tarife, leiter)
     # P1 (11.09.2026): das Datenvolumen je tarif_id - dieselbe Datei, die
     # dritte Lesart. Es traegt die GB-Angabe je Karte und die Angabe in der
     # Band-Werteliste; getrennt von `band_je_tarif`, weil eine Karte ohne
@@ -889,12 +893,12 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         # `report/geraete_tco_band.py`. P1: die Werteliste bekommt ihr
         # Datenvolumen aus derselben Lesart wie die Karten.
         modell["baender"] = geraete_tco_band.baender_fuer_modell(
-            modell, band_je_tarif, gb_je_tarif)
+            modell, band_je_tarif, gb_je_tarif, leiter)
         # O1: der Leerlauf des Graphen für Modelle ohne ein einziges Band -
         # ein Satz, der an Modell (Vorlage) und JSON-Knoten (app.js)
         # dieselbe Stelle hat, statt zweimal im Code zu stehen.
         modell["band_leer"] = (None if modell["baender"]
-                               else geraete_tco_band.BAND_LEER_TEXT)
+                               else geraete_tco_band.band_leer_text(leiter))
 
     # P2 (Antonio F4, 17.09.2026): der G2-Leser ist GEFALLEN - die Markt-
     # Historie (`geraete_tco_karten.historienreihen` +
@@ -1018,11 +1022,10 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         # Grund (F-R2-3). Ein Slug als Geraetename war keins von beidem.
         "ohne_zuordnung": modelle["ohne_zuordnung"],
         "anbieter_erwartet": list(geraete_tco_karten.ANBIETER_REIHENFOLGE),
-        # GRAPH-1: der feste Bandkatalog (§7) fuer die Tarifband-Auswahl -
-        # EINMAL hier benannt, damit die Vorlage ihn nicht ein zweites Mal
-        # aus der Konstante abschreibt (CLAUDE.md §6).
-        "baender_katalog": [{"key": k, "label": l, "bereich": b}
-                            for k, l, b in geraete_tco_band.BAENDER],
+        # P3-E1: die Vodafone-Tarifleiter als Auswahlkatalog - EINMAL hier
+        # benannt, damit Vorlage, Zeitreihe und Radar dieselben Stufen in
+        # derselben Reihenfolge lesen.
+        "baender_katalog": geraete_tco_band.baender_katalog(leiter),
         # RAD-1 (08.09.2026): derselbe Bandindex, den der Graph oben schon
         # gerechnet hat - `report/geraete_radar.py` braucht ihn fuer die
         # Vergleichbarkeitspruefung seiner %-Abweichung und rechnet ihn
@@ -1053,8 +1056,7 @@ def leer() -> dict:
             "modelle_gesamt": 0, "ohne_zuordnung": [], "graph_daten": None,
             "haendler_seit": geraete_tco_band.HAENDLER_SEIT,
             "anbieter_erwartet": list(geraete_tco_karten.ANBIETER_REIHENFOLGE),
-            "baender_katalog": [{"key": k, "label": l, "bereich": b}
-                                for k, l, b in geraete_tco_band.BAENDER],
+            "baender_katalog": [],
             "band_je_tarif": {},
             "export": {"buendel": [], "sim_only": []},
             "historie_lage": {"messtage": 0, "seit": "", "buendel": 0}}

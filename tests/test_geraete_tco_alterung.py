@@ -59,7 +59,7 @@ HEUTE = "2026-09-20"
 TAG_3 = "2026-09-17"    # Grenzfall: 3 Tage alt -> noch frisch
 TAG_4 = "2026-09-16"    # 4 Tage alt -> alt (jenseits der 3-Tage-Grenze)
 SKU = "apple-iphone-17-pro-256gb-schwarz"
-BAND_MITTEL = {"o2:l": "mittel", "vf:m": "mittel", "tk:m": "mittel"}
+BAND_MITTEL = {"o2:l": "m", "vf:m": "m", "tk:m": "m"}
 
 _KATALOG = None
 
@@ -284,12 +284,12 @@ def test_band_und_radar_rechnen_nur_mit_frischen_karten():
     günstigste Karte des Bandes auftauchen."""
     modell = _modell(_standard())
     alle = geraete_tco_band.alle_karten_je_band(modell, BAND_MITTEL)
-    assert sorted(alle["mittel"]) == ["Telekom", "Vodafone"]
+    assert sorted(alle["m"]) == ["Telekom", "Vodafone"]
     beste = geraete_tco_band.karten_je_band(modell, BAND_MITTEL)
-    assert beste["mittel"]["Vodafone"]["gesamt"] == 1224.76
+    assert beste["m"]["Vodafone"]["gesamt"] == 1224.76
     # Gegenprobe: der günstigste Wert DES BANDES ist der frische - nicht
     # das alte 1.200,76-Angebot von o2.
-    assert min(k["gesamt"] for ks in alle["mittel"].values()
+    assert min(k["gesamt"] for ks in alle["m"].values()
                for k in ks) == 1224.76
 
 
@@ -332,6 +332,11 @@ def test_buendelzeilen_sortieren_alte_nach_hinten():
                 "quelle_url": "https://telekom.invalid/x",
                 "abgerufen_am": "2026-09-19"}]
     tarife = {tid: {"datenvolumen_gb": 30} for tid in BAND_MITTEL}
+    # P3-E1: ohne Vodafone-Tarifleiter gaebe es keine Stufe - eine
+    # einzige Stufe genuegt, alle drei Tarife fallen hinein.
+    tarife["vf:m-sp"] = {"anbieter": "Vodafone",
+                         "name": "Vodafone Mobil M mit Smartphone",
+                         "datenvolumen_gb": 30, "grundgebuehr": 19.99}
     ansicht = geraete_tco_view.aufbereiten(buendel, [], _listungen(),
                                            _katalog(), tarife=tarife,
                                            heute=HEUTE)
@@ -352,7 +357,7 @@ def _tco_dict(modell):
         tid = (k.get("tarif_id") or "").strip()
         k["band"] = BAND_MITTEL.get(tid)
     return {"modelle": [modell],
-            "baender_katalog": [{"key": "mittel", "label": "Mittel",
+            "baender_katalog": [{"key": "m", "label": "M",
                                  "bereich": "21 bis 60 GB"}],
             "historie_lage": {"seit": "", "messtage": 0, "buendel": 0}}
 
@@ -364,12 +369,12 @@ def test_zeitreihe_band_mit_nur_alten_angeboten_bleibt_waehlbar(tmp_path):
     tco = _tco_dict(_modell(_alles_alt()))
     zr = geraete_zeitreihe.aufbereiten(tmp_path / "state", tco)
     mid = tco["modelle"][0]["id"]
-    assert zr["daten"]["erlaubt"][mid] == ["mittel"]
+    assert zr["daten"]["erlaubt"][mid] == ["m"]
     paar = next(p for p in zr["paare"] if p["modell"] == mid)
     assert "kein aktueller Stand" in paar["antwort_html"]
     assert "16.09.2026" in paar["antwort_html"]
     # Die Kachel zeigt keinen „ab“-Preis, sondern den alten Stand.
-    kachel = zr["kacheln"][0]["baender"]["mittel"]
+    kachel = zr["kacheln"][0]["baender"]["m"]
     assert kachel["ab"] is None
     assert kachel["alt_text"] == "kein aktueller Stand seit 16.09.2026"
     # Die Lücke nennt die drei Anbieter beim alten Stand; 1&1 und
@@ -390,7 +395,7 @@ def test_zeitreihe_gemischtes_band_ignoriert_das_alte_angebot(tmp_path):
     paar = next(p for p in zr["paare"] if p["modell"] == mid)
     assert "führt Vodafone" in paar["antwort_html"]
     assert "1.224,76" in paar["antwort_html"]
-    kachel = zr["kacheln"][0]["baender"]["mittel"]
+    kachel = zr["kacheln"][0]["baender"]["m"]
     assert kachel["ab"] == "1.224,76 €"
     assert kachel.get("alt_text") is None
     assert "Kein aktueller Stand: o2." in (paar["luecke_text"] or "")
@@ -404,7 +409,7 @@ def test_band_zeilen_trennen_frisch_und_alt():
     for k in modell["karten"]:
         k["band"] = BAND_MITTEL.get((k.get("tarif_id") or "").strip())
     saetze = geraete_zeitreihe._band_zeilen(modell)
-    satz = saetze["mittel"]
+    satz = saetze["m"]
     assert [k["anbieter"] for k in satz["zeilen"]] == ["Vodafone", "Telekom"]
     assert [k["anbieter"] for k in satz["alt"]] == ["o2"]
 
@@ -688,11 +693,11 @@ def test_radar_zeigt_alte_karte_als_beleg_nicht_als_paar():
              "abgerufen_am": "2026-09-15"}
     basis = {"gesamt": 1320.76, "tarif": "Mobil M", "naeherung": False,
              "monate": 24,
-             "band": "mittel", "band_label": "Mittel (21 bis 60 GB)",
+             "band": "m", "band_label": "Mittel (21 bis 60 GB)",
              "quelle_url": "", "abgerufen_am": "",
              "tarif_quelle_url": "", "tarif_abgerufen_am": ""}
     zeile = radar_modul._zeile_fuer_anbieter(
-        "Telekom", karte, basis, {"tk:m": "mittel"})
+        "Telekom", karte, basis, {"tk:m": "m"})
     assert zeile["status"] == radar_modul.STATUS_NICHT_VERGLEICHBAR
     assert zeile["prozent"] is None
     assert zeile["grund"] == "kein aktueller Stand seit 15.09.2026"
@@ -703,7 +708,7 @@ def test_radar_zeigt_alte_karte_als_beleg_nicht_als_paar():
     # (1.080,76 gegen 1.320,76 = -18,2 % - Telekom billiger).
     frisch = {**karte, "frisch": True, "alt_marke": ""}
     frisch_zeile = radar_modul._zeile_fuer_anbieter(
-        "Telekom", frisch, basis, {"tk:m": "mittel"})
+        "Telekom", frisch, basis, {"tk:m": "m"})
     assert frisch_zeile["status"] == radar_modul.STATUS_VERGLEICHBAR
     assert frisch_zeile["prozent"] == -18.2
 
@@ -979,26 +984,26 @@ def test_radar_beleg_nimmt_die_frische_karte_nicht_die_alte_billige():
 
 def test_zeitreihe_nennt_den_alten_stand_statt_ein_buendel_abzustreiten(
         tmp_path):
-    """S2-3: Telekom führt im Band klein ein (gealtetes) Bündel -
-    720,76 EUR vom 15.09. - und im Band groß ein frisches. Vor dem Fix
+    """S2-3: Telekom führt im Band XS ein (gealtetes) Bündel -
+    720,76 EUR vom 15.09. - und im Band L ein frisches. Vor dem Fix
     prüfte `_luecken` die Frische über ALLE Karten des Anbieters VOR
     der Bandfrage und sagte dann „Kein Bündel in diesem Band: Telekom“,
     obwohl die alte Klein-Karte als alt-Zeile über dem Satz steht - eine
     falsche Existenzaussage (harte Regel 9). Richtig ist der alte Stand
-    DES BANDES: „Kein aktueller Stand: Telekom (groß 1.440,76 €)“."""
+    DES BANDES: „Kein aktueller Stand: Telekom (L 1.440,76 €)“."""
     modell = _modell(_telekom_zwei_baender())
-    band_je = {"tk:s": "klein", "tk:xl": "gross", "vf:m": "mittel"}
+    band_je = {"tk:s": "xs", "tk:xl": "l", "vf:m": "m"}
     for k in modell["karten"]:
         k["band"] = band_je.get((k.get("tarif_id") or "").strip())
     tco = {"modelle": [modell],
            "baender_katalog": [
-               {"key": "klein", "label": "Klein", "bereich": "bis 20 GB"},
-               {"key": "mittel", "label": "Mittel",
+               {"key": "xs", "label": "XS", "bereich": "bis 20 GB"},
+               {"key": "m", "label": "M",
                 "bereich": "21 bis 60 GB"},
-               {"key": "gross", "label": "Groß", "bereich": "ab 61 GB"}],
+               {"key": "l", "label": "L", "bereich": "ab 61 GB"}],
            "historie_lage": {"seit": "", "messtage": 0, "buendel": 0}}
     zr = geraete_zeitreihe.aufbereiten(tmp_path / "state", tco)
-    paar = next(p for p in zr["paare"] if p["band"] == "klein")
+    paar = next(p for p in zr["paare"] if p["band"] == "xs")
     assert "Kein aktueller Stand: Telekom" in paar["luecke_text"]
     assert "Kein Bündel in diesem Band: Telekom" not in paar["luecke_text"]
     # Die alte Karte des Bandes bleibt sichtbar: der Satz über den

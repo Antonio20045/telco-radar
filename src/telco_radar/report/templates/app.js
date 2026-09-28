@@ -1092,9 +1092,11 @@ var TelcoFrage = (function () {
   }
   if (!daten || !daten.vorgabe) return;
 
-  var BAND_KEYS = ['klein', 'mittel', 'gross'];
+  /* Die Stufen der Vodafone-Tarifleiter (P3-E1) stehen im Datenknoten -
+     kein zweiter, fest verdrahteter Katalog im Browser. */
+  var BAND_KEYS = daten.band_folge || [];
   var zustand = { modell: daten.vorgabe,
-                  band: daten.start_band || 'klein' };
+                  band: daten.start_band || BAND_KEYS[0] || '' };
 
   function element(id) { return document.getElementById(id); }
 

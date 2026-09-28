@@ -27,6 +27,7 @@ import pathlib
 import yaml
 from bs4 import BeautifulSoup
 
+from tarifleiter_testbestand import mit_leiter
 from telco_radar.geraete_config import lade_katalog, lade_quellen
 from telco_radar.report import geraete_view
 from telco_radar.report.html import render_site
@@ -112,7 +113,7 @@ def _tarif(anbieter, tarif_id, tarif_name, gb):
 
 
 def _baue_ohne_band(tmp_path: pathlib.Path) -> BeautifulSoup:
-    """Ein Modell in drei Lagern: Band Klein (o2 + Vodafone), unbegrenzt
+    """Ein Modell in drei Lagern: Band XS (o2 + Vodafone), unbegrenzt
     (o2, ohne Band), kein Tarifbestand (1&1, ohne Band) - dazu Saturn mit
     und Amazon/Expert ohne Händlerpreis."""
     import math
@@ -155,6 +156,7 @@ def _baue_ohne_band(tmp_path: pathlib.Path) -> BeautifulSoup:
     tarife = [_tarif("o2", "o2:klein", "O2 Mobile Klein", 10),
               _tarif("Vodafone", "vf:klein", "Vodafone Mobil XS", 18),
               _tarif("o2", "o2:unlimited", "O2 Unlimited", math.inf)]
+    tarife = mit_leiter(tarife)
     (state / "tarife.jsonl").write_text(
         "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
     reports = root / "data" / "reports"
@@ -447,7 +449,7 @@ def test_die_bandliste_traegt_ihr_band_als_attribut(tmp_path):
     zeilen = s.select("#gr-bndliste .gr-bnd")
     assert zeilen
     for z in zeilen:
-        assert z.get("data-band") in ("klein", "mittel", "gross"), \
+        assert z.get("data-band") in ("xs", "m", "l"), \
             z.get("data-band")
 
 

@@ -277,15 +277,15 @@
     <div class="gr-zr-feld">
       <label id="gr-zr-band-label">Tarifband</label>
       <div class="gr-zr-baender" role="group" aria-labelledby="gr-zr-band-label" id="gr-zr-baender">
-        {# Drei feste Optionen; nicht erlaubte werden vom Client
+        {# Die Stufen der Tarifleiter; nicht erlaubte werden vom Client
            DEAKTIVIERT, nicht entfernt (Angebot, nicht Existenz) - dieselbe
            Regel wie am alten <select>. #}
         {% for b in zr.band_folge %}
         <button type="button" data-band="{{ b }}"{% if zr.start
           %}{% if zr.start.band == b %} aria-pressed="true"{% else
           %} aria-pressed="false"{% endif %}{% else %} aria-pressed="false"{% endif
-          %}>{{ zr.baender[b].label }}<small>{{ zr.baender[b].bereich
-          }}</small></button>
+          %}>{{ zr.baender[b].label }}{% if zr.baender[b].bereich
+          %}<small>{{ zr.baender[b].bereich }}</small>{% endif %}</button>
         {% endfor %}
       </div>
     </div>
@@ -371,10 +371,13 @@
      app.js dort selbst, statt mit dem Block verschwinden zu müssen. #}
   <div class="gr-zr-panel" id="gr-zr-panel" hidden></div>
   {% elif m %}
-  {# Paare ohne Serie: der ehrliche Leer-Satz an derselben Stelle. #}
-  <div class="gr-zr-gruppe" id="gr-zr-gruppe"><p class="gr-zr-keine">Für dieses Gerät liegt
+  {# Paare ohne Serie: der ehrliche Leer-Satz an derselben Stelle. Hat das
+     Geraet gar keine Stufe (keine Tarifleiter erhoben, kein Buendel), nennt
+     `band_leer` diesen Grund statt einer fehlenden Messreihe. #}
+  <div class="gr-zr-gruppe" id="gr-zr-gruppe"><p class="gr-zr-keine">{% if m.band_leer %}{{
+  m.band_leer }}{% else %}Für dieses Gerät liegt
   noch keine Messreihe vor - die Zeitreihe beginnt mit dem ersten
-  nächtlichen Lauf, der sie schreibt, und wächst mit jedem Messtag.</p>
+  nächtlichen Lauf, der sie schreibt, und wächst mit jedem Messtag.{% endif %}</p>
   </div>
   {% endif %}
 
@@ -817,7 +820,7 @@
           m.tco_delta_kurz }}</span>{% elif m.tco_delta_leer %}<span
             class="gr-a-klein" title="{{ m.tco_delta_leer_grund }}">{{ m.tco_delta_leer }}</span>{% else %}–{% endif %}</td>
         <td class="gr-sp--tco"><span class="gr-k-band">{{
-          {'klein': 'Klein', 'mittel': 'Mittel', 'gross': 'Groß'}.get(m.tco_band or '', '') or '–' }}</span></td>
+          m.tco_band_label or '–' }}</span></td>
       </tr>
       {# --- Der Zeilen-Aufklapper: die Listungs-Details des Modells
          (C1-Feld `zeilen`). Dieselbe Mechanik wie die Radar-Modellliste:

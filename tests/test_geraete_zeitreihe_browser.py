@@ -362,11 +362,11 @@ def test_nach_der_auswahl_ist_die_vorschau_zu(telefon):
     assert hoehe == 0, f"die Vorschau steht offen ({hoehe} px) nach Auswahl"
     # Der Band-Knopfe muss ohne Umweg treffbar sein: der Klick wartet
     # kurze Zeit - ein Overlay davor waere der Timeout.
-    s.tap("#gr-zr-baender button[data-band='mittel']", timeout=4000)
+    s.tap("#gr-zr-baender button[data-band='m']", timeout=4000)
     s.wait_for_timeout(500)
     antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort",
                                  "e => e.textContent")
-    assert "Mittel" in antwort
+    assert "M" in antwort
 
 
 def test_ausstapschliesst_die_vorschau(telefon):
@@ -400,13 +400,13 @@ def test_der_bandwechsel_liefert_den_graphen_des_bandes(schreibtisch):
     s, _ = schreibtisch
     vor = s.eval_on_selector_all("#tafel-tco svg.gr-zr circle.gr-zr-punkt",
                                  "es => es.map(e => e.getAttribute('cx'))")
-    s.click("#gr-zr-baender button[data-band='mittel']")
+    s.click("#gr-zr-baender button[data-band='m']")
     s.wait_for_timeout(400)
     nach = s.eval_on_selector_all("#tafel-tco svg.gr-zr circle.gr-zr-punkt",
                                   "es => es.map(e => e.getAttribute('cx'))")
     antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort",
                                  "e => e.textContent")
-    assert "Mittel" in antwort
+    assert "M" in antwort
     assert len(nach) < len(vor) or vor != nach
 
 
@@ -415,11 +415,11 @@ def test_der_deep_link_setzt_modell_und_band(_browser_seite):
     s = browser.new_page(viewport={"width": 1440, "height": 900})
     try:
         s.goto(f"{basis}/geraete.html?modell=samsung-galaxy-s26-256"
-               f"&band=klein", wait_until="load")
+               f"&band=xs", wait_until="load")
         s.wait_for_timeout(450)
         antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort",
                                      "e => e.textContent")
-        assert "Galaxy S26" in antwort and "Klein" in antwort
+        assert "Galaxy S26" in antwort and "XS" in antwort
         url = s.url
         assert "modell=samsung-galaxy-s26-256" in url
     finally:
@@ -456,10 +456,10 @@ def test_der_bandtitel_und_die_sichtbaren_zeilen_meinen_dasselbe_band(
     Bandblock, nicht heimlich in einem Band). Dieser Test nagelt die
     Zusicherung fest, damit der Filter nicht still entfallen kann."""
     s, _ = schreibtisch
-    s.click("#gr-zr-baender button[data-band='mittel']")
+    s.click("#gr-zr-baender button[data-band='m']")
     s.wait_for_timeout(500)
     titel = s.eval_on_selector("#gr-bnd-titel", "e => e.textContent")
-    assert "Band Mittel" in titel
+    assert "Band M" in titel
     zeilen = s.evaluate("""() => Array.from(
       document.querySelectorAll('#gr-bnd-gruppe .gr-bnd')).map(z => ({
         band: z.getAttribute('data-band'),
@@ -469,19 +469,19 @@ def test_der_bandtitel_und_die_sichtbaren_zeilen_meinen_dasselbe_band(
     sichtbar = [z for z in zeilen if z["sichtbar"]]
     assert sichtbar, "im Band-Zustand ist keine Zeile sichtbar"
     # JEDE sichtbare Zeile MIT data-band gehört zum gewählten Band - der
-    # Titel „Alle Bündel im Band Mittel" darf nichts anderes überstehen
+    # Titel „Alle Bündel im Band M" darf nichts anderes überstehen
     # haben. Zeilen OHNE data-band sind die §7-Gruppe „Ohne Tarifband".
     for z in sichtbar:
         if z["ohneband"]:
             assert z["band"] is None, \
                 "eine Band-Zeile steht in der Ohne-Band-Gruppe"
         else:
-            assert z["band"] == "mittel", \
+            assert z["band"] == "m", \
                 f"sichtbare Zeile mit data-band={z['band']!r} unter " \
-                f"dem Titel 'Band Mittel'"
+                f"dem Titel 'Band M'"
     # und umgekehrt: jede Zeile eines ANDEREN Bands ist wirklich weg
     for z in zeilen:
-        if z["band"] not in (None, "mittel"):
+        if z["band"] not in (None, "m"):
             assert not z["sichtbar"], \
                 f"Zeile data-band={z['band']!r} ist sichtbar geblieben"
 

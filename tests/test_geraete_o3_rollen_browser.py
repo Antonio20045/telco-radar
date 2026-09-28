@@ -19,6 +19,8 @@ import json
 import math
 
 import pytest
+
+from tarifleiter_testbestand import mit_leiter
 import yaml
 
 from telco_radar.report.html import render_site
@@ -107,6 +109,7 @@ def _baue(tmp_path):
          "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}}
         for _d, _s, anbieter, tarif_id, tarif, gb, _r in _BUENDEL
     ]
+    tarife = mit_leiter(tarife)
     (state / "tarife.jsonl").write_text(
         "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
     reports = root / "data" / "reports"

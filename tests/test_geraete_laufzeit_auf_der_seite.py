@@ -32,6 +32,8 @@ import pathlib
 import yaml
 from bs4 import BeautifulSoup
 
+from tarifleiter_testbestand import mit_leiter
+
 from telco_radar.geraete_config import lade_katalog, lade_quellen
 from telco_radar.report import geraete_tco_karten as karten
 from telco_radar.report import geraete_view, geraete_zeitreihe
@@ -118,7 +120,7 @@ def _vodafone() -> Buendel:
 
 
 def _tarife():
-    return {t["tarif_id"]: t for t in (
+    return mit_leiter({t["tarif_id"]: t for t in (
         {"anbieter": "congstar", "name": "Allnet Flat S", "tarif_id": "cs:s",
          "art": "mobilfunk", "grundgebuehr": 15.0, "laufzeit_monate": 24,
          "datenvolumen_gb": 50,
@@ -131,7 +133,7 @@ def _tarife():
          "preisphasen": [{"von_monat": 1, "bis_monat": None,
                           "betrag": 29.95}],
          "dokument_url": "https://example.de/pib/vf-xs",
-         "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}})}
+         "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}})}, HEUTE)
 
 
 def _referenzen():
@@ -423,15 +425,16 @@ def _zeitreihe_wurzel(tmp_path: pathlib.Path, buendel_id: str,
                                                 encoding="utf-8")
     (state / "geraete_tco_historie.jsonl").write_text(
         "\n".join(json.dumps(z) for z in zeilen) + "\n", encoding="utf-8")
-    (state / "tarife.jsonl").write_text(json.dumps(
+    tarife = mit_leiter([
         {"anbieter": "o2", "name": "O2 Mobile M", "tarif_id": "o2:m",
          "art": "mobilfunk", "grundgebuehr": 20.0, "laufzeit_monate": 24,
          "datenvolumen_gb": 50,
          "preisphasen": [{"von_monat": 1, "bis_monat": None,
                           "betrag": 20.0}],
          "dokument_url": "https://example.de/pib/o2-m",
-         "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}}) + "\n",
-        encoding="utf-8")
+         "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}}], HEUTE)
+    (state / "tarife.jsonl").write_text(
+        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
     return root, state
 
 

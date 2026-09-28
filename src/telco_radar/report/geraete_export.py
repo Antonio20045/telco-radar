@@ -576,7 +576,7 @@ def modell_tco_csv(modelle: list) -> tuple[str, int]:
             _zahl(m.get("tco_monat")), _zahl(m.get("tco_delta")),
             # Klartext statt Rohschluessel (S4-1 der P3-Code-Pruefung):
             # dieselbe Bezeichnung wie der Chip der Vergleichsansicht und
-            # die Band-Spalte des Katalogs - ein "klein" in der Spalte
+            # die Band-Spalte des Katalogs - ein "xs" in der Spalte
             # waere eine zweite Sprache fuer dieselbe Sache (O4-Regel).
             _prozent(m.get("tco_delta_prozent")),
             band_label(m.get("tco_band")),
