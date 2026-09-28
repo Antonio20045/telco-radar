@@ -524,9 +524,9 @@
    Frage selbst ist die des Modulkopfs von `geraete_radar.py` -
    dieselbe wie die h1 der Schwesterseite.
 
-   P4/D1 (18.09.2026): die Tafel führt mit der BALKENGRAFIK (erstes
-   `gr-r-sektion` der Teilvorlage); die beiden großen Tabellen stehen
-   als Aufklapper darunter. Der Sortiments-Aufklapper „Bei Wettbewerbern
+   P4/D1 (18.09.2026): die Tafel führte mit der BALKENGRAFIK. Seit
+   28.09.2026 steht die Modell-Liste „Mit Tarif" zuerst (aus ihr stammt
+   die Leitzahl), dann die drei Sektionen „Ohne Vertrag". Der Sortiments-Aufklapper „Bei Wettbewerbern
    gelistet, bei Vodafone nicht" steht SEIT P4 Schritt 2b HIER (unter
    der Grafik) und nicht mehr im Katalog-Reiter - siehe den Kommentar
    in der Teilvorlage. Der Datenkontext der Tafel heißt `radar` (dasselbe
@@ -544,15 +544,18 @@
      Label klein, .gr-leit) - Werte aus der ERSTEN Zeile der Modellliste
      (`modellliste.zeilen[0]`, sortiert nach negativester Prozentzahl,
      geraete_radar.py - dieselbe Rechnung wie die Liste, kein zweiter
-     Rechner). Ohne vergleichbare Zeile (leerer Bestand) gibt es keine
+     Rechner). Seit 28.09.2026 steht dort der Euro-Abstand (`euro_text`)
+     statt der Prozentzahl - dieselbe Einheit und dasselbe Vorzeichen wie
+     die Balken darunter (negativ = Wettbewerber günstiger). Ohne
+     vergleichbare Zeile (leerer Bestand) gibt es keine
      Leitzahl-Zeile - dann steht der Satz allein. #}
   {% set spitze = radar.modelliste.zeilen[0] if radar.modelliste.zeilen
     else none %}
   {% if spitze and spitze.prozent is not none %}
   <div class="gr-leit gr-leit--radar"><b class="gr-leit-zahl">{{
-    spitze.prozent_text }} %</b><span class="gr-leit-label">stärkste
-    Abweichung zu Vodafone: {{ spitze.titel }} bei {{ spitze.anbieter
-    }} · {{ spitze.euro_text }} € Kosten über 24 Monate</span></div>
+    spitze.euro_text }} €</b><span class="gr-leit-label">{{ spitze.anbieter }} {{
+    spitze.richtung }} Vodafone: {{ spitze.titel }} mit Tarif, Kosten
+    über 24 Monate</span></div>
   {% endif %}
   {# E3-Fix (QA 17.09.2026, B2) / P4-Fix (Sicht-Pruefung 18.09.): Der Kopf
      behauptete die vorzeichenbehaftete Leitzahl für ALLE drei Sektionen -

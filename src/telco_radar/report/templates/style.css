@@ -4135,3 +4135,9 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
 .gr-bnd-aktion{display:block;font-family:var(--sans);font-size:12px;
   font-weight:600;color:var(--ink-3);white-space:nowrap}
 .gr-kk-aktion{margin:0 0 5px;font-size:13px;line-height:1.45}
+/* Übersicht am Telefon (28.09.2026): die Frage stand in drei Zeilen zu
+   25,5 px und draengte sich vor die Leitzahl (30 px). Zwei Zeilen, die
+   Leitzahl bleibt die groesste Schrift ihres Bereichs (Antonios Regel). */
+@media(max-width:700px){
+  .gr-radar>h2.rubrik{font-size:19px;line-height:1.3;margin-bottom:6px}
+}

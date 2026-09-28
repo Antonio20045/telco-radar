@@ -412,6 +412,81 @@ def test_kein_querscroll_auf_dem_telefon_radar(ctx):
         s.close()
 
 
+
+def test_die_frage_der_uebersicht_steht_am_telefon_in_hoechstens_zwei_zeilen(ctx):
+    """28.09.2026: bei 390 px stand die Frage des Reiters in drei Zeilen
+    zu 25,5 px (109 px Höhe) über einer Leitzahl von 30 px - die Frage
+    drängte sich vor ihre Antwort. Gemessen im Browser: höchstens zwei
+    Zeilen, und die Leitzahl bleibt die größte Schrift."""
+    _site, wurzel, browser = ctx
+    s = browser.new_page(viewport={"width": 390, "height": 844})
+    try:
+        s.goto(f"{wurzel}/geraete.html#tafel-radar", wait_until="load")
+        s.wait_for_timeout(400)
+        m = s.evaluate("""() => {
+          const h = document.querySelector('#tafel-radar h2.rubrik');
+          const z = document.querySelector('#tafel-radar .gr-leit-zahl');
+          if (!h || !z) return null;
+          const cs = getComputedStyle(h);
+          // Inhaltshöhe: die Rubrik trägt Linie und Innenabstand oben.
+          const rand = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom)
+            + parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth);
+          return {hoehe: h.getBoundingClientRect().height - rand,
+                  zeile: parseFloat(cs.lineHeight),
+                  frage: parseFloat(cs.fontSize),
+                  zahl: parseFloat(getComputedStyle(z).fontSize)};
+        }""")
+        assert m is not None, "Frage oder Leitzahl fehlt"
+        # Gegenprobe: die Zeilenhöhe ist gemessen, nicht 'normal' (NaN).
+        assert m["zeile"] > 0, m
+        assert m["hoehe"] <= 2 * m["zeile"] + 2, m
+        assert m["zahl"] > m["frage"], m
+    finally:
+        s.close()
+
+
+def test_die_balkenwerte_links_laufen_nicht_in_die_modellnamen(ctx):
+    """28.09.2026: ein günstigerer Wettbewerber steht links der Vodafone-
+    Linie, Wert und Laden stehen zwischen Namensspalte und Balkenende.
+    Gemessen am ungünstigsten Fall (vierstelliger Abstand, langer
+    Ladenname, langer Modellname) in der echten Seite: keine Überlappung.
+    Geprüft wird die Eigenschaft, keine Pixelbreite (Rückfallschrift)."""
+    from telco_radar.report import geraete_radar as wr
+    zeilen = [
+        {"device_id": "a", "speicher": 1024, "modell": "Galaxy S26 Ultra",
+         "hersteller": "x", "delta": 1012.50, "prozent": 40.0,
+         "laden": "ElectronicPartner", "vf_preis": 2500.0,
+         "gegen_preis": 1487.50},
+        {"device_id": "b", "speicher": 128, "modell": "iPhone 16",
+         "hersteller": "x", "delta": -30.0, "prozent": -3.0,
+         "laden": "Saturn", "vf_preis": 1000.0, "gegen_preis": 1030.0},
+    ]
+    svg = wr._grafik_svg(zeilen, ("a", 1024), True)
+    _site, wurzel, browser = ctx
+    s = browser.new_page(viewport={"width": 1440, "height": 900})
+    try:
+        s.goto(f"{wurzel}/geraete.html#tafel-radar", wait_until="load")
+        s.wait_for_timeout(300)
+        ueber = s.evaluate("""svg => {
+          const bild = document.querySelector('#tafel-radar .wr-grafik-bild');
+          if (!bild) return null;
+          bild.innerHTML = svg;
+          const g = bild.querySelector('svg.wr-gr--breit');
+          const namen = [...g.querySelectorAll('text.wr-gr-name')];
+          const werte = [...g.querySelectorAll('text.wr-gr-wert')];
+          return namen.map((n, i) => {
+            const a = n.getBoundingClientRect(), b = werte[i].getBoundingClientRect();
+            return {name: a.right, wert: b.left, breit: b.width};
+          });
+        }""", svg)
+        assert ueber, "keine Grafik auf der Seite"
+        # Gegenprobe: die Werte sind wirklich gesetzt und sichtbar breit.
+        assert all(z["breit"] > 20 for z in ueber), ueber
+        for z in ueber:
+            assert z["wert"] >= z["name"], ueber
+    finally:
+        s.close()
+
 def test_die_erste_balkenzeile_bleibt_ueber_der_telefon_falz(ctx):
     """11c am eigenen Maß: Untertitel + vierter Reiter kosten Höhe über
     der ersten Balkenzeile — die Leitantwort (A1) geht vor. Der Entwurfs-
