@@ -572,6 +572,161 @@ def test_der_zweite_preis_der_buendelzeile_ist_am_telefon_benannt(ctx, breite):
     finally:
         s.close()
 
+
+_KATALOG_MESSEN = """() => {
+  const t = document.getElementById('gr-katalogtabelle');
+  const box = t.parentElement.getBoundingClientRect();
+  const sichtbar = e => getComputedStyle(e).display !== 'none';
+  const zeilen = [...t.querySelectorAll('tbody > tr.gr-a-zeile')];
+  return {
+    breite: innerWidth,
+    boxRechts: box.right,
+    zeilen: zeilen.map(z => ({
+      rest: z.classList.contains('gr-a-rest'),
+      hidden: z.hidden,
+      an: sichtbar(z),
+      rechts: Math.max(...[...z.children].filter(sichtbar)
+        .map(c => c.getBoundingClientRect().right)),
+      bar: [...z.querySelectorAll('td.gr-sp--barpreis')].map(
+        c => getComputedStyle(c).display),
+      tco: [...z.querySelectorAll('td.gr-sp--tco')].map(
+        c => getComputedStyle(c).display),
+    })),
+  };
+}"""
+
+
+def test_der_katalog_steht_am_telefon_als_karten(ctx):
+    """28.09.2026: bei 390 px zeigte der Katalog nur Modell und einen
+    angeschnittenen Preis („bei Satu"), der Rest der Tabelle lag rechts im
+    Rollbehälter. Jetzt stapelt jede sichtbare Modellzeile ihre Zellen:
+    nichts ragt über den Behälter, der Umschalter tauscht die Zellen der
+    Ansicht, jede Zelle nennt ihre Spalte. Gegenprobe am Schirm: dort
+    bleibt die Tabelle eine Tabelle."""
+    _site, wurzel, browser = ctx
+    s = browser.new_page(viewport={"width": 390, "height": 844})
+    try:
+        s.goto(f"{wurzel}/geraete.html#tafel-katalog", wait_until="load")
+        s.click(".gr-reiter [data-tafel=tafel-katalog]")
+        s.wait_for_timeout(300)
+        m = s.evaluate(_KATALOG_MESSEN)
+        an = [z for z in m["zeilen"] if z["an"]]
+        assert an, "keine sichtbare Katalogzeile"
+        for z in an:
+            assert z["rechts"] <= m["boxRechts"] + 1, (z, m["boxRechts"])
+            assert all(d == "block" for d in z["bar"]), z
+            assert all(d == "none" for d in z["tco"]), z
+        s.click(".gr-kansicht [data-ansicht=tco]")
+        s.wait_for_timeout(200)
+        m = s.evaluate(_KATALOG_MESSEN)
+        for z in (z for z in m["zeilen"] if z["an"]):
+            assert all(d == "none" for d in z["bar"]), z
+            assert all(d == "block" for d in z["tco"]), z
+        # Die Leitzahl der Kostenansicht trägt ihren Spaltennamen - ohne
+        # Kopf läse sich „ab 1.459 €" wie der Einzelgerätpreis.
+        etikett = s.evaluate("""() => getComputedStyle(document.querySelector(
+          '#gr-katalogtabelle tr.gr-a-zeile td.gr-sp--tco'), '::before').content""")
+        kopf = s.evaluate("""() => document.querySelector(
+          '#gr-katalogtabelle thead th.gr-sp--tco').textContent.replace(/\\s+/g, ' ').trim()""")
+        assert kopf.startswith("Kosten über"), kopf
+        assert etikett.strip('" ') == kopf, (etikett, kopf)
+    finally:
+        s.close()
+    s = browser.new_page(viewport={"width": 1440, "height": 900})
+    try:
+        s.goto(f"{wurzel}/geraete.html#tafel-katalog", wait_until="load")
+        s.click(".gr-reiter [data-tafel=tafel-katalog]")
+        s.wait_for_timeout(300)
+        m = s.evaluate(_KATALOG_MESSEN)
+        an = [z for z in m["zeilen"] if z["an"]]
+        assert an and all(d == "table-cell" for z in an for d in z["bar"]), an
+    finally:
+        s.close()
+
+
+_KARTE_ANZEIGE = """() => {
+  const z = document.querySelector('#gr-katalogtabelle tbody tr.gr-a-zeile');
+  return getComputedStyle(z).display;
+}"""
+
+
+def test_katalogkarten_folgen_den_sichtbarkeitsregeln_der_tabelle(ctx):
+    """Die Karten fassen die Zeile selbst nicht an: gefiltert ([hidden])
+    und hinter dem Deckel (`gr-a-rest`) ist sie weg, mit „alle zeigen"
+    wieder da. Die Fixture hat weniger Modelle als der Deckel und keinen
+    Filter, also setzt der Test beide Zustände selbst - sonst prüfte die
+    Schleife nichts."""
+    _site, wurzel, browser = ctx
+    s = browser.new_page(viewport={"width": 390, "height": 844})
+    try:
+        s.goto(f"{wurzel}/geraete.html#tafel-katalog", wait_until="load")
+        s.click(".gr-reiter [data-tafel=tafel-katalog]")
+        s.wait_for_timeout(300)
+        assert s.evaluate(_KARTE_ANZEIGE) != "none"
+        s.evaluate("""() => { document.querySelector(
+          '#gr-katalogtabelle tbody tr.gr-a-zeile').hidden = true; }""")
+        assert s.evaluate(_KARTE_ANZEIGE) == "none"
+        s.evaluate("""() => { const z = document.querySelector(
+          '#gr-katalogtabelle tbody tr.gr-a-zeile');
+          z.hidden = false; z.classList.add('gr-a-rest'); }""")
+        assert s.evaluate(_KARTE_ANZEIGE) == "none"
+        s.evaluate("""() => document.getElementById('gr-katalogtabelle')
+          .classList.add('gr-alarm--alle')""")
+        assert s.evaluate(_KARTE_ANZEIGE) != "none"
+    finally:
+        s.close()
+
+
+def test_aufgeklappte_katalogkarte_rollt_in_sich_und_ziel_ist_markiert(ctx):
+    """Die breite Listungstabelle einer aufgeklappten Karte schob die ganze
+    Katalogtabelle auf 562 px; sie rollt jetzt in ihrer eigenen Box. Und
+    der Radar-Sprung markiert die Zielkarte am Telefon (der rote Rahmen
+    der Tabellenzeile fiel mit `border:0` der Kartenzellen weg)."""
+    _site, wurzel, browser = ctx
+    s = browser.new_page(viewport={"width": 390, "height": 844})
+    try:
+        s.goto(f"{wurzel}/geraete.html#tafel-katalog", wait_until="load")
+        s.click(".gr-reiter [data-tafel=tafel-katalog]")
+        s.wait_for_timeout(300)
+        # Enter statt Klick: die Mitte der Karte kann ein Link sein.
+        s.focus("#gr-katalogtabelle tbody tr.gr-a-zeile:not(.gr-k--ohne-details)")
+        s.keyboard.press("Enter")
+        s.wait_for_timeout(200)
+        m = s.evaluate("""() => {
+          const t = document.getElementById('gr-katalogtabelle');
+          const auf = t.querySelector('tr.gr-a-auf--an');
+          const liste = auf.querySelector('.gr-k-listungen');
+          return {tabelle: t.getBoundingClientRect().width,
+                  box: t.parentElement.clientWidth,
+                  auf: getComputedStyle(auf).display,
+                  liste: liste.getBoundingClientRect().width,
+                  seite: document.documentElement.scrollWidth};
+        }""")
+        assert m["auf"] != "none", m
+        assert m["liste"] > m["box"], m  # Gegenprobe: es gibt etwas zu rollen
+        assert m["tabelle"] <= m["box"] + 1, m
+        assert m["seite"] <= 390, m
+        # Luft über dem Modellnamen: sonst klebt er an der Linie der
+        # vorigen Karte (eine spezifischere padding-Regel schluckte sie).
+        oben = s.evaluate("""() => parseFloat(getComputedStyle(document.querySelector(
+          '#gr-katalogtabelle tr.gr-a-zeile > td')).paddingTop)""")
+        assert oben >= 8, oben
+        ziel = s.evaluate("""() => {
+          const z = document.querySelector('#gr-katalogtabelle tr.gr-k-zeile');
+          const td = z.querySelector('td');
+          const vorher = getComputedStyle(td).boxShadow;
+          z.classList.add('gr-k-ziel');
+          const text = td.querySelector('.gr-a-modell').getBoundingClientRect().left;
+          return {vorher, nachher: getComputedStyle(td).boxShadow,
+                  abstand: text - td.getBoundingClientRect().left};
+        }""")
+        assert ziel["vorher"] == "none" and ziel["nachher"] != "none", ziel
+        # Der 3-px-Balken darf den Text nicht überdecken.
+        assert ziel["abstand"] >= 6, ziel
+    finally:
+        s.close()
+
+
 def test_die_erste_balkenzeile_bleibt_ueber_der_telefon_falz(ctx):
     """11c am eigenen Maß: Untertitel + vierter Reiter kosten Höhe über
     der ersten Balkenzeile — die Leitantwort (A1) geht vor. Der Entwurfs-
