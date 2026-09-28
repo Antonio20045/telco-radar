@@ -513,6 +513,18 @@ def _dvorzeichen(betrag: float, stellen: int = 2) -> str:
     return text.replace(",", "#").replace(".", ",").replace("#", ".")
 
 
+def _richtung(differenz: float) -> str:
+    """„günstiger als", „teurer als" oder „gleich teuer wie" für eine Differenz
+    Wettbewerber − Vodafone, auf den angezeigten Cent gerundet (sonst
+    hiesse -0,004 € „günstiger" neben „+0,00 €")."""
+    cent = round(differenz, 2)
+    if cent < 0:
+        return "günstiger als"
+    if cent > 0:
+        return "teurer als"
+    return "gleich teuer wie"
+
+
 def modellliste(gruppen: list[dict]) -> dict:
     """EINE Zeile je Modell - die Modell-Liste des Radar-Reiters (S2).
 
@@ -589,6 +601,11 @@ def modellliste(gruppen: list[dict]) -> dict:
                              if paar else ""),
             "euro_text": (_dvorzeichen(paar["gesamt"] - paar["vf_gesamt"])
                           if paar else ""),
+            # Das Wort zur Zahl, aus DERSELBEN Differenz wie `euro_text`
+            # (nicht aus der gerundeten Prozentzahl): die Leitzahl der
+            # Übersicht sagt damit, wer günstiger ist, ohne Erklärsatz.
+            "richtung": (_richtung(paar["gesamt"] - paar["vf_gesamt"])
+                         if paar else ""),
             "anbieter": (paar or {}).get("anbieter", ""),
             "tarif": (paar or {}).get("tarif", ""),
             "band_label": (paar or {}).get("band_label", ""),
@@ -721,12 +738,25 @@ def _grafik_svg(zeilen: list[dict], spitze_schluessel: tuple | None,
     Rechenvorschrift): der linke Arm ergibt sich aus dem groessten
     Abstand nach links, derselbe Massstab wie rechts.
     """
+    # Gezeichnet UND beschriftet wird in der Zeichenregel der Seite
+    # (negativ = Wettbewerber guenstiger, wie Modell-Liste, Händler und
+    # die Δ-Spalte „Mit Tarif"): ein guenstigerer Wettbewerber steht links
+    # der Vodafone-Linie mit negativem Wert. `delta` aus grafik_zeilen()
+    # rechnet VF − Wettbewerber und wird hier EINMAL gedreht, damit
+    # Richtung, Farbe und Beschriftung aus derselben Groesse kommen (bis
+    # 28.09.2026 stand „+280,90 €" unter einer Leitzahl „-50,4 %").
+    zeilen = [{**z, "delta": -z["delta"], "prozent": -z["prozent"]}
+              for z in zeilen]
     n = len(zeilen)
     if breit:
-        w, name_breite, wert_raum, neg_raum = 1120, 158, 158, 96
+        # Der LINKE Arm traegt seit 28.09.2026 den Regelfall (Wettbewerber
+        # guenstiger) mit Wert UND Laden - er bekommt den breitesten Raum
+        # („-1.012,50 € · ElectronicPartner" misst ~170 px und darf nicht
+        # in die Namensspalte laufen).
+        w, name_breite, wert_raum, neg_raum = 1120, 158, 158, 190
         reihen_hoehe, balken_hoehe, kopf, fuss = 30, 14, 30, 12
     else:
-        w, name_breite, wert_raum, neg_raum = 350, 0, 78, 62
+        w, name_breite, wert_raum, neg_raum = 350, 0, 78, 78
         reihen_hoehe, balken_hoehe, kopf, fuss = 40, 12, 26, 8
     h = kopf + n * reihen_hoehe + fuss
     max_abs = max((abs(z["delta"]) for z in zeilen), default=1.0) or 1.0
@@ -770,7 +800,7 @@ def _grafik_svg(zeilen: list[dict], spitze_schluessel: tuple | None,
         klasse = "wr-gr-balken"
         if ist_spitze:
             klasse += " wr-gr-balken--spitze"
-        elif z["delta"] > 0:
+        elif z["delta"] < 0:
             klasse += " wr-gr-balken--teuer"
         else:
             klasse += " wr-gr-balken--gut"
@@ -802,7 +832,8 @@ def _grafik_svg(zeilen: list[dict], spitze_schluessel: tuple | None,
             else:
                 teile.append(
                     f"<text class='wr-gr-wert' x='{x0 - laenge - 8:.1f}' "
-                    f"y='{ty:.1f}' text-anchor='end'>{wert}</text>")
+                    f"y='{ty:.1f}' text-anchor='end'>{wert}<tspan "
+                    f"class='wr-gr-laden'> · {_x(z['laden'])}</tspan></text>")
         else:
             ly = kopf + i * reihen_hoehe
             y = ly + 19
@@ -870,7 +901,7 @@ def grafik(vergleich_ohne_vertrag: dict, n: int = GRAFIK_MAX) -> dict:
                                  f"{spitze_kandidat['speicher'] or ''}"),
                   "modell": spitze_kandidat["modell"],
                   "delta": spitze_kandidat["delta"],
-                  "delta_text": f"{_dvorzeichen(spitze_kandidat['delta'])} €"}
+                  "delta_text": f"{_dvorzeichen(-spitze_kandidat['delta'])} €"}
     schluessel = ((spitze["device_id"], spitze["speicher"])
                   if spitze else None)
     return {"svg_breit": _grafik_svg(gewaehlt, schluessel, True),

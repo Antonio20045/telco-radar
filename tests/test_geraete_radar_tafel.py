@@ -234,17 +234,20 @@ def test_drei_sektionen_in_folge_jede_mit_ihrem_satz(tmp_path):
     Frage des Reiters liest sich zuerst als Bild, die Tabellen sind
     Aufklapper darunter (design.md: „Radar: Balken je Modell statt 746
     Zeilen"). Der Test war gegen den Grafik-Stand ROT (3 Köpfe statt 4)
-    und hält jetzt VIER Sektionen in dieser Folge fest."""
+    und hält jetzt VIER Sektionen fest. Seit 28.09.2026 steht die
+    Modell-Liste „Mit Tarif" vor der Grafik (aus ihr stammt die Leitzahl)."""
     suppe = _suppe(tmp_path)
     tafel = suppe.select_one("#tafel-radar")
     assert tafel is not None, "#tafel-radar fehlt"
     koepfe = [_text(k) for k in tafel.select("h3.gr-unter")]
     assert len(koepfe) == 4, f"vier Sektionen erwartet, steht da: {koepfe}"
-    assert koepfe[0].startswith("Die größten Abstände zu Vodafone"), koepfe
-    assert koepfe[1].startswith("Preis-Alarme"), koepfe
-    assert koepfe[2].startswith("Alle Modelle nach Abweichung zu Vodafone"), \
-        koepfe
-    assert koepfe[3].startswith("Händler"), koepfe
+    # 28.09.2026: erst „Mit Tarif" (die Leitzahl darueber stammt aus
+    # dieser Liste), dann die drei Barpreis-Sektionen „Ohne Vertrag" -
+    # dieselben Begriffe wie die Reiter.
+    assert koepfe[0].startswith("Mit Tarif – alle Modelle"), koepfe
+    assert koepfe[1].startswith("Ohne Vertrag – wo Vodafone"), koepfe
+    assert koepfe[2].startswith("Ohne Vertrag – Preis-Alarme"), koepfe
+    assert koepfe[3].startswith("Ohne Vertrag – Händler"), koepfe
     # Jede Sektion erklärt in einem Satz ihre Frage - keine ohne Zweck.
     for kopf in koepfe:
         sec = kopf and suppe.find(string=kopf)
@@ -370,11 +373,12 @@ def test_die_haendler_sektion_steht_nicht_mehr_ganz_unten_als_rest(tmp_path):
 
     P4/D1 (18.09.2026): die Grafik-Sektion (#wr-grafik) steht seit dem
     Design-Durchlauf VOR den dreien - dieselbe Liste, ein Kopf mehr. Der
-    Test war gegen den Grafik-Stand ROT und dreht seitdem mit."""
+    Test war gegen den Grafik-Stand ROT und dreht seitdem mit. Seit
+    28.09.2026 führt die Modell-Liste „Mit Tarif"."""
     suppe = _suppe(tmp_path)
     sektionen = suppe.select("#tafel-radar .gr-r-sektion")
-    assert [s.get("id") for s in sektionen] == ["wr-grafik", "wr-alarme",
-                                                "wr-abweichung",
+    assert [s.get("id") for s in sektionen] == ["wr-abweichung",
+                                                "wr-grafik", "wr-alarme",
                                                 "wr-haendler"]
 
 
@@ -579,3 +583,71 @@ def test_leerzustand_traegt_den_modellisten_schluessel():
     voll = wr.radar({"modelle": [], "band_je_tarif": {}}, {}, {})
     assert set(wr.leer()) == set(voll)
     assert voll["modelliste"] == wr.leer()["modelliste"]
+
+
+def test_die_leitzahl_der_uebersicht_liest_sich_wie_die_balken(tmp_path):
+    """28.09.2026 (Antonio: „kein roter Faden"): die Leitzahl stand als
+    „-50,4 %" über Balken mit „+280,90 €" - andere Einheit, anderes
+    Vorzeichen auf demselben Reiter. Jetzt zeigt sie den Euro-Abstand der
+    ersten Zeile der Modell-Liste in der Zeichenregel der Seite (negativ =
+    Wettbewerber günstiger). Gegen den alten Stand rot (dort stand die
+    Prozentzahl)."""
+    suppe = _suppe(tmp_path)
+    zahl = suppe.select_one("#tafel-radar .gr-leit--radar .gr-leit-zahl")
+    assert zahl is not None, "Leitzahl fehlt"
+    erste = next(z for z in suppe.select("#wr-abweichung tr.gr-a-zeile")
+                 if z.get("data-s-prozent"))
+    gesamt = float(erste["data-s-gesamt"])
+    vf = float(erste["data-s-vf"])
+    # Gegenprobe: die Fixture hat einen echten Abstand, sonst prüft der
+    # Vorzeichenvergleich unten nichts.
+    assert abs(vf - gesamt) > 0.005, (vf, gesamt)
+    erwartet = wr._dvorzeichen(gesamt - vf) + " €"
+    assert _text(zahl) == erwartet, (_text(zahl), erwartet)
+    # Dieselbe Zahl steht in der Quellzeile direkt darunter.
+    assert erwartet in _text(erste), _text(erste)
+    # Das Wort zur Zahl kommt aus derselben Differenz.
+    label = suppe.select_one("#tafel-radar .gr-leit--radar .gr-leit-label")
+    wort = "günstiger als" if gesamt < vf else "teurer als"
+    anbieter = erste["data-s-anbieter"]
+    assert anbieter, "die Quellzeile nennt keinen Anbieter"
+    assert _text(label).startswith(f"{anbieter} {wort} Vodafone:"), \
+        _text(label)
+
+
+def test_das_richtungswort_liest_den_angezeigten_cent():
+    """Das Wort der Leitzahl rundet wie ihre Zahl: -0,004 € steht als
+    „+0,00 €" (bzw. „-0,00 €") da und darf nicht „günstiger" heißen."""
+    assert wr._richtung(-811.05) == "günstiger als"
+    assert wr._richtung(12.0) == "teurer als"
+    assert wr._richtung(0.0) == "gleich teuer wie"
+    assert wr._richtung(-0.004) == "gleich teuer wie"
+    assert wr._richtung(-0.006) == "günstiger als"
+
+
+def test_die_balken_tragen_das_vorzeichen_der_seite():
+    """Die Balken rechnen `delta` = Vodafone − Wettbewerber (Länge und
+    Richtung), beschriften aber in der Zeichenregel der Seite: ein
+    Wettbewerber, der 280,90 € günstiger ist, steht als „-280,90 €" da -
+    wie in Modell-Liste, Händlertabelle und Δ-Spalte „Mit Tarif". Bis
+    28.09.2026 stand dort „+280,90 €" (gegen den alten Stand rot)."""
+    zeilen = [
+        {"device_id": "a", "speicher": 128, "modell": "Guenstig bei W",
+         "hersteller": "x", "delta": 280.90, "prozent": 28.7,
+         "laden": "Medimax", "vf_preis": 979.90, "gegen_preis": 699.00},
+        {"device_id": "b", "speicher": 128, "modell": "Teurer bei W",
+         "hersteller": "x", "delta": -20.0, "prozent": -2.0,
+         "laden": "Saturn", "vf_preis": 1000.0, "gegen_preis": 1020.0},
+    ]
+    for breit in (True, False):
+        svg = BeautifulSoup(wr._grafik_svg(zeilen, ("a", 128), breit),
+                            "html.parser")
+        werte = [_text(t) for t in svg.select("text.wr-gr-wert")]
+        assert any(w.startswith("-280,90 €") for w in werte), werte
+        assert any(w.startswith("+20,00 €") for w in werte), werte
+        assert not any(w.startswith("+280,90") for w in werte), werte
+        # Richtung und Vorzeichen aus derselben Größe: negative Werte
+        # stehen links der Vodafone-Linie (Anker am Ende), positive rechts.
+        for t in svg.select("text.wr-gr-wert"):
+            links = t.get("text-anchor") == "end"
+            assert links == _text(t).startswith("-"), (_text(t), links)
