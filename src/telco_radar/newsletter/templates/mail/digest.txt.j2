@@ -16,7 +16,19 @@
 ==============================================================
 
 {{ chrome.anrede }} {{ einleitung }}
-{% for it in items %}
+{% if bewegung %}
+{{ bewegung.titel | upper }}{% if bewegung.zeitraum %} ({{ bewegung.zeitraum }}){% endif %}
+{% if bewegung.ausfall %}{{ bewegung.ausfall }}
+{% elif bewegung.leer %}{{ bewegung.leer }}
+{% endif %}{% for z in bewegung.zeilen %}
+- {{ z.anbieter }} · {{ z.geraet }} · {{ z.band }}: {{ z.betrag }} {{ z.richtung }}
+  {{ z.vorher }} · {{ z.jetzt }} · {{ z.bewegt }}
+  {{ chrome.bewegung.link_seite }}: {{ z.link }}
+{% if z.quelle %}  {{ z.quelle_text }}: {{ z.quelle }}
+{% endif %}{% if z.eigen_quelle %}  {{ z.eigen_quelle_text }}: {{ z.eigen_quelle }}
+{% endif %}{% endfor %}{% if bewegung.weitere %}{{ bewegung.weitere }}: {{ bewegung.seite }}
+{% endif %}--------------------------------------------------------------
+{% endif %}{% for it in items %}
 {% if it.stichwort %}{{ chrome.stichwort_marker | replace('{stichwort}', it.stichwort) }}
 {% endif %}{{ loop.index }}. {{ it.titel }}{% if it.absender %}  [{{ it.absender }}]{% endif %}
 {% if it.text %}   {{ it.text }}

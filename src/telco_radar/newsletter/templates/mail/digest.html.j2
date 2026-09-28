@@ -53,6 +53,39 @@
     <tr><td style="padding:20px 0 2px 0;font:400 14px/1.55 Georgia,'Times New Roman',Times,serif;color:#141414">{{ chrome.anrede }} {{ einleitung }}</td></tr>
   </table>
 
+  {#- -------------------------------------------------- Geraeteblock -#}
+  {#- P4: hoechstens fuenf Zeilen, die groesste Zahl ist die Aenderung des
+      Abstands. Jede Zeile verlinkt beide Angebote und die Geraeteseite mit
+      vorgewaehltem Geraet und Band. -#}
+  {% if bewegung %}
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+         style="border-collapse:collapse">
+    <tr><td style="padding:20px 0 4px 0">
+      <div style="font:700 11px/1.4 Arial,Helvetica,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#6b6b6b">{{ bewegung.titel }}{% if bewegung.zeitraum %} &middot; {{ bewegung.zeitraum }}{% endif %}</div>
+    </td></tr>
+    {% if bewegung.ausfall %}
+    <tr><td style="padding:6px 0 14px 0;font:400 14px/1.55 Georgia,'Times New Roman',Times,serif;color:#3a3a3a">{{ bewegung.ausfall }}</td></tr>
+    {% elif bewegung.leer %}
+    <tr><td style="padding:6px 0 14px 0;font:400 14px/1.55 Georgia,'Times New Roman',Times,serif;color:#3a3a3a">{{ bewegung.leer }}</td></tr>
+    {% endif %}
+    {% for z in bewegung.zeilen %}
+    <tr><td style="padding:12px 0 12px 0;{% if not loop.first %}border-top:1px solid #ddd8cc{% endif %}">
+      <div style="font:700 11px/1.4 Arial,Helvetica,sans-serif;letter-spacing:.04em;padding-bottom:4px"><span style="color:{{ z.farbe }}">{{ z.anbieter }}</span> <span style="color:#6b6b6b">&middot;</span> <span style="color:#141414">{{ z.geraet }}</span> <span style="color:#6b6b6b">&middot;</span> <span style="color:#6b6b6b">{{ z.band }}</span></div>
+      <div style="padding-bottom:4px"><span style="font:700 24px/1.2 Georgia,'Times New Roman',Times,serif;color:#141414">{{ z.betrag }}</span> <span style="font:400 14px/1.4 Georgia,'Times New Roman',Times,serif;color:#141414">{{ z.richtung }}</span></div>
+      <div style="font:400 13px/1.5 Georgia,'Times New Roman',Times,serif;color:#3a3a3a"><span>{{ z.vorher }}</span> &middot; <span>{{ z.jetzt }}</span> &middot; <span>{{ z.bewegt }}</span></div>
+      <div style="font:700 12px/1.4 Arial,Helvetica,sans-serif;padding-top:6px">
+        <a href="{{ z.link }}" style="color:#e60000;text-decoration:none">{{ chrome.bewegung.link_seite }} &rsaquo;</a>
+        {%- if z.quelle %}&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="{{ z.quelle }}" style="color:#6b6b6b;text-decoration:none">{{ z.quelle_text }} &rsaquo;</a>{% endif %}
+        {%- if z.eigen_quelle %}&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="{{ z.eigen_quelle }}" style="color:#6b6b6b;text-decoration:none">{{ z.eigen_quelle_text }} &rsaquo;</a>{% endif %}
+      </div>
+    </td></tr>
+    {% endfor %}
+    {% if bewegung.weitere %}
+    <tr><td style="padding:0 0 14px 0;font:700 12px/1.4 Arial,Helvetica,sans-serif"><a href="{{ bewegung.seite }}" style="color:#e60000;text-decoration:none">{{ bewegung.weitere }} &rsaquo;</a></td></tr>
+    {% endif %}
+  </table>
+  {% endif %}
+
   {#- ------------------------------------------------------ Meldungen -#}
   {% if items %}
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"

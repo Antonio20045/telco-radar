@@ -847,3 +847,25 @@ Schuld verschwinden über die Zeit aus den Panels).
   `git checkout --` ungesicherte Arbeit vernichtet (per gesichertem Patch
   wiederhergestellt); veralteter Bytecode zeigte grüne Tests rot; Bot-Commits lösen
   keine CI aus und können main still rot machen.
+
+### P4 — Bewegungsblock im Newsletter, 28.09.2026 (Branch `claude/project-thread-6xhw5b`)
+
+**Gebaut:** `report/geraete_bewegung.py` rechnet je (Gerät, Band, Wettbewerber) die
+Änderung des Abstands zu Vodafone über 7 Tage (> 50 € oder > 5 %, ≤ 5 Zeilen), nur
+für DASSELBE Bündel an beiden Tagen auf beiden Seiten. Feld `geraete_bewegung` im
+Berichts-JSON (`pipeline.py`), Block in `digest.html.j2`/`.txt.j2`, nur in der ersten
+Ausgabe der ISO-Woche. `send_digest.py --nur-test` schickt eine Ausgabe nur an
+`$TEST_EMPFAENGER`; `mail_repo/…/newsletter.yml` hat dafür `nur_test` und `sha`.
+
+**Gemessen:** Am echten Bestand (Stichtag 27.09., Vergleich 20.09.) 8 prüfbare
+Vergleiche, 0 Bewegungen; 47 Angebotswechsel, 49 fehlende Messungen, 22 andere
+Zeiträume ohne Aussage. Kein Bündel hat im Fenster seinen Preis geändert. Die naive
+Rechnung (günstigstes Bündel je Tag) hätte 6 Zeilen gemeldet, alle Vodafone-Sprünge
+Mobil S ↔ Mobil M um 240 €. Diese Zählung stammt aus einem eigenen Skript des Leads,
+nicht vom Prüfagenten.
+
+**Offen:** `telco-radar-inbox` reicht `report_ready` nicht weiter; `newsletter.yml`
+ist nie gelaufen. Die eine Zeile wartet auf Antonios Freigabe (`mail_repo/README.md`).
+Testversand braucht das Secret `TEST_EMPFAENGER` in `telco-radar-mail`. Eine
+Tarifpreisänderung erscheint nicht als Bewegung (Leitzahl rechnet mit dem heutigen
+Tarifstamm). Ändert Vodafone selbst, kann ein Ereignis mehrere Zeilen füllen.

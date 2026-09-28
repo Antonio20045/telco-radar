@@ -25,11 +25,13 @@ abgemeldet, die naechste Ausgabe kommt trotzdem.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
 import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
+from ..report.anbieter_farben import farbe_fuer
 from ..textwerkzeug import saetze as _saetze
 from .filters import Treffer
 
@@ -77,8 +79,14 @@ def lade_chrome(pfad: Path | None = None) -> dict:
 
 
 def rahmentexte(chrome: dict | None = None) -> set[str]:
-    """Jeder Rahmentext als Zeichenkette - die Allowlist des Treue-Tests."""
+    """Jeder Rahmentext als Zeichenkette - die Allowlist des Treue-Tests.
+
+    OHNE den Geraeteblock (`bewegung`): seine Platzhalter („{von} bis
+    {bis}", „jetzt {abstand}") wuerden als `.*` jeden erfundenen Satz der
+    ganzen Mail durchlassen. Er hat seine eigene, enge Pruefung
+    (`tests/test_newsletter_bewegung.py`)."""
     chrome = chrome if chrome is not None else lade_chrome()
+    chrome = {k: v for k, v in chrome.items() if k != "bewegung"}
     aus: set[str] = set()
 
     def sammle(wert):
@@ -112,6 +120,110 @@ def kuerze(text: str, anzahl: int = MAX_SAETZE) -> str:
     """
     teile = _saetze((text or "").strip())
     return " ".join(t for t in teile[:anzahl] if t).strip()
+
+
+# ======================================================  Geraeteblock  ====
+
+def _euro(betrag: float, cent: bool = False) -> str:
+    """„1.234 €" - ganze Euro wie am Bewegungs-Abzeichen der Geraeteseite,
+    kaufmaennisch gerundet; mit `cent` „50,40 €"."""
+    wert = Decimal(str(abs(betrag)))
+    if cent:
+        text = f"{wert.quantize(Decimal('0.01'), ROUND_HALF_UP):,.2f}"
+        return (text.replace(",", "X").replace(".", ",")
+                .replace("X", ".") + " €")
+    return f"{wert.quantize(Decimal('1'), ROUND_HALF_UP):,.0f}".replace(
+        ",", ".") + " €"
+
+
+def _tag(iso: str) -> str:
+    """„27.9." - dasselbe kurze Datum wie auf der Geraeteseite."""
+    _j, m, d = iso.split("-")
+    return f"{int(d)}.{int(m)}."
+
+
+def _abstand(betrag: float, texte: dict) -> str:
+    if round(betrag) == 0:
+        return texte["abstand_gleich"]
+    wort = "abstand_guenstiger" if betrag < 0 else "abstand_teurer"
+    return texte[wort].replace("{betrag}", _euro(betrag))
+
+
+def bewegung_kontext(block: dict | None, basis: str,
+                     chrome: dict) -> dict | None:
+    """Der Geraeteblock fuer die Vorlage - oder None, wenn er fehlt.
+
+    Kein Block, wenn der Bericht keinen traegt (Berichte vor P4) oder er
+    nicht in DIESE Ausgabe gehoert (`im_newsletter`: nur die erste Ausgabe
+    der Woche). Ein AUSFALL ist dagegen ein Block: er sagt den Grund,
+    statt „keine Bewegung" vorzutaeuschen (Regel 9).
+    """
+    if not block or not block.get("im_newsletter"):
+        return None
+    from ..report.geraete_bewegung import (AUSFALL_AUFBEREITUNG,
+                                           BEWEGUNG_EURO, BEWEGUNG_PROZENT)
+    texte = chrome["bewegung"]
+    basis = (basis or "").rstrip("/")
+    seite = f"{basis}/geraete.html" if basis else "geraete.html"
+    aus = {"titel": texte["titel"], "zeitraum": "", "zeilen": [],
+           "leer": "", "ausfall": "", "weitere": "", "seite": seite}
+    try:
+        von, bis = block["vergleichstag"], block["stichtag"]
+        zeilen = list(block["zeilen"])
+        geprueft = int(block["geprueft"])
+        ohne = sum((block.get("ohne_aussage") or {}).values())
+    except (KeyError, TypeError, ValueError):
+        # Ein Block ohne seine Felder ist ein Ausfall, kein Grund, den
+        # ganzen Versand abzubrechen.
+        if not block.get("error"):
+            block = dict(block, error=AUSFALL_AUFBEREITUNG)
+    if block.get("error"):
+        aus["ausfall"] = texte["ausfall"].replace("{grund}", block["error"])
+        return aus
+    aus["zeitraum"] = (texte["zeitraum"].replace("{von}", _tag(von))
+                       .replace("{bis}", _tag(bis)))
+    for z in zeilen:
+        if round(z["fremd_delta"]) and round(z["eigen_delta"]):
+            bewegt = texte["bewegt_beide"]
+        elif round(z["eigen_delta"]):
+            bewegt = texte["bewegt_eigen"]
+        else:
+            bewegt = texte["bewegt_fremd"].replace("{anbieter}",
+                                                   z["anbieter"])
+        aus["zeilen"].append({
+            # Nahe der Schwelle mit Cent: „50 €" neben „über 50 €" im
+            # Leersatz waere ein Widerspruch.
+            "betrag": _euro(z["delta"],
+                            cent=abs(z["delta"]) < BEWEGUNG_EURO + 1),
+            "richtung": texte["zugunsten"].replace(
+                "{anbieter}",
+                z["anbieter"] if z["delta"] < 0 else "Vodafone"),
+            "anbieter": z["anbieter"],
+            "farbe": farbe_fuer(z["anbieter"]),
+            "geraet": z["geraet"], "band": z["band_label"],
+            "vorher": texte["vorher"].replace(
+                "{abstand}", _abstand(z["abstand_vorher"], texte)),
+            "jetzt": texte["jetzt"].replace(
+                "{abstand}", _abstand(z["abstand_jetzt"], texte)),
+            "bewegt": bewegt,
+            "link": f"{basis}/{z['link']}" if basis else z["link"],
+            "quelle": z["quelle_url"],
+            "quelle_text": texte["link_angebot"].replace("{anbieter}",
+                                                         z["anbieter"]),
+            "eigen_quelle": z["eigen_quelle_url"],
+            "eigen_quelle_text": texte["link_angebot"].replace(
+                "{anbieter}", "Vodafone"),
+        })
+    if not aus["zeilen"]:
+        aus["leer"] = (texte["leer"].replace("{von}", _tag(von))
+                       .replace("{euro}", _euro(BEWEGUNG_EURO))
+                       .replace("{prozent}", f"{BEWEGUNG_PROZENT:g} %")
+                       .replace("{geprueft}", str(geprueft))
+                       .replace("{gesamt}", str(geprueft + ohne)))
+    if block.get("weitere"):
+        aus["weitere"] = texte["weitere"].replace("{n}",
+                                                  str(block["weitere"]))
+    return aus
 
 
 # ============================================================  Betreff  ====
@@ -174,12 +286,16 @@ def _items(treffer: list[Treffer]) -> list[dict]:
 
 def baue(treffer: list[Treffer], *, datum_de: str, bericht_url: str,
          abmelde_url: str, seit_datum: str = "", basis_url: str = "",
-         chrome: dict | None = None, mit_filter: bool = True) -> Nachricht:
-    """Die fertige Nachricht - HTML, Text und Kopfzeilen."""
+         chrome: dict | None = None, mit_filter: bool = True,
+         bewegung: dict | None = None) -> Nachricht:
+    """Die fertige Nachricht - HTML, Text und Kopfzeilen.
+
+    `bewegung` ist der Block `geraete_bewegung` aus dem Bericht-JSON."""
     chrome = chrome if chrome is not None else lade_chrome()
     basis = (basis_url or "").rstrip("/")
     ctx = {
         "chrome": chrome,
+        "bewegung": bewegung_kontext(bewegung, basis, chrome),
         "items": _items(treffer),
         "betreff": betreff(datum_de, treffer, chrome),
         "datum_de": datum_de,

@@ -107,6 +107,22 @@ rm subscribers.jsonl                   # nie im Klartext committen
 mit Datum und Commit-SHA. Der Schritt steht dort schon; er braucht das Secret
 `INBOX_DISPATCH_TOKEN` und tut ohne es nichts (mit einer Zeile im Protokoll).
 
+**Stand 28.09.2026: dieses Ereignis kommt nicht an.** `weiterreichen.yml` in
+`telco-radar-inbox` reicht nur `send_doi, confirm, unsubscribe` weiter;
+`newsletter.yml` ist deshalb noch nie gelaufen. Die Zeile, die das ändert,
+schaltet den Versand an ALLE bestätigten Abonnenten scharf und wird erst nach
+Antonios ausdrücklicher Freigabe angewandt:
+
+```diff
+-    types: [send_doi, confirm, unsubscribe]
++    types: [send_doi, confirm, unsubscribe, report_ready]
+```
+
+Vorher: `newsletter.yml` per Hand mit `nur_test` (Vorgabe an) starten. Das
+schickt EINE Ausgabe an das Secret `TEST_EMPFAENGER` und lässt Store,
+Sendeplan und Sendeprotokoll unberührt; mit `dry_run` an wird nur gerendert
+und als Artefakt abgelegt.
+
 ---
 
 ## Die drei Stellen, an denen ein Fehler hier still Abos löscht
