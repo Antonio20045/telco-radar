@@ -202,7 +202,19 @@ def test_je_radar_gruppe_ein_querlink_mit_deep_link(radar, geraete):
     links = radar.select(
         "#wr-abweichung a.gr-sprung[href^='geraete.html?modell=']")
     assert links, "kein Sprung-Link in der Modell-Liste des Radars"
-    assert "im Graph ansehen" in links[0].get_text(strip=True)
+    # 28.09.2026: der Link nennt den Reiter, in den er springt („Mit
+    # Tarif →"), statt „im Graph ansehen" - seit „Ohne Vertrag" ebenfalls
+    # einen Graphen hat, war „der Graph" zweideutig.
+    katalog = geraete.select("#gr-katalogtabelle a.gr-sprung")
+    # Gegenprobe: beide Tabellen tragen Sprung-Links.
+    assert katalog, "kein Sprung-Link im Katalog"
+    texte = {a.get_text(strip=True) for a in list(links) + katalog}
+    assert all(t.startswith("Mit Tarif") for t in texte), texte
+    # Die Modellzahl steht an der Katalog-Überschrift, nicht noch einmal
+    # im Leitzahl-Label.
+    label = geraete.select_one("#tafel-katalog .gr-leit--katalog .gr-leit-label")
+    assert label is not None and not any(ch.isdigit()
+                                         for ch in label.get_text()), label
     # Das Band (&band=klein) gehört zum Link, nicht zur Modell-ID - vor dem
     # Vergleich gegen den Selektor abgeschnitten, sonst träfe der Lookup
     # nie zu und wäre grün, ohne etwas zu prüfen.

@@ -610,8 +610,8 @@
    P4 SCHRITT 2c (18.09.2026) - DER ROTE FADEN ZWISCHEN DEN REITERN: jede
    Modellzeile trägt ihren `modell_schluessel` als `data-modell` (derselbe
    EINE Schlüssel wie Radar-Liste und Zeitreihen-Wahl), und unter dem Titel
-   steht der Sprung in die ZEITREIHE des Vergleichs-Reiters ("im Graph
-   ansehen", dieselbe `gr-sprung`-Mechanik wie die Radar-Liste: href trägt
+   steht der Sprung in die ZEITREIHE des Reiters „Mit Tarif" ("Mit
+   Tarif →", dieselbe `gr-sprung`-Mechanik wie die Radar-Liste: href trägt
    den Deep-Link, app.js schaltet Reiter, Modell und Band). Der Link steht
    NUR, wo `m.zr` sagt, dass die Zeitreihe das Modell kennt (Wahl-Menge,
    aus demselben Knoten gelesen, aus dem app.js waehlt) - ein Modell ohne
@@ -631,8 +631,7 @@
   {% if geraete.katalog_ab_preis is not none %}
   <div class="gr-leit gr-leit--katalog"><b class="gr-leit-zahl">{{
     geraete.katalog_ab_preis | euro }}</b><span class="gr-leit-label">günstigster
-    Einzelgerätpreis im Regal · {{
-    geraete.katalog_modelle | length }} Modelle</span></div>
+    Einzelgerätpreis im Regal</span></div>
   {% endif %}
   {# D4a (24.09.2026): der Erklärsatz ist GEFALLEN (Antonios Regel: keine
      Erklär-Unterzeile unter einer Überschrift). Dieselbe Auskunft - eine
@@ -738,7 +737,7 @@
           {% if m.zr %}<a class="gr-sprung"
             href="geraete.html?modell={{ m.schluessel }}{% if m.tco_band %}&amp;band={{ m.tco_band }}{% endif %}"
             data-modell="{{ m.schluessel }}"{% if m.tco_band %} data-band="{{ m.tco_band }}"{% endif %}
-            >im Graph ansehen&nbsp;→</a>
+            >Mit Tarif&nbsp;→</a>
           {# P5-Auftrag 1 (18.09.): ein Modell MIT Bündel, das (noch) nicht
              waehlbar ist - Auto-Eintrag unter der Messtag-Schwelle der Wahl
              (`AUTO_SICHTBAR_AB_MESTAGEN`, gegen Bündel-Messtage gerechnet).
