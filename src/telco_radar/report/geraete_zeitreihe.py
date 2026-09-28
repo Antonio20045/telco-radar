@@ -668,8 +668,11 @@ def _leitzahl_html(zeilen: list) -> str | None:
     # Beste liegt also IMMER unter der Referenz, sobald Vodafone nicht
     # selbst fuehrt - "unter" heisst guenstiger (Buendel-Karten S4).
     delta = round(eigen["gesamt"] - beste["gesamt"], 2)
+    # Das Label nennt, WER unter Vodafone liegt - wie die Leitzahl der
+    # Übersicht; ohne Namen stand die groesste Zahl der Seite anonym da.
     return (f"<b class='gr-leit-zahl'>{_euro(delta)}</b>"
-            f"<span class='gr-leit-label'>unter Vodafone "
+            f"<span class='gr-leit-label'>{_esc(beste['anbieter'])} "
+            f"unter Vodafone "
             f"({_euro(eigen['gesamt'])}"
             f"{', Näherung' if eigen.get('naeherung') else ''})</span>")
 

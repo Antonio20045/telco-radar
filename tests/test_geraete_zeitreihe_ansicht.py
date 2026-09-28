@@ -381,8 +381,9 @@ def test_der_antwort_satz_polt_den_abstand_zur_referenz_richtig(ansicht):
     # der <b>-Zahl an den Anfang des Labels ("€unter") - ein schwacher
     # Parser darf die Aussage nicht zerlegen (Lehre B6, 30.08.2026).
     assert "264,00 €" in leit, (text, leit)
-    # 28.09.2026: das Label heisst kurz "unter Vodafone (…)".
-    assert "unter Vodafone (1.105,00 €)" in leit, (text, leit)
+    # Das Label nennt den Anbieter der Zahl: "1&1 unter Vodafone (…)".
+    # Roh geprüft: "&amp;" hält zugleich das Escaping des Namens fest.
+    assert "1&amp;1 unter Vodafone (1.105,00 €)" in leit, (text, leit)
     assert "über Vodafone" not in leit, leit
     assert "über der Vodafone-Referenz" not in text, text
 
