@@ -64,7 +64,8 @@ from typing import Optional
 
 from .collect.tarif_crawler import tarif_id
 from .tarif_model import (HOCH, MITTEL, PREISTYP_LIVE_SHOP,
-                          ist_zurueckgezogen, zeitreihen_basis)
+                          ist_geraeteblatt_von, ist_zurueckgezogen,
+                          vertrag_basis, zeitreihen_basis)
 
 log = logging.getLogger(__name__)
 
@@ -357,9 +358,41 @@ class Tarifbestand:
 
     # ------------------------------------------------------------ beides
 
+    def geraeteblatt(self, bezug: Bezug) -> Bezug:
+        """Das Geraeteblatt desselben Tarifs, wenn es genau eines gibt.
+
+        Ein Buendel IST der Tarif mit Geraet. Vodafone beschreibt ihn auf
+        einem eigenen Blatt ("Vodafone Mobil XS mit Smartphone", 15 GB),
+        und das Tarifblatt ohne Zusatz nennt die SIM-only-Fassung (18 GB).
+        Die Stufe der Tarifleiter und das Datenvolumen eines Buendels
+        stehen auf dem Geraeteblatt. Die Regel ist dieselbe wie bei der
+        Dublette der SIM-only-Massstaebe (`tarif_model.
+        ist_geraeteblatt_von`); zwei Treffer sind keine Zuordnung, dann
+        bleibt der Bezug, wie er ist - dieselbe Haltung wie `ueber_betrag`.
+        """
+        tarif = self.je_id_aktuell.get(bezug.tarif_id)
+        if not tarif:
+            return bezug
+        treffer = sorted(
+            tid for tid in self.je_id
+            if tid != bezug.tarif_id and zeitreihen_basis(tid) == tid
+            and vertrag_basis(tid) == vertrag_basis(bezug.tarif_id)
+            and ist_geraeteblatt_von(self.je_id_aktuell[tid], tarif))
+        if len(treffer) != 1:
+            if len(treffer) > 1:
+                log.info("Geraeteblatt fuer %s nicht eindeutig (%s) - "
+                         "Buendel bleibt am Tarifblatt", bezug.tarif_id,
+                         ", ".join(treffer))
+            return bezug
+        blatt = self.je_id_aktuell[treffer[0]]
+        return Bezug(tarif_id=treffer[0], tarif_name=blatt.get("name", ""),
+                     guete=bezug.guete,
+                     grund=f"{bezug.grund}; Geraeteblatt: "
+                           f"{blatt.get('name', '')}")
+
     def loese(self, anbieter: str, referenz: str = "",
               betrag: Optional[float] = None,
-              slug: str = "") -> Optional[Bezug]:
+              slug: str = "", mit_geraet: bool = False) -> Optional[Bezug]:
         """Erst der Name, dann der Slug, dann der Betrag. Nie umgekehrt.
 
         Ein Name, der trifft, ist die staerkere Aussage; ihn zugunsten
@@ -371,7 +404,13 @@ class Tarifbestand:
         ANBIETERS ueber seine eigene Produktordnung, waehrend der Name die
         Auskunft des Pflichtdokuments ist. Wo beide etwas sagen, gilt das
         Blatt.
+
+        `mit_geraet` (ein Buendel, P3 28.09.2026): der Bezug wandert auf das
+        Geraeteblatt desselben Tarifs, wenn es eines gibt (`geraeteblatt`).
         """
-        return (self.ueber_namen(anbieter, referenz)
-                or self.ueber_slug(anbieter, slug)
-                or self.ueber_betrag(anbieter, betrag))
+        bezug = (self.ueber_namen(anbieter, referenz)
+                 or self.ueber_slug(anbieter, slug)
+                 or self.ueber_betrag(anbieter, betrag))
+        if bezug is not None and mit_geraet:
+            return self.geraeteblatt(bezug)
+        return bezug

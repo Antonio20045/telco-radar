@@ -434,6 +434,34 @@ class TarifSpeicher:
             satz.pop("zurueckgezogen_am", None)
             satz.pop("zurueckgezogen_grund", None)
 
+    def lies_nach(self, tid: str, satz: dict) -> list[str]:
+        """Dasselbe Dokument, besser gelesen: leere Felder des letzten
+        Stands bekommen den Wert, den der Extraktor heute findet.
+
+        Nur Luecken werden gefuellt, nie ein Wert ersetzt - ein anderer
+        Wert aus demselben Dokument waere kein Tarifwechsel, sondern ein
+        Extraktorwechsel, und der gehoert nicht still in die Zeitreihe.
+        Keine Meldung, kein neuer Stand. Anlass: Vodafone Mobil XL
+        ("Unlimitierte Highspeed-Daten"), dessen Volumen der Extraktor bis
+        P3 nicht las - ohne Nachlesen bliebe es leer, bis Vodafone das PDF
+        neu hochlaedt. Rueckgabe: die gefuellten Felder.
+        """
+        vorher = self.letzter(tid)
+        if vorher is None:
+            return []
+        gefuellt = []
+        for feld, wert in satz.items():
+            if feld in ("confidence", "fundstellen", "abgerufen_am"):
+                continue
+            if vorher.get(feld) in (None, "", []) and wert not in (None, "", []):
+                vorher[feld] = wert
+                gefuellt.append(feld)
+        for feld in gefuellt:
+            for teil in ("confidence", "fundstellen"):
+                if feld in (satz.get(teil) or {}):
+                    vorher.setdefault(teil, {})[feld] = satz[teil][feld]
+        return gefuellt
+
     def ziehe_zurueck(self, dokument_url: str, wann: str,
                       grund: str) -> list[str]:
         """Der letzte Stand jedes Tarifs aus diesem Dokument gilt als
@@ -479,6 +507,17 @@ def vergleiche(alt: dict, neu: Tarif) -> list[Feldaenderung]:
         # Aenderung - es ist ein Ausfall. Als "80 GB -> nicht angegeben" zu
         # melden waere die haeufigste Falschmeldung dieses Radars.
         if n is None and a is not None:
+            continue
+        # "Nicht angegeben -> unbegrenzt" beim Datenvolumen ist keine
+        # Tarifaenderung (P3, 28.09.2026): bis dahin schrieb die o2-Kachel
+        # "Unbegrenzt" als None, und das Vodafone-XL-Blatt ("Unlimitierte
+        # Highspeed-Daten") las der Extraktor nicht. Der erste Stand nach
+        # der Umstellung waere sonst eine falsche Meldung. Ein neu
+        # hinzugekommenes Feld zaehlt sonst weiter
+        # (`test_neu_hinzugekommenes_feld_zaehlt`), und "100 GB ->
+        # unbegrenzt" bleibt eine Aenderung.
+        if (feld == "datenvolumen_gb" and a is None
+                and n == float("inf")):
             continue
         if a is None and n is None:
             continue
@@ -633,6 +672,11 @@ def uebernimm_stand(tarif: Tarif, hash_: str, herkunft: str, *,
     if vorher.get("dokument_hash") == hash_:
         bilanz["unveraendert"] += 1
         speicher.beruehre(tid, jetzt.date().isoformat())
+        gefuellt = speicher.lies_nach(tid, satz)
+        if gefuellt:
+            bilanz["nachgelesen"] = bilanz.get("nachgelesen", 0) + 1
+            log.info("Tarif %s nachgelesen (gleiches Dokument): %s", tid,
+                     ", ".join(gefuellt))
         return
 
     aenderungen = vergleiche(vorher, tarif)

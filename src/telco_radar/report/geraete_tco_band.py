@@ -60,7 +60,8 @@ log = logging.getLogger(__name__)
 # Anbieter verkauft. Jetzt ist die Leiter das Sortiment, gegen das die
 # Seite vergleicht: die Vodafone-Tarife "mit Smartphone" aus
 # `tarife.jsonl`, je Lauf neu abgeleitet (Stand 25.09.2026: XS 15 GB,
-# S 30 GB, M 60 GB, L 120 GB, XL ohne erhobenes Volumen). Ein Wettbewerber
+# S 30 GB, M 60 GB, L 120 GB, XL unbegrenzt ab dem Tariflauf nach P3,
+# vorher ohne erhobenes Volumen). Ein Wettbewerber
 # faellt in die Stufe des naechstgelegenen Vodafone-Volumens.
 #
 # Die Stufe traegt den Namen, den Vodafone ihr gibt ("XS"), der Schluessel
@@ -71,7 +72,7 @@ _VODAFONE_MIT_SMARTPHONE = re.compile(
 # Vodafones eigene Tarife werden ueber den NAMEN zugeordnet, nicht ueber
 # das Volumen: "Vodafone Mobil XS" (ohne Geraet, 18 GB) ist die Stufe XS,
 # auch wenn ihr Volumen naeher an einer anderen laege. Und "Vodafone Mobil
-# XL" traegt heute kein erhobenes Volumen, gehoert aber trotzdem zu XL.
+# XL" gehoert zu XL, auch solange sein Volumen nicht erhoben ist.
 _VODAFONE_STUFE = re.compile(
     r"^Vodafone Mobil (?P<stufe>[A-Z]{1,4})(?: mit Smartphone)?$")
 
@@ -117,9 +118,9 @@ def _zahl(wert) -> Optional[float]:
 def tarifleiter(tarife: dict) -> tuple[Stufe, ...]:
     """Die Vodafone-Tarife "mit Smartphone" als Leiter, guenstigste zuerst.
 
-    Geordnet wird nach der Grundgebuehr, nicht nach dem Volumen: XL traegt
-    heute kein erhobenes Volumen und stuende sonst an einer geratenen
-    Stelle. Die Grundgebuehr steht in jedem Satz, und bei Vodafone steigt
+    Geordnet wird nach der Grundgebuehr, nicht nach dem Volumen: ein
+    Volumen kann fehlen (XL bis zum Tariflauf nach P3), und die Stufe
+    stuende sonst an einer geratenen Stelle. Die Grundgebuehr steht in jedem Satz, und bei Vodafone steigt
     sie mit der Stufe. Eine Stufe erscheint einmal, auch wenn der Bestand
     sie unter zwei Lesarten fuehrt (`#live_shop`).
 

@@ -50,7 +50,7 @@ from . import geraete_tco_band, geraete_tco_grafik, geraete_tco_karten
 from . import geraete_vergleich
 from ..geraete_model import (VERGLEICHBARE_ZUSTAENDE, Ratenzahlung,
                              normalisiere)
-from ..tarif_model import PREISTYP_LIVE_SHOP
+from ..tarif_model import PREISTYP_LIVE_SHOP, vertrag_basis
 from ..tco_model import (POSTEN_ANSCHLUSS, POSTEN_RABATTE, POSTEN_RATE,
                          POSTEN_TARIF, POSTEN_ZUZAHLUNG, TCO_HORIZONT,
                          _LUECKEN_OHNE_EINFLUSS_AUF_DIE_DIFFERENZ, Buendel,
@@ -788,6 +788,11 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         if referenz is None and (b.tarif_id or "").strip():
             referenz = referenz_je_id.get(
                 (normalisiere(b.anbieter), b.tarif_id.strip()))
+        if referenz is None and (b.tarif_id or "").strip():
+            # Ein Buendel haengt am Geraeteblatt ("... mit Smartphone"), sein
+            # Massstab am Tarifblatt desselben Vertrags (P3, 28.09.2026).
+            referenz = referenz_je_id.get(
+                (normalisiere(b.anbieter), vertrag_basis(b.tarif_id)))
         zeilen.append(_zeile(b, referenz, katalog, geraet_je_sku))
 
     zeilen.sort(key=lambda z: (not z["belastbar"], z["gesamt"] is None,

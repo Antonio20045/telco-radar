@@ -690,6 +690,23 @@ def test_der_massstab_wird_ueber_den_tarif_id_gefunden():
     assert ohne["zeilen"][0]["geraeteanteil"] is None
 
 
+def test_ein_buendel_am_geraeteblatt_findet_den_massstab_des_tarifblatts():
+    """P3 (28.09.2026): das Buendel haengt am Geraeteblatt (`...-mit-
+    smartphone`), der SIM-only-Massstab am Tarifblatt desselben Vertrags -
+    die Geraeteblatt-Referenz ist als Dublette gestrichen. Der Rueckfall
+    ueber `vertrag_basis` findet ihn. Gegenprobe: ein Geraeteblatt eines
+    ANDEREN Vertrags findet nichts."""
+    daten = aufbereiten(
+        [_o2_buendel(tarif_id="o2:o2-mobile-on-demand-m-mit-smartphone")],
+        [_o2_referenz()], _o2_listung(), katalog=None)
+    assert abs(daten["zeilen"][0]["geraeteanteil"] - 1105.0) < 0.005
+
+    fremd = aufbereiten(
+        [_o2_buendel(tarif_id="o2:o2-mobile-on-demand-l-mit-smartphone")],
+        [_o2_referenz()], _o2_listung(), katalog=None)
+    assert fremd["zeilen"][0]["geraeteanteil"] is None
+
+
 def test_zwei_referenzen_zu_einer_tarif_id_ergeben_keinen_massstab():
     """Zwei Massstaebe sind kein schwacher Massstab, sondern gar keiner.
 

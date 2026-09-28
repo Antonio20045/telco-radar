@@ -2678,6 +2678,11 @@ _GW_VF_MIT_SMARTPHONE = re.compile(
 _GW_VF_STUFE = re.compile(r"^Vodafone Mobil ([A-Z]{1,4})(?: mit Smartphone)?$")
 _GW_LEITER_STAND = (("xs", 15.0), ("s", 30.0), ("m", 60.0), ("l", 120.0),
                     ("xl", None))
+# Ab dem ersten Tariflauf nach P3 (Nachlesen, "Unlimitierte Highspeed-
+# Daten") steht Vodafone XL unbegrenzt im Bestand. Beide Staende sind
+# gueltig; jeder andere ist neu zu verankern.
+_GW_LEITER_STAENDE = (_GW_LEITER_STAND,
+                      _GW_LEITER_STAND[:4] + (("xl", float("inf")),))
 
 
 def _gw_volumen(wert):
@@ -3354,6 +3359,18 @@ _GW_TOR_FAELLE = [
 ]
 
 
+# Die XL-Paare, sobald Vodafone XL unbegrenzt im Bestand steht (am
+# simulierten Stand nach dem Tariflauf nachgerechnet, 28.09.2026).
+_GW_TOR_FAELLE_XL = [
+    ("apple-iphone-17-pro-256", "xl"), ("apple-iphone-17-256", "xl"),
+    ("samsung-galaxy-s26-ultra-256", "xl"),
+]
+
+
+def _gw_xl_unbegrenzt(blaetter) -> bool:
+    return dict(_gw_leiter(_gw_aktuell(blaetter))).get("xl") == float("inf")
+
+
 @pytest.mark.parametrize("modell,band", _GW_TOR_FAELLE)
 def test_tor_geraete_leitzahl_je_band_am_bestand(gw_seite, modell, band):
     """Je eine Leitzahl der vier Tor-Geräte, je Stufe: die Zahl des
@@ -3422,9 +3439,9 @@ def test_tarifleiter_aus_den_rohdaten_ist_die_der_seite(gw_seite):
     im Datenknoten - plus der Anker am Bestand vom 25.09.2026."""
     tco, blaetter, _db = _gw_rohdaten()
     leiter = _gw_leiter(_gw_aktuell(blaetter))
-    assert tuple(leiter) == _GW_LEITER_STAND, (
+    assert tuple(leiter) in _GW_LEITER_STAENDE, (
         f"Leiter aus tarife.jsonl ist {leiter}, verankert ist "
-        f"{_GW_LEITER_STAND} (Stand 25.09.2026) - nachrechnen und den "
+        f"{_GW_LEITER_STAENDE} (Stand 25.09.2026) - nachrechnen und den "
         "Anker samt Datum nachziehen")
     seite = gw_seite["geraete"]
     daten = json.loads(re.search(
@@ -3435,7 +3452,8 @@ def test_tarifleiter_aus_den_rohdaten_ist_die_der_seite(gw_seite):
         r'<button type="button" data-band="([a-z]+)" aria-pressed="[a-z]+">'
         r"([A-Z]+)(?:<small>([^<]*)</small>)?</button>", seite)
     assert knoepfe, "keine Stufen-Knöpfe auf der Seite - Lookup ins Leere"
-    soll = [(k, k.upper(), "" if gb is None else f"{gb:g} GB")
+    soll = [(k, k.upper(), "" if gb is None
+             else "unbegrenzt" if gb == float("inf") else f"{gb:g} GB")
             for k, gb in leiter]
     assert knoepfe == soll, (
         f"Stufen-Knöpfe der Seite {knoepfe}, eigene Leiter {soll}")
@@ -3469,8 +3487,13 @@ def test_tor_geraete_zeigen_genau_die_stufen_der_eigenen_rechnung(gw_seite):
                 "frisches Bündel")
     # Anti-Leerlauf: die Tor-Fälle oben sind Teilmenge dieser Rechnung,
     # und wenigstens ein Paar ohne frisches Angebot wurde mitgeprüft.
+    # Ab Vodafone XL unbegrenzt (Tariflauf nach P3) kommen die XL-Paare
+    # hinzu (o2 Unlimited, Telekom XL) - je Stand ein eigenes Soll.
+    soll = set(_GW_TOR_FAELLE)
+    if _gw_xl_unbegrenzt(blaetter):
+        soll |= set(_GW_TOR_FAELLE_XL)
     assert {(m, b) for m in _GW_TOR_MODELLE for b in frisch.get(m, ())} \
-        == set(_GW_TOR_FAELLE)
+        == soll
     assert any(alle.get(m, set()) - frisch.get(m, set())
                for m in _GW_TOR_MODELLE), \
         "kein Tor-Paar ohne frisches Angebot - der Leer-Zweig prüft nichts"
@@ -3523,7 +3546,11 @@ def test_stufe_jeder_exportzeile_gegen_die_eigene_leiter(gw_seite):
         if r["Band"] != soll:
             abweich.append((schluessel, r["Band"], soll))
     assert geprueft >= 900, f"nur {geprueft} Exportzeilen geprüft"
-    assert ohne >= 10, "keine Zeile ohne Stufe geprüft - Leer-Zweig greift nicht"
+    # Ist Vodafone XL unbegrenzt, haben fast alle Bündel eine Stufe; ohne
+    # bleiben Zeilen ohne Tarif (Simulation 28.09.2026: 2).
+    mindest = 1 if _gw_xl_unbegrenzt(_gw_rohdaten()[1]) else 10
+    assert ohne >= mindest, (
+        "keine Zeile ohne Stufe geprüft - Leer-Zweig greift nicht")
     assert set(je_stufe) == {"XS", "S", "M", "L", "XL", ""}, je_stufe
     assert not abweich, f"{len(abweich)} Exportzeilen mit falscher Stufe: " \
                         f"{abweich[:5]}"

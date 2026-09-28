@@ -465,6 +465,36 @@ def test_ein_aufgeloester_tarifname_ergibt_ein_echtes_buendel():
     assert buendel.anschlusspreis == 0.0
 
 
+def test_ein_buendel_haengt_am_geraeteblatt_und_behaelt_seine_id():
+    """P3 (28.09.2026): steht neben "Vodafone Mobil S" das Geraeteblatt
+    "Vodafone Mobil S mit Smartphone" zum selben Preis im Bestand, haengt
+    das Buendel daran (Datenvolumen und Stufe stehen dort). Die Buendel-ID
+    kommt aus dem Tarifnamen der Seite und bleibt - sonst zerfiele der
+    Verlauf. Gegenprobe: ohne Geraeteblatt bleibt das Tarifblatt."""
+    rohbuendel = [s for s in _saetze() if s["tarif_slug"] == _HASH_RATE_12]
+
+    def hole(url, kopfzeilen=None):
+        return 200, _fixture("vodafone_tarif_hardware.json")
+
+    loese_tarifnamen(hole, {}, rohbuendel)
+    satz = {**rohbuendel[0], "anbieter": "Vodafone",
+            "sku_id": "google-pixel-11-256gb-frost",
+            "quelle_url": rohbuendel[0]["url"]}
+    beide = Tarifbestand([
+        {"tarif_id": "vodafone:vodafone-mobil-s", "anbieter": "Vodafone",
+         "name": "Vodafone Mobil S", "grundgebuehr": 39.95},
+        {"tarif_id": "vodafone:vodafone-mobil-s-mit-smartphone",
+         "anbieter": "Vodafone", "name": "Vodafone Mobil S mit Smartphone",
+         "grundgebuehr": 39.95},
+    ])
+    mit = aus_rohsaetzen([satz], beide, "2026-09-05").buendel[0]
+    ohne = aus_rohsaetzen([satz], _bestand_mit_mobil_s(),
+                          "2026-09-05").buendel[0]
+    assert mit.tarif_id == "vodafone:vodafone-mobil-s-mit-smartphone"
+    assert ohne.tarif_id == "vodafone:vodafone-mobil-s"
+    assert mit.id == ohne.id
+
+
 def test_ohne_aufgeloesten_tarifnamen_wird_verworfen_und_gezaehlt():
     """Kein Blocker fuer den Merge (siehe Auftrag) - aber auch kein
     stilles Ablegen einer Zahl ohne nachschlagbaren Tarif: dieselbe Regel

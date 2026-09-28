@@ -482,6 +482,26 @@ def test_ein_hash_zusatz_bleibt_ein_fremder_tarif():
             _referenz(tarif_id="o2:o2-home-l-flex#8f3a1c"))
 
 
+def test_das_geraeteblatt_ist_derselbe_vertrag():
+    """P3 (28.09.2026): ein Vodafone-Buendel haengt am Geraeteblatt
+    ("Vodafone Mobil M mit Smartphone"), sein SIM-only-Massstab am
+    Tarifblatt ("Vodafone Mobil M") - derselbe Vertrag. Vorher warf die
+    Paarung, und das Buendel verlor seinen Geraeteanteil."""
+    ergebnis = geraeteanteil(
+        _buendel(anbieter="Vodafone", tarif_name="Mobil M",
+                 tarif_id="vodafone:vodafone-mobil-m-mit-smartphone"),
+        _referenz(anbieter="Vodafone", tarif_name="Vodafone Mobil M",
+                  tarif_id="vodafone:vodafone-mobil-m"))
+    assert ergebnis.betrag is not None
+    # Gegenprobe: das Geraeteblatt einer anderen Stufe bleibt fremd.
+    with pytest.raises(ValueError, match="Tarifen"):
+        geraeteanteil(
+            _buendel(anbieter="Vodafone", tarif_name="Mobil L",
+                     tarif_id="vodafone:vodafone-mobil-l-mit-smartphone"),
+            _referenz(anbieter="Vodafone", tarif_name="Vodafone Mobil M",
+                      tarif_id="vodafone:vodafone-mobil-m"))
+
+
 def test_zwei_namen_fuer_denselben_tarif_rechnen_trotzdem():
     """Der Fall, wegen dem die Regel auf die ID umgestellt wurde.
 

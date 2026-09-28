@@ -605,3 +605,60 @@ def test_der_slug_kommt_vor_dem_betrag():
                           slug="o2-mobile-on-demand-m-plus")
     assert bezug.tarif_id == "o2:o2-mobile-on-demand-m"
     assert bezug.guete == HOCH
+
+
+# --------------------------------------------------------------------------
+# Das Geraeteblatt (P3, 28.09.2026)
+# --------------------------------------------------------------------------
+
+def test_ein_buendel_haengt_am_geraeteblatt_des_tarifs(echt):
+    """Vodafone "Mobil M" auf der Produktseite ist mit Geraet der Tarif
+    "Vodafone Mobil M mit Smartphone" - gemessen am echten Bestand."""
+    ohne = echt.loese("Vodafone", "Mobil M")
+    mit = echt.loese("Vodafone", "Mobil M", mit_geraet=True)
+    assert ohne.tarif_id == "vodafone:vodafone-mobil-m"
+    assert mit.tarif_id == "vodafone:vodafone-mobil-m-mit-smartphone"
+    assert mit.guete == HOCH
+    assert "Geraeteblatt" in mit.grund
+
+
+def test_ohne_geraeteblatt_bleibt_der_bezug(echt):
+    """Gegenprobe: congstar hat kein Geraeteblatt - der Bezug bleibt."""
+    bezug = echt.loese("congstar", "Allnet Flat L", mit_geraet=True)
+    assert bezug.tarif_id == "congstar:allnet-flat-l"
+
+
+def test_ein_geraeteblatt_mit_anderem_preis_ist_ein_anderer_tarif():
+    """Nur bei gleichem Grundpreis ist das Geraeteblatt derselbe Vertrag."""
+    bestand = Tarifbestand([
+        _satz("Vodafone", "Vodafone Mobil M", 49.95),
+        _satz("Vodafone", "Vodafone Mobil M mit Smartphone", 54.95)])
+    bezug = bestand.loese("Vodafone", "Mobil M", mit_geraet=True)
+    assert bezug.tarif_id == "vodafone:vodafone-mobil-m"
+    gleich = Tarifbestand([
+        _satz("Vodafone", "Vodafone Mobil M", 49.95),
+        _satz("Vodafone", "Vodafone Mobil M mit Smartphone", 49.95)])
+    assert gleich.loese("Vodafone", "Mobil M", mit_geraet=True).tarif_id \
+        == "vodafone:vodafone-mobil-m-mit-smartphone"
+
+
+def test_vertrag_basis_fuehrt_beide_blaetter_zusammen():
+    from telco_radar.tarif_model import vertrag_basis
+    assert vertrag_basis("vodafone:vodafone-mobil-m-mit-smartphone") \
+        == "vodafone:vodafone-mobil-m"
+    assert vertrag_basis("telekom:magentamobil-l#live_shop") \
+        == "telekom:magentamobil-l"
+    # Ein Hash-Zusatz trennt zwei Produkte und bleibt.
+    assert vertrag_basis("o2:o2-home-l-flex#f43139ef") \
+        == "o2:o2-home-l-flex#f43139ef"
+
+
+def test_zwei_geraeteblaetter_sind_keine_zuordnung():
+    """"mit Smartphone" und "mit Handy" zum selben Preis: welches gilt,
+    entschiede die Reihenfolge der Datei - also keines."""
+    bestand = Tarifbestand([
+        _satz("Vodafone", "Vodafone Mobil M", 49.95),
+        _satz("Vodafone", "Vodafone Mobil M mit Smartphone", 49.95),
+        _satz("Vodafone", "Vodafone Mobil M mit Handy", 49.95)])
+    assert bestand.loese("Vodafone", "Mobil M", mit_geraet=True).tarif_id \
+        == "vodafone:vodafone-mobil-m"
