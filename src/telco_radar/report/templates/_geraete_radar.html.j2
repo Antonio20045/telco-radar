@@ -151,7 +151,7 @@
     <td>{% if z.id in zr_ids %}<a class="gr-sprung"
       href="geraete.html?modell={{ z.id }}{% if z.sprung_band %}&amp;band={{ z.sprung_band }}{% endif %}"
            data-modell="{{ z.id }}"{% if z.sprung_band %} data-band="{{ z.sprung_band }}"{% endif %}
-           >im Graph ansehen&nbsp;→</a>{% else %}<span class="gr-a-klein"
+           >Mit Tarif&nbsp;→</a>{% else %}<span class="gr-a-klein"
       >noch keine Zeitreihe</span>{% endif %}</td>
   </tr>
   <tr class="gr-a-auf{% if rest %} gr-a-rest{% endif %}" id="mw-{{ nr }}"><td colspan="7">
@@ -356,7 +356,7 @@
         data-sort="vf" data-art="zahl">Vodafone</button></th>
       <th scope="col"><button type="button" class="gr-sort"
         data-sort="abgerufen" data-art="text">Beleg</button></th>
-      <th scope="col"><span class="gr-s-th">Graph</span></th>
+      <th scope="col"><span class="gr-s-th">Verlauf</span></th>
     </tr></thead>
     <tbody>
       {% for z in ml.sichtbar %}{{ modellzeile(z, loop.index, False,

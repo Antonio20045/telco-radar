@@ -87,7 +87,7 @@ def _radar_zeigen(seite):
 
 
 def test_der_sprung_stellt_reiter_modell_und_band_ein(paar):
-    """EIN Klick auf „im Graph ansehen": der Vergleichs-Reiter ist aktiv,
+    """EIN Klick auf „Mit Tarif →": der Reiter „Mit Tarif" ist aktiv,
     die URL trägt ?modell= und &band= (die Deep-Link-Mechanik von E2), und
     der Bündel-Titel nennt das GEWÄHLTE Modell - nicht das Startgerät."""
     _radar_zeigen(paar)
@@ -185,7 +185,7 @@ def test_der_katalog_sprung_legt_filter_und_zeile_frei(paar):
 
 
 def test_der_katalog_graph_sprung_waehlt_das_modell(paar):
-    """Klick auf „im Graph ansehen“ an der KATALOG-Modellzeile: der
+    """Klick auf „Mit Tarif →“ an der KATALOG-Modellzeile: der
     Vergleichs-Reiter ist aktiv und die URL traegt das GEWAEHLTE Modell -
     der dritte Reiter der Kette am selben Schluessel."""
     paar.goto(paar.url.split("#")[0].split("?")[0], wait_until="load")
