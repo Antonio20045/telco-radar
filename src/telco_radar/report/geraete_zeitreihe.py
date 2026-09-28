@@ -49,6 +49,7 @@ from ..analyze.tco_store import basis_aus_satz, id_aus_satz
 from ..tco_model import (Buendel, POSTEN_ANSCHLUSS, POSTEN_BUENDEL,
                          POSTEN_RATE, POSTEN_ZUZAHLUNG, TCO_HORIZONT, tco_24,
                          zeitraum_vergleichbar)
+from . import geraete_bewegung
 from .anbieter_farben import STRICHMUSTER, stil_fuer
 from .geraete_tco_band import ERWARTETE_ANBIETER
 from .geraete_tco_karten import kurz_datum, phasen_fuer_buendel
@@ -2288,6 +2289,12 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
                            for m in modelle},
     }
 
+    # P4: der Bewegungsblock des Newsletters aus DERSELBEN Lesung der
+    # Historie und derselben Wahl-Menge wie der Graph, den sein Link oeffnet.
+    bewegung_woche = geraete_bewegung.bewegungen(
+        messungen_alle, erlaubt, daten["titel"], band_katalog,
+        buendel_schluessel)
+
     return {
         # hat_daten heisst: es gibt mindestens EINEN Messpunkt - ohne
         # Historie steht der ehrliche Leer-Satz je Paar, aber keine Serie.
@@ -2303,6 +2310,7 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
                        if b in band_katalog],
         "suchindex": suchindex,
         "daten": daten,
+        "bewegung_woche": bewegung_woche,
     }
 
 
@@ -2315,6 +2323,8 @@ def leer() -> dict:
     """
     return {"hat_daten": False, "start": None, "start_block": None,
             "paare": [], "kacheln": [], "baender": {}, "band_folge": [],
+            "bewegung_woche": geraete_bewegung.ausfall(
+                geraete_bewegung.AUSFALL_AUFBEREITUNG),
             "suchindex": [], "daten": {"vorgabe": "", "start_band": "",
                                        "modelle_gesamt": 0, "suchindex": [],
                                        "erlaubt": {}, "titel": {},

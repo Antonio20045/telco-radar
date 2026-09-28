@@ -41,6 +41,7 @@ from .quellen_register import Quellenregister, quellen_der_config
 from .report import bilder as report_bilder
 from .report import diff_bilder
 from .report import differenzierung_view
+from .report import geraete_bewegung
 from .report.html import render_site
 
 log = logging.getLogger("telco_radar")
@@ -1358,6 +1359,11 @@ def run(root: Path, use_llm: bool | None = None,
     }
     if redaktion_ausfall:
         report_json["redaktion_ausfall"] = redaktion_ausfall
+    # P4: der woechentliche Bewegungsblock der Geraeteseite fuer die Mail.
+    # Er steht im Berichts-JSON, weil der Versand nur aus ihm rendert
+    # (scripts/newsletter/send_digest.py); ein Ausfall steht als `error`.
+    report_json["geraete_bewegung"] = geraete_bewegung.fuer_bericht(
+        root, today, reports_dir)
     json_path = reports_dir / f"{today.isoformat()}.json"
     json_path.write_text(
         json.dumps(report_json, ensure_ascii=False, indent=1), encoding="utf-8")

@@ -54,6 +54,13 @@ def main(argv=None) -> int:
     p.add_argument("--stufe", choices=("plan", "versand"), default="versand",
                    help="'plan' schreibt nur den Sendeplan (Stufe 1 der "
                         "Idempotenz, wird VOR dem Versand gepusht)")
+    p.add_argument("--nur-test", action="store_true",
+                   help="eine Ausgabe (alle Themen) NUR an die Adresse aus "
+                        "$TEST_EMPFAENGER - Store, Plan und Sendeprotokoll "
+                        "bleiben unberuehrt")
+    p.add_argument("--ausgabe", default="",
+                   help="Verzeichnis: die Test-Ausgabe zusaetzlich als "
+                        "test.html/test.txt ablegen (Sichtpruefung)")
     args = p.parse_args(argv)
 
     bericht = json.loads(Path(args.bericht).read_text(encoding="utf-8"))
@@ -70,6 +77,9 @@ def main(argv=None) -> int:
         daten = json.loads(Path(args.promo).read_text(encoding="utf-8"))
         eintraege += aus_promo(daten.get("entries") or [])
     _zahl("Eintraege zur Auswahl", len(eintraege))
+
+    if args.nur_test:
+        return _testausgabe(args, bericht, datum, eintraege, katalog, basis)
 
     store = st.AboStore(Path(args.store), katalog)
     abos = store.aktive()
@@ -114,7 +124,8 @@ def main(argv=None) -> int:
             seit_datum=_fmt_date_de((erstes_abo.confirmed_at or datum)[:10])
             if erstes_abo else _fmt_date_de(datum),
             basis_url=basis,
-            mit_filter=not segment.filter.ist_leer)
+            mit_filter=not segment.filter.ist_leer,
+            bewegung=bericht.get("geraete_bewegung"))
 
     # Die Abmelde-URL traegt ein signiertes Token je Abo, ist also je
     # Empfaenger verschieden. GERENDERT wurde trotzdem nur einmal je Segment
@@ -158,6 +169,57 @@ def main(argv=None) -> int:
     Path("newsletter_lauf.json").write_text(
         json.dumps(lauf.as_dict(), ensure_ascii=False), encoding="utf-8")
     return 0
+
+
+def _testausgabe(args, bericht: dict, datum: str, eintraege, katalog,
+                 basis: str) -> int:
+    """P4: EINE Ausgabe an EINE Adresse, bevor echte Abonnenten eine sehen.
+
+    Die Adresse kommt nur aus der Umgebung (`TEST_EMPFAENGER`, ein Secret im
+    privaten Repo) und steht in keiner Logzeile. Die Auswahl ist die eines
+    Abos ohne Filter (alle Themen). Store, Sendeplan und Sendeprotokoll
+    werden nicht angefasst: ein Testversand zaehlt nicht als Zustellung.
+    """
+    from datetime import date
+
+    from telco_radar.newsletter.filters import Filtersatz, waehle
+    from telco_radar.report import geraete_bewegung
+    block = bericht.get("geraete_bewegung")
+    if block is None:
+        # Ein Bericht von vor P4 traegt den Block nicht. Der Test soll ihn
+        # trotzdem zeigen: gerechnet aus dem Geraetestand DIESES Checkouts,
+        # genau wie der naechste Radar-Lauf es tut.
+        block = geraete_bewegung.fuer_bericht(
+            WURZEL, date.fromisoformat(datum), WURZEL / "data" / "reports")
+    # Der Test zeigt den Block immer, auch an einem Freitag.
+    block = dict(block, im_newsletter=True)
+    adresse = os.environ.get("TEST_EMPFAENGER", "").strip()
+    if not adresse and not args.dry_run:
+        print("::error::TEST_EMPFAENGER fehlt - kein Testversand.", flush=True)
+        return 2
+    if adresse and os.environ.get("GITHUB_ACTIONS"):
+        print(f"::add-mask::{adresse}", flush=True)
+    nachricht = render.baue(
+        waehle(eintraege, Filtersatz(), katalog),
+        datum_de=_fmt_date_de(datum), bericht_url=f"{basis}/index.html",
+        abmelde_url=f"{basis}/newsletter-abgemeldet.html",
+        seit_datum=_fmt_date_de(datum), basis_url=basis, mit_filter=False,
+        bewegung=block)
+    nachricht.betreff = f"[Test] {nachricht.betreff}"
+    if args.ausgabe:
+        ziel = Path(args.ausgabe)
+        ziel.mkdir(parents=True, exist_ok=True)
+        (ziel / "test.html").write_text(nachricht.html, encoding="utf-8")
+        (ziel / "test.txt").write_text(nachricht.text, encoding="utf-8")
+    transport = Trockenlauf() if args.dry_run else BrevoTransport(
+        api_key=os.environ.get("BREVO_API_KEY", ""),
+        absender_name=render.lade_chrome().get("absender_name", "Telco Radar"),
+        absender_adresse=os.environ.get(
+            "MAIL_FROM", "antonio.fotiadis.francisco@gmail.com"))
+    ergebnis = transport.send(nachricht, adresse or "trocken@example.invalid")
+    _zahl("Testversand", "zugestellt" if ergebnis.ok else
+          f"gescheitert ({ergebnis.status})")
+    return 0 if ergebnis.ok else 1
 
 
 def _abmeldelinks(abos, basis: str) -> dict:

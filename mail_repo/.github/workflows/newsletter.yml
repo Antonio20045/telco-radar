@@ -29,6 +29,17 @@ on:
         description: "alles rendern, nichts verschicken"
         type: boolean
         default: true
+      nur_test:
+        # P4: EINE Ausgabe nur an das Secret TEST_EMPFAENGER. Store,
+        # Sendeplan und Sendeprotokoll bleiben unberuehrt. Vorgabe an, damit
+        # ein Knopfdruck nie aus Versehen alle Abonnenten beschickt.
+        description: "nur an TEST_EMPFAENGER schicken"
+        type: boolean
+        default: true
+      sha:
+        description: "Commit oder Branch von telco-radar (Vorgabe main)"
+        required: false
+        default: "main"
 
 concurrency:
   group: telco-radar-store
@@ -43,7 +54,7 @@ jobs:
     timeout-minutes: 45
     env:
       DATUM: ${{ github.event.client_payload.date || inputs.datum }}
-      SHA: ${{ github.event.client_payload.sha || 'main' }}
+      SHA: ${{ github.event.client_payload.sha || inputs.sha || 'main' }}
       TROCKEN: ${{ inputs.dry_run && '--dry-run' || '' }}
     steps:
       - uses: actions/checkout@v4
@@ -71,7 +82,32 @@ jobs:
             exit 1
           }
 
+      # ------------------------------------------------- Testversand -----
+      # P4: nur per Hand und nur an eine Adresse. Die Schritte danach laufen
+      # dann nicht - kein Store, kein Sendeplan, kein Sendeprotokoll.
+      - name: Testausgabe an TEST_EMPFAENGER
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.nur_test }}
+        env:
+          TEST_EMPFAENGER: ${{ secrets.TEST_EMPFAENGER }}
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          SITE_BASE_URL: ${{ vars.SITE_BASE_URL }}
+          MAIL_FROM: ${{ vars.MAIL_FROM }}
+          PYTHONPATH: logik/src:logik
+        run: |
+          python logik/scripts/newsletter/send_digest.py $TROCKEN --nur-test \
+            --bericht "logik/data/reports/$DATUM.json" \
+            --promo logik/data/state/promo_db.json \
+            --ausgabe testausgabe
+
+      - name: Testausgabe ablegen
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.nur_test }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: testausgabe-${{ env.DATUM }}
+          path: testausgabe/
+
       - name: Store entschluesseln
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.nur_test) }}
         env:
           AGE_SECRET_KEY: ${{ secrets.AGE_SECRET_KEY }}
         run: |
@@ -86,6 +122,7 @@ jobs:
 
       # ---------------------------------------------------- Stufe 1 -------
       - name: Sendeplan schreiben und pushen
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.nur_test) }}
         env:
           SITE_BASE_URL: ${{ vars.SITE_BASE_URL }}
           PYTHONPATH: logik/src:logik
@@ -106,6 +143,7 @@ jobs:
 
       # ---------------------------------------------------- Stufe 2 -------
       - name: Versenden
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.nur_test) }}
         env:
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
           SIGNUP_TOKEN_KEY: ${{ secrets.SIGNUP_TOKEN_KEY }}
@@ -121,7 +159,7 @@ jobs:
             --plan store/sendeplan.json
 
       - name: Sendeprotokoll sichern
-        if: always()
+        if: ${{ always() && !(github.event_name == 'workflow_dispatch' && inputs.nur_test) }}
         run: |
           rm -f store/subscribers.jsonl /tmp/age.key
           git config user.name "telco-radar-bot"
@@ -136,7 +174,7 @@ jobs:
       - name: Zahlen ans oeffentliche Repo zurueckmelden
         # NUR ZAHLEN. Sie landen in data/state/newsletter_stats.jsonl und von
         # dort auf transparenz.html - dort, wo ohnehin hingesehen wird.
-        if: always()
+        if: ${{ always() && !(github.event_name == 'workflow_dispatch' && inputs.nur_test) }}
         env:
           TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN }}
         run: |

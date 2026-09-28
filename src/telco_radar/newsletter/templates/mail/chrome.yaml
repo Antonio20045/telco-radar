@@ -24,7 +24,7 @@
 # Absicht: ein neuer Rahmensatz soll eine bewusste Entscheidung sein.
 # -----------------------------------------------------------------------------
 
-version: "2026-08-13"
+version: "2026-09-28"
 
 # Der Absender. Anzeigename bewusst neutral: ein Markenname vor einer nicht
 # zur Marke gehoerenden Adresse ist genau das Muster, auf das
@@ -77,3 +77,31 @@ fuss:
   datenschutz: "Datenschutzerklärung"
   impressum: "Impressum"
   automatisch: "Automatisch erstellt aus öffentlichen Quellen. Jede Aussage ist mit ihrer Originalquelle verlinkt."
+
+# P4: der woechentliche Geraeteblock. Zahlen, Geraet, Anbieter und Band
+# kommen aus `geraete_bewegung` im Bericht-JSON; hier stehen nur die Worte
+# drumherum. {euro}/{prozent} sind die Schwellen aus
+# `report/geraete_bewegung.py`, nie hier eingetragen.
+bewegung:
+  titel: "Geräte: Abstand zu Vodafone"
+  zeitraum: "{von} bis {bis}"
+  # Die groesste Zahl ist die AENDERUNG des Abstands, kein Preisniveau:
+  # „240 € zugunsten von o2" heisst, o2 steht gegen Vodafone 240 € besser
+  # da als vor einer Woche - auch wenn der Abstand dabei das Vorzeichen
+  # wechselt.
+  zugunsten: "zugunsten von {anbieter}"
+  vorher: "vorher {abstand}"
+  jetzt: "jetzt {abstand}"
+  abstand_guenstiger: "{betrag} günstiger als Vodafone"
+  abstand_teurer: "{betrag} teurer als Vodafone"
+  abstand_gleich: "gleich teuer wie Vodafone"
+  bewegt_fremd: "{anbieter} hat den Preis geändert"
+  bewegt_eigen: "Vodafone hat den Preis geändert"
+  bewegt_beide: "beide haben den Preis geändert"
+  link_seite: "Auf der Geräteseite"
+  link_angebot: "Angebot {anbieter}"
+  weitere: "und {n} weitere auf der Geräteseite"
+  # „Keine Bewegung" waere gelogen, solange die meisten Vergleiche ohne
+  # Aussage sind (Angebotswechsel, fehlende Messung) - deshalb die Zahl.
+  leer: "Keine belegte Bewegung über {euro} oder {prozent} seit dem {von} ({geprueft} von {gesamt} Vergleichen prüfbar)."
+  ausfall: "Der Gerätevergleich ist diesmal ausgefallen: {grund}"
