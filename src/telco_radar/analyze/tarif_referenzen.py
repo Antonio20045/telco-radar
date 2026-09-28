@@ -61,11 +61,11 @@ Saetze zuerst dran ist, nicht ob einer verworfen wird.
 from __future__ import annotations
 
 import logging
-import re
-from typing import Optional
 
 from ..tarif_bezug import Tarifbestand
-from ..tarif_model import HOCH, PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP
+from ..tarif_model import (GERAETEBLATT_ZUSATZ, HOCH, PREISTYP_DOKUMENT,
+                           PREISTYP_LIVE_SHOP, erster_betrag,
+                           ist_geraeteblatt_von)
 from ..tco_model import SimOnlyReferenz
 
 log = logging.getLogger(__name__)
@@ -87,26 +87,7 @@ _UNGEEIGNET = ("festnetz",)
 # denselben Preis und sind trotzdem zwei Tarife (der eine mit
 # Mindestlaufzeit, der andere ohne) - eine Regel ueber Namenspraefixe
 # haette den zweiten geloescht.
-_HARDWARE_ZUSATZ = re.compile(r"\s+mit\s+(?:Smartphone|Handy|Endger[aä]t)\s*$",
-                              re.I)
-
-
-def _erste_phase(satz: dict) -> Optional[float]:
-    """Der Betrag, der bei Vertragsschluss gilt.
-
-    `grundgebuehr` und die erste Preisphase sind bei jedem heute gelesenen
-    Dokument dieselbe Zahl - der Extraktor setzt die Phase aus ihr, wo das
-    Blatt keine Zeitachse hat. Wo es eine hat (Vodafone: "Monat 1-24" /
-    "ab Monat 25"), ist die erste Phase die genauere Angabe, und sobald
-    dort einmal eine Rabattphase steht, ist sie die einzige richtige.
-    """
-    phasen = satz.get("preisphasen") or []
-    if phasen:
-        erste = min(phasen, key=lambda p: p.get("von_monat", 1))
-        if erste.get("betrag") is not None:
-            return float(erste["betrag"])
-    grund = satz.get("grundgebuehr")
-    return None if grund is None else float(grund)
+# Die Regel selbst: `tarif_model.ist_geraeteblatt_von`.
 
 
 def _bevorzugt_live(saetze: list[dict]) -> list[dict]:
@@ -131,35 +112,33 @@ def aus_bestand(bestand: Tarifbestand) -> list[SimOnlyReferenz]:
     """
     saetze = _bevorzugt_live(bestand.saetze())
 
-    # Betrag je (Anbieter, Tarifname) - fuer die Dublettenregel unten.
+    # Satz je (Anbieter, Tarifname) - fuer die Dublettenregel unten.
     # Verglichen wird auf Kleinschreibung: der Zusatz steht auf beiden
     # Blaettern gleich, der Name selbst nicht immer.
-    je_name: dict[tuple[str, str], float] = {}
+    je_name: dict[tuple[str, str], dict] = {}
     for satz in saetze:
-        betrag = _erste_phase(satz)
-        if betrag is not None:
-            je_name[((satz.get("anbieter") or "").strip().lower(),
-                     (satz.get("name") or "").strip().lower())] = betrag
+        je_name[((satz.get("anbieter") or "").strip().lower(),
+                 (satz.get("name") or "").strip().lower())] = satz
 
     referenzen: list[SimOnlyReferenz] = []
     gesehen: dict[str, str] = {}
     for satz in saetze:
         if (satz.get("art") or "").lower() in _UNGEEIGNET:
             continue
-        betrag = _erste_phase(satz)
+        betrag = erster_betrag(satz)
         if betrag is None:
             continue
         anbieter = (satz.get("anbieter") or "").strip()
         name = (satz.get("name") or "").strip()
         if not anbieter or not name:
             continue
-        ohne_zusatz = _HARDWARE_ZUSATZ.sub("", name)
-        if ohne_zusatz != name and je_name.get(
-                (anbieter.lower(), ohne_zusatz.lower())) == betrag:
+        tarifblatt = je_name.get(
+            (anbieter.lower(), GERAETEBLATT_ZUSATZ.sub("", name).lower()))
+        if tarifblatt is not None and ist_geraeteblatt_von(satz, tarifblatt):
             # Das Buendelblatt desselben Tarifs. Sein Datensatz bleibt im
             # Bestand - nur als MASSSTAB waere er eine Dublette.
             log.debug("SIM-only-Referenz uebersprungen: %r ist das "
-                      "Geraeteblatt von %r", name, ohne_zusatz)
+                      "Geraeteblatt von %r", name, tarifblatt.get("name"))
             continue
         referenz = SimOnlyReferenz(
             anbieter=anbieter,

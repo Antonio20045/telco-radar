@@ -107,6 +107,66 @@ def zeitreihen_basis(tid: str) -> str:
     return tid[: -len(zusatz)] if tid.endswith(zusatz) else tid
 
 
+# DAS GERAETEBLATT EINES TARIFS (P3, 28.09.2026). Vodafone veroeffentlicht
+# jeden Tarif zweimal: als reines Tarifblatt ("Vodafone Mobil M") und mit
+# der Geraetestaffel ("Vodafone Mobil M mit Smartphone") - derselbe Vertrag,
+# zwei Blaetter, derselbe Preis ohne Geraet. EINE Stelle fuer den Zusatz:
+# `ist_geraeteblatt_von` ist die Regel: `analyze/tarif_referenzen` streicht
+# damit die Dublette unter den SIM-only-Massstaeben, `tarif_bezug` haengt
+# ein Buendel an das Geraeteblatt, und `vertrag_basis` fuehrt beide IDs auf
+# denselben Vertrag zurueck.
+GERAETEBLATT_ZUSATZ = re.compile(
+    r"\s+mit\s+(?:Smartphone|Handy|Endger[aä]t)\s*$", re.I)
+_GERAETEBLATT_ID = re.compile(r"-mit-(?:smartphone|handy|endgeraet)$")
+
+
+def erster_betrag(satz: dict) -> Optional[float]:
+    """Der Betrag, der bei Vertragsschluss gilt.
+
+    `grundgebuehr` und die erste Preisphase sind bei jedem heute gelesenen
+    Dokument dieselbe Zahl - der Extraktor setzt die Phase aus ihr, wo das
+    Blatt keine Zeitachse hat. Wo es eine hat (Vodafone: "Monat 1-24" /
+    "ab Monat 25"), ist die erste Phase die genauere Angabe, und sobald
+    dort einmal eine Rabattphase steht, ist sie die einzige richtige.
+    """
+    phasen = satz.get("preisphasen") or []
+    if phasen:
+        erste = min(phasen, key=lambda p: p.get("von_monat", 1))
+        if erste.get("betrag") is not None:
+            return float(erste["betrag"])
+    grund = satz.get("grundgebuehr")
+    return None if grund is None else float(grund)
+
+
+def ist_geraeteblatt_von(blatt: dict, tarif: dict) -> bool:
+    """Ist `blatt` das Geraeteblatt des Tarifs `tarif`?
+
+    Eng gefasst: derselbe Anbieter, woertlich derselbe Name plus
+    `GERAETEBLATT_ZUSATZ`, UND derselbe Betrag bei Vertragsschluss
+    (`erster_betrag`). "MagentaMobil S" und "MagentaMobil S Flex" kosten
+    ebenfalls gleich viel und sind trotzdem zwei Tarife - eine Regel ueber
+    Namenspraefixe haette sie verschmolzen.
+    """
+    name = (blatt.get("name") or "").strip()
+    ohne = GERAETEBLATT_ZUSATZ.sub("", name)
+    if ohne == name:
+        return False
+    if ((blatt.get("anbieter") or "").strip().lower()
+            != (tarif.get("anbieter") or "").strip().lower()):
+        return False
+    if ohne.lower() != (tarif.get("name") or "").strip().lower():
+        return False
+    a, b = erster_betrag(blatt), erster_betrag(tarif)
+    return a is not None and b is not None and abs(a - b) < 0.005
+
+
+def vertrag_basis(tid: str) -> str:
+    """Die ID des Vertrags: ohne Lesart-Zusatz (`zeitreihen_basis`) und
+    ohne Geraeteblatt-Zusatz. `vodafone:vodafone-mobil-m-mit-smartphone`
+    und `vodafone:vodafone-mobil-m` sind derselbe Vertrag."""
+    return _GERAETEBLATT_ID.sub("", zeitreihen_basis(tid or ""))
+
+
 @dataclass
 class Preisphase:
     """Ein Abschnitt der Laufzeit mit gleichbleibendem Monatspreis.

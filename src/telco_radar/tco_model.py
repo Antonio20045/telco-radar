@@ -101,7 +101,7 @@ from typing import Optional
 
 from .geraete_model import Ratenzahlung, normalisiere
 from .tarif_model import (PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP, Preisphase,
-                          zeitreihen_basis)
+                          vertrag_basis)
 
 log = logging.getLogger(__name__)
 
@@ -1080,13 +1080,9 @@ class Geraeteanteil:
             if l not in _LUECKEN_OHNE_EINFLUSS_AUF_DIE_DIFFERENZ]
 
 
-# B3 (21.09.2026): die Kuerzung selbst wohnt jetzt in `tarif_model.
-# zeitreihen_basis` - `tarif_bezug.Tarifbestand` braucht sie fuer dieselbe
-# Frage ("welche Lesart gilt fuer diesen Vertrag"), und zwei Kopien derselben
-# ID-Umformung waeren zwei Stellen, die auseinanderlaufen koennten. Der Name
-# bleibt hier als lokaler Alias stehen, weil `geraeteanteil()` unten ihn so
-# nennt und ein Umbenennen an dieser Stelle keinen Wert haette.
-_zeitreihen_basis = zeitreihen_basis
+# Die Kuerzung auf den Vertrag wohnt in `tarif_model.vertrag_basis` (Lesart-
+# und Geraeteblatt-Zusatz) - `tarif_bezug.Tarifbestand` braucht dieselbe
+# Frage, und zwei Kopien einer ID-Umformung laufen auseinander.
 
 
 def geraeteanteil(buendel: Buendel, referenz: SimOnlyReferenz) -> Geraeteanteil:
@@ -1137,7 +1133,10 @@ def geraeteanteil(buendel: Buendel, referenz: SimOnlyReferenz) -> Geraeteanteil:
                          f"{referenz.anbieter!r}")
     ids = ((buendel.tarif_id or "").strip(), (referenz.tarif_id or "").strip())
     if all(ids):
-        if _zeitreihen_basis(ids[0]) != _zeitreihen_basis(ids[1]):
+        # `vertrag_basis` statt `zeitreihen_basis` (P3, 28.09.2026): ein
+        # Buendel haengt am Geraeteblatt ("... mit Smartphone"), der
+        # SIM-only-Massstab am Tarifblatt - derselbe Vertrag.
+        if vertrag_basis(ids[0]) != vertrag_basis(ids[1]):
             raise ValueError(f"Buendel und SIM-only-Referenz gehoeren zu "
                              f"verschiedenen Tarifen: {ids[0]!r} / {ids[1]!r}")
     elif normalisiere(buendel.tarif_name) != normalisiere(referenz.tarif_name):

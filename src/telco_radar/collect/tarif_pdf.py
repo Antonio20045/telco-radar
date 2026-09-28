@@ -274,16 +274,25 @@ def _drossel(text: str, t: Tarif) -> None:
         break
 
 
+# Unbegrenztes Volumen in den Schreibweisen der Blaetter: o2 "Unlimited",
+# Vodafone Mobil XL "Unlimitierte Highspeed-Daten ... mit einer Fair Use von
+# 135 GB" (PIB Juli 2026). Die Fair-Use-Grenze ist keine Drossel und kein
+# Volumen des Tarifs - danach wird je MB berechnet, nicht gedrosselt.
+_UNBEGRENZT = re.compile(
+    r"\bUnlimited\b|\bUnlimitierte?s?\s+(?:Highspeed-)?Daten"
+    r"|unbegrenzt(?:es)?\s+Datenvolumen", re.I)
+
+
 def _volumen_ohne_drossel(text: str, t: Tarif) -> None:
     """Das Datenvolumen, wenn es nicht an einer Drosselschwelle haengt."""
     if t.datenvolumen_gb is not None:
         return
-    if re.search(r"\bUnlimited\b|unbegrenzt(?:es)?\s+Datenvolumen", text, re.I):
+    if _UNBEGRENZT.search(text):
         # Unlimited ist eine Aussage, kein fehlender Wert. Als None waere der
         # Tarif aus jeder Preis-je-GB-Rechnung gefallen - richtig -, aber auch
         # aus der Positionskarte, und dort gehoert er hin.
         t.setze("datenvolumen_gb", float("inf"),
-                _zeile_mit(text, re.compile(r"Unlimited|unbegrenzt", re.I)))
+                _zeile_mit(text, _UNBEGRENZT))
         return
     muster = re.compile(r"(\d+(?:[.,]\d+)?)\s*GB\b(?![^\n]*Verbrauch)", re.I)
     treffer = muster.search(text)

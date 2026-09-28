@@ -51,10 +51,13 @@ Uebernommen werden nur Werte, die woertlich in der Kachel stehen:
                       Listenpreis, und was heute zu zahlen ist, ist die
                       Auskunft einer Shop-Seite.
     datenvolumen_gb   der Text zwischen den beiden `<span class="small">`
-                      ("15 GB+"). Eine Kachel ohne GB-Angabe
-                      ("Unbegrenzt") bekommt KEINEN Wert - `None` heisst
-                      hier "die Kachel nennt keine Zahl", und eine
-                      unbegrenzte Menge ist keine Zahl.
+                      ("15 GB+"). "Unbegrenzt" ist eine Aussage und wird
+                      `float("inf")` - dieselbe Lesart wie im
+                      Produktinformationsblatt (`tarif_pdf`, "Unlimited").
+                      Bis P3 blieb das Feld hier leer, und derselbe Tarif
+                      stand je nach Quelle einmal unbegrenzt und einmal
+                      ohne Volumen im Bestand. Eine Kachel ohne beides
+                      bekommt KEINEN Wert.
     laufzeit_monate   nur aus dem ANGEKREUZTEN Auswahlknopf
                       ("Mindestlaufzeit wählen: 24 Monate"). Steht dort
                       "Monatlich kündbar", bleibt das Feld leer: ein
@@ -112,6 +115,8 @@ _KACHEL_KLASSE = "teaser-with-price"
 # kein Volumen - genau deshalb wird sie hier nur im Volumenteil der
 # Ueberschrift gesucht und nicht in der ganzen Kachel.
 _VOLUMEN_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*GB\b", re.I)
+# Die Volumenzeile der Unlimited-Kacheln heisst genau "Unbegrenzt".
+_UNBEGRENZT_RE = re.compile(r"\s*(?:Unbegrenzt|Unlimited)\s*$", re.I)
 
 # "+ einm. Anschlusspreis 0,00 € statt 39,99 €" -> 0,00.
 _ANSCHLUSS_RE = re.compile(r"Anschlusspreis\D{0,10}?(\d+(?:[.,]\d+)?)", re.I)
@@ -270,6 +275,8 @@ def tarif_aus_kachel(kachel, *, anbieter: str, seiten_url: str,
     if volumen:
         tarif.setze("datenvolumen_gb", zahl(volumen.group(1)),
                     volumenzeile, HOCH)
+    elif _UNBEGRENZT_RE.match(volumenzeile):
+        tarif.setze("datenvolumen_gb", float("inf"), volumenzeile, HOCH)
 
     if laufzeit is not None:
         tarif.setze("laufzeit_monate", laufzeit, laufzeittext, HOCH)

@@ -167,11 +167,23 @@ def test_flex_kacheln_bekommen_keine_laufzeit():
     assert je_name["O2 Mobile Unlimited L Flex"].laufzeit_monate is None
 
 
-def test_unbegrenzte_kacheln_bekommen_kein_datenvolumen():
-    """"Unbegrenzt" ist keine Zahl, und None heisst "die Quelle nennt keine"."""
+def test_unbegrenzte_kacheln_sind_unendlich():
+    """"Unbegrenzt" ist eine Aussage wie "Unlimited" im Blatt: `inf`, nicht
+    None. Bis P3 stand hier None - o2 Unlimited M (die Kachel, an der die
+    o2-Buendel haengen) fiel damit aus jeder Stufe der Tarifleiter."""
     je_name = {t.name: t for t, _ in _tarife()}
     assert je_name["O2 Mobile L"].datenvolumen_gb == 150.0
-    assert je_name["O2 Mobile Unlimited M"].datenvolumen_gb is None
+    unbegrenzt = [n for n in je_name if "Unlimited" in n]
+    assert len(unbegrenzt) == 6, unbegrenzt
+    for n in unbegrenzt:
+        assert je_name[n].datenvolumen_gb == float("inf"), n
+        assert je_name[n].fundstellen["datenvolumen_gb"] == "Unbegrenzt"
+
+
+def test_eine_kachel_ohne_volumenangabe_bleibt_ohne_volumen():
+    """Gegenprobe: weder Zahl noch "Unbegrenzt" - dann kein Wert."""
+    (tarif, _), = _tarife(_kachel(volumen=""))
+    assert tarif.datenvolumen_gb is None
 
 
 def test_die_geschwindigkeit_wird_nicht_fuer_volumen_gehalten():

@@ -135,8 +135,11 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str
             bilanz.ohne_geraet += 1
             continue
 
+        # Ein Buendel ist der Tarif MIT Geraet - es haengt am Geraeteblatt,
+        # wo es eines gibt (Vodafone "... mit Smartphone", P3 28.09.2026).
         bezug = bestand.loese(anbieter, tarif_name,
-                              slug=str(satz.get("tarif_slug") or ""))
+                              slug=str(satz.get("tarif_slug") or ""),
+                              mit_geraet=True)
         if bezug is None:
             bilanz.ohne_tarif += 1
             schluessel = tarif_name or str(satz.get("tarif_slug") or "?")

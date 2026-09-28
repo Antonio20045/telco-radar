@@ -654,3 +654,24 @@ def test_die_wochensperre_haengt_an_der_vertragslaufzeit():
            "Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 4 Wochen\n"
            "Listenpreis inkl. MwSt. 29,99 €\n")
     assert lies_text(roh).grundgebuehr == 29.99
+
+
+def test_vodafone_mobil_xl_unlimitiert_ist_unendlich():
+    """Vodafone Mobil XL mit Smartphone (PIB Juli 2026, SHA-256-Kopf
+    9930a393... = `dokument_hash` des Produktionsbestands vom 25.09.2026)
+    schreibt "Unlimitierte Highspeed-Daten ... mit einer Fair Use von
+    135 GB". Vorher stand das Volumen leer: weder "Unlimited" noch
+    "unbegrenztes Datenvolumen" traf, und die GB-Zahl liegt auf einer
+    Zeile mit "Verbrauch". Ohne diesen Wert hat die Tarifleiter der
+    Geraeteseite keine unbegrenzte Stufe."""
+    xl = lies_text(text("vodafone_mobil_xl_mit_smartphone"))
+    assert xl.name == "Vodafone Mobil XL mit Smartphone"
+    assert xl.grundgebuehr == 79.95
+    assert xl.datenvolumen_gb == float("inf")
+    assert "Unlimitierte Highspeed-Daten" in xl.fundstellen["datenvolumen_gb"]
+
+
+def test_gegenprobe_endliches_vodafone_volumen_bleibt_endlich():
+    """Das Muster darf ein Blatt mit Zahl nicht zu "unbegrenzt" machen."""
+    m = lies_text(text("vodafone_mobil_m_mit_smartphone"))
+    assert m.datenvolumen_gb == 60.0

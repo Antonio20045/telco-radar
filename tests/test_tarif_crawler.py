@@ -113,6 +113,21 @@ def _tarif(**kw) -> Tarif:
     return t
 
 
+def test_ein_zum_ersten_mal_gelesener_wert_ist_keine_aenderung():
+    """Alter Stand ohne Volumen, neuer mit "unbegrenzt" (o2-Kachel mit
+    neuem Aktionstext, also neuem Hash): keine Meldung "o2 aendert
+    stillschweigend die Konditionen". Gegenprobe: ein echter Wechsel
+    zwischen zwei Werten bleibt eine Aenderung."""
+    alt = {"grundgebuehr": 39.99, "datenvolumen_gb": None}
+    assert vergleiche(alt, _tarif(grundgebuehr=39.99,
+                                  datenvolumen_gb=float("inf"))) == []
+    alt = {"grundgebuehr": 39.99, "datenvolumen_gb": 100.0}
+    ae = vergleiche(alt, _tarif(grundgebuehr=39.99,
+                                datenvolumen_gb=float("inf")))
+    assert [(a.feld, a.alt, a.neu) for a in ae] == [
+        ("datenvolumen_gb", 100.0, float("inf"))]
+
+
 def test_geaenderter_preis_wird_erkannt():
     alt = {"grundgebuehr": 59.95, "datenvolumen_gb": 80.0}
     ae = vergleiche(alt, _tarif(grundgebuehr=64.95, datenvolumen_gb=80.0))
@@ -997,3 +1012,48 @@ def test_dieselbe_lesart_bleibt_eine_zeitreihe(tmp_path):
                          _stand("O2 Mobile L", PREISTYP_LIVE_SHOP, 22.99), "b")
     assert bilanz["geaendert"] == 1
     assert {s["tarif_id"] for s in speicher.staende} == {"o2:o2-mobile-l"}
+
+
+def _stand_umschreiben(root, **felder):
+    pfad = root / "data" / "state" / "tarife.jsonl"
+    satz = json.loads(pfad.read_text(encoding="utf-8").strip())
+    satz.update(felder)
+    pfad.write_text(json.dumps(satz) + "\n", encoding="utf-8")
+
+
+def test_unveraendertes_dokument_fuellt_luecken_eines_aelteren_extraktors(
+        tmp_path):
+    """Derselbe Hash, aber der alte Stand kannte das Volumen nicht (so
+    Vodafone Mobil XL bis P3): das Nachlesen fuellt die Luecke im letzten
+    Stand, ohne neuen Satz und ohne Meldung."""
+    verlinkt = f"{EINSTIEG}/magentamobil-l-20240801"
+    seiten = {EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
+              verlinkt: _Antwort(_pib_text(), typ="text/plain")}
+    root = _repo(tmp_path, CONFIG)
+    sammle(root, {}, jetzt=JETZT, hole=_Netz(seiten))
+    _stand_umschreiben(root, datenvolumen_gb=None)
+
+    items, bilanz = sammle(root, {}, jetzt=JETZT, hole=_Netz(seiten))
+    assert items == []
+    assert bilanz["nachgelesen"] == 1
+    zeilen = (root / "data" / "state" / "tarife.jsonl").read_text(
+        encoding="utf-8").strip().splitlines()
+    assert len(zeilen) == 1
+    assert json.loads(zeilen[0])["datenvolumen_gb"] == 80.0
+
+
+def test_nachlesen_ersetzt_keinen_vorhandenen_wert(tmp_path):
+    """Gegenprobe: ein Wert, der schon steht, bleibt - auch wenn der
+    Extraktor heute etwas anderes liest."""
+    verlinkt = f"{EINSTIEG}/magentamobil-l-20240801"
+    seiten = {EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
+              verlinkt: _Antwort(_pib_text(), typ="text/plain")}
+    root = _repo(tmp_path, CONFIG)
+    sammle(root, {}, jetzt=JETZT, hole=_Netz(seiten))
+    _stand_umschreiben(root, datenvolumen_gb=70.0)
+
+    _, bilanz = sammle(root, {}, jetzt=JETZT, hole=_Netz(seiten))
+    assert "nachgelesen" not in bilanz
+    satz = json.loads((root / "data" / "state" / "tarife.jsonl")
+                      .read_text(encoding="utf-8").strip())
+    assert satz["datenvolumen_gb"] == 70.0
