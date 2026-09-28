@@ -25,6 +25,8 @@ import socket
 import threading
 
 import pytest
+
+from tarifleiter_testbestand import mit_leiter
 import yaml
 
 from telco_radar.report import geraete_tco_karten
@@ -134,6 +136,7 @@ def _baue(tmp_path):
          "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}}
         for anbieter, tarif_id, tarif, _r, _ab in _BUENDEL
     ]
+    tarife = mit_leiter(tarife)
     (state / "tarife.jsonl").write_text(
         "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
     reports = root / "data" / "reports"

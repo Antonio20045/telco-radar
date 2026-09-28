@@ -71,6 +71,17 @@ PREISTYP_LIVE_SHOP = "live_shop"
 PREISTYPEN = (PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP)
 
 
+def ist_zurueckgezogen(satz: dict) -> bool:
+    """Traegt der Stand einen Rueckzug (`TarifSpeicher.ziehe_zurueck`)?
+
+    Ein zurueckgezogener Tarif steht noch in der Zeitreihe, ist aber kein
+    aktueller Tarif mehr - jeder Leser, der "was gibt es heute" fragt,
+    laesst ihn aus. EINE Stelle fuer diese Frage, damit Tarifseite und
+    Geraeteseite nicht zweierlei Bestand sehen.
+    """
+    return bool((satz or {}).get("zurueckgezogen_am"))
+
+
 def zeitreihen_basis(tid: str) -> str:
     """Eine Tarif-ID ohne den `#live_shop`-Lesart-Zusatz.
 

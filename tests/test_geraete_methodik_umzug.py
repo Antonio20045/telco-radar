@@ -107,14 +107,16 @@ def test_die_entfernten_lesehilfen_stehen_nicht_im_nichts(tmp_path):
     fragmente = {
         "Ein fehlender Punkt heißt":
             "Ein fehlender Punkt heißt",
+        # P3-E1: seit der Tarifleiter mit neuem Wortlaut.
         "Unbegrenzte Tarife und Tarife ohne erhobenes Datenvolumen":
-            "Unbegrenzte Tarife und Tarife ohne erhobenes Datenvolumen",
+            "Tarife ohne erhobenes Datenvolumen und unbegrenzte Tarife",
         "Balkenlänge = Abstand in Euro zum Vodafone-Preis":
             "Balkenlänge = Abstand in Euro zum Vodafone-Preis",
         "Diese Geräte führen nur":
             "nennt den günstigsten Anbieter, der das Gerät führt",
         "jede Zeile ein Modell, gerechnet gegen Vodafone im selben Tarifband":
-            "jede Zeile ein Modell, gerechnet gegen Vodafone im selben Tarifband",
+            "jede Zeile ein Modell, gerechnet gegen Vodafone in derselben "
+            "Stufe der Tarifleiter",
         "Abweichung je Zeile = Wettbewerber-Kosten":
             "Abweichung je Zeile = Wettbewerber-Kosten",
         "Fachhändler verkaufen ohne eigenen Tarif":

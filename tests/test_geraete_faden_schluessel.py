@@ -58,7 +58,7 @@ def _rendern(root: pathlib.Path) -> BeautifulSoup:
 
 def _seite(tmp_path: pathlib.Path) -> BeautifulSoup:
     """Die Zeitreihen-Fixture als gerenderte Seite: drei Modelle, drei
-    Lagen - iPhone 17 Pro (Bänder klein+mittel), Galaxy S26 (Band klein),
+    Lagen - iPhone 17 Pro (Bänder klein+mittel), Galaxy S26 (Band XS),
     Pixel 11 (Listung OHNE Bündel -> Katalog ohne Graph-Sprung)."""
     root, _state = _baue_zeitreihe(tmp_path)
     return _rendern(root)
@@ -272,7 +272,7 @@ def test_zr_feld_ohne_erlaubnis_bleibt_false(tmp_path):
     schluessel = {m["schluessel"] for m in ohne}
     teil = schluessel - {"google-pixel-11-128"}
     mit = katalog_modellzeilen(eintraege, katalog, zr_erlaubt=
-                               {k: ["klein"] for k in teil})
+                               {k: ["xs"] for k in teil})
     wahr = {m["schluessel"] for m in mit if m["zr"]}
     assert wahr == teil, \
         f"zr trifft nicht die uebergebene Menge: {wahr} != {teil}"

@@ -63,7 +63,8 @@ from pathlib import Path
 from typing import Optional
 
 from .collect.tarif_crawler import tarif_id
-from .tarif_model import HOCH, MITTEL, PREISTYP_LIVE_SHOP, zeitreihen_basis
+from .tarif_model import (HOCH, MITTEL, PREISTYP_LIVE_SHOP,
+                          ist_zurueckgezogen, zeitreihen_basis)
 
 log = logging.getLogger(__name__)
 
@@ -163,7 +164,12 @@ class Tarifbestand:
     `je_id`         JEDE Zeitreihe unter ihrem eigenen Schluessel, unveraendert
                     - auch die STILLGELEGTE Lesart bleibt hier stehen (nichts
                     wird geloescht, CLAUDE.md § 2 gilt sinngemaess auch fuer
-                    dieses In-Memory-Abbild).
+                    dieses In-Memory-Abbild). Einzige Ausnahme seit P3-E1
+                    (28.09.2026): ein Tarif, dessen juengster Stand als
+                    zurueckgezogen markiert ist (`tarif_model.
+                    ist_zurueckgezogen`), fehlt in beiden Sichten - er
+                    steht weiter in der Datei, ist aber kein Tarif von
+                    heute und kein Bezugsziel.
     `je_id_aktuell` je Vertrag (`tarif_model.zeitreihen_basis`) NUR der Satz,
                     der nach `_aktuelle_lesart` gerade gilt - unter ZWEI
                     Schluesseln erreichbar (B3-Regression, FIX4,
@@ -188,6 +194,10 @@ class Tarifbestand:
         for satz in saetze:
             if isinstance(satz, dict) and satz.get("tarif_id"):
                 self.je_id[satz["tarif_id"]] = satz
+        # P3-E1: ein zurueckgezogener Tarif (juengster Stand traegt den
+        # Rueckzug) ist kein Bezugsziel mehr.
+        self.je_id = {tid: satz for tid, satz in self.je_id.items()
+                      if not ist_zurueckgezogen(satz)}
 
         self.je_id_aktuell: dict[str, dict] = {}
         for tid, satz in self.je_id.items():

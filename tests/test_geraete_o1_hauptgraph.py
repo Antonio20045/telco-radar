@@ -75,11 +75,12 @@ def bestand():
 def _baender(modell, tarife):
     gb = {tid: (satz or {}).get("datenvolumen_gb")
           for tid, satz in tarife.items()}
-    return bandmod.baender_fuer_modell(modell, bandmod.tarif_baender(tarife),
-                                       gb)
+    leiter = bandmod.tarifleiter(tarife)
+    return bandmod.baender_fuer_modell(
+        modell, bandmod.tarif_baender(tarife, leiter), gb, leiter)
 
 
-def _balken(modell, tarife, key="klein"):
+def _balken(modell, tarife, key="xs"):
     for b in _baender(modell, tarife):
         if b["key"] == key:
             return b["balken"]
@@ -133,7 +134,7 @@ def test_genau_eine_referenzzeile_und_deltas_dagegen(bestand):
     """Vodafone trägt als ECHTES Bündel die Emphasis-Zeile ("Referenz",
     kein Δ); jede andere Zeile trägt Δ gegen genau diese Zahl. Gibt es kein
     echtes Vodafone-Bündel im Band, gibt es auch kein Δ - der Entwurf sagt
-    das im Band Groß wörtlich ("keine Δ-Angabe"), und die Näherung bleibt
+    das im Band L wörtlich ("keine Δ-Angabe"), und die Näherung bleibt
     der Massstab der Karten, keine Zeile des Graphen."""
     modell, tarife, band = _mit_zwei_anbietern(bestand)
     balken = band["balken"]
@@ -201,7 +202,7 @@ def test_die_luecke_nennt_namen_ohne_einzelsaetze():
     Einzelsätze der alten Band-Panels entfallen mit dem Graph - ein Name
     pro fehlendem Anbieter, gruppiert nach Grund."""
     buendel = [
-        # Ein echtes o2-Bündel im Band Klein und ein ERNEUERTES Telekom-
+        # Ein echtes o2-Bündel im Band XS und ein ERNEUERTES Telekom-
         # Bündel im selben Band: o2 trägt die Zeile, Telekom steht als
         # "nur erneuert" in der Lücke, 1&1 und Vodafone als "kein Bündel".
         Buendel(sku_id="apple-iphone-17-pro-256gb-schwarz", anbieter="o2",
@@ -229,6 +230,10 @@ def test_die_luecke_nennt_namen_ohne_einzelsaetze():
     tarife = {
         "o2:klein": {"datenvolumen_gb": 10},
         "tk:klein": {"datenvolumen_gb": 15},
+        # P3-E1: die Stufe, in die beide fallen - Vodafone XS.
+        "vf:xs-sp": {"anbieter": "Vodafone", "datenvolumen_gb": 15,
+                     "name": "Vodafone Mobil XS mit Smartphone",
+                     "grundgebuehr": 29.95},
     }
     modell = karten.modelle(buendel, listungen, [], tarife,
                             lade_katalog(WURZEL))["modelle"][0]

@@ -36,47 +36,32 @@ VORGABE_MODELL = "apple-iphone-17-pro-256"
 # (a) Bandableitung aus echten tarife.jsonl-Datenvolumina
 # --------------------------------------------------------------------------
 
-def test_band_von_gb_ist_die_norm_aus_dem_lastenheft():
-    """§7: Klein bis 20, Mittel 21-60, Groß über 60 - fehlend und unbegrenzt
-    fallen beide heraus (`None`)."""
-    assert band.band_von_gb(20) == "klein"
-    assert band.band_von_gb(20.0) == "klein"
-    assert band.band_von_gb(21) == "mittel"
-    assert band.band_von_gb(60) == "mittel"
-    assert band.band_von_gb(61) == "gross"
-    assert band.band_von_gb(None) is None
-    assert band.band_von_gb(float("inf")) is None
-
-
 @pytest.fixture(scope="module")
 def tarife():
     return Tarifbestand.aus_datei(ZUSTAND / "tarife.jsonl").je_id
 
 
-def test_drei_echte_tarifsaetze_treffen_ihr_band(tarife):
-    """Drei Beispiele aus dem echten Bestand (Aufgabe 5a): ein unbegrenzter
-    Tarif faellt aus jedem Band, ein 18-GB- und ein 150-GB-Tarif treffen
-    Klein bzw. Gross, und die Grenze bei 60 GB gehoert zu Mittel."""
+def test_drei_echte_tarifsaetze_treffen_ihre_stufe(tarife):
+    """Beispiele aus dem echten Bestand, seit P3-E1 gegen die Vodafone-
+    Tarifleiter: ein unbegrenzter Tarif faellt heraus (Vodafone XL traegt
+    kein erhobenes Volumen), Vodafone-Tarife gehen ueber ihren Namen in
+    ihre Stufe, ein 150-GB-Tarif in die naechste Stufe L (120 GB)."""
+    leiter = band.tarifleiter(tarife)
+    assert leiter, "keine Vodafone-Tarifleiter im Bestand"
+    index = band.tarif_baender(tarife, leiter)
     faelle = [
         ("o2:o2-mobile-unlimited-m-flex", None),   # unbegrenzt (Infinity)
-        ("vodafone:vodafone-mobil-xs", "klein"),   # 18 GB
-        ("vodafone:vodafone-mobil-m", "mittel"),   # 60 GB, obere Grenze
-        ("o2:o2-mobile-l", "gross"),                # 150 GB
+        ("vodafone:vodafone-mobil-xs", "xs"),      # 18 GB, ueber den Namen
+        ("vodafone:vodafone-mobil-m", "m"),        # 60 GB
+        ("o2:o2-mobile-l", "l"),                    # 150 GB
     ]
     geprueft = 0
     for tarif_id, erwartet in faelle:
-        tarif = tarife.get(tarif_id)
-        if tarif is None:
+        if tarif_id not in tarife:
             continue  # Tarifbestand kann sich zwischen Laeufen leicht verschieben
         geprueft += 1
-        assert band.band_von_gb(tarif.get("datenvolumen_gb")) == erwartet, tarif_id
+        assert index.get(tarif_id) == erwartet, tarif_id
     assert geprueft >= 3, "weniger als drei der Beispiel-Tarife im Bestand"
-
-
-def test_tarif_baender_indiziert_nur_bestimmbare_baender(tarife):
-    index = band.tarif_baender(tarife)
-    assert index["vodafone:vodafone-mobil-xs"] == "klein"
-    assert "o2:o2-mobile-unlimited-m-flex" not in index
 
 
 # --------------------------------------------------------------------------
@@ -119,7 +104,9 @@ def bestand():
         abgerufen_am=r.get("abgerufen_am", "")) for r in tco["sim_only"]]
     modelle = karten.modelle(buendel, db["listungen"], referenzen, tarife,
                              lade_katalog(WURZEL))
-    return {"modelle": modelle, "band_je_tarif": band.tarif_baender(tarife)}
+    leiter = band.tarifleiter(tarife)
+    return {"modelle": modelle, "leiter": leiter,
+            "band_je_tarif": band.tarif_baender(tarife, leiter)}
 
 
 def _modell(bestand, mid):
@@ -134,9 +121,10 @@ def test_vorgabefall_zeigt_genau_die_anbieter_mit_echten_buendeln(bestand):
     jedes Band zeigt genau die Anbieter, fuer die es ein ECHTES Buendel
     gibt, keinen mehr."""
     modell = _modell(bestand, VORGABE_MODELL)
-    baender = band.baender_fuer_modell(modell, bestand["band_je_tarif"])
+    baender = band.baender_fuer_modell(modell, bestand["band_je_tarif"],
+                                     leiter=bestand["leiter"])
     je_band = {b["key"]: b for b in baender}
-    assert set(je_band) <= {"klein", "mittel", "gross"}
+    assert set(je_band) <= {s.key for s in bestand["leiter"]}
     assert je_band, "kein einziges Band mit Buendel - Datenlage geprueft?"
 
     for key, eintrag in je_band.items():
@@ -157,13 +145,14 @@ def test_telekom_congstar_und_11_stehen_als_benannte_luecke(bestand):
     still verschwinden - jeder ist entweder gezeichnet oder mit Grund
     benannt. Bis B2 (08.09.2026) hielt dieser Test die Datenlage fest
     (Telekom, congstar und 1&1 in KEINEM Band zeichenbar); seit dem
-    Telekom-Lokallauf fuehrt Telekom ECHTE Bündel und ist im Band Klein
+    Telekom-Lokallauf fuehrt Telekom ECHTE Bündel und ist im Band XS
     gezeichnet, in anderen ehrlich fehlend. Gemessen wird deshalb die
     REGEL: je Band gilt gezeichnet-oder-benannt fuer ALLE erwarteten
     Anbieter - und beide Telekom-Zustaende treten wirklich ein
     (Lookup-Zeile, sonst pruefte der Test nur einen von beiden)."""
     modell = _modell(bestand, VORGABE_MODELL)
-    baender = band.baender_fuer_modell(modell, bestand["band_je_tarif"])
+    baender = band.baender_fuer_modell(modell, bestand["band_je_tarif"],
+                                     leiter=bestand["leiter"])
     assert baender, "kein Band vorhanden - Test prueft nichts"
     je_band = band.karten_je_band(modell, bestand["band_je_tarif"])
     telekom_gezeichnet = telekom_fehlend = 0
@@ -191,7 +180,7 @@ def test_leerzustand_modell_ohne_buendel_in_keinem_band(bestand, tarife):
 
     BIS B4 (08.09.2026) war das der NATUERLICHE Fall jedes 1&1-Modells: die
     Buendel kamen aus dem Listung-Umweg ohne tarif_id, also ohne Band. Seit
-    B4 loest jeder 1&1-Satz auf die All-Net-Flat S (Band Klein) auf, und
+    B4 loest jeder 1&1-Satz auf die All-Net-Flat S (Band XS) auf, und
     der Bestand kennt den Fall nicht mehr - der Test KONSTRUIERT ihn
     deshalb am echten Tarifbestand (1&1 Unlimited XL traegt kein
     Datenvolumen), statt an einer Datenlage zu haengen, die ein
@@ -218,12 +207,14 @@ def test_leerzustand_modell_ohne_buendel_in_keinem_band(bestand, tarife):
     echte = [k for k in ohne["karten"]
              if k["belastbar"] and not k["naeherung"]]
     assert echte, "das konstruierte Modell hat kein echtes Buendel - kein Fall"
-    assert band.baender_fuer_modell(ohne, bestand["band_je_tarif"]) == [], \
+    assert band.baender_fuer_modell(ohne, bestand["band_je_tarif"],
+                                     leiter=bestand["leiter"]) == [], \
         "ein Tarif ohne Datenvolumen darf kein Band gebaeren"
 
     mit_band = _modell_mit("11:1-1-all-net-flat-s", "1&1 All-Net-Flat S")
-    assert band.baender_fuer_modell(mit_band, bestand["band_je_tarif"]), \
-        "Gegenprobe: die All-Net-Flat S (10 GB) muss Band Klein gebaeren"
+    assert band.baender_fuer_modell(mit_band, bestand["band_je_tarif"],
+                                     leiter=bestand["leiter"]), \
+        "Gegenprobe: die All-Net-Flat S (10 GB) muss Stufe XS gebaeren"
 
 
 # --------------------------------------------------------------------------
@@ -235,7 +226,8 @@ def test_kein_tco36_in_keinem_bandgraphen(bestand):
     kein Bandgraph darf eine TCO-36-Zahl oder -Beschriftung tragen."""
     geprueft = 0
     for modell in bestand["modelle"]["modelle"]:
-        for eintrag in band.baender_fuer_modell(modell, bestand["band_je_tarif"]):
+        for eintrag in band.baender_fuer_modell(modell, bestand["band_je_tarif"],
+                                     leiter=bestand["leiter"]):
             svg = eintrag["grafik"]["svg"]
             if not svg:
                 continue

@@ -15,9 +15,9 @@ Hover lesbar ist, sieht man trotzdem erst im gerenderten Dokument (ein
 Die Fixture (rot-vor-gruen gegen den Stand vom 11.09.2026 geschrieben)
 ----------
 EIN Modell, fuenf Bündelkarten in drei Lagen:
-  - o2 "Klein" (18 GB)                -> Band klein,  Gerätepreis = Barpreis
-  - Vodafone "Mittel" (40 GB)         -> Band mittel, Gerätepreis = Barpreis
-  - congstar "Allnet M" (25 GB)       -> Band mittel, OHNE eigene Listung ->
+  - o2 "XS" (18 GB)                -> Band XS,  Gerätepreis = Barpreis
+  - Vodafone "M" (40 GB)         -> Band M, Gerätepreis = Barpreis
+  - congstar "Allnet M" (25 GB)       -> Band M, OHNE eigene Listung ->
                                          Gerätepreis ist die Finanzierungssumme
                                          (TCO-1: derselbe Fall wie congstar
                                          Galaxy S26 Ultra 1024 am Bestand)
@@ -40,6 +40,8 @@ import socket
 import threading
 
 import pytest
+
+from tarifleiter_testbestand import mit_leiter
 import yaml
 
 from telco_radar.report.html import render_site
@@ -157,6 +159,7 @@ def _baue(tmp_path: pathlib.Path):
         _tarif("o2", "o2:unlimited", "O2 Unlimited", math.inf, 34.99),
         _tarif("congstar", "congstar:allnet-m", "Allnet Flat M", 25.0, 24.00),
     ]
+    tarife = mit_leiter(tarife)
     (state / "tarife.jsonl").write_text(
         "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
     reports = root / "data" / "reports"
@@ -235,15 +238,15 @@ def test_die_zeilenliste_aendert_sich_bei_bandwechsel(_seite):
     """UX-1: bis P1 zeigte die Klappe bei jedem Band dieselben Karten aller
     Bänder gemischt. Seit O2 zeigt die Zeilenliste die Bündel des
     gewählten Bands - und die Liste ist nach dem Wechsel eine ANDERE."""
-    waehle_band(_seite, "klein")
+    waehle_band(_seite, "xs")
     _seite.wait_for_timeout(120)
     klein = _sichtbare_anbieter(_seite)
-    assert "o2" in klein, f"Band klein zeigt keine o2-Karte: {klein}"
+    assert "o2" in klein, f"Band XS zeigt keine o2-Karte: {klein}"
     # congstar führt nur ein Mittel-Band-Bündel - in Klein gehört sie nicht
     # in die Auswahl des Bands.
     assert "congstar" not in klein, klein
 
-    waehle_band(_seite, "mittel")
+    waehle_band(_seite, "m")
     _seite.wait_for_timeout(120)
     mittel = _sichtbare_anbieter(_seite)
     assert "congstar" in mittel and "Vodafone" in mittel, mittel
@@ -254,10 +257,10 @@ def test_die_zeilenliste_aendert_sich_bei_bandwechsel(_seite):
 def test_zeilen_anderer_baender_bleiben_im_dokument_und_verstecken_sich(_seite):
     """Versteckt, nicht entfernt: die Zeilen sind statisch im Dokument, und
     ein Bandwechsel darf kein Nachladen auslösen (OPTIK-6/E1)."""
-    waehle_band(_seite, "mittel")
+    waehle_band(_seite, "m")
     _seite.wait_for_timeout(120)
     verdeckt = _seite.eval_on_selector(
-        '#gr-bndliste .gr-bnd[data-band="klein"]',
+        '#gr-bndliste .gr-bnd[data-band="xs"]',
         "e => ({versteckt: e.hidden,"
         "       sichtbar: getComputedStyle(e).display !== 'none'})")
     assert verdeckt["versteckt"] is True, "die Klein-Zeile trägt kein hidden"
@@ -266,8 +269,8 @@ def test_zeilen_anderer_baender_bleiben_im_dokument_und_verstecken_sich(_seite):
 
 def test_jede_bandzeile_traegt_ihre_gb_angabe(_seite):
     """Ohne GB-Angabe ist eine Bandauswahl nicht nachprüfbar: der Leser
-    muss sehen, WARUM diese Zeile im Band Klein steht."""
-    waehle_band(_seite, "mittel")
+    muss sehen, WARUM diese Zeile im Band XS steht."""
+    waehle_band(_seite, "m")
     _seite.wait_for_timeout(120)
     gb = _seite.eval_on_selector_all(
         "#gr-bndliste .gr-bnd[data-band]",
@@ -289,7 +292,7 @@ def test_zeilen_ohne_tarifband_bilden_eine_markierte_gruppe(_seite):
     dem Bandraster - seit O2 stehen sie in der eigenen Gruppe 'Ohne
     Tarifband' UNTER der Bandliste (#gr-ohneband), nicht heimlich in einem
     Band (o2-Unlimited-Zeile, UX-1)."""
-    waehle_band(_seite, "mittel")
+    waehle_band(_seite, "m")
     _seite.wait_for_timeout(120)
     lage = _seite.evaluate("""() => {
       const tafel = document.querySelector('#tafel-tco');
@@ -329,14 +332,14 @@ def test_die_tco_werte_des_bands_stehen_ohne_hover_im_dom(_seite):
     Antwort-Satz (der beste des Bands) und auf jeder Bündel-Zeile. Das
     SVG der Zeitreihe trägt seine Werte ebenfalls als <text>, niemals
     nur als Tooltip."""
-    waehle_band(_seite, "klein")
+    waehle_band(_seite, "xs")
     _seite.wait_for_timeout(250)
     tafel = _seite.eval_on_selector("#tafel-tco", "e => e.innerText")
     assert "1.032,76" in tafel, (
         f"der o2-TCO-24 (1 + 24x24,99 + 24x18) steht nicht als Text")
     assert "18 GB" in tafel, "das Datenvolumen des Band-Tarifs fehlt"
 
-    waehle_band(_seite, "mittel")
+    waehle_band(_seite, "m")
     _seite.wait_for_timeout(250)
     tafel = _seite.eval_on_selector("#tafel-tco", "e => e.innerText")
     # Vodafone: 1 + 24x26,99 + 24x15 = 1.008,76 - congstar (A1, 36 Raten):
@@ -348,13 +351,13 @@ def test_der_antwort_satz_nennt_die_zahl_der_guenstigsten_zeile(_seite):
     """Keine zweite Rechnung (E2-Fassung der Wertelisten-Regel): der
     Betrag des Antwort-Satzes ist der KLEINSTE data-gesamt der im Band
     sichtbaren Bündel-Zeilen - zwei Stellen, eine Zahl."""
-    waehle_band(_seite, "mittel")
+    waehle_band(_seite, "m")
     _seite.wait_for_timeout(250)
     lage = _seite.evaluate("""() => {
       const antwort = document.querySelector('#tafel-tco .gr-zr-antwort')
         .innerText;
       const bnd = [...document.querySelectorAll('#gr-bndliste .gr-bnd')]
-          .filter(z => !z.hidden && z.getAttribute('data-band') === 'mittel');
+          .filter(z => !z.hidden && z.getAttribute('data-band') === 'm');
       return {antwort,
               min: Math.min(...bnd.map(z => parseFloat(z.dataset.gesamt))),
               anbieter: bnd.map(z => z.dataset.anbieter)};
@@ -382,7 +385,7 @@ def test_mobil_bleibt_ohne_querscroll_und_mit_werteliste_lesbar(_seite):
     try:
         seite.goto(_seite.url, wait_until="load")
         seite.click('[data-tafel="tafel-tco"]')
-        waehle_band(seite, "mittel")
+        waehle_band(seite, "m")
         seite.wait_for_timeout(250)
         breite = seite.evaluate("document.documentElement.scrollWidth")
         sichtbar = seite.evaluate("document.documentElement.clientWidth")
@@ -404,13 +407,13 @@ def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(_seite):
     nie vermischt: die Finanzierung heißt Finanzierung, und der reine
     Gerätepreis ohne Vertrag wird als eigene Aussage benannt - hier als
     benannte Lücke, weil congstar dazu nichts gemessen hat."""
-    waehle_band(_seite, "mittel")
+    waehle_band(_seite, "m")
     _seite.wait_for_timeout(120)
     # Der Rechenweg steht im geschlossenen Aufklapper - innerText zeigt ihn
     # nur, wenn die Zeile offen ist (Transitivitaet der <details>-Regel).
     congstar = _seite.eval_on_selector(
         "#gr-bndliste .gr-bnd[data-anbieter='congstar']"
-        "[data-band='mittel']",
+        "[data-band='m']",
         """e => {
           // P4-Fix (Sicht-Pruefung 18.09.): der Rechenweg wird erst beim
           // OEFFNEN aus dem <template> montiert - der SUMMARY-KLICK ist
@@ -446,10 +449,10 @@ def test_ein_gemessener_barpreis_fuehrt_weiter_als_geraetepreis(_seite):
     """Gegenprobe: Karten mit gemessenem eigenen Barpreis (o2, Vodafone)
     führen unverändert mit „Gerätepreis“ - das neue Etikett gilt nur der
     Finanzierungssumme, nicht dem Barpreis."""
-    waehle_band(_seite, "klein")
+    waehle_band(_seite, "xs")
     _seite.wait_for_timeout(120)
     o2 = _seite.eval_on_selector(
-        "#gr-bndliste .gr-bnd[data-anbieter='o2'][data-band='klein']",
+        "#gr-bndliste .gr-bnd[data-anbieter='o2'][data-band='xs']",
         "e => ({bar: e.querySelector('.gr-bnd-bar').textContent,"
         "          text: e.innerText})")
     # Ein gemessener Barpreis steht OHNE Finanzierungs-Etikett in der
@@ -484,7 +487,7 @@ def test_der_graph_traegt_keine_tooltips_mehr(_seite):
     steht als <text> im Bild (am letzten und ersten Punkt), der beste
     zusätzlich im Antwort-Satz. Ein Tooltip-Fehler käme zurück, wenn
     Werte NUR in <title> steckten."""
-    waehle_band(_seite, "klein")
+    waehle_band(_seite, "xs")
     _seite.wait_for_timeout(250)
     assert _seite.eval_on_selector_all(
         "#tafel-tco title", "e => e.length") == 0

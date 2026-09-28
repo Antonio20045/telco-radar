@@ -181,18 +181,16 @@ MODELLISTE_SICHTBAR = 5
 # Aufklapper unter der Grafik (nichts streichen).
 GRAFIK_MAX = 12
 
-_BAND_LABEL = {k: l for k, l, _ in geraete_tco_band.BAENDER}
-# Einfuegereihenfolge der Baender in einer Gruppe: die Ordnung aus
-# `BAENDER` (Klein, Mittel, Gross) - alphabetisch waere "gross, klein,
-# mittel" und stuende quer zum Rest des Moduls. Wirkt nur bei
-# prozent-Gleichstand (die Endsortierung der Zeilen rechnet nach Prozent).
-_BAND_RANG = {k: i for i, (k, _, _) in enumerate(geraete_tco_band.BAENDER)}
-
-
 def _band_label(band: Optional[str]) -> str:
-    if not band:
-        return "nicht bestimmbar"
-    return _BAND_LABEL.get(band, band)
+    return geraete_tco_band.band_label(band) or "nicht bestimmbar"
+
+
+def _band_rang(katalog: list | None) -> dict:
+    """Einfuegereihenfolge der Stufen in einer Gruppe: die Leiterfolge aus
+    dem Katalog (XS, S, M, L, XL) - alphabetisch stuende "l" vor "xs".
+    Wirkt nur bei prozent-Gleichstand (die Endsortierung der Zeilen rechnet
+    nach Prozent)."""
+    return {b["key"]: i for i, b in enumerate(katalog or [])}
 
 
 def _beleg(quelle_url: str, abgerufen_am: str) -> dict:
@@ -394,7 +392,8 @@ def _guenstigste_echte_karte_je_anbieter(modell: dict) -> dict[str, dict]:
     return beste
 
 
-def netzbetreiber_gruppen(modelle: list, band_je_tarif: dict) -> list[dict]:
+def netzbetreiber_gruppen(modelle: list, band_je_tarif: dict,
+                          band_rang: dict | None = None) -> list[dict]:
     """Je Modell eine Zeilengruppe (Aufgabe 3): Vodafone-Basis + Zeilen der
     drei Wettbewerber, IMMER alle drei genannt (kein_buendel statt
     Weglassen), dazu Zweitmarken MIT Karte ohne Platzhalter (B3) - sortiert
@@ -412,6 +411,7 @@ def netzbetreiber_gruppen(modelle: list, band_je_tarif: dict) -> list[dict]:
     vergleichbare Zeile mit Grund daneben (B1-Zustandsregel), es verdraengt
     die vergleichbare Karte nicht mehr. Gibt es kein gemeinsames Band:
     ehrlicher Band-Mismatch mit seiner GUENSTIGSTEN Karte als Beleg."""
+    band_rang = band_rang or {}
     gruppen = []
     for modell in modelle:
         basis = _vodafone_basis(modell, band_je_tarif)
@@ -463,8 +463,10 @@ def netzbetreiber_gruppen(modelle: list, band_je_tarif: dict) -> list[dict]:
                          if a in je and "Vodafone" in je
                          and je_band[b]["Vodafone"].get("vergleichbar", True)}
             if gemeinsam:
-                for b, karten_wb in sorted(gemeinsam.items(),
-                                            key=lambda kv: _BAND_RANG[kv[0]]):
+                for b, karten_wb in sorted(
+                        gemeinsam.items(),
+                        key=lambda kv: (band_rang.get(kv[0], len(band_rang)),
+                                        kv[0])):
                     for karte_wb in karten_wb[a]:
                         zeilen.append(_paar_zeile(
                             a, b, karte_wb, je_band[b]["Vodafone"]))
@@ -947,7 +949,9 @@ def radar(tco: dict, vergleich_ohne_vertrag: dict, quellenlage: dict,
     Sortiment, die der Radar ueber den Preis stellt.
     """
     band_je_tarif = tco.get("band_je_tarif") or {}
-    gruppen = netzbetreiber_gruppen(tco.get("modelle", []), band_je_tarif)
+    gruppen = netzbetreiber_gruppen(
+        tco.get("modelle", []), band_je_tarif,
+        _band_rang(tco.get("baender_katalog")))
     haendler = haendler_zeilen(vergleich_ohne_vertrag)
     fehlt = nicht_erhebbar(quellenlage)
     hat_vergleichbare = any(z["prozent"] is not None

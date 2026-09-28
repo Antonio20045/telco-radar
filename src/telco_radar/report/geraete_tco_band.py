@@ -2,14 +2,15 @@
 
 Die eine Frage, an der dieser Baustein gebaut ist
 --------------------------------------------------
-    "Iphone 17 Pro, Tarifband Mittel - was kostet dasselbe Gerät bei
+    "iPhone 17 Pro, Vodafone Mobil M - was kostet dasselbe Gerät bei
      welchem Anbieter, wenn ich nach Datenvolumen vergleiche statt nach
      Tarifnamen?"
 
 AUFTRAG_GERAETESEITE.md §2a verlangt die Kopplung Geraet x Tarifniveau,
-eine Linie je Anbieter. §7 legt die drei Baender fest (Klein/Mittel/Gross),
-abgeleitet aus den ERHOBENEN Datenvolumina von `tarife.jsonl` - nicht
-erfunden, nicht gerundet.
+eine Linie je Anbieter. Die Stufen sind seit P3-E1 (28.09.2026) die
+Vodafone-Tarifleiter (`tarifleiter`), abgeleitet aus den ERHOBENEN Saetzen
+von `tarife.jsonl` - nicht erfunden, nicht gerundet. Die frueheren festen
+Baender Klein/Mittel/Gross (bis 20 / 21-60 / ueber 60 GB) sind entfallen.
 
 Warum hier keine echte Zeitreihe entsteht
 ------------------------------------------
@@ -41,7 +42,10 @@ Die drei Regeln, die dieses Modul traegt
 from __future__ import annotations
 
 import datetime as _dt
+import logging
 import math
+import re
+from dataclasses import dataclass
 from typing import Optional
 
 from . import geraete_tco_grafik
@@ -49,16 +53,43 @@ from .anbieter_farben import farbe_fuer
 from .geraete_tco_karten import (ANBIETER_REIHENFOLGE,
                                  HAENDLER_OHNE_BUENDEL)
 
-# Die drei Baender aus AUFTRAG_GERAETESEITE.md §7 - entschieden am
-# 05.09.2026 aus 56 erhobenen Tarifsaetzen (o2 15, Telekom 14, Vodafone 10,
-# congstar 10, 1&1 7), je mindestens 12 Saetze und alle fuenf erhobenen
-# Anbieter je Band. NICHT erfunden, NICHT gerundet auf "runde" GB-Zahlen.
-BAENDER = (
-    ("klein", "Klein", "bis 20 GB"),
-    ("mittel", "Mittel", "21 bis 60 GB"),
-    ("gross", "Groß", "über 60 GB"),
-)
-_BAND_LABEL = {k: (l, b) for k, l, b in BAENDER}
+log = logging.getLogger(__name__)
+
+# P3-E1 (28.09.2026): die Tarifleiter. Bis hierher standen drei feste
+# Baender (bis 20 GB, 21 bis 60 GB, ueber 60 GB) - eine Einteilung, die kein
+# Anbieter verkauft. Jetzt ist die Leiter das Sortiment, gegen das die
+# Seite vergleicht: die Vodafone-Tarife "mit Smartphone" aus
+# `tarife.jsonl`, je Lauf neu abgeleitet (Stand 25.09.2026: XS 15 GB,
+# S 30 GB, M 60 GB, L 120 GB, XL ohne erhobenes Volumen). Ein Wettbewerber
+# faellt in die Stufe des naechstgelegenen Vodafone-Volumens.
+#
+# Die Stufe traegt den Namen, den Vodafone ihr gibt ("XS"), der Schluessel
+# ist derselbe Name klein geschrieben ("xs") - `band_label` kehrt das um,
+# ohne dass ein Leser die Leiter kennen muss.
+_VODAFONE_MIT_SMARTPHONE = re.compile(
+    r"^Vodafone Mobil (?P<stufe>[A-Z]{1,4}) mit Smartphone$")
+# Vodafones eigene Tarife werden ueber den NAMEN zugeordnet, nicht ueber
+# das Volumen: "Vodafone Mobil XS" (ohne Geraet, 18 GB) ist die Stufe XS,
+# auch wenn ihr Volumen naeher an einer anderen laege. Und "Vodafone Mobil
+# XL" traegt heute kein erhobenes Volumen, gehoert aber trotzdem zu XL.
+_VODAFONE_STUFE = re.compile(
+    r"^Vodafone Mobil (?P<stufe>[A-Z]{1,4})(?: mit Smartphone)?$")
+
+
+@dataclass(frozen=True)
+class Stufe:
+    """Eine Sprosse der Tarifleiter: ein Vodafone-Tarif "mit Smartphone"."""
+    key: str                  # "xs"
+    label: str                # "XS"
+    gb: Optional[float]       # erhobenes Volumen, inf = unbegrenzt, None = fehlt
+    tarif_id: str
+    name: str                 # "Vodafone Mobil XS mit Smartphone"
+    grundgebuehr: Optional[float]
+
+    @property
+    def bereich(self) -> str:
+        """Das Volumen der Stufe als Text ("15 GB"), leer wenn es fehlt."""
+        return gb_text(self.gb)
 
 # Dieselben Anbieter wie die vier festen Karten der Hauptansicht
 # (`geraete_tco_karten.ANBIETER_REIHENFOLGE`), UM CONGSTAR ERWEITERT: die
@@ -71,47 +102,124 @@ _BAND_LABEL = {k: (l, b) for k, l, b in BAENDER}
 ERWARTETE_ANBIETER = ANBIETER_REIHENFOLGE + ("congstar",)
 
 
-def band_von_gb(gb) -> Optional[str]:
-    """Klein/Mittel/Gross - oder `None`: kein Band (fehlend ODER unbegrenzt).
-
-    §7 zieht beide Faelle aus dem Raster: "13 der 56 Tarifsaetze tragen
-    KEIN Datenvolumen ... fallen aus jedem Raster heraus" (fehlend, `gb`
-    ist `None`) und "Unbegrenzt bleibt ausserhalb der Baender ... wird als
-    Markierung am Tarif gefuehrt, nicht als Vergleichsstufe" (unbegrenzt,
-    `tarife.jsonl` schreibt dafuer `Infinity`). Beide sind ehrlich `None`
-    statt in ein Band gepresst zu werden - ein Tarif ohne Volumenangabe im
-    Band "Gross" waere eine erfundene Aussage.
-    """
-    if gb is None:
+def _zahl(wert) -> Optional[float]:
+    """Ein Datenvolumen als Zahl - `None`, wenn es fehlt oder unlesbar ist.
+    `inf` (unbegrenzt) bleibt `inf`: das ist eine Aussage, kein Loch."""
+    if wert is None:
         return None
     try:
-        gb = float(gb)
+        zahl = float(wert)
     except (TypeError, ValueError):
         return None
-    if math.isnan(gb) or math.isinf(gb):
+    return None if math.isnan(zahl) else zahl
+
+
+def tarifleiter(tarife: dict) -> tuple[Stufe, ...]:
+    """Die Vodafone-Tarife "mit Smartphone" als Leiter, guenstigste zuerst.
+
+    Geordnet wird nach der Grundgebuehr, nicht nach dem Volumen: XL traegt
+    heute kein erhobenes Volumen und stuende sonst an einer geratenen
+    Stelle. Die Grundgebuehr steht in jedem Satz, und bei Vodafone steigt
+    sie mit der Stufe. Eine Stufe erscheint einmal, auch wenn der Bestand
+    sie unter zwei Lesarten fuehrt (`#live_shop`).
+
+    Eine leere Leiter (kein Vodafone-Satz im Bestand) ist ein Ausfall der
+    Erhebung, kein Ergebnis - `band_leer_text` sagt das auf der Seite
+    (Leersatz des Graphen in `geraete.html.j2`).
+    """
+    je_key: dict[str, Stufe] = {}
+    for tarif_id, satz in sorted((tarife or {}).items()):
+        satz = satz or {}
+        if (satz.get("anbieter") or "").strip().lower() != "vodafone":
+            continue
+        treffer = _VODAFONE_MIT_SMARTPHONE.match((satz.get("name") or "").strip())
+        if not treffer:
+            continue
+        label = treffer.group("stufe")
+        key = label.lower()
+        if key in je_key:
+            continue
+        je_key[key] = Stufe(
+            key=key, label=label, gb=_zahl(satz.get("datenvolumen_gb")),
+            tarif_id=tarif_id, name=satz["name"].strip(),
+            grundgebuehr=_zahl(satz.get("grundgebuehr")))
+    if not je_key:
+        log.warning("Tarifleiter: kein Vodafone-Tarif 'mit Smartphone' im "
+                    "Tarifbestand - keine Tarifbaender.")
+    return tuple(sorted(
+        je_key.values(),
+        key=lambda s: (s.grundgebuehr is None, s.grundgebuehr or 0.0,
+                       s.gb is None, s.gb or 0.0, s.key)))
+
+
+def band_von_gb(gb, leiter: tuple[Stufe, ...]) -> Optional[str]:
+    """Die Stufe des naechstgelegenen Vodafone-Volumens - oder `None`.
+
+    `None` heisst: nicht zuordenbar, und die Karte steht unter "Ohne
+    Tarifband" statt in einer erfundenen Stufe. Das gilt fuer ein fehlendes
+    Volumen und fuer "unbegrenzt", solange keine Vodafone-Stufe selbst als
+    unbegrenzt erhoben ist; ist sie es, faellt unbegrenzt genau dorthin.
+    Liegt ein Volumen genau zwischen zwei Stufen, zaehlt die groessere:
+    wer 45 GB bietet, deckt die 30-GB-Stufe ganz ab.
+    """
+    zahl = _zahl(gb)
+    if zahl is None:
         return None
-    if gb <= 20:
-        return "klein"
-    if gb <= 60:
-        return "mittel"
-    return "gross"
+    if math.isinf(zahl):
+        for stufe in leiter:
+            if stufe.gb is not None and math.isinf(stufe.gb):
+                return stufe.key
+        return None
+    endlich = [s for s in leiter if s.gb is not None and not math.isinf(s.gb)]
+    if not endlich:
+        return None
+    return min(endlich, key=lambda s: (abs(s.gb - zahl), -s.gb)).key
 
 
-def tarif_baender(tarife: dict) -> dict:
-    """tarif_id -> Band, aus dem ERHOBENEN Datenvolumen von `tarife.jsonl`.
+def _eigene_stufe(satz: dict, leiter: tuple[Stufe, ...]) -> Optional[str]:
+    """Die Stufe eines Vodafone-Tarifs ueber seinen Namen (siehe
+    `_VODAFONE_STUFE`) - `None` fuer jeden anderen Anbieter oder einen
+    Vodafone-Tarif, dessen Stufe nicht auf der Leiter steht."""
+    if (satz.get("anbieter") or "").strip().lower() != "vodafone":
+        return None
+    treffer = _VODAFONE_STUFE.match((satz.get("name") or "").strip())
+    if not treffer:
+        return None
+    key = treffer.group("stufe").lower()
+    return key if any(s.key == key for s in leiter) else None
+
+
+def tarif_baender(tarife: dict,
+                  leiter: Optional[tuple[Stufe, ...]] = None) -> dict:
+    """tarif_id -> Stufe der Tarifleiter, aus demselben Tarifbestand.
 
     `tarife` ist derselbe Bestand, den `geraete_tco_view.aufbereiten` schon
     fuer die Tarifbindung liest (`Tarifbestand.je_id_aktuell`, B3
     21.09.2026 - nicht `je_id`, sonst traegt die Bandkarte bei Telekom das
     Datenvolumen des Pflichtdokuments statt der aktuellen Lesart) - keine
-    zweite Datenquelle, nur eine zweite Lesart derselben Datei.
+    zweite Datenquelle, nur eine zweite Lesart derselben Datei. Die Leiter
+    kommt aus demselben Bestand, wenn sie nicht mitgegeben wird.
     """
+    if leiter is None:
+        leiter = tarifleiter(tarife)
     out: dict = {}
     for tarif_id, tarif in (tarife or {}).items():
-        band = band_von_gb((tarif or {}).get("datenvolumen_gb"))
+        tarif = tarif or {}
+        band = (_eigene_stufe(tarif, leiter)
+                or band_von_gb(tarif.get("datenvolumen_gb"), leiter))
         if band:
             out[tarif_id] = band
     return out
+
+
+def baender_katalog(leiter: tuple[Stufe, ...]) -> list[dict]:
+    """Die Leiter als Auswahlkatalog: key, label, bereich - in Leiterfolge.
+
+    EINMAL hier gebaut, damit Vorlage, Zeitreihe und Radar dieselben
+    Stufen in derselben Reihenfolge nennen.
+    """
+    return [{"key": s.key, "label": s.label, "bereich": s.bereich}
+            for s in leiter]
 
 
 def gb_text(gb) -> str:
@@ -418,40 +526,48 @@ def _unterzeile(balken: dict) -> str:
 # (derselben Regel wie die Übersetzungs-Linkbeschriftung: steht ein Text
 # zweimal im Code, hält ihn ein Test zusammen - hier hält ihn der Test an
 # genau dieser Konstanten).
+# Die Leiter selbst fehlt: dann gibt es fuer KEIN Geraet eine Stufe, und
+# der Grund ist die Erhebung, nicht das Sortiment (Regel 9 aus CLAUDE.md).
+LEITER_FEHLT_TEXT = ("Vodafone-Tarifleiter nicht erhoben – ohne sie gibt es "
+                     "keine Tarifstufen zum Vergleich.")
+
+
+def band_leer_text(leiter: tuple[Stufe, ...]) -> str:
+    """Der Leersatz des Graphen: fehlende Leiter oder kein Bündel."""
+    return BAND_LEER_TEXT if leiter else LEITER_FEHLT_TEXT
+
+
 BAND_LEER_TEXT = ("Für dieses Gerät liegt in keinem Tarifband ein Bündel "
                   "vor – die Tarifband-Auswahl entsteht, sobald ein Anbieter "
                   "einen Tarif mit erhobenem Datenvolumen ausweist.")
 
 
-def _chip(key: str) -> str:
-    label, bereich = _BAND_LABEL[key]
-    return f"Band {label} · {bereich}"
+def _chip(stufe: Stufe) -> str:
+    """"Band XS · 15 GB" - ohne erhobenes Volumen nur "Band XL"."""
+    return f"Band {stufe.label}" + (f" · {stufe.bereich}" if stufe.bereich
+                                    else "")
 
 
 def band_label(band) -> str:
-    """Das Band als lesbares Wort ('Klein'), leer wenn keins ist.
+    """Die Stufe als lesbarer Name ('XS'), leer wenn keine ist.
 
     O4: der TCO-Export traegt dieselbe Bezeichnung, die der Chip der
-    Vergleichsansicht zeigt - ein 'klein' in der Spalte waere eine zweite
-    Sprache fuer dieselbe Sache. Ein UNBEKANNTES Band wird mit seinem
-    Schluessel benannt statt erraten (dieselbe Regel wie eine unbekannte
-    Farbe in farben.yaml).
+    Vergleichsansicht zeigt. Der Schluessel ist Vodafones Stufenname klein
+    geschrieben (`tarifleiter`), der Name ist er gross geschrieben - dafuer
+    braucht kein Leser die Leiter.
     """
-    if not band:
-        return ""
-    if band in _BAND_LABEL:
-        return _BAND_LABEL[band][0]
-    return str(band)
+    return str(band).upper() if band else ""
 
 
 def baender_fuer_modell(modell: dict, band_je_tarif: dict,
-                        gb_je_tarif: dict | None = None) -> list[dict]:
+                        gb_je_tarif: dict | None = None,
+                        leiter: tuple[Stufe, ...] = ()) -> list[dict]:
     """Je Modell die Baender, fuer die es ECHTE Buendel gibt (§7/Aufgabe 1).
 
     Rueckgabe: eine Liste, EIN Eintrag je Band MIT mindestens einem echten
     Buendel - kein leeres Band wird als Auswahloption angeboten (Aufgabe 1:
     "pro Modell nur Bänder anbieten, für die Bündel existieren"). Je Eintrag:
-        key, label, bereich   - siehe `BAENDER`
+        key, label, bereich   - die Stufe der `leiter`
         grafik                 - `geraete_tco_grafik.zeitreihe(...)`,
                                   Y-Achse TCO-24 (Aufgabe 3)
         fehlend                 - [{"anbieter","grund"}] fuer jeden
@@ -472,7 +588,8 @@ def baender_fuer_modell(modell: dict, band_je_tarif: dict,
     mit_irgendeinem_buendel = anbieter_mit_irgendeinem_buendel(modell)
 
     ergebnis = []
-    for key, label, bereich in BAENDER:
+    for stufe in leiter:
+        key, label, bereich = stufe.key, stufe.label, stufe.bereich
         karten_je_anbieter = je_band.get(key)
         if not karten_je_anbieter:
             continue           # kein einziges Buendel in diesem Band
@@ -517,6 +634,6 @@ def baender_fuer_modell(modell: dict, band_je_tarif: dict,
             # O4 erreichbar - dieselbe Kappe wie bei G1 (BRIEF_FADEN).
             "balken": balken,
             "unterzeile": _unterzeile(balken),
-            "chip": _chip(key),
+            "chip": _chip(stufe),
         })
     return ergebnis

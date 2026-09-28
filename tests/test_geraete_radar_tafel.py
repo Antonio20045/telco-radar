@@ -29,6 +29,8 @@ import pathlib
 import yaml
 from bs4 import BeautifulSoup
 
+from tarifleiter_testbestand import mit_leiter
+
 from telco_radar.report import geraete_radar as wr
 from telco_radar.report.html import render_site
 
@@ -56,8 +58,10 @@ def _tarife() -> list[dict]:
     xs = satz("Vodafone", "Vodafone Mobil XS", "vf:xs", 18, 29.95)
     xs["preisphasen"] = [{"von_monat": 1, "bis_monat": 24, "betrag": 29.95},
                          {"von_monat": 25, "bis_monat": None, "betrag": 29.95}]
-    return [xs, satz("o2", "O2 Mobile S", "o2:k", 10, 9.99),
-            satz("o2", "O2 Mobile L", "o2:g", 100, 39.99)]
+    # P3-E1: die Testleiter XS/M/L (5/36/85 GB) legt die Stufen dorthin,
+    # wo die alten Baender lagen - XS 10/18 GB, L 100 GB.
+    return mit_leiter([xs, satz("o2", "O2 Mobile S", "o2:k", 10, 9.99),
+                       satz("o2", "O2 Mobile L", "o2:g", 100, 39.99)], HEUTE)
 
 
 def _listung(anbieter, sku, preis, typ="netzbetreiber") -> dict:
@@ -109,7 +113,7 @@ def _katalog(n_generisch: int) -> dict:
         geraete.append({"hersteller": "Testmarke",
                         "modell": f"Testgerät {i + 1:02d}",
                         "generation": 1, "speicher": [128],
-                        "segment": "mittel"})
+                        "segment": "m"})
     return {"geraete": geraete}
 
 
@@ -136,7 +140,7 @@ _QUELLEN = {"anbieter": [
 def _state(n_generisch: int) -> dict:
     """Listungen, Preise und Bündel der Fixture.
 
-    Jedes generische Geraet bekommt VF-Listung + o2-Bündel im Band klein
+    Jedes generische Geraet bekommt VF-Listung + o2-Bündel im Band XS
     (vergleichbar); die vier festen Geraete decken die Sonderfaelle ab.
     """
     listungen = [

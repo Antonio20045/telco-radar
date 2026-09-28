@@ -112,7 +112,7 @@ def test_die_wahl_leiste_traegt_suchfeld_band_und_kacheln(tafel):
     assert tafel.select_one("#gr-zr-suche") is not None
     knoepfe = tafel.select("#gr-zr-baender button[data-band]")
     assert [k.get("data-band") for k in knoepfe] == \
-        ["klein", "mittel", "gross"]
+        ["xs", "m", "l"]
     kacheln = tafel.select("#gr-zr-kacheln button[data-modell]")
     assert 1 <= len(kacheln) <= 6
 
@@ -195,7 +195,7 @@ def test_der_zeitreihe_knoten_traegt_startzustand_und_suchindex(suppe):
     assert knoten is not None
     daten = json.loads(knoten.string)
     assert daten["vorgabe"] == "apple-iphone-17-pro-256"
-    assert daten["start_band"] == "klein"
+    assert daten["start_band"] == "xs"
     assert daten["suchindex"] and daten["erlaubt"]
     assert "€" not in knoten.string
 
@@ -226,6 +226,6 @@ def test_das_fragment_traegt_alle_pare_und_den_startzustand(tmp_path_factory):
     # ALLE Paare - auch die des Startzustands: der Rueckweg nach einem
     # Wechsel hat genau EINE Quelle (kein Vorgabe-Klon, keine S2-Falle).
     paare = {(l.get("data-modell"), l.get("data-band")) for l in lager}
-    assert ("apple-iphone-17-pro-256", "klein") in paare
-    assert ("apple-iphone-17-pro-256", "mittel") in paare
-    assert ("samsung-galaxy-s26-256", "klein") in paare
+    assert ("apple-iphone-17-pro-256", "xs") in paare
+    assert ("apple-iphone-17-pro-256", "m") in paare
+    assert ("samsung-galaxy-s26-256", "xs") in paare

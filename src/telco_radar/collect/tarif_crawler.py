@@ -148,6 +148,12 @@ class Quelle:
     einstieg: list[str] = field(default_factory=list)
     pfadmuster: list[str] = field(default_factory=list)
     bevorzugt: list[str] = field(default_factory=list)
+    # P3-E1 (28.09.2026): Dokumente, die der Anbieter noch verlinkt, aber
+    # nicht mehr verkauft. Gesucht wird wie bei `bevorzugt` in Adresse UND
+    # Linkbeschriftung. Ein ausgeschlossenes Dokument wird nicht geholt,
+    # und sein Stand im Bestand wird als zurueckgezogen markiert - er
+    # bliebe sonst als "aktueller" Tarif stehen.
+    ausschliessen: list[str] = field(default_factory=list)
     max_dokumente: int = 5
     methode: str = METHODE_DOKUMENTE
     # Per-Anbieter-Override des Absenders (BRIEF_TELEKOM_TAEGLICH_R3_E4).
@@ -203,6 +209,8 @@ def lade_quellen(root: Path) -> list[Quelle]:
             einstieg=[str(u) for u in q["einstieg"]],
             pfadmuster=[str(m).lower() for m in (q.get("pfadmuster") or [])],
             bevorzugt=[str(b).lower() for b in (q.get("bevorzugt") or [])],
+            ausschliessen=[str(a).lower()
+                           for a in (q.get("ausschliessen") or [])],
             max_dokumente=int(q.get("max_dokumente") or 5),
             # Eine unbekannte Methode wird NICHT stillschweigend zur
             # Vorgabe gemacht. Sie faellt in `sammle()` als Fehler auf -
@@ -421,6 +429,33 @@ class TarifSpeicher:
         satz = self.letzter(tid)
         if satz is not None:
             satz["abgerufen_am"] = wann
+            # Wieder gelesen heisst wieder im Sortiment: ein frueherer
+            # Rueckzug (`ziehe_zurueck`) gilt nicht mehr.
+            satz.pop("zurueckgezogen_am", None)
+            satz.pop("zurueckgezogen_grund", None)
+
+    def ziehe_zurueck(self, dokument_url: str, wann: str,
+                      grund: str) -> list[str]:
+        """Der letzte Stand jedes Tarifs aus diesem Dokument gilt als
+        zurueckgezogen - der Anbieter verlinkt es noch, verkauft es aber
+        nicht mehr (`Quelle.ausschliessen`).
+
+        Kein Loeschen: die Zeitreihe bleibt, nur der juengste Stand traegt
+        das Datum. Leser ueberspringen ihn (`tarif_model.ist_zurueckgezogen`).
+        Rueckgabe: die betroffenen Tarif-IDs.
+        """
+        juengste: dict[str, dict] = {}
+        for satz in self.staende:
+            juengste[satz["tarif_id"]] = satz
+        betroffen = []
+        for tid, satz in juengste.items():
+            if satz.get("dokument_url") != dokument_url:
+                continue
+            if not satz.get("zurueckgezogen_am"):
+                satz["zurueckgezogen_am"] = wann
+                satz["zurueckgezogen_grund"] = grund
+            betroffen.append(tid)
+        return betroffen
 
     def speichern(self) -> None:
         self.pfad.parent.mkdir(parents=True, exist_ok=True)
@@ -718,7 +753,8 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
     bilanz = {"quellen": len(quellen), "einstiege": 0, "verlinkt": 0,
               "geholt": 0, "gelesen": 0, "quarantaene": 0, "grundlinie": 0,
               "unveraendert": 0, "geaendert": 0, "kleingedruckt": 0,
-              "fehler": 0, "ohne_links": 0, "meldungen": 0}
+              "fehler": 0, "ohne_links": 0, "ausgeschlossen": 0,
+              "meldungen": 0}
     besucht: list[str] = []
     erlaubt: set[str] = set()
     items: list[Item] = []
@@ -798,6 +834,21 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
             log.info("Tarifquelle %s: %d von %d Adressen sind aeltere "
                      "Vermarktungsfassungen", quelle.anbieter,
                      vor_auswahl - len(links), vor_auswahl)
+        if quelle.ausschliessen:
+            behalten = []
+            for url in links:
+                klein = url.lower() + " " + texte.get(url, "").lower()
+                if not any(a in klein for a in quelle.ausschliessen):
+                    behalten.append(url)
+                    continue
+                bilanz["ausgeschlossen"] += 1
+                for tid in speicher.ziehe_zurueck(
+                        url, jetzt.date().isoformat(),
+                        "Dokument noch verlinkt, Tarif nicht mehr im "
+                        "Sortiment (tarif_quellen.yaml: ausschliessen)"):
+                    log.info("Tarifquelle %s: %s zurueckgezogen (%s)",
+                             quelle.anbieter, tid, texte.get(url, url))
+            links = behalten
         bilanz["verlinkt"] += len(links)
         for url in _sortiere(links, quelle.bevorzugt,
                              texte)[:quelle.max_dokumente]:

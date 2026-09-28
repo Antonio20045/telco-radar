@@ -2175,10 +2175,15 @@ def _geraete_katalog_site(tmp_path):
                "tarif_id": b["tarif_id"], "tarif_id_guete": "hoch",
                "grundgebuehr": b["tarif_monatlich"],
                "mindestlaufzeit_monate": 24, "rabattphasen": [],
+               # P3-E1: ein Volumen plus Testleiter, damit die Band-Spalte
+               # eine Stufe hat (10 GB -> XS der Testleiter).
+               "datenvolumen_gb": 10,
                "quelle_url": b["quelle_url"],
                "abgerufen_am": "2026-09-17"}
               for b in (state / "geraete_tco.json").exists() and
               json.loads((state / "geraete_tco.json").read_text())["buendel"]]
+    from tarifleiter_testbestand import mit_leiter
+    tarife = mit_leiter(tarife, "2026-09-17")
     (state / "tarife.jsonl").write_text(
         "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
 
@@ -2394,6 +2399,30 @@ def test_der_katalog_uebersteht_einen_unlesbaren_tco_store(tmp_path):
         f"der Beleg der Listung fehlt: {links}")
 
 
+def test_die_band_spalte_nennt_die_stufe_der_zeile(tmp_path):
+    """Die Spalte "Band" der Katalogtabelle zeigt die Stufe des guenstigsten
+    Buendels als Etikett der Tarifleiter ("XS"), eine Zeile ohne Buendel "–".
+    Vorher bildete die Vorlage die alten Schluessel klein/mittel/gross von
+    Hand ab - mit den Stufen-Schluesseln lief das ins Leere, und jede Zeile
+    zeigte still "–". Gegenprobe: mindestens eine Zeile traegt eine Stufe."""
+    site, g = _geraete_katalog_site(tmp_path)
+    suppe = _katalog_suppe(site)
+    je_modell = {z.get("data-s-geraet"): z for z in
+                 suppe.select("#gr-katalogtabelle .gr-k-zeile")}
+    gezeigt = {}
+    for m in g["katalog_modelle"]:
+        zeile = je_modell.get(m["titel"])
+        assert zeile is not None, f"keine Tabellenzeile fuer {m['titel']}"
+        zelle = zeile.select("td.gr-sp--tco")[3].get_text().strip()
+        soll = (m.get("tco_band") or "").upper() or "–"
+        assert zelle == soll, f"{m['titel']}: Band {zelle!r} statt {soll!r}"
+        gezeigt[m["titel"]] = zelle
+    assert any(z != "–" for z in gezeigt.values()), (
+        f"keine Zeile zeigt eine Stufe - der Test prueft so nichts: "
+        f"{gezeigt}")
+    assert gezeigt.get("Google Pixel 11 128 GB") == "–", gezeigt
+
+
 def test_die_delta_spalte_benennt_ihren_leergrund(tmp_path):
     """Sicht-Pruefung Wesentliches 3: 38 von 111 Zeilen der Live-Seite
     zeigten ein stummes "–" in der Delta-Spalte - TCO da, aber keine
@@ -2511,9 +2540,10 @@ from decimal import ROUND_HALF_UP as _gw_HUP
 
 _GW_WURZEL = Path(__file__).resolve().parents[1]
 _GW_HORIZONT = 24
-# Die Bandgrenzen der Vergleichsansicht (report/geraete_tco_band.py):
-# kontinuierlich bis 20 GB klein, bis 60 GB mittel, darueber gross;
-# FEHLEND und UNBEGRENZT sind kein Band (siehe _gw_band).
+# Die Stufen der Vergleichsansicht sind seit P3-E1 (28.09.2026) die
+# Vodafone-Tarifleiter (XS/S/M/L/XL aus "Vodafone Mobil <STUFE> mit
+# Smartphone") - hier EIGENSTAENDIG aus tarife.jsonl nachgebaut
+# (_gw_leiter/_gw_band), nicht aus geraete_tco_band importiert.
 import math as _gw_math
 import datetime as _gw_dt
 
@@ -2623,34 +2653,104 @@ def _gw_leitzahl(buendel: dict, blaetter: dict) -> tuple:
     return sum(teile), rest
 
 
-def _gw_band(buendel: dict, blaetter: dict) -> str | None:
-    """Band aus dem Datenvolumen des Blatts - kontinuierlich, wie die Seite.
+# ---- Die Tarifleiter, EIGENE Rechnung (P3-E1, Pruefer 28.09.2026) --------
+# Die Regeln stehen im Auftrag P3-E1, hier ohne einen Baustein des Bauern
+# nachgebaut:
+#   - Leiter = Vodafone-Saetze mit dem Namen "Vodafone Mobil <STUFE> mit
+#     Smartphone", je Stufe einmal, geordnet nach Grundgebuehr.
+#     Schluessel = Stufe klein ("xs"), Etikett = Stufe gross ("XS").
+#   - Ein Vodafone-Tarif "Vodafone Mobil <STUFE>" (mit oder ohne "mit
+#     Smartphone") gehoert ueber den NAMEN zu seiner Stufe.
+#   - Jeder andere Tarif zur Stufe mit dem naechstgelegenen ENDLICHEN
+#     Vodafone-Volumen; Gleichstand -> die groessere Stufe.
+#   - Volumen fehlt/NaN -> keine Stufe; unbegrenzt (inf) -> nur die Stufe,
+#     deren eigenes Volumen unbegrenzt ist, sonst keine.
+# Gelesen wird je Vertrag die AKTUELLE Lesart (dieselbe dokumentierte
+# Regel wie `tarif_bezug._aktuelle_lesart`, hier nachgebaut): der letzte
+# Stand je tarif_id, ein zurueckgezogener Stand faellt heraus, und von
+# zwei Lesarten desselben Vertrags (`#live_shop`-Zusatz) gewinnt die
+# Live-Shop-Kachel. Vorher las das Orakel das ERSTE Blatt mit Volumen -
+# bei der Telekom das Pflichtdokument (S 6 GB statt 30 GB der Kachel).
+# Anker am Bestand vom 25.09.2026 (tarife.jsonl): XS 15, S 30, M 60,
+# L 120 GB, XL ohne erhobenes Volumen (`_GW_LEITER_STAND`).
+_GW_VF_MIT_SMARTPHONE = re.compile(
+    r"^Vodafone Mobil ([A-Z]{1,4}) mit Smartphone$")
+_GW_VF_STUFE = re.compile(r"^Vodafone Mobil ([A-Z]{1,4})(?: mit Smartphone)?$")
+_GW_LEITER_STAND = (("xs", 15.0), ("s", 30.0), ("m", 60.0), ("l", 120.0),
+                    ("xl", None))
 
-    bis 20 GB klein, bis 60 GB mittel, darueber gross. FEHLEND und
-    UNBEGRENZT sind kein Band (`None`) - dieselbe Regel wie
-    `geraete_tco_band.band_von_gb`: unbegrenzt ist eine Markierung am
-    Tarif und keine Vergleichsstufe, und ein Tarif ohne Volumenangabe in
-    "gross" waere eine erfundene Aussage. Kein 21/61-Raster: 20,5 GB
-    liegt im Band mittel, nicht zwischen den Baendern.
-    """
-    gb = None
-    for blatt in blaetter.get(buendel.get("tarif_id") or "", []):
-        if blatt.get("datenvolumen_gb") is not None:
-            gb = blatt["datenvolumen_gb"]
-            break
-    if gb is None:
+
+def _gw_volumen(wert):
+    """Datenvolumen als float; None fuer fehlend/unlesbar/NaN, inf bleibt."""
+    if wert is None:
         return None
     try:
-        gb = float(gb)
+        zahl = float(wert)
     except (TypeError, ValueError):
-        return None                     # 'unbegrenzt' o. a. ist kein Band
-    if _gw_math.isnan(gb) or _gw_math.isinf(gb):
         return None
-    if gb <= 20:
-        return "klein"
-    if gb <= 60:
-        return "mittel"
-    return "gross"
+    return None if _gw_math.isnan(zahl) else zahl
+
+
+def _gw_aktuell(blaetter: dict) -> dict:
+    """tarif_id -> aktuelle Lesart des Vertrags (siehe Kopf)."""
+    stand = {tid: liste[-1] for tid, liste in blaetter.items() if liste}
+    stand = {tid: s for tid, s in stand.items()
+             if not s.get("zurueckgezogen_am")}
+    kern_von = {tid: tid[:-len("#live_shop")]
+                if tid.endswith("#live_shop") else tid for tid in stand}
+    je_kern: dict = {}
+    for tid, satz in stand.items():
+        bisher = je_kern.get(kern_von[tid])
+        if bisher is None or (bisher.get("preistyp") != "live_shop"
+                              and satz.get("preistyp") == "live_shop"):
+            je_kern[kern_von[tid]] = satz
+    return {tid: je_kern[kern_von[tid]] for tid in stand} | je_kern
+
+
+def _gw_leiter(aktuell: dict) -> list:
+    """[(key, gb)] der Vodafone-Tarife "mit Smartphone", guenstigste zuerst."""
+    stufen: dict = {}
+    for satz in aktuell.values():
+        if (satz.get("anbieter") or "").strip().lower() != "vodafone":
+            continue
+        m = _GW_VF_MIT_SMARTPHONE.match((satz.get("name") or "").strip())
+        if m and m.group(1).lower() not in stufen:
+            stufen[m.group(1).lower()] = (
+                _gw_volumen(satz.get("grundgebuehr")),
+                _gw_volumen(satz.get("datenvolumen_gb")))
+    return [(k, stufen[k][1]) for k in sorted(
+        stufen, key=lambda k: (stufen[k][0] is None, stufen[k][0] or 0.0))]
+
+
+def _gw_band_satz(satz: dict | None, leiter: list) -> str | None:
+    """Die Stufe eines Tarifsatzes nach den Regeln im Kopf - oder None."""
+    if not satz:
+        return None
+    if (satz.get("anbieter") or "").strip().lower() == "vodafone":
+        m = _GW_VF_STUFE.match((satz.get("name") or "").strip())
+        if m and m.group(1).lower() in {k for k, _gb in leiter}:
+            return m.group(1).lower()
+    gb = _gw_volumen(satz.get("datenvolumen_gb"))
+    if gb is None:
+        return None
+    if _gw_math.isinf(gb):
+        return next((k for k, v in leiter
+                     if v is not None and _gw_math.isinf(v)), None)
+    beste = None
+    for key, v in leiter:
+        if v is None or _gw_math.isinf(v):
+            continue
+        rang = (abs(v - gb), -v)      # naechste, bei Gleichstand groessere
+        if beste is None or rang < beste[0]:
+            beste = (rang, key)
+    return beste[1] if beste else None
+
+
+def _gw_band(buendel: dict, blaetter: dict) -> str | None:
+    """Stufe eines Buendels ueber seine tarif_id - EIGENE Rechnung."""
+    aktuell = _gw_aktuell(blaetter)
+    return _gw_band_satz(aktuell.get(buendel.get("tarif_id") or ""),
+                         _gw_leiter(aktuell))
 
 
 # Welche Stells ein Berichtsdatum sind - dieselbe Form, nach der
@@ -2868,6 +2968,11 @@ def gw_seite(tmp_path_factory) -> dict:
 _GW_PFLICHT_SKU = "apple-iphone-17-pro-256gb"
 _GW_PFLICHT_ANBIETER = "congstar"
 _GW_PFLICHT_TARIF = "Allnet Flat XS"
+# Die Stufe des Pflichtfalls auf der Vodafone-Tarifleiter (P3-E1): congstar
+# Allnet Flat XS traegt 15 GB, die Vodafone-Stufe XS ebenfalls 15 GB -
+# naechstgelegen ist XS. `_gw_pflichtbuendel` rechnet das aus den Rohdaten
+# nach, statt es hier nur zu behaupten.
+_GW_PFLICHT_BAND = "xs"
 # EXAKTE ANKER, keine Untergrenzen: Ratenzahl -> Monatsrate IN CENT
 # (Geld rechnet dieser Abschnitt in ganzen Cent, siehe `_gw_cent`; ein
 # Vergleich auf der float-Schreibweise haette 30.5 gegen "30.50"
@@ -2909,6 +3014,11 @@ def _gw_pflichtbuendel(tco: dict, blaetter: dict) -> tuple:
         "Erfassungslücke schliesst sich weiter - nachrechnen und den "
         "Anker samt Datum nachziehen. WENIGER: eine Zahlweise ist "
         "verlorengegangen, das ist ein Fehler und wird behoben.")
+    baender = {_gw_band(b, blaetter) for b in kandidaten}
+    assert baender == {_GW_PFLICHT_BAND}, (
+        f"der Pflichttarif liegt nach eigener Leiter-Rechnung in {baender}, "
+        f"verankert ist {_GW_PFLICHT_BAND!r} - Leiter oder Volumen haben "
+        "sich geaendert, der Anker ist nachzurechnen")
     tage = {b.get("abgerufen_am", "") for b in kandidaten}
     return werte.pop(), je_laufzeit, tage
 
@@ -2943,14 +3053,15 @@ def test_leitzahl_congstar_xs_iphone17pro256_am_bestand(gw_seite):
 
     # 2) Das Paar im Fragment: Antwort-Satz mit Leitzahl und O/Monat.
     block = _gw_paar_block(gw_seite["fragment"],
-                           "apple-iphone-17-pro-256", "klein")
-    assert block, "Paar apple-iphone-17-pro-256/klein fehlt im Fragment"
+                           "apple-iphone-17-pro-256", _GW_PFLICHT_BAND)
+    assert block, (f"Paar apple-iphone-17-pro-256/{_GW_PFLICHT_BAND} fehlt "
+                   "im Fragment")
     antwort = _gw_antwort(block)
     assert antwort, f"Paar ohne Antwort-Satz: {block[:200]!r}"
     assert antwort["anb"] == _GW_PFLICHT_ANBIETER, (
         f"Antwort nennt {antwort['anb']!r}, erwartet congstar")
     _gw_vergleiche(antwort["gesamt"], soll_cent,
-                   "Pflichtfall, Antwort-Satz im Paar klein")
+                   f"Pflichtfall, Antwort-Satz im Paar {_GW_PFLICHT_BAND}")
     assert _GW_PFLICHT_TARIF in antwort["klammer"], antwort["klammer"]
     assert antwort["o"] in _gw_o_monat(soll_cent), (
         f"Ø/Monat im Satz: {antwort['o']} €, erwartet "
@@ -3023,7 +3134,7 @@ def test_leitzahl_congstar_xs_iphone17pro256_am_bestand(gw_seite):
     for dok in (gw_seite["geraete"], gw_seite["buendel"]):
         for roh in re.findall(
                 r'<details class="gr-bnd"[^>]*data-anbieter="congstar"'
-                r'[^>]*data-band="klein"[^>]*>(.*?)</details>', dok, re.S):
+                rf'[^>]*data-band="{_GW_PFLICHT_BAND}"[^>]*>(.*?)</details>', dok, re.S):
             klar = " ".join(re.sub(r"<[^>]+>", " ", roh).split())
             if f"{_GW_PFLICHT_TARIF} ·" not in klar \
                     or "1.459,00 €" not in klar:
@@ -3052,9 +3163,9 @@ def test_leitzahl_congstar_xs_iphone17pro256_am_bestand(gw_seite):
                        "Pflichtfall, Antwort-Satz im First Paint")
         zeile = re.search(
             r'<details class="gr-bnd"[^>]*data-anbieter="congstar"'
-            r'[^>]*data-band="klein"[^>]*>(.*?)</details>',
+            rf'[^>]*data-band="{_GW_PFLICHT_BAND}"[^>]*>(.*?)</details>',
             gw_seite["geraete"], re.S)
-        assert zeile, "Bündelzeile congstar/klein fehlt im First Paint"
+        assert zeile, f"Bündelzeile congstar/{_GW_PFLICHT_BAND} fehlt im First Paint"
         kopf = re.search(r"<summary>(.*?)</summary>", zeile.group(1), re.S)
         assert kopf and _GW_PFLICHT_TARIF in kopf.group(1), \
             "Bündelzeile nennt nicht den Pflichttarif"
@@ -3103,7 +3214,7 @@ def test_monatsschnitt_und_restschuld_des_pflichtfalls_am_bestand(gw_seite):
         24: (145900, 0, 145900), 36: (145900, 36600, 109300)}
 
     block = _gw_paar_block(gw_seite["fragment"],
-                           "apple-iphone-17-pro-256", "klein")
+                           "apple-iphone-17-pro-256", _GW_PFLICHT_BAND)
     _messtag, inhalt = _gw_neueste_vorlage(block, _GW_PFLICHT_ANBIETER)
     n_raten = int(re.search(
         r"<span class='gr-zr-pn'>Geräterate</span>.*?(\d+) × ",
@@ -3166,7 +3277,7 @@ def test_monatsschnitt_und_restschuld_des_pflichtfalls_am_bestand(gw_seite):
     # paarungebunden geprüft und fällt nicht mit dem Startfall um.
     titel = re.search(r'class="gr-bnd-titel"[^>]*>([^<]+)<',
                       gw_seite["geraete"])
-    # Seit dem 22.09. trägt der Startblock ZWEI congstar/klein-Zeilen je
+    # Seit dem 22.09. trägt der Startblock ZWEI congstar/xs-Zeilen je
     # Tarif (24 und 36 Raten). Geprüft wird JEDE Pflichttarif-Zeile
     # gegen die Rechnung IHRER Ratenzahl - `re.search` nahm die erste
     # und hätte die zweite still übersprungen.
@@ -3174,7 +3285,7 @@ def test_monatsschnitt_und_restschuld_des_pflichtfalls_am_bestand(gw_seite):
     if titel and "Apple iPhone 17 Pro 256 GB" in titel.group(1):
         for roh in re.findall(
                 r'<details class="gr-bnd"[^>]*data-anbieter="congstar"'
-                r'[^>]*data-band="klein"[^>]*>(.*?)</details>',
+                rf'[^>]*data-band="{_GW_PFLICHT_BAND}"[^>]*>(.*?)</details>',
                 gw_seite["geraete"], re.S):
             text = " ".join(re.sub(r"<[^>]+>", " ", roh).split())
             raten = re.search(r"in (\d+) Raten à ([\d.,]+) €", text)
@@ -3221,35 +3332,50 @@ def test_monatsschnitt_und_restschuld_des_pflichtfalls_am_bestand(gw_seite):
         "Rechenweg oben).")
 
 
-# Die vier Tor-Geräte des Auftrags, je zwei Bänder (Band-IDs der Paare).
+# Die vier Tor-Geräte des Auftrags, JE STUFE DER TARIFLEITER, in der die
+# eigene Rechnung ein frisches neu-Bündel mit Leitzahl findet (P3-E1,
+# nachgerechnet am Bestand vom 27.09.2026 - Soll steht NICHT hier, es
+# entsteht in `_gw_min_buendel`). Bis P3-E1 standen hier "klein"/"mittel";
+# nach dem Umbau liefen alle acht Paare ins Leere und wurden STILL
+# uebersprungen - deshalb skippt der Test nicht mehr, ein fehlendes Paar
+# ist rot.
+_GW_TOR_MODELLE = ("apple-iphone-17-pro-256", "apple-iphone-17-256",
+                   "samsung-galaxy-s26-ultra-256", "google-pixel-10-pro-128")
 _GW_TOR_FAELLE = [
-    ("apple-iphone-17-pro-256", "klein"), ("apple-iphone-17-pro-256", "mittel"),
-    ("apple-iphone-17-256", "klein"), ("apple-iphone-17-256", "mittel"),
-    ("samsung-galaxy-s26-ultra-256", "klein"),
-    ("samsung-galaxy-s26-ultra-256", "mittel"),
-    ("google-pixel-10-pro-128", "klein"), ("google-pixel-10-pro-128", "mittel"),
+    ("apple-iphone-17-pro-256", "xs"), ("apple-iphone-17-pro-256", "s"),
+    ("apple-iphone-17-pro-256", "m"), ("apple-iphone-17-pro-256", "l"),
+    ("apple-iphone-17-256", "xs"), ("apple-iphone-17-256", "s"),
+    ("apple-iphone-17-256", "m"),
+    ("samsung-galaxy-s26-ultra-256", "xs"),
+    ("samsung-galaxy-s26-ultra-256", "s"),
+    ("samsung-galaxy-s26-ultra-256", "m"),
+    ("samsung-galaxy-s26-ultra-256", "l"),
+    ("google-pixel-10-pro-128", "xs"), ("google-pixel-10-pro-128", "m"),
 ]
 
 
 @pytest.mark.parametrize("modell,band", _GW_TOR_FAELLE)
 def test_tor_geraete_leitzahl_je_band_am_bestand(gw_seite, modell, band):
-    """Je eine Leitzahl der vier Tor-Geräte, je zwei Bänder: die Zahl des
+    """Je eine Leitzahl der vier Tor-Geräte, je Stufe: die Zahl des
     Antwort-Satzes gegen die EIGENE Minimumsrechnung über alle neu-Bündel
-    des Modells im Band - und die Guenstigkeitsbehauptung des Satzes
-    ('ist X am guenstigsten' / 'fuehrt nur X') gegen dasselbe Minimum."""
+    des Modells in der Stufe - und die Guenstigkeitsbehauptung des Satzes
+    ('ist X am guenstigsten' / 'fuehrt nur X') gegen dasselbe Minimum.
+    Kein Skip: die Faelle sind am Bestand nachgerechnet, ein fehlendes
+    Paar oder ein fehlender Satz ist ein Befund."""
     tco, blaetter, _db = _gw_rohdaten()
-    block = _gw_paar_block(gw_seite["fragment"], modell, band)
-    if block is None:
-        pytest.skip(f"benannte Lücke: Paar {modell}/{band} fehlt im "
-                    f"Fragment (Bestand vom {gw_seite['stand']})")
-    antwort = _gw_antwort(block)
-    if antwort is None:
-        pytest.skip(f"benannte Lücke: Paar {modell}/{band} ohne Antwort-Satz")
     min_cent, min_buendel = _gw_min_buendel(tco, blaetter, f"{modell}gb",
-                                            band)
-    if min_buendel is None:
-        pytest.skip(f"benannte Lücke: kein neu-Bündel von {modell} im Band "
-                    f"{band} in der Auswahlmenge (Bestand {gw_seite['stand']})")
+                                            band) or (None, None)
+    assert min_buendel is not None, (
+        f"die eigene Rechnung findet kein frisches neu-Bündel von {modell} "
+        f"in Stufe {band} (Bestand {gw_seite['stand']}) - Tor-Fall neu "
+        "nachrechnen, nicht überspringen")
+    block = _gw_paar_block(gw_seite["fragment"], modell, band)
+    assert block is not None, (
+        f"Paar {modell}/{band} fehlt im Fragment, obwohl die eigene "
+        f"Rechnung dort {min_buendel['anbieter']} mit "
+        f"{_gw_Dez(min_cent) / 100} € findet")
+    antwort = _gw_antwort(block)
+    assert antwort is not None, f"Paar {modell}/{band} ohne Antwort-Satz"
     _gw_vergleiche(antwort["gesamt"], min_cent,
                    f"{modell} Band {band}: Leitzahl des Antwort-Satzes")
     assert antwort["anb"] == min_buendel["anbieter"], (
@@ -3262,6 +3388,145 @@ def test_tor_geraete_leitzahl_je_band_am_bestand(gw_seite, modell, band):
     assert antwort["o"] in _gw_o_monat(min_cent), (
         f"{modell} Band {band}: Ø/Monat {antwort['o']} € != "
         f"{_gw_o_monat(min_cent)}")
+    # Gegenprobe: ein Euro daneben fällt auf.
+    for falsch in (antwort["gesamt"] + 1, antwort["gesamt"] - 1):
+        with pytest.raises(AssertionError):
+            _gw_vergleiche(falsch, min_cent, "Gegenprobe")
+
+
+def _gw_baender_je_modell(tco: dict, blaetter: dict) -> tuple[dict, dict]:
+    """({modell: Stufen mit irgendeinem neu-Bündel},
+        {modell: Stufen mit frischem neu-Bündel und Leitzahl}) - EIGEN."""
+    aktuell = _gw_aktuell(blaetter)
+    leiter = _gw_leiter(aktuell)
+    heute = _gw_heute(tco)
+    alle: dict = {}
+    frisch: dict = {}
+    for b in tco["buendel"]:
+        if b.get("zustand") != "neu":
+            continue
+        band = _gw_band_satz(aktuell.get(b.get("tarif_id") or ""), leiter)
+        modell = _pf_modell(b["sku_id"])
+        if not band or not modell:
+            continue
+        alle.setdefault(modell, set()).add(band)
+        if _gw_frisch(b, heute) and _gw_leitzahl(b, blaetter)[0] is not None:
+            frisch.setdefault(modell, set()).add(band)
+    return alle, frisch
+
+
+def test_tarifleiter_aus_den_rohdaten_ist_die_der_seite(gw_seite):
+    """P3-E1: die Stufen der Seite sind die Vodafone-Tarifleiter aus
+    tarife.jsonl. EIGENE Ableitung (`_gw_leiter`) gegen die gerenderten
+    Stufen-Knöpfe (Etikett, Volumen, Reihenfolge) und gegen `band_folge`
+    im Datenknoten - plus der Anker am Bestand vom 25.09.2026."""
+    tco, blaetter, _db = _gw_rohdaten()
+    leiter = _gw_leiter(_gw_aktuell(blaetter))
+    assert tuple(leiter) == _GW_LEITER_STAND, (
+        f"Leiter aus tarife.jsonl ist {leiter}, verankert ist "
+        f"{_GW_LEITER_STAND} (Stand 25.09.2026) - nachrechnen und den "
+        "Anker samt Datum nachziehen")
+    seite = gw_seite["geraete"]
+    daten = json.loads(re.search(
+        r'<script type="application/json" id="gr-zeitreihe-daten">(.*?)'
+        r"</script>", seite, re.S).group(1))
+    assert daten["band_folge"] == [k for k, _gb in leiter]
+    knoepfe = re.findall(
+        r'<button type="button" data-band="([a-z]+)" aria-pressed="[a-z]+">'
+        r"([A-Z]+)(?:<small>([^<]*)</small>)?</button>", seite)
+    assert knoepfe, "keine Stufen-Knöpfe auf der Seite - Lookup ins Leere"
+    soll = [(k, k.upper(), "" if gb is None else f"{gb:g} GB")
+            for k, gb in leiter]
+    assert knoepfe == soll, (
+        f"Stufen-Knöpfe der Seite {knoepfe}, eigene Leiter {soll}")
+    # Gegenprobe: eine verdrehte Leiter (M und L vertauscht) fiele auf.
+    assert knoepfe != [soll[0], soll[1], soll[3], soll[2], soll[4]]
+
+
+def test_tor_geraete_zeigen_genau_die_stufen_der_eigenen_rechnung(gw_seite):
+    """Je Tor-Gerät: die Stufen, die die Seite als Paar anbietet, sind
+    GENAU die, in denen die eigene Rechnung ein neu-Bündel findet (auch
+    ein altes - eine Stufe mit nur altem Angebot bleibt wählbar, A3), und
+    einen Antwort-Satz trägt ein Paar GENAU dann, wenn die eigene Rechnung
+    ein frisches Bündel mit Leitzahl findet. So fallen erfundene Stufen
+    (etwa XL ohne ein XL-Bündel) ebenso auf wie verschluckte."""
+    tco, blaetter, _db = _gw_rohdaten()
+    alle, frisch = _gw_baender_je_modell(tco, blaetter)
+    for modell in _GW_TOR_MODELLE:
+        seite = set(re.findall(
+            rf'<div class="gr-zr-lager" data-modell="{re.escape(modell)}" '
+            r'data-band="([^"]+)"', gw_seite["fragment"]))
+        assert seite == alle.get(modell, set()), (
+            f"{modell}: Seite bietet Stufen {sorted(seite)}, die eigene "
+            f"Rechnung findet neu-Bündel in {sorted(alle.get(modell, ()))}")
+        for band in seite:
+            antwort = _gw_antwort(_gw_paar_block(gw_seite["fragment"],
+                                                 modell, band))
+            assert (antwort is not None) == (band in frisch.get(modell, ())), (
+                f"{modell}/{band}: Antwort-Satz {'da' if antwort else 'fehlt'}"
+                f", die eigene Rechnung findet "
+                f"{'ein' if band in frisch.get(modell, ()) else 'kein'} "
+                "frisches Bündel")
+    # Anti-Leerlauf: die Tor-Fälle oben sind Teilmenge dieser Rechnung,
+    # und wenigstens ein Paar ohne frisches Angebot wurde mitgeprüft.
+    assert {(m, b) for m in _GW_TOR_MODELLE for b in frisch.get(m, ())} \
+        == set(_GW_TOR_FAELLE)
+    assert any(alle.get(m, set()) - frisch.get(m, set())
+               for m in _GW_TOR_MODELLE), \
+        "kein Tor-Paar ohne frisches Angebot - der Leer-Zweig prüft nichts"
+
+
+def test_jede_stufe_der_seite_ist_von_der_eigenen_rechnung_gedeckt(gw_seite):
+    """Alle (Modell, Stufe)-Paare des Fragments gegen die eigene Leiter-
+    Zuordnung: keine Stufe ohne neu-Bündel darin, und kein Modell der
+    Seite verschweigt eine Stufe, in der es ein neu-Bündel hat."""
+    tco, blaetter, _db = _gw_rohdaten()
+    alle, _frisch = _gw_baender_je_modell(tco, blaetter)
+    paare = set(re.findall(
+        r'<div class="gr-zr-lager" data-modell="([^"]+)" data-band="([^"]+)"',
+        gw_seite["fragment"]))
+    assert len(paare) >= 200, (
+        f"nur {len(paare)} Paare im Fragment - am 27.09.2026 waren es 262")
+    modelle = {m for m, _b in paare}
+    erfunden = sorted(p for p in paare if p[1] not in alle.get(p[0], ()))
+    verschluckt = sorted((m, b) for m in modelle for b in alle.get(m, ())
+                         if (m, b) not in paare)
+    assert not erfunden, f"Stufen ohne neu-Bündel auf der Seite: {erfunden[:5]}"
+    assert not verschluckt, f"Stufen mit neu-Bündel fehlen: {verschluckt[:5]}"
+
+
+def test_stufe_jeder_exportzeile_gegen_die_eigene_leiter(gw_seite):
+    """Die Spalte 'Band' des Exports (Bündel UND SIM-only) gegen die
+    eigene Leiter-Zuordnung über die tarif_id des Stores. Ohne Stufe
+    (fehlendes oder unbegrenztes Volumen) steht die Zelle LEER - nie eine
+    geratene Stufe."""
+    tco, blaetter, _db = _gw_rohdaten()
+    aktuell = _gw_aktuell(blaetter)
+    leiter = _gw_leiter(aktuell)
+    tarif_id = {("Bündel", b["anbieter"], b["tarif_name"]): b.get("tarif_id")
+                for b in tco["buendel"]}
+    tarif_id.update({("SIM-only", s["anbieter"], s["tarif_name"]):
+                     s.get("tarif_id") for s in tco.get("sim_only") or []})
+    zeilen = list(_gw_csv.DictReader(
+        gw_seite["csv"].open(encoding="utf-8-sig"), delimiter=";"))
+    abweich, geprueft, ohne = [], 0, 0
+    je_stufe: dict = {}
+    for r in zeilen:
+        schluessel = (r["Art"], r["Anbieter"], r["Tarif"])
+        assert schluessel in tarif_id, (
+            f"Exportzeile {schluessel} ohne Store-Satz - Lookup ins Leere")
+        band = _gw_band_satz(aktuell.get(tarif_id[schluessel] or ""), leiter)
+        soll = band.upper() if band else ""
+        geprueft += 1
+        ohne += not band
+        je_stufe[soll] = je_stufe.get(soll, 0) + 1
+        if r["Band"] != soll:
+            abweich.append((schluessel, r["Band"], soll))
+    assert geprueft >= 900, f"nur {geprueft} Exportzeilen geprüft"
+    assert ohne >= 10, "keine Zeile ohne Stufe geprüft - Leer-Zweig greift nicht"
+    assert set(je_stufe) == {"XS", "S", "M", "L", "XL", ""}, je_stufe
+    assert not abweich, f"{len(abweich)} Exportzeilen mit falscher Stufe: " \
+                        f"{abweich[:5]}"
 
 
 def test_vodafone_referenz_und_delta_des_pflichtfalls_am_bestand(gw_seite):
@@ -3272,17 +3537,17 @@ def test_vodafone_referenz_und_delta_des_pflichtfalls_am_bestand(gw_seite):
     ein neu-Bündel im Band hat - sonst rechnet die Seite eine Naeherung,
     und das ist eine andere Rechnung als diese (benannte Grenze)."""
     tco, blaetter, _db = _gw_rohdaten()
-    vf = _gw_min_buendel(tco, blaetter, _GW_PFLICHT_SKU, "klein",
+    vf = _gw_min_buendel(tco, blaetter, _GW_PFLICHT_SKU, _GW_PFLICHT_BAND,
                          anbieter="Vodafone")
     if vf is None:
         pytest.skip("benannte Lücke: Vodafone ohne neu-Bündel des "
-                    "Pflichtfalls im Band klein - die Seite rechnet dann "
+                    "Pflichtfalls im Band xs - die Seite rechnet dann "
                     "eine Näherung, dieser Test prüft die Bündel-Referenz")
     beste_c, _b, _t = _gw_pflichtbuendel(tco, blaetter)
     soll_ref, soll_delta = vf[0], vf[0] - beste_c
 
     block = _gw_paar_block(gw_seite["fragment"],
-                           "apple-iphone-17-pro-256", "klein")
+                           "apple-iphone-17-pro-256", _GW_PFLICHT_BAND)
     leit = _GW_LEIT_MUSTER.search(block or "")
     assert leit, "Leit-Zeile fehlt im Paar des Pflichtfalls"
     _gw_vergleiche(_gw_dezimal(leit.group(1)), soll_delta,
@@ -3481,7 +3746,7 @@ def test_mutation_eines_euros_am_pflichtfall_schlaegt_aus(gw_seite):
     tco, blaetter, _db = _gw_rohdaten()
     soll_cent, _b, _t = _gw_pflichtbuendel(tco, blaetter)
     block = _gw_paar_block(gw_seite["fragment"],
-                           "apple-iphone-17-pro-256", "klein")
+                           "apple-iphone-17-pro-256", _GW_PFLICHT_BAND)
     antwort = _gw_antwort(block)
     assert antwort, "ohne Antwort-Satz prüft die Mutation nichts"
     for mutation in (antwort["gesamt"] + 1, antwort["gesamt"] - 1):
@@ -3837,7 +4102,8 @@ _PF_CS_SKU = "apple-iphone-17-pro-512gb-cosmic-orange"
 _PF_CS_MODELL = "apple-iphone-17-pro-512"
 
 
-def _pf_wegwerf_wurzel(tmp_path, buendel, blatt: dict):
+def _pf_wegwerf_wurzel(tmp_path, buendel, blatt: dict,
+                       leiter: bool = True):
     """Ein Wegwerf-Repo (config/, data/state/, data/reports/) und der
     gerenderte Stand darin. Weder `site/` noch `data/` des Repos werden
     angefasst (harte Regel 1/3)."""
@@ -3865,8 +4131,16 @@ def _pf_wegwerf_wurzel(tmp_path, buendel, blatt: dict):
 
     state = tmp_path / "data" / "state"
     state.mkdir(parents=True, exist_ok=True)
+    # P3-E1: ohne Vodafone-Tarifleiter gibt es keine Stufe und damit
+    # keinen Startblock (`vorgabe` leer) - die Mechanik braucht eine Leiter.
+    # Die Testleiter (XS 5 / M 36 / L 85 GB) legt Allnet Flat M (125 GB)
+    # in Stufe L; die Zahlen dieses Tests haengen an keiner Stufe.
+    from tarifleiter_testbestand import mit_leiter
     (state / "tarife.jsonl").write_text(
-        json.dumps(blatt, ensure_ascii=False) + "\n", encoding="utf-8")
+        "".join(json.dumps(t, ensure_ascii=False) + "\n"
+                for t in (mit_leiter([blatt], _PF_MECHANIK_HEUTE) if leiter
+                          else [blatt])),
+        encoding="utf-8")
     (state / "geraete_preise.jsonl").write_text("", encoding="utf-8")
     (state / "geraete_db.json").write_text(json.dumps({
         "updated": _PF_MECHANIK_HEUTE,
@@ -4035,6 +4309,45 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
         f"aus 12 Geraeteraten), gefunden: {offen}")
 
 
+def test_pf_ohne_tarifleiter_nennt_die_seite_den_grund(tmp_path):
+    """Fehlt die Vodafone-Leiter im Bestand, hat kein Geraet eine Stufe.
+    Die Seite sagt dann genau das (`LEITER_FEHLT_TEXT`) und nicht, es gebe
+    noch keine Messreihe - darunter stehen ja gemessene Buendel (Regel 9).
+
+    Gegen den alten Stand rot: `band_leer` stand nur im JSON-Knoten, keine
+    Vorlage las es; die Seite zeigte den Messreihen-Satz."""
+    from telco_radar.analyze.tco_buendel import aus_rohsaetzen
+    from telco_radar.collect.geraete.congstar import lies_buendel
+    from telco_radar.report.geraete_tco_band import LEITER_FEHLT_TEXT
+    from telco_radar.tarif_bezug import Tarifbestand
+
+    pfad = Path(__file__).parent / "fixtures" / "geraete" / _PF_CS_FIXTURE
+    antwort = _pf_gzip.open(pfad, "rb").read().decode("utf-8", "replace")
+    rohsaetze = [s for s in lies_buendel(antwort, url=_PF_CS_URL)
+                 if s["titel"] == _PF_CS_TITEL
+                 and s["tarif_name"] == _PF_CS_TARIF]
+    blatt = next(
+        json.loads(z) for z in
+        (_GW_WURZEL / "data" / "state" / "tarife.jsonl")
+        .read_text(encoding="utf-8").splitlines()
+        if z.strip() and json.loads(z).get("tarif_id") == _PF_CS_BLATT)
+    bilanz = aus_rohsaetzen(
+        [{**s, "anbieter": "congstar", "sku_id": _PF_CS_SKU,
+          "quelle_url": s["url"]} for s in rohsaetze],
+        Tarifbestand([blatt]), _PF_MECHANIK_HEUTE)
+    # Gegenprobe: ohne Buendel waere der Messreihen-Satz sogar richtig.
+    assert bilanz.buendel, "kein Buendel aus dem gespeicherten Abruf"
+
+    site = _pf_wegwerf_wurzel(tmp_path, bilanz.buendel, blatt, leiter=False)
+    seite = BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
+                          "html.parser")
+    leer = seite.select_one("#gr-zr-gruppe .gr-zr-keine")
+    assert leer is not None, "kein Leersatz im Graphbereich"
+    text = " ".join(leer.get_text().split())
+    assert text == LEITER_FEHLT_TEXT, text
+    assert "Messreihe" not in text
+
+
 # Der Stand des Bestands am 22.09.2026 (`data/state/geraete_tco.json`,
 # `updated` 2026-09-22), gemessen und nicht geschaetzt - Grundlage der
 # Aussage unten.
@@ -4114,7 +4427,7 @@ def test_pf_bestand_zaehlt_seine_ratenlaufzeiten_und_haelt_die_luecke_fest():
         24 x 15,00 EUR Tarif und 0,00 EUR Anschlusspreis in beiden
         Faellen 1.459,00 EUR).
       - Die Seite ZEIGT beide: der Server-First-Paint fuehrt zum
-        Startpaar (Apple iPhone 17 Pro 256 GB, Band klein) zwei
+        Startpaar (Apple iPhone 17 Pro 256 GB, Band klein, seit P3-E1 xs) zwei
         congstar-Buendelzeilen je Tarif, "1.098,00 EUR in 36 Raten a
         30,50 EUR" und "1.098,00 EUR in 24 Raten a 45,75 EUR", beide mit
         1.459,00 EUR Leitzahl. Geprueft wird das in

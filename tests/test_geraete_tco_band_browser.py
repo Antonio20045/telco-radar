@@ -20,6 +20,8 @@ import socket
 import threading
 
 import pytest
+
+from tarifleiter_testbestand import mit_leiter
 import yaml
 
 from telco_radar.report.html import render_site
@@ -109,6 +111,7 @@ def _baue(tmp_path: pathlib.Path):
         _tarif("o2", "o2:tarif-klein", "O2 Mobile Klein", 18.0),
         _tarif("Vodafone", "vodafone:tarif-mittel", "Vodafone Mittel", 40.0),
     ]
+    tarife = mit_leiter(tarife)
     (state / "tarife.jsonl").write_text(
         "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
     reports = root / "data" / "reports"
@@ -181,14 +184,14 @@ def test_beide_auswahlen_stehen_sichtbar_nebeneinander(_seite):
 
     knoepfe = _seite.eval_on_selector_all(
         "#gr-zr-baender button", "(es) => es.map(e => e.dataset.band)")
-    assert set(knoepfe) == {"klein", "mittel", "gross"}
-    # "Groß" hat fuer dieses Modell kein Buendel und ist deshalb DEAKTIVIERT
+    assert set(knoepfe) == {"xs", "m", "l"}
+    # "L" hat fuer dieses Modell kein Buendel und ist deshalb DEAKTIVIERT
     # (Angebot, nicht Existenz der Option) - dieselbe Regel wie am alten
     # <select>, jetzt an den Knoepfen.
     disabled = _seite.eval_on_selector_all(
         "#gr-zr-baender button",
         "(es) => es.filter(e => e.disabled).map(e => e.dataset.band)")
-    assert disabled == ["gross"], disabled
+    assert disabled == ["l"], disabled
 
 
 def test_bandwechsel_schaltet_den_richtigen_graphen_sichtbar(_seite):
@@ -199,16 +202,16 @@ def test_bandwechsel_schaltet_den_richtigen_graphen_sichtbar(_seite):
     # Ausgangslage: das erste verfuegbare Band (Klein) ist gerendert.
     antwort = _seite.eval_on_selector("#tafel-tco .gr-zr-antwort",
                                       "(e) => e.textContent")
-    assert "Klein" in antwort, antwort
+    assert "XS" in antwort, antwort
 
     # Umschalten auf Mittel.
-    waehle_band(_seite, "mittel")
+    waehle_band(_seite, "m")
     _seite.wait_for_timeout(400)
     antwort = _seite.eval_on_selector("#tafel-tco .gr-zr-antwort",
                                       "(e) => e.textContent")
-    assert "Mittel" in antwort, antwort
+    assert "M" in antwort, antwort
     knopf = _seite.eval_on_selector(
-        "#gr-zr-baender button[data-band='mittel']",
+        "#gr-zr-baender button[data-band='m']",
         "e => e.getAttribute('aria-pressed')")
     assert knopf == "true", "der Mittel-Knopf ist nicht gedrückt"
     # Die Panels des alten Bands existieren nicht mehr - der Graph ist

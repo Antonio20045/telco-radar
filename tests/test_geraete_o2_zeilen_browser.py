@@ -24,6 +24,8 @@ import json
 import math
 
 import pytest
+
+from tarifleiter_testbestand import mit_leiter
 import yaml
 
 from telco_radar.report.html import render_site
@@ -33,7 +35,7 @@ from test_geraete_browser_fixture import (
 from test_geraete_zeitreihe_browser import waehle_band, waehle_modell
 
 # Die O1-Lage PLUS einer unbegrenzten Zeile am Vorgabemodell (o2) und
-# einer zweiten Zeile im Band Klein (Telekom) - genug Zeilen, um Stapel,
+# einer zweiten Zeile im Band XS (Telekom) - genug Zeilen, um Stapel,
 # Bandwechsel und Deckelung zu messen.
 _BAENDER_BUENDEL = [
     ("apple-iphone-17-pro", 256, "o2", "o2:klein", "O2 Mobile Klein", 10, 18.0),
@@ -99,6 +101,7 @@ def _baue(tmp_path):
          "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}}
         for _d, _s, anbieter, tarif_id, tarif, gb, _r in _BAENDER_BUENDEL
     ]
+    tarife = mit_leiter(tarife)
     (state / "tarife.jsonl").write_text(
         "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
     reports = root / "data" / "reports"
@@ -231,16 +234,16 @@ def test_der_bandwechsel_versteckt_zeilen_anderer_baender(seite):
     Band versteckt die Zeilen des alten - die Liste ist danach eine
     ANDERE (P1/UX-1 für die Zeilenform)."""
     klein = seite.eval_on_selector_all(
-        "#gr-bndliste .gr-bnd[data-band='klein']:not([hidden])",
+        "#gr-bndliste .gr-bnd[data-band='xs']:not([hidden])",
         "e => e.map(z => z.dataset.anbieter)")
-    waehle_band(seite, "mittel")
+    waehle_band(seite, "m")
     seite.wait_for_timeout(120)
     verdeckt = seite.eval_on_selector(
-        "#gr-bndliste .gr-bnd[data-band='klein']",
+        "#gr-bndliste .gr-bnd[data-band='xs']",
         "e => ({versteckt: e.hidden,"
         "       sichtbar: getComputedStyle(e).display !== 'none'})")
     mittel = seite.eval_on_selector_all(
-        "#gr-bndliste .gr-bnd[data-band='mittel']:not([hidden])",
+        "#gr-bndliste .gr-bnd[data-band='m']:not([hidden])",
         "e => e.map(z => z.dataset.anbieter)")
     assert "o2" in klein, klein
     assert verdeckt["versteckt"] is True, "Klein-Zeile trägt kein hidden"
@@ -249,7 +252,7 @@ def test_der_bandwechsel_versteckt_zeilen_anderer_baender(seite):
         f"die Zeilenliste folgt der Bandwahl nicht: {klein} == {mittel}")
     # Der Titel nennt das neue Band.
     titel = seite.eval_on_selector("#gr-bnd-titel", "e => e.textContent")
-    assert "Mittel" in titel, titel
+    assert "M" in titel, titel
 
 
 def test_die_ohne_tarifband_zeilen_bleiben_stehen(seite):
@@ -258,7 +261,7 @@ def test_die_ohne_tarifband_zeilen_bleiben_stehen(seite):
     ohne = seite.eval_on_selector_all(
         "#gr-ohneband .gr-bnd", "e => e.map(z => z.dataset.anbieter)")
     assert ohne, "die Fixture trägt keine Zeile ohne Band"
-    waehle_band(seite, "mittel")
+    waehle_band(seite, "m")
     seite.wait_for_timeout(120)
     danach = seite.eval_on_selector_all(
         "#gr-ohneband .gr-bnd:not([hidden])",

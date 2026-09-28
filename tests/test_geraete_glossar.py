@@ -286,6 +286,8 @@ def test_der_antwort_satz_und_die_wahl_leiste_erklaeren_die_begriffe(
     assert "Kosten über 24 Monate" in antwort
     knoepfe = {k.get_text(" ", strip=True): k
                for k in tafel.select("#gr-zr-baender button")}
-    assert any("20 GB" in text for text in knoepfe), \
-        "die Band-Knöpfe nennen keine GB-Spanne"
-    assert any("60 GB" in text for text in knoepfe), knoepfe.keys()
+    # P3-E1: die Knöpfe sind die Stufen der Vodafone-Tarifleiter und
+    # nennen ihr Volumen (Testleiter: XS 5 GB, M 36 GB).
+    assert any("5 GB" in text for text in knoepfe), \
+        "die Band-Knöpfe nennen kein Datenvolumen"
+    assert any("36 GB" in text for text in knoepfe), knoepfe.keys()

@@ -46,7 +46,8 @@ import json
 import logging
 from pathlib import Path
 
-from ..tarif_model import PREISTYP_LIVE_SHOP, Preisphase, Tarif
+from ..tarif_model import (PREISTYP_LIVE_SHOP, Preisphase, Tarif,
+                           ist_zurueckgezogen)
 from .effektivpreis import VERGLEICHSMONATE, Effektivpreis, rechne, regression
 
 log = logging.getLogger(__name__)
@@ -98,7 +99,9 @@ def lade_staende(pfad: Path) -> list[dict]:
             continue
         if isinstance(satz, dict) and satz.get("tarif_id"):
             neueste[satz["tarif_id"]] = satz
-    return list(neueste.values())
+    # P3-E1: ein zurueckgezogener Tarif ist kein Tarif von heute.
+    return [satz for satz in neueste.values()
+            if not ist_zurueckgezogen(satz)]
 
 
 def _zeile(satz: dict) -> dict:

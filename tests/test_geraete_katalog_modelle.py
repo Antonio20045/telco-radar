@@ -69,7 +69,7 @@ def _tco_modell(mid, karten, referenz=None):
 
 
 def _karte(anbieter, gesamt, monat=41.0, zustand="neu", vergleichbar=True,
-           belastbar=True, delta=None, delta_kurz=None, band="klein",
+           belastbar=True, delta=None, delta_kurz=None, band="xs",
            eigen=False, leitzahl_monate=TCO_HORIZONT, delta_zustand=None):
     # `leitzahl_monate` ist der ZEITRAUM, den `gesamt` traegt (P0-B-h1) -
     # jede echte Karte aus `geraete_tco_karten.modelle()` traegt ihn, und
@@ -304,7 +304,8 @@ def test_tco_felder_waehlen_das_beste_vergleichbare_angebot():
     assert zeile["tco_monat"] == 41.67
     assert zeile["tco_delta_kurz"] == "−100,00 € · −9,1 %"
     assert zeile["tco_delta"] == -100.0
-    assert zeile["tco_band"] == "klein"
+    assert zeile["tco_band"] == "xs"
+    assert zeile["tco_band_label"] == "XS"
     assert zeile["tco_leer"] is None
 
 
@@ -468,6 +469,7 @@ def test_36_monats_summe_steht_nicht_unter_dem_24_monats_kopf():
     assert zeile["tco_monat"] is None
     assert zeile["tco_anbieter"] is None
     assert zeile["tco_band"] is None
+    assert zeile["tco_band_label"] == ""
     assert zeile["tco_leer"] == "kein Bündel über 24 Monate"
 
 
@@ -631,9 +633,9 @@ def test_modell_tco_csv_traegt_den_grund_statt_einer_luecke(tmp_path):
     assert apple[kopf.index("TCO ab EUR")] == "1000,00"
     assert apple[kopf.index("Abweichung zu Vodafone EUR")] == "-100,00"
     # Klartext wie auf der Seite (S4-1): der Chip der Vergleichsansicht
-    # sagt "Klein", nicht "klein" - zwei Sprachen fuer dieselbe Sache
+    # sagt "XS", nicht "xs" - zwei Sprachen fuer dieselbe Sache
     # waeren der O4-Befund wieder.
-    assert apple[kopf.index("Tarifband")] == "Klein"
+    assert apple[kopf.index("Tarifband")] == "XS"
     assert apple[kopf.index("Status")] == ""
     assert pixel[kopf.index("TCO ab EUR")] == ""
     assert pixel[kopf.index("Status")] == "kein Bündel gemessen"
