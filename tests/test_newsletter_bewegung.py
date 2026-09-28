@@ -11,6 +11,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
 from bs4 import BeautifulSoup, Doctype
 
 from telco_radar.newsletter import render as r
@@ -273,7 +274,8 @@ def test_der_testversand_fasst_store_und_protokoll_nicht_an(tmp_path):
     lauf = _send(tmp_path, "--dry-run", "--ausgabe", str(tmp_path / "aus"),
                  env={"TEST_EMPFAENGER": "test@example.invalid"})
     assert lauf.returncode == 0, lauf.stderr
-    assert "Testversand: zugestellt" in lauf.stdout
+    assert "Testversand: nur gerendert" in lauf.stdout
+    assert "zugestellt" not in lauf.stdout
     assert "test@example.invalid" not in lauf.stdout + lauf.stderr
     html = (tmp_path / "aus" / "test.html").read_text(encoding="utf-8")
     assert "240 €" in html and "Telekom senkt Preise" in html
@@ -309,3 +311,48 @@ def test_in_actions_steht_die_adresse_nur_in_der_maskenzeile(tmp_path):
     zeilen = [z for z in (lauf.stdout + lauf.stderr).splitlines()
               if "test@example.invalid" in z]
     assert zeilen == ["::add-mask::test@example.invalid"]
+
+
+def _send_modul():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "send_digest_test", WURZEL / "scripts/newsletter/send_digest.py")
+    modul = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(modul)
+    return modul
+
+
+@pytest.mark.parametrize("trocken, ok, erwartet, code", [
+    (False, True, "Testversand: zugestellt", 0),
+    (False, False, "Testversand: gescheitert (402)", 1),
+    (True, False, "Testversand: gescheitert (402)", 1),
+    (True, True, "Testversand: nur gerendert", 0),
+])
+def test_die_testversand_zeile_sagt_was_geschah(
+        tmp_path, monkeypatch, capsys, trocken, ok, erwartet, code):
+    """Nur ein echter, erfolgreicher Versand heisst "zugestellt"; ein
+    Fehler schlaegt den Trockenlauf-Hinweis."""
+    from telco_radar.newsletter.transport import Ergebnis
+    modul = _send_modul()
+
+    class Stub:
+        def __init__(self, *a, **k):
+            pass
+
+        def send(self, nachricht, an):
+            return Ergebnis(ok=ok, status=0 if ok else 402)
+
+    monkeypatch.setattr(modul, "BrevoTransport", Stub)
+    monkeypatch.setattr(modul, "Trockenlauf", Stub)
+    monkeypatch.setenv("TEST_EMPFAENGER", "test@example.invalid")
+    monkeypatch.delenv("GITHUB_ACTIONS", raising=False)
+    bericht = tmp_path / "bericht.json"
+    bericht.write_text(json.dumps(BERICHT, ensure_ascii=False))
+    argv = ["--bericht", str(bericht), "--nur-test"]
+    if trocken:
+        argv.append("--dry-run")
+    assert modul.main(argv) == code
+    aus = capsys.readouterr().out
+    assert erwartet in aus
+    if erwartet != "Testversand: zugestellt":
+        assert "zugestellt" not in aus

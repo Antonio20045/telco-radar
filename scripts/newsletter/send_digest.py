@@ -217,8 +217,14 @@ def _testausgabe(args, bericht: dict, datum: str, eintraege, katalog,
         absender_adresse=os.environ.get(
             "MAIL_FROM", "antonio.fotiadis.francisco@gmail.com"))
     ergebnis = transport.send(nachricht, adresse or "trocken@example.invalid")
-    _zahl("Testversand", "zugestellt" if ergebnis.ok else
-          f"gescheitert ({ergebnis.status})")
+    # Ein Trockenlauf stellt nichts zu; das Log darf es nicht behaupten.
+    if not ergebnis.ok:
+        stand = f"gescheitert ({ergebnis.status})"
+    elif args.dry_run:
+        stand = "nur gerendert (Trockenlauf, nichts verschickt)"
+    else:
+        stand = "zugestellt"
+    _zahl("Testversand", stand)
     return 0 if ergebnis.ok else 1
 
 
