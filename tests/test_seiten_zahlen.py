@@ -2810,8 +2810,9 @@ def _gw_min_buendel(tco: dict, blaetter: dict, sku_präfix: str, band: str,
     """Günstigstes neu-Bündel des Modells im Band nach EIGENER Rechnung.
 
     Auswahlmenge wie die Seite: Zustand neu (vergleichbar), eine
-    belastbare Zahl (ohne Tarifgrundpreis zaehlt ein Bündel nicht) und -
-    seit A3 - FRISCHE (`_gw_frisch`). Mit `anbieter` auf dessen Bündel
+    belastbare Zahl (ohne Tarifgrundpreis zaehlt ein Bündel nicht), -
+    seit A3 - FRISCHE (`_gw_frisch`) und eine Leitzahl ueber 24 Monate
+    (kein Buendelbetrag ueber eine andere Laufzeit, P0-B-h3). Mit `anbieter` auf dessen Bündel
     beschraenkt - die Vodafone-Referenz ist das Minimum UNTER DEN
     EIGENEN frischen Bündeln, nicht der Sieger des Bandes.
     """
@@ -2827,6 +2828,14 @@ def _gw_min_buendel(tco: dict, blaetter: dict, sku_präfix: str, band: str,
         if _gw_band(b, blaetter) != band:
             continue
         if not _gw_frisch(b, heute):
+            continue
+        # Fremder Zeitraum (P0-B-h3): ein Buendelbetrag ueber eine andere
+        # Laufzeit als 24 Monate (1&1, 36) traegt eine Leitzahl ueber
+        # diese Laufzeit und steht in keiner Rangfolge der 24-Monats-Tafel.
+        # Ohne diese Regel gewann 1&1 am Pixel 11 das Band XS mit einer
+        # 36-Monats-Summe gegen Vodafones 24-Monats-Zahl.
+        if (b.get("buendel_monatlich") is not None
+                and int(b["laufzeit_monate"]) != _GW_HORIZONT):
             continue
         gesamt, _rest = _gw_leitzahl(b, blaetter)
         if gesamt is None:
@@ -3345,7 +3354,7 @@ def test_monatsschnitt_und_restschuld_des_pflichtfalls_am_bestand(gw_seite):
 # uebersprungen - deshalb skippt der Test nicht mehr, ein fehlendes Paar
 # ist rot.
 _GW_TOR_MODELLE = ("apple-iphone-17-pro-256", "apple-iphone-17-256",
-                   "samsung-galaxy-s26-ultra-256", "google-pixel-10-pro-128")
+                   "samsung-galaxy-s26-ultra-256", "google-pixel-11-256")
 _GW_TOR_FAELLE = [
     ("apple-iphone-17-pro-256", "xs"), ("apple-iphone-17-pro-256", "s"),
     ("apple-iphone-17-pro-256", "m"), ("apple-iphone-17-pro-256", "l"),
@@ -3355,7 +3364,11 @@ _GW_TOR_FAELLE = [
     ("samsung-galaxy-s26-ultra-256", "s"),
     ("samsung-galaxy-s26-ultra-256", "m"),
     ("samsung-galaxy-s26-ultra-256", "l"),
-    ("google-pixel-10-pro-128", "xs"), ("google-pixel-10-pro-128", "m"),
+    # Pixel 11 statt Pixel 10 Pro (28.09.2026): Vodafone hat das Pixel 10
+    # Pro ausgelistet (Listung `ausgelistet`, die Produktadresse leitet auf
+    # die Google-Uebersicht um); seine Buendel altern seitdem aus.
+    ("google-pixel-11-256", "xs"), ("google-pixel-11-256", "s"),
+    ("google-pixel-11-256", "m"),
 ]
 
 
@@ -3834,8 +3847,8 @@ _PF_FAELLE = (
     ("samsung-galaxy-s26-ultra-256", "Vodafone", "Mobil S"),
     ("samsung-galaxy-s26-ultra-256", "o2",
      "O2 Mobile Unlimited M Plus mit 100 MBit/s (24 Mon.)"),
-    ("google-pixel-10-pro-128", "Vodafone", "Mobil XS"),
-    ("google-pixel-10-pro-128", "o2",
+    ("google-pixel-11-256", "Vodafone", "Mobil XS"),
+    ("google-pixel-11-256", "o2",
      "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)"),
 )
 _PF_MINDESTFAELLE = len(_PF_FAELLE)
@@ -3993,7 +4006,7 @@ def test_pf_leitzahl_von_zehn_buendeln_gegen_die_historie(gw_seite):
     eine EIGENE Cent-Rechnung aus `geraete_tco_historie.jsonl`.
 
     Vier Geraete (iPhone 17 Pro 256, iPhone 17 256, Galaxy S26 Ultra 256,
-    Pixel 10 Pro 128) x je Anbieter ein Buendel. Gerechnet wird
+    Pixel 11 256) x je Anbieter ein Buendel. Gerechnet wird
     Anzahlung + 24 x Tarif + Laufzeit x Rate + Anschlusspreis, bei 1&1
     Anzahlung + Laufzeit x Buendelbetrag + Anschlusspreis.
 
