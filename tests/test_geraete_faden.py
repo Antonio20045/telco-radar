@@ -101,7 +101,7 @@ def test_der_antwort_satz_nennt_anbieter_und_die_leitzahl(tmp_path):
 def test_der_seitentitel_ist_sachlich(tmp_path):
     s = _baue(tmp_path)
     titel = s.select_one("title").get_text(strip=True)
-    assert titel.endswith("Gerätepreise im Vergleich")
+    assert titel.endswith("· Gerätepreise")
 
 
 # --------------------------------------------------------------------------
@@ -192,10 +192,10 @@ def test_die_reiterleiste_traegt_vergleich_radar_verlauf_katalog(tmp_path):
     beschriftungen = [(k.get("data-tafel"), k.get_text(strip=True))
                       for k in knoepfe]
     assert beschriftungen == [
-        ("tafel-tco", "Vergleich"),
-        ("tafel-radar", "Radar"),
-        ("tafel-verlauf", "Preisverlauf"),
-        ("tafel-katalog", "Gerätekatalog"),
+        ("tafel-tco", "Mit Tarif"),
+        ("tafel-verlauf", "Ohne Vertrag"),
+        ("tafel-radar", "Übersicht"),
+        ("tafel-katalog", "Katalog"),
     ]
     assert s.select_one(".gr-reiter a") is None, \
         "die Reiterleiste trägt noch einen Link (E3: vier Tafeln)"

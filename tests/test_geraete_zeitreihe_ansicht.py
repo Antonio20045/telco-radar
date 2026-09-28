@@ -381,8 +381,9 @@ def test_der_antwort_satz_polt_den_abstand_zur_referenz_richtig(ansicht):
     # der <b>-Zahl an den Anfang des Labels ("€unter") - ein schwacher
     # Parser darf die Aussage nicht zerlegen (Lehre B6, 30.08.2026).
     assert "264,00 €" in leit, (text, leit)
-    assert "unter der Vodafone-Referenz" in leit, (text, leit)
-    assert "über der Vodafone-Referenz" not in leit, leit
+    # 28.09.2026: das Label heisst kurz "unter Vodafone (…)".
+    assert "unter Vodafone (1.105,00 €)" in leit, (text, leit)
+    assert "über Vodafone" not in leit, leit
     assert "über der Vodafone-Referenz" not in text, text
 
 
@@ -448,12 +449,6 @@ def test_der_antwort_satz_mit_hersteller_die_kachel_ohne(ansicht):
         paar["antwort_html"]), _text(paar["antwort_html"])
     assert ansicht["daten"]["kurz"]["apple-iphone-17-pro-256"] == \
         "iPhone 17 Pro"
-
-
-def test_die_messtagzeile_nennt_die_echte_spanne(ansicht):
-    paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
-    assert paar["messtage_text"] == \
-        "Messtage: 12.9. bis 15.9. (4 Messungen)"
 
 
 def test_ein_lueckensatz_mit_alternativbaendern_statt_zeilen(ansicht):
@@ -535,13 +530,18 @@ def test_ein_geraet_mit_nur_ein_punkt_serien_ist_trotzdem_beschriftet(
     assert suppe.select("circle.gr-zr-halo")
 
 
-def test_vodafone_ist_rot_und_traegt_unser_angebot(ansicht):
+def test_vodafone_ist_rot_ohne_zusatzetikett(ansicht):
+    """Vodafone erkennt man am Rot und am Namen; das Etikett „unser
+    Angebot" unter dem Namen ist am 28.09.2026 gefallen (Antonio: keine
+    Unterkommentare)."""
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     suppe = __import__("bs4").BeautifulSoup(paar["svg_breit"], "html.parser")
     vf_punkte = [c for c in suppe.select("circle.gr-zr-punkt")
                  if c.get("fill") == "#e60000"]
     assert vf_punkte
-    assert "unser Angebot" in paar["svg_breit"]
+    assert "Vodafone" in suppe.get_text(" ")
+    assert "unser Angebot" not in paar["svg_breit"]
+    assert "unser Angebot" not in paar["svg_schmal"]
 
 
 def test_kein_beleglink_ohne_echte_url(tmp_path):

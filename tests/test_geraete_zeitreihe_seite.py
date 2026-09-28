@@ -141,9 +141,11 @@ def test_jede_karte_traegt_preis_und_anbieter_punkte(tafel):
             monat = k.select_one(".gr-zr-k-monat")
             assert monat is not None and "€/Monat" in monat.get_text()
         assert k.select(".gr-zr-k-punkte i"), "Karte ohne Anbieter-Punkte"
+        # Eine Bewegung steht nur, wenn sich etwas bewegt hat (28.09.2026).
         delta = k.select_one(".gr-zr-k-delta")
         assert delta is None or ("€" in delta.get_text()
-                                 and "Tag" in delta.get_text())
+                                 and "Tag" in delta.get_text()
+                                 and "±0" not in delta.get_text())
         assert "€" in k.get_text()
 
 

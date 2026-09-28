@@ -52,7 +52,7 @@
    ist selten ein Beschriftungsproblem, meistens ein Existenzproblem." #}
 {% extends "base.html.j2" %}
 {% set active = 'geraete' %}
-{% block title %}Vodafone Product and Services Insights · Gerätepreise im Vergleich{% endblock %}
+{% block title %}Vodafone Product and Services Insights · Gerätepreise{% endblock %}
 
 {# O2 (STRATEGIE_GERAETE_OPTIK §3, 11.09.2026): die Alarmtabelle war
    AUS dieser Seite auf den Wettbewerbs-Radar gezogen (seit E3 lebt sie
@@ -82,7 +82,7 @@
   <div class="page-hero-row">
     <div>
       <p class="page-kicker">Deutschland · Geräte</p>
-      <h1>Gerätepreise im Vergleich</h1>
+      <h1>Gerätepreise</h1>
     </div>
     {# DAS KOPFDATUM IST DAS ABRUFDATUM, nicht der Berichtstag (30.08.2026).
 
@@ -136,7 +136,9 @@
 
 {# --- Reiterleiste ---------------------------------------------------- #}
 {# VIER REITER, VIER TAFELN, EINE SEITE (E3, AUFTRAG_GERAETE_EINE_SEITE_V2
-   §1d): Vergleich · Radar · Preisverlauf · Gerätekatalog. Bis E3 war der
+   §1d). Seit 28.09.2026 heissen sie nach dem, was sie messen: Mit Tarif ·
+   Ohne Vertrag · Übersicht · Katalog (vorher Vergleich · Radar ·
+   Preisverlauf · Gerätekatalog). Bis E3 war der
    Radar ein QUASI-Reiter - ein Link auf die Radar-Alt-URL mit Pfeil
    als Seitenwechsel (O3). Antonios Wortlaut („Wieso kannst du nicht
    einfach Geräte-Unterseite, darunter dann verschiedene Unterseiten/
@@ -159,13 +161,13 @@
    Entscheidung, Strategie §5.2). #}
 <nav class="gr-reiter" role="tablist" aria-label="Ansichten des Geräteradars">
   <button type="button" role="tab" aria-selected="true"
-          aria-controls="tafel-tco" data-tafel="tafel-tco">Vergleich</button>
+          aria-controls="tafel-tco" data-tafel="tafel-tco">Mit Tarif</button>
   <button type="button" role="tab" aria-selected="false"
-          aria-controls="tafel-radar" data-tafel="tafel-radar">Radar</button>
+          aria-controls="tafel-verlauf" data-tafel="tafel-verlauf">Ohne Vertrag</button>
   <button type="button" role="tab" aria-selected="false"
-          aria-controls="tafel-verlauf" data-tafel="tafel-verlauf">Preisverlauf</button>
+          aria-controls="tafel-radar" data-tafel="tafel-radar">Übersicht</button>
   <button type="button" role="tab" aria-selected="false"
-          aria-controls="tafel-katalog" data-tafel="tafel-katalog">Gerätekatalog</button>
+          aria-controls="tafel-katalog" data-tafel="tafel-katalog">Katalog</button>
 </nav>
 
 
@@ -338,9 +340,12 @@
           s.fremd_text }}</small></span>
         {%- else %}<span class="gr-zr-k-preis"><small class="gr-zr-k-leer"
           title="kein Bündel-Angebot in diesem Band">—</small></span>{%- endif %}
-        {%- if s.delta_text %}<span class="gr-zr-k-delta{% if
-          s.delta_richtung %} gr-zr-k-delta--{{ s.delta_richtung }}{% endif
-          %}">{{ s.delta_text }}</span>{%- endif %}
+        {#- 28.09.2026: die Bewegung steht nur, wenn sich wirklich etwas
+            bewegt hat - „±0 € in 16 Tagen" auf jeder Karte war Rauschen,
+            ein echter Preissprung faellt so auf. #}
+        {%- if s.delta_text and s.delta_richtung != 'gleich' %}<span
+          class="gr-zr-k-delta gr-zr-k-delta--{{ s.delta_richtung }}">{{
+          s.delta_text }}</span>{%- endif %}
       </span>
       {% endfor %}
       {# Ein Band, das DIESE Karte nicht führt, lässt sie nicht leer
@@ -965,22 +970,12 @@
    (`setzeG0`), die Rechnung `modell["zeitreihe"]` im View. #}
 
 <section class="gr-verlauf" id="verlauf">
-  {# P2-Fix (Sicht-Prüfung 17.09.): „Barpreis-Verlauf" statt „Wie sich der
-     Barpreis eines Geräts entwickelt hat". Auf dem Telefon brach die alte
-     h2 ZWEIZEILIG (129 px) und drückte die Kurve 164 px unter die Falz -
-     der Reiter soll aber mit dem Diagramm aufgehen (Antonio F4). Der
-     Kurztitel ist auf 390 UND 1440 einzeilig und sagt dieselbe Sache:
-     Barpreis (nicht TCO - die Grenze steht im Datenlage-Aufklapper),
-     Verlauf über die Zeit. #}
-  <h2 class="rubrik">Barpreis-Verlauf</h2>
-
-  {# P2 (Antonio F4, 17.09.2026): ZWISCHEN h2 UND SUCHFELD STEHT NICHTS
-     MEHR. Bis P2 stand hier der Erklaer-Satz zum Barpreis (31 Woerter) -
-     er sagt die Grenze dieses Reiters (Barpreis hier, TCO-24 im
-     Vergleichs-Reiter), aber er stand vor dem einzigen Bedienelement und
-     schob das Suchfeld auf dem Telefon aus dem ersten Viewport. Der Satz
-     lebt weiter im Aufklapper „Datenlage“ am Reiterende - dieselbe
-     Auskunft, ein Klick spaeter. #}
+  {# 28.09.2026: keine eigene Ueberschrift und kein Datenlage-Aufklapper
+     mehr. Der Reiter heisst „Ohne Vertrag“ und sagt damit die Grenze zu
+     „Mit Tarif“ selbst (Antonio: „ich verstehe den Unterschied zwischen
+     Vergleich und Preisverlauf nicht“). Die frueheren Stufen - h2
+     „Barpreis-Verlauf“, Erklaer-Satz, Aufklapper - stehen in der
+     Git-Historie. #}
 
   {# --- P2 (Antonio F4, 17.09.2026): G2 IST GEFALLEN ---------------------
    Bis P2 stand hier der G2-Block - die servergerenderte Markt-Historie
@@ -1016,7 +1011,7 @@
   Messreihen vor.</p>
   {% else %}
   <div class="gr-vsuche">
-    <label class="gr-vlabel" for="gr-vsuche">Gerät suchen</label>
+    <label class="gr-vlabel" for="gr-vsuche">Gerät</label>
     <input type="search" id="gr-vsuche" class="gr-vfeld"
            placeholder="Marke, Modell, Speicher, Farbe …"
            autocomplete="off" role="combobox" aria-expanded="false"
@@ -1122,28 +1117,6 @@
 
   <div class="gr-vtabelle" id="gr-vtabelle" hidden></div>
 
-  {# --- Der EINE Datenlage-Aufklapper am Reiterende (P2, Antonio F4). Alles
-     Erklarende dieses Reiters steht geschlossen HIER - auf dem Bildschirm,
-     der den Reiter oeffnet, steht vor dem Suchfeld nur die h2. Zwei Saetze:
-     die Grenze der Kurve (Barpreis, nicht Gesamtkosten - bis P2 stand der
-     Satz ueber dem Suchfeld) und der globale Stand samt Belastbarkeit
-     (bis P2 der Anfangszustand von #gr-vstand, den die Auto-Vorauswahl
-     sofort ueberschrieben haette). #}
-  <details class="gr-vdatenlage">
-    <summary>Datenlage</summary>
-    <div class="gr-vdatenlage-inhalt">
-      <p>Die Kurve zeigt den Barpreis ohne Vertrag, nicht die
-      Gesamtkosten: wer das Gerät im Vertrag kauft, zahlt daneben Tarif
-      und Anschlusspreis. Die Kosten über 24 Monate stehen
-      im Reiter „Vergleich“.</p>
-      <p>Preisverlauf wird seit dem {{ geraete.verlauf.seit | date_de }}
-      erfasst – {{ geraete.verlauf.messtermine }}
-      {{ 'Messtermin' if geraete.verlauf.messtermine == 1
-         else 'Messtermine' }}. Aussagen zu Preisverfall und Verweildauer
-      ab etwa {{ geraete.verlauf.belastbar_ab_wochen }} Wochen.</p>
-    </div>
-  </details>
-
   <script type="application/json" id="gr-verlaufdaten">
     {{ geraete.verlauf.geraete | tojson }}
   </script>
@@ -1181,11 +1154,8 @@
    Lesehilfen, die bis hierhin als Sätze unter Überschriften, Grafiken und
    Zahlen standen, sind hierher gezogen (geraete-quellen.html#methodik),
    nicht gestrichen. #}
-<p class="dz-foot"><a href="{{ prefix }}geraete-quellen.html">Welche
-Anbieter liefern Geräte, welche warum nicht</a>{% if
-radar_verlinkt %} · <a href="#tafel-radar"
->Wettbewerbs-Radar: alle Geräte nach Abweichung zu Vodafone</a>{% endif %}
-· <a href="{{ prefix }}geraete-quellen.html#methodik">Methodik</a>.</p>
+<p class="dz-foot"><a href="{{ prefix }}geraete-quellen.html">Quellen</a>
+· <a href="{{ prefix }}geraete-quellen.html#methodik">Methodik</a></p>
 
 
 {% else %}

@@ -573,12 +573,15 @@ def test_die_reiterleiste_traegt_vier_knoepfe_ohne_link(_seite):
     knoepfe = _seite.eval_on_selector_all(
         ".gr-reiter button[data-tafel]",
         "e => e.map(x => x.getAttribute('data-tafel'))")
-    assert knoepfe == ["tafel-tco", "tafel-radar", "tafel-verlauf",
+    # 28.09.2026 (Antonio: „ich verstehe den Unterschied zwischen
+    # Vergleich und Preisverlauf nicht"): die Reiter heissen nach dem,
+    # was sie messen, und die zwei Ein-Geraet-Reiter stehen nebeneinander.
+    assert knoepfe == ["tafel-tco", "tafel-verlauf", "tafel-radar",
                        "tafel-katalog"]
     beschriftung = _seite.eval_on_selector_all(
         ".gr-reiter button", "e => e.map(x => x.textContent.trim())")
-    assert beschriftung == ["Vergleich", "Radar", "Preisverlauf",
-                            "Gerätekatalog"]
+    assert beschriftung == ["Mit Tarif", "Ohne Vertrag", "Übersicht",
+                            "Katalog"]
     links = _seite.eval_on_selector_all(
         ".gr-reiter a", "e => e.length")
     assert links == 0, "die Reiterleiste trägt noch einen Link (E3: Tafel)"
@@ -2854,6 +2857,9 @@ def test_die_modellauswahl_blendet_ohne_neuladen_um(_seite):
     und die Bündel-Zeilen desselben Modells - ohne Neuladen, mit demselben
     Markup wie der Server-Render (kein Client-Renderer, keine Zahl im
     Client)."""
+    # Die Seite ist modulweit geteilt; unter pytest-xdist lief hier zuvor
+    # ein Test, der einen anderen Reiter offen liess (auch auf main rot).
+    _zeige_tafel(_seite, "tafel-tco")
     auswahl = _seite.eval_on_selector(
         "#gr-zeitreihe-daten",
         "k => Object.keys(JSON.parse(k.textContent).erlaubt)")

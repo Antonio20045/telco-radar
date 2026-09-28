@@ -55,10 +55,6 @@ MAX_LINIEN = 8
 # Etikett ist eine Zumutung.
 MAX_DATUMSMARKEN = 8
 
-# Ab wann Aussagen ueber Preisverfall und Verweildauer tragen. Nicht
-# gerechnet, sondern gesetzt: bei zwei Messterminen im Abstand von 19 Tagen
-# ist jede Steigung eine Gerade durch zwei Punkte.
-BELASTBAR_AB_WOCHEN = 12
 
 # Ab wie vielen MESSTERMINEN ueberhaupt ein Diagramm gezeichnet wird
 # (30.08.2026).
@@ -385,7 +381,6 @@ def aufbereiten(eintraege: list, historie, katalog) -> dict:
         "seit": tage[0] if tage else "",
         "bis": tage[-1] if tage else "",
         "messtermine": len(tage),
-        "belastbar_ab_wochen": BELASTBAR_AB_WOCHEN,
         "diagramm_ab_terminen": DIAGRAMM_AB_TERMINEN,
         "linien_abstand": LINIEN_ABSTAND,
         "luecke_tage_schwelle": LUECKE_TAGE_SCHWELLE,
@@ -397,7 +392,7 @@ def aufbereiten(eintraege: list, historie, katalog) -> dict:
 
 def leer() -> dict:
     return {"hat_daten": False, "geraete": [], "seit": "", "bis": "",
-            "messtermine": 0, "belastbar_ab_wochen": BELASTBAR_AB_WOCHEN,
+            "messtermine": 0,
             "diagramm_ab_terminen": DIAGRAMM_AB_TERMINEN,
             "linien_abstand": LINIEN_ABSTAND,
             "luecke_tage_schwelle": LUECKE_TAGE_SCHWELLE,

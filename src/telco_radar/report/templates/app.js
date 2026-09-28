@@ -10,6 +10,16 @@
    friert die Suchzeichenfolge der ANKUNFT ein; fuer Leser-Wuensche gilt
    nur sie. */
 var TR_ANKUNFT_SEARCH = location.search;
+/* DAS GERAET DES LESERS (28.09.2026): „Mit Tarif“ und „Ohne Vertrag“ zeigen
+   dasselbe Geraet. Gemeinsam ist nur, was ein LESER wollte - ein
+   ?modell=-Deep-Link bei Ankunft oder eine Wahl in einem der beiden
+   Reiter. Das ?modell=, das „Mit Tarif“ beim Laden fuer sein Startgeraet
+   in die Adresse schreibt, ist interne Zustandsspeicherung und gilt
+   hier NICHT (sonst ueberschriebe es einen Deep-Link auf ein Geraet ohne
+   Buendel). */
+var TR_LESER_MODELL = null;
+try { TR_LESER_MODELL = new URLSearchParams(TR_ANKUNFT_SEARCH).get('modell'); }
+catch (e) { /* aeltere Browser: keine Uebernahme */ }
 
 /* P2/D4b: DER AKTIVE NAVIGATIONSEINTRAG STEHT IM BILD - auf jeder Seite.
  * `.subbar.subnav` (base.html.j2) rollt seit dem 08.08.2026 seitlich statt
@@ -1745,6 +1755,7 @@ var TelcoFrage = (function () {
     var erlaubt = daten.erlaubt[modell] || [];
     if (!erlaubt.length) return;
     zustand.modell = modell;
+    TR_LESER_MODELL = modell;
     if (band && erlaubt.indexOf(band) > -1) {
       zustand.band = band;
     } else if (erlaubt.indexOf(zustand.band) === -1) {
@@ -1768,8 +1779,21 @@ var TelcoFrage = (function () {
       var p = new URLSearchParams(location.search);
       p.set('modell', zustand.modell);
       p.set('band', zustand.band);
-      history.replaceState(null, '', '?' + p.toString());
+      history.replaceState(null, '', '?' + p.toString() + location.hash);
     } catch (e) { /* Datei-Offline: kein replaceState noetig */ }
+  }
+
+  /* Gegenstueck zu „Ohne Vertrag“ (siehe `leserGeraet` dort): wird dieser
+     Reiter sichtbar und hat der Leser ein anderes Geraet gewaehlt, das
+     hier Buendel hat, zeigt er dieses. */
+  var tcoTafel = element('tafel-tco');
+  if (tcoTafel) {
+    tcoTafel.addEventListener('gr-tafel-sichtbar', function () {
+      var id = TR_LESER_MODELL;
+      if (id && id !== zustand.modell && (daten.erlaubt[id] || []).length) {
+        waehle(id);
+      }
+    });
   }
 
   Array.prototype.forEach.call(
@@ -2018,7 +2042,7 @@ var TelcoFrage = (function () {
     var p0 = new URLSearchParams(location.search);
     p0.set('modell', zustand.modell);
     p0.set('band', zustand.band);
-    history.replaceState(null, '', '?' + p0.toString());
+    history.replaceState(null, '', '?' + p0.toString() + location.hash);
   } catch (e) { /* offline */ }
   /* Ein Deep-Link auf ein ANDERES Geraet als den Server-Startzustand
      braucht den ersten Fragmentabruf - sonst zeigten Graph und Tabelle
@@ -2026,6 +2050,20 @@ var TelcoFrage = (function () {
   if (zustand.modell !== vorgabe) {
     waehle(zustand.modell, zustand.band);
   }
+  /* Ohne Leser-Wunsch gilt das Startgeraet dieses Reiters auch fuer
+     „Ohne Vertrag“ - beide Reiter oeffnen mit demselben Geraet. */
+  if (TR_LESER_MODELL && !(daten.erlaubt[TR_LESER_MODELL] || []).length) {
+    /* Unbekannte ids zaehlen nicht als Wunsch: nur ein Geraet, das
+       „Ohne Vertrag“ kennt, bleibt dort stehen. */
+    var vlKnoten = document.getElementById('gr-verlaufdaten');
+    var bekannt = false;
+    try {
+      bekannt = JSON.parse(vlKnoten ? vlKnoten.textContent : '[]')
+        .some(function (g) { return g.id === TR_LESER_MODELL; });
+    } catch (e) { /* kein Verlauf: nicht bekannt */ }
+    if (!bekannt) TR_LESER_MODELL = null;
+  }
+  if (!TR_LESER_MODELL) TR_LESER_MODELL = zustand.modell;
 })();
 /* Die Alarmtabelle: Filter, Suche, Zeilenaufklapper, "alle anzeigen".
  *
@@ -2756,9 +2794,9 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
      Auswahl zusaechlich den globalen Stand ("seit dem 10. August, 20
      Messtermine") samt Nachsatz zur Belastbarkeit - am 30.08.2026 standen
      Kachel (4) und Satz (5) mit zwei richtigen Zahlen fuer scheinbar
-     dieselbe Sache nebeneinander. Die globalen Zahlen stehen jetzt als
-     zwei Saetze im Datenlage-Aufklapper der Vorlage; der dynamische Satz
-     hier gehoert ganz dem gezeichneten Geraet. */
+     dieselbe Sache nebeneinander. Die globalen Zahlen stehen seit
+     28.09.2026 nicht mehr auf der Seite (Datenlage-Aufklapper gefallen);
+     der dynamische Satz hier gehoert ganz dem gezeichneten Geraet. */
   function termine(n) {
     return n === 1 ? 'liegt 1 Messtermin' : 'liegen ' + n + ' Messtermine';
   }
@@ -2790,8 +2828,7 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     if (!stand) return;
     /* OHNE GEWAEHLTES GERAET SCHWEIGT DIESER SATZ. Der Zustand entsteht
        seit der Auto-Vorauswahl nur noch beim Rueckbau (der Leser tippt im
-       Suchfeld); der globale Stand steht im Datenlage-Aufklapper - beide
-       gleichzeitig waeren wieder zwei Zahlen fuer dieselbe Sache. */
+       Suchfeld) - ein Satz ueber kein Geraet waere keine Auskunft. */
     if (!g || !tage || !tage.length) {
       stand.hidden = true;
       /* P4-Fix (Code-Pruefung 18.09., S2): ohne gewaehltes Geraet muss
@@ -3532,9 +3569,17 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     tabelle.appendChild(t);
   }
 
-  function waehle(g) {
+  function waehle(g, vomLeser) {
     gewaehlt = g;
     feld.value = g.label;
+    if (vomLeser) {
+      TR_LESER_MODELL = g.id;
+      try {
+        var p = new URLSearchParams(location.search);
+        p.set('modell', g.id);
+        history.replaceState(null, '', '?' + p.toString() + location.hash);
+      } catch (e) { /* Datei-Offline: kein replaceState noetig */ }
+    }
     treffer.hidden = true;
     feld.setAttribute('aria-expanded', 'false');
     steuer.hidden = false;
@@ -3582,9 +3627,9 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
       // P2-Fix (Sicht-Prüfung 17.09.): der Ternär hier hatte zwei
       // IDENTISCHE Zweige (' Anbieter' : ' Anbieter') - toter Code.
       li.textContent = g.label + ' · ' + g.anbieter + ' Anbieter';
-      li.addEventListener('click', function () { waehle(g); });
+      li.addEventListener('click', function () { waehle(g, true); });
       li.addEventListener('keydown', function (ev) {
-        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); waehle(g); }
+        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); waehle(g, true); }
       });
       treffer.appendChild(li);
     });
@@ -3645,10 +3690,25 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
      Zeichenvorgang. Der Tab-Umschalter weiter oben in dieser Datei feuert
      `gr-tafel-sichtbar` auf der Tafel, sobald sie aktiv wird - hier reicht
      das, um mit der jetzt echten Containerbreite neu zu zeichnen. */
+  /* EIN GERAET FUER BEIDE REITER (28.09.2026): wird dieser Reiter
+     sichtbar, zeigt er das Geraet des Lesers (`TR_LESER_MODELL`, oben in
+     der Datei), sofern es dafuer Barpreise gibt - sonst bleibt seine
+     Auswahl. */
+  function leserGeraet() {
+    var id = TR_LESER_MODELL;
+    /* Tippt der Leser gerade (keine Auswahl), bleibt sein Suchwort. */
+    if (!id || !gewaehlt || gewaehlt.id === id) return null;
+    for (var j = 0; j < GERAETE.length; j++) {
+      if (GERAETE[j].id === id) return GERAETE[j];
+    }
+    return null;
+  }
   var tafel = document.getElementById('tafel-verlauf');
   if (tafel) {
     tafel.addEventListener('gr-tafel-sichtbar', function () {
-      if (gewaehlt) zeichne(gewaehlt);
+      var neu = leserGeraet();
+      if (neu) waehle(neu);
+      else if (gewaehlt) zeichne(gewaehlt);
     });
   }
 
