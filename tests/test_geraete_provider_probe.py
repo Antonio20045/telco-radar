@@ -48,12 +48,14 @@ from test_geraete_pipeline import _jetzt
 # --------------------------------------------------------------------------
 
 def test_die_gemessene_antwort_besteht_alle_proben():
-    """66 Kandidaten, 66 bestanden - die Existenz-Schwelle an der echten,
-    unveraenderten Antwort vom 04.09.2026 (Praezedenz Phase S)."""
+    """69 Kandidaten, 69 bestanden - die Existenz-Schwelle an der echten,
+    unveraenderten Antwort vom 04.09.2026 (Praezedenz Phase S). Bis zum
+    29.09.2026 waren es 66: drei Geraete mit Gratiszugabe fielen als
+    Zubehoerbuendel heraus (siehe `o2._BUENDEL_RE`)."""
     proben: dict = {}
     saetze = lies_buendel(_katalog(), _URL, proben=proben)
-    assert len(saetze) == 66
-    assert proben == {"kandidaten": 66, "bestanden": 66}
+    assert len(saetze) == 69
+    assert proben == {"kandidaten": 69, "bestanden": 69}
 
 
 def test_die_protokollzeile_hat_ihren_festen_wortlaut(caplog):
@@ -109,7 +111,10 @@ def test_zubehoer_und_tariflose_zaehlen_nicht_als_kandidaten():
     """Ohne Erwartung keine Probe: Zubehoerbuendel und Eintraege ohne
     Tarifnamen fallen aus anderen Gruenden und duerfen die Quote nicht
     verwaessern."""
-    zubehoer = _eintrag(beschreibung="Apple iPhone 17 Pro mit Watch Ultra 3")
+    zubehoer = _eintrag(
+        beschreibung="Apple iPhone 17 Pro mit Watch Ultra 3",
+        angebot="privatkunden-apple-iphone-17-pro-256gb-tiefblau-mit-watch-"
+                "ultra-3-schwarz-ocean-36xhigh")
     tariflos = _eintrag()
     del tariflos["bundle"]["tariffName"]
     proben: dict = {}
@@ -132,7 +137,7 @@ def test_ohne_kandidaten_steht_keine_zeile(caplog):
 
 # --------------------------------------------------------------------------
 # S2-1 der P5-Codepruefung: der Totaltod des Referenzfeldes, an der
-# gespeicherten ECHTEN Antwort gemessen (88 Eintraege, 66 Buendel)
+# gespeicherten ECHTEN Antwort gemessen (88 Eintraege, 69 Buendel)
 # --------------------------------------------------------------------------
 
 def _katalog_ohne_monthlyprice() -> str:
@@ -147,7 +152,7 @@ def _katalog_ohne_monthlyprice() -> str:
 
 def test_totaltod_des_referenzfeldes_ist_eine_gescheiterte_probe(caplog):
     """Verschwindet monthlyPrice KOMPLETT aus der Antwort (Schnittstellen-
-    Umbau), bleiben alle 66 Kandidaten Kandidaten - als GESCHEITERTE Probe
+    Umbau), bleiben alle 69 Kandidaten Kandidaten - als GESCHEITERTE Probe
     der Ebene 'monthlyPrice' (0 %), nicht als Stille. Bis zum P5-Fix zaehlte
     der Code nur Kandidaten MIT monthlyPrice: kandidaten == 0, keine
     Probzeile - und Ausfallalarm (zaehlt LISTUNGEN, o2 liefert sie weiter)
@@ -155,12 +160,12 @@ def test_totaltod_des_referenzfeldes_ist_eine_gescheiterte_probe(caplog):
     proben: dict = {}
     saetze = lies_buendel(_katalog_ohne_monthlyprice(), _URL, proben=proben)
     assert saetze == []
-    assert proben == {"kandidaten": 66, "monthlyPrice": 66}
+    assert proben == {"kandidaten": 69, "monthlyPrice": 69}
     with caplog.at_level(logging.WARNING,
                          logger="telco_radar.geraete_pipeline"):
         melde_proben([{"anbieter": "o2", "proben": proben}])
-    assert ("Geraeteradar-Probe: o2 liefert 0 von 66 erwarteten Saetzen "
-            "noch ihre Felder (0 %) - gescheitert an: 66x monthlyPrice") \
+    assert ("Geraeteradar-Probe: o2 liefert 0 von 69 erwarteten Saetzen "
+            "noch ihre Felder (0 %) - gescheitert an: 69x monthlyPrice") \
         in caplog.text
     assert caplog.records[-1].levelname == "WARNING"
 

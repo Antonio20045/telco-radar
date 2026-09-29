@@ -113,6 +113,22 @@ kopfhoerer headset ohrhoerer armband ladeschale ladestation dockingstation
 ersatzakku ersatzdisplay folie aufkleber skin simkarte
 """.split())
 
+# Woerter, die ein eigenes GERAET benennen, aber kein Smartphone (29.09.2026:
+# o2 fuehrt „Apple AirPods 5“ mit Tarif, die Auto-Erkennung legte daraus ein
+# Katalogmodell an, und die Geraeteseite bot es neben dem iPhone an). Sie
+# gelten fuer die Auto-Erkennung und fuer den Altbestand auf der
+# Geraeteseite (`report/geraete_view.aufbereiten`), nicht fuer den
+# Listungsweg: ein Haendlertitel „iPhone 17 inkl. AirPods“ bleibt ein iPhone.
+_KEIN_SMARTPHONE = frozenset("""
+airpods pods buds earbuds kopfhoerer watch smartwatch fitbit ipad tab tablet pad
+""".split())
+
+
+def ist_kein_smartphone(marken: list) -> bool:
+    """True, wenn eine Wortmarke ein Nicht-Smartphone benennt."""
+    return any(m in _KEIN_SMARTPHONE for m in marken)
+
+
 # Woerter, die aus einem Modellnamen ein ANDERES Modell machen. Steht so ein
 # Wort direkt hinter einem Katalogtreffer, ohne selbst dazuzugehoeren, ist die
 # Zuordnung nicht belegbar - dann wird nichts zugeordnet.

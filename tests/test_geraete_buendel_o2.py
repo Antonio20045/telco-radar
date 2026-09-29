@@ -91,11 +91,14 @@ def _antwort(*eintraege, zustand="BUNDLE"):
 # Die gemessene Antwort
 # --------------------------------------------------------------------------
 
-def test_sechsundsechzig_buendel_aus_achtundachtzig_eintraegen():
-    """22 der 88 sind Geraet PLUS Zubehoer und fallen heraus."""
+def test_neunundsechzig_buendel_aus_achtundachtzig_eintraegen():
+    """19 der 88 sind Geraet PLUS Zubehoer und fallen heraus. Bis zum
+    29.09.2026 waren es 22: drei Geraete mit GRATISZUGABE (Pixel 11 Pro mit
+    Fitbit, Xiaomi 17 Ultra mit Redmi Pad 2, Galaxy S25 FE mit Tab S10 FE)
+    fielen mit heraus - siehe `test_gratiszugabe_ist_kein_zubehoerbuendel`."""
     roh = json.loads(_katalog())
     assert len(roh["hardware"]) == 88
-    assert len(_saetze()) == 66
+    assert len(_saetze()) == 69
 
 
 def test_jedes_buendel_traegt_seine_vier_posten():
@@ -118,7 +121,7 @@ def test_die_aufteilung_ergibt_wieder_den_monatsbetrag():
     saetze = _saetze()
     # Die Zeile, ohne die dieser Test nichts prueft: trifft der Schluessel
     # nicht, ist die Schleife leer und `assert` in ihr nie ausgefuehrt.
-    assert len(saetze) == 66
+    assert len(saetze) == 69
     for satz in saetze:
         h = je_sku[satz["sku"]]
         summe = satz["geraet_monatsrate"] + satz["tarif_monatlich"]
@@ -176,8 +179,46 @@ def test_unlesbare_nutzlast_wirft():
 
 
 def test_zubehoerbuendel_faellt_heraus():
-    mit = _eintrag(beschreibung="Apple iPhone 17 Pro Max mit AirPods Pro 3")
+    """Erkannt am Angebotsnamen des Artikels - so, wie o2 ein echtes
+    Zubehoerbuendel ausliefert. Auch ohne "mit" in der Beschreibung
+    ("Samsung Galaxy Z Fold8 + Watch Ultra2", gemessen 29.09.2026)."""
+    mit = _eintrag(
+        beschreibung="Apple iPhone 17 Pro Max mit AirPods Pro 3",
+        angebot="privatkunden-apple-iphone-17-pro-max-256gb-tiefblau-mit-"
+                "airpods-pro-3-weiss-36xhigh")
+    plus = _eintrag(
+        beschreibung="Samsung Galaxy Z Fold8 + Watch Ultra2",
+        angebot="privatkunden-samsung-galaxy-z-fold8-256gb-lavender-mit-"
+                "watch-ultra-2-36xhigh")
     assert lies_buendel(_antwort(mit)) == []
+    assert lies_buendel(_antwort(plus)) == []
+
+
+def test_gratiszugabe_ist_kein_zubehoerbuendel():
+    """"Google Pixel 11 Pro mit Fitbit Charge 6" traegt das "mit" NUR in der
+    Beschreibung; der Angebotsname ist der des nackten Geraets. Die
+    Produktseite, die der Eintrag selbst verlinkt, sagt am 29.09.2026:
+    "erhalte die Fitbit Charge 6 ... kostenlos dazu". Bis zu diesem Tag fiel
+    das Pixel 11 Pro deshalb bei o2 ganz heraus (Abdeckungswaechter:
+    Pflichtmodell google-pixel-11-pro ohne Buendel).
+
+    Gegenprobe in DERSELBEN Antwort: das echte Buendel "Google Pixel 11 Pro
+    mit Pixel Watch 5 WiFi" (Angebotsname "...-mit-pixel-watch-5-...")
+    bleibt draussen, und sein Geraeteanteil ist hoeher (37,00 gegen 33,00
+    EUR Rate) - das Zubehoer steckt dort im Preis, die Zugabe hier nicht.
+    """
+    saetze = _saetze()
+    pixel = [s for s in saetze
+             if s["strukturierter_name"] == "Google Pixel 11 Pro"]
+    assert len(pixel) == 1
+    assert pixel[0]["angebot"] == \
+        "privatkunden-google-pixel-11-pro-256gb-canyon-36xhigh"
+    assert pixel[0]["titel"] == "Google Pixel 11 Pro 256 GB canyon"
+    assert pixel[0]["geraet_monatsrate"] == 33.0
+    assert not any("pixel-watch" in s["angebot"] for s in saetze)
+    namen = {s["strukturierter_name"] for s in saetze}
+    assert {"Xiaomi 17 Ultra", "Samsung Galaxy S25 FE 5G"} <= namen
+    assert not any(" mit " in n for n in namen)
 
 
 def test_ohne_tarifnamen_kein_buendel():
@@ -397,13 +438,62 @@ def test_der_ganze_weg_an_der_echten_antwort():
     roh = [{**s, "anbieter": "o2", "sku_id": f"geraet-{i}",
             "quelle_url": s["url"]} for i, s in enumerate(_saetze())]
     bilanz = aus_rohsaetzen(roh, _bestand(), "2026-09-04")
-    # 66 von 66. Bis zum 29.09.2026 waren es 65: der Tarif "O2 Mobile on
+    # 69 von 69. Bis zum 29.09.2026 waren es 65: der Tarif "O2 Mobile on
     # Demand M" (ohne "Plus") traegt keinen Kachel-Slug und loeste nicht
     # auf. Sein Buendel-Slug ist die Tarif-ID der Kachel
-    # (`Tarifbestand._slug_ist_tarif_id`).
-    assert len(bilanz.buendel) == 66
+    # (`Tarifbestand._slug_ist_tarif_id`). Dazu kamen am selben Tag drei
+    # Geraete mit Gratiszugabe (`test_gratiszugabe_ist_kein_zubehoerbuendel`).
+    assert len(bilanz.buendel) == 69
     assert bilanz.ohne_tarif == 0
     assert {b.tarif_id for b in bilanz.buendel
             if "Plus" not in b.tarif_name} == {"o2:o2-mobile-on-demand-m"}
     assert all(tco_24(b).belastbar for b in bilanz.buendel)
     assert {b.laufzeit_monate for b in bilanz.buendel} == {36}
+
+
+def test_vertiefung_beginnt_bei_den_pflichtmodellen():
+    """Endet die Vertiefung an der Frist, fehlen Altmodelle, nicht die
+    Pflichtmodelle (o2, 29.09.2026: 32 von 75 Geräten in Seitenreihenfolge).
+    Das iPhone 18 Pro steht als Auto-Eintrag OHNE Marktstart im Katalog -
+    der Marktstart allein hätte es ans Ende sortiert."""
+    from telco_radar.collect.geraete import vorrang_zuerst
+    from telco_radar.geraete_model import Geraet, Katalog
+    katalog = Katalog([
+        Geraet("Apple", "iPhone 18 Pro", auto="2026-09-10"),
+        Geraet("Google", "Pixel 11 Pro", marktstart="2026-08-20"),
+        Geraet("Google", "Pixel 11 Pro XL", marktstart="2026-08-21"),
+        Geraet("Apple", "iPhone 15", marktstart="2023-09-22")])
+    saetze = [{"sku_id": "apple-iphone-15-128gb-schwarz"},
+              {"sku_id": "unbekannt-1-128gb-x"},
+              {},
+              {"sku_id": "google-pixel-11-pro-256gb-canyon"},
+              {"sku_id": "apple-iphone-18-pro-256gb-silber"},
+              {"sku_id": "google-pixel-11-pro-xl-256gb-canyon"}]
+    vorrang = frozenset({"apple-iphone-18-pro", "google-pixel-11-pro"})
+    assert [s.get("sku_id") for s in
+            vorrang_zuerst(saetze, katalog, vorrang)] == [
+        "google-pixel-11-pro-256gb-canyon",
+        "apple-iphone-18-pro-256gb-silber",
+        "google-pixel-11-pro-xl-256gb-canyon",
+        "apple-iphone-15-128gb-schwarz",
+        "unbekannt-1-128gb-x", None]
+    # Ohne Vorrang: nach Marktstart, das iPhone 18 Pro ohne Datum hinten.
+    ohne = [s.get("sku_id") for s in vorrang_zuerst(saetze, katalog)]
+    assert ohne[0] == "google-pixel-11-pro-xl-256gb-canyon"
+    assert ohne.index("apple-iphone-18-pro-256gb-silber") > \
+        ohne.index("apple-iphone-15-128gb-schwarz")
+    assert vorrang_zuerst([], katalog, vorrang) == []
+
+
+def test_ohne_angebotsnamen_entscheidet_die_beschreibung_streng():
+    """Ändert o2 das Nutzlastformat und der Angebotsname fehlt, darf ein
+    Paket „mit Watch“ nicht still als Gerätepreis durchgehen."""
+    from telco_radar.collect.geraete.o2 import _ist_zubehoerbuendel
+    assert _ist_zubehoerbuendel("", "Apple iPhone 17 Pro Max mit Watch Ultra 3")
+    assert not _ist_zubehoerbuendel("", "Apple iPhone 17 Pro Max")
+    assert not _ist_zubehoerbuendel(
+        "privatkunden-google-pixel-11-pro-256gb-canyon-36xhigh",
+        "Google Pixel 11 Pro mit Fitbit Charge 6")
+    assert _ist_zubehoerbuendel(
+        "privatkunden-samsung-galaxy-s26-256gb-black-mit-tab-a11-wifi-24xhigh",
+        "Samsung Galaxy S26 mit Galaxy Tab A11 WiFi")

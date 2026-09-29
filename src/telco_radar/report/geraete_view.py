@@ -40,7 +40,9 @@ from itertools import zip_longest
 from pathlib import Path
 from typing import Optional
 
-from ..geraete_model import ratenhinweis_aus_eintrag, serie_aus_modell
+from ..analyze.buendel_abdeckung import modell_und_speicher
+from ..geraete_model import (ist_kein_smartphone, ratenhinweis_aus_eintrag,
+                             serie_aus_modell, wortmarken)
 from . import (geraete_alarme, geraete_bereinigung, geraete_pruefung,
                geraete_tco_karten, geraete_tco_view, geraete_vergleich,
                geraete_verlauf, geraete_zeitreihe)
@@ -1941,7 +1943,16 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # Tarifmonate, die niemand schuldet (A5.5). Fehlt die Datei, bleibt
     # `je_id` leer und die Karten sagen ihre Luecke.
     tarifbestand = Tarifbestand.aus_datei(state_dir / "tarife.jsonl")
-    alle = db.eintraege()
+    # Nur Smartphones (29.09.2026): o2 fuehrt AirPods, Uhren und Tablets
+    # mit Tarif. Die Auto-Erkennung legt sie nicht mehr an; was aus der Zeit
+    # davor im Bestand steht, faellt hier heraus - Listungen wie Buendel.
+    alle = [e for e in db.eintraege()
+            if not ist_kein_smartphone(wortmarken(e.get("device_id") or ""))]
+    # Beim Buendel zaehlt nur der Geraeteteil der SKU, nicht Speicher und
+    # Farbe: ein Farbwort darf kein Smartphone von der Seite nehmen.
+    buendel = [b for b in tco_db.buendel()
+               if not ist_kein_smartphone(wortmarken(
+                   modell_und_speicher(b.get("sku_id") or "")[0] or ""))]
     sichtbar = [e for e in alle if e.get("status") in _SICHTBAR]
 
     # ZWEI MENGEN, und jede Zeile darunter sagt, welche sie meint (siehe
@@ -2137,7 +2148,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # stellt die Uhr fuer die Frische der ab-Auswahl.
     bestand_heute = _spaeterer_tag(heute, db.updated) if heute else ""
     tco = geraete_tco_view.aufbereiten(
-        tco_db.buendel(), tco_db.referenzen(), belastbar, katalog,
+        buendel, tco_db.referenzen(), belastbar, katalog,
         # B3 (21.09.2026): `je_id_aktuell`, nicht `je_id` - ein Buendel
         # loest immer auf den BARE `tarif_id` auf, und der bare Schluessel
         # gehoert oft dem Pflichtdokument (Bestandsschutz der Zeitreihe,
@@ -2182,7 +2193,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # Schrift seiner Tafel war die h2.
     katalog_modelle = katalog_modellzeilen(
         bestand, katalog, (tco or {}).get("modelle"),
-        tco_db.buendel() if tco_db.lesbar
+        buendel if tco_db.lesbar
         else _buendel_aus_listungen(bestand),
         zr_erlaubt=zr_erlaubt,
         # A3: die Uhr der ab-Auswahl - der spaetere von Berichtstag und

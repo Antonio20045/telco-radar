@@ -53,7 +53,8 @@ from pathlib import Path
 from typing import Optional
 
 from ...geraete_model import (
-    Geraet, Katalog, device_id, ist_modellzusatz, ist_zubehoer, normalisiere,
+    Geraet, Katalog, device_id, ist_kein_smartphone, ist_modellzusatz,
+    ist_zubehoer, normalisiere,
     serie_aus_modell, wortmarken,
 )
 
@@ -117,49 +118,22 @@ def _serien_anker(katalog: Katalog) -> dict:
             if len(h) == 1}
 
 
-# FESTE FAMILIEN-ANKER (P5/E3, gemessen 17.09.2026): Vodafone nennt seine
-# iPads im strukturierten Namen OHNE Hersteller-Praefix - `modelName` ist
-# „iPad Pro 11 (2025)", „iPad (2025)", „iPad Pro 11 2024" (data/state/
-# geraete_unbekannt.jsonl vom 17.09., quelle vodafone_buendel/vodafone_api).
-# Die Serie „iPad" stand in KEINEM Katalog-Eintrag (Hand wie Auto - der
-# Hand-Katalog verfolgte bewusst keine Tablets), also griff der Serien-Anker
-# nie: die Anker-Luecke aus auto-doku.md. Diese Familien sind keine Raterei,
-# sondern Markennamen EINES Herstellers: iPad, Watch und AirPods sind
-# Apple-Serien. Watch- und AirPods-Nennungen MIT Praefix liefen ohnehin ueber
-# den Praefix-Pfad (17.09.: Watch S12, AirPods 5, auto-angelegt); der
-# Familien-Anker traegt nur den Namen OHNE Praefix nach - kuenftige iPads
-# („iPad Air", „iPad mini", „iPad Pro 14") werden damit automatisch
-# Katalog-Eintraege, ohne dass jemand den Katalog anfasst.
-_FESTE_FAMILIEN = {
-    "ipad": "Apple",
-    "watch": "Apple",
-    "airpods": "Apple",
-}
+# Die festen Familien-Anker (iPad, Watch, AirPods ohne Hersteller-Praefix,
+# P5/E3 vom 17.09.2026) sind seit dem 29.09.2026 entfernt: die Erkennung
+# legt nur noch Smartphones an (`geraete_model.ist_kein_smartphone`), und
+# alle drei Familien waren keine.
 
 
 def _anker_treffer(serie: Optional[str], anker: dict,
                    katalog: Katalog) -> Optional[str]:
-    """Hersteller fuer eine normalisierte Baureihe: der Katalog-Anker
-    zuerst, der feste Familien-Anker nur als Lueckenfueller.
+    """Hersteller fuer eine normalisierte Baureihe aus dem Katalog-Anker.
 
-    Kennt der Katalog die Reihe - EINDEUTIG oder WIDERSPRUECHLICH -,
-    entscheidet er allein: der eindeutige Fall steht im Anker, der
-    widerspruechliche bleibt absichtlich ohne Hersteller (nichts geraten),
-    und genau dann darf der Familien-Anker nicht eingreifen - sonst ebnete
-    er eine gepflegte Zuordnung ein (Hand schlaegt Auto, in beide
-    Richtungen). Er greift nur fuer eine Reihe, die in KEINEM Katalog-
-    Eintrag vorkommt, und prueft das gegen den Katalog selbst, nicht gegen
-    das Anker-Diktat darueber.
-    """
+    Nur der EINDEUTIGE Fall steht im Anker; eine Reihe, die der Katalog
+    widerspruechlich oder gar nicht kennt, bleibt ohne Hersteller (nichts
+    geraten)."""
     if not serie:
         return None
-    treffer = anker.get(serie)
-    if treffer is not None:
-        return treffer
-    if any(normalisiere(serie_aus_modell(g.modell)) == serie
-           for g in katalog.geraete):
-        return None          # der Katalog kennt die Reihe - er entscheidet
-    return _FESTE_FAMILIEN.get(serie.split("-")[0])
+    return anker.get(serie)
 
 
 def schale(name: str, katalog: Katalog) -> Optional[tuple]:
@@ -173,7 +147,8 @@ def schale(name: str, katalog: Katalog) -> Optional[tuple]:
     """
     name = (name or "").strip()
     marken = wortmarken(name)
-    if len(marken) < _MINDEST_MARKEN or ist_zubehoer(marken):
+    if (len(marken) < _MINDEST_MARKEN or ist_zubehoer(marken)
+            or ist_kein_smartphone(marken)):
         return None
 
     hersteller: Optional[str] = None
@@ -339,6 +314,11 @@ def lade_auto_zusaetze(root: Path, katalog: Katalog) -> int:
         modell = str(eintrag.get("modell") or "").strip()
         auto = str(eintrag.get("auto") or "").strip()
         if not hersteller or not modell or not auto:
+            continue
+        if ist_kein_smartphone(wortmarken(modell)):
+            # Ein Eintrag aus der Zeit vor dem Filter (AirPods 5, o2).
+            log.info("Auto-Katalog: %s %s (auto:%s) verworfen - kein "
+                     "Smartphone", hersteller, modell, auto)
             continue
         generation = eintrag.get("generation")
         geraet = Geraet(

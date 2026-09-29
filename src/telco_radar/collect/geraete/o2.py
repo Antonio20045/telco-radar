@@ -38,7 +38,14 @@ ZWEI FALLEN IN DIESEM KATALOG
    ("Apple iPhone 17 Pro Max mit Watch Ultra 3", 2323 EUR). Der Preis gilt
    fuer beides zusammen; als Geraetepreis gespeichert waere er um den Wert
    einer Smartwatch zu hoch. Sie werden verworfen, nicht korrigiert - was
-   der Zubehoerpreis ist, steht nirgends.
+   der Zubehoerpreis ist, steht nirgends. Erkannt wird ein solches Buendel
+   am Angebotsnamen, nicht an der Beschreibung: "mit" NUR in der
+   Beschreibung ist eine Gratiszugabe zum nackten Geraet (siehe
+   `_BUENDEL_RE`, gemessen am 29.09.2026). Belege: Pixel 11 Pro „mit
+   Fitbit Charge 6“ kostet 1189 EUR wie das nackte Geraet, das echte Paket
+   mit Pixel Watch 5 1333 EUR; das Galaxy S25 FE „mit Tab S10 FE“ (Katalog
+   vom 04.09.) kostete 775 EUR, genau so viel wie am 29.09. das S25 FE ohne
+   Zugabe. Fehlt der Angebotsname, entscheidet die Beschreibung (streng).
 2. **`oneTimePrice` ist die Anzahlung, nicht der Preis.** Der Geraetepreis
    ist `totalPrice`, und er ist nachrechenbar: Anzahlung plus 24 Monatsraten
    (gemessen: 92 von 93 Eintraegen gehen exakt auf). Wer `oneTimePrice`
@@ -103,11 +110,45 @@ def _speicher(m) -> Optional[int]:
         return None
     return int(m.group("zahl")) * (1024 if m.group("einheit") == "tb" else 1)
 
-# Ein Zubehoerbuendel erkennt man am " mit " im ANGEBOTSNAMEN. Gemessen an
-# den 93 Eintraegen vom 28.08.2026: 18 Treffer, alle echt (Watch, Buds,
-# Headphone, Pad, Tab). Geprueft wird auf `description` UND `offerName` -
-# "Xiaomi 17 Ultra mit Redmi Pad 2" traegt das Wort nur in der Beschreibung.
+# Ein Zubehoerbuendel erkennt man am "-mit-" im ANGEBOTSNAMEN - der Name
+# des Artikels, den o2 verkauft ("...-17-pro-256gb-tiefblau-mit-watch-ultra-
+# 3-schwarz-ocean-36xhigh"). Gemessen an den 93 Eintraegen vom 28.08.2026:
+# 18 Treffer, alle echt (Watch, Buds, Headphone, Pad, Tab). Die
+# Beschreibung allein zaehlt NICHT, in beide Richtungen:
+#   * "Samsung Galaxy Z Fold8 + Watch Ultra2" traegt kein "mit", der
+#     Angebotsname schon ("...-mit-watch-ultra-2-36xhigh") - verworfen.
+#   * "Google Pixel 11 Pro mit Fitbit Charge 6" und "Xiaomi 17 Ultra mit
+#     Redmi Pad 2" tragen es NUR in der Beschreibung; ihr Angebotsname ist
+#     der des nackten Geraets. Das ist eine Gratiszugabe, kein Buendel -
+#     gemessen am 29.09.2026 an den Produktseiten, die der Katalog selbst
+#     verlinkt: "erhalte die Fitbit Charge 6 ... kostenlos dazu" (Pixel 11
+#     Pro, Registrierung im Hardware-Extra-Portal, bis 06.10.2026) und
+#     "Xiaomi 17 Ultra mit gratis Redmi Pad 2". Der Geraetepreis ist der
+#     des Geraets: Pixel 11 Pro 256 GB 1.189,00 EUR gegen 1.333,00 EUR fuer
+#     den echten Artikel "...-mit-pixel-watch-5-..." derselben Antwort.
+#     Bis zum 29.09.2026 fiel das Pixel 11 Pro dadurch bei o2 ganz heraus
+#     (Pflichtmodell ohne Buendel im Abdeckungswaechter).
+# Die Zugabe wird aus dem Modellnamen gestrichen (`_ohne_zugabe`), sonst
+# faende der Katalog das Geraet nicht.
 _BUENDEL_RE = re.compile(r"\bmit\b", re.IGNORECASE)
+_ZUGABE_RE = re.compile(r"\s+mit\s+.*$", re.IGNORECASE)
+
+
+def _ist_zubehoerbuendel(angebot: str, beschreibung: str) -> bool:
+    """Geraet plus Zubehoer? Entschieden am Angebotsnamen. Fehlt er (ein
+    geaendertes Nutzlastformat), gilt die alte, strengere Probe auf der
+    Beschreibung: lieber eine Gratiszugabe verworfen als einen
+    Paketpreis still als Geraetepreis gespeichert."""
+    if not angebot:
+        return bool(_BUENDEL_RE.search(beschreibung))
+    return bool(_BUENDEL_RE.search(angebot))
+
+
+def _ohne_zugabe(beschreibung: str) -> str:
+    """Der Modellname ohne die Gratiszugabe: "Google Pixel 11 Pro mit Fitbit
+    Charge 6" -> "Google Pixel 11 Pro". Nur fuer Eintraege, deren
+    Angebotsname KEIN Zubehoerbuendel ist - siehe `_BUENDEL_RE`."""
+    return _ZUGABE_RE.sub("", beschreibung).strip()
 
 
 # Die Ratenzahl steht am Ende des Angebotsnamens: "...-mitternacht-24xhigh".
@@ -168,8 +209,9 @@ def lies(text: str, url: str = "") -> list[dict]:
         angebot = str(h.get("offerName") or "").strip()
         if not modell:
             continue
-        if _BUENDEL_RE.search(modell) or _BUENDEL_RE.search(angebot):
+        if _ist_zubehoerbuendel(angebot, modell):
             continue                      # Geraet plus Zubehoer, siehe Modulkopf
+        modell = _ohne_zugabe(modell)
 
         preisblock = h.get("price") or {}
         preis = _preis(preisblock.get("totalPrice"))
@@ -352,8 +394,9 @@ def _buendelsatz(h: dict, proben: Optional[dict] = None) -> Optional[dict]:
     angebot = str(h.get("offerName") or "").strip()
     if not modell:
         return None
-    if _BUENDEL_RE.search(modell) or _BUENDEL_RE.search(angebot):
+    if _ist_zubehoerbuendel(angebot, modell):
         return None                       # Geraet plus Zubehoer
+    modell = _ohne_zugabe(modell)
 
     buendel = h.get("bundle") or {}
     tarif_name = _ohne_markup(buendel.get("tariffName") or "")

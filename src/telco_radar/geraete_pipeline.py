@@ -44,6 +44,7 @@ from .analyze.geraete_store import (
     TEILGELESEN,
     tag_de,
 )
+from .analyze.buendel_abdeckung import lade_pflicht
 from .analyze.tarif_referenzen import aus_bestand
 from .analyze.tco_buendel import aus_rohsaetzen
 from .analyze.tco_store import TcoDB
@@ -319,6 +320,16 @@ def melde_proben(bilanzen: list) -> None:
                         ebenen or "unbekannt")
 
 
+def _pflichtmodelle(root: Path) -> frozenset:
+    """Die Pflichtmodelle des Buendelwaechters - sie bekommen die
+    Vertiefung zuerst. Fehlt die Datei, gibt es keinen Vorrang."""
+    pfad = Path(root) / "config" / "geraete_abdeckung.yaml"
+    if not pfad.exists():
+        log.warning("Keine %s - die Vertiefung laeuft ohne Vorrang", pfad)
+        return frozenset()
+    return frozenset(lade_pflicht(pfad)["modelle"])
+
+
 def nachsammle_buendel(bilanzen: list, quellen, hole: Callable,
                        uhr: Optional[Callable[[], datetime]] = None) -> None:
     """Die Nachbearbeitungs-Haken der Adapter ueber die Buendel laufen
@@ -436,7 +447,8 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
 
     hole = hole or _hole_fabrik(http_cfg)
     ergebnis = sammle(quellen, katalog, farben, hole, heute, jetzt,
-                      frist_sekunden=frist_sekunden)
+                      frist_sekunden=frist_sekunden,
+                      vorrang=_pflichtmodelle(root))
 
     zustand = root / "data" / "state"
     db = GeraeteDB(zustand / "geraete_db.json")

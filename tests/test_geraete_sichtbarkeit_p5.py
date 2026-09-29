@@ -7,7 +7,8 @@ programmieren muss. Ziel: dass man hier nie wieder was dran ändern muss."
 
 Die gemessene Lücke (auto-doku.md, 17.09.): das iPhone 18 kam mit 105
 Bündeln an, bevor die erste Listung stand - und der Katalog zählte nur
-Listungen. Ein bündelloses Auto-Modell (Watch, Tab, AirPods) erschien
+Listungen. Ein bündelloses Auto-Modell (damals Watch, Tab, AirPods; seit
+29.09.2026 legt die Auto-Erkennung nur noch Smartphones an) erschien
 NIRGENDS: der Katalog wollte eine Listung, die Zeitreihen-Wahl zwei
 Bündel-Messtage. Diese Datei nagelt die Regel an ihrem gemessenen Fall fest:
 
@@ -37,9 +38,19 @@ from test_geraete_zeitreihe_ansicht import HEUTE, _baue, _sku
 
 # Dasselbe Auto-Eintrag-Format wie in test_geraete_zeitreihe_ansicht: State,
 # nicht Config - der Produktionsweg der E4-Auto-Erkennung.
-_AUTO_EINTRAG = {"hersteller": "Apple", "modell": "iPad Pro 13",
+#
+# Beispielgeraet GEAENDERT 29.09.2026: bis dahin „iPad Pro 13". Seit der
+# Regel „nur Smartphones" (Antonio will auf der Geraeteseite nur
+# Smartphones; o2 fuehrte AirPods, Uhren und Tablets mit Tarif, die Seite
+# zeigte „AirPods 5") faellt ein iPad in `lade_auto_zusaetze` und in
+# `geraete_view.aufbereiten` heraus - die Sichtbarkeitsregel darunter liess
+# sich an ihm nicht mehr pruefen. Das Galaxy XCover7 Pro ist ein Smartphone
+# aus derselben Auto-Anlage vom 17.09. und traegt mit „xcover" ein Wort,
+# das kein Hand-Modell der Fixture nennt (die Zeitreihen-Suche im
+# Browser-Test braucht 0 Treffer in der Wahl).
+_AUTO_EINTRAG = {"hersteller": "Samsung", "modell": "Galaxy XCover7 Pro",
                  "generation": None, "speicher": [256], "auto": "2026-09-15"}
-_GID, _SPEICHER = "apple-ipad-pro-13", 256
+_GID, _SPEICHER = "samsung-galaxy-xcover7-pro", 256
 _MID = f"{_GID}-{_SPEICHER}"
 _TARIF_ID, _TARIF = "o2:klein", "O2 Mobile Klein"
 
@@ -66,7 +77,7 @@ def _baue_buendel_modell(tmp_path: pathlib.Path, messtage: list[str],
             "status": "aktiv", "missed_checks": 0,
             "preis_ohne_vertrag": 1199.00, "erstpreis": 1199.00,
             "erstpreis_art": "ohne_vertrag", "erstpreis_am": "2026-09-15",
-            "quelle_url": "https://example.de/o2/ipad-pro-13",
+            "quelle_url": "https://example.de/o2/galaxy-xcover7-pro",
             "abgerufen_am": HEUTE, "verfuegbarkeit": "lieferbar",
             "confidence": "hoch", "einstiege": ["https://example.de/l"]})
         (state / "geraete_db.json").write_text(json.dumps(db),
@@ -75,7 +86,7 @@ def _baue_buendel_modell(tmp_path: pathlib.Path, messtage: list[str],
     tco = json.loads((state / "geraete_tco.json").read_text(encoding="utf-8"))
     buendel_id = f"buendel--o2--{_sku(_GID, _SPEICHER)}--{_TARIF_ID}"
     # Das Bündel im Store entsteht nur, wenn es Messungen gibt - die
-    # bündellose Lage (Watches/Tabs/AirPods) hat KEIN Bündel, nur die
+    # bündellose Lage (ein Auto-Modell nur mit Listung) hat KEIN Bündel, nur die
     # Listung. (Ein Bündel OHNE Messtag wäre eine dritte, eigene Lage -
     # nach der Heimregel "Tag 1 ist gespeichert" kommt sie im Bestand
     # nicht vor.)
@@ -86,7 +97,7 @@ def _baue_buendel_modell(tmp_path: pathlib.Path, messtage: list[str],
             "tarif_id_guete": "hoch", "tarif_monatlich": 20.0,
             "geraet_zuzahlung": 1.0, "geraet_monatsrate": 25.0,
             "laufzeit_monate": 24, "anschlusspreis": 0.0, "zustand": "neu",
-            "rabatte": [], "quelle_url": "https://example.de/o2/ipad",
+            "rabatte": [], "quelle_url": "https://example.de/o2/galaxy-xcover7",
             "abgerufen_am": HEUTE, "first_seen": "2026-09-15",
             "last_verified": HEUTE})
         (state / "geraete_tco.json").write_text(json.dumps(tco),
@@ -100,7 +111,7 @@ def _baue_buendel_modell(tmp_path: pathlib.Path, messtage: list[str],
             "tarif_id_guete": "hoch", "tarif_monatlich": 20.0,
             "geraet_zuzahlung": 1.0, "geraet_monatsrate": 25.0,
             "laufzeit_monate": 24, "anschlusspreis": 0.0,
-            "quelle_url": "https://example.de/o2/ipad", "abgerufen_am": tag,
+            "quelle_url": "https://example.de/o2/galaxy-xcover7", "abgerufen_am": tag,
             "zustand": "neu", "gesamt": 1400.00,
             "sku_id": _sku(_GID, _SPEICHER)}))
     (state / "geraete_tco_historie.jsonl").write_text(
@@ -151,8 +162,9 @@ def test_buendel_ohne_listung_mit_einem_mestag_steht_im_katalog(tmp_path):
 
 
 # ==========================================================================
-# (b) Die Zeitreihen-WAHL: erst ab 2 Bündel-Messtagen - und die 12
-#     bündellosen Auto-Modelle (Watches, Tabs, AirPods) bleiben draussen
+# (b) Die Zeitreihen-WAHL: erst ab 2 Bündel-Messtagen - und bündellose
+#     Auto-Modelle bleiben draussen (der Fall vom 17.09. waren 12 Watches,
+#     Tabs, AirPods; seit 29.09.2026 legt die Erkennung nur Smartphones an)
 # ==========================================================================
 
 

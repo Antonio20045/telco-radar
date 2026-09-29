@@ -40,4 +40,14 @@ pflicht_modelle:
 
 # anbieter + modelle (fehlt `modelle`, gilt der Grund für den ganzen
 # Anbieter) + grund + geprueft (Datum der Messung).
-belegte_luecken: []
+belegte_luecken:
+  - anbieter: congstar
+    modelle: [google-pixel-10a]
+    grund: >-
+      congstar führt das Pixel 10a nicht. Die Geräte-Sitemap
+      https://www.congstar.de/sitemap/devices.xml nennt von Google nur
+      Pixel 11, 11 Pro und 11 Pro XL, die Herstellerseite
+      https://www.congstar.de/geraete/google/ ebenso, und
+      https://www.congstar.de/geraete/google/google-pixel-10a/ leitet auf
+      /geraete/google/?redirectFrom=device-details um.
+    geprueft: 2026-09-29

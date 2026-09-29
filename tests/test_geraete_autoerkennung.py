@@ -800,69 +800,81 @@ def test_ueber_den_ganzen_echten_bestand_vom_17_09():
 # ==========================================================================
 # Vodafone nennt seine iPads im strukturierten Namen OHNE Hersteller-Praefix
 # (`modelName`: „iPad Pro 11 (2025)", „iPad (2025)", „iPad Pro 11 2024" -
-# data/state/geraete_unbekannt.jsonl vom 17.09.). Die Serie „iPad" stand in
-# keinem Katalog-Eintrag, also griff der Serien-Anker nie: die Anker-Luecke
-# aus auto-doku.md. iPad, Watch und AirPods sind Apple-Serien - der feste
-# Familien-Anker ist Markennamen-Fakt, keine Raterei, und greift NUR, wo der
-# Katalog die Reihe nicht kennt (Hand schlaegt Auto bleibt).
+# data/state/geraete_unbekannt.jsonl vom 17.09.). Der feste Familien-Anker
+# (iPad, Watch, AirPods -> Apple) legte sie seit P5/E3 an.
+#
+# GEAENDERT 29.09.2026 - nur Smartphones: Antonio will auf der Geraeteseite
+# nur Smartphones; o2 fuehrte AirPods, Uhren und Tablets mit Tarif, und die
+# Seite zeigte „AirPods 5". `ist_kein_smartphone` verwirft diese Namen in
+# `schale()` VOR jedem Anker - mit und ohne Praefix, auch wenn der Katalog
+# die Reihe kennt. Die Tests unten sind deshalb umgedreht: dieselben echten
+# Namen werden NICHT mehr angelegt.
 
-def test_ipad_ohne_hersteller_praefix_wird_ueber_familien_anker_angelegt():
-    """Die echten Vodafone-modelNames vom 17.09. werden von _mini_katalog
-    (der Katalog kennt KEIN iPad) aus Apple geschält - kuenftige iPads
-    („iPad Air", „iPad mini", „iPad Pro 14") ebenso, ohne Katalog-Pflege."""
-    for name in ("iPad Pro 11 (2025)", "iPad (2025)", "iPad Pro 11 2024"):
-        assert autoerkennung.schale(name, _mini_katalog()) == ("Apple", name)
+def test_ipad_ohne_hersteller_praefix_wird_nicht_mehr_angelegt():
+    """Die echten Vodafone-modelNames vom 17.09. werden NICHT mehr aus Apple
+    geschält (29.09.2026: nur Smartphones) - auch nicht mit Praefix, und
+    lege_an traegt nichts in den Katalog ein."""
+    for name in ("iPad Pro 11 (2025)", "iPad (2025)", "iPad Pro 11 2024",
+                 "Apple iPad Pro 11 (2025)"):
+        assert autoerkennung.schale(name, _mini_katalog()) is None, name
 
-    eintrag = autoerkennung.lege_an("iPad Pro 11 (2025)", _mini_katalog(),
+    katalog = _mini_katalog()
+    vorher = [g.device_id for g in katalog.geraete]
+    eintrag = autoerkennung.lege_an("iPad Pro 11 (2025)", katalog,
                                     "2026-09-18", speicher_gb=256)
-    assert eintrag is not None
-    assert eintrag.hersteller == "Apple"
-    assert eintrag.modell == "iPad Pro 11 (2025)"
-    assert eintrag.device_id == device_id("Apple", "iPad Pro 11 (2025)")
-    assert eintrag.auto == "2026-09-18"
-    # Auto-Regeln unveraendert: marktstart und vorgaenger bleiben leer.
-    assert eintrag.marktstart == "" and eintrag.vorgaenger == ""
+    assert eintrag is None
+    assert [g.device_id for g in katalog.geraete] == vorher
 
 
-def test_vodafone_ipad_titel_trifft_den_auto_eintrag():
-    """Die Launch-Kette bis zur Listung: nach der Anlage aus dem strukturierten
-    Namen trifft der ZUSAMMENGESETZTE Vodafone-Titel (echt aus der Liste vom
-    17.09., mit Speicher und Farbe) den Eintrag - derselbe Retry, den der
-    Listungsweg macht."""
+def test_vodafone_ipad_titel_trifft_keinen_eintrag():
+    """Die Launch-Kette bis zur Listung reisst beim iPad jetzt am Anfang ab
+    (29.09.2026: nur Smartphones): ohne Anlage aus dem strukturierten Namen
+    trifft der ZUSAMMENGESETZTE Vodafone-Titel (echt aus der Liste vom
+    17.09., mit Speicher und Farbe) keinen Eintrag - auch nicht fuzzig ein
+    iPhone des Katalogs."""
     katalog = _mini_katalog()
     autoerkennung.lege_an("iPad Pro 11 (2025)", katalog, "2026-09-18",
                           speicher_gb=256)
-    treffer = erkenne_geraet("iPad Pro 11 (2025) 256 GB Silber", katalog)
-    assert treffer is not None
-    assert treffer.device_id == device_id("Apple", "iPad Pro 11 (2025)")
+    assert erkenne_geraet("iPad Pro 11 (2025) 256 GB Silber", katalog) is None
 
 
-def test_watch_und_airpods_ohne_praefix_werden_angelegt():
+def test_watch_und_airpods_werden_nicht_mehr_angelegt():
     """Dieselben Familien in den Benennformen des Bestands: Watch-Modellnamen
-    (so stehen sie seit dem 17.09. im Auto-Katalog) und die AirPods-Titel
-    congstars. Mit Praefix liefen sie ueber den Praefix-Pfad - der Anker
-    traegt die Nennung OHNE nach."""
+    (so standen sie seit dem 17.09. im Auto-Katalog) und die AirPods-Titel
+    congstars - ohne UND mit Praefix. Seit 29.09.2026 (nur Smartphones)
+    wird keiner davon angelegt; „AirPods 5" war der Fall auf der Seite."""
     katalog = _mini_katalog()
     for name in ("Watch Ultra 4", "Watch Series 12 46 Aluminium",
-                 "AirPods 5", "AirPods Max 2", "AirPods Pro (3. Gen.)"):
-        assert autoerkennung.schale(name, katalog) == ("Apple", name)
+                 "AirPods 5", "AirPods Max 2", "AirPods Pro (3. Gen.)",
+                 "Apple Watch Ultra 4", "Apple AirPods 5"):
+        assert autoerkennung.schale(name, katalog) is None, name
+        assert autoerkennung.lege_an(name, katalog, _HEUTE) is None, name
+    assert [g for g in katalog.geraete if g.auto] == []
 
 
-def test_familien_anker_schlaegt_nicht_den_katalog():
-    """Hand schlaegt Auto, in beide Richtungen: kennt der Katalog die Reihe
-    EINDEUTIG - auch von einem ANDEREN Hersteller -, entscheidet er; kennt er
-    sie WIDERSPRUECHLICH, bleibt es beim Verwurf (nichts geraten). Der feste
-    Apple-Anker darf beides nicht ueberschreiben."""
+def test_serien_anker_ohne_praefix_eindeutig_und_widerspruechlich():
+    """Hand schlaegt Auto, in beide Richtungen - jetzt an einer Smartphone-
+    Reihe (29.09.2026; vorher „Watch 8", das seit dem Smartphone-Filter nie
+    mehr bis zum Anker kommt): kennt der Katalog die Reihe EINDEUTIG,
+    entscheidet er; kennt er sie WIDERSPRUECHLICH (zwei Hersteller), bleibt
+    es beim Verwurf - nichts geraten."""
     eindeutig_samsung = Katalog(geraete=[
-        Geraet(hersteller="Samsung", modell="Watch 7", generation=7)])
-    assert autoerkennung.schale("Watch 8", eindeutig_samsung) \
-        == ("Samsung", "Watch 8")
+        Geraet(hersteller="Samsung", modell="Galaxy S25", generation=25)])
+    assert autoerkennung.schale("Galaxy S26", eindeutig_samsung) \
+        == ("Samsung", "Galaxy S26")
 
     zweideutig = Katalog(geraete=[
-        Geraet(hersteller="Samsung", modell="Watch 7", generation=7),
-        Geraet(hersteller="Apple", modell="Watch 9", generation=9)])
-    assert autoerkennung.schale("Watch 8", zweideutig) is None
-    assert autoerkennung.lege_an("Watch 8", zweideutig, _HEUTE) is None
+        Geraet(hersteller="Samsung", modell="Galaxy S25", generation=25),
+        Geraet(hersteller="Acme", modell="Galaxy S9", generation=9)])
+    assert autoerkennung.schale("Galaxy S26", zweideutig) is None
+    assert autoerkennung.lege_an("Galaxy S26", zweideutig, _HEUTE) is None
+
+    # Der Smartphone-Filter steht VOR dem Anker: auch eine Reihe, die der
+    # Katalog eindeutig kennt, wird nicht angelegt, wenn sie kein
+    # Smartphone benennt (Gegenprobe zur alten „Watch 8"-Zeile).
+    samsung_uhr = Katalog(geraete=[
+        Geraet(hersteller="Samsung", modell="Watch 7", generation=7)])
+    assert autoerkennung.schale("Watch 8", samsung_uhr) is None
 
 
 def test_hmd_und_router_bleiben_anker_luecken():

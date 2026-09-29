@@ -793,7 +793,8 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
                     heute: str, waechter: RobotsWaechter,
                     jetzt: Optional[datetime] = None,
                     frist_bis: Optional[float] = None,
-                    uhr: Optional[Callable[[], datetime]] = None
+                    uhr: Optional[Callable[[], datetime]] = None,
+                    vorrang: frozenset = frozenset()
                     ) -> Anbieterbilanz:
     """Einen Anbieter abarbeiten. Wirft nie - Fehler stehen in der Bilanz.
 
@@ -925,7 +926,8 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
                                    heute, bilanz)
                 if adapter.vertiefe_buendel is not None and gemappt:
                     gemappt = _vertiefe(adapter, anbieter, einstieg,
-                                        gemappt, _hole, frist_bis, katalog,
+                                        gemappt, _hole, frist_bis, vorrang,
+                                        katalog,
                                         farben, heute, bilanz)
                 bilanz.buendel.extend(gemappt)
             except GeraeteAbrufFehler as exc:
@@ -1146,8 +1148,31 @@ def _uebernimm(rohsaetze, anbieter, einstieg, quelle_url: str, katalog: Katalog,
                  "quelle": quellen.get(id(listung), "")})
 
 
+def vorrang_zuerst(saetze: list, katalog: Katalog,
+                   vorrang: frozenset = frozenset()) -> list:
+    """Reihenfolge der Vertiefung: erst die Pflichtmodelle (*vorrang*), dann
+    nach Marktstart, neueste zuerst; ohne Marktstart zuletzt. Endet die
+    Vertiefung an der Frist, fehlen dann Altmodelle und nicht das iPhone 18
+    Pro (o2, Lauf vom 29.09.2026: 32 von 75 Geraeten vertieft, in
+    Seitenreihenfolge). Der Marktstart allein reicht nicht: die neuesten
+    Modelle stehen oft ohne ihn im Katalog (Auto-Eintraege)."""
+    def schluessel(satz: dict) -> tuple:
+        sku = str(satz.get("sku_id") or "")
+        # Laengster Treffer: "google-pixel-11-pro-xl-…" ist auch ein
+        # Praefix-Treffer fuer "google-pixel-11-pro".
+        treffer = [g for g in katalog.geraete
+                   if sku.startswith(g.device_id + "-")]
+        if not treffer:
+            return (False, "")
+        geraet = max(treffer, key=lambda g: len(g.device_id))
+        return (geraet.device_id in vorrang, geraet.marktstart or "")
+    # Stabil sortiert: bei gleichem Schluessel bleibt die Seitenreihenfolge.
+    return sorted(saetze, key=schluessel, reverse=True)
+
+
 def _vertiefe(adapter, anbieter, einstieg, gemappt: list, hole_text: Callable,
-              frist_bis: Optional[float], katalog: Katalog, farben: dict,
+              frist_bis: Optional[float], vorrang: frozenset,
+              katalog: Katalog, farben: dict,
               heute: str, bilanz: Anbieterbilanz) -> list:
     """Die Vertiefung eines Buendel-Einstiegs (siehe `Adapter`).
 
@@ -1162,8 +1187,10 @@ def _vertiefe(adapter, anbieter, einstieg, gemappt: list, hole_text: Callable,
         return frist_bis is None or time.monotonic() <= frist_bis
 
     try:
-        tief = adapter.vertiefe_buendel(hole_text, gemappt, weiter,
-                                        zaehler) or []
+        tief = adapter.vertiefe_buendel(hole_text,
+                                        vorrang_zuerst(gemappt, katalog,
+                                                       vorrang),
+                                        weiter, zaehler) or []
     except Exception as exc:                          # noqa: BLE001
         log.warning("%s: Buendel-Vertiefung gescheitert (%s: %s)",
                     anbieter.name, type(exc).__name__, str(exc)[:160])
@@ -1351,8 +1378,12 @@ _MINDEST_JE_ANBIETER = 120.0
 def sammle(quellen, katalog: Katalog, farben: dict, hole: Callable, heute: str,
            jetzt: Optional[datetime] = None,
            frist_sekunden: Optional[float] = None,
-           uhr: Optional[Callable[[], datetime]] = None) -> dict:
+           uhr: Optional[Callable[[], datetime]] = None,
+           vorrang: frozenset = frozenset()) -> dict:
     """Den ganzen Beobachtungsraum abarbeiten.
+
+    `vorrang`: device_ids, die eine Vertiefung zuerst bekommt (die
+    Pflichtmodelle aus `config/geraete_abdeckung.yaml`).
 
     Sequenziell, nicht nebenlaeufig: die Bremse ist ohnehin der Abstand je
     Domain (bei Medimax und ep.de zehn Sekunden aus ihrer eigenen
@@ -1408,7 +1439,7 @@ def sammle(quellen, katalog: Katalog, farben: dict, hole: Callable, heute: str,
                                      rest - nach_mir * _MINDEST_JE_ANBIETER))
         bilanzen.append(sammle_anbieter(
             anbieter, katalog, farben, hole, heute, waechter, jetzt,
-            eigene_frist, uhr=uhr))
+            eigene_frist, uhr=uhr, vorrang=vorrang))
     return {
         "anbieter": bilanzen,
         "listungen": [l for b in bilanzen for l in b.listungen],
