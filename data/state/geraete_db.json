@@ -2,8 +2,8 @@
  "updated": "2026-09-29",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 42,
-   "funde_gesamt": 184,
+   "laeufe": 43,
+   "funde_gesamt": 188,
    "letzter_lauf": "2026-09-29",
    "letzte_funde": 4,
    "letzter_fund": "2026-09-29",
@@ -117,8 +117,8 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 40,
-   "funde_gesamt": 6642,
+   "laeufe": 41,
+   "funde_gesamt": 6823,
    "letzter_lauf": "2026-09-29",
    "letzte_funde": 181,
    "termine": [
@@ -232,8 +232,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 40,
-   "funde_gesamt": 2675,
+   "laeufe": 41,
+   "funde_gesamt": 2744,
    "letzter_lauf": "2026-09-29",
    "letzte_funde": 69,
    "termine": [
@@ -339,7 +339,7 @@
      "2026-09-29",
      69,
      "gelesen",
-     1669,
+     1847,
      0,
      null
     ]
@@ -348,8 +348,8 @@
   },
   "mobilcom-debitel": {
    "laeufe": 5,
-   "funde_gesamt": 5028,
-   "letzte_funde": 84,
+   "funde_gesamt": 5120,
+   "letzte_funde": 92,
    "termine": [
     "2026-08-29",
     "2026-08-30",
@@ -451,15 +451,15 @@
     ],
     [
      "2026-09-29",
-     84,
+     92,
      "lesefehler",
      0,
-     27,
-     3
+     29,
+     4
     ]
    ],
    "letzter_lauf": "2026-09-29",
-   "tote_adressen": 3
+   "tote_adressen": 4
   },
   "ElectronicPartner": {
    "laeufe": 1,
@@ -629,8 +629,8 @@
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 24,
-   "funde_gesamt": 4456,
+   "laeufe": 25,
+   "funde_gesamt": 4596,
    "letzter_lauf": "2026-09-29",
    "letzte_funde": 140,
    "termine": [
@@ -738,8 +738,8 @@
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 32,
-   "funde_gesamt": 1146,
+   "laeufe": 33,
+   "funde_gesamt": 1182,
    "letzter_lauf": "2026-09-29",
    "letzte_funde": 36,
    "termine": [
@@ -920,8 +920,8 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 28,
-   "funde_gesamt": 572,
+   "laeufe": 29,
+   "funde_gesamt": 590,
    "letzter_lauf": "2026-09-29",
    "letzte_funde": 18,
    "termine": [
