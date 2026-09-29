@@ -86,23 +86,29 @@ def _wahl(url: str, daten: dict) -> dict:
 
 def _erwartet(daten, wahl):
     r = gk.rangliste(daten, wahl["modell"], wahl["stufe"], wahl["raten"])
-    zeilen = []
-    for i, g in enumerate(r["gruppen"]):
-        zeilen.append(("kopf", f"Kosten über {g['monate']} Monate", ""))
-        erste = i == 0 and g["monate"] == gk.HORIZONT
-        zeilen += [(z["anbieter"], euro(z["angebot"]["gesamt"]),
-                    "günstigste" if z["sieger"] else
-                    ("+" + euro(z["abstand"])) if z["abstand"] is not None
-                    else "einziges Angebot" if erste and j == 0 else "")
-                   for j, z in enumerate(g["zeilen"])]
-    if not r["gruppen"]:
-        zeilen.append(("kopf", f"Kosten über {gk.HORIZONT} Monate", ""))
+
+    def zeilen_von(g, haupt):
+        einzig = haupt and len(g["zeilen"]) == 1 and not r["anders"]
+        return [(z["anbieter"], euro(z["angebot"]["gesamt"]),
+                 "günstigste" if z["sieger"] else
+                 ("+" + euro(z["abstand"])) if z["abstand"] is not None
+                 else "einziges Angebot" if einzig else "")
+                for z in g["zeilen"]]
+
+    zeilen = [("kopf", f"Kosten über {gk.HORIZONT} Monate", "")]
+    for g in r["gruppen"]:
+        if g["monate"] == gk.HORIZONT:
+            zeilen += zeilen_von(g, True)
     if r["anders"]:
         zeilen.append(("anders", " | ".join(
             f"{x['anbieter']} · {n} Raten →" for x in r["anders"]
             for n in x["raten"]), ""))
     if r["ohne"]:
         zeilen.append(("ohne", " · ".join(r["ohne"]), "—"))
+    for g in r["gruppen"]:
+        if g["monate"] != gk.HORIZONT:
+            zeilen.append(("kopf", f"Kosten über {g['monate']} Monate", ""))
+            zeilen += zeilen_von(g, False)
     return zeilen
 
 
@@ -161,7 +167,11 @@ def test_telefon_waehlt_das_geraet_aus_der_liste(seite):
     page = browser.new_page(viewport={"width": 390, "height": 844})
     page.goto(f"{basis}/geraete.html")
     assert not page.is_visible('.kv-reihe[data-wahl="familie"]')
-    ziel = next(f for f in daten["geraete"] if f["hersteller"] == "Samsung")
+    ziel = [f for f in daten["geraete"] if f["hersteller"] == "Samsung"][1]
+    page.click('.kv-reihe[data-wahl="hersteller"] [data-wert="Samsung"]')
+    # Die Liste zeigt nur die Geräte der gewählten Marke.
+    ids = page.eval_on_selector_all("#kv-geraet option", "os => os.map(o => o.value)")
+    assert ids == [f["id"] for f in daten["geraete"] if f["hersteller"] == "Samsung"]
     page.select_option("#kv-geraet", ziel["id"])
     wahl = _pruefe(page, daten)
     assert wahl["modell"] in {s["modell"] for s in ziel["speicher"]}
@@ -315,4 +325,43 @@ def test_neues_geraet_oeffnet_mit_dem_kleinsten_speicher(seite):
     page.evaluate("f => grKosten.waehle('familie', f)", ziel["id"])
     assert _wahl(page.url, daten)["modell"] == ziel["speicher"][0]["modell"]
     _pruefe(page, daten)
+    page.close()
+
+
+_UEBERLAPPUNG = """() => {
+    // Die Teile der Infozeile einzeln: ein nicht umbrechender Teil ragt
+    // aus seinem Behälter, dessen Box bliebe unauffällig.
+    const teile = '.kv-anb, .kv-info > span, .kv-summe, .kv-abstand';
+    const fehler = [];
+    document.querySelectorAll('#kv-ergebnis .kv-zeile').forEach(z => {
+        const boxen = [...z.querySelectorAll(teile)]
+            .filter(e => e.textContent.trim())
+            .map(e => [e.className, e.getBoundingClientRect()]);
+        for (let i = 0; i < boxen.length; i++)
+            for (let j = i + 1; j < boxen.length; j++) {
+                const a = boxen[i][1], b = boxen[j][1];
+                if (a.left < b.right - 1 && b.left < a.right - 1 &&
+                    a.top < b.bottom - 1 && b.top < a.bottom - 1)
+                    fehler.push(z.dataset.anbieter + ': ' + boxen[i][0] + ' / ' + boxen[j][0]);
+            }
+    });
+    return fehler;
+}"""
+
+
+@pytest.mark.parametrize("breite", [390, 1440])
+def test_keine_zeile_ueberlappt_sich(seite, breite):
+    """Prüfer Runde 7: "Stand 14.09." lag am Telefon über "einziges
+    Angebot". Geprüft über alle Geräte mit veraltetem Stand und je zwei
+    Stufen, nicht nur an der Startansicht."""
+    browser, basis, daten = seite
+    page = browser.new_page(viewport={"width": breite, "height": 900})
+    faelle = []
+    for modell, liste in daten["angebote"].items():
+        if any(not a["frisch"] for a in liste):
+            faelle += [(modell, s) for s in sorted({a["stufe"] for a in liste})[:2]]
+    assert faelle, "kein Gerät mit veraltetem Stand - Gegenprobe fehlt"
+    for modell, stufe in faelle:
+        page.goto(f"{basis}/geraete.html?modell={modell}&band={stufe}&raten=alle")
+        assert page.evaluate(_UEBERLAPPUNG) == [], (modell, stufe)
     page.close()

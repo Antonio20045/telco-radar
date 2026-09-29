@@ -291,3 +291,16 @@ def test_rechenweg_nennt_faktoren_nur_wenn_sie_aufgehen(echte_seite):
                     assert round(int(anzahl) * wert, 2) == p["betrag"], p
                     geprueft += 1
     assert geprueft > 50
+
+
+def test_unbegrenzter_tarif_ohne_volumen_nennt_unbegrenzt():
+    karte = _karte("o2", 1758.76, band=None)
+    karte["tarif"] = "O2 Mobile Unlimited M Plus"
+    karte["band_gb_text"] = ""
+    d = _daten([karte, _karte("congstar", 1700.0)])
+    oben = d["stufen"][-1]["key"]
+    a = [x for x in d["angebote"]["apple-iphone-18-pro-256"] if x["anbieter"] == "o2"]
+    assert [(x["stufe"], x["gb"]) for x in a] == [(oben, "unbegrenzt")]
+    # Gegenprobe: ein Tarif mit Volumen behält seine Zahl.
+    c = [x for x in d["angebote"]["apple-iphone-18-pro-256"] if x["anbieter"] == "congstar"]
+    assert c[0]["gb"] != "unbegrenzt"

@@ -3835,9 +3835,9 @@ var grKosten = (function () {
       (a.raten ? '<span class="kv-raten">' + a.raten + '&nbsp;Raten</span>' : '') +
       (!a.frisch && a.stand_kurz ? '<span class="kv-alt">Stand&nbsp;' +
       esc(a.stand_kurz) + '</span>' : '') + '</span>' +
-      '<span class="kv-summe">' + betrag(a.gesamt) + '</span><span class="kv-abstand">' +
+      '<span class="kv-summe">' + betrag(a.gesamt) + '</span><span class="kv-abstand' + (z.einzig ? ' kv-abstand--einzig' : '') + '">' +
       (z.sieger ? 'günstigste' : z.abstand !== null ? '+' + euro(z.abstand)
-        : z.erste ? 'einziges Angebot' : '') +
+        : z.einzig ? 'einziges Angebot' : '') +
       '</span><span class="kv-pfeil" aria-hidden="true"></span></summary>' +
       '<div class="kv-weg"><table>';
     a.posten.forEach(function (p) {
@@ -3847,30 +3847,24 @@ var grKosten = (function () {
     h += '<tr class="kv-weg-summe"><th>Gesamt</th><td class="kv-weg-mal"></td><td>' +
       euro(a.gesamt) + '</td></tr></table>';
     if (a.url) h += '<a class="kv-quelle" href="' + esc(a.url) +
-      '" rel="nofollow noopener" target="_blank">' +
-      (a.tarif ? esc(a.tarif) + ' bei ' : 'Angebot bei ') + esc(z.anbieter) + ' ↗</a>';
+      '" rel="nofollow noopener" target="_blank">Angebot bei ' + esc(z.anbieter) + ' ↗</a>';
     return h + '</div></details></li>';
   }
 
+  /* wie das Makro ergebnis() der Vorlage: Hauptliste, Umschalter,
+     Luecken, ganz unten zugeklappt ein anderer Zeitraum */
   function ergebnis(r) {
-    var h = r.gruppen.map(function (g, i) {
-      var liste = '<ol class="kv-liste">' + g.zeilen.map(function (z, j) {
-        z.erste = i === 0 && j === 0 && g.monate === HORIZONT;
+    function liste(g, haupt) {
+      return '<ol class="kv-liste">' + g.zeilen.map(function (z, j) {
+        z.erste = haupt && j === 0;
+        z.einzig = z.erste && g.zeilen.length === 1 && !r.anders.length;
         return zeile(z);
       }).join('') + '</ol>';
-      if (g.monate === HORIZONT)
-        return '<section class="kv-gruppe"><h2 class="kv-kopfzeile">Kosten über ' +
-          g.monate + ' Monate</h2>' + liste + '</section>';
-      /* wie die Vorlage: ein anderer Zeitraum steht zugeklappt darunter */
-      return '<details class="kv-gruppe kv-gruppe--neben"><summary class="kv-neben-kopf">' +
-        '<h2 class="kv-kopfzeile">Kosten über ' + g.monate + ' Monate</h2>' +
-        '<span class="kv-neben-namen">' + g.zeilen.map(function (z) {
-          return esc(z.anbieter); }).join(' · ') +
-        '</span><span class="kv-pfeil" aria-hidden="true"></span></summary>' +
-        liste + '</details>';
-    }).join('');
-    if (!r.gruppen.length) h = '<section class="kv-gruppe"><h2 class="kv-kopfzeile">Kosten über ' +
-      HORIZONT + ' Monate</h2></section>';
+    }
+    var h = '<section class="kv-gruppe"><h2 class="kv-kopfzeile">Kosten über ' +
+      HORIZONT + ' Monate</h2>';
+    r.gruppen.forEach(function (g) { if (g.monate === HORIZONT) h += liste(g, true); });
+    h += '</section>';
     if (r.anders.length) {
       h += '<p class="kv-anders">';
       r.anders.forEach(function (x) {
@@ -3883,6 +3877,15 @@ var grKosten = (function () {
     }
     if (r.ohne.length) h += '<p class="kv-ohne"><span class="kv-ohne-namen">' +
       r.ohne.map(esc).join(' · ') + '</span><span class="kv-summe">—</span></p>';
+    r.gruppen.forEach(function (g) {
+      if (g.monate === HORIZONT) return;
+      h += '<details class="kv-gruppe kv-gruppe--neben"><summary class="kv-neben-kopf">' +
+        '<h2 class="kv-kopfzeile">Kosten über ' + g.monate + ' Monate</h2>' +
+        '<span class="kv-neben-namen">' + g.zeilen.map(function (z) {
+          return esc(z.anbieter); }).join(' · ') +
+        '</span><span class="kv-pfeil" aria-hidden="true"></span></summary>' +
+        liste(g, false) + '</details>';
+    });
     return h;
   }
 
@@ -3957,8 +3960,17 @@ var grKosten = (function () {
     fam.speicher.forEach(function (s) { if (s.modell === wahl.modell) sp = s; });
     document.getElementById('kv-titel').innerHTML =
       esc(fam.name) + ' <span>' + esc(sp.text) + '</span>';
+    /* die Auswahlliste am Telefon zeigt die Geraete der gewaehlten Marke,
+       wie `ansicht()["auswahl"]` */
     var liste = document.getElementById('kv-geraet');
-    if (liste) liste.value = fam.id;
+    if (liste) {
+      liste.innerHTML = D.geraete.filter(function (f) {
+        return f.hersteller === fam.hersteller;
+      }).map(function (f) {
+        return '<option value="' + esc(f.id) + '">' + esc(f.name) + '</option>';
+      }).join('');
+      liste.value = fam.id;
+    }
     var r = reihen(wahl);
     Object.keys(r).forEach(function (name) {
       var el = document.querySelector('.kv-reihe[data-wahl="' + name + '"] .kv-chips');

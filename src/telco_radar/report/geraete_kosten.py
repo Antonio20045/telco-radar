@@ -104,8 +104,8 @@ def _posten(karte: dict) -> list:
         name = p["name"]
         rang = 9
         if art == "tarif":
-            # Der Produktname des Tarifs ("Allnet Flat S") steht am Link zum
-            # Angebot; hier hieße er unter der Stufe M "S" und verwirrte.
+            # Nicht der Produktname: "Allnet Flat S" unter der Stufe M
+            # verwirrte in drei Prüfrunden; die Zeile nennt das Volumen.
             name, rang = "Tarif", 1
             wert = tarif
         elif art == "raten":
@@ -115,7 +115,11 @@ def _posten(karte: dict) -> list:
             name, rang = "Tarif mit Gerät", 2
             wert = buendel
         elif art == "restschuld":
-            name, rang = f"Restschuld nach Monat {HORIZONT}", 4
+            # Beim Bündel (1&1) enthalten die Monate danach auch den Tarif;
+            # "Restschuld" hieße dort nur Gerät.
+            name = (f"Restschuld nach Monat {HORIZONT}" if rate is not None
+                    else f"Tarif mit Gerät ab Monat {HORIZONT + 1}")
+            rang = 4
             wert = rate if rate is not None else buendel
         elif name == "Gerätezuzahlung":
             name, wert, rang = "Anzahlung", None, 0
@@ -204,7 +208,12 @@ def aufbereiten(tco: dict, geraete_katalog=None) -> dict:
             stufe = _stufe(karte, oberste)
             if stufe is None:
                 continue
-            liste.append(_angebot(karte, stufe))
+            angebot = _angebot(karte, stufe)
+            if not angebot["gb"] and stufe == oberste and oberste:
+                # Ohne Volumenangabe steht ein Tarif nur wegen "unlimited"
+                # in der obersten Stufe; das sagt die Zeile dann auch.
+                angebot["gb"] = "unbegrenzt"
+            liste.append(angebot)
         if not liste:
             continue
         angebote[modell["id"]] = _nur_guenstigste(liste)
@@ -428,19 +437,17 @@ def ansicht(daten: dict, wahl: dict, alle_familien: bool = False) -> dict:
             # Die erste Zahl der Seite ist immer die größte, auch wenn
             # nur ein Anbieter da ist und es keinen "günstigsten" gibt.
             z["erste"] = i == 0 and j == 0 and gruppe["monate"] == HORIZONT
+            # "einziges Angebot" nur, wenn auch kein Ratenfilter einen
+            # weiteren Anbieter ausblendet.
+            z["einzig"] = (z["erste"] and len(gruppe["zeilen"]) == 1
+                           and not rang["anders"])
             z["stil"] = stil.get(z["anbieter"], {
                 "farbe": farbe_fuer(z["anbieter"]), "eigen": False})
     return {"titel": fam["name"], "speicher": sp["text"], "reihen": reihen,
             "gruppen": rang["gruppen"], "anders": rang["anders"],
             "ohne": rang["ohne"],
-            "auswahl": auswahl_liste(daten)}
-
-
-def auswahl_liste(daten: dict) -> list:
-    """Alle Geräte je Marke für die Auswahlliste am Telefon."""
-    return [{"hersteller": h, "geraete": [f for f in daten["geraete"]
-                                          if f["hersteller"] == h]}
-            for h in daten["hersteller"]]
+            "auswahl": [f for f in daten["geraete"]
+                        if f["hersteller"] == fam["hersteller"]]}
 
 
 def seite(tco: dict, geraete_katalog=None) -> dict:

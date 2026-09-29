@@ -4261,7 +4261,7 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
 .kv-info>span{white-space:nowrap}
 .kv-gb{font-weight:700;color:var(--ink)}
 .kv-gb{min-width:64px}
-.kv-alt{color:var(--al-mittel);font-weight:700}
+.kv-alt{color:var(--ink-3);font-weight:700}
 .kv-summe{font-family:var(--serif);font-weight:700;font-size:28px;line-height:1;
   text-align:right;color:var(--ink);white-space:nowrap;
   font-variant-numeric:tabular-nums}
@@ -4269,6 +4269,7 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
 .kv-abstand{font-family:var(--sans);font-size:13px;font-weight:700;
   color:var(--ink-3);text-align:right;white-space:nowrap}
 .kv-zeile--eigen .kv-abstand{color:var(--red)}
+.kv-zeile .kv-abstand--einzig{color:var(--ink-3);font-weight:600}
 .kv-pfeil{align-self:center}
 .kv-pfeil::before{content:"";display:block;width:7px;height:7px;
   border-right:2px solid var(--ink-3);border-bottom:2px solid var(--ink-3);
@@ -4347,8 +4348,8 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
     grid-template-areas:"anb summe pfeil" "info abstand pfeil";
     row-gap:6px;column-gap:10px;padding:14px 6px 14px 10px}
   .kv-anb{grid-area:anb}
-  .kv-info{grid-area:info;display:block}
-  .kv-info>span+span::before{content:" · "}
+  .kv-info{grid-area:info;display:flex;flex-wrap:wrap;column-gap:0}
+  .kv-info>span+span::before{content:"·";margin:0 5px}
   .kv-info{font-size:13px}
   .kv-gb{min-width:0}
   .kv-summe{grid-area:summe;font-size:24px}

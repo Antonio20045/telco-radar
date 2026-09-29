@@ -24,7 +24,7 @@
       <span class="kv-anb">{{ z.anbieter }}</span>
       <span class="kv-info"><span class="kv-gb">{{ a.gb }}</span>{% if a.raten %}<span class="kv-raten">{{ a.raten }}&nbsp;Raten</span>{% endif %}{% if not a.frisch and a.stand_kurz %}<span class="kv-alt">Stand&nbsp;{{ a.stand_kurz }}</span>{% endif %}</span>
       <span class="kv-summe">{{ betrag(a.gesamt) }}</span>
-      <span class="kv-abstand">{% if z.sieger %}günstigste{% elif z.abstand is not none %}+{{ z.abstand | euro }}{% elif z.erste %}einziges Angebot{% endif %}</span>
+      <span class="kv-abstand{% if z.einzig %} kv-abstand--einzig{% endif %}">{% if z.sieger %}günstigste{% elif z.abstand is not none %}+{{ z.abstand | euro }}{% elif z.einzig %}einziges Angebot{% endif %}</span>
       <span class="kv-pfeil" aria-hidden="true"></span>
     </summary>
     <div class="kv-weg">
@@ -35,7 +35,7 @@
         <tr class="kv-weg-summe"><th>Gesamt</th><td class="kv-weg-mal"></td><td>{{ a.gesamt | euro }}</td></tr>
       </table>
       {%- if a.url %}
-      <a class="kv-quelle" href="{{ a.url }}" rel="nofollow noopener" target="_blank">{% if a.tarif %}{{ a.tarif }} bei {% else %}Angebot bei {% endif %}{{ z.anbieter }} ↗</a>
+      <a class="kv-quelle" href="{{ a.url }}" rel="nofollow noopener" target="_blank">Angebot bei {{ z.anbieter }} ↗</a>
       {%- endif %}
     </div>
   </details>
@@ -43,33 +43,17 @@
 {%- endmacro %}
 
 {% macro ergebnis(ansicht, horizont) -%}
-{%- for g in ansicht.gruppen %}
-{%- if g.monate == horizont %}
-<section class="kv-gruppe">
-  <h2 class="kv-kopfzeile">Kosten über {{ g.monate }} Monate</h2>
-  <ol class="kv-liste">
-    {%- for z in g.zeilen %}
-    {{ kv_zeile(z) }}
-    {%- endfor %}
-  </ol>
-</section>
-{%- else %}
-{#- Ein anderer Zeitraum ist mit der Hauptliste nicht vergleichbar: er
-    steht zugeklappt darunter, ohne Betrag im Blick. #}
-<details class="kv-gruppe kv-gruppe--neben">
-  <summary class="kv-neben-kopf"><h2 class="kv-kopfzeile">Kosten über {{ g.monate }} Monate</h2><span class="kv-neben-namen">{{ g.zeilen | map(attribute='anbieter') | join(' · ') }}</span><span class="kv-pfeil" aria-hidden="true"></span></summary>
-  <ol class="kv-liste">
-    {%- for z in g.zeilen %}
-    {{ kv_zeile(z) }}
-    {%- endfor %}
-  </ol>
-</details>
-{%- endif %}
-{%- else %}
+{%- set haupt = ansicht.gruppen | selectattr('monate', 'equalto', horizont) | list %}
 <section class="kv-gruppe">
   <h2 class="kv-kopfzeile">Kosten über {{ horizont }} Monate</h2>
+  {%- for g in haupt %}
+  <ol class="kv-liste">
+    {%- for z in g.zeilen %}
+    {{ kv_zeile(z) }}
+    {%- endfor %}
+  </ol>
+  {%- endfor %}
 </section>
-{%- endfor %}
 {%- if ansicht.anders %}
 <p class="kv-anders">
   {%- for x in ansicht.anders %}{% for r in x.raten %}
@@ -80,6 +64,18 @@
 {%- if ansicht.ohne %}
 <p class="kv-ohne"><span class="kv-ohne-namen">{{ ansicht.ohne | join(' · ') }}</span><span class="kv-summe">—</span></p>
 {%- endif %}
+{%- for g in ansicht.gruppen if g.monate != horizont %}
+{#- Ein anderer Zeitraum ist mit der Hauptliste nicht vergleichbar: er
+    steht zugeklappt ganz unten, ohne Betrag im Blick. #}
+<details class="kv-gruppe kv-gruppe--neben">
+  <summary class="kv-neben-kopf"><h2 class="kv-kopfzeile">Kosten über {{ g.monate }} Monate</h2><span class="kv-neben-namen">{{ g.zeilen | map(attribute='anbieter') | join(' · ') }}</span><span class="kv-pfeil" aria-hidden="true"></span></summary>
+  <ol class="kv-liste">
+    {%- for z in g.zeilen %}
+    {{ kv_zeile(z) }}
+    {%- endfor %}
+  </ol>
+</details>
+{%- endfor %}
 {%- endmacro %}
 
 {% macro chips(name, label, eintraege) -%}
@@ -106,12 +102,8 @@
     <label class="kv-reihe kv-reihe--liste">
       <span class="kv-reihe-name">Gerät</span>
       <select id="kv-geraet">
-        {%- for m in kv.ansicht.auswahl %}
-        <optgroup label="{{ m.hersteller }}">
-          {%- for f in m.geraete %}
-          <option value="{{ f.id }}"{% if f.id == kv.start.familie %} selected{% endif %}>{{ f.name }}</option>
-          {%- endfor %}
-        </optgroup>
+        {%- for f in kv.ansicht.auswahl %}
+        <option value="{{ f.id }}"{% if f.id == kv.start.familie %} selected{% endif %}>{{ f.name }}</option>
         {%- endfor %}
       </select>
     </label>
