@@ -618,6 +618,16 @@ anbieter:
       # (Mindestlaufzeit 24 Monate): 14,99 €"). Im Betrieb werden diese
       # Seiten NICHT abgerufen - 66 Seiten a rund 950 KB fuer eine
       # Aufteilung, die schon in der einen Katalogantwort steht.
+      #
+      # SEIT DEM 29.09.2026 WIRD VERTIEFT (`o2.vertiefe_buendel`): der
+      # Katalog nennt je Geraet nur EIN Buendel (ein Speicher, ein Tarif,
+      # 36 Raten). Von jeder verlinkten Produktseite aus folgt der Sammler
+      # den Speicher- und Laufzeitschaltern, die die Seite selbst nennt
+      # (GET /e-shop/rest/configuration/<id>, derselbe Medientyp), und
+      # liest alle zwoelf Tarife je Antwort. Abrufe: je Geraet Speicher x
+      # 2 Laufzeiten, einmal 11 fuer den Referenzdurchlauf der Tarife.
+      # Er laeuft gegen die Frist des Anbieters; was sie abschneidet, steht
+      # in `gedeckelt`, die Katalogbuendel bleiben.
       - url: https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__
         label: Geraetekatalog mit Tarif
         kind: buendel

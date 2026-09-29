@@ -349,6 +349,45 @@
       "gzip": false,
       "absender": "TelcoRadar/1.0",
       "bytes_abgelegt": 23653
+    },
+    {
+      "datei": "o2_vertiefung_iphone17pro.json.gz",
+      "url": "https://www.o2online.de/e-shop/apple/... (Produktseite aus dem Buendelkatalog) und 14 x https://www.o2online.de/e-shop/rest/configuration/<id>",
+      "abgerufen_am": "2026-09-29",
+      "http_status": 200,
+      "content_type": "application/vnd.commerce.message+json",
+      "bytes_roh": 199220,
+      "sha256_roh": "b8b7a863d74b286592138c30a4e06ea48704a9cc371c0f0645e5a6cffebb99aa",
+      "gzip": true,
+      "absender": "TelcoRadar/1.0",
+      "bytes_abgelegt": 7263,
+      "hinweis": "GEKUERZT, nicht byteidentisch: 15 echte Antworten der o2-Vertiefung (1 Produktseite, 14 Konfigurationsantworten) plus der Katalogeintrag \"Apple iPhone 17 Pro\" aus dem Buendelkatalog, alle vom 29.09.2026. Jede Antwort ist auf die gelesenen Felder gekuerzt (pageValue: offerName, Speicher-/Laufzeit-/Tarifschalter samt Links und monthlyCharges, priceSummary, metric2-5, dimension59), Werte unveraendert. URL, Status, Groesse und sha256 jeder UNGEKUERZTEN Antwort stehen in der Datei selbst unter \"herkunft\"."
+    },
+    {
+      "datei": "o2_tarifdurchlauf_xiaomi17.json.gz",
+      "url": "https://www.o2online.de/e-shop/rest/configuration/<id> (22 Adressen, verlinkt von der Produktseite Xiaomi 17)",
+      "abgerufen_am": "2026-09-29",
+      "http_status": 200,
+      "content_type": "application/vnd.commerce.message+json",
+      "bytes_roh": 229686,
+      "sha256_roh": "524aa755945997f3998fbdcdb59ff60c18eeb1aea18eece36278055a6d9df570",
+      "gzip": true,
+      "absender": "TelcoRadar/1.0",
+      "bytes_abgelegt": 4599,
+      "hinweis": "GEKUERZT, nicht byteidentisch: 22 echte Konfigurationsantworten zu Xiaomi 17 512 GB (je Tarif und Laufzeit 24/36 eine, 29.09.2026), auf dieselben Felder gekuerzt wie o2_vertiefung_iphone17pro, Werte unveraendert. Beleg fuer den Befund \"Geraeterate und Anzahlung haengen nicht am Tarif\"."
+    },
+    {
+      "datei": "o2_vertiefung_iphone18pro.json.gz",
+      "url": "https://www.o2online.de/e-shop/apple/apple-iphone-18-pro-256gb-burgunder-details?... und 13 x https://www.o2online.de/e-shop/rest/configuration/<id>",
+      "abgerufen_am": "2026-09-29",
+      "http_status": 200,
+      "content_type": "application/vnd.commerce.message+json",
+      "bytes_roh": 164153,
+      "sha256_roh": "6f1a40f3659c36f42c03c7f19854967495eb91c27c242eed0d9a8bb92382acca",
+      "gzip": true,
+      "absender": "TelcoRadar/1.0",
+      "bytes_abgelegt": 7431,
+      "hinweis": "GEKUERZT wie o2_vertiefung_iphone17pro (29.09.2026): iPhone 18 Pro mit vier Speichern (256 GB bis 2 TB) und sieben Tarifen. Beleg fuer Terabyte im Angebotsnamen und fuer den Trackingblock, der der Preiszusammenfassung widerspricht (24 Raten: metric2 34,99, Zusammenfassung 24,99)."
     }
   ]
 }

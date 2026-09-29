@@ -210,8 +210,14 @@ def test_am_echten_bestand_traegt_jede_o2_zeile_ihre_zwei_laufzeiten():
                     anschlusspreis=satz.get("anschlusspreis"))
         e = tco_bindung(b)
         assert e.belastbar, f"{satz['id']} nicht belastbar: {e.luecken}"
-        assert e.bindung == 36 and e.tarif_bindung == 24
-        assert e.offen_nach_24 == round(satz["geraet_monatsrate"] * 12, 2)
+        # Seit der o2-Vertiefung (29.09.2026) liefert o2 24 UND 36 Raten.
+        # Die Bindung ist die gemessene Ratenlaufzeit, die Restschuld nach
+        # Monat 24 ihre offenen Raten - bei 24 Raten 0,00 EUR.
+        laufzeit = satz["laufzeit_monate"]
+        assert laufzeit in (24, 36), satz["id"]
+        assert e.bindung == laufzeit and e.tarif_bindung == 24
+        assert e.offen_nach_24 == round(
+            satz["geraet_monatsrate"] * (laufzeit - 24), 2)
         geprueft += 1
     assert geprueft == len(o2_saetze) >= 62, \
         "der Test muss ALLE o2-Saetze angefasst haben, sonst prueft er nichts"

@@ -147,6 +147,18 @@ class Adapter:
     buendel_auf_produktseite: bool = True
     loese_tarifnamen: Optional[Callable] = None
     ergaenze_buendel: Optional[Callable] = None
+    # `vertiefe_buendel(hole, rohsaetze, weiter, zaehler) -> list[rohsatz]`
+    # ist OPTIONAL und laeuft IN der Sammelphase, direkt nach `lies_buendel`
+    # eines `kind: buendel`-Einstiegs - mit dem gebremsten Abruf des
+    # Sammlers (robots, Abstand, Besuchszeit) und gegen dessen Frist
+    # (`weiter()`). Sie folgt den Links, die die Buendel selbst nennen
+    # (o2: Produktseite -> Speicher-, Laufzeit- und Tarifschalter), und
+    # liefert weitere Rohsaetze. Sie steht HIER und nicht in den Haken der
+    # Pipeline, weil ihre Saetze andere Speicher tragen und damit eine
+    # eigene `sku_id` brauchen - die entsteht nur hier (`_mit_sku`).
+    # `fuehre_zusammen(katalog, tief)` entfernt Doppel.
+    vertiefe_buendel: Optional[Callable] = None
+    fuehre_zusammen: Optional[Callable] = None
     # Ein Satz aus strukturierten Daten ist belegt, einer aus Fliesstext
     # geraten. Wer das hier vergisst, bekommt eine Listung, die sich selbst
     # als "mittel" ausweist, obwohl sie aus ld+json stammt.
@@ -466,6 +478,12 @@ def _registriere_anbieter_adapter() -> None:
     registriere("o2_katalog", Adapter(name="o2_katalog",
                                       lies=o2_modul.lies,
                                       lies_buendel=o2_modul.lies_buendel,
+                                      # 29.09.2026: jede Tarifstufe x
+                                      # Speicher x Laufzeit ueber die
+                                      # Schalter der Produktseite (o2.py,
+                                      # "DIE VERTIEFUNG").
+                                      vertiefe_buendel=o2_modul.vertiefe_buendel,
+                                      fuehre_zusammen=o2_modul.fuehre_zusammen,
                                       direkt=True))
     # Kein `ernte` noetig: die Sitemap traegt echte `<loc>`-Adressen, die
     # generische `ernte_links(kind="sitemap")` findet sie ohne Zutun. Nicht
@@ -902,9 +920,13 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
             try:
                 roh = adapter.lies_buendel(inhalt, einstieg.url,
                                            proben=bilanz.proben) or []
-                bilanz.buendel.extend(
-                    _mit_sku(roh, anbieter, einstieg, katalog, farben,
-                             heute, bilanz))
+                gemappt = _mit_sku(roh, anbieter, einstieg, katalog, farben,
+                                   heute, bilanz)
+                if adapter.vertiefe_buendel is not None and gemappt:
+                    gemappt = _vertiefe(adapter, anbieter, einstieg,
+                                        gemappt, _hole, frist_bis, katalog,
+                                        farben, heute, bilanz)
+                bilanz.buendel.extend(gemappt)
             except GeraeteAbrufFehler as exc:
                 # Laut, nicht still: eine Buendelantwort, die keine ist,
                 # heisst "das Nutzlastformat hat sich geaendert" - und ein
@@ -1112,6 +1134,48 @@ def _uebernimm(rohsaetze, anbieter, einstieg, quelle_url: str, katalog: Katalog,
             bilanz.unbekannt.append(
                 {"art": "farbe", "wert": listung.farbe_roh,
                  "quelle": quellen.get(id(listung), "")})
+
+
+def _vertiefe(adapter, anbieter, einstieg, gemappt: list, hole_text: Callable,
+              frist_bis: Optional[float], katalog: Katalog, farben: dict,
+              heute: str, bilanz: Anbieterbilanz) -> list:
+    """Die Vertiefung eines Buendel-Einstiegs (siehe `Adapter`).
+
+    Wirft nie: was die Vertiefung nicht schafft, fehlt als Zusatz, die
+    Katalogsaetze bleiben. Ein Abbruch an der Frist steht in
+    `bilanz.gedeckelt` und im Protokoll - er ist eine benannte Luecke, kein
+    stiller Rest.
+    """
+    zaehler: dict = {}
+
+    def weiter() -> bool:
+        return frist_bis is None or time.monotonic() <= frist_bis
+
+    try:
+        tief = adapter.vertiefe_buendel(hole_text, gemappt, weiter,
+                                        zaehler) or []
+    except Exception as exc:                          # noqa: BLE001
+        log.warning("%s: Buendel-Vertiefung gescheitert (%s: %s)",
+                    anbieter.name, type(exc).__name__, str(exc)[:160])
+        return gemappt
+    tief_gemappt = _mit_sku(tief, anbieter, einstieg, katalog, farben, heute,
+                            bilanz)
+    zusammen = (adapter.fuehre_zusammen(gemappt, tief_gemappt)
+                if adapter.fuehre_zusammen else gemappt + tief_gemappt)
+    log.info("%s: Buendel-Vertiefung %d Geraete, %d Abrufe, %d gemessen, "
+             "%d abgeleitet, %d Rohsaetze (%d mit Geraet), zusammen %d "
+             "(Zaehler %s)", anbieter.name, zaehler.get("geraete", 0),
+             zaehler.get("abrufe", 0), zaehler.get("gemessen", 0),
+             zaehler.get("abgeleitet", 0), len(tief), len(tief_gemappt),
+             len(zusammen), dict(sorted(zaehler.items())))
+    if zaehler.get("frist"):
+        bilanz.gedeckelt.append(
+            f"{einstieg.url}: Buendel-Vertiefung an der Frist beendet "
+            f"({zaehler.get('geraete', 0)} Geraete vertieft)")
+        log.warning("%s: Buendel-Vertiefung an der Frist beendet - %d "
+                    "Geraete vertieft", anbieter.name,
+                    zaehler.get("geraete", 0))
+    return zusammen
 
 
 def _mit_sku(rohsaetze, anbieter, einstieg, katalog: Katalog, farben: dict,
