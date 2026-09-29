@@ -86,7 +86,7 @@
   <h2 class="rubrik">Alle beobachteten Anbieter
     <span class="rubrik-zahl">21</span></h2>
   <div class="t-bilanz-reihe">
-    <div class="t-kennzahl"><b>5</b><span>liefern Geräte</span></div>
+    <div class="t-kennzahl"><b>6</b><span>liefern Geräte</span></div>
     <div class="t-kennzahl"><b>32</b><span>abgefragte Einstiegsseiten</span></div>
     <div class="t-kennzahl"><b>2</b><span>ohne Hardware-Vermarktung</span></div>
   </div>
@@ -221,14 +221,16 @@
   <td><code>vodafone_api</code></td>
   <td>
     
-    <span class="sdot unbekannt"></span> heute nicht gelesen
+    
+    <span class="sdot ok"></span>
+    liefert
     
   </td>
   <td class="num">182</td>
   <td class="gr-grund">
     
     
-    <b>zuletzt vollständig gelesen am 29.09.2026</b>
+    
     
     
     Eigene Referenz, nicht Teil der Wettbewerbsauswertung. Gemessen am 28.08.2026: die Liste nennt 51 Geraete, die Detailnutzlast je Geraet den Preis OHNE Vertrag je Variante (Speicher x Farbe). Der Befund vom 11.08.2026 - &#34;im Roh-HTML steht kein Preis&#34; - bleibt richtig; er gilt fuer die HTML-Seite, nicht fuer die Schnittstelle, die diese Seite selbst aufruft. api.vodafone.de hat keine robots.txt (HTTP 404). Buendel (Geraet plus Tarif): die Detailantwort traegt unter `atomics[].prices.composition` nur eine VORSCHAU von vier Angeboten je Variante (Mobil S/12, Mobil M/24, Mobil XS/36 Monate, FamilyCard XL) - gemessen am 29.09.2026. Alle Angebote (Mobil XS bis XL je mit 12/24/36 Monaten plus FamilyCard S-XL) nennt erst `/glados/v2/tariff/v2/hardware?hardwareId=&lt;Liste&gt;`, mit Klarnamen in `tariffName`; abgerufen wird sie einmal je Geraet mit allen `hardwareId` seiner Varianten. FamilyCard ist eine Zusatzkarte ohne eigenes Tarifblatt im Bestand und faellt in `tco_buendel` als &#34;ohne aufloesbaren Tarif&#34; heraus.
@@ -421,11 +423,11 @@
   </td>
   <td class="num">133</td>
   <td class="gr-grund">
-    <b>mobilcom-debitel: heute unvollständig erfasst – 92 Zeilen, am 28.09.2026 waren es 133 (31 % weniger).</b>
+    <b>mobilcom-debitel: heute unvollständig erfasst – 84 Zeilen, am 28.09.2026 waren es 133 (37 % weniger).</b>
     
     
     
-    <span class="gr-luecke">5 verlinkte Produktseiten gibt es nicht mehr</span>
+    <span class="gr-luecke">3 verlinkte Produktseiten gibt es nicht mehr</span>
     mobilcom-debitel.de leitet vollständig auf freenet.de - es ist derselbe Shop. Die Produktseite trägt neben dem Hauptangebot bis zu sieben Varianten mit eigenem Preis und eigener Farbe unter isSimilarTo, also genau die Granularität, die ein SKU-Radar braucht.
     
     <span class="gr-einstiege"><a href="https://www.freenet.de/sitemap.xml" rel="noopener">Sitemap (Smartphones ohne Vertrag)</a></span>
