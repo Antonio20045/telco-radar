@@ -44,7 +44,10 @@ def test_die_alt_url_liegt_genau_einmal_als_weiterleitung(tmp_path):
     treffer = [p for p in site.rglob("wettbewerbsradar.html")]
     assert len(treffer) == 1, [str(t.relative_to(site)) for t in treffer]
     inhalt = treffer[0].read_text(encoding="utf-8")
-    assert "url=geraete.html#tafel-radar" in inhalt
+    # Seit 29.09.2026 hat die Geräteseite keine Reiter mehr: das Ziel ist
+    # die Seite selbst, ohne Anker (Gegenprobe: kein alter Reiter-Anker).
+    assert 'url=geraete.html">' in inhalt
+    assert "#tafel-" not in inhalt
     assert "noindex" in inhalt
 
 

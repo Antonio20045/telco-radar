@@ -30,24 +30,18 @@ Dazu die zwei Kriterien der Runde vom 08.08.2026 (Suche und Differenzierung):
      bebilderte Karten - gemessen im Browser, weil die Seite ihren Index per
      fetch() laedt.
 
-Dazu das Kriterium des Geraeteradars (10.08.2026):
+Dazu die Kriterien der Geraeteseite, einer Kosten-Rangliste in section#kosten
+(die Reiter-Seite mit Tafeln und Zeitreihe ist ersetzt):
 
- 11. Der Geraeteradar traegt seine Reiter: kein Diagramm auf der Startansicht,
-     keine Reste der geloeschten Preisgrafik, jede Alarmzeile mit Quelllink,
-     Abrufdatum und Aufklapper, und die vier Kacheln zaehlen dasselbe wie der
-     Satz darunter. Sind noch keine Alarmzeilen erfasst, gilt das Kriterium
-     als uebersprungen - die Seite steht dann unter ihrer
-     Veroeffentlichungsschwelle.
-     Seit E3 Schritt 3 (17.09.2026) steht die Alarmtabelle im Radar-Reiter
-     von geraete.html (bis dahin eigene Seite wettbewerbsradar.html, heute
-     eine Weiterleitung) - Kriterium 11 liest sie von der EINEN Seite, und
-     11b misst deren ALLE Tafeln einschliesslich der Radar-Tafel.
-
-     Bis zum 30.08.2026 vermass dieses Kriterium die Positionskarte und
-     rechnete aus jeder Etikettenhoehe den Preis zurueck. Die Karte ist
-     geloescht; die drei Verbote des Auftrags (kein gedrehter Text, keine
-     Schrift unter 12 px, keine mit "..." gekuerzte Beschriftung) misst
-     `tests/test_geraete_reiter_browser.py` im echten Chromium.
+ 11. Die Rangliste steht: #kosten, #kv-wahl mit den fuenf Auswahlreihen,
+     ein lesbarer Datenknoten #kv-daten und mindestens eine Ergebniszeile -
+     sonst ein benannter Leerzustand. Keine Reste der Reiter-Seite.
+ 11b. Die erste Summe endet bei 1440x900 und 390x844 ueber der Falz, und
+     auf 390 px laeuft nichts seitwaerts.
+ 11c. In keiner Ergebniszeile ueberdecken sich Anbieter, Info, Summe und
+     Abstand - an der Startansicht und an Adressen aus dem Datenknoten.
+ 13. Der Text ausserhalb von Zahlen und Chips bleibt unter einem Deckel.
+ 15. Jedes Aufklappen zeigt Zeiger und Aufklappzeichen.
 
 Dazu das Kriterium der Umbenennung (11.08.2026):
 
@@ -57,8 +51,8 @@ Dazu das Kriterium der Umbenennung (11.08.2026):
      Mitte. Der laengere Name hat in seiner ersten Fassung alle drei Zahlen
      gerissen: 169 px aus der Mitte und 61 px aus dem Bild heraus.
 
-Kriterium 1, 6, 7, 10 und 12 brauchen einen echten Browser - Chromium liegt
-unter /opt/pw-browsers. Ohne Browser laufen die uebrigen trotzdem durch.
+Kriterium 1, 6, 7, 10, 11b, 11c, 12 und 15 brauchen einen echten Browser -
+Chromium liegt unter /opt/pw-browsers. Ohne Browser laufen die uebrigen trotzdem durch.
 
 **Gemessen wird ueber einen lokalen HTTP-Server, nicht ueber file://.** Der
 Grund ist Kriterium 10: `fetch('search_index.json')` ist unter file:// von der
@@ -84,7 +78,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from bs4 import BeautifulSoup                                    # noqa: E402
+from bs4 import BeautifulSoup, Comment                           # noqa: E402
 
 from telco_radar.report.bilder import (                          # noqa: E402
     MIND_BREITE_GROSS, ist_leer)
@@ -102,6 +96,7 @@ _MIND_OBEN = 6
 # px lassen dem laengeren Namen Luft, ohne den zweiten Fehlerfall (169 px)
 # durchzulassen.
 _MOBIL_BREITE = 390
+_MOBIL_HOEHE = 844
 _MARKE = "Vodafone Product and Services Insights"
 _MAX_KOPF_VERSATZ = 90
 # Der Anteil bebilderter Meldungen. Bis zum 07.08.2026 stand hier die
@@ -202,248 +197,210 @@ def _haeufigster_absender(site: Path) -> str:
     return ""
 
 
-# Hoechste zulaessige Seitenhoehe je Reiter, auf _BREITE gemessen. Der
-# Auftrag: "Jeder Reiter bleibt unter 3 Bildschirmen." Die alte Seite war
-# 18.412 px hoch.
-_MAX_REITERHOEHE = 3000
+# ---- Geraeteseite: EINE Kosten-Rangliste in section#kosten.
+#
+# Die fuenf Auswahlreihen in #kv-wahl, in der Reihenfolge der Vorlage. Eine
+# fehlende Reihe ist eine Frage, die der Leser nicht mehr stellen kann.
+_KV_REIHEN = ("hersteller", "familie", "modell", "stufe", "raten")
+# Reste der Reiter-Seite, die nicht zurueckkehren duerfen.
+_KV_ALTLASTEN = (".gr-reiter", "[id^=tafel-]", "svg.gr-zr", ".gr-zr-antwort")
+# Die vier Teile einer Ergebniszeile, die sich nie ueberdecken duerfen
+# (Kriterium 11c). `.kv-info > span` sind mehrere Kaesten je Zeile.
+_KV_TEILE = (".kv-anb", ".kv-info > span", ".kv-summe", ".kv-abstand")
+# So viele Adressen `?modell=…&band=…&raten=alle` misst 11c zusaetzlich zur
+# Startansicht - die Geraete mit den meisten Anbietern, weil dort die
+# meisten Zeilen und die laengsten Info-Zeilen stehen.
+_KV_ADRESSEN = 4
 
-# ---- Fliessttext-Deckel je Reiter der Geraeteseite (P4/D3, 18.09.2026).
-# FM 4 der Strategie: "Text kriecht zurueck" - Antonio: "Ich will keinen
-# Text sehen. Alles so unruhig." Gezaehlt wird der Leerraum-normalisierte
-# Text aller <p> EINER Tafel, INKLUSIVE Aufklapp-Text (details, JS-
-# Aufklappzeilen): FM 4 sagt ausdruecklich, der Preis-Klick (P1) sei der
-# Haertetest - "geraet er zum Textblock, ist FM 4 sofort zurueck", und ein
-# Deckel, der nur den ersten Bildschirm misst, saehe genau diesen
-# Rueckschlag nicht. Nie sichtbar und nicht gezaehlt: <template>-Inhalte
-# (der Rechenweg-Pool von P1 wird erst per Klick zum DOM montiert).
-# Die Grenzen sind am Befund des 17.09. kalibriert (design.md mass mit
-# derselben Menge: Vergleich 18 388 Z, Radar 8 359 Z - der Vor-P4-Stand,
-# als die Reiter Erklaerprosa trugen):
-#   Radar 6000: faellt mit der P4-Balkengrafik, die die 48-fache
-#     "Vodafone-Basis"-Zeile zu EINER Legende macht (-6 300 Z), auf rund
-#     2 600 Z - knapp gruen, weitere Prosa kippt.
-#   Preisverlauf 2500: der mit P2 gefallene 1813-Zeichen-Datenblock allein
-#     haette diesen Deckel zu drei Vierteln gefuellt - genau die Grenze,
-#     die einen zweiten solchen Block verbeugt.
-#   Katalog 2500: eine Tabelle, keine Erzaehlung; der Stand vom 18.09.
-#     liegt bei 377 Z.
-#   Vergleich 6000: traegt heute 18 100 Z, fast alles in den 20 Tarif-
-#     Rechenweg-Aufklappern (je ~500 Z "Gerechnet ueber ..." plus Posten).
-#     Der Reiter wird erst gruen, wenn dieser Text dem P1-Panel-Weg als
-#     <template> folgt oder gekuerzt ist - der Deckel zeigt den Hebel,
-#     das ist seine Aufgabe (die Entscheidung steht beim Lead/P5, nicht
-#     in diesem Kriterium).
-_FLIESSTEXT_DECKEL = {
-    "tafel-tco": 6000,
-    "tafel-radar": 6000,
-    "tafel-verlauf": 2500,
-    "tafel-katalog": 2500,
-}
-_REITER_NAMEN = {
-    "tafel-tco": "Vergleich",
-    "tafel-radar": "Radar",
-    "tafel-verlauf": "Preisverlauf",
-    "tafel-katalog": "Katalog",
-}
-# design.md Regel 8: "Kein Fliesstblock unter Grafiken" - Kurvendaten
-# gehoeren in Tooltip/Legende, nicht in Text. Der 1813-Zeichen-Datenblock
-# unter dem (mit P2 gefallenen) G2-Graph war der Fall; 200 Zeichen lassen
-# eine Bildunterschrift zu, aber keinen Datenblock.
-_MAX_ABSATZ_NACH_SVG = 200
+# ---- Fliesstext-Deckel der Geraeteseite (Kriterium 13). Antonio: "Ich will
+# keinen Text sehen." Gezaehlt wird jeder Text in #kosten AUSSER den Zahlen
+# und Chips: die Auswahl (#kv-wahl), die Ergebniszeilen samt Rechenweg
+# (.kv-zeile), Knoepfe, Datenknoten und <template>. Uebrig bleiben Titel,
+# Kopfzeilen, die Zeile der Anbieter ohne Preis, ein Leerzustand und der
+# Fuss - zusammen rund 100 Zeichen. 400 lassen einer laengeren Fehlermeldung
+# Platz, aber keinem Erklaerabsatz.
+_FLIESSTEXT_DECKEL = 400
+_FLIESSTEXT_OHNE = ("#kv-wahl", ".kv-zeile", "button", "script", "template")
 
 
-def fliesstext_zeichen(tafel) -> int:
-    """Fliessttext-Zeichen einer Tafel: alle <p> inklusive Aufklapp-Text.
+def fliesstext_zeichen(bereich) -> int:
+    """Zeichen des Textes in `bereich`, der weder Zahl noch Chip ist.
 
-    Nur <template>-Inhalte zaehen nicht - sie sind nie sichtbar, sondern
-    werden per Klick zum DOM montiert (P1-Rechenwege). Whitespace wird
-    auf ein Leerzeichen normalisiert, damit Einrueckungen im Quelltext
-    die Zahl nicht aufblasen (design.md mass am 17.09. dieselbe Menge:
-    18 388 Zeichen im Vergleichs-Reiter).
+    Ausgenommen ist alles unter `_FLIESSTEXT_OHNE`. Leerraum wird auf ein
+    Leerzeichen normalisiert, damit Einrueckungen im Quelltext die Zahl
+    nicht aufblasen.
     """
-    return sum(len(re.sub(r"\s+", " ", p.get_text(" ", strip=True)))
-               for p in tafel.find_all("p")
-               if p.get_text(strip=True) and p.find_parent("template") is None)
-
-
-def _sichtbar_initial(el) -> bool:
-    """Initialer Zustand ohne Nutzerklick: kein hidden-Attribut, kein
-    zugeklapptes <details>, keine JS-Aufklappzeile (.gr-a-auf ohne
-    --an), kein <template> - irgendwo in der Vorfahrenkette."""
-    knoten = el
-    while knoten is not None and getattr(knoten, "name", None):
-        if knoten.name == "template" or knoten.has_attr("hidden"):
-            return False
-        if knoten.name == "details" and not knoten.has_attr("open"):
-            return False
-        klassen = set(knoten.get("class") or [])
-        if "gr-a-auf" in klassen and "gr-a-auf--an" not in klassen:
-            return False
-        knoten = knoten.parent
-    return True
-
-
-def _vorheriges_element(el):
-    """Das naechste ELEMENT-Geschwister vor el (Textknoten uebersprungen).
-
-    previous_element_sibling alleine reicht nicht: unter html.parser ist
-    der Pointer nach einem inline-<svg> None, obwohl previous_siblings
-    das svg fuehrt - die Elementkette bricht am self-closing Tag. Wer
-    hier den Pointer fragt, misst "kein Absatz nach Grafik", wo einer
-    steht (gefunden am 18.09.2026 am Mini-Fall der pytest-Fixture).
-    """
-    for geschwister in el.previous_siblings:
-        if getattr(geschwister, "name", None):
-            return geschwister
-    return None
-
-
-def max_absatz_nach_svg(tafel) -> tuple[int, str]:
-    """Laengster initial sichtbarer <p>-Absatz, der einem <svg> folgt.
-
-    "Folgt" heisst: das vorherige Element-Geschwister ist ein <svg>, oder
-    der Absatz ist das erste Element seines Containers und der CONTAINER
-    folgt einem <svg> (Graph-Wrapper-Struktur: svg und Absatz stehen
-    Geschwister in einem div). Versteckte Absaetze (hidden, zugeklappt)
-    zaehen nicht - die Regel misst, was der Leser unter der Grafik sieht.
-    Rueckgabe (Zeichen, Anfang des Absatzes fuer die Fehlermeldung).
-    """
-    best, best_text = 0, ""
-    for p in tafel.find_all("p"):
-        if not p.get_text(strip=True) or not _sichtbar_initial(p):
+    ausgenommen = {id(el) for sel in _FLIESSTEXT_OHNE
+                   for el in bereich.select(sel)}
+    teile = []
+    for s in bereich.find_all(string=True):
+        if any(id(v) in ausgenommen for v in s.parents):
             continue
-        vorher = _vorheriges_element(p)
-        if vorher is None and p.parent is not None \
-                and p.parent.name not in ("td", "th", "li"):
-            vorher = _vorheriges_element(p.parent)
-        if vorher is None or vorher.name != "svg":
+        if isinstance(s, Comment) or s.parent.name in ("script", "template"):
             continue
-        text = re.sub(r"\s+", " ", p.get_text(" ", strip=True))
-        if len(text) > best:
-            best, best_text = len(text), text[:50]
-    return best, best_text
+        if s.strip():
+            teile.append(s.strip())
+    return len(re.sub(r"\s+", " ", " ".join(teile)))
 
 
-def _reiterhoehen(seite, wurzel: str, b: Bilanz) -> None:
-    """Jeder Reiter unter drei Bildschirmen - an der ECHTEN Seite gemessen.
+# Kriterium 15 - EINE Messung, die pruefe_portal an der echten Seite und
+# tests/test_geraete_textdeckel.py an Mini-HTML mit der echten style.css
+# ausfuehren. Gemessen wird COMPUTED: der Zeiger und ein Aufklappzeichen
+# (`.kv-pfeil`, dessen ::before gezeichnet wird), auch in zugeklappten
+# details.
+SUMMARY_JS = """(wurzel) => {
+  const w = wurzel ? document.querySelector(wurzel) : document;
+  if (!w) return null;
+  return [...w.querySelectorAll('summary')].map(s => {
+    const pfeil = s.querySelector('.kv-pfeil');
+    return {
+      text: s.textContent.replace(/\\s+/g, ' ').trim().slice(0, 40),
+      kern: s.classList.contains('kv-kern'),
+      pointer: getComputedStyle(s).cursor === 'pointer',
+      caret: !!pfeil &&
+             (getComputedStyle(pfeil, '::before').content || 'none') !== 'none',
+    };
+  });
+}"""
 
-    Es gibt dafuer auch einen Browser-Test, aber der laeuft auf einer
-    Fixture mit zwanzig Geraeten. Der echte Bestand ist ein Vielfaches davon
-    und waechst; genau daran ist der Katalog-Reiter am 30.08.2026 gerissen,
-    nachdem der naechtliche Lauf acht Listungen und mit ihnen laengere
-    Modellnamen brachte - dieselbe Zeilenzahl wurde hoeher. Ein Deckel in
-    ZEILEN ist nur ein Stellvertreter fuer eine Grenze in PIXELN, und dieser
-    Punkt hier ist der einzige, der die Pixel wirklich misst.
+
+def _kosten_falz(browser, wurzel: str, b: Bilanz) -> None:
+    """11b: die erste Summe steht auf beiden Breiten ueber der Falz.
+
+    Wer die Seite oeffnet, soll ohne Scrollen lesen, was das guenstigste
+    Angebot kostet. Gemessen am ECHTEN Bestand, nicht an einer Fixture -
+    laengere Modellnamen im Titel schieben die Liste nach unten.
     """
-    seite.goto(f"{wurzel}/geraete.html", wait_until="networkidle")
-    if not seite.query_selector(".gr-reiter [data-tafel]"):
-        b.prueft(None, "11b. Reiterhoehen (Geraeteseite ohne Reiter)")
-        return
-    zu_hoch, gemessen = [], []
-    for knopf in seite.query_selector_all(".gr-reiter [data-tafel]"):
-        tid = knopf.get_attribute("data-tafel")
-        knopf.click()
-        seite.wait_for_timeout(80)
-        hoehe = seite.evaluate("document.documentElement.scrollHeight")
-        gemessen.append(f"{tid.replace('tafel-', '')} {hoehe}")
-        if hoehe >= _MAX_REITERHOEHE:
-            zu_hoch.append(f"{tid} {hoehe} px")
-    b.prueft(not zu_hoch,
-             "11b. Reiterhoehen: " + ", ".join(gemessen) + " px"
-             + (f" - ZU HOCH: {'; '.join(zu_hoch)}" if zu_hoch else ""))
+    messungen, fehler = [], []
+    for breite, hoehe in ((_BREITE, _FALZ), (_MOBIL_BREITE, _MOBIL_HOEHE)):
+        seite = browser.new_page(viewport={"width": breite, "height": hoehe})
+        try:
+            seite.goto(f"{wurzel}/geraete.html", wait_until="load")
+            seite.wait_for_timeout(300)
+            m = seite.evaluate("""() => {
+              const s = document.querySelector('#kosten .kv-summe');
+              return {unten: s ? Math.round(s.getBoundingClientRect().bottom) : null,
+                      quer: Math.max(document.documentElement.scrollWidth,
+                                     document.body.scrollWidth)};
+            }""")
+        finally:
+            seite.close()
+        if m["unten"] is None:
+            b.prueft(None, "11b. Kostenfalz (Geraeteseite ohne Ergebniszeile)")
+            return
+        messungen.append(f"{breite}x{hoehe} Summe endet bei {m['unten']} px")
+        if m["unten"] > hoehe:
+            fehler.append(f"{breite}px: erste Summe unter der Falz "
+                          f"({m['unten']} > {hoehe})")
+        if breite == _MOBIL_BREITE and m["quer"] > _MOBIL_BREITE + 1:
+            fehler.append(f"{breite}px: Seite {m['quer']} px breit")
+    b.prueft(not fehler, "11b. Kostenfalz: " + ", ".join(messungen)
+             + (f" - {'; '.join(fehler)}" if fehler else ""))
 
-    # E2 (16.09.2026): DIE ANTWORT DER HAUPTANSICHT UEBER DER TELEFON-FALZ
-    # - am ECHTEN Bestand gemessen, nicht an der Fixture der Browsertests
-    # (deren kuerzere Namen lassen die Zeilen niedriger enden). Gemessen
-    # wird der ANTWORT-SATZ und der GRAPHKOPF (Messtag-Zeile): wer ein
-    # Geraet waehlt, muss ohne Scrollen lesen, was es kostet und welche
-    # Tage der Graph zeigt - der Graph selbst beginnt unterhalb. Ohne
-    # Antwort-Satz (Seite ohne jeden Bestand) entfaellt die Messung ohne
-    # Mangel: ein Leerzustand hat keine Falzfrage.
-    mobil = seite.context.browser.new_page(
-        viewport={"width": _MOBIL_BREITE, "height": 844})
+
+def _kv_adressen(site: Path) -> list[str]:
+    """Adressen fuer 11c aus dem Datenknoten, nicht geraten: je Modell die
+    Tarifstufe mit den meisten Anbietern, die Modelle mit den meisten
+    Anbietern zuerst."""
     try:
-        mobil.goto(f"{wurzel}/geraete.html", wait_until="load")
-        mobil.wait_for_timeout(300)
-        box = mobil.evaluate("""() => {
-          const a = document.querySelector('#tafel-tco .gr-zr-antwort');
-          // Graphkopf = Oberkante des Graph-Abschnitts (die Messtag-Zeile
-          // ist am 28.09.2026 gefallen, die Datumsachse traegt die Tage).
-          const k = document.querySelector('#tafel-tco .gr-zr-graph');
-          if (!a) return null;
-          return {antwort: Math.round(a.getBoundingClientRect().bottom),
-                  kopf: k ? Math.round(k.getBoundingClientRect().top) : null,
-                  quer: Math.max(document.documentElement.scrollWidth,
-                                 document.body.scrollWidth)};
-        }""")
-        if box:
-            quer = box["quer"] <= _MOBIL_BREITE + 1
-            ok = box["antwort"] <= 844 and (box["kopf"] is None
-                                            or box["kopf"] <= 844) and quer
-            b.prueft(ok,
-                     f"11c. Graphfalz (Telefon {_MOBIL_BREITE}x844): "
-                     f"Antwort-Satz endet bei {box['antwort']} px, Graphkopf "
-                     f"bei {box['kopf']} px (Falz 844)"
-                     + ("" if quer
-                        else f", Seite {box['quer']} px breit"))
-        else:
-            b.prueft(None, "11c. Graphfalz (Telefon): Hauptansicht ohne "
-                           "Antwort-Satz (kein Bestand)")
-    finally:
-        mobil.close()
+        soup = BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
+                             "html.parser")
+        daten = json.loads(soup.select_one("#kv-daten").string)
+    except (OSError, AttributeError, TypeError, json.JSONDecodeError):
+        return []
+    kandidaten = []
+    for modell, angebote in (daten.get("angebote") or {}).items():
+        je_stufe: dict[str, set] = {}
+        for a in angebote:
+            je_stufe.setdefault(a.get("stufe"), set()).add(a.get("anbieter"))
+        if not je_stufe:
+            continue
+        stufe, anbieter = max(je_stufe.items(),
+                              key=lambda kv: (len(kv[1]), str(kv[0])))
+        kandidaten.append((len(anbieter), modell, stufe))
+    kandidaten.sort(key=lambda k: (-k[0], k[1]))
+    return [f"?modell={m}&band={s}&raten=alle"
+            for _, m, s in kandidaten[:_KV_ADRESSEN]]
+
+
+def _kosten_ueberlappung(browser, wurzel: str, site: Path, b: Bilanz) -> None:
+    """11c: in keiner Ergebniszeile ueberdecken sich Anbieter, Info, Summe
+    und Abstand - auf beiden Breiten, an der Startansicht und an Adressen
+    aus dem Datenknoten. Zeilen in zugeklappten Gruppen haben keine Box und
+    fallen heraus; gezaehlt wird, was gemessen wurde."""
+    adressen = ["", *_kv_adressen(site)]
+    gemessen, fehler = 0, []
+    for breite, hoehe in ((_BREITE, _FALZ), (_MOBIL_BREITE, _MOBIL_HOEHE)):
+        seite = browser.new_page(viewport={"width": breite, "height": hoehe})
+        try:
+            for adr in adressen:
+                seite.goto(f"{wurzel}/geraete.html{adr}", wait_until="load")
+                seite.wait_for_timeout(250)
+                ergebnis = seite.evaluate(
+                    """(teile) => {
+                      const aus = [];
+                      let n = 0;
+                      for (const z of document.querySelectorAll('#kosten .kv-zeile')) {
+                        const kaesten = [];
+                        for (const sel of teile)
+                          for (const el of z.querySelectorAll(sel)) {
+                            const r = el.getBoundingClientRect();
+                            if (r.width > 0 && r.height > 0)
+                              kaesten.push({sel, r});
+                          }
+                        if (!kaesten.length) continue;
+                        n++;
+                        for (let i = 0; i < kaesten.length; i++)
+                          for (let j = i + 1; j < kaesten.length; j++) {
+                            const a = kaesten[i].r, c = kaesten[j].r;
+                            const x = Math.min(a.right, c.right) - Math.max(a.left, c.left);
+                            const y = Math.min(a.bottom, c.bottom) - Math.max(a.top, c.top);
+                            if (x > 0.5 && y > 0.5)
+                              aus.push((z.dataset.anbieter || '?') + ': ' +
+                                       kaesten[i].sel + ' / ' + kaesten[j].sel);
+                          }
+                      }
+                      return {n, aus};
+                    }""", list(_KV_TEILE))
+                gemessen += ergebnis["n"]
+                fehler += [f"{breite}px {adr or 'Start'} {x}"
+                           for x in ergebnis["aus"]]
+        finally:
+            seite.close()
+    if not gemessen:
+        b.prueft(None, "11c. Zeilenueberlappung (keine Ergebniszeile)")
+        return
+    b.prueft(not fehler,
+             f"11c. Zeilenueberlappung: {gemessen} Zeilen an "
+             f"{len(adressen)} Adressen auf 2 Breiten, {len(fehler)} Ueberdeckungen"
+             + (f" - {'; '.join(fehler[:4])}" if fehler else ""))
 
 
 def _summary_zeiger(seite, b: Bilanz) -> None:
-    """P4/D3, Kriterium 15: Klickbarkeit zeigt sich.
-
-    design.md (17.09.): 20 von 22 Aufklappern des Vergleichs-Reiters
-    sahen aus wie Tabellenzeilen - cursor:auto, kein Chevron. Gemessen
-    wird COMPUTED (das, was der Leser sieht), je Tafel der Geräteseite,
-    auch in zugeklappten details: die Regel von style.css gilt fuer die
-    ganze Tafel-Flaeche, nicht nur fuer den ersten Bildschirm. Ein
-    summary ohne Text ist keins - das Kriterium fragt dieselbe Menge ab,
-    die die Vorlage hervorbringt.
-    """
-    fehler: list[str] = []
-    gesamt = 0
-    for knopf in seite.query_selector_all(".gr-reiter [data-tafel]"):
-        tid = knopf.get_attribute("data-tafel")
-        knopf.click()
-        seite.wait_for_timeout(80)
-        daten = seite.evaluate(
-            """(tid) => {
-              const t = document.getElementById(tid);
-              if (!t) return null;
-              return [...t.querySelectorAll('summary')].map(s => ({
-                text: s.textContent.replace(/\\s+/g, ' ').trim().slice(0, 40),
-                pointer: getComputedStyle(s).cursor === 'pointer',
-                caret: (getComputedStyle(s, '::after').content || 'none')
-                       !== 'none',
-              }));
-            }""", tid)
-        if daten is None:
-            fehler.append(f"{tid} fehlt")
-            continue
-        gesamt += len(daten)
-        for d in daten:
-            why = []
-            if not d["pointer"]:
-                why.append("ohne Zeiger")
-            if not d["caret"]:
-                why.append("ohne Aufklappzeichen")
-            if why:
-                fehler.append(f"{tid}: „{d['text']}“ {', '.join(why)}")
-    if not gesamt and not fehler:
+    """Kriterium 15: Klickbarkeit zeigt sich. Jedes summary in #kosten -
+    Ergebniszeilen und die zugeklappte Nebengruppe - traegt den Zeiger und
+    ein gezeichnetes Aufklappzeichen."""
+    daten = seite.evaluate(SUMMARY_JS, "#kosten")
+    if not daten:
         b.prueft(None, "15. Aufklappzeichen (Geräteseite ohne Aufklapper)")
         return
-    b.prueft(not fehler,
-             f"15. Aufklappzeichen: {gesamt} summaries, alle mit Zeiger "
-             f"und Aufklappzeichen"
-             + (f" - FEHLEN: {'; '.join(fehler[:6])}" if fehler else ""))
+    fehler = []
+    for d in daten:
+        why = [w for w, ok in (("ohne Zeiger", d["pointer"]),
+                               ("ohne Aufklappzeichen", d["caret"])) if not ok]
+        if why:
+            fehler.append(f"„{d['text']}“ {', '.join(why)}")
+    kerne = sum(1 for d in daten if d["kern"])
+    b.prueft(not fehler and kerne > 0,
+             f"15. Aufklappzeichen: {len(daten)} summaries ({kerne} "
+             f"Ergebniszeilen), alle mit Zeiger und Aufklappzeichen"
+             + (f" - FEHLEN: {'; '.join(fehler[:6])}" if fehler else "")
+             + ("" if kerne else " - keine summary.kv-kern"))
 
 
 def _browser_messungen(site: Path, b: Bilanz) -> None:
-    """Kriterium 1, 6, 7, 10 und 12 - alles, was eine Darstellung braucht."""
+    """Kriterium 1, 6, 7, 10, 11b, 11c, 12 und 15 - alles, was eine
+    Darstellung braucht."""
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
@@ -452,7 +409,7 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
     # Die zwei festen Pfade sind Linux (Sandbox bzw. Runner). Findet keiner
     # etwas, wird Playwright SELBST gefragt, statt die Messung abzusagen:
     # `executable_path=None` heisst "nimm den Browser, den du verwaltest" -
-    # genau den, den `tests/test_geraete_reiter_browser.py` benutzt. Ohne
+    # genau den, den die Browsertests (`tests/test_falz_browser.py`) benutzen. Ohne
     # diesen Rueckfall meldete das Skript auf einem Mac "kein Chromium
     # gefunden" und uebersprang fuenf Kriterien, waehrend die Browsertests
     # derselben Arbeitskopie liefen. Ein uebersprungenes Kriterium sieht in
@@ -478,7 +435,8 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
             b.prueft(None, f"Browser-Messungen ({type(exc).__name__})")
             return
         seite = browser.new_page(viewport={"width": _BREITE, "height": _FALZ})
-        _reiterhoehen(seite, wurzel, b)
+        _kosten_falz(browser, wurzel, b)
+        _kosten_ueberlappung(browser, wurzel, site, b)
         seite.goto(f"{wurzel}/geraete.html", wait_until="load")
         seite.wait_for_timeout(300)
         _summary_zeiger(seite, b)
@@ -603,7 +561,7 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
         # aus der Mitte als _MAX_KOPF_VERSATZ. Die dritte Zahl ist die, an
         # der eine Schriftvergroesserung zuerst auffaellt.
         kopf: dict = {}
-        for breite, hoehe in ((_BREITE, _FALZ), (_MOBIL_BREITE, 844)):
+        for breite, hoehe in ((_BREITE, _FALZ), (_MOBIL_BREITE, _MOBIL_HOEHE)):
             klein = browser.new_page(viewport={"width": breite, "height": hoehe})
             klein.goto(f"{wurzel}/index.html")
             klein.wait_for_timeout(400)
@@ -718,11 +676,9 @@ def main() -> int:
     # Seit dem 08.08.2026 auch auf der Differenzierungs-Seite: ihre Karten
     # ziehen die Hauptzeile aus zwei Speichern, und der Presse-Zweig liefert
     # rohe Zusammenfassungen - genau dort entsteht ein halber Satz.
-    # Und seit dem 10.08.2026 die Geraeteseite. Geprueft wird dort genau
-    # eine Stelle: die Saetze der Karte "Was diese Woche auffaellt" tragen
-    # `szl`. Die Etiketten der Positionskarte kuerzt `_kurz()` bewusst mit
-    # "…" - sie liegen in `.gr-etikett`, tragen kein `szl` und sind hier
-    # richtigerweise nicht gemeint. Wer eine Seite mit Schlagzeilen
+    # Die Geraeteseite traegt als Kosten-Rangliste keine `szl` mehr; sie
+    # bleibt in der Liste, damit eine zurueckkehrende Schlagzeile dort
+    # geprueft wird. Wer eine Seite mit Schlagzeilen
     # ergaenzt und sie hier vergisst, prueft sie nie: genau dieser Zuschnitt
     # hat am 08.08.2026 37 Karten ohne Motiv gedeckt.
     seiten = [index, meldungen]
@@ -824,255 +780,85 @@ def main() -> int:
                  f"{len(falsch)} widersprechen"
                  + (f" ({', '.join(falsch)})" if falsch else ""))
 
-    # ---- Kriterium 11: die Reiter des Geraeteradars
+    # ---- Kriterium 11: die Kosten-Rangliste der Geraeteseite
     #
-    # Die Positionskarte ist am 30.08.2026 GELOESCHT worden - 59 Geraete mal
-    # vier Anbietern in einem Bild, 114 senkrecht gedrehte
-    # Achsenbeschriftungen, 155 von 164 Punkten ohne Beschriftung. Dieses
-    # Kriterium hat sie bis dahin vermessen (Preis aus Etikettenhoehe
-    # zurueckgerechnet); jetzt prueft es, dass sie WEG ist und dass die
-    # Tabelle, die sie ersetzt, ihre Belege traegt.
-    #
-    # E2 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1a, 16.09.2026): DIE HAUPTANSICHT
-    # IST DIE TCO-ZEITREIHE - ein SVG-Koordinatensystem mit Y=EUR-Ticks,
-    # X=echten Messtagen, je Anbieter eine Linie mit einem Punkt je
-    # Messung (Antonio: „Den Graphen finde ich gut."). Bis E2 pruefte
-    # dieses Kriterium den HTML/CSS-Balken (O1) und verbot JEDES SVG in
-    # der Vergleichsansicht - die Erwartung folgt dem Auftrag, nicht
-    # umgekehrt. Die drei Verbote aus Abschnitt 0 des alten Auftrags (kein
-    # gedrehter Text, keine Schrift unter 12 px, keine "..."-Beschriftung)
-    # werden im echten Chromium gemessen -
-    # `tests/test_geraete_reiter_browser.py` und
-    # `tests/test_geraete_zeitreihe_browser.py`.
+    # Die Seite ist EINE Frage: Geraet, Speicher, Tarifstufe und Raten
+    # waehlen, je Anbieter die Kosten ueber 24 Monate sehen. Geprueft wird
+    # die Struktur, die diese Frage traegt, und dass die Reiter-Seite nicht
+    # zurueckkehrt. Ohne Ergebniszeile ist ein benannter Leerzustand Pflicht
+    # (CLAUDE.md, Clean Code 5: Scheitern ist kein leeres Ergebnis).
     gr_datei = site / "geraete.html"
     if not gr_datei.exists():
         # KEIN "uebersprungen": render_site() erzeugt diese Seite immer,
-        # notfalls mit ihrem Fehlerzustand. Fehlt sie ganz, ist etwas
-        # kaputt - und ein Totalausfall, der als "nicht pruefbar" durchgeht,
-        # ist genau die Sorte gruener Lauf, vor der CLAUDE.md §6 warnt.
-        b.prueft(False, "11. Geraeteradar: geraete.html fehlt ganz")
+        # notfalls mit ihrem Fehlerzustand. Fehlt sie ganz, ist etwas kaputt.
+        b.prueft(False, "11. Geraeteseite: geraete.html fehlt ganz")
     else:
         gr = BeautifulSoup(gr_datei.read_text(encoding="utf-8"), "html.parser")
         maengel = []
+        kosten = gr.select_one("#kosten")
+        if kosten is None:
+            maengel.append("section#kosten fehlt")
+        for alt in _KV_ALTLASTEN:
+            if gr.select_one(alt) is not None:
+                maengel.append(f"Rest der Reiter-Seite: {alt}")
 
-        start = gr.select_one("#tafel-tco")
-        if start is None:
-            maengel.append("die Hauptansicht 'Vergleich' fehlt")
-        for tot in (".gr-flaeche", ".gr-punkt", ".gr-etikett", ".gr-band"):
-            if gr.select(tot):
-                maengel.append(f"Reste der geloeschten Preisgrafik: {tot}")
-
-        # VIER TAFELN AUF EINER SEITE (E3, AUFTRAG_GERAETE_EINE_SEITE_V2
-        # §1d): "Vergleich", "Radar", "Preisverlauf" und "Gerätekatalog"
-        # sind Knöpfe DIESER Seite. Bis E3 stand der Radar als LINK in der
-        # Leiste (O3-Quasi-Reiter, Seitenwechsel auf wettbewerbsradar.
-        # html); E3 ersetzt ihn durch die Tafel - deshalb ist jetzt auch
-        # der Link verboten, sonst böte die Leiste neben der Tafel noch
-        # einen Seitenwechsel an. Die Portfolio-Tafel bleibt GANZ weg; ein
-        # wiederauferstandenes #tafel-portfolio wäre die nächste tote
-        # Tafel.
-        reiter = [k.get("data-tafel") for k in gr.select(".gr-reiter [data-tafel]")]
-        # 28.09.2026: die zwei Ein-Geraet-Reiter („Mit Tarif", „Ohne
-        # Vertrag") stehen nebeneinander, danach Übersicht und Katalog.
-        erwartet = ["tafel-tco", "tafel-verlauf", "tafel-radar",
-                    "tafel-katalog"]
-        if reiter != erwartet:
-            maengel.append(f"Reiter {reiter} statt {erwartet}")
-        if gr.select_one(".gr-reiter a") is not None:
-            maengel.append("die Reiterleiste trägt noch einen Link statt "
-                           "der vier Tafeln (E3: der Radar ist ein Reiter)")
-        if gr.select_one("#tafel-radar") is None:
-            maengel.append("#tafel-radar fehlt - der Radar-Reiter ohne "
-                           "Tafel wäre ein toter Tab")
-        if gr.select_one("#tafel-portfolio") is not None:
-            maengel.append("#tafel-portfolio steht noch auf der Geräteseite "
-                           "- seine Abschnitte gehören auf den Radar (O3)")
-
-        # E2: DER EINE Graph der Hauptansicht ist DIE ZEITREIHE - SVG mit
-        # Koordinatensystem, Punkten je Messung und echten Messtag-Ticks.
-        # Die Balkenform (O1) ist ersetzt, nicht daneben gestellt: ihre
-        # Reste (.gr-hgraph, .gr-bz, .gr-balkenliste) sind verboten.
-        if start is not None and start.select_one("svg.gr-zr") is None:
-            maengel.append("die TCO-Zeitreihe (svg.gr-zr) fehlt in der "
-                           "Hauptansicht (E2)")
-        if start is not None:
-            svg = start.select_one("svg.gr-zr")
-            if svg is not None:
-                if not svg.select("circle.gr-zr-punkt"):
-                    maengel.append("der Zeitreihen-Graph trägt keine "
-                                   "Messpunkte")
-                if not svg.select("text.gr-zr-xtick"):
-                    maengel.append("die X-Achse trägt keine Messtag-Ticks")
-            for tot in (".gr-hgraph", ".gr-balkenliste", ".gr-bz",
-                        ".gr-msel", ".gr-antwort-leit"):
-                if start.select(tot):
-                    maengel.append(f"Rest der bis E2 ersetzten Form: {tot}")
-        verlaufflaeche = gr.select_one("#tafel-verlauf")
-        # P2 (Antonio F4, 17.09.2026): G2 ist GEFALLEN - der feste Markt-
-        # Graph des Reiters zeigte in der heutigen Datenlage zwei echte
-        # Kurven von einem Anbieter unter fünf Linien, mit vier Text-
-        # blöcken daneben („mehr Text als Graf"); seine Frage beantworten
-        # der Modell-Wähler und die Radar-Tafel. Inhalt des Reiters ist
-        # der Wähler: sein Datenknoten muss dastehen - oder der ehrliche
-        # Leerzustand (KEIN Mangel ohne Messreihen, C.2).
-        if verlaufflaeche is not None and \
-                verlaufflaeche.select_one("#gr-verlaufdaten") is None and \
-                "liegen noch keine Messreihen vor" not in \
-                verlaufflaeche.get_text():
-            maengel.append("die Gerätedaten des Preisverlaufs "
-                           "(#gr-verlaufdaten) fehlen im Verlaufs-Reiter")
-        # Und kehrt der G2-Block zurück, ist die Doppel-Darstellung zurück
-        # (derselbe Schutz wie beim G0-Block darunter).
-        if verlaufflaeche is not None and \
-                verlaufflaeche.select_one("svg.gr-g2") is not None:
-            maengel.append("der G2-Block ist im Verlaufs-Reiter "
-                           "zurückgekehrt - der Reiter trägt den Modell-"
-                           "Wähler als alleinige Grafik (F4)")
-        # E3-Fix (QA 17.09.2026): G0 ist aus dem Verlaufs-Reiter GEFALLEN.
-        # Der Reiter trug ZWEI Barpreis-Grafiken desselben Geräts - der
-        # G0-Block oben (gesteuert von der Modellwahl des VERGLEICHS-
-        # Reiters) und die eigene Geräteauswahl unten; wählte der Leser
-        # hier ein Gerät, zeigte der obere Block weiterhin das des anderen
-        # Reiters (Doppel-Darstellung und zweite Graph-Form, §4.6/§4.8).
-        # Das Kriterium kehrt die alte O4-Regel um: kehrt der Block zurück,
-        # ist die Doppel-Darstellung zurück.
-        if verlaufflaeche is not None and \
-                verlaufflaeche.select_one("#gr-g0-lager, svg.gr-g0") \
-                is not None:
-            maengel.append("der G0-Block ist im Verlaufs-Reiter "
-                           "zurückgekehrt - der Reiter trägt seine eigene "
-                           "Barpreis-Auswahl (Doppel-Darstellung, §4.6/4.8)")
-
-        # Die Pflichtzeile aus A5.2 - Antonios Leitfrage, woertlich
-        # beantwortet. Seit O2 (11.09.2026) steht sie im Rechenweg-Aufklapper
-        # JEDER Bündel-Zeile mit einer Zahl.
-        if start is not None and start.select(".gr-bnd[data-gesamt]") \
-                and not start.select(".gr-bnd .gr-kk-24"):
-            maengel.append("keine Bündelzeile beantwortet "
-                           "'nach 24 Monaten gezahlt'")
-        # KEIN Mangel, wenn der Datensatz fehlt: die Vorlage rendert ihn nur
-        # bei `verlauf.hat_daten`, und das rechnet auf den GEPRUEFTEN
-        # Eintraegen. Ein Bestand, der nur gebrauchte Geraete oder nur
-        # Buendelpreise traegt, erzeugt einen ehrlichen Leerzustand - ihn als
-        # Durchfaller zu melden ist derselbe Fehler wie Kriterium 4 nach
-        # einem --no-llm-Lauf.
-        verlauf = gr.select_one("#tafel-verlauf")
-        verlauf_leer = (verlauf is not None
-                        and verlauf.select_one("#gr-verlaufdaten") is None)
-
-        # Kein gedrehter Text - hier als Attribut, im Browser als gerechnete
-        # Transformation.
-        for el in gr.find_all(attrs={"transform": True}):
-            if "rotate" in (el.get("transform") or ""):
-                maengel.append("gedrehte Beschriftung im Dokument")
-                break
-
-        # O2 (11.09.2026) stand die Alarmtabelle auf dem WETTBEWERBS-RADAR;
-        # seit E3 Schritt 3 (17.09.2026) ist der Radar der Reiter "Radar"
-        # DIESER Seite - die Alt-URL ist eine Weiterleitung. Beleg- und
-        # Kachel-Zaehlung lesen deshalb dieselbe Suppe wie alles
-        # Strukturelle darueber: eine Seite, eine Quelle der Wahrheit.
-        radar_seite = gr
-        zeilen = radar_seite.select("#wr-alarme .gr-a-zeile")
-        if not zeilen:
-            # NICHT einfach ueberspringen: die strukturelle Haelfte dieses
-            # Kriteriums - "die Grafik ist WEG" - gilt auch ohne Daten. Sie
-            # im Skip-Zweig zu verwerfen hiesse, dass ein
-            # wiederauferstandenes `.gr-punkt` nach einem --no-llm-Lauf als
-            # "uebersprungen" durchginge.
-            if maengel:
-                b.prueft(False, "11. Geraeteradar: " + "; ".join(maengel))
+        zeilen = gr.select("#kosten .kv-zeile")
+        if zeilen:
+            wahl = gr.select_one("#kv-wahl")
+            reihen = [r.get("data-wahl")
+                      for r in gr.select("#kv-wahl .kv-reihe[data-wahl]")]
+            if wahl is None:
+                maengel.append("#kv-wahl fehlt")
+            elif reihen != list(_KV_REIHEN):
+                maengel.append(f"Auswahlreihen {reihen} statt {list(_KV_REIHEN)}")
+            for r in gr.select("#kv-wahl .kv-reihe[data-wahl]"):
+                gewaehlt = r.select('.kv-chip[aria-checked="true"]')
+                if len(gewaehlt) != 1:
+                    maengel.append(f"Reihe {r.get('data-wahl')}: "
+                                   f"{len(gewaehlt)} gewaehlte Chips statt 1")
+            if gr.select_one("select#kv-geraet") is None:
+                maengel.append("select#kv-geraet fehlt (Geraetewahl am Telefon)")
+            knoten = gr.select_one("script#kv-daten")
+            if knoten is None:
+                maengel.append("script#kv-daten fehlt")
             else:
-                b.prueft(None, "11. Geraeteradar: noch keine Alarmzeile "
-                               "erfasst (Grafik ist weg, Struktur in Ordnung"
-                               + (", Preisverlauf noch ohne Messreihen"
-                                  if verlauf_leer else "") + ")")
-        else:
-            # Jede Zeile traegt Quelle UND Abrufdatum - der Belegzwang ist das
-            # Verkaufsargument dieser Seite.
-            # `.gr-a-datum` und nicht `.gr-a-klein`: die zweite Klasse
-            # steht ZWEIMAL in der Zeile (Speichergroesse und Abrufdatum).
-            # Damit war die Datumshaelfte des Belegzwangs wirkungslos - mit
-            # geleerter Datumsspalte meldete die Pruefung null Verstoesse.
-            ohne_beleg = [z for z in zeilen
-                          if not (z.select_one("a.gr-a-quelle[href^='http']")
-                                  and z.select_one(".gr-a-datum"))]
-            # Jede Zeile hat ihren Aufklapper, und der zeigt mehr als einen
-            # Anbieter - sonst waere der Klick eine Handlung ohne Ergebnis.
-            ohne_aufklapper = [z for z in zeilen
-                               if radar_seite.find(
-                                   id=z.get("data-auf")) is None]
-            if ohne_beleg:
-                maengel.append(f"{len(ohne_beleg)} Alarmzeilen ohne Beleg")
-            if ohne_aufklapper:
-                maengel.append(f"{len(ohne_aufklapper)} Zeilen ohne Aufklapper")
-
-            # Die vier Kacheln zaehlen genau die verglichenen Kombinationen.
-            # Eine Kachel, die anders zaehlt als der Satz darunter, ist der
-            # Fehlertyp aus CLAUDE.md 6.
-            kacheln = radar_seite.select(".gr-chips .gr-chip b")
-            summe = sum(int(k.get_text(strip=True)) for k in kacheln
-                        if k.get_text(strip=True).isdigit())
-            # `start` kann None sein - dann ist die Tafel umbenannt worden,
-            # und das ist ein Durchfaller, kein Absturz. Die erste Fassung
-            # rief hier `.get_text()` darauf auf und riss das ganze Skript
-            # mit einem AttributeError ab.
-            alarm_abschnitt = radar_seite.select_one("#wr-alarme")
-            satz = (" ".join(alarm_abschnitt.get_text(" ", strip=True).split())
-                    if alarm_abschnitt is not None else "")
-            if len(kacheln) != 4:
-                maengel.append(f"{len(kacheln)} statt 4 Alarm-Chips")
-            elif f"{summe} Modelle mit ihren Speichergrößen" not in satz:
-                maengel.append(f"die Kacheln zaehlen {summe}, der Satz "
-                               f"darunter etwas anderes")
-
-            # Der Grund gehoert IN die Zeile. Als eigener `print` danach
-            # ging er in der gepufferten Ausgabe verloren, und das Kriterium
-            # meldete "DURCHGEFALLEN" neben seinem Erfolgstext - unbrauchbar
-            # fuer den, der es liest.
+                try:
+                    daten = json.loads(knoten.string or "")
+                except json.JSONDecodeError as exc:
+                    maengel.append(f"#kv-daten nicht parsebar ({exc.msg})")
+                else:
+                    if not (daten.get("angebote") and daten.get("start")):
+                        maengel.append("#kv-daten ohne Angebote oder "
+                                       "Startauswahl")
+            ohne_summe = [z for z in zeilen
+                          if not ((s := z.select_one("summary.kv-kern .kv-summe"))
+                                  and s.get_text(strip=True))]
+            if ohne_summe:
+                maengel.append(f"{len(ohne_summe)} Zeilen ohne Summe")
             b.prueft(not maengel,
-                     f"11. Geraeteradar: {len(zeilen)} Alarmzeilen, "
-                     f"{len(kacheln)} Chips ueber {summe} Vergleichen, "
-                     f"die TCO-Zeitreihe steht in der Hauptansicht"
+                     f"11. Geraeteseite: {len(zeilen)} Ergebniszeilen, "
+                     f"{len(reihen)} Auswahlreihen, Datenknoten gelesen"
                      if not maengel else
-                     "11. Geraeteradar: " + "; ".join(maengel[:5]))
+                     "11. Geraeteseite: " + "; ".join(maengel[:5]))
+        else:
+            nichts = gr.select_one("#kosten .kv-nichts")
+            grund = nichts.get_text(" ", strip=True) if nichts else ""
+            if not grund:
+                maengel.append("keine Ergebniszeile und kein benannter "
+                               "Leerzustand (.kv-nichts)")
+            b.prueft(not maengel,
+                     f"11. Geraeteseite: Leerzustand „{grund[:60]}“"
+                     if not maengel else
+                     "11. Geraeteseite: " + "; ".join(maengel[:5]))
 
-        # ---- Kriterium 13: Fliessttext-Deckel je Reiter (P4/D3, FM 4).
-        # Messmenge und Kalibrierung stehen im Kommentar zu
-        # _FLIESSTEXT_DECKEL; gezaehlt wird statisch am gerenderten HTML,
-        # deterministisch und ohne Browser - dieselbe Zahl, gegen die der
-        # pytest tests/test_geraete_textdeckel.py die Zaehlfunktion haelt.
-        werte, zuviel = [], []
-        for tid, deckel in _FLIESSTEXT_DECKEL.items():
-            tafel = gr.select_one(f"#{tid}")
-            if tafel is None:
-                zuviel.append(f"{_REITER_NAMEN[tid]}: Tafel {tid} fehlt")
-                continue
-            n = fliesstext_zeichen(tafel)
-            werte.append(f"{_REITER_NAMEN[tid]} {n} Z (max {deckel})")
-            if n > deckel:
-                zuviel.append(f"{_REITER_NAMEN[tid]} {n} Z > {deckel}")
-        b.prueft(not zuviel,
-                 "13. Fliessttext-Deckel: " + ", ".join(werte)
-                 + (f" - ZU VIEL TEXT: {'; '.join(zuviel)}" if zuviel else ""))
-
-        # ---- Kriterium 14: kein Fliesstblock unter Grafiken
-        # (design.md Regel 8). Der 1813-Zeichen-Datenblock unter dem mit
-        # P2 gefallenen G2-Graph war der Fall; die Grenze haelt ihn draussen,
-        # sobald er zurueckkehrte - in welcher Tafel auch immer.
-        block_max, block_wo = 0, ""
-        for tid in _FLIESSTEXT_DECKEL:
-            tafel = gr.select_one(f"#{tid}")
-            if tafel is None:
-                continue
-            n, anfang = max_absatz_nach_svg(tafel)
-            if n > block_max:
-                block_max, block_wo = n, f"{_REITER_NAMEN[tid]}: {anfang}"
-        b.prueft(block_max <= _MAX_ABSATZ_NACH_SVG,
-                 f"14. Fliesstblock unter Grafik: laengster Absatz nach "
-                 f"<svg> {block_max} Z (max {_MAX_ABSATZ_NACH_SVG})"
-                 + (f" - {block_wo}" if block_max > _MAX_ABSATZ_NACH_SVG
-                    else ""))
+        # ---- Kriterium 13: Fliesstext-Deckel (Messmenge am Kommentar zu
+        # _FLIESSTEXT_DECKEL). Statisch am gerenderten HTML - dieselbe
+        # Zaehlfunktion haelt tests/test_geraete_textdeckel.py fest.
+        if kosten is not None:
+            n = fliesstext_zeichen(kosten)
+            b.prueft(n <= _FLIESSTEXT_DECKEL,
+                     f"13. Fliesstext-Deckel: {n} Zeichen ausserhalb von "
+                     f"Zahlen und Chips (max {_FLIESSTEXT_DECKEL})")
 
     _browser_messungen(site, b)
 

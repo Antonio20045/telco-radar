@@ -1,25 +1,14 @@
 """E3 Schritt 2 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d/S2/S3): die Radar-Tafel
 im Radar-Reiter von geraete.html.
 
-Die Inhalte der bisherigen Schwesterseite wettbewerbsradar.html stehen
-seit E3 Schritt 1 als eigener Reiter auf der EINEN Geräteseite - dieser
-Test hält die NEUSTRUKTURIERUNG nach S2/S3:
-
-  * DREI klar getrennte, gleichwertige Sektionen (S3): Alarme /
-    Abweichung TCO als MODELL-LISTE (S2) / Händler als eigener Abschnitt,
-    jede mit einem Satz, was sie misst.
-  * Die Abweichungstabelle IST die Modell-Liste (S2): klarer Titel
-    "Alle Modelle nach Abweichung zu Vodafone", ALLE Zeilen im DOM
-    (kein stiller Deckel - Deckel nur mit Aufklapper "alle N anzeigen"),
-    sortierbar nach Rohwert (data-s-*), JE Zeile ein Sprung in den
-    Graphen des Vergleichs-Reiters (?modell=…&band=…).
-  * Händler = Gerätepreis ohne Finanzierung als GLEICHWERTIGER Abschnitt
-    (Antonio: "nicht auf so einem komischen unteren Abschnitt ganz unten").
-
-Gemessen wird am gerenderten Paar (geraete.html derselben Site), gebaut
-in tmp_path nach der Bauform von `test_wettbewerbsradar._seite`: die
-Karten entstehen auf dem echten Weg über `karten.modelle()` → `tco_24()`,
-keine handgebauten Dicts (Adapter-Lektion vom 11.08.).
+Der Radar-Reiter ist mit dem Neuentwurf der Geräteseite (29.09.2026,
+eine Kosten-Rangliste ohne Reiter) gefallen, mit ihm die Seitentests
+dieser Datei. Geblieben sind die Einheiten von `geraete_radar`, die für
+den Radar-Export weiter rechnen (Leerzustand, Richtungswort, Vorzeichen
+der Balken), und die Fixture `_seite` (gebaut in tmp_path nach der
+Bauform von `test_wettbewerbsradar._seite`, Karten auf dem echten Weg
+über `karten.modelle()` → `tco_24()`), die
+`test_geraete_methodik_umzug.py` nutzt.
 """
 from __future__ import annotations
 
@@ -213,364 +202,8 @@ def _seite(tmp_path: pathlib.Path) -> str:
             for name in ("geraete.html", "wettbewerbsradar.html")}
 
 
-def _suppe(tmp_path) -> BeautifulSoup:
-    return BeautifulSoup(_seite(tmp_path)["geraete.html"], "html.parser")
-
-
 def _text(el) -> str:
     return " ".join(el.get_text(" ", strip=True).split())
-
-
-# --------------------------------------------------------------------------
-# S3: drei gleichwertige Sektionen, jede mit ihrem Satz
-# --------------------------------------------------------------------------
-
-def test_drei_sektionen_in_folge_jede_mit_ihrem_satz(tmp_path):
-    """S3: Alarme / Abweichung als Modell-Liste / Händler als gleichwertiger
-    Abschnitt - jede mit einem Satz, was sie misst.
-
-    P4/D1 (STRATEGIE_GERAETE_V3, 18.09.2026): VOR diesen dreien steht
-    seit dem Design-Durchlauf die GRAFIK-Sektion (#wr-grafik) - die
-    Frage des Reiters liest sich zuerst als Bild, die Tabellen sind
-    Aufklapper darunter (design.md: „Radar: Balken je Modell statt 746
-    Zeilen"). Der Test war gegen den Grafik-Stand ROT (3 Köpfe statt 4)
-    und hält jetzt VIER Sektionen fest. Seit 28.09.2026 steht die
-    Modell-Liste „Mit Tarif" vor der Grafik (aus ihr stammt die Leitzahl)."""
-    suppe = _suppe(tmp_path)
-    tafel = suppe.select_one("#tafel-radar")
-    assert tafel is not None, "#tafel-radar fehlt"
-    koepfe = [_text(k) for k in tafel.select("h3.gr-unter")]
-    assert len(koepfe) == 4, f"vier Sektionen erwartet, steht da: {koepfe}"
-    # 28.09.2026: erst „Mit Tarif" (die Leitzahl darueber stammt aus
-    # dieser Liste), dann die drei Barpreis-Sektionen „Ohne Vertrag" -
-    # dieselben Begriffe wie die Reiter.
-    assert koepfe[0].startswith("Mit Tarif – alle Modelle"), koepfe
-    assert koepfe[1].startswith("Ohne Vertrag – wo Vodafone"), koepfe
-    assert koepfe[2].startswith("Ohne Vertrag – Preis-Alarme"), koepfe
-    assert koepfe[3].startswith("Ohne Vertrag – Händler"), koepfe
-    # Jede Sektion erklärt in einem Satz ihre Frage - keine ohne Zweck.
-    for kopf in koepfe:
-        sec = kopf and suppe.find(string=kopf)
-        assert sec, kopf
-
-
-# --------------------------------------------------------------------------
-# P4/D1 (STRATEGIE_GERAETE_V3, 18.09.2026): die Grafik, die Legende, der
-# Rot-Deckel
-# --------------------------------------------------------------------------
-
-def test_die_radar_tafel_traegt_eine_balkengrafik(tmp_path):
-    """design.md Regel 3: kein Reiter ohne Grafik - die Frage des Radars
-    ("wo sind wir teuer?") liest sich zuerst als BILD. Servergerendertes
-    SVG in ZWEI Varianten (schirm/mobil, dasselbe Umschalten wie die
-    Zeitreihe), je Balken der Wert an der Spitze, die Nulllinie mit GENAU
-    EINEM Etikett ("Vodafone" - die Referenz, nicht 48-mal wiederholt)."""
-    suppe = _suppe(tmp_path)
-    tafel = suppe.select_one("#tafel-radar")
-    assert tafel is not None
-    svgs = tafel.select("svg.wr-gr")
-    varianten = {v for s in svgs for v in s.get("class", [])}
-    assert {"wr-gr--breit", "wr-gr--schmal"} <= varianten, \
-        "die Grafik fehlt oder steht nur in einer Breite da"
-    breit = tafel.select_one("svg.wr-gr--breit")
-    balken = breit.select("path.wr-gr-balken")
-    assert balken, "die Grafik trägt keinen Balken - der Test prüft nichts"
-    # Ein Balken trägt beide Zahlen selbst (Wert an der Spitze); der
-    # <title> nennt beide Preise der Messung (Nachprüfbarkeit).
-    assert breit.select("text.wr-gr-wert"), "kein Balken trägt seinen Wert"
-    titel = balken[0].select_one("title")
-    assert titel is not None and "€" in titel.get_text(), \
-        "der Balken nennt seine Messung nicht (Belegzwang)"
-    etiketten = [e.get_text(strip=True)
-                 for e in breit.select("text.wr-gr-nulltext")]
-    assert etiketten == ["Vodafone"], etiketten
-
-
-def test_die_grafik_traegt_genau_einen_roten_balken(tmp_path):
-    """Rot-Deckel (design.md Regel 4): in der Grafik trägt ROT genau der
-    schärfste Befund - der größte Abstand ZUUNGUNSTEN Vodafones. Ist kein
-    solcher Fall im Bestand, gibt es keinen roten Balken (die Fixture
-    trägt genau einen: iPhone 15, VF 709,90 € gegen Saturn 679,90 €)."""
-    suppe = _suppe(tmp_path)
-    tafel = suppe.select_one("#tafel-radar")
-    for variante in ("wr-gr--breit", "wr-gr--schmal"):
-        svg = tafel.select_one(f"svg.{variante}")
-        assert svg is not None
-        rot = svg.select("path.wr-gr-balken--spitze")
-        assert len(rot) == 1, \
-            f"{variante}: {len(rot)} rote Balken statt genau einem"
-        assert rot[0].select_one("title").get_text().startswith("iPhone 15")
-
-
-def test_die_vodafone_basis_steht_als_eine_legende(tmp_path):
-    """P4/D1: die Zeile 'Vodafone-Basis: … TCO-24 (…, Band …)' stand in
-    JEDER Modell-Detailzeile (am echten Bestand 48- bis 60-mal dieselbe
-    Formel). Seit P4 gibt es EINE Legende über der Tabelle - der
-    VF-Betrag steht je Anbieter-Zeile selbst ('Band · VF x €')."""
-    suppe = _suppe(tmp_path)
-    tafel = suppe.select_one("#tafel-radar")
-    assert tafel.select_one(".wr-basis-legende") is not None, \
-        "die Vodafone-Basis-Legende fehlt"
-    assert len(tafel.select(".wr-basis-legende")) == 1, \
-        "die Legende steht mehrfach da - wiederholte Formel"
-    assert not tafel.select(".wr-basis"), \
-        "eine alte Vodafone-Basis-Zeile steht noch in einer Detailzeile"
-
-
-def test_rot_ist_akzent_nicht_teppich(tmp_path):
-    """Rot-Deckel (design.md Regel 4, messbar): maximal ZEHN rot
-    eingefärbte Datenelemente je Tafel. Als DOM-Stellvertreter zählt der
-    Test die Elemente, die eine Rot-Klasse tragen ('--spitze' sowie das
-    rote Eigen-Markierung des Lifecycle), denn die Farbe sitzt im
-    Stylesheet - am echten Bestand gemessen (Playwright, 18.09.2026):
-    vorher 40 sichtbare Daten-Rot-Elemente, nachher 1."""
-    suppe = _suppe(tmp_path)
-    tafel = suppe.select_one("#tafel-radar")
-    rot = tafel.select("[class*='--spitze'], .gr-eigen")
-    assert len(rot) <= 10, \
-        f"{len(rot)} Elemente tragen Rot-Klassen - Rot ist Fläche geworden"
-
-
-def test_jede_sektion_traegt_eine_aussagekraeftige_ueberschrift(tmp_path):
-    """D4a (24.09.2026, Erklärtext-Inventur): der Erklärsatz je Sektion ist
-    GEFALLEN - Antonios Regel ('keine Erklär-Unterzeile unter Überschriften,
-    Grafiken oder Zahlen') gilt jetzt auch hier. Jede Sektion bleibt an
-    ihrer eigenen Überschrift erkennbar; die Methodik, die bis hierhin als
-    Satz darunter stand, trägt jetzt der `title` von Überschrift oder
-    Spaltenkopf (siehe test_geraete_methodik_umzug.py)."""
-    suppe = _suppe(tmp_path)
-    for sec in suppe.select("#tafel-radar .gr-r-sektion"):
-        kopf = sec.select_one("h3.gr-unter")
-        assert kopf is not None and len(_text(kopf)) > 5, \
-            f"Sektion ohne Überschrift: {_text(sec)[:60]}"
-
-
-def test_die_haendler_sektion_sagt_was_sie_misst(tmp_path):
-    """S3: 'Händler = Gerätepreis ohne Finanzierung […] mit einem Satz, was
-    er misst (Barpreis ohne Vertrag/Tarif)'. D4a: der Satz steht seit der
-    Erklärtext-Inventur nicht mehr sichtbar, sondern als `title` an der
-    Überschrift - dieselbe Zusicherung, andere Bauform."""
-    suppe = _suppe(tmp_path)
-    sec = suppe.select_one("#wr-haendler")
-    assert sec is not None, "die Händler-Sektion fehlt"
-    kopf = sec.select_one("h3")
-    assert "ohne Finanzierung" in _text(kopf)
-    titel = kopf.get("title") or ""
-    assert "Barpreis" in titel and "ohne Vertrag" in titel, \
-        "der title-Hinweis nennt nicht das Maß (Barpreis ohne Vertrag/Tarif)"
-    # Der Händler steht MIT Namen und Abweichung da - dieselbe %-Logik,
-    # nie gegen eine TCO gerechnet.
-    text = _text(sec)
-    assert "Saturn" in text
-    assert "%" in text
-
-
-def test_die_haendler_sektion_steht_nicht_mehr_ganz_unten_als_rest(tmp_path):
-    """Antonios Wortlaut: 'das sollte nicht auf so einem komischen unteren
-    Abschnitt ganz unten sein' - die Händler-Sektion ist die LETZTE der
-    gleichwertigen Sektionen, kein Rest unter dem Rest (bis E3 stand sie
-    auf der Schwesterseite unter den Portfolio-Listen).
-
-    P4/D1 (18.09.2026): die Grafik-Sektion (#wr-grafik) steht seit dem
-    Design-Durchlauf VOR den dreien - dieselbe Liste, ein Kopf mehr. Der
-    Test war gegen den Grafik-Stand ROT und dreht seitdem mit. Seit
-    28.09.2026 führt die Modell-Liste „Mit Tarif"."""
-    suppe = _suppe(tmp_path)
-    sektionen = suppe.select("#tafel-radar .gr-r-sektion")
-    assert [s.get("id") for s in sektionen] == ["wr-abweichung",
-                                                "wr-grafik", "wr-alarme",
-                                                "wr-haendler"]
-
-
-def test_der_tafelkopf_polt_nur_die_sektionen_mit_vorzeichen(tmp_path):
-    """E3-Fix (QA 17.09.2026, B2): Der Tafelkopf sagte, die Leitzahl gelte
-    'mit Vorzeichen' für ALLE drei Sektionen - die Alarmtabelle zeigt
-    denselben Abstand aber als positiven BETRAG (Stufen, Sortierung und
-    Export der Alarme sind Betrags-Sprache: '41,3 %' heißt dort
-    Wettbewerber günstiger, in der Modellliste heißt dasselbe '−41,3 %').
-    Der Leser sah auf EINER Tafel −55,5 % und +41,3 % für dieselbe
-    Richtung der Aussage. Die Zeichenregel muss irgendwo die Wahrheit
-    sagen: Vorzeichen in Modellliste und Händlern, Betrag ohne Vorzeichen
-    in den Preis-Alarmen - und die Alarmtabelle bleibt Betrags-Tabelle
-    (keine Zeile trägt ein Minus, für die keine Regel mehr gilt).
-    P4-Fix (Sicht-Prüfung 18.09.): der Regel-Satz stand seit dem Design-
-    Durchlauf als Achslabel UNTER der Balkengrafik. D4a (24.09.2026,
-    Erklärtext-Inventur): das sichtbare Achslabel ist GEFALLEN (Antonios
-    Regel: keine Erklär-Unterzeile unter einer Grafik) - dieselbe Aussage
-    steht jetzt als `title` an der Grafik selbst, der Locator ist
-    mitgezogen."""
-    suppe = _suppe(tmp_path)
-    tafel = suppe.select_one("#tafel-radar")
-    kopf = tafel.select_one("#wr-grafik .wr-grafik-bild").get("title") or ""
-    assert kopf, "der Titel-Hinweis an der Balkengrafik fehlt"
-    # Die Pauschalbehauptung ('mit Vorzeichen' für alle drei) ist weg …
-    assert "Die drei Sektionen messen sie" not in kopf, kopf
-    # … und die Alarme sind als BETRAG benannt, nicht als vorzeichen-
-    # behaftete Leitzahl. P4/D4 (18.09.2026) hat den Kopf von drei
-    # Sätzen auf EINEN gestrafft (Falz-Regel: vor dem ersten Datenelement
-    # höchstens EIN Satz - die Leitzahl darüber sagt die Richtung ohne
-    # Worte); der Test hält die AUSSAGE, nicht den alten Wortlaut.
-    assert "als Betrag" in kopf, kopf
-    # Die Gegenseite der Zusicherung: die Alarmtabelle zeigt Beträge -
-    # jede sichtbare Prozentzahl ist positiv (Wettbewerber günstiger).
-    werte = [float(z.get("data-s-prozent"))
-             for z in tafel.select("#wr-alarme .gr-a-zeile[data-s-prozent]")]
-    assert werte, "Fixture ohne Alarmzeilen - der Test prüfte nichts"
-    assert all(w > 0 for w in werte), werte
-
-
-# --------------------------------------------------------------------------
-# S2: die Abweichungstabelle IST die Modell-Liste
-# --------------------------------------------------------------------------
-
-def test_die_modelliste_zeigt_alle_modelle_ohne_stillen_deckel(tmp_path):
-    """S2: 'alle Zeilen' - jede Modell-Gruppe steht als Zeile im DOM. Der
-    Deckel kappt nur die ANSICHT (gr-a-rest), der Rest ist hinter dem
-    Aufklapper-Knopf 'alle N anzeigen' erreichbar - nichts wird still
-    weggelassen."""
-    suppe = _suppe(tmp_path)
-    tabelle = suppe.select_one("#wr-abweichung table")
-    assert tabelle is not None, "die Modell-Liste fehlt"
-    zeilen = tabelle.select("tr.gr-a-zeile")
-    n_generisch = wr.MODELLISTE_SICHTBAR + 2
-    assert len(zeilen) == 4 + n_generisch, \
-        f"{len(zeilen)} Zeilen statt {4 + n_generisch} Modellen"
-    ohne_deckel = [z for z in zeilen if "gr-a-rest" not in z.get("class", [])]
-    assert len(ohne_deckel) == wr.MODELLISTE_SICHTBAR
-    knopf = suppe.select_one("#gr-wmehr")
-    assert knopf is not None, "kein 'alle N anzeigen'-Knopf"
-    assert f"alle {4 + n_generisch}" in _text(knopf), _text(knopf)
-
-
-def test_die_modelliste_ist_nach_abweichung_sortiert(tmp_path):
-    """Die bewusste Leseentscheidung des Modulkopfs: negativste Abweichung
-    (stärkste Benachteiligung Vodafones) zuerst, Zeilen ohne Zahl zuletzt."""
-    suppe = _suppe(tmp_path)
-    werte = []
-    for z in suppe.select("#wr-abweichung tr.gr-a-zeile"):
-        roh = z.get("data-s-prozent", "")
-        werte.append(float(roh) if roh else None)
-    zahlen = [w for w in werte if w is not None]
-    assert zahlen == sorted(zahlen), \
-        "die Modell-Zeilen stehen nicht nach Abweichung sortiert da"
-    assert all(w is None for w in werte[len(zahlen):]), \
-        "Zeilen ohne Zahl stehen vor vergleichbaren Zeilen"
-
-
-def test_die_modellliste_sortiert_nach_robwerten(tmp_path):
-    """CLAUDE.md-Regel: Sortierköpfe mit data-sort/data-art, die Rohwerte
-    stehen als Zahl an der Zeile (data-s-*), nie im Zelltext - '1.099,90 €'
-    ist als Zeichenkette kleiner als '199,00 €'."""
-    suppe = _suppe(tmp_path)
-    koepfe = {k.get("data-sort"): k.get("data-art")
-              for k in suppe.select("#wr-abweichung .gr-sort")}
-    assert koepfe.get("prozent") == "zahl", koepfe
-    assert koepfe.get("geraet") == "text", koepfe
-    assert koepfe.get("gesamt") == "zahl", koepfe
-    for z in suppe.select("#wr-abweichung tr.gr-a-zeile"):
-        roh = z.get("data-s-prozent", "")
-        assert roh == "" or isinstance(float(roh), float)
-    # Der Prozent-ROHWERT trägt den Punkt, die ZELLE das deutsche Komma -
-    # zwei verschiedene Schreibweisen derselben Zahl sind die Regel, nicht
-    # der Zufall (die Zelle formatiert, der Rohwert sortiert).
-    erste = suppe.select_one("#wr-abweichung tr.gr-a-zeile td:nth-child(2)")
-    assert "," in _text(erste), "die Abweichungs-Zelle ist nicht formatiert"
-
-
-def test_je_modellzeile_ein_sprung_in_den_graphen(tmp_path):
-    """S2: je Zeile ein Sprung in den Graphen des Vergleichs-Reiters, über
-    die Deep-Link-Mechanik von E2 (?modell=…&band=…)."""
-    suppe = _suppe(tmp_path)
-    zeilen = suppe.select("#wr-abweichung tr.gr-a-zeile")
-    assert zeilen
-    for z in zeilen:
-        sprung = z.select_one("a.gr-sprung")
-        assert sprung is not None, \
-            f"Zeile {_text(z.select_one('td'))} ohne Sprung in den Graphen"
-        href = sprung.get("href", "")
-        assert "modell=" in href, href
-        assert href.startswith("geraete.html") or href.startswith("?"), href
-    # Eine vergleichbare Zeile nennt ihr Band (der Graph springt direkt
-    # in das Band, in dem das Paar gerechnet wurde).
-    vergleichbar = [z for z in zeilen
-                    if z.get("data-s-prozent") not in (None, "")]
-    assert vergleichbar, "die Fixture trägt keine vergleichbare Zeile"
-    with_band = [z.select_one("a.gr-sprung")["href"] for z in vergleichbar
-                 if "band=" in z.select_one("a.gr-sprung")["href"]]
-    assert with_band, "keine vergleichbare Zeile springt mit Band"
-
-
-def test_lueckenzeilen_sagen_ihren_grund(tmp_path):
-    """Eine Zeile ohne Zahl ist keine leere Zeile: sie sagt, WARUM kein
-    Vergleich steht (keine Vodafone-Kosten über 24 Monate erhoben, kein
-    gemeinsames Band)."""
-    suppe = _suppe(tmp_path)
-    text = _text(suppe.select_one("#wr-abweichung"))
-    assert "keine Vodafone-Kosten über 24 Monate erhoben" in text, \
-        "der Fall Xiaomi (nur o2) nennt keinen Grund"
-    assert "kein gemeinsames Band" in text, \
-        "der Fall Pixel (VF klein, o2 gross) nennt keinen Grund"
-
-
-def test_die_detailzeile_zeigt_alle_anbieter_der_gruppe(tmp_path):
-    """B.2.5 gilt weiter: Telekom und 1&1 stehen je Modell als Zeilen ohne
-    Zahl da - der Klick auf eine Modell-Zeile zeigt die ganze Gruppe, kein
-    Anbieter wird weggelassen."""
-    suppe = _suppe(tmp_path)
-    tafel = suppe.select_one("#wr-abweichung")
-    for z in tafel.select("tr.gr-a-zeile"):
-        auf = suppe.select_one("#" + z["data-auf"])
-        assert auf is not None, "Modell-Zeile ohne Detailzeile"
-        # Nur Zeilen MIT td zaehlen - der html.parser setzt die thead-Zeile
-        # der Tabelle-in-Zelle neben den tbody (Browser-Test deckt das DOM).
-        namen = {_text(det.select("td")[0]) for det in auf.select("tr")
-                 if det.select("td")}
-        assert {"Telekom", "1&1", "o2"} <= namen, \
-            f"Detailzeile ohne alle Netzbetreiber: {namen}"
-
-
-def test_die_alarmsektion_steht_im_radar_reiter(tmp_path):
-    """Die Alarmtabelle steht im Radar-REITER (S3, erste Sektion) - und
-    weiterhin NICHT in der Vergleichsansicht (O2-Regel bleibt)."""
-    suppe = _suppe(tmp_path)
-    tafel = suppe.select_one("#tafel-radar")
-    alarme = tafel.select_one("#wr-alarme")
-    assert alarme is not None, "die Alarm-Sektion fehlt im Radar-Reiter"
-    assert alarme.select_one(".gr-chips") is not None, "ohne Kacheln"
-    assert alarme.select_one("table.gr-alarm") is not None, "ohne Tabelle"
-    assert alarme.select("[data-filter='marke']"), "ohne Filter"
-    assert alarme.select("tr.gr-a-zeile"), "ohne Alarmzeilen"
-    vergleich = suppe.select_one("#tafel-tco")
-    assert vergleich.select_one("tr.gr-a-zeile") is None, \
-        "Alarmzeilen stehen in der Vergleichsansicht"
-
-
-def test_die_alt_url_ist_weiterleitung_und_der_lifecycle_ist_mitgezogen(tmp_path):
-    """E3 Schritt 3: die Schwesterseite wettbewerbsradar.html ist eine
-    Meta-Refresh-Weiterleitung auf #tafel-radar (Musterdatei im Entwurfs-
-    ordner). Der Vergleichstest gegen ihre Alarmtabelle ist damit gegen-
-    standslos - es gibt sie nicht mehr. Was er sicherte (EINE Quelle, kein
-    zweites Leben), sichert jetzt die Struktur: die Alt-URL trägt keine
-    Tabelle, und die Lifecycle-Sektion, die bis zur Abschaltung NUR dort
-    stand, ist MITGEZOGEN - zugeklappt im Radar-Reiter (Bauform des
-    genehmigten Prototyps), nicht gelöscht."""
-    seiten = _seite(tmp_path)
-    alt = BeautifulSoup(seiten["wettbewerbsradar.html"], "html.parser")
-    assert alt.select_one('meta[http-equiv="refresh"]') is not None, \
-        "die Alt-URL ist keine Weiterleitung"
-    assert alt.select_one(".gr-a-zeile") is None, \
-        "die Alt-URL trägt noch Alarmzeilen"
-    geraete = BeautifulSoup(seiten["geraete.html"], "html.parser")
-    tafel = geraete.select_one("#tafel-radar")
-    lifecycle = tafel.select_one("#lifecycle")
-    assert lifecycle is not None, \
-        "die Lifecycle-Sektion fehlt im Radar-Reiter (Inhaltsverlust)"
-    details = lifecycle.select_one("details.gr-auf")
-    assert details is not None and "Wie lange ein Gerät im Markt lebt" \
-        in _text(details.select_one("summary")), \
-        "der Lifecycle ist kein zugeklappter Aufklapper (Prototyp-Bauform)"
-    assert not details.get("open", False), \
-        "der Lifecycle-Aufklapper steht offen und frisst das 11b-Budget"
 
 
 # --------------------------------------------------------------------------
@@ -583,36 +216,6 @@ def test_leerzustand_traegt_den_modellisten_schluessel():
     voll = wr.radar({"modelle": [], "band_je_tarif": {}}, {}, {})
     assert set(wr.leer()) == set(voll)
     assert voll["modelliste"] == wr.leer()["modelliste"]
-
-
-def test_die_leitzahl_der_uebersicht_liest_sich_wie_die_balken(tmp_path):
-    """28.09.2026 (Antonio: „kein roter Faden"): die Leitzahl stand als
-    „-50,4 %" über Balken mit „+280,90 €" - andere Einheit, anderes
-    Vorzeichen auf demselben Reiter. Jetzt zeigt sie den Euro-Abstand der
-    ersten Zeile der Modell-Liste in der Zeichenregel der Seite (negativ =
-    Wettbewerber günstiger). Gegen den alten Stand rot (dort stand die
-    Prozentzahl)."""
-    suppe = _suppe(tmp_path)
-    zahl = suppe.select_one("#tafel-radar .gr-leit--radar .gr-leit-zahl")
-    assert zahl is not None, "Leitzahl fehlt"
-    erste = next(z for z in suppe.select("#wr-abweichung tr.gr-a-zeile")
-                 if z.get("data-s-prozent"))
-    gesamt = float(erste["data-s-gesamt"])
-    vf = float(erste["data-s-vf"])
-    # Gegenprobe: die Fixture hat einen echten Abstand, sonst prüft der
-    # Vorzeichenvergleich unten nichts.
-    assert abs(vf - gesamt) > 0.005, (vf, gesamt)
-    erwartet = wr._dvorzeichen(gesamt - vf) + " €"
-    assert _text(zahl) == erwartet, (_text(zahl), erwartet)
-    # Dieselbe Zahl steht in der Quellzeile direkt darunter.
-    assert erwartet in _text(erste), _text(erste)
-    # Das Wort zur Zahl kommt aus derselben Differenz.
-    label = suppe.select_one("#tafel-radar .gr-leit--radar .gr-leit-label")
-    wort = "günstiger als" if gesamt < vf else "teurer als"
-    anbieter = erste["data-s-anbieter"]
-    assert anbieter, "die Quellzeile nennt keinen Anbieter"
-    assert _text(label).startswith(f"{anbieter} {wort} Vodafone:"), \
-        _text(label)
 
 
 def test_das_richtungswort_liest_den_angezeigten_cent():
@@ -651,3 +254,25 @@ def test_die_balken_tragen_das_vorzeichen_der_seite():
         for t in svg.select("text.wr-gr-wert"):
             links = t.get("text-anchor") == "end"
             assert links == _text(t).startswith("-"), (_text(t), links)
+
+
+def test_scheiternder_kostenvergleich_steht_sichtbar_auf_der_seite(
+        tmp_path, monkeypatch):
+    """Clean Code 5: wirft die Aufbereitung, nennt die Seite das Scheitern
+    im Kostenbereich, statt still "Keine Gerätepreise." zu zeigen."""
+    from telco_radar.report import geraete_kosten
+
+    def kaputt(*_a, **_k):
+        raise ValueError("kaputt")
+
+    monkeypatch.setattr(geraete_kosten, "seite", kaputt)
+    html = _seite(tmp_path)["geraete.html"]
+    kosten = BeautifulSoup(html, "html.parser").select_one("#kosten .kv-nichts")
+    assert kosten is not None
+    assert _text(kosten) == "Kostenvergleich fehlgeschlagen: ValueError"
+
+
+def test_heiler_kostenvergleich_nennt_kein_scheitern(tmp_path):
+    """Gegenprobe zum Fehlerweg."""
+    html = _seite(tmp_path)["geraete.html"]
+    assert "Kostenvergleich fehlgeschlagen" not in html
