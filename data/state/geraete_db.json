@@ -2,8 +2,8 @@
  "updated": "2026-09-29",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 41,
-   "funde_gesamt": 180,
+   "laeufe": 42,
+   "funde_gesamt": 184,
    "letzter_lauf": "2026-09-29",
    "letzte_funde": 4,
    "letzter_fund": "2026-09-29",
@@ -117,10 +117,10 @@
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 39,
-   "funde_gesamt": 6461,
+   "laeufe": 40,
+   "funde_gesamt": 6642,
    "letzter_lauf": "2026-09-29",
-   "letzte_funde": 180,
+   "letzte_funde": 181,
    "termine": [
     "2026-08-29",
     "2026-08-30",
@@ -222,18 +222,18 @@
     ],
     [
      "2026-09-29",
-     180,
-     "lesefehler",
-     693,
-     45,
+     181,
+     "gelesen",
+     694,
+     48,
      0
     ]
    ],
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 39,
-   "funde_gesamt": 2606,
+   "laeufe": 40,
+   "funde_gesamt": 2675,
    "letzter_lauf": "2026-09-29",
    "letzte_funde": 69,
    "termine": [
@@ -339,7 +339,7 @@
      "2026-09-29",
      69,
      "gelesen",
-     924,
+     1669,
      0,
      null
     ]
@@ -348,8 +348,8 @@
   },
   "mobilcom-debitel": {
    "laeufe": 5,
-   "funde_gesamt": 4944,
-   "letzte_funde": 92,
+   "funde_gesamt": 5028,
+   "letzte_funde": 84,
    "termine": [
     "2026-08-29",
     "2026-08-30",
@@ -451,15 +451,15 @@
     ],
     [
      "2026-09-29",
-     92,
+     84,
      "lesefehler",
      0,
-     30,
-     5
+     27,
+     3
     ]
    ],
    "letzter_lauf": "2026-09-29",
-   "tote_adressen": 5
+   "tote_adressen": 3
   },
   "ElectronicPartner": {
    "laeufe": 1,
@@ -629,8 +629,8 @@
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 23,
-   "funde_gesamt": 4316,
+   "laeufe": 24,
+   "funde_gesamt": 4456,
    "letzter_lauf": "2026-09-29",
    "letzte_funde": 140,
    "termine": [
@@ -738,8 +738,8 @@
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 31,
-   "funde_gesamt": 1110,
+   "laeufe": 32,
+   "funde_gesamt": 1146,
    "letzter_lauf": "2026-09-29",
    "letzte_funde": 36,
    "termine": [
@@ -920,8 +920,8 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 27,
-   "funde_gesamt": 554,
+   "laeufe": 28,
+   "funde_gesamt": 572,
    "letzter_lauf": "2026-09-29",
    "letzte_funde": 18,
    "termine": [
