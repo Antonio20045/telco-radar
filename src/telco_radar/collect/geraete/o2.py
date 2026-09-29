@@ -565,6 +565,10 @@ def lies_buendel(text: str, url: str = "",
 # Laufzeiten - 1) Konfigurationsantworten, einmal 11 fuer die Referenz.
 
 _TIEF_QUELLE = "o2_tarifwahl"
+# Markiert einen Tarifbetrag, der als monthlyCharges(T) minus gemessener
+# Geraeterate derselben Antwort entsteht - nicht direkt abgelesen. Reist
+# bis in den Bestand (`tco_model.Buendel.herleitung`).
+HERLEITUNG_TARIFSUMME = "tarifsumme_minus_geraeterate"
 
 _PAGE_VALUE_RE = re.compile(
     r'<script id="pageValue" type="application/json">(.*?)</script>', re.S)
@@ -781,8 +785,10 @@ def saetze_aus_konfiguration(pv: dict, basis: dict,
         if tarif_rate <= 0:
             _zaehle(z, "unplausibel")
             continue
-        out.append(_rohsatz(basis, g, _tarifname(option, pv), ref["slug"],
-                            tarif_rate, ref["anschluss"], url))
+        satz = _rohsatz(basis, g, _tarifname(option, pv), ref["slug"],
+                        tarif_rate, ref["anschluss"], url)
+        satz["herleitung"] = HERLEITUNG_TARIFSUMME
+        out.append(satz)
         _zaehle(z, "abgeleitet")
     return out
 

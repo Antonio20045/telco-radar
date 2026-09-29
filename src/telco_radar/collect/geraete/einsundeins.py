@@ -747,6 +747,10 @@ _RASTER_TARIF_RE = re.compile(r"Inkl\.\s*([^<]+)")
 
 _KLAMMERZUSATZ_RE = re.compile(r"\s*\([^()]*\)\s*$")
 
+# So viele Geraete muessen Default- und Tarifraster gemeinsam fuehren, bevor
+# ein gleicher Aufschlag als "einheitlich" gilt und auf alle Speichergroessen
+# uebertragen wird. Gemessen am 29.09.2026: 43 gemeinsame Geraete je Raster.
+_MINDEST_GERAETE_EINHEITLICH = 5
 HERLEITUNG_TARIFAUFSCHLAG = "tarifaufschlag_aus_tarifraster"
 
 
@@ -926,7 +930,10 @@ def ergaenze_tarifstufen(hole: Callable, kopfzeilen: dict,
             hw: preis[0] - basisraster["preise"][hw][0]
             for hw, preis in gelesen["preise"].items()
             if hw in basisraster["preise"]}
-        einheitlich = len(set(aufschlaege.values())) == 1
+        # Einheitlich heisst: an genug Geraeten gemessen gleich. Ein
+        # einziges gemeinsames Geraet waere trivial "einheitlich".
+        einheitlich = (len(aufschlaege) >= _MINDEST_GERAETE_EINHEITLICH
+                       and len(set(aufschlaege.values())) == 1)
         detail_url, slug = details.get(tarif, ("", ""))
         unstimmig = 0
         for hw, saetze in sorted(je_geraet.items()):
@@ -958,10 +965,11 @@ def ergaenze_tarifstufen(hole: Callable, kopfzeilen: dict,
                     "buendel_monatlich": round(cent / 100.0, 2),
                     "laufzeit_monate": monate,
                     # Die Einmalzahlungs-Karte der Geraeteseite gehoert zum
-                    # Default-Tarif. Uebertragen wird sie nur, wo der
-                    # Aufschlag nachweislich geraeteunabhaengig ist.
-                    "geraet_zuzahlung": (satz.get("geraet_zuzahlung")
-                                         if einheitlich else None),
+                    # Default-Tarif, und das Raster nennt keine. Ein
+                    # einheitlicher MONATSaufschlag sagt nichts ueber die
+                    # Einmalzahlung eines anderen Tarifs - sie bleibt eine
+                    # benannte Luecke (Clean Code 3), nicht uebertragen.
+                    "geraet_zuzahlung": None,
                     "herleitung": HERLEITUNG_TARIFAUFSCHLAG,
                     "url": adresse,
                     "quelle_url": adresse,

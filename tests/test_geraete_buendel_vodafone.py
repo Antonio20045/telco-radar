@@ -563,6 +563,32 @@ def test_eine_fehlende_variante_behaelt_ihre_vorschau():
         assert len(je_sku[sku]) == 4
 
 
+def test_unlesbare_kombinationen_lassen_die_vorschau_stehen():
+    """Clean Code 6: steht eine Variante in der Antwort, besteht aber keine
+    ihrer Kombinationen die Probe (hier: `priceByComponent` fehlt, wie bei
+    einem geaenderten Format), bleibt ihre Vorschau stehen - einmal, ohne
+    Doppel - statt dass die Variante still leer wird."""
+    roh = json.loads(_fixture("vodafone_tarif_hardware_geraet_2026-09-29.json"))
+    for e in roh["data"]:
+        if e["hardware"]["hardwareId"] == "58060":
+            for t in e["tariffs"]:
+                for a in t["atomics"]:
+                    for k in a["prices"]["composition"]:
+                        k.pop("priceByComponent", None)
+    rohbuendel = _vorschau_2909()
+    vorher = [s for s in rohbuendel if s["sku"] == "58060"]
+
+    def hole(url, kopfzeilen=None):
+        return 200, json.dumps(roh)
+
+    loese_tarifnamen(hole, {}, rohbuendel)
+    nachher = [s for s in rohbuendel if s["sku"] == "58060"]
+    assert len(nachher) == len(vorher) == 4
+    assert len({id(s) for s in nachher}) == 4
+    # Gegenprobe: die uebrigen Varianten sind voll ersetzt.
+    assert len([s for s in rohbuendel if s["sku"] == "58061"]) == 19
+
+
 def _bestand_vodafone_mobil():
     """Die zehn Blaetter, die der Tarif-Sammler fuer Vodafone schreibt
     (Tarif und "mit Smartphone"), Grundpreise wie in tarife.jsonl."""

@@ -90,6 +90,11 @@ def _ohne_marke(tid: str, anbieter: str) -> str:
     return f"{kopf}:{rumpf}"
 
 
+# Der einzige Anbieter, fuer den "Buendel-Slug == Tarif-ID des Bestands"
+# gemessen ist (29.09.2026, `Tarifbestand._slug_ist_tarif_id`).
+_SLUG_ALS_ID_ANBIETER = "o2"
+
+
 @dataclass(frozen=True)
 class Bezug:
     """Eine hergestellte Verbindung - mit ihrer Guete und ihrem Weg.
@@ -351,7 +356,11 @@ class Tarifbestand:
 
         Nur wenn kein Kachel-Slug trifft (die staerkere Angabe, sie steht
         vorn), und nur mit genau einer aktuellen Lesart dieses Vertrags.
+        Gemessen ist das nur fuer o2; bei jedem anderen Anbieter greift
+        der Weg nicht, bis er dort ebenso belegt ist.
         """
+        if anbieter != _SLUG_ALS_ID_ANBIETER:
+            return None
         kern = f"{tarif_id(anbieter, '')}:{slug}"
         satz = self.je_id_aktuell.get(kern)
         if satz is None or not satz.get("tarif_id"):

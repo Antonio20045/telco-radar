@@ -575,6 +575,11 @@ class Buendel:
     aktionen: list[Aktion] = field(default_factory=list)
     quelle_url: str = ""
     abgerufen_am: str = ""
+    # Leer = alle Betraege stehen so auf der Anbieterseite. Sonst der Name
+    # der Rechnung, mit der ein Betrag aus gemessenen Zahlen hergeleitet
+    # wurde (1&1 Tarifaufschlag, o2 Tarifsumme minus Geraeterate) - damit
+    # Seite und Pruefung Gemessenes von Hergeleitetem trennen koennen.
+    herleitung: str = ""
     # DER GERAETEZUSTAND, wie ihn die Listung derselben SKU traegt
     # (`geraete_model.ZUSTAENDE`: neu | refurbished | b-ware | unbekannt).
     # Er ist eine PREISDIMENSION und kein Etikett (CLAUDE.md § 6) - ein

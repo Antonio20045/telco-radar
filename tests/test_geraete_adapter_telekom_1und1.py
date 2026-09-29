@@ -659,8 +659,10 @@ def test_einsundeins_landet_als_buendellistung_im_bestand(katalog, farben,
     bilanz = sammle_anbieter(anbieter, katalog, farben, hole, "2026-09-04",
                              RobotsWaechter(hole=hole),
                              datetime(2026, 9, 4, 3, tzinfo=timezone.utc))
-    # 42 Kacheln, alle abgerufen - der Deckel von 45 greift nicht.
-    assert bilanz.gedeckelt == []
+    # 42 Kacheln, alle abgerufen - der Deckel von 45 greift nicht. Die
+    # einzige benannte Luecke sind die 41 Stub-Seiten ohne Buendelkatalog
+    # (seit 29.09.2026 gezaehlt statt nur protokolliert).
+    assert bilanz.gedeckelt == ["41 Produktseiten ohne lesbare Buendel"]
     treffer = [l for l in bilanz.listungen if l.quelle_url == _EE_PRODUKT]
     assert len(treffer) == 1
     assert treffer[0].preis_ohne_vertrag is None

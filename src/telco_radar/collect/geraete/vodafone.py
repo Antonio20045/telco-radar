@@ -735,11 +735,24 @@ def loese_tarifnamen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> int:
 
     neu: list = []
     gesetzt = 0
+    # "Nicht gelesen" ist nicht "leer" (Clean Code 6): hat fuer eine
+    # Variante keine Kombination der Tarifschnittstelle ihre Probe
+    # bestanden, bleibt ihre Vorschau stehen und geht den Hash-Weg unten.
+    ersetzt: dict[str, list] = {}
+    for hwid in list(vollstaendig):
+        saetze = _alle_angebote(vorschau[hwid][0], hwid, vollstaendig[hwid])
+        if saetze:
+            ersetzt[hwid] = saetze
+        else:
+            log.warning("Vodafone: %s - keine Kombination der "
+                        "Tarifschnittstelle lesbar, die Vorschau bleibt",
+                        hwid)
+            del vollstaendig[hwid]
     for r in rohbuendel:
         hwid = str(r.get("sku") or "").strip()
         if r.get("quelle") == "vodafone_buendel" and hwid in vollstaendig:
             if r is vorschau[hwid][0]:
-                saetze = _alle_angebote(r, hwid, vollstaendig[hwid])
+                saetze = ersetzt[hwid]
                 neu.extend(saetze)
                 gesetzt += len(saetze)
             continue                     # die uebrige Vorschau faellt weg

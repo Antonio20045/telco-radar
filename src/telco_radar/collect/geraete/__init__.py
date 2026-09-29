@@ -872,6 +872,7 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
     schleuse = Abrufschleuse(waechter, uhr, anbieter.rate_limit_sekunden)
     gruende: list[str] = []
     frist_erreicht = False
+    buendel_unlesbar = 0
 
     def _hole(url: str) -> str:
         try:
@@ -1047,8 +1048,13 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
                     roh_buendel = adapter.lies_buendel(seite, url,
                                                        proben=bilanz.proben) or []
                 except GeraeteAbrufFehler as exc:
-                    log.info("%s: %s Buendel unlesbar (%s)",
-                            anbieter.name, url, exc)
+                    # Seit congstar seine Buendel NUR noch hier liest
+                    # (29.09.2026), ist das kein Nebenbefund mehr: ein
+                    # geaendertes Nutzlastformat kostete sonst still alle
+                    # Buendel. Gezaehlt wird es als benannte Luecke.
+                    log.warning("%s: %s Buendel unlesbar (%s)",
+                                anbieter.name, url, exc)
+                    buendel_unlesbar += 1
                 else:
                     bilanz.buendel.extend(
                         _mit_sku(roh_buendel, anbieter, einstieg, katalog,
@@ -1068,6 +1074,10 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
                         anbieter.name, einstieg.url, tot_hier, versucht_hier)
         if vollstaendig:
             bilanz.gelesene_einstiege.add(einstieg.url)
+
+    if buendel_unlesbar:
+        bilanz.gedeckelt.append(
+            f"{buendel_unlesbar} Produktseiten ohne lesbare Buendel")
 
     if frist_erreicht:
         bilanz.status = "frist"
@@ -1157,6 +1167,9 @@ def _vertiefe(adapter, anbieter, einstieg, gemappt: list, hole_text: Callable,
     except Exception as exc:                          # noqa: BLE001
         log.warning("%s: Buendel-Vertiefung gescheitert (%s: %s)",
                     anbieter.name, type(exc).__name__, str(exc)[:160])
+        bilanz.gedeckelt.append(
+            f"{einstieg.url}: Buendel-Vertiefung gescheitert "
+            f"({type(exc).__name__})")
         return gemappt
     tief_gemappt = _mit_sku(tief, anbieter, einstieg, katalog, farben, heute,
                             bilanz)

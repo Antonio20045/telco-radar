@@ -185,7 +185,10 @@ def test_der_aufschlag_kommt_auf_die_preiskarte_der_groesse():
     m512 = _satz(saetze, "iPhone 18 Pro 512 GB", "1&1 All-Net-Flat M")
     assert m512["buendel_monatlich"] == 61.99
     assert m512["laufzeit_monate"] == 36
-    assert m512["geraet_zuzahlung"] == 510.0
+    # Die Einmalzahlung steht nur fuer den Default-Tarif auf der Seite.
+    assert m512["geraet_zuzahlung"] is None
+    assert _satz(saetze, "iPhone 18 Pro 512 GB",
+                 "1&1 All-Net-Flat S")["geraet_zuzahlung"] == 510.0
     assert m512["tarif_slug"] == "tariff-anf-m-mvl"
     assert m512["herleitung"] == E.HERLEITUNG_TARIFAUFSCHLAG
     assert m512["quelle_url"] == \

@@ -50,7 +50,7 @@ PREISSPRUNG_ANTEIL = 0.25
 # vollständig.
 BEISPIELE = 8
 
-_SKU_MUSTER = re.compile(r"^(?P<modell>.+?)-(?P<speicher>\d+gb)-")
+_SKU_MUSTER = re.compile(r"^(?P<modell>.+?)-(?P<speicher>\d+gb|ohne-speicher)-")
 
 
 @dataclass
