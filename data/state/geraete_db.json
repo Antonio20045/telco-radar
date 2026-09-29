@@ -2,8 +2,8 @@
  "updated": "2026-09-29",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 40,
-   "funde_gesamt": 176,
+   "laeufe": 41,
+   "funde_gesamt": 180,
    "letzter_lauf": "2026-09-29",
    "letzte_funde": 4,
    "letzter_fund": "2026-09-29",
@@ -110,7 +110,7 @@
      4,
      "gelesen",
      0,
-     27,
+     25,
      0
     ]
    ],
@@ -118,9 +118,9 @@
   },
   "Vodafone": {
    "laeufe": 39,
-   "funde_gesamt": 6281,
+   "funde_gesamt": 6461,
    "letzter_lauf": "2026-09-29",
-   "letzte_funde": 181,
+   "letzte_funde": 180,
    "termine": [
     "2026-08-29",
     "2026-08-30",
@@ -222,18 +222,18 @@
     ],
     [
      "2026-09-29",
-     181,
-     "gelesen",
-     694,
-     48,
+     180,
+     "lesefehler",
+     693,
+     45,
      0
     ]
    ],
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 38,
-   "funde_gesamt": 2537,
+   "laeufe": 39,
+   "funde_gesamt": 2606,
    "letzter_lauf": "2026-09-29",
    "letzte_funde": 69,
    "termine": [
@@ -339,7 +339,7 @@
      "2026-09-29",
      69,
      "gelesen",
-     68,
+     924,
      0,
      null
     ]
@@ -348,8 +348,8 @@
   },
   "mobilcom-debitel": {
    "laeufe": 5,
-   "funde_gesamt": 4852,
-   "letzte_funde": 133,
+   "funde_gesamt": 4944,
+   "letzte_funde": 92,
    "termine": [
     "2026-08-29",
     "2026-08-30",
@@ -451,15 +451,15 @@
     ],
     [
      "2026-09-29",
-     133,
-     "gelesen",
+     92,
+     "lesefehler",
      0,
-     45,
-     9
+     30,
+     5
     ]
    ],
    "letzter_lauf": "2026-09-29",
-   "tote_adressen": 9
+   "tote_adressen": 5
   },
   "ElectronicPartner": {
    "laeufe": 1,
@@ -629,10 +629,10 @@
    "tote_adressen": 0
   },
   "congstar": {
-   "laeufe": 22,
-   "funde_gesamt": 4176,
+   "laeufe": 23,
+   "funde_gesamt": 4316,
    "letzter_lauf": "2026-09-29",
-   "letzte_funde": 139,
+   "letzte_funde": 140,
    "termine": [
     "2026-09-03",
     "2026-09-04",
@@ -728,18 +728,18 @@
     ],
     [
      "2026-09-29",
-     139,
+     140,
      "gelesen",
-     144,
-     56,
+     896,
+     43,
      0
     ]
    ],
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 30,
-   "funde_gesamt": 1074,
+   "laeufe": 31,
+   "funde_gesamt": 1110,
    "letzter_lauf": "2026-09-29",
    "letzte_funde": 36,
    "termine": [
@@ -920,10 +920,10 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 26,
-   "funde_gesamt": 536,
+   "laeufe": 27,
+   "funde_gesamt": 554,
    "letzter_lauf": "2026-09-29",
-   "letzte_funde": 20,
+   "letzte_funde": 18,
    "termine": [
     "2026-09-05",
     "2026-09-06",
@@ -1018,7 +1018,7 @@
     ],
     [
      "2026-09-29",
-     20,
+     18,
      "gelesen",
      0,
      0,
@@ -3216,7 +3216,7 @@
    "erstpreis_am": "2026-09-02",
    "last_verified": "2026-09-29",
    "letzter_check": "2026-09-29",
-   "quelle_url": "https://www.alditalk.de/p/fairphone-fairphone-gen-6-256-gb-horizon-black-model-fp6-30042277A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=22&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
+   "quelle_url": "https://www.alditalk.de/p/fairphone-fairphone-gen-6-256-gb-horizon-black-model-fp6-30042277A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=19&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
    "abgerufen_am": "2026-09-29",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
@@ -3798,24 +3798,23 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-05",
-   "status": "ausgelistet",
-   "missed_checks": 2,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 939.99,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-05",
-   "last_verified": "2026-09-24",
-   "letzter_check": "2026-09-26",
+   "last_verified": "2026-09-29",
+   "letzter_check": "2026-09-29",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17-5g-256-gb-nebelblau-dual-sim-3013577.html",
-   "abgerufen_am": "2026-09-24",
+   "abgerufen_am": "2026-09-29",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
     "https://www.saturn.de/de/brand/apple/iphone/iphone-17"
    ],
    "titel_roh": "APPLE iPhone 17 5G 256 GB Nebelblau Dual SIM",
-   "preis_ohne_vertrag": 1089.0,
-   "ended_since": "2026-09-26",
-   "stale_since": "2026-09-25"
+   "preis_ohne_vertrag": 1029.0,
+   "ended_since": "2026-09-26"
   },
   {
    "id": "saturn--apple-iphone-17-256gb-schwarz",
@@ -3845,7 +3844,7 @@
     "https://www.saturn.de/de/brand/apple/iphone/iphone-17"
    ],
    "titel_roh": "APPLE iPhone 17 5G 256 GB Schwarz Dual SIM",
-   "preis_ohne_vertrag": 1089.0,
+   "preis_ohne_vertrag": 1029.0,
    "ended_since": "2026-09-23"
   },
   {
@@ -3876,7 +3875,7 @@
     "https://www.saturn.de/de/brand/apple/iphone/iphone-17"
    ],
    "titel_roh": "APPLE iPhone 17 5G 256 GB Lavendel Dual SIM",
-   "preis_ohne_vertrag": 1089.0,
+   "preis_ohne_vertrag": 1029.0,
    "ended_since": "2026-09-11"
   },
   {
@@ -3907,7 +3906,7 @@
     "https://www.saturn.de/de/brand/apple/iphone/iphone-17"
    ],
    "titel_roh": "APPLE iPhone 17 5G 256 GB Weiß Dual SIM",
-   "preis_ohne_vertrag": 1089.0,
+   "preis_ohne_vertrag": 1029.0,
    "ended_since": "2026-09-27"
   },
   {
@@ -11215,13 +11214,13 @@
    "ean": "0195950643589",
    "zustand": "neu",
    "first_seen": "2026-09-03",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "vermutlich ausgelistet",
+   "missed_checks": 1,
    "erstpreis": 919.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
    "last_verified": "2026-09-28",
-   "letzter_check": "2026-09-28",
+   "letzter_check": "2026-09-29",
    "quelle_url": "https://www.congstar.de/geraete/apple/apple-iphone-17/",
    "abgerufen_am": "2026-09-28",
    "verfuegbarkeit": "nicht_lieferbar",
@@ -11230,7 +11229,8 @@
     "https://www.congstar.de/sitemap/devices.xml"
    ],
    "titel_roh": "Apple iPhone 17 256 GB schwarz",
-   "preis_ohne_vertrag": 1081.0
+   "preis_ohne_vertrag": 1081.0,
+   "stale_since": "2026-09-29"
   },
   {
    "id": "congstar--apple-iphone-17-256gb-violett",
@@ -11291,6 +11291,36 @@
    ],
    "titel_roh": "Apple iPhone 17 256 GB weiß",
    "preis_ohne_vertrag": 1081.0
+  },
+  {
+   "id": "congstar--apple-iphone-17-256gb-weiss-refurbished",
+   "sku_id": "apple-iphone-17-256gb-weiss-refurbished",
+   "device_id": "apple-iphone-17",
+   "anbieter": "congstar",
+   "anbieter_typ": "discount",
+   "netz": "Telekom",
+   "speicher_gb": 256,
+   "farbe_roh": "White",
+   "farbe_normalisiert": "weiss",
+   "ean": "4021114381522",
+   "zustand": "refurbished",
+   "first_seen": "2026-09-29",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "erstpreis": 757.0,
+   "erstpreis_art": "ohne_vertrag",
+   "erstpreis_am": "2026-09-29",
+   "last_verified": "2026-09-29",
+   "letzter_check": "2026-09-29",
+   "quelle_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-zustand-wie-neu/",
+   "abgerufen_am": "2026-09-29",
+   "verfuegbarkeit": "lieferbar",
+   "confidence": "hoch",
+   "einstiege": [
+    "https://www.congstar.de/sitemap/devices.xml"
+   ],
+   "titel_roh": "Apple iPhone 17 256 GB weiß NEUWERTIG",
+   "preis_ohne_vertrag": 757.0
   },
   {
    "id": "congstar--apple-iphone-17-512gb-gruen",
@@ -11457,13 +11487,13 @@
    "ean": "0195950627640",
    "zustand": "neu",
    "first_seen": "2026-09-03",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "vermutlich ausgelistet",
+   "missed_checks": 1,
    "erstpreis": 1225.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
    "last_verified": "2026-09-28",
-   "letzter_check": "2026-09-28",
+   "letzter_check": "2026-09-29",
    "quelle_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/",
    "abgerufen_am": "2026-09-28",
    "verfuegbarkeit": "lieferbar",
@@ -11472,7 +11502,8 @@
     "https://www.congstar.de/sitemap/devices.xml"
    ],
    "titel_roh": "Apple iPhone 17 Pro 256 GB tiefblau",
-   "preis_ohne_vertrag": 1225.0
+   "preis_ohne_vertrag": 1225.0,
+   "stale_since": "2026-09-29"
   },
   {
    "id": "congstar--apple-iphone-17-pro-256gb-silber",
@@ -11487,13 +11518,13 @@
    "ean": "0195950627244",
    "zustand": "neu",
    "first_seen": "2026-09-03",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "vermutlich ausgelistet",
+   "missed_checks": 1,
    "erstpreis": 1225.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
    "last_verified": "2026-09-28",
-   "letzter_check": "2026-09-28",
+   "letzter_check": "2026-09-29",
    "quelle_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro/",
    "abgerufen_am": "2026-09-28",
    "verfuegbarkeit": "lieferbar",
@@ -11502,7 +11533,8 @@
     "https://www.congstar.de/sitemap/devices.xml"
    ],
    "titel_roh": "Apple iPhone 17 Pro 256 GB silber",
-   "preis_ohne_vertrag": 1225.0
+   "preis_ohne_vertrag": 1225.0,
+   "stale_since": "2026-09-29"
   },
   {
    "id": "congstar--apple-iphone-17-pro-512gb-cosmic-orange",
@@ -11653,6 +11685,36 @@
    ],
    "titel_roh": "Apple iPhone 17 Pro Max 256 GB tiefblau",
    "preis_ohne_vertrag": 1395.0
+  },
+  {
+   "id": "congstar--apple-iphone-17-pro-max-256gb-deep-blue-refurbished",
+   "sku_id": "apple-iphone-17-pro-max-256gb-deep-blue-refurbished",
+   "device_id": "apple-iphone-17-pro-max",
+   "anbieter": "congstar",
+   "anbieter_typ": "discount",
+   "netz": "Telekom",
+   "speicher_gb": 256,
+   "farbe_roh": "Deep Blue",
+   "farbe_normalisiert": null,
+   "ean": "4021114382246",
+   "zustand": "refurbished",
+   "first_seen": "2026-09-29",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "erstpreis": 1179.0,
+   "erstpreis_art": "ohne_vertrag",
+   "erstpreis_am": "2026-09-29",
+   "last_verified": "2026-09-29",
+   "letzter_check": "2026-09-29",
+   "quelle_url": "https://www.congstar.de/geraete/apple/apple-iphone-17-pro-max-zustand-wie-neu/",
+   "abgerufen_am": "2026-09-29",
+   "verfuegbarkeit": "lieferbar",
+   "confidence": "hoch",
+   "einstiege": [
+    "https://www.congstar.de/sitemap/devices.xml"
+   ],
+   "titel_roh": "Apple iPhone 17 Pro Max 256 GB tiefblau NEUWERTIG",
+   "preis_ohne_vertrag": 1179.0
   },
   {
    "id": "congstar--apple-iphone-17-pro-max-512gb-cosmic-orange",
@@ -11820,13 +11882,13 @@
    "ean": "4021114388613",
    "zustand": "neu",
    "first_seen": "2026-09-26",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "ausgelistet",
+   "missed_checks": 2,
    "erstpreis": 685.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-26",
    "last_verified": "2026-09-27",
-   "letzter_check": "2026-09-28",
+   "letzter_check": "2026-09-29",
    "quelle_url": "https://www.congstar.de/geraete/apple/apple-iphone-17e/",
    "abgerufen_am": "2026-09-27",
    "verfuegbarkeit": "lieferbar",
@@ -11836,7 +11898,8 @@
    ],
    "titel_roh": "Apple iPhone 17e 256 GB weiß",
    "preis_ohne_vertrag": 685.0,
-   "stale_since": "2026-09-28"
+   "stale_since": "2026-09-28",
+   "ended_since": "2026-09-29"
   },
   {
    "id": "congstar--apple-iphone-18-pro-1024gb-burgunder",
@@ -12683,13 +12746,13 @@
    "ean": "0195951410555",
    "zustand": "neu",
    "first_seen": "2026-09-17",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "vermutlich ausgelistet",
+   "missed_checks": 1,
    "erstpreis": 1849.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-17",
    "last_verified": "2026-09-28",
-   "letzter_check": "2026-09-28",
+   "letzter_check": "2026-09-29",
    "quelle_url": "https://www.congstar.de/geraete/apple/apple-iphone-18-pro-max/",
    "abgerufen_am": "2026-09-28",
    "verfuegbarkeit": "nicht_lieferbar",
@@ -12698,7 +12761,8 @@
     "https://www.congstar.de/sitemap/devices.xml"
    ],
    "titel_roh": "Apple iPhone 18 Pro Max 512 GB silber",
-   "preis_ohne_vertrag": 1849.0
+   "preis_ohne_vertrag": 1849.0,
+   "stale_since": "2026-09-29"
   },
   {
    "id": "congstar--apple-iphone-air-256gb-sky-blue",
@@ -12991,13 +13055,13 @@
    "ean": "0840353950092",
    "zustand": "neu",
    "first_seen": "2026-09-12",
-   "status": "aktiv",
-   "missed_checks": 0,
+   "status": "vermutlich ausgelistet",
+   "missed_checks": 1,
    "erstpreis": 595.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-12",
    "last_verified": "2026-09-28",
-   "letzter_check": "2026-09-28",
+   "letzter_check": "2026-09-29",
    "quelle_url": "https://www.congstar.de/geraete/google/google-pixel-10a/",
    "abgerufen_am": "2026-09-28",
    "verfuegbarkeit": "lieferbar",
@@ -13006,7 +13070,8 @@
     "https://www.congstar.de/sitemap/devices.xml"
    ],
    "titel_roh": "Google Pixel 10a 256 GB lavender",
-   "preis_ohne_vertrag": 497.0
+   "preis_ohne_vertrag": 497.0,
+   "stale_since": "2026-09-29"
   },
   {
    "id": "congstar--google-pixel-11-256gb-frost",
@@ -15383,13 +15448,13 @@
    "ean": "8806099192013",
    "zustand": "neu",
    "first_seen": "2026-09-03",
-   "status": "vermutlich ausgelistet",
-   "missed_checks": 1,
+   "status": "ausgelistet",
+   "missed_checks": 2,
    "erstpreis": 1297.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
    "last_verified": "2026-09-27",
-   "letzter_check": "2026-09-28",
+   "letzter_check": "2026-09-29",
    "quelle_url": "https://www.congstar.de/geraete/samsung/samsung-galaxy-z-flip8/",
    "abgerufen_am": "2026-09-27",
    "verfuegbarkeit": "lieferbar",
@@ -15399,7 +15464,7 @@
    ],
    "titel_roh": "Samsung Galaxy Z Flip8 256 GB pink",
    "preis_ohne_vertrag": 1297.0,
-   "ended_since": "2026-09-10",
+   "ended_since": "2026-09-29",
    "stale_since": "2026-09-28"
   },
   {
