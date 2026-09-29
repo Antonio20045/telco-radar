@@ -87,12 +87,14 @@ def _wahl(url: str, daten: dict) -> dict:
 def _erwartet(daten, wahl):
     r = gk.rangliste(daten, wahl["modell"], wahl["stufe"], wahl["raten"])
     zeilen = []
-    for g in r["gruppen"]:
+    for i, g in enumerate(r["gruppen"]):
         zeilen.append(("kopf", f"Kosten über {g['monate']} Monate", ""))
+        erste = i == 0 and g["monate"] == gk.HORIZONT
         zeilen += [(z["anbieter"], euro(z["angebot"]["gesamt"]),
                     "günstigste" if z["sieger"] else
                     ("+" + euro(z["abstand"])) if z["abstand"] is not None
-                    else "") for z in g["zeilen"]]
+                    else "einziges Angebot" if erste and j == 0 else "")
+                   for j, z in enumerate(g["zeilen"])]
     if not r["gruppen"]:
         zeilen.append(("kopf", f"Kosten über {gk.HORIZONT} Monate", ""))
     if r["anders"]:

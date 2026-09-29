@@ -24,7 +24,7 @@
       <span class="kv-anb">{{ z.anbieter }}</span>
       <span class="kv-info"><span class="kv-gb">{{ a.gb }}</span>{% if a.raten %}<span class="kv-raten">{{ a.raten }}&nbsp;Raten</span>{% endif %}{% if not a.frisch and a.stand_kurz %}<span class="kv-alt">Stand&nbsp;{{ a.stand_kurz }}</span>{% endif %}</span>
       <span class="kv-summe">{{ betrag(a.gesamt) }}</span>
-      <span class="kv-abstand">{% if z.sieger %}günstigste{% elif z.abstand is not none %}+{{ z.abstand | euro }}{% endif %}</span>
+      <span class="kv-abstand">{% if z.sieger %}günstigste{% elif z.abstand is not none %}+{{ z.abstand | euro }}{% elif z.erste %}einziges Angebot{% endif %}</span>
       <span class="kv-pfeil" aria-hidden="true"></span>
     </summary>
     <div class="kv-weg">
@@ -35,7 +35,7 @@
         <tr class="kv-weg-summe"><th>Gesamt</th><td class="kv-weg-mal"></td><td>{{ a.gesamt | euro }}</td></tr>
       </table>
       {%- if a.url %}
-      <a class="kv-quelle" href="{{ a.url }}" rel="nofollow noopener" target="_blank">Angebot bei {{ z.anbieter }} ↗</a>
+      <a class="kv-quelle" href="{{ a.url }}" rel="nofollow noopener" target="_blank">{% if a.tarif %}{{ a.tarif }} bei {% else %}Angebot bei {% endif %}{{ z.anbieter }} ↗</a>
       {%- endif %}
     </div>
   </details>
@@ -100,7 +100,6 @@
 {% if kv.hat_daten and kv.ansicht %}
   <header class="kv-kopf">
     <h1 class="kv-titel" id="kv-titel">{{ kv.ansicht.titel }} <span>{{ kv.ansicht.speicher }}</span></h1>
-    {% if geraete.abgerufen_bis %}<span class="page-date">Preise vom {{ geraete.abgerufen_bis | date_de }}</span>{% endif %}
   </header>
 
   <div class="kv-wahl" id="kv-wahl">

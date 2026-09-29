@@ -104,8 +104,9 @@ def _posten(karte: dict) -> list:
         name = p["name"]
         rang = 9
         if art == "tarif":
-            # Der Tarifname steht als Posten im Rechenweg, nicht über ihm.
-            name, rang = karte.get("tarif") or "Tarif", 1
+            # Der Produktname des Tarifs ("Allnet Flat S") steht am Link zum
+            # Angebot; hier hieße er unter der Stufe M "S" und verwirrte.
+            name, rang = "Tarif", 1
             wert = tarif
         elif art == "raten":
             name, rang = "Geräteraten", 3

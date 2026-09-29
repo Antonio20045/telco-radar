@@ -3836,7 +3836,8 @@ var grKosten = (function () {
       (!a.frisch && a.stand_kurz ? '<span class="kv-alt">Stand&nbsp;' +
       esc(a.stand_kurz) + '</span>' : '') + '</span>' +
       '<span class="kv-summe">' + betrag(a.gesamt) + '</span><span class="kv-abstand">' +
-      (z.sieger ? 'günstigste' : z.abstand !== null ? '+' + euro(z.abstand) : '') +
+      (z.sieger ? 'günstigste' : z.abstand !== null ? '+' + euro(z.abstand)
+        : z.erste ? 'einziges Angebot' : '') +
       '</span><span class="kv-pfeil" aria-hidden="true"></span></summary>' +
       '<div class="kv-weg"><table>';
     a.posten.forEach(function (p) {
@@ -3846,7 +3847,8 @@ var grKosten = (function () {
     h += '<tr class="kv-weg-summe"><th>Gesamt</th><td class="kv-weg-mal"></td><td>' +
       euro(a.gesamt) + '</td></tr></table>';
     if (a.url) h += '<a class="kv-quelle" href="' + esc(a.url) +
-      '" rel="nofollow noopener" target="_blank">Angebot bei ' + esc(z.anbieter) + ' ↗</a>';
+      '" rel="nofollow noopener" target="_blank">' +
+      (a.tarif ? esc(a.tarif) + ' bei ' : 'Angebot bei ') + esc(z.anbieter) + ' ↗</a>';
     return h + '</div></details></li>';
   }
 

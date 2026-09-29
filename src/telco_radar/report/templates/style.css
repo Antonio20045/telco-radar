@@ -4261,7 +4261,7 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
 .kv-info>span{white-space:nowrap}
 .kv-gb{font-weight:700;color:var(--ink)}
 .kv-gb{min-width:64px}
-.kv-alt{color:var(--ink-4)}
+.kv-alt{color:var(--al-mittel);font-weight:700}
 .kv-summe{font-family:var(--serif);font-weight:700;font-size:28px;line-height:1;
   text-align:right;color:var(--ink);white-space:nowrap;
   font-variant-numeric:tabular-nums}
@@ -4330,7 +4330,11 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
   .kv-reihe{grid-template-columns:1fr;gap:5px}
   .kv-reihe-name{padding-top:0;font-size:10px}
   .kv-reihe--liste{display:grid}
-  .kv-reihe[data-wahl="hersteller"],.kv-reihe[data-wahl="familie"]{display:none}
+  .kv-reihe[data-wahl="familie"]{display:none}
+  .kv-reihe[data-wahl="hersteller"]{order:-1}
+  .kv-reihe[data-wahl="hersteller"] .kv-chips{grid-auto-flow:row;
+    grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .kv-reihe[data-wahl="hersteller"] .kv-chip{border-radius:3px;margin-left:0}
   .kv-chips{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:0}
   .kv-chip{border-radius:0;margin-left:-1px;padding:9px 2px;font-size:14px}
   .kv-chips .kv-chip:first-child{border-radius:3px 0 0 3px;margin-left:0}
