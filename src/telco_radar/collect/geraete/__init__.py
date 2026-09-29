@@ -521,13 +521,17 @@ def _registriere_anbieter_adapter() -> None:
     # Tarifdetails-Link. Die BEREITSTELLUNGSGEBUEHR steht erst hinter
     # jenem Link - dafuer der `ergaenze_buendel`-Haken: ein GET je
     # Tarif-Slug, nach dem Sammeln, aus der Pipeline.
+    #
+    # Tarifstufen (29.09.2026): derselbe Haken holt VORHER die zwei
+    # Tarifuebersichten und ihre Geraeteraster je Tarif und leitet daraus
+    # die Saetze der uebrigen Tarife her (`einsundeins.ergaenze_
+    # tarifstufen`, Rechnung und Gegenprobe im Modul).
     registriere("einsundeins_buendel",
                 Adapter(name="einsundeins_buendel",
                         lies=einsundeins_modul.lies,
                         ernte=einsundeins_modul.ernte,
                         lies_buendel=einsundeins_modul.lies_buendel,
-                        ergaenze_buendel=(
-                            einsundeins_modul.ergaenze_bereitstellungsgebuehr)))
+                        ergaenze_buendel=einsundeins_modul.ergaenze_buendel))
     # Die Markenseite IST die Nutzlast (direkt): ld+json UND Apollo-Cache
     # stehen bereits in dieser einen Antwort, keine Produktseite wird
     # nachgeladen. Kein `ernte` noetig - die Beleglinks je Variante liest

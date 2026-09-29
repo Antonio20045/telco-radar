@@ -434,7 +434,7 @@ def lies_buendel(text: str, url: str = "",
             f"1&1-Geräteseite ohne hwdVariantsPrices ({len(text or '')} Bytes)"
             " - kein Bündelkatalog (Markup geändert?)")
 
-    tarif = _tarifname(text)
+    tarif = tarifname_bereinigt(_tarifname(text))
     if not tarif:
         log.info("1&1: %s nennt keinen Tarifnamen (tariff-description/"
                  "Beschreibung) - Bündelsätze verworfen", url)
@@ -448,6 +448,13 @@ def lies_buendel(text: str, url: str = "",
     # ein gueltiger Zustand - der Block steht hinter `=== '36'`.
     einmalzahlungen = _einmalzahlungen(text)
     tarifdetails = _tarifdetails_url(text, url)
+    # Fuer die Tarifstufen (29.09.2026, `ergaenze_tarifstufen`): die
+    # Geraete-ID der Seite verbindet sie mit den Tarifrastern, und die
+    # vorausgewaehlte Groesse samt dem Preis, den die Seite beim Laden
+    # ZEIGT, ist die Gegenprobe gegen das Raster des Default-Tarifs.
+    hw_id = _hw_id(text)
+    vorauswahl = variante(text).get("size") or ""
+    angezeigt = _angezeigter_preis(text, hw_id)
     out: list[dict] = []
     gesehen: dict[int, tuple[str, float]] = {}
     for treffer in _PREISKARTE_SCHLUESSEL.finditer(karte):
@@ -477,7 +484,16 @@ def lies_buendel(text: str, url: str = "",
         if einmalzahlungen and einmalzahlung is None:
             log.info("1&1: %s nennt keine Einmalzahlung für %s/%d GB - "
                      "Feld bleibt offen", url, farbe_roh, gb)
+        vorausgewaehlt = str(gb) == vorauswahl
         out.append({
+            "hw_id": hw_id,
+            "vorausgewaehlt": vorausgewaehlt,
+            # Nur am vorausgewaehlten Satz: der Preis, den die Seite beim
+            # Laden zeigt - MIT einem vorab angehakten Zubehoer-Bundle
+            # (`data-auto-add="true"`, gemessen am Galaxy S26 Ultra: 44,99
+            # gezeigt, 42,99 in der Preiskarte). Er ist KEIN Buendelpreis
+            # und geht in keinen Betrag ein - nur in die Gegenprobe.
+            "angezeigt_monatlich": angezeigt if vorausgewaehlt else None,
             "titel": " ".join(x for x in (marke, name, f"{gb} GB", farbe)
                               if x),
             "farbe": farbe,
@@ -643,6 +659,333 @@ def ergaenze_bereitstellungsgebuehr(hole: Callable, kopfzeilen: dict,
         satz["anschlusspreis"] = gebuehr
         gesetzt += 1
     return gesetzt
+
+
+# --------------------------------------------------------------------------
+# DIE TARIFSTUFEN (29.09.2026): Tarifuebersicht -> Geraeteraster je Tarif
+# --------------------------------------------------------------------------
+#
+# WAS GEMESSEN IST (29.09.2026, HTTP-GET, Absender TelcoRadar/1.0)
+# ----------------------------------------------------------------
+# Die Geraeteseite preist NUR den Default-Tarif (All-Net-Flat S), mit und
+# ohne `?chosenTariff=` byte-gleich im Preis (Modulkopf). Der Tarifwechsel
+# der Seite ("Weiter zur Tarifauswahl") ist ein Warenkorb-Schritt
+# (`add-to-cart-button`, `startPageFlowId=f2-ssc-hw-private`) - eine
+# Bestellstrecke, die hier nicht betreten wird. Serverseitig da ist etwas
+# anderes: die Tarifuebersichten `/all-net-flat-vergleich` und
+# `/unbegrenztes-datenvolumen` verlinken je Tarif "Mit Handy weiter" auf
+# ein GERAETERASTER dieses Tarifs (`targetpage="//mobile.1und1.de/
+# smartphones-all-net-flat-m?..."`, dazu `-s`, `-l`, `smartphones-
+# unlimited-s/-m/-l` und `/smartphones-unlimited-xl`). Jedes Raster traegt
+# fuer alle 43 Geraete EINEN Monatspreis (die vorausgewaehlte Variante),
+# den Tarifnamen ("Inkl. 1&1 All-Net-Flat M (50 GB)") und die Laufzeit
+# (`data-hardware-months="36"`). robots.txt: keiner dieser Pfade ist
+# gesperrt.
+#
+# DIE RECHNUNG, UND WARUM SIE KEINE ANNAHME IST
+# ---------------------------------------------
+# Rasterpreis(Tarif T) minus Rasterpreis(All-Net-Flat S) ist am 29.09.2026
+# fuer ALLE 43 Geraete derselbe Betrag: M +5,00, L +10,00, Unlimited S
+# +5,00, M +10,00, L +15,00 - bei Geraeten von 19,99 bis 69,99 EUR. Der
+# Tarifaufschlag haengt also nicht am Geraet, und damit auch nicht an
+# seiner Speichergroesse. Nur dann (`einheitlich`) wird er auf JEDE
+# Speichergroesse der Geraeteseite uebertragen:
+#
+#     Buendel(Groesse, T) = Preiskarte(Groesse, S) + Aufschlag(T, Geraet)
+#
+# Der Aufschlag ist je Geraet GEMESSEN (zwei Rasterpreise desselben
+# Geraets), nicht der Mittelwert. Das Raster selbst wird NICHT als
+# Buendelpreis uebernommen: es zeigt den Preis MIT einem vorab angehakten
+# Zubehoer-Bundle (Galaxy S26 Ultra: Raster S 44,99, Preiskarte 42,99 -
+# `data-auto-add="true"`), und Buendel aus Geraet plus Zubehoer werden
+# verworfen (CLAUDE.md, Geraeteradar). Die Differenz zweier Raster traegt
+# dasselbe Zubehoer auf beiden Seiten und hebt es auf.
+#
+# Unlimited XL ist NICHT einheitlich (Apple +25,00, alle anderen +30,00):
+# dort haengt der Aufschlag am Geraet, und ob er an der Speichergroesse
+# haengt, sagt keine serverseitige Zahl. Ein solcher Tarif bekommt nur
+# den Satz der VORAUSGEWAEHLTEN Groesse (fuer die der Aufschlag genau
+# gemessen ist), und seine Geraete-Einmalzahlung bleibt offen - die
+# Einmalzahlungs-Karte der Seite gehoert zum Default-Tarif.
+#
+# DIE GEGENPROBE je Geraet: der Rasterpreis im Default-Tarif muss dem
+# Preis gleichen, den die Geraeteseite beim Laden zeigt, und die Raster-
+# laufzeit der der Seite. Sonst sind Raster und Seite nicht dasselbe
+# Angebot, und das Geraet bekommt keinen weiteren Tarif.
+#
+# DIE LAUFZEIT: Alle Raster und alle Geraeteseiten nennen 36 Monate
+# ("24 + 12", `/handyvertrag`). Die 24-Monats-Finanzierung waehlt man erst
+# im Warenkorb (`hwDurationsAvailable`) - serverseitig steht sie nirgends.
+# Sie bleibt eine benannte Luecke, statt geraten zu werden.
+
+# Die zwei Tarifuebersichten, von denen die Raster verlinkt sind. Jede
+# Geraeteseite verlinkt sie in ihrer Hauptnavigation ("1&1 Unlimited
+# Tarife", "1&1 All-Net-Flat mit 10, 50 oder 150 GB").
+TARIFUEBERSICHTEN = (
+    "https://mobile.1und1.de/all-net-flat-vergleich",
+    "https://mobile.1und1.de/unbegrenztes-datenvolumen",
+)
+
+# "Mit Handy weiter": `targetpage="//mobile.1und1.de/smartphones-…?…"`
+# oder relativ `targetpage="/smartphones-unlimited-xl?"`. Die Anfrage-
+# parameter (`tariffChangeUrl`, `optionalPrecedingDocuments`) fuehren nur
+# den Warenkorb zurueck und werden nicht mitgeschickt.
+_RASTER_LINK_RE = re.compile(
+    r'targetpage="(?P<ziel>(?://mobile\.1und1\.de)?/smartphones-[a-z0-9-]+)')
+
+# Der Tarifdetails-Link je Tarifkachel der Uebersicht: `data-iframe` mit
+# `chosenTariff=` und `title="Tarifdetails <Tarifname>"` im selben Tag.
+_TAG_RE = re.compile(r"<(?:a|span)\b[^>]*>", re.S)
+_ATTR_RE = re.compile(r'([\w-]+)="([^"]*)"')
+
+_RASTER_FORM_RE = re.compile(r'<form class="hardware-box\b.*?</form>', re.S)
+_RASTER_GERAET_RE = re.compile(r'data-hardware-select="([^"]+)"')
+_RASTER_MONATE_RE = re.compile(r'data-hardware-months="(\d+)"')
+_RASTER_EURO_RE = re.compile(r'-price--euro"[^>]*>\s*(\d+)\s*<')
+_RASTER_CENT_RE = re.compile(r'-price--cent"[^>]*>\s*([0-9–-]+)\s*<')
+_RASTER_TARIF_RE = re.compile(r"Inkl\.\s*([^<]+)")
+
+_KLAMMERZUSATZ_RE = re.compile(r"\s*\([^()]*\)\s*$")
+
+HERLEITUNG_TARIFAUFSCHLAG = "tarifaufschlag_aus_tarifraster"
+
+
+def tarifname_bereinigt(name: str) -> str:
+    """"1&1 All-Net-Flat M (50 GB)" -> "1&1 All-Net-Flat M".
+
+    Das Raster haengt das Volumen in Klammern an; der Tarifbestand fuehrt
+    den Namen ohne (`/handytarife`), und `tarif_bezug` loest nur den auf.
+    """
+    text = " ".join(html_modul.unescape(name or "").split())
+    return _KLAMMERZUSATZ_RE.sub("", text).strip()
+
+
+def _hw_id(text: str) -> str:
+    treffer = re.search(r"window\.productId\s*=\s*'([^']+)'", text or "")
+    return treffer.group(1) if treffer else ""
+
+
+def _cent(euro: str, cent: str) -> int:
+    rest = cent.strip()
+    return int(euro) * 100 + (0 if rest in ("–", "-") else int(rest))
+
+
+def _angezeigter_preis(text: str, hw_id: str) -> Optional[float]:
+    """Der Monatspreis, den die Geraeteseite serverseitig anzeigt."""
+    if not hw_id:
+        return None
+    kopf = re.escape(hw_id)
+    euro = re.search(rf'id="{kopf}--price__digits">\s*(\d+)\s*<', text or "")
+    cent = re.search(rf'id="{kopf}--price__decimals"[^>]*>\s*([0-9–-]+)\s*<',
+                     text or "")
+    if not (euro and cent):
+        return None
+    return _cent(euro.group(1), cent.group(1)) / 100.0
+
+
+def tarifraster_adressen(text: str, basis_url: str) -> list[str]:
+    """Die Geraeteraster, die eine Tarifuebersicht verlinkt."""
+    out: list[str] = []
+    for treffer in _RASTER_LINK_RE.finditer(text or ""):
+        ziel = urljoin(basis_url or "https://mobile.1und1.de",
+                       treffer.group("ziel"))
+        if ziel not in out:
+            out.append(ziel)
+    return out
+
+
+def tarifdetails_je_tarif(text: str, basis_url: str) -> dict:
+    """{Tarifname: (Tarifdetails-Adresse, Slug)} aus einer Tarifuebersicht."""
+    out: dict = {}
+    for tag in _TAG_RE.findall(text or ""):
+        attrs = dict(_ATTR_RE.findall(tag))
+        ziel = html_modul.unescape(attrs.get("data-iframe", ""))
+        titel = html_modul.unescape(attrs.get("title", ""))
+        if "/details-" not in ziel or not titel.startswith("Tarifdetails "):
+            continue
+        slug = _SLUG_RE.search(ziel)
+        if not slug:
+            continue
+        name = tarifname_bereinigt(titel[len("Tarifdetails "):])
+        out.setdefault(name, (urljoin(basis_url, ziel), slug.group(1)))
+    return out
+
+
+def lies_tarifraster(text: str) -> dict:
+    """Ein Geraeteraster: Tarifname und je Geraete-ID (Cent, Monate).
+
+    Wirft, wenn die Seite keine Geraetekachel traegt - ein leeres Raster
+    ist ein geaendertes Markup und nicht "dieser Tarif hat keine Geraete".
+    Nennen die Kacheln verschiedene Tarife, ist der Name leer.
+    """
+    namen: set = set()
+    preise: dict = {}
+    for form in _RASTER_FORM_RE.findall(text or ""):
+        geraet = _RASTER_GERAET_RE.search(form)
+        euro = _RASTER_EURO_RE.search(form)
+        cent = _RASTER_CENT_RE.search(form)
+        if not (geraet and euro and cent):
+            continue
+        monate = _RASTER_MONATE_RE.search(form)
+        tarif = _RASTER_TARIF_RE.search(form)
+        if tarif:
+            namen.add(tarifname_bereinigt(tarif.group(1)))
+        preise[geraet.group(1)] = (
+            _cent(euro.group(1), cent.group(1)),
+            int(monate.group(1)) if monate else None)
+    if not preise:
+        raise GeraeteAbrufFehler(
+            f"1&1-Geräteraster ohne hardware-box-Kachel "
+            f"({len(text or '')} Bytes) - Markup geändert?")
+    if len(namen) != 1:
+        log.warning("1&1: Geräteraster nennt %d Tarifnamen (%s) - verworfen",
+                    len(namen), ", ".join(sorted(namen)))
+    return {"tarif_name": next(iter(namen)) if len(namen) == 1 else "",
+            "preise": preise}
+
+
+def _hole_text(hole: Callable, kopfzeilen: dict, adresse: str
+               ) -> Optional[str]:
+    """Ein Abruf; None bei Fehler - protokolliert, nie still."""
+    try:
+        status, text = hole(adresse, kopfzeilen=kopfzeilen)
+    except Exception as exc:                              # noqa: BLE001
+        log.warning("1&1: %s nicht abrufbar (%s)", adresse, exc)
+        return None
+    if not (200 <= int(status) < 300):
+        log.warning("1&1: %s mit HTTP %s", adresse, status)
+        return None
+    return text
+
+
+def ergaenze_tarifstufen(hole: Callable, kopfzeilen: dict,
+                         rohbuendel: list) -> int:
+    """Aus den Default-Tarif-Saetzen die Saetze der uebrigen Tarifstufen.
+
+    Rechnung, Gegenprobe und Grenzen stehen im Kopf dieses Abschnitts.
+    Abrufe: die zwei Tarifuebersichten plus ein Raster je verlinktem
+    Tarif (am 29.09.2026: 2 + 7). Haengt die neuen Saetze an `rohbuendel`
+    an und gibt ihre Zahl zurueck. Ein fehlendes Default-Raster heisst:
+    nichts herleiten - ohne die Gegenprobe ist ein Aufschlag keiner.
+    """
+    basis = [s for s in (rohbuendel or [])
+             if s.get("quelle") == "einsundeins_buendel"
+             and not s.get("herleitung") and s.get("hw_id")]
+    if not basis:
+        return 0
+    basistarife = {s.get("tarif_name") for s in basis}
+    if len(basistarife) != 1:
+        log.warning("1&1: Geräteseiten nennen %d Default-Tarife (%s) - "
+                    "keine Tarifstufen hergeleitet", len(basistarife),
+                    ", ".join(sorted(map(str, basistarife))))
+        return 0
+    basistarif = basistarife.pop()
+    je_geraet: dict = {}
+    for satz in basis:
+        je_geraet.setdefault(satz["hw_id"], []).append(satz)
+
+    raster_adressen: list[str] = []
+    details: dict = {}
+    for uebersicht in TARIFUEBERSICHTEN:
+        text = _hole_text(hole, kopfzeilen, uebersicht)
+        if text is None:
+            continue
+        for adresse in tarifraster_adressen(text, uebersicht):
+            if adresse not in raster_adressen:
+                raster_adressen.append(adresse)
+        for name, wert in tarifdetails_je_tarif(text, uebersicht).items():
+            details.setdefault(name, wert)
+
+    raster: dict = {}
+    for adresse in raster_adressen:
+        text = _hole_text(hole, kopfzeilen, adresse)
+        if text is None:
+            continue
+        try:
+            gelesen = lies_tarifraster(text)
+        except GeraeteAbrufFehler as exc:
+            log.warning("1&1: %s: %s", adresse, exc)
+            continue
+        if gelesen["tarif_name"]:
+            raster.setdefault(gelesen["tarif_name"], (adresse, gelesen))
+
+    if basistarif not in raster:
+        log.warning("1&1: kein Geräteraster für den Default-Tarif %s - "
+                    "keine Tarifstufen hergeleitet (%d Raster gelesen)",
+                    basistarif, len(raster))
+        return 0
+    _, basisraster = raster[basistarif]
+
+    vorhanden = {(s.get("sku_id"), s.get("tarif_name"),
+                  s.get("laufzeit_monate")) for s in rohbuendel}
+    neu: list[dict] = []
+    for tarif, (adresse, gelesen) in sorted(raster.items()):
+        if tarif == basistarif:
+            continue
+        aufschlaege = {
+            hw: preis[0] - basisraster["preise"][hw][0]
+            for hw, preis in gelesen["preise"].items()
+            if hw in basisraster["preise"]}
+        einheitlich = len(set(aufschlaege.values())) == 1
+        detail_url, slug = details.get(tarif, ("", ""))
+        unstimmig = 0
+        for hw, saetze in sorted(je_geraet.items()):
+            if hw not in aufschlaege:
+                continue
+            vorher = next((s for s in saetze if s.get("vorausgewaehlt")),
+                          None)
+            basis_cent, basis_monate = basisraster["preise"][hw]
+            monate = gelesen["preise"][hw][1]
+            angezeigt = vorher.get("angezeigt_monatlich") if vorher else None
+            if (angezeigt is None or round(angezeigt * 100) != basis_cent
+                    or monate is None or monate != basis_monate
+                    or monate != vorher.get("laufzeit_monate")):
+                unstimmig += 1
+                continue
+            ziele = saetze if einheitlich else [vorher]
+            for satz in ziele:
+                schluessel = (satz.get("sku_id"), tarif, monate)
+                if schluessel in vorhanden:
+                    continue
+                vorhanden.add(schluessel)
+                cent = round(satz["buendel_monatlich"] * 100) + aufschlaege[hw]
+                kopie = {k: v for k, v in satz.items()
+                         if k not in ("angezeigt_monatlich", "anschlusspreis")}
+                kopie.update({
+                    "tarif_name": tarif,
+                    "tarif_slug": slug,
+                    "tarifdetails_url": detail_url,
+                    "buendel_monatlich": round(cent / 100.0, 2),
+                    "laufzeit_monate": monate,
+                    # Die Einmalzahlungs-Karte der Geraeteseite gehoert zum
+                    # Default-Tarif. Uebertragen wird sie nur, wo der
+                    # Aufschlag nachweislich geraeteunabhaengig ist.
+                    "geraet_zuzahlung": (satz.get("geraet_zuzahlung")
+                                         if einheitlich else None),
+                    "herleitung": HERLEITUNG_TARIFAUFSCHLAG,
+                    "url": adresse,
+                    "quelle_url": adresse,
+                })
+                neu.append(kopie)
+        log.info("1&1: %s - Aufschlag %s, %s%s", tarif,
+                 "einheitlich" if einheitlich else "geräteabhängig",
+                 "alle Speichergrößen" if einheitlich
+                 else "nur die vorausgewählte Größe",
+                 f", {unstimmig} Geräte ohne passende Gegenprobe"
+                 if unstimmig else "")
+    rohbuendel.extend(neu)
+    return len(neu)
+
+
+def ergaenze_buendel(hole: Callable, kopfzeilen: dict,
+                     rohbuendel: list) -> int:
+    """Der Nachbearbeitungs-Haken: erst die Tarifstufen, dann die
+    Bereitstellungsgebühr fuer ALLE Saetze (auch die neuen Tarife).
+    Zurueck kommt die Zahl der Saetze mit gesetzter Gebühr."""
+    neu = ergaenze_tarifstufen(hole, kopfzeilen, rohbuendel)
+    if neu:
+        log.info("1&1: %d Bündel-Sätze weiterer Tarifstufen hergeleitet", neu)
+    return ergaenze_bereitstellungsgebuehr(hole, kopfzeilen, rohbuendel)
 
 
 def lies(text: str, url: str = "") -> list[dict]:

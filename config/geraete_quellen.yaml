@@ -689,6 +689,16 @@ anbieter:
       /xml/, /static/, /modules/ sowie einzelne Aktions- und
       Bestellstrecken. /smartphones und die Produktseiten sind frei, der
       Parameter ?chosenTariff= ist ausdrücklich erlaubt.
+      TARIFSTUFEN SEIT 29.09.2026: Die Tarifübersichten
+      /all-net-flat-vergleich und /unbegrenztes-datenvolumen verlinken je
+      Tarif ein Geräteraster (/smartphones-all-net-flat-s|m|l,
+      /smartphones-unlimited-s|m|l|xl) mit einem Monatspreis je Gerät.
+      Der Aufschlag gegen All-Net-Flat S ist je Gerät gemessen und kommt
+      auf die Preiskarte jeder Speichergröße, wenn er für alle Geräte
+      gleich ist (sechs Tarife); sonst (Unlimited XL: Apple +25, andere +30)
+      nur auf die vorausgewählte Größe. Neun Abrufe mehr je Lauf im
+      `ergaenze_buendel`-Haken, siehe `einsundeins.ergaenze_tarifstufen`.
+      Die 24-Monats-Finanzierung steht nur im Warenkorb und bleibt offen.
       Die Tarife desselben Anbieters kommen NICHT von hier, sondern aus
       config/tarif_quellen.yaml (1und1.de/handytarife, methode ldjson) -
       dort trägt derselbe Anbieter seine eigene Marke, hier trägt das
