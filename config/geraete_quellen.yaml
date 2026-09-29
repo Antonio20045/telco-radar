@@ -532,19 +532,16 @@ anbieter:
       11.08.2026 - "im Roh-HTML steht kein Preis" - bleibt richtig; er gilt
       fuer die HTML-Seite, nicht fuer die Schnittstelle, die diese Seite
       selbst aufruft. api.vodafone.de hat keine robots.txt (HTTP 404).
-      SEIT DEM 05.09.2026 (B1) traegt dieselbe Detailantwort auch
-      Geraet-x-Tarif-Buendel (`atomics[].prices.composition`, 2-4 je
-      Variante) ohne Klarnamen - nur einen `offerCoreHash`. Aufgeloest wird
-      er ueber einen zweiten, GEZIELTEN Abruf je `hardwareId` gegen
-      `/glados/v2/tariff/v2/hardware`. Die erste Schaetzung ("gut ein
-      Drittel") stammte aus einer Stichprobe von 15 Geraeten/30 Hashes; der
-      volle Lauf vom 05.09.2026 (51 Geraete, 596 Rohsaetze) misst 339 von
-      596 Hashes ueber die Schnittstelle aufloesbar (56,9 %), davon
-      matchen 253 (42,5 % von 596) gegen den hier erfassten Tarifbestand
-      (10 Basistarife XS-XL). Der groesste Rest sind FamilyCard-Varianten
-      (86 Stueck) - namentlich aufgeloest, aber nicht Teil des Bestands,
-      also kein Aufloesungsfehler - siehe `outputs/phase-b1-buendel-
-      vodafone-2026-09-05.md`.
+      Buendel (Geraet plus Tarif): die Detailantwort traegt unter
+      `atomics[].prices.composition` nur eine VORSCHAU von vier Angeboten
+      je Variante (Mobil S/12, Mobil M/24, Mobil XS/36 Monate, FamilyCard
+      XL) - gemessen am 29.09.2026. Alle Angebote (Mobil XS bis XL je mit
+      12/24/36 Monaten plus FamilyCard S-XL) nennt erst
+      `/glados/v2/tariff/v2/hardware?hardwareId=<Liste>`, mit Klarnamen in
+      `tariffName`; abgerufen wird sie einmal je Geraet mit allen
+      `hardwareId` seiner Varianten. FamilyCard ist eine Zusatzkarte ohne
+      eigenes Tarifblatt im Bestand und faellt in `tco_buendel` als "ohne
+      aufloesbaren Tarif" heraus.
     einstiege:
       - url: https://api.vodafone.de/glados/v2/hardware/v2?businessTransaction=newContract&salesChannel=Online.Consumer
         label: Geraeteliste (Schnittstelle der Uebersichtsseite)
@@ -621,6 +618,16 @@ anbieter:
       # (Mindestlaufzeit 24 Monate): 14,99 €"). Im Betrieb werden diese
       # Seiten NICHT abgerufen - 66 Seiten a rund 950 KB fuer eine
       # Aufteilung, die schon in der einen Katalogantwort steht.
+      #
+      # SEIT DEM 29.09.2026 WIRD VERTIEFT (`o2.vertiefe_buendel`): der
+      # Katalog nennt je Geraet nur EIN Buendel (ein Speicher, ein Tarif,
+      # 36 Raten). Von jeder verlinkten Produktseite aus folgt der Sammler
+      # den Speicher- und Laufzeitschaltern, die die Seite selbst nennt
+      # (GET /e-shop/rest/configuration/<id>, derselbe Medientyp), und
+      # liest alle zwoelf Tarife je Antwort. Abrufe: je Geraet Speicher x
+      # 2 Laufzeiten, einmal 11 fuer den Referenzdurchlauf der Tarife.
+      # Er laeuft gegen die Frist des Anbieters; was sie abschneidet, steht
+      # in `gedeckelt`, die Katalogbuendel bleiben.
       - url: https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/ratenzahlung/default/__not-specified__/__not-specified__/__not-specified__
         label: Geraetekatalog mit Tarif
         kind: buendel
@@ -692,6 +699,16 @@ anbieter:
       /xml/, /static/, /modules/ sowie einzelne Aktions- und
       Bestellstrecken. /smartphones und die Produktseiten sind frei, der
       Parameter ?chosenTariff= ist ausdrücklich erlaubt.
+      TARIFSTUFEN SEIT 29.09.2026: Die Tarifübersichten
+      /all-net-flat-vergleich und /unbegrenztes-datenvolumen verlinken je
+      Tarif ein Geräteraster (/smartphones-all-net-flat-s|m|l,
+      /smartphones-unlimited-s|m|l|xl) mit einem Monatspreis je Gerät.
+      Der Aufschlag gegen All-Net-Flat S ist je Gerät gemessen und kommt
+      auf die Preiskarte jeder Speichergröße, wenn er für alle Geräte
+      gleich ist (sechs Tarife); sonst (Unlimited XL: Apple +25, andere +30)
+      nur auf die vorausgewählte Größe. Neun Abrufe mehr je Lauf im
+      `ergaenze_buendel`-Haken, siehe `einsundeins.ergaenze_tarifstufen`.
+      Die 24-Monats-Finanzierung steht nur im Warenkorb und bleibt offen.
       Die Tarife desselben Anbieters kommen NICHT von hier, sondern aus
       config/tarif_quellen.yaml (1und1.de/handytarife, methode ldjson) -
       dort trägt derselbe Anbieter seine eigene Marke, hier trägt das
@@ -757,13 +774,14 @@ anbieter:
       991/477 gegen Vodafones 949,90/849,90/999,90/499,90 fuer dieselben
       Geraete - dieselbe Groessenordnung, nicht der Sprung, den ein
       versteckter Tarifzwang verursachen wuerde).
-      BUENDEL SEIT B3 (08.09.2026): Die Geraet-x-Tarif-Kombinatorik steht
-      NICHT auf der Geräteseite (deren Zahlweisen tragen nur die Hardware),
-      sondern auf den vier Tarifseiten unter /handytarife/allnet-flat-tarife/
-      - serverseitig im selben Flight-Payload unter prefetchedPlan.variants[]
-      mit Tarifpreis, Bereitstellungspreis und je Geraet den Ratenzahlweisen.
-      Die vier Adressen nennt congstar selbst in der sitemap pages.xml; eine
-      Postpaid-Seite allnet-flat-xl existiert dort nicht (XL laeuft nur als
+      BUENDEL SEIT 29.09.2026 VON DEN PRODUKTSEITEN: Jede Geraeteseite
+      traegt serverseitig die ganze Tarifmatrix ihres Geraets
+      (prefetchedPlans mit Tarif- und Bereitstellungspreis,
+      prefetchedPlansWithDevicesPrices mit den Ratenzahlweisen je
+      PlanVariant und Geraetevariante). Die vier Tarifseiten unter
+      /handytarife/allnet-flat-tarife/ (B3, 08.09.2026) fuehren nur vier
+      Aufmachergeraete und lieferten deshalb nur zehn SKUs. Eine Allnet
+      Flat XL mit Geraet bietet congstar nicht an (XL laeuft nur als
       Pflichtblatt) - das ist eine Messgrenze, keine Luecke. Im Buendel gilt
       der Rabatt (`discounted`), fuer den Barpreis gilt `listed` - beides
       mit Begründung im Modulkopf von congstar.py. Der Tarifbezug läuft
@@ -784,21 +802,20 @@ anbieter:
         label: Geräte-Sitemap
         kind: sitemap
         pfadmuster: /geraete/
-      # B3: die vier Tarifseiten als Buendelkatalog (kind: buendel, kein
-      # Ernten - die Seite ist die Nutzlast). congstar nennt alle vier
-      # Adressen selbst in der sitemap pages.xml.
-      - url: https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-xs/
-        label: Allnet Flat XS (Bündel)
-        kind: buendel
-      - url: https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-s/
-        label: Allnet Flat S (Bündel)
-        kind: buendel
-      - url: https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-m/
-        label: Allnet Flat M (Bündel)
-        kind: buendel
-      - url: https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-l/
-        label: Allnet Flat L (Bündel)
-        kind: buendel
+        # Keine Smartphones - gemessen an der Sitemap vom 29.09.2026: Uhren
+        # (apple-watch-*, anio, xplora-kidswatch), AirPods, iPads, Galaxy
+        # Tab. Jede dieser Seiten waere ein Abruf von rund 900 KB ohne
+        # Smartphone-Buendel.
+        ohne_pfadmuster: ["-watch-", "/airpods-", "/apple-ipad-", "-galaxy-tab-", "/anio/", "/xplora/"]
+      # BUENDEL KOMMEN SEIT 29.09.2026 VON DEN PRODUKTSEITEN: jede traegt
+      # die ganze Tarifmatrix ihres Geraets (prefetchedPlansWithDevicesPrices,
+      # XS/S/M/L je mit Flex x Speicher x 24/36 Monate). Die vier Tarifseiten
+      # /handytarife/allnet-flat-tarife/allnet-flat-{xs,s,m,l}/, die bis dahin
+      # hier als `kind: buendel` standen, fuehren nur vier Aufmachergeraete
+      # (iPhone 18 Pro Max, 18 Pro, 17 Pro, Galaxy S26 Ultra) - sie lieferten
+      # deshalb nur zehn SKUs und sind durch die Produktseiten vollstaendig
+      # abgedeckt. Eine Allnet Flat XL mit Geraet bietet congstar nicht an:
+      # die Produktseiten nennen in prefetchedPlans nur XS/S/M/L (+Flex).
 
   - name: fraenk
     typ: discount

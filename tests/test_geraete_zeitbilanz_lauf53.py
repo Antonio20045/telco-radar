@@ -24,6 +24,12 @@ wortgleich mit den gemessenen "56 Produktseiten") und die vier ECHTEN
 Buendel-Adressen aus der ausgelieferten Konfiguration
 (`lade_quellen(root)`).
 
+NACHTRAG 29.09.2026: congstar hat keine Tarifseiten-Einstiege mehr - die
+Buendel kommen von den Produktseiten (volle Tarifmatrix je Geraet), und
+Nicht-Smartphones der Sitemap schliesst `ohne_pfadmuster` vorher aus.
+Vollstaendig heisst deshalb jetzt: jede verbleibende Produktseite hat ihre
+Buendel geliefert.
+
 Frist und Reihenfolge kommen NICHT hartkodiert in diese Datei, sondern
 werden aus den echten Dateien gelesen (`.github/workflows/geraete.yml`,
 `config/geraete_quellen.yaml`) - der Test haengt so direkt am produktiven
@@ -126,24 +132,19 @@ def _congstar_bilanz(monkeypatch, frist_sekunden: float):
     fueller, fueller_kosten = _fueller_anbieter()
     congstar = _congstar_anbieter()
 
-    sitemap_url = next(e.url for e in congstar.einstiege if e.kind == "sitemap")
-    buendel_urls = [e.url for e in congstar.einstiege if e.kind == "buendel"]
-    assert len(buendel_urls) == 4, \
-        "congstar: die vier Tarifseiten fehlen in der Konfiguration"
+    sitemap = next(e for e in congstar.einstiege if e.kind == "sitemap")
+    sitemap_url = sitemap.url
+    # Seit 29.09.2026 kommen die Buendel von den Produktseiten (volle
+    # Tarifmatrix je Geraet); die vier Tarifseiten sind keine Einstiege mehr.
+    assert not [e for e in congstar.einstiege if e.kind == "buendel"]
 
     sitemap_text = _fixture("congstar_sitemap_devices.xml")
-    produkt_urls = set(re.findall(r"<loc>\s*([^<\s]+)\s*</loc>", sitemap_text))
-    assert len(produkt_urls) >= 50, "Sitemap-Fixtur: zu wenige Produktseiten"
+    alle_urls = set(re.findall(r"<loc>\s*([^<\s]+)\s*</loc>", sitemap_text))
+    produkt_urls = {u for u in alle_urls
+                    if not any(m in u for m in sitemap.ohne_pfadmuster)}
+    assert len(produkt_urls) >= 40, "Sitemap-Fixtur: zu wenige Produktseiten"
 
     produkt_seite = _fixture("congstar_produkt_iphone17.html.gz")
-    s_seite = _fixture("congstar_tarifseite_allnet_flat_s.html.gz")
-    m_seite = _fixture("congstar_tarifseite_allnet_flat_m.html.gz")
-    # xs/l: keine eigenen Fixturen gespeichert - dieselbe Seitenform wie
-    # s/m wiederverwendet. `lies_buendel` bekommt die URL als Parameter und
-    # liest den Tarifnamen NICHT aus ihr, sondern aus der Nutzlast - siehe
-    # test_geraete_buendel_congstar.py.
-    buendel_seiten = {buendel_urls[0]: s_seite, buendel_urls[1]: s_seite,
-                      buendel_urls[2]: m_seite, buendel_urls[3]: m_seite}
 
     def hole(url, kopfzeilen=None, user_agent=None):
         if url.endswith("/robots.txt"):
@@ -154,12 +155,9 @@ def _congstar_bilanz(monkeypatch, frist_sekunden: float):
         if url == sitemap_url:
             uhr["t"] += _KOSTEN_JE_ABRUF_CONGSTAR
             return (200, sitemap_text)
-        if url in produkt_urls:
+        if url in alle_urls:
             uhr["t"] += _KOSTEN_JE_ABRUF_CONGSTAR
             return (200, produkt_seite)
-        if url in buendel_seiten:
-            uhr["t"] += _KOSTEN_JE_ABRUF_CONGSTAR
-            return (200, buendel_seiten[url])
         return (404, "")
 
     quellen = QuellenConfig(anbieter=[*fueller, congstar])
@@ -167,10 +165,10 @@ def _congstar_bilanz(monkeypatch, frist_sekunden: float):
                       datetime(2026, 9, 24, 7, 36, 8, tzinfo=timezone.utc),
                       frist_sekunden=frist_sekunden)
     bilanz = next(b for b in ergebnis["anbieter"] if b.name == "congstar")
-    return bilanz, produkt_urls, buendel_urls
+    return bilanz, produkt_urls
 
 
-def _erwarte_vollstaendigen_congstar_lauf(bilanz, produkt_urls, buendel_urls):
+def _erwarte_vollstaendigen_congstar_lauf(bilanz, produkt_urls):
     assert bilanz.status == "ok", (
         f"congstar verhungert weiterhin: status={bilanz.status!r}, "
         f"grund={bilanz.grund!r}, "
@@ -180,9 +178,9 @@ def _erwarte_vollstaendigen_congstar_lauf(bilanz, produkt_urls, buendel_urls):
         "ein nicht vollstaendig gelesener congstar darf nicht altern (Regel 6)"
 
     gelesene_buendel_urls = {s["url"] for s in bilanz.buendel}
-    assert gelesene_buendel_urls == set(buendel_urls), (
-        "nicht alle vier Tarifseiten wurden gelesen: "
-        f"gelesen={gelesene_buendel_urls}, erwartet={set(buendel_urls)}")
+    assert gelesene_buendel_urls == produkt_urls, (
+        "nicht jede Produktseite hat ihre Buendelmatrix geliefert: "
+        f"fehlend={sorted(produkt_urls - gelesene_buendel_urls)[:5]}")
     assert bilanz.produkte_abgerufen >= len(produkt_urls), (
         f"nicht alle {len(produkt_urls)} Produktseiten wurden gelesen "
         f"({bilanz.produkte_abgerufen} Produkte extrahiert)")
@@ -193,8 +191,8 @@ def test_congstar_bekommt_im_nachbau_von_lauf_53_einen_vollstaendigen_lauf(monke
     heute 1800s). Deckt beide Teile der Abhilfe zusammen ab: Reihenfolge
     UND groesseres Budget."""
     frist = _lies_geraete_frist_aus_workflow()
-    bilanz, produkt_urls, buendel_urls = _congstar_bilanz(monkeypatch, frist)
-    _erwarte_vollstaendigen_congstar_lauf(bilanz, produkt_urls, buendel_urls)
+    bilanz, produkt_urls = _congstar_bilanz(monkeypatch, frist)
+    _erwarte_vollstaendigen_congstar_lauf(bilanz, produkt_urls)
 
 
 def test_die_neue_reihenfolge_allein_reicht_schon_beim_alten_budget(monkeypatch):
@@ -203,5 +201,5 @@ def test_die_neue_reihenfolge_allein_reicht_schon_beim_alten_budget(monkeypatch)
     gelesen. congstar muss schon hier vollstaendig durchlaufen - sonst
     haengt die Abhilfe allein am groesseren Budget und waere beim naechsten
     Verzug wieder zu knapp (Antonios Hinweis im Auftrag)."""
-    bilanz, produkt_urls, buendel_urls = _congstar_bilanz(monkeypatch, 1500.0)
-    _erwarte_vollstaendigen_congstar_lauf(bilanz, produkt_urls, buendel_urls)
+    bilanz, produkt_urls = _congstar_bilanz(monkeypatch, 1500.0)
+    _erwarte_vollstaendigen_congstar_lauf(bilanz, produkt_urls)

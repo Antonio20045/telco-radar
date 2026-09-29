@@ -90,6 +90,11 @@ def _ohne_marke(tid: str, anbieter: str) -> str:
     return f"{kopf}:{rumpf}"
 
 
+# Der einzige Anbieter, fuer den "Buendel-Slug == Tarif-ID des Bestands"
+# gemessen ist (29.09.2026, `Tarifbestand._slug_ist_tarif_id`).
+_SLUG_ALS_ID_ANBIETER = "o2"
+
+
 @dataclass(frozen=True)
 class Bezug:
     """Eine hergestellte Verbindung - mit ihrer Guete und ihrem Weg.
@@ -313,6 +318,8 @@ class Tarifbestand:
         treffer = [s for s in self.je_id.values()
                    if str(s.get("buendel_slug") or "").strip().lower() == gesucht
                    and tarif_id(s.get("anbieter", ""), "") == marke]
+        if not treffer:
+            return self._slug_ist_tarif_id(anbieter, gesucht)
         if len(treffer) != 1:
             if treffer:
                 log.info("Tarifbezug ueber den Slug %r bei %s ist nicht "
@@ -326,6 +333,43 @@ class Tarifbestand:
             grund=(f"Der Anbieter verlinkt von der SIM-only-Kachel "
                    f"{satz.get('name', '')!r} aus genau diesen Buendeltarif "
                    f"({gesucht})"))
+
+    def _slug_ist_tarif_id(self, anbieter: str, slug: str) -> Optional[Bezug]:
+        """Der Slug IST die Tarif-ID des Bestands - der Tarif ohne "Plus".
+
+        o2 fuehrt jeden Tarif mit Geraet zweimal: als "Plus"-Fassung
+        (`o2-mobile-unlimited-m-plus`, Rabatt im Buendel) und als den
+        Tarif selbst (`o2-mobile-unlimited-m`). Fuer die Plus-Fassung
+        stellt die SIM-only-Kachel die Verbindung her ("Handy
+        hinzufuegen", oben). Fuer den Tarif selbst gibt es keinen solchen
+        Link - und er braucht keinen: gemessen am 29.09.2026 bestellt die
+        SIM-only-Kachel "O2 Mobile Unlimited M" das Angebot
+        `privatkunden-o2-mobile-unlimited-m-online-promo`, und GENAU
+        dieses Angebot fuehrt die Produktseite als Tarif des Buendels
+        "O2 Mobile Unlimited M mit 100 MBit/s" (`tariffProductName`), mit
+        dem Slug `o2-mobile-unlimited-m`. Dasselbe gilt fuer on Demand M,
+        L, Unlimited S Special und Unlimited L. Der Slug ist also die
+        kanonische ID genau des Kacheltarifs (`tarif_crawler.tarif_id`
+        aus seinem Namen) - verglichen wird GLEICHHEIT des ganzen
+        Schluessels, nicht Aehnlichkeit: "o2-mobile-unlimited-l-plus"
+        trifft "o2:o2-mobile-unlimited-l" nie.
+
+        Nur wenn kein Kachel-Slug trifft (die staerkere Angabe, sie steht
+        vorn), und nur mit genau einer aktuellen Lesart dieses Vertrags.
+        Gemessen ist das nur fuer o2; bei jedem anderen Anbieter greift
+        der Weg nicht, bis er dort ebenso belegt ist.
+        """
+        if anbieter != _SLUG_ALS_ID_ANBIETER:
+            return None
+        kern = f"{tarif_id(anbieter, '')}:{slug}"
+        satz = self.je_id_aktuell.get(kern)
+        if satz is None or not satz.get("tarif_id"):
+            return None
+        return Bezug(
+            tarif_id=satz["tarif_id"], tarif_name=satz.get("name", ""),
+            guete=HOCH,
+            grund=(f"Der Buendel-Slug {slug!r} ist die Tarif-ID von "
+                   f"{satz.get('name', '')!r} im Bestand"))
 
     # ------------------------------------------------------------ Betrag
 

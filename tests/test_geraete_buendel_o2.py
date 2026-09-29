@@ -397,9 +397,13 @@ def test_der_ganze_weg_an_der_echten_antwort():
     roh = [{**s, "anbieter": "o2", "sku_id": f"geraet-{i}",
             "quelle_url": s["url"]} for i, s in enumerate(_saetze())]
     bilanz = aus_rohsaetzen(roh, _bestand(), "2026-09-04")
-    # 65 von 66: der Promo-Tarif "O2 Mobile on Demand M" (ohne "Plus")
-    # steht in keiner SIM-only-Kachel und loest deshalb nicht auf.
-    assert len(bilanz.buendel) == 65
-    assert bilanz.ohne_tarif == 1
+    # 66 von 66. Bis zum 29.09.2026 waren es 65: der Tarif "O2 Mobile on
+    # Demand M" (ohne "Plus") traegt keinen Kachel-Slug und loeste nicht
+    # auf. Sein Buendel-Slug ist die Tarif-ID der Kachel
+    # (`Tarifbestand._slug_ist_tarif_id`).
+    assert len(bilanz.buendel) == 66
+    assert bilanz.ohne_tarif == 0
+    assert {b.tarif_id for b in bilanz.buendel
+            if "Plus" not in b.tarif_name} == {"o2:o2-mobile-on-demand-m"}
     assert all(tco_24(b).belastbar for b in bilanz.buendel)
     assert {b.laufzeit_monate for b in bilanz.buendel} == {36}

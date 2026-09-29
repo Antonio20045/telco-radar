@@ -123,13 +123,12 @@ class Adapter:
     `buendel_auf_produktseite` (Voreinstellung True) sagt, ob die zweite
     Lesart auf den Produktseiten des ERNTE-Wegs ueberhaupt sinvoll ist.
     Vodafone traegt seine Buendel in derselben Detailantwort wie die
-    Listungen (B1) - dort gehoert der Zusatzaufruf hin. congstar (B3)
-    liest seine Buendel auf EIGENEN Tarifseiten-Einstiegen (`kind:
-    buendel`, wie Telekom und o2); seine Produktseiten tragen KEIN
-    prefetchedPlan, der Zusatzaufruf wuerde auf jeder der 55 Seiten
-    werfen. Ein Adapter mit eigenen Buendel-Einstiegen setzt die Flagge
-    auf False - die Einstiege selbst rufen `lies_buendel` natuerlich
-    weiterhin.
+    Listungen (B1) - dort gehoert der Zusatzaufruf hin, ebenso bei
+    congstar (seit 29.09.2026: die Produktseite traegt die ganze
+    Tarifmatrix des Geraets). Ein Adapter, dessen Produktseiten keine
+    Buendel tragen und der sie auf eigenen `kind: buendel`-Einstiegen
+    liest, setzt die Flagge auf False - die Einstiege selbst rufen
+    `lies_buendel` natuerlich weiterhin.
 
     `lies_buendel(text, url, proben=None)` - der dritte Parameter ist die
     PROVIDER-PROBE (FM-2, P5-Auftrag 2): der Collector reicht die Bilanz-
@@ -148,6 +147,18 @@ class Adapter:
     buendel_auf_produktseite: bool = True
     loese_tarifnamen: Optional[Callable] = None
     ergaenze_buendel: Optional[Callable] = None
+    # `vertiefe_buendel(hole, rohsaetze, weiter, zaehler) -> list[rohsatz]`
+    # ist OPTIONAL und laeuft IN der Sammelphase, direkt nach `lies_buendel`
+    # eines `kind: buendel`-Einstiegs - mit dem gebremsten Abruf des
+    # Sammlers (robots, Abstand, Besuchszeit) und gegen dessen Frist
+    # (`weiter()`). Sie folgt den Links, die die Buendel selbst nennen
+    # (o2: Produktseite -> Speicher-, Laufzeit- und Tarifschalter), und
+    # liefert weitere Rohsaetze. Sie steht HIER und nicht in den Haken der
+    # Pipeline, weil ihre Saetze andere Speicher tragen und damit eine
+    # eigene `sku_id` brauchen - die entsteht nur hier (`_mit_sku`).
+    # `fuehre_zusammen(katalog, tief)` entfernt Doppel.
+    vertiefe_buendel: Optional[Callable] = None
+    fuehre_zusammen: Optional[Callable] = None
     # Ein Satz aus strukturierten Daten ist belegt, einer aus Fliesstext
     # geraten. Wer das hier vergisst, bekommt eine Listung, die sich selbst
     # als "mittel" ausweist, obwohl sie aus ld+json stammt.
@@ -467,6 +478,12 @@ def _registriere_anbieter_adapter() -> None:
     registriere("o2_katalog", Adapter(name="o2_katalog",
                                       lies=o2_modul.lies,
                                       lies_buendel=o2_modul.lies_buendel,
+                                      # 29.09.2026: jede Tarifstufe x
+                                      # Speicher x Laufzeit ueber die
+                                      # Schalter der Produktseite (o2.py,
+                                      # "DIE VERTIEFUNG").
+                                      vertiefe_buendel=o2_modul.vertiefe_buendel,
+                                      fuehre_zusammen=o2_modul.fuehre_zusammen,
                                       direkt=True))
     # Kein `ernte` noetig: die Sitemap traegt echte `<loc>`-Adressen, die
     # generische `ernte_links(kind="sitemap")` findet sie ohne Zutun. Nicht
@@ -480,14 +497,15 @@ def _registriere_anbieter_adapter() -> None:
     # Tarifname steht in derselben Antwort (`prefetchedPlan.variants[].title`),
     # deshalb braucht congstar anders als Vodafone keinen
     # `loese_tarifnamen`-Haken - derselbe Grund wie bei der Telekom.
-    # `buendel_auf_produktseite=False`: Die Produktseiten tragen KEIN
-    # prefetchedPlan - der Zusatzaufruf des Ernte-Wegs wuerde auf jeder der
-    # bis zu 55 Seiten werfen (gemessen am ersten B3-Lauf), die Bündel
-    # kommen ausschliesslich über die Tarifseiten-Einstiege.
+    # Seit 29.09.2026 liest `lies_buendel` auch die PRODUKTseite: sie traegt
+    # die ganze Tarifmatrix des Geraets (`prefetchedPlansWithDevicesPrices`,
+    # alle acht PlanVarianten x alle Speicher x 24/36 Monate), die
+    # Tarifseiten dagegen nur vier Aufmachergeraete - daran lag, dass
+    # congstar nur zehn SKUs als Buendel lieferte. Die zweite Lesart laeuft
+    # deshalb auf jeder Produktseite (Voreinstellung, wie bei Vodafone).
     registriere("congstar_next", Adapter(name="congstar_next",
                                          lies=congstar_modul.lies,
-                                         lies_buendel=congstar_modul.lies_buendel,
-                                         buendel_auf_produktseite=False))
+                                         lies_buendel=congstar_modul.lies_buendel))
     # Die Kategorieseite IST die Nutzlast (`direkt`): sie traegt die
     # absoluten Betraege serverseitig, und die zehn Produktadressen stehen
     # als echte `<a href>` darin - der Adapter liest sie aus demselben
@@ -521,13 +539,17 @@ def _registriere_anbieter_adapter() -> None:
     # Tarifdetails-Link. Die BEREITSTELLUNGSGEBUEHR steht erst hinter
     # jenem Link - dafuer der `ergaenze_buendel`-Haken: ein GET je
     # Tarif-Slug, nach dem Sammeln, aus der Pipeline.
+    #
+    # Tarifstufen (29.09.2026): derselbe Haken holt VORHER die zwei
+    # Tarifuebersichten und ihre Geraeteraster je Tarif und leitet daraus
+    # die Saetze der uebrigen Tarife her (`einsundeins.ergaenze_
+    # tarifstufen`, Rechnung und Gegenprobe im Modul).
     registriere("einsundeins_buendel",
                 Adapter(name="einsundeins_buendel",
                         lies=einsundeins_modul.lies,
                         ernte=einsundeins_modul.ernte,
                         lies_buendel=einsundeins_modul.lies_buendel,
-                        ergaenze_buendel=(
-                            einsundeins_modul.ergaenze_bereitstellungsgebuehr)))
+                        ergaenze_buendel=einsundeins_modul.ergaenze_buendel))
     # Die Markenseite IST die Nutzlast (direkt): ld+json UND Apollo-Cache
     # stehen bereits in dieser einen Antwort, keine Produktseite wird
     # nachgeladen. Kein `ernte` noetig - die Beleglinks je Variante liest
@@ -850,6 +872,7 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
     schleuse = Abrufschleuse(waechter, uhr, anbieter.rate_limit_sekunden)
     gruende: list[str] = []
     frist_erreicht = False
+    buendel_unlesbar = 0
 
     def _hole(url: str) -> str:
         try:
@@ -898,9 +921,13 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
             try:
                 roh = adapter.lies_buendel(inhalt, einstieg.url,
                                            proben=bilanz.proben) or []
-                bilanz.buendel.extend(
-                    _mit_sku(roh, anbieter, einstieg, katalog, farben,
-                             heute, bilanz))
+                gemappt = _mit_sku(roh, anbieter, einstieg, katalog, farben,
+                                   heute, bilanz)
+                if adapter.vertiefe_buendel is not None and gemappt:
+                    gemappt = _vertiefe(adapter, anbieter, einstieg,
+                                        gemappt, _hole, frist_bis, katalog,
+                                        farben, heute, bilanz)
+                bilanz.buendel.extend(gemappt)
             except GeraeteAbrufFehler as exc:
                 # Laut, nicht still: eine Buendelantwort, die keine ist,
                 # heisst "das Nutzlastformat hat sich geaendert" - und ein
@@ -936,6 +963,18 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
         else:
             links = ernte_links(inhalt, einstieg.url, einstieg.pfadmuster,
                                 einstieg.kind)
+        ohne = getattr(einstieg, "ohne_pfadmuster", ()) or ()
+        if ohne:
+            # VOR dem Deckel: eine ausgeschlossene Adresse ist keine
+            # abgeschnittene, sie gehoert nicht zum Sortiment dieser
+            # Erhebung (Uhren, Kopfhoerer, Tablets) - die Seite bleibt
+            # vollstaendig gelesen.
+            behalten = [a for a in links if not any(m in a for m in ohne)]
+            if len(behalten) < len(links):
+                log.info("%s: %d Adressen von %s ausgeschlossen "
+                         "(ohne_pfadmuster)", anbieter.name,
+                         len(links) - len(behalten), einstieg.url)
+            links = behalten
         erlaubt.update(links)
         vollstaendig = True
         versucht_hier = 0
@@ -1009,8 +1048,13 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
                     roh_buendel = adapter.lies_buendel(seite, url,
                                                        proben=bilanz.proben) or []
                 except GeraeteAbrufFehler as exc:
-                    log.info("%s: %s Buendel unlesbar (%s)",
-                            anbieter.name, url, exc)
+                    # Seit congstar seine Buendel NUR noch hier liest
+                    # (29.09.2026), ist das kein Nebenbefund mehr: ein
+                    # geaendertes Nutzlastformat kostete sonst still alle
+                    # Buendel. Gezaehlt wird es als benannte Luecke.
+                    log.warning("%s: %s Buendel unlesbar (%s)",
+                                anbieter.name, url, exc)
+                    buendel_unlesbar += 1
                 else:
                     bilanz.buendel.extend(
                         _mit_sku(roh_buendel, anbieter, einstieg, katalog,
@@ -1030,6 +1074,10 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
                         anbieter.name, einstieg.url, tot_hier, versucht_hier)
         if vollstaendig:
             bilanz.gelesene_einstiege.add(einstieg.url)
+
+    if buendel_unlesbar:
+        bilanz.gedeckelt.append(
+            f"{buendel_unlesbar} Produktseiten ohne lesbare Buendel")
 
     if frist_erreicht:
         bilanz.status = "frist"
@@ -1096,6 +1144,51 @@ def _uebernimm(rohsaetze, anbieter, einstieg, quelle_url: str, katalog: Katalog,
             bilanz.unbekannt.append(
                 {"art": "farbe", "wert": listung.farbe_roh,
                  "quelle": quellen.get(id(listung), "")})
+
+
+def _vertiefe(adapter, anbieter, einstieg, gemappt: list, hole_text: Callable,
+              frist_bis: Optional[float], katalog: Katalog, farben: dict,
+              heute: str, bilanz: Anbieterbilanz) -> list:
+    """Die Vertiefung eines Buendel-Einstiegs (siehe `Adapter`).
+
+    Wirft nie: was die Vertiefung nicht schafft, fehlt als Zusatz, die
+    Katalogsaetze bleiben. Ein Abbruch an der Frist steht in
+    `bilanz.gedeckelt` und im Protokoll - er ist eine benannte Luecke, kein
+    stiller Rest.
+    """
+    zaehler: dict = {}
+
+    def weiter() -> bool:
+        return frist_bis is None or time.monotonic() <= frist_bis
+
+    try:
+        tief = adapter.vertiefe_buendel(hole_text, gemappt, weiter,
+                                        zaehler) or []
+    except Exception as exc:                          # noqa: BLE001
+        log.warning("%s: Buendel-Vertiefung gescheitert (%s: %s)",
+                    anbieter.name, type(exc).__name__, str(exc)[:160])
+        bilanz.gedeckelt.append(
+            f"{einstieg.url}: Buendel-Vertiefung gescheitert "
+            f"({type(exc).__name__})")
+        return gemappt
+    tief_gemappt = _mit_sku(tief, anbieter, einstieg, katalog, farben, heute,
+                            bilanz)
+    zusammen = (adapter.fuehre_zusammen(gemappt, tief_gemappt)
+                if adapter.fuehre_zusammen else gemappt + tief_gemappt)
+    log.info("%s: Buendel-Vertiefung %d Geraete, %d Abrufe, %d gemessen, "
+             "%d abgeleitet, %d Rohsaetze (%d mit Geraet), zusammen %d "
+             "(Zaehler %s)", anbieter.name, zaehler.get("geraete", 0),
+             zaehler.get("abrufe", 0), zaehler.get("gemessen", 0),
+             zaehler.get("abgeleitet", 0), len(tief), len(tief_gemappt),
+             len(zusammen), dict(sorted(zaehler.items())))
+    if zaehler.get("frist"):
+        bilanz.gedeckelt.append(
+            f"{einstieg.url}: Buendel-Vertiefung an der Frist beendet "
+            f"({zaehler.get('geraete', 0)} Geraete vertieft)")
+        log.warning("%s: Buendel-Vertiefung an der Frist beendet - %d "
+                    "Geraete vertieft", anbieter.name,
+                    zaehler.get("geraete", 0))
+    return zusammen
 
 
 def _mit_sku(rohsaetze, anbieter, einstieg, katalog: Katalog, farben: dict,

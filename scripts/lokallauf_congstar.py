@@ -17,8 +17,9 @@ Datei `beleg-congstar-geraete-<datum>.json`.
 WAS ES TUT
 ----------
 `geraete_pipeline.run_geraete_stage()` NUR fuer den congstar-Anbieter -
-die Geräte-Sitemap (Listungen) samt der vier `kind: buendel`-Einstiege
-(Tarifseiten) und, nach dem Sammeln, die Tarif-Referenzen und Bündel aus
+die Geräte-Sitemap (Listungen und, seit 29.09.2026, die Bündelmatrix jeder
+Produktseite; Uhren, Kopfhörer und Tablets schließt `ohne_pfadmuster` aus)
+und, nach dem Sammeln, die Tarif-Referenzen und Bündel aus
 dem Tarifbestand (inklusive der PIB-Nummern-Brücke, siehe
 `congstar.ergaenze_pib_slug` - die Pipeline ruft sie selbst).
 
@@ -52,8 +53,9 @@ AUFRUF
     PYTHONPATH=src python3 scripts/lokallauf_congstar.py [--root .] [--frist 900]
 
 `--frist` ist das Zeitbudget der Geräte-Stufe in Sekunden. congstar
-crawlt seine Geräte-Sitemap (bis zu 55 Seiten, Crawl-Abstand 2 s aus der
-Konfiguration) PLUS die vier Tarifseiten; 900 Sekunden reichen mit Reserve.
+crawlt seine Geräte-Sitemap (gemessen 29.09.2026: 43 Produktseiten nach
+Ausschluss, Crawl-Abstand 2 s, 45 Abrufe in 88 s); 900 Sekunden reichen
+mit großer Reserve.
 """
 from __future__ import annotations
 

@@ -595,8 +595,11 @@ def test_adapter_registry_traegt_den_buendelhaken():
     # S2-C: der BETRAGS-Haken - die Bereitstellungsgebühr steht erst im
     # Tarifdetails-Iframe, einer eigenen, von der Geräteseite verlinkten
     # Adresse. Er läuft über dieselbe Stelle der Pipeline wie Vodafones
-    # `loese_tarifnamen`: NACH dem Sammeln, VOR `aus_rohsaetzen`.
-    assert adapter.ergaenze_buendel is ergaenze_bereitstellungsgebuehr
+    # `loese_tarifnamen`: NACH dem Sammeln, VOR `aus_rohsaetzen`. Seit
+    # 29.09.2026 laeuft davor die Herleitung der Tarifstufen im selben
+    # Haken (`test_geraete_tarifstufen_einsundeins.py`).
+    from telco_radar.collect.geraete.einsundeins import ergaenze_buendel
+    assert adapter.ergaenze_buendel is ergaenze_buendel
 
 
 def test_die_konfiguration_braucht_keinen_buendel_einstieg():

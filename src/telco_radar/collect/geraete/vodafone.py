@@ -68,15 +68,17 @@ eine separate Geraeterate gibt es nicht. Deshalb probiert
 Rechnungen aufgeht. Das haengt nicht am Namen `financingType`, der koennte
 sich aendern; es haengt an der Zahl.
 
-ALLE LAUFZEITEN SIND SCHON ERFASST - GEMESSEN, NICHT VERMUTET (P0-B2a)
-------------------------------------------------------------------------
-`lies_buendel()` iteriert bereits ueber JEDE Komposition in
-`prices.composition` (2-4 je Variante) und legt fuer jede einen eigenen
-Rohsatz an - 12/24/36 Monate UND `sub` kommen alle vier als eigene Buendel
-heraus (gemessen am Musterbuendel: 3 Varianten x 4 Kompositionen = 12
-Saetze, `test_zwoelf_buendel_aus_drei_varianten_und_vier_kompositionen`).
-Anders als bei Telekom/congstar musste hier also keine Auswahl aufgehoben
-werden.
+DIE DETAILANTWORT IST NUR EINE VORSCHAU (Befund 29.09.2026)
+------------------------------------------------------------
+Die Annahme von P0-B2a ("alle Laufzeiten sind schon erfasst") war falsch.
+`prices.composition` der Detailantwort traegt genau vier Angebote je
+Variante in fester Kopplung: Mobil S nur mit 12, Mobil M nur mit 24,
+Mobil XS nur mit 36 Monaten, dazu FamilyCard XL als `sub`. Mobil L und XL
+fehlen dort ganz. `lies_buendel()` liest diese Vorschau weiterhin - sie
+traegt Variante, Farbe und Speicher, an denen der Sammler die `sku_id`
+festmacht -, aber `loese_tarifnamen()` ersetzt sie danach je Variante
+durch ALLE Angebote der Tarifschnittstelle (5 Mobil-Tarife x 12/24/36
+Monate plus vier FamilyCards). Siehe dort.
 
 Eine ZWEITE Phase in `totalMonthlyRatePrice` (36-Monats-Finanzierung: Monate
 1-24 Tarif+Geraet, 25-36 nur noch Geraet) ist KEIN verlorener Messpunkt:
@@ -128,17 +130,17 @@ newContract&salesChannel=Online.Consumer` (Pfad `xy+Ty[V2]` im
 Skriptbuendel, Parameter `hardwareId` = `fy` in dessen Variablennamen)
 liefert je Geraet die Liste seiner buchbaren Tarife MIT `tariffName` UND
 dem GLEICHEN `offerCoreHash` in ihren eigenen `atomics[].prices.composition`
--Eintraegen. Live gemessen (05.09.2026, 15 Geraete, reiner HTTP-GET, `x-api-
-key` wie beim Hauptendpunkt): 11 von 30 Kompositions-Hashes lösten auf (9 von
-15 Geraeten mit mindestens einem Treffer) - u. a. "Mobil S", "Mobil M",
-"FamilyCard M". Nicht jeder Hash steht in der Antwort (Kampagnen- oder
-auslaufende Tarife fehlen dort); das ist keine Luecke der Aufloesung,
-sondern der Antwort selbst - `loese_tarifnamen()` verwirft in diesem Fall
-nichts, der Rohsatz bleibt mit `tarif_name=""` stehen und faellt spaeter in
-`tco_buendel.aus_rohsaetzen()` in den Zweig "ohne aufloesbaren Tarif".
+-Eintraegen. "DEM GLEICHEN Hash" stimmt nur teilweise: am 29.09.2026
+standen beim Pixel 11 nur 9 von 24 Vorschau-Hashes in der Tarifantwort,
+und derselbe Hash wechselt zwischen Tagen. Seit dem 29.09.2026 ist die
+Tarifantwort deshalb nicht mehr nur Namensquelle, sondern DIE Quelle der
+Buendel: sie nennt je Variante alle Tarife mit allen Laufzeiten, und der
+Name kommt aus `tariffName` (siehe `loese_tarifnamen`). Der Parameter
+`hardwareId` ist dort eine Liste; alle Varianten eines Geraets gehen in
+EINEN Abruf.
 
-`loese_tarifnamen()` macht dafuer EINEN zusaetzlichen GET je EINDEUTIGER
-`hardwareId` (nicht je Rohsatz) und wird NICHT von `lies_buendel()` selbst
+`loese_tarifnamen()` macht dafuer EINEN zusaetzlichen GET je GERAET
+(nicht je Variante oder Rohsatz) und wird NICHT von `lies_buendel()` selbst
 aufgerufen - ein Adapter bleibt ein reiner Text-zu-Daten-Uebersetzer ohne
 eigenes Netz. Aufgerufen wird sie von der Pipeline (`geraete_pipeline.py`),
 nachdem alle Anbieter gesammelt sind, ueber den generischen Adapter-Haken
@@ -542,22 +544,27 @@ def lies_buendel(text: str, url: str = "",
 # TARIFNAMEN AUFLOESEN - siehe Modulkopf, Abschnitt B1
 # --------------------------------------------------------------------------
 
-def _hash_namen_aus_tarifantwort(text: str) -> dict:
-    """offerCoreHash -> Tarifname aus `/glados/v2/tariff/v2/hardware`.
+def _buendel_aus_tarifantwort(text: str) -> dict:
+    """`hardwareId` -> Liste von (Tarifname, Komposition) - ALLE Angebote.
 
-    Dieselbe `prices.composition`-Form wie in der Geraeteliste, nur je
-    TARIF gruppiert und mit `tariffName` versehen - derselbe Hash, ein
-    zweiter Endpunkt. Eine unlesbare oder leere Antwort ergibt ein leeres
-    Woerterbuch, kein Fehler - der Aufrufer behandelt "nichts aufgeloest"
-    ohnehin wie einen Nichttreffer.
+    Die Tarifschnittstelle nennt je Geraetevariante JEDEN buchbaren Tarif
+    (gemessen 29.09.2026: Mobil XS/S/M/L/XL je mit 12/24/36 Monaten
+    Ratenlaufzeit plus FamilyCard S/M/L/XL als `sub`) - in derselben
+    `prices.composition`-Form wie die Detailantwort, aber mit `tariffName`.
+    Eine unlesbare Antwort ergibt ein leeres Woerterbuch; der Aufrufer
+    behandelt das als "nicht gelesen" und laesst die bisherigen Saetze
+    stehen.
     """
     try:
         daten = json.loads(text or "")
     except (json.JSONDecodeError, ValueError):
         return {}
-    out: dict[str, str] = {}
+    out: dict[str, list] = {}
     for eintrag in (_pfad(daten, "data") if isinstance(daten, dict) else None) or []:
         if not isinstance(eintrag, dict):
+            continue
+        hwid = str(_pfad(eintrag, "hardware", "hardwareId") or "").strip()
+        if not hwid:
             continue
         for tarif in (eintrag.get("tariffs") or []):
             if not isinstance(tarif, dict):
@@ -569,12 +576,21 @@ def _hash_namen_aus_tarifantwort(text: str) -> dict:
                 if not isinstance(atom, dict):
                     continue
                 for komposition in (_pfad(atom, "prices", "composition") or []):
-                    if not isinstance(komposition, dict):
-                        continue
-                    h = str(komposition.get("offerCoreHash") or "").strip()
-                    if h:
-                        out[h] = name
+                    if isinstance(komposition, dict):
+                        out.setdefault(hwid, []).append((name, komposition))
     return out
+
+
+def _hash_namen_aus_tarifantwort(text: str) -> dict:
+    """offerCoreHash -> Tarifname aus `/glados/v2/tariff/v2/hardware`.
+
+    Nur noch der RUECKFALL fuer eine Variante, deren eigener Eintrag in der
+    Tarifantwort fehlt (siehe `loese_tarifnamen`).
+    """
+    return {str(k.get("offerCoreHash") or "").strip(): name
+            for eintraege in _buendel_aus_tarifantwort(text).values()
+            for name, k in eintraege
+            if str(k.get("offerCoreHash") or "").strip()}
 
 
 # Derselbe Mindestabstand wie `rate_limit_sekunden` des Anbieters in
@@ -583,53 +599,171 @@ def _hash_namen_aus_tarifantwort(text: str) -> dict:
 # der Hauptabruf.
 _TARIF_RATE_LIMIT = 2.0
 
+# Wie viele `hardwareId` ein Abruf der Tarifschnittstelle hoechstens traegt.
+# Der Parameter ist dort als LISTE typisiert (HTTP 400 nennt ihn woertlich
+# "Required request parameter 'hardwareId' for method parameter type List"),
+# gemessen am 29.09.2026: 16 Ids des iPhone 18 Pro in einem Abruf, 684 kB,
+# HTTP 200, 16 Eintraege. Der Deckel teilt einen groesseren Satz in mehrere
+# Abrufe, er schneidet keinen ab.
+_IDS_JE_ABRUF = 16
+
+
+def _tarifadresse(hardware_ids: list) -> str:
+    return ("https://api.vodafone.de/glados/v2/tariff/v2/hardware"
+            f"?hardwareId={','.join(hardware_ids)}&{_PARAMETER}")
+
+
+def _hole_angebote(hole: Callable, kopfzeilen: dict, geraet: str,
+                   ids: list) -> dict:
+    """Ein Abruf der Tarifschnittstelle; bei jedem Scheitern `{}` MIT
+    Protokoll - der Aufrufer laesst dann die Vorschau stehen."""
+    try:
+        status, text = hole(_tarifadresse(ids), kopfzeilen=kopfzeilen)
+    except Exception as exc:                              # noqa: BLE001
+        log.info("Vodafone-Tarifschnittstelle %s: Abruf gescheitert (%s) - "
+                 "Vorschau bleibt", geraet, exc)
+        return {}
+    if not (200 <= int(status) < 300):
+        log.info("Vodafone-Tarifschnittstelle %s: HTTP %s - Vorschau bleibt",
+                 geraet, status)
+        return {}
+    angebote = _buendel_aus_tarifantwort(text)
+    if not angebote:
+        log.info("Vodafone-Tarifschnittstelle %s: Antwort ohne lesbare "
+                 "Angebote - Vorschau bleibt", geraet)
+    return angebote
+
+
+def _alle_angebote(vorlage: dict, hwid: str, angebote: list) -> list:
+    """Aus den Angeboten einer Variante die Rohsaetze, je (Tarif, Laufzeit)
+    einer. Die Felder des Sammlers (`sku_id`, `anbieter`, `zustand`,
+    `quelle_url`) kommen aus der Vorschau DERSELBEN Variante."""
+    out: list = []
+    gesehen: set = set()
+    for name, komposition in angebote:
+        satz = _buendelsatz_aus_komposition(
+            str(vorlage.get("titel") or ""), str(vorlage.get("url") or ""),
+            hwid, str(vorlage.get("farbe") or ""),
+            vorlage.get("speicher_gb"), komposition)
+        if satz is None:
+            continue
+        # Tarif und Laufzeit sind der Buendelschluessel
+        # (`tco_model.buendel_id`); ein zweites Angebot mit demselben Paar
+        # ueberschriebe das erste still.
+        paar = (name, satz["laufzeit_monate"])
+        if paar in gesehen:
+            log.warning("Vodafone-Tarifschnittstelle: Variante %s traegt "
+                        "%s/%s Monate doppelt - das zweite Angebot wird "
+                        "uebergangen", hwid, name, satz["laufzeit_monate"])
+            continue
+        gesehen.add(paar)
+        out.append({**vorlage, **satz, "tarif_name": name})
+    return out
+
 
 def loese_tarifnamen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> int:
-    """Fuellt `tarif_name` in bereits gesammelten Buendel-Rohsaetzen.
+    """Ersetzt die Vorschau-Buendel je Variante durch ALLE Tarifangebote.
 
-    EIN GET je eindeutiger `sku` (= Vodafones `hardwareId`), nicht je
-    Rohsatz - ein Geraet traegt bis zu vier Kompositionen, die alle in
-    derselben Tarifantwort stehen. Nicht von `lies_buendel()` selbst
-    aufgerufen: ein Adapter bleibt ein reiner Text-zu-Daten-Uebersetzer
-    ohne eigenes Netz (siehe Modulkopf); diese Funktion wird von der
-    Pipeline ueber `Adapter.loese_tarifnamen` aufgerufen, NACHDEM alle
-    Anbieter gesammelt sind.
+    WARUM DIE DETAILANTWORT NICHT REICHT (Befund 29.09.2026)
+    ---------------------------------------------------------
+    `atomics[].prices.composition` der Detailantwort ist eine VORSCHAU:
+    genau vier Angebote je Variante in immer derselben Kopplung - Mobil S
+    nur mit 12, Mobil M nur mit 24, Mobil XS nur mit 36 Monaten, dazu
+    FamilyCard XL als `sub`. Mobil L und XL kommen dort nie vor. Der
+    Bestand vom 29.09.2026 (398 Buendel, nur XS/S/M, je Stufe eine
+    Laufzeit) war genau diese Vorschau.
 
-    Mutiert die Eintraege in `rohbuendel` in place (dieselben dict-Objekte,
-    die auch in `Anbieterbilanz.buendel` stehen) und gibt die Zahl der neu
-    aufgeloesten Saetze zurueck. Ein Hash, der in der Tarifantwort nicht
-    steht, bleibt unveraendert bei `tarif_name=""` - nicht raten.
+    Obendrein loeste der Name nur ueber den Hash auf, und der
+    `offerCoreHash` der Vorschau ist oft NICHT der Hash desselben Angebots
+    in der Tarifschnittstelle (Pixel 11, 29.09.2026: 9 von 24
+    Vorschau-Hashes stehen dort, bei gleichen Betraegen); er wechselt
+    ausserdem zwischen Tagen (Pixel 11 512 GB Frost, Mobil XS 36 Monate:
+    `3F714701...` am 05.09., `050EE4DA...` am 29.09.2026). Deshalb loeste
+    je Lauf nur gut die Haelfte der Saetze auf, und welche, wechselte:
+    131 von 287 Kombinationen vom 28.09. fehlten am 29.09.
+
+    WAS STATTDESSEN GESCHIEHT
+    -------------------------
+    Die Tarifschnittstelle nennt je Variante JEDEN buchbaren Tarif MIT
+    `tariffName` und je Ratenlaufzeit eine eigene Komposition derselben
+    Form. Fuer jede Variante, die dort steht, werden ihre Vorschau-Saetze
+    durch diese vollstaendige Menge ersetzt; der Name kommt aus
+    `tariffName`, nicht ueber den Hash. Ein Abruf je GERAET (alle
+    `hardwareId` eines Modells, `_IDS_JE_ABRUF`), nicht je Variante.
+
+    Eine Variante, die in der Antwort fehlt oder deren Abruf scheitert,
+    behaelt ihre Vorschau-Saetze (nicht gelesen ist nicht leer); fuer sie
+    bleibt der Hash-Rueckfall ueber alle gelesenen Antworten.
+
+    Mutiert `rohbuendel` in place (die Liste ist `Anbieterbilanz.buendel`)
+    und gibt die Zahl der Saetze zurueck, die hier ihren Tarifnamen
+    bekommen haben.
     """
-    ziele = sorted({
-        str(r.get("sku") or "").strip()
-        for r in rohbuendel
-        if r.get("quelle") == "vodafone_buendel"
-        and not str(r.get("tarif_name") or "").strip()
-        and str(r.get("sku") or "").strip()
-    })
-    aufgeloest = 0
+    vorschau: dict[str, list] = {}
+    for r in rohbuendel:
+        hwid = str(r.get("sku") or "").strip()
+        if r.get("quelle") == "vodafone_buendel" and hwid:
+            vorschau.setdefault(hwid, []).append(r)
+    if not vorschau:
+        return 0
+
+    je_geraet: dict[tuple, list] = {}
+    for hwid, saetze in vorschau.items():
+        je_geraet.setdefault((str(saetze[0].get("titel") or ""),
+                              str(saetze[0].get("url") or "")),
+                             []).append(hwid)
+
+    vollstaendig: dict[str, list] = {}
+    hash_namen: dict[str, str] = {}
     letzter = 0.0
-    for hwid in ziele:
-        warte = _TARIF_RATE_LIMIT - (time.monotonic() - letzter)
-        if letzter and warte > 0:
-            time.sleep(warte)
-        letzter = time.monotonic()
-        url = (f"https://api.vodafone.de/glados/v2/tariff/v2/hardware"
-              f"?hardwareId={hwid}&{_PARAMETER}")
-        try:
-            status, text = hole(url, kopfzeilen=kopfzeilen)
-        except Exception:                                 # noqa: BLE001
-            continue
-        if not (200 <= int(status) < 300):
-            continue
-        namen = _hash_namen_aus_tarifantwort(text)
-        if not namen:
-            continue
-        for r in rohbuendel:
-            if r.get("sku") != hwid or str(r.get("tarif_name") or "").strip():
-                continue
-            name = namen.get(str(r.get("tarif_slug") or "").strip())
+    for geraet in sorted(je_geraet):
+        ids = sorted(je_geraet[geraet])
+        for i in range(0, len(ids), _IDS_JE_ABRUF):
+            teil = ids[i:i + _IDS_JE_ABRUF]
+            warte = _TARIF_RATE_LIMIT - (time.monotonic() - letzter)
+            if letzter and warte > 0:
+                time.sleep(warte)
+            letzter = time.monotonic()
+            angebote = _hole_angebote(hole, kopfzeilen, geraet[0], teil)
+            for hwid, eintraege in angebote.items():
+                if hwid in teil and eintraege:
+                    vollstaendig[hwid] = eintraege
+                for name, k in eintraege:
+                    h = str(k.get("offerCoreHash") or "").strip()
+                    if h:
+                        hash_namen[h] = name
+
+    neu: list = []
+    gesetzt = 0
+    # "Nicht gelesen" ist nicht "leer" (Clean Code 6): hat fuer eine
+    # Variante keine Kombination der Tarifschnittstelle ihre Probe
+    # bestanden, bleibt ihre Vorschau stehen und geht den Hash-Weg unten.
+    ersetzt: dict[str, list] = {}
+    for hwid in list(vollstaendig):
+        saetze = _alle_angebote(vorschau[hwid][0], hwid, vollstaendig[hwid])
+        if saetze:
+            ersetzt[hwid] = saetze
+        else:
+            log.warning("Vodafone: %s - keine Kombination der "
+                        "Tarifschnittstelle lesbar, die Vorschau bleibt",
+                        hwid)
+            del vollstaendig[hwid]
+    for r in rohbuendel:
+        hwid = str(r.get("sku") or "").strip()
+        if r.get("quelle") == "vodafone_buendel" and hwid in vollstaendig:
+            if r is vorschau[hwid][0]:
+                saetze = ersetzt[hwid]
+                neu.extend(saetze)
+                gesetzt += len(saetze)
+            continue                     # die uebrige Vorschau faellt weg
+        if (r.get("quelle") == "vodafone_buendel"
+                and not str(r.get("tarif_name") or "").strip()):
+            name = hash_namen.get(str(r.get("tarif_slug") or "").strip())
             if name:
                 r["tarif_name"] = name
-                aufgeloest += 1
-    return aufgeloest
+                gesetzt += 1
+        neu.append(r)
+    log.info("Vodafone-Tarifschnittstelle: %d von %d Varianten vollstaendig "
+             "gelesen", len(vollstaendig), len(vorschau))
+    rohbuendel[:] = neu
+    return gesetzt

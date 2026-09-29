@@ -189,7 +189,8 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str
                 aktionen=aktionen_aus(satz.get("aktionen")),
                 zustand=str(satz.get("zustand") or ""),
                 quelle_url=str(satz.get("quelle_url") or ""),
-                abgerufen_am=heute))
+                abgerufen_am=heute,
+                herleitung=str(satz.get("herleitung") or "")))
         except (ValueError, TypeError) as exc:
             # `Buendel` prueft seine Posten selbst (negative Betraege, eine
             # Laufzeit von null, ein Geraetepreis ohne SKU). Ein Satz, der
