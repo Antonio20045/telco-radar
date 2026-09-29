@@ -26,11 +26,15 @@ import json
 import pathlib
 import re
 
+import pytest
 from bs4 import BeautifulSoup
 
+from telco_radar.geraete_config import lade_katalog, lade_quellen
 from telco_radar.report import geraete_zeitreihe as zr
 from telco_radar.tco_model import tco_24
+from telco_radar.report.html import render_site
 
+from test_geraete_zeitreihe_ansicht import HEUTE, _baue
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 
@@ -557,3 +561,82 @@ def test_ein_einzelmesstag_traegt_einen_halo_und_heisst_erstmals():
     suppe3 = BeautifulSoup(svg3, "html.parser")
     assert suppe3.select("circle.gr-zr-halo") == []
     assert "erstmals" not in svg3
+
+
+# --------------------------------------------------------------------------
+# Integration - First Paint und Fragment tragen dieselben Vorlagen
+# --------------------------------------------------------------------------
+
+@pytest.fixture(scope="module")
+def gerendert(tmp_path_factory):
+    root, state = _baue(tmp_path_factory.mktemp("zrrechen"))
+    reports = root / "data" / "reports"
+    reports.mkdir(parents=True, exist_ok=True)
+    (reports / f"{HEUTE}.json").write_text(json.dumps({
+        "date": HEUTE, "language": "de",
+        "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
+        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{HEUTE}.md").write_text("# B\n", encoding="utf-8")
+    site = root / "site"
+    render_site(site, reports)
+    return site
+
+
+def _treffer_und_vorlagen(container: BeautifulSoup) -> tuple[set, set]:
+    """(Kreis-Paare, Template-Paare) eines Blocks - die Kreise kommen in
+    beiden SVG-Varianten doppelt vor, Templates nicht."""
+    kreise = {(c["data-anb"], c["data-m"])
+              for c in container.select("circle.gr-zr-hit")}
+    vorlagen = {(t["data-anb"], t["data-m"])
+                for t in container.select("template[data-anb][data-m]")}
+    return kreise, vorlagen
+
+
+def test_im_first_paint_findet_jeder_kreis_sein_template(gerendert):
+    suppe = BeautifulSoup((gerendert / "geraete.html").read_text(
+        encoding="utf-8"), "html.parser")
+    block = suppe.select_one("#tafel-tco .gr-zr-graph")
+    assert block is not None
+    kreise, vorlagen = _treffer_und_vorlagen(block)
+    assert kreise, "der Startblock braucht Punkte mit Trefferfläche"
+    assert kreise <= vorlagen, \
+        f"Kreise ohne Rechenweg-Vorlage: {kreise - vorlagen}"
+
+
+def test_im_fragment_findet_jeder_kreis_sein_template(gerendert):
+    inhalt = (gerendert / "data" / "geraete-zeitreihe.html").read_text(
+        encoding="utf-8")
+    suppe = BeautifulSoup(inhalt, "html.parser")
+    lager = suppe.select(".gr-zr-lager")
+    assert lager, "das Fragment braucht Blöcke"
+    for block in lager:
+        kreise, vorlagen = _treffer_und_vorlagen(block)
+        if not kreise:
+            continue                    # Paar ohne Serie (ehrlicher Leer-Satz)
+        assert kreise <= vorlagen, \
+            f"{block.get('data-modell')}/{block.get('data-band')}: " \
+            f"Kreise ohne Vorlage: {kreise - vorlagen}"
+
+
+def test_der_rechenweg_steht_unter_dem_svg_nicht_daneben(gerendert):
+    """Montagevertrag mit app.js (A2): die Vorlagen liegen IM Graph-Block
+    unter dem Bild - der Klick-Handler findet sie relativ zum SVG."""
+    suppe = BeautifulSoup((gerendert / "geraete.html").read_text(
+        encoding="utf-8"), "html.parser")
+    graph = suppe.select_one("#tafel-tco .gr-zr-graph")
+    bild = graph.select_one(".gr-zr-bild")
+    lager = graph.select_one(".gr-zr-rechnungen")
+    assert lager is not None
+    assert bild is not None and lager.sourceline > bild.sourceline
+
+
+def test_der_json_knoten_bleibt_zahlenfrei(gerendert):
+    """Regel 1 des Moduls: die Beträge stehen im HTML (Vorlage), nicht im
+    JSON-Knoten für den Client - sonst rechnete oder formatierte der
+    Browser doch."""
+    suppe = BeautifulSoup((gerendert / "geraete.html").read_text(
+        encoding="utf-8"), "html.parser")
+    knoten = suppe.select_one("#gr-zeitreihe-daten")
+    assert knoten is not None
+    assert "€" not in knoten.string
+    assert "×" not in knoten.string

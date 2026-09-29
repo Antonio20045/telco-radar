@@ -25,9 +25,11 @@ Preis je Tag traegt o2 normale Punkte.
 """
 from __future__ import annotations
 
+import json
+
 from telco_radar.report import geraete_verlauf as verlauf
 
-from test_geraete_tco_zustand import SKU_NEU, _listungen
+from test_geraete_tco_zustand import SKU_NEU, _baue, _listungen
 
 
 class _Historie:
@@ -79,3 +81,24 @@ def _historie_gestellt(o2_doppelt: bool) -> list:
     return zeilen
 
 
+def test_die_seite_benennt_die_messluecke_statt_sie_zu_zeichnen(tmp_path):
+    """Bis P2 prüfte dieser Test beide Ansichten des Reiters; die G2-Teile
+    sind mit dem Block gefallen. Der Wähler liest DIESELBE Regel aus
+    `#gr-verlaufdaten`: kein o2-Punkt, die Lücke benannt."""
+    s = _baue(tmp_path, erneuert=False, punkte=_historie_gestellt(True))
+    daten = json.loads(s.select_one("#gr-verlaufdaten").get_text())
+    (geraet,) = [g for g in daten if g["id"] == "apple-iphone-15-128"]
+    assert [r["anbieter"] for r in geraet["reihen"]] == ["Vodafone"]
+    assert geraet["mehrdeutig"] == [{
+        "anbieter": "o2", "listung_id": "o2--" + SKU_NEU,
+        "tage": ["2026-09-02", "2026-09-03", "2026-09-04"],
+        "betraege": {"2026-09-02": [700.0, 720.0], "2026-09-03": [700.0, 720.0],
+                     "2026-09-04": [700.0, 720.0]}}]
+
+    # Gegenprobe: ohne den zweiten Preis je Tag ist o2 eine normale Reihe.
+    s2 = _baue(tmp_path / "gegen", erneuert=False,
+               punkte=_historie_gestellt(False))
+    daten2 = json.loads(s2.select_one("#gr-verlaufdaten").get_text())
+    (geraet2,) = [g for g in daten2 if g["id"] == "apple-iphone-15-128"]
+    assert sorted(r["anbieter"] for r in geraet2["reihen"]) == ["Vodafone", "o2"]
+    assert geraet2["mehrdeutig"] == []

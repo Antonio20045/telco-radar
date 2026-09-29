@@ -8,21 +8,24 @@ die andere nicht trivial macht:
     wird) stehen NICHT MEHR als sichtbarer Fließtext auf geraete.html.
     Gegen den Stand vor D4a ist dieser Teil ROT - die Sätze standen dort
     wörtlich als <p class="gr-erklaer">/<p class="gr-achsenlabel"> etc.
-  * GEGENPROBE: echte DATEN-Aussagen bleiben stehen - seit dem
-    Neuentwurf (29.09.2026) die Zeilen der Kosten-Rangliste mit Betrag.
-    Ohne diese Gegenprobe wäre die Negativliste auch an einer leeren Seite
-    erfüllt (CLAUDE.md Clean Code 3, Regel 9).
+  * POSITIVLISTE (Gegenprobe): echte DATEN-Aussagen - Zahlen, Quellen,
+    benannte Lücken - bleiben stehen. Ohne diese Gegenprobe wäre die
+    Negativliste erfüllt, auch wenn irrtümlich Daten mitgelöscht worden
+    wären (CLAUDE.md Clean Code 3, Regel 9).
 
 Die entfernte Methodik landet nicht im Nichts: geraete-quellen.html trägt
 seit D4a eine Methodik-Sektion (`#methodik`), die dieselben Sätze sinngleich
-wiederholt, und der Link "Quellen" im Fuß von geraete.html führt dorthin.
+wiederholt, und der EINE Fußzeilen-Link "Methodik" auf geraete.html führt
+dorthin.
 """
 from __future__ import annotations
 
 import pathlib
+from unittest import mock
 
 from bs4 import BeautifulSoup
 
+from telco_radar.report import geraete_radar
 from test_geraete_radar_tafel import _seite
 
 
@@ -71,11 +74,6 @@ def test_keine_lesehilfe_steht_noch_sichtbar_auf_der_geraeteseite(tmp_path):
     assert not treffer, (
         "Lesehilfe(n) stehen noch sichtbar auf der Geräteseite: "
         f"{treffer}")
-    # Gegenprobe: die Seite ist nicht leer - die Rangliste steht mit
-    # Beträgen da, sonst wäre die Negativliste trivial erfüllt.
-    zeilen = geraete.select("#kosten .kv-zeile .kv-summe")
-    assert zeilen, "keine Zeile der Kosten-Rangliste - Test prüft nichts"
-    assert all("€" in _sichtbarer_text(z) for z in zeilen)
 
 
 def test_die_entfernten_lesehilfen_stehen_nicht_im_nichts(tmp_path):
@@ -87,19 +85,20 @@ def test_die_entfernten_lesehilfen_stehen_nicht_im_nichts(tmp_path):
     geraete-quellen.html), NICHT das `title`-Attribut - `title` bleibt
     nur die Desktop-Abkürzung. Jeder der umgezogenen Sätze (Kern der
     Aussage, aus derselben `_ENTFERNTE_LESEHILFEN`-Liste oben) muss
-    SICHTBAR in der Methodik-Sektion stehen, und geraete.html muss die
-    Seite mit der Methodik verlinken."""
+    SICHTBAR in der Methodik-Sektion stehen, und der EINE Fußzeilen-Link
+    "Methodik" auf geraete.html muss genau auf diesen Anker zeigen."""
     geraete, quellen = _gebaut(tmp_path)
     methodik = quellen.select_one("section#methodik")
     assert methodik is not None, "die Methodik-Sektion fehlt"
     methodik_text = _sichtbarer_text(methodik)
 
-    # Seit dem Neuentwurf (29.09.2026) führt der EINE Link "Quellen" im
-    # Fuß der Geräteseite auf die Seite, die die Methodik trägt.
-    quellen_links = [a for a in geraete.select("#kosten .kv-fuss a")
-                     if a.get("href") == "geraete-quellen.html"]
-    assert len(quellen_links) == 1, (
-        f"{len(quellen_links)} Quellen-Links im Fuß von geraete.html")
+    # Der Fußzeilen-Link zeigt auf GENAU diesen Anker (nicht nur auf die
+    # Seite) - sonst landet ein Handy-Leser auf der Quellenübersicht,
+    # nie bei der Methodik selbst.
+    methodik_links = [a for a in geraete.select("a")
+                      if a.get_text(strip=True) == "Methodik"]
+    assert methodik_links, "kein Fußzeilen-Link 'Methodik' auf geraete.html"
+    assert methodik_links[0]["href"].endswith("geraete-quellen.html#methodik")
 
     # Kernfragment je umgezogenem Satz -> muss WÖRTLICH oder sinngleich in
     # der Methodik-Sektion stehen. Wo der Kern nicht wortgleich uebernommen
@@ -142,9 +141,85 @@ def test_die_entfernten_lesehilfen_stehen_nicht_im_nichts(tmp_path):
         f"{fehlend}")
 
 
+def test_geraeteseite_verlinkt_genau_einmal_auf_die_methodik(tmp_path):
+    """Die Geräteseite bekommt höchstens EINEN Fußzeilen-Link 'Methodik'
+    (Auftrag D4a) - kein Wissen geht verloren, es zieht nur um."""
+    geraete, _ = _gebaut(tmp_path)
+    links = [a for a in geraete.select("a")
+             if a.get_text(strip=True) == "Methodik"]
+    assert len(links) == 1, f"{len(links)} Methodik-Links statt genau einem"
+    assert links[0]["href"].endswith("geraete-quellen.html#methodik"), \
+        links[0]["href"]
+
+
 # ---------------------------------------------------------------------------
 # Die Daten-Aussagen, die bleiben MÜSSEN (Positivliste, Gegenprobe)
 # ---------------------------------------------------------------------------
+
+def test_daten_aussagen_bleiben_sichtbar_auf_der_geraeteseite(tmp_path):
+    """POSITIVLISTE. Ohne diese Gegenprobe wäre die Negativliste oben
+    trivial erfüllbar (auch durch versehentliches Mitlöschen echter
+    Daten). Jede geprüfte Zeile ist eine Aussage über die DATEN - eine
+    Zahl, ein Anbietername, ein Preis, ein Beleglink -, keine Lesehilfe,
+    und CLAUDE.md Clean Code 3/Regel 9 verlangt sie namentlich."""
+    # S1-Fix (Review D4a): `wr.grafik.basis` (geraete_radar.py, len(alle)
+    # aus grafik_zeilen()) ist eine echte gezählte Zahl, keine Lesehilfe -
+    # sie muss sichtbar bleiben. Gegenprobe gegen den ECHTEN Aufruf
+    # waehrend des Renderns (CLAUDE.md Regel 10: ein Test ohne Gegenprobe
+    # gegen die Daten ist grün und prüft nichts), nicht gegen eine im Test
+    # neu erfundene Zahl.
+    echte_basis = []
+    original_grafik_zeilen = geraete_radar.grafik_zeilen
+
+    def _erfasst(vergleich_ohne_vertrag):
+        zeilen = original_grafik_zeilen(vergleich_ohne_vertrag)
+        echte_basis.append(len(zeilen))
+        return zeilen
+
+    with mock.patch.object(geraete_radar, "grafik_zeilen",
+                           side_effect=_erfasst):
+        geraete, _ = _gebaut(tmp_path)
+    assert echte_basis, ("grafik_zeilen() wurde beim Bauen der Seite nicht "
+                         "aufgerufen - der Test prüfte nichts")
+    erwartete_basis = echte_basis[-1]
+
+    grafik_meta = geraete.select_one("#wr-grafik .gr-v-meta")
+    assert grafik_meta is not None, (
+        "die gezählte Modellzahl (wr.grafik.basis) an der Radar-Grafik "
+        "fehlt - sie ist beim Kürzen des Achslabels nirgends mehr "
+        "sichtbar")
+    assert str(erwartete_basis) in _sichtbarer_text(grafik_meta), (
+        f"die sichtbare Zahl ({_sichtbarer_text(grafik_meta)!r}) stimmt "
+        f"nicht mit dem echten len(alle) = {erwartete_basis} überein")
+
+    sichtbar = _sichtbarer_text(geraete)
+
+    # Die Kachel-Summe der Alarmtabelle bleibt als Datensatz stehen - nur
+    # ihr methodischer Nachsatz ("Verglichen werden ausschließlich …")
+    # ist gefallen (siehe Negativliste).
+    assert "Modelle mit ihren Speichergrößen stehen einem Wettbewerber" \
+        in sichtbar
+
+    # Die Händler-Sektion nennt weiterhin den echten Händlernamen und die
+    # echten Preise/Prozente der Fixture (Saturn, iPhone 15) - keine
+    # Lesehilfe, sondern der Bestand selbst.
+    haendler = geraete.select_one("#wr-haendler")
+    assert haendler is not None, "die Händler-Sektion fehlt"
+    haendler_text = _sichtbarer_text(haendler)
+    assert "Saturn" in haendler_text
+    assert "%" in haendler_text
+
+    # Der Leer-Satz der Alarmtabelle ist eine Daten-Aussage (keine Zeile
+    # der aktuellen Auswahl) und bleibt im DOM, auch wenn `hidden`.
+    leer = geraete.select_one("#wr-alarme .gr-a-leer")
+    assert leer is not None
+    assert "günstiger" in _sichtbarer_text(leer)
+
+    # Belegpflicht: mindestens ein Quellenlink mit Abrufdatum steht in der
+    # Modell-Liste des Radars (jede Aussage verlinkt auf ihre Quelle,
+    # CLAUDE.md "Antonios Stil").
+    beleg = geraete.select_one("#wr-abweichung a.gr-a-quelle")
+    assert beleg is not None and beleg.get("href", "").startswith("http")
 
 
 def test_methodik_sektion_traegt_die_umgezogenen_saetze(tmp_path):
