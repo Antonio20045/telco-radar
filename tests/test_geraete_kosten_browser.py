@@ -97,7 +97,7 @@ def _erwartet(daten, wahl):
         zeilen.append(("kopf", f"Kosten über {gk.HORIZONT} Monate", ""))
     if r["anders"]:
         zeilen.append(("anders", " | ".join(
-            f"{x['anbieter']} · {n} Raten" for x in r["anders"]
+            f"{x['anbieter']} · {n} Raten →" for x in r["anders"]
             for n in x["raten"]), ""))
     if r["ohne"]:
         zeilen.append(("ohne", " · ".join(r["ohne"]), "—"))

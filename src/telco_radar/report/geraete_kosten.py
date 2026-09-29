@@ -102,21 +102,22 @@ def _posten(karte: dict) -> list:
     for p in roh:
         art, betrag = p.get("kategorie"), p["betrag"]
         name = p["name"]
+        rang = 9
         if art == "tarif":
-            name = "Tarif"
+            # Der Tarifname steht als Posten im Rechenweg, nicht über ihm.
+            name, rang = karte.get("tarif") or "Tarif", 1
             wert = tarif
         elif art == "raten":
-            name = "Geräteraten"
+            name, rang = "Geräteraten", 3
             wert = rate
         elif art == "buendel":
-            name = "Tarif mit Gerät"
+            name, rang = "Tarif mit Gerät", 2
             wert = buendel
         elif art == "restschuld":
-            name = ("Geräteraten" if rate is not None
-                    else "Tarif mit Gerät") + f" ab Monat {HORIZONT + 1}"
+            name, rang = f"Restschuld nach Monat {HORIZONT}", 4
             wert = rate if rate is not None else buendel
         elif name == "Gerätezuzahlung":
-            name, wert = "Anzahlung", None
+            name, wert, rang = "Anzahlung", None, 0
         else:
             wert = None
         mal = ""
@@ -125,11 +126,11 @@ def _posten(karte: dict) -> list:
             if anzahl > 0 and round(anzahl * wert, 2) == round(betrag, 2):
                 mal = _mal(anzahl, wert)
         posten.append({"name": name, "mal": mal, "betrag": betrag,
-                       "offen": p["offen"]})
-    folge = ("Anzahlung", "Tarif", "Tarif mit Gerät", "Geräteraten")
-    return sorted(posten, key=lambda p: (
-        folge.index(p["name"]) if p["name"] in folge else
-        len(folge) + (0 if p["offen"] else 1)))
+                       "offen": p["offen"], "rang": rang})
+    posten.sort(key=lambda p: p["rang"])
+    for p in posten:
+        del p["rang"]
+    return posten
 
 
 def _angebot(karte: dict, stufe: str) -> dict:

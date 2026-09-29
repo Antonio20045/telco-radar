@@ -3827,7 +3827,7 @@ var grKosten = (function () {
   function zeile(z) {
     var a = z.angebot, s = stilVon(z.anbieter);
     var h = '<li class="kv-zeile' + (z.erste ? ' kv-zeile--erste' : '') +
-      (z.sieger ? ' kv-zeile--sieger' : '') + (!a.frisch ? ' kv-zeile--alt' : '') +
+      (z.sieger ? ' kv-zeile--sieger' : '') +
       (s.eigen ? ' kv-zeile--eigen' : '') + '" style="--anb:' + esc(s.farbe) +
       '" data-anbieter="' + esc(z.anbieter) + '"><details class="kv-auf">' +
       '<summary class="kv-kern"><span class="kv-anb">' + esc(z.anbieter) + '</span>' +
@@ -3838,7 +3838,7 @@ var grKosten = (function () {
       '<span class="kv-summe">' + betrag(a.gesamt) + '</span><span class="kv-abstand">' +
       (z.sieger ? 'günstigste' : z.abstand !== null ? '+' + euro(z.abstand) : '') +
       '</span><span class="kv-pfeil" aria-hidden="true"></span></summary>' +
-      '<div class="kv-weg"><p class="kv-weg-tarif">' + esc(a.tarif) + '</p><table>';
+      '<div class="kv-weg"><table>';
     a.posten.forEach(function (p) {
       h += '<tr' + (p.offen ? ' class="kv-weg-offen"' : '') + '><th>' + esc(p.name) +
         '</th><td class="kv-weg-mal">' + esc(p.mal) + '</td><td>' + euro(p.betrag) + '</td></tr>';
@@ -3874,7 +3874,7 @@ var grKosten = (function () {
       r.anders.forEach(function (x) {
         x.raten.forEach(function (n) {
           h += '<button type="button" class="kv-umschalten" data-raten="' + n + '">' +
-            esc(x.anbieter) + ' · ' + n + '&nbsp;Raten</button>';
+            esc(x.anbieter) + ' · ' + n + '&nbsp;Raten&nbsp;→</button>';
         });
       });
       h += '</p>';

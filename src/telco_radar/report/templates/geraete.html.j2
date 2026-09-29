@@ -17,7 +17,7 @@
 
 {% macro kv_zeile(z) -%}
 {%- set a = z.angebot -%}
-<li class="kv-zeile{% if z.erste %} kv-zeile--erste{% endif %}{% if z.sieger %} kv-zeile--sieger{% endif %}{% if z.stil.eigen %} kv-zeile--eigen{% endif %}{% if not a.frisch %} kv-zeile--alt{% endif %}"
+<li class="kv-zeile{% if z.erste %} kv-zeile--erste{% endif %}{% if z.sieger %} kv-zeile--sieger{% endif %}{% if z.stil.eigen %} kv-zeile--eigen{% endif %}"
     style="--anb:{{ z.stil.farbe }}" data-anbieter="{{ z.anbieter }}">
   <details class="kv-auf">
     <summary class="kv-kern">
@@ -28,7 +28,6 @@
       <span class="kv-pfeil" aria-hidden="true"></span>
     </summary>
     <div class="kv-weg">
-      <p class="kv-weg-tarif">{{ a.tarif }}</p>
       <table>
         {%- for p in a.posten %}
         <tr{% if p.offen %} class="kv-weg-offen"{% endif %}><th>{{ p.name }}</th><td class="kv-weg-mal">{{ p.mal }}</td><td>{{ p.betrag | euro }}</td></tr>
@@ -74,7 +73,7 @@
 {%- if ansicht.anders %}
 <p class="kv-anders">
   {%- for x in ansicht.anders %}{% for r in x.raten %}
-  <button type="button" class="kv-umschalten" data-raten="{{ r }}">{{ x.anbieter }} · {{ r }}&nbsp;Raten</button>
+  <button type="button" class="kv-umschalten" data-raten="{{ r }}">{{ x.anbieter }} · {{ r }}&nbsp;Raten&nbsp;→</button>
   {%- endfor %}{% endfor %}
 </p>
 {%- endif %}

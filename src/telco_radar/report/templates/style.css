@@ -4285,7 +4285,6 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
 .kv-neben-namen{flex:1;font-family:var(--sans);font-size:14px;font-weight:700;
   color:var(--ink-3)}
 .kv-gruppe--neben[open] > .kv-neben-kopf .kv-pfeil::before{transform:rotate(-135deg);margin-top:4px}
-.kv-zeile--alt .kv-summe,.kv-zeile--alt .kv-cent{color:var(--ink-3)}
 .kv-gruppe--neben .kv-summe{font-size:22px;color:var(--ink-3)}
 .kv-gruppe--neben .kv-cent{color:var(--ink-3)}
 .kv-zeile--sieger .kv-abstand{color:var(--al-gering)}
@@ -4293,9 +4292,7 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
 /* Rechenweg: rechtsbündig unter dem Betrag, "Gesamt" fluchtet mit ihm */
 .kv-weg{display:flex;flex-direction:column;align-items:flex-end;
   padding:0 178px 18px 0}
-.kv-weg-tarif{margin:0 0 6px;font-family:var(--sans);font-size:14px;
-  font-weight:700;color:var(--ink)}
-.kv-weg table{border-collapse:collapse;font-family:var(--sans);font-size:14px}
+.kv-weg table{border-collapse:collapse;min-width:380px;font-family:var(--sans);font-size:14px}
 .kv-weg th{text-align:left;font-weight:400;color:var(--ink-2);
   padding:5px 28px 5px 0}
 .kv-weg td{text-align:right;font-variant-numeric:tabular-nums;padding:5px 0;
@@ -4317,8 +4314,8 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
 .kv-ohne{display:flex;justify-content:space-between;align-items:baseline;
   margin:0;padding:14px 38px 14px 17px;border-bottom:1px solid var(--rule-2)}
 .kv-ohne-namen{font-family:var(--sans);font-weight:700;font-size:14px;
-  color:var(--ink-4)}
-.kv-ohne .kv-summe{font-size:18px;font-weight:400;color:var(--ink-4)}
+  color:var(--ink-3)}
+.kv-ohne .kv-summe{font-size:18px;font-weight:400;color:var(--ink-3)}
 
 .kv-fuss{display:flex;gap:20px;margin-top:28px;font-family:var(--sans);
   font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
@@ -4359,6 +4356,7 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
   .kv-weg{padding:0 10px 16px 10px;align-items:stretch}
   .kv-weg th,.kv-weg td{font-size:13px}
   .kv-weg th{padding-right:10px}
+  .kv-weg table{min-width:0}
   .kv-weg td.kv-weg-mal{padding-right:10px;font-size:12px}
   .kv-quelle{align-self:flex-end}
   .kv-ohne{padding:12px 18px 12px 13px}
