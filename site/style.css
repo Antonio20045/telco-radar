@@ -2215,9 +2215,7 @@ b,strong{font-weight:700}
    Die Regel gilt für die Tafel-Fläche (.gr-tafel), also alle vier
    Reiter einschließlich der P3-Zeilen-Aufklapper und der nachgezogenen
    Wochenkarte. Sie steht BEWUSST vor den spezifischen summary-Regeln
-   dieses Abschnitts: .gr-vdatenlage>summary::after weiter unten trägt
-   sein eigenes +/– und gewinnt bei gleicher Spezifität als die spätere
-   Regel - der Datenlage-Aufklapper behält seine Form. */
+   dieses Abschnitts. */
 .gr-tafel summary{cursor:pointer;list-style:none}
 .gr-tafel summary::-webkit-details-marker{display:none}
 .gr-tafel summary::marker{content:""}
@@ -2400,10 +2398,8 @@ b,strong{font-weight:700}
    Regel gewinnt gegen ihn nur, weil sie SPEZIFISCHER ist (0-2-0 gegen
    0-0-1 des Browsers).
 
-   Mobil gilt unverändert `.gr-alarm{min-width:700px}` plus
-   `gr-alarm-scroll`: die Tabelle rollt IN SICH (Rollbehaelter-Muster
-   der Seite), die Seite selbst laeuft nicht waagerecht. Je Ansicht
-   sind nur 4-5 der 8 Spalten sichtbar. */
+   Mobil steht jede Modellzeile als Karte (Block „Katalog am Telefon“
+   weiter unten); nur die Listungen im Aufklapper rollen in sich. */
 .gr-kansicht{margin:0 0 14px}
 /* P4/D4 (18.09.2026): der Umschalter bleibt am Telefon in EINER
    Button-Reihe (Falz-Regel: vor dem ersten Datenelement höchstens EINE
@@ -2436,6 +2432,46 @@ b,strong{font-weight:700}
    zeigt keinen Zeiger. */
 .gr-katalog-mod tbody .gr-a-zeile{cursor:pointer}
 .gr-katalog-mod tbody .gr-a-zeile.gr-k--ohne-details{cursor:auto}
+/* Katalog am Telefon (28.09.2026): KARTEN statt Rolltabelle. Bei 390 px
+   zeigte der Rollbehaelter nur Modell und einen angeschnittenen Preis,
+   der Rest lag rechts ausserhalb. Nur die Zellen der Modellzeile werden
+   Block: der Browser fasst sie in EINE anonyme Zelle, die Zeile bleibt
+   eine Tabellenzeile. Zeilen- und Aufklapper-Sichtbarkeit ([hidden],
+   `gr-a-rest`, `gr-a-auf--an`) gelten damit unveraendert aus den Regeln
+   oben, und die display:none-Regeln der anderen Ansicht auch. Der
+   Spaltenkopf fehlt, also nennt `data-k` den Namen der Zelle. */
+@media (max-width:700px){
+  .gr-alarm.gr-katalog-mod{min-width:0}
+  /* width:0 plus min-width:100%: die breite Listungstabelle eines
+     geoeffneten Aufklappers traegt nichts zur Spaltenbreite bei und rollt
+     in ihrer `gr-scroll`, statt die ganze Tabelle aufzuschieben. */
+  .gr-katalog-mod>tbody>tr.gr-a-auf>td>.gr-scroll{width:0;min-width:100%}
+  /* Betrag und € bleiben zusammen; die Kleinschrift darunter bricht. */
+  .gr-katalog-mod .gr-k-listungen td.num{white-space:nowrap}
+  .gr-katalog-mod .gr-k-listungen td.num .gr-a-klein{white-space:normal}
+  .gr-katalog-mod>thead{display:none}
+  .gr-katalog-mod:not(.gr-katalog--tco)>tbody>tr.gr-a-zeile>td:not(.gr-sp--tco),
+  .gr-katalog-mod.gr-katalog--tco>tbody>tr.gr-a-zeile>td:not(.gr-sp--barpreis){
+    display:block}
+  /* Bewusst niedrig gewichtet, damit Luft und Zielmarke darunter greifen. */
+  .gr-katalog-mod>tbody>tr.gr-a-zeile>td{border:0;padding:1px 0;text-align:left}
+  /* Trennlinie an der Zeile (border-collapse), Luft an der ersten und
+     der letzten SICHTBAREN Zelle der Ansicht. */
+  .gr-katalog-mod>tbody>tr.gr-a-zeile{border-bottom:1px solid var(--rule-2)}
+  .gr-katalog-mod>tbody>tr.gr-a-zeile>td:first-child{padding-top:11px}
+  .gr-katalog-mod:not(.gr-katalog--tco)>tbody>tr.gr-a-zeile>td:not(.gr-sp--tco):has(+td.gr-sp--tco),
+  .gr-katalog-mod.gr-katalog--tco>tbody>tr.gr-a-zeile>td:last-child{padding-bottom:11px}
+  .gr-katalog-mod>tbody>tr.gr-a-zeile>td[data-k]::before{content:attr(data-k) " ";
+    font-family:var(--sans);font-size:12px;color:var(--ink-4)}
+  .gr-katalog-mod>tbody>tr.gr-a-zeile>td .gr-a-klein{display:inline}
+  /* Die Leitzahl der Karte ist ihre groesste Schrift, nicht das Δ. */
+  .gr-katalog-mod>tbody>tr.gr-a-zeile .gr-k-ab{font-size:18px}
+  .gr-katalog-mod>tbody>tr.gr-a-zeile .gr-a-prozent{font-size:15px}
+  /* Der Radar-Sprung markiert die Zielkarte: der rote Rahmen der
+     Tabellenzeile laege als Linie zwischen jeder gestapelten Zelle. */
+  .gr-katalog-mod>tbody>tr.gr-k-zeile.gr-k-ziel>td{
+    box-shadow:inset 3px 0 0 var(--red);padding-left:10px}
+}
 /* Der ab-Preis bricht nicht zwischen Betrag und Waehrung. */
 .gr-k-ab{font-family:var(--serif);font-weight:600;white-space:nowrap}
 .gr-k-anzahl{font-family:var(--sans);font-weight:700;font-size:15px}
@@ -2802,23 +2838,6 @@ b,strong{font-weight:700}
 .gr-vtabelle table{width:100%}
 .gr-veigen{background:var(--red-wash)}
 
-/* Der EINE Datenlage-Aufklapper am Reiterende (P2): alles Erklärende des
-   Preisverlaufs steht geschlossen hier, vor dem Suchfeld steht nur die h2.
-   cursor:pointer ist P4-Regel - ein summary ohne Zeiger sieht aus wie eine
-   Tabellenzeile (design.md: 20 von 22 Aufklappern). */
-.gr-vdatenlage{margin:22px 0 0;border-top:1px solid var(--rule)}
-.gr-vdatenlage>summary{list-style:none;cursor:pointer;display:flex;
-  align-items:baseline;gap:8px;padding:10px 0;font-family:var(--sans);
-  font-size:12px;font-weight:600;letter-spacing:.06em;
-  text-transform:uppercase;color:var(--ink-3)}
-.gr-vdatenlage>summary::-webkit-details-marker{display:none}
-.gr-vdatenlage>summary::after{content:"+";font-size:15px;color:var(--red);
-  line-height:1}
-.gr-vdatenlage[open]>summary::after{content:"–"}
-.gr-vdatenlage>summary:hover{color:var(--red)}
-.gr-vdatenlage-inhalt{padding:2px 0 14px;max-width:720px}
-.gr-vdatenlage-inhalt p{font-size:13.5px;line-height:1.6;color:var(--ink-2);
-  margin:0 0 10px}
 
 @media (max-width:760px){
   /* P2-Fix (Sicht-Prüfung 17.09.2026): DIE KURVE GEHÖRT IN DEN ERSTEN
@@ -3101,9 +3120,16 @@ b,strong{font-weight:700}
 .gr-bnd-delta,.gr-bnd-bar{text-align:right;font-family:var(--sans);
   font-size:13px;color:var(--ink-2)}
 .gr-bnd-delta{white-space:nowrap}
-.gr-bnd-chev{text-align:right;color:var(--ink-4);font-family:var(--sans)}
-.gr-bnd:not([open]) .gr-bnd-chev::before{content:"+"}
-.gr-bnd[open] .gr-bnd-chev::before{content:"−"}
+/* EIN Aufklappzeichen je Bündelzeile (28.09.2026): bis hierhin trug die
+   Zeile das „+" der Chevron-Zelle UND das rote „▾" der Tafel-Regel
+   (`.gr-tafel summary::after`), das als eigenes Grid-Element in eine
+   neue Zeile unter den Anbieternamen rutschte. Jetzt IST das ::after das
+   Zeichen und sitzt in der Chevron-Spalte; die leere `.gr-bnd-chev`
+   bleibt im Markup (Fixtures kennen sie), nimmt aber keinen Platz. */
+.gr-bnd-chev{display:none}
+.gr-tafel .gr-bnd>summary::after{content:"+";grid-column:6;grid-row:1;
+  justify-self:end;margin:0;font-size:inherit;color:var(--ink-4)}
+.gr-tafel .gr-bnd[open]>summary::after{content:"−"}
 .gr-bnd-rw{margin:0 6px 12px;padding:10px 14px;background:var(--paper-2);
   border-left:1px solid var(--rule-2);border-right:1px solid var(--rule-2);
   border-bottom:1px solid var(--rule-2);font-size:13px;color:var(--ink-2);
@@ -3134,9 +3160,8 @@ b,strong{font-weight:700}
 .gr-haendlerzeile b{color:var(--ink);font-weight:700}
 
 /* Auf dem Telefon werden die Zeilen GESTAPELT, nicht gequetscht (derselbe
-   Grundsatz wie am Graphen): Anbieter und TCO oben, Tarif und Gerät darunter,
-   Delta und Chevron in der dritten Reihe. Die Zahlenspalten richten sich
-   rechts aus, weil sie unten rechts im Stapel landen. */
+   Grundsatz wie am Graphen): Anbieter und TCO je eine Reihe, dann Tarif
+   und Gerätepreis, zuletzt Delta (links) und Aufklappzeichen (rechts). */
 @media (max-width:900px){
   .gr-bnd-kopf{display:none}
   .gr-bnd{border-left-width:3px}
@@ -3156,7 +3181,7 @@ b,strong{font-weight:700}
      und das Abzeichen (na"chste Regel) bekommt die GANZE Zeilenbreite
      statt nur die halbe. */
   .gr-bnd summary{
-    grid-template-columns:1fr auto;row-gap:3px;
+    grid-template-columns:minmax(0,1fr) auto;row-gap:3px;
     grid-template-areas:"an an" "tco tco" "tar bar" "dl chev"}
   .gr-bnd-an{grid-area:an;min-width:0}
   /* I (QA-Fix 24.09.2026): DAS ABZEICHEN BEKOMMT DIE VOLLE ZEILENBREITE.
@@ -3188,7 +3213,17 @@ b,strong{font-weight:700}
      vor "Referenz" und "–" steht es nicht, die Klasse setzt das Makro. */
   .gr-bnd-delta--wert::before{content:"Δ ";font-family:var(--sans);
     color:var(--ink-4)}
-  .gr-bnd-chev{grid-area:chev}
+  .gr-tafel .gr-bnd>summary::after{grid-area:chev}
+  /* Der zweite Euro-Betrag der Zeile ist der Gerätepreis ohne Vertrag -
+     mobil fehlt der Spaltenkopf, also steht sein Name davor (wie das
+     Δ-Praefix eine Zeile darunter). Nur vor einer Zahl, nicht vor „–". */
+  .gr-bnd-delta{text-align:left}
+  /* Eigene Zeile über der Zahl: inline stand „ohne Vertrag 1.225,00 €"
+     ungebrochen ~140 px breit neben dem Tarif und schob die Zeile bei
+     360 px über den Rand. */
+  .gr-bnd-bar--wert{white-space:nowrap}
+  .gr-bnd-bar--wert::before{content:"ohne Vertrag";display:block;
+    font-family:var(--sans);font-size:12px;color:var(--ink-4)}
   .gr-bnd-rw{margin:0 0 12px;padding:10px 12px}
 }
 /* Der Leer-Satz der Antwortzeile steht INNERHALB von .gr-antwort, die
@@ -3794,7 +3829,6 @@ td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
   font-size:13.5px;font-weight:700}
 .gr-zr-k-delta--steigt{color:var(--red)}
 .gr-zr-k-delta--sinkt{color:#2f6b3a}
-.gr-zr-k-delta--gleich{font-size:12px;color:var(--ink-4)}
 /* Die Punkte-Spalte ist selbst ein Band-Span (wechselt mit) - ihr
    flex-direction MUSS hier ausdrücklich row stehen, sonst erbt sie die
    column des Band-Koerpers und stapelt die Anbieterpunkte untereinander
@@ -3883,10 +3917,6 @@ td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
 .gr-zr-rechnung{margin:0 0 12px}
 .gr-zr-rechnung>summary{font-family:var(--sans);font-size:12px;
   letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
-.gr-zr-kopf{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;
-  margin:0 0 6px}
-.gr-zr-messtage{font-family:var(--sans);font-size:12px;font-weight:600;
-  letter-spacing:.04em;color:var(--ink-3)}
 .gr-zr-legende{display:flex;flex-wrap:wrap;gap:5px 18px;margin:2px 0 10px;
   font-family:var(--sans);font-size:12px;color:var(--ink-2)}
 .gr-zr-legende span{display:inline-flex;align-items:center;gap:6px;
@@ -3930,8 +3960,6 @@ td .gr-sprung,td .gr-ksprung{display:inline-block;margin-top:3px}
 .gr-zr-wert{font-family:var(--sans-system);font-size:13.5px;font-weight:700;
   fill:var(--ink)}
 .gr-zr-name{font-family:var(--sans-system);font-size:15px;font-weight:700}
-.gr-zr-chip{font-family:var(--sans-system);font-size:10px;font-weight:700;
-  letter-spacing:.06em;text-transform:uppercase;fill:var(--red)}
 .gr-zr-datum{font-family:var(--sans-system);font-size:10.5px;fill:var(--ink-4)}
 .gr-zr-pfeil{fill:var(--ink-4)}
 .gr-zr-bild svg a{cursor:pointer}
@@ -4069,10 +4097,8 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
     margin-bottom:0}
   .gr-zr-rechnung{margin-bottom:2px}
   .gr-zr-rechnung>summary{font-size:11px;line-height:1.1}
-  .gr-zr-kopf{margin:0}
   .gr-zr-legende{font-size:10.5px;gap:3px 12px;margin-bottom:6px}
   .gr-zr-legende i{width:8px;height:8px}
-  .gr-zr-messtage{font-size:10px}
   .gr-zr-bild svg.gr-zr--breit{display:none}
   .gr-zr-bild svg.gr-zr--schmal{display:block}
   .gr-zr-hinweis{font-size:10px}
@@ -4090,7 +4116,6 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
      genehmigten Prototyps); ihre "ab"-Werte braucht der Leser beim Lesen
      der Kurve, nicht davor. Desktop unveraendert. */
   .gr-zr-graph{display:flex;flex-direction:column}
-  .gr-zr-kopf{order:1;line-height:1.2}
   .gr-zr-bild{order:2;margin-top:0}
   .gr-zr-legende{order:3;margin:6px 0 0}
   .gr-zr-hinweis{order:4}
@@ -4105,7 +4130,6 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
   .gr-leit-zahl{line-height:1}
   .gr-leit-label{line-height:1.25}
   .gr-zr-antwort{line-height:1.26;padding-top:2px}
-  .gr-zr-messtage{line-height:1.2}
   .gr-zr-kacheln button{padding-bottom:0}
   .gr-zr-kacheln button .gr-zr-k-name{line-height:1.05}
 }
@@ -4179,3 +4203,9 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
 .gr-bnd-aktion{display:block;font-family:var(--sans);font-size:12px;
   font-weight:600;color:var(--ink-3);white-space:nowrap}
 .gr-kk-aktion{margin:0 0 5px;font-size:13px;line-height:1.45}
+/* Übersicht am Telefon (28.09.2026): die Frage stand in drei Zeilen zu
+   25,5 px und draengte sich vor die Leitzahl (30 px). Zwei Zeilen, die
+   Leitzahl bleibt die groesste Schrift ihres Bereichs (Antonios Regel). */
+@media(max-width:700px){
+  .gr-radar>h2.rubrik{font-size:19px;line-height:1.3;margin-bottom:6px}
+}
