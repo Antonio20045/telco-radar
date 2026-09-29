@@ -121,6 +121,20 @@ Postpaid-Seite "allnet-flat-xl" existiert nicht (gemessen 08.09.2026 in
 pages.xml) - XL laeuft nur als Pflichtblatt im Bestand, und das ist eine
 ehrlich benannte Messgrenze, keine Luecke dieser Erhebung.
 
+NACHTRAG 29.09.2026: DIE PRODUKTSEITE TRAEGT DIE GANZE MATRIX
+-------------------------------------------------------------
+Die Tarifseiten fuehren nur vier Aufmachergeraete (iPhone 18 Pro Max,
+18 Pro, 17 Pro, Galaxy S26 Ultra - auf allen vier Seiten dieselben), und
+genau daran lag, dass congstar nur zehn SKUs als Buendel lieferte. Die
+Aussage "die Gerateseite traegt nur die Hardware" oben stimmt nur fuer
+`prefetchedDevice.variants[].prices`: dieselbe Nutzlast traegt daneben
+`prefetchedPlans` (alle acht PlanVarianten mit Preisen und Pflichtblatt)
+und `prefetchedPlansWithDevicesPrices` (je PlanVariant und
+Geraetevariante die tarifabhaengigen Zahlweisen). `lies_buendel` liest
+deshalb bevorzugt diese Matrix (`_produktseiten_plaene`) und faellt nur
+ohne sie auf die Tarifseitenform zurueck; der Adapter ruft es auf jeder
+Produktseite. Auch dort gibt es keine XL-PlanVariant.
+
 DIE EINE REGEL: IM BUENDEL GILT DER RABATT - `discounted`, NICHT `listed`
 -------------------------------------------------------------------------
 Fuer den BARPREIS ist `listed` richtig und `discounted` die Falle (oben).
@@ -268,7 +282,11 @@ def _nutzlast(text: str) -> str:
 
 
 def _balanciertes_objekt(text: str, start: int) -> Optional[str]:
-    """Von der oeffnenden `{` bei `start` bis zur PASSENDEN `}`.
+    """Von der oeffnenden `{` (oder `[`) bei `start` bis zur PASSENDEN
+    schliessenden Klammer. Beide Klammerarten zaehlen in dieselbe Tiefe -
+    in gueltigem JSON schliesst Tiefe 0 genau an der passenden Klammer, und
+    die Produktseite braucht die Listen `prefetchedPlans` und
+    `prefetchedPlansWithDevicesPrices` als Ganzes (29.09.2026).
 
     Ein einfacher `find("}")` schnitte an der ersten verschachtelten
     Klammer ab (jede Variante traegt `discounts`, `media`, `availability`
@@ -293,9 +311,9 @@ def _balanciertes_objekt(text: str, start: int) -> Optional[str]:
             continue
         if zeichen == '"':
             in_string = True
-        elif zeichen == "{":
+        elif zeichen in "{[":
             tiefe += 1
-        elif zeichen == "}":
+        elif zeichen in "}]":
             tiefe -= 1
             if tiefe == 0:
                 return text[start:i + 1]
@@ -667,114 +685,218 @@ def _speicher_gb(memory) -> Optional[int]:
 # `proben` ist die Schnittstelle der Provider-Probe (FM-2, P5 - siehe
 # Adapter-Docstring in collect/geraete/__init__.py); dieser Adapter
 # traegt keine Feld-Proben hinein.
+def _json_unter(nutzlast: str, schluessel: str):
+    """Der Wert des ersten `"schluessel":{...}` oder `"schluessel":[...]`
+    der Nutzlast, geparst - oder None.
+
+    Next.js schreibt einen schon gesendeten Wert als Verweis
+    (`"prefetchedDeviceVariant":"$8:1:props:..."`); ein Treffer, hinter dem
+    keine Klammer steht, ist so ein Verweis und wird uebergangen."""
+    muster = f'"{schluessel}":'
+    pos = nutzlast.find(muster)
+    while pos >= 0:
+        start = pos + len(muster)
+        if start < len(nutzlast) and nutzlast[start] in "{[":
+            roh = _balanciertes_objekt(nutzlast, start)
+            if roh is not None:
+                try:
+                    return json.loads(roh)
+                except (json.JSONDecodeError, ValueError):
+                    log.info("congstar: %s nicht als JSON lesbar", schluessel)
+                    return None
+        pos = nutzlast.find(muster, start)
+    return None
+
+
+def _produktseiten_plaene(nutzlast: str) -> Optional[list[dict]]:
+    """Die Buendelmatrix der PRODUKTseite als PlanVarianten in derselben
+    Form wie auf der Tarifseite (`plan["devices"][]["variants"][]`) - oder
+    None, wenn die Seite die Matrix nicht traegt.
+
+    Gemessen 29.09.2026 an /geraete/apple/apple-iphone-17/ (HTTP 200,
+    920 KB, TelcoRadar/1.0): die Geraeteseite traegt serverseitig DREI
+    Knoten, die zusammen die volle Kombinatorik ergeben -
+
+        prefetchedDevice.variants[]          Titel, Farbe, Speicher,
+                                             Zustand, gtin je Variante
+        prefetchedPlans[].variants[]         alle acht PlanVarianten (XS, S,
+                                             M, L je mit Flex) samt Tarif-
+                                             und Bereitstellungspreis und
+                                             Pflichtblatt
+        prefetchedPlansWithDevicesPrices[]   je PlanVariant-ID und je
+             .variants[].devices[].variants[]   Geraetevarianten-ID die
+                                             Zahlweisen (24/36 Monate) -
+                                             tarifabhaengig: dieselbe
+                                             Variante kostet in XS eine
+                                             andere Rate als in L oder Flex
+
+    Die Tarifseiten fuehren dagegen nur vier Aufmachergeraete (gemessen:
+    iPhone 18 Pro Max, 18 Pro, 17 Pro, Galaxy S26 Ultra auf allen vier
+    Seiten) - das war die Ursache, dass congstar nur zehn SKUs als
+    Buendel lieferte.
+    """
+    preise = _json_unter(nutzlast, "prefetchedPlansWithDevicesPrices")
+    if not isinstance(preise, list):
+        return None
+    geraet = _json_unter(nutzlast, "prefetchedDevice")
+    tarife = _json_unter(nutzlast, "prefetchedPlans")
+    if not isinstance(geraet, dict) or not isinstance(tarife, list):
+        return None
+    varianten = {v.get("id"): v for v in (geraet.get("variants") or [])
+                 if isinstance(v, dict)}
+    planvarianten = {pv.get("id"): pv for tarif in tarife
+                     if isinstance(tarif, dict)
+                     for pv in (tarif.get("variants") or [])
+                     if isinstance(pv, dict)}
+    out: list[dict] = []
+    for tarif in preise:
+        for pv in ((tarif or {}).get("variants") or []):
+            if not isinstance(pv, dict):
+                continue
+            plan = planvarianten.get(pv.get("id"))
+            if plan is None:
+                log.info("congstar-Produktseite: Preise fuer PlanVariant %r "
+                         "ohne Tarifknoten - uebergangen", pv.get("id"))
+                continue
+            zusammen: list[dict] = []
+            for dev in (pv.get("devices") or []):
+                for v in ((dev or {}).get("variants") or []):
+                    if not isinstance(v, dict):
+                        continue
+                    meta = varianten.get(v.get("id"))
+                    if meta is None:
+                        log.info("congstar-Produktseite: Preise fuer "
+                                 "Variante %r ohne Geraeteknoten - "
+                                 "uebergangen", v.get("id"))
+                        continue
+                    zusammen.append({**meta, "prices": v.get("prices")})
+            out.append({**plan, "devices": [{"variants": zusammen}]})
+    return out
+
+
 def lies_buendel(text: str, url: str = "",
                  proben: Optional[dict] = None) -> list[dict]:
-    """Aus einer Tarifseite je (PlanVariant x Geraet x Speicher) einen
-    Buendel-Rohsatz (`kind: buendel`-Einstieg, keine Ernte, keine
-    Produktseite wird nachgeladen - die Seite IST die Nutzlast).
+    """Je (PlanVariant x Geraet x Speicher x Laufzeit) einen
+    Buendel-Rohsatz - aus einer PRODUKTseite (die ganze Tarifmatrix eines
+    Geraets, siehe `_produktseiten_plaene`) oder aus einer Tarifseite
+    (`kind: buendel`-Einstieg, nur deren Aufmachergeraete).
 
-    Wirft, wenn die Antwort gar keine Tarifseite ist (kein Flight-Payload,
-    kein `prefetchedPlan`) - dasselbe Muster wie bei o2 und Telekom: ein
-    leeres Ergebnis waere die falsche Meldung fuer ein geaendertes
-    Nutzlastformat. Eine einzelne PlanVariant ohne Tarifpreis oder ohne
-    Geraete liefert dagegen nur ihre leere Ausbeute - die andere Variante
-    derselben Seite kann noch liefern.
+    Wirft, wenn die Antwort keins von beiden traegt (kein Flight-Payload,
+    weder Produktmatrix noch `prefetchedPlan`) - dasselbe Muster wie bei o2
+    und Telekom: ein leeres Ergebnis waere die falsche Meldung fuer ein
+    geaendertes Nutzlastformat. Eine einzelne PlanVariant ohne Tarifpreis
+    oder ohne Geraete liefert dagegen nur ihre leere Ausbeute - die anderen
+    Varianten derselben Seite koennen noch liefern.
     """
     nutzlast = _nutzlast(text)
     if not nutzlast:
         raise GeraeteAbrufFehler(
-            "congstar-Tarifseite ohne Next.js-Flight-Nutzlast (self.__next_f)")
-    plaene = _planvarianten(nutzlast)
+            "congstar-Seite ohne Next.js-Flight-Nutzlast (self.__next_f)")
+    plaene = _produktseiten_plaene(nutzlast)
+    quelle = "congstar_produktseite"
+    if plaene is None:
+        plaene = _planvarianten(nutzlast)
+        quelle = "congstar_tarifseite"
     if not plaene:
         raise GeraeteAbrufFehler(
-            "congstar-Tarifseite ohne prefetchedPlan.variants - keine "
-            "Buendelantwort (Tarifseite umgezogen?)")
+            "congstar-Seite weder mit prefetchedPlansWithDevicesPrices "
+            "(Produktseite) noch mit prefetchedPlan.variants (Tarifseite) - "
+            "keine Buendelantwort")
 
     out: list[dict] = []
     for plan in plaene:
-        tarif_name = str(plan.get("title") or "").strip()
-        if not tarif_name:
-            continue
-        preise = plan.get("prices") or {}
-        tarif_monatlich = _preis((preise.get("recurring") or {}).get("discounted"))
-        if tarif_monatlich is None:
-            # Ohne Tarifpreis ist keine Buendelaussage moeglich - derselbe
-            # Grund wie beim Telekom-selectedPlan ohne recurringFee.
-            log.info("congstar-Buendel: PlanVariant %r ohne Tarifpreis - "
-                     "uebersprungen", tarif_name)
-            continue
-        anschluss = _preis((preise.get("activation") or {}).get("discounted"))
-        tarif_slug = _pib_nummer(plan)
-        # Die Aktionen des TARIFS (P3-E3): Grundpreisnachlass und
-        # geschenkter Bereitstellungspreis - beide in `discounted` schon
-        # enthalten, also `eingerechnet`.
-        tarif_aktionen = (_rabatt_aktionen(preise.get("recurring"),
-                                           AKTION_TARIFRABATT, url)
-                          + _rabatt_aktionen(preise.get("activation"),
-                                             AKTION_ANSCHLUSS_ERLASSEN, url))
+        out.extend(_saetze_eines_plans(plan, url, quelle))
+    return out
 
-        for geraet in (plan.get("devices") or []):
-            if not isinstance(geraet, dict):
+
+def _saetze_eines_plans(plan: dict, url: str, quelle: str) -> list[dict]:
+    """Die Buendel-Rohsaetze EINER PlanVariant (Tarif oder Flex) ueber alle
+    ihre Geraete, Speichergroessen und Ratenlaufzeiten."""
+    out: list[dict] = []
+    tarif_name = str(plan.get("title") or "").strip()
+    if not tarif_name:
+        return out
+    preise = plan.get("prices") or {}
+    tarif_monatlich = _preis((preise.get("recurring") or {}).get("discounted"))
+    if tarif_monatlich is None:
+        # Ohne Tarifpreis ist keine Buendelaussage moeglich - derselbe
+        # Grund wie beim Telekom-selectedPlan ohne recurringFee.
+        log.info("congstar-Buendel: PlanVariant %r ohne Tarifpreis - "
+                 "uebersprungen", tarif_name)
+        return out
+    anschluss = _preis((preise.get("activation") or {}).get("discounted"))
+    tarif_slug = _pib_nummer(plan)
+    # Die Aktionen des TARIFS (P3-E3): Grundpreisnachlass und
+    # geschenkter Bereitstellungspreis - beide in `discounted` schon
+    # enthalten, also `eingerechnet`.
+    tarif_aktionen = (_rabatt_aktionen(preise.get("recurring"),
+                                       AKTION_TARIFRABATT, url)
+                      + _rabatt_aktionen(preise.get("activation"),
+                                         AKTION_ANSCHLUSS_ERLASSEN, url))
+
+    for geraet in (plan.get("devices") or []):
+        if not isinstance(geraet, dict):
+            continue
+        # JE SPEICHERGROESSE (UND ZUSTAND) EIN SATZ: die Zahlweise ist
+        # bei jeder Farbe derselben Groesse identisch (gemessen an allen
+        # vier Tarifseiten); die erste Variante mit lesbarer Zahlweise
+        # vertritt den Satz - dedupliziert, wie der Auftrag es verlangt.
+        gesehen: set = set()
+        for variante in (geraet.get("variants") or []):
+            if not isinstance(variante, dict):
                 continue
-            # JE SPEICHERGROESSE (UND ZUSTAND) EIN SATZ: die Zahlweise ist
-            # bei jeder Farbe derselben Groesse identisch (gemessen an allen
-            # vier Tarifseiten); die erste Variante mit lesbarer Zahlweise
-            # vertritt den Satz - dedupliziert, wie der Auftrag es verlangt.
-            gesehen: set = set()
-            for variante in (geraet.get("variants") or []):
-                if not isinstance(variante, dict):
-                    continue
-                speicher = _speicher_gb(variante.get("memory"))
-                zustand = str(variante.get("condition") or "").strip().upper()
-                if (speicher, zustand) in gesehen:
-                    continue
-                formen = _buendelzahlweisen(variante, url)
-                if not formen:
-                    continue
-                titel = str(variante.get("title") or "").strip()
-                if not titel:
-                    continue
-                gesehen.add((speicher, zustand))
-                farbe = str((variante.get("color") or {})
-                           .get("name") or "").strip()
-                sku = str(variante.get("id") or "").strip()
-                ean = str(variante.get("gtin") or "").strip()
-                zustand_hinweis = str(variante.get("condition") or "")
-                # JEDE erlaubte Zahlweise (24 UND 36 Monate) wird ein
-                # eigener Satz mit eigener `laufzeit_monate` - der
-                # Bestandsschluessel traegt seit B1 die Laufzeit
-                # (`tco_model.buendel_id`), die Zahlweisen ueberschreiben
-                # sich also nicht mehr.
-                for laufzeit in sorted(formen):
-                    form = formen[laufzeit]
-                    out.append({
-                        "titel": titel,
-                        "farbe": farbe,
-                        "speicher_gb": speicher,
-                        "sku": sku,
-                        "ean": ean,
-                        # Dasselbe rohe `condition`-Feld wie im Listungsweg -
-                        # die Einordnung leistet `zustand_aus_feldern` ueber
-                        # `lies_listung`, siehe Docstring von `lies()`.
-                        "zustand_hinweis": zustand_hinweis,
-                        "tarif_name": tarif_name,
-                        # Die Pflichtblattnummer, siehe Modulkopf ("DER SLUG
-                        # IST DIE NUMMER DES PFLICHTBLATTS").
-                        "tarif_slug": tarif_slug,
-                        "tarif_monatlich": tarif_monatlich,
-                        "geraet_zuzahlung": form["zuzahlung"],
-                        "geraet_monatsrate": form["rate"],
-                        "anschlusspreis": anschluss,
-                        "laufzeit_monate": laufzeit,
-                        # P3-E3: was an diesem Preis haengt (Tarif und
-                        # Geraet) und was er mit Eintausch noch wird.
-                        "aktionen": [dict(a) for a in
-                                     tarif_aktionen + form["aktionen"]],
-                        # Die Tarifseite ist die Seite, auf der diese Zahlen
-                        # stehen - dieselbe Regel wie bei der Telekom-Kategorie.
-                        "url": url,
-                        "quelle": "congstar_tarifseite",
-                    })
+            speicher = _speicher_gb(variante.get("memory"))
+            zustand = str(variante.get("condition") or "").strip().upper()
+            if (speicher, zustand) in gesehen:
+                continue
+            formen = _buendelzahlweisen(variante, url)
+            if not formen:
+                continue
+            titel = str(variante.get("title") or "").strip()
+            if not titel:
+                continue
+            gesehen.add((speicher, zustand))
+            farbe = str((variante.get("color") or {})
+                       .get("name") or "").strip()
+            sku = str(variante.get("id") or "").strip()
+            ean = str(variante.get("gtin") or "").strip()
+            zustand_hinweis = str(variante.get("condition") or "")
+            # JEDE erlaubte Zahlweise (24 UND 36 Monate) wird ein
+            # eigener Satz mit eigener `laufzeit_monate` - der
+            # Bestandsschluessel traegt seit B1 die Laufzeit
+            # (`tco_model.buendel_id`), die Zahlweisen ueberschreiben
+            # sich also nicht mehr.
+            for laufzeit in sorted(formen):
+                form = formen[laufzeit]
+                out.append({
+                    "titel": titel,
+                    "farbe": farbe,
+                    "speicher_gb": speicher,
+                    "sku": sku,
+                    "ean": ean,
+                    # Dasselbe rohe `condition`-Feld wie im Listungsweg -
+                    # die Einordnung leistet `zustand_aus_feldern` ueber
+                    # `lies_listung`, siehe Docstring von `lies()`.
+                    "zustand_hinweis": zustand_hinweis,
+                    "tarif_name": tarif_name,
+                    # Die Pflichtblattnummer, siehe Modulkopf ("DER SLUG
+                    # IST DIE NUMMER DES PFLICHTBLATTS").
+                    "tarif_slug": tarif_slug,
+                    "tarif_monatlich": tarif_monatlich,
+                    "geraet_zuzahlung": form["zuzahlung"],
+                    "geraet_monatsrate": form["rate"],
+                    "anschlusspreis": anschluss,
+                    "laufzeit_monate": laufzeit,
+                    # P3-E3: was an diesem Preis haengt (Tarif und
+                    # Geraet) und was er mit Eintausch noch wird.
+                    "aktionen": [dict(a) for a in
+                                 tarif_aktionen + form["aktionen"]],
+                    # Die gelesene Seite (Produkt- oder Tarifseite) ist
+                    # die Seite, auf der diese Zahlen stehen - dieselbe
+                    # Regel wie bei der Telekom-Kategorie.
+                    "url": url,
+                    "quelle": quelle,
+                })
     return out
 
 

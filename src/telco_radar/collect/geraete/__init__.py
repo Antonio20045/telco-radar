@@ -123,13 +123,12 @@ class Adapter:
     `buendel_auf_produktseite` (Voreinstellung True) sagt, ob die zweite
     Lesart auf den Produktseiten des ERNTE-Wegs ueberhaupt sinvoll ist.
     Vodafone traegt seine Buendel in derselben Detailantwort wie die
-    Listungen (B1) - dort gehoert der Zusatzaufruf hin. congstar (B3)
-    liest seine Buendel auf EIGENEN Tarifseiten-Einstiegen (`kind:
-    buendel`, wie Telekom und o2); seine Produktseiten tragen KEIN
-    prefetchedPlan, der Zusatzaufruf wuerde auf jeder der 55 Seiten
-    werfen. Ein Adapter mit eigenen Buendel-Einstiegen setzt die Flagge
-    auf False - die Einstiege selbst rufen `lies_buendel` natuerlich
-    weiterhin.
+    Listungen (B1) - dort gehoert der Zusatzaufruf hin, ebenso bei
+    congstar (seit 29.09.2026: die Produktseite traegt die ganze
+    Tarifmatrix des Geraets). Ein Adapter, dessen Produktseiten keine
+    Buendel tragen und der sie auf eigenen `kind: buendel`-Einstiegen
+    liest, setzt die Flagge auf False - die Einstiege selbst rufen
+    `lies_buendel` natuerlich weiterhin.
 
     `lies_buendel(text, url, proben=None)` - der dritte Parameter ist die
     PROVIDER-PROBE (FM-2, P5-Auftrag 2): der Collector reicht die Bilanz-
@@ -480,14 +479,15 @@ def _registriere_anbieter_adapter() -> None:
     # Tarifname steht in derselben Antwort (`prefetchedPlan.variants[].title`),
     # deshalb braucht congstar anders als Vodafone keinen
     # `loese_tarifnamen`-Haken - derselbe Grund wie bei der Telekom.
-    # `buendel_auf_produktseite=False`: Die Produktseiten tragen KEIN
-    # prefetchedPlan - der Zusatzaufruf des Ernte-Wegs wuerde auf jeder der
-    # bis zu 55 Seiten werfen (gemessen am ersten B3-Lauf), die Bündel
-    # kommen ausschliesslich über die Tarifseiten-Einstiege.
+    # Seit 29.09.2026 liest `lies_buendel` auch die PRODUKTseite: sie traegt
+    # die ganze Tarifmatrix des Geraets (`prefetchedPlansWithDevicesPrices`,
+    # alle acht PlanVarianten x alle Speicher x 24/36 Monate), die
+    # Tarifseiten dagegen nur vier Aufmachergeraete - daran lag, dass
+    # congstar nur zehn SKUs als Buendel lieferte. Die zweite Lesart laeuft
+    # deshalb auf jeder Produktseite (Voreinstellung, wie bei Vodafone).
     registriere("congstar_next", Adapter(name="congstar_next",
                                          lies=congstar_modul.lies,
-                                         lies_buendel=congstar_modul.lies_buendel,
-                                         buendel_auf_produktseite=False))
+                                         lies_buendel=congstar_modul.lies_buendel))
     # Die Kategorieseite IST die Nutzlast (`direkt`): sie traegt die
     # absoluten Betraege serverseitig, und die zehn Produktadressen stehen
     # als echte `<a href>` darin - der Adapter liest sie aus demselben
@@ -940,6 +940,18 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
         else:
             links = ernte_links(inhalt, einstieg.url, einstieg.pfadmuster,
                                 einstieg.kind)
+        ohne = getattr(einstieg, "ohne_pfadmuster", ()) or ()
+        if ohne:
+            # VOR dem Deckel: eine ausgeschlossene Adresse ist keine
+            # abgeschnittene, sie gehoert nicht zum Sortiment dieser
+            # Erhebung (Uhren, Kopfhoerer, Tablets) - die Seite bleibt
+            # vollstaendig gelesen.
+            behalten = [a for a in links if not any(m in a for m in ohne)]
+            if len(behalten) < len(links):
+                log.info("%s: %d Adressen von %s ausgeschlossen "
+                         "(ohne_pfadmuster)", anbieter.name,
+                         len(links) - len(behalten), einstieg.url)
+            links = behalten
         erlaubt.update(links)
         vollstaendig = True
         versucht_hier = 0
