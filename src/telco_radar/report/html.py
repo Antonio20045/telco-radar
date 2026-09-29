@@ -1979,6 +1979,14 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         # Datei steht, nicht eine gerechnete.
         radar_view["export"] = geraete["export"]["radar"]
 
+    from . import geraete_kosten as _geraete_kosten
+    try:
+        geraete["kosten"] = _geraete_kosten.seite(geraete.get("tco") or {})
+    except Exception as exc:  # noqa: BLE001
+        log.error("Kostenvergleich nicht aufbereitbar: %s: %s",
+                  type(exc).__name__, exc)
+        geraete["kosten"] = {"hat_daten": False}
+        geraete["fehler"] = f"Kostenvergleich fehlgeschlagen: {type(exc).__name__}"
     (site_dir / "geraete.html").write_text(
         # E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d): die Geräteseite ist EINE
         # Seite mit vier Reitern; der Radar-Reiter und der Sortiments-
@@ -2128,14 +2136,14 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     # wieder eine echte Seite - die Dossier-Suche. Ein Lesezeichen darauf
     # landet also dort, wo es immer hinwollte.
     # `wettbewerbsradar.html` ist seit E3 Schritt 3 (17.09.2026) dabei: der
-    # Radar ist der Reiter "Radar" der EINEN Geräteseite, der Hash schaltet
-    # ihn (app.js) - die Alt-URL steht in Lesezeichen der Fachabteilung.
+    # Radar ging in der EINEN Geräteseite auf (seit 29.09.2026 ohne Reiter) -
+    # die Alt-URL steht in Lesezeichen der Fachabteilung.
     for alt, ziel in (("bericht.html", "index.html"),
                       ("archive.html", "meldungen.html#archiv"),
                       ("protokoll.html", "transparenz.html"),
                       ("sources.html", "transparenz.html#bestand"),
                       ("wettbewerber.html", "wettbewerb.html"),
-                      ("wettbewerbsradar.html", "geraete.html#tafel-radar")):
+                      ("wettbewerbsradar.html", "geraete.html")):
         (site_dir / alt).write_text(_redirect_html(ziel), encoding="utf-8")
 
     log.info("Site rendered: %d report(s) -> %s", len(reports), site_dir)

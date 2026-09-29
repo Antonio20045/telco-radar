@@ -3726,3 +3726,261 @@ grFilterleiste('wr-abweichung', 'gr-wmehr');
     }, 150);
   });
 })();
+
+/* GERAETESEITE: KOSTENVERGLEICH (Neuentwurf 29.09.2026).
+   Dieselbe Auswahlregel wie `geraete_kosten.rangliste()` und dasselbe
+   Markup wie die Makros `kv_zeile`/`ergebnis` in geraete.html.j2.
+   Gerechnet wird hier nichts: jede Zahl steht fertig in den Daten.
+   tests/test_geraete_kosten_browser.py haelt Python und JS zusammen. */
+var grKosten = (function () {
+  var knoten = document.getElementById('kv-daten');
+  if (!knoten) return null;
+  var D;
+  try { D = JSON.parse(knoten.textContent); } catch (e) { return null; }
+  var HORIZONT = D.horizont, SICHTBAR = D.familien_sichtbar, MEHR = D.mehr;
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+  /* wie geraete_tco_grafik.euro() */
+  function euro(b) {
+    if (b == null) return '–';
+    var teile = Math.abs(b).toFixed(2).split('.');
+    var ganz = teile[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    return (b < 0 ? '-' : '') + ganz + ',' + teile[1] + ' €';
+  }
+  function betrag(b) {
+    var t = euro(b);
+    return '<span class="kv-euro">' + esc(t.slice(0, -5)) +
+      '</span><span class="kv-cent">' + esc(t.slice(-5, -2)) + '&nbsp;€</span>';
+  }
+  function familie(id) {
+    for (var i = 0; i < D.geraete.length; i++)
+      if (D.geraete[i].id === id) return D.geraete[i];
+    return null;
+  }
+  function familieVonModell(mid) {
+    for (var i = 0; i < D.geraete.length; i++)
+      for (var j = 0; j < D.geraete[i].speicher.length; j++)
+        if (D.geraete[i].speicher[j].modell === mid) return D.geraete[i];
+    return null;
+  }
+  function stilVon(name) {
+    for (var i = 0; i < D.anbieter.length; i++)
+      if (D.anbieter[i].name === name) return D.anbieter[i];
+    return { farbe: '', eigen: false };
+  }
+  function passend(modell, stufe, raten) {
+    return (D.angebote[modell] || []).filter(function (a) {
+      return a.stufe === stufe && (raten === 'alle' || a.raten === raten);
+    });
+  }
+
+  function rangliste(modell, stufe, raten) {
+    var best = {}, namen = [];
+    passend(modell, stufe, raten).forEach(function (a) {
+      var alt = best[a.anbieter];
+      if (!alt) namen.push(a.anbieter);
+      if (!alt || a.gesamt < alt.gesamt ||
+          (a.gesamt === alt.gesamt && (a.raten || 0) < (alt.raten || 0)))
+        best[a.anbieter] = a;
+    });
+    var werte = namen.map(function (n) { return best[n]; });
+    var zeitraeume = [];
+    werte.forEach(function (a) {
+      if (zeitraeume.indexOf(a.monate) < 0) zeitraeume.push(a.monate);
+    });
+    zeitraeume.sort(function (x, y) {
+      return ((x !== HORIZONT) - (y !== HORIZONT)) || ((x || 0) - (y || 0));
+    });
+    var gruppen = zeitraeume.map(function (m) {
+      var liste = werte.filter(function (a) { return a.monate === m; })
+        .sort(function (x, y) {
+          return x.gesamt - y.gesamt ||
+            (x.anbieter < y.anbieter ? -1 : x.anbieter > y.anbieter ? 1 : 0);
+        });
+      var mehrere = liste.length > 1;
+      return { monate: m, zeilen: liste.map(function (a) {
+        return { anbieter: a.anbieter, angebot: a,
+          abstand: mehrere ? Math.round((a.gesamt - liste[0].gesamt) * 100) / 100 : null,
+          sieger: mehrere && a === liste[0] };
+      }) };
+    });
+    var ohne = D.anbieter.map(function (s) { return s.name; })
+      .filter(function (n) { return !best[n]; });
+    return { gruppen: gruppen, ohne: ohne };
+  }
+
+  function zeile(z) {
+    var a = z.angebot, s = stilVon(z.anbieter);
+    var h = '<li class="kv-zeile' + (z.sieger ? ' kv-zeile--sieger' : '') +
+      (s.eigen ? ' kv-zeile--eigen' : '') + '" style="--anb:' + esc(s.farbe) +
+      '" data-anbieter="' + esc(z.anbieter) + '"><details class="kv-auf">' +
+      '<summary class="kv-kern"><span class="kv-anb">' + esc(z.anbieter) + '</span>' +
+      '<span class="kv-info"><span class="kv-gb">' + esc(a.gb) + '</span><span class="kv-tarif">' +
+      esc(a.tarif) + (!a.frisch && a.stand_kurz ? ' <span class="kv-alt">Stand&nbsp;' +
+      esc(a.stand_kurz) + '</span>' : '') + '</span><span class="kv-raten">' +
+      (a.raten ? a.raten + '&nbsp;Raten' : '') + '</span></span>' +
+      '<span class="kv-summe">' + betrag(a.gesamt) + '</span><span class="kv-abstand">' +
+      (z.sieger ? 'günstigste' : z.abstand !== null ? '+' + euro(z.abstand) : '') +
+      '</span><span class="kv-pfeil" aria-hidden="true"></span></summary>' +
+      '<div class="kv-weg"><table>';
+    a.posten.forEach(function (p) {
+      h += '<tr' + (p.offen ? ' class="kv-weg-offen"' : '') + '><th>' + esc(p.name) +
+        '</th><td class="kv-weg-mal">' + esc(p.mal) + '</td><td>' + euro(p.betrag) + '</td></tr>';
+    });
+    h += '<tr class="kv-weg-summe"><th>Gesamt</th><td class="kv-weg-mal"></td><td>' +
+      euro(a.gesamt) + '</td></tr></table>';
+    if (a.url) h += '<a class="kv-quelle" href="' + esc(a.url) +
+      '" rel="nofollow noopener" target="_blank">Angebot bei ' + esc(z.anbieter) + ' ↗</a>';
+    return h + '</div></details></li>';
+  }
+
+  function ergebnis(r) {
+    var h = r.gruppen.map(function (g) {
+      return '<section class="kv-gruppe"><h2 class="kv-kopfzeile">Kosten über ' + g.monate +
+        ' Monate</h2><ol class="kv-liste">' + g.zeilen.map(zeile).join('') + '</ol></section>';
+    }).join('');
+    if (!r.gruppen.length) h = '<section class="kv-gruppe"><h2 class="kv-kopfzeile">Kosten über ' +
+      HORIZONT + ' Monate</h2></section>';
+    if (r.ohne.length) h += '<p class="kv-ohne"><span class="kv-ohne-namen">' +
+      r.ohne.map(esc).join(' · ') + '</span><span class="kv-summe">—</span></p>';
+    return h;
+  }
+
+  function chip(wert, text, an, aus, zusatz) {
+    return '<button type="button" role="radio" class="kv-chip" data-wert="' + esc(wert) +
+      '" aria-checked="' + (an ? 'true' : 'false') + '"' +
+      (aus ? ' data-aus' + (an ? '' : ' disabled') : '') + '>' +
+      esc(text) + (zusatz ? '<small>' + esc(zusatz) + '</small>' : '') + '</button>';
+  }
+
+  var alleFamilien = false;
+  /* wie geraete_kosten.familien_chips() */
+  function familienChips(fam) {
+    var liste = D.geraete.filter(function (f) { return f.hersteller === fam.hersteller; });
+    var zeigen = liste.filter(function (f, i) {
+      return alleFamilien || i < SICHTBAR || f.id === fam.id;
+    });
+    var chips = zeigen.map(function (f) { return chip(f.id, f.name, f.id === fam.id); });
+    if (liste.length > SICHTBAR)
+      chips.push(chip(MEHR, alleFamilien ? 'weniger'
+        : '+' + (liste.length - zeigen.length) + ' ältere', false));
+    return chips;
+  }
+
+  /* wie geraete_kosten.ansicht() */
+  function reihen(w) {
+    var fam = familie(w.familie);
+    var stufenMit = {}, ratenMit = {};
+    (D.angebote[w.modell] || []).forEach(function (a) {
+      stufenMit[a.stufe] = true;
+      if (a.stufe === w.stufe) ratenMit[a.raten] = true;
+    });
+    return {
+      hersteller: D.hersteller.map(function (h) { return chip(h, h, h === fam.hersteller); }),
+      familie: familienChips(fam),
+      modell: fam.speicher.map(function (s) { return chip(s.modell, s.text, s.modell === w.modell); }),
+      stufe: D.stufen.map(function (s) {
+        return chip(s.key, s.label, s.key === w.stufe, !stufenMit[s.key], s.gb);
+      }),
+      raten: D.raten.map(function (r) {
+        return chip(r, r === 'alle' ? 'alle' : String(r), r === w.raten,
+          r !== 'alle' && !ratenMit[r]);
+      })
+    };
+  }
+
+  var wahl = { familie: D.start.familie, modell: D.start.modell,
+    stufe: D.start.stufe, raten: D.start.raten };
+
+  function ausAdresse() {
+    var q;
+    try { q = new URLSearchParams(location.search); } catch (e) { return; }
+    var m = q.get('modell'), fam = m && familieVonModell(m);
+    if (fam) { wahl.modell = m; wahl.familie = fam.id; }
+    var b = q.get('band');
+    if (b && D.stufen.some(function (s) { return s.key === b; })) wahl.stufe = b;
+    var r = q.get('raten');
+    if (r && D.raten.indexOf(r === 'alle' ? r : Number(r)) >= 0)
+      wahl.raten = r === 'alle' ? r : Number(r);
+  }
+
+  function inAdresse() {
+    try {
+      var q = new URLSearchParams(location.search);
+      q.set('modell', wahl.modell); q.set('band', wahl.stufe); q.set('raten', wahl.raten);
+      history.replaceState(null, '', location.pathname + '?' + q.toString() + location.hash);
+    } catch (e) { /* ohne History-API bleibt die Adresse, wie sie ist */ }
+  }
+
+  function zeichne() {
+    var fam = familie(wahl.familie), sp = null;
+    fam.speicher.forEach(function (s) { if (s.modell === wahl.modell) sp = s; });
+    document.getElementById('kv-titel').innerHTML =
+      esc(fam.name) + ' <span>' + esc(sp.text) + '</span>';
+    var liste = document.getElementById('kv-geraet');
+    if (liste) liste.value = fam.id;
+    var r = reihen(wahl);
+    Object.keys(r).forEach(function (name) {
+      var el = document.querySelector('.kv-reihe[data-wahl="' + name + '"] .kv-chips');
+      if (!el) return;
+      el.innerHTML = r[name].join('');
+      var an = el.querySelector('[aria-checked="true"]');
+      if (an && el.scrollWidth > el.clientWidth)
+        el.scrollLeft = Math.max(0, an.offsetLeft - el.offsetLeft - 24);
+    });
+    document.getElementById('kv-ergebnis').innerHTML =
+      ergebnis(rangliste(wahl.modell, wahl.stufe, wahl.raten));
+  }
+
+  function waehle(name, wert) {
+    if (name === 'familie' && wert === MEHR) {
+      alleFamilien = !alleFamilien;
+      zeichne();
+      return;
+    }
+    if (name === 'hersteller') {
+      var erste = D.geraete.filter(function (f) { return f.hersteller === wert; })[0];
+      if (!erste) return;
+      alleFamilien = false;
+      name = 'familie'; wert = erste.id;
+    }
+    if (name === 'familie') {
+      var alt = familieVonModell(wahl.modell), gb = null;
+      alt.speicher.forEach(function (s) { if (s.modell === wahl.modell) gb = s.gb; });
+      var neu = familie(wert), treffer = neu.speicher[0];
+      neu.speicher.forEach(function (s) { if (s.gb === gb) treffer = s; });
+      wahl.familie = neu.id; wahl.modell = treffer.modell;
+    } else if (name === 'modell') {
+      wahl.modell = wert;
+    } else if (name === 'stufe') {
+      wahl.stufe = wert;
+    } else if (name === 'raten') {
+      wahl.raten = wert === 'alle' ? 'alle' : Number(wert);
+    }
+    /* Eine Ratenzahl, die es fuer Geraet und Tarif nicht gibt, bleibt
+       nicht als unsichtbarer Filter haengen. */
+    if (name !== 'raten' && wahl.raten !== 'alle' &&
+        !passend(wahl.modell, wahl.stufe, wahl.raten).length) wahl.raten = 'alle';
+    zeichne();
+    inAdresse();
+  }
+
+  document.getElementById('kv-wahl').addEventListener('click', function (ev) {
+    var knopf = ev.target.closest('.kv-chip');
+    if (!knopf || knopf.disabled) return;
+    var name = knopf.closest('.kv-reihe').getAttribute('data-wahl');
+    waehle(name, knopf.getAttribute('data-wert'));
+    var neu = document.querySelector('.kv-reihe[data-wahl="' + name + '"] [aria-checked="true"]');
+    if (neu) neu.focus({ preventScroll: true });
+  });
+  var liste = document.getElementById('kv-geraet');
+  if (liste) liste.addEventListener('change', function () { waehle('familie', liste.value); });
+
+  ausAdresse();
+  zeichne();
+  return { wahl: wahl, rangliste: rangliste, waehle: waehle };
+})();
