@@ -1,17 +1,23 @@
-"""Die Ruhe-Mechanik der Geräteseite (Kosten-Rangliste in section#kosten).
+"""P4/D3 (18.09.2026): die Ruhe-Mechanik der Geräteseite ist messbar.
 
-Zwei Regeln, die `scripts/pruefe_portal.py` an der echten Seite misst:
+Drei Regeln aus STRATEGIE_GERAETE_V3 §P4 / design.md (17.09.2026):
 
-  1. FLIESSTEXT-DECKEL (Kriterium 13, `fliesstext_zeichen` gegen
-     `_FLIESSTEXT_DECKEL`): Text in #kosten außerhalb von Zahlen und Chips.
-     Antonio: "Ich will keinen Text sehen."
-  2. KLICKBARKEIT ZEIGT SICH (Kriterium 15, `SUMMARY_JS`): jedes summary
-     trägt cursor:pointer und ein gezeichnetes Aufklappzeichen.
+  1. FLIESSTEXT-DECKEL je Reiter (`pruefe_portal.fliesstext_zeichen`
+     gegen `_FLIESSTEXT_DECKEL`) - FM 4: "Text kriecht zurück". Antonio:
+     "Ich will keinen Text sehen."
+  2. KEIN FLIESSTBLOCK UNTER GRAFIKEN (`max_absatz_nach_svg` gegen
+     `_MAX_ABSATZ_NACH_SVG` = 200) - design.md Regel 8. Der gefallene
+     1813-Zeichen-Datenblock unter dem G2-Graph war der Fall.
+  3. KLICKBARKEIT ZEIGT SICH - jedes <summary> der Geräteseite trägt
+     cursor:pointer und ein Aufklappzeichen (design.md Regel 5: 20 von 22
+     Aufklappern des Vergleichs-Reiters sahen aus wie Tabellenzeilen).
 
-Diese Tests halten dieselben Funktionen gegen Mini-HTML fest - eine
-Rechnung, keine zweite. Die Klickbarkeit wird im echten Browser gegen die
-WIRKLICHE style.css gemessen: eine Regel, die niemanden trifft, wäre im
-Quelltext vorhanden und prüfte nichts.
+Diese Tests halten die ZÄHLFUNKTIONEN gegen Mini-HTML fest - dieselben
+Funktionen, gegen die `pruefe_portal.py` Kriterium 13/14 die echte Seite
+misst (eine Rechnung, keine zweite). Die Klickbarkeit wird an einem
+echten Browser gegen die WIRKLICHE style.css gemessen, nicht gegen ihre
+Quelltext-Existenz: eine Regel, die niemanden färbt, wäre grün und
+prüfte nichts.
 """
 from __future__ import annotations
 
@@ -30,62 +36,107 @@ pp = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(pp)
 
 
-def _mini(html: str):
-    return BeautifulSoup(html, "html.parser").select_one("#kosten")
+def _mini(html: str) -> BeautifulSoup:
+    return BeautifulSoup(html, "html.parser")
 
 
 # ---- 1. Fließtext-Deckel: die Zählweise -------------------------------
 
-def test_deckel_zaehlt_text_ausserhalb_von_zahlen_und_chips():
-    kosten = _mini(
-        '<section id="kosten"><h1>iPhone 17 <span>256 GB</span></h1>'
-        '<div id="kv-wahl"><button class="kv-chip">Apple</button>'
-        '<span class="kv-reihe-name">Marke</span></div>'
-        '<ol><li class="kv-zeile"><span class="kv-anb">congstar</span>'
-        '<span class="kv-summe">1.783,00 €</span></li></ol>'
-        '<p class="kv-ohne">Telekom · o2</p>'
-        '<script id="kv-daten">{"a": "sehr langer Datenknoten"}</script>'
-        '</section>')
-    assert pp.fliesstext_zeichen(kosten) == \
-        len("iPhone 17 256 GB Telekom · o2")
+def test_deckel_zaehlt_sichtbare_und_aufklapp_absaetze():
+    """FM 4 nennt den Preis-Klick den Härtetest - "gerät er zum
+    Textblock, ist FM 4 sofort zurück". Deshalb zählt der Deckel Text
+    hinter Klicks MIT: ein Deckel, der nur den ersten Bildschirm misst,
+    sähe genau diesen Rückschlag nicht."""
+    soup = _mini('<div id="t"><p>Erste Zeile.</p>'
+                 '<details><summary>mehr</summary>'
+                 '<p>Und der Aufklapp-Text.</p></details></div>')
+    tafel = soup.select_one("#t")
+    assert pp.fliesstext_zeichen(tafel) == \
+        len("Erste Zeile.") + len("Und der Aufklapp-Text.")
 
 
-def test_deckel_zaehlt_neue_prosa_in_jedem_element():
-    """Gegenprobe: ein Erklärabsatz wird gezählt, egal in welchem Tag er
-    steht - ein Deckel nur über <p> ließe ein <div> voller Text durch."""
-    ohne = _mini('<section id="kosten"><h2>Kosten</h2></section>')
-    mit = _mini('<section id="kosten"><h2>Kosten</h2>'
-                '<div>So lesen Sie diese Liste.</div></section>')
-    assert pp.fliesstext_zeichen(mit) - pp.fliesstext_zeichen(ohne) == \
-        len(" So lesen Sie diese Liste.")
-
-
-def test_deckel_zaehlt_knoepfe_templates_und_kommentare_nicht():
-    kosten = _mini('<section id="kosten"><p>x<button>o2 · 36 Raten →'
-                   '</button></p><template><p>unsichtbar</p></template>'
-                   '<!-- Kommentar --></section>')
-    assert pp.fliesstext_zeichen(kosten) == 1
+def test_deckel_zaehlt_templates_nicht():
+    """Templates sind nie sichtbar (der P1-Rechenweg-Pool wird erst per
+    Klick zum DOM montiert) - sie belongen zu keiner Tafel-Ruhe."""
+    soup = _mini('<div id="t"><p>sichtbar</p>'
+                 '<template data-m="x"><p>70,00 € × 24 = 1 680 €</p>'
+                 '</template></div>')
+    assert pp.fliesstext_zeichen(soup.select_one("#t")) == len("sichtbar")
 
 
 def test_deckel_normalisiert_leerraum():
-    kosten = _mini('<section id="kosten"><p>  viel   Leer\ntraum\t  hier  '
-                   '</p></section>')
-    assert pp.fliesstext_zeichen(kosten) == len("viel Leer traum hier")
+    soup = _mini('<div id="t"><p>  viel   Leer\ntraum\t  hier  </p></div>')
+    assert pp.fliesstext_zeichen(soup.select_one("#t")) == \
+        len("viel Leer traum hier")
 
 
-def test_deckel_haelt_einen_erklaerabsatz_draussen():
-    """Der Deckel lässt Titel, Kopfzeilen und eine Fehlermeldung zu, aber
-    keinen Absatz Erklärprosa (Gegenprobe knapp über der Grenze)."""
-    assert 0 < pp._FLIESSTEXT_DECKEL <= 600
-    genau = _mini(f'<section id="kosten"><p>{"a" * pp._FLIESSTEXT_DECKEL}'
-                  '</p></section>')
-    drueber = _mini(f'<section id="kosten"><p>'
-                    f'{"a" * (pp._FLIESSTEXT_DECKEL + 1)}</p></section>')
-    assert pp.fliesstext_zeichen(genau) <= pp._FLIESSTEXT_DECKEL
-    assert pp.fliesstext_zeichen(drueber) > pp._FLIESSTEXT_DECKEL
+def test_deckel_ignoriert_leere_absaetze():
+    soup = _mini('<div id="t"><p>   </p><p>x</p></div>')
+    assert pp.fliesstext_zeichen(soup.select_one("#t")) == 1
 
 
-# ---- 2. Klickbarkeit zeigt sich (echter Browser, echte style.css) -----
+def test_jeder_reiter_hat_einen_deckel():
+    """pruefe_portal erwartet vier Tafeln (`erwartet` in Kriterium 11) -
+    jeder davon braucht einen Deckel, sonst ist der fünfte Reiter ein
+    Textloch. Der Test hält die Abdeckung, nicht die Höhe."""
+    erwartet = ["tafel-tco", "tafel-radar", "tafel-verlauf", "tafel-katalog"]
+    assert sorted(pp._FLIESSTEXT_DECKEL) == sorted(erwartet)
+    assert all(w > 0 for w in pp._FLIESSTEXT_DECKEL.values())
+
+
+# ---- 2. Kein Fließblock unter Grafiken --------------------------------
+
+def test_absatz_nach_svg_wird_gemessen():
+    soup = _mini('<div id="t"><svg></svg><p>Der Datenblock unter dem '
+                 'Graph, der die Kurve als Text wiederholt.</p></div>')
+    n, _ = pp.max_absatz_nach_svg(soup.select_one("#t"))
+    assert n == len("Der Datenblock unter dem Graph, "
+                    "der die Kurve als Text wiederholt.")
+
+
+def test_absatz_im_container_nach_svg_wird_gemessen():
+    """Graph-Wrapper-Struktur: svg und der Absatz stehen Geschwister in
+    einem div - der Absatz ist erstes Element seines Containers."""
+    soup = _mini('<div id="t"><svg></svg><div class="gr-vbild-wrap">'
+                 '<p>Bildunterschrift.</p></div></div>')
+    n, _ = pp.max_absatz_nach_svg(soup.select_one("#t"))
+    assert n == len("Bildunterschrift.")
+
+
+def test_versteckter_absatz_nach_svg_zaehlt_nicht():
+    """Initial hidden (die JS-gefüllten Verlaufs-Sätze) oder hinter
+    zugeklapptem details - die Regel misst, was der Leser unter der
+    Grafik SIEHT, nicht was im DOM liegt."""
+    soup = _mini('<div id="t"><svg></svg>'
+                 '<p hidden>versteckt</p>'
+                 '<details><summary>z</summary><svg></svg>'
+                 '<p>im Aufklapper</p></details></div>')
+    n, _ = pp.max_absatz_nach_svg(soup.select_one("#t"))
+    assert n == 0
+
+
+def test_absatz_ohne_svg_davor_zaehlt_nicht():
+    soup = _mini('<div id="t"><h3>Titel</h3><p>Ganz normaler Absatz, '
+                 'der niemanden stört.</p></div>')
+    assert pp.max_absatz_nach_svg(soup.select_one("#t"))[0] == 0
+
+
+def test_die_200_zeichen_grenze_ist_genau_der_datenblock_fall():
+    """design.md maß 1813 Zeichen unter dem G2-Graph. Die Grenze muss
+    einen solchen Block verbeugen (Gegenprobe: eine kurze
+    Bildunterschrift besteht)."""
+    assert pp._MAX_ABSATZ_NACH_SVG == 200
+    kurz = "a" * pp._MAX_ABSATZ_NACH_SVG
+    lang = "a" * (pp._MAX_ABSATZ_NACH_SVG + 1)
+    soup = _mini(f'<div id="t"><svg></svg><p>{kurz}</p></div>')
+    assert pp.max_absatz_nach_svg(soup.select_one("#t"))[0] \
+        <= pp._MAX_ABSATZ_NACH_SVG
+    soup = _mini(f'<div id="t"><svg></svg><p>{lang}</p></div>')
+    assert pp.max_absatz_nach_svg(soup.select_one("#t"))[0] \
+        > pp._MAX_ABSATZ_NACH_SVG
+
+
+# ---- 3. Klickbarkeit zeigt sich (echter Browser, echte style.css) -----
 
 def _chromium() -> str | None:
     for muster in ("/opt/pw-browsers/chromium-*/chrome-linux/chrome",
@@ -98,7 +149,8 @@ def _chromium() -> str | None:
         if treffer:
             return treffer[-1]
     # None heisst "nimm den Browser, den Playwright selbst verwaltet" -
-    # dieselbe Rueckfalloption wie pruefe_portal.
+    # dieselbe Rueckfalloption wie pruefe_portal (Phase 6a: ein
+    # uebersprungenes Kriterium sieht in der Bilanz aus wie ein bestandenes).
     return None
 
 
@@ -122,33 +174,44 @@ def seite():
     pw.stop()
 
 
-def test_je_summary_der_kostenliste_zeiger_und_pfeil(seite):
-    """Gegenprobe inklusive: ein summary ohne .kv-pfeil hat kein
-    Aufklappzeichen, und ein nacktes summary außerhalb der Kostenliste
-    bekommt von den kv-Regeln keinen Zeiger - die Messung unterscheidet,
-    statt alles grün zu melden."""
+def test_je_summary_der_geraeteseite_zeiger_und_caret(seite):
+    """Gegenprobe inklusive: .mressort (Meldungsseite) trägt sein EIGENES
+    ▾ aus der Vor-P4-Regel, und ein NACKTES summary außerhalb von
+    .gr-tafel bekommt von der neuen Regel nichts - das Scoping ist
+    Absicht, keine Nebenwirkung auf andere Seiten."""
     html = f"""<!doctype html><html><head><style>{_style()}</style></head>
     <body>
-    <section id="kosten">
-      <ol class="kv-liste"><li class="kv-zeile"><details class="kv-auf">
-        <summary class="kv-kern"><span class="kv-anb">congstar</span>
-          <span class="kv-summe">1.783 €</span>
-          <span class="kv-pfeil" aria-hidden="true"></span></summary>
-        <div class="kv-weg">x</div></details></li></ol>
-      <details class="kv-gruppe kv-gruppe--neben">
-        <summary class="kv-neben-kopf"><h2 class="kv-kopfzeile">36</h2>
-          <span class="kv-pfeil" aria-hidden="true"></span></summary>
-      </details>
-    </section>
-    <div id="woanders"><details><summary>nackt</summary></details></div>
+    <div class="gr-tafel" id="t1">
+      <details><summary>Maßstab &amp; Datenlage</summary><p>x</p></details>
+      <details class="gr-tdetail" open><summary>congstar · Tarif</summary>
+        <p>x</p></details>
+      <details class="gr-mehrliste"><summary>41 weitere</summary></details>
+    </div>
+    <details class="mressort" open><summary><h2>Ressort</h2></summary>
+      <p>x</p></details>
+    <div class="woanders"><details><summary>plain</summary></details></div>
     </body></html>"""
     seite.set_content(html)
-    kosten = seite.evaluate(pp.SUMMARY_JS, "#kosten")
-    assert len(kosten) == 2
-    assert [d["kern"] for d in kosten] == [True, False]
-    for d in kosten:
-        assert d["pointer"] is True, kosten
-        assert d["caret"] is True, kosten
-    nackt = seite.evaluate(pp.SUMMARY_JS, "#woanders")
-    assert nackt == [{"text": "nackt", "kern": False,
-                      "pointer": False, "caret": False}]
+    ergebnis = seite.evaluate(
+        """() => {
+          const inTafel = [...document.querySelectorAll('.gr-tafel summary')]
+            .map(s => ({cursor: getComputedStyle(s).cursor,
+                        caret: (getComputedStyle(s, '::after').content
+                                || 'none') !== 'none'}));
+          const mressort = [...document.querySelectorAll('.mressort>summary')]
+            .map(s => (getComputedStyle(s, '::after').content || 'none'));
+          const woanders = document.querySelector('.woanders summary');
+          return {inTafel, mressort,
+                  nackt: {cursor: getComputedStyle(woanders).cursor,
+                          caret: (getComputedStyle(woanders, '::after').content
+                                  || 'none') !== 'none'}};
+        }""")
+    assert len(ergebnis["inTafel"]) == 3
+    for e in ergebnis["inTafel"]:
+        assert e["cursor"] == "pointer", ergebnis
+        assert e["caret"] is True, ergebnis
+    # .mressort trägt sein EIGENES ▾ (Vor-P4-Regel) - unangetastet.
+    assert all(c not in ("none", "") for c in ergebnis["mressort"]), ergebnis
+    # Und das nackte summary außerhalb bleibt, wie es war - die Regel
+    # greift nur innerhalb der Geräteseiten-Tafeln.
+    assert ergebnis["nackt"]["caret"] is False, ergebnis

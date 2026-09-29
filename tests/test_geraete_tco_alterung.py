@@ -621,46 +621,19 @@ def test_berichtstag_allein_macht_kein_angebot_frisch(tmp_path):
     assert modell["alles_alt"] is False
 
 
-def _mit_stufen(root):
-    """Hängt die Test-Tarifleiter an und gibt beiden M-Tarifen 36 GB -
-    erst dann stehen die Bündel der Welt in einer Stufe, und die
-    Kosten-Rangliste der Geräteseite zeigt sie (ohne Leiter: "Keine
-    Gerätepreise")."""
-    import json
-
-    from tarifleiter_testbestand import mit_leiter
-    pfad = root / "data" / "state" / "tarife.jsonl"
-    saetze = [json.loads(z) for z in
-              pfad.read_text(encoding="utf-8").splitlines() if z.strip()]
-    saetze = mit_leiter([{**t, "datenvolumen_gb": 36} for t in saetze])
-    pfad.write_text("\n".join(json.dumps(t) for t in saetze) + "\n",
-                    encoding="utf-8")
-
-
-def _kv_zeile(html, anbieter):
-    """Die gerenderte Zeile eines Anbieters in der Kosten-Rangliste."""
-    import re
-    treffer = re.search(
-        r'<li class="kv-zeile[^"]*"[^>]*data-anbieter="' + re.escape(anbieter)
-        + r'">(.*?)</li>', html, re.S)
-    assert treffer, f"keine Zeile für {anbieter} - Lookup ins Leere"
-    return treffer.group(1)
-
-
 def test_render_site_traegt_die_marke_in_die_seite(tmp_path):
     """Harte Regel 10 an der VERDRAHTUNG: durch `render_site` gerendert,
     mit dem Bericht vom 16.09. im reports/-Ordner - so rendert geraete.yml
-    täglich. Seit dem Neuentwurf (29.09.2026) trägt die Zeile eines alten
-    Angebots in der Kosten-Rangliste ihren Stand ("Stand 15.09."). Vom
-    Berichtstag aus wäre der Telekom-Abruf nur einen Tag alt und damit
-    frisch - die Marke steht also nur, wenn die spätere Uhr gilt."""
+    täglich. Die Seite trägt die Alt-Marke des Telekom-Bündels, und der
+    "alles alt"-Satz bleibt aus (Vodafone ist frisch), solange der
+    Berichtstag allein nichts frisch stellen könnte."""
     root, _ = _buendel_welt(tmp_path)
-    _mit_stufen(root)
     html = _weltsite(root)
-    assert "Stand 15.09." in _kv_zeile(html, "Telekom")
-    # Gegenprobe im selben Test: die frische Vodafone-Zeile trägt keine
-    # Marke - die Marke hängt an der einzelnen Zeile.
-    assert "kv-alt" not in _kv_zeile(html, "Vodafone")
+    assert "kein aktueller Stand seit 15.09.2026" in html
+    # Gegenprobe im selben Test: der "alles alt"-Satz der Gruppe steht
+    # NICHT - die Marke kommt von der einzelnen Zeile, nicht vom
+    # Notzustand des Modells.
+    assert "Kein aktueller Bündel-Stand" not in html
 
 
 def test_gleiche_uhren_altern_nicht_ueber_die_grenze(tmp_path):
@@ -854,6 +827,28 @@ def test_katalog_ohne_heute_liest_weiter_den_billigsten():
     assert zeile["ab_preis"] == 289.0
     assert zeile["ab_anbieter"] == "Medimax"
     assert zeile["ab_alt"] is False
+
+
+def test_render_site_traegt_die_katalog_marke_in_die_seite(tmp_path):
+    """Harte Regel 10 am Markup, durch `render_site`: Sind die Barpreis-
+    Belege EINES Modells alle älter als die Grenze, zeigt die Katalog-
+    zeile den letzten Stand AUSGEGRAUT mit Marke - und die Leitzahl des
+    Regals („günstigster Einzelgerätpreis im Regal“) bleibt weg, statt
+    einen 37 Tage alten Preis als großen Tagessatz zu führen."""
+    import json
+    root, _ = _buendel_welt(tmp_path)
+    pfad = root / "data" / "state" / "geraete_db.json"
+    roh = json.loads(pfad.read_text(encoding="utf-8"))
+    for e in roh["listungen"]:
+        e["abgerufen_am"] = DEBITEL_TAG
+    pfad.write_text(json.dumps(roh), encoding="utf-8")
+    html = _weltsite(root)
+    assert "gr-k-ab--alt" in html
+    assert "kein aktueller Stand seit 14.08.2026" in html
+    # Die Leitzahl des Regals fehlt: ihr Block ist der EINSTE mit der
+    # Klasse `gr-leit--katalog` (die Wortwahl "günstigster" allein taugt
+    # nicht als Gegenprobe - sie steht auch am Tabellenkopf des Vergleichs).
+    assert "gr-leit--katalog" not in html
 
 
 def test_alters_haendlerpreis_fuehrt_die_antwortzeile_nicht():
@@ -1050,11 +1045,30 @@ def test_bericht_ohne_datumfeld_rendert_statt_zu_crashen(tmp_path):
         {"language": "de",
          "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
          "stats": {}, "regions": []}), encoding="utf-8")
-    _mit_stufen(root)
     html = _weltsite(root)
-    assert "1.080,76" in _kv_zeile(html, "Telekom")
+    assert "1.080,76" in html
     assert "KeyError" not in html
 
 
 # ---- S3d (Pin): die Wochenkarte hängt an der Berichts-Uhr ------------------
 
+def test_wochenkarte_rechnet_gegen_den_berichtstag(tmp_path):
+    """S3d: seit der A3-Verdrahtung rechnet „Was diese Woche auffällt“
+    gegen den BERICHTSTAG (und `geraete_lifecycle` über dieselbe Leitung)
+    - nicht gegen today(). `first_seen` 13 Tage vor dem Bericht liegt im
+    14-Tage-Fenster, 18 Tage vor today() (21.09.) läge außerhalb: Der
+    Satz „erstmals erfasst“ stünde also nur, wenn der Bericht die Uhr
+    stellt. Die Gegenprobe im selben Test ist der Kompatibilitätsmodus
+    ohne Bericht (heute="") - dasselbe Datenbild, keine Uhr, kein Satz."""
+    import json
+    root, _ = _buendel_welt(tmp_path)
+    pfad = root / "data" / "state" / "geraete_db.json"
+    roh = json.loads(pfad.read_text(encoding="utf-8"))
+    for e in roh["listungen"]:
+        e["first_seen"] = "2026-09-03"    # 13 Tage vor REPORT_STAND
+    pfad.write_text(json.dumps(roh), encoding="utf-8")
+    assert "erstmals erfasst" in _weltsite(root)
+    reports = root / "data" / "reports"
+    for alt in reports.iterdir():
+        alt.unlink()
+    assert "erstmals erfasst" not in _weltsite(root)

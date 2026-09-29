@@ -1,11 +1,368 @@
 """O3 (STRATEGIE_GERAETE_OPTIK §3, 15.09.2026): Rollen und Navigation.
 
-Die Reiter, Querlinks und Bündel-Fragmente dieser Datei sind mit dem
-Neuentwurf der Geräteseite (29.09.2026, eine Kosten-Rangliste ohne Reiter)
-gefallen, mit ihnen die Seitentests. Geblieben ist der Rückbau leserloser
-Felder in `geraete_tco_view` (S4).
+Die O2-Abnahme endete mit zwei offenen Befunden an der ARCHITEKTUR der
+Geräteseite, die dieser Datei ihre Kriterien geben:
+
+  S3 (Evaluator-Auflage) — der Modell-Umschalter zeigte Bündel-ZEILEN nur
+      für das Vorgabegerät (19 von 423 am echten Bestand); die alte
+      „Alle Bündel als Tabelle" fiel in O2 ersatzlos weg. Ab O3 zeigt die
+      Vergleichsansicht für JEDES wählbare Gerät seine eigenen Zeilen —
+      dieselben Garantien wie O2 (Pflichtzeile, Belege, Rechenweg).
+  S4 — die toten DIVs: `#tafel-verlauf` ist wieder über einen Reiter
+      erreichbar (lebendig), `#tafel-portfolio` ist WEG (seine Abschnitte
+      stehen auf dem Wettbewerbs-Radar — Antonios Entscheidung, Strategie
+      §5.2).
+
+Dazu die Rollen selbst (Entwurf `docs/entwuerfe/geraete-optik-2026-09-11/
+entwurf.html`): Reiterfolge „Vergleich | Wettbewerbs-Radar | Preisverlauf |
+Gerätekatalog" mit dem Radar als LINK (Seitenwechsel, kein toter Tab),
+ehrlicher Untertitel nach Entwurf-Wortlaut, je Radar-Geräteblock ein
+Querlink zurück ins Vergleichsansicht desselben Modells.
+
+Alle statischen Prüfungen hier laufen am ECHTEN Bestand (88 Modelle, 423
+Bündelzeilen) — die Fixture der Browser-Tests trägt fünf Zeilen und könnte
+Größen- und Zähl-Aussagen nicht tragen.
 """
 from __future__ import annotations
+
+import json
+import pathlib
+import re
+
+import pytest
+from bs4 import BeautifulSoup
+
+from telco_radar.report.html import render_site
+
+WURZEL = pathlib.Path(__file__).resolve().parents[1]
+
+
+@pytest.fixture(scope="module")
+def site(tmp_path_factory) -> pathlib.Path:
+    ziel = tmp_path_factory.mktemp("o3-rollen") / "site"
+    render_site(ziel, WURZEL / "data" / "reports")
+    return ziel
+
+
+@pytest.fixture(scope="module")
+def geraete(site) -> BeautifulSoup:
+    return BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
+                         "html.parser")
+
+
+@pytest.fixture(scope="module")
+def radar(site) -> BeautifulSoup:
+    """Die Radar-TAFEL von geraete.html. Bis E3 Schritt 3 (17.09.2026) war
+    der Radar eine eigene Seite (wettbewerbsradar.html); seitdem ist er der
+    Reiter „Radar" der EINEN Geräteseite, und die Alt-URL ist eine
+    Weiterleitung ohne Inhalt."""
+    suppe = BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
+                          "html.parser")
+    tafel = suppe.select_one("#tafel-radar")
+    assert tafel is not None, "#tafel-radar fehlt - die Fixture prüft nichts"
+    return BeautifulSoup(str(tafel), "html.parser")
+
+
+# --------------------------------------------------------------------------
+# B1: Reiterleiste und Rollen
+# --------------------------------------------------------------------------
+
+def test_die_reiterfolge_ist_vergleich_radar_verlauf_katalog(geraete):
+    """E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d) ersetzt den O3-Quasi-Reiter
+    (Link auf wettbewerbsradar.html) durch eine echte Tafel DIESER Seite:
+    vier Knöpfe in der Folge Vergleich · Radar · Preisverlauf ·
+    Gerätekatalog, kein Link mehr in der Leiste. Der Umschalter kennt
+    jeden Knopf; der Weg zur Schwesterseite bleibt bis zu ihrem Redirect
+    (E5) der Fußlink am Seitenende."""
+    eintraege = geraete.select(".gr-reiter > *")
+    rollen = [(e.get("data-tafel"), e.get_text(strip=True))
+              for e in eintraege if e.name == "button"]
+    assert rollen == [
+        ("tafel-tco", "Mit Tarif"),
+        ("tafel-verlauf", "Ohne Vertrag"),
+        ("tafel-radar", "Übersicht"),
+        ("tafel-katalog", "Katalog"),
+    ], rollen
+    assert geraete.select_one(".gr-reiter a") is None, \
+        "die Reiterleiste trägt noch einen Link statt der vier Tafeln"
+    # Die RADAR-TAFEL existiert und ist lebendig verknüpft: Knopf UND
+    # Panel, kein toter Tab-Body (die O3-Lektion, jetzt für die vierte
+    # Tafel - ihr Inhalt montiert E3 Schritt 2 in #gr-radar-inhalt).
+    assert geraete.select_one("#tafel-radar") is not None, \
+        "#tafel-radar fehlt"
+    assert geraete.select_one("#gr-radar-inhalt") is not None, \
+        "der Montagepunkt #gr-radar-inhalt fehlt"
+
+
+def test_zwischen_kopf_und_wahl_leiste_steht_kein_absatz(geraete):
+    """E2 (§4.2) loeste den Untertitel („Alle Anbieter eines Modells im
+    gewaehlten Tarifband …"): zwischen Zeitungskopf und Reiterleiste bzw.
+    Wahl-Leiste steht KEIN erklaerender Absatz mehr - der Antwort-Satz
+    loest TCO-24 selbst auf, der Radar-Weg steht als Quasi-Reiter. Dieser
+    Test haelt die Regel statt des Wortlauts."""
+    assert geraete.select_one(".gr-untertitel") is None, \
+        "der Untertitel ist zurueckgekehrt (E2 loest ihn)"
+    assert geraete.select_one("#gr-zr-wahl") is not None
+
+
+def test_der_verlaufs_reiter_fuehrt_auf_eine_lebendige_tafel(geraete):
+    """B2: Der Reiter existiert UND die Tafel hinter ihm ist nicht tot —
+    sie zeigt die Geräteauswahl (Suchfeld + JSON-Knoten) oder ihren
+    ehrlichen Leerzustand. Strategie O3: „die zwei toten Tafel-DIVs sind
+    danach weg oder lebendig“. Ein leerer Tab-Body wäre die nächste tote
+    Tafel. (Bis P2 galt hier alternativ das G2-SVG; der feste Markt-Graph
+    ist am 17.09.2026 gefallen - Antonio F4.)"""
+    tafel = geraete.select_one("#tafel-verlauf")
+    assert tafel is not None, "#tafel-verlauf fehlt"
+    assert geraete.select_one(
+        ".gr-reiter [data-tafel='tafel-verlauf']") is not None, \
+        "kein Reiter-Knopf auf #tafel-verlauf"
+    lebendig = (tafel.select_one("#gr-verlaufdaten") is not None
+                or "liegen noch keine Messreihen vor" in tafel.get_text())
+    assert lebendig, "die Verlaufs-Tafel ist tot: kein Inhalt, kein Leerzustand"
+
+
+def test_tafel_portfolio_ist_weg(geraete):
+    """B4: Die Portfolio-Tafel verlässt die Geräteseite GANZ — Container,
+    Abschnitte und Macros. Ein leer stehender Tab-Body wäre die nächste
+    tote Tafel. Die ABSCHNITTE selbst bleiben (seit E3 Schritt 3 als
+    zugeklappte Sektionen im Radar-Reiter, siehe den Test darunter) - weg
+    ist die tote Tafel, nicht der Inhalt."""
+    assert geraete.select_one("#tafel-portfolio") is None
+    assert geraete.select_one(".gr-reiter [data-tafel='tafel-portfolio']") \
+        is None, "ein fünfter Reiter-Knopf auf die tote Portfolio-Tafel"
+    # Die Portfolio-Sektionen stehen je an ihrem Ort, nirgendwo sonst:
+    # Lifecycle im Radar-Reiter; die Wochenkarte #wr-bewegungen seit
+    # P4 Schritt 2a (STRATEGIE_GERAETE_V3, 18.09.2026) im REITER
+    # PREISVERLAUF - „letzte 14 Tage Preisbewegungen" ist eine Verlaufs-
+    # frage. Ihr alter Assert schrieb ihr den Radar-Ort fest und war
+    # gegen den verschobenen Stand ROT (Vorher-rot bewiesen), seither
+    # dreht er mit.
+    erwartet = {"#lifecycle": "tafel-radar", "#wr-bewegungen": "tafel-verlauf"}
+    for anker, tafel in erwartet.items():
+        treffer = geraete.select(anker)
+        assert len(treffer) == 1, f"{anker} steht {len(treffer)}x da"
+        assert any(el.get("id") == tafel for el in
+                   treffer[0].parents), f"{anker} außerhalb von #{tafel}"
+
+
+def test_die_portfolio_abschnitte_stehen_auf_dem_radar(radar):
+    """B4: Dieselben Abschnitte, neuer Ort — Verweildauer, Nachfolger-
+    Effekt und Portfolio-Tiefe sind Portfolio-Fragen, und der Radar ist
+    die Portfolio-Seite (Antonios Entscheidung, Strategie §5.2).
+
+    „Preisverfall gegenüber dem Einführungspreis" steht NICHT als Pflicht:
+    am echten Bestand ist `lifecycle.trends` leer (eine Trend-Zeile braucht
+    zwei Messtage einer Listung) — eine erzwungene Überschrift ohne Zeile
+    wäre ein leerer Tabellenkörper, genau der Anblick, gegen den
+    `NACHFOLGER_SICHTBAR=0` gebaut wurde. Steht die Überschrift, stehen
+    auch Zeilen (derselbe if-Guard)."""
+    text = " ".join(radar.get_text(" ", strip=True).split())
+    assert "Wie lange ein Gerät im Markt lebt" in text
+    assert "Verweildauer im Regal" in text
+    assert "Was der Nachfolger mit dem Preis macht" in text
+    assert "Wie viele Generationen ein Anbieter gleichzeitig führt" in text
+    if "Preisverfall gegenüber dem Einführungspreis" in text:
+        listenteil = text.split("Preisverfall gegenüber dem "
+                                "Einführungspreis", 1)[1][:400]
+        assert "seit" in listenteil, \
+            "Preisverfall-Überschrift ohne eine einzige Zeile dahinter"
+
+
+def test_was_diese_woche_auffaellt_steht_im_preisverlauf(geraete):
+    """B4, P4-Fassung (18.09.2026): Die Wochenkarte der Preisbewegungen
+    („letzte 14 Tage") ist eine VERLAUFS-Frage und steht seit P4
+    Schritt 2a im Reiter Preisverlauf - bis dahin war sie die vierte
+    Sektion der Radar-Tafel, und ihr damaliger Test hier schrieb ihr
+    genau DEN Ort fest (er war gegen den verschobenen Stand ROT,
+    Vorher-rot bewiesen)."""
+    tafel = geraete.select_one("#tafel-verlauf")
+    assert tafel is not None, "#tafel-verlauf fehlt - Test prüft nichts"
+    text = " ".join(tafel.get_text(" ", strip=True).split())
+    assert "Was diese Woche auffällt" in text
+
+
+# --------------------------------------------------------------------------
+# B5: Querlink je Radar-Geräteblock
+# --------------------------------------------------------------------------
+
+def test_je_radar_gruppe_ein_querlink_mit_deep_link(radar, geraete):
+    """B5, E3-Fassung: Jede Modell-Zeile der Abweichungsliste verlinkt auf
+    DIESELBE Modell-ID, die der Selektor der Geräteseite trägt — sonst
+    landet der Deep-Link auf dem Vorgabegerät und zeigt ein anderes Gerät,
+    als der Link verspricht. (Bis E3 Schritt 3 hingen die Links an den
+    `.wr-gruppe`-Blöcken der Schwesterseite; seit S2 ist die Modell-Liste
+    mit ihren Zeilen der Ort.) Die Gegenprobe ist Teil des Tests
+    (CLAUDE.md §6: ein Lookup, der nichts trifft, ist grün und prüft
+    nichts)."""
+    # E2: der Selektor ist das Suchfeld; wählbar ist, was der Zeitreihen-
+    # Knoten als erlaubt traegt (derselben Quelle, aus der app.js waehlt).
+    ids_selektor = set(json.loads(
+        geraete.select_one("#gr-zeitreihe-daten").get_text())["erlaubt"])
+    links = radar.select(
+        "#wr-abweichung a.gr-sprung[href^='geraete.html?modell=']")
+    assert links, "kein Sprung-Link in der Modell-Liste des Radars"
+    # 28.09.2026: der Link nennt den Reiter, in den er springt („Mit
+    # Tarif →"), statt „im Graph ansehen" - seit „Ohne Vertrag" ebenfalls
+    # einen Graphen hat, war „der Graph" zweideutig.
+    katalog = geraete.select("#gr-katalogtabelle a.gr-sprung")
+    # Gegenprobe: beide Tabellen tragen Sprung-Links.
+    assert katalog, "kein Sprung-Link im Katalog"
+    texte = {a.get_text(strip=True) for a in list(links) + katalog}
+    assert all(t.startswith("Mit Tarif") for t in texte), texte
+    # Die Modellzahl steht an der Katalog-Überschrift, nicht noch einmal
+    # im Leitzahl-Label.
+    label = geraete.select_one("#tafel-katalog .gr-leit--katalog .gr-leit-label")
+    assert label is not None and not any(ch.isdigit()
+                                         for ch in label.get_text()), label
+    # Das Band (&band=klein) gehört zum Link, nicht zur Modell-ID - vor dem
+    # Vergleich gegen den Selektor abgeschnitten, sonst träfe der Lookup
+    # nie zu und wäre grün, ohne etwas zu prüfen.
+    fehlende = [a.get("href") for a in links
+                if a.get("href").split("modell=", 1)[-1].split("&", 1)[0]
+                not in ids_selektor]
+    assert not fehlende, \
+        f"Querlinks auf Modell-IDs außerhalb des Selektors: {fehlende[:5]}"
+    # JEDE Modell-Zeile trägt ihren Sprung ODER die benannte Luecke -
+    # sichtbare wie die hinter dem Aufklapper (alle stehen im DOM, der
+    # Deckel kappt nur die Ansicht).
+    #
+    # P4-Fix (Sicht-Pruefung 18.09.): bis hierher verlangte der Test einen
+    # Link auf JEDER Zeile - das war die Vor-P4-Welt, und sie WAR der
+    # vorbestehende Rot ("iPhone-18-Querlinks"): 10 Zeilen der echten
+    # Seite verlinkten Modelle ausserhalb des Selektors, der Deep-Link
+    # fiel still aufs Vorgabegeraet. Der Link steht seit dem Fix nur auf
+    # der Wahlmenge (der erste Assert dieses Tests), jede Zeile ausserhalb
+    # nennt die Luecke "noch keine Zeitreihe" - keinen dritten Zustand.
+    zeilen = radar.select("#wr-abweichung tr.gr-a-zeile[data-auf]")
+    assert zeilen, "keine Modell-Zeile im Radar - der Test prüft nichts"
+    ohne = [z.get("data-auf") for z in zeilen
+            if z.select_one("a.gr-sprung") is None
+            and "noch keine Zeitreihe" not in " ".join(
+                (z.select("td")[-1].get_text(" ", strip=True)
+                 if z.select("td") else "").split())]
+    assert not ohne, \
+        f"{len(ohne)} Modell-Zeilen ohne Sprung und ohne benannte Lücke"
+
+
+# --------------------------------------------------------------------------
+# B6: tarife.html erreichbar
+# --------------------------------------------------------------------------
+
+def test_tarife_ist_vom_radar_verlinkt(radar):
+    """B6: die Tarifübersicht ist die Quelle der Bänder und Tarifbindungen
+    — vom Radar (der in Bändern vergleicht) gehört ein Weg dorthin."""
+    assert radar.select_one("a[href$='tarife.html']") is not None, \
+        "der Radar-Reiter verlinkt die Tarifübersicht nicht"
+
+
+def test_tarife_bleibt_von_der_geraeteseite_verlinkt(geraete):
+    """B6: der O1-Fußnoten-Link bleibt — zwei Wege sind erlaubt, null
+    waren der Befund („tarife.html ist eine Waise ohne jeden eingehenden
+    Link")."""
+    assert geraete.select_one("a[href$='tarife.html']") is not None
+
+
+# --------------------------------------------------------------------------
+# A (S3): das Bündel-Fragment — Zeilen für JEDES wählbare Gerät
+# --------------------------------------------------------------------------
+
+def test_das_buendel_fragment_existiert_fuer_alle_anderen_modelle(site,
+                                                                  geraete):
+    """A: Die Zeilen aller Nicht-Vorgabemodelle stehen in einem eigenen
+    Fragment unter site/data/ — NICHT in der Seite selbst. O1 hat die
+    Seite von 3,9 MB auf ~1,1 MB gebracht; 423 Zeilen à 2,7 KB im HTML
+    wären der Weg zurück (gemessen: +1,17 MB). Das Fragment wird beim
+    ersten Modellwechsel geladen (lazy), der Netzwerk-Test des
+    Rechenweg-Aufklappers bleibt dadurch grün."""
+    fragment = site / "data" / "geraete-buendel.html"
+    assert fragment.exists(), "site/data/geraete-buendel.html fehlt"
+    lager = BeautifulSoup(fragment.read_text(encoding="utf-8"),
+                          "html.parser")
+    container = lager.select(".gr-bnd-lager[data-modell]")
+    assert len(container) >= 80, \
+        f"nur {len(container)} Modell-Container im Fragment (88 Modelle)"
+    # Das Vorgabemodell steht SCHON auf der Seite - im Fragment würde es
+    # doppelt (52 KB am echten Bestand).
+    vorgabe = json.loads(
+        geraete.select_one("#gr-zeitreihe-daten").text)["vorgabe"]
+    ids = {c.get("data-modell") for c in container}
+    assert vorgabe not in ids, "das Vorgabemodell steht doppelt"
+    zeilen = lager.select(".gr-bnd")
+    assert len(zeilen) >= 380, \
+        f"nur {len(zeilen)} Zeilen im Fragment (423 am Bestand, 19 Vorgabe)"
+
+
+def test_jede_belastbare_fragment_zeile_traegt_die_pflichtzeile(site):
+    """A: dieselben Garantien wie O2 — jede Zeile mit Zahl beantwortet
+    „nach 24 Monaten gezahlt" und trägt Sortier-Schlüssel als Daten-
+    Attribute (C: TCO-24, Δ, Anbieter)."""
+    lager = BeautifulSoup(
+        (site / "data" / "geraete-buendel.html").read_text(encoding="utf-8"),
+        "html.parser")
+    belastbar = [z for z in lager.select(".gr-bnd") if z.get("data-gesamt")]
+    assert belastbar, "keine belastbare Zeile im Fragment"
+    ohne_pflicht = [z for z in belastbar
+                    if z.select_one(".gr-kk-24") is None]
+    assert not ohne_pflicht, \
+        f"{len(ohne_pflicht)} belastbare Zeilen ohne Pflichtzeile"
+    for z in lager.select(".gr-bnd")[:50]:
+        assert z.get("data-anbieter"), "Zeile ohne data-anbieter"
+        assert z.has_attr("data-delta"), \
+            "Zeile ohne data-delta-Sortierschlüssel (auch leer erlaubt)"
+
+
+def test_die_sortierkoepfe_stehen_ueber_der_bandliste(geraete):
+    """C: Die Spaltenköpfe der Bündeltabelle (Leitzahl, Δ und Anbieter)
+    sind Knöpfe — sortierbar ohne Reload; die Server-Vorsortierung nach
+    der Leitzahl (O2) bleibt der Ausgangszustand.
+
+    P0-B-z2: der Kopf nennt die SPALTE, nicht den Zeitraum. Bis hierhin
+    stand dort fest "Kosten über 24 Monate" — über der einen Tafel, in der
+    beide Zeiträume der Leitzahl gemischt stehen (1&1 trägt 36). Der
+    Zeitraum steht seither am Etikett JEDER Zeile
+    (`geraete_tco_karten.label_der_leitzahl`, die eine Beschriftungsregel);
+    `tests/test_geraete_buendel_kopf_zeitraum.py` hält beides zusammen.
+    """
+    kopf = geraete.select_one("#gr-buendel .gr-bnd-kopf")
+    assert kopf is not None
+    beschriftungen = " ".join(kopf.get_text(" ", strip=True).split())
+    knoepfe = kopf.select("button[data-bsort]")
+    arten = {b.get("data-bsort") for b in knoepfe}
+    assert arten == {"tco", "delta", "anbieter"}, arten
+    assert "Kosten mit Tarif" in beschriftungen \
+        and "Anbieter" in beschriftungen
+    assert "Monate" not in beschriftungen, beschriftungen
+
+
+# --------------------------------------------------------------------------
+# D: O1/O2-Restpunkte
+# --------------------------------------------------------------------------
+
+def test_der_karten_hinweis_ist_weg(geraete):
+    """S4: Der Hinweis „Die Bündel-Tabelle steht für das Vorgabegerät" war
+    die Stimme der S3-Lücke — mit Zeilen für jedes Modell lügt er."""
+    assert geraete.select_one("#gr-karten-hinweis") is None
+    assert "Vorgabegerät" not in geraete.get_text()
+
+
+def test_der_lueckenwortlaut_ist_der_genehmigte_sammelsatz(site, geraete):
+    """E2 ersetzt den D1-Wortlaut („Vodafone fehlt in diesem Band – keine
+    Δ-Angabe", Balkenzeit) durch Antonios 9b.7/§4.5: EIN Sammelsatz unter
+    dem Graphen, fehlende Anbieter MIT NAMEN, Alternativ-Bänder samt
+    Betrag in Klammern - und was gar nichts hat, nur EIN Mal im selben
+    Satz. Geprüft am Server-Startzustand UND am Zeitreihen-Fragment (die
+    Lücken aller übrigen Paare stehen nur dort)."""
+    quellen = [geraete.get_text(" ", strip=True)]
+    fragment = site / "data" / "geraete-zeitreihe.html"
+    assert fragment.exists(), "Zeitreihen-Fragment fehlt"
+    quellen.append(fragment.read_text(encoding="utf-8"))
+    for text in quellen:
+        assert "führt kein Bündel" not in text, "alter Wortlaut ist zurück"
+    gesamt = " ".join(quellen)
+    assert "Kein Bündel in diesem Band:" in gesamt, \
+        "der Sammelsatz fehlt am echten Bestand"
+    assert "gar nicht im Bündel" in gesamt
 
 
 def test_die_tco_view_liefert_keine_leserlosen_felder_mehr():

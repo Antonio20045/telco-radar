@@ -1,129 +1,1250 @@
-{# Geräteseite: eine Frage, eine Rangliste (Neuentwurf 29.09.2026).
+{# Geraete- und Preisradar.
 
-   Der Leser wählt Gerät, Speicher, Tarifstufe und Ratenlaufzeit und sieht
-   je Anbieter die Kosten über 24 Monate, günstigste zuerst. Keine Reiter,
-   keine Erklärtexte. Die Daten kommen aus `geraete_kosten.seite()`; der
-   Server rendert die Startauswahl, `app.js` (`grKosten`) jede weitere mit
-   derselben Auswahlregel und demselben Markup (Makros unten, JS-Funktionen
-   `zeile()` und `ergebnis()`). #}
+   VIER FRAGEN, VIER REITER. Bis zum 30.08.2026 stand alles untereinander auf
+   einer Seite, angefuehrt von einer Positionskarte mit 59 Geraeten mal vier
+   Anbietern in EINEM Bild: 114 senkrecht gedrehte Achsenbeschriftungen, 155
+   von 164 Punkten ohne Beschriftung. Drei Umschalter boten drei Ansichten
+   derselben unlesbaren Grafik an - das sind keine drei Antworten.
+
+   Die Grafik ist geloescht, nicht umgebaut. Was sie zeigen sollte, zeigt
+   jetzt eine Tabelle: die Startansicht traegt KEIN Diagramm.
+
+   Drei Regeln, die diese Vorlage tragen:
+     1. Ein Diagramm zeigt genau EIN Geraet. Es wird in "Preisverlauf"
+        stehen (B4) und erst nach einer Auswahl erscheinen - auch kein
+        leeres davor. Bis dahin traegt diese Seite GAR KEIN Diagramm, und
+        das ist der Zustand, den Kriterium 11 misst.
+     2. Kein gedrehter Text, keine Schrift unter 12 px, keine mit "..."
+        abgeschnittene Beschriftung. Passt ein Name nicht hin, ist die
+        Ansicht zu voll: dann fallen Eintraege, nicht Buchstaben.
+     3. Keine Zeile, die nichts sagt. "niemand guenstiger" stand 36-mal in
+        der alten Tabelle; die Kachel "Bestpreis" sagt dasselbe einmal.
+
+   Alle Tafeln stehen fertig im HTML - der Reiter blendet um, er laedt nicht
+   neu und braucht kein Netz.
+
+   Seit dem 03.09.2026 traegt die Seite KEINE Erklarsektionen mehr: der
+   Einleitungssatz ueber die Preisbasis, der Betriebszahlenabsatz ("Wie
+   vollstaendig ist das") und die Sektion "Datenbasis und Luecken" sind auf
+   Antonios Auftrag geloescht. Wer liefern sollte und warum nicht, steht auf
+   geraete-quellen.html; die Arbeitslisten (unbekannte Farbschreibweisen,
+   Titel ohne Katalogtreffer) stehen im Protokoll des naechtlichen Laufs -
+   geraete.html ist eine Leseseite, kein Pflegeradar.
+
+   BRIEF_FADEN (05.09.2026, Senecas Freigabe): EINE Frage, EIN Graph. Die
+   Titelseiten-Ueberschrift ("Dieses Geraet - wo kaufe ich es am
+   guenstigsten?") ist gescheitert (Antonios Urteil: umgangssprachlich,
+   "ich" mehrdeutig) und weicht der sachlichen "Gerätepreise im Vergleich".
+   Bis O3 trugen die Reiter nur "Vergleich" und "Gerätekatalog"; seit O3
+   (STRATEGIE_GERAETE_OPTIK §3) sind es VIER EINTRÄGE: der Wettbewerbs-
+   Radar als Quasi-Reiter (Link auf seine Seite), "Preisverlauf" (die
+   Einzelgerät-Zeitreihe ist wieder erreichbar - O4 bindet dort die
+   gekappte Barpreis-Zeitreihe an) und "Gerätekatalog". Die Portfolio-
+   Tafel ist GANZ weg - ihre Abschnitte stehen seit E3 Schritt 3 als
+   Sektionen im Radar-Reiter DIESER Seite (bis dahin auf der abgeschalteten
+   Alt-Seite des Radars (heute Weiterleitung), Antonios Entscheidung, Strategie
+   §5.2). G1 (der TCO-Balkenvergleich)
+   bleibt aus DIESER Ansicht entfernt - Datenquelle und Rechnung
+   (`geraete_tco_grafik.balken`, `m.svg`/`m.legende`) bleiben im Code,
+   nur der Aufruf im Template ist geloescht.
+   Ampel-Kacheln (Preis-Alarme) und die Analysten-Tabellen (alle Buendel,
+   Tarife) stehen seit O2 auf dem Wettbewerbs-Radar - Seneca: "Unerklaert
+   ist selten ein Beschriftungsproblem, meistens ein Existenzproblem." #}
 {% extends "base.html.j2" %}
 {% set active = 'geraete' %}
 {% block title %}Vodafone Product and Services Insights · Gerätepreise{% endblock %}
 
-{% macro betrag(wert) -%}
-{%- set text = wert | euro -%}
-<span class="kv-euro">{{ text[:-5] }}</span><span class="kv-cent">{{ text[-5:-2] }}&nbsp;€</span>
-{%- endmacro %}
+{# O2 (STRATEGIE_GERAETE_OPTIK §3, 11.09.2026): die Alarmtabelle war
+   AUS dieser Seite auf den Wettbewerbs-Radar gezogen (seit E3 lebt sie
+   in der geteilten Teilvorlage `_geraete_alarme.html.j2` - der
+   Radar-Reiter dieser Seite rendert sie).
+   Die Radar-Tafel sortiert Geräte nach Abweichung zu Vodafone; die
+   Alarmtabelle ist dieselbe Aussicht im Detail, und "Bei Wettbewerbern
+   gelistet" ist dieselbe Frage über das Sortiment. Hier bleibt keins von
+   beidem - nicht doppelt. #}
 
-{% macro kv_zeile(z) -%}
-{%- set a = z.angebot -%}
-<li class="kv-zeile{% if z.erste %} kv-zeile--erste{% endif %}{% if z.sieger %} kv-zeile--sieger{% endif %}{% if z.stil.eigen %} kv-zeile--eigen{% endif %}"
-    style="--anb:{{ z.stil.farbe }}" data-anbieter="{{ z.anbieter }}">
-  <details class="kv-auf">
-    <summary class="kv-kern">
-      <span class="kv-anb">{{ z.anbieter }}</span>
-      <span class="kv-info"><span class="kv-gb">{{ a.gb }}</span>{% if a.raten %}<span class="kv-raten">{{ a.raten }}&nbsp;Raten</span>{% endif %}{% if a.alt %}<span class="kv-alt">{{ a.alt }}</span>{% endif %}</span>
-      <span class="kv-summe">{{ betrag(a.gesamt) }}</span>
-      <span class="kv-abstand{% if z.einzig %} kv-abstand--einzig{% endif %}">{% if z.sieger %}günstigste{% elif z.abstand is not none %}+{{ z.abstand | euro }}{% elif z.einzig %}einziges Angebot{% endif %}</span>
-      <span class="kv-pfeil" aria-hidden="true"></span>
-    </summary>
-    <div class="kv-weg">
-      <table>
-        {%- for p in a.posten %}
-        <tr{% if p.offen %} class="kv-weg-offen"{% endif %}><th>{{ p.name }}</th><td class="kv-weg-mal">{{ p.mal }}</td><td>{{ p.betrag | euro }}</td></tr>
-        {%- endfor %}
-        <tr class="kv-weg-summe"><th>Gesamt</th><td class="kv-weg-mal"></td><td>{{ a.gesamt | euro }}</td></tr>
-      </table>
-      {%- if a.url %}
-      <a class="kv-quelle" href="{{ a.url }}" rel="nofollow noopener" target="_blank">Angebot bei {{ z.anbieter }} ↗</a>
-      {%- endif %}
-    </div>
-  </details>
-</li>
-{%- endmacro %}
-
-{% macro ergebnis(ansicht, horizont) -%}
-{%- set haupt = ansicht.gruppen | selectattr('monate', 'equalto', horizont) | list %}
-<section class="kv-gruppe">
-  <h2 class="kv-kopfzeile">Kosten über {{ horizont }} Monate</h2>
-  {%- for g in haupt %}
-  <ol class="kv-liste">
-    {%- for z in g.zeilen %}
-    {{ kv_zeile(z) }}
-    {%- endfor %}
-  </ol>
-  {%- endfor %}
-</section>
-{%- if ansicht.anders %}
-<p class="kv-anders">
-  {%- for x in ansicht.anders %}{% for r in x.raten %}
-  <button type="button" class="kv-umschalten" data-raten="{{ 'alle' if r is none else r }}">{{ x.anbieter }} · {% if r is none %}ohne&nbsp;Raten{% else %}{{ r }}&nbsp;Raten{% endif %}&nbsp;→</button>
-  {%- endfor %}{% endfor %}
-</p>
-{%- endif %}
-{%- if ansicht.ohne %}
-<p class="kv-ohne"><span class="kv-ohne-namen">{{ ansicht.ohne | join(' · ') }}</span><span class="kv-summe">—</span></p>
-{%- endif %}
-{%- for g in ansicht.gruppen if g.monate != horizont %}
-{#- Ein anderer Zeitraum ist mit der Hauptliste nicht vergleichbar: er
-    steht zugeklappt ganz unten, ohne Betrag im Blick. #}
-<details class="kv-gruppe kv-gruppe--neben">
-  <summary class="kv-neben-kopf"><h2 class="kv-kopfzeile">Kosten über {{ g.monate }} Monate</h2><span class="kv-neben-namen">{{ g.zeilen | map(attribute='anbieter') | join(' · ') }}</span><span class="kv-pfeil" aria-hidden="true"></span></summary>
-  <ol class="kv-liste">
-    {%- for z in g.zeilen %}
-    {{ kv_zeile(z) }}
-    {%- endfor %}
-  </ol>
-</details>
-{%- endfor %}
-{%- endmacro %}
-
-{% macro chips(name, label, eintraege) -%}
-<div class="kv-reihe" role="radiogroup" aria-label="{{ label }}" data-wahl="{{ name }}">
-  <span class="kv-reihe-name">{{ label }}</span>
-  <div class="kv-chips">
-    {%- for e in eintraege %}
-    <button type="button" role="radio" class="kv-chip" data-wert="{{ e.wert }}"
-      aria-checked="{{ 'true' if e.an else 'false' }}"{% if e.aus %} data-aus{% if not e.an %} disabled{% endif %}{% endif %}>{{ e.text }}{% if e.zusatz %}<small>{{ e.zusatz }}</small>{% endif %}</button>
-    {%- endfor %}
-  </div>
-</div>
-{%- endmacro %}
+{# O3 (15.09.2026): die Bündel-ZEILEN stehen in der Teilvorlage
+   `_geraete_buendel.html.j2` - dieselbe Quelle für die Seite (Vorgabe-
+   modell, serverseitig) und das lazy Fragment `geraete_buendel_fragment
+   .html.j2` (alle übrigen Modelle, siehe den Kommentar an `#gr-buendel`).
+   E3-Fix (QA 17.09.2026): der G0-Block des Verlaufs-Reiters ist GEFALLEN
+   (Doppel-Darstellung zur eigenen Geräteauswahl, §4.6/§4.8). #}
+{% from "_geraete_buendel.html.j2" import buendelzeile, buendelgruppe %}
+{% from "_geraete_zeitreihe.html.j2" import paarblock %}
+{# E3 Schritt 2: die Radar-Tafel - `with context`, weil das Makro den
+   `prefix` der Seite für den Tarifübersichts-Link braucht. P4/2a dazu:
+   `wochenkarte` („Was diese Woche auffällt") - dieselbe Teilvorlage,
+   aber aufgerufen im REITER PREISVERLAUF (siehe den Kommentar dort). #}
+{% from "_geraete_radar.html.j2" import radar_tafel, wochenkarte with context %}
 
 {% block content %}
-{% set kv = geraete.kosten %}
-<section class="kv wide" id="kosten">
-{% if kv.hat_daten and kv.ansicht %}
-  <header class="kv-kopf">
-    <h1 class="kv-titel" id="kv-titel">{{ kv.ansicht.titel }} <span>{{ kv.ansicht.speicher }}</span></h1>
-  </header>
-  {% if geraete.fehler %}<p class="kv-nichts">{{ geraete.fehler }}</p>{% endif %}
+<section class="page-hero wide gr-hero-export">
+  <div class="page-hero-row">
+    <div>
+      <p class="page-kicker">Deutschland · Geräte</p>
+      <h1>Gerätepreise</h1>
+    </div>
+    {# DAS KOPFDATUM IST DAS ABRUFDATUM, nicht der Berichtstag (30.08.2026).
 
-  <div class="kv-wahl" id="kv-wahl">
-    <label class="kv-reihe kv-reihe--liste">
-      <span class="kv-reihe-name">Gerät</span>
-      <select id="kv-geraet">
-        {%- for f in kv.ansicht.auswahl %}
-        <option value="{{ f.id }}"{% if f.id == kv.start.familie %} selected{% endif %}>{{ f.name }}</option>
-        {%- endfor %}
-      </select>
-    </label>
-    {%- for r in kv.ansicht.reihen %}
-    {{ chips(r.name, r.label, r.chips) }}
-    {%- endfor %}
+       Bis dahin stand hier `geraete.stand`, also der Tag der Ausgabe. Der
+       Geraetezweig laeuft aber NAECHTLICH und der Bericht zweimal die Woche:
+       am 30.08.2026 sagte der Kopf "Stand 28. August 2026", waehrend jede
+       Tabellenzeile darunter "30. August 2026" trug und der Fliesstext am
+       Seitenende es richtig erklaerte. Wer zwei Zahlen im selben Blick
+       vergleicht, haelt die juengere Seite fuer die aeltere.
+
+       `abgerufen_bis` ist der spaeteste Abruf im Bestand - dieselbe Zahl,
+       die in den Zeilen steht. Faellt der naechtliche Lauf aus, altert das
+       Kopfdatum mit den Daten, statt Frische zu behaupten. #}
+    {% if geraete.abgerufen_bis %}<span class="page-date">Preise vom {{
+      geraete.abgerufen_bis | date_de }}</span>
+    {% elif geraete.stand %}<span class="page-date">Stand {{ geraete.stand | date_de }}</span>{% endif %}
+    {# P4/D4 (STRATEGIE_GERAETE_V3, 18.09.2026): DIE EXPORT-KNOEPFE STEHEN
+       NICHT MEHR HIER. Bis P4 füllten sechs Knöpfe die Kopfzeile - am
+       Telefon standen sie gequetscht ÜBER der Reiter-Steuerung und
+       drückten Antwort-Satz und Graphkopf Richtung Falz (11c). Sie
+       stehen seit P4 als EINE Fußzeile am Seitenende (siehe
+       .gr-export-fuss unten) - dieselben sechs Dateien, dieselben
+       Ziele, dieselbe Zeilenzahl neben dem Link; EINE Stelle für alle
+       Reiter bleibt gewahrt (O4-Regel: nie einer je Reiter, keine
+       Dubletten). Das Gatter fragt weiter die DATEI ab, nicht die
+       Zeilenzahl: auch ein leerer Bestand nennt seine Null neben dem
+       Link (Modulkopf geraete_export). #}
+  </div>
+</section>
+
+{# RAD-1 (08.09.2026): der eine Fusslink auf den Wettbewerbs-Radar - kein
+   Erklaersatz, nur der Weg dorthin (Aufgabe 2: "verlinkt ... UND
+   geraete.html"). Dieselbe Ausnahme wie der Fusslink auf
+   geraete-quellen.html: ein Bedienelement, kein Kommentar.
+
+   O1 (11.09.2026): der Link stand seither AM SEITENFUSS neben dem
+   Quellen-Link. O3 gibt dem Radar seinen Platz IN der Reiterleiste (als
+   Quasi-Reiter mit Seitenwechsel-Pfeil); der Fusslink bleibt - zwei Wege
+   von derselben Seite sind erlaubt, die Verwirrung von damals war der
+   fehlende Weg ÜBERHAUPT. #}
+
+{# E2 (16.09.2026): der Untertitel („Alle Anbieter eines Modells im
+   gewählten Tarifband, Leitzahl TCO-24 … Schwesterseite …") ist GEFALLEN
+   (§4.2: nichts zwischen Kopf und Wahl-Leiste). Der Antwort-Satz löst
+   TCO-24 selbst auf (§4.9), und der Weg zum Radar steht als Quasi-Reiter
+   in der Leiste sowie im Fußlink. Der alte CSS-Versteck-Selektor
+   .gr-untertitel ist mit ihm entfernt. #}
+
+
+{% if geraete.hat_daten %}
+
+{# --- Reiterleiste ---------------------------------------------------- #}
+{# VIER REITER, VIER TAFELN, EINE SEITE (E3, AUFTRAG_GERAETE_EINE_SEITE_V2
+   §1d). Seit 28.09.2026 heissen sie nach dem, was sie messen: Mit Tarif ·
+   Ohne Vertrag · Übersicht · Katalog (vorher Vergleich · Radar ·
+   Preisverlauf · Gerätekatalog). Bis E3 war der
+   Radar ein QUASI-Reiter - ein Link auf die Radar-Alt-URL mit Pfeil
+   als Seitenwechsel (O3). Antonios Wortlaut („Wieso kannst du nicht
+   einfach Geräte-Unterseite, darunter dann verschiedene Unterseiten/
+   Reiter … statt dass man 30 Minuten scrollt") dreht das um: der Radar
+   ist eine Tafel DIESER Seite; die Schwesterseite ist seit E3 Schritt 3
+   (17.09.2026) eine Weiterleitung auf #tafel-radar, und der Navigationseintrag
+   ist gefallen (8 → 7).
+
+   Bis O3 (BRIEF_FADEN, 05.09.2026) standen hier zwei Knöpfe:
+   "Preis- und TCO-Historie" und "Portfolio" hatten ihren verloren, ihre
+   Tafeln blieben unverknüpft im Dokument. O3 löst beides: der
+
+   Bis O3 (BRIEF_FADEN, 05.09.2026) standen hier zwei Knöpfe:
+   "Preis- und TCO-Historie" und "Portfolio" hatten ihren verloren, ihre
+   Tafeln blieben unverknüpft im Dokument. O3 löst beides: der
+   Verlaufs-Reiter ist zurück (die Einzelgerät-Zeitreihe dahinter war
+   fertig gebaut und unerreichbar - O4 bindet dort zusätzlich die gekappte
+   Barpreis-Zeitreihe an), und die Portfolio-Tafel ist GANZ weg - ihre
+   Abschnitte stehen seit O3 auf dem Wettbewerbs-Radar (Antonios
+   Entscheidung, Strategie §5.2). #}
+<nav class="gr-reiter" role="tablist" aria-label="Ansichten des Geräteradars">
+  <button type="button" role="tab" aria-selected="true"
+          aria-controls="tafel-tco" data-tafel="tafel-tco">Mit Tarif</button>
+  <button type="button" role="tab" aria-selected="false"
+          aria-controls="tafel-verlauf" data-tafel="tafel-verlauf">Ohne Vertrag</button>
+  <button type="button" role="tab" aria-selected="false"
+          aria-controls="tafel-radar" data-tafel="tafel-radar">Übersicht</button>
+  <button type="button" role="tab" aria-selected="false"
+          aria-controls="tafel-katalog" data-tafel="tafel-katalog">Katalog</button>
+</nav>
+
+
+{# --- Reiter 1: die Hauptansicht (TCO-Vergleich) -----------------------
+     Eigene Tafel und ausdruecklich KEINE weitere Spalte der Alarmtabelle:
+     "wo liegen wir zurueck" und "was kostet es" sind zwei Fragen (Strategie
+     § 8). Heute traegt sie ihre Luecke - null Buendel, weil kein Adapter
+     Tarifpreise sammelt. Sie zeigt deshalb, WAS schon gemessen ist und was
+     fehlt, statt aus einem Geraetepreis eine Gesamtsumme zu runden. #}
+{# Die Referenztabelle steht an ZWEI Orten (offen und im Aufklapper).
+   Als Makro, nicht als zwei Kopien: zwei Kopien einer Tabelle sind zwei
+   Tabellen, und die zweite wird beim naechsten Umbau vergessen. #}
+{% macro referenztabelle(zeilen) %}
+{# `gr-scroll`: eine breite Tabelle rollt IN SICH, nie die ganze Seite.
+   Vier Spalten, deren letzte "Produktinformationsblatt" plus Datum traegt;
+   auf 390 px einzeln gemessen wird sie 403 px breit und reicht bis 446.
+   Die 480 px, auf die der Reiter im Vorzustand lief, gehen NICHT auf ihr
+   Konto, sondern auf das der Bereitschaftstabelle weiter unten (437 breit)
+   - eine Zahl gehoert an die Tabelle, an der sie gemessen wurde. Eine
+   Seite, die waagerecht rollt, ist auf dem Telefon unbenutzbar; dieselbe
+   Regel und derselbe Behaelter wie bei der SKU-Matrix (dort
+   `gr-matrix-scroll`) und der Bewegungstabelle.
+
+   Das Makro wird ZWEIMAL aufgerufen - offen und im Aufklapper "Die
+   uebrigen N Tarife" -, zwei Behaelter im Template ergeben also drei auf
+   der Seite. #}
+<div class="gr-scroll">
+<table class="gr-ttab gr-ttab--simonly">
+  <thead><tr>
+    <th scope="col">Anbieter und Tarif</th>
+    <th scope="col">je Monat</th>
+    <th scope="col">über {{ geraete.tco.horizont }} Monate</th>
+    <th scope="col">Beleg</th>
+  </tr></thead>
+  <tbody>
+  {% for r in zeilen %}
+  <tr{% if r.eigen %} class="gr-tzeile--eigen"{% endif %}>
+    <td><span class="gr-t-anbieter">{{ r.anbieter }}</span>
+        <span class="gr-a-klein">{{ r.tarif }}</span></td>
+    <td>{{ r.monatlich | euro }}</td>
+    <td>{{ r.ueber_horizont | euro }}</td>
+    <td>{% if r.quelle_url %}<a href="{{ r.quelle_url }}"
+          rel="nofollow noopener" target="_blank">{% if r.quelle_ist_dokument %}Produktinformationsblatt{% else %}Shop-Seite{% endif %}<span
+          class="gr-a-pfeil" aria-hidden="true">↗</span></a>{%
+        else %}<span class="gr-t-luecke">kein Beleg</span>{% endif %}
+        {% if r.abgerufen_am %}<span class="gr-a-klein gr-a-datum">{{
+          r.abgerufen_am | date_de }}</span>{% endif %}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endmacro %}
+
+{# EINE Karte je Anbieter und Tarif. Die Pflichtzeilen stehen in der
+   Reihenfolge des Terminologie-Katalogs D, und ihre Beschriftungen sind
+   woertlich von dort: `TCO-<Laufzeit>`, `Ø X €/Monat`, `monatlich X €`,
+   `Gerät einmalig X €`, `eff. X €/M. ohne Gerät`, `ab Monat 25: X €`.
+   Ein Synonym waere ein zweites Mass. #}
+
+<div class="gr-tafel" id="tafel-tco" role="tabpanel">
+
+<section class="gr-tco" id="tco">
+  {# E2 (16.09.2026): DIESE TAFEL IST DIE ZEITREIHE. Bis E2 führte sie
+     Modell-<select>, Antwort-Leitzeilen und den HTML/CSS-Balkengraphen
+     (O1); Antonios Graph-Entscheidung (AUFTRAG_GERAETE_EINE_SEITE_V2 §1a)
+     ersetzt alle diese Formen durch EIN Koordinatensystem: Y = TCO-24 in
+     EUR, X = das Datum mit den echten Messtagen, je Anbieter eine Linie
+     mit einem Punkt je Messung, nichts interpoliert. Aufbau nach dem
+     genehmigten Prototyp: Wahl-Leiste, Antwort-Satz, Graph - nichts
+     dazwischen (§4.2), die Bündel-Zeilen DARUNTER bleiben (§3.1b: der
+     Rechenweg je Anbieterzeile). #}
+
+  {# EIN BUENDEL OHNE GERAETEZUORDNUNG STEHT HIER BEIM NAMEN (F-R2-3).
+     P4/D4 (18.09.2026): der Satz stand bis hierhin VOR der Wahl-Leiste
+     und war damit der Mini-Satz zwischen Kopf und Steuerung, den die
+     Falz-Regel streicht (vor dem ersten Datenelement höchstens EIN Satz
+     und EINE Auswahlgruppe). Er ist NACH UNTEN gezogen - direkt hinter
+     die Bündel-Sektion (dieselbe Tafel, weiterhin ohne Modellgatter,
+     also auch da, wenn kein Bündel auflöst). #}
+
+  {% if geraete.tco.modelle %}
+  {% set zr = geraete.zeitreihe %}
+  {% set start_modell = zr.start.modell if zr.start else geraete.tco.modell_vorgabe %}
+  {% set m = geraete.tco.modelle | selectattr('id', 'equalto', start_modell)
+    | first %}
+
+  {# --- 1. DIE EINE WAHL-LEISTE (§4.2, §1b): Suchfeld MIT Live-Vorschau
+         (Tippen genügt, ≤ 8 Treffer, klickbar vor vollständiger Eingabe)
+         und Tarifband-Knöpfe daneben - dieselbe Stelle, an der bis E2 der
+         Modell-<select> stand. Die Vorschau selbst baut app.js aus dem
+         JSON-Knoten #gr-zeitreihe-daten (Titel und Zählungen, KEINE
+         Preise); die Treffer-Reihenfolge kommt fertig und sortiert aus
+         geraete_zeitreihe (Bandabdeckung vor Auslaufware, PM-7). #}
+  <div class="gr-zr-wahl" id="gr-zr-wahl">
+    <div class="gr-zr-feld gr-zr-feld--suche">
+      <label for="gr-zr-suche">Gerät</label>
+      <div class="gr-zr-suchfeld">
+        <input id="gr-zr-suche" type="text" autocomplete="off"
+               spellcheck="false"
+               placeholder="z. B. „google pixel“ oder „iphone 17“"
+               aria-describedby="gr-zr-treffer">
+        <span class="gr-zr-treffer" id="gr-zr-treffer">{{
+          zr.daten.modelle_gesamt }} Modelle</span>
+      </div>
+      <div class="gr-zr-vorschau" id="gr-zr-vorschau" role="listbox"
+           aria-label="Modell-Vorschau"></div>
+    </div>
+    <div class="gr-zr-feld">
+      <label id="gr-zr-band-label">Tarifband</label>
+      <div class="gr-zr-baender" role="group" aria-labelledby="gr-zr-band-label" id="gr-zr-baender">
+        {# Die Stufen der Tarifleiter; nicht erlaubte werden vom Client
+           DEAKTIVIERT, nicht entfernt (Angebot, nicht Existenz) - dieselbe
+           Regel wie am alten <select>. #}
+        {% for b in zr.band_folge %}
+        <button type="button" data-band="{{ b }}"{% if zr.start
+          %}{% if zr.start.band == b %} aria-pressed="true"{% else
+          %} aria-pressed="false"{% endif %}{% else %} aria-pressed="false"{% endif
+          %}>{{ zr.baender[b].label }}{% if zr.baender[b].bereich
+          %}<small>{{ zr.baender[b].bereich }}</small>{% endif %}</button>
+        {% endfor %}
+      </div>
+    </div>
   </div>
 
-  <div class="kv-ergebnis" id="kv-ergebnis">{{ ergebnis(kv.ansicht, kv.horizont) }}</div>
+  {# --- 1b. Die MODELL-KARTEN (§3.2 + P1/F3): die häufigsten Geräte als
+         prominenter Schnelleingang - jede Karte trägt JE BAND (P1-Fix
+         Sicht-B2: die Karte reagiert auf den Band-Umschalter) ihren
+         ab-Preis (bestes echtes Angebot DES BANDES, groß), die Bewegung
+         seit dem ersten Messtag und die Anbieter der Zeitreihe als Punkte
+         in Hausfarben. Alle Zahlen kommen fertig aus geraete_zeitreihe
+         (Regel 1); die Reihung (Anbieter, dann Punkte) ist unverändert.
+         Zwei Klickwege: der Karten-Körper wählt das Modell
+         (waehle(modell, null)), die PREISZAHL öffnet zusätzlich den
+         Rechenweg dieses Preises (P1-Fix Sicht-A1 - app.js liest nur
+         fertige data-Attribute, kein Rechnen). Ein Band ohne echtes
+         Angebot zeigt „—" statt eines geratenen Preises. #}
+  {% if zr.kacheln %}
+  {% set aktives_band = zr.start.band if zr.start else '' %}
+  <div class="gr-zr-kacheln" id="gr-zr-kacheln" aria-label="Häufige Geräte">
+    {% for k in zr.kacheln %}
+    <button type="button" data-modell="{{ k.id }}"{% if k.id ==
+      start_modell %} aria-pressed="true"{% endif %}>
+      <span class="gr-zr-k-kopf"><span class="gr-zr-k-name">{{ k.kurz
+        }}</span>{% for b, s in k.baender.items() %}<span class="gr-zr-k-punkte
+        gr-zr-k-band" data-band="{{ b }}"{% if b != aktives_band %}
+        hidden{% endif %}{% if s.anbieter_text %} role="img"
+        aria-label="Anbieter mit Messung: {{ s.anbieter_text }}"{% endif
+        %}>{{ s.punkte_html|safe }}</span>{% endfor %}</span>
+      {% for b, s in k.baender.items() %}
+      <span class="gr-zr-k-band" data-band="{{ b }}"{% if b != aktives_band %}
+        hidden{% endif %}{% if s.anb %} data-anb="{{ s.anb }}"{% endif %}>
+        {%- if s.ab %}<span class="gr-zr-k-preis"><small>ab</small><b>{{
+          s.ab }}</b>{% if s.ab_monat %}<span class="gr-zr-k-monat">{{
+          s.ab_monat }}</span>{% endif %}</span>
+        {# A3: ein Band mit nur alten Angeboten zeigt den benannten alten
+           Stand (`alt_text`, in Python gebaut, MIT Abrufdatum) statt
+           „—" - harte Regel 9; der Titel nennt denselben Sachverhalt
+           für Maus und Touch. #}
+        {%- elif s.alt_text %}<span class="gr-zr-k-preis"><small
+          class="gr-zr-k-leer gr-zr-k-alt"
+          title="kein aktueller Bündel-Stand">{{
+          s.alt_text }}</small></span>
+        {# P0-B-z1: der fremde Zeitraum ist sein EIGENER Zustand
+           (`fremd_text`) - das Angebot ist von heute, nur seine Laufzeit
+           ist eine andere. Der Titel des alten Stands wäre hier falsch. #}
+        {%- elif s.fremd_text %}<span class="gr-zr-k-preis"><small
+          class="gr-zr-k-leer gr-zr-k-alt gr-zr-k-fremd"
+          title="Bündel-Angebot nur über eine andere Laufzeit">{{
+          s.fremd_text }}</small></span>
+        {%- else %}<span class="gr-zr-k-preis"><small class="gr-zr-k-leer"
+          title="kein Bündel-Angebot in diesem Band">—</small></span>{%- endif %}
+        {#- 28.09.2026: die Bewegung steht nur, wenn sich wirklich etwas
+            bewegt hat - „±0 € in 16 Tagen" auf jeder Karte war Rauschen,
+            ein echter Preissprung faellt so auf. #}
+        {%- if s.delta_text and s.delta_richtung != 'gleich' %}<span
+          class="gr-zr-k-delta gr-zr-k-delta--{{ s.delta_richtung }}">{{
+          s.delta_text }}</span>{%- endif %}
+      </span>
+      {% endfor %}
+      {# Ein Band, das DIESE Karte nicht führt, lässt sie nicht leer
+         sterben: der Ersatz-Span steht auf und sagt „—" (dasselbe
+         Zeichen wie ein Band ohne echtes Angebot - ein benannter
+         Zustand, kein geratener Preis). #}
+      <span class="gr-zr-k-band gr-zr-k-band--kein" data-band="__ohne" hidden>
+        <span class="gr-zr-k-preis"><small class="gr-zr-k-leer"
+          title="dieses Gerät wird in diesem Band nicht geführt">—</small>
+      </span></span>
+    </button>
+    {% endfor %}
+  </div>
+  {% endif %}
 
-  <script type="application/json" id="kv-daten">{{ kv.json | safe }}</script>
+  {# --- 2. Der Montagepunkt: der STARTZUSTAND steht serverseitig da
+         (First Paint ohne JavaScript, lesbar ohne jede Anfrage); jeder
+         andere Zustand kommt als fertiges Markup aus dem Fragment
+         `data/geraete-zeitreihe.html` (app.js montiert nur). #}
+  {% if zr.start_block %}
+  <div class="gr-zr-gruppe" id="gr-zr-gruppe">{{ paarblock(zr.start_block) }}</div>
+  {# P1/A2 (17.09.2026): EIN Klick-Panel unter dem Graph. app.js setzt hier
+     bei Klick auf einen Kurvenpunkt (unsichtbare Fläche .gr-zr-hit) oder die
+     PREISZAHL im Antwort-Satz das fertige <template> genau dieser Messung
+     ein (content.cloneNode - reine Montage, keine Client-Rechnung). Der
+     Container steht BEWUSST außerhalb des Montagepunkts #gr-zr-gruppe:
+     setzeGraph() leert die Gruppe bei jedem Modellwechsel, das Panel schließt
+     app.js dort selbst, statt mit dem Block verschwinden zu müssen. #}
+  <div class="gr-zr-panel" id="gr-zr-panel" hidden></div>
+  {% elif m %}
+  {# Paare ohne Serie: der ehrliche Leer-Satz an derselben Stelle. Hat das
+     Geraet gar keine Stufe (keine Tarifleiter erhoben, kein Buendel), nennt
+     `band_leer` diesen Grund statt einer fehlenden Messreihe. #}
+  <div class="gr-zr-gruppe" id="gr-zr-gruppe"><p class="gr-zr-keine">{% if m.band_leer %}{{
+  m.band_leer }}{% else %}Für dieses Gerät liegt
+  noch keine Messreihe vor - die Zeitreihe beginnt mit dem ersten
+  nächtlichen Lauf, der sie schreibt, und wächst mit jedem Messtag.{% endif %}</p>
+  </div>
+  {% endif %}
+
+  {# --- 3. Alle Bündel des GEWÄHLTEN Modells als Tabellenzeilen (O2/O3,
+         unverändert) - der Rechenweg je Anbieterzeile ist Aufklapper (b)
+         der drei Rest-Aufklapper. Der Titel nennt das gewählte Band; beim
+         Wechsel setzt app.js ihn aus dem JSON-Knoten (fertige Zeichen-
+         kette, kein zweiter Satzbaumeister im Browser). #}
+  <section class="gr-buendel" id="gr-buendel" aria-label="Alle Bündel dieses Geräts">
+    <h3 class="gr-bnd-titel" id="gr-bnd-titel">{% if m and m.baender and zr.start %}Alle Bündel
+    im Band {{ zr.baender[zr.start.band].label if zr.start.band in zr.baender else m.baender[0].label }} – {{
+    m.titel }}{% elif m %}Alle Bündel – {{ m.titel }}{% endif %}</h3>
+    {# P0-B-z2: DER KOPF NENNT DIE SPALTE, DIE ZEILE NENNT IHREN ZEITRAUM.
+       Hier stand fest „Kosten über 24 Monate" - ausgerechnet über der
+       EINEN Tafel, in der beide Zeiträume wirklich gemischt stehen (iPhone
+       17 Pro 256 GB, Band Klein: drei 24-Monats-Summen und 1&1 mit
+       2.019,54 € über 36 Monate). Der Zeitraum steht AN DER ZAHL, als
+       Etikett jeder Zeile (`k.label`, gebaut aus
+       `geraete_tco_karten.label_der_leitzahl` - das ist DIE eine
+       Beschriftungsregel für diesen Zeitraum). Ein Kopf, der ihn ein
+       zweites Mal behauptet, ist deshalb keine Beschriftung mehr, sondern
+       eine zweite Regel - und genau die lief hier gegen den Inhalt.
+       „Kosten mit Tarif" ist das Gegenstück zu „Gerät ohne Vertrag"
+       daneben und dasselbe Wort, mit dem der Rechenweg jeder Zeile die
+       Zahl schon erklärt. #}
+    <div class="gr-bnd-kopf">
+      <span><button type="button" class="gr-bsort" data-bsort="anbieter"
+        >Anbieter</button></span><span>Tarif · Volumen</span><span><button
+        type="button" class="gr-bsort" data-bsort="tco" aria-label=
+        "nach den Kosten mit Tarif sortieren, getrennt nach Zeitraum"
+        >Kosten mit Tarif</button></span><span><button type="button" class="gr-bsort"
+        data-bsort="delta" aria-label=
+        "nach Abstand über oder unter der Vodafone-Referenz sortieren"
+        >Δ zu Vodafone</button></span><span>Gerät ohne
+        Vertrag</span><span></span>
+    </div>
+    <div id="gr-bnd-gruppe">{{ buendelgruppe(m, ids=true) }}</div>
+  </section>
+
+  {# EIN BUENDEL OHNE GERAETEZUORDNUNG STEHT HIER BEIM NAMEN (F-R2-3) -
+     seit P4/D4 HINTER der Bündel-Sektion: vor der Wahl-Leiste war er der
+     Mini-Satz zwischen Kopf und Steuerung (Falz-Regel: höchstens EIN Satz
+     vor dem ersten Datenelement - das ist der Antwort-Satz der Zeitreihe). #}
+  {% if geraete.tco.ohne_zuordnung %}
+  <p class="gr-erklaer gr-basis--duenn gr-tco-ohne-zuordnung">Nicht auf der
+  Tafel, weil kein Gerät zuzuordnen ist: {% for u in geraete.tco.ohne_zuordnung
+  %}{{ u.anbieter }}, <code>{{ u.sku_id }}</code> – {{ u.grund }}{% if not
+  loop.last %}; {% endif %}{% endfor %}.</p>
+  {% endif %}
+
+  {# --- 4. Der EINE Fuß-Aufklapper (c): „Maßstab & Datenlage" - bis E2
+         waren es zwei eigene Aufklapper (der Tarifmaßstab und die
+         Datenlage). §3.1: genau DREI Rest-Aufklapper auf der ganzen
+         Tafel, das ist der dritte; die Referenztabelle samt ihrer
+         „N weitere Tarife"-Klappe ist Inhalt, kein vierter. #}
+  <details class="gr-auf" id="gr-massstab-datenlage">
+  <summary>Maßstab & Datenlage</summary>
+  {% if geraete.tco.referenzen %}
+  <p class="gr-erklaer">{{ geraete.tco.referenzen_gesamt }} Tarife aus den
+  Produktinformationsblättern – dem gesetzlich vorgeschriebenen Dokument,
+  nicht der Werbeseite. Der Betrag gilt <b>ohne Gerät</b>; er ist der
+  Maßstab, gegen den ein Gerätepreis im Bündel überhaupt bestimmbar wird
+  (<a href="{{ prefix }}tarife.html">Tarifübersicht</a>).</p>
+  {{ referenztabelle(geraete.tco.referenzen) }}
+  {% if geraete.tco.referenzen_rest %}
+  <details class="gr-auf">
+    <summary>{{ geraete.tco.referenzen_rest | length }} weitere Tarife anzeigen</summary>
+    {{ referenztabelle(geraete.tco.referenzen_rest) }}
+  </details>
+  {% endif %}
+  {% else %}
+  <p class="gr-erklaer">Der Tarifmaßstab steht noch nicht: ohne
+  Produktinformationsblatt ist kein Gesamtpreis berechenbar.</p>
+  {% endif %}
+  <h3 class="gr-tueber">Was der Rechnung noch fehlt</h3>
+  <ul class="gr-tposten gr-tposten--offen">
+    {% for o in geraete.tco.offene_posten %}
+    <li><span>{{ o.name }}</span><em>{{ o.phase }}</em></li>
+    {% endfor %}
+  </ul>
+  {% if geraete.tco.bereitschaft %}
+  <h3 class="gr-tueber">Was je Anbieter schon gemessen ist</h3>
+  <div class="gr-scroll">
+  <table class="gr-ttab gr-ttab--bereit">
+    <thead><tr>
+      <th scope="col">Anbieter</th><th scope="col">Neugeräte</th>
+      <th scope="col">Preisform</th>
+      <th scope="col">Geräteseite vollständig</th>
+    </tr></thead>
+    <tbody>
+    {% for b in geraete.tco.bereitschaft %}
+    <tr{% if b.eigen %} class="gr-tzeile--eigen"{% endif %}>
+      <td>{{ b.anbieter }}</td>
+      <td>{{ b.listungen }}</td>
+      <td>{{ b.preisform }}</td>
+      <td>{% if b.mit_raten %}{{ b.raten_probe_ok }} von {{ b.mit_raten }}
+        mit geprüfter Ratenrechnung{% else %}–{% endif %}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% endif %}
+  </details>
+
+  {# Der Client-Knoten: Titel, Zählungen, Erlaubnis - KEINE Beträge. Der
+     Zustands-Graph selbst (Antwort-Satz, SVG) kommt nie als Daten, sondern
+     als fertiges Markup aus dem Fragment. #}
+  <script type="application/json" id="gr-zeitreihe-daten">{{
+    zr.daten | tojson }}</script>
+  {% else %}
+  <p class="gr-erklaer gr-basis--duenn">Es gibt heute kein einziges Bündel
+  aus Gerät und Tarif im Bestand – ohne diese Verbindung gibt es nichts zu
+  rechnen. Was schon gemessen ist, steht unten.</p>
+  {% endif %}
+
+  {% if not geraete.tco.lesbar %}
+  <p class="gr-erklaer gr-basis--duenn">Der Bündelbestand
+  (<code>geraete_tco.json</code>) war nicht lesbar. Was hier steht, ist
+  deshalb unvollständig – das ist ein Lesefehler und keine Auskunft über den
+  Markt.</p>
+  {% endif %}
+</section>
+</div>
+
+{# --- Reiter 2: Radar ---------------------------------------------------
+   E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d/S2/S3): die Tafel trägt die
+   Inhalte der bisherigen Radar-Alt-Seite (heute Weiterleitung), NEU
+   strukturiert nach S3 - drei klar getrennte, gleichwertige Sektionen
+   (Alarme / Abweichung als MODELL-LISTE / Händler als eigener Abschnitt),
+   jede mit einem Satz, was sie misst. Die Struktur steht in der Teil-
+   vorlage `_geraete_radar.html.j2`.
+
+   Der Kopf hier ist die FRAGE DES REITERS (S1: „Jeder Reiter beantwortet
+   EINE klar benannte Frage in seinem Titel + einem Satz"). Bis E3
+   Schritt 2 hieß er „Alle Modelle nach Abweichung zu Vodafone" - das ist
+   der Titel der MODELL-LISTE (S2) und steht jetzt AN deren Sektion; als
+   Tafelkopf hätte er die erste Sektion (Alarme) falsch beschriftet. Die
+   Frage selbst ist die des Modulkopfs von `geraete_radar.py` -
+   dieselbe wie die h1 der Schwesterseite.
+
+   P4/D1 (18.09.2026): die Tafel führte mit der BALKENGRAFIK. Seit
+   28.09.2026 steht die Modell-Liste „Mit Tarif" zuerst (aus ihr stammt
+   die Leitzahl), dann die drei Sektionen „Ohne Vertrag". Der Sortiments-Aufklapper „Bei Wettbewerbern
+   gelistet, bei Vodafone nicht" steht SEIT P4 Schritt 2b HIER (unter
+   der Grafik) und nicht mehr im Katalog-Reiter - siehe den Kommentar
+   in der Teilvorlage. Der Datenkontext der Tafel heißt `radar` (dasselbe
+   Dict, das auch der Sortiments-Aufklapper liest, von render_site
+   übergeben). #}
+<div class="gr-tafel gr-tafel--aus" id="tafel-radar" role="tabpanel">
+<section class="gr-radar" id="radar">
+  <h2 class="rubrik">Bei welchem Gerät ist Vodafone teurer als der Wettbewerb?</h2>
+  {# P4/D4 (STRATEGIE_GERAETE_V3, 18.09.2026): DIE ANTWORT IST DIE
+     GROESSTE ZAHL. Der Reiter fragt nach der Abweichung zu Vodafone -
+     seine Antwort ist die STAERKSTE davon, und sie stand bis P4 nirgends:
+     746 Tabellenzeilen, keine einzige Zahl größer als 13 px (design.md:
+     0 % Grafik, der Reiter war „ein Excel-Export mit Überschriften").
+     Die Leitzahl-Zeile nennt sie als erste Schrift der Tafel (Zahl groß,
+     Label klein, .gr-leit) - Werte aus der ERSTEN Zeile der Modellliste
+     (`modellliste.zeilen[0]`, sortiert nach negativester Prozentzahl,
+     geraete_radar.py - dieselbe Rechnung wie die Liste, kein zweiter
+     Rechner). Seit 28.09.2026 steht dort der Euro-Abstand (`euro_text`)
+     statt der Prozentzahl - dieselbe Einheit und dasselbe Vorzeichen wie
+     die Balken darunter (negativ = Wettbewerber günstiger). Ohne
+     vergleichbare Zeile (leerer Bestand) gibt es keine
+     Leitzahl-Zeile - dann steht der Satz allein. #}
+  {% set spitze = radar.modelliste.zeilen[0] if radar.modelliste.zeilen
+    else none %}
+  {% if spitze and spitze.prozent is not none %}
+  <div class="gr-leit gr-leit--radar"><b class="gr-leit-zahl">{{
+    spitze.euro_text }} €</b><span class="gr-leit-label">{{ spitze.anbieter }} {{
+    spitze.richtung }} Vodafone: {{ spitze.titel }} mit Tarif, Kosten
+    über 24 Monate</span></div>
+  {% endif %}
+  {# E3-Fix (QA 17.09.2026, B2) / P4-Fix (Sicht-Pruefung 18.09.): Der Kopf
+     behauptete die vorzeichenbehaftete Leitzahl für ALLE drei Sektionen -
+     die Alarmtabelle zeigt denselben Abstand aber als positiven BETRAG.
+     Die Zeichenregel (negativ = Wettbewerber günstiger) und die Betrags-
+     Regel der Alarme traegt jetzt das Achslabel UNTER der Balkengrafik
+     (siehe _geraete_radar.html.j2) - als Absatz zwischen Leitzahl und
+     Bild war sie der Rueckstand der Ruecke: der Reiter beginnt mit der
+     Leitzahl, dann kommt das Bild (Ruhe; Sicht-Prufer Kleineres 9). #}
+  <div id="gr-radar-inhalt">{{ radar_tafel(radar) }}</div>
+</section>
+</div>
+
+{# --- Reiter 4: Gerätekatalog ----------------------------------------
+   (Die CSV-Knoepfe standen bis O4 je Reiter oben in einem `gr-werkzeug`-
+   DIV; sie stehen EINMAL in der Kopfzeile - siehe den Kommentar dort.) #}
+<div class="gr-tafel gr-tafel--aus" id="tafel-katalog" role="tabpanel">
+
+{# --- P3 (Strategie Geraete v3, 17.09.2026): EINE Tabelle auf MODELL-
+   Ebene mit EINEM Umschalter Einzelgerätpreis / Gesamtkosten ----
+   Bis P3 stand hier die Listungs-Tabelle: 566 Zeilen zu 111 Modellen,
+   36 davon "ohne Preis" (alle 1&1, deren Bündelpreis längst im Store
+   lag), und dieselben Geräte als Farb-/Anbieter-Zeilen wiederholt.
+   Antonios Forderungen 5 und 6: der Preis muss da stehen - und statt
+   einer zweiten TCO-Liste gibt es EINEN Umschalter über EINER Tabelle.
+
+   DIE EINE REGEL (P3): keine Modellzeile sagt "ohne Preis". Jede Zeile
+   trägt einen Barpreis ("ab X bei Y") ODER den benannten Bündel-Zustand
+   ("nur im Bündel, ab X /Monat") - die Zahlen kommen fertig aus
+   `geraete_view.katalog_modellzeilen()` (C1), hier wird nichts gerechnet.
+   Die Listungs-Details (Farbe, Zustand, Beleg) sind NICHT gelöscht: sie
+   stehen im Zeilen-Aufklapper (dieselbe `data-auf`-Mechanik wie die
+   Radar-Modellliste; Klick auf die Zeile öffnet sie).
+
+   Beide Ansichten stehen SERVERSEITIG fertig im Markup - `app.js`
+   blendet nur um (Klasse an der Tabelle, kein Reload, kein Rechnen,
+   bewusst kein URL-Parameter). Default ist der Einzelgerätpreis: das
+   ist die Frage dieses Reiters, die Gesamtkosten sind die des
+   Vergleichs-Reiters. Der Umschalter teilt die Preisspalte, nicht die
+   Modellmenge: beide Ansichten laufen über denselben `modell_schluessel`
+   (C1, geteilt mit der TCO-Ansicht).
+
+   Sortierung weiterhin nach ROHWERT (`data-s-*`); eine Zeile ohne Zahl
+   in der sortierten Spalte trägt keinen Schlüssel und fällt ans Ende
+   (bestehende Regel). Der Deckel (`zeilen_rest` aus C1 - `KATALOG_SICHTBAR`
+   zählt MODELLE) und der filterbewusste Nachzähler in `app.js`
+   (`anwenden()`) bleiben unverändert in Geltung. Die Sortier- und
+   Interleave-Regeln, die bis P3 im Kommentar hier standen, leben seit C1
+   im Docstring von `katalog_modellzeilen()` - eine Ebene tiefer, dort wo
+   sie gerechnet werden.
+
+   P4 SCHRITT 2c (18.09.2026) - DER ROTE FADEN ZWISCHEN DEN REITERN: jede
+   Modellzeile trägt ihren `modell_schluessel` als `data-modell` (derselbe
+   EINE Schlüssel wie Radar-Liste und Zeitreihen-Wahl), und unter dem Titel
+   steht der Sprung in die ZEITREIHE des Reiters „Mit Tarif" ("Mit
+   Tarif →", dieselbe `gr-sprung`-Mechanik wie die Radar-Liste: href trägt
+   den Deep-Link, app.js schaltet Reiter, Modell und Band). Der Link steht
+   NUR, wo `m.zr` sagt, dass die Zeitreihe das Modell kennt (Wahl-Menge,
+   aus demselben Knoten gelesen, aus dem app.js waehlt) - ein Modell ohne
+   Bündel erhält keinen toten Link; seine TCO-Spalte nennt den Grund
+   ("kein Bündel gemessen"). Die Gegenrichtung (Radar -> Katalog) hängt an
+   `gr-ksprung` in `_geraete_radar.html.j2`. #}
+<section class="gr-katalog" id="katalog">
+  <h2 class="rubrik">Was wo im Regal steht
+    <span class="rubrik-zahl">{{ geraete.katalog_modelle | length }}</span></h2>
+  {# P4-Fix (Sicht-Pruefung 18.09., Falz 1): DIE LEITZAHL DES KATALOGS -
+     der guenstigste Einzelgeraetepreis des Regals als groesste Schrift
+     der Tafel. Der Katalog war der einzige der vier Reiter ohne Falz-
+     Antwort (groesste Schrift: die h2). Die Zahl kommt fertiggerechnet
+     aus geraete_view (`katalog_ab_preis`, min ueber die Modellzeilen -
+     dort steht die EINE Rechnung); ohne Barpreis im ganzen Regal gibt
+     es keine Leitzahl, dann traegt der Satz darunter die Antwort. #}
+  {% if geraete.katalog_ab_preis is not none %}
+  <div class="gr-leit gr-leit--katalog"><b class="gr-leit-zahl">{{
+    geraete.katalog_ab_preis | euro }}</b><span class="gr-leit-label">günstigster
+    Einzelgerätpreis im Regal</span></div>
+  {% endif %}
+  {# D4a (24.09.2026): der Erklärsatz ist GEFALLEN (Antonios Regel: keine
+     Erklär-Unterzeile unter einer Überschrift). Dieselbe Auskunft - eine
+     Zeile je Modell, der Umschalter wählt Einzelgerätpreis oder Kosten
+     über 24 Monate - steht jetzt als `title` an den Umschalter-Knöpfen
+     selbst. #}
+
+  <div class="gr-filter" data-fuer="gr-katalogtabelle">
+    <label class="gr-fbox"><span>Marke</span>
+      <select data-filter="marke">
+        <option value="">alle</option>
+        {% for m in geraete.katalog_modelle | map(attribute='hersteller')
+              | reject('equalto','') | unique | sort %}
+        <option value="{{ m }}">{{ m }}</option>{% endfor %}
+      </select></label>
+    <label class="gr-fbox"><span>Speicher</span>
+      <select data-filter="speicher">
+        <option value="">alle</option>
+        {% for sp in geraete.katalog_modelle | map(attribute='speicher')
+              | select | unique | sort %}
+        <option value="{{ sp }}">{{ sp }} GB</option>{% endfor %}
+      </select></label>
+    <label class="gr-fbox gr-fbox--weit"><span>Suche</span>
+      <input type="search" data-filter="suche" placeholder="Modell, Händler …"></label>
+  </div>
+
+  {# EIN Umschalter, gleiche Bauform wie der Zeitraum- und der Band-
+     Schalter der Seite (`gr-vgruppe`/`gr-vknopf`, aktiv ROT). Der
+     Zustand steht NICHT in der URL - bewusst (Keep it simple): ein
+     geteilter Link soll den Katalog in seiner Grundfrage zeigen. #}
+  <div class="gr-vgruppe gr-kansicht" role="group"
+       aria-label="Welcher Preis in der Tabelle steht">
+    <button type="button" class="gr-vknopf is-aktiv" data-ansicht="barpreis"
+            aria-pressed="true" title="eine Zeile je Modell, alle Listungen darunter">Einzelgerätpreis</button>
+    {# Derselbe Zeitraum wie der Spaltenkopf und der Filter der Spalte
+       (P0-B-h2) - der Umschalter benennt die Spalte, die er einschaltet. #}
+    <button type="button" class="gr-vknopf" data-ansicht="tco"
+            aria-pressed="false" title="eine Zeile je Modell, alle Listungen darunter">Kosten über {{ geraete.tco.horizont }} Monate</button>
+  </div>
+
+  <div class="gr-alarm-scroll">
+  {# Spaltennamen EINMAL: der Kopf und am Telefon das `data-k`-Etikett
+     jeder Zelle (dort fehlt der Kopf, die Zeile steht als Karte). #}
+  {% set spalten = {'anbieter': 'Händler', 'spanne': 'Spanne',
+    'tco': 'Kosten über ' ~ geraete.tco.horizont ~ ' Monate',
+    'monat': 'Ø €/Monat', 'delta': 'Δ zu Vodafone', 'band': 'Band'} %}
+  <table class="src-table gr-alarm gr-katalog-mod" id="gr-katalogtabelle">
+    {# Dieselbe Sortiermechanik wie im Radar - `grFilterleiste` traegt
+       beide Tabellen. Sortiert wird nach dem ROHWERT (`data-s-*`); eine
+       Zeile ohne Zahl in der sortierten Spalte traegt keinen Schluessel
+       und faellt ans Ende (bestehende Regel). #}
+    <thead><tr>
+      <th scope="col"><button type="button" class="gr-sort" data-sort="geraet"
+        data-art="text">Modell</button></th>
+      {# Ansicht Einzelgerätpreis: ab-Preis, Händler, Spanne. #}
+      <th scope="col" class="num gr-sp--barpreis"><button type="button"
+        class="gr-sort" data-sort="preis" data-art="zahl">Einzelgerätepreis</button></th>
+      <th scope="col" class="gr-sp--barpreis"><button type="button"
+        class="gr-sort" data-sort="anbieter" data-art="zahl">{{ spalten.anbieter }}</button></th>
+      <th scope="col" class="num gr-sp--barpreis"><button type="button"
+        class="gr-sort" data-sort="spanne" data-art="zahl">{{ spalten.spanne }}</button></th>
+      {# Ansicht Gesamtkosten: TCO-24 ab, Ø €/Monat, Δ zur Referenz, Band.
+         Die Band-Spalte trägt KEINEN Sortierknopf: "Groß/Klein/Mittel"
+         hat keine alphabetisch sinnvolle Ordnung, und ein Zahlen-Rang
+         dafür wäre eine zweite Abbildung derselben Auswahl.
+
+         P0-B-h2: der Zeitraum IM KOPF ist derselbe Wert, auf den
+         `geraete_view._tco_spalte` die Zeilen filtert
+         (`tco_model.TCO_HORIZONT`, hier als `geraete.tco.horizont`
+         durchgereicht). Eine feste 24 in der Vorlage konnte gegen den
+         Inhalt der Spalte laufen - genau das war der Befund: 16 Zeilen
+         trugen eine 36-Monats-Summe unter diesem Kopf. #}
+      <th scope="col" class="num gr-sp--tco"><button type="button"
+        class="gr-sort" data-sort="tco" data-art="zahl">{{ spalten.tco }}</button></th>
+      <th scope="col" class="num gr-sp--tco"><button type="button"
+        class="gr-sort" data-sort="monat" data-art="zahl">{{ spalten.monat }}</button></th>
+      <th scope="col" class="gr-sp--tco"><button type="button"
+        class="gr-sort" data-sort="delta" data-art="zahl">{{ spalten.delta }}</button></th>
+      <th scope="col" class="gr-sp--tco">{{ spalten.band }}</th>
+    </tr></thead>
+    <tbody>
+    {% for m in geraete.katalog_modelle %}
+      {# `gr-a-rest` kommt aus `m.zeilen_rest` (C1): der Deckel zaehlt
+         MODELLE, `BLOCK_SICHTBAR` hat auf dieser Ebene keine Bedeutung.
+         Hauptzeile und Aufklappzeile tragen ihn PAARWEISE - die
+         Sortiermechanik verschiebt beide zusammen (`data-auf`). #}
+      <tr class="gr-a-zeile gr-k-zeile{{ ' gr-a-rest' if m.zeilen_rest }}{{ ' gr-k--ohne-details' if not m.zeilen }}"
+          data-auf="kz-{{ loop.index }}"
+          data-modell="{{ m.schluessel }}"
+          data-marke="{{ m.hersteller }}" data-speicher="{{ m.speicher or '' }}"
+          data-s-geraet="{{ m.titel }}"
+          data-s-preis="{{ m.ab_preis if m.ab_preis is not none else '' }}"
+          data-s-anbieter="{{ m.anbieterzahl }}"
+          data-s-spanne="{{ ((m.spanne[1] - m.spanne[0]) | round(2)) if m.spanne else '' }}"
+          data-s-tco="{{ m.tco_ab if m.tco_ab is not none else '' }}"
+          data-s-monat="{{ m.tco_monat if m.tco_monat is not none else '' }}"
+          data-s-delta="{{ m.tco_delta if m.tco_delta is not none else '' }}"
+          tabindex="0">
+        <td><span class="gr-a-modell">{{ m.titel }}</span>
+          {# P4 Schritt 2c: der Sprung in die Zeitreihe desselben Modells -
+             derselbe `modell_schluessel` wie data-modell dieser Zeile und
+             wie die Radar-Liste, EINE Modellmenge ueber die Reiter. Das
+             Band des Deep-Links ist das des besten TCO-Angebots (m.tco_band
+             aus derselben Karte, die die TCO-Spalte fuellt); ohne Band
+             waehlt der Graph selbst sein erstes erlaubtes. `m.zr` siehe
+             Kommentar oben - kein Link, wo der Sprung nicht trifft. #}
+          {% if m.zr %}<a class="gr-sprung"
+            href="geraete.html?modell={{ m.schluessel }}{% if m.tco_band %}&amp;band={{ m.tco_band }}{% endif %}"
+            data-modell="{{ m.schluessel }}"{% if m.tco_band %} data-band="{{ m.tco_band }}"{% endif %}
+            >Mit Tarif&nbsp;→</a>
+          {# P5-Auftrag 1 (18.09.): ein Modell MIT Bündel, das (noch) nicht
+             waehlbar ist - Auto-Eintrag unter der Messtag-Schwelle der Wahl
+             (`AUTO_SICHTBAR_AB_MESTAGEN`, gegen Bündel-Messtage gerechnet).
+             Die Zeitreihe BEGINNT mit dem nächsten Messtag, die Lücke heisst
+             beim Namen wie im Radar - kein toter Deep-Link, kein Stummsein.
+             Ein Modell OHNE Bündel nennt die TCO-Spalte den Grund ("kein
+             Bündel gemessen"); derselbe Satz hier waere die zweite Aussage
+             fuer dieselbe Tatsache (Beruhigungsregel: eine Zahl/Aussage je
+             Ort genau EINMAL). #}
+          {% elif m.hat_buendel %}<span class="gr-a-klein">noch keine
+            Zeitreihe</span>{% endif %}</td>
+        {# --- Einzelgeraepreis: DIE EINE REGEL. Barpreis ("ab X bei Y",
+               Beleg verlinkt), sonst der benannte Buendel-Zustand mit
+               Monatspreis - nie eine Rate als Barpreis. Ein Modell ohne
+               beides kann nach C1 nicht vorkommen (0 Zeilen im Bestand);
+               der Zweig steht trotzdem da, weil die Regel lauter ist als
+               der heutige Bestand. #}
+        <td class="num gr-sp--barpreis">
+          {%- if m.ab_preis is not none %}
+          {# A3: ein "ab" ohne frischen Beleg ist der LETZTE STAND, kein
+             aktueller - ausgegraut, mit Marke samt Abrufdatum (derselbe
+             Satz wie an der Bündelzeile, gebaut in Python). #}
+          <span class="gr-k-ab{% if m.ab_alt %} gr-k-ab--alt{% endif %}">ab {{
+            m.ab_preis | euro }}</span>
+          {% if m.ab_beleg and m.ab_beleg.quelle_url %}<a
+            class="gr-a-quelle" href="{{ m.ab_beleg.quelle_url }}"
+            rel="noopener" title="Quelle bei {{ m.ab_anbieter }} öffnen">bei
+            {{ m.ab_anbieter }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>
+          {% else %}<span class="gr-a-klein">bei {{ m.ab_anbieter }}</span>{% endif %}
+          {% if m.ab_beleg and m.ab_beleg.abgerufen_am %} <span
+            class="gr-a-klein gr-a-datum">{{ m.ab_beleg.abgerufen_am | date_de }}</span>{% endif %}
+          {% if m.ab_alt %} <span class="gr-spalten-marke gr-spalten-marke--alt">{{
+            m.ab_alt_marke }}</span>{% endif %}
+          {%- elif m.nur_buendel %}
+          <span class="gr-k-ab">nur im Bündel</span>
+          <span class="gr-a-klein">ab {{ m.buendel_monat | euro }}/Monat{% if m.buendel_anbieter %}
+            bei {{ m.buendel_anbieter }}{% endif %}{% if m.buendel_beleg and m.buendel_beleg.quelle_url %} · <a
+            class="gr-a-quelle" href="{{ m.buendel_beleg.quelle_url }}" rel="noopener"
+            title="Bündel beim Anbieter öffnen">Beleg<span class="gr-a-pfeil"
+            aria-hidden="true">↗</span></a>{% endif %}{% if m.buendel_tarif %} · {{ m.buendel_tarif }}{% endif %}</span>
+          {%- else %}<span class="gr-a-klein">kein Preis gemessen</span>
+          {%- endif %}</td>
+        {# Haendler: die ZAHL fuehrt (sortierbar nach Anzahl), die Namen
+           stehen klein dahinter - die Suche der Filterleiste durchsucht
+           den Zeilentext und findet damit auch Haendlernamen. #}
+        <td class="gr-sp--barpreis" data-k="{{ spalten.anbieter }}"><span class="gr-k-anzahl">{{
+          m.anbieterzahl }}</span>
+          <span class="gr-a-klein">{{ m.anbieter | join(' · ') }}</span></td>
+        {# Spanne: nur wenn WESSENTLICH verschieden (C1). Ein Modell mit
+           EINEM Händler hat gar keine zweite Zahl, die eine Spanne stellen
+           könnte - das sagt die Zelle selbst statt eines stummen "–"
+           (Sicht-Prüfung Kleineres 4); bei mehreren Händlern mit
+           unwesentlichem Abstand bleibt "–" (echte Spanne, nur klein). #}
+        <td class="num gr-sp--barpreis" data-k="{{ spalten.spanne }}">{% if m.spanne %}{{ m.spanne[0] | euro
+          }} – {{ m.spanne[1] | euro }}{% elif m.anbieterzahl == 1 %}<span
+            class="gr-a-klein">ein Preis</span>{% else %}–{% endif %}</td>
+        {# --- Gesamtkosten: TCO-24 des besten vergleichbaren Angebots,
+               Ø €/Monat, Abstand zur Vodafone-Referenz. Der TRAEGER des
+               Abstands ist das guenstigste WETTBEWERBER-Angebot: fuehrt
+               Vodafone selbst, stellt das eigene Angebot die Leitzahl und
+               die Delta-Zelle den Abstand des naechsten Wettbewerbres
+               (A2-Nachbesserung 20.09.2026 - vorher behauptete die Zelle
+               "keine Referenz", obwohl die TCO-Zelle derselben Zeile
+               "bei Vodafone" sagte). Die Leergruende sind benannt
+               (Sicht-Prüfung Wesentliches 3): "keine Referenz", wo
+               Vodafone das Modell nicht listet; "kein
+               Wettbewerber-Angebot", wo nur das eigene Angebot
+               vergleichbar ist. Ein Modell ohne Bündel trägt "–" hier,
+               weil seine TCO-Zelle den Grund schon nennt ("kein Bündel
+               gemessen"). #}
+        <td class="num gr-sp--tco" data-k="{{ spalten.tco }}">
+          {%- if m.tco_ab is not none %}
+          <span class="gr-k-ab">ab {{ m.tco_ab | euro }}</span>
+          {% if m.tco_beleg and m.tco_beleg.quelle_url %}<a
+            class="gr-a-quelle" href="{{ m.tco_beleg.quelle_url }}"
+            rel="noopener" title="Quelle bei {{ m.tco_anbieter }} öffnen">bei
+            {{ m.tco_anbieter }}<span class="gr-a-pfeil" aria-hidden="true">↗</span></a>
+          {% else %}<span class="gr-a-klein">bei {{ m.tco_anbieter }}</span>{% endif %}
+          {% if m.tco_beleg and m.tco_beleg.abgerufen_am %} <span
+            class="gr-a-klein gr-a-datum">{{ m.tco_beleg.abgerufen_am | date_de }}</span>{% endif %}
+          {%- else %}<span class="gr-a-klein">{{ m.tco_leer }}</span>{%- endif %}</td>
+        <td class="num gr-sp--tco" data-k="{{ spalten.monat }}">{% if m.tco_monat is not none %}{{
+          m.tco_monat | euro }}{% else %}–{% endif %}</td>
+        <td class="gr-sp--tco" data-k="{{ spalten.delta }}">{% if m.tco_delta_kurz %}<span
+          class="gr-a-prozent wr-prozent{{ ' wr-prozent--negativ' if m.tco_delta is not none and m.tco_delta < 0 else ' wr-prozent--positiv' }}"{%
+          if m.tco_delta_anbieter %} title="Vodafone ist am günstigsten – Δ ist der Abstand des günstigsten Wettbewerber-Angebots ({{ m.tco_delta_anbieter }}) zur Vodafone-Referenz"{% endif %}>{{
+          m.tco_delta_kurz }}</span>{% elif m.tco_delta_leer %}<span
+            class="gr-a-klein" title="{{ m.tco_delta_leer_grund }}">{{ m.tco_delta_leer }}</span>{% else %}–{% endif %}</td>
+        <td class="gr-sp--tco" data-k="{{ spalten.band }}"><span class="gr-k-band">{{
+          m.tco_band_label or '–' }}</span></td>
+      </tr>
+      {# --- Der Zeilen-Aufklapper: die Listungs-Details des Modells
+         (C1-Feld `zeilen`). Dieselbe Mechanik wie die Radar-Modellliste:
+         Klick/Enter auf der Hauptzeile toggelt `.gr-a-auf--an`. Die
+         Spalte hiess bis P3 "Verfügbar" und heisst jetzt "Bestand" - 98
+         von 636 Listungen sagen "keine Angabe", und "Verfügbar"
+         verspricht über der leeren Zelle eine Lieferauskunft, die die
+         Quelle meist nicht gibt (P3-Auftrag 4; P4 entscheidet weiter).
+         P4/D3 (18.09.2026): die WERTE folgen dem Etikett - der
+         lieferbare Zustand sagt "lieferbar" (klein, wie alle übrigen
+         Werte) statt "Verfügbar"; NICHT gelöscht, über die Spalte
+         selbst entscheidet P5 (Antonio).
+         Eine 1&1-Zeile ohne Barpreis trägt hier ihre Bündel-Angabe
+         statt "ohne Preis" (C1).
+         P5-Auftrag 1 (18.09.): ein Modell ohne Listung (nur im Bündel)
+         hat KEINE Detailzeile - es gibt keine Listungs-Details, und die
+         Bündel-Angebote stehen bereits im Vergleichs-Reiter und im
+         Radar (keine Doppel-Darstellung). app.js verschiebt die Paare
+         mit `if (p.auf)` - eine Zeile ohne Aufklapper ist dort
+         ausdrücklich vorgesehen. #}
+      {% if m.zeilen %}
+      <tr class="gr-a-auf{{ ' gr-a-rest' if m.zeilen_rest }}" id="kz-{{ loop.index }}"><td colspan="8">
+        <div class="gr-scroll">
+        <table class="src-table gr-k-listungen">
+          <thead><tr><th>Händler</th><th>Farbe</th>
+            <th class="num">Preis</th><th>Zustand</th><th>Bestand</th>
+            <th>Abgerufen</th></tr></thead>
+          <tbody>
+          {% for z in m.zeilen %}
+          <tr>
+            <td>{% if z.url %}<a class="gr-a-quelle" href="{{ z.url }}" rel="noopener"
+                 title="Quelle bei {{ z.anbieter }} öffnen">{{ z.anbieter }}<span
+                 class="gr-a-pfeil" aria-hidden="true">↗</span></a>
+              {% else %}{{ z.anbieter }}{% endif %}
+              {% if z.netz %} <span class="gr-a-klein">Netz {{ z.netz }}</span>{% endif %}</td>
+            <td>{{ z.farbe or '–' }}</td>
+            <td class="num">{% if z.preis is not none
+              %}{{ z.preis | euro }}{% if z.ratenhinweis %} <span
+                class="gr-a-klein">{{ z.ratenhinweis }}</span>{% endif %}{% elif z.zuzahlung is not none
+              %}{{ z.zuzahlung | euro }} <span class="gr-a-klein">Zuzahlung{% if z.tarif %},
+                {{ z.tarif }}{% endif %}</span>{% elif z.buendel_monat is defined and z.buendel_monat is not none
+              %}<span class="gr-a-klein">ab {{ z.buendel_monat | euro }}/Monat{% if z.buendel_tarif %},
+                {{ z.buendel_tarif }}{% endif %}{% if z.buendel_url %} · <a class="gr-a-quelle"
+                href="{{ z.buendel_url }}" rel="noopener">Beleg<span class="gr-a-pfeil"
+                aria-hidden="true">↗</span></a>{% endif %}</span>
+              {% else %}<span class="gr-a-klein">ohne Preis</span>{% endif %}</td>
+            <td><span class="gr-pille gr-pille--{{ 'bestpreis' if z.zustand == 'neu' else 'mittel' }}">{{ z.zustand }}</span></td>
+            {# P4-Fix (Sicht-Pruefung 18.09., Kleineres 10): die leere
+               Angabe ist STILL. "keine Angabe" stand als Text-Pille
+               166-mal auf der Tafel - Rauschen ohne Aussage; ein leises
+               "–" sagt in der Bestand-Spalte dasselbe (dieselbe Zeichen-
+               konvention wie in allen uebrigen Zellen). Echte Aussagen
+               (lieferbar, nicht lieferbar, vorbestellbar) bleiben Pille.
+               Die Spalte selbst bleibt - ueber sie entscheidet P5. #}
+            <td>{% if z.verfuegbarkeit in ('unbekannt', '') %}<span
+              class="gr-a-klein">–</span>{% else %}<span class="gr-pille
+              gr-pille--{% if z.verfuegbarkeit == 'lieferbar'
+              %}gering{% else %}kritisch{% endif %}">{{
+              'lieferbar' if z.verfuegbarkeit == 'lieferbar'
+              else ('nicht lieferbar' if z.verfuegbarkeit == 'nicht_lieferbar'
+                    else ('vorbestellbar' if z.verfuegbarkeit == 'vorbestellbar'
+                          else z.verfuegbarkeit)) }}</span>{% endif %}</td>
+            <td><span class="gr-a-klein gr-a-datum">{{ z.abgerufen_am | date_de }}</span></td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+        </div>
+      </td></tr>
+      {% endif %}
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {# Der Leer-Satz ist ein FILTER-Satz - aber bei NULL Modellen im ganzen
+     Bestand ist er der benannte LeerZUSTAND und steht serverseitig offen
+     da (E5, Leer-Sicherung "Katalog leer", von der Listungs-Tafel
+     uebernommen). app.js blendet ihn bei Filterung ein und aus. #}
+  <p class="gr-erklaer gr-a-leer"{% if geraete.katalog_modelle | length
+    %} hidden{% endif %}>Zu dieser Auswahl steht keine Zeile im
+  Bestand.</p>
+  {% if geraete.katalog_modelle | selectattr('zeilen_rest') | list %}
+  <p class="gr-erklaer"><button type="button" class="gr-mehr" id="gr-kmehr">alle
+    {{ geraete.katalog_modelle | length }} Zeilen zeigen</button></p>
+  {% endif %}
+
+  {# P4 Schritt 2b (STRATEGIE_GERAETE_V3, 18.09.2026): DER SORTIMENTS-
+     AUFKLAPPER ist in den RADAR-REITER gewandert (unter die Grafik,
+     eigener details-Block mit der unveränderten ID #gr-sortiment).
+     Er stand seit E3 hier im Katalog - design.md §3c dazu: „Katalogs
+     Aufklapper ‚Bei Wettbewerbern gelistet, bei Vodafone nicht (29)'
+     ist Radar-Material im Katalog". Der Katalog bleibt der Reiter der
+     EIGENEN Liste (was führen wir und wer sonst), die Lücken-Frage
+     gehört zur Radar-Frage nach dem Wettbewerb. Umgezogen, nicht
+     kopiert: er steht GENAU EINMAL auf der Seite. #}
+</section>
+</div>
+
+{# --- Reiter 4: Preisverlauf ------------------------------------------
+   E3 (S1-ENTSCHEIDUNG): UMGEWIDMET zum BARPREIS-Verlauf. Bis E2 hieß die
+   Tafel „Preis- und TCO-Historie" - seit E2 ist die TCO-Zeitreihe aber
+   die HAUPTansicht des Vergleichs-Reiters. Zwei Reiter, dieselbe Frage
+   zu stellen, wäre Doppel-Darstellung (§4.6/4.8); der Reiter fragt
+   deshalb bewusst ANDERS: Wie hat sich der BARPREIS eines Geräts
+   entwickelt - ohne Tarif, ohne Bindung, reine Euro über der Zeit.
+   Der TCO-Historie-Absatz, der eine Gesamtkosten-Kurve ANKÜNDIGTE, ist
+   mit der Umwidmung gefallen - die Kurve existiert seit E2, und ihre
+   Messtage nennt die Zeitreihe selbst. Der G0-Block (Barpreis je Modell,
+   gesteuert vom VERGLEICHS-Reiter) ist mit dem E3-Fix vom 17.09.2026
+   gefallen, der G2-Block (Barpreis-Änderungen über den Markt) am selben
+   Tag mit P2 - siehe die Kommentare direkt unter der h2.
+
+   Die Reihenfolge von oben nach unten ist vorgegeben und nicht verhandelbar:
+   Suchfeld -> Zeitraum -> vier Kacheln -> Diagramm -> Tabelle. Seit P2
+   (Antonio F4, 17.09.2026) ist der Wähler der HAUPTINHALT des Reiters und
+   steht DIREKT unter der h2 - vor ihm steht kein Satz mehr. Ohne Klick ist
+   das ERSTE Gerät der Liste vorausgewählt (Sortierung nach Messtagen, das
+   meistgemessene steht oben): der Reiter zeigt sofort ein Diagramm. Das
+   kippt bewusst die alte B4-Regel „ohne Auswahl kein Diagramm" - sie galt
+   dem Zustand, in dem über dem Wähler noch der feste G2-Marktgraph stand;
+   mit seinem Fall (P2) wäre der Reiter sonst grafiklos. Der Satz
+   „Kein Gerät gefunden." lebt weiter als Rückbau-Zustand, während der
+   Leser im Suchfeld tippt (P2-Fix: der alte Sieben-Wort-Satz erklärte die
+   Bedienung - Hausregel - und stand doppelt im Code; ein Test hält beide
+   Stellen zusammen). Ein `?modell=`-Deep-Link schlägt die
+   Vorauswahl.                                                       #}
+<div class="gr-tafel gr-tafel--aus" id="tafel-verlauf" role="tabpanel">
+
+{# --- E3-Fix (QA 17.09.2026): G0 IST GEFALLEN ----------------------------
+   Bis zu diesem Fix stand hier der G0-Block - die Barpreis-Zeitreihe des
+   Modells, das der VERGLEICHS-Reiter gewählt hat (serverseitig fürs
+   Vorgabemodell, per Fragment je Modellwechsel). Der Reiter trug damit
+   ZWEI Barpreis-Grafiken desselben Geräts über dieselbe Zeitachse: diesen
+   Block oben und die eigene Geräteauswahl unten - §4.6/§4.8 (keine
+   Doppel-Darstellung, keine zweite Graph-Form neben der Zeitreihe).
+   Verschärft hatte der QA-Lauf gemessen: Wählt der Leser im Verlaufs-
+   Suchfeld ein Gerät, folgte der obere Block NICHT (er hängt an der
+   Modellwahl des anderen Reiters) - zwei Bilder, widersprüchlicher
+   Gerätezustand. Die Barpreis-Frage des Reiters (E3/S1) antwortet seither
+   die eigene Auswahl unten. Mitgefallen:
+   `_geraete_g0.html.j2`, der G0-Teil des Fragments und `app.js`-Montage
+   (`setzeG0`), die Rechnung `modell["zeitreihe"]` im View. #}
+
+<section class="gr-verlauf" id="verlauf">
+  {# 28.09.2026: keine eigene Ueberschrift und kein Datenlage-Aufklapper
+     mehr. Der Reiter heisst „Ohne Vertrag“ und sagt damit die Grenze zu
+     „Mit Tarif“ selbst (Antonio: „ich verstehe den Unterschied zwischen
+     Vergleich und Preisverlauf nicht“). Die frueheren Stufen - h2
+     „Barpreis-Verlauf“, Erklaer-Satz, Aufklapper - stehen in der
+     Git-Historie. #}
+
+  {# --- P2 (Antonio F4, 17.09.2026): G2 IST GEFALLEN ---------------------
+   Bis P2 stand hier der G2-Block - die servergerenderte Markt-Historie
+   (fuenf Reihen mit der groessten Preisbewegung, `geraete_tco_grafik.
+   historie`). Antonio: „Bei Preisverlauf der erste Graph, da sind mehr
+   Text als Graf … Ich sehe nur iPhone 17 Pro und Pro Max. Ich verstehe
+   nicht den Sinn. Das ist doch genau das gleiche wie unten, wo ich das
+   Modell aussuchen kann." Gemessen (befunde/preisverlauf.md, an der
+   gerenderten Seite): 5 gezeichnete Linien, aber nur 2 echte Kurven von
+   2 Geraeten - alle von mobilcom-debitel, weil eine G2-Reihe je LISTUNG
+   (Farbe) entsteht und die zwei groessten Bewegungen des Bestands damit
+   alle fuenf Deckelplaetze belegen. Dem Bild standen vier Textblöcke
+   gegenueber (Bildunterschrift, Ereignis-Satz, Ausgelassen-Hinweis,
+   Tabelle) - mehr Text als Graf. Dieselbe Datenlage liest die Auswahl
+   unten (gemeinsamer Weg `geraete_verlauf.messtage`), und „wo steht wer
+   im Preis" beantwortet die Radar-Tafel. Mitgefallen (E5-Regel, Praezedenz
+   G0): `geraete_tco_grafik.historie/_ereignisse/_reihenrang/MAX_REIHEN`,
+   `geraete_tco_karten.historienreihen`, das Macro `g2_ausgelassen` und
+   die vier G2-Textblöcke samt der Tabelle „Daten dieser Kurven". #}
+
+  {# E3 (S1): DER TCO-HISTORIE-ABSATZ IST GEFALLEN. Bis E2 kündigte er
+     hier eine Kurve der Gesamtkosten an („entsteht, sobald genügend
+     Messtage daliegen") - seit E2 IST diese Kurve die Zeitreihe des
+     Vergleichs-Reiters, und ihre echten Messtage nennt deren Messtag-
+     Zeile selbst. Dieselbe Ankündigung in diesem Reiter zu wiederholen
+     wäre die Doppel-Darstellung aus §4.6/4.8 - und verwischte die Grenze,
+     die diesen Reiter vom Vergleichs-Reiter trennt (Barpreis hier,
+     TCO-24 dort). `geraete.tco.historie_lage` bleibt gerechnet; sein
+     einziger Vorlagen-Leser war dieser Absatz. #}
+
+  {% if not geraete.verlauf.hat_daten %}
+  <p class="gr-erklaer gr-basis--duenn">Für den Preisverlauf liegen noch keine
+  Messreihen vor.</p>
+  {% else %}
+  <div class="gr-vsuche">
+    <label class="gr-vlabel" for="gr-vsuche">Gerät</label>
+    <input type="search" id="gr-vsuche" class="gr-vfeld"
+           placeholder="Marke, Modell, Speicher, Farbe …"
+           autocomplete="off" role="combobox" aria-expanded="false"
+           aria-controls="gr-vtreffer">
+    <ul class="gr-vtreffer" id="gr-vtreffer" role="listbox" hidden></ul>
+  </div>
+
+  {# P2-Fix (Sicht-Prüfung 17.09.): Steuer und Kacheln stehen auf dem
+     Schirm in EINER Reihe (Wrapper `.gr-vkopf`) - vorher belegten sie
+     zwei Blöcke übereinander und die erste Kurve begann auf 1440 erst
+     34 px vor der Falz. Mobil (unter der min-width der Kachelreihe)
+     bricht der Wrapper um und die Reihenfolge Steuer → Kacheln bleibt. #}
+  <div class="gr-vkopf">
+  <div class="gr-vsteuer" hidden id="gr-vsteuer">
+    <div class="gr-vgruppe" role="group" aria-label="Zeitraum">
+      <button type="button" class="gr-vknopf is-aktiv" data-raster="woche">Wöchentlich</button>
+      <button type="button" class="gr-vknopf" data-raster="monat">Monatlich</button>
+      <button type="button" class="gr-vknopf" data-raster="quartal">Quartal</button>
+    </div>
+    <div class="gr-vgruppe gr-vzeit">
+      <label class="gr-vlabel" for="gr-vvon">Von</label>
+      <input type="date" id="gr-vvon" class="gr-vdatum"
+             min="{{ geraete.verlauf.seit }}" max="{{ geraete.verlauf.bis }}"
+             value="{{ geraete.verlauf.seit }}">
+      <label class="gr-vlabel" for="gr-vbis">Bis</label>
+      <input type="date" id="gr-vbis" class="gr-vdatum"
+             min="{{ geraete.verlauf.seit }}" max="{{ geraete.verlauf.bis }}"
+             value="{{ geraete.verlauf.bis }}">
+    </div>
+  </div>
+
+  <div class="gr-vkacheln" hidden id="gr-vkacheln">
+    <div class="gr-vkachel"><b id="gr-vmin">–</b><span>Niedrigster Preis</span></div>
+    <div class="gr-vkachel"><b id="gr-vmax">–</b><span>Höchster Preis</span></div>
+    <div class="gr-vkachel"><b id="gr-vanb">–</b><span>Anbieter mit Daten</span></div>
+    {# MESSTERMINE, NICHT MESSPUNKTE (30.08.2026). Die Kachel zeigte die
+       Zahl der Preispunkte ueber alle Anbieter ("4"), der Satz unter dem
+       Diagramm die Zahl der Messtage ("5") - zwei Zahlen auf einem
+       Bildschirm fuer etwas, das der Leser fuer dieselbe Sache haelt.
+       Beide meinen jetzt Messtage, und der Satz darunter wird bei einer
+       Auswahl auf DIESES Geraet umgeschrieben, damit nur eine davon
+       gleichzeitig dasteht. #}
+    <div class="gr-vkachel"><b id="gr-vpkt">–</b><span>Messtermine</span></div>
+  </div>
+  </div>
+
+  {# Der Rueckbau-Satz: sichtbar nur, waehrend der Leser im Suchfeld tippt
+     und keine Treffer listet (P2-Auto-Vorauswahl hat den initialen
+     Leerzustand abgeloest - siehe `app.js`); bei offener Trefferliste
+     deckt ihn das Dropdown ab. Initial `hidden`, damit der Reiter ohne
+     Klick mit dem Diagramm des vorausgewaehlten Geraets beginnt.
+     P2-Fix (Sicht-Prüfung 17.09.): der Satz erklaerte die Bedienung
+     („Wählen Sie oben ein Gerät …", Hausregel: kein Satz erklärt die
+     Bedienung) - „Kein Gerät gefunden." sagt im Zwischenzustand
+     dasselbe. Der Text steht ZWEIMAL im Code (hier und in `app.js`)
+     und ein Test haelt beide zusammen. #}
+  <p class="gr-erklaer" id="gr-vleer" hidden>Kein Gerät gefunden.</p>
+
+  {# Der Satz fuer den Fall, dass die Reihe fuer ein Diagramm zu kurz ist.
+     Er steht im HTML und wird von `app.js` gefuellt und eingeblendet - der
+     Text nennt die Zahl der Messtermine DIESES Geraets und die Schwelle,
+     ab der ein Verlauf entsteht. #}
+  <p class="gr-erklaer gr-basis--duenn" id="gr-vzukurz" hidden></p>
+
+  {# P4/D4 (18.09.2026): DIE LEITZAHL DES REITERS - der aktuelle Preis des
+     gewählten Geräts, direkt über der Kurve. app.js setzt sie beim
+     Zeichnen (guenstigster Preis am LETZTEN Messtag, aus den ungefassten
+     Rohpunkten derselben Reihen, die auch die Kacheln füllen - kein
+     zweiter Datenweg): Zahl groß (.gr-leit-zahl), Label klein. Die
+     Kacheln darüber nennen MIN und MAX über den Zeitraum - die Leitzahl
+     sagt, was das Gerät JETZT kostet; verschiedene Zahlen, keine
+     Doppelung. Hidden, solange keine Reihe gezeichnet wird. #}
+  <div class="gr-leit gr-vleit" id="gr-vleit" hidden><b
+    class="gr-leit-zahl" id="gr-vaktuell">–</b><span class="gr-leit-label"
+    id="gr-vleit-label"></span></div>
+
+  <div class="gr-vbild" id="gr-vbild" hidden></div>
+  <p class="gr-vlegende" id="gr-vlegende" hidden></p>
+
+  {# EINE ZAHL ZUR ZEIT. `app.js` schreibt diesen Satz bei einer Auswahl
+     auf das GEWAEHLTE Geraet um („… liegen 11 Messtermine vor, vom 10.8.
+     bis zum 16.9.“) und benennt hier die Messluecken. Vor P2 trug er
+     zusaetzlich den globalen Stand („wird seit dem … erfasst“) samt
+     Nachsatz - beide stehen jetzt im Aufklapper „Datenlage“ am
+     Reiterende, und der Satz hier spricht NUR noch über das eine
+     gezeichnete Geraet. Initial `hidden`: die Auto-Vorauswahl fuellt ihn
+     beim Laden. Die data-Attribute sind die zwei Schwellen aus
+     `geraete_verlauf.py`, die `app.js` am Knoten liest (AB_TERMINEN,
+     ABSTAND) - eine dritte Kopie einer Zahl waere die Fehlerklasse aus
+     CLAUDE.md 6 (Stichwort-Vorschau). #}
+  <p class="gr-erklaer gr-basis--duenn" id="gr-vstand" hidden
+     data-abterminen="{{ geraete.verlauf.diagramm_ab_terminen }}"
+     data-abstand="{{ geraete.verlauf.linien_abstand }}"
+     {# A/E (QA-Fix 24.09.2026): dieselbe EINE Schwelle wie der
+        TCO-Server-Chart (`geraete_zeitreihe.LUECKE_TAGE_SCHWELLE`), nur
+        gelesen - kein zweiter Wert in app.js. #}
+     data-luecke-tage="{{ geraete.verlauf.luecke_tage_schwelle }}"
+     {# I2 (QA-Fix 24.09.2026): ab wie vielen Messterminen dieser Satz
+        schweigt, weil er sonst nur noch die Kachel "Messtermine"
+        doppelt - dieselbe EINE Zahl wie oben, aus
+        `geraete_verlauf.VERLAUF_SATZ_MAX_TERMINE`. #}
+     data-satzmaxtermine="{{ geraete.verlauf.verlauf_satz_max_termine }}"></p>
+
+  <div class="gr-vtabelle" id="gr-vtabelle" hidden></div>
+
+  <script type="application/json" id="gr-verlaufdaten">
+    {{ geraete.verlauf.geraete | tojson }}
+  </script>
+  {% endif %}
+
+  {# --- P4 Schritt 2a (STRATEGIE_GERAETE_V3, 18.09.2026): die WOCHENKARTE
+         der Preisbewegungen wohnt in DIESEM Reiter. Bis P4/2a stand sie
+         als vierte Sektion der Radar-Tafel; „letzte 14 Tage
+         Preisbewegungen" ist eine Verlaufs-Frage (design.md §3b) - im
+         Radar konkurrierte sie mit den Abweichungs-Sektionen um dieselbe
+         Aufmerksamkeit. NUR VERSCHOBEN: Markup, Klassen und die ID
+         #wr-bewegungen sind unveraendert (Makro `wochenkarte` in
+         _geraete_radar.html.j2, denselben Datenkontext `radar.portfolio`
+         wie vorher - keine zweite Berechnung).
+
+         Sie steht UNTER der Tabelle und dem Datenlage-Aufklapper, am
+         Reiterende: ihr Gatter ist das EIGENE (`auffaellig.hat_daten`),
+         unabhaengig vom hat_daten-Gatter des Verlaufs darueber - haenge
+         sie in dessen else-Zweig, wuerde sie im Verlaufs-Leerzustand
+         still verschwinden, obwohl sie vorher (im Radar) unabhaengig
+         stand. Zugeklappt bleibt sie Nachfrage, wie sie es im Radar war. #}
+  {{ wochenkarte(radar.portfolio) }}
+</section>
+</div>
+
+
+{# Der EINE Weg zur Quellenseite (B1 des Reviews vom 03.09.2026). Mit den
+   Erklaersektionen fielen alle drei Links auf geraete-quellen.html - die
+   Seite waere fertig, geprueft und fuer jeden Leser unauffindbar gewesen.
+   Eine Zeile am Fuss, kein Absatz: sie nennt kein Wort, das die Seite
+   ueber sich selbst sagt. Der Radar-Link ist seit E3 Schritt 3 kein
+   Seitenwechsel mehr, sondern der Sprung in den Radar-Reiter DIESER
+   Seite (#tafel-radar schaltet ihn auch per Hash). #}
+{# D4a (24.09.2026): der EINE Fußzeilen-Link auf die Methodik - alle
+   Lesehilfen, die bis hierhin als Sätze unter Überschriften, Grafiken und
+   Zahlen standen, sind hierher gezogen (geraete-quellen.html#methodik),
+   nicht gestrichen. #}
+<p class="dz-foot"><a href="{{ prefix }}geraete-quellen.html">Quellen</a>
+· <a href="{{ prefix }}geraete-quellen.html#methodik">Methodik</a></p>
+
+
 {% else %}
-  <header class="kv-kopf"><h1 class="kv-titel">Gerätepreise</h1></header>
-  <p class="kv-nichts">{{ geraete.fehler or kv.grund or 'Keine Gerätepreise.' }}</p>
+<section class="gr-leer">
+  {% if geraete.fehler %}
+  <h2 class="rubrik">Diese Seite konnte nicht gebaut werden</h2>
+  <p class="empty-note">Die Aufbereitung der Gerätedaten ist gescheitert:
+  <code>{{ geraete.fehler }}</code>. Das heißt <em>nicht</em>, dass keine
+  Geräte gefunden wurden – es heißt, dass diese Seite gerade nichts über sie
+  aussagen kann.</p>
+  {% elif not geraete.db_lesbar %}
+  {# Eine unlesbare Datei ist NICHT "noch nichts gefunden". Sie sieht nur so
+     aus - und genau das ist der Fallstrick aus CLAUDE.md §6. #}
+  <h2 class="rubrik">Der Gerätebestand ist nicht lesbar</h2>
+  <p class="empty-note"><code>data/state/geraete_db.json</code> ließ sich nicht
+  einlesen. Diese Seite zeigt deshalb nichts – das heißt <em>nicht</em>, dass
+  keine Geräte gefunden wurden. Der Grund steht im Protokoll des letzten
+  Laufs.</p>
+  {% else %}
+  <h2 class="rubrik">Noch keine Geräte erfasst</h2>
+  <p class="empty-note">Der Gerätezweig läuft, hat aber noch keine Listung
+  aufgenommen. Welche Anbieter angebunden sind und welche warum nicht, steht
+  auf <a href="{{ prefix }}geraete-quellen.html">der Quellenseite</a>.</p>
+  {% endif %}
+</section>
 {% endif %}
 
-  <footer class="kv-fuss">
-    <a href="geraete-quellen.html">Quellen</a>
-    {% if geraete.export and geraete.export.tco.datei %}<a href="{{ geraete.export.tco.datei }}" download>Export</a>{% endif %}
-  </footer>
+{# P4/D4 (STRATEGIE_GERAETE_V3, 18.09.2026): DIE EXPORT-FUSSZEILE.
+   Die sechs Knöpfe standen bis P4 in der Kopfzeile (O4/E5) - am Telefon
+   gequetscht ÜBER der Reiter-Steuerung, vor jedem ersten Datenelement
+   (design.md: „6 verschiedene Meta-Bedienelemente um die eigentliche
+   Tabelle"). Sie stehen jetzt als EINE Zeile am Seitenende: EINE Stelle
+   für alle Reiter bleibt gewahrt (O4-Regel: nie einer je Reiter -
+   `test_geraete_verlinkt_jede_datei_genau_einmal` hält dagegen), dieselben
+   sechs Dateien, dieselben Ziele, dieselbe Zeilenzahl neben dem Link.
+   Sie steht AUSSERHALB des hat_daten-Gatters: die E5-Leersicherung
+   „Export ohne Zeilen" verlangt die Null neben dem Link AUCH im
+   Leerzustand (Modulkopf geraete_export: ein fehlender Download wäre
+   die schlechtere Auskunft als ein leerer) - im hat_daten-Zweig wäre
+   sie im Ganz-Leer-Fall still verschwunden. Das Gatter fragt weiter
+   die DATEI ab: steht kein Dateiname (Export nicht schreibbar), gibt
+   es keine Fußzeile - fail closed. #}
+{# P2/D4b (24.09.2026): SECHS Knoepfe -> EIN "Export ▾"-Menue. Gemessen
+   auf dem Telefon standen sechs `.gr-knopf`-Elemente in einer Zeile, die
+   zwar IN SICH rollte (kein Querscroll der Seite), aber sechs
+   Bedienelemente vor jeder Zahl der Seite waren am Fuss noch immer
+   sechs Bedienelemente zu viel - "Export" ist EINE Handlung mit sechs
+   ZIELEN, kein Bedienfeld mit sechs Handlungen. `<details>`/`<summary>`
+   statt eigenem JS: zugeklappt zeigt die Fusszeile GENAU EINEN Knopf
+   ("Export ▾"), aufgeklappt dieselben sechs Ziele in derselben rollenden
+   Zeile wie zuvor - Tastatur und Screenreader bekommen das Verhalten
+   kostenlos vom nativen Element. Der äussere `<section class="gr-export-
+   fuss">` bleibt (Tests und `test_geraete_verlinkt_jede_datei_genau_
+   einmal` suchen `section.gr-export-fuss`), nur ihr Inhalt ist jetzt
+   EIN Aufklapper statt einer offenen Knopfreihe. #}
+{% if geraete.export and geraete.export.aktuell.datei %}
+<section class="gr-export-fuss" aria-label="Exporte">
+  <details class="gr-export-menu">
+    <summary class="gr-knopf gr-export-oeffner">Export <span
+      class="gr-export-pfeil" aria-hidden="true">▾</span></summary>
+    <span class="gr-export-knoepfe">
+      <a class="gr-knopf" href="{{ geraete.export.aktuell.datei }}" download
+        >Alle exportieren ({{ geraete.export.aktuell.zeilen }} Zeilen)</a>
+      <a class="gr-knopf" href="{{ geraete.export.historie.datei }}" download
+        >Preishistorie ({{ geraete.export.historie.zeilen }})</a>
+      <a class="gr-knopf" href="{{ geraete.export.tco.datei }}" download
+        >Bündel-TCO ({{ geraete.export.tco.zeilen }})</a>
+      <a class="gr-knopf" href="{{ geraete.export.radar.datei }}" download
+        >Radar ({{ geraete.export.radar.zeilen }})</a>
+      {# P3: der Katalog auf Modellebene ist eine eigene ZAHLENSEKTION -
+         E5 "alle Zahlensektionen exportierbar" braucht je Ansicht EINEN
+         Knopf (eine Datei je Ansicht, kein Formatmix). Die Zeilenzahl
+         ist die MODELLZAHL - "Alle exportieren" nennt die Listungen. #}
+      {% if geraete.export.modell_barpreis.datei %}
+      <a class="gr-knopf" href="{{ geraete.export.modell_barpreis.datei }}"
+        download>Katalog Barpreis ({{ geraete.export.modell_barpreis.zeilen
+        }})</a>
+      <a class="gr-knopf" href="{{ geraete.export.modell_tco.datei }}"
+        download>Katalog TCO ({{ geraete.export.modell_tco.zeilen }})</a>
+      {% endif %}
+    </span>
+  </details>
 </section>
+{% endif %}
+
 {% endblock %}
