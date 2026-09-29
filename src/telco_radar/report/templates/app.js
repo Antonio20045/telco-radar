@@ -3778,13 +3778,19 @@ var grKosten = (function () {
     });
   }
 
+  /* wie geraete_kosten._rang(): frische vor nicht frischen, dann Betrag */
+  function rang(x, y) {
+    return (!x.frisch - !y.frisch) || (x.gesamt - y.gesamt);
+  }
+
+  /* wie geraete_kosten.rangliste() */
   function rangliste(modell, stufe, raten) {
     var best = {}, namen = [];
     passend(modell, stufe, raten).forEach(function (a) {
       var alt = best[a.anbieter];
       if (!alt) namen.push(a.anbieter);
-      if (!alt || a.gesamt < alt.gesamt ||
-          (a.gesamt === alt.gesamt && (a.raten || 0) < (alt.raten || 0)))
+      if (!alt || rang(a, alt) < 0 ||
+          (rang(a, alt) === 0 && (a.raten || 0) < (alt.raten || 0)))
         best[a.anbieter] = a;
     });
     var werte = namen.map(function (n) { return best[n]; });
@@ -3798,27 +3804,33 @@ var grKosten = (function () {
     var gruppen = zeitraeume.map(function (m) {
       var liste = werte.filter(function (a) { return a.monate === m; })
         .sort(function (x, y) {
-          return x.gesamt - y.gesamt ||
+          return rang(x, y) ||
             (x.anbieter < y.anbieter ? -1 : x.anbieter > y.anbieter ? 1 : 0);
         });
-      var mehrere = liste.length > 1;
+      var mehrere = liste.filter(function (a) { return a.frisch; }).length > 1;
       return { monate: m, zeilen: liste.map(function (a) {
         return { anbieter: a.anbieter, angebot: a,
-          abstand: mehrere ? Math.round((a.gesamt - liste[0].gesamt) * 100) / 100 : null,
+          abstand: mehrere && a.frisch
+            ? Math.round((a.gesamt - liste[0].gesamt) * 100) / 100 : null,
           sieger: mehrere && a === liste[0] };
       }) };
     });
-    /* wie geraete_kosten.rangliste(): nur vom Ratenfilter ausgeblendete
-       Anbieter stehen mit ihren Ratenzahlen, nicht bei den Luecken */
+    /* nur vom Ratenfilter ausgeblendete Anbieter stehen mit ihren
+       Ratenzahlen (null = ohne Raten), nicht bei den Luecken */
     var andere = {};
     (D.angebote[modell] || []).forEach(function (a) {
-      if (a.stufe !== stufe || best[a.anbieter] || a.raten == null) return;
+      if (a.stufe !== stufe || best[a.anbieter]) return;
       var l = andere[a.anbieter] || (andere[a.anbieter] = []);
       if (l.indexOf(a.raten) < 0) l.push(a.raten);
     });
     var namen2 = D.anbieter.map(function (s) { return s.name; });
-    var anders = namen2.filter(function (n) { return andere[n]; }).map(function (n) {
-      return { anbieter: n, raten: andere[n].sort(function (x, y) { return x - y; }) };
+    var folge = namen2.concat(Object.keys(andere).filter(function (n) {
+      return namen2.indexOf(n) < 0;
+    }).sort());
+    var anders = folge.filter(function (n) { return andere[n]; }).map(function (n) {
+      return { anbieter: n, raten: andere[n].sort(function (x, y) {
+        return ((x === null) - (y === null)) || ((x || 0) - (y || 0));
+      }) };
     });
     var ohne = namen2.filter(function (n) { return !best[n] && !andere[n]; });
     return { gruppen: gruppen, anders: anders, ohne: ohne };
@@ -3833,8 +3845,8 @@ var grKosten = (function () {
       '<summary class="kv-kern"><span class="kv-anb">' + esc(z.anbieter) + '</span>' +
       '<span class="kv-info"><span class="kv-gb">' + esc(a.gb) + '</span>' +
       (a.raten ? '<span class="kv-raten">' + a.raten + '&nbsp;Raten</span>' : '') +
-      (!a.frisch && a.stand_kurz ? '<span class="kv-alt">Stand&nbsp;' +
-      esc(a.stand_kurz) + '</span>' : '') + '</span>' +
+      (a.alt ? '<span class="kv-alt">' + esc(a.alt) +
+      '</span>' : '') + '</span>' +
       '<span class="kv-summe">' + betrag(a.gesamt) + '</span><span class="kv-abstand' + (z.einzig ? ' kv-abstand--einzig' : '') + '">' +
       (z.sieger ? 'günstigste' : z.abstand !== null ? '+' + euro(z.abstand)
         : z.einzig ? 'einziges Angebot' : '') +
@@ -3869,8 +3881,9 @@ var grKosten = (function () {
       h += '<p class="kv-anders">';
       r.anders.forEach(function (x) {
         x.raten.forEach(function (n) {
-          h += '<button type="button" class="kv-umschalten" data-raten="' + n + '">' +
-            esc(x.anbieter) + ' · ' + n + '&nbsp;Raten&nbsp;→</button>';
+          h += '<button type="button" class="kv-umschalten" data-raten="' +
+            (n === null ? 'alle' : n) + '">' + esc(x.anbieter) + ' · ' +
+            (n === null ? 'ohne&nbsp;Raten' : n + '&nbsp;Raten') + '&nbsp;→</button>';
         });
       });
       h += '</p>';

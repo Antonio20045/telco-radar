@@ -127,7 +127,9 @@ def test_unbegrenzter_tarif_ohne_band_faellt_in_die_oberste_stufe():
     stufen = {a["anbieter"]: a["stufe"]
               for a in d["angebote"]["apple-iphone-18-pro-256"]}
     assert stufen == {"o2": "xl", "Telekom": "xl"}
-    assert d["stufen"][-1]["gb"] == "unbegrenzt"
+    # Der Chip der obersten Stufe rät kein Volumen: die Leiter kennt es
+    # (noch) nicht, also steht dort nichts (Clean Code 3).
+    assert d["stufen"][-1]["gb"] == ""
 
 
 def test_start_ist_die_stufe_mit_den_meisten_anbietern():
@@ -304,3 +306,63 @@ def test_unbegrenzter_tarif_ohne_volumen_nennt_unbegrenzt():
     # Gegenprobe: ein Tarif mit Volumen behält seine Zahl.
     c = [x for x in d["angebote"]["apple-iphone-18-pro-256"] if x["anbieter"] == "congstar"]
     assert c[0]["gb"] != "unbegrenzt"
+
+
+def test_veralteter_preis_verdraengt_keinen_frischen():
+    d = _daten([_karte("o2", 1500.0, frisch=False, abgerufen_am="2026-09-08"),
+                _karte("congstar", 1700.0), _karte("Vodafone", 2000.0)])
+    zeilen = _zeilen(gk.rangliste(d, "apple-iphone-18-pro-256", "s", "alle"))
+    assert [z["anbieter"] for z in zeilen] == ["congstar", "Vodafone", "o2"]
+    assert zeilen[0]["sieger"] and zeilen[1]["abstand"] == 300.0
+    # Der alte Preis steht dabei, aber ohne Abstand und mit Stand-Marke.
+    assert zeilen[2]["abstand"] is None and not zeilen[2]["sieger"]
+    assert zeilen[2]["angebot"]["alt"] == "Stand 08.09."
+    # Gegenprobe: frisch gerechnet wäre o2 die günstigste.
+    d2 = _daten([_karte("o2", 1500.0), _karte("congstar", 1700.0)])
+    assert _zeilen(gk.rangliste(d2, "apple-iphone-18-pro-256", "s",
+                                "alle"))[0]["anbieter"] == "o2"
+
+
+def test_frisches_angebot_schlaegt_billigeres_altes_desselben_anbieters():
+    d = _daten([_karte("congstar", 1500.0, raten=36, frisch=False),
+                _karte("congstar", 1700.0, raten=24)])
+    a = _zeilen(gk.rangliste(d, "apple-iphone-18-pro-256", "s", "alle"))[0]
+    assert a["angebot"]["gesamt"] == 1700.0 and a["angebot"]["alt"] == ""
+
+
+def test_veraltet_ohne_datum_heisst_stand_unbekannt():
+    d = _daten([_karte("o2", 1500.0, frisch=False, abgerufen_am=None)])
+    a = _zeilen(gk.rangliste(d, "apple-iphone-18-pro-256", "s", "alle"))[0]
+    assert a["angebot"]["alt"] == "Stand unbekannt"
+
+
+def test_angebot_ohne_raten_steht_unter_filter_zum_umschalten():
+    d = _daten([_karte("congstar", 1700.0, raten=None),
+                _karte("Vodafone", 2000.0, raten=24)])
+    r = gk.rangliste(d, "apple-iphone-18-pro-256", "s", 24)
+    assert r["anders"] == [{"anbieter": "congstar", "raten": [None]}]
+    assert "congstar" not in r["ohne"]
+
+
+def test_unbekannter_anbieter_bleibt_unter_filter_sichtbar():
+    d = _daten([_karte("Aldi Talk", 1700.0, raten=36),
+                _karte("Vodafone", 2000.0, raten=24)])
+    r = gk.rangliste(d, "apple-iphone-18-pro-256", "s", 24)
+    assert r["anders"] == [{"anbieter": "Aldi Talk", "raten": [36]}]
+
+
+def test_nur_web_adressen_werden_verlinkt():
+    d = _daten([_karte("o2", 1500.0, quelle_url="javascript:alert(1)"),
+                _karte("congstar", 1700.0)])
+    zeilen = _zeilen(gk.rangliste(d, "apple-iphone-18-pro-256", "s", "alle"))
+    urls = {z["anbieter"]: z["angebot"]["url"] for z in zeilen}
+    assert not urls["o2"]
+    assert urls["congstar"] == "https://example.com/congstar"
+
+
+def test_json_maskiert_spitze_klammern():
+    d = gk.seite(_tco(_modell("apple-iphone-18-pro-256", "iPhone 18 Pro 256 GB",
+                              256, [_karte("congstar", 1700.0,
+                                           tarif="<!--<script>")])))
+    assert "<" not in d["json"]
+    assert "<!--<script>" in json.dumps(json.loads(d["json"]), ensure_ascii=False)

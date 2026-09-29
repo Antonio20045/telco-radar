@@ -14,6 +14,7 @@ import glob
 import http.server
 import json
 import threading
+import urllib.request
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
@@ -101,7 +102,9 @@ def _erwartet(daten, wahl):
             zeilen += zeilen_von(g, True)
     if r["anders"]:
         zeilen.append(("anders", " | ".join(
-            f"{x['anbieter']} · {n} Raten →" for x in r["anders"]
+            f"{x['anbieter']} · "
+            + ("ohne Raten" if n is None else f"{n} Raten") + " →"
+            for x in r["anders"]
             for n in x["raten"]), ""))
     if r["ohne"]:
         zeilen.append(("ohne", " · ".join(r["ohne"]), "—"))
@@ -360,8 +363,70 @@ def test_keine_zeile_ueberlappt_sich(seite, breite):
     for modell, liste in daten["angebote"].items():
         if any(not a["frisch"] for a in liste):
             faelle += [(modell, s) for s in sorted({a["stufe"] for a in liste})[:2]]
-    assert faelle, "kein Gerät mit veraltetem Stand - Gegenprobe fehlt"
+    if not faelle:
+        page.close()
+        pytest.skip("Bestand ohne veralteten Stand")
     for modell, stufe in faelle:
         page.goto(f"{basis}/geraete.html?modell={modell}&band={stufe}&raten=alle")
         assert page.evaluate(_UEBERLAPPUNG) == [], (modell, stufe)
+    page.close()
+
+
+@pytest.fixture
+def geaendert(seite, tmp_path):
+    """Die echte Seite mit eingespielten Randfällen, die der Bestand nicht
+    immer hat: ein Angebot ohne Raten und eine veraltete Karte ohne Datum.
+    `app.js` zeichnet beim Laden aus `#kv-daten`; so läuft der JS-Weg,
+    unabhängig vom Bestand."""
+    browser, basis, daten = seite
+    daten = json.loads(json.dumps(daten))
+    modell = daten["start"]["modell"]
+    stufe = daten["start"]["stufe"]
+    liste = daten["angebote"][modell]
+    vorlage = next(a for a in liste if a["stufe"] == stufe)
+    neu = [dict(vorlage, anbieter="congstar", raten=None, monate=gk.HORIZONT,
+                gesamt=1.0, frisch=True, alt=""),
+           dict(vorlage, anbieter="Telekom", raten=24, monate=gk.HORIZONT,
+                gesamt=0.5, frisch=False, stand="", alt="Stand unbekannt")]
+    daten["angebote"][modell] = [a for a in liste if a["anbieter"] not in
+                                 ("congstar", "Telekom") or a["stufe"] != stufe] + neu
+    html = urllib.request.urlopen(f"{basis}/geraete.html").read().decode("utf-8")
+    anfang = html.index('id="kv-daten">') + len('id="kv-daten">')
+    ende = html.index("</script>", anfang)
+    roh = json.dumps(daten, ensure_ascii=False).replace("<", "\\u003c")
+    ziel = tmp_path / "geaendert.html"
+    ziel.write_text(html[:anfang] + roh + html[ende:], encoding="utf-8")
+
+    def liefern(route):
+        route.fulfill(path=str(ziel), content_type="text/html; charset=utf-8")
+
+    return browser, basis, daten, modell, stufe, liefern
+
+
+@pytest.mark.parametrize("breite", [390, 1440])
+def test_randfaelle_ohne_raten_und_ohne_datum_im_browser(geaendert, breite):
+    browser, basis, daten, modell, stufe, liefern = geaendert
+    page = browser.new_page(viewport={"width": breite, "height": 900})
+    page.route("**/geraete.html*", liefern)
+    # Ohne Filter: congstar ohne Raten ist die günstigste frische Zeile, die
+    # billigere veraltete Telekom-Karte steht dahinter mit "Stand unbekannt".
+    page.goto(f"{basis}/geraete.html?modell={modell}&band={stufe}&raten=alle")
+    _pruefe(page, daten)
+    zeilen = page.eval_on_selector_all(
+        "#kv-ergebnis .kv-zeile", "els => els.map(e => e.dataset.anbieter)")
+    assert zeilen[0] == "congstar"
+    assert zeilen.index("Telekom") > zeilen.index("congstar")
+    alt = page.text_content('.kv-zeile[data-anbieter="Telekom"] .kv-alt')
+    assert alt.replace("\u00a0", " ") == "Stand unbekannt"
+    assert page.evaluate(_UEBERLAPPUNG) == []
+    # Unter dem 24-Raten-Filter steht congstar als Umschalter "ohne Raten",
+    # nicht bei den Lücken; der Klick hebt den Filter auf.
+    page.goto(f"{basis}/geraete.html?modell={modell}&band={stufe}&raten=24")
+    _pruefe(page, daten)
+    knopf = page.locator('.kv-umschalten[data-raten="alle"]', has_text="congstar")
+    assert knopf.count() == 1
+    assert "ohne" in knopf.text_content()
+    knopf.click()
+    assert _wahl(page.url, daten)["raten"] == "alle"
+    _pruefe(page, daten)
     page.close()

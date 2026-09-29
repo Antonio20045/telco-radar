@@ -155,11 +155,28 @@ def _angebot(karte: dict, stufe: str) -> dict:
         "monatlich": karte.get("monatlich"),
         "buendel_monatlich": karte.get("buendel_monatlich"),
         "posten": posten,
-        "url": karte.get("quelle_url") or "",
+        "url": _nur_web(karte.get("quelle_url")),
         "stand": karte.get("abgerufen_am") or "",
-        "stand_kurz": _datum_kurz(karte.get("abgerufen_am") or ""),
         "frisch": bool(karte.get("frisch")),
+        # Die Marke an einer nicht frischen Zeile; ohne lesbares Datum
+        # "Stand unbekannt", nie still frisch (Clean Code 4).
+        "alt": "" if karte.get("frisch") else
+               "Stand " + (_datum_kurz(karte.get("abgerufen_am") or "")
+                           or "unbekannt"),
     }
+
+
+def _nur_web(url) -> str:
+    """Nur http(s)-Adressen werden zum Link; alles andere fällt weg."""
+    url = str(url or "")
+    return url if re.match(r"https?://", url, re.IGNORECASE) else ""
+
+
+def _rang(a: dict) -> tuple:
+    """Frische Angebote vor nicht frischen: ein alter Preis verdrängt nie
+    einen aktuellen und wird nie "günstigste" (wie der Vergleich in
+    `geraete_tco_karten`, der nicht frische Karten ausnimmt)."""
+    return (not a["frisch"], a["gesamt"])
 
 
 def _nur_guenstigste(liste: list) -> list:
@@ -168,7 +185,7 @@ def _nur_guenstigste(liste: list) -> list:
     best: dict[tuple, dict] = {}
     for a in liste:
         schluessel = (a["anbieter"], a["stufe"], a["raten"])
-        if schluessel not in best or a["gesamt"] < best[schluessel]["gesamt"]:
+        if schluessel not in best or _rang(a) < _rang(best[schluessel]):
             best[schluessel] = a
     return sorted(best.values(), key=lambda a: (a["gesamt"], a["anbieter"]))
 
@@ -195,8 +212,6 @@ def aufbereiten(tco: dict, geraete_katalog=None) -> dict:
     stufen = [{"key": b["key"], "label": b["label"],
                "gb": b.get("bereich") or ""} for b in katalog]
     oberste = stufen[-1]["key"] if stufen else None
-    if stufen and not stufen[-1]["gb"]:
-        stufen[-1]["gb"] = "unbegrenzt"
 
     familien: dict[str, dict] = {}
     angebote: dict[str, list] = {}
@@ -348,8 +363,9 @@ def rangliste(daten: dict, modell: str, stufe: str, raten) -> dict:
     Verglichen wird nur innerhalb eines Zeitraums (`monate`): die Gruppe
     über `HORIZONT` Monate zuerst, danach z. B. ein Bündelmonatspreis über
     36 Monate (1&1) in einer eigenen Gruppe. "günstigste" und der Abstand
-    gibt es nur in einer Gruppe mit mindestens zwei Anbietern. Anbieter
-    ohne Angebot stehen in `ohne`.
+    gibt es nur zwischen mindestens zwei frischen Angeboten; nicht frische
+    stehen dahinter, ohne Abstand. Anbieter, die nur der Ratenfilter
+    ausblendet, stehen in `anders`, Anbieter ohne Angebot in `ohne`.
     """
     alle = daten.get("angebote", {}).get(modell) or []
     passend = [a for a in alle if a["stufe"] == stufe
@@ -357,30 +373,32 @@ def rangliste(daten: dict, modell: str, stufe: str, raten) -> dict:
     best: dict[str, dict] = {}
     for a in passend:
         alt = best.get(a["anbieter"])
-        if alt is None or (a["gesamt"], a["raten"] or 0) < (alt["gesamt"],
-                                                             alt["raten"] or 0):
+        if alt is None or _rang(a) + (a["raten"] or 0,) < \
+                _rang(alt) + (alt["raten"] or 0,):
             best[a["anbieter"]] = a
     zeitraeume = sorted({a["monate"] for a in best.values()},
                         key=lambda m: (m != HORIZONT, m or 0))
     gruppen = []
     for monate in zeitraeume:
         liste = sorted((a for a in best.values() if a["monate"] == monate),
-                       key=lambda a: (a["gesamt"], a["anbieter"]))
-        mehrere = len(liste) > 1
+                       key=lambda a: _rang(a) + (a["anbieter"],))
+        mehrere = sum(a["frisch"] for a in liste) > 1
         gruppen.append({"monate": monate, "zeilen": [
             {"anbieter": a["anbieter"], "angebot": a,
              "abstand": round(a["gesamt"] - liste[0]["gesamt"], 2)
-             if mehrere else None,
+             if mehrere and a["frisch"] else None,
              "sieger": mehrere and a is liste[0]} for a in liste]})
     # Anbieter, die nur der Ratenfilter ausblendet, stehen nicht bei den
-    # Lücken, sondern mit ihren Ratenzahlen zum Umschalten.
+    # Lücken, sondern mit ihren Ratenzahlen zum Umschalten; ein Angebot
+    # ohne Raten (Einmalzahlung, `None`) schaltet auf "alle".
     andere: dict[str, set] = {}
     for a in alle:
-        if (a["stufe"] == stufe and a["anbieter"] not in best
-                and a["raten"] is not None):
+        if a["stufe"] == stufe and a["anbieter"] not in best:
             andere.setdefault(a["anbieter"], set()).add(a["raten"])
-    anders = [{"anbieter": n, "raten": sorted(andere[n])}
-              for n in ANBIETER if n in andere]
+    folge = list(ANBIETER) + sorted(n for n in andere if n not in ANBIETER)
+    anders = [{"anbieter": n, "raten": sorted(
+        andere[n], key=lambda r: (r is None, r or 0))}
+        for n in folge if n in andere]
     ohne = [n for n in ANBIETER if n not in best and n not in andere]
     return {"gruppen": gruppen, "anders": anders, "ohne": ohne}
 
@@ -450,13 +468,32 @@ def ansicht(daten: dict, wahl: dict, alle_familien: bool = False) -> dict:
                         if f["hersteller"] == fam["hersteller"]]}
 
 
-def seite(tco: dict, geraete_katalog=None) -> dict:
+NICHT_LESBAR = "Gerätepreise nicht lesbar."
+
+
+def _grund(tco: dict, daten: dict, db_lesbar: bool) -> str:
+    """Warum die Seite keine Rangliste zeigt - nie still "keine Preise"
+    (CLAUDE.md Regel 9): ein unlesbarer Bestand oder eine fehlende
+    Vodafone-Tarifleiter (`band_leer` der Modelle) werden benannt. Das
+    gilt für beide Dateien: den TCO-Bestand (`tco["lesbar"]`) und die
+    Gerätedatenbank (`db_lesbar` aus `geraete_view`)."""
+    if daten["hat_daten"]:
+        return ""
+    if tco.get("lesbar") is False or not db_lesbar:
+        return NICHT_LESBAR
+    return next((m["band_leer"] for m in tco.get("modelle") or []
+                 if m.get("band_leer")), "")
+
+
+def seite(tco: dict, geraete_katalog=None, db_lesbar: bool = True) -> dict:
     """Der Kontext der Vorlage: Daten, Startansicht und die Daten als JSON
     für `app.js`."""
     import json
     daten = aufbereiten(tco, geraete_katalog)
     start = daten["start"]
-    return dict(daten,
+    return dict(daten, grund=_grund(tco, daten, db_lesbar),
                 ansicht=ansicht(daten, start) if start else None,
+                # Jedes "<" als \u003c: weder "</script>" noch "<!--" aus
+                # Fremddaten (Tarifname, Adresse) erreicht den HTML-Parser.
                 json=json.dumps(daten, ensure_ascii=False,
-                                separators=(",", ":")).replace("</", "<\\/"))
+                                separators=(",", ":")).replace("<", "\\u003c"))

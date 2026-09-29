@@ -22,7 +22,7 @@
   <details class="kv-auf">
     <summary class="kv-kern">
       <span class="kv-anb">{{ z.anbieter }}</span>
-      <span class="kv-info"><span class="kv-gb">{{ a.gb }}</span>{% if a.raten %}<span class="kv-raten">{{ a.raten }}&nbsp;Raten</span>{% endif %}{% if not a.frisch and a.stand_kurz %}<span class="kv-alt">Stand&nbsp;{{ a.stand_kurz }}</span>{% endif %}</span>
+      <span class="kv-info"><span class="kv-gb">{{ a.gb }}</span>{% if a.raten %}<span class="kv-raten">{{ a.raten }}&nbsp;Raten</span>{% endif %}{% if a.alt %}<span class="kv-alt">{{ a.alt }}</span>{% endif %}</span>
       <span class="kv-summe">{{ betrag(a.gesamt) }}</span>
       <span class="kv-abstand{% if z.einzig %} kv-abstand--einzig{% endif %}">{% if z.sieger %}günstigste{% elif z.abstand is not none %}+{{ z.abstand | euro }}{% elif z.einzig %}einziges Angebot{% endif %}</span>
       <span class="kv-pfeil" aria-hidden="true"></span>
@@ -57,7 +57,7 @@
 {%- if ansicht.anders %}
 <p class="kv-anders">
   {%- for x in ansicht.anders %}{% for r in x.raten %}
-  <button type="button" class="kv-umschalten" data-raten="{{ r }}">{{ x.anbieter }} · {{ r }}&nbsp;Raten&nbsp;→</button>
+  <button type="button" class="kv-umschalten" data-raten="{{ 'alle' if r is none else r }}">{{ x.anbieter }} · {% if r is none %}ohne&nbsp;Raten{% else %}{{ r }}&nbsp;Raten{% endif %}&nbsp;→</button>
   {%- endfor %}{% endfor %}
 </p>
 {%- endif %}
@@ -97,6 +97,7 @@
   <header class="kv-kopf">
     <h1 class="kv-titel" id="kv-titel">{{ kv.ansicht.titel }} <span>{{ kv.ansicht.speicher }}</span></h1>
   </header>
+  {% if geraete.fehler %}<p class="kv-nichts">{{ geraete.fehler }}</p>{% endif %}
 
   <div class="kv-wahl" id="kv-wahl">
     <label class="kv-reihe kv-reihe--liste">
@@ -117,7 +118,7 @@
   <script type="application/json" id="kv-daten">{{ kv.json | safe }}</script>
 {% else %}
   <header class="kv-kopf"><h1 class="kv-titel">Gerätepreise</h1></header>
-  <p class="kv-nichts">{{ geraete.fehler or 'Keine Gerätepreise.' }}</p>
+  <p class="kv-nichts">{{ geraete.fehler or kv.grund or 'Keine Gerätepreise.' }}</p>
 {% endif %}
 
   <footer class="kv-fuss">

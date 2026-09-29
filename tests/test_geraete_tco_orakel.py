@@ -133,8 +133,9 @@ def _buendel_aus_satz(satz: dict) -> Buendel | None:
 
 
 @pytest.mark.skipif(not BESTAND_DA, reason="kein ausgelieferter Bestand")
-def test_widerspruch_pib_und_shopmessung_am_echten_bestand():
-    """Der Pruefer-Befund vom 20.09.2026 (schwere "hoch") am echten Bestand:
+def test_widerspruch_pib_und_shopmessung_festgehaltene_messung():
+    """Der Pruefer-Befund vom 20.09.2026 (schwere "hoch"), festgehalten als
+    Messung gegen das echte Blatt im ausgelieferten Tarifbestand:
     Samsung Galaxy Z Fold8 256 an Vodafone Mobil XS misst 31,95 EUR im
     Shop, das Blatt nennt 29,95 EUR (Tarif ohne Smartphone-Zuschlag).
 
@@ -143,16 +144,22 @@ def test_widerspruch_pib_und_shopmessung_am_echten_bestand():
     Bis zum Fix entschieden die Phasen des Blatts den Widerspruch still
     fuer sich: 2.249,79 EUR auf der Karte, 718,80 EUR im Posten - neben
     einer Bauteilezeile, die 'monatlich 31,95 EUR' sagte."""
-    tco = json.loads((ZUSTAND / "geraete_tco.json").read_text(encoding="utf-8"))
+    # Der Befundsfall als festgehaltene Messung vom 20.09.2026, nicht als
+    # Suche im Bestand: seit P3 (28.09.) haengen Vodafone-Buendel am Blatt
+    # "mit Smartphone", und seit dem 29.09. liest der Adapter alle Tarife
+    # neu - ein Lookup im taeglich wechselnden Bestand liefe ins Leere.
+    # Echt bleibt das Blatt: es kommt weiter aus dem ausgelieferten
+    # Tarifbestand, und die Gegenprobe darunter haelt fest, dass es Phasen
+    # hat.
     tarife = _tarife()
-    treffer = [s for s in tco.get("buendel") or []
-               if s.get("anbieter") == "Vodafone"
-               and "z-fold8-256gb" in (s.get("sku_id") or "")
-               and s.get("tarif_id") == "vodafone:vodafone-mobil-xs"
-               and s.get("tarif_monatlich") == 31.95
-               and s.get("geraet_monatsrate") == 42.5]
-    assert treffer, "der Befundsfall fehlt im Bestand - Literal pruefen"
-    b = _buendel_aus_satz(treffer[0])
+    satz = {"anbieter": "Vodafone",
+            "sku_id": "samsung-galaxy-z-fold8-256gb-grau",
+            "tarif_name": "Mobil XS",
+            "tarif_id": "vodafone:vodafone-mobil-xs",
+            "tarif_monatlich": 31.95, "geraet_monatsrate": 42.5,
+            "geraet_zuzahlung": 0.99, "laufzeit_monate": 36,
+            "anschlusspreis": 0.0, "zustand": "neu"}
+    b = _buendel_aus_satz(satz)
     assert b is not None
     # Gegenprobe: das Blatt HAT Phasen, der Konflikt ist real - sonst
     # pruefte dieser Test den unstrittigen Fall.

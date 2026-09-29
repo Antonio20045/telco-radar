@@ -8,9 +8,8 @@ der EINE zentrale Ort der Export-Links.
   * Radar-Export - TCO UND Händler-Barpreis in EINER Datei; die %-Spalte
     ist KONSUMENT derselben Rechnung aus `wettbewerbsradar.py`, keine
     zweite Rechnung für dieselbe Zahl (CLAUDE.md §6).
-  * Export-Links EINMAL zentral: seit P4/D4 (18.09.2026) die FUSSZEILE der
-    Geräteseite (.gr-export-fuss) - bis P4 die Kopfzeile (O4), davor je
-    Reiter. Die duplizierten Knopfpaare in den Reitern bleiben gefallen.
+  * Der Export-Link EINMAL zentral: seit dem Neuentwurf (29.09.2026) der
+    EINE Link auf geraete-tco.csv im Fuß der Kosten-Rangliste (.kv-fuss).
 
 Doktrin (Modulkopf geraete_export.py): der Export filtert nicht selbst -
 er schreibt den Bestand. Diese Datei misst am ECHTEN Bestand.
@@ -112,21 +111,6 @@ def radar_csv(site) -> tuple[list[str], list[list[str]]]:
 def geraete(site) -> BeautifulSoup:
     return BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
                          "html.parser")
-
-
-@pytest.fixture(scope="module")
-def radar(site) -> BeautifulSoup:
-    """Die Radar-TAFEL von geraete.html - seit E3 Schritt 3 (17.09.2026)
-    ist der Radar der Reiter „Radar" der EINEN Geräteseite; die Alt-URL
-    wettbewerbsradar.html ist eine Weiterleitung ohne Inhalt. Der Export-
-    Knopf des Radars steht in der FUSSZEILE der Seite (P4/D4, 18.09.2026:
-    EINE Stelle für alle Reiter - bis dahin in der Kopfzeile, nie je
-    Reiter, und auch die Fußzeile nie ZUSÄTZLICH in einer Tafel)."""
-    suppe = BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
-                          "html.parser")
-    tafel = suppe.select_one("#tafel-radar")
-    assert tafel is not None, "#tafel-radar fehlt - die Fixture prüft nichts"
-    return BeautifulSoup(str(tafel), "html.parser")
 
 
 @pytest.fixture(scope="module")
@@ -479,25 +463,6 @@ def test_der_radar_export_traegt_tco_und_haendlerzeilen(radar_csv):
                      "Händler Barpreis"}, arten
 
 
-def test_die_prozentzahl_ist_die_der_seite(radar_csv, radar):
-    """Die %-Spalte ist KONSUMENT derselben Rechnung: die Zahl der
-    vergleichbaren Zeilen in der Datei ist die Zahl der vergleichbaren
-    Zeilen auf der Seite (`wr-status--vergleichbar`) - keine zweite
-    Rechnung für dieselbe Zahl. Seit E3 Schritt 3 stehen die Zeilen in
-    den Detailzeilen der Modell-Liste (bis dahin in den `.wr-gruppe`-
-    Blöcken der Schwesterseite; die Klasse `.wr-zeile` tragen seit S2 nur
-    noch die Händler-Zeilen)."""
-    kopf, zeilen = radar_csv
-    idx = {name: i for i, name in enumerate(kopf)}
-    datei = sum(1 for z in zeilen
-                if z[idx["Art"]] == "Netzbetreiber"
-                and z[idx["Abweichung %"]])
-    seite = len(radar.select("#wr-abweichung tr.wr-status--vergleichbar"))
-    assert seite > 0, "die Radar-Tafel zeigt keine vergleichbare Zeile"
-    assert datei == seite, (
-        f"{datei} Zeilen mit Abweichung in der Datei, {seite} auf der Seite")
-
-
 def test_haendlerzeilen_ennen_den_barpreis_beider_seiten(radar_csv):
     kopf, zeilen = radar_csv
     idx = {name: i for i, name in enumerate(kopf)}
@@ -510,7 +475,7 @@ def test_haendlerzeilen_ennen_den_barpreis_beider_seiten(radar_csv):
 
 
 def test_die_nicht_vergleichbaren_zeilen_stehen_mit_status_darin(
-        radar_csv, radar):
+        radar_csv):
     """Auch Band-Mismatch und kein Bündel stehen in der Datei - mit Status
     statt %-Zahl. Der Export schreibt den Bestand, die Ansicht kappt."""
     kopf, zeilen = radar_csv
@@ -575,68 +540,6 @@ def test_keine_1und1_netzzeile_behauptet_24_monate(radar_csv):
     assert not falsch, falsch
 
 
-def test_radar_export_enthaelt_auch_die_alarmtabelle(radar_csv, geraete):
-    """E5 (Strategie §7, O4-Evaluator S3): die vierte Zahlensektion ist
-    exportierbar - JEDE Alarmzeile der Seite steht in der Datei, Zahl für
-    Zahl dieselbe (Zeilenzahl == Seite, kein Lookup ins Leere: die
-    Zuordnung wird am Ende auf Vollständigkeit geprüft, CLAUDE.md §6).
-
-    Verglichen wird gegen die data-Attribute der GERENDERTEN Zeilen -
-    dieselben Rohwerte, aus denen die Zellen der Seite gesetzt werden -
-    und nicht gegen eine zweite Aufbereitung: die Datei ist Konsument
-    der Rechnung, nicht ihr zweiter Rechner."""
-    kopf, zeilen = radar_csv
-    idx = {name: i for i, name in enumerate(kopf)}
-    alarm_zeilen = [z for z in zeilen if z[idx["Art"]] == "Preis-Alarm"]
-    assert alarm_zeilen, "keine Preis-Alarm-Zeile im Radar-Export"
-
-    seite_zeilen = geraete.select("#wr-alarme tr.gr-a-zeile")
-    assert seite_zeilen, "die Alarmtabelle der Seite ist leer - der Test \
-würde an einer leeren Ausgabe grün vorbeigehen"
-
-    # (modell, speicher, prozent, wettbewerbspreis, unser preis) ist der
-    # Schluessel, unter dem eine Alarmzeile eindeutig ist - am echten
-    # Bestand teilen zwei Zeilen dieselbe Zahlenkombination, nur das
-    # Geraet unterscheidet sie. Der Laden steht daneben und wird
-    # mitgeprüft.
-    def _speicher(roh: str) -> str:
-        return str(int(float(roh))) if roh else ""
-
-    def _schluessel(z):
-        return (z[idx["Modell"]], _speicher(z[idx["Speicher GB"]]),
-                z[idx["Abweichung %"]], z[idx["Wettbewerber-Preis EUR"]],
-                z[idx["Vodafone-Preis EUR"]])
-
-    def _seitenschluessel(tr):
-        return (tr["data-modell"], _speicher(tr.get("data-speicher") or ""),
-                f"{float(tr['data-s-prozent']):.1f}".replace(".", ","),
-                f"{float(tr['data-s-fremd']):.2f}".replace(".", ","),
-                f"{float(tr['data-s-unser']):.2f}".replace(".", ","))
-
-    datei = {_schluessel(z): z for z in alarm_zeilen}
-    erwartet = {_seitenschluessel(tr): tr for tr in seite_zeilen}
-    assert len(datei) == len(alarm_zeilen), (
-        "doppelte Alarmzeile in der Datei")
-    assert len(erwartet) == len(seite_zeilen), (
-        "doppelte Alarmzeile auf der Seite")
-    assert set(datei) == set(erwartet), (
-        f"{len(datei)} Alarmzeilen in der Datei, {len(erwartet)} auf der "
-        f"Seite; nur in der Datei: {sorted(set(datei) - set(erwartet))[:3]}")
-
-    # Der Laden und die Stufe stehen NAMENTLICH in der Datei - dieselben
-    # Wörter wie die Zelle der Seite (S3: ein zweites Wort für dieselbe
-    # Sache wäre ein zweites Etikett).
-    for schluessel, tr in erwartet.items():
-        z = datei[schluessel]
-        assert z[idx["Anbieter"]] == tr["data-s-laden"], (z, tr)
-        stufe = tr.select_one(".gr-pille")
-        assert stufe is not None, "Alarmzeile ohne Einstufungs-Pille"
-        assert z[idx["Status"]] == stufe.get_text(strip=True), (z, stufe)
-        assert z[idx["Preisart"]] == "Gerätepreis ohne Vertrag", z
-        quelle = tr.select_one(".gr-a-quelle")
-        assert z[idx["Quelle"]] == (quelle.get("href") if quelle else ""), z
-
-
 def test_die_alarmzeilen_stehen_als_erster_abschnitt_der_datei(radar_csv):
     """Die Reihenfolge der Arten in der Datei ist die der Sektionen auf
     der Seite: Alarme, dann Abweichung (Netzbetreiber), dann Händler."""
@@ -653,70 +556,30 @@ def test_die_alarmzeilen_stehen_als_erster_abschnitt_der_datei(radar_csv):
 # Export-Links: EINMAL zentral, von beiden Seiten
 # --------------------------------------------------------------------------
 
-def test_geraete_verlinkt_jede_datei_genau_einmal(geraete):
+def test_geraete_verlinkt_den_export_genau_einmal(geraete, site):
+    """Seit dem Neuentwurf (29.09.2026) trägt die Geräteseite EINEN
+    Export-Link: die Datei der Kosten über 24 Monate
+    (`geraete.export.tco.datei`). Genau einmal, und die Datei existiert -
+    ein Link ins Leere wäre der teuerste Weg, das herauszufinden."""
     links = [a.get("href") for a in geraete.select("a[href^='exporte/']")]
-    assert links, "kein Export-Link auf der Geräteseite"
-    assert len(links) == len(set(links)), (
-        f"doppelter Export-Link auf derselben Seite: {links}")
-    assert "exporte/geraete-aktuell.csv" in links
-    assert "exporte/geraete-historie.csv" in links
-    assert "exporte/geraete-tco.csv" in links
+    assert links == ["exporte/geraete-tco.csv"], links
+    assert (site / links[0]).exists(), f"{links[0]} fehlt in site/"
 
 
-def test_die_export_links_stehen_in_der_fusszeile(geraete):
-    """P4/D4 (18.09.2026): die FUSSZEILE (.gr-export-fuss) ist der EINE
-    Ort - bis P4 standen die Knöpfe in der Kopfzeile (O4), davor je
-    Reiter (`gr-werkzeug`), davor im Hero der Schwesterseite. Der Umzug
-    an den Seitenende nahm ihnen den Platz über der Reiter-Steuerung
-    (mobil: gequetscht vor jedem ersten Datenelement)."""
-    fuss = geraete.select_one("section.gr-export-fuss")
-    assert fuss is not None, "keine Export-Fußzeile auf der Geräteseite"
+def test_der_export_link_steht_im_fuss_der_seite(geraete):
+    """Der EINE Ort des Export-Links ist der Fuß der Kosten-Rangliste
+    (`.kv-fuss`), neben dem Link auf die Quellen - nicht im Kopf und
+    nicht zwischen Auswahl und Ergebnis."""
+    fuss = geraete.select_one("#kosten .kv-fuss")
+    assert fuss is not None, "kein Fuß an der Kosten-Rangliste"
     links = geraete.select("a[href^='exporte/']")
     assert links, "kein Export-Link auf der Geräteseite"
     for a in links:
         assert fuss in a.parents, (
-            f"Export-Link außerhalb der Fußzeile: {a.get('href')}")
-    hero = geraete.select_one("section.page-hero")
-    assert hero is not None
-    assert not hero.select("a[href^='exporte/']"), (
-        "Export-Knöpfe stehen noch in der Kopfzeile (P4/D4: Fußzeile)")
-    assert not geraete.select(".gr-werkzeug a[href^='exporte/']"), (
-        "Export-Knöpfe stehen noch in einem Reiter")
-
-
-def test_der_radar_verlinkt_seinen_export_genau_einmal(geraete):
-    """Seit E3 Schritt 3 gehört der Radar-Export zur EINEN Geräteseite -
-    sein Knopf steht im Hero neben den drei anderen (bis dahin im Hero der
-    Schwesterseite). Genau ein Mal, nie zusätzlich in einem Reiter."""
-    links = [a.get("href") for a in geraete.select("a[href^='exporte/']")
-             if a.get("href") == "exporte/wettbewerbsradar.csv"]
-    assert links == ["exporte/wettbewerbsradar.csv"], links
-    radar_tafel = geraete.select_one("#tafel-radar")
-    assert radar_tafel is not None
-    assert not radar_tafel.select("a[href^='exporte/']"), \
-        "der Radar-Export steht zusätzlich IN der Tafel (O4: eine Stelle)"
-
-
-def test_die_links_nennen_die_zeilenzahl(geraete):
-    """Zeilenzahl NEBEN dem Link (Modulkopf geraete_export): ein leerer
-    Download ist der teuerste Weg herauszufinden, dass er sich nicht
-    lohnt. Seit P4/D4 stehen die Links in der Fußzeile."""
-    links = geraete.select("section.gr-export-fuss a[href^='exporte/']")
-    assert links, "kein Export-Link in der Fußzeile"
-    for a in links:
-        assert re.search(r"\d+", a.get_text()), a.get_text()
-
-
-def test_der_radar_wird_durch_den_export_nicht_hoeher(radar):
-    """Bekannte Grenze (O3-Bericht): Radar mobil ~20.400 px. Der Export
-    steht als KNOPF in der Kopfzeile, nicht als neue offene Tabelle - keine
-    neue Tabellenstruktur mit mehr als zehn Zeilen."""
-    for tabelle in radar.select("table"):
-        # Nur NEUE Strukturen dieses Auftrags prüfen: der Export darf
-        # keine eigene Tabelle auf der Seite aufbauen.
-        if "wr-export" in (tabelle.get("class") or []):
-            pytest.fail("der Export baut eine offene Tabelle auf der "
-                        "Radar-Seite")
+            f"Export-Link außerhalb des Fußes: {a.get('href')}")
+        assert a.has_attr("download"), "der Export-Link lädt nicht herunter"
+    assert fuss.select_one("a[href='geraete-quellen.html']") is not None, (
+        "der Quellen-Link fehlt im Fuß")
 
 
 # ==========================================================================

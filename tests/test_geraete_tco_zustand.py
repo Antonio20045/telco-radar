@@ -457,100 +457,10 @@ def _baue(tmp_path: pathlib.Path, erneuert: bool = True,
                          "html.parser")
 
 
-def test_die_gerenderte_seite_traegt_das_etikett_auf_zeile_und_rechenweg(tmp_path):
-    """BRIEF_FADEN (05.09.2026): G1 (der Balken) ist aus DIESER Ansicht
-    entfernt - seit O2 (11.09.2026) sind die Karten Tabellenzeilen, und
-    der Test prueft das Etikett an den ZEILEN. Dass `geraete_tco_grafik.
-    balken()` das Etikett weiterhin rechnet (Code bleibt, nur der Aufruf
-    im Template ist geloescht), haelt die Gegenprobe unten UND
-    `test_das_etikett_steht_am_g1_balken` oben."""
-    s = _baue(tmp_path)
-    tafel = s.select_one("#tafel-tco")
-    zeilen_o2 = tafel.select('.gr-bnd[data-anbieter="o2"]')
-    assert len(zeilen_o2) == 2
-
-    erneuert = tafel.select_one('.gr-bnd[data-zustand="refurbished"]')
-    assert erneuert is not None
-    assert erneuert.select_one(".gr-kk-marke--zustand").get_text(strip=True) == "erneuert"
-    assert erneuert.select_one(".gr-kk-delta") is None, \
-        "das erneuerte Geraet ist kein Konkurrent des Neugeraets"
-    neu = tafel.select_one('.gr-bnd[data-anbieter="o2"][data-zustand="neu"]')
-    assert neu.select_one(".gr-kk-marke--zustand") is None
-    assert neu.select_one(".gr-kk-delta") is not None
-
-    # G1 wird nicht mehr gerendert - G0 (die Zeitreihe) ist die einzige
-    # Grafik je Modellblock (BRIEF_FADEN, Kriterium 1).
-    assert tafel.select_one("svg.gr-g1") is None
-    # Die Rechnung bleibt trotzdem korrekt, nur nicht mehr aufgerufen -
-    # dieselbe Zusicherung wie `test_das_etikett_steht_am_g1_balken`.
-    svg = grafik.balken(_modell())
-    assert 'class="gr-g1-zustand">erneuert</tspan>' in svg
-
-    # Die alte "Alle Bündel als Tabelle" (mit ihrer eigenen Zustandsspalte
-    # `.gr-t-zustand`) ist mit O2 in die Zeilen-Tabelle aufgegangen - das
-    # Etikett steht jetzt an der Zeile selbst.
-    assert tafel.select_one("#gr-tco-tabelle") is None
-    assert not tafel.select(".gr-t-zustand")
-    assert "erneuert" in " ".join(erneuert.get_text(" ", strip=True).split())
-
-    # Die gr-mband-Angebotszeile ("2 Angebote · davon 1 erneuert") ist mit
-    # O1 entfallen - die fuenf Zaehlsysteme der Vergleichsansicht sind auf
-    # DIE EINE Fussnote unter dem Graphen gesammelt, und die nennt Geraete,
-    # keine Angebote. Das Etikett selbst steht weiterhin auf der Zeile
-    # (oben geprueft) - der Zweck der Zeile bleibt erfuellt.
-    assert tafel.select_one(".gr-mband") is None
-    # Die leere Vodafone-Zeile gibt es hier nicht, die gefuellte ist die
-    # Referenzrechnung - und die heisst nicht "unser Angebot" (S3).
-    marken = [m.get_text(strip=True) for m in tafel.select(".gr-kk-marke")]
-    assert "unser Angebot" not in marken
-
-
-def test_ohne_erneuertes_buendel_kein_etikett(tmp_path):
-    """Die Gegenprobe: dieselbe Seite ohne das zweite Buendel."""
-    s = _baue(tmp_path, erneuert=False)
-    tafel = s.select_one("#tafel-tco")
-    assert len(tafel.select('.gr-bnd[data-anbieter="o2"]')) == 1
-    assert not tafel.select(".gr-kk-marke--zustand")
-    assert not tafel.select(".gr-g1-zustand")
-    assert "erneuert" not in tafel.get_text(" ")
-
-
 # --------------------------------------------------------------------------
 # F1 (Stufe 1) und F5 an der gerenderten Seite
 # --------------------------------------------------------------------------
 
-def test_jede_karte_mit_zahl_nennt_den_preis_nach_der_laufzeit_oder_die_luecke(tmp_path):
-    """F5: "ab Monat 25" steht auf JEDER Zeile mit Zahl - als Betrag, wo das
-    Pflichtdokument eine Preisphase nennt (Vodafone Mobil XS: 29,95 EUR),
-    sonst als benannte Luecke (o2: `preisphasen: []`). Eine stumme
-    Auslassung liest sich als "es aendert sich nichts"."""
-    s = _baue(tmp_path)
-    tafel = s.select_one("#tafel-tco")
-    mit_zahl = [k for k in tafel.select(".gr-bnd")
-                if k.get("data-gesamt")]
-    assert len(mit_zahl) == 3            # o2 neu, o2 erneuert, Referenz
-    for k in mit_zahl:
-        assert k.select_one(".gr-kk-nach") is not None, k["data-anbieter"]
-
-    referenz = tafel.select_one('.gr-bnd[data-anbieter="Vodafone"]')
-    assert "ab Monat 25: 29,95 € Tarifgrundpreis" in vorlage_text(
-        referenz.select_one(".gr-kk-nach"))
-    o2 = tafel.select_one('.gr-bnd[data-anbieter="o2"][data-zustand="neu"]')
-    luecke = o2.select_one(".gr-kk-nach--luecke")
-    assert luecke is not None
-    assert "ab Monat 25: nicht belegt" in vorlage_text(luecke)
-
-    # F1, Stufe 1: die Referenz spricht dem Anbieter nichts ab, das er
-    # ausweist - sie nennt sich Naeherung und den Buendelpreis "nicht erhoben".
-    hinweis = vorlage_text(referenz.select_one(".gr-kk-hinweis"))
-    assert "noch nicht erhoben" in hinweis
-    # Gegen seitenlangen Blindtest: seit dem P4-Fix (template-Pool) sieht
-    # get_text() den Rechenweg NICHT mehr - der "not in"-Check laeuft
-    # gegen den VORLAGEN-Text, sonst pruefte er einen leer gerenderten
-    # Baum (CLAUDE.md §6: ein Test, dessen Lookup ins Leere geht, ist
-    # gruen und prueft nichts).
-    assert "weist zu diesem Gerät keinen Bündelpreis aus" \
-        not in vorlage_text(tafel)
 
 
 # --------------------------------------------------------------------------
@@ -719,41 +629,6 @@ def test_delta_kurz_und_der_graph_traegen_das_ungefaehr():
     # Antwort-Satz rechnen weiter darueber). Das Prozent kommt als
     # ABSOLUTER Wert - das Vorzeichen liefert der Euro-Betrag.
     assert tco_band.delta_text(-100.0, 9.1) == "−100,00 € · −9,1 %"
-
-
-def test_die_gerenderte_zeile_zeigt_kleine_abstaende_mit_ungefaehr(tmp_path):
-    """Fix 2 (A2) am gerenderten Blatt: die Δ-Spalte zeigt "≈ +11,00 €"
-    und OHNE die Δ-Präfix-Klasse (mobil wuerde sonst "Δ ≈" stehen), der
-    Delta-Satz im Rechenweg "≈ 11,00 € über der Vodafone-Referenz" ohne
-    Prozent. Gegenproben am selben Blatt: das wesentliche o2-Delta
-    (−679,05 € · −37,7 %) behält Prozent UND Präfix-Klasse, und das
-    erneuerte Geraet zeigt weiterhin den Strich - "kein Angebot"."""
-    s = _baue(tmp_path, ungefaehr_delta=True)
-    tafel = s.select_one("#tafel-tco")
-    o2_zeilen = tafel.select('.gr-bnd[data-anbieter="o2"]')
-    assert len(o2_zeilen) == 3, "o2 neu, o2 knapp daneben, o2 erneuert"
-
-    knapp = next(z for z in o2_zeilen
-                 if "≈" in (z.select_one(".gr-bnd-delta").get_text() or ""))
-    zelle = knapp.select_one(".gr-bnd-delta")
-    assert zelle.get_text(strip=True) == "≈ +11,00 €"
-    assert "gr-bnd-delta--wert" not in (zelle.get("class") or [])
-    satz = vorlage_text(knapp.select_one(".gr-kk-delta"))
-    assert "≈ 11,00 € über der Vodafone-Referenz" in satz, satz
-    assert "%" not in satz and "unter" not in satz, satz
-
-    deutlich = next(z for z in o2_zeilen
-                    if z.get("data-zustand") == "neu" and z is not knapp)
-    dzelle = deutlich.select_one(".gr-bnd-delta")
-    assert dzelle.get_text(strip=True) == "−679,05 € · −37,7 %"
-    assert "gr-bnd-delta--wert" in (dzelle.get("class") or [])
-    dsatz = vorlage_text(deutlich.select_one(".gr-kk-delta"))
-    assert "679,05 € (37,7 %) unter der Vodafone-Referenz" in dsatz, dsatz
-
-    erneuert_zeile = tafel.select_one(
-        '.gr-bnd[data-anbieter="o2"][data-zustand="refurbished"]')
-    assert erneuert_zeile.select_one(".gr-bnd-delta").get_text(
-        strip=True) == "–"
 
 
 def test_ueber_zwei_zeitraeume_steht_kein_betrag_sondern_der_zustand():
