@@ -1,0 +1,43 @@
+# =============================================================================
+# Pflichtabdeckung des Geräteradars (Bündel = Gerät plus Tarif)
+# =============================================================================
+# Gelesen von `analyze/buendel_abdeckung.py` und dem Wächterschritt in
+# `.github/workflows/geraete.yml`. Fehlt am Messtag ein Pflichtanbieter oder
+# ein Pflichtmodell bei einem Pflichtanbieter, wird der Lauf rot.
+#
+# Eine Lücke ist nur dann kein Befund, wenn sie hier mit Grund steht:
+# „Anbieter führt das Gerät nicht“ (geprüft an seiner Seite, mit Datum) oder
+# „Anbieter nicht erreichbar“ (gemessen). Eine Lücke ohne Grund gibt es nicht.
+# =============================================================================
+
+pflicht_anbieter:
+  - Telekom
+  - Vodafone
+  - o2
+  - 1&1
+  - congstar
+
+# Modell-IDs wie in der SKU (`geraete_model.device_id`): die aktuellen
+# Topmodelle je Hersteller, die jeder Netzbetreiber üblicherweise führt.
+pflicht_modelle:
+  - apple-iphone-18-pro
+  - apple-iphone-18-pro-max
+  - apple-iphone-17
+  - apple-iphone-17-pro
+  - apple-iphone-17-pro-max
+  - apple-iphone-17e
+  - apple-iphone-air
+  - samsung-galaxy-s26
+  - samsung-galaxy-s26-plus
+  - samsung-galaxy-s26-ultra
+  - samsung-galaxy-z-fold8
+  - samsung-galaxy-z-flip8
+  - samsung-galaxy-a57
+  - google-pixel-11
+  - google-pixel-11-pro
+  - google-pixel-11-pro-xl
+  - google-pixel-10a
+
+# anbieter + modelle (fehlt `modelle`, gilt der Grund für den ganzen
+# Anbieter) + grund + geprueft (Datum der Messung).
+belegte_luecken: []
