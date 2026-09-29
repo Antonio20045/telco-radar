@@ -83,7 +83,12 @@ def test_ratenfilter_laesst_andere_laufzeiten_weg():
                 _karte("Vodafone", 2000.0, raten=24)])
     r = gk.rangliste(d, "apple-iphone-18-pro-256", "s", 24)
     assert [z["anbieter"] for z in _zeilen(r)] == ["Vodafone"]
-    assert "congstar" in r["ohne"]
+    # congstar fehlt nicht, der Filter blendet es aus: es steht mit seiner
+    # Ratenzahl zum Umschalten da, nicht bei den Lücken.
+    assert r["anders"] == [{"anbieter": "congstar", "raten": [36]}]
+    assert "congstar" not in r["ohne"]
+    # Gegenprobe: ohne Filter keine Umschalter.
+    assert gk.rangliste(d, "apple-iphone-18-pro-256", "s", "alle")["anders"] == []
 
 
 def test_ein_einzelnes_angebot_ist_kein_sieger():
@@ -151,15 +156,38 @@ def test_familien_und_speicher():
         ["256 GB", "512 GB", "1 TB"]
 
 
-def test_modelle_sortieren_neueste_und_groesste_zuerst():
-    namen = ["Galaxy S25", "Galaxy Z Fold 7", "Galaxy S26 Ultra",
-             "Galaxy Z Fold8", "Galaxy S26", "Galaxy A57"]
-    assert sorted(["iPhone Air", "iPhone 18 Pro", "iPhone 17"],
-                  key=gk._namensrang) == ["iPhone 18 Pro", "iPhone 17",
-                                          "iPhone Air"]
-    assert sorted(namen, key=gk._namensrang) == [
-        "Galaxy Z Fold8", "Galaxy Z Fold 7", "Galaxy S26 Ultra",
-        "Galaxy S26", "Galaxy S25", "Galaxy A57"]
+def test_geraete_folge_aktuelle_flaggschiffe_zuerst():
+    from types import SimpleNamespace as NS
+    namen = ["Galaxy S25", "Galaxy Z Fold 7", "Galaxy S26 Ultra", "Galaxy A57",
+             "Galaxy Z Fold8", "Galaxy S26", "iPhone Air", "iPhone 18 Pro",
+             "iPhone 17", "iPhone 17 Pro"]
+    info = {"Galaxy S25": (25, "premium"), "Galaxy Z Fold 7": (7, "flagship"),
+            "Galaxy S26 Ultra": (26, "flagship"), "Galaxy A57": (57, "mid"),
+            "Galaxy Z Fold8": (8, "flagship"), "Galaxy S26": (26, "premium"),
+            "iPhone Air": (17, "flagship"), "iPhone 18 Pro": (18, ""),
+            "iPhone 17": (17, "premium"), "iPhone 17 Pro": (17, "flagship")}
+    fid = {n: n.lower().replace(" ", "-") for n in namen}
+    katalog = NS(geraete=[NS(device_id=fid[n], generation=g, segment=s)
+                          for n, (g, s) in info.items()])
+    familien = [{"id": fid[n], "name": n,
+                 "hersteller": "Apple" if n.startswith("iPhone") else "Samsung"}
+                for n in namen]
+    folge = [f["name"] for f in gk._geraete_folge(
+        familien, ["Apple", "Samsung"], gk._katalog_info(katalog))]
+    assert folge == [
+        "iPhone 18 Pro", "iPhone Air", "iPhone 17 Pro", "iPhone 17",
+        "Galaxy S26 Ultra", "Galaxy Z Fold8", "Galaxy S26", "Galaxy A57",
+        "Galaxy S25", "Galaxy Z Fold 7"]
+    # Gegenprobe: ohne Katalog zählt die Zahl im Namen, das A57 (57) wäre
+    # sonst das "neueste" Samsung - die Baureihe hält es auseinander.
+    ohne = [f["name"] for f in gk._geraete_folge(familien, ["Apple", "Samsung"], {})]
+    assert ohne.index("Galaxy S26 Ultra") < ohne.index("Galaxy S25")
+
+
+def test_groesserer_zusatz_steht_vorn():
+    assert sorted(["Pixel 11 Pro", "Pixel 11 Pro XL", "Pixel 11"],
+                  key=gk._Absteigend) == ["Pixel 11 Pro XL", "Pixel 11 Pro",
+                                          "Pixel 11"]
 
 
 def test_ansicht_graut_stufen_und_raten_ohne_angebot_aus():

@@ -17,6 +17,7 @@ from __future__ import annotations
 import re
 from typing import Optional
 
+from ..geraete_model import serie_aus_modell
 from .anbieter_farben import farbe_fuer
 from .geraete_tco_grafik import anbieter_slug
 
@@ -39,6 +40,7 @@ FAMILIEN_SICHTBAR = 8
 MEHR = "__mehr"
 
 HERSTELLER_FOLGE = ("Apple", "Samsung", "Google", "Xiaomi")
+SEGMENT_FOLGE = ("flagship", "premium", "mid", "entry")
 
 # Tarife ohne Volumengrenze fallen in die oberste Stufe. Die Tarifleiter
 # (`geraete_tco_band.tarifleiter`) kennt das XL-Volumen erst nach dem
@@ -177,8 +179,12 @@ def _brauchbar(karte: dict) -> bool:
                 and karte.get("gesamt") is not None)
 
 
-def aufbereiten(tco: dict) -> dict:
-    """Geräte, Stufen und Angebote für die Seite und für `app.js`."""
+def aufbereiten(tco: dict, geraete_katalog=None) -> dict:
+    """Geräte, Stufen und Angebote für die Seite und für `app.js`.
+
+    `geraete_katalog` (`geraete_config.lade_katalog`) liefert Generation und
+    Segment für die Reihenfolge der Geräte; ohne ihn gilt die Zahl im
+    Namen als Generation."""
     katalog = tco.get("baender_katalog") or []
     stufen = [{"key": b["key"], "label": b["label"],
                "gb": b.get("bereich") or ""} for b in katalog]
@@ -215,9 +221,8 @@ def aufbereiten(tco: dict) -> dict:
                         key=lambda h: (HERSTELLER_FOLGE.index(h)
                                        if h in HERSTELLER_FOLGE
                                        else len(HERSTELLER_FOLGE), h))
-    geraete = sorted(familien.values(),
-                     key=lambda f: (hersteller.index(f["hersteller"]),
-                                    _namensrang(f["name"])))
+    geraete = _geraete_folge(list(familien.values()), hersteller,
+                             _katalog_info(geraete_katalog))
 
     return {
         "hat_daten": bool(angebote),
@@ -236,10 +241,58 @@ def aufbereiten(tco: dict) -> dict:
     }
 
 
+def _katalog_info(katalog) -> dict:
+    """device_id -> (generation, segment) aus dem Gerätekatalog."""
+    return {g.device_id: (g.generation, g.segment or "")
+            for g in (getattr(katalog, "geraete", None) or [])}
+
+
+def _geraete_folge(familien: list, hersteller: list, info: dict) -> list:
+    """Reihenfolge der Geräte je Marke: zuerst die aktuelle Generation
+    jeder Baureihe, Flaggschiffe vorn (Galaxy S26 Ultra vor Z Fold8 vor
+    Galaxy A57, iPhone Air neben dem iPhone 18), danach die Vorgänger je
+    Baureihe, neueste zuerst."""
+    def seg_rang(seg: str) -> int:
+        return (SEGMENT_FOLGE.index(seg) if seg in SEGMENT_FOLGE
+                else len(SEGMENT_FOLGE))
+
+    def gen(f: dict) -> int:
+        g = info.get(f["id"], (None, ""))[0]
+        if g is None:
+            zahl = re.search(r"\d+", f["name"])
+            g = int(zahl.group()) if zahl else 0
+        return g
+
+    serie = {f["id"]: (f["hersteller"], serie_aus_modell(f["name"]))
+             for f in familien}
+    neueste: dict = {}
+    serie_seg: dict = {}
+    for f in familien:
+        k = serie[f["id"]]
+        neueste[k] = max(neueste.get(k, 0), gen(f))
+        serie_seg[k] = min(serie_seg.get(k, 99),
+                           seg_rang(info.get(f["id"], (None, ""))[1]))
+
+    def schluessel(f: dict):
+        k = serie[f["id"]]
+        # Ohne Segment im Katalog (neue Modelle) gilt das beste der Baureihe.
+        seg = seg_rang(info.get(f["id"], (None, ""))[1])
+        if seg == len(SEGMENT_FOLGE):
+            seg = serie_seg[k]
+        aktuell = gen(f) == neueste[k]
+        if aktuell:
+            rest = (seg, serie_seg[k], k[1], 0, _Absteigend(f["name"]))
+        else:
+            rest = (serie_seg[k], k[1], -gen(f), seg, _Absteigend(f["name"]))
+        return (hersteller.index(f["hersteller"]), not aktuell) + rest
+
+    return sorted(familien, key=schluessel)
+
+
 class _Absteigend:
-    """Natürliche Sortierung, umgekehrt: Baureihen bleiben beisammen, die
-    neueste Generation und das größte Modell stehen vorn ("Z Fold8" vor
-    "Z Fold 7", "18 Pro Max" vor "18 Pro" vor "18")."""
+    """Natürliche Sortierung, umgekehrt: die neueste Generation und das
+    größere Modell stehen vorn ("Z Fold8" vor "Z Fold 7", "18 Pro Max" vor
+    "18 Pro" vor "18")."""
 
     def __init__(self, name: str):
         flach = re.sub(r"\s+(?=\d)", "", name.lower())
@@ -253,15 +306,11 @@ class _Absteigend:
             if type(a) is not type(b):
                 return isinstance(a, str)
             if isinstance(a, str) and (a.startswith(b) or b.startswith(a)):
-                # "iPhone 18" vor "iPhone Air": die nummerierte Baureihe
-                # zuerst, Sondermodelle ohne Nummer dahinter.
-                return len(a) < len(b)
+                # "Pro XL" vor "Pro": der längere Zusatz ist das größere
+                # Modell.
+                return len(a) > len(b)
             return a > b
         return len(self.teile) > len(other.teile)
-
-
-def _namensrang(name: str) -> _Absteigend:
-    return _Absteigend(name)
 
 
 def startwahl(geraete: list, stufen: list, angebote: dict) -> dict:
@@ -312,8 +361,17 @@ def rangliste(daten: dict, modell: str, stufe: str, raten) -> dict:
              "abstand": round(a["gesamt"] - liste[0]["gesamt"], 2)
              if mehrere else None,
              "sieger": mehrere and a is liste[0]} for a in liste]})
-    ohne = [n for n in ANBIETER if n not in best]
-    return {"gruppen": gruppen, "ohne": ohne}
+    # Anbieter, die nur der Ratenfilter ausblendet, stehen nicht bei den
+    # Lücken, sondern mit ihren Ratenzahlen zum Umschalten.
+    andere: dict[str, set] = {}
+    for a in alle:
+        if (a["stufe"] == stufe and a["anbieter"] not in best
+                and a["raten"] is not None):
+            andere.setdefault(a["anbieter"], set()).add(a["raten"])
+    anders = [{"anbieter": n, "raten": sorted(andere[n])}
+              for n in ANBIETER if n in andere]
+    ohne = [n for n in ANBIETER if n not in best and n not in andere]
+    return {"gruppen": gruppen, "anders": anders, "ohne": ohne}
 
 
 def _chip(wert, text, an, aus=False, zusatz="") -> dict:
@@ -363,12 +421,16 @@ def ansicht(daten: dict, wahl: dict, alle_familien: bool = False) -> dict:
     ]
     stil = {a["name"]: a for a in daten["anbieter"]}
     rang = rangliste(daten, wahl["modell"], wahl["stufe"], wahl["raten"])
-    for gruppe in rang["gruppen"]:
-        for z in gruppe["zeilen"]:
+    for i, gruppe in enumerate(rang["gruppen"]):
+        for j, z in enumerate(gruppe["zeilen"]):
+            # Die erste Zahl der Seite ist immer die größte, auch wenn
+            # nur ein Anbieter da ist und es keinen "günstigsten" gibt.
+            z["erste"] = i == 0 and j == 0 and gruppe["monate"] == HORIZONT
             z["stil"] = stil.get(z["anbieter"], {
                 "farbe": farbe_fuer(z["anbieter"]), "eigen": False})
     return {"titel": fam["name"], "speicher": sp["text"], "reihen": reihen,
-            "gruppen": rang["gruppen"], "ohne": rang["ohne"],
+            "gruppen": rang["gruppen"], "anders": rang["anders"],
+            "ohne": rang["ohne"],
             "auswahl": auswahl_liste(daten)}
 
 
@@ -379,11 +441,11 @@ def auswahl_liste(daten: dict) -> list:
             for h in daten["hersteller"]]
 
 
-def seite(tco: dict) -> dict:
+def seite(tco: dict, geraete_katalog=None) -> dict:
     """Der Kontext der Vorlage: Daten, Startansicht und die Daten als JSON
     für `app.js`."""
     import json
-    daten = aufbereiten(tco)
+    daten = aufbereiten(tco, geraete_katalog)
     start = daten["start"]
     return dict(daten,
                 ansicht=ansicht(daten, start) if start else None,

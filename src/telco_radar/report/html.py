@@ -1981,7 +1981,8 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
 
     from . import geraete_kosten as _geraete_kosten
     try:
-        geraete["kosten"] = _geraete_kosten.seite(geraete.get("tco") or {})
+        geraete["kosten"] = _geraete_kosten.seite(geraete.get("tco") or {},
+                                                  lade_katalog(_wurzel))
     except Exception as exc:  # noqa: BLE001
         log.error("Kostenvergleich nicht aufbereitbar: %s: %s",
                   type(exc).__name__, exc)

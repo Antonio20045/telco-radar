@@ -4201,7 +4201,7 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
    Eine Auswahl oben, eine Rangliste darunter. Die größte Zahl ist die
    des günstigsten Anbieters.
    ========================================================================= */
-.kv{max-width:1000px;margin:0 auto;padding:28px 24px 48px}
+.kv{max-width:900px;margin:0 auto;padding:28px 24px 48px}
 .kv-kopf{display:flex;align-items:baseline;justify-content:space-between;
   gap:6px 16px;flex-wrap:wrap;margin-bottom:20px}
 .kv-titel{font-family:var(--serif);font-weight:700;font-size:44px;
@@ -4232,9 +4232,9 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
 .kv-chip[aria-checked="true"]{background:var(--ink);border-color:var(--ink);
   color:var(--paper-2);position:relative;z-index:1}
 .kv-chip[aria-checked="true"] small{color:var(--rule)}
-.kv-chip[data-aus]{color:var(--rule);background:transparent;
+.kv-chip[data-aus]{color:var(--ink-4);background:transparent;
   border-color:var(--rule-2)}
-.kv-chip[data-aus] small{color:var(--rule)}
+.kv-chip[data-aus] small{color:var(--ink-4)}
 .kv-chip[disabled]{cursor:default}
 .kv-chip[disabled]:hover{border-color:var(--rule-2)}
 .kv-chip[data-aus][aria-checked="true"]{background:var(--ink-4);
@@ -4253,15 +4253,15 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
   grid-template-columns:112px minmax(0,1fr) 190px 128px 14px;
   padding:18px 10px 18px 14px;list-style:none;cursor:pointer}
 .kv-kern::-webkit-details-marker{display:none}
-@media (hover:hover){.kv-kern:hover .kv-anb{text-decoration:underline;text-underline-offset:4px}}
+@media (hover:hover){.kv-auf:not([open]) .kv-kern:hover .kv-anb{text-decoration:underline;text-underline-offset:4px}}
 .kv-anb{font-family:var(--sans);font-weight:800;font-size:17px;
   color:var(--anb,var(--ink))}
-.kv-info{display:grid;grid-template-columns:72px minmax(0,1fr) 72px;
-  column-gap:14px;align-items:baseline;font-family:var(--sans);font-size:13px;
-  color:var(--ink-3);line-height:1.35}
+.kv-info{display:flex;flex-wrap:wrap;column-gap:18px;align-items:baseline;
+  font-family:var(--sans);font-size:14px;color:var(--ink-3);line-height:1.35}
+.kv-info>span{white-space:nowrap}
 .kv-gb{font-weight:700;color:var(--ink)}
-.kv-raten{text-align:right;white-space:nowrap}
-.kv-alt{font-weight:700;color:var(--al-mittel);white-space:nowrap}
+.kv-gb{min-width:64px}
+.kv-alt{color:var(--ink-4)}
 .kv-summe{font-family:var(--serif);font-weight:700;font-size:28px;line-height:1;
   text-align:right;color:var(--ink);white-space:nowrap;
   font-variant-numeric:tabular-nums}
@@ -4275,12 +4275,26 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
   transform:rotate(45deg);margin-top:-4px;transition:transform .15s}
 .kv-auf[open] .kv-pfeil::before{transform:rotate(-135deg);margin-top:4px}
 .kv-zeile--sieger{background:var(--paper-2)}
-.kv-zeile--sieger .kv-summe{font-size:42px}
+.kv-zeile--erste .kv-summe{font-size:42px}
+.kv-gruppe--neben{margin-top:36px}
+.kv-neben-kopf{display:flex;align-items:baseline;gap:14px;cursor:pointer;
+  list-style:none;padding:0 10px 10px 0;border-bottom:1px solid var(--rule)}
+.kv-neben-kopf::-webkit-details-marker{display:none}
+.kv-neben-kopf .kv-kopfzeile{font-size:15px;color:var(--ink-3);margin:0;
+  padding:0;border:0}
+.kv-neben-namen{flex:1;font-family:var(--sans);font-size:14px;font-weight:700;
+  color:var(--ink-3)}
+.kv-gruppe--neben[open] > .kv-neben-kopf .kv-pfeil::before{transform:rotate(-135deg);margin-top:4px}
+.kv-zeile--alt .kv-summe,.kv-zeile--alt .kv-cent{color:var(--ink-3)}
+.kv-gruppe--neben .kv-summe{font-size:22px;color:var(--ink-3)}
+.kv-gruppe--neben .kv-cent{color:var(--ink-3)}
 .kv-zeile--sieger .kv-abstand{color:var(--al-gering)}
 
 /* Rechenweg: rechtsbündig unter dem Betrag, "Gesamt" fluchtet mit ihm */
 .kv-weg{display:flex;flex-direction:column;align-items:flex-end;
   padding:0 178px 18px 0}
+.kv-weg-tarif{margin:0 0 6px;font-family:var(--sans);font-size:14px;
+  font-weight:700;color:var(--ink)}
 .kv-weg table{border-collapse:collapse;font-family:var(--sans);font-size:14px}
 .kv-weg th{text-align:left;font-weight:400;color:var(--ink-2);
   padding:5px 28px 5px 0}
@@ -4294,6 +4308,12 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
   font-weight:700;color:var(--anb,var(--ink));text-decoration:none}
 .kv-quelle:hover{text-decoration:underline;text-underline-offset:3px}
 
+.kv-anders{display:flex;flex-wrap:wrap;gap:6px;margin:0;
+  padding:12px 10px 12px 17px;border-bottom:1px solid var(--rule-2)}
+.kv-umschalten{font-family:var(--sans);font-size:13px;font-weight:700;
+  color:var(--ink-2);background:transparent;border:1px solid var(--rule);
+  border-radius:3px;padding:6px 10px;cursor:pointer}
+.kv-umschalten:hover{border-color:var(--ink-3)}
 .kv-ohne{display:flex;justify-content:space-between;align-items:baseline;
   margin:0;padding:14px 38px 14px 17px;border-bottom:1px solid var(--rule-2)}
 .kv-ohne-namen{font-family:var(--sans);font-weight:700;font-size:14px;
@@ -4328,9 +4348,12 @@ circle.gr-zr-punkt.gr-zr-aktiv{stroke:var(--ink);stroke-width:2.8}
   .kv-anb{grid-area:anb}
   .kv-info{grid-area:info;display:block}
   .kv-info>span+span::before{content:" · "}
-  .kv-raten{text-align:left}
+  .kv-info{font-size:13px}
+  .kv-gb{min-width:0}
   .kv-summe{grid-area:summe;font-size:24px}
-  .kv-zeile--sieger .kv-summe{font-size:32px}
+  .kv-zeile--erste .kv-summe{font-size:32px}
+  .kv-gruppe--neben .kv-summe{font-size:20px}
+  .kv-anders{padding:10px 6px 10px 13px}
   .kv-abstand{grid-area:abstand;align-self:start}
   .kv-pfeil{grid-area:pfeil}
   .kv-weg{padding:0 10px 16px 10px;align-items:stretch}

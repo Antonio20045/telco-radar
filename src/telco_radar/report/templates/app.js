@@ -3808,25 +3808,37 @@ var grKosten = (function () {
           sieger: mehrere && a === liste[0] };
       }) };
     });
-    var ohne = D.anbieter.map(function (s) { return s.name; })
-      .filter(function (n) { return !best[n]; });
-    return { gruppen: gruppen, ohne: ohne };
+    /* wie geraete_kosten.rangliste(): nur vom Ratenfilter ausgeblendete
+       Anbieter stehen mit ihren Ratenzahlen, nicht bei den Luecken */
+    var andere = {};
+    (D.angebote[modell] || []).forEach(function (a) {
+      if (a.stufe !== stufe || best[a.anbieter] || a.raten == null) return;
+      var l = andere[a.anbieter] || (andere[a.anbieter] = []);
+      if (l.indexOf(a.raten) < 0) l.push(a.raten);
+    });
+    var namen2 = D.anbieter.map(function (s) { return s.name; });
+    var anders = namen2.filter(function (n) { return andere[n]; }).map(function (n) {
+      return { anbieter: n, raten: andere[n].sort(function (x, y) { return x - y; }) };
+    });
+    var ohne = namen2.filter(function (n) { return !best[n] && !andere[n]; });
+    return { gruppen: gruppen, anders: anders, ohne: ohne };
   }
 
   function zeile(z) {
     var a = z.angebot, s = stilVon(z.anbieter);
-    var h = '<li class="kv-zeile' + (z.sieger ? ' kv-zeile--sieger' : '') +
+    var h = '<li class="kv-zeile' + (z.erste ? ' kv-zeile--erste' : '') +
+      (z.sieger ? ' kv-zeile--sieger' : '') + (!a.frisch ? ' kv-zeile--alt' : '') +
       (s.eigen ? ' kv-zeile--eigen' : '') + '" style="--anb:' + esc(s.farbe) +
       '" data-anbieter="' + esc(z.anbieter) + '"><details class="kv-auf">' +
       '<summary class="kv-kern"><span class="kv-anb">' + esc(z.anbieter) + '</span>' +
-      '<span class="kv-info"><span class="kv-gb">' + esc(a.gb) + '</span><span class="kv-tarif">' +
-      esc(a.tarif) + (!a.frisch && a.stand_kurz ? ' <span class="kv-alt">Stand&nbsp;' +
-      esc(a.stand_kurz) + '</span>' : '') + '</span><span class="kv-raten">' +
-      (a.raten ? a.raten + '&nbsp;Raten' : '') + '</span></span>' +
+      '<span class="kv-info"><span class="kv-gb">' + esc(a.gb) + '</span>' +
+      (a.raten ? '<span class="kv-raten">' + a.raten + '&nbsp;Raten</span>' : '') +
+      (!a.frisch && a.stand_kurz ? '<span class="kv-alt">Stand&nbsp;' +
+      esc(a.stand_kurz) + '</span>' : '') + '</span>' +
       '<span class="kv-summe">' + betrag(a.gesamt) + '</span><span class="kv-abstand">' +
       (z.sieger ? 'günstigste' : z.abstand !== null ? '+' + euro(z.abstand) : '') +
       '</span><span class="kv-pfeil" aria-hidden="true"></span></summary>' +
-      '<div class="kv-weg"><table>';
+      '<div class="kv-weg"><p class="kv-weg-tarif">' + esc(a.tarif) + '</p><table>';
     a.posten.forEach(function (p) {
       h += '<tr' + (p.offen ? ' class="kv-weg-offen"' : '') + '><th>' + esc(p.name) +
         '</th><td class="kv-weg-mal">' + esc(p.mal) + '</td><td>' + euro(p.betrag) + '</td></tr>';
@@ -3839,12 +3851,34 @@ var grKosten = (function () {
   }
 
   function ergebnis(r) {
-    var h = r.gruppen.map(function (g) {
-      return '<section class="kv-gruppe"><h2 class="kv-kopfzeile">Kosten über ' + g.monate +
-        ' Monate</h2><ol class="kv-liste">' + g.zeilen.map(zeile).join('') + '</ol></section>';
+    var h = r.gruppen.map(function (g, i) {
+      var liste = '<ol class="kv-liste">' + g.zeilen.map(function (z, j) {
+        z.erste = i === 0 && j === 0 && g.monate === HORIZONT;
+        return zeile(z);
+      }).join('') + '</ol>';
+      if (g.monate === HORIZONT)
+        return '<section class="kv-gruppe"><h2 class="kv-kopfzeile">Kosten über ' +
+          g.monate + ' Monate</h2>' + liste + '</section>';
+      /* wie die Vorlage: ein anderer Zeitraum steht zugeklappt darunter */
+      return '<details class="kv-gruppe kv-gruppe--neben"><summary class="kv-neben-kopf">' +
+        '<h2 class="kv-kopfzeile">Kosten über ' + g.monate + ' Monate</h2>' +
+        '<span class="kv-neben-namen">' + g.zeilen.map(function (z) {
+          return esc(z.anbieter); }).join(' · ') +
+        '</span><span class="kv-pfeil" aria-hidden="true"></span></summary>' +
+        liste + '</details>';
     }).join('');
     if (!r.gruppen.length) h = '<section class="kv-gruppe"><h2 class="kv-kopfzeile">Kosten über ' +
       HORIZONT + ' Monate</h2></section>';
+    if (r.anders.length) {
+      h += '<p class="kv-anders">';
+      r.anders.forEach(function (x) {
+        x.raten.forEach(function (n) {
+          h += '<button type="button" class="kv-umschalten" data-raten="' + n + '">' +
+            esc(x.anbieter) + ' · ' + n + '&nbsp;Raten</button>';
+        });
+      });
+      h += '</p>';
+    }
     if (r.ohne.length) h += '<p class="kv-ohne"><span class="kv-ohne-namen">' +
       r.ohne.map(esc).join(' · ') + '</span><span class="kv-summe">—</span></p>';
     return h;
@@ -3949,13 +3983,15 @@ var grKosten = (function () {
       name = 'familie'; wert = erste.id;
     }
     if (name === 'familie') {
-      var alt = familieVonModell(wahl.modell), gb = null;
-      alt.speicher.forEach(function (s) { if (s.modell === wahl.modell) gb = s.gb; });
+      /* ein anderes Geraet oeffnet mit seinem kleinsten Speicher, der
+         Wechsel des Speichers ist ein eigener Klick */
       var neu = familie(wert), treffer = neu.speicher[0];
-      neu.speicher.forEach(function (s) { if (s.gb === gb) treffer = s; });
+      alleFamilien = false;
       wahl.familie = neu.id; wahl.modell = treffer.modell;
     } else if (name === 'modell') {
-      wahl.modell = wert;
+      var zu = familieVonModell(wert);
+      if (!zu) return;
+      wahl.modell = wert; wahl.familie = zu.id;
     } else if (name === 'stufe') {
       wahl.stufe = wert;
     } else if (name === 'raten') {
@@ -3976,6 +4012,10 @@ var grKosten = (function () {
     waehle(name, knopf.getAttribute('data-wert'));
     var neu = document.querySelector('.kv-reihe[data-wahl="' + name + '"] [aria-checked="true"]');
     if (neu) neu.focus({ preventScroll: true });
+  });
+  document.getElementById('kv-ergebnis').addEventListener('click', function (ev) {
+    var knopf = ev.target.closest('.kv-umschalten');
+    if (knopf) waehle('raten', knopf.getAttribute('data-raten'));
   });
   var liste = document.getElementById('kv-geraet');
   if (liste) liste.addEventListener('change', function () { waehle('familie', liste.value); });

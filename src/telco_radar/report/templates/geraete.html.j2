@@ -17,17 +17,18 @@
 
 {% macro kv_zeile(z) -%}
 {%- set a = z.angebot -%}
-<li class="kv-zeile{% if z.sieger %} kv-zeile--sieger{% endif %}{% if z.stil.eigen %} kv-zeile--eigen{% endif %}"
+<li class="kv-zeile{% if z.erste %} kv-zeile--erste{% endif %}{% if z.sieger %} kv-zeile--sieger{% endif %}{% if z.stil.eigen %} kv-zeile--eigen{% endif %}{% if not a.frisch %} kv-zeile--alt{% endif %}"
     style="--anb:{{ z.stil.farbe }}" data-anbieter="{{ z.anbieter }}">
   <details class="kv-auf">
     <summary class="kv-kern">
       <span class="kv-anb">{{ z.anbieter }}</span>
-      <span class="kv-info"><span class="kv-gb">{{ a.gb }}</span><span class="kv-tarif">{{ a.tarif }}{% if not a.frisch and a.stand_kurz %} <span class="kv-alt">Stand&nbsp;{{ a.stand_kurz }}</span>{% endif %}</span><span class="kv-raten">{% if a.raten %}{{ a.raten }}&nbsp;Raten{% endif %}</span></span>
+      <span class="kv-info"><span class="kv-gb">{{ a.gb }}</span>{% if a.raten %}<span class="kv-raten">{{ a.raten }}&nbsp;Raten</span>{% endif %}{% if not a.frisch and a.stand_kurz %}<span class="kv-alt">Stand&nbsp;{{ a.stand_kurz }}</span>{% endif %}</span>
       <span class="kv-summe">{{ betrag(a.gesamt) }}</span>
       <span class="kv-abstand">{% if z.sieger %}günstigste{% elif z.abstand is not none %}+{{ z.abstand | euro }}{% endif %}</span>
       <span class="kv-pfeil" aria-hidden="true"></span>
     </summary>
     <div class="kv-weg">
+      <p class="kv-weg-tarif">{{ a.tarif }}</p>
       <table>
         {%- for p in a.posten %}
         <tr{% if p.offen %} class="kv-weg-offen"{% endif %}><th>{{ p.name }}</th><td class="kv-weg-mal">{{ p.mal }}</td><td>{{ p.betrag | euro }}</td></tr>
@@ -44,6 +45,7 @@
 
 {% macro ergebnis(ansicht, horizont) -%}
 {%- for g in ansicht.gruppen %}
+{%- if g.monate == horizont %}
 <section class="kv-gruppe">
   <h2 class="kv-kopfzeile">Kosten über {{ g.monate }} Monate</h2>
   <ol class="kv-liste">
@@ -53,10 +55,29 @@
   </ol>
 </section>
 {%- else %}
+{#- Ein anderer Zeitraum ist mit der Hauptliste nicht vergleichbar: er
+    steht zugeklappt darunter, ohne Betrag im Blick. #}
+<details class="kv-gruppe kv-gruppe--neben">
+  <summary class="kv-neben-kopf"><h2 class="kv-kopfzeile">Kosten über {{ g.monate }} Monate</h2><span class="kv-neben-namen">{{ g.zeilen | map(attribute='anbieter') | join(' · ') }}</span><span class="kv-pfeil" aria-hidden="true"></span></summary>
+  <ol class="kv-liste">
+    {%- for z in g.zeilen %}
+    {{ kv_zeile(z) }}
+    {%- endfor %}
+  </ol>
+</details>
+{%- endif %}
+{%- else %}
 <section class="kv-gruppe">
   <h2 class="kv-kopfzeile">Kosten über {{ horizont }} Monate</h2>
 </section>
 {%- endfor %}
+{%- if ansicht.anders %}
+<p class="kv-anders">
+  {%- for x in ansicht.anders %}{% for r in x.raten %}
+  <button type="button" class="kv-umschalten" data-raten="{{ r }}">{{ x.anbieter }} · {{ r }}&nbsp;Raten</button>
+  {%- endfor %}{% endfor %}
+</p>
+{%- endif %}
 {%- if ansicht.ohne %}
 <p class="kv-ohne"><span class="kv-ohne-namen">{{ ansicht.ohne | join(' · ') }}</span><span class="kv-summe">—</span></p>
 {%- endif %}

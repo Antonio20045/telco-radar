@@ -95,6 +95,10 @@ def _erwartet(daten, wahl):
                     else "") for z in g["zeilen"]]
     if not r["gruppen"]:
         zeilen.append(("kopf", f"Kosten über {gk.HORIZONT} Monate", ""))
+    if r["anders"]:
+        zeilen.append(("anders", " | ".join(
+            f"{x['anbieter']} · {n} Raten" for x in r["anders"]
+            for n in x["raten"]), ""))
     if r["ohne"]:
         zeilen.append(("ohne", " · ".join(r["ohne"]), "—"))
     return zeilen
@@ -103,6 +107,8 @@ def _erwartet(daten, wahl):
 _LESEN = """els => els.map(el => {
     const text = sel => el.querySelector(sel).textContent.replace(/\\u00a0/g, ' ').trim();
     if (el.classList.contains('kv-kopfzeile')) return ['kopf', el.textContent.trim(), ''];
+    if (el.classList.contains('kv-anders')) return ['anders', [...el.querySelectorAll('button')]
+        .map(b => b.textContent.replace(/\u00a0/g, ' ').trim()).join(' | '), ''];
     if (el.classList.contains('kv-ohne')) return ['ohne', text('.kv-ohne-namen'), text('.kv-summe')];
     return [el.dataset.anbieter, text('.kv-summe'), text('.kv-abstand')];
 })"""
@@ -110,7 +116,8 @@ _LESEN = """els => els.map(el => {
 
 def _gelesen(page):
     return [tuple(z) for z in page.eval_on_selector_all(
-        "#kv-ergebnis .kv-kopfzeile, #kv-ergebnis .kv-zeile, #kv-ergebnis .kv-ohne",
+        "#kv-ergebnis .kv-kopfzeile, #kv-ergebnis .kv-zeile, "
+        "#kv-ergebnis .kv-anders, #kv-ergebnis .kv-ohne",
         _LESEN)]
 
 
@@ -224,4 +231,86 @@ def test_der_guenstigste_steht_ohne_scrollen_da(seite, breite, hoehe):
         '.kv-zeile .kv-summe').getBoundingClientRect().bottom""")
     assert unten <= hoehe
     assert page.evaluate("document.documentElement.scrollWidth") <= breite
+    page.close()
+
+
+def test_ausgefilterte_anbieter_schalten_die_raten_um(seite):
+    browser, basis, daten = seite
+    page = browser.new_page(viewport={"width": 1440, "height": 900})
+    for modell, liste in daten["angebote"].items():
+        for a in liste:
+            andere = {b["raten"] for b in liste if b["anbieter"] == a["anbieter"]
+                      and b["stufe"] == a["stufe"]}
+            if a["raten"] in andere and len(andere) == 1:
+                fremd = next((b for b in liste if b["stufe"] == a["stufe"]
+                              and b["anbieter"] != a["anbieter"]
+                              and b["raten"] != a["raten"]), None)
+                if fremd is None:
+                    continue
+                page.goto(f"{basis}/geraete.html?modell={modell}"
+                          f"&band={a['stufe']}&raten={fremd['raten']}")
+                _pruefe(page, daten)
+                knopf = page.locator(
+                    f'.kv-umschalten[data-raten="{a["raten"]}"]',
+                    has_text=a["anbieter"])
+                assert knopf.count() == 1
+                assert a["anbieter"] not in page.text_content(".kv-ohne") \
+                    if page.locator(".kv-ohne").count() else True
+                knopf.click()
+                assert _wahl(page.url, daten)["raten"] == a["raten"]
+                assert page.locator(
+                    f'.kv-zeile[data-anbieter="{a["anbieter"]}"]').count() == 1
+                _pruefe(page, daten)
+                page.close()
+                return
+    page.close()
+    pytest.skip("kein Anbieter mit nur einer Ratenzahl neben einem anderen")
+
+
+def test_die_erste_zahl_ist_immer_die_groesste(seite):
+    browser, basis, daten = seite
+    page = browser.new_page(viewport={"width": 1440, "height": 900})
+    page.goto(f"{basis}/geraete.html")
+    groessen = page.eval_on_selector_all(
+        "#kv-ergebnis .kv-summe",
+        "els => els.map(e => parseFloat(getComputedStyle(e).fontSize))")
+    assert groessen and groessen[0] == max(groessen)
+    assert all(g < groessen[0] for g in groessen[1:])
+    page.close()
+
+
+def test_anderer_zeitraum_steht_zugeklappt_ohne_betrag_im_blick(seite):
+    browser, basis, daten = seite
+    for modell, liste in daten["angebote"].items():
+        for a in liste:
+            if a["monate"] != gk.HORIZONT and any(
+                    b["monate"] == gk.HORIZONT and b["stufe"] == a["stufe"]
+                    for b in liste):
+                page = browser.new_page(viewport={"width": 1440, "height": 900})
+                page.goto(f"{basis}/geraete.html?modell={modell}"
+                          f"&band={a['stufe']}&raten=alle")
+                _pruefe(page, daten)
+                neben = page.locator(".kv-gruppe--neben")
+                assert neben.count() == 1
+                betrag = neben.locator(".kv-summe").first
+                assert not betrag.is_visible()
+                assert a["anbieter"] in neben.locator(".kv-neben-namen").text_content()
+                neben.locator("summary.kv-neben-kopf").click()
+                # Gegenprobe: aufgeklappt ist der Betrag da.
+                assert betrag.is_visible()
+                page.close()
+                return
+    pytest.skip("kein zweiter Zeitraum neben 24 Monaten im Bestand")
+
+
+def test_neues_geraet_oeffnet_mit_dem_kleinsten_speicher(seite):
+    browser, basis, daten = seite
+    page = browser.new_page(viewport={"width": 1440, "height": 900})
+    page.goto(f"{basis}/geraete.html")
+    ziel = next(f for f in daten["geraete"]
+                if f["hersteller"] == "Apple" and len(f["speicher"]) > 1
+                and f["id"] != daten["start"]["familie"])
+    page.evaluate("f => grKosten.waehle('familie', f)", ziel["id"])
+    assert _wahl(page.url, daten)["modell"] == ziel["speicher"][0]["modell"]
+    _pruefe(page, daten)
     page.close()
