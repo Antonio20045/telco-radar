@@ -69,6 +69,14 @@ on:
     # Sammelfrist wird gegen das Fensterende gedeckelt. Wer hier etwas
     # verschiebt, prueft beides mit.
     - cron: "17 2 * * *"
+    # ERSATZTERMINE (29.09.2026). GitHub verspaetet geplante Laeufe nicht
+    # nur, es laesst sie unter Last auch ganz ausfallen. Zwei weitere
+    # Termine am selben Tag holen einen ausgefallenen Messtag nach. Jeder
+    # Lauf prueft zuerst, ob der Bestand heute schon gemessen ist
+    # (Schritt "Heute schon gemessen?"), und endet dann sofort - ein Tag
+    # bekommt also genau einen Crawl, nicht drei.
+    - cron: "47 9 * * *"
+    - cron: "47 15 * * *"
   workflow_dispatch:
     inputs:
       frist:
@@ -101,14 +109,33 @@ jobs:
           # Datei fuer neu und bricht mit "CONFLICT (add/add)" ab.
           fetch-depth: 0
 
+      # Nur fuer geplante Laeufe: ist der Bestand heute schon gemessen
+      # (`updated` in geraete_tco.json ist das heutige UTC-Datum), endet
+      # der Ersatztermin hier. Ein Lauf von Hand misst immer.
+      - name: Heute schon gemessen?
+        id: heute
+        run: |
+          heute=$(date -u +%Y-%m-%d)
+          stand=$(python3 -c "import json; print(json.load(open('data/state/geraete_tco.json')).get('updated',''))" 2>/dev/null || true)
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$stand" = "$heute" ]; then
+            echo "Bestand ist vom $stand - dieser Ersatztermin crawlt nicht."
+            echo "fertig=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Bestand ist vom ${stand:-unbekannt}, heute ist $heute - es wird gemessen."
+            echo "fertig=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/setup-python@v5
+        if: steps.heute.outputs.fertig != 'true'
         with:
           python-version: "3.11"
 
       - name: Install dependencies
+        if: steps.heute.outputs.fertig != 'true'
         run: pip install -r requirements.txt
 
       - name: Run geraete stage
+        if: steps.heute.outputs.fertig != 'true'
         env:
           PYTHONPATH: src
         run: |
@@ -122,7 +149,7 @@ jobs:
         # Pipeline-Log: ein gruener Lauf kann eine halb tote Quelle verdecken,
         # und ohne das Log ist hinterher nicht zu beantworten, ob eine Quelle
         # nichts FAND oder ob sie SCHEITERTE.
-        if: always()
+        if: always() && steps.heute.outputs.fertig != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: geraeteradar-log-${{ github.run_id }}
@@ -142,6 +169,7 @@ jobs:
       # nicht neu gebaute Seite ist es sehr wohl (der naechste Lauf holt sie
       # nach). Also wird der Bestand zuerst gesichert.
       - name: Commit state
+        if: steps.heute.outputs.fertig != 'true'
         run: |
           git config user.name "telco-radar-bot"
           git config user.email "actions@users.noreply.github.com"
@@ -195,6 +223,7 @@ jobs:
           exit 1
 
       - name: Render site
+        if: steps.heute.outputs.fertig != 'true'
         # OHNE `continue-on-error` (P0-B, 21.09.2026). Bis hierher hiess die
         # Begruendung: der Bestand ist oben schon committet, ein Fehler
         # kostet einen Seitenaufbau, keinen Messtag. Das erste stimmt weiter
@@ -223,6 +252,7 @@ jobs:
           "
 
       - name: Commit site
+        if: steps.heute.outputs.fertig != 'true'
         # Ebenfalls ohne `continue-on-error` (P0-B, 21.09.2026). Der
         # Aufgeben-Weg dieses Schritts endet selbst mit exit 0 und der
         # Zeile "Seite konnte nicht gepusht werden" - ein verlorenes Rennen
@@ -282,6 +312,7 @@ jobs:
       # der Navigationseintrag am 11.08.: gebaut, geprueft, committet - und
       # fuer jeden Leser nicht da.
       - name: Trigger Render deploy
+        if: steps.heute.outputs.fertig != 'true'
         continue-on-error: true
         env:
           HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
@@ -329,7 +360,7 @@ jobs:
       # Schritt liest nur den Bestand; scheitert er selbst (kein Messtag,
       # Zustellfehler), faellt der Job weiterhin rot aus.
       - name: Abdeckungsalarme melden
-        if: always()
+        if: always() && steps.heute.outputs.fertig != 'true'
         env:
           PYTHONPATH: src
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
@@ -339,3 +370,17 @@ jobs:
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
           MAIL_TO: ${{ secrets.MAIL_TO }}
         run: python scripts/geraete_abdeckung_mail.py --root .
+
+      # DER BUENDELWAECHTER (29.09.2026) macht den Lauf ROT, wenn ein
+      # Pflichtanbieter kein Buendel liefert, ein Pflichtmodell ohne belegte
+      # Luecke fehlt, Kombinationen wegfallen oder Leitzahlen unplausibel
+      # springen (`config/geraete_abdeckung.yaml`,
+      # `analyze/buendel_abdeckung.py`). Er steht als letzter Schritt:
+      # Bestand und Seite sind zu diesem Zeitpunkt gesichert, rot wird nur
+      # das Signal. Die Matrix steht in der Zusammenfassung des Laufs.
+      # Er verschickt nichts.
+      - name: Buendelabdeckung pruefen
+        if: always() && steps.heute.outputs.fertig != 'true'
+        env:
+          PYTHONPATH: src
+        run: python scripts/geraete_abdeckungswaechter.py --root . --bericht geraete_abdeckung.md

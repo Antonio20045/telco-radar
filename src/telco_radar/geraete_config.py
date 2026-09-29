@@ -70,6 +70,12 @@ class Einstieg:
     # jede dieser Seiten Crawl-delay-Sekunden kostet, ohne den Katalog
     # treffen zu koennen.
     pfadmuster: object = ""
+    # Das Gegenstueck: Links, deren Adresse EINEN dieser Teilstrings
+    # enthaelt, werden nicht abgerufen. congstars Geraete-Sitemap fuehrt
+    # unter /geraete/ auch Uhren, Kopfhoerer und Tablets (gemessen
+    # 29.09.2026: 13 von 56 Adressen) - jede davon kostet einen Abruf von
+    # rund 900 KB, ohne je ein Smartphone-Buendel zu liefern.
+    ohne_pfadmuster: tuple = ()
 
     @property
     def crawlable(self) -> bool:
@@ -313,9 +319,14 @@ def _parse_einstiege(raw_liste, basis_url: str, anbieter: str = "") -> list:
             pfadmuster = [str(m).strip() for m in roh_muster if str(m).strip()]
         else:
             pfadmuster = str(roh_muster or "").strip()
+        roh_ohne = e.get("ohne_pfadmuster")
+        if isinstance(roh_ohne, (list, tuple)):
+            ohne = tuple(str(m).strip() for m in roh_ohne if str(m).strip())
+        else:
+            ohne = (str(roh_ohne).strip(),) if str(roh_ohne or "").strip() else ()
         out.append(Einstieg(
             url=url, label=str(e.get("label") or "").strip(), kind=kind,
-            pfadmuster=pfadmuster))
+            pfadmuster=pfadmuster, ohne_pfadmuster=ohne))
     return out
 
 

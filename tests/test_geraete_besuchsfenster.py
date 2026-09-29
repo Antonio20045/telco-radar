@@ -479,3 +479,39 @@ def test_der_nachbearbeitungs_haken_haelt_die_besuchszeit_ein(monkeypatch):
         monkeypatch, "User-agent: *\nVisit-time: 0200-0800\n",
         start=_um(3, 0))
     assert _HAKEN_ERLAUBT in protokoll and fehler == []
+
+
+def test_die_haken_abrufe_tragen_den_absender_des_anbieters(monkeypatch):
+    """Nicht nur der robots-Abruf, auch was der Haken selbst holt, geht mit
+    dem Absender des Anbieters hinaus (29.09.2026, 1&1-Tarifstufen: neun
+    Abrufe je Lauf im Haken). Vorher trug der Haken die globale Kennung."""
+    import telco_radar.geraete_pipeline as P
+    from telco_radar.collect.geraete import Adapter
+
+    monkeypatch.setattr(G, "time", _Laufzeit())
+    absender: dict = {}
+
+    def hole(url, kopfzeilen=None, user_agent=None):
+        absender[url] = user_agent
+        if url.endswith("/robots.txt"):
+            return (200, "User-agent: *\n")
+        return (200, "{}")
+
+    def haken(hole_, kopfzeilen, rohbuendel):
+        hole_(_HAKEN_ERLAUBT, kopfzeilen=kopfzeilen)
+        return 0
+
+    monkeypatch.setitem(P.ADAPTER, "ldjson",
+                        Adapter(name="probe", lies=lambda text, url="": [],
+                                ergaenze_buendel=haken))
+    anbieter = _anbieter(name="Vodafone", basis_url="https://www.vodafone.de",
+                         user_agent="TelcoRadar/1.0 (+probe)")
+    P.nachsammle_buendel([_Bilanz("Vodafone", [{"sku": "1"}])],
+                         _Quellen(anbieter), hole, uhr=lambda: _um(3, 0))
+    assert absender[_HAKEN_ERLAUBT] == "TelcoRadar/1.0 (+probe)"
+    # Gegenprobe: ohne eigenen Absender bleibt es beim Aufruf ohne.
+    absender.clear()
+    anbieter = _anbieter(name="Vodafone", basis_url="https://www.vodafone.de")
+    P.nachsammle_buendel([_Bilanz("Vodafone", [{"sku": "1"}])],
+                         _Quellen(anbieter), hole, uhr=lambda: _um(3, 0))
+    assert absender[_HAKEN_ERLAUBT] is None

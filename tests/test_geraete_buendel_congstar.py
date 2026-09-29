@@ -218,14 +218,138 @@ def test_kaputte_nutzlast_wirft():
         lies_buendel("gar kein html")
 
 
-def test_die_geraeteseite_ist_keine_buendelantwort():
-    """Die Produktseite trägt `prefetchedDevice`, aber keinen Plan - ihre
-    Zahlweisen haben ohnehin nur die Hardware. An einer Bündel-Stelle
-    gelesen, ist sie der Fehlerpfad: ein leeres Ergebnis wäre die falsche
-    Meldung für ein geändertes Nutzlastformat."""
-    with pytest.raises(GeraeteAbrufFehler, match="prefetchedPlan"):
-        lies_buendel(_fixture("congstar_produkt_iphone17.html.gz"),
-                     url="https://www.congstar.de/geraete/apple/apple-iphone-17/")
+def test_eine_seite_ohne_matrix_und_ohne_plan_wirft():
+    """Eine Flight-Nutzlast mit Geraet, aber ohne Tarifmatrix und ohne
+    Tarifseitenplan ist keine Buendelantwort - der Fehlerpfad, kein leeres
+    Ergebnis. Gebaut aus der echten Produktseite, indem nur die zwei
+    Schluessel der Matrix umbenannt werden."""
+    roh = _fixture(_IPHONE17_HEUTE)
+    kaputt = (roh.replace("prefetchedPlansWithDevicesPrices", "entferntA")
+              .replace("prefetchedPlans\\\"", "entferntB\\\""))
+    assert "prefetchedPlansWithDevicesPrices" not in kaputt
+    with pytest.raises(GeraeteAbrufFehler, match="keine Buendelantwort"):
+        lies_buendel(kaputt, url=_IPHONE17_URL)
+
+
+# ==========================================================================
+# Die PRODUKTseite traegt die ganze Tarifmatrix (29.09.2026)
+# ==========================================================================
+#
+# `congstar_produkt_iphone17_20260929.html.gz` und
+# `congstar_produkt_pixel11pro_20260929.html.gz` sind gespeicherte echte
+# Abrufe vom 29.09.2026 (HTTP 200, TelcoRadar/1.0, reiner GET) von
+# /geraete/apple/apple-iphone-17/ und /geraete/google/google-pixel-11-pro/.
+# Bis dahin warf `lies_buendel` auf jeder Produktseite und congstar lieferte
+# nur die vier Aufmachergeraete der Tarifseiten als Buendel (10 SKUs).
+
+_IPHONE17_HEUTE = "congstar_produkt_iphone17_20260929.html.gz"
+_PIXEL11PRO_HEUTE = "congstar_produkt_pixel11pro_20260929.html.gz"
+_IPHONE17_URL = "https://www.congstar.de/geraete/apple/apple-iphone-17/"
+_ACHT_TARIFE = {"Allnet Flat XS", "Allnet Flat XS Flex", "Allnet Flat S",
+                "Allnet Flat S Flex", "Allnet Flat M", "Allnet Flat M Flex",
+                "Allnet Flat L", "Allnet Flat L Flex"}
+
+
+def _sichtbarer_text(html: str) -> str:
+    """Der serverseitig gerenderte Text derselben Seite - das, was ein
+    Mensch in der Voreinstellung sieht (erste Variante, Allnet Flat M)."""
+    import re
+    ohne_skripte = re.sub(r"<script.*?</script>", "", html, flags=re.S)
+    text = re.sub(r"<[^>]+>", " | ", ohne_skripte)
+    text = re.sub(r"(\s*\|\s*)+", " | ", text)
+    return re.sub(r"\s+", " ", text)
+
+
+def test_die_produktseite_liefert_jeden_tarif_jeden_speicher_jede_laufzeit():
+    for name, speicher in ((_IPHONE17_HEUTE, {256, 512}),
+                           (_PIXEL11PRO_HEUTE, {256, 512})):
+        saetze = lies_buendel(_fixture(name), url=_IPHONE17_URL)
+        kombis = {(s["tarif_name"], s["speicher_gb"], s["laufzeit_monate"])
+                  for s in saetze}
+        erwartet = {(t, g, n) for t in _ACHT_TARIFE for g in speicher
+                    for n in (24, 36)}
+        assert kombis == erwartet, name
+        assert len(saetze) == 32, name
+        assert all(s["quelle"] == "congstar_produktseite" for s in saetze)
+        # Jede PlanVariant verlinkt ihr eigenes Pflichtblatt - die Bruecke
+        # zum Tarifbestand (Modulkopf) steht an jedem Satz.
+        assert all(s["tarif_slug"] for s in saetze)
+
+
+def test_congstar_bietet_mit_geraet_keine_xl_an():
+    """Gemessen: die Produktseiten nennen in `prefetchedPlans` nur XS/S/M/L
+    (+Flex). Taucht XL auf, soll dieser Test auffallen, nicht still fehlen."""
+    for name in (_IPHONE17_HEUTE, _PIXEL11PRO_HEUTE):
+        namen = {s["tarif_name"] for s in lies_buendel(_fixture(name))}
+        assert not [n for n in namen if "XL" in n], name
+
+
+def test_iphone17_256_gb_allnet_flat_m_24_monate_nach_rechnung():
+    """Stichprobe am gespeicherten Abruf, per Hand aus der Nutzlast
+    nachgelesen: Zuzahlung 19, Rate 39,75, Tarif 24, Anschluss 0."""
+    saetze = lies_buendel(_fixture(_IPHONE17_HEUTE), url=_IPHONE17_URL)
+    s = next(x for x in saetze if x["speicher_gb"] == 256
+             and x["tarif_name"] == "Allnet Flat M"
+             and x["laufzeit_monate"] == 24)
+    assert (s["geraet_zuzahlung"], s["geraet_monatsrate"],
+            s["tarif_monatlich"], s["anschlusspreis"], s["tarif_slug"]) \
+        == (19.0, 39.75, 24.0, 0.0, "540")
+    assert s["url"] == _IPHONE17_URL
+
+
+def test_der_maximale_gesamtpreis_der_seite_ist_zuzahlung_plus_raten():
+    """Gegenprobe gegen den SICHTBAREN Text derselben Antwort: die Seite
+    zeigt in der Voreinstellung (Allnet Flat M, 36 Raten) den maximalen
+    Gesamtpreis - er muss Zuzahlung + 36 x Rate des M-Satzes sein."""
+    import re
+    html = _fixture(_IPHONE17_HEUTE)
+    treffer = re.search(r"wenn du dein Gerät behältst: \| ([\d.]+),(\d\d) €",
+                        _sichtbarer_text(html))
+    assert treffer, "Fixture ohne sichtbaren Gesamtpreis"
+    seite = float(treffer.group(1).replace(".", "")) + int(treffer.group(2)) / 100
+    s = next(x for x in lies_buendel(html) if x["speicher_gb"] == 256
+             and x["tarif_name"] == "Allnet Flat M"
+             and x["laufzeit_monate"] == 36)
+    assert s["geraet_zuzahlung"] + 36 * s["geraet_monatsrate"] == seite == 973.0
+
+
+def test_die_rate_haengt_am_tarif_wie_die_seite_es_sagt():
+    """Die Seite nennt je Tarif "Zusätzlich N € Rabatt auf dein Gerät"
+    gegenueber der Flex-Variante. Dieselbe Zahl muss aus den Raten folgen:
+    36 x (Flex-Rate - Tarif-Rate). Wer die Matrix nicht je PlanVariant
+    liest (etwa ueberall die M-Rate), faellt hier durch."""
+    import re
+    html = _fixture(_IPHONE17_HEUTE)
+    text = _sichtbarer_text(html)
+    saetze = [s for s in lies_buendel(html)
+              if s["speicher_gb"] == 256 and s["laufzeit_monate"] == 36]
+    rate = {s["tarif_name"]: s["geraet_monatsrate"] for s in saetze}
+    raten = set()
+    for stufe in ("XS", "S", "M", "L"):
+        treffer = re.search(r"Zusätzlich (\d+) € Rabatt auf dein Gerät \| "
+                            r"[\d ]+GB \| ([\d,]+) € \| mtl\. \| Allnet Flat "
+                            + stufe + r" \|", text)
+        assert treffer, stufe
+        rabatt = 36 * (rate[f"Allnet Flat {stufe} Flex"]
+                       - rate[f"Allnet Flat {stufe}"])
+        assert rabatt == float(treffer.group(1)), stufe
+        raten.add(rate[f"Allnet Flat {stufe}"])
+    assert len(raten) == 4, "vier Tarife, vier verschiedene Raten"
+
+
+def test_alle_acht_tarife_der_produktseite_loesen_gegen_den_echten_bestand():
+    bestand = Tarifbestand.aus_datei(_WURZEL / "data" / "state" / "tarife.jsonl")
+    ergaenze_pib_slug(bestand)
+    rohsaetze = [{**s, "anbieter": "congstar",
+                  "sku_id": f"sku-{s['speicher_gb']}", "quelle_url": s["url"]}
+                 for s in lies_buendel(_fixture(_IPHONE17_HEUTE),
+                                       url=_IPHONE17_URL)]
+    bilanz = aus_rohsaetzen(rohsaetze, bestand, "2026-09-29")
+    assert bilanz.ohne_tarif == 0, bilanz.offene_tarife
+    assert len(bilanz.buendel) == 32
+    assert {b.tarif_name for b in bilanz.buendel} == _ACHT_TARIFE
+    assert all(b.tarif_id.startswith("congstar:") for b in bilanz.buendel)
+    assert len({b.id for b in bilanz.buendel}) == 32, "Schluessel kollidieren"
 
 
 def test_beide_ratenlaufzeiten_werden_erhoben():
@@ -495,52 +619,80 @@ def test_adapter_registry_traegt_congstars_buendelhaken():
     assert adapter.loese_tarifnamen is None
 
 
-def test_auf_den_produktseiten_wird_keine_buendellesart_gerufen(katalog, farben,
-                                                                 monkeypatch):
-    """B3-Befund am ersten Lauf: der generische Ernte-Weg ruft die zweite
-    Lesart auf JEDER Produktseite auf (Vodafone-Muster, B1) - congstars
-    Produktseiten tragen aber keinen Plan, der Aufruf warf auf jeder der
-    55 Seiten. `buendel_auf_produktseite=False` schaltet ihn ab; die
-    Bündel-Einstiege rufen `lies_buendel` weiterhin (siehe Test oben)."""
-    aufrufe = []
-    monkeypatch.setattr(
-        "telco_radar.collect.geraete.congstar.lies_buendel",
-        lambda text, url="": aufrufe.append(url) or [])
+def _congstar_aus_konfiguration():
+    from telco_radar.geraete_config import lade_quellen
+    quellen = lade_quellen(_WURZEL)
+    return next(a for a in quellen.anbieter if a.name == "congstar")
+
+
+def _sitemap_hole(abgerufen: list, seite: str):
+    sitemap = _fixture("congstar_sitemap_devices_20260929.xml")
 
     def hole(url, kopfzeilen=None, user_agent=None):
         if url.endswith("/robots.txt"):
             return _ROBOTS_FREI
         if url.endswith("/sitemap/devices.xml"):
-            return 200, ('<?xml version="1.0"?><urlset>'
-                         '<url><loc>https://www.congstar.de/geraete/apple/'
-                         'apple-iphone-17/</loc></url></urlset>')
-        return 200, _fixture("congstar_produkt_iphone17.html.gz")
+            return 200, sitemap
+        abgerufen.append(url)
+        return 200, seite
+    return hole
 
-    anbieter = Anbieter(
-        name="congstar", typ="discount", netz="Telekom",
-        methode="congstar_next", basis_url="https://www.congstar.de",
-        rate_limit_sekunden=0,
-        einstiege=[Einstieg(
-            url="https://www.congstar.de/sitemap/devices.xml",
-            kind="sitemap", pfadmuster="/geraete/")])
-    bilanz = sammle_anbieter(anbieter, katalog, farben, hole, "2026-09-08",
-                             RobotsWaechter(hole=hole))
+
+def test_auf_den_produktseiten_wird_die_buendelmatrix_gelesen(katalog, farben):
+    """Der ausgelieferte congstar-Eintrag gegen die echte Sitemap vom
+    29.09.2026: jede Produktseite liefert ihre Buendel (hier ueberall die
+    echte iPhone-17-Seite als Antwort). Bis 29.09.2026 stand
+    `buendel_auf_produktseite=False`, und von Produktseiten kam kein
+    einziges Buendel."""
+    abgerufen: list = []
+    anbieter = _congstar_aus_konfiguration()
+    anbieter.rate_limit_sekunden = 0
+    bilanz = sammle_anbieter(anbieter, katalog, farben,
+                             _sitemap_hole(abgerufen, _fixture(_IPHONE17_HEUTE)),
+                             "2026-09-29", RobotsWaechter(hole=_sitemap_hole(
+                                 [], "")))
     assert bilanz.status == "ok"
-    assert aufrufe == [], "lies_buendel wurde auf einer Produktseite gerufen"
-    # Vodafone trägt die Flagge nicht explizit - die Voreinstellung True
-    # hält seinen B1-Weg unverändert.
-    assert ADAPTER["vodafone_api"].buendel_auf_produktseite is True
+    assert ADAPTER["congstar_next"].buendel_auf_produktseite is True
+    assert {b["url"] for b in bilanz.buendel} == set(abgerufen)
+    assert len(bilanz.buendel) == 32 * len(abgerufen)
+    assert bilanz.vollstaendig
 
 
-def test_die_konfiguration_traegt_vier_buendel_einstiege():
-    from telco_radar.geraete_config import lade_quellen
-    quellen = lade_quellen(_WURZEL)
-    anbieter = next(a for a in quellen.anbieter if a.name == "congstar")
-    buendel = [e for e in anbieter.einstiege if e.kind == "buendel"]
-    assert len(buendel) == 4
-    assert all(e.url.startswith(
-        "https://www.congstar.de/handytarife/allnet-flat-tarife/")
-        for e in buendel)
+def test_die_sitemap_holt_keine_uhren_kopfhoerer_oder_tablets(katalog, farben):
+    """56 Adressen in der echten Sitemap, 13 davon keine Smartphones
+    (Apple Watch x5, AirPods x2, iPad x3, Galaxy Tab, Anio, Xplora) -
+    `ohne_pfadmuster` laesst sie aus. Gegenprobe: derselbe Einstieg ohne
+    Ausschluss holt alle 56."""
+    anbieter = _congstar_aus_konfiguration()
+    anbieter.rate_limit_sekunden = 0
+    abgerufen: list = []
+    sammle_anbieter(anbieter, katalog, farben,
+                    _sitemap_hole(abgerufen, _fixture(_IPHONE17_HEUTE)),
+                    "2026-09-29", RobotsWaechter(hole=_sitemap_hole([], "")))
+    assert len(abgerufen) == 43
+    for marke in ("watch", "airpods", "ipad", "galaxy-tab", "/anio/",
+                  "/xplora/"):
+        assert not [u for u in abgerufen if marke in u], marke
+    assert any("apple-iphone-17/" in u for u in abgerufen)
+    assert any("samsung-galaxy-xcover-7-ee" in u for u in abgerufen)
+
+    einstieg = anbieter.einstiege[0]
+    anbieter.einstiege = [Einstieg(url=einstieg.url, kind=einstieg.kind,
+                                   pfadmuster=einstieg.pfadmuster)]
+    ohne_ausschluss: list = []
+    sammle_anbieter(anbieter, katalog, farben,
+                    _sitemap_hole(ohne_ausschluss, _fixture(_IPHONE17_HEUTE)),
+                    "2026-09-29", RobotsWaechter(hole=_sitemap_hole([], "")))
+    assert len(ohne_ausschluss) == 56
+
+
+def test_die_konfiguration_liest_buendel_von_den_produktseiten():
+    anbieter = _congstar_aus_konfiguration()
+    # Die Tarifseiten fuehren nur vier Aufmachergeraete - sie sind durch
+    # die Produktseiten vollstaendig abgedeckt und keine Einstiege mehr.
+    assert [e for e in anbieter.einstiege if e.kind == "buendel"] == []
+    sitemap = [e for e in anbieter.einstiege if e.kind == "sitemap"]
+    assert len(sitemap) == 1 and sitemap[0].ohne_pfadmuster
     # Der ehrliche Absender ist per Anbieter überschrieben (B2-Muster) -
-    # sonst gingen die Tarifseiten mit der globalen Chrome-Kennung hinaus.
+    # sonst gingen die Produktseiten mit der globalen Chrome-Kennung hinaus.
     assert anbieter.user_agent.startswith("TelcoRadar/1.0")

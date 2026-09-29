@@ -36,6 +36,7 @@ import pytest
 
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
 from telco_radar.collect.geraete import ADAPTER, GeraeteAbrufFehler, sammle_anbieter
+from telco_radar.collect.geraete import vodafone as vodafone_modul
 from telco_radar.collect.geraete.robots import RobotsWaechter
 from telco_radar.collect.geraete.vodafone import (
     _hash_namen_aus_tarifantwort,
@@ -373,29 +374,31 @@ def test_unlesbare_tarifantwort_liefert_leeres_woerterbuch():
     assert _hash_namen_aus_tarifantwort(json.dumps({"data": []})) == {}
 
 
-def test_loese_tarifnamen_fuellt_bekannte_hashes_und_laesst_rest_leer():
-    rohbuendel = [s for s in _saetze() if s["sku"] == "58060"]
-    assert len(rohbuendel) == 4
+def test_rueckfall_loest_vorschau_ohne_eigenen_eintrag_ueber_den_hash():
+    """Die Fixture vom 05.09.2026 traegt nur 58060. Diese Variante wird
+    vollstaendig ersetzt; 58061 und 58063 behalten ihre Vorschau und
+    bekommen ihren Namen nur, wo der Hash zufaellig in der Antwort steht."""
+    rohbuendel = _saetze()
     aufrufe = []
 
     def hole(url, kopfzeilen=None):
         aufrufe.append((url, kopfzeilen))
-        assert "hardwareId=58060" in url
         assert kopfzeilen == {"x-api-key": "geheim"}
         return 200, _fixture("vodafone_tarif_hardware.json")
 
-    aufgeloest = loese_tarifnamen(hole, {"x-api-key": "geheim"}, rohbuendel)
-    assert aufgeloest == 2
-    assert len(aufrufe) == 1                     # EIN GET je hardwareId
-    je_hash = {s["tarif_slug"]: s["tarif_name"] for s in rohbuendel}
-    assert je_hash[_HASH_RATE_12] == "Mobil S"
-    assert je_hash[_HASH_RATE_24] == "Mobil M"
-    assert je_hash[_HASH_SUB] == ""               # bleibt unaufgeloest
-    assert je_hash[_HASH_RATE_36] == ""
+    loese_tarifnamen(hole, {"x-api-key": "geheim"}, rohbuendel)
+    assert len(aufrufe) == 1                     # EIN GET je Geraet
+    assert "hardwareId=58060,58061,58063&" in aufrufe[0][0]
+    je_sku = {}
+    for s in rohbuendel:
+        je_sku.setdefault(s["sku"], []).append(s)
+    assert len(je_sku["58060"]) == 19            # 5 x 3 Mobil + 4 FamilyCard
+    assert all(s["tarif_name"] for s in je_sku["58060"])
+    assert len(je_sku["58061"]) == 4             # Vorschau bleibt
+    assert len(je_sku["58063"]) == 4
 
 
-def test_loese_tarifnamen_macht_nur_einen_get_je_hardwareid():
-    """Zwoelf Rohsaetze, drei eindeutige `hardwareId` - nicht zwoelf GETs."""
+def test_loese_tarifnamen_macht_einen_get_je_geraet_nicht_je_variante():
     rohbuendel = _saetze()
     aufrufe = []
 
@@ -404,18 +407,31 @@ def test_loese_tarifnamen_macht_nur_einen_get_je_hardwareid():
         return 200, _fixture("vodafone_tarif_hardware.json")
 
     loese_tarifnamen(hole, {}, rohbuendel)
-    assert len(aufrufe) == 3
-    assert len({u.split("hardwareId=")[1].split("&")[0] for u in aufrufe}) == 3
+    assert len(aufrufe) == 1
+
+
+def test_ein_deckel_teilt_die_ids_in_mehrere_abrufe(monkeypatch):
+    monkeypatch.setattr(vodafone_modul, "_IDS_JE_ABRUF", 2)
+    monkeypatch.setattr(vodafone_modul, "_TARIF_RATE_LIMIT", 0.0)
+    aufrufe = []
+
+    def hole(url, kopfzeilen=None):
+        aufrufe.append(url.split("hardwareId=")[1].split("&")[0])
+        return 200, _fixture("vodafone_tarif_hardware.json")
+
+    loese_tarifnamen(hole, {}, _saetze())
+    assert aufrufe == ["58060,58061", "58063"]
 
 
 def test_loese_tarifnamen_uebersteht_einen_scheiternden_abruf():
     rohbuendel = [s for s in _saetze() if s["sku"] == "58060"]
+    vorher = [dict(s) for s in rohbuendel]
 
     def hole(url, kopfzeilen=None):
         raise ConnectionError("kein Netz")
 
     assert loese_tarifnamen(hole, {}, rohbuendel) == 0
-    assert all(s["tarif_name"] == "" for s in rohbuendel)
+    assert rohbuendel == vorher                  # nicht gelesen ist nicht leer
 
 
 def test_loese_tarifnamen_uebersteht_einen_fehlerstatus():
@@ -425,6 +441,188 @@ def test_loese_tarifnamen_uebersteht_einen_fehlerstatus():
         return 404, "nicht gefunden"
 
     assert loese_tarifnamen(hole, {}, rohbuendel) == 0
+    assert len(rohbuendel) == 4
+
+
+# ==========================================================================
+# Alle Tarife x alle Laufzeiten (Befund 29.09.2026)
+# ==========================================================================
+
+_MOBIL = ("Mobil XS", "Mobil S", "Mobil M", "Mobil L", "Mobil XL")
+
+
+def _vorschau_2909():
+    """Die Detailantwort vom 29.09.2026 (Pixel 11, sechs Varianten), wie
+    der Sammler sie anreichert - `sku_id` je Variante eindeutig."""
+    return [{**s, "anbieter": "Vodafone", "sku_id": f"pixel-11-{s['sku']}",
+             "zustand": "neu", "quelle_url": s["url"]}
+            for s in lies_buendel(_fixture(
+                "vodafone_virtualitem_2026-09-29.json"))]
+
+
+def _vollstaendig_2909():
+    rohbuendel = _vorschau_2909()
+    aufrufe = []
+
+    def hole(url, kopfzeilen=None):
+        aufrufe.append(url)
+        return 200, _fixture("vodafone_tarif_hardware_geraet_2026-09-29.json")
+
+    gesetzt = loese_tarifnamen(hole, {}, rohbuendel)
+    return rohbuendel, aufrufe, gesetzt
+
+
+def test_die_vorschau_koppelt_jede_tarifstufe_an_eine_laufzeit():
+    """Die Ursache der Luecke, an der echten Antwort festgehalten: vier
+    Angebote je Variante, Tarifbetrag 41,95 (Mobil S) nur mit 12, 51,95
+    (Mobil M) nur mit 24, 31,95 (Mobil XS) nur mit 36 Monaten."""
+    saetze = _vorschau_2909()
+    assert len(saetze) == 24
+    paare = {(s["tarif_monatlich"], s["laufzeit_monate"]) for s in saetze}
+    assert paare == {(69.99, 24), (41.95, 12), (51.95, 24), (31.95, 36)}
+
+
+def test_nur_ein_teil_der_vorschau_hashes_steht_in_der_tarifantwort():
+    namen = _hash_namen_aus_tarifantwort(
+        _fixture("vodafone_tarif_hardware_geraet_2026-09-29.json"))
+    treffer = [s for s in _vorschau_2909() if s["tarif_slug"] in namen]
+    assert len(treffer) == 9
+
+
+def test_jede_variante_bekommt_alle_tarife_und_alle_laufzeiten():
+    rohbuendel, aufrufe, gesetzt = _vollstaendig_2909()
+    assert len(aufrufe) == 1
+    assert ("hardwareId=58060,58061,58063,58065,58066,58068&"
+            in aufrufe[0])
+    assert len(rohbuendel) == 6 * 19
+    assert gesetzt == 6 * 19
+    for sku in ("58060", "58061", "58063", "58065", "58066", "58068"):
+        paare = {(s["tarif_name"], s["laufzeit_monate"])
+                 for s in rohbuendel if s["sku"] == sku}
+        for tarif in _MOBIL:
+            for laufzeit in (12, 24, 36):
+                assert (tarif, laufzeit) in paare, (sku, tarif, laufzeit)
+    # Gegenprobe: ein Paar, das die Antwort nicht nennt, entsteht nicht.
+    assert not any(s["tarif_name"] == "Mobil XL" and s["laufzeit_monate"] == 6
+                   for s in rohbuendel)
+
+
+def test_die_anreicherung_des_sammlers_bleibt_je_variante_erhalten():
+    rohbuendel, _, _ = _vollstaendig_2909()
+    for s in rohbuendel:
+        assert s["sku_id"] == f"pixel-11-{s['sku']}"
+        assert s["anbieter"] == "Vodafone"
+        assert s["zustand"] == "neu"
+        assert s["quelle_url"].startswith("https://www.vodafone.de/")
+        assert s["quelle"] == "vodafone_buendel"
+
+
+def test_betraege_kommen_unveraendert_aus_der_tarifantwort():
+    """Mobil L, 24 Monate, 58060 - gegen die rohe Antwort gelesen."""
+    roh = json.loads(_fixture("vodafone_tarif_hardware_geraet_2026-09-29.json"))
+    eintrag = next(e for e in roh["data"]
+                   if e["hardware"]["hardwareId"] == "58060")
+    tarif = next(t for t in eintrag["tariffs"] if t["tariffName"] == "Mobil L")
+    komp = next(k for a in tarif["atomics"] for k in a["prices"]["composition"]
+                if k["financingDuration"] == 24)
+    teile = komp["priceByComponent"]
+    erwartet_tarif = teile["tariff"]["priceByType"]["rate"]["month"][
+        "withoutDiscounts"]["gross"]
+    erwartet_rate = teile["hardware"]["priceByType"]["rate"]["month"][
+        "withoutDiscounts"]["gross"]
+    erwartet_zuzahlung = teile["hardware"]["priceByType"]["rate"]["onetime"][
+        "withoutDiscounts"]["gross"]
+
+    rohbuendel, _, _ = _vollstaendig_2909()
+    satz = next(s for s in rohbuendel if s["sku"] == "58060"
+                and s["tarif_name"] == "Mobil L" and s["laufzeit_monate"] == 24)
+    assert satz["tarif_monatlich"] == erwartet_tarif == 61.95
+    assert satz["geraet_monatsrate"] == erwartet_rate == 39.75
+    assert satz["geraet_zuzahlung"] == erwartet_zuzahlung == 1.0
+    assert satz["anschlusspreis"] == 0.0
+    assert satz["tarif_slug"] == komp["offerCoreHash"]
+
+
+def test_eine_fehlende_variante_behaelt_ihre_vorschau():
+    """Nur 58060 steht in der (gekuerzten echten) Antwort: die anderen
+    fuenf Varianten verlieren nichts."""
+    roh = json.loads(_fixture("vodafone_tarif_hardware_geraet_2026-09-29.json"))
+    roh["data"] = [e for e in roh["data"]
+                   if e["hardware"]["hardwareId"] == "58060"]
+    rohbuendel = _vorschau_2909()
+
+    def hole(url, kopfzeilen=None):
+        return 200, json.dumps(roh)
+
+    loese_tarifnamen(hole, {}, rohbuendel)
+    je_sku = {}
+    for s in rohbuendel:
+        je_sku.setdefault(s["sku"], []).append(s)
+    assert len(je_sku["58060"]) == 19
+    for sku in ("58061", "58063", "58065", "58066", "58068"):
+        assert len(je_sku[sku]) == 4
+
+
+def test_unlesbare_kombinationen_lassen_die_vorschau_stehen():
+    """Clean Code 6: steht eine Variante in der Antwort, besteht aber keine
+    ihrer Kombinationen die Probe (hier: `priceByComponent` fehlt, wie bei
+    einem geaenderten Format), bleibt ihre Vorschau stehen - einmal, ohne
+    Doppel - statt dass die Variante still leer wird."""
+    roh = json.loads(_fixture("vodafone_tarif_hardware_geraet_2026-09-29.json"))
+    for e in roh["data"]:
+        if e["hardware"]["hardwareId"] == "58060":
+            for t in e["tariffs"]:
+                for a in t["atomics"]:
+                    for k in a["prices"]["composition"]:
+                        k.pop("priceByComponent", None)
+    rohbuendel = _vorschau_2909()
+    vorher = [s for s in rohbuendel if s["sku"] == "58060"]
+
+    def hole(url, kopfzeilen=None):
+        return 200, json.dumps(roh)
+
+    loese_tarifnamen(hole, {}, rohbuendel)
+    nachher = [s for s in rohbuendel if s["sku"] == "58060"]
+    assert len(nachher) == len(vorher) == 4
+    assert len({id(s) for s in nachher}) == 4
+    # Gegenprobe: die uebrigen Varianten sind voll ersetzt.
+    assert len([s for s in rohbuendel if s["sku"] == "58061"]) == 19
+
+
+def _bestand_vodafone_mobil():
+    """Die zehn Blaetter, die der Tarif-Sammler fuer Vodafone schreibt
+    (Tarif und "mit Smartphone"), Grundpreise wie in tarife.jsonl."""
+    saetze = []
+    for stufe, preis in (("XS", 29.95), ("S", 39.95), ("M", 49.95),
+                         ("L", 59.95), ("XL", 79.95)):
+        slug = stufe.lower()
+        saetze.append({"tarif_id": f"vodafone:vodafone-mobil-{slug}",
+                       "anbieter": "Vodafone",
+                       "name": f"Vodafone Mobil {stufe}",
+                       "grundgebuehr": preis})
+        saetze.append({"tarif_id": f"vodafone:vodafone-mobil-{slug}"
+                                   "-mit-smartphone",
+                       "anbieter": "Vodafone",
+                       "name": f"Vodafone Mobil {stufe} mit Smartphone",
+                       "grundgebuehr": preis})
+    return Tarifbestand(saetze)
+
+
+def test_alle_mobil_tarife_werden_buendel_familycard_bleibt_draussen():
+    rohbuendel, _, _ = _vollstaendig_2909()
+    bilanz = aus_rohsaetzen(rohbuendel, _bestand_vodafone_mobil(),
+                            "2026-09-29")
+    assert len(bilanz.buendel) == 6 * 15
+    assert {b.tarif_id for b in bilanz.buendel} == {
+        f"vodafone:vodafone-mobil-{s}-mit-smartphone"
+        for s in ("xs", "s", "m", "l", "xl")}
+    assert {b.laufzeit_monate for b in bilanz.buendel} == {12, 24, 36}
+    # Die Buendel-ID traegt Tarif und Laufzeit: keine zwei gleich.
+    assert len({b.id for b in bilanz.buendel}) == 6 * 15
+    # FamilyCard ist eine Zusatzkarte ohne eigenes Blatt im Bestand.
+    assert bilanz.ohne_tarif == 6 * 4
+    assert set(bilanz.offene_tarife) == {
+        "FamilyCard S", "FamilyCard M", "FamilyCard L", "FamilyCard XL"}
 
 
 # ==========================================================================
@@ -434,29 +632,26 @@ def test_loese_tarifnamen_uebersteht_einen_fehlerstatus():
 def _bestand_mit_mobil_s():
     """Der Tarifbestand, wie ihn der Tarif-Sammler aus einem Vodafone-PIB
     schreibt - Namen tragen dort das Markenpraefix, die Tarifantwort
-    (`_hash_namen_aus_tarifantwort`) nicht. `ueber_namen()` gleicht das
-    ueber `_ohne_marke` auf BEIDEN Seiten aus (siehe `tarif_bezug.py`)."""
+    (`tariffName`) nicht. `ueber_namen()` gleicht das ueber `_ohne_marke`
+    auf BEIDEN Seiten aus (siehe `tarif_bezug.py`)."""
     return Tarifbestand([
         {"tarif_id": "vodafone:vodafone-mobil-s", "anbieter": "Vodafone",
          "name": "Vodafone Mobil S", "grundgebuehr": 39.95},
     ])
 
 
+def _mobil_s_12():
+    rohbuendel, _, _ = _vollstaendig_2909()
+    return next(s for s in rohbuendel if s["sku"] == "58060"
+                and s["tarif_name"] == "Mobil S"
+                and s["laufzeit_monate"] == 12)
+
+
 def test_ein_aufgeloester_tarifname_ergibt_ein_echtes_buendel():
-    """Der Weg zu Ende gegangen: Hash -> Klarname (Tarifschnittstelle) ->
+    """Der Weg zu Ende gegangen: `tariffName` (Tarifschnittstelle) ->
     `tarif_id` (Tarifbestand, ueber den Namen ohne Markenpraefix)."""
-    rohbuendel = [s for s in _saetze() if s["tarif_slug"] == _HASH_RATE_12]
-    assert len(rohbuendel) == 1
-
-    def hole(url, kopfzeilen=None):
-        return 200, _fixture("vodafone_tarif_hardware.json")
-
-    loese_tarifnamen(hole, {}, rohbuendel)
-    assert rohbuendel[0]["tarif_name"] == "Mobil S"
-
-    satz = {**rohbuendel[0], "anbieter": "Vodafone", "sku_id": "google-pixel-11-256gb-frost",
-            "quelle_url": rohbuendel[0]["url"]}
-    bilanz = aus_rohsaetzen([satz], _bestand_mit_mobil_s(), "2026-09-05")
+    satz = _mobil_s_12()
+    bilanz = aus_rohsaetzen([satz], _bestand_mit_mobil_s(), "2026-09-29")
     assert len(bilanz.buendel) == 1
     buendel = bilanz.buendel[0]
     assert buendel.tarif_id == "vodafone:vodafone-mobil-s"
@@ -471,15 +666,7 @@ def test_ein_buendel_haengt_am_geraeteblatt_und_behaelt_seine_id():
     das Buendel daran (Datenvolumen und Stufe stehen dort). Die Buendel-ID
     kommt aus dem Tarifnamen der Seite und bleibt - sonst zerfiele der
     Verlauf. Gegenprobe: ohne Geraeteblatt bleibt das Tarifblatt."""
-    rohbuendel = [s for s in _saetze() if s["tarif_slug"] == _HASH_RATE_12]
-
-    def hole(url, kopfzeilen=None):
-        return 200, _fixture("vodafone_tarif_hardware.json")
-
-    loese_tarifnamen(hole, {}, rohbuendel)
-    satz = {**rohbuendel[0], "anbieter": "Vodafone",
-            "sku_id": "google-pixel-11-256gb-frost",
-            "quelle_url": rohbuendel[0]["url"]}
+    satz = _mobil_s_12()
     beide = Tarifbestand([
         {"tarif_id": "vodafone:vodafone-mobil-s", "anbieter": "Vodafone",
          "name": "Vodafone Mobil S", "grundgebuehr": 39.95},

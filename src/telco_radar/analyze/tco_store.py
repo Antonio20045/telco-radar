@@ -109,7 +109,7 @@ _MESSFELDER = ("tarif_id", "tarif_id_guete", "tarif_monatlich",
                "tarif_bindung_monate", "buendel_monatlich",
                "geraet_zuzahlung", "geraet_monatsrate",
                "laufzeit_monate", "anschlusspreis", "quelle_url",
-               "abgerufen_am", "zustand")
+               "abgerufen_am", "zustand", "herleitung")
 
 # `bindung_monate` und `volumen_gb` seit S-5 (09.09.2026): dieselbe
 # Positivliste-Pflicht wie bei `_MESSFELDER` - ein Messfeld, das hier

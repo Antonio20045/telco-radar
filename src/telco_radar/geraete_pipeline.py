@@ -362,8 +362,16 @@ def nachsammle_buendel(bilanzen: list, quellen, hole: Callable,
         waechter = RobotsWaechter(
             hole=(lambda url, ua=user_agent: hole(url, user_agent=ua))
             if user_agent else hole)
+        # DIE HAKEN-ABRUFE TRAGEN DENSELBEN ABSENDER (29.09.2026). Bis
+        # hierher ging nur der robots-Abruf mit dem Absender des Anbieters
+        # hinaus; was der Haken selbst holte, trug die globale Kennung aus
+        # settings.yaml. Seit 1&1s Haken neun Seiten mehr holt
+        # (Tarifstufen), waere das der groessere Teil seiner Abrufe.
+        hole_anbieter = ((lambda url, *args, ua=user_agent, **kwargs:
+                          hole(url, *args, user_agent=ua, **kwargs))
+                         if user_agent else hole)
         gebremst = hole_mit_robots(
-            hole, waechter,
+            hole_anbieter, waechter,
             getattr(anbieter, "rate_limit_sekunden", 0.0) or 0.0, uhr)
         for haken, meldung in (
                 (adapter.loese_tarifnamen,
