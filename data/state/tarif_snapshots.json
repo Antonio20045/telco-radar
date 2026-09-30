@@ -61,7 +61,7 @@
    "|59.99€",
    "|5gb"
   ],
-  "stand": "2026-09-25"
+  "stand": "2026-09-30"
  },
  "https://www.o2online.de/mobilfunk/prepaid/": {
   "werte": [
@@ -90,7 +90,7 @@
    "|80gb",
    "|999gb"
   ],
-  "stand": "2026-09-25"
+  "stand": "2026-09-30"
  },
  "https://www.blau.de/tarife/": {
   "werte": [
@@ -121,7 +121,7 @@
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-09-25"
+  "stand": "2026-09-30"
  },
  "https://www.1und1.de/handytarife": {
   "werte": [
@@ -155,7 +155,7 @@
    "|50gb",
    "|9.99€"
   ],
-  "stand": "2026-09-25"
+  "stand": "2026-09-30"
  },
  "https://www.winsim.de/5g-tarife": {
   "werte": [
@@ -164,10 +164,11 @@
    "|10gb",
    "|11.99€",
    "|14.99€",
+   "|15gb",
    "|19.99€",
    "|192€",
    "|20gb",
-   "|264€",
+   "|216€",
    "|30gb",
    "|360€",
    "|40gb",
@@ -178,7 +179,7 @@
    "|8.99€",
    "|9.99€"
   ],
-  "stand": "2026-09-25"
+  "stand": "2026-09-30"
  },
  "https://www.premiumsim.de/": {
   "werte": [
@@ -204,7 +205,7 @@
    "|9.99€",
    "|96€"
   ],
-  "stand": "2026-09-25"
+  "stand": "2026-09-30"
  },
  "https://www.mobilcom-debitel.de/handytarife/": {
   "werte": [
@@ -239,7 +240,7 @@
    "|59.99€",
    "|99€"
   ],
-  "stand": "2026-09-25"
+  "stand": "2026-09-30"
  },
  "https://www.klarmobil.de/handytarife": {
   "werte": [
@@ -260,24 +261,24 @@
    "|60%",
    "|99€"
   ],
-  "stand": "2026-09-25"
+  "stand": "2026-09-30"
  },
  "https://www.pennymobil.de/tarife": {
   "werte": [
-   "fußnote zu|40€",
+   "fußnote zu|10€",
    "|0€",
+   "|10€",
    "|12monate",
    "|1399€",
    "|1899€",
    "|2999€",
-   "|40€",
    "|499€",
    "|6999€",
    "|6monate",
    "|899€",
    "|9999€"
   ],
-  "stand": "2026-09-25"
+  "stand": "2026-09-30"
  },
  "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html": {
   "werte": [
@@ -466,7 +467,7 @@
    "|9.98€",
    "|999.99€"
   ],
-  "stand": "2026-09-25"
+  "stand": "2026-09-30"
  },
  "https://www.otelo.de/allnet-flat": {
   "werte": [
@@ -475,16 +476,16 @@
    "ab|179€",
    "ab|189€",
    "ab|1€",
-   "ab|229€",
+   "ab|29€",
    "ab|49€",
+   "ab|89€",
    "ab|99€",
    "ab|9€",
    "|10€",
-   "|1€",
    "|20€",
    "|30€",
    "|5€"
   ],
-  "stand": "2026-09-25"
+  "stand": "2026-09-30"
  }
 }

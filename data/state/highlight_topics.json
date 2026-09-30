@@ -1,5 +1,5 @@
 {
- "updated": "2026-09-25",
+ "updated": "2026-09-30",
  "topics": [
   {
    "slug": "apples-iphone-event-am-9-september",
@@ -16,8 +16,8 @@
    ],
    "first_seen": "2026-08-28",
    "last_active": "2026-08-28",
-   "runs_ohne_zuwachs": 3,
-   "status": "aktiv",
+   "runs_ohne_zuwachs": 4,
+   "status": "beendet",
    "items": [
     {
      "url": "https://www.telepolis.pl/tech/sprzet/apple-iphone-18-pro-iphone-ultra-premiera-data",
@@ -244,7 +244,8 @@
      "image_h": 600
     }
    ],
-   "event_datum": "2026-09-09"
+   "event_datum": "2026-09-09",
+   "ended": "2026-09-30"
   }
  ]
 }
