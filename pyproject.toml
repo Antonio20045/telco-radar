@@ -13,3 +13,7 @@ testpaths = ["tests"]
 # der sich mangels Import ueberspringt, sieht im Protokoll aus wie ein
 # Erfolg. Genau derselbe Grund, aus dem ci.yml Chromium installiert.
 pythonpath = ["src", "."]
+
+[tool.ruff]
+target-version = "py311"
+include = ["src/**/*.py", "tests/**/*.py", "scripts/**/*.py"]
