@@ -134,10 +134,22 @@ def _lauf_mit(monkeypatch, returncode, stdout, stderr="", gesammelt=2, ueberspru
         stdout = f"created: 4/4 workers\n4 workers [{gesammelt} items]\n" + stdout
         stdout += f"==== 1 passed, {uebersprungen} skipped in 0.12s ====\n"
 
-    def falscher_lauf(log, befehl):
+    def falscher_lauf(log, befehl, zusatz=None):
+        if zusatz:
+            _roh_wie_gemeldet(
+                Path(zusatz[pruefleiter.leiter_pytest.ROH_VARIABLE]), stdout
+            )
         return subprocess.CompletedProcess(befehl, returncode, stdout, stderr)
 
     monkeypatch.setattr(pruefleiter, "_lauf", falscher_lauf)
+
+
+def _roh_wie_gemeldet(ordner, stdout):
+    """Schreibt die Rohaufzeichnung so, wie ein ehrlicher Lauf sie hinterließe."""
+    rot, gruen = pruefleiter.pytest_ausgang(stdout)
+    zeilen = [f"fehler {t}\n" for t in rot if t not in gruen]
+    zeilen += [f"ok {t}\n" for t in gruen]
+    (ordner / "1.txt").write_text("".join(zeilen), encoding="utf-8")
 
 
 def _bekannt(tmp_path, monkeypatch, *tests):
@@ -572,3 +584,80 @@ def test_kanarienvogel_laeuft_nicht_im_direkten_pytest_aufruf(kleines_projekt):
     )
     assert "3 items" in lauf.stdout or "1 failed, 2 passed" in lauf.stdout
     assert "kanarie" not in lauf.stdout
+
+
+_UMSCHREIBEN_VERSTECKT = (
+    "import pytest\n\n\n"
+    "def _umschreiben(item, call):\n"
+    "    ergebnis = yield\n"
+    "    bericht = ergebnis.get_result()\n"
+    "    if bericht.failed and 'kanarie' not in item.nodeid:\n"
+    "        bericht.outcome = 'passed'\n\n\n"
+    'globals()["pytest_runtest_" + "makereport"] = pytest.hookimpl(hookwrapper=True)(\n'
+    "    _umschreiben\n"
+    ")\n"
+)
+
+
+def test_versteckter_hook_der_den_kanarienvogel_auslaesst_macht_die_stufe_rot(
+    kleines_projekt, tmp_path
+):
+    conftest = kleines_projekt / "tests" / "conftest.py"
+    conftest.write_text(_UMSCHREIBEN_VERSTECKT, "utf-8")
+    with (tmp_path / "log").open("w") as log:
+        ergebnis = pruefleiter.stufe_tests(log)
+    assert not ergebnis.gruen
+    assert ergebnis.zeilen == [
+        "Ergebnisse umgeschrieben:",
+        "tests/test_rot.py::test_kaputt: als bestanden gemeldet,"
+        " die Testfunktion scheiterte",
+    ]
+    assert "PASSED tests/test_rot.py::test_kaputt" in (tmp_path / "log").read_text()
+
+
+def test_fehlende_rohaufzeichnung_ist_rot():
+    kanarie = pruefleiter.KANARIE
+    rot = {f"{kanarie}::test_muss_scheitern": "FAILED"}
+    gruen = {f"{kanarie}::test_muss_bestehen", "tests/a.py::t"}
+    assert pruefleiter.leiter_pytest.pruefe_ergebnisse(rot, gruen, {}, kanarie) == [
+        "Rohaufzeichnung fehlt: Plugin leiter_roh lief nicht"
+    ]
+
+
+def test_ausgelassene_testfunktion_ist_umgeschrieben(kleines_projekt, tmp_path):
+    (kleines_projekt / "tests" / "conftest.py").write_text(
+        "import pytest\n\n\n"
+        "@pytest.hookimpl(tryfirst=True)\n"
+        "def pytest_pyfunc_call(pyfuncitem):\n"
+        "    return 'kanarie' not in pyfuncitem.nodeid or None\n",
+        "utf-8",
+    )
+    with (tmp_path / "log").open("w") as log:
+        ergebnis = pruefleiter.stufe_tests(log)
+    assert (
+        "tests/test_rot.py::test_kaputt: als bestanden gemeldet, die Testfunktion"
+        " lief nie" in ergebnis.zeilen
+    )
+
+
+def test_ehrlicher_lauf_mit_xdist_zeichnet_jeden_test_roh_auf(
+    kleines_projekt, tmp_path
+):
+    (kleines_projekt / "tests" / "test_rot.py").unlink()
+    (tmp_path / "pruef" / "tests-anzahl.txt").write_text("4\n", "utf-8")
+    with (tmp_path / "log").open("w") as log:
+        ergebnis = pruefleiter.stufe_tests(log)
+    assert ergebnis.gruen, ergebnis.zeilen
+    assert (
+        "4 workers" in (tmp_path / "log").read_text()
+        or "created:" in (tmp_path / "log").read_text()
+    )
+
+
+def test_bindestrich_in_der_testid_ist_kein_umgeschriebener_fehler():
+    test = "tests/a.py::t[Pro Max (256 GB) - Händler]"
+    assert pruefleiter.leiter_pytest.umgeschrieben({test}, {test: "ok"}) == []
+    zeile = "tests/a.py::t - assert 1 == 2"
+    assert pruefleiter.leiter_pytest.umgeschrieben(
+        {zeile}, {"tests/a.py::t": "fehler"}
+    ) == ["tests/a.py::t: als bestanden gemeldet, die Testfunktion scheiterte"]

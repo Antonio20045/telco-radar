@@ -14,10 +14,10 @@ import argparse
 import contextlib
 import json
 import os
-import re
 import signal
 import subprocess
 import sys
+import tempfile
 import time
 from collections import Counter
 from collections.abc import Callable, Mapping
@@ -25,7 +25,10 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TextIO
 
+import leiter_pytest
 import waechter
+from leiter_befunde import Befund, gesenkte_basis, mypy_befunde, neue_befunde
+from leiter_pytest import gesammelte_tests, nicht_ausgefuehrte_tests, pytest_ausgang
 from waechter import lies_zaehlbasis, schreibe_zaehlbasis
 
 WURZEL = Path(__file__).resolve().parents[1]
@@ -38,7 +41,6 @@ TESTS_UEBERSPRUNGEN = WURZEL / "pruef" / "tests-uebersprungen.txt"
 KANARIE = "tests/kanarie_leiter.py"
 LAUF_ORDNER = WURZEL / ".pruefleiter"
 MAX_ROT_ZEILEN = 60
-_MYPY_FEHLER = ": error: "
 TEST_FRIST_SEKUNDEN = 300
 STUFE_FRIST_SEKUNDEN = 1800
 NACHLAUF_SEKUNDEN = 10
@@ -56,31 +58,7 @@ _FREMDE_UMGEBUNG = (
     "NO_COLOR",
     "CLICOLOR",
 )
-_GESAMMELT = re.compile(
-    r"^\d+ workers? \[(\d+) items?\]$"
-    r"|^collected \d+ items?(?: / \d+ deselected)? / (\d+) selected"
-    r"|^collected (\d+) items?$",
-    re.MULTILINE,
-)
-_SCHLUSSZEILE = re.compile(r"^=+ (.+) in [\d.]+s(?: \([\d:]+\))? =+$", re.MULTILINE)
-_NICHT_AUSGEFUEHRT = re.compile(r"(\d+) (?:skipped|xfailed)\b")
-
 Schluessel = waechter.Schluessel
-
-
-@dataclass(frozen=True)
-class Befund:
-    """Ein Befund eines Prüfwerkzeugs; verglichen wird je Datei und Code, ohne Zeile."""
-
-    pfad: str
-    zeile: int
-    code: str
-    text: str
-
-    @property
-    def schluessel(self) -> Schluessel:
-        """Datei und Code, unter denen die Basis den Befund zählt."""
-        return (self.pfad, self.code)
 
 
 @dataclass
@@ -92,20 +70,8 @@ class Ergebnis:
     zeilen: list[str] = field(default_factory=list)
     gesenkt: list[str] = field(default_factory=list)
     angehoben: list[str] = field(default_factory=list)
+    hinweise: list[str] = field(default_factory=list)
     sekunden: float = 0.0
-
-
-def neue_befunde(befunde: list[Befund], basis: Counter[Schluessel]) -> list[Befund]:
-    """Gibt die Befunde der Schlüssel zurück, die öfter vorkommen als in der Basis."""
-    ueber = set(waechter.ueber_basis(Counter(b.schluessel for b in befunde), basis))
-    return [b for b in befunde if b.schluessel in ueber]
-
-
-def gesenkte_basis(
-    befunde: list[Befund], basis: Counter[Schluessel]
-) -> Counter[Schluessel]:
-    """Gibt die Basis zurück, in der kein Schlüssel öfter steht als heute gefunden."""
-    return waechter.gesenkt(Counter(b.schluessel for b in befunde), basis)
 
 
 def ruff_befunde(ausgabe: str) -> list[Befund]:
@@ -119,53 +85,6 @@ def ruff_befunde(ausgabe: str) -> list[Befund]:
         )
         for eintrag in json.loads(ausgabe)
     ]
-
-
-def mypy_befunde(ausgabe: str) -> list[Befund]:
-    """Liest die Fehlerzeilen von mypy; Hinweiszeilen zählen nicht."""
-    befunde = []
-    for zeile in ausgabe.splitlines():
-        ort, trenner, rest = zeile.partition(_MYPY_FEHLER)
-        if not trenner:
-            continue
-        pfad, _, nummer = ort.partition(":")
-        text, _, code = rest.rpartition("  [")
-        if not code.endswith("]"):
-            text, code = rest, "ohne-code]"
-        nummer = nummer.partition(":")[0]
-        zeile_nr = int(nummer) if nummer.isdigit() else 0
-        befunde.append(Befund(pfad, zeile_nr, code[:-1], text))
-    return befunde
-
-
-def pytest_ausgang(ausgabe: str) -> tuple[dict[str, str], set[str]]:
-    """Gibt gescheiterte Tests mit ihrer Zeile und bestandene aus ``-rfEp`` zurück."""
-    rot: dict[str, str] = {}
-    gruen: set[str] = set()
-    _, _, zusammenfassung = ausgabe.partition("short test summary info")
-    for zeile in zusammenfassung.splitlines():
-        art, _, rest = zeile.partition(" ")
-        if art in ("FAILED", "ERROR"):
-            rot[rest.split(" - ", 1)[0]] = zeile
-        elif art == "PASSED":
-            gruen.add(rest)
-    return rot, gruen
-
-
-def gesammelte_tests(ausgabe: str) -> int | None:
-    """Liest, wie viele Tests pytest nach Auswahl ausführt; ``None`` heißt unlesbar."""
-    treffer = _GESAMMELT.search(ausgabe)
-    if treffer is None:
-        return None
-    return int(next(gruppe for gruppe in treffer.groups() if gruppe is not None))
-
-
-def nicht_ausgefuehrte_tests(ausgabe: str) -> int | None:
-    """Zählt übersprungene und ``xfail``-Tests der Schlusszeile; ``None``: unlesbar."""
-    zeilen = _SCHLUSSZEILE.findall(ausgabe)
-    if not zeilen:
-        return None
-    return sum(int(n) for n in _NICHT_AUSGEFUEHRT.findall(zeilen[-1]))
 
 
 def umgebung(basis: Mapping[str, str]) -> dict[str, str]:
@@ -203,7 +122,9 @@ def stufe_waechter(log: TextIO) -> Ergebnis:
         return Ergebnis("0 Wächter", False, meldung)
     privat = Counter(b.schluessel for b in ruff_befunde(lauf.stdout))
     rot, geschrieben = waechter.pruefe(WURZEL, privat)
-    return Ergebnis("0 Wächter", not rot, rot, [_relativ(p) for p in geschrieben])
+    ergebnis = Ergebnis("0 Wächter", not rot, rot, [_relativ(p) for p in geschrieben])
+    ergebnis.hinweise = waechter.anker_verschiebungen(WURZEL)
+    return ergebnis
 
 
 def stufe_lint(log: TextIO) -> Ergebnis:
@@ -261,8 +182,14 @@ def stufe_tests(log: TextIO) -> Ergebnis:
         f"--timeout={TEST_FRIST_SEKUNDEN}",
         "-o",
         f"python_files=test_*.py *_test.py {Path(KANARIE).name}",
+        "-p",
+        leiter_pytest.PLUGIN,
     ]
-    lauf = _lauf(log, befehl)
+    with tempfile.TemporaryDirectory() as ordner:
+        pfade = os.pathsep.join(map(str, (WURZEL / "src", leiter_pytest.PLUGIN_ORDNER)))
+        zusatz = {leiter_pytest.ROH_VARIABLE: ordner, "PYTHONPATH": pfade}
+        lauf = _lauf(log, befehl, zusatz)
+        roh = leiter_pytest.lies_roh(Path(ordner))
     rot, gruen = pytest_ausgang(lauf.stdout)
     if lauf.returncode not in (0, 1) or (lauf.returncode == 1 and not rot):
         ende = lauf.stdout.splitlines()[-20:] + lauf.stderr.splitlines()[-20:]
@@ -287,10 +214,9 @@ def stufe_tests(log: TextIO) -> Ergebnis:
             f" {obergrenze} ({_relativ(TESTS_UEBERSPRUNGEN)})"
         )
         return Ergebnis("Tests", False, [meldung])
-    gescheitert = rot.pop(f"{KANARIE}::test_muss_scheitern", None)
-    if gescheitert is None or f"{KANARIE}::test_muss_bestehen" not in gruen:
-        meldung = f"{KANARIE}: Ergebnisse werden umgeschrieben oder abgewählt"
-        return Ergebnis("Tests", False, [meldung])
+    falsch = leiter_pytest.pruefe_ergebnisse(rot, gruen, roh, KANARIE)
+    if falsch:
+        return Ergebnis("Tests", False, falsch)
     bekannt = []
     if ROT_BEKANNT.exists():
         bekannt = ROT_BEKANNT.read_text(encoding="utf-8").splitlines()
@@ -311,13 +237,13 @@ def stufe_tests(log: TextIO) -> Ergebnis:
     return ergebnis
 
 
-STUFEN_VOLL: list[Callable[[TextIO], Ergebnis]] = [
+STUFEN_STATISCH: list[Callable[[TextIO], Ergebnis]] = [
     stufe_waechter,
     stufe_lint,
     stufe_typen,
     stufe_schichten,
-    stufe_tests,
 ]
+STUFEN_VOLL = [*STUFEN_STATISCH, stufe_tests]
 
 
 def fuehre_aus(
@@ -342,15 +268,17 @@ def zusammenfassung(ergebnisse: list[Ergebnis]) -> list[str]:
     zeiten = ", ".join(f"{e.stufe} {e.sekunden:.0f} s" for e in ergebnisse)
     gesenkt = [pfad for e in ergebnisse for pfad in e.gesenkt]
     angehoben = [pfad for e in ergebnisse for pfad in e.angehoben]
+    hinweise = [h for e in ergebnisse for h in e.hinweise]
     letzte = ergebnisse[-1]
     if letzte.gruen:
         senkung = f"; gesenkt: {', '.join(gesenkt)}" if gesenkt else ""
         hebung = f"; angehoben: {', '.join(angehoben)}" if angehoben else ""
-        return [f"Prüfleiter grün ({zeiten}{senkung}{hebung})"]
+        lockerung = f"; {'; '.join(hinweise)}" if hinweise else ""
+        return [f"Prüfleiter grün ({zeiten}{senkung}{hebung}{lockerung})"]
     kopf = f"Prüfleiter rot in Stufe {letzte.stufe} ({zeiten})"
     fuss = f"Volles Protokoll: {_relativ(LAUF_ORDNER / 'letzter-lauf.log')}"
     platz = MAX_ROT_ZEILEN - 2
-    zeilen = letzte.zeilen
+    zeilen = [*hinweise, *letzte.zeilen]
     if len(zeilen) > platz:
         zeilen = [
             *zeilen[: platz - 1],
@@ -362,15 +290,13 @@ def zusammenfassung(ergebnisse: list[Ergebnis]) -> list[str]:
 def main(argv: list[str] | None = None) -> int:
     """Startet die Leiter; Exit 0 heißt grün, 1 rot."""
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument(
-        "--voll", action="store_true", help="Stufen 1 bis 3 und alle Tests"
-    )
+    art = parser.add_mutually_exclusive_group(required=True)
+    art.add_argument("--voll", action="store_true", help="Stufen 0 bis 3, alle Tests")
+    art.add_argument("--statisch", action="store_true", help="Stufen 0 bis 3")
     args = parser.parse_args(argv)
-    if not args.voll:
-        parser.error("bisher gibt es nur --voll")
     LAUF_ORDNER.mkdir(exist_ok=True)
     with (LAUF_ORDNER / "letzter-lauf.log").open("w", encoding="utf-8") as log:
-        ergebnisse = fuehre_aus(STUFEN_VOLL, log)
+        ergebnisse = fuehre_aus(STUFEN_VOLL if args.voll else STUFEN_STATISCH, log)
         ausgabe = zusammenfassung(ergebnisse)
         log.writelines(f"{zeile}\n" for zeile in ausgabe)
     with (LAUF_ORDNER / "zeiten.csv").open("a", encoding="utf-8") as zeiten:
@@ -383,13 +309,15 @@ def main(argv: list[str] | None = None) -> int:
     return 0 if ergebnisse[-1].gruen else 1
 
 
-def _lauf(log: TextIO, befehl: list[str]) -> subprocess.CompletedProcess[str]:
+def _lauf(
+    log: TextIO, befehl: list[str], zusatz: Mapping[str, str] | None = None
+) -> subprocess.CompletedProcess[str]:
     # Eigene Prozessgruppe: Bei überschrittener Frist sterben auch die Worker von
     # pytest-xdist, sonst hielten sie die Pipes offen und die Leiter hinge mit.
     with subprocess.Popen(
         befehl,
         cwd=WURZEL,
-        env=umgebung(os.environ),
+        env={**umgebung(os.environ), **(zusatz or {})},
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,

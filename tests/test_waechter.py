@@ -7,10 +7,12 @@ from pathlib import Path
 import pytest
 
 _PFAD = Path(__file__).resolve().parents[1] / "scripts" / "waechter.py"
+sys.path.insert(0, str(_PFAD.parent))
 _spec = importlib.util.spec_from_file_location("waechter", _PFAD)
 waechter = importlib.util.module_from_spec(_spec)
 sys.modules["waechter"] = waechter
 _spec.loader.exec_module(waechter)
+waechter_regeln = sys.modules["waechter_regeln"]
 
 _REPORT = Path("src/telco_radar/report")
 _IMPORTLINTER = """[importlinter]
@@ -33,7 +35,6 @@ _SPECNAME = (
     "def umschreiben(item):\n"
     "    pass\n"
 )
-_AUFBAU = "Bestand\n\nLockerung: Testaufbau"
 _VERSUCH = "try:\n    x = 1\nexcept {}:\n    x = 2\n"
 _PYPROJECT = """[tool.ruff]
 include = ["src/**/*.py"]
@@ -90,6 +91,11 @@ def projekt(tmp_path, monkeypatch):
     return wurzel
 
 
+def _anker_neu(wurzel, monkeypatch):
+    """Antonios Handweg: Bestand committen und den Anker auf diesen Commit legen."""
+    monkeypatch.setattr(waechter, "ANKER", _commit(wurzel, "Bestand"))
+
+
 def _rot(wurzel):
     return waechter.pruefe(wurzel, Counter())[0]
 
@@ -113,9 +119,11 @@ def test_letzte_zeile_ohne_umbruch_zaehlt_mit(projekt):
     assert _rot(projekt)[0].startswith("src/telco_radar/neu.py [zeilen]")
 
 
-def test_gelistete_riesendatei_darf_nicht_wachsen_und_sinkt_selbst(projekt):
+def test_gelistete_riesendatei_darf_nicht_wachsen_und_sinkt_selbst(
+    projekt, monkeypatch
+):
     _schreibe(projekt, "pruef/riesendateien.txt", "src/gross.py zeilen 500\n")
-    _commit(projekt, _AUFBAU)
+    _anker_neu(projekt, monkeypatch)
     _schreibe(projekt, "src/gross.py", "x = 1\n" * 501)
     assert len(_rot(projekt)) == 1
     _schreibe(projekt, "src/gross.py", "x = 1\n" * 450)
@@ -189,13 +197,43 @@ def test_strengere_listen_sind_gruen(projekt):
     assert _rot(projekt) == []
 
 
-def test_lockerung_nur_mit_ausdruecklicher_commitzeile(projekt):
+_LOCKERUNG = (
+    ("src/telco_radar/a.py", "import os  # noqa: F401\n"),
+    ("pruef/waechter-basis.txt", "src/telco_radar/a.py noqa:F401 1\n"),
+    ("pruef/rot-bekannt.txt", "tests/test_a.py::test_x\nt::neu\n"),
+    ("pruef/tests-anzahl.txt", "1\n"),
+    ("pruef/tests-uebersprungen.txt", "999\n"),
+    (
+        ".importlinter",
+        _IMPORTLINTER + "    telco_radar.report.b -> telco_radar.collect\n",
+    ),
+    ("pyproject.toml", _PYPROJECT.replace('"E", "F"', '"E"')),
+)
+
+
+@pytest.mark.parametrize("nachricht", ["chore: aufräumen", "x\n\nLockerung: x"])
+def test_keine_commitzeile_erlaubt_eine_lockerung(projekt, nachricht):
+    for pfad, text in _LOCKERUNG:
+        _schreibe(projekt, pfad, text)
+    commit = _commit(projekt, nachricht)[:7]
+    rot = _rot(projekt)
+    assert [z.split(" ")[0] for z in rot] == [p for p, _ in _LOCKERUNG[1:]]
+    assert all(f"lockerer ({commit})" in z for z in rot)
+
+
+def test_verschobener_anker_ist_die_einzige_lockerung_und_wird_genannt(
+    projekt, monkeypatch
+):
+    _schreibe(projekt, waechter.WAECHTER, 'ANKER = "a"\n')
+    _commit(projekt, "Wächter angelegt")
+    assert waechter.anker_verschiebungen(projekt) == []
     _schreibe(projekt, "pruef/tests-uebersprungen.txt", "5\n")
-    _commit(projekt, "Mehr Skips\n\nLockerung: Antonio, Netztests ausgelagert")
+    _schreibe(projekt, waechter.WAECHTER, 'ANKER = "b"\n')
+    commit = _commit(projekt, "Antonio lockert Skips")
+    monkeypatch.setattr(waechter, "ANKER", commit)
     assert _rot(projekt) == []
-    _schreibe(projekt, "pruef/tests-uebersprungen.txt", "6\n")
-    assert _rot(projekt) == [
-        "pruef/tests-uebersprungen.txt lockerer (Arbeitsstand): 5 -> 6"
+    assert waechter.anker_verschiebungen(projekt) == [
+        f"Anker verschoben in {commit[:7]} Antonio lockert Skips"
     ]
 
 
@@ -223,6 +261,7 @@ def test_fehlender_verlauf_ist_rot(projekt, monkeypatch):
         ("src/telco_radar/a.py", "x = datetime.now(UTC)\n", "uhr"),
         ("src/telco_radar/a.py", "x = _datum.today()\n", "uhr"),
         ("src/telco_radar/a.py", "x = time.time()\n", "uhr"),
+        ("src/telco_radar/collect/http.py", "x = time.time()\n", "uhr"),
         ("src/telco_radar/report/a.py", "x = Path('d').read_text()\n", ""),
         ("src/telco_radar/report/a.py", "x = open('d')\n", "dateizugriff"),
         ("src/telco_radar/a.py", _VERSUCH.format("Exception"), "breite"),
@@ -286,10 +325,12 @@ def test_privater_import_ueber_der_basis_ist_rot(projekt):
     ]
 
 
-def test_weniger_befunde_senken_die_basis_nur_wenn_alles_gruen_ist(projekt):
+def test_weniger_befunde_senken_die_basis_nur_wenn_alles_gruen_ist(
+    projekt, monkeypatch
+):
     basis = projekt / "pruef/waechter-basis.txt"
     basis.write_text("src/telco_radar/a.py uhr 2\n", "utf-8")
-    _commit(projekt, _AUFBAU)
+    _anker_neu(projekt, monkeypatch)
     _schreibe(projekt, "src/telco_radar/a.py", "x = date.today()\n")
     _schreibe(projekt, "pruef/tests-anzahl.txt", "9\n")
     assert len(_rot(projekt)) == 1
@@ -298,3 +339,98 @@ def test_weniger_befunde_senken_die_basis_nur_wenn_alles_gruen_ist(projekt):
     assert _rot(projekt) == []
     assert basis.read_text() == "src/telco_radar/a.py uhr 1\n"
     assert waechter.pruefe(projekt, Counter(), schreiben=False) == ([], [])
+
+
+@pytest.mark.parametrize(
+    "pfad",
+    [
+        "src/telco_radar/report/ruff.toml",
+        "src/telco_radar/report/.ruff.toml",
+        "src/telco_radar/pyproject.toml",
+        "tests/pyproject.toml",
+        "mypy.ini",
+        "src/.mypy.ini",
+        "setup.cfg",
+        "scripts/setup.cfg",
+        "pytest.ini",
+        ".pytest.ini",
+        "pytest.toml",
+        "tests/tox.ini",
+        "conftest.py",
+        "src/telco_radar/conftest.py",
+        "src/sitecustomize.py",
+        "docs/usercustomize.py",
+        "src/.importlinter",
+    ],
+)
+def test_konfiguration_neben_der_wurzel_ist_rot_ueberall_im_repo(projekt, pfad):
+    _schreibe(projekt, pfad, "[lint]\nignore = ['F401']\n")
+    assert _rot(projekt) == [
+        f"{pfad} [fremde-konfig] erwartet höchstens 0, gefunden 1"
+        " (pruef/waechter-basis.txt)"
+    ]
+
+
+def test_nur_benannte_umgebungs_und_worktree_ordner_bleiben_ungelesen(projekt):
+    _schreibe(projekt, ".venv/lib/paket/pyproject.toml", "[tool.ruff]\n")
+    _schreibe(projekt, ".claude/worktrees/lauf1/pyproject.toml", "[tool.ruff]\n")
+    _schreibe(projekt, ".claude/worktrees/lauf1/tests/conftest.py", "x = 1\n")
+    _schreibe(projekt, "tests/conftest.py", "import pytest\n")
+    _schreibe(projekt, "tests/geraete/conftest.py", "import pytest\n")
+    assert _rot(projekt) == []
+    _schreibe(projekt, "src/pyvenv.cfg", "home = /usr\n")
+    _schreibe(projekt, "src/ruff.toml", "[lint]\nignore = ['F401']\n")
+    assert _rot(projekt)[0].startswith("src/ruff.toml [fremde-konfig]")
+
+
+def test_zaehlung_ist_parallel_dieselbe_wie_seriell(projekt, monkeypatch):
+    for n in range(5):
+        _schreibe(projekt, f"src/telco_radar/m{n}.py", "x = date.today()  # noqa\n")
+    seriell = waechter_regeln.waechter_zaehlung(projekt)
+    monkeypatch.setattr(waechter_regeln, "PARALLEL_AB", 1)
+    assert waechter_regeln.waechter_zaehlung(projekt) == seriell
+    assert seriell[("src/telco_radar/m4.py", "uhr")] == 1
+
+
+def test_anker_meldet_den_wert_nicht_die_schreibweise(projekt):
+    _schreibe(projekt, waechter.WAECHTER, 'ANKER = "a"\n')
+    _commit(projekt, "Wächter angelegt")
+    _schreibe(projekt, waechter.WAECHTER, 'ANKER: str = "a"\n')
+    _commit(projekt, "typ annotiert")
+    assert waechter.anker_verschiebungen(projekt) == []
+    _schreibe(projekt, waechter.WAECHTER, 'ANKER: str = "b"\n')
+    commit = _commit(projekt, "verschoben")
+    _schreibe(projekt, waechter.WAECHTER, 'ANKER = "c"\n')
+    assert waechter.anker_verschiebungen(projekt) == [
+        f"Anker verschoben in {commit[:7]} verschoben",
+        "Anker verschoben in Arbeitsstand",
+    ]
+    _schreibe(projekt, waechter.WAECHTER, 'ANKER = "b" + "c"\n')
+    assert (
+        waechter.anker_verschiebungen(projekt)[-1]
+        == "Anker in Arbeitsstand nicht lesbar"
+    )
+
+
+def test_unlesbarer_verlauf_ist_rot_statt_keine_lockerung(projekt, monkeypatch):
+    def kaputt(wurzel, paare):
+        raise waechter.subprocess.CalledProcessError(128, ["git", "cat-file"])
+
+    monkeypatch.setattr(waechter, "_inhalte", kaputt)
+    assert _rot(projekt) == [f"Inhalte ab {waechter.ANKER[:7]} nicht lesbar"]
+
+
+def test_uhr_ausserhalb_der_einstiegsfunktion_wird_gezaehlt(projekt):
+    _schreibe(
+        projekt,
+        "src/telco_radar/pipeline.py",
+        "def run():\n    a = datetime.now(UTC)\n\n\n"
+        "def neben():\n    b = date.today()\n",
+    )
+    _schreibe(
+        projekt,
+        "src/telco_radar/geraete_pipeline.py",
+        "x = time.time()\n\n\ndef run_geraete_stage():\n    y = time.monotonic()\n",
+    )
+    assert _rot(projekt) == []
+    assert waechter_regeln.uhr_ausserhalb_einstieg(projekt) == 2
