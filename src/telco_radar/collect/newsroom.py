@@ -159,10 +159,16 @@ _JUNK_EXACT = {
     "media contacts",
     "regulatory news service (regulatory)",
 }
-# Phrases that mark a non-article link when the title is short.
-_JUNK_CONTAINS = re.compile(
-    r"^(perspectives|faq|frequently asked|social media|press conference "
-    r"materials|our reports|emergency resource|media (center|centre)|sitemap)\b",
+# Navigation labels that mark a non-article link when they ARE the whole short
+# title: the label alone, optionally "of [the] <owner> newsroom|website|site"
+# and trailing punctuation.
+# A label followed by a statement ("Social media ban for kids", "FAQ: neue
+# Regeln ...") is a real headline and stays.
+_JUNK_BEGRIFF = re.compile(
+    r"(?:perspectives|faqs?|frequently asked(?: questions)?|social media"
+    r"|press conference materials|our reports|emergency resources?"
+    r"|media (?:center|centre)|sitemap)"
+    r"(?:\s+of\s+(?:the\s+)?(?:\S+\s+){0,3}(?:newsroom|website|site))?\W*",
     re.I,
 )
 
@@ -240,7 +246,7 @@ def _is_junk_title(title: str) -> bool:
     norm = " ".join(title.strip().lower().split())
     if norm in _JUNK_EXACT:
         return True
-    if len(title) < 45 and _JUNK_CONTAINS.search(norm):
+    if len(title) < 45 and _JUNK_BEGRIFF.fullmatch(norm):
         return True
     words = norm.split()
     if len(words) >= 2 and len(set(words)) == 1:  # "Perspectives Perspectives"

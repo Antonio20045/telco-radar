@@ -481,3 +481,41 @@ def test_newsroom_behaelt_meldung_mit_navigationswort_im_satz():
     src = Source(type="newsroom", url="https://example.com/news", name="S")
     items = parse_newsroom_html(html, src, "europe", "Example", "operator")
     assert [i.title for i in items] == ["Example adds 5G cells to its sitemap"]
+
+
+def _newsroom_titel(*titel):
+    html = "".join(
+        f'<article><a href="/press-release/2026/07/m{i}">{t}</a>'
+        "<time>July 9, 2026</time></article>"
+        for i, t in enumerate(titel)
+    )
+    src = Source(type="newsroom", url="https://example.com/news", name="S")
+    return [
+        i.title for i in parse_newsroom_html(html, src, "europe", "Example", "operator")
+    ]
+
+
+def test_newsroom_behaelt_kurzmeldung_die_mit_navigationsbegriff_beginnt():
+    titel = [
+        "Social media ban for kids",
+        "FAQ: neue Regeln für eSIM",
+        "Perspectives of 6G in Europe",
+        "Social media of teens doubles",
+    ]
+    assert _newsroom_titel(*titel) == titel
+
+
+def test_newsroom_verwirft_reine_navigationsbegriffe():
+    assert _newsroom_titel(
+        "Social Media",
+        "FAQ",
+        "Sitemap",
+        "Media Center",
+        "Social Media:",
+        "FAQs",
+        "Frequently Asked Questions",
+        "Media Centre",
+        "Our reports",
+        "Social media of the Example website",
+        "New customer service launch",
+    ) == ["New customer service launch"]
