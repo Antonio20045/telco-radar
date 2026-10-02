@@ -72,6 +72,7 @@ import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime
 
+from .begriffe import MECHANICS
 from .llm import complete, extract_json
 
 log = logging.getLogger(__name__)
@@ -103,21 +104,6 @@ DEFAULT_WEIGHTS: dict[str, float] = {
 DEFAULT_ENTER = 68
 DEFAULT_EXIT = 60
 
-# Geschlossene Mechanik-Liste fuer Achse D. Bewusst klein und trennscharf:
-# die Achse zaehlt, wie viele ANDERE Marken gerade dieselbe Mechanik fahren,
-# und das funktioniert nur mit einem festen Vokabular. Alles, was nicht
-# eindeutig passt, faellt auf "sonstiges" und traegt damit nichts bei.
-MECHANICS: dict[str, str] = {
-    "wechselpraemie": "Wechsel- oder Altgerätprämie",
-    "geraetesubvention": "Gerät vergünstigt",
-    "preisnachlass": "Preisnachlass auf den Tarif",
-    "datenbonus": "mehr Datenvolumen",
-    "gebuehrenerlass": "Gebühren erlassen",
-    "zugabe": "Gratis-Zugabe",
-    "bindungsfrei": "ohne Bindung",
-    "zielgruppe": "Zielgruppentarif",
-    "sonstiges": "sonstiges",
-}
 _DEFAULT_MECHANIC = "sonstiges"
 
 # Achse C: Marktreichweite der Marke. Deterministisch aus der Quellen-

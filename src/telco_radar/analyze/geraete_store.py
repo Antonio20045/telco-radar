@@ -35,13 +35,14 @@ from datetime import date
 from pathlib import Path
 from typing import Iterable, Optional
 
-from ..geraete_model import Listung
+from ..geraete_model import (
+    STATUS_AKTIV,
+    STATUS_AUSGELISTET,
+    STATUS_VERMUTLICH,
+    Listung,
+)
 
 log = logging.getLogger(__name__)
-
-STATUS_AKTIV = "aktiv"
-STATUS_VERMUTLICH = "vermutlich ausgelistet"
-STATUS_AUSGELISTET = "ausgelistet"
 
 # Ab wie vielen Laeufen ohne einen einzigen Fund ein Anbieter als "vermarktet
 # keine Hardware" gilt. Drei, nicht einer: nach einem leeren Lauf ist die

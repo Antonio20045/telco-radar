@@ -20,6 +20,7 @@ import pytest
 from bs4 import BeautifulSoup
 
 from telco_radar.analyze import highlight_topics as ht
+from telco_radar.analyze import themen_store as ts
 from telco_radar.report.html import render_site
 
 
@@ -216,7 +217,7 @@ def test_neue_meldungen_wandern_per_suchwort_ins_thema(tmp_path, agent):
         nachschlag, tmp_path, "2026-08-11", model="m", use_llm=True
     )
 
-    thema = ht.lade_themen(tmp_path)[0]
+    thema = ts.lade_themen(tmp_path)[0]
     urls = {i["url"] for i in thema["items"]}
     assert "https://e.example/9" in urls and "https://f.example/10" in urls
     assert "https://g.example/11" not in urls
@@ -231,7 +232,7 @@ def test_dieselbe_meldung_kommt_nicht_zweimal_ins_thema(tmp_path, agent):
     agent(json.dumps([]))
     ht.pflege_highlight_themen(LAUNCH, tmp_path, "2026-08-11", model="m", use_llm=True)
 
-    thema = ht.lade_themen(tmp_path)[0]
+    thema = ts.lade_themen(tmp_path)[0]
     urls = [i["url"] for i in thema["items"]]
     assert len(urls) == len(set(urls)) == len(LAUNCH)
 
@@ -273,7 +274,7 @@ def test_ereignis_ueber_zwei_laeufe_wird_gefunden(tmp_path, agent):
         reports_dir=reports,
     )
     assert bilanz["kandidaten"] == 1 and len(aufrufe) == 1
-    thema = ht.lade_themen(tmp_path)[0]
+    thema = ts.lade_themen(tmp_path)[0]
     zuordnung = {i["url"]: i["week"] for i in thema["items"]}
     assert len(zuordnung) == 4
     assert zuordnung[LAUNCH[3]["url"]] == "2026-08-07"
@@ -328,7 +329,7 @@ def test_erfasstes_ereignis_wird_dem_agenten_nicht_erneut_vorgelegt(tmp_path, ag
         use_llm=True,
         reports_dir=reports,
     )
-    assert len(ht.lade_themen(tmp_path)) == 1 and len(aufrufe) == 1
+    assert len(ts.lade_themen(tmp_path)) == 1 and len(aufrufe) == 1
 
     _bericht(reports, "2026-08-14", LAUNCH)
     aufrufe = agent(_urteil())
@@ -341,7 +342,7 @@ def test_erfasstes_ereignis_wird_dem_agenten_nicht_erneut_vorgelegt(tmp_path, ag
         reports_dir=reports,
     )
     assert bilanz["kandidaten"] == 0 and not aufrufe
-    assert len(ht.lade_themen(tmp_path)) == 1
+    assert len(ts.lade_themen(tmp_path)) == 1
 
 
 def test_der_seltenheitsdeckel_rechnet_je_ausgabe():
@@ -642,7 +643,7 @@ def test_antizipation_konkurriert_nicht_um_max_kandidaten(tmp_path, agent):
     assert len(payload["kandidaten"]) == 2
     assert payload["kandidaten"][1]["bevorstehendes_ereignis"] is True
     assert bilanz["neu"] == ["samsung-galaxy-fold8-kommt", "apple-kuendigt-keynote-an"]
-    themen = {t["slug"]: t for t in ht.lade_store(tmp_path)["topics"]}
+    themen = {t["slug"]: t for t in ts.lade_store(tmp_path)["topics"]}
     assert themen["apple-kuendigt-keynote-an"]["event_datum"] == "2026-09-09"
     assert "event_datum" not in themen["samsung-galaxy-fold8-kommt"]
 
@@ -660,18 +661,18 @@ def test_thema_endet_nach_vier_laeufen_ohne_zuwachs(tmp_path, agent):
     ht.pflege_highlight_themen(
         LAUNCH + RAUSCHEN, tmp_path, "2026-08-07", model="m", use_llm=True
     )
-    assert len(ht.lade_themen(tmp_path)) == 1
+    assert len(ts.lade_themen(tmp_path)) == 1
 
     for n, datum in enumerate(("2026-08-11", "2026-08-14", "2026-08-18"), start=1):
         bilanz = _lauf_ohne_zuwachs(tmp_path, agent, datum)
         assert bilanz["beendet"] == []
-        assert len(ht.lade_themen(tmp_path)) == 1, f"nach {n} stillen Laeufen"
+        assert len(ts.lade_themen(tmp_path)) == 1, f"nach {n} stillen Laeufen"
 
     bilanz = _lauf_ohne_zuwachs(tmp_path, agent, "2026-08-21")
     assert bilanz["beendet"] == ["samsung-galaxy-fold8-kommt"]
-    assert ht.lade_themen(tmp_path) == []
+    assert ts.lade_themen(tmp_path) == []
     # Beendet heisst nicht geloescht: der Speicher bleibt das Gedaechtnis.
-    store = ht.lade_store(tmp_path)
+    store = ts.lade_store(tmp_path)
     assert [t["status"] for t in store["topics"]] == ["beendet"]
 
 
@@ -680,7 +681,7 @@ def test_beendetes_thema_wird_nicht_neu_entdeckt(tmp_path, agent):
     ht.pflege_highlight_themen(LAUNCH, tmp_path, "2026-08-07", model="m", use_llm=True)
     for datum in ("2026-08-11", "2026-08-14", "2026-08-18", "2026-08-21"):
         _lauf_ohne_zuwachs(tmp_path, agent, datum)
-    assert ht.lade_themen(tmp_path) == []
+    assert ts.lade_themen(tmp_path) == []
 
     # Dieselben Meldungen noch einmal - und der Agent wuerde wieder
     # zustimmen. Der Speicher darf sie trotzdem nicht als neu ausgeben.
@@ -689,7 +690,7 @@ def test_beendetes_thema_wird_nicht_neu_entdeckt(tmp_path, agent):
         LAUNCH, tmp_path, "2026-09-01", model="m", use_llm=True
     )
     assert bilanz["neu"] == []
-    assert ht.lade_themen(tmp_path) == []
+    assert ts.lade_themen(tmp_path) == []
     # Der Agent wurde gar nicht erst gefragt - der Kandidat war schon weg.
     assert aufrufe == []
 
@@ -720,14 +721,14 @@ def test_thema_mit_bevorstehendem_ereignis_altert_nicht_vor_der_frist(tmp_path, 
     test_thema_endet_nach_vier_laeufen_ohne_zuwachs oben."""
     agent(_urteil_bevorstehend("2026-09-06"))
     ht.pflege_highlight_themen(LAUNCH, tmp_path, "2026-08-27", model="m", use_llm=True)
-    assert ht.lade_store(tmp_path)["topics"][0]["event_datum"] == "2026-09-06"
+    assert ts.lade_store(tmp_path)["topics"][0]["event_datum"] == "2026-09-06"
 
     for n, datum in enumerate(
         ("2026-08-31", "2026-09-03", "2026-09-07", "2026-09-10"), start=1
     ):
         bilanz = _lauf_ohne_zuwachs(tmp_path, agent, datum)
         assert bilanz["beendet"] == []
-        assert len(ht.lade_themen(tmp_path)) == 1, f"nach {n} stillen Laeufen"
+        assert len(ts.lade_themen(tmp_path)) == 1, f"nach {n} stillen Laeufen"
 
 
 def test_thema_mit_bevorstehendem_ereignis_altert_nach_der_frist(tmp_path, agent):
@@ -740,11 +741,11 @@ def test_thema_mit_bevorstehendem_ereignis_altert_nach_der_frist(tmp_path, agent
     for n, datum in enumerate(("2026-09-14", "2026-09-17", "2026-09-20"), start=1):
         bilanz = _lauf_ohne_zuwachs(tmp_path, agent, datum)
         assert bilanz["beendet"] == []
-        assert len(ht.lade_themen(tmp_path)) == 1, f"nach {n} Laeufen nach der Frist"
+        assert len(ts.lade_themen(tmp_path)) == 1, f"nach {n} Laeufen nach der Frist"
 
     bilanz = _lauf_ohne_zuwachs(tmp_path, agent, "2026-09-23")
     assert bilanz["beendet"] == ["samsung-galaxy-fold8-kommt"]
-    assert ht.lade_themen(tmp_path) == []
+    assert ts.lade_themen(tmp_path) == []
 
 
 def test_ein_halluziniertes_event_datum_macht_kein_thema_unsterblich(tmp_path, agent):
@@ -759,7 +760,7 @@ def test_ein_halluziniertes_event_datum_macht_kein_thema_unsterblich(tmp_path, a
     Umbau (CLAUDE.md §6)."""
     agent(_urteil_bevorstehend("2028-09-09"))
     ht.pflege_highlight_themen(LAUNCH, tmp_path, "2026-08-27", model="m", use_llm=True)
-    thema = ht.lade_store(tmp_path)["topics"][0]
+    thema = ts.lade_store(tmp_path)["topics"][0]
     # Gar nicht erst uebernommen: ein Termin jenseits des Horizonts ist
     # Roadmap, kein Termin.
     assert "event_datum" not in thema
@@ -782,7 +783,7 @@ def test_ein_event_datum_in_der_vergangenheit_wird_nicht_uebernommen(tmp_path, a
     doppelt."""
     agent(_urteil_bevorstehend("2026-07-01"))
     ht.pflege_highlight_themen(LAUNCH, tmp_path, "2026-08-27", model="m", use_llm=True)
-    assert "event_datum" not in ht.lade_store(tmp_path)["topics"][0]
+    assert "event_datum" not in ts.lade_store(tmp_path)["topics"][0]
 
 
 def test_die_datumspruefung_liest_niemals_die_uhr():
@@ -802,7 +803,7 @@ def test_thema_ohne_event_datum_altert_wie_bisher(tmp_path, agent):
     fuer ein solches Thema NIE, unabhaengig vom Datum des Laufs."""
     agent(_urteil())
     ht.pflege_highlight_themen(LAUNCH, tmp_path, "2026-08-07", model="m", use_llm=True)
-    thema = ht.lade_store(tmp_path)["topics"][0]
+    thema = ts.lade_store(tmp_path)["topics"][0]
     assert "event_datum" not in thema
     assert ht._durch_event_geschuetzt(thema, "2026-08-07") is False
     assert ht._durch_event_geschuetzt(thema, "2099-01-01") is False
@@ -814,7 +815,7 @@ def test_ohne_llm_entsteht_kein_thema(tmp_path):
         LAUNCH + RAUSCHEN, tmp_path, "2026-08-07", use_llm=False
     )
     assert bilanz["neu"] == []
-    assert ht.lade_themen(tmp_path) == []
+    assert ts.lade_themen(tmp_path) == []
 
 
 def test_gescheiterter_agent_legt_nichts_an_pflegt_aber_weiter(tmp_path, agent):
@@ -865,7 +866,7 @@ def test_gescheiterter_agent_legt_nichts_an_pflegt_aber_weiter(tmp_path, agent):
 
     assert bilanz["neu"] == []
     assert "error" in bilanz
-    thema = ht.lade_themen(tmp_path)[0]
+    thema = ts.lade_themen(tmp_path)[0]
     # Die Pflege braucht kein Modell - ein Aussetzer des Anbieters darf ein
     # laufendes Thema nicht altern lassen, obwohl neue Meldungen da waren.
     assert "https://e.example/9" in {i["url"] for i in thema["items"]}
@@ -873,9 +874,9 @@ def test_gescheiterter_agent_legt_nichts_an_pflegt_aber_weiter(tmp_path, agent):
 
 
 def test_unlesbarer_speicher_kippt_den_lauf_nicht(tmp_path):
-    ht.store_pfad(tmp_path).parent.mkdir(parents=True, exist_ok=True)
-    ht.store_pfad(tmp_path).write_text("{kaputt", encoding="utf-8")
-    assert ht.lade_themen(tmp_path) == []
+    ts.store_pfad(tmp_path).parent.mkdir(parents=True, exist_ok=True)
+    ts.store_pfad(tmp_path).write_text("{kaputt", encoding="utf-8")
+    assert ts.lade_themen(tmp_path) == []
     ht.pflege_highlight_themen(LAUNCH, tmp_path, "2026-08-07", use_llm=False)
 
 
@@ -898,7 +899,7 @@ def test_zwei_urteile_mit_denselben_suchwoertern_ergeben_ein_thema(tmp_path, age
     ht.pflege_highlight_themen(
         LAUNCH + RAUSCHEN, tmp_path, "2026-08-11", model="m", use_llm=True
     )
-    assert len(ht.lade_store(tmp_path)["topics"]) == 1
+    assert len(ts.lade_store(tmp_path)["topics"]) == 1
 
 
 # ------------------------------------------------------------ Slug/Anker
@@ -998,7 +999,7 @@ def test_themenseite_zeigt_nur_belegbare_aktionen(tmp_path, agent):
     ht.pflege_highlight_themen(
         LAUNCH, tmp_path / "data" / "state", "2026-08-07", model="m", use_llm=True
     )
-    thema = ht.lade_themen(tmp_path / "data" / "state")[0]
+    thema = ts.lade_themen(tmp_path / "data" / "state")[0]
 
     from telco_radar.report.thema import build_thema_view
 
@@ -1066,7 +1067,7 @@ def test_kein_zu_kleines_bild_in_einer_grossen_position(tmp_path, agent):
     ]
     agent(_urteil())
     ht.pflege_highlight_themen(schmal, tmp_path, "2026-08-07", model="m", use_llm=True)
-    view = build_thema_view(ht.lade_themen(tmp_path)[0])
+    view = build_thema_view(ts.lade_themen(tmp_path)[0])
 
     assert view["aufmacher"] is not None, "die Position bleibt besetzt"
     assert "image" not in view["aufmacher"], "nur das Bild faellt weg"
@@ -1082,5 +1083,5 @@ def test_kein_zu_kleines_bild_in_einer_grossen_position(tmp_path, agent):
     ht.pflege_highlight_themen(
         breit, tmp_path / "b", "2026-08-07", model="m", use_llm=True
     )
-    view = build_thema_view(ht.lade_themen(tmp_path / "b")[0])
+    view = build_thema_view(ts.lade_themen(tmp_path / "b")[0])
     assert view["aufmacher"]["image"] == "gross.jpg"

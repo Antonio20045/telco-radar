@@ -27,7 +27,9 @@ from .analyze import competitors as competitor_mod
 from .analyze import diff_curator
 from .analyze import category_sweep
 from .analyze import differentiation_editor
+from .analyze.begriffe import THEME_LABEL
 from .analyze.diff_curator import DiffStore
+from .analyze.diff_db import DiffDB
 from .analyze import highlight_topics
 from .analyze import redaktion_kontinuitaet
 from .analyze import vorsortierung as vorsortierung_mod
@@ -1374,9 +1376,9 @@ def run(
     # quellengebundenen Regelbericht nutzbar.
     diff_report_dir = reports_dir / "differenzierung"
     diff_report_dir.mkdir(parents=True, exist_ok=True)
-    diff_db = category_sweep.DiffDB(state_dir / "differentiation_db.json")
+    diff_db = DiffDB(state_dir / "differentiation_db.json")
     diff_entries = list(diff_db.entries.values())
-    theme_labels = category_sweep.THEME_LABEL
+    theme_labels = THEME_LABEL
     try:
         if use_llm and diff_entries:
             diff_body = differentiation_editor.synthesize(

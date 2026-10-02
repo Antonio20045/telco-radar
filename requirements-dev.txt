@@ -1,3 +1,4 @@
 -r requirements.txt
 pytest-xdist>=3.5
 ruff==0.15.20
+import-linter==2.15

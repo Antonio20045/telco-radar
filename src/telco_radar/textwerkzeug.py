@@ -337,3 +337,42 @@ def ohne_vodafone_teil(note: str) -> str:
     if len(teile) > 1 and "vodafone" not in kopf.lower():
         return kopf if kopf.endswith((".", "!", "?")) else kopf + "."
     return ""
+
+
+# Zahlen im Satz, die belegt sein muessen. Prozentangaben, Preise, Volumen.
+# Einstellige Zahlen bleiben aussen vor: "5G", "die ersten drei" und
+# Aufzaehlungen sind keine Behauptung ueber die Quelle.
+_ZAHL_IM_SATZ = re.compile(r"\d+(?:[.,]\d+)*")
+
+
+def ungedeckte_zahl(satz: str, quelle: str) -> str | None:
+    """Nennt der Satz eine Zahl, die in der Quelle nicht steht?"""
+    quelle_zahlen = {
+        z.replace(".", "").replace(",", ".")
+        for z in _ZAHL_IM_SATZ.findall(quelle or "")
+    }
+    for roh in _ZAHL_IM_SATZ.findall(satz or ""):
+        normal = roh.replace(".", "").replace(",", ".")
+        if len(normal.replace(".", "")) <= 1:
+            continue
+        # "35 Euro" deckt "34,95 Euro" nicht ab, aber "5G" deckt "5G" ab -
+        # verglichen wird der reine Zahlenwert, gerundete Naeherungen zaehlen
+        # als gedeckt, wenn die Quelle denselben Betrag ganzzahlig enthaelt.
+        if normal in quelle_zahlen:
+            continue
+        try:
+            wert = float(normal)
+        except ValueError:
+            return roh
+        if any(abs(wert - float(q)) < 1.0 for q in quelle_zahlen if _ist_zahl(q)):
+            continue
+        return roh
+    return None
+
+
+def _ist_zahl(text: str) -> bool:
+    try:
+        float(text)
+        return True
+    except ValueError:
+        return False

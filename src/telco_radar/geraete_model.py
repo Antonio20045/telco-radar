@@ -62,6 +62,10 @@ VERFUEGBARKEITEN = (
 
 ANBIETER_TYPEN = ("handel", "netzbetreiber", "discount")
 
+STATUS_AKTIV = "aktiv"
+STATUS_VERMUTLICH = "vermutlich ausgelistet"
+STATUS_AUSGELISTET = "ausgelistet"
+
 # Belegstufen, gleiche Skala wie collect/lieferzeit.py:
 #   hoch    strukturierte Daten (ld+json, API)
 #   mittel  gezielter Selektor / JSON-Endpunkt der Seite

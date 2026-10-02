@@ -41,7 +41,13 @@ from itertools import zip_longest
 from pathlib import Path
 from typing import Optional
 
-from ..geraete_model import ratenhinweis_aus_eintrag, serie_aus_modell
+from ..geraete_model import (
+    STATUS_AKTIV,
+    STATUS_AUSGELISTET,
+    STATUS_VERMUTLICH,
+    ratenhinweis_aus_eintrag,
+    serie_aus_modell,
+)
 from . import (
     geraete_alarme,
     geraete_bereinigung,
@@ -68,9 +74,6 @@ from ..analyze.geraete_store import (
     GELESEN,
     GeraeteDB,
     Preishistorie,
-    STATUS_AKTIV,
-    STATUS_AUSGELISTET,
-    STATUS_VERMUTLICH,
     TEILGELESEN,
     tag_de,
 )

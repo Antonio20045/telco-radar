@@ -43,7 +43,7 @@ import re
 import unicodedata
 from urllib.parse import urlsplit
 
-from ..analyze.promo_ranker import MECHANICS
+from ..analyze.begriffe import MECHANICS
 from ..textwerkzeug import ohne_vodafone_teil
 
 # Wie viele Aktionen je Wettbewerber auf der Seite stehen. Der Rest steht

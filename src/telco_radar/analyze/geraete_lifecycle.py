@@ -100,8 +100,13 @@ import logging
 from datetime import date, datetime
 from typing import Optional
 
-from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, Katalog, serie_aus_modell
-from .geraete_store import STATUS_AKTIV, STATUS_VERMUTLICH
+from ..geraete_model import (
+    STATUS_AKTIV,
+    STATUS_VERMUTLICH,
+    VERGLEICHBARE_ZUSTAENDE,
+    Katalog,
+    serie_aus_modell,
+)
 
 log = logging.getLogger(__name__)
 

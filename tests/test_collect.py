@@ -459,3 +459,25 @@ def test_deckel_je_feed_ist_einstellbar():
         )
         == 10
     )
+
+
+def test_newsroom_verwirft_sitemap_link():
+    html = """
+    <article><a href="/press-release/2026/07/sitemap-overview">Sitemap of the Example newsroom</a>
+      <time>July 9, 2026</time></article>
+    <article><a href="/press-release/2026/07/new-service">New customer service launch</a>
+      <time>July 9, 2026</time></article>
+    """
+    src = Source(type="newsroom", url="https://example.com/news", name="S")
+    items = parse_newsroom_html(html, src, "europe", "Example", "operator")
+    assert [i.title for i in items] == ["New customer service launch"]
+
+
+def test_newsroom_behaelt_meldung_mit_navigationswort_im_satz():
+    html = """
+    <article><a href="/press-release/2026/07/cell-map">Example adds 5G cells to its sitemap</a>
+      <time>July 9, 2026</time></article>
+    """
+    src = Source(type="newsroom", url="https://example.com/news", name="S")
+    items = parse_newsroom_html(html, src, "europe", "Example", "operator")
+    assert [i.title for i in items] == ["Example adds 5G cells to its sitemap"]

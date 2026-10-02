@@ -41,11 +41,12 @@ from datetime import date, timedelta
 from pathlib import Path
 
 from ..textwerkzeug import gewicht, haeufigkeiten, slug, wortmenge
+from .begriffe import MIND_TREFFER, suchmuster, treffer
+from .themen_store import aktive_themen, lade_store, speichere_store
 from .llm import complete, extract_json
 
 log = logging.getLogger(__name__)
 
-STORE_NAME = "highlight_topics.json"
 
 # --- Kandidatensuche ------------------------------------------------------
 # Was eine Gruppe sein muss, um ueberhaupt gefragt zu werden. Der Schutz vor
@@ -223,10 +224,6 @@ MAX_ANTIZIPATION = 3
 ANKUENDIGUNG_HORIZONT_TAGE = 180
 
 # --- Pflege ---------------------------------------------------------------
-# Wie viele Suchwoerter eine neue Meldung treffen muss, um einem Thema
-# zugeordnet zu werden. Eins reicht nicht: "Samsung" allein zieht jede
-# Geraetemeldung des Herstellers in den Launch der Z-Fold-Reihe.
-MIND_TREFFER = 2
 # Ab wie vielen neuen Meldungen ein Lauf als Zuwachs zaehlt.
 MIND_ZUWACHS = 2
 MAX_RUNS_OHNE_ZUWACHS = 4
@@ -250,52 +247,6 @@ MAX_ITEMS_JE_THEMA = 80
 ARCHIV_TAGE = 14
 
 _TOKENS = 16000
-
-
-# ---------------------------------------------------------------- Speicher
-def store_pfad(state_dir: Path) -> Path:
-    return Path(state_dir) / STORE_NAME
-
-
-def lade_store(state_dir: Path) -> dict:
-    """Der Themenspeicher. Fehlt oder bricht er, faengt der Lauf bei null an -
-    ein unlesbarer Speicher darf nie den Lauf kippen."""
-    pfad = store_pfad(state_dir)
-    if not pfad.exists():
-        return {"updated": "", "topics": []}
-    try:
-        daten = json.loads(pfad.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        log.warning("%s unlesbar - beginne mit leerem Themenspeicher", pfad)
-        return {"updated": "", "topics": []}
-    if not isinstance(daten, dict) or not isinstance(daten.get("topics"), list):
-        return {"updated": "", "topics": []}
-    return daten
-
-
-def speichere_store(state_dir: Path, store: dict) -> None:
-    pfad = store_pfad(state_dir)
-    pfad.parent.mkdir(parents=True, exist_ok=True)
-    pfad.write_text(json.dumps(store, ensure_ascii=False, indent=1), encoding="utf-8")
-
-
-def aktive_themen(store: dict) -> list[dict]:
-    """Die Themen, die eine Seite bekommen - neueste Aktivitaet zuerst."""
-    aktiv = [
-        t
-        for t in (store.get("topics") or [])
-        if t.get("status") == "aktiv" and t.get("items")
-    ]
-    return sorted(
-        aktiv,
-        key=lambda t: (t.get("last_active") or "", len(t.get("items") or [])),
-        reverse=True,
-    )
-
-
-def lade_themen(state_dir: Path) -> list[dict]:
-    """Die aktiven Themen zum Rendern. Einziger Einstieg fuer report/."""
-    return aktive_themen(lade_store(state_dir))
 
 
 # ----------------------------------------------------------- Archivzugriff
@@ -564,9 +515,9 @@ def _kuenftiger_termin(text: str, heute: date | None) -> bool:
     Tag dann schon vorbei ist, gegen das naechste - so bleibt "10. Januar"
     im Dezember ein bevorstehender Termin.
     """
-    for treffer in _DATUM_MUSTER.finditer(text or ""):
-        monat = (treffer.group("m1") or treffer.group("m2") or "").lower()
-        tag = treffer.group("t1") or treffer.group("t2") or ""
+    for fund in _DATUM_MUSTER.finditer(text or ""):
+        monat = (fund.group("m1") or fund.group("m2") or "").lower()
+        tag = fund.group("t1") or fund.group("t2") or ""
         if heute is None:
             return True
         try:
@@ -603,8 +554,8 @@ def _ankuendigungssprache(items: list[dict], heute: date | None = None) -> bool:
     eine beilaeufige Datumsnennung, kein Ereignishinweis. Erst ein Muster
     ueber mehrere Meldungen der Gruppe ist eins.
     """
-    treffer = _ankuendigungstreffer(items, heute)
-    return treffer >= max(MIND_ANKUENDIGUNGSTREFFER, len(items) // 2)
+    anzahl = _ankuendigungstreffer(items, heute)
+    return anzahl >= max(MIND_ANKUENDIGUNGSTREFFER, len(items) // 2)
 
 
 def _ankuendigungsdichte(kandidat: dict, heute: date | None) -> float:
@@ -672,25 +623,6 @@ def finde_antizipation(highlights: list[dict], heute: str = "") -> list[dict]:
         )
     )
     return out[:MAX_ANTIZIPATION]
-
-
-# ------------------------------------------------------------ Suchwortlogik
-def suchmuster(suchwoerter) -> list[re.Pattern]:
-    """Wortgrenzen-Muster je Suchwort - dieselbe Regel wie in
-    analyze/competitors.py. Ohne die Grenzen faende "fold" jedes "Foldable"
-    und "O2" jedes "CO2"."""
-    muster = []
-    for w in suchwoerter or []:
-        w = " ".join(str(w or "").split())
-        if len(w) >= 2:
-            muster.append(re.compile(r"(?<!\w)" + re.escape(w.lower()) + r"(?!\w)"))
-    return muster
-
-
-def treffer(text: str, muster: list[re.Pattern]) -> int:
-    """Wie viele VERSCHIEDENE Suchwoerter in diesem Text vorkommen."""
-    t = (text or "").lower()
-    return sum(1 for p in muster if p.search(t))
 
 
 def _item(h: dict, woche: str) -> dict:

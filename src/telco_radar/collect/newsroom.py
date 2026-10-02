@@ -162,7 +162,7 @@ _JUNK_EXACT = {
 # Phrases that mark a non-article link when the title is short.
 _JUNK_CONTAINS = re.compile(
     r"^(perspectives|faq|frequently asked|social media|press conference "
-    r"materials|our reports|emergency resource|media (center|centre)|sitemap)",
+    r"materials|our reports|emergency resource|media (center|centre)|sitemap)\b",
     re.I,
 )
 

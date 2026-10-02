@@ -57,12 +57,10 @@ from pathlib import Path
 
 import yaml
 
-# Die Zahlenrechnung des Prueflaufs, nicht eine zweite daneben. Ob eine Zahl
-# "aus der Quelle" stammt, muss hier dasselbe heissen wie dort - sonst laesst
-# der Kasten eine Zeile zu, die die Belegpruefung verworfen haette.
-# faithfulness importiert nur `.llm`, also entsteht kein Ringschluss.
-from .faithfulness import _zahlen_gedeckt
-from ..textwerkzeug import begriffs_muster
+# Die Zahlenrechnung des Prueflaufs (faithfulness), nicht eine zweite daneben.
+# Ob eine Zahl "aus der Quelle" stammt, muss hier dasselbe heissen wie dort -
+# sonst laesst der Kasten eine Zeile zu, die die Belegpruefung verworfen haette.
+from ..textwerkzeug import begriffs_muster, ungedeckte_zahl
 
 log = logging.getLogger(__name__)
 
@@ -328,7 +326,7 @@ def hat_zahl_aus_der_quelle(h: dict) -> bool:
     if not zahlen:
         return False
     quelle = f"{h.get('title') or ''} {h.get('summary') or ''}"
-    return _zahlen_gedeckt(satz, quelle) is None
+    return ungedeckte_zahl(satz, quelle) is None
 
 
 # Der Zuschnitt des Kurzpfads. Er steht HIER und nicht bei seinem Aufrufer,

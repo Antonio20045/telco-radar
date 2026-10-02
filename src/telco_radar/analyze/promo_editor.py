@@ -15,6 +15,7 @@ import json
 import logging
 import re
 
+from .begriffe import DIGEST_MARKER
 from .llm import complete
 
 log = logging.getLogger(__name__)
@@ -164,18 +165,6 @@ def _source_link(e: dict, mit_marke: bool = True) -> str:
     brand = e.get("brand") or "Anbieter"
     label = e.get("headline") or "Angebot"
     return f"[{brand + ' – ' if mit_marke else ''}{label}]({e.get('url') or ''})"
-
-
-# Der Digest ist KEIN Redaktionstext, und er darf auch nicht so aussehen.
-# Bis zum 07.08.2026 stand er unter derselben Ueberschrift und in derselben
-# Form wie die Prosa des Editors - die Promo-Uebersicht schnitt daraus ihren
-# Vorspann und zeigte am 06.08. "ALDI TALK imoo Kinder-Smartwatch kaufen + 2
-# MovieChoice-Kinogutscheine ALDI TALK - imoo Kinder-Smartwatch kaufen + 2
-# MovieChoice-Kinogutscheine ." - derselbe Titel zweimal, mit freistehendem
-# Punkt. Der Fehler lag nicht im Schnitt, sondern hier: der Titel stand
-# zweimal in der Zeile (einmal blank, einmal als Linktext), und nichts sagte
-# der Seite, dass sie keine Saetze vor sich hat.
-DIGEST_MARKER = "Für diesen Lauf liegt kein Redaktionstext vor."
 
 
 def build_digest(entries: list[dict]) -> str:

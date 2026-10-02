@@ -35,10 +35,14 @@ from .promo import prepare_promo_view
 from .thema import build_thema_view
 from .wettbewerb import anker as _wb_anker, build_wettbewerb_view
 from ..analyze import ctm
-from ..analyze import highlight_topics
+from ..analyze import themen_store
 from ..analyze.diff_curator import DiffStore
-from ..analyze.category_sweep import DiffDB, THEMES as SWEEP_THEMES
-from ..analyze.promo_ranker import MECHANICS as PROMO_MECHANICS
+from ..analyze.begriffe import (
+    DIGEST_MARKER,
+    MECHANICS as PROMO_MECHANICS,
+    THEMES as SWEEP_THEMES,
+)
+from ..analyze.diff_db import DiffDB
 from ..promo_config import load_promo_config
 from ..textwerkzeug import (
     ABKUERZUNGEN as _ABK,
@@ -1269,7 +1273,6 @@ def _promo_lead(md_text: str) -> str:
     zurueckgegeben, als eine Aufzaehlung als Analyse auszugeben. Die Karte
     zeigt in dem Fall die Datenlage statt eines Textes (siehe Vorlage).
     """
-    from ..analyze.promo_editor import DIGEST_MARKER
 
     secs = _briefing_sections(md_text)
     if not secs:
@@ -1447,7 +1450,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     # verweist - gerendert werden ihre Seiten weiter unten, nach den Promos:
     # ein Thema darf die dazu passenden Aktionen zeigen.
     state_dir = reports_dir.parent / "state"
-    themen = highlight_topics.lade_themen(state_dir)
+    themen = themen_store.lade_themen(state_dir)
     for thema in themen:
         for item in thema.get("items") or []:
             if item.get("image") and item["image"] not in vorhandene_bilder:

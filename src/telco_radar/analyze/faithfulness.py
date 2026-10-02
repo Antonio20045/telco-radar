@@ -31,18 +31,13 @@ from __future__ import annotations
 
 import json
 import logging
-import re
 
+from ..textwerkzeug import ungedeckte_zahl
 from .llm import complete, extract_json
 
 log = logging.getLogger(__name__)
 
 STAPEL = 10  # Saetze je Pruefaufruf
-
-# Zahlen im Satz, die belegt sein muessen. Prozentangaben, Preise, Volumen.
-# Einstellige Zahlen bleiben aussen vor: "5G", "die ersten drei" und
-# Aufzaehlungen sind keine Behauptung ueber die Quelle.
-_ZAHL_IM_SATZ = re.compile(r"\d+(?:[.,]\d+)*")
 
 _SICHERHEIT = ("sehr wahrscheinlich", "wahrscheinlich", "möglich")
 
@@ -70,39 +65,6 @@ Antworte mit NUR diesem JSON, ohne Markdown:
 
 Im Zweifel belegt=false.
 """
-
-
-def _zahlen_gedeckt(satz: str, quelle: str) -> str | None:
-    """Nennt der Satz eine Zahl, die in der Quelle nicht steht?"""
-    quelle_zahlen = {
-        z.replace(".", "").replace(",", ".")
-        for z in _ZAHL_IM_SATZ.findall(quelle or "")
-    }
-    for roh in _ZAHL_IM_SATZ.findall(satz or ""):
-        normal = roh.replace(".", "").replace(",", ".")
-        if len(normal.replace(".", "")) <= 1:
-            continue
-        # "35 Euro" deckt "34,95 Euro" nicht ab, aber "5G" deckt "5G" ab -
-        # verglichen wird der reine Zahlenwert, gerundete Naeherungen zaehlen
-        # als gedeckt, wenn die Quelle denselben Betrag ganzzahlig enthaelt.
-        if normal in quelle_zahlen:
-            continue
-        try:
-            wert = float(normal)
-        except ValueError:
-            return roh
-        if any(abs(wert - float(q)) < 1.0 for q in quelle_zahlen if _ist_zahl(q)):
-            continue
-        return roh
-    return None
-
-
-def _ist_zahl(text: str) -> bool:
-    try:
-        float(text)
-        return True
-    except ValueError:
-        return False
 
 
 def _uebertreibt(satz: str, quelle: str) -> bool:
@@ -165,7 +127,7 @@ def pruefe(highlights: list[dict], *, model: str, use_llm: bool) -> dict:
     offen = []
     for h in kandidaten:
         quelle = f"{h.get('title') or ''} {h.get('summary') or ''}"
-        erfunden = _zahlen_gedeckt(h["ctm_satz"], quelle)
+        erfunden = ungedeckte_zahl(h["ctm_satz"], quelle)
         if erfunden:
             verwirf(h, f"Zahl {erfunden} steht nicht in der Quelle")
             continue

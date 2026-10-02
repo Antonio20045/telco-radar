@@ -799,7 +799,7 @@ def lies_text(
     sauber = normalisiere(text or "")
     # Die Rohzeilen behalten ihre Spaltenausrichtung - nur die unsichtbaren
     # Zeichen fliegen raus. Ohne sie ist die Geraetestaffel nicht zuzuordnen.
-    rohzeilen = (text or "").replace("​", "").replace("­", "").splitlines()
+    rohzeilen = (text or "").replace("\u200b", "").replace("\xad", "").splitlines()
     t = Tarif(
         dokument_url=url, dokument_hash=hash_, abgerufen_am=abgerufen_am, rohtext=sauber
     )

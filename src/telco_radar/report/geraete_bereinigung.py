@@ -141,8 +141,8 @@ from __future__ import annotations
 from copy import copy
 from typing import Optional
 
-from ..analyze.geraete_store import STATUS_AKTIV
 from ..geraete_model import (
+    STATUS_AKTIV,
     VERGLEICHBARE_ZUSTAENDE,
     farbschluessel,
     ohne_zustandswort,

@@ -326,7 +326,12 @@ def normalisiere(text: str) -> str:
     * **Spaltenabstaende.** `-layout` polstert mit bis zu vierzig Leerzeichen;
       ohne Zusammenziehen braeuchte jeder Regex ein `\\s{1,40}`.
     """
-    text = text.replace("​", "").replace("­", "").replace(" ", " ").replace("‑", "-")
+    text = (
+        text.replace("\u200b", "")
+        .replace("\xad", "")
+        .replace("\xa0", " ")
+        .replace("\u2011", "-")
+    )
     zeilen = [" ".join(z.split()) for z in text.splitlines()]
     return "\n".join(z for z in zeilen if z)
 
@@ -335,7 +340,7 @@ def zahl(roh: str) -> Optional[float]:
     """Eine deutsche Dezimalzahl als float. "1.234,56" -> 1234.56."""
     if roh is None:
         return None
-    s = str(roh).strip().replace(" ", "")
+    s = str(roh).strip().replace("\xa0", "")
     if not s:
         return None
     s = re.sub(r"[^\d,.\-]", "", s)

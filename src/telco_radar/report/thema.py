@@ -21,7 +21,7 @@ from __future__ import annotations
 
 from urllib.parse import urlsplit
 
-from ..analyze.highlight_topics import MIND_TREFFER, suchmuster, treffer
+from ..analyze.begriffe import MIND_TREFFER, suchmuster, treffer
 
 # Ab welcher Bildbreite ein Bild in Aufmacher oder zweite Reihe darf.
 # Gemessen an der gerenderten Seite bei 1440 px: der Aufmacher stellt sein

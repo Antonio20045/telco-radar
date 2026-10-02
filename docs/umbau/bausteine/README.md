@@ -23,7 +23,7 @@ Die Option `--dist worksteal` statt `loadgroup` ist Absicht, weil sonst eine ein
 
 ### import-linter-Verträge (`.importlinter`)
 
-Die Ausnahmeliste von `report-rechnet-nur` ist vollständig und gegen den Klon geprüft: Mit genau diesen 27 Kanten meldet `lint-imports` den Vertrag als gehalten, mit den ersten sieben allein bleiben 13 Verstöße. Die Reihenfolge entspricht dem Plan im Abschnitt „Verträge statt Sätze“: Die ersten elf Zeilen fallen in Schritt 3 weg, die drei Wurzelmodul-Kanten in Schritt 10, der Rest in Schritt 9. `wurzel-unten` ist heute von genau zwei Kanten gebrochen, die hier als Ausnahme stehen. Stufe 0 vergleicht die Länge aller `ignore_imports` mit dem letzten Commit. Der Vertrag „Kein Zyklus im Adapterpaket“ ergibt sich aus `adapter-unabhaengig` zusammen mit der Regel, dass `collect/geraete/__init__.py` nach dem Umbau keine Adapter mehr importiert; bis dahin steht dieser Import ebenfalls in den Ausnahmen.
+Die Ausnahmeliste von `report-rechnet-nur` ist vollständig und gegen den Klon geprüft: Ursprünglich waren es 27 Kanten; Paket 4 hat die elf aus Schritt 3 gestrichen, mit den verbleibenden 16 meldet `lint-imports` den Vertrag als gehalten. Die Reihenfolge entspricht dem Plan im Abschnitt „Verträge statt Sätze“: die drei Wurzelmodul-Kanten in Schritt 10, der Rest in Schritt 9. `wurzel-unten` ist heute von genau zwei Kanten gebrochen, die hier als Ausnahme stehen. Stufe 0 vergleicht die Länge aller `ignore_imports` mit dem letzten Commit. Der Vertrag „Kein Zyklus im Adapterpaket“ ergibt sich aus `adapter-unabhaengig` zusammen mit der Regel, dass `collect/geraete/__init__.py` nach dem Umbau keine Adapter mehr importiert; bis dahin steht dieser Import ebenfalls in den Ausnahmen.
 
 ### Git-Hooks (`.githooks/`) und `Makefile`
 

@@ -44,7 +44,7 @@ from __future__ import annotations
 import re
 from datetime import datetime, timedelta
 
-from ..analyze.promo_ranker import MECHANICS
+from ..analyze.begriffe import MECHANICS
 from .suchindex import marken_anker
 from ..analyze.promo_store import _same_offer
 

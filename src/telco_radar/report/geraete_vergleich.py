@@ -40,8 +40,12 @@ from __future__ import annotations
 
 from typing import Optional
 
-from ..analyze.geraete_store import STATUS_AKTIV, STATUS_VERMUTLICH
-from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ratenhinweis_aus_eintrag
+from ..geraete_model import (
+    STATUS_AKTIV,
+    STATUS_VERMUTLICH,
+    VERGLEICHBARE_ZUSTAENDE,
+    ratenhinweis_aus_eintrag,
+)
 
 # Ab wann ein Preisunterschied ein BEFUND ist und kein Rundungsrauschen.
 # Am 29.08.2026 standen 62 Zeilen auf der Seite, davon 36 "niemand

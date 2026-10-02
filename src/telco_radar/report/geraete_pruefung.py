@@ -68,8 +68,13 @@ from __future__ import annotations
 
 from statistics import median
 
-from ..analyze.geraete_store import STATUS_AKTIV, STATUS_VERMUTLICH
-from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, farbschluessel, zustand_aus_titel
+from ..geraete_model import (
+    STATUS_AKTIV,
+    STATUS_VERMUTLICH,
+    VERGLEICHBARE_ZUSTAENDE,
+    farbschluessel,
+    zustand_aus_titel,
+)
 
 # Ab dieser Spanne ueber die FARBEN eines Geraets wird der Fall berichtet -
 # nicht aussortiert. Kein Farbaufschlag ist ein Viertel des Geraetepreises;
