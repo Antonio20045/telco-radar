@@ -2,10 +2,10 @@
  "updated": "2026-10-02",
  "anbieter": {
   "ALDI TALK": {
-   "laeufe": 46,
-   "funde_gesamt": 200,
+   "laeufe": 47,
+   "funde_gesamt": 205,
    "letzter_lauf": "2026-10-02",
-   "letzte_funde": 4,
+   "letzte_funde": 5,
    "letzter_fund": "2026-10-02",
    "termine": [
     "2026-08-29",
@@ -134,18 +134,18 @@
     ],
     [
      "2026-10-02",
-     4,
+     5,
      "gelesen",
      0,
-     27,
+     28,
      0
     ]
    ],
    "tote_adressen": 0
   },
   "Vodafone": {
-   "laeufe": 44,
-   "funde_gesamt": 7370,
+   "laeufe": 45,
+   "funde_gesamt": 7553,
    "letzter_lauf": "2026-10-02",
    "letzte_funde": 183,
    "termine": [
@@ -286,8 +286,8 @@
    "tote_adressen": 0
   },
   "o2": {
-   "laeufe": 44,
-   "funde_gesamt": 2948,
+   "laeufe": 45,
+   "funde_gesamt": 3016,
    "letzter_lauf": "2026-10-02",
    "letzte_funde": 68,
    "termine": [
@@ -429,8 +429,8 @@
   },
   "mobilcom-debitel": {
    "laeufe": 5,
-   "funde_gesamt": 5376,
-   "letzte_funde": 86,
+   "funde_gesamt": 5451,
+   "letzte_funde": 75,
    "termine": [
     "2026-08-29",
     "2026-08-30",
@@ -559,15 +559,15 @@
     ],
     [
      "2026-10-02",
-     86,
+     75,
      "lesefehler",
      0,
-     27,
-     5
+     16,
+     3
     ]
    ],
    "letzter_lauf": "2026-09-29",
-   "tote_adressen": 5
+   "tote_adressen": 3
   },
   "ElectronicPartner": {
    "laeufe": 1,
@@ -786,9 +786,9 @@
   },
   "congstar": {
    "laeufe": 26,
-   "funde_gesamt": 5020,
+   "funde_gesamt": 5173,
    "letzter_lauf": "2026-10-02",
-   "letzte_funde": 152,
+   "letzte_funde": 153,
    "termine": [
     "2026-09-03",
     "2026-09-04",
@@ -911,9 +911,9 @@
     ],
     [
      "2026-10-02",
-     152,
-     "gelesen",
-     944,
+     153,
+     "lesefehler",
+     960,
      43,
      0
     ]
@@ -921,8 +921,8 @@
    "tote_adressen": 0
   },
   "1&1": {
-   "laeufe": 36,
-   "funde_gesamt": 1290,
+   "laeufe": 37,
+   "funde_gesamt": 1326,
    "letzter_lauf": "2026-10-02",
    "letzte_funde": 36,
    "termine": [
@@ -1154,10 +1154,10 @@
    "tote_adressen": null
   },
   "Saturn": {
-   "laeufe": 32,
-   "funde_gesamt": 637,
+   "laeufe": 33,
+   "funde_gesamt": 650,
    "letzter_lauf": "2026-10-02",
-   "letzte_funde": 14,
+   "letzte_funde": 13,
    "termine": [
     "2026-09-05",
     "2026-09-06",
@@ -1279,7 +1279,7 @@
     ],
     [
      "2026-10-02",
-     14,
+     13,
      "gelesen",
      0,
      0,
@@ -3792,7 +3792,7 @@
    "erstpreis_am": "2026-09-01",
    "last_verified": "2026-10-02",
    "letzter_check": "2026-10-02",
-   "quelle_url": "https://www.alditalk.de/p/fairphone-fairphone-gen-6-256-gb-forest-green-model-fp6-30042279A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=12&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
+   "quelle_url": "https://www.alditalk.de/p/fairphone-fairphone-gen-6-256-gb-forest-green-model-fp6-30042279A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=14&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
    "abgerufen_am": "2026-10-02",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
@@ -3842,7 +3842,7 @@
    "speicher_gb": 128,
    "farbe_roh": "Black",
    "farbe_normalisiert": "schwarz",
-   "ean": "8806097642671",
+   "ean": "8806097651192",
    "zustand": "neu",
    "first_seen": "2026-08-29",
    "status": "aktiv",
@@ -3852,15 +3852,15 @@
    "erstpreis_am": "2026-08-29",
    "last_verified": "2026-10-02",
    "letzter_check": "2026-10-02",
-   "quelle_url": "https://www.alditalk.de/p/samsung-samsung-galaxy-a17-5g-128-gb-black-sm-a176b-ds-30041613A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=23&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
+   "quelle_url": "https://www.alditalk.de/p/samsung-samsung-galaxy-a17-lte-128-gb-black-sm-a175f-dsb-30042091A1?FF_QUERY=*%3Acategory_id%3BG5DE0Z0SIKUBHRGTNF411A7XPLN9RV3D&FF_POS=23&FF_PAGE=1&FF_PAGESIZE=30&FF_SCORE=100.0&FF_CAMPAIGN=&FF_CAMPAIGN_PAGE_ID=",
    "abgerufen_am": "2026-10-02",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.alditalk.de/smartphones"
    ],
-   "titel_roh": "SAMSUNG Galaxy A17 5G, 128 GB, Black (SM-A176B/DS)",
-   "preis_ohne_vertrag": 149.0
+   "titel_roh": "SAMSUNG Galaxy A17 LTE, 128 GB, Black (SM-A175F/DSB)",
+   "preis_ohne_vertrag": 139.0
   },
   {
    "id": "electronicpartner--samsung-galaxy-a37-128gb-ohne-farbe",
@@ -4531,15 +4531,15 @@
    "ean": "",
    "zustand": "neu",
    "first_seen": "2026-09-21",
-   "status": "ausgelistet",
-   "missed_checks": 2,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 1179.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-21",
-   "last_verified": "2026-09-29",
-   "letzter_check": "2026-10-01",
+   "last_verified": "2026-10-02",
+   "letzter_check": "2026-10-02",
    "quelle_url": "https://www.saturn.de/de/product/_apple-iphone-17-5g-512-gb-schwarz-dual-sim-3013580.html",
-   "abgerufen_am": "2026-09-29",
+   "abgerufen_am": "2026-10-02",
    "verfuegbarkeit": "unbekannt",
    "confidence": "hoch",
    "einstiege": [
@@ -4547,8 +4547,7 @@
    ],
    "titel_roh": "APPLE iPhone 17 5G 512 GB Schwarz Dual SIM",
    "preis_ohne_vertrag": 1179.0,
-   "ended_since": "2026-10-01",
-   "stale_since": "2026-09-30"
+   "ended_since": "2026-10-01"
   },
   {
    "id": "saturn--apple-iphone-17-512gb-violett",
@@ -13674,26 +13673,25 @@
    "speicher_gb": 128,
    "farbe_roh": "Fog",
    "farbe_normalisiert": null,
-   "ean": "8403539497990",
+   "ean": "0840353949799",
    "zustand": "neu",
    "first_seen": "2026-09-04",
-   "status": "ausgelistet",
-   "missed_checks": 2,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 487.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-04",
-   "last_verified": "2026-09-09",
-   "letzter_check": "2026-09-15",
+   "last_verified": "2026-10-02",
+   "letzter_check": "2026-10-02",
    "quelle_url": "https://www.congstar.de/geraete/google/google-pixel-10a/",
-   "abgerufen_am": "2026-09-09",
+   "abgerufen_am": "2026-10-02",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.congstar.de/sitemap/devices.xml"
    ],
    "titel_roh": "Google Pixel 10a 128 GB fog",
-   "preis_ohne_vertrag": 487.0,
-   "stale_since": "2026-09-10",
+   "preis_ohne_vertrag": 397.0,
    "ended_since": "2026-09-15"
   },
   {
@@ -13728,6 +13726,36 @@
    "stale_since": "2026-10-02"
   },
   {
+   "id": "congstar--google-pixel-10a-128gb-violett",
+   "sku_id": "google-pixel-10a-128gb-violett",
+   "device_id": "google-pixel-10a",
+   "anbieter": "congstar",
+   "anbieter_typ": "discount",
+   "netz": "Telekom",
+   "speicher_gb": 128,
+   "farbe_roh": "Lavender",
+   "farbe_normalisiert": "violett",
+   "ean": "0840353949850",
+   "zustand": "neu",
+   "first_seen": "2026-10-02",
+   "status": "aktiv",
+   "missed_checks": 0,
+   "erstpreis": 397.0,
+   "erstpreis_art": "ohne_vertrag",
+   "erstpreis_am": "2026-10-02",
+   "last_verified": "2026-10-02",
+   "letzter_check": "2026-10-02",
+   "quelle_url": "https://www.congstar.de/geraete/google/google-pixel-10a/",
+   "abgerufen_am": "2026-10-02",
+   "verfuegbarkeit": "lieferbar",
+   "confidence": "hoch",
+   "einstiege": [
+    "https://www.congstar.de/sitemap/devices.xml"
+   ],
+   "titel_roh": "Google Pixel 10a 128 GB lavender",
+   "preis_ohne_vertrag": 397.0
+  },
+  {
    "id": "congstar--google-pixel-10a-256gb-schwarz",
    "sku_id": "google-pixel-10a-256gb-schwarz",
    "device_id": "google-pixel-10a",
@@ -13740,23 +13768,22 @@
    "ean": "0840353949973",
    "zustand": "neu",
    "first_seen": "2026-09-03",
-   "status": "ausgelistet",
-   "missed_checks": 2,
+   "status": "aktiv",
+   "missed_checks": 0,
    "erstpreis": 595.0,
    "erstpreis_art": "ohne_vertrag",
    "erstpreis_am": "2026-09-03",
-   "last_verified": "2026-09-16",
-   "letzter_check": "2026-09-28",
+   "last_verified": "2026-10-02",
+   "letzter_check": "2026-10-02",
    "quelle_url": "https://www.congstar.de/geraete/google/google-pixel-10a/",
-   "abgerufen_am": "2026-09-16",
+   "abgerufen_am": "2026-10-02",
    "verfuegbarkeit": "lieferbar",
    "confidence": "hoch",
    "einstiege": [
     "https://www.congstar.de/sitemap/devices.xml"
    ],
    "titel_roh": "Google Pixel 10a 256 GB obsidian",
-   "preis_ohne_vertrag": 595.0,
-   "stale_since": "2026-09-27",
+   "preis_ohne_vertrag": 497.0,
    "ended_since": "2026-09-28"
   },
   {
