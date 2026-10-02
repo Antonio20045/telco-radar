@@ -4,6 +4,12 @@ Stand: 2. Oktober 2026
 
 Grundlage ist das Konzept „Agenten-Entwicklungssystem für Telco Radar“. Sein Markdown-Export liegt unter `docs/archiv/umbau-konzept.md`. Paket 1 verdichtet ihn zu `docs/umbau/plan.md` und `docs/umbau/bausteine/`; danach verweisen alle Pakete nur noch auf diese Dateien und auf CLAUDE.md. Jedes Paket füllt genau eine Sitzung.
 
+## Ziel
+
+Der Umbau räumt nicht nur auf. Er baut ein Software-Engineering-System, das sehr guten Quellcode erzeugt und ihn dauerhaft so hält, auch wenn ihn Agenten schreiben. Qualität entsteht dabei durch Mechanik, nicht durch Anweisungstext: Ein lokaler Prüfleiter entscheidet per Exit-Code, Importverträge machen falsche Abhängigkeiten unschreibbar, Basislinien und Ausnahmelisten dürfen nur schrumpfen, Tests sind hermetisch und prüfen die gerenderte Seite gegen eine unabhängige Rechnung, und ein Prüfer zählt nur mit Reproduktion. Jede Änderung soll den Code danach messbar besser hinterlassen, und keine soll ihn still verschlechtern können. Erreicht ist das Ziel, wenn `make stand` alle zehn Schritte als erfüllt meldet, alle Ausnahmelisten leer sind und neue Funktionen nur noch über `tools/auftrag.py` entstehen.
+
+Daraus folgt eine Regel für jede Sitzung: Zeigt sich eine Lehre, wird sie als Prüfung, Typ oder Vertrag festgeschrieben, nicht als weiterer Satz in CLAUDE.md. Ein Paket, das sein Fertig-Kriterium erfüllt, aber eine Regel nur in Text statt in Mechanik gegossen hat, ist nicht fertig.
+
 ## Sitzungsstart
 
 Jede Paketsitzung beginnt mit: „Lies CLAUDE.md, docs/umbau/plan.md und outputs/umbau-fortschritt.md. Setze dann Paket N aus docs/umbau/pakete.md um. Beginne im Plan Mode.“ In Paket 1 entfallen die beiden Dateien, die es erst anlegt.
