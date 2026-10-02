@@ -23,3 +23,7 @@ tmp_nachpruef/
 # Abgelegter Ballast; der Ordner wurde im Umbau-Paket 1 geloescht und darf
 # nicht wieder eingecheckt werden.
 _to_delete/
+.pruefleiter/
+.mypy_cache/
+.ruff_cache/
+.import_linter_cache/
