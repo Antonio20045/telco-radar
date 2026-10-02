@@ -29,6 +29,7 @@ Sie zeichnet keine Karte ohne belastbare Zahl. Ein Balken der Laenge null
 mit einem Anbieternamen davor sieht aus wie "kostenlos"; der Leerzustand
 gehoert in die Karte, wo sein Grund danebensteht.
 """
+
 from __future__ import annotations
 
 import math
@@ -64,12 +65,21 @@ ACHSE_HOEHE = 26
 # Kostenart unterscheidet sich in der Deckkraft. So bleibt die
 # Anbieterfarbe ueber alle Grafiken und Tabellen der Seite konsistent
 # (C.3), ohne dass jede Kombination eine eigene Farbe braucht.
-DECKKRAFT = {"einmalig": 1.0, "tarif": 0.62, "raten": 0.34,
-             "buendel": 0.5, "bonus": 0.18}
+DECKKRAFT = {
+    "einmalig": 1.0,
+    "tarif": 0.62,
+    "raten": 0.34,
+    "buendel": 0.5,
+    "bonus": 0.18,
+}
 
-KATEGORIE_NAME = {"einmalig": "einmalig", "tarif": "Tarif",
-                  "raten": "Geräteraten", "buendel": "Tarif und Gerät",
-                  "bonus": "Bonus"}
+KATEGORIE_NAME = {
+    "einmalig": "einmalig",
+    "tarif": "Tarif",
+    "raten": "Geräteraten",
+    "buendel": "Tarif und Gerät",
+    "bonus": "Bonus",
+}
 
 
 def anbieter_slug(anbieter: str) -> str:
@@ -82,8 +92,7 @@ def euro(betrag: Optional[float]) -> str:
     """Deutsche Schreibweise mit Tausenderpunkt - wie im Rest des Portals."""
     if betrag is None:
         return "–"
-    return f"{betrag:,.2f}".replace(",", "#").replace(".", ",") \
-        .replace("#", ".") + " €"
+    return f"{betrag:,.2f}".replace(",", "#").replace(".", ",").replace("#", ".") + " €"
 
 
 def _t(text) -> str:
@@ -93,6 +102,7 @@ def _t(text) -> str:
 # --------------------------------------------------------------------------
 # G1 - der TCO-Vergleich
 # --------------------------------------------------------------------------
+
 
 def _gruppen(karten: list) -> list:
     """Die Karten nach dem ZEITRAUM IHRER LEITZAHL, kuerzeste Gruppe zuerst.
@@ -128,14 +138,13 @@ def _gruppen(karten: list) -> list:
         nach_zeitraum.setdefault(k["leitzahl_monate"], []).append(k)
     gruppen = []
     for monate in sorted(nach_zeitraum):
-        zeilen = sorted(nach_zeitraum[monate],
-                        key=lambda k: k["gesamt"])
+        zeilen = sorted(nach_zeitraum[monate], key=lambda k: k["gesamt"])
         gruppen.append({"monate": monate, "karten": zeilen})
     return gruppen
 
 
 def _monate_wort(gruppen: list) -> str:
-    """"24" oder "24 und 36" - die Zeitraeume, die die Balken TRAGEN.
+    """ "24" oder "24 und 36" - die Zeitraeume, die die Balken TRAGEN.
 
     Fuer die Ueberschrift der Grafik (P0-B-h3). Sie kommt aus den
     Gruppen und nennt damit genau die Zeitraeume, die gezeichnet werden -
@@ -144,8 +153,7 @@ def _monate_wort(gruppen: list) -> str:
     monate = [g["monate"] for g in gruppen]
     if len(monate) == 1:
         return str(monate[0])
-    return " und ".join([", ".join(str(m) for m in monate[:-1]),
-                         str(monate[-1])])
+    return " und ".join([", ".join(str(m) for m in monate[:-1]), str(monate[-1])])
 
 
 def _skala(betrag: float, hoechst: float) -> float:
@@ -173,9 +181,11 @@ def balken(modell: dict) -> str:
     # wird als abgezogenes Stueck AN das Balkenende gezeichnet, der Stapel
     # ist also so lang wie die Summe seiner positiven Posten. Gegen
     # `gesamt` skaliert liefe ein Angebot mit hohem Bonus aus dem Bild.
-    hoechst = max(sum(max(0.0, p.get("betrag") or 0.0)
-                      for p in (k.get("bestandteile") or []))
-                  for g in gruppen for k in g["karten"])
+    hoechst = max(
+        sum(max(0.0, p.get("betrag") or 0.0) for p in (k.get("bestandteile") or []))
+        for g in gruppen
+        for k in g["karten"]
+    )
     # Ein bisschen Luft rechts, damit der Betrag hinter dem laengsten
     # Balken noch Platz hat.
     hoechst = hoechst * 1.18
@@ -183,8 +193,7 @@ def balken(modell: dict) -> str:
 
     hoehe = ACHSE_HOEHE
     for g in gruppen:
-        hoehe += GRUPPE_KOPF + len(g["karten"]) * (BALKEN_HOEHE
-                                                   + BALKEN_ABSTAND)
+        hoehe += GRUPPE_KOPF + len(g["karten"]) * (BALKEN_HOEHE + BALKEN_ABSTAND)
         hoehe += GRUPPE_ABSTAND
     hoehe = int(hoehe)
 
@@ -195,13 +204,12 @@ def balken(modell: dict) -> str:
     # fuer einen Screenreader war das die GANZE Grafik in einem falschen
     # Satz. Die Zeitraeume kommen aus den Gruppen, also aus den Zahlen
     # selbst; jede Gruppe nennt ihren eigenen darunter noch einmal.
-    titel = (f'Kosten über {_monate_wort(gruppen)} Monate für {_t(name)} '
-             f'je Anbieter')
+    titel = f"Kosten über {_monate_wort(gruppen)} Monate für {_t(name)} je Anbieter"
     teile = [
         f'<svg class="gr-g1" viewBox="0 0 {BREITE} {hoehe}" '
         f'width="100%" height="{hoehe}" role="img" '
         f'aria-label="{titel}">',
-        f'<title>{titel}</title>',
+        f"<title>{titel}</title>",
     ]
 
     y = 0.0
@@ -219,13 +227,15 @@ def balken(modell: dict) -> str:
         # (Regel 2 des Modulkopfs).
         teile.append(
             f'<text class="gr-g1-gruppe" x="0" y="{y + 20:.0f}">'
-            f'gerechnet über {laufzeit} Monate</text>')
+            f"gerechnet über {laufzeit} Monate</text>"
+        )
         # Die eigene Nulllinie der Gruppe (A5.4).
         oben = y + GRUPPE_KOPF - 6
-        unten = oben + len(gruppe["karten"]) * (BALKEN_HOEHE
-                                                + BALKEN_ABSTAND)
-        teile.append(f'<line class="gr-g1-null" x1="{LINKS}" y1="{oben:.0f}" '
-                     f'x2="{LINKS}" y2="{unten:.0f}" />')
+        unten = oben + len(gruppe["karten"]) * (BALKEN_HOEHE + BALKEN_ABSTAND)
+        teile.append(
+            f'<line class="gr-g1-null" x1="{LINKS}" y1="{oben:.0f}" '
+            f'x2="{LINKS}" y2="{unten:.0f}" />'
+        )
         y += GRUPPE_KOPF
 
         # Die Referenzlinie - nur in der Gruppe, deren Zeitraum sie
@@ -235,8 +245,7 @@ def balken(modell: dict) -> str:
         # Gruppe waere genau der Massstab, den Befund 2 meint. Verglichen
         # wird der Zeitraum der REFERENZZAHL gegen den der Gruppe - bis
         # hierher stand rechts die Tariflaufzeit der Karten (konstant 24).
-        if referenz and zeitraum_vergleichbar(referenz.get("monate"),
-                                              laufzeit):
+        if referenz and zeitraum_vergleichbar(referenz.get("monate"), laufzeit):
             x = LINKS + _skala(referenz["gesamt"], hoechst)
             # DAS ETIKETT KIPPT NACH LINKS, wenn es sonst aus dem Bild
             # liefe. Die Referenz ist regelmaessig der teuerste Balken -
@@ -249,10 +258,13 @@ def balken(modell: dict) -> str:
             # Zusatz liest sich "Vodafone-Referenz 1.428,70 EUR" unter dem
             # Kopf "gerechnet über 36 Monate" als 36-Monats-Zahl.
             tarif_monate = referenz.get("tarif_monate")
-            text = f'Vodafone-Referenz {euro(referenz["gesamt"])}'
-            if (tarif_monate and tarif_monate != laufzeit
-                    and referenz.get("geraet_betrag") is not None):
-                text += f' · Barkauf + {tarif_monate} Monate Tarif'
+            text = f"Vodafone-Referenz {euro(referenz['gesamt'])}"
+            if (
+                tarif_monate
+                and tarif_monate != laufzeit
+                and referenz.get("geraet_betrag") is not None
+            ):
+                text += f" · Barkauf + {tarif_monate} Monate Tarif"
             # ~6,6 px je Zeichen bei 12 px Grotesk - grosszuegig gerundet,
             # damit der Kipp-Punkt eher zu frueh als zu spaet greift.
             rechts = x + 5 + int(len(text) * 6.6) > BREITE
@@ -261,8 +273,9 @@ def balken(modell: dict) -> str:
                 f'x2="{x:.1f}" y2="{unten:.0f}" />'
                 f'<text class="gr-g1-reftext" x="{x - 5 if rechts else x + 5:.1f}" '
                 f'y="{y - 12:.0f}"'
-                + (' text-anchor="end"' if rechts else '')
-                + f'>{_t(text)}</text>')
+                + (' text-anchor="end"' if rechts else "")
+                + f">{_t(text)}</text>"
+            )
 
         for karte in gruppe["karten"]:
             slug = anbieter_slug(karte["anbieter"])
@@ -273,14 +286,21 @@ def balken(modell: dict) -> str:
             etikett = karte.get("zustand_etikett") or ""
             teile.append(
                 f'<text class="gr-g1-anbieter" x="0" y="{y + 13:.0f}">'
-                f'{_t(karte["anbieter"])}'
-                + (' <tspan class="gr-g1-ref-etikett">Referenz</tspan>'
-                   if karte.get("naeherung") else '')
-                + (f' <tspan class="gr-g1-zustand">{_t(etikett)}</tspan>'
-                   if etikett else '')
-                + '</text>'
+                f"{_t(karte['anbieter'])}"
+                + (
+                    ' <tspan class="gr-g1-ref-etikett">Referenz</tspan>'
+                    if karte.get("naeherung")
+                    else ""
+                )
+                + (
+                    f' <tspan class="gr-g1-zustand">{_t(etikett)}</tspan>'
+                    if etikett
+                    else ""
+                )
+                + "</text>"
                 f'<text class="gr-g1-tarif" x="0" y="{y + 25:.0f}">'
-                f'{_t(karte["tarif"])}</text>')
+                f"{_t(karte['tarif'])}</text>"
+            )
             x = float(LINKS)
             for posten in karte.get("bestandteile") or []:
                 betrag = posten.get("betrag") or 0.0
@@ -298,10 +318,12 @@ def balken(modell: dict) -> str:
                     f'y="{y:.0f}" width="{breite:.1f}" '
                     f'height="{BALKEN_HOEHE}" '
                     f'fill-opacity="{DECKKRAFT.get(kat, 0.6)}">'
-                    f'<title>{_t(karte["anbieter"])}'
-                    + (f' ({_t(etikett)})' if etikett else '') + ': '
-                    f'{_t(posten.get("name") or KATEGORIE_NAME.get(kat, kat))} '
-                    f'{_t(euro(betrag))}</title></rect>')
+                    f"<title>{_t(karte['anbieter'])}"
+                    + (f" ({_t(etikett)})" if etikett else "")
+                    + ": "
+                    f"{_t(posten.get('name') or KATEGORIE_NAME.get(kat, kat))} "
+                    f"{_t(euro(betrag))}</title></rect>"
+                )
                 x += breite
             for bonus in karte.get("boni") or []:
                 breite = _skala(bonus["betrag"], hoechst)
@@ -309,8 +331,9 @@ def balken(modell: dict) -> str:
                 teile.append(
                     f'<rect class="gr-g1-bonus" x="{x:.1f}" y="{y:.0f}" '
                     f'width="{breite:.1f}" height="{BALKEN_HOEHE}">'
-                    f'<title>Bonus {_t(bonus["name"])} '
-                    f'−{_t(euro(bonus["betrag"]))}</title></rect>')
+                    f"<title>Bonus {_t(bonus['name'])} "
+                    f"−{_t(euro(bonus['betrag']))}</title></rect>"
+                )
             # S4 / C.1: das Euro-Delta zur Referenz steht IN der Grafik, am
             # Balken - dieselbe Zahl wie auf der Karte (`_delta`), nicht
             # neu gerechnet. Nur bei gleicher Laufzeit gibt es einen
@@ -323,16 +346,19 @@ def balken(modell: dict) -> str:
                 # schwelle ist eine Annäherung - "≈" davor, derselbe echte
                 # Betrag. Der Strich blieb dem "kein Angebot" vorbehalten.
                 ungefaehr = "≈ " if delta.get("ungefaehr") else ""
-                delta_text = (f' <tspan class="gr-g1-delta">'
-                              f'{ungefaehr}{zeichen}'
-                              f'{_t(euro(delta["abstand"]))}</tspan>')
+                delta_text = (
+                    f' <tspan class="gr-g1-delta">'
+                    f"{ungefaehr}{zeichen}"
+                    f"{_t(euro(delta['abstand']))}</tspan>"
+                )
             teile.append(
                 f'<text class="gr-g1-betrag" x="{x + 8:.1f}" '
-                f'y="{y + 18:.0f}">{_t(euro(karte["gesamt"]))}{delta_text}</text>')
+                f'y="{y + 18:.0f}">{_t(euro(karte["gesamt"]))}{delta_text}</text>'
+            )
             y += BALKEN_HOEHE + BALKEN_ABSTAND
         y += GRUPPE_ABSTAND
 
-    teile.append('</svg>')
+    teile.append("</svg>")
     return "".join(teile)
 
 
@@ -348,9 +374,13 @@ def legende(modell: dict) -> list:
             kat = posten.get("kategorie")
             if kat and kat not in gesehen and (posten.get("betrag") or 0) > 0:
                 gesehen.add(kat)
-                arten.append({"kategorie": kat,
-                              "name": KATEGORIE_NAME.get(kat, kat),
-                              "deckkraft": DECKKRAFT.get(kat, 0.6)})
+                arten.append(
+                    {
+                        "kategorie": kat,
+                        "name": KATEGORIE_NAME.get(kat, kat),
+                        "deckkraft": DECKKRAFT.get(kat, 0.6),
+                    }
+                )
     return arten
 
 
@@ -406,12 +436,28 @@ G0_LUECKE_TAGE = 7
 #  - Vodafone steht ueberall auf Position 0 (die Eigen-Reihe sortiert
 #    sich vor alle anderen), der Kreis ist damit die Form des eigenen
 #    Angebots - und hat dieselbe Ausnahme wie die rote Farbe.
-G0_SYMBOLE = ("kreis", "quadrat", "dreieck", "raute", "ring", "kreuz",
-              "dreieck--runter", "sechseck")
+G0_SYMBOLE = (
+    "kreis",
+    "quadrat",
+    "dreieck",
+    "raute",
+    "ring",
+    "kreuz",
+    "dreieck--runter",
+    "sechseck",
+)
 
 
-def _symbol(nr: int, x: float, y: float, slug: str, *, einzeln: bool = False,
-            titel: str = "", gross: float = 1.0) -> str:
+def _symbol(
+    nr: int,
+    x: float,
+    y: float,
+    slug: str,
+    *,
+    einzeln: bool = False,
+    titel: str = "",
+    gross: float = 1.0,
+) -> str:
     """EIN Datenpunkt als Marken-Symbol - Form je Reihenposition (F-4b).
 
     `gross` skaliert (Einzel-Punkte 1.19-fach); `titel` wird zum
@@ -428,57 +474,95 @@ def _symbol(nr: int, x: float, y: float, slug: str, *, einzeln: bool = False,
     gegenprueft am Band-Panel). Der rohe Titel durchreicht, das Escaping
     passiert GENAU EINMAL in `_symbol_form`.
     """
-    basis = f'gr-g0-punkt{" gr-g0-punkt--einzeln" if einzeln else ""} ' \
-            f'gr-g0-punkt--{G0_SYMBOLE[nr % len(G0_SYMBOLE)]} gr-anb--{slug}'
-    return _symbol_form(G0_SYMBOLE[nr % len(G0_SYMBOLE)], x, y,
-                        gross * (1.19 if einzeln else 1.0), basis, titel)
+    basis = (
+        f"gr-g0-punkt{' gr-g0-punkt--einzeln' if einzeln else ''} "
+        f"gr-g0-punkt--{G0_SYMBOLE[nr % len(G0_SYMBOLE)]} gr-anb--{slug}"
+    )
+    return _symbol_form(
+        G0_SYMBOLE[nr % len(G0_SYMBOLE)],
+        x,
+        y,
+        gross * (1.19 if einzeln else 1.0),
+        basis,
+        titel,
+    )
 
 
-def _symbol_form(art: str, x: float, y: float, s: float,
-                 klasse: str = "", titel: str = "") -> str:
+def _symbol_form(
+    art: str, x: float, y: float, s: float, klasse: str = "", titel: str = ""
+) -> str:
     """Das nackte Formelement eines Symbols, zentriert auf (x, y), Skala `s`.
 
     Ohne `klasse`/`titel` entsteht die Rohform fuer die `<defs>` der
     Legende - Fuellung und Strich ergeben sich dort aus dem `<use>`, der
     sie referenziert (CSS-Eigenschaften vererben in den Schattenbaum).
     """
-    t = f'<title>{_t(titel)}</title>' if titel else ""
+    t = f"<title>{_t(titel)}</title>" if titel else ""
     k = f' class="{klasse}"' if klasse else ""
     if art == "kreis":
         return f'<circle{k} cx="{x:.1f}" cy="{y:.1f}" r="{4.2 * s:.1f}">{t}</circle>'
     if art == "quadrat":
         a = 5.2 * s
-        return f'<rect{k} x="{x - a:.1f}" y="{y - a:.1f}" width="{2 * a:.1f}" ' \
-               f'height="{2 * a:.1f}" rx="1.5">{t}</rect>'
+        return (
+            f'<rect{k} x="{x - a:.1f}" y="{y - a:.1f}" width="{2 * a:.1f}" '
+            f'height="{2 * a:.1f}" rx="1.5">{t}</rect>'
+        )
     if art == "dreieck":
-        return f'<polygon{k} points="{x:.1f},{y - 6.0 * s:.1f} ' \
-               f'{x + 5.6 * s:.1f},{y + 4.4 * s:.1f} ' \
-               f'{x - 5.6 * s:.1f},{y + 4.4 * s:.1f}">{t}</polygon>'
+        return (
+            f'<polygon{k} points="{x:.1f},{y - 6.0 * s:.1f} '
+            f"{x + 5.6 * s:.1f},{y + 4.4 * s:.1f} "
+            f'{x - 5.6 * s:.1f},{y + 4.4 * s:.1f}">{t}</polygon>'
+        )
     if art == "raute":
-        return f'<polygon{k} points="{x:.1f},{y - 6.6 * s:.1f} ' \
-               f'{x + 5.0 * s:.1f},{y:.1f} {x:.1f},{y + 6.6 * s:.1f} ' \
-               f'{x - 5.0 * s:.1f},{y:.1f}">{t}</polygon>'
+        return (
+            f'<polygon{k} points="{x:.1f},{y - 6.6 * s:.1f} '
+            f"{x + 5.0 * s:.1f},{y:.1f} {x:.1f},{y + 6.6 * s:.1f} "
+            f'{x - 5.0 * s:.1f},{y:.1f}">{t}</polygon>'
+        )
     if art == "ring":
         return f'<circle{k} cx="{x:.1f}" cy="{y:.1f}" r="{4.0 * s:.1f}">{t}</circle>'
     if art == "kreuz":
         # Ein KREUZ als 12-Punkte-Polygon (Plus-Form) - kein `<path>`
         # (Baubedingung 2) und keine Rotation (Baubedingung 3).
         d, b = 2.0 * s, 6.0 * s
-        punkte = [(x, y - b), (x + d, y - b), (x + d, y - d), (x + b, y - d),
-                  (x + b, y + d), (x + d, y + d), (x + d, y + b), (x - d, y + b),
-                  (x - d, y + d), (x - b, y + d), (x - b, y - d), (x - d, y - d)]
-        return f'<polygon{k} points="' + " ".join(
-            f"{px:.1f},{py:.1f}" for px, py in punkte) + f'">{t}</polygon>'
+        punkte = [
+            (x, y - b),
+            (x + d, y - b),
+            (x + d, y - d),
+            (x + b, y - d),
+            (x + b, y + d),
+            (x + d, y + d),
+            (x + d, y + b),
+            (x - d, y + b),
+            (x - d, y + d),
+            (x - b, y + d),
+            (x - b, y - d),
+            (x - d, y - d),
+        ]
+        return (
+            f'<polygon{k} points="'
+            + " ".join(f"{px:.1f},{py:.1f}" for px, py in punkte)
+            + f'">{t}</polygon>'
+        )
     if art == "dreieck--runter":
-        return f'<polygon{k} points="{x:.1f},{y + 6.0 * s:.1f} ' \
-               f'{x + 5.6 * s:.1f},{y - 4.4 * s:.1f} ' \
-               f'{x - 5.6 * s:.1f},{y - 4.4 * s:.1f}">{t}</polygon>'
+        return (
+            f'<polygon{k} points="{x:.1f},{y + 6.0 * s:.1f} '
+            f"{x + 5.6 * s:.1f},{y - 4.4 * s:.1f} "
+            f'{x - 5.6 * s:.1f},{y - 4.4 * s:.1f}">{t}</polygon>'
+        )
     # sechseck: sechs Punkte auf einem Kreis, bei 0/60/... Grad
-    punkte = [(x + 5.4 * s * math.cos(math.radians(w)),
-               y + 5.4 * s * math.sin(math.radians(w)))
-              for w in (0, 60, 120, 180, 240, 300)]
-    return f'<polygon{k} points="' + " ".join(
-        f"{px:.1f},{py:.1f}" for px, py in punkte) + f'">{t}</polygon>'
+    punkte = [
+        (
+            x + 5.4 * s * math.cos(math.radians(w)),
+            y + 5.4 * s * math.sin(math.radians(w)),
+        )
+        for w in (0, 60, 120, 180, 240, 300)
+    ]
+    return (
+        f'<polygon{k} points="'
+        + " ".join(f"{px:.1f},{py:.1f}" for px, py in punkte)
+        + f'">{t}</polygon>'
+    )
 
 
 def _symbole_defs() -> str:
@@ -490,8 +574,8 @@ def _symbole_defs() -> str:
     mit - und die Form steht trotzdem neben dem Anbieternamen.
     """
     innen = "".join(
-        f'<g id="gr-sym-{art}">{_symbol_form(art, 0, 0, 1.0)}</g>'
-        for art in G0_SYMBOLE)
+        f'<g id="gr-sym-{art}">{_symbol_form(art, 0, 0, 1.0)}</g>' for art in G0_SYMBOLE
+    )
     return f"<defs>{innen}</defs>"
 
 
@@ -519,6 +603,7 @@ def _achsenmarken(tief: float, hoch: float) -> list[float]:
     Stufe so lange, bis zwei stehen; das ist die Untergrenze, ab der
     eine Achse noch eine Achse ist.
     """
+
     def _marken_fuer(stufe: float) -> list[float]:
         out = []
         m = math.ceil(tief / stufe - 1e-9) * stufe
@@ -536,13 +621,14 @@ def _achsenmarken(tief: float, hoch: float) -> list[float]:
     # naechst feinere die Achse besser. Die Obergrenze ist die Rohweite
     # mit einem Drittel Luft (eine 50-€-Stufe auf der Rohweite 42 €
     # traegt vier Marken und liest sich besser als sieben 25er).
-    stufen = [s for s in (mag, 2 * mag, 2.5 * mag, 5 * mag, 10 * mag)
-              if s <= roh * 1.35] or [mag]
-    for stufe in reversed(stufen):          # groebster Schritt zuerst
+    stufen = [
+        s for s in (mag, 2 * mag, 2.5 * mag, 5 * mag, 10 * mag) if s <= roh * 1.35
+    ] or [mag]
+    for stufe in reversed(stufen):  # groebster Schritt zuerst
         marken = _marken_fuer(stufe)
         if len(marken) >= 4:
             return marken
-    for stufe in stufen:                    # aufsteigend: zwei Marken reichen
+    for stufe in stufen:  # aufsteigend: zwei Marken reichen
         marken = _marken_fuer(stufe)
         if len(marken) >= 2:
             return marken
@@ -565,6 +651,7 @@ def _achsenformat(marken: list[float]) -> list[str]:
     eigentlich nicht mehr kennen). KEIN Tausendertrenner, wie vorher:
     die Achse bleibt damit ohnehin fuer `parseFloat` lesbar.
     """
+
     def _fmt(m: float, stellen: int) -> str:
         return f"{m:.{stellen}f}".replace(".", ",")
 
@@ -625,12 +712,12 @@ def _tage_dieses_geraets(reihen: list) -> list:
 def _luecken(tage: list, schwelle: int = G0_LUECKE_TAGE) -> list:
     """Die Intervalle zwischen zwei Messtagen dieses Geraets, die weiter
     auseinanderliegen als `schwelle` Tage - fuer die Schattierung im Bild."""
-    return [(a, b) for a, b in zip(tage, tage[1:])
-            if (b - a).days > schwelle]
+    return [(a, b) for a, b in zip(tage, tage[1:]) if (b - a).days > schwelle]
 
 
-def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
-             klasse: str = "gr-g0") -> dict:
+def zeitreihe(
+    reihen: list, messgroesse: str = "Gerätepreis", klasse: str = "gr-g0"
+) -> dict:
     """G0: Gerätepreis über die Zeit, je Anbieter, fuer EIN gewaehltes
     Geraet - der neue Hauptgraph ueber den Balkenbloecken.
 
@@ -682,8 +769,16 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
     """
     tage = _tage_dieses_geraets(reihen)
     if not tage:
-        return {"svg": "", "hat_daten": False, "messtage": 0, "seit": "",
-                "bis": "", "linien": [], "chrome": "", "anbieterzahl": 0}
+        return {
+            "svg": "",
+            "hat_daten": False,
+            "messtage": 0,
+            "seit": "",
+            "bis": "",
+            "linien": [],
+            "chrome": "",
+            "anbieterzahl": 0,
+        }
 
     luecken = _luecken(tage)
     von, bis = tage[0], tage[-1]
@@ -704,8 +799,7 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
 
     def y(preis: float) -> float:
         hoehe = G0_HOEHE - G0_OBEN - G0_UNTEN
-        return round(G0_HOEHE - G0_UNTEN
-                     - (preis - tief) / (hoch - tief) * hoehe, 1)
+        return round(G0_HOEHE - G0_UNTEN - (preis - tief) / (hoch - tief) * hoehe, 1)
 
     # F-5 (05.09.2026): DIE EINE ZAEHLWEISE fuer "Anbieter" auf dieser Tafel
     # - Preispunkte-Reihen der Zeitreihe, PM-vorgegeben. Das Auswahl-Dropdown
@@ -717,8 +811,8 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
         f'width="100%" height="{G0_HOEHE}" role="img" '
         f'aria-label="{_t(messgroesse)} über die Zeit, {anbieterzahl} Anbieter, '
         f'{_t(von.isoformat())} bis {_t(bis.isoformat())}">',
-        f'<title>{_t(messgroesse)} über die Zeit, {_t(von.isoformat())} bis '
-        f'{_t(bis.isoformat())}</title>',
+        f"<title>{_t(messgroesse)} über die Zeit, {_t(von.isoformat())} bis "
+        f"{_t(bis.isoformat())}</title>",
         _symbole_defs(),
     ]
 
@@ -732,12 +826,16 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
     texte = _achsenformat(marken)
     for marke, beschriftung in zip(marken, texte):
         yy = y(marke)
-        teile.append(f'<line class="gr-g0-raster" x1="{G0_LINKS}" y1="{yy}" '
-                     f'x2="{G0_BREITE - G0_RECHTS}" y2="{yy}" />'
-                     f'<text class="gr-g0-achse" x="{G0_LINKS - 8}" '
-                     f'y="{yy + 4}" text-anchor="end">{beschriftung} €</text>')
-    teile.append(f'<text class="gr-g0-spanne" x="{G0_LINKS}" y="12" '
-                 f'text-anchor="start">{_t(_spanne_text(tief, hoch))}</text>')
+        teile.append(
+            f'<line class="gr-g0-raster" x1="{G0_LINKS}" y1="{yy}" '
+            f'x2="{G0_BREITE - G0_RECHTS}" y2="{yy}" />'
+            f'<text class="gr-g0-achse" x="{G0_LINKS - 8}" '
+            f'y="{yy + 4}" text-anchor="end">{beschriftung} €</text>'
+        )
+    teile.append(
+        f'<text class="gr-g0-spanne" x="{G0_LINKS}" y="12" '
+        f'text-anchor="start">{_t(_spanne_text(tief, hoch))}</text>'
+    )
 
     # X-Achse: Wochenraster kurzfristig, Monatsraster ab drei Monaten -
     # dieselbe Regel wie G2.
@@ -750,24 +848,28 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
     if bis not in gesetzt and (bis - gesetzt[-1]).days > schritt // 3:
         gesetzt.append(bis)
     for tag in gesetzt:
-        teile.append(f'<line class="gr-g0-raster gr-g0-raster--x" '
-                     f'x1="{x(tag)}" y1="{G0_OBEN}" x2="{x(tag)}" '
-                     f'y2="{G0_HOEHE - G0_UNTEN}" />'
-                     f'<text class="gr-g0-achse" x="{x(tag)}" '
-                     f'y="{G0_HOEHE - 12}" text-anchor="middle">'
-                     f'{tag.strftime("%d.%m.")}</text>')
+        teile.append(
+            f'<line class="gr-g0-raster gr-g0-raster--x" '
+            f'x1="{x(tag)}" y1="{G0_OBEN}" x2="{x(tag)}" '
+            f'y2="{G0_HOEHE - G0_UNTEN}" />'
+            f'<text class="gr-g0-achse" x="{x(tag)}" '
+            f'y="{G0_HOEHE - 12}" text-anchor="middle">'
+            f"{tag.strftime('%d.%m.')}</text>"
+        )
 
     # Die Sammelluecke bekommt ein Feld im Bild - sonst ist der leere Raum
     # zwischen zwei Rasterlinien nicht von einer ruhigen Woche zu
     # unterscheiden.
     for lo, hi in luecken:
         x1, x2 = x(lo), x(hi)
-        teile.append(f'<rect class="gr-g0-luecke" x="{x1}" y="{G0_OBEN}" '
-                     f'width="{x2 - x1:.1f}" '
-                     f'height="{G0_HOEHE - G0_OBEN - G0_UNTEN}">'
-                     f'<title>Sammellücke {_t(lo.strftime("%d.%m.%Y"))} bis '
-                     f'{_t(hi.strftime("%d.%m.%Y"))} – in dieser Zeit liegt '
-                     f'kein Messpunkt vor.</title></rect>')
+        teile.append(
+            f'<rect class="gr-g0-luecke" x="{x1}" y="{G0_OBEN}" '
+            f'width="{x2 - x1:.1f}" '
+            f'height="{G0_HOEHE - G0_OBEN - G0_UNTEN}">'
+            f"<title>Sammellücke {_t(lo.strftime('%d.%m.%Y'))} bis "
+            f"{_t(hi.strftime('%d.%m.%Y'))} – in dieser Zeit liegt "
+            f"kein Messpunkt vor.</title></rect>"
+        )
 
     linien = []
     # F-4e (Optik-Schritt 5, 09.09.2026): die "Serie startet"-Beschriftungen
@@ -784,9 +886,14 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
     for nr, reihe in enumerate(reihen):
         slug = anbieter_slug(reihe["anbieter"])
         punkte = sorted(
-            ((t, p["preis"]) for p in (reihe.get("punkte") or [])
-             for t in [_tag(p.get("datum"))] if t is not None),
-            key=lambda tb: tb[0])
+            (
+                (t, p["preis"])
+                for p in (reihe.get("punkte") or [])
+                for t in [_tag(p.get("datum"))]
+                if t is not None
+            ),
+            key=lambda tb: tb[0],
+        )
         if not punkte:
             continue
 
@@ -805,8 +912,10 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
 
         for lauf in laeufe:
             if len(lauf) >= 2:
-                pfad = " ".join(f"{'M' if i == 0 else 'L'}{x(t)} {y(b)}"
-                                for i, (t, b) in enumerate(lauf))
+                pfad = " ".join(
+                    f"{'M' if i == 0 else 'L'}{x(t)} {y(b)}"
+                    for i, (t, b) in enumerate(lauf)
+                )
                 # F-4d: die eigene Reihe traegt MEHR GEWICHT (3 statt 2 px
                 # Strichstaerke) - dieselbe Auszeichnung wie im
                 # interaktiven Chart (`r.eigen ? 3 : 2` in app.js). Rot ist
@@ -815,16 +924,25 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
                 # sich Telekom-Magenta als zweite rote Linie, mit mehr
                 # Gewicht bleibt Rot die Eine und Magenta die Andere.
                 eigen_klasse = " gr-g0-linie--eigen" if reihe.get("eigen") else ""
-                teile.append(f'<path class="gr-g0-linie{eigen_klasse} '
-                             f'gr-anb--{slug}" d="{pfad}" fill="none" />')
+                teile.append(
+                    f'<path class="gr-g0-linie{eigen_klasse} '
+                    f'gr-anb--{slug}" d="{pfad}" fill="none" />'
+                )
                 for (t0, b0), (t1_, b1_) in zip(lauf, lauf[1:]):
                     daten_strecken.append((x(t0), y(b0), x(t1_), y(b1_)))
             einzeln = len(lauf) == 1
             for t, b in lauf:
-                teile.append(_symbol(
-                    nr, x(t), y(b), slug, einzeln=einzeln,
-                    titel=f'{reihe["anbieter"]} · '
-                          f'{t.strftime("%d.%m.%Y")}: {euro(b)}'))
+                teile.append(
+                    _symbol(
+                        nr,
+                        x(t),
+                        y(b),
+                        slug,
+                        einzeln=einzeln,
+                        titel=f"{reihe['anbieter']} · "
+                        f"{t.strftime('%d.%m.%Y')}: {euro(b)}",
+                    )
+                )
                 daten_punkte.append((x(t), y(b)))
                 if einzeln:
                     # KEIN NACKTER PUNKT (BRIEF_FADEN, 05.09.2026): ein
@@ -833,9 +951,15 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
                     # Einzelpunkt vom 05.09.2026. Die Beschriftung nennt das
                     # Datum, nicht nur die Existenz einer Serie - derselbe
                     # Belegzwang wie am Tooltip.
-                    annotationen.append((nr, slug, x(t), y(b),
-                                         f'Serie startet · 1. Messpunkt '
-                                         f'{t.strftime("%d.%m.%Y")}'))
+                    annotationen.append(
+                        (
+                            nr,
+                            slug,
+                            x(t),
+                            y(b),
+                            f"Serie startet · 1. Messpunkt {t.strftime('%d.%m.%Y')}",
+                        )
+                    )
 
         # Die Legende traegt das Symbol NEBEN dem Namen (F-4b): dieselbe
         # Form wie der Datenpunkt der Reihe, per `<use>` aus den `<defs>`
@@ -851,24 +975,31 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
             f'x="{G0_BREITE - G0_RECHTS + 17}" y="{legende_y - 4}" />'
             f'<text class="gr-g0-legende gr-anb--{slug}" '
             f'x="{G0_BREITE - G0_RECHTS + 28}" y="{legende_y}">'
-            f'{_t(reihe["anbieter"])}</text>')
-        linien.append({"anbieter": reihe["anbieter"], "farbe": reihe["farbe"],
-                       "eigen": reihe["eigen"], "punkte": len(punkte),
-                       "von": punkte[0][0].isoformat(),
-                       "bis": punkte[-1][0].isoformat(),
-                       "von_de": punkte[0][0].strftime("%d.%m.%Y"),
-                       "bis_de": punkte[-1][0].strftime("%d.%m.%Y"),
-                       # O4 (STRATEGIE_GERAETE_OPTIK §3): die BETRAEGE der
-                       # Reihe - fuer die Wertetabelle unter der Grafik
-                       # (Entwurf §2: "Werte des Verlaufs als Tabelle").
-                       # Erst- und Letztpreis aus denselben Punkten, die
-                       # auch gezeichnet werden, plus ihrer Differenz -
-                       # keine zweite Menge und kein eigener Rundungsweg
-                       # (derselbe Fehlertyp wie zwei Rechnungen fuer
-                       # dieselbe Zahl).
-                       "von_preis": punkte[0][1],
-                       "bis_preis": punkte[-1][1],
-                       "delta": round(punkte[-1][1] - punkte[0][1], 2)})
+            f"{_t(reihe['anbieter'])}</text>"
+        )
+        linien.append(
+            {
+                "anbieter": reihe["anbieter"],
+                "farbe": reihe["farbe"],
+                "eigen": reihe["eigen"],
+                "punkte": len(punkte),
+                "von": punkte[0][0].isoformat(),
+                "bis": punkte[-1][0].isoformat(),
+                "von_de": punkte[0][0].strftime("%d.%m.%Y"),
+                "bis_de": punkte[-1][0].strftime("%d.%m.%Y"),
+                # O4 (STRATEGIE_GERAETE_OPTIK §3): die BETRAEGE der
+                # Reihe - fuer die Wertetabelle unter der Grafik
+                # (Entwurf §2: "Werte des Verlaufs als Tabelle").
+                # Erst- und Letztpreis aus denselben Punkten, die
+                # auch gezeichnet werden, plus ihrer Differenz -
+                # keine zweite Menge und kein eigener Rundungsweg
+                # (derselbe Fehlertyp wie zwei Rechnungen fuer
+                # dieselbe Zahl).
+                "von_preis": punkte[0][1],
+                "bis_preis": punkte[-1][1],
+                "delta": round(punkte[-1][1] - punkte[0][1], 2),
+            }
+        )
 
     # F-4e: PLATZIERUNG DER BESCHRIFTUNGEN - jede gegen die Geometrie des
     # ganzen Bildes. Eine Kandidatenbox (geschaetzte Textbreite bei 12 px
@@ -890,8 +1021,7 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
         if y0 < G0_OBEN + 2 or y1 > G0_HOEHE - G0_UNTEN - 2:
             v += 2
         for b in belegt:
-            if (x0 < b[2] + 2 and b[0] < x1 + 2
-                    and y0 < b[3] + 2 and b[1] < y1 + 2):
+            if x0 < b[2] + 2 and b[0] < x1 + 2 and y0 < b[3] + 2 and b[1] < y1 + 2:
                 v += 4
                 break
         for dx_, dy_ in daten_punkte:
@@ -900,9 +1030,11 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
                 break
         for xa, ya, xb, yb_ in daten_strecken:
             n = max(1, int(math.hypot(xb - xa, yb_ - ya) / 8))
-            if any(x0 - 3 < xa + (xb - xa) * i / n < x1 + 3
-                   and y0 - 3 < ya + (yb_ - ya) * i / n < y1 + 3
-                   for i in range(n + 1)):
+            if any(
+                x0 - 3 < xa + (xb - xa) * i / n < x1 + 3
+                and y0 - 3 < ya + (yb_ - ya) * i / n < y1 + 3
+                for i in range(n + 1)
+            ):
                 v += 1
                 break
         return v
@@ -911,7 +1043,7 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
         breite = len(text) * 6.3 + 8
         mitte_x = G0_LINKS + (G0_BREITE - G0_LINKS - G0_RECHTS) / 2
         seiten = ("end", "start") if px > mitte_x else ("start", "end")
-        bester = None      # (verstoesse, seite, tx, ty, box)
+        bester = None  # (verstoesse, seite, tx, ty, box)
         for seite in seiten:
             for dy in (-17, 21, -31, 35, -45, 49):
                 tx = px - 9 if seite == "end" else px + 9
@@ -931,17 +1063,27 @@ def zeitreihe(reihen: list, messgroesse: str = "Gerätepreis",
         teile.append(
             f'<text class="gr-g0-einzeln gr-anb--{slug}" '
             f'x="{tx:.1f}" y="{ty:.1f}" text-anchor="{seite}">'
-            f'{_t(text)}</text>')
+            f"{_t(text)}</text>"
+        )
 
-    teile.append('</svg>')
+    teile.append("</svg>")
     # DIE CHART-CHROME-ZEILE ENTSTEHT HIER UND NICHT IN DER VORLAGE - eine
     # einzige Zeichenkette statt einer Rechnung aus Datumsfiltern im
     # Template, damit kein zweiter Ort je einen abweichenden Wortlaut
     # erzeugen kann (Kriterium 3 des Auftrags: "kein Fliesstext" ausser
     # GENAU diesem einen Satz).
-    chrome = (f"Sammlung läuft · {len(tage)} "
-             f"{'Messtag' if len(tage) == 1 else 'Messtage'} · "
-             f"seit {von.strftime('%d.%m.%Y')}")
-    return {"svg": "".join(teile), "hat_daten": True, "messtage": len(tage),
-            "seit": von.isoformat(), "bis": bis.isoformat(), "linien": linien,
-            "chrome": chrome, "anbieterzahl": anbieterzahl}
+    chrome = (
+        f"Sammlung läuft · {len(tage)} "
+        f"{'Messtag' if len(tage) == 1 else 'Messtage'} · "
+        f"seit {von.strftime('%d.%m.%Y')}"
+    )
+    return {
+        "svg": "".join(teile),
+        "hat_daten": True,
+        "messtage": len(tage),
+        "seit": von.isoformat(),
+        "bis": bis.isoformat(),
+        "linien": linien,
+        "chrome": chrome,
+        "anbieterzahl": anbieterzahl,
+    }

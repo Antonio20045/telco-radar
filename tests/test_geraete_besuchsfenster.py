@@ -18,6 +18,7 @@ Fixture setzt ihren Startzeitpunkt selbst, und die verstrichene Zeit kommt
 aus einer eingespeisten Uhr (`_Laufzeit`), nicht aus `time.monotonic()` der
 Maschine. Geschlafen wird nie wirklich.
 """
+
 from collections import namedtuple
 from datetime import datetime, timedelta, timezone
 
@@ -36,7 +37,8 @@ _ROBOTS_MIT_FENSTER = (
     "Disallow: /cart\n"
     "Request-rate: 1/10\n"
     "Crawl-delay: {delay}\n"
-    "Visit-time: 0200-0800\n")
+    "Visit-time: 0200-0800\n"
+)
 
 
 # Ein Abruf, wie ihn die Testattrappe sieht: Adresse UND Wanduhrzeit.
@@ -57,7 +59,7 @@ class _Laufzeit:
     Latenz, die der Test ihm gibt.
     """
 
-    NULLPUNKT = 1000.0           # ein beliebiger, aber fester Startwert
+    NULLPUNKT = 1000.0  # ein beliebiger, aber fester Startwert
 
     def __init__(self, latenz: float = 0.0):
         self.t = self.NULLPUNKT
@@ -76,17 +78,33 @@ class _Laufzeit:
 
 
 def _anbieter(einstiege=None, **kw):
-    vor = {"name": "Medimax", "typ": "handel", "methode": "ldjson",
-           "basis_url": "https://www.medimax.de", "rate_limit_sekunden": 0,
-           "einstiege": einstiege or [
-               Einstieg(url=_EINSTIEG, label="Smartphones", kind="static",
-                        pfadmuster="/p/")]}
+    vor = {
+        "name": "Medimax",
+        "typ": "handel",
+        "methode": "ldjson",
+        "basis_url": "https://www.medimax.de",
+        "rate_limit_sekunden": 0,
+        "einstiege": einstiege
+        or [
+            Einstieg(
+                url=_EINSTIEG, label="Smartphones", kind="static", pfadmuster="/p/"
+            )
+        ],
+    }
     vor.update(kw)
     return Anbieter(**vor)
 
 
-def _lauf(monkeypatch, *, start: datetime, delay: float, latenz: float = 0.0,
-          seiten=None, anbieter=None, frist_bis=None):
+def _lauf(
+    monkeypatch,
+    *,
+    start: datetime,
+    delay: float,
+    latenz: float = 0.0,
+    seiten=None,
+    anbieter=None,
+    frist_bis=None,
+):
     """Ein Lauf mit gestellter Uhr. Gibt (Bilanz, Protokoll, Uhr) zurueck."""
     laufzeit = _Laufzeit(latenz=latenz)
     monkeypatch.setattr(G, "time", laufzeit)
@@ -98,17 +116,28 @@ def _lauf(monkeypatch, *, start: datetime, delay: float, latenz: float = 0.0,
         # Jeder Abruf wird MIT SEINER WANDUHRZEIT protokolliert. Nur so laesst
         # sich die eigentliche Regel pruefen ("kein Abruf ausserhalb des
         # Fensters") statt eines ihrer Symptome.
-        protokoll.append(_Abruf(url, start + timedelta(
-            seconds=laufzeit.monotonic() - _Laufzeit.NULLPUNKT)))
+        protokoll.append(
+            _Abruf(
+                url,
+                start + timedelta(seconds=laufzeit.monotonic() - _Laufzeit.NULLPUNKT),
+            )
+        )
         if url.endswith("/robots.txt"):
             return (200, _ROBOTS_MIT_FENSTER.format(delay=delay))
         laufzeit.vor(laufzeit.latenz)
         return (200, seiten.get(url, ""))
 
     waechter = RobotsWaechter(hole=hole)
-    bilanz = sammle_anbieter(anbieter or _anbieter(), _KATALOG, _FARBEN, hole,
-                             "2026-08-11", waechter, start,
-                             frist_bis=frist_bis)
+    bilanz = sammle_anbieter(
+        anbieter or _anbieter(),
+        _KATALOG,
+        _FARBEN,
+        hole,
+        "2026-08-11",
+        waechter,
+        start,
+        frist_bis=frist_bis,
+    )
     return bilanz, protokoll, laufzeit
 
 
@@ -122,13 +151,17 @@ def _produktabrufe(protokoll) -> list:
 
 def _ausserhalb(protokoll, regeln) -> list:
     """Alle Abrufe, die ausserhalb des Besuchsfensters hinausgingen."""
-    return [(a.url, a.zeit.strftime("%H:%M:%S")) for a in protokoll
-            if not regeln.im_fenster(a.zeit)]
+    return [
+        (a.url, a.zeit.strftime("%H:%M:%S"))
+        for a in protokoll
+        if not regeln.im_fenster(a.zeit)
+    ]
 
 
 # --------------------------------------------------------------------------
 # Die Restzeit des Fensters
 # --------------------------------------------------------------------------
+
 
 def test_restzeit_ohne_fenster_ist_none_und_nicht_null():
     """Clean Code 3: "kein Fenster" ist ein fehlender Wert, keine Null.
@@ -160,6 +193,7 @@ def test_restzeit_ueber_mitternacht():
 # --------------------------------------------------------------------------
 # DER KERNTEST
 # --------------------------------------------------------------------------
+
 
 def test_fenster_geht_waehrend_des_laufs_zu(monkeypatch):
     """Start INNERHALB des Fensters, Abruf AUSSERHALB.
@@ -213,6 +247,7 @@ def test_die_uhr_wandert_mit_der_wartezeit_nicht_mit_dem_datumsstempel(monkeypat
 # Teilweise gelesen
 # --------------------------------------------------------------------------
 
+
 def test_teilweise_gelesen_altert_nur_die_wirklich_gelesene_seite(monkeypatch):
     """Zwei Einstiege, das Fenster geht zwischen ihnen zu.
 
@@ -224,15 +259,25 @@ def test_teilweise_gelesen_altert_nur_die_wirklich_gelesene_seite(monkeypatch):
     zweiter = "https://www.medimax.de/c/117/mehr-smartphones"
     seiten = dict(_SEITEN)
     seiten[zweiter] = _fixture("medimax_kategorie.html")
-    anbieter = _anbieter(einstiege=[
-        Einstieg(url=_EINSTIEG, label="Smartphones", kind="static",
-                 pfadmuster="/p/"),
-        Einstieg(url=zweiter, label="Mehr", kind="static", pfadmuster="/p/")])
+    anbieter = _anbieter(
+        einstiege=[
+            Einstieg(
+                url=_EINSTIEG, label="Smartphones", kind="static", pfadmuster="/p/"
+            ),
+            Einstieg(url=zweiter, label="Mehr", kind="static", pfadmuster="/p/"),
+        ]
+    )
 
     # 07:30, und jeder Seitenabruf kostet 300 s: der erste Einstieg (1 + 3
     # Seiten) ist um 07:50 fertig, mitten im zweiten geht um 08:00 die Tuer zu.
-    bilanz, protokoll, _ = _lauf(monkeypatch, start=_um(7, 30), delay=0,
-                                 latenz=300, seiten=seiten, anbieter=anbieter)
+    bilanz, protokoll, _ = _lauf(
+        monkeypatch,
+        start=_um(7, 30),
+        delay=0,
+        latenz=300,
+        seiten=seiten,
+        anbieter=anbieter,
+    )
 
     assert bilanz.gelesene_einstiege == {_EINSTIEG}
     assert zweiter not in bilanz.gelesene_einstiege
@@ -246,6 +291,7 @@ def test_teilweise_gelesen_altert_nur_die_wirklich_gelesene_seite(monkeypatch):
 # Der Deckel auf das Fensterende
 # --------------------------------------------------------------------------
 
+
 def test_fensterfrist_deckelt_auf_das_fensterende(monkeypatch):
     laufzeit = _Laufzeit()
     monkeypatch.setattr(G, "time", laufzeit)
@@ -256,7 +302,8 @@ def test_fensterfrist_deckelt_auf_das_fensterende(monkeypatch):
     waechter = RobotsWaechter(hole=hole)
     frist = G._fensterfrist(waechter, "https://www.medimax.de/p/1", _um(7, 55))
     assert frist == pytest.approx(
-        laufzeit.monotonic() + 300 - G._FENSTER_PUFFER_SEKUNDEN)
+        laufzeit.monotonic() + 300 - G._FENSTER_PUFFER_SEKUNDEN
+    )
 
 
 def test_ohne_fenster_deckelt_nichts(monkeypatch):
@@ -294,14 +341,24 @@ def test_fristablauf_am_fenster_heisst_besuchszeit_und_nicht_budget(monkeypatch)
     zweiter = "https://www.medimax.de/c/117/mehr-smartphones"
     seiten = dict(_SEITEN)
     seiten[zweiter] = _fixture("medimax_kategorie.html")
-    anbieter = _anbieter(einstiege=[
-        Einstieg(url=_EINSTIEG, label="Smartphones", kind="static",
-                 pfadmuster="/p/"),
-        Einstieg(url=zweiter, label="Mehr", kind="static", pfadmuster="/p/")])
+    anbieter = _anbieter(
+        einstiege=[
+            Einstieg(
+                url=_EINSTIEG, label="Smartphones", kind="static", pfadmuster="/p/"
+            ),
+            Einstieg(url=zweiter, label="Mehr", kind="static", pfadmuster="/p/"),
+        ]
+    )
 
-    bilanz, _, _ = _lauf(monkeypatch, start=_um(7, 30), delay=0, latenz=300,
-                         seiten=seiten, anbieter=anbieter,
-                         frist_bis=10_000_000.0)   # Budget im Ueberfluss
+    bilanz, _, _ = _lauf(
+        monkeypatch,
+        start=_um(7, 30),
+        delay=0,
+        latenz=300,
+        seiten=seiten,
+        anbieter=anbieter,
+        frist_bis=10_000_000.0,
+    )  # Budget im Ueberfluss
 
     assert bilanz.status == "frist"
     assert "Besuchszeit" in bilanz.grund
@@ -328,13 +385,23 @@ def test_kein_einziger_abruf_verlaesst_das_fenster(monkeypatch):
     zweiter = "https://www.medimax.de/c/117/mehr-smartphones"
     seiten = dict(_SEITEN)
     seiten[zweiter] = _fixture("medimax_kategorie.html")
-    anbieter = _anbieter(einstiege=[
-        Einstieg(url=_EINSTIEG, label="Smartphones", kind="static",
-                 pfadmuster="/p/"),
-        Einstieg(url=zweiter, label="Mehr", kind="static", pfadmuster="/p/")])
+    anbieter = _anbieter(
+        einstiege=[
+            Einstieg(
+                url=_EINSTIEG, label="Smartphones", kind="static", pfadmuster="/p/"
+            ),
+            Einstieg(url=zweiter, label="Mehr", kind="static", pfadmuster="/p/"),
+        ]
+    )
 
-    bilanz, protokoll, _ = _lauf(monkeypatch, start=_um(7, 30), delay=0,
-                                 latenz=500, seiten=seiten, anbieter=anbieter)
+    bilanz, protokoll, _ = _lauf(
+        monkeypatch,
+        start=_um(7, 30),
+        delay=0,
+        latenz=500,
+        seiten=seiten,
+        anbieter=anbieter,
+    )
     regeln = lies_robots(_ROBOTS_MIT_FENSTER.format(delay=0))
 
     assert _ausserhalb(protokoll, regeln) == []
@@ -349,6 +416,7 @@ def test_kein_einziger_abruf_verlaesst_das_fenster(monkeypatch):
 # --------------------------------------------------------------------------
 # Was der Abdeckungswaechter aus einem Teillauf macht
 # --------------------------------------------------------------------------
+
 
 def test_der_teillauf_am_fenster_gilt_als_teilweise_gelesen(monkeypatch):
     """Dieselbe Lage wie `test_teilweise_gelesen_...`, eine Schicht
@@ -367,13 +435,23 @@ def test_der_teillauf_am_fenster_gilt_als_teilweise_gelesen(monkeypatch):
     zweiter = "https://www.medimax.de/c/117/mehr-smartphones"
     seiten = dict(_SEITEN)
     seiten[zweiter] = _fixture("medimax_kategorie.html")
-    anbieter = _anbieter(einstiege=[
-        Einstieg(url=_EINSTIEG, label="Smartphones", kind="static",
-                 pfadmuster="/p/"),
-        Einstieg(url=zweiter, label="Mehr", kind="static", pfadmuster="/p/")])
+    anbieter = _anbieter(
+        einstiege=[
+            Einstieg(
+                url=_EINSTIEG, label="Smartphones", kind="static", pfadmuster="/p/"
+            ),
+            Einstieg(url=zweiter, label="Mehr", kind="static", pfadmuster="/p/"),
+        ]
+    )
 
-    bilanz, _, _ = _lauf(monkeypatch, start=_um(7, 30), delay=0, latenz=300,
-                         seiten=seiten, anbieter=anbieter)
+    bilanz, _, _ = _lauf(
+        monkeypatch,
+        start=_um(7, 30),
+        delay=0,
+        latenz=300,
+        seiten=seiten,
+        anbieter=anbieter,
+    )
 
     # Die Messung selbst - ohne sie prueft die Zeile darunter nichts.
     assert bilanz.status == "frist"
@@ -435,25 +513,30 @@ def _nachsammeln(monkeypatch, robots: str, *, start=None):
         for url in (_HAKEN_ERLAUBT, _HAKEN_GESPERRT):
             try:
                 hole_(url, kopfzeilen=kopfzeilen)
-            except Exception as exc:                      # noqa: BLE001
+            except Exception as exc:  # noqa: BLE001
                 fehler.append((url, str(exc)))
         return 0
 
-    monkeypatch.setitem(P.ADAPTER, "ldjson",
-                        Adapter(name="probe", lies=lambda text, url="": [],
-                                loese_tarifnamen=haken))
+    monkeypatch.setitem(
+        P.ADAPTER,
+        "ldjson",
+        Adapter(name="probe", lies=lambda text, url="": [], loese_tarifnamen=haken),
+    )
     anbieter = _anbieter(name="Vodafone", basis_url="https://www.vodafone.de")
     zeit = start or _um(3, 0)
-    P.nachsammle_buendel([_Bilanz("Vodafone", [{"sku": "1"}])],
-                         _Quellen(anbieter), hole, uhr=lambda: zeit)
+    P.nachsammle_buendel(
+        [_Bilanz("Vodafone", [{"sku": "1"}])],
+        _Quellen(anbieter),
+        hole,
+        uhr=lambda: zeit,
+    )
     return protokoll, fehler
 
 
 def test_der_nachbearbeitungs_haken_haelt_disallow_ein(monkeypatch):
     """Eine per robots.txt gesperrte Adresse wird nicht abgerufen - auch
     nicht aus einem Haken heraus."""
-    protokoll, fehler = _nachsammeln(
-        monkeypatch, "User-agent: *\nDisallow: /intern\n")
+    protokoll, fehler = _nachsammeln(monkeypatch, "User-agent: *\nDisallow: /intern\n")
 
     # Gegenprobe zuerst: die erlaubte Adresse ging hinaus. Ohne sie waere
     # der Test auch dann gruen, wenn der Haken gar nicht laeuft.
@@ -467,8 +550,8 @@ def test_der_nachbearbeitungs_haken_haelt_die_besuchszeit_ein(monkeypatch):
     """Und das Besuchsfenster ebenso - gemessen an der Uhrzeit DIESES
     Abrufs, nicht am Start des Laufs."""
     protokoll, fehler = _nachsammeln(
-        monkeypatch, "User-agent: *\nVisit-time: 0200-0800\n",
-        start=_um(9, 0))
+        monkeypatch, "User-agent: *\nVisit-time: 0200-0800\n", start=_um(9, 0)
+    )
 
     assert _HAKEN_ERLAUBT not in protokoll
     assert _HAKEN_GESPERRT not in protokoll
@@ -476,8 +559,8 @@ def test_der_nachbearbeitungs_haken_haelt_die_besuchszeit_ein(monkeypatch):
     assert "Besuchszeit" in fehler[0][1]
     # Gegenprobe: im Fenster geht dieselbe Adresse hinaus.
     protokoll, fehler = _nachsammeln(
-        monkeypatch, "User-agent: *\nVisit-time: 0200-0800\n",
-        start=_um(3, 0))
+        monkeypatch, "User-agent: *\nVisit-time: 0200-0800\n", start=_um(3, 0)
+    )
     assert _HAKEN_ERLAUBT in protokoll and fehler == []
 
 
@@ -501,17 +584,30 @@ def test_die_haken_abrufe_tragen_den_absender_des_anbieters(monkeypatch):
         hole_(_HAKEN_ERLAUBT, kopfzeilen=kopfzeilen)
         return 0
 
-    monkeypatch.setitem(P.ADAPTER, "ldjson",
-                        Adapter(name="probe", lies=lambda text, url="": [],
-                                ergaenze_buendel=haken))
-    anbieter = _anbieter(name="Vodafone", basis_url="https://www.vodafone.de",
-                         user_agent="TelcoRadar/1.0 (+probe)")
-    P.nachsammle_buendel([_Bilanz("Vodafone", [{"sku": "1"}])],
-                         _Quellen(anbieter), hole, uhr=lambda: _um(3, 0))
+    monkeypatch.setitem(
+        P.ADAPTER,
+        "ldjson",
+        Adapter(name="probe", lies=lambda text, url="": [], ergaenze_buendel=haken),
+    )
+    anbieter = _anbieter(
+        name="Vodafone",
+        basis_url="https://www.vodafone.de",
+        user_agent="TelcoRadar/1.0 (+probe)",
+    )
+    P.nachsammle_buendel(
+        [_Bilanz("Vodafone", [{"sku": "1"}])],
+        _Quellen(anbieter),
+        hole,
+        uhr=lambda: _um(3, 0),
+    )
     assert absender[_HAKEN_ERLAUBT] == "TelcoRadar/1.0 (+probe)"
     # Gegenprobe: ohne eigenen Absender bleibt es beim Aufruf ohne.
     absender.clear()
     anbieter = _anbieter(name="Vodafone", basis_url="https://www.vodafone.de")
-    P.nachsammle_buendel([_Bilanz("Vodafone", [{"sku": "1"}])],
-                         _Quellen(anbieter), hole, uhr=lambda: _um(3, 0))
+    P.nachsammle_buendel(
+        [_Bilanz("Vodafone", [{"sku": "1"}])],
+        _Quellen(anbieter),
+        hole,
+        uhr=lambda: _um(3, 0),
+    )
     assert absender[_HAKEN_ERLAUBT] is None

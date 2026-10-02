@@ -41,6 +41,7 @@ Zweimal die Woche, im Launch-Fenster eines Flaggschiffs taeglich. Bewusst
 niedrig: das schont die Zielsysteme, vermeidet Bot-Abwehr und stuetzt die
 Position, falls jemand fragt.
 """
+
 from __future__ import annotations
 
 import json
@@ -77,20 +78,23 @@ _ENTFERNEN = ("script", "style", "noscript", "svg", "iframe")
 
 # "1-3 Werktage", "2 bis 4 Werktagen", "ca. 14 Tage"
 _SPANNE = re.compile(
-    r"(\d{1,3})\s*(?:-|–|bis)\s*(\d{1,3})\s*(Werktage[n]?|Tage[n]?|Wochen?)",
-    re.I)
+    r"(\d{1,3})\s*(?:-|–|bis)\s*(\d{1,3})\s*(Werktage[n]?|Tage[n]?|Wochen?)", re.I
+)
 _EINZEL = re.compile(
     r"(?:ca\.?\s*|circa\s*|innerhalb von\s*|in\s*)?(\d{1,3})\s*"
-    r"(Werktage[n]?|Tage[n]?|Wochen?)", re.I)
+    r"(Werktage[n]?|Tage[n]?|Wochen?)",
+    re.I,
+)
 _SOFORT = re.compile(r"sofort (?:lieferbar|versandfertig)|auf Lager", re.I)
 _NICHT_LIEFERBAR = re.compile(
     r"(nicht|derzeit nicht|momentan nicht)\s+(lieferbar|verf[üu]gbar)|"
-    r"ausverkauft|vorbestell", re.I)
+    r"ausverkauft|vorbestell",
+    re.I,
+)
 
 # Der Kontext, in dem eine Zahl ueberhaupt eine Lieferzeit sein KANN. Ohne
 # ihn liest der Regex "24 Monate Laufzeit" als Lieferzeit.
-_KONTEXT = re.compile(
-    r"(liefer|versand|zustell|ankunft|verf[üu]gbar|lager)", re.I)
+_KONTEXT = re.compile(r"(liefer|versand|zustell|ankunft|verf[üu]gbar|lager)", re.I)
 
 _TAGE_JE_EINHEIT = {"woche": 7, "wochen": 7}
 
@@ -104,14 +108,14 @@ class Beobachtung:
     anbieter: str
     url: str
     zeitstempel: str
-    verfuegbarkeit: str = ""          # "sofort" | "verzoegert" | "nein" | ""
-    lieferzeit_roh: str = ""          # der Originaltext, immer mitgefuehrt
+    verfuegbarkeit: str = ""  # "sofort" | "verzoegert" | "nein" | ""
+    lieferzeit_roh: str = ""  # der Originaltext, immer mitgefuehrt
     tage_min: int | None = None
     tage_max: int | None = None
-    methode: str = ""                 # jsonld | selektor | text
+    methode: str = ""  # jsonld | selektor | text
     belastbarkeit: str = NIEDRIG
     plz: str = ""
-    quarantaene: str = ""             # Grund, wenn nicht veroeffentlicht
+    quarantaene: str = ""  # Grund, wenn nicht veroeffentlicht
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -151,27 +155,38 @@ def lade_warenkorb(root: Path) -> Warenkorb:
         return Warenkorb()
     daten = yaml.safe_load(pfad.read_text(encoding="utf-8")) or {}
     korb = Warenkorb(test_plz=str(daten.get("test_plz") or ""))
-    korb.produkte = [Produkt(ref=str(p.get("ref")), name=str(p.get("name")),
-                             variante=str(p.get("variante") or ""),
-                             typ=str(p.get("typ") or ""))
-                     for p in (daten.get("produkte") or []) if p.get("ref")]
-    for a in (daten.get("anbieter") or []):
+    korb.produkte = [
+        Produkt(
+            ref=str(p.get("ref")),
+            name=str(p.get("name")),
+            variante=str(p.get("variante") or ""),
+            typ=str(p.get("typ") or ""),
+        )
+        for p in (daten.get("produkte") or [])
+        if p.get("ref")
+    ]
+    for a in daten.get("anbieter") or []:
         marke = str(a.get("marke") or "")
         korb.anbieter_meta[marke] = {
             "ident": str(a.get("ident") or ""),
             "getrennte_sendung": bool(a.get("getrennte_sendung")),
         }
-        for s in (a.get("seiten") or []):
+        for s in a.get("seiten") or []:
             if s.get("url"):
-                korb.seiten.append(AnbieterSeite(
-                    marke=marke, produkt=str(s.get("produkt") or ""),
-                    url=str(s.get("url")),
-                    selector=str(s.get("selector") or ""),
-                    braucht_browser=bool(s.get("braucht_browser"))))
+                korb.seiten.append(
+                    AnbieterSeite(
+                        marke=marke,
+                        produkt=str(s.get("produkt") or ""),
+                        url=str(s.get("url")),
+                        selector=str(s.get("selector") or ""),
+                        braucht_browser=bool(s.get("braucht_browser")),
+                    )
+                )
     return korb
 
 
 # ------------------------------------------------------------- Extraktion
+
 
 def aus_jsonld(html: str) -> tuple[str, int | None, int | None] | None:
     """`OfferShippingDetails.deliveryTime` aus schema.org, wenn vorhanden.
@@ -182,15 +197,16 @@ def aus_jsonld(html: str) -> tuple[str, int | None, int | None] | None:
     gelesen.
     """
     for treffer in re.finditer(
-            r'<script[^>]*application/ld\+json[^>]*>(.*?)</script>',
-            html or "", re.S | re.I):
+        r"<script[^>]*application/ld\+json[^>]*>(.*?)</script>", html or "", re.S | re.I
+    ):
         try:
             daten = json.loads(treffer.group(1))
         except (json.JSONDecodeError, TypeError):
             continue
         for knoten in _knoten(daten):
             versand = knoten.get("shippingDetails") or knoten.get(
-                "OfferShippingDetails")
+                "OfferShippingDetails"
+            )
             if not isinstance(versand, dict):
                 continue
             zeit = versand.get("deliveryTime")
@@ -198,8 +214,11 @@ def aus_jsonld(html: str) -> tuple[str, int | None, int | None] | None:
                 continue
             gesamt = _summe_tage(zeit)
             if gesamt:
-                return f"schema.org deliveryTime {gesamt[0]}-{gesamt[1]} Tage", \
-                    gesamt[0], gesamt[1]
+                return (
+                    f"schema.org deliveryTime {gesamt[0]}-{gesamt[1]} Tage",
+                    gesamt[0],
+                    gesamt[1],
+                )
     return None
 
 
@@ -255,8 +274,12 @@ def aus_text(text: str) -> tuple[str, str, int | None, int | None] | None:
         m = _SPANNE.search(satz)
         if m:
             faktor = _TAGE_JE_EINHEIT.get(m.group(3).lower(), 1)
-            return (roh, _lage(int(m.group(2)) * faktor),
-                    int(m.group(1)) * faktor, int(m.group(2)) * faktor)
+            return (
+                roh,
+                _lage(int(m.group(2)) * faktor),
+                int(m.group(1)) * faktor,
+                int(m.group(2)) * faktor,
+            )
         m = _EINZEL.search(satz)
         if m:
             faktor = _TAGE_JE_EINHEIT.get(m.group(2).lower(), 1)
@@ -282,13 +305,18 @@ def _text(html: str, selector: str = "") -> str:
     return (bereich or suppe).get_text("\n", strip=True)
 
 
-def beobachte(html: str, seite: AnbieterSeite, produkt: Produkt,
-              plz: str, jetzt: datetime) -> Beobachtung:
+def beobachte(
+    html: str, seite: AnbieterSeite, produkt: Produkt, plz: str, jetzt: datetime
+) -> Beobachtung:
     """Eine Seite auswerten. Setzt Methode, Belastbarkeit und Quarantaene."""
     b = Beobachtung(
-        produkt_ref=produkt.ref, produkt_name=produkt.name,
-        anbieter=seite.marke, url=seite.url,
-        zeitstempel=jetzt.isoformat(timespec="seconds"), plz=plz)
+        produkt_ref=produkt.ref,
+        produkt_name=produkt.name,
+        anbieter=seite.marke,
+        url=seite.url,
+        zeitstempel=jetzt.isoformat(timespec="seconds"),
+        plz=plz,
+    )
 
     treffer = aus_jsonld(html)
     if treffer:
@@ -315,6 +343,7 @@ def beobachte(html: str, seite: AnbieterSeite, produkt: Produkt,
 
 # ------------------------------------------------------------------ Speicher
 
+
 class Lieferzeitspeicher:
     """Die Zeitreihe je Produkt und Anbieter."""
 
@@ -336,8 +365,9 @@ class Lieferzeitspeicher:
         return self.daten["reihen"].get(self._key(produkt_ref, anbieter)) or []
 
     def letzte(self, produkt_ref: str, anbieter: str) -> dict | None:
-        reihe = [b for b in self.reihe(produkt_ref, anbieter)
-                 if not b.get("quarantaene")]
+        reihe = [
+            b for b in self.reihe(produkt_ref, anbieter) if not b.get("quarantaene")
+        ]
         return reihe[-1] if reihe else None
 
     def anhaengen(self, b: Beobachtung) -> None:
@@ -350,8 +380,8 @@ class Lieferzeitspeicher:
         self.daten["stand"] = stand
         self.pfad.parent.mkdir(parents=True, exist_ok=True)
         self.pfad.write_text(
-            json.dumps(self.daten, ensure_ascii=False, indent=1),
-            encoding="utf-8")
+            json.dumps(self.daten, ensure_ascii=False, indent=1), encoding="utf-8"
+        )
 
 
 def ist_engpass(vorher: dict | None, jetzt: Beobachtung) -> bool:
@@ -369,8 +399,9 @@ def ist_engpass(vorher: dict | None, jetzt: Beobachtung) -> bool:
     return jetzt.tage_max - int(vorher["tage_max"]) >= ENGPASS_SPRUNG
 
 
-def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
-           hole=None) -> dict:
+def sammle(
+    root: Path, http_cfg: dict, *, jetzt: datetime | None = None, hole=None
+) -> dict:
     """Den ganzen Warenkorb messen. Liefert die Bilanz fuers Laufprotokoll.
 
     `hole` ist der Abrufer - in Tests eine Attrappe, sonst `fetch`.
@@ -378,30 +409,42 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
     jetzt = jetzt or datetime.now(timezone.utc)
     hole = hole or (lambda url: fetch(url, http_cfg).text)
     korb = lade_warenkorb(root)
-    speicher = Lieferzeitspeicher(Path(root) / "data" / "state" /
-                                  "lieferzeit.json")
-    bilanz = {"seiten": len(korb.seiten), "gemessen": 0, "quarantaene": 0,
-              "fehler": 0, "engpaesse": []}
+    speicher = Lieferzeitspeicher(Path(root) / "data" / "state" / "lieferzeit.json")
+    bilanz = {
+        "seiten": len(korb.seiten),
+        "gemessen": 0,
+        "quarantaene": 0,
+        "fehler": 0,
+        "engpaesse": [],
+    }
 
     for seite in korb.seiten:
         produkt = korb.produkt(seite.produkt)
         if produkt is None:
-            log.warning("Lieferzeit: Seite %s verweist auf unbekanntes "
-                        "Produkt %r", seite.url, seite.produkt)
+            log.warning(
+                "Lieferzeit: Seite %s verweist auf unbekanntes Produkt %r",
+                seite.url,
+                seite.produkt,
+            )
             continue
         try:
             html = hole(seite.url)
         except Exception as exc:  # noqa: BLE001
             bilanz["fehler"] += 1
-            log.info("Lieferzeit %s (%s) nicht abrufbar: %s",
-                     seite.marke, produkt.name, str(exc)[:110])
+            log.info(
+                "Lieferzeit %s (%s) nicht abrufbar: %s",
+                seite.marke,
+                produkt.name,
+                str(exc)[:110],
+            )
             continue
         b = beobachte(html, seite, produkt, korb.test_plz, jetzt)
         vorher = speicher.letzte(produkt.ref, seite.marke)
         if ist_engpass(vorher, b):
             bilanz["engpaesse"].append(
                 f"{seite.marke} / {produkt.name}: "
-                f"{vorher.get('tage_max')} -> {b.tage_max} Tage")
+                f"{vorher.get('tage_max')} -> {b.tage_max} Tage"
+            )
         speicher.anhaengen(b)
         if b.quarantaene:
             bilanz["quarantaene"] += 1
@@ -409,9 +452,14 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
             bilanz["gemessen"] += 1
 
     speicher.speichern(jetzt.date().isoformat())
-    log.info("Lieferzeit-Radar: %d Seiten, %d gemessen, %d Quarantaene, "
-             "%d Fehler%s", bilanz["seiten"], bilanz["gemessen"],
-             bilanz["quarantaene"], bilanz["fehler"],
-             (" | ENGPASS: " + "; ".join(bilanz["engpaesse"]))
-             if bilanz["engpaesse"] else "")
+    log.info(
+        "Lieferzeit-Radar: %d Seiten, %d gemessen, %d Quarantaene, %d Fehler%s",
+        bilanz["seiten"],
+        bilanz["gemessen"],
+        bilanz["quarantaene"],
+        bilanz["fehler"],
+        (" | ENGPASS: " + "; ".join(bilanz["engpaesse"]))
+        if bilanz["engpaesse"]
+        else "",
+    )
     return bilanz

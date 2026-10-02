@@ -25,6 +25,7 @@ Ein Monat mit wenigen Aufnahmen hat einen wackligen Anteil. Deshalb
 Trendaussage benutzt. Ein "Fintech verdoppelt sich" aus zwei Beispielen ist
 keine Beobachtung, sondern eine Rundung.
 """
+
 from __future__ import annotations
 
 from collections import defaultdict
@@ -42,8 +43,20 @@ _MIND_JE_MONAT = 5
 # Bewegung heisst. Darunter ist es dieselbe Lage in anderer Rundung.
 _SCHWELLE_PUNKTE = 5.0
 
-MONATE_DE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli",
-             "August", "September", "Oktober", "November", "Dezember"]
+MONATE_DE = [
+    "Januar",
+    "Februar",
+    "März",
+    "April",
+    "Mai",
+    "Juni",
+    "Juli",
+    "August",
+    "September",
+    "Oktober",
+    "November",
+    "Dezember",
+]
 
 
 def _monat_label(iso_monat: str) -> str:
@@ -67,8 +80,7 @@ def aufbereiten(bestand: list[dict], theme_label: dict[str, str]) -> dict:
     if len(monate) < 2:
         # Ein einzelner Monat ist kein Verlauf. Lieber nichts zeigen als eine
         # Linie mit einem Punkt.
-        return {"aktiv": False, "monate": [], "reihen": [],
-                "waechst": [], "kippt": []}
+        return {"aktiv": False, "monate": [], "reihen": [], "waechst": [], "kippt": []}
 
     gesamt = {m: sum(je_monat[m].values()) for m in monate}
     belastbar = [m for m in monate if gesamt[m] >= _MIND_JE_MONAT]
@@ -79,13 +91,25 @@ def aufbereiten(bestand: list[dict], theme_label: dict[str, str]) -> dict:
         for m in monate:
             n = je_monat[m].get(key, 0)
             anteil = 100.0 * n / gesamt[m] if gesamt[m] else 0.0
-            punkte.append({"monat": m, "label": _monat_label(m), "n": n,
-                           "anteil": round(anteil, 1),
-                           "belastbar": m in belastbar})
+            punkte.append(
+                {
+                    "monat": m,
+                    "label": _monat_label(m),
+                    "n": n,
+                    "anteil": round(anteil, 1),
+                    "belastbar": m in belastbar,
+                }
+            )
         if not any(p["n"] for p in punkte):
             continue
-        reihen.append({"key": key, "label": label, "punkte": punkte,
-                       "gesamt": sum(p["n"] for p in punkte)})
+        reihen.append(
+            {
+                "key": key,
+                "label": label,
+                "punkte": punkte,
+                "gesamt": sum(p["n"] for p in punkte),
+            }
+        )
     reihen.sort(key=lambda r: -r["gesamt"])
 
     # Die Bewegung: letzter belastbarer Monat gegen den Durchschnitt der
@@ -100,9 +124,13 @@ def aufbereiten(bestand: list[dict], theme_label: dict[str, str]) -> dict:
             jetzt = je.get(letzter, 0.0)
             basis = sum(je.get(m, 0.0) for m in davor) / len(davor)
             delta = round(jetzt - basis, 1)
-            eintrag = {"label": reihe["label"], "key": reihe["key"],
-                       "jetzt": jetzt, "vorher": round(basis, 1),
-                       "delta": delta}
+            eintrag = {
+                "label": reihe["label"],
+                "key": reihe["key"],
+                "jetzt": jetzt,
+                "vorher": round(basis, 1),
+                "delta": delta,
+            }
             if delta >= _SCHWELLE_PUNKTE:
                 waechst.append(eintrag)
             elif delta <= -_SCHWELLE_PUNKTE:
@@ -112,13 +140,19 @@ def aufbereiten(bestand: list[dict], theme_label: dict[str, str]) -> dict:
 
     return {
         "aktiv": True,
-        "monate": [{"monat": m, "label": _monat_label(m), "n": gesamt[m],
-                    "belastbar": m in belastbar} for m in monate],
+        "monate": [
+            {
+                "monat": m,
+                "label": _monat_label(m),
+                "n": gesamt[m],
+                "belastbar": m in belastbar,
+            }
+            for m in monate
+        ],
         "reihen": reihen[:8],
         "waechst": waechst[:3],
         "kippt": kippt[:3],
         # Damit die Seite den Vorbehalt nennen kann, statt ihn zu verschweigen.
-        "duenne_monate": [_monat_label(m) for m in monate
-                          if m not in belastbar],
+        "duenne_monate": [_monat_label(m) for m in monate if m not in belastbar],
         "mind_je_monat": _MIND_JE_MONAT,
     }

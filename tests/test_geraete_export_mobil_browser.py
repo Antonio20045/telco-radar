@@ -21,6 +21,7 @@ test_geraete_zeitreihe_browser.py):
   - Der Kicker bricht nicht um: der Kopf ist auf dem Telefon eine
     SPALTE (Kicker, Schlagzeile, Datum).
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -44,10 +45,18 @@ def _baue_site(tmp_path: pathlib.Path) -> pathlib.Path:
     root, state = _baue(tmp_path)
     reports = root / "data" / "reports"
     reports.mkdir(parents=True, exist_ok=True)
-    (reports / f"{HEUTE}.json").write_text(json.dumps({
-        "date": HEUTE, "language": "de",
-        "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
-        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{HEUTE}.json").write_text(
+        json.dumps(
+            {
+                "date": HEUTE,
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     (reports / f"{HEUTE}.md").write_text("# B\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
@@ -55,10 +64,15 @@ def _baue_site(tmp_path: pathlib.Path) -> pathlib.Path:
 
 
 def _chromium():
-    for muster in ("/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-                   str(pathlib.Path.home() / ".cache/ms-playwright"
-                       / "chromium*/chrome-linux*/chrome"),
-                   "/Applications/Chromium.app/Contents/MacOS/Chromium"):
+    for muster in (
+        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
+        str(
+            pathlib.Path.home()
+            / ".cache/ms-playwright"
+            / "chromium*/chrome-linux*/chrome"
+        ),
+        "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    ):
         treffer = sorted(glob.glob(muster))
         if treffer:
             return treffer[-1]
@@ -71,8 +85,9 @@ def _server(site: pathlib.Path):
     s.bind(("127.0.0.1", 0))
     port = s.getsockname()[1]
     s.close()
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler,
-                                directory=str(site))
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(site)
+    )
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     try:
@@ -84,12 +99,12 @@ def _server(site: pathlib.Path):
 @pytest.fixture(scope="module")
 def _browser_seite(tmp_path_factory):
     sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt").sync_playwright
+        "playwright.sync_api", reason="playwright fehlt"
+    ).sync_playwright
     site = _baue_site(tmp_path_factory.mktemp("exmobil"))
     exe = _chromium()
     with _server(site) as basis, sync_playwright() as p:
-        browser = (p.chromium.launch(executable_path=exe) if exe
-                   else p.chromium.launch())
+        browser = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
         yield browser, basis, site
         browser.close()
 
@@ -186,12 +201,12 @@ def test_am_telefon_ist_das_export_menue_zugeklappt_ein_knopf(telefon):
     assert zustand["oeffnerBox"] > 0, "der 'Export ▾'-Knopf ist unsichtbar"
     assert zustand["knoepfeBox"] == 0, (
         f"die sechs Ziele stehen schon vor dem Klick im Bild "
-        f"({zustand['knoepfeBox']} px hoch)")
+        f"({zustand['knoepfeBox']} px hoch)"
+    )
     assert zustand["sichtbareKnoepfeAusserhalb"] == 0
 
 
-def test_am_telefon_ist_die_export_zeile_nach_dem_oeffnen_vollstaendig(
-        telefon):
+def test_am_telefon_ist_die_export_zeile_nach_dem_oeffnen_vollstaendig(telefon):
     """Alle Export-Dateien sind vom Telefon aus erreichbar, sobald das
     Menü offen ist - die Reihe steht da (Hoehe > 0), jeder Knopf hat eine
     Box, und alle liegen in EINER Zeile (die Reihe rollt in sich, sie
@@ -206,7 +221,8 @@ def test_am_telefon_ist_die_export_zeile_nach_dem_oeffnen_vollstaendig(
     assert r["overflow"] == "auto", (
         f"overflow-x ist {r['overflow']} - die Reihe kann nicht in sich "
         "rollen, der vierte Knopf wäre unerreichbar oder drückt die Seite "
-        "quer")
+        "quer"
+    )
 
 
 def test_am_telefon_rollt_die_geoeffnete_seite_nicht_quer(telefon):
@@ -215,9 +231,11 @@ def test_am_telefon_rollt_die_geoeffnete_seite_nicht_quer(telefon):
     assert r is not None
     assert r["quer"] <= 391, (
         f"Seite {r['quer']} px breit - die Knopfreihe drückt das Dokument "
-        "in die Waagerechte statt selbst zu rollen")
+        "in die Waagerechte statt selbst zu rollen"
+    )
     assert r["scroll"] > r["client"] or r["scroll"] == r["client"], (
-        "scrollWidth kleiner als clientWidth - da stimmt die Messung nicht")
+        "scrollWidth kleiner als clientWidth - da stimmt die Messung nicht"
+    )
 
 
 def test_am_telefon_bleibt_die_falz_von_11c_erfuellt(telefon):
@@ -231,9 +249,11 @@ def test_am_telefon_bleibt_die_falz_von_11c_erfuellt(telefon):
     r = _reihe(telefon)
     assert r is not None, "keine Export-Reihe in der Fußzeile der Seite"
     assert r["antwort"] is not None and r["antwort"] <= 844, (
-        f"Antwort-Satz endet bei {r['antwort']} px")
+        f"Antwort-Satz endet bei {r['antwort']} px"
+    )
     assert r["kopf"] is not None and r["kopf"] <= 844, (
-        f"Graphkopf endet bei {r['kopf']} px")
+        f"Graphkopf endet bei {r['kopf']} px"
+    )
 
 
 def test_der_kicker_bricht_auf_dem_telefon_nicht_um(telefon):
@@ -258,13 +278,15 @@ def test_der_kicker_bricht_auf_dem_telefon_nicht_um(telefon):
     assert box is not None, "Kopf ohne Kicker oder Datum - Messung ins Leere"
     assert box["kh"] <= box["lh"] + 2, (
         f"der Kicker ist {box['kh']} px hoch bei {box['lh']} px Zeilenhöhe "
-        "- er bricht um")
+        "- er bricht um"
+    )
     # Das Datum endet rechtsbündig an derselben Kante wie der Kopf
     # (Grid-Spalte, justify-self:end) - es steht UNTER der Schlagzeile,
     # nicht mehr am Flex-Grund neben dem Text-Block.
     assert box["breite"] - box["drechts"] <= 2, (
         f"Datumszeile endet {box['breite'] - box['drechts']} px vor der "
-        "rechten Kopf-Kante")
+        "rechten Kopf-Kante"
+    )
 
 
 def test_die_vier_links_zielen_auf_vier_dateien(_browser_seite):
@@ -272,14 +294,20 @@ def test_die_vier_links_zielen_auf_vier_dateien(_browser_seite):
     geschrieben hat - ein Link auf eine fehlende Datei ist ein Download,
     der im Browser in einem 404 endet."""
     _, _, site = _browser_seite
-    for name in ("geraete-aktuell.csv", "geraete-historie.csv",
-                 "geraete-tco.csv", "wettbewerbsradar.csv"):
+    for name in (
+        "geraete-aktuell.csv",
+        "geraete-historie.csv",
+        "geraete-tco.csv",
+        "wettbewerbsradar.csv",
+    ):
         assert (site / "exporte" / name).exists(), (
-            f"exporte/{name} fehlt im gerenderten site/-Verzeichnis")
+            f"exporte/{name} fehlt im gerenderten site/-Verzeichnis"
+        )
 
 
 def test_am_schreibtisch_steht_die_reihe_nach_dem_oeffnen_in_der_fusszeile(
-        schreibtisch):
+    schreibtisch,
+):
     """Der Desktop verhält sich wie das Telefon: EIN "Export ▾"-Knopf am
     Fuß, nach dem Öffnen dieselben sechs Ziele in EINER Zeile. Bis P4/D4
     stand die Reihe im Hero, bis P2/D4b immer offen in der Fußzeile."""

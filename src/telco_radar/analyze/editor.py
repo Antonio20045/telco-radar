@@ -4,6 +4,7 @@ Gets the list of previously reported topics as "do not repeat" memory.
 If no LLM is available, build_digest() produces a deterministic raw digest
 so the pipeline always delivers something useful.
 """
+
 from __future__ import annotations
 
 import json
@@ -31,6 +32,7 @@ class EditorialBriefingError(RuntimeError):
     def __init__(self, message: str, grund: str = "gliederung"):
         super().__init__(message)
         self.grund = grund
+
 
 EDITOR_SYSTEM = """\
 You are the chief editor of "Telco Radar", a weekly global
@@ -138,8 +140,11 @@ def _select_for_editor(clean: dict[str, dict], budget: int) -> tuple[dict, int]:
     which is showing what happened ACROSS regions.
     """
     ranked = {
-        rn: sorted(r.get("highlights") or [],
-                   key=lambda h: (h.get("relevance") or 0), reverse=True)
+        rn: sorted(
+            r.get("highlights") or [],
+            key=lambda h: h.get("relevance") or 0,
+            reverse=True,
+        )
         for rn, r in clean.items()
     }
     total = sum(len(v) for v in ranked.values())
@@ -159,10 +164,14 @@ def _select_for_editor(clean: dict[str, dict], budget: int) -> tuple[dict, int]:
     return out, total - picked
 
 
-def synthesize(regional: dict[str, dict], already_covered: list[str],
-               model: str, language: str = "Deutsch",
-               highlight_budget: int = EDITOR_HIGHLIGHT_BUDGET,
-               themenbereiche: list[str] | None = None) -> tuple[str, list[str]]:
+def synthesize(
+    regional: dict[str, dict],
+    already_covered: list[str],
+    model: str,
+    language: str = "Deutsch",
+    highlight_budget: int = EDITOR_HIGHLIGHT_BUDGET,
+    themenbereiche: list[str] | None = None,
+) -> tuple[str, list[str]]:
     """Run the editor. Returns (markdown_report, covered_topics).
 
     `themenbereiche` sind die Anzeigenamen der Themenfelder, die in DIESEM
@@ -176,8 +185,12 @@ def synthesize(regional: dict[str, dict], already_covered: list[str],
     }
     clean, omitted = _select_for_editor(clean, highlight_budget)
     if omitted:
-        log.info("Editor gets %d highlights, %d weaker ones omitted "
-                 "(all remain in the report JSON)", highlight_budget, omitted)
+        log.info(
+            "Editor gets %d highlights, %d weaker ones omitted "
+            "(all remain in the report JSON)",
+            highlight_budget,
+            omitted,
+        )
     payload = {
         "regional_analyses": clean,
         "already_covered_topics": already_covered[-300:],
@@ -193,13 +206,20 @@ def synthesize(regional: dict[str, dict], already_covered: list[str],
     # Printed on every run: with no cap the editor prompt grows with the week,
     # and this is the number that decides whether the configured model can
     # still take it (~4 characters per token).
-    log.info("Editor prompt: %d highlights, %.0f KB (~%dk tokens), model=%s",
-             n_highlights, len(user) / 1024, len(user) // 4000, model)
+    log.info(
+        "Editor prompt: %d highlights, %.0f KB (~%dk tokens), model=%s",
+        n_highlights,
+        len(user) / 1024,
+        len(user) // 4000,
+        model,
+    )
     themen = [t for t in (themenbereiche or []) if t]
     system = EDITOR_SYSTEM.format(
         language=language,
-        themenabschnitt=(THEMEN_ABSCHNITT.format(themen='", "'.join(themen))
-                         if themen else ""))
+        themenabschnitt=(
+            THEMEN_ABSCHNITT.format(themen='", "'.join(themen)) if themen else ""
+        ),
+    )
     pflicht = frozenset({THEMEN_UEBERSCHRIFT}) if themen else frozenset()
     try:
         return _ein_versuch(system, user, model, pflicht)
@@ -266,8 +286,9 @@ passiert ist, nicht, was jemand daraus machen soll.
 EDITOR_MAX_TOKENS = 32000
 
 
-def _ein_versuch(system: str, user: str, model: str,
-                 zusatz_pflicht: frozenset[str] = frozenset()) -> tuple[str, list[str]]:
+def _ein_versuch(
+    system: str, user: str, model: str, zusatz_pflicht: frozenset[str] = frozenset()
+) -> tuple[str, list[str]]:
     raw = complete(system, user, model=model, max_tokens=EDITOR_MAX_TOKENS)
 
     topics: list[str] = []
@@ -293,8 +314,8 @@ def _ein_versuch(system: str, user: str, model: str,
 
 
 def validate_editorial_briefing(
-        markdown: str,
-        zusatz_pflicht: frozenset[str] = frozenset()) -> None:
+    markdown: str, zusatz_pflicht: frozenset[str] = frozenset()
+) -> None:
     """Reject a raw source list before it can replace the public report.
 
     A technical outage at the free model provider must leave the last good
@@ -307,8 +328,7 @@ def validate_editorial_briefing(
     den anderen mit.
     """
     headings = {
-        line.strip().lower()
-        .replace("ä", "ae").replace("ö", "oe").replace("ü", "ue")
+        line.strip().lower().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue")
         for line in markdown.splitlines()
         if line.strip().startswith("## ")
     }
@@ -334,18 +354,24 @@ def validate_editorial_briefing(
             f"Gefunden: {gefunden}. Anfang: {anfang!r}"
         )
     lowered = markdown.lower().replace("ä", "ae").replace("ö", "oe").replace("ü", "ue")
-    for phrase in ("empfehlungen fuer vodafone", "fuer vodafone:",
-                   "vodafone sollte", "vodafone koennte"):
+    for phrase in (
+        "empfehlungen fuer vodafone",
+        "fuer vodafone:",
+        "vodafone sollte",
+        "vodafone koennte",
+    ):
         pos = lowered.find(phrase)
         if pos < 0:
             continue
         # Die Fundstelle mitgeben: ohne sie ist nicht zu unterscheiden, ob das
         # Modell wirklich einen Empfehlungsteil geschrieben hat oder ob eine
         # harmlose Formulierung die Regel ausloest.
-        stelle = " ".join(markdown[max(0, pos - 80):pos + 120].split())
+        stelle = " ".join(markdown[max(0, pos - 80) : pos + 120].split())
         raise EditorialBriefingError(
             f"Editor output contains Vodafone recommendations "
-            f"({phrase!r}). Stelle: ...{stelle}...", grund="empfehlungen")
+            f"({phrase!r}). Stelle: ...{stelle}...",
+            grund="empfehlungen",
+        )
 
 
 # =========================================================================== #
@@ -480,16 +506,18 @@ CHEF_MELDUNGEN_JE_BEREICH = 5
 
 def _staerkste(highlights: list[dict], anzahl: int) -> list[dict]:
     """Die relevantesten Meldungen eines Bereichs, knapp fuer die Chefredaktion."""
-    sortiert = sorted(highlights, key=lambda h: (h.get("relevance") or 0),
-                      reverse=True)
-    return [{
-        "title": h.get("title", ""),
-        "operator": h.get("operator", ""),
-        "url": h.get("url", ""),
-        "category": h.get("category", ""),
-        "relevance": h.get("relevance"),
-        "summary": h.get("summary", ""),
-    } for h in sortiert[:anzahl]]
+    sortiert = sorted(highlights, key=lambda h: h.get("relevance") or 0, reverse=True)
+    return [
+        {
+            "title": h.get("title", ""),
+            "operator": h.get("operator", ""),
+            "url": h.get("url", ""),
+            "category": h.get("category", ""),
+            "relevance": h.get("relevance"),
+            "summary": h.get("summary", ""),
+        }
+        for h in sortiert[:anzahl]
+    ]
 
 
 def _teile_antwort(raw: str) -> tuple[str, str, list[str]]:
@@ -516,8 +544,7 @@ def _teile_antwort(raw: str) -> tuple[str, str, list[str]]:
     return rest.strip(), " ".join(kurz.split()), topics
 
 
-def _notfall_abschnitt(bereich: str, highlights: list[dict],
-                       ueberschrift: str) -> str:
+def _notfall_abschnitt(bereich: str, highlights: list[dict], ueberschrift: str) -> str:
     """Regelbasierter Abschnitt, wenn ein Bereichsredakteur ausfaellt.
 
     Ein Bereich darf nicht deshalb aus dem Bericht verschwinden, weil EIN
@@ -525,25 +552,33 @@ def _notfall_abschnitt(bereich: str, highlights: list[dict],
     fest, und der Seen-Store merkt sie sich ohnehin als erledigt. Lieber eine
     nuechterne Liste als ein Loch im Wochenbericht.
     """
-    zeilen = [f"{ueberschrift} {bereich}", "",
-              "_Dieser Abschnitt konnte in diesem Lauf nicht redaktionell "
-              "verdichtet werden; die Meldungen stehen unveraendert mit ihren "
-              "Originalquellen._", ""]
-    for h in sorted(highlights, key=lambda x: (x.get("relevance") or 0),
-                    reverse=True):
+    zeilen = [
+        f"{ueberschrift} {bereich}",
+        "",
+        "_Dieser Abschnitt konnte in diesem Lauf nicht redaktionell "
+        "verdichtet werden; die Meldungen stehen unveraendert mit ihren "
+        "Originalquellen._",
+        "",
+    ]
+    for h in sorted(highlights, key=lambda x: x.get("relevance") or 0, reverse=True):
         titel = h.get("title", "").strip()
         url = h.get("url", "")
         betreiber = h.get("operator", "")
         text = h.get("summary", "").strip()
         kopf = f"- **{betreiber}**: {titel}" if betreiber else f"- {titel}"
-        zeilen.append(f"{kopf} — {text} [Quelle]({url})" if url
-                      else f"{kopf} — {text}")
+        zeilen.append(f"{kopf} — {text} [Quelle]({url})" if url else f"{kopf} — {text}")
     zeilen.append("")
     return "\n".join(zeilen)
 
 
-def _ein_bereich(bereich: str, daten: dict, already_covered: list[str],
-                 model: str, language: str, ist_thema: bool) -> dict:
+def _ein_bereich(
+    bereich: str,
+    daten: dict,
+    already_covered: list[str],
+    model: str,
+    language: str,
+    ist_thema: bool,
+) -> dict:
     """Einen Bereichsredakteur laufen lassen. Faellt nie hart aus."""
     highlights = daten.get("highlights") or []
     # Themenfelder stehen als H3 unter der gemeinsamen H2; Regionen sind H2.
@@ -551,54 +586,83 @@ def _ein_bereich(bereich: str, daten: dict, already_covered: list[str],
     # Ein grosser Bereich darf laenger schreiben als ein kleiner - sonst
     # bekommt Europa mit 40 Meldungen so viel Platz wie Ozeanien mit zweien.
     woerter = max(120, min(600, 60 + 25 * len(highlights)))
-    system = BEREICH_SYSTEM.format(bereich=bereich, language=language,
-                                   ueberschrift=ueberschrift, woerter=woerter)
-    user = json.dumps({
-        "bereich": bereich,
-        "ist_themenfeld": ist_thema,
-        "analyse": {k: v for k, v in daten.items() if not k.startswith("_")},
-        "already_covered_topics": already_covered[-300:],
-    }, ensure_ascii=False)
+    system = BEREICH_SYSTEM.format(
+        bereich=bereich, language=language, ueberschrift=ueberschrift, woerter=woerter
+    )
+    user = json.dumps(
+        {
+            "bereich": bereich,
+            "ist_themenfeld": ist_thema,
+            "analyse": {k: v for k, v in daten.items() if not k.startswith("_")},
+            "already_covered_topics": already_covered[-300:],
+        },
+        ensure_ascii=False,
+    )
     try:
         raw = complete(system, user, model=model, max_tokens=BEREICH_MAX_TOKENS)
         abschnitt, kurz, topics = _teile_antwort(raw)
         if not abschnitt.lstrip().startswith("#"):
             raise ValueError(f"kein Abschnitt mit Ueberschrift: {abschnitt[:120]!r}")
     except (ValueError, RuntimeError, KeyError) as exc:
-        log.error("Bereichsredaktion %s gescheitert (%s) - Regelabschnitt",
-                  bereich, str(exc)[:160])
+        log.error(
+            "Bereichsredaktion %s gescheitert (%s) - Regelabschnitt",
+            bereich,
+            str(exc)[:160],
+        )
         abschnitt = _notfall_abschnitt(bereich, highlights, ueberschrift)
         kurz = str(daten.get("region_summary") or "")[:600]
-        topics = [f"{h.get('operator','')}: {h.get('title','')[:120]}"
-                  for h in highlights]
-    return {"bereich": bereich, "abschnitt": abschnitt, "kurzfassung": kurz,
-            "topics": topics, "ist_thema": ist_thema,
-            "staerkste": _staerkste(highlights, CHEF_MELDUNGEN_JE_BEREICH),
-            "anzahl": len(highlights)}
+        topics = [
+            f"{h.get('operator', '')}: {h.get('title', '')[:120]}" for h in highlights
+        ]
+    return {
+        "bereich": bereich,
+        "abschnitt": abschnitt,
+        "kurzfassung": kurz,
+        "topics": topics,
+        "ist_thema": ist_thema,
+        "staerkste": _staerkste(highlights, CHEF_MELDUNGEN_JE_BEREICH),
+        "anzahl": len(highlights),
+    }
 
 
 def synthesize_zweistufig(
-        regional: dict[str, dict], already_covered: list[str], model: str,
-        language: str = "Deutsch", themenbereiche: list[str] | None = None,
-        workers: int = 4) -> tuple[str, list[str]]:
+    regional: dict[str, dict],
+    already_covered: list[str],
+    model: str,
+    language: str = "Deutsch",
+    themenbereiche: list[str] | None = None,
+    workers: int = 4,
+) -> tuple[str, list[str]]:
     """Bereichsredakteure parallel, dann Chefredaktion. Wie synthesize()."""
     themen = set(t for t in (themenbereiche or []) if t)
-    bereiche = [(name, daten) for name, daten in regional.items()
-                if (daten.get("highlights") or [])]
+    bereiche = [
+        (name, daten)
+        for name, daten in regional.items()
+        if (daten.get("highlights") or [])
+    ]
     if not bereiche:
         raise EditorialBriefingError(
-            "Keine bewerteten Meldungen - nichts zu redigieren")
+            "Keine bewerteten Meldungen - nichts zu redigieren"
+        )
 
-    log.info("Zweistufige Redaktion: %d Bereiche (%d davon Themenfelder), "
-             "%d bewertete Meldungen, %d parallel",
-             len(bereiche), sum(1 for n, _ in bereiche if n in themen),
-             sum(len(d.get("highlights") or []) for _, d in bereiche), workers)
+    log.info(
+        "Zweistufige Redaktion: %d Bereiche (%d davon Themenfelder), "
+        "%d bewertete Meldungen, %d parallel",
+        len(bereiche),
+        sum(1 for n, _ in bereiche if n in themen),
+        sum(len(d.get("highlights") or []) for _, d in bereiche),
+        workers,
+    )
 
     with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
-        ergebnisse = list(pool.map(
-            lambda p: _ein_bereich(p[0], p[1], already_covered, model,
-                                   language, p[0] in themen),
-            bereiche))
+        ergebnisse = list(
+            pool.map(
+                lambda p: _ein_bereich(
+                    p[0], p[1], already_covered, model, language, p[0] in themen
+                ),
+                bereiche,
+            )
+        )
 
     regionen = [e for e in ergebnisse if not e["ist_thema"]]
     themenfelder = [e for e in ergebnisse if e["ist_thema"]]
@@ -607,18 +671,29 @@ def synthesize_zweistufig(
     themenfelder.sort(key=lambda e: -e["anzahl"])
 
     # ------------------------------------------------------- Chefredaktion
-    chef_eingabe = json.dumps({
-        "bereiche": [{"bereich": e["bereich"],
-                      "ist_themenfeld": e["ist_thema"],
-                      "bewertete_meldungen": e["anzahl"],
-                      "kurzfassung": e["kurzfassung"],
-                      "staerkste_meldungen": e["staerkste"]}
-                     for e in regionen + themenfelder],
-        "already_covered_topics": already_covered[-300:],
-    }, ensure_ascii=False)
-    log.info("Chefredaktion: %d Bereiche, %.0f KB (~%dk Token) - unabhaengig "
-             "von der Zahl der Meldungen",
-             len(ergebnisse), len(chef_eingabe) / 1024, len(chef_eingabe) // 4000)
+    chef_eingabe = json.dumps(
+        {
+            "bereiche": [
+                {
+                    "bereich": e["bereich"],
+                    "ist_themenfeld": e["ist_thema"],
+                    "bewertete_meldungen": e["anzahl"],
+                    "kurzfassung": e["kurzfassung"],
+                    "staerkste_meldungen": e["staerkste"],
+                }
+                for e in regionen + themenfelder
+            ],
+            "already_covered_topics": already_covered[-300:],
+        },
+        ensure_ascii=False,
+    )
+    log.info(
+        "Chefredaktion: %d Bereiche, %.0f KB (~%dk Token) - unabhaengig "
+        "von der Zahl der Meldungen",
+        len(ergebnisse),
+        len(chef_eingabe) / 1024,
+        len(chef_eingabe) // 4000,
+    )
 
     system = CHEF_SYSTEM.format(language=language)
     pflicht = frozenset()  # der Themenabschnitt wird montiert, nicht geschrieben
@@ -627,8 +702,9 @@ def synthesize_zweistufig(
     except EditorialBriefingError as exc:
         log.warning("Chefredaktion abgelehnt (%s) - ein Korrekturversuch", exc)
         nachfassen = NACHFASSEN[exc.grund]
-        chefteil, chef_topics = _ein_versuch(system + nachfassen, chef_eingabe,
-                                             model, pflicht)
+        chefteil, chef_topics = _ein_versuch(
+            system + nachfassen, chef_eingabe, model, pflicht
+        )
 
     # ---------------------------------------------------------- Montage
     # Die Bereichsabschnitte kommen ZWISCHEN "Die wichtigsten Signale" und
@@ -663,18 +739,25 @@ def _teile_am_muster(chefteil: str) -> tuple[str, str]:
     Bericht wuerde mit seinem Fazit enden, bevor die Belege dafuer kommen.
     """
     for zeile in chefteil.splitlines():
-        norm = (zeile.strip().lower().replace("ä", "ae")
-                .replace("ö", "oe").replace("ü", "ue"))
+        norm = (
+            zeile.strip()
+            .lower()
+            .replace("ä", "ae")
+            .replace("ö", "oe")
+            .replace("ü", "ue")
+        )
         if norm.startswith("## muster der woche"):
             pos = chefteil.index(zeile)
             return chefteil[:pos], chefteil[pos:]
     return chefteil, ""
 
 
-def build_digest(items_by_region: dict[str, list[Item]],
-                 region_names: dict[str, str],
-                 llm_was_available: bool = False,
-                 include_note: bool = True) -> tuple[str, list[str]]:
+def build_digest(
+    items_by_region: dict[str, list[Item]],
+    region_names: dict[str, str],
+    llm_was_available: bool = False,
+    include_note: bool = True,
+) -> tuple[str, list[str]]:
     """No-LLM fallback: deterministic digest of all new items.
 
     `include_note` is False when the caller already explains upstream why the
@@ -708,13 +791,13 @@ def build_digest(items_by_region: dict[str, list[Item]],
             "",
         ]
     topics: list[str] = []
-    for region_key in sorted(items_by_region,
-                             key=lambda k: -len(items_by_region[k])):
+    for region_key in sorted(items_by_region, key=lambda k: -len(items_by_region[k])):
         items = items_by_region[region_key]
         if not items:
             continue
-        lines.append(f"### {region_names.get(region_key, region_key)} "
-                     f"({len(items)} neu)")
+        lines.append(
+            f"### {region_names.get(region_key, region_key)} ({len(items)} neu)"
+        )
         lines.append("")
         by_op: dict[str, list[Item]] = defaultdict(list)
         for item in items:

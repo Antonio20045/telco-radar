@@ -41,6 +41,7 @@ Das alte Angebot DARF die Antwortzeile nicht mehr führen - genau
 dafür ist dieser Fall gebaut (ein frischer Zweiter gegen einen alten
 Ersten ist die interessante Richtung, nicht der umgekehrte).
 """
+
 from __future__ import annotations
 
 import pathlib
@@ -56,8 +57,8 @@ from telco_radar.tco_model import Buendel, SimOnlyReferenz
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 
 HEUTE = "2026-09-20"
-TAG_3 = "2026-09-17"    # Grenzfall: 3 Tage alt -> noch frisch
-TAG_4 = "2026-09-16"    # 4 Tage alt -> alt (jenseits der 3-Tage-Grenze)
+TAG_3 = "2026-09-17"  # Grenzfall: 3 Tage alt -> noch frisch
+TAG_4 = "2026-09-16"  # 4 Tage alt -> alt (jenseits der 3-Tage-Grenze)
 SKU = "apple-iphone-17-pro-256gb-schwarz"
 BAND_MITTEL = {"o2:l": "m", "vf:m": "m", "tk:m": "m"}
 
@@ -72,12 +73,19 @@ def _katalog():
 
 
 def _buendel(anbieter, tarif_id, tarif_name, monat, rate, tag):
-    return Buendel(sku_id=SKU, anbieter=anbieter, tarif_name=tarif_name,
-                   tarif_id=tarif_id, tarif_monatlich=monat,
-                   geraet_zuzahlung=1.0, geraet_monatsrate=rate,
-                   laufzeit_monate=24, anschlusspreis=0.0,
-                   quelle_url=f"https://{anbieter.lower()}.invalid/x",
-                   abgerufen_am=tag)
+    return Buendel(
+        sku_id=SKU,
+        anbieter=anbieter,
+        tarif_name=tarif_name,
+        tarif_id=tarif_id,
+        tarif_monatlich=monat,
+        geraet_zuzahlung=1.0,
+        geraet_monatsrate=rate,
+        laufzeit_monate=24,
+        anschlusspreis=0.0,
+        quelle_url=f"https://{anbieter.lower()}.invalid/x",
+        abgerufen_am=tag,
+    )
 
 
 def _o2(tag=TAG_4):
@@ -93,18 +101,33 @@ def _telekom(tag="2026-09-19"):
 
 
 def _listungen(tag=HEUTE):
-    return [{"id": f"{a.lower()}--sku", "sku_id": SKU,
-             "device_id": "apple-iphone-17-pro", "anbieter": a,
-             "speicher_gb": 256, "zustand": "neu", "status": "aktiv",
-             "preis_ohne_vertrag": None, "quelle_url": "",
-             "abgerufen_am": tag}
-            for a in ("o2", "Vodafone", "Telekom")]
+    return [
+        {
+            "id": f"{a.lower()}--sku",
+            "sku_id": SKU,
+            "device_id": "apple-iphone-17-pro",
+            "anbieter": a,
+            "speicher_gb": 256,
+            "zustand": "neu",
+            "status": "aktiv",
+            "preis_ohne_vertrag": None,
+            "quelle_url": "",
+            "abgerufen_am": tag,
+        }
+        for a in ("o2", "Vodafone", "Telekom")
+    ]
 
 
 def _standard(o2_tag=TAG_4, heute=HEUTE):
     """o2 alt, Vodafone und Telekom frisch - der Pflichtfall."""
-    return karten.modelle([_o2(o2_tag), _vodafone(), _telekom()],
-                          _listungen(), [], {}, _katalog(), heute=heute)
+    return karten.modelle(
+        [_o2(o2_tag), _vodafone(), _telekom()],
+        _listungen(),
+        [],
+        {},
+        _katalog(),
+        heute=heute,
+    )
 
 
 def _modell(ergebnis):
@@ -113,8 +136,9 @@ def _modell(ergebnis):
 
 
 def _karte(modell, anbieter):
-    treffer = [k for k in modell["karten"] if k["anbieter"] == anbieter
-               and k.get("sku_id")]
+    treffer = [
+        k for k in modell["karten"] if k["anbieter"] == anbieter and k.get("sku_id")
+    ]
     assert treffer, f"{anbieter} hat keine echte Karte"
     return treffer[0]
 
@@ -122,6 +146,7 @@ def _karte(modell, anbieter):
 # --------------------------------------------------------------------------
 # Die Grenze selbst
 # --------------------------------------------------------------------------
+
 
 def test_die_grenze_liegt_bei_drei_tagen():
     """TAG_3 ist frisch, TAG_4 ist alt - der Grenzfall des Auftrags.
@@ -171,6 +196,7 @@ def test_ohne_heute_gibt_es_keine_alterung():
 # Der Pflichtfall: alt fällt aus ab, Delta und Ranking, Zeile bleibt
 # --------------------------------------------------------------------------
 
+
 def test_altes_angebot_faellt_aus_ab_delta_und_ranking():
     """DIE PFLICHTZAHL: Vodafone frisch 1.224,76 EUR führt, obwohl das
     ALTE o2-Angebot mit 1.200,76 EUR billiger ist. Die o2-ZEILE bleibt
@@ -185,8 +211,12 @@ def test_altes_angebot_faellt_aus_ab_delta_und_ranking():
     assert o2["alt_marke"] == "kein aktueller Stand seit 16.09.2026"
     # ... aber ohne Delta und außerhalb jedes Rankings.
     assert o2["delta"] is None
-    assert [k["anbieter"] for k in modell["karten"]] == \
-        ["Vodafone", "Telekom", "o2", "1&1"]
+    assert [k["anbieter"] for k in modell["karten"]] == [
+        "Vodafone",
+        "Telekom",
+        "o2",
+        "1&1",
+    ]
     # Die Antwortzeile führt das frische Angebot.
     assert modell["antwort"]["tarif_anbieter"] == "Vodafone"
     assert modell["antwort"]["tarif_gesamt"] == 1224.76
@@ -216,8 +246,14 @@ def test_grenzfall_am_modell_drei_tage_bleibt_drin():
 def test_unbekanntes_datum_faellt_aus_dem_ranking():
     """Ein undatiertes Bündel ist kein frisches - es fällt wie ein altes
     aus der Bewertung, behält aber seine Zeile."""
-    ergebnis = karten.modelle([_o2(""), _vodafone(), _telekom()],
-                              _listungen(), [], {}, _katalog(), heute=HEUTE)
+    ergebnis = karten.modelle(
+        [_o2(""), _vodafone(), _telekom()],
+        _listungen(),
+        [],
+        {},
+        _katalog(),
+        heute=HEUTE,
+    )
     modell = _modell(ergebnis)
     o2 = _karte(modell, "o2")
     assert o2["frisch"] is False
@@ -230,9 +266,16 @@ def test_unbekanntes_datum_faellt_aus_dem_ranking():
 # „alles alt“: sichtbar statt „nichts gefunden“
 # --------------------------------------------------------------------------
 
+
 def _alles_alt(o2=TAG_4, vodafone="2026-09-15", telekom=TAG_4):
-    return karten.modelle([_o2(o2), _vodafone(vodafone), _telekom(telekom)],
-                          _listungen(), [], {}, _katalog(), heute=HEUTE)
+    return karten.modelle(
+        [_o2(o2), _vodafone(vodafone), _telekom(telekom)],
+        _listungen(),
+        [],
+        {},
+        _katalog(),
+        heute=HEUTE,
+    )
 
 
 def test_alles_alt_nennt_den_letzten_stand_mit_datum():
@@ -243,8 +286,7 @@ def test_alles_alt_nennt_den_letzten_stand_mit_datum():
     # Der letzte Stand ist der späteste Abruf: 16.09.2026 (o2/Telekom),
     # Vodafone ist älter (15.09.) und darf den Satz nicht stellen.
     assert modell["alt_seit"] == TAG_4
-    assert "Kein aktueller Bündel-Stand seit dem 16.09.2026" \
-        in modell["alt_hinweis"]
+    assert "Kein aktueller Bündel-Stand seit dem 16.09.2026" in modell["alt_hinweis"]
     # Alles fällt aus der Bewertung - ohne Zeile zu verlieren.
     assert modell["antwort"]["tarif_gesamt"] is None
     assert modell["antwort"]["tarif_anbieter"] is None
@@ -257,10 +299,11 @@ def test_alles_alt_nennt_den_letzten_stand_mit_datum():
         assert karte["gesamt"] is not None, f"{anbieter}: Zeile verloren"
         assert karte["delta"] is None
     # Die Marke an der ältesten Zeile nennt ihr Datum.
-    assert _karte(modell, "o2")["alt_marke"] == \
-        "kein aktueller Stand seit 16.09.2026"
-    assert _karte(modell, "Vodafone")["alt_marke"] == \
-        "kein aktueller Stand seit 15.09.2026"
+    assert _karte(modell, "o2")["alt_marke"] == "kein aktueller Stand seit 16.09.2026"
+    assert (
+        _karte(modell, "Vodafone")["alt_marke"]
+        == "kein aktueller Stand seit 15.09.2026"
+    )
 
 
 def test_alles_alt_ohne_datum_nennt_unbekannt():
@@ -278,6 +321,7 @@ def test_alles_alt_ohne_datum_nennt_unbekannt():
 # Band, Balken und Radar: dieselbe Auswahl
 # --------------------------------------------------------------------------
 
+
 def test_band_und_radar_rechnen_nur_mit_frischen_karten():
     """Clean Code 7 an der zweiten Auswahl: Balken-JSON und Radar lesen
     `alle_karten_je_band` - das alte o2-Angebot darf dort nicht als
@@ -289,8 +333,7 @@ def test_band_und_radar_rechnen_nur_mit_frischen_karten():
     assert beste["m"]["Vodafone"]["gesamt"] == 1224.76
     # Gegenprobe: der günstigste Wert DES BANDES ist der frische - nicht
     # das alte 1.200,76-Angebot von o2.
-    assert min(k["gesamt"] for ks in alle["m"].values()
-               for k in ks) == 1224.76
+    assert min(k["gesamt"] for ks in alle["m"].values() for k in ks) == 1224.76
 
 
 def test_katalog_spalte_nennt_den_zustand_wenn_alles_alt_ist():
@@ -311,38 +354,65 @@ def test_katalog_spalte_nennt_den_zustand_wenn_alles_alt_ist():
 def test_buendelzeilen_sortieren_alte_nach_hinten():
     """Die Bündel-Tabelle des Vergleichs-Reiters: frische Zeilen vor
     alten - die alte bleibt eine Zeile, ausgegraut, mit Datum."""
-    buendel = [{"sku_id": SKU, "anbieter": "o2", "tarif_name": "O2 Mobile L",
-                "tarif_id": "o2:l", "tarif_monatlich": 24.99,
-                "geraet_zuzahlung": 1.0, "geraet_monatsrate": 25.0,
-                "laufzeit_monate": 24, "anschlusspreis": 0.0,
-                "quelle_url": "https://o2.invalid/x",
-                "abgerufen_am": TAG_4},
-               {"sku_id": SKU, "anbieter": "Vodafone",
-                "tarif_name": "Vodafone Mobil M", "tarif_id": "vf:m",
-                "tarif_monatlich": 19.99, "geraet_zuzahlung": 1.0,
-                "geraet_monatsrate": 31.0, "laufzeit_monate": 24,
-                "anschlusspreis": 0.0,
-                "quelle_url": "https://vodafone.invalid/x",
-                "abgerufen_am": HEUTE},
-               {"sku_id": SKU, "anbieter": "Telekom",
-                "tarif_name": "MagentaMobil M", "tarif_id": "tk:m",
-                "tarif_monatlich": 29.99, "geraet_zuzahlung": 1.0,
-                "geraet_monatsrate": 25.0, "laufzeit_monate": 24,
-                "anschlusspreis": 0.0,
-                "quelle_url": "https://telekom.invalid/x",
-                "abgerufen_am": "2026-09-19"}]
+    buendel = [
+        {
+            "sku_id": SKU,
+            "anbieter": "o2",
+            "tarif_name": "O2 Mobile L",
+            "tarif_id": "o2:l",
+            "tarif_monatlich": 24.99,
+            "geraet_zuzahlung": 1.0,
+            "geraet_monatsrate": 25.0,
+            "laufzeit_monate": 24,
+            "anschlusspreis": 0.0,
+            "quelle_url": "https://o2.invalid/x",
+            "abgerufen_am": TAG_4,
+        },
+        {
+            "sku_id": SKU,
+            "anbieter": "Vodafone",
+            "tarif_name": "Vodafone Mobil M",
+            "tarif_id": "vf:m",
+            "tarif_monatlich": 19.99,
+            "geraet_zuzahlung": 1.0,
+            "geraet_monatsrate": 31.0,
+            "laufzeit_monate": 24,
+            "anschlusspreis": 0.0,
+            "quelle_url": "https://vodafone.invalid/x",
+            "abgerufen_am": HEUTE,
+        },
+        {
+            "sku_id": SKU,
+            "anbieter": "Telekom",
+            "tarif_name": "MagentaMobil M",
+            "tarif_id": "tk:m",
+            "tarif_monatlich": 29.99,
+            "geraet_zuzahlung": 1.0,
+            "geraet_monatsrate": 25.0,
+            "laufzeit_monate": 24,
+            "anschlusspreis": 0.0,
+            "quelle_url": "https://telekom.invalid/x",
+            "abgerufen_am": "2026-09-19",
+        },
+    ]
     tarife = {tid: {"datenvolumen_gb": 30} for tid in BAND_MITTEL}
     # P3-E1: ohne Vodafone-Tarifleiter gaebe es keine Stufe - eine
     # einzige Stufe genuegt, alle drei Tarife fallen hinein.
-    tarife["vf:m-sp"] = {"anbieter": "Vodafone",
-                         "name": "Vodafone Mobil M mit Smartphone",
-                         "datenvolumen_gb": 30, "grundgebuehr": 19.99}
-    ansicht = geraete_tco_view.aufbereiten(buendel, [], _listungen(),
-                                           _katalog(), tarife=tarife,
-                                           heute=HEUTE)
+    tarife["vf:m-sp"] = {
+        "anbieter": "Vodafone",
+        "name": "Vodafone Mobil M mit Smartphone",
+        "datenvolumen_gb": 30,
+        "grundgebuehr": 19.99,
+    }
+    ansicht = geraete_tco_view.aufbereiten(
+        buendel, [], _listungen(), _katalog(), tarife=tarife, heute=HEUTE
+    )
     modell = ansicht["modelle"][0]
-    assert [k["anbieter"] for k in modell["zeilen_band"]] == \
-        ["Vodafone", "Telekom", "o2"]
+    assert [k["anbieter"] for k in modell["zeilen_band"]] == [
+        "Vodafone",
+        "Telekom",
+        "o2",
+    ]
     o2 = next(k for k in modell["zeilen_band"] if k["anbieter"] == "o2")
     assert o2["frisch"] is False
     assert o2["gesamt"] == 1200.76
@@ -352,14 +422,16 @@ def test_buendelzeilen_sortieren_alte_nach_hinten():
 # Die Zeitreihe: Band bleibt wählbar, Satz und Kachel sagen den Stand
 # --------------------------------------------------------------------------
 
+
 def _tco_dict(modell):
     for k in modell["karten"]:
         tid = (k.get("tarif_id") or "").strip()
         k["band"] = BAND_MITTEL.get(tid)
-    return {"modelle": [modell],
-            "baender_katalog": [{"key": "m", "label": "M",
-                                 "bereich": "21 bis 60 GB"}],
-            "historie_lage": {"seit": "", "messtage": 0, "buendel": 0}}
+    return {
+        "modelle": [modell],
+        "baender_katalog": [{"key": "m", "label": "M", "bereich": "21 bis 60 GB"}],
+        "historie_lage": {"seit": "", "messtage": 0, "buendel": 0},
+    }
 
 
 def test_zeitreihe_band_mit_nur_alten_angeboten_bleibt_waehlbar(tmp_path):
@@ -380,10 +452,8 @@ def test_zeitreihe_band_mit_nur_alten_angeboten_bleibt_waehlbar(tmp_path):
     # Die Lücke nennt die drei Anbieter beim alten Stand; 1&1 und
     # congstar führen das Gerät gar nicht im Bündel (keine Karte).
     assert paar["luecke_text"] is not None
-    assert "Kein aktueller Stand: Telekom, Vodafone, o2." \
-        in paar["luecke_text"]
-    assert "1&1, congstar führen das Gerät gar nicht im Bündel." \
-        in paar["luecke_text"]
+    assert "Kein aktueller Stand: Telekom, Vodafone, o2." in paar["luecke_text"]
+    assert "1&1, congstar führen das Gerät gar nicht im Bündel." in paar["luecke_text"]
 
 
 def test_zeitreihe_gemischtes_band_ignoriert_das_alte_angebot(tmp_path):
@@ -418,6 +488,7 @@ def test_band_zeilen_trennen_frisch_und_alt():
 # Das Markup der Zeile
 # --------------------------------------------------------------------------
 
+
 def test_die_alte_zeile_traegt_marke_und_klasse():
     """Die Vorlage graut die alte Zeile aus und setzt die Marke mit
     Datum - gerendert am echten Makro (nicht am String-Attribut)."""
@@ -446,12 +517,10 @@ def test_die_gruppe_nennt_den_alten_stand_ueber_den_zeilen():
     assert "Kein aktueller Bündel-Stand seit dem 16.09.2026" in html
     # Gegenprobe: das gemischte Modell nennt den Satz nicht.
     gemischt = _modell(_standard())
-    gemischt["zeilen_band"] = [k for k in gemischt["karten"]
-                               if k.get("sku_id")]
+    gemischt["zeilen_band"] = [k for k in gemischt["karten"] if k.get("sku_id")]
     gemischt["zeilen_ohne_band"] = []
     gemischt["haendler_ohne_buendel"] = {}
-    assert "Kein aktueller Bündel-Stand" not in \
-        modul.buendelgruppe(gemischt)
+    assert "Kein aktueller Bündel-Stand" not in modul.buendelgruppe(gemischt)
 
 
 # ==========================================================================
@@ -470,7 +539,7 @@ def test_die_gruppe_nennt_den_alten_stand_ueber_den_zeilen():
 # geraete_tco_view -> karten.
 # ==========================================================================
 
-REPORT_STAND = "2026-09-16"   # Mi/Fr-Radar: jüngster Bericht am 20.09.
+REPORT_STAND = "2026-09-16"  # Mi/Fr-Radar: jüngster Bericht am 20.09.
 BUENDEL_STAND = "2026-09-20"  # der tägliche Lauf schreibt sein eigenes Datum
 # Der Telekom-Abruf muss vom STAND aus alt sein (5 Tage), vom BERICHTSTAG
 # aus aber frisch (1 Tag) - nur so prüft der Fall, dass die spätere Uhr
@@ -495,89 +564,177 @@ def _buendel_welt(tmp_path):
     import yaml
 
     from telco_radar.geraete_config import lade_katalog, lade_quellen
+
     root = tmp_path / "verdrahtung"
     (root / "config").mkdir(parents=True)
     (root / "config" / "geraete_katalog.yaml").write_text(
-        yaml.safe_dump({"geraete": [
-            {"hersteller": "Apple", "modell": "Apple X", "generation": 1,
-             "speicher": [256], "segment": "flagship"}]},
-            allow_unicode=True, sort_keys=False), encoding="utf-8")
+        yaml.safe_dump(
+            {
+                "geraete": [
+                    {
+                        "hersteller": "Apple",
+                        "modell": "Apple X",
+                        "generation": 1,
+                        "speicher": [256],
+                        "segment": "flagship",
+                    }
+                ]
+            },
+            allow_unicode=True,
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
     (root / "config" / "farben.yaml").write_text(
-        yaml.safe_dump({"farben": {"schwarz": ["Schwarz"]}},
-                       allow_unicode=True, sort_keys=False), encoding="utf-8")
+        yaml.safe_dump(
+            {"farben": {"schwarz": ["Schwarz"]}}, allow_unicode=True, sort_keys=False
+        ),
+        encoding="utf-8",
+    )
     (root / "config" / "geraete_quellen.yaml").write_text(
-        yaml.safe_dump({"anbieter": [
-            {"name": "Telekom", "typ": "netzbetreiber", "rang": 1,
-             "methode": "ldjson", "basis_url": "https://t.example",
-             "einstiege": [{"url": "https://t.example/liste"}]},
-            {"name": "Vodafone", "typ": "netzbetreiber", "rang": 2,
-             "methode": "ldjson", "basis_url": "https://v.example",
-             "einstiege": [{"url": "https://v.example/liste"}]}]},
-            allow_unicode=True, sort_keys=False), encoding="utf-8")
+        yaml.safe_dump(
+            {
+                "anbieter": [
+                    {
+                        "name": "Telekom",
+                        "typ": "netzbetreiber",
+                        "rang": 1,
+                        "methode": "ldjson",
+                        "basis_url": "https://t.example",
+                        "einstiege": [{"url": "https://t.example/liste"}],
+                    },
+                    {
+                        "name": "Vodafone",
+                        "typ": "netzbetreiber",
+                        "rang": 2,
+                        "methode": "ldjson",
+                        "basis_url": "https://v.example",
+                        "einstiege": [{"url": "https://v.example/liste"}],
+                    },
+                ]
+            },
+            allow_unicode=True,
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
 
     def _listung(anbieter, preis):
-        return {"id": f"{anbieter.lower()}--{_SKU}", "sku_id": _SKU,
-                "device_id": "apple-x", "anbieter": anbieter,
-                "anbieter_typ": "netzbetreiber", "speicher_gb": 256,
-                "farbe_roh": "Schwarz", "farbe_normalisiert": "schwarz",
-                "zustand": "neu", "first_seen": "2026-09-01",
-                "last_verified": BUENDEL_STAND, "status": "aktiv",
-                "missed_checks": 0, "preis_ohne_vertrag": preis,
-                "zuzahlung": None,
-                "quelle_url": f"https://example.de/{_SKU}",
-                "abgerufen_am": BUENDEL_STAND, "verfuegbarkeit": "lieferbar"}
+        return {
+            "id": f"{anbieter.lower()}--{_SKU}",
+            "sku_id": _SKU,
+            "device_id": "apple-x",
+            "anbieter": anbieter,
+            "anbieter_typ": "netzbetreiber",
+            "speicher_gb": 256,
+            "farbe_roh": "Schwarz",
+            "farbe_normalisiert": "schwarz",
+            "zustand": "neu",
+            "first_seen": "2026-09-01",
+            "last_verified": BUENDEL_STAND,
+            "status": "aktiv",
+            "missed_checks": 0,
+            "preis_ohne_vertrag": preis,
+            "zuzahlung": None,
+            "quelle_url": f"https://example.de/{_SKU}",
+            "abgerufen_am": BUENDEL_STAND,
+            "verfuegbarkeit": "lieferbar",
+        }
 
     def _buendel(anbieter, tarif, tarif_monat, abgerufen):
-        return {"id": f"buendel--{anbieter.lower()}--{_SKU}",
-                "sku_id": _SKU, "anbieter": anbieter, "tarif_name": tarif,
-                "tarif_id": f"{anbieter.lower()}:m", "tarif_id_guete": "hoch",
-                "buendel_monatlich": None, "tarif_monatlich": tarif_monat,
-                "geraet_zuzahlung": 1.0, "geraet_monatsrate": 25.0,
-                "laufzeit_monate": 24, "anschlusspreis": 0.0,
-                "zustand": "neu", "rabatte": [],
-                "quelle_url": f"https://example.de/{_SKU}/buendel",
-                "abgerufen_am": abgerufen,
-                "first_seen": "2026-09-01", "last_verified": abgerufen}
+        return {
+            "id": f"buendel--{anbieter.lower()}--{_SKU}",
+            "sku_id": _SKU,
+            "anbieter": anbieter,
+            "tarif_name": tarif,
+            "tarif_id": f"{anbieter.lower()}:m",
+            "tarif_id_guete": "hoch",
+            "buendel_monatlich": None,
+            "tarif_monatlich": tarif_monat,
+            "geraet_zuzahlung": 1.0,
+            "geraet_monatsrate": 25.0,
+            "laufzeit_monate": 24,
+            "anschlusspreis": 0.0,
+            "zustand": "neu",
+            "rabatte": [],
+            "quelle_url": f"https://example.de/{_SKU}/buendel",
+            "abgerufen_am": abgerufen,
+            "first_seen": "2026-09-01",
+            "last_verified": abgerufen,
+        }
 
-    buendel = [_buendel("Telekom", "MagentaMobil M", 19.99, TELEKOM_ABRUF),
-               _buendel("Vodafone", "Vodafone Mobil M", 29.99,
-                        BUENDEL_STAND)]
+    buendel = [
+        _buendel("Telekom", "MagentaMobil M", 19.99, TELEKOM_ABRUF),
+        _buendel("Vodafone", "Vodafone Mobil M", 29.99, BUENDEL_STAND),
+    ]
     state = root / "data" / "state"
     state.mkdir(parents=True)
-    (state / "geraete_db.json").write_text(json.dumps(
-        {"updated": BUENDEL_STAND,
-         "anbieter": {n: {"laeufe": 4} for n in ("Telekom", "Vodafone")},
-         "listungen": [_listung("Telekom", 1199.0),
-                       _listung("Vodafone", 1249.0)]}), encoding="utf-8")
+    (state / "geraete_db.json").write_text(
+        json.dumps(
+            {
+                "updated": BUENDEL_STAND,
+                "anbieter": {n: {"laeufe": 4} for n in ("Telekom", "Vodafone")},
+                "listungen": [
+                    _listung("Telekom", 1199.0),
+                    _listung("Vodafone", 1249.0),
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
     (state / "geraete_preise.jsonl").write_text("", encoding="utf-8")
-    (state / "geraete_tco.json").write_text(json.dumps(
-        {"updated": BUENDEL_STAND, "buendel": buendel, "sim_only": []}),
-        encoding="utf-8")
+    (state / "geraete_tco.json").write_text(
+        json.dumps({"updated": BUENDEL_STAND, "buendel": buendel, "sim_only": []}),
+        encoding="utf-8",
+    )
     (state / "geraete_tco_historie.jsonl").write_text("", encoding="utf-8")
     (state / "tarife.jsonl").write_text(
-        "\n".join(json.dumps(t) for t in (
-            {"anbieter": b["anbieter"], "name": b["tarif_name"],
-             "tarif_id": b["tarif_id"], "tarif_id_guete": "hoch",
-             "grundgebuehr": b["tarif_monatlich"],
-             "mindestlaufzeit_monate": 24, "rabattphasen": [],
-             "quelle_url": b["quelle_url"], "abgerufen_am": BUENDEL_STAND}
-            for b in buendel)) + "\n", encoding="utf-8")
+        "\n".join(
+            json.dumps(t)
+            for t in (
+                {
+                    "anbieter": b["anbieter"],
+                    "name": b["tarif_name"],
+                    "tarif_id": b["tarif_id"],
+                    "tarif_id_guete": "hoch",
+                    "grundgebuehr": b["tarif_monatlich"],
+                    "mindestlaufzeit_monate": 24,
+                    "rabattphasen": [],
+                    "quelle_url": b["quelle_url"],
+                    "abgerufen_am": BUENDEL_STAND,
+                }
+                for b in buendel
+            )
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
-    (reports / f"{REPORT_STAND}.json").write_text(json.dumps(
-        {"date": REPORT_STAND, "language": "de",
-         "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
-         "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{REPORT_STAND}.json").write_text(
+        json.dumps(
+            {
+                "date": REPORT_STAND,
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     (reports / f"{REPORT_STAND}.md").write_text("# B\n", encoding="utf-8")
     # Derselbe `heute`, den `render_site` aus reports[0]["date"] durchreicht
     # (html.py) - der Test stellt die Uhr NICHT freundlicher als Produktion.
-    g = geraete_view.aufbereiten(state, lade_quellen(root),
-                                 lade_katalog(root), heute=REPORT_STAND)
+    g = geraete_view.aufbereiten(
+        state, lade_quellen(root), lade_katalog(root), heute=REPORT_STAND
+    )
     return root, g
 
 
 def _weltsite(root):
     from telco_radar.report.html import render_site
+
     site = root / "site"
     render_site(site, root / "data" / "reports")
     return (site / "geraete.html").read_text(encoding="utf-8")
@@ -587,13 +744,11 @@ def test_spaeterer_tag_liest_nur_lesbare_uhren():
     """Die Bezugregel selbst: der spätere Tag gewinnt, ein unlesbarer
     zählt nicht (Clean Code 4) - er wird nie durch den anderen ersetzt
     und ersetzt nie selbst den anderen."""
-    assert geraete_view._spaeterer_tag(REPORT_STAND, BUENDEL_STAND) \
-        == BUENDEL_STAND
+    assert geraete_view._spaeterer_tag(REPORT_STAND, BUENDEL_STAND) == BUENDEL_STAND
     # Gegenprobe: ein Bericht NEUER als der Stock (radar.yml läuft, der
     # nächtliche Lauf nicht) - dann altert der Stock ehrlich gegen den
     # Berichtstag.
-    assert geraete_view._spaeterer_tag(BUENDEL_STAND, REPORT_STAND) \
-        == BUENDEL_STAND
+    assert geraete_view._spaeterer_tag(BUENDEL_STAND, REPORT_STAND) == BUENDEL_STAND
     assert geraete_view._spaeterer_tag(REPORT_STAND, "kaputt") == REPORT_STAND
     assert geraete_view._spaeterer_tag("", BUENDEL_STAND) == BUENDEL_STAND
     assert geraete_view._spaeterer_tag("", "") == ""
@@ -643,6 +798,7 @@ def test_gleiche_uhren_altern_nicht_ueber_die_grenze(tmp_path):
     und führt (derselbe Tag-3-Grenzfall wie oben); der Bezug darf nicht
     auf den älteren Berichtstag zurückfallen."""
     import json
+
     root, _ = _buendel_welt(tmp_path)
     # Beide Uhren auf den 20.09., Telekom auf den 17.09. - Tag 3.
     pfad = root / "data" / "state" / "geraete_tco.json"
@@ -652,14 +808,27 @@ def test_gleiche_uhren_altern_nicht_ueber_die_grenze(tmp_path):
     reports = root / "data" / "reports"
     for alt in reports.iterdir():
         alt.unlink()
-    (reports / "2026-09-20.json").write_text(json.dumps(
-        {"date": "2026-09-20", "language": "de",
-         "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
-         "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / "2026-09-20.json").write_text(
+        json.dumps(
+            {
+                "date": "2026-09-20",
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     (reports / "2026-09-20.md").write_text("# B\n", encoding="utf-8")
     from telco_radar.geraete_config import lade_katalog, lade_quellen
-    g = geraete_view.aufbereiten(root / "data" / "state", lade_quellen(root),
-                                 lade_katalog(root), heute="2026-09-20")
+
+    g = geraete_view.aufbereiten(
+        root / "data" / "state",
+        lade_quellen(root),
+        lade_katalog(root),
+        heute="2026-09-20",
+    )
     modell = g["tco"]["modelle"][0]
     telekom = _karte(modell, "Telekom")
     assert telekom["frisch"] is True
@@ -671,6 +840,7 @@ def test_gleiche_uhren_altern_nicht_ueber_die_grenze(tmp_path):
 # Der Wettbewerbs-Radar: eine alte Karte ist Beleg, kein Paar
 # --------------------------------------------------------------------------
 
+
 def test_radar_zeigt_alte_karte_als_beleg_nicht_als_paar():
     """A3-Nachbesserung am Radar: `alle_karten_je_band` filtert frisch,
     aber der Band-Mismatch-Belegpfad (`uebrig` -> `_zeile_fuer_anbieter`)
@@ -679,25 +849,37 @@ def test_radar_zeigt_alte_karte_als_beleg_nicht_als_paar():
     weiterhin Zeile, Preis und Beleg (Regel 9), aber weder Status
     „vergleichbar" noch Prozent (Vorgabe 1: aus jeder Bewertung)."""
     from telco_radar.report import geraete_radar as radar_modul
+
     # `leitzahl_monate` an der Karte und `monate` an der Basis wie am
     # echten Bestand (P0-B-h1/h3): der Radar vergleicht seit P0-B-h3 nur
     # ueber denselben Zeitraum, und ein unbekannter Zeitraum ist nie
     # gleich - eine Fixture ohne die zwei Felder pruefte das Tor, nicht
     # die Frische.
-    karte = {"belastbar": True, "gesamt": 1080.76,
-             "tarif": "MagentaMobil M", "tarif_id": "tk:m",
-             "leitzahl_monate": 24,
-             "vergleichbar": True, "frisch": False,
-             "alt_marke": "kein aktueller Stand seit 15.09.2026",
-             "quelle_url": "https://t.invalid/x",
-             "abgerufen_am": "2026-09-15"}
-    basis = {"gesamt": 1320.76, "tarif": "Mobil M", "naeherung": False,
-             "monate": 24,
-             "band": "m", "band_label": "Mittel (21 bis 60 GB)",
-             "quelle_url": "", "abgerufen_am": "",
-             "tarif_quelle_url": "", "tarif_abgerufen_am": ""}
-    zeile = radar_modul._zeile_fuer_anbieter(
-        "Telekom", karte, basis, {"tk:m": "m"})
+    karte = {
+        "belastbar": True,
+        "gesamt": 1080.76,
+        "tarif": "MagentaMobil M",
+        "tarif_id": "tk:m",
+        "leitzahl_monate": 24,
+        "vergleichbar": True,
+        "frisch": False,
+        "alt_marke": "kein aktueller Stand seit 15.09.2026",
+        "quelle_url": "https://t.invalid/x",
+        "abgerufen_am": "2026-09-15",
+    }
+    basis = {
+        "gesamt": 1320.76,
+        "tarif": "Mobil M",
+        "naeherung": False,
+        "monate": 24,
+        "band": "m",
+        "band_label": "Mittel (21 bis 60 GB)",
+        "quelle_url": "",
+        "abgerufen_am": "",
+        "tarif_quelle_url": "",
+        "tarif_abgerufen_am": "",
+    }
+    zeile = radar_modul._zeile_fuer_anbieter("Telekom", karte, basis, {"tk:m": "m"})
     assert zeile["status"] == radar_modul.STATUS_NICHT_VERGLEICHBAR
     assert zeile["prozent"] is None
     assert zeile["grund"] == "kein aktueller Stand seit 15.09.2026"
@@ -708,7 +890,8 @@ def test_radar_zeigt_alte_karte_als_beleg_nicht_als_paar():
     # (1.080,76 gegen 1.320,76 = -18,2 % - Telekom billiger).
     frisch = {**karte, "frisch": True, "alt_marke": ""}
     frisch_zeile = radar_modul._zeile_fuer_anbieter(
-        "Telekom", frisch, basis, {"tk:m": "m"})
+        "Telekom", frisch, basis, {"tk:m": "m"}
+    )
     assert frisch_zeile["status"] == radar_modul.STATUS_VERGLEICHBAR
     assert frisch_zeile["prozent"] == -18.2
 
@@ -724,24 +907,30 @@ def test_radar_zeigt_alte_karte_als_beleg_nicht_als_paar():
 # es keinen frischen gibt, trägt die Marke (harte Regel 9).
 # ==========================================================================
 
-MEDIMAX_TAG = "2026-09-06"       # 14 Tage - der gemessene Fall
-EP_TAG = "2026-09-19"            # 1 Tag - das frische Gegenstück
-DEBITEL_TAG = "2026-08-14"       # 37 Tage - der gemessene Pixel-Fall
+MEDIMAX_TAG = "2026-09-06"  # 14 Tage - der gemessene Fall
+EP_TAG = "2026-09-19"  # 1 Tag - das frische Gegenstück
+DEBITEL_TAG = "2026-08-14"  # 37 Tage - der gemessene Pixel-Fall
 
 
-def _listung_mit_preis(anbieter, preis, tag, sku=SKU,
-                       device="apple-iphone-17-pro", speicher=256):
-    return {"id": f"{anbieter.lower()}--{sku}", "sku_id": sku,
-            "device_id": device, "anbieter": anbieter,
-            "speicher_gb": speicher, "zustand": "neu", "status": "aktiv",
-            "preis_ohne_vertrag": preis,
-            "quelle_url": f"https://{anbieter.lower()}.invalid/x",
-            "abgerufen_am": tag}
+def _listung_mit_preis(
+    anbieter, preis, tag, sku=SKU, device="apple-iphone-17-pro", speicher=256
+):
+    return {
+        "id": f"{anbieter.lower()}--{sku}",
+        "sku_id": sku,
+        "device_id": device,
+        "anbieter": anbieter,
+        "speicher_gb": speicher,
+        "zustand": "neu",
+        "status": "aktiv",
+        "preis_ohne_vertrag": preis,
+        "quelle_url": f"https://{anbieter.lower()}.invalid/x",
+        "abgerufen_am": tag,
+    }
 
 
 def _katalogzeilen(listungen, heute=HEUTE):
-    return geraete_view.katalog_modellzeilen(listungen, _katalog(),
-                                             heute=heute)
+    return geraete_view.katalog_modellzeilen(listungen, _katalog(), heute=heute)
 
 
 def test_katalog_ab_nimmt_den_frischen_beleg_nicht_den_billigeren_alten():
@@ -749,9 +938,12 @@ def test_katalog_ab_nimmt_den_frischen_beleg_nicht_den_billigeren_alten():
     ElectronicPartner 299 EUR vom 19.09. - "ab" führt das FRISCHE Angebot,
     und die Spanne rechnet ohne den alten Anbieter (seine Zeile bleibt im
     Aufklapper stehen, mit Datum)."""
-    zeilen = _katalogzeilen([
-        _listung_mit_preis("Medimax", 289.0, MEDIMAX_TAG),
-        _listung_mit_preis("ElectronicPartner", 299.0, EP_TAG)])
+    zeilen = _katalogzeilen(
+        [
+            _listung_mit_preis("Medimax", 289.0, MEDIMAX_TAG),
+            _listung_mit_preis("ElectronicPartner", 299.0, EP_TAG),
+        ]
+    )
     assert len(zeilen) == 1, "beide Listungen gehören zu EINEM Modell"
     zeile = zeilen[0]
     assert zeile["ab_preis"] == 299.0
@@ -763,8 +955,10 @@ def test_katalog_ab_nimmt_den_frischen_beleg_nicht_den_billigeren_alten():
     assert zeile["spanne"] == []
     assert zeile["anbieterzahl"] == 2
     # Die alte Zeile bleibt im Aufklapper, mit ihrem Datum.
-    assert sorted(z["anbieter"] for z in zeile["zeilen"]) == \
-        ["ElectronicPartner", "Medimax"]
+    assert sorted(z["anbieter"] for z in zeile["zeilen"]) == [
+        "ElectronicPartner",
+        "Medimax",
+    ]
 
 
 def test_katalog_ab_ohne_frischen_beleg_zeigt_den_letzten_stand():
@@ -773,7 +967,8 @@ def test_katalog_ab_ohne_frischen_beleg_zeigt_den_letzten_stand():
     Datum - statt "kein Preis gemessen" vorzutäuschen (harte Regel 9).
     Die Leitzahl des Regals nimmt ihn nicht auf."""
     zeile = _katalogzeilen(
-        [_listung_mit_preis("mobilcom-debitel", 1299.0, DEBITEL_TAG)])[0]
+        [_listung_mit_preis("mobilcom-debitel", 1299.0, DEBITEL_TAG)]
+    )[0]
     assert zeile["ab_preis"] == 1299.0
     assert zeile["ab_anbieter"] == "mobilcom-debitel"
     assert zeile["ab_alt"] is True
@@ -788,11 +983,19 @@ def test_katalog_leitzahl_nimmt_nur_aktuelle_staende():
     """Die große Zahl über der Katalogtafel: ein billiger LETZTER STAND
     (Galaxy A37, 289 EUR vom 06.09.) darf sie nicht stellen - der
     frische iPhone-Preis (299 EUR vom 19.09.) ist die Leitzahl."""
-    frisch = _katalogzeilen([_listung_mit_preis(
-        "ElectronicPartner", 299.0, EP_TAG)])[0]
-    alt = _katalogzeilen([_listung_mit_preis(
-        "Medimax", 289.0, MEDIMAX_TAG, device="samsung-galaxy-a37",
-        speicher=128, sku="samsung-galaxy-a37-128gb-schwarz")])[0]
+    frisch = _katalogzeilen([_listung_mit_preis("ElectronicPartner", 299.0, EP_TAG)])[0]
+    alt = _katalogzeilen(
+        [
+            _listung_mit_preis(
+                "Medimax",
+                289.0,
+                MEDIMAX_TAG,
+                device="samsung-galaxy-a37",
+                speicher=128,
+                sku="samsung-galaxy-a37-128gb-schwarz",
+            )
+        ]
+    )[0]
     assert alt["ab_alt"] is True
     assert geraete_view.katalog_leitzahl([alt, frisch]) == 299.0
 
@@ -801,17 +1004,23 @@ def test_katalog_ab_grenzfall_tag_drei_fuehrt_tag_vier_nicht():
     """Der Grenzfall an der ab-Auswahl: Tag 3 (noch frisch, der
     Grenzfall des Auftrags) stellt das "ab"; Tag 4 stellt es nicht
     mehr, auch nicht billiger."""
-    zeile = _katalogzeilen([
-        _listung_mit_preis("Saturn", 899.0, TAG_4),
-        _listung_mit_preis("Expert", 999.0, TAG_3)])[0]
+    zeile = _katalogzeilen(
+        [
+            _listung_mit_preis("Saturn", 899.0, TAG_4),
+            _listung_mit_preis("Expert", 999.0, TAG_3),
+        ]
+    )[0]
     assert zeile["ab_preis"] == 999.0
     assert zeile["ab_anbieter"] == "Expert"
     assert zeile["ab_alt"] is False
     # Gegenprobe: fällt auch der Tag-3-Beleg auf Tag 4, bleibt das "ab"
     # als letzter Stand stehen - mit Marke.
-    beides_alt = _katalogzeilen([
-        _listung_mit_preis("Saturn", 899.0, TAG_4),
-        _listung_mit_preis("Expert", 999.0, TAG_4)])[0]
+    beides_alt = _katalogzeilen(
+        [
+            _listung_mit_preis("Saturn", 899.0, TAG_4),
+            _listung_mit_preis("Expert", 999.0, TAG_4),
+        ]
+    )[0]
     assert beides_alt["ab_alt"] is True
     assert beides_alt["ab_preis"] == 899.0
     assert beides_alt["ab_alt_marke"] == "kein aktueller Stand seit 16.09.2026"
@@ -820,10 +1029,13 @@ def test_katalog_ab_grenzfall_tag_drei_fuehrt_tag_vier_nicht():
 def test_katalog_ohne_heute_liest_weiter_den_billigsten():
     """Rückwärtskompatibilität: ohne Uhr (leerer String) altert nichts -
     der alte Aufrufer bekommt weiter den billigsten Beleg, ohne Marke."""
-    zeile = _katalogzeilen([
-        _listung_mit_preis("Medimax", 289.0, MEDIMAX_TAG),
-        _listung_mit_preis("ElectronicPartner", 299.0, EP_TAG)],
-        heute="")[0]
+    zeile = _katalogzeilen(
+        [
+            _listung_mit_preis("Medimax", 289.0, MEDIMAX_TAG),
+            _listung_mit_preis("ElectronicPartner", 299.0, EP_TAG),
+        ],
+        heute="",
+    )[0]
     assert zeile["ab_preis"] == 289.0
     assert zeile["ab_anbieter"] == "Medimax"
     assert zeile["ab_alt"] is False
@@ -836,6 +1048,7 @@ def test_render_site_traegt_die_katalog_marke_in_die_seite(tmp_path):
     Regals („günstigster Einzelgerätpreis im Regal“) bleibt weg, statt
     einen 37 Tage alten Preis als großen Tagessatz zu führen."""
     import json
+
     root, _ = _buendel_welt(tmp_path)
     pfad = root / "data" / "state" / "geraete_db.json"
     roh = json.loads(pfad.read_text(encoding="utf-8"))
@@ -857,26 +1070,41 @@ def test_alters_haendlerpreis_fuehrt_die_antwortzeile_nicht():
     von heute - die frische eigene Vodafone-Zahl (1249 EUR) führt. Ist
     der Saturn-Beleg Tag 3 alt, führt er wie zuvor."""
     listungen = [
-        {"id": f"vf-bar--{SKU}", "sku_id": SKU,
-         "device_id": "apple-iphone-17-pro", "anbieter": "Vodafone",
-         "speicher_gb": 256, "zustand": "neu", "status": "aktiv",
-         "preis_ohne_vertrag": 1249.0,
-         "quelle_url": "https://vodafone.invalid/x",
-         "abgerufen_am": HEUTE},
-        {"id": f"saturn--{SKU}", "sku_id": SKU,
-         "device_id": "apple-iphone-17-pro", "anbieter": "Saturn",
-         "speicher_gb": 256, "zustand": "neu", "status": "aktiv",
-         "preis_ohne_vertrag": 1199.0,
-         "quelle_url": "https://saturn.invalid/x",
-         "abgerufen_am": TAG_4}]
-    alt = karten.modelle([_vodafone(), _telekom()], listungen, [], {},
-                         _katalog(), heute=HEUTE)["modelle"][0]
+        {
+            "id": f"vf-bar--{SKU}",
+            "sku_id": SKU,
+            "device_id": "apple-iphone-17-pro",
+            "anbieter": "Vodafone",
+            "speicher_gb": 256,
+            "zustand": "neu",
+            "status": "aktiv",
+            "preis_ohne_vertrag": 1249.0,
+            "quelle_url": "https://vodafone.invalid/x",
+            "abgerufen_am": HEUTE,
+        },
+        {
+            "id": f"saturn--{SKU}",
+            "sku_id": SKU,
+            "device_id": "apple-iphone-17-pro",
+            "anbieter": "Saturn",
+            "speicher_gb": 256,
+            "zustand": "neu",
+            "status": "aktiv",
+            "preis_ohne_vertrag": 1199.0,
+            "quelle_url": "https://saturn.invalid/x",
+            "abgerufen_am": TAG_4,
+        },
+    ]
+    alt = karten.modelle(
+        [_vodafone(), _telekom()], listungen, [], {}, _katalog(), heute=HEUTE
+    )["modelle"][0]
     assert alt["antwort"]["geraetepreis"] == 1249.0
     assert alt["antwort"]["geraetepreis_anbieter"] == "Vodafone"
     # Gegenprobe am Grenzfall: Tag 3 ist frisch - Saturn führt (1199).
     listungen[1]["abgerufen_am"] = TAG_3
-    frisch = karten.modelle([_vodafone(), _telekom()], listungen, [], {},
-                            _katalog(), heute=HEUTE)["modelle"][0]
+    frisch = karten.modelle(
+        [_vodafone(), _telekom()], listungen, [], {}, _katalog(), heute=HEUTE
+    )["modelle"][0]
     assert frisch["antwort"]["geraetepreis"] == 1199.0
     assert frisch["antwort"]["geraetepreis_anbieter"] == "Saturn"
 
@@ -887,9 +1115,9 @@ def test_alters_haendlerpreis_fuehrt_die_antwortzeile_nicht():
 # die Repro-Zahlen des Prüfers stehen in den Fixtures.
 # ==========================================================================
 
-VF_BARPREIS_ALT = "2026-09-08"    # 12 Tage vor HEUTE - der S2-1-Repro
-TELEKOM_ALT = "2026-09-15"        # 5 Tage: Telekoms altes Klein-Bündel
-TELEKOM_FRISCH = "2026-09-19"     # 1 Tag: Telekoms frisches Groß-Bündel
+VF_BARPREIS_ALT = "2026-09-08"  # 12 Tage vor HEUTE - der S2-1-Repro
+TELEKOM_ALT = "2026-09-15"  # 5 Tage: Telekoms altes Klein-Bündel
+TELEKOM_FRISCH = "2026-09-19"  # 1 Tag: Telekoms frisches Groß-Bündel
 
 
 def _telekom_zwei_baender():
@@ -903,15 +1131,23 @@ def _telekom_zwei_baender():
     Das sind die Repro-Zahlen des Prüfers zu S2-2 (Radar-Beleg) und
     S2-3 (falsche Existenzaussage der Zeitreihe)."""
     return karten.modelle(
-        [_buendel("Telekom", "tk:s", "MagentaMobil S", 4.99, 25.0,
-                  TELEKOM_ALT),
-         _buendel("Telekom", "tk:xl", "MagentaMobil XL", 24.99, 35.0,
-                  TELEKOM_FRISCH),
-         _vodafone()],
-        _listungen(), [], {}, _katalog(), heute=HEUTE)
+        [
+            _buendel("Telekom", "tk:s", "MagentaMobil S", 4.99, 25.0, TELEKOM_ALT),
+            _buendel(
+                "Telekom", "tk:xl", "MagentaMobil XL", 24.99, 35.0, TELEKOM_FRISCH
+            ),
+            _vodafone(),
+        ],
+        _listungen(),
+        [],
+        {},
+        _katalog(),
+        heute=HEUTE,
+    )
 
 
 # ---- S2-1: die Näherung altert über ihre beiden Belege --------------------
+
 
 def _naeherung_welt():
     """Vodafone OHNE Bündel, dafür ein eigener Barpreis (999,00 EUR vom
@@ -919,22 +1155,41 @@ def _naeherung_welt():
     die Näherung 24 × 24,99 + 999,00 = 1.598,76 EUR ist mit BEIDEN
     Belegen 12 Tage alt. Telekom frisch: 1,00 + 24 × 24,99 + 24 × 35,00
     = 1.440,76 EUR (der S2-1-Repro des Prüfers)."""
-    referenzen = [SimOnlyReferenz(
-        anbieter="Vodafone", tarif_name="Vodafone Mobil XS",
-        tarif_id="vf:xs", tarif_sim_only_monatlich=24.99,
-        quelle_url="https://example.de/pib/vf-xs",
-        abgerufen_am=VF_BARPREIS_ALT)]
+    referenzen = [
+        SimOnlyReferenz(
+            anbieter="Vodafone",
+            tarif_name="Vodafone Mobil XS",
+            tarif_id="vf:xs",
+            tarif_sim_only_monatlich=24.99,
+            quelle_url="https://example.de/pib/vf-xs",
+            abgerufen_am=VF_BARPREIS_ALT,
+        )
+    ]
     listungen = [
-        {"id": "vf-bar--" + SKU, "sku_id": SKU,
-         "device_id": "apple-iphone-17-pro", "anbieter": "Vodafone",
-         "speicher_gb": 256, "zustand": "neu", "status": "aktiv",
-         "preis_ohne_vertrag": 999.0,
-         "quelle_url": "https://vodafone.invalid/barpreis",
-         "abgerufen_am": VF_BARPREIS_ALT},
-        *[l for l in _listungen() if l["anbieter"] == "Telekom"]]
-    return _modell(karten.modelle(
-        [_buendel("Telekom", "tk:m", "MagentaMobil M", 24.99, 35.0, HEUTE)],
-        listungen, referenzen, {}, _katalog(), heute=HEUTE))
+        {
+            "id": "vf-bar--" + SKU,
+            "sku_id": SKU,
+            "device_id": "apple-iphone-17-pro",
+            "anbieter": "Vodafone",
+            "speicher_gb": 256,
+            "zustand": "neu",
+            "status": "aktiv",
+            "preis_ohne_vertrag": 999.0,
+            "quelle_url": "https://vodafone.invalid/barpreis",
+            "abgerufen_am": VF_BARPREIS_ALT,
+        },
+        *[l for l in _listungen() if l["anbieter"] == "Telekom"],
+    ]
+    return _modell(
+        karten.modelle(
+            [_buendel("Telekom", "tk:m", "MagentaMobil M", 24.99, 35.0, HEUTE)],
+            listungen,
+            referenzen,
+            {},
+            _katalog(),
+            heute=HEUTE,
+        )
+    )
 
 
 def test_eine_alte_naeherung_ist_keine_zahl_von_heute():
@@ -965,6 +1220,7 @@ def test_eine_alte_naeherung_ist_keine_zahl_von_heute():
 
 # ---- S2-2: der Radar-Beleg je Anbieter nimmt die FRISCHE Karte -------------
 
+
 def test_radar_beleg_nimmt_die_frische_karte_nicht_die_alte_billige():
     """S2-2: `_guenstigste_echte_karte_je_anbieter` nahm das Minimum
     über frische UND alte Karten - Telekom alt 720,76 EUR (15.09.)
@@ -973,6 +1229,7 @@ def test_radar_beleg_nimmt_die_frische_karte_nicht_die_alte_billige():
     Seit dem Fix gilt dieselbe Ordnung wie `_angebot_rang`: Frische vor
     Preis."""
     from telco_radar.report import geraete_radar as radar_modul
+
     modell = _modell(_telekom_zwei_baender())
     beste = radar_modul._guenstigste_echte_karte_je_anbieter(modell)
     assert set(beste) == {"Telekom"}
@@ -982,8 +1239,8 @@ def test_radar_beleg_nimmt_die_frische_karte_nicht_die_alte_billige():
 
 # ---- S2-3: keine falsche Existenzaussage in der Zeitreihe ------------------
 
-def test_zeitreihe_nennt_den_alten_stand_statt_ein_buendel_abzustreiten(
-        tmp_path):
+
+def test_zeitreihe_nennt_den_alten_stand_statt_ein_buendel_abzustreiten(tmp_path):
     """S2-3: Telekom führt im Band XS ein (gealtetes) Bündel -
     720,76 EUR vom 15.09. - und im Band L ein frisches. Vor dem Fix
     prüfte `_luecken` die Frische über ALLE Karten des Anbieters VOR
@@ -995,13 +1252,15 @@ def test_zeitreihe_nennt_den_alten_stand_statt_ein_buendel_abzustreiten(
     band_je = {"tk:s": "xs", "tk:xl": "l", "vf:m": "m"}
     for k in modell["karten"]:
         k["band"] = band_je.get((k.get("tarif_id") or "").strip())
-    tco = {"modelle": [modell],
-           "baender_katalog": [
-               {"key": "xs", "label": "XS", "bereich": "bis 20 GB"},
-               {"key": "m", "label": "M",
-                "bereich": "21 bis 60 GB"},
-               {"key": "l", "label": "L", "bereich": "ab 61 GB"}],
-           "historie_lage": {"seit": "", "messtage": 0, "buendel": 0}}
+    tco = {
+        "modelle": [modell],
+        "baender_katalog": [
+            {"key": "xs", "label": "XS", "bereich": "bis 20 GB"},
+            {"key": "m", "label": "M", "bereich": "21 bis 60 GB"},
+            {"key": "l", "label": "L", "bereich": "ab 61 GB"},
+        ],
+        "historie_lage": {"seit": "", "messtage": 0, "buendel": 0},
+    }
     zr = geraete_zeitreihe.aufbereiten(tmp_path / "state", tco)
     paar = next(p for p in zr["paare"] if p["band"] == "xs")
     assert "Kein aktueller Stand: Telekom" in paar["luecke_text"]
@@ -1013,21 +1272,30 @@ def test_zeitreihe_nennt_den_alten_stand_statt_ein_buendel_abzustreiten(
 
 # ---- S3b: `abgerufen_am: null` ist unbekannt, kein Notzustand --------------
 
+
 def test_abgerufen_am_none_ist_unbekannt_kein_crash():
     """S3b: ein JSON-null im `abgerufen_am` (Rest eines halben
     Schreibvorgangs) warf in `kurz_datum` einen TypeError - und damit
     die ganze Geräteseite in ihren Notzustand. Unbekannt heißt
     unbekannt: nie Crash, nie geraten (Clean Code 4)."""
     assert karten.kurz_datum(None) == ""
-    modell = _modell(karten.modelle([_o2(None), _vodafone(), _telekom()],
-                                    _listungen(), [], {}, _katalog(),
-                                    heute=HEUTE))
+    modell = _modell(
+        karten.modelle(
+            [_o2(None), _vodafone(), _telekom()],
+            _listungen(),
+            [],
+            {},
+            _katalog(),
+            heute=HEUTE,
+        )
+    )
     o2 = _karte(modell, "o2")
     assert o2["frisch"] is False
     assert o2["alt_marke"] == "kein aktueller Stand – Abrufdatum unbekannt"
 
 
 # ---- S3c: ein Berichts-JSON ohne "date" bringt das Rendern nicht um --------
+
 
 def test_bericht_ohne_datumfeld_rendert_statt_zu_crashen(tmp_path):
     """S3c: ein gültiges Berichts-JSON ohne „date“ (Rest eines
@@ -1037,20 +1305,29 @@ def test_bericht_ohne_datumfeld_rendert_statt_zu_crashen(tmp_path):
     Stamm - der Berichtssatz bekommt es von dort, genau wie der
     .md-Fallback in `_load_reports` es ohnehin tut."""
     import json
+
     root, _ = _buendel_welt(tmp_path)
     reports = root / "data" / "reports"
     for alt in reports.iterdir():
         alt.unlink()
-    (reports / f"{REPORT_STAND}.json").write_text(json.dumps(
-        {"language": "de",
-         "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
-         "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{REPORT_STAND}.json").write_text(
+        json.dumps(
+            {
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     html = _weltsite(root)
     assert "1.080,76" in html
     assert "KeyError" not in html
 
 
 # ---- S3d (Pin): die Wochenkarte hängt an der Berichts-Uhr ------------------
+
 
 def test_wochenkarte_rechnet_gegen_den_berichtstag(tmp_path):
     """S3d: seit der A3-Verdrahtung rechnet „Was diese Woche auffällt“
@@ -1061,11 +1338,12 @@ def test_wochenkarte_rechnet_gegen_den_berichtstag(tmp_path):
     stellt. Die Gegenprobe im selben Test ist der Kompatibilitätsmodus
     ohne Bericht (heute="") - dasselbe Datenbild, keine Uhr, kein Satz."""
     import json
+
     root, _ = _buendel_welt(tmp_path)
     pfad = root / "data" / "state" / "geraete_db.json"
     roh = json.loads(pfad.read_text(encoding="utf-8"))
     for e in roh["listungen"]:
-        e["first_seen"] = "2026-09-03"    # 13 Tage vor REPORT_STAND
+        e["first_seen"] = "2026-09-03"  # 13 Tage vor REPORT_STAND
     pfad.write_text(json.dumps(roh), encoding="utf-8")
     assert "erstmals erfasst" in _weltsite(root)
     reports = root / "data" / "reports"

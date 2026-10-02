@@ -31,6 +31,7 @@ ZWEI NACHRECHNUNGEN SIND BEDINGUNG, NICHT PROTOKOLL
    entsprechen (Betrag) — sonst hätte die Antwort zwei Tarife, und der
    Satz wäre falsch etikettiert.
 """
+
 import gzip
 import json
 import re
@@ -92,12 +93,13 @@ def _zustand(html: str) -> dict:
 # lies_buendel()
 # ==========================================================================
 
+
 def test_neun_saetze_aus_neun_geraeten_und_einer_werbekachel():
     """10 Einträge, davon eine Kachel ohne `name` (tileType/höhererTariff-
     Discount) — sie wird übergangen, nicht geraten."""
     saetze = _saetze()
     assert len(saetze) == 9
-    assert len({s["titel"] for s in saetze}) == 9      # keine Dublette
+    assert len({s["titel"] for s in saetze}) == 9  # keine Dublette
 
 
 def test_jeder_satz_traegt_den_tarifnamen_aus_der_antwort():
@@ -126,8 +128,9 @@ def test_der_pixel_satz_nach_rechnung():
     s = next(x for x in _saetze() if "Pixel 11 Pro 256 GB" in x["titel"])
     assert s["geraet_zuzahlung"] == 99.0
     assert s["geraet_monatsrate"] == 28.3
-    assert s["geraet_zuzahlung"] + 36 * s["geraet_monatsrate"] == \
-        pytest.approx(1117.8, abs=0.005)
+    assert s["geraet_zuzahlung"] + 36 * s["geraet_monatsrate"] == pytest.approx(
+        1117.8, abs=0.005
+    )
     assert s["farbe"] == "olive"
     assert s["speicher_gb"] == 256
 
@@ -145,17 +148,20 @@ def test_jede_ratenform_geht_gegen_die_rohantwort_auf():
     assert len(roh_je_id) == 9
 
     saetze = _saetze()
-    assert len(saetze) == 9                 # die Lookup-Zeile (kein blinder Test)
+    assert len(saetze) == 9  # die Lookup-Zeile (kein blinder Test)
     for s in saetze:
         eintrag = roh_je_id[s["sku"]]
         erste = (eintrag.get("price") or {}).get("installments")[0]
-        assert s["geraet_zuzahlung"] + \
-            s["laufzeit_monate"] * s["geraet_monatsrate"] == \
-            pytest.approx(float(erste["totalPrice"]), abs=0.005)
+        assert s["geraet_zuzahlung"] + s["laufzeit_monate"] * s[
+            "geraet_monatsrate"
+        ] == pytest.approx(float(erste["totalPrice"]), abs=0.005)
         assert s["geraet_monatsrate"] == float(erste["recurringPrice"])
         # Zweite Probe: der je-Gerät-Tarifpreis gehört zum selectedPlan.
-        geraet_tarif = (eintrag.get("formattedPrices") or {}) \
-            .get("recurringTariffPrice", {}).get("price", {})
+        geraet_tarif = (
+            (eintrag.get("formattedPrices") or {})
+            .get("recurringTariffPrice", {})
+            .get("price", {})
+        )
         assert geraet_tarif["id"].startswith(f"{_PLAN_ID}-")
         assert s["tarif_monatlich"] == float(geraet_tarif["actualValue"])
 
@@ -171,18 +177,18 @@ def test_die_ohne_vertrag_antwort_ist_keine_buendelantwort():
     leeres Ergebnis wäre die falsche Meldung: das Nutzlastformat hat den
     Tarif nicht, der Aufrufer hat ihn nicht mitgegeben."""
     with pytest.raises(GeraeteAbrufFehler, match="selectedPlan"):
-        lies_buendel(_fixture(
-            "telekom_kategorie_smartphones_ohne_vertrag.html.gz"))
+        lies_buendel(_fixture("telekom_kategorie_smartphones_ohne_vertrag.html.gz"))
 
 
 def _erster_geraeteeintrag(html: str) -> str:
     """Die Antwort auf den ersten GERÄTEEintrag kappen, damit ein
     manipuliertes Beispiel nicht zwischen echten Sätzen verschwindet."""
     daten = _zustand(html)
-    geraete = [e for e in daten["productList"]["data"]
-               if isinstance(e, dict) and e.get("name")]
+    geraete = [
+        e for e in daten["productList"]["data"] if isinstance(e, dict) and e.get("name")
+    ]
     daten["productList"]["data"] = geraete[:1]
-    return f'<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>'
+    return f"<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>"
 
 
 def test_mehrere_ratenplaene_ergeben_je_ein_eigenes_buendel():
@@ -198,25 +204,30 @@ def test_mehrere_ratenplaene_ergeben_je_ein_eigenes_buendel():
     daneben)."""
     html = _fixture("telekom_kategorie_buendel_magentamobil_s.html.gz")
     daten = _zustand(html)
-    geraete = [e for e in daten["productList"]["data"]
-               if isinstance(e, dict) and e.get("name")]
+    geraete = [
+        e for e in daten["productList"]["data"] if isinstance(e, dict) and e.get("name")
+    ]
     erster = geraete[0]["price"]["installments"][0]
     assert erster["numberOfInstallments"] == 36
     # Selbst konsistent nachgerechnet: dieselbe Anzahlung, 24 Monate.
     anzahlung = geraete[0]["price"]["upfrontPrice"]
-    zweiter_plan = {"numberOfInstallments": 24, "recurringPrice": 42.4,
-                    "totalPrice": round(anzahlung + 24 * 42.4, 2)}
+    zweiter_plan = {
+        "numberOfInstallments": 24,
+        "recurringPrice": 42.4,
+        "totalPrice": round(anzahlung + 24 * 42.4, 2),
+    }
     geraete[0]["price"]["installments"] = [erster, zweiter_plan]
     daten["productList"]["data"] = geraete[:1]
-    geaendert = f'<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>'
+    geaendert = f"<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>"
 
     saetze = lies_buendel(geaendert)
     assert len(saetze) == 2
     laufzeiten = {s["laufzeit_monate"] for s in saetze}
     assert laufzeiten == {36, 24}
     nach_laufzeit = {s["laufzeit_monate"]: s for s in saetze}
-    assert nach_laufzeit[36]["geraet_monatsrate"] == \
-        pytest.approx(float(erster["recurringPrice"]))
+    assert nach_laufzeit[36]["geraet_monatsrate"] == pytest.approx(
+        float(erster["recurringPrice"])
+    )
     assert nach_laufzeit[24]["geraet_monatsrate"] == pytest.approx(42.4)
     # Tarifname und -preis bleiben fuer beide Plaene gleich - nur die
     # Geraeteseite der Rechnung unterscheidet sich.
@@ -236,19 +247,26 @@ def test_ein_nicht_aufgehender_plan_faellt_einzeln_im_buendel(caplog):
     """
     html = _fixture("telekom_kategorie_buendel_magentamobil_s.html.gz")
     daten = _zustand(html)
-    geraete = [e for e in daten["productList"]["data"]
-               if isinstance(e, dict) and e.get("name")]
+    geraete = [
+        e for e in daten["productList"]["data"] if isinstance(e, dict) and e.get("name")
+    ]
     echter = geraete[0]["price"]["installments"][0]
     assert echter["numberOfInstallments"] == 36
-    kaputter_plan = {"numberOfInstallments": 36, "recurringPrice": 42.4,
-                     "totalPrice": 1.0}
+    kaputter_plan = {
+        "numberOfInstallments": 36,
+        "recurringPrice": 42.4,
+        "totalPrice": 1.0,
+    }
     # Selbst konsistent nachgerechnet: dieselbe Anzahlung, 24 Monate.
     anzahlung = geraete[0]["price"]["upfrontPrice"]
-    gesunder_plan = {"numberOfInstallments": 24, "recurringPrice": 42.4,
-                     "totalPrice": round(anzahlung + 24 * 42.4, 2)}
+    gesunder_plan = {
+        "numberOfInstallments": 24,
+        "recurringPrice": 42.4,
+        "totalPrice": round(anzahlung + 24 * 42.4, 2),
+    }
     geraete[0]["price"]["installments"] = [kaputter_plan, gesunder_plan]
     daten["productList"]["data"] = geraete[:1]
-    geaendert = f'<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>'
+    geaendert = f"<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>"
 
     with caplog.at_level("INFO"):
         saetze = lies_buendel(geaendert)
@@ -256,18 +274,20 @@ def test_ein_nicht_aufgehender_plan_faellt_einzeln_im_buendel(caplog):
     assert saetze[0]["laufzeit_monate"] == 24
     assert saetze[0]["geraet_monatsrate"] == pytest.approx(42.4)
     # Der kaputte Plan ist nicht still verschwunden.
-    assert any("ohne aufgehende" in m and "Rechenprobe" in m
-               for m in caplog.messages), caplog.messages
+    assert any(
+        "ohne aufgehende" in m and "Rechenprobe" in m for m in caplog.messages
+    ), caplog.messages
 
 
 def test_eine_ratenform_die_nicht_aufgeht_faellt():
     html = _fixture("telekom_kategorie_buendel_magentamobil_s.html.gz")
     daten = _zustand(html)
-    geraete = [e for e in daten["productList"]["data"]
-               if isinstance(e, dict) and e.get("name")]
+    geraete = [
+        e for e in daten["productList"]["data"] if isinstance(e, dict) and e.get("name")
+    ]
     geraete[0]["price"]["installments"][0]["totalPrice"] = 9999.0
     daten["productList"]["data"] = geraete[:1]
-    geaendert = f'<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>'
+    geaendert = f"<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>"
     assert lies_buendel(geaendert) == []
 
 
@@ -276,12 +296,14 @@ def test_ein_geraetepreis_eines_fremden_tarifs_faellt():
     MF_17785 — der Satz wäre falsch etikettiert, also verworfen."""
     html = _fixture("telekom_kategorie_buendel_magentamobil_s.html.gz")
     daten = _zustand(html)
-    geraete = [e for e in daten["productList"]["data"]
-               if isinstance(e, dict) and e.get("name")]
-    geraete[0]["formattedPrices"]["recurringTariffPrice"]["price"]["id"] = \
+    geraete = [
+        e for e in daten["productList"]["data"] if isinstance(e, dict) and e.get("name")
+    ]
+    geraete[0]["formattedPrices"]["recurringTariffPrice"]["price"]["id"] = (
         "MF_99999-MRC-Price"
+    )
     daten["productList"]["data"] = geraete[:1]
-    geaendert = f'<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>'
+    geaendert = f"<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>"
     assert lies_buendel(geaendert) == []
 
 
@@ -290,12 +312,14 @@ def test_ein_geraetepreis_der_dem_plan_widerspricht_faellt():
     — kein Satz, sondern ein Befund."""
     html = _fixture("telekom_kategorie_buendel_magentamobil_s.html.gz")
     daten = _zustand(html)
-    geraete = [e for e in daten["productList"]["data"]
-               if isinstance(e, dict) and e.get("name")]
-    geraete[0]["formattedPrices"]["recurringTariffPrice"]["price"] \
-        ["actualValue"] = 19.99
+    geraete = [
+        e for e in daten["productList"]["data"] if isinstance(e, dict) and e.get("name")
+    ]
+    geraete[0]["formattedPrices"]["recurringTariffPrice"]["price"]["actualValue"] = (
+        19.99
+    )
     daten["productList"]["data"] = geraete[:1]
-    geaendert = f'<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>'
+    geaendert = f"<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>"
     assert lies_buendel(geaendert) == []
 
 
@@ -303,25 +327,33 @@ def test_ein_geraetepreis_der_dem_plan_widerspricht_faellt():
 # Vom Rohsatz zum echten Buendel - der Name loest im Bestand auf
 # ==========================================================================
 
+
 def _bestand_mit_magentamobil_s():
     """Der Tarifbestand, wie ihn der Tarif-Sammler aus dem Telekom-PIB
     schreibt — der Name steht wortgleich in `selectedPlan.name`."""
-    return Tarifbestand([
-        {"tarif_id": "telekom:magentamobil-s", "anbieter": "Telekom",
-         "name": "MagentaMobil S", "grundgebuehr": 39.95},
-    ])
+    return Tarifbestand(
+        [
+            {
+                "tarif_id": "telekom:magentamobil-s",
+                "anbieter": "Telekom",
+                "name": "MagentaMobil S",
+                "grundgebuehr": 39.95,
+            },
+        ]
+    )
 
 
 def test_der_ganze_weg_bis_zum_buendel():
     """Ende zu Ende: selectedPlan.name -> tarif_id über den Bestand
     (Güte HOCH, über den Namen), mit Zuzahlung, Rate, Anschlusspreis."""
-    roh = next(s for s in _saetze()
-               if "Pixel 11 Pro 256 GB" in s["titel"])
-    satz = {**roh, "anbieter": "Telekom",
-            "sku_id": "google-pixel-11-pro-256gb-ohne-farbe",
-            "quelle_url": roh["url"]}
-    bilanz = aus_rohsaetzen([satz], _bestand_mit_magentamobil_s(),
-                            "2026-09-08")
+    roh = next(s for s in _saetze() if "Pixel 11 Pro 256 GB" in s["titel"])
+    satz = {
+        **roh,
+        "anbieter": "Telekom",
+        "sku_id": "google-pixel-11-pro-256gb-ohne-farbe",
+        "quelle_url": roh["url"],
+    }
+    bilanz = aus_rohsaetzen([satz], _bestand_mit_magentamobil_s(), "2026-09-08")
     assert len(bilanz.buendel) == 1
     b = bilanz.buendel[0]
     assert b.tarif_id == "telekom:magentamobil-s"
@@ -349,33 +381,41 @@ _ROBOTS_FREI = (200, "User-agent: *\nDisallow: /is-bin/\n")
 
 def _telekom_anbieter():
     return Anbieter(
-        name="Telekom", typ="netzbetreiber", methode="telekom_kategorie",
-        basis_url="https://www.telekom.de", rate_limit_sekunden=0,
-        einstiege=[Einstieg(
-            url="https://www.telekom.de/shop/geraete/smartphones"
-                "?tariffId=MF_17785",
-            label="Bündel MagentaMobil S", kind="buendel")])
+        name="Telekom",
+        typ="netzbetreiber",
+        methode="telekom_kategorie",
+        basis_url="https://www.telekom.de",
+        rate_limit_sekunden=0,
+        einstiege=[
+            Einstieg(
+                url="https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17785",
+                label="Bündel MagentaMobil S",
+                kind="buendel",
+            )
+        ],
+    )
 
 
 def test_sammle_anbieter_liefert_buendel_und_keine_listungen(katalog, farben):
     """`kind: buendel` heißt: die Sätze gehen an der Listungsstrecke
     vorbei in `bilanz.buendel` — ein Bündelmonatspreis gehört nicht in die
     Preisspalte der Geräteseite."""
+
     def hole(url, **kwargs):
         if url.endswith("/robots.txt"):
             return _ROBOTS_FREI
-        return 200, _fixture(
-            "telekom_kategorie_buendel_magentamobil_s.html.gz")
+        return 200, _fixture("telekom_kategorie_buendel_magentamobil_s.html.gz")
 
     waechter = RobotsWaechter(hole=hole)
-    bilanz = sammle_anbieter(_telekom_anbieter(), katalog, farben, hole,
-                             "2026-09-08", waechter)
+    bilanz = sammle_anbieter(
+        _telekom_anbieter(), katalog, farben, hole, "2026-09-08", waechter
+    )
     assert bilanz.status == "ok"
     assert bilanz.listungen == []
     assert len(bilanz.buendel) == 9
     b = bilanz.buendel[0]
     assert b["anbieter"] == "Telekom"
-    assert b["sku_id"]                     # über den Katalog gebildet
+    assert b["sku_id"]  # über den Katalog gebildet
     assert b["tarif_name"] == "MagentaMobil S"
     assert b["geraet_zuzahlung"] is not None
 
@@ -402,20 +442,27 @@ def test_der_robots_abruf_traegt_den_absender_des_anbieters(katalog, farben):
         gesehen[url] = user_agent
         if url.endswith("/robots.txt"):
             return (200, "User-agent: *\nDisallow: /is-bin/\n")
-        return 200, _fixture(
-            "telekom_kategorie_buendel_magentamobil_s.html.gz")
+        return 200, _fixture("telekom_kategorie_buendel_magentamobil_s.html.gz")
 
     anbieter = Anbieter(
-        name="Telekom", typ="netzbetreiber", methode="telekom_kategorie",
-        basis_url="https://www.telekom.de", rate_limit_sekunden=0,
+        name="Telekom",
+        typ="netzbetreiber",
+        methode="telekom_kategorie",
+        basis_url="https://www.telekom.de",
+        rate_limit_sekunden=0,
         user_agent="TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)",
-        einstiege=[Einstieg(
-            url="https://www.telekom.de/shop/geraete/smartphones"
-                "?tariffId=MF_17785",
-            label="Bündel MagentaMobil S", kind="buendel")])
+        einstiege=[
+            Einstieg(
+                url="https://www.telekom.de/shop/geraete/smartphones?tariffId=MF_17785",
+                label="Bündel MagentaMobil S",
+                kind="buendel",
+            )
+        ],
+    )
 
-    bilanz = sammle_anbieter(anbieter, katalog, farben, hole, "2026-09-08",
-                             RobotsWaechter(hole=hole))
+    bilanz = sammle_anbieter(
+        anbieter, katalog, farben, hole, "2026-09-08", RobotsWaechter(hole=hole)
+    )
     assert bilanz.status == "ok" and bilanz.buendel
     robots = [u for u in gesehen if u.endswith("/robots.txt")]
     assert robots, "kein robots.txt-Abruf erfolgt — der Test prüft nichts"
@@ -423,4 +470,5 @@ def test_der_robots_abruf_traegt_den_absender_des_anbieters(katalog, farben):
     # Bündelseite — mit demselben ehrlichen Absender.
     assert gesehen and all(
         ua == "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
-        for ua in gesehen.values()), gesehen
+        for ua in gesehen.values()
+    ), gesehen

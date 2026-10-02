@@ -9,19 +9,23 @@ Dazu die Zusicherung, die diese Aenderung ueberhaupt erst erlaubt:
 **`summary` bleibt gekappt.** Was der Analyst sieht, ist eine eigene
 Entscheidung - kein Nebeneffekt einer Uebersetzungsfunktion.
 """
+
 from __future__ import annotations
 
 from telco_radar.collect.rss import parse_feed_bytes, VOLLTEXT_MINDESTLAENGE
 from telco_radar.config import Source
 from telco_radar.models import Item
 
-LANG = ("Este es un parrafo largo del articulo original que el sistema de "
-        "gestion de contenidos entrega dentro del feed. ")
+LANG = (
+    "Este es un parrafo largo del articulo original que el sistema de "
+    "gestion de contenidos entrega dentro del feed. "
+)
 
 
 def _feed(beschreibung: str = "", content: str = "") -> bytes:
-    inhalt = (f"<content:encoded><![CDATA[{content}]]></content:encoded>"
-              if content else "")
+    inhalt = (
+        f"<content:encoded><![CDATA[{content}]]></content:encoded>" if content else ""
+    )
     return f"""<?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel><title>Testfeed</title>
@@ -97,8 +101,14 @@ def test_das_laengste_content_element_gewinnt():
 
 # ------------------------------------------------------------------- Modell
 def test_item_dict_runde_haelt_die_neuen_felder():
-    item = Item(title="t", url="https://beispiel.test/x", source_name="q",
-                volltext="lang", sprache="es", image_url="https://bild.test/1")
+    item = Item(
+        title="t",
+        url="https://beispiel.test/x",
+        source_name="q",
+        volltext="lang",
+        sprache="es",
+        image_url="https://bild.test/1",
+    )
     zurueck = Item.from_dict(item.to_dict())
     assert zurueck.volltext == "lang"
     assert zurueck.sprache == "es"
@@ -110,6 +120,10 @@ def test_from_dict_verliert_das_bild_nicht():
     `to_dict` schrieb es korrekt, `from_dict` liess es fallen - ein aus
     einem Dict wiederhergestelltes Item verlor sein Feed-Bild lautlos.
     """
-    item = Item(title="t", url="https://beispiel.test/y", source_name="q",
-                image_url="https://bild.test/2.jpg")
+    item = Item(
+        title="t",
+        url="https://beispiel.test/y",
+        source_name="q",
+        image_url="https://bild.test/2.jpg",
+    )
     assert Item.from_dict(item.to_dict()).image_url == "https://bild.test/2.jpg"

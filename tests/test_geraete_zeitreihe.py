@@ -14,16 +14,24 @@ dieselbe Ebene wie `tests/test_geraete_verlauf.py` und
 zwei sichtbare `<svg>` in der Hauptansicht ergibt (G0 und G1), misst
 `tests/test_geraete_reiter_browser.py`.
 """
+
 from __future__ import annotations
 
 from telco_radar.geraete_model import Geraet, Katalog
 from telco_radar.report import geraete_tco_grafik as grafik
 from telco_radar.report import geraete_verlauf as verlauf
 
-_KATALOG = Katalog(geraete=[
-    Geraet(hersteller="Apple", modell="iPhone 17 Pro", generation=17,
-           speicher=[256], segment="premium"),
-])
+_KATALOG = Katalog(
+    geraete=[
+        Geraet(
+            hersteller="Apple",
+            modell="iPhone 17 Pro",
+            generation=17,
+            speicher=[256],
+            segment="premium",
+        ),
+    ]
+)
 _GID = "apple-iphone-17-pro"
 
 
@@ -35,29 +43,42 @@ class _Historie:
         self._reihen = reihen or {}
 
     def reihe(self, listung_id):
-        return sorted(self._reihen.get(listung_id, []),
-                      key=lambda s: s.get("datum", ""))
+        return sorted(
+            self._reihen.get(listung_id, []), key=lambda s: s.get("datum", "")
+        )
 
 
-def _l(kennung, anbieter, preis, *, last_verified="2026-09-05",
-       speicher=256, zustand="neu"):
-    return {"id": kennung, "anbieter": anbieter, "device_id": _GID,
-            "speicher_gb": speicher, "zustand": zustand,
-            "preis_ohne_vertrag": preis, "last_verified": last_verified,
-            "farbe_normalisiert": "titan"}
+def _l(
+    kennung, anbieter, preis, *, last_verified="2026-09-05", speicher=256, zustand="neu"
+):
+    return {
+        "id": kennung,
+        "anbieter": anbieter,
+        "device_id": _GID,
+        "speicher_gb": speicher,
+        "zustand": zustand,
+        "preis_ohne_vertrag": preis,
+        "last_verified": last_verified,
+        "farbe_normalisiert": "titan",
+    }
 
 
 def _reihe(anbieter, punkte, farbe="#123456", eigen=False):
     """Eine fertige Reihe, wie sie `geraete_verlauf._reihen` liefert -
     fuer die Tests, die direkt gegen `zeitreihe()` messen und keine
     Listungen/Historie brauchen."""
-    return {"anbieter": anbieter, "farbe": farbe, "eigen": eigen,
-            "punkte": [{"datum": d, "preis": p} for d, p in punkte]}
+    return {
+        "anbieter": anbieter,
+        "farbe": farbe,
+        "eigen": eigen,
+        "punkte": [{"datum": d, "preis": p} for d, p in punkte],
+    }
 
 
 # --------------------------------------------------------------------------
 # reihen_fuer_listungen - die Filterung vor der Grafik
 # --------------------------------------------------------------------------
+
 
 def test_reihen_fuer_listungen_laesst_gebrauchte_geraete_weg():
     hist = _Historie({"a": [{"datum": "2026-08-29", "preis_ohne_vertrag": 900.0}]})
@@ -71,9 +92,17 @@ def test_reihen_fuer_listungen_laesst_buendel_ohne_barpreis_weg():
     keine Zeile dieser Grafik - sie zeigt den Gerätepreis ohne Vertrag,
     keinen Buendelbestandteil."""
     hist = _Historie()
-    listungen = [{"id": "b", "anbieter": "1&1", "device_id": _GID,
-                 "speicher_gb": 256, "zustand": "neu",
-                 "preis_ohne_vertrag": None, "last_verified": "2026-09-05"}]
+    listungen = [
+        {
+            "id": "b",
+            "anbieter": "1&1",
+            "device_id": _GID,
+            "speicher_gb": 256,
+            "zustand": "neu",
+            "preis_ohne_vertrag": None,
+            "last_verified": "2026-09-05",
+        }
+    ]
     assert verlauf.reihen_fuer_listungen(listungen, hist) == []
 
 
@@ -83,13 +112,13 @@ def test_reihen_fuer_listungen_baut_reihen_aus_listung_und_historie():
     reihen = verlauf.reihen_fuer_listungen(listungen, hist)
     assert len(reihen) == 1
     assert reihen[0]["anbieter"] == "o2"
-    assert [p["datum"] for p in reihen[0]["punkte"]] == \
-        ["2026-08-29", "2026-09-05"]
+    assert [p["datum"] for p in reihen[0]["punkte"]] == ["2026-08-29", "2026-09-05"]
 
 
 # --------------------------------------------------------------------------
 # a) Linien nur ab zwei Messpunkten
 # --------------------------------------------------------------------------
+
 
 def test_ein_anbieter_mit_zwei_punkten_bekommt_eine_linie():
     reihen = [_reihe("o2", [("2026-08-29", 1315.0), ("2026-09-05", 1315.0)])]
@@ -123,12 +152,14 @@ def test_gemischte_reihen_zeigen_linie_und_punkt_nebeneinander():
 # b) Eine Sammelluecke wird nicht ueberbrueckt
 # --------------------------------------------------------------------------
 
+
 def test_die_19_tage_luecke_wird_nicht_ueberbrueckt():
     """mobilcom-debitel: ein Punkt vor der Luecke (10.08.), einer danach
     (05.09.) - dieselbe Lage wie am echten Bestand vom 05.09.2026. Es
     entsteht KEINE Linie, sondern zwei einzelne Punkte."""
-    reihen = [_reihe("mobilcom-debitel",
-                     [("2026-08-10", 1299.0), ("2026-09-05", 1299.0)])]
+    reihen = [
+        _reihe("mobilcom-debitel", [("2026-08-10", 1299.0), ("2026-09-05", 1299.0)])
+    ]
     ergebnis = grafik.zeitreihe(reihen)
     assert "<path" not in ergebnis["svg"]
     # Neukalibriert am 09.09.2026 (Optik-Schritt 5, F-4b): Daten-Punkte
@@ -144,8 +175,7 @@ def test_die_19_tage_luecke_wird_nicht_ueberbrueckt():
 def test_ein_kurzer_abstand_bleibt_verbunden():
     """Fuenf Tage (dieselbe Spanne wie 29.08. -> 03.09. am echten Bestand)
     sind normale Kadenz, keine Sammelluecke - die Linie bleibt durchgezogen."""
-    reihen = [_reihe("congstar",
-                     [("2026-08-29", 1225.0), ("2026-09-03", 1225.0)])]
+    reihen = [_reihe("congstar", [("2026-08-29", 1225.0), ("2026-09-03", 1225.0)])]
     ergebnis = grafik.zeitreihe(reihen)
     assert "<path" in ergebnis["svg"]
     assert "gr-g0-punkt--einzeln" not in ergebnis["svg"]
@@ -155,10 +185,16 @@ def test_drei_punkte_mit_luecke_ergeben_zwei_getrennte_laeufe():
     """Punkt 1 und 2 liegen nah beieinander (verbunden), Punkt 3 liegt
     hinter der Luecke (einzeln) - EIN `<path>` mit zwei Punkten, dazu ein
     einzelner."""
-    reihen = [_reihe("Vodafone", [
-        ("2026-08-29", 1199.9), ("2026-09-01", 1199.9),
-        ("2026-09-25", 1149.9),
-    ])]
+    reihen = [
+        _reihe(
+            "Vodafone",
+            [
+                ("2026-08-29", 1199.9),
+                ("2026-09-01", 1199.9),
+                ("2026-09-25", 1149.9),
+            ],
+        )
+    ]
     ergebnis = grafik.zeitreihe(reihen)
     assert ergebnis["svg"].count("<path") == 1
     assert ergebnis["svg"].count("gr-g0-punkt--einzeln") == 1
@@ -168,8 +204,9 @@ def test_drei_punkte_mit_luecke_ergeben_zwei_getrennte_laeufe():
 
 
 def test_die_luecke_bekommt_ein_sichtbares_feld():
-    reihen = [_reihe("mobilcom-debitel",
-                     [("2026-08-10", 1299.0), ("2026-09-05", 1299.0)])]
+    reihen = [
+        _reihe("mobilcom-debitel", [("2026-08-10", 1299.0), ("2026-09-05", 1299.0)])
+    ]
     ergebnis = grafik.zeitreihe(reihen)
     assert "gr-g0-luecke" in ergebnis["svg"]
     assert "Sammellücke" in ergebnis["svg"]
@@ -184,6 +221,7 @@ def test_keine_luecke_ohne_grossen_abstand():
 # --------------------------------------------------------------------------
 # c) Die Y-Achse rechnet aus den echten Daten
 # --------------------------------------------------------------------------
+
 
 def test_die_achse_traegt_den_echten_minimal_und_maximalpreis():
     """Fuenf Marken zwischen (Minimum - Polster) und (Maximum + Polster) -
@@ -201,9 +239,11 @@ def test_zwei_verschiedene_geraete_ergeben_zwei_verschiedene_achsen():
     """Dieselbe Rechnung, andere Eingabe, andere Achse - sonst waere die
     Achse eine Konstante und keine Rechnung."""
     billig = grafik.zeitreihe(
-        [_reihe("o2", [("2026-08-29", 100.0), ("2026-09-05", 110.0)])])
+        [_reihe("o2", [("2026-08-29", 100.0), ("2026-09-05", 110.0)])]
+    )
     teuer = grafik.zeitreihe(
-        [_reihe("o2", [("2026-08-29", 1900.0), ("2026-09-05", 1950.0)])])
+        [_reihe("o2", [("2026-08-29", 1900.0), ("2026-09-05", 1950.0)])]
+    )
     assert billig["svg"] != teuer["svg"]
     assert "€" in billig["svg"] and "€" in teuer["svg"]
 
@@ -221,6 +261,7 @@ def test_eine_flache_reihe_bekommt_trotzdem_eine_spanne():
 # --------------------------------------------------------------------------
 # d) Ein Punkt bleibt ein Punkt
 # --------------------------------------------------------------------------
+
 
 def test_genau_ein_messpunkt_erzeugt_keine_linie_im_ganzen_bild():
     reihen = [_reihe("Telekom", [("2026-09-05", 1197.0)])]
@@ -249,10 +290,11 @@ def test_ohne_jeden_messpunkt_gibt_es_keine_grafik():
 # Punkt statt nur einem Tooltip.
 # --------------------------------------------------------------------------
 
+
 def test_ein_einzelner_messpunkt_traegt_eine_sichtbare_beschriftung():
     reihen = [_reihe("Telekom", [("2026-09-05", 1197.0)])]
     ergebnis = grafik.zeitreihe(reihen)
-    assert ('class="gr-g0-einzeln gr-anb--telekom"' in ergebnis["svg"])
+    assert 'class="gr-g0-einzeln gr-anb--telekom"' in ergebnis["svg"]
     assert "Serie startet · 1. Messpunkt 05.09.2026" in ergebnis["svg"]
 
 
@@ -267,10 +309,16 @@ def test_nur_der_isolierte_punkt_traegt_die_beschriftung_nicht_die_linie():
     """Wie `test_drei_punkte_mit_luecke_ergeben_zwei_getrennte_laeufe`: zwei
     verbundene Punkte, ein dritter isolierter hinter der Sammelluecke - nur
     der dritte ist "einzeln" und bekommt die Beschriftung."""
-    reihen = [_reihe("Vodafone", [
-        ("2026-08-29", 1199.9), ("2026-09-01", 1199.9),
-        ("2026-09-25", 1149.9),
-    ])]
+    reihen = [
+        _reihe(
+            "Vodafone",
+            [
+                ("2026-08-29", 1199.9),
+                ("2026-09-01", 1199.9),
+                ("2026-09-25", 1149.9),
+            ],
+        )
+    ]
     ergebnis = grafik.zeitreihe(reihen)
     assert ergebnis["svg"].count("gr-g0-einzeln") == 1
     assert ergebnis["svg"].count("Serie startet") == 1
@@ -290,6 +338,7 @@ def test_gemischte_reihen_beschriften_nur_den_einzelnen_punkt():
 # --------------------------------------------------------------------------
 # Die Chart-Chrome-Zeile - kein Fliesstext, ein einziger Satz
 # --------------------------------------------------------------------------
+
 
 def test_die_chrome_zeile_nennt_messtage_und_das_erste_datum():
     reihen = [
@@ -317,8 +366,18 @@ def test_die_chrome_zeile_ist_der_einzige_satz_im_belegtext():
     reihen = [_reihe("o2", [("2026-08-29", 1315.0), ("2026-09-05", 1310.0)])]
     ergebnis = grafik.zeitreihe(reihen)
     assert set(ergebnis["linien"][0]) == {
-        "anbieter", "farbe", "eigen", "punkte", "von", "bis", "von_de",
-        "bis_de", "von_preis", "bis_preis", "delta"}
+        "anbieter",
+        "farbe",
+        "eigen",
+        "punkte",
+        "von",
+        "bis",
+        "von_de",
+        "bis_de",
+        "von_preis",
+        "bis_preis",
+        "delta",
+    }
     assert ergebnis["linien"][0]["von_de"] == "29.08.2026"
     assert ergebnis["linien"][0]["bis_de"] == "05.09.2026"
     # O4: Erst- und Letztpreis aus denselben Punkten, die gezeichnet werden
@@ -331,6 +390,7 @@ def test_die_chrome_zeile_ist_der_einzige_satz_im_belegtext():
 # Keine erfundenen Zwischenpunkte
 # --------------------------------------------------------------------------
 
+
 def test_es_werden_nur_die_gegebenen_preise_gezeichnet():
     """Zwei Punkte, ein Pfad mit genau zwei Koordinatenbefehlen (M und L) -
     keine dritte, interpolierte Koordinate dazwischen."""
@@ -340,8 +400,8 @@ def test_es_werden_nur_die_gegebenen_preise_gezeichnet():
     # `gr-g0-linie`-Element gelesen - das naive `split('d="')` traf seit
     # den Symbol-defs (`id="gr-sym-kreis"`) die id statt des Pfades.
     import re as _re
-    treffer = _re.search(r'class="gr-g0-linie[^"]*" d="([^"]+)"',
-                         ergebnis["svg"])
+
+    treffer = _re.search(r'class="gr-g0-linie[^"]*" d="([^"]+)"', ergebnis["svg"])
     assert treffer, "kein Linienpfad in der Grafik"
     befehle = [c for c in treffer.group(1) if c in "ML"]
     assert befehle == ["M", "L"]

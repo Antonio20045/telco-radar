@@ -13,6 +13,7 @@ kleine, eigene HTML-Seite und misst die Boundingboxen der
 Bauform (eigener Server, Chromium an beiden bekannten Orten) wie
 `test_geraete_zeitreihe_browser.py`.
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -31,10 +32,15 @@ from telco_radar.report.anbieter_farben import in_stylesheet
 
 
 def _chromium():
-    for muster in ("/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-                   str(pathlib.Path.home() / ".cache/ms-playwright"
-                       / "chromium*/chrome-linux*/chrome"),
-                   "/Applications/Chromium.app/Contents/MacOS/Chromium"):
+    for muster in (
+        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
+        str(
+            pathlib.Path.home()
+            / ".cache/ms-playwright"
+            / "chromium*/chrome-linux*/chrome"
+        ),
+        "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    ):
         treffer = sorted(glob.glob(muster))
         if treffer:
             return treffer[-1]
@@ -47,8 +53,9 @@ def _server(root: pathlib.Path):
     s.bind(("127.0.0.1", 0))
     port = s.getsockname()[1]
     s.close()
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler,
-                                directory=str(root))
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(root)
+    )
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     try:
@@ -67,12 +74,14 @@ def _dichte_seite(tmp_path: pathlib.Path, breit: bool) -> pathlib.Path:
     beleg = {"Vodafone": ("https://example.de/vodafone", "2026-09-20")}
     svg = gz._svg(serien, breit, beleg, None)
     breite = gz.BREIT_W if breit else gz.SCHMAL_W
-    html = (f"<!doctype html><html><head><meta charset='utf-8'>"
-           f"<link rel='stylesheet' href='style.css'></head>"
-           f"<body style='margin:0'><div class='gr-zr-bild' "
-           f"style='width:{breite}px'>{svg}</div></body></html>")
+    html = (
+        f"<!doctype html><html><head><meta charset='utf-8'>"
+        f"<link rel='stylesheet' href='style.css'></head>"
+        f"<body style='margin:0'><div class='gr-zr-bild' "
+        f"style='width:{breite}px'>{svg}</div></body></html>"
+    )
     (tmp_path / "index.html").write_text(html, encoding="utf-8")
-    css_pfad = (pathlib.Path(gz.__file__).parent / "templates" / "style.css")
+    css_pfad = pathlib.Path(gz.__file__).parent / "templates" / "style.css"
     css = in_stylesheet(css_pfad.read_text(encoding="utf-8"))
     (tmp_path / "style.css").write_text(css, encoding="utf-8")
     return tmp_path
@@ -80,15 +89,14 @@ def _dichte_seite(tmp_path: pathlib.Path, breit: bool) -> pathlib.Path:
 
 def _messe_ueberlapp(tmp_path, breite_px, breit):
     sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt").sync_playwright
+        "playwright.sync_api", reason="playwright fehlt"
+    ).sync_playwright
     root = _dichte_seite(tmp_path, breit)
     exe = _chromium()
     with _server(root) as basis, sync_playwright() as p:
-        browser = (p.chromium.launch(executable_path=exe) if exe
-                   else p.chromium.launch())
+        browser = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
         try:
-            context = browser.new_context(
-                viewport={"width": breite_px, "height": 700})
+            context = browser.new_context(viewport={"width": breite_px, "height": 700})
             page = context.new_page()
             page.goto(f"{basis}/index.html", wait_until="load")
             boxen = page.eval_on_selector_all(
@@ -96,7 +104,8 @@ def _messe_ueberlapp(tmp_path, breite_px, breit):
                 "els => els.map(e => {"
                 "const r = e.getBoundingClientRect();"
                 "return {links: r.left, rechts: r.right, "
-                "text: e.textContent};})")
+                "text: e.textContent};})",
+            )
         finally:
             browser.close()
     return boxen
@@ -110,7 +119,8 @@ def test_x_labels_ueberlappen_nicht_schmal_390px(tmp_path):
         assert a["rechts"] <= b["links"] + 0.5, (
             f"X-Labels ueberlappen: {a['text']!r} "
             f"({a['links']:.1f}-{a['rechts']:.1f}) trifft "
-            f"{b['text']!r} ({b['links']:.1f}-{b['rechts']:.1f})")
+            f"{b['text']!r} ({b['links']:.1f}-{b['rechts']:.1f})"
+        )
 
 
 def test_x_labels_ueberlappen_nicht_breit_1440px(tmp_path):
@@ -121,7 +131,8 @@ def test_x_labels_ueberlappen_nicht_breit_1440px(tmp_path):
         assert a["rechts"] <= b["links"] + 0.5, (
             f"X-Labels ueberlappen: {a['text']!r} "
             f"({a['links']:.1f}-{a['rechts']:.1f}) trifft "
-            f"{b['text']!r} ({b['links']:.1f}-{b['rechts']:.1f})")
+            f"{b['text']!r} ({b['links']:.1f}-{b['rechts']:.1f})"
+        )
 
 
 def test_jeder_messtag_traegt_trotzdem_eine_rasterlinie(tmp_path):
@@ -133,8 +144,13 @@ def test_jeder_messtag_traegt_trotzdem_eine_rasterlinie(tmp_path):
     # eine Rasterlinie je Messtag PLUS die y-Rasterlinien - untere Grenze
     # reicht: mindestens 12 vertikale x1==x2 Linien.
     import re
-    linien = re.findall(r"<line class='gr-zr-raster' x1='([\d.]+)' "
-                        r"y1='[\d.]+' x2='([\d.]+)'", svg)
+
+    linien = re.findall(
+        r"<line class='gr-zr-raster' x1='([\d.]+)' "
+        r"y1='[\d.]+' x2='([\d.]+)'",
+        svg,
+    )
     vertikale = [l for l in linien if l[0] == l[1]]
     assert len(vertikale) == 12, (
-        f"{len(vertikale)} vertikale Rasterlinien statt 12 Messtagen")
+        f"{len(vertikale)} vertikale Rasterlinien statt 12 Messtagen"
+    )

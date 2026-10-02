@@ -6,6 +6,7 @@ JSON-LD (freenet mitsamt Varianten unter `isSimilarTo`), ALDI TALK
 schema.org-Microdata, Shopify-Shops ihren Katalog als products.json.
 Kein Test fasst das Netz an.
 """
+
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -38,18 +39,45 @@ def _fixture(name: str) -> str:
     return (_FIX / name).read_text(encoding="utf-8")
 
 
-_KATALOG = Katalog(geraete=[
-    Geraet(hersteller="Apple", modell="iPhone 17 Pro Max", generation=17,
-           speicher=[256, 512, 1024], segment="flagship"),
-    Geraet(hersteller="Samsung", modell="Galaxy A57", generation=57,
-           speicher=[128, 256], segment="mid"),
-    Geraet(hersteller="Google", modell="Pixel 10 Pro", generation=10,
-           speicher=[128, 256], segment="flagship"),
-    Geraet(hersteller="Motorola", modell="Motorola moto g85", generation=85,
-           speicher=[128, 256], segment="mid"),
-])
-_FARBEN = {"titannatur": "titan-natur", "blau": "blau", "obsidian": "schwarz",
-           "porcelain": "weiss", "moonstone": "grau"}
+_KATALOG = Katalog(
+    geraete=[
+        Geraet(
+            hersteller="Apple",
+            modell="iPhone 17 Pro Max",
+            generation=17,
+            speicher=[256, 512, 1024],
+            segment="flagship",
+        ),
+        Geraet(
+            hersteller="Samsung",
+            modell="Galaxy A57",
+            generation=57,
+            speicher=[128, 256],
+            segment="mid",
+        ),
+        Geraet(
+            hersteller="Google",
+            modell="Pixel 10 Pro",
+            generation=10,
+            speicher=[128, 256],
+            segment="flagship",
+        ),
+        Geraet(
+            hersteller="Motorola",
+            modell="Motorola moto g85",
+            generation=85,
+            speicher=[128, 256],
+            segment="mid",
+        ),
+    ]
+)
+_FARBEN = {
+    "titannatur": "titan-natur",
+    "blau": "blau",
+    "obsidian": "schwarz",
+    "porcelain": "weiss",
+    "moonstone": "grau",
+}
 
 
 def _jetzt(stunde=3):
@@ -60,31 +88,47 @@ def _jetzt(stunde=3):
 # Preise lesen
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("roh,erwartet", [
-    ("1449.00", 1449.0), (1099, 1099.0), ("1099", 1099.0),
-    ("1.099,00", 1099.0), ("1.099", 1099.0), ("189,99", 189.99),
-    ("1.234.567,89", 1234567.89 if False else None),   # ueber der Obergrenze
-    ("349,00 €", 349.0), ("", None), (None, None), ("kostenlos", None),
-    ("0", None), ("-5", None),
-])
+
+@pytest.mark.parametrize(
+    "roh,erwartet",
+    [
+        ("1449.00", 1449.0),
+        (1099, 1099.0),
+        ("1099", 1099.0),
+        ("1.099,00", 1099.0),
+        ("1.099", 1099.0),
+        ("189,99", 189.99),
+        ("1.234.567,89", 1234567.89 if False else None),  # ueber der Obergrenze
+        ("349,00 €", 349.0),
+        ("", None),
+        (None, None),
+        ("kostenlos", None),
+        ("0", None),
+        ("-5", None),
+    ],
+)
 def test_preisformate(roh, erwartet):
     assert lies_preis(roh) == erwartet
 
 
 def test_deutscher_tausenderpunkt_wird_nicht_zum_dezimaltrenner():
-    """"1.099" ist 1099 Euro und nicht 1,099 Euro - der Fehler, der einen
+    """ "1.099" ist 1099 Euro und nicht 1,099 Euro - der Fehler, der einen
     Flaggschiffpreis in die Entry-Spalte der Positionskarte schiebt."""
     assert lies_preis("1.099") == 1099.0
-    assert lies_preis("1.99") == 1.99      # zwei Nachkommastellen: Dezimal
+    assert lies_preis("1.99") == 1.99  # zwei Nachkommastellen: Dezimal
 
 
-@pytest.mark.parametrize("wert,erwartet", [
-    ("http://schema.org/InStock", "lieferbar"),
-    ("https://schema.org/PreOrder", "vorbestellbar"),
-    ("https://schema.org/BackOrder", "nicht_lieferbar"),
-    ("http://schema.org/OutOfStock", "ausverkauft"),
-    ("", "unbekannt"), ("Quatsch", "unbekannt"),
-])
+@pytest.mark.parametrize(
+    "wert,erwartet",
+    [
+        ("http://schema.org/InStock", "lieferbar"),
+        ("https://schema.org/PreOrder", "vorbestellbar"),
+        ("https://schema.org/BackOrder", "nicht_lieferbar"),
+        ("http://schema.org/OutOfStock", "ausverkauft"),
+        ("", "unbekannt"),
+        ("Quatsch", "unbekannt"),
+    ],
+)
 def test_verfuegbarkeit(wert, erwartet):
     assert verfuegbarkeit_aus_schema(wert) == erwartet
 
@@ -92,8 +136,10 @@ def test_verfuegbarkeit(wert, erwartet):
 def test_ausverkauft_ist_keine_auslistung():
     # Teil F: eine Verfuegbarkeitsstufe ist kein Portfolio-Ende. Das Wort
     # "ausgelistet" darf aus einer einzelnen Seite gar nicht entstehen.
-    werte = {verfuegbarkeit_aus_schema(w) for w in
-             ("InStock", "OutOfStock", "SoldOut", "Discontinued", "BackOrder")}
+    werte = {
+        verfuegbarkeit_aus_schema(w)
+        for w in ("InStock", "OutOfStock", "SoldOut", "Discontinued", "BackOrder")
+    }
     assert "ausgelistet" not in werte
 
 
@@ -106,6 +152,7 @@ def test_lockpreis_erkannt():
 # --------------------------------------------------------------------------
 # Strukturierte Daten
 # --------------------------------------------------------------------------
+
 
 def test_ldjson_produkt():
     saetze = produkte_aus_ldjson(_fixture("medimax_produkt.html"))
@@ -136,14 +183,18 @@ def test_microdata_wenn_kein_ldjson():
 
 def test_kaskade_nimmt_ldjson_zuerst():
     assert produkte_aus_html(_fixture("medimax_produkt.html"))[0]["quelle"] == "ldjson"
-    assert produkte_aus_html(_fixture("alditalk_produkt.html"))[0]["quelle"] == "microdata"
+    assert (
+        produkte_aus_html(_fixture("alditalk_produkt.html"))[0]["quelle"] == "microdata"
+    )
 
 
 def test_kaputtes_ldjson_kippt_die_seite_nicht():
-    html = ('<script type="application/ld+json">{kaputt</script>'
-            '<script type="application/ld+json">'
-            '{"@type":"Product","name":"Apple iPhone 17 Pro Max 256GB",'
-            '"offers":{"price":"1449.00","priceCurrency":"EUR"}}</script>')
+    html = (
+        '<script type="application/ld+json">{kaputt</script>'
+        '<script type="application/ld+json">'
+        '{"@type":"Product","name":"Apple iPhone 17 Pro Max 256GB",'
+        '"offers":{"price":"1449.00","priceCurrency":"EUR"}}</script>'
+    )
     assert len(produkte_aus_ldjson(html)) == 1
 
 
@@ -172,9 +223,13 @@ def test_kaputtes_shopify_json_wirft_statt_leer_zurueckzugeben():
 # Linkernte
 # --------------------------------------------------------------------------
 
+
 def test_linkernte_aus_html_mit_pfadmuster():
-    links = ernte_links(_fixture("medimax_kategorie.html"),
-                        "https://www.medimax.de/c/116/smartphones", "/p/")
+    links = ernte_links(
+        _fixture("medimax_kategorie.html"),
+        "https://www.medimax.de/c/116/smartphones",
+        "/p/",
+    )
     assert links == [
         "https://www.medimax.de/p/1518897/galaxy-a57-5g-a576b-128gb",
         "https://www.medimax.de/p/1514136/iphone-17-pro-max-256gb",
@@ -183,17 +238,23 @@ def test_linkernte_aus_html_mit_pfadmuster():
 
 
 def test_fremde_domain_faellt_raus():
-    links = ernte_links(_fixture("medimax_kategorie.html"),
-                        "https://www.medimax.de/c/116/smartphones", "")
+    links = ernte_links(
+        _fixture("medimax_kategorie.html"),
+        "https://www.medimax.de/c/116/smartphones",
+        "",
+    )
     assert not any("fremd.de" in l for l in links)
 
 
 def test_linkernte_aus_sitemap():
     # Das Geraetemuster allein trifft auch das Tablet - genau die Streuung,
     # fuer die es die Musterliste (Test darunter) braucht.
-    links = ernte_links(_fixture("freenet_sitemap.xml"),
-                        "https://www.freenet.de/sitemap.xml",
-                        "-ohne-vertrag/p/P-M-", kind="sitemap")
+    links = ernte_links(
+        _fixture("freenet_sitemap.xml"),
+        "https://www.freenet.de/sitemap.xml",
+        "-ohne-vertrag/p/P-M-",
+        kind="sitemap",
+    )
     assert links == [
         "https://www.freenet.de/handys-smartphones/google/"
         "google-pixel-10-pro-ohne-vertrag/p/P-M-4206120",
@@ -207,17 +268,25 @@ def test_musterliste_verlangt_alle_teile():
     dem Geraetemuster auch Tablets; jede dieser Seiten kostet Crawl-delay-
     Sekunden des Zeitbudgets, ohne je den Katalog treffen zu koennen -
     das war die halbe Ursache des verhungerten Nachtlaufs (G0, 28.08.2026)."""
-    links = ernte_links(_fixture("freenet_sitemap.xml"),
-                        "https://www.freenet.de/sitemap.xml",
-                        ["/handys-smartphones/", "-ohne-vertrag/p/P-M-"],
-                        kind="sitemap")
-    assert links == ["https://www.freenet.de/handys-smartphones/google/"
-                     "google-pixel-10-pro-ohne-vertrag/p/P-M-4206120"]
+    links = ernte_links(
+        _fixture("freenet_sitemap.xml"),
+        "https://www.freenet.de/sitemap.xml",
+        ["/handys-smartphones/", "-ohne-vertrag/p/P-M-"],
+        kind="sitemap",
+    )
+    assert links == [
+        "https://www.freenet.de/handys-smartphones/google/"
+        "google-pixel-10-pro-ohne-vertrag/p/P-M-4206120"
+    ]
 
 
 def test_sitemap_ohne_muster_nimmt_alles_der_domain():
-    links = ernte_links(_fixture("freenet_sitemap.xml"),
-                        "https://www.freenet.de/sitemap.xml", "", kind="sitemap")
+    links = ernte_links(
+        _fixture("freenet_sitemap.xml"),
+        "https://www.freenet.de/sitemap.xml",
+        "",
+        kind="sitemap",
+    )
     assert len(links) == 5
 
 
@@ -230,10 +299,21 @@ _ROBOTS_FREI = (200, "User-agent: *\nDisallow: /cart\n")
 
 def _anbieter(**kw):
     grund = kw.pop("einstieg_kind", "static")
-    vor = {"name": "Medimax", "typ": "handel", "methode": "ldjson",
-           "basis_url": "https://www.medimax.de", "rate_limit_sekunden": 0,
-           "einstiege": [Einstieg(url="https://www.medimax.de/c/116/smartphones",
-                                  label="Smartphones", kind=grund, pfadmuster="/p/")]}
+    vor = {
+        "name": "Medimax",
+        "typ": "handel",
+        "methode": "ldjson",
+        "basis_url": "https://www.medimax.de",
+        "rate_limit_sekunden": 0,
+        "einstiege": [
+            Einstieg(
+                url="https://www.medimax.de/c/116/smartphones",
+                label="Smartphones",
+                kind=grund,
+                pfadmuster="/p/",
+            )
+        ],
+    }
     vor.update(kw)
     return Anbieter(**vor)
 
@@ -247,33 +327,42 @@ def _hole_fabrik(seiten, protokoll=None):
         if url in seiten:
             return (200, seiten[url])
         return (404, "")
+
     return hole
 
 
 _SEITEN = {
     "https://www.medimax.de/c/116/smartphones": _fixture("medimax_kategorie.html"),
-    "https://www.medimax.de/p/1518897/galaxy-a57-5g-a576b-128gb":
-        _fixture("medimax_produkt.html"),
-    "https://www.medimax.de/p/1514136/iphone-17-pro-max-256gb":
-        _fixture("medimax_produkt.html"),
-    "https://www.medimax.de/p/1514200/huelle-iphone-17":
-        "<html><body>Zubehör ohne strukturierte Daten</body></html>",
+    "https://www.medimax.de/p/1518897/galaxy-a57-5g-a576b-128gb": _fixture(
+        "medimax_produkt.html"
+    ),
+    "https://www.medimax.de/p/1514136/iphone-17-pro-max-256gb": _fixture(
+        "medimax_produkt.html"
+    ),
+    "https://www.medimax.de/p/1514200/huelle-iphone-17": "<html><body>Zubehör ohne strukturierte Daten</body></html>",
 }
 
 
 def _lauf(anbieter=None, seiten=None, protokoll=None, jetzt=None, frist_bis=None):
     hole = _hole_fabrik(seiten if seiten is not None else _SEITEN, protokoll)
     waechter = RobotsWaechter(hole=hole)
-    return sammle_anbieter(anbieter or _anbieter(), _KATALOG, _FARBEN, hole,
-                           "2026-08-11", waechter, jetzt or _jetzt(),
-                           frist_bis=frist_bis)
+    return sammle_anbieter(
+        anbieter or _anbieter(),
+        _KATALOG,
+        _FARBEN,
+        hole,
+        "2026-08-11",
+        waechter,
+        jetzt or _jetzt(),
+        frist_bis=frist_bis,
+    )
 
 
 def test_ende_zu_ende_ergibt_belegte_listungen():
     bilanz = _lauf()
     assert bilanz.status == "ok"
     assert bilanz.produkte_abgerufen == 3
-    assert len(bilanz.listungen) == 2      # die Huelle liefert nichts
+    assert len(bilanz.listungen) == 2  # die Huelle liefert nichts
     l = bilanz.listungen[0]
     assert l.preis_ohne_vertrag == 1449.0
     assert l.sku_id == "apple-iphone-17-pro-max-256gb-titan-natur"
@@ -318,8 +407,16 @@ def test_ausserhalb_der_besuchszeit_wird_nichts_geholt_und_nichts_gelesen():
         return (200, seiten.get(url, ""))
 
     waechter = RobotsWaechter(hole=hole)
-    bilanz = sammle_anbieter(_anbieter(), _KATALOG, _FARBEN, hole, "2026-08-11",
-                             waechter, _jetzt(8), frist_bis=None)
+    bilanz = sammle_anbieter(
+        _anbieter(),
+        _KATALOG,
+        _FARBEN,
+        hole,
+        "2026-08-11",
+        waechter,
+        _jetzt(8),
+        frist_bis=None,
+    )
     assert bilanz.gelesene_einstiege == set()
     assert bilanz.vollstaendig is False
     assert "Besuchszeit" in bilanz.grund
@@ -337,8 +434,16 @@ def test_gesperrter_pfad_wird_nicht_abgerufen():
         return (200, seiten.get(url, ""))
 
     waechter = RobotsWaechter(hole=hole)
-    bilanz = sammle_anbieter(_anbieter(), _KATALOG, _FARBEN, hole, "2026-08-11",
-                             waechter, _jetzt(), frist_bis=None)
+    bilanz = sammle_anbieter(
+        _anbieter(),
+        _KATALOG,
+        _FARBEN,
+        hole,
+        "2026-08-11",
+        waechter,
+        _jetzt(),
+        frist_bis=None,
+    )
     assert [u for u in protokoll if "/p/" in u] == []
     assert bilanz.listungen == []
     # Die Kategorieseite war lesbar, aber keins ihrer Produkte - sie gilt
@@ -350,6 +455,7 @@ def test_zeitbudget_bricht_sauber_ab_und_altert_nichts():
     """Teil F: bei Fristablauf sauber abbrechen, Teilergebnis behalten - und
     die halb gelesene Seite NICHT als gelesen fuehren."""
     import time
+
     bilanz = _lauf(frist_bis=time.monotonic() - 1)
     assert bilanz.status == "frist"
     assert bilanz.gelesene_einstiege == set()
@@ -361,7 +467,8 @@ def test_unbekannte_titel_werden_gemeldet_statt_verworfen():
     seiten["https://www.medimax.de/p/1514200/huelle-iphone-17"] = (
         '<script type="application/ld+json">{"@type":"Product",'
         '"name":"Fairphone 6 256 GB","offers":{"price":"599.00","priceCurrency":"EUR"}}'
-        "</script>")
+        "</script>"
+    )
     bilanz = _lauf(seiten=seiten)
     assert "Fairphone 6 256 GB" in bilanz.unbekannte_titel
 
@@ -371,7 +478,8 @@ def test_fremde_waehrung_wird_nicht_uebernommen():
     seiten["https://www.medimax.de/p/1514136/iphone-17-pro-max-256gb"] = (
         '<script type="application/ld+json">{"@type":"Product",'
         '"name":"Apple iPhone 17 Pro Max 256GB Titannatur",'
-        '"offers":{"price":"1449.00","priceCurrency":"CHF"}}</script>')
+        '"offers":{"price":"1449.00","priceCurrency":"CHF"}}</script>'
+    )
     bilanz = _lauf(seiten=seiten)
     assert len(bilanz.listungen) == 1
 
@@ -383,10 +491,12 @@ def test_lockpreis_wird_nicht_als_ladenpreis_gefuehrt():
     seiten["https://www.medimax.de/p/1514136/iphone-17-pro-max-256gb"] = (
         '<script type="application/ld+json">{"@type":"Product",'
         '"name":"Apple iPhone 17 Pro Max 256GB Titannatur",'
-        '"offers":{"price":"1.00","priceCurrency":"EUR"}}</script>')
+        '"offers":{"price":"1.00","priceCurrency":"EUR"}}</script>'
+    )
     bilanz = _lauf(seiten=seiten)
-    lock = [l for l in bilanz.listungen
-            if l.quelle_url.endswith("iphone-17-pro-max-256gb")]
+    lock = [
+        l for l in bilanz.listungen if l.quelle_url.endswith("iphone-17-pro-max-256gb")
+    ]
     assert len(lock) == 1
     assert lock[0].preis_ohne_vertrag is None
     assert lock[0].preisart == "kein_preis"
@@ -406,9 +516,12 @@ def test_gescheiterter_einstieg_ist_kein_leeres_ergebnis():
 
 def test_nicht_umgesetzte_methode_sagt_das_und_ruehrt_nichts_an():
     protokoll = []
-    bilanz = _lauf(_anbieter(name="Telekom", methode="json_endpunkt",
-                             grund="Preis nur im Zustandsobjekt"),
-                   protokoll=protokoll)
+    bilanz = _lauf(
+        _anbieter(
+            name="Telekom", methode="json_endpunkt", grund="Preis nur im Zustandsobjekt"
+        ),
+        protokoll=protokoll,
+    )
     assert bilanz.status == "nicht_umgesetzt"
     assert bilanz.grund == "Preis nur im Zustandsobjekt"
     assert protokoll == []
@@ -416,8 +529,14 @@ def test_nicht_umgesetzte_methode_sagt_das_und_ruehrt_nichts_an():
 
 
 def test_deaktivierter_anbieter_behaelt_seinen_grund():
-    bilanz = _lauf(_anbieter(name="Amazon", aktiv=False, methode="deaktiviert",
-                             grund="erfordert Product-Advertising-API-Zugang"))
+    bilanz = _lauf(
+        _anbieter(
+            name="Amazon",
+            aktiv=False,
+            methode="deaktiviert",
+            grund="erfordert Product-Advertising-API-Zugang",
+        )
+    )
     assert bilanz.status == "uebersprungen"
     assert "API" in bilanz.grund
 
@@ -426,16 +545,29 @@ def test_deaktivierter_anbieter_behaelt_seinen_grund():
 # Alle Anbieter
 # --------------------------------------------------------------------------
 
+
 def test_sammle_geht_alle_anbieter_durch_und_meldet_jeden():
-    quellen = QuellenConfig(anbieter=[
-        _anbieter(rang=1),
-        _anbieter(name="Amazon", rang=2, aktiv=False, methode="deaktiviert",
-                  grund="API nötig"),
-        _anbieter(name="fraenk", rang=3, methode="kein_hardware",
-                  grund="vermarktet keine Hardware"),
-    ])
-    ergebnis = sammle(quellen, _KATALOG, _FARBEN, _hole_fabrik(_SEITEN),
-                      "2026-08-11", _jetzt())
+    quellen = QuellenConfig(
+        anbieter=[
+            _anbieter(rang=1),
+            _anbieter(
+                name="Amazon",
+                rang=2,
+                aktiv=False,
+                methode="deaktiviert",
+                grund="API nötig",
+            ),
+            _anbieter(
+                name="fraenk",
+                rang=3,
+                methode="kein_hardware",
+                grund="vermarktet keine Hardware",
+            ),
+        ]
+    )
+    ergebnis = sammle(
+        quellen, _KATALOG, _FARBEN, _hole_fabrik(_SEITEN), "2026-08-11", _jetzt()
+    )
     assert len(ergebnis["anbieter"]) == 3
     assert {b.name for b in ergebnis["anbieter"]} == {"Medimax", "Amazon", "fraenk"}
     assert len(ergebnis["listungen"]) == 2
@@ -449,6 +581,7 @@ def test_sammle_geht_alle_anbieter_durch_und_meldet_jeden():
 # --------------------------------------------------------------------------
 # Die Befunde des Reviews vom 10.08.2026
 # --------------------------------------------------------------------------
+
 
 def test_abgeschnittene_seite_gilt_nicht_als_gelesen():
     """Befund 3, und er haette am meisten Schaden angerichtet: `max_produkte`
@@ -472,15 +605,15 @@ def test_ein_gedeckelter_anbieter_heisst_nicht_kein_einstieg_lesbar():
     erreicht. Wer das Protokoll liest, muss den Unterschied sehen; sonst
     sucht die naechste Session einen Ausfall, den es nicht gibt."""
     bilanz = _lauf(_anbieter(max_produkte=2))
-    assert bilanz.status == "fehler"          # richtig: nichts darf altern
+    assert bilanz.status == "fehler"  # richtig: nichts darf altern
     assert "kein Einstieg lesbar" not in bilanz.grund
-    assert "3 Adressen" in bilanz.grund       # der Deckel steht drin
+    assert "3 Adressen" in bilanz.grund  # der Deckel steht drin
 
 
 def test_kein_einstieg_lesbar_bleibt_fuer_den_echten_ausfall():
     """Gegenprobe: wenn die Einstiegsseite wirklich nicht kommt, soll genau
     das dastehen - und nicht ploetzlich eine Deckelmeldung."""
-    bilanz = _lauf(seiten={})          # die Einstiegsseite antwortet 404
+    bilanz = _lauf(seiten={})  # die Einstiegsseite antwortet 404
     assert bilanz.status == "fehler"
     assert bilanz.produkte_abgerufen == 0
     assert "HTTP 404" in bilanz.grund
@@ -500,8 +633,7 @@ def test_sammelknoten_einer_produktseite_wird_verworfen():
     als eigene Listung geschrieben kollidiert er mit jeder Variante, deren
     Speicher nicht gelesen werden konnte."""
     seiten = {
-        "https://www.medimax.de/c/116/smartphones":
-            '<a href="/p/1/pixel">Pixel</a>',
+        "https://www.medimax.de/c/116/smartphones": '<a href="/p/1/pixel">Pixel</a>',
         "https://www.medimax.de/p/1/pixel": _fixture("freenet_produkt.html"),
     }
     bilanz = _lauf(seiten=seiten)
@@ -512,10 +644,9 @@ def test_sammelknoten_einer_produktseite_wird_verworfen():
 def test_seite_mit_nur_einem_sammelknoten_behaelt_ihn():
     seiten = {
         "https://www.medimax.de/c/116/smartphones": '<a href="/p/1/x">X</a>',
-        "https://www.medimax.de/p/1/x":
-            '<script type="application/ld+json">{"@type":"Product",'
-            '"name":"Apple iPhone 17 Pro Max","offers":{"price":"1449.00",'
-            '"priceCurrency":"EUR"}}</script>',
+        "https://www.medimax.de/p/1/x": '<script type="application/ld+json">{"@type":"Product",'
+        '"name":"Apple iPhone 17 Pro Max","offers":{"price":"1449.00",'
+        '"priceCurrency":"EUR"}}</script>',
     }
     bilanz = _lauf(seiten=seiten)
     assert len(bilanz.listungen) == 1
@@ -529,7 +660,8 @@ def test_unbekannte_farbe_der_quelle_landet_in_der_arbeitsliste():
     seiten["https://www.medimax.de/p/1514136/iphone-17-pro-max-256gb"] = (
         '<script type="application/ld+json">{"@type":"Product",'
         '"name":"Apple iPhone 17 Pro Max 256GB","color":"Desert Mocha",'
-        '"offers":{"price":"1449.00","priceCurrency":"EUR"}}</script>')
+        '"offers":{"price":"1449.00","priceCurrency":"EUR"}}</script>'
+    )
     bilanz = _lauf(seiten=seiten)
     assert "Desert Mocha" in bilanz.unbekannte_farben
 
@@ -537,6 +669,7 @@ def test_unbekannte_farbe_der_quelle_landet_in_der_arbeitsliste():
 # --------------------------------------------------------------------------
 # Das Zeitbudget ist keine gemeinsame Weide (Diagnose G0 vom 28.08.2026)
 # --------------------------------------------------------------------------
+
 
 def test_ein_grosser_anbieter_laesst_den_naechsten_nicht_verhungern(monkeypatch):
     """Der Befund: freenet (Rang 4, ueber 70 Produktseiten mal Crawl-Abstand)
@@ -549,39 +682,61 @@ def test_ein_grosser_anbieter_laesst_den_naechsten_nicht_verhungern(monkeypatch)
 
     uhr = {"t": 0.0}
     monkeypatch.setattr(g.time, "monotonic", lambda: uhr["t"])
-    monkeypatch.setattr(g.time, "sleep",
-                        lambda s: uhr.__setitem__("t", uhr["t"] + s))
+    monkeypatch.setattr(g.time, "sleep", lambda s: uhr.__setitem__("t", uhr["t"] + s))
 
-    produkt = ('<script type="application/ld+json">{"@type":"Product",'
-               '"name":"Apple iPhone 17 Pro Max 256GB Titannatur",'
-               '"offers":{"price":"1449.00","priceCurrency":"EUR"}}</script>')
-    seiten = {"https://www.gross.de/kat":
-              "".join(f'<a href="/p/{i}">P{i}</a>' for i in range(20)),
-              "https://www.klein.de/kat": '<a href="/p/1">P1</a>',
-              "https://www.klein.de/p/1": produkt}
+    produkt = (
+        '<script type="application/ld+json">{"@type":"Product",'
+        '"name":"Apple iPhone 17 Pro Max 256GB Titannatur",'
+        '"offers":{"price":"1449.00","priceCurrency":"EUR"}}</script>'
+    )
+    seiten = {
+        "https://www.gross.de/kat": "".join(
+            f'<a href="/p/{i}">P{i}</a>' for i in range(20)
+        ),
+        "https://www.klein.de/kat": '<a href="/p/1">P1</a>',
+        "https://www.klein.de/p/1": produkt,
+    }
     seiten.update({f"https://www.gross.de/p/{i}": produkt for i in range(20)})
 
     def hole(url):
-        uhr["t"] += 30.0                      # jeder Abruf kostet 30 Sekunden
+        uhr["t"] += 30.0  # jeder Abruf kostet 30 Sekunden
         if url.endswith("/robots.txt"):
             return _ROBOTS_FREI
         return (200, seiten[url]) if url in seiten else (404, "")
 
-    quellen = QuellenConfig(anbieter=[
-        _anbieter(name="Gross", rang=1, basis_url="https://www.gross.de",
-                  einstiege=[Einstieg(url="https://www.gross.de/kat",
-                                      kind="static", pfadmuster="/p/")]),
-        _anbieter(name="Klein", rang=2, basis_url="https://www.klein.de",
-                  einstiege=[Einstieg(url="https://www.klein.de/kat",
-                                      kind="static", pfadmuster="/p/")]),
-    ])
-    ergebnis = sammle(quellen, _KATALOG, _FARBEN, hole, "2026-08-28",
-                      _jetzt(), frist_sekunden=600.0)
+    quellen = QuellenConfig(
+        anbieter=[
+            _anbieter(
+                name="Gross",
+                rang=1,
+                basis_url="https://www.gross.de",
+                einstiege=[
+                    Einstieg(
+                        url="https://www.gross.de/kat", kind="static", pfadmuster="/p/"
+                    )
+                ],
+            ),
+            _anbieter(
+                name="Klein",
+                rang=2,
+                basis_url="https://www.klein.de",
+                einstiege=[
+                    Einstieg(
+                        url="https://www.klein.de/kat", kind="static", pfadmuster="/p/"
+                    )
+                ],
+            ),
+        ]
+    )
+    ergebnis = sammle(
+        quellen, _KATALOG, _FARBEN, hole, "2026-08-28", _jetzt(), frist_sekunden=600.0
+    )
     gross, klein = ergebnis["anbieter"]
     assert gross.status == "frist", "der Grosse laeuft in seinen Anteil"
     assert gross.produkte_abgerufen > 0, "das Teilergebnis bleibt"
-    assert klein.vollstaendig is True, \
+    assert klein.vollstaendig is True, (
         "der Kleine bekommt seine Reserve und liest zu Ende"
+    )
 
 
 def test_bei_knappem_budget_verhungert_nicht_jeder_ausser_dem_letzten(monkeypatch):
@@ -597,21 +752,28 @@ def test_bei_knappem_budget_verhungert_nicht_jeder_ausser_dem_letzten(monkeypatc
 
     uhr = {"t": 0.0}
     monkeypatch.setattr(g.time, "monotonic", lambda: uhr["t"])
-    monkeypatch.setattr(g.time, "sleep",
-                        lambda s: uhr.__setitem__("t", uhr["t"] + s))
+    monkeypatch.setattr(g.time, "sleep", lambda s: uhr.__setitem__("t", uhr["t"] + s))
 
-    produkt = ('<script type="application/ld+json">{"@type":"Product",'
-               '"name":"Apple iPhone 17 Pro Max 256GB Titannatur",'
-               '"offers":{"price":"1449.00","priceCurrency":"EUR"}}</script>')
+    produkt = (
+        '<script type="application/ld+json">{"@type":"Product",'
+        '"name":"Apple iPhone 17 Pro Max 256GB Titannatur",'
+        '"offers":{"price":"1449.00","priceCurrency":"EUR"}}</script>'
+    )
     seiten, anbieter = {}, []
     for i in range(4):
         host = f"https://www.a{i}.de"
         seiten[f"{host}/kat"] = f'<a href="/p/1">P</a>'
         seiten[f"{host}/p/1"] = produkt
-        anbieter.append(_anbieter(
-            name=f"A{i}", rang=i, basis_url=host,
-            einstiege=[Einstieg(url=f"{host}/kat", kind="static",
-                                pfadmuster="/p/")]))
+        anbieter.append(
+            _anbieter(
+                name=f"A{i}",
+                rang=i,
+                basis_url=host,
+                einstiege=[
+                    Einstieg(url=f"{host}/kat", kind="static", pfadmuster="/p/")
+                ],
+            )
+        )
 
     def hole(url):
         uhr["t"] += 20.0
@@ -621,9 +783,17 @@ def test_bei_knappem_budget_verhungert_nicht_jeder_ausser_dem_letzten(monkeypatc
 
     # 240 s fuer vier Anbieter: nicht genug fuer alle, aber die ersten
     # muessen etwas bekommen - nicht null.
-    ergebnis = sammle(QuellenConfig(anbieter=anbieter), _KATALOG, _FARBEN,
-                      hole, "2026-08-29", _jetzt(), frist_sekunden=240.0)
+    ergebnis = sammle(
+        QuellenConfig(anbieter=anbieter),
+        _KATALOG,
+        _FARBEN,
+        hole,
+        "2026-08-29",
+        _jetzt(),
+        frist_sekunden=240.0,
+    )
     mit_funden = [b for b in ergebnis["anbieter"] if b.listungen]
     assert mit_funden, "bei knappem Budget liefert KEIN Anbieter etwas"
-    assert mit_funden[0].name == "A0", \
+    assert mit_funden[0].name == "A0", (
         "der erste Anbieter kommt zuerst dran, nicht der letzte"
+    )

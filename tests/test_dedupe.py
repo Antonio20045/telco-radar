@@ -1,4 +1,5 @@
 """Tests for the novelty layer (seen store, freshness, topic memory)."""
+
 from datetime import datetime, timedelta, timezone
 
 from telco_radar.dedupe import ReportedTopics, SeenStore, filter_fresh
@@ -13,8 +14,9 @@ def _item(title, url, days_old=None):
 
 
 def test_normalize_url_strips_noise():
-    assert normalize_url("https://www.Example.com/News/?utm_source=x&utm_medium=y") \
-        == normalize_url("http://example.com/News")
+    assert normalize_url(
+        "https://www.Example.com/News/?utm_source=x&utm_medium=y"
+    ) == normalize_url("http://example.com/News")
 
 
 def test_seen_store_roundtrip(tmp_path):
@@ -55,7 +57,9 @@ def test_filter_fresh_rejects_far_future_dates():
 def test_reported_topics_memory(tmp_path):
     path = tmp_path / "topics.jsonl"
     topics = ReportedTopics(path, max_entries=2)
-    topics.add(["Vodafone: OneNumber Launch", "Jio: AI plan", "MTN: MoMo"], "2026-07-16")
+    topics.add(
+        ["Vodafone: OneNumber Launch", "Jio: AI plan", "MTN: MoMo"], "2026-07-16"
+    )
 
     reloaded = ReportedTopics(path, max_entries=2)
     assert reloaded.recent() == ["Jio: AI plan", "MTN: MoMo"]  # capped at 2

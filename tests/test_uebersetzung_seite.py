@@ -4,6 +4,7 @@ Der teuerste Fehler waere hier nicht ein fehlender Link, sondern ein
 verschwundener Originallink - die Uebersetzung tritt NEBEN das Original,
 nicht an seine Stelle. Das steht deshalb als eigener Test da.
 """
+
 from __future__ import annotations
 
 import json
@@ -14,8 +15,7 @@ import pytest
 
 from telco_radar.report import uebersetzung_view as uv
 from telco_radar.report.html import render_site, _env
-from telco_radar.uebersetzung.store import (
-    UebersetzungsStore, Uebersetzung, text_hash)
+from telco_radar.uebersetzung.store import UebersetzungsStore, Uebersetzung, text_hash
 
 WURZEL = Path(__file__).resolve().parents[1]
 
@@ -36,6 +36,7 @@ def test_die_id_kommt_aus_der_normalisierten_url():
 def test_die_id_stimmt_mit_der_des_items_ueberein():
     """Die Website darf keinen EIGENEN Schluessel rechnen."""
     from telco_radar.models import Item
+
     url = "https://beispiel.test/a/2"
     assert uv.id_fuer_url(url) == Item(title="t", url=url, source_name="q").id
 
@@ -43,13 +44,20 @@ def test_die_id_stimmt_mit_der_des_items_ueberein():
 # ------------------------------------------------------------------ Zuordnung
 def _store(tmp_path, **kw):
     store = UebersetzungsStore(tmp_path / "uebersetzungen.jsonl")
-    basis = dict(item_id=uv.id_fuer_url("https://beispiel.test/a/1"),
-                 quell_hash=text_hash("q"), titel_de="Deutscher Titel",
-                 absaetze=["Erster Absatz.", "Zweiter Absatz."],
-                 sprache="es", titel_original="Titulo original",
-                 url="https://beispiel.test/a/1", quelle="TeleSemana",
-                 datum="2026-08-13", erstellt_am="2026-08-13",
-                 zeichen_original=4321, herkunft="artikel")
+    basis = dict(
+        item_id=uv.id_fuer_url("https://beispiel.test/a/1"),
+        quell_hash=text_hash("q"),
+        titel_de="Deutscher Titel",
+        absaetze=["Erster Absatz.", "Zweiter Absatz."],
+        sprache="es",
+        titel_original="Titulo original",
+        url="https://beispiel.test/a/1",
+        quelle="TeleSemana",
+        datum="2026-08-13",
+        erstellt_am="2026-08-13",
+        zeichen_original=4321,
+        herkunft="artikel",
+    )
     basis.update(kw)
     store.add(Uebersetzung(**basis))
     return store
@@ -81,8 +89,10 @@ def _seite(tmp_path) -> str:
     # Liste liefe der Test irgendwann gegen eine andere Vorlage als die
     # Website.
     return env.get_template("uebersetzung.html.j2").render(
-        prefix="../", u=seite["u"],
-        **{k: v for k, v in seite.items() if k not in ("u", "dateiname")})
+        prefix="../",
+        u=seite["u"],
+        **{k: v for k, v in seite.items() if k not in ("u", "dateiname")},
+    )
 
 
 def test_die_seite_nennt_die_maschinelle_herkunft(tmp_path):
@@ -139,16 +149,26 @@ def gerendert(tmp_path_factory):
     shutil.copytree(WURZEL / "data" / "reports", basis / "data" / "reports")
     (basis / "data" / "state").mkdir(parents=True, exist_ok=True)
     store = UebersetzungsStore(basis / "data" / "state" / "uebersetzungen.jsonl")
-    store.add(Uebersetzung(
-        item_id=uv.id_fuer_url(ziel["url"]), quell_hash=text_hash("q"),
-        titel_de="Vollstaendig uebersetzte Probemeldung",
-        absaetze=["Ein Absatz."], sprache="es",
-        titel_original=ziel.get("title", ""), url=ziel["url"],
-        quelle=ziel.get("source", "Quelle"), datum="2026-08-13",
-        erstellt_am="2026-08-13", zeichen_original=4321, herkunft="artikel"))
+    store.add(
+        Uebersetzung(
+            item_id=uv.id_fuer_url(ziel["url"]),
+            quell_hash=text_hash("q"),
+            titel_de="Vollstaendig uebersetzte Probemeldung",
+            absaetze=["Ein Absatz."],
+            sprache="es",
+            titel_original=ziel.get("title", ""),
+            url=ziel["url"],
+            quelle=ziel.get("source", "Quelle"),
+            datum="2026-08-13",
+            erstellt_am="2026-08-13",
+            zeichen_original=4321,
+            herkunft="artikel",
+        )
+    )
     store.speichern()
 
     from telco_radar.config import load_config
+
     cfg = load_config(WURZEL)
     render_site(basis / "site", basis / "data" / "reports", cfg)
     return basis / "site", ziel
@@ -192,8 +212,11 @@ def test_der_explorer_bekommt_die_uebersetzung_mitgeliefert(gerendert):
     site, ziel = gerendert
     # Der Explorer steht auf den ARCHIVWOCHEN (reports/<datum>.html), nicht
     # auf meldungen.html - dort listet die Seite ihre Meldungen als HTML.
-    seiten = [p for p in sorted((site / "reports").glob("*.html"))
-              if 'id="explorer-data">' in p.read_text(encoding="utf-8")]
+    seiten = [
+        p
+        for p in sorted((site / "reports").glob("*.html"))
+        if 'id="explorer-data">' in p.read_text(encoding="utf-8")
+    ]
     assert seiten, "keine Seite traegt einen Explorer-Datensatz"
     html = seiten[-1].read_text(encoding="utf-8")
     daten = html.split('id="explorer-data">', 1)[1].split("</script>", 1)[0]
@@ -236,27 +259,37 @@ def test_die_archivwoche_verlinkt_mit_der_richtigen_tiefe(tmp_path_factory):
             if not h.get("url"):
                 continue
             n += 1
-            store.add(Uebersetzung(
-                item_id=uv.id_fuer_url(h["url"]), quell_hash=text_hash("q"),
-                titel_de="Probe", absaetze=["Ein Absatz."], sprache="es",
-                titel_original=h.get("title", ""), url=h["url"],
-                quelle=h.get("source", "Q"), datum="2026-08-13",
-                erstellt_am="2026-08-13", zeichen_original=4321,
-                herkunft="artikel"))
+            store.add(
+                Uebersetzung(
+                    item_id=uv.id_fuer_url(h["url"]),
+                    quell_hash=text_hash("q"),
+                    titel_de="Probe",
+                    absaetze=["Ein Absatz."],
+                    sprache="es",
+                    titel_original=h.get("title", ""),
+                    url=h["url"],
+                    quelle=h.get("source", "Q"),
+                    datum="2026-08-13",
+                    erstellt_am="2026-08-13",
+                    zeichen_original=4321,
+                    herkunft="artikel",
+                )
+            )
     if not n:
         pytest.skip("keine Meldung mit URL")
     store.speichern()
 
     from telco_radar.config import load_config
-    render_site(basis / "site", basis / "data" / "reports",
-                load_config(WURZEL))
+
+    render_site(basis / "site", basis / "data" / "reports", load_config(WURZEL))
 
     archivseite = basis / "site" / "reports" / f"{daten['date']}.html"
     assert archivseite.exists()
     html = archivseite.read_text(encoding="utf-8")
     assert "ueb-link" in html, "der Aufmacher der Archivwoche traegt keinen Link"
     assert 'href="../uebersetzung/' in html, (
-        "die Archivwoche verlinkt ohne ../ und zeigt damit ins Leere")
+        "die Archivwoche verlinkt ohne ../ und zeigt damit ins Leere"
+    )
     # Und die Startseite dieselbe Meldung OHNE das ../
     start = (basis / "site" / "index.html").read_text(encoding="utf-8")
     assert 'href="uebersetzung/' in start
@@ -265,6 +298,7 @@ def test_die_archivwoche_verlinkt_mit_der_richtigen_tiefe(tmp_path_factory):
 def test_das_stylesheet_kennt_den_roten_link(gerendert):
     site, _ = gerendert
     import re
+
     css = (site / "style.css").read_text(encoding="utf-8")
     assert ".ueb-link" in css
     # Der Rotwert wird NICHT neu erfunden, sondern aus der Variablen geholt.
@@ -272,14 +306,23 @@ def test_das_stylesheet_kennt_den_roten_link(gerendert):
     assert regel, "die Regel .ueb-link a fehlt"
     assert "var(--red)" in regel.group(1)
     # Und nirgends im Uebersetzungsblock steht ein eigener Farbwert.
-    block = css[css.index("/* =====================================================  UEBERSETZUNG = */"):]
-    block = block[:block.index("/* ==========================================================  AUFKLAPPER = */")]
+    block = css[
+        css.index(
+            "/* =====================================================  UEBERSETZUNG = */"
+        ) :
+    ]
+    block = block[
+        : block.index(
+            "/* ==========================================================  AUFKLAPPER = */"
+        )
+    ]
     assert not re.search(r"#[0-9a-fA-F]{3,6}\b", block), (
-        "der Uebersetzungsblock erfindet eine eigene Farbe")
+        "der Uebersetzungsblock erfindet eine eigene Farbe"
+    )
 
 
 def test_die_sprache_steht_im_richtigen_fall(tmp_path):
-    """"aus dem Spanisch" ist falsch - und der Satz steht zweimal pro Seite.
+    """ "aus dem Spanisch" ist falsch - und der Satz steht zweimal pro Seite.
 
     Erst beim ANSEHEN der gerenderten Seite aufgefallen, nicht in einem
     Test: die Zeichenkette war korrekt, der Satz war es nicht.
@@ -301,6 +344,7 @@ def test_die_seite_schreibt_deutsch_mit_umlauten(tmp_path):
 
 def test_sprachen_ohne_isch_bleiben_unveraendert():
     from telco_radar.uebersetzung.sprache import sprachname_dativ
+
     assert sprachname_dativ("hi") == "Hindi"
     assert sprachname_dativ("th") == "Thai"
     assert sprachname_dativ("tr") == "Türkischen"
@@ -319,27 +363,38 @@ def titelseite_voll(tmp_path_factory):
     if not reports:
         pytest.skip("keine Berichte im Repo")
     daten = json.loads(reports[-1].read_text(encoding="utf-8"))
-    urls = [h["url"] for region in (daten.get("regions") or {}).values()
-            for h in (region.get("highlights") or []) if h.get("url")]
+    urls = [
+        h["url"]
+        for region in (daten.get("regions") or {}).values()
+        for h in (region.get("highlights") or [])
+        if h.get("url")
+    ]
     if len(urls) < 8:
         pytest.skip("zu wenige Meldungen fuer die Zaehlung")
 
     basis = tmp_path_factory.mktemp("titelseite")
     shutil.copytree(WURZEL / "data" / "reports", basis / "data" / "reports")
     (basis / "data" / "state").mkdir(parents=True, exist_ok=True)
-    store = UebersetzungsStore(
-        basis / "data" / "state" / "uebersetzungen.jsonl")
+    store = UebersetzungsStore(basis / "data" / "state" / "uebersetzungen.jsonl")
     for u in urls:
-        store.add(Uebersetzung(
-            item_id=uv.id_fuer_url(u), quell_hash=text_hash(u),
-            titel_de="Deutsche Fassung", absaetze=["Ein Absatz."],
-            sprache="pl", url=u, quelle="Quelle", erstellt_am="2026-08-15",
-            herkunft="artikel"))
+        store.add(
+            Uebersetzung(
+                item_id=uv.id_fuer_url(u),
+                quell_hash=text_hash(u),
+                titel_de="Deutsche Fassung",
+                absaetze=["Ein Absatz."],
+                sprache="pl",
+                url=u,
+                quelle="Quelle",
+                erstellt_am="2026-08-15",
+                herkunft="artikel",
+            )
+        )
     store.speichern()
 
     from telco_radar.config import load_config
-    render_site(basis / "site", basis / "data" / "reports",
-                load_config(WURZEL))
+
+    render_site(basis / "site", basis / "data" / "reports", load_config(WURZEL))
     return (basis / "site" / "index.html").read_text(encoding="utf-8")
 
 

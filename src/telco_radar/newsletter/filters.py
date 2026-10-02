@@ -32,6 +32,7 @@ Abonnent, und niemand kuratiert sie. Vier Sicherungen ersetzen die Kuration:
      die wirksamste Einzelmassnahme gegen Abo-Muedigkeit, weil sie das
      Problem loest, bevor es Mails erzeugt.
 """
+
 from __future__ import annotations
 
 import json
@@ -56,18 +57,19 @@ class Eintrag:
     benannt (`headline`/`headline`, aber `source`/`brand`, `region`/nichts).
     Die Uebersetzung steht in `quelle.py`, damit sie an EINER Stelle steht.
     """
+
     id: str
     bereich: str
     titel: str
     text: str
     url: str
     absender: str = ""
-    region: str = ""          # Schluessel, nicht Label
+    region: str = ""  # Schluessel, nicht Label
     ressort: str = ""
     betreiber: str = ""
-    gewicht: int = 0          # groesser = wichtiger; sortiert die Ausgabe
+    gewicht: int = 0  # groesser = wichtiger; sortiert die Ausgabe
     datum: str = ""
-    anker: str = ""           # Sprungziel im Webbericht
+    anker: str = ""  # Sprungziel im Webbericht
 
     @property
     def suchtext(self) -> str:
@@ -82,9 +84,10 @@ class Eintrag:
 @dataclass
 class Treffer:
     """Ein Eintrag samt der Begruendung, warum er in dieser Ausgabe steht."""
+
     eintrag: Eintrag
-    grund: str                       # "filter" | "stichwort"
-    stichwort: str = ""              # nur bei grund == "stichwort"
+    grund: str  # "filter" | "stichwort"
+    stichwort: str = ""  # nur bei grund == "stichwort"
 
     @property
     def ueber_stichwort(self) -> bool:
@@ -93,10 +96,11 @@ class Treffer:
 
 # ===========================================================  Stichwoerter ==
 
+
 @dataclass(frozen=True)
 class Stichwort:
     term: str
-    mode: str = "word"               # "word" | "phrase"
+    mode: str = "word"  # "word" | "phrase"
 
     def muster(self) -> re.Pattern | None:
         if self.mode == "phrase":
@@ -109,7 +113,7 @@ class Stichwort:
 
 
 def _phrasen_muster(term: str) -> re.Pattern | None:
-    """"Fixed Wireless Access" - mit beliebigem Zwischenraum.
+    """ "Fixed Wireless Access" - mit beliebigem Zwischenraum.
 
     Zwischen den Woertern steht `[\\s-]+`: der Handel schreibt dieselbe Sache
     mal mit Leerzeichen, mal mit Bindestrich, und ein Umbruch im Fliesstext
@@ -119,8 +123,7 @@ def _phrasen_muster(term: str) -> re.Pattern | None:
     woerter = [re.escape(w) for w in (term or "").split()]
     if not woerter:
         return None
-    return re.compile(r"(?<![\w.])" + r"[\s\-]+".join(woerter) + r"(?!\w)",
-                      re.I)
+    return re.compile(r"(?<![\w.])" + r"[\s\-]+".join(woerter) + r"(?!\w)", re.I)
 
 
 def stichwort_fehler(term: str, katalog: NewsletterKatalog) -> str:
@@ -139,9 +142,11 @@ def stichwort_fehler(term: str, katalog: NewsletterKatalog) -> str:
     # zusammen gesucht wird.
     laengstes = max((len(w) for w in t.split()), default=0)
     if laengstes < katalog.grenzen.min_stichwort_laenge:
-        return (f"Zu kurz: mindestens ein Wort mit "
-                f"{katalog.grenzen.min_stichwort_laenge} Zeichen. Kurze "
-                f"Begriffe treffen zu viel - „tim“ steht in „Optimierung“.")
+        return (
+            f"Zu kurz: mindestens ein Wort mit "
+            f"{katalog.grenzen.min_stichwort_laenge} Zeichen. Kurze "
+            f"Begriffe treffen zu viel - „tim“ steht in „Optimierung“."
+        )
     if len(t) > 60:
         return "Zu lang: höchstens 60 Zeichen."
     return ""
@@ -176,9 +181,11 @@ def lies_stichwoerter(roh) -> list[Stichwort]:
 
 # ==============================================================  Filter  ====
 
+
 @dataclass
 class Filtersatz:
     """Die vier Dimensionen plus Stichwoerter. Leer heisst alles."""
+
     bereiche: tuple[str, ...] = ()
     regionen: tuple[str, ...] = ()
     wettbewerber: tuple[str, ...] = ()
@@ -205,6 +212,7 @@ def lies_filtersatz(roh: dict, katalog: NewsletterKatalog) -> Filtersatz:
     leere Ausgabe (die nicht verschickt wird) statt einer falschen.
     """
     from .config import FELD_JE_DIMENSION
+
     werte = {}
     for dimension in DIMENSIONEN:
         feld = FELD_JE_DIMENSION[dimension]
@@ -214,13 +222,19 @@ def lies_filtersatz(roh: dict, katalog: NewsletterKatalog) -> Filtersatz:
         werte[dimension] = tuple(sorted(set(gewaehlt)))
     return Filtersatz(
         **werte,
-        stichwoerter=tuple(lies_stichwoerter(roh.get("keywords"))[
-            :katalog.grenzen.max_stichwoerter]))
+        stichwoerter=tuple(
+            lies_stichwoerter(roh.get("keywords"))[: katalog.grenzen.max_stichwoerter]
+        ),
+    )
 
 
-def _dimension_trifft(dimension: str, gewaehlt: tuple[str, ...],
-                      eintrag: Eintrag, katalog: NewsletterKatalog) -> bool:
-    if not gewaehlt:                       # leer heisst alles
+def _dimension_trifft(
+    dimension: str,
+    gewaehlt: tuple[str, ...],
+    eintrag: Eintrag,
+    katalog: NewsletterKatalog,
+) -> bool:
+    if not gewaehlt:  # leer heisst alles
         return True
     if dimension == "bereiche":
         return eintrag.bereich in gewaehlt
@@ -247,8 +261,13 @@ def _dimension_trifft(dimension: str, gewaehlt: tuple[str, ...],
     return True
 
 
-def waehle(eintraege, satz: Filtersatz, katalog: NewsletterKatalog,
-           *, max_eintraege: int | None = None) -> list[Treffer]:
+def waehle(
+    eintraege,
+    satz: Filtersatz,
+    katalog: NewsletterKatalog,
+    *,
+    max_eintraege: int | None = None,
+) -> list[Treffer]:
     """Die Ausgabe fuer EINEN Filtersatz. Sortiert, gedeckelt, begruendet.
 
     Die Reihenfolge ist: erst alles, was die Filter treffen, dann die
@@ -264,8 +283,9 @@ def waehle(eintraege, satz: Filtersatz, katalog: NewsletterKatalog,
     for eintrag in eintraege:
         if eintrag.id in gesehen:
             continue
-        passt = all(_dimension_trifft(d, satz.werte(d), eintrag, katalog)
-                    for d in DIMENSIONEN)
+        passt = all(
+            _dimension_trifft(d, satz.werte(d), eintrag, katalog) for d in DIMENSIONEN
+        )
         if passt:
             gesehen.add(eintrag.id)
             ueber_filter.append(Treffer(eintrag=eintrag, grund="filter"))
@@ -275,9 +295,11 @@ def waehle(eintraege, satz: Filtersatz, katalog: NewsletterKatalog,
         for stichwort in satz.stichwoerter:
             if stichwort.trifft(eintrag.suchtext):
                 gesehen.add(eintrag.id)
-                ueber_stichwort.append(Treffer(eintrag=eintrag,
-                                               grund="stichwort",
-                                               stichwort=stichwort.term))
+                ueber_stichwort.append(
+                    Treffer(
+                        eintrag=eintrag, grund="stichwort", stichwort=stichwort.term
+                    )
+                )
                 break
 
     def _rang(t: Treffer):
@@ -311,8 +333,9 @@ def _bericht_dateien(reports_dir: Path, tage: int, heute: date | None = None):
             yield pfad
 
 
-def _texte_aus_berichten(reports_dir: Path, tage: int,
-                         heute: date | None = None) -> list[str]:
+def _texte_aus_berichten(
+    reports_dir: Path, tage: int, heute: date | None = None
+) -> list[str]:
     """Ueberschrift + Zusammenfassung je Meldung der letzten `tage` Tage.
 
     Genau die Textmenge, die auch `Eintrag.suchtext` liefert - eine Vorschau,
@@ -332,15 +355,24 @@ def _texte_aus_berichten(reports_dir: Path, tage: int,
     return texte
 
 
-def vorschau(term: str, reports_dir: Path, *, tage: int = 30,
-             heute: date | None = None, mode: str = "") -> int:
+def vorschau(
+    term: str,
+    reports_dir: Path,
+    *,
+    tage: int = 30,
+    heute: date | None = None,
+    mode: str = "",
+) -> int:
     """Wie viele Meldungen der letzten `tage` Tage haette dieses Stichwort
     getroffen? Die Zahl, die vor dem Absenden auf dem Formular steht."""
     stichwort = lies_stichwoerter([{"term": term, "mode": mode}])
     if not stichwort:
         return 0
-    return sum(1 for text in _texte_aus_berichten(reports_dir, tage, heute)
-               if stichwort[0].trifft(text))
+    return sum(
+        1
+        for text in _texte_aus_berichten(reports_dir, tage, heute)
+        if stichwort[0].trifft(text)
+    )
 
 
 # Rueckwaertskompatibler englischer Name - so steht er im Konzept (N2).
@@ -385,8 +417,11 @@ def _neuester_bericht(reports_dir: Path) -> date | None:
     Stunde dieselbe Zahl - das Fenster wandert nur, wenn ein neuer Bericht
     dazu kommt.
     """
-    stems = [p.stem for p in Path(reports_dir).glob("*.json")
-             if re.fullmatch(r"\d{4}-\d{2}-\d{2}", p.stem)]
+    stems = [
+        p.stem
+        for p in Path(reports_dir).glob("*.json")
+        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", p.stem)
+    ]
     if not stems:
         return None
     try:
@@ -397,8 +432,9 @@ def _neuester_bericht(reports_dir: Path) -> date | None:
         return None
 
 
-def baue_stichwort_index(reports_dir: Path, *, tage: int = 30,
-                         heute: date | None = None) -> dict:
+def baue_stichwort_index(
+    reports_dir: Path, *, tage: int = 30, heute: date | None = None
+) -> dict:
     """Der Index fuer die clientseitige Vorschau (`site/data/keyword-index.json`).
 
     Enthaelt nur Woerter ab vier Zeichen - dieselbe Grenze wie
@@ -414,7 +450,7 @@ def baue_stichwort_index(reports_dir: Path, *, tage: int = 30,
     texte = _texte_aus_berichten(reports_dir, tage, heute)
     zaehler: dict[str, int] = {}
     for text in texte:
-        for wort in _index_woerter(text):     # Menge: EINE Meldung zaehlt 1
+        for wort in _index_woerter(text):  # Menge: EINE Meldung zaehlt 1
             zaehler[wort] = zaehler.get(wort, 0) + 1
     return {
         "stand": (heute or date.today()).isoformat(),

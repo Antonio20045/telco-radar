@@ -135,14 +135,19 @@ haben will, nimmt sie dort in die Kennungsmenge auf - die Angabe dafuer
 muss aus dieser Funktion kommen, denn nur sie weiss, welche Zeile welche
 abgeloest hat.
 """
+
 from __future__ import annotations
 
 from copy import copy
 from typing import Optional
 
 from ..analyze.geraete_store import STATUS_AKTIV
-from ..geraete_model import (VERGLEICHBARE_ZUSTAENDE, farbschluessel,
-                             ohne_zustandswort, zustand_aus_feldern)
+from ..geraete_model import (
+    VERGLEICHBARE_ZUSTAENDE,
+    farbschluessel,
+    ohne_zustandswort,
+    zustand_aus_feldern,
+)
 
 # Die zwei Felder, aus denen Anzeige und Export ihre Farbe bauen - beide mit
 # demselben Ausdruck `farbe_normalisiert or farbe_roh`
@@ -261,7 +266,8 @@ def _verschmolzen(gruppe: list[dict]) -> dict:
     if daten:
         sieger["first_seen"] = min(daten)
     sieger["zwilling_ids"] = sorted(
-        e.get("id") for e in gruppe if e is not sieger and e.get("id"))
+        e.get("id") for e in gruppe if e is not sieger and e.get("id")
+    )
     return sieger
 
 
@@ -292,8 +298,9 @@ def _zwillingsschluessel(eintrag: dict) -> tuple:
         eintrag.get("zuzahlung"),
         eintrag.get("tarif_referenz"),
         eintrag.get("quelle_url"),
-        farbschluessel(eintrag.get("farbe_normalisiert"),
-                       eintrag.get("farbe_roh") or ""),
+        farbschluessel(
+            eintrag.get("farbe_normalisiert"), eintrag.get("farbe_roh") or ""
+        ),
     )
 
 
@@ -322,9 +329,9 @@ def zustand_der_zeile(eintrag: dict) -> str:
     Adapter aus dem strukturierten Feld der Quelle gelesen, und das weiss
     mehr als ein Titel.
     """
-    abgeleitet = zustand_aus_feldern(eintrag.get("titel_roh"),
-                                     eintrag.get("farbe_roh"),
-                                     eintrag.get("quelle_url"))
+    abgeleitet = zustand_aus_feldern(
+        eintrag.get("titel_roh"), eintrag.get("farbe_roh"), eintrag.get("quelle_url")
+    )
     if abgeleitet in VERGLEICHBARE_ZUSTAENDE:
         return eintrag.get("zustand") or "neu"
     return abgeleitet

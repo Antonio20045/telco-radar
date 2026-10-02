@@ -11,6 +11,7 @@ TCO-Zeitreihe):
   c) `style.css` bekommt seinen Anbieterfarben-Block NUR aus dieser
      Tabelle (`css_block`/`in_stylesheet`), nie von Hand.
 """
+
 import logging
 
 import pytest
@@ -22,6 +23,7 @@ from telco_radar.report.geraete_tco_grafik import anbieter_slug
 # --------------------------------------------------------------------------
 # a) bekannte Anbieter - stabile, unterschiedliche Stile
 # --------------------------------------------------------------------------
+
 
 def test_jeder_bekannte_anbieter_hat_einen_stil():
     for name in af.ANBIETER_FARBE:
@@ -74,13 +76,13 @@ def test_haendler_sind_grau_durchgezogen_und_nur_an_der_form_verschieden():
     stand beim Rendern gegen den echten Bestand als benannte Luecke da,
     bis es hier ergaenzt wurde - derselbe Auftrag wie Medimax und
     ElectronicPartner, keine geratene Farbe."""
-    stile = [af.stil_fuer(n) for n in
-            ("medimax", "electronicpartner", "saturn")]
+    stile = [af.stil_fuer(n) for n in ("medimax", "electronicpartner", "saturn")]
     assert all(s.farbe == af.GRAU_HAENDLER for s in stile)
     assert all(s.strich == "voll" for s in stile)
     marker = [s.marker for s in stile]
     assert len(set(marker)) == len(marker), (
-        "gleiche Farbe, gleiche Strichart - nur die Form darf sie trennen")
+        "gleiche Farbe, gleiche Strichart - nur die Form darf sie trennen"
+    )
 
 
 def test_1_und_1_ist_gestrichelt():
@@ -100,6 +102,7 @@ def test_slug_stimmt_mit_geraete_tco_grafik_ueberein():
 # --------------------------------------------------------------------------
 # b) unbekannte Anbieter - benannte Luecke, nie geraten
 # --------------------------------------------------------------------------
+
 
 def test_unbekannter_anbieter_bekommt_die_benannte_luecke():
     stil = af.stil_fuer("Ein ganz neuer Anbieter")
@@ -130,8 +133,10 @@ def test_leerer_anbietername_ist_auch_unbekannt():
 
 def test_legendenname_traegt_den_zusatz_nur_bei_der_luecke():
     assert af.legendenname("Telekom") == "Telekom"
-    assert af.legendenname("Nirgends Gelistet") == \
-        "Nirgends Gelistet (Farbe nicht hinterlegt)"
+    assert (
+        af.legendenname("Nirgends Gelistet")
+        == "Nirgends Gelistet (Farbe nicht hinterlegt)"
+    )
 
 
 def test_farbe_fuer_ist_die_kurzform_von_stil_fuer():
@@ -142,6 +147,7 @@ def test_farbe_fuer_ist_die_kurzform_von_stil_fuer():
 # --------------------------------------------------------------------------
 # c) das Stylesheet - EIN Platzhalter, EIN erzeugter Block
 # --------------------------------------------------------------------------
+
 
 def test_css_block_traegt_jeden_bekannten_anbieter_und_die_luecke():
     block = af.css_block()

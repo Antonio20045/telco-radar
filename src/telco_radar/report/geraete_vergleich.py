@@ -35,6 +35,7 @@ Die Gegenrichtung ist selbst ein Befund: was Wettbewerber fuehren und
 Vodafone nicht, steht in einer eigenen kurzen Zeile. Eine Luecke im eigenen
 Regal ist eine Auskunft, kein fehlender Datensatz.
 """
+
 from __future__ import annotations
 
 from typing import Optional
@@ -74,8 +75,10 @@ def ist_wesentlich(zeile: dict) -> bool:
     """Traegt diese Zeile eine Aussage, oder ist sie Rauschen?"""
     if not zeile.get("bester"):
         return False
-    return ((zeile.get("prozent") or 0) >= WESENTLICH_PROZENT
-            or (zeile.get("differenz") or 0) >= WESENTLICH_EURO)
+    return (zeile.get("prozent") or 0) >= WESENTLICH_PROZENT or (
+        zeile.get("differenz") or 0
+    ) >= WESENTLICH_EURO
+
 
 # Wie in `geraete_view`: Vodafone ist die eigene Referenz, kein Wettbewerber.
 EIGEN = ("vodafone",)
@@ -130,8 +133,10 @@ def _preis(eintrag: dict) -> tuple[Optional[float], str]:
 
 def _belegt(eintrag: dict) -> bool:
     """Traegt diese Listung Quelle UND Abrufdatum?"""
-    return bool((eintrag.get("quelle_url") or "").strip()
-                and (eintrag.get("abgerufen_am") or "").strip())
+    return bool(
+        (eintrag.get("quelle_url") or "").strip()
+        and (eintrag.get("abgerufen_am") or "").strip()
+    )
 
 
 def _angebot(eintrag: dict, laeden: Optional[dict] = None) -> dict:
@@ -180,8 +185,12 @@ def _guenstigstes_je_laden(eintraege: list, laeden: Optional[dict]) -> list:
     return sorted(beste.values(), key=lambda a: a["preis"])
 
 
-def vergleich(eintraege: list, katalog, laeden: Optional[dict] = None,
-              preisart: str = OHNE_VERTRAG) -> dict:
+def vergleich(
+    eintraege: list,
+    katalog,
+    laeden: Optional[dict] = None,
+    preisart: str = OHNE_VERTRAG,
+) -> dict:
     """Je (Modell, Speicher, Zustand) eine Zeile - fuer alles, was Vodafone hat.
 
     Gibt zusaetzlich `ohne_vodafone`: was Wettbewerber fuehren und Vodafone
@@ -206,8 +215,11 @@ def vergleich(eintraege: list, katalog, laeden: Optional[dict] = None,
         # angenommen. Beides bleibt im CSV-Export und in der SKU-Ansicht.
         if (e.get("zustand") or "neu") not in VERGLEICHBARE_ZUSTAENDE:
             continue
-        schluessel = (e.get("device_id"), e.get("speicher_gb"),
-                      e.get("zustand") or "neu")
+        schluessel = (
+            e.get("device_id"),
+            e.get("speicher_gb"),
+            e.get("zustand") or "neu",
+        )
         gruppen.setdefault(schluessel, []).append(e)
 
     zeilen = []
@@ -222,8 +234,11 @@ def vergleich(eintraege: list, katalog, laeden: Optional[dict] = None,
         wettbewerb = _guenstigstes_je_laden(fremde, laeden)
 
         kopf = {
-            "device_id": gid, "modell": modell, "hersteller": hersteller,
-            "speicher": speicher, "zustand": zustand,
+            "device_id": gid,
+            "modell": modell,
+            "hersteller": hersteller,
+            "speicher": speicher,
+            "zustand": zustand,
             "segment": geraet.segment if geraet else "",
         }
 
@@ -248,9 +263,14 @@ def vergleich(eintraege: list, katalog, laeden: Optional[dict] = None,
             # rohe dicts aus der Zustandsdatei sieht - und weil ein falscher
             # Satz ueber das eigene Regal teurer ist als eine fehlende Zeile.
             if wettbewerb and not eigene:
-                ohne_vodafone.append({**kopf, "anbieter": wettbewerb,
-                                      "anzahl": len(wettbewerb),
-                                      "ab_preis": wettbewerb[0]["preis"]})
+                ohne_vodafone.append(
+                    {
+                        **kopf,
+                        "anbieter": wettbewerb,
+                        "anzahl": len(wettbewerb),
+                        "ab_preis": wettbewerb[0]["preis"],
+                    }
+                )
             continue
 
         eigen = vodafone[0]
@@ -273,14 +293,14 @@ def vergleich(eintraege: list, katalog, laeden: Optional[dict] = None,
             bester = guenstiger[0]
             zeile["differenz"] = round(eigen["preis"] - bester["preis"], 2)
             zeile["prozent"] = round(
-                (eigen["preis"] - bester["preis"]) / eigen["preis"] * 100.0, 1)
+                (eigen["preis"] - bester["preis"]) / eigen["preis"] * 100.0, 1
+            )
         zeilen.append(zeile)
 
     # Groesster Abstand zuerst; Zeilen ohne guenstigeren Wettbewerber danach,
     # nach Modell sortiert. Sie verschwinden NICHT - "nirgends guenstiger"
     # ist die Auskunft, wegen der man eine Vergleichsliste liest.
-    zeilen.sort(key=lambda z: (-(z["differenz"] or 0), z["modell"],
-                               z["speicher"] or 0))
+    zeilen.sort(key=lambda z: (-(z["differenz"] or 0), z["modell"], z["speicher"] or 0))
     ohne_vodafone.sort(key=lambda z: (-z["anzahl"], z["modell"]))
 
     mit_vorteil = [z for z in zeilen if z["anzahl_guenstiger"]]
@@ -313,8 +333,7 @@ def vergleich(eintraege: list, katalog, laeden: Optional[dict] = None,
     }
 
 
-def beide_preisarten(eintraege: list, katalog,
-                     laeden: Optional[dict] = None) -> dict:
+def beide_preisarten(eintraege: list, katalog, laeden: Optional[dict] = None) -> dict:
     """Beide Achsen getrennt gerechnet - nie in einer Tabelle gemischt."""
     ohne = vergleich(eintraege, katalog, laeden, OHNE_VERTRAG)
     mit = vergleich(eintraege, katalog, laeden, MIT_VERTRAG)

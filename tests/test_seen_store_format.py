@@ -6,6 +6,7 @@ Migration bekannt war, muss danach bekannt sein - sonst kaeme bereits
 Berichtetes zurueck in den naechsten Wochenbericht. Genau das pruefen diese
 Tests, und zwar getrennt fuer Lesen, Schreiben, Mischbestand und Migration.
 """
+
 from __future__ import annotations
 
 import json
@@ -24,9 +25,16 @@ def _item(url: str, titel: str = "Eine Meldung", quelle: str = "Testquelle") -> 
 
 
 def _v1_zeile(item: Item, stempel: str = "2026-07-17T12:00:00+00:00") -> str:
-    return json.dumps({"id": item.id, "url": item.url, "title": item.title,
-                       "source": item.source_name, "first_seen": stempel},
-                      ensure_ascii=False)
+    return json.dumps(
+        {
+            "id": item.id,
+            "url": item.url,
+            "title": item.title,
+            "source": item.source_name,
+            "first_seen": stempel,
+        },
+        ensure_ascii=False,
+    )
 
 
 def test_neuer_store_schreibt_kompakt(tmp_path):
@@ -87,8 +95,7 @@ def test_add_schreibt_keine_dubletten(tmp_path):
     store = SeenStore(pfad)
     store.add([a])
     store.add([a, _item("https://beispiel.de/b")])
-    hashes = [z for z in pfad.read_text().splitlines()
-              if not z.startswith(("#", "@"))]
+    hashes = [z for z in pfad.read_text().splitlines() if not z.startswith(("#", "@"))]
     assert len(hashes) == len(set(hashes)) == 2
 
 
@@ -105,12 +112,14 @@ def test_add_ohne_neue_meldungen_schreibt_nichts(tmp_path):
 
 # --------------------------------------------------------------- Migration
 
+
 def test_migration_erhaelt_jeden_hash(tmp_path):
     state = tmp_path / "data" / "state"
     state.mkdir(parents=True)
     pfad = state / "seen.jsonl"
-    items = [_item(f"https://beispiel.de/{i}", quelle=f"Quelle {i % 3}")
-             for i in range(20)]
+    items = [
+        _item(f"https://beispiel.de/{i}", quelle=f"Quelle {i % 3}") for i in range(20)
+    ]
     pfad.write_text("".join(_v1_zeile(i) + "\n" for i in items), encoding="utf-8")
     vorher = {i.id for i in items}
 
@@ -125,8 +134,7 @@ def test_migration_schrumpft_deutlich(tmp_path):
     state = tmp_path / "data" / "state"
     state.mkdir(parents=True)
     pfad = state / "seen.jsonl"
-    items = [_item(f"https://beispiel.de/ein-recht-langer-pfad-{i}")
-             for i in range(50)]
+    items = [_item(f"https://beispiel.de/ein-recht-langer-pfad-{i}") for i in range(50)]
     pfad.write_text("".join(_v1_zeile(i) + "\n" for i in items), encoding="utf-8")
     vorher = pfad.stat().st_size
 
@@ -150,16 +158,25 @@ def test_migration_haelt_historie_je_quelle_fest(tmp_path):
     ausgewertet, sonst waere der historische Nenner der Trefferquote weg."""
     state = tmp_path / "data" / "state"
     state.mkdir(parents=True)
-    zeilen = [_v1_zeile(_item(f"https://beispiel.de/a{i}", quelle="Alpha"),
-                        "2026-07-17T12:00:00+00:00") for i in range(3)]
-    zeilen += [_v1_zeile(_item("https://beispiel.de/b1", quelle="Beta"),
-                         "2026-07-20T12:00:00+00:00")]
+    zeilen = [
+        _v1_zeile(
+            _item(f"https://beispiel.de/a{i}", quelle="Alpha"),
+            "2026-07-17T12:00:00+00:00",
+        )
+        for i in range(3)
+    ]
+    zeilen += [
+        _v1_zeile(
+            _item("https://beispiel.de/b1", quelle="Beta"), "2026-07-20T12:00:00+00:00"
+        )
+    ]
     (state / "seen.jsonl").write_text("\n".join(zeilen) + "\n", encoding="utf-8")
 
     migration.main(["--root", str(tmp_path), "--schreiben"])
 
     historie = json.loads(
-        (state / "seen_historie_je_quelle.json").read_text(encoding="utf-8"))
+        (state / "seen_historie_je_quelle.json").read_text(encoding="utf-8")
+    )
     je_quelle = {e["quelle"]: e for e in historie}
     assert je_quelle["Alpha"]["neu_gesamt"] == 3
     assert je_quelle["Beta"]["erste_meldung"] == "2026-07-20"
@@ -169,8 +186,7 @@ def test_migration_ist_wiederholbar(tmp_path):
     state = tmp_path / "data" / "state"
     state.mkdir(parents=True)
     pfad = state / "seen.jsonl"
-    pfad.write_text(_v1_zeile(_item("https://beispiel.de/a")) + "\n",
-                    encoding="utf-8")
+    pfad.write_text(_v1_zeile(_item("https://beispiel.de/a")) + "\n", encoding="utf-8")
     migration.main(["--root", str(tmp_path), "--schreiben"])
     text = pfad.read_text()
     assert migration.main(["--root", str(tmp_path), "--schreiben"]) == 0

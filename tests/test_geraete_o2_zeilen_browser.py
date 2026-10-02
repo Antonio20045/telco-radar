@@ -17,6 +17,7 @@ Vorgabemodell (unbegrenzter Tarif, §7): die Gruppe unter der Bandliste
 braucht ihren eigenen Fall, und die O1-Fixture durfte nicht geändert
 werden - ihre Zahlen stehen in O1-Tests.
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -31,7 +32,15 @@ import yaml
 from telco_radar.report.html import render_site
 
 from test_geraete_browser_fixture import (
-    HEUTE, _chromium, _KATALOG, _FARBEN, _listung, _QUELLEN, _server, _sku)
+    HEUTE,
+    _chromium,
+    _KATALOG,
+    _FARBEN,
+    _listung,
+    _QUELLEN,
+    _server,
+    _sku,
+)
 from test_geraete_zeitreihe_browser import waehle_band, waehle_modell
 
 # Die O1-Lage PLUS einer unbegrenzten Zeile am Vorgabemodell (o2) und
@@ -39,13 +48,10 @@ from test_geraete_zeitreihe_browser import waehle_band, waehle_modell
 # Bandwechsel und Deckelung zu messen.
 _BAENDER_BUENDEL = [
     ("apple-iphone-17-pro", 256, "o2", "o2:klein", "O2 Mobile Klein", 10, 18.0),
-    ("apple-iphone-17-pro", 256, "Vodafone", "vf:klein", "Vodafone Mobil XS",
-     18, 26.0),
-    ("apple-iphone-17-pro", 256, "congstar", "cs:mittel", "Allnet Flat S",
-     50, 20.0),
+    ("apple-iphone-17-pro", 256, "Vodafone", "vf:klein", "Vodafone Mobil XS", 18, 26.0),
+    ("apple-iphone-17-pro", 256, "congstar", "cs:mittel", "Allnet Flat S", 50, 20.0),
     # Unbegrenzt: außerhalb der Bänder - Zeile der Gruppe "Ohne Tarifband".
-    ("apple-iphone-17-pro", 256, "o2", "o2:unlimited", "O2 Unlimited",
-     math.inf, 30.0),
+    ("apple-iphone-17-pro", 256, "o2", "o2:unlimited", "O2 Unlimited", math.inf, 30.0),
     # Modell B für den Modellwechsel-Test.
     ("samsung-galaxy-s26", 256, "1&1", "11:klein", "All-Net-Flat S", 10, 15.0),
 ]
@@ -54,12 +60,14 @@ _BAENDER_BUENDEL = [
 def _baue(tmp_path):
     root = tmp_path / "site_baum"
     (root / "config").mkdir(parents=True)
-    for name, daten in (("geraete_katalog.yaml", _KATALOG),
-                        ("farben.yaml", _FARBEN),
-                        ("geraete_quellen.yaml", _QUELLEN)):
+    for name, daten in (
+        ("geraete_katalog.yaml", _KATALOG),
+        ("farben.yaml", _FARBEN),
+        ("geraete_quellen.yaml", _QUELLEN),
+    ):
         (root / "config" / name).write_text(
-            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
-            encoding="utf-8")
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False), encoding="utf-8"
+        )
     state = root / "data" / "state"
     state.mkdir(parents=True)
     listungen = [
@@ -67,49 +75,83 @@ def _baue(tmp_path):
         _listung("o2", "apple-iphone-17-pro", 256, 1099.00),
         _listung("1&1", "samsung-galaxy-s26", 256, 1049.00),
     ]
-    (state / "geraete_db.json").write_text(json.dumps({
-        "updated": HEUTE, "anbieter": {
-            n: {"laeufe": 4, "funde_gesamt": 1}
-            for n in ("Vodafone", "o2", "1&1")},
-        "listungen": listungen}), encoding="utf-8")
+    (state / "geraete_db.json").write_text(
+        json.dumps(
+            {
+                "updated": HEUTE,
+                "anbieter": {
+                    n: {"laeufe": 4, "funde_gesamt": 1}
+                    for n in ("Vodafone", "o2", "1&1")
+                },
+                "listungen": listungen,
+            }
+        ),
+        encoding="utf-8",
+    )
     (state / "geraete_preise.jsonl").write_text("", encoding="utf-8")
     buendel = []
-    for device_id, speicher, anbieter, tarif_id, tarif, gb, rate \
-            in _BAENDER_BUENDEL:
-        buendel.append({
-            "id": f"buendel--{anbieter.lower()}--{_sku(device_id, speicher)}"
-                  f"--{tarif_id}",
-            "sku_id": _sku(device_id, speicher), "anbieter": anbieter,
-            "tarif_name": tarif, "tarif_id": tarif_id,
-            "tarif_id_guete": "hoch", "tarif_monatlich": 24.99,
-            "geraet_zuzahlung": 1.0, "geraet_monatsrate": rate,
-            "laufzeit_monate": 24, "anschlusspreis": 0.0,
-            "zustand": "neu", "rabatte": [],
-            "quelle_url": f"https://example.de/{anbieter.lower()}/{device_id}",
-            "abgerufen_am": HEUTE, "first_seen": HEUTE,
-            "last_verified": HEUTE})
-    (state / "geraete_tco.json").write_text(json.dumps({
-        "updated": HEUTE, "buendel": buendel, "sim_only": []}),
-        encoding="utf-8")
+    for device_id, speicher, anbieter, tarif_id, tarif, gb, rate in _BAENDER_BUENDEL:
+        buendel.append(
+            {
+                "id": f"buendel--{anbieter.lower()}--{_sku(device_id, speicher)}"
+                f"--{tarif_id}",
+                "sku_id": _sku(device_id, speicher),
+                "anbieter": anbieter,
+                "tarif_name": tarif,
+                "tarif_id": tarif_id,
+                "tarif_id_guete": "hoch",
+                "tarif_monatlich": 24.99,
+                "geraet_zuzahlung": 1.0,
+                "geraet_monatsrate": rate,
+                "laufzeit_monate": 24,
+                "anschlusspreis": 0.0,
+                "zustand": "neu",
+                "rabatte": [],
+                "quelle_url": f"https://example.de/{anbieter.lower()}/{device_id}",
+                "abgerufen_am": HEUTE,
+                "first_seen": HEUTE,
+                "last_verified": HEUTE,
+            }
+        )
+    (state / "geraete_tco.json").write_text(
+        json.dumps({"updated": HEUTE, "buendel": buendel, "sim_only": []}),
+        encoding="utf-8",
+    )
     tarife = [
-        {"anbieter": anbieter, "name": tarif, "tarif_id": tarif_id,
-         "art": "mobilfunk", "grundgebuehr": 24.99, "laufzeit_monate": 24,
-         "datenvolumen_gb": gb,
-         "preisphasen": [{"von_monat": 1, "bis_monat": None,
-                          "betrag": 24.99}],
-         "dokument_url": f"https://example.de/pib/{tarif_id}",
-         "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}}
+        {
+            "anbieter": anbieter,
+            "name": tarif,
+            "tarif_id": tarif_id,
+            "art": "mobilfunk",
+            "grundgebuehr": 24.99,
+            "laufzeit_monate": 24,
+            "datenvolumen_gb": gb,
+            "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": 24.99}],
+            "dokument_url": f"https://example.de/pib/{tarif_id}",
+            "abgerufen_am": HEUTE,
+            "confidence": {},
+            "fundstellen": {},
+        }
         for _d, _s, anbieter, tarif_id, tarif, gb, _r in _BAENDER_BUENDEL
     ]
     tarife = mit_leiter(tarife)
     (state / "tarife.jsonl").write_text(
-        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
+        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8"
+    )
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
-    (reports / f"{HEUTE}.json").write_text(json.dumps({
-        "date": HEUTE, "language": "de",
-        "briefing_md": "## Auf einen Blick\n\n- Nichts Besonderes.\n",
-        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{HEUTE}.json").write_text(
+        json.dumps(
+            {
+                "date": HEUTE,
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- Nichts Besonderes.\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     (reports / f"{HEUTE}.md").write_text("# Bericht\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
@@ -119,12 +161,12 @@ def _baue(tmp_path):
 @contextlib.contextmanager
 def _browser_ctx(tmp_path_factory):
     sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt").sync_playwright
+        "playwright.sync_api", reason="playwright fehlt"
+    ).sync_playwright
     site = _baue(tmp_path_factory.mktemp("o2zeilen"))
     exe = _chromium()
     with _server(site) as basis, sync_playwright() as p:
-        browser = (p.chromium.launch(executable_path=exe) if exe
-                   else p.chromium.launch())
+        browser = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
         try:
             yield browser, basis
         finally:
@@ -165,6 +207,7 @@ def telefon(_browser_seite):
 # A1 - Aufklapper über der Falz
 # --------------------------------------------------------------------------
 
+
 @pytest.mark.parametrize("fixture_name", ["seite", "telefon"])
 def test_hoechstens_ein_aufklapper_ueber_der_falz(fixture_name, request):
     """O2 hielt A1 von O1; E2 verschiebt die Grenze um eine Kategorie: die
@@ -173,20 +216,23 @@ def test_hoechstens_ein_aufklapper_ueber_der_falz(fixture_name, request):
     der EINE Rechenschafts-Aufklapper 'So gerechnet'."""
     s = request.getfixturevalue(fixture_name)
     falz = s.viewport_size["height"]
-    ueber = s.evaluate("""(falz) => Array.from(
+    ueber = s.evaluate(
+        """(falz) => Array.from(
         document.querySelectorAll('#tafel-tco details'))
         .filter(d => {
           if (d.classList.contains('gr-bnd')) return false;
           const b = d.getBoundingClientRect();
           return b.height > 0 && b.top < falz;
-        }).map(d => d.className)""", falz)
-    assert len(ueber) <= 1, \
+        }).map(d => d.className)""",
+        falz,
+    )
+    assert len(ueber) <= 1, (
         f"{len(ueber)} Erklär-Aufklapper über der Falz ({falz} px): {ueber}"
+    )
 
 
 @pytest.mark.parametrize("fixture_name", ["seite", "telefon"])
-def test_die_erste_buendelzeile_ist_ohne_scroll_erreichbar(fixture_name,
-                                                           request):
+def test_die_erste_buendelzeile_ist_ohne_scroll_erreichbar(fixture_name, request):
     """Der Entwurf will die Tabelle UNTER dem Graphen - aber die ERSTE
     Zeile gehört noch ins erste Bild, sonst ist der Weg zur Tabelle eine
     Blindheit. (1440: die erste Zeile endet im ersten Bildschirm;
@@ -196,32 +242,33 @@ def test_die_erste_buendelzeile_ist_ohne_scroll_erreichbar(fixture_name,
     box = s.eval_on_selector(
         "#gr-bndliste .gr-bnd",
         "e => { const r = e.getBoundingClientRect();"
-        "      return {top: Math.round(r.top), endet: Math.round(r.bottom)}; }")
+        "      return {top: Math.round(r.top), endet: Math.round(r.bottom)}; }",
+    )
     assert box is not None, "keine Bündelzeile im Dokument"
     assert box["endet"] <= grenze, (
         f"die erste Zeile endet bei {box['endet']} px - tiefer als zwei "
-        f"Bildschirme ({grenze} px)")
+        f"Bildschirme ({grenze} px)"
+    )
 
 
 # --------------------------------------------------------------------------
 # A2 - die Zahl der Aufklapper am Vorgabemodell
 # --------------------------------------------------------------------------
 
+
 def test_deutlich_unter_hundert_aufklapper(seite):
     """A2 am Vorgabemodell: eine Zeile je Bündel, je Zeile EIN Rechenweg-
     Aufklapper - zusammen mit 'Wie gerechnet?', Maßstab und Datenlage
     deutlich unter 100."""
-    anzahl = seite.eval_on_selector_all(
-        "#tafel-tco details", "e => e.length")
-    zeilen = seite.eval_on_selector_all(
-        "#tafel-tco .gr-bnd", "e => e.length")
+    anzahl = seite.eval_on_selector_all("#tafel-tco details", "e => e.length")
+    zeilen = seite.eval_on_selector_all("#tafel-tco .gr-bnd", "e => e.length")
     assert zeilen >= 3, f"die Fixture trägt nur {zeilen} Zeilen"
     assert anzahl < 100, f"{anzahl} <details> in der Vergleichsansicht"
     # Der Zuwachs gegen O1 (27) sind die Zeilen-Aufklapper selbst: keine
     # Karte trägt noch ihren EIGENEN zusätzlichen Rechenweg-Aufklapper.
     rw = seite.eval_on_selector_all(
-        "#tafel-tco .gr-bnd-rw ~ details, #tafel-tco details details",
-        "e => e.length")
+        "#tafel-tco .gr-bnd-rw ~ details, #tafel-tco details details", "e => e.length"
+    )
     assert rw == 0, f"{rw} verschachtelte Aufklapper in den Zeilen"
 
 
@@ -229,27 +276,32 @@ def test_deutlich_unter_hundert_aufklapper(seite):
 # Die Bandwahl steuert die Zeilen mit
 # --------------------------------------------------------------------------
 
+
 def test_der_bandwechsel_versteckt_zeilen_anderer_baender(seite):
     """Dieselbe Auswahl, dieselbe Tabelle: der Wechsel auf ein anderes
     Band versteckt die Zeilen des alten - die Liste ist danach eine
     ANDERE (P1/UX-1 für die Zeilenform)."""
     klein = seite.eval_on_selector_all(
         "#gr-bndliste .gr-bnd[data-band='xs']:not([hidden])",
-        "e => e.map(z => z.dataset.anbieter)")
+        "e => e.map(z => z.dataset.anbieter)",
+    )
     waehle_band(seite, "m")
     seite.wait_for_timeout(120)
     verdeckt = seite.eval_on_selector(
         "#gr-bndliste .gr-bnd[data-band='xs']",
         "e => ({versteckt: e.hidden,"
-        "       sichtbar: getComputedStyle(e).display !== 'none'})")
+        "       sichtbar: getComputedStyle(e).display !== 'none'})",
+    )
     mittel = seite.eval_on_selector_all(
         "#gr-bndliste .gr-bnd[data-band='m']:not([hidden])",
-        "e => e.map(z => z.dataset.anbieter)")
+        "e => e.map(z => z.dataset.anbieter)",
+    )
     assert "o2" in klein, klein
     assert verdeckt["versteckt"] is True, "Klein-Zeile trägt kein hidden"
     assert verdeckt["sichtbar"] is False
     assert mittel and mittel != klein, (
-        f"die Zeilenliste folgt der Bandwahl nicht: {klein} == {mittel}")
+        f"die Zeilenliste folgt der Bandwahl nicht: {klein} == {mittel}"
+    )
     # Der Titel nennt das neue Band.
     titel = seite.eval_on_selector("#gr-bnd-titel", "e => e.textContent")
     assert "M" in titel, titel
@@ -259,13 +311,14 @@ def test_die_ohne_tarifband_zeilen_bleiben_stehen(seite):
     """§7: die Zeilen ohne Band gehören zu KEINEM Band - sie bleiben bei
     jedem Bandwechsel stehen (sie hängen nicht an der Auswahl an)."""
     ohne = seite.eval_on_selector_all(
-        "#gr-ohneband .gr-bnd", "e => e.map(z => z.dataset.anbieter)")
+        "#gr-ohneband .gr-bnd", "e => e.map(z => z.dataset.anbieter)"
+    )
     assert ohne, "die Fixture trägt keine Zeile ohne Band"
     waehle_band(seite, "m")
     seite.wait_for_timeout(120)
     danach = seite.eval_on_selector_all(
-        "#gr-ohneband .gr-bnd:not([hidden])",
-        "e => e.map(z => z.dataset.anbieter)")
+        "#gr-ohneband .gr-bnd:not([hidden])", "e => e.map(z => z.dataset.anbieter)"
+    )
     assert danach == ohne, danach
 
 
@@ -278,21 +331,23 @@ def test_der_modellwechsel_setzt_die_eigenen_zeilen_ein(seite):
     assert sichtbar, "beim Vorgabemodell steht die Tabelle offen da"
     # E2: die waehlbaren Modelle stehen im Zeitreihen-Knoten (erlaubt).
     auswahl = seite.eval_on_selector(
-        "#gr-zeitreihe-daten",
-        "k => Object.keys(JSON.parse(k.textContent).erlaubt)")
+        "#gr-zeitreihe-daten", "k => Object.keys(JSON.parse(k.textContent).erlaubt)"
+    )
     vorgabe = seite.eval_on_selector(
-        "#gr-zeitreihe-daten", "k => JSON.parse(k.textContent).vorgabe")
+        "#gr-zeitreihe-daten", "k => JSON.parse(k.textContent).vorgabe"
+    )
     fremd = [o for o in auswahl if o != vorgabe]
     assert fremd, "die Fixture braucht ein zweites Modell"
     waehle_modell(seite, fremd[0])
     seite.wait_for_timeout(300)
     assert seite.eval_on_selector("#gr-buendel", "e => !e.hidden")
     anbieter = seite.eval_on_selector_all(
-        "#gr-buendel .gr-bnd", "e => e.map(z => z.dataset.anbieter)")
+        "#gr-buendel .gr-bnd", "e => e.map(z => z.dataset.anbieter)"
+    )
     assert set(anbieter) == {"1&1"}, anbieter
-    assert seite.evaluate(
-        "() => !document.getElementById('gr-karten-hinweis')"), \
+    assert seite.evaluate("() => !document.getElementById('gr-karten-hinweis')"), (
         "der Vorgabegerät-Hinweis ist mit S3 entfallen"
+    )
 
 
 def test_der_zeilen_aufklapper_oeffnet_ohne_netzwerk(seite):
@@ -325,13 +380,12 @@ def test_der_zeilen_aufklapper_oeffnet_ohne_netzwerk(seite):
         seite.remove_listener("request", _zaehle)
         seite.evaluate(
             "() => document.querySelectorAll('.gr-bnd')"
-            ".forEach(z => { z.open = false; })")
+            ".forEach(z => { z.open = false; })"
+        )
     assert ergebnis is not None, "keine Zeile im Dokument"
     assert ergebnis["sichtbar"], "der Rechenweg bleibt unsichtbar"
-    assert ergebnis["hoehe"] > 60, \
-        f"der Rechenweg hat nur {ergebnis['hoehe']} px Höhe"
-    assert anfragen == [], \
-        f"das Öffnen hat Netzwerkanfragen ausgelöst: {anfragen}"
+    assert ergebnis["hoehe"] > 60, f"der Rechenweg hat nur {ergebnis['hoehe']} px Höhe"
+    assert anfragen == [], f"das Öffnen hat Netzwerkanfragen ausgelöst: {anfragen}"
 
 
 def test_der_rechenweg_wird_erst_beim_oeffnen_montiert(seite):
@@ -373,9 +427,10 @@ def test_der_rechenweg_wird_erst_beim_oeffnen_montiert(seite):
         }""")
     assert vor is not None, "keine Bündelzeile - der Test prüft nichts"
     assert not vor["offen"], "die gemessene Zeile steht schon offen"
-    assert vor["vorlageZeichen"] > 200, \
-        f"die Vorlage ist zu duenn ({vor['vorlageZeichen']} Z) - " \
+    assert vor["vorlageZeichen"] > 200, (
+        f"die Vorlage ist zu duenn ({vor['vorlageZeichen']} Z) - "
         "der Test misst einen leeren Rechenweg"
+    )
 
     nach = seite.evaluate("""() => {
       // Dieselbe Auswahl wie im vor-Schritt: erste Zeile mit leerem Ziel.
@@ -391,18 +446,20 @@ def test_der_rechenweg_wird_erst_beim_oeffnen_montiert(seite):
       return null;
     }""")
     seite.evaluate(
-        "() => document.querySelectorAll('.gr-bnd')"
-        ".forEach(z => { z.open = false; })")
+        "() => document.querySelectorAll('.gr-bnd').forEach(z => { z.open = false; })"
+    )
     assert nach is not None, "keine unmontierte Zeile für den Klick"
     assert nach["offen"], "der Klick hat die Zeile nicht geöffnet"
-    assert nach["zeichen"] > 200, \
+    assert nach["zeichen"] > 200, (
         f"nach dem Öffnen nur {nach['zeichen']} Z im Ziel - nicht montiert"
+    )
     assert nach["posten"], "montierter Rechenweg ohne Postenliste"
 
 
 # --------------------------------------------------------------------------
 # Mobil 390: Zeilen-Stapel statt Querscroll
 # --------------------------------------------------------------------------
+
 
 def test_zeilen_stapeln_sich_auf_dem_telefon_ohne_querscroll(telefon):
     """Auftrag 1: 'Mobile 390: Tabelle darf quer laufen IN einem
@@ -411,7 +468,8 @@ def test_zeilen_stapeln_sich_auf_dem_telefon_ohne_querscroll(telefon):
     die Seite rollt nicht waagerecht."""
     quer = telefon.evaluate(
         "() => Math.max(document.documentElement.scrollWidth,"
-        "               document.body.scrollWidth)")
+        "               document.body.scrollWidth)"
+    )
     assert quer <= 391, f"die Seite ist {quer} px breit"
     zu_breit = telefon.evaluate("""() => Array.from(
         document.querySelectorAll('#gr-bndliste .gr-bnd summary'))
@@ -429,5 +487,6 @@ def test_zeilen_stapeln_sich_auf_dem_telefon_ohne_querscroll(telefon):
               tcoRechtsOderUeber: tco.left > an.left};
     }""")
     assert lage["tarifUnterAnbieter"] is True, (
-        "die Zellen stehen nebeneinander statt gestapelt")
+        "die Zellen stehen nebeneinander statt gestapelt"
+    )
     assert lage["tcoRechtsOderUeber"] is True

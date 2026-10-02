@@ -4,6 +4,7 @@ Achsenbruch, Markerform. Getestet wird direkt gegen `_svg()` mit
 synthetischen Serien (schnell, ohne die volle Katalog-/Buendel-Fixture) -
 dieselbe Bauform wie der Repro fuer den X-Label-Ueberlapp
 (`test_geraete_zeitreihe_xtick_browser.py`)."""
+
 from __future__ import annotations
 
 import re
@@ -11,19 +12,21 @@ from datetime import date, timedelta
 
 from telco_radar.report import geraete_zeitreihe as gz
 
-_BELEG = {"Vodafone": ("https://example.de/vodafone", "2026-09-20"),
-          "Telekom": ("https://example.de/telekom", "2026-09-20")}
+_BELEG = {
+    "Vodafone": ("https://example.de/vodafone", "2026-09-20"),
+    "Telekom": ("https://example.de/telekom", "2026-09-20"),
+}
 
 
 def _tage(start_iso: str, n: int, schritt_tage: int = 1) -> list[str]:
     start = date.fromisoformat(start_iso)
-    return [(start + timedelta(days=i * schritt_tage)).isoformat()
-            for i in range(n)]
+    return [(start + timedelta(days=i * schritt_tage)).isoformat() for i in range(n)]
 
 
 # --------------------------------------------------------------------------
 # Stufenlinie - der Pfad springt, statt zu gleiten
 # --------------------------------------------------------------------------
+
 
 def test_stufenpfad_springt_statt_zu_gleiten():
     punkte = [(0.0, 100.0, 900.0), (50.0, 60.0, 950.0), (100.0, 60.0, 950.0)]
@@ -36,8 +39,7 @@ def test_stufenpfad_springt_statt_zu_gleiten():
 
 def test_die_linie_im_svg_ist_eine_stufe_kein_direkter_sprung():
     tage = _tage("2026-09-12", 3)
-    serien = {"Vodafone": [(tage[0], 900.0), (tage[1], 950.0),
-                           (tage[2], 950.0)]}
+    serien = {"Vodafone": [(tage[0], 900.0), (tage[1], 950.0), (tage[2], 950.0)]}
     svg = gz._svg(serien, True, _BELEG, None)
     pfad = re.search(r"<path class='gr-zr-linie' d='([^']+)'", svg).group(1)
     # eine Stufe hat MEHR "L"-Befehle als Punkte-1 (direkte Linie); bei
@@ -49,6 +51,7 @@ def test_die_linie_im_svg_ist_eine_stufe_kein_direkter_sprung():
 # --------------------------------------------------------------------------
 # Messluecke: gepunktet, kein schraeger Durchzug
 # --------------------------------------------------------------------------
+
 
 def test_grosse_luecke_wird_gepunktet_nicht_schraeg_verbunden():
     """Vodafone: 12.9. -> 25.9. (13 Tage, > LUECKE_TAGE_SCHWELLE=10) ->
@@ -64,7 +67,9 @@ def test_grosse_luecke_wird_gepunktet_nicht_schraeg_verbunden():
     assert linien.count("gr-zr-linie gr-zr-linie--luecke") == 1, linien
     luecken_pfad = re.search(
         r"<path class='gr-zr-linie gr-zr-linie--luecke' d='[^']+' "
-        r"stroke='[^']+' stroke-dasharray='([^']+)'", svg)
+        r"stroke='[^']+' stroke-dasharray='([^']+)'",
+        svg,
+    )
     assert luecken_pfad is not None
     assert luecken_pfad.group(1) == gz.STRICHMUSTER["gepunktet"]
 
@@ -76,14 +81,16 @@ def test_grenzfall_genau_schwelle_tage_bleibt_durchgezogen():
     EIN durchgezogener Lauf, keine gepunktete Teilstrecke."""
     assert gz.LUECKE_TAGE_SCHWELLE == 10, (
         "dieser Grenzfalltest nimmt 10 an - die Konstante hat sich "
-        f"geaendert ({gz.LUECKE_TAGE_SCHWELLE})")
+        f"geaendert ({gz.LUECKE_TAGE_SCHWELLE})"
+    )
     tage = ["2026-09-12", "2026-09-22"]  # exakt 10 Tage Abstand
     serien = {"Vodafone": [(t, 900.0 + i * 5) for i, t in enumerate(tage)]}
     svg = gz._svg(serien, True, _BELEG, None)
     pfade = re.findall(r"<path class='([^']+)'", svg)
     linien = [p for p in pfade if p.startswith("gr-zr-linie")]
     assert linien == ["gr-zr-linie"], (
-        f"eine 10-Tage-Luecke (== Schwelle) wurde gepunktet: {linien}")
+        f"eine 10-Tage-Luecke (== Schwelle) wurde gepunktet: {linien}"
+    )
 
 
 def test_grenzfall_ein_tag_ueber_der_schwelle_wird_gepunktet():
@@ -95,7 +102,8 @@ def test_grenzfall_ein_tag_ueber_der_schwelle_wird_gepunktet():
     pfade = re.findall(r"<path class='([^']+)'", svg)
     linien = [p for p in pfade if p.startswith("gr-zr-linie")]
     assert linien == ["gr-zr-linie gr-zr-linie--luecke"], (
-        f"eine 11-Tage-Luecke (> Schwelle) blieb durchgezogen: {linien}")
+        f"eine 11-Tage-Luecke (> Schwelle) blieb durchgezogen: {linien}"
+    )
 
 
 def test_kleine_luecke_bleibt_durchgezogen():
@@ -113,14 +121,14 @@ def test_kleine_luecke_bleibt_durchgezogen():
 # Y-Achse: 4-5 runde Werte, Achsenbruch bei kleiner Spanne
 # --------------------------------------------------------------------------
 
+
 def test_y_achse_zeigt_vier_bis_fuenf_werte():
     """Vorher (_nice_step((y1-y0)/4) direkt): bei dieser Spanne (752-1248)
     kamen nur DREI Ticks heraus (800/1000/1200, Schritt 200 statt 100)."""
     tage = _tage("2026-09-12", 2)
     serien = {"Vodafone": [(tage[0], 800.0), (tage[1], 1200.0)]}
     svg = gz._svg(serien, True, _BELEG, None)
-    werte = re.findall(r"<text class='gr-zr-achse'[^>]*>([^<]*)</text>",
-                       svg)
+    werte = re.findall(r"<text class='gr-zr-achse'[^>]*>([^<]*)</text>", svg)
     assert 4 <= len(werte) <= 5, werte
 
 
@@ -142,6 +150,7 @@ def test_achsenbruch_bei_kleiner_spanne():
 # --------------------------------------------------------------------------
 # Markerform: gezeichnet, additiv zum bestehenden Kreis
 # --------------------------------------------------------------------------
+
 
 def test_markerform_wird_fuer_telekom_gezeichnet_kreis_bleibt():
     """Telekom traegt die Form 'quadrat' (anbieter_farben.ANBIETER_FARBE)

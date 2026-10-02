@@ -17,6 +17,7 @@ Deshalb wird der Hash ueber eine normalisierte, sortierte Form gerechnet und
 nicht ueber das Abo-JSON. Ein Feld, das dem Abo spaeter dazukommt (ein
 Anzeigename, ein Zaehler), darf die Buendelung nicht veraendern.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -29,20 +30,27 @@ from .filters import Filtersatz, Treffer, waehle
 
 def normalform(satz: Filtersatz) -> dict:
     """Die Form, ueber die gehasht wird. Sortiert und kleingeschrieben."""
-    aus = {d: sorted({w.strip().lower() for w in satz.werte(d) if w.strip()})
-           for d in DIMENSIONEN}
+    aus = {
+        d: sorted({w.strip().lower() for w in satz.werte(d) if w.strip()})
+        for d in DIMENSIONEN
+    }
     # Stichwoerter tragen ihre Betriebsart mit: "5G Netz" als Phrase und
     # dieselben zwei Woerter als zwei Stichwoerter sind verschiedene Abos,
     # und sie bekommen verschiedene Mails.
     aus["keywords"] = sorted(
-        {f"{s.mode}:{s.term.strip().lower()}" for s in satz.stichwoerter
-         if s.term.strip()})
+        {
+            f"{s.mode}:{s.term.strip().lower()}"
+            for s in satz.stichwoerter
+            if s.term.strip()
+        }
+    )
     return aus
 
 
 def segment_hash(satz: Filtersatz) -> str:
-    roh = json.dumps(normalform(satz), sort_keys=True, ensure_ascii=False,
-                     separators=(",", ":"))
+    roh = json.dumps(
+        normalform(satz), sort_keys=True, ensure_ascii=False, separators=(",", ":")
+    )
     return hashlib.sha256(roh.encode("utf-8")).hexdigest()[:16]
 
 

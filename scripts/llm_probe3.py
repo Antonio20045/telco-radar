@@ -12,6 +12,7 @@ Timeout, damit die Zahl fuer das neue Timeout gemessen und nicht geraten ist.
 
 Gibt den Key niemals aus.
 """
+
 from __future__ import annotations
 
 import json
@@ -21,7 +22,9 @@ import time
 
 import httpx
 
-BASE = (os.environ.get("LLM_API_BASE") or "https://integrate.api.nvidia.com/v1").rstrip("/")
+BASE = (os.environ.get("LLM_API_BASE") or "https://integrate.api.nvidia.com/v1").rstrip(
+    "/"
+)
 KEY = (os.environ.get("LLM_API_KEY") or "").strip().strip('"').strip("'").strip()
 URL = f"{BASE}/chat/completions"
 HEADERS = {"Authorization": f"Bearer {KEY}", "Content-Type": "application/json"}
@@ -38,32 +41,43 @@ SYSTEM = (
 )
 
 
-def editor_payload(n_regions: int = 6, per_region: int = 15,
-                   n_topics: int = 300) -> dict:
+def editor_payload(
+    n_regions: int = 6, per_region: int = 15, n_topics: int = 300
+) -> dict:
     """Baut einen Prompt in der Groessenordnung des echten Editor-Aufrufs."""
     regions = {}
     for r in range(n_regions):
         name = f"Region {r + 1}"
-        regions[name] = [{
-            "operator": f"Betreiber {r}-{i}",
-            "title": f"Betreiber {r}-{i} startet neues Angebot fuer Geschaeftskunden",
-            "url": f"https://example.com/{r}/{i}",
-            "category": "Produkt",
-            "relevance": 4,
-            "urgency": 3,
-            "assessment": ("Der Betreiber buendelt Konnektivitaet mit einer "
-                           "Software-Plattform und adressiert damit mittelstaendische "
-                           "Kunden. Preis und Verfuegbarkeit sind genannt, der "
-                           "Rollout laeuft ueber zwei Quartale."),
-        } for i in range(per_region)]
-    topics = [f"Bereits berichtetes Thema Nummer {i} zu Netzausbau und Tarifen"
-              for i in range(n_topics)]
-    user = json.dumps({"regional_analyses": regions, "already_covered": topics},
-                      ensure_ascii=False)
+        regions[name] = [
+            {
+                "operator": f"Betreiber {r}-{i}",
+                "title": f"Betreiber {r}-{i} startet neues Angebot fuer Geschaeftskunden",
+                "url": f"https://example.com/{r}/{i}",
+                "category": "Produkt",
+                "relevance": 4,
+                "urgency": 3,
+                "assessment": (
+                    "Der Betreiber buendelt Konnektivitaet mit einer "
+                    "Software-Plattform und adressiert damit mittelstaendische "
+                    "Kunden. Preis und Verfuegbarkeit sind genannt, der "
+                    "Rollout laeuft ueber zwei Quartale."
+                ),
+            }
+            for i in range(per_region)
+        ]
+    topics = [
+        f"Bereits berichtetes Thema Nummer {i} zu Netzausbau und Tarifen"
+        for i in range(n_topics)
+    ]
+    user = json.dumps(
+        {"regional_analyses": regions, "already_covered": topics}, ensure_ascii=False
+    )
     return {
         "model": PRO,
-        "messages": [{"role": "system", "content": SYSTEM},
-                     {"role": "user", "content": user}],
+        "messages": [
+            {"role": "system", "content": SYSTEM},
+            {"role": "user", "content": user},
+        ],
         "max_tokens": 5000,
         "temperature": 0.3,
         "chat_template_kwargs": {"thinking": False},
@@ -86,15 +100,21 @@ def run(label: str, payload: dict, stream: bool, timeout: float) -> None:
                 print(f"{label:44s} HTTP {r.status_code} {dt:7.1f}s {r.text[:150]}")
                 return
             d = r.json()
-            c = (d.get("choices") or [{}])[0].get("message", {}).get("content", "") or ""
+            c = (d.get("choices") or [{}])[0].get("message", {}).get(
+                "content", ""
+            ) or ""
             u = d.get("usage") or {}
-            print(f"{label:44s} OK {dt:7.1f}s  in~{approx_in} tok  "
-                  f"out={u.get('completion_tokens')} tok / {len(c)} Zeichen")
+            print(
+                f"{label:44s} OK {dt:7.1f}s  in~{approx_in} tok  "
+                f"out={u.get('completion_tokens')} tok / {len(c)} Zeichen"
+            )
             return
         with httpx.stream("POST", URL, json=p, headers=HEADERS, timeout=timeout) as r:
             if r.status_code != 200:
-                print(f"{label:44s} HTTP {r.status_code} "
-                      f"{time.monotonic()-t0:7.1f}s {r.read()[:150]}")
+                print(
+                    f"{label:44s} HTTP {r.status_code} "
+                    f"{time.monotonic() - t0:7.1f}s {r.read()[:150]}"
+                )
                 return
             for line in r.iter_lines():
                 if not line or not line.startswith("data:"):
@@ -103,7 +123,9 @@ def run(label: str, payload: dict, stream: bool, timeout: float) -> None:
                 if data == "[DONE]":
                     break
                 try:
-                    delta = (json.loads(data).get("choices") or [{}])[0].get("delta", {})
+                    delta = (json.loads(data).get("choices") or [{}])[0].get(
+                        "delta", {}
+                    )
                 except json.JSONDecodeError:
                     continue
                 piece = delta.get("content") or delta.get("reasoning_content") or ""
@@ -112,22 +134,28 @@ def run(label: str, payload: dict, stream: bool, timeout: float) -> None:
                 chars += len(piece)
         total = time.monotonic() - t0
         gen = total - first if first is not None else 0.0
-        print(f"{label:44s} OK {total:7.1f}s  in~{approx_in} tok  "
-              f"Warten bis 1. Token {first:.1f}s + Generierung {gen:.1f}s  "
-              f"{chars} Zeichen" if first is not None else
-              f"{label:44s} OK {total:7.1f}s  kein Token")
+        print(
+            f"{label:44s} OK {total:7.1f}s  in~{approx_in} tok  "
+            f"Warten bis 1. Token {first:.1f}s + Generierung {gen:.1f}s  "
+            f"{chars} Zeichen"
+            if first is not None
+            else f"{label:44s} OK {total:7.1f}s  kein Token"
+        )
     except httpx.ReadTimeout:
         ttft = f"{first:.1f}s" if first is not None else "nie"
-        print(f"{label:44s} TIMEOUT {time.monotonic()-t0:7.1f}s (1. Token: {ttft})")
+        print(f"{label:44s} TIMEOUT {time.monotonic() - t0:7.1f}s (1. Token: {ttft})")
     except Exception as exc:  # noqa: BLE001
-        print(f"{label:44s} {type(exc).__name__} {time.monotonic()-t0:7.1f}s "
-              f"{str(exc)[:150]}")
+        print(
+            f"{label:44s} {type(exc).__name__} {time.monotonic() - t0:7.1f}s "
+            f"{str(exc)[:150]}"
+        )
     sys.stdout.flush()
 
 
 def main() -> None:
     if not KEY:
-        print("LLM_API_KEY leer"); sys.exit(1)
+        print("LLM_API_KEY leer")
+        sys.exit(1)
     print(f"Endpunkt: {BASE} | Key-Laenge {len(KEY)}\n")
 
     full = editor_payload()
@@ -141,10 +169,18 @@ def main() -> None:
     print("\n" + "=" * 78)
     print("Skaliert die Wartezeit mit der Prompt-Groesse?")
     print("=" * 78, flush=True)
-    run("PRO  kleiner Prompt (1 Region, 0 Themen)",
-        editor_payload(1, 3, 0), True, PATIENT)
-    run("PRO  halber Prompt (3 Regionen, 150 Themen)",
-        editor_payload(3, 15, 150), True, PATIENT)
+    run(
+        "PRO  kleiner Prompt (1 Region, 0 Themen)",
+        editor_payload(1, 3, 0),
+        True,
+        PATIENT,
+    )
+    run(
+        "PRO  halber Prompt (3 Regionen, 150 Themen)",
+        editor_payload(3, 15, 150),
+        True,
+        PATIENT,
+    )
 
     print("\n" + "=" * 78)
     print("Kontrolle: derselbe Prompt auf v4-flash")

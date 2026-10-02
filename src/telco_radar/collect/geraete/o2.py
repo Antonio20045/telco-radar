@@ -71,6 +71,7 @@ Anbieter ohne diesen Nachweis bekaeme hier `None`.
 Die Preishistorie bleibt davon unberuehrt: gespeichert wird weiterhin
 `totalPrice`, und kein Preispunkt aus einem frueheren Lauf wird umgedeutet.
 """
+
 from __future__ import annotations
 
 import json
@@ -95,13 +96,15 @@ log = logging.getLogger(__name__)
 # Schluessel. Gezaehlt wird wie in `geraete_model` (1 TB = 1024 GB).
 _OFFER_RE = re.compile(
     r"^[a-z]+-(?P<slug>.+?)-(?P<zahl>\d+)(?P<einheit>gb|tb)-(?P<farbe>.+?)"
-    r"-\d+x\w+$")
+    r"-\d+x\w+$"
+)
 
 
 def _speicher(m) -> Optional[int]:
     if not m:
         return None
     return int(m.group("zahl")) * (1024 if m.group("einheit") == "tb" else 1)
+
 
 # Ein Zubehoerbuendel erkennt man am " mit " im ANGEBOTSNAMEN. Gemessen an
 # den 93 Eintraegen vom 28.08.2026: 18 Treffer, alle echt (Watch, Buds,
@@ -125,9 +128,12 @@ def _preis(wert) -> Optional[float]:
         return None
 
 
-def _laufzeit(angebot: str, anzahlung: Optional[float],
-              monatsrate: Optional[float],
-              gesamt: Optional[float]) -> Optional[int]:
+def _laufzeit(
+    angebot: str,
+    anzahlung: Optional[float],
+    monatsrate: Optional[float],
+    gesamt: Optional[float],
+) -> Optional[int]:
     """Die Ratenzahl aus dem Angebotsnamen - aber nur, wenn sie aufgeht.
 
     Die Zahl kommt aus der Quelle, die Rechenprobe entscheidet, ob sie
@@ -161,7 +167,7 @@ def lies(text: str, url: str = "") -> list[dict]:
         raise GeraeteAbrufFehler("o2-Katalog ohne Feld 'hardware'")
 
     out: list[dict] = []
-    for h in (daten.get("hardware") or []):
+    for h in daten.get("hardware") or []:
         if not isinstance(h, dict):
             continue
         modell = str(h.get("description") or "").strip()
@@ -169,7 +175,7 @@ def lies(text: str, url: str = "") -> list[dict]:
         if not modell:
             continue
         if _BUENDEL_RE.search(modell) or _BUENDEL_RE.search(angebot):
-            continue                      # Geraet plus Zubehoer, siehe Modulkopf
+            continue  # Geraet plus Zubehoer, siehe Modulkopf
 
         preisblock = h.get("price") or {}
         preis = _preis(preisblock.get("totalPrice"))
@@ -187,30 +193,35 @@ def lies(text: str, url: str = "") -> list[dict]:
         # Die Seite, die ein Mensch aufrufen kann - sie traegt in ihrer
         # eigenen Adresse `ohne-tarif=ja`, also genau die Preisart, die hier
         # gespeichert wird.
-        ziel = ((h.get("detailWwwAbsoluteCall") or {}).get("constantPayload")
-                or {}).get("link") or {}
-        out.append({
-            "titel": " ".join(x for x in (modell,
-                                          f"{speicher} GB" if speicher else "",
-                                          farbe) if x),
-            # E4-Auto-Erkennung: der strukturierte NAME (Feld `description`),
-            # getrennt vom zusammengesetzten Titel.
-            "strukturierter_name": modell,
-            "preis": preis,
-            # Die Preisform, aus der Quelle gelesen - siehe Modulkopf.
-            "anzahlung": anzahlung if laufzeit else None,
-            "monatsrate": monatsrate if laufzeit else None,
-            "laufzeit_monate": laufzeit,
-            "zins_effektiv": 0.0 if laufzeit else None,
-            "waehrung": "EUR",
-            "verfuegbarkeit": "unbekannt",
-            "sku": str(h.get("externalId") or "").strip(),
-            "ean": "",
-            "farbe": farbe,
-            "speicher_gb": speicher,
-            "url": str(ziel.get("uri") or "").strip(),
-            "quelle": "o2_katalog",
-        })
+        ziel = (
+            (h.get("detailWwwAbsoluteCall") or {}).get("constantPayload") or {}
+        ).get("link") or {}
+        out.append(
+            {
+                "titel": " ".join(
+                    x
+                    for x in (modell, f"{speicher} GB" if speicher else "", farbe)
+                    if x
+                ),
+                # E4-Auto-Erkennung: der strukturierte NAME (Feld `description`),
+                # getrennt vom zusammengesetzten Titel.
+                "strukturierter_name": modell,
+                "preis": preis,
+                # Die Preisform, aus der Quelle gelesen - siehe Modulkopf.
+                "anzahlung": anzahlung if laufzeit else None,
+                "monatsrate": monatsrate if laufzeit else None,
+                "laufzeit_monate": laufzeit,
+                "zins_effektiv": 0.0 if laufzeit else None,
+                "waehrung": "EUR",
+                "verfuegbarkeit": "unbekannt",
+                "sku": str(h.get("externalId") or "").strip(),
+                "ean": "",
+                "farbe": farbe,
+                "speicher_gb": speicher,
+                "url": str(ziel.get("uri") or "").strip(),
+                "quelle": "o2_katalog",
+            }
+        )
     return out
 
 
@@ -353,7 +364,7 @@ def _buendelsatz(h: dict, proben: Optional[dict] = None) -> Optional[dict]:
     if not modell:
         return None
     if _BUENDEL_RE.search(modell) or _BUENDEL_RE.search(angebot):
-        return None                       # Geraet plus Zubehoer
+        return None  # Geraet plus Zubehoer
 
     buendel = h.get("bundle") or {}
     tarif_name = _ohne_markup(buendel.get("tariffName") or "")
@@ -390,14 +401,19 @@ def _buendelsatz(h: dict, proben: Optional[dict] = None) -> Optional[dict]:
         if monatlich is None:
             fehlend.append("monthlyPrice")
         else:
-            if geraet_rate is None or tarif_rate is None \
-                    or not _gleich(geraet_rate + tarif_rate, monatlich):
+            if (
+                geraet_rate is None
+                or tarif_rate is None
+                or not _gleich(geraet_rate + tarif_rate, monatlich)
+            ):
                 fehlend.append("metric3+metric2")
-            if anzahlung is None or not _gleich(_preis(werte.get("metric5")),
-                                                anzahlung):
+            if anzahlung is None or not _gleich(
+                _preis(werte.get("metric5")), anzahlung
+            ):
                 fehlend.append("metric5")
-            if anschluss is None or not _gleich(_preis(werte.get("metric4")),
-                                                anschluss):
+            if anschluss is None or not _gleich(
+                _preis(werte.get("metric4")), anschluss
+            ):
                 fehlend.append("metric4")
         if fehlend:
             for name in fehlend:
@@ -407,8 +423,7 @@ def _buendelsatz(h: dict, proben: Optional[dict] = None) -> Optional[dict]:
 
     dauer = _DAUER_RE.search(str(h.get("rateDurationValue") or ""))
     laufzeit = int(dauer.group(1)) if dauer else None
-    if laufzeit is None or not probe_geht_auf(anzahlung, monatlich,
-                                              laufzeit, gesamt):
+    if laufzeit is None or not probe_geht_auf(anzahlung, monatlich, laufzeit, gesamt):
         # Dieselbe Probe wie beim Geraetekatalog, hier auf der Summe aus
         # Rate und Tarif. Geht sie nicht auf, stimmt die Laufzeit nicht -
         # und ohne Laufzeit ist eine Monatszahl keine Aussage.
@@ -427,12 +442,13 @@ def _buendelsatz(h: dict, proben: Optional[dict] = None) -> Optional[dict]:
     m = _OFFER_RE.match(angebot)
     speicher = _speicher(m)
     farbe = m.group("farbe").replace("-", " ").strip() if m else ""
-    ziel = ((h.get("detailWwwAbsoluteCall") or {}).get("constantPayload")
-            or {}).get("link") or {}
+    ziel = ((h.get("detailWwwAbsoluteCall") or {}).get("constantPayload") or {}).get(
+        "link"
+    ) or {}
     return {
-        "titel": " ".join(x for x in (modell,
-                                      f"{speicher} GB" if speicher else "",
-                                      farbe) if x),
+        "titel": " ".join(
+            x for x in (modell, f"{speicher} GB" if speicher else "", farbe) if x
+        ),
         "strukturierter_name": modell,
         "farbe": farbe,
         "speicher_gb": speicher,
@@ -460,8 +476,7 @@ def _buendelsatz(h: dict, proben: Optional[dict] = None) -> Optional[dict]:
     }
 
 
-def lies_buendel(text: str, url: str = "",
-                 proben: Optional[dict] = None) -> list[dict]:
+def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> list[dict]:
     """Den Buendelkatalog in Rohsaetze zerlegen.
 
     Wirft, wenn die Antwort gar keine Buendelantwort ist. Das ist NICHT
@@ -481,16 +496,23 @@ def lies_buendel(text: str, url: str = "",
     if not isinstance(daten, dict) or "hardware" not in daten:
         raise GeraeteAbrufFehler("o2-Buendelkatalog ohne Feld 'hardware'")
 
-    zustand = (((daten.get("hwCatalogSwitcherStateValue") or {})
-                .get("hwOnlyOrBundleSwitcherValue") or {})
-               .get("hwOnlyOrBundleState") or {}).get("name")
+    zustand = (
+        (
+            (daten.get("hwCatalogSwitcherStateValue") or {}).get(
+                "hwOnlyOrBundleSwitcherValue"
+            )
+            or {}
+        ).get("hwOnlyOrBundleState")
+        or {}
+    ).get("name")
     if zustand != "BUNDLE":
         raise GeraeteAbrufFehler(
             f"o2-Katalog steht auf {zustand!r} statt 'BUNDLE' - diese "
-            f"Antwort traegt keine Tarifbuendel")
+            f"Antwort traegt keine Tarifbuendel"
+        )
 
     out: list[dict] = []
-    for h in (daten.get("hardware") or []):
+    for h in daten.get("hardware") or []:
         if not isinstance(h, dict):
             continue
         satz = _buendelsatz(h, proben)
@@ -571,7 +593,8 @@ _TIEF_QUELLE = "o2_tarifwahl"
 HERLEITUNG_TARIFSUMME = "tarifsumme_minus_geraeterate"
 
 _PAGE_VALUE_RE = re.compile(
-    r'<script id="pageValue" type="application/json">(.*?)</script>', re.S)
+    r'<script id="pageValue" type="application/json">(.*?)</script>', re.S
+)
 _BETRAG_RE = re.compile(r"(-?\d{1,3}(?:\.\d{3})*,\d{2})")
 
 
@@ -595,8 +618,9 @@ def lies_konfiguration(text: str) -> dict:
 
 
 def _link(option: dict) -> str:
-    return str((((option or {}).get("selectCall") or {}).get("link") or {})
-               .get("uri") or "").strip()
+    return str(
+        (((option or {}).get("selectCall") or {}).get("link") or {}).get("uri") or ""
+    ).strip()
 
 
 def _betrag(text) -> Optional[float]:
@@ -610,8 +634,9 @@ def _zusammenfassung(pv: dict) -> dict:
     """Die Zeilen der Preiszusammenfassung, Beschriftung -> Betrag."""
     ps = pv.get("priceSummary") or {}
     out: dict = {}
-    for e in ((ps.get("recurringChargesListEntries") or [])
-              + (ps.get("nonRecurringChargesListEntries") or [])):
+    for e in (ps.get("recurringChargesListEntries") or []) + (
+        ps.get("nonRecurringChargesListEntries") or []
+    ):
         if not isinstance(e, dict):
             continue
         name = _ohne_markup(_TAG_RE.split(str(e.get("description") or ""))[0])
@@ -620,8 +645,7 @@ def _zusammenfassung(pv: dict) -> dict:
 
 
 def _ausgewaehlt(optionen) -> Optional[dict]:
-    treffer = [o for o in (optionen or []) if isinstance(o, dict)
-               and o.get("selected")]
+    treffer = [o for o in (optionen or []) if isinstance(o, dict) and o.get("selected")]
     return treffer[0] if len(treffer) == 1 else None
 
 
@@ -670,8 +694,7 @@ def _gemessen(pv: dict) -> Optional[dict]:
     raten = m_knopf.group(1)
     zeilen = _zusammenfassung(pv)
     rate = zeilen.get(f"Gerät mtl. ({raten} Raten):")
-    tarif_zeilen = [v for k, v in zeilen.items()
-                    if k.startswith("Tarif mtl.")]
+    tarif_zeilen = [v for k, v in zeilen.items() if k.startswith("Tarif mtl.")]
     tarif_rate = tarif_zeilen[0] if len(tarif_zeilen) == 1 else None
     anzahlung = zeilen.get("Gerät Anzahlung:")
     anschluss = zeilen.get("einmaliger Anschlusspreis")
@@ -681,12 +704,18 @@ def _gemessen(pv: dict) -> Optional[dict]:
     if not _gleich(rate + tarif_rate, summe):
         return None
     werte = (pv.get("ecommerceProductValue") or {}).get("attributes") or {}
-    return {"angebot": angebot, "laufzeit": int(m_knopf.group(1)),
-            "rate": rate, "tarif_rate": tarif_rate, "anzahlung": anzahlung,
-            "anschluss": anschluss, "summe": summe,
-            "slug": str(werte.get("dimension59") or "").strip(),
-            "name": _tarifname(option, pv),
-            "anzeige": _ohne_markup(option.get("displayValue") or "")}
+    return {
+        "angebot": angebot,
+        "laufzeit": int(m_knopf.group(1)),
+        "rate": rate,
+        "tarif_rate": tarif_rate,
+        "anzahlung": anzahlung,
+        "anschluss": anschluss,
+        "summe": summe,
+        "slug": str(werte.get("dimension59") or "").strip(),
+        "name": _tarifname(option, pv),
+        "anzeige": _ohne_markup(option.get("displayValue") or ""),
+    }
 
 
 def referenz_aus(seiten: list) -> Optional[dict]:
@@ -709,21 +738,27 @@ def referenz_aus(seiten: list) -> Optional[dict]:
     for g in gemessen:
         if not g["slug"] or g["anzeige"] in tarife:
             return None
-        tarife[g["anzeige"]] = {"slug": g["slug"],
-                                "anschluss": g["anschluss"]}
+        tarife[g["anzeige"]] = {"slug": g["slug"], "anschluss": g["anschluss"]}
     return tarife
 
 
-def _rohsatz(basis: dict, g: dict, name: str, slug: str,
-             tarif_rate: float, anschluss: float, url: str) -> dict:
+def _rohsatz(
+    basis: dict,
+    g: dict,
+    name: str,
+    slug: str,
+    tarif_rate: float,
+    anschluss: float,
+    url: str,
+) -> dict:
     m = _OFFER_RE.match(g["angebot"])
     speicher = _speicher(m)
     farbe = m.group("farbe").replace("-", " ").strip() if m else ""
     modell = basis.get("strukturierter_name") or ""
     return {
-        "titel": " ".join(x for x in (modell,
-                                      f"{speicher} GB" if speicher else "",
-                                      farbe) if x),
+        "titel": " ".join(
+            x for x in (modell, f"{speicher} GB" if speicher else "", farbe) if x
+        ),
         "strukturierter_name": modell,
         "farbe": farbe,
         "speicher_gb": speicher,
@@ -748,9 +783,13 @@ def _zaehle(z: dict, name: str, n: int = 1) -> None:
     z[name] = int(z.get(name, 0)) + n
 
 
-def saetze_aus_konfiguration(pv: dict, basis: dict,
-                             referenz: Optional[dict], url: str,
-                             zaehler: Optional[dict] = None) -> list[dict]:
+def saetze_aus_konfiguration(
+    pv: dict,
+    basis: dict,
+    referenz: Optional[dict],
+    url: str,
+    zaehler: Optional[dict] = None,
+) -> list[dict]:
     """Alle Buendel einer Antwort: der gemessene Tarif plus die abgeleiteten.
 
     Abgeleitet wird nur mit Referenz, nur wenn der eigene Tarif dieser
@@ -763,14 +802,18 @@ def saetze_aus_konfiguration(pv: dict, basis: dict,
     if g is None:
         _zaehle(z, "ohne_probe")
         return []
-    out = [_rohsatz(basis, g, g["name"], g["slug"], g["tarif_rate"],
-                    g["anschluss"], url)]
+    out = [
+        _rohsatz(basis, g, g["name"], g["slug"], g["tarif_rate"], g["anschluss"], url)
+    ]
     _zaehle(z, "gemessen")
     if referenz is None:
         return out
     eigen = referenz.get(g["anzeige"])
-    if eigen is None or eigen["slug"] != g["slug"] \
-            or not _gleich(eigen["anschluss"], g["anschluss"]):
+    if (
+        eigen is None
+        or eigen["slug"] != g["slug"]
+        or not _gleich(eigen["anschluss"], g["anschluss"])
+    ):
         _zaehle(z, "referenz_widerspricht")
         return out
     for option in (pv.get("tariff") or {}).get("tariffOptions") or []:
@@ -785,8 +828,15 @@ def saetze_aus_konfiguration(pv: dict, basis: dict,
         if tarif_rate <= 0:
             _zaehle(z, "unplausibel")
             continue
-        satz = _rohsatz(basis, g, _tarifname(option, pv), ref["slug"],
-                        tarif_rate, ref["anschluss"], url)
+        satz = _rohsatz(
+            basis,
+            g,
+            _tarifname(option, pv),
+            ref["slug"],
+            tarif_rate,
+            ref["anschluss"],
+            url,
+        )
         satz["herleitung"] = HERLEITUNG_TARIFSUMME
         out.append(satz)
         _zaehle(z, "abgeleitet")
@@ -800,15 +850,20 @@ def _hole_seite(hole, url: str, z: dict) -> Optional[dict]:
     except GeraeteAbrufFehler as exc:
         _zaehle(z, "unlesbar")
         log.info("o2-Vertiefung: %s nicht lesbar (%s)", url, exc)
-    except Exception as exc:                          # noqa: BLE001
+    except Exception as exc:  # noqa: BLE001
         _zaehle(z, "unlesbar")
-        log.warning("o2-Vertiefung: %s nicht abrufbar (%s: %s)", url,
-                    type(exc).__name__, str(exc)[:120])
+        log.warning(
+            "o2-Vertiefung: %s nicht abrufbar (%s: %s)",
+            url,
+            type(exc).__name__,
+            str(exc)[:120],
+        )
     return None
 
 
-def vertiefe_buendel(hole, rohsaetze: list, weiter=None,
-                     zaehler: Optional[dict] = None) -> list[dict]:
+def vertiefe_buendel(
+    hole, rohsaetze: list, weiter=None, zaehler: Optional[dict] = None
+) -> list[dict]:
     """Je Katalogbuendel alle Speicher x Laufzeiten x Tarife als Rohsaetze.
 
     `hole(url) -> text` ist der gebremste Abruf des Sammlers (robots,
@@ -865,13 +920,15 @@ def vertiefe_buendel(hole, rohsaetze: list, weiter=None,
             referenz = referenz_aus(durchlauf)
             z["referenz_tarife"] = len(referenz or {})
             if referenz is None:
-                log.warning("o2-Vertiefung: der Referenzdurchlauf haelt die "
-                            "Befunde nicht (Rate/Anzahlung tarifabhaengig "
-                            "oder eine Probe faellt) - nur gemessene Saetze")
+                log.warning(
+                    "o2-Vertiefung: der Referenzdurchlauf haelt die "
+                    "Befunde nicht (Rate/Anzahlung tarifabhaengig "
+                    "oder eine Probe faellt) - nur gemessene Saetze"
+                )
         for pv in antworten:
             angebot = str((pv.get("hardware") or {}).get("offerName") or "")
             if angebot in gesehen:
-                continue          # derselbe Speicher ueber zwei Katalogeintraege
+                continue  # derselbe Speicher ueber zwei Katalogeintraege
             gesehen.add(angebot)
             out.extend(saetze_aus_konfiguration(pv, basis, referenz, url, z))
     return out
@@ -887,6 +944,6 @@ def fuehre_zusammen(katalog: list, tief: list) -> list:
     Produktseite genau dieses Buendels.
     """
     schon = {(s.get("angebot"), s.get("tarif_slug")) for s in katalog}
-    return list(katalog) + [s for s in tief
-                            if (s.get("angebot"), s.get("tarif_slug"))
-                            not in schon]
+    return list(katalog) + [
+        s for s in tief if (s.get("angebot"), s.get("tarif_slug")) not in schon
+    ]

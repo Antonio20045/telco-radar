@@ -11,6 +11,7 @@ durchkam - rund 33 ungelesene Meldungen wanderten trotzdem in den Store und
 waeren dauerhaft weg gewesen. Mit mehr Quellen gibt es mehr Stapel und damit
 mehr solcher Teilausfaelle.
 """
+
 from __future__ import annotations
 
 import json
@@ -20,16 +21,22 @@ from telco_radar.models import Item
 
 
 def _items(n: int) -> list[Item]:
-    return [Item(title=f"Meldung {i}", url=f"https://example.com/{i}",
-                 source_name="X") for i in range(n)]
+    return [
+        Item(title=f"Meldung {i}", url=f"https://example.com/{i}", source_name="X")
+        for i in range(n)
+    ]
 
 
 def _antwort(titel: list[str]) -> str:
-    return json.dumps({
-        "region_summary": "Zusammenfassung",
-        "highlights": [{"title": t, "url": "https://example.com/x",
-                        "relevance": 3} for t in titel],
-    })
+    return json.dumps(
+        {
+            "region_summary": "Zusammenfassung",
+            "highlights": [
+                {"title": t, "url": "https://example.com/x", "relevance": 3}
+                for t in titel
+            ],
+        }
+    )
 
 
 def test_gescheiterter_stapel_meldet_seine_meldungen_als_ungelesen(monkeypatch):
@@ -51,7 +58,7 @@ def test_gescheiterter_stapel_meldet_seine_meldungen_als_ungelesen(monkeypatch):
     ungelesen = set(res["_ungelesen"])
     # Genau die Meldungen des gescheiterten Stapels, keine anderen.
     assert len(ungelesen) == agents.BATCH_SIZE
-    mittlere = {i.id for i in items[agents.BATCH_SIZE:2 * agents.BATCH_SIZE]}
+    mittlere = {i.id for i in items[agents.BATCH_SIZE : 2 * agents.BATCH_SIZE]}
     assert ungelesen == mittlere
     assert res["_telemetry"]["unread_items"] == agents.BATCH_SIZE
     assert res["_telemetry"]["batches_ok"] == 2
@@ -78,9 +85,7 @@ def test_pipeline_haelt_ungelesene_meldungen_aus_dem_seen_store(tmp_path):
     store = SeenStore(tmp_path / "seen.jsonl")
 
     # Genau die Zeile aus pipeline.py, die den Schutz umsetzt.
-    zu_merken = [i for i in alle
-                 if i.region not in set()
-                 and i.id not in ungelesen]
+    zu_merken = [i for i in alle if i.region not in set() and i.id not in ungelesen]
     store.add(zu_merken)
 
     assert len(store) == 30

@@ -11,6 +11,7 @@ benutzen - und genau deshalb ist er richtig: rechnete die Website ihren
 eigenen Schluessel (etwa aus dem Titel), zeigten alte Berichte nach dem
 ersten Titel-Umbau ins Leere. Das ist Premortem 6.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -60,10 +61,12 @@ def seiten(store: UebersetzungsStore) -> list[dict]:
     for u in store.alle():
         if not u.absaetze:
             continue
-        raus.append({
-            "dateiname": f"{u.item_id}.html",
-            "u": u,
-            "sprachname": sprachname(u.sprache),
-            "sprachname_dativ": sprachname_dativ(u.sprache),
-        })
+        raus.append(
+            {
+                "dateiname": f"{u.item_id}.html",
+                "u": u,
+                "sprachname": sprachname(u.sprache),
+                "sprachname_dativ": sprachname_dativ(u.sprache),
+            }
+        )
     return raus

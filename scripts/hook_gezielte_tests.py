@@ -4,6 +4,7 @@ Die ganze Suite (3000+ Tests) dauert weit laenger als das Hook-Timeout und
 laeuft in CI. Hier: bearbeiteter Test -> genau diese Datei; bearbeitetes
 src/.../modul.py -> tests/test_modul*.py; sonst nichts.
 """
+
 import glob
 import json
 import os
@@ -25,7 +26,11 @@ else:
 if not ziele:
     sys.exit(0)
 env = {**os.environ, "PYTHONPATH": "src"}
-lauf = subprocess.run([sys.executable, "-m", "pytest", "-q", "-x", *ziele],
-                      env=env, capture_output=True, text=True)
+lauf = subprocess.run(
+    [sys.executable, "-m", "pytest", "-q", "-x", *ziele],
+    env=env,
+    capture_output=True,
+    text=True,
+)
 print("\n".join((lauf.stdout + lauf.stderr).strip().splitlines()[-15:]))
 sys.exit(0)

@@ -26,6 +26,7 @@ auf den echten Ursprung zeigen, nicht auf die zuletzt uebernommene Ausgabe.
 Das haelt den sichtbaren "Stand:"-Hinweis stabil, auch wenn mehrere Runden
 in Folge ausfallen.
 """
+
 from __future__ import annotations
 
 import json
@@ -40,8 +41,9 @@ _DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
 def bewertete_meldungen(report: dict) -> int:
     """Summe aller Highlights ueber alle Regionen und Themenfelder."""
-    return sum(len(r.get("highlights") or [])
-               for r in (report.get("regions") or {}).values())
+    return sum(
+        len(r.get("highlights") or []) for r in (report.get("regions") or {}).values()
+    )
 
 
 def ist_gueltige_redaktion(report: dict) -> bool:
@@ -72,9 +74,13 @@ def letzte_gueltige_redaktion(reports_dir: Path, vor_datum: str) -> dict | None:
     if not reports_dir.exists():
         return None
     kandidaten = sorted(
-        (f for f in reports_dir.glob("*.json")
-         if _DATE_RE.fullmatch(f.stem) and f.stem < vor_datum),
-        reverse=True)
+        (
+            f
+            for f in reports_dir.glob("*.json")
+            if _DATE_RE.fullmatch(f.stem) and f.stem < vor_datum
+        ),
+        reverse=True,
+    )
     for pfad in kandidaten:
         try:
             report = json.loads(pfad.read_text(encoding="utf-8"))
@@ -86,9 +92,14 @@ def letzte_gueltige_redaktion(reports_dir: Path, vor_datum: str) -> dict | None:
     return None
 
 
-def uebernehmen(regional: dict, body: str, competitor_profiles: list,
-                reports_dir: Path, heutiges_datum: str,
-                grund: str) -> tuple[dict, str, list, dict | None]:
+def uebernehmen(
+    regional: dict,
+    body: str,
+    competitor_profiles: list,
+    reports_dir: Path,
+    heutiges_datum: str,
+    grund: str,
+) -> tuple[dict, str, list, dict | None]:
     """Bei 0 bewerteten Meldungen die letzte gueltige Redaktion uebernehmen.
 
     Gibt IMMER ein 4-Tupel zurueck (regions, briefing_md, competitors,
@@ -104,7 +115,10 @@ def uebernehmen(regional: dict, body: str, competitor_profiles: list,
     stand = vorheriger.get("date", "")
     log.warning(
         "Redaktion ausgefallen (0 bewertete Meldungen am %s) - Titelseite "
-        "zeigt weiter den Stand vom %s", heutiges_datum, stand)
+        "zeigt weiter den Stand vom %s",
+        heutiges_datum,
+        stand,
+    )
     return (
         dict(vorheriger.get("regions") or {}),
         vorheriger.get("briefing_md") or "",

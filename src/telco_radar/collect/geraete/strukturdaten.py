@@ -23,6 +23,7 @@ Vertrag" durch. Das ist keine Plausibilitaetsschaetzung, sondern eine
 Aussage ueber die Preisart: ein Elektronikhaendler verkauft kein Smartphone
 fuer unter 30 Euro, ein Netzbetreiber verschenkt es im Buendel staendig.
 """
+
 from __future__ import annotations
 
 import json
@@ -36,7 +37,8 @@ log = logging.getLogger(__name__)
 
 _LDJSON_RE = re.compile(
     r'<script[^>]+type\s*=\s*["\']application/ld\+json["\'][^>]*>(.*?)</script>',
-    re.IGNORECASE | re.DOTALL)
+    re.IGNORECASE | re.DOTALL,
+)
 
 # Unterhalb dieser Grenze ist eine Zahl in der Spalte "Preis ohne Vertrag"
 # keine Preisangabe, sondern ein Buendel-Lockpreis. Gemessen an echten
@@ -63,7 +65,7 @@ _VERFUEGBARKEIT = {
 
 
 def verfuegbarkeit_aus_schema(wert) -> str:
-    """"http://schema.org/InStock" -> "lieferbar".
+    """ "http://schema.org/InStock" -> "lieferbar".
 
     "ausverkauft" ist NICHT "ausgelistet": ob ein Geraet aus dem Portfolio
     faellt, entscheidet die Zwei-Stufen-Logik des Stores ueber mehrere
@@ -156,6 +158,7 @@ def ist_lockpreis(preis: Optional[float]) -> bool:
 # Stufe 1: JSON-LD
 # --------------------------------------------------------------------------
 
+
 def _knoten(wurzel):
     """Alle dicts eines JSON-Baums, flach. Iterativ, damit ein tief
     verschachtelter @graph nicht die Rekursionsgrenze reisst - dieselbe
@@ -191,8 +194,11 @@ def _aus_produktknoten(knoten: dict) -> Optional[dict]:
     angebot = _erstes_angebot(knoten)
     preis = lies_preis(angebot.get("price"))
     if preis is None:
-        preis = lies_preis((angebot.get("priceSpecification") or {}).get("price")
-                           if isinstance(angebot.get("priceSpecification"), dict) else None)
+        preis = lies_preis(
+            (angebot.get("priceSpecification") or {}).get("price")
+            if isinstance(angebot.get("priceSpecification"), dict)
+            else None
+        )
     farbe = knoten.get("color")
     return {
         "titel": name.strip(),
@@ -204,8 +210,10 @@ def _aus_produktknoten(knoten: dict) -> Optional[dict]:
         # je nachdem, wie der Shop sein Schema baut.
         # Produkt UND Angebot: schema.org verortet den Zustand ueblicherweise
         # am Angebot, viele Shops setzen ihn ans Produkt.
-        "zustand_hinweis": (zustand_aus_schema(knoten.get("itemCondition"))
-                            or zustand_aus_schema(angebot.get("itemCondition"))),
+        "zustand_hinweis": (
+            zustand_aus_schema(knoten.get("itemCondition"))
+            or zustand_aus_schema(angebot.get("itemCondition"))
+        ),
         "sku": str(knoten.get("sku") or "").strip(),
         "ean": str(knoten.get("gtin13") or knoten.get("gtin") or "").strip(),
         "farbe": str(farbe).strip() if isinstance(farbe, str) else "",
@@ -247,6 +255,7 @@ def produkte_aus_ldjson(html: str) -> list[dict]:
 # Stufe 2: Microdata
 # --------------------------------------------------------------------------
 
+
 def _itemprop(wurzel, name: str) -> str:
     knoten = wurzel.find(attrs={"itemprop": name})
     if knoten is None:
@@ -269,24 +278,32 @@ def produkte_aus_microdata(html: str) -> list[dict]:
         name = _itemprop(produkt, "name")
         if not name:
             continue
-        angebot = produkt.find(attrs={"itemtype": re.compile(r"schema\.org/Offer$", re.I)})
+        angebot = produkt.find(
+            attrs={"itemtype": re.compile(r"schema\.org/Offer$", re.I)}
+        )
         quelle = angebot if angebot is not None else produkt
         preis = lies_preis(_itemprop(quelle, "price"))
-        gefunden.append({
-            "titel": name,
-            "preis": preis,
-            "waehrung": (_itemprop(quelle, "priceCurrency") or "").upper(),
-            "verfuegbarkeit": verfuegbarkeit_aus_schema(_itemprop(quelle, "availability")),
-            # `quelle` ist das Angebot, sobald eins da ist - der Zustand kann
-            # aber am Produkt haengen. Beide fragen, wie im ld+json-Pfad.
-            "zustand_hinweis": (zustand_aus_schema(_itemprop(quelle, "itemCondition"))
-                                or zustand_aus_schema(_itemprop(produkt, "itemCondition"))),
-            "sku": _itemprop(produkt, "sku"),
-            "ean": _itemprop(produkt, "gtin13"),
-            "farbe": _itemprop(produkt, "color"),
-            "url": "",
-            "quelle": "microdata",
-        })
+        gefunden.append(
+            {
+                "titel": name,
+                "preis": preis,
+                "waehrung": (_itemprop(quelle, "priceCurrency") or "").upper(),
+                "verfuegbarkeit": verfuegbarkeit_aus_schema(
+                    _itemprop(quelle, "availability")
+                ),
+                # `quelle` ist das Angebot, sobald eins da ist - der Zustand kann
+                # aber am Produkt haengen. Beide fragen, wie im ld+json-Pfad.
+                "zustand_hinweis": (
+                    zustand_aus_schema(_itemprop(quelle, "itemCondition"))
+                    or zustand_aus_schema(_itemprop(produkt, "itemCondition"))
+                ),
+                "sku": _itemprop(produkt, "sku"),
+                "ean": _itemprop(produkt, "gtin13"),
+                "farbe": _itemprop(produkt, "color"),
+                "url": "",
+                "quelle": "microdata",
+            }
+        )
     return gefunden
 
 

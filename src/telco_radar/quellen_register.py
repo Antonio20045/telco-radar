@@ -27,6 +27,7 @@ mal 200, und eine Quelle, die nie wieder probiert wird, waere dauerhaft weg,
 obwohl ihr Server nur zeitweise dicht war. Ein einziger Erfolg hebt die
 Quarantaene sofort auf.
 """
+
 from __future__ import annotations
 
 import json
@@ -98,7 +99,8 @@ class Quellenregister:
             for url, rec in (roh.get("quellen") or {}).items():
                 bekannt = {f for f in Quelleneintrag.__dataclass_fields__}
                 self.eintraege[url] = Quelleneintrag(
-                    **{k: v for k, v in rec.items() if k in bekannt})
+                    **{k: v for k, v in rec.items() if k in bekannt}
+                )
 
     def __len__(self) -> int:
         return len(self.eintraege)
@@ -120,9 +122,13 @@ class Quellenregister:
 
     # ---------------------------------------------------- Lauf verbuchen
 
-    def verbuche_lauf(self, ergebnisse: list[dict], heute: str | None = None,
-                      quarantaene_nach: int = QUARANTAENE_NACH_LAEUFEN,
-                      quellen_der_config: dict[str, dict] | None = None) -> dict:
+    def verbuche_lauf(
+        self,
+        ergebnisse: list[dict],
+        heute: str | None = None,
+        quarantaene_nach: int = QUARANTAENE_NACH_LAEUFEN,
+        quellen_der_config: dict[str, dict] | None = None,
+    ) -> dict:
         """Ein Laufergebnis einarbeiten. Liefert eine Zusammenfassung.
 
         `ergebnisse` sind die source_results der Sammelphase. Quellen, die in
@@ -172,8 +178,13 @@ class Quellenregister:
                     e.quarantaene_grund = (
                         f"{e.fehlserie} Laeufe ohne Meldung "
                         f"(zuletzt {rec.get('status')}"
-                        + (f": {str(rec.get('error'))[:80]}" if rec.get("error") else "")
-                        + ")")
+                        + (
+                            f": {str(rec.get('error'))[:80]}"
+                            if rec.get("error")
+                            else ""
+                        )
+                        + ")"
+                    )
                     neu_stillgelegt.append(url)
 
         # Nicht abgerufene (stillgelegte) Quellen: Zaehler zur naechsten Probe
@@ -189,11 +200,17 @@ class Quellenregister:
                 e.abgenommen = angaben.get("abgenommen") or e.abgenommen
 
         if neu_stillgelegt:
-            log.warning("Quarantaene: %d Quelle(n) stillgelegt - %s",
-                        len(neu_stillgelegt), ", ".join(neu_stillgelegt[:5]))
+            log.warning(
+                "Quarantaene: %d Quelle(n) stillgelegt - %s",
+                len(neu_stillgelegt),
+                ", ".join(neu_stillgelegt[:5]),
+            )
         if rehabilitiert:
-            log.info("Quarantaene aufgehoben fuer %d Quelle(n): %s",
-                     len(rehabilitiert), ", ".join(rehabilitiert[:5]))
+            log.info(
+                "Quarantaene aufgehoben fuer %d Quelle(n): %s",
+                len(rehabilitiert),
+                ", ".join(rehabilitiert[:5]),
+            )
 
         return {
             "bekannt": len(self.eintraege),
@@ -205,14 +222,16 @@ class Quellenregister:
     def speichern(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         daten = {
-            "hinweis": ("Automatisch gepflegt von der Pipeline. herkunft und "
-                        "abgenommen stammen aus der YAML, alles andere ist "
-                        "gemessen. Siehe src/telco_radar/quellen_register.py."),
-            "quellen": {url: asdict(e)
-                        for url, e in sorted(self.eintraege.items())},
+            "hinweis": (
+                "Automatisch gepflegt von der Pipeline. herkunft und "
+                "abgenommen stammen aus der YAML, alles andere ist "
+                "gemessen. Siehe src/telco_radar/quellen_register.py."
+            ),
+            "quellen": {url: asdict(e) for url, e in sorted(self.eintraege.items())},
         }
         self.path.write_text(
-            json.dumps(daten, ensure_ascii=False, indent=1), encoding="utf-8")
+            json.dumps(daten, ensure_ascii=False, indent=1), encoding="utf-8"
+        )
 
 
 def quellen_der_config(cfg) -> dict[str, dict]:

@@ -10,6 +10,7 @@ sieht das kerngesund aus, obwohl die Quelle fuer den Wochenbericht tot ist.
 Deshalb stehen hier auch das neueste Datum und die Zahl der Meldungen im
 Frischefenster; Quellen ohne frische Meldung werden unten aufgelistet.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -31,8 +32,11 @@ def check(source, region, operator, origin, http_cfg, lookback):
         items = collect_source(source, region, operator, origin, http_cfg)
         dates = [i.published for i in items if i.published]
         newest = max(dates) if dates else None
-        fresh = sum(1 for i in items
-                    if i.age_days() is not None and -1 <= i.age_days() <= lookback)
+        fresh = sum(
+            1
+            for i in items
+            if i.age_days() is not None and -1 <= i.age_days() <= lookback
+        )
         return ("OK" if items else "EMPTY", len(items), len(dates), newest, fresh, "")
     except Exception as exc:  # noqa: BLE001
         return ("FAIL", 0, 0, None, 0, f"{type(exc).__name__}: {str(exc)[:80]}")
@@ -41,9 +45,13 @@ def check(source, region, operator, origin, http_cfg, lookback):
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path("."))
-    parser.add_argument("--lookback", type=int, default=None,
-                        help="Frischefenster in Tagen (Standard: lookback_days "
-                             "aus config/settings.yaml)")
+    parser.add_argument(
+        "--lookback",
+        type=int,
+        default=None,
+        help="Frischefenster in Tagen (Standard: lookback_days "
+        "aus config/settings.yaml)",
+    )
     args = parser.parse_args()
 
     cfg = load_config(args.root.resolve())
@@ -62,8 +70,10 @@ def main() -> int:
     for src in cfg.tech_sources:
         jobs.append((src, src.theme, src.name, "tech_watch"))
 
-    print(f"{'STATUS':7} {'ITEMS':>5} {'DATED':>5} {'NEWEST':>11} {'FRESH':>5}  "
-          f"{'NAME':24} URL")
+    print(
+        f"{'STATUS':7} {'ITEMS':>5} {'DATED':>5} {'NEWEST':>11} {'FRESH':>5}  "
+        f"{'NAME':24} URL"
+    )
     print("-" * 130)
     counts = {"OK": 0, "EMPTY": 0, "FAIL": 0, "SKIP": 0}
     stale: list[tuple[str, str, str]] = []
@@ -78,26 +88,34 @@ def main() -> int:
             counts[status] += 1
             name = (operator or src.name or "")[:24]
             newest_txt = newest.date().isoformat() if newest else "-"
-            print(f"{status:7} {n:>5} {dated:>5} {newest_txt:>11} {fresh:>5}  "
-                  f"{name:24} {src.url}  {err}")
+            print(
+                f"{status:7} {n:>5} {dated:>5} {newest_txt:>11} {fresh:>5}  "
+                f"{name:24} {src.url}  {err}"
+            )
             if status == "OK" and not fresh:
                 stale.append((name, newest_txt, src.url))
 
     total = sum(counts.values())
     print("-" * 130)
-    print(f"Total: {total} | OK: {counts['OK']} | EMPTY: {counts['EMPTY']} "
-          f"| FAIL: {counts['FAIL']}")
+    print(
+        f"Total: {total} | OK: {counts['OK']} | EMPTY: {counts['EMPTY']} "
+        f"| FAIL: {counts['FAIL']}"
+    )
 
     if stale:
-        print(f"\nLiefern Inhalte, aber nichts im {lookback}-Tage-Fenster "
-              f"({len(stale)}) - jeweils pruefen, ob der Betreiber wirklich "
-              f"nicht publiziert oder ob die Seite/das Datum falsch gelesen wird:")
+        print(
+            f"\nLiefern Inhalte, aber nichts im {lookback}-Tage-Fenster "
+            f"({len(stale)}) - jeweils pruefen, ob der Betreiber wirklich "
+            f"nicht publiziert oder ob die Seite/das Datum falsch gelesen wird:"
+        )
         for name, newest_txt, url in sorted(stale, key=lambda x: x[1]):
             print(f"  {name:24} neuestes {newest_txt:>11}  {url}")
     if counts["FAIL"] or counts["EMPTY"]:
-        print("\nHint: EMPTY newsroom pages are often JavaScript-rendered. "
-              "Options: find the operator's RSS feed, add an item_selector, "
-              "or rely on the industry-news layer for that operator.")
+        print(
+            "\nHint: EMPTY newsroom pages are often JavaScript-rendered. "
+            "Options: find the operator's RSS feed, add an item_selector, "
+            "or rely on the industry-news layer for that operator."
+        )
     return 0
 
 

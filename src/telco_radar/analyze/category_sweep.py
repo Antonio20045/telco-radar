@@ -12,6 +12,7 @@ Kein hartkodierter Katalog: jeder Eintrag hat Quelle + Datum, wird aktualisiert
 und re-verifiziert. Failsafe: ohne Brave/LLM passiert einfach nichts Neues, die
 bestehende DB bleibt.
 """
+
 from __future__ import annotations
 
 import json
@@ -45,11 +46,21 @@ THEME_LABEL = dict(THEMES)
 
 # Suchanfragen je Kategorie für den Brave-Sweep (bewusst breit, LLM filtert danach).
 CATEGORY_QUERIES = {
-    "ki": ["telecom operator free AI assistant Perplexity OR Gemini OR Copilot included mobile plan"],
-    "entertainment": ["mobile operator free Netflix OR Disney+ OR Spotify OR streaming bundle plan"],
-    "garantie": ["telecom operator price guarantee OR multi-year warranty OR satisfaction guarantee"],
-    "geraete": ["carrier annual phone upgrade program OR trade-in OR device as a service"],
-    "security": ["telecom operator free scam OR fraud OR spam protection network deepfake"],
+    "ki": [
+        "telecom operator free AI assistant Perplexity OR Gemini OR Copilot included mobile plan"
+    ],
+    "entertainment": [
+        "mobile operator free Netflix OR Disney+ OR Spotify OR streaming bundle plan"
+    ],
+    "garantie": [
+        "telecom operator price guarantee OR multi-year warranty OR satisfaction guarantee"
+    ],
+    "geraete": [
+        "carrier annual phone upgrade program OR trade-in OR device as a service"
+    ],
+    "security": [
+        "telecom operator free scam OR fraud OR spam protection network deepfake"
+    ],
     "fintech": ["telecom operator mobile money OR wallet OR fintech super app"],
     "superapp": ["telecom operator super app mini apps everyday services"],
     "cloud": ["mobile operator free cloud storage plan perk customers"],
@@ -62,23 +73,36 @@ CATEGORY_QUERIES = {
 BRAVE_URL = "https://api.search.brave.com/res/v1/web/search"
 
 
-def brave_search(query: str, key: str, count: int = 8, freshness: str = "py") -> list[dict]:
+def brave_search(
+    query: str, key: str, count: int = 8, freshness: str = "py"
+) -> list[dict]:
     """Brave Web Search -> Liste {title, url, description, age}. Failsafe: []."""
     if not key:
         return []
-    url = BRAVE_URL + "?" + urllib.parse.urlencode(
-        {"q": query, "count": count, "freshness": freshness})
-    req = urllib.request.Request(url, headers={
-        "Accept": "application/json", "X-Subscription-Token": key})
+    url = (
+        BRAVE_URL
+        + "?"
+        + urllib.parse.urlencode({"q": query, "count": count, "freshness": freshness})
+    )
+    req = urllib.request.Request(
+        url, headers={"Accept": "application/json", "X-Subscription-Token": key}
+    )
     try:
         with urllib.request.urlopen(req, timeout=20) as r:
             data = json.load(r)
     except Exception as exc:  # noqa: BLE001
         log.warning("Brave-Suche fehlgeschlagen (%s): %s", query[:40], str(exc)[:120])
         return []
-    return [{"title": x.get("title"), "url": x.get("url"),
-             "description": x.get("description"), "age": x.get("age")}
-            for x in data.get("web", {}).get("results", []) if x.get("url")]
+    return [
+        {
+            "title": x.get("title"),
+            "url": x.get("url"),
+            "description": x.get("description"),
+            "age": x.get("age"),
+        }
+        for x in data.get("web", {}).get("results", [])
+        if x.get("url")
+    ]
 
 
 _EXTRACT_SYSTEM = """\
@@ -108,11 +132,21 @@ mit JSON-Array, kein weiterer Text.
 def _llm_extract(theme_key: str, results: list[dict], model: str) -> list[dict]:
     if not results:
         return []
-    payload = [{"title": r.get("title"), "url": r.get("url"),
-                "snippet": (r.get("description") or "")[:280]} for r in results]
+    payload = [
+        {
+            "title": r.get("title"),
+            "url": r.get("url"),
+            "snippet": (r.get("description") or "")[:280],
+        }
+        for r in results
+    ]
     try:
-        raw = complete(_EXTRACT_SYSTEM.format(label=THEME_LABEL.get(theme_key, theme_key)),
-                       json.dumps(payload, ensure_ascii=False), model=model, max_tokens=16000)
+        raw = complete(
+            _EXTRACT_SYSTEM.format(label=THEME_LABEL.get(theme_key, theme_key)),
+            json.dumps(payload, ensure_ascii=False),
+            model=model,
+            max_tokens=16000,
+        )
         parsed = extract_json(raw)
     except Exception as exc:  # noqa: BLE001
         log.warning("LLM-Extraktion (%s) fehlgeschlagen: %s", theme_key, str(exc)[:120])
@@ -123,10 +157,16 @@ def _llm_extract(theme_key: str, results: list[dict], model: str) -> list[dict]:
         if not isinstance(row, dict):
             continue
         if row.get("operator") and row.get("what") and row.get("url") in valid_urls:
-            out.append({"theme": theme_key, "operator": str(row["operator"]).strip(),
-                        "region": str(row.get("region") or "").strip(),
-                        "what": str(row["what"]).strip(), "url": row["url"],
-                        "why": str(row.get("why") or "").strip()})
+            out.append(
+                {
+                    "theme": theme_key,
+                    "operator": str(row["operator"]).strip(),
+                    "region": str(row.get("region") or "").strip(),
+                    "what": str(row["what"]).strip(),
+                    "url": row["url"],
+                    "why": str(row.get("why") or "").strip(),
+                }
+            )
     return out
 
 
@@ -135,6 +175,7 @@ class DiffDB:
 
     def __init__(self, path):
         from pathlib import Path
+
         self.path = Path(path)
         self.entries: dict[str, dict] = {}
         self.updated = None
@@ -166,11 +207,18 @@ class DiffDB:
                 e["status"] = "aktiv"
             else:
                 self.entries[eid] = {
-                    "id": eid, "theme": it.get("theme"), "operator": it.get("operator"),
-                    "region": it.get("region"), "what": it.get("what"),
-                    "url": it.get("url"), "source": src, "date": it.get("date"),
-                    "why": it.get("why"), "first_seen": it.get("first_seen") or today,
-                    "last_verified": today, "status": "aktiv",
+                    "id": eid,
+                    "theme": it.get("theme"),
+                    "operator": it.get("operator"),
+                    "region": it.get("region"),
+                    "what": it.get("what"),
+                    "url": it.get("url"),
+                    "source": src,
+                    "date": it.get("date"),
+                    "why": it.get("why"),
+                    "first_seen": it.get("first_seen") or today,
+                    "last_verified": today,
+                    "status": "aktiv",
                 }
                 new += 1
         return new
@@ -180,21 +228,29 @@ class DiffDB:
         for e in self.entries.values():
             out.setdefault(e.get("theme") or "_", []).append(e)
         for k in out:
-            out[k].sort(key=lambda e: (e.get("first_seen") or "", e.get("date") or ""),
-                        reverse=True)
+            out[k].sort(
+                key=lambda e: (e.get("first_seen") or "", e.get("date") or ""),
+                reverse=True,
+            )
         return out
 
     def save(self, today: str) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        payload = {"updated": today,
-                   "entries": sorted(self.entries.values(),
-                                     key=lambda e: (e.get("theme") or "", e.get("first_seen") or ""))}
-        self.path.write_text(json.dumps(payload, ensure_ascii=False, indent=1),
-                             encoding="utf-8")
+        payload = {
+            "updated": today,
+            "entries": sorted(
+                self.entries.values(),
+                key=lambda e: (e.get("theme") or "", e.get("first_seen") or ""),
+            ),
+        }
+        self.path.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8"
+        )
 
 
 def _domain(url: str) -> str:
     from urllib.parse import urlsplit
+
     return urlsplit(url or "").netloc.removeprefix("www.")
 
 
@@ -207,8 +263,9 @@ def rotation_slice(week: int, per_run: int = 4) -> list[str]:
     return [keys[(start + i) % len(keys)] for i in range(per_run)]
 
 
-def sweep(db: DiffDB, brave_key: str, model: str, today: str,
-          theme_keys: list[str]) -> int:
+def sweep(
+    db: DiffDB, brave_key: str, model: str, today: str, theme_keys: list[str]
+) -> int:
     """Führe den Sweep für die gegebenen Kategorien aus. Gibt #neu zurück."""
     total_new = 0
     for tk in theme_keys:
@@ -220,17 +277,21 @@ def sweep(db: DiffDB, brave_key: str, model: str, today: str,
     return total_new
 
 
-def run_sweep(state_dir, brave_key: str, model: str, use_llm: bool,
-              week: int, per_run: int = 4) -> None:
+def run_sweep(
+    state_dir, brave_key: str, model: str, use_llm: bool, week: int, per_run: int = 4
+) -> None:
     """Pipeline-Einstieg: DB laden, rotierenden Sweep fahren, speichern."""
     from pathlib import Path
+
     db = DiffDB(Path(state_dir) / "differentiation_db.json")
     today = date.today().isoformat()
     if use_llm and brave_key:
         keys = rotation_slice(week, per_run)
         try:
             n = sweep(db, brave_key, model, today, keys)
-            log.info("Kategorie-Sweep: %s -> %d neu (DB: %d)", ",".join(keys), n, len(db))
+            log.info(
+                "Kategorie-Sweep: %s -> %d neu (DB: %d)", ",".join(keys), n, len(db)
+            )
         except Exception as exc:  # noqa: BLE001
             log.error("Kategorie-Sweep fehlgeschlagen: %s", exc)
     db.save(today)

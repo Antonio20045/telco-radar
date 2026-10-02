@@ -1,4 +1,5 @@
 """Static report site generator - Vodafone light design."""
+
 from __future__ import annotations
 
 import html as html_lib
@@ -39,9 +40,14 @@ from ..analyze.diff_curator import DiffStore
 from ..analyze.category_sweep import DiffDB, THEMES as SWEEP_THEMES
 from ..analyze.promo_ranker import MECHANICS as PROMO_MECHANICS
 from ..promo_config import load_promo_config
-from ..textwerkzeug import (ABKUERZUNGEN as _ABK, gewicht as _gewicht,
-                            haeufigkeiten as _haeufigkeiten, saetze as _saetze,
-                            slug as _tw_slug, wortmenge as _wortmenge)
+from ..textwerkzeug import (
+    ABKUERZUNGEN as _ABK,
+    gewicht as _gewicht,
+    haeufigkeiten as _haeufigkeiten,
+    saetze as _saetze,
+    slug as _tw_slug,
+    wortmenge as _wortmenge,
+)
 from .. import promo_bilder
 
 _DIFF_COLOR = {t["key"]: t["color"] for t in DIFF_THEMES}
@@ -56,17 +62,39 @@ _DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
 _SUPPRESSED_SOURCE_DOMAINS = {"inside-digital.de"}
 
 RELEVANCE_LABELS = {
-    5: "Sofort ansehen", 4: "Wichtig", 3: "Beobachten",
-    2: "Randnotiz", 1: "Randnotiz", 0: "Unbewertet",
+    5: "Sofort ansehen",
+    4: "Wichtig",
+    3: "Beobachten",
+    2: "Randnotiz",
+    1: "Randnotiz",
+    0: "Unbewertet",
 }
 CATEGORY_COLORS = {
-    "Produktlaunch": "#e60000", "Tarif/Pricing": "#ac1811", "Kampagne": "#c2185b",
-    "Partnerschaft": "#3860be", "Netz/Technologie": "#5a6b9e",
-    "Regulierung": "#8a7a2f", "M&A": "#25282b", "Finanzen": "#7e7e7e",
-    "Sonstiges": "#a8a8a8", "Unbewertet": "#c4c4c4",
+    "Produktlaunch": "#e60000",
+    "Tarif/Pricing": "#ac1811",
+    "Kampagne": "#c2185b",
+    "Partnerschaft": "#3860be",
+    "Netz/Technologie": "#5a6b9e",
+    "Regulierung": "#8a7a2f",
+    "M&A": "#25282b",
+    "Finanzen": "#7e7e7e",
+    "Sonstiges": "#a8a8a8",
+    "Unbewertet": "#c4c4c4",
 }
-MONTHS_DE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli",
-             "August", "September", "Oktober", "November", "Dezember"]
+MONTHS_DE = [
+    "Januar",
+    "Februar",
+    "März",
+    "April",
+    "Mai",
+    "Juni",
+    "Juli",
+    "August",
+    "September",
+    "Oktober",
+    "November",
+    "Dezember",
+]
 
 
 def _fmt_date_de(iso: str) -> str:
@@ -78,7 +106,7 @@ def _fmt_date_de(iso: str) -> str:
 
 
 def _fmt_monat_de(iso_monat: str) -> str:
-    """"2026-08" -> "August 2026" - die Ueberschrift einer Monatsgruppe in
+    """ "2026-08" -> "August 2026" - die Ueberschrift einer Monatsgruppe in
     der Chronik der Wettbewerbsseite."""
     try:
         jahr, monat = (iso_monat or "").split("-")[:2]
@@ -98,8 +126,10 @@ def _redaktion_ausfall_ctx(report: dict) -> dict | None:
     ausfall = report.get("redaktion_ausfall")
     if not ausfall:
         return None
-    return {"stand_de": _fmt_date_de(ausfall.get("stand", "")),
-            "grund": ausfall.get("grund", "")}
+    return {
+        "stand_de": _fmt_date_de(ausfall.get("stand", "")),
+        "grund": ausfall.get("grund", ""),
+    }
 
 
 def _env() -> Environment:
@@ -116,8 +146,10 @@ def _env() -> Environment:
     # (briefing_html, diff_report_html, promo_report_html, explorer_json),
     # tragen bereits "| safe" - die Vorlagen waren also immer fuer aktives
     # Escaping geschrieben, es war nur nie eingeschaltet.
-    env = Environment(loader=FileSystemLoader(_TEMPLATES),
-                      autoescape=select_autoescape(["html", "htm", "xml", "j2"]))
+    env = Environment(
+        loader=FileSystemLoader(_TEMPLATES),
+        autoescape=select_autoescape(["html", "htm", "xml", "j2"]),
+    )
     env.filters["domain"] = lambda u: urlsplit(u or "").netloc.removeprefix("www.")
     env.filters["date_de"] = _fmt_date_de
     # EINE Eurofassung fuer die ganze Seite. Vorher stand in jeder Vorlage
@@ -129,10 +161,33 @@ def _env() -> Environment:
     return env
 
 
-_MD_TAGS = {"a", "blockquote", "br", "code", "em", "h2", "h3", "h4",
-            "li", "ol", "p", "pre", "strong", "ul"}
-_MD_DANGEROUS_TAGS = {"base", "embed", "form", "iframe", "math", "object",
-                      "script", "style", "svg"}
+_MD_TAGS = {
+    "a",
+    "blockquote",
+    "br",
+    "code",
+    "em",
+    "h2",
+    "h3",
+    "h4",
+    "li",
+    "ol",
+    "p",
+    "pre",
+    "strong",
+    "ul",
+}
+_MD_DANGEROUS_TAGS = {
+    "base",
+    "embed",
+    "form",
+    "iframe",
+    "math",
+    "object",
+    "script",
+    "style",
+    "svg",
+}
 
 
 def _md_to_html(text: str, inline: bool = False) -> str:
@@ -191,7 +246,7 @@ def _anchor_headings(html: str) -> tuple[str, list[dict]]:
         if not titel:
             continue
         anker = _slug(titel)
-        if anker in vergeben:          # zwei gleichnamige Abschnitte
+        if anker in vergeben:  # zwei gleichnamige Abschnitte
             n = 2
             while f"{anker}-{n}" in vergeben:
                 n += 1
@@ -210,12 +265,14 @@ def _lesezeit(md_text: str) -> int:
 
 def _json_for_script(value: object) -> str:
     """Serialize public source text safely inside an application/json script."""
-    return (json.dumps(value, ensure_ascii=False)
-            .replace("<", "\\u003c")
-            .replace(">", "\\u003e")
-            .replace("&", "\\u0026")
-            .replace("\u2028", "\\u2028")
-            .replace("\u2029", "\\u2029"))
+    return (
+        json.dumps(value, ensure_ascii=False)
+        .replace("<", "\\u003c")
+        .replace(">", "\\u003e")
+        .replace("&", "\\u0026")
+        .replace("\u2028", "\\u2028")
+        .replace("\u2029", "\\u2029")
+    )
 
 
 def _redirect_html(ziel: str) -> str:
@@ -227,14 +284,15 @@ def _redirect_html(ziel: str) -> str:
     """
     ziel_escaped = html_lib.escape(ziel, quote=True)
     return (
-        "<!DOCTYPE html>\n<html lang=\"de\">\n<head>\n<meta charset=\"utf-8\">\n"
-        f"<meta http-equiv=\"refresh\" content=\"0; url={ziel_escaped}\">\n"
-        f"<link rel=\"canonical\" href=\"{ziel_escaped}\">\n"
-        "<meta name=\"robots\" content=\"noindex\">\n"
+        '<!DOCTYPE html>\n<html lang="de">\n<head>\n<meta charset="utf-8">\n'
+        f'<meta http-equiv="refresh" content="0; url={ziel_escaped}">\n'
+        f'<link rel="canonical" href="{ziel_escaped}">\n'
+        '<meta name="robots" content="noindex">\n'
         "<title>Weitergeleitet – Vodafone Product and Services Insights</title>\n</head>\n"
-        "<body style=\"font-family:Inter,Arial,sans-serif;padding:40px\">\n"
-        f"<p>Diese Seite ist umgezogen. <a href=\"{ziel_escaped}\">Weiter zu "
-        f"{ziel_escaped}</a></p>\n</body>\n</html>\n")
+        '<body style="font-family:Inter,Arial,sans-serif;padding:40px">\n'
+        f'<p>Diese Seite ist umgezogen. <a href="{ziel_escaped}">Weiter zu '
+        f"{ziel_escaped}</a></p>\n</body>\n</html>\n"
+    )
 
 
 def _load_reports(reports_dir: Path) -> list[dict]:
@@ -258,9 +316,13 @@ def _load_reports(reports_dir: Path) -> list[dict]:
         reports[f.stem] = satz
     for f in sorted(reports_dir.glob("*.md")):
         if _DATE_RE.fullmatch(f.stem) and f.stem not in reports:
-            reports[f.stem] = {"date": f.stem, "generated_with_llm": False,
-                               "stats": {}, "briefing_md": f.read_text(encoding="utf-8"),
-                               "regions": {}}
+            reports[f.stem] = {
+                "date": f.stem,
+                "generated_with_llm": False,
+                "stats": {},
+                "briefing_md": f.read_text(encoding="utf-8"),
+                "regions": {},
+            }
     return [reports[k] for k in sorted(reports, reverse=True)]
 
 
@@ -268,14 +330,12 @@ def _load_latest_diff_report(reports_dir: Path) -> dict | None:
     """Load the newest generated prose report for the differentiation tab."""
     if not reports_dir.exists():
         return None
-    candidates = [f for f in reports_dir.glob("*.md")
-                  if _DATE_RE.fullmatch(f.stem)]
+    candidates = [f for f in reports_dir.glob("*.md") if _DATE_RE.fullmatch(f.stem)]
     if not candidates:
         return None
     path = max(candidates, key=lambda f: f.stem)
     try:
-        return {"date": path.stem,
-                "briefing_md": path.read_text(encoding="utf-8")}
+        return {"date": path.stem, "briefing_md": path.read_text(encoding="utf-8")}
     except OSError:
         log.warning("Differenzierungsbericht nicht lesbar: %s", path)
         return None
@@ -283,7 +343,9 @@ def _load_latest_diff_report(reports_dir: Path) -> dict | None:
 
 _IST_PLATZHALTER = re.compile(
     r"(kein[^,]*betreiber|keine?r?|branche|diverse?|mehrere|unbekannt|"
-    r"n/?a|-+|allgemein)", re.I)
+    r"n/?a|-+|allgemein)",
+    re.I,
+)
 
 
 def _flatten(report: dict) -> list[dict]:
@@ -307,7 +369,9 @@ def _flatten(report: dict) -> list[dict]:
             # Quelle, die die Meldung wirklich verantwortet.
             if _IST_PLATZHALTER.fullmatch((h.get("operator") or "").strip()):
                 h["operator"] = ""
-            h["de_title"] = _first_sentence(h.get("summary") or "", 150) or h.get("title") or ""
+            h["de_title"] = (
+                _first_sentence(h.get("summary") or "", 150) or h.get("title") or ""
+            )
             # Jede Meldung traegt ihre vollstaendige Ueberschrift - die
             # Meldungsseite zeigt alle, nicht nur die der Titelseite.
             h["schlagzeile"] = _schlagzeile(h)
@@ -331,8 +395,7 @@ def _flatten(report: dict) -> list[dict]:
     # ChatGPT gratis unbegrenzt" ueber die Telekom-Flat fuer 34,95 Euro stellen
     # sollte. Am 27.08.2026 hat sich das gegen den Leser gewendet, siehe
     # `_rangschluessel` fuer die Begruendung.
-    out.sort(key=lambda h: (*_rangschluessel(h), h.get("date") or ""),
-             reverse=True)
+    out.sort(key=lambda h: (*_rangschluessel(h), h.get("date") or ""), reverse=True)
     for i, h in enumerate(out):
         h["id"] = i
     return out
@@ -341,34 +404,81 @@ def _flatten(report: dict) -> list[dict]:
 def _is_suppressed_source(item: dict) -> bool:
     host = urlsplit(item.get("url") or "").netloc.removeprefix("www.").lower()
     source = (item.get("source") or "").strip().lower()
-    return source == "inside digital" or host in _SUPPRESSED_SOURCE_DOMAINS \
+    return (
+        source == "inside digital"
+        or host in _SUPPRESSED_SOURCE_DOMAINS
         or any(host.endswith("." + domain) for domain in _SUPPRESSED_SOURCE_DOMAINS)
+    )
 
 
 def _strip_suppressed_source_content(text: str) -> str:
     """Remove stale source-linked paragraphs/lines from historical briefings."""
     blocks = re.split(r"\n\s*\n", text or "")
-    kept = [block for block in blocks if not any(
-        domain in block.lower() for domain in _SUPPRESSED_SOURCE_DOMAINS
-    ) and "inside digital" not in block.lower()]
+    kept = [
+        block
+        for block in blocks
+        if not any(domain in block.lower() for domain in _SUPPRESSED_SOURCE_DOMAINS)
+        and "inside digital" not in block.lower()
+    ]
     cleaned = "\n\n".join(kept)
-    return re.sub(r"(?im)^.*(?:inside-digital\.de|inside digital).*$\n?", "", cleaned).strip()
+    return re.sub(
+        r"(?im)^.*(?:inside-digital\.de|inside digital).*$\n?", "", cleaned
+    ).strip()
 
 
 TECH_THEMES = [
     ("5G Standalone", ["standalone", "5g sa", "5g-sa", "5g core", "sa network", "5g+"]),
-    ("Satellit / NTN", ["satellite", "satellit", "ntn", "direct-to-cell", "direct to cell",
-                          "starlink", "spacemobile", "non-terrestrial", "d2c", "leo "]),
-    ("KI / AI", [" ai ", " ai-", "a.i.", "artificial intelligence", "genai", "gen ai",
-                  "agentic", "machine learning", " llm", "copilot", " ki ", "ki-"]),
-    ("Glasfaser / FTTH", ["fiber", "fibre", "ftth", "glasfaser", "gigabit", "broadband"]),
-    ("Private Networks", ["private 5g", "private network", "campus network", "private-5g"]),
+    (
+        "Satellit / NTN",
+        [
+            "satellite",
+            "satellit",
+            "ntn",
+            "direct-to-cell",
+            "direct to cell",
+            "starlink",
+            "spacemobile",
+            "non-terrestrial",
+            "d2c",
+            "leo ",
+        ],
+    ),
+    (
+        "KI / AI",
+        [
+            " ai ",
+            " ai-",
+            "a.i.",
+            "artificial intelligence",
+            "genai",
+            "gen ai",
+            "agentic",
+            "machine learning",
+            " llm",
+            "copilot",
+            " ki ",
+            "ki-",
+        ],
+    ),
+    (
+        "Glasfaser / FTTH",
+        ["fiber", "fibre", "ftth", "glasfaser", "gigabit", "broadband"],
+    ),
+    (
+        "Private Networks",
+        ["private 5g", "private network", "campus network", "private-5g"],
+    ),
     ("IoT / eSIM", ["iot", "esim", "e-sim", "m2m", "internet of things"]),
-    ("Cloud / Edge", ["cloud", "edge computing", "hyperscaler", "edge-computing", " mec "]),
+    (
+        "Cloud / Edge",
+        ["cloud", "edge computing", "hyperscaler", "edge-computing", " mec "],
+    ),
     ("Open RAN", ["open ran", "openran", "o-ran", "oran", "vran", "v-ran"]),
     ("6G", ["6g"]),
     ("FWA", ["fwa", "fixed wireless", "fixed-wireless"]),
 ]
+
+
 def _tag_tech(text):
     t = " " + (text or "").lower() + " "
     return [name for name, kws in TECH_THEMES if any(k in t for k in kws)]
@@ -385,8 +495,7 @@ def _tag_tech(text):
 # kaufen und was kostet es"), und ein Ressort mit fuenf Meldungen ist keins.
 RESSORTS: list[tuple[str, str, set[str]]] = [
     ("netz", "Netz & Technik", {"Netz/Technologie"}),
-    ("tarife", "Tarife & Angebote",
-     {"Tarif/Pricing", "Produktlaunch", "Kampagne"}),
+    ("tarife", "Tarife & Angebote", {"Tarif/Pricing", "Produktlaunch", "Kampagne"}),
     ("regulierung", "Regulierung & Politik", {"Regulierung"}),
     ("geld", "Geld & Übernahmen", {"Finanzen", "M&A"}),
     ("partner", "Partnerschaften", {"Partnerschaft"}),
@@ -397,8 +506,15 @@ RESSORTS: list[tuple[str, str, set[str]]] = [
 # 06.08.2026, plus 28 Satellitenmeldungen darin), und das ist kein Ressort,
 # das ist ein Sammelbecken. Der Themen-Tagger steht ohnehin schon da.
 _SATELLIT = ("satellit", "Satellit & Direct-to-Cell")
-_RESSORT_REIHENFOLGE = ["netz", "tarife", _SATELLIT[0], "regulierung",
-                        "geld", "partner", "vermischt"]
+_RESSORT_REIHENFOLGE = [
+    "netz",
+    "tarife",
+    _SATELLIT[0],
+    "regulierung",
+    "geld",
+    "partner",
+    "vermischt",
+]
 _RESSORT_LABEL = dict([(k, l) for k, l, _ in RESSORTS] + [_SATELLIT])
 
 
@@ -427,9 +543,25 @@ def _bildbreite(h: dict) -> int:
 # Woerter, die keinen Absender unterscheiden. Ohne diese Liste faende
 # "T-Mobile US" und "Mobile World Live" denselben Namen.
 _GENERISCHE_NAMENSWOERTER = {
-    "group", "telecom", "telecoms", "mobile", "communications", "holdings",
-    "international", "limited", "global", "media", "news", "corp", "world",
-    "corporation", "company", "networks", "network", "digital", "wireless",
+    "group",
+    "telecom",
+    "telecoms",
+    "mobile",
+    "communications",
+    "holdings",
+    "international",
+    "limited",
+    "global",
+    "media",
+    "news",
+    "corp",
+    "world",
+    "corporation",
+    "company",
+    "networks",
+    "network",
+    "digital",
+    "wireless",
 }
 
 
@@ -443,8 +575,7 @@ def _kennwoerter(name: str) -> frozenset[str]:
     Firma auf der Titelseite, auch wenn die Nachrichtenlage es hergibt.
     """
     woerter = re.findall(r"[a-zäöüß0-9]{4,}", (name or "").lower())
-    return frozenset(w for w in woerter
-                     if w not in _GENERISCHE_NAMENSWOERTER)
+    return frozenset(w for w in woerter if w not in _GENERISCHE_NAMENSWOERTER)
 
 
 # Wie oft ein Absender oberhalb der Falz vorkommen darf.
@@ -518,8 +649,7 @@ def _fuehrende_saetze(md_text: str) -> list[str]:
     return []
 
 
-def _faden(highlights: list[dict],
-           saetze: list[str]) -> list[list[dict]]:
+def _faden(highlights: list[dict], saetze: list[str]) -> list[list[dict]]:
     """Zu jedem Fuehrungssatz die Meldungen, die ihn belegen - beste zuerst.
 
     Zugeordnet wird ueber SELTENE gemeinsame Woerter. Ein Abgleich ueber
@@ -549,9 +679,12 @@ def _faden(highlights: list[dict],
     if not highlights or not saetze:
         return []
     worte_je_meldung = [
-        _wortmenge(f"{h.get('schlagzeile') or ''} {h.get('operator') or ''} "
-                   f"{h.get('title') or ''} {h.get('summary') or ''}")
-        for h in highlights]
+        _wortmenge(
+            f"{h.get('schlagzeile') or ''} {h.get('operator') or ''} "
+            f"{h.get('title') or ''} {h.get('summary') or ''}"
+        )
+        for h in highlights
+    ]
     haeufigkeit = _haeufigkeiten(worte_je_meldung)
     deckel = max(2, len(highlights) // 8)
 
@@ -566,8 +699,9 @@ def _faden(highlights: list[dict],
             selten = [t for t in sw & worte if haeufigkeit[t] <= deckel]
             if len(selten) < _FADEN_MIND_TREFFER:
                 continue
-            kandidaten.append((-_gewicht(selten, haeufigkeit),
-                               -_bildbreite(h), rang, h))
+            kandidaten.append(
+                (-_gewicht(selten, haeufigkeit), -_bildbreite(h), rang, h)
+            )
         if not kandidaten:
             continue
         kandidaten.sort(key=lambda k: k[:3])
@@ -595,15 +729,21 @@ def _ctm_achse(highlights: list[dict]) -> list[dict]:
     `sorted` ist stabil - bei gleichem Bezug bleibt die Dringlichkeitsfolge,
     in der die Meldungen ankommen, unangetastet.
     """
-    return sorted(highlights,
-                  key=lambda h: (-int(h.get("ctm_bezug") or 0),
-                                 -int(h.get("relevance") or 0),
-                                 -int(h.get("quellenzahl") or 1)))
+    return sorted(
+        highlights,
+        key=lambda h: (
+            -int(h.get("ctm_bezug") or 0),
+            -int(h.get("relevance") or 0),
+            -int(h.get("quellenzahl") or 1),
+        ),
+    )
 
 
-def _titelseite(highlights: list[dict],
-                faden: list[list[dict]] | None = None,
-                belegt: list[str] | None = None) -> dict:
+def _titelseite(
+    highlights: list[dict],
+    faden: list[list[dict]] | None = None,
+    belegt: list[str] | None = None,
+) -> dict:
     """Verteilt die Meldungen auf die Gewichtsstufen der Titelseite.
 
     Bis zum 06.08.2026 kannte die Titelseite ZWEI Stufen: einen Aufmacher
@@ -650,8 +790,8 @@ def _titelseite(highlights: list[dict],
     """
     gesperrt: set[str] = {u for u in (belegt or []) if u}
     benutzt: set[str] = set()
-    absender: list[set[str]] = []      # Kennwoerter je Absendergruppe
-    vergeben: list[int] = []           # wie viele Plaetze die Gruppe schon hat
+    absender: list[set[str]] = []  # Kennwoerter je Absendergruppe
+    vergeben: list[int] = []  # wie viele Plaetze die Gruppe schon hat
 
     def gruppe(h: dict) -> int | None:
         kw = _kennwoerter(h.get("operator") or h.get("source_label") or "")
@@ -659,14 +799,19 @@ def _titelseite(highlights: list[dict],
             return None
         for i, g in enumerate(absender):
             if g & kw:
-                g |= kw                # Namensvarianten wachsen zusammen
+                g |= kw  # Namensvarianten wachsen zusammen
                 return i
         absender.append(set(kw))
         vergeben.append(0)
         return len(absender) - 1
 
-    def nimm(n: int, *, mind_breite: int = 0, aus: list[dict] | None = None,
-             streng: bool = False) -> list[dict]:
+    def nimm(
+        n: int,
+        *,
+        mind_breite: int = 0,
+        aus: list[dict] | None = None,
+        streng: bool = False,
+    ) -> list[dict]:
         gewaehlt: list[dict] = []
         # Drei Durchgaenge, in dieser Reihenfolge:
         #   1. Bildanspruch UND Absenderdeckel
@@ -675,11 +820,15 @@ def _titelseite(highlights: list[dict],
         # `streng` laesst nur den ersten zu: wer aus einer Kandidatenliste
         # des Fadens waehlt, will lieber leer ausgehen als den Bildanspruch
         # aufgeben - die naechste Stufe darueber faengt das ab.
-        stufen = [(mind_breite, True)] if streng else (
-            ([(mind_breite, True)] if mind_breite else [])
-            + [(0, True), (0, False)])
+        stufen = (
+            [(mind_breite, True)]
+            if streng
+            else (
+                ([(mind_breite, True)] if mind_breite else []) + [(0, True), (0, False)]
+            )
+        )
         for anspruch, deckel in stufen:
-            for h in (highlights if aus is None else aus):
+            for h in highlights if aus is None else aus:
                 if len(gewaehlt) >= n:
                     break
                 if h.get("url") in benutzt or _bildbreite(h) < anspruch:
@@ -729,13 +878,15 @@ def _titelseite(highlights: list[dict],
         Die Messlatte fuer den roten Faden: was darunter liegt, darf den
         Platz nicht bekommen, egal wie gut es den Fuehrungssatz belegt.
         """
-        return max((_rangschluessel(h) for h in highlights
-                    if frei(h, mind_breite)), default=None)
+        return max(
+            (_rangschluessel(h) for h in highlights if frei(h, mind_breite)),
+            default=None,
+        )
 
-    def gleichrangig(kandidaten: list[dict],
-                     latte: tuple[int, int] | None) -> list[dict]:
-        return [h for h in kandidaten
-                if latte is None or _rangschluessel(h) >= latte]
+    def gleichrangig(
+        kandidaten: list[dict], latte: tuple[int, int] | None
+    ) -> list[dict]:
+        return [h for h in kandidaten if latte is None or _rangschluessel(h) >= latte]
 
     # Der Faden zuerst: die Meldungen, die die Fuehrungssaetze des Berichts
     # belegen, bekommen Aufmacher und zweite Reihe - in der Reihenfolge des
@@ -760,11 +911,15 @@ def _titelseite(highlights: list[dict],
     aufmacher_roh = None
     latte = spitze(MIND_BREITE_GROSS)
     for i, kandidaten in enumerate(offen):
-        treffer = nimm(1, mind_breite=MIND_BREITE_GROSS,
-                       aus=gleichrangig(kandidaten, latte), streng=True)
+        treffer = nimm(
+            1,
+            mind_breite=MIND_BREITE_GROSS,
+            aus=gleichrangig(kandidaten, latte),
+            streng=True,
+        )
         if treffer:
             aufmacher_roh = treffer[0]
-            offen.pop(i)          # dieser Satz ist erzaehlt
+            offen.pop(i)  # dieser Satz ist erzaehlt
             break
     if aufmacher_roh is None:
         aufmacher_roh = (nimm(1, mind_breite=MIND_BREITE_GROSS) or [None])[0]
@@ -783,10 +938,12 @@ def _titelseite(highlights: list[dict],
     zwei: list[dict] = []
     while len(zwei) < 2:
         latte = spitze(MIND_BREITE_GROSS)
-        treffer = nimm(1, mind_breite=MIND_BREITE_GROSS,
-                       aus=gleichrangig([k[0] for k in offen], latte),
-                       streng=True) \
-            or nimm(1, mind_breite=MIND_BREITE_GROSS)
+        treffer = nimm(
+            1,
+            mind_breite=MIND_BREITE_GROSS,
+            aus=gleichrangig([k[0] for k in offen], latte),
+            streng=True,
+        ) or nimm(1, mind_breite=MIND_BREITE_GROSS)
         if not treffer:
             break
         zwei += treffer
@@ -823,10 +980,15 @@ def _titelseite(highlights: list[dict],
     # Die Reservierung greift NICHT vor Aufmacher und zweiter Reihe: dort
     # steht eine Stufe-3-Meldung besser als in einer Textzeile, und die
     # zwei Stufen sind ohnehin streng nach Rang vergeben.
-    wichtig = nimm(_WICHTIG_ZEILEN,
-                   aus=[h for h in _ctm_achse(highlights)
-                        if h.get("url") not in gesperrt
-                        and int(h.get("ctm_bezug") or 0) >= ctm.DIREKT])
+    wichtig = nimm(
+        _WICHTIG_ZEILEN,
+        aus=[
+            h
+            for h in _ctm_achse(highlights)
+            if h.get("url") not in gesperrt
+            and int(h.get("ctm_bezug") or 0) >= ctm.DIREKT
+        ],
+    )
     # `streng` ist hier die halbe Regel: die dritte Reihe ist eine
     # BILDposition. Ohne sie greift ihr Rueckfall auf Meldungen OHNE Bild
     # zu - und weil sie vor der Spalte zieht, holte sie sich die hoch
@@ -834,9 +996,10 @@ def _titelseite(highlights: list[dict],
     # und naehme sie damit der Spalte weg. Eine bildlose Meldung ist in
     # einer Textzeile besser aufgehoben als in einer Bildkachel ohne Bild.
     vier = nimm(4, mind_breite=1, streng=True)
-    wichtig += nimm(_WICHTIG_ZEILEN - len(wichtig),
-                    aus=[h for h in _ctm_achse(highlights)
-                         if h.get("url") not in gesperrt])
+    wichtig += nimm(
+        _WICHTIG_ZEILEN - len(wichtig),
+        aus=[h for h in _ctm_achse(highlights) if h.get("url") not in gesperrt],
+    )
     vier += nimm(4 - len(vier), mind_breite=1)
 
     # Hier wurden bis zum 07.08.2026 zusaetzlich sechs Ressortbloecke
@@ -847,19 +1010,25 @@ def _titelseite(highlights: list[dict],
     # Die Meldungen, die dort standen, sind nicht verschwunden; sie stehen
     # auf meldungen.html, wo sie ohnehin schon standen.
 
-    return {"aufmacher": aufmacher, "zwei": zwei, "vier": vier,
-            "wichtig": wichtig,
-            # Wie viele der Fuehrungssaetze des Berichts oberhalb der Falz
-            # wirklich mit ihrer Meldung stehen. Die Zahl ist die Messgroesse
-            # fuer den roten Faden - tests/test_seiten_zahlen.py haelt sie
-            # dagegen, damit die Kopplung nicht still verloren geht.
-            "faden_oben": sum(1 for kandidaten in (faden or [])
-                              if any(h.get("url") in benutzt
-                                     for h in kandidaten)),
-            # Was oberhalb der Falz mit eigener Schlagzeile steht. Der Test
-            # in tests/test_seiten_zahlen.py haelt diese Zahl gegen die
-            # gerenderten Elemente.
-            "oben": 1 + len(zwei) + len(vier) + len(wichtig) if aufmacher else 0}
+    return {
+        "aufmacher": aufmacher,
+        "zwei": zwei,
+        "vier": vier,
+        "wichtig": wichtig,
+        # Wie viele der Fuehrungssaetze des Berichts oberhalb der Falz
+        # wirklich mit ihrer Meldung stehen. Die Zahl ist die Messgroesse
+        # fuer den roten Faden - tests/test_seiten_zahlen.py haelt sie
+        # dagegen, damit die Kopplung nicht still verloren geht.
+        "faden_oben": sum(
+            1
+            for kandidaten in (faden or [])
+            if any(h.get("url") in benutzt for h in kandidaten)
+        ),
+        # Was oberhalb der Falz mit eigener Schlagzeile steht. Der Test
+        # in tests/test_seiten_zahlen.py haelt diese Zahl gegen die
+        # gerenderten Elemente.
+        "oben": 1 + len(zwei) + len(vier) + len(wichtig) if aufmacher else 0,
+    }
 
 
 def _nach_ressort(highlights: list[dict]) -> list[dict]:
@@ -887,18 +1056,26 @@ def _nach_ressort(highlights: list[dict]) -> list[dict]:
         # haben. Sonst gaehnt links eine Textwueste, waehrend die zwei
         # kleineren daneben bebildert sind. Unter den ersten fuenf, damit
         # die Dringlichkeit nicht der Bebilderung geopfert wird.
-        lead = next((h for h in eintraege[:5] if _bildbreite(h) >= 500),
-                    eintraege[0])
+        lead = next((h for h in eintraege[:5] if _bildbreite(h) >= 500), eintraege[0])
         rest = [h for h in eintraege if h is not lead]
         # Zwei Begleiter zum Aufmacher: bebilderte zuerst, sonst waere die
         # Kachel ein Inhaltsverzeichnis. Innerhalb beider Gruppen bleibt die
         # Reihenfolge nach Dringlichkeit erhalten.
-        begleiter = ([h for h in rest if h.get("image")]
-                     + [h for h in rest if not h.get("image")])[:2]
-        out.append({"key": key, "label": _RESSORT_LABEL[key],
-                    "lead": lead, "mittel": rest[:4],
-                    "zeilen": rest[4:], "n": len(eintraege),
-                    "kachel": [lead] + begleiter})
+        begleiter = (
+            [h for h in rest if h.get("image")]
+            + [h for h in rest if not h.get("image")]
+        )[:2]
+        out.append(
+            {
+                "key": key,
+                "label": _RESSORT_LABEL[key],
+                "lead": lead,
+                "mittel": rest[:4],
+                "zeilen": rest[4:],
+                "n": len(eintraege),
+                "kachel": [lead] + begleiter,
+            }
+        )
     return out
 
 
@@ -956,7 +1133,8 @@ def _text_aus_html(html: str) -> str:
 # beginnt mit einer Ziffer ("1&1 Mobilfunk"), nicht mit einem Grossbuchstaben.
 _SATZENDE = re.compile(
     r"(?:(?<=[a-z\u00e4\u00f6\u00fc\u00dfA-Z\u00c4\u00d6\u00dc\)\"'\u00bb])[.!?](?=\s+[A-Z\u00c4\u00d6\u00dc\u00ab\"\u201e])"
-    r"|(?<=\s)[.!?](?=\s))")
+    r"|(?<=\s)[.!?](?=\s))"
+)
 
 
 def _first_sentence(text, limit=170):
@@ -975,12 +1153,12 @@ def _first_sentence(text, limit=170):
         geschuetzt = geschuetzt.replace(abk, "\x00" * len(abk))
     m = _SATZENDE.search(geschuetzt)
     if m and 0 < m.end() < limit:
-        return t[:m.end()]
+        return t[: m.end()]
     if len(t) <= limit:
         return t
     schnitt = t[:limit].rstrip()
     leer = schnitt.rfind(" ")
-    if leer > limit * 0.6:          # sonst waere die Zeile unbrauchbar kurz
+    if leer > limit * 0.6:  # sonst waere die Zeile unbrauchbar kurz
         schnitt = schnitt[:leer]
     return schnitt.rstrip(" ,;:\u2013-") + "\u2026"
 
@@ -1002,22 +1180,31 @@ def _briefing_sections(md_text):
 
 
 _ADVICE_SECTION_RE = re.compile(
-    r"(?ms)^##\s+(?:Empfehlungen|Handlungsempfehlungen)[^\n]*\n.*?(?=^##\s|\Z)")
+    r"(?ms)^##\s+(?:Empfehlungen|Handlungsempfehlungen)[^\n]*\n.*?(?=^##\s|\Z)"
+)
 _ADVICE_LINE_RE = re.compile(r"(?mi)^\s*(?:Fuer|Für)\s+Vodafone\s*:.*(?:\n|$)")
 
 
 _ADVICE_PHRASES = (
-    "für vodafone", "fuer vodafone", "vodafone sollte", "vodafone könnte",
-    "vodafone koennte", "vodafone muss", "vodafone kann",
+    "für vodafone",
+    "fuer vodafone",
+    "vodafone sollte",
+    "vodafone könnte",
+    "vodafone koennte",
+    "vodafone muss",
+    "vodafone kann",
 )
+
+
 def _ohne_ratschlagsaetze(block: str) -> str:
     """Entfernt aus einem Absatz die SAETZE mit Vodafone-Ratschlag.
 
     Der Satztrenner (mit Abkuerzungsschutz) steht in textwerkzeug - er wird
     von drei Stellen gebraucht, die dieselbe Redaktionsregel durchsetzen.
     """
-    behalten = [s for s in _saetze(block)
-                if not any(p in s.lower() for p in _ADVICE_PHRASES)]
+    behalten = [
+        s for s in _saetze(block) if not any(p in s.lower() for p in _ADVICE_PHRASES)
+    ]
     return " ".join(behalten).strip()
 
 
@@ -1095,7 +1282,7 @@ def _promo_lead(md_text: str) -> str:
         geschuetzt = geschuetzt.replace(abk, "\x00" * len(abk))
     m = _PROMO_SATZENDE.search(geschuetzt)
     if m and m.end() <= 280:
-        return text[:m.end()]
+        return text[: m.end()]
     return _first_sentence(text, 280)
 
 
@@ -1127,7 +1314,7 @@ def _stats(report):
     # --- Themenradar (Schlagwortthemen ueber Titel und Zusammenfassung) ---
     tech: dict[str, dict] = {}
     for h in _flatten(report):
-        for name in _tag_tech(f"{h.get('title','')} {h.get('summary','')}"):
+        for name in _tag_tech(f"{h.get('title', '')} {h.get('summary', '')}"):
             t = tech.setdefault(name, {"theme": name, "n": 0})
             t["n"] += 1
     tech_radar = sorted(tech.values(), key=lambda x: -x["n"])
@@ -1147,10 +1334,10 @@ def _prep_competitors(report: dict) -> list[dict]:
     umgezogen - die Titelseite nennt nur noch Name und Lage in einer Zeile.
     """
     out = []
-    for c in (report.get("competitors") or []):
+    for c in report.get("competitors") or []:
         c = dict(c)
         moves = []
-        for m in (c.get("moves") or []):
+        for m in c.get("moves") or []:
             m = dict(m)
             if _is_suppressed_source(m):
                 continue
@@ -1246,8 +1433,9 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     # Beide Speicher, weil beide nach site/images/ gespiegelt werden - ein
     # Differenzierungs-Beispiel kann sein Bild aus dem Bericht geerbt haben
     # oder ein eigenes og:image tragen.
-    vorhandene_bilder = {b.name for quelle in bild_quellen
-                         for b in quelle.iterdir() if b.is_file()}
+    vorhandene_bilder = {
+        b.name for quelle in bild_quellen for b in quelle.iterdir() if b.is_file()
+    }
     for report in reports:
         for region in (report.get("regions") or {}).values():
             for h in region.get("highlights") or []:
@@ -1265,8 +1453,10 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             if item.get("image") and item["image"] not in vorhandene_bilder:
                 for feld in ("image", "image_w", "image_h"):
                     item.pop(feld, None)
-    themen_band = [{"slug": t.get("slug"), "titel": t.get("title"),
-                    "n": len(t.get("items") or [])} for t in themen]
+    themen_band = [
+        {"slug": t.get("slug"), "titel": t.get("title"), "n": len(t.get("items") or [])}
+        for t in themen
+    ]
 
     # Hier standen bis zum 07.08.2026 die Globals `ausgabe_datum` und
     # `ausgabe_quellen` fuer die Datumszeile des Zeitungskopfs. Die Zeile ist
@@ -1284,6 +1474,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     # deckt ausdruecklich NUR das Aufbereiten ab, nie das Rendern.
     from ..geraete_config import lade_katalog, lade_quellen as _lade_geraetequellen
     from . import geraete_view as geraete_view_mod
+
     _wurzel = getattr(cfg, "root", None) or reports_dir.parent.parent
     try:
         # `heute` ist der Berichtstag (radar.yml, Mi/Fr) - NICHT die Uhr der
@@ -1300,16 +1491,17 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         # Wand (S3c) - ein KeyError hier würde die Geräteseite in ihren
         # Notzustand werfen, obwohl die Seite längst alles hat.
         geraete = geraete_view_mod.aufbereiten(
-            state_dir, _lade_geraetequellen(_wurzel), lade_katalog(_wurzel),
-            heute=reports[0].get("date", "") if reports else "")
+            state_dir,
+            _lade_geraetequellen(_wurzel),
+            lade_katalog(_wurzel),
+            heute=reports[0].get("date", "") if reports else "",
+        )
     except Exception as exc:  # noqa: BLE001
-        log.error("Geraetedaten nicht aufbereitbar: %s: %s",
-                  type(exc).__name__, exc)
+        log.error("Geraetedaten nicht aufbereitbar: %s: %s", type(exc).__name__, exc)
         geraete = geraete_view_mod.leer(f"{type(exc).__name__}: {exc}")
         ausfaelle.append(Ausfall.aus_ausnahme("Gerätedaten", exc))
     ausfaelle.extend(geraete["ausfaelle"])
-    env.globals["geraete_verlinkt"] = bool(
-        geraete["bilanz"].get("schwelle_erreicht"))
+    env.globals["geraete_verlinkt"] = bool(geraete["bilanz"].get("schwelle_erreicht"))
 
     # ---- Wettbewerbs-Radar (RAD-1, 08.09.2026): AUFTRAG_GERAETESEITE.md
     # §2b. Rechnet HIER, nicht erst bei der eigenen Seite - der
@@ -1319,6 +1511,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     # Seite ohne eine einzige vergleichbare Zeile ginge sonst in die
     # Navigation und behauptete eine Antwort, die sie nicht hat.
     from . import geraete_radar as _geraete_radar_mod
+
     try:
         # O3: die Portfolio-Abschnitte der Geräteseite (Lifecycle,
         # Wochenkarte) - dieselben Felder, die die alte Tafel
@@ -1331,16 +1524,19 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             "fenster_tage": geraete["fenster_tage"],
         }
         radar_view = _geraete_radar_mod.radar(
-            geraete["tco"], geraete["vergleich"]["ohne_vertrag"],
-            geraete["quellenlage"], alarme=geraete["alarme"],
-            portfolio=_portfolio)
+            geraete["tco"],
+            geraete["vergleich"]["ohne_vertrag"],
+            geraete["quellenlage"],
+            alarme=geraete["alarme"],
+            portfolio=_portfolio,
+        )
     except Exception as exc:  # noqa: BLE001
-        log.error("Wettbewerbs-Radar nicht aufbereitbar: %s: %s",
-                  type(exc).__name__, exc)
+        log.error(
+            "Wettbewerbs-Radar nicht aufbereitbar: %s: %s", type(exc).__name__, exc
+        )
         radar_view = _geraete_radar_mod.leer()
         ausfaelle.append(Ausfall.aus_ausnahme("Wettbewerbs-Radar", exc))
-    env.globals["radar_verlinkt"] = bool(
-        radar_view["hat_vergleichbare_zeilen"])
+    env.globals["radar_verlinkt"] = bool(radar_view["hat_vergleichbare_zeilen"])
 
     # ---- Rechtstexte: aus demselben Grund HIER und nicht bei ihrer Seite.
     # Die Fusszeile steht in `base.html.j2`, also auf JEDER Seite - und die
@@ -1366,6 +1562,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     # vor drei Monaten ihren Link weiter. Das ist die Gegenmassnahme zu den
     # toten Archivlinks (Premortem 6).
     from . import uebersetzung_view as uebersetzung_view_mod
+
     uebersetzungen = uebersetzung_view_mod.lade(state_dir)
     uebersetzung_je_url = uebersetzung_view_mod.zuordnung(uebersetzungen)
     if not env.globals["newsletter_verlinkt"]:
@@ -1375,14 +1572,26 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     for text in rechtstexte:
         (site_dir / f"{text.schluessel}.html").write_text(
             rechtstext_tpl.render(
-                prefix="", active=text.schluessel,
-                text={"titel": text.titel, "luecken": text.luecken,
-                      "html": _md_to_html(text.markdown)}),
-            encoding="utf-8")
+                prefix="",
+                active=text.schluessel,
+                text={
+                    "titel": text.titel,
+                    "luecken": text.luecken,
+                    "html": _md_to_html(text.markdown),
+                },
+            ),
+            encoding="utf-8",
+        )
 
-    archive = [{"date": r["date"], "date_de": _fmt_date_de(r["date"]),
-                "stats": r.get("stats", {}),
-                "llm": r.get("generated_with_llm", False)} for r in reports]
+    archive = [
+        {
+            "date": r["date"],
+            "date_de": _fmt_date_de(r["date"]),
+            "stats": r.get("stats", {}),
+            "llm": r.get("generated_with_llm", False),
+        }
+        for r in reports
+    ]
 
     # Eine Vorlage fuer die aktuelle Woche UND jede Archivwoche. Bis zum
     # 06.08.2026 waren es zwei (uebersicht.html.j2 + report.html.j2), die
@@ -1406,7 +1615,8 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             if pfad:
                 h["uebersetzung"] = pfad
         briefing_md = _strip_vodafone_advice(
-            _strip_suppressed_source_content(report.get("briefing_md", "")))
+            _strip_suppressed_source_content(report.get("briefing_md", ""))
+        )
         briefing_html, toc = _anchor_headings(_md_to_html(briefing_md))
         # Vier Gewichtsstufen plus Ressortbloecke statt "Aufmacher, drei
         # gleich grosse Anreisser, flache Liste" - siehe _titelseite(). Der
@@ -1423,29 +1633,35 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         # kassiert; die Regel "eine Meldung genau einmal" galt auf dieser
         # Seite bisher nur innerhalb von `_titelseite`.
         kurzpfad = ctm.kurzpfad(highlights)
-        front = _titelseite(highlights,
-                            _faden(highlights, _fuehrende_saetze(briefing_md)),
-                            belegt=[h.get("url") for h in kurzpfad])
+        front = _titelseite(
+            highlights,
+            _faden(highlights, _fuehrende_saetze(briefing_md)),
+            belegt=[h.get("url") for h in kurzpfad],
+        )
         competitors = _prep_competitors(report)
-        wochen.append({
-            "date": report["date"], "highlights": highlights,
-            # E3B: eine uebernommene Redaktion traegt woertlich dieselben
-            # Wettbewerber-Profile wie ihr Ursprung. Ohne diese Ausnahme
-            # stuende "dieselbe Woche" ein zweites Mal im Themenverlauf der
-            # Wettbewerbsseite (report/wettbewerb.py), als haetten zwei
-            # unabhaengige Laeufe zufaellig dasselbe gefunden. Die
-            # Meldungen selbst (`highlights`) brauchen das nicht: die
-            # Chronik dort schluesselt auf die URL und verwirft die zweite
-            # Nennung ohnehin - unter dem WAHREN, frueheren Datum.
-            "competitors": [] if report.get("redaktion_ausfall") else competitors,
-        })
+        wochen.append(
+            {
+                "date": report["date"],
+                "highlights": highlights,
+                # E3B: eine uebernommene Redaktion traegt woertlich dieselben
+                # Wettbewerber-Profile wie ihr Ursprung. Ohne diese Ausnahme
+                # stuende "dieselbe Woche" ein zweites Mal im Themenverlauf der
+                # Wettbewerbsseite (report/wettbewerb.py), als haetten zwei
+                # unabhaengige Laeufe zufaellig dasselbe gefunden. Die
+                # Meldungen selbst (`highlights`) brauchen das nicht: die
+                # Chronik dort schluesselt auf die URL und verwirft die zweite
+                # Nennung ohnehin - unter dem WAHREN, frueheren Datum.
+                "competitors": [] if report.get("redaktion_ausfall") else competitors,
+            }
+        )
         public_highlights = []
         for h in highlights:
             public_h = dict(h)
             public_h.pop("why_it_matters", None)
             public_highlights.append(public_h)
         ctx = {
-            "report": report, "date_de": _fmt_date_de(report["date"]),
+            "report": report,
+            "date_de": _fmt_date_de(report["date"]),
             # E3B: eine Runde ohne bewertete Meldung zeigt weiter die letzte
             # gueltige Redaktion (pipeline.py); None auf jeder normalen Woche.
             "redaktion_ausfall": _redaktion_ausfall_ctx(report),
@@ -1470,7 +1686,8 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             "zwei_minuten": kurzpfad,
             "regions": sorted({h["region"] for h in highlights}),
             "categories": sorted({h["category"] for h in highlights}),
-            "archive": archive, "is_latest": i == 0,
+            "archive": archive,
+            "is_latest": i == 0,
             "num_operators": num_operators or report.get("stats", {}).get("operators"),
             "n_competitors": len(competitors),
             # Die laufenden Themenseiten. Nur die aktuelle Ausgabe verweist
@@ -1495,7 +1712,8 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         ctx_archiv = dict(ctx, is_latest=False)
         (site_dir / "reports" / f"{report['date']}.html").write_text(
             woche_tpl.render(prefix="../", show_explorer=True, **ctx_archiv),
-            encoding="utf-8")
+            encoding="utf-8",
+        )
         # Der Foliensatz je Ausgabe. Feste Vorlage, feste Platzhalter, harte
         # Zeichengrenzen - der Nutzer braucht selten einen Text, er braucht
         # drei Folien fuer den Montagstermin. Ein Ueberlauf wirft, statt eine
@@ -1503,6 +1721,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         # kosten, deshalb wird der Fehler protokolliert und nicht geworfen.
         try:
             from . import folien as folien_mod
+
             # E3B: bei einer uebernommenen Redaktion soll die Coverfolie
             # ("Stand ...") das Datum des Inhalts zeigen, nicht das Datum
             # der leeren Runde - sonst behauptet die Folie ein Datum, das
@@ -1511,20 +1730,21 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             folien_report = report
             if report.get("redaktion_ausfall"):
                 folien_report = dict(
-                    report, date=report["redaktion_ausfall"].get(
-                        "stand", report["date"]))
+                    report,
+                    date=report["redaktion_ausfall"].get("stand", report["date"]),
+                )
             (folien_dir / f"{report['date']}.html").write_text(
-                folien_mod.baue(folien_report), encoding="utf-8")
+                folien_mod.baue(folien_report), encoding="utf-8"
+            )
         except Exception as exc:  # noqa: BLE001
-            log.error("Foliensatz fuer %s nicht erzeugt: %s",
-                      report["date"], exc)
-            ausfaelle.append(Ausfall.aus_ausnahme(
-                f"Foliensatz {report['date']}", exc))
+            log.error("Foliensatz fuer %s nicht erzeugt: %s", report["date"], exc)
+            ausfaelle.append(Ausfall.aus_ausnahme(f"Foliensatz {report['date']}", exc))
         if i == 0:
             latest_ctx = ctx
             (site_dir / "index.html").write_text(
                 woche_tpl.render(prefix="", show_explorer=False, **ctx),
-                encoding="utf-8")
+                encoding="utf-8",
+            )
 
     # Das Fruehwarn-Board steht auf der Startseite, braucht aber alle
     # Ausgaben - erst nach der Schleife oben liegen sie vor. Die Startseite
@@ -1534,10 +1754,12 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     # _flatten(), der teuerste Teil des Rendervorgangs).
     if latest_ctx is not None:
         latest_ctx["fruehwarnung"] = fruehwarnung_mod.aufbereiten(
-            wochen, reports_dir.parent.parent)
+            wochen, reports_dir.parent.parent
+        )
         (site_dir / "index.html").write_text(
             woche_tpl.render(prefix="", show_explorer=False, **latest_ctx),
-            encoding="utf-8")
+            encoding="utf-8",
+        )
 
     latest = reports[0] if reports else None
     diff_report = _load_latest_diff_report(reports_dir / "differenzierung")
@@ -1550,6 +1772,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     # Presse-Eintrag seine Hauptzeile aus `summary` bezieht) steht in
     # report/differenzierung_view.py.
     from datetime import date
+
     db = DiffDB(state_dir / "differentiation_db.json")
     store = DiffStore(state_dir / "differentiation.jsonl")
     latest_date = latest["date"] if latest else date.today().isoformat()
@@ -1561,7 +1784,8 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     # "Konkrete Entwicklungen" + "Quellenbasis") landet noch als Block am
     # Seitenende - siehe report/differenzierung_bericht.py.
     diff_teile = differenzierung_bericht.zerlegen(
-        (diff_report or {}).get("briefing_md", ""), theme_label_map)
+        (diff_report or {}).get("briefing_md", ""), theme_label_map
+    )
 
     # Die Bilder kommen aus dem Index, den die Pipeline gefuellt hat
     # (report/diff_bilder.py). `render_site()` fasst nie das Netz an - sonst
@@ -1569,13 +1793,19 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     # Sie gehen IN `aufbereiten` hinein, nicht nachtraeglich darueber: die
     # Gewichtung eines Hebels entscheidet anhand des Bildes, wer ihn anfuehrt.
     diff = differenzierung_view.aufbereiten(
-        list(db.entries.values()), store.entries(), SWEEP_THEMES,
-        latest_date, _DIFF_COLOR, diff_teile["einordnung"],
+        list(db.entries.values()),
+        store.entries(),
+        SWEEP_THEMES,
+        latest_date,
+        _DIFF_COLOR,
+        diff_teile["einordnung"],
         bilder=diff_bilder.lade_index(state_dir.parent.parent),
-        vorhandene_bilder=vorhandene_bilder)
+        vorhandene_bilder=vorhandene_bilder,
+    )
     (site_dir / "differenzierung.html").write_text(
         env.get_template("differenzierung.html.j2").render(
-            prefix="", diff=diff,
+            prefix="",
+            diff=diff,
             # Neben der Ueberschrift stand bis zum 08.08.2026 in einem sonst
             # leeren Drittel nur "Stand 7. August 2026" - der beste Platz der
             # Seite mit einer Datumszeile belegt (report/seit.py).
@@ -1588,19 +1818,26 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             # Gerechnet gegen eine GEPFLEGTE Liste - nie gegen eine
             # Modellvermutung (report/luecken.py).
             luecken=luecken_mod.bauen(
-                diff["bestand"], theme_label_map,
-                luecken_mod.lade_eigene_hebel(reports_dir.parent.parent)),
+                diff["bestand"],
+                theme_label_map,
+                luecken_mod.lade_eigene_hebel(reports_dir.parent.parent),
+            ),
             date_de=_fmt_date_de(latest["date"]) if latest else "",
             diff_lage_html=_md_to_html(diff_teile["lage"])
-            if diff_teile["lage"] else "",
-            diff_muster=[dict(m, text_html=_md_to_html(m["text"], inline=True))
-                         for m in diff_teile["muster"]],
+            if diff_teile["lage"]
+            else "",
+            diff_muster=[
+                dict(m, text_html=_md_to_html(m["text"], inline=True))
+                for m in diff_teile["muster"]
+            ],
             # Nur noch der Rueckfall fuer die alte Gliederung.
             diff_report_html=_md_to_html(diff_teile["alt_md"])
-            if diff_teile["alt_md"] else "",
-            diff_report_date=_fmt_date_de(diff_report["date"])
-            if diff_report else ""),
-        encoding="utf-8")
+            if diff_teile["alt_md"]
+            else "",
+            diff_report_date=_fmt_date_de(diff_report["date"]) if diff_report else "",
+        ),
+        encoding="utf-8",
+    )
 
     # ---- Meldungen: die Belegebene an EINEM Ort. Loest den zugeklappten
     # Explorer der Berichtsseite, suche.html und archive.html ab - drei Orte
@@ -1609,7 +1846,9 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     # fetch() und filtert im Browser, kein Suchserver noetig.
     (site_dir / "meldungen.html").write_text(
         env.get_template("meldungen.html.j2").render(
-            prefix="", archive=archive, num_operators=num_operators,
+            prefix="",
+            archive=archive,
+            num_operators=num_operators,
             date_de=(latest_ctx or {}).get("date_de", ""),
             # E3B-R2: dieselbe uebernommene Redaktion wie auf der Titelseite -
             # ohne den Hinweis stand hier "Ausgabe vom 4. September" ueber
@@ -1621,8 +1860,10 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             ressorts=_nach_ressort((latest_ctx or {}).get("highlights", [])),
             explorer_json=(latest_ctx or {}).get("explorer_json", "[]"),
             regions=(latest_ctx or {}).get("regions", []),
-            categories=(latest_ctx or {}).get("categories", [])),
-        encoding="utf-8")
+            categories=(latest_ctx or {}).get("categories", []),
+        ),
+        encoding="utf-8",
+    )
 
     # ---- Promo Uebersicht: eigener zweiter Anwendungsfall neben Marktrecherche
     # (siehe promo_pipeline.py). Eigene Quellen (config/promo_sources.yaml),
@@ -1642,7 +1883,9 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             except json.JSONDecodeError:
                 log.warning("promo_db.json unlesbar - rendere leere Promo-Uebersicht")
         promo_entries = promo_db_raw.get("entries") or []
-        promo_updated = promo_db_raw.get("updated") or (latest["date"] if latest else "")
+        promo_updated = promo_db_raw.get("updated") or (
+            latest["date"] if latest else ""
+        )
 
         # Kampagnenbilder (data/state/promo_images/<hash>-1280.jpg, von
         # promo_bilder.py je ANGEBOT abgelegt) sind Pipeline-State, keine
@@ -1680,35 +1923,47 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
                 if veraltet.is_file() and veraltet.name not in ausgeliefert:
                     veraltet.unlink()
 
-        promo_view = prepare_promo_view(promo_entries, promo_cfg.sources,
-                                        promo_updated)
+        promo_view = prepare_promo_view(promo_entries, promo_cfg.sources, promo_updated)
 
         promo_report_dir = reports_dir / "promo"
         promo_report = None
         if promo_report_dir.exists():
-            cands = [f for f in promo_report_dir.glob("*.md") if _DATE_RE.fullmatch(f.stem)]
+            cands = [
+                f for f in promo_report_dir.glob("*.md") if _DATE_RE.fullmatch(f.stem)
+            ]
             if cands:
                 p = max(cands, key=lambda f: f.stem)
-                promo_report = {"date": p.stem, "briefing_md": p.read_text(encoding="utf-8")}
+                promo_report = {
+                    "date": p.stem,
+                    "briefing_md": p.read_text(encoding="utf-8"),
+                }
 
         promo_dir = site_dir / "promo"
         promo_dir.mkdir(exist_ok=True)
         (promo_dir / "index.html").write_text(
             env.get_template("promo_index.html.j2").render(
-                prefix="../", date_de=_fmt_date_de(promo_updated),
+                prefix="../",
+                date_de=_fmt_date_de(promo_updated),
                 promo_view=promo_view,
                 seit=seit_mod.fuer_promo(promo_view),
                 promo_report_html=_md_to_html(promo_report["briefing_md"])
-                if promo_report else "",
+                if promo_report
+                else "",
                 promo_report_date=_fmt_date_de(promo_report["date"])
-                if promo_report else "",
+                if promo_report
+                else "",
                 promo_lead=_promo_lead(promo_report["briefing_md"])
-                if promo_report else ""),
-            encoding="utf-8")
+                if promo_report
+                else "",
+            ),
+            encoding="utf-8",
+        )
         (promo_dir / "quellen.html").write_text(
             env.get_template("promo_quellen.html.j2").render(
-                prefix="../", sources=promo_cfg.sources),
-            encoding="utf-8")
+                prefix="../", sources=promo_cfg.sources
+            ),
+            encoding="utf-8",
+        )
 
     # ---- Themenseiten: eine Seite je laufendem Ereignis, temporaer.
     # Der Ordner SPIEGELT den Themenspeicher, er sammelt nicht - genau wie
@@ -1732,13 +1987,14 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             # wie in `_items_payload`.
             for schluessel in ("aufmacher", "zwei", "rest"):
                 wert = view.get(schluessel)
-                for h in ([wert] if isinstance(wert, dict) else (wert or [])):
+                for h in [wert] if isinstance(wert, dict) else (wert or []):
                     pfad = uebersetzung_je_url.get(h.get("url") or "")
                     if pfad:
                         h["uebersetzung"] = pfad
             datei = f"{view['slug']}.html"
             (thema_dir / datei).write_text(
-                thema_tpl.render(prefix="../", t=view), encoding="utf-8")
+                thema_tpl.render(prefix="../", t=view), encoding="utf-8"
+            )
             geschrieben.add(datei)
     if thema_dir.exists():
         for veraltet in thema_dir.iterdir():
@@ -1764,10 +2020,14 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         ueb_tpl = env.get_template("uebersetzung.html.j2")
         for seite in ueb_seiten:
             (ueb_dir / seite["dateiname"]).write_text(
-                ueb_tpl.render(prefix="../", u=seite["u"],
-                               sprachname=seite["sprachname"],
-                               sprachname_dativ=seite["sprachname_dativ"]),
-                encoding="utf-8")
+                ueb_tpl.render(
+                    prefix="../",
+                    u=seite["u"],
+                    sprachname=seite["sprachname"],
+                    sprachname_dativ=seite["sprachname_dativ"],
+                ),
+                encoding="utf-8",
+            )
         log.info("Uebersetzungsseiten gerendert: %d", len(ueb_seiten))
 
     # ---- Suchindex und Dossier-Seite.
@@ -1783,10 +2043,15 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     # Gesucht wird rein clientseitig: app.js laedt search_index.json per
     # fetch() und filtert im Browser, kein Suchserver noetig.
     search_index = suchindex.bauen(
-        wochen, diff["bestand"], theme_label_map,
-        promo_aktionen=promo_entries, mechanik_label=PROMO_MECHANICS)
+        wochen,
+        diff["bestand"],
+        theme_label_map,
+        promo_aktionen=promo_entries,
+        mechanik_label=PROMO_MECHANICS,
+    )
     (site_dir / "search_index.json").write_text(
-        json.dumps(search_index, ensure_ascii=False), encoding="utf-8")
+        json.dumps(search_index, ensure_ascii=False), encoding="utf-8"
+    )
 
     # ---- Der Stichwort-Index der Newsletter-Anmeldung.
     # Die Trefferzahl-Vorschau ("Ihr Stichwort hätte in den letzten 30 Tagen
@@ -1802,16 +2067,21 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     # einloest, und beide waeren fuer sich gruen.
     from ..newsletter.filters import baue_stichwort_index
     from ..newsletter.config import lade_katalog as _lade_nl_katalog
+
     try:
         _nl_tage = _lade_nl_katalog(_wurzel).grenzen.vorschau_tage
     except (FileNotFoundError, ValueError) as exc:
-        log.warning("newsletter.yaml nicht lesbar (%s) - Stichwort-Index mit "
-                    "30 Tagen", exc)
+        log.warning(
+            "newsletter.yaml nicht lesbar (%s) - Stichwort-Index mit 30 Tagen", exc
+        )
         _nl_tage = 30
     (site_dir / "data").mkdir(exist_ok=True)
     (site_dir / "data" / "keyword-index.json").write_text(
-        json.dumps(baue_stichwort_index(reports_dir, tage=_nl_tage),
-                   ensure_ascii=False), encoding="utf-8")
+        json.dumps(
+            baue_stichwort_index(reports_dir, tage=_nl_tage), ensure_ascii=False
+        ),
+        encoding="utf-8",
+    )
 
     # ---- Die Anmeldeseite und ihre zwei Abschlussseiten.
     # Die beiden kleinen sind die wichtigeren: sie sind STATISCH und kommen
@@ -1819,6 +2089,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     # Render die Instanz schlafen laesst, wartet sonst eine Minute vor einem
     # Spinner - und der Abmeldelink ist der einzige Abmeldeweg.
     from . import newsletter_seite as nl_seite
+
     try:
         nl_katalog = _lade_nl_katalog(_wurzel)
     except (FileNotFoundError, ValueError) as exc:
@@ -1834,33 +2105,45 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         # Einwilligung ab, bevor er las, dass nichts davon ankommt. Solange
         # die Rechtstexte unvollstaendig waren, fiel das niemandem auf: ohne
         # Navigationseintrag fand die Seite ohnehin niemand.
-        nl_dienst_url = (cfg.settings.get("newsletter_dienst_url", "")
-                         if cfg is not None else "")
+        nl_dienst_url = (
+            cfg.settings.get("newsletter_dienst_url", "") if cfg is not None else ""
+        )
         (site_dir / "newsletter.html").write_text(
             env.get_template("newsletter.html.j2").render(
-                prefix="", active="newsletter",
+                prefix="",
+                active="newsletter",
                 dimensionen=nl_seite.dimensionen(nl_katalog),
                 grenzen=nl_katalog.grenzen,
                 dienst_da=bool(nl_dienst_url),
                 einwilligung_absaetze=nl_seite.einwilligung_absaetze(
-                    fassung.text if fassung else ""),
+                    fassung.text if fassung else ""
+                ),
                 einwilligung_version=fassung.version if fassung else "—",
                 nl_config=nl_seite.konfiguration(
                     nl_katalog,
                     dienst_url=nl_dienst_url,
-                    frei=env.globals["newsletter_verlinkt"])),
-            encoding="utf-8")
+                    frei=env.globals["newsletter_verlinkt"],
+                ),
+            ),
+            encoding="utf-8",
+        )
         for name, (titel, text, weiter) in nl_seite.abschlussseiten().items():
             (site_dir / f"newsletter-{name}.html").write_text(
                 env.get_template("newsletter_abschluss.html.j2").render(
-                    prefix="", active="newsletter", titel=titel, text=text,
-                    weiter=weiter),
-                encoding="utf-8")
+                    prefix="",
+                    active="newsletter",
+                    titel=titel,
+                    text=text,
+                    weiter=weiter,
+                ),
+                encoding="utf-8",
+            )
     (site_dir / "suche.html").write_text(
         env.get_template("suche.html.j2").render(
-            prefix="",
-            top_absender=suchindex.haeufigste_absender(search_index)),
-        encoding="utf-8")
+            prefix="", top_absender=suchindex.haeufigste_absender(search_index)
+        ),
+        encoding="utf-8",
+    )
 
     # ---- Wettbewerb: die Dauerseite zu Telekom, O2 und 1&1.
     # Antonio am 08.08.2026: "nicht nur die Meldung dieser Woche, sondern
@@ -1870,19 +2153,25 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     # Deshalb waechst sie mit jedem Lauf, ohne dass die Pipeline etwas davon
     # wissen muss.
     wettbewerb_view = build_wettbewerb_view(
-        wochen, getattr(cfg, "focus_competitors", None) or [],
-        promo_entries, promo_sources,
+        wochen,
+        getattr(cfg, "focus_competitors", None) or [],
+        promo_entries,
+        promo_sources,
         # Die Differenzierungs-Hebel je Wettbewerber. Sie lagen bis zum
         # 08.08.2026 eine Seite weiter und dort nach THEMA sortiert - also
         # genau nicht nach der Frage "was macht dieser eine Anbieter".
-        diff_bestand=diff["bestand"], theme_label=theme_label_map)
+        diff_bestand=diff["bestand"],
+        theme_label=theme_label_map,
+    )
     (site_dir / "wettbewerb.html").write_text(
         env.get_template("wettbewerb.html.j2").render(
-            prefix="", wettbewerb=wettbewerb_view,
-            seit=seit_mod.fuer_wettbewerb(wettbewerb_view,
-                                          wettbewerb_view["stand"]),
-            date_de=_fmt_date_de(wettbewerb_view["stand"])),
-        encoding="utf-8")
+            prefix="",
+            wettbewerb=wettbewerb_view,
+            seit=seit_mod.fuer_wettbewerb(wettbewerb_view, wettbewerb_view["stand"]),
+            date_de=_fmt_date_de(wettbewerb_view["stand"]),
+        ),
+        encoding="utf-8",
+    )
 
     # ---- Lieferzeiten: die einzige Frage dieses Portals, zu der es sonst
     # NIRGENDS eine Antwort gibt - es existiert keine oeffentliche Studie, die
@@ -1890,21 +2179,25 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     # entsteht wie die Wettbewerbsseite beim Rendern, aus dem Speicher, den
     # die Sammelstufe gefuellt hat (collect/lieferzeit.py).
     from ..collect.lieferzeit import lade_warenkorb
+
     lieferzeit_daten: dict = {}
     lieferzeit_pfad = state_dir / "lieferzeit.json"
     if lieferzeit_pfad.exists():
         try:
-            lieferzeit_daten = json.loads(
-                lieferzeit_pfad.read_text(encoding="utf-8"))
+            lieferzeit_daten = json.loads(lieferzeit_pfad.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             log.warning("lieferzeit.json unlesbar - rendere leere Seite")
     lieferzeit_view = lieferzeit_view_mod.aufbereiten(
-        lieferzeit_daten, lade_warenkorb(reports_dir.parent.parent),
-        heute=latest["date"] if latest else "")
+        lieferzeit_daten,
+        lade_warenkorb(reports_dir.parent.parent),
+        heute=latest["date"] if latest else "",
+    )
     (site_dir / "lieferzeit.html").write_text(
         env.get_template("lieferzeit.html.j2").render(
-            prefix="", lieferzeit=lieferzeit_view),
-        encoding="utf-8")
+            prefix="", lieferzeit=lieferzeit_view
+        ),
+        encoding="utf-8",
+    )
 
     # ---- Tarife: Effektivpreis und Positionskarte.
     # Die erste Seite, die nicht aus Meldungen entsteht, sondern aus den
@@ -1912,18 +2205,23 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     # Streudiagramms werden hier gerechnet, nicht im Browser - kein CDN-JS
     # ist Hausregel, und so ist die Darstellung ohne Browser testbar.
     from . import tarife_view as tarife_view_mod
+
     try:
         from ..collect.tarif_crawler import lade_quellen as _lade_tarifquellen
+
         tarif_quellen = _lade_tarifquellen(reports_dir.parent.parent)
     except Exception as exc:  # noqa: BLE001 - eine fehlende Config kippt keine Seite
         tarif_quellen = []
         ausfaelle.append(Ausfall.aus_ausnahme("Tarifquellen", exc))
     tarife = tarife_view_mod.aufbereiten(
-        state_dir / "tarife.jsonl", tarif_quellen,
-        heute=latest["date"] if latest else "")
+        state_dir / "tarife.jsonl",
+        tarif_quellen,
+        heute=latest["date"] if latest else "",
+    )
     (site_dir / "tarife.html").write_text(
         env.get_template("tarife.html.j2").render(prefix="", tarife=tarife),
-        encoding="utf-8")
+        encoding="utf-8",
+    )
 
     # ---- Geraete- und Preisradar: Positionskarte, SKU-Matrix, Lifecycle.
     # Zwei Seiten aus einem Datensatz, wie Promo-Uebersicht und Promo-Quellen.
@@ -1963,24 +2261,29 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     # der Pruefbericht namentlich verweist.
     try:
         from . import geraete_export as _geraete_export
+
         # O4: dazu die TCO-Zeilen (aufgeloest in der View) und die FERTIGE
         # Radar-Aufbereitung - der Radar-Export liest seine Prozentzahlen
         # aus derselben Rechnung, die der Radar-Reiter rendert, und
         # rechnet sie nicht ein zweites Mal.
         geraete["export"] = _geraete_export.schreibe_exporte(
-            site_dir, geraete.get("bestand") or [],
-            geraete.get("alle_punkte") or [], geraete.get("katalog_obj"),
+            site_dir,
+            geraete.get("bestand") or [],
+            geraete.get("alle_punkte") or [],
+            geraete.get("katalog_obj"),
             stand=geraete.get("stand", ""),
             tco=(geraete.get("tco") or {}).get("export"),
             radar=radar_view,
             # P3: die Modell-Tabelle des Katalogs als Ansichts-Export -
             # dieselbe Aufbereitung, die die Modellzeilen liefert.
-            modelle=geraete.get("katalog_modelle"))
-    except Exception as exc:                      # noqa: BLE001
+            modelle=geraete.get("katalog_modelle"),
+        )
+    except Exception as exc:  # noqa: BLE001
         # Wie beim Rest dieser Stufe: ein gescheiterter Export darf die
         # Seite nicht kosten - aber er verschwindet auch nicht still.
         log.error("Geraete-Export gescheitert: %s: %s", type(exc).__name__, exc)
         from . import geraete_export as _geraete_export
+
         geraete["export"] = _geraete_export.leer()
         radar_view["export"] = _geraete_export.leer()["radar"]
         ausfaelle.append(Ausfall.aus_ausnahme("Geräte-Export", exc))
@@ -1997,8 +2300,10 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         # - EINE Berechnung (`radar()`), zwei Vorlagenausschnitte,
         # keine zweite Rechnung für dieselbe Zahl.
         env.get_template("geraete.html.j2").render(
-            prefix="", geraete=geraete, radar=radar_view),
-        encoding="utf-8")
+            prefix="", geraete=geraete, radar=radar_view
+        ),
+        encoding="utf-8",
+    )
     # O3 (STRATEGIE_GERAETE_OPTIK §3, 15.09.2026): das Bündel-Fragment -
     # die Zeilen-Gruppe eines jeden NICHT-Vorgabemodells, aus DEMSELBEN
     # Makro wie der Server-Block der Seite. Die Seite bleibt bei ~1,1 MB
@@ -2014,12 +2319,14 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         # traegt alle uebrigen. Bis E2 war es die Bündel-Vorgabe; seit
         # Graph und Tabelle demselben Start folgen, muesste das Fragment
         # sonst die Gruppe des Startmodells doppelt vermissen lassen.
-        _zr_start = ((geraete.get("zeitreihe") or {}).get("start") or {})
+        _zr_start = (geraete.get("zeitreihe") or {}).get("start") or {}
         _start_modell = _zr_start.get("modell") or _tco["modell_vorgabe"]
         (site_dir / "data" / "geraete-buendel.html").write_text(
             env.get_template("geraete_buendel_fragment.html.j2").render(
-                modelle=_tco["modelle"], vorgabe=_start_modell),
-            encoding="utf-8")
+                modelle=_tco["modelle"], vorgabe=_start_modell
+            ),
+            encoding="utf-8",
+        )
         # E2 (16.09.2026): das ZEITREIHEN-Fragment - der Graph-Zustand
         # jedes (Modell x Band) der Hauptansicht, aus DEMSELBEN Makro wie
         # der Server-First-Paint. EINE eigene Datei neben den Bündel-Zeilen:
@@ -2030,14 +2337,15 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         _zr = geraete.get("zeitreihe") or {}
         if _zr.get("paare"):
             (site_dir / "data" / "geraete-zeitreihe.html").write_text(
-                env.get_template(
-                    "geraete_zeitreihe_fragment.html.j2").render(
-                    paare=_zr["paare"]),
-                encoding="utf-8")
+                env.get_template("geraete_zeitreihe_fragment.html.j2").render(
+                    paare=_zr["paare"]
+                ),
+                encoding="utf-8",
+            )
     (site_dir / "geraete-quellen.html").write_text(
-        env.get_template("geraete_quellen.html.j2").render(
-            prefix="", geraete=geraete),
-        encoding="utf-8")
+        env.get_template("geraete_quellen.html.j2").render(prefix="", geraete=geraete),
+        encoding="utf-8",
+    )
 
     # ---- Transparenz: Laufprotokoll UND Quellenbestand auf einer Seite.
     # Beide beantworten dieselbe Frage ("kann ich dem Ding trauen?") und
@@ -2045,8 +2353,9 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     run = (latest or {}).get("run") if latest else None
     if run:
         run = dict(run)
-        run["sources"] = [s for s in run.get("sources", [])
-                           if not _is_suppressed_source(s)]
+        run["sources"] = [
+            s for s in run.get("sources", []) if not _is_suppressed_source(s)
+        ]
         summary = dict(run.get("source_summary") or {})
         summary["total"] = len(run["sources"])
         # Die Statuswerte des Laufprotokolls heissen "ok", "empty", "fail" und
@@ -2056,14 +2365,19 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         # 05.08. hatte 6 gescheiterte Quellen, die Seite meldete 0. Der
         # Schluessel der Zusammenfassung und der Wert im Protokoll sind zwei
         # verschiedene Namen fuer dieselbe Sache - hier die Zuordnung.
-        for schluessel, status in (("ok", "ok"), ("empty", "empty"),
-                                   ("failed", "fail")):
-            summary[schluessel] = sum(1 for s in run["sources"]
-                                      if s.get("status") == status)
+        for schluessel, status in (
+            ("ok", "ok"),
+            ("empty", "empty"),
+            ("failed", "fail"),
+        ):
+            summary[schluessel] = sum(
+                1 for s in run["sources"] if s.get("status") == status
+            )
         # Stillgelegte Quellen zaehlen nicht als "abgefragt" - sonst sieht die
         # Bilanz besser aus, je mehr Quellen aufgegeben wurden.
-        summary["quarantaene"] = sum(1 for s in run["sources"]
-                                     if s.get("status") == "quarantaene")
+        summary["quarantaene"] = sum(
+            1 for s in run["sources"] if s.get("status") == "quarantaene"
+        )
         summary["total"] -= summary["quarantaene"]
         run["source_summary"] = summary
     by_region: dict[str, list] = {}
@@ -2078,13 +2392,14 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         for key, label in cfg.themes:
             quellen = [s for s in cfg.tech_sources if s.theme == key]
             if quellen:
-                tech_themes.append({"key": key, "label": label,
-                                    "sources": quellen})
+                tech_themes.append({"key": key, "label": label, "sources": quellen})
         news_sources = cfg.news_sources
 
     (site_dir / "transparenz.html").write_text(
         env.get_template("transparenz.html.j2").render(
-            prefix="", run=run, report=latest,
+            prefix="",
+            run=run,
+            report=latest,
             # Die Zahl, die die Seite wirklich zeigen kann: bewertete
             # Meldungen nach dem Ausfiltern stillgelegter Quellen. NICHT
             # stats.new - das sind die neu GESAMMELTEN.
@@ -2099,38 +2414,62 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             n_bewertet=(
                 latest.get("stats", {}).get("bewertete")
                 if latest and latest.get("stats", {}).get("bewertete") is not None
-                else (len(_flatten(latest)) if latest else 0)),
+                else (len(_flatten(latest)) if latest else 0)
+            ),
             date_de=_fmt_date_de(latest["date"]) if latest else "",
             # Die CTM-Linse erklaert sich hier und nur hier: die Startseite
             # zeigt die Etiketten, die Transparenzseite sagt, was sie
             # bedeuten. Die Sicherheitsskala kommt aus derselben Datei, aus
             # der auch der Prompt sie bezieht - zwei Fassungen davon waeren
             # zwei Bedeutungen desselben Wortes.
-            ctm_stufen=[{"stufe": s, "label": ctm.STUFEN_LABEL[s],
-                         "text": ctm.STUFEN_ERKLAERUNG[s]}
-                        for s in (3, 2, 1, 0)],
-            sicherheitsskala=ctm.lade_fokus(
-                reports_dir.parent.parent).sicherheitsskala,
+            ctm_stufen=[
+                {
+                    "stufe": s,
+                    "label": ctm.STUFEN_LABEL[s],
+                    "text": ctm.STUFEN_ERKLAERUNG[s],
+                }
+                for s in (3, 2, 1, 0)
+            ],
+            sicherheitsskala=ctm.lade_fokus(reports_dir.parent.parent).sicherheitsskala,
             # Der Newsletter-Abschnitt: NUR Zahlen, nie Adressen. Ein
             # CI-Test prueft die Statistikdatei gegen ein Adressmuster.
             newsletter=newsletter_protokoll.aufbereiten(
-                state_dir / "newsletter_stats.jsonl"),
-            by_region=by_region, news_sources=news_sources,
+                state_dir / "newsletter_stats.jsonl"
+            ),
+            by_region=by_region,
+            news_sources=news_sources,
             tech_themes=tech_themes,
             n_tech_sources=sum(len(t["sources"]) for t in tech_themes),
-            num_operators=num_operators),
-        encoding="utf-8")
+            num_operators=num_operators,
+        ),
+        encoding="utf-8",
+    )
 
     if not reports:
         (site_dir / "index.html").write_text(
-            woche_tpl.render(prefix="", report=None, date_de="", highlights=[],
-                             explorer_json="[]", front=_titelseite([]),
-                             competitors=[], dash=None, toc=[], lesezeit=0,
-                             briefing_html="", regions=[],
-                             categories=[], archive=[], is_latest=True,
-                             show_explorer=False, themen=[],
-                             num_operators=num_operators, n_competitors=0),
-            encoding="utf-8")
+            woche_tpl.render(
+                prefix="",
+                report=None,
+                date_de="",
+                highlights=[],
+                explorer_json="[]",
+                front=_titelseite([]),
+                competitors=[],
+                dash=None,
+                toc=[],
+                lesezeit=0,
+                briefing_html="",
+                regions=[],
+                categories=[],
+                archive=[],
+                is_latest=True,
+                show_explorer=False,
+                themen=[],
+                num_operators=num_operators,
+                n_competitors=0,
+            ),
+            encoding="utf-8",
+        )
 
     # ---- Weiterleitungen von den alten Dateinamen. Sie stehen in Lesezeichen
     # und in Mails an die Fachabteilung; ein 404 waere die teuerste Art, eine
@@ -2141,12 +2480,14 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     # `wettbewerbsradar.html` ist seit E3 Schritt 3 (17.09.2026) dabei: der
     # Radar ist der Reiter "Radar" der EINEN Geräteseite, der Hash schaltet
     # ihn (app.js) - die Alt-URL steht in Lesezeichen der Fachabteilung.
-    for alt, ziel in (("bericht.html", "index.html"),
-                      ("archive.html", "meldungen.html#archiv"),
-                      ("protokoll.html", "transparenz.html"),
-                      ("sources.html", "transparenz.html#bestand"),
-                      ("wettbewerber.html", "wettbewerb.html"),
-                      ("wettbewerbsradar.html", "geraete.html#tafel-radar")):
+    for alt, ziel in (
+        ("bericht.html", "index.html"),
+        ("archive.html", "meldungen.html#archiv"),
+        ("protokoll.html", "transparenz.html"),
+        ("sources.html", "transparenz.html#bestand"),
+        ("wettbewerber.html", "wettbewerb.html"),
+        ("wettbewerbsradar.html", "geraete.html#tafel-radar"),
+    ):
         (site_dir / alt).write_text(_redirect_html(ziel), encoding="utf-8")
 
     log.info("Site rendered: %d report(s) -> %s", len(reports), site_dir)

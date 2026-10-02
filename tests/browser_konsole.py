@@ -54,6 +54,7 @@ Alles andere bleibt ein Fehler, und zwar ausdruecklich auch:
   ausgeliefert wird;
 * eine fehlende oder leere Herkunft - im Zweifel laut, nicht still.
 """
+
 from __future__ import annotations
 
 from typing import Optional
@@ -92,8 +93,7 @@ def _fremder_netzfehler(text: str, herkunft: Optional[dict]) -> bool:
     return any(url.startswith(ort) for ort in FREMDE_HERKUNFT)
 
 
-def ist_seitenfehler(typ: str, text: str,
-                     herkunft: Optional[dict] = None) -> bool:
+def ist_seitenfehler(typ: str, text: str, herkunft: Optional[dict] = None) -> bool:
     """Gehoert dieser Konsoleneintrag der SEITE zur Last?
 
     `typ` und `text` sind `ConsoleMessage.type` und `.text`, `herkunft`
@@ -116,7 +116,13 @@ def konsole_sammeln(seite) -> list:
     # Mit Kanalmarke: bei rotem Test ist sonst nicht zu sehen, ob die
     # Konsole gemeckert oder ob etwas GEWORFEN hat - und genau dieser
     # Unterschied ist der Grund, warum es diese Datei gibt.
-    seite.on("console", lambda m: fehler.append(f"console: {m.text}")
-             if ist_seitenfehler(m.type, m.text, m.location) else None)
+    seite.on(
+        "console",
+        lambda m: (
+            fehler.append(f"console: {m.text}")
+            if ist_seitenfehler(m.type, m.text, m.location)
+            else None
+        ),
+    )
     seite.on("pageerror", lambda e: fehler.append(f"pageerror: {e}"))
     return fehler

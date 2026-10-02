@@ -74,6 +74,7 @@ Tag-Objekte mit der gesuchten Klasse und wird deshalb gar nicht erst
 gefunden - kein zusaetzlicher Dublettenfilter noetig, anders als bei den
 o2-Kacheln (`tarif_kacheln.py`), deren Dublette echtes HTML ist.
 """
+
 from __future__ import annotations
 
 import logging
@@ -119,8 +120,9 @@ def _auswahl_link(kachel) -> str:
     return ""
 
 
-def tarif_aus_kachel(kachel, *, anbieter: str, seiten_url: str,
-                     abgerufen_am: str) -> Optional[tuple[Tarif, str]]:
+def tarif_aus_kachel(
+    kachel, *, anbieter: str, seiten_url: str, abgerufen_am: str
+) -> Optional[tuple[Tarif, str]]:
     """Eine Tarifkachel wird ein Tarif - oder nichts.
 
     Nichts wird sie ohne Namen und ohne durchgestrichenen Preis. Die grosse
@@ -134,8 +136,11 @@ def tarif_aus_kachel(kachel, *, anbieter: str, seiten_url: str,
     strike_text = _text(kachel.find(class_=_STRIKE_RE))
     grundgebuehr = zahl(strike_text)
     if grundgebuehr is None:
-        log.info("Telekom-Tarifkachel %r ohne durchgestrichenen Preis - "
-                 "verworfen (nur der Ø-Kombipreis waere belegt)", name)
+        log.info(
+            "Telekom-Tarifkachel %r ohne durchgestrichenen Preis - "
+            "verworfen (nur der Ø-Kombipreis waere belegt)",
+            name,
+        )
         return None
 
     href = _auswahl_link(kachel)
@@ -145,9 +150,13 @@ def tarif_aus_kachel(kachel, *, anbieter: str, seiten_url: str,
     if href:
         rohtext = f"{rohtext} | Tarif auswählen: {href}"
 
-    tarif = Tarif(anbieter=anbieter, abgerufen_am=abgerufen_am,
-                  rohtext=rohtext, preistyp=PREISTYP_LIVE_SHOP,
-                  dokument_url=tarif_url)
+    tarif = Tarif(
+        anbieter=anbieter,
+        abgerufen_am=abgerufen_am,
+        rohtext=rohtext,
+        preistyp=PREISTYP_LIVE_SHOP,
+        dokument_url=tarif_url,
+    )
     tarif.setze("name", name, name, HOCH)
     tarif.setze("grundgebuehr", grundgebuehr, strike_text, HOCH)
 
@@ -165,8 +174,9 @@ def tarif_aus_kachel(kachel, *, anbieter: str, seiten_url: str,
     return tarif, hash_
 
 
-def tarife_aus_html(html: str, *, anbieter: str, seiten_url: str,
-                    abgerufen_am: str) -> list[tuple[Tarif, str]]:
+def tarife_aus_html(
+    html: str, *, anbieter: str, seiten_url: str, abgerufen_am: str
+) -> list[tuple[Tarif, str]]:
     """Alle Tarife, die die Seite in ihren Tarifkacheln zeigt.
 
     Gleiche Signatur wie `tarif_ldjson.tarife_aus_html` und
@@ -177,9 +187,9 @@ def tarife_aus_html(html: str, *, anbieter: str, seiten_url: str,
     out: list[tuple[Tarif, str]] = []
     gesehen: set[str] = set()
     for kachel in suppe.find_all(class_=_TILE_RE):
-        ergebnis = tarif_aus_kachel(kachel, anbieter=anbieter,
-                                    seiten_url=seiten_url,
-                                    abgerufen_am=abgerufen_am)
+        ergebnis = tarif_aus_kachel(
+            kachel, anbieter=anbieter, seiten_url=seiten_url, abgerufen_am=abgerufen_am
+        )
         if ergebnis is None:
             continue
         tarif, hash_ = ergebnis

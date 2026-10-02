@@ -1,4 +1,5 @@
 """Load and validate the YAML configuration (watchlist, news sources, settings)."""
+
 from __future__ import annotations
 
 import logging
@@ -49,7 +50,7 @@ class Source:
     item_selector: str | None = None  # optional CSS selector for newsroom pages
     kind: str = ""  # display/crawl kind (see above); defaults from type
     label: str = ""  # human label for the source card
-    plan: str = ""   # for 'official' sources: why not yet crawled + the plan
+    plan: str = ""  # for 'official' sources: why not yet crawled + the plan
     link_template: str | None = None  # json_api: build item URL from a record
     # field when the payload has no direct url/link field, e.g. only a slug
     # ("https://example.com/news?slug={slug}"). Formatted with str.format_map
@@ -89,7 +90,7 @@ class Source:
     # nachlesen kann, woher eine Quelle stammt und ob sie je geprueft wurde.
     # Das Gegenstueck - seit wann bekannt, wann zuletzt geliefert - pflegt die
     # Pipeline in data/state/quellen_register.json.
-    herkunft: str = ""    # z. B. "muster:cision", "rel=alternate", "Recherche"
+    herkunft: str = ""  # z. B. "muster:cision", "rel=alternate", "Recherche"
     abgenommen: str = ""  # ISO-Datum des bestandenen Abnahme-Checks
     allow_short_titles: bool = False  # newsroom(_js): explicit opt-in to drop
     # the 25-char title-length floor down to 6, for sources whose real
@@ -180,7 +181,8 @@ def load_config(root: Path) -> Config:
         for rk, rgn in extra["regions"].items():
             if rk in base_regions:
                 base_regions[rk].setdefault("operators", []).extend(
-                    rgn.get("operators") or [])
+                    rgn.get("operators") or []
+                )
             else:
                 base_regions[rk] = rgn
 
@@ -191,33 +193,37 @@ def load_config(root: Path) -> Config:
         region_names[region_key] = region_name
         for op in region.get("operators") or []:
             sources: list[Source] = []
-            for s in (op.get("sources") or []):
+            for s in op.get("sources") or []:
                 stype = s.get("type", "newsroom")
-                sources.append(Source(
-                    type=stype,
-                    url=s["url"],
+                sources.append(
+                    Source(
+                        type=stype,
+                        url=s["url"],
+                        name=op["name"],
+                        item_selector=s.get("item_selector"),
+                        kind=s.get("kind", stype),
+                        label=s.get("label", ""),
+                        plan=s.get("plan", ""),
+                        link_template=s.get("link_template"),
+                        headers=s.get("headers"),
+                        exclude_url_pattern=s.get("exclude_url_pattern"),
+                        timeout_seconds=s.get("timeout_seconds"),
+                        herkunft=s.get("herkunft", ""),
+                        abgenommen=str(s.get("abgenommen", "") or ""),
+                        allow_short_titles=s.get("allow_short_titles", False),
+                    )
+                )
+            operators.append(
+                Operator(
                     name=op["name"],
-                    item_selector=s.get("item_selector"),
-                    kind=s.get("kind", stype),
-                    label=s.get("label", ""),
-                    plan=s.get("plan", ""),
-                    link_template=s.get("link_template"),
-                    headers=s.get("headers"),
-                    exclude_url_pattern=s.get("exclude_url_pattern"),
-                    timeout_seconds=s.get("timeout_seconds"),
-                    herkunft=s.get("herkunft", ""),
-                    abgenommen=str(s.get("abgenommen", "") or ""),
-                    allow_short_titles=s.get("allow_short_titles", False),
-                ))
-            operators.append(Operator(
-                name=op["name"],
-                region_key=region_key,
-                region_name=region_name,
-                country=op.get("country", ""),
-                website=op.get("website", ""),
-                aliases=op.get("aliases") or [],
-                sources=sources,
-            ))
+                    region_key=region_key,
+                    region_name=region_name,
+                    country=op.get("country", ""),
+                    website=op.get("website", ""),
+                    aliases=op.get("aliases") or [],
+                    sources=sources,
+                )
+            )
 
     # `kind` steuert BEIDES: welcher Collector laeuft (collect/__init__.py) und
     # wie die Quelle auf der Website beschriftet wird. Bis 08/2026 stand hier
@@ -227,29 +233,38 @@ def load_config(root: Path) -> Config:
     # die lief damit in den RSS-Parser: "unparseable feed: syntax error". Der
     # Typ gewinnt jetzt, "trade_press" bleibt nur der Normalfall RSS.
     news_sources = []
-    for s in (news.get("news_sources") or []):
+    for s in news.get("news_sources") or []:
         stype = s.get("type", "rss")
-        news_sources.append(Source(
-            type=stype, url=s["url"], name=s.get("name", s["url"]),
-            kind=s.get("kind") or ("trade_press" if stype == "rss" else stype),
-            label=s.get("name", ""),
-            item_selector=s.get("item_selector"),
-            link_template=s.get("link_template"),
-            headers=s.get("headers"),
-            exclude_url_pattern=s.get("exclude_url_pattern"),
-            timeout_seconds=s.get("timeout_seconds"),
-            allow_short_titles=s.get("allow_short_titles", False),
-            region=str(s.get("region", "") or ""),
-            herkunft=s.get("herkunft", ""),
-            abgenommen=str(s.get("abgenommen", "") or "")))
+        news_sources.append(
+            Source(
+                type=stype,
+                url=s["url"],
+                name=s.get("name", s["url"]),
+                kind=s.get("kind") or ("trade_press" if stype == "rss" else stype),
+                label=s.get("name", ""),
+                item_selector=s.get("item_selector"),
+                link_template=s.get("link_template"),
+                headers=s.get("headers"),
+                exclude_url_pattern=s.get("exclude_url_pattern"),
+                timeout_seconds=s.get("timeout_seconds"),
+                allow_short_titles=s.get("allow_short_titles", False),
+                region=str(s.get("region", "") or ""),
+                herkunft=s.get("herkunft", ""),
+                abgenommen=str(s.get("abgenommen", "") or ""),
+            )
+        )
     # Eine Vorgabe-Region, die es gar nicht gibt, waere ein eigener
     # Analysten-Bereich mit einem Tippfehler als Namen. Lieber laut hier als
     # still im Bericht.
     for s in news_sources:
         if s.region and s.region not in region_names:
-            log.warning("news_sources.yaml: %s hat region: %r - diese Region "
-                        "steht nicht in der Watchlist, die Vorgabe wird "
-                        "ignoriert", s.name, s.region)
+            log.warning(
+                "news_sources.yaml: %s hat region: %r - diese Region "
+                "steht nicht in der Watchlist, die Vorgabe wird "
+                "ignoriert",
+                s.name,
+                s.region,
+            )
             s.region = ""
 
     tech_sources, theme_names = _load_tech_sources(cfg_dir / "tech_sources.yaml")
@@ -258,8 +273,12 @@ def load_config(root: Path) -> Config:
     log.info(
         "Config loaded: %d operators in %d regions, %d crawlable operator "
         "sources, %d trade-press sources, %d theme sources in %d themes",
-        len(operators), len(region_names) - 1, n_crawled, len(news_sources),
-        len(tech_sources), len(theme_names),
+        len(operators),
+        len(region_names) - 1,
+        n_crawled,
+        len(news_sources),
+        len(tech_sources),
+        len(theme_names),
     )
     return Config(
         root=root,
@@ -293,23 +312,25 @@ def _load_tech_sources(path: Path) -> tuple[list[Source], dict[str, str]]:
     for theme_key, theme in (raw.get("themen") or {}).items():
         key = THEME_PREFIX + theme_key
         names[key] = theme.get("name", theme_key)
-        for s in (theme.get("quellen") or []):
+        for s in theme.get("quellen") or []:
             stype = s.get("type", "rss")
-            sources.append(Source(
-                type=stype,
-                url=s["url"],
-                name=s.get("name", s["url"]),
-                item_selector=s.get("item_selector"),
-                kind=s.get("kind", stype),
-                label=s.get("label", "") or s.get("name", ""),
-                plan=s.get("plan", ""),
-                link_template=s.get("link_template"),
-                headers=s.get("headers"),
-                exclude_url_pattern=s.get("exclude_url_pattern"),
-                timeout_seconds=s.get("timeout_seconds"),
-                herkunft=s.get("herkunft", ""),
-                abgenommen=str(s.get("abgenommen", "") or ""),
-                theme=key,
-                allow_short_titles=s.get("allow_short_titles", False),
-            ))
+            sources.append(
+                Source(
+                    type=stype,
+                    url=s["url"],
+                    name=s.get("name", s["url"]),
+                    item_selector=s.get("item_selector"),
+                    kind=s.get("kind", stype),
+                    label=s.get("label", "") or s.get("name", ""),
+                    plan=s.get("plan", ""),
+                    link_template=s.get("link_template"),
+                    headers=s.get("headers"),
+                    exclude_url_pattern=s.get("exclude_url_pattern"),
+                    timeout_seconds=s.get("timeout_seconds"),
+                    herkunft=s.get("herkunft", ""),
+                    abgenommen=str(s.get("abgenommen", "") or ""),
+                    theme=key,
+                    allow_short_titles=s.get("allow_short_titles", False),
+                )
+            )
     return sources, names

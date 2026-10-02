@@ -7,6 +7,7 @@ die Unvollstaendigkeit einer Seite wirklich etwas AUSSCHALTET - und zwar im
 Code, nicht in einem Test (eine Regel, die nur ein Test kennt, schaltet keine
 Navigation; siehe Geraeteseite, CLAUDE.md §5).
 """
+
 import re
 
 import pytest
@@ -15,8 +16,14 @@ from bs4 import BeautifulSoup
 from telco_radar.report import rechtstexte
 from telco_radar.report.html import render_site
 
-WURZEL_SEITEN = ("index.html", "meldungen.html", "transparenz.html",
-                 "differenzierung.html", "wettbewerb.html", "suche.html")
+WURZEL_SEITEN = (
+    "index.html",
+    "meldungen.html",
+    "transparenz.html",
+    "differenzierung.html",
+    "wettbewerb.html",
+    "suche.html",
+)
 
 
 @pytest.fixture()
@@ -25,25 +32,30 @@ def wurzel(tmp_path):
     legal = tmp_path / "content" / "legal"
     legal.mkdir(parents=True)
     (legal / "impressum.md").write_text(
-        "# Impressum\n\nMusterfirma\nMusterweg 1, 12345 Musterstadt\n",
-        encoding="utf-8")
+        "# Impressum\n\nMusterfirma\nMusterweg 1, 12345 Musterstadt\n", encoding="utf-8"
+    )
     (legal / "datenschutz.md").write_text(
         "# Datenschutzerklärung\n\n## 1. Verantwortlicher\n\nMusterfirma\n",
-        encoding="utf-8")
+        encoding="utf-8",
+    )
     consent = tmp_path / "content" / "consent_texts"
     consent.mkdir(parents=True)
-    (consent / "2026-08-11.md").write_text("Ich möchte den Radar.\n",
-                                           encoding="utf-8")
+    (consent / "2026-08-11.md").write_text("Ich möchte den Radar.\n", encoding="utf-8")
     return tmp_path
 
 
 def _luecke_einbauen(wurzel):
     datei = wurzel / "content" / "legal" / "impressum.md"
-    datei.write_text(datei.read_text(encoding="utf-8").replace(
-        "Musterweg 1, 12345 Musterstadt", "{{ANSCHRIFT}}"), encoding="utf-8")
+    datei.write_text(
+        datei.read_text(encoding="utf-8").replace(
+            "Musterweg 1, 12345 Musterstadt", "{{ANSCHRIFT}}"
+        ),
+        encoding="utf-8",
+    )
 
 
 # ------------------------------------------------------------ das Modul ----
+
 
 def test_vollstaendige_texte_erreichen_die_schwelle(wurzel):
     assert rechtstexte.vollstaendig(wurzel) is True
@@ -87,6 +99,7 @@ def test_die_eigene_ueberschrift_faellt_weg(wurzel):
 
 # ------------------------------------------------- Einwilligungsfassungen --
 
+
 def test_einwilligung_ist_versioniert_und_nachrechenbar(wurzel):
     aktuell = rechtstexte.aktuelle_einwilligung(wurzel)
     assert aktuell.version == "2026-08-11"
@@ -94,15 +107,16 @@ def test_einwilligung_ist_versioniert_und_nachrechenbar(wurzel):
     # Der Nachweis besteht darin, dass JEDER ihn nachrechnen kann, der den
     # Text hat - also ohne Pepper und ohne Projektwissen.
     import hashlib
-    erwartet = hashlib.sha256(
-        aktuell.text.strip().encode("utf-8")).hexdigest()
+
+    erwartet = hashlib.sha256(aktuell.text.strip().encode("utf-8")).hexdigest()
     assert aktuell.hash == f"sha256:{erwartet}"
 
 
 def test_eine_alte_fassung_bleibt_abrufbar(wurzel):
     """Die Aufsichtsbehoerde fragt nach dem Wortlaut von DAMALS."""
     (wurzel / "content" / "consent_texts" / "2026-09-01.md").write_text(
-        "Neuer Wortlaut.\n", encoding="utf-8")
+        "Neuer Wortlaut.\n", encoding="utf-8"
+    )
     assert rechtstexte.aktuelle_einwilligung(wurzel).version == "2026-09-01"
     alt = rechtstexte.einwilligung(wurzel, "2026-08-11")
     assert alt is not None and "Ich möchte" in alt.text
@@ -112,12 +126,12 @@ def test_eine_alte_fassung_bleibt_abrufbar(wurzel):
 def test_eine_geaenderte_fassung_faellt_am_hash_auf(wurzel):
     vorher = rechtstexte.aktuelle_einwilligung(wurzel).hash
     datei = wurzel / "content" / "consent_texts" / "2026-08-11.md"
-    datei.write_text("Ich möchte den Radar. Und noch etwas.\n",
-                     encoding="utf-8")
+    datei.write_text("Ich möchte den Radar. Und noch etwas.\n", encoding="utf-8")
     assert rechtstexte.aktuelle_einwilligung(wurzel).hash != vorher
 
 
 # ---------------------------------------------------------- die Seiten -----
+
 
 def _render(wurzel):
     reports_dir = wurzel / "data" / "reports"
@@ -136,8 +150,9 @@ def test_beide_seiten_entstehen_und_stehen_in_jeder_fusszeile(wurzel):
         datei = site / name
         if not datei.exists():
             continue
-        fuss = BeautifulSoup(datei.read_text(encoding="utf-8"),
-                             "html.parser").select_one(".foot .foot-recht")
+        fuss = BeautifulSoup(
+            datei.read_text(encoding="utf-8"), "html.parser"
+        ).select_one(".foot .foot-recht")
         ziele = {a["href"] for a in fuss.select("a")} if fuss else set()
         if {"impressum.html", "datenschutz.html"} - ziele:
             ohne.append((name, sorted(ziele)))
@@ -153,18 +168,29 @@ def test_eine_unterseite_zeigt_eine_ebene_hoeher(wurzel):
     Startseite, nur mit `prefix="../"`. Ohne einen Bericht gibt es sie nicht,
     also legt der Test einen an."""
     import json
+
     (wurzel / "data" / "reports").mkdir(parents=True, exist_ok=True)
-    (wurzel / "data" / "reports" / "2026-08-05.json").write_text(json.dumps({
-        "date": "2026-08-05", "stats": {"new": 1}, "briefing_md": "Text.",
-        "regions": {"Europa": {"highlights": []}},
-    }), encoding="utf-8")
+    (wurzel / "data" / "reports" / "2026-08-05.json").write_text(
+        json.dumps(
+            {
+                "date": "2026-08-05",
+                "stats": {"new": 1},
+                "briefing_md": "Text.",
+                "regions": {"Europa": {"highlights": []}},
+            }
+        ),
+        encoding="utf-8",
+    )
     site = _render(wurzel)
     datei = site / "reports" / "2026-08-05.html"
     assert datei.exists()
-    fuss = BeautifulSoup(datei.read_text(encoding="utf-8"),
-                         "html.parser").select_one(".foot-recht")
+    fuss = BeautifulSoup(datei.read_text(encoding="utf-8"), "html.parser").select_one(
+        ".foot-recht"
+    )
     assert {a["href"] for a in fuss.select("a")} == {
-        "../impressum.html", "../datenschutz.html"}
+        "../impressum.html",
+        "../datenschutz.html",
+    }
 
 
 def test_die_seite_nennt_die_drei_auftragsverarbeiter(wurzel):
@@ -174,12 +200,18 @@ def test_die_seite_nennt_die_drei_auftragsverarbeiter(wurzel):
     site = _render(wurzel)
     # Der echte Text des Repos, nicht die Fixture.
     from pathlib import Path
+
     echt = Path(__file__).resolve().parents[1]
     text = rechtstexte.lade(echt, "datenschutz").markdown
     for name in ("Render", "GitHub", "Brevo"):
         assert name in text, name
-    for pflicht in ("Art. 6 Abs. 1 lit. a", "Art. 77", "Widerruf",
-                    "Double-Opt-in", "Speicherdauer"):
+    for pflicht in (
+        "Art. 6 Abs. 1 lit. a",
+        "Art. 77",
+        "Widerruf",
+        "Double-Opt-in",
+        "Speicherdauer",
+    ):
         assert pflicht in text, pflicht
     assert (site / "datenschutz.html").exists()
 
@@ -187,8 +219,9 @@ def test_die_seite_nennt_die_drei_auftragsverarbeiter(wurzel):
 def test_die_luecke_steht_oben_auf_der_seite(wurzel):
     _luecke_einbauen(wurzel)
     site = _render(wurzel)
-    soup = BeautifulSoup((site / "impressum.html").read_text(encoding="utf-8"),
-                         "html.parser")
+    soup = BeautifulSoup(
+        (site / "impressum.html").read_text(encoding="utf-8"), "html.parser"
+    )
     kasten = soup.select_one(".rechtstext-luecke")
     assert kasten is not None
     assert "ANSCHRIFT" in kasten.get_text()
@@ -202,8 +235,8 @@ def test_rohes_html_im_rechtstext_wird_entschaerft(wurzel):
     dem Repo, aber sie laufen durch denselben Renderer - eine Ausnahme hier
     waere ein zweiter Pfad mit anderen Regeln."""
     (wurzel / "content" / "legal" / "impressum.md").write_text(
-        "# Impressum\n\nText <script>alert(1)</script> Ende\n",
-        encoding="utf-8")
+        "# Impressum\n\nText <script>alert(1)</script> Ende\n", encoding="utf-8"
+    )
     site = _render(wurzel)
     html = (site / "impressum.html").read_text(encoding="utf-8")
     assert "<script>alert" not in html
@@ -216,14 +249,16 @@ def test_ohne_content_verzeichnis_kippt_keine_seite(tmp_path):
     site = _render(tmp_path)
     assert (site / "index.html").exists()
     assert not (site / "impressum.html").exists()
-    fuss = BeautifulSoup((site / "index.html").read_text(encoding="utf-8"),
-                         "html.parser").select_one(".foot-inner")
+    fuss = BeautifulSoup(
+        (site / "index.html").read_text(encoding="utf-8"), "html.parser"
+    ).select_one(".foot-inner")
     # Kein Link auf eine Seite, die es nicht gibt.
     assert fuss.select_one(".foot-recht") is None
 
 
 def test_das_echte_repo_hat_beide_pflichtseiten():
     from pathlib import Path
+
     echt = Path(__file__).resolve().parents[1]
     for schluessel in ("impressum", "datenschutz"):
         assert rechtstexte.lade(echt, schluessel) is not None, schluessel
@@ -234,6 +269,7 @@ def test_der_api_key_steht_in_keiner_datei_des_repos():
     """Der Brevo-Key gehoert ausschliesslich in ein GitHub-Secret. Ein Key im
     Repo ist oeffentlich, sobald das Repo es ist - und dieses ist es."""
     from pathlib import Path
+
     wurzel = Path(__file__).resolve().parents[1]
     # Brevo-Keys beginnen mit "xkeysib-" (API v3) bzw. "xsmtpsib-" (SMTP).
     muster = re.compile(r"xkeysib-[A-Za-z0-9]|xsmtpsib-[A-Za-z0-9]")
@@ -241,8 +277,18 @@ def test_der_api_key_steht_in_keiner_datei_des_repos():
     for pfad in wurzel.rglob("*"):
         if not pfad.is_file() or ".git/" in str(pfad):
             continue
-        if pfad.suffix not in {".py", ".yml", ".yaml", ".md", ".json", ".j2",
-                               ".js", ".css", ".txt", ".sh"}:
+        if pfad.suffix not in {
+            ".py",
+            ".yml",
+            ".yaml",
+            ".md",
+            ".json",
+            ".j2",
+            ".js",
+            ".css",
+            ".txt",
+            ".sh",
+        }:
             continue
         try:
             inhalt = pfad.read_text(encoding="utf-8")

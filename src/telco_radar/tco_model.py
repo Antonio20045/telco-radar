@@ -93,6 +93,7 @@ Sachleistung bekommt ein Preisschild, und ein Buendel wird nie gegen die
 SIM-only-Referenz eines ANDEREN Anbieters oder Tarifs gerechnet - das waere
 eine Differenz zweier verschiedener Fragen.
 """
+
 from __future__ import annotations
 
 import logging
@@ -100,8 +101,12 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from .geraete_model import Ratenzahlung, normalisiere
-from .tarif_model import (PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP, Preisphase,
-                          vertrag_basis)
+from .tarif_model import (
+    PREISTYP_DOKUMENT,
+    PREISTYP_LIVE_SHOP,
+    Preisphase,
+    vertrag_basis,
+)
 
 log = logging.getLogger(__name__)
 
@@ -180,6 +185,7 @@ _LUECKEN_OHNE_EINFLUSS_AUF_DIE_DIFFERENZ = (POSTEN_RABATTE,)
 # IDs - eine eigene Namensmenge, die keine bestehende beruehrt
 # --------------------------------------------------------------------------
 
+
 def laufzeit_in_monaten(laufzeit_monate) -> Optional[int]:
     """Die Ratenlaufzeit als ganze Monatszahl - oder `None` als Luecke.
 
@@ -204,20 +210,27 @@ def laufzeit_in_monaten(laufzeit_monate) -> Optional[int]:
     if laufzeit_monate is None:
         return None
     if isinstance(laufzeit_monate, bool):
-        log.warning("Laufzeit %r ist ein Wahrheitswert, keine Monatszahl - "
-                    "gilt als nicht gemessen", laufzeit_monate)
+        log.warning(
+            "Laufzeit %r ist ein Wahrheitswert, keine Monatszahl - "
+            "gilt als nicht gemessen",
+            laufzeit_monate,
+        )
         return None
     try:
         monate = int(laufzeit_monate)
         if monate != float(laufzeit_monate):
             raise ValueError("keine ganze Monatszahl")
     except (TypeError, ValueError):
-        log.warning("Laufzeit %r ist keine ganze Monatszahl - gilt als "
-                    "nicht gemessen", laufzeit_monate)
+        log.warning(
+            "Laufzeit %r ist keine ganze Monatszahl - gilt als nicht gemessen",
+            laufzeit_monate,
+        )
         return None
     if monate <= 0:
-        log.warning("Laufzeit %r ist keine Ratenlaufzeit - gilt als nicht "
-                    "gemessen", laufzeit_monate)
+        log.warning(
+            "Laufzeit %r ist keine Ratenlaufzeit - gilt als nicht gemessen",
+            laufzeit_monate,
+        )
         return None
     return monate
 
@@ -244,8 +257,9 @@ def laufzeit_segment(laufzeit_monate: Optional[int]) -> str:
     return LAUFZEIT_LUECKE if monate is None else f"{monate}m"
 
 
-def buendel_id(sku_id: str, anbieter: str, tarif_name: str,
-               laufzeit_monate: Optional[int]) -> str:
+def buendel_id(
+    sku_id: str, anbieter: str, tarif_name: str, laufzeit_monate: Optional[int]
+) -> str:
     """`buendel--<anbieter>--<sku>--<tarif>--<laufzeit>`.
 
     Ein Buendel ist ein NEUER Datensatz und bekommt eine neue ID. Das ist
@@ -279,14 +293,20 @@ def buendel_id(sku_id: str, anbieter: str, tarif_name: str,
     `sku_id`. Eine ID mit weggelassenem Segment waere kuerzer und damit
     aus der Form gefallen.
     """
-    return _TRENNER.join(("buendel", normalisiere(anbieter) or "ohne-anbieter",
-                          sku_id or "ohne-geraet",
-                          normalisiere(tarif_name) or "ohne-tarif",
-                          laufzeit_segment(laufzeit_monate)))
+    return _TRENNER.join(
+        (
+            "buendel",
+            normalisiere(anbieter) or "ohne-anbieter",
+            sku_id or "ohne-geraet",
+            normalisiere(tarif_name) or "ohne-tarif",
+            laufzeit_segment(laufzeit_monate),
+        )
+    )
 
 
-def buendel_id_aktuell(gespeicherte_id: str,
-                       laufzeit_monate: Optional[int]) -> Optional[str]:
+def buendel_id_aktuell(
+    gespeicherte_id: str, laufzeit_monate: Optional[int]
+) -> Optional[str]:
     """Die heutige Buendel-ID eines GESPEICHERTEN Satzes - Lesemigration B1.
 
     `data/state/geraete_tco.json` und `geraete_tco_historie.jsonl` tragen
@@ -337,13 +357,19 @@ def buendel_id_ohne_laufzeit(buendel_id_: str) -> Optional[str]:
 
 def sim_only_id(anbieter: str, tarif_name: str) -> str:
     """`simonly--<anbieter>--<tarif>` - drei Bestandteile, siehe oben."""
-    return _TRENNER.join(("simonly", normalisiere(anbieter) or "ohne-anbieter",
-                          normalisiere(tarif_name) or "ohne-tarif"))
+    return _TRENNER.join(
+        (
+            "simonly",
+            normalisiere(anbieter) or "ohne-anbieter",
+            normalisiere(tarif_name) or "ohne-tarif",
+        )
+    )
 
 
 # --------------------------------------------------------------------------
 # Die Posten
 # --------------------------------------------------------------------------
+
 
 @dataclass
 class Rabatt:
@@ -382,9 +408,11 @@ class Rabatt:
                 continue
             wert = float(wert)
             if wert < 0:
-                raise ValueError(f"negativer betrag in {feld}: {wert} - ein "
-                                 f"Rabatt wird als positiver Nachlass "
-                                 f"geschrieben")
+                raise ValueError(
+                    f"negativer betrag in {feld}: {wert} - ein "
+                    f"Rabatt wird als positiver Nachlass "
+                    f"geschrieben"
+                )
             setattr(self, feld, round(wert, 2))
         self.von_monat = int(self.von_monat)
         if self.von_monat < 1:
@@ -392,8 +420,9 @@ class Rabatt:
         if self.bis_monat is not None:
             self.bis_monat = int(self.bis_monat)
             if self.bis_monat < self.von_monat:
-                raise ValueError(f"bis_monat vor von_monat: {self.bis_monat} "
-                                 f"< {self.von_monat}")
+                raise ValueError(
+                    f"bis_monat vor von_monat: {self.bis_monat} < {self.von_monat}"
+                )
 
     def wert(self, horizont: int = TCO_HORIZONT) -> float:
         """Was dieser Nachlass ueber den Horizont waere - zum ANZEIGEN.
@@ -418,9 +447,14 @@ AKTION_TARIFRABATT = "tarifrabatt"
 AKTION_ANSCHLUSS_ERLASSEN = "anschluss_erlassen"
 AKTION_WECHSELBONUS = "wechselbonus"
 AKTION_ONLINE_VORTEIL = "online_vorteil"
-AKTION_ARTEN = (AKTION_TRADE_IN, AKTION_GERAETERABATT, AKTION_TARIFRABATT,
-                AKTION_ANSCHLUSS_ERLASSEN, AKTION_WECHSELBONUS,
-                AKTION_ONLINE_VORTEIL)
+AKTION_ARTEN = (
+    AKTION_TRADE_IN,
+    AKTION_GERAETERABATT,
+    AKTION_TARIFRABATT,
+    AKTION_ANSCHLUSS_ERLASSEN,
+    AKTION_WECHSELBONUS,
+    AKTION_ONLINE_VORTEIL,
+)
 
 
 @dataclass
@@ -469,8 +503,7 @@ class Aktion:
             raise ValueError(f"unbekannte Aktionsart: {self.art!r}")
         self.bedingung = (self.bedingung or "").strip()
         if not self.bedingung:
-            raise ValueError("eine Aktion ohne Bedingung ist nicht "
-                             "nachpruefbar")
+            raise ValueError("eine Aktion ohne Bedingung ist nicht nachpruefbar")
         self.quelle_url = (self.quelle_url or "").strip()
         if not self.quelle_url:
             raise ValueError("eine Aktion ohne Quelle ist nicht nachpruefbar")
@@ -480,9 +513,11 @@ class Aktion:
                 continue
             wert = float(wert)
             if wert < 0:
-                raise ValueError(f"negativer Vorteil in {feld}: {wert} - "
-                                 f"eine Aktion wird als positiver Betrag "
-                                 f"geschrieben")
+                raise ValueError(
+                    f"negativer Vorteil in {feld}: {wert} - "
+                    f"eine Aktion wird als positiver Betrag "
+                    f"geschrieben"
+                )
             setattr(self, feld, round(wert, 2))
         self.eingerechnet = bool(self.eingerechnet)
         self.gueltig_bis = (self.gueltig_bis or "").strip()
@@ -611,9 +646,13 @@ class Buendel:
         self.tarif_name = self.tarif_name.strip()
         self.sku_id = (self.sku_id or "").strip()
         self.zustand = (self.zustand or "").strip().lower()
-        for feld in ("tarif_monatlich", "buendel_monatlich",
-                     "geraet_zuzahlung", "geraet_monatsrate",
-                     "anschlusspreis"):
+        for feld in (
+            "tarif_monatlich",
+            "buendel_monatlich",
+            "geraet_zuzahlung",
+            "geraet_monatsrate",
+            "anschlusspreis",
+        ):
             wert = getattr(self, feld)
             if wert is None:
                 continue
@@ -622,18 +661,19 @@ class Buendel:
                 raise ValueError(f"negativer preis in {feld}: {wert}")
             setattr(self, feld, round(wert, 2))
         if self.buendel_monatlich is not None and (
-                self.tarif_monatlich is not None
-                or self.geraet_monatsrate is not None):
+            self.tarif_monatlich is not None or self.geraet_monatsrate is not None
+        ):
             # Sonst stuende derselbe Monat zweimal in der Summe: einmal als
             # Buendelbetrag und einmal als seine Bestandteile. Wer beides
             # kennt, traegt die Bestandteile ein - sie sagen mehr.
-            raise ValueError("ein Buendelmonatspreis steht ANSTELLE von "
-                             "Tarifpreis und Geraeterate, nicht daneben")
+            raise ValueError(
+                "ein Buendelmonatspreis steht ANSTELLE von "
+                "Tarifpreis und Geraeterate, nicht daneben"
+            )
         if self.tarif_bindung_monate is not None:
             self.tarif_bindung_monate = int(self.tarif_bindung_monate)
             if self.tarif_bindung_monate < 0:
-                raise ValueError("negative Tarifbindung: "
-                                 f"{self.tarif_bindung_monate}")
+                raise ValueError(f"negative Tarifbindung: {self.tarif_bindung_monate}")
         if self.laufzeit_monate is not None:
             # FEHLT (`None`) ist die benannte Luecke; eine Zahl, die keine
             # Laufzeit sein KANN (0, negativ, 24,5), ist dagegen ein
@@ -643,22 +683,28 @@ class Buendel:
             # Weitergabe (CLAUDE.md, Clean Code 5).
             monate = laufzeit_in_monaten(self.laufzeit_monate)
             if monate is None:
-                raise ValueError("laufzeit_monate ist keine Ratenlaufzeit: "
-                                 f"{self.laufzeit_monate!r}")
+                raise ValueError(
+                    f"laufzeit_monate ist keine Ratenlaufzeit: {self.laufzeit_monate!r}"
+                )
             self.laufzeit_monate = monate
-        if not self.sku_id and (self.geraet_zuzahlung is not None
-                                or self.geraet_monatsrate is not None
-                                or self.buendel_monatlich is not None):
+        if not self.sku_id and (
+            self.geraet_zuzahlung is not None
+            or self.geraet_monatsrate is not None
+            or self.buendel_monatlich is not None
+        ):
             # Sonst haette eine SIM-only-Referenz einen Geraetepreis, und die
             # Differenz aus beiden - der effektive Geraetepreis - zoege ihn
             # von sich selbst ab.
-            raise ValueError("Geraetepreis ohne SKU: ein Buendel ohne Geraet "
-                             "kann keine Zuzahlung und keine Rate tragen")
+            raise ValueError(
+                "Geraetepreis ohne SKU: ein Buendel ohne Geraet "
+                "kann keine Zuzahlung und keine Rate tragen"
+            )
 
     @property
     def id(self) -> str:
-        return buendel_id(self.sku_id, self.anbieter, self.tarif_name,
-                          self.laufzeit_monate)
+        return buendel_id(
+            self.sku_id, self.anbieter, self.tarif_name, self.laufzeit_monate
+        )
 
     @property
     def ohne_geraet(self) -> bool:
@@ -675,15 +721,20 @@ class Buendel:
         kennt das Buendel den vollen Geraetepreis (`.gesamt`) und seine
         Rechenprobe, ohne beides ein zweites Mal zu rechnen.
         """
-        if (self.geraet_zuzahlung is None or self.geraet_monatsrate is None
-                or self.laufzeit_monate is None):
+        if (
+            self.geraet_zuzahlung is None
+            or self.geraet_monatsrate is None
+            or self.laufzeit_monate is None
+        ):
             # Ohne die Zahl der Monate ist eine Rate kein Ratengeschaeft,
             # sondern ein Betrag - `Ratenzahlung` wuerde die Luecke ohnehin
             # zurueckweisen (`laufzeit_monate muss positiv sein`).
             return None
-        return Ratenzahlung(anzahlung=self.geraet_zuzahlung,
-                            monatsrate=self.geraet_monatsrate,
-                            laufzeit_monate=self.laufzeit_monate)
+        return Ratenzahlung(
+            anzahlung=self.geraet_zuzahlung,
+            monatsrate=self.geraet_monatsrate,
+            laufzeit_monate=self.laufzeit_monate,
+        )
 
 
 @dataclass
@@ -746,8 +797,7 @@ class SimOnlyReferenz:
             setattr(self, feld, round(wert, 2))
         if self.bindung_monate is not None:
             if int(self.bindung_monate) < 0:
-                raise ValueError(f"negative bindung_monate: "
-                                 f"{self.bindung_monate}")
+                raise ValueError(f"negative bindung_monate: {self.bindung_monate}")
             self.bindung_monate = int(self.bindung_monate)
         if self.volumen_gb is not None:
             if float(self.volumen_gb) < 0:
@@ -767,22 +817,26 @@ class SimOnlyReferenz:
         Differenz waere keine Aussage ueber den Geraetepreis, sondern ueber
         den Unterschied der Wege.
         """
-        return Buendel(sku_id="", anbieter=self.anbieter,
-                       tarif_name=self.tarif_name,
-                       tarif_id=self.tarif_id,
-                       tarif_id_guete=self.tarif_id_guete,
-                       tarif_monatlich=self.tarif_sim_only_monatlich,
-                       anschlusspreis=self.anschlusspreis,
-                       rabatte=list(self.rabatte), quelle_url=self.quelle_url,
-                       abgerufen_am=self.abgerufen_am)
+        return Buendel(
+            sku_id="",
+            anbieter=self.anbieter,
+            tarif_name=self.tarif_name,
+            tarif_id=self.tarif_id,
+            tarif_id_guete=self.tarif_id_guete,
+            tarif_monatlich=self.tarif_sim_only_monatlich,
+            anschlusspreis=self.anschlusspreis,
+            rabatte=list(self.rabatte),
+            quelle_url=self.quelle_url,
+            abgerufen_am=self.abgerufen_am,
+        )
 
 
 # --------------------------------------------------------------------------
 # Die Rechnung
 # --------------------------------------------------------------------------
 
-def monatsschnitt(gesamt: Optional[float],
-                  monate: Optional[int]) -> Optional[float]:
+
+def monatsschnitt(gesamt: Optional[float], monate: Optional[int]) -> Optional[float]:
     """Ø/Monat: eine Summe geteilt durch IHREN eigenen Zeitraum.
 
     DIE EINE STELLE dieser Division (P0-B-h1, Clean Code 1). Bis hierher
@@ -805,8 +859,7 @@ def monatsschnitt(gesamt: Optional[float],
     return round(gesamt / monate, 2)
 
 
-def zeitraum_vergleichbar(monate: Optional[int],
-                          andere: Optional[int]) -> bool:
+def zeitraum_vergleichbar(monate: Optional[int], andere: Optional[int]) -> bool:
     """Duerfen zwei Leitzahlen gegeneinander gestellt werden?
 
     Nur bei GLEICHEM Zeitraum. Eine 36-Monats-Summe gegen eine
@@ -820,8 +873,7 @@ def zeitraum_vergleichbar(monate: Optional[int],
     Kartenschicht (`report/geraete_tco_karten.gleicher_horizont`) liest
     die zwei Felder und fragt hier, statt die Regel zu wiederholen.
     """
-    return (monate is not None and andere is not None
-            and monate == andere)
+    return monate is not None and andere is not None and monate == andere
 
 
 def phasensumme(phasen: list[Preisphase], horizont: int) -> Optional[float]:
@@ -909,9 +961,11 @@ class Tco:
         uebrig bliebe, waeren Zuzahlung und Anschlusspreis, und die saehen
         als "Kosten über 24 Monate" nach einem sehr guenstigen Angebot aus.
         """
-        return (self.gesamt is not None
-                and POSTEN_TARIF not in self.luecken
-                and POSTEN_LAUFZEIT not in self.luecken)
+        return (
+            self.gesamt is not None
+            and POSTEN_TARIF not in self.luecken
+            and POSTEN_LAUFZEIT not in self.luecken
+        )
 
 
 def tco_24(buendel: Buendel) -> Tco:
@@ -954,8 +1008,7 @@ def tco_24(buendel: Buendel) -> Tco:
     # (`None` heisst hier "nicht bestimmbar", 0,00 EUR hiesse "nichts
     # offen", und das waere eine Aussage, die niemand gemessen hat).
     laufzeit = buendel.laufzeit_monate
-    offen_monate = (None if laufzeit is None
-                    else max(0, laufzeit - TCO_HORIZONT))
+    offen_monate = None if laufzeit is None else max(0, laufzeit - TCO_HORIZONT)
 
     if buendel.buendel_monatlich is not None:
         # DER ZEITRAUM DER LEITZAHL WIRD HIER BESTIMMT, an der Stelle, die
@@ -969,11 +1022,10 @@ def tco_24(buendel: Buendel) -> Tco:
             # (§ 13.2): ohne seine Laufzeit fehlt der gesamte Monatsblock.
             ergebnis.luecken.append(POSTEN_LAUFZEIT)
         else:
-            ergebnis.bestandteile[f"{POSTEN_BUENDEL} über "
-                                  f"{laufzeit} Monate"] = \
-                round(buendel.buendel_monatlich * laufzeit, 2)
-            ergebnis.restbetrag = round(
-                buendel.buendel_monatlich * offen_monate, 2)
+            ergebnis.bestandteile[f"{POSTEN_BUENDEL} über {laufzeit} Monate"] = round(
+                buendel.buendel_monatlich * laufzeit, 2
+            )
+            ergebnis.restbetrag = round(buendel.buendel_monatlich * offen_monate, 2)
         # Ein Bündel mit Monatsbetrag traegt immer ein Geraet - ein Satz
         # ohne SKU wirft schon `Buendel.__post_init__`. Dieselbe Regel wie
         # in der aufgeteilten Form: None ist eine LUECKE, 0.0 ein
@@ -989,14 +1041,17 @@ def tco_24(buendel: Buendel) -> Tco:
         # der Zahl - ueber ihn ist sie mit der Vodafone-Referenz
         # (24 Tarifmonate + Barpreis) vergleichbar.
         ergebnis.leitzahl_monate = TCO_HORIZONT
-        tarif_summe = phasensumme(buendel.tarif_phasen, TCO_HORIZONT) \
-            if buendel.tarif_phasen else None
+        tarif_summe = (
+            phasensumme(buendel.tarif_phasen, TCO_HORIZONT)
+            if buendel.tarif_phasen
+            else None
+        )
         if tarif_summe is not None:
-            ergebnis.bestandteile[f"Tarif über {TCO_HORIZONT} Monate"] = \
-                tarif_summe
+            ergebnis.bestandteile[f"Tarif über {TCO_HORIZONT} Monate"] = tarif_summe
         elif buendel.tarif_monatlich is not None:
-            ergebnis.bestandteile[f"Tarif über {TCO_HORIZONT} Monate"] = \
-                round(buendel.tarif_monatlich * TCO_HORIZONT, 2)
+            ergebnis.bestandteile[f"Tarif über {TCO_HORIZONT} Monate"] = round(
+                buendel.tarif_monatlich * TCO_HORIZONT, 2
+            )
         else:
             ergebnis.luecken.append(POSTEN_TARIF)
 
@@ -1005,8 +1060,7 @@ def tco_24(buendel: Buendel) -> Tco:
             # eine Luecke ("nicht gemessen"). Der Unterschied ist der ganze
             # Punkt.
             if buendel.geraet_zuzahlung is not None:
-                ergebnis.bestandteile[POSTEN_ZUZAHLUNG] = \
-                    buendel.geraet_zuzahlung
+                ergebnis.bestandteile[POSTEN_ZUZAHLUNG] = buendel.geraet_zuzahlung
             else:
                 ergebnis.luecken.append(POSTEN_ZUZAHLUNG)
 
@@ -1019,14 +1073,13 @@ def tco_24(buendel: Buendel) -> Tco:
                 # nicht gemessen" waere an diesem Satz falsch.
                 ergebnis.luecken.append(POSTEN_LAUFZEIT)
             else:
-                ergebnis.bestandteile[f"Geräteraten über "
-                                      f"{laufzeit} Monate"] = \
-                    round(buendel.geraet_monatsrate * laufzeit, 2)
+                ergebnis.bestandteile[f"Geräteraten über {laufzeit} Monate"] = round(
+                    buendel.geraet_monatsrate * laufzeit, 2
+                )
                 # Die Restschuld nach Monat 24 - IN der Leitzahl und
                 # zusaetzlich ausgewiesen: 0.0 bei Laufzeit <= 24 ist die
                 # gemessene Aussage "nichts offen", nie ein fehlender Wert.
-                ergebnis.restbetrag = round(
-                    buendel.geraet_monatsrate * offen_monate, 2)
+                ergebnis.restbetrag = round(buendel.geraet_monatsrate * offen_monate, 2)
 
     if buendel.anschlusspreis is not None:
         ergebnis.bestandteile[POSTEN_ANSCHLUSS] = buendel.anschlusspreis
@@ -1038,7 +1091,8 @@ def tco_24(buendel: Buendel) -> Tco:
     if buendel.rabatte:
         # Berechnet, ausgewiesen, NICHT abgezogen - siehe `Rabatt`.
         ergebnis.rabatte_offen = round(
-            sum(r.wert(TCO_HORIZONT) for r in buendel.rabatte), 2)
+            sum(r.wert(TCO_HORIZONT) for r in buendel.rabatte), 2
+        )
     else:
         # Kein erfasster Rabatt heisst nicht "es gibt keinen". Boni und
         # Gutschriften stehen bei allen Anbietern im Fliesstext (§ 6.2
@@ -1050,8 +1104,7 @@ def tco_24(buendel: Buendel) -> Tco:
         # Geteilt wird durch den Zeitraum, den die Summe TRAEGT, nicht
         # durch den Tarifhorizont (P0-B-h1) - und nur an dieser einen
         # Stelle (`monatsschnitt`).
-        ergebnis.monatlich = monatsschnitt(ergebnis.gesamt,
-                                           ergebnis.leitzahl_monate)
+        ergebnis.monatlich = monatsschnitt(ergebnis.gesamt, ergebnis.leitzahl_monate)
     return ergebnis
 
 
@@ -1081,8 +1134,8 @@ class Geraeteanteil:
         (`UNGLEICHER_ZEITRAUM`, P0-B-h1): die Luecke steht in der Liste
         und macht die Differenz unbelastbar."""
         return self.betrag is not None and not [
-            l for l in self.luecken
-            if l not in _LUECKEN_OHNE_EINFLUSS_AUF_DIE_DIFFERENZ]
+            l for l in self.luecken if l not in _LUECKEN_OHNE_EINFLUSS_AUF_DIE_DIFFERENZ
+        ]
 
 
 # Die Kuerzung auf den Vertrag wohnt in `tarif_model.vertrag_basis` (Lesart-
@@ -1133,21 +1186,27 @@ def geraeteanteil(buendel: Buendel, referenz: SimOnlyReferenz) -> Geraeteanteil:
     wie die schlechtere der zwei Rechnungen.
     """
     if normalisiere(buendel.anbieter) != normalisiere(referenz.anbieter):
-        raise ValueError(f"Buendel und SIM-only-Referenz gehoeren zu "
-                         f"verschiedenen Anbietern: {buendel.anbieter!r} / "
-                         f"{referenz.anbieter!r}")
+        raise ValueError(
+            f"Buendel und SIM-only-Referenz gehoeren zu "
+            f"verschiedenen Anbietern: {buendel.anbieter!r} / "
+            f"{referenz.anbieter!r}"
+        )
     ids = ((buendel.tarif_id or "").strip(), (referenz.tarif_id or "").strip())
     if all(ids):
         # `vertrag_basis` statt `zeitreihen_basis` (P3, 28.09.2026): ein
         # Buendel haengt am Geraeteblatt ("... mit Smartphone"), der
         # SIM-only-Massstab am Tarifblatt - derselbe Vertrag.
         if vertrag_basis(ids[0]) != vertrag_basis(ids[1]):
-            raise ValueError(f"Buendel und SIM-only-Referenz gehoeren zu "
-                             f"verschiedenen Tarifen: {ids[0]!r} / {ids[1]!r}")
+            raise ValueError(
+                f"Buendel und SIM-only-Referenz gehoeren zu "
+                f"verschiedenen Tarifen: {ids[0]!r} / {ids[1]!r}"
+            )
     elif normalisiere(buendel.tarif_name) != normalisiere(referenz.tarif_name):
-        raise ValueError(f"Buendel und SIM-only-Referenz gehoeren zu "
-                         f"verschiedenen Tarifen: {buendel.tarif_name!r} / "
-                         f"{referenz.tarif_name!r}")
+        raise ValueError(
+            f"Buendel und SIM-only-Referenz gehoeren zu "
+            f"verschiedenen Tarifen: {buendel.tarif_name!r} / "
+            f"{referenz.tarif_name!r}"
+        )
     if buendel.ohne_geraet:
         raise ValueError("ein Buendel ohne Geraet hat keinen Geraeteanteil")
 
@@ -1164,13 +1223,16 @@ def geraeteanteil(buendel: Buendel, referenz: SimOnlyReferenz) -> Geraeteanteil:
     # Referenz ueber 24 waere die Differenz zum Teil der
     # Laufzeitunterschied - sie bleibt `None` und der Grund steht benannt
     # in `luecken` (Clean Code 4 und 5, nie eine stille Zahl).
-    vergleichbar = zeitraum_vergleichbar(mit.leitzahl_monate,
-                                         ohne.leitzahl_monate)
+    vergleichbar = zeitraum_vergleichbar(mit.leitzahl_monate, ohne.leitzahl_monate)
     if not vergleichbar:
         luecken.append(UNGLEICHER_ZEITRAUM)
 
-    ergebnis = Geraeteanteil(horizont=TCO_HORIZONT, tco_buendel=mit.gesamt,
-                             tco_sim_only=ohne.gesamt, luecken=luecken)
+    ergebnis = Geraeteanteil(
+        horizont=TCO_HORIZONT,
+        tco_buendel=mit.gesamt,
+        tco_sim_only=ohne.gesamt,
+        luecken=luecken,
+    )
     if vergleichbar and mit.gesamt is not None and ohne.gesamt is not None:
         ergebnis.betrag = round(mit.gesamt - ohne.gesamt, 2)
     return ergebnis
@@ -1285,19 +1347,22 @@ class TcoBindung:
         Beschriftung (A5.1). Und ohne Tarifanteil ist die Zahl der
         Geraetebetrag und keine TCO.
         """
-        return (self.gesamt is not None and self.bindung is not None
-                and POSTEN_TARIF not in self.luecken
-                # Ein Grundpreis ohne gemessene Bindung steht in KEINEM
-                # Bestandteil - die Summe waere dann der Geraetebetrag
-                # allein und saehe wie ein sehr guenstiges Buendel aus.
-                # Dasselbe gilt fuer einen Flextarif, nur aus dem
-                # umgekehrten Grund: dort ist der Betrag nicht geschuldet.
-                and POSTEN_TARIFBINDUNG not in self.luecken
-                and POSTEN_TARIF_FLEX not in self.luecken
-                # Und ohne Ratenlaufzeit fehlt der Monatsblock des
-                # Geraets (P0-B-fix1) - dieselbe Schwelle wie in
-                # `Tco.belastbar`.
-                and POSTEN_LAUFZEIT not in self.luecken)
+        return (
+            self.gesamt is not None
+            and self.bindung is not None
+            and POSTEN_TARIF not in self.luecken
+            # Ein Grundpreis ohne gemessene Bindung steht in KEINEM
+            # Bestandteil - die Summe waere dann der Geraetebetrag
+            # allein und saehe wie ein sehr guenstiges Buendel aus.
+            # Dasselbe gilt fuer einen Flextarif, nur aus dem
+            # umgekehrten Grund: dort ist der Betrag nicht geschuldet.
+            and POSTEN_TARIFBINDUNG not in self.luecken
+            and POSTEN_TARIF_FLEX not in self.luecken
+            # Und ohne Ratenlaufzeit fehlt der Monatsblock des
+            # Geraets (P0-B-fix1) - dieselbe Schwelle wie in
+            # `Tco.belastbar`.
+            and POSTEN_LAUFZEIT not in self.luecken
+        )
 
     @property
     def label(self) -> str:
@@ -1327,9 +1392,11 @@ def tco_bindung(buendel: Buendel) -> TcoBindung:
     e = TcoBindung()
 
     zusammen = buendel.buendel_monatlich is not None
-    e.raten_laufzeit = (buendel.laufzeit_monate
-                        if (zusammen or buendel.geraet_monatsrate is not None)
-                        else None)
+    e.raten_laufzeit = (
+        buendel.laufzeit_monate
+        if (zusammen or buendel.geraet_monatsrate is not None)
+        else None
+    )
     e.tarif_bindung = buendel.tarif_bindung_monate
 
     if zusammen:
@@ -1351,20 +1418,25 @@ def tco_bindung(buendel: Buendel) -> TcoBindung:
         # (P0-B-fix1). Benannt, nicht mit 24 geraten.
         e.luecken.append(POSTEN_LAUFZEIT)
     elif zusammen:
-        e.bestandteile.append({
-            "name": f"{POSTEN_BUENDEL} · {buendel.laufzeit_monate} × "
-                    f"{buendel.buendel_monatlich:.2f} €".replace(".", ","),
-            "betrag": round(buendel.buendel_monatlich
-                            * buendel.laufzeit_monate, 2),
-            "kategorie": KAT_BUENDEL})
+        e.bestandteile.append(
+            {
+                "name": f"{POSTEN_BUENDEL} · {buendel.laufzeit_monate} × "
+                f"{buendel.buendel_monatlich:.2f} €".replace(".", ","),
+                "betrag": round(buendel.buendel_monatlich * buendel.laufzeit_monate, 2),
+                "kategorie": KAT_BUENDEL,
+            }
+        )
     elif buendel.tarif_monatlich is None:
         e.luecken.append(POSTEN_TARIF)
     elif e.tarif_bindung:
-        e.bestandteile.append({
-            "name": f"Tarif · {e.tarif_bindung} × "
-                    f"{buendel.tarif_monatlich:.2f} €".replace(".", ","),
-            "betrag": round(buendel.tarif_monatlich * e.tarif_bindung, 2),
-            "kategorie": KAT_TARIF})
+        e.bestandteile.append(
+            {
+                "name": f"Tarif · {e.tarif_bindung} × "
+                f"{buendel.tarif_monatlich:.2f} €".replace(".", ","),
+                "betrag": round(buendel.tarif_monatlich * e.tarif_bindung, 2),
+                "kategorie": KAT_TARIF,
+            }
+        )
     elif e.tarif_bindung == 0:
         # Monatlich kuendbar: der Kunde schuldet den Tarif nicht ueber die
         # Laufzeit, sondern Monat fuer Monat. Ihn ueber 36 Monate zu
@@ -1379,9 +1451,13 @@ def tco_bindung(buendel: Buendel) -> TcoBindung:
     # ---- Geraet ---------------------------------------------------------
     if not buendel.ohne_geraet and not zusammen:
         if buendel.geraet_zuzahlung is not None:
-            e.bestandteile.append({"name": POSTEN_ZUZAHLUNG,
-                                   "betrag": buendel.geraet_zuzahlung,
-                                   "kategorie": KAT_EINMALIG})
+            e.bestandteile.append(
+                {
+                    "name": POSTEN_ZUZAHLUNG,
+                    "betrag": buendel.geraet_zuzahlung,
+                    "kategorie": KAT_EINMALIG,
+                }
+            )
         else:
             e.luecken.append(POSTEN_ZUZAHLUNG)
         if buendel.geraet_monatsrate is None:
@@ -1390,18 +1466,26 @@ def tco_bindung(buendel: Buendel) -> TcoBindung:
             # Rate gemessen, Monatszahl nicht - benannt wird die Laufzeit.
             e.luecken.append(POSTEN_LAUFZEIT)
         else:
-            e.bestandteile.append({
-                "name": f"Geräteraten · {buendel.laufzeit_monate} × "
-                        f"{buendel.geraet_monatsrate:.2f} €".replace(".", ","),
-                "betrag": round(buendel.geraet_monatsrate
-                                * buendel.laufzeit_monate, 2),
-                "kategorie": KAT_RATEN})
+            e.bestandteile.append(
+                {
+                    "name": f"Geräteraten · {buendel.laufzeit_monate} × "
+                    f"{buendel.geraet_monatsrate:.2f} €".replace(".", ","),
+                    "betrag": round(
+                        buendel.geraet_monatsrate * buendel.laufzeit_monate, 2
+                    ),
+                    "kategorie": KAT_RATEN,
+                }
+            )
 
     # ---- Anschluss ------------------------------------------------------
     if buendel.anschlusspreis is not None:
-        e.bestandteile.append({"name": POSTEN_ANSCHLUSS,
-                               "betrag": buendel.anschlusspreis,
-                               "kategorie": KAT_EINMALIG})
+        e.bestandteile.append(
+            {
+                "name": POSTEN_ANSCHLUSS,
+                "betrag": buendel.anschlusspreis,
+                "kategorie": KAT_EINMALIG,
+            }
+        )
     else:
         e.luecken.append(POSTEN_ANSCHLUSS)
 
@@ -1414,10 +1498,10 @@ def tco_bindung(buendel: Buendel) -> TcoBindung:
             wert = r.wert(e.bindung)
             if not wert:
                 continue
-            e.boni.append({"name": r.name, "betrag": wert,
-                           "beleg_url": r.beleg_url})
-            e.bestandteile.append({"name": f"Bonus · {r.name}",
-                                   "betrag": -wert, "kategorie": KAT_BONUS})
+            e.boni.append({"name": r.name, "betrag": wert, "beleg_url": r.beleg_url})
+            e.bestandteile.append(
+                {"name": f"Bonus · {r.name}", "betrag": -wert, "kategorie": KAT_BONUS}
+            )
         e.boni_abzug = round(sum(b["betrag"] for b in e.boni), 2)
     elif not buendel.rabatte:
         # Kein erfasster Bonus heisst nicht "es gibt keinen" - dieselbe
@@ -1444,18 +1528,25 @@ def tco_bindung(buendel: Buendel) -> TcoBindung:
             gezahlt += p["betrag"]
     if zusammen:
         if buendel.laufzeit_monate is not None:
-            gezahlt += round(buendel.buendel_monatlich
-                             * min(LEITFRAGE_MONATE,
-                                   buendel.laufzeit_monate), 2)
+            gezahlt += round(
+                buendel.buendel_monatlich
+                * min(LEITFRAGE_MONATE, buendel.laufzeit_monate),
+                2,
+            )
     else:
         if buendel.tarif_monatlich is not None and e.tarif_bindung:
-            gezahlt += round(buendel.tarif_monatlich
-                             * min(LEITFRAGE_MONATE, e.tarif_bindung), 2)
-        if (buendel.geraet_monatsrate is not None
-                and buendel.laufzeit_monate is not None):
-            gezahlt += round(buendel.geraet_monatsrate
-                             * min(LEITFRAGE_MONATE,
-                                   buendel.laufzeit_monate), 2)
+            gezahlt += round(
+                buendel.tarif_monatlich * min(LEITFRAGE_MONATE, e.tarif_bindung), 2
+            )
+        if (
+            buendel.geraet_monatsrate is not None
+            and buendel.laufzeit_monate is not None
+        ):
+            gezahlt += round(
+                buendel.geraet_monatsrate
+                * min(LEITFRAGE_MONATE, buendel.laufzeit_monate),
+                2,
+            )
     for r in buendel.rabatte:
         # Ueber den kuerzeren der beiden Zeitraeume: laeuft der Vertrag nur
         # zwoelf Monate, gibt es keinen Bonus fuer Monat 13 bis 24. Mit
@@ -1468,8 +1559,9 @@ def tco_bindung(buendel: Buendel) -> TcoBindung:
     return e
 
 
-def effektiv_ohne_geraet(kennzahl: TcoBindung,
-                         barpreis: Optional[float]) -> Optional[float]:
+def effektiv_ohne_geraet(
+    kennzahl: TcoBindung, barpreis: Optional[float]
+) -> Optional[float]:
     """`Ø/Monat − (Geräte-Barpreis ÷ Bindung)` - die Finanztip-Formel.
 
     Was bleibt, ist der monatliche Preis des TARIFS, wenn man das Geraet zu

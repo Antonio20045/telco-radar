@@ -80,6 +80,7 @@ Alles hier gelesene steht bereits in der ersten HTTP-Antwort (siehe Spike
 Beruehrung der zwei robots-gesperrten Operationen `GetPaidBundles`/
 `GetFreeBundles`. robots.txt sperrt fuer `/de/brand/...` nichts (Spike §5).
 """
+
 from __future__ import annotations
 
 import json
@@ -111,7 +112,8 @@ _STATE_MARK = "window.__PRELOADED_STATE__ = "
 _FARBE_RE = re.compile(
     r"\b\d+\s*(?:GB|TB)\b\s+(?P<farbe>.+?)"
     r"(?:\s+(?:Dual SIM|Single SIM|eSIM))?\s*$",
-    re.IGNORECASE)
+    re.IGNORECASE,
+)
 
 
 def _farbe_aus_saturn_titel(titel: str) -> str:
@@ -129,12 +131,12 @@ def _preloaded_state(html: str) -> dict:
     if idx == -1:
         raise GeraeteAbrufFehler(
             "Saturn-Markenseite ohne window.__PRELOADED_STATE__ "
-            f"({len(html or '')} Bytes) - neues Format oder Bot-Abwehr")
+            f"({len(html or '')} Bytes) - neues Format oder Bot-Abwehr"
+        )
     start = idx + len(_STATE_MARK)
     end = html.find("</script>", start)
     if end == -1:
-        raise GeraeteAbrufFehler(
-            "Saturn-Zustandsobjekt: kein Skriptende gefunden")
+        raise GeraeteAbrufFehler("Saturn-Zustandsobjekt: kein Skriptende gefunden")
     raw = html[start:end].rstrip()
     if raw.endswith(";"):
         raw = raw[:-1]
@@ -144,8 +146,7 @@ def _preloaded_state(html: str) -> dict:
     try:
         daten = json.loads(raw)
     except (json.JSONDecodeError, ValueError) as exc:
-        raise GeraeteAbrufFehler(
-            f"Saturn-Zustandsobjekt unlesbar: {exc}") from exc
+        raise GeraeteAbrufFehler(f"Saturn-Zustandsobjekt unlesbar: {exc}") from exc
     if not isinstance(daten, dict):
         raise GeraeteAbrufFehler("Saturn-Zustandsobjekt ist kein Objekt")
     return daten
@@ -169,19 +170,21 @@ def _preisfeatures(state: dict) -> list[dict]:
         if not isinstance(produkt, dict):
             produkt = {}
         preis = (val.get("price") or {}).get("amount")
-        out.append({
-            "apollo_key": key,
-            "product_id": str(produkt_id or "").strip(),
-            "title": str(produkt.get("title") or "").strip(),
-            "product_url": str(produkt.get("url") or "").strip(),
-            "amount": preis,
-            "currency": val.get("currency"),
-            "installment_present":
-                (val.get("price") or {}).get("installment") is not None,
-            # `None` heisst "die Quelle nennt es nicht" und ist ausdruecklich
-            # NICHT dasselbe wie `False` - siehe Modulkopf, fail closed.
-            "is_marketplace": val.get("isProductOfTypeMarketplace"),
-        })
+        out.append(
+            {
+                "apollo_key": key,
+                "product_id": str(produkt_id or "").strip(),
+                "title": str(produkt.get("title") or "").strip(),
+                "product_url": str(produkt.get("url") or "").strip(),
+                "amount": preis,
+                "currency": val.get("currency"),
+                "installment_present": (val.get("price") or {}).get("installment")
+                is not None,
+                # `None` heisst "die Quelle nennt es nicht" und ist ausdruecklich
+                # NICHT dasselbe wie `False` - siehe Modulkopf, fail closed.
+                "is_marketplace": val.get("isProductOfTypeMarketplace"),
+            }
+        )
     return out
 
 
@@ -196,8 +199,9 @@ def _dedupe_by_product_id(features: list[dict]) -> list[dict]:
         if not pid:
             continue
         vorher = gesehen.get(pid)
-        if vorher is None or (f["installment_present"]
-                              and not vorher["installment_present"]):
+        if vorher is None or (
+            f["installment_present"] and not vorher["installment_present"]
+        ):
             gesehen[pid] = f
     return list(gesehen.values())
 
@@ -225,8 +229,7 @@ def lies(text: str, url: str = "") -> list[dict]:
     if not alle:
         return []
 
-    eigen = _dedupe_by_product_id(
-        [f for f in alle if f["is_marketplace"] is False])
+    eigen = _dedupe_by_product_id([f for f in alle if f["is_marketplace"] is False])
     ld_json_index = _ld_json_preisindex(text)
 
     out: list[dict] = []
@@ -253,15 +256,20 @@ def lies(text: str, url: str = "") -> list[dict]:
             log.warning(
                 "Saturn: %r (%.2f EUR) aus dem Apollo-Cache ohne "
                 "Entsprechung im ld+json-ItemList derselben Seite (%s)",
-                titel, preis, url)
+                titel,
+                preis,
+                url,
+            )
 
-        out.append({
-            "titel": titel,
-            "preis": preis,
-            "waehrung": "EUR",
-            "sku": f["product_id"],
-            "farbe": _farbe_aus_saturn_titel(titel),
-            "url": urljoin(url, f["product_url"]) if f["product_url"] else url,
-            "quelle": "saturn_brand",
-        })
+        out.append(
+            {
+                "titel": titel,
+                "preis": preis,
+                "waehrung": "EUR",
+                "sku": f["product_id"],
+                "farbe": _farbe_aus_saturn_titel(titel),
+                "url": urljoin(url, f["product_url"]) if f["product_url"] else url,
+                "quelle": "saturn_brand",
+            }
+        )
     return out

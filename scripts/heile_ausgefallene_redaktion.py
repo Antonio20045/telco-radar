@@ -31,6 +31,7 @@ wurde). Das heilt jede fuer sich richtig, verlinkt aber ab dann dieselben
 Meldungen unter mehreren Archivdaten - fuer die eine akute Reparatur reicht
 in aller Regel `--datum <die kaputte Ausgabe>`.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -56,20 +57,26 @@ _GRUND_AUSFALL = "eine vorübergehende Störung des Analyse-Dienstes"
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--schreiben", action="store_true",
-                     help="Aenderungen wirklich schreiben (sonst Probelauf)")
-    ap.add_argument("--reports-dir", type=Path,
-                     default=ROOT / "data" / "reports")
-    ap.add_argument("--datum", help="nur diese eine Ausgabe pruefen/heilen "
-                                    "(YYYY-MM-DD), sonst das ganze Archiv")
+    ap.add_argument(
+        "--schreiben",
+        action="store_true",
+        help="Aenderungen wirklich schreiben (sonst Probelauf)",
+    )
+    ap.add_argument("--reports-dir", type=Path, default=ROOT / "data" / "reports")
+    ap.add_argument(
+        "--datum",
+        help="nur diese eine Ausgabe pruefen/heilen "
+        "(YYYY-MM-DD), sonst das ganze Archiv",
+    )
     args = ap.parse_args()
 
     reports_dir: Path = args.reports_dir
     if args.datum:
         kandidaten = [reports_dir / f"{args.datum}.json"]
     else:
-        kandidaten = sorted(f for f in reports_dir.glob("*.json")
-                            if _DATE_RE.fullmatch(f.stem))
+        kandidaten = sorted(
+            f for f in reports_dir.glob("*.json") if _DATE_RE.fullmatch(f.stem)
+        )
 
     geheilt = 0
     for pfad in kandidaten:
@@ -79,15 +86,22 @@ def main() -> int:
         if rk.bewertete_meldungen(report) > 0:
             continue  # diese Ausgabe hat selbst etwas geliefert
 
-        grund = (_GRUND_AUSFALL if report.get("stats", {}).get("new")
-                else _GRUND_KEIN_STOFF)
+        grund = (
+            _GRUND_AUSFALL if report.get("stats", {}).get("new") else _GRUND_KEIN_STOFF
+        )
         regional, body, competitors, ausfall = rk.uebernehmen(
-            report.get("regions") or {}, report.get("briefing_md") or "",
-            report.get("competitors") or [], reports_dir, report["date"],
-            grund)
+            report.get("regions") or {},
+            report.get("briefing_md") or "",
+            report.get("competitors") or [],
+            reports_dir,
+            report["date"],
+            grund,
+        )
         if ausfall is None:
-            print(f"{pfad.name}: 0 bewertete Meldungen, aber keine gueltige "
-                  f"vorherige Redaktion im Archiv - bleibt unveraendert")
+            print(
+                f"{pfad.name}: 0 bewertete Meldungen, aber keine gueltige "
+                f"vorherige Redaktion im Archiv - bleibt unveraendert"
+            )
             continue
 
         print(f"{pfad.name}: uebernimmt Stand vom {ausfall['stand']}")
@@ -104,18 +118,22 @@ def main() -> int:
         # auf transparenz.html). Hier ist sie per Vorbedingung 0 - genau das
         # hat den Bericht erst zum Heilungskandidaten gemacht.
         report.setdefault("stats", {})["bewertete"] = 0
-        pfad.write_text(json.dumps(report, ensure_ascii=False, indent=1),
-                        encoding="utf-8")
+        pfad.write_text(
+            json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8"
+        )
 
         md_pfad = pfad.with_suffix(".md")
         if md_pfad.exists():
             header = editor.report_header(
-                date.fromisoformat(report["date"]), report.get("stats", {}))
+                date.fromisoformat(report["date"]), report.get("stats", {})
+            )
             md_pfad.write_text(header + body, encoding="utf-8")
 
     if not args.schreiben and geheilt:
-        print(f"\n{geheilt} Bericht(e) wuerden geheilt - mit --schreiben "
-              f"wirklich schreiben.")
+        print(
+            f"\n{geheilt} Bericht(e) wuerden geheilt - mit --schreiben "
+            f"wirklich schreiben."
+        )
     elif not geheilt:
         print("Nichts zu heilen.")
     return 0

@@ -9,6 +9,7 @@ The run environment installs Chromium (see .github/workflows/radar.yml). If
 Playwright/Chromium is unavailable the source raises and is logged as a normal
 source failure - it never aborts the run.
 """
+
 from __future__ import annotations
 
 import logging
@@ -37,11 +38,11 @@ _BLOCK_TYPES = {"image", "media", "font"}
 # failures are silently ignored, since most pages have no banner at all.
 _CONSENT_SELECTORS = (
     "#onetrust-accept-btn-handler",
-    "button:has-text(\"Accept All\")",
-    "button:has-text(\"Accept all\")",
-    "button:has-text(\"Accept\")",
-    "button:has-text(\"I Agree\")",
-    "button:has-text(\"Alle akzeptieren\")",
+    'button:has-text("Accept All")',
+    'button:has-text("Accept all")',
+    'button:has-text("Accept")',
+    'button:has-text("I Agree")',
+    'button:has-text("Alle akzeptieren")',
     "#CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll",
 )
 
@@ -50,14 +51,18 @@ def render_html(url: str, timeout_s: float, ua: str) -> str:
     """Render *url* in headless Chromium and return the final DOM HTML."""
     from playwright.sync_api import sync_playwright
 
-    launch_args = ["--no-sandbox", "--disable-dev-shm-usage",
-                   "--disable-gpu", "--disable-blink-features=AutomationControlled",
-                   # Some sites (e.g. Optus) fail HTTP/2 negotiation from
-                   # datacenter IPs with ERR_HTTP2_PROTOCOL_ERROR; forcing
-                   # HTTP/1.1 for the whole browser session is a safe,
-                   # widely-used workaround since virtually every server also
-                   # speaks HTTP/1.1.
-                   "--disable-http2"]
+    launch_args = [
+        "--no-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--disable-blink-features=AutomationControlled",
+        # Some sites (e.g. Optus) fail HTTP/2 negotiation from
+        # datacenter IPs with ERR_HTTP2_PROTOCOL_ERROR; forcing
+        # HTTP/1.1 for the whole browser session is a safe,
+        # widely-used workaround since virtually every server also
+        # speaks HTTP/1.1.
+        "--disable-http2",
+    ]
     launch_kwargs: dict = {"headless": True, "args": launch_args}
     # Dev-sandbox escape hatch only: some local dev environments front all
     # outbound traffic with a TLS-terminating proxy whose ClientHello parser
@@ -80,11 +85,13 @@ def render_html(url: str, timeout_s: float, ua: str) -> str:
             )
             page.route(
                 "**/*",
-                lambda route: route.abort()
-                if route.request.resource_type in _BLOCK_TYPES else route.continue_(),
+                lambda route: (
+                    route.abort()
+                    if route.request.resource_type in _BLOCK_TYPES
+                    else route.continue_()
+                ),
             )
-            page.goto(url, wait_until="domcontentloaded",
-                      timeout=int(timeout_s * 1000))
+            page.goto(url, wait_until="domcontentloaded", timeout=int(timeout_s * 1000))
             for selector in _CONSENT_SELECTORS:
                 try:
                     page.click(selector, timeout=1200)
@@ -103,10 +110,12 @@ def render_html(url: str, timeout_s: float, ua: str) -> str:
             browser.close()
 
 
-def collect_newsroom_js(source: Source, region: str, operator: str | None,
-                        origin: str, http_cfg: dict) -> list[Item]:
-    timeout_s = float(http_cfg.get("render_timeout_seconds",
-                                   http_cfg.get("timeout_seconds", 25)))
+def collect_newsroom_js(
+    source: Source, region: str, operator: str | None, origin: str, http_cfg: dict
+) -> list[Item]:
+    timeout_s = float(
+        http_cfg.get("render_timeout_seconds", http_cfg.get("timeout_seconds", 25))
+    )
     ua = http_cfg.get("user_agent", BROWSER_UA)
     max_links = int(http_cfg.get("max_links_per_newsroom", 30))
     html = render_html(source.url, timeout_s, ua)

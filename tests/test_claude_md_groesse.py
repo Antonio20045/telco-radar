@@ -3,6 +3,7 @@
 Sie war auf 3.840 Zeilen / 279 KB (~70.000 Tokens) angewachsen, weil jede
 Sitzung ihren Bericht dort anhing. Dieser Test hält sie klein.
 """
+
 from pathlib import Path
 
 CLAUDE_MD = Path(__file__).resolve().parents[1] / "CLAUDE.md"
@@ -21,10 +22,12 @@ HINWEIS = (
 def test_claude_md_hat_hoechstens_200_zeilen():
     zeilen = len(CLAUDE_MD.read_text(encoding="utf-8").splitlines())
     assert zeilen <= MAX_ZEILEN, HINWEIS.format(
-        ist=f"{zeilen} Zeilen", soll=f"{MAX_ZEILEN} Zeilen")
+        ist=f"{zeilen} Zeilen", soll=f"{MAX_ZEILEN} Zeilen"
+    )
 
 
 def test_claude_md_hat_hoechstens_20000_bytes():
     groesse = CLAUDE_MD.stat().st_size
     assert groesse <= MAX_BYTES, HINWEIS.format(
-        ist=f"{groesse} Bytes", soll=f"{MAX_BYTES} Bytes")
+        ist=f"{groesse} Bytes", soll=f"{MAX_BYTES} Bytes"
+    )

@@ -40,14 +40,14 @@ nie neu AUSGESTELLT - `abgerufen_am` wandert weiter, waehrend die Seite
 Shop-Kachel (`collect/tarif_telekom_kacheln.py`) traegt denselben Betrag,
 aber mit dem Stand von heute und einem Link auf die Verkaufsseite.
 """
+
 from __future__ import annotations
 
 import json
 import logging
 from pathlib import Path
 
-from ..tarif_model import (PREISTYP_LIVE_SHOP, Preisphase, Tarif,
-                           ist_zurueckgezogen)
+from ..tarif_model import PREISTYP_LIVE_SHOP, Preisphase, Tarif, ist_zurueckgezogen
 from .effektivpreis import VERGLEICHSMONATE, Effektivpreis, rechne, regression
 
 log = logging.getLogger(__name__)
@@ -75,9 +75,11 @@ def _aus_satz(satz: dict) -> Tarif:
         if hasattr(t, feld):
             setattr(t, feld, wert)
     t.preisphasen = [
-        Preisphase(von_monat=int(p.get("von_monat", 1)),
-                   bis_monat=p.get("bis_monat"),
-                   betrag=float(p.get("betrag", 0)))
+        Preisphase(
+            von_monat=int(p.get("von_monat", 1)),
+            bis_monat=p.get("bis_monat"),
+            betrag=float(p.get("betrag", 0)),
+        )
         for p in (satz.get("preisphasen") or [])
         if isinstance(p, dict)
     ]
@@ -100,8 +102,7 @@ def lade_staende(pfad: Path) -> list[dict]:
         if isinstance(satz, dict) and satz.get("tarif_id"):
             neueste[satz["tarif_id"]] = satz
     # P3-E1: ein zurueckgezogener Tarif ist kein Tarif von heute.
-    return [satz for satz in neueste.values()
-            if not ist_zurueckgezogen(satz)]
+    return [satz for satz in neueste.values() if not ist_zurueckgezogen(satz)]
 
 
 def _zeile(satz: dict) -> dict:
@@ -144,16 +145,20 @@ def _bevorzuge_live_shop(staende: list[dict]) -> list[dict]:
     """
     gruppen: dict[tuple[str, str], list[dict]] = {}
     for satz in staende:
-        schluessel = ((satz.get("anbieter") or "").strip().lower(),
-                      (satz.get("name") or "").strip().lower())
+        schluessel = (
+            (satz.get("anbieter") or "").strip().lower(),
+            (satz.get("name") or "").strip().lower(),
+        )
         gruppen.setdefault(schluessel, []).append(satz)
 
     ergebnis: list[dict] = []
     for staende_der_gruppe in gruppen.values():
-        live = [s for s in staende_der_gruppe
-                if s.get("preistyp") == PREISTYP_LIVE_SHOP]
-        dokument = [s for s in staende_der_gruppe
-                   if s.get("preistyp") != PREISTYP_LIVE_SHOP]
+        live = [
+            s for s in staende_der_gruppe if s.get("preistyp") == PREISTYP_LIVE_SHOP
+        ]
+        dokument = [
+            s for s in staende_der_gruppe if s.get("preistyp") != PREISTYP_LIVE_SHOP
+        ]
         if not live or not dokument:
             ergebnis.extend(staende_der_gruppe)
             continue
@@ -167,19 +172,28 @@ def _bevorzuge_live_shop(staende: list[dict]) -> list[dict]:
             url = str(d.get("dokument_url") or "")
             if url and url != primaer.get("dokument_url"):
                 primaer.setdefault("_referenz_url", url)
-                primaer.setdefault("_referenz_stand",
-                                   d.get("abgerufen_am") or "")
+                primaer.setdefault("_referenz_stand", d.get("abgerufen_am") or "")
         ergebnis.extend(live)
     return ergebnis
 
 
 def _karte(zeilen: list[dict]) -> dict:
     """Die Positionskarte: Punkte, Achsen und die Fair-Value-Linie."""
-    punkte = [z for z in zeilen
-              if z["volumen"] and z["effektiv"] is not None and z["belastbar"]]
+    punkte = [
+        z
+        for z in zeilen
+        if z["volumen"] and z["effektiv"] is not None and z["belastbar"]
+    ]
     if not punkte:
-        return {"punkte": [], "hat_daten": False, "gerade": None,
-                "breite": BREITE, "hoehe": HOEHE, "x_ticks": [], "y_ticks": []}
+        return {
+            "punkte": [],
+            "hat_daten": False,
+            "gerade": None,
+            "breite": BREITE,
+            "hoehe": HOEHE,
+            "x_ticks": [],
+            "y_ticks": [],
+        }
 
     xs = [z["volumen"] for z in punkte]
     ys = [z["effektiv"] for z in punkte]
@@ -203,9 +217,14 @@ def _karte(zeilen: list[dict]) -> dict:
         # Nur zeichnen, wenn die Gerade im Bild bleibt - eine Linie, die
         # oben aus dem Rahmen laeuft, behauptet mehr als die Daten hergeben.
         if 0 <= y0 <= y_max and 0 <= y1 <= y_max:
-            linie = {"x1": round(px(0), 1), "y1": round(py(y0), 1),
-                     "x2": round(px(x_max), 1), "y2": round(py(y1), 1),
-                     "a": a, "b": b}
+            linie = {
+                "x1": round(px(0), 1),
+                "y1": round(py(y0), 1),
+                "x2": round(px(x_max), 1),
+                "y2": round(py(y1), 1),
+                "a": a,
+                "b": b,
+            }
 
     gezeichnet = []
     for z in punkte:
@@ -213,12 +232,14 @@ def _karte(zeilen: list[dict]) -> dict:
         if gerade:
             erwartet = gerade[0] + gerade[1] * z["volumen"]
             ueber = round(z["effektiv"] - erwartet, 2)
-        gezeichnet.append({
-            **z,
-            "cx": round(px(z["volumen"]), 1),
-            "cy": round(py(z["effektiv"]), 1),
-            "ueber_linie": ueber,
-        })
+        gezeichnet.append(
+            {
+                **z,
+                "cx": round(px(z["volumen"]), 1),
+                "cy": round(py(z["effektiv"]), 1),
+                "ueber_linie": ueber,
+            }
+        )
 
     schritt_x = max(1, int(x_max / 5))
     schritt_y = max(1, int(y_max / 5))
@@ -226,12 +247,19 @@ def _karte(zeilen: list[dict]) -> dict:
         "punkte": gezeichnet,
         "hat_daten": True,
         "gerade": linie,
-        "breite": BREITE, "hoehe": HOEHE,
-        "rand_l": RAND_L, "rand_u": RAND_U, "rand_o": RAND_O,
-        "x_ticks": [{"wert": w, "x": round(px(w), 1)}
-                    for w in range(0, int(x_max) + 1, schritt_x)],
-        "y_ticks": [{"wert": w, "y": round(py(w), 1)}
-                    for w in range(0, int(y_max) + 1, schritt_y)],
+        "breite": BREITE,
+        "hoehe": HOEHE,
+        "rand_l": RAND_L,
+        "rand_u": RAND_U,
+        "rand_o": RAND_O,
+        "x_ticks": [
+            {"wert": w, "x": round(px(w), 1)}
+            for w in range(0, int(x_max) + 1, schritt_x)
+        ],
+        "y_ticks": [
+            {"wert": w, "y": round(py(w), 1)}
+            for w in range(0, int(y_max) + 1, schritt_y)
+        ],
     }
 
 
@@ -281,9 +309,11 @@ def aufbereiten(state_pfad: Path, quellen=None, heute: str = "") -> dict:
             "belastbar": sum(1 for z in zeilen if z["belastbar"]),
             "in_der_karte": len(_karte(zeilen)["punkte"]),
             "ohne_anschlusspreis": sum(
-                1 for z in zeilen if "Anschlusspreis" in z["luecken"]),
+                1 for z in zeilen if "Anschlusspreis" in z["luecken"]
+            ),
             "ohne_volumen": sum(
-                1 for z in zeilen if not z["volumen"] and not z["unbegrenzt"]),
+                1 for z in zeilen if not z["volumen"] and not z["unbegrenzt"]
+            ),
             "unbegrenzt": sum(1 for z in zeilen if z["unbegrenzt"]),
         },
         "vorhanden": vorhanden,

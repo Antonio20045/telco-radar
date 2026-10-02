@@ -19,6 +19,7 @@ Werte des Klicks festhalten statt die der Anmeldung, und bei einem Klick vom
 Telefon aus dem Mobilfunknetz stuende im Einwilligungsprotokoll etwas, das
 mit der Einwilligung nichts zu tun hat.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -59,8 +60,9 @@ def normalisiere_adresse(wert: str) -> str:
 
 def kennwert(pepper: str, wert: str) -> str:
     """HMAC-SHA256 mit Pepper. Der einzige Weg, in diesem Paket zu hashen."""
-    return hmac.new((pepper or "").encode("utf-8"),
-                    (wert or "").encode("utf-8"), hashlib.sha256).hexdigest()
+    return hmac.new(
+        (pepper or "").encode("utf-8"), (wert or "").encode("utf-8"), hashlib.sha256
+    ).hexdigest()
 
 
 def adress_kennwert(pepper: str, adresse: str) -> str:
@@ -76,8 +78,12 @@ def adress_kennwert(pepper: str, adresse: str) -> str:
 
 
 def jetzt() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace(
-        "+00:00", "Z")
+    return (
+        datetime.now(timezone.utc)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
 
 
 @dataclass
@@ -89,9 +95,13 @@ class Einwilligungsnachweis:
     confirm_token_id: str = ""
 
     def as_dict(self) -> dict:
-        return {"text_version": self.text_version, "text_hash": self.text_hash,
-                "ip_hmac": self.ip_hmac, "user_agent_hmac": self.user_agent_hmac,
-                "confirm_token_id": self.confirm_token_id}
+        return {
+            "text_version": self.text_version,
+            "text_hash": self.text_hash,
+            "ip_hmac": self.ip_hmac,
+            "user_agent_hmac": self.user_agent_hmac,
+            "confirm_token_id": self.confirm_token_id,
+        }
 
     @property
     def vollstaendig(self) -> bool:
@@ -131,19 +141,26 @@ class Abo:
         Anmeldeversuch wieder angeschrieben, und ein Widerruf, der nach vier
         Wochen von selbst verfaellt, ist keiner.
         """
-        return replace(self, state="unsubscribed", email="",
-                       confirmed_at=self.confirmed_at,
-                       bounce_last=zeitpunkt or jetzt())
+        return replace(
+            self,
+            state="unsubscribed",
+            email="",
+            confirmed_at=self.confirmed_at,
+            bounce_last=zeitpunkt or jetzt(),
+        )
 
 
 # ==================================================  lesen und schreiben  ==
 
+
 def als_dict(abo: Abo) -> dict:
     """Die Form, die in `subscribers.jsonl` steht."""
-    filters = {FELD_JE_DIMENSION[d]: list(abo.filter.werte(d))
-               for d in FELD_JE_DIMENSION}
-    filters["keywords"] = [{"term": s.term, "mode": s.mode}
-                           for s in abo.filter.stichwoerter]
+    filters = {
+        FELD_JE_DIMENSION[d]: list(abo.filter.werte(d)) for d in FELD_JE_DIMENSION
+    }
+    filters["keywords"] = [
+        {"term": s.term, "mode": s.mode} for s in abo.filter.stichwoerter
+    ]
     return {
         "id": abo.id,
         "email": abo.email,
@@ -155,8 +172,11 @@ def als_dict(abo: Abo) -> dict:
         "cadence": abo.cadence,
         "format": abo.format,
         "state": abo.state,
-        "bounce": {"hard": abo.bounce_hard, "soft": abo.bounce_soft,
-                   "last": abo.bounce_last or None},
+        "bounce": {
+            "hard": abo.bounce_hard,
+            "soft": abo.bounce_soft,
+            "last": abo.bounce_last or None,
+        },
     }
 
 
@@ -173,7 +193,8 @@ def aus_dict(roh: dict, katalog: NewsletterKatalog) -> Abo:
             text_hash=str(consent.get("text_hash") or ""),
             ip_hmac=str(consent.get("ip_hmac") or ""),
             user_agent_hmac=str(consent.get("user_agent_hmac") or ""),
-            confirm_token_id=str(consent.get("confirm_token_id") or "")),
+            confirm_token_id=str(consent.get("confirm_token_id") or ""),
+        ),
         created_at=str(roh.get("created_at") or ""),
         confirmed_at=str(roh.get("confirmed_at") or ""),
         state=str(roh.get("state") or "pending"),
@@ -191,8 +212,10 @@ def neue_id() -> str:
 
 # =========================================================  Zulaessigkeit  ==
 
-def pruefe_anmeldung(adresse: str, filter_roh: dict,
-                     katalog: NewsletterKatalog) -> list[str]:
+
+def pruefe_anmeldung(
+    adresse: str, filter_roh: dict, katalog: NewsletterKatalog
+) -> list[str]:
     """Alles, was an einer Anmeldung nicht stimmt - als lesbare Saetze.
 
     Gibt eine LISTE zurueck und nicht den ersten Fehler: wer drei Stichwoerter
@@ -208,13 +231,16 @@ def pruefe_anmeldung(adresse: str, filter_roh: dict,
         erlaubt = katalog.schluessel(dimension)
         unbekannt = [w for w in satz.werte(dimension) if w not in erlaubt]
         if unbekannt:
-            fehler.append(f"Unbekannte Auswahl bei {dimension}: "
-                          f"{', '.join(sorted(unbekannt))}.")
+            fehler.append(
+                f"Unbekannte Auswahl bei {dimension}: {', '.join(sorted(unbekannt))}."
+            )
 
     roh_stichwoerter = (filter_roh or {}).get("keywords") or []
     if len(roh_stichwoerter) > katalog.grenzen.max_stichwoerter:
-        fehler.append(f"Höchstens {katalog.grenzen.max_stichwoerter} "
-                      f"Stichwörter, angegeben sind {len(roh_stichwoerter)}.")
+        fehler.append(
+            f"Höchstens {katalog.grenzen.max_stichwoerter} "
+            f"Stichwörter, angegeben sind {len(roh_stichwoerter)}."
+        )
     for stichwort in satz.stichwoerter:
         grund = stichwort_fehler(stichwort.term, katalog)
         if grund:
@@ -235,8 +261,11 @@ def erlaubt_nach_domainliste(adresse: str, erlaubte_domains) -> bool:
     erlaubt"** - dieselbe Regel wie bei den Filtern, damit niemand zwei
     gegensaetzliche Bedeutungen von "leer" im Kopf behalten muss.
     """
-    domains = [d.strip().lower().lstrip("@") for d in (erlaubte_domains or [])
-               if str(d).strip()]
+    domains = [
+        d.strip().lower().lstrip("@")
+        for d in (erlaubte_domains or [])
+        if str(d).strip()
+    ]
     if not domains:
         return True
     domain = normalisiere_adresse(adresse).rpartition("@")[2]

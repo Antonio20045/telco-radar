@@ -20,6 +20,7 @@ Die kleinen HTML-Schnipsel weiter unten stellen Ausfaelle nach, die sich
 nicht ehrlich herbeimessen lassen (fremde Marke, fremde Waehrung, kaputter
 Block) - sie geben sich nicht als Messung aus.
 """
+
 import gzip
 import json
 from pathlib import Path
@@ -37,25 +38,40 @@ def _seite() -> str:
 
 
 def _tarife(html=None):
-    return tarif_ldjson.tarife_aus_html(html if html is not None else _seite(),
-                                        anbieter="1&1", seiten_url=_URL,
-                                        abgerufen_am="2026-09-04")
+    return tarif_ldjson.tarife_aus_html(
+        html if html is not None else _seite(),
+        anbieter="1&1",
+        seiten_url=_URL,
+        abgerufen_am="2026-09-04",
+    )
 
 
-def _knoten(name="1&1 All-Net-Flat S", marke="1&1", preis="14.99",
-            waehrung="EUR", beschreibung="1&1 All-Net-Flat S 10 GB") -> str:
-    knoten = {"@context": "https://schema.org", "@type": "Product",
-              "name": name, "description": beschreibung,
-              "brand": {"@type": "Brand", "name": marke},
-              "offers": {"@type": "Offer", "priceCurrency": waehrung,
-                         "price": preis}}
-    return ('<script type="application/ld+json">'
-            + json.dumps(knoten, ensure_ascii=False) + "</script>")
+def _knoten(
+    name="1&1 All-Net-Flat S",
+    marke="1&1",
+    preis="14.99",
+    waehrung="EUR",
+    beschreibung="1&1 All-Net-Flat S 10 GB",
+) -> str:
+    knoten = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": name,
+        "description": beschreibung,
+        "brand": {"@type": "Brand", "name": marke},
+        "offers": {"@type": "Offer", "priceCurrency": waehrung, "price": preis},
+    }
+    return (
+        '<script type="application/ld+json">'
+        + json.dumps(knoten, ensure_ascii=False)
+        + "</script>"
+    )
 
 
 # --------------------------------------------------------------------------
 # Die gemessene Seite
 # --------------------------------------------------------------------------
+
 
 def test_die_sieben_tarife_der_seite():
     gefunden = _tarife()
@@ -95,7 +111,7 @@ def test_keine_laufzeit_wird_abgeleitet():
 
 
 def test_keine_preisphase_wird_erfunden():
-    """"ab dem 7. Monat" kommt im gemessenen HTML kein einziges Mal vor.
+    """ "ab dem 7. Monat" kommt im gemessenen HTML kein einziges Mal vor.
     Ob 14,99 EUR Aktions- oder Dauerpreis ist, sagt die Quelle nicht - und
     dieses Modul sagt es deshalb auch nicht."""
     assert all(not t.preisphasen for t, _ in _tarife())
@@ -135,13 +151,13 @@ def test_kein_tarif_geraet_in_quarantaene():
 # Abgrenzung und Ausfaelle
 # --------------------------------------------------------------------------
 
+
 def test_ein_geraet_ist_kein_tarif():
     """mobile.1und1.de/iphone-17-pro traegt AUCH einen Product-Knoten mit
     `offers.price` - dort 44,99 EUR als Monatspreis des BUENDELS. Getrennt
     werden die zwei an der Marke: der Anbieter verkauft seinen eigenen
     Tarif und Apples Telefon."""
-    assert _tarife(_knoten(name="iPhone 17 Pro", marke="Apple",
-                           preis="44.99")) == []
+    assert _tarife(_knoten(name="iPhone 17 Pro", marke="Apple", preis="44.99")) == []
 
 
 def test_die_marke_wird_verglichen_und_nicht_buchstabiert():
@@ -165,8 +181,7 @@ def test_knoten_ohne_namen_wird_uebergangen():
 def test_ein_kaputter_block_kippt_die_seite_nicht():
     """Bei 1&1 stehen FAQPage, WebSite und Organization neben dem
     Tarifgraphen. Ein unlesbarer Block darf die heilen nicht mitnehmen."""
-    html = ('<script type="application/ld+json">{kaputt</script>'
-            + _knoten())
+    html = '<script type="application/ld+json">{kaputt</script>' + _knoten()
     assert len(_tarife(html)) == 1
 
 
@@ -174,12 +189,16 @@ def test_der_graph_wird_genauso_gelesen_wie_das_einzelobjekt():
     """schema.org kennt drei Verpackungen; 1&1 benutzt `@graph`. Wer nur
     eine liest, findet bei der naechsten Umstellung nichts mehr - ohne dass
     etwas wirft."""
-    einzeln = {"@type": "Product", "name": "1&1 All-Net-Flat S",
-               "brand": {"name": "1&1"},
-               "offers": {"priceCurrency": "EUR", "price": "14.99"}}
+    einzeln = {
+        "@type": "Product",
+        "name": "1&1 All-Net-Flat S",
+        "brand": {"name": "1&1"},
+        "offers": {"priceCurrency": "EUR", "price": "14.99"},
+    }
     for verpackung in ({"@graph": [einzeln]}, [einzeln], einzeln):
-        html = ('<script type="application/ld+json">'
-                + json.dumps(verpackung) + "</script>")
+        html = (
+            '<script type="application/ld+json">' + json.dumps(verpackung) + "</script>"
+        )
         assert [t.name for t, _ in _tarife(html)] == ["1&1 All-Net-Flat S"]
 
 

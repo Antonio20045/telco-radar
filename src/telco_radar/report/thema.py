@@ -16,6 +16,7 @@ die Titelseite und sonst nichts:
 Die Meldungen kommen aus dem Themenspeicher, nicht aus der Wochenausgabe:
 ein Thema laeuft ueber mehrere Ausgaben, und genau das ist sein Zweck.
 """
+
 from __future__ import annotations
 
 from urllib.parse import urlsplit
@@ -47,8 +48,7 @@ def _ohne_zu_kleines_bild(m: dict) -> dict:
     Bild. Die Vorlage kennt dafuer die Klasse `ohne-bild`.
     """
     if 0 < _bildbreite(m) < MIND_BREITE_BILD:
-        m = {k: v for k, v in m.items()
-             if k not in ("image", "image_w", "image_h")}
+        m = {k: v for k, v in m.items() if k not in ("image", "image_w", "image_h")}
     return m
 
 
@@ -56,10 +56,12 @@ def _aktion(eintrag: dict) -> dict:
     """Ein laufendes Angebot als Zeile - wie auf der Wettbewerbsseite ohne
     den Score: eine Zahl auf einer Skala, die diese Seite nicht erklaert,
     ist fuer die Zielgruppe Jargon (CLAUDE.md §8)."""
-    return {"marke": eintrag.get("brand") or "",
-            "headline": eintrag.get("headline") or "",
-            "beschreibung": eintrag.get("description") or "",
-            "url": eintrag.get("url") or ""}
+    return {
+        "marke": eintrag.get("brand") or "",
+        "headline": eintrag.get("headline") or "",
+        "beschreibung": eintrag.get("description") or "",
+        "url": eintrag.get("url") or "",
+    }
 
 
 def passende_aktionen(thema: dict, promo_entries) -> list[dict]:
@@ -77,12 +79,15 @@ def passende_aktionen(thema: dict, promo_entries) -> list[dict]:
     for e in promo_entries or []:
         if e.get("status") != "aktiv":
             continue
-        text = (f"{e.get('brand') or ''} {e.get('headline') or ''} "
-                f"{e.get('description') or ''}")
+        text = (
+            f"{e.get('brand') or ''} {e.get('headline') or ''} "
+            f"{e.get('description') or ''}"
+        )
         if treffer(text, muster) >= MIND_TREFFER:
             passend.append(e)
-    passend.sort(key=lambda e: (e.get("highlight") is True, e.get("score") or 0),
-                 reverse=True)
+    passend.sort(
+        key=lambda e: (e.get("highlight") is True, e.get("score") or 0), reverse=True
+    )
     return [_aktion(e) for e in passend[:MAX_AKTIONEN]]
 
 
@@ -107,8 +112,9 @@ def build_thema_view(thema: dict, promo_entries=()) -> dict:
         # `_flatten()`. Ohne diesen Rueckfall stand unter dem Aufmacher
         # "Bild:" ohne Namen dahinter - manche Meldungen tragen kein
         # `source`, weil ihre Quelle keinen Anzeigenamen liefert.
-        m["quelle"] = (item.get("source")
-                       or urlsplit(item.get("url") or "").netloc.removeprefix("www."))
+        m["quelle"] = item.get("source") or urlsplit(
+            item.get("url") or ""
+        ).netloc.removeprefix("www.")
         m["absender"] = item.get("operator") or m["quelle"]
         meldungen.append(m)
 
@@ -124,8 +130,10 @@ def build_thema_view(thema: dict, promo_entries=()) -> dict:
     # In die zweite Reihe zuerst, was ein tragfaehiges Bild hat - sonst steht
     # neben dem Aufmacher zweimal nur Text, waehrend weiter unten Bilder in
     # Zeilen verpuffen. Innerhalb beider Gruppen bleibt die Dringlichkeit.
-    zwei = ([m for m in rest if _bildbreite(m) >= MIND_BREITE_BILD]
-            + [m for m in rest if _bildbreite(m) < MIND_BREITE_BILD])[:2]
+    zwei = (
+        [m for m in rest if _bildbreite(m) >= MIND_BREITE_BILD]
+        + [m for m in rest if _bildbreite(m) < MIND_BREITE_BILD]
+    )[:2]
     zeilen = [m for m in rest if m not in zwei]
     aufmacher = _ohne_zu_kleines_bild(aufmacher) if aufmacher else None
     zwei = [_ohne_zu_kleines_bild(m) for m in zwei]

@@ -5,6 +5,7 @@ Anbieter, deren Bilanz vollstaendig ist. Ein Teilausfall, ein Fristablauf,
 eine gesperrte oder ausserhalb ihrer Besuchszeit liegende Quelle heissen
 alle "nicht gelesen" - und was nicht gelesen wurde, altert nicht.
 """
+
 import json
 from datetime import datetime, timezone
 from pathlib import Path
@@ -20,44 +21,79 @@ from telco_radar.geraete_pipeline import run_geraete_stage
 
 _FIX = Path(__file__).parent / "fixtures" / "geraete"
 
-_KATALOG = {"geraete": [
-    {"hersteller": "Apple", "modell": "iPhone 17 Pro Max", "generation": 17,
-     "speicher": [256, 512, 1024], "segment": "flagship"},
-    {"hersteller": "Samsung", "modell": "Galaxy A57", "generation": 57,
-     "speicher": [128, 256], "segment": "mid"},
-]}
+_KATALOG = {
+    "geraete": [
+        {
+            "hersteller": "Apple",
+            "modell": "iPhone 17 Pro Max",
+            "generation": 17,
+            "speicher": [256, 512, 1024],
+            "segment": "flagship",
+        },
+        {
+            "hersteller": "Samsung",
+            "modell": "Galaxy A57",
+            "generation": 57,
+            "speicher": [128, 256],
+            "segment": "mid",
+        },
+    ]
+}
 
 _FARBEN = {"farben": {"titan-natur": ["Titannatur"], "schwarz": ["Black"]}}
 
-_QUELLEN = {"anbieter": [
-    {"name": "Medimax", "typ": "handel", "methode": "ldjson", "rang": 1,
-     "basis_url": "https://www.medimax.de", "rate_limit_sekunden": 0,
-     "einstiege": [{"url": "https://www.medimax.de/c/116/smartphones",
-                    "label": "Smartphones", "pfadmuster": "/p/"}]},
-    {"name": "Amazon", "typ": "handel", "methode": "deaktiviert", "rang": 2,
-     "aktiv": False, "grund": "erfordert Product-Advertising-API-Zugang"},
-]}
+_QUELLEN = {
+    "anbieter": [
+        {
+            "name": "Medimax",
+            "typ": "handel",
+            "methode": "ldjson",
+            "rang": 1,
+            "basis_url": "https://www.medimax.de",
+            "rate_limit_sekunden": 0,
+            "einstiege": [
+                {
+                    "url": "https://www.medimax.de/c/116/smartphones",
+                    "label": "Smartphones",
+                    "pfadmuster": "/p/",
+                }
+            ],
+        },
+        {
+            "name": "Amazon",
+            "typ": "handel",
+            "methode": "deaktiviert",
+            "rang": 2,
+            "aktiv": False,
+            "grund": "erfordert Product-Advertising-API-Zugang",
+        },
+    ]
+}
 
 _SEITEN = {
-    "https://www.medimax.de/c/116/smartphones":
-        (_FIX / "medimax_kategorie.html").read_text(encoding="utf-8"),
-    "https://www.medimax.de/p/1518897/galaxy-a57-5g-a576b-128gb":
-        (_FIX / "medimax_produkt_a57.html").read_text(encoding="utf-8"),
-    "https://www.medimax.de/p/1514136/iphone-17-pro-max-256gb":
-        (_FIX / "medimax_produkt.html").read_text(encoding="utf-8"),
-    "https://www.medimax.de/p/1514200/huelle-iphone-17":
-        "<html><body>Zubehör</body></html>",
+    "https://www.medimax.de/c/116/smartphones": (
+        _FIX / "medimax_kategorie.html"
+    ).read_text(encoding="utf-8"),
+    "https://www.medimax.de/p/1518897/galaxy-a57-5g-a576b-128gb": (
+        _FIX / "medimax_produkt_a57.html"
+    ).read_text(encoding="utf-8"),
+    "https://www.medimax.de/p/1514136/iphone-17-pro-max-256gb": (
+        _FIX / "medimax_produkt.html"
+    ).read_text(encoding="utf-8"),
+    "https://www.medimax.de/p/1514200/huelle-iphone-17": "<html><body>Zubehör</body></html>",
 }
 
 
 def _root(tmp_path: Path) -> Path:
     (tmp_path / "config").mkdir(exist_ok=True)
-    for name, daten in (("geraete_katalog.yaml", _KATALOG),
-                        ("farben.yaml", _FARBEN),
-                        ("geraete_quellen.yaml", _QUELLEN)):
+    for name, daten in (
+        ("geraete_katalog.yaml", _KATALOG),
+        ("farben.yaml", _FARBEN),
+        ("geraete_quellen.yaml", _QUELLEN),
+    ):
         (tmp_path / "config" / name).write_text(
-            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
-            encoding="utf-8")
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False), encoding="utf-8"
+        )
     return tmp_path
 
 
@@ -83,6 +119,7 @@ def _hole(seiten=None, protokoll=None, serverfehler=()):
         if url in serverfehler:
             return (500, "")
         return (200, seiten[url]) if url in seiten else (404, "")
+
     return hole
 
 
@@ -92,18 +129,24 @@ def _jetzt(stunde=3):
 
 # --------------------------------------------------------------------------
 
+
 def test_lauf_schreibt_datenbank_und_historie(tmp_path):
     root = _root(tmp_path)
-    bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(),
-                               hole=_hole())
+    bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
     assert bilanz["status"] == "ok"
     assert bilanz["listungen"] == 2 and bilanz["neu"] == 2
     assert bilanz["preispunkte"] == 2
 
-    db = json.loads((root / "data" / "state" / "geraete_db.json").read_text(encoding="utf-8"))
+    db = json.loads(
+        (root / "data" / "state" / "geraete_db.json").read_text(encoding="utf-8")
+    )
     assert db["updated"] == "2026-08-11" and len(db["listungen"]) == 2
-    zeilen = (root / "data" / "state" / "geraete_preise.jsonl").read_text(
-        encoding="utf-8").strip().splitlines()
+    zeilen = (
+        (root / "data" / "state" / "geraete_preise.jsonl")
+        .read_text(encoding="utf-8")
+        .strip()
+        .splitlines()
+    )
     assert len(zeilen) == 2
     preise = sorted(json.loads(z)["preis_ohne_vertrag"] for z in zeilen)
     assert preise == [349.0, 1449.0]
@@ -111,8 +154,9 @@ def test_lauf_schreibt_datenbank_und_historie(tmp_path):
 
 def test_jeder_anbieter_taucht_in_der_bilanz_auf(tmp_path):
     """Akzeptanzkriterium aus Teil E: kein Anbieter fehlt stillschweigend."""
-    bilanz = run_geraete_stage(_root(tmp_path), {}, "2026-08-11",
-                               jetzt=_jetzt(), hole=_hole())
+    bilanz = run_geraete_stage(
+        _root(tmp_path), {}, "2026-08-11", jetzt=_jetzt(), hole=_hole()
+    )
     namen = {a["anbieter"] for a in bilanz["anbieter"]}
     assert namen == {"Medimax", "Amazon"}
     amazon = [a for a in bilanz["anbieter"] if a["anbieter"] == "Amazon"][0]
@@ -124,8 +168,7 @@ def test_zweiter_lauf_ohne_treffer_altert_nur_eine_stufe(tmp_path):
     run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
     leer = dict(_SEITEN)
     leer["https://www.medimax.de/c/116/smartphones"] = "<html><body></body></html>"
-    bilanz = run_geraete_stage(root, {}, "2026-08-14", jetzt=_jetzt(),
-                               hole=_hole(leer))
+    bilanz = run_geraete_stage(root, {}, "2026-08-14", jetzt=_jetzt(), hole=_hole(leer))
     assert bilanz["gealtert"] == 2
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
     assert {e["status"] for e in db.eintraege()} == {STATUS_VERMUTLICH}
@@ -136,8 +179,7 @@ def test_ein_ausgefallener_anbieter_altert_nichts(tmp_path):
     'keine Geraete mehr da'."""
     root = _root(tmp_path)
     run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
-    bilanz = run_geraete_stage(root, {}, "2026-08-14", jetzt=_jetzt(),
-                               hole=_hole({}))
+    bilanz = run_geraete_stage(root, {}, "2026-08-14", jetzt=_jetzt(), hole=_hole({}))
     assert bilanz["gealtert"] == 0
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
     assert {e["status"] for e in db.eintraege()} == {STATUS_AKTIV}
@@ -159,8 +201,7 @@ def test_ausserhalb_der_besuchszeit_wird_weder_geholt_noch_gealtert(tmp_path):
             return (200, "User-agent: *\nVisit-time: 0200-0800\n")
         return (200, _SEITEN[url]) if url in _SEITEN else (404, "")
 
-    bilanz = run_geraete_stage(root, {}, "2026-08-14", jetzt=_jetzt(8),
-                               hole=hole)
+    bilanz = run_geraete_stage(root, {}, "2026-08-14", jetzt=_jetzt(8), hole=hole)
     assert bilanz["gealtert"] == 0
     assert [u for u in protokoll if "/p/" in u] == []
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
@@ -170,11 +211,14 @@ def test_ausserhalb_der_besuchszeit_wird_weder_geholt_noch_gealtert(tmp_path):
 def test_unveraenderter_preis_schreibt_keinen_zweiten_punkt(tmp_path):
     root = _root(tmp_path)
     run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
-    bilanz = run_geraete_stage(root, {}, "2026-08-14", jetzt=_jetzt(),
-                               hole=_hole())
+    bilanz = run_geraete_stage(root, {}, "2026-08-14", jetzt=_jetzt(), hole=_hole())
     assert bilanz["preispunkte"] == 0
-    zeilen = (root / "data" / "state" / "geraete_preise.jsonl").read_text(
-        encoding="utf-8").strip().splitlines()
+    zeilen = (
+        (root / "data" / "state" / "geraete_preise.jsonl")
+        .read_text(encoding="utf-8")
+        .strip()
+        .splitlines()
+    )
     assert len(zeilen) == 2
 
 
@@ -182,8 +226,9 @@ def test_zeitbudget_bricht_sauber_ab(tmp_path):
     """Teil F: bei Fristablauf sauber abbrechen, Teilergebnis speichern, im
     Protokoll vermerken - und nichts altern."""
     root = _root(tmp_path)
-    bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(),
-                               hole=_hole(), frist_sekunden=0.0001)
+    bilanz = run_geraete_stage(
+        root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole(), frist_sekunden=0.0001
+    )
     medimax = [a for a in bilanz["anbieter"] if a["anbieter"] == "Medimax"][0]
     assert medimax["status"] == "frist"
     assert medimax["vollstaendig"] is False
@@ -192,8 +237,7 @@ def test_zeitbudget_bricht_sauber_ab(tmp_path):
 
 def test_ohne_konfiguration_tut_die_stufe_nichts(tmp_path):
     (tmp_path / "config").mkdir()
-    bilanz = run_geraete_stage(tmp_path, {}, "2026-08-11", jetzt=_jetzt(),
-                               hole=_hole())
+    bilanz = run_geraete_stage(tmp_path, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
     assert bilanz["status"] == "keine Konfiguration"
     assert not (tmp_path / "data").exists()
 
@@ -219,11 +263,13 @@ def test_drei_leere_aber_gelesene_laeufe_ergeben_sim_only(tmp_path):
 
 
 def _seite_mit_titel(titel: str, preis: str = "299.00") -> str:
-    return ('<html><head><script type="application/ld+json">'
-            '{"@type":"Product","name":"%s","offers":{"@type":"Offer",'
-            '"price":"%s","priceCurrency":"EUR",'
-            '"availability":"https://schema.org/InStock"}}'
-            '</script></head><body></body></html>' % (titel, preis))
+    return (
+        '<html><head><script type="application/ld+json">'
+        '{"@type":"Product","name":"%s","offers":{"@type":"Offer",'
+        '"price":"%s","priceCurrency":"EUR",'
+        '"availability":"https://schema.org/InStock"}}'
+        "</script></head><body></body></html>" % (titel, preis)
+    )
 
 
 def test_unerkannte_titel_stehen_im_protokoll(tmp_path, caplog):
@@ -235,11 +281,13 @@ def test_unerkannte_titel_stehen_im_protokoll(tmp_path, caplog):
     obwohl von 27 abgerufenen ALDI-TALK-Seiten genau EINE eine Listung
     ergab."""
     seiten = dict(_SEITEN)
-    seiten["https://www.medimax.de/p/1514200/huelle-iphone-17"] = \
-        _seite_mit_titel("Nothing Phone (3a) 128GB")
+    seiten["https://www.medimax.de/p/1514200/huelle-iphone-17"] = _seite_mit_titel(
+        "Nothing Phone (3a) 128GB"
+    )
     with caplog.at_level("INFO", logger="telco_radar.geraete_pipeline"):
-        bilanz = run_geraete_stage(_root(tmp_path), {}, "2026-08-11",
-                                   jetzt=_jetzt(), hole=_hole(seiten))
+        bilanz = run_geraete_stage(
+            _root(tmp_path), {}, "2026-08-11", jetzt=_jetzt(), hole=_hole(seiten)
+        )
     assert "Nothing Phone (3a) 128GB" in bilanz["unbekannte_titel"]
     assert bilanz["unbekannte_titel_gesamt"] == len(bilanz["unbekannte_titel"])
     text = caplog.text
@@ -247,8 +295,7 @@ def test_unerkannte_titel_stehen_im_protokoll(tmp_path, caplog):
     assert "Nothing Phone (3a) 128GB" in text
 
 
-def test_protokoll_nennt_die_listungen_eines_gescheiterten_anbieters(tmp_path,
-                                                                    caplog):
+def test_protokoll_nennt_die_listungen_eines_gescheiterten_anbieters(tmp_path, caplog):
     """Ein Anbieter, der 84 Listungen liefert und trotzdem "fehler" heisst,
     ist erklaerbar - aber nur, wenn die Zeile die 84 nennt. Im ersten echten
     Lauf stand dort bloss "mobilcom-debitel -> fehler (kein Einstieg
@@ -262,9 +309,13 @@ def test_protokoll_nennt_die_listungen_eines_gescheiterten_anbieters(tmp_path,
     als sein Text behauptet."""
     kaputt = "https://www.medimax.de/p/1518897/galaxy-a57-5g-a576b-128gb"
     with caplog.at_level("INFO", logger="telco_radar.geraete_pipeline"):
-        bilanz = run_geraete_stage(_root(tmp_path), {}, "2026-08-11",
-                                   jetzt=_jetzt(),
-                                   hole=_hole(serverfehler={kaputt}))
+        bilanz = run_geraete_stage(
+            _root(tmp_path),
+            {},
+            "2026-08-11",
+            jetzt=_jetzt(),
+            hole=_hole(serverfehler={kaputt}),
+        )
     medimax = [a for a in bilanz["anbieter"] if a["anbieter"] == "Medimax"][0]
     assert medimax["status"] == "fehler" and medimax["listungen"] == 1
     assert "Medimax -> fehler, 1 Listungen aus 2 Produktseiten" in caplog.text
@@ -273,10 +324,12 @@ def test_protokoll_nennt_die_listungen_eines_gescheiterten_anbieters(tmp_path,
 def test_nichts_wird_ausserhalb_von_data_state_geschrieben(tmp_path):
     root = _root(tmp_path)
     run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
-    geschrieben = {p.relative_to(root).as_posix()
-                   for p in root.rglob("*") if p.is_file()}
-    ausserhalb = {p for p in geschrieben
-                  if not p.startswith(("config/", "data/state/"))}
+    geschrieben = {
+        p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file()
+    }
+    ausserhalb = {
+        p for p in geschrieben if not p.startswith(("config/", "data/state/"))
+    }
     assert ausserhalb == set()
 
 
@@ -295,14 +348,17 @@ def test_teillauf_mit_listungen_landet_in_der_messtermin_buchfuehrung(tmp_path):
     # Luecke - der Test haette dann die Leseschwelle gemessen statt des
     # Teillaufs, um den es hier geht.
     kaputt = "https://www.medimax.de/p/1514200/huelle-iphone-17"
-    run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(),
-                      hole=_hole(serverfehler={kaputt}))
+    run_geraete_stage(
+        root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole(serverfehler={kaputt})
+    )
 
     from telco_radar.analyze.geraete_store import GeraeteDB
+
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
     assert db.messtermine("Medimax") == ["2026-08-11"]
-    assert db.laufbilanz("Medimax").get("laeufe", 0) == 0, \
+    assert db.laufbilanz("Medimax").get("laeufe", 0) == 0, (
         "ein Teillauf zaehlt nicht als vollstaendiger Lauf"
+    )
     assert db.hardware_vermarktung("Medimax") == "ja"
 
 
@@ -329,13 +385,15 @@ def test_die_hole_fabrik_gibt_den_statuscode_zurueck_statt_zu_werfen():
         raise httpx.HTTPStatusError("404", request=None, response=_Antwort())
 
     import telco_radar.collect.http as http_modul
+
     echt = http_modul.fetch
     http_modul.fetch = _werfen
     try:
         # Die Fabrik bindet `fetch` beim ERZEUGEN, nicht beim Aufruf - sie
         # muss also nach dem Austausch gebaut werden.
         status, text = _hole_fabrik({"timeout_seconds": 5})(
-            "https://api.example.de/robots.txt")
+            "https://api.example.de/robots.txt"
+        )
     finally:
         http_modul.fetch = echt
     assert status == 404 and "not found" in text.lower()
@@ -355,17 +413,18 @@ def test_ein_host_ohne_robots_txt_wird_abgefragt_statt_uebersprungen(tmp_path):
 
     def _fetch(url, cfg, **kw):
         if url.endswith("/robots.txt"):
-            raise httpx.HTTPStatusError("404", request=None,
-                                        response=_Antwort404())
+            raise httpx.HTTPStatusError("404", request=None, response=_Antwort404())
+
         class _Ok:
             status_code = 200
             text = seiten.get(url, "")
+
         if url not in seiten:
-            raise httpx.HTTPStatusError("404", request=None,
-                                        response=_Antwort404())
+            raise httpx.HTTPStatusError("404", request=None, response=_Antwort404())
         return _Ok()
 
     import telco_radar.collect.http as http_modul
+
     echt = http_modul.fetch
     http_modul.fetch = _fetch
     try:
@@ -385,15 +444,28 @@ def test_ein_host_ohne_robots_txt_wird_abgefragt_statt_uebersprungen(tmp_path):
 # --------------------------------------------------------------------------
 
 _TARIFE = [
-    {"tarif_id": "telekom:magentamobil-l", "anbieter": "Telekom",
-     "name": "MagentaMobil L", "art": "mobilfunk", "grundgebuehr": 59.95,
-     "anschlusspreis": None, "preisphasen": [],
-     "dokument_url": "https://www.telekom.de/pib/magentamobil-l",
-     "abgerufen_am": "2026-08-11"},
-    {"tarif_id": "o2:o2-home-l", "anbieter": "o2", "name": "O2 Home L",
-     "art": "festnetz", "grundgebuehr": 44.99, "anschlusspreis": None,
-     "preisphasen": [], "dokument_url": "https://x.de/home-l.pdf",
-     "abgerufen_am": "2026-08-11"},
+    {
+        "tarif_id": "telekom:magentamobil-l",
+        "anbieter": "Telekom",
+        "name": "MagentaMobil L",
+        "art": "mobilfunk",
+        "grundgebuehr": 59.95,
+        "anschlusspreis": None,
+        "preisphasen": [],
+        "dokument_url": "https://www.telekom.de/pib/magentamobil-l",
+        "abgerufen_am": "2026-08-11",
+    },
+    {
+        "tarif_id": "o2:o2-home-l",
+        "anbieter": "o2",
+        "name": "O2 Home L",
+        "art": "festnetz",
+        "grundgebuehr": 44.99,
+        "anschlusspreis": None,
+        "preisphasen": [],
+        "dokument_url": "https://x.de/home-l.pdf",
+        "abgerufen_am": "2026-08-11",
+    },
 ]
 
 
@@ -401,19 +473,22 @@ def _mit_tarifen(root: Path, saetze=None) -> Path:
     zustand = root / "data" / "state"
     zustand.mkdir(parents=True, exist_ok=True)
     (zustand / "tarife.jsonl").write_text(
-        "".join(json.dumps(s, ensure_ascii=False) + "\n"
-                for s in (_TARIFE if saetze is None else saetze)),
-        encoding="utf-8")
+        "".join(
+            json.dumps(s, ensure_ascii=False) + "\n"
+            for s in (_TARIFE if saetze is None else saetze)
+        ),
+        encoding="utf-8",
+    )
     return root
 
 
 def test_der_lauf_schreibt_die_sim_only_referenzen(tmp_path):
     root = _mit_tarifen(_root(tmp_path))
-    bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(),
-                               hole=_hole())
+    bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
 
-    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
-                     .read_text(encoding="utf-8"))
+    tco = json.loads(
+        (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
+    )
     namen = [r["tarif_name"] for r in tco["sim_only"]]
     # Der Festnetztarif ist KEIN Massstab fuer ein Smartphone-Buendel.
     assert namen == ["MagentaMobil L"]
@@ -426,8 +501,7 @@ def test_der_lauf_schreibt_die_sim_only_referenzen(tmp_path):
 def test_ohne_tarifbestand_bleibt_der_geraetebestand_unberuehrt(tmp_path):
     """Kein `tarife.jsonl`: die Stufe laeuft durch, ohne etwas zu verlieren."""
     root = _root(tmp_path)
-    bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(),
-                               hole=_hole())
+    bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
     assert bilanz["status"] == "ok"
     assert bilanz["sim_only_referenzen"] == 0
     assert (root / "data" / "state" / "geraete_db.json").exists()
@@ -435,7 +509,7 @@ def test_ohne_tarifbestand_bleibt_der_geraetebestand_unberuehrt(tmp_path):
 
 
 def test_ein_leerer_tarifbestand_loescht_den_massstab_nicht(tmp_path):
-    """"Nicht gelesen" ist nicht "leer".
+    """ "Nicht gelesen" ist nicht "leer".
 
     `Tarifbestand.aus_datei` wirft bei fehlender Datei nicht. Ein
     Baseline-Reset, ein Merge-Konflikt oder ein Wettlauf mit `radar.yml`
@@ -448,11 +522,11 @@ def test_ein_leerer_tarifbestand_loescht_den_massstab_nicht(tmp_path):
     run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
     (root / "data" / "state" / "tarife.jsonl").unlink()
 
-    bilanz = run_geraete_stage(root, {}, "2026-08-14", jetzt=_jetzt(),
-                               hole=_hole())
-    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
-                     .read_text(encoding="utf-8"))
-    assert len(tco["sim_only"]) == 1          # noch da
+    bilanz = run_geraete_stage(root, {}, "2026-08-14", jetzt=_jetzt(), hole=_hole())
+    tco = json.loads(
+        (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
+    )
+    assert len(tco["sim_only"]) == 1  # noch da
     assert bilanz["sim_only_referenzen"] == 0  # aber nicht geschrieben
 
 
@@ -465,13 +539,18 @@ def test_ein_verschwundener_tarif_verschwindet_aus_dem_massstab(tmp_path):
     """
     root = _mit_tarifen(_root(tmp_path))
     run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
-    anders = dict(_TARIFE[0], tarif_id="telekom:magentamobil-m",
-                  name="MagentaMobil M", grundgebuehr=49.95)
+    anders = dict(
+        _TARIFE[0],
+        tarif_id="telekom:magentamobil-m",
+        name="MagentaMobil M",
+        grundgebuehr=49.95,
+    )
     _mit_tarifen(root, [anders])
 
     run_geraete_stage(root, {}, "2026-08-14", jetzt=_jetzt(), hole=_hole())
-    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
-                     .read_text(encoding="utf-8"))
+    tco = json.loads(
+        (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
+    )
     assert [r["tarif_name"] for r in tco["sim_only"]] == ["MagentaMobil M"]
 
 
@@ -482,14 +561,15 @@ def test_ein_fehler_beim_massstab_kostet_den_messtag_nicht(tmp_path, monkeypatch
     der Block nach `db.save()` und in seinem eigenen Auffangboden.
     """
     import telco_radar.geraete_pipeline as pipeline
+
     root = _mit_tarifen(_root(tmp_path))
 
     def kaputt(*_a, **_k):
         raise OSError("Platte voll")
+
     monkeypatch.setattr(pipeline.TcoDB, "save", kaputt)
 
-    bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(),
-                               hole=_hole())
+    bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
     assert bilanz["status"] == "ok"
     assert bilanz["listungen"] > 0
     assert (root / "data" / "state" / "geraete_db.json").exists()
@@ -508,61 +588,107 @@ def test_ein_fehler_beim_massstab_kostet_den_messtag_nicht(tmp_path, monkeypatch
 
 _O2_BUENDEL_URL = "https://www.o2online.de/e-shop/rest/catalog/buendel"
 
-_O2_QUELLEN = {"anbieter": [
-    {"name": "o2", "typ": "netzbetreiber", "methode": "o2_katalog", "rang": 1,
-     "basis_url": "https://www.o2online.de", "rate_limit_sekunden": 0,
-     "einstiege": [{"url": _O2_BUENDEL_URL, "label": "mit Tarif",
-                    "kind": "buendel"}]},
-]}
+_O2_QUELLEN = {
+    "anbieter": [
+        {
+            "name": "o2",
+            "typ": "netzbetreiber",
+            "methode": "o2_katalog",
+            "rang": 1,
+            "basis_url": "https://www.o2online.de",
+            "rate_limit_sekunden": 0,
+            "einstiege": [
+                {"url": _O2_BUENDEL_URL, "label": "mit Tarif", "kind": "buendel"}
+            ],
+        },
+    ]
+}
 
 _O2_TARIFE = [
-    {"tarif_id": "o2:o2-mobile-on-demand-m", "anbieter": "o2",
-     "name": "O2 Mobile on Demand M", "grundgebuehr": 19.99,
-     "buendel_slug": "o2-mobile-on-demand-m-plus", "art": "mobilfunk",
-     "dokument_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
-     "abgerufen_am": "2026-09-04", "preisphasen": []},
+    {
+        "tarif_id": "o2:o2-mobile-on-demand-m",
+        "anbieter": "o2",
+        "name": "O2 Mobile on Demand M",
+        "grundgebuehr": 19.99,
+        "buendel_slug": "o2-mobile-on-demand-m-plus",
+        "art": "mobilfunk",
+        "dokument_url": "https://www.o2online.de/tarife/handyvertrag-ohne-handy/",
+        "abgerufen_am": "2026-09-04",
+        "preisphasen": [],
+    },
 ]
 
 
 def _o2_antwort(monatlich=48.99, gesamt=1764.64):
     """Ein Buendelkatalog mit EINEM Eintrag, in der Form, die o2 liefert."""
-    return json.dumps({
-        "hwCatalogSwitcherStateValue": {"hwOnlyOrBundleSwitcherValue": {
-            "hwOnlyOrBundleState": {"name": "BUNDLE"}}},
-        "hardware": [{
-            "description": "Apple iPhone 17 Pro Max",
-            "offerName": ("privatkunden-apple-iphone-17-pro-max-"
-                          "256gb-titan-natur-36xhigh"),
-            "externalId": "4510 301298 00",
-            "rateDurationValue": "36 Monate",
-            "price": {"oneTimePrice": 1.0, "monthlyPrice": monatlich,
-                      "totalPrice": gesamt, "activationFee": 39.99},
-            "bundle": {"tariffName": "O<sub>2</sub> Mobile on Demand M Plus "
-                                     "mit 50 GB+ (24 Mon.)"},
-            "ecommerceProductValue": {"attributes": {
-                "metric3": f"{monatlich - 14.99:.2f}", "metric2": "14.99",
-                "metric5": "1", "metric4": "39.99",
-                "dimension59": "o2-mobile-on-demand-m-plus"}},
-            "detailWwwAbsoluteCall": {"constantPayload": {"link": {
-                "uri": "https://www.o2online.de/e-shop/apple/x-details"}}},
-        }]})
+    return json.dumps(
+        {
+            "hwCatalogSwitcherStateValue": {
+                "hwOnlyOrBundleSwitcherValue": {
+                    "hwOnlyOrBundleState": {"name": "BUNDLE"}
+                }
+            },
+            "hardware": [
+                {
+                    "description": "Apple iPhone 17 Pro Max",
+                    "offerName": (
+                        "privatkunden-apple-iphone-17-pro-max-256gb-titan-natur-36xhigh"
+                    ),
+                    "externalId": "4510 301298 00",
+                    "rateDurationValue": "36 Monate",
+                    "price": {
+                        "oneTimePrice": 1.0,
+                        "monthlyPrice": monatlich,
+                        "totalPrice": gesamt,
+                        "activationFee": 39.99,
+                    },
+                    "bundle": {
+                        "tariffName": "O<sub>2</sub> Mobile on Demand M Plus "
+                        "mit 50 GB+ (24 Mon.)"
+                    },
+                    "ecommerceProductValue": {
+                        "attributes": {
+                            "metric3": f"{monatlich - 14.99:.2f}",
+                            "metric2": "14.99",
+                            "metric5": "1",
+                            "metric4": "39.99",
+                            "dimension59": "o2-mobile-on-demand-m-plus",
+                        }
+                    },
+                    "detailWwwAbsoluteCall": {
+                        "constantPayload": {
+                            "link": {
+                                "uri": "https://www.o2online.de/e-shop/apple/x-details"
+                            }
+                        }
+                    },
+                }
+            ],
+        }
+    )
 
 
 def _o2_root(tmp_path: Path, tarife=None) -> Path:
     root = tmp_path
     (root / "config").mkdir(exist_ok=True)
-    for name, daten in (("geraete_katalog.yaml", _KATALOG),
-                        ("farben.yaml", _FARBEN),
-                        ("geraete_quellen.yaml", _O2_QUELLEN)):
+    for name, daten in (
+        ("geraete_katalog.yaml", _KATALOG),
+        ("farben.yaml", _FARBEN),
+        ("geraete_quellen.yaml", _O2_QUELLEN),
+    ):
         (root / "config" / name).write_text(
-            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
-            encoding="utf-8")
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False), encoding="utf-8"
+        )
     zustand = root / "data" / "state"
     zustand.mkdir(parents=True, exist_ok=True)
     (zustand / "tarife.jsonl").write_text(
-        "\n".join(json.dumps(t, ensure_ascii=False)
-                  for t in (_O2_TARIFE if tarife is None else tarife)) + "\n",
-        encoding="utf-8")
+        "\n".join(
+            json.dumps(t, ensure_ascii=False)
+            for t in (_O2_TARIFE if tarife is None else tarife)
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     return root
 
 
@@ -573,19 +699,20 @@ def _o2_hole(antwort=None):
         if url == _O2_BUENDEL_URL:
             return (200, _o2_antwort() if antwort is None else antwort)
         return (404, "")
+
     return hole
 
 
 def test_ein_buendel_einstieg_schreibt_die_tco_datei_und_keine_listung(tmp_path):
     root = _o2_root(tmp_path)
-    bilanz = run_geraete_stage(root, {}, "2026-09-04", jetzt=_jetzt(),
-                               hole=_o2_hole())
+    bilanz = run_geraete_stage(root, {}, "2026-09-04", jetzt=_jetzt(), hole=_o2_hole())
     assert bilanz["listungen"] == 0
     assert bilanz["rohbuendel"] == 1
     assert bilanz["buendel"] == 1 and bilanz["buendel_neu"] == 1
 
-    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
-                     .read_text(encoding="utf-8"))
+    tco = json.loads(
+        (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
+    )
     assert len(tco["buendel"]) == 1
     satz = tco["buendel"][0]
     assert satz["sku_id"] == "apple-iphone-17-pro-max-256gb-titan-natur"
@@ -605,9 +732,13 @@ def test_ein_buendel_einstieg_schreibt_die_tco_datei_und_keine_listung(tmp_path)
     assert satz["laufzeit_monate"] == 36
     # Kein Geraet in `geraete_db.json`: der Buendelbetrag hat in der
     # Preisspalte nichts verloren.
-    assert not (root / "data" / "state" / "geraete_db.json").exists() or \
-        json.loads((root / "data" / "state" / "geraete_db.json")
-                   .read_text(encoding="utf-8"))["listungen"] == []
+    assert (
+        not (root / "data" / "state" / "geraete_db.json").exists()
+        or json.loads(
+            (root / "data" / "state" / "geraete_db.json").read_text(encoding="utf-8")
+        )["listungen"]
+        == []
+    )
 
 
 def test_ohne_tarif_im_bestand_wird_kein_buendel_geschrieben(tmp_path):
@@ -616,16 +747,23 @@ def test_ohne_tarif_im_bestand_wird_kein_buendel_geschrieben(tmp_path):
     Ohne sie kostet ein einziger unaufloesbarer Satz die ganze Uebergabe -
     und der Bestand haette null Buendel statt der uebrigen.
     """
-    root = _o2_root(tmp_path, tarife=[
-        {**_O2_TARIFE[0], "buendel_slug": "ein-ganz-anderer-tarif",
-         "name": "O2 Etwas Anderes",
-         "tarif_id": "o2:o2-etwas-anderes"}])
-    bilanz = run_geraete_stage(root, {}, "2026-09-04", jetzt=_jetzt(),
-                               hole=_o2_hole())
+    root = _o2_root(
+        tmp_path,
+        tarife=[
+            {
+                **_O2_TARIFE[0],
+                "buendel_slug": "ein-ganz-anderer-tarif",
+                "name": "O2 Etwas Anderes",
+                "tarif_id": "o2:o2-etwas-anderes",
+            }
+        ],
+    )
+    bilanz = run_geraete_stage(root, {}, "2026-09-04", jetzt=_jetzt(), hole=_o2_hole())
     assert bilanz["rohbuendel"] == 1
     assert bilanz["buendel"] == 0 and bilanz["buendel_ohne_tarif"] == 1
-    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
-                     .read_text(encoding="utf-8"))
+    tco = json.loads(
+        (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
+    )
     assert tco["buendel"] == []
 
 
@@ -634,18 +772,31 @@ def test_eine_unlesbare_buendelantwort_schreibt_nichts_und_altert_nicht(tmp_path
     root = _o2_root(tmp_path)
     run_geraete_stage(root, {}, "2026-09-04", jetzt=_jetzt(), hole=_o2_hole())
     bilanz = run_geraete_stage(
-        root, {}, "2026-09-05", jetzt=_jetzt(),
-        hole=_o2_hole(json.dumps({"hardware": [], "hwCatalogSwitcherStateValue":
-                                  {"hwOnlyOrBundleSwitcherValue": {
-                                      "hwOnlyOrBundleState":
-                                          {"name": "HW_ONLY"}}}})))
+        root,
+        {},
+        "2026-09-05",
+        jetzt=_jetzt(),
+        hole=_o2_hole(
+            json.dumps(
+                {
+                    "hardware": [],
+                    "hwCatalogSwitcherStateValue": {
+                        "hwOnlyOrBundleSwitcherValue": {
+                            "hwOnlyOrBundleState": {"name": "HW_ONLY"}
+                        }
+                    },
+                }
+            )
+        ),
+    )
     assert bilanz["rohbuendel"] == 0
     o2 = [a for a in bilanz["anbieter"] if a["anbieter"] == "o2"][0]
     assert "HW_ONLY" in o2["grund"]
     # Der Bestand von gestern steht unveraendert - Buendel werden
     # aufgefrischt, nicht ersetzt.
-    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
-                     .read_text(encoding="utf-8"))
+    tco = json.loads(
+        (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
+    )
     assert len(tco["buendel"]) == 1
     assert tco["buendel"][0]["last_verified"] == "2026-09-04"
 
@@ -654,13 +805,18 @@ def test_ein_geaenderter_buendelpreis_frischt_den_satz_auf(tmp_path):
     root = _o2_root(tmp_path)
     run_geraete_stage(root, {}, "2026-09-04", jetzt=_jetzt(), hole=_o2_hole())
     bilanz = run_geraete_stage(
-        root, {}, "2026-09-05", jetzt=_jetzt(),
+        root,
+        {},
+        "2026-09-05",
+        jetzt=_jetzt(),
         # 30,00 statt 34,00 Geraeterate: Summe und Gesamtbetrag ziehen mit,
         # sonst faellt der Satz an seiner eigenen Rechenprobe.
-        hole=_o2_hole(_o2_antwort(monatlich=44.99, gesamt=1620.64)))
+        hole=_o2_hole(_o2_antwort(monatlich=44.99, gesamt=1620.64)),
+    )
     assert bilanz["buendel"] == 1 and bilanz["buendel_neu"] == 0
-    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
-                     .read_text(encoding="utf-8"))
+    tco = json.loads(
+        (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
+    )
     assert len(tco["buendel"]) == 1
     assert tco["buendel"][0]["geraet_monatsrate"] == 30.0
     assert tco["buendel"][0]["first_seen"] == "2026-09-04"
@@ -685,22 +841,31 @@ def test_ein_kollidierender_satz_bekommt_keinen_historienpunkt(tmp_path):
     assert zweit != produkt, "die Fixture muss den Preis 1449 tragen"
     kategorie = _SEITEN["https://www.medimax.de/c/116/smartphones"].replace(
         "/p/1518897/galaxy-a57-5g-a576b-128gb",
-        "/p/1514137/iphone-17-pro-max-256gb-zweit")
+        "/p/1514137/iphone-17-pro-max-256gb-zweit",
+    )
     seiten = dict(_SEITEN)
     seiten["https://www.medimax.de/c/116/smartphones"] = kategorie
     seiten["https://www.medimax.de/p/1514137/iphone-17-pro-max-256gb-zweit"] = zweit
 
-    bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(),
-                               hole=_hole(seiten))
+    bilanz = run_geraete_stage(
+        root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole(seiten)
+    )
     assert bilanz["status"] == "ok"
     # Die Kollision tritt wirklich ein - sonst misst der Test nichts.
     assert bilanz["kollisionen"] == 1
     assert bilanz["preispunkte"] == 1
 
-    db = json.loads((root / "data" / "state" / "geraete_db.json").read_text(encoding="utf-8"))
+    db = json.loads(
+        (root / "data" / "state" / "geraete_db.json").read_text(encoding="utf-8")
+    )
     (eintrag,) = db["listungen"]
-    zeilen = [json.loads(z) for z in (root / "data" / "state" / "geraete_preise.jsonl")
-              .read_text(encoding="utf-8").strip().splitlines()]
+    zeilen = [
+        json.loads(z)
+        for z in (root / "data" / "state" / "geraete_preise.jsonl")
+        .read_text(encoding="utf-8")
+        .strip()
+        .splitlines()
+    ]
     assert len(zeilen) == 1
     assert zeilen[0]["listung_id"] == eintrag["id"]
     assert zeilen[0]["preis_ohne_vertrag"] == eintrag["preis_ohne_vertrag"]
@@ -716,22 +881,33 @@ def test_ein_kollidierender_satz_bekommt_keinen_historienpunkt(tmp_path):
 
 import gzip as _gzip
 
-from telco_radar.collect.tarif_einsundeins_simonly import (
-    SEITEN_URL as _SIMONLY_URL)
+from telco_radar.collect.tarif_einsundeins_simonly import SEITEN_URL as _SIMONLY_URL
 
 _TARIF_FIX = Path(__file__).parent / "fixtures" / "tarife"
 
 _EINSUND_EINS = [
-    {"tarif_id": "11:1-1-all-net-flat-s", "anbieter": "1&1",
-     "name": "1&1 All-Net-Flat S", "art": "mobilfunk",
-     "grundgebuehr": 14.99, "anschlusspreis": None, "preisphasen": [],
-     "dokument_url": "https://www.1und1.de/handytarife",
-     "abgerufen_am": "2026-08-11"},
-    {"tarif_id": "telekom:magentamobil-l", "anbieter": "Telekom",
-     "name": "MagentaMobil L", "art": "mobilfunk", "grundgebuehr": 59.95,
-     "anschlusspreis": None, "preisphasen": [],
-     "dokument_url": "https://www.telekom.de/pib/magentamobil-l",
-     "abgerufen_am": "2026-08-11"},
+    {
+        "tarif_id": "11:1-1-all-net-flat-s",
+        "anbieter": "1&1",
+        "name": "1&1 All-Net-Flat S",
+        "art": "mobilfunk",
+        "grundgebuehr": 14.99,
+        "anschlusspreis": None,
+        "preisphasen": [],
+        "dokument_url": "https://www.1und1.de/handytarife",
+        "abgerufen_am": "2026-08-11",
+    },
+    {
+        "tarif_id": "telekom:magentamobil-l",
+        "anbieter": "Telekom",
+        "name": "MagentaMobil L",
+        "art": "mobilfunk",
+        "grundgebuehr": 59.95,
+        "anschlusspreis": None,
+        "preisphasen": [],
+        "dokument_url": "https://www.telekom.de/pib/magentamobil-l",
+        "abgerufen_am": "2026-08-11",
+    },
 ]
 
 
@@ -739,11 +915,13 @@ def _simonly_hole(seite_ok=True):
     """`_hole` plus die 1&1-SIM-only-Welt: robots frei, die echte
     Seiten-Fixture und EIN Tarifdetails-Dokument fuer alle Slugs."""
     standard = _hole()
-    with _gzip.open(_TARIF_FIX / "1und1_handytarife_ohne_handy.html.gz",
-                    "rt", encoding="utf-8") as fh:
+    with _gzip.open(
+        _TARIF_FIX / "1und1_handytarife_ohne_handy.html.gz", "rt", encoding="utf-8"
+    ) as fh:
         seite = fh.read()
-    with _gzip.open(_TARIF_FIX / "1und1_details_all_net_flat_s.html.gz",
-                    "rt", encoding="utf-8") as fh:
+    with _gzip.open(
+        _TARIF_FIX / "1und1_details_all_net_flat_s.html.gz", "rt", encoding="utf-8"
+    ) as fh:
         details = fh.read()
 
     def hole(url, kopfzeilen=None, user_agent=None):
@@ -754,6 +932,7 @@ def _simonly_hole(seite_ok=True):
         if url == "https://mobile.1und1.de/robots.txt":
             return (200, "User-agent: *\n")
         return standard(url)
+
     return hole
 
 
@@ -762,13 +941,14 @@ def test_simonly_messung_ersetzt_die_bestandsableitung(tmp_path, monkeypatch):
     1&1-Saetze kommen von der SIM-only-Seite, der Rest des Massstabs
     bleibt, wie er war."""
     from telco_radar.collect import tarif_einsundeins_simonly
+
     monkeypatch.setattr(tarif_einsundeins_simonly, "_ABSTAND_SEKUNDEN", 0.0)
     root = _mit_tarifen(_root(tmp_path), _EINSUND_EINS)
 
-    run_geraete_stage(root, {}, "2026-09-09", jetzt=_jetzt(),
-                      hole=_simonly_hole())
-    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
-                     .read_text(encoding="utf-8"))
+    run_geraete_stage(root, {}, "2026-09-09", jetzt=_jetzt(), hole=_simonly_hole())
+    tco = json.loads(
+        (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
+    )
     nach_name = {r["tarif_name"]: r for r in tco["sim_only"]}
     s = nach_name["1&1 All-Net-Flat S"]
     assert s["quelle_url"] == _SIMONLY_URL
@@ -778,8 +958,10 @@ def test_simonly_messung_ersetzt_die_bestandsableitung(tmp_path, monkeypatch):
     assert [rab["name"] for rab in s["rabatte"]]
     # Der Telekom-Satz ist unberuehrt auf seiner Pflichtblatt-Quelle
     # stehen geblieben - kein 1&1-Handgriff darf ihn anfassen.
-    assert nach_name["MagentaMobil L"]["quelle_url"] == \
-        "https://www.telekom.de/pib/magentamobil-l"
+    assert (
+        nach_name["MagentaMobil L"]["quelle_url"]
+        == "https://www.telekom.de/pib/magentamobil-l"
+    )
 
 
 def test_simonly_messung_ersetzt_nur_was_sie_misst(tmp_path, monkeypatch):
@@ -788,21 +970,27 @@ def test_simonly_messung_ersetzt_nur_was_sie_misst(tmp_path, monkeypatch):
     wuerde `ersetze_referenzen` ihn still entfernen und seine Buendel
     ihren Massstab verlieren."""
     from telco_radar.collect import tarif_einsundeins_simonly
+
     monkeypatch.setattr(tarif_einsundeins_simonly, "_ABSTAND_SEKUNDEN", 0.0)
-    alt = dict(_EINSUND_EINS[0], tarif_id="11:1-1-alt-tarif",
-               name="1&1 Alt-Tarif", grundgebuehr=9.99)
+    alt = dict(
+        _EINSUND_EINS[0],
+        tarif_id="11:1-1-alt-tarif",
+        name="1&1 Alt-Tarif",
+        grundgebuehr=9.99,
+    )
     root = _mit_tarifen(_root(tmp_path), _EINSUND_EINS + [alt])
 
-    run_geraete_stage(root, {}, "2026-09-09", jetzt=_jetzt(),
-                      hole=_simonly_hole())
-    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
-                     .read_text(encoding="utf-8"))
+    run_geraete_stage(root, {}, "2026-09-09", jetzt=_jetzt(), hole=_simonly_hole())
+    tco = json.loads(
+        (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
+    )
     nach_name = {r["tarif_name"]: r for r in tco["sim_only"]}
     # Der gemessene Tarif ist von der Messung, der ungemessene vom
     # Bestand - und beide sind DA.
     assert nach_name["1&1 All-Net-Flat S"]["quelle_url"] == _SIMONLY_URL
-    assert nach_name["1&1 Alt-Tarif"]["quelle_url"] == \
-        "https://www.1und1.de/handytarife"
+    assert (
+        nach_name["1&1 Alt-Tarif"]["quelle_url"] == "https://www.1und1.de/handytarife"
+    )
 
 
 def test_gescheiterte_simonly_messung_laesst_den_bestand_stehen(tmp_path):
@@ -811,19 +999,24 @@ def test_gescheiterte_simonly_messung_laesst_den_bestand_stehen(tmp_path):
     leeren, nur seine Herkunft einen Augenblick alt machen."""
     root = _mit_tarifen(_root(tmp_path), _EINSUND_EINS)
 
-    run_geraete_stage(root, {}, "2026-09-09", jetzt=_jetzt(),
-                      hole=_simonly_hole(seite_ok=False))
-    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
-                     .read_text(encoding="utf-8"))
+    run_geraete_stage(
+        root, {}, "2026-09-09", jetzt=_jetzt(), hole=_simonly_hole(seite_ok=False)
+    )
+    tco = json.loads(
+        (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
+    )
     nach_name = {r["tarif_name"]: r for r in tco["sim_only"]}
-    assert nach_name["1&1 All-Net-Flat S"]["quelle_url"] == \
-        "https://www.1und1.de/handytarife"
+    assert (
+        nach_name["1&1 All-Net-Flat S"]["quelle_url"]
+        == "https://www.1und1.de/handytarife"
+    )
     assert nach_name["1&1 All-Net-Flat S"]["anschlusspreis"] is None
     assert len(tco["sim_only"]) == 2
 
 
 def test_scoped_lauf_datiert_keine_fremdanbieter_und_ruft_sie_nicht_ab(
-        tmp_path, monkeypatch):
+    tmp_path, monkeypatch
+):
     """Befund Runde 2 (15.09.2026): der Telekom-Lokallauf datierte 35
     Fremd-Referenzen neu und rief dafuer 1&1 ab. `referenz_anbieter`
     schliesst BEIDES: kein Schreibzug auf Fremde, kein Abruf bei Fremden.
@@ -832,6 +1025,7 @@ def test_scoped_lauf_datiert_keine_fremdanbieter_und_ruft_sie_nicht_ab(
     Anbieter - nur der Scope haelt den 1&1-Eintrag zurueck, nicht etwa
     eine Eigenschaft der Fixture."""
     from telco_radar.collect import tarif_einsundeins_simonly
+
     monkeypatch.setattr(tarif_einsundeins_simonly, "_ABSTAND_SEKUNDEN", 0.0)
     root = _mit_tarifen(_root(tmp_path), _EINSUND_EINS)
 
@@ -839,8 +1033,9 @@ def test_scoped_lauf_datiert_keine_fremdanbieter_und_ruft_sie_nicht_ab(
     # erreichbar - die Messung schlaegt fehl, die Bestandsableitung
     # bleibt, beide Referenzen entstehen mit dem Laufdatum).
     run_geraete_stage(root, {}, "2026-09-14", jetzt=_jetzt(), hole=_hole())
-    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
-                     .read_text(encoding="utf-8"))
+    tco = json.loads(
+        (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
+    )
     vorher = {r["tarif_name"]: r for r in tco["sim_only"]}
     assert vorher["1&1 All-Net-Flat S"]["last_verified"] == "2026-09-14"
     assert vorher["MagentaMobil L"]["last_verified"] == "2026-09-14"
@@ -849,11 +1044,17 @@ def test_scoped_lauf_datiert_keine_fremdanbieter_und_ruft_sie_nicht_ab(
     # kein einziger Abruf darf hinausgehen, der nicht Telekom/Medimax
     # gilt (insbesondere keiner gegen 1und1.de).
     abrufe: list = []
-    run_geraete_stage(root, {}, "2026-09-15", jetzt=_jetzt(),
-                      hole=_hole(protokoll=abrufe),
-                      referenz_anbieter={"Telekom"})
-    tco = json.loads((root / "data" / "state" / "geraete_tco.json")
-                     .read_text(encoding="utf-8"))
+    run_geraete_stage(
+        root,
+        {},
+        "2026-09-15",
+        jetzt=_jetzt(),
+        hole=_hole(protokoll=abrufe),
+        referenz_anbieter={"Telekom"},
+    )
+    tco = json.loads(
+        (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
+    )
     nachher = {r["tarif_name"]: r for r in tco["sim_only"]}
     # Der Fremde bleibt bytegleich auf seinem alten Stand - kein
     # last_verified von heute, keine neue Ableitung, keine Loeschung.

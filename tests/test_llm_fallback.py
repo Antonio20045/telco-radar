@@ -3,6 +3,7 @@
 Reproduziert den Ausfall vom 25.07.2026: der Endpunkt nimmt die Verbindung an
 und liefert fuer deepseek-v4-pro kein Token, waehrend v4-flash normal antwortet.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -31,8 +32,9 @@ def _stub(monkeypatch, dead: set[str]) -> list[str]:
     def fake(system, user, model, max_tokens, retries):
         calls.append(model)
         if model in dead:
-            raise RuntimeError("LLM call failed after 3 attempts: "
-                               "The read operation timed out")
+            raise RuntimeError(
+                "LLM call failed after 3 attempts: The read operation timed out"
+            )
         return f"antwort von {model}"
 
     monkeypatch.setattr(llm, "_dispatch", fake)

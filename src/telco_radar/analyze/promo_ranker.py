@@ -62,6 +62,7 @@ Highlight ueber Wochen stehen, statt woechentlich neu gewuerfelt zu werden -
 genau das, was der Betrieb hier braucht, weil die Pipeline ohnehin nur
 prueft, ob ein Angebot noch laeuft.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -89,8 +90,11 @@ RUBRIC_VERSION = 2
 # Gewichte der fuenf Achsen. Summe muss 1.0 ergeben; ueber
 # settings.yaml -> promo_score.weights ohne Codeaenderung drehbar.
 DEFAULT_WEIGHTS: dict[str, float] = {
-    "lever": 0.30, "depth": 0.25, "reach": 0.20,
-    "momentum": 0.15, "campaign": 0.10,
+    "lever": 0.30,
+    "depth": 0.25,
+    "reach": 0.20,
+    "momentum": 0.15,
+    "campaign": 0.10,
 }
 
 # Ein-/Ausstiegsschwelle fuer die Highlight-Sektion (Hysterese-Band, siehe
@@ -203,6 +207,7 @@ Angebot, in derselben Reihenfolge und mit dem mitgelieferten Feld "id":
 # Deterministische Achsen (C, D, E) - kein LLM, exakt reproduzierbar
 # --------------------------------------------------------------------------
 
+
 def reach_axis(source) -> int:
     """Achse C aus der Quellenkonfiguration. *source* ist ein PromoSource
     (oder None, wenn die Marke nicht mehr konfiguriert ist - dann 0, statt
@@ -233,8 +238,7 @@ def mechanic_brand_index(entries: list[dict]) -> dict[str, set[str]]:
     return index
 
 
-def momentum_axis(mechanic: str | None, brand: str,
-                  index: dict[str, set[str]]) -> int:
+def momentum_axis(mechanic: str | None, brand: str, index: dict[str, set[str]]) -> int:
     """Achse D: wie viele ANDERE Marken fahren gerade dieselbe Mechanik?
     0 andere -> 0, 1 -> 1, 2-3 -> 2, ab 4 -> 3."""
     if not mechanic or mechanic == _DEFAULT_MECHANIC:
@@ -302,6 +306,7 @@ def campaign_axis(valid_until: str | None, today: str) -> int:
 # Aggregation
 # --------------------------------------------------------------------------
 
+
 def normalise_weights(raw: dict | None) -> dict[str, float]:
     """Gewichte aus settings.yaml uebernehmen, fehlende Achsen aus den
     Defaults ergaenzen und auf Summe 1.0 normieren. Unbrauchbare Eingaben
@@ -340,11 +345,13 @@ def composite(axes: dict, weights: dict[str, float] | None = None) -> int:
 def score_basis(entry: dict) -> str:
     """Fingerabdruck des bewerteten Angebotstextes. Aendert er sich, muessen
     die LLM-Achsen neu bewertet werden - sonst nicht (Score-Caching)."""
-    basis = "|".join([
-        (entry.get("brand") or "").strip().lower(),
-        " ".join((entry.get("headline") or "").lower().split()),
-        " ".join((entry.get("description") or "").lower().split()),
-    ])
+    basis = "|".join(
+        [
+            (entry.get("brand") or "").strip().lower(),
+            " ".join((entry.get("headline") or "").lower().split()),
+            " ".join((entry.get("description") or "").lower().split()),
+        ]
+    )
     return hashlib.sha1(basis.encode("utf-8")).hexdigest()[:16]
 
 
@@ -365,6 +372,7 @@ def needs_judgement(entry: dict, model: str) -> bool:
 # --------------------------------------------------------------------------
 # LLM-Achsen (A, B)
 # --------------------------------------------------------------------------
+
 
 def _clamp_axis(value) -> int:
     try:
@@ -387,19 +395,28 @@ def _evidence_supported(evidence: str, entry: dict) -> bool:
     if len(quote) < 8:
         return False
     haystack = _normalise_quote(
-        f"{entry.get('headline') or ''} {entry.get('description') or ''}")
+        f"{entry.get('headline') or ''} {entry.get('description') or ''}"
+    )
     return quote in haystack
 
 
 def _offer_payload(entries: list[dict]) -> str:
-    return json.dumps([
-        {"id": e.get("id"), "titel": e.get("headline") or "",
-         "beschreibung": e.get("description") or ""}
-        for e in entries], ensure_ascii=False)
+    return json.dumps(
+        [
+            {
+                "id": e.get("id"),
+                "titel": e.get("headline") or "",
+                "beschreibung": e.get("description") or "",
+            }
+            for e in entries
+        ],
+        ensure_ascii=False,
+    )
 
 
-def judge_offers(brand: str, entries: list[dict], model: str,
-                 max_tokens: int = 16000) -> dict[str, dict]:
+def judge_offers(
+    brand: str, entries: list[dict], model: str, max_tokens: int = 16000
+) -> dict[str, dict]:
     """Bewertet die LLM-Achsen fuer die Angebote EINER Marke in einem Aufruf.
 
     Warum gebuendelt statt ein Aufruf je Angebot (was fuer die Urteilsqualitaet
@@ -419,8 +436,9 @@ def judge_offers(brand: str, entries: list[dict], model: str,
     mechanics = "\n".join(f"  {k} = {v}" for k, v in MECHANICS.items())
     system = _SCORE_SYSTEM.format(brand=brand, mechanics=mechanics)
     try:
-        raw = complete(system, _offer_payload(entries), model=model,
-                       max_tokens=max_tokens)
+        raw = complete(
+            system, _offer_payload(entries), model=model, max_tokens=max_tokens
+        )
         parsed = extract_json(raw)
     except Exception as exc:  # noqa: BLE001
         log.warning("Promo-Bewertung (%s) fehlgeschlagen: %s", brand, str(exc)[:140])
@@ -445,11 +463,14 @@ def judge_offers(brand: str, entries: list[dict], model: str,
         if mechanic not in MECHANICS:
             mechanic = _DEFAULT_MECHANIC
         out[eid] = {
-            "lever": lever, "depth": depth, "mechanic": mechanic,
+            "lever": lever,
+            "depth": depth,
+            "mechanic": mechanic,
             "evidence": evidence if supported else "",
             "evidence_ok": supported,
             "reason": str(row.get("reason") or "").strip(),
-            "basis": score_basis(entry), "model": model,
+            "basis": score_basis(entry),
+            "model": model,
             "rubric_version": RUBRIC_VERSION,
         }
     return out
@@ -458,6 +479,7 @@ def judge_offers(brand: str, entries: list[dict], model: str,
 # --------------------------------------------------------------------------
 # Orchestrierung
 # --------------------------------------------------------------------------
+
 
 def apply_hysteresis(entry: dict, score: int, enter: int, exit_: int) -> bool:
     """Highlight-Zustand mit Hysterese-Band fortschreiben: rein ab *enter*,
@@ -472,9 +494,15 @@ def apply_hysteresis(entry: dict, score: int, enter: int, exit_: int) -> bool:
     return bool(entry.get("highlight"))
 
 
-def score_all(entries: list[dict], sources: list, today: str,
-              model: str, use_llm: bool, settings: dict | None = None,
-              max_workers: int = 2) -> dict:
+def score_all(
+    entries: list[dict],
+    sources: list,
+    today: str,
+    model: str,
+    use_llm: bool,
+    settings: dict | None = None,
+    max_workers: int = 2,
+) -> dict:
     """Bewertet alle nicht-ausgelaufenen Eintraege und schreibt Score,
     Achsen, Begruendung und Highlight-Flag IN die uebergebenen Dicts
     (PromoDB-Eintraege werden also direkt aktualisiert und danach mitgespei-
@@ -500,8 +528,11 @@ def score_all(entries: list[dict], sources: list, today: str,
     # Tier-3-Zweig). Die tauchen auf der Seite nirgends auf - sie zu bewerten
     # waere pure LLM-Verschwendung.
     by_name = {getattr(s, "name", ""): s for s in (sources or [])}
-    live = [e for e in entries
-            if e.get("status") != "ausgelaufen" and e.get("brand") in by_name]
+    live = [
+        e
+        for e in entries
+        if e.get("status") != "ausgelaufen" and e.get("brand") in by_name
+    ]
 
     judged_new = judged_failed = 0
     if use_llm:
@@ -510,18 +541,26 @@ def score_all(entries: list[dict], sources: list, today: str,
             if needs_judgement(e, model):
                 pending.setdefault(e.get("brand") or "", []).append(e)
         if pending:
-            log.info("Promo-Bewertung: %d Angebote in %d Marken zu bewerten",
-                     sum(len(v) for v in pending.values()), len(pending))
+            log.info(
+                "Promo-Bewertung: %d Angebote in %d Marken zu bewerten",
+                sum(len(v) for v in pending.values()),
+                len(pending),
+            )
             with ThreadPoolExecutor(max_workers=max(1, max_workers)) as pool:
-                futures = {pool.submit(judge_offers, brand, items, model): (brand, items)
-                           for brand, items in pending.items()}
+                futures = {
+                    pool.submit(judge_offers, brand, items, model): (brand, items)
+                    for brand, items in pending.items()
+                }
                 for fut in as_completed(futures):
                     brand, items = futures[fut]
                     try:
                         verdicts = fut.result()
                     except Exception as exc:  # noqa: BLE001
-                        log.warning("Promo-Bewertung (%s) abgebrochen: %s",
-                                    brand, str(exc)[:140])
+                        log.warning(
+                            "Promo-Bewertung (%s) abgebrochen: %s",
+                            brand,
+                            str(exc)[:140],
+                        )
                         verdicts = {}
                     for item in items:
                         verdict = verdicts.get(item.get("id"))
@@ -573,6 +612,12 @@ def score_all(entries: list[dict], sources: list, today: str,
         if e.get("status") == "ausgelaufen":
             e["highlight"] = False
 
-    return {"scored": scored, "judged_new": judged_new,
-            "judged_failed": judged_failed, "highlights": highlights,
-            "enter": enter, "exit": exit_, "weights": weights}
+    return {
+        "scored": scored,
+        "judged_new": judged_new,
+        "judged_failed": judged_failed,
+        "highlights": highlights,
+        "enter": enter,
+        "exit": exit_,
+        "weights": weights,
+    }

@@ -24,6 +24,7 @@ wieder eine geratene 24 oder eine Aussage, die niemand gemessen hat.
 Die Gegenproben stehen JE Test: ein Test, der nur zeigt, dass etwas fehlt,
 waere auch mit einer Seite gruen, die ueberhaupt nichts mehr zeigt.
 """
+
 from __future__ import annotations
 
 import json
@@ -56,98 +57,176 @@ def vorlage_text(el) -> str:
 
 def zeile_html(karte: dict) -> BeautifulSoup:
     """EINE Buendelzeile am ECHTEN Makro - keine Textkopie."""
-    return BeautifulSoup(_env().from_string(
-        '{% from "_geraete_buendel.html.j2" import buendelzeile %}'
-        "{{ buendelzeile(k) }}").render(k=karte), "html.parser")
+    return BeautifulSoup(
+        _env()
+        .from_string(
+            '{% from "_geraete_buendel.html.j2" import buendelzeile %}'
+            "{{ buendelzeile(k) }}"
+        )
+        .render(k=karte),
+        "html.parser",
+    )
 
 
 # --------------------------------------------------------------------------
 # Bausteine fuer die Kartenansicht
 # --------------------------------------------------------------------------
 
+
 def _listung(anbieter, preis, sku=SKU):
-    return {"id": f"{anbieter.lower()}--{sku}", "sku_id": sku,
-            "device_id": DEVICE, "anbieter": anbieter,
-            "anbieter_typ": "netzbetreiber", "netz": anbieter,
-            "speicher_gb": 256, "farbe_roh": "Schwarz",
-            "farbe_normalisiert": "schwarz", "zustand": "neu",
-            "first_seen": "2026-09-01", "last_verified": HEUTE,
-            "status": "aktiv", "missed_checks": 0,
-            "preis_ohne_vertrag": preis, "erstpreis": preis,
-            "erstpreis_art": "ohne_vertrag", "erstpreis_am": "2026-09-01",
-            "quelle_url": f"https://example.de/{anbieter.lower()}/{sku}",
-            "abgerufen_am": HEUTE, "verfuegbarkeit": "lieferbar",
-            "confidence": "hoch", "einstiege": ["https://example.de/l"]}
+    return {
+        "id": f"{anbieter.lower()}--{sku}",
+        "sku_id": sku,
+        "device_id": DEVICE,
+        "anbieter": anbieter,
+        "anbieter_typ": "netzbetreiber",
+        "netz": anbieter,
+        "speicher_gb": 256,
+        "farbe_roh": "Schwarz",
+        "farbe_normalisiert": "schwarz",
+        "zustand": "neu",
+        "first_seen": "2026-09-01",
+        "last_verified": HEUTE,
+        "status": "aktiv",
+        "missed_checks": 0,
+        "preis_ohne_vertrag": preis,
+        "erstpreis": preis,
+        "erstpreis_art": "ohne_vertrag",
+        "erstpreis_am": "2026-09-01",
+        "quelle_url": f"https://example.de/{anbieter.lower()}/{sku}",
+        "abgerufen_am": HEUTE,
+        "verfuegbarkeit": "lieferbar",
+        "confidence": "hoch",
+        "einstiege": ["https://example.de/l"],
+    }
 
 
 def _congstar(laufzeit: int, rate: float) -> Buendel:
     """Dieselbe Zahlweise, ANDERE Ratenlaufzeit - congstar bietet 24 und
     36 Raten zum selben Tarif an (`config/geraete_quellen.yaml`,
     `tests/test_geraete_buendel_congstar.py`)."""
-    return Buendel(sku_id=SKU, anbieter="congstar",
-                   tarif_name="Allnet Flat S", tarif_id="cs:s",
-                   tarif_id_guete="hoch", tarif_monatlich=15.0,
-                   tarif_bindung_monate=24, geraet_zuzahlung=1.0,
-                   geraet_monatsrate=rate, laufzeit_monate=laufzeit,
-                   anschlusspreis=0.0, zustand="neu",
-                   quelle_url="https://example.de/congstar/s",
-                   abgerufen_am=HEUTE)
+    return Buendel(
+        sku_id=SKU,
+        anbieter="congstar",
+        tarif_name="Allnet Flat S",
+        tarif_id="cs:s",
+        tarif_id_guete="hoch",
+        tarif_monatlich=15.0,
+        tarif_bindung_monate=24,
+        geraet_zuzahlung=1.0,
+        geraet_monatsrate=rate,
+        laufzeit_monate=laufzeit,
+        anschlusspreis=0.0,
+        zustand="neu",
+        quelle_url="https://example.de/congstar/s",
+        abgerufen_am=HEUTE,
+    )
 
 
 def _einsundeins(laufzeit=36) -> Buendel:
     """1&1: EIN Monatsbetrag fuer Tarif UND Geraet (§ 13.2) ueber 36
     Monate - die Werte der echten Fixture (340,00 Zuzahlung, 42,99 im
     Monat, 39,90 Anschlusspreis, siehe Befund 3)."""
-    return Buendel(sku_id=SKU, anbieter="1&1",
-                   tarif_name="All-Net-Flat S",
-                   buendel_monatlich=42.99, geraet_zuzahlung=340.0,
-                   laufzeit_monate=laufzeit, anschlusspreis=39.9,
-                   zustand="neu", quelle_url="https://example.de/1und1/s",
-                   abgerufen_am=HEUTE)
+    return Buendel(
+        sku_id=SKU,
+        anbieter="1&1",
+        tarif_name="All-Net-Flat S",
+        buendel_monatlich=42.99,
+        geraet_zuzahlung=340.0,
+        laufzeit_monate=laufzeit,
+        anschlusspreis=39.9,
+        zustand="neu",
+        quelle_url="https://example.de/1und1/s",
+        abgerufen_am=HEUTE,
+    )
 
 
 def _vodafone() -> Buendel:
     """Ein eigenes Buendel mit getrenntem Tarif und Rate - seine Zahl
     traegt 24 Tarifmonate und ist damit die Referenz."""
-    return Buendel(sku_id=SKU, anbieter="Vodafone",
-                   tarif_name="Vodafone Mobil XS", tarif_id="vf:xs",
-                   tarif_id_guete="hoch", tarif_monatlich=29.95,
-                   tarif_bindung_monate=24, geraet_zuzahlung=1.0,
-                   geraet_monatsrate=45.0, laufzeit_monate=24,
-                   anschlusspreis=0.0, zustand="neu",
-                   quelle_url="https://example.de/vf/xs",
-                   abgerufen_am=HEUTE)
+    return Buendel(
+        sku_id=SKU,
+        anbieter="Vodafone",
+        tarif_name="Vodafone Mobil XS",
+        tarif_id="vf:xs",
+        tarif_id_guete="hoch",
+        tarif_monatlich=29.95,
+        tarif_bindung_monate=24,
+        geraet_zuzahlung=1.0,
+        geraet_monatsrate=45.0,
+        laufzeit_monate=24,
+        anschlusspreis=0.0,
+        zustand="neu",
+        quelle_url="https://example.de/vf/xs",
+        abgerufen_am=HEUTE,
+    )
 
 
 def _tarife():
-    return mit_leiter({t["tarif_id"]: t for t in (
-        {"anbieter": "congstar", "name": "Allnet Flat S", "tarif_id": "cs:s",
-         "art": "mobilfunk", "grundgebuehr": 15.0, "laufzeit_monate": 24,
-         "datenvolumen_gb": 50,
-         "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": 15.0}],
-         "dokument_url": "https://example.de/pib/cs-s",
-         "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}},
-        {"anbieter": "Vodafone", "name": "Vodafone Mobil XS",
-         "tarif_id": "vf:xs", "art": "mobilfunk", "grundgebuehr": 29.95,
-         "laufzeit_monate": 24, "datenvolumen_gb": 18,
-         "preisphasen": [{"von_monat": 1, "bis_monat": None,
-                          "betrag": 29.95}],
-         "dokument_url": "https://example.de/pib/vf-xs",
-         "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}})}, HEUTE)
+    return mit_leiter(
+        {
+            t["tarif_id"]: t
+            for t in (
+                {
+                    "anbieter": "congstar",
+                    "name": "Allnet Flat S",
+                    "tarif_id": "cs:s",
+                    "art": "mobilfunk",
+                    "grundgebuehr": 15.0,
+                    "laufzeit_monate": 24,
+                    "datenvolumen_gb": 50,
+                    "preisphasen": [
+                        {"von_monat": 1, "bis_monat": None, "betrag": 15.0}
+                    ],
+                    "dokument_url": "https://example.de/pib/cs-s",
+                    "abgerufen_am": HEUTE,
+                    "confidence": {},
+                    "fundstellen": {},
+                },
+                {
+                    "anbieter": "Vodafone",
+                    "name": "Vodafone Mobil XS",
+                    "tarif_id": "vf:xs",
+                    "art": "mobilfunk",
+                    "grundgebuehr": 29.95,
+                    "laufzeit_monate": 24,
+                    "datenvolumen_gb": 18,
+                    "preisphasen": [
+                        {"von_monat": 1, "bis_monat": None, "betrag": 29.95}
+                    ],
+                    "dokument_url": "https://example.de/pib/vf-xs",
+                    "abgerufen_am": HEUTE,
+                    "confidence": {},
+                    "fundstellen": {},
+                },
+            )
+        },
+        HEUTE,
+    )
 
 
 def _referenzen():
-    return [SimOnlyReferenz(anbieter="Vodafone", tarif_name="Vodafone Mobil XS",
-                            tarif_id="vf:xs", tarif_sim_only_monatlich=29.95,
-                            quelle_url="https://example.de/pib/vf-xs",
-                            abgerufen_am=HEUTE)]
+    return [
+        SimOnlyReferenz(
+            anbieter="Vodafone",
+            tarif_name="Vodafone Mobil XS",
+            tarif_id="vf:xs",
+            tarif_sim_only_monatlich=29.95,
+            quelle_url="https://example.de/pib/vf-xs",
+            abgerufen_am=HEUTE,
+        )
+    ]
 
 
 def _modell(buendel, listungen=None):
-    ergebnis = karten.modelle(buendel, listungen or [_listung("Vodafone",
-                                                              1199.9)],
-                              _referenzen(), _tarife(),
-                              lade_katalog(WURZEL), heute=HEUTE)
+    ergebnis = karten.modelle(
+        buendel,
+        listungen or [_listung("Vodafone", 1199.9)],
+        _referenzen(),
+        _tarife(),
+        lade_katalog(WURZEL),
+        heute=HEUTE,
+    )
     treffer = [m for m in ergebnis["modelle"] if m["id"] == MODELL]
     assert treffer, f"kein Modellblock {MODELL}: {ergebnis['modelle']}"
     return treffer[0]
@@ -157,6 +236,7 @@ def _modell(buendel, listungen=None):
 # 1. Der Kartenschluessel traegt die GEMESSENE Ratenlaufzeit (Befund 1)
 # --------------------------------------------------------------------------
 
+
 def test_zwei_ratenlaufzeiten_desselben_tarifs_sind_zwei_zeilen():
     """Befund 1: 918,00 EUR in 24 Raten und in 36 Raten sind ZWEI
     Angebote - kein Angebot verdraengt das andere.
@@ -165,11 +245,9 @@ def test_zwei_ratenlaufzeiten_desselben_tarifs_sind_zwei_zeilen():
     also die Konstante 24 fuer beide, und `_angebot_rang` liess genau eine
     Zeile uebrig.
     """
-    modell = _modell([_congstar(36, 25.5), _congstar(24, 38.25),
-                      _vodafone()])
+    modell = _modell([_congstar(36, 25.5), _congstar(24, 38.25), _vodafone()])
     cs = [k for k in modell["karten"] if k["anbieter"] == "congstar"]
-    assert len(cs) == 2, \
-        "zwei Ratenlaufzeiten desselben Tarifs sind zwei Zeilen"
+    assert len(cs) == 2, "zwei Ratenlaufzeiten desselben Tarifs sind zwei Zeilen"
     assert sorted(k["raten_laufzeit"] for k in cs) == [24, 36]
     # Dieselbe Zahl, die den Schluessel traegt, steht auch am Modell -
     # eine zweite Definition waere eine zweite Wahrheit.
@@ -196,11 +274,14 @@ def test_zwei_farben_derselben_laufzeit_bleiben_eine_zeile():
     Schluessel, nicht die Farbe."""
     blau = _congstar(36, 25.5)
     blau.sku_id = SKU.replace("schwarz", "blau")
-    modell = _modell([_congstar(36, 25.5), blau, _vodafone()],
-                     listungen=[_listung("Vodafone", 1199.9),
-                                _listung("congstar", 1249.0),
-                                _listung("congstar", 1249.0,
-                                         sku=SKU.replace("schwarz", "blau"))])
+    modell = _modell(
+        [_congstar(36, 25.5), blau, _vodafone()],
+        listungen=[
+            _listung("Vodafone", 1199.9),
+            _listung("congstar", 1249.0),
+            _listung("congstar", 1249.0, sku=SKU.replace("schwarz", "blau")),
+        ],
+    )
     cs = [k for k in modell["karten"] if k["anbieter"] == "congstar"]
     assert len(cs) == 1, "zwei Farben sind EIN Angebot"
 
@@ -208,6 +289,7 @@ def test_zwei_farben_derselben_laufzeit_bleiben_eine_zeile():
 # --------------------------------------------------------------------------
 # 3. Etikett und Delta sagen die Wahrheit (Befund 3)
 # --------------------------------------------------------------------------
+
 
 def test_ein_buendelmonatspreis_ueber_36_monate_nennt_seinen_zeitraum():
     """Befund 3a: 340,00 + 36 × 42,99 + 39,90 = 1.927,54 EUR sind KEINE
@@ -230,8 +312,9 @@ def test_ein_buendelmonatspreis_ueber_36_monate_nennt_seinen_zeitraum():
     # GEGENPROBE: die aufgeteilte Form (Tarif und Rate getrennt) traegt
     # weiter 24 - dort sind es wirklich 24 Tarifmonate, und die Raten
     # jenseits stehen als Restschuld daneben.
-    vf = next(k for k in modell["karten"]
-              if k["anbieter"] == "Vodafone" and k["sku_id"])
+    vf = next(
+        k for k in modell["karten"] if k["anbieter"] == "Vodafone" and k["sku_id"]
+    )
     assert vf["leitzahl_monate"] == 24
     assert vf["label"] == "Kosten über 24 Monate"
 
@@ -268,8 +351,9 @@ def test_ueber_zwei_zeitraeume_steht_der_zustand_statt_eines_vorzeichens():
     # Der Satz steht als benannte Luecke im Rechenweg - zurueckgenommen,
     # nicht als lauter Delta-Satz in Alarmfarbe (`gr-kk-delta`).
     assert zeile.select_one(".gr-kk-delta") is None
-    assert vorlage_text(zeile.select_one(".gr-kk-luecke")) == \
-        eins["delta_zustand"]["satz"]
+    assert (
+        vorlage_text(zeile.select_one(".gr-kk-luecke")) == eins["delta_zustand"]["satz"]
+    )
 
     # GEGENPROBE: die 24-Monats-Zeile desselben Modells bekommt ihr Delta
     # wie bisher - mit Betrag, Prozent und Vorzeichen.
@@ -280,13 +364,13 @@ def test_ueber_zwei_zeitraeume_steht_der_zustand_statt_eines_vorzeichens():
     assert cs["delta"]["betrag"] is not None
     assert cs["delta"]["gleiche_laufzeit"] is True
     zeile2 = zeile_html(cs)
-    assert zeile2.select_one(".gr-bnd")["data-delta"] == str(
-        cs["delta"]["betrag"])
+    assert zeile2.select_one(".gr-bnd")["data-delta"] == str(cs["delta"]["betrag"])
 
 
 # --------------------------------------------------------------------------
 # 4. Kein Lesepfad raet mehr eine 24 (Befund 4)
 # --------------------------------------------------------------------------
+
 
 def test_eine_listung_ohne_laufzeit_bekommt_keine_geratene_24():
     """`buendel_aus_listungen` las `int(... or 24)`.
@@ -295,15 +379,25 @@ def test_eine_listung_ohne_laufzeit_bekommt_keine_geratene_24():
     24 × 44,99 EUR und stand mit einer belastbaren Zahl da, die niemand
     gemessen hat.
     """
-    listung = dict(_listung("1&1", None), preis_mit_vertrag_ab=44.99,
-                   tarif_referenz="All-Net-Flat S")
+    listung = dict(
+        _listung("1&1", None),
+        preis_mit_vertrag_ab=44.99,
+        tarif_referenz="All-Net-Flat S",
+    )
     listung.pop("laufzeit_monate", None)
     b = karten.buendel_aus_listungen([listung])
     assert len(b) == 1
     assert b[0].laufzeit_monate is None, "keine Dauer in der Quelle"
 
-    karte = karten._karte(b[0], None, None, lade_katalog(WURZEL),
-                          {SKU: (DEVICE, 256)}, zustand="neu", heute=HEUTE)
+    karte = karten._karte(
+        b[0],
+        None,
+        None,
+        lade_katalog(WURZEL),
+        {SKU: (DEVICE, 256)},
+        zustand="neu",
+        heute=HEUTE,
+    )
     assert karte["belastbar"] is False
     assert "Ratenlaufzeit" in karte["luecken"]
     assert karte["gesamt"] is None
@@ -314,17 +408,22 @@ def test_eine_listung_ohne_laufzeit_bekommt_keine_geratene_24():
     assert "keine belastbare Zahl" in text
     assert karte["leer_grund"] == (
         "Die Ratenlaufzeit dieses Bündels ist nicht erhoben – ohne die "
-        "Zahl der Monate ergibt der Monatsbetrag keine Gesamtsumme."), \
-        karte["leer_grund"]
+        "Zahl der Monate ergibt der Monatsbetrag keine Gesamtsumme."
+    ), karte["leer_grund"]
     assert karte["leer_grund"] in text, "der Grund steht auf der Zeile"
 
     # GEGENPROBE: MIT gemessener Laufzeit rechnet derselbe Weg wie immer.
-    mit = karten.buendel_aus_listungen(
-        [dict(listung, laufzeit_monate=24)])[0]
+    mit = karten.buendel_aus_listungen([dict(listung, laufzeit_monate=24)])[0]
     assert mit.laufzeit_monate == 24
-    karte_mit = karten._karte(mit, None, None, lade_katalog(WURZEL),
-                              {SKU: (DEVICE, 256)}, zustand="neu",
-                              heute=HEUTE)
+    karte_mit = karten._karte(
+        mit,
+        None,
+        None,
+        lade_katalog(WURZEL),
+        {SKU: (DEVICE, 256)},
+        zustand="neu",
+        heute=HEUTE,
+    )
     assert karte_mit["leitzahl_monate"] == 24
 
 
@@ -336,17 +435,34 @@ def test_eine_rate_ohne_laufzeit_wirft_keinen_typeerror():
     type(s) for *: 'float' and 'NoneType'` - die ganze Seite waere
     ausgefallen.
     """
-    b = Buendel(sku_id=SKU, anbieter="o2", tarif_name="O2 Mobile M",
-                tarif_id="o2:m", tarif_monatlich=19.99,
-                tarif_bindung_monate=24, geraet_zuzahlung=1.0,
-                geraet_monatsrate=30.5, laufzeit_monate=None,
-                anschlusspreis=0.0, zustand="neu",
-                quelle_url="https://example.de/o2/m", abgerufen_am=HEUTE)
-    karte = karten._karte(b, None, None, lade_katalog(WURZEL),
-                          {SKU: (DEVICE, 256)}, zustand="neu", heute=HEUTE)
+    b = Buendel(
+        sku_id=SKU,
+        anbieter="o2",
+        tarif_name="O2 Mobile M",
+        tarif_id="o2:m",
+        tarif_monatlich=19.99,
+        tarif_bindung_monate=24,
+        geraet_zuzahlung=1.0,
+        geraet_monatsrate=30.5,
+        laufzeit_monate=None,
+        anschlusspreis=0.0,
+        zustand="neu",
+        quelle_url="https://example.de/o2/m",
+        abgerufen_am=HEUTE,
+    )
+    karte = karten._karte(
+        b,
+        None,
+        None,
+        lade_katalog(WURZEL),
+        {SKU: (DEVICE, 256)},
+        zustand="neu",
+        heute=HEUTE,
+    )
     assert karte["raten_summe"] is None, "keine Ratensumme ohne ihre Monate"
-    assert karte["offene_raten"] is None, \
+    assert karte["offene_raten"] is None, (
         "unbekannt viele offene Raten sind nicht null offene Raten"
+    )
     assert karte["belastbar"] is False
     assert "Ratenlaufzeit" in karte["luecken"]
     # Und die Zeile rendert (kein halbes Dokument).
@@ -354,8 +470,15 @@ def test_eine_rate_ohne_laufzeit_wirft_keinen_typeerror():
 
     # GEGENPROBE: mit Laufzeit steht die Ratensumme da wie immer.
     b.laufzeit_monate = 36
-    karte36 = karten._karte(b, None, None, lade_katalog(WURZEL),
-                            {SKU: (DEVICE, 256)}, zustand="neu", heute=HEUTE)
+    karte36 = karten._karte(
+        b,
+        None,
+        None,
+        lade_katalog(WURZEL),
+        {SKU: (DEVICE, 256)},
+        zustand="neu",
+        heute=HEUTE,
+    )
     assert karte36["raten_summe"] == 1098.0
     assert karte36["offene_raten"] == 12
 
@@ -364,21 +487,43 @@ def test_eine_rate_ohne_laufzeit_wirft_keinen_typeerror():
 # 2. + 4. Die Zeitreihe: unbekannte ID-Form und ungeratene Laufzeit
 # --------------------------------------------------------------------------
 
-_KATALOG = {"geraete": [
-    {"hersteller": "Apple", "modell": "iPhone 17 Pro", "generation": 17,
-     "marktstart": "2025-09-19", "speicher": [256], "segment": "premium"}]}
+_KATALOG = {
+    "geraete": [
+        {
+            "hersteller": "Apple",
+            "modell": "iPhone 17 Pro",
+            "generation": 17,
+            "marktstart": "2025-09-19",
+            "speicher": [256],
+            "segment": "premium",
+        }
+    ]
+}
 _FARBEN = {"farben": {"schwarz": ["Schwarz"]}}
-_QUELLEN = {"anbieter": [
-    {"name": "Vodafone", "typ": "netzbetreiber", "rang": 1, "eigen": True,
-     "methode": "ldjson", "basis_url": "https://www.vodafone.de",
-     "einstiege": [{"url": "https://www.vodafone.de/handys"}]},
-    {"name": "o2", "typ": "netzbetreiber", "rang": 2, "methode": "ldjson",
-     "basis_url": "https://www.o2online.de",
-     "einstiege": [{"url": "https://www.o2online.de/handys"}]}]}
+_QUELLEN = {
+    "anbieter": [
+        {
+            "name": "Vodafone",
+            "typ": "netzbetreiber",
+            "rang": 1,
+            "eigen": True,
+            "methode": "ldjson",
+            "basis_url": "https://www.vodafone.de",
+            "einstiege": [{"url": "https://www.vodafone.de/handys"}],
+        },
+        {
+            "name": "o2",
+            "typ": "netzbetreiber",
+            "rang": 2,
+            "methode": "ldjson",
+            "basis_url": "https://www.o2online.de",
+            "einstiege": [{"url": "https://www.o2online.de/handys"}],
+        },
+    ]
+}
 
 
-def _zeitreihe_wurzel(tmp_path: pathlib.Path, buendel_id: str,
-                      laufzeit=24) -> tuple:
+def _zeitreihe_wurzel(tmp_path: pathlib.Path, buendel_id: str, laufzeit=24) -> tuple:
     """Ein Bestand mit EINEM o2-Buendel und drei Messtagen.
 
     `buendel_id` ist der Schluessel, unter dem Stand und Historie
@@ -387,70 +532,109 @@ def _zeitreihe_wurzel(tmp_path: pathlib.Path, buendel_id: str,
     """
     root = tmp_path / "zr"
     (root / "config").mkdir(parents=True)
-    for name, daten in (("geraete_katalog.yaml", _KATALOG),
-                        ("farben.yaml", _FARBEN),
-                        ("geraete_quellen.yaml", _QUELLEN)):
+    for name, daten in (
+        ("geraete_katalog.yaml", _KATALOG),
+        ("farben.yaml", _FARBEN),
+        ("geraete_quellen.yaml", _QUELLEN),
+    ):
         (root / "config" / name).write_text(
-            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
-            encoding="utf-8")
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False), encoding="utf-8"
+        )
     state = root / "data" / "state"
     state.mkdir(parents=True)
-    (state / "geraete_db.json").write_text(json.dumps({
-        "updated": HEUTE, "anbieter": {"o2": {"laeufe": 3, "funde_gesamt": 1}},
-        "listungen": [_listung("o2", 1099.0)]}), encoding="utf-8")
+    (state / "geraete_db.json").write_text(
+        json.dumps(
+            {
+                "updated": HEUTE,
+                "anbieter": {"o2": {"laeufe": 3, "funde_gesamt": 1}},
+                "listungen": [_listung("o2", 1099.0)],
+            }
+        ),
+        encoding="utf-8",
+    )
     (state / "geraete_preise.jsonl").write_text("", encoding="utf-8")
-    satz = {"id": buendel_id, "sku_id": SKU, "anbieter": "o2",
-            "tarif_name": "O2 Mobile M", "tarif_id": "o2:m",
-            "tarif_id_guete": "hoch", "tarif_monatlich": 20.0,
-            "geraet_zuzahlung": 1.0, "geraet_monatsrate": 25.0,
-            "laufzeit_monate": laufzeit, "anschlusspreis": 0.0,
-            "zustand": "neu", "rabatte": [],
-            "quelle_url": "https://example.de/o2/m", "abgerufen_am": HEUTE,
-            "first_seen": "2026-09-18", "last_verified": HEUTE}
-    (state / "geraete_tco.json").write_text(json.dumps(
-        {"updated": HEUTE, "buendel": [satz], "sim_only": []}),
-        encoding="utf-8")
+    satz = {
+        "id": buendel_id,
+        "sku_id": SKU,
+        "anbieter": "o2",
+        "tarif_name": "O2 Mobile M",
+        "tarif_id": "o2:m",
+        "tarif_id_guete": "hoch",
+        "tarif_monatlich": 20.0,
+        "geraet_zuzahlung": 1.0,
+        "geraet_monatsrate": 25.0,
+        "laufzeit_monate": laufzeit,
+        "anschlusspreis": 0.0,
+        "zustand": "neu",
+        "rabatte": [],
+        "quelle_url": "https://example.de/o2/m",
+        "abgerufen_am": HEUTE,
+        "first_seen": "2026-09-18",
+        "last_verified": HEUTE,
+    }
+    (state / "geraete_tco.json").write_text(
+        json.dumps({"updated": HEUTE, "buendel": [satz], "sim_only": []}),
+        encoding="utf-8",
+    )
     zeilen = []
-    for tag, rate in (("2026-09-18", 25.0), ("2026-09-19", 24.0),
-                      (HEUTE, 25.0)):
-        z = dict(satz, datum=tag, geraet_monatsrate=rate,
-                 gesamt=round(1.0 + 24 * 20.0 + (laufzeit or 24) * rate, 2))
+    for tag, rate in (("2026-09-18", 25.0), ("2026-09-19", 24.0), (HEUTE, 25.0)):
+        z = dict(
+            satz,
+            datum=tag,
+            geraet_monatsrate=rate,
+            gesamt=round(1.0 + 24 * 20.0 + (laufzeit or 24) * rate, 2),
+        )
         if laufzeit is None:
             z.pop("laufzeit_monate")
         zeilen.append(z)
     if laufzeit is None:
         roh = json.loads((state / "geraete_tco.json").read_text("utf-8"))
         roh["buendel"][0].pop("laufzeit_monate")
-        (state / "geraete_tco.json").write_text(json.dumps(roh),
-                                                encoding="utf-8")
+        (state / "geraete_tco.json").write_text(json.dumps(roh), encoding="utf-8")
     (state / "geraete_tco_historie.jsonl").write_text(
-        "\n".join(json.dumps(z) for z in zeilen) + "\n", encoding="utf-8")
-    tarife = mit_leiter([
-        {"anbieter": "o2", "name": "O2 Mobile M", "tarif_id": "o2:m",
-         "art": "mobilfunk", "grundgebuehr": 20.0, "laufzeit_monate": 24,
-         "datenvolumen_gb": 50,
-         "preisphasen": [{"von_monat": 1, "bis_monat": None,
-                          "betrag": 20.0}],
-         "dokument_url": "https://example.de/pib/o2-m",
-         "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}}], HEUTE)
+        "\n".join(json.dumps(z) for z in zeilen) + "\n", encoding="utf-8"
+    )
+    tarife = mit_leiter(
+        [
+            {
+                "anbieter": "o2",
+                "name": "O2 Mobile M",
+                "tarif_id": "o2:m",
+                "art": "mobilfunk",
+                "grundgebuehr": 20.0,
+                "laufzeit_monate": 24,
+                "datenvolumen_gb": 50,
+                "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": 20.0}],
+                "dokument_url": "https://example.de/pib/o2-m",
+                "abgerufen_am": HEUTE,
+                "confidence": {},
+                "fundstellen": {},
+            }
+        ],
+        HEUTE,
+    )
     (state / "tarife.jsonl").write_text(
-        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
+        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8"
+    )
     return root, state
 
 
 def _punkte(root: pathlib.Path, state: pathlib.Path) -> dict:
     """Wie viele Messungen die Zeitreihe aus dem Bestand liest - und wie
     viele Punkte davon im fertigen SVG stehen."""
-    g = geraete_view.aufbereiten(state, lade_quellen(root),
-                                 lade_katalog(root), heute=HEUTE)
+    g = geraete_view.aufbereiten(
+        state, lade_quellen(root), lade_katalog(root), heute=HEUTE
+    )
     tco = g["tco"]
     mess = geraete_zeitreihe._messungen(state, tco)
     paare = geraete_zeitreihe.aufbereiten(state, tco).get("paare") or []
-    return {"reihen": sum(len(anbieter) for anbieter in mess.values()),
-            "punkte": sum(len(tage) for anbieter in mess.values()
-                          for tage in anbieter.values()),
-            "kreise": sum(p.get("svg_breit", "").count("<circle")
-                          for p in paare)}
+    return {
+        "reihen": sum(len(anbieter) for anbieter in mess.values()),
+        "punkte": sum(
+            len(tage) for anbieter in mess.values() for tage in anbieter.values()
+        ),
+        "kreise": sum(p.get("svg_breit", "").count("<circle") for p in paare),
+    }
 
 
 def test_eine_unbekannte_id_form_behaelt_ihre_messungen(tmp_path):
@@ -465,8 +649,7 @@ def test_eine_unbekannte_id_form_behaelt_ihre_messungen(tmp_path):
     """
     root, state = _zeitreihe_wurzel(tmp_path, "buendel--o2-1")
     gemessen = _punkte(root, state)
-    assert gemessen["reihen"] >= 1, \
-        "die unbekannte ID-Form kostet die ganze Zeitreihe"
+    assert gemessen["reihen"] >= 1, "die unbekannte ID-Form kostet die ganze Zeitreihe"
     assert gemessen["punkte"] == 3, "drei Messtage, drei Punkte"
     assert gemessen["kreise"] >= 3, "die Punkte stehen auch im Bild"
 
@@ -474,10 +657,13 @@ def test_eine_unbekannte_id_form_behaelt_ihre_messungen(tmp_path):
     # genau dasselbe Bild - der Test misst die Zuordnung, nicht die
     # Fixture.
     root2, state2 = _zeitreihe_wurzel(
-        tmp_path / "bekannt", "buendel--o2--" + SKU + "--o2-mobile-m--24m")
+        tmp_path / "bekannt", "buendel--o2--" + SKU + "--o2-mobile-m--24m"
+    )
     bekannt = _punkte(root2, state2)
-    assert (bekannt["reihen"], bekannt["punkte"]) == \
-        (gemessen["reihen"], gemessen["punkte"])
+    assert (bekannt["reihen"], bekannt["punkte"]) == (
+        gemessen["reihen"],
+        gemessen["punkte"],
+    )
 
 
 def test_der_schluessel_verwirft_nur_einen_satz_ohne_jede_id():
@@ -488,11 +674,14 @@ def test_der_schluessel_verwirft_nur_einen_satz_ohne_jede_id():
     jede ID hat keinen Schluessel.
     """
     schluessel = geraete_zeitreihe.buendel_schluessel
-    assert schluessel({"id": "buendel--o2--sku--tarif",
-                       "laufzeit_monate": 36}) == \
-        "buendel--o2--sku--tarif--36m"
-    assert schluessel({"id": "buendel--o2--sku--tarif--24m"}) == \
-        "buendel--o2--sku--tarif--24m"
+    assert (
+        schluessel({"id": "buendel--o2--sku--tarif", "laufzeit_monate": 36})
+        == "buendel--o2--sku--tarif--36m"
+    )
+    assert (
+        schluessel({"id": "buendel--o2--sku--tarif--24m"})
+        == "buendel--o2--sku--tarif--24m"
+    )
     assert schluessel({"id": "buendel--o2-1"}) == "buendel--o2-1"
     assert schluessel({"id": ""}) is None
     assert schluessel({}) is None
@@ -506,22 +695,28 @@ def test_eine_historienzeile_ohne_laufzeit_wird_nicht_auf_24_geraten(tmp_path):
     aus keiner Messung folgt. Jetzt gibt es keinen Punkt - eine erfundene
     Hoehe ist schlechter als eine Luecke (Modulkopf-Regel 2).
     """
-    root, state = _zeitreihe_wurzel(tmp_path, "buendel--o2--sku--o2-m",
-                                    laufzeit=None)
+    root, state = _zeitreihe_wurzel(tmp_path, "buendel--o2--sku--o2-m", laufzeit=None)
     ohne = _punkte(root, state)
     assert ohne["punkte"] == 0, "kein Punkt aus einer geratenen Laufzeit"
 
-    satz = json.loads((state / "geraete_tco_historie.jsonl")
-                      .read_text("utf-8").splitlines()[0])
+    satz = json.loads(
+        (state / "geraete_tco_historie.jsonl").read_text("utf-8").splitlines()[0]
+    )
     stand = json.loads((state / "geraete_tco.json").read_text("utf-8"))
     b = geraete_zeitreihe._buendel_aus_messung(
-        {"satz": satz, "stand": stand["buendel"][0]})
+        {"satz": satz, "stand": stand["buendel"][0]}
+    )
     assert b is not None and b.laufzeit_monate is None
-    assert geraete_zeitreihe._wert_aus_messung(
-        {"satz": satz, "stand": stand["buendel"][0]}) is None
+    assert (
+        geraete_zeitreihe._wert_aus_messung(
+            {"satz": satz, "stand": stand["buendel"][0]}
+        )
+        is None
+    )
 
     # GEGENPROBE: MIT gemessener Laufzeit rechnet dieselbe Stelle ihre
     # drei Punkte wie immer.
-    root2, state2 = _zeitreihe_wurzel(tmp_path / "mit",
-                                      "buendel--o2--sku--o2-m", laufzeit=24)
+    root2, state2 = _zeitreihe_wurzel(
+        tmp_path / "mit", "buendel--o2--sku--o2-m", laufzeit=24
+    )
     assert _punkte(root2, state2)["punkte"] == 3

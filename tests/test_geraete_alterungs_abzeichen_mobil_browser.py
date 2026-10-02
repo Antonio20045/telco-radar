@@ -17,6 +17,7 @@ Kommentar unten) in eine kleine eigenstaendige Seite und misst mit
 D3 baut parallel an der Buendel-TABELLE) - der Fix ist rein CSS
 (`.gr-kk-marke{display:inline-block}`), reproduziert hier deshalb ohne
 die volle Buendel-Pipeline."""
+
 from __future__ import annotations
 
 import contextlib
@@ -56,9 +57,14 @@ _BUNDLE_KOPF = """
 
 
 def _chromium():
-    for muster in ("/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-                   str(pathlib.Path.home() / ".cache/ms-playwright"
-                       / "chromium*/chrome-linux*/chrome")):
+    for muster in (
+        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
+        str(
+            pathlib.Path.home()
+            / ".cache/ms-playwright"
+            / "chromium*/chrome-linux*/chrome"
+        ),
+    ):
         treffer = sorted(glob.glob(muster))
         if treffer:
             return treffer[-1]
@@ -71,8 +77,9 @@ def _server(root: pathlib.Path):
     s.bind(("127.0.0.1", 0))
     port = s.getsockname()[1]
     s.close()
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler,
-                                directory=str(root))
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(root)
+    )
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     try:
@@ -82,10 +89,12 @@ def _server(root: pathlib.Path):
 
 
 def _seite(tmp_path: pathlib.Path) -> pathlib.Path:
-    html = (f"<!doctype html><html><head><meta charset='utf-8'>"
-           f"<link rel='stylesheet' href='style.css'></head>"
-           f"<body style='margin:0;width:390px'>{_BUNDLE_KOPF}</body>"
-           f"</html>")
+    html = (
+        f"<!doctype html><html><head><meta charset='utf-8'>"
+        f"<link rel='stylesheet' href='style.css'></head>"
+        f"<body style='margin:0;width:390px'>{_BUNDLE_KOPF}</body>"
+        f"</html>"
+    )
     (tmp_path / "index.html").write_text(html, encoding="utf-8")
     css_pfad = pathlib.Path(gz.__file__).parent / "templates" / "style.css"
     css = in_stylesheet(css_pfad.read_text(encoding="utf-8"))
@@ -95,20 +104,23 @@ def _seite(tmp_path: pathlib.Path) -> pathlib.Path:
 
 def test_das_abzeichen_bleibt_ein_zusammenhaengender_rahmen(tmp_path):
     sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt").sync_playwright
+        "playwright.sync_api", reason="playwright fehlt"
+    ).sync_playwright
     root = _seite(tmp_path)
     exe = _chromium()
     with _server(root) as basis, sync_playwright() as p:
-        browser = (p.chromium.launch(executable_path=exe) if exe
-                   else p.chromium.launch())
+        browser = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
         try:
             page = browser.new_context(
-                viewport={"width": 390, "height": 400}).new_page()
+                viewport={"width": 390, "height": 400}
+            ).new_page()
             page.goto(f"{basis}/index.html", wait_until="load")
             rechtecke = page.eval_on_selector(
-                ".gr-kk-marke--alt", "e => e.getClientRects().length")
+                ".gr-kk-marke--alt", "e => e.getClientRects().length"
+            )
             anzeige = page.eval_on_selector(
-                ".gr-kk-marke--alt", "e => getComputedStyle(e).display")
+                ".gr-kk-marke--alt", "e => getComputedStyle(e).display"
+            )
         finally:
             browser.close()
     # QA-Fix 24.09.2026 (Punkt 7): INNERHALB `.gr-bnd-an` ist das Abzeichen
@@ -124,4 +136,5 @@ def test_das_abzeichen_bleibt_ein_zusammenhaengender_rahmen(tmp_path):
     # Rahmen JE ZEILE (der gemeldete "Stapel Einzelkaestchen").
     assert rechtecke == 1, (
         f"das Abzeichen zerfaellt in {rechtecke} Rahmen-Rechtecke statt "
-        "eines zusammenhaengenden")
+        "eines zusammenhaengenden"
+    )

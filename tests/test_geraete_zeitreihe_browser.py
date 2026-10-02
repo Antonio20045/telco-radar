@@ -12,6 +12,7 @@ Abnahmekriterien des E2-Auftrags als Messung:
   - Band-Wahl und Deep-Link ?modell=&band= wechseln den Graphen - ohne
     dass der Client eine Zahl rechnet (alle Werte kommen fertig).
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -35,10 +36,18 @@ def _baue_site(tmp_path: pathlib.Path) -> pathlib.Path:
     root, state = _baue(tmp_path)
     reports = root / "data" / "reports"
     reports.mkdir(parents=True, exist_ok=True)
-    (reports / f"{HEUTE}.json").write_text(json.dumps({
-        "date": HEUTE, "language": "de",
-        "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
-        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{HEUTE}.json").write_text(
+        json.dumps(
+            {
+                "date": HEUTE,
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     (reports / f"{HEUTE}.md").write_text("# B\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
@@ -46,10 +55,15 @@ def _baue_site(tmp_path: pathlib.Path) -> pathlib.Path:
 
 
 def _chromium():
-    for muster in ("/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-                   str(pathlib.Path.home() / ".cache/ms-playwright"
-                       / "chromium*/chrome-linux*/chrome"),
-                   "/Applications/Chromium.app/Contents/MacOS/Chromium"):
+    for muster in (
+        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
+        str(
+            pathlib.Path.home()
+            / ".cache/ms-playwright"
+            / "chromium*/chrome-linux*/chrome"
+        ),
+        "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    ):
         treffer = sorted(glob.glob(muster))
         if treffer:
             return treffer[-1]
@@ -62,8 +76,9 @@ def _server(site: pathlib.Path):
     s.bind(("127.0.0.1", 0))
     port = s.getsockname()[1]
     s.close()
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler,
-                                directory=str(site))
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(site)
+    )
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     try:
@@ -75,12 +90,12 @@ def _server(site: pathlib.Path):
 @pytest.fixture(scope="module")
 def _browser_seite(tmp_path_factory):
     sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt").sync_playwright
+        "playwright.sync_api", reason="playwright fehlt"
+    ).sync_playwright
     site = _baue_site(tmp_path_factory.mktemp("zrbrowser"))
     exe = _chromium()
     with _server(site) as basis, sync_playwright() as p:
-        browser = (p.chromium.launch(executable_path=exe) if exe
-                   else p.chromium.launch())
+        browser = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
         yield browser, basis
         browser.close()
 
@@ -90,8 +105,9 @@ def _ansicht(_browser_seite, breite=1440, hoehe=900, touch=False):
     browser, basis = _browser_seite
     # touch=True (E2-F3): erst ein Kontext mit has_touch kann tap() senden -
     # die Mobil-Tests gehen den echten Fingerweg, nicht den Mausklick.
-    context = browser.new_context(viewport={"width": breite, "height": hoehe},
-                                  has_touch=touch)
+    context = browser.new_context(
+        viewport={"width": breite, "height": hoehe}, has_touch=touch
+    )
     s = context.new_page()
     fehler = konsole_sammeln(s)
     s.goto(f"{basis}/geraete.html", wait_until="load")
@@ -118,6 +134,7 @@ def telefon(_browser_seite):
 # Die Falz auf dem Telefon (Kriterium 11c, hier an der Fixture)
 # --------------------------------------------------------------------------
 
+
 def test_am_telefon_steht_die_antwort_ueber_der_falz(telefon):
     s, _ = telefon
     box = s.evaluate("""() => {
@@ -132,8 +149,9 @@ def test_am_telefon_steht_die_antwort_ueber_der_falz(telefon):
     }""")
     assert box["antwort"] is not None, "der Antwort-Satz fehlt"
     assert box["antwort"] <= 844, f"Antwort-Satz endet bei {box['antwort']} px"
-    assert box["kopf"] is not None and box["kopf"] <= 844, \
+    assert box["kopf"] is not None and box["kopf"] <= 844, (
         f"der Graphkopf endet bei {box['kopf']} px"
+    )
     assert box["quer"] <= 391, f"Seite {box['quer']} px breit"
 
 
@@ -158,9 +176,12 @@ def test_am_telefon_beginnt_die_kurve_oberhalb_der_falz(telefon):
     und `test_der_kopf_laeuft_auch_mit_breiterer_schrift_nicht_aus_dem_bild`
     in test_marke.py), nicht mit einer bestimmten Schriftart."""
     s, _ = telefon
-    s.add_style_tag(content=(
-        ".gr-reiter button,.gr-reiter .gr-reiter-seite"
-        "{letter-spacing:1px !important}"))
+    s.add_style_tag(
+        content=(
+            ".gr-reiter button,.gr-reiter .gr-reiter-seite"
+            "{letter-spacing:1px !important}"
+        )
+    )
     s.wait_for_timeout(120)
     mess = s.evaluate("""() => {
       const svg = document.querySelector(
@@ -190,17 +211,21 @@ def test_am_telefon_beginnt_die_kurve_oberhalb_der_falz(telefon):
     assert mess, "die Zeitreihe zeichnet kein SVG (Fixture prüfen)"
     assert mess["reiterZeilen"] == 1, (
         f"die Reiterleiste bricht in {mess['reiterZeilen']} Zeilen um - "
-        "das drueckt den Graphen unter die Falz")
+        "das drueckt den Graphen unter die Falz"
+    )
     assert mess["svg"] <= 844, (
         f"das SVG beginnt bei {mess['svg']} px - {mess['svg'] - 844} px "
-        "unter der Falz 844")
-    kurve = min(p for p in (mess["punkt"], mess["halo"], mess["linie"])
-                if p is not None) if any(
-        p is not None for p in (mess["punkt"], mess["halo"], mess["linie"])) \
+        "unter der Falz 844"
+    )
+    kurve = (
+        min(p for p in (mess["punkt"], mess["halo"], mess["linie"]) if p is not None)
+        if any(p is not None for p in (mess["punkt"], mess["halo"], mess["linie"]))
         else None
+    )
     assert kurve is not None and kurve <= 844, (
         f"der oberste Kurvenpunkt liegt bei {kurve} px - die Kurve steht "
-        "komplett unter der Falz 844, der Reiter öffnet mit Gerüst")
+        "komplett unter der Falz 844, der Reiter öffnet mit Gerüst"
+    )
 
 
 def test_die_kachelzeile_drueckt_die_falz_nicht_unter_844(telefon):
@@ -214,8 +239,7 @@ def test_die_kachelzeile_drueckt_die_falz_nicht_unter_844(telefon):
               hoehe: k ? Math.round(k.getBoundingClientRect().height) : 0};
     }""")
     assert box["karten"] is not None, "die Kartenreihe fehlt"
-    assert box["karten"] <= 844, \
-        f"Kartenreihe endet bei {box['karten']} px (Falz 844)"
+    assert box["karten"] <= 844, f"Kartenreihe endet bei {box['karten']} px (Falz 844)"
 
 
 def test_die_karten_preiszahl_ist_mindestens_20px(schreibtisch, telefon):
@@ -226,10 +250,10 @@ def test_die_karten_preiszahl_ist_mindestens_20px(schreibtisch, telefon):
         groessen = s.evaluate(
             """() => [...document.querySelectorAll(
                  '#gr-zr-kacheln .gr-zr-k-preis b')]
-               .map(b => parseFloat(getComputedStyle(b).fontSize))""")
+               .map(b => parseFloat(getComputedStyle(b).fontSize))"""
+        )
         assert groessen, "keine Karte mit Preiszahl gefunden"
-        assert min(groessen) >= 20, \
-            f"kleinste Preiszahl {min(groessen)} px (< 20)"
+        assert min(groessen) >= 20, f"kleinste Preiszahl {min(groessen)} px (< 20)"
 
 
 def test_alle_karten_im_ersten_viewport_beim_schreibtisch(schreibtisch):
@@ -246,8 +270,7 @@ def test_alle_karten_im_ersten_viewport_beim_schreibtisch(schreibtisch):
                 k => Math.round(k.getBoundingClientRect().right)))};
     }""")
     assert 1 <= erg["n"] <= 6
-    assert erg["unten"] <= 900, \
-        f"Karten enden bei {erg['unten']} px (Falz 900)"
+    assert erg["unten"] <= 900, f"Karten enden bei {erg['unten']} px (Falz 900)"
     assert erg["rechts"] <= 1440
 
 
@@ -266,15 +289,18 @@ def test_die_aktive_karte_ist_deutlich_markiert(schreibtisch):
     inaktive = [k for k in karten if not k["aktiv"]]
     assert aktive, "keine Karte als aktiv markiert (aria-pressed)"
     assert inaktive, "alle Karten markiert - die Messung prueft nichts"
-    assert aktive[0]["rand"] >= 2, \
+    assert aktive[0]["rand"] >= 2, (
         f"aktive Karte hat {aktive[0]['rand']} px Rahmen (< 2)"
-    assert aktive[0]["flaeche"] != inaktive[0]["flaeche"], \
+    )
+    assert aktive[0]["flaeche"] != inaktive[0]["flaeche"], (
         "aktive Karte hat dieselbe Flaeche wie eine inaktive"
+    )
 
 
 # --------------------------------------------------------------------------
 # Konsole
 # --------------------------------------------------------------------------
+
 
 def test_keine_javascript_fehler_auf_der_startansicht(schreibtisch):
     s, fehler = schreibtisch
@@ -284,6 +310,7 @@ def test_keine_javascript_fehler_auf_der_startansicht(schreibtisch):
 # --------------------------------------------------------------------------
 # Das Suchfeld - Antonios Beispiel
 # --------------------------------------------------------------------------
+
 
 def test_die_vorschau_kommt_ab_zwei_zeichen_und_bleibt_klein(schreibtisch):
     s, _ = schreibtisch
@@ -299,17 +326,14 @@ def test_die_vorschau_kommt_ab_zwei_zeichen_und_bleibt_klein(schreibtisch):
     assert "iPhone 17 Pro" in text and "GB" in text
 
 
-def test_der_vorschau_treffer_ist_vor_vollstaendiger_eingabe_klickbar(
-        schreibtisch):
+def test_der_vorschau_treffer_ist_vor_vollstaendiger_eingabe_klickbar(schreibtisch):
     s, _ = schreibtisch
-    vorher = s.eval_on_selector("#tafel-tco .gr-zr-antwort",
-                                "e => e.textContent")
+    vorher = s.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
     s.fill("#gr-zr-suche", "iph")
     s.wait_for_timeout(150)
     s.click("#gr-zr-vorschau button")
     s.wait_for_timeout(400)
-    nachher = s.eval_on_selector("#tafel-tco .gr-zr-antwort",
-                                 "e => e.textContent")
+    nachher = s.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
     assert vorher != nachher or "iPhone 17 Pro" in nachher
     assert "iPhone 17 Pro" in nachher
 
@@ -323,17 +347,19 @@ def test_auftippen_und_schreiben_ersetzt_die_vorbelegung(schreibtisch):
     s, _ = schreibtisch
     s.click("#gr-zr-suche")
     value, von, bis = s.eval_on_selector(
-        "#gr-zr-suche",
-        "e => [e.value, e.selectionStart, e.selectionEnd]")
-    assert von == 0 and bis == len(value), \
+        "#gr-zr-suche", "e => [e.value, e.selectionStart, e.selectionEnd]"
+    )
+    assert von == 0 and bis == len(value), (
         f"Fokus markiert nicht die Vorbelegung: [{von},{bis}] von {len(value)}"
+    )
     s.type("#gr-zr-suche", "galaxy")
     s.wait_for_timeout(200)
     value = s.eval_on_selector("#gr-zr-suche", "e => e.value")
     assert value == "galaxy", f"Tippen hat nicht ersetzt: {value!r}"
     treffer = s.eval_on_selector("#gr-zr-treffer", "e => e.textContent")
-    assert "kein Treffer" not in treffer, \
+    assert "kein Treffer" not in treffer, (
         "die ersetzte Eingabe findet nichts - der erste Versuch scheitert"
+    )
 
 
 def test_die_unveraenderte_vorbelegung_oeffnet_die_vorschau_nicht(telefon):
@@ -354,20 +380,20 @@ def test_nach_der_auswahl_ist_die_vorschau_zu(telefon):
     s, _ = telefon
     s.fill("#gr-zr-suche", "iph")
     s.wait_for_timeout(200)
-    assert s.query_selector_all("#gr-zr-vorschau button"), \
+    assert s.query_selector_all("#gr-zr-vorschau button"), (
         "die Vorschau oeffnet nicht - der Test misst seinen eigenen Vorweg"
+    )
     s.tap("#gr-zr-vorschau button")
     s.wait_for_timeout(500)
-    hoehe = s.eval_on_selector("#gr-zr-vorschau",
-                               "e => Math.round(e.getBoundingClientRect()"
-                               ".height)")
+    hoehe = s.eval_on_selector(
+        "#gr-zr-vorschau", "e => Math.round(e.getBoundingClientRect().height)"
+    )
     assert hoehe == 0, f"die Vorschau steht offen ({hoehe} px) nach Auswahl"
     # Der Band-Knopfe muss ohne Umweg treffbar sein: der Klick wartet
     # kurze Zeit - ein Overlay davor waere der Timeout.
     s.tap("#gr-zr-baender button[data-band='m']", timeout=4000)
     s.wait_for_timeout(500)
-    antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort",
-                                 "e => e.textContent")
+    antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
     assert "M" in antwort
 
 
@@ -380,9 +406,9 @@ def test_ausstapschliesst_die_vorschau(telefon):
     assert s.query_selector_all("#gr-zr-vorschau button")
     s.tap(".gr-zr-antwort")
     s.wait_for_timeout(250)
-    hoehe = s.eval_on_selector("#gr-zr-vorschau",
-                               "e => Math.round(e.getBoundingClientRect()"
-                               ".height)")
+    hoehe = s.eval_on_selector(
+        "#gr-zr-vorschau", "e => Math.round(e.getBoundingClientRect().height)"
+    )
     assert hoehe == 0, "Tap daneben laesst die Vorschau offen"
 
 
@@ -391,23 +417,28 @@ def test_die_kachel_waehlt_das_geraet(schreibtisch):
     s.click("#gr-zr-kacheln button")
     s.wait_for_timeout(400)
     assert "iPhone 17 Pro" in s.eval_on_selector(
-        "#tafel-tco .gr-zr-antwort", "e => e.textContent")
+        "#tafel-tco .gr-zr-antwort", "e => e.textContent"
+    )
 
 
 # --------------------------------------------------------------------------
 # Band-Wahl und Deep-Link
 # --------------------------------------------------------------------------
 
+
 def test_der_bandwechsel_liefert_den_graphen_des_bandes(schreibtisch):
     s, _ = schreibtisch
-    vor = s.eval_on_selector_all("#tafel-tco svg.gr-zr circle.gr-zr-punkt",
-                                 "es => es.map(e => e.getAttribute('cx'))")
+    vor = s.eval_on_selector_all(
+        "#tafel-tco svg.gr-zr circle.gr-zr-punkt",
+        "es => es.map(e => e.getAttribute('cx'))",
+    )
     s.click("#gr-zr-baender button[data-band='m']")
     s.wait_for_timeout(400)
-    nach = s.eval_on_selector_all("#tafel-tco svg.gr-zr circle.gr-zr-punkt",
-                                  "es => es.map(e => e.getAttribute('cx'))")
-    antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort",
-                                 "e => e.textContent")
+    nach = s.eval_on_selector_all(
+        "#tafel-tco svg.gr-zr circle.gr-zr-punkt",
+        "es => es.map(e => e.getAttribute('cx'))",
+    )
+    antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
     assert "M" in antwort
     assert len(nach) < len(vor) or vor != nach
 
@@ -416,11 +447,12 @@ def test_der_deep_link_setzt_modell_und_band(_browser_seite):
     browser, basis = _browser_seite
     s = browser.new_page(viewport={"width": 1440, "height": 900})
     try:
-        s.goto(f"{basis}/geraete.html?modell=samsung-galaxy-s26-256"
-               f"&band=xs", wait_until="load")
+        s.goto(
+            f"{basis}/geraete.html?modell=samsung-galaxy-s26-256&band=xs",
+            wait_until="load",
+        )
         s.wait_for_timeout(450)
-        antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort",
-                                     "e => e.textContent")
+        antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
         assert "Galaxy S26" in antwort and "XS" in antwort
         url = s.url
         assert "modell=samsung-galaxy-s26-256" in url
@@ -436,8 +468,7 @@ def test_der_modellwechsel_holt_den_graphen_aus_dem_fragment(schreibtisch):
     s.wait_for_timeout(200)
     s.click("#gr-zr-vorschau button")
     s.wait_for_timeout(450)
-    antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort",
-                                 "e => e.textContent")
+    antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
     assert "Galaxy S26" in antwort
     assert s.query_selector("#tafel-tco svg.gr-zr circle.gr-zr-punkt")
 
@@ -446,8 +477,8 @@ def test_der_modellwechsel_holt_den_graphen_aus_dem_fragment(schreibtisch):
 # (Wahrheitstest zur QA-Zurückweisung E2-F1, 17.09.2026)
 # --------------------------------------------------------------------------
 
-def test_der_bandtitel_und_die_sichtbaren_zeilen_meinen_dasselbe_band(
-        schreibtisch):
+
+def test_der_bandtitel_und_die_sichtbaren_zeilen_meinen_dasselbe_band(schreibtisch):
     """E2-F1 wurde mit dieser Messung ZURÜCKGEWIESEN: der QA las `innerText`
     über ALLE .gr-bnd-Zeilen (auch die per `hidden` versteckten - innerText
     fällt auf display:none-Elemente auf textContent zurück) und zählte
@@ -475,17 +506,17 @@ def test_der_bandtitel_und_die_sichtbaren_zeilen_meinen_dasselbe_band(
     # haben. Zeilen OHNE data-band sind die §7-Gruppe „Ohne Tarifband".
     for z in sichtbar:
         if z["ohneband"]:
-            assert z["band"] is None, \
-                "eine Band-Zeile steht in der Ohne-Band-Gruppe"
+            assert z["band"] is None, "eine Band-Zeile steht in der Ohne-Band-Gruppe"
         else:
-            assert z["band"] == "m", \
-                f"sichtbare Zeile mit data-band={z['band']!r} unter " \
-                f"dem Titel 'Band M'"
+            assert z["band"] == "m", (
+                f"sichtbare Zeile mit data-band={z['band']!r} unter dem Titel 'Band M'"
+            )
     # und umgekehrt: jede Zeile eines ANDEREN Bands ist wirklich weg
     for z in zeilen:
         if z["band"] not in (None, "m"):
-            assert not z["sichtbar"], \
+            assert not z["sichtbar"], (
                 f"Zeile data-band={z['band']!r} ist sichtbar geblieben"
+            )
 
 
 # --------------------------------------------------------------------------
@@ -493,8 +524,8 @@ def test_der_bandtitel_und_die_sichtbaren_zeilen_meinen_dasselbe_band(
 # Die Schrift im Graphen
 # --------------------------------------------------------------------------
 
-def test_keine_schrift_unter_zwoelf_pixel_im_sichtbaren_graphen(
-        schreibtisch):
+
+def test_keine_schrift_unter_zwoelf_pixel_im_sichtbaren_graphen(schreibtisch):
     """Die 12-px-Regel der Seite gilt den LESSENDEN Labels (Werte, Namen,
     Achsen, Ticks). Die Meta-Etiketten des genehmigten Prototyps (kleiner
     Erst-Wert, "unser Angebot"-Chip, Abrufdatum am Linienende) stehen
@@ -516,7 +547,9 @@ def test_keine_schrift_unter_zwoelf_pixel_im_sichtbaren_graphen(
               neben: px(neben).filter(t => t.px < 10)};
     }""")
     assert befund is not None, "kein sichtbares SVG"
-    assert befund["pflicht"] == [], f"Lesende Schrift unter 12 px: {befund['pflicht'][:4]}"
+    assert befund["pflicht"] == [], (
+        f"Lesende Schrift unter 12 px: {befund['pflicht'][:4]}"
+    )
     assert befund["neben"] == [], f"Meta-Etikett unter 10 px: {befund['neben'][:4]}"
 
 
@@ -527,10 +560,12 @@ def test_keine_schrift_unter_zwoelf_pixel_im_sichtbaren_graphen(
 # Wege sind die echten Bedienelemente der Seite, keine Testklopfer.
 # --------------------------------------------------------------------------
 
+
 def waehle_modell(s, mid: str) -> None:
     titel = s.eval_on_selector(
         "#gr-zeitreihe-daten",
-        "k => JSON.parse(k.textContent).titel[" + json.dumps(mid) + "]")
+        "k => JSON.parse(k.textContent).titel[" + json.dumps(mid) + "]",
+    )
     assert titel, f"Modell {mid} kennt der Knoten nicht"
     s.fill("#gr-zr-suche", "")
     s.type("#gr-zr-suche", titel)
@@ -550,25 +585,26 @@ def waehle_band(s, band: str) -> None:
 # das schmale Bild selbst nicht zeigt.
 # --------------------------------------------------------------------------
 
+
 def test_die_legende_weicht_den_endlabels_auf_dem_schreibtisch(schreibtisch):
     s, _ = schreibtisch
     anzeige = s.eval_on_selector(
-        "#tafel-tco .gr-zr-legende",
-        "el => getComputedStyle(el).display")
+        "#tafel-tco .gr-zr-legende", "el => getComputedStyle(el).display"
+    )
     assert anzeige == "none", f"Legende zeigt sich trotz Endlabels: {anzeige}"
     # Die Endlabels selbst stehen im SVG - die Aussage bleibt sichtbar,
     # nur nicht zweimal.
     namen = s.eval_on_selector_all(
-        "#tafel-tco svg.gr-zr--breit text.gr-zr-name",
-        "els => els.length")
+        "#tafel-tco svg.gr-zr--breit text.gr-zr-name", "els => els.length"
+    )
     assert namen and namen > 0
 
 
 def test_die_legende_bleibt_auf_dem_telefon(telefon):
     s, _ = telefon
     anzeige = s.eval_on_selector(
-        "#tafel-tco .gr-zr-legende",
-        "el => getComputedStyle(el).display")
+        "#tafel-tco .gr-zr-legende", "el => getComputedStyle(el).display"
+    )
     assert anzeige != "none", "Legende fehlt mobil - dort traegt sie ab/zuletzt"
 
 
@@ -579,6 +615,7 @@ def test_die_legende_bleibt_auf_dem_telefon(telefon):
 # `geraete_verlinkt`-Sichtbarkeitsschwelle greift nicht), deshalb steht die
 # Messung dafuer eigenstaendig in `test_navigation_aktiver_eintrag_browser.
 # py` - hier nur der Scroll-Hinweis der Reiterleiste dieser Seite selbst.
+
 
 def test_die_reiterleiste_braucht_keinen_scroll_mehr(telefon):
     """QA-Fix 24.09.2026: die Leiste ROLLTE bis zu diesem Fix in sich
@@ -591,10 +628,12 @@ def test_die_reiterleiste_braucht_keinen_scroll_mehr(telefon):
     s, _ = telefon
     breiten = s.eval_on_selector(
         "#tafel-tco .gr-reiter, .gr-reiter",
-        "e => ({sw: e.scrollWidth, cw: e.clientWidth})")
+        "e => ({sw: e.scrollWidth, cw: e.clientWidth})",
+    )
     assert breiten["sw"] <= breiten["cw"] + 1, (
         f"die Reiterleiste rollt noch innerlich: scrollWidth {breiten['sw']} "
-        f"> clientWidth {breiten['cw']}")
+        f"> clientWidth {breiten['cw']}"
+    )
 
 
 # --------------------------------------------------------------------------
@@ -606,7 +645,7 @@ def test_die_reiterleiste_braucht_keinen_scroll_mehr(telefon):
 # wachsen: die rechte Kante bleibt im SVG, unabhaengig von der Glyphenbreite.
 # --------------------------------------------------------------------------
 
-_ENDLABEL_SEL = ('.gr-zr-name, .gr-zr-chip, .gr-zr-datum, .gr-zr-mon')
+_ENDLABEL_SEL = ".gr-zr-name, .gr-zr-chip, .gr-zr-datum, .gr-zr-mon"
 
 
 def _endlabel_lage(s):
@@ -614,18 +653,22 @@ def _endlabel_lage(s):
     das Bild, das die aktuelle Bildschirmbreite per Mediaquery zeigt
     (`display:none` nimmt das andere aus dem Layout, `getBoundingClientRect`
     liefert dafuer ein Nullrechteck)."""
-    return s.evaluate("""() => {
+    return s.evaluate(
+        """() => {
       const svg = [...document.querySelectorAll('#tafel-tco svg.gr-zr')]
         .find(e => e.getBoundingClientRect().width > 0);
       if (!svg) return null;
       const sr = svg.getBoundingClientRect();
-      const labels = [...svg.querySelectorAll('""" + _ENDLABEL_SEL + """')]
+      const labels = [...svg.querySelectorAll('"""
+        + _ENDLABEL_SEL
+        + """')]
         .map(e => {
           const r = e.getBoundingClientRect();
           return { text: e.textContent, links: r.left, rechts: r.right };
         });
       return { svgLinks: sr.left, svgRechts: sr.right, labels };
-    }""")
+    }"""
+    )
 
 
 def test_jedes_endlabel_liegt_vollstaendig_im_svg(schreibtisch, telefon):
@@ -638,10 +681,12 @@ def test_jedes_endlabel_liegt_vollstaendig_im_svg(schreibtisch, telefon):
         for l in lage["labels"]:
             assert l["links"] >= lage["svgLinks"] - 0.5, (
                 f"Endlabel {l['text']!r} beginnt links vor dem SVG: {l} "
-                f"gegen SVG-links {lage['svgLinks']}")
+                f"gegen SVG-links {lage['svgLinks']}"
+            )
             assert l["rechts"] <= lage["svgRechts"] + 0.5, (
                 f"Endlabel {l['text']!r} ragt rechts aus dem SVG: {l} "
-                f"gegen SVG-rechts {lage['svgRechts']}")
+                f"gegen SVG-rechts {lage['svgRechts']}"
+            )
 
 
 def test_endlabel_bleibt_im_svg_auch_bei_verbreitertem_text(telefon):
@@ -663,7 +708,8 @@ def test_endlabel_bleibt_im_svg_auch_bei_verbreitertem_text(telefon):
     for l in lage["labels"]:
         assert l["rechts"] <= lage["svgRechts"] + 0.5, (
             f"Endlabel {l['text']!r} ragt bei verbreitertem Text rechts "
-            f"aus dem SVG: {l} gegen SVG-rechts {lage['svgRechts']}")
+            f"aus dem SVG: {l} gegen SVG-rechts {lage['svgRechts']}"
+        )
 
 
 # --------------------------------------------------------------------------
@@ -673,6 +719,7 @@ def test_endlabel_bleibt_im_svg_auch_bei_verbreitertem_text(telefon):
 # breit wie sein Text, die Leiste selbst rollt (`overflow-x:auto`), statt den
 # Text zu kappen. Gemessen im echten Chromium, nicht am Quelltext.
 # --------------------------------------------------------------------------
+
 
 def test_kein_reitertext_wird_abgeschnitten(telefon):
     """QA-Fix 24.09.2026: die alte Fassung mass `scrollWidth` gegen
@@ -700,9 +747,12 @@ def test_kein_reitertext_wird_abgeschnitten(telefon):
     unabhaengig vom Innenabstand des Knopfs): zwischen zwei benachbarten
     Reiterworten muessen mindestens 8 px Luft bleiben."""
     s, _ = telefon
-    s.add_style_tag(content=(
-        ".gr-reiter button,.gr-reiter .gr-reiter-seite"
-        "{letter-spacing:1px !important}"))
+    s.add_style_tag(
+        content=(
+            ".gr-reiter button,.gr-reiter .gr-reiter-seite"
+            "{letter-spacing:1px !important}"
+        )
+    )
     s.wait_for_timeout(120)
     daten = s.evaluate("""() => {
       const leiste = document.querySelector('.gr-reiter');
@@ -733,25 +783,31 @@ def test_kein_reitertext_wird_abgeschnitten(telefon):
     assert daten["knoepfe"], "keine Reiter gefunden"
     assert daten["zeilen"] == 1, (
         f"die Reiterleiste bricht in {daten['zeilen']} Zeilen um - das "
-        "drueckt den Graphen unter die Falz")
+        "drueckt den Graphen unter die Falz"
+    )
     for k in daten["knoepfe"]:
         assert k["left"] >= daten["leiste"]["left"] - 1, (
             f"Reiter {k['text']!r} beginnt links ausserhalb der Leiste: "
-            f"{k['left']} < {daten['leiste']['left']}")
+            f"{k['left']} < {daten['leiste']['left']}"
+        )
         assert k["right"] <= daten["leiste"]["right"] + 1, (
             f"Reiter {k['text']!r} ist abgeschnitten: rechte Kante "
-            f"{k['right']} > Leiste {daten['leiste']['right']}")
+            f"{k['right']} > Leiste {daten['leiste']['right']}"
+        )
     texte = daten["textRechtecke"]
     assert all(texte), "der Reiter-Text liess sich nicht per Range messen"
     for vorher, nachher in zip(texte, texte[1:]):
         luecke = nachher["links"] - vorher["rechts"]
         assert luecke >= 8, (
             f"nur {luecke:.1f} px Abstand zwischen zwei Reiterworten - "
-            "sie stossen fast aneinander (mind. 8 px verlangt)")
+            "sie stossen fast aneinander (mind. 8 px verlangt)"
+        )
 
 
 def test_die_reiterleiste_verursacht_keinen_seitenweiten_querscroll(telefon):
     s, _ = telefon
-    breite = s.evaluate("() => Math.max(document.documentElement.scrollWidth,"
-                        " document.body.scrollWidth)")
+    breite = s.evaluate(
+        "() => Math.max(document.documentElement.scrollWidth,"
+        " document.body.scrollWidth)"
+    )
     assert breite <= 391, f"die Seite ist {breite} px breit (Telefon 390 px)"

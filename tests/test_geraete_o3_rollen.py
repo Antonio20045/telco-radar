@@ -23,6 +23,7 @@ Alle statischen Prüfungen hier laufen am ECHTEN Bestand (88 Modelle, 423
 Bündelzeilen) — die Fixture der Browser-Tests trägt fünf Zeilen und könnte
 Größen- und Zähl-Aussagen nicht tragen.
 """
+
 from __future__ import annotations
 
 import json
@@ -46,8 +47,9 @@ def site(tmp_path_factory) -> pathlib.Path:
 
 @pytest.fixture(scope="module")
 def geraete(site) -> BeautifulSoup:
-    return BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
-                         "html.parser")
+    return BeautifulSoup(
+        (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
+    )
 
 
 @pytest.fixture(scope="module")
@@ -56,8 +58,9 @@ def radar(site) -> BeautifulSoup:
     der Radar eine eigene Seite (wettbewerbsradar.html); seitdem ist er der
     Reiter „Radar" der EINEN Geräteseite, und die Alt-URL ist eine
     Weiterleitung ohne Inhalt."""
-    suppe = BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
-                          "html.parser")
+    suppe = BeautifulSoup(
+        (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
+    )
     tafel = suppe.select_one("#tafel-radar")
     assert tafel is not None, "#tafel-radar fehlt - die Fixture prüft nichts"
     return BeautifulSoup(str(tafel), "html.parser")
@@ -67,6 +70,7 @@ def radar(site) -> BeautifulSoup:
 # B1: Reiterleiste und Rollen
 # --------------------------------------------------------------------------
 
+
 def test_die_reiterfolge_ist_vergleich_radar_verlauf_katalog(geraete):
     """E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d) ersetzt den O3-Quasi-Reiter
     (Link auf wettbewerbsradar.html) durch eine echte Tafel DIESER Seite:
@@ -75,23 +79,27 @@ def test_die_reiterfolge_ist_vergleich_radar_verlauf_katalog(geraete):
     jeden Knopf; der Weg zur Schwesterseite bleibt bis zu ihrem Redirect
     (E5) der Fußlink am Seitenende."""
     eintraege = geraete.select(".gr-reiter > *")
-    rollen = [(e.get("data-tafel"), e.get_text(strip=True))
-              for e in eintraege if e.name == "button"]
+    rollen = [
+        (e.get("data-tafel"), e.get_text(strip=True))
+        for e in eintraege
+        if e.name == "button"
+    ]
     assert rollen == [
         ("tafel-tco", "Mit Tarif"),
         ("tafel-verlauf", "Ohne Vertrag"),
         ("tafel-radar", "Übersicht"),
         ("tafel-katalog", "Katalog"),
     ], rollen
-    assert geraete.select_one(".gr-reiter a") is None, \
+    assert geraete.select_one(".gr-reiter a") is None, (
         "die Reiterleiste trägt noch einen Link statt der vier Tafeln"
+    )
     # Die RADAR-TAFEL existiert und ist lebendig verknüpft: Knopf UND
     # Panel, kein toter Tab-Body (die O3-Lektion, jetzt für die vierte
     # Tafel - ihr Inhalt montiert E3 Schritt 2 in #gr-radar-inhalt).
-    assert geraete.select_one("#tafel-radar") is not None, \
-        "#tafel-radar fehlt"
-    assert geraete.select_one("#gr-radar-inhalt") is not None, \
+    assert geraete.select_one("#tafel-radar") is not None, "#tafel-radar fehlt"
+    assert geraete.select_one("#gr-radar-inhalt") is not None, (
         "der Montagepunkt #gr-radar-inhalt fehlt"
+    )
 
 
 def test_zwischen_kopf_und_wahl_leiste_steht_kein_absatz(geraete):
@@ -100,8 +108,9 @@ def test_zwischen_kopf_und_wahl_leiste_steht_kein_absatz(geraete):
     Wahl-Leiste steht KEIN erklaerender Absatz mehr - der Antwort-Satz
     loest TCO-24 selbst auf, der Radar-Weg steht als Quasi-Reiter. Dieser
     Test haelt die Regel statt des Wortlauts."""
-    assert geraete.select_one(".gr-untertitel") is None, \
+    assert geraete.select_one(".gr-untertitel") is None, (
         "der Untertitel ist zurueckgekehrt (E2 loest ihn)"
+    )
     assert geraete.select_one("#gr-zr-wahl") is not None
 
 
@@ -114,11 +123,13 @@ def test_der_verlaufs_reiter_fuehrt_auf_eine_lebendige_tafel(geraete):
     ist am 17.09.2026 gefallen - Antonio F4.)"""
     tafel = geraete.select_one("#tafel-verlauf")
     assert tafel is not None, "#tafel-verlauf fehlt"
-    assert geraete.select_one(
-        ".gr-reiter [data-tafel='tafel-verlauf']") is not None, \
+    assert geraete.select_one(".gr-reiter [data-tafel='tafel-verlauf']") is not None, (
         "kein Reiter-Knopf auf #tafel-verlauf"
-    lebendig = (tafel.select_one("#gr-verlaufdaten") is not None
-                or "liegen noch keine Messreihen vor" in tafel.get_text())
+    )
+    lebendig = (
+        tafel.select_one("#gr-verlaufdaten") is not None
+        or "liegen noch keine Messreihen vor" in tafel.get_text()
+    )
     assert lebendig, "die Verlaufs-Tafel ist tot: kein Inhalt, kein Leerzustand"
 
 
@@ -129,8 +140,9 @@ def test_tafel_portfolio_ist_weg(geraete):
     zugeklappte Sektionen im Radar-Reiter, siehe den Test darunter) - weg
     ist die tote Tafel, nicht der Inhalt."""
     assert geraete.select_one("#tafel-portfolio") is None
-    assert geraete.select_one(".gr-reiter [data-tafel='tafel-portfolio']") \
-        is None, "ein fünfter Reiter-Knopf auf die tote Portfolio-Tafel"
+    assert geraete.select_one(".gr-reiter [data-tafel='tafel-portfolio']") is None, (
+        "ein fünfter Reiter-Knopf auf die tote Portfolio-Tafel"
+    )
     # Die Portfolio-Sektionen stehen je an ihrem Ort, nirgendwo sonst:
     # Lifecycle im Radar-Reiter; die Wochenkarte #wr-bewegungen seit
     # P4 Schritt 2a (STRATEGIE_GERAETE_V3, 18.09.2026) im REITER
@@ -142,8 +154,9 @@ def test_tafel_portfolio_ist_weg(geraete):
     for anker, tafel in erwartet.items():
         treffer = geraete.select(anker)
         assert len(treffer) == 1, f"{anker} steht {len(treffer)}x da"
-        assert any(el.get("id") == tafel for el in
-                   treffer[0].parents), f"{anker} außerhalb von #{tafel}"
+        assert any(el.get("id") == tafel for el in treffer[0].parents), (
+            f"{anker} außerhalb von #{tafel}"
+        )
 
 
 def test_die_portfolio_abschnitte_stehen_auf_dem_radar(radar):
@@ -163,10 +176,12 @@ def test_die_portfolio_abschnitte_stehen_auf_dem_radar(radar):
     assert "Was der Nachfolger mit dem Preis macht" in text
     assert "Wie viele Generationen ein Anbieter gleichzeitig führt" in text
     if "Preisverfall gegenüber dem Einführungspreis" in text:
-        listenteil = text.split("Preisverfall gegenüber dem "
-                                "Einführungspreis", 1)[1][:400]
-        assert "seit" in listenteil, \
+        listenteil = text.split("Preisverfall gegenüber dem Einführungspreis", 1)[1][
+            :400
+        ]
+        assert "seit" in listenteil, (
             "Preisverfall-Überschrift ohne eine einzige Zeile dahinter"
+        )
 
 
 def test_was_diese_woche_auffaellt_steht_im_preisverlauf(geraete):
@@ -186,6 +201,7 @@ def test_was_diese_woche_auffaellt_steht_im_preisverlauf(geraete):
 # B5: Querlink je Radar-Geräteblock
 # --------------------------------------------------------------------------
 
+
 def test_je_radar_gruppe_ein_querlink_mit_deep_link(radar, geraete):
     """B5, E3-Fassung: Jede Modell-Zeile der Abweichungsliste verlinkt auf
     DIESELBE Modell-ID, die der Selektor der Geräteseite trägt — sonst
@@ -197,10 +213,10 @@ def test_je_radar_gruppe_ein_querlink_mit_deep_link(radar, geraete):
     nichts)."""
     # E2: der Selektor ist das Suchfeld; wählbar ist, was der Zeitreihen-
     # Knoten als erlaubt traegt (derselben Quelle, aus der app.js waehlt).
-    ids_selektor = set(json.loads(
-        geraete.select_one("#gr-zeitreihe-daten").get_text())["erlaubt"])
-    links = radar.select(
-        "#wr-abweichung a.gr-sprung[href^='geraete.html?modell=']")
+    ids_selektor = set(
+        json.loads(geraete.select_one("#gr-zeitreihe-daten").get_text())["erlaubt"]
+    )
+    links = radar.select("#wr-abweichung a.gr-sprung[href^='geraete.html?modell=']")
     assert links, "kein Sprung-Link in der Modell-Liste des Radars"
     # 28.09.2026: der Link nennt den Reiter, in den er springt („Mit
     # Tarif →"), statt „im Graph ansehen" - seit „Ohne Vertrag" ebenfalls
@@ -213,16 +229,18 @@ def test_je_radar_gruppe_ein_querlink_mit_deep_link(radar, geraete):
     # Die Modellzahl steht an der Katalog-Überschrift, nicht noch einmal
     # im Leitzahl-Label.
     label = geraete.select_one("#tafel-katalog .gr-leit--katalog .gr-leit-label")
-    assert label is not None and not any(ch.isdigit()
-                                         for ch in label.get_text()), label
+    assert label is not None and not any(ch.isdigit() for ch in label.get_text()), label
     # Das Band (&band=klein) gehört zum Link, nicht zur Modell-ID - vor dem
     # Vergleich gegen den Selektor abgeschnitten, sonst träfe der Lookup
     # nie zu und wäre grün, ohne etwas zu prüfen.
-    fehlende = [a.get("href") for a in links
-                if a.get("href").split("modell=", 1)[-1].split("&", 1)[0]
-                not in ids_selektor]
-    assert not fehlende, \
+    fehlende = [
+        a.get("href")
+        for a in links
+        if a.get("href").split("modell=", 1)[-1].split("&", 1)[0] not in ids_selektor
+    ]
+    assert not fehlende, (
         f"Querlinks auf Modell-IDs außerhalb des Selektors: {fehlende[:5]}"
+    )
     # JEDE Modell-Zeile trägt ihren Sprung ODER die benannte Luecke -
     # sichtbare wie die hinter dem Aufklapper (alle stehen im DOM, der
     # Deckel kappt nur die Ansicht).
@@ -236,24 +254,31 @@ def test_je_radar_gruppe_ein_querlink_mit_deep_link(radar, geraete):
     # nennt die Luecke "noch keine Zeitreihe" - keinen dritten Zustand.
     zeilen = radar.select("#wr-abweichung tr.gr-a-zeile[data-auf]")
     assert zeilen, "keine Modell-Zeile im Radar - der Test prüft nichts"
-    ohne = [z.get("data-auf") for z in zeilen
-            if z.select_one("a.gr-sprung") is None
-            and "noch keine Zeitreihe" not in " ".join(
-                (z.select("td")[-1].get_text(" ", strip=True)
-                 if z.select("td") else "").split())]
-    assert not ohne, \
-        f"{len(ohne)} Modell-Zeilen ohne Sprung und ohne benannte Lücke"
+    ohne = [
+        z.get("data-auf")
+        for z in zeilen
+        if z.select_one("a.gr-sprung") is None
+        and "noch keine Zeitreihe"
+        not in " ".join(
+            (
+                z.select("td")[-1].get_text(" ", strip=True) if z.select("td") else ""
+            ).split()
+        )
+    ]
+    assert not ohne, f"{len(ohne)} Modell-Zeilen ohne Sprung und ohne benannte Lücke"
 
 
 # --------------------------------------------------------------------------
 # B6: tarife.html erreichbar
 # --------------------------------------------------------------------------
 
+
 def test_tarife_ist_vom_radar_verlinkt(radar):
     """B6: die Tarifübersicht ist die Quelle der Bänder und Tarifbindungen
     — vom Radar (der in Bändern vergleicht) gehört ein Weg dorthin."""
-    assert radar.select_one("a[href$='tarife.html']") is not None, \
+    assert radar.select_one("a[href$='tarife.html']") is not None, (
         "der Radar-Reiter verlinkt die Tarifübersicht nicht"
+    )
 
 
 def test_tarife_bleibt_von_der_geraeteseite_verlinkt(geraete):
@@ -267,8 +292,8 @@ def test_tarife_bleibt_von_der_geraeteseite_verlinkt(geraete):
 # A (S3): das Bündel-Fragment — Zeilen für JEDES wählbare Gerät
 # --------------------------------------------------------------------------
 
-def test_das_buendel_fragment_existiert_fuer_alle_anderen_modelle(site,
-                                                                  geraete):
+
+def test_das_buendel_fragment_existiert_fuer_alle_anderen_modelle(site, geraete):
     """A: Die Zeilen aller Nicht-Vorgabemodelle stehen in einem eigenen
     Fragment unter site/data/ — NICHT in der Seite selbst. O1 hat die
     Seite von 3,9 MB auf ~1,1 MB gebracht; 423 Zeilen à 2,7 KB im HTML
@@ -277,20 +302,20 @@ def test_das_buendel_fragment_existiert_fuer_alle_anderen_modelle(site,
     Rechenweg-Aufklappers bleibt dadurch grün."""
     fragment = site / "data" / "geraete-buendel.html"
     assert fragment.exists(), "site/data/geraete-buendel.html fehlt"
-    lager = BeautifulSoup(fragment.read_text(encoding="utf-8"),
-                          "html.parser")
+    lager = BeautifulSoup(fragment.read_text(encoding="utf-8"), "html.parser")
     container = lager.select(".gr-bnd-lager[data-modell]")
-    assert len(container) >= 80, \
+    assert len(container) >= 80, (
         f"nur {len(container)} Modell-Container im Fragment (88 Modelle)"
+    )
     # Das Vorgabemodell steht SCHON auf der Seite - im Fragment würde es
     # doppelt (52 KB am echten Bestand).
-    vorgabe = json.loads(
-        geraete.select_one("#gr-zeitreihe-daten").text)["vorgabe"]
+    vorgabe = json.loads(geraete.select_one("#gr-zeitreihe-daten").text)["vorgabe"]
     ids = {c.get("data-modell") for c in container}
     assert vorgabe not in ids, "das Vorgabemodell steht doppelt"
     zeilen = lager.select(".gr-bnd")
-    assert len(zeilen) >= 380, \
+    assert len(zeilen) >= 380, (
         f"nur {len(zeilen)} Zeilen im Fragment (423 am Bestand, 19 Vorgabe)"
+    )
 
 
 def test_jede_belastbare_fragment_zeile_traegt_die_pflichtzeile(site):
@@ -299,17 +324,17 @@ def test_jede_belastbare_fragment_zeile_traegt_die_pflichtzeile(site):
     Attribute (C: TCO-24, Δ, Anbieter)."""
     lager = BeautifulSoup(
         (site / "data" / "geraete-buendel.html").read_text(encoding="utf-8"),
-        "html.parser")
+        "html.parser",
+    )
     belastbar = [z for z in lager.select(".gr-bnd") if z.get("data-gesamt")]
     assert belastbar, "keine belastbare Zeile im Fragment"
-    ohne_pflicht = [z for z in belastbar
-                    if z.select_one(".gr-kk-24") is None]
-    assert not ohne_pflicht, \
-        f"{len(ohne_pflicht)} belastbare Zeilen ohne Pflichtzeile"
+    ohne_pflicht = [z for z in belastbar if z.select_one(".gr-kk-24") is None]
+    assert not ohne_pflicht, f"{len(ohne_pflicht)} belastbare Zeilen ohne Pflichtzeile"
     for z in lager.select(".gr-bnd")[:50]:
         assert z.get("data-anbieter"), "Zeile ohne data-anbieter"
-        assert z.has_attr("data-delta"), \
+        assert z.has_attr("data-delta"), (
             "Zeile ohne data-delta-Sortierschlüssel (auch leer erlaubt)"
+        )
 
 
 def test_die_sortierkoepfe_stehen_ueber_der_bandliste(geraete):
@@ -330,14 +355,14 @@ def test_die_sortierkoepfe_stehen_ueber_der_bandliste(geraete):
     knoepfe = kopf.select("button[data-bsort]")
     arten = {b.get("data-bsort") for b in knoepfe}
     assert arten == {"tco", "delta", "anbieter"}, arten
-    assert "Kosten mit Tarif" in beschriftungen \
-        and "Anbieter" in beschriftungen
+    assert "Kosten mit Tarif" in beschriftungen and "Anbieter" in beschriftungen
     assert "Monate" not in beschriftungen, beschriftungen
 
 
 # --------------------------------------------------------------------------
 # D: O1/O2-Restpunkte
 # --------------------------------------------------------------------------
+
 
 def test_der_karten_hinweis_ist_weg(geraete):
     """S4: Der Hinweis „Die Bündel-Tabelle steht für das Vorgabegerät" war
@@ -360,8 +385,9 @@ def test_der_lueckenwortlaut_ist_der_genehmigte_sammelsatz(site, geraete):
     for text in quellen:
         assert "führt kein Bündel" not in text, "alter Wortlaut ist zurück"
     gesamt = " ".join(quellen)
-    assert "Kein Bündel in diesem Band:" in gesamt, \
+    assert "Kein Bündel in diesem Band:" in gesamt, (
         "der Sammelsatz fehlt am echten Bestand"
+    )
     assert "gar nicht im Bündel" in gesamt
 
 
@@ -375,7 +401,7 @@ def test_die_tco_view_liefert_keine_leserlosen_felder_mehr():
     aus `zeilen` — der Auftragswortlaut sagt „entfernen ODER verbrauchen",
     und das ist das Verbrauchen."""
     from telco_radar.report import geraete_tco_view
+
     for feld in ("tabelle", "zeilen_gesamt", "hat_tco"):
         assert feld not in geraete_tco_view.leer(), feld
-        assert feld not in geraete_tco_view.aufbereiten(
-            [], [], [], katalog=None), feld
+        assert feld not in geraete_tco_view.aufbereiten([], [], [], katalog=None), feld

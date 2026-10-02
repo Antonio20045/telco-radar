@@ -57,6 +57,7 @@ nachmessen - nicht an einem Lauf. Was hier tatsaechlich konfigurierbar
 waere (welche Quellen ein Anbieter hat), steht laengst in
 `config/geraete_quellen.yaml`.
 """
+
 from __future__ import annotations
 
 import logging
@@ -110,13 +111,20 @@ class Anbieterstil:
         return STRICHMUSTER[self.strich]
 
 
-def _stil(slug, farbe, strich, marker, *, marker_farbe="", marker_rand="none",
-          eigen=False) -> Anbieterstil:
+def _stil(
+    slug, farbe, strich, marker, *, marker_farbe="", marker_rand="none", eigen=False
+) -> Anbieterstil:
     return Anbieterstil(
-        slug=slug, farbe=farbe, marker_farbe=marker_farbe or farbe,
-        marker_rand=marker_rand, strich=strich, marker=marker,
+        slug=slug,
+        farbe=farbe,
+        marker_farbe=marker_farbe or farbe,
+        marker_rand=marker_rand,
+        strich=strich,
+        marker=marker,
         breite=BREITE_EIGEN if eigen else BREITE_ANDERE,
-        eigen=eigen, bekannt=True)
+        eigen=eigen,
+        bekannt=True,
+    )
 
 
 # Die zwei Neutraltoene fuer Service-Provider und Haendler.
@@ -142,10 +150,17 @@ LUECKE_NAME_ZUSATZ = "Farbe nicht hinterlegt"
 # geraten und nie aus dem Namen gerechnet - er ist immer dieser eine, und
 # `stil_fuer()` protokolliert jeden Fall.
 LUECKE = Anbieterstil(
-    slug="ohne-farbe", farbe=LUECKE_FARBE, marker_farbe=LUECKE_FARBE,
-    marker_rand="none", strich="luecke", marker="kreuz",
-    breite=BREITE_ANDERE, eigen=False, bekannt=False,
-    name_zusatz=LUECKE_NAME_ZUSATZ)
+    slug="ohne-farbe",
+    farbe=LUECKE_FARBE,
+    marker_farbe=LUECKE_FARBE,
+    marker_rand="none",
+    strich="luecke",
+    marker="kreuz",
+    breite=BREITE_ANDERE,
+    eigen=False,
+    bekannt=False,
+    name_zusatz=LUECKE_NAME_ZUSATZ,
+)
 
 
 # Schluessel ist der KLEINGESCHRIEBENE Anbietername, wie ihn die Adapter
@@ -163,12 +178,17 @@ ANBIETER_FARBE: dict[str, Anbieterstil] = {
     # Zweitmarke: die Linie traegt das congstar-Schwarz, der Marker das
     # congstar-Gelb. Gelb allein waere auf hellem Papier unsichtbar,
     # deshalb bekommt der Marker den schwarzen Rand der Linie.
-    "congstar": _stil("congstar", "#121212", "voll", "sechseck",
-                      marker_farbe="#ffed00", marker_rand="#121212"),
+    "congstar": _stil(
+        "congstar",
+        "#121212",
+        "voll",
+        "sechseck",
+        marker_farbe="#ffed00",
+        marker_rand="#121212",
+    ),
     # Service-Provider: grau GEPUNKTET. Sie verkaufen fremde Netze - eine
     # eigene Marke im Bild waere eine Aussage, die sie nicht haben.
-    "mobilcom-debitel": _stil("mobilcom-debitel", GRAU_SERVICE,
-                              "gepunktet", "ring"),
+    "mobilcom-debitel": _stil("mobilcom-debitel", GRAU_SERVICE, "gepunktet", "ring"),
     "freenet": _stil("freenet", GRAU_SERVICE, "gepunktet", "dreieck--runter"),
     "aldi talk": _stil("aldi-talk", GRAU_SERVICE, "gepunktet", "sechseck"),
     # Haendler: grau DURCHGEZOGEN, unterschieden allein durch die
@@ -178,8 +198,7 @@ ANBIETER_FARBE: dict[str, Anbieterstil] = {
     # Luecke da, obwohl es ein bekannter Haendler ist; die Kategorie ist
     # belegt, keine geratene Farbe.
     "medimax": _stil("medimax", GRAU_HAENDLER, "voll", "raute"),
-    "electronicpartner": _stil("electronicpartner", GRAU_HAENDLER,
-                               "voll", "dreieck"),
+    "electronicpartner": _stil("electronicpartner", GRAU_HAENDLER, "voll", "dreieck"),
     "saturn": _stil("saturn", GRAU_HAENDLER, "voll", "sechseck"),
 }
 
@@ -198,8 +217,11 @@ def stil_fuer(anbieter: str) -> Anbieterstil:
     """
     stil = ANBIETER_FARBE.get(_schluessel(anbieter))
     if stil is None:
-        log.warning("Anbieter ohne hinterlegte Farbe: %r - gezeichnet als "
-                    "benannte Luecke (%s)", anbieter, LUECKE_FARBE)
+        log.warning(
+            "Anbieter ohne hinterlegte Farbe: %r - gezeichnet als benannte Luecke (%s)",
+            anbieter,
+            LUECKE_FARBE,
+        )
         return LUECKE
     return stil
 
@@ -243,11 +265,13 @@ class AnbieterfarbenFehlen(RuntimeError):
 
 
 def _regel(stil: Anbieterstil) -> str:
-    return (f".gr-anb--{stil.slug}{{--anb:{stil.farbe};"
-            f"--anb-marker:{stil.marker_farbe};"
-            f"--anb-marker-rand:{stil.marker_rand};"
-            f"--anb-strich:{stil.muster};"
-            f"--anb-breite:{stil.breite}}}")
+    return (
+        f".gr-anb--{stil.slug}{{--anb:{stil.farbe};"
+        f"--anb-marker:{stil.marker_farbe};"
+        f"--anb-marker-rand:{stil.marker_rand};"
+        f"--anb-strich:{stil.muster};"
+        f"--anb-breite:{stil.breite}}}"
+    )
 
 
 def css_block() -> str:
@@ -273,5 +297,6 @@ def in_stylesheet(css: str) -> str:
     if MARKE not in css:
         raise AnbieterfarbenFehlen(
             f"style.css enthaelt {MARKE!r} nicht - ohne den Platzhalter "
-            f"stuenden alle Anbieterlinien grau auf der Seite")
+            f"stuenden alle Anbieterlinien grau auf der Seite"
+        )
     return css.replace(MARKE, css_block())

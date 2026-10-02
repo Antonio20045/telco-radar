@@ -8,6 +8,7 @@ so one collector serves several operators (currently Vodafone Group).
 Item URLs are resolved against the API host so relative newsUrl paths become
 absolute links on the operator's own domain.
 """
+
 from __future__ import annotations
 
 import json
@@ -22,22 +23,50 @@ from ..models import Item
 
 log = logging.getLogger(__name__)
 
-_TITLE_KEYS = ("newsTitle", "title", "headline", "name", "articleSubtitle",
-              "alternative")
+_TITLE_KEYS = (
+    "newsTitle",
+    "title",
+    "headline",
+    "name",
+    "articleSubtitle",
+    "alternative",
+)
 _URL_KEYS = ("newsUrl", "url", "link", "href", "path")
 # Ordered by trust: an explicit publication date beats a generic "created"/
 # "updated" timestamp, which for some CMSes is the day an editor touched the
 # record rather than the day the release went out.
-_DATE_KEYS = ("newsDate", "date", "published", "publishedDate", "pubDate",
-             "releaseDate", "publishedAt", "field_news_date_raw", "publishDate",
-             "publication_date", "publicationDate", "publication_date_display",
-             "datePublished", "date_published", "news_date", "post_date",
-             "createdDt", "created_at", "createdAt")
+_DATE_KEYS = (
+    "newsDate",
+    "date",
+    "published",
+    "publishedDate",
+    "pubDate",
+    "releaseDate",
+    "publishedAt",
+    "field_news_date_raw",
+    "publishDate",
+    "publication_date",
+    "publicationDate",
+    "publication_date_display",
+    "datePublished",
+    "date_published",
+    "news_date",
+    "post_date",
+    "createdDt",
+    "created_at",
+    "createdAt",
+)
 _DESC_KEYS = ("newsDesc", "description", "summary", "excerpt", "field_summary")
 
 _DATE_FORMATS = (
-    "%d %b %Y", "%d %B %Y", "%Y-%m-%d", "%Y-%m-%dT%H:%M:%S",
-    "%Y-%m-%dT%H:%M:%SZ", "%d/%m/%Y", "%b %d, %Y", "%B %d, %Y",
+    "%d %b %Y",
+    "%d %B %Y",
+    "%Y-%m-%d",
+    "%Y-%m-%dT%H:%M:%S",
+    "%Y-%m-%dT%H:%M:%SZ",
+    "%d/%m/%Y",
+    "%b %d, %Y",
+    "%B %d, %Y",
 )
 
 
@@ -56,8 +85,15 @@ _EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
 # - the real headline for those records is only recoverable from a longer
 # text field (description/body), never from this field, so treat these
 # values as absent rather than returning a useless title.
-_TITLE_PLACEHOLDERS = {"details", "read more", "more", "more details",
-                       "learn more", "view details", "click here"}
+_TITLE_PLACEHOLDERS = {
+    "details",
+    "read more",
+    "more",
+    "more details",
+    "learn more",
+    "view details",
+    "click here",
+}
 
 
 def _first(d: dict, keys, skip_values: frozenset[str] = frozenset()) -> str:
@@ -80,7 +116,11 @@ def _first(d: dict, keys, skip_values: frozenset[str] = frozenset()) -> str:
     if isinstance(fields, dict):
         for k in keys:
             v = fields.get(k)
-            if isinstance(v, str) and v.strip() and v.strip().lower() not in skip_values:
+            if (
+                isinstance(v, str)
+                and v.strip()
+                and v.strip().lower() not in skip_values
+            ):
                 return v.strip()
     return ""
 
@@ -107,9 +147,26 @@ _EMBEDDED_DATE_RES = (
     re.compile(r"(\d{1,2})\s+([A-Za-z]{3,9})\.?,?\s+(\d{4})"),
     re.compile(r"([A-Za-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4})"),
 )
-_MONTH_NAMES = {m: n for n, m in enumerate(
-    ("jan", "feb", "mar", "apr", "may", "jun",
-     "jul", "aug", "sep", "oct", "nov", "dec"), start=1)}
+_MONTH_NAMES = {
+    m: n
+    for n, m in enumerate(
+        (
+            "jan",
+            "feb",
+            "mar",
+            "apr",
+            "may",
+            "jun",
+            "jul",
+            "aug",
+            "sep",
+            "oct",
+            "nov",
+            "dec",
+        ),
+        start=1,
+    )
+}
 
 
 def _from_parts(year: str, month: str, day: str) -> datetime | None:
@@ -128,7 +185,9 @@ def _parse_date(raw: str) -> datetime | None:
         return None
     for fmt in _DATE_FORMATS:
         try:
-            return datetime.strptime(raw[:len(fmt) + 6], fmt).replace(tzinfo=timezone.utc)
+            return datetime.strptime(raw[: len(fmt) + 6], fmt).replace(
+                tzinfo=timezone.utc
+            )
         except ValueError:
             continue
     try:  # leading YYYY-MM-DD (also covers ISO stamps with millis/offset)
@@ -141,9 +200,13 @@ def _parse_date(raw: str) -> datetime | None:
         if not m:
             continue
         a, b, c = m.groups()
-        parsed = (_from_parts(a, b, c) if pattern is _EMBEDDED_DATE_RES[0]
-                  else _from_parts(c, b, a) if pattern is _EMBEDDED_DATE_RES[1]
-                  else _from_parts(c, a, b))
+        parsed = (
+            _from_parts(a, b, c)
+            if pattern is _EMBEDDED_DATE_RES[0]
+            else _from_parts(c, b, a)
+            if pattern is _EMBEDDED_DATE_RES[1]
+            else _from_parts(c, a, b)
+        )
         if parsed:
             return parsed
     return None
@@ -165,7 +228,9 @@ def _find_record_lists(node, depth: int = 0, max_depth: int = 8) -> list[list[di
         return found
     if isinstance(node, list):
         dict_items = [x for x in node if isinstance(x, dict)]
-        if dict_items and sum(_looks_like_record(d) for d in dict_items) >= max(1, len(dict_items) // 2):
+        if dict_items and sum(_looks_like_record(d) for d in dict_items) >= max(
+            1, len(dict_items) // 2
+        ):
             found.append(dict_items)
             return found  # a matched list's own items aren't recursed into
         for item in node:
@@ -201,8 +266,9 @@ def _records(payload) -> list[dict]:
     return merged
 
 
-def parse_json_bytes(raw: bytes, source: Source, region: str,
-                     operator: str | None, origin: str) -> list[Item]:
+def parse_json_bytes(
+    raw: bytes, source: Source, region: str, operator: str | None, origin: str
+) -> list[Item]:
     payload = json.loads(raw)
     site_root = f"{urlsplit(source.url).scheme}://{urlsplit(source.url).netloc}"
     items: list[Item] = []
@@ -237,24 +303,33 @@ def parse_json_bytes(raw: bytes, source: Source, region: str,
             rel = _first(rec, _URL_KEYS)
         if not rel:
             continue
-        url = rel if rel.startswith("http") else urljoin(site_root + "/", rel.lstrip("/"))
-        items.append(Item(
-            title=unescape(title),
-            url=url,
-            source_name=source.name or urlsplit(url).netloc.removeprefix("www."),
-            region=region,
-            operator=operator,
-            published=_parse_date(_first(rec, _DATE_KEYS) or _split_date(rec)),
-            summary=" ".join(_TAG_RE.sub(" ", unescape(_first(rec, _DESC_KEYS))).split())[:600],
-            origin=origin,
-        ))
-    items.sort(key=lambda i: (i.published is not None,
-                             i.published or _EPOCH), reverse=True)
+        url = (
+            rel if rel.startswith("http") else urljoin(site_root + "/", rel.lstrip("/"))
+        )
+        items.append(
+            Item(
+                title=unescape(title),
+                url=url,
+                source_name=source.name or urlsplit(url).netloc.removeprefix("www."),
+                region=region,
+                operator=operator,
+                published=_parse_date(_first(rec, _DATE_KEYS) or _split_date(rec)),
+                summary=" ".join(
+                    _TAG_RE.sub(" ", unescape(_first(rec, _DESC_KEYS))).split()
+                )[:600],
+                origin=origin,
+            )
+        )
+    items.sort(
+        key=lambda i: (i.published is not None, i.published or _EPOCH), reverse=True
+    )
     return items[:MAX_ITEMS]
 
 
-def collect_json(source: Source, region: str, operator: str | None,
-                 origin: str, http_cfg: dict) -> list[Item]:
+def collect_json(
+    source: Source, region: str, operator: str | None, origin: str, http_cfg: dict
+) -> list[Item]:
     from .http import fetch
+
     resp = fetch(source.url, http_cfg, source.timeout_seconds, source.headers)
     return parse_json_bytes(resp.content, source, region, operator, origin)

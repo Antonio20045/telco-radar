@@ -158,6 +158,7 @@ an, dasselbe Muster wie Vodafone B1). Der Parameter `?size=` (robots:
 erlaubt) wuerde dieselbe Karte je Speichergroesse einzeln liefern - die
 Karte steht schon in EINER Antwort, also wird er nicht benutzt.
 """
+
 from __future__ import annotations
 
 import html as html_modul
@@ -184,12 +185,13 @@ _TARIF_RE = re.compile(r"\bmit\s+(?P<tarif>\S.*?)\s*$", re.I)
 
 # window.currentProductVariants[window.productId] = { 'color': 'X', ... }
 _VARIANTE_RE = re.compile(
-    r"window\.currentProductVariants\s*\[[^\]]+\]\s*=\s*\{(?P<rumpf>[^}]*)\}",
-    re.S)
+    r"window\.currentProductVariants\s*\[[^\]]+\]\s*=\s*\{(?P<rumpf>[^}]*)\}", re.S
+)
 _FELD_RE = re.compile(r"['\"](?P<feld>\w+)['\"]\s*:\s*['\"](?P<wert>[^'\"]*)['\"]")
 
 _LAUFZEIT_RE = re.compile(
-    r"window\.currentHardwareOfferDuration\s*=\s*['\"](?P<monate>\d+)['\"]")
+    r"window\.currentHardwareOfferDuration\s*=\s*['\"](?P<monate>\d+)['\"]"
+)
 
 # schema.org/InStock -> lieferbar. Nur die Zustaende, die 1&1 wirklich
 # ausliefert, werden uebersetzt; alles andere ist `unbekannt` und behauptet
@@ -218,8 +220,10 @@ def variante(html: str) -> dict:
     treffer = _VARIANTE_RE.search(html or "")
     if not treffer:
         return {}
-    return {m.group("feld"): m.group("wert")
-            for m in _FELD_RE.finditer(treffer.group("rumpf"))}
+    return {
+        m.group("feld"): m.group("wert")
+        for m in _FELD_RE.finditer(treffer.group("rumpf"))
+    }
 
 
 def laufzeit_monate(html: str) -> Optional[int]:
@@ -264,16 +268,20 @@ def ernte(text: str, basis_url: str, pfadmuster="", kind: str = "") -> list[str]
     Bedeutung wie in `ernte_links`, damit eine Konfiguration den Umfang
     weiter einengen kann, ohne den Adapter anzufassen.
     """
-    muster = ([m for m in pfadmuster if m] if isinstance(pfadmuster, (list, tuple))
-              else ([pfadmuster] if pfadmuster else []))
+    muster = (
+        [m for m in pfadmuster if m]
+        if isinstance(pfadmuster, (list, tuple))
+        else ([pfadmuster] if pfadmuster else [])
+    )
     suppe = BeautifulSoup(text or "", "html.parser")
     out: list[str] = []
     gesehen: set[str] = set()
     for anker in suppe.find_all("a", href=True):
         if _KACHEL_KLASSE not in (anker.get("class") or []):
             continue
-        ziel = urljoin(basis_url or "https://mobile.1und1.de",
-                       anker["href"]).split("#", 1)[0]
+        ziel = urljoin(basis_url or "https://mobile.1und1.de", anker["href"]).split(
+            "#", 1
+        )[0]
         if muster and not all(m in ziel for m in muster):
             continue
         if ziel in gesehen:
@@ -285,9 +293,13 @@ def ernte(text: str, basis_url: str, pfadmuster="", kind: str = "") -> list[str]
         # sichtbarer Zustand ("0 Listungen aus 1 Seite"). Eine Ausnahme
         # machte daraus einen Abruffehler und verwechselte "Seite gelesen,
         # Raster leer" mit "Seite nicht gelesen".
-        log.warning("1&1: %s traegt keine %s-Kachel (%d Bytes) - "
-                    "Raster leer oder Markup geaendert",
-                    basis_url, _KACHEL_KLASSE, len(text or ""))
+        log.warning(
+            "1&1: %s traegt keine %s-Kachel (%d Bytes) - "
+            "Raster leer oder Markup geaendert",
+            basis_url,
+            _KACHEL_KLASSE,
+            len(text or ""),
+        )
     return out
 
 
@@ -308,11 +320,11 @@ _PREISKARTE_ANFANG = "hwdVariantsPrices = {"
 # verwirft die Zubehoer-Schluessel deshalb ueber ihre FORM, nicht ueber
 # ihren (hoeheren) Betrag.
 _PREISKARTE_SCHLUESSEL = re.compile(
-    r"'product-(?P<farbe>[A-Z0-9_]+)-(?P<gb>\d+)':\s*\[\s*(?P<cents>\d+)")
+    r"'product-(?P<farbe>[A-Z0-9_]+)-(?P<gb>\d+)':\s*\[\s*(?P<cents>\d+)"
+)
 
 # Der Tarifname des Bündels, wie die Seite ihn neben dem Preis setzt.
-_TARIF_SPAN_RE = re.compile(
-    r'<span id="tariff-description">([^<]*)</span>')
+_TARIF_SPAN_RE = re.compile(r'<span id="tariff-description">([^<]*)</span>')
 
 # Die Slug des Tarifs aus dem Tarifdetails-Link, den die Seite selbst
 # setzt (`data-iframe="…?chosenTariff=tariff-anf-s-mvl&…"`).
@@ -360,7 +372,8 @@ _EINMALZAHLUNG_ANFANG = "hwdVariantsOneOffPaymentFees = {"
 # und Waehrungszeichen ab.
 _EINMALZAHLUNG_SCHLUESSEL = re.compile(
     r"[\"']product-(?P<farbe>[A-Z0-9_]+)-(?P<gb>\d+)[\"']\s*:\s*"
-    r"[\"'](?P<wert>[^\"']*)[\"']")
+    r"[\"'](?P<wert>[^\"']*)[\"']"
+)
 
 
 def _einmalzahlungen(text: str) -> dict:
@@ -408,8 +421,7 @@ def _tarifname(text: str) -> str:
 # `proben` ist die Schnittstelle der Provider-Probe (FM-2, P5 - siehe
 # Adapter-Docstring in collect/geraete/__init__.py); dieser Adapter
 # traegt keine Feld-Proben hinein.
-def lies_buendel(text: str, url: str = "",
-                 proben: Optional[dict] = None) -> list[dict]:
+def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> list[dict]:
     """Aus einer Geräteseite je SPEICHERGROESSE einen Bündel-Rohsatz.
 
     Die Karte preist den Default-Tarif der Seite (gemessen an zehn Seiten:
@@ -432,12 +444,16 @@ def lies_buendel(text: str, url: str = "",
     if not karte:
         raise GeraeteAbrufFehler(
             f"1&1-Geräteseite ohne hwdVariantsPrices ({len(text or '')} Bytes)"
-            " - kein Bündelkatalog (Markup geändert?)")
+            " - kein Bündelkatalog (Markup geändert?)"
+        )
 
     tarif = tarifname_bereinigt(_tarifname(text))
     if not tarif:
-        log.info("1&1: %s nennt keinen Tarifnamen (tariff-description/"
-                 "Beschreibung) - Bündelsätze verworfen", url)
+        log.info(
+            "1&1: %s nennt keinen Tarifnamen (tariff-description/"
+            "Beschreibung) - Bündelsätze verworfen",
+            url,
+        )
         return []
     slug_treffer = _SLUG_RE.search(text or "")
     tarif_slug = slug_treffer.group(1) if slug_treffer else ""
@@ -469,52 +485,62 @@ def lies_buendel(text: str, url: str = "",
                 # derselbe Preis) - sollte eine Seite es doch tun, steht
                 # es im Protokoll und der ERSTE Eintrag bleibt, statt
                 # still die billigste Farbe zu nehmen.
-                log.warning("1&1: %s trägt zwei Preise für %d GB (%.2f und "
-                            "%.2f) - der erste bleibt", url, gb, vorher[1],
-                            betrag)
+                log.warning(
+                    "1&1: %s trägt zwei Preise für %d GB (%.2f und "
+                    "%.2f) - der erste bleibt",
+                    url,
+                    gb,
+                    vorher[1],
+                    betrag,
+                )
             continue
         gesehen[gb] = (farbe, betrag)
         if not name:
-            continue          # ohne Gerätname kein Titel, also kein Satz
+            continue  # ohne Gerätname kein Titel, also kein Satz
         # DIE EINMALZAHLUNG DES GERAETS, geschluesselt ueber dieselbe
         # Rohschreibweise wie die Preiskarte. Fehlt der Schlussel, bleibt
         # das Feld leer - der Betrag einer ANDEREN Farbe derselben Groesse
         # waere eine Annahme, keine Messung.
         einmalzahlung = einmalzahlungen.get((farbe_roh, gb))
         if einmalzahlungen and einmalzahlung is None:
-            log.info("1&1: %s nennt keine Einmalzahlung für %s/%d GB - "
-                     "Feld bleibt offen", url, farbe_roh, gb)
+            log.info(
+                "1&1: %s nennt keine Einmalzahlung für %s/%d GB - Feld bleibt offen",
+                url,
+                farbe_roh,
+                gb,
+            )
         vorausgewaehlt = str(gb) == vorauswahl
-        out.append({
-            "hw_id": hw_id,
-            "vorausgewaehlt": vorausgewaehlt,
-            # Nur am vorausgewaehlten Satz: der Preis, den die Seite beim
-            # Laden zeigt - MIT einem vorab angehakten Zubehoer-Bundle
-            # (`data-auto-add="true"`, gemessen am Galaxy S26 Ultra: 44,99
-            # gezeigt, 42,99 in der Preiskarte). Er ist KEIN Buendelpreis
-            # und geht in keinen Betrag ein - nur in die Gegenprobe.
-            "angezeigt_monatlich": angezeigt if vorausgewaehlt else None,
-            "titel": " ".join(x for x in (marke, name, f"{gb} GB", farbe)
-                              if x),
-            "farbe": farbe,
-            "speicher_gb": gb,
-            "tarif_name": tarif,
-            # Die Ordnung des Anbieters aus dem Tarifdetails-Link (Modulkopf)
-            "tarif_slug": tarif_slug,
-            # § 13.2: EIN Betrag für Tarif und Gerät - keine Aufspaltung
-            # ohne Beleg (der Datalayer widerspricht sich selbst, Modulkopf).
-            "buendel_monatlich": betrag,
-            # S2-C: die Geräte-Einmalzahlung dieser Variante bei der
-            # 36-Monats-Finanzierung - None heisst "nicht genannt", nicht
-            # "kostet nichts".
-            "geraet_zuzahlung": einmalzahlung,
-            "laufzeit_monate": dauer,
-            # Der Tarifdetails-Link des ANBIETERS, fuer die
-            # Bereitstellungsgebühr (siehe ergaenze_bereitstellungsgebuehr).
-            "tarifdetails_url": tarifdetails,
-            "url": url,
-            "quelle": "einsundeins_buendel",
-        })
+        out.append(
+            {
+                "hw_id": hw_id,
+                "vorausgewaehlt": vorausgewaehlt,
+                # Nur am vorausgewaehlten Satz: der Preis, den die Seite beim
+                # Laden zeigt - MIT einem vorab angehakten Zubehoer-Bundle
+                # (`data-auto-add="true"`, gemessen am Galaxy S26 Ultra: 44,99
+                # gezeigt, 42,99 in der Preiskarte). Er ist KEIN Buendelpreis
+                # und geht in keinen Betrag ein - nur in die Gegenprobe.
+                "angezeigt_monatlich": angezeigt if vorausgewaehlt else None,
+                "titel": " ".join(x for x in (marke, name, f"{gb} GB", farbe) if x),
+                "farbe": farbe,
+                "speicher_gb": gb,
+                "tarif_name": tarif,
+                # Die Ordnung des Anbieters aus dem Tarifdetails-Link (Modulkopf)
+                "tarif_slug": tarif_slug,
+                # § 13.2: EIN Betrag für Tarif und Gerät - keine Aufspaltung
+                # ohne Beleg (der Datalayer widerspricht sich selbst, Modulkopf).
+                "buendel_monatlich": betrag,
+                # S2-C: die Geräte-Einmalzahlung dieser Variante bei der
+                # 36-Monats-Finanzierung - None heisst "nicht genannt", nicht
+                # "kostet nichts".
+                "geraet_zuzahlung": einmalzahlung,
+                "laufzeit_monate": dauer,
+                # Der Tarifdetails-Link des ANBIETERS, fuer die
+                # Bereitstellungsgebühr (siehe ergaenze_bereitstellungsgebuehr).
+                "tarifdetails_url": tarifdetails,
+                "url": url,
+                "quelle": "einsundeins_buendel",
+            }
+        )
     return out
 
 
@@ -530,8 +556,7 @@ def _marke_name(text: str) -> tuple[str, str]:
         if typ != "Product" and not (isinstance(typ, list) and "Product" in typ):
             continue
         marke = knoten.get("brand")
-        marke_name = (marke.get("name") if isinstance(marke, dict)
-                      else marke) or ""
+        marke_name = (marke.get("name") if isinstance(marke, dict) else marke) or ""
         name = str(knoten.get("name") or "").strip()
         if name:
             return str(marke_name).strip(), name
@@ -556,8 +581,7 @@ _GEBUEHR_ABSTAND = 2.0
 # Treffer wird.
 _GEBUEHR_FENSTER = 2000
 _BEREITSTELLUNGS_RE = re.compile(r"Einmalige Bereitstellungsgebühr")
-_MIT_SMARTPHONE_RE = re.compile(
-    r"Tarif mit Smartphone:?\s*</strong>\s*([^<]{1,40})")
+_MIT_SMARTPHONE_RE = re.compile(r"Tarif mit Smartphone:?\s*</strong>\s*([^<]{1,40})")
 
 
 def _tarifdetails_url(text: str, basis_url: str) -> str:
@@ -565,8 +589,9 @@ def _tarifdetails_url(text: str, basis_url: str) -> str:
     treffer = _TARIFDETAILS_RE.search(text or "")
     if not treffer:
         return ""
-    return urljoin(basis_url or "https://mobile.1und1.de",
-                   html_modul.unescape(treffer.group(1)))
+    return urljoin(
+        basis_url or "https://mobile.1und1.de", html_modul.unescape(treffer.group(1))
+    )
 
 
 def bereitstellungsgebuehr(text: str) -> Optional[float]:
@@ -580,15 +605,17 @@ def bereitstellungsgebuehr(text: str) -> Optional[float]:
     anfang = _BEREITSTELLUNGS_RE.search(roh)
     if not anfang:
         return None
-    treffer = _MIT_SMARTPHONE_RE.search(roh, anfang.end(),
-                                        anfang.end() + _GEBUEHR_FENSTER)
+    treffer = _MIT_SMARTPHONE_RE.search(
+        roh, anfang.end(), anfang.end() + _GEBUEHR_FENSTER
+    )
     if not treffer:
         return None
     return zahl(html_modul.unescape(treffer.group(1)))
 
 
-def ergaenze_bereitstellungsgebuehr(hole: Callable, kopfzeilen: dict,
-                                    rohbuendel: list) -> int:
+def ergaenze_bereitstellungsgebuehr(
+    hole: Callable, kopfzeilen: dict, rohbuendel: list
+) -> int:
     """`anschlusspreis` auf bereits gesammelte 1&1-Bündelsätze setzen.
 
     EIN GET JE TARIF-SLUG, nicht je Gerät: Die Gebühr ist tarif- und
@@ -611,7 +638,7 @@ def ergaenze_bereitstellungsgebuehr(hole: Callable, kopfzeilen: dict,
     """
     # Ein Vertreter je Slug: die erste `tarifdetails_url` dieses Slugs.
     vertreter: dict[str, str] = {}
-    for satz in (rohbuendel or []):
+    for satz in rohbuendel or []:
         if satz.get("quelle") != "einsundeins_buendel":
             continue
         if satz.get("anschlusspreis") is not None:
@@ -631,23 +658,33 @@ def ergaenze_bereitstellungsgebuehr(hole: Callable, kopfzeilen: dict,
         letzter = time.monotonic()
         try:
             status, text = hole(adresse, kopfzeilen=kopfzeilen)
-        except Exception:                                 # noqa: BLE001
-            log.info("1&1: Tarifdetails zu %s nicht abrufbar - "
-                     "Bereitstellungsgebühr bleibt offen", slug)
+        except Exception:  # noqa: BLE001
+            log.info(
+                "1&1: Tarifdetails zu %s nicht abrufbar - "
+                "Bereitstellungsgebühr bleibt offen",
+                slug,
+            )
             continue
         if not (200 <= int(status) < 300):
-            log.info("1&1: Tarifdetails zu %s mit HTTP %s - "
-                     "Bereitstellungsgebühr bleibt offen", slug, status)
+            log.info(
+                "1&1: Tarifdetails zu %s mit HTTP %s - "
+                "Bereitstellungsgebühr bleibt offen",
+                slug,
+                status,
+            )
             continue
         gebuehr = bereitstellungsgebuehr(text)
         if gebuehr is None:
-            log.info("1&1: Tarifdetails zu %s nennen keine "
-                     "Bereitstellungsgebühr - Feld bleibt offen", slug)
+            log.info(
+                "1&1: Tarifdetails zu %s nennen keine "
+                "Bereitstellungsgebühr - Feld bleibt offen",
+                slug,
+            )
             continue
         gebuehren[slug] = gebuehr
 
     gesetzt = 0
-    for satz in (rohbuendel or []):
+    for satz in rohbuendel or []:
         if satz.get("quelle") != "einsundeins_buendel":
             continue
         if satz.get("anschlusspreis") is not None:
@@ -731,7 +768,8 @@ TARIFUEBERSICHTEN = (
 # parameter (`tariffChangeUrl`, `optionalPrecedingDocuments`) fuehren nur
 # den Warenkorb zurueck und werden nicht mitgeschickt.
 _RASTER_LINK_RE = re.compile(
-    r'targetpage="(?P<ziel>(?://mobile\.1und1\.de)?/smartphones-[a-z0-9-]+)')
+    r'targetpage="(?P<ziel>(?://mobile\.1und1\.de)?/smartphones-[a-z0-9-]+)'
+)
 
 # Der Tarifdetails-Link je Tarifkachel der Uebersicht: `data-iframe` mit
 # `chosenTariff=` und `title="Tarifdetails <Tarifname>"` im selben Tag.
@@ -755,7 +793,7 @@ HERLEITUNG_TARIFAUFSCHLAG = "tarifaufschlag_aus_tarifraster"
 
 
 def tarifname_bereinigt(name: str) -> str:
-    """"1&1 All-Net-Flat M (50 GB)" -> "1&1 All-Net-Flat M".
+    """ "1&1 All-Net-Flat M (50 GB)" -> "1&1 All-Net-Flat M".
 
     Das Raster haengt das Volumen in Klammern an; der Tarifbestand fuehrt
     den Namen ohne (`/handytarife`), und `tarif_bezug` loest nur den auf.
@@ -780,8 +818,9 @@ def _angezeigter_preis(text: str, hw_id: str) -> Optional[float]:
         return None
     kopf = re.escape(hw_id)
     euro = re.search(rf'id="{kopf}--price__digits">\s*(\d+)\s*<', text or "")
-    cent = re.search(rf'id="{kopf}--price__decimals"[^>]*>\s*([0-9–-]+)\s*<',
-                     text or "")
+    cent = re.search(
+        rf'id="{kopf}--price__decimals"[^>]*>\s*([0-9–-]+)\s*<', text or ""
+    )
     if not (euro and cent):
         return None
     return _cent(euro.group(1), cent.group(1)) / 100.0
@@ -791,8 +830,7 @@ def tarifraster_adressen(text: str, basis_url: str) -> list[str]:
     """Die Geraeteraster, die eine Tarifuebersicht verlinkt."""
     out: list[str] = []
     for treffer in _RASTER_LINK_RE.finditer(text or ""):
-        ziel = urljoin(basis_url or "https://mobile.1und1.de",
-                       treffer.group("ziel"))
+        ziel = urljoin(basis_url or "https://mobile.1und1.de", treffer.group("ziel"))
         if ziel not in out:
             out.append(ziel)
     return out
@@ -810,7 +848,7 @@ def tarifdetails_je_tarif(text: str, basis_url: str) -> dict:
         slug = _SLUG_RE.search(ziel)
         if not slug:
             continue
-        name = tarifname_bereinigt(titel[len("Tarifdetails "):])
+        name = tarifname_bereinigt(titel[len("Tarifdetails ") :])
         out.setdefault(name, (urljoin(basis_url, ziel), slug.group(1)))
     return out
 
@@ -836,24 +874,30 @@ def lies_tarifraster(text: str) -> dict:
             namen.add(tarifname_bereinigt(tarif.group(1)))
         preise[geraet.group(1)] = (
             _cent(euro.group(1), cent.group(1)),
-            int(monate.group(1)) if monate else None)
+            int(monate.group(1)) if monate else None,
+        )
     if not preise:
         raise GeraeteAbrufFehler(
             f"1&1-Geräteraster ohne hardware-box-Kachel "
-            f"({len(text or '')} Bytes) - Markup geändert?")
+            f"({len(text or '')} Bytes) - Markup geändert?"
+        )
     if len(namen) != 1:
-        log.warning("1&1: Geräteraster nennt %d Tarifnamen (%s) - verworfen",
-                    len(namen), ", ".join(sorted(namen)))
-    return {"tarif_name": next(iter(namen)) if len(namen) == 1 else "",
-            "preise": preise}
+        log.warning(
+            "1&1: Geräteraster nennt %d Tarifnamen (%s) - verworfen",
+            len(namen),
+            ", ".join(sorted(namen)),
+        )
+    return {
+        "tarif_name": next(iter(namen)) if len(namen) == 1 else "",
+        "preise": preise,
+    }
 
 
-def _hole_text(hole: Callable, kopfzeilen: dict, adresse: str
-               ) -> Optional[str]:
+def _hole_text(hole: Callable, kopfzeilen: dict, adresse: str) -> Optional[str]:
     """Ein Abruf; None bei Fehler - protokolliert, nie still."""
     try:
         status, text = hole(adresse, kopfzeilen=kopfzeilen)
-    except Exception as exc:                              # noqa: BLE001
+    except Exception as exc:  # noqa: BLE001
         log.warning("1&1: %s nicht abrufbar (%s)", adresse, exc)
         return None
     if not (200 <= int(status) < 300):
@@ -862,8 +906,7 @@ def _hole_text(hole: Callable, kopfzeilen: dict, adresse: str
     return text
 
 
-def ergaenze_tarifstufen(hole: Callable, kopfzeilen: dict,
-                         rohbuendel: list) -> int:
+def ergaenze_tarifstufen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> int:
     """Aus den Default-Tarif-Saetzen die Saetze der uebrigen Tarifstufen.
 
     Rechnung, Gegenprobe und Grenzen stehen im Kopf dieses Abschnitts.
@@ -872,16 +915,23 @@ def ergaenze_tarifstufen(hole: Callable, kopfzeilen: dict,
     an und gibt ihre Zahl zurueck. Ein fehlendes Default-Raster heisst:
     nichts herleiten - ohne die Gegenprobe ist ein Aufschlag keiner.
     """
-    basis = [s for s in (rohbuendel or [])
-             if s.get("quelle") == "einsundeins_buendel"
-             and not s.get("herleitung") and s.get("hw_id")]
+    basis = [
+        s
+        for s in (rohbuendel or [])
+        if s.get("quelle") == "einsundeins_buendel"
+        and not s.get("herleitung")
+        and s.get("hw_id")
+    ]
     if not basis:
         return 0
     basistarife = {s.get("tarif_name") for s in basis}
     if len(basistarife) != 1:
-        log.warning("1&1: Geräteseiten nennen %d Default-Tarife (%s) - "
-                    "keine Tarifstufen hergeleitet", len(basistarife),
-                    ", ".join(sorted(map(str, basistarife))))
+        log.warning(
+            "1&1: Geräteseiten nennen %d Default-Tarife (%s) - "
+            "keine Tarifstufen hergeleitet",
+            len(basistarife),
+            ", ".join(sorted(map(str, basistarife))),
+        )
         return 0
     basistarif = basistarife.pop()
     je_geraet: dict = {}
@@ -914,14 +964,19 @@ def ergaenze_tarifstufen(hole: Callable, kopfzeilen: dict,
             raster.setdefault(gelesen["tarif_name"], (adresse, gelesen))
 
     if basistarif not in raster:
-        log.warning("1&1: kein Geräteraster für den Default-Tarif %s - "
-                    "keine Tarifstufen hergeleitet (%d Raster gelesen)",
-                    basistarif, len(raster))
+        log.warning(
+            "1&1: kein Geräteraster für den Default-Tarif %s - "
+            "keine Tarifstufen hergeleitet (%d Raster gelesen)",
+            basistarif,
+            len(raster),
+        )
         return 0
     _, basisraster = raster[basistarif]
 
-    vorhanden = {(s.get("sku_id"), s.get("tarif_name"),
-                  s.get("laufzeit_monate")) for s in rohbuendel}
+    vorhanden = {
+        (s.get("sku_id"), s.get("tarif_name"), s.get("laufzeit_monate"))
+        for s in rohbuendel
+    }
     neu: list[dict] = []
     for tarif, (adresse, gelesen) in sorted(raster.items()):
         if tarif == basistarif:
@@ -929,24 +984,30 @@ def ergaenze_tarifstufen(hole: Callable, kopfzeilen: dict,
         aufschlaege = {
             hw: preis[0] - basisraster["preise"][hw][0]
             for hw, preis in gelesen["preise"].items()
-            if hw in basisraster["preise"]}
+            if hw in basisraster["preise"]
+        }
         # Einheitlich heisst: an genug Geraeten gemessen gleich. Ein
         # einziges gemeinsames Geraet waere trivial "einheitlich".
-        einheitlich = (len(aufschlaege) >= _MINDEST_GERAETE_EINHEITLICH
-                       and len(set(aufschlaege.values())) == 1)
+        einheitlich = (
+            len(aufschlaege) >= _MINDEST_GERAETE_EINHEITLICH
+            and len(set(aufschlaege.values())) == 1
+        )
         detail_url, slug = details.get(tarif, ("", ""))
         unstimmig = 0
         for hw, saetze in sorted(je_geraet.items()):
             if hw not in aufschlaege:
                 continue
-            vorher = next((s for s in saetze if s.get("vorausgewaehlt")),
-                          None)
+            vorher = next((s for s in saetze if s.get("vorausgewaehlt")), None)
             basis_cent, basis_monate = basisraster["preise"][hw]
             monate = gelesen["preise"][hw][1]
             angezeigt = vorher.get("angezeigt_monatlich") if vorher else None
-            if (angezeigt is None or round(angezeigt * 100) != basis_cent
-                    or monate is None or monate != basis_monate
-                    or monate != vorher.get("laufzeit_monate")):
+            if (
+                angezeigt is None
+                or round(angezeigt * 100) != basis_cent
+                or monate is None
+                or monate != basis_monate
+                or monate != vorher.get("laufzeit_monate")
+            ):
                 unstimmig += 1
                 continue
             ziele = saetze if einheitlich else [vorher]
@@ -956,37 +1017,42 @@ def ergaenze_tarifstufen(hole: Callable, kopfzeilen: dict,
                     continue
                 vorhanden.add(schluessel)
                 cent = round(satz["buendel_monatlich"] * 100) + aufschlaege[hw]
-                kopie = {k: v for k, v in satz.items()
-                         if k not in ("angezeigt_monatlich", "anschlusspreis")}
-                kopie.update({
-                    "tarif_name": tarif,
-                    "tarif_slug": slug,
-                    "tarifdetails_url": detail_url,
-                    "buendel_monatlich": round(cent / 100.0, 2),
-                    "laufzeit_monate": monate,
-                    # Die Einmalzahlungs-Karte der Geraeteseite gehoert zum
-                    # Default-Tarif, und das Raster nennt keine. Ein
-                    # einheitlicher MONATSaufschlag sagt nichts ueber die
-                    # Einmalzahlung eines anderen Tarifs - sie bleibt eine
-                    # benannte Luecke (Clean Code 3), nicht uebertragen.
-                    "geraet_zuzahlung": None,
-                    "herleitung": HERLEITUNG_TARIFAUFSCHLAG,
-                    "url": adresse,
-                    "quelle_url": adresse,
-                })
+                kopie = {
+                    k: v
+                    for k, v in satz.items()
+                    if k not in ("angezeigt_monatlich", "anschlusspreis")
+                }
+                kopie.update(
+                    {
+                        "tarif_name": tarif,
+                        "tarif_slug": slug,
+                        "tarifdetails_url": detail_url,
+                        "buendel_monatlich": round(cent / 100.0, 2),
+                        "laufzeit_monate": monate,
+                        # Die Einmalzahlungs-Karte der Geraeteseite gehoert zum
+                        # Default-Tarif, und das Raster nennt keine. Ein
+                        # einheitlicher MONATSaufschlag sagt nichts ueber die
+                        # Einmalzahlung eines anderen Tarifs - sie bleibt eine
+                        # benannte Luecke (Clean Code 3), nicht uebertragen.
+                        "geraet_zuzahlung": None,
+                        "herleitung": HERLEITUNG_TARIFAUFSCHLAG,
+                        "url": adresse,
+                        "quelle_url": adresse,
+                    }
+                )
                 neu.append(kopie)
-        log.info("1&1: %s - Aufschlag %s, %s%s", tarif,
-                 "einheitlich" if einheitlich else "geräteabhängig",
-                 "alle Speichergrößen" if einheitlich
-                 else "nur die vorausgewählte Größe",
-                 f", {unstimmig} Geräte ohne passende Gegenprobe"
-                 if unstimmig else "")
+        log.info(
+            "1&1: %s - Aufschlag %s, %s%s",
+            tarif,
+            "einheitlich" if einheitlich else "geräteabhängig",
+            "alle Speichergrößen" if einheitlich else "nur die vorausgewählte Größe",
+            f", {unstimmig} Geräte ohne passende Gegenprobe" if unstimmig else "",
+        )
     rohbuendel.extend(neu)
     return len(neu)
 
 
-def ergaenze_buendel(hole: Callable, kopfzeilen: dict,
-                     rohbuendel: list) -> int:
+def ergaenze_buendel(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> int:
     """Der Nachbearbeitungs-Haken: erst die Tarifstufen, dann die
     Bereitstellungsgebühr fuer ALLE Saetze (auch die neuen Tarife).
     Zurueck kommt die Zahl der Saetze mit gesetzter Gebühr."""
@@ -1026,38 +1092,49 @@ def lies(text: str, url: str = "") -> list[dict]:
             # `Listung.__post_init__` wuerde sie ohnehin zurueckweisen.
             # Hier faellt sie mit einer Zeile im Protokoll, statt weiter
             # unten mit einer Ausnahme.
-            log.info("1&1: %s nennt keinen Tarif in der Beschreibung (%r) - "
-                     "Buendelpreis verworfen", url,
-                     str(knoten.get("description"))[:80])
+            log.info(
+                "1&1: %s nennt keinen Tarif in der Beschreibung (%r) - "
+                "Buendelpreis verworfen",
+                url,
+                str(knoten.get("description"))[:80],
+            )
             continue
 
         marke = knoten.get("brand")
-        marke_name = (marke.get("name") if isinstance(marke, dict)
-                      else marke) or ""
+        marke_name = (marke.get("name") if isinstance(marke, dict) else marke) or ""
         name = str(knoten.get("name") or "").strip()
         if not name:
             continue
         speicher = var.get("size")
         farbe = (var.get("color") or "").replace("_", " ").strip().lower()
-        out.append({
-            "titel": " ".join(x for x in (str(marke_name).strip(), name,
-                                          f"{speicher} GB" if speicher else "",
-                                          farbe) if x),
-            # KEIN Barpreis. 1&1 verkauft Geraete nur im Tarifbund; die
-            # Spalte bleibt leer, statt eine Zahl zu bekommen, die es
-            # nicht gibt.
-            "preis": None,
-            "monatspreis": monatspreis,
-            "tarif": tarif,
-            "laufzeit_monate": laufzeit,
-            "waehrung": str(angebot.get("priceCurrency") or "EUR").upper(),
-            "verfuegbarkeit": _verfuegbarkeit(angebot.get("availability")),
-            # Die Kennung, die die Seite selbst fuehrt.
-            "sku": str(knoten.get("sku") or "").strip(),
-            "ean": str(knoten.get("gtin13") or knoten.get("gtin") or "").strip(),
-            "farbe": farbe,
-            "speicher_gb": int(speicher) if str(speicher).isdigit() else None,
-            "url": str(knoten.get("url") or "").strip() or url,
-            "quelle": "einsundeins_buendel",
-        })
+        out.append(
+            {
+                "titel": " ".join(
+                    x
+                    for x in (
+                        str(marke_name).strip(),
+                        name,
+                        f"{speicher} GB" if speicher else "",
+                        farbe,
+                    )
+                    if x
+                ),
+                # KEIN Barpreis. 1&1 verkauft Geraete nur im Tarifbund; die
+                # Spalte bleibt leer, statt eine Zahl zu bekommen, die es
+                # nicht gibt.
+                "preis": None,
+                "monatspreis": monatspreis,
+                "tarif": tarif,
+                "laufzeit_monate": laufzeit,
+                "waehrung": str(angebot.get("priceCurrency") or "EUR").upper(),
+                "verfuegbarkeit": _verfuegbarkeit(angebot.get("availability")),
+                # Die Kennung, die die Seite selbst fuehrt.
+                "sku": str(knoten.get("sku") or "").strip(),
+                "ean": str(knoten.get("gtin13") or knoten.get("gtin") or "").strip(),
+                "farbe": farbe,
+                "speicher_gb": int(speicher) if str(speicher).isdigit() else None,
+                "url": str(knoten.get("url") or "").strip() or url,
+                "quelle": "einsundeins_buendel",
+            }
+        )
     return out

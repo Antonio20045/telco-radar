@@ -9,6 +9,7 @@ gemessen statt behauptet:
 
 Die Tests laufen gegen einen gemockten GitHub-Endpunkt, nie gegen das Netz.
 """
+
 import json
 import time
 from pathlib import Path
@@ -16,11 +17,11 @@ from pathlib import Path
 import pytest
 
 fastapi = pytest.importorskip("fastapi")
-from fastapi.testclient import TestClient          # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
 
-from service.signup import app as app_mod          # noqa: E402
-from service.signup import tokens                  # noqa: E402
-from service.signup.ratelimit import IPBremse      # noqa: E402
+from service.signup import app as app_mod  # noqa: E402
+from service.signup import tokens  # noqa: E402
+from service.signup.ratelimit import IPBremse  # noqa: E402
 
 KEY = "test-token-key"
 PEPPER = "test-pepper"
@@ -35,8 +36,9 @@ def dienst(monkeypatch):
     monkeypatch.setattr(app_mod.einstellungen, "erlaubte_domains", [])
     monkeypatch.setattr(app_mod, "bremse", IPBremse(erlaubt=50))
     gesendet = []
-    monkeypatch.setattr(app_mod, "_dispatch",
-                        lambda e, n: (gesendet.append((e, n)), True)[1])
+    monkeypatch.setattr(
+        app_mod, "_dispatch", lambda e, n: (gesendet.append((e, n)), True)[1]
+    )
     klient = TestClient(app_mod.app)
     klient.gesendet = gesendet
     return klient
@@ -46,24 +48,32 @@ def _anmeldung(klient, **kw):
     nonce = klient.get("/form-token").json()["nonce"]
     # Die Nonce hat ein MINDESTALTER von zwei Sekunden. Statt zu warten wird
     # sie mit einem Ausstellungszeitpunkt in der Vergangenheit gebaut.
-    nonce = tokens.schreibe(KEY, tokens.ZWECK_NONCE, {},
-                            jetzt=time.time() - 30)
-    koerper = {"email": "vorname@beispiel.test", "nonce": nonce,
-               "consent": True, "website": "",
-               "filters": {"regions": ["europa"], "categories": ["tarife"],
-                           "keywords": ["Starlink"]}}
+    nonce = tokens.schreibe(KEY, tokens.ZWECK_NONCE, {}, jetzt=time.time() - 30)
+    koerper = {
+        "email": "vorname@beispiel.test",
+        "nonce": nonce,
+        "consent": True,
+        "website": "",
+        "filters": {
+            "regions": ["europa"],
+            "categories": ["tarife"],
+            "keywords": ["Starlink"],
+        },
+    }
     koerper.update(kw)
     return klient.post("/subscribe", json=koerper)
 
 
 # ==============================================================  Token  ====
 
+
 def test_ein_verfaelschtes_token_faellt_durch():
     token = tokens.schreibe(KEY, tokens.ZWECK_BESTAETIGUNG, {"email": "a@b.de"})
     koerper, signatur = token.split(".")
     with pytest.raises(tokens.TokenFehler):
-        tokens.lies(KEY, tokens.ZWECK_BESTAETIGUNG, f"{koerper}x.{signatur}",
-                    max_alter=3600)
+        tokens.lies(
+            KEY, tokens.ZWECK_BESTAETIGUNG, f"{koerper}x.{signatur}", max_alter=3600
+        )
 
 
 def test_ein_fremder_schluessel_faellt_durch():
@@ -82,72 +92,101 @@ def test_eine_nonce_ist_kein_bestaetigungstoken():
 
 
 def test_ein_abgelaufenes_token_faellt_durch():
-    alt = tokens.schreibe(KEY, tokens.ZWECK_BESTAETIGUNG, {},
-                          jetzt=time.time() - tokens.TTL_BESTAETIGUNG - 10)
+    alt = tokens.schreibe(
+        KEY,
+        tokens.ZWECK_BESTAETIGUNG,
+        {},
+        jetzt=time.time() - tokens.TTL_BESTAETIGUNG - 10,
+    )
     with pytest.raises(tokens.TokenFehler):
-        tokens.lies(KEY, tokens.ZWECK_BESTAETIGUNG, alt,
-                    max_alter=tokens.TTL_BESTAETIGUNG)
+        tokens.lies(
+            KEY, tokens.ZWECK_BESTAETIGUNG, alt, max_alter=tokens.TTL_BESTAETIGUNG
+        )
 
 
 def test_das_ablaufdatum_steht_im_signierten_teil():
     """Ein Ablauf neben der Signatur waere frei aenderbar."""
-    token = tokens.schreibe(KEY, tokens.ZWECK_BESTAETIGUNG, {},
-                            jetzt=time.time() - 1000)
+    token = tokens.schreibe(
+        KEY, tokens.ZWECK_BESTAETIGUNG, {}, jetzt=time.time() - 1000
+    )
     import base64
+
     koerper, signatur = token.split(".")
     daten = json.loads(base64.urlsafe_b64decode(koerper + "==").decode())
-    daten["iat"] = int(time.time())          # "verlaengern"
-    gefaelscht = base64.urlsafe_b64encode(
-        json.dumps(daten, sort_keys=True, separators=(",", ":")).encode()
-    ).decode().rstrip("=")
+    daten["iat"] = int(time.time())  # "verlaengern"
+    gefaelscht = (
+        base64.urlsafe_b64encode(
+            json.dumps(daten, sort_keys=True, separators=(",", ":")).encode()
+        )
+        .decode()
+        .rstrip("=")
+    )
     with pytest.raises(tokens.TokenFehler):
-        tokens.lies(KEY, tokens.ZWECK_BESTAETIGUNG, f"{gefaelscht}.{signatur}",
-                    max_alter=3600)
+        tokens.lies(
+            KEY, tokens.ZWECK_BESTAETIGUNG, f"{gefaelscht}.{signatur}", max_alter=3600
+        )
 
 
 def test_ein_token_aus_der_zukunft_faellt_durch():
     """Entweder eine verstellte Uhr oder ein Versuch, den Ablauf
     auszuhebeln."""
     with pytest.raises(tokens.TokenFehler):
-        tokens.lies(KEY, tokens.ZWECK_BESTAETIGUNG,
-                    tokens.schreibe(KEY, tokens.ZWECK_BESTAETIGUNG, {},
-                                    jetzt=time.time() + 7200),
-                    max_alter=3600)
+        tokens.lies(
+            KEY,
+            tokens.ZWECK_BESTAETIGUNG,
+            tokens.schreibe(
+                KEY, tokens.ZWECK_BESTAETIGUNG, {}, jetzt=time.time() + 7200
+            ),
+            max_alter=3600,
+        )
 
 
 def test_ein_token_traegt_keine_polsterung():
     """Es steht in einem PFADSEGMENT. "=" ist dort zwar zulaessig, aber jedes
     zweite Gateway macht etwas anderes daraus."""
     for i in range(20):
-        token = tokens.schreibe(KEY, tokens.ZWECK_BESTAETIGUNG,
-                                {"email": "a" * i + "@b.de"})
+        token = tokens.schreibe(
+            KEY, tokens.ZWECK_BESTAETIGUNG, {"email": "a" * i + "@b.de"}
+        )
         assert "=" not in token
         assert token.count(".") == 1
 
 
 def test_die_nutzlast_ueberlebt_den_umweg():
-    daten = {"email": "a@b.de", "filters": {"regions": ["europa"]},
-             "consent_version": "2026-08-11"}
-    zurueck = tokens.lies(KEY, tokens.ZWECK_BESTAETIGUNG,
-                          tokens.schreibe(KEY, tokens.ZWECK_BESTAETIGUNG, daten),
-                          max_alter=3600)
+    daten = {
+        "email": "a@b.de",
+        "filters": {"regions": ["europa"]},
+        "consent_version": "2026-08-11",
+    }
+    zurueck = tokens.lies(
+        KEY,
+        tokens.ZWECK_BESTAETIGUNG,
+        tokens.schreibe(KEY, tokens.ZWECK_BESTAETIGUNG, daten),
+        max_alter=3600,
+    )
     assert {k: zurueck[k] for k in daten} == daten
 
 
 # =========================================================  form-token  ====
 
+
 def test_form_token_liefert_eine_pruefbare_nonce(dienst):
     antwort = dienst.get("/form-token")
     assert antwort.status_code == 200
     nonce = antwort.json()["nonce"]
-    daten = tokens.lies(KEY, tokens.ZWECK_NONCE, nonce,
-                        max_alter=tokens.NONCE_MAX,
-                        jetzt=time.time() + tokens.NONCE_MIN + 1)
+    daten = tokens.lies(
+        KEY,
+        tokens.ZWECK_NONCE,
+        nonce,
+        max_alter=tokens.NONCE_MAX,
+        jetzt=time.time() + tokens.NONCE_MIN + 1,
+    )
     assert "iat" in daten
     assert antwort.headers["Referrer-Policy"] == "no-referrer"
 
 
 # ==========================================================  subscribe  ====
+
 
 def test_eine_saubere_anmeldung_loest_send_doi_aus(dienst):
     antwort = _anmeldung(dienst)
@@ -177,8 +216,9 @@ def test_der_honeypot_antwortet_wie_ein_erfolg(dienst):
 
 
 def test_ohne_nonce_passiert_nichts_und_es_sieht_normal_aus(dienst):
-    antwort = dienst.post("/subscribe", json={
-        "email": "a@beispiel.test", "consent": True, "filters": {}})
+    antwort = dienst.post(
+        "/subscribe", json={"email": "a@beispiel.test", "consent": True, "filters": {}}
+    )
     assert antwort.status_code == 202
     assert dienst.gesendet == []
 
@@ -186,9 +226,15 @@ def test_ohne_nonce_passiert_nichts_und_es_sieht_normal_aus(dienst):
 def test_eine_zu_frische_nonce_wird_abgewiesen(dienst):
     """Schneller als zwei Sekunden fuellt kein Mensch ein Formular aus."""
     frisch = tokens.schreibe(KEY, tokens.ZWECK_NONCE, {})
-    antwort = dienst.post("/subscribe", json={
-        "email": "a@beispiel.test", "nonce": frisch, "consent": True,
-        "filters": {}})
+    antwort = dienst.post(
+        "/subscribe",
+        json={
+            "email": "a@beispiel.test",
+            "nonce": frisch,
+            "consent": True,
+            "filters": {},
+        },
+    )
     assert antwort.status_code == 202
     assert dienst.gesendet == []
 
@@ -205,8 +251,12 @@ def test_die_einwilligungsfassung_reist_im_token_mit(dienst):
     heute."""
     _anmeldung(dienst)
     _e, nutzlast = dienst.gesendet[0]
-    daten = tokens.lies(KEY, tokens.ZWECK_BESTAETIGUNG, nutzlast["token"],
-                        max_alter=tokens.TTL_BESTAETIGUNG)
+    daten = tokens.lies(
+        KEY,
+        tokens.ZWECK_BESTAETIGUNG,
+        nutzlast["token"],
+        max_alter=tokens.TTL_BESTAETIGUNG,
+    )
     assert daten["consent_version"]
     assert daten["consent_hash"].startswith("sha256:")
 
@@ -218,26 +268,31 @@ def test_ip_und_browser_reisen_im_token_mit(dienst):
     nichts zu tun hat."""
     _anmeldung(dienst)
     _e, nutzlast = dienst.gesendet[0]
-    daten = tokens.lies(KEY, tokens.ZWECK_BESTAETIGUNG, nutzlast["token"],
-                        max_alter=tokens.TTL_BESTAETIGUNG)
+    daten = tokens.lies(
+        KEY,
+        tokens.ZWECK_BESTAETIGUNG,
+        nutzlast["token"],
+        max_alter=tokens.TTL_BESTAETIGUNG,
+    )
     assert daten["ip_hmac"] and daten["ua_hmac"] and daten["addr_hmac"]
     # ... und zwar als HMAC mit Pepper, nicht als blanker Hash und erst recht
     # nicht im Klartext. Ein blanker SHA-256 ueber eine IPv4 ist auf einem
     # Notebook in Sekunden zurueckgerechnet.
     import hashlib
     from telco_radar.newsletter.subscription import adress_kennwert
+
     assert all(len(daten[f]) == 64 for f in ("ip_hmac", "ua_hmac", "addr_hmac"))
     assert daten["addr_hmac"] == adress_kennwert(PEPPER, "vorname@beispiel.test")
-    assert daten["addr_hmac"] != hashlib.sha256(
-        b"vorname@beispiel.test").hexdigest()
+    assert daten["addr_hmac"] != hashlib.sha256(b"vorname@beispiel.test").hexdigest()
     # Die Adresse selbst steht NUR im Feld `email` - nirgends sonst.
     ohne_email = {k: v for k, v in daten.items() if k != "email"}
     assert "beispiel.test" not in json.dumps(ohne_email)
 
 
 def test_eine_fehlerhafte_eingabe_nennt_alle_gruende(dienst):
-    antwort = _anmeldung(dienst, email="kein-at",
-                         filters={"regions": ["mars"], "keywords": ["ab"]})
+    antwort = _anmeldung(
+        dienst, email="kein-at", filters={"regions": ["mars"], "keywords": ["ab"]}
+    )
     assert antwort.status_code == 400
     assert len(antwort.json()["fehler"]) >= 3
     assert dienst.gesendet == []
@@ -246,13 +301,28 @@ def test_eine_fehlerhafte_eingabe_nennt_alle_gruende(dienst):
 def test_unbekannte_felder_reisen_nicht_mit(dienst):
     """Ohne das Saeubern landet alles, was jemand ins Formular-JSON
     schreibt, signiert im Token und von dort im Store."""
-    _anmeldung(dienst, filters={"regions": ["europa"], "boeses": ["x" * 5000],
-                                "keywords": ["Starlink"]})
+    _anmeldung(
+        dienst,
+        filters={
+            "regions": ["europa"],
+            "boeses": ["x" * 5000],
+            "keywords": ["Starlink"],
+        },
+    )
     _e, nutzlast = dienst.gesendet[0]
-    daten = tokens.lies(KEY, tokens.ZWECK_BESTAETIGUNG, nutzlast["token"],
-                        max_alter=tokens.TTL_BESTAETIGUNG)
-    assert set(daten["filters"]) == {"branches", "regions", "competitors",
-                                     "categories", "keywords"}
+    daten = tokens.lies(
+        KEY,
+        tokens.ZWECK_BESTAETIGUNG,
+        nutzlast["token"],
+        max_alter=tokens.TTL_BESTAETIGUNG,
+    )
+    assert set(daten["filters"]) == {
+        "branches",
+        "regions",
+        "competitors",
+        "categories",
+        "keywords",
+    }
     assert "boeses" not in json.dumps(daten)
 
 
@@ -284,6 +354,7 @@ def test_die_domainliste_weist_neutral_ab(dienst, monkeypatch):
 
 
 # ============================================================  confirm  ====
+
 
 def test_confirm_loest_das_ereignis_aus_und_bestaetigt(dienst):
     _anmeldung(dienst)
@@ -320,10 +391,12 @@ def test_das_token_steht_im_pfad_und_nicht_in_der_query(dienst):
 
 # ========================================================  unsubscribe  ====
 
+
 def test_unsubscribe_bestaetigt_sofort(dienst):
     """Der EINZIGE Abmeldeweg - er muss auch im kalten Zustand tragen."""
-    token = tokens.schreibe(KEY, tokens.ZWECK_ABMELDUNG,
-                            {"sub_id": "sub_1", "addr_hmac": "abc"})
+    token = tokens.schreibe(
+        KEY, tokens.ZWECK_ABMELDUNG, {"sub_id": "sub_1", "addr_hmac": "abc"}
+    )
     antwort = dienst.get(f"/unsubscribe/{token}")
     assert antwort.status_code == 200
     assert "Abgemeldet" in antwort.text
@@ -335,23 +408,30 @@ def test_es_gibt_keinen_post_endpunkt_fuer_rfc_8058(dienst):
     Timeout in den Render-Kaltstart laufen und still fehlschlagen."""
     token = tokens.schreibe(KEY, tokens.ZWECK_ABMELDUNG, {"sub_id": "s"})
     assert dienst.post(f"/unsubscribe/{token}").status_code == 405
-    pfade = {(r.path, tuple(sorted(r.methods))) for r in app_mod.app.routes
-             if hasattr(r, "methods")}
+    pfade = {
+        (r.path, tuple(sorted(r.methods)))
+        for r in app_mod.app.routes
+        if hasattr(r, "methods")
+    }
     assert not any("POST" in m for p, m in pfade if "unsubscribe" in p)
 
 
 def test_ein_abmeldelink_laeuft_nicht_ab(dienst):
     """Ein abgelaufener Abmeldelink waere das Gegenteil von Widerruf: die
     Mail von vor zwei Jahren muss ihn noch tragen."""
-    alt = tokens.schreibe(KEY, tokens.ZWECK_ABMELDUNG, {"sub_id": "s"},
-                          jetzt=time.time() - 3 * 365 * 24 * 3600)
+    alt = tokens.schreibe(
+        KEY,
+        tokens.ZWECK_ABMELDUNG,
+        {"sub_id": "s"},
+        jetzt=time.time() - 3 * 365 * 24 * 3600,
+    )
     assert "Abgemeldet" in dienst.get(f"/unsubscribe/{alt}").text
 
 
 # ============================  die drei tragenden Zusicherungen  ===========
 
-def test_der_dienst_schreibt_nichts_auf_die_platte(dienst, tmp_path,
-                                                   monkeypatch):
+
+def test_der_dienst_schreibt_nichts_auf_die_platte(dienst, tmp_path, monkeypatch):
     """Render Free hat ein ephemeres Dateisystem - und die Architektur
     braucht das gar nicht. Gemessen statt behauptet."""
     monkeypatch.chdir(tmp_path)
@@ -367,8 +447,14 @@ def test_der_dienst_kennt_keinen_versandweg():
     ordner = Path(app_mod.__file__).parent
     for datei in ordner.glob("*.py"):
         quelle = datei.read_text(encoding="utf-8")
-        for verboten in ("smtplib", "brevo", "BREVO", "api.brevo.com",
-                         "sendmail", "starttls"):
+        for verboten in (
+            "smtplib",
+            "brevo",
+            "BREVO",
+            "api.brevo.com",
+            "sendmail",
+            "starttls",
+        ):
             assert verboten not in quelle, f"{datei.name}: {verboten}"
 
 
@@ -381,24 +467,34 @@ def test_das_dispatch_ziel_ist_das_leere_inbox_repo():
     # Begruendung, und die muss den Namen nennen duerfen. Also: keine
     # Zeichenkette im Programmtext nennt das Store-Repo.
     import ast
+
     baum = ast.parse(Path(app_mod.__file__).read_text(encoding="utf-8"))
     # Docstrings sind Dokumentation, kein Programmtext - sie muessen den
     # Namen nennen duerfen, sonst laesst sich die Regel nicht begruenden.
     docs = set()
     for knoten in ast.walk(baum):
-        if isinstance(knoten, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef,
-                               ast.ClassDef)):
+        if isinstance(
+            knoten, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+        ):
             koerper = getattr(knoten, "body", [])
-            if (koerper and isinstance(koerper[0], ast.Expr)
-                    and isinstance(koerper[0].value, ast.Constant)
-                    and isinstance(koerper[0].value.value, str)):
+            if (
+                koerper
+                and isinstance(koerper[0], ast.Expr)
+                and isinstance(koerper[0].value, ast.Constant)
+                and isinstance(koerper[0].value.value, str)
+            ):
                 docs.add(id(koerper[0].value))
-    texte = [k.value for k in ast.walk(baum)
-             if isinstance(k, ast.Constant) and isinstance(k.value, str)
-             and id(k) not in docs]
+    texte = [
+        k.value
+        for k in ast.walk(baum)
+        if isinstance(k, ast.Constant)
+        and isinstance(k.value, str)
+        and id(k) not in docs
+    ]
     assert texte, "keine Zeichenketten gefunden - der Test prueft nichts"
-    assert any("telco-radar-inbox" in t for t in texte), \
+    assert any("telco-radar-inbox" in t for t in texte), (
         "das Inbox-Repo kommt gar nicht vor - der Test prueft nichts"
+    )
     treffer = [t for t in texte if "telco-radar-mail" in t]
     assert not treffer, treffer
 
@@ -414,6 +510,7 @@ def test_alle_antworten_tragen_die_sicherheitskopfzeilen(dienst):
 
 
 # =========================================================  IP-Bremse  =====
+
 
 def test_die_bremse_vergisst_nach_dem_fenster():
     b = IPBremse(erlaubt=2, fenster=100)
@@ -469,11 +566,14 @@ def test_der_preflight_auf_subscribe_wird_beantwortet(dienst):
     """Ein POST mit `content-type: application/json` loest einen Preflight
     aus. Ohne Middleware antwortet FastAPI darauf mit 405 - der eigentliche
     POST wird dann nie abgeschickt."""
-    antwort = dienst.options("/subscribe", headers={
-        "Origin": EIGENE_SEITE,
-        "Access-Control-Request-Method": "POST",
-        "Access-Control-Request-Headers": "content-type",
-    })
+    antwort = dienst.options(
+        "/subscribe",
+        headers={
+            "Origin": EIGENE_SEITE,
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        },
+    )
     assert antwort.status_code == 200, "Preflight abgelehnt"
     assert antwort.headers.get("access-control-allow-origin") == EIGENE_SEITE
     assert "POST" in antwort.headers.get("access-control-allow-methods", "")
@@ -483,8 +583,7 @@ def test_eine_fremde_seite_bekommt_keine_freigabe(dienst):
     """Die Gegenprobe - ohne sie belegen die zwei Tests oben nur, dass
     IRGENDEIN Kopf gesetzt wird. Ein '*' wuerde jeder fremden Seite
     erlauben, das Anmeldeformular in ihrem Namen abzuschicken."""
-    antwort = dienst.get("/form-token",
-                         headers={"Origin": "https://boese.example"})
+    antwort = dienst.get("/form-token", headers={"Origin": "https://boese.example"})
     freigabe = antwort.headers.get("access-control-allow-origin")
     assert freigabe != "https://boese.example"
     assert freigabe != "*"

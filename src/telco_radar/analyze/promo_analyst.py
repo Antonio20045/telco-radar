@@ -16,6 +16,7 @@ fehlender, ungueltiger oder nicht referenzierter Index bleibt einfach leer;
 promo_pipeline.py faellt dann auf die bisherige Markenseiten-URL zurueck -
 keine Verschlechterung gegenueber vorher.
 """
+
 from __future__ import annotations
 
 import json
@@ -39,6 +40,7 @@ class PromoExtractionError(RuntimeError):
     Luecke, die im Presse-Zweig der Seen-Store-Stapelschutz schliesst
     (siehe CLAUDE.md: gescheiterte Stapel duerfen nicht als gelesen gelten).
     """
+
 
 # Harte Obergrenze pro SEITE und Lauf, unabhaengig davon, ob die
 # Prompt-Anweisung (keine SKU-fuer-SKU-Liste) tatsaechlich befolgt wird - eine
@@ -130,7 +132,7 @@ def _format_link_candidates(links: list[dict]) -> str:
         if not href:
             continue
         text = (link.get("text") or "").strip()[:120] or "(kein Text)"
-        lines.append(f"{len(lines) + 1}. \"{text}\" -> {href}")
+        lines.append(f'{len(lines) + 1}. "{text}" -> {href}')
     return "\n".join(lines)
 
 
@@ -158,9 +160,13 @@ def _resolve_link_index(row: dict, links: list[dict]) -> str | None:
     return href or None
 
 
-def extract_promos(brand: str, snapshot_text: str, model: str,
-                   links: list[dict] | None = None,
-                   max_tokens: int = 16000) -> list[dict]:
+def extract_promos(
+    brand: str,
+    snapshot_text: str,
+    model: str,
+    links: list[dict] | None = None,
+    max_tokens: int = 16000,
+) -> list[dict]:
     """LLM-Extraktion.
 
     Rueckgabe: die gefundenen Angebote. Eine LEERE Liste heisst "auf dieser
@@ -200,8 +206,9 @@ def extract_promos(brand: str, snapshot_text: str, model: str,
             "brand": brand,
             "headline": headline,
             "description": str(row.get("description") or "").strip(),
-            "valid_until": (str(row["valid_until"]).strip()
-                           if row.get("valid_until") else None),
+            "valid_until": (
+                str(row["valid_until"]).strip() if row.get("valid_until") else None
+            ),
         }
         if links:
             href = _resolve_link_index(row, links)
@@ -209,7 +216,11 @@ def extract_promos(brand: str, snapshot_text: str, model: str,
                 entry["url"] = href
         out.append(entry)
     if len(out) > _MAX_ENTRIES_PER_PAGE:
-        log.info("Promo-Extraktion (%s): %d Eintraege auf %d gekappt",
-                 brand, len(out), _MAX_ENTRIES_PER_PAGE)
+        log.info(
+            "Promo-Extraktion (%s): %d Eintraege auf %d gekappt",
+            brand,
+            len(out),
+            _MAX_ENTRIES_PER_PAGE,
+        )
         out = out[:_MAX_ENTRIES_PER_PAGE]
     return out

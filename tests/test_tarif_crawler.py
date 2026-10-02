@@ -6,6 +6,7 @@ sonst nur im Kommentar staende: es wird ausschliesslich abgerufen, was auf
 einer konfigurierten Seite als Link stand. Keine geratenen Pfade, keine
 hochgezaehlten Blob-IDs.
 """
+
 from __future__ import annotations
 
 import json
@@ -16,8 +17,17 @@ import pytest
 
 from telco_radar.collect import tarif_crawler
 from telco_radar.collect.tarif_crawler import (
-    Feldaenderung, TarifSpeicher, _sortiere, als_item, dokumentlinks,
-    juengste_fassung, lade_quellen, linktexte, sammle, tarif_id, vergleiche,
+    Feldaenderung,
+    TarifSpeicher,
+    _sortiere,
+    als_item,
+    dokumentlinks,
+    juengste_fassung,
+    lade_quellen,
+    linktexte,
+    sammle,
+    tarif_id,
+    vergleiche,
 )
 from telco_radar.tarif_model import Tarif
 
@@ -42,8 +52,11 @@ HUB = """
 
 
 def test_dokumentlinks_nimmt_nur_passende_pfade():
-    links = dokumentlinks(HUB, "https://www.telekom.de/produktinformationsblatt",
-                          ["/produktinformationsblatt/"])
+    links = dokumentlinks(
+        HUB,
+        "https://www.telekom.de/produktinformationsblatt",
+        ["/produktinformationsblatt/"],
+    )
     assert links == [
         "https://www.telekom.de/produktinformationsblatt/magentamobil-l-20240801",
         "https://www.telekom.de/produktinformationsblatt/magentamobil-basic-20240801",
@@ -51,8 +64,11 @@ def test_dokumentlinks_nimmt_nur_passende_pfade():
 
 
 def test_dokumentlinks_entdoppelt_und_haelt_die_reihenfolge():
-    links = dokumentlinks(HUB, "https://www.telekom.de/produktinformationsblatt",
-                          ["/produktinformationsblatt/"])
+    links = dokumentlinks(
+        HUB,
+        "https://www.telekom.de/produktinformationsblatt",
+        ["/produktinformationsblatt/"],
+    )
     assert len(links) == len(set(links))
 
 
@@ -63,8 +79,9 @@ def test_die_einstiegsseite_selbst_ist_kein_dokument():
 
 
 def test_ohne_muster_zaehlt_jeder_link():
-    links = dokumentlinks('<a href="/a.pdf">a</a><a href="/b">b</a>',
-                          "https://x.de/", [])
+    links = dokumentlinks(
+        '<a href="/a.pdf">a</a><a href="/b">b</a>', "https://x.de/", []
+    )
     assert links == ["https://x.de/a.pdf", "https://x.de/b"]
 
 
@@ -76,16 +93,19 @@ def test_dokumentlinks_vertraegt_leeres_html():
 # Die Tarif-ID
 # --------------------------------------------------------------------------- #
 
+
 def test_tarif_id_ueberlebt_die_jahreszahl():
-    """"O2 Mobile Unlimited M Flex (2026)" und dieselbe Zeile im Folgejahr
+    """ "O2 Mobile Unlimited M Flex (2026)" und dieselbe Zeile im Folgejahr
     sind derselbe Tarif - sonst haette der Diff nie zwei Staende verbunden."""
-    assert (tarif_id("o2", "O2 Mobile Unlimited M Flex (2026)")
-            == tarif_id("o2", "O2 Mobile Unlimited M Flex (2027)"))
+    assert tarif_id("o2", "O2 Mobile Unlimited M Flex (2026)") == tarif_id(
+        "o2", "O2 Mobile Unlimited M Flex (2027)"
+    )
 
 
 def test_tarif_id_trennt_verschiedene_tarife():
-    assert tarif_id("Telekom", "MagentaMobil L") != \
-        tarif_id("Telekom", "MagentaMobil Basic")
+    assert tarif_id("Telekom", "MagentaMobil L") != tarif_id(
+        "Telekom", "MagentaMobil Basic"
+    )
 
 
 def test_tarif_id_trennt_anbieter():
@@ -93,8 +113,9 @@ def test_tarif_id_trennt_anbieter():
 
 
 def test_tarif_id_ist_stabil_ueber_klammerzusatz():
-    assert (tarif_id("Telekom", "MagentaMobil L (Mobilfunk)")
-            == tarif_id("Telekom", "MagentaMobil L"))
+    assert tarif_id("Telekom", "MagentaMobil L (Mobilfunk)") == tarif_id(
+        "Telekom", "MagentaMobil L"
+    )
 
 
 def test_tarif_id_vertraegt_umlaute():
@@ -105,9 +126,14 @@ def test_tarif_id_vertraegt_umlaute():
 # Feld-Diff
 # --------------------------------------------------------------------------- #
 
+
 def _tarif(**kw) -> Tarif:
-    t = Tarif(anbieter="Telekom", name="MagentaMobil L",
-              dokument_url="https://x.de/pib/l", dokument_hash="abc")
+    t = Tarif(
+        anbieter="Telekom",
+        name="MagentaMobil L",
+        dokument_url="https://x.de/pib/l",
+        dokument_hash="abc",
+    )
     for k, v in kw.items():
         setattr(t, k, v)
     return t
@@ -119,20 +145,20 @@ def test_ein_zum_ersten_mal_gelesener_wert_ist_keine_aenderung():
     stillschweigend die Konditionen". Gegenprobe: ein echter Wechsel
     zwischen zwei Werten bleibt eine Aenderung."""
     alt = {"grundgebuehr": 39.99, "datenvolumen_gb": None}
-    assert vergleiche(alt, _tarif(grundgebuehr=39.99,
-                                  datenvolumen_gb=float("inf"))) == []
+    assert (
+        vergleiche(alt, _tarif(grundgebuehr=39.99, datenvolumen_gb=float("inf"))) == []
+    )
     alt = {"grundgebuehr": 39.99, "datenvolumen_gb": 100.0}
-    ae = vergleiche(alt, _tarif(grundgebuehr=39.99,
-                                datenvolumen_gb=float("inf")))
+    ae = vergleiche(alt, _tarif(grundgebuehr=39.99, datenvolumen_gb=float("inf")))
     assert [(a.feld, a.alt, a.neu) for a in ae] == [
-        ("datenvolumen_gb", 100.0, float("inf"))]
+        ("datenvolumen_gb", 100.0, float("inf"))
+    ]
 
 
 def test_geaenderter_preis_wird_erkannt():
     alt = {"grundgebuehr": 59.95, "datenvolumen_gb": 80.0}
     ae = vergleiche(alt, _tarif(grundgebuehr=64.95, datenvolumen_gb=80.0))
-    assert [(a.feld, a.alt, a.neu) for a in ae] == [
-        ("grundgebuehr", 59.95, 64.95)]
+    assert [(a.feld, a.alt, a.neu) for a in ae] == [("grundgebuehr", 59.95, 64.95)]
 
 
 def test_ausgefallenes_feld_ist_keine_aenderung():
@@ -145,14 +171,16 @@ def test_ausgefallenes_feld_ist_keine_aenderung():
 
 
 def test_neu_hinzugekommenes_feld_zaehlt():
-    ae = vergleiche({"grundgebuehr": 59.95},
-                    _tarif(grundgebuehr=59.95, drossel_down=64.0))
+    ae = vergleiche(
+        {"grundgebuehr": 59.95}, _tarif(grundgebuehr=59.95, drossel_down=64.0)
+    )
     assert [a.feld for a in ae] == ["drossel_down"]
 
 
 def test_unendlich_bleibt_unendlich():
-    ae = vergleiche({"datenvolumen_gb": float("inf")},
-                    _tarif(datenvolumen_gb=float("inf")))
+    ae = vergleiche(
+        {"datenvolumen_gb": float("inf")}, _tarif(datenvolumen_gb=float("inf"))
+    )
     assert ae == []
 
 
@@ -162,18 +190,20 @@ def test_lesbare_form_nennt_einheit():
 
 
 def test_lesbare_form_bei_fehlendem_altwert():
-    assert Feldaenderung("drossel_down", None, 64.0).lesbar() == \
-        "Drosselung (Download): nicht angegeben → 64 KBit/s"
+    assert (
+        Feldaenderung("drossel_down", None, 64.0).lesbar()
+        == "Drosselung (Download): nicht angegeben → 64 KBit/s"
+    )
 
 
 def test_unbegrenzt_wird_ausgeschrieben():
-    assert "unbegrenzt" in Feldaenderung(
-        "datenvolumen_gb", float("inf"), 50.0).lesbar()
+    assert "unbegrenzt" in Feldaenderung("datenvolumen_gb", float("inf"), 50.0).lesbar()
 
 
 # --------------------------------------------------------------------------- #
 # A9: der Kleingedruckt-Waechter
 # --------------------------------------------------------------------------- #
+
 
 def test_drosselaenderung_bei_gleichem_preis_ist_kleingedrucktes():
     """Das Akzeptanzkriterium aus A9.
@@ -181,8 +211,10 @@ def test_drosselaenderung_bei_gleichem_preis_ist_kleingedrucktes():
     Eine Drosselgrenze von 80 GB auf 50 GB bei gleichem Preis ist eine
     Preiserhoehung, die nirgends als solche auftaucht.
     """
-    ae = vergleiche({"grundgebuehr": 59.95, "datenvolumen_gb": 80.0},
-                    _tarif(grundgebuehr=59.95, datenvolumen_gb=50.0))
+    ae = vergleiche(
+        {"grundgebuehr": 59.95, "datenvolumen_gb": 80.0},
+        _tarif(grundgebuehr=59.95, datenvolumen_gb=50.0),
+    )
     assert len(ae) == 1
     assert ae[0].ist_kleingedruckt
 
@@ -195,11 +227,16 @@ def test_kleingedrucktes_erreicht_ctm_stufe_drei():
     """Die Meldung muss durch die CTM-Linse auf Stufe 3 (DIREKT) kommen -
     sonst steht der stille Konditionswechsel unter "ferner liefen"."""
     from telco_radar.analyze.ctm import DIREKT, deterministische_stufe, lade_fokus
+
     fokus = lade_fokus(Path(__file__).resolve().parents[1])
     ae = [Feldaenderung("datenvolumen_gb", 80.0, 50.0)]
     item = als_item(_tarif(datenvolumen_gb=50.0), ae, JETZT)
-    h = {"operator": item.operator, "title": item.title,
-         "summary": item.summary, "category": "Tarif/Pricing"}
+    h = {
+        "operator": item.operator,
+        "title": item.title,
+        "summary": item.summary,
+        "category": "Tarif/Pricing",
+    }
     assert deterministische_stufe(h, fokus) == DIREKT
 
 
@@ -231,11 +268,11 @@ def test_item_traegt_origin_und_quelle():
 # Speicher
 # --------------------------------------------------------------------------- #
 
+
 def test_speicher_haelt_ueber_neuladen(tmp_path):
     p = tmp_path / "tarife.jsonl"
     s = TarifSpeicher(p)
-    s.ergaenze({"tarif_id": "telekom:x", "grundgebuehr": 10.0,
-                "dokument_hash": "a"})
+    s.ergaenze({"tarif_id": "telekom:x", "grundgebuehr": 10.0, "dokument_hash": "a"})
     s.speichern()
     assert TarifSpeicher(p).letzter("telekom:x")["grundgebuehr"] == 10.0
 
@@ -266,6 +303,7 @@ def test_speicher_ueberliest_kaputte_zeilen(tmp_path):
 # sammle(): die Regel gegen ID-Enumeration
 # --------------------------------------------------------------------------- #
 
+
 class _Antwort:
     def __init__(self, text="", content=b"", typ="text/html"):
         self.text = text
@@ -293,8 +331,7 @@ EINSTIEG = "https://telekom.de/produktinformationsblatt"
 def _repo(tmp_path: Path, yaml_text: str) -> Path:
     (tmp_path / "config").mkdir(parents=True, exist_ok=True)
     (tmp_path / "data" / "state").mkdir(parents=True, exist_ok=True)
-    (tmp_path / "config" / "tarif_quellen.yaml").write_text(
-        yaml_text, encoding="utf-8")
+    (tmp_path / "config" / "tarif_quellen.yaml").write_text(yaml_text, encoding="utf-8")
     return tmp_path
 
 
@@ -320,13 +357,15 @@ def test_crawler_ruft_nur_verlinkte_adressen_ab(tmp_path):
     Datenbank wird (§ 87b UrhG).
     """
     verlinkt = f"{EINSTIEG}/magentamobil-l-20240801"
-    netz = _Netz({
-        EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
-        verlinkt: _Antwort(_pib_text(), typ="text/plain"),
-        # Die Falle: erreichbar, aber NICHT verlinkt. Ein enumerierender
-        # Crawler wuerde sie finden.
-        f"{EINSTIEG}/magentamobil-l-20240802": _Antwort(_pib_text()),
-    })
+    netz = _Netz(
+        {
+            EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
+            verlinkt: _Antwort(_pib_text(), typ="text/plain"),
+            # Die Falle: erreichbar, aber NICHT verlinkt. Ein enumerierender
+            # Crawler wuerde sie finden.
+            f"{EINSTIEG}/magentamobil-l-20240802": _Antwort(_pib_text()),
+        }
+    )
     root = _repo(tmp_path, CONFIG)
     _, bilanz = sammle(root, {}, jetzt=JETZT, hole=netz)
 
@@ -350,8 +389,12 @@ def test_crawler_haelt_die_obergrenze_ein(tmp_path):
 
 def test_erster_lauf_legt_grundlinie_und_meldet_nichts(tmp_path):
     verlinkt = f"{EINSTIEG}/magentamobil-l-20240801"
-    netz = _Netz({EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
-                  verlinkt: _Antwort(_pib_text(), typ="text/plain")})
+    netz = _Netz(
+        {
+            EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
+            verlinkt: _Antwort(_pib_text(), typ="text/plain"),
+        }
+    )
     root = _repo(tmp_path, CONFIG)
     items, bilanz = sammle(root, {}, jetzt=JETZT, hole=netz)
     assert items == []
@@ -361,31 +404,52 @@ def test_erster_lauf_legt_grundlinie_und_meldet_nichts(tmp_path):
 
 def test_unveraendertes_dokument_erzeugt_keinen_neuen_satz(tmp_path):
     verlinkt = f"{EINSTIEG}/magentamobil-l-20240801"
-    seiten = {EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
-              verlinkt: _Antwort(_pib_text(), typ="text/plain")}
+    seiten = {
+        EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
+        verlinkt: _Antwort(_pib_text(), typ="text/plain"),
+    }
     root = _repo(tmp_path, CONFIG)
     sammle(root, {}, jetzt=JETZT, hole=_Netz(seiten))
     items, bilanz = sammle(root, {}, jetzt=JETZT, hole=_Netz(seiten))
     assert items == []
     assert bilanz["unveraendert"] == 1
-    zeilen = (root / "data" / "state" / "tarife.jsonl").read_text(
-        encoding="utf-8").strip().splitlines()
+    zeilen = (
+        (root / "data" / "state" / "tarife.jsonl")
+        .read_text(encoding="utf-8")
+        .strip()
+        .splitlines()
+    )
     assert len(zeilen) == 1
 
 
 def test_geaendertes_dokument_meldet_den_feld_diff(tmp_path):
     verlinkt = f"{EINSTIEG}/magentamobil-l-20240801"
     root = _repo(tmp_path, CONFIG)
-    sammle(root, {}, jetzt=JETZT, hole=_Netz({
-        EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
-        verlinkt: _Antwort(_pib_text(), typ="text/plain")}))
+    sammle(
+        root,
+        {},
+        jetzt=JETZT,
+        hole=_Netz(
+            {
+                EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
+                verlinkt: _Antwort(_pib_text(), typ="text/plain"),
+            }
+        ),
+    )
 
     # Dasselbe Dokument, aber die Drosselschwelle halbiert.
-    geaendert = _pib_text().replace("Ab Verbrauch von 80 GB",
-                                    "Ab Verbrauch von 40 GB")
-    items, bilanz = sammle(root, {}, jetzt=JETZT, hole=_Netz({
-        EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
-        verlinkt: _Antwort(geaendert, typ="text/plain")}))
+    geaendert = _pib_text().replace("Ab Verbrauch von 80 GB", "Ab Verbrauch von 40 GB")
+    items, bilanz = sammle(
+        root,
+        {},
+        jetzt=JETZT,
+        hole=_Netz(
+            {
+                EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
+                verlinkt: _Antwort(geaendert, typ="text/plain"),
+            }
+        ),
+    )
 
     assert bilanz["geaendert"] == 1
     assert bilanz["kleingedruckt"] == 1
@@ -398,23 +462,42 @@ def test_neues_layout_ohne_wertaenderung_meldet_nichts(tmp_path):
     nicht den Tarif."""
     verlinkt = f"{EINSTIEG}/magentamobil-l-20240801"
     root = _repo(tmp_path, CONFIG)
-    sammle(root, {}, jetzt=JETZT, hole=_Netz({
-        EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
-        verlinkt: _Antwort(_pib_text(), typ="text/plain")}))
+    sammle(
+        root,
+        {},
+        jetzt=JETZT,
+        hole=_Netz(
+            {
+                EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
+                verlinkt: _Antwort(_pib_text(), typ="text/plain"),
+            }
+        ),
+    )
 
     umgebaut = _pib_text() + "\n\nHinweis: Stand der Drucklegung.\n"
-    items, bilanz = sammle(root, {}, jetzt=JETZT, hole=_Netz({
-        EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
-        verlinkt: _Antwort(umgebaut, typ="text/plain")}))
+    items, bilanz = sammle(
+        root,
+        {},
+        jetzt=JETZT,
+        hole=_Netz(
+            {
+                EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
+                verlinkt: _Antwort(umgebaut, typ="text/plain"),
+            }
+        ),
+    )
     assert items == []
     assert bilanz["geaendert"] == 0
 
 
 def test_fremdes_dokument_wird_nicht_als_tarif_gezaehlt(tmp_path):
     verlinkt = f"{EINSTIEG}/agb"
-    netz = _Netz({EINSTIEG: _Antwort(f'<a href="{verlinkt}">AGB</a>'),
-                  verlinkt: _Antwort("Allgemeine Geschäftsbedingungen",
-                                     typ="text/plain")})
+    netz = _Netz(
+        {
+            EINSTIEG: _Antwort(f'<a href="{verlinkt}">AGB</a>'),
+            verlinkt: _Antwort("Allgemeine Geschäftsbedingungen", typ="text/plain"),
+        }
+    )
     root = _repo(tmp_path, CONFIG)
     items, bilanz = sammle(root, {}, jetzt=JETZT, hole=netz)
     assert items == [] and bilanz["gelesen"] == 0
@@ -481,8 +564,7 @@ def test_beleg_deckt_alle_konfigurierten_telekom_einstiege_ab():
     beleg_urls = {r["url"] for r in beleg["requests"]}
 
     fehlend = erwartet - beleg_urls
-    assert not fehlend, (
-        f"Telekom-Einstiegs-URLs ohne Requestbeleg: {fehlend}")
+    assert not fehlend, f"Telekom-Einstiegs-URLs ohne Requestbeleg: {fehlend}"
     # Kriterium 2: jeder Beleg-Eintrag ehrlich, browserlos, HTTP-GET.
     assert beleg["alle_ehrlich"] is True
     for r in beleg["requests"]:
@@ -558,20 +640,26 @@ def test_zwei_dokumente_mit_gleichem_titel_bleiben_getrennt(tmp_path):
     # Zwei Dokumente, gleicher Produktname, verschiedene Werte.
     eins = _pib_text()
     zwei = _pib_text().replace("Ab Verbrauch von 80 GB", "Ab Verbrauch von 30 GB")
-    netz = _Netz({
-        EINSTIEG: _Antwort(f'<a href="{a}">A</a><a href="{b}">B</a>'),
-        a: _Antwort(eins, typ="text/plain"),
-        b: _Antwort(zwei, typ="text/plain"),
-    })
+    netz = _Netz(
+        {
+            EINSTIEG: _Antwort(f'<a href="{a}">A</a><a href="{b}">B</a>'),
+            a: _Antwort(eins, typ="text/plain"),
+            b: _Antwort(zwei, typ="text/plain"),
+        }
+    )
     root = _repo(tmp_path, CONFIG)
     items, bilanz = sammle(root, {}, jetzt=JETZT, hole=netz)
 
     # Beide sind Grundlinie, keines ist eine Aenderung des anderen.
     assert bilanz["grundlinie"] == 2
     assert items == []
-    ids = {json.loads(z)["tarif_id"] for z in
-           (root / "data" / "state" / "tarife.jsonl").read_text(
-               encoding="utf-8").strip().splitlines()}
+    ids = {
+        json.loads(z)["tarif_id"]
+        for z in (root / "data" / "state" / "tarife.jsonl")
+        .read_text(encoding="utf-8")
+        .strip()
+        .splitlines()
+    }
     assert len(ids) == 2
 
 
@@ -580,14 +668,33 @@ def test_dieselbe_adresse_bleibt_eine_versionsfolge(tmp_path):
     darf das nicht kaputtmachen."""
     url = f"{EINSTIEG}/doc-a"
     root = _repo(tmp_path, CONFIG)
-    sammle(root, {}, jetzt=JETZT, hole=_Netz({
-        EINSTIEG: _Antwort(f'<a href="{url}">A</a>'),
-        url: _Antwort(_pib_text(), typ="text/plain")}))
-    items, bilanz = sammle(root, {}, jetzt=JETZT, hole=_Netz({
-        EINSTIEG: _Antwort(f'<a href="{url}">A</a>'),
-        url: _Antwort(_pib_text().replace("Ab Verbrauch von 80 GB",
-                                          "Ab Verbrauch von 30 GB"),
-                      typ="text/plain")}))
+    sammle(
+        root,
+        {},
+        jetzt=JETZT,
+        hole=_Netz(
+            {
+                EINSTIEG: _Antwort(f'<a href="{url}">A</a>'),
+                url: _Antwort(_pib_text(), typ="text/plain"),
+            }
+        ),
+    )
+    items, bilanz = sammle(
+        root,
+        {},
+        jetzt=JETZT,
+        hole=_Netz(
+            {
+                EINSTIEG: _Antwort(f'<a href="{url}">A</a>'),
+                url: _Antwort(
+                    _pib_text().replace(
+                        "Ab Verbrauch von 80 GB", "Ab Verbrauch von 30 GB"
+                    ),
+                    typ="text/plain",
+                ),
+            }
+        ),
+    )
     assert bilanz["geaendert"] == 1
     assert len(items) == 1
 
@@ -612,20 +719,32 @@ def test_von_vier_staenden_bleibt_der_neueste():
     (59,95 EUR) unter einem Hash-Zusatz landete - die Zeitreihe haengt dann
     am toten Produkt.
     """
-    links = [_TELEKOM + s for s in ("magentamobil-l-20170601",
-                                    "magentamobil-l-20180831",
-                                    "magentamobil-l-20220701",
-                                    "magentamobil-l-20240801")]
+    links = [
+        _TELEKOM + s
+        for s in (
+            "magentamobil-l-20170601",
+            "magentamobil-l-20180831",
+            "magentamobil-l-20220701",
+            "magentamobil-l-20240801",
+        )
+    ]
     assert juengste_fassung(links) == [_TELEKOM + "magentamobil-l-20240801"]
 
 
 def test_verschiedene_tarife_bleiben_alle():
     """Gruppiert wird nach Adressstamm, nicht nach Anbieter."""
-    links = [_TELEKOM + s for s in ("magentamobil-s-20240801",
-                                    "magentamobil-m-20240801",
-                                    "magentamobil-m-20180831")]
-    assert juengste_fassung(links) == [_TELEKOM + "magentamobil-s-20240801",
-                                       _TELEKOM + "magentamobil-m-20240801"]
+    links = [
+        _TELEKOM + s
+        for s in (
+            "magentamobil-s-20240801",
+            "magentamobil-m-20240801",
+            "magentamobil-m-20180831",
+        )
+    ]
+    assert juengste_fassung(links) == [
+        _TELEKOM + "magentamobil-s-20240801",
+        _TELEKOM + "magentamobil-m-20240801",
+    ]
 
 
 def test_eine_variante_ist_ein_eigener_tarif():
@@ -634,9 +753,14 @@ def test_eine_variante_ist_ein_eigener_tarif():
     Sie duerfen nicht als aeltere Fassung des Grundtarifs verschwinden -
     ihr Adressstamm ist ein anderer.
     """
-    links = [_TELEKOM + s for s in ("magentamobil-s-20240801",
-                                    "magentamobil-s-flex-20240801",
-                                    "magentamobil-s-young-20251007")]
+    links = [
+        _TELEKOM + s
+        for s in (
+            "magentamobil-s-20240801",
+            "magentamobil-s-flex-20240801",
+            "magentamobil-s-young-20251007",
+        )
+    ]
     assert juengste_fassung(links) == links
 
 
@@ -646,9 +770,11 @@ def test_adressen_ohne_datum_bleiben_unberuehrt():
     Die Reihenfolge bleibt die der Seite - sie ist bei congstar die einzige
     Ordnung, die es gibt, solange `bevorzugt` nichts trifft.
     """
-    links = ["https://static2.o9.de/resource/blob/2241742/x/o2-mobile-m.pdf",
-             "https://www.congstar.de/x/Produktinformationsblatt_549.pdf",
-             "https://www.vodafone.de/x/VF-Mobil-M-Juli-2026.pdf"]
+    links = [
+        "https://static2.o9.de/resource/blob/2241742/x/o2-mobile-m.pdf",
+        "https://www.congstar.de/x/Produktinformationsblatt_549.pdf",
+        "https://www.vodafone.de/x/VF-Mobil-M-Juli-2026.pdf",
+    ]
     assert juengste_fassung(links) == links
 
 
@@ -671,10 +797,14 @@ def test_bevorzugt_findet_den_tarif_in_der_linkbeschriftung():
     Versprechen" sagt alles. Ohne den Text kann die Vorauswahl dort nur
     die Seitenreihenfolge nehmen - und die ist keine Zusage.
     """
-    links = ["https://www.congstar.de/x/Produktinformationsblatt_9001.pdf",
-             "https://www.congstar.de/x/Produktinformationsblatt_549.pdf"]
-    texte = {links[0]: "Produktinformationsblatt Homespot & Go S",
-             links[1]: "Produktinformationsblatt congstar Allnet Flat L"}
+    links = [
+        "https://www.congstar.de/x/Produktinformationsblatt_9001.pdf",
+        "https://www.congstar.de/x/Produktinformationsblatt_549.pdf",
+    ]
+    texte = {
+        links[0]: "Produktinformationsblatt Homespot & Go S",
+        links[1]: "Produktinformationsblatt congstar Allnet Flat L",
+    }
     assert _sortiere(links, ["congstar allnet flat"], texte)[0] == links[1]
     # Ohne die Beschriftung bleibt es bei der Seitenreihenfolge - und die
     # ist bei congstar die einzige Ordnung, die es gibt: die Seite stellt
@@ -686,9 +816,11 @@ def test_linktexte_liest_dieselbe_menge_wie_dokumentlinks():
     """Sonst bekaeme die Vorauswahl eine Beschriftung zu einer Adresse, die
     gar nicht abgerufen werden darf - oder umgekehrt keine zu einer, die es
     darf."""
-    html = ('<a href="/pib/Produktinformationsblatt_1.pdf">Allnet Flat S</a>'
-            '<a href="/agb/">AGB</a>'
-            '<a href="/pib/Produktinformationsblatt_2.pdf">Allnet Flat M</a>')
+    html = (
+        '<a href="/pib/Produktinformationsblatt_1.pdf">Allnet Flat S</a>'
+        '<a href="/agb/">AGB</a>'
+        '<a href="/pib/Produktinformationsblatt_2.pdf">Allnet Flat M</a>'
+    )
     basis = "https://www.congstar.de/produktinformationsblaetter/"
     links = dokumentlinks(html, basis, ["produktinformationsblatt"])
     texte = linktexte(html, basis, ["produktinformationsblatt"])
@@ -706,12 +838,14 @@ def test_ein_einstieg_ohne_dokumentlink_meldet_sich(caplog, tmp_path):
     leeren Rubrik zu unterscheiden.
     """
     import logging
+
     (tmp_path / "config").mkdir()
     (tmp_path / "config" / "tarif_quellen.yaml").write_text(
         "quellen:\n  - anbieter: Telekom\n    einstieg:\n"
         "      - https://www.telekom.de/produktinformationsblatt\n"
         "    pfadmuster:\n      - /produktinformationsblatt/\n",
-        encoding="utf-8")
+        encoding="utf-8",
+    )
 
     class Challenge:
         status_code = 202
@@ -722,7 +856,7 @@ def test_ein_einstieg_ohne_dokumentlink_meldet_sich(caplog, tmp_path):
     with caplog.at_level(logging.WARNING):
         _, bilanz = sammle(tmp_path, {}, hole=lambda u, c: Challenge())
     assert bilanz["ohne_links"] == 1
-    assert bilanz["fehler"] == 0        # es war eben KEIN Fehler
+    assert bilanz["fehler"] == 0  # es war eben KEIN Fehler
     assert "202" in caplog.text and "2048" in caplog.text
 
 
@@ -735,13 +869,18 @@ def test_der_erste_wunsch_frisst_nicht_den_ganzen_einkauf():
     damit NEUNMAL MagentaMobil S und kein einziges Mal M, L, XL oder Basic.
     Dieselbe Ueberlegung wie `_interleave_by_source` in der Pipeline.
     """
-    links = ([f"https://x.de/magentamobil-s-{i}" for i in range(9)]
-             + ["https://x.de/magentamobil-m-1", "https://x.de/magentamobil-l-1"])
-    gereiht = _sortiere(links, ["magentamobil-s-", "magentamobil-m-",
-                                "magentamobil-l-"])
-    assert gereiht[:3] == ["https://x.de/magentamobil-s-0",
-                           "https://x.de/magentamobil-m-1",
-                           "https://x.de/magentamobil-l-1"]
+    links = [f"https://x.de/magentamobil-s-{i}" for i in range(9)] + [
+        "https://x.de/magentamobil-m-1",
+        "https://x.de/magentamobil-l-1",
+    ]
+    gereiht = _sortiere(
+        links, ["magentamobil-s-", "magentamobil-m-", "magentamobil-l-"]
+    )
+    assert gereiht[:3] == [
+        "https://x.de/magentamobil-s-0",
+        "https://x.de/magentamobil-m-1",
+        "https://x.de/magentamobil-l-1",
+    ]
     # Ohne Reihum stuenden hier die naechsten acht S-Dokumente.
     assert gereiht[3] == "https://x.de/magentamobil-s-1"
 
@@ -752,11 +891,16 @@ def test_unerwuenschtes_steht_hinten_und_geht_nicht_verloren():
     Was kein Wunsch trifft, faellt in Seitenreihenfolge ans Ende - es kann
     einen Deckel unterschreiten, aber es verschwindet nicht aus der Liste.
     """
-    links = ["https://x.de/anderes-a", "https://x.de/wunsch-1",
-             "https://x.de/anderes-b"]
-    assert _sortiere(links, ["wunsch"]) == ["https://x.de/wunsch-1",
-                                            "https://x.de/anderes-a",
-                                            "https://x.de/anderes-b"]
+    links = [
+        "https://x.de/anderes-a",
+        "https://x.de/wunsch-1",
+        "https://x.de/anderes-b",
+    ]
+    assert _sortiere(links, ["wunsch"]) == [
+        "https://x.de/wunsch-1",
+        "https://x.de/anderes-a",
+        "https://x.de/anderes-b",
+    ]
 
 
 # --------------------------------------------------------------------------- #
@@ -783,25 +927,35 @@ def _shop_seite(*betraege: str) -> str:
         '"brand": {"name": "1&1"}, '
         '"offers": {"priceCurrency": "EUR", "price": "%s"}}</script>'
         % (name, name, betrag)
-        for name, betrag in zip("SML", betraege))
+        for name, betrag in zip("SML", betraege)
+    )
     return f"<html><body>{knoten}</body></html>"
 
 
 def _staende(root: Path) -> list[dict]:
     pfad = root / "data" / "state" / "tarife.jsonl"
-    return [json.loads(z) for z in pfad.read_text(encoding="utf-8").splitlines()
-            if z.strip()]
+    return [
+        json.loads(z)
+        for z in pfad.read_text(encoding="utf-8").splitlines()
+        if z.strip()
+    ]
 
 
 def test_ldjson_quelle_ruft_ausschliesslich_ihre_einstiegsseite_ab(tmp_path):
     """Kein Link wird geerntet, keine zweite Adresse geholt. Damit ist die
     Regel "nur abrufen, was verlinkt ist" hier trivial erfuellt - abgerufen
     wird genau die Adresse, die in der Konfiguration steht."""
-    netz = _Netz({
-        _SHOP: _Antwort(_shop_seite("14.99", "19.99")
-                        + '<a href="https://www.1und1.de/handytarife-ohne-handy">SIM</a>'),
-        "https://www.1und1.de/handytarife-ohne-handy": _Antwort(_shop_seite("14.99")),
-    })
+    netz = _Netz(
+        {
+            _SHOP: _Antwort(
+                _shop_seite("14.99", "19.99")
+                + '<a href="https://www.1und1.de/handytarife-ohne-handy">SIM</a>'
+            ),
+            "https://www.1und1.de/handytarife-ohne-handy": _Antwort(
+                _shop_seite("14.99")
+            ),
+        }
+    )
     root = _repo(tmp_path, CONFIG_LDJSON)
     _, bilanz = sammle(root, {}, jetzt=JETZT, hole=netz)
     assert netz.abgerufen == [_SHOP]
@@ -827,8 +981,12 @@ def test_pib_satz_bleibt_ein_dokumentsatz(tmp_path):
     """Der Vorgabewert ist `dokument`. Jeder Bestandssatz aus der Zeit vor
     dem 04.09.2026 bleibt beim Wiedereinlesen genau das, was er war."""
     verlinkt = f"{EINSTIEG}/magentamobil-l-20240801"
-    netz = _Netz({EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
-                  verlinkt: _Antwort(_pib_text(), typ="text/plain")})
+    netz = _Netz(
+        {
+            EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
+            verlinkt: _Antwort(_pib_text(), typ="text/plain"),
+        }
+    )
     root = _repo(tmp_path, CONFIG)
     sammle(root, {}, jetzt=JETZT, hole=netz)
     assert _staende(root)[0]["preistyp"] == "dokument"
@@ -856,10 +1014,10 @@ def test_zweiter_lauf_derselben_shop_seite_meldet_nichts(tmp_path):
 
 def test_geaenderter_shop_preis_wird_gemeldet(tmp_path):
     root = _repo(tmp_path, CONFIG_LDJSON)
-    sammle(root, {}, jetzt=JETZT,
-           hole=_Netz({_SHOP: _Antwort(_shop_seite("14.99"))}))
-    items, bilanz = sammle(root, {}, jetzt=JETZT,
-                           hole=_Netz({_SHOP: _Antwort(_shop_seite("12.99"))}))
+    sammle(root, {}, jetzt=JETZT, hole=_Netz({_SHOP: _Antwort(_shop_seite("14.99"))}))
+    items, bilanz = sammle(
+        root, {}, jetzt=JETZT, hole=_Netz({_SHOP: _Antwort(_shop_seite("12.99"))})
+    )
     assert bilanz["geaendert"] == 1
     assert len(items) == 1
     assert "14.99" in items[0].summary and "12.99" in items[0].summary
@@ -896,8 +1054,7 @@ def test_vertippte_methode_wird_laut_und_nicht_zur_vorgabe(tmp_path):
     """Ohne diese Zeile faellt ein Tippfehler erst auf, wenn jemand merkt,
     dass ein Anbieter seit Wochen nichts mehr liefert."""
     netz = _Netz({_SHOP: _Antwort(_shop_seite("14.99"))})
-    root = _repo(tmp_path, CONFIG_LDJSON.replace("methode: ldjson",
-                                                 "methode: ldjsom"))
+    root = _repo(tmp_path, CONFIG_LDJSON.replace("methode: ldjson", "methode: ldjsom"))
     _, bilanz = sammle(root, {}, jetzt=JETZT, hole=netz)
     assert bilanz["fehler"] == 1
     assert netz.abgerufen == []
@@ -905,8 +1062,11 @@ def test_vertippte_methode_wird_laut_und_nicht_zur_vorgabe(tmp_path):
 
 def test_die_ausgelieferte_config_kennt_nur_gebaute_methoden():
     from telco_radar.collect.tarif_crawler import (
-        METHODE_KACHELN, METHODE_LDJSON, METHODEN,
+        METHODE_KACHELN,
+        METHODE_LDJSON,
+        METHODEN,
     )
+
     quellen = lade_quellen(Path(__file__).resolve().parents[1])
     assert {q.methode for q in quellen} <= set(METHODEN)
     einsundeins = [q for q in quellen if q.anbieter == "1&1"]
@@ -922,17 +1082,25 @@ def test_die_ausgelieferte_config_kennt_nur_gebaute_methoden():
     assert {q.methode for q in o2} == {"dokumente", METHODE_KACHELN}
     kacheln = [q for q in o2 if q.methode == METHODE_KACHELN][0]
     assert kacheln.einstieg == [
-        "https://www.o2online.de/tarife/handyvertrag-ohne-handy/"]
+        "https://www.o2online.de/tarife/handyvertrag-ohne-handy/"
+    ]
 
 
 # --------------------------------------------------------------------------
 # Zwei Lesarten sind zwei Zeitreihen
 # --------------------------------------------------------------------------
 
+
 def _stand(name, preistyp, grundgebuehr, laufzeit=None):
     from telco_radar.tarif_model import HOCH, Tarif
-    tarif = Tarif(anbieter="o2", name=name, preistyp=preistyp,
-                  abgerufen_am="2026-09-04", rohtext=f"{name} {grundgebuehr}")
+
+    tarif = Tarif(
+        anbieter="o2",
+        name=name,
+        preistyp=preistyp,
+        abgerufen_am="2026-09-04",
+        rohtext=f"{name} {grundgebuehr}",
+    )
     tarif.confidence["grundgebuehr"] = HOCH
     tarif.grundgebuehr = grundgebuehr
     tarif.laufzeit_monate = laufzeit
@@ -941,13 +1109,19 @@ def _stand(name, preistyp, grundgebuehr, laufzeit=None):
 
 def _lege_ab(speicher, tarif, herkunft, im_lauf=None):
     from telco_radar.collect.tarif_crawler import uebernimm_stand
-    bilanz = {"grundlinie": 0, "unveraendert": 0, "geaendert": 0,
-              "kleingedruckt": 0}
+
+    bilanz = {"grundlinie": 0, "unveraendert": 0, "geaendert": 0, "kleingedruckt": 0}
     items = []
-    uebernimm_stand(tarif, hash_=herkunft, herkunft=herkunft,
-                    speicher=speicher, bilanz=bilanz,
-                    im_lauf=im_lauf if im_lauf is not None else {},
-                    items=items, jetzt=JETZT)
+    uebernimm_stand(
+        tarif,
+        hash_=herkunft,
+        herkunft=herkunft,
+        speicher=speicher,
+        bilanz=bilanz,
+        im_lauf=im_lauf if im_lauf is not None else {},
+        items=items,
+        jetzt=JETZT,
+    )
     return bilanz, items
 
 
@@ -962,22 +1136,28 @@ def test_shop_preis_wird_keine_neue_fassung_des_pflichtblattes(tmp_path):
     """
     from telco_radar.collect.tarif_crawler import TarifSpeicher
     from telco_radar.tarif_model import PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP
+
     speicher = TarifSpeicher(tmp_path / "tarife.jsonl")
 
-    bilanz, _ = _lege_ab(speicher, _stand("O2 Mobile Unlimited M Flex",
-                                          PREISTYP_DOKUMENT, 39.99, 24),
-                         "https://o2.de/blatt.pdf")
+    bilanz, _ = _lege_ab(
+        speicher,
+        _stand("O2 Mobile Unlimited M Flex", PREISTYP_DOKUMENT, 39.99, 24),
+        "https://o2.de/blatt.pdf",
+    )
     assert bilanz["grundlinie"] == 1
 
-    bilanz, items = _lege_ab(speicher, _stand("O2 Mobile Unlimited M Flex",
-                                              PREISTYP_LIVE_SHOP, 39.99),
-                             "kachelhash")
+    bilanz, items = _lege_ab(
+        speicher,
+        _stand("O2 Mobile Unlimited M Flex", PREISTYP_LIVE_SHOP, 39.99),
+        "kachelhash",
+    )
     # Eine eigene Grundlinie - KEINE Aenderungsmeldung.
     assert bilanz["grundlinie"] == 1 and bilanz["geaendert"] == 0
     assert items == []
     assert [s["tarif_id"] for s in speicher.staende] == [
         "o2:o2-mobile-unlimited-m-flex",
-        "o2:o2-mobile-unlimited-m-flex#live_shop"]
+        "o2:o2-mobile-unlimited-m-flex#live_shop",
+    ]
 
 
 def test_der_zusatz_bleibt_ueber_die_laeufe_stabil(tmp_path):
@@ -989,27 +1169,35 @@ def test_der_zusatz_bleibt_ueber_die_laeufe_stabil(tmp_path):
     """
     from telco_radar.collect.tarif_crawler import TarifSpeicher
     from telco_radar.tarif_model import PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP
+
     speicher = TarifSpeicher(tmp_path / "tarife.jsonl")
-    _lege_ab(speicher, _stand("O2 Mobile L", PREISTYP_DOKUMENT, 24.99),
-             "https://o2.de/blatt.pdf")
-    _lege_ab(speicher, _stand("O2 Mobile L", PREISTYP_LIVE_SHOP, 24.99),
-             "hash-eins")
-    bilanz, items = _lege_ab(speicher,
-                             _stand("O2 Mobile L", PREISTYP_LIVE_SHOP, 22.99),
-                             "hash-zwei")
+    _lege_ab(
+        speicher,
+        _stand("O2 Mobile L", PREISTYP_DOKUMENT, 24.99),
+        "https://o2.de/blatt.pdf",
+    )
+    _lege_ab(speicher, _stand("O2 Mobile L", PREISTYP_LIVE_SHOP, 24.99), "hash-eins")
+    bilanz, items = _lege_ab(
+        speicher, _stand("O2 Mobile L", PREISTYP_LIVE_SHOP, 22.99), "hash-zwei"
+    )
     assert bilanz["geaendert"] == 1 and len(items) == 1
     assert [s["tarif_id"] for s in speicher.staende] == [
-        "o2:o2-mobile-l", "o2:o2-mobile-l#live_shop", "o2:o2-mobile-l#live_shop"]
+        "o2:o2-mobile-l",
+        "o2:o2-mobile-l#live_shop",
+        "o2:o2-mobile-l#live_shop",
+    ]
 
 
 def test_dieselbe_lesart_bleibt_eine_zeitreihe(tmp_path):
     """Die Gegenprobe: ohne sie truennte die Regel auch, was zusammengehoert."""
     from telco_radar.collect.tarif_crawler import TarifSpeicher
     from telco_radar.tarif_model import PREISTYP_LIVE_SHOP
+
     speicher = TarifSpeicher(tmp_path / "tarife.jsonl")
     _lege_ab(speicher, _stand("O2 Mobile L", PREISTYP_LIVE_SHOP, 24.99), "a")
-    bilanz, _ = _lege_ab(speicher,
-                         _stand("O2 Mobile L", PREISTYP_LIVE_SHOP, 22.99), "b")
+    bilanz, _ = _lege_ab(
+        speicher, _stand("O2 Mobile L", PREISTYP_LIVE_SHOP, 22.99), "b"
+    )
     assert bilanz["geaendert"] == 1
     assert {s["tarif_id"] for s in speicher.staende} == {"o2:o2-mobile-l"}
 
@@ -1021,14 +1209,15 @@ def _stand_umschreiben(root, **felder):
     pfad.write_text(json.dumps(satz) + "\n", encoding="utf-8")
 
 
-def test_unveraendertes_dokument_fuellt_luecken_eines_aelteren_extraktors(
-        tmp_path):
+def test_unveraendertes_dokument_fuellt_luecken_eines_aelteren_extraktors(tmp_path):
     """Derselbe Hash, aber der alte Stand kannte das Volumen nicht (so
     Vodafone Mobil XL bis P3): das Nachlesen fuellt die Luecke im letzten
     Stand, ohne neuen Satz und ohne Meldung."""
     verlinkt = f"{EINSTIEG}/magentamobil-l-20240801"
-    seiten = {EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
-              verlinkt: _Antwort(_pib_text(), typ="text/plain")}
+    seiten = {
+        EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
+        verlinkt: _Antwort(_pib_text(), typ="text/plain"),
+    }
     root = _repo(tmp_path, CONFIG)
     sammle(root, {}, jetzt=JETZT, hole=_Netz(seiten))
     _stand_umschreiben(root, datenvolumen_gb=None)
@@ -1036,8 +1225,12 @@ def test_unveraendertes_dokument_fuellt_luecken_eines_aelteren_extraktors(
     items, bilanz = sammle(root, {}, jetzt=JETZT, hole=_Netz(seiten))
     assert items == []
     assert bilanz["nachgelesen"] == 1
-    zeilen = (root / "data" / "state" / "tarife.jsonl").read_text(
-        encoding="utf-8").strip().splitlines()
+    zeilen = (
+        (root / "data" / "state" / "tarife.jsonl")
+        .read_text(encoding="utf-8")
+        .strip()
+        .splitlines()
+    )
     assert len(zeilen) == 1
     assert json.loads(zeilen[0])["datenvolumen_gb"] == 80.0
 
@@ -1046,14 +1239,17 @@ def test_nachlesen_ersetzt_keinen_vorhandenen_wert(tmp_path):
     """Gegenprobe: ein Wert, der schon steht, bleibt - auch wenn der
     Extraktor heute etwas anderes liest."""
     verlinkt = f"{EINSTIEG}/magentamobil-l-20240801"
-    seiten = {EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
-              verlinkt: _Antwort(_pib_text(), typ="text/plain")}
+    seiten = {
+        EINSTIEG: _Antwort(f'<a href="{verlinkt}">L</a>'),
+        verlinkt: _Antwort(_pib_text(), typ="text/plain"),
+    }
     root = _repo(tmp_path, CONFIG)
     sammle(root, {}, jetzt=JETZT, hole=_Netz(seiten))
     _stand_umschreiben(root, datenvolumen_gb=70.0)
 
     _, bilanz = sammle(root, {}, jetzt=JETZT, hole=_Netz(seiten))
     assert "nachgelesen" not in bilanz
-    satz = json.loads((root / "data" / "state" / "tarife.jsonl")
-                      .read_text(encoding="utf-8").strip())
+    satz = json.loads(
+        (root / "data" / "state" / "tarife.jsonl").read_text(encoding="utf-8").strip()
+    )
     assert satz["datenvolumen_gb"] == 70.0

@@ -5,6 +5,7 @@ zurueck und bedeutet "gerade voll, frag gleich nochmal". Ein Read-Timeout
 kostet die vollen 180s und bringt nichts. Die alte Logik gab nach 3 Versuchen
 auf - bei den billigen Fehlern viel zu frueh, bei den teuren viel zu spaet.
 """
+
 from __future__ import annotations
 
 import httpx
@@ -18,20 +19,24 @@ def _fast(monkeypatch):
     """Backoff nicht wirklich schlafen, aber die Uhr weiterlaufen lassen."""
     clock = {"t": 0.0}
     monkeypatch.setattr(llm.time, "monotonic", lambda: clock["t"])
-    monkeypatch.setattr(llm.time, "sleep",
-                        lambda s: clock.__setitem__("t", clock["t"] + s))
+    monkeypatch.setattr(
+        llm.time, "sleep", lambda s: clock.__setitem__("t", clock["t"] + s)
+    )
     monkeypatch.setenv("LLM_HTTP_TIMEOUT", "180")
     monkeypatch.setenv("LLM_CALL_BUDGET", "300")
     return clock
 
 
 def _resp(status: int, body: str = "{}"):
-    return httpx.Response(status, text=body,
-                          request=httpx.Request("POST", "https://x/y"))
+    return httpx.Response(
+        status, text=body, request=httpx.Request("POST", "https://x/y")
+    )
 
 
-BUSY = ('{"error":{"message":"ResourceExhausted: Worker local total request '
-        'limit reached (48/48)","type":"Service Unavailable","code":503}}')
+BUSY = (
+    '{"error":{"message":"ResourceExhausted: Worker local total request '
+    'limit reached (48/48)","type":"Service Unavailable","code":503}}'
+)
 
 
 def test_viele_billige_503_werden_durchgehalten(monkeypatch, _fast):
@@ -40,14 +45,15 @@ def test_viele_billige_503_werden_durchgehalten(monkeypatch, _fast):
 
     def post(url, **kw):
         calls["n"] += 1
-        _fast["t"] += 0.4          # ein 503 kommt sofort zurueck
+        _fast["t"] += 0.4  # ein 503 kommt sofort zurueck
         if calls["n"] <= 6:
             return _resp(503, BUSY)
         return _resp(200, '{"choices":[{"message":{"content":"fertig"}}]}')
 
     monkeypatch.setattr(llm.httpx, "post", post)
-    out = llm._post_with_retries("https://x/y", {}, {}, 3,
-                                 lambda d: d["choices"][0]["message"]["content"])
+    out = llm._post_with_retries(
+        "https://x/y", {}, {}, 3, lambda d: d["choices"][0]["message"]["content"]
+    )
     assert out == "fertig"
     assert calls["n"] == 7
 
@@ -58,7 +64,7 @@ def test_langsame_timeouts_brechen_schnell_ab(monkeypatch, _fast):
 
     def post(url, **kw):
         calls["n"] += 1
-        _fast["t"] += 180.0        # volles HTTP-Timeout verbrannt
+        _fast["t"] += 180.0  # volles HTTP-Timeout verbrannt
         raise httpx.ReadTimeout("The read operation timed out")
 
     monkeypatch.setattr(llm.httpx, "post", post)
@@ -100,8 +106,10 @@ def test_timeout_default_ist_nicht_mehr_gesenkt(monkeypatch):
 
 
 # ------------------------------------------------- Leeres Guthaben (402)
-BEZAHLUNG = ('{"error":{"message":"Insufficient Balance","type":'
-             '"unknown_error","code":"invalid_request_error"}}')
+BEZAHLUNG = (
+    '{"error":{"message":"Insufficient Balance","type":'
+    '"unknown_error","code":"invalid_request_error"}}'
+)
 
 
 def test_ein_402_wird_nicht_ein_einziges_mal_wiederholt(monkeypatch, _fast):
@@ -118,22 +126,23 @@ def test_ein_402_wird_nicht_ein_einziges_mal_wiederholt(monkeypatch, _fast):
 
     def post(url, **kw):
         calls["n"] += 1
-        _fast["t"] += 0.8          # ein 402 kommt sofort zurueck: "billig"
+        _fast["t"] += 0.8  # ein 402 kommt sofort zurueck: "billig"
         return _resp(402, BEZAHLUNG)
 
     monkeypatch.setattr(llm.httpx, "post", post)
     with pytest.raises(llm.LLMModelUnavailable):
-        llm._post_with_retries("https://x/y", {}, {}, 5,
-                               lambda d: d["choices"][0]["message"]["content"])
+        llm._post_with_retries(
+            "https://x/y", {}, {}, 5, lambda d: d["choices"][0]["message"]["content"]
+        )
     assert calls["n"] == 1, (
         f"402 wurde {calls['n']}x versucht - ein leeres Konto ist so "
-        f"endgueltig wie ein falscher Schluessel")
+        f"endgueltig wie ein falscher Schluessel"
+    )
 
 
 def test_das_leere_guthaben_nennt_sich_beim_namen(monkeypatch, _fast):
     """Im Protokoll muss stehen, WARUM der Lauf duenn ist."""
-    monkeypatch.setattr(llm.httpx, "post",
-                        lambda url, **kw: _resp(402, BEZAHLUNG))
+    monkeypatch.setattr(llm.httpx, "post", lambda url, **kw: _resp(402, BEZAHLUNG))
     with pytest.raises(llm.LLMModelUnavailable) as fehler:
         llm._post_with_retries("https://x/y", {}, {}, 3, lambda d: d)
     text = str(fehler.value)
@@ -155,8 +164,9 @@ def test_ein_402_laesst_die_anbieterkette_weiterlaufen(monkeypatch, _fast):
     def _dispatch(system, user, candidate, max_tokens, retries):
         gesehen.append(candidate)
         if len(gesehen) == 1:
-            raise llm.LLMModelUnavailable("HTTP 402 Payment Required "
-                                          "(Guthaben aufgebraucht)")
+            raise llm.LLMModelUnavailable(
+                "HTTP 402 Payment Required (Guthaben aufgebraucht)"
+            )
         return "vom zweiten Anbieter"
 
     monkeypatch.setattr(llm, "_dispatch", _dispatch)
@@ -168,6 +178,7 @@ def test_ein_402_laesst_die_anbieterkette_weiterlaufen(monkeypatch, _fast):
         assert gesehen == ["erstes", "zweites"]
         assert "erstes" in llm.dead_models(), (
             "das leere Konto muss fuer den Rest des Laufs vermerkt sein - "
-            "sonst steht der Befund nicht auf transparenz.html")
+            "sonst steht der Befund nicht auf transparenz.html"
+        )
     finally:
         llm._DEAD_MODELS.clear()

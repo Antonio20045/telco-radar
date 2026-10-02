@@ -57,6 +57,7 @@ crawlt seine Geräte-Sitemap (gemessen 29.09.2026: 43 Produktseiten nach
 Ausschluss, Crawl-Abstand 2 s, 45 Abrufe in 88 s); 900 Sekunden reichen
 mit großer Reserve.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -94,7 +95,8 @@ def _hole_mit_beleg(beleg: list):
             resp = getattr(exc, "response", None)
             eintrag["status"] = getattr(resp, "status_code", None)
             eintrag["user_agent"] = (
-                resp.request.headers.get("User-Agent") if resp is not None else None)
+                resp.request.headers.get("User-Agent") if resp is not None else None
+            )
             eintrag["fehler"] = type(exc).__name__
             beleg.append(eintrag)
             raise
@@ -111,19 +113,24 @@ def _nur_congstar(original_lade_quellen):
         quellen = original_lade_quellen(root)
         quellen.anbieter = [a for a in quellen.anbieter if a.name == "congstar"]
         return quellen
+
     return _gefiltert
 
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--root", default=".")
-    p.add_argument("--frist", type=float, default=900.0,
-                   help="Zeitbudget der Geraetestufe in Sekunden")
+    p.add_argument(
+        "--frist",
+        type=float,
+        default=900.0,
+        help="Zeitbudget der Geraetestufe in Sekunden",
+    )
     args = p.parse_args()
 
     logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+        level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
+    )
     log = logging.getLogger("lokallauf_congstar")
 
     root = Path(args.root)
@@ -145,38 +152,63 @@ def main() -> None:
     try:
         geraete_pipeline.lade_quellen = _nur_congstar(geraete_config.lade_quellen)
         bilanz = geraete_pipeline.run_geraete_stage(
-            root, http_cfg, heute, frist_sekunden=args.frist)
+            root, http_cfg, heute, frist_sekunden=args.frist
+        )
     finally:
         _http_mod.fetch = _echter_fetch
-    log.info("Bilanz: %s", {k: v for k, v in bilanz.items()
-                            if k not in ("unbekannte_titel",
-                                         "unbekannte_farben")})
+    log.info(
+        "Bilanz: %s",
+        {
+            k: v
+            for k, v in bilanz.items()
+            if k not in ("unbekannte_titel", "unbekannte_farben")
+        },
+    )
 
-    unehrlich = [e for e in beleg
-                 if not _ist_ehrliche_kennung(e.get("user_agent"))]
+    unehrlich = [e for e in beleg if not _ist_ehrliche_kennung(e.get("user_agent"))]
     beleg_datei = root / "outputs" / f"beleg-congstar-geraete-{heute}.json"
     beleg_datei.parent.mkdir(parents=True, exist_ok=True)
-    beleg_datei.write_text(json.dumps({
-        "datum": heute,
-        "anzahl_requests": len(beleg),
-        "alle_ehrlich": not unehrlich,
-        "requests": beleg,
-    }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    log.info("Laufzeitbeleg geschrieben: %s (%d Requests, alle_ehrlich=%s)",
-             beleg_datei, len(beleg), not unehrlich)
+    beleg_datei.write_text(
+        json.dumps(
+            {
+                "datum": heute,
+                "anzahl_requests": len(beleg),
+                "alle_ehrlich": not unehrlich,
+                "requests": beleg,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    log.info(
+        "Laufzeitbeleg geschrieben: %s (%d Requests, alle_ehrlich=%s)",
+        beleg_datei,
+        len(beleg),
+        not unehrlich,
+    )
     if unehrlich:
-        log.error("BEFUND: %d von %d congstar-Requests wurden NICHT mit "
-                  "TelcoRadar/1.0 gesendet. Details in %s. Das ist ein "
-                  "Abnahme-Befund, kein Erfolg.",
-                  len(unehrlich), len(beleg), beleg_datei)
+        log.error(
+            "BEFUND: %d von %d congstar-Requests wurden NICHT mit "
+            "TelcoRadar/1.0 gesendet. Details in %s. Das ist ein "
+            "Abnahme-Befund, kein Erfolg.",
+            len(unehrlich),
+            len(beleg),
+            beleg_datei,
+        )
     else:
-        log.info("Alle %d congstar-Requests bestaetigt mit ehrlichem "
-                 "TelcoRadar/1.0-Absender, reines HTTP-GET (kein Browser).",
-                 len(beleg))
+        log.info(
+            "Alle %d congstar-Requests bestaetigt mit ehrlichem "
+            "TelcoRadar/1.0-Absender, reines HTTP-GET (kein Browser).",
+            len(beleg),
+        )
 
-    log.info("Fertig. Jetzt rendern (report.html.render_site) und committen -"
-             " dieses Skript tut beides bewusst nicht.")
+    log.info(
+        "Fertig. Jetzt rendern (report.html.render_site) und committen -"
+        " dieses Skript tut beides bewusst nicht."
+    )
 
 
-if __name__ == "__main__":       # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     main()

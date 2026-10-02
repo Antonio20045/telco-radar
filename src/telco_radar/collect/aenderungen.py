@@ -47,6 +47,7 @@ vertretbar. Ein breiter Scrape des gesamten Sortiments waere eine andere
 Frage - dort greift potenziell das Datenbankherstellerrecht nach § 87b UrhG.
 Keine Rechtsberatung; die Ausgestaltung oben ist die Antwort darauf.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -86,15 +87,25 @@ MIND_WERTE = 10
 # auszugeben ist die sicherste Art, den Kanal unbrauchbar zu machen.
 MAX_AENDERUNGEN_JE_SEITE = 12
 
-_ENTFERNEN = ("script", "style", "noscript", "nav", "footer", "header",
-              "svg", "iframe", "form")
+_ENTFERNEN = (
+    "script",
+    "style",
+    "noscript",
+    "nav",
+    "footer",
+    "header",
+    "svg",
+    "iframe",
+    "form",
+)
 
 # Zahlenwerte, auf die es ankommt. Bewusst mit Einheit: eine nackte Zahl auf
 # einer Webseite ist eine Artikelnummer, ein Zaehler oder eine Jahreszahl.
 _WERT = re.compile(
     r"(\d{1,4}(?:[.,]\d{1,2})?)\s?"
     r"(€|EUR|Euro|GB|MB|TB|Mbit/s|MBit/s|GBit/s|Gbit/s|Monate?|Tage?|%)",
-    re.I)
+    re.I,
+)
 
 # Was NIE eine Aenderung im Sinne dieses Radars ist. Ohne diese Liste meldet
 # jeder Abruf eine Aenderung, weil die Seite die Uhrzeit ausgibt.
@@ -147,11 +158,16 @@ def lade_seiten(root: Path) -> list[Tarifseite]:
     if not pfad.exists():
         return []
     daten = yaml.safe_load(pfad.read_text(encoding="utf-8")) or {}
-    return [Tarifseite(marke=str(s.get("marke") or ""),
-                       was=str(s.get("was") or ""),
-                       url=str(s.get("url") or ""),
-                       selector=str(s.get("selector") or ""))
-            for s in (daten.get("seiten") or []) if s.get("url")]
+    return [
+        Tarifseite(
+            marke=str(s.get("marke") or ""),
+            was=str(s.get("was") or ""),
+            url=str(s.get("url") or ""),
+            selector=str(s.get("selector") or ""),
+        )
+        for s in (daten.get("seiten") or [])
+        if s.get("url")
+    ]
 
 
 def _text(html: str, selector: str = "") -> str:
@@ -187,9 +203,10 @@ def werte(text: str, max_werte: int = MAX_WERTE) -> set[str]:
             sauber = muster.sub(" ", sauber)
         sauber = " ".join(sauber.split())
         for treffer in _WERT.finditer(sauber):
-            davor = sauber[:treffer.start()]
-            etikett = " ".join(re.findall(r"[A-Za-zÄÖÜäöüß][\wÄÖÜäöüß.-]*",
-                                          davor)[-4:]).lower()
+            davor = sauber[: treffer.start()]
+            etikett = " ".join(
+                re.findall(r"[A-Za-zÄÖÜäöüß][\wÄÖÜäöüß.-]*", davor)[-4:]
+            ).lower()
             zahl = treffer.group(1).replace(".", "").replace(",", ".")
             einheit = treffer.group(2).lower()
             einheit = _EINHEIT_NORM.get(einheit, einheit)
@@ -228,8 +245,8 @@ class Snapshotspeicher:
     def speichern(self) -> None:
         self.pfad.parent.mkdir(parents=True, exist_ok=True)
         self.pfad.write_text(
-            json.dumps(self.daten, ensure_ascii=False, indent=1),
-            encoding="utf-8")
+            json.dumps(self.daten, ensure_ascii=False, indent=1), encoding="utf-8"
+        )
 
 
 def vergleiche(alt: set[str], neu: set[str]) -> tuple[list[str], list[str]]:
@@ -251,8 +268,11 @@ def als_item(a: Aenderung, stand: datetime) -> Item:
     Seen-Store haette die zweite Preisaenderung fuer eine schon berichtete
     gehalten.
     """
-    titel = (f"{a.seite.marke}: Preise auf der Seite {a.seite.was} geändert"
-             if a.n else f"{a.seite.marke}: {a.seite.was}")
+    titel = (
+        f"{a.seite.marke}: Preise auf der Seite {a.seite.was} geändert"
+        if a.n
+        else f"{a.seite.marke}: {a.seite.was}"
+    )
     teile = []
     if a.dazu:
         teile.append("neu: " + "; ".join(_lesbar(f) for f in a.dazu[:8]))
@@ -265,16 +285,19 @@ def als_item(a: Aenderung, stand: datetime) -> Item:
         region="europe",
         operator=a.seite.marke,
         published=stand,
-        summary=("Auf der Tarifseite haben sich Werte geändert, ohne dass es "
-                 "dazu eine Pressemitteilung gibt. " + " · ".join(teile))[:900],
+        summary=(
+            "Auf der Tarifseite haben sich Werte geändert, ohne dass es "
+            "dazu eine Pressemitteilung gibt. " + " · ".join(teile)
+        )[:900],
         origin="tarif_change",
         source_url=a.seite.url,
         id=a.kennung(),
     )
 
 
-def sammle(root: Path, http_cfg: dict, *, heute: datetime | None = None
-           ) -> tuple[list[Item], dict]:
+def sammle(
+    root: Path, http_cfg: dict, *, heute: datetime | None = None
+) -> tuple[list[Item], dict]:
     """Alle Tarifseiten abrufen, vergleichen, Aenderungen als Items liefern.
 
     Der ERSTE Abruf einer Seite meldet nie etwas - er legt die Grundlinie.
@@ -283,11 +306,17 @@ def sammle(root: Path, http_cfg: dict, *, heute: datetime | None = None
     """
     heute = heute or datetime.now(timezone.utc)
     seiten = lade_seiten(root)
-    speicher = Snapshotspeicher(Path(root) / "data" / "state" /
-                                "tarif_snapshots.json")
-    bilanz = {"seiten": len(seiten), "gelesen": 0, "grundlinie": 0,
-              "geaendert": 0, "umgebaut": 0, "fehler": 0, "ohne_werte": 0,
-              "meldungen": 0}
+    speicher = Snapshotspeicher(Path(root) / "data" / "state" / "tarif_snapshots.json")
+    bilanz = {
+        "seiten": len(seiten),
+        "gelesen": 0,
+        "grundlinie": 0,
+        "geaendert": 0,
+        "umgebaut": 0,
+        "fehler": 0,
+        "ohne_werte": 0,
+        "meldungen": 0,
+    }
     items: list[Item] = []
 
     for seite in seiten:
@@ -296,8 +325,7 @@ def sammle(root: Path, http_cfg: dict, *, heute: datetime | None = None
             aktuell = werte(_text(antwort.text, seite.selector))
         except Exception as exc:  # noqa: BLE001
             bilanz["fehler"] += 1
-            log.info("Tarifseite %s nicht lesbar: %s", seite.url,
-                     str(exc)[:120])
+            log.info("Tarifseite %s nicht lesbar: %s", seite.url, str(exc)[:120])
             continue
         if len(aktuell) < MIND_WERTE:
             # Zu wenige Werte heisst: die Preistabelle baut JavaScript auf,
@@ -306,9 +334,12 @@ def sammle(root: Path, http_cfg: dict, *, heute: datetime | None = None
             # Falschmeldung, die dieser Radar produzieren kann; ihren
             # Prosa-Diff zu melden die zweitteuerste.
             bilanz["ohne_werte"] += 1
-            log.info("Tarifseite %s liefert nur %d Werte (Preistabelle "
-                     "vermutlich per JavaScript) - uebersprungen",
-                     seite.url, len(aktuell))
+            log.info(
+                "Tarifseite %s liefert nur %d Werte (Preistabelle "
+                "vermutlich per JavaScript) - uebersprungen",
+                seite.url,
+                len(aktuell),
+            )
             continue
         bilanz["gelesen"] += 1
 
@@ -325,17 +356,27 @@ def sammle(root: Path, http_cfg: dict, *, heute: datetime | None = None
         if a.n > MAX_AENDERUNGEN_JE_SEITE:
             # Ein Relaunch ist keine Preisaenderung.
             bilanz["umgebaut"] += 1
-            log.info("Tarifseite %s: %d Wertaenderungen - sieht nach Umbau "
-                     "aus, nicht gemeldet", seite.url, a.n)
+            log.info(
+                "Tarifseite %s: %d Wertaenderungen - sieht nach Umbau "
+                "aus, nicht gemeldet",
+                seite.url,
+                a.n,
+            )
             continue
         bilanz["geaendert"] += 1
         items.append(als_item(a, heute))
 
     speicher.speichern()
     bilanz["meldungen"] = len(items)
-    log.info("Aenderungsradar: %d Seiten, %d gelesen, %d Grundlinie, "
-             "%d geaendert, %d Umbau, %d ohne Werte (JavaScript), %d Fehler",
-             bilanz["seiten"], bilanz["gelesen"], bilanz["grundlinie"],
-             bilanz["geaendert"], bilanz["umgebaut"], bilanz["ohne_werte"],
-             bilanz["fehler"])
+    log.info(
+        "Aenderungsradar: %d Seiten, %d gelesen, %d Grundlinie, "
+        "%d geaendert, %d Umbau, %d ohne Werte (JavaScript), %d Fehler",
+        bilanz["seiten"],
+        bilanz["gelesen"],
+        bilanz["grundlinie"],
+        bilanz["geaendert"],
+        bilanz["umgebaut"],
+        bilanz["ohne_werte"],
+        bilanz["fehler"],
+    )
     return items, bilanz

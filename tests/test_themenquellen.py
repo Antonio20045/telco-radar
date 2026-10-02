@@ -11,12 +11,13 @@ denen genau das haengt:
      Watchlist ueberschneiden (Praefix "thema:").
   3. Fehlt die Datei, laeuft alles wie vorher - der Ausbau ist additiv.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
 
 from telco_radar.collect import collect_all, tag_news_regions
-from telco_radar.config import (THEME_PREFIX, is_theme_key, load_config)
+from telco_radar.config import THEME_PREFIX, is_theme_key, load_config
 from telco_radar.models import Item
 
 WATCHLIST = """
@@ -55,7 +56,9 @@ def _projekt(tmp_path: Path, mit_themen: bool = True) -> Path:
     (cfg / "watchlist_extra.yaml").write_text("regions: {}\n", encoding="utf-8")
     (cfg / "news_sources.yaml").write_text(
         'news_sources:\n  - {name: "Fachblatt", type: rss, '
-        'url: "https://presse.example/feed"}\n', encoding="utf-8")
+        'url: "https://presse.example/feed"}\n',
+        encoding="utf-8",
+    )
     if mit_themen:
         (cfg / "tech_sources.yaml").write_text(TECH, encoding="utf-8")
     return tmp_path
@@ -102,9 +105,16 @@ def test_collect_all_nimmt_themenquellen_mit(tmp_path, monkeypatch):
 
     def fake_collect(source, region, operator, origin, http_cfg):
         gesehen.append((source.url, region, origin))
-        return [Item(title="Beispielmeldung mit ausreichender Laenge",
-                     url=source.url + "/1", source_name=source.name,
-                     region=region, operator=operator, origin=origin)]
+        return [
+            Item(
+                title="Beispielmeldung mit ausreichender Laenge",
+                url=source.url + "/1",
+                source_name=source.name,
+                region=region,
+                operator=operator,
+                origin=origin,
+            )
+        ]
 
     monkeypatch.setattr("telco_radar.collect._collect_source", fake_collect)
     items, results = collect_all(cfg, max_workers=1)
@@ -116,8 +126,10 @@ def test_collect_all_nimmt_themenquellen_mit(tmp_path, monkeypatch):
         "https://gsma.example/feed",
     }
     assert themen_jobs["https://openai.example/news.xml"] == ("thema:ki", "tech_watch")
-    assert themen_jobs["https://gsma.example/feed"] == \
-        ("thema:regulierung", "tech_watch")
+    assert themen_jobs["https://gsma.example/feed"] == (
+        "thema:regulierung",
+        "tech_watch",
+    )
     # Betreiber- und Fachpressequellen laufen unveraendert weiter
     assert ("https://example.com/feed", "europe", "operator") in gesehen
     assert ("https://presse.example/feed", "global", "industry_news") in gesehen
@@ -129,12 +141,20 @@ def test_alias_tagging_fasst_themenmeldungen_nicht_an(tmp_path):
     die zufaellig einen Betreibernamen im Titel hat, muss in ihrem Themenfeld
     bleiben - sonst verschwindet sie zwischen den Betreibermeldungen."""
     cfg = load_config(_projekt(tmp_path))
-    thema = Item(title="Beispiel Telco setzt auf neue Chips",
-                 url="https://nvidia.example/1", source_name="Nvidia",
-                 region="thema:ki", origin="tech_watch")
-    presse = Item(title="Beispiel Telco senkt Preise",
-                  url="https://presse.example/1", source_name="Fachblatt",
-                  region="global", origin="industry_news")
+    thema = Item(
+        title="Beispiel Telco setzt auf neue Chips",
+        url="https://nvidia.example/1",
+        source_name="Nvidia",
+        region="thema:ki",
+        origin="tech_watch",
+    )
+    presse = Item(
+        title="Beispiel Telco senkt Preise",
+        url="https://presse.example/1",
+        source_name="Fachblatt",
+        region="global",
+        origin="industry_news",
+    )
 
     tag_news_regions([thema, presse], cfg.operators)
 
@@ -156,10 +176,11 @@ def test_fachpresse_mit_json_api_laeuft_nicht_in_den_rss_parser(tmp_path):
     (cfg_dir / "watchlist.yaml").write_text("regions: {}\n", encoding="utf-8")
     (cfg_dir / "watchlist_extra.yaml").write_text("regions: {}\n", encoding="utf-8")
     (cfg_dir / "news_sources.yaml").write_text(
-        'news_sources:\n'
+        "news_sources:\n"
         '  - {name: "Feed-Presse", type: rss, url: "https://a.de/feed"}\n'
         '  - {name: "JSON-Presse", type: json_api, url: "https://b.de/api"}\n',
-        encoding="utf-8")
+        encoding="utf-8",
+    )
 
     quellen = {s.name: s for s in load_config(tmp_path).news_sources}
     assert quellen["Feed-Presse"].kind == "trade_press"

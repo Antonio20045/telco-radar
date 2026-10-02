@@ -13,6 +13,7 @@ press-release endpoint and turn it into a `json_api` source.
 Usage:
     PLAYWRIGHT_PROXY_SERVER=... python scripts/sniff_xhr.py --names "Jio,TIM" [--timeout 25]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -28,8 +29,18 @@ from telco_radar.config import load_config  # noqa: E402
 
 _BLOCK_TYPES = {"image", "media", "font"}
 _JSON_HINTS = ("json", "javascript")
-_NEWS_HINTS = ("press", "news", "media", "article", "release", "story",
-              "newsroom", "content", "search", "listing")
+_NEWS_HINTS = (
+    "press",
+    "news",
+    "media",
+    "article",
+    "release",
+    "story",
+    "newsroom",
+    "content",
+    "search",
+    "listing",
+)
 
 
 def sniff(url: str, timeout_s: float, ua: str) -> None:
@@ -37,8 +48,13 @@ def sniff(url: str, timeout_s: float, ua: str) -> None:
 
     responses: list[dict] = []
 
-    launch_args = ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu",
-                  "--disable-blink-features=AutomationControlled", "--disable-http2"]
+    launch_args = [
+        "--no-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--disable-blink-features=AutomationControlled",
+        "--disable-http2",
+    ]
     launch_kwargs: dict = {"headless": True, "args": launch_args}
     proxy_server = os.environ.get("PLAYWRIGHT_PROXY_SERVER")
     if proxy_server:
@@ -48,10 +64,17 @@ def sniff(url: str, timeout_s: float, ua: str) -> None:
     with sync_playwright() as p:
         browser = p.chromium.launch(**launch_kwargs)
         try:
-            page = browser.new_page(user_agent=ua, viewport={"width": 1366, "height": 900},
-                                    locale="en-US")
-            page.route("**/*", lambda route: route.abort()
-                      if route.request.resource_type in _BLOCK_TYPES else route.continue_())
+            page = browser.new_page(
+                user_agent=ua, viewport={"width": 1366, "height": 900}, locale="en-US"
+            )
+            page.route(
+                "**/*",
+                lambda route: (
+                    route.abort()
+                    if route.request.resource_type in _BLOCK_TYPES
+                    else route.continue_()
+                ),
+            )
 
             def on_response(resp):
                 try:
@@ -61,18 +84,30 @@ def sniff(url: str, timeout_s: float, ua: str) -> None:
                 rtype = resp.request.resource_type
                 if rtype not in ("xhr", "fetch") and "json" not in ctype:
                     return
-                responses.append({"url": resp.url, "status": resp.status,
-                                  "ctype": ctype, "resp": resp})
+                responses.append(
+                    {
+                        "url": resp.url,
+                        "status": resp.status,
+                        "ctype": ctype,
+                        "resp": resp,
+                    }
+                )
 
             page.on("response", on_response)
             try:
-                page.goto(url, wait_until="domcontentloaded", timeout=int(timeout_s * 1000))
+                page.goto(
+                    url, wait_until="domcontentloaded", timeout=int(timeout_s * 1000)
+                )
             except Exception as exc:  # noqa: BLE001
                 print(f"  goto FAILED: {type(exc).__name__}: {exc}")
             # Click common cookie-consent buttons in case they block XHRs.
-            for sel in ("#onetrust-accept-btn-handler", "button:has-text(\"Accept\")",
-                       "button:has-text(\"Accept All\")", "button:has-text(\"I Agree\")",
-                       "button:has-text(\"Alle akzeptieren\")"):
+            for sel in (
+                "#onetrust-accept-btn-handler",
+                'button:has-text("Accept")',
+                'button:has-text("Accept All")',
+                'button:has-text("I Agree")',
+                'button:has-text("Alle akzeptieren")',
+            ):
                 try:
                     page.click(sel, timeout=1500)
                     break

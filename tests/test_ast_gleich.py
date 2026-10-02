@@ -44,7 +44,9 @@ def test_relative_einrueckung_im_docstring_zaehlt():
 
 def _repo(tmp_path, monkeypatch):
     def git(*argumente):
-        subprocess.run(["git", *argumente], cwd=tmp_path, check=True, capture_output=True)
+        subprocess.run(
+            ["git", *argumente], cwd=tmp_path, check=True, capture_output=True
+        )
 
     git("init", "-q")
     git("config", "user.email", "t@t")

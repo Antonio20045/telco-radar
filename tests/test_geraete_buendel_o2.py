@@ -26,6 +26,7 @@ wird ihm nichts geglaubt, was sich nicht gegen die typisierten Zahlen
 DERSELBEN Antwort nachrechnen laesst - und die Proben sind Bedingung,
 nicht Protokoll. Die Tests unten loesen jede einzeln aus.
 """
+
 import gzip
 import hashlib
 import json
@@ -38,14 +39,15 @@ from telco_radar.collect.geraete import GeraeteAbrufFehler
 from telco_radar.collect.geraete.o2 import lies_buendel
 from telco_radar.tarif_bezug import Tarifbestand
 from telco_radar.tarif_model import HOCH
-from telco_radar.tco_model import (LAUFZEIT_LUECKE, POSTEN_LAUFZEIT,
-                                   TCO_HORIZONT, tco_24)
+from telco_radar.tco_model import LAUFZEIT_LUECKE, POSTEN_LAUFZEIT, TCO_HORIZONT, tco_24
 
 _FIX = Path(__file__).parent / "fixtures" / "geraete"
 _DATEI = "o2_katalog_buendel.json.gz"
-_URL = ("https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/"
-        "ratenzahlung/default/__not-specified__/__not-specified__/"
-        "__not-specified__")
+_URL = (
+    "https://www.o2online.de/e-shop/rest/catalog/o2shop/privatkunden/"
+    "ratenzahlung/default/__not-specified__/__not-specified__/"
+    "__not-specified__"
+)
 
 
 def _katalog() -> str:
@@ -57,39 +59,72 @@ def _saetze():
     return lies_buendel(_katalog(), _URL)
 
 
-def _eintrag(beschreibung="Apple iPhone 15 Pro",
-             angebot="privatkunden-apple-iphone-15-pro-128gb-titan-natur-36xhigh",
-             einmalig=1.0, monatlich=48.99, gesamt=1764.64, anschluss=39.99,
-             dauer="36 Monate", tarif="O<sub>2</sub> Mobile on Demand M Plus",
-             geraet_mtl="34.0", tarif_mtl="14.99", anzahlung="1",
-             anschluss_track="39.99", slug="o2-mobile-on-demand-m-plus"):
+def _eintrag(
+    beschreibung="Apple iPhone 15 Pro",
+    angebot="privatkunden-apple-iphone-15-pro-128gb-titan-natur-36xhigh",
+    einmalig=1.0,
+    monatlich=48.99,
+    gesamt=1764.64,
+    anschluss=39.99,
+    dauer="36 Monate",
+    tarif="O<sub>2</sub> Mobile on Demand M Plus",
+    geraet_mtl="34.0",
+    tarif_mtl="14.99",
+    anzahlung="1",
+    anschluss_track="39.99",
+    slug="o2-mobile-on-demand-m-plus",
+):
     """Ein Katalogeintrag in der Form, die o2 wirklich ausliefert."""
     return {
-        "description": beschreibung, "offerName": angebot,
+        "description": beschreibung,
+        "offerName": angebot,
         "rateDurationValue": dauer,
-        "price": {"oneTimePrice": einmalig, "monthlyPrice": monatlich,
-                  "totalPrice": gesamt, "activationFee": anschluss},
-        "bundle": {"tariffName": tarif,
-                   "tariffOfferName": f"privatkunden-{slug}-online-hwv"},
-        "ecommerceProductValue": {"attributes": {
-            "metric3": geraet_mtl, "metric2": tarif_mtl, "metric5": anzahlung,
-            "metric4": anschluss_track, "dimension59": slug}},
-        "detailWwwAbsoluteCall": {"constantPayload": {"link": {
-            "uri": "https://www.o2online.de/e-shop/apple/x-details?tarif=y"}}},
+        "price": {
+            "oneTimePrice": einmalig,
+            "monthlyPrice": monatlich,
+            "totalPrice": gesamt,
+            "activationFee": anschluss,
+        },
+        "bundle": {
+            "tariffName": tarif,
+            "tariffOfferName": f"privatkunden-{slug}-online-hwv",
+        },
+        "ecommerceProductValue": {
+            "attributes": {
+                "metric3": geraet_mtl,
+                "metric2": tarif_mtl,
+                "metric5": anzahlung,
+                "metric4": anschluss_track,
+                "dimension59": slug,
+            }
+        },
+        "detailWwwAbsoluteCall": {
+            "constantPayload": {
+                "link": {
+                    "uri": "https://www.o2online.de/e-shop/apple/x-details?tarif=y"
+                }
+            }
+        },
     }
 
 
 def _antwort(*eintraege, zustand="BUNDLE"):
-    return json.dumps({
-        "hardware": list(eintraege),
-        "hwCatalogSwitcherStateValue": {
-            "hwOnlyOrBundleSwitcherValue": {
-                "hwOnlyOrBundleState": {"name": zustand}}}})
+    return json.dumps(
+        {
+            "hardware": list(eintraege),
+            "hwCatalogSwitcherStateValue": {
+                "hwOnlyOrBundleSwitcherValue": {
+                    "hwOnlyOrBundleState": {"name": zustand}
+                }
+            },
+        }
+    )
 
 
 # --------------------------------------------------------------------------
 # Die gemessene Antwort
 # --------------------------------------------------------------------------
+
 
 def test_sechsundsechzig_buendel_aus_achtundachtzig_eintraegen():
     """22 der 88 sind Geraet PLUS Zubehoer und fallen heraus."""
@@ -123,10 +158,8 @@ def test_die_aufteilung_ergibt_wieder_den_monatsbetrag():
         h = je_sku[satz["sku"]]
         summe = satz["geraet_monatsrate"] + satz["tarif_monatlich"]
         assert abs(summe - h["price"]["monthlyPrice"]) < 0.005
-        assert abs(satz["geraet_zuzahlung"]
-                   - h["price"]["oneTimePrice"]) < 0.005
-        assert abs(satz["anschlusspreis"]
-                   - h["price"]["activationFee"]) < 0.005
+        assert abs(satz["geraet_zuzahlung"] - h["price"]["oneTimePrice"]) < 0.005
+        assert abs(satz["anschlusspreis"] - h["price"]["activationFee"]) < 0.005
 
 
 def test_der_name_kommt_ohne_markup_an():
@@ -135,13 +168,19 @@ def test_der_name_kommt_ohne_markup_an():
     assert namen == {
         "O2 Mobile L Plus mit 150 GB+ (24 Mon.)",
         "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)",
-        "O2 Mobile on Demand M mit 50 GB+ (24 Mon.)"}
+        "O2 Mobile on Demand M mit 50 GB+ (24 Mon.)",
+    }
     assert not any("<" in n for n in namen)
 
 
 def test_die_fixture_ist_der_unveraenderte_abruf():
-    eintrag = [e for e in json.loads((_FIX / "_herkunft.json").read_text(
-        encoding="utf-8"))["eintraege"] if e["datei"] == _DATEI]
+    eintrag = [
+        e
+        for e in json.loads((_FIX / "_herkunft.json").read_text(encoding="utf-8"))[
+            "eintraege"
+        ]
+        if e["datei"] == _DATEI
+    ]
     assert len(eintrag) == 1
     roh = gzip.open(_FIX / _DATEI, "rb").read()
     assert hashlib.sha256(roh).hexdigest() == eintrag[0]["sha256_roh"]
@@ -155,6 +194,7 @@ def test_die_fixture_ist_der_unveraenderte_abruf():
 # --------------------------------------------------------------------------
 # Was NICHT hereinkommt
 # --------------------------------------------------------------------------
+
 
 def test_eine_hw_only_antwort_wirft_statt_leer_zu_liefern():
     """Ein leeres Ergebnis waere hier die falsche Meldung.
@@ -186,12 +226,15 @@ def test_ohne_tarifnamen_kein_buendel():
     assert lies_buendel(_antwort(_eintrag(tarif=""))) == []
 
 
-@pytest.mark.parametrize("feld,wert", [
-    ("geraet_mtl", "30.0"),        # Summe trifft monthlyPrice nicht mehr
-    ("tarif_mtl", "10.0"),
-    ("anzahlung", "5"),            # widerspricht oneTimePrice
-    ("anschluss_track", "0.0"),    # widerspricht activationFee
-])
+@pytest.mark.parametrize(
+    "feld,wert",
+    [
+        ("geraet_mtl", "30.0"),  # Summe trifft monthlyPrice nicht mehr
+        ("tarif_mtl", "10.0"),
+        ("anzahlung", "5"),  # widerspricht oneTimePrice
+        ("anschluss_track", "0.0"),  # widerspricht activationFee
+    ],
+)
 def test_ein_trackingblock_der_der_preisstruktur_widerspricht_faellt(feld, wert):
     """Jede der drei Proben einzeln ausgeloest.
 
@@ -224,33 +267,48 @@ def test_eine_laufzeit_die_nicht_aufgeht_faellt():
 # Vom Rohsatz zum Buendel
 # --------------------------------------------------------------------------
 
+
 def _bestand():
     """Der Tarifbestand, wie ihn die o2-Kacheln schreiben."""
-    return Tarifbestand([
-        {"tarif_id": "o2:o2-mobile-on-demand-m", "anbieter": "o2",
-         "name": "O2 Mobile on Demand M", "grundgebuehr": 19.99,
-         "buendel_slug": "o2-mobile-on-demand-m-plus"},
-        {"tarif_id": "o2:o2-mobile-l", "anbieter": "o2",
-         "name": "O2 Mobile L", "grundgebuehr": 24.99,
-         "buendel_slug": "o2-mobile-l-plus"},
-    ])
+    return Tarifbestand(
+        [
+            {
+                "tarif_id": "o2:o2-mobile-on-demand-m",
+                "anbieter": "o2",
+                "name": "O2 Mobile on Demand M",
+                "grundgebuehr": 19.99,
+                "buendel_slug": "o2-mobile-on-demand-m-plus",
+            },
+            {
+                "tarif_id": "o2:o2-mobile-l",
+                "anbieter": "o2",
+                "name": "O2 Mobile L",
+                "grundgebuehr": 24.99,
+                "buendel_slug": "o2-mobile-l-plus",
+            },
+        ]
+    )
 
 
 def _rohsatz(**kw):
-    satz = {"sku_id": "apple-iphone-15-pro-128gb-titan-natur",
-            "anbieter": "o2",
-            "tarif_name": "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)",
-            "tarif_slug": "o2-mobile-on-demand-m-plus",
-            "tarif_monatlich": 14.99, "geraet_zuzahlung": 1.0,
-            "geraet_monatsrate": 34.0, "anschlusspreis": 39.99,
-            "laufzeit_monate": 36,
-            "quelle_url": "https://www.o2online.de/e-shop/apple/x-details",
-            # `lies_buendel` setzt dieses Flag auf JEDEM echten Rohsatz (o2
-            # nennt seinen eigenen Nachlass einen Rabatt) - der Standard
-            # hier bildet das nach. Seit P0-B-fix1 WERTET diese Stufe es
-            # nicht mehr aus: o2s -5 EUR sind kein bedingter Nachlass,
-            # sondern der Preis (Modulkopf `tco_buendel.py`).
-            "tarif_rabatt_beleg": True}
+    satz = {
+        "sku_id": "apple-iphone-15-pro-128gb-titan-natur",
+        "anbieter": "o2",
+        "tarif_name": "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)",
+        "tarif_slug": "o2-mobile-on-demand-m-plus",
+        "tarif_monatlich": 14.99,
+        "geraet_zuzahlung": 1.0,
+        "geraet_monatsrate": 34.0,
+        "anschlusspreis": 39.99,
+        "laufzeit_monate": 36,
+        "quelle_url": "https://www.o2online.de/e-shop/apple/x-details",
+        # `lies_buendel` setzt dieses Flag auf JEDEM echten Rohsatz (o2
+        # nennt seinen eigenen Nachlass einen Rabatt) - der Standard
+        # hier bildet das nach. Seit P0-B-fix1 WERTET diese Stufe es
+        # nicht mehr aus: o2s -5 EUR sind kein bedingter Nachlass,
+        # sondern der Preis (Modulkopf `tco_buendel.py`).
+        "tarif_rabatt_beleg": True,
+    }
     satz.update(kw)
     return satz
 
@@ -275,9 +333,10 @@ def test_ohne_aufloesbaren_tarif_wird_verworfen_und_gezaehlt():
     bleiben.
     """
     bilanz = aus_rohsaetzen(
-        [_rohsatz(), _rohsatz(tarif_slug="gibts-nicht",
-                              tarif_name="O2 Irgendwas")],
-        _bestand(), "2026-09-04")
+        [_rohsatz(), _rohsatz(tarif_slug="gibts-nicht", tarif_name="O2 Irgendwas")],
+        _bestand(),
+        "2026-09-04",
+    )
     assert len(bilanz.buendel) == 1
     assert bilanz.ohne_tarif == 1
     assert bilanz.offene_tarife == {"O2 Irgendwas": 1}
@@ -293,7 +352,9 @@ def test_ohne_sku_wird_verworfen():
 def test_ein_unmoeglicher_posten_kostet_nicht_die_uebrigen():
     bilanz = aus_rohsaetzen(
         [_rohsatz(), _rohsatz(geraet_monatsrate=-1.0), "kein dict"],
-        _bestand(), "2026-09-04")
+        _bestand(),
+        "2026-09-04",
+    )
     assert len(bilanz.buendel) == 1
     assert bilanz.ungueltig == 2
 
@@ -321,8 +382,9 @@ def test_die_rechenprobe_der_tco_am_echten_satz():
     assert buendel.tarif_monatlich == pytest.approx(14.99, abs=0.005)
     tco = tco_24(buendel)
     assert tco.belastbar
-    assert tco.gesamt == pytest.approx(1.0 + TCO_HORIZONT * 14.99 + 36 * 34.0
-                                       + 39.99, abs=0.005)
+    assert tco.gesamt == pytest.approx(
+        1.0 + TCO_HORIZONT * 14.99 + 36 * 34.0 + 39.99, abs=0.005
+    )
     assert tco.gesamt == pytest.approx(1624.75, abs=0.005)
     assert tco.restbetrag == pytest.approx(408.0, abs=0.005)
 
@@ -371,7 +433,9 @@ def test_ein_rohsatz_ohne_laufzeit_verschmilzt_nicht_mit_dem_24er_angebot():
     """
     bilanz = aus_rohsaetzen(
         [_rohsatz(laufzeit_monate=None), _rohsatz(laufzeit_monate=24)],
-        _bestand(), "2026-09-04")
+        _bestand(),
+        "2026-09-04",
+    )
     assert len(bilanz.buendel) == 2
     ohne, echt = bilanz.buendel
     assert ohne.laufzeit_monate is None
@@ -394,8 +458,10 @@ def test_ein_rohsatz_ohne_laufzeit_verschmilzt_nicht_mit_dem_24er_angebot():
 
 def test_der_ganze_weg_an_der_echten_antwort():
     """Vom gespeicherten Abruf bis zur rechenbaren TCO, ohne Attrappe."""
-    roh = [{**s, "anbieter": "o2", "sku_id": f"geraet-{i}",
-            "quelle_url": s["url"]} for i, s in enumerate(_saetze())]
+    roh = [
+        {**s, "anbieter": "o2", "sku_id": f"geraet-{i}", "quelle_url": s["url"]}
+        for i, s in enumerate(_saetze())
+    ]
     bilanz = aus_rohsaetzen(roh, _bestand(), "2026-09-04")
     # 66 von 66. Bis zum 29.09.2026 waren es 65: der Tarif "O2 Mobile on
     # Demand M" (ohne "Plus") traegt keinen Kachel-Slug und loeste nicht
@@ -403,7 +469,8 @@ def test_der_ganze_weg_an_der_echten_antwort():
     # (`Tarifbestand._slug_ist_tarif_id`).
     assert len(bilanz.buendel) == 66
     assert bilanz.ohne_tarif == 0
-    assert {b.tarif_id for b in bilanz.buendel
-            if "Plus" not in b.tarif_name} == {"o2:o2-mobile-on-demand-m"}
+    assert {b.tarif_id for b in bilanz.buendel if "Plus" not in b.tarif_name} == {
+        "o2:o2-mobile-on-demand-m"
+    }
     assert all(tco_24(b).belastbar for b in bilanz.buendel)
     assert {b.laufzeit_monate for b in bilanz.buendel} == {36}

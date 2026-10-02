@@ -7,6 +7,7 @@ Navigationslabels als "Ueberschriften" ausgeben.
 
 Kein Netz noetig - collect_source wird ersetzt.
 """
+
 from __future__ import annotations
 
 import importlib.util
@@ -29,8 +30,12 @@ _spec.loader.exec_module(pq)
 class FakeBestand:
     """Ein Bestand ohne Config und ohne Netz."""
 
-    def __init__(self, bekannt: dict | None = None, je_operator: dict | None = None,
-                 item_index: dict | None = None):
+    def __init__(
+        self,
+        bekannt: dict | None = None,
+        je_operator: dict | None = None,
+        item_index: dict | None = None,
+    ):
         self.http_cfg: dict = {}
         self.lookback = 8
         self._bekannt = bekannt or {}
@@ -43,8 +48,13 @@ class FakeBestand:
         return self._bekannt.get(url, "")
 
 
-def _items(n: int, *, datiert: int | None = None, frisch: int = 3,
-           titel: str = "Betreiber startet neuen Tarif mit 50 GB Datenvolumen"):
+def _items(
+    n: int,
+    *,
+    datiert: int | None = None,
+    frisch: int = 3,
+    titel: str = "Betreiber startet neuen Tarif mit 50 GB Datenvolumen",
+):
     """n Meldungen, davon `datiert` mit Datum und `frisch` im Fenster."""
     datiert = n if datiert is None else datiert
     jetzt = datetime.now(timezone.utc)
@@ -56,13 +66,20 @@ def _items(n: int, *, datiert: int | None = None, frisch: int = 3,
             pub = jetzt - timedelta(days=200)
         else:
             pub = None
-        out.append(Item(title=f"{titel} Nr. {i}", url=f"https://example.com/a{i}",
-                        source_name="X", published=pub))
+        out.append(
+            Item(
+                title=f"{titel} Nr. {i}",
+                url=f"https://example.com/a{i}",
+                source_name="X",
+                published=pub,
+            )
+        )
     return out
 
 
-def _pruefe(kand: pq.Kandidat, items, bestand=None, overlap=False,
-            zweimal=False, zweite=None):
+def _pruefe(
+    kand: pq.Kandidat, items, bestand=None, overlap=False, zweimal=False, zweite=None
+):
     """`zweite` erlaubt es, dem zweiten Abruf ein ANDERES Ergebnis zu geben -
     genau der Fall, den Kriterium 1b faengt."""
     original = pq.collect_source
@@ -73,8 +90,7 @@ def _pruefe(kand: pq.Kandidat, items, bestand=None, overlap=False,
 
     pq.collect_source = fake
     try:
-        return pq._pruefe_einen(kand, bestand or FakeBestand(), 8, overlap,
-                                zweimal)
+        return pq._pruefe_einen(kand, bestand or FakeBestand(), 8, overlap, zweimal)
     finally:
         pq.collect_source = original
 
@@ -83,8 +99,12 @@ def test_wechselhafte_quelle_faellt_beim_zweiten_abruf_durch():
     """newswire.ca, 04.08.2026: erster Abruf 23 von 23 datiert, zweiter Abruf
     30 Meldungen ganz ohne Datum. Ein Check, der nur einmal hinsieht, laesst
     so etwas durch - und undatierte Meldungen liest kein Analyst je."""
-    k = pq.Kandidat(url="https://example.com/presse", type="newsroom",
-                    operator="Beispiel", website="example.com")
+    k = pq.Kandidat(
+        url="https://example.com/presse",
+        type="newsroom",
+        operator="Beispiel",
+        website="example.com",
+    )
     gut = _items(23)
     schlecht = _items(30, datiert=0, frisch=0)
     b = _pruefe(k, gut, zweimal=True, zweite=schlecht)
@@ -95,8 +115,12 @@ def test_wechselhafte_quelle_faellt_beim_zweiten_abruf_durch():
 
 
 def test_stabile_quelle_besteht_auch_den_zweiten_abruf():
-    k = pq.Kandidat(url="https://example.com/presse", type="newsroom",
-                    operator="Beispiel", website="example.com")
+    k = pq.Kandidat(
+        url="https://example.com/presse",
+        type="newsroom",
+        operator="Beispiel",
+        website="example.com",
+    )
     b = _pruefe(k, _items(23), zweimal=True, zweite=_items(23))
     assert b.bestanden, b.durchgefallen
 
@@ -104,8 +128,12 @@ def test_stabile_quelle_besteht_auch_den_zweiten_abruf():
 def test_zweiter_abruf_gilt_nur_fuer_geparste_seiten():
     """Ein RSS-Feed hat das Problem nicht - der doppelte Abruf waere nur
     doppelte Last."""
-    k = pq.Kandidat(url="https://example.com/feed", type="rss",
-                    operator="Beispiel", website="example.com")
+    k = pq.Kandidat(
+        url="https://example.com/feed",
+        type="rss",
+        operator="Beispiel",
+        website="example.com",
+    )
     b = _pruefe(k, _items(12), zweimal=True)
     assert b.bestanden
     assert not [x for x in b.kriterien if "zweiter Abruf" in x["name"]]
@@ -114,16 +142,21 @@ def test_zweiter_abruf_gilt_nur_fuer_geparste_seiten():
 def _grund(befund, nr, name_enthaelt=""):
     """Kriterium 7 wird zweimal geprueft (URL-Dublette und Inhaltsdublette) -
     deshalb optional zusaetzlich nach dem Namen filtern."""
-    treffer = [k for k in befund.kriterien if k["nr"] == nr
-               and name_enthaelt in k["name"]]
+    treffer = [
+        k for k in befund.kriterien if k["nr"] == nr and name_enthaelt in k["name"]
+    ]
     assert treffer, f"Kriterium {nr} ({name_enthaelt!r}) wurde nicht geprueft"
     return treffer[0]
 
 
 # ------------------------------------------------------------------ Kriterien
 def test_gute_quelle_besteht():
-    k = pq.Kandidat(url="https://example.com/feed", type="rss",
-                    operator="Beispiel", website="example.com")
+    k = pq.Kandidat(
+        url="https://example.com/feed",
+        type="rss",
+        operator="Beispiel",
+        website="example.com",
+    )
     b = _pruefe(k, _items(12))
     assert b.bestanden, b.durchgefallen
     assert (b.n_items, b.n_datiert, b.n_frisch) == (12, 12, 3)
@@ -131,8 +164,12 @@ def test_gute_quelle_besteht():
 
 
 def test_zu_wenige_meldungen_fallen_durch():
-    k = pq.Kandidat(url="https://example.com/feed", type="rss",
-                    operator="Beispiel", website="example.com")
+    k = pq.Kandidat(
+        url="https://example.com/feed",
+        type="rss",
+        operator="Beispiel",
+        website="example.com",
+    )
     b = _pruefe(k, _items(4))
     assert not b.bestanden
     assert not _grund(b, 2)["ok"]
@@ -140,39 +177,68 @@ def test_zu_wenige_meldungen_fallen_durch():
 
 def test_undatierte_meldungen_fallen_durch():
     """Kriterium 3: undatiert sortiert ans Ende und ist faktisch unsichtbar."""
-    k = pq.Kandidat(url="https://example.com/feed", type="rss",
-                    operator="Beispiel", website="example.com")
+    k = pq.Kandidat(
+        url="https://example.com/feed",
+        type="rss",
+        operator="Beispiel",
+        website="example.com",
+    )
     b = _pruefe(k, _items(10, datiert=7))
     assert not b.bestanden
     assert "7/10" in _grund(b, 3)["detail"]
 
 
 def test_keine_frische_meldung_faellt_durch_ohne_ausnahme():
-    k = pq.Kandidat(url="https://example.com/feed", type="rss",
-                    operator="Beispiel", website="example.com")
+    k = pq.Kandidat(
+        url="https://example.com/feed",
+        type="rss",
+        operator="Beispiel",
+        website="example.com",
+    )
     b = _pruefe(k, _items(10, frisch=0))
     assert not b.bestanden
     assert not _grund(b, 4)["ok"]
 
 
 def test_belegte_ausnahme_ersetzt_die_frische():
-    k = pq.Kandidat(url="https://example.com/ir", type="rss",
-                    operator="Beispiel", website="example.com",
-                    ausnahme_frische="IR-Seite, publiziert quartalsweise")
+    k = pq.Kandidat(
+        url="https://example.com/ir",
+        type="rss",
+        operator="Beispiel",
+        website="example.com",
+        ausnahme_frische="IR-Seite, publiziert quartalsweise",
+    )
     b = _pruefe(k, _items(10, frisch=0))
     assert b.bestanden, b.durchgefallen
     assert "quartalsweise" in _grund(b, 4)["detail"]
 
 
 def test_navigationslabels_fallen_durch():
-    k = pq.Kandidat(url="https://example.com/presse", type="newsroom",
-                    operator="Beispiel", website="example.com")
-    nav = [Item(title=t, url=f"https://example.com/n{i}", source_name="X",
-                published=datetime.now(timezone.utc))
-           for i, t in enumerate(
-               ["Mehr erfahren", "Presse", "12.03.2026", "Alle anzeigen",
-                "Kontakt", "Datenschutz",
-                "Betreiber startet neuen Tarif mit 50 GB Datenvolumen"])]
+    k = pq.Kandidat(
+        url="https://example.com/presse",
+        type="newsroom",
+        operator="Beispiel",
+        website="example.com",
+    )
+    nav = [
+        Item(
+            title=t,
+            url=f"https://example.com/n{i}",
+            source_name="X",
+            published=datetime.now(timezone.utc),
+        )
+        for i, t in enumerate(
+            [
+                "Mehr erfahren",
+                "Presse",
+                "12.03.2026",
+                "Alle anzeigen",
+                "Kontakt",
+                "Datenschutz",
+                "Betreiber startet neuen Tarif mit 50 GB Datenvolumen",
+            ]
+        )
+    ]
     b = _pruefe(k, nav)
     assert not b.bestanden
     assert not _grund(b, 5)["ok"]
@@ -182,13 +248,24 @@ def test_identische_titel_fallen_durch():
     """Gemessen am SEC-EDGAR-Feed von AT&T: 40 sauber datierte Meldungen,
     alle mit dem Titel "8-K - Current report". Technisch tadellos, inhaltlich
     wertlos - und die Navigationslabel-Regel greift dort nicht."""
-    k = pq.Kandidat(url="https://www.sec.gov/edgar", type="rss",
-                    operator="Beispiel", website="example.com",
-                    ausnahme_domain="SEC EDGAR")
+    k = pq.Kandidat(
+        url="https://www.sec.gov/edgar",
+        type="rss",
+        operator="Beispiel",
+        website="example.com",
+        ausnahme_domain="SEC EDGAR",
+    )
     from datetime import datetime, timezone
-    formulare = [Item(title="8-K - Current report",
-                      url=f"https://www.sec.gov/e{i}", source_name="X",
-                      published=datetime.now(timezone.utc)) for i in range(20)]
+
+    formulare = [
+        Item(
+            title="8-K - Current report",
+            url=f"https://www.sec.gov/e{i}",
+            source_name="X",
+            published=datetime.now(timezone.utc),
+        )
+        for i in range(20)
+    ]
     b = _pruefe(k, formulare)
     assert not b.bestanden
     assert not _grund(b, 5, "unterscheidbar")["ok"]
@@ -198,25 +275,37 @@ def test_identische_titel_fallen_durch():
 
 
 def test_fremde_domain_faellt_durch_ohne_ausnahme():
-    k = pq.Kandidat(url="https://news.cision.com/beispiel", type="newsroom",
-                    operator="Beispiel", website="example.com")
+    k = pq.Kandidat(
+        url="https://news.cision.com/beispiel",
+        type="newsroom",
+        operator="Beispiel",
+        website="example.com",
+    )
     b = _pruefe(k, _items(12))
     assert not b.bestanden
     assert not _grund(b, 6)["ok"]
 
 
 def test_verbreitungsdienst_mit_begruendung_ist_erlaubt():
-    k = pq.Kandidat(url="https://news.cision.com/beispiel", type="newsroom",
-                    operator="Beispiel", website="example.com",
-                    ausnahme_domain="Cision ist der offizielle Verbreitungsweg")
+    k = pq.Kandidat(
+        url="https://news.cision.com/beispiel",
+        type="newsroom",
+        operator="Beispiel",
+        website="example.com",
+        ausnahme_domain="Cision ist der offizielle Verbreitungsweg",
+    )
     b = _pruefe(k, _items(12))
     assert b.bestanden, b.durchgefallen
 
 
 def test_bekannte_url_ist_eine_dublette():
     bestand = FakeBestand(bekannt={"https://example.com/feed": "Beispiel (rss)"})
-    k = pq.Kandidat(url="https://example.com/feed", type="rss",
-                    operator="Beispiel", website="example.com")
+    k = pq.Kandidat(
+        url="https://example.com/feed",
+        type="rss",
+        operator="Beispiel",
+        website="example.com",
+    )
     b = _pruefe(k, _items(12), bestand)
     assert not b.bestanden
     assert not _grund(b, 7)["ok"]
@@ -227,19 +316,29 @@ def test_bekannte_url_ist_eine_dublette():
 def test_inhaltsdublette_wird_erkannt():
     """Zwei Pfade derselben Seite sind EINE Quelle, nicht zwei."""
     from telco_radar.config import Source
+
     gleiche = _items(10)
-    bestand = FakeBestand(je_operator={
-        "Beispiel": [Source(type="rss", url="https://example.com/alt")]})
-    k = pq.Kandidat(url="https://example.com/neu", type="rss",
-                    operator="Beispiel", website="example.com")
+    bestand = FakeBestand(
+        je_operator={"Beispiel": [Source(type="rss", url="https://example.com/alt")]}
+    )
+    k = pq.Kandidat(
+        url="https://example.com/neu",
+        type="rss",
+        operator="Beispiel",
+        website="example.com",
+    )
     b = _pruefe(k, gleiche, bestand, overlap=True)
     assert not b.bestanden
     assert "100%" in _grund(b, 7, "Inhaltsdublette")["detail"]
 
 
 def test_newsroom_js_ist_nicht_abnehmbar():
-    k = pq.Kandidat(url="https://example.com/news", type="newsroom_js",
-                    operator="Beispiel", website="example.com")
+    k = pq.Kandidat(
+        url="https://example.com/news",
+        type="newsroom_js",
+        operator="Beispiel",
+        website="example.com",
+    )
     b = _pruefe(k, _items(30))
     assert not b.bestanden
     assert not _grund(b, 8)["ok"]
@@ -247,8 +346,12 @@ def test_newsroom_js_ist_nicht_abnehmbar():
 
 
 def test_abrufsfehler_wird_als_fehler_gemeldet():
-    k = pq.Kandidat(url="https://example.com/feed", type="rss",
-                    operator="Beispiel", website="example.com")
+    k = pq.Kandidat(
+        url="https://example.com/feed",
+        type="rss",
+        operator="Beispiel",
+        website="example.com",
+    )
     original = pq.collect_source
 
     def boom(*a, **kw):
@@ -265,32 +368,50 @@ def test_abrufsfehler_wird_als_fehler_gemeldet():
 
 
 # ---------------------------------------------------------------- Hilfsstuecke
-@pytest.mark.parametrize("titel", [
-    "Mehr erfahren", "Read more", "Presse", "Newsroom", "12.03.2026",
-    "2026-03-12", "March 12, 2026", "Alle anzeigen", "Cookie-Einstellungen",
-    "About Us", "", "   ",
-])
+@pytest.mark.parametrize(
+    "titel",
+    [
+        "Mehr erfahren",
+        "Read more",
+        "Presse",
+        "Newsroom",
+        "12.03.2026",
+        "2026-03-12",
+        "March 12, 2026",
+        "Alle anzeigen",
+        "Cookie-Einstellungen",
+        "About Us",
+        "",
+        "   ",
+    ],
+)
 def test_navigationslabel_erkannt(titel):
     assert pq._ist_navigationslabel(titel)
 
 
-@pytest.mark.parametrize("titel", [
-    "Telekom startet 5G-Standalone in 200 Staedten",
-    "Q1 Results 2026 published by the group board",
-    "Vodafone and AST SpaceMobile complete first video call via satellite",
-])
+@pytest.mark.parametrize(
+    "titel",
+    [
+        "Telekom startet 5G-Standalone in 200 Staedten",
+        "Q1 Results 2026 published by the group board",
+        "Vodafone and AST SpaceMobile complete first video call via satellite",
+    ],
+)
 def test_echte_ueberschrift_erkannt(titel):
     assert not pq._ist_navigationslabel(titel)
 
 
-@pytest.mark.parametrize("host,erwartet", [
-    ("www.telekom.com", "telekom.com"),
-    ("newsroom.bt.com", "bt.com"),
-    ("www.three.co.uk", "three.co.uk"),
-    ("investors.att.com", "att.com"),
-    ("tim.com.br", "tim.com.br"),
-    ("example.com", "example.com"),
-])
+@pytest.mark.parametrize(
+    "host,erwartet",
+    [
+        ("www.telekom.com", "telekom.com"),
+        ("newsroom.bt.com", "bt.com"),
+        ("www.three.co.uk", "three.co.uk"),
+        ("investors.att.com", "att.com"),
+        ("tim.com.br", "tim.com.br"),
+        ("example.com", "example.com"),
+    ],
+)
 def test_registrierbare_domain(host, erwartet):
     assert pq._registrable(host) == erwartet
 
@@ -303,6 +424,7 @@ def test_registrierbare_domain(host, erwartet):
 # seines Betreibers live ab, und ein Abbruch nach 800 Kandidaten bedeutete,
 # von vorn anzufangen.
 # =========================================================================== #
+
 
 def _kandidat(url="https://a.de/feed", **kw):
     return pq.Kandidat(url=url, **kw)
@@ -318,8 +440,9 @@ def test_cache_schluessel_trennt_verschiedene_anlaeufe():
 
 
 def test_cache_schluessel_ignoriert_url_kosmetik():
-    assert (pq._cache_schluessel(_kandidat("https://www.a.de/feed/"))
-            == pq._cache_schluessel(_kandidat("https://a.de/feed")))
+    assert pq._cache_schluessel(
+        _kandidat("https://www.a.de/feed/")
+    ) == pq._cache_schluessel(_kandidat("https://a.de/feed"))
 
 
 def test_cache_wird_geschrieben_und_gelesen(tmp_path):
@@ -365,13 +488,22 @@ def test_dublette_wird_gegen_den_index_erkannt(monkeypatch):
         return _items(10)
 
     monkeypatch.setattr(pq, "collect_source", _collect)
-    bestand = FakeBestand(item_index={"Alpha": {
-        "https://alpha.de/presse": {normalize_url(i.url) for i in _items(10)}}})
+    bestand = FakeBestand(
+        item_index={
+            "Alpha": {
+                "https://alpha.de/presse": {normalize_url(i.url) for i in _items(10)}
+            }
+        }
+    )
 
     befund = pq._pruefe_einen(
-        _kandidat("https://alpha.de/news", operator="Alpha",
-                  website="alpha.de", type="rss"),
-        bestand, 8, True)
+        _kandidat(
+            "https://alpha.de/news", operator="Alpha", website="alpha.de", type="rss"
+        ),
+        bestand,
+        8,
+        True,
+    )
 
     dublette = [k for k in befund.kriterien if k["name"] == "keine Inhaltsdublette"]
     assert dublette and not dublette[0]["ok"]
@@ -387,12 +519,20 @@ def test_ohne_index_wird_live_verglichen(monkeypatch):
         return _items(10)
 
     monkeypatch.setattr(pq, "collect_source", _collect)
-    bestand = FakeBestand(je_operator={"Alpha": [
-        Source(type="rss", url="https://alpha.de/presse", name="Alpha")]})
+    bestand = FakeBestand(
+        je_operator={
+            "Alpha": [Source(type="rss", url="https://alpha.de/presse", name="Alpha")]
+        }
+    )
 
-    pq._pruefe_einen(_kandidat("https://alpha.de/news", operator="Alpha",
-                               website="alpha.de", type="rss"),
-                     bestand, 8, True)
+    pq._pruefe_einen(
+        _kandidat(
+            "https://alpha.de/news", operator="Alpha", website="alpha.de", type="rss"
+        ),
+        bestand,
+        8,
+        True,
+    )
     assert "https://alpha.de/presse" in abrufe
 
 
@@ -407,14 +547,24 @@ def test_dublette_wird_ueber_die_domain_erkannt(monkeypatch):
     Betreiber.
     """
     monkeypatch.setattr(pq, "collect_source", lambda *a, **k: _items(10))
-    bestand = FakeBestand(item_index={"arm.com": {
-        "https://newsroom.arm.com/rss": {normalize_url(i.url)
-                                         for i in _items(10)}}})
+    bestand = FakeBestand(
+        item_index={
+            "arm.com": {
+                "https://newsroom.arm.com/rss": {
+                    normalize_url(i.url) for i in _items(10)
+                }
+            }
+        }
+    )
 
     befund = pq._pruefe_einen(
-        pq.Kandidat(url="https://newsroom.arm.com/feed", type="rss",
-                    thema="chips", name="Arm"),
-        bestand, 8, True)
+        pq.Kandidat(
+            url="https://newsroom.arm.com/feed", type="rss", thema="chips", name="Arm"
+        ),
+        bestand,
+        8,
+        True,
+    )
 
     assert not befund.bestanden
     dublette = [k for k in befund.kriterien if k["name"] == "keine Inhaltsdublette"]
@@ -427,13 +577,21 @@ def test_zweiter_kanal_derselben_domain_bleibt_erlaubt(monkeypatch):
     Auftrag sucht. Entscheidend ist die Ueberschneidung der MELDUNGEN."""
     monkeypatch.setattr(pq, "collect_source", lambda *a, **k: _items(10))
     andere = {f"https://example.com/ganz-anders-{i}" for i in range(10)}
-    bestand = FakeBestand(item_index={"arm.com": {
-        "https://newsroom.arm.com/rss": andere}})
+    bestand = FakeBestand(
+        item_index={"arm.com": {"https://newsroom.arm.com/rss": andere}}
+    )
 
     befund = pq._pruefe_einen(
-        pq.Kandidat(url="https://newsroom.arm.com/blog/feed", type="rss",
-                    thema="chips", name="Arm"),
-        bestand, 8, True)
+        pq.Kandidat(
+            url="https://newsroom.arm.com/blog/feed",
+            type="rss",
+            thema="chips",
+            name="Arm",
+        ),
+        bestand,
+        8,
+        True,
+    )
     assert befund.bestanden, befund.durchgefallen
 
 
@@ -447,9 +605,16 @@ def test_nicht_pruefbare_dublette_ist_kein_pass(monkeypatch):
     bestand.domains_mit_quelle = {"overons.kpn"}
 
     befund = pq._pruefe_einen(
-        pq.Kandidat(url="https://www.overons.kpn/nieuws/feed/en/feed/",
-                    type="rss", operator="KPN", website="overons.kpn"),
-        bestand, 8, True)
+        pq.Kandidat(
+            url="https://www.overons.kpn/nieuws/feed/en/feed/",
+            type="rss",
+            operator="KPN",
+            website="overons.kpn",
+        ),
+        bestand,
+        8,
+        True,
+    )
     assert not befund.bestanden
     dublette = [k for k in befund.kriterien if k["name"] == "keine Inhaltsdublette"]
     assert dublette and "nicht pruefbar" in dublette[0]["detail"]
@@ -463,9 +628,13 @@ def test_domain_ganz_ohne_bestand_bleibt_erlaubt(monkeypatch):
     bestand.domains_mit_quelle = {"andere.de"}
 
     befund = pq._pruefe_einen(
-        pq.Kandidat(url="https://neu.de/feed", type="rss", operator="Neu",
-                    website="neu.de"),
-        bestand, 8, True)
+        pq.Kandidat(
+            url="https://neu.de/feed", type="rss", operator="Neu", website="neu.de"
+        ),
+        bestand,
+        8,
+        True,
+    )
     assert befund.bestanden, befund.durchgefallen
 
 
@@ -476,14 +645,22 @@ def test_obermenge_einer_bestehenden_quelle_ist_eine_dublette(monkeypatch):
     kandidat_items = _items(25)
     monkeypatch.setattr(pq, "collect_source", lambda *a, **k: kandidat_items)
     bestehende = {normalize_url(i.url) for i in kandidat_items[:10]}
-    bestand = FakeBestand(item_index={"example.com": {
-        "https://www.example.com/feed/": bestehende}})
+    bestand = FakeBestand(
+        item_index={"example.com": {"https://www.example.com/feed/": bestehende}}
+    )
     bestand.domains_mit_quelle = {"example.com"}
 
     befund = pq._pruefe_einen(
-        pq.Kandidat(url="https://www.example.com/wp-json/wp/v2/posts",
-                    type="json_api", operator="Beispiel", website="example.com"),
-        bestand, 8, True)
+        pq.Kandidat(
+            url="https://www.example.com/wp-json/wp/v2/posts",
+            type="json_api",
+            operator="Beispiel",
+            website="example.com",
+        ),
+        bestand,
+        8,
+        True,
+    )
     assert not befund.bestanden
     dublette = [k for k in befund.kriterien if k["name"] == "keine Inhaltsdublette"]
     assert dublette and "100%" in dublette[0]["detail"]

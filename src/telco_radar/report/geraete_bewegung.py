@@ -36,6 +36,7 @@ Ist KEIN Vergleich pruefbar, ist das ein benannter Ausfall und kein
 „keine Bewegung" (Clean Code 4) - sonst meldete die Mail Ruhe, waehrend
 der Vodafone-Adapter wochenlang nichts liest.
 """
+
 from __future__ import annotations
 
 import logging
@@ -84,22 +85,30 @@ def _messung_um(slot: dict, tag: str) -> dict | None:
 
 def stichtag_aus(messungen: dict, anbieter: str | None = None) -> str | None:
     """Der jüngste Messtag der Historie - aller Anbieter oder eines."""
-    tage = {d for reihen in messungen.values()
-            for name, slot in reihen.items()
-            if anbieter is None or name == anbieter for d in slot}
+    tage = {
+        d
+        for reihen in messungen.values()
+        for name, slot in reihen.items()
+        if anbieter is None or name == anbieter
+        for d in slot
+    }
     return max(tage) if tage else None
 
 
 def ist_bewegung(delta: float, eigen_wert: float) -> bool:
     """Überschreitet die Abstandsänderung die Schwelle? ODER, nicht UND."""
     betrag = abs(delta)
-    return (betrag > BEWEGUNG_EURO
-            or betrag > eigen_wert * BEWEGUNG_PROZENT / 100)
+    return betrag > BEWEGUNG_EURO or betrag > eigen_wert * BEWEGUNG_PROZENT / 100
 
 
-def bewegungen(messungen: dict, erlaubt: dict, titel: dict,
-               band_katalog: dict, schluessel, stichtag: str | None = None
-               ) -> dict:
+def bewegungen(
+    messungen: dict,
+    erlaubt: dict,
+    titel: dict,
+    band_katalog: dict,
+    schluessel,
+    stichtag: str | None = None,
+) -> dict:
     """Der Block als reines Dict - so steht er im Berichts-JSON.
 
     `messungen` ist `geraete_zeitreihe._messungen()`, `erlaubt` die
@@ -127,12 +136,15 @@ def bewegungen(messungen: dict, erlaubt: dict, titel: dict,
             if None in (v0, v1, c0, c1):
                 ohne[GRUND_MESSUNG] += 1
                 continue
-            if (schluessel(c0["satz"]) != schluessel(c1["satz"])
-                    or schluessel(v0["satz"]) != schluessel(v1["satz"])):
+            if schluessel(c0["satz"]) != schluessel(c1["satz"]) or schluessel(
+                v0["satz"]
+            ) != schluessel(v1["satz"]):
                 ohne[GRUND_WECHSEL] += 1
                 continue
-            if not all(zeitraum_vergleichbar(m["monate"], TCO_HORIZONT)
-                       for m in (v0, v1, c0, c1)):
+            if not all(
+                zeitraum_vergleichbar(m["monate"], TCO_HORIZONT)
+                for m in (v0, v1, c0, c1)
+            ):
                 ohne[GRUND_ZEITRAUM] += 1
                 continue
             geprueft += 1
@@ -141,39 +153,52 @@ def bewegungen(messungen: dict, erlaubt: dict, titel: dict,
             delta = round(fremd_delta - eigen_delta, 2)
             if not ist_bewegung(delta, v1["wert"]):
                 continue
-            treffer.append({
-                "modell": modell, "band": band,
-                "geraet": titel.get(modell) or modell,
-                "band_label": (band_katalog.get(band) or {}).get("label",
-                                                                 band),
-                "anbieter": name,
-                "abstand_vorher": round(c0["wert"] - v0["wert"], 2),
-                "abstand_jetzt": round(c1["wert"] - v1["wert"], 2),
-                "delta": delta,
-                "fremd_delta": fremd_delta,
-                "eigen_delta": eigen_delta,
-                "fremd_wert": c1["wert"], "eigen_wert": v1["wert"],
-                "quelle_url": c1["satz"].get("quelle_url") or "",
-                "eigen_quelle_url": v1["satz"].get("quelle_url") or "",
-                "link": f"geraete.html?modell={modell}&band={band}",
-            })
-    treffer.sort(key=lambda t: (-abs(t["delta"]), t["geraet"],
-                                t["anbieter"]))
+            treffer.append(
+                {
+                    "modell": modell,
+                    "band": band,
+                    "geraet": titel.get(modell) or modell,
+                    "band_label": (band_katalog.get(band) or {}).get("label", band),
+                    "anbieter": name,
+                    "abstand_vorher": round(c0["wert"] - v0["wert"], 2),
+                    "abstand_jetzt": round(c1["wert"] - v1["wert"], 2),
+                    "delta": delta,
+                    "fremd_delta": fremd_delta,
+                    "eigen_delta": eigen_delta,
+                    "fremd_wert": c1["wert"],
+                    "eigen_wert": v1["wert"],
+                    "quelle_url": c1["satz"].get("quelle_url") or "",
+                    "eigen_quelle_url": v1["satz"].get("quelle_url") or "",
+                    "link": f"geraete.html?modell={modell}&band={band}",
+                }
+            )
+    treffer.sort(key=lambda t: (-abs(t["delta"]), t["geraet"], t["anbieter"]))
     if not geprueft:
         log.error("Bewegungsblock: kein Vergleich pruefbar (%s)", dict(ohne))
-        return dict(ausfall(AUSFALL_NICHT_PRUEFBAR),
-                    ohne_aussage=dict(sorted(ohne.items())))
-    return {"error": None, "stichtag": bis, "vergleichstag": von,
-            "eigen_stichtag": stichtag_aus(messungen, EIGEN),
-            "zeilen": treffer[:MAX_ZEILEN],
-            "weitere": max(0, len(treffer) - MAX_ZEILEN),
-            "geprueft": geprueft, "ohne_aussage": dict(sorted(ohne.items()))}
+        return dict(
+            ausfall(AUSFALL_NICHT_PRUEFBAR), ohne_aussage=dict(sorted(ohne.items()))
+        )
+    return {
+        "error": None,
+        "stichtag": bis,
+        "vergleichstag": von,
+        "eigen_stichtag": stichtag_aus(messungen, EIGEN),
+        "zeilen": treffer[:MAX_ZEILEN],
+        "weitere": max(0, len(treffer) - MAX_ZEILEN),
+        "geprueft": geprueft,
+        "ohne_aussage": dict(sorted(ohne.items())),
+    }
 
 
 def ausfall(grund: str) -> dict:
     """Der benannte Ausfall: die Mail sagt ihn, statt „nichts" zu melden."""
-    return {"error": grund, "zeilen": [], "weitere": 0, "geprueft": 0,
-            "ohne_aussage": {}}
+    return {
+        "error": grund,
+        "zeilen": [],
+        "weitere": 0,
+        "geprueft": 0,
+        "ohne_aussage": {},
+    }
 
 
 def erste_ausgabe_der_woche(reports_dir, heute: date) -> bool:
@@ -209,23 +234,30 @@ def fuer_bericht(root, heute: date, reports_dir) -> dict:
     root = Path(root)
     try:
         geraete = geraete_view.aufbereiten(
-            root / "data" / "state", lade_quellen(root), lade_katalog(root),
-            heute=heute.isoformat())
-        block = dict((geraete.get("zeitreihe") or {}).get("bewegung_woche")
-                     or ausfall(AUSFALL_AUFBEREITUNG))
-    except Exception as exc:                       # noqa: BLE001
-        log.error("Bewegungsblock: Geraetedaten nicht aufbereitbar: %s: %s",
-                  type(exc).__name__, exc)
+            root / "data" / "state",
+            lade_quellen(root),
+            lade_katalog(root),
+            heute=heute.isoformat(),
+        )
+        block = dict(
+            (geraete.get("zeitreihe") or {}).get("bewegung_woche")
+            or ausfall(AUSFALL_AUFBEREITUNG)
+        )
+    except Exception as exc:  # noqa: BLE001
+        log.error(
+            "Bewegungsblock: Geraetedaten nicht aufbereitbar: %s: %s",
+            type(exc).__name__,
+            exc,
+        )
         block = ausfall(AUSFALL_AUFBEREITUNG)
     # Frisch muss VODAFONES Messung sein: ein frischer Stichtag der
     # Wettbewerber verdeckte sonst einen stehengebliebenen eigenen Adapter.
     eigen = block.get("eigen_stichtag")
     if not block.get("error") and (
-            not eigen or date.fromisoformat(eigen)
-            < heute - timedelta(days=TOLERANZ_TAGE)):
+        not eigen or date.fromisoformat(eigen) < heute - timedelta(days=TOLERANZ_TAGE)
+    ):
         log.error("Bewegungsblock: letzte Vodafone-Messung %s", eigen)
-        tag = (date.fromisoformat(eigen).strftime("%d.%m.%Y")
-               if eigen else "?")
+        tag = date.fromisoformat(eigen).strftime("%d.%m.%Y") if eigen else "?"
         block = ausfall(AUSFALL_VERALTET.replace("{tag}", tag))
     block["im_newsletter"] = erste_ausgabe_der_woche(Path(reports_dir), heute)
     return block

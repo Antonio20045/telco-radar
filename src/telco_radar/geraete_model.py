@@ -37,6 +37,7 @@ behalten und als `farbe_normalisiert=None` markiert - nicht auf die
 naechstaehnliche gebogen. Ein Titel, der ZWEI Speichergroessen nennt, ergibt
 keinen Wert statt des groesseren.
 """
+
 from __future__ import annotations
 
 import re
@@ -54,8 +55,8 @@ from typing import Iterable, Optional
 VERFUEGBARKEITEN = (
     "lieferbar",
     "vorbestellbar",
-    "ausverkauft",        # dauerhaft weg beim Haendler, Seite lebt noch
-    "nicht_lieferbar",    # voruebergehend, Nachschub angekuendigt
+    "ausverkauft",  # dauerhaft weg beim Haendler, Seite lebt noch
+    "nicht_lieferbar",  # voruebergehend, Nachschub angekuendigt
     "unbekannt",
 )
 
@@ -73,12 +74,27 @@ CONFIDENCE = ("hoch", "mittel", "niedrig")
 # ist eine Speicherstufe.
 _SPEICHER_STUFEN = (32, 64, 128, 256, 512, 1024, 2048)
 
-_UMLAUTE = str.maketrans({
-    "ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss",
-    "Ä": "ae", "Ö": "oe", "Ü": "ue",
-    "é": "e", "è": "e", "ê": "e", "á": "a", "à": "a", "í": "i", "ó": "o",
-    "ú": "u", "ñ": "n", "ç": "c",
-})
+_UMLAUTE = str.maketrans(
+    {
+        "ä": "ae",
+        "ö": "oe",
+        "ü": "ue",
+        "ß": "ss",
+        "Ä": "ae",
+        "Ö": "oe",
+        "Ü": "ue",
+        "é": "e",
+        "è": "e",
+        "ê": "e",
+        "á": "a",
+        "à": "a",
+        "í": "i",
+        "ó": "o",
+        "ú": "u",
+        "ñ": "n",
+        "ç": "c",
+    }
+)
 
 # Woerter, die einen Titel zu Zubehoer machen. Eine Kategorieseite eines
 # Elektronikhaendlers mischt Huellen, Schutzglas und Ladekabel unter die
@@ -102,16 +118,20 @@ _UMLAUTE = str.maketrans({
 #                    naemlich ein Zubehoertitel ("Ladekabel USB-C fuer
 #                    iPhone 17"), waehrend die Beigabe hinten steht
 #                    ("iPhone 16 128 GB inkl. Ladekabel").
-_ZUBEHOER_IMMER = frozenset("""
+_ZUBEHOER_IMMER = frozenset(
+    """
 huelle huellen huellenset case cases cover schutzhuelle schutzglas panzerglas
 displayschutz displayschutzfolie schutzfolie bumper reparaturset zubehoer
-""".split())
+""".split()
+)
 
-_ZUBEHOER_DAVOR = frozenset("""
+_ZUBEHOER_DAVOR = frozenset(
+    """
 ladekabel ladegeraet netzteil adapter kabel powerbank halterung halter tasche
 kopfhoerer headset ohrhoerer armband ladeschale ladestation dockingstation
 ersatzakku ersatzdisplay folie aufkleber skin simkarte
-""".split())
+""".split()
+)
 
 # Woerter, die aus einem Modellnamen ein ANDERES Modell machen. Steht so ein
 # Wort direkt hinter einem Katalogtreffer, ohne selbst dazuzugehoeren, ist die
@@ -122,14 +142,17 @@ ersatzakku ersatzdisplay folie aufkleber skin simkarte
 # dieselbe listung_id, und weil sie rund 800 Euro auseinanderliegen, schrieb
 # die Preishistorie bei JEDEM Lauf zwei Aenderungspunkte hin und zurueck - eine
 # dauerhafte Saegezahnkurve, die wie ein wilder Preiskampf aussieht.
-_MODELLZUSATZ = frozenset("""
+_MODELLZUSATZ = frozenset(
+    """
 pro max plus ultra mini air fold flip lite neo note fe edge se xl active
-""".split())
+""".split()
+)
 
 
 # --------------------------------------------------------------------------
 # Normalisierung
 # --------------------------------------------------------------------------
+
 
 def normalisiere(text: str) -> str:
     """Vergleichs- und ID-Form: klein, Umlaute gefaltet, alles ausser
@@ -181,6 +204,7 @@ def _binnenmajuskel(text: str) -> str:
 # Die IDs
 # --------------------------------------------------------------------------
 
+
 def device_id(hersteller: str, modell: str) -> str:
     """Hersteller + Modell als Slug.
 
@@ -194,8 +218,12 @@ def device_id(hersteller: str, modell: str) -> str:
     return f"{h}-{m}".strip("-")
 
 
-def sku_id(geraet_id: str, speicher_gb: Optional[int], farbe: Optional[str],
-           zustand: str = "neu") -> str:
+def sku_id(
+    geraet_id: str,
+    speicher_gb: Optional[int],
+    farbe: Optional[str],
+    zustand: str = "neu",
+) -> str:
     """SKU-ID aus Geraet + Speicher + Farbe (+ Zustand, wenn nicht neu).
 
     Fehlt ein Teil, sagt die ID das offen ("ohne-speicher", "ohne-farbe")
@@ -243,10 +271,10 @@ def _ist_arbeitsspeicher(text: str, treffer, ab: int = 0) -> bool:
     oft ohne Trennzeichen hintereinander, ein Schraegstrich rettet einen also
     nicht.
     """
-    nach = text[treffer.end():treffer.end() + 16]
+    nach = text[treffer.end() : treffer.end() + 16]
     if _RAM_WORT.match(nach.lstrip(" -:")):
         return True
-    vor = text[:treffer.start()]
+    vor = text[: treffer.start()]
     letzter = ab
     for t in _TRENNER.finditer(vor):
         if t.end() > letzter:
@@ -254,7 +282,9 @@ def _ist_arbeitsspeicher(text: str, treffer, ab: int = 0) -> bool:
     return bool(_ARBEITSSPEICHER_WORT.search(vor[letzter:]))
 
 
-def speicher_aus_titel(titel: str, erlaubt: Optional[Iterable[int]] = None) -> Optional[int]:
+def speicher_aus_titel(
+    titel: str, erlaubt: Optional[Iterable[int]] = None
+) -> Optional[int]:
     """Speichergroesse in GB, oder None.
 
     `erlaubt` (die Speicherstufen des Katalogeintrags) ist eine VORLIEBE, kein
@@ -384,17 +414,20 @@ def farbe_aus_titel(titel: str, tabelle: dict) -> tuple[str, Optional[str]]:
         woerter = [w for w in schreibweise.split("-") if w]
         if not woerter:
             continue
-        muster = (r"\b(?P<vor>[A-Za-zÄÖÜäöüß]+)?[\s\-]*"
-                  + r"[\s\-]*".join(re.escape(w) for w in woerter)
-                  + r"[\s\-]*(?P<nach>[A-Za-zÄÖÜäöüß]+)?\b")
+        muster = (
+            r"\b(?P<vor>[A-Za-zÄÖÜäöüß]+)?[\s\-]*"
+            + r"[\s\-]*".join(re.escape(w) for w in woerter)
+            + r"[\s\-]*(?P<nach>[A-Za-zÄÖÜäöüß]+)?\b"
+        )
         treffer = re.search(muster, titel, re.IGNORECASE)
         if not treffer:
             continue
         nachbarn = [treffer.group("vor"), treffer.group("nach")]
         if any(n and normalisiere(n) in farbwoerter for n in nachbarn):
-            continue          # Bruchstueck einer laengeren Farbe
-        kern = re.search(r"[\s\-]*".join(re.escape(w) for w in woerter),
-                         titel, re.IGNORECASE)
+            continue  # Bruchstueck einer laengeren Farbe
+        kern = re.search(
+            r"[\s\-]*".join(re.escape(w) for w in woerter), titel, re.IGNORECASE
+        )
         return (kern.group(0).strip(), kanonisch)
     return ("", None)
 
@@ -420,10 +453,23 @@ def farbe_aus_titel(titel: str, tabelle: dict) -> tuple[str, Optional[str]]:
 # Vergleichstabelle. Ein Gebrauchtpreis, der einen Neupreis schlaegt, ist
 # dieselbe Fehlerklasse wie die Buendelzahl, die einen Geraetepreis schlaegt.
 _ZUSTAENDE = (
-    ("refurbished", ("refurbished", "refurb", "generalueberholt", "erneuert",
-                     "renewed", "gebraucht", "wie-neu", "second-hand")),
-    ("b-ware", ("b-ware", "bware", "vorfuehrgeraet", "vorfuehrer",
-                "ausstellungsstueck")),
+    (
+        "refurbished",
+        (
+            "refurbished",
+            "refurb",
+            "generalueberholt",
+            "erneuert",
+            "renewed",
+            "gebraucht",
+            "wie-neu",
+            "second-hand",
+        ),
+    ),
+    (
+        "b-ware",
+        ("b-ware", "bware", "vorfuehrgeraet", "vorfuehrer", "ausstellungsstueck"),
+    ),
 )
 
 
@@ -432,8 +478,15 @@ _ZUSTAENDE = (
 # fuehren - beides ist eine Aussage, die die Quelle nicht deckt. Sie ergeben
 # deshalb "unbekannt", und "unbekannt" faellt aus Preisvergleich und
 # Preisgrafik heraus (siehe VERGLEICHBARE_ZUSTAENDE).
-_UNSICHER = ("neuwertig", "retoure", "open-box", "openbox", "zweite-wahl",
-             "2-wahl", "geprueft-und-zertifiziert")
+_UNSICHER = (
+    "neuwertig",
+    "retoure",
+    "open-box",
+    "openbox",
+    "zweite-wahl",
+    "2-wahl",
+    "geprueft-und-zertifiziert",
+)
 
 # Ab welcher Laenge ein Zustandsmarker auch gebeugt treffen darf. Acht
 # Zeichen halten "erneuert" (8) und "gebraucht" (9) drin und "refurb" (6)
@@ -556,8 +609,11 @@ def ohne_zustandswort(farbe: str) -> str:
     getroffen = 0
     for wort in sorted(woerter, key=len, reverse=True):
         rest, treffer = re.subn(
-            rf"(?<![a-z0-9]){_zustandsmuster(wort)}(?![a-z0-9])", " ", rest,
-            flags=re.IGNORECASE)
+            rf"(?<![a-z0-9]){_zustandsmuster(wort)}(?![a-z0-9])",
+            " ",
+            rest,
+            flags=re.IGNORECASE,
+        )
         getroffen += treffer
     # KEIN Kennzeichen gefunden: die Farbe geht unveraendert zurueck. Siehe
     # Docstring - alles andere waere eine Aenderung an Daten, ueber die diese
@@ -587,7 +643,7 @@ def zustand_aus_feldern(*felder) -> str:
 
 
 def zustand_aus_titel(titel: str) -> str:
-    """"neu" | "refurbished" | "b-ware" | "unbekannt"."""
+    """ "neu" | "refurbished" | "b-ware" | "unbekannt"."""
     marken = set(wortmarken(titel))
     text = normalisiere(titel)
 
@@ -607,8 +663,9 @@ def zustand_aus_titel(titel: str) -> str:
         # die frueher oder spaeter ein harmloses laengeres Wort trifft.
         if len(wort) < _BEUGBAR_AB:
             return False
-        return any(f"{wort}{endung}" in marken
-                   for endung in ("e", "es", "er", "en", "em"))
+        return any(
+            f"{wort}{endung}" in marken for endung in ("e", "es", "er", "en", "em")
+        )
 
     for name, woerter in _ZUSTAENDE:
         for wort in woerter:
@@ -627,17 +684,18 @@ def zustand_aus_titel(titel: str) -> str:
 # Geraet und Katalog
 # --------------------------------------------------------------------------
 
+
 @dataclass
 class Geraet:
     hersteller: str
     modell: str
-    marktstart: str = ""          # YYYY-MM-DD, Marktstart des Modells
+    marktstart: str = ""  # YYYY-MM-DD, Marktstart des Modells
     generation: Optional[int] = None
     # Modellname des Vorgaengers, wie er im Katalog steht. Das Feld, an dem
     # die ganze Lifecycle-Auswertung haengt: ohne gepflegte Kette gibt es
     # keine Nachfolger-Analyse.
     vorgaenger: str = ""
-    segment: str = ""             # flagship | premium | mid | entry
+    segment: str = ""  # flagship | premium | mid | entry
     speicher: list = field(default_factory=list)
     aliase: list = field(default_factory=list)
     # E4-Auto-Erkennung: ISO-Datum des Laufs, der diesen Eintrag aus einem
@@ -677,7 +735,8 @@ class Katalog:
             if g.device_id in gesehen:
                 raise ValueError(
                     f"Geraet doppelt im Katalog: {g.hersteller} {g.modell} "
-                    f"ergibt dieselbe device_id wie {gesehen[g.device_id]}")
+                    f"ergibt dieselbe device_id wie {gesehen[g.device_id]}"
+                )
             gesehen[g.device_id] = f"{g.hersteller} {g.modell}"
         self._index = {g.device_id: g for g in self.geraete}
         # Erkennungstabelle: Wortmarkenfolge -> Geraet. Laengste zuerst,
@@ -695,7 +754,7 @@ class Katalog:
                 vorher = belegt.get(schluessel)
                 if vorher is not None:
                     if vorher.device_id == g.device_id:
-                        continue          # derselbe Eintrag, doppelt genannt
+                        continue  # derselbe Eintrag, doppelt genannt
                     # Zwei VERSCHIEDENE Geraete mit derselben Wortmarkenfolge:
                     # die Erkennung waere ab hier zufaellig. Genau so ist der
                     # Alias "Galaxy S25+" entstanden - das Pluszeichen
@@ -705,7 +764,8 @@ class Katalog:
                         f"Schreibweise {s!r} ist nach der Normalisierung nicht "
                         f"unterscheidbar: {vorher.hersteller} {vorher.modell} "
                         f"und {g.hersteller} {g.modell} ergeben beide "
-                        f"{' '.join(marken)}")
+                        f"{' '.join(marken)}"
+                    )
                 belegt[schluessel] = g
                 muster.append((marken, g))
         muster.sort(key=lambda p: -len(p[0]))
@@ -737,7 +797,7 @@ class Katalog:
             schluessel = tuple(marken)
             vorher = belegt.get(schluessel)
             if vorher is not None and vorher is not geraet:
-                return False          # nicht unterscheidbar, siehe __post_init__
+                return False  # nicht unterscheidbar, siehe __post_init__
             belegt[schluessel] = geraet
             neu.append((marken, geraet))
         self.geraete.append(geraet)
@@ -793,7 +853,7 @@ def _fundstellen(heuhaufen: list, nadel: list) -> list:
     n, k = len(heuhaufen), len(nadel)
     if k == 0 or k > n:
         return []
-    return [i for i in range(n - k + 1) if heuhaufen[i:i + k] == nadel]
+    return [i for i in range(n - k + 1) if heuhaufen[i : i + k] == nadel]
 
 
 def _ist_zubehoer(marken: list, ab: int = 0) -> bool:
@@ -846,11 +906,11 @@ def erkenne_geraet(titel: str, katalog: Katalog) -> Optional[Geraet]:
     marken = wortmarken(titel)
     if not marken or any(m in _ZUBEHOER_IMMER for m in marken):
         return None
-    for nadel, geraet in katalog._muster:   # nach Laenge absteigend sortiert
+    for nadel, geraet in katalog._muster:  # nach Laenge absteigend sortiert
         for start in _fundstellen(marken, nadel):
-            danach = marken[start + len(nadel):]
+            danach = marken[start + len(nadel) :]
             if danach and danach[0] in _MODELLZUSATZ:
-                continue          # der Titel meint ein anderes Modell
+                continue  # der Titel meint ein anderes Modell
             if _ist_zubehoer(marken, ab=start):
                 continue
             return geraet
@@ -860,6 +920,7 @@ def erkenne_geraet(titel: str, katalog: Katalog) -> Optional[Geraet]:
 # --------------------------------------------------------------------------
 # SKU und Listung
 # --------------------------------------------------------------------------
+
 
 @dataclass
 class Sku:
@@ -880,9 +941,12 @@ _DATUM_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 TOLERANZ_EURO = 0.01
 
 
-def probe_geht_auf(anzahlung: Optional[float], monatsrate: Optional[float],
-                   laufzeit_monate: Optional[int],
-                   gesamt: Optional[float]) -> bool:
+def probe_geht_auf(
+    anzahlung: Optional[float],
+    monatsrate: Optional[float],
+    laufzeit_monate: Optional[int],
+    gesamt: Optional[float],
+) -> bool:
     """`anzahlung + n * rate == gesamt`, auf einen Cent genau.
 
     DIE EINE STELLE, an der diese Rechnung steht. Sie ist die billigste
@@ -944,13 +1008,13 @@ class Ratenzahlung:
             setattr(self, feld, round(wert, 2))
         self.laufzeit_monate = int(self.laufzeit_monate)
         if self.laufzeit_monate <= 0:
-            raise ValueError(f"laufzeit_monate muss positiv sein: "
-                             f"{self.laufzeit_monate}")
+            raise ValueError(
+                f"laufzeit_monate muss positiv sein: {self.laufzeit_monate}"
+            )
         if self.zins_effektiv is not None:
             self.zins_effektiv = float(self.zins_effektiv)
             if self.zins_effektiv < 0:
-                raise ValueError(f"negativer zins_effektiv: "
-                                 f"{self.zins_effektiv}")
+                raise ValueError(f"negativer zins_effektiv: {self.zins_effektiv}")
 
     @property
     def gesamt(self) -> float:
@@ -964,12 +1028,14 @@ class Ratenzahlung:
 
     def deckt(self, gesamt: Optional[float]) -> bool:
         """Passt diese Ratenzahlung zu einem gemessenen Gesamtbetrag?"""
-        return probe_geht_auf(self.anzahlung, self.monatsrate,
-                              self.laufzeit_monate, gesamt)
+        return probe_geht_auf(
+            self.anzahlung, self.monatsrate, self.laufzeit_monate, gesamt
+        )
 
 
-def ratenhinweis(laufzeit_monate: Optional[int],
-                 zins_effektiv: Optional[float] = None) -> str:
+def ratenhinweis(
+    laufzeit_monate: Optional[int], zins_effektiv: Optional[float] = None
+) -> str:
     """Wie eine Ratenzahl auf der Seite bezeichnet wird - an EINER Stelle.
 
     Der Befund vom 03.09.2026: o2s Preisspalte traegt `totalPrice`, also den
@@ -1010,8 +1076,7 @@ def ratenhinweis_aus_eintrag(eintrag: dict) -> str:
     sie bekommen einen leeren Hinweis und werden nicht nachtraeglich
     umgedeutet. Was damals gemessen wurde, bleibt, wie es gemessen wurde.
     """
-    return ratenhinweis(eintrag.get("laufzeit_monate"),
-                        eintrag.get("zins_effektiv"))
+    return ratenhinweis(eintrag.get("laufzeit_monate"), eintrag.get("zins_effektiv"))
 
 
 @dataclass
@@ -1023,6 +1088,7 @@ class Listung:
     keine Zahl auf die Seite geraten, die niemand nachschlagen kann - das
     Nachpruefbarkeitsversprechen des ganzen Portals.
     """
+
     sku_id: str
     device_id: str
     anbieter: str
@@ -1054,7 +1120,7 @@ class Listung:
     farbe_roh: str = ""
     farbe_normalisiert: Optional[str] = None
     ean: str = ""
-    zustand: str = "neu"          # neu | refurbished | b-ware | unbekannt
+    zustand: str = "neu"  # neu | refurbished | b-ware | unbekannt
     titel_roh: str = ""
     # Die Einstiegsseite, auf der dieses Geraet gefunden wurde. Sie ist der
     # Schluessel der Auslistungslogik: gealtert wird nur, was auf einer
@@ -1065,11 +1131,14 @@ class Listung:
 
     def __post_init__(self):
         if not (self.quelle_url or "").strip():
-            raise ValueError("Listung ohne quelle_url: ein Preis ohne Beleg "
-                             "ist auf diesem Portal keine Zahl")
+            raise ValueError(
+                "Listung ohne quelle_url: ein Preis ohne Beleg "
+                "ist auf diesem Portal keine Zahl"
+            )
         if not _DATUM_RE.match((self.abgerufen_am or "").strip()):
-            raise ValueError("Listung ohne gueltiges abgerufen_am "
-                             "(erwartet YYYY-MM-DD)")
+            raise ValueError(
+                "Listung ohne gueltiges abgerufen_am (erwartet YYYY-MM-DD)"
+            )
         if self.verfuegbarkeit not in VERFUEGBARKEITEN:
             raise ValueError(f"unbekannte verfuegbarkeit: {self.verfuegbarkeit!r}")
         if self.anbieter_typ not in ANBIETER_TYPEN:
@@ -1078,8 +1147,14 @@ class Listung:
             raise ValueError(f"unbekannter zustand: {self.zustand!r}")
         if self.confidence not in CONFIDENCE:
             raise ValueError(f"unbekannte confidence: {self.confidence!r}")
-        for feld in ("preis_ohne_vertrag", "uvp", "preis_mit_vertrag_ab",
-                     "zuzahlung", "anzahlung", "monatsrate"):
+        for feld in (
+            "preis_ohne_vertrag",
+            "uvp",
+            "preis_mit_vertrag_ab",
+            "zuzahlung",
+            "anzahlung",
+            "monatsrate",
+        ):
             wert = getattr(self, feld)
             if wert is None:
                 continue
@@ -1090,8 +1165,9 @@ class Listung:
         if self.laufzeit_monate is not None:
             self.laufzeit_monate = int(self.laufzeit_monate)
             if self.laufzeit_monate <= 0:
-                raise ValueError(f"laufzeit_monate muss positiv sein: "
-                                 f"{self.laufzeit_monate}")
+                raise ValueError(
+                    f"laufzeit_monate muss positiv sein: {self.laufzeit_monate}"
+                )
         if self.zins_effektiv is not None:
             self.zins_effektiv = float(self.zins_effektiv)
             # Dieselbe Sicherung wie bei den Preisfeldern darueber. Ein
@@ -1099,16 +1175,20 @@ class Listung:
             # Anbieter draufzahlt - im Zweifel ein Vorzeichenfehler in der
             # Quelle, und der gehoert nicht unbemerkt auf die Seite.
             if self.zins_effektiv < 0:
-                raise ValueError(f"negativer zins_effektiv: "
-                                 f"{self.zins_effektiv}")
+                raise ValueError(f"negativer zins_effektiv: {self.zins_effektiv}")
         # Teil C4: "iPhone fuer 1 Euro" ist ohne den Tarif dahinter eine Zahl
         # ohne Bedeutung. JEDE Buendelzahl braucht ihren Tarif - auch
         # `preis_mit_vertrag_ab`, sonst waere sie das Schlupfloch, durch das
         # der Lockpreis doch auf die Seite kaeme.
         for feld in ("zuzahlung", "preis_mit_vertrag_ab"):
-            if getattr(self, feld) is not None and not (self.tarif_referenz or "").strip():
-                raise ValueError(f"{feld} ohne tarif_referenz: eine Buendelzahl "
-                                 "ohne ihren Tarif ist bedeutungslos")
+            if (
+                getattr(self, feld) is not None
+                and not (self.tarif_referenz or "").strip()
+            ):
+                raise ValueError(
+                    f"{feld} ohne tarif_referenz: eine Buendelzahl "
+                    "ohne ihren Tarif ist bedeutungslos"
+                )
 
     @property
     def listung_id(self) -> str:
@@ -1140,13 +1220,18 @@ class Listung:
         Buendel. Fehlt eines der drei Pflichtfelder, gibt es keine
         Ratenzahlung - ein halbes Teilzahlungsgeschaeft ist keins.
         """
-        if (self.anzahlung is None or self.monatsrate is None
-                or not self.laufzeit_monate):
+        if (
+            self.anzahlung is None
+            or self.monatsrate is None
+            or not self.laufzeit_monate
+        ):
             return None
-        return Ratenzahlung(anzahlung=self.anzahlung,
-                            monatsrate=self.monatsrate,
-                            laufzeit_monate=self.laufzeit_monate,
-                            zins_effektiv=self.zins_effektiv)
+        return Ratenzahlung(
+            anzahlung=self.anzahlung,
+            monatsrate=self.monatsrate,
+            laufzeit_monate=self.laufzeit_monate,
+            zins_effektiv=self.zins_effektiv,
+        )
 
     @property
     def ratenhinweis(self) -> str:
@@ -1164,29 +1249,43 @@ class Listung:
         return None
 
     def sku(self) -> Sku:
-        return Sku(sku_id=self.sku_id, device_id=self.device_id,
-                   speicher_gb=self.speicher_gb, farbe_roh=self.farbe_roh,
-                   farbe_normalisiert=self.farbe_normalisiert, ean=self.ean)
+        return Sku(
+            sku_id=self.sku_id,
+            device_id=self.device_id,
+            speicher_gb=self.speicher_gb,
+            farbe_roh=self.farbe_roh,
+            farbe_normalisiert=self.farbe_normalisiert,
+            ean=self.ean,
+        )
 
 
-def lies_listung(*, titel: str, anbieter: str, anbieter_typ: str,
-                 quelle_url: str, abgerufen_am: str, katalog: Katalog,
-                 farben: dict, netz: str = "",
-                 preis_ohne_vertrag: Optional[float] = None,
-                 uvp: Optional[float] = None,
-                 preis_mit_vertrag_ab: Optional[float] = None,
-                 zuzahlung: Optional[float] = None,
-                 tarif_referenz: str = "",
-                 anzahlung: Optional[float] = None,
-                 monatsrate: Optional[float] = None,
-                 laufzeit_monate: Optional[int] = None,
-                 zins_effektiv: Optional[float] = None,
-                 verfuegbarkeit: str = "unbekannt",
-                 confidence: str = "mittel",
-                 speicher_gb: Optional[int] = None,
-                 farbe_roh: str = "", ean: str = "",
-                 zustand_hinweis: str = "",
-                 einstieg_url: str = "") -> Optional[Listung]:
+def lies_listung(
+    *,
+    titel: str,
+    anbieter: str,
+    anbieter_typ: str,
+    quelle_url: str,
+    abgerufen_am: str,
+    katalog: Katalog,
+    farben: dict,
+    netz: str = "",
+    preis_ohne_vertrag: Optional[float] = None,
+    uvp: Optional[float] = None,
+    preis_mit_vertrag_ab: Optional[float] = None,
+    zuzahlung: Optional[float] = None,
+    tarif_referenz: str = "",
+    anzahlung: Optional[float] = None,
+    monatsrate: Optional[float] = None,
+    laufzeit_monate: Optional[int] = None,
+    zins_effektiv: Optional[float] = None,
+    verfuegbarkeit: str = "unbekannt",
+    confidence: str = "mittel",
+    speicher_gb: Optional[int] = None,
+    farbe_roh: str = "",
+    ean: str = "",
+    zustand_hinweis: str = "",
+    einstieg_url: str = "",
+) -> Optional[Listung]:
     """Die ganze Kette in einem Aufruf - der Einstieg fuer jeden Adapter.
 
     Titel -> Katalogeintrag -> Speicher -> Farbe -> IDs -> Listung. Gibt
@@ -1232,13 +1331,29 @@ def lies_listung(*, titel: str, anbieter: str, anbieter_typ: str,
     sid = sku_id(gid, speicher_gb, kanonisch or farbe_roh or None, zustand)
 
     return Listung(
-        sku_id=sid, device_id=gid, anbieter=anbieter, anbieter_typ=anbieter_typ,
-        quelle_url=quelle_url, abgerufen_am=abgerufen_am, netz=netz,
-        preis_ohne_vertrag=preis_ohne_vertrag, uvp=uvp,
-        preis_mit_vertrag_ab=preis_mit_vertrag_ab, zuzahlung=zuzahlung,
-        tarif_referenz=tarif_referenz, anzahlung=anzahlung,
-        monatsrate=monatsrate, laufzeit_monate=laufzeit_monate,
-        zins_effektiv=zins_effektiv, verfuegbarkeit=verfuegbarkeit,
-        confidence=confidence, speicher_gb=speicher_gb, farbe_roh=farbe_roh,
-        farbe_normalisiert=kanonisch, ean=ean, zustand=zustand,
-        titel_roh=(titel or "").strip(), einstieg_url=einstieg_url)
+        sku_id=sid,
+        device_id=gid,
+        anbieter=anbieter,
+        anbieter_typ=anbieter_typ,
+        quelle_url=quelle_url,
+        abgerufen_am=abgerufen_am,
+        netz=netz,
+        preis_ohne_vertrag=preis_ohne_vertrag,
+        uvp=uvp,
+        preis_mit_vertrag_ab=preis_mit_vertrag_ab,
+        zuzahlung=zuzahlung,
+        tarif_referenz=tarif_referenz,
+        anzahlung=anzahlung,
+        monatsrate=monatsrate,
+        laufzeit_monate=laufzeit_monate,
+        zins_effektiv=zins_effektiv,
+        verfuegbarkeit=verfuegbarkeit,
+        confidence=confidence,
+        speicher_gb=speicher_gb,
+        farbe_roh=farbe_roh,
+        farbe_normalisiert=kanonisch,
+        ean=ean,
+        zustand=zustand,
+        titel_roh=(titel or "").strip(),
+        einstieg_url=einstieg_url,
+    )

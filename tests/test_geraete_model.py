@@ -15,6 +15,7 @@ Lifecycle-Auswertung waere Muell. Deshalb entsteht die ID hier NIE aus dem
 Titel, sondern aus dem KATALOGEINTRAG, den der Titel trifft, plus den
 normalisierten Feldern Speicher und Farbe.
 """
+
 import pytest
 
 from telco_radar.geraete_model import (
@@ -44,27 +45,62 @@ from telco_radar.geraete_model import (
 # (iPhone 17 / 17 Pro / 17 Pro Max), zwei Hersteller mit derselben Ziffer
 # und ein Geraet, dessen Name eine angeklebte Ziffer traegt (Fold7).
 # --------------------------------------------------------------------------
-_KATALOG = Katalog(geraete=[
-    Geraet(hersteller="Apple", modell="iPhone 17", generation=17,
-           vorgaenger="iPhone 16", marktstart="2026-09-19",
-           speicher=[128, 256, 512], segment="premium"),
-    Geraet(hersteller="Apple", modell="iPhone 17 Pro", generation=17,
-           vorgaenger="iPhone 16 Pro", marktstart="2026-09-19",
-           speicher=[256, 512, 1024], segment="flagship"),
-    Geraet(hersteller="Apple", modell="iPhone 17 Pro Max", generation=17,
-           vorgaenger="iPhone 16 Pro Max", marktstart="2026-09-19",
-           aliase=["Apple iPhone 17 ProMax 5G"],
-           speicher=[256, 512, 1024], segment="flagship"),
-    Geraet(hersteller="Apple", modell="iPhone 16 Pro Max", generation=16,
-           marktstart="2025-09-20", speicher=[256, 512, 1024],
-           segment="flagship"),
-    Geraet(hersteller="Samsung", modell="Galaxy S25 Ultra", generation=25,
-           marktstart="2026-01-24", speicher=[256, 512, 1024],
-           segment="flagship"),
-    Geraet(hersteller="Samsung", modell="Galaxy Z Fold 7", generation=7,
-           marktstart="2026-07-25", speicher=[256, 512],
-           segment="flagship"),
-])
+_KATALOG = Katalog(
+    geraete=[
+        Geraet(
+            hersteller="Apple",
+            modell="iPhone 17",
+            generation=17,
+            vorgaenger="iPhone 16",
+            marktstart="2026-09-19",
+            speicher=[128, 256, 512],
+            segment="premium",
+        ),
+        Geraet(
+            hersteller="Apple",
+            modell="iPhone 17 Pro",
+            generation=17,
+            vorgaenger="iPhone 16 Pro",
+            marktstart="2026-09-19",
+            speicher=[256, 512, 1024],
+            segment="flagship",
+        ),
+        Geraet(
+            hersteller="Apple",
+            modell="iPhone 17 Pro Max",
+            generation=17,
+            vorgaenger="iPhone 16 Pro Max",
+            marktstart="2026-09-19",
+            aliase=["Apple iPhone 17 ProMax 5G"],
+            speicher=[256, 512, 1024],
+            segment="flagship",
+        ),
+        Geraet(
+            hersteller="Apple",
+            modell="iPhone 16 Pro Max",
+            generation=16,
+            marktstart="2025-09-20",
+            speicher=[256, 512, 1024],
+            segment="flagship",
+        ),
+        Geraet(
+            hersteller="Samsung",
+            modell="Galaxy S25 Ultra",
+            generation=25,
+            marktstart="2026-01-24",
+            speicher=[256, 512, 1024],
+            segment="flagship",
+        ),
+        Geraet(
+            hersteller="Samsung",
+            modell="Galaxy Z Fold 7",
+            generation=7,
+            marktstart="2026-07-25",
+            speicher=[256, 512],
+            segment="flagship",
+        ),
+    ]
+)
 
 _FARBEN = {
     "titannatur": "titan-natur",
@@ -78,6 +114,7 @@ _FARBEN = {
 # --------------------------------------------------------------------------
 # Normalisierung
 # --------------------------------------------------------------------------
+
 
 def test_normalisiere_faltet_umlaute_und_sonderzeichen():
     assert normalisiere("Titan Natur") == "titan-natur"
@@ -107,6 +144,7 @@ def test_wortmarken_lassen_ziffer_buchstabe_zusammen():
 # Die ID-Regel
 # --------------------------------------------------------------------------
 
+
 def test_ids_sind_lesbar_und_nicht_gehasht():
     # Klartext statt Hash, dieselbe Begruendung wie bei data/state/ct_seen.jsonl:
     # es sind hunderte Zeilen, nicht Millionen, und der Klartext ist die halbe
@@ -124,17 +162,26 @@ def test_sku_id_ohne_speicher_oder_farbe_sagt_das_offen():
     assert sku_id(d, 128, None) == "apple-iphone-17-128gb-ohne-farbe"
 
 
-@pytest.mark.parametrize("titel", [
-    "APPLE iPhone 17 Pro Max 5G 256 GB Titannatur Dual-SIM",
-    "Apple iPhone 17 Pro Max (256 GB) - Titan Natur",
-    "Apple iPhone 17 Pro Max 256GB Natural Titanium, Smartphone",
-])
+@pytest.mark.parametrize(
+    "titel",
+    [
+        "APPLE iPhone 17 Pro Max 5G 256 GB Titannatur Dual-SIM",
+        "Apple iPhone 17 Pro Max (256 GB) - Titan Natur",
+        "Apple iPhone 17 Pro Max 256GB Natural Titanium, Smartphone",
+    ],
+)
 def test_drei_haendlerschreibweisen_ergeben_dieselbe_sku_id(titel):
     """Akzeptanzkriterium 1 aus Teil E."""
     listung = lies_listung(
-        titel=titel, anbieter="MediaMarkt", anbieter_typ="handel",
-        quelle_url="https://example.de/p/1", abgerufen_am="2026-08-10",
-        katalog=_KATALOG, farben=_FARBEN, preis_ohne_vertrag=1449.0)
+        titel=titel,
+        anbieter="MediaMarkt",
+        anbieter_typ="handel",
+        quelle_url="https://example.de/p/1",
+        abgerufen_am="2026-08-10",
+        katalog=_KATALOG,
+        farben=_FARBEN,
+        preis_ohne_vertrag=1449.0,
+    )
     assert listung is not None
     assert listung.sku_id == "apple-iphone-17-pro-max-256gb-titan-natur"
     assert listung.device_id == "apple-iphone-17-pro-max"
@@ -143,15 +190,26 @@ def test_drei_haendlerschreibweisen_ergeben_dieselbe_sku_id(titel):
 def test_geaenderter_produkttitel_ergibt_keine_neue_id():
     """Der Kern der Regel: derselbe Artikel, naechste Woche umbenannt."""
     alt = lies_listung(
-        titel="Apple iPhone 17 Pro Max 256GB Titannatur", anbieter="expert",
-        anbieter_typ="handel", quelle_url="https://example.de/p/1",
-        abgerufen_am="2026-08-03", katalog=_KATALOG, farben=_FARBEN,
-        preis_ohne_vertrag=1449.0)
+        titel="Apple iPhone 17 Pro Max 256GB Titannatur",
+        anbieter="expert",
+        anbieter_typ="handel",
+        quelle_url="https://example.de/p/1",
+        abgerufen_am="2026-08-03",
+        katalog=_KATALOG,
+        farben=_FARBEN,
+        preis_ohne_vertrag=1449.0,
+    )
     neu = lies_listung(
         titel="Apple iPhone 17 Pro Max 5G 256 GB Titan Natur (Neuware, "
-              "sofort lieferbar)", anbieter="expert", anbieter_typ="handel",
-        quelle_url="https://example.de/p/1", abgerufen_am="2026-08-10",
-        katalog=_KATALOG, farben=_FARBEN, preis_ohne_vertrag=1399.0)
+        "sofort lieferbar)",
+        anbieter="expert",
+        anbieter_typ="handel",
+        quelle_url="https://example.de/p/1",
+        abgerufen_am="2026-08-10",
+        katalog=_KATALOG,
+        farben=_FARBEN,
+        preis_ohne_vertrag=1399.0,
+    )
     assert alt is not None and neu is not None
     assert alt.listung_id == neu.listung_id
     # Gegenprobe, damit der Test nicht durch einen leeren Vergleich gruen
@@ -161,10 +219,15 @@ def test_geaenderter_produkttitel_ergibt_keine_neue_id():
 
 def test_verschiedene_speicher_sind_verschiedene_skus():
     ids = {
-        lies_listung(titel=f"Apple iPhone 17 Pro Max {gb} GB Titannatur",
-                     anbieter="expert", anbieter_typ="handel",
-                     quelle_url="https://example.de/p", abgerufen_am="2026-08-10",
-                     katalog=_KATALOG, farben=_FARBEN).sku_id
+        lies_listung(
+            titel=f"Apple iPhone 17 Pro Max {gb} GB Titannatur",
+            anbieter="expert",
+            anbieter_typ="handel",
+            quelle_url="https://example.de/p",
+            abgerufen_am="2026-08-10",
+            katalog=_KATALOG,
+            farben=_FARBEN,
+        ).sku_id
         for gb in (256, 512, 1024)
     }
     assert len(ids) == 3
@@ -174,13 +237,16 @@ def test_verschiedene_speicher_sind_verschiedene_skus():
 # Geraeteerkennung
 # --------------------------------------------------------------------------
 
+
 def test_laengster_treffer_gewinnt():
-    """"iPhone 17", "iPhone 17 Pro" und "iPhone 17 Pro Max" stehen alle im
+    """ "iPhone 17", "iPhone 17 Pro" und "iPhone 17 Pro Max" stehen alle im
     Katalog und passen alle auf denselben Titel. Ohne diese Regel liefe die
     ganze Pro-Max-Klasse unter "iPhone 17"."""
     g = erkenne_geraet("Apple iPhone 17 Pro Max 256 GB", _KATALOG)
     assert g.modell == "iPhone 17 Pro Max"
-    assert erkenne_geraet("Apple iPhone 17 Pro 256 GB", _KATALOG).modell == "iPhone 17 Pro"
+    assert (
+        erkenne_geraet("Apple iPhone 17 Pro 256 GB", _KATALOG).modell == "iPhone 17 Pro"
+    )
     assert erkenne_geraet("Apple iPhone 17 128 GB Blau", _KATALOG).modell == "iPhone 17"
 
 
@@ -194,12 +260,15 @@ def test_angeklebte_ziffer_wird_erkannt():
     assert g is not None and g.modell == "Galaxy Z Fold 7"
 
 
-@pytest.mark.parametrize("titel", [
-    "Schutzhülle für Apple iPhone 17 Pro Max, transparent",
-    "Panzerglas Displayschutz iPhone 17 Pro Max (2er-Pack)",
-    "Samsung Galaxy Z Fold 7 Case, schwarz",
-    "Ladekabel USB-C für iPhone 17",
-])
+@pytest.mark.parametrize(
+    "titel",
+    [
+        "Schutzhülle für Apple iPhone 17 Pro Max, transparent",
+        "Panzerglas Displayschutz iPhone 17 Pro Max (2er-Pack)",
+        "Samsung Galaxy Z Fold 7 Case, schwarz",
+        "Ladekabel USB-C für iPhone 17",
+    ],
+)
 def test_zubehoer_ist_kein_geraet(titel):
     """Eine Kategorieseite eines Haendlers listet Huellen und Schutzglas
     zwischen den Geraeten. Ohne diesen Filter stuenden 9,99-Euro-Huellen als
@@ -217,10 +286,18 @@ def test_zubehoerwort_im_geraetetitel_verwirft_nicht():
 
 def test_unbekanntes_geraet_wird_nicht_erfunden():
     assert erkenne_geraet("Fairphone 6 256 GB", _KATALOG) is None
-    assert lies_listung(titel="Fairphone 6 256 GB", anbieter="expert",
-                        anbieter_typ="handel", quelle_url="https://example.de/p",
-                        abgerufen_am="2026-08-10", katalog=_KATALOG,
-                        farben=_FARBEN) is None
+    assert (
+        lies_listung(
+            titel="Fairphone 6 256 GB",
+            anbieter="expert",
+            anbieter_typ="handel",
+            quelle_url="https://example.de/p",
+            abgerufen_am="2026-08-10",
+            katalog=_KATALOG,
+            farben=_FARBEN,
+        )
+        is None
+    )
 
 
 def test_teiltreffer_ueber_wortgrenze_zaehlt_nicht():
@@ -228,6 +305,7 @@ def test_teiltreffer_ueber_wortgrenze_zaehlt_nicht():
     # KEIN Zubehoerwort enthalten, sonst faellt er schon dort durch und der
     # Test prueft die Wortfolgenpruefung gar nicht.
     from telco_radar.geraete_model import _ist_zubehoer
+
     titel = "Apple Watch Series 17 GPS 42 mm"
     assert not _ist_zubehoer(wortmarken(titel))
     assert erkenne_geraet(titel, _KATALOG) is None
@@ -237,12 +315,16 @@ def test_teiltreffer_ueber_wortgrenze_zaehlt_nicht():
 # Speicher
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("titel,erwartet", [
-    ("iPhone 17 Pro Max 256GB", 256),
-    ("iPhone 17 Pro Max 256 GB", 256),
-    ("Galaxy S25 Ultra 1 TB", 1024),
-    ("Galaxy S25 Ultra 1TB Titanium", 1024),
-])
+
+@pytest.mark.parametrize(
+    "titel,erwartet",
+    [
+        ("iPhone 17 Pro Max 256GB", 256),
+        ("iPhone 17 Pro Max 256 GB", 256),
+        ("Galaxy S25 Ultra 1 TB", 1024),
+        ("Galaxy S25 Ultra 1TB Titanium", 1024),
+    ],
+)
 def test_speicher_aus_titel(titel, erwartet):
     assert speicher_aus_titel(titel) == erwartet
 
@@ -264,13 +346,15 @@ def test_zwei_verschiedene_groessen_im_titel_ergeben_keine_vermutung():
 
 
 def test_1024_gb_und_1_tb_sind_derselbe_wert():
-    assert speicher_aus_titel("Galaxy S25 Ultra 1024 GB") == \
-        speicher_aus_titel("Galaxy S25 Ultra 1 TB")
+    assert speicher_aus_titel("Galaxy S25 Ultra 1024 GB") == speicher_aus_titel(
+        "Galaxy S25 Ultra 1 TB"
+    )
 
 
 # --------------------------------------------------------------------------
 # Farben
 # --------------------------------------------------------------------------
+
 
 def test_farbnormalisierung_fasst_schreibweisen_zusammen():
     assert normalisiere_farbe("Titannatur", _FARBEN) == "titan-natur"
@@ -286,10 +370,16 @@ def test_unbekannte_farbe_landet_trotzdem_in_der_sku_id():
     """Sonst faendest du zwei Geraete in einem Topf, nur weil niemand die
     Farbtabelle gepflegt hat. Der Preis dafuer steht im Farbbericht am
     Seitenende: zwei unbekannte Schreibweisen sind zwei SKUs."""
-    l = lies_listung(titel="Apple iPhone 17 Pro Max 256 GB Desert Mocha",
-                     anbieter="expert", anbieter_typ="handel",
-                     quelle_url="https://example.de/p", abgerufen_am="2026-08-10",
-                     katalog=_KATALOG, farben=_FARBEN, farbe_roh="Desert Mocha")
+    l = lies_listung(
+        titel="Apple iPhone 17 Pro Max 256 GB Desert Mocha",
+        anbieter="expert",
+        anbieter_typ="handel",
+        quelle_url="https://example.de/p",
+        abgerufen_am="2026-08-10",
+        katalog=_KATALOG,
+        farben=_FARBEN,
+        farbe_roh="Desert Mocha",
+    )
     assert l.farbe_normalisiert is None
     assert l.farbe_roh == "Desert Mocha"
     assert l.sku_id.endswith("-desert-mocha")
@@ -301,17 +391,23 @@ def test_ohne_farbfeld_der_quelle_wird_keine_farbe_erfunden():
     keine Farbe. Das ist ehrlich - aber es heisst auch, dass der Farbbericht
     am Seitenende sich aus den Farbfeldern der QUELLEN speist, nicht aus
     Titeln."""
-    l = lies_listung(titel="Apple iPhone 17 Pro Max 256 GB Desert Mocha",
-                     anbieter="expert", anbieter_typ="handel",
-                     quelle_url="https://example.de/p", abgerufen_am="2026-08-10",
-                     katalog=_KATALOG, farben=_FARBEN)
+    l = lies_listung(
+        titel="Apple iPhone 17 Pro Max 256 GB Desert Mocha",
+        anbieter="expert",
+        anbieter_typ="handel",
+        quelle_url="https://example.de/p",
+        abgerufen_am="2026-08-10",
+        katalog=_KATALOG,
+        farben=_FARBEN,
+    )
     assert l.farbe_roh == "" and l.farbe_normalisiert is None
     assert l.sku_id.endswith("-ohne-farbe")
 
 
 def test_farbe_aus_titel_gibt_die_rohschreibweise_zurueck():
-    roh, kanonisch = farbe_aus_titel("Apple iPhone 17 Pro Max 256 GB Titan Natur",
-                                     _FARBEN)
+    roh, kanonisch = farbe_aus_titel(
+        "Apple iPhone 17 Pro Max 256 GB Titan Natur", _FARBEN
+    )
     assert roh == "Titan Natur"
     assert kanonisch == "titan-natur"
 
@@ -324,32 +420,55 @@ def test_farbe_aus_titel_ohne_treffer():
 # Listung: die harten Zusicherungen
 # --------------------------------------------------------------------------
 
+
 def test_listung_ohne_quelle_laesst_sich_nicht_bauen():
     """Akzeptanzkriterium aus Teil E: kein Preis ohne Quelle und Abrufdatum."""
     with pytest.raises(ValueError, match="quelle_url"):
-        Listung(sku_id="x", device_id="x", anbieter="expert",
-                anbieter_typ="handel", quelle_url="", abgerufen_am="2026-08-10")
+        Listung(
+            sku_id="x",
+            device_id="x",
+            anbieter="expert",
+            anbieter_typ="handel",
+            quelle_url="",
+            abgerufen_am="2026-08-10",
+        )
 
 
 def test_listung_ohne_abrufdatum_laesst_sich_nicht_bauen():
     with pytest.raises(ValueError, match="abgerufen_am"):
-        Listung(sku_id="x", device_id="x", anbieter="expert",
-                anbieter_typ="handel", quelle_url="https://e.de/p",
-                abgerufen_am="")
+        Listung(
+            sku_id="x",
+            device_id="x",
+            anbieter="expert",
+            anbieter_typ="handel",
+            quelle_url="https://e.de/p",
+            abgerufen_am="",
+        )
 
 
 def test_abrufdatum_muss_ein_datum_sein():
     with pytest.raises(ValueError, match="abgerufen_am"):
-        Listung(sku_id="x", device_id="x", anbieter="expert",
-                anbieter_typ="handel", quelle_url="https://e.de/p",
-                abgerufen_am="gestern")
+        Listung(
+            sku_id="x",
+            device_id="x",
+            anbieter="expert",
+            anbieter_typ="handel",
+            quelle_url="https://e.de/p",
+            abgerufen_am="gestern",
+        )
 
 
 def test_unbekannte_verfuegbarkeit_wird_abgewiesen():
     with pytest.raises(ValueError, match="verfuegbarkeit"):
-        Listung(sku_id="x", device_id="x", anbieter="expert",
-                anbieter_typ="handel", quelle_url="https://e.de/p",
-                abgerufen_am="2026-08-10", verfuegbarkeit="vielleicht")
+        Listung(
+            sku_id="x",
+            device_id="x",
+            anbieter="expert",
+            anbieter_typ="handel",
+            quelle_url="https://e.de/p",
+            abgerufen_am="2026-08-10",
+            verfuegbarkeit="vielleicht",
+        )
 
 
 def test_ausverkauft_ist_nicht_ausgelistet():
@@ -362,19 +481,31 @@ def test_ausverkauft_ist_nicht_ausgelistet():
 
 def test_negativer_preis_wird_abgewiesen():
     with pytest.raises(ValueError, match="preis"):
-        Listung(sku_id="x", device_id="x", anbieter="expert",
-                anbieter_typ="handel", quelle_url="https://e.de/p",
-                abgerufen_am="2026-08-10", preis_ohne_vertrag=-1.0)
+        Listung(
+            sku_id="x",
+            device_id="x",
+            anbieter="expert",
+            anbieter_typ="handel",
+            quelle_url="https://e.de/p",
+            abgerufen_am="2026-08-10",
+            preis_ohne_vertrag=-1.0,
+        )
 
 
 def test_zwei_preisarten_bleiben_getrennt():
     """Teil C4: Geraetepreis ohne Vertrag und Zuzahlung im Buendel sind nicht
     dieselbe Zahl - und eine Zuzahlung ohne Tarifbezug ist bedeutungslos."""
-    l = lies_listung(titel="Apple iPhone 17 Pro Max 256 GB Titannatur",
-                     anbieter="Telekom", anbieter_typ="netzbetreiber",
-                     quelle_url="https://telekom.de/p", abgerufen_am="2026-08-10",
-                     katalog=_KATALOG, farben=_FARBEN, zuzahlung=49.95,
-                     tarif_referenz="MagentaMobil M")
+    l = lies_listung(
+        titel="Apple iPhone 17 Pro Max 256 GB Titannatur",
+        anbieter="Telekom",
+        anbieter_typ="netzbetreiber",
+        quelle_url="https://telekom.de/p",
+        abgerufen_am="2026-08-10",
+        katalog=_KATALOG,
+        farben=_FARBEN,
+        zuzahlung=49.95,
+        tarif_referenz="MagentaMobil M",
+    )
     assert l.preis_ohne_vertrag is None
     assert l.zuzahlung == 49.95
     assert l.tarif_referenz == "MagentaMobil M"
@@ -383,33 +514,57 @@ def test_zwei_preisarten_bleiben_getrennt():
 
 def test_zuzahlung_ohne_tarifbezug_wird_abgewiesen():
     with pytest.raises(ValueError, match="tarif_referenz"):
-        Listung(sku_id="x", device_id="x", anbieter="Telekom",
-                anbieter_typ="netzbetreiber", quelle_url="https://e.de/p",
-                abgerufen_am="2026-08-10", zuzahlung=1.0)
+        Listung(
+            sku_id="x",
+            device_id="x",
+            anbieter="Telekom",
+            anbieter_typ="netzbetreiber",
+            quelle_url="https://e.de/p",
+            abgerufen_am="2026-08-10",
+            zuzahlung=1.0,
+        )
 
 
 def test_preisart_ohne_vertrag():
-    l = Listung(sku_id="x", device_id="x", anbieter="expert",
-                anbieter_typ="handel", quelle_url="https://e.de/p",
-                abgerufen_am="2026-08-10", preis_ohne_vertrag=1449.0)
+    l = Listung(
+        sku_id="x",
+        device_id="x",
+        anbieter="expert",
+        anbieter_typ="handel",
+        quelle_url="https://e.de/p",
+        abgerufen_am="2026-08-10",
+        preis_ohne_vertrag=1449.0,
+    )
     assert l.preisart == "ohne_vertrag"
 
 
 def test_listung_ohne_jeden_preis_ist_erlaubt_aber_kennzeichnet_sich():
     # Ein Geraet kann gelistet und gerade nicht bepreist sein
     # ("demnaechst verfuegbar"). Das ist eine Listung, aber kein Preis.
-    l = Listung(sku_id="x", device_id="x", anbieter="expert",
-                anbieter_typ="handel", quelle_url="https://e.de/p",
-                abgerufen_am="2026-08-10", verfuegbarkeit="vorbestellbar")
+    l = Listung(
+        sku_id="x",
+        device_id="x",
+        anbieter="expert",
+        anbieter_typ="handel",
+        quelle_url="https://e.de/p",
+        abgerufen_am="2026-08-10",
+        verfuegbarkeit="vorbestellbar",
+    )
     assert l.preisart == "kein_preis"
     assert l.preis is None
 
 
 def test_sku_aus_listung():
-    l = lies_listung(titel="Apple iPhone 17 Pro Max 256 GB Titannatur",
-                     anbieter="expert", anbieter_typ="handel",
-                     quelle_url="https://example.de/p", abgerufen_am="2026-08-10",
-                     katalog=_KATALOG, farben=_FARBEN, ean="0194253000000")
+    l = lies_listung(
+        titel="Apple iPhone 17 Pro Max 256 GB Titannatur",
+        anbieter="expert",
+        anbieter_typ="handel",
+        quelle_url="https://example.de/p",
+        abgerufen_am="2026-08-10",
+        katalog=_KATALOG,
+        farben=_FARBEN,
+        ean="0194253000000",
+    )
     s = l.sku()
     assert isinstance(s, Sku)
     assert s.sku_id == l.sku_id and s.speicher_gb == 256 and s.ean == "0194253000000"
@@ -419,11 +574,16 @@ def test_sku_aus_listung():
 # Katalog: die Vorgaengerkette
 # --------------------------------------------------------------------------
 
+
 def test_vorgaengerkette_wird_auf_device_ids_aufgeloest():
     g = _KATALOG.nach_id("apple-iphone-17-pro-max")
     assert g.vorgaenger_device_id == "apple-iphone-16-pro-max"
-    assert _KATALOG.vorgaenger_von("apple-iphone-17-pro-max").modell == "iPhone 16 Pro Max"
-    assert _KATALOG.nachfolger_von("apple-iphone-16-pro-max").modell == "iPhone 17 Pro Max"
+    assert (
+        _KATALOG.vorgaenger_von("apple-iphone-17-pro-max").modell == "iPhone 16 Pro Max"
+    )
+    assert (
+        _KATALOG.nachfolger_von("apple-iphone-16-pro-max").modell == "iPhone 17 Pro Max"
+    )
 
 
 def test_vorgaenger_ausserhalb_des_katalogs_bleibt_leer():
@@ -435,10 +595,14 @@ def test_vorgaenger_ausserhalb_des_katalogs_bleibt_leer():
 
 def test_katalog_weist_doppelte_geraete_ab():
     with pytest.raises(ValueError, match="doppelt"):
-        Katalog(geraete=[
-            Geraet(hersteller="Apple", modell="iPhone 17", marktstart="2026-09-19"),
-            Geraet(hersteller="Apple", modell="iPhone  17", marktstart="2026-09-19"),
-        ])
+        Katalog(
+            geraete=[
+                Geraet(hersteller="Apple", modell="iPhone 17", marktstart="2026-09-19"),
+                Geraet(
+                    hersteller="Apple", modell="iPhone  17", marktstart="2026-09-19"
+                ),
+            ]
+        )
 
 
 # --------------------------------------------------------------------------
@@ -446,25 +610,55 @@ def test_katalog_weist_doppelte_geraete_ab():
 # Gegen den Stand VOR den Korrekturen faellt jeder dieser Tests durch.
 # --------------------------------------------------------------------------
 
-_KATALOG_REVIEW = Katalog(geraete=[
-    Geraet(hersteller="Google", modell="Pixel 10 Pro", generation=10,
-           speicher=[128, 256], segment="flagship"),
-    Geraet(hersteller="Samsung", modell="Galaxy S25", generation=25,
-           speicher=[128, 256, 512], segment="premium"),
-    Geraet(hersteller="Samsung", modell="Galaxy S25 Plus", generation=25,
-           speicher=[256, 512], segment="premium"),
-    Geraet(hersteller="Apple", modell="iPhone 17 Pro Max", generation=17,
-           speicher=[256, 512, 1024], segment="flagship"),
-    Geraet(hersteller="Apple", modell="iPhone 17", generation=17,
-           speicher=[256, 512], segment="premium"),
-])
+_KATALOG_REVIEW = Katalog(
+    geraete=[
+        Geraet(
+            hersteller="Google",
+            modell="Pixel 10 Pro",
+            generation=10,
+            speicher=[128, 256],
+            segment="flagship",
+        ),
+        Geraet(
+            hersteller="Samsung",
+            modell="Galaxy S25",
+            generation=25,
+            speicher=[128, 256, 512],
+            segment="premium",
+        ),
+        Geraet(
+            hersteller="Samsung",
+            modell="Galaxy S25 Plus",
+            generation=25,
+            speicher=[256, 512],
+            segment="premium",
+        ),
+        Geraet(
+            hersteller="Apple",
+            modell="iPhone 17 Pro Max",
+            generation=17,
+            speicher=[256, 512, 1024],
+            segment="flagship",
+        ),
+        Geraet(
+            hersteller="Apple",
+            modell="iPhone 17",
+            generation=17,
+            speicher=[256, 512],
+            segment="premium",
+        ),
+    ]
+)
 
 
-@pytest.mark.parametrize("titel", [
-    "Google Pixel 10 Pro Fold 256 GB Moonstone",
-    "Samsung Galaxy S25 FE 128 GB Icyblue",
-    "Samsung Galaxy S25 Edge 256GB",
-])
+@pytest.mark.parametrize(
+    "titel",
+    [
+        "Google Pixel 10 Pro Fold 256 GB Moonstone",
+        "Samsung Galaxy S25 FE 128 GB Icyblue",
+        "Samsung Galaxy S25 Edge 256GB",
+    ],
+)
 def test_ein_modellzusatz_hinter_dem_treffer_verwirft_die_zuordnung(titel):
     """Befund 1 des Reviews, der teuerste: "Pixel 10 Pro Fold" traf den
     Katalogeintrag "Pixel 10 Pro". Beide stehen beim selben Haendler, liegen
@@ -481,24 +675,30 @@ def test_ohne_zusatz_greift_derselbe_titel_weiterhin():
 
 
 def test_pluszeichen_wird_zu_plus_und_findet_das_richtige_modell():
-    """"Galaxy S25+" verlor sein Pluszeichen in der Normalisierung und lief
+    """ "Galaxy S25+" verlor sein Pluszeichen in der Normalisierung und lief
     als "Galaxy S25" - zwei Geraete, eine ID."""
     g = erkenne_geraet("Samsung Galaxy S25+ 5G 256GB Navy", _KATALOG_REVIEW)
     assert g is not None and g.modell == "Galaxy S25 Plus"
 
 
 def test_binnenmajuskel_wird_getrennt():
-    """"ProMax" zerfiel nicht, der Titel lief als "iPhone 17"."""
+    """ "ProMax" zerfiel nicht, der Titel lief als "iPhone 17"."""
     g = erkenne_geraet("Apple iPhone 17 ProMax 256GB Titannatur", _KATALOG_REVIEW)
     assert g is not None and g.modell == "iPhone 17 Pro Max"
     # ... und "iPhone" darf dabei NICHT zu "i Phone" zerfallen.
     assert wortmarken("iPhone")[0] == "iphone"
 
 
-@pytest.mark.parametrize("titel,modell", [
-    ("Apple iPhone 17 Pro Max 256GB Titanschwarz, ohne Netzteil", "iPhone 17 Pro Max"),
-    ("Apple iPhone 17 256 GB Blau inkl. Ladekabel", "iPhone 17"),
-])
+@pytest.mark.parametrize(
+    "titel,modell",
+    [
+        (
+            "Apple iPhone 17 Pro Max 256GB Titanschwarz, ohne Netzteil",
+            "iPhone 17 Pro Max",
+        ),
+        ("Apple iPhone 17 256 GB Blau inkl. Ladekabel", "iPhone 17"),
+    ],
+)
 def test_zubehoerwort_hinter_dem_modell_verwirft_kein_geraet(titel, modell):
     """Befund 6: "ohne Netzteil" ist im deutschen Handel eine Pflichtangabe.
     Eine einzige breite Zubehoerliste hat echte Geraete verworfen."""
@@ -507,7 +707,9 @@ def test_zubehoerwort_hinter_dem_modell_verwirft_kein_geraet(titel, modell):
 
 
 def test_zubehoerwort_vor_dem_modell_verwirft_weiterhin():
-    assert erkenne_geraet("Ladekabel USB-C für Apple iPhone 17", _KATALOG_REVIEW) is None
+    assert (
+        erkenne_geraet("Ladekabel USB-C für Apple iPhone 17", _KATALOG_REVIEW) is None
+    )
 
 
 def test_ram_ohne_trennzeichen_verschluckt_den_speicher_nicht():
@@ -529,8 +731,9 @@ def test_katalogstufen_sind_eine_vorliebe_kein_filter():
 
 def test_mehrdeutigkeit_wird_ueber_die_katalogstufen_aufgeloest():
     # Zwei Werte, aber nur einer steht im Katalog: dann ist es dieser.
-    assert speicher_aus_titel("iPhone 17 mit 64 GB oder 256 GB",
-                              erlaubt=[256, 512]) == 256
+    assert (
+        speicher_aus_titel("iPhone 17 mit 64 GB oder 256 GB", erlaubt=[256, 512]) == 256
+    )
     # Zwei Werte, beide im Katalog: es wird nichts geraten.
     assert speicher_aus_titel("iPhone 17 256 GB / 512 GB", erlaubt=[256, 512]) is None
 
@@ -539,9 +742,15 @@ def test_farbbruchstueck_wird_nicht_kanonisiert():
     """Befund 13: aus "Titanium Black" wurde ueber das Teilwort "Black" die
     Farbe `schwarz`, waehrend "Black Titanium" - dieselbe Farbe, andere
     Wortstellung - `titan-schwarz` ergab. Zwei SKUs fuer ein Geraet."""
-    tabelle = {"schwarz": "schwarz", "black": "schwarz",
-               "titan-schwarz": "titan-schwarz", "black-titanium": "titan-schwarz",
-               "gold": "gold", "rosa": "rosa", "rose": "rosa"}
+    tabelle = {
+        "schwarz": "schwarz",
+        "black": "schwarz",
+        "titan-schwarz": "titan-schwarz",
+        "black-titanium": "titan-schwarz",
+        "gold": "gold",
+        "rosa": "rosa",
+        "rose": "rosa",
+    }
     assert farbe_aus_titel("Handy in Black Titanium", tabelle)[1] == "titan-schwarz"
     # "Titanium Black" kennt die Tabelle nicht - dann gibt es keine Farbe,
     # statt das Bruchstueck "Black" zu nehmen.
@@ -554,16 +763,26 @@ def test_gebrauchtgeraet_ist_eine_eigene_sku():
     """Befund 17: freenet fuehrt eine eigene "-refurbished"-Strecke. Ohne
     diese Dimension teilten sich Neu- und Gebrauchtgeraet eine listung_id,
     und der Preisverlauf sprang zwischen beiden Preisen."""
-    neu = lies_listung(titel="Apple iPhone 17 Pro Max 256 GB Titannatur",
-                       anbieter="freenet", anbieter_typ="handel",
-                       quelle_url="https://f.de/p/iphone-17-pro-max-ohne-vertrag",
-                       abgerufen_am="2026-08-10", katalog=_KATALOG_REVIEW,
-                       farben=_FARBEN, preis_ohne_vertrag=1449.0)
-    alt = lies_listung(titel="Apple iPhone 17 Pro Max 256 GB Titannatur",
-                       anbieter="freenet", anbieter_typ="handel",
-                       quelle_url="https://f.de/p/iphone-17-pro-max-refurbished-ohne-vertrag",
-                       abgerufen_am="2026-08-10", katalog=_KATALOG_REVIEW,
-                       farben=_FARBEN, preis_ohne_vertrag=899.0)
+    neu = lies_listung(
+        titel="Apple iPhone 17 Pro Max 256 GB Titannatur",
+        anbieter="freenet",
+        anbieter_typ="handel",
+        quelle_url="https://f.de/p/iphone-17-pro-max-ohne-vertrag",
+        abgerufen_am="2026-08-10",
+        katalog=_KATALOG_REVIEW,
+        farben=_FARBEN,
+        preis_ohne_vertrag=1449.0,
+    )
+    alt = lies_listung(
+        titel="Apple iPhone 17 Pro Max 256 GB Titannatur",
+        anbieter="freenet",
+        anbieter_typ="handel",
+        quelle_url="https://f.de/p/iphone-17-pro-max-refurbished-ohne-vertrag",
+        abgerufen_am="2026-08-10",
+        katalog=_KATALOG_REVIEW,
+        farben=_FARBEN,
+        preis_ohne_vertrag=899.0,
+    )
     assert neu.zustand == "neu" and alt.zustand == "refurbished"
     assert neu.listung_id != alt.listung_id
     assert alt.sku_id.endswith("-refurbished")
@@ -573,35 +792,45 @@ def test_vertragspreis_ohne_tarifbezug_wird_abgewiesen():
     """Befund 12: `zuzahlung` war gesichert, `preis_mit_vertrag_ab` nicht -
     das Schlupfloch, durch das der Lockpreis doch auf die Seite kaeme."""
     with pytest.raises(ValueError, match="tarif_referenz"):
-        Listung(sku_id="x", device_id="x", anbieter="o2",
-                anbieter_typ="netzbetreiber", quelle_url="https://e.de/p",
-                abgerufen_am="2026-08-10", preis_mit_vertrag_ab=1.00)
+        Listung(
+            sku_id="x",
+            device_id="x",
+            anbieter="o2",
+            anbieter_typ="netzbetreiber",
+            quelle_url="https://e.de/p",
+            abgerufen_am="2026-08-10",
+            preis_mit_vertrag_ab=1.00,
+        )
 
 
 # --------------------------------------------------------------------------
 # Zustand: die Preisdimension, die am 29.08.2026 den Vergleich verdreht hat
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("titel,erwartet", [
-    # o2 kennzeichnet seine Gebrauchtstrecke in ZWEI Schreibweisen. Die
-    # Stichwortliste kannte am 29.08.2026 nur die erste - und genau die zwei
-    # Geraete, die o2 "(erneuert)" nennt, liefen als Neugeraet mit und
-    # gewannen damit den Preisvergleich gegen Vodafone.
-    ("Apple iPhone 14 (gebraucht) 128 GB mitternacht erneuert", "refurbished"),
-    ("Apple iPhone 14 Pro (erneuert) 128 GB space schwarz erneuert", "refurbished"),
-    ("Samsung Galaxy S25 (erneuert) 128 GB grau erneuert", "refurbished"),
-    ("Apple iPhone 16 (gebraucht) 128 GB blau erneuert", "refurbished"),
-    # "wie neu" stand in der Liste und konnte nie treffen: ein Zwei-Wort-
-    # String wurde gegen eine Menge einzelner Wortmarken geprueft.
-    ("Apple iPhone 13 wie neu 128 GB", "refurbished"),
-    ("Apple iPhone 15 renewed 128 GB", "refurbished"),
-    ("Apple iPhone 15 generalueberholt 128 GB", "refurbished"),
-    ("Samsung Galaxy S24 B-Ware 128 GB", "b-ware"),
-    # Gegenprobe: ein Neugeraet bleibt neu. "Neuheit" und "erneuerbar"
-    # duerfen nicht anschlagen - deshalb Wortmarken statt Teilketten.
-    ("Apple iPhone 17 256 GB Titannatur", "neu"),
-    ("Samsung Galaxy S25 Neuheit 128 GB", "neu"),
-])
+
+@pytest.mark.parametrize(
+    "titel,erwartet",
+    [
+        # o2 kennzeichnet seine Gebrauchtstrecke in ZWEI Schreibweisen. Die
+        # Stichwortliste kannte am 29.08.2026 nur die erste - und genau die zwei
+        # Geraete, die o2 "(erneuert)" nennt, liefen als Neugeraet mit und
+        # gewannen damit den Preisvergleich gegen Vodafone.
+        ("Apple iPhone 14 (gebraucht) 128 GB mitternacht erneuert", "refurbished"),
+        ("Apple iPhone 14 Pro (erneuert) 128 GB space schwarz erneuert", "refurbished"),
+        ("Samsung Galaxy S25 (erneuert) 128 GB grau erneuert", "refurbished"),
+        ("Apple iPhone 16 (gebraucht) 128 GB blau erneuert", "refurbished"),
+        # "wie neu" stand in der Liste und konnte nie treffen: ein Zwei-Wort-
+        # String wurde gegen eine Menge einzelner Wortmarken geprueft.
+        ("Apple iPhone 13 wie neu 128 GB", "refurbished"),
+        ("Apple iPhone 15 renewed 128 GB", "refurbished"),
+        ("Apple iPhone 15 generalueberholt 128 GB", "refurbished"),
+        ("Samsung Galaxy S24 B-Ware 128 GB", "b-ware"),
+        # Gegenprobe: ein Neugeraet bleibt neu. "Neuheit" und "erneuerbar"
+        # duerfen nicht anschlagen - deshalb Wortmarken statt Teilketten.
+        ("Apple iPhone 17 256 GB Titannatur", "neu"),
+        ("Samsung Galaxy S25 Neuheit 128 GB", "neu"),
+    ],
+)
 def test_zustand_kennt_alle_schreibweisen_des_handels(titel, erwartet):
     assert zustand_aus_titel(titel) == erwartet
 
@@ -611,50 +840,91 @@ def test_zustand_liest_auch_das_farbfeld():
     strukturiert liefert ("grau erneuert"), ist das Farbfeld das einzige
     Signal - und wurde bis zum 29.08.2026 gar nicht befragt."""
     listung = lies_listung(
-        titel="Samsung Galaxy S25 128 GB", anbieter="o2",
+        titel="Samsung Galaxy S25 128 GB",
+        anbieter="o2",
         anbieter_typ="netzbetreiber",
         quelle_url="https://www.o2online.de/e-shop/samsung/s25-128gb-details",
-        abgerufen_am="2026-08-29", katalog=_KATALOG_REVIEW, farben=_FARBEN,
-        farbe_roh="grau erneuert", speicher_gb=128, preis_ohne_vertrag=577.0)
+        abgerufen_am="2026-08-29",
+        katalog=_KATALOG_REVIEW,
+        farben=_FARBEN,
+        farbe_roh="grau erneuert",
+        speicher_gb=128,
+        preis_ohne_vertrag=577.0,
+    )
     assert listung.zustand == "refurbished"
     assert listung.sku_id.endswith("-refurbished")
 
 
-@pytest.mark.parametrize("titel,farbe,url,preis", [
-    ("Apple iPhone 14 Pro (erneuert) 128 GB space schwarz erneuert",
-     "space schwarz erneuert",
-     "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-space-schwarz-erneuert-details",
-     577.0),
-    ("Samsung Galaxy S25 (erneuert) 128 GB grau erneuert", "grau erneuert",
-     "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-grau-erneuert-details",
-     577.0),
-    ("Apple iPhone 16 (gebraucht) 128 GB blau erneuert", "blau erneuert",
-     "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-blau-erneuert-details",
-     697.0),
-])
+@pytest.mark.parametrize(
+    "titel,farbe,url,preis",
+    [
+        (
+            "Apple iPhone 14 Pro (erneuert) 128 GB space schwarz erneuert",
+            "space schwarz erneuert",
+            "https://www.o2online.de/e-shop/apple/apple-iphone-14-pro-128gb-space-schwarz-erneuert-details",
+            577.0,
+        ),
+        (
+            "Samsung Galaxy S25 (erneuert) 128 GB grau erneuert",
+            "grau erneuert",
+            "https://www.o2online.de/e-shop/samsung/samsung-galaxy-s25-128gb-grau-erneuert-details",
+            577.0,
+        ),
+        (
+            "Apple iPhone 16 (gebraucht) 128 GB blau erneuert",
+            "blau erneuert",
+            "https://www.o2online.de/e-shop/apple/apple-iphone-16-128gb-blau-erneuert-details",
+            697.0,
+        ),
+    ],
+)
 def test_die_drei_faelle_der_evaluation_vom_29_august(titel, farbe, url, preis):
     """Regressionsfaelle aus `claude/geraeteradar-evaluation-2026-08-29.md`,
     Abschnitt 1. Alle drei standen live im Export; zwei davon (die
     "(erneuert)"-Schreibweise) liefen als Neugeraet und schlugen damit den
     Vodafone-Preis. Der dritte war korrekt erkannt und belegt, dass der
     Filter im Vergleich greift, sobald der Zustand stimmt."""
-    katalog = Katalog(geraete=[
-        Geraet(hersteller="Apple", modell="iPhone 14 Pro", generation=14,
-               speicher=[128, 256], segment="flagship"),
-        Geraet(hersteller="Apple", modell="iPhone 16", generation=16,
-               speicher=[128, 256], segment="premium"),
-        Geraet(hersteller="Samsung", modell="Galaxy S25", generation=25,
-               speicher=[128, 256], segment="premium"),
-    ])
+    katalog = Katalog(
+        geraete=[
+            Geraet(
+                hersteller="Apple",
+                modell="iPhone 14 Pro",
+                generation=14,
+                speicher=[128, 256],
+                segment="flagship",
+            ),
+            Geraet(
+                hersteller="Apple",
+                modell="iPhone 16",
+                generation=16,
+                speicher=[128, 256],
+                segment="premium",
+            ),
+            Geraet(
+                hersteller="Samsung",
+                modell="Galaxy S25",
+                generation=25,
+                speicher=[128, 256],
+                segment="premium",
+            ),
+        ]
+    )
     listung = lies_listung(
-        titel=titel, anbieter="o2", anbieter_typ="netzbetreiber",
-        quelle_url=url, abgerufen_am="2026-08-29", katalog=katalog,
-        farben=_FARBEN, farbe_roh=farbe, speicher_gb=128,
-        preis_ohne_vertrag=preis)
+        titel=titel,
+        anbieter="o2",
+        anbieter_typ="netzbetreiber",
+        quelle_url=url,
+        abgerufen_am="2026-08-29",
+        katalog=katalog,
+        farben=_FARBEN,
+        farbe_roh=farbe,
+        speicher_gb=128,
+        preis_ohne_vertrag=preis,
+    )
     assert listung is not None
     assert listung.zustand == "refurbished", (
-        f"{titel!r} ist Gebrauchtware und darf den Neupreis-Vergleich "
-        f"nicht gewinnen")
+        f"{titel!r} ist Gebrauchtware und darf den Neupreis-Vergleich nicht gewinnen"
+    )
 
 
 def test_der_zustand_wird_aus_der_farbe_herausgeloest():
@@ -663,11 +933,17 @@ def test_der_zustand_wird_aus_der_farbe_herausgeloest():
     Seitenende eine Schreibweise, die keine Farbe ist, und dieselbe Farbe
     steht als zwei Eintraege da."""
     listung = lies_listung(
-        titel="Apple iPhone 17 (erneuert) 256 GB", anbieter="o2",
-        anbieter_typ="netzbetreiber", quelle_url="https://o2.de/p/x",
-        abgerufen_am="2026-08-29", katalog=_KATALOG_REVIEW, farben=_FARBEN,
-        farbe_roh="schwarz erneuert", speicher_gb=256,
-        preis_ohne_vertrag=899.0)
+        titel="Apple iPhone 17 (erneuert) 256 GB",
+        anbieter="o2",
+        anbieter_typ="netzbetreiber",
+        quelle_url="https://o2.de/p/x",
+        abgerufen_am="2026-08-29",
+        katalog=_KATALOG_REVIEW,
+        farben=_FARBEN,
+        farbe_roh="schwarz erneuert",
+        speicher_gb=256,
+        preis_ohne_vertrag=899.0,
+    )
     assert listung.zustand == "refurbished"
     assert "erneuert" not in (listung.farbe_roh or "")
     assert listung.farbe_roh == "schwarz"
@@ -678,20 +954,30 @@ def test_eine_farbe_die_nur_aus_dem_zustand_besteht_bleibt_stehen():
     "gebraucht" nichts uebrig, verloere die SKU ihre Farbdimension und zwei
     verschiedene Geraete teilten sich eine ID."""
     listung = lies_listung(
-        titel="Apple iPhone 17 256 GB", anbieter="o2",
-        anbieter_typ="netzbetreiber", quelle_url="https://o2.de/p/y",
-        abgerufen_am="2026-08-29", katalog=_KATALOG_REVIEW, farben=_FARBEN,
-        farbe_roh="gebraucht", speicher_gb=256, preis_ohne_vertrag=899.0)
+        titel="Apple iPhone 17 256 GB",
+        anbieter="o2",
+        anbieter_typ="netzbetreiber",
+        quelle_url="https://o2.de/p/y",
+        abgerufen_am="2026-08-29",
+        katalog=_KATALOG_REVIEW,
+        farben=_FARBEN,
+        farbe_roh="gebraucht",
+        speicher_gb=256,
+        preis_ohne_vertrag=899.0,
+    )
     assert listung.zustand == "refurbished"
     assert listung.farbe_roh == "gebraucht"
 
 
-@pytest.mark.parametrize("titel", [
-    "Apple iPhone 17 256 GB neuwertig",
-    "Apple iPhone 17 256 GB Retoure",
-    "Apple iPhone 17 256 GB Open Box",
-    "Apple iPhone 17 256 GB zweite Wahl",
-])
+@pytest.mark.parametrize(
+    "titel",
+    [
+        "Apple iPhone 17 256 GB neuwertig",
+        "Apple iPhone 17 256 GB Retoure",
+        "Apple iPhone 17 256 GB Open Box",
+        "Apple iPhone 17 256 GB zweite Wahl",
+    ],
+)
 def test_ein_unklares_kennzeichen_wird_nicht_als_neu_durchgewunken(titel):
     """W1.1: "Ein Geraet, dessen Zustand nicht sicher bestimmbar ist,
     bekommt `zustand: unbekannt` und faellt aus dem Preisvergleich heraus -
@@ -705,7 +991,7 @@ def test_ein_unklares_kennzeichen_wird_nicht_als_neu_durchgewunken(titel):
 
 
 def test_ein_eindeutiges_kennzeichen_schlaegt_das_unklare():
-    """"Apple iPhone 17 neuwertig refurbished" ist refurbished, nicht
+    """ "Apple iPhone 17 neuwertig refurbished" ist refurbished, nicht
     unbekannt: eine eindeutige Angabe wird durch eine unklare daneben nicht
     wieder unklar."""
     assert zustand_aus_titel("Apple iPhone 17 neuwertig refurbished") == "refurbished"
@@ -724,44 +1010,57 @@ def test_eine_leere_farbe_reisst_den_nachtlauf_nicht(farbe):
     Farbe selbst strippen. Die naechsten (otelo, klarmobil, congstar) sind
     noch nicht geschrieben."""
     listung = lies_listung(
-        titel="Apple iPhone 17 256 GB", anbieter="o2",
-        anbieter_typ="netzbetreiber", quelle_url="https://o2.de/p/x",
-        abgerufen_am="2026-08-29", katalog=_KATALOG_REVIEW, farben=_FARBEN,
-        farbe_roh=farbe, speicher_gb=256, preis_ohne_vertrag=899.0)
+        titel="Apple iPhone 17 256 GB",
+        anbieter="o2",
+        anbieter_typ="netzbetreiber",
+        quelle_url="https://o2.de/p/x",
+        abgerufen_am="2026-08-29",
+        katalog=_KATALOG_REVIEW,
+        farben=_FARBEN,
+        farbe_roh=farbe,
+        speicher_gb=256,
+        preis_ohne_vertrag=899.0,
+    )
     assert listung is not None
     assert listung.sku_id
 
 
-@pytest.mark.parametrize("roh,erwartet", [
-    ("Schwarz (gebraucht)", "Schwarz"),
-    ("schwarz, refurbished", "schwarz"),
-    ("space schwarz erneuert", "space schwarz"),
-    # Ein unklares Kennzeichen gehoert genauso wenig in die Farbe wie ein
-    # eindeutiges - sonst traegt die sku_id "neuwertig" als Farbe.
-    ("schwarz neuwertig", "schwarz"),
-    # Gegenprobe: eine echte Farbe wird nicht angetastet.
-    ("Erneuerbar-Gruen", "Erneuerbar-Gruen"),
-    ("gebrauchtgrau", "gebrauchtgrau"),
-    ("sunset-gold", "sunset-gold"),
-])
+@pytest.mark.parametrize(
+    "roh,erwartet",
+    [
+        ("Schwarz (gebraucht)", "Schwarz"),
+        ("schwarz, refurbished", "schwarz"),
+        ("space schwarz erneuert", "space schwarz"),
+        # Ein unklares Kennzeichen gehoert genauso wenig in die Farbe wie ein
+        # eindeutiges - sonst traegt die sku_id "neuwertig" als Farbe.
+        ("schwarz neuwertig", "schwarz"),
+        # Gegenprobe: eine echte Farbe wird nicht angetastet.
+        ("Erneuerbar-Gruen", "Erneuerbar-Gruen"),
+        ("gebrauchtgrau", "gebrauchtgrau"),
+        ("sunset-gold", "sunset-gold"),
+    ],
+)
 def test_ohne_zustandswort_raeumt_auch_die_interpunktion_ab(roh, erwartet):
     assert ohne_zustandswort(roh) == erwartet
 
 
-@pytest.mark.parametrize("farbe", [
-    # Der Fall, der die Regel erzwungen hat: `.strip(" -,;/()[]")` lief bis
-    # zum 31.08.2026 unbedingt und machte hieraus "Silver Shadow (Enterprise
-    # Edition" - eine geoeffnete Klammer, die nie geschlossen wird. Die Zeile
-    # steht so im Livebestand (mobilcom-debitel, Galaxy S25 128 GB) und im
-    # CSV-Export. Solange nur `lies_listung` diese Funktion rief, fiel es
-    # nicht auf; seit `report.geraete_bereinigung` den GANZEN Bestand
-    # hindurchschickt, waere es ausgeliefert worden.
-    "Silver Shadow (Enterprise Edition)",
-    "Blau [Sondermodell]",
-    "Grau,",
-    "Titan Natur -",
-    "Blau/Grau",
-])
+@pytest.mark.parametrize(
+    "farbe",
+    [
+        # Der Fall, der die Regel erzwungen hat: `.strip(" -,;/()[]")` lief bis
+        # zum 31.08.2026 unbedingt und machte hieraus "Silver Shadow (Enterprise
+        # Edition" - eine geoeffnete Klammer, die nie geschlossen wird. Die Zeile
+        # steht so im Livebestand (mobilcom-debitel, Galaxy S25 128 GB) und im
+        # CSV-Export. Solange nur `lies_listung` diese Funktion rief, fiel es
+        # nicht auf; seit `report.geraete_bereinigung` den GANZEN Bestand
+        # hindurchschickt, waere es ausgeliefert worden.
+        "Silver Shadow (Enterprise Edition)",
+        "Blau [Sondermodell]",
+        "Grau,",
+        "Titan Natur -",
+        "Blau/Grau",
+    ],
+)
 def test_eine_farbe_ohne_kennzeichen_kommt_zeichengenau_zurueck(farbe):
     """Wo nichts gestrichen wurde, wird auch nichts aufgeraeumt. Das
     Aufraeumen der Interpunktion ist die FOLGE einer Streichung, kein
@@ -770,28 +1069,31 @@ def test_eine_farbe_ohne_kennzeichen_kommt_zeichengenau_zurueck(farbe):
     assert ohne_zustandswort(farbe) == farbe
 
 
-@pytest.mark.parametrize("roh,erwartet", [
-    # Jedes mehrteilige Kennzeichen der Wortliste einzeln, in beiden
-    # Schreibweisen des Handels. Bis zum 31.08.2026 traf KEINES davon: der
-    # Musterbau zerlegte sein eigenes Ergebnis zu `b[\s[\s-]]ware`, einer
-    # Zeichenklasse plus einem literalen "]". Sechs von neun Kennzeichen
-    # waren damit tot, und aufgefallen ist es nicht, weil der Livebestand
-    # zufaellig nur die einwortigen "erneuert" und "gebraucht" fuehrt.
-    ("Schwarz B-Ware", "Schwarz"),
-    ("Schwarz B Ware", "Schwarz"),
-    ("Schwarz wie-neu", "Schwarz"),
-    ("Schwarz wie neu", "Schwarz"),
-    ("Grau second-hand", "Grau"),
-    ("Grau second hand", "Grau"),
-    ("Blau Open-Box", "Blau"),
-    ("Blau open box", "Blau"),
-    ("Schwarz zweite-Wahl", "Schwarz"),
-    ("Schwarz zweite Wahl", "Schwarz"),
-    ("Blau 2-Wahl", "Blau"),
-    ("Titan Natur (2. Wahl)", "Titan Natur"),
-    ("Grau geprueft-und-zertifiziert", "Grau"),
-    ("Grau geprueft und zertifiziert", "Grau"),
-])
+@pytest.mark.parametrize(
+    "roh,erwartet",
+    [
+        # Jedes mehrteilige Kennzeichen der Wortliste einzeln, in beiden
+        # Schreibweisen des Handels. Bis zum 31.08.2026 traf KEINES davon: der
+        # Musterbau zerlegte sein eigenes Ergebnis zu `b[\s[\s-]]ware`, einer
+        # Zeichenklasse plus einem literalen "]". Sechs von neun Kennzeichen
+        # waren damit tot, und aufgefallen ist es nicht, weil der Livebestand
+        # zufaellig nur die einwortigen "erneuert" und "gebraucht" fuehrt.
+        ("Schwarz B-Ware", "Schwarz"),
+        ("Schwarz B Ware", "Schwarz"),
+        ("Schwarz wie-neu", "Schwarz"),
+        ("Schwarz wie neu", "Schwarz"),
+        ("Grau second-hand", "Grau"),
+        ("Grau second hand", "Grau"),
+        ("Blau Open-Box", "Blau"),
+        ("Blau open box", "Blau"),
+        ("Schwarz zweite-Wahl", "Schwarz"),
+        ("Schwarz zweite Wahl", "Schwarz"),
+        ("Blau 2-Wahl", "Blau"),
+        ("Titan Natur (2. Wahl)", "Titan Natur"),
+        ("Grau geprueft-und-zertifiziert", "Grau"),
+        ("Grau geprueft und zertifiziert", "Grau"),
+    ],
+)
 def test_auch_ein_mehrteiliges_kennzeichen_faellt_aus_der_farbe(roh, erwartet):
     assert ohne_zustandswort(roh) == erwartet
 
@@ -802,26 +1104,35 @@ def test_ein_unbekannter_zustand_wird_abgewiesen():
     fail closed und stillschweigend aus beiden Preisaussagen fallen. Ein
     Tippfehler darf laut sein, nicht unsichtbar."""
     with pytest.raises(ValueError, match="zustand"):
-        Listung(sku_id="x", device_id="x", anbieter="o2",
-                anbieter_typ="netzbetreiber", quelle_url="https://o2.de/p",
-                abgerufen_am="2026-08-29", zustand="Neu")
+        Listung(
+            sku_id="x",
+            device_id="x",
+            anbieter="o2",
+            anbieter_typ="netzbetreiber",
+            quelle_url="https://o2.de/p",
+            abgerufen_am="2026-08-29",
+            zustand="Neu",
+        )
 
 
-@pytest.mark.parametrize("modell,serie", [
-    ("Galaxy S26 Ultra", "Galaxy S"),
-    ("Galaxy S26", "Galaxy S"),
-    ("Galaxy A57", "Galaxy A"),
-    ("Galaxy Z Fold8 Ultra", "Galaxy Z Fold"),
-    ("Galaxy Z Flip 7", "Galaxy Z Flip"),
-    ("iPhone 17 Pro Max", "iPhone"),
-    ("iPhone Air", "iPhone Air"),
-    ("Redmi Note 17 Pro", "Redmi Note"),
-    ("Redmi 17", "Redmi"),
-    ("Xiaomi 17T Pro", "Xiaomi"),
-    ("Pixel 11 Pro XL", "Pixel"),
-    ("Nothing Phone (4a)", "Nothing Phone"),
-    ("Fairphone 6", "Fairphone"),
-])
+@pytest.mark.parametrize(
+    "modell,serie",
+    [
+        ("Galaxy S26 Ultra", "Galaxy S"),
+        ("Galaxy S26", "Galaxy S"),
+        ("Galaxy A57", "Galaxy A"),
+        ("Galaxy Z Fold8 Ultra", "Galaxy Z Fold"),
+        ("Galaxy Z Flip 7", "Galaxy Z Flip"),
+        ("iPhone 17 Pro Max", "iPhone"),
+        ("iPhone Air", "iPhone Air"),
+        ("Redmi Note 17 Pro", "Redmi Note"),
+        ("Redmi 17", "Redmi"),
+        ("Xiaomi 17T Pro", "Xiaomi"),
+        ("Pixel 11 Pro XL", "Pixel"),
+        ("Nothing Phone (4a)", "Nothing Phone"),
+        ("Fairphone 6", "Fairphone"),
+    ],
+)
 def test_die_baureihe_wird_aus_dem_modellnamen_gelesen(modell, serie):
     """`generation` ist die Nummer INNERHALB einer Baureihe, kein
     vergleichbarer Jahrgang: Samsungs Galaxy A57 traegt 57, die Galaxy S26
@@ -835,21 +1146,24 @@ def test_die_baureihe_wird_aus_dem_modellnamen_gelesen(modell, serie):
     assert serie_aus_modell(modell) == serie
 
 
-@pytest.mark.parametrize("modell,serie", [
-    # Der Bindestrich trennt wie ein Leerzeichen. Ohne das wäre
-    # "Pixel-11 Pro" seine eigene Baureihe, jede Variante wäre "aktuelle
-    # Generation", der Filter ein No-Op und `portfolio_tiefe` zählte
-    # Varianten als Jahrgänge.
-    ("Pixel-11 Pro", "Pixel"),
-    ("Galaxy-S26-Ultra", "Galaxy S"),
-    # Rückfall: ein Name, der mit einer Ziffer beginnt, und einer ganz ohne
-    # Ziffer sind selbst die Reihe. Eine geratene Reihe würfe zwei
-    # Produktlinien zusammen, und das ist teurer.
-    ("5G Phone X", "5G Phone X"),
-    ("Rugged Phone", "Rugged Phone"),
-    ("17", "17"),
-    ("", ""),
-])
+@pytest.mark.parametrize(
+    "modell,serie",
+    [
+        # Der Bindestrich trennt wie ein Leerzeichen. Ohne das wäre
+        # "Pixel-11 Pro" seine eigene Baureihe, jede Variante wäre "aktuelle
+        # Generation", der Filter ein No-Op und `portfolio_tiefe` zählte
+        # Varianten als Jahrgänge.
+        ("Pixel-11 Pro", "Pixel"),
+        ("Galaxy-S26-Ultra", "Galaxy S"),
+        # Rückfall: ein Name, der mit einer Ziffer beginnt, und einer ganz ohne
+        # Ziffer sind selbst die Reihe. Eine geratene Reihe würfe zwei
+        # Produktlinien zusammen, und das ist teurer.
+        ("5G Phone X", "5G Phone X"),
+        ("Rugged Phone", "Rugged Phone"),
+        ("17", "17"),
+        ("", ""),
+    ],
+)
 def test_die_baureihe_haelt_auch_bei_ungewoehnlichen_namen(modell, serie):
     assert serie_aus_modell(modell) == serie
 

@@ -15,6 +15,7 @@ geaendert hat.
     python scripts/kostenrechnung.py
     python scripts/kostenrechnung.py --quellen 1000 --md outputs/kosten.md
 """
+
 from __future__ import annotations
 
 import argparse
@@ -33,7 +34,7 @@ PREISE = {
 ZEICHEN_JE_TOKEN = 4
 
 # Aus dem Analysten-Prompt (analyze/agents.py) und einem echten Lauf gemessen.
-ANALYST_SYSTEM_TOKEN = 1200    # ANALYST_SYSTEM/TECH_ANALYST_SYSTEM (mit TEXTFELD)
+ANALYST_SYSTEM_TOKEN = 1200  # ANALYST_SYSTEM/TECH_ANALYST_SYSTEM (mit TEXTFELD)
 # Titel + Betreiber + Quelle + Datum + `text`.
 #
 # Seit dem 15.08.2026 traegt `text` bis zu ANALYST_TEXT_ZEICHEN (2500)
@@ -63,14 +64,20 @@ def _kosten(modell: str, ein_token: float, aus_token: float) -> float:
     return ein_token / 1e6 * p["ein"] + aus_token / 1e6 * p["aus"]
 
 
-def rechne(quellen: int, neue_meldungen: float, bewertete: float,
-           bereiche: int, zweistufig: bool,
-           zeichen_je_meldung: int = 716) -> dict:
+def rechne(
+    quellen: int,
+    neue_meldungen: float,
+    bewertete: float,
+    bereiche: int,
+    zweistufig: bool,
+    zeichen_je_meldung: int = 716,
+) -> dict:
     """Ein Lauf, aufgeschluesselt nach Posten."""
     # --- Analysten (flash): ein Aufruf je Stapel a 15 Meldungen
     stapel = max(1, round(neue_meldungen / BATCH_SIZE + 0.49))
-    analyst_ein = stapel * ANALYST_SYSTEM_TOKEN + \
-        neue_meldungen * ANALYST_JE_MELDUNG_TOKEN
+    analyst_ein = (
+        stapel * ANALYST_SYSTEM_TOKEN + neue_meldungen * ANALYST_JE_MELDUNG_TOKEN
+    )
     analyst_aus = bewertete * ANALYST_AUSGABE_JE_HIGHLIGHT
     analyst = _kosten("deepseek-v4-flash", analyst_ein, analyst_aus)
 
@@ -78,13 +85,13 @@ def rechne(quellen: int, neue_meldungen: float, bewertete: float,
     if zweistufig:
         # Stufe 1: je Bereich nur SEINE Meldungen; Stufe 2 nur die
         # Kurzfassungen und fuenf Meldungen je Bereich.
-        bereich_ein = bewertete * zeichen_je_meldung / ZEICHEN_JE_TOKEN + \
-            bereiche * 700
+        bereich_ein = bewertete * zeichen_je_meldung / ZEICHEN_JE_TOKEN + bereiche * 700
         bereich_aus = bereiche * 700
         chef_ein = bereiche * (150 + 5 * zeichen_je_meldung / ZEICHEN_JE_TOKEN) + 900
         chef_aus = 1400
-        redaktion = _kosten("deepseek-v4-pro", bereich_ein + chef_ein,
-                            bereich_aus + chef_aus)
+        redaktion = _kosten(
+            "deepseek-v4-pro", bereich_ein + chef_ein, bereich_aus + chef_aus
+        )
         redaktion_aufrufe = bereiche + 1
     else:
         ein = bewertete * zeichen_je_meldung / ZEICHEN_JE_TOKEN + 1500
@@ -108,15 +115,18 @@ def rechne(quellen: int, neue_meldungen: float, bewertete: float,
 
 
 def _zeile(e: dict) -> str:
-    return (f"| {e['quellen']} | {e['neue_meldungen']} | {e['bewertete']} | "
-            f"{e['redaktion']} | {e['analysten_aufrufe']} + "
-            f"{e['redaktions_aufrufe']} | {e['kosten_lauf']:.3f} $ | "
-            f"{e['kosten_monat']:.2f} $ | {e['kosten_monat_stosszeit']:.2f} $ |")
+    return (
+        f"| {e['quellen']} | {e['neue_meldungen']} | {e['bewertete']} | "
+        f"{e['redaktion']} | {e['analysten_aufrufe']} + "
+        f"{e['redaktions_aufrufe']} | {e['kosten_lauf']:.3f} $ | "
+        f"{e['kosten_monat']:.2f} $ | {e['kosten_monat_stosszeit']:.2f} $ |"
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(description=__doc__,
-                                formatter_class=argparse.RawDescriptionHelpFormatter)
+    p = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     p.add_argument("--root", type=Path, default=Path("."))
     p.add_argument("--quellen", type=int, default=1000)
     p.add_argument("--md", type=Path)
@@ -127,25 +137,27 @@ def main(argv: list[str] | None = None) -> int:
     lauf = bericht["run"]
     ist_quellen = stats["sources_total"]
     ist_neu = stats["new"]
-    ist_bewertet = sum(len(r.get("highlights") or [])
-                       for r in bericht["regions"].values())
+    ist_bewertet = sum(
+        len(r.get("highlights") or []) for r in bericht["regions"].values()
+    )
     ist_bereiche = len(lauf.get("analysts") or []) or len(bericht["regions"])
 
     je_quelle_neu = ist_neu / ist_quellen
     bewertungsquote = ist_bewertet / ist_neu if ist_neu else 0.0
 
-    ist = rechne(ist_quellen, ist_neu, ist_bewertet, ist_bereiche,
-                 zweistufig=False)
+    ist = rechne(ist_quellen, ist_neu, ist_bewertet, ist_bereiche, zweistufig=False)
     ziel_neu = je_quelle_neu * args.quellen
     ziel_bewertet = ziel_neu * bewertungsquote
     # Mehr Quellen heissen nicht mehr Regionen, aber mehr Themenfelder. Zwei
     # neue Kategorien sind in dieser Session dazugekommen; 16 Bereiche sind
     # eine vorsichtige Annahme.
     ziel_bereiche = 16
-    ziel_einstufig = rechne(args.quellen, ziel_neu, ziel_bewertet,
-                            ziel_bereiche, zweistufig=False)
-    ziel_zweistufig = rechne(args.quellen, ziel_neu, ziel_bewertet,
-                             ziel_bereiche, zweistufig=True)
+    ziel_einstufig = rechne(
+        args.quellen, ziel_neu, ziel_bewertet, ziel_bereiche, zweistufig=False
+    )
+    ziel_zweistufig = rechne(
+        args.quellen, ziel_neu, ziel_bewertet, ziel_bereiche, zweistufig=True
+    )
 
     zeilen = [
         "# Kostenrechnung",

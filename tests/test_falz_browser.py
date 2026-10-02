@@ -17,6 +17,7 @@ Er ist die Gegenprobe zu jeder kuenftigen Ergaenzung oberhalb der Falz. Wer
 dort etwas einfuegt, sieht hier, was es kostet - `pruefe_portal.py`
 Kriterium 1 zaehlt Geschichten, dieses hier misst Pixel.
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -51,9 +52,10 @@ def _chromium() -> str | None:
     Test, der diese Runde absichert, auf der Maschine schweigt, die Merges
     absichert - und zwar lautlos, weil ein Skip wie ein Erfolg aussieht.
     """
-    for muster in ("/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-                   str(Path.home() / ".cache/ms-playwright"
-                       / "chromium*/chrome-linux*/chrome")):
+    for muster in (
+        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
+        str(Path.home() / ".cache/ms-playwright" / "chromium*/chrome-linux*/chrome"),
+    ):
         treffer = sorted(glob.glob(muster))
         if treffer:
             return treffer[-1]
@@ -72,8 +74,9 @@ def _server(site: Path):
     s.bind(("127.0.0.1", 0))
     port = s.getsockname()[1]
     s.close()
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler,
-                                directory=str(site))
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(site)
+    )
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     try:
@@ -107,22 +110,20 @@ def _gemessen(tmp_path_factory):
     """Ein Browserstart je Testlauf, nicht je Format: Chromium hochzufahren
     kostet mehr als die Messung selbst."""
     sync_playwright = pytest.importorskip(
-        "playwright.sync_api",
-        reason="playwright fehlt - Browser-Messung entfaellt").sync_playwright
+        "playwright.sync_api", reason="playwright fehlt - Browser-Messung entfaellt"
+    ).sync_playwright
     pfad = _chromium()
     site = _baue(tmp_path_factory.mktemp("falz"))
 
     werte: dict[str, dict] = {}
     with _server(site) as wurzel, sync_playwright() as p:
         try:
-            browser = p.chromium.launch(
-                **({"executable_path": pfad} if pfad else {}))
-        except Exception as exc:                       # noqa: BLE001
+            browser = p.chromium.launch(**({"executable_path": pfad} if pfad else {}))
+        except Exception as exc:  # noqa: BLE001
             pytest.skip(f"Chromium startet nicht ({str(exc)[:80]})")
         try:
             for name, breite, hoehe in FORMATE:
-                seite = browser.new_page(
-                    viewport={"width": breite, "height": hoehe})
+                seite = browser.new_page(viewport={"width": breite, "height": hoehe})
                 seite.goto(f"{wurzel}/index.html", wait_until="load")
                 # Ohne das misst die Pruefung die Platzhalterhoehe der
                 # noch nicht geladenen Bilder oberhalb der Falz.
@@ -132,10 +133,16 @@ def _gemessen(tmp_path_factory):
                     "hoehe": hoehe,
                     "kasten": szl.bounding_box(),
                     "text": " ".join(szl.inner_text().split())[:80],
-                    "kurzpfad": (seite.locator(".kurzpfad").first.bounding_box()
-                                 if seite.locator(".kurzpfad").count() else None),
-                    "fokusband": (seite.locator(".fokusband").first.bounding_box()
-                                  if seite.locator(".fokusband").count() else None),
+                    "kurzpfad": (
+                        seite.locator(".kurzpfad").first.bounding_box()
+                        if seite.locator(".kurzpfad").count()
+                        else None
+                    ),
+                    "fokusband": (
+                        seite.locator(".fokusband").first.bounding_box()
+                        if seite.locator(".fokusband").count()
+                        else None
+                    ),
                 }
                 seite.close()
         finally:
@@ -157,7 +164,8 @@ def test_die_aufmacher_schlagzeile_steht_ohne_scrollen_da(_gemessen, format_name
     assert unterkante <= messung["hoehe"], (
         f"{format_name}: die Schlagzeile {messung['text']!r} endet bei "
         f"{unterkante:.0f} px und damit unterhalb der Falz "
-        f"({messung['hoehe']} px)")
+        f"({messung['hoehe']} px)"
+    )
 
 
 @pytest.mark.parametrize("format_name", [f[0] for f in FORMATE])
@@ -182,7 +190,8 @@ def test_der_kurzpfad_steht_nicht_ueber_der_schlagzeile(_gemessen, format_name):
     assert unterkante > messung["kasten"]["y"], (
         f"{format_name}: der Kurzpfad endet bei {unterkante:.0f} px, bevor "
         f"die Schlagzeile bei {messung['kasten']['y']:.0f} px beginnt - er "
-        f"steht ueber ihr statt neben ihr")
+        f"steht ueber ihr statt neben ihr"
+    )
 
 
 @pytest.mark.parametrize("format_name", [f[0] for f in FORMATE])
@@ -213,7 +222,8 @@ def test_das_fokusband_steht_ohne_scrollen_da(_gemessen, format_name):
     assert unterkante <= messung["hoehe"], (
         f"{format_name}: das Fokusband endet bei {unterkante:.0f} px und "
         f"damit unterhalb der Falz ({messung['hoehe']} px) - die "
-        f"Themenseite ist beim Aufruf der Domain unsichtbar")
+        f"Themenseite ist beim Aufruf der Domain unsichtbar"
+    )
 
 
 @pytest.mark.parametrize("format_name", [f[0] for f in FORMATE])
@@ -229,4 +239,5 @@ def test_das_fokusband_verdraengt_die_schlagzeile_nicht(_gemessen, format_name):
     unterkante = kasten["y"] + kasten["height"]
     assert unterkante <= messung["hoehe"], (
         f"{format_name}: mit dem Fokusband endet die Schlagzeile erst bei "
-        f"{unterkante:.0f} px, Falz {messung['hoehe']} px")
+        f"{unterkante:.0f} px, Falz {messung['hoehe']} px"
+    )

@@ -93,11 +93,13 @@ NEGATIVE Wert (Wettbewerber guenstiger). Sortiert wird deshalb aufsteigend
 (negativste/"zuungunsten Vodafones"-Werte zuerst) - siehe
 `outputs/rad1-2026-09-08.md` fuer die ausgeschriebene Begruendung.
 """
+
 from __future__ import annotations
 
 from typing import Optional
 
 from . import geraete_tco_band, geraete_tco_karten
+
 # DIE EINE REGEL, ob zwei Leitzahlen gegeneinander gestellt werden duerfen
 # (P0-B-h1). Dieses Modul leitet sie nicht ab, es liest sie - genau wie
 # der Katalog (`geraete_view`) und die Buendelzeile
@@ -107,8 +109,9 @@ from ..tco_model import zeitraum_vergleichbar
 # Die drei Netzbetreiber-Wettbewerber - dieselbe Menge, die
 # `geraete_tco_karten.modelle()` ohnehin immer (mit oder ohne Zahl) neben
 # Vodafone fuehrt.
-NETZ_WETTBEWERBER = tuple(a for a in geraete_tco_karten.ANBIETER_REIHENFOLGE
-                          if a != "Vodafone")
+NETZ_WETTBEWERBER = tuple(
+    a for a in geraete_tco_karten.ANBIETER_REIHENFOLGE if a != "Vodafone"
+)
 
 # Zweitmarken mit Bündelerhebung (B3, siehe Modulkopf "WETTBEWERBERKREIS"):
 # Zeile NUR, wo sie eine Karte haben - kein Platzhalter, wo sie keine haben.
@@ -130,8 +133,10 @@ STATUS_KEIN_BUENDEL = "kein_buendel"
 # CSV dieselbe Menge lesen (Clean Code 7).
 STATUS_NICHT_VERGLEICHBAR = "nicht_vergleichbar"
 
-def _grund_anderer_zeitraum(anbieter: str, monate: Optional[int],
-                            vf_monate: Optional[int]) -> str:
+
+def _grund_anderer_zeitraum(
+    anbieter: str, monate: Optional[int], vf_monate: Optional[int]
+) -> str:
     """Der Satz, der eine Zahl mit fremdem Zeitraum benennt (P0-B-h3).
 
     Er nennt BEIDE Zeitraeume - "nicht vergleichbar" allein liest sich
@@ -141,12 +146,19 @@ def _grund_anderer_zeitraum(anbieter: str, monate: Optional[int],
     Satz statt in zwei Feldern. Ein unbekannter Zeitraum wird benannt,
     nicht als 24 geraten (Clean Code 3/4).
     """
-    dieses = (f"{monate} Monate" if monate is not None
-              else "eine nicht gemessene Laufzeit")
-    gegen = (f"{vf_monate} Monate" if vf_monate is not None
-             else "eine nicht gemessene Laufzeit")
-    return (f"Die Zahl von {anbieter} trägt {dieses}, die Vodafone-Zahl "
-            f"{gegen} – über zwei Laufzeiten gibt es keinen Abstand.")
+    dieses = (
+        f"{monate} Monate" if monate is not None else "eine nicht gemessene Laufzeit"
+    )
+    gegen = (
+        f"{vf_monate} Monate"
+        if vf_monate is not None
+        else "eine nicht gemessene Laufzeit"
+    )
+    return (
+        f"Die Zahl von {anbieter} trägt {dieses}, die Vodafone-Zahl "
+        f"{gegen} – über zwei Laufzeiten gibt es keinen Abstand."
+    )
+
 
 # Wie viele Geraete-Gruppen ohne Aufklappen sichtbar sind. NICHTS wird
 # geloescht - der Rest steht im DOM hinter einem <details> (Test c: nicht
@@ -180,6 +192,7 @@ MODELLISTE_SICHTBAR = 5
 # Laenge gegeben, keine Aussage. Der Rest steht in der Tabelle im
 # Aufklapper unter der Grafik (nichts streichen).
 GRAFIK_MAX = 12
+
 
 def _band_label(band: Optional[str]) -> str:
     return geraete_tco_band.band_label(band) or "nicht bestimmbar"
@@ -220,24 +233,34 @@ def _vodafone_basis(modell: dict, band_je_tarif: dict) -> Optional[dict]:
         "naeherung": not bool(ref.get("aus_buendel")),
         "band": band,
         "band_label": _band_label(band),
-        "quelle_url": ref.get("geraet_quelle_url", "") or ref.get("tarif_quelle_url", ""),
-        "abgerufen_am": (ref.get("geraet_abgerufen_am", "")
-                         or ref.get("tarif_abgerufen_am", "")),
+        "quelle_url": ref.get("geraet_quelle_url", "")
+        or ref.get("tarif_quelle_url", ""),
+        "abgerufen_am": (
+            ref.get("geraet_abgerufen_am", "") or ref.get("tarif_abgerufen_am", "")
+        ),
         "tarif_quelle_url": ref.get("tarif_quelle_url", ""),
         "tarif_abgerufen_am": ref.get("tarif_abgerufen_am", ""),
     }
 
 
-def _zeile_fuer_anbieter(anbieter: str, karte: Optional[dict],
-                         basis: dict, band_je_tarif: dict) -> dict:
+def _zeile_fuer_anbieter(
+    anbieter: str, karte: Optional[dict], basis: dict, band_je_tarif: dict
+) -> dict:
     """Eine Zeile des Wettbewerbers gegen die Vodafone-Basis dieses Geraets."""
     grund = "" if karte is None else (karte.get("leer_grund") or "")
     if karte is None or not karte.get("belastbar") or karte.get("gesamt") is None:
-        return {"anbieter": anbieter, "status": STATUS_KEIN_BUENDEL,
-                "prozent": None, "gesamt": None, "tarif": "", "band": None,
-                "band_label": "", "grund": grund or
-                f"Für dieses Modell ist bei {anbieter} kein Bündel erhoben.",
-                **_beleg("", "")}
+        return {
+            "anbieter": anbieter,
+            "status": STATUS_KEIN_BUENDEL,
+            "prozent": None,
+            "gesamt": None,
+            "tarif": "",
+            "band": None,
+            "band_label": "",
+            "grund": grund
+            or f"Für dieses Modell ist bei {anbieter} kein Bündel erhoben.",
+            **_beleg("", ""),
+        }
     # A3-Nachbesserung (Pruefer 20.09.2026, "hoch"): Eine ALTE Karte ist
     # keine Zahl von heute - sie darf als BELEG neben der Zeile stehen
     # (mit Quelle und Abrufdatum), aber weder Prozent noch Vergleichspaar
@@ -250,38 +273,58 @@ def _zeile_fuer_anbieter(anbieter: str, karte: Optional[dict],
     # eine Definition aus `geraete_tco_karten.ist_frisch` (Clean Code 7),
     # hier wird nichts zweitgerechnet.
     if karte.get("frisch") is False:
-        return {"anbieter": anbieter, "status": STATUS_NICHT_VERGLEICHBAR,
-                "prozent": None, "gesamt": karte["gesamt"],
-                "tarif": karte.get("tarif", ""), "band": None,
-                "band_label": "",
-                # S3e (Diff-Prüfung 21.09.2026): der or-Fallback war tot -
-                # `alt_marke_fuer` liefert für ein unlesbares Datum
-                # selbst den „unbekannt"-Satz, es gibt keinen Produktions-
-                # pfad, der hier einen leeren String hinterlegt.
-                "grund": karte.get("alt_marke", ""),
-                **_beleg(karte.get("quelle_url", ""),
-                         karte.get("abgerufen_am", ""))}
+        return {
+            "anbieter": anbieter,
+            "status": STATUS_NICHT_VERGLEICHBAR,
+            "prozent": None,
+            "gesamt": karte["gesamt"],
+            "tarif": karte.get("tarif", ""),
+            "band": None,
+            "band_label": "",
+            # S3e (Diff-Prüfung 21.09.2026): der or-Fallback war tot -
+            # `alt_marke_fuer` liefert für ein unlesbares Datum
+            # selbst den „unbekannt"-Satz, es gibt keinen Produktions-
+            # pfad, der hier einen leeren String hinterlegt.
+            "grund": karte.get("alt_marke", ""),
+            **_beleg(karte.get("quelle_url", ""), karte.get("abgerufen_am", "")),
+        }
     if not karte.get("vergleichbar", True):
-        return {"anbieter": anbieter, "status": STATUS_NICHT_VERGLEICHBAR,
-                "prozent": None, "gesamt": karte["gesamt"], "tarif": karte.get("tarif", ""),
-                "band": None, "band_label": "",
-                "grund": (f"{anbieter} führt für dieses Gerät nur ein "
-                          f"{karte.get('zustand_etikett') or 'nicht neues'} "
-                          "Gerät – kein Vergleich gegen ein Neugerät."),
-                **_beleg(karte.get("quelle_url", ""), karte.get("abgerufen_am", ""))}
+        return {
+            "anbieter": anbieter,
+            "status": STATUS_NICHT_VERGLEICHBAR,
+            "prozent": None,
+            "gesamt": karte["gesamt"],
+            "tarif": karte.get("tarif", ""),
+            "band": None,
+            "band_label": "",
+            "grund": (
+                f"{anbieter} führt für dieses Gerät nur ein "
+                f"{karte.get('zustand_etikett') or 'nicht neues'} "
+                "Gerät – kein Vergleich gegen ein Neugerät."
+            ),
+            **_beleg(karte.get("quelle_url", ""), karte.get("abgerufen_am", "")),
+        }
 
     band = band_je_tarif.get(karte.get("tarif_id") or "")
     if basis["band"] is None or band is None or band != basis["band"]:
         vf_band = basis["band_label"]
         wb_band = _band_label(band)
-        grund = (f"Kein Tarifband, in dem beide dieses Gerät führen "
-                f"(Vodafone: {vf_band}, {anbieter}: {wb_band}) – "
-                "nicht vergleichbar (Tarifband-Mismatch).")
-        return {"anbieter": anbieter, "status": STATUS_BAND_MISMATCH,
-                "prozent": None, "gesamt": karte["gesamt"],
-                "tarif": karte.get("tarif", ""), "band": band,
-                "band_label": wb_band, "grund": grund,
-                **_beleg(karte.get("quelle_url", ""), karte.get("abgerufen_am", ""))}
+        grund = (
+            f"Kein Tarifband, in dem beide dieses Gerät führen "
+            f"(Vodafone: {vf_band}, {anbieter}: {wb_band}) – "
+            "nicht vergleichbar (Tarifband-Mismatch)."
+        )
+        return {
+            "anbieter": anbieter,
+            "status": STATUS_BAND_MISMATCH,
+            "prozent": None,
+            "gesamt": karte["gesamt"],
+            "tarif": karte.get("tarif", ""),
+            "band": band,
+            "band_label": wb_band,
+            "grund": grund,
+            **_beleg(karte.get("quelle_url", ""), karte.get("abgerufen_am", "")),
+        }
 
     # DAS HORIZONT-TOR, aus derselben Quelle wie an der Buendelzeile
     # (P0-B-h3, Befund 1). Bis hierher rechnete die naechste Zeile das
@@ -294,29 +337,37 @@ def _zeile_fuer_anbieter(anbieter: str, karte: Optional[dict],
     # als jedes hier ausgewiesene Delta. Die Zahl BLEIBT stehen (sie ist
     # richtig gemessen), nur Vorzeichen und Rang fallen weg - mit
     # benanntem Grund, nie als stille Null.
-    if not zeitraum_vergleichbar(karte.get("leitzahl_monate"),
-                                 basis.get("monate")):
-        return {"anbieter": anbieter, "status": STATUS_NICHT_VERGLEICHBAR,
-                "prozent": None, "gesamt": karte["gesamt"],
-                "vf_gesamt": basis["gesamt"],
-                "tarif": karte.get("tarif", ""), "band": band,
-                "band_label": _band_label(band),
-                "grund": _grund_anderer_zeitraum(
-                    anbieter, karte.get("leitzahl_monate"),
-                    basis.get("monate")),
-                **_beleg(karte.get("quelle_url", ""),
-                         karte.get("abgerufen_am", ""))}
-    prozent = round((karte["gesamt"] - basis["gesamt"]) / basis["gesamt"] * 100, 1)
-    return {"anbieter": anbieter, "status": STATUS_VERGLEICHBAR,
-            "prozent": prozent, "gesamt": karte["gesamt"],
+    if not zeitraum_vergleichbar(karte.get("leitzahl_monate"), basis.get("monate")):
+        return {
+            "anbieter": anbieter,
+            "status": STATUS_NICHT_VERGLEICHBAR,
+            "prozent": None,
+            "gesamt": karte["gesamt"],
             "vf_gesamt": basis["gesamt"],
-            "tarif": karte.get("tarif", ""), "band": band,
-            "band_label": _band_label(band), "grund": "",
-            **_beleg(karte.get("quelle_url", ""), karte.get("abgerufen_am", ""))}
+            "tarif": karte.get("tarif", ""),
+            "band": band,
+            "band_label": _band_label(band),
+            "grund": _grund_anderer_zeitraum(
+                anbieter, karte.get("leitzahl_monate"), basis.get("monate")
+            ),
+            **_beleg(karte.get("quelle_url", ""), karte.get("abgerufen_am", "")),
+        }
+    prozent = round((karte["gesamt"] - basis["gesamt"]) / basis["gesamt"] * 100, 1)
+    return {
+        "anbieter": anbieter,
+        "status": STATUS_VERGLEICHBAR,
+        "prozent": prozent,
+        "gesamt": karte["gesamt"],
+        "vf_gesamt": basis["gesamt"],
+        "tarif": karte.get("tarif", ""),
+        "band": band,
+        "band_label": _band_label(band),
+        "grund": "",
+        **_beleg(karte.get("quelle_url", ""), karte.get("abgerufen_am", "")),
+    }
 
 
-def _paar_zeile(anbieter: str, band: str, wb_karte: dict,
-                vf_karte: dict) -> dict:
+def _paar_zeile(anbieter: str, band: str, wb_karte: dict, vf_karte: dict) -> dict:
     """Vergleichbare Zeile: beide Karten liegen im SELBEN Band, und die
     Abweichung rechnet gegen VODAFONES KARTE IN DIESEM BAND - nicht gegen
     die Referenz des Geraets. Der Grund: Vodafones Referenz ist sein
@@ -327,42 +378,61 @@ def _paar_zeile(anbieter: str, band: str, wb_karte: dict,
     VF selbst Mittel 1.949,80). GRAPH-1 vergleicht INNERHALB eines Bandes;
     diese Zeile tut dasselbe und nennt die VF-Gegenkarte im Beleg."""
     if not wb_karte.get("vergleichbar", True):
-        return {"anbieter": anbieter, "status": STATUS_NICHT_VERGLEICHBAR,
-                "prozent": None, "gesamt": wb_karte["gesamt"],
-                "vf_gesamt": vf_karte["gesamt"],
-                "tarif": wb_karte.get("tarif", ""), "band": band,
-                "band_label": _band_label(band),
-                "grund": (f"{anbieter} führt für dieses Gerät nur ein "
-                          f"{wb_karte.get('zustand_etikett') or 'nicht neues'} "
-                          "Gerät – kein Vergleich gegen ein Neugerät."),
-                **_beleg(wb_karte.get("quelle_url", ""),
-                         wb_karte.get("abgerufen_am", ""))}
+        return {
+            "anbieter": anbieter,
+            "status": STATUS_NICHT_VERGLEICHBAR,
+            "prozent": None,
+            "gesamt": wb_karte["gesamt"],
+            "vf_gesamt": vf_karte["gesamt"],
+            "tarif": wb_karte.get("tarif", ""),
+            "band": band,
+            "band_label": _band_label(band),
+            "grund": (
+                f"{anbieter} führt für dieses Gerät nur ein "
+                f"{wb_karte.get('zustand_etikett') or 'nicht neues'} "
+                "Gerät – kein Vergleich gegen ein Neugerät."
+            ),
+            **_beleg(wb_karte.get("quelle_url", ""), wb_karte.get("abgerufen_am", "")),
+        }
     # DASSELBE TOR wie in `_zeile_fuer_anbieter` und an der Buendelzeile
     # (P0-B-h3): hier stehen ZWEI Karten gegeneinander, gelesen werden
     # also zwei `leitzahl_monate` - die Regel dazu ist dieselbe eine
     # (`tco_model.zeitraum_vergleichbar`). Ein Paar im selben Tarifband
     # ist noch kein Paar ueber denselben Zeitraum.
-    if not zeitraum_vergleichbar(wb_karte.get("leitzahl_monate"),
-                                 vf_karte.get("leitzahl_monate")):
-        return {"anbieter": anbieter, "status": STATUS_NICHT_VERGLEICHBAR,
-                "prozent": None, "gesamt": wb_karte["gesamt"],
-                "vf_gesamt": vf_karte["gesamt"],
-                "tarif": wb_karte.get("tarif", ""), "band": band,
-                "band_label": _band_label(band),
-                "grund": _grund_anderer_zeitraum(
-                    anbieter, wb_karte.get("leitzahl_monate"),
-                    vf_karte.get("leitzahl_monate")),
-                **_beleg(wb_karte.get("quelle_url", ""),
-                         wb_karte.get("abgerufen_am", ""))}
-    prozent = round((wb_karte["gesamt"] - vf_karte["gesamt"])
-                    / vf_karte["gesamt"] * 100, 1)
-    return {"anbieter": anbieter, "status": STATUS_VERGLEICHBAR,
-            "prozent": prozent, "gesamt": wb_karte["gesamt"],
+    if not zeitraum_vergleichbar(
+        wb_karte.get("leitzahl_monate"), vf_karte.get("leitzahl_monate")
+    ):
+        return {
+            "anbieter": anbieter,
+            "status": STATUS_NICHT_VERGLEICHBAR,
+            "prozent": None,
+            "gesamt": wb_karte["gesamt"],
             "vf_gesamt": vf_karte["gesamt"],
-            "tarif": wb_karte.get("tarif", ""), "band": band,
-            "band_label": _band_label(band), "grund": "",
-            **_beleg(wb_karte.get("quelle_url", ""),
-                     wb_karte.get("abgerufen_am", ""))}
+            "tarif": wb_karte.get("tarif", ""),
+            "band": band,
+            "band_label": _band_label(band),
+            "grund": _grund_anderer_zeitraum(
+                anbieter,
+                wb_karte.get("leitzahl_monate"),
+                vf_karte.get("leitzahl_monate"),
+            ),
+            **_beleg(wb_karte.get("quelle_url", ""), wb_karte.get("abgerufen_am", "")),
+        }
+    prozent = round(
+        (wb_karte["gesamt"] - vf_karte["gesamt"]) / vf_karte["gesamt"] * 100, 1
+    )
+    return {
+        "anbieter": anbieter,
+        "status": STATUS_VERGLEICHBAR,
+        "prozent": prozent,
+        "gesamt": wb_karte["gesamt"],
+        "vf_gesamt": vf_karte["gesamt"],
+        "tarif": wb_karte.get("tarif", ""),
+        "band": band,
+        "band_label": _band_label(band),
+        "grund": "",
+        **_beleg(wb_karte.get("quelle_url", ""), wb_karte.get("abgerufen_am", "")),
+    }
 
 
 def _guenstigste_echte_karte_je_anbieter(modell: dict) -> dict[str, dict]:
@@ -377,23 +447,28 @@ def _guenstigste_echte_karte_je_anbieter(modell: dict) -> dict[str, dict]:
     frische Karte desselben Anbieters (1.440,76 EUR vom 19.09.) als
     Beleg - die frische war im Radar unsichtbar."""
     beste: dict[str, dict] = {}
-    for k in (modell.get("karten") or []):
+    for k in modell.get("karten") or []:
         a = k["anbieter"]
         if a == "Vodafone" or a not in ALLE_WETTBEWERBER:
             continue
-        if not (k.get("belastbar") and not k.get("naeherung")
-                and k.get("gesamt") is not None):
+        if not (
+            k.get("belastbar")
+            and not k.get("naeherung")
+            and k.get("gesamt") is not None
+        ):
             continue
         rang = (not k.get("frisch", True), k["gesamt"])
-        if (a not in beste
-                or rang < (not beste[a].get("frisch", True),
-                           beste[a]["gesamt"])):
+        if a not in beste or rang < (
+            not beste[a].get("frisch", True),
+            beste[a]["gesamt"],
+        ):
             beste[a] = k
     return beste
 
 
-def netzbetreiber_gruppen(modelle: list, band_je_tarif: dict,
-                          band_rang: dict | None = None) -> list[dict]:
+def netzbetreiber_gruppen(
+    modelle: list, band_je_tarif: dict, band_rang: dict | None = None
+) -> list[dict]:
     """Je Modell eine Zeilengruppe (Aufgabe 3): Vodafone-Basis + Zeilen der
     drei Wettbewerber, IMMER alle drei genannt (kein_buendel statt
     Weglassen), dazu Zweitmarken MIT Karte ohne Platzhalter (B3) - sortiert
@@ -415,32 +490,45 @@ def netzbetreiber_gruppen(modelle: list, band_je_tarif: dict,
     gruppen = []
     for modell in modelle:
         basis = _vodafone_basis(modell, band_je_tarif)
-        alle_je_band = geraete_tco_band.alle_karten_je_band(modell,
-                                                            band_je_tarif)
+        alle_je_band = geraete_tco_band.alle_karten_je_band(modell, band_je_tarif)
         je_band = geraete_tco_band.karten_je_band(modell, band_je_tarif)
         uebrig = _guenstigste_echte_karte_je_anbieter(modell)
         hat_karte = {k.get("anbieter") for k in (modell.get("karten") or [])}
         if basis is None:
-            zeilen = [{"anbieter": a, "status": STATUS_KEIN_BUENDEL,
-                      "prozent": None,
-                      "gesamt": (uebrig.get(a) or {}).get("gesamt"),
-                      "tarif": (uebrig.get(a) or {}).get("tarif", ""),
-                      "band": None, "band_label": "",
-                      "grund": "", **_beleg("", "")}
-                     # Zweitmarken auch hier nur MIT Karte (B3, kein
-                     # Platzhalter - siehe der Kommentar unten).
-                     for a in ALLE_WETTBEWERBER
-                     if a in NETZ_WETTBEWERBER or a in hat_karte]
-            gruppen.append({
-                "id": modell["id"], "titel": modell["titel"],
-                "hersteller": modell["hersteller"], "speicher": modell["speicher"],
-                "vodafone": None,
-                "vodafone_grund": ("Keine Vodafone-Kosten über 24 Monate "
-                                  "für dieses Gerät "
-                                  "erhoben – kein Bündel und kein eigener "
-                                  "Barpreis."),
-                "zeilen": zeilen, "rang": float("inf"),
-            })
+            zeilen = [
+                {
+                    "anbieter": a,
+                    "status": STATUS_KEIN_BUENDEL,
+                    "prozent": None,
+                    "gesamt": (uebrig.get(a) or {}).get("gesamt"),
+                    "tarif": (uebrig.get(a) or {}).get("tarif", ""),
+                    "band": None,
+                    "band_label": "",
+                    "grund": "",
+                    **_beleg("", ""),
+                }
+                # Zweitmarken auch hier nur MIT Karte (B3, kein
+                # Platzhalter - siehe der Kommentar unten).
+                for a in ALLE_WETTBEWERBER
+                if a in NETZ_WETTBEWERBER or a in hat_karte
+            ]
+            gruppen.append(
+                {
+                    "id": modell["id"],
+                    "titel": modell["titel"],
+                    "hersteller": modell["hersteller"],
+                    "speicher": modell["speicher"],
+                    "vodafone": None,
+                    "vodafone_grund": (
+                        "Keine Vodafone-Kosten über 24 Monate "
+                        "für dieses Gerät "
+                        "erhoben – kein Bündel und kein eigener "
+                        "Barpreis."
+                    ),
+                    "zeilen": zeilen,
+                    "rang": float("inf"),
+                }
+            )
             continue
         zeilen = []
         for a in ALLE_WETTBEWERBER:
@@ -459,34 +547,49 @@ def netzbetreiber_gruppen(modelle: list, band_je_tarif: dict,
             # die fuer Vodafone konservative Wahl (eine Behauptung "VF ist
             # X % teurer" muss auch gegen VF's billigstes Angebot im Band
             # halten).
-            gemeinsam = {b: je for b, je in alle_je_band.items()
-                         if a in je and "Vodafone" in je
-                         and je_band[b]["Vodafone"].get("vergleichbar", True)}
+            gemeinsam = {
+                b: je
+                for b, je in alle_je_band.items()
+                if a in je
+                and "Vodafone" in je
+                and je_band[b]["Vodafone"].get("vergleichbar", True)
+            }
             if gemeinsam:
                 for b, karten_wb in sorted(
-                        gemeinsam.items(),
-                        key=lambda kv: (band_rang.get(kv[0], len(band_rang)),
-                                        kv[0])):
+                    gemeinsam.items(),
+                    key=lambda kv: (band_rang.get(kv[0], len(band_rang)), kv[0]),
+                ):
                     for karte_wb in karten_wb[a]:
-                        zeilen.append(_paar_zeile(
-                            a, b, karte_wb, je_band[b]["Vodafone"]))
+                        zeilen.append(
+                            _paar_zeile(a, b, karte_wb, je_band[b]["Vodafone"])
+                        )
                 continue
             karte_anders = uebrig.get(a)
             if karte_anders is not None:
-                zeilen.append(_zeile_fuer_anbieter(a, karte_anders, basis,
-                                                   band_je_tarif))
+                zeilen.append(
+                    _zeile_fuer_anbieter(a, karte_anders, basis, band_je_tarif)
+                )
                 continue
             zeilen.append(_zeile_fuer_anbieter(a, None, basis, band_je_tarif))
-        zeilen.sort(key=lambda z: z["prozent"] if z["prozent"] is not None
-                    else float("inf"))
-        rang = min((z["prozent"] for z in zeilen if z["prozent"] is not None),
-                  default=float("inf"))
-        gruppen.append({
-            "id": modell["id"], "titel": modell["titel"],
-            "hersteller": modell["hersteller"], "speicher": modell["speicher"],
-            "vodafone": basis, "vodafone_grund": "",
-            "zeilen": zeilen, "rang": rang,
-        })
+        zeilen.sort(
+            key=lambda z: z["prozent"] if z["prozent"] is not None else float("inf")
+        )
+        rang = min(
+            (z["prozent"] for z in zeilen if z["prozent"] is not None),
+            default=float("inf"),
+        )
+        gruppen.append(
+            {
+                "id": modell["id"],
+                "titel": modell["titel"],
+                "hersteller": modell["hersteller"],
+                "speicher": modell["speicher"],
+                "vodafone": basis,
+                "vodafone_grund": "",
+                "zeilen": zeilen,
+                "rang": rang,
+            }
+        )
     gruppen.sort(key=lambda g: g["rang"])
     return gruppen
 
@@ -548,8 +651,9 @@ def modellliste(gruppen: list[dict]) -> dict:
     """
     zeilen = []
     for g in gruppen:
-        paar = next((z for z in g["zeilen"]
-                     if z["status"] == STATUS_VERGLEICHBAR), None)
+        paar = next(
+            (z for z in g["zeilen"] if z["status"] == STATUS_VERGLEICHBAR), None
+        )
         luecke = ""
         sprung_band = ""
         if paar is None:
@@ -574,59 +678,69 @@ def modellliste(gruppen: list[dict]) -> dict:
                 # vorher eine Mismatch-Zeile mit einer unvergleichbaren
                 # Karte daneben).
                 luecke = "kein Vergleich"
-                for status in (STATUS_NICHT_VERGLEICHBAR,
-                               STATUS_BAND_MISMATCH,
-                               STATUS_KEIN_BUENDEL):
+                for status in (
+                    STATUS_NICHT_VERGLEICHBAR,
+                    STATUS_BAND_MISMATCH,
+                    STATUS_KEIN_BUENDEL,
+                ):
                     if any(z["status"] == status for z in g["zeilen"]):
                         luecke = _LUECKE_WORT[status]
                         break
         else:
             sprung_band = paar.get("band") or ""
-        zeilen.append({
-            "id": g["id"], "titel": g["titel"],
-            "hersteller": g["hersteller"], "speicher": g["speicher"],
-            # Der TITEL traegt die GB-Stufe meist schon („Xiaomi 17 512 GB")
-            # - die Klein-Zeile der Zeile wuerde sie ein zweites Mal setzen
-            # („512 GB 512 GB", dieselbe Fehlerklasse wie „2454 Modelle").
-            "speicher_klein": ("" if g["speicher"] and
-                               f"{g['speicher']} GB" in (g["titel"] or "")
-                               else (f"{g['speicher']} GB" if g["speicher"]
-                                     else "")),
-            "prozent": paar["prozent"] if paar else None,
-            "euro": (paar["gesamt"] - paar["vf_gesamt"]) if paar else None,
-            # Fertige deutsche Zeichenketten fuer die Zelle - die Vorlage
-            # formatiert keine Zahl (S4; und ein zweiter Formatierer im
-            # Template waere die zweite Stelle fuer dieselbe Zahl).
-            "prozent_text": (_dvorzeichen(paar["prozent"], 1)
-                             if paar else ""),
-            "euro_text": (_dvorzeichen(paar["gesamt"] - paar["vf_gesamt"])
-                          if paar else ""),
-            # Das Wort zur Zahl, aus DERSELBEN Differenz wie `euro_text`
-            # (nicht aus der gerundeten Prozentzahl): die Leitzahl der
-            # Übersicht sagt damit, wer günstiger ist, ohne Erklärsatz.
-            "richtung": (_richtung(paar["gesamt"] - paar["vf_gesamt"])
-                         if paar else ""),
-            "anbieter": (paar or {}).get("anbieter", ""),
-            "tarif": (paar or {}).get("tarif", ""),
-            "band_label": (paar or {}).get("band_label", ""),
-            "gesamt": (paar or {}).get("gesamt"),
-            "vf_gesamt": (paar or {}).get("vf_gesamt"),
-            "quelle_url": (paar or {}).get("quelle_url", ""),
-            "abgerufen_am": (paar or {}).get("abgerufen_am", ""),
-            "luecke": luecke,
-            # Das Band des Paares - der Sprung in den Graphen landet direkt
-            # im Band, in dem die Abweichung gerechnet wurde (Deep-Link
-            # ?modell=…&band=…). Ohne Paar bleibt es leer und der Graph
-            # waehlt selbst sein erlaubtes Band.
-            "sprung_band": sprung_band,
-            "vodafone": g["vodafone"],
-            "vodafone_grund": g["vodafone_grund"],
-            "gruppe_zeilen": g["zeilen"],
-        })
-    return {"zeilen": zeilen,
-            "sichtbar": zeilen[:MODELLISTE_SICHTBAR],
-            "rest": zeilen[MODELLISTE_SICHTBAR:],
-            "gesamt": len(zeilen)}
+        zeilen.append(
+            {
+                "id": g["id"],
+                "titel": g["titel"],
+                "hersteller": g["hersteller"],
+                "speicher": g["speicher"],
+                # Der TITEL traegt die GB-Stufe meist schon („Xiaomi 17 512 GB")
+                # - die Klein-Zeile der Zeile wuerde sie ein zweites Mal setzen
+                # („512 GB 512 GB", dieselbe Fehlerklasse wie „2454 Modelle").
+                "speicher_klein": (
+                    ""
+                    if g["speicher"] and f"{g['speicher']} GB" in (g["titel"] or "")
+                    else (f"{g['speicher']} GB" if g["speicher"] else "")
+                ),
+                "prozent": paar["prozent"] if paar else None,
+                "euro": (paar["gesamt"] - paar["vf_gesamt"]) if paar else None,
+                # Fertige deutsche Zeichenketten fuer die Zelle - die Vorlage
+                # formatiert keine Zahl (S4; und ein zweiter Formatierer im
+                # Template waere die zweite Stelle fuer dieselbe Zahl).
+                "prozent_text": (_dvorzeichen(paar["prozent"], 1) if paar else ""),
+                "euro_text": (
+                    _dvorzeichen(paar["gesamt"] - paar["vf_gesamt"]) if paar else ""
+                ),
+                # Das Wort zur Zahl, aus DERSELBEN Differenz wie `euro_text`
+                # (nicht aus der gerundeten Prozentzahl): die Leitzahl der
+                # Übersicht sagt damit, wer günstiger ist, ohne Erklärsatz.
+                "richtung": (
+                    _richtung(paar["gesamt"] - paar["vf_gesamt"]) if paar else ""
+                ),
+                "anbieter": (paar or {}).get("anbieter", ""),
+                "tarif": (paar or {}).get("tarif", ""),
+                "band_label": (paar or {}).get("band_label", ""),
+                "gesamt": (paar or {}).get("gesamt"),
+                "vf_gesamt": (paar or {}).get("vf_gesamt"),
+                "quelle_url": (paar or {}).get("quelle_url", ""),
+                "abgerufen_am": (paar or {}).get("abgerufen_am", ""),
+                "luecke": luecke,
+                # Das Band des Paares - der Sprung in den Graphen landet direkt
+                # im Band, in dem die Abweichung gerechnet wurde (Deep-Link
+                # ?modell=…&band=…). Ohne Paar bleibt es leer und der Graph
+                # waehlt selbst sein erlaubtes Band.
+                "sprung_band": sprung_band,
+                "vodafone": g["vodafone"],
+                "vodafone_grund": g["vodafone_grund"],
+                "gruppe_zeilen": g["zeilen"],
+            }
+        )
+    return {
+        "zeilen": zeilen,
+        "sichtbar": zeilen[:MODELLISTE_SICHTBAR],
+        "rest": zeilen[MODELLISTE_SICHTBAR:],
+        "gesamt": len(zeilen),
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -657,11 +771,17 @@ def modellliste(gruppen: list[dict]) -> dict:
 # Kontrast >= 3:1 (beide PASS, 18.09.2026).
 # ---------------------------------------------------------------------------
 
+
 def _x(text: object) -> str:
     """XML-Escaping fuer SVG-Text (Modelle- und Ladennamen kommen aus dem
     Bestand und duerfen & < > enthalten)."""
-    return (str(text or "").replace("&", "&amp;").replace("<", "&lt;")
-            .replace(">", "&gt;").replace('"', "&quot;"))
+    return (
+        str(text or "")
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
 
 
 def _euro0(betrag: float) -> str:
@@ -691,18 +811,25 @@ def grafik_zeilen(vergleich_ohne_vertrag: dict) -> list[dict]:
         prozent = z.get("prozent")
         if prozent is None:
             prozent = round(delta / vf * 100.0, 1)
-        zeilen.append({
-            "device_id": z.get("device_id"), "speicher": z.get("speicher"),
-            "modell": z.get("modell") or "", "hersteller": z.get("hersteller"),
-            "delta": float(delta), "prozent": float(prozent),
-            "laden": gegen.get("laden") or gegen.get("anbieter", ""),
-            "vf_preis": vf, "gegen_preis": gegen.get("preis"),
-        })
+        zeilen.append(
+            {
+                "device_id": z.get("device_id"),
+                "speicher": z.get("speicher"),
+                "modell": z.get("modell") or "",
+                "hersteller": z.get("hersteller"),
+                "delta": float(delta),
+                "prozent": float(prozent),
+                "laden": gegen.get("laden") or gegen.get("anbieter", ""),
+                "vf_preis": vf,
+                "gegen_preis": gegen.get("preis"),
+            }
+        )
     return zeilen
 
 
-def _balken_pfad(x_null: float, y: float, laenge: float, hoehe: float,
-                 nach_rechts: bool) -> str:
+def _balken_pfad(
+    x_null: float, y: float, laenge: float, hoehe: float, nach_rechts: bool
+) -> str:
     """Ein Balken mit runder AUSSEN-Seite und eckiger Basis an der
     Nulllinie (Markenspezifikation: Datenende gerundet, Basis quadrat) -
     ein `<rect rx>` rundet beide Enden und stellte die Basis als eigener
@@ -712,24 +839,27 @@ def _balken_pfad(x_null: float, y: float, laenge: float, hoehe: float,
     if nach_rechts:
         xe = x_null + laenge
         if not r:
-            return (f"M{x_null:.1f} {y:.1f}H{xe:.1f}V{y + hoehe:.1f}"
-                    f"H{x_null:.1f}Z")
-        return (f"M{x_null:.1f} {y:.1f}H{xe - r:.1f}Q{xe:.1f} {y:.1f} "
-                f"{xe:.1f} {y + r:.1f}V{y + hoehe - r:.1f}"
-                f"Q{xe:.1f} {y + hoehe:.1f} {xe - r:.1f} {y + hoehe:.1f}"
-                f"H{x_null:.1f}Z")
+            return f"M{x_null:.1f} {y:.1f}H{xe:.1f}V{y + hoehe:.1f}H{x_null:.1f}Z"
+        return (
+            f"M{x_null:.1f} {y:.1f}H{xe - r:.1f}Q{xe:.1f} {y:.1f} "
+            f"{xe:.1f} {y + r:.1f}V{y + hoehe - r:.1f}"
+            f"Q{xe:.1f} {y + hoehe:.1f} {xe - r:.1f} {y + hoehe:.1f}"
+            f"H{x_null:.1f}Z"
+        )
     xe = x_null - laenge
     if not r:
-        return (f"M{x_null:.1f} {y:.1f}H{xe:.1f}V{y + hoehe:.1f}"
-                f"H{x_null:.1f}Z")
-    return (f"M{x_null:.1f} {y:.1f}H{xe + r:.1f}Q{xe:.1f} {y:.1f} "
-            f"{xe:.1f} {y + r:.1f}V{y + hoehe - r:.1f}"
-            f"Q{xe:.1f} {y + hoehe:.1f} {xe + r:.1f} {y + hoehe:.1f}"
-            f"H{x_null:.1f}Z")
+        return f"M{x_null:.1f} {y:.1f}H{xe:.1f}V{y + hoehe:.1f}H{x_null:.1f}Z"
+    return (
+        f"M{x_null:.1f} {y:.1f}H{xe + r:.1f}Q{xe:.1f} {y:.1f} "
+        f"{xe:.1f} {y + r:.1f}V{y + hoehe - r:.1f}"
+        f"Q{xe:.1f} {y + hoehe:.1f} {xe + r:.1f} {y + hoehe:.1f}"
+        f"H{x_null:.1f}Z"
+    )
 
 
-def _grafik_svg(zeilen: list[dict], spitze_schluessel: tuple | None,
-                breit: bool) -> str:
+def _grafik_svg(
+    zeilen: list[dict], spitze_schluessel: tuple | None, breit: bool
+) -> str:
     """Das servergerenderte SVG in zwei Varianten (schirm/mobil) - kein
     Client-Rechnen. Beide stehen im DOM, das Mediaquery zeigt eine
     (derselbe Mechanismus wie die Zeitreihe `svg.gr-zr--breit/schmal`).
@@ -745,8 +875,7 @@ def _grafik_svg(zeilen: list[dict], spitze_schluessel: tuple | None,
     # rechnet VF − Wettbewerber und wird hier EINMAL gedreht, damit
     # Richtung, Farbe und Beschriftung aus derselben Groesse kommen (bis
     # 28.09.2026 stand „+280,90 €" unter einer Leitzahl „-50,4 %").
-    zeilen = [{**z, "delta": -z["delta"], "prozent": -z["prozent"]}
-              for z in zeilen]
+    zeilen = [{**z, "delta": -z["delta"], "prozent": -z["prozent"]} for z in zeilen]
     n = len(zeilen)
     if breit:
         # Der LINKE Arm traegt seit 28.09.2026 den Regelfall (Wettbewerber
@@ -760,8 +889,7 @@ def _grafik_svg(zeilen: list[dict], spitze_schluessel: tuple | None,
         reihen_hoehe, balken_hoehe, kopf, fuss = 40, 12, 26, 8
     h = kopf + n * reihen_hoehe + fuss
     max_abs = max((abs(z["delta"]) for z in zeilen), default=1.0) or 1.0
-    neg_arm = max((abs(z["delta"]) for z in zeilen if z["delta"] < 0),
-                  default=0.0)
+    neg_arm = max((abs(z["delta"]) for z in zeilen if z["delta"] < 0), default=0.0)
     # Schmal beginnt die Nulllinie mit Einsatz (10 statt 2): eine 1,5-px-
     # Haarlinie direkt an der Kante ist auf dem Telefon unsichtbar (am
     # Screenshot vom 18.09.2026 nachgesehen), mit Einsatz liest sie sich
@@ -776,25 +904,35 @@ def _grafik_svg(zeilen: list[dict], spitze_schluessel: tuple | None,
 
     spitze = None
     if spitze_schluessel is not None:
-        spitze = next((z for z in zeilen
-                       if (z["device_id"], z["speicher"]) == spitze_schluessel),
-                      None)
+        spitze = next(
+            (z for z in zeilen if (z["device_id"], z["speicher"]) == spitze_schluessel),
+            None,
+        )
     teile: list[str] = []
     teile.append(
         f"<svg class='wr-gr wr-gr--{'breit' if breit else 'schmal'}' "
         f"viewBox='0 0 {w} {h}' role='img' "
         f"aria-label='Abstand zum Vodafone-Preis in Euro, {n} Modelle"
-        + (f", größter Abstand {_dvorzeichen(spitze['delta'])} Euro "
-           f"bei {_x(spitze['modell'])}" if spitze else "")
-        + "'>")
+        + (
+            f", größter Abstand {_dvorzeichen(spitze['delta'])} Euro "
+            f"bei {_x(spitze['modell'])}"
+            if spitze
+            else ""
+        )
+        + "'>"
+    )
     # Die EINE Nulllinie mit dem EINEN Etikett (Auftrag P4/D1): kein
     # Raster und keine zweite Achse - jeder Balken traegt seinen Wert
     # selbst als Beschriftung, die Nulllinie ist die Referenz.
     anker = " text-anchor='middle'" if breit else ""
-    teile.append(f"<line class='wr-gr-null' x1='{x0:.1f}' y1='{kopf - 8}' "
-                 f"x2='{x0:.1f}' y2='{h - 4:.1f}'/>")
-    teile.append(f"<text class='wr-gr-nulltext' x='{x0:.1f}' "
-                 f"y='{kopf - 13}'{anker}>Vodafone</text>")
+    teile.append(
+        f"<line class='wr-gr-null' x1='{x0:.1f}' y1='{kopf - 8}' "
+        f"x2='{x0:.1f}' y2='{h - 4:.1f}'/>"
+    )
+    teile.append(
+        f"<text class='wr-gr-nulltext' x='{x0:.1f}' "
+        f"y='{kopf - 13}'{anker}>Vodafone</text>"
+    )
     for i, z in enumerate(zeilen):
         ist_spitze = spitze is not None and spitze is z
         klasse = "wr-gr-balken"
@@ -807,54 +945,71 @@ def _grafik_svg(zeilen: list[dict], spitze_schluessel: tuple | None,
         laenge = abs(z["delta"]) * skala
         wert = f"{_dvorzeichen(z['delta'])} €"
         prozent = f"{z['prozent']:+.1f}".replace(".", ",") + " %"
-        titel = (f"{_x(z['modell'])}: {wert} ({prozent}) gegenüber "
-                 f"{_x(z['laden'])} – Vodafone {_euro0(z['vf_preis'])}, "
-                 f"{_x(z['laden'])} {_euro0(z['gegen_preis'])}")
+        titel = (
+            f"{_x(z['modell'])}: {wert} ({prozent}) gegenüber "
+            f"{_x(z['laden'])} – Vodafone {_euro0(z['vf_preis'])}, "
+            f"{_x(z['laden'])} {_euro0(z['gegen_preis'])}"
+        )
         if breit:
             y = kopf + i * reihen_hoehe + (reihen_hoehe - balken_hoehe) / 2
             ty = y + balken_hoehe / 2 + 4
             speicher = ""
             if z["speicher"]:
-                speicher = (f" <tspan class='wr-gr-name-zusatz'>· "
-                            f"{_x(z['speicher'])} GB</tspan>")
-            teile.append(f"<text class='wr-gr-name' x='{name_breite}' "
-                         f"y='{ty:.1f}' text-anchor='end'>{_x(z['modell'])}"
-                         f"{speicher}</text>")
+                speicher = (
+                    f" <tspan class='wr-gr-name-zusatz'>· "
+                    f"{_x(z['speicher'])} GB</tspan>"
+                )
+            teile.append(
+                f"<text class='wr-gr-name' x='{name_breite}' "
+                f"y='{ty:.1f}' text-anchor='end'>{_x(z['modell'])}"
+                f"{speicher}</text>"
+            )
             teile.append(
                 f"<path class='{klasse}' d='"
                 f"{_balken_pfad(x0, y, laenge, balken_hoehe, z['delta'] > 0)}'>"
-                f"<title>{titel}</title></path>")
+                f"<title>{titel}</title></path>"
+            )
             if z["delta"] > 0:
                 teile.append(
                     f"<text class='wr-gr-wert' x='{x0 + laenge + 8:.1f}' "
                     f"y='{ty:.1f}'>{wert}<tspan class='wr-gr-laden'> · "
-                    f"{_x(z['laden'])}</tspan></text>")
+                    f"{_x(z['laden'])}</tspan></text>"
+                )
             else:
                 teile.append(
                     f"<text class='wr-gr-wert' x='{x0 - laenge - 8:.1f}' "
                     f"y='{ty:.1f}' text-anchor='end'>{wert}<tspan "
-                    f"class='wr-gr-laden'> · {_x(z['laden'])}</tspan></text>")
+                    f"class='wr-gr-laden'> · {_x(z['laden'])}</tspan></text>"
+                )
         else:
             ly = kopf + i * reihen_hoehe
             y = ly + 19
             name = _x(z["modell"])
             if z["speicher"]:
-                name = (f"{name} <tspan class='wr-gr-name-zusatz'>· "
-                        f"{_x(z['speicher'])} GB</tspan>")
-            teile.append(f"<text class='wr-gr-name' x='2' y='{ly + 12:.1f}'>"
-                         f"{name}</text>")
+                name = (
+                    f"{name} <tspan class='wr-gr-name-zusatz'>· "
+                    f"{_x(z['speicher'])} GB</tspan>"
+                )
+            teile.append(
+                f"<text class='wr-gr-name' x='2' y='{ly + 12:.1f}'>{name}</text>"
+            )
             teile.append(
                 f"<path class='{klasse}' d='"
                 f"{_balken_pfad(x0, y, laenge, balken_hoehe, z['delta'] > 0)}'>"
-                f"<title>{titel}</title></path>")
+                f"<title>{titel}</title></path>"
+            )
             if z["delta"] > 0:
-                teile.append(f"<text class='wr-gr-wert' "
-                             f"x='{x0 + laenge + 6:.1f}' y='{y + 10:.1f}'>"
-                             f"{wert}</text>")
+                teile.append(
+                    f"<text class='wr-gr-wert' "
+                    f"x='{x0 + laenge + 6:.1f}' y='{y + 10:.1f}'>"
+                    f"{wert}</text>"
+                )
             else:
-                teile.append(f"<text class='wr-gr-wert' "
-                             f"x='{x0 - laenge - 6:.1f}' y='{y + 10:.1f}' "
-                             f"text-anchor='end'>{wert}</text>")
+                teile.append(
+                    f"<text class='wr-gr-wert' "
+                    f"x='{x0 - laenge - 6:.1f}' y='{y + 10:.1f}' "
+                    f"text-anchor='end'>{wert}</text>"
+                )
     teile.append("</svg>")
     return "".join(teile)
 
@@ -867,18 +1022,25 @@ def grafik(vergleich_ohne_vertrag: dict, n: int = GRAFIK_MAX) -> dict:
     Bild fehlt (und die Alarm-Pille haette keinen Balken)."""
     alle = grafik_zeilen(vergleich_ohne_vertrag)
     if not alle:
-        return {"svg_breit": "", "svg_schmal": "", "zeilen": [],
-                "n": 0, "basis": 0, "spitze": None,
-                "leer_grund": ("Noch keine vergleichbaren Barpreise erhoben "
-                               "– die Grafik entsteht mit dem nächsten Lauf.")}
-    spitze_kandidat = max((z for z in alle if z["delta"] > 0),
-                          key=lambda z: z["delta"], default=None)
+        return {
+            "svg_breit": "",
+            "svg_schmal": "",
+            "zeilen": [],
+            "n": 0,
+            "basis": 0,
+            "spitze": None,
+            "leer_grund": (
+                "Noch keine vergleichbaren Barpreise erhoben "
+                "– die Grafik entsteht mit dem nächsten Lauf."
+            ),
+        }
+    spitze_kandidat = max(
+        (z for z in alle if z["delta"] > 0), key=lambda z: z["delta"], default=None
+    )
     gewaehlt = sorted(alle, key=lambda z: -abs(z["delta"]))[:n]
     if spitze_kandidat is not None:
-        schluessel = (spitze_kandidat["device_id"],
-                      spitze_kandidat["speicher"])
-        if not any((z["device_id"], z["speicher"]) == schluessel
-                   for z in gewaehlt):
+        schluessel = (spitze_kandidat["device_id"], spitze_kandidat["speicher"])
+        if not any((z["device_id"], z["speicher"]) == schluessel for z in gewaehlt):
             # P4-Fix (Code-Pruefung S4): n<=0 (ein kuenftiger Aufrufer)
             # wuerde `gewaehlt[-1]` auf einer LEEREN Liste lesen -
             # IndexError statt Leerzustand. Produktion ruft ohne n
@@ -891,23 +1053,31 @@ def grafik(vergleich_ohne_vertrag: dict, n: int = GRAFIK_MAX) -> dict:
             gewaehlt.sort(key=lambda z: -abs(z["delta"]))
     spitze = None
     if spitze_kandidat is not None:
-        spitze = {"device_id": spitze_kandidat["device_id"],
-                  "speicher": spitze_kandidat["speicher"],
-                  # Der Schluessel fuer die Vorlage: dieselbe Normalisierung
-                  # wie in der Alarm-Zeile (None -> ''), sonst traegt die
-                  # Spitzen-Markierung an einem Modell ohne Speicherangabe
-                  # vorbei ("...|None" trifft nie).
-                  "schluessel": (f"{spitze_kandidat['device_id'] or ''}|"
-                                 f"{spitze_kandidat['speicher'] or ''}"),
-                  "modell": spitze_kandidat["modell"],
-                  "delta": spitze_kandidat["delta"],
-                  "delta_text": f"{_dvorzeichen(-spitze_kandidat['delta'])} €"}
-    schluessel = ((spitze["device_id"], spitze["speicher"])
-                  if spitze else None)
-    return {"svg_breit": _grafik_svg(gewaehlt, schluessel, True),
-            "svg_schmal": _grafik_svg(gewaehlt, schluessel, False),
-            "zeilen": gewaehlt, "n": len(gewaehlt), "basis": len(alle),
-            "spitze": spitze, "leer_grund": ""}
+        spitze = {
+            "device_id": spitze_kandidat["device_id"],
+            "speicher": spitze_kandidat["speicher"],
+            # Der Schluessel fuer die Vorlage: dieselbe Normalisierung
+            # wie in der Alarm-Zeile (None -> ''), sonst traegt die
+            # Spitzen-Markierung an einem Modell ohne Speicherangabe
+            # vorbei ("...|None" trifft nie).
+            "schluessel": (
+                f"{spitze_kandidat['device_id'] or ''}|"
+                f"{spitze_kandidat['speicher'] or ''}"
+            ),
+            "modell": spitze_kandidat["modell"],
+            "delta": spitze_kandidat["delta"],
+            "delta_text": f"{_dvorzeichen(-spitze_kandidat['delta'])} €",
+        }
+    schluessel = (spitze["device_id"], spitze["speicher"]) if spitze else None
+    return {
+        "svg_breit": _grafik_svg(gewaehlt, schluessel, True),
+        "svg_schmal": _grafik_svg(gewaehlt, schluessel, False),
+        "zeilen": gewaehlt,
+        "n": len(gewaehlt),
+        "basis": len(alle),
+        "spitze": spitze,
+        "leer_grund": "",
+    }
 
 
 def haendler_zeilen(vergleich_ohne_vertrag: dict) -> list[dict]:
@@ -929,16 +1099,21 @@ def haendler_zeilen(vergleich_ohne_vertrag: dict) -> list[dict]:
             if w.get("preis") is None:
                 continue
             prozent = round((w["preis"] - vf["preis"]) / vf["preis"] * 100, 1)
-            zeilen.append({
-                "modell": z.get("modell", ""), "hersteller": z.get("hersteller", ""),
-                "speicher": z.get("speicher"),
-                "vodafone_preis": vf["preis"], "vodafone_url": vf.get("url", ""),
-                "vodafone_abgerufen_am": vf.get("abgerufen_am", ""),
-                "anbieter": w.get("laden") or w.get("anbieter", ""),
-                "preis": w["preis"], "url": w.get("url", ""),
-                "abgerufen_am": w.get("abgerufen_am", ""),
-                "prozent": prozent,
-            })
+            zeilen.append(
+                {
+                    "modell": z.get("modell", ""),
+                    "hersteller": z.get("hersteller", ""),
+                    "speicher": z.get("speicher"),
+                    "vodafone_preis": vf["preis"],
+                    "vodafone_url": vf.get("url", ""),
+                    "vodafone_abgerufen_am": vf.get("abgerufen_am", ""),
+                    "anbieter": w.get("laden") or w.get("anbieter", ""),
+                    "preis": w["preis"],
+                    "url": w.get("url", ""),
+                    "abgerufen_am": w.get("abgerufen_am", ""),
+                    "prozent": prozent,
+                }
+            )
     zeilen.sort(key=lambda r: r["prozent"])
     return zeilen
 
@@ -954,14 +1129,24 @@ def nicht_erhebbar(quellenlage: dict) -> list[dict]:
             continue
         if z.get("zustand") == "liefert":
             continue
-        out.append({"anbieter": z.get("name", ""), "aktiv": bool(z.get("aktiv")),
-                   "grund": z.get("grund") or "Keine Daten erhoben."})
+        out.append(
+            {
+                "anbieter": z.get("name", ""),
+                "aktiv": bool(z.get("aktiv")),
+                "grund": z.get("grund") or "Keine Daten erhoben.",
+            }
+        )
     out.sort(key=lambda x: x["anbieter"])
     return out
 
 
-def radar(tco: dict, vergleich_ohne_vertrag: dict, quellenlage: dict,
-          alarme: dict | None = None, portfolio: dict | None = None) -> dict:
+def radar(
+    tco: dict,
+    vergleich_ohne_vertrag: dict,
+    quellenlage: dict,
+    alarme: dict | None = None,
+    portfolio: dict | None = None,
+) -> dict:
     """Alles fuer die Radar-Tafel der EINEN Geräteseite (#tafel-radar).
 
     `gruppen`/`haendler` bleiben die VOLLSTAENDIGEN Listen (Test c: nichts
@@ -981,12 +1166,13 @@ def radar(tco: dict, vergleich_ohne_vertrag: dict, quellenlage: dict,
     """
     band_je_tarif = tco.get("band_je_tarif") or {}
     gruppen = netzbetreiber_gruppen(
-        tco.get("modelle", []), band_je_tarif,
-        _band_rang(tco.get("baender_katalog")))
+        tco.get("modelle", []), band_je_tarif, _band_rang(tco.get("baender_katalog"))
+    )
     haendler = haendler_zeilen(vergleich_ohne_vertrag)
     fehlt = nicht_erhebbar(quellenlage)
-    hat_vergleichbare = any(z["prozent"] is not None
-                            for g in gruppen for z in g["zeilen"])
+    hat_vergleichbare = any(
+        z["prozent"] is not None for g in gruppen for z in g["zeilen"]
+    )
     ohne = (vergleich_ohne_vertrag or {}).get("ohne_vodafone") or []
     return {
         "gruppen": gruppen,
@@ -1012,7 +1198,8 @@ def radar(tco: dict, vergleich_ohne_vertrag: dict, quellenlage: dict,
         # ist die Sortimentshaelfte derselben Radar-Frage.
         "ohne_vodafone": ohne,
         "ohne_vodafone_gesamt": (vergleich_ohne_vertrag or {}).get(
-            "ohne_vodafone_gesamt", len(ohne)),
+            "ohne_vodafone_gesamt", len(ohne)
+        ),
         # O3: die Portfolio-Abschnitte der Geräteseite (Lifecycle,
         # Wochenkarte) - als GANZES durchgereicht, keine zweite Rechnung;
         # `render_site` baut das Dict aus denselben Feldern, die die alte
@@ -1033,8 +1220,11 @@ def _portfolio_leer() -> dict:
     das Dict aus `render_site`, damit die Vorlage nie auf ein fehlendes
     Feld trifft (derselbe Grund wie bei `_alarme_leer`)."""
     return {
-        "lifecycle": None, "auffaellig": None,
-        "lifecycle_sichtbar": 0, "nachfolger_sichtbar": 0, "fenster_tage": 0,
+        "lifecycle": None,
+        "auffaellig": None,
+        "lifecycle_sichtbar": 0,
+        "nachfolger_sichtbar": 0,
+        "fenster_tage": 0,
     }
 
 
@@ -1044,21 +1234,29 @@ def _alarme_leer() -> dict:
     `EIGEN` im Modulkopf: eine Abhaengigkeit zwischen zwei Seiten, die
     sonst nichts miteinander zu tun haben)."""
     from . import geraete_alarme
+
     return geraete_alarme.leer()
 
 
 def leer() -> dict:
-    return {"gruppen": [], "gruppen_sichtbar": [], "gruppen_rest": [],
-            "modelliste": {"zeilen": [], "sichtbar": [], "rest": [],
-                           "gesamt": 0},
-            "grafik": grafik({}),
-            "haendler": [], "haendler_sichtbar": [], "haendler_rest": [],
-            "nicht_erhebbar": [],
-            "hat_daten": False, "hat_vergleichbare_zeilen": False,
-            "anbieter_erwartet": list(NETZ_WETTBEWERBER),
-            "alarme": _alarme_leer(),
-            "ohne_vodafone": [], "ohne_vodafone_gesamt": 0,
-            "portfolio": _portfolio_leer(),
-            # O4: der Radar-Export - Notzustand mit denselben Schlüsseln,
-            # damit die Vorlage nie auf ein fehlendes Feld trifft.
-            "export": {"datei": "", "zeilen": 0, "bytes": 0}}
+    return {
+        "gruppen": [],
+        "gruppen_sichtbar": [],
+        "gruppen_rest": [],
+        "modelliste": {"zeilen": [], "sichtbar": [], "rest": [], "gesamt": 0},
+        "grafik": grafik({}),
+        "haendler": [],
+        "haendler_sichtbar": [],
+        "haendler_rest": [],
+        "nicht_erhebbar": [],
+        "hat_daten": False,
+        "hat_vergleichbare_zeilen": False,
+        "anbieter_erwartet": list(NETZ_WETTBEWERBER),
+        "alarme": _alarme_leer(),
+        "ohne_vodafone": [],
+        "ohne_vodafone_gesamt": 0,
+        "portfolio": _portfolio_leer(),
+        # O4: der Radar-Export - Notzustand mit denselben Schlüsseln,
+        # damit die Vorlage nie auf ein fehlendes Feld trifft.
+        "export": {"datei": "", "zeilen": 0, "bytes": 0},
+    }

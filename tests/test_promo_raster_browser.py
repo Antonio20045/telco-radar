@@ -27,6 +27,7 @@ Dinge, die alle drei nur die fertige Seite beantworten kann:
      die Promo Uebersicht, deren Karten seit dem 16.08.2026 eine feste
      Bildflaeche haben - und eine feste Flaeche kann skalieren).
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -58,9 +59,10 @@ TOLERANZ = 4
 def _chromium() -> str | None:
     """Beide Orte - Sandbox-Image und GitHub-Runner. Siehe
     tests/test_falz_browser.py."""
-    for muster in ("/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-                   str(Path.home() / ".cache/ms-playwright"
-                       / "chromium*/chrome-linux*/chrome")):
+    for muster in (
+        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
+        str(Path.home() / ".cache/ms-playwright" / "chromium*/chrome-linux*/chrome"),
+    ):
         treffer = sorted(glob.glob(muster))
         if treffer:
             return treffer[-1]
@@ -73,8 +75,9 @@ def _server(site: Path):
     s.bind(("127.0.0.1", 0))
     port = s.getsockname()[1]
     s.close()
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler,
-                                directory=str(site))
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(site)
+    )
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     try:
@@ -113,8 +116,8 @@ _MESSUNG = """() => {
 def _bloecke(tmp_path_factory):
     """Ein Browserstart, die echte Promo Uebersicht, alle Kartenmasse."""
     sync_playwright = pytest.importorskip(
-        "playwright.sync_api",
-        reason="playwright fehlt - Browser-Messung entfaellt").sync_playwright
+        "playwright.sync_api", reason="playwright fehlt - Browser-Messung entfaellt"
+    ).sync_playwright
     if not (REPO / "data" / "state" / "promo_db.json").exists():
         pytest.skip("kein Promo-Bestand im Repo")
     pfad = _chromium()
@@ -127,9 +130,8 @@ def _bloecke(tmp_path_factory):
 
     with _server(site) as wurzel, sync_playwright() as p:
         try:
-            browser = p.chromium.launch(
-                **({"executable_path": pfad} if pfad else {}))
-        except Exception as exc:                       # noqa: BLE001
+            browser = p.chromium.launch(**({"executable_path": pfad} if pfad else {}))
+        except Exception as exc:  # noqa: BLE001
             pytest.skip(f"Chromium startet nicht ({str(exc)[:80]})")
         try:
             seite = browser.new_page(viewport={"width": 1440, "height": 900})
@@ -139,7 +141,8 @@ def _bloecke(tmp_path_factory):
             seite.evaluate(
                 "async()=>{for(let y=0;y<document.body.scrollHeight;y+=600)"
                 "{window.scrollTo(0,y);await new Promise(r=>setTimeout(r,50));}"
-                "window.scrollTo(0,0);}")
+                "window.scrollTo(0,0);}"
+            )
             seite.wait_for_timeout(1200)
             daten = seite.evaluate(_MESSUNG)
         finally:
@@ -169,8 +172,7 @@ def test_die_motive_einer_reihe_sind_gleich_hoch(_bloecke):
     schief = []
     for block in _bloecke:
         for reihe in _reihen(block["karten"]):
-            hoehen = [k["motiv_hoehe"] for k in reihe
-                      if k["motiv_hoehe"] is not None]
+            hoehen = [k["motiv_hoehe"] for k in reihe if k["motiv_hoehe"] is not None]
             if hoehen and max(hoehen) - min(hoehen) > TOLERANZ:
                 schief.append((block["marke"], hoehen))
     assert not schief, f"Motivhoehen einer Reihe laufen auseinander: {schief}"
@@ -195,10 +197,12 @@ def test_kein_motiv_wird_hochskaliert(_bloecke):
     Regel, dass nur in eine Flaeche darf, wer sie fuellen kann
     (promo.LEAD_MIND_BREITE fuer die grosse, die Mindestbreite des
     Bildholers fuer die kleine). Dieser Test haelt sie."""
-    zu_gross = [(b["marke"], k["bild"])
-                for b in _bloecke for k in b["karten"]
-                if k["bild"] and k["bild"]["nat"]
-                and k["bild"]["disp"] > k["bild"]["nat"] + 1]
+    zu_gross = [
+        (b["marke"], k["bild"])
+        for b in _bloecke
+        for k in b["karten"]
+        if k["bild"] and k["bild"]["nat"] and k["bild"]["disp"] > k["bild"]["nat"] + 1
+    ]
     assert not zu_gross, f"hochskalierte Motive: {zu_gross}"
 
 
@@ -207,8 +211,7 @@ def test_jede_karte_traegt_ein_motiv(_bloecke):
     fehlendes Bild, sondern die zweite gueltige Form einer Karte (08.08.2026,
     Kriterium 8c von scripts/pruefe_portal.py). Ohne diese Zusicherung
     reisst eine Karte ohne Motiv wieder ein Loch in ihre Rasterreihe."""
-    ohne = [b["marke"] for b in _bloecke for k in b["karten"]
-            if not k["motiv_hoehe"]]
+    ohne = [b["marke"] for b in _bloecke for k in b["karten"] if not k["motiv_hoehe"]]
     assert not ohne, f"Karten ohne Motiv: {sorted(set(ohne))}"
 
 
@@ -249,11 +252,17 @@ def _synth_entry(brand: str, n: int) -> dict:
     """Ein minimaler Angebots-Eintrag ohne Bild - eine Schriftkachel traegt
     dieselbe feste 16:9-Flaeche wie ein Bild (siehe motiv()-Makro), die
     Geometriemessung braucht also keine echte Bilddatei."""
-    return {"id": f"{brand}:{n}", "brand": brand,
-            "headline": f"{(n + 1) * 10} GB Angebot Nr {n}",
-            "description": "", "valid_until": None,
-            "url": "https://example.test/aktion", "status": "aktiv",
-            "first_seen": "2026-07-01", "last_verified": "2026-08-20"}
+    return {
+        "id": f"{brand}:{n}",
+        "brand": brand,
+        "headline": f"{(n + 1) * 10} GB Angebot Nr {n}",
+        "description": "",
+        "valid_until": None,
+        "url": "https://example.test/aktion",
+        "status": "aktiv",
+        "first_seen": "2026-07-01",
+        "last_verified": "2026-08-20",
+    }
 
 
 @pytest.fixture(scope="module")
@@ -262,16 +271,21 @@ def _rasterluecken_bloecke(tmp_path_factory):
     DREI weiteren Karten - die beiden live gemessenen Bugfaelle vom
     27.08.2026, unabhaengig vom aktuellen Datenbestand nachgebaut."""
     sync_playwright = pytest.importorskip(
-        "playwright.sync_api",
-        reason="playwright fehlt - Browser-Messung entfaellt").sync_playwright
+        "playwright.sync_api", reason="playwright fehlt - Browser-Messung entfaellt"
+    ).sync_playwright
     pfad = _chromium()
 
-    sources = [PromoSource(name="ZweiKarten", url="https://example.test/",
-                           tier=2, kind="static"),
-              PromoSource(name="VierKarten", url="https://example.test/",
-                         tier=2, kind="static")]
-    entries = ([_synth_entry("ZweiKarten", i) for i in range(2)]
-              + [_synth_entry("VierKarten", i) for i in range(4)])
+    sources = [
+        PromoSource(
+            name="ZweiKarten", url="https://example.test/", tier=2, kind="static"
+        ),
+        PromoSource(
+            name="VierKarten", url="https://example.test/", tier=2, kind="static"
+        ),
+    ]
+    entries = [_synth_entry("ZweiKarten", i) for i in range(2)] + [
+        _synth_entry("VierKarten", i) for i in range(4)
+    ]
     view = prepare_promo_view(entries, sources, "2026-08-20")
 
     site = tmp_path_factory.mktemp("promoraster_synth") / "site"
@@ -279,17 +293,25 @@ def _rasterluecken_bloecke(tmp_path_factory):
     templates_dir = REPO / "src" / "telco_radar" / "report" / "templates"
     shutil.copyfile(templates_dir / "style.css", site / "style.css")
     shutil.copyfile(templates_dir / "logo.png", site / "logo.png")
-    html = _env().get_template("promo_index.html.j2").render(
-        prefix="", date_de="20. August 2026", promo_view=view,
-        seit={"zeilen": []}, promo_report_html="", promo_report_date="",
-        promo_lead="")
+    html = (
+        _env()
+        .get_template("promo_index.html.j2")
+        .render(
+            prefix="",
+            date_de="20. August 2026",
+            promo_view=view,
+            seit={"zeilen": []},
+            promo_report_html="",
+            promo_report_date="",
+            promo_lead="",
+        )
+    )
     (site / "index.html").write_text(html, encoding="utf-8")
 
     with _server(site) as wurzel, sync_playwright() as p:
         try:
-            browser = p.chromium.launch(
-                **({"executable_path": pfad} if pfad else {}))
-        except Exception as exc:                       # noqa: BLE001
+            browser = p.chromium.launch(**({"executable_path": pfad} if pfad else {}))
+        except Exception as exc:  # noqa: BLE001
             pytest.skip(f"Chromium startet nicht ({str(exc)[:80]})")
         try:
             seite = browser.new_page(viewport={"width": 1440, "height": 900})
@@ -319,8 +341,10 @@ def _luecke_neben_aufmacherkarte(block: dict) -> str | None:
     for y, karten_in_zeile in zeilen.items():
         rechts = max(k["right"] for k in karten_in_zeile)
         if rechts < block["rand"] - 4:
-            return (f"Zeile bei y={y} erreicht den rechten Rasterrand nicht "
-                    f"({rechts} von {block['rand']})")
+            return (
+                f"Zeile bei y={y} erreicht den rechten Rasterrand nicht "
+                f"({rechts} von {block['rand']})"
+            )
     return None
 
 
@@ -333,7 +357,8 @@ def test_zwei_karten_je_block_haben_keine_luecke(_rasterluecken_bloecke):
     assert len(block["karten"]) == 2
     assert not any(k["gross"] for k in block["karten"]), (
         "die Aufmacherkarte darf bei genau einer weiteren Karte nicht mehr "
-        "breit sein - sonst bleibt die vierte Spalte leer")
+        "breit sein - sonst bleibt die vierte Spalte leer"
+    )
     assert _luecke_neben_aufmacherkarte(block) is None
 
 
@@ -346,6 +371,7 @@ def test_vier_karten_je_block_haben_keine_luecke(_rasterluecken_bloecke):
     assert len(block["karten"]) == 4
     lead = next(k for k in block["karten"] if k["gross"])
     assert lead["hoch"] is False, (
-        "drei weitere Karten fuellen die 2x2-Flaeche nicht vollstaendig")
+        "drei weitere Karten fuellen die 2x2-Flaeche nicht vollstaendig"
+    )
     fehler = _luecke_neben_aufmacherkarte(block)
     assert fehler is None, fehler

@@ -17,6 +17,7 @@ Test dieser Art nie entstanden:
 Diese Datei prueft, was die Seite BEHAUPTET, gegen das, was in
 promo_db.json und im Bildordner steht.
 """
+
 from __future__ import annotations
 
 import json
@@ -34,8 +35,9 @@ from telco_radar.report.promo import prepare_promo_view
 class _Quelle:
     """Minimalfassung einer promo_sources.yaml-Quelle."""
 
-    def __init__(self, name, tier=2, internal_reference=False, crawlable=True,
-                 rang=None):
+    def __init__(
+        self, name, tier=2, internal_reference=False, crawlable=True, rang=None
+    ):
         self.name = name
         self.url = f"https://{name.lower().replace(' ', '')}.test/"
         self.tier = tier
@@ -48,28 +50,40 @@ class _Quelle:
         self.reach = None
 
 
-def _angebot(i, brand, score=None, status="aktiv", highlight=False,
-             bild=None):
+def _angebot(i, brand, score=None, status="aktiv", highlight=False, bild=None):
     e = {
-        "id": f"id{i}", "brand": brand, "tier": 2,
+        "id": f"id{i}",
+        "brand": brand,
+        "tier": 2,
         "headline": f"Aktion {i} von {brand}",
         "description": f"Beschreibung {i}.",
         "url": f"https://{brand.lower().replace(' ', '')}.test/aktion-{i}",
-        "first_seen": "2026-07-20", "last_verified": "2026-08-05",
-        "status": status, "valid_until": None,
+        "first_seen": "2026-07-20",
+        "last_verified": "2026-08-05",
+        "status": status,
+        "valid_until": None,
     }
     if score is not None:
-        e |= {"score": score, "highlight": highlight,
-              "score_reason": f"Grund {i}.", "mechanic": "preisnachlass"}
+        e |= {
+            "score": score,
+            "highlight": highlight,
+            "score_reason": f"Grund {i}.",
+            "mechanic": "preisnachlass",
+        }
     if bild:
-        e |= {"image": f"bild-{i}-1280.jpg", "image_w": 1280, "image_h": 720,
-              "image_kind": bild}
+        e |= {
+            "image": f"bild-{i}-1280.jpg",
+            "image_w": 1280,
+            "image_h": 720,
+            "image_kind": bild,
+        }
     return e
 
 
 MARKEN = ["Alpha Mobil", "Beta Funk", "Gamma Tel", "Delta Connect"]
 QUELLEN = [_Quelle(m, rang=i) for i, m in enumerate(MARKEN, start=1)] + [
-    _Quelle("Vodafone Deutschland", tier=1, internal_reference=True, rang=5)]
+    _Quelle("Vodafone Deutschland", tier=1, internal_reference=True, rang=5)
+]
 EINTRAEGE = [
     _angebot(1, "Alpha Mobil", score=88, highlight=True, bild="angebot"),
     _angebot(2, "Alpha Mobil", score=70),
@@ -80,6 +94,8 @@ EINTRAEGE = [
     _angebot(7, "Delta Connect", status="ausgelaufen"),
     _angebot(8, "Vodafone Deutschland", score=60),
 ]
+
+
 def _view(eintraege=None):
     return prepare_promo_view(eintraege or EINTRAEGE, QUELLEN, "2026-08-06")
 
@@ -91,8 +107,11 @@ def test_die_kennzahlen_stimmen_mit_den_daten_ueberein():
     Kommentare machen die Seite unruhig); sie tragen die Marktlage-Balken
     und die Wahrheitstests."""
     view = _view()
-    aktive = [e for e in EINTRAEGE if e["status"] == "aktiv"
-              and e["brand"] != "Vodafone Deutschland"]
+    aktive = [
+        e
+        for e in EINTRAEGE
+        if e["status"] == "aktiv" and e["brand"] != "Vodafone Deutschland"
+    ]
     assert view["active_total"] == len(aktive)
     assert view["brands_active"] == len({e["brand"] for e in aktive})
     # Vodafone zaehlt nicht als beobachteter Wettbewerber.
@@ -100,8 +119,7 @@ def test_die_kennzahlen_stimmen_mit_den_daten_ueberein():
     # highlight_count zaehlt die hervorgehobenen KARTEN - seit dem
     # Markenraster steht jede sichtbare Aktion als Karte da, nicht nur die
     # staerkste je Marke.
-    assert view["highlight_count"] == len(
-        [e for e in EINTRAEGE if e.get("highlight")])
+    assert view["highlight_count"] == len([e for e in EINTRAEGE if e.get("highlight")])
 
 
 def test_je_marke_ein_block_die_bloecke_nach_anbieterrang():
@@ -114,9 +132,17 @@ def test_je_marke_ein_block_die_bloecke_nach_anbieterrang():
     Feld `rang`), nicht nach dem Score ihrer staerksten Aktion."""
     view = _view()
     assert [b["name"] for b in view["bloecke"]] == [
-        "Alpha Mobil", "Beta Funk", "Gamma Tel", "Delta Connect"]
+        "Alpha Mobil",
+        "Beta Funk",
+        "Gamma Tel",
+        "Delta Connect",
+    ]
     assert [b["lead"]["offer"]["id"] for b in view["bloecke"]] == [
-        "id1", "id4", "id5", "id6"]
+        "id1",
+        "id4",
+        "id5",
+        "id6",
+    ]
     alpha = view["bloecke"][0]
     assert [k["offer"]["id"] for k in alpha["weitere"]] == ["id2", "id3"]
     assert all(not b["internal_reference"] for b in view["bloecke"])
@@ -128,11 +154,17 @@ def test_eine_starke_aktion_hebt_eine_kleine_marke_nicht_nach_oben():
     Angebote hergaben - Antonio: "die groessten Anbieter wie Telekom etc. an
     erster Stelle". Ein Spitzenangebot des Kleinsten darf die Seite nicht
     umsortieren; es steht innerhalb SEINES Blocks vorn."""
-    laut = [dict(e, score=100, highlight=True) if e["brand"] == "Delta Connect"
-            else e for e in EINTRAEGE]
+    laut = [
+        dict(e, score=100, highlight=True) if e["brand"] == "Delta Connect" else e
+        for e in EINTRAEGE
+    ]
     view = prepare_promo_view(laut, QUELLEN, "2026-08-06")
     assert [b["name"] for b in view["bloecke"]] == [
-        "Alpha Mobil", "Beta Funk", "Gamma Tel", "Delta Connect"]
+        "Alpha Mobil",
+        "Beta Funk",
+        "Gamma Tel",
+        "Delta Connect",
+    ]
     assert view["bloecke"][-1]["top_score"] == 100
 
 
@@ -145,7 +177,7 @@ def test_das_bild_gehoert_zum_angebot_und_kennzeichnet_sein_belegniveau():
     assert nach_id["id1"]["bild"] == "images/bild-1-1280.jpg"
     assert nach_id["id1"]["bild_ist_motiv"] is False
     assert nach_id["id4"]["bild_ist_motiv"] is True
-    assert nach_id["id5"]["bild"] == ""       # kein Beleg, keine Behauptung
+    assert nach_id["id5"]["bild"] == ""  # kein Beleg, keine Behauptung
     assert view["mit_bild"] == 2
 
 
@@ -158,7 +190,11 @@ def test_eine_ruhige_woche_laesst_die_seite_nicht_leer():
     assert view["highlight_count"] == 0
     assert len(view["bloecke"]) == 4
     assert [b["lead"]["offer"]["id"] for b in view["bloecke"]] == [
-        "id1", "id4", "id5", "id6"]
+        "id1",
+        "id4",
+        "id5",
+        "id6",
+    ]
 
 
 def test_jede_sichtbare_aktion_steht_genau_einmal_auf_der_seite():
@@ -200,10 +236,15 @@ def test_ein_leerer_screenshot_wird_erkannt():
 
     # Gegenprobe: ein Bild mit Inhalt faellt nicht durch.
     import random
+
     rnd = random.Random(1)
     bunt = Image.new("RGB", (1280, 720))
-    bunt.putdata([(rnd.randrange(256), rnd.randrange(256), rnd.randrange(256))
-                  for _ in range(1280 * 720)])
+    bunt.putdata(
+        [
+            (rnd.randrange(256), rnd.randrange(256), rnd.randrange(256))
+            for _ in range(1280 * 720)
+        ]
+    )
     assert ist_leer(als_jpeg(bunt)) is False
 
 
@@ -223,7 +264,8 @@ def test_die_echten_screenshots_bestehen_die_pruefung():
     leer = [p.name for p in bilder if ist_leer(p.read_bytes())]
     gut = len(bilder) - len(leer)
     assert gut >= 10, (
-        f"Nur {gut} von {len(bilder)} Screenshots haben Inhalt; leer: {leer}")
+        f"Nur {gut} von {len(bilder)} Screenshots haben Inhalt; leer: {leer}"
+    )
 
 
 # ------------------------------------------------------------- Vorspann
@@ -248,8 +290,10 @@ def test_ein_digest_wird_nicht_als_analyse_ausgegeben():
 def test_echte_prosa_wird_weiterhin_als_vorspann_genommen():
     from telco_radar.report.html import _promo_lead
 
-    prosa = ("## Was diese Woche auffaellt\n\nMehrere Anbieter senken den "
-             "Einstiegspreis. Danach kommt noch mehr Text.\n")
+    prosa = (
+        "## Was diese Woche auffaellt\n\nMehrere Anbieter senken den "
+        "Einstiegspreis. Danach kommt noch mehr Text.\n"
+    )
     assert _promo_lead(prosa) == "Mehrere Anbieter senken den Einstiegspreis."
 
 
@@ -262,16 +306,22 @@ def test_eine_klein_geschriebene_marke_beendet_den_vorspann_trotzdem():
     mobilcom-debitel)."""
     from telco_radar.report.html import _promo_lead
 
-    prosa = ("## Was diese Woche auffaellt\n\nDie Rabattschlacht hat eine neue "
-             "Eskalationsstufe erreicht. winSIM senkt die monatlichen "
-             "Grundgebuehren seiner gesamten 5G-Allnet-Flat-Palette drastisch, "
-             "und auch simplytel zieht mit stark reduzierten Monatspreisen "
-             "sowie einem dauerhaften Speed-Upgrade nach.\n")
-    assert _promo_lead(prosa) == \
-        "Die Rabattschlacht hat eine neue Eskalationsstufe erreicht."
+    prosa = (
+        "## Was diese Woche auffaellt\n\nDie Rabattschlacht hat eine neue "
+        "Eskalationsstufe erreicht. winSIM senkt die monatlichen "
+        "Grundgebuehren seiner gesamten 5G-Allnet-Flat-Palette drastisch, "
+        "und auch simplytel zieht mit stark reduzierten Monatspreisen "
+        "sowie einem dauerhaften Speed-Upgrade nach.\n"
+    )
+    assert (
+        _promo_lead(prosa)
+        == "Die Rabattschlacht hat eine neue Eskalationsstufe erreicht."
+    )
     # Und die Abkuerzungsbremse haelt weiter: der Punkt in "z. B." ist keiner.
-    kurz = ("## Was diese Woche auffaellt\n\nMehrere Marken, z. B. congstar, "
-            "senken den Preis. Danach mehr Text.\n")
+    kurz = (
+        "## Was diese Woche auffaellt\n\nMehrere Marken, z. B. congstar, "
+        "senken den Preis. Danach mehr Text.\n"
+    )
     assert _promo_lead(kurz) == "Mehrere Marken, z. B. congstar, senken den Preis."
 
 
@@ -294,12 +344,17 @@ def promo_site(tmp_path):
 def test_die_seite_zeigt_mindestens_zehn_echte_bilder(promo_site):
     """Abnahmekriterium 4 des Auftrags. Vorher: 2 <img> auf der ganzen
     Seite, eines davon das Logo."""
-    soup = BeautifulSoup((promo_site / "promo" / "index.html")
-                         .read_text(encoding="utf-8"), "html.parser")
-    quellen = [img["src"] for img in soup.select("img[src]")
-               if "images/" in img["src"] and "logo" not in img["src"]]
+    soup = BeautifulSoup(
+        (promo_site / "promo" / "index.html").read_text(encoding="utf-8"), "html.parser"
+    )
+    quellen = [
+        img["src"]
+        for img in soup.select("img[src]")
+        if "images/" in img["src"] and "logo" not in img["src"]
+    ]
     assert len(set(quellen)) >= 10, (
-        f"Nur {len(set(quellen))} verschiedene Bilder auf der Seite")
+        f"Nur {len(set(quellen))} verschiedene Bilder auf der Seite"
+    )
     for src in set(quellen):
         datei = (promo_site / "promo" / src).resolve()
         assert datei.exists(), f"Bildverweis ins Leere: {src}"
@@ -312,8 +367,7 @@ def test_der_leere_screenshot_wird_nicht_ausgeliefert(promo_site):
     ordner = promo_site / "promo" / "images"
     assert ordner.exists()
     for bild in ordner.iterdir():
-        assert not ist_leer(bild.read_bytes()), (
-            f"Leeres Bild ausgeliefert: {bild.name}")
+        assert not ist_leer(bild.read_bytes()), f"Leeres Bild ausgeliefert: {bild.name}"
 
 
 def test_kein_angebotstitel_steht_zweimal_hintereinander(promo_site):
@@ -332,8 +386,9 @@ def test_kein_angebotstitel_steht_zweimal_hintereinander(promo_site):
 
 def test_keine_promo_ueberschrift_ist_abgeschnitten(promo_site):
     """Dieselbe Regel wie in der Marktrecherche, ueber dieselbe Klasse."""
-    soup = BeautifulSoup((promo_site / "promo" / "index.html")
-                         .read_text(encoding="utf-8"), "html.parser")
+    soup = BeautifulSoup(
+        (promo_site / "promo" / "index.html").read_text(encoding="utf-8"), "html.parser"
+    )
     schlagzeilen = [e.get_text(" ", strip=True) for e in soup.select(".szl")]
     assert schlagzeilen, "Die Seite traegt keine erkennbare Schlagzeile"
     for t in schlagzeilen:
@@ -354,25 +409,32 @@ def test_die_zahl_der_marktlage_stimmt_mit_der_datenbank(promo_site):
     wurzel = Path(__file__).resolve().parent.parent
     cfg = load_config(wurzel)
     promo_cfg = load_promo_config(cfg.root)
-    db = json.loads((wurzel / "data" / "state" / "promo_db.json")
-                    .read_text(encoding="utf-8"))
+    db = json.loads(
+        (wurzel / "data" / "state" / "promo_db.json").read_text(encoding="utf-8")
+    )
     intern = {s.name for s in promo_cfg.sources if s.internal_reference}
-    crawlbar = {s.name for s in promo_cfg.sources
-                if getattr(s, "crawlable", True)}
-    sichtbar = [e for e in db.get("entries", [])
-                if e.get("status") in ("aktiv", "evtl. ausgelaufen")
-                and e.get("brand") in crawlbar - intern]
+    crawlbar = {s.name for s in promo_cfg.sources if getattr(s, "crawlable", True)}
+    sichtbar = [
+        e
+        for e in db.get("entries", [])
+        if e.get("status") in ("aktiv", "evtl. ausgelaufen")
+        and e.get("brand") in crawlbar - intern
+    ]
 
-    soup = BeautifulSoup((promo_site / "promo" / "index.html")
-                         .read_text(encoding="utf-8"), "html.parser")
+    soup = BeautifulSoup(
+        (promo_site / "promo" / "index.html").read_text(encoding="utf-8"), "html.parser"
+    )
     zeilen = soup.select(".promo-lage .lage-zeile")
     assert zeilen, "Die Marktlage fehlt auf der Seite"
     assert len(zeilen) <= 5, "Die Marktlage soll eine schmale Leiste bleiben"
     for zeile in zeilen:
         label = zeile.select_one(".lage-label").get_text(strip=True)
         gezaehlt = int(zeile.select_one(".lage-zahl").get_text(strip=True).split()[0])
-        marken = {e["brand"] for e in sichtbar
-                  if MECHANICS.get(e.get("mechanic") or "") == label}
+        marken = {
+            e["brand"]
+            for e in sichtbar
+            if MECHANICS.get(e.get("mechanic") or "") == label
+        }
         assert gezaehlt == len(marken), f"{label}: {gezaehlt} statt {len(marken)}"
 
     # Und keine Zahlenzeile mehr im Kopf.
@@ -382,8 +444,9 @@ def test_die_zahl_der_marktlage_stimmt_mit_der_datenbank(promo_site):
 def test_die_seite_zeigt_kein_motiv_zweimal(promo_site):
     """Zwei gleiche Kacheln nebeneinander lesen sich als Fehler - am
     08.08.2026 stand bei O2 derselbe Router unter zwei Schlagzeilen."""
-    soup = BeautifulSoup((promo_site / "promo" / "index.html")
-                         .read_text(encoding="utf-8"), "html.parser")
+    soup = BeautifulSoup(
+        (promo_site / "promo" / "index.html").read_text(encoding="utf-8"), "html.parser"
+    )
     quellen = [img["src"] for img in soup.select(".pk-bild img[src]")]
     assert len(quellen) == len(set(quellen)), "Ein Motiv steht mehrfach auf der Seite"
     # Dasselbe fuer die Schriftkacheln: identischer Text auf zwei Kacheln
@@ -393,11 +456,14 @@ def test_die_seite_zeigt_kein_motiv_zweimal(promo_site):
     # zweier verschiedener Anbieter nun einmal beide "10 €". Nebeneinander
     # stehen sie nie; als Fehler liest sich nur die Wiederholung IM Block.
     for block in soup.select(".pmarke"):
-        kacheln = [k.get_text(" ", strip=True)
-                   for k in block.select(".pk-bild--typo .pk-typo-zahl")]
+        kacheln = [
+            k.get_text(" ", strip=True)
+            for k in block.select(".pk-bild--typo .pk-typo-zahl")
+        ]
         marke = block.select_one(".pmarke-name").get_text(strip=True)
-        assert len(kacheln) == len(set(kacheln)), \
+        assert len(kacheln) == len(set(kacheln)), (
             f"Doppelte Schriftkachel bei {marke}: {kacheln}"
+        )
 
 
 def test_ein_ungeladenes_bild_malt_keinen_grauen_kasten():
@@ -407,8 +473,14 @@ def test_ein_ungeladenes_bild_malt_keinen_grauen_kasten():
     16:9-Kasten. Gemessen an der fertigen Seite waren 31 von 36 Bildern in
     diesem Zustand, solange nicht gescrollt wurde - und in jedem Screenshot
     dauerhaft. Ohne Fuellung bleibt dort Zeitungspapier."""
-    css = (Path(__file__).resolve().parent.parent / "src" / "telco_radar"
-           / "report" / "templates" / "style.css").read_text(encoding="utf-8")
+    css = (
+        Path(__file__).resolve().parent.parent
+        / "src"
+        / "telco_radar"
+        / "report"
+        / "templates"
+        / "style.css"
+    ).read_text(encoding="utf-8")
     regel = re.search(r"\.pk-bild img\{([^}]*)\}", css)
     assert regel, "Die Bildregel der Promo-Karte fehlt"
     assert "background" not in regel.group(1)
@@ -418,7 +490,8 @@ def test_die_promo_quellenseite_bleibt(promo_site):
     """Sie ist die Belegebene und war ausdruecklich nicht Teil des Umbaus."""
     assert (promo_site / "promo" / "quellen.html").exists()
     assert "Quellen" in (promo_site / "promo" / "index.html").read_text(
-        encoding="utf-8")
+        encoding="utf-8"
+    )
 
 
 def test_jede_karte_traegt_ein_motiv(promo_site):
@@ -428,12 +501,16 @@ def test_jede_karte_traegt_ein_motiv(promo_site):
     ohne Bild eine Schriftkachel -, und weil eine Rasterzeile so hoch ist
     wie ihre hoechste Karte, stand neben jedem Bild eine handbreite Luecke.
     Ein Bild kann fehlen (es muss belegt sein), ein MOTIV nie."""
-    soup = BeautifulSoup((promo_site / "promo" / "index.html")
-                         .read_text(encoding="utf-8"), "html.parser")
+    soup = BeautifulSoup(
+        (promo_site / "promo" / "index.html").read_text(encoding="utf-8"), "html.parser"
+    )
     karten = soup.select(".promo-karten .pkarte")
     assert karten
-    ohne = [k.select_one(".szl").get_text(" ", strip=True)
-            for k in karten if not k.select_one(".pk-bild")]
+    ohne = [
+        k.select_one(".szl").get_text(" ", strip=True)
+        for k in karten
+        if not k.select_one(".pk-bild")
+    ]
     assert not ohne, f"{len(ohne)} Karten ohne Motiv, z. B. {ohne[:3]}"
     # ... und keine Kachel ist leer.
     for kasten in soup.select(".pk-bild"):
@@ -447,17 +524,23 @@ def test_die_marken_stehen_in_der_reihenfolge_der_konfiguration(promo_site):
     zehn."""
     from telco_radar.promo_config import load_promo_config
 
-    soup = BeautifulSoup((promo_site / "promo" / "index.html")
-                         .read_text(encoding="utf-8"), "html.parser")
-    gezeigt = [b.select_one(".pmarke-name").get_text(strip=True)
-               for b in soup.select(".pmarke")]
+    soup = BeautifulSoup(
+        (promo_site / "promo" / "index.html").read_text(encoding="utf-8"), "html.parser"
+    )
+    gezeigt = [
+        b.select_one(".pmarke-name").get_text(strip=True)
+        for b in soup.select(".pmarke")
+    ]
     cfg = load_promo_config(Path(__file__).resolve().parent.parent)
     rang = {s.name: s.rang for s in cfg.sources}
     wettbewerber = [n for n in gezeigt if not n.startswith("Vodafone")]
     assert wettbewerber == sorted(wettbewerber, key=lambda n: rang[n])
     # Die eigene Marke steht am Ende, nicht an ihrem Rang.
-    assert not gezeigt or gezeigt[-1].startswith("Vodafone") \
+    assert (
+        not gezeigt
+        or gezeigt[-1].startswith("Vodafone")
         or "Vodafone Deutschland" not in gezeigt
+    )
 
 
 def test_jede_marke_der_konfiguration_hat_einen_eindeutigen_rang():
@@ -468,8 +551,7 @@ def test_jede_marke_der_konfiguration_hat_einen_eindeutigen_rang():
 
     cfg = load_promo_config(Path(__file__).resolve().parent.parent)
     raenge = [s.rang for s in cfg.sources]
-    assert all(r for r in raenge), \
-        [s.name for s in cfg.sources if not s.rang]
+    assert all(r for r in raenge), [s.name for s in cfg.sources if not s.rang]
     assert len(set(raenge)) == len(raenge), sorted(raenge)
     # Die Netzbetreiber stehen vorn - das ist die erste Regel der Rangfolge.
     mno = [s.rang for s in cfg.sources if s.tier == 1]

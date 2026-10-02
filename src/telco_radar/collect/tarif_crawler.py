@@ -36,6 +36,7 @@ gelaufen. Die ID kommt deshalb aus Anbieter plus bereinigtem Produktnamen:
 "O2 Mobile Unlimited M Flex (2026)" und dieselbe Zeile ein Jahr spaeter
 ergeben `o2:mobile-unlimited-m-flex`.
 """
+
 from __future__ import annotations
 
 import json
@@ -60,9 +61,17 @@ log = logging.getLogger(__name__)
 # Felder, deren Aenderung eine Meldung wert ist. Die Reihenfolge ist die
 # Reihenfolge im Meldungstext.
 BEOBACHTET = (
-    "grundgebuehr", "anschlusspreis", "datenvolumen_gb", "laufzeit_monate",
-    "kuendigungsfrist_monate", "drossel_down", "drossel_up",
-    "speed_down_max", "speed_up_max", "volumen_automatik", "allnet_flat",
+    "grundgebuehr",
+    "anschlusspreis",
+    "datenvolumen_gb",
+    "laufzeit_monate",
+    "kuendigungsfrist_monate",
+    "drossel_down",
+    "drossel_up",
+    "speed_down_max",
+    "speed_up_max",
+    "volumen_automatik",
+    "allnet_flat",
 )
 
 # Das KLEINGEDRUCKTE (A9): Felder, die sich aendern koennen, ohne dass der
@@ -70,8 +79,14 @@ BEOBACHTET = (
 # ist der Grund fuer diesen Radar: eine Drosselgrenze von 80 GB auf 50 GB bei
 # gleichem Preis ist eine Preiserhoehung, die nirgends als solche auftaucht.
 KLEINGEDRUCKT = (
-    "datenvolumen_gb", "drossel_down", "drossel_up", "kuendigungsfrist_monate",
-    "laufzeit_monate", "volumen_automatik", "speed_down_max", "speed_up_max",
+    "datenvolumen_gb",
+    "drossel_down",
+    "drossel_up",
+    "kuendigungsfrist_monate",
+    "laufzeit_monate",
+    "volumen_automatik",
+    "speed_down_max",
+    "speed_up_max",
 )
 
 PREISFELDER = ("grundgebuehr", "anschlusspreis")
@@ -91,10 +106,15 @@ LESBAR = {
 }
 
 EINHEIT = {
-    "grundgebuehr": "€/Monat", "anschlusspreis": "€", "datenvolumen_gb": "GB",
-    "laufzeit_monate": "Monate", "kuendigungsfrist_monate": "Monate",
-    "drossel_down": "KBit/s", "drossel_up": "KBit/s",
-    "speed_down_max": "MBit/s", "speed_up_max": "MBit/s",
+    "grundgebuehr": "€/Monat",
+    "anschlusspreis": "€",
+    "datenvolumen_gb": "GB",
+    "laufzeit_monate": "Monate",
+    "kuendigungsfrist_monate": "Monate",
+    "drossel_down": "KBit/s",
+    "drossel_up": "KBit/s",
+    "speed_down_max": "MBit/s",
+    "speed_up_max": "MBit/s",
 }
 
 
@@ -179,8 +199,7 @@ class Feldaenderung:
     def lesbar(self) -> str:
         name = LESBAR.get(self.feld, self.feld)
         einheit = EINHEIT.get(self.feld, "")
-        return (f"{name}: {_wert(self.alt, einheit)} → "
-                f"{_wert(self.neu, einheit)}")
+        return f"{name}: {_wert(self.alt, einheit)} → {_wert(self.neu, einheit)}"
 
 
 def _wert(v, einheit: str) -> str:
@@ -201,25 +220,26 @@ def lade_quellen(root: Path) -> list[Quelle]:
         return []
     daten = yaml.safe_load(pfad.read_text(encoding="utf-8")) or {}
     quellen = []
-    for q in (daten.get("quellen") or []):
+    for q in daten.get("quellen") or []:
         if not q.get("anbieter") or not q.get("einstieg"):
             continue
-        quellen.append(Quelle(
-            anbieter=str(q["anbieter"]),
-            einstieg=[str(u) for u in q["einstieg"]],
-            pfadmuster=[str(m).lower() for m in (q.get("pfadmuster") or [])],
-            bevorzugt=[str(b).lower() for b in (q.get("bevorzugt") or [])],
-            ausschliessen=[str(a).lower()
-                           for a in (q.get("ausschliessen") or [])],
-            max_dokumente=int(q.get("max_dokumente") or 5),
-            # Eine unbekannte Methode wird NICHT stillschweigend zur
-            # Vorgabe gemacht. Sie faellt in `sammle()` als Fehler auf -
-            # ein Tippfehler in der Konfiguration soll nicht dazu fuehren,
-            # dass eine Shop-Seite als Dokumentverzeichnis gelesen wird und
-            # null Links liefert.
-            methode=str(q.get("methode") or METHODE_DOKUMENTE).strip(),
-            user_agent=(str(q["user_agent"]) if q.get("user_agent") else None),
-        ))
+        quellen.append(
+            Quelle(
+                anbieter=str(q["anbieter"]),
+                einstieg=[str(u) for u in q["einstieg"]],
+                pfadmuster=[str(m).lower() for m in (q.get("pfadmuster") or [])],
+                bevorzugt=[str(b).lower() for b in (q.get("bevorzugt") or [])],
+                ausschliessen=[str(a).lower() for a in (q.get("ausschliessen") or [])],
+                max_dokumente=int(q.get("max_dokumente") or 5),
+                # Eine unbekannte Methode wird NICHT stillschweigend zur
+                # Vorgabe gemacht. Sie faellt in `sammle()` als Fehler auf -
+                # ein Tippfehler in der Konfiguration soll nicht dazu fuehren,
+                # dass eine Shop-Seite als Dokumentverzeichnis gelesen wird und
+                # null Links liefert.
+                methode=str(q.get("methode") or METHODE_DOKUMENTE).strip(),
+                user_agent=(str(q["user_agent"]) if q.get("user_agent") else None),
+            )
+        )
     return quellen
 
 
@@ -240,11 +260,18 @@ def tarif_id(anbieter: str, name: str) -> str:
     # dieser Zeile hiess congstars stabiler Schluessel
     # `congstar:allnet-flat-l-postpaid-mobilfunk`, und eine Tarifangabe
     # "Allnet Flat L" von einer Produktseite traf ihn nie.
-    name = re.sub(r"\((?:(?:Post|Pre)paid\s+)?(?:Mobilfunk|Festnetz)\)",
-                  " ", name, flags=re.I)
-    schlank = re.sub(r"[^a-z0-9]+", "-",
-                     name.lower().replace("ä", "ae").replace("ö", "oe")
-                     .replace("ü", "ue").replace("ß", "ss")).strip("-")
+    name = re.sub(
+        r"\((?:(?:Post|Pre)paid\s+)?(?:Mobilfunk|Festnetz)\)", " ", name, flags=re.I
+    )
+    schlank = re.sub(
+        r"[^a-z0-9]+",
+        "-",
+        name.lower()
+        .replace("ä", "ae")
+        .replace("ö", "oe")
+        .replace("ü", "ue")
+        .replace("ß", "ss"),
+    ).strip("-")
     marke = re.sub(r"[^a-z0-9]+", "", (anbieter or "").lower())
     return f"{marke}:{schlank}" if schlank else marke
 
@@ -258,8 +285,7 @@ def dokumentlinks(html: str, basis: str, muster: list[str]) -> list[str]:
     return [url for url, _text in _ankerpaare(html, basis, muster)]
 
 
-def _ankerpaare(html: str, basis: str,
-                muster: list[str]) -> list[tuple[str, str]]:
+def _ankerpaare(html: str, basis: str, muster: list[str]) -> list[tuple[str, str]]:
     """Adresse und Linkbeschriftung jedes zulaessigen Dokumentlinks.
 
     DIE EINE STELLE, die entscheidet, was abgerufen werden darf. Die Regel
@@ -338,18 +364,23 @@ def juengste_fassung(links: list[str]) -> list[str]:
         treffer = _VERMARKTUNGSDATUM.search(name)
         if not treffer:
             continue
-        stamm = url[:url.rfind(treffer.group(0))]
+        stamm = url[: url.rfind(treffer.group(0))]
         if stamm not in neueste or treffer.group(1) > neueste[stamm][0]:
             neueste[stamm] = (treffer.group(1), url)
     behalten = {url for _, url in neueste.values()}
-    return [u for u in links
-            if not _VERMARKTUNGSDATUM.search(
-                urlsplit(u).path.rstrip("/").rsplit("/", 1)[-1])
-            or u in behalten]
+    return [
+        u
+        for u in links
+        if not _VERMARKTUNGSDATUM.search(
+            urlsplit(u).path.rstrip("/").rsplit("/", 1)[-1]
+        )
+        or u in behalten
+    ]
 
 
-def _sortiere(links: list[str], bevorzugt: list[str],
-              texte: dict[str, str] | None = None) -> list[str]:
+def _sortiere(
+    links: list[str], bevorzugt: list[str], texte: dict[str, str] | None = None
+) -> list[str]:
     """Bevorzugte Dokumente nach vorn - alphabetisch waeren es Tarife von 2017.
 
     Gesucht wird in der Adresse UND in der Linkbeschriftung. Ohne den Text
@@ -462,8 +493,7 @@ class TarifSpeicher:
                     vorher.setdefault(teil, {})[feld] = satz[teil][feld]
         return gefuellt
 
-    def ziehe_zurueck(self, dokument_url: str, wann: str,
-                      grund: str) -> list[str]:
+    def ziehe_zurueck(self, dokument_url: str, wann: str, grund: str) -> list[str]:
         """Der letzte Stand jedes Tarifs aus diesem Dokument gilt als
         zurueckgezogen - der Anbieter verlinkt es noch, verkauft es aber
         nicht mehr (`Quelle.ausschliessen`).
@@ -489,7 +519,9 @@ class TarifSpeicher:
         self.pfad.parent.mkdir(parents=True, exist_ok=True)
         self.pfad.write_text(
             "\n".join(json.dumps(s, ensure_ascii=False) for s in self.staende)
-            + ("\n" if self.staende else ""), encoding="utf-8")
+            + ("\n" if self.staende else ""),
+            encoding="utf-8",
+        )
 
 
 def vergleiche(alt: dict, neu: Tarif) -> list[Feldaenderung]:
@@ -516,8 +548,7 @@ def vergleiche(alt: dict, neu: Tarif) -> list[Feldaenderung]:
         # hinzugekommenes Feld zaehlt sonst weiter
         # (`test_neu_hinzugekommenes_feld_zaehlt`), und "100 GB ->
         # unbegrenzt" bleibt eine Aenderung.
-        if (feld == "datenvolumen_gb" and a is None
-                and n == float("inf")):
+        if feld == "datenvolumen_gb" and a is None and n == float("inf"):
             continue
         if a is None and n is None:
             continue
@@ -530,8 +561,7 @@ def vergleiche(alt: dict, neu: Tarif) -> list[Feldaenderung]:
     return aenderungen
 
 
-def als_item(tarif: Tarif, aenderungen: list[Feldaenderung],
-             stand: datetime) -> Item:
+def als_item(tarif: Tarif, aenderungen: list[Feldaenderung], stand: datetime) -> Item:
     """Die Aenderung als Meldung.
 
     Der Titel unterscheidet den Preis vom Kleingedruckten. Das ist keine
@@ -553,26 +583,32 @@ def als_item(tarif: Tarif, aenderungen: list[Feldaenderung],
     quelle_kurz = "Produktinformationsblatt" if dokument else "Shop-Seite"
     # Mit Praeposition, damit beide Saetze deutsch bleiben: "im
     # Produktinformationsblatt" gegen "auf der Shop-Seite".
-    quelle_wo = ("im Produktinformationsblatt" if dokument
-                 else "auf der Shop-Seite")
-    quelle_satz = ("Quelle ist das gesetzlich vorgeschriebene "
-                   "Produktinformationsblatt." if dokument else
-                   "Quelle sind die strukturierten Daten der Shop-Seite "
-                   "des Anbieters (schema.org) - der beworbene Preis von "
-                   "heute, nicht das Pflichtdokument.")
+    quelle_wo = "im Produktinformationsblatt" if dokument else "auf der Shop-Seite"
+    quelle_satz = (
+        "Quelle ist das gesetzlich vorgeschriebene Produktinformationsblatt."
+        if dokument
+        else "Quelle sind die strukturierten Daten der Shop-Seite "
+        "des Anbieters (schema.org) - der beworbene Preis von "
+        "heute, nicht das Pflichtdokument."
+    )
     if nur_klein:
-        titel = (f"{tarif.anbieter} ändert stillschweigend die Konditionen "
-                 f"von {tarif.name}")
-        einleitung = ("Die Konditionen haben sich geändert, ohne dass der "
-                      "Preis sich bewegt — und ohne Pressemitteilung. ")
+        titel = (
+            f"{tarif.anbieter} ändert stillschweigend die Konditionen von {tarif.name}"
+        )
+        einleitung = (
+            "Die Konditionen haben sich geändert, ohne dass der "
+            "Preis sich bewegt — und ohne Pressemitteilung. "
+        )
     elif preis:
         titel = f"{tarif.anbieter} ändert den Preis von {tarif.name}"
         einleitung = f"Der Preis {quelle_wo} hat sich geändert. "
     else:
         titel = f"{tarif.anbieter} ändert {tarif.name}"
-        einleitung = ("Das Produktinformationsblatt hat sich geändert. "
-                      if dokument else
-                      "Die Shop-Seite hat sich geändert. ")
+        einleitung = (
+            "Das Produktinformationsblatt hat sich geändert. "
+            if dokument
+            else "Die Shop-Seite hat sich geändert. "
+        )
 
     liste = " · ".join(a.lesbar() for a in aenderungen[:8])
     kennung = f"{tarif_id(tarif.anbieter, tarif.name)}|{tarif.dokument_hash}"
@@ -596,9 +632,17 @@ def als_item(tarif: Tarif, aenderungen: list[Feldaenderung],
     )
 
 
-def uebernimm_stand(tarif: Tarif, hash_: str, herkunft: str, *,
-                    speicher: TarifSpeicher, bilanz: dict, im_lauf: dict,
-                    items: list, jetzt: datetime) -> None:
+def uebernimm_stand(
+    tarif: Tarif,
+    hash_: str,
+    herkunft: str,
+    *,
+    speicher: TarifSpeicher,
+    bilanz: dict,
+    im_lauf: dict,
+    items: list,
+    jetzt: datetime,
+) -> None:
     """Einen gelesenen Tarif in die Zeitreihe legen - und melden, was neu ist.
 
     DIE EINE STELLE, an der ueber Grundlinie, Unveraendertheit und Meldung
@@ -640,13 +684,17 @@ def uebernimm_stand(tarif: Tarif, hash_: str, herkunft: str, *,
     # Rangfolge, sondern Bestandsschutz: die vorhandene Zeitreihe soll
     # nicht umziehen.
     vorheriger = speicher.letzter(tid)
-    if (vorheriger is not None
-            and vorheriger.get("preistyp", PREISTYP_DOKUMENT)
-            != tarif.preistyp):
-        log.info("Tarif %r liegt schon als %r vor - der neue Satz (%s) "
-                 "bekommt eine eigene Zeitreihe", tarif.name,
-                 vorheriger.get("preistyp", PREISTYP_DOKUMENT),
-                 tarif.preistyp)
+    if (
+        vorheriger is not None
+        and vorheriger.get("preistyp", PREISTYP_DOKUMENT) != tarif.preistyp
+    ):
+        log.info(
+            "Tarif %r liegt schon als %r vor - der neue Satz (%s) "
+            "bekommt eine eigene Zeitreihe",
+            tarif.name,
+            vorheriger.get("preistyp", PREISTYP_DOKUMENT),
+            tarif.preistyp,
+        )
         tid = f"{tid}#{tarif.preistyp}"
 
     if tid in im_lauf and im_lauf[tid] != herkunft:
@@ -675,8 +723,9 @@ def uebernimm_stand(tarif: Tarif, hash_: str, herkunft: str, *,
         gefuellt = speicher.lies_nach(tid, satz)
         if gefuellt:
             bilanz["nachgelesen"] = bilanz.get("nachgelesen", 0) + 1
-            log.info("Tarif %s nachgelesen (gleiches Dokument): %s", tid,
-                     ", ".join(gefuellt))
+            log.info(
+                "Tarif %s nachgelesen (gleiches Dokument): %s", tid, ", ".join(gefuellt)
+            )
         return
 
     aenderungen = vergleiche(vorher, tarif)
@@ -703,6 +752,7 @@ def _hole_dokument(url: str, http_cfg: dict, hole) -> tuple[str, str] | None:
     rohdaten = antwort.content
     if "pdf" in typ or rohdaten[:5] == b"%PDF-":
         import tempfile
+
         with tempfile.NamedTemporaryFile(suffix=".pdf", delete=True) as f:
             f.write(rohdaten)
             f.flush()
@@ -718,10 +768,20 @@ def _hole_dokument(url: str, http_cfg: dict, hole) -> tuple[str, str] | None:
     return text, dokument_hash(rohdaten)
 
 
-def _sammle_seite(quelle: Quelle, http_cfg: dict, *, hole, jetzt: datetime,
-                  speicher: TarifSpeicher, bilanz: dict, items: list,
-                  im_lauf: dict, besucht: list, erlaubt: set,
-                  extrahiere) -> None:
+def _sammle_seite(
+    quelle: Quelle,
+    http_cfg: dict,
+    *,
+    hole,
+    jetzt: datetime,
+    speicher: TarifSpeicher,
+    bilanz: dict,
+    items: list,
+    im_lauf: dict,
+    besucht: list,
+    erlaubt: set,
+    extrahiere,
+) -> None:
     """Eine Quelle, deren Einstiegsseite selbst die Tarife traegt.
 
     `extrahiere` ist die Lesart (`_SEITEN_LESARTEN`): strukturierte Daten
@@ -748,13 +808,15 @@ def _sammle_seite(quelle: Quelle, http_cfg: dict, *, hole, jetzt: datetime,
             html = antwort.text
         except Exception as exc:  # noqa: BLE001
             bilanz["fehler"] += 1
-            log.info("Tarifquelle %s nicht lesbar: %s", einstieg,
-                     str(exc)[:120])
+            log.info("Tarifquelle %s nicht lesbar: %s", einstieg, str(exc)[:120])
             continue
         bilanz["geholt"] += 1
         gefunden = extrahiere(
-            html, anbieter=quelle.anbieter, seiten_url=einstieg,
-            abgerufen_am=jetzt.date().isoformat())
+            html,
+            anbieter=quelle.anbieter,
+            seiten_url=einstieg,
+            abgerufen_am=jetzt.date().isoformat(),
+        )
         if not gefunden:
             # Derselbe Befund wie eine Einstiegsseite ohne Dokumentlink,
             # und er muss genauso laut sein: eine Seite, die 200 und 450 KB
@@ -763,28 +825,42 @@ def _sammle_seite(quelle: Quelle, http_cfg: dict, *, hole, jetzt: datetime,
             # Status und Groesse in der Zeile ist das nicht zu
             # unterscheiden (die Telekom-Lehre vom 04.09.2026).
             bilanz["ohne_links"] += 1
-            log.warning("Tarifquelle %s (%s): HTTP %s, %d Bytes, aber KEIN "
-                        "Tarif in der Nutzlast der Seite",
-                        einstieg, quelle.anbieter,
-                        getattr(antwort, "status_code", "?"),
-                        len(getattr(antwort, "content", b"") or b""))
+            log.warning(
+                "Tarifquelle %s (%s): HTTP %s, %d Bytes, aber KEIN "
+                "Tarif in der Nutzlast der Seite",
+                einstieg,
+                quelle.anbieter,
+                getattr(antwort, "status_code", "?"),
+                len(getattr(antwort, "content", b"") or b""),
+            )
             continue
-        for tarif, hash_ in gefunden[:quelle.max_dokumente]:
+        for tarif, hash_ in gefunden[: quelle.max_dokumente]:
             if tarif.ist_quarantaene:
                 bilanz["quarantaene"] += 1
-                log.info("Tarif %r von %s traegt weder Preis noch Laufzeit - "
-                         "Quarantaene", tarif.name, einstieg)
+                log.info(
+                    "Tarif %r von %s traegt weder Preis noch Laufzeit - Quarantaene",
+                    tarif.name,
+                    einstieg,
+                )
                 continue
             bilanz["gelesen"] += 1
             # Die Herkunft ist hier der Fingerabdruck des Knotens: alle
             # Tarife dieser Seite teilen sich ihre Adresse.
-            uebernimm_stand(tarif, hash_, hash_, speicher=speicher,
-                            bilanz=bilanz, im_lauf=im_lauf, items=items,
-                            jetzt=jetzt)
+            uebernimm_stand(
+                tarif,
+                hash_,
+                hash_,
+                speicher=speicher,
+                bilanz=bilanz,
+                im_lauf=im_lauf,
+                items=items,
+                jetzt=jetzt,
+            )
 
 
-def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
-           hole=None) -> tuple[list[Item], dict]:
+def sammle(
+    root: Path, http_cfg: dict, *, jetzt: datetime | None = None, hole=None
+) -> tuple[list[Item], dict]:
     """Alle Quellen crawlen, Dokumente lesen, Aenderungen melden.
 
     Der erste Lauf je Tarif legt die Grundlinie und meldet nichts - wie bei
@@ -794,11 +870,22 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
     hole = hole or fetch
     quellen = lade_quellen(root)
     speicher = TarifSpeicher(Path(root) / "data" / "state" / "tarife.jsonl")
-    bilanz = {"quellen": len(quellen), "einstiege": 0, "verlinkt": 0,
-              "geholt": 0, "gelesen": 0, "quarantaene": 0, "grundlinie": 0,
-              "unveraendert": 0, "geaendert": 0, "kleingedruckt": 0,
-              "fehler": 0, "ohne_links": 0, "ausgeschlossen": 0,
-              "meldungen": 0}
+    bilanz = {
+        "quellen": len(quellen),
+        "einstiege": 0,
+        "verlinkt": 0,
+        "geholt": 0,
+        "gelesen": 0,
+        "quarantaene": 0,
+        "grundlinie": 0,
+        "unveraendert": 0,
+        "geaendert": 0,
+        "kleingedruckt": 0,
+        "fehler": 0,
+        "ohne_links": 0,
+        "ausgeschlossen": 0,
+        "meldungen": 0,
+    }
     besucht: list[str] = []
     erlaubt: set[str] = set()
     items: list[Item] = []
@@ -809,22 +896,37 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
         # Per-Anbieter-Override, NICHT die globale Konfiguration: eine
         # Quelle mit `user_agent:` bekommt ihre eigene Kopie von `http_cfg`,
         # jede andere Quelle sieht `http_cfg` unveraendert.
-        quelle_cfg = ({**http_cfg, "user_agent": quelle.user_agent}
-                      if quelle.user_agent else http_cfg)
+        quelle_cfg = (
+            {**http_cfg, "user_agent": quelle.user_agent}
+            if quelle.user_agent
+            else http_cfg
+        )
         if quelle.methode in _SEITEN_LESARTEN:
-            _sammle_seite(quelle, quelle_cfg, hole=hole, jetzt=jetzt,
-                          speicher=speicher, bilanz=bilanz, items=items,
-                          im_lauf=im_lauf, besucht=besucht, erlaubt=erlaubt,
-                          extrahiere=_SEITEN_LESARTEN[quelle.methode])
+            _sammle_seite(
+                quelle,
+                quelle_cfg,
+                hole=hole,
+                jetzt=jetzt,
+                speicher=speicher,
+                bilanz=bilanz,
+                items=items,
+                im_lauf=im_lauf,
+                besucht=besucht,
+                erlaubt=erlaubt,
+                extrahiere=_SEITEN_LESARTEN[quelle.methode],
+            )
             continue
         if quelle.methode != METHODE_DOKUMENTE:
             # Eine unbekannte Methode wird laut, nicht still: sonst faellt
             # ein Tippfehler in der Konfiguration erst auf, wenn jemand
             # merkt, dass ein Anbieter seit Wochen nichts mehr liefert.
             bilanz["fehler"] += 1
-            log.warning("Tarifquelle %s: unbekannte methode %r - "
-                        "uebersprungen (bekannt: %s)", quelle.anbieter,
-                        quelle.methode, METHODEN)
+            log.warning(
+                "Tarifquelle %s: unbekannte methode %r - uebersprungen (bekannt: %s)",
+                quelle.anbieter,
+                quelle.methode,
+                METHODEN,
+            )
             continue
         links: list[str] = []
         texte: dict[str, str] = {}
@@ -834,19 +936,18 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
             try:
                 besucht.append(einstieg)
                 antwort = hole(einstieg, quelle_cfg)
-                gefunden = dokumentlinks(antwort.text, einstieg,
-                                         quelle.pfadmuster)
+                gefunden = dokumentlinks(antwort.text, einstieg, quelle.pfadmuster)
                 # setdefault statt update: innerhalb einer Seite gewinnt
                 # der ERSTE Linktext, ueber mehrere Einstiegsseiten soll
                 # dasselbe gelten. Mit `update` gewaenne dort der letzte -
                 # zwei Regeln fuer dieselbe Frage.
                 for adresse, beschriftung in linktexte(
-                        antwort.text, einstieg, quelle.pfadmuster).items():
+                    antwort.text, einstieg, quelle.pfadmuster
+                ).items():
                     texte.setdefault(adresse, beschriftung)
             except Exception as exc:  # noqa: BLE001
                 bilanz["fehler"] += 1
-                log.info("Tarifquelle %s nicht lesbar: %s", einstieg,
-                         str(exc)[:120])
+                log.info("Tarifquelle %s nicht lesbar: %s", einstieg, str(exc)[:120])
                 continue
             if not gefunden:
                 # Eine Einstiegsseite ohne einen einzigen Dokumentlink ist
@@ -859,12 +960,15 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
                 # liefert dieselbe Adresse 200 und 1114 Links. Ohne Status
                 # und Groesse in der Zeile ist das nicht zu unterscheiden.
                 bilanz["ohne_links"] += 1
-                log.warning("Tarifquelle %s (%s): HTTP %s, %d Bytes, aber "
-                            "KEIN Dokumentlink zum Muster %s",
-                            einstieg, quelle.anbieter,
-                            getattr(antwort, "status_code", "?"),
-                            len(getattr(antwort, "content", b"") or b""),
-                            quelle.pfadmuster or ["(alle)"])
+                log.warning(
+                    "Tarifquelle %s (%s): HTTP %s, %d Bytes, aber "
+                    "KEIN Dokumentlink zum Muster %s",
+                    einstieg,
+                    quelle.anbieter,
+                    getattr(antwort, "status_code", "?"),
+                    len(getattr(antwort, "content", b"") or b""),
+                    quelle.pfadmuster or ["(alle)"],
+                )
             erlaubt.update(gefunden)
             links.extend(gefunden)
 
@@ -875,9 +979,12 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
         vor_auswahl = len(links)
         links = juengste_fassung(links)
         if vor_auswahl != len(links):
-            log.info("Tarifquelle %s: %d von %d Adressen sind aeltere "
-                     "Vermarktungsfassungen", quelle.anbieter,
-                     vor_auswahl - len(links), vor_auswahl)
+            log.info(
+                "Tarifquelle %s: %d von %d Adressen sind aeltere Vermarktungsfassungen",
+                quelle.anbieter,
+                vor_auswahl - len(links),
+                vor_auswahl,
+            )
         if quelle.ausschliessen:
             behalten = []
             for url in links:
@@ -887,22 +994,26 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
                     continue
                 bilanz["ausgeschlossen"] += 1
                 for tid in speicher.ziehe_zurueck(
-                        url, jetzt.date().isoformat(),
-                        "Dokument noch verlinkt, Tarif nicht mehr im "
-                        "Sortiment (tarif_quellen.yaml: ausschliessen)"):
-                    log.info("Tarifquelle %s: %s zurueckgezogen (%s)",
-                             quelle.anbieter, tid, texte.get(url, url))
+                    url,
+                    jetzt.date().isoformat(),
+                    "Dokument noch verlinkt, Tarif nicht mehr im "
+                    "Sortiment (tarif_quellen.yaml: ausschliessen)",
+                ):
+                    log.info(
+                        "Tarifquelle %s: %s zurueckgezogen (%s)",
+                        quelle.anbieter,
+                        tid,
+                        texte.get(url, url),
+                    )
             links = behalten
         bilanz["verlinkt"] += len(links)
-        for url in _sortiere(links, quelle.bevorzugt,
-                             texte)[:quelle.max_dokumente]:
+        for url in _sortiere(links, quelle.bevorzugt, texte)[: quelle.max_dokumente]:
             try:
                 besucht.append(url)
                 ergebnis = _hole_dokument(url, quelle_cfg, hole)
             except Exception as exc:  # noqa: BLE001
                 bilanz["fehler"] += 1
-                log.info("Tarifdokument %s nicht lesbar: %s", url,
-                         str(exc)[:120])
+                log.info("Tarifdokument %s nicht lesbar: %s", url, str(exc)[:120])
                 continue
             if ergebnis is None:
                 continue
@@ -911,8 +1022,9 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
             if not ist_tarifdokument(text):
                 continue
 
-            tarif = lies_text(text, url=url, hash_=hash_,
-                              abgerufen_am=jetzt.date().isoformat())
+            tarif = lies_text(
+                text, url=url, hash_=hash_, abgerufen_am=jetzt.date().isoformat()
+            )
             if not tarif.anbieter:
                 # Der Anbieter aus der Config, nicht aus dem Dokument.
                 # Deshalb OHNE Fundstelle und bewusst nicht ueber setze():
@@ -923,27 +1035,42 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
                 tarif.anbieter = quelle.anbieter
             if tarif.ist_quarantaene:
                 bilanz["quarantaene"] += 1
-                log.info("Tarifdokument %s: unbekanntes Layout - Quarantaene",
-                         url)
+                log.info("Tarifdokument %s: unbekanntes Layout - Quarantaene", url)
                 continue
             bilanz["gelesen"] += 1
 
             # Die Adresse ist die Herkunft des Dokuments - siehe
             # `uebernimm_stand`.
-            uebernimm_stand(tarif, hash_, url, speicher=speicher,
-                            bilanz=bilanz, im_lauf=im_lauf, items=items,
-                            jetzt=jetzt)
+            uebernimm_stand(
+                tarif,
+                hash_,
+                url,
+                speicher=speicher,
+                bilanz=bilanz,
+                im_lauf=im_lauf,
+                items=items,
+                jetzt=jetzt,
+            )
 
     speicher.speichern()
     bilanz["meldungen"] = len(items)
     bilanz["besucht"] = besucht
     bilanz["nicht_verlinkt"] = sorted(set(besucht) - erlaubt)
-    log.info("Tarif-Sammler: %d Quellen, %d verlinkt, %d geholt, %d gelesen, "
-             "%d Grundlinie, %d unveraendert, %d geaendert (davon %d nur "
-             "Kleingedrucktes), %d Quarantaene, %d Fehler, %d Einstiege ohne "
-             "Dokumentlink",
-             bilanz["quellen"], bilanz["verlinkt"], bilanz["geholt"],
-             bilanz["gelesen"], bilanz["grundlinie"], bilanz["unveraendert"],
-             bilanz["geaendert"], bilanz["kleingedruckt"],
-             bilanz["quarantaene"], bilanz["fehler"], bilanz["ohne_links"])
+    log.info(
+        "Tarif-Sammler: %d Quellen, %d verlinkt, %d geholt, %d gelesen, "
+        "%d Grundlinie, %d unveraendert, %d geaendert (davon %d nur "
+        "Kleingedrucktes), %d Quarantaene, %d Fehler, %d Einstiege ohne "
+        "Dokumentlink",
+        bilanz["quellen"],
+        bilanz["verlinkt"],
+        bilanz["geholt"],
+        bilanz["gelesen"],
+        bilanz["grundlinie"],
+        bilanz["unveraendert"],
+        bilanz["geaendert"],
+        bilanz["kleingedruckt"],
+        bilanz["quarantaene"],
+        bilanz["fehler"],
+        bilanz["ohne_links"],
+    )
     return items, bilanz

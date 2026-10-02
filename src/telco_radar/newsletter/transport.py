@@ -22,6 +22,7 @@ DIE ZWEI DINGE, DIE HIER RICHTIG SEIN MUESSEN:
    beides gleich behandelt, verbrennt entweder Tageskontingent an tote
    Adressen oder wirft lebende weg.
 """
+
 from __future__ import annotations
 
 import json
@@ -43,11 +44,12 @@ BREVO_EVENTS = "https://api.brevo.com/v3/smtp/statistics/events"
 @dataclass
 class Ergebnis:
     """Was aus einem Zustellversuch geworden ist."""
+
     ok: bool
     message_id: str = ""
     status: int = 0
     fehler: str = ""
-    dauerhaft: bool = False        # True = nicht wiederholen, Empfaenger markieren
+    dauerhaft: bool = False  # True = nicht wiederholen, Empfaenger markieren
 
     @property
     def wiederholbar(self) -> bool:
@@ -69,6 +71,7 @@ class Trockenlauf(Transport):
     sich vor dem ersten echten Versand ansieht, und dafuer muss man
     hineinsehen koennen.
     """
+
     versendet: list[tuple[str, Nachricht]] = field(default_factory=list)
 
     def send(self, nachricht: Nachricht, an: str) -> Ergebnis:
@@ -88,6 +91,7 @@ class BrevoTransport(Transport):
     Abmelde-URL kann nicht personalisiert werden, und ein Fehler betrifft
     die ganze Gruppe statt einer Adresse.
     """
+
     api_key: str
     absender_name: str = "Telco Radar"
     absender_adresse: str = ""
@@ -96,8 +100,7 @@ class BrevoTransport(Transport):
 
     def _nutzlast(self, nachricht: Nachricht, an: str) -> dict:
         nutzlast = {
-            "sender": {"name": self.absender_name,
-                       "email": self.absender_adresse},
+            "sender": {"name": self.absender_name, "email": self.absender_adresse},
             "to": [{"email": an}],
             "subject": nachricht.betreff,
             "htmlContent": nachricht.html,
@@ -124,22 +127,28 @@ class BrevoTransport(Transport):
                 # Rueckwaerts wachsende Wartezeit. Bei 429 ist die Gegenseite
                 # ueberlastet oder das Kontingent erschoepft - schnelles
                 # Nachfassen macht beides schlimmer.
-                time.sleep(min(2 ** versuch, 16))
+                time.sleep(min(2**versuch, 16))
         return letzte
 
     def _einmal(self, nachricht: Nachricht, an: str) -> Ergebnis:
         anfrage = urllib.request.Request(
             BREVO_API,
             data=json.dumps(self._nutzlast(nachricht, an)).encode("utf-8"),
-            headers={"api-key": self.api_key,
-                     "content-type": "application/json",
-                     "accept": "application/json"},
-            method="POST")
+            headers={
+                "api-key": self.api_key,
+                "content-type": "application/json",
+                "accept": "application/json",
+            },
+            method="POST",
+        )
         try:
             with urllib.request.urlopen(anfrage, timeout=self.timeout) as antwort:
                 koerper = json.loads(antwort.read().decode("utf-8") or "{}")
-                return Ergebnis(ok=True, status=antwort.status,
-                                message_id=str(koerper.get("messageId") or ""))
+                return Ergebnis(
+                    ok=True,
+                    status=antwort.status,
+                    message_id=str(koerper.get("messageId") or ""),
+                )
         except urllib.error.HTTPError as fehler:
             text = fehler.read().decode("utf-8", "replace")[:300]
             # 429 ist die Ratengrenze und voruebergehend, 5xx ebenso. Alles
@@ -147,8 +156,10 @@ class BrevoTransport(Transport):
             # wird beim vierten Versuch nicht wahrer.
             dauerhaft = 400 <= fehler.code < 500 and fehler.code != 429
             if fehler.code == 401:
-                text += (" | Erste Ursache: Brevo-Keys verfallen nach 90 "
-                         "Tagen ohne Nutzung (docs/mail-setup.md 3.2).")
+                text += (
+                    " | Erste Ursache: Brevo-Keys verfallen nach 90 "
+                    "Tagen ohne Nutzung (docs/mail-setup.md 3.2)."
+                )
             # Im Log steht der Code und der Text der API - NIE die Adresse.
             # Der Grund gehoert ins Protokoll, die Adresse nicht. Brevo
             # nennt in `code`/`message` die verletzte Regel; Adressen darin
@@ -157,21 +168,27 @@ class BrevoTransport(Transport):
             # Ursache war eine Stunde Suche wert.
             try:
                 d = json.loads(text or "{}")
-                grund = f'{d.get("code", "?")}: {d.get("message", "")}'
+                grund = f"{d.get('code', '?')}: {d.get('message', '')}"
             except json.JSONDecodeError:
                 grund = text
             grund = re.sub(r"[\w.+-]+@[\w.-]+", "<adresse>", grund)[:200]
-            log.warning("Brevo antwortet HTTP %s (%s) - %s", fehler.code,
-                        "dauerhaft" if dauerhaft else "wiederholbar", grund)
-            return Ergebnis(ok=False, status=fehler.code, fehler=text,
-                            dauerhaft=dauerhaft)
+            log.warning(
+                "Brevo antwortet HTTP %s (%s) - %s",
+                fehler.code,
+                "dauerhaft" if dauerhaft else "wiederholbar",
+                grund,
+            )
+            return Ergebnis(
+                ok=False, status=fehler.code, fehler=text, dauerhaft=dauerhaft
+            )
         except (OSError, json.JSONDecodeError) as fehler:
             log.warning("Brevo nicht erreichbar: %s", type(fehler).__name__)
             return Ergebnis(ok=False, fehler=f"{type(fehler).__name__}: {fehler}")
 
 
-def hole_ereignisse(api_key: str, *, seit: str = "", limit: int = 500,
-                    oeffner=None) -> list[dict]:
+def hole_ereignisse(
+    api_key: str, *, seit: str = "", limit: int = 500, oeffner=None
+) -> list[dict]:
     """Die Bounce- und Beschwerde-Ereignisse. Grundlage von `bounce_sync`.
 
     `seit` ist ein ISO-Datum; Brevo will `startDate=YYYY-MM-DD`. Der zuletzt
@@ -183,7 +200,8 @@ def hole_ereignisse(api_key: str, *, seit: str = "", limit: int = 500,
     if seit:
         ziel += f"&startDate={seit}"
     anfrage = urllib.request.Request(
-        ziel, headers={"api-key": api_key, "accept": "application/json"})
+        ziel, headers={"api-key": api_key, "accept": "application/json"}
+    )
     oeffnen = oeffner or urllib.request.urlopen
     try:
         with oeffnen(anfrage, timeout=30) as antwort:

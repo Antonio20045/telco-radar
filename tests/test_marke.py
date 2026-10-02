@@ -19,6 +19,7 @@ Die Geometrie selbst (Versatz aus der Mitte, kein Seitwaertslauf) misst
 scripts/pruefe_portal.py als Kriterium 12 im echten Browser - ein statischer
 Test kann sie nicht sehen.
 """
+
 import re
 
 import pytest
@@ -29,10 +30,20 @@ MARKE = "Vodafone Product and Services Insights"
 
 # Alle Seiten, die base.html.j2 erben. promo/ liegt eine Ebene tiefer und
 # traegt denselben Kopf - genau dort faellt ein halber Rename auf.
-SEITEN = ("index.html", "meldungen.html", "differenzierung.html",
-          "wettbewerb.html", "transparenz.html", "suche.html",
-          "tarife.html", "lieferzeit.html", "geraete.html",
-          "geraete-quellen.html", "promo/index.html", "promo/quellen.html")
+SEITEN = (
+    "index.html",
+    "meldungen.html",
+    "differenzierung.html",
+    "wettbewerb.html",
+    "transparenz.html",
+    "suche.html",
+    "tarife.html",
+    "lieferzeit.html",
+    "geraete.html",
+    "geraete-quellen.html",
+    "promo/index.html",
+    "promo/quellen.html",
+)
 
 
 def _site(tmp_path):
@@ -49,8 +60,7 @@ def _kopftext(html: str) -> str:
     Der Name ist ausgezeichnet (`.brand-zusatz` klein, `<em>` kursiv); ein
     Test, der auf die Zeichenkette im HTML prueft, wuerde deshalb genau die
     Fassung durchwinken, die auf dem Telefon aus dem Bild laeuft."""
-    treffer = re.search(r'<span class="brand-name">(.*?)</span>\s*</a>',
-                        html, re.S)
+    treffer = re.search(r'<span class="brand-name">(.*?)</span>\s*</a>', html, re.S)
     assert treffer, "kein Zeitungskopf (.brand-name) auf der Seite"
     return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", treffer.group(1))).strip()
 
@@ -60,10 +70,11 @@ def test_jede_seite_traegt_den_namen_im_titel(tmp_path):
     ohne = []
     for name in SEITEN:
         datei = site_dir / name
-        if not datei.exists():          # geraete.html haengt an Daten
+        if not datei.exists():  # geraete.html haengt an Daten
             continue
-        titel = re.search(r"<title>(.*?)</title>",
-                          datei.read_text(encoding="utf-8"), re.S)
+        titel = re.search(
+            r"<title>(.*?)</title>", datei.read_text(encoding="utf-8"), re.S
+        )
         assert titel, name
         # Die Unterseiten der Promo Uebersicht und der Marktrecherche tragen
         # ihre eigene Ueberschrift im Titel ("Promo Uebersicht - Quellen").
@@ -123,8 +134,13 @@ def test_die_alten_seiten_leiten_unter_dem_neuen_namen_weiter(tmp_path):
     """Die Weiterleitungen stehen in Lesezeichen und Mails - sie sind der
     Ort, an dem der alte Name am laengsten ueberlebt haette."""
     site_dir = _site(tmp_path)
-    for alt in ("bericht.html", "archive.html", "sources.html",
-                "protokoll.html", "wettbewerber.html"):
+    for alt in (
+        "bericht.html",
+        "archive.html",
+        "sources.html",
+        "protokoll.html",
+        "wettbewerber.html",
+    ):
         datei = site_dir / alt
         if not datei.exists():
             continue
@@ -136,13 +152,13 @@ def test_kein_alter_name_mehr_in_den_vorlagen():
     """Gegen die Quelle, nicht gegen die Ausgabe: eine Vorlage, die heute
     nicht gerendert wird (thema/, folien/), faellt sonst durch jedes Raster."""
     from pathlib import Path
+
     wurzel = Path(__file__).resolve().parent.parent / "src" / "telco_radar"
     reste = []
-    for datei in [*wurzel.rglob("*.j2"), *wurzel.rglob("*.py"),
-                  *wurzel.rglob("*.css")]:
+    for datei in [*wurzel.rglob("*.j2"), *wurzel.rglob("*.py"), *wurzel.rglob("*.css")]:
         text = datei.read_text(encoding="utf-8")
         for treffer in re.finditer(r"Vodafone Insights", text):
-            reste.append(f"{datei.name}:{text[:treffer.start()].count(chr(10)) + 1}")
+            reste.append(f"{datei.name}:{text[: treffer.start()].count(chr(10)) + 1}")
     assert not reste, f"alter Name uebrig: {reste}"
 
 
@@ -150,12 +166,15 @@ def test_kein_alter_name_mehr_in_den_vorlagen():
 # Der teuerste Fehler dieser Kopfleiste ist nicht, dass sie zu breit ist -
 # sondern dass ihre Breite gegen EINE Schrift kalibriert war.
 
+
 def _chromium():
     import os
-    for kandidat in ("/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
-                     os.path.expanduser(
-                         "~/.cache/ms-playwright/chromium-1194/chrome-linux/chrome"),
-                     os.environ.get("CHROMIUM_PFAD", "")):
+
+    for kandidat in (
+        "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+        os.path.expanduser("~/.cache/ms-playwright/chromium-1194/chrome-linux/chrome"),
+        os.environ.get("CHROMIUM_PFAD", ""),
+    ):
         if kandidat and os.path.exists(kandidat):
             return kandidat
     return None
@@ -196,16 +215,17 @@ def test_der_kopf_laeuft_auch_mit_breiterer_schrift_nicht_aus_dem_bild(tmp_path)
     s.bind(("127.0.0.1", 0))
     port = s.getsockname()[1]
     s.close()
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler,
-                                directory=str(site_dir))
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(site_dir)
+    )
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     gemessen = {}
     try:
         with sync_playwright() as pw:
             browser = pw.chromium.launch(
-                executable_path=exe,
-                args=["--no-sandbox", "--disable-dev-shm-usage"])
+                executable_path=exe, args=["--no-sandbox", "--disable-dev-shm-usage"]
+            )
             for aufschlag in (0, 1.2, 3.0):
                 page = browser.new_page(viewport={"width": 390, "height": 844})
                 page.goto(f"http://127.0.0.1:{port}/index.html")
@@ -213,8 +233,9 @@ def test_der_kopf_laeuft_auch_mit_breiterer_schrift_nicht_aus_dem_bild(tmp_path)
                 # Schrift vorauszusetzen. 3 px je Zeichen sind rund 40 % mehr
                 # Breite - deutlich mehr, als eine Serife gegenueber ihrer
                 # Rueckfallschrift ausmacht.
-                page.add_style_tag(content=(
-                    f".brand-name{{letter-spacing:{aufschlag}px}}"))
+                page.add_style_tag(
+                    content=(f".brand-name{{letter-spacing:{aufschlag}px}}")
+                )
                 page.wait_for_timeout(120)
                 gemessen[aufschlag] = page.evaluate(
                     """() => ({
@@ -223,19 +244,25 @@ def test_der_kopf_laeuft_auch_mit_breiterer_schrift_nicht_aus_dem_bild(tmp_path)
                          kopf: Math.ceil(
                            document.querySelector('.brand-name')
                                    .getBoundingClientRect().right),
-                       })""")
+                       })"""
+                )
                 page.close()
             browser.close()
     finally:
         httpd.shutdown()
 
-    schuldig = [f"+{a} px Sperrung: Seite {m['doc']} px breit bei "
-                f"{m['fenster']} px Fenster"
-                for a, m in gemessen.items() if m["doc"] > m["fenster"] + 1]
+    schuldig = [
+        f"+{a} px Sperrung: Seite {m['doc']} px breit bei {m['fenster']} px Fenster"
+        for a, m in gemessen.items()
+        if m["doc"] > m["fenster"] + 1
+    ]
     assert not schuldig, schuldig
     # ... und der Kopf selbst bleibt im Bild.
-    ragt = [f"+{a} px: Kopf endet bei {m['kopf']} px"
-            for a, m in gemessen.items() if m["kopf"] > m["fenster"] + 1]
+    ragt = [
+        f"+{a} px: Kopf endet bei {m['kopf']} px"
+        for a, m in gemessen.items()
+        if m["kopf"] > m["fenster"] + 1
+    ]
     assert not ragt, ragt
     # Gegenprobe: der Aufschlag hat wirklich etwas veraendert - sonst misst
     # der Test dreimal dasselbe.

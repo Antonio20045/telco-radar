@@ -22,6 +22,7 @@ anschlaegt:**
 CI-Test prueft die Datei gegen ein Adressmuster; er ist die zweite
 Sicherung, nachdem die erste (die Trennung der Repositories) schon greift.
 """
+
 from __future__ import annotations
 
 import json
@@ -78,15 +79,21 @@ class Ausgabe:
         """
         aus = []
         if self.geplant and self.zustellquote < MIN_ZUSTELLQUOTE:
-            aus.append(f"Zustellquote {self.quote_prozent} % — unter "
-                       f"{int(MIN_ZUSTELLQUOTE * 100)} %.")
+            aus.append(
+                f"Zustellquote {self.quote_prozent} % — unter "
+                f"{int(MIN_ZUSTELLQUOTE * 100)} %."
+            )
         if self.dauerhaft_fehl > MAX_HARTE_FEHLER:
-            aus.append(f"{self.dauerhaft_fehl} dauerhaft gescheiterte "
-                       f"Zustellungen in einem Lauf.")
+            aus.append(
+                f"{self.dauerhaft_fehl} dauerhaft gescheiterte "
+                f"Zustellungen in einem Lauf."
+            )
         if self.auslastung >= int(WARNUNG_AB_ANTEIL * 100):
-            aus.append(f"{self.auslastung} % des Tageskontingents gebraucht "
-                       f"({TAGESLIMIT} Mails/Tag im Brevo-Free-Plan). Ab hier "
-                       f"lohnt der Blick in docs/mail-setup.md, Ausbaustufe B.")
+            aus.append(
+                f"{self.auslastung} % des Tageskontingents gebraucht "
+                f"({TAGESLIMIT} Mails/Tag im Brevo-Free-Plan). Ab hier "
+                f"lohnt der Blick in docs/mail-setup.md, Ausbaustufe B."
+            )
         return aus
 
 
@@ -108,18 +115,21 @@ def lade(pfad: Path, *, grenze: int = 12) -> list[Ausgabe]:
         except json.JSONDecodeError:
             log.warning("newsletter_stats.jsonl: Zeile nicht lesbar")
             continue
-        aus.append(Ausgabe(
-            datum=str(daten.get("date") or ""),
-            segmente=int(daten.get("segments") or 0),
-            geplant=int(daten.get("planned") or 0),
-            zugestellt=int(daten.get("delivered") or 0),
-            uebersprungen=int(daten.get("skipped") or 0),
-            fehler=int(daten.get("failed") or 0),
-            dauerhaft_fehl=int(daten.get("hard_fail") or 0),
-            abstand_zum_limit=int(daten.get("limit_left") or TAGESLIMIT),
-            neu=int(daten.get("new") or 0),
-            abmeldungen=int(daten.get("unsubscribed") or 0),
-            bounces=int(daten.get("bounced") or 0)))
+        aus.append(
+            Ausgabe(
+                datum=str(daten.get("date") or ""),
+                segmente=int(daten.get("segments") or 0),
+                geplant=int(daten.get("planned") or 0),
+                zugestellt=int(daten.get("delivered") or 0),
+                uebersprungen=int(daten.get("skipped") or 0),
+                fehler=int(daten.get("failed") or 0),
+                dauerhaft_fehl=int(daten.get("hard_fail") or 0),
+                abstand_zum_limit=int(daten.get("limit_left") or TAGESLIMIT),
+                neu=int(daten.get("new") or 0),
+                abmeldungen=int(daten.get("unsubscribed") or 0),
+                bounces=int(daten.get("bounced") or 0),
+            )
+        )
     aus.sort(key=lambda a: a.datum, reverse=True)
     return aus[:grenze]
 
@@ -148,8 +158,18 @@ def vermerken(pfad: Path, lauf: dict) -> None:
     andere fallengelassen. Ein Feld mehr im Payload darf nicht bedeuten, dass
     eine Adresse ins oeffentliche Repo wandert.
     """
-    felder = ("segments", "planned", "delivered", "skipped", "failed",
-              "hard_fail", "limit_left", "new", "unsubscribed", "bounced")
+    felder = (
+        "segments",
+        "planned",
+        "delivered",
+        "skipped",
+        "failed",
+        "hard_fail",
+        "limit_left",
+        "new",
+        "unsubscribed",
+        "bounced",
+    )
     datum = str(lauf.get("date") or "")[:10]
     if not datum:
         raise ValueError("Laufzahlen ohne Datum")

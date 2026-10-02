@@ -22,6 +22,7 @@ Laufprotokoll je Lauf mit ("new" je Quelle).
     python scripts/migriere_seen_store.py            # Probelauf, schreibt nichts
     python scripts/migriere_seen_store.py --schreiben
 """
+
 from __future__ import annotations
 
 import argparse
@@ -29,8 +30,9 @@ import json
 from collections import defaultdict
 from pathlib import Path
 
-KOPFZEILE = ("# telco-radar seen-store v2 - ein Item-Hash je Zeile, '@' setzt "
-             "den Zeitstempel\n")
+KOPFZEILE = (
+    "# telco-radar seen-store v2 - ein Item-Hash je Zeile, '@' setzt den Zeitstempel\n"
+)
 
 
 def _lies_v1(pfad: Path) -> tuple[list[dict], list[str], int]:
@@ -63,10 +65,16 @@ def historie_je_quelle(saetze: list[dict]) -> dict[str, dict]:
     je_quelle: dict[str, dict] = {}
     for rec in saetze:
         quelle = rec.get("source") or "?"
-        eintrag = je_quelle.setdefault(quelle, {
-            "quelle": quelle, "neu_gesamt": 0,
-            "erste_meldung": None, "letzte_meldung": None, "laeufe": 0,
-        })
+        eintrag = je_quelle.setdefault(
+            quelle,
+            {
+                "quelle": quelle,
+                "neu_gesamt": 0,
+                "erste_meldung": None,
+                "letzte_meldung": None,
+                "laeufe": 0,
+            },
+        )
         eintrag["neu_gesamt"] += 1
         ts = (rec.get("first_seen") or "")[:10]
         if ts:
@@ -105,11 +113,15 @@ def schreibe_v2(saetze: list[dict], v2_hashes: list[str]) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(description=__doc__,
-                                formatter_class=argparse.RawDescriptionHelpFormatter)
+    p = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     p.add_argument("--root", type=Path, default=Path("."))
-    p.add_argument("--schreiben", action="store_true",
-                   help="ohne dieses Flag nur rechnen, nichts aendern")
+    p.add_argument(
+        "--schreiben",
+        action="store_true",
+        help="ohne dieses Flag nur rechnen, nichts aendern",
+    )
     args = p.parse_args(argv)
 
     state = args.root / "data" / "state"
@@ -121,31 +133,42 @@ def main(argv: list[str] | None = None) -> int:
     vorher_bytes = pfad.stat().st_size
     saetze, v2_hashes, defekt = _lies_v1(pfad)
     if not saetze:
-        print(f"Keine v1-Zeilen in {pfad} - der Store ist bereits migriert "
-              f"({len(v2_hashes)} Hashes).")
+        print(
+            f"Keine v1-Zeilen in {pfad} - der Store ist bereits migriert "
+            f"({len(v2_hashes)} Hashes)."
+        )
         return 0
 
     text = schreibe_v2(saetze, v2_hashes)
 
     # --- Nachpruefung: die MENGE der Hashes muss identisch sein
     vorher = {r["id"] for r in saetze} | set(v2_hashes)
-    nachher = {z.strip() for z in text.splitlines()
-               if z.strip() and not z.startswith(("#", "@"))}
+    nachher = {
+        z.strip()
+        for z in text.splitlines()
+        if z.strip() and not z.startswith(("#", "@"))
+    }
     if vorher != nachher:
         fehlend = vorher - nachher
-        print(f"ABBRUCH: {len(fehlend)} Hash(es) wuerden verloren gehen "
-              f"(z.B. {sorted(fehlend)[:3]}). Es wurde nichts geschrieben.")
+        print(
+            f"ABBRUCH: {len(fehlend)} Hash(es) wuerden verloren gehen "
+            f"(z.B. {sorted(fehlend)[:3]}). Es wurde nichts geschrieben."
+        )
         return 1
 
     historie = historie_je_quelle(saetze)
     nachher_bytes = len(text.encode("utf-8"))
     print(f"{len(vorher)} Hashes | {defekt} defekte Zeile(n) uebersprungen")
-    print(f"{vorher_bytes/1024:.0f} KB  ->  {nachher_bytes/1024:.0f} KB "
-          f"(Faktor {vorher_bytes/nachher_bytes:.1f}, "
-          f"{nachher_bytes/max(1,len(vorher)):.0f} Byte je Eintrag)")
-    print(f"Hochrechnung 233 000 Eintraege/Jahr: "
-          f"{233_000*nachher_bytes/max(1,len(vorher))/1024/1024:.1f} MB/Jahr "
-          f"(vorher {233_000*vorher_bytes/max(1,len(vorher))/1024/1024:.1f} MB/Jahr)")
+    print(
+        f"{vorher_bytes / 1024:.0f} KB  ->  {nachher_bytes / 1024:.0f} KB "
+        f"(Faktor {vorher_bytes / nachher_bytes:.1f}, "
+        f"{nachher_bytes / max(1, len(vorher)):.0f} Byte je Eintrag)"
+    )
+    print(
+        f"Hochrechnung 233 000 Eintraege/Jahr: "
+        f"{233_000 * nachher_bytes / max(1, len(vorher)) / 1024 / 1024:.1f} MB/Jahr "
+        f"(vorher {233_000 * vorher_bytes / max(1, len(vorher)) / 1024 / 1024:.1f} MB/Jahr)"
+    )
     print(f"Historie je Quelle: {len(historie)} Quellen")
 
     if not args.schreiben:
@@ -153,10 +176,15 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     (state / "seen_historie_je_quelle.json").write_text(
-        json.dumps(sorted(historie.values(), key=lambda e: -e["neu_gesamt"]),
-                   ensure_ascii=False, indent=1), encoding="utf-8")
+        json.dumps(
+            sorted(historie.values(), key=lambda e: -e["neu_gesamt"]),
+            ensure_ascii=False,
+            indent=1,
+        ),
+        encoding="utf-8",
+    )
     pfad.write_text(text, encoding="utf-8")
-    print(f"\nGeschrieben: {pfad} und {state/'seen_historie_je_quelle.json'}")
+    print(f"\nGeschrieben: {pfad} und {state / 'seen_historie_je_quelle.json'}")
     return 0
 
 

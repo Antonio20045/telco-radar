@@ -18,6 +18,7 @@ Zeilen-Tabelle), keine Alarmtabelle und kein "Bei Wettbewerbern gelistet"
 auf der Geräteseite (beide stehen auf wettbewerbsradar.html - dort hält
 sie `tests/test_wettbewerbsradar_alarme.py` fest).
 """
+
 from __future__ import annotations
 
 import json
@@ -37,11 +38,12 @@ from test_geraete_tco_zustand import HEUTE, _baue, vorlage_text
 def _zr_fragment(tmp_path: pathlib.Path) -> list:
     """Die Zeitreihen-Lager des gerenderten Fragments - _baue_ohne_band
     rendert nach <tmp>/ohne_band/site, das Fragment liegt daneben."""
-    fragment = (tmp_path / "ohne_band" / "site" / "data"
-                / "geraete-zeitreihe.html")
+    fragment = tmp_path / "ohne_band" / "site" / "data" / "geraete-zeitreihe.html"
     assert fragment.exists(), "Zeitreihen-Fragment fehlt"
-    return BeautifulSoup(fragment.read_text(encoding="utf-8"),
-                         "html.parser").select(".gr-zr-lager")
+    return BeautifulSoup(fragment.read_text(encoding="utf-8"), "html.parser").select(
+        ".gr-zr-lager"
+    )
+
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 
@@ -53,63 +55,128 @@ WURZEL = pathlib.Path(__file__).resolve().parents[1]
 # Mischkarten im Band.
 # --------------------------------------------------------------------------
 
-_KATALOG = {"geraete": [
-    {"hersteller": "Apple", "modell": "iPhone 17 Pro", "generation": 17,
-     "marktstart": "2025-09-19", "speicher": [256], "segment": "premium"}]}
+_KATALOG = {
+    "geraete": [
+        {
+            "hersteller": "Apple",
+            "modell": "iPhone 17 Pro",
+            "generation": 17,
+            "marktstart": "2025-09-19",
+            "speicher": [256],
+            "segment": "premium",
+        }
+    ]
+}
 _FARBEN = {"farben": {"schwarz": ["Schwarz"]}}
-_QUELLEN = {"anbieter": [
-    {"name": "o2", "typ": "netzbetreiber", "rang": 2, "methode": "ldjson",
-     "basis_url": "https://www.o2online.de",
-     "einstiege": [{"url": "https://www.o2online.de/handys"}]},
-    {"name": "Vodafone", "typ": "netzbetreiber", "rang": 1, "eigen": True,
-     "methode": "ldjson", "basis_url": "https://www.vodafone.de",
-     "einstiege": [{"url": "https://www.vodafone.de/handys"}]},
-    {"name": "Saturn", "typ": "handel", "gruppe": "Ceconomy", "rang": 2,
-     "methode": "saturn_brand", "aktiv": True,
-     "basis_url": "https://www.saturn.de",
-     "einstiege": [{"url": "https://www.saturn.de/handys"}]},
-]}
+_QUELLEN = {
+    "anbieter": [
+        {
+            "name": "o2",
+            "typ": "netzbetreiber",
+            "rang": 2,
+            "methode": "ldjson",
+            "basis_url": "https://www.o2online.de",
+            "einstiege": [{"url": "https://www.o2online.de/handys"}],
+        },
+        {
+            "name": "Vodafone",
+            "typ": "netzbetreiber",
+            "rang": 1,
+            "eigen": True,
+            "methode": "ldjson",
+            "basis_url": "https://www.vodafone.de",
+            "einstiege": [{"url": "https://www.vodafone.de/handys"}],
+        },
+        {
+            "name": "Saturn",
+            "typ": "handel",
+            "gruppe": "Ceconomy",
+            "rang": 2,
+            "methode": "saturn_brand",
+            "aktiv": True,
+            "basis_url": "https://www.saturn.de",
+            "einstiege": [{"url": "https://www.saturn.de/handys"}],
+        },
+    ]
+}
 
 SKU = "apple-iphone-17-pro-256gb-schwarz"
 
 
 def _listung(anbieter, preis):
-    return {"id": f"{anbieter.lower()}--{SKU}", "sku_id": SKU,
-            "device_id": "apple-iphone-17-pro", "anbieter": anbieter,
-            "anbieter_typ": ("handel" if anbieter == "Saturn"
-                             else "netzbetreiber"),
-            "speicher_gb": 256, "farbe_roh": "Schwarz",
-            "farbe_normalisiert": "schwarz", "zustand": "neu",
-            "first_seen": "2026-08-20", "last_verified": HEUTE,
-            "status": "aktiv", "missed_checks": 0,
-            "preis_ohne_vertrag": preis, "erstpreis": preis,
-            "erstpreis_art": "ohne_vertrag", "erstpreis_am": "2026-08-20",
-            "quelle_url": f"https://example.de/{anbieter.lower()}/{SKU}",
-            "abgerufen_am": HEUTE, "verfuegbarkeit": "lieferbar",
-            "confidence": "hoch", "einstiege": ["https://example.de/liste"]}
+    return {
+        "id": f"{anbieter.lower()}--{SKU}",
+        "sku_id": SKU,
+        "device_id": "apple-iphone-17-pro",
+        "anbieter": anbieter,
+        "anbieter_typ": ("handel" if anbieter == "Saturn" else "netzbetreiber"),
+        "speicher_gb": 256,
+        "farbe_roh": "Schwarz",
+        "farbe_normalisiert": "schwarz",
+        "zustand": "neu",
+        "first_seen": "2026-08-20",
+        "last_verified": HEUTE,
+        "status": "aktiv",
+        "missed_checks": 0,
+        "preis_ohne_vertrag": preis,
+        "erstpreis": preis,
+        "erstpreis_art": "ohne_vertrag",
+        "erstpreis_am": "2026-08-20",
+        "quelle_url": f"https://example.de/{anbieter.lower()}/{SKU}",
+        "abgerufen_am": HEUTE,
+        "verfuegbarkeit": "lieferbar",
+        "confidence": "hoch",
+        "einstiege": ["https://example.de/liste"],
+    }
 
 
-def _buendel(anbieter, tarif_id, tarif_name, gb, *, tarif=24.99, rate=20.0,
-             laufzeit=24, zuzahlung=1.0):
-    return {"id": f"buendel--{anbieter.lower()}--{tarif_id}",
-            "sku_id": SKU, "anbieter": anbieter, "tarif_name": tarif_name,
-            "tarif_id": tarif_id, "tarif_id_guete": "hoch",
-            "tarif_monatlich": tarif, "geraet_zuzahlung": zuzahlung,
-            "geraet_monatsrate": rate, "laufzeit_monate": laufzeit,
-            "anschlusspreis": 0.0, "zustand": "neu", "rabatte": [],
-            "quelle_url": f"https://example.de/{anbieter.lower()}/{SKU}",
-            "abgerufen_am": HEUTE, "first_seen": HEUTE,
-            "last_verified": HEUTE}
+def _buendel(
+    anbieter,
+    tarif_id,
+    tarif_name,
+    gb,
+    *,
+    tarif=24.99,
+    rate=20.0,
+    laufzeit=24,
+    zuzahlung=1.0,
+):
+    return {
+        "id": f"buendel--{anbieter.lower()}--{tarif_id}",
+        "sku_id": SKU,
+        "anbieter": anbieter,
+        "tarif_name": tarif_name,
+        "tarif_id": tarif_id,
+        "tarif_id_guete": "hoch",
+        "tarif_monatlich": tarif,
+        "geraet_zuzahlung": zuzahlung,
+        "geraet_monatsrate": rate,
+        "laufzeit_monate": laufzeit,
+        "anschlusspreis": 0.0,
+        "zustand": "neu",
+        "rabatte": [],
+        "quelle_url": f"https://example.de/{anbieter.lower()}/{SKU}",
+        "abgerufen_am": HEUTE,
+        "first_seen": HEUTE,
+        "last_verified": HEUTE,
+    }
 
 
 def _tarif(anbieter, tarif_id, tarif_name, gb):
-    return {"anbieter": anbieter, "name": tarif_name, "tarif_id": tarif_id,
-            "art": "mobilfunk", "grundgebuehr": 24.99, "laufzeit_monate": 24,
-            "datenvolumen_gb": gb,
-            "preisphasen": [{"von_monat": 1, "bis_monat": None,
-                             "betrag": 24.99}],
-            "dokument_url": f"https://example.de/pib/{tarif_id}",
-            "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}}
+    return {
+        "anbieter": anbieter,
+        "name": tarif_name,
+        "tarif_id": tarif_id,
+        "art": "mobilfunk",
+        "grundgebuehr": 24.99,
+        "laufzeit_monate": 24,
+        "datenvolumen_gb": gb,
+        "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": 24.99}],
+        "dokument_url": f"https://example.de/pib/{tarif_id}",
+        "abgerufen_am": HEUTE,
+        "confidence": {},
+        "fundstellen": {},
+    }
 
 
 def _baue_ohne_band(tmp_path: pathlib.Path) -> BeautifulSoup:
@@ -117,23 +184,37 @@ def _baue_ohne_band(tmp_path: pathlib.Path) -> BeautifulSoup:
     (o2, ohne Band), kein Tarifbestand (1&1, ohne Band) - dazu Saturn mit
     und Amazon/Expert ohne Händlerpreis."""
     import math
+
     root = tmp_path / "ohne_band"
     (root / "config").mkdir(parents=True)
-    for name, daten in (("geraete_katalog.yaml", _KATALOG),
-                        ("farben.yaml", _FARBEN),
-                        ("geraete_quellen.yaml", _QUELLEN)):
+    for name, daten in (
+        ("geraete_katalog.yaml", _KATALOG),
+        ("farben.yaml", _FARBEN),
+        ("geraete_quellen.yaml", _QUELLEN),
+    ):
         (root / "config" / name).write_text(
-            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
-            encoding="utf-8")
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False), encoding="utf-8"
+        )
     state = root / "data" / "state"
     state.mkdir(parents=True)
-    listungen = [_listung("o2", 1099.0), _listung("Vodafone", 1199.90),
-                 _listung("Saturn", 1179.0)]
-    (state / "geraete_db.json").write_text(json.dumps({
-        "updated": HEUTE, "anbieter": {
-            n: {"laeufe": 4, "funde_gesamt": 1}
-            for n in ("o2", "Vodafone", "Saturn")},
-        "listungen": listungen}), encoding="utf-8")
+    listungen = [
+        _listung("o2", 1099.0),
+        _listung("Vodafone", 1199.90),
+        _listung("Saturn", 1179.0),
+    ]
+    (state / "geraete_db.json").write_text(
+        json.dumps(
+            {
+                "updated": HEUTE,
+                "anbieter": {
+                    n: {"laeufe": 4, "funde_gesamt": 1}
+                    for n in ("o2", "Vodafone", "Saturn")
+                },
+                "listungen": listungen,
+            }
+        ),
+        encoding="utf-8",
+    )
     (state / "geraete_preise.jsonl").write_text("", encoding="utf-8")
     buendel = [
         _buendel("o2", "o2:klein", "O2 Mobile Klein", 10),
@@ -142,34 +223,51 @@ def _baue_ohne_band(tmp_path: pathlib.Path) -> BeautifulSoup:
         _buendel("o2", "o2:unlimited", "O2 Unlimited", math.inf),
         # 1&1 ohne tarif_id (wie im echten Bestand: 1&1-Tarife stehen
         # nicht im Tarifbestand) - kein Datenvolumen, also kein Band.
-        {**_buendel("1&1", "", "1&1 All-Net-Flat S", None),
-         "tarif_monatlich": None, "geraet_monatsrate": None,
-         "buendel_monatlich": 44.99, "geraet_zuzahlung": 1.0,
-         "laufzeit_monate": 36},
+        {
+            **_buendel("1&1", "", "1&1 All-Net-Flat S", None),
+            "tarif_monatlich": None,
+            "geraet_monatsrate": None,
+            "buendel_monatlich": 44.99,
+            "geraet_zuzahlung": 1.0,
+            "laufzeit_monate": 36,
+        },
     ]
     for b in buendel:
         if b["tarif_id"] == "":
             b.pop("tarif_id")
-    (state / "geraete_tco.json").write_text(json.dumps({
-        "updated": HEUTE, "buendel": buendel, "sim_only": []}),
-        encoding="utf-8")
-    tarife = [_tarif("o2", "o2:klein", "O2 Mobile Klein", 10),
-              _tarif("Vodafone", "vf:klein", "Vodafone Mobil XS", 18),
-              _tarif("o2", "o2:unlimited", "O2 Unlimited", math.inf)]
+    (state / "geraete_tco.json").write_text(
+        json.dumps({"updated": HEUTE, "buendel": buendel, "sim_only": []}),
+        encoding="utf-8",
+    )
+    tarife = [
+        _tarif("o2", "o2:klein", "O2 Mobile Klein", 10),
+        _tarif("Vodafone", "vf:klein", "Vodafone Mobil XS", 18),
+        _tarif("o2", "o2:unlimited", "O2 Unlimited", math.inf),
+    ]
     tarife = mit_leiter(tarife)
     (state / "tarife.jsonl").write_text(
-        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
+        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8"
+    )
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
-    (reports / f"{HEUTE}.json").write_text(json.dumps({
-        "date": HEUTE, "language": "de",
-        "briefing_md": "## Auf einen Blick\n\n- Nichts Besonderes.\n",
-        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{HEUTE}.json").write_text(
+        json.dumps(
+            {
+                "date": HEUTE,
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- Nichts Besonderes.\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     (reports / f"{HEUTE}.md").write_text("# Bericht\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
-    return BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
-                         "html.parser")
+    return BeautifulSoup(
+        (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
+    )
 
 
 def _text(el) -> str:
@@ -179,6 +277,7 @@ def _text(el) -> str:
 # --------------------------------------------------------------------------
 # Die Zeilen-Struktur (Auftrag 1)
 # --------------------------------------------------------------------------
+
 
 def test_je_buendel_eine_zeile_mit_vier_kernangaben_und_aufklapper(tmp_path):
     """Jedes Bündel des Vorgabemodells ist EINE Zeile: Anbieter, Tarif mit
@@ -198,17 +297,24 @@ def test_je_buendel_eine_zeile_mit_vier_kernangaben_und_aufklapper(tmp_path):
         tco = summary.select_one(".gr-bnd-tco")
         delta = summary.select_one(".gr-bnd-delta")
         bar = summary.select_one(".gr-bnd-bar")
-        for zelle, name in ((an, "Anbieter"), (tarif, "Tarif"),
-                            (tco, "Kosten über 24 Monate"), (delta, "Δ"),
-                            (bar, "Gerät")):
+        for zelle, name in (
+            (an, "Anbieter"),
+            (tarif, "Tarif"),
+            (tco, "Kosten über 24 Monate"),
+            (delta, "Δ"),
+            (bar, "Gerät"),
+        ):
             assert zelle is not None, f"Zeile ohne {name}-Zelle"
         assert "€" in tco.get_text(), "TCO-Zelle ohne Zahl"
-        assert "Kosten über 24 Monate" in tco.get_text(), \
+        assert "Kosten über 24 Monate" in tco.get_text(), (
             "TCO-Zelle ohne Leitzahl-Etikett"
-        assert z.select_one(".gr-bnd-rw") is not None, \
+        )
+        assert z.select_one(".gr-bnd-rw") is not None, (
             "Zeile ohne Rechenweg-Montageziel"
-        assert z.select_one("template.gr-bnd-rw-vorlage .gr-tposten li") \
-            is not None, "Zeile ohne Rechenweg im Vorlagen-Pool"
+        )
+        assert z.select_one("template.gr-bnd-rw-vorlage .gr-tposten li") is not None, (
+            "Zeile ohne Rechenweg im Vorlagen-Pool"
+        )
 
 
 def test_die_zeilen_stehen_nach_gesamtkosten_sortiert(tmp_path):
@@ -230,13 +336,16 @@ def test_keine_karten_und_keine_kartenklappe_mehr(tmp_path):
     mit der Zeilen-Tabelle - keins der drei alten Gebilde bleibt."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
-    assert tafel.select_one("details.gr-karten-auf") is None, \
+    assert tafel.select_one("details.gr-karten-auf") is None, (
         "die Kartenklappe steht noch"
+    )
     assert tafel.select_one(".gr-kkarte") is None, "Karten stehen noch"
-    assert tafel.select_one(".gr-ksteuer") is None, \
+    assert tafel.select_one(".gr-ksteuer") is None, (
         "Sortierung/Filter der Klappe stehen noch"
-    assert tafel.select_one("#gr-tco-tabelle") is None, \
+    )
+    assert tafel.select_one("#gr-tco-tabelle") is None, (
         "'Alle Bündel als Tabelle' steht noch als eigene Tabelle"
+    )
     assert tafel.select_one("table.gr-ttab--leit") is None
 
 
@@ -244,13 +353,13 @@ def test_keine_karten_und_keine_kartenklappe_mehr(tmp_path):
 # A6 - kein Datenverlust, gezählt vorher (Aufbereitung) gegen nachher (Seite)
 # --------------------------------------------------------------------------
 
+
 def _vorgabe_daten(root: pathlib.Path) -> dict:
     geraete = geraete_view.aufbereiten(
-        root / "data" / "state", lade_quellen(root), lade_katalog(root),
-        heute=HEUTE)
+        root / "data" / "state", lade_quellen(root), lade_katalog(root), heute=HEUTE
+    )
     tco = geraete["tco"]
-    modell = next(m for m in tco["modelle"]
-                  if m["id"] == tco["modell_vorgabe"])
+    modell = next(m for m in tco["modelle"] if m["id"] == tco["modell_vorgabe"])
     return modell
 
 
@@ -264,23 +373,24 @@ def test_jede_karte_der_aufbereitung_ist_eine_zeile(tmp_path):
     assert len(karten) == 3
     zeilen = s.select("#tafel-tco .gr-bnd")
     assert len(zeilen) == len(karten), (
-        f"{len(karten)} Karten stehen {len(zeilen)} Zeilen gegenüber")
+        f"{len(karten)} Karten stehen {len(zeilen)} Zeilen gegenüber"
+    )
     gesehen = set()
     for k in karten:
-        treffer = [z for z in zeilen
-                   if z.get("data-anbieter") == k["anbieter"]
-                   and _text(z.select_one(".gr-bnd-tco")).startswith(
-                       _euro(k["gesamt"]))]
-        assert len(treffer) == 1, (
-            f"{k['anbieter']} {k['tarif']}: {len(treffer)} Zeilen")
+        treffer = [
+            z
+            for z in zeilen
+            if z.get("data-anbieter") == k["anbieter"]
+            and _text(z.select_one(".gr-bnd-tco")).startswith(_euro(k["gesamt"]))
+        ]
+        assert len(treffer) == 1, f"{k['anbieter']} {k['tarif']}: {len(treffer)} Zeilen"
         gesehen.add(id(treffer[0]))
     assert len(gesehen) == len(karten), "Zeilen wurden doppelt getroffen"
 
 
 def _euro(betrag: float) -> str:
     """Dieselbe deutsche Euro-Schreibweise wie der `euro`-Filter der Seite."""
-    text = f"{betrag:,.2f}".replace(",", "#").replace(".", ",") \
-        .replace("#", ".")
+    text = f"{betrag:,.2f}".replace(",", "#").replace(".", ",").replace("#", ".")
     return text
 
 
@@ -303,11 +413,14 @@ def test_jede_zeile_traegt_rechenweg_pflichtzeile_und_belege(tmp_path):
         # vorlage_text (nicht _text): BS4 versteckt template-Inhalt
         # vor get_text - der Rechenweg liegt seit dem P4-Fix dort.
         assert "nach 24 Monaten gezahlt" in vorlage_text(rw), (
-            f"{z.get('data-anbieter')}: Pflichtzeile fehlt")
-        assert rw.select_one("a[href]") is not None, \
+            f"{z.get('data-anbieter')}: Pflichtzeile fehlt"
+        )
+        assert rw.select_one("a[href]") is not None, (
             f"{z.get('data-anbieter')}: kein Beleglink im Rechenweg"
-        assert "abgerufen" in _text(rw), \
+        )
+        assert "abgerufen" in _text(rw), (
             f"{z.get('data-anbieter')}: kein Abrufdatum im Rechenweg"
+        )
 
 
 def test_der_zustand_steht_auf_der_zeile(tmp_path):
@@ -317,7 +430,7 @@ def test_der_zustand_steht_auf_der_zeile(tmp_path):
     tafel = s.select_one("#tafel-tco")
     erneuert = tafel.select_one('.gr-bnd[data-zustand="refurbished"]')
     assert erneuert is not None
-    assert _text(erneuert.select_one(".gr-bnd-an")) .endswith("erneuert")
+    assert _text(erneuert.select_one(".gr-bnd-an")).endswith("erneuert")
     assert erneuert.select_one(".gr-kk-marke--zustand") is not None
     # Und die Gegenprobe am selben Bestand: die neu-Zeile trägt KEIN
     # Etikett - sonst wäre 'erneuert' kein Etikett, sondern Zierat.
@@ -336,13 +449,13 @@ def test_die_referenz_nennt_ihre_naehrung_im_rechenweg(tmp_path):
     assert "Referenzrechnung" in _text(ref.select_one(".gr-bnd-an"))
     rw = vorlage_text(ref.select_one("template.gr-bnd-rw-vorlage"))
     assert "noch nicht erhoben" in rw
-    assert "weist zu diesem Gerät keinen Bündelpreis aus" not in \
-        tafel.get_text(" ")
+    assert "weist zu diesem Gerät keinen Bündelpreis aus" not in tafel.get_text(" ")
 
 
 # --------------------------------------------------------------------------
 # Auftrag 2 - "Beschaffung läuft" und leere Platzhalter weg
 # --------------------------------------------------------------------------
+
 
 def test_beschaffung_laeuft_steht_nicht_mehr_in_der_leseflaeche(tmp_path):
     """E2 (§3.1 + Antonio 9b.7): die 'Beschaffung läuft'-Legende der
@@ -373,8 +486,7 @@ def test_keine_leeren_platzhalterkarten_mehr(tmp_path):
     assert ". ." not in legende
 
 
-def test_die_lueckensaetze_des_fragments_bleiben_fuer_das_umschalten(
-        tmp_path):
+def test_die_lueckensaetze_des_fragments_bleiben_fuer_das_umschalten(tmp_path):
     """E2: das Modell-/Band-Umschalten versorgt das lazy Fragment
     `data/geraete-zeitreihe.html` - JEDES (Modell, Band) trägt seinen
     Lückensatz dort (und der Server-Startzustand seinen auf der Seite).
@@ -388,13 +500,15 @@ def test_die_lueckensaetze_des_fragments_bleiben_fuer_das_umschalten(
         if not satz:
             continue
         assert satz.count("Kein Bündel") <= 1, satz
-        assert ", " in satz or "·" in satz, \
+        assert ", " in satz or "·" in satz, (
             "der Sammelsatz gruppiert, er listet nicht je Anbieter"
+        )
 
 
 # --------------------------------------------------------------------------
 # Auftrag 3 - die kompakte Gruppe "Ohne Tarifband"
 # --------------------------------------------------------------------------
+
 
 def test_ohne_tarifband_ist_eigene_gruppe_unter_der_bandliste(tmp_path):
     """Unbegrenzte Tarife und Tarife ohne erhobenes Volumen stehen in
@@ -415,8 +529,10 @@ def test_ohne_tarifband_ist_eigene_gruppe_unter_der_bandliste(tmp_path):
     assert all(z.get("data-band") is None for z in zeilen)
     # Und die Gruppe steht NACH der Bandliste: select() liefert in
     # Dokumentreihenfolge.
-    reihenfolge = [el.get("id") or "gr-bndliste"
-                   for el in tafel.select("#gr-bndliste, #gr-ohneband")]
+    reihenfolge = [
+        el.get("id") or "gr-bndliste"
+        for el in tafel.select("#gr-bndliste, #gr-ohneband")
+    ]
     assert reihenfolge == ["gr-bndliste", "gr-ohneband"], reihenfolge
 
 
@@ -449,13 +565,13 @@ def test_die_bandliste_traegt_ihr_band_als_attribut(tmp_path):
     zeilen = s.select("#gr-bndliste .gr-bnd")
     assert zeilen
     for z in zeilen:
-        assert z.get("data-band") in ("xs", "m", "l"), \
-            z.get("data-band")
+        assert z.get("data-band") in ("xs", "m", "l"), z.get("data-band")
 
 
 # --------------------------------------------------------------------------
 # A2 - die Anzahl der Aufklapper
 # --------------------------------------------------------------------------
+
 
 def test_deutlich_weniger_als_hundert_aufklapper(tmp_path):
     """A2: <details> gesamt in der Vergleichsansicht deutlich unter 100 -
@@ -469,7 +585,8 @@ def test_deutlich_weniger_als_hundert_aufklapper(tmp_path):
     # Und die Mischkarte ist wirklich weg: keine Karte, keine Klappe.
     assert anzahl <= 4 + 3 * 3, (
         f"{anzahl} Aufklapper - mehr als Wie-gerechnet + Maßstab + "
-        "Datenlage + Rest + Rechenwege je Zeile")
+        "Datenlage + Rest + Rechenwege je Zeile"
+    )
 
 
 # --------------------------------------------------------------------------
@@ -478,13 +595,15 @@ def test_deutlich_weniger_als_hundert_aufklapper(tmp_path):
 #   tests/test_wettbewerbsradar_alarme.py beide fest. )
 # --------------------------------------------------------------------------
 
+
 def test_keine_alarmtabelle_mehr_auf_der_geraeteseite(tmp_path):
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
     assert tafel.select_one("#gr-alarme") is None
     assert tafel.select_one(".gr-chips") is None
-    assert tafel.select_one(".gr-a-zeile") is None, \
+    assert tafel.select_one(".gr-a-zeile") is None, (
         "Alarmzeilen stehen noch in der Vergleichsansicht"
+    )
     assert "stehen einem Wettbewerber gegenüber" not in tafel.get_text(" ")
 
 

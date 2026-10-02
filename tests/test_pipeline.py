@@ -1,4 +1,5 @@
 """End-to-end pipeline test with mocked HTTP (no network, no LLM)."""
+
 import shutil
 from datetime import date
 from pathlib import Path
@@ -28,7 +29,9 @@ def project(tmp_path):
     # this end-to-end test exercises the newsroom parser, so enable that path
     # (production keeps crawl_newsrooms: false) and drop auto Bing feeds/focus
     settings = (tmp_path / "config" / "settings.yaml").read_text(encoding="utf-8")
-    settings += "\ncrawl_newsrooms: true\nauto_operator_news: false\nfocus_competitors: []\n"
+    settings += (
+        "\ncrawl_newsrooms: true\nauto_operator_news: false\nfocus_competitors: []\n"
+    )
     # The copied config/ also brings config/promo_sources.yaml. Its "js" brands
     # go through Playwright (collect/newsroom_js.py), which the fake_http
     # fixture below cannot mock (it only patches httpx.get) - so leaving the
@@ -48,14 +51,18 @@ regions:
         sources:
           - type: newsroom
             url: "https://www.example-telco.com/news"
-""", encoding="utf-8")
+""",
+        encoding="utf-8",
+    )
     (tmp_path / "config" / "news_sources.yaml").write_text(
         """
 news_sources:
   - name: "Sample Telco News"
     type: rss
     url: "https://example-telconews.com/feed"
-""", encoding="utf-8")
+""",
+        encoding="utf-8",
+    )
     return tmp_path
 
 
@@ -82,9 +89,9 @@ def test_full_run_no_llm(project, fake_http):
     assert report.exists()
     text = report.read_text(encoding="utf-8")
     assert "Telco Radar" in text
-    assert "Unlimited 5G+" in text            # newsroom item made it in
-    assert "eSIM roaming" in text             # rss item made it in
-    assert "Old story" not in text            # freshness filter worked
+    assert "Unlimited 5G+" in text  # newsroom item made it in
+    assert "eSIM roaming" in text  # rss item made it in
+    assert "Old story" not in text  # freshness filter worked
 
     site = project / "site"
     assert (site / "index.html").exists()
@@ -100,8 +107,8 @@ def test_second_run_reports_nothing_new(project, fake_http):
     report2, _ = pipeline.run(project, use_llm=False, lookback_days=FIXTURE_LOOKBACK)
 
     text = report2.read_text(encoding="utf-8")
-    assert "davon neu: 0" in text             # everything already seen
-    assert "Unlimited 5G+" not in text        # not re-reported
+    assert "davon neu: 0" in text  # everything already seen
+    assert "Unlimited 5G+" not in text  # not re-reported
 
 
 def test_interleave_gives_every_source_a_slot():
@@ -114,9 +121,14 @@ def test_interleave_gives_every_source_a_slot():
     from telco_radar.pipeline import _interleave_by_source
 
     def mk(source, day, operator=None):
-        return Item(title=f"{source} {day}", url=f"https://x.test/{source}/{day}",
-                    source_name=source, region="europa", operator=operator,
-                    published=datetime(2026, 7, day, tzinfo=timezone.utc))
+        return Item(
+            title=f"{source} {day}",
+            url=f"https://x.test/{source}/{day}",
+            source_name=source,
+            region="europa",
+            operator=operator,
+            published=datetime(2026, 7, day, tzinfo=timezone.utc),
+        )
 
     items = [mk("Light Reading", d) for d in (31, 30, 29, 28, 27)]
     items += [mk("Orange Newsroom", 26, "Orange"), mk("Telia Newsroom", 25, "Telia")]
@@ -136,11 +148,22 @@ def test_interleave_keeps_dated_sources_ahead_of_undated():
     from telco_radar.models import Item
     from telco_radar.pipeline import _interleave_by_source
 
-    dated = Item(title="dated", url="https://x.test/a", source_name="A",
-                 region="europa", operator="A",
-                 published=datetime(2026, 7, 30, tzinfo=timezone.utc))
-    undated = Item(title="undated", url="https://x.test/b", source_name="B",
-                   region="europa", operator="B", published=None)
+    dated = Item(
+        title="dated",
+        url="https://x.test/a",
+        source_name="A",
+        region="europa",
+        operator="A",
+        published=datetime(2026, 7, 30, tzinfo=timezone.utc),
+    )
+    undated = Item(
+        title="undated",
+        url="https://x.test/b",
+        source_name="B",
+        region="europa",
+        operator="B",
+        published=None,
+    )
     assert _interleave_by_source([undated, dated])[0].title == "dated"
 
 
@@ -168,13 +191,14 @@ def test_analyst_reads_every_item_when_uncapped():
         agents.analyze_region("Europa", items, model="m", max_items=None)
     assert len(seen_batches) == 3
     for n in range(anzahl):
-        assert any(f"item-{n}\n" in b or f"item-{n} " in b or f"item-{n}" in b
-                   for b in seen_batches), n
+        assert any(
+            f"item-{n}\n" in b or f"item-{n} " in b or f"item-{n}" in b
+            for b in seen_batches
+        ), n
 
     seen_batches.clear()
     with patch.object(agents, "complete", fake_complete):
-        agents.analyze_region("Europa", items, model="m",
-                              max_items=agents.BATCH_SIZE)
+        agents.analyze_region("Europa", items, model="m", max_items=agents.BATCH_SIZE)
     assert len(seen_batches) == 1  # old behaviour still available
 
 
@@ -182,9 +206,15 @@ def _mk_item(n):
     from datetime import datetime, timezone
 
     from telco_radar.models import Item
-    return Item(title=f"item-{n}", url=f"https://x.test/{n}", source_name="S",
-                region="europa", operator=f"Op{n}",
-                published=datetime(2026, 7, 30, tzinfo=timezone.utc))
+
+    return Item(
+        title=f"item-{n}",
+        url=f"https://x.test/{n}",
+        source_name="S",
+        region="europa",
+        operator=f"Op{n}",
+        published=datetime(2026, 7, 30, tzinfo=timezone.utc),
+    )
 
 
 def test_editor_gets_everything_by_default():

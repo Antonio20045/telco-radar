@@ -30,6 +30,7 @@ Sie liegen als Pipeline-State unter data/state/report_images/ und werden bei
 jedem Rendern nach site/images/ kopiert, wie die Promo-Screenshots auch -
 nie von Hand in site/ legen.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -45,12 +46,13 @@ import httpx
 
 log = logging.getLogger(__name__)
 
-_MAX_BYTES = 6_000_000       # Rohdaten; verkleinert wird danach
+_MAX_BYTES = 6_000_000  # Rohdaten; verkleinert wird danach
 _TIMEOUT = 10.0
-_UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
-       "(KHTML, like Gecko) Chrome/126.0 Safari/537.36")
-_ERLAUBTE_TYPEN = ("image/jpeg", "image/png", "image/webp", "image/avif",
-                   "image/jpg")
+_UA = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+    "(KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+)
+_ERLAUBTE_TYPEN = ("image/jpeg", "image/png", "image/webp", "image/avif", "image/jpg")
 
 # Wie viele Meldungen gleichzeitig bearbeitet werden. Jede kostet bis zu
 # drei Abrufe (Artikelseite + zwei Bilder); 12 gleichzeitig halten die
@@ -78,9 +80,17 @@ _MIND_BREITE = 400
 MIND_BREITE_GROSS = 800
 
 _OG_RE = (
-    re.compile(r'<meta[^>]+property=["\']og:image(?::url)?["\'][^>]+content=["\']([^"\']+)', re.I),
-    re.compile(r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:image(?::url)?["\']', re.I),
-    re.compile(r'<meta[^>]+name=["\']twitter:image["\'][^>]+content=["\']([^"\']+)', re.I),
+    re.compile(
+        r'<meta[^>]+property=["\']og:image(?::url)?["\'][^>]+content=["\']([^"\']+)',
+        re.I,
+    ),
+    re.compile(
+        r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:image(?::url)?["\']',
+        re.I,
+    ),
+    re.compile(
+        r'<meta[^>]+name=["\']twitter:image["\'][^>]+content=["\']([^"\']+)', re.I
+    ),
 )
 # Logos, Zaehlpixel und Platzhalter sehen aus wie Bilder und sind keine.
 #
@@ -92,7 +102,9 @@ _OG_RE = (
 # ein 60x60-Logo faellt ohnehin durch `_MIND_BREITE`.
 _MUELL = re.compile(
     r"(logo|sprite|favicon|/icons?[-_/.]|placeholder|avatar|1x1|"
-    r"pixel|spacer|blank)", re.I)
+    r"pixel|spacer|blank)",
+    re.I,
+)
 
 
 def bildordner(root: Path) -> Path:
@@ -134,7 +146,7 @@ def _hol(bild_url: str, client: httpx.Client) -> bytes:
         typ = r.headers.get("content-type", "").split(";")[0].strip().lower()
         if typ not in _ERLAUBTE_TYPEN or len(r.content) > _MAX_BYTES:
             return b""
-        if len(r.content) < 2_000:   # Zaehlpixel oder kaputter Platzhalter
+        if len(r.content) < 2_000:  # Zaehlpixel oder kaputter Platzhalter
             return b""
         return r.content
     except (httpx.HTTPError, OSError) as exc:
@@ -149,9 +161,10 @@ def masse(daten: bytes) -> tuple[int, int]:
     """
     try:
         from PIL import Image
+
         with Image.open(io.BytesIO(daten)) as im:
             return im.size
-    except Exception:                # noqa: BLE001 - jedes kaputte Bild faellt hier durch
+    except Exception:  # noqa: BLE001 - jedes kaputte Bild faellt hier durch
         return (0, 0)
 
 
@@ -181,13 +194,13 @@ def auf_weiss(im):
     Rahmen, sobald er neben einem weissen Motiv steht.
     """
     from PIL import Image
-    if im.mode in ("RGBA", "LA") or (im.mode == "P"
-                                     and "transparency" in im.info):
+
+    if im.mode in ("RGBA", "LA") or (im.mode == "P" and "transparency" in im.info):
         rgba = im.convert("RGBA")
         grund = Image.new("RGB", rgba.size, (255, 255, 255))
         grund.paste(rgba, mask=rgba.split()[-1])
         return grund
-    return im.convert("RGB")          # Palette, Graustufe, CMYK
+    return im.convert("RGB")  # Palette, Graustufe, CMYK
 
 
 def ist_leer(daten: bytes) -> bool:
@@ -206,10 +219,11 @@ def ist_leer(daten: bytes) -> bool:
     """
     try:
         from PIL import Image, ImageStat
+
         with Image.open(io.BytesIO(daten)) as im:
             grau = auf_weiss(im).convert("L")
             return ImageStat.Stat(grau).stddev[0] < _MIND_STREUUNG
-    except Exception:                # noqa: BLE001 - unlesbar zeigt auch nichts
+    except Exception:  # noqa: BLE001 - unlesbar zeigt auch nichts
         return True
 
 
@@ -220,14 +234,14 @@ def _schreibe(daten: bytes, ziel: Path, max_breite: int) -> tuple[int, int]:
     die Seite spaeter rechnet, nicht die des Originals.
     """
     from PIL import Image
+
     with Image.open(io.BytesIO(daten)) as im:
-        im = auf_weiss(im)           # PNG mit Alpha, Palette, CMYK
+        im = auf_weiss(im)  # PNG mit Alpha, Palette, CMYK
         if im.width > max_breite:
             hoehe = max(1, round(im.height * max_breite / im.width))
             im = im.resize((max_breite, hoehe), Image.LANCZOS)
         ziel.parent.mkdir(parents=True, exist_ok=True)
-        im.save(ziel, "JPEG", quality=_JPEG_QUALITAET, optimize=True,
-                progressive=True)
+        im.save(ziel, "JPEG", quality=_JPEG_QUALITAET, optimize=True, progressive=True)
         return im.size
 
 
@@ -237,9 +251,13 @@ def _dateiname(bild_url: str, max_breite: int) -> str:
     return f"{hashlib.sha1(bild_url.encode('utf-8')).hexdigest()[:16]}-{max_breite}.jpg"
 
 
-def lade_und_lege_ab(bild_url: str, ordner: Path, max_breite: int,
-                     client: httpx.Client,
-                     mind_breite: int = _MIND_BREITE) -> tuple[str, int, int] | None:
+def lade_und_lege_ab(
+    bild_url: str,
+    ordner: Path,
+    max_breite: int,
+    client: httpx.Client,
+    mind_breite: int = _MIND_BREITE,
+) -> tuple[str, int, int] | None:
     """Holt EIN Bild, misst es, verkleinert es und legt es ab.
 
     Gibt `(dateiname, breite, hoehe)` der abgelegten Datei zurueck - oder
@@ -269,14 +287,15 @@ def lade_und_lege_ab(bild_url: str, ordner: Path, max_breite: int,
         return None
     try:
         breite, hoehe = _schreibe(daten, fertig, max_breite)
-    except Exception as exc:         # noqa: BLE001 - ein kaputtes Bild kippt keinen Lauf
+    except Exception as exc:  # noqa: BLE001 - ein kaputtes Bild kippt keinen Lauf
         log.debug("Bild konnte nicht abgelegt werden (%s): %s", bild_url, exc)
         return None
     return fertig.name, breite, hoehe
 
 
-def _eine_meldung(h: dict, ordner: Path, client: httpx.Client,
-                  max_breite: int) -> Counter:
+def _eine_meldung(
+    h: dict, ordner: Path, client: httpx.Client, max_breite: int
+) -> Counter:
     """Beschafft das beste verfuegbare Bild EINER Meldung.
 
     Setzt bei Erfolg h["image"], h["image_w"], h["image_h"].
@@ -347,7 +366,7 @@ def _eine_meldung(h: dict, ordner: Path, client: httpx.Client,
     try:
         ziel = ordner / _dateiname(url, max_breite)
         breite, hoehe = _schreibe(daten, ziel, max_breite)
-    except Exception as exc:         # noqa: BLE001 - ein kaputtes Bild kippt keinen Lauf
+    except Exception as exc:  # noqa: BLE001 - ein kaputtes Bild kippt keinen Lauf
         log.debug("Bild konnte nicht abgelegt werden (%s): %s", url, exc)
         z["schreibfehler"] += 1
         return z
@@ -356,8 +375,7 @@ def _eine_meldung(h: dict, ordner: Path, client: httpx.Client,
     return z
 
 
-def hole_bilder(highlights: list[dict], root: Path,
-                gross_bis_rang: int = 40) -> dict:
+def hole_bilder(highlights: list[dict], root: Path, gross_bis_rang: int = 40) -> dict:
     """Beschafft Bilder fuer ALLE Meldungen und stempelt sie ein.
 
     Setzt `h["image"]` auf den Dateinamen im Bildordner sowie `h["image_w"]`
@@ -376,31 +394,34 @@ def hole_bilder(highlights: list[dict], root: Path,
     Unterschied nirgends.
     """
     ordner = bildordner(root)
-    kandidaten = sorted(highlights, key=lambda h: (h.get("relevance") or 0),
-                        reverse=True)
+    kandidaten = sorted(highlights, key=lambda h: h.get("relevance") or 0, reverse=True)
     if not kandidaten:
         return dict(Counter())
 
     bilanz: Counter = Counter()
-    with httpx.Client(headers={"User-Agent": _UA}, timeout=_TIMEOUT,
-                      follow_redirects=True) as client:
+    with httpx.Client(
+        headers={"User-Agent": _UA}, timeout=_TIMEOUT, follow_redirects=True
+    ) as client:
+
         def arbeite(paar: tuple[int, dict]) -> Counter:
             i, h = paar
             breite = _BREIT_GROSS if i < gross_bis_rang else _BREIT_KLEIN
             try:
                 return _eine_meldung(h, ordner, client, breite)
             except Exception as exc:  # noqa: BLE001
-                log.debug("Bildbeschaffung fuer %s gescheitert: %s",
-                          h.get("url"), exc)
+                log.debug("Bildbeschaffung fuer %s gescheitert: %s", h.get("url"), exc)
                 return Counter(geprueft=1, fehler=1)
 
         with ThreadPoolExecutor(max_workers=_GLEICHZEITIG) as pool:
             for teil in pool.map(arbeite, enumerate(kandidaten)):
                 bilanz.update(teil)
 
-    log.info("Bilder: %d von %d Meldungen haben eins (%s)",
-             bilanz["geladen"], bilanz["geprueft"],
-             ", ".join(f"{k}={v}" for k, v in sorted(bilanz.items())))
+    log.info(
+        "Bilder: %d von %d Meldungen haben eins (%s)",
+        bilanz["geladen"],
+        bilanz["geprueft"],
+        ", ".join(f"{k}={v}" for k, v in sorted(bilanz.items())),
+    )
     return dict(bilanz)
 
 
@@ -414,13 +435,18 @@ def raeume_auf(root: Path, reports_dir: Path, behalte_berichte: int = 4) -> int:
     aus, das ist von Anfang an so gebaut).
     """
     import json
+
     ordner = bildordner(root)
     if not ordner.exists():
         return 0
     berichte = sorted(
-        (f for f in reports_dir.glob("*.json")
-         if re.fullmatch(r"\d{4}-\d{2}-\d{2}", f.stem)),
-        reverse=True)[:behalte_berichte]
+        (
+            f
+            for f in reports_dir.glob("*.json")
+            if re.fullmatch(r"\d{4}-\d{2}-\d{2}", f.stem)
+        ),
+        reverse=True,
+    )[:behalte_berichte]
     gebraucht: set[str] = set()
     for f in berichte:
         try:
@@ -440,6 +466,5 @@ def raeume_auf(root: Path, reports_dir: Path, behalte_berichte: int = 4) -> int:
             except OSError:
                 pass
     if geloescht:
-        log.info("Bilder aufgeraeumt: %d nicht mehr referenzierte geloescht",
-                 geloescht)
+        log.info("Bilder aufgeraeumt: %d nicht mehr referenzierte geloescht", geloescht)
     return geloescht

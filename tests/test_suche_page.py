@@ -15,11 +15,17 @@ ist suche.html ein Dossier und keine Trefferliste.
 Die Aggregationslogik ist unabhaengig davon in test_search_index.py
 abgesichert.
 """
+
 from telco_radar.report.html import render_site
 
 # Die vier Seiten der Marktrecherche nach dem Redesign.
-SEITEN = ("index.html", "meldungen.html", "differenzierung.html",
-          "wettbewerb.html", "transparenz.html")
+SEITEN = (
+    "index.html",
+    "meldungen.html",
+    "differenzierung.html",
+    "wettbewerb.html",
+    "transparenz.html",
+)
 
 
 def test_die_suchseite_traegt_das_dossier_und_referenziert_den_index(tmp_path):
@@ -34,7 +40,7 @@ def test_die_suchseite_traegt_das_dossier_und_referenziert_den_index(tmp_path):
     assert 'id="dossier-input"' in suche
     assert 'id="dossier-bilanz"' in suche
     assert 'id="dossier-treffer"' in suche
-    assert 'id="dossier-verlauf"' in suche      # die Entwicklung ueber Monate
+    assert 'id="dossier-verlauf"' in suche  # die Entwicklung ueber Monate
     assert 'id="dossier-filter"' in suche
 
     # search_index.json entsteht daneben und ist das, was app.js laedt.
@@ -54,8 +60,12 @@ def test_die_suche_steht_nicht_mehr_am_fuss_der_meldungsseite(tmp_path):
     render_site(site_dir, reports_dir, cfg=None)
 
     meldungen = (site_dir / "meldungen.html").read_text(encoding="utf-8")
-    for tot in ('id="suche-input"', 'id="suche-count"', 'id="suche-results"',
-                "Im Gesamtarchiv suchen"):
+    for tot in (
+        'id="suche-input"',
+        'id="suche-count"',
+        'id="suche-results"',
+        "Im Gesamtarchiv suchen",
+    ):
         assert tot not in meldungen, tot
     # Und kein toter CSS-Block zurueckgeblieben.
     assert "meldungen-suche" not in (site_dir / "style.css").read_text(encoding="utf-8")
@@ -127,8 +137,13 @@ def test_navigation_hat_fuenf_eintraege(tmp_path):
 
     html = (site_dir / "index.html").read_text(encoding="utf-8")
     nav = html.split('aria-label="Marktrecherche"')[1].split("</nav>")[0]
-    for ziel in ("index.html", "meldungen.html", "differenzierung.html",
-                 "wettbewerb.html", "transparenz.html"):
+    for ziel in (
+        "index.html",
+        "meldungen.html",
+        "differenzierung.html",
+        "wettbewerb.html",
+        "transparenz.html",
+    ):
         assert f'href="{ziel}"' in nav
     # Die Rubrik heisst "Quellen" - "Transparenz" war Behoerdendeutsch.
     assert ">Quellen</a>" in nav
@@ -136,15 +151,23 @@ def test_navigation_hat_fuenf_eintraege(tmp_path):
     assert nav.count("<a ") == 5
     # Die aufgeloesten Seiten duerfen nicht mehr in der Navigation stehen -
     # und die zwei unter der Schwelle ebenfalls nicht.
-    for weg in ("bericht.html", "archive.html", "sources.html",
-                "protokoll.html", "wettbewerber.html", "suche.html",
-                "tarife.html", "lieferzeit.html", "newsletter.html",
-                "wettbewerbsradar.html"):
+    for weg in (
+        "bericht.html",
+        "archive.html",
+        "sources.html",
+        "protokoll.html",
+        "wettbewerber.html",
+        "suche.html",
+        "tarife.html",
+        "lieferzeit.html",
+        "newsletter.html",
+        "wettbewerbsradar.html",
+    ):
         assert f'href="{weg}"' not in nav
 
 
 def test_seiten_unter_der_schwelle_werden_gebaut_aber_nicht_verlinkt(tmp_path):
-    """"Nicht verlinkt" heisst nicht "weg".
+    """ "Nicht verlinkt" heisst nicht "weg".
 
     Eine Seite unter der Veroeffentlichungsschwelle wird weiter gebaut und
     ist ueber ihren direkten Link erreichbar - sonst waere die Schwelle eine

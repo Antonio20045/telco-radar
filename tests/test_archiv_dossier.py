@@ -5,6 +5,7 @@ Der Test, der den Auftrag entscheidet, ist
 Archiv gibt, muss zu "nichts gefunden" fuehren - nicht zu einer freundlich
 formulierten Erfindung.
 """
+
 from __future__ import annotations
 
 import json
@@ -13,36 +14,61 @@ from pathlib import Path
 import pytest
 
 from telco_radar.report.archiv_dossier import (
-    MIND_SCORE, ArchivIndex, als_dict, frage, verlauf, zerlege,
+    MIND_SCORE,
+    ArchivIndex,
+    als_dict,
+    frage,
+    verlauf,
+    zerlege,
 )
 
 
 def _e(titel: str, summary: str = "", **kw) -> dict:
-    d = {"kind": "bericht", "title": titel, "summary": summary,
-         "operator": kw.pop("operator", ""), "category": kw.pop("category", ""),
-         "source_label": kw.pop("quelle", "presse"),
-         "url": kw.pop("url", f"https://x.de/{abs(hash(titel)) % 10000}"),
-         "date": kw.pop("date", "2026-08-01")}
+    d = {
+        "kind": "bericht",
+        "title": titel,
+        "summary": summary,
+        "operator": kw.pop("operator", ""),
+        "category": kw.pop("category", ""),
+        "source_label": kw.pop("quelle", "presse"),
+        "url": kw.pop("url", f"https://x.de/{abs(hash(titel)) % 10000}"),
+        "date": kw.pop("date", "2026-08-01"),
+    }
     d.update(kw)
     return d
 
 
 ARCHIV = [
-    _e("Telekom hebt den Preis für MagentaMobil L an",
-       "Der Grundpreis steigt von 59,95 auf 64,95 Euro.",
-       operator="Deutsche Telekom", date="2026-07-04"),
-    _e("o2 senkt den Preis für unbegrenzte Tarife",
-       "Unlimited Max kostet künftig 10 Euro weniger im Monat.",
-       operator="o2", date="2026-07-18"),
-    _e("Vodafone bündelt Streaming in den Mobilfunktarif",
-       "Ein Streamingdienst liegt dem Tarif bei.",
-       operator="Vodafone", date="2026-08-01"),
-    _e("1&1 startet Wechselbonus für Neukunden",
-       "Bis zu 100 Euro Bonus bei Rufnummernmitnahme.",
-       operator="1&1", date="2026-08-05"),
-    _e("MTN übernimmt IHS Towers",
-       "Der Funkturmbetreiber wechselt den Eigentümer.",
-       operator="MTN", date="2026-06-02"),
+    _e(
+        "Telekom hebt den Preis für MagentaMobil L an",
+        "Der Grundpreis steigt von 59,95 auf 64,95 Euro.",
+        operator="Deutsche Telekom",
+        date="2026-07-04",
+    ),
+    _e(
+        "o2 senkt den Preis für unbegrenzte Tarife",
+        "Unlimited Max kostet künftig 10 Euro weniger im Monat.",
+        operator="o2",
+        date="2026-07-18",
+    ),
+    _e(
+        "Vodafone bündelt Streaming in den Mobilfunktarif",
+        "Ein Streamingdienst liegt dem Tarif bei.",
+        operator="Vodafone",
+        date="2026-08-01",
+    ),
+    _e(
+        "1&1 startet Wechselbonus für Neukunden",
+        "Bis zu 100 Euro Bonus bei Rufnummernmitnahme.",
+        operator="1&1",
+        date="2026-08-05",
+    ),
+    _e(
+        "MTN übernimmt IHS Towers",
+        "Der Funkturmbetreiber wechselt den Eigentümer.",
+        operator="MTN",
+        date="2026-06-02",
+    ),
 ]
 
 
@@ -54,6 +80,7 @@ def index() -> ArchivIndex:
 # --------------------------------------------------------------------------- #
 # Die Zusage des Auftrags
 # --------------------------------------------------------------------------- #
+
 
 def test_frage_ohne_treffer_erfindet_nichts(index):
     """DER Test dieses Moduls.
@@ -103,11 +130,11 @@ def test_frage_ohne_begriffe(index):
 # BM25: seltene Woerter tragen die Frage
 # --------------------------------------------------------------------------- #
 
+
 def test_seltener_begriff_schlaegt_haeufigen(index):
-    """"Wie hat sich der Preis unbegrenzter Tarife entwickelt" enthaelt vier
+    """ "Wie hat sich der Preis unbegrenzter Tarife entwickelt" enthaelt vier
     haeufige und zwei seltene Woerter - nur die seltenen tragen die Frage."""
-    antwort = frage(index, "Wie hat sich der Preis für unbegrenzte Tarife "
-                           "entwickelt?")
+    antwort = frage(index, "Wie hat sich der Preis für unbegrenzte Tarife entwickelt?")
     assert antwort.belege[0].titel.startswith("o2 senkt den Preis")
 
 
@@ -117,8 +144,7 @@ def test_treffer_werden_benannt(index):
 
 
 def test_stoppwoerter_fliegen_raus():
-    assert zerlege("Die Frage ist, was der Preis macht") == ["frage", "preis",
-                                                             "macht"]
+    assert zerlege("Die Frage ist, was der Preis macht") == ["frage", "preis", "macht"]
 
 
 def test_zerlege_vertraegt_leer():
@@ -157,26 +183,28 @@ def test_lange_eintraege_werden_nicht_bevorzugt():
 # Form der Antwort
 # --------------------------------------------------------------------------- #
 
+
 def test_antwort_ist_gedeckelt(index):
     viele = [_e(f"Preis Meldung {i}", "Preis Preis") for i in range(40)]
-    antwort = frage(ArchivIndex(viele), "Preis", max_belege=5,
-                    mind_score=OHNE_SCHWELLE)
+    antwort = frage(ArchivIndex(viele), "Preis", max_belege=5, mind_score=OHNE_SCHWELLE)
     assert len(antwort.belege) == 5
 
 
 def test_dubletten_erscheinen_einmal():
-    doppelt = [_e("A", "Wechselbonus", url="https://x.de/1"),
-               _e("B", "Wechselbonus", url="https://x.de/1")]
-    antwort = frage(ArchivIndex(doppelt), "Wechselbonus",
-                    mind_score=OHNE_SCHWELLE)
+    doppelt = [
+        _e("A", "Wechselbonus", url="https://x.de/1"),
+        _e("B", "Wechselbonus", url="https://x.de/1"),
+    ]
+    antwort = frage(ArchivIndex(doppelt), "Wechselbonus", mind_score=OHNE_SCHWELLE)
     assert len(antwort.belege) == 1
 
 
 def test_bei_gleichstand_zuerst_das_juengere():
-    gleich = [_e("Alt", "Wechselbonus", url="https://x.de/1", date="2026-01-01"),
-              _e("Neu", "Wechselbonus", url="https://x.de/2", date="2026-08-01")]
-    antwort = frage(ArchivIndex(gleich), "Wechselbonus",
-                    mind_score=OHNE_SCHWELLE)
+    gleich = [
+        _e("Alt", "Wechselbonus", url="https://x.de/1", date="2026-01-01"),
+        _e("Neu", "Wechselbonus", url="https://x.de/2", date="2026-08-01"),
+    ]
+    antwort = frage(ArchivIndex(gleich), "Wechselbonus", mind_score=OHNE_SCHWELLE)
     assert antwort.belege[0].titel == "Neu"
 
 
@@ -210,6 +238,7 @@ def test_mind_score_ist_wirksam(index):
 # Gegen den echten Suchindex
 # --------------------------------------------------------------------------- #
 
+
 def test_laeuft_gegen_den_echten_bestand():
     """Nicht gegen ein Konstrukt: gegen die Meldungen, die wirklich im
     Archiv stehen."""
@@ -219,11 +248,11 @@ def test_laeuft_gegen_den_echten_bestand():
         pytest.skip("kein Bericht im Archiv")
 
     from telco_radar.report import suchindex
+
     bericht = json.loads(berichte[-1].read_text(encoding="utf-8"))
     eintraege = []
     regionen = bericht.get("regions") or {}
-    for inhalt in (regionen.values() if isinstance(regionen, dict)
-                   else regionen):
+    for inhalt in regionen.values() if isinstance(regionen, dict) else regionen:
         for h in (inhalt or {}).get("highlights") or []:
             eintraege.append(suchindex.eintrag_bericht(h, bericht["date"]))
     if not eintraege:
@@ -245,9 +274,16 @@ def test_laeuft_gegen_den_echten_bestand():
 # Python und Browser muessen dasselbe antworten
 # --------------------------------------------------------------------------- #
 
+
 def _app_js() -> str:
-    return (Path(__file__).resolve().parents[1] / "src" / "telco_radar" /
-            "report" / "templates" / "app.js").read_text(encoding="utf-8")
+    return (
+        Path(__file__).resolve().parents[1]
+        / "src"
+        / "telco_radar"
+        / "report"
+        / "templates"
+        / "app.js"
+    ).read_text(encoding="utf-8")
 
 
 def test_js_fassung_nutzt_dieselben_konstanten():
@@ -257,13 +293,18 @@ def test_js_fassung_nutzt_dieselben_konstanten():
     Test - und niemand merkt es, weil beide fuer sich gruen sind.
     """
     from telco_radar.report import archiv_dossier as ad
+
     js = _app_js()
-    assert "var K1 = %s, B = %s, MIND_SCORE = %s, MAX_BELEGE = %d;" % (
-        ad.K1, ad.B, ad.MIND_SCORE, ad.MAX_BELEGE) in js
+    assert (
+        "var K1 = %s, B = %s, MIND_SCORE = %s, MAX_BELEGE = %d;"
+        % (ad.K1, ad.B, ad.MIND_SCORE, ad.MAX_BELEGE)
+        in js
+    )
 
 
 def test_js_fassung_kennt_dieselben_stoppwoerter():
     from telco_radar.report import archiv_dossier as ad
+
     js = _app_js()
     block = js.split("var STOPP = (")[1].split(").split(' ')")[0]
     im_js = set(block.replace("'", "").replace("+", "").split())
@@ -272,6 +313,7 @@ def test_js_fassung_kennt_dieselben_stoppwoerter():
 
 def test_js_fassung_sagt_dasselbe_wenn_nichts_gefunden():
     from telco_radar.report import archiv_dossier as ad
+
     leer = frage(ArchivIndex([]), "x")
     js = _app_js()
     assert "Das Archiv ist leer." in js
@@ -284,6 +326,12 @@ def test_js_fassung_sagt_dasselbe_wenn_nichts_gefunden():
 
 
 def test_suchseite_hat_den_behaelter_fuer_die_antwort():
-    tpl = (Path(__file__).resolve().parents[1] / "src" / "telco_radar" /
-           "report" / "templates" / "suche.html.j2").read_text(encoding="utf-8")
+    tpl = (
+        Path(__file__).resolve().parents[1]
+        / "src"
+        / "telco_radar"
+        / "report"
+        / "templates"
+        / "suche.html.j2"
+    ).read_text(encoding="utf-8")
     assert 'id="dossier-antwort"' in tpl

@@ -11,6 +11,7 @@ Die Do-Not-Liste des Auftrags als Messung:
   §3.4  Der Zeitreihen-Graph ersetzt ALLE frueheren Graph-Formen der
         Hauptansicht (Balkenliste, G1, Antwort-Leitzeilen).
 """
+
 from __future__ import annotations
 
 import json
@@ -29,10 +30,18 @@ def seite_html(tmp_path_factory):
     root, state = _baue(tmp_path_factory.mktemp("zrseite"))
     reports = root / "data" / "reports"
     reports.mkdir(parents=True, exist_ok=True)
-    (reports / f"{HEUTE}.json").write_text(json.dumps({
-        "date": HEUTE, "language": "de",
-        "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
-        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{HEUTE}.json").write_text(
+        json.dumps(
+            {
+                "date": HEUTE,
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     (reports / f"{HEUTE}.md").write_text("# B\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
@@ -53,17 +62,24 @@ def tafel(suppe):
 # §3.4 - der Zeitreihen-Graph ersetzt alle frueheren Graph-Formen
 # --------------------------------------------------------------------------
 
+
 def test_der_startzustand_steht_serverseitig_als_svg(tafel):
     svg = tafel.select_one("svg.gr-zr")
     assert svg is not None
     assert svg.select("circle.gr-zr-punkt"), "der Graph braucht Punkte"
-    assert tafel.select("text.gr-zr-xtick"), \
-        "die X-Achse braucht echte Messtag-Ticks"
+    assert tafel.select("text.gr-zr-xtick"), "die X-Achse braucht echte Messtag-Ticks"
 
 
 def test_die_balkenliste_und_die_alten_graphformen_sind_weg(tafel):
-    for tot in (".gr-hgraph", ".gr-balkenliste", ".gr-bz", ".gr-msel",
-                ".gr-antwort-leit", "svg.gr-g0", "svg.gr-g1"):
+    for tot in (
+        ".gr-hgraph",
+        ".gr-balkenliste",
+        ".gr-bz",
+        ".gr-msel",
+        ".gr-antwort-leit",
+        "svg.gr-g0",
+        "svg.gr-g1",
+    ):
         assert tafel.select(tot) == [], f"Rest der alten Form: {tot}"
 
 
@@ -86,6 +102,7 @@ def test_der_glossar_und_wie_gerechnet_sind_weg(suppe, tafel):
 # §4.2 - Wahl-Leiste, Antwort-Satz, Graph - in dieser Reihenfolge
 # --------------------------------------------------------------------------
 
+
 def test_zwischen_wahl_leiste_und_graph_steht_nur_der_antwort_satz(tafel):
     wahl = tafel.select_one(".gr-zr-wahl")
     kacheln = tafel.select_one(".gr-zr-kacheln")
@@ -94,25 +111,31 @@ def test_zwischen_wahl_leiste_und_graph_steht_nur_der_antwort_satz(tafel):
     assert all(e is not None for e in (wahl, antwort, graph))
     # DOM-Reihenfolge: Wahl < Kacheln < Antwort < Graph (§4.2) - nichts
     # Unbenanntes darf dazwischenrutschen.
-    positionen = [e.sourceline for e in (wahl, kacheln, antwort, graph)
-                  if e is not None]
+    positionen = [
+        e.sourceline for e in (wahl, kacheln, antwort, graph) if e is not None
+    ]
     assert positionen == sorted(positionen)
     # Der Antwort-Satz ist das EINZIGE Element zwischen Wahl-Leiste bzw.
     # Kacheln und dem Graphen, das kein Aufklapper und keine Tabelle ist.
-    zwischen = [e for e in tafel.select(".gr-zr-wahl ~ *")
-                if e.sourceline < graph.sourceline
-                and e.name not in ("script",)
-                and not any(k.startswith("gr-zr") or k.startswith("gr-bnd")
-                            for k in (e.get("class") or []))]
-    assert zwischen == [], \
+    zwischen = [
+        e
+        for e in tafel.select(".gr-zr-wahl ~ *")
+        if e.sourceline < graph.sourceline
+        and e.name not in ("script",)
+        and not any(
+            k.startswith("gr-zr") or k.startswith("gr-bnd")
+            for k in (e.get("class") or [])
+        )
+    ]
+    assert zwischen == [], (
         f"unbekanntes Element zwischen Wahl und Graph: {[e.name for e in zwischen]}"
+    )
 
 
 def test_die_wahl_leiste_traegt_suchfeld_band_und_kacheln(tafel):
     assert tafel.select_one("#gr-zr-suche") is not None
     knoepfe = tafel.select("#gr-zr-baender button[data-band]")
-    assert [k.get("data-band") for k in knoepfe] == \
-        ["xs", "m", "l"]
+    assert [k.get("data-band") for k in knoepfe] == ["xs", "m", "l"]
     kacheln = tafel.select("#gr-zr-kacheln button[data-modell]")
     assert 1 <= len(kacheln) <= 6
 
@@ -143,9 +166,11 @@ def test_jede_karte_traegt_preis_und_anbieter_punkte(tafel):
         assert k.select(".gr-zr-k-punkte i"), "Karte ohne Anbieter-Punkte"
         # Eine Bewegung steht nur, wenn sich etwas bewegt hat (28.09.2026).
         delta = k.select_one(".gr-zr-k-delta")
-        assert delta is None or ("€" in delta.get_text()
-                                 and "Tag" in delta.get_text()
-                                 and "±0" not in delta.get_text())
+        assert delta is None or (
+            "€" in delta.get_text()
+            and "Tag" in delta.get_text()
+            and "±0" not in delta.get_text()
+        )
         assert "€" in k.get_text()
 
 
@@ -156,24 +181,24 @@ def test_kein_weiterer_aufklapper_ueber_dem_graphen(tafel):
     graph = tafel.select_one(".gr-zr-graph")
     for details in tafel.select("details"):
         if details.select_one(".gr-zr-graph") is not None:
-            continue                      # der Fuss-Aufklapper umfasst mehr
-        vor_graph = details.sourceline < graph.sourceline \
-            if graph else False
+            continue  # der Fuss-Aufklapper umfasst mehr
+        vor_graph = details.sourceline < graph.sourceline if graph else False
         inhalt = " ".join(details.get_text(" ", strip=True).split())[:60]
         if vor_graph and "gr-bnd" not in (details.get("class") or []):
-            assert "gr-zr-rechnung" in (details.get("class") or []), \
+            assert "gr-zr-rechnung" in (details.get("class") or []), (
                 f"unerwarteter Aufklapper ueber dem Graphen: {inhalt}"
+            )
 
 
 # --------------------------------------------------------------------------
 # §3.1c - der Fuss-Aufklapper "Massstab & Datenlage"
 # --------------------------------------------------------------------------
 
+
 def test_der_fuss_aufklapper_heisst_massstab_und_datenlage(tafel):
     fuss = tafel.select_one("details#gr-massstab-datenlage")
     assert fuss is not None
-    assert "Maßstab & Datenlage" in fuss.select_one("summary").get_text(
-        " ", strip=True)
+    assert "Maßstab & Datenlage" in fuss.select_one("summary").get_text(" ", strip=True)
 
 
 def test_zwei_separate_fuss_aufklapper_gibt_es_nicht_mehr(tafel):
@@ -184,13 +209,15 @@ def test_zwei_separate_fuss_aufklapper_gibt_es_nicht_mehr(tafel):
 def test_die_buendel_zeilen_bleiben_unter_dem_graphen(tafel):
     assert tafel.select_one("#gr-buendel") is not None
     assert tafel.select(".gr-bnd"), "die Anbieterzeilen fehlen"
-    assert tafel.select(".gr-bnd .gr-bnd-rw"), \
+    assert tafel.select(".gr-bnd .gr-bnd-rw"), (
         "der Rechenweg-Aufklapper je Zeile fehlt (§3.1b)"
+    )
 
 
 # --------------------------------------------------------------------------
 # Der Client-Knoten - Interaktion ohne Zahlen
 # --------------------------------------------------------------------------
+
 
 def test_der_zeitreihe_knoten_traegt_startzustand_und_suchindex(suppe):
     knoten = suppe.select_one("#gr-zeitreihe-daten")
@@ -211,16 +238,26 @@ def test_der_grafik_daten_knoten_ist_weg(suppe):
 
 def test_das_fragment_traegt_alle_pare_und_den_startzustand(tmp_path_factory):
     import pathlib
+
     root, state = _baue(tmp_path_factory.mktemp("zrfrag"))
     reports = root / "data" / "reports"
     reports.mkdir(parents=True, exist_ok=True)
-    (reports / f"{HEUTE}.json").write_text(json.dumps({
-        "date": HEUTE, "language": "de", "briefing_md": "## Auf einen Blick",
-        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{HEUTE}.json").write_text(
+        json.dumps(
+            {
+                "date": HEUTE,
+                "language": "de",
+                "briefing_md": "## Auf einen Blick",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     (reports / f"{HEUTE}.md").write_text("# B\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
-    fragment = (site / "data" / "geraete-zeitreihe.html")
+    fragment = site / "data" / "geraete-zeitreihe.html"
     assert fragment.exists(), "das Zeitreihen-Fragment fehlt"
     inhalt = fragment.read_text(encoding="utf-8")
     frag = BeautifulSoup(inhalt, "html.parser")

@@ -10,6 +10,7 @@ laut Premortem stirbt - nicht die, die sich leicht pruefen lassen:
   - die Stufe kostet den Bericht nie
   - der Link zum Original bleibt stehen
 """
+
 from __future__ import annotations
 
 import json
@@ -24,8 +25,7 @@ from telco_radar.uebersetzung import sprache as sprache_mod
 from telco_radar.uebersetzung import stufe as stufe_mod
 from telco_radar.uebersetzung import uebersetzer as u_mod
 from telco_radar.uebersetzung import volltext as volltext_mod
-from telco_radar.uebersetzung.store import (
-    UebersetzungsStore, Uebersetzung, text_hash)
+from telco_radar.uebersetzung.store import UebersetzungsStore, Uebersetzung, text_hash
 
 
 # --------------------------------------------------------------- Fixtures
@@ -50,8 +50,9 @@ ENGLISCH = (
 
 
 def _item(**kw):
-    basis = dict(title="Titel", url="https://beispiel.test/artikel/1",
-                 source_name="Testquelle")
+    basis = dict(
+        title="Titel", url="https://beispiel.test/artikel/1", source_name="Testquelle"
+    )
     basis.update(kw)
     return Item(**basis)
 
@@ -76,10 +77,12 @@ def test_englischer_fliesstext_gilt_als_fremdsprachig():
 
 def test_deutscher_text_bekommt_keine_uebersetzung():
     """Die einzige echte Muttersprache, die uebrig bleibt (E5, 27.08.2026)."""
-    text = ("Die Bundesnetzagentur hat am Mittwoch mitgeteilt, dass die "
-            "Vergabe der Frequenzen im kommenden Jahr stattfinden soll. Die "
-            "Behoerde nannte dabei weder einen genauen Termin noch die "
-            "Bedingungen, unter denen die Anbieter mitbieten duerfen. ") * 3
+    text = (
+        "Die Bundesnetzagentur hat am Mittwoch mitgeteilt, dass die "
+        "Vergabe der Frequenzen im kommenden Jahr stattfinden soll. Die "
+        "Behoerde nannte dabei weder einen genauen Termin noch die "
+        "Bedingungen, unter denen die Anbieter mitbieten duerfen. "
+    ) * 3
     fremd, kuerzel, _ = sprache_mod.ist_fremdsprachig(text)
     assert fremd is False
     assert kuerzel == "de"
@@ -113,7 +116,8 @@ def test_die_ueberschrift_allein_entscheidet_nie():
 def test_titel_verschiebt_das_ergebnis_des_fliesstexts_nicht():
     """Ein englischer Titel ueber spanischem Text bleibt spanisch."""
     fremd, kuerzel, _ = sprache_mod.ist_fremdsprachig(
-        SPANISCH, titel="Starlink and the temptation to compete with partners")
+        SPANISCH, titel="Starlink and the temptation to compete with partners"
+    )
     assert (fremd, kuerzel) == (True, "es")
 
 
@@ -138,9 +142,11 @@ def test_zu_kurzer_extrakt_bekommt_keinen_link(monkeypatch):
     Faktor gerechnet waeren das 3,1x und damit ein Treffer - deshalb ist
     die Schwelle absolut.
     """
-    monkeypatch.setattr(volltext_mod, "fetch",
-                        lambda *a, **k: SimpleNamespace(status_code=200,
-                                                        text="<html/>"))
+    monkeypatch.setattr(
+        volltext_mod,
+        "fetch",
+        lambda *a, **k: SimpleNamespace(status_code=200, text="<html/>"),
+    )
     monkeypatch.setattr(volltext_mod, "_extrahiere", lambda h: "x" * 141)
     item = _item(summary="x" * 45)
     ergebnis = volltext_mod.hole_volltext(item, {})
@@ -151,9 +157,11 @@ def test_zu_kurzer_extrakt_bekommt_keinen_link(monkeypatch):
 
 
 def test_extrakt_der_nur_den_teaser_wiederholt_faellt_durch(monkeypatch):
-    monkeypatch.setattr(volltext_mod, "fetch",
-                        lambda *a, **k: SimpleNamespace(status_code=200,
-                                                        text="<html/>"))
+    monkeypatch.setattr(
+        volltext_mod,
+        "fetch",
+        lambda *a, **k: SimpleNamespace(status_code=200, text="<html/>"),
+    )
     monkeypatch.setattr(volltext_mod, "_extrahiere", lambda h: "y" * 1400)
     item = _item(summary="y" * 1300)
     ergebnis = volltext_mod.hole_volltext(item, {})
@@ -162,20 +170,23 @@ def test_extrakt_der_nur_den_teaser_wiederholt_faellt_durch(monkeypatch):
 
 
 def test_sammelseite_wird_verworfen(monkeypatch):
-    monkeypatch.setattr(volltext_mod, "fetch",
-                        lambda *a, **k: SimpleNamespace(status_code=200,
-                                                        text="<html/>"))
-    monkeypatch.setattr(volltext_mod, "_extrahiere",
-                        lambda h: "z" * (volltext_mod.HOECHSTLAENGE + 1))
+    monkeypatch.setattr(
+        volltext_mod,
+        "fetch",
+        lambda *a, **k: SimpleNamespace(status_code=200, text="<html/>"),
+    )
+    monkeypatch.setattr(
+        volltext_mod, "_extrahiere", lambda h: "z" * (volltext_mod.HOECHSTLAENGE + 1)
+    )
     ergebnis = volltext_mod.hole_volltext(_item(), {})
     assert ergebnis.erfolg is False
     assert "zu lang" in ergebnis.grund
 
 
 def test_gesperrte_seite_nennt_ihren_status(monkeypatch):
-    monkeypatch.setattr(volltext_mod, "fetch",
-                        lambda *a, **k: SimpleNamespace(status_code=403,
-                                                        text=""))
+    monkeypatch.setattr(
+        volltext_mod, "fetch", lambda *a, **k: SimpleNamespace(status_code=403, text="")
+    )
     ergebnis = volltext_mod.hole_volltext(_item(), {})
     assert ergebnis.erfolg is False
     assert ergebnis.status == 403
@@ -185,6 +196,7 @@ def test_gesperrte_seite_nennt_ihren_status(monkeypatch):
 def test_abgeschalteter_artikelabruf_ruft_nicht_ab(monkeypatch):
     def _nie(*a, **k):
         raise AssertionError("es darf kein Abruf stattfinden")
+
     monkeypatch.setattr(volltext_mod, "fetch", _nie)
     ergebnis = volltext_mod.hole_volltext(_item(), {}, artikelabruf=False)
     assert ergebnis.erfolg is False
@@ -207,9 +219,12 @@ def test_leere_antwort_faellt_durch(monkeypatch):
 
 def test_absaetze_bleiben_erhalten(monkeypatch):
     monkeypatch.setattr(
-        u_mod.llm, "complete",
-        lambda system, user, *a, **k: "Erster Absatz. " * 8 + "\n\n"
-                                      + "Zweiter Absatz. " * 8)
+        u_mod.llm,
+        "complete",
+        lambda system, user, *a, **k: (
+            "Erster Absatz. " * 8 + "\n\n" + "Zweiter Absatz. " * 8
+        ),
+    )
     _, absaetze = u_mod.uebersetze("kurz " * 40, "es", "modell")
     assert len(absaetze) == 2
     assert absaetze[0].startswith("Erster Absatz.")
@@ -227,7 +242,7 @@ def test_langer_artikel_wird_abschnittsweise_uebersetzt(monkeypatch):
         return user.split(")\n\n", 1)[-1].split(":\n\n", 1)[-1]
 
     monkeypatch.setattr(u_mod.llm, "complete", _complete)
-    absatz = "Satz. " * 200            # ~1200 Zeichen
+    absatz = "Satz. " * 200  # ~1200 Zeichen
     text = "\n\n".join([absatz] * 10)  # ~12 000 Zeichen -> mehrere Abschnitte
     _, absaetze = u_mod.uebersetze(text, "es", "modell")
     assert len(aufrufe) > 1, "der Text haette gebuendelt werden muessen"
@@ -236,22 +251,26 @@ def test_langer_artikel_wird_abschnittsweise_uebersetzt(monkeypatch):
 
 def test_vorrede_des_modells_wird_entfernt(monkeypatch):
     monkeypatch.setattr(
-        u_mod.llm, "complete",
-        lambda *a, **k: "Hier ist die Übersetzung:\n\n" + "Inhalt. " * 60)
+        u_mod.llm,
+        "complete",
+        lambda *a, **k: "Hier ist die Übersetzung:\n\n" + "Inhalt. " * 60,
+    )
     _, absaetze = u_mod.uebersetze("x" * 300, "es", "modell")
     assert not absaetze[0].lower().startswith("hier ist")
 
 
 def test_gescheiterter_titel_kostet_nicht_die_uebersetzung(monkeypatch):
     """Eine spanische Ueberschrift ist unschoen, eine fehlende Seite schlimmer."""
+
     def _complete(system, user, *a, **k):
         if system == u_mod.TITEL_SYSTEM:
             raise RuntimeError("Titel kaputt")
         return "Inhalt. " * 60
 
     monkeypatch.setattr(u_mod.llm, "complete", _complete)
-    titel_de, absaetze = u_mod.uebersetze("x" * 300, "es", "modell",
-                                          titel="Titulo original")
+    titel_de, absaetze = u_mod.uebersetze(
+        "x" * 300, "es", "modell", titel="Titulo original"
+    )
     assert titel_de == ""
     assert absaetze
 
@@ -261,8 +280,14 @@ def test_store_haelt_je_meldung_genau_einen_stand(tmp_path):
     pfad = tmp_path / "u.jsonl"
     store = UebersetzungsStore(pfad)
     for titel in ("erste", "zweite"):
-        store.add(Uebersetzung(item_id="abc", quell_hash=text_hash(titel),
-                               titel_de=titel, absaetze=["x"]))
+        store.add(
+            Uebersetzung(
+                item_id="abc",
+                quell_hash=text_hash(titel),
+                titel_de=titel,
+                absaetze=["x"],
+            )
+        )
     store.speichern()
     assert len(UebersetzungsStore(pfad)) == 1
     assert UebersetzungsStore(pfad).get("abc").titel_de == "zweite"
@@ -270,16 +295,22 @@ def test_store_haelt_je_meldung_genau_einen_stand(tmp_path):
 
 def test_neuer_textstand_gilt_als_nicht_uebersetzt(tmp_path):
     store = UebersetzungsStore(tmp_path / "u.jsonl")
-    store.add(Uebersetzung(item_id="abc", quell_hash=text_hash("alt"),
-                           titel_de="t", absaetze=["x"]))
+    store.add(
+        Uebersetzung(
+            item_id="abc", quell_hash=text_hash("alt"), titel_de="t", absaetze=["x"]
+        )
+    )
     assert store.hat_aktuelle("abc", "alt") is True
     assert store.hat_aktuelle("abc", "neu") is False
 
 
 def test_kaputte_zeile_kostet_nicht_den_bestand(tmp_path):
     pfad = tmp_path / "u.jsonl"
-    gut = json.dumps(Uebersetzung(item_id="ok", quell_hash="h",
-                                  titel_de="t", absaetze=["x"]).to_dict())
+    gut = json.dumps(
+        Uebersetzung(
+            item_id="ok", quell_hash="h", titel_de="t", absaetze=["x"]
+        ).to_dict()
+    )
     pfad.write_text("{kaputt\n" + gut + "\n", encoding="utf-8")
     assert len(UebersetzungsStore(pfad)) == 1
 
@@ -287,9 +318,11 @@ def test_kaputte_zeile_kostet_nicht_den_bestand(tmp_path):
 # --------------------------------------------------------------------- Stufe
 def test_budget_rechnet_gegen_die_restzeit_des_jobs():
     """Die Lehre aus Lauf 31422689829 - gegen den JOB, nicht gegen sich selbst."""
-    settings = {"job_frist_sekunden": 3000,
-                "veroeffentlichung_reserve_sekunden": 420,
-                "uebersetzung_frist_sekunden": 600}
+    settings = {
+        "job_frist_sekunden": 3000,
+        "veroeffentlichung_reserve_sekunden": 420,
+        "uebersetzung_frist_sekunden": 600,
+    }
     assert stufe_mod.budget(settings, 100) == 600.0
     # Nur noch 380 s bis zur Reserve -> weniger als die eigene Frist.
     assert stufe_mod.budget(settings, 2200) == pytest.approx(380.0)
@@ -303,11 +336,14 @@ def test_abgeschaltet_heisst_kein_budget():
 
 def test_ein_kaputter_artikel_kostet_nie_den_lauf(tmp_path, monkeypatch):
     """Die wichtigste Zusicherung der ganzen Stufe."""
-    monkeypatch.setattr(stufe_mod, "hole_volltext",
-                        lambda *a, **k: (_ for _ in ()).throw(
-                            RuntimeError("kaputt")))
-    bilanz = stufe_mod.lauf([_item()], tmp_path, {}, "modell",
-                            frist_sekunden=30, heute=date(2026, 8, 13))
+    monkeypatch.setattr(
+        stufe_mod,
+        "hole_volltext",
+        lambda *a, **k: (_ for _ in ()).throw(RuntimeError("kaputt")),
+    )
+    bilanz = stufe_mod.lauf(
+        [_item()], tmp_path, {}, "modell", frist_sekunden=30, heute=date(2026, 8, 13)
+    )
     assert bilanz["gescheitert"] == 1
     assert bilanz["uebersetzt"] == 0
 
@@ -316,28 +352,35 @@ def test_englischer_artikel_wird_uebersetzt(tmp_path, monkeypatch):
     """Entscheidung vom 27.08.2026 (E5): Englisch ist keine Muttersprache
     mehr. Gegen den alten Stand faellt dieser Test - dort verwarf die
     Vorauswahl den Artikel vor jedem Abruf."""
-    monkeypatch.setattr(stufe_mod, "uebersetze",
-                        lambda *a, **k: ("Deutscher Titel", ["Ein Absatz."]))
-    monkeypatch.setattr(stufe_mod, "hole_volltext",
-                        lambda *a, **k: volltext_mod.VolltextErgebnis(
-                            text=ENGLISCH, herkunft="feed"))
+    monkeypatch.setattr(
+        stufe_mod, "uebersetze", lambda *a, **k: ("Deutscher Titel", ["Ein Absatz."])
+    )
+    monkeypatch.setattr(
+        stufe_mod,
+        "hole_volltext",
+        lambda *a, **k: volltext_mod.VolltextErgebnis(text=ENGLISCH, herkunft="feed"),
+    )
     item = _item(volltext=ENGLISCH)
-    bilanz = stufe_mod.lauf([item], tmp_path, {}, "modell",
-                            frist_sekunden=30, heute=date(2026, 8, 13))
+    bilanz = stufe_mod.lauf(
+        [item], tmp_path, {}, "modell", frist_sekunden=30, heute=date(2026, 8, 13)
+    )
     assert bilanz["uebersetzt"] == 1
     assert bilanz["sprachen"]["en"] == 1
 
 
 def test_spanischer_artikel_landet_im_speicher(tmp_path, monkeypatch):
-    monkeypatch.setattr(stufe_mod, "uebersetze",
-                        lambda *a, **k: ("Deutscher Titel", ["Ein Absatz."]))
+    monkeypatch.setattr(
+        stufe_mod, "uebersetze", lambda *a, **k: ("Deutscher Titel", ["Ein Absatz."])
+    )
     item = _item(volltext=SPANISCH, title="Titulo")
-    bilanz = stufe_mod.lauf([item], tmp_path, {}, "modell",
-                            frist_sekunden=30, heute=date(2026, 8, 13))
+    bilanz = stufe_mod.lauf(
+        [item], tmp_path, {}, "modell", frist_sekunden=30, heute=date(2026, 8, 13)
+    )
     assert bilanz["uebersetzt"] == 1
     assert bilanz["aus_feed"] == 1
     gespeichert = UebersetzungsStore(
-        tmp_path / "data" / "state" / "uebersetzungen.jsonl")
+        tmp_path / "data" / "state" / "uebersetzungen.jsonl"
+    )
     assert len(gespeichert) == 1
     u = gespeichert.get(item.id)
     assert u.titel_de == "Deutscher Titel"
@@ -346,31 +389,43 @@ def test_spanischer_artikel_landet_im_speicher(tmp_path, monkeypatch):
 
 
 def test_der_deckel_wird_eingehalten(tmp_path, monkeypatch):
-    monkeypatch.setattr(stufe_mod, "uebersetze",
-                        lambda *a, **k: ("T", ["Absatz"]))
-    items = [_item(url=f"https://beispiel.test/a/{i}", volltext=SPANISCH)
-             for i in range(10)]
-    bilanz = stufe_mod.lauf(items, tmp_path, {"uebersetzung_max_je_lauf": 3},
-                            "modell", frist_sekunden=30,
-                            heute=date(2026, 8, 13))
+    monkeypatch.setattr(stufe_mod, "uebersetze", lambda *a, **k: ("T", ["Absatz"]))
+    items = [
+        _item(url=f"https://beispiel.test/a/{i}", volltext=SPANISCH) for i in range(10)
+    ]
+    bilanz = stufe_mod.lauf(
+        items,
+        tmp_path,
+        {"uebersetzung_max_je_lauf": 3},
+        "modell",
+        frist_sekunden=30,
+        heute=date(2026, 8, 13),
+    )
     assert bilanz["uebersetzt"] == 3
 
 
-def test_schon_uebersetztes_kostet_keinen_zweiten_modellaufruf(tmp_path,
-                                                               monkeypatch):
+def test_schon_uebersetztes_kostet_keinen_zweiten_modellaufruf(tmp_path, monkeypatch):
     aufrufe = []
-    monkeypatch.setattr(stufe_mod, "uebersetze",
-                        lambda *a, **k: (aufrufe.append(1), ("T", ["A"]))[1])
+    monkeypatch.setattr(
+        stufe_mod, "uebersetze", lambda *a, **k: (aufrufe.append(1), ("T", ["A"]))[1]
+    )
     item = _item(volltext=SPANISCH)
     for _ in range(2):
-        stufe_mod.lauf([item], tmp_path, {}, "modell", frist_sekunden=30,
-                       heute=date(2026, 8, 13))
+        stufe_mod.lauf(
+            [item], tmp_path, {}, "modell", frist_sekunden=30, heute=date(2026, 8, 13)
+        )
     assert len(aufrufe) == 1
 
 
 def test_protokollzeile_nennt_die_gruende():
-    bilanz = stufe_mod.lauf([], Path("/tmp"), {"uebersetzung_enabled": True},
-                            "m", frist_sekunden=1, heute=date(2026, 8, 13))
+    bilanz = stufe_mod.lauf(
+        [],
+        Path("/tmp"),
+        {"uebersetzung_enabled": True},
+        "m",
+        frist_sekunden=1,
+        heute=date(2026, 8, 13),
+    )
     zeile = stufe_mod.protokollzeile(bilanz)
     assert "Uebersetzung:" in zeile
     assert "uebersetzt" in zeile and "gescheitert" in zeile

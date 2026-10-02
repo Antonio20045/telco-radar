@@ -28,6 +28,7 @@ liefert es `alt_md` - und die Seite zeigt den Bericht wie bisher zugeklappt am
 Ende, statt eine leere Zeile zu behaupten. Kein Lauf muss abgewartet werden,
 damit die Seite steht.
 """
+
 from __future__ import annotations
 
 import re
@@ -89,8 +90,9 @@ def _muster(zeilen: list[str]) -> list[dict]:
     for absatz in _absaetze(zeilen):
         m = _FETT_AM_ANFANG.match(absatz)
         if m:
-            out.append({"titel": m.group(1).strip(),
-                        "text": " ".join(m.group(2).split())})
+            out.append(
+                {"titel": m.group(1).strip(), "text": " ".join(m.group(2).split())}
+            )
         else:
             out.append({"titel": "", "text": " ".join(absatz.split())})
     return out
@@ -161,5 +163,9 @@ def zerlegen(markdown: str, label_map: dict[str, str]) -> dict:
             einordnung = _einordnung(zeilen, label_map)
             erkannt = erkannt or bool(einordnung)
 
-    return {"lage": lage, "muster": muster, "einordnung": einordnung,
-            "alt_md": "" if erkannt else (markdown or "").strip()}
+    return {
+        "lage": lage,
+        "muster": muster,
+        "einordnung": einordnung,
+        "alt_md": "" if erkannt else (markdown or "").strip(),
+    }

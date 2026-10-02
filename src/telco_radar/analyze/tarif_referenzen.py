@@ -58,14 +58,20 @@ Saetze dafuer VOR der Dublettenpruefung um; die generische Regel darunter
 Rest unveraendert - sie entscheidet dann nur noch, WELCHER der zwei
 Saetze zuerst dran ist, nicht ob einer verworfen wird.
 """
+
 from __future__ import annotations
 
 import logging
 
 from ..tarif_bezug import Tarifbestand
-from ..tarif_model import (GERAETEBLATT_ZUSATZ, HOCH, PREISTYP_DOKUMENT,
-                           PREISTYP_LIVE_SHOP, erster_betrag,
-                           ist_geraeteblatt_von)
+from ..tarif_model import (
+    GERAETEBLATT_ZUSATZ,
+    HOCH,
+    PREISTYP_DOKUMENT,
+    PREISTYP_LIVE_SHOP,
+    erster_betrag,
+    ist_geraeteblatt_von,
+)
 from ..tco_model import SimOnlyReferenz
 
 log = logging.getLogger(__name__)
@@ -98,8 +104,7 @@ def _bevorzugt_live(saetze: list[dict]) -> list[dict]:
     Titelzeile, steht der `live_shop`-Satz jetzt vorn und gewinnt deshalb -
     ohne dass die Regel selbst etwas von Preistypen wissen muesste.
     """
-    return sorted(saetze,
-                  key=lambda s: s.get("preistyp") != PREISTYP_LIVE_SHOP)
+    return sorted(saetze, key=lambda s: s.get("preistyp") != PREISTYP_LIVE_SHOP)
 
 
 def aus_bestand(bestand: Tarifbestand) -> list[SimOnlyReferenz]:
@@ -117,8 +122,12 @@ def aus_bestand(bestand: Tarifbestand) -> list[SimOnlyReferenz]:
     # Blaettern gleich, der Name selbst nicht immer.
     je_name: dict[tuple[str, str], dict] = {}
     for satz in saetze:
-        je_name[((satz.get("anbieter") or "").strip().lower(),
-                 (satz.get("name") or "").strip().lower())] = satz
+        je_name[
+            (
+                (satz.get("anbieter") or "").strip().lower(),
+                (satz.get("name") or "").strip().lower(),
+            )
+        ] = satz
 
     referenzen: list[SimOnlyReferenz] = []
     gesehen: dict[str, str] = {}
@@ -133,12 +142,16 @@ def aus_bestand(bestand: Tarifbestand) -> list[SimOnlyReferenz]:
         if not anbieter or not name:
             continue
         tarifblatt = je_name.get(
-            (anbieter.lower(), GERAETEBLATT_ZUSATZ.sub("", name).lower()))
+            (anbieter.lower(), GERAETEBLATT_ZUSATZ.sub("", name).lower())
+        )
         if tarifblatt is not None and ist_geraeteblatt_von(satz, tarifblatt):
             # Das Buendelblatt desselben Tarifs. Sein Datensatz bleibt im
             # Bestand - nur als MASSSTAB waere er eine Dublette.
-            log.debug("SIM-only-Referenz uebersprungen: %r ist das "
-                      "Geraeteblatt von %r", name, tarifblatt.get("name"))
+            log.debug(
+                "SIM-only-Referenz uebersprungen: %r ist das Geraeteblatt von %r",
+                name,
+                tarifblatt.get("name"),
+            )
             continue
         referenz = SimOnlyReferenz(
             anbieter=anbieter,
@@ -149,8 +162,11 @@ def aus_bestand(bestand: Tarifbestand) -> list[SimOnlyReferenz]:
             tarif_id=satz.get("tarif_id", ""),
             tarif_id_guete=HOCH,
             tarif_sim_only_monatlich=betrag,
-            anschlusspreis=(None if satz.get("anschlusspreis") is None
-                            else float(satz["anschlusspreis"])),
+            anschlusspreis=(
+                None
+                if satz.get("anschlusspreis") is None
+                else float(satz["anschlusspreis"])
+            ),
             quelle_url=satz.get("dokument_url", ""),
             abgerufen_am=satz.get("abgerufen_am", ""),
             quelle_art=satz.get("preistyp") or PREISTYP_DOKUMENT,
@@ -169,10 +185,14 @@ def aus_bestand(bestand: Tarifbestand) -> list[SimOnlyReferenz]:
         # Massstab, dessen Beleg auf ein anderes Blatt zeigt, ist schlimmer
         # als ein fehlender.
         if referenz.id in gesehen:
-            log.warning("SIM-only-Referenz %s doppelt: %r und %r tragen "
-                        "dieselbe Titelzeile - der zweite Satz bleibt "
-                        "draussen", referenz.id, gesehen[referenz.id],
-                        satz.get("tarif_id"))
+            log.warning(
+                "SIM-only-Referenz %s doppelt: %r und %r tragen "
+                "dieselbe Titelzeile - der zweite Satz bleibt "
+                "draussen",
+                referenz.id,
+                gesehen[referenz.id],
+                satz.get("tarif_id"),
+            )
             continue
         gesehen[referenz.id] = satz.get("tarif_id", "")
         referenzen.append(referenz)

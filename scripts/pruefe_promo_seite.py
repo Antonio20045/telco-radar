@@ -62,6 +62,7 @@ leerer Abruf alle ihre Angebote in Richtung "ausgelaufen" schiebt.
 
 Exit-Code 0, wenn ALLE Kandidaten bestanden haben, sonst 1.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -112,7 +113,7 @@ SIGNALE: dict[str, str] = {
     "bonus": r"\bbonus\b|\bstartguthaben\b|\bguthaben\b|\bpr[äa]mie\b|\bcashback\b",
     "aktion": r"\baktion(?:en|spreis|szeitraum)?\b|\bdeal\b|\bkampagne\b|\bangebot\b",
     "frist": r"\bnur bis\b|\bbis zum\s+\d|\bbefristet\b|\bsolange der vorrat\b|"
-             r"\bendet am\b|\baktionszeitraum\b",
+    r"\bendet am\b|\baktionszeitraum\b",
     "wechsel": r"\bwechsel|\brufnummernmitnahme\b|\bportier|\bneukund",
     "tarif": r"\btarif|\ballnet\s*flat\b|\bflat\b|\bvertrag\b",
 }
@@ -120,25 +121,83 @@ SIGNALE: dict[str, str] = {
 # Mobilfunk gegen Festnetz. Nicht als Verbot einzelner Woerter - eine
 # Mobilfunkseite darf DSL erwaehnen -, sondern als Uebergewicht: eine Seite,
 # auf der die Festnetzwoerter dominieren, ist eine Festnetzseite.
-MOBIL_WOERTER = (r"\bmobilfunk|\bhandy|\bsmartphone|\bsim\b|\besim\b|\btarif|"
-                 r"\ballnet|\blte\b|\b5g\b|\bprepaid|\bmobil(?:es|em)?\s+internet")
-FEST_WOERTER = (r"\bdsl\b|\bglasfaser|\bkabel(?:anschluss|internet)?\b|"
-                r"\bfestnetz|\bmagentazuhause|\bhomespot|\brouter\b|\bfritz!?box|"
-                r"\bfiber\b|\binternet f[üu]r zuhause|\bhausanschluss")
+MOBIL_WOERTER = (
+    r"\bmobilfunk|\bhandy|\bsmartphone|\bsim\b|\besim\b|\btarif|"
+    r"\ballnet|\blte\b|\b5g\b|\bprepaid|\bmobil(?:es|em)?\s+internet"
+)
+FEST_WOERTER = (
+    r"\bdsl\b|\bglasfaser|\bkabel(?:anschluss|internet)?\b|"
+    r"\bfestnetz|\bmagentazuhause|\bhomespot|\brouter\b|\bfritz!?box|"
+    r"\bfiber\b|\binternet f[üu]r zuhause|\bhausanschluss"
+)
 
 _WORT_RE = re.compile(r"[a-zäöüß0-9]{4,}", re.I)
 # Allerweltswoerter, die auf JEDER deutschen Anbieterseite stehen. Sie wuerden
 # den Ueberlappungswert kuenstlich hochziehen und zwei voellig verschiedene
 # Seiten derselben Marke als Dublette erscheinen lassen.
 _STOPP = {
-    "auch", "aber", "alle", "allen", "aller", "dass", "dein", "deine", "deinen",
-    "deiner", "dich", "diese", "diesem", "diesen", "dieser", "dieses", "durch",
-    "eine", "einem", "einen", "einer", "eines", "sich", "sind", "über", "oder",
-    "ohne", "nach", "noch", "nicht", "mehr", "kann", "können", "wenn", "wird",
-    "werden", "hier", "haben", "unter", "unsere", "unseren", "unserer", "beim",
-    "jetzt", "mit", "cookies", "datenschutz", "impressum", "agb", "startseite",
-    "weitere", "informationen", "seite", "menü", "suche", "anmelden", "login",
-    "kundencenter", "service", "hilfe", "kontakt", "warenkorb",
+    "auch",
+    "aber",
+    "alle",
+    "allen",
+    "aller",
+    "dass",
+    "dein",
+    "deine",
+    "deinen",
+    "deiner",
+    "dich",
+    "diese",
+    "diesem",
+    "diesen",
+    "dieser",
+    "dieses",
+    "durch",
+    "eine",
+    "einem",
+    "einen",
+    "einer",
+    "eines",
+    "sich",
+    "sind",
+    "über",
+    "oder",
+    "ohne",
+    "nach",
+    "noch",
+    "nicht",
+    "mehr",
+    "kann",
+    "können",
+    "wenn",
+    "wird",
+    "werden",
+    "hier",
+    "haben",
+    "unter",
+    "unsere",
+    "unseren",
+    "unserer",
+    "beim",
+    "jetzt",
+    "mit",
+    "cookies",
+    "datenschutz",
+    "impressum",
+    "agb",
+    "startseite",
+    "weitere",
+    "informationen",
+    "seite",
+    "menü",
+    "suche",
+    "anmelden",
+    "login",
+    "kundencenter",
+    "service",
+    "hilfe",
+    "kontakt",
+    "warenkorb",
 }
 
 
@@ -190,26 +249,30 @@ def angebotsbreite(text: str) -> tuple[int, int]:
     fluten wuerden - genau das, wogegen promo_analyst._MAX_ENTRIES_PER_PAGE
     und die Prompt-Anweisung "keine SKU-Liste" gebaut sind.
     """
-    return (len(set(_PREIS_RE.findall(text or ""))),
-            len(set(_GB_RE.findall(text or ""))))
+    return (
+        len(set(_PREIS_RE.findall(text or ""))),
+        len(set(_GB_RE.findall(text or ""))),
+    )
 
 
 def signale(text: str) -> list[str]:
     """Welche Angebotssignale traegt der Text - je Signal hoechstens einmal
     gezaehlt."""
     low = (text or "").lower()
-    return [name for name, muster in SIGNALE.items()
-            if re.search(muster, low, re.I)]
+    return [name for name, muster in SIGNALE.items() if re.search(muster, low, re.I)]
 
 
 def mobilfunk_uebergewicht(text: str) -> tuple[int, int]:
     low = (text or "").lower()
-    return (len(re.findall(MOBIL_WOERTER, low, re.I)),
-            len(re.findall(FEST_WOERTER, low, re.I)))
+    return (
+        len(re.findall(MOBIL_WOERTER, low, re.I)),
+        len(re.findall(FEST_WOERTER, low, re.I)),
+    )
 
 
-def _pruefungen(kandidat: dict, snap: dict, snap2: dict | None,
-                bestand: dict) -> list[dict]:
+def _pruefungen(
+    kandidat: dict, snap: dict, snap2: dict | None, bestand: dict
+) -> list[dict]:
     """Die eigentliche Kriterienliste. Getrennt vom Abruf, damit die Tests sie
     ohne Netz durchspielen koennen."""
     text = snap.get("text") or ""
@@ -221,28 +284,43 @@ def _pruefungen(kandidat: dict, snap: dict, snap2: dict | None,
     def kriterium(nr, name, ok, detail):
         aus.append({"nr": nr, "name": name, "ok": bool(ok), "detail": detail})
 
-    kriterium(1, "abrufbar", bool(text.strip()),
-              f"{len(text)} Zeichen sichtbarer Text")
-    kriterium(2, "genug Text", len(text) >= MIN_TEXT,
-              f"{len(text)} >= {MIN_TEXT} Zeichen")
+    kriterium(1, "abrufbar", bool(text.strip()), f"{len(text)} Zeichen sichtbarer Text")
+    kriterium(
+        2, "genug Text", len(text) >= MIN_TEXT, f"{len(text)} >= {MIN_TEXT} Zeichen"
+    )
 
     gefunden = signale(text)
-    kriterium(3, "Angebotssignale", len(gefunden) >= MIN_SIGNALE,
-              f"{len(gefunden)}/{len(SIGNALE)}: {', '.join(gefunden) or 'keine'}")
+    kriterium(
+        3,
+        "Angebotssignale",
+        len(gefunden) >= MIN_SIGNALE,
+        f"{len(gefunden)}/{len(SIGNALE)}: {', '.join(gefunden) or 'keine'}",
+    )
 
     mobil, fest = mobilfunk_uebergewicht(text)
-    kriterium(4, "Mobilfunk statt Festnetz", mobil > fest,
-              f"{mobil} Mobilfunk- vs. {fest} Festnetz-Treffer")
+    kriterium(
+        4,
+        "Mobilfunk statt Festnetz",
+        mobil > fest,
+        f"{mobil} Mobilfunk- vs. {fest} Festnetz-Treffer",
+    )
 
     marken_host = _registrable(urlsplit(bestand.get("leitseite", "")).netloc)
     kand_host = _registrable(urlsplit(url).netloc)
-    kriterium(5, "eigene Domain der Marke",
-              bool(marken_host) and kand_host == marken_host,
-              f"{kand_host or '?'} gegen {marken_host or '?'}")
+    kriterium(
+        5,
+        "eigene Domain der Marke",
+        bool(marken_host) and kand_host == marken_host,
+        f"{kand_host or '?'} gegen {marken_host or '?'}",
+    )
 
     schon_da = _normalize_url(url) in bestand.get("konfiguriert", set())
-    kriterium(6, "noch nicht konfiguriert", not schon_da,
-              "steht bereits in config/promo_sources.yaml" if schon_da else "neu")
+    kriterium(
+        6,
+        "noch nicht konfiguriert",
+        not schon_da,
+        "steht bereits in config/promo_sources.yaml" if schon_da else "neu",
+    )
 
     # 7: gegen JEDE bestehende Seite dieser Marke UND gegen jeden bereits
     # angenommenen Kandidaten derselben Marke - der schlechteste Wert zaehlt.
@@ -261,24 +339,39 @@ def _pruefungen(kandidat: dict, snap: dict, snap2: dict | None,
         # gilt hier als Durchfaller. "Nicht pruefbar" ist kein PASS.
         unerreichbar = bestand.get("unerreichbar") or []
         if unerreichbar:
-            kriterium(7, "eigenstaendig", False,
-                      f"{len(unerreichbar)} konfigurierte Seite(n) dieser Marke "
-                      f"nicht abrufbar - Vergleich nicht durchfuehrbar")
+            kriterium(
+                7,
+                "eigenstaendig",
+                False,
+                f"{len(unerreichbar)} konfigurierte Seite(n) dieser Marke "
+                f"nicht abrufbar - Vergleich nicht durchfuehrbar",
+            )
         else:
-            kriterium(7, "eigenstaendig", True,
-                      "keine Vergleichsseite konfiguriert - erste Seite dieser Marke")
+            kriterium(
+                7,
+                "eigenstaendig",
+                True,
+                "keine Vergleichsseite konfiguriert - erste Seite dieser Marke",
+            )
     else:
         werte = {u: ueberlappung(text, t) for u, t in vergleiche.items()}
         nicht_pruefbar = [u for u, w in werte.items() if w < 0]
         hoechste = max((w for w in werte.values() if w >= 0), default=None)
         if hoechste is None:
-            kriterium(7, "eigenstaendig", False,
-                      "kein Vergleich moeglich (Seiten zu duenn) - gilt als "
-                      "Durchfaller, nicht als bestanden")
+            kriterium(
+                7,
+                "eigenstaendig",
+                False,
+                "kein Vergleich moeglich (Seiten zu duenn) - gilt als "
+                "Durchfaller, nicht als bestanden",
+            )
         else:
-            schlimmste = max((u for u, w in werte.items() if w >= 0),
-                             key=lambda u: werte[u])
-            detail = f"max. {hoechste:.2f} gegen {schlimmste} (Grenze {MAX_UEBERLAPPUNG})"
+            schlimmste = max(
+                (u for u, w in werte.items() if w >= 0), key=lambda u: werte[u]
+            )
+            detail = (
+                f"max. {hoechste:.2f} gegen {schlimmste} (Grenze {MAX_UEBERLAPPUNG})"
+            )
             if nicht_pruefbar:
                 detail += f"; {len(nicht_pruefbar)} Seite(n) zu duenn zum Vergleich"
             kriterium(7, "eigenstaendig", hoechste < MAX_UEBERLAPPUNG, detail)
@@ -286,15 +379,19 @@ def _pruefungen(kandidat: dict, snap: dict, snap2: dict | None,
     if snap2 is not None:
         text2 = snap2.get("text") or ""
         gefunden2 = signale(text2)
-        kriterium(8, "zweimal stabil",
-                  len(text2) >= MIN_TEXT and len(gefunden2) >= MIN_SIGNALE,
-                  f"2. Abruf: {len(text2)} Zeichen, {len(gefunden2)} Signale")
+        kriterium(
+            8,
+            "zweimal stabil",
+            len(text2) >= MIN_TEXT and len(gefunden2) >= MIN_SIGNALE,
+            f"2. Abruf: {len(text2)} Zeichen, {len(gefunden2)} Signale",
+        )
 
     return aus
 
 
-def hole_kandidat(kandidat: dict, http_cfg: dict, zweimal: bool = False,
-                  fetch=fetch_snapshot) -> dict:
+def hole_kandidat(
+    kandidat: dict, http_cfg: dict, zweimal: bool = False, fetch=fetch_snapshot
+) -> dict:
     """Nur der Abruf - getrennt von der Bewertung, weil der Abruf nebenlaeufig
     laufen darf, die Bewertung aber nicht: Kriterium 7 vergleicht jeden
     Kandidaten auch gegen die bereits ANGENOMMENEN derselben Marke und haengt
@@ -310,8 +407,10 @@ def hole_kandidat(kandidat: dict, http_cfg: dict, zweimal: bool = False,
         try:
             aus["snap2"] = fetch(url, kind, http_cfg)
         except Exception as exc:  # noqa: BLE001
-            aus["snap2"] = {"text": "",
-                            "fehler": f"{type(exc).__name__}: {str(exc)[:120]}"}
+            aus["snap2"] = {
+                "text": "",
+                "fehler": f"{type(exc).__name__}: {str(exc)[:120]}",
+            }
     return aus
 
 
@@ -320,14 +419,23 @@ def bewerte_kandidat(geholt: dict, bestand: dict) -> dict:
     ein fehlgeschlagener Abruf ist ein Durchfaller mit Begruendung, kein
     Absturz."""
     kandidat = geholt["kandidat"]
-    ergebnis = {"marke": kandidat.get("marke", ""), "url": kandidat["url"],
-                "kind": kandidat.get("kind", "static"),
-                "label": kandidat.get("label", ""),
-                "begruendung": kandidat.get("begruendung", "")}
+    ergebnis = {
+        "marke": kandidat.get("marke", ""),
+        "url": kandidat["url"],
+        "kind": kandidat.get("kind", "static"),
+        "label": kandidat.get("label", ""),
+        "begruendung": kandidat.get("begruendung", ""),
+    }
     if "snap" not in geholt:
         ergebnis["pass"] = False
-        ergebnis["kriterien"] = [{"nr": 1, "name": "abrufbar", "ok": False,
-                                  "detail": geholt.get("fehler", "unbekannt")}]
+        ergebnis["kriterien"] = [
+            {
+                "nr": 1,
+                "name": "abrufbar",
+                "ok": False,
+                "detail": geholt.get("fehler", "unbekannt"),
+            }
+        ]
         return ergebnis
     snap = geholt["snap"]
     kriterien = _pruefungen(kandidat, snap, geholt.get("snap2"), bestand)
@@ -349,8 +457,13 @@ def bewerte_kandidat(geholt: dict, bestand: dict) -> dict:
     return ergebnis
 
 
-def sammle_bestand(root: Path, http_cfg: dict, marken: set[str],
-                   fetch=fetch_snapshot, statisch: bool = False) -> dict[str, dict]:
+def sammle_bestand(
+    root: Path,
+    http_cfg: dict,
+    marken: set[str],
+    fetch=fetch_snapshot,
+    statisch: bool = False,
+) -> dict[str, dict]:
     """Fuer jede betroffene Marke: die schon konfigurierten Seiten samt ihrem
     aktuellen Text. Nur so kann Kriterium 7 die Kandidaten gegen den ECHTEN
     Bestand halten statt gegen eine Annahme.
@@ -370,19 +483,30 @@ def sammle_bestand(root: Path, http_cfg: dict, marken: set[str],
         unerreichbar: list[str] = []
         for page in src.crawled_pages:
             try:
-                text = fetch(page.url, "static" if statisch else page.kind,
-                             http_cfg).get("text") or ""
+                text = (
+                    fetch(page.url, "static" if statisch else page.kind, http_cfg).get(
+                        "text"
+                    )
+                    or ""
+                )
             except Exception as exc:  # noqa: BLE001
-                print(f"  ! Bestandsseite nicht abrufbar ({src.name} / "
-                      f"{page.url}): {type(exc).__name__}", file=sys.stderr)
+                print(
+                    f"  ! Bestandsseite nicht abrufbar ({src.name} / "
+                    f"{page.url}): {type(exc).__name__}",
+                    file=sys.stderr,
+                )
                 unerreichbar.append(page.url)
                 continue
             if text.strip():
                 seiten[page.url] = text
             else:
                 unerreichbar.append(page.url)
-        aus[src.name] = {"leitseite": src.url, "seiten": seiten,
-                         "unerreichbar": unerreichbar, "konfiguriert": alle_urls}
+        aus[src.name] = {
+            "leitseite": src.url,
+            "seiten": seiten,
+            "unerreichbar": unerreichbar,
+            "konfiguriert": alle_urls,
+        }
     return aus
 
 
@@ -390,8 +514,9 @@ def _lade_kandidaten(pfad: Path) -> list[dict]:
     roh = yaml.safe_load(pfad.read_text(encoding="utf-8")) or {}
     if isinstance(roh, list):
         return [k for k in roh if isinstance(k, dict) and k.get("url")]
-    return [k for k in (roh.get("kandidaten") or [])
-            if isinstance(k, dict) and k.get("url")]
+    return [
+        k for k in (roh.get("kandidaten") or []) if isinstance(k, dict) and k.get("url")
+    ]
 
 
 def main() -> int:
@@ -403,9 +528,11 @@ def main() -> int:
     p.add_argument("--root", type=Path, default=Path("."))
     p.add_argument("--json", type=Path)
     p.add_argument("--zweimal", action="store_true")
-    p.add_argument("--statisch", action="store_true",
-                   help="jeden Kandidaten als kind=static abrufen, egal was "
-                        "in der Eingabe steht")
+    p.add_argument(
+        "--statisch",
+        action="store_true",
+        help="jeden Kandidaten als kind=static abrufen, egal was in der Eingabe steht",
+    )
     p.add_argument("--workers", type=int, default=4)
     args = p.parse_args()
 
@@ -433,14 +560,15 @@ def main() -> int:
     http_cfg = load_config(root).settings.get("http", {})
     marken = {k.get("marke", "") for k in kandidaten if k.get("marke")}
     print(f"Bestand einlesen ({len(marken)} Marke(n)) ...")
-    bestand_je_marke = sammle_bestand(root, http_cfg, marken,
-                                      statisch=args.statisch)
+    bestand_je_marke = sammle_bestand(root, http_cfg, marken, statisch=args.statisch)
 
     print(f"{len(kandidaten)} Kandidaten abrufen ...")
     with ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
-        geholt = list(pool.map(
-            lambda k: hole_kandidat(k, http_cfg, zweimal=args.zweimal),
-            kandidaten))
+        geholt = list(
+            pool.map(
+                lambda k: hole_kandidat(k, http_cfg, zweimal=args.zweimal), kandidaten
+            )
+        )
 
     # Bewertung SEQUENTIELL, in Eingabereihenfolge (der Sucher liefert nach
     # Punkten sortiert, der beste Kandidat einer Marke steht also vorn). Nur
@@ -466,19 +594,24 @@ def main() -> int:
             zeichen = "+" if k["ok"] else "-"
             print(f"   {zeichen} {k['nr']}. {k['name']}: {k['detail']}")
         if e["pass"]:
-            print(f"     {e.get('links', 0)} Link-, {e.get('bilder', 0)} "
-                  f"Bildkandidaten | {e.get('preise', 0)} verschiedene Preise, "
-                  f"{e.get('volumen', 0)} Datenvolumen")
+            print(
+                f"     {e.get('links', 0)} Link-, {e.get('bilder', 0)} "
+                f"Bildkandidaten | {e.get('preise', 0)} verschiedene Preise, "
+                f"{e.get('volumen', 0)} Datenvolumen"
+            )
 
     print(f"\n{len(bestanden)}/{len(ergebnisse)} bestanden.")
     if args.json:
         args.json.parent.mkdir(parents=True, exist_ok=True)
-        args.json.write_text(json.dumps(ergebnisse, ensure_ascii=False, indent=1),
-                             encoding="utf-8")
+        args.json.write_text(
+            json.dumps(ergebnisse, ensure_ascii=False, indent=1), encoding="utf-8"
+        )
         print(f"Details: {args.json}")
-    print("\nHinweis: Der Check prueft FORM, nicht WERT. Ob eine Seite wirklich "
-          "Aktionen zeigt, die auf keiner anderen Seite dieser Marke stehen, "
-          "entscheidet weiterhin ein Blick in den Text.")
+    print(
+        "\nHinweis: Der Check prueft FORM, nicht WERT. Ob eine Seite wirklich "
+        "Aktionen zeigt, die auf keiner anderen Seite dieser Marke stehen, "
+        "entscheidet weiterhin ein Blick in den Text."
+    )
     return 0 if len(bestanden) == len(ergebnisse) else 1
 
 

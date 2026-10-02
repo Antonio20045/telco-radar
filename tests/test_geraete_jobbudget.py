@@ -10,6 +10,7 @@ Ein Timeout ist in GitHub ausserdem ein "cancelled", kein "failed".
 Ein eigenes Zeitbudget schuetzt also nur, wenn es gegen die verbleibende
 JOBZEIT gerechnet wird. Das ist die Regel, die diese Datei festnagelt.
 """
+
 import re
 
 import yaml
@@ -17,8 +18,12 @@ from pathlib import Path
 
 from telco_radar.pipeline import _GERAETE_MINDESTBUDGET, geraete_budget
 
-_AN = {"geraete_enabled": True, "geraete_frist_sekunden": 600,
-       "job_frist_sekunden": 3000, "veroeffentlichung_reserve_sekunden": 420}
+_AN = {
+    "geraete_enabled": True,
+    "geraete_frist_sekunden": 600,
+    "job_frist_sekunden": 3000,
+    "veroeffentlichung_reserve_sekunden": 420,
+}
 
 
 def test_am_anfang_bekommt_die_stufe_ihr_volles_budget():
@@ -54,7 +59,7 @@ def test_genau_an_der_schwelle_wird_noch_gelaufen():
 
 def test_ausgeschaltet_heisst_ausgeschaltet():
     assert geraete_budget({**_AN, "geraete_enabled": False}, 0.0) is None
-    assert geraete_budget({}, 0.0) is None       # Vorgabe ist AUS
+    assert geraete_budget({}, 0.0) is None  # Vorgabe ist AUS
 
 
 def test_die_ausgelieferte_konfiguration_haelt_die_stufe_aus_dem_wochenlauf():
@@ -62,8 +67,10 @@ def test_die_ausgelieferte_konfiguration_haelt_die_stufe_aus_dem_wochenlauf():
     .github/workflows/geraete.yml einen eigenen taeglichen Job, der
     ausserdem im Besuchsfenster von medimax.de und ep.de liegt."""
     s = yaml.safe_load(
-        (Path(__file__).resolve().parents[1] / "config" / "settings.yaml")
-        .read_text(encoding="utf-8"))
+        (Path(__file__).resolve().parents[1] / "config" / "settings.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
     assert s.get("geraete_enabled") is False
     assert geraete_budget(s, 0.0) is None
 
@@ -73,9 +80,12 @@ def test_die_jobfrist_passt_zum_workflow():
     `job_frist_sekunden` mitaendern - sonst rechnet die Sicherung gegen eine
     Grenze, die es nicht mehr gibt, und faellt genau dann nicht auf."""
     wurzel = Path(__file__).resolve().parents[1]
-    s = yaml.safe_load((wurzel / "config" / "settings.yaml").read_text(encoding="utf-8"))
+    s = yaml.safe_load(
+        (wurzel / "config" / "settings.yaml").read_text(encoding="utf-8")
+    )
     workflow = yaml.safe_load(
-        (wurzel / ".github" / "workflows" / "radar.yml").read_text(encoding="utf-8"))
+        (wurzel / ".github" / "workflows" / "radar.yml").read_text(encoding="utf-8")
+    )
     minuten = workflow["jobs"]["radar"]["timeout-minutes"]
     assert s["job_frist_sekunden"] == minuten * 60
 
@@ -99,13 +109,18 @@ def test_der_nachtlauf_committet_alle_vier_zustandsdateien():
     Buendel-Preishistorie `geraete_tco_historie.jsonl` kann KEIN Spaeterer
     Lauf neu erzeugen - ein nicht committeter Messtag ist fuer immer weg.
     """
-    text = (Path(__file__).parent.parent / ".github" / "workflows"
-            / "geraete.yml").read_text(encoding="utf-8")
+    text = (
+        Path(__file__).parent.parent / ".github" / "workflows" / "geraete.yml"
+    ).read_text(encoding="utf-8")
     zeile = [z for z in text.splitlines() if "git add data/state" in z]
     assert zeile, "der Workflow addiert keine Zustandsdatei mehr"
-    block = text[text.index(zeile[0]):text.index(zeile[0]) + 300]
-    for datei in ("geraete_db.json", "geraete_preise.jsonl",
-                  "geraete_tco.json", "geraete_tco_historie.jsonl"):
+    block = text[text.index(zeile[0]) : text.index(zeile[0]) + 300]
+    for datei in (
+        "geraete_db.json",
+        "geraete_preise.jsonl",
+        "geraete_tco.json",
+        "geraete_tco_historie.jsonl",
+    ):
         assert datei in block, datei
 
 
@@ -127,10 +142,16 @@ def test_der_nachtlauf_committet_alle_vier_zustandsdateien():
 # nicht, also wird das Einzige geprueft, was hier pruefbar ist: dass die
 # Griffe, die den Lauf still machen, nicht zurueckkommen.
 
+
 def _geraete_workflow() -> dict:
-    return yaml.safe_load((Path(__file__).resolve().parents[1]
-                           / ".github" / "workflows" / "geraete.yml")
-                          .read_text(encoding="utf-8"))
+    return yaml.safe_load(
+        (
+            Path(__file__).resolve().parents[1]
+            / ".github"
+            / "workflows"
+            / "geraete.yml"
+        ).read_text(encoding="utf-8")
+    )
 
 
 def _schritt(name: str) -> dict:
@@ -153,8 +174,9 @@ def test_der_render_hook_schluckt_keinen_fehler_und_prueft_die_live_seite():
     assert hook.get("continue-on-error") in (None, False)
     assert "steps.commit_site.outcome == 'success'" in hook["if"]
     assert "render_deploy.sh geraete.html" in hook["run"]
-    skript = (Path(__file__).resolve().parents[1] / "scripts"
-              / "render_deploy.sh").read_text(encoding="utf-8")
+    skript = (
+        Path(__file__).resolve().parents[1] / "scripts" / "render_deploy.sh"
+    ).read_text(encoding="utf-8")
     assert "for versuch in 1 2 3" in skript and "date -u +%Y-%m-%d" in skript
     assert skript.rstrip().splitlines()[-1].endswith("exit 1")
 
@@ -171,10 +193,10 @@ def test_der_neuaufbau_im_wiederholungsweg_bricht_laut_ab():
     """
     rumpf = _schritt("Commit site")["run"]
     assert "reset --hard" in rumpf, "der Wiederholungsweg ist weg"
-    assert "|| exit 0" not in rumpf, \
+    assert "|| exit 0" not in rumpf, (
         "der Neuaufbau verschluckt wieder einen Renderfehler"
-    assert "exit 1" in rumpf, \
-        "der Neuaufbau bricht nicht mehr laut ab"
+    )
+    assert "exit 1" in rumpf, "der Neuaufbau bricht nicht mehr laut ab"
 
 
 def test_das_verlorene_push_rennen_bleibt_gruen():
@@ -215,8 +237,9 @@ _GERAETE_YML_MINDESTABSTAND_SEKUNDEN = 10 * 60
 
 
 def _geraete_yml_text() -> str:
-    return (Path(__file__).resolve().parents[1] / ".github" / "workflows"
-           / "geraete.yml").read_text(encoding="utf-8")
+    return (
+        Path(__file__).resolve().parents[1] / ".github" / "workflows" / "geraete.yml"
+    ).read_text(encoding="utf-8")
 
 
 def _geraete_yml_cron_frist() -> float:
@@ -226,14 +249,18 @@ def _geraete_yml_cron_frist() -> float:
     `workflow_dispatch`-Inputs. Genau dieser Pfad lief in Lauf 52 und 53."""
     treffer = re.search(
         r"--frist\s+\"\$\{\{\s*github\.event\.inputs\.frist\s*\|\|\s*(\d+)\s*\}\}\"",
-        _geraete_yml_text())
-    assert treffer, "geraete.yml: die Frist-Fallback-Zeile fehlt oder hat sich geaendert"
+        _geraete_yml_text(),
+    )
+    assert treffer, (
+        "geraete.yml: die Frist-Fallback-Zeile fehlt oder hat sich geaendert"
+    )
     return float(treffer.group(1))
 
 
 def _geraete_yml_dispatch_frist_default() -> float:
-    treffer = re.search(r'frist:\s*\n(?:.*\n)*?\s*default:\s*"(\d+)"',
-                        _geraete_yml_text())
+    treffer = re.search(
+        r'frist:\s*\n(?:.*\n)*?\s*default:\s*"(\d+)"', _geraete_yml_text()
+    )
     assert treffer, "geraete.yml: workflow_dispatch-Vorgabewert fuer frist fehlt"
     return float(treffer.group(1))
 
@@ -244,5 +271,3 @@ def test_der_workflow_dispatch_vorgabewert_und_der_cron_fallback_laufen_nicht_au
     wie der taegliche Cron-Lauf, sonst ist eine Abnahme ueber
     `workflow_dispatch` keine Abnahme des echten Laufs."""
     assert _geraete_yml_dispatch_frist_default() == _geraete_yml_cron_frist()
-
-

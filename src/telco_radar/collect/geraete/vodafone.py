@@ -146,6 +146,7 @@ eigenes Netz. Aufgerufen wird sie von der Pipeline (`geraete_pipeline.py`),
 nachdem alle Anbieter gesammelt sind, ueber den generischen Adapter-Haken
 `Adapter.loese_tarifnamen`.
 """
+
 from __future__ import annotations
 
 import json
@@ -156,6 +157,7 @@ from typing import Callable, Optional
 from urllib.parse import urlsplit
 
 from . import GeraeteAbrufFehler
+
 # DIE EINE STELLE, die entscheidet, ob ein Rohwert eine Ratenlaufzeit IST
 # (Clean Code 1) - dieselbe Pruefung, die `buendel_id` und `Buendel` lesen.
 # Eine eigene `int()`-Zeile hier waere eine zweite, schwaechere Definition:
@@ -183,7 +185,7 @@ def _json(text: str, was: str) -> dict:
 
 
 def _speicher_gb(label: str) -> Optional[int]:
-    """"256 GB" -> 256, "1 TB" -> 1024.
+    """ "256 GB" -> 256, "1 TB" -> 1024.
 
     Bewusst am `displayLabel` und nicht am `sortValue`: der ist in Mebibyte
     (262144 fuer 256 GB) und braeuchte eine zweite Umrechnung, die bei
@@ -225,8 +227,7 @@ def ernte(text: str, basis_url: str, pfadmuster="", kind: str = "") -> list[str]
         if not vid or vid in gesehen:
             continue
         gesehen.add(vid)
-        out.append(f"{herkunft}/glados/v2/hardware/v2/virtualItem/{vid}"
-                   f"?{_PARAMETER}")
+        out.append(f"{herkunft}/glados/v2/hardware/v2/virtualItem/{vid}?{_PARAMETER}")
     return out
 
 
@@ -260,11 +261,19 @@ def lies(text: str, url: str = "") -> list[dict]:
         hubpage = "https://www.vodafone.de" + hubpage
 
     out: list[dict] = []
-    for atom in (knoten.get("atomics") or []):
+    for atom in knoten.get("atomics") or []:
         if not isinstance(atom, dict):
             continue
-        preis = _pfad(atom, "prices", "hardware", "priceByType", "rate",
-                      "onetime", "withoutDiscounts", "gross")
+        preis = _pfad(
+            atom,
+            "prices",
+            "hardware",
+            "priceByType",
+            "rate",
+            "onetime",
+            "withoutDiscounts",
+            "gross",
+        )
         if preis is None:
             continue
         speicher = _speicher_gb(str(_pfad(atom, "capacity", "displayLabel") or ""))
@@ -274,35 +283,38 @@ def lies(text: str, url: str = "") -> list[dict]:
         # ohne die Generation, weil die Farbe den Modellnamen verdraengt hat.
         # Aus so einem Titel findet die Geraeteerkennung ihren Katalogeintrag
         # nicht mehr.
-        titel = " ".join(x for x in (modell,
-                                     f"{speicher} GB" if speicher else "",
-                                     farbe) if x)
-        out.append({
-            "titel": titel,
-            # E4-Auto-Erkennung: der strukturierte NAME (Feld `modelName`),
-            # getrennt vom zusammengesetzten Titel.
-            "strukturierter_name": modell,
-            "preis": float(preis),
-            "waehrung": "EUR",
-            # `shippingInfo` nennt einen Liefertermin, wenn es einen gibt.
-            # Daraus "lieferbar" zu machen waere eine Behauptung ueber den
-            # Lagerbestand, die dort nicht steht.
-            "verfuegbarkeit": ("lieferbar"
-                               if _pfad(atom, "shippingInfo", "date")
-                               else "unbekannt"),
-            "sku": str(atom.get("hardwareId") or "").strip(),
-            "ean": "",
-            "farbe": farbe,
-            "speicher_gb": speicher,
-            "url": hubpage,
-            "quelle": "vodafone_api",
-        })
+        titel = " ".join(
+            x for x in (modell, f"{speicher} GB" if speicher else "", farbe) if x
+        )
+        out.append(
+            {
+                "titel": titel,
+                # E4-Auto-Erkennung: der strukturierte NAME (Feld `modelName`),
+                # getrennt vom zusammengesetzten Titel.
+                "strukturierter_name": modell,
+                "preis": float(preis),
+                "waehrung": "EUR",
+                # `shippingInfo` nennt einen Liefertermin, wenn es einen gibt.
+                # Daraus "lieferbar" zu machen waere eine Behauptung ueber den
+                # Lagerbestand, die dort nicht steht.
+                "verfuegbarkeit": (
+                    "lieferbar" if _pfad(atom, "shippingInfo", "date") else "unbekannt"
+                ),
+                "sku": str(atom.get("hardwareId") or "").strip(),
+                "ean": "",
+                "farbe": farbe,
+                "speicher_gb": speicher,
+                "url": hubpage,
+                "quelle": "vodafone_api",
+            }
+        )
     return out
 
 
 # --------------------------------------------------------------------------
 # BUENDELPREISE - siehe Modulkopf, Abschnitt B1
 # --------------------------------------------------------------------------
+
 
 def _preis(wert) -> Optional[float]:
     try:
@@ -372,14 +384,17 @@ def _letztes_phasenende(komposition: dict) -> Optional[int]:
     machte `int(None)` zum TypeError, die Laufzeit blieb None und der Satz
     fiel ohne Protokoll heraus (Behebung FIX3).
     """
-    enden = [ende for ende in (laufzeit_in_monaten(p.get("recurrenceEnd"))
-                               for p in _perioden(komposition))
-             if ende is not None]         # None = offene Phase, kein Ende
+    enden = [
+        ende
+        for ende in (
+            laufzeit_in_monaten(p.get("recurrenceEnd")) for p in _perioden(komposition)
+        )
+        if ende is not None
+    ]  # None = offene Phase, kein Ende
     return max(enden) if enden else None
 
 
-def _laufzeit(komposition: dict,
-              geraet_monatsrate: Optional[float]) -> Optional[int]:
+def _laufzeit(komposition: dict, geraet_monatsrate: Optional[float]) -> Optional[int]:
     """Die Ratenlaufzeit dieser Komposition - oder None als Luecke.
 
     DREI QUELLEN, IN DIESER ORDNUNG, UND KEINE VERMISCHUNG:
@@ -406,14 +421,28 @@ def _laufzeit(komposition: dict,
         return laufzeit
     if geraet_monatsrate is not None:
         return laufzeit_in_monaten(
-            _pfad(komposition, "priceByComponent", "hardware", "priceByType",
-                  "rate", "month", "withoutDiscounts", "recurrenceEnd"))
+            _pfad(
+                komposition,
+                "priceByComponent",
+                "hardware",
+                "priceByType",
+                "rate",
+                "month",
+                "withoutDiscounts",
+                "recurrenceEnd",
+            )
+        )
     return _letztes_phasenende(komposition)
 
 
-def _buendelsatz_aus_komposition(modell: str, hubpage: str, hardware_id: str,
-                                 farbe: str, speicher: Optional[int],
-                                 komposition: dict) -> Optional[dict]:
+def _buendelsatz_aus_komposition(
+    modell: str,
+    hubpage: str,
+    hardware_id: str,
+    farbe: str,
+    speicher: Optional[int],
+    komposition: dict,
+) -> Optional[dict]:
     """Eine Komposition wird ein Buendel-Rohsatz - oder nichts, siehe
     Modulkopf (die Rechenprobe entscheidet, nicht `financingType`)."""
     hash_ = str(komposition.get("offerCoreHash") or "").strip()
@@ -421,22 +450,29 @@ def _buendelsatz_aus_komposition(modell: str, hubpage: str, hardware_id: str,
         # Ohne `offerCoreHash` gibt es keinen Schluessel, ueber den
         # `loese_tarifnamen()` je einen Tarifnamen findet - der Satz waere
         # ein Buendel ohne benennbaren Tarif.
-        log.info("Vodafone-Buendel: Komposition ohne offerCoreHash "
-                 "(financingType %r) - verworfen",
-                 komposition.get("financingType"))
+        log.info(
+            "Vodafone-Buendel: Komposition ohne offerCoreHash "
+            "(financingType %r) - verworfen",
+            komposition.get("financingType"),
+        )
         return None
 
     periode = _periode0(komposition)
     gesamt = _preis((periode or {}).get("gross")) if periode else None
     if gesamt is None:
-        log.info("Vodafone-Buendel: Komposition %s ohne Gesamtrate in "
-                 "totalMonthlyRatePrice - verworfen", hash_)
+        log.info(
+            "Vodafone-Buendel: Komposition %s ohne Gesamtrate in "
+            "totalMonthlyRatePrice - verworfen",
+            hash_,
+        )
         return None
 
-    tarif = _pfad(komposition, "priceByComponent", "tariff",
-                  "priceByType", "rate") or {}
-    hardware = _pfad(komposition, "priceByComponent", "hardware",
-                     "priceByType", "rate") or {}
+    tarif = (
+        _pfad(komposition, "priceByComponent", "tariff", "priceByType", "rate") or {}
+    )
+    hardware = (
+        _pfad(komposition, "priceByComponent", "hardware", "priceByType", "rate") or {}
+    )
     t_monat = _preis(_pfad(tarif, "month", "withoutDiscounts", "gross"))
     t_einmalig = _preis(_pfad(tarif, "onetime", "withoutDiscounts", "gross"))
     h_monat = _preis(_pfad(hardware, "month", "withoutDiscounts", "gross"))
@@ -444,8 +480,9 @@ def _buendelsatz_aus_komposition(modell: str, hubpage: str, hardware_id: str,
     if t_monat is None:
         # Ohne Tarifrate keine Buendelaussage - und der Ausfall wird
         # benannt, nicht verschluckt.
-        log.info("Vodafone-Buendel: Komposition %s ohne Tarif-Monatsrate "
-                 "- verworfen", hash_)
+        log.info(
+            "Vodafone-Buendel: Komposition %s ohne Tarif-Monatsrate - verworfen", hash_
+        )
         return None
 
     if h_monat is not None and _gleich(t_monat + h_monat, gesamt):
@@ -455,24 +492,39 @@ def _buendelsatz_aus_komposition(modell: str, hubpage: str, hardware_id: str,
         # Tarifpreis, eine separate Rate wird nicht berechnet (Modulkopf).
         geraet_monatsrate = None
     else:
-        log.info("Vodafone-Buendel: Komposition %s geht nicht auf "
-                 "(Tarif %s + Geraet %s gegen Gesamtrate %s) - verworfen",
-                 hash_, t_monat, h_monat, gesamt)
-        return None                       # Summe geht nicht auf - verwerfen
+        log.info(
+            "Vodafone-Buendel: Komposition %s geht nicht auf "
+            "(Tarif %s + Geraet %s gegen Gesamtrate %s) - verworfen",
+            hash_,
+            t_monat,
+            h_monat,
+            gesamt,
+        )
+        return None  # Summe geht nicht auf - verwerfen
 
     laufzeit = _laufzeit(komposition, geraet_monatsrate)
     if laufzeit is None:
         # BENANNTE LUECKE statt stillem Verlust: hier verschwindet ein
         # gemessenes Angebot, und der Grund steht im Protokoll.
-        log.info("Vodafone-Buendel: Komposition %s ohne bestimmbare "
-                 "Ratenlaufzeit (financingDuration %r, Geraeterate %r, "
-                 "Ende der Geraeterate %r, Phasenenden %r) - verworfen",
-                 hash_, komposition.get("financingDuration"),
-                 geraet_monatsrate,
-                 _pfad(komposition, "priceByComponent", "hardware",
-                       "priceByType", "rate", "month", "withoutDiscounts",
-                       "recurrenceEnd"),
-                 [p.get("recurrenceEnd") for p in _perioden(komposition)])
+        log.info(
+            "Vodafone-Buendel: Komposition %s ohne bestimmbare "
+            "Ratenlaufzeit (financingDuration %r, Geraeterate %r, "
+            "Ende der Geraeterate %r, Phasenenden %r) - verworfen",
+            hash_,
+            komposition.get("financingDuration"),
+            geraet_monatsrate,
+            _pfad(
+                komposition,
+                "priceByComponent",
+                "hardware",
+                "priceByType",
+                "rate",
+                "month",
+                "withoutDiscounts",
+                "recurrenceEnd",
+            ),
+            [p.get("recurrenceEnd") for p in _perioden(komposition)],
+        )
         return None
 
     return {
@@ -500,8 +552,7 @@ def _buendelsatz_aus_komposition(modell: str, hubpage: str, hardware_id: str,
 # `proben` ist die Schnittstelle der Provider-Probe (FM-2, P5 - siehe
 # Adapter-Docstring in collect/geraete/__init__.py); dieser Adapter
 # traegt keine Feld-Proben hinein.
-def lies_buendel(text: str, url: str = "",
-                 proben: Optional[dict] = None) -> list[dict]:
+def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> list[dict]:
     """Aus DERSELBEN Detailnutzlast, die `lies()` liest, die Buendelsaetze.
 
     Kein eigener Abruf: `text` ist exakt die Antwort, die der Sammler fuer
@@ -522,7 +573,7 @@ def lies_buendel(text: str, url: str = "",
         hubpage = "https://www.vodafone.de" + hubpage
 
     out: list[dict] = []
-    for atom in (knoten.get("atomics") or []):
+    for atom in knoten.get("atomics") or []:
         if not isinstance(atom, dict):
             continue
         hardware_id = str(atom.get("hardwareId") or "").strip()
@@ -530,11 +581,12 @@ def lies_buendel(text: str, url: str = "",
             continue
         speicher = _speicher_gb(str(_pfad(atom, "capacity", "displayLabel") or ""))
         farbe = str(_pfad(atom, "color", "displayLabel") or "").strip()
-        for eintrag in (_pfad(atom, "prices", "composition") or []):
+        for eintrag in _pfad(atom, "prices", "composition") or []:
             if not isinstance(eintrag, dict):
                 continue
             satz = _buendelsatz_aus_komposition(
-                modell, hubpage, hardware_id, farbe, speicher, eintrag)
+                modell, hubpage, hardware_id, farbe, speicher, eintrag
+            )
             if satz is not None:
                 out.append(satz)
     return out
@@ -543,6 +595,7 @@ def lies_buendel(text: str, url: str = "",
 # --------------------------------------------------------------------------
 # TARIFNAMEN AUFLOESEN - siehe Modulkopf, Abschnitt B1
 # --------------------------------------------------------------------------
+
 
 def _buendel_aus_tarifantwort(text: str) -> dict:
     """`hardwareId` -> Liste von (Tarifname, Komposition) - ALLE Angebote.
@@ -566,16 +619,16 @@ def _buendel_aus_tarifantwort(text: str) -> dict:
         hwid = str(_pfad(eintrag, "hardware", "hardwareId") or "").strip()
         if not hwid:
             continue
-        for tarif in (eintrag.get("tariffs") or []):
+        for tarif in eintrag.get("tariffs") or []:
             if not isinstance(tarif, dict):
                 continue
             name = str(tarif.get("tariffName") or "").strip()
             if not name:
                 continue
-            for atom in (tarif.get("atomics") or []):
+            for atom in tarif.get("atomics") or []:
                 if not isinstance(atom, dict):
                     continue
-                for komposition in (_pfad(atom, "prices", "composition") or []):
+                for komposition in _pfad(atom, "prices", "composition") or []:
                     if isinstance(komposition, dict):
                         out.setdefault(hwid, []).append((name, komposition))
     return out
@@ -587,10 +640,12 @@ def _hash_namen_aus_tarifantwort(text: str) -> dict:
     Nur noch der RUECKFALL fuer eine Variante, deren eigener Eintrag in der
     Tarifantwort fehlt (siehe `loese_tarifnamen`).
     """
-    return {str(k.get("offerCoreHash") or "").strip(): name
-            for eintraege in _buendel_aus_tarifantwort(text).values()
-            for name, k in eintraege
-            if str(k.get("offerCoreHash") or "").strip()}
+    return {
+        str(k.get("offerCoreHash") or "").strip(): name
+        for eintraege in _buendel_aus_tarifantwort(text).values()
+        for name, k in eintraege
+        if str(k.get("offerCoreHash") or "").strip()
+    }
 
 
 # Derselbe Mindestabstand wie `rate_limit_sekunden` des Anbieters in
@@ -609,28 +664,36 @@ _IDS_JE_ABRUF = 16
 
 
 def _tarifadresse(hardware_ids: list) -> str:
-    return ("https://api.vodafone.de/glados/v2/tariff/v2/hardware"
-            f"?hardwareId={','.join(hardware_ids)}&{_PARAMETER}")
+    return (
+        "https://api.vodafone.de/glados/v2/tariff/v2/hardware"
+        f"?hardwareId={','.join(hardware_ids)}&{_PARAMETER}"
+    )
 
 
-def _hole_angebote(hole: Callable, kopfzeilen: dict, geraet: str,
-                   ids: list) -> dict:
+def _hole_angebote(hole: Callable, kopfzeilen: dict, geraet: str, ids: list) -> dict:
     """Ein Abruf der Tarifschnittstelle; bei jedem Scheitern `{}` MIT
     Protokoll - der Aufrufer laesst dann die Vorschau stehen."""
     try:
         status, text = hole(_tarifadresse(ids), kopfzeilen=kopfzeilen)
-    except Exception as exc:                              # noqa: BLE001
-        log.info("Vodafone-Tarifschnittstelle %s: Abruf gescheitert (%s) - "
-                 "Vorschau bleibt", geraet, exc)
+    except Exception as exc:  # noqa: BLE001
+        log.info(
+            "Vodafone-Tarifschnittstelle %s: Abruf gescheitert (%s) - Vorschau bleibt",
+            geraet,
+            exc,
+        )
         return {}
     if not (200 <= int(status) < 300):
-        log.info("Vodafone-Tarifschnittstelle %s: HTTP %s - Vorschau bleibt",
-                 geraet, status)
+        log.info(
+            "Vodafone-Tarifschnittstelle %s: HTTP %s - Vorschau bleibt", geraet, status
+        )
         return {}
     angebote = _buendel_aus_tarifantwort(text)
     if not angebote:
-        log.info("Vodafone-Tarifschnittstelle %s: Antwort ohne lesbare "
-                 "Angebote - Vorschau bleibt", geraet)
+        log.info(
+            "Vodafone-Tarifschnittstelle %s: Antwort ohne lesbare "
+            "Angebote - Vorschau bleibt",
+            geraet,
+        )
     return angebote
 
 
@@ -642,9 +705,13 @@ def _alle_angebote(vorlage: dict, hwid: str, angebote: list) -> list:
     gesehen: set = set()
     for name, komposition in angebote:
         satz = _buendelsatz_aus_komposition(
-            str(vorlage.get("titel") or ""), str(vorlage.get("url") or ""),
-            hwid, str(vorlage.get("farbe") or ""),
-            vorlage.get("speicher_gb"), komposition)
+            str(vorlage.get("titel") or ""),
+            str(vorlage.get("url") or ""),
+            hwid,
+            str(vorlage.get("farbe") or ""),
+            vorlage.get("speicher_gb"),
+            komposition,
+        )
         if satz is None:
             continue
         # Tarif und Laufzeit sind der Buendelschluessel
@@ -652,9 +719,14 @@ def _alle_angebote(vorlage: dict, hwid: str, angebote: list) -> list:
         # ueberschriebe das erste still.
         paar = (name, satz["laufzeit_monate"])
         if paar in gesehen:
-            log.warning("Vodafone-Tarifschnittstelle: Variante %s traegt "
-                        "%s/%s Monate doppelt - das zweite Angebot wird "
-                        "uebergangen", hwid, name, satz["laufzeit_monate"])
+            log.warning(
+                "Vodafone-Tarifschnittstelle: Variante %s traegt "
+                "%s/%s Monate doppelt - das zweite Angebot wird "
+                "uebergangen",
+                hwid,
+                name,
+                satz["laufzeit_monate"],
+            )
             continue
         gesehen.add(paar)
         out.append({**vorlage, **satz, "tarif_name": name})
@@ -709,9 +781,9 @@ def loese_tarifnamen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> int:
 
     je_geraet: dict[tuple, list] = {}
     for hwid, saetze in vorschau.items():
-        je_geraet.setdefault((str(saetze[0].get("titel") or ""),
-                              str(saetze[0].get("url") or "")),
-                             []).append(hwid)
+        je_geraet.setdefault(
+            (str(saetze[0].get("titel") or ""), str(saetze[0].get("url") or "")), []
+        ).append(hwid)
 
     vollstaendig: dict[str, list] = {}
     hash_namen: dict[str, str] = {}
@@ -719,7 +791,7 @@ def loese_tarifnamen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> int:
     for geraet in sorted(je_geraet):
         ids = sorted(je_geraet[geraet])
         for i in range(0, len(ids), _IDS_JE_ABRUF):
-            teil = ids[i:i + _IDS_JE_ABRUF]
+            teil = ids[i : i + _IDS_JE_ABRUF]
             warte = _TARIF_RATE_LIMIT - (time.monotonic() - letzter)
             if letzter and warte > 0:
                 time.sleep(warte)
@@ -744,9 +816,11 @@ def loese_tarifnamen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> int:
         if saetze:
             ersetzt[hwid] = saetze
         else:
-            log.warning("Vodafone: %s - keine Kombination der "
-                        "Tarifschnittstelle lesbar, die Vorschau bleibt",
-                        hwid)
+            log.warning(
+                "Vodafone: %s - keine Kombination der "
+                "Tarifschnittstelle lesbar, die Vorschau bleibt",
+                hwid,
+            )
             del vollstaendig[hwid]
     for r in rohbuendel:
         hwid = str(r.get("sku") or "").strip()
@@ -755,15 +829,20 @@ def loese_tarifnamen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> int:
                 saetze = ersetzt[hwid]
                 neu.extend(saetze)
                 gesetzt += len(saetze)
-            continue                     # die uebrige Vorschau faellt weg
-        if (r.get("quelle") == "vodafone_buendel"
-                and not str(r.get("tarif_name") or "").strip()):
+            continue  # die uebrige Vorschau faellt weg
+        if (
+            r.get("quelle") == "vodafone_buendel"
+            and not str(r.get("tarif_name") or "").strip()
+        ):
             name = hash_namen.get(str(r.get("tarif_slug") or "").strip())
             if name:
                 r["tarif_name"] = name
                 gesetzt += 1
         neu.append(r)
-    log.info("Vodafone-Tarifschnittstelle: %d von %d Varianten vollstaendig "
-             "gelesen", len(vollstaendig), len(vorschau))
+    log.info(
+        "Vodafone-Tarifschnittstelle: %d von %d Varianten vollstaendig gelesen",
+        len(vollstaendig),
+        len(vorschau),
+    )
     rohbuendel[:] = neu
     return gesetzt

@@ -6,6 +6,7 @@ Modelle, die config/settings.yaml verwendet - und wenn nicht, woran es liegt.
 Gibt niemals den API-Key aus. Nur Statuscodes, Laufzeiten und gekuerzte
 Fehlertexte landen im Log.
 """
+
 from __future__ import annotations
 
 import os
@@ -14,7 +15,9 @@ import time
 
 import httpx
 
-BASE = (os.environ.get("LLM_API_BASE") or "https://integrate.api.nvidia.com/v1").rstrip("/")
+BASE = (os.environ.get("LLM_API_BASE") or "https://integrate.api.nvidia.com/v1").rstrip(
+    "/"
+)
 KEY = (os.environ.get("LLM_API_KEY") or "").strip().strip('"').strip("'").strip()
 
 PROBE_TIMEOUT = 90.0
@@ -45,16 +48,18 @@ def list_models() -> set[str]:
     ids: set[str] = set()
     try:
         t0 = time.monotonic()
-        r = httpx.get(f"{BASE}/models",
-                      headers={"Authorization": f"Bearer {KEY}"},
-                      timeout=30)
+        r = httpx.get(
+            f"{BASE}/models", headers={"Authorization": f"Bearer {KEY}"}, timeout=30
+        )
         dt = time.monotonic() - t0
         print(f"HTTP {r.status_code} in {dt:.1f}s")
         if r.status_code == 200:
             ids = {m.get("id", "") for m in r.json().get("data", [])}
             print(f"Modelle insgesamt : {len(ids)}")
             for name in (PRO, FLASH):
-                print(f"  {name:38s} -> {'GELISTET' if name in ids else 'NICHT GELISTET'}")
+                print(
+                    f"  {name:38s} -> {'GELISTET' if name in ids else 'NICHT GELISTET'}"
+                )
             print("  deepseek-Slugs im Katalog:")
             for m in sorted(x for x in ids if "deepseek" in x.lower()):
                 print(f"    - {m}")
@@ -78,25 +83,38 @@ def probe(label: str, model: str, thinking_off: bool, max_tokens: int = 16) -> N
         payload["chat_template_kwargs"] = {"thinking": False}
     t0 = time.monotonic()
     try:
-        r = httpx.post(f"{BASE}/chat/completions", json=payload,
-                       headers={"Authorization": f"Bearer {KEY}",
-                                "Content-Type": "application/json"},
-                       timeout=PROBE_TIMEOUT)
+        r = httpx.post(
+            f"{BASE}/chat/completions",
+            json=payload,
+            headers={
+                "Authorization": f"Bearer {KEY}",
+                "Content-Type": "application/json",
+            },
+            timeout=PROBE_TIMEOUT,
+        )
         dt = time.monotonic() - t0
         if r.status_code == 200:
             data = r.json()
-            content = (data.get("choices") or [{}])[0].get("message", {}).get("content", "")
+            content = (
+                (data.get("choices") or [{}])[0].get("message", {}).get("content", "")
+            )
             usage = data.get("usage") or {}
-            print(f"{label:44s} HTTP 200 in {dt:6.1f}s | out={content.strip()[:40]!r}"
-                  f" | tokens={usage.get('completion_tokens')}")
+            print(
+                f"{label:44s} HTTP 200 in {dt:6.1f}s | out={content.strip()[:40]!r}"
+                f" | tokens={usage.get('completion_tokens')}"
+            )
         else:
             print(f"{label:44s} HTTP {r.status_code} in {dt:6.1f}s | {r.text[:220]}")
     except httpx.ReadTimeout:
-        print(f"{label:44s} READ-TIMEOUT nach {time.monotonic()-t0:6.1f}s"
-              f" (Verbindung stand, Modell lieferte nichts)")
+        print(
+            f"{label:44s} READ-TIMEOUT nach {time.monotonic() - t0:6.1f}s"
+            f" (Verbindung stand, Modell lieferte nichts)"
+        )
     except Exception as exc:  # noqa: BLE001
-        print(f"{label:44s} {type(exc).__name__} nach {time.monotonic()-t0:6.1f}s"
-              f" | {str(exc)[:200]}")
+        print(
+            f"{label:44s} {type(exc).__name__} nach {time.monotonic() - t0:6.1f}s"
+            f" | {str(exc)[:200]}"
+        )
     sys.stdout.flush()
 
 

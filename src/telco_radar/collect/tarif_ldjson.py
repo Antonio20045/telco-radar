@@ -67,6 +67,7 @@ Kniff, sondern die Sache selbst - 1&1 verkauft seinen eigenen Tarif und
 Apples Telefon. Ein Knoten mit fremder Marke wird uebersprungen und
 protokolliert.
 """
+
 from __future__ import annotations
 
 import json
@@ -155,8 +156,9 @@ def _ausschnitt(knoten: dict, *pfad) -> str:
     return json.dumps({letzte: o[letzte]}, ensure_ascii=False)[1:-1].strip()
 
 
-def tarif_aus_knoten(knoten: dict, *, anbieter: str, seiten_url: str,
-                     abgerufen_am: str) -> Optional[tuple[Tarif, str]]:
+def tarif_aus_knoten(
+    knoten: dict, *, anbieter: str, seiten_url: str, abgerufen_am: str
+) -> Optional[tuple[Tarif, str]]:
     """Ein Product-Knoten wird ein Tarif - oder nichts.
 
     Nichts wird er, wenn er einem anderen Hersteller gehoert, keinen Namen
@@ -169,12 +171,15 @@ def tarif_aus_knoten(knoten: dict, *, anbieter: str, seiten_url: str,
         return None
 
     marke = knoten.get("brand")
-    marke_name = (marke.get("name") if isinstance(marke, dict)
-                  else marke) or ""
+    marke_name = (marke.get("name") if isinstance(marke, dict) else marke) or ""
     if _marke(marke_name) != _marke(anbieter):
-        log.info("ld+json-Knoten %r traegt die Marke %r und nicht %r - "
-                 "das ist ein Fremdprodukt, kein Tarif dieses Anbieters",
-                 name, str(marke_name), anbieter)
+        log.info(
+            "ld+json-Knoten %r traegt die Marke %r und nicht %r - "
+            "das ist ein Fremdprodukt, kein Tarif dieses Anbieters",
+            name,
+            str(marke_name),
+            anbieter,
+        )
         return None
 
     angebot = knoten.get("offers")
@@ -184,8 +189,9 @@ def tarif_aus_knoten(knoten: dict, *, anbieter: str, seiten_url: str,
         return None
     waehrung = str(angebot.get("priceCurrency") or "").upper()
     if waehrung and waehrung != "EUR":
-        log.info("ld+json-Knoten %r rechnet in %s - kein Vergleichswert",
-                 name, waehrung)
+        log.info(
+            "ld+json-Knoten %r rechnet in %s - kein Vergleichswert", name, waehrung
+        )
         return None
     betrag = zahl(angebot.get("price"))
     if betrag is None:
@@ -194,22 +200,29 @@ def tarif_aus_knoten(knoten: dict, *, anbieter: str, seiten_url: str,
     # Der Rohtext IST der Knoten. Damit steht jede Fundstelle unten
     # woertlich darin, und `pruefe_belege()` prueft eine echte Zusage.
     rohtext = json.dumps(knoten, ensure_ascii=False)
-    tarif = Tarif(anbieter=anbieter, abgerufen_am=abgerufen_am,
-                  rohtext=rohtext, preistyp=PREISTYP_LIVE_SHOP,
-                  # Die Seite, auf der die Zahl stand. `offers.url` waere
-                  # verlockend, ist aber der Bestellweg und nicht die
-                  # Fundstelle - 1&1 setzt dort dieselbe Adresse fuer alle
-                  # sieben Tarife.
-                  dokument_url=seiten_url)
+    tarif = Tarif(
+        anbieter=anbieter,
+        abgerufen_am=abgerufen_am,
+        rohtext=rohtext,
+        preistyp=PREISTYP_LIVE_SHOP,
+        # Die Seite, auf der die Zahl stand. `offers.url` waere
+        # verlockend, ist aber der Bestellweg und nicht die
+        # Fundstelle - 1&1 setzt dort dieselbe Adresse fuer alle
+        # sieben Tarife.
+        dokument_url=seiten_url,
+    )
     tarif.setze("name", name, _ausschnitt(knoten, "name"), HOCH)
-    tarif.setze("grundgebuehr", betrag,
-                _ausschnitt(knoten, "offers", "price"), HOCH)
+    tarif.setze("grundgebuehr", betrag, _ausschnitt(knoten, "offers", "price"), HOCH)
 
     beschreibung = str(knoten.get("description") or "")
     treffer = _VOLUMEN_RE.search(beschreibung)
     if treffer:
-        tarif.setze("datenvolumen_gb", zahl(treffer.group(1)),
-                    _ausschnitt(knoten, "description"), HOCH)
+        tarif.setze(
+            "datenvolumen_gb",
+            zahl(treffer.group(1)),
+            _ausschnitt(knoten, "description"),
+            HOCH,
+        )
 
     # Der Fingerabdruck haengt am KNOTEN, nicht an der Seite. Sieben
     # Tarife auf einer Seite haetten sonst denselben Hash: eine Aenderung
@@ -220,16 +233,20 @@ def tarif_aus_knoten(knoten: dict, *, anbieter: str, seiten_url: str,
     return tarif, hash_
 
 
-def tarife_aus_html(html: str, *, anbieter: str, seiten_url: str,
-                    abgerufen_am: str) -> list[tuple[Tarif, str]]:
+def tarife_aus_html(
+    html: str, *, anbieter: str, seiten_url: str, abgerufen_am: str
+) -> list[tuple[Tarif, str]]:
     """Alle Tarife, die die Seite in ihren strukturierten Daten nennt."""
     out: list[tuple[Tarif, str]] = []
     gesehen: set[str] = set()
     for block in ld_json_bloecke(html):
         for knoten in _knoten(block):
-            ergebnis = tarif_aus_knoten(knoten, anbieter=anbieter,
-                                        seiten_url=seiten_url,
-                                        abgerufen_am=abgerufen_am)
+            ergebnis = tarif_aus_knoten(
+                knoten,
+                anbieter=anbieter,
+                seiten_url=seiten_url,
+                abgerufen_am=abgerufen_am,
+            )
             if ergebnis is None:
                 continue
             tarif, hash_ = ergebnis

@@ -12,6 +12,7 @@ bereits konfigurierter.
 
 Kein Netz - fetch_snapshot wird ersetzt.
 """
+
 from __future__ import annotations
 
 import importlib.util
@@ -30,33 +31,42 @@ _spec.loader.exec_module(pp)
 # der Ueberlappungswert verweigert die Auskunft, wenn eine der beiden Seiten
 # unter MIN_WOERTER_VERGLEICH eigene Woerter hat - eine echte Aktionsseite
 # liegt bei mehreren hundert, ein viermal wiederholter Absatz nicht.
-GUT = ("Handytarife Aktion Sommer. Allnet Flat mit 30 GB fuer 19,99 EUR "
-       "monatlich statt 29,99 EUR. Wechselbonus 50 EUR fuer Neukunden mit "
-       "Rufnummernmitnahme. Der Aktionspreis gilt nur bis zum 30.09.2026. "
-       "Smartphone mit Vertrag im 5G Netz, eSIM kostenlos dazu, Prepaid "
-       "Startguthaben geschenkt. Tarif ohne Laufzeit, Rabatt auf die "
-       "Grundgebuehr, sparen Sie 120 EUR im ersten Jahr. "
-       + " ".join(f"produkt{i} leistung{i} baustein{i}" for i in range(90)))
+GUT = (
+    "Handytarife Aktion Sommer. Allnet Flat mit 30 GB fuer 19,99 EUR "
+    "monatlich statt 29,99 EUR. Wechselbonus 50 EUR fuer Neukunden mit "
+    "Rufnummernmitnahme. Der Aktionspreis gilt nur bis zum 30.09.2026. "
+    "Smartphone mit Vertrag im 5G Netz, eSIM kostenlos dazu, Prepaid "
+    "Startguthaben geschenkt. Tarif ohne Laufzeit, Rabatt auf die "
+    "Grundgebuehr, sparen Sie 120 EUR im ersten Jahr. "
+    + " ".join(f"produkt{i} leistung{i} baustein{i}" for i in range(90))
+)
 
 
 def _snap(text=GUT, links=3, images=2):
-    return {"text": text,
-            "links": [{"href": f"https://marke.test/a{i}", "text": "x"}
-                      for i in range(links)],
-            "images": [{"src": f"https://marke.test/b{i}.jpg"} for i in range(images)],
-            "image_url": None}
+    return {
+        "text": text,
+        "links": [
+            {"href": f"https://marke.test/a{i}", "text": "x"} for i in range(links)
+        ],
+        "images": [{"src": f"https://marke.test/b{i}.jpg"} for i in range(images)],
+        "image_url": None,
+    }
 
 
 def _bestand(seiten=None, unerreichbar=None, konfiguriert=None):
-    return {"leitseite": "https://marke.test/aktionen",
-            "seiten": seiten or {},
-            "unerreichbar": unerreichbar or [],
-            "konfiguriert": konfiguriert or set()}
+    return {
+        "leitseite": "https://marke.test/aktionen",
+        "seiten": seiten or {},
+        "unerreichbar": unerreichbar or [],
+        "konfiguriert": konfiguriert or set(),
+    }
 
 
 def _pruefe(url="https://marke.test/handys", snap=None, bestand=None, snap2=None):
-    geholt = {"kandidat": {"marke": "Marke", "url": url, "kind": "static"},
-              "snap": snap or _snap()}
+    geholt = {
+        "kandidat": {"marke": "Marke", "url": url, "kind": "static"},
+        "snap": snap or _snap(),
+    }
     if snap2 is not None:
         geholt["snap2"] = snap2
     return pp.bewerte_kandidat(geholt, bestand or _bestand())
@@ -73,8 +83,12 @@ def test_gute_seite_besteht():
 
 def test_abrufmisserfolg_ist_ein_durchfaller_kein_absturz():
     e = pp.bewerte_kandidat(
-        {"kandidat": {"marke": "M", "url": "https://marke.test/x"},
-         "fehler": "HTTPStatusError: 404"}, _bestand())
+        {
+            "kandidat": {"marke": "M", "url": "https://marke.test/x"},
+            "fehler": "HTTPStatusError: 404",
+        },
+        _bestand(),
+    )
     assert e["pass"] is False
     assert _fehler(e) == {"abrufbar"}
 
@@ -86,20 +100,24 @@ def test_zu_wenig_text_faellt_durch():
 
 
 def test_markenprosa_ohne_angebot_faellt_durch():
-    prosa = ("Wir sind ein Unternehmen mit langer Geschichte und einem klaren "
-             "Auftrag. Unser Netz verbindet Menschen in ganz Deutschland. "
-             "Nachhaltigkeit ist uns wichtig, ebenso die Zufriedenheit "
-             "unserer Kundinnen und Kunden im Mobilfunk. ") * 8
+    prosa = (
+        "Wir sind ein Unternehmen mit langer Geschichte und einem klaren "
+        "Auftrag. Unser Netz verbindet Menschen in ganz Deutschland. "
+        "Nachhaltigkeit ist uns wichtig, ebenso die Zufriedenheit "
+        "unserer Kundinnen und Kunden im Mobilfunk. "
+    ) * 8
     e = _pruefe(snap=_snap(prosa))
     assert "Angebotssignale" in _fehler(e)
 
 
 def test_festnetzseite_faellt_durch():
-    fest = ("Glasfaser und DSL fuer Zuhause. Der Kabel Internet Anschluss mit "
-            "1000 Mbit fuer 39,99 EUR monatlich, Router inklusive, "
-            "FritzBox gratis. MagentaZuhause Aktion: Rabatt auf den "
-            "Hausanschluss, sparen Sie bis zum 30.09.2026. Internet fuer "
-            "zuhause mit Glasfaser, Festnetz Flat inklusive. ") * 6
+    fest = (
+        "Glasfaser und DSL fuer Zuhause. Der Kabel Internet Anschluss mit "
+        "1000 Mbit fuer 39,99 EUR monatlich, Router inklusive, "
+        "FritzBox gratis. MagentaZuhause Aktion: Rabatt auf den "
+        "Hausanschluss, sparen Sie bis zum 30.09.2026. Internet fuer "
+        "zuhause mit Glasfaser, Festnetz Flat inklusive. "
+    ) * 6
     e = _pruefe(snap=_snap(fest))
     assert "Mobilfunk statt Festnetz" in _fehler(e)
 
@@ -117,14 +135,18 @@ def test_subdomain_derselben_marke_ist_in_ordnung():
 
 
 def test_bereits_konfigurierte_seite_faellt_durch():
-    e = _pruefe(url="https://marke.test/handys",
-                bestand=_bestand(konfiguriert={"marke.test/handys"}))
+    e = _pruefe(
+        url="https://marke.test/handys",
+        bestand=_bestand(konfiguriert={"marke.test/handys"}),
+    )
     assert "noch nicht konfiguriert" in _fehler(e)
 
 
 def test_schraegstrich_und_www_taeuschen_die_dublettenpruefung_nicht():
-    e = _pruefe(url="https://www.marke.test/handys/",
-                bestand=_bestand(konfiguriert={"marke.test/handys"}))
+    e = _pruefe(
+        url="https://www.marke.test/handys/",
+        bestand=_bestand(konfiguriert={"marke.test/handys"}),
+    )
     assert "noch nicht konfiguriert" in _fehler(e)
 
 
@@ -139,10 +161,14 @@ def test_seite_die_eine_bestehende_enthaelt_faellt_durch():
     Kandidatenmenge gerechnet sieht eine Seite, die eine bestehende
     VOLLSTAENDIG enthaelt, faelschlich neu aus. Gerechnet wird gegen die
     kleinere Menge."""
-    kleiner = GUT[:len(GUT) // 3]
-    e = _pruefe(snap=_snap(GUT + " Zusaetzlich noch viele weitere Woerter, die "
-                                 "es auf der bestehenden Seite gar nicht gibt. " * 20),
-                bestand=_bestand(seiten={"https://marke.test/aktionen": kleiner}))
+    kleiner = GUT[: len(GUT) // 3]
+    e = _pruefe(
+        snap=_snap(
+            GUT + " Zusaetzlich noch viele weitere Woerter, die "
+            "es auf der bestehenden Seite gar nicht gibt. " * 20
+        ),
+        bestand=_bestand(seiten={"https://marke.test/aktionen": kleiner}),
+    )
     assert "eigenstaendig" in _fehler(e)
 
 
@@ -150,12 +176,16 @@ def test_wirklich_andere_seite_besteht():
     # Wortreich genug fuer einen belastbaren Vergleich (echte Aktionsseiten
     # liegen bei mehreren hundert verschiedenen Woertern) und inhaltlich
     # klar etwas anderes als GUT.
-    anders = ("Prepaid Startpaket ohne Vertrag. 10 GB fuer 7,99 EUR im Monat, "
-              "Guthaben aufladen im Laden. Aktion: doppeltes Datenvolumen "
-              "bis zum 15.10.2026 geschenkt fuer Neukunden im Prepaid Tarif. "
-              + " ".join(f"stichwort{i} begriff{i} merkmal{i}" for i in range(90)))
-    e = _pruefe(snap=_snap(anders),
-                bestand=_bestand(seiten={"https://marke.test/aktionen": GUT}))
+    anders = (
+        "Prepaid Startpaket ohne Vertrag. 10 GB fuer 7,99 EUR im Monat, "
+        "Guthaben aufladen im Laden. Aktion: doppeltes Datenvolumen "
+        "bis zum 15.10.2026 geschenkt fuer Neukunden im Prepaid Tarif. "
+        + " ".join(f"stichwort{i} begriff{i} merkmal{i}" for i in range(90))
+    )
+    e = _pruefe(
+        snap=_snap(anders),
+        bestand=_bestand(seiten={"https://marke.test/aktionen": GUT}),
+    )
     assert "eigenstaendig" not in _fehler(e)
 
 
@@ -163,13 +193,14 @@ def test_duenner_kandidat_gilt_als_nicht_vergleichbar():
     """Die Kehrseite: eine Seite mit zu wenig eigenem Wortschatz laesst sich
     gegen nichts halten - und "nicht pruefbar" ist kein PASS."""
     duenn = "Aktion 19,99 EUR monatlich 30 GB Rabatt Bonus Tarif " * 12
-    e = _pruefe(snap=_snap(duenn),
-                bestand=_bestand(seiten={"https://marke.test/aktionen": GUT}))
+    e = _pruefe(
+        snap=_snap(duenn), bestand=_bestand(seiten={"https://marke.test/aktionen": GUT})
+    )
     assert "eigenstaendig" in _fehler(e)
 
 
 def test_nicht_abrufbare_bestandsseiten_sind_kein_bestehen():
-    """"Nicht pruefbar" ist kein PASS. Waeren die Bestandsseiten einer Marke
+    """ "Nicht pruefbar" ist kein PASS. Waeren die Bestandsseiten einer Marke
     gerade nicht erreichbar, haette Kriterium 7 nichts zu vergleichen - und
     jeder Kandidat kaeme ungeprueft durch."""
     e = _pruefe(bestand=_bestand(unerreichbar=["https://marke.test/aktionen"]))

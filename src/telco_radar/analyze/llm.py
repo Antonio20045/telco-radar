@@ -17,6 +17,7 @@ runtime). Runtime differences: the model id goes in the URL rather than the
 body, it needs the regional inference-profile prefix ("us."), and the body
 carries anthropic_version instead of a model field.
 """
+
 from __future__ import annotations
 
 import json
@@ -52,17 +53,23 @@ def _bedrock_profile(model: str) -> str:
     if model.split(".", 1)[0] in ("us", "eu", "apac", "global"):
         return model
     region = _bedrock_region()
-    prefix = "eu" if region.startswith("eu-") else (
-        "apac" if region.startswith("ap-") else "us")
+    prefix = (
+        "eu"
+        if region.startswith("eu-")
+        else ("apac" if region.startswith("ap-") else "us")
+    )
     return f"{prefix}.{model}"
 
 
 def _bedrock_url(model: str) -> str:
     from urllib.parse import quote
+
     # ":" stays literal - it is part of the versioned model id
     # (…-v1:0) and Bedrock does not accept it percent-encoded.
-    return (f"https://bedrock-runtime.{_bedrock_region()}.amazonaws.com"
-            f"/model/{quote(_bedrock_profile(model), safe=':')}/invoke")
+    return (
+        f"https://bedrock-runtime.{_bedrock_region()}.amazonaws.com"
+        f"/model/{quote(_bedrock_profile(model), safe=':')}/invoke"
+    )
 
 
 def _use_bedrock() -> bool:
@@ -78,8 +85,7 @@ def _use_openai() -> bool:
 
 
 def llm_available() -> bool:
-    return (_use_bedrock() or _use_openai()
-            or bool(os.environ.get("ANTHROPIC_API_KEY")))
+    return _use_bedrock() or _use_openai() or bool(os.environ.get("ANTHROPIC_API_KEY"))
 
 
 def active_backend() -> str:
@@ -321,10 +327,14 @@ def _zaehle_usage(model: str, data: dict) -> None:
         aus = usage.get("output_tokens") or 0
     # Anthropic weist Cache-Treffer getrennt aus; sie sind Eingabe und
     # wuerden sonst gar nicht auftauchen.
-    ein = int(ein) + int(usage.get("cache_read_input_tokens") or 0) \
+    ein = (
+        int(ein)
+        + int(usage.get("cache_read_input_tokens") or 0)
         + int(usage.get("cache_creation_input_tokens") or 0)
+    )
     eintrag = _VERBRAUCH.setdefault(
-        model, {"aufrufe": 0, "prompt_tokens": 0, "completion_tokens": 0})
+        model, {"aufrufe": 0, "prompt_tokens": 0, "completion_tokens": 0}
+    )
     eintrag["aufrufe"] += 1
     eintrag["prompt_tokens"] += ein
     eintrag["completion_tokens"] += int(aus)
@@ -335,13 +345,17 @@ def _usd(model: str, prompt_tokens: int, completion_tokens: int) -> float | None
     preis = _PREISE.get(model)
     if not preis:
         return None
-    return (prompt_tokens * preis.get("ein", 0.0)
-            + completion_tokens * preis.get("aus", 0.0)) / 1_000_000
+    return (
+        prompt_tokens * preis.get("ein", 0.0)
+        + completion_tokens * preis.get("aus", 0.0)
+    ) / 1_000_000
 
 
 def _summe_usd() -> float:
-    return sum(_usd(name, v["prompt_tokens"], v["completion_tokens"]) or 0.0
-               for name, v in _VERBRAUCH.items())
+    return sum(
+        _usd(name, v["prompt_tokens"], v["completion_tokens"]) or 0.0
+        for name, v in _VERBRAUCH.items()
+    )
 
 
 def kosten_reset() -> None:
@@ -349,8 +363,7 @@ def kosten_reset() -> None:
     _VERBRAUCH.clear()
 
 
-def budget_setzen(usd_limit: float | None,
-                  preistabelle: dict | None = None) -> None:
+def budget_setzen(usd_limit: float | None, preistabelle: dict | None = None) -> None:
     """Warnschwelle und Preistabelle setzen. 0/leer heisst: keine Schwelle.
 
     Warnschwelle, nicht Not-Aus: der Zaehler greift NIE in den Lauf ein
@@ -372,8 +385,9 @@ def budget_setzen(usd_limit: float | None,
                 "aus": float(preis.get("aus", preis.get("output", 0)) or 0),
             }
         except (TypeError, ValueError):
-            log.warning("Unbrauchbare Preiszeile fuer %s - Modell bleibt "
-                        "unbeziffert", name)
+            log.warning(
+                "Unbrauchbare Preiszeile fuer %s - Modell bleibt unbeziffert", name
+            )
 
 
 def budget_ueberschritten() -> bool:
@@ -424,10 +438,12 @@ def _anthropic_text(data: dict) -> str:
     bloecke = data.get("content") or []
     text = "".join(b.get("text", "") for b in bloecke if b.get("type") == "text")
     if not text.strip():
-        log.warning("Leere Modellantwort: stop_reason=%s, Blocktypen=%s, "
-                    "Verbrauch=%s", data.get("stop_reason"),
-                    [b.get("type") for b in bloecke] or "keine",
-                    data.get("usage"))
+        log.warning(
+            "Leere Modellantwort: stop_reason=%s, Blocktypen=%s, Verbrauch=%s",
+            data.get("stop_reason"),
+            [b.get("type") for b in bloecke] or "keine",
+            data.get("usage"),
+        )
     return text
 
 
@@ -456,8 +472,9 @@ def _post_with_retries(url, payload, headers, retries, parse):
         attempt += 1
         started = time.monotonic()
         try:
-            resp = httpx.post(url, json=payload, headers=headers,
-                              timeout=http_timeout())
+            resp = httpx.post(
+                url, json=payload, headers=headers, timeout=http_timeout()
+            )
             if resp.status_code == 402:
                 # Leeres Guthaben ist eine Ablehnung des ANBIETERS, kein
                 # defekter Request: ein anderes Modell desselben Kontos
@@ -469,7 +486,8 @@ def _post_with_retries(url, payload, headers, retries, parse):
                 # Ende, ohne den zweiten Anbieter auch nur zu fragen.
                 raise LLMModelUnavailable(
                     f"HTTP 402 Payment Required (Guthaben aufgebraucht): "
-                    f"{resp.text[:200]}")
+                    f"{resp.text[:200]}"
+                )
             if resp.status_code in _FATAL_STATUSES:
                 raise _FatalHTTP(f"HTTP {resp.status_code}: {resp.text[:300]}")
             if _is_daily_quota(resp):
@@ -479,12 +497,13 @@ def _post_with_retries(url, payload, headers, retries, parse):
                 # path would spend the full call budget (300s) on it, per
                 # stage. Give up on this model at once so the run either falls
                 # back or publishes the digest in seconds instead of hours.
-                raise RuntimeError(
-                    f"daily token quota exhausted: {resp.text[:200]}")
+                raise RuntimeError(f"daily token quota exhausted: {resp.text[:200]}")
             if resp.status_code in (429, 529) or resp.status_code >= 500:
                 raise httpx.HTTPStatusError(
                     f"retryable status {resp.status_code}: {resp.text[:200]}",
-                    request=resp.request, response=resp)
+                    request=resp.request,
+                    response=resp,
+                )
             resp.raise_for_status()
             return parse(resp.json())
         except _FatalHTTP as exc:
@@ -505,28 +524,37 @@ def _post_with_retries(url, payload, headers, retries, parse):
                 if slow_failures >= max(1, min(retries, MAX_SLOW_FAILURES)):
                     raise RuntimeError(
                         f"LLM call failed after {attempt} attempts "
-                        f"({slow_failures} slow): {last_err}")
+                        f"({slow_failures} slow): {last_err}"
+                    )
                 wait = 2.0
             else:
                 cheap_failures += 1
                 wait = CHEAP_BACKOFF_SECONDS[
-                    min(cheap_failures - 1, len(CHEAP_BACKOFF_SECONDS) - 1)]
+                    min(cheap_failures - 1, len(CHEAP_BACKOFF_SECONDS) - 1)
+                ]
 
             remaining = deadline - time.monotonic()
             if remaining <= wait:
                 raise RuntimeError(
                     f"LLM call failed after {attempt} attempts / "
-                    f"{budget:.0f}s budget: {last_err}")
-            log.warning("LLM call failed (attempt %d, %s after %.1fs): %s "
-                        "- retrying in %.0fs (%.0fs budget left)",
-                        attempt, "slow" if elapsed >= http_timeout() * 0.5
-                        else "busy", elapsed, str(last_err)[:140], wait,
-                        remaining)
+                    f"{budget:.0f}s budget: {last_err}"
+                )
+            log.warning(
+                "LLM call failed (attempt %d, %s after %.1fs): %s "
+                "- retrying in %.0fs (%.0fs budget left)",
+                attempt,
+                "slow" if elapsed >= http_timeout() * 0.5 else "busy",
+                elapsed,
+                str(last_err)[:140],
+                wait,
+                remaining,
+            )
             time.sleep(wait)
 
 
-def _complete_openai(system: str, user: str, model: str,
-                     max_tokens: int, retries: int) -> str:
+def _complete_openai(
+    system: str, user: str, model: str, max_tokens: int, retries: int
+) -> str:
     key = os.environ["LLM_API_KEY"].strip().strip('"').strip("'").strip()
     payload = {
         "model": model,
@@ -572,25 +600,30 @@ def _complete_openai(system: str, user: str, model: str,
         # ValueError: der Retry-Wrapper oben faengt ihn NICHT, und das ist
         # richtig - ein zu kleines Budget wird beim vierten Versuch nicht
         # groesser, die Wiederholung waere nur teurer.
-        denkspur = (nachricht.get("reasoning_content")
-                    or nachricht.get("reasoning") or "")
+        denkspur = (
+            nachricht.get("reasoning_content") or nachricht.get("reasoning") or ""
+        )
         grund = data["choices"][0].get("finish_reason", "?")
         if denkspur:
             raise ValueError(
                 f"Modell {model} lieferte KEINE Antwort, nur {len(denkspur)} "
                 f"Zeichen Denkspur (finish_reason={grund}, max_tokens="
                 f"{max_tokens}). Das Token-Budget dieser Stufe reicht fuer "
-                f"dieses Modell nicht - erhoehen, nicht wiederholen.")
+                f"dieses Modell nicht - erhoehen, nicht wiederholen."
+            )
         raise ValueError(
             f"Modell {model} lieferte eine leere Antwort "
-            f"(finish_reason={grund}, max_tokens={max_tokens}).")
+            f"(finish_reason={grund}, max_tokens={max_tokens})."
+        )
 
-    return _post_with_retries(_openai_base() + "/chat/completions",
-                              payload, headers, retries, parse)
+    return _post_with_retries(
+        _openai_base() + "/chat/completions", payload, headers, retries, parse
+    )
 
 
-def _complete_anthropic(system: str, user: str, model: str,
-                        max_tokens: int, retries: int) -> str:
+def _complete_anthropic(
+    system: str, user: str, model: str, max_tokens: int, retries: int
+) -> str:
     key = os.environ.get("ANTHROPIC_API_KEY")
     if not key:
         raise RuntimeError("ANTHROPIC_API_KEY is not set")
@@ -613,8 +646,9 @@ def _complete_anthropic(system: str, user: str, model: str,
     return _post_with_retries(ANTHROPIC_URL, payload, headers, retries, parse)
 
 
-def _complete_bedrock(system: str, user: str, model: str,
-                      max_tokens: int, retries: int) -> str:
+def _complete_bedrock(
+    system: str, user: str, model: str, max_tokens: int, retries: int
+) -> str:
     key = os.environ.get("AWS_BEARER_TOKEN_BEDROCK")
     if not key:
         raise RuntimeError("AWS_BEARER_TOKEN_BEDROCK is not set")
@@ -635,12 +669,10 @@ def _complete_bedrock(system: str, user: str, model: str,
         _zaehle_usage(model, data)
         return _anthropic_text(data)
 
-    return _post_with_retries(_bedrock_url(model), payload, headers,
-                              retries, parse)
+    return _post_with_retries(_bedrock_url(model), payload, headers, retries, parse)
 
 
-def _dispatch(system: str, user: str, model: str,
-              max_tokens: int, retries: int) -> str:
+def _dispatch(system: str, user: str, model: str, max_tokens: int, retries: int) -> str:
     # Der Anthropic-Anker wird je MODELL geroutet, nicht je Prozess.
     #
     # Bis zum 27.08.2026 waehlte diese Funktion das Backend EINMAL aus der
@@ -663,9 +695,14 @@ def _dispatch(system: str, user: str, model: str,
     return _complete_anthropic(system, user, model, max_tokens, retries)
 
 
-def complete(system: str, user: str, model: str,
-             max_tokens: int = 4096, retries: int = 3,
-             ausweich: str = "") -> str:
+def complete(
+    system: str,
+    user: str,
+    model: str,
+    max_tokens: int = 4096,
+    retries: int = 3,
+    ausweich: str = "",
+) -> str:
     """Single-turn completion via the active backend.
 
     Survives a provider that stops serving one model. If `model` has a
@@ -702,8 +739,11 @@ def complete(system: str, user: str, model: str,
         except LLMModelUnavailable as exc:
             _DEAD_MODELS.add(candidate)
             last_exc = exc
-            log.warning("Model %s is not usable on this account - skipping it "
-                        "for the rest of this run", candidate)
+            log.warning(
+                "Model %s is not usable on this account - skipping it "
+                "for the rest of this run",
+                candidate,
+            )
         except LLMFatalError:
             raise
         except RuntimeError as exc:
@@ -721,8 +761,7 @@ def extract_json(text: str):
         text = text.split("\n", 1)[1] if "\n" in text else text
         if text.rstrip().endswith("```"):
             text = text.rstrip()[:-3]
-    start = min((i for i in (text.find("{"), text.find("[")) if i >= 0),
-                default=-1)
+    start = min((i for i in (text.find("{"), text.find("[")) if i >= 0), default=-1)
     if start > 0:
         text = text[start:]
     return json.loads(text)

@@ -12,6 +12,7 @@ alles" plotzlich ALLES. Ein Tippfehler in dieser Datei kehrt also die
 Auswahl eines Menschen ins Gegenteil, ohne dass irgendwo etwas rot wird.
 Deshalb: unbekannter Schluessel -> `ValueError` beim Laden, nicht spaeter.
 """
+
 from __future__ import annotations
 
 import logging
@@ -30,13 +31,18 @@ DIMENSIONEN = ("bereiche", "regionen", "wettbewerber", "kategorien")
 # weil sie im JSON eines Abos landen und dort neben `email`, `filters` und
 # `state` stehen - ein halb uebersetztes Schema ist schlimmer als ein ganz
 # englisches oder ein ganz deutsches.
-FELD_JE_DIMENSION = {"bereiche": "branches", "regionen": "regions",
-                     "wettbewerber": "competitors", "kategorien": "categories"}
+FELD_JE_DIMENSION = {
+    "bereiche": "branches",
+    "regionen": "regions",
+    "wettbewerber": "competitors",
+    "kategorien": "categories",
+}
 
 
 @dataclass(frozen=True)
 class Auswahl:
     """Ein waehlbarer Eintrag einer Dimension."""
+
     key: str
     label: str
     beschreibung: str = ""
@@ -109,9 +115,14 @@ def lade_katalog(root: Path) -> NewsletterKatalog:
     daten = yaml.safe_load(pfad.read_text(encoding="utf-8")) or {}
 
     katalog = NewsletterKatalog(
-        grenzen=Grenzen(**{k: int(v) for k, v in
-                           (daten.get("grenzen") or {}).items()
-                           if k in Grenzen.__dataclass_fields__}))
+        grenzen=Grenzen(
+            **{
+                k: int(v)
+                for k, v in (daten.get("grenzen") or {}).items()
+                if k in Grenzen.__dataclass_fields__
+            }
+        )
+    )
     for dimension in DIMENSIONEN:
         eintraege = [_auswahl(r, dimension) for r in (daten.get(dimension) or [])]
         if not eintraege:
@@ -121,7 +132,8 @@ def lade_katalog(root: Path) -> NewsletterKatalog:
             if a.key in gesehen:
                 raise ValueError(
                     f"newsletter.yaml: Schluessel '{a.key}' kommt in "
-                    f"'{dimension}' zweimal vor")
+                    f"'{dimension}' zweimal vor"
+                )
             gesehen.add(a.key)
         setattr(katalog, dimension, eintraege)
     return katalog

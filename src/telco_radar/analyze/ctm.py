@@ -47,6 +47,7 @@ beantwortet, wegen der jemand die Seite ueberhaupt aufschlaegt. Er laeuft
 deshalb NICHT durch die Ratschlags-Filter. Wer das dreht, dreht den Auftrag
 vom 08.08.2026 zurueck.
 """
+
 from __future__ import annotations
 
 import logging
@@ -76,12 +77,11 @@ STUFEN_LABEL = {
 
 STUFEN_ERKLAERUNG = {
     3: "Deutscher Markt, Endkundengeschäft, Preis, Portfolio, Option oder "
-       "Logistik – hier ist eine Entscheidung möglich.",
+    "Logistik – hier ist eine Entscheidung möglich.",
     2: "Eine Endkundenmechanik aus einem vergleichbaren Markt – lässt sich "
-       "auf das eigene Portfolio übertragen.",
+    "auf das eigene Portfolio übertragen.",
     1: "Branche, Technik oder Regulierung mit mittelbarer Wirkung.",
-    0: "Infrastruktur, Geschäftskunden oder Kapitalmarkt ohne "
-       "Endkundenbezug.",
+    0: "Infrastruktur, Geschäftskunden oder Kapitalmarkt ohne Endkundenbezug.",
 }
 
 # Maximale Laenge des CTM-Satzes in Woertern. Kein Schnitt - ein zu langer
@@ -103,13 +103,16 @@ _KONSEQUENZ = re.compile(
     r"brauchen wir|bräuchte|unsere[nrms]?\b|unser\b|eigene[nrms]?\b|"
     r"vorlage|kontern|nachziehen|gleichzieh|antwort|risiko|chance|"
     r"frage|prüfen|offen ist|untergrenze|obergrenze|erwarten|"
-    r"werden fragen|verhandl|marge|abwander|wechsel)", re.I)
+    r"werden fragen|verhandl|marge|abwander|wechsel)",
+    re.I,
+)
 
 # Reine Beobachtungssaetze, die nichts fuer das eigene Haus folgern.
 _LEERFORMEL = re.compile(
     r"^(das zeigt|dies zeigt|zeigt,? dass|ein weiterer schritt|"
     r"unterstreicht|verdeutlicht|bestätigt den trend|passt in den trend)",
-    re.I)
+    re.I,
+)
 
 
 @dataclass
@@ -161,8 +164,7 @@ def lade_fokus(root: Path) -> CtmFokus:
         heimatmarkt=list(daten.get("heimatmarkt_marken") or []),
         nachbarmarkt=list(daten.get("nachbarmarkt_marken") or []),
         direkte_kategorien=set(daten.get("direkte_kategorien") or []),
-        direkte_stichworte=[s.lower() for s in
-                            (daten.get("direkte_stichworte") or [])],
+        direkte_stichworte=[s.lower() for s in (daten.get("direkte_stichworte") or [])],
         vergleichbare_maerkte=list(daten.get("vergleichbare_maerkte") or []),
         sicherheitsskala=list(daten.get("sicherheitsskala") or []),
     )
@@ -177,8 +179,9 @@ def deterministische_stufe(h: dict, fokus: CtmFokus) -> int | None:
     Portfoliofrage, "Jio senkt Preise" ist eine Preisfrage und trotzdem nicht
     unser Markt.
     """
-    text = " ".join(str(h.get(f) or "") for f in
-                    ("operator", "title", "headline", "summary"))
+    text = " ".join(
+        str(h.get(f) or "") for f in ("operator", "title", "headline", "summary")
+    )
     if not fokus.trifft_heimatmarkt(text):
         return None
     kategorie = (h.get("category") or "").strip()
@@ -198,15 +201,19 @@ def _rueckfall_stufe(h: dict, fokus: CtmFokus) -> int:
     waere leer - schlimmer als vorher, weil die Prioritaet dann nichts mehr
     ordnete.
     """
-    text = " ".join(str(h.get(f) or "") for f in
-                    ("operator", "title", "headline", "summary"))
+    text = " ".join(
+        str(h.get(f) or "") for f in ("operator", "title", "headline", "summary")
+    )
     kategorie = (h.get("category") or "").strip()
     endkunde = kategorie in fokus.direkte_kategorien
     if fokus.trifft_heimatmarkt(text) or fokus.trifft_nachbarmarkt(text):
         return UEBERTRAGBAR if endkunde else KONTEXT
     if endkunde:
-        return UEBERTRAGBAR if (h.get("region") or "") in \
-            fokus.vergleichbare_maerkte else KONTEXT
+        return (
+            UEBERTRAGBAR
+            if (h.get("region") or "") in fokus.vergleichbare_maerkte
+            else KONTEXT
+        )
     if kategorie in {"Finanzen", "M&A"}:
         return HINTERGRUND
     return KONTEXT
@@ -244,8 +251,15 @@ def veredle(highlights: list[dict], fokus: CtmFokus) -> dict:
     laesst sich nach einem Lauf nicht sagen, ob die Linse gegriffen hat oder
     nur nichts gefunden wurde.
     """
-    bilanz = {"direkt": 0, "uebertragbar": 0, "kontext": 0, "hintergrund": 0,
-              "saetze": 0, "saetze_verworfen": 0, "gruende": {}}
+    bilanz = {
+        "direkt": 0,
+        "uebertragbar": 0,
+        "kontext": 0,
+        "hintergrund": 0,
+        "saetze": 0,
+        "saetze_verworfen": 0,
+        "gruende": {},
+    }
     for h in highlights:
         fest = deterministische_stufe(h, fokus)
         if fest is not None:
@@ -279,8 +293,9 @@ def veredle(highlights: list[dict], fokus: CtmFokus) -> dict:
             # Konsequenzsatz zu einer Meldung ohne Konsequenz ist erfunden.
             h.pop("ctm_satz", None)
 
-        bilanz[{3: "direkt", 2: "uebertragbar", 1: "kontext",
-                0: "hintergrund"}[stufe]] += 1
+        bilanz[
+            {3: "direkt", 2: "uebertragbar", 1: "kontext", 0: "hintergrund"}[stufe]
+        ] += 1
     return bilanz
 
 
@@ -305,8 +320,11 @@ def hat_zahl_aus_der_quelle(h: dict) -> bool:
     "900 TV-Kanaele" und "300 Dollar" tun es.
     """
     satz = h.get("ctm_satz") or ""
-    zahlen = [z for z in _ECHTE_ZAHL.findall(satz)
-              if len(z.replace(".", "").replace(",", "")) > 1]
+    zahlen = [
+        z
+        for z in _ECHTE_ZAHL.findall(satz)
+        if len(z.replace(".", "").replace(",", "")) > 1
+    ]
     if not zahlen:
         return False
     quelle = f"{h.get('title') or ''} {h.get('summary') or ''}"
@@ -330,13 +348,18 @@ def kurzpfad(highlights: list[dict]) -> list[dict]:
     aus dem ersten Bildschirm gedraengt; vier der fuenf waren reine
     Konjunktiv-Ableitungen.
     """
-    return zwei_minuten(highlights, KURZPFAD_ZEILEN, nur_belegt=True,
-                        max_woerter=KURZPFAD_WOERTER)
+    return zwei_minuten(
+        highlights, KURZPFAD_ZEILEN, nur_belegt=True, max_woerter=KURZPFAD_WOERTER
+    )
 
 
-def zwei_minuten(highlights: list[dict], max_zeilen: int = 5, *,
-                 nur_belegt: bool = False,
-                 max_woerter: int = 0) -> list[dict]:
+def zwei_minuten(
+    highlights: list[dict],
+    max_zeilen: int = 5,
+    *,
+    nur_belegt: bool = False,
+    max_woerter: int = 0,
+) -> list[dict]:
     """Die Zeilen des Zwei-Minuten-Pfads.
 
     "Lesezeit ca. 16 Minuten" ist ehrlich und trotzdem das Ende der Nutzung:
@@ -391,9 +414,12 @@ def zwei_minuten(highlights: list[dict], max_zeilen: int = 5, *,
 
     kandidaten = sorted(
         (h for h in highlights if zugelassen(h)),
-        key=lambda h: (-int(h.get("ctm_bezug") or 0),
-                       -int(h.get("relevance") or 0),
-                       -int(h.get("quellenzahl") or 1)))
+        key=lambda h: (
+            -int(h.get("ctm_bezug") or 0),
+            -int(h.get("relevance") or 0),
+            -int(h.get("quellenzahl") or 1),
+        ),
+    )
     for h in kandidaten:
         absender = (h.get("operator") or h.get("source_label") or "").lower()
         if absender and absender in gesehen:
@@ -403,7 +429,10 @@ def zwei_minuten(highlights: list[dict], max_zeilen: int = 5, *,
         if len(out) >= max_zeilen:
             break
     if any(gefallen.values()):
-        log.info("Kurzpfad: %d Zeilen aus %d Kandidaten; abgewiesen %s",
-                 len(out), len(kandidaten),
-                 ", ".join(f"{n}x {grund}" for grund, n in gefallen.items() if n))
+        log.info(
+            "Kurzpfad: %d Zeilen aus %d Kandidaten; abgewiesen %s",
+            len(out),
+            len(kandidaten),
+            ", ".join(f"{n}x {grund}" for grund, n in gefallen.items() if n),
+        )
     return out

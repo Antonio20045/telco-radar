@@ -32,11 +32,13 @@ ZWEI ALARME, ZWEI FÄLLE (S2-1: welcher greift wann)
   (`test_geraete_abdeckung.py::test_wer_gestern_lieferte_und_heute_
   nichts_liefert_alarmiert` deckt genau diesen Weg).
 """
+
 import json
 import logging
 
 from telco_radar.collect.geraete.o2 import lies_buendel
 from telco_radar.geraete_pipeline import melde_proben, run_geraete_stage
+
 # Repo-Uebung fuer Testfixtures ueber Modulgrenzen (siehe
 # test_eine_seite_querlinks.py & Co.).
 from test_geraete_buendel_o2 import _antwort, _eintrag, _katalog, _URL
@@ -46,6 +48,7 @@ from test_geraete_pipeline import _jetzt
 # --------------------------------------------------------------------------
 # Die gemessene Antwort
 # --------------------------------------------------------------------------
+
 
 def test_die_gemessene_antwort_besteht_alle_proben():
     """66 Kandidaten, 66 bestanden - die Existenz-Schwelle an der echten,
@@ -60,15 +63,19 @@ def test_die_protokollzeile_hat_ihren_festen_wortlaut(caplog):
     """Die Zeile ist der Alarm - ein driftender Wortlaut waere im
     Actions-Log nicht mehr grepbar."""
     with caplog.at_level(logging.INFO, logger="telco_radar.geraete_pipeline"):
-        melde_proben([{"anbieter": "o2",
-                       "proben": {"kandidaten": 66, "bestanden": 66}}])
-    assert ("Geraeteradar-Probe: o2 liefert 66 von 66 erwarteten Saetzen "
-            "noch ihre Felder (100 %)") in caplog.text
+        melde_proben(
+            [{"anbieter": "o2", "proben": {"kandidaten": 66, "bestanden": 66}}]
+        )
+    assert (
+        "Geraeteradar-Probe: o2 liefert 66 von 66 erwarteten Saetzen "
+        "noch ihre Felder (100 %)"
+    ) in caplog.text
 
 
 # --------------------------------------------------------------------------
 # Der Fall, fuer den die Probe gebaut ist
 # --------------------------------------------------------------------------
+
 
 def _antwort_ohne_metric3(n=2):
     eintraege = [_eintrag(beschreibung=f"Geraet {i}") for i in range(n)]
@@ -85,12 +92,12 @@ def test_verschwindende_feldebene_faellt_auf_null_prozent(caplog):
     saetze = lies_buendel(_antwort_ohne_metric3(), _URL, proben=proben)
     assert saetze == []
     assert proben == {"kandidaten": 2, "metric3+metric2": 2}
-    with caplog.at_level(logging.WARNING,
-                         logger="telco_radar.geraete_pipeline"):
+    with caplog.at_level(logging.WARNING, logger="telco_radar.geraete_pipeline"):
         melde_proben([{"anbieter": "o2", "proben": proben}])
-    assert ("Geraeteradar-Probe: o2 liefert 0 von 2 erwarteten Saetzen "
-            "noch ihre Felder (0 %) - gescheitert an: 2x metric3+metric2") \
-        in caplog.text
+    assert (
+        "Geraeteradar-Probe: o2 liefert 0 von 2 erwarteten Saetzen "
+        "noch ihre Felder (0 %) - gescheitert an: 2x metric3+metric2"
+    ) in caplog.text
     assert caplog.records[-1].levelname == "WARNING"
 
 
@@ -113,8 +120,7 @@ def test_zubehoer_und_tariflose_zaehlen_nicht_als_kandidaten():
     tariflos = _eintrag()
     del tariflos["bundle"]["tariffName"]
     proben: dict = {}
-    lies_buendel(_antwort(zubehoer, tariflos, _eintrag()), _URL,
-                 proben=proben)
+    lies_buendel(_antwort(zubehoer, tariflos, _eintrag()), _URL, proben=proben)
     assert proben == {"kandidaten": 1, "bestanden": 1}
 
 
@@ -134,6 +140,7 @@ def test_ohne_kandidaten_steht_keine_zeile(caplog):
 # S2-1 der P5-Codepruefung: der Totaltod des Referenzfeldes, an der
 # gespeicherten ECHTEN Antwort gemessen (88 Eintraege, 66 Buendel)
 # --------------------------------------------------------------------------
+
 
 def _katalog_ohne_monthlyprice() -> str:
     """Die echte Antwort vom 04.09. mit EINER Operation: `price.monthlyPrice`
@@ -156,12 +163,12 @@ def test_totaltod_des_referenzfeldes_ist_eine_gescheiterte_probe(caplog):
     saetze = lies_buendel(_katalog_ohne_monthlyprice(), _URL, proben=proben)
     assert saetze == []
     assert proben == {"kandidaten": 66, "monthlyPrice": 66}
-    with caplog.at_level(logging.WARNING,
-                         logger="telco_radar.geraete_pipeline"):
+    with caplog.at_level(logging.WARNING, logger="telco_radar.geraete_pipeline"):
         melde_proben([{"anbieter": "o2", "proben": proben}])
-    assert ("Geraeteradar-Probe: o2 liefert 0 von 66 erwarteten Saetzen "
-            "noch ihre Felder (0 %) - gescheitert an: 66x monthlyPrice") \
-        in caplog.text
+    assert (
+        "Geraeteradar-Probe: o2 liefert 0 von 66 erwarteten Saetzen "
+        "noch ihre Felder (0 %) - gescheitert an: 66x monthlyPrice"
+    ) in caplog.text
     assert caplog.records[-1].levelname == "WARNING"
 
 
@@ -169,10 +176,10 @@ def test_ein_einzelfehler_ist_keine_perfektion(caplog):
     """199 von 200: round() wuerde 100 % daraus machen und die Info-Zeile
     waere Perfektion fuer einen gescheiterten Satz (S3 der P5-Codepruefung).
     Die Quote wird abgerundet - nur bestanden == erwartete heisst 100 %."""
-    with caplog.at_level(logging.WARNING,
-                         logger="telco_radar.geraete_pipeline"):
-        melde_proben([{"anbieter": "o2",
-                       "proben": {"kandidaten": 200, "bestanden": 199}}])
+    with caplog.at_level(logging.WARNING, logger="telco_radar.geraete_pipeline"):
+        melde_proben(
+            [{"anbieter": "o2", "proben": {"kandidaten": 200, "bestanden": 199}}]
+        )
     assert "(99 %)" in caplog.text
     assert "100 %" not in caplog.text
     assert caplog.records[-1].levelname == "WARNING"
@@ -182,15 +189,19 @@ def test_ein_einzelfehler_ist_keine_perfektion(caplog):
 # Ende-zu-Ende: der Collector reicht die Zaehler durch
 # --------------------------------------------------------------------------
 
+
 def test_der_lauf_traegt_die_probe_in_seine_bilanz(tmp_path, caplog):
     """Vom Adapterzaehler bis zur Protokollzeile in EINEM Lauf: der
     Collector reicht `bilanz.proben` nach `lies_buendel`, die Pipeline
     meldet sie. Ein Eintrag in der Antwort -> 1 von 1 (100 %)."""
     from test_geraete_pipeline import _o2_hole, _o2_root
+
     with caplog.at_level(logging.INFO, logger="telco_radar.geraete_pipeline"):
-        bilanz = run_geraete_stage(_o2_root(tmp_path), {}, "2026-09-17",
-                                   jetzt=_jetzt(), hole=_o2_hole())
-    assert bilanz["anbieter"][0]["proben"] == {"kandidaten": 1,
-                                               "bestanden": 1}
-    assert ("Geraeteradar-Probe: o2 liefert 1 von 1 erwarteten Saetzen "
-            "noch ihre Felder (100 %)") in caplog.text
+        bilanz = run_geraete_stage(
+            _o2_root(tmp_path), {}, "2026-09-17", jetzt=_jetzt(), hole=_o2_hole()
+        )
+    assert bilanz["anbieter"][0]["proben"] == {"kandidaten": 1, "bestanden": 1}
+    assert (
+        "Geraeteradar-Probe: o2 liefert 1 von 1 erwarteten Saetzen "
+        "noch ihre Felder (100 %)"
+    ) in caplog.text

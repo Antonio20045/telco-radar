@@ -27,6 +27,7 @@ benutzt.
 Aus demselben Grund verfaellt ein Eintrag ohne `stand`: eine undatierte
 Aussage ueber ein Portfolio ist nach drei Monaten keine Aussage mehr.
 """
+
 from __future__ import annotations
 
 import logging
@@ -72,25 +73,27 @@ class EigeneHebel:
 def lade_eigene_hebel(root: Path) -> EigeneHebel:
     pfad = Path(root) / "config" / "vodafone_hebel.yaml"
     if not pfad.exists():
-        log.info("config/vodafone_hebel.yaml fehlt - die Luecken-Ansicht "
-                 "bleibt aus")
+        log.info("config/vodafone_hebel.yaml fehlt - die Luecken-Ansicht bleibt aus")
         return EigeneHebel()
     daten = yaml.safe_load(pfad.read_text(encoding="utf-8")) or {}
     return EigeneHebel(
         markt=str(daten.get("markt") or ""),
         direktvergleich=str(daten.get("direktvergleich") or ""),
-        hebel={str(h.get("key")): h for h in (daten.get("hebel") or [])
-               if h.get("key")},
+        hebel={
+            str(h.get("key")): h for h in (daten.get("hebel") or []) if h.get("key")
+        },
     )
 
 
 def _absender(eintrag: dict) -> str:
-    return str(eintrag.get("operator") or eintrag.get("company")
-               or eintrag.get("source") or "").strip()
+    return str(
+        eintrag.get("operator") or eintrag.get("company") or eintrag.get("source") or ""
+    ).strip()
 
 
-def bauen(bestand: list[dict], theme_label: dict[str, str],
-          eigene: EigeneHebel) -> dict:
+def bauen(
+    bestand: list[dict], theme_label: dict[str, str], eigene: EigeneHebel
+) -> dict:
     """Die drei Ansichten. `bestand` ist der gemischte Differenzierungs-Bestand
     (differenzierung_view.merge), also je Eintrag mindestens `theme`, ein
     Absenderfeld und `url`."""
@@ -100,8 +103,14 @@ def bauen(bestand: list[dict], theme_label: dict[str, str],
         if not key:
             continue
         eintrag = je_hebel.setdefault(
-            key, {"key": key, "label": theme_label.get(key, key),
-                  "wettbewerber": set(), "beispiele": []})
+            key,
+            {
+                "key": key,
+                "label": theme_label.get(key, key),
+                "wettbewerber": set(),
+                "beispiele": [],
+            },
+        )
         absender = _absender(e)
         if absender:
             eintrag["wettbewerber"].add(absender)
@@ -135,20 +144,27 @@ def bauen(bestand: list[dict], theme_label: dict[str, str],
     gegner_hebel = []
     if gegner:
         for zeile in vergleich:
-            treffer = [e for e in (je_hebel.get(zeile["key"]) or
-                                   {"beispiele": []})["beispiele"]
-                       if gegner.lower() in _absender(e).lower()]
+            treffer = [
+                e
+                for e in (je_hebel.get(zeile["key"]) or {"beispiele": []})["beispiele"]
+                if gegner.lower() in _absender(e).lower()
+            ]
             if not treffer and zeile["zustand"] == OFFEN:
                 continue
-            gegner_hebel.append({
-                **zeile,
-                "gegner_hat": bool(treffer),
-                "gegner_beispiel": (treffer[0].get("headline")
-                                    or treffer[0].get("title")
-                                    or treffer[0].get("summary", "")[:120])
-                if treffer else "",
-                "gegner_url": treffer[0].get("url") if treffer else "",
-            })
+            gegner_hebel.append(
+                {
+                    **zeile,
+                    "gegner_hat": bool(treffer),
+                    "gegner_beispiel": (
+                        treffer[0].get("headline")
+                        or treffer[0].get("title")
+                        or treffer[0].get("summary", "")[:120]
+                    )
+                    if treffer
+                    else "",
+                    "gegner_url": treffer[0].get("url") if treffer else "",
+                }
+            )
 
     return {
         "aktiv": bool(eigene.hebel),

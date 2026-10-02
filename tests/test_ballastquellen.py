@@ -9,6 +9,7 @@ wird ueber das Fachpresse-Tagging seiner Aliase mitabgedeckt, CLAUDE.md §4) -
 geloescht wurde nur ihr Eintrag im Quellenbestand, nicht ihre Kenntnis. Eine
 Wiederaufnahme bleibt jederzeit moeglich, wenn sich die Trefferquote aendert.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -48,7 +49,9 @@ def test_die_ballastquellen_operatoren_stehen_noch_in_der_watchlist():
     wurde, nur eben nicht mehr abgefragt wird."""
     operatoren = _operatoren_nach_name()
     fehlend = [name for name in BALLASTQUELLEN if name not in operatoren]
-    assert not fehlend, f"aus der Watchlist verschwunden statt nur entkoppelt: {fehlend}"
+    assert not fehlend, (
+        f"aus der Watchlist verschwunden statt nur entkoppelt: {fehlend}"
+    )
 
 
 def test_die_ballastquellen_operatoren_haben_keine_crawlbaren_quellen_mehr():
@@ -56,8 +59,9 @@ def test_die_ballastquellen_operatoren_haben_keine_crawlbaren_quellen_mehr():
     ab. `sources` OHNE Eintrag ist die Konvention fuer "bot-geschuetzt /
     ueber Fachpresse-Tagging abgedeckt" (CLAUDE.md §4)."""
     operatoren = _operatoren_nach_name()
-    noch_crawlbar = {name: len(operatoren[name].crawled_sources)
-                     for name in BALLASTQUELLEN}
+    noch_crawlbar = {
+        name: len(operatoren[name].crawled_sources) for name in BALLASTQUELLEN
+    }
     uebrig = {name: n for name, n in noch_crawlbar.items() if n}
     assert not uebrig, f"haben noch crawlbare Quellen: {uebrig}"
 
@@ -68,10 +72,13 @@ def test_die_ballastquellen_operatoren_behalten_ihre_aliase():
     mitgeloescht haette, machte den Betreiber unsichtbar statt nur
     unabgefragt. Nachgezaehlt nur dort, wo vorher welche standen."""
     operatoren = _operatoren_nach_name()
-    vorher_mit_aliasen = {"MTN Group": ["MTN"], "du": ["EITC"],
-                          "AIS": ["Advanced Info Service"],
-                          "Orange MEA": ["Orange Egypt", "Orange Jordan"],
-                          "Liquid Intelligent Technologies": ["Liquid Telecom"],
-                          "Chunghwa Telecom": ["Chunghwa"]}
+    vorher_mit_aliasen = {
+        "MTN Group": ["MTN"],
+        "du": ["EITC"],
+        "AIS": ["Advanced Info Service"],
+        "Orange MEA": ["Orange Egypt", "Orange Jordan"],
+        "Liquid Intelligent Technologies": ["Liquid Telecom"],
+        "Chunghwa Telecom": ["Chunghwa"],
+    }
     for name, erwartet in vorher_mit_aliasen.items():
         assert set(erwartet) <= set(operatoren[name].aliases), name

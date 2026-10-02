@@ -48,6 +48,7 @@ Drei Filterstufen, und die Reihenfolge ist der Punkt
 Ohne Modell laeuft das Modul vollstaendig weiter; dann fehlt nur Stufe 3.
 Das ist Absicht: `--no-llm` und der Testlauf duerfen kein Netz brauchen.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -114,7 +115,7 @@ class Fund:
     name: str
     zuerst_gesehen: str = ""
     nicht_vor: str = ""
-    einschaetzung: str = ""      # vom Modell, leer wenn ohne
+    einschaetzung: str = ""  # vom Modell, leer wenn ohne
     begruendung: str = ""
 
     def kennung(self) -> str:
@@ -135,10 +136,12 @@ def lade_domains(root: Path) -> tuple[list[Domain], list[str]]:
         return [], []
     daten = yaml.safe_load(pfad.read_text(encoding="utf-8")) or {}
     domains = [
-        Domain(marke=str(d.get("marke") or ""),
-               domain=str(d.get("domain") or "").strip().lower(),
-               konzern=str(d.get("konzern") or ""),
-               gross=bool(d.get("gross")))
+        Domain(
+            marke=str(d.get("marke") or ""),
+            domain=str(d.get("domain") or "").strip().lower(),
+            konzern=str(d.get("konzern") or ""),
+            gross=bool(d.get("gross")),
+        )
         for d in (daten.get("domains") or [])
         if d.get("domain") and d.get("marke")
     ]
@@ -189,9 +192,9 @@ def _zuerst(daten, name: str) -> tuple[str, str]:
     treffer = [
         str(e.get("not_before") or "")
         for e in daten
-        if isinstance(e, dict) and name in {
-            str(n).strip().lower().rstrip(".") for n in (e.get("dns_names") or [])
-        }
+        if isinstance(e, dict)
+        and name
+        in {str(n).strip().lower().rstrip(".") for n in (e.get("dns_names") or [])}
     ]
     treffer = sorted(t for t in treffer if t)
     return (treffer[0] if treffer else ""), (treffer[0][:10] if treffer else "")
@@ -228,13 +231,13 @@ class CTSpeicher:
         return set(self._daten.get(domain, {}).get("namen") or [])
 
     def setze(self, domain: str, namen: set[str], stand: str) -> None:
-        self._daten[domain] = {"domain": domain, "namen": sorted(namen),
-                               "stand": stand}
+        self._daten[domain] = {"domain": domain, "namen": sorted(namen), "stand": stand}
 
     def speichern(self) -> None:
         self.pfad.parent.mkdir(parents=True, exist_ok=True)
-        zeilen = [json.dumps(self._daten[d], ensure_ascii=False)
-                  for d in sorted(self._daten)]
+        zeilen = [
+            json.dumps(self._daten[d], ensure_ascii=False) for d in sorted(self._daten)
+        ]
         self.pfad.write_text("\n".join(zeilen) + "\n", encoding="utf-8")
 
 
@@ -244,20 +247,30 @@ def hole(domain: Domain, http_cfg: dict, *, client=None) -> list:
     Wirft `CTZeitueberschreitung` statt eine leere Liste zurueckzugeben.
     Der Unterschied ist der ganze Punkt der Fehlerklasse.
     """
-    params = {"domain": domain.domain, "include_subdomains": "true",
-              "expand": "dns_names"}
-    kopf = {"User-Agent": http_cfg.get("user_agent", "TelcoRadar/1.0"),
-            "Accept": "application/json"}
+    params = {
+        "domain": domain.domain,
+        "include_subdomains": "true",
+        "expand": "dns_names",
+    }
+    kopf = {
+        "User-Agent": http_cfg.get("user_agent", "TelcoRadar/1.0"),
+        "Accept": "application/json",
+    }
     try:
         if client is not None:
-            antwort = client.get(API, params=params, headers=kopf,
-                                 timeout=domain.frist)
+            antwort = client.get(API, params=params, headers=kopf, timeout=domain.frist)
         else:
-            antwort = httpx.get(API, params=params, headers=kopf,
-                                timeout=domain.frist, follow_redirects=True)
+            antwort = httpx.get(
+                API,
+                params=params,
+                headers=kopf,
+                timeout=domain.frist,
+                follow_redirects=True,
+            )
     except httpx.TimeoutException as exc:
         raise CTZeitueberschreitung(
-            f"{domain.domain} nicht in {domain.frist:.0f}s beantwortet") from exc
+            f"{domain.domain} nicht in {domain.frist:.0f}s beantwortet"
+        ) from exc
     except httpx.HTTPError as exc:
         raise CTFehler(f"{domain.domain}: {exc}") from exc
 
@@ -276,8 +289,8 @@ SYSTEM = (
     "aufgetaucht sind. Fuer jeden Namen genau eine Frage: sieht er nach einem "
     "Produkt-, Marken- oder Kampagnennamen aus, oder nach technischer "
     "Infrastruktur?\n\n"
-    "Antworte als JSON: {\"namen\": [{\"name\": \"...\", \"art\": "
-    "\"kampagne\"|\"infrastruktur\"|\"unklar\", \"begruendung\": \"kurz\"}]}\n\n"
+    'Antworte als JSON: {"namen": [{"name": "...", "art": '
+    '"kampagne"|"infrastruktur"|"unklar", "begruendung": "kurz"}]}\n\n'
     "Regeln:\n"
     "- Marken- und Produktnamen, Aktionsbegriffe, Namen von Zweitmarken, "
     "Wechselaktionen oder Geraetekampagnen sind 'kampagne'.\n"
@@ -311,7 +324,7 @@ def bewerte(funde: list[Fund], modell: str, *, komplett=None) -> list[Fund]:
         return funde
 
     urteil = {}
-    for eintrag in (daten.get("namen") or []):
+    for eintrag in daten.get("namen") or []:
         if isinstance(eintrag, dict) and eintrag.get("name"):
             urteil[str(eintrag["name"]).strip().lower()] = eintrag
 
@@ -355,8 +368,7 @@ def als_item(f: Fund, stand: datetime) -> Item:
         summary=(
             f"Für {f.name} wurde ein TLS-Zertifikat{datum} ausgestellt. Das "
             f"heißt, dass {f.domain.marke} dort etwas vorbereitet hat — nicht, "
-            f"dass es startet oder was es ist. Bedeutung unbestätigt."
-            + zusatz
+            f"dass es startet oder was es ist. Bedeutung unbestätigt." + zusatz
         )[:900],
         origin="ct_log",
         source_url=f"{API}?domain={f.domain.domain}",
@@ -364,9 +376,15 @@ def als_item(f: Fund, stand: datetime) -> Item:
     )
 
 
-def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
-           modell: str = "", komplett=None, client=None
-           ) -> tuple[list[Item], dict]:
+def sammle(
+    root: Path,
+    http_cfg: dict,
+    *,
+    jetzt: datetime | None = None,
+    modell: str = "",
+    komplett=None,
+    client=None,
+) -> tuple[list[Item], dict]:
     """Alle Domains abfragen, neue Namen finden, als Items liefern.
 
     Der erste Abruf einer Domain legt die Grundlinie und meldet nichts.
@@ -374,9 +392,17 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
     jetzt = jetzt or datetime.now(timezone.utc)
     domains, rauschen = lade_domains(root)
     speicher = CTSpeicher(Path(root) / "data" / "state" / "ct_seen.jsonl")
-    bilanz = {"domains": len(domains), "gelesen": 0, "grundlinie": 0,
-              "neu_roh": 0, "technisch": 0, "zu_viele": 0,
-              "zeitueberschreitung": 0, "fehler": 0, "meldungen": 0}
+    bilanz = {
+        "domains": len(domains),
+        "gelesen": 0,
+        "grundlinie": 0,
+        "neu_roh": 0,
+        "technisch": 0,
+        "zu_viele": 0,
+        "zeitueberschreitung": 0,
+        "fehler": 0,
+        "meldungen": 0,
+    }
     funde: list[Fund] = []
 
     for domain in domains:
@@ -412,13 +438,18 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
             # So viele neue Namen auf einmal sind ein Umbau des Namensraums,
             # keine Kampagne.
             bilanz["zu_viele"] += 1
-            log.info("CT-Radar: %s meldet %d neue Namen - sieht nach Umbau "
-                     "aus, nicht gemeldet", domain.domain, len(gefiltert))
+            log.info(
+                "CT-Radar: %s meldet %d neue Namen - sieht nach Umbau "
+                "aus, nicht gemeldet",
+                domain.domain,
+                len(gefiltert),
+            )
             continue
         for name in gefiltert:
             roh, tag = _zuerst(daten, name)
-            funde.append(Fund(domain=domain, name=name, zuerst_gesehen=roh,
-                              nicht_vor=tag))
+            funde.append(
+                Fund(domain=domain, name=name, zuerst_gesehen=roh, nicht_vor=tag)
+            )
 
     if funde and modell:
         funde = bewerte(funde, modell, komplett=komplett)
@@ -426,11 +457,18 @@ def sammle(root: Path, http_cfg: dict, *, jetzt: datetime | None = None,
     speicher.speichern()
     items = [als_item(f, jetzt) for f in funde]
     bilanz["meldungen"] = len(items)
-    log.info("CT-Radar: %d Domains, %d gelesen, %d Grundlinie, %d neu roh, "
-             "%d technisch verworfen, %d Umbau, %d Zeitueberschreitung, "
-             "%d Fehler, %d Meldungen",
-             bilanz["domains"], bilanz["gelesen"], bilanz["grundlinie"],
-             bilanz["neu_roh"], bilanz["technisch"], bilanz["zu_viele"],
-             bilanz["zeitueberschreitung"], bilanz["fehler"],
-             bilanz["meldungen"])
+    log.info(
+        "CT-Radar: %d Domains, %d gelesen, %d Grundlinie, %d neu roh, "
+        "%d technisch verworfen, %d Umbau, %d Zeitueberschreitung, "
+        "%d Fehler, %d Meldungen",
+        bilanz["domains"],
+        bilanz["gelesen"],
+        bilanz["grundlinie"],
+        bilanz["neu_roh"],
+        bilanz["technisch"],
+        bilanz["zu_viele"],
+        bilanz["zeitueberschreitung"],
+        bilanz["fehler"],
+        bilanz["meldungen"],
+    )
     return items, bilanz

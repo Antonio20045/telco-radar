@@ -10,6 +10,7 @@ dagegen eine gepflegte Blockliste, hier nicht (die Begriffe tippt der
 Abonnent). Sie muessen also an der Wortgrenze und an der Mindestlaenge
 scheitern, nicht an einer Liste.
 """
+
 from datetime import date
 from pathlib import Path
 
@@ -18,8 +19,16 @@ import pytest
 
 from telco_radar.newsletter.config import lade_katalog
 from telco_radar.newsletter.filters import (
-    Eintrag, Filtersatz, Stichwort, baue_stichwort_index, lies_filtersatz,
-    lies_stichwoerter, stichwort_fehler, vorschau, waehle)
+    Eintrag,
+    Filtersatz,
+    Stichwort,
+    baue_stichwort_index,
+    lies_filtersatz,
+    lies_stichwoerter,
+    stichwort_fehler,
+    vorschau,
+    waehle,
+)
 
 WURZEL = Path(__file__).resolve().parents[1]
 
@@ -29,16 +38,34 @@ def katalog():
     return lade_katalog(WURZEL)
 
 
-def _eintrag(i, *, bereich="marktrecherche", region="europa", ressort="tarife",
-             betreiber="", titel=None, text="", gewicht=0):
-    return Eintrag(id=f"e{i}", bereich=bereich,
-                   titel=titel if titel is not None else f"Meldung {i}",
-                   text=text, url=f"https://beispiel.test/{i}",
-                   absender="Fachpresse", region=region, ressort=ressort,
-                   betreiber=betreiber, gewicht=gewicht, datum="2026-08-11")
+def _eintrag(
+    i,
+    *,
+    bereich="marktrecherche",
+    region="europa",
+    ressort="tarife",
+    betreiber="",
+    titel=None,
+    text="",
+    gewicht=0,
+):
+    return Eintrag(
+        id=f"e{i}",
+        bereich=bereich,
+        titel=titel if titel is not None else f"Meldung {i}",
+        text=text,
+        url=f"https://beispiel.test/{i}",
+        absender="Fachpresse",
+        region=region,
+        ressort=ressort,
+        betreiber=betreiber,
+        gewicht=gewicht,
+        datum="2026-08-11",
+    )
 
 
 # ==================================================  Verknuepfungsregel  ===
+
 
 def test_leere_auswahl_heisst_alles(katalog):
     """Die Erwartung fast aller Nutzer - und die gefaehrlichste Zeile des
@@ -54,14 +81,18 @@ def test_zwischen_den_dimensionen_gilt_und(katalog):
     nur_region = _eintrag(2, region="europa", ressort="netz")
     nur_ressort = _eintrag(3, region="asien", ressort="tarife")
     satz = Filtersatz(regionen=("europa",), kategorien=("tarife",))
-    ids = {t.eintrag.id for t in waehle([passt, nur_region, nur_ressort],
-                                        satz, katalog)}
+    ids = {
+        t.eintrag.id for t in waehle([passt, nur_region, nur_ressort], satz, katalog)
+    }
     assert ids == {"e1"}
 
 
 def test_innerhalb_einer_dimension_gilt_oder(katalog):
-    eintraege = [_eintrag(1, region="europa"), _eintrag(2, region="nordamerika"),
-                 _eintrag(3, region="asien")]
+    eintraege = [
+        _eintrag(1, region="europa"),
+        _eintrag(2, region="nordamerika"),
+        _eintrag(3, region="asien"),
+    ]
     satz = Filtersatz(regionen=("europa", "nordamerika"))
     ids = {t.eintrag.id for t in waehle(eintraege, satz, katalog)}
     assert ids == {"e1", "e2"}
@@ -84,10 +115,14 @@ def test_ein_unbekannter_schluessel_gilt_nicht_als_leer(katalog):
 
 # =====================================================  Wettbewerber  ======
 
+
 def test_wettbewerber_trifft_ueber_das_betreiberfeld(katalog):
     satz = Filtersatz(wettbewerber=("telekom",))
-    treffer = waehle([_eintrag(1, betreiber="Deutsche Telekom"),
-                      _eintrag(2, betreiber="Orange")], satz, katalog)
+    treffer = waehle(
+        [_eintrag(1, betreiber="Deutsche Telekom"), _eintrag(2, betreiber="Orange")],
+        satz,
+        katalog,
+    )
     assert {t.eintrag.id for t in treffer} == {"e1"}
 
 
@@ -95,9 +130,11 @@ def test_wettbewerber_trifft_auch_ueber_die_ueberschrift(katalog):
     """Eine branchenweite Meldung hat kein Betreiberfeld - und genau in
     solchen Meldungen stehen drei Anbieter gleichzeitig."""
     satz = Filtersatz(wettbewerber=("o2",))
-    treffer = waehle([_eintrag(1, betreiber="",
-                               titel="Telekom und O2 streiten über Roaming")],
-                     satz, katalog)
+    treffer = waehle(
+        [_eintrag(1, betreiber="", titel="Telekom und O2 streiten über Roaming")],
+        satz,
+        katalog,
+    )
     assert len(treffer) == 1
 
 
@@ -106,27 +143,28 @@ def test_wettbewerber_trifft_nicht_in_der_zusammenfassung(katalog):
     Wettbewerbsfilter sieht bewusst nur Betreiber und Ueberschrift. Sonst
     liefert jede Meldung, die o2 im Nebensatz erwaehnt, ein o2-Abo voll."""
     satz = Filtersatz(wettbewerber=("o2",))
-    eintrag = _eintrag(1, titel="Netzausbau in Bayern",
-                       text="Beteiligt ist unter anderem O2.")
+    eintrag = _eintrag(
+        1, titel="Netzausbau in Bayern", text="Beteiligt ist unter anderem O2."
+    )
     assert waehle([eintrag], satz, katalog) == []
 
 
 def test_die_marke_trifft_nicht_als_teilwort(katalog):
-    """"1&1" darf nicht in "1&10" treffen, "Telekom" nicht in "Telekomm"."""
+    """ "1&1" darf nicht in "1&10" treffen, "Telekom" nicht in "Telekomm"."""
     satz = Filtersatz(wettbewerber=("telekom",))
-    assert waehle([_eintrag(1, titel="Telekommunikation in Ghana")],
-                  satz, katalog) == []
+    assert (
+        waehle([_eintrag(1, titel="Telekommunikation in Ghana")], satz, katalog) == []
+    )
 
 
 # =======================================================  Stichwoerter  ====
 
+
 def test_stichwoerter_sind_additiv_und_begruendet(katalog):
     """Die eine Regel, die entscheidet, ob Stichwort-Abos als nuetzlich oder
     als kaputt empfunden werden."""
-    passt_nicht = _eintrag(1, region="asien",
-                           titel="Starlink startet Mobilfunkdienst")
-    satz = Filtersatz(regionen=("europa",),
-                      stichwoerter=(Stichwort("Starlink"),))
+    passt_nicht = _eintrag(1, region="asien", titel="Starlink startet Mobilfunkdienst")
+    satz = Filtersatz(regionen=("europa",), stichwoerter=(Stichwort("Starlink"),))
     treffer = waehle([passt_nicht], satz, katalog)
     assert len(treffer) == 1
     assert treffer[0].ueber_stichwort
@@ -137,8 +175,9 @@ def test_ein_filtertreffer_bleibt_ein_filtertreffer(katalog):
     """Auch wenn zusaetzlich ein Stichwort passt - sonst stuende neben jeder
     zweiten Zeile "Ihr Stichwort", und die Markierung waere wertlos."""
     satz = Filtersatz(regionen=("europa",), stichwoerter=(Stichwort("Netzausbau"),))
-    treffer = waehle([_eintrag(1, region="europa", titel="Netzausbau in Hessen")],
-                     satz, katalog)
+    treffer = waehle(
+        [_eintrag(1, region="europa", titel="Netzausbau in Hessen")], satz, katalog
+    )
     assert treffer[0].grund == "filter"
     assert treffer[0].stichwort == ""
 
@@ -147,9 +186,10 @@ def test_stichworttreffer_stehen_hinter_den_filtertreffern(katalog):
     """Eine Zugabe, keine Uebernahme: das Stichwort darf die wichtigste
     Meldung des gewaehlten Bereichs nicht verdraengen."""
     satz = Filtersatz(regionen=("europa",), stichwoerter=(Stichwort("Starlink"),))
-    eintraege = [_eintrag(1, region="asien", titel="Starlink weltweit",
-                          gewicht=99),
-                 _eintrag(2, region="europa", titel="Kleine Meldung", gewicht=1)]
+    eintraege = [
+        _eintrag(1, region="asien", titel="Starlink weltweit", gewicht=99),
+        _eintrag(2, region="europa", titel="Kleine Meldung", gewicht=1),
+    ]
     treffer = waehle(eintraege, satz, katalog)
     assert [t.eintrag.id for t in treffer] == ["e2", "e1"]
 
@@ -169,19 +209,22 @@ def test_deutsche_komposita_treffen_am_bindestrich():
 
 
 def test_ein_kurzes_wort_geht_nicht_im_kompositum_unter():
-    """"Netz" darf NICHT in "Netzwerkkarte" treffen - der Fall, an dem eine
+    """ "Netz" darf NICHT in "Netzwerkkarte" treffen - der Fall, an dem eine
     zu grosszuegige Regel als Erstes auffliegt."""
     assert not Stichwort("Netz").trifft("Die Netzwerkkarte ist defekt")
     assert Stichwort("Netz").trifft("Das Netz ist überlastet")
 
 
-@pytest.mark.parametrize("begriff, harmlos", [
-    ("spark", "Die Sparkasse investiert in Glasfaser"),
-    ("globe", "Globetrotter eröffnet Filiale"),
-    ("orange", "Orangensaft im Bordbistro"),
-    ("smart", "Smartphone-Absatz steigt"),
-    ("bell", "Bellheim bekommt Glasfaser"),
-])
+@pytest.mark.parametrize(
+    "begriff, harmlos",
+    [
+        ("spark", "Die Sparkasse investiert in Glasfaser"),
+        ("globe", "Globetrotter eröffnet Filiale"),
+        ("orange", "Orangensaft im Bordbistro"),
+        ("smart", "Smartphone-Absatz steigt"),
+        ("bell", "Bellheim bekommt Glasfaser"),
+    ],
+)
 def test_die_bekannten_problembegriffe_erzeugen_keine_falschtreffer(begriff, harmlos):
     """Dieselben Begriffe, an denen sich das Fachpresse-Tagging verschluckt
     hat. Dort haelt eine gepflegte Blockliste dagegen; hier muss die
@@ -206,11 +249,12 @@ def test_zu_kurze_stichwoerter_werden_abgewiesen(katalog):
 
 
 def test_eine_phrase_darf_kurze_woerter_enthalten(katalog):
-    """"5G in Afrika" ist als Ganzes eindeutig, auch wenn "5G" zwei Zeichen
+    """ "5G in Afrika" ist als Ganzes eindeutig, auch wenn "5G" zwei Zeichen
     hat - gemessen wird das LAENGSTE Wort."""
     assert stichwort_fehler("5G in Afrika", katalog) == ""
     assert Stichwort("5G in Afrika", "phrase").trifft(
-        "Der Ausbau von 5G in Afrika beschleunigt sich")
+        "Der Ausbau von 5G in Afrika beschleunigt sich"
+    )
 
 
 def test_eine_phrase_toleriert_bindestrich_und_umbruch():
@@ -225,7 +269,9 @@ def test_die_betriebsart_wird_abgeleitet_wenn_sie_fehlt():
     """Wer "Fixed Wireless Access" eintippt, meint nicht drei Stichwoerter."""
     assert lies_stichwoerter(["Fixed Wireless Access"])[0].mode == "phrase"
     assert lies_stichwoerter(["Starlink"])[0].mode == "word"
-    assert lies_stichwoerter([{"term": "Starlink", "mode": "phrase"}])[0].mode == "phrase"
+    assert (
+        lies_stichwoerter([{"term": "Starlink", "mode": "phrase"}])[0].mode == "phrase"
+    )
 
 
 def test_stichwoerter_sehen_nur_titel_und_zusammenfassung():
@@ -237,6 +283,7 @@ def test_stichwoerter_sehen_nur_titel_und_zusammenfassung():
 
 
 # ============================================================  Deckel  =====
+
 
 def test_die_ausgabe_ist_auf_acht_eintraege_gedeckelt(katalog):
     eintraege = [_eintrag(i, gewicht=100 - i) for i in range(20)]
@@ -254,19 +301,41 @@ def test_mehr_als_zehn_stichwoerter_werden_beschnitten(katalog):
 
 # =====================================  Vorschau und ihr Browser-Index  ====
 
+
 @pytest.fixture()
 def archiv(tmp_path):
     reports = tmp_path / "data" / "reports"
     reports.mkdir(parents=True)
+
     def bericht(datum, meldungen):
-        (reports / f"{datum}.json").write_text(json.dumps({
-            "date": datum,
-            "regions": {"Europa": {"highlights": [
-                {"headline": t, "summary": s, "url": f"https://x.test/{i}"}
-                for i, (t, s) in enumerate(meldungen)]}},
-        }), encoding="utf-8")
-    bericht("2026-08-08", [("Netzausbau in Hessen", "Glasfaser kommt."),
-                           ("Starlink startet", "Satellit für Mobilfunk.")])
+        (reports / f"{datum}.json").write_text(
+            json.dumps(
+                {
+                    "date": datum,
+                    "regions": {
+                        "Europa": {
+                            "highlights": [
+                                {
+                                    "headline": t,
+                                    "summary": s,
+                                    "url": f"https://x.test/{i}",
+                                }
+                                for i, (t, s) in enumerate(meldungen)
+                            ]
+                        }
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+
+    bericht(
+        "2026-08-08",
+        [
+            ("Netzausbau in Hessen", "Glasfaser kommt."),
+            ("Starlink startet", "Satellit für Mobilfunk."),
+        ],
+    )
     bericht("2026-08-05", [("Netzausbau in Bayern", "Weiterer Ausbau.")])
     # Aelter als das Fenster - darf NICHT mitzaehlen.
     bericht("2026-05-01", [("Netzausbau im Frühjahr", "Alt.")])
@@ -333,6 +402,7 @@ def test_der_index_zaehlt_an_jedem_rebuild_tag_dieselbe_zahl(archiv, monkeypatch
             @classmethod
             def today(cls):
                 return tag
+
         monkeypatch.setattr(filters, "date", KlebeDatum)
 
     ergebnisse = []
@@ -342,7 +412,8 @@ def test_der_index_zaehlt_an_jedem_rebuild_tag_dieselbe_zahl(archiv, monkeypatch
     assert ergebnisse[0] == ergebnisse[1], (
         f"Rebuild am {date(2026, 8, 8)} und am {date(2026, 9, 6)} "
         f"rechnen verschieden: {ergebnisse[0]['meldungen']} gegen "
-        f"{ergebnisse[1]['meldungen']} Meldungen")
+        f"{ergebnisse[1]['meldungen']} Meldungen"
+    )
     # Die Zahl ist die der DATENLAGE, nicht irgendeine zwischen zwei
     # Wanduhren: der juengste Bericht (08-08) ist der Anker, sein Fenster
     # [07-09, ...] traegt beide Berichte, der Mai-Bericht bleibt draussen.
@@ -352,12 +423,14 @@ def test_der_index_zaehlt_an_jedem_rebuild_tag_dieselbe_zahl(archiv, monkeypatch
 
 # ==========================================================  Katalog  ======
 
+
 def test_die_kategorien_zeigen_auf_echte_ressorts():
     """Ein umbenanntes Ressort wuerde in newsletter.yaml still ins Leere
     zeigen - die Kategorie waere fuer immer leer, ohne dass irgendwo etwas
     rot wird. Genau die Sorte Test, die diese Codebasis schon einmal teuer
     bezahlt hat."""
     from telco_radar.report.html import _RESSORT_LABEL
+
     katalog = lade_katalog(WURZEL)
     gepruefte = 0
     for auswahl in katalog.kategorien:
@@ -373,6 +446,7 @@ def test_die_regionen_zeigen_auf_echte_regionen():
     Regionsnamen aus der Watchlist."""
     from telco_radar.config import load_config
     from telco_radar.newsletter.quelle import region_schluessel
+
     katalog = lade_katalog(WURZEL)
     cfg = load_config(WURZEL)
     # `region_name` ist der deutsche Name - genau der, der im Bericht-JSON
@@ -392,7 +466,8 @@ def test_ein_doppelter_schluessel_faellt_beim_laden_auf(tmp_path):
         "regionen:\n  - {key: europa, label: Europa}\n"
         "wettbewerber:\n  - {key: t, label: T}\n"
         "kategorien:\n  - {key: k, label: K, ressorts: [tarife]}\n",
-        encoding="utf-8")
+        encoding="utf-8",
+    )
     with pytest.raises(ValueError, match="zweimal"):
         lade_katalog(tmp_path)
 
@@ -403,7 +478,8 @@ def test_eine_leere_dimension_faellt_beim_laden_auf(tmp_path):
     (tmp_path / "config").mkdir()
     (tmp_path / "config" / "newsletter.yaml").write_text(
         "bereiche: []\nregionen: []\nwettbewerber: []\nkategorien: []\n",
-        encoding="utf-8")
+        encoding="utf-8",
+    )
     with pytest.raises(ValueError, match="leer"):
         lade_katalog(tmp_path)
 

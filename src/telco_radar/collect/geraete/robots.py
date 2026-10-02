@@ -37,6 +37,7 @@ Wer hier die Startzeit einfriert, bekommt fuer jeden spaeteren Abruf ein
 wie lange die Tuer noch offen ist, damit der Collector den Zeitanteil eines
 solchen Anbieters gar nicht erst ueber das Fensterende hinaus plant.
 """
+
 from __future__ import annotations
 
 import logging
@@ -86,12 +87,13 @@ def _als_regex(muster: str) -> re.Pattern:
 @dataclass
 class Regelwerk:
     """Die fuer uns geltenden Regeln EINES Hosts."""
+
     disallow: list = field(default_factory=list)
     allow: list = field(default_factory=list)
     crawl_delay: Optional[float] = None
-    visit_von: Optional[int] = None       # Minuten seit Mitternacht UTC
+    visit_von: Optional[int] = None  # Minuten seit Mitternacht UTC
     visit_bis: Optional[int] = None
-    abrufbar: bool = True                 # robots.txt selbst erreichbar?
+    abrufbar: bool = True  # robots.txt selbst erreichbar?
     fehler: str = ""
 
     def erlaubt(self, url: str) -> bool:
@@ -101,11 +103,13 @@ class Regelwerk:
         Freigabe ueberstimmen."""
         pfad = _pfad_von(url)
         laengstes_disallow = max(
-            (len(m) for m in self.disallow if _als_regex(m).match(pfad)), default=-1)
+            (len(m) for m in self.disallow if _als_regex(m).match(pfad)), default=-1
+        )
         if laengstes_disallow < 0:
             return True
         laengstes_allow = max(
-            (len(m) for m in self.allow if _als_regex(m).match(pfad)), default=-1)
+            (len(m) for m in self.allow if _als_regex(m).match(pfad)), default=-1
+        )
         return laengstes_allow >= laengstes_disallow
 
     def im_fenster(self, jetzt: datetime) -> bool:
@@ -137,8 +141,11 @@ class Regelwerk:
             return None
         if not self.im_fenster(jetzt):
             return 0.0
-        minute_jetzt = (jetzt.hour * _MINUTEN_JE_STUNDE + jetzt.minute
-                        + jetzt.second / _SEKUNDEN_JE_MINUTE)
+        minute_jetzt = (
+            jetzt.hour * _MINUTEN_JE_STUNDE
+            + jetzt.minute
+            + jetzt.second / _SEKUNDEN_JE_MINUTE
+        )
         bis = float(self.visit_bis)
         if bis <= minute_jetzt:
             # Fenster ueber Mitternacht (z.B. 2200-0600) und wir stehen im
@@ -150,8 +157,10 @@ class Regelwerk:
     def fenster_text(self) -> str:
         if self.visit_von is None or self.visit_bis is None:
             return ""
-        return (f"{self.visit_von // 60:02d}:{self.visit_von % 60:02d}-"
-                f"{self.visit_bis // 60:02d}:{self.visit_bis % 60:02d} UTC")
+        return (
+            f"{self.visit_von // 60:02d}:{self.visit_von % 60:02d}-"
+            f"{self.visit_bis // 60:02d}:{self.visit_bis % 60:02d} UTC"
+        )
 
 
 def lies_robots(text: str) -> Regelwerk:
@@ -164,7 +173,7 @@ def lies_robots(text: str) -> Regelwerk:
     """
     regeln = Regelwerk()
     trifft_uns = False
-    gruppenkopf = False        # stehen wir gerade in einer Folge von User-agent-Zeilen?
+    gruppenkopf = False  # stehen wir gerade in einer Folge von User-agent-Zeilen?
     for rohzeile in (text or "").splitlines():
         zeile = rohzeile.split("#", 1)[0].strip()
         if not zeile or ":" not in zeile:
@@ -183,7 +192,7 @@ def lies_robots(text: str) -> Regelwerk:
         if not trifft_uns:
             continue
         if feld == "disallow":
-            if wert:                       # "Disallow:" ohne Wert erlaubt alles
+            if wert:  # "Disallow:" ohne Wert erlaubt alles
                 regeln.disallow.append(wert)
         elif feld == "allow":
             if wert:
@@ -213,7 +222,10 @@ def lies_robots(text: str) -> Regelwerk:
 class RobotsWaechter:
     """Fragt je Host genau EINMAL nach und merkt sich die Antwort."""
 
-    def __init__(self, hole: Callable[[str], tuple], ):
+    def __init__(
+        self,
+        hole: Callable[[str], tuple],
+    ):
         """`hole(url) -> (status, text)`. Bewusst eine Attrappe statt eines
         direkten httpx-Aufrufs: der Waechter ist die eine Stelle, die ohne
         Netz vollstaendig testbar sein muss."""
@@ -228,25 +240,28 @@ class RobotsWaechter:
         robots_url = f"{teile.scheme or 'https'}://{teile.netloc}/robots.txt"
         try:
             status, text = self._hole(robots_url)
-        except Exception as exc:                       # noqa: BLE001
+        except Exception as exc:  # noqa: BLE001
             # Kein Ergebnis heisst nicht "erlaubt". Ein Netzfehler an dieser
             # Stelle darf nicht dazu fuehren, dass wir loslaufen.
-            regeln = Regelwerk(abrufbar=False,
-                               fehler=f"{type(exc).__name__}: {str(exc)[:120]}")
+            regeln = Regelwerk(
+                abrufbar=False, fehler=f"{type(exc).__name__}: {str(exc)[:120]}"
+            )
             self._cache[host] = regeln
             return regeln
         if status in (401, 403):
             # Wer uns die robots.txt verweigert, verweigert uns die Seite.
-            regeln = Regelwerk(abrufbar=False,
-                               fehler=f"robots.txt nicht lesbar (HTTP {status})")
+            regeln = Regelwerk(
+                abrufbar=False, fehler=f"robots.txt nicht lesbar (HTTP {status})"
+            )
         elif status == 404 or status == 410:
             # Keine robots.txt = keine Einschraenkung. So steht es im Entwurf.
             regeln = Regelwerk()
         elif 200 <= status < 300:
             regeln = lies_robots(text)
         else:
-            regeln = Regelwerk(abrufbar=False,
-                               fehler=f"robots.txt nicht lesbar (HTTP {status})")
+            regeln = Regelwerk(
+                abrufbar=False, fehler=f"robots.txt nicht lesbar (HTTP {status})"
+            )
         self._cache[host] = regeln
         return regeln
 
@@ -266,13 +281,15 @@ class RobotsWaechter:
         if not regeln.erlaubt(url):
             return (False, f"per robots.txt gesperrt: {_pfad_von(url)}")
         if not regeln.im_fenster(jetzt):
-            return (False, "ausserhalb der Besuchszeit laut robots.txt "
-                           f"({regeln.fenster_text}, Abruf um "
-                           f"{jetzt.hour:02d}:{jetzt.minute:02d} UTC)")
+            return (
+                False,
+                "ausserhalb der Besuchszeit laut robots.txt "
+                f"({regeln.fenster_text}, Abruf um "
+                f"{jetzt.hour:02d}:{jetzt.minute:02d} UTC)",
+            )
         return (True, "")
 
-    def restzeit_im_fenster(self, url: str,
-                            jetzt: datetime) -> Optional[float]:
+    def restzeit_im_fenster(self, url: str, jetzt: datetime) -> Optional[float]:
         """Restzeit des Besuchsfensters dieses Hosts - `None` ohne Fenster.
 
         Der Collector fragt den Waechter und nicht das Regelwerk hinter ihm

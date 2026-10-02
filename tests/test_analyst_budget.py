@@ -9,6 +9,7 @@ Nachrichtenwoche nicht zu unterscheiden. Der Zaehler zaehlt und warnt.
 Ein Test fuer etwas, das NICHT passiert, ist hier der richtige Test: die
 Sperre war gebaut, und sie wieder einzubauen waere eine Zeile.
 """
+
 from __future__ import annotations
 
 import json
@@ -30,19 +31,24 @@ def _sauber():
 
 
 def _items(n: int) -> list[Item]:
-    return [Item(id=f"id{i}", title=f"Meldung {i}",
-                 url=f"https://example.com/{i}", source_name="Quelle",
-                 published=datetime(2026, 8, 27, tzinfo=timezone.utc),
-                 region="Europa")
-            for i in range(n)]
+    return [
+        Item(
+            id=f"id{i}",
+            title=f"Meldung {i}",
+            url=f"https://example.com/{i}",
+            source_name="Quelle",
+            published=datetime(2026, 8, 27, tzinfo=timezone.utc),
+            region="Europa",
+        )
+        for i in range(n)
+    ]
 
 
 def _stapelweise(monkeypatch) -> list[int]:
     """Ersetzt den Modellaufruf und zaehlt die Stapel."""
     aufrufe: list[int] = []
 
-    def fake_complete(system, user, model, max_tokens=4096, retries=3,
-                      ausweich=""):
+    def fake_complete(system, user, model, max_tokens=4096, retries=3, ausweich=""):
         aufrufe.append(len(aufrufe) + 1)
         return json.dumps({"region_summary": "s.", "highlights": []})
 
@@ -54,8 +60,11 @@ def test_eine_ueberschrittene_schwelle_stoppt_keinen_stapel(monkeypatch):
     """Die Zusicherung, um die es geht: der Lauf liest zu Ende."""
     llm.budget_setzen(0.000001, {"m": {"ein": 1000.0, "aus": 1000.0}})
     # Die Schwelle ist von der ersten gezaehlten Antwort an ueberschritten.
-    llm._VERBRAUCH["m"] = {"aufrufe": 1, "prompt_tokens": 1_000_000,
-                           "completion_tokens": 1_000_000}
+    llm._VERBRAUCH["m"] = {
+        "aufrufe": 1,
+        "prompt_tokens": 1_000_000,
+        "completion_tokens": 1_000_000,
+    }
     assert llm.budget_ueberschritten()
 
     aufrufe = _stapelweise(monkeypatch)

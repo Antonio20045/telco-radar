@@ -41,6 +41,7 @@ Tarif und Geraet zerlegt (§ 13.2: 1&1 nennt EINEN Betrag, seine Aufteilung
 waere unsere Erfindung), und keine Zahl wird ueber Laufzeiten hinweg
 verglichen ausser `Ø/Monat` (A5.3).
 """
+
 from __future__ import annotations
 
 import datetime as _dt
@@ -53,14 +54,27 @@ from . import anbieter_farben, geraete_vergleich
 from .geraete_tco_grafik import anbieter_slug
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, ZUSTAENDE, normalisiere
 from ..tarif_model import Preisphase
-from ..tco_model import (AKTION_ANSCHLUSS_ERLASSEN, AKTION_GERAETERABATT,
-                         AKTION_ONLINE_VORTEIL, AKTION_TARIFRABATT,
-                         AKTION_TRADE_IN, AKTION_WECHSELBONUS,
-                         POSTEN_ANSCHLUSS, POSTEN_BUENDEL, POSTEN_LAUFZEIT,
-                         POSTEN_RABATTE, POSTEN_RATE, POSTEN_TARIF,
-                         POSTEN_ZUZAHLUNG, TCO_HORIZONT, Buendel,
-                         monatsschnitt, phasensumme, tco_24,
-                         zeitraum_vergleichbar)
+from ..tco_model import (
+    AKTION_ANSCHLUSS_ERLASSEN,
+    AKTION_GERAETERABATT,
+    AKTION_ONLINE_VORTEIL,
+    AKTION_TARIFRABATT,
+    AKTION_TRADE_IN,
+    AKTION_WECHSELBONUS,
+    POSTEN_ANSCHLUSS,
+    POSTEN_BUENDEL,
+    POSTEN_LAUFZEIT,
+    POSTEN_RABATTE,
+    POSTEN_RATE,
+    POSTEN_TARIF,
+    POSTEN_ZUZAHLUNG,
+    TCO_HORIZONT,
+    Buendel,
+    monatsschnitt,
+    phasensumme,
+    tco_24,
+    zeitraum_vergleichbar,
+)
 
 # Ticket TCO24-1 (08.09.2026) stellte die Tafel auf `tco_24()` und den
 # festen 24-Monats-Horizont; A1 (20.09.2026) hat dieselbe Funktion auf die
@@ -150,8 +164,9 @@ def alter_in_tagen(abgerufen_am: str, heute: str) -> Optional[int]:
     if not abgerufen_am or not heute:
         return None
     try:
-        return (_dt.date.fromisoformat(heute)
-                - _dt.date.fromisoformat(abgerufen_am)).days
+        return (
+            _dt.date.fromisoformat(heute) - _dt.date.fromisoformat(abgerufen_am)
+        ).days
     except ValueError:
         return None
 
@@ -204,6 +219,7 @@ def alt_marke_fuer(abgerufen_am: str) -> str:
         return f"kein aktueller Stand seit {kurz}"
     return "kein aktueller Stand – Abrufdatum unbekannt"
 
+
 # Das Geraet der Leitfrage aus dem Lastenheft (Abschnitt A). Es ist die
 # Vorgabe des Auswahlfeldes, solange es mit zwei Anbietern rechenbar ist.
 LEITFRAGE_MODELL = "apple-iphone-17-pro-256"
@@ -219,14 +235,20 @@ LEITFRAGE_MODELL = "apple-iphone-17-pro-256"
 # wer Quellen pflegt, braucht sie), hier steht nur noch, was es fuer die
 # Zahl bedeutet: sie fehlt heute und kommt mit der naechsten Messung.
 LEER_GRUND = {
-    "Telekom": ("Für dieses Modell ist bei Telekom noch kein Bündelpreis "
-                "erhoben – die Vergleichszahl folgt mit der nächsten "
-                "wöchentlichen Messung."),
-    "1&1": ("Für dieses Modell ist bei 1&1 kein Bündel erhoben – die "
-            "Kategorieseite führt es nicht als eigene Produktkachel."),
+    "Telekom": (
+        "Für dieses Modell ist bei Telekom noch kein Bündelpreis "
+        "erhoben – die Vergleichszahl folgt mit der nächsten "
+        "wöchentlichen Messung."
+    ),
+    "1&1": (
+        "Für dieses Modell ist bei 1&1 kein Bündel erhoben – die "
+        "Kategorieseite führt es nicht als eigene Produktkachel."
+    ),
     "o2": "Für dieses Modell ist bei o2 kein Bündel erhoben.",
-    "Vodafone": ("Kein Bündelpreis erhoben, und kein Barpreis dieses "
-                 "Geräts – ohne beides gibt es keine Vergleichszahl."),
+    "Vodafone": (
+        "Kein Bündelpreis erhoben, und kein Barpreis dieses "
+        "Geräts – ohne beides gibt es keine Vergleichszahl."
+    ),
 }
 
 # Der Zustand, ueber den ueberhaupt verglichen wird. Ein refurbished Geraet
@@ -237,8 +259,12 @@ _ZUSTAND = VERGLEICHBARE_ZUSTAENDE
 # Was auf der Karte steht, wenn das Geraet kein Neugeraet ist - oder wenn
 # niemand belegt hat, was es ist. "erneuert" ist das Wort, das o2 selbst
 # benutzt; "Zustand nicht belegt" ist ehrlicher als ein stilles "neu".
-ZUSTAND_ETIKETT = {"neu": "", "refurbished": "erneuert", "b-ware": "B-Ware",
-                   "unbekannt": "Zustand nicht belegt"}
+ZUSTAND_ETIKETT = {
+    "neu": "",
+    "refurbished": "erneuert",
+    "b-ware": "B-Ware",
+    "unbekannt": "Zustand nicht belegt",
+}
 
 
 def zustand_des_buendels(b: Buendel, zustand_je_listung: dict) -> str:
@@ -261,7 +287,7 @@ def zustand_des_buendels(b: Buendel, zustand_je_listung: dict) -> str:
         return zustand
     for kandidat in ZUSTAENDE:
         if kandidat in _ZUSTAND:
-            continue          # ein fehlendes Suffix belegt kein Neugeraet
+            continue  # ein fehlendes Suffix belegt kein Neugeraet
         if b.sku_id.endswith("-" + normalisiere(kandidat)):
             return kandidat
     return "unbekannt"
@@ -329,7 +355,7 @@ def geraet_aus_sku(sku_id: str, katalog) -> tuple:
         gid = getattr(g, "device_id", "") or ""
         if not gid or not sku.startswith(gid + "-"):
             continue
-        rest = _SPEICHER_SEGMENT.match(sku[len(gid) + 1:])
+        rest = _SPEICHER_SEGMENT.match(sku[len(gid) + 1 :])
         if rest is None:
             continue
         if treffer is None or len(gid) > len(treffer[0]):
@@ -337,12 +363,13 @@ def geraet_aus_sku(sku_id: str, katalog) -> tuple:
     return treffer or ("", None)
 
 
-GRUND_OHNE_ZUORDNUNG = ("im Gerätebestand steht keine Listung zu dieser SKU, "
-                        "und der Katalog kennt das Gerät nicht")
+GRUND_OHNE_ZUORDNUNG = (
+    "im Gerätebestand steht keine Listung zu dieser SKU, "
+    "und der Katalog kennt das Gerät nicht"
+)
 
 
-def ergaenze_geraete_aus_katalog(geraet_je_sku: dict, buendel, katalog
-                                 ) -> list:
+def ergaenze_geraete_aus_katalog(geraet_je_sku: dict, buendel, katalog) -> list:
     """Buendel-SKUs ohne Listung ueber den Katalog nachtragen.
 
     Traegt `geraet_je_sku` fuer jede aufloesbare SKU nach und gibt die
@@ -359,12 +386,20 @@ def ergaenze_geraete_aus_katalog(geraet_je_sku: dict, buendel, katalog
         if device_id:
             geraet_je_sku[sku] = (device_id, speicher)
         else:
-            offen.append({"sku_id": sku,
-                          "anbieter": getattr(b, "anbieter", ""),
-                          "grund": GRUND_OHNE_ZUORDNUNG})
+            offen.append(
+                {
+                    "sku_id": sku,
+                    "anbieter": getattr(b, "anbieter", ""),
+                    "grund": GRUND_OHNE_ZUORDNUNG,
+                }
+            )
     for o in offen:
-        log.warning("TCO: Buendel %s (%s) nicht zugeordnet - %s",
-                    o["sku_id"], o["anbieter"], o["grund"])
+        log.warning(
+            "TCO: Buendel %s (%s) nicht zugeordnet - %s",
+            o["sku_id"],
+            o["anbieter"],
+            o["grund"],
+        )
     return offen
 
 
@@ -407,6 +442,7 @@ def titel(hersteller: str, name: str) -> str:
 # Die Bausteine: Barpreise und Buendel aus den zwei Speichern
 # --------------------------------------------------------------------------
 
+
 def barpreise(listungen: list) -> dict:
     """sku_id -> {anbieter -> Beleg}, nur Neugeraete mit Kassenpreis.
 
@@ -422,9 +458,12 @@ def barpreise(listungen: list) -> dict:
         preis = e.get("preis_ohne_vertrag")
         if preis is None:
             continue
-        beleg = {"anbieter": e.get("anbieter", ""), "betrag": float(preis),
-                 "quelle_url": e.get("quelle_url", ""),
-                 "abgerufen_am": e.get("abgerufen_am", "")}
+        beleg = {
+            "anbieter": e.get("anbieter", ""),
+            "betrag": float(preis),
+            "quelle_url": e.get("quelle_url", ""),
+            "abgerufen_am": e.get("abgerufen_am", ""),
+        }
         # Eine Listung OHNE `sku_id` kommt vor (Fixtures, kaputte Saetze) -
         # sie darf keinen Schluesselfehler werfen und keinen Barpreis
         # stellen, dem niemand ein Geraet zuordnen kann.
@@ -440,9 +479,9 @@ def barpreise(listungen: list) -> dict:
     return je_sku
 
 
-def _geraetepreis(barpreis: Optional[dict], zuzahlung: Optional[float],
-                  raten_summe: Optional[float]) -> tuple[Optional[float],
-                                                         Optional[str]]:
+def _geraetepreis(
+    barpreis: Optional[dict], zuzahlung: Optional[float], raten_summe: Optional[float]
+) -> tuple[Optional[float], Optional[str]]:
     """Der Geraetepreis der Karte - MIT SEINER ART (P1/TCO-1, 11.09.2026).
 
     Rueckgabe `(betrag, art)`, art ist "barpreis" oder "finanzierung"
@@ -515,7 +554,8 @@ def _haendler_geraetepreise(listungen: list) -> dict:
     out: dict = {}
     for name in HAENDLER_OHNE_BUENDEL:
         kandidaten = [
-            l for l in listungen
+            l
+            for l in listungen
             if l.get("anbieter") == name
             and l.get("preis_ohne_vertrag") is not None
             and (l.get("zustand") or "neu") in VERGLEICHBARE_ZUSTAENDE
@@ -555,37 +595,41 @@ def buendel_aus_listungen(listungen: list) -> list[Buendel]:
             # Bedeutung - dieselbe Regel wie bei `Listung.zuzahlung`.
             continue
         try:
-            fertig.append(Buendel(
-                sku_id=e.get("sku_id", ""), anbieter=e.get("anbieter", ""),
-                # Der Tarifname ist der, den die Produktseite nennt - ein
-                # Fremdschluessel auf `tarife.jsonl` entsteht daraus nicht,
-                # weil 1&1s Tarife nicht im Tarifbestand stehen. Die Karte
-                # traegt deshalb keinen Tarifbeleg und sagt das.
-                tarif_name=e["tarif_referenz"],
-                buendel_monatlich=float(betrag),
-                # DIE GEMESSENE LAUFZEIT, ungeraten (P0-B-fix2, dieselbe
-                # Regel und dieselbe Stelle wie P0-B-fix1 im Rechenkern):
-                # bis hierher stand `int(... or 24)`. Eine Listung ohne
-                # `laufzeit_monate` - 1&1 liefert sie, wenn die
-                # Produktseite keine Dauer nennt - bekam damit eine
-                # geratene 24 in Schluessel, Rechnung und Etikett. Jetzt
-                # geht der Wert durch: `None` wird zur benannten Luecke
-                # (`tco_model.POSTEN_LAUFZEIT`), die Zeile bleibt stehen
-                # und nennt sie (Regel 9), eine unmoegliche Zahl wirft in
-                # `Buendel.__post_init__` und landet im `except` darunter.
-                laufzeit_monate=e.get("laufzeit_monate"),
-                zustand=e.get("zustand") or "",
-                quelle_url=e.get("quelle_url", ""),
-                abgerufen_am=e.get("abgerufen_am", "")))
+            fertig.append(
+                Buendel(
+                    sku_id=e.get("sku_id", ""),
+                    anbieter=e.get("anbieter", ""),
+                    # Der Tarifname ist der, den die Produktseite nennt - ein
+                    # Fremdschluessel auf `tarife.jsonl` entsteht daraus nicht,
+                    # weil 1&1s Tarife nicht im Tarifbestand stehen. Die Karte
+                    # traegt deshalb keinen Tarifbeleg und sagt das.
+                    tarif_name=e["tarif_referenz"],
+                    buendel_monatlich=float(betrag),
+                    # DIE GEMESSENE LAUFZEIT, ungeraten (P0-B-fix2, dieselbe
+                    # Regel und dieselbe Stelle wie P0-B-fix1 im Rechenkern):
+                    # bis hierher stand `int(... or 24)`. Eine Listung ohne
+                    # `laufzeit_monate` - 1&1 liefert sie, wenn die
+                    # Produktseite keine Dauer nennt - bekam damit eine
+                    # geratene 24 in Schluessel, Rechnung und Etikett. Jetzt
+                    # geht der Wert durch: `None` wird zur benannten Luecke
+                    # (`tco_model.POSTEN_LAUFZEIT`), die Zeile bleibt stehen
+                    # und nennt sie (Regel 9), eine unmoegliche Zahl wirft in
+                    # `Buendel.__post_init__` und landet im `except` darunter.
+                    laufzeit_monate=e.get("laufzeit_monate"),
+                    zustand=e.get("zustand") or "",
+                    quelle_url=e.get("quelle_url", ""),
+                    abgerufen_am=e.get("abgerufen_am", ""),
+                )
+            )
         except (TypeError, ValueError) as exc:
-            log.warning("Buendel aus Listung %s uebergangen: %s",
-                        e.get("id", "?"), exc)
+            log.warning("Buendel aus Listung %s uebergangen: %s", e.get("id", "?"), exc)
     return fertig
 
 
 # --------------------------------------------------------------------------
 # Eine Karte
 # --------------------------------------------------------------------------
+
 
 def _bestandteile_mit_kategorie(kennzahl) -> list:
     """`tco_24`s Posten (Name -> Betrag) mit ihrer Kostenart, fuer die
@@ -623,8 +667,9 @@ _ZERLEGUNG_RATENKATEGORIEN = ("raten", "buendel")
 LABEL_RESTSCHULD = "Restschuld nach Monat 24"
 
 
-def zerlegung_balken(bestandteile: list, restbetrag: Optional[float],
-                     gesamt: Optional[float]) -> list:
+def zerlegung_balken(
+    bestandteile: list, restbetrag: Optional[float], gesamt: Optional[float]
+) -> list:
     """Die Segmente des Zerlegungsbalkens, mit ihrem Breitenanteil `pct`.
 
     Ohne `gesamt` (die Kennzahl ist nicht belastbar) oder ohne einen
@@ -666,17 +711,34 @@ def zerlegung_balken(bestandteile: list, restbetrag: Optional[float],
                 log.warning(
                     "zerlegung_balken: restbetrag %.2f EUR groesser als "
                     "der Posten %r (%.2f EUR) - Balken bleibt "
-                    "ungezeichnet", rest, name, betrag)
+                    "ungezeichnet",
+                    rest,
+                    name,
+                    betrag,
+                )
                 return []
             if faellig:
-                segmente.append({"name": name, "betrag": faellig,
-                                 "kategorie": kategorie, "offen": False})
-            segmente.append({"name": LABEL_RESTSCHULD, "betrag": rest,
-                             "kategorie": "restschuld", "offen": True})
+                segmente.append(
+                    {
+                        "name": name,
+                        "betrag": faellig,
+                        "kategorie": kategorie,
+                        "offen": False,
+                    }
+                )
+            segmente.append(
+                {
+                    "name": LABEL_RESTSCHULD,
+                    "betrag": rest,
+                    "kategorie": "restschuld",
+                    "offen": True,
+                }
+            )
             gesplittet = True
         elif betrag:
-            segmente.append({"name": name, "betrag": betrag,
-                             "kategorie": kategorie, "offen": False})
+            segmente.append(
+                {"name": name, "betrag": betrag, "kategorie": kategorie, "offen": False}
+            )
     for seg in segmente:
         seg["pct"] = round(seg["betrag"] / gesamt * 100, 3) if gesamt else 0.0
     return segmente
@@ -693,7 +755,7 @@ def zerlegung_balken(bestandteile: list, restbetrag: Optional[float],
 
 
 def label_der_leitzahl(monate: Optional[int]) -> str:
-    """"Kosten über 36 Monate" - das Etikett NENNT den Zeitraum der Zahl.
+    """ "Kosten über 36 Monate" - das Etikett NENNT den Zeitraum der Zahl.
 
     Ein Etikett, das 24 sagt, wo die Zahl 36 Monate traegt, ist keine
     Formulierungsfrage: es macht aus einer richtigen Summe eine falsche
@@ -737,26 +799,38 @@ def aktionen_der_karte(b: Buendel, heute: str = "") -> tuple[list, Optional[dict
     for a in b.aktionen:
         if not a.gilt_am(heute):
             continue
-        liste.append({"art": a.art, "name": AKTION_NAME.get(a.art, a.art),
-                      "betrag": a.betrag,
-                      "betrag_monatlich": a.betrag_monatlich,
-                      "bedingung": a.bedingung,
-                      "eingerechnet": a.eingerechnet,
-                      "gueltig_bis": a.gueltig_bis,
-                      "quelle_url": a.quelle_url})
+        liste.append(
+            {
+                "art": a.art,
+                "name": AKTION_NAME.get(a.art, a.art),
+                "betrag": a.betrag,
+                "betrag_monatlich": a.betrag_monatlich,
+                "bedingung": a.bedingung,
+                "eingerechnet": a.eingerechnet,
+                "gueltig_bis": a.gueltig_bis,
+                "quelle_url": a.quelle_url,
+            }
+        )
     offen = [a for a in liste if not a["eingerechnet"] and a["betrag"]]
     ueberhang = None
     if offen:
         groesste = max(offen, key=lambda a: a["betrag"])
-        ueberhang = {"betrag": groesste["betrag"],
-                     "kurz": AKTION_KURZ.get(groesste["art"],
-                                             groesste["name"])}
+        ueberhang = {
+            "betrag": groesste["betrag"],
+            "kurz": AKTION_KURZ.get(groesste["art"], groesste["name"]),
+        }
     return liste, ueberhang
 
 
-def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
-           katalog, geraet_je_sku: dict, zustand: str = "unbekannt",
-           heute: str = "") -> dict:
+def _karte(
+    b: Buendel,
+    tarif: Optional[dict],
+    barpreis: Optional[dict],
+    katalog,
+    geraet_je_sku: dict,
+    zustand: str = "unbekannt",
+    heute: str = "",
+) -> dict:
     """Aus einem Buendel wird eine Karte - gerechnet wird in `tco_model`.
 
     Diese Funktion addiert keinen Euro. Sie holt die Kennzahl, haengt die
@@ -803,9 +877,11 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
     # rechnete dann `float * None` (TypeError, die ganze Seite aus).
     # Ein geratener Faktor waere die andere Haelfte desselben Fehlers:
     # "1.098,00 € in 36 Raten" ohne gemessene 36 ist eine Erfindung.
-    raten_summe = (round(b.geraet_monatsrate * b.laufzeit_monate, 2)
-                   if (b.geraet_monatsrate is not None
-                       and b.laufzeit_monate is not None) else None)
+    raten_summe = (
+        round(b.geraet_monatsrate * b.laufzeit_monate, 2)
+        if (b.geraet_monatsrate is not None and b.laufzeit_monate is not None)
+        else None
+    )
     # Wie viele Raten nach Monat 24 noch laufen.
     #
     # P0-B-fix2: `(b.laufzeit_monate or 0)` ist weg. Ein Angebot OHNE
@@ -820,7 +896,8 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
     else:
         offene_raten = max(0, b.laufzeit_monate - TCO_HORIZONT)
     geraetepreis, geraetepreis_art = _geraetepreis(
-        barpreis, b.geraet_zuzahlung, raten_summe)
+        barpreis, b.geraet_zuzahlung, raten_summe
+    )
     # D3: EINMAL berechnet, zweimal gelesen (Clean Code 1) - die
     # textliche Postenliste (`bestandteile`) und der Zerlegungsbalken
     # (`zerlegung`) lesen dieselbe Liste, keine zweite Ableitung aus
@@ -893,9 +970,11 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
         # die tatsaechliche Laufzeit der Geraeteraten. Beide bestimmen die
         # Leitzahl NICHT mehr - die tut es nie, seit sie fest ist.
         "tarif_bindung": b.tarif_bindung_monate,
-        "raten_laufzeit": (b.laufzeit_monate
-                           if (b.geraet_monatsrate is not None
-                               or b.buendel_monatlich is not None) else None),
+        "raten_laufzeit": (
+            b.laufzeit_monate
+            if (b.geraet_monatsrate is not None or b.buendel_monatlich is not None)
+            else None
+        ),
         "belastbar": kennzahl.belastbar,
         "gesamt": kennzahl.gesamt if kennzahl.belastbar else None,
         "schnitt_monat": kennzahl.monatlich if kennzahl.belastbar else None,
@@ -906,12 +985,16 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
         # `is not None` und nicht Truthiness: eine gemessene 0.0 ist die
         # Aussage "nichts offen", kein fehlender Wert (CLAUDE.md Clean
         # Code 3).
-        "gezahlt_nach_24": (round(kennzahl.gesamt - (kennzahl.restbetrag
-                                or 0.0), 2)
-                            if kennzahl.belastbar else None),
-        "offen_nach_24": (kennzahl.restbetrag
-                          if kennzahl.belastbar
-                          and kennzahl.restbetrag is not None else None),
+        "gezahlt_nach_24": (
+            round(kennzahl.gesamt - (kennzahl.restbetrag or 0.0), 2)
+            if kennzahl.belastbar
+            else None
+        ),
+        "offen_nach_24": (
+            kennzahl.restbetrag
+            if kennzahl.belastbar and kennzahl.restbetrag is not None
+            else None
+        ),
         "offene_raten": offene_raten,
         # Die Bausteine, jeder mit dem Label aus Katalog D.
         "monatlich": b.tarif_monatlich,
@@ -927,14 +1010,17 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
         "bestandteile": bestandteile,
         # D3: der Zerlegungsbalken der Leitzahl - liest `bestandteile` und
         # `restbetrag` dieser Kennzahl, rechnet keinen Euro neu.
-        "zerlegung": zerlegung_balken(bestandteile, kennzahl.restbetrag,
-                                      kennzahl.gesamt if kennzahl.belastbar
-                                      else None),
+        "zerlegung": zerlegung_balken(
+            bestandteile,
+            kennzahl.restbetrag,
+            kennzahl.gesamt if kennzahl.belastbar else None,
+        ),
         # P3-E3: "Boni und Rabatte - nicht gemessen" ist falsch, sobald die
         # Aktionen dieses Buendels erhoben sind; sie stehen dann einzeln im
         # Rechenweg. In der Leitzahl steht keine von beiden Arten.
-        "luecken": [l for l in kennzahl.luecken
-                    if not (l == POSTEN_RABATTE and aktionen)],
+        "luecken": [
+            l for l in kennzahl.luecken if not (l == POSTEN_RABATTE and aktionen)
+        ],
         # Rabatte werden nie in die Leitzahl gerechnet (tco_model Regel 3,
         # AUFTRAG_GERAETESEITE §3: "Prämien, Cashback [...] bleiben
         # außerhalb der TCO-24"); `tco_24` fuehrt sie deshalb nicht mehr
@@ -962,12 +1048,16 @@ def _karte(b: Buendel, tarif: Optional[dict], barpreis: Optional[dict],
 # Sonderfaelle von `tco_bindung` entfallen - "Immer 24 Monate" rechnet den
 # Tarifgrundpreis unabhaengig von der Mindestlaufzeit.
 _GRUND_JE_LUECKE = {
-    POSTEN_TARIF: ("Der Tarifgrundpreis dieses Bündels ist nicht erhoben – "
-                   "ohne ihn ist es kein Gesamtpreis, sondern ein "
-                   "Gerätebetrag."),
-    POSTEN_LAUFZEIT: ("Die Ratenlaufzeit dieses Bündels ist nicht erhoben – "
-                      "ohne die Zahl der Monate ergibt der Monatsbetrag "
-                      "keine Gesamtsumme."),
+    POSTEN_TARIF: (
+        "Der Tarifgrundpreis dieses Bündels ist nicht erhoben – "
+        "ohne ihn ist es kein Gesamtpreis, sondern ein "
+        "Gerätebetrag."
+    ),
+    POSTEN_LAUFZEIT: (
+        "Die Ratenlaufzeit dieses Bündels ist nicht erhoben – "
+        "ohne die Zahl der Monate ergibt der Monatsbetrag "
+        "keine Gesamtsumme."
+    ),
 }
 
 
@@ -983,15 +1073,20 @@ def _grund(kennzahl) -> str:
         # erklaeren.
         return _GRUND_JE_LUECKE[POSTEN_LAUFZEIT]
     if kennzahl.gesamt is None:
-        return ("Zu diesem Bündel ist kein einziger Posten erhoben – es "
-                "steht als Angebot da, nicht als Preis.")
-    return ("Die Rechnung ist unvollständig: " +
-            ", ".join(kennzahl.luecken) + " nicht gemessen.")
+        return (
+            "Zu diesem Bündel ist kein einziger Posten erhoben – es "
+            "steht als Angebot da, nicht als Preis."
+        )
+    return (
+        "Die Rechnung ist unvollständig: "
+        + ", ".join(kennzahl.luecken)
+        + " nicht gemessen."
+    )
 
 
 def _phase_ab(tarif: dict, monat: int) -> Optional[float]:
     """Der Betrag, der im gegebenen Monat laut Pflichtdokument gilt."""
-    for phase in (tarif.get("preisphasen") or []):
+    for phase in tarif.get("preisphasen") or []:
         von = phase.get("von_monat") or 1
         bis = phase.get("bis_monat")
         if von <= monat and (bis is None or monat <= bis):
@@ -1002,38 +1097,68 @@ def _phase_ab(tarif: dict, monat: int) -> Optional[float]:
 
 def _leere_karte(anbieter: str, grund: str = "") -> dict:
     """Ein Anbieter ohne Zahl - mit Namen und mit Begruendung (B.2.5)."""
-    return {"anbieter": anbieter, "eigen": _eigen(anbieter), "tarif": "",
-            "slug": anbieter_slug(anbieter),
-            "anb_farbe": anbieter_farben.farbe_fuer(anbieter),
-            "geraetepreis": None, "geraetepreis_art": None,
-            "label": "", "laufzeit": None, "leitzahl_monate": None,
-            "ab_monat": None, "belastbar": False,
-            "gesamt": None, "schnitt_monat": None, "gezahlt_nach_24": None,
-            "offen_nach_24": None, "offene_raten": 0, "monatlich": None,
-            "buendel_monatlich": None, "zuzahlung": None, "rate": None,
-            "raten_summe": None,
-            "anschlusspreis": None, "nach_bindung": None,
-            "eff_ohne_geraet": None, "eff_basis": None, "bestandteile": [],
-            "zerlegung": [],
-            "luecken": [], "boni": [], "boni_abzug": 0.0, "quelle_url": "",
-            "abgerufen_am": "", "tarif_quelle_url": "", "naeherung": False,
-            "leer_grund": grund or LEER_GRUND.get(anbieter, ""),
-            "ab_preis": False,
-            # A3: eine Leerkarte ist keine Bündel-Messung - sie altert
-            # nicht. Die NÄHERUNGSKARTE, die auf dieser Bauform aufsetzt,
-            # überschreibt beide Felder mit dem Stand ihrer Belege
-            # (`_referenzkarte`, S2-1) - dieser Default gilt nur für
-            # Karten ohne jede Messung.
-            "frisch": True, "alt_marke": "",
-            "zustand": "", "zustand_etikett": "", "vergleichbar": False,
-            "sku_id": "", "modell_id": "", "geraet": "", "tarif_id": "",
-            "tarif_id_guete": "", "tarif_bindung": None,
-            "raten_laufzeit": None}
+    return {
+        "anbieter": anbieter,
+        "eigen": _eigen(anbieter),
+        "tarif": "",
+        "slug": anbieter_slug(anbieter),
+        "anb_farbe": anbieter_farben.farbe_fuer(anbieter),
+        "geraetepreis": None,
+        "geraetepreis_art": None,
+        "label": "",
+        "laufzeit": None,
+        "leitzahl_monate": None,
+        "ab_monat": None,
+        "belastbar": False,
+        "gesamt": None,
+        "schnitt_monat": None,
+        "gezahlt_nach_24": None,
+        "offen_nach_24": None,
+        "offene_raten": 0,
+        "monatlich": None,
+        "buendel_monatlich": None,
+        "zuzahlung": None,
+        "rate": None,
+        "raten_summe": None,
+        "anschlusspreis": None,
+        "nach_bindung": None,
+        "eff_ohne_geraet": None,
+        "eff_basis": None,
+        "bestandteile": [],
+        "zerlegung": [],
+        "luecken": [],
+        "boni": [],
+        "boni_abzug": 0.0,
+        "quelle_url": "",
+        "abgerufen_am": "",
+        "tarif_quelle_url": "",
+        "naeherung": False,
+        "leer_grund": grund or LEER_GRUND.get(anbieter, ""),
+        "ab_preis": False,
+        # A3: eine Leerkarte ist keine Bündel-Messung - sie altert
+        # nicht. Die NÄHERUNGSKARTE, die auf dieser Bauform aufsetzt,
+        # überschreibt beide Felder mit dem Stand ihrer Belege
+        # (`_referenzkarte`, S2-1) - dieser Default gilt nur für
+        # Karten ohne jede Messung.
+        "frisch": True,
+        "alt_marke": "",
+        "zustand": "",
+        "zustand_etikett": "",
+        "vergleichbar": False,
+        "sku_id": "",
+        "modell_id": "",
+        "geraet": "",
+        "tarif_id": "",
+        "tarif_id_guete": "",
+        "tarif_bindung": None,
+        "raten_laufzeit": None,
+    }
 
 
 # --------------------------------------------------------------------------
 # Die Vodafone-Referenz: gemessene Summanden, gerechnete Summe
 # --------------------------------------------------------------------------
+
 
 def phasen_aus_tarifsatz(tarif: Optional[dict]) -> list:
     """Die Preisphasen aus einem Tarifsatz des Bestands (`tarife.jsonl`).
@@ -1046,11 +1171,15 @@ def phasen_aus_tarifsatz(tarif: Optional[dict]) -> list:
     Blatt", nicht "0 EUR"); ohne Phasen bleibt eine leere Liste, und die
     Rechnung faellt auf den flachen Grundpreis zurueck.
     """
-    return [Preisphase(von_monat=p.get("von_monat") or 1,
-                       bis_monat=p.get("bis_monat"),
-                       betrag=p.get("betrag"))
-            for p in ((tarif or {}).get("preisphasen") or [])
-            if p.get("betrag") is not None]
+    return [
+        Preisphase(
+            von_monat=p.get("von_monat") or 1,
+            bis_monat=p.get("bis_monat"),
+            betrag=p.get("betrag"),
+        )
+        for p in ((tarif or {}).get("preisphasen") or [])
+        if p.get("betrag") is not None
+    ]
 
 
 # Die Spanne, innerhalb derer eine gemessene Monatsrate als "im Blatt
@@ -1059,8 +1188,9 @@ def phasen_aus_tarifsatz(tarif: Optional[dict]) -> list:
 _PREIS_TOLERANZ = 0.005
 
 
-def phasen_fuer_buendel(tarif: Optional[dict],
-                        tarif_monatlich: Optional[float]) -> list:
+def phasen_fuer_buendel(
+    tarif: Optional[dict], tarif_monatlich: Optional[float]
+) -> list:
     """Phasen des Blatts - nur, wenn sie zur MESSUNG am Bündel passen.
 
     QA-Fix (20.09.2026, Prüfer-Befund "hoch"): das Blatt beschreibt den
@@ -1083,14 +1213,18 @@ def phasen_fuer_buendel(tarif: Optional[dict],
     if not phasen or tarif_monatlich is None:
         return phasen
     betraege = [p.betrag for p in phasen]
-    if (min(betraege) - _PREIS_TOLERANZ <= tarif_monatlich
-            <= max(betraege) + _PREIS_TOLERANZ):
+    if (
+        min(betraege) - _PREIS_TOLERANZ
+        <= tarif_monatlich
+        <= max(betraege) + _PREIS_TOLERANZ
+    ):
         return phasen
     return []
 
 
-def _vodafone_referenz(referenzen: list, tarife: dict,
-                       barpreise_der_sku: dict) -> Optional[dict]:
+def _vodafone_referenz(
+    referenzen: list, tarife: dict, barpreise_der_sku: dict
+) -> Optional[dict]:
     """Tarif ohne Geraet + eigener Barpreis, ueber den festen 24-Monats-
     Horizont (TICKET TCO24-1: "Immer 24 Monate" - AUFTRAG_GERAETESEITE.md
     §3. Bis dahin rechnete diese Funktion ueber ein variables FENSTER,
@@ -1111,9 +1245,12 @@ def _vodafone_referenz(referenzen: list, tarife: dict,
     und danach, wird sie gelesen; steht keine, gilt der Grundpreis fort,
     und die Karte sagt es.
     """
-    vodafone = [r for r in referenzen
-                if _eigen(getattr(r, "anbieter", ""))
-                and getattr(r, "tarif_sim_only_monatlich", None) is not None]
+    vodafone = [
+        r
+        for r in referenzen
+        if _eigen(getattr(r, "anbieter", ""))
+        and getattr(r, "tarif_sim_only_monatlich", None) is not None
+    ]
     geraet = (barpreise_der_sku or {}).get("Vodafone")
     if not vodafone or geraet is None:
         return None
@@ -1135,8 +1272,9 @@ def _vodafone_referenz(referenzen: list, tarife: dict,
     # eine Annahme - deshalb steht sie auf der Karte und nicht nur im Code.
     abgedeckt = 0
     for phase in phasen:
-        abgedeckt = max(abgedeckt, monate if phase.bis_monat is None
-                        else phase.bis_monat)
+        abgedeckt = max(
+            abgedeckt, monate if phase.bis_monat is None else phase.bis_monat
+        )
     fortgeschrieben = abgedeckt < monate
     if summe is None:
         summe = round(referenz.tarif_sim_only_monatlich * monate, 2)
@@ -1184,7 +1322,8 @@ def _referenz_aus_buendel(karte: dict) -> dict:
     steht je Ort genau EINMAL.
     """
     return {
-        "tarif": karte["tarif"], "tarif_id": karte.get("tarif_id", ""),
+        "tarif": karte["tarif"],
+        "tarif_id": karte.get("tarif_id", ""),
         "monatlich": karte.get("monatlich") or karte.get("buendel_monatlich"),
         "tarif_summe": None,
         "tarif_quelle_url": karte.get("tarif_quelle_url", ""),
@@ -1204,8 +1343,10 @@ def _referenz_aus_buendel(karte: dict) -> dict:
         # meldete ein eigenes 36-Monats-Buendel als Referenz "24 Monate"
         # und jede fremde Zeile bekaeme ein Delta gegen einen anderen
         # Zeitraum.
-        "monate": karte["leitzahl_monate"], "gesamt": karte["gesamt"],
-        "schnitt_monat": karte["schnitt_monat"], "fortgeschrieben": False,
+        "monate": karte["leitzahl_monate"],
+        "gesamt": karte["gesamt"],
+        "schnitt_monat": karte["schnitt_monat"],
+        "fortgeschrieben": False,
         "aus_buendel": True,
     }
 
@@ -1227,8 +1368,9 @@ def referenz_ist_frisch(ref: Optional[dict], heute: str) -> bool:
         return False
     if ref.get("aus_buendel"):
         return True
-    return (ist_frisch(ref.get("tarif_abgerufen_am") or "", heute)
-            and ist_frisch(ref.get("geraet_abgerufen_am") or "", heute))
+    return ist_frisch(ref.get("tarif_abgerufen_am") or "", heute) and ist_frisch(
+        ref.get("geraet_abgerufen_am") or "", heute
+    )
 
 
 def _referenz_stand(ref: dict) -> str:
@@ -1239,8 +1381,7 @@ def _referenz_stand(ref: dict) -> str:
     unbekannt („seit <Datum>“ hieße, der andere Summand hätte noch
     gestimmt - geraten wird nichts, Clean Code 4).
     """
-    daten = [ref.get("tarif_abgerufen_am") or "",
-             ref.get("geraet_abgerufen_am") or ""]
+    daten = [ref.get("tarif_abgerufen_am") or "", ref.get("geraet_abgerufen_am") or ""]
     try:
         return str(min(_dt.date.fromisoformat(d) for d in daten))
     except ValueError:
@@ -1257,92 +1398,103 @@ def _referenzkarte(ref: dict, heute: str = "") -> dict:
     zeile und jedem Delta-Bezug (dort filtert `frisch` sie heraus).
     """
     karte = _leere_karte("Vodafone")
-    karte.update({
-        # KEIN Leergrund: diese Karte traegt eine Zahl. Der Vorbehalt steht
-        # in `naeherung` und auf der Seite in einem eigenen Satz - nicht in
-        # dem Feld, das "hier gibt es nichts" bedeutet.
-        "leer_grund": "",
-        "tarif": ref["tarif"],
-        # P1/UX-1, nachgetragen mit O2: DIE TARIF-ID MIT - ohne sie bekam
-        # die Referenzkarte KEIN Band (band_je_tarif schluesselt auf die
-        # tarif_id) und stand in der Gruppe "Ohne Tarifband", obwohl ihr
-        # Tarif eines hat. Am echten Bestand fiel es nicht auf (Vodafone
-        # hat dort ueberall echte Buendel); die Zustands-Fixture traegt
-        # eine Naeherung, und an ihr hielt der neue Zeilen-Test es fest.
-        "tarif_id": ref.get("tarif_id", ""),
-        # TICKET TCO24-1: die Leitzahl ist IMMER TCO-24 - `ref["monate"]`
-        # und `ref["tarif_monate"]` sind seit `_vodafone_referenz` beide
-        # der feste Horizont (`TCO_HORIZONT`), keine variable Fensterzahl
-        # mehr. Vorher trugen alle 30 Referenzkarten "TCO-36" bei einer
-        # Rechnung, die 24 Tarifmonate plus Barkauf war (QA-Befund F-R2-2).
-        # P0-B-fix2: Etikett und Zeitraum kommen aus DEMSELBEN Feld wie an
-        # jeder anderen Zeile - die Naeherung rechnet `tarif_monate`
-        # Tarifmonate plus den Barpreis, ihre Zahl traegt also genau
-        # diesen Zeitraum - gebaut aus `label_der_leitzahl`, damit hier
-        # keine zweite Beschriftungsregel entsteht.
-        "label": label_der_leitzahl(ref["tarif_monate"]),
-        "ab_monat": AB_MONAT,
-        "laufzeit": ref["tarif_monate"],
-        "leitzahl_monate": ref["tarif_monate"],
-        "fenster": ref["monate"],
-        "belastbar": True, "naeherung": True,
-        # A-R5: der Barpreis des Geraets bei Vodafone ist der Geraetepreis
-        # inkl. Finanzierung dieser Karte - er ist einer der zwei GEMESSENEN
-        # Summanden, aus denen die Naeherung ihre TCO rechnet (siehe
-        # Modulkopf). Kommt die Referenz aus einem echten Vodafone-Buendel,
-        # steht hier stattdessen dessen eigener Geraetepreis (oder `None`,
-        # wenn das Buendel selbst keinen belegt).
-        "geraetepreis": ref["geraet_betrag"],
-        # P1/TCO-1: auch die Referenzkarte nennt ihre Zahl beim Namen -
-        # aus `_vodafone_referenz` ist es immer der eigene Barpreis, aus
-        # `_referenz_aus_buendel` die Art des Quellbuendels.
-        "geraetepreis_art": ref.get("geraet_art"),
-        # `barpreise()` nimmt nur Neugeraete - die Referenz ist also eine
-        # Neugeraet-Zahl und spielt im Vergleich mit.
-        "zustand": "neu", "zustand_etikett": "", "vergleichbar": True,
-        "gesamt": ref["gesamt"], "schnitt_monat": ref["schnitt_monat"],
-        "monatlich": ref["monatlich"],
-        # Auch die Referenz beantwortet Antonios Frage: nach 24 Monaten hat
-        # man den Barpreis laengst gezahlt und den Tarif fuer 24 Monate.
-        # Das Geraet ist am ersten Tag bezahlt, der Tarif laeuft seine
-        # Mindestlaufzeit - nach 24 Monaten ist damit alles gezahlt, was
-        # geschuldet ist.
-        #
-        # A1 (20.09.2026): `gezahlt_nach_24` ist SEITHER die `gesamt` der
-        # Referenz selbst. Die fruehere Formel (Barpreis + flacher
-        # Tarifgrundpreis × 24) rechnete eine ZWEITE Summe - und gegen die
-        # phasengewichtete `gesamt` ein NEGATIVES `offen_nach_24`, sobald
-        # das Blatt Rabattphaen nennt. Die Referenz schuldet nach Monat 24
-        # nichts: 0.0 ist die Aussage, nicht ein fehlender Wert.
-        "gezahlt_nach_24": ref["gesamt"],
-        "tarif_bindung": ref["tarif_monate"],
-        "nach_bindung": ref.get("nach_bindung"),
-        "bestandteile": [
-            {"name": "Gerät ohne Vertrag · Barpreis",
-             "betrag": ref["geraet_betrag"], "kategorie": "einmalig"},
-            {"name": f"Tarif · {ref['tarif_monate']} Monate {ref['tarif']}",
-             "betrag": ref["tarif_summe"], "kategorie": "tarif"}],
-        # Der Anschlusspreis steht in KEINEM der fuenf Vodafone-Blaetter -
-        # unbekannt ist nicht kostenlos.
-        "luecken": [POSTEN_ANSCHLUSS],
-        "quelle_url": ref["geraet_quelle_url"],
-        "abgerufen_am": ref["geraet_abgerufen_am"],
-        "tarif_quelle_url": ref["tarif_quelle_url"],
-        "referenz": ref,
-    })
+    karte.update(
+        {
+            # KEIN Leergrund: diese Karte traegt eine Zahl. Der Vorbehalt steht
+            # in `naeherung` und auf der Seite in einem eigenen Satz - nicht in
+            # dem Feld, das "hier gibt es nichts" bedeutet.
+            "leer_grund": "",
+            "tarif": ref["tarif"],
+            # P1/UX-1, nachgetragen mit O2: DIE TARIF-ID MIT - ohne sie bekam
+            # die Referenzkarte KEIN Band (band_je_tarif schluesselt auf die
+            # tarif_id) und stand in der Gruppe "Ohne Tarifband", obwohl ihr
+            # Tarif eines hat. Am echten Bestand fiel es nicht auf (Vodafone
+            # hat dort ueberall echte Buendel); die Zustands-Fixture traegt
+            # eine Naeherung, und an ihr hielt der neue Zeilen-Test es fest.
+            "tarif_id": ref.get("tarif_id", ""),
+            # TICKET TCO24-1: die Leitzahl ist IMMER TCO-24 - `ref["monate"]`
+            # und `ref["tarif_monate"]` sind seit `_vodafone_referenz` beide
+            # der feste Horizont (`TCO_HORIZONT`), keine variable Fensterzahl
+            # mehr. Vorher trugen alle 30 Referenzkarten "TCO-36" bei einer
+            # Rechnung, die 24 Tarifmonate plus Barkauf war (QA-Befund F-R2-2).
+            # P0-B-fix2: Etikett und Zeitraum kommen aus DEMSELBEN Feld wie an
+            # jeder anderen Zeile - die Naeherung rechnet `tarif_monate`
+            # Tarifmonate plus den Barpreis, ihre Zahl traegt also genau
+            # diesen Zeitraum - gebaut aus `label_der_leitzahl`, damit hier
+            # keine zweite Beschriftungsregel entsteht.
+            "label": label_der_leitzahl(ref["tarif_monate"]),
+            "ab_monat": AB_MONAT,
+            "laufzeit": ref["tarif_monate"],
+            "leitzahl_monate": ref["tarif_monate"],
+            "fenster": ref["monate"],
+            "belastbar": True,
+            "naeherung": True,
+            # A-R5: der Barpreis des Geraets bei Vodafone ist der Geraetepreis
+            # inkl. Finanzierung dieser Karte - er ist einer der zwei GEMESSENEN
+            # Summanden, aus denen die Naeherung ihre TCO rechnet (siehe
+            # Modulkopf). Kommt die Referenz aus einem echten Vodafone-Buendel,
+            # steht hier stattdessen dessen eigener Geraetepreis (oder `None`,
+            # wenn das Buendel selbst keinen belegt).
+            "geraetepreis": ref["geraet_betrag"],
+            # P1/TCO-1: auch die Referenzkarte nennt ihre Zahl beim Namen -
+            # aus `_vodafone_referenz` ist es immer der eigene Barpreis, aus
+            # `_referenz_aus_buendel` die Art des Quellbuendels.
+            "geraetepreis_art": ref.get("geraet_art"),
+            # `barpreise()` nimmt nur Neugeraete - die Referenz ist also eine
+            # Neugeraet-Zahl und spielt im Vergleich mit.
+            "zustand": "neu",
+            "zustand_etikett": "",
+            "vergleichbar": True,
+            "gesamt": ref["gesamt"],
+            "schnitt_monat": ref["schnitt_monat"],
+            "monatlich": ref["monatlich"],
+            # Auch die Referenz beantwortet Antonios Frage: nach 24 Monaten hat
+            # man den Barpreis laengst gezahlt und den Tarif fuer 24 Monate.
+            # Das Geraet ist am ersten Tag bezahlt, der Tarif laeuft seine
+            # Mindestlaufzeit - nach 24 Monaten ist damit alles gezahlt, was
+            # geschuldet ist.
+            #
+            # A1 (20.09.2026): `gezahlt_nach_24` ist SEITHER die `gesamt` der
+            # Referenz selbst. Die fruehere Formel (Barpreis + flacher
+            # Tarifgrundpreis × 24) rechnete eine ZWEITE Summe - und gegen die
+            # phasengewichtete `gesamt` ein NEGATIVES `offen_nach_24`, sobald
+            # das Blatt Rabattphaen nennt. Die Referenz schuldet nach Monat 24
+            # nichts: 0.0 ist die Aussage, nicht ein fehlender Wert.
+            "gezahlt_nach_24": ref["gesamt"],
+            "tarif_bindung": ref["tarif_monate"],
+            "nach_bindung": ref.get("nach_bindung"),
+            "bestandteile": [
+                {
+                    "name": "Gerät ohne Vertrag · Barpreis",
+                    "betrag": ref["geraet_betrag"],
+                    "kategorie": "einmalig",
+                },
+                {
+                    "name": f"Tarif · {ref['tarif_monate']} Monate {ref['tarif']}",
+                    "betrag": ref["tarif_summe"],
+                    "kategorie": "tarif",
+                },
+            ],
+            # Der Anschlusspreis steht in KEINEM der fuenf Vodafone-Blaetter -
+            # unbekannt ist nicht kostenlos.
+            "luecken": [POSTEN_ANSCHLUSS],
+            "quelle_url": ref["geraet_quelle_url"],
+            "abgerufen_am": ref["geraet_abgerufen_am"],
+            "tarif_quelle_url": ref["tarif_quelle_url"],
+            "referenz": ref,
+        }
+    )
     karte["offen_nach_24"] = 0.0
     # D3: die Näherung schuldet nach Monat 24 nichts (siehe oben) - ihr
     # Balken hat deshalb nie ein schraffiertes Segment, aber denselben
     # Aufbau wie jede andere Zeile (aus ihren EIGENEN `bestandteile`).
-    karte["zerlegung"] = zerlegung_balken(karte["bestandteile"], 0.0,
-                                          karte["gesamt"])
+    karte["zerlegung"] = zerlegung_balken(karte["bestandteile"], 0.0, karte["gesamt"])
     # S2-1: die Frische ÜBERSCHREIBT den Default der Leerkarte - die
     # Näherung ist eine gerechnete Summe aus zwei gemessenen Belegen,
     # und ihr Stand ist der der Belege (siehe `_referenz_stand`).
     frisch = referenz_ist_frisch(ref, heute)
     karte["frisch"] = frisch
-    karte["alt_marke"] = ("" if frisch
-                          else alt_marke_fuer(_referenz_stand(ref)))
+    karte["alt_marke"] = "" if frisch else alt_marke_fuer(_referenz_stand(ref))
     return karte
 
 
@@ -1350,12 +1502,15 @@ def _referenzkarte(ref: dict, heute: str = "") -> dict:
 # Das Delta gegen die Referenz
 # --------------------------------------------------------------------------
 
+
 def _wesentlich(differenz: float, bezug: float) -> bool:
     """ODER, nicht UND - bei 200 EUR sind 15 EUR viel und 3 Prozent wenig."""
     abstand = abs(differenz)
     prozent = (abstand / bezug * 100) if bezug else 0.0
-    return (prozent >= geraete_vergleich.WESENTLICH_PROZENT
-            or abstand >= geraete_vergleich.WESENTLICH_EURO)
+    return (
+        prozent >= geraete_vergleich.WESENTLICH_PROZENT
+        or abstand >= geraete_vergleich.WESENTLICH_EURO
+    )
 
 
 def _delta_faellig(karte: dict, referenz: Optional[dict]) -> bool:
@@ -1410,8 +1565,7 @@ def gleicher_horizont(karte: dict, referenz: Optional[dict]) -> bool:
     """
     if referenz is None:
         return False
-    return zeitraum_vergleichbar(karte.get("leitzahl_monate"),
-                                 referenz.get("monate"))
+    return zeitraum_vergleichbar(karte.get("leitzahl_monate"), referenz.get("monate"))
 
 
 def delta_zustand(karte: dict, referenz: Optional[dict]) -> Optional[dict]:
@@ -1429,16 +1583,18 @@ def delta_zustand(karte: dict, referenz: Optional[dict]) -> Optional[dict]:
     damit auch keinen numerischen Δ-Sortierschluessel und faellt aus der
     Rangfolge nach Δ heraus (`data-delta` bleibt leer).
     """
-    if not _delta_faellig(karte, referenz) or gleicher_horizont(karte,
-                                                                referenz):
+    if not _delta_faellig(karte, referenz) or gleicher_horizont(karte, referenz):
         return None
     monate = karte.get("leitzahl_monate")
-    dieses = (f"{monate} Monate" if monate is not None
-              else "eine nicht gemessene Laufzeit")
+    dieses = (
+        f"{monate} Monate" if monate is not None else "eine nicht gemessene Laufzeit"
+    )
     return {
         "kurz": DELTA_ANDERE_LAUFZEIT,
-        "satz": (f"Kein Abstand zur Vodafone-Referenz: diese Zahl trägt "
-                 f"{dieses}, die Referenz {referenz['monate']} Monate."),
+        "satz": (
+            f"Kein Abstand zur Vodafone-Referenz: diese Zahl trägt "
+            f"{dieses}, die Referenz {referenz['monate']} Monate."
+        ),
     }
 
 
@@ -1487,8 +1643,11 @@ def _delta(karte: dict, referenz: Optional[dict]) -> Optional[dict]:
     return {
         "ungefaehr": ungefaehr,
         "betrag": betrag,
-        "prozent": (None if ungefaehr or not referenz["gesamt"] else
-                    round(abs(betrag) / referenz["gesamt"] * 100, 1)),
+        "prozent": (
+            None
+            if ungefaehr or not referenz["gesamt"]
+            else round(abs(betrag) / referenz["gesamt"] * 100, 1)
+        ),
         "monatlich": monatlich,
         "guenstiger": betrag < 0,
         "abstand": abs(betrag),
@@ -1505,6 +1664,7 @@ def _delta(karte: dict, referenz: Optional[dict]) -> Optional[dict]:
 # Der Einstieg
 # --------------------------------------------------------------------------
 
+
 def _rang(karte: dict) -> tuple:
     """Default-Sortierung: Ø/Monat aufsteigend (A5.3).
 
@@ -1513,10 +1673,14 @@ def _rang(karte: dict) -> tuple:
     guenstigstes Angebot, sondern eine Luecke. Dasselbe gilt seit A3 für
     ALTE Angebote: die Zeile bleibt, aber hinter jeder frischen.
     """
-    return (not karte["belastbar"], not karte.get("vergleichbar", True),
-            karte["naeherung"], not karte.get("frisch", True),
-            karte["schnitt_monat"] if karte["schnitt_monat"] is not None
-            else 9e9, karte["anbieter"])
+    return (
+        not karte["belastbar"],
+        not karte.get("vergleichbar", True),
+        karte["naeherung"],
+        not karte.get("frisch", True),
+        karte["schnitt_monat"] if karte["schnitt_monat"] is not None else 9e9,
+        karte["anbieter"],
+    )
 
 
 def _neuigkeit(karte: dict) -> int:
@@ -1528,7 +1692,8 @@ def _neuigkeit(karte: dict) -> int:
     """
     try:
         return _datum.fromisoformat(
-            (karte.get("abgerufen_am") or "").strip()).toordinal()
+            (karte.get("abgerufen_am") or "").strip()
+        ).toordinal()
     except ValueError:
         return 0
 
@@ -1558,11 +1723,12 @@ def _angebot_rang(karte: dict) -> tuple:
     alle Karten gleich frisch sind: dort entscheidet weiter das
     aktuellste Datum vor dem Preis.
     """
-    return (not karte.get("frisch", True),
-            1 if karte.get("aus_listung") else 0,
-            -_neuigkeit(karte),
-            karte["schnitt_monat"] if karte["schnitt_monat"] is not None
-            else 9e9)
+    return (
+        not karte.get("frisch", True),
+        1 if karte.get("aus_listung") else 0,
+        -_neuigkeit(karte),
+        karte["schnitt_monat"] if karte["schnitt_monat"] is not None else 9e9,
+    )
 
 
 # P3-E2: die Ratenlaufzeit, die der Laufzeit-Filter der Bündeltabelle ohne
@@ -1589,8 +1755,7 @@ def laufzeit_wahl(karten: list) -> Optional[dict]:
     (`laufzeit_sichtbar` leer). Rueckgabe `None`, wenn das Modell keine
     zwei Laufzeiten fuehrt - dann gibt es nichts zu waehlen.
     """
-    optionen = sorted({k["raten_laufzeit"] for k in karten
-                       if k.get("raten_laufzeit")})
+    optionen = sorted({k["raten_laufzeit"] for k in karten if k.get("raten_laufzeit")})
     for k in karten:
         k["laufzeit_sichtbar"] = ""
     if len(optionen) < 2:
@@ -1608,9 +1773,11 @@ def laufzeit_wahl(karten: list) -> Optional[dict]:
             sichtbar[passend].append(str(wahl))
         for k in gruppe:
             k["laufzeit_sichtbar"] = " ".join(sichtbar[k["raten_laufzeit"]])
-    start = (LAUFZEIT_STANDARD if LAUFZEIT_STANDARD in optionen
-             else min(optionen, key=lambda lz: (abs(lz - LAUFZEIT_STANDARD),
-                                                lz)))
+    start = (
+        LAUFZEIT_STANDARD
+        if LAUFZEIT_STANDARD in optionen
+        else min(optionen, key=lambda lz: (abs(lz - LAUFZEIT_STANDARD), lz))
+    )
     return {"optionen": optionen, "start": start}
 
 
@@ -1634,14 +1801,19 @@ def _vorgabe(modelle: list) -> str:
     Preispunkten in einem Chart.
     """
     for modell in modelle:
-        if modell["id"] == LEITFRAGE_MODELL and len(
-                modell["bundle_anbieter"]) >= 2:
+        if modell["id"] == LEITFRAGE_MODELL and len(modell["bundle_anbieter"]) >= 2:
             return modell["id"]
     return modelle[0]["id"] if modelle else ""
 
 
-def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
-            katalog, heute: str = "") -> dict:
+def modelle(
+    buendel: list,
+    listungen: list,
+    referenzen: list,
+    tarife: dict,
+    katalog,
+    heute: str = "",
+) -> dict:
     """Alle Modelle mit mindestens einem Buendel, je Modell vier Anbieter.
 
     Rueckgabe:
@@ -1659,12 +1831,12 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
     geraet_je_sku: dict = {}
     for e in listungen:
         if e.get("sku_id"):
-            geraet_je_sku.setdefault(e["sku_id"], (e.get("device_id") or "",
-                                                   e.get("speicher_gb")))
+            geraet_je_sku.setdefault(
+                e["sku_id"], (e.get("device_id") or "", e.get("speicher_gb"))
+            )
     # Ein Buendel ohne Listung derselben SKU bekommt sein Geraet aus dem
     # Katalog (F-R2-3); was auch dort nicht steht, faellt BENANNT heraus.
-    ohne_zuordnung = ergaenze_geraete_aus_katalog(geraet_je_sku, buendel,
-                                                  katalog)
+    ohne_zuordnung = ergaenze_geraete_aus_katalog(geraet_je_sku, buendel, katalog)
     belege = barpreise(listungen)
     zustaende = _zustand_je_listung(listungen)
 
@@ -1692,26 +1864,37 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
     # die BRUECKE fuer Anbieter OHNE Bündel-Adapter - hat derselbe
     # Anbieter ein gemessenes Bündel, ist sie die schwaechere Quelle und
     # weicht, egal was sie kostet.
-    listung_ids = {id(b) for b in alle[len(buendel):]}
+    listung_ids = {id(b) for b in alle[len(buendel) :]}
     gruppen: dict = {}
     for b in alle:
         if not isinstance(b, Buendel) or b.ohne_geraet:
             continue
         if b.sku_id not in geraet_je_sku:
-            continue          # steht in `ohne_zuordnung`, mit Grund
+            continue  # steht in `ohne_zuordnung`, mit Grund
         device_id, speicher = geraet_je_sku[b.sku_id]
         mid = modell_schluessel(device_id, speicher)
         tarif = tarife.get(b.tarif_id) if b.tarif_id else None
-        karte = _karte(b, tarif, _barpreis_fuer(belege.get(b.sku_id, {}),
-                                                b.anbieter),
-                       katalog, geraet_je_sku,
-                       zustand=zustand_des_buendels(b, zustaende),
-                       heute=heute)
+        karte = _karte(
+            b,
+            tarif,
+            _barpreis_fuer(belege.get(b.sku_id, {}), b.anbieter),
+            katalog,
+            geraet_je_sku,
+            zustand=zustand_des_buendels(b, zustaende),
+            heute=heute,
+        )
         if id(b) in listung_ids:
             karte["aus_listung"] = True
-        gruppen.setdefault(mid, {"id": mid, "device_id": device_id,
-                                 "speicher": speicher, "karten": [],
-                                 "skus": set()})
+        gruppen.setdefault(
+            mid,
+            {
+                "id": mid,
+                "device_id": device_id,
+                "speicher": speicher,
+                "karten": [],
+                "skus": set(),
+            },
+        )
         gruppen[mid]["karten"].append(karte)
         gruppen[mid]["skus"].add(b.sku_id)
 
@@ -1747,8 +1930,7 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         # solche Zeilen gruppieren sich weiter korrekt miteinander.
         je_angebot: dict = {}
         for k in karten:
-            schluessel = (k["anbieter"], k["tarif"], k["raten_laufzeit"],
-                          k["zustand"])
+            schluessel = (k["anbieter"], k["tarif"], k["raten_laufzeit"], k["zustand"])
             bisher = je_angebot.get(schluessel)
             if bisher is None or _angebot_rang(k) < _angebot_rang(bisher):
                 je_angebot[schluessel] = k
@@ -1767,8 +1949,9 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         # Vorher stand hier `k["laufzeit"]`, also die Konstante 24 - eine
         # Liste, die per Konstruktion `[24]` war und damit nichts sagte.
         # Dieselbe Zahl, die auch den Entdoppelungs-Schluessel traegt.
-        laufzeiten = sorted({k["raten_laufzeit"] for k in karten
-                             if k["raten_laufzeit"]})
+        laufzeiten = sorted(
+            {k["raten_laufzeit"] for k in karten if k["raten_laufzeit"]}
+        )
         # ERST DAS EIGENE BUENDEL, DANN DIE NAEHERUNG. Wo Vodafone selbst
         # ein Buendel zu diesem Geraet ausweist, ist es die Referenz; die
         # gerechnete Summe traete sonst als zweite Vodafone-Karte daneben.
@@ -1779,13 +1962,14 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         # Massstab von heute; die Referenz faellt dann auf die gerechnete
         # Naeherung zurueck (deren Karte aber NICHT mit dazu - Vodafone
         # steht je Modell genau einmal, siehe unten).
-        eigene = [k for k in karten
-                  if k["eigen"] and k["belastbar"] and k["vergleichbar"]
-                  and k["frisch"]]
+        eigene = [
+            k
+            for k in karten
+            if k["eigen"] and k["belastbar"] and k["vergleichbar"] and k["frisch"]
+        ]
         naeherung = None
         if eigene:
-            referenz = _referenz_aus_buendel(
-                min(eigene, key=lambda k: k["gesamt"]))
+            referenz = _referenz_aus_buendel(min(eigene, key=lambda k: k["gesamt"]))
         else:
             # TICKET TCO24-1: die Naeherung rechnet ueber den festen
             # 24-Monats-Horizont - keine Laufzeit mehr, die sie sich von
@@ -1830,18 +2014,18 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         # (F-R2-2), hiesse das "TCO-36 von 1.120,75 bis 1.428,70 EUR" mit
         # einer TCO-24-Zahl als Obergrenze. Dieselbe Fehlerklasse wie das
         # Etikett selbst, eine Zeile weiter oben auf der Seite.
-        betraege = [k["gesamt"] for k in angebote
-                    if k["vergleichbar"] and k["frisch"]
-                    and k["gesamt"] is not None]
-        name = _name(katalog, gruppe["device_id"], gruppe["speicher"],
-                     rueckfall=mid)
+        betraege = [
+            k["gesamt"]
+            for k in angebote
+            if k["vergleichbar"] and k["frisch"] and k["gesamt"] is not None
+        ]
+        name = _name(katalog, gruppe["device_id"], gruppe["speicher"], rueckfall=mid)
         hersteller = _hersteller(katalog, gruppe["device_id"])
         # E4: der Auto-Marker des Katalog-Eintrags - die Sichtbarkeitsregel
         # der Zeitreihen-Wahl haengt daran (geraete_zeitreihe: Auto-Modelle
         # erst ab 2 Messtagen waehlbar). Leer = Hand-Eintrag aus der Config
         # (oder kein Katalog uebergeben, wie in den Karten-Tests).
-        katalog_eintrag = (katalog.nach_id(gruppe["device_id"])
-                           if katalog else None)
+        katalog_eintrag = katalog.nach_id(gruppe["device_id"]) if katalog else None
 
         # DIE EINE ANTWORTZEILE (BRIEF_FADEN, 05.09.2026): "Was kostet
         # dieses Geraet?" - zwei Zahlen, je mit ihrem Anbieter, sonst ist
@@ -1865,10 +2049,13 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         # (Galaxy S26 Ultra 1024: „1.285,00 € (congstar)“), und widersprach
         # damit ihrer eigenen Kartendefinition. Jetzt zaehlen nur noch
         # Barpreise; ist keiner gemessen, fehlt die Zahl ehrlich.
-        geraetepreise = [k for k in vergleichbar_alle
-                         if k["geraetepreis"] is not None
-                         and k.get("geraetepreis_art") != "finanzierung"
-                         and k.get("frisch", True)]
+        geraetepreise = [
+            k
+            for k in vergleichbar_alle
+            if k["geraetepreis"] is not None
+            and k.get("geraetepreis_art") != "finanzierung"
+            and k.get("frisch", True)
+        ]
         # F-4a' (PM, 05.09.2026, 19:xx): das Minimum gilt auch ueber die
         # Haendler OHNE Tarifbuendel (Amazon/Expert/Saturn) - sie tragen
         # keine Karte in `karten` (kein Buendel, siehe oben), stehen aber
@@ -1877,7 +2064,8 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         # dass die Antwortzeile es je gesehen haette - E1-Verstoss, die
         # Leitzahl widersprach ihrer eigenen Nachbarkarte.
         for haendler, eintrag in _haendler_geraetepreise(
-                listungen_je_modell.get(mid, [])).items():
+            listungen_je_modell.get(mid, [])
+        ).items():
             # A3-Nachbesserung (Prüfer 20.09.2026, "hoch"): DIESELBE
             # Frische-Definition wie an jeder anderen Stelle der Antwort-
             # zeile (`ist_frisch`, Clean Code 7) - ein alter Händlerpreis
@@ -1886,26 +2074,37 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
             # zeigt den Preis weiter, mit Datum - nur die Auswahl der
             # Antwortzeile liest frisch.
             if eintrag is not None and ist_frisch(
-                    eintrag.get("abgerufen_am", ""), heute):
-                geraetepreise.append({"anbieter": haendler,
-                                      "geraetepreis": eintrag["preis"]})
-        guenstigstes_geraet = (min(geraetepreise,
-                                   key=lambda k: k["geraetepreis"])
-                               if geraetepreise else None)
-        tarifangebote = [k for k in angebote
-                         if k["vergleichbar"] and k["frisch"]
-                         and k["gesamt"] is not None]
-        guenstigster_tarif = (min(tarifangebote, key=lambda k: k["gesamt"])
-                              if tarifangebote else None)
+                eintrag.get("abgerufen_am", ""), heute
+            ):
+                geraetepreise.append(
+                    {"anbieter": haendler, "geraetepreis": eintrag["preis"]}
+                )
+        guenstigstes_geraet = (
+            min(geraetepreise, key=lambda k: k["geraetepreis"])
+            if geraetepreise
+            else None
+        )
+        tarifangebote = [
+            k
+            for k in angebote
+            if k["vergleichbar"] and k["frisch"] and k["gesamt"] is not None
+        ]
+        guenstigster_tarif = (
+            min(tarifangebote, key=lambda k: k["gesamt"]) if tarifangebote else None
+        )
         antwort = {
-            "geraetepreis": (guenstigstes_geraet["geraetepreis"]
-                             if guenstigstes_geraet else None),
-            "geraetepreis_anbieter": (guenstigstes_geraet["anbieter"]
-                                      if guenstigstes_geraet else None),
-            "tarif_gesamt": (guenstigster_tarif["gesamt"]
-                             if guenstigster_tarif else None),
-            "tarif_anbieter": (guenstigster_tarif["anbieter"]
-                               if guenstigster_tarif else None),
+            "geraetepreis": (
+                guenstigstes_geraet["geraetepreis"] if guenstigstes_geraet else None
+            ),
+            "geraetepreis_anbieter": (
+                guenstigstes_geraet["anbieter"] if guenstigstes_geraet else None
+            ),
+            "tarif_gesamt": (
+                guenstigster_tarif["gesamt"] if guenstigster_tarif else None
+            ),
+            "tarif_anbieter": (
+                guenstigster_tarif["anbieter"] if guenstigster_tarif else None
+            ),
         }
 
         # A3: „alles alt“ am ganzen Modell. Ein Modell, dessen letzte
@@ -1917,53 +2116,68 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
         # mit.
         alte = [k for k in karten if k.get("sku_id") and not k["frisch"]]
         alt_seit = max(
-            (k.get("abgerufen_am") or "" for k in alte
-             if kurz_datum(k.get("abgerufen_am") or "")), default="")
+            (
+                k.get("abgerufen_am") or ""
+                for k in alte
+                if kurz_datum(k.get("abgerufen_am") or "")
+            ),
+            default="",
+        )
         alles_alt = bool(alte) and not any(
-            k["frisch"] for k in karten if k.get("sku_id"))
+            k["frisch"] for k in karten if k.get("sku_id")
+        )
         if alles_alt and alt_seit:
-            alt_hinweis = (f"Kein aktueller Bündel-Stand seit dem "
-                           f"{kurz_datum(alt_seit)} – alle Zeilen dieses "
-                           f"Modells sind älter als {ALT_AB_TAGEN} Tage.")
+            alt_hinweis = (
+                f"Kein aktueller Bündel-Stand seit dem "
+                f"{kurz_datum(alt_seit)} – alle Zeilen dieses "
+                f"Modells sind älter als {ALT_AB_TAGEN} Tage."
+            )
         elif alles_alt:
-            alt_hinweis = ("Kein aktueller Bündel-Stand – das Abrufdatum "
-                           "dieser Bündel ist unbekannt, ihre Werte zählen "
-                           "nicht in den Vergleich.")
+            alt_hinweis = (
+                "Kein aktueller Bündel-Stand – das Abrufdatum "
+                "dieser Bündel ist unbekannt, ihre Werte zählen "
+                "nicht in den Vergleich."
+            )
         else:
             alt_hinweis = ""
 
-        fertig.append({
-            "id": mid,
-            "name": name,
-            "hersteller": hersteller,
-            "titel": titel(hersteller, name),
-            "auto": (katalog_eintrag.auto if katalog_eintrag else ""),
-            "speicher": gruppe["speicher"],
-            "karten": karten,
-            "referenz": referenz,
-            "laufzeiten": laufzeiten,
-            "laufzeit_wahl": laufzeit_wahl(karten),
-            "angebote": len(angebote),
-            # Wie viele der Angebote NICHT im Vergleich stehen, je Grund -
-            # das Band sagt "davon 1 erneuert", nicht "3 Angebote" allein.
-            "erneuert": len([k for k in angebote
-                             if k["zustand"] in ("refurbished", "b-ware")]),
-            "zustand_offen": len([k for k in angebote
-                                  if k["zustand"] == "unbekannt"]),
-            "spanne": ([min(betraege), max(betraege)] if betraege else []),
-            # F-5: NICHT die "Anbieter"-Zahl der Seite (siehe Docstring
-            # oben) - nur der Sortier-/Vorgabe-Schluessel dieser Funktion.
-            # A3: nur FRISCHE Angebote - ein alter Anbieter ist keines,
-            # das die Seite heute beantworten kann.
-            "bundle_anbieter": sorted({k["anbieter"] for k in angebote
-                                       if k["frisch"]}),
-            # A3: der benannte Zustand des ganzen Modells, wenn kein
-            # frisches Bündel mehr steht (siehe Block oben).
-            "alles_alt": alles_alt,
-            "alt_seit": alt_seit,
-            "alt_hinweis": alt_hinweis,
-            "antwort": antwort,
-        })
+        fertig.append(
+            {
+                "id": mid,
+                "name": name,
+                "hersteller": hersteller,
+                "titel": titel(hersteller, name),
+                "auto": (katalog_eintrag.auto if katalog_eintrag else ""),
+                "speicher": gruppe["speicher"],
+                "karten": karten,
+                "referenz": referenz,
+                "laufzeiten": laufzeiten,
+                "laufzeit_wahl": laufzeit_wahl(karten),
+                "angebote": len(angebote),
+                # Wie viele der Angebote NICHT im Vergleich stehen, je Grund -
+                # das Band sagt "davon 1 erneuert", nicht "3 Angebote" allein.
+                "erneuert": len(
+                    [k for k in angebote if k["zustand"] in ("refurbished", "b-ware")]
+                ),
+                "zustand_offen": len(
+                    [k for k in angebote if k["zustand"] == "unbekannt"]
+                ),
+                "spanne": ([min(betraege), max(betraege)] if betraege else []),
+                # F-5: NICHT die "Anbieter"-Zahl der Seite (siehe Docstring
+                # oben) - nur der Sortier-/Vorgabe-Schluessel dieser Funktion.
+                # A3: nur FRISCHE Angebote - ein alter Anbieter ist keines,
+                # das die Seite heute beantworten kann.
+                "bundle_anbieter": sorted(
+                    {k["anbieter"] for k in angebote if k["frisch"]}
+                ),
+                # A3: der benannte Zustand des ganzen Modells, wenn kein
+                # frisches Bündel mehr steht (siehe Block oben).
+                "alles_alt": alles_alt,
+                "alt_seit": alt_seit,
+                "alt_hinweis": alt_hinweis,
+                "antwort": antwort,
+            }
+        )
 
     # Die Reihenfolge des Auswahlfeldes: die meisten Buendel-Anbieter zuerst
     # - dort beantwortet die Seite ihre Tarif-Frage am vollstaendigsten -,
@@ -1971,8 +2185,12 @@ def modelle(buendel: list, listungen: list, referenzen: list, tarife: dict,
     # Modellliste ist eine Rangliste des Marktes, und der Marktueberblick
     # steht im Katalog.
     fertig.sort(key=lambda m: (-len(m["bundle_anbieter"]), m["name"]))
-    return {"modelle": fertig, "vorgabe": _vorgabe(fertig),
-            "gesamt": len(fertig), "ohne_zuordnung": ohne_zuordnung}
+    return {
+        "modelle": fertig,
+        "vorgabe": _vorgabe(fertig),
+        "gesamt": len(fertig),
+        "ohne_zuordnung": ohne_zuordnung,
+    }
 
 
 # P2 (Antonio F4, 17.09.2026): der Abschnitt "Die Reihen fuer G2"

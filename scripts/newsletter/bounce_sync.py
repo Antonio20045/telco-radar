@@ -18,6 +18,7 @@ Zugeordnet wird ueber die **Message-ID** aus `send_log.jsonl`, nicht ueber
 die Adresse: die steht in den Ereignissen zwar drin, muesste dann aber durch
 dieses Skript und ins Log - und im Log darf keine stehen.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -29,10 +30,10 @@ from pathlib import Path
 WURZEL = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(WURZEL / "src"))
 
-from telco_radar.newsletter import store as st                   # noqa: E402
-from telco_radar.newsletter import versand as v                  # noqa: E402
-from telco_radar.newsletter.config import lade_katalog           # noqa: E402
-from telco_radar.newsletter.transport import hole_ereignisse     # noqa: E402
+from telco_radar.newsletter import store as st  # noqa: E402
+from telco_radar.newsletter import versand as v  # noqa: E402
+from telco_radar.newsletter.config import lade_katalog  # noqa: E402
+from telco_radar.newsletter.transport import hole_ereignisse  # noqa: E402
 
 
 def _zahl(name: str, wert) -> None:
@@ -43,8 +44,11 @@ def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--store", default="store/subscribers.jsonl")
     p.add_argument("--send-log", default="store/send_log.jsonl")
-    p.add_argument("--stand", default="store/bounce_stand.json",
-                   help="zuletzt verarbeiteter Zeitpunkt")
+    p.add_argument(
+        "--stand",
+        default="store/bounce_stand.json",
+        help="zuletzt verarbeiteter Zeitpunkt",
+    )
     p.add_argument("--trocken", action="store_true")
     args = p.parse_args(argv)
 
@@ -63,14 +67,17 @@ def main(argv=None) -> int:
         return 0
 
     # message_id -> abo_id, aus dem Sendeprotokoll.
-    zuordnung = {str(e.get("message_id")): str(e.get("sub"))
-                 for e in st.lies_jsonl(Path(args.send_log))
-                 if e.get("message_id") and e.get("sub")}
+    zuordnung = {
+        str(e.get("message_id")): str(e.get("sub"))
+        for e in st.lies_jsonl(Path(args.send_log))
+        if e.get("message_id") and e.get("sub")
+    }
 
     katalog = lade_katalog(WURZEL)
     store = st.AboStore(Path(args.store), katalog)
-    bounce_stand = {a.id: {"hard": a.bounce_hard, "soft": a.bounce_soft}
-                    for a in store.alle()}
+    bounce_stand = {
+        a.id: {"hard": a.bounce_hard, "soft": a.bounce_soft} for a in store.alle()
+    }
 
     ergebnis = v.werte_ereignisse_aus(ereignisse, zuordnung, bounce_stand)
     _zahl("Nicht zuzuordnen", ergebnis.unbekannt)
@@ -105,8 +112,9 @@ def main(argv=None) -> int:
     # und ein zweimal gezaehlter Soft Bounce schaltet eine lebende Adresse ab.
     if ergebnis.letzter_zeitpunkt:
         stand_pfad.parent.mkdir(parents=True, exist_ok=True)
-        stand_pfad.write_text(json.dumps({"bis": ergebnis.letzter_zeitpunkt}),
-                              encoding="utf-8")
+        stand_pfad.write_text(
+            json.dumps({"bis": ergebnis.letzter_zeitpunkt}), encoding="utf-8"
+        )
     _zahl("Abos aktiv", len(store.aktive()))
     return 0
 

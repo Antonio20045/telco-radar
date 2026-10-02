@@ -35,6 +35,7 @@ aus `_flatten()`, `competitors` aus `_prep_competitors()`. Beide haben die
 stillgelegten Quellen (`_SUPPRESSED_SOURCE_DOMAINS`) schon aussortiert -
 diese Datei filtert deshalb nicht noch einmal danach.
 """
+
 from __future__ import annotations
 
 import html as html_lib
@@ -66,7 +67,6 @@ _OFFEN_JE_MONAT = 12
 _TRACKING = ("utm_", "fbclid", "gclid", "mc_cid", "mc_eid")
 
 
-
 def anker(name: str) -> str:
     """Stabiler Anker aus einem Wettbewerbernamen ("Telefónica / O2" ->
     "telefonica-o2"). Muss ueber Laeufe hinweg gleich bleiben - die Anker
@@ -87,8 +87,9 @@ def _norm_url(url: str) -> str:
     teile = urlsplit((url or "").strip().lower())
     host = teile.netloc.removeprefix("www.")
     pfad = teile.path.rstrip("/")
-    query = "&".join(sorted(t for t in teile.query.split("&")
-                            if t and not t.startswith(_TRACKING)))
+    query = "&".join(
+        sorted(t for t in teile.query.split("&") if t and not t.startswith(_TRACKING))
+    )
     return f"{host}{pfad}" + (f"?{query}" if query else "")
 
 
@@ -162,8 +163,9 @@ def _marken(sources, muster: list[re.Pattern]) -> set[str]:
     for src in sources or []:
         if getattr(src, "internal_reference", False):
             continue
-        kandidaten = _konzern_teile(getattr(src, "group", "") or "") \
-            or [getattr(src, "name", "") or ""]
+        kandidaten = _konzern_teile(getattr(src, "group", "") or "") or [
+            getattr(src, "name", "") or ""
+        ]
         if any(p.match(k.lower()) for k in kandidaten for p in muster):
             treffer.add(getattr(src, "name", "") or "")
     return treffer
@@ -186,19 +188,26 @@ def _aktion(eintrag: dict) -> dict:
     }
 
 
-def _chronik_eintrag(datum: str, rubrik: str, titel: str, url: str,
-                     note: str, quelle: str, herkunft: str) -> dict:
+def _chronik_eintrag(
+    datum: str, rubrik: str, titel: str, url: str, note: str, quelle: str, herkunft: str
+) -> dict:
     # `tag` steht als Zeilenmarke ueber der Schlagzeile ("7.8."). Bis zum
     # 08.08.2026 stand dort nur die Tageszahl, und sie wurde bei
     # Wiederholung ausgeblendet - das ging, solange die Chronik EINE Spalte
     # war. In zwei Spalten (siehe die Vorlage) zerreisst ein Spaltenumbruch
     # jede solche Gruppe: oben in Spalte zwei stuenden Meldungen ohne Datum.
     # Jede Zeile traegt ihr Datum deshalb selbst, dafuer kurz und leise.
-    return {"datum": datum, "monat": datum[:7],
-            "tag": f"{int(datum[8:10])}.{int(datum[5:7])}.",
-            "rubrik": rubrik or "Sonstiges", "titel": _klartext(titel),
-            "url": url, "note": _ohne_vodafone_teil(note), "quelle": quelle,
-            "herkunft": herkunft}
+    return {
+        "datum": datum,
+        "monat": datum[:7],
+        "tag": f"{int(datum[8:10])}.{int(datum[5:7])}.",
+        "rubrik": rubrik or "Sonstiges",
+        "titel": _klartext(titel),
+        "url": url,
+        "note": _ohne_vodafone_teil(note),
+        "quelle": quelle,
+        "herkunft": herkunft,
+    }
 
 
 def _nach_monaten(eintraege: list[dict]) -> list[dict]:
@@ -221,12 +230,17 @@ def _nach_monaten(eintraege: list[dict]) -> list[dict]:
     monate = []
     for monat in sorted(gruppen, reverse=True):
         eintraege_monat = gruppen[monat]
-        monate.append({"monat": monat, "eintraege": eintraege_monat,
-                       "n": len(eintraege_monat),
-                       # Der offene Monat zeigt seinen Anfang und haelt den
-                       # Rest bereit, siehe _OFFEN_JE_MONAT.
-                       "offen": eintraege_monat[:_OFFEN_JE_MONAT],
-                       "rest": eintraege_monat[_OFFEN_JE_MONAT:]})
+        monate.append(
+            {
+                "monat": monat,
+                "eintraege": eintraege_monat,
+                "n": len(eintraege_monat),
+                # Der offene Monat zeigt seinen Anfang und haelt den
+                # Rest bereit, siehe _OFFEN_JE_MONAT.
+                "offen": eintraege_monat[:_OFFEN_JE_MONAT],
+                "rest": eintraege_monat[_OFFEN_JE_MONAT:],
+            }
+        )
     return monate
 
 
@@ -240,9 +254,10 @@ def _hebel_je_wettbewerber(bestand, muster, theme_label: dict) -> list[dict]:
     genau nicht nach der Frage "was macht dieser eine Anbieter".
     """
     je_hebel: dict[str, dict] = {}
-    for e in (bestand or []):
-        absender = " ".join(str(e.get("operator") or e.get("company")
-                                or e.get("source") or "").split()).lower()
+    for e in bestand or []:
+        absender = " ".join(
+            str(e.get("operator") or e.get("company") or e.get("source") or "").split()
+        ).lower()
         # Der Name muss am ANFANG des Absenders stehen - dieselbe Regel wie
         # in `_gehoert_dazu`. Ohne sie zog der Alias "Telekom" auch
         # "A1 Telekom Austria" und "Turk Telekom" in dieses Profil.
@@ -251,25 +266,43 @@ def _hebel_je_wettbewerber(bestand, muster, theme_label: dict) -> list[dict]:
         key = str(e.get("theme") or "")
         if not key:
             continue
-        h = je_hebel.setdefault(key, {"key": key,
-                                      "label": theme_label.get(key, key),
-                                      "n": 0, "beispiel": "", "url": ""})
+        h = je_hebel.setdefault(
+            key,
+            {
+                "key": key,
+                "label": theme_label.get(key, key),
+                "n": 0,
+                "beispiel": "",
+                "url": "",
+            },
+        )
         h["n"] += 1
         if not h["beispiel"]:
             # `what` ist das Feld der Differenzierungs-Bibliothek ("was
             # dieser Anbieter tut"); `headline`/`summary` gibt es dort NICHT -
             # ohne diese Zuordnung blieb die Beispielzeile leer, und der
             # Hebel stand als nackte Zahl da.
-            h["beispiel"] = " ".join(str(
-                e.get("what") or e.get("headline") or e.get("title")
-                or e.get("summary") or "").split())[:120]
+            h["beispiel"] = " ".join(
+                str(
+                    e.get("what")
+                    or e.get("headline")
+                    or e.get("title")
+                    or e.get("summary")
+                    or ""
+                ).split()
+            )[:120]
             h["url"] = e.get("url") or ""
     return sorted(je_hebel.values(), key=lambda h: (-h["n"], h["label"]))
 
 
-def build_wettbewerb_view(wochen: list[dict], focus: list[dict],
-                          promo_entries=(), promo_sources=(),
-                          diff_bestand=(), theme_label=None) -> dict:
+def build_wettbewerb_view(
+    wochen: list[dict],
+    focus: list[dict],
+    promo_entries=(),
+    promo_sources=(),
+    diff_bestand=(),
+    theme_label=None,
+) -> dict:
     """Baut die Anzeigedaten der Wettbewerbsseite aus dem Berichtsarchiv.
 
     `wochen` ist je Berichtswoche ein Wörterbuch mit `date`, den bereits
@@ -280,15 +313,16 @@ def build_wettbewerb_view(wochen: list[dict], focus: list[dict],
     Aliase). Fehlt sie - etwa beim Rendern ohne Config -, folgt die Seite
     den Profilen des letzten Laufs, statt leer zu bleiben.
     """
-    wochen = sorted((w for w in wochen if w.get("date")),
-                    key=lambda w: w["date"])
+    wochen = sorted((w for w in wochen if w.get("date")), key=lambda w: w["date"])
     if not focus:
         letzte = wochen[-1] if wochen else {}
-        focus = [{"name": c.get("name")}
-                 for c in (letzte.get("competitors") or []) if c.get("name")]
+        focus = [
+            {"name": c.get("name")}
+            for c in (letzte.get("competitors") or [])
+            if c.get("name")
+        ]
 
-    aktive_angebote = [e for e in (promo_entries or [])
-                       if e.get("status") == "aktiv"]
+    aktive_angebote = [e for e in (promo_entries or []) if e.get("status") == "aktiv"]
 
     wettbewerber = []
     for eintrag in focus:
@@ -310,7 +344,7 @@ def build_wettbewerb_view(wochen: list[dict], focus: list[dict],
             # gigafactory bid"). Fuer eine Leserschaft ohne
             # Technikhintergrund ist das der ganze Unterschied. Das Datum
             # bleibt davon unberuehrt - es ist in beiden Faellen dasselbe.
-            for h in (woche.get("highlights") or []):
+            for h in woche.get("highlights") or []:
                 if not _gehoert_dazu(h, muster):
                     continue
                 url = h.get("url") or ""
@@ -320,33 +354,53 @@ def build_wettbewerb_view(wochen: list[dict], focus: list[dict],
                 titel = h.get("schlagzeile") or h.get("title") or ""
                 note = h.get("de_title") or ""
                 chronik[schluessel] = _chronik_eintrag(
-                    datum, h.get("category") or "", titel, url,
+                    datum,
+                    h.get("category") or "",
+                    titel,
+                    url,
                     "" if note == titel else note,
                     h.get("source_domain") or h.get("source_label") or "",
-                    "meldung")
+                    "meldung",
+                )
 
-            profil = next((c for c in (woche.get("competitors") or [])
-                           if (c.get("name") or "").strip() == name), None)
+            profil = next(
+                (
+                    c
+                    for c in (woche.get("competitors") or [])
+                    if (c.get("name") or "").strip() == name
+                ),
+                None,
+            )
             if profil:
                 if profil.get("summary"):
                     summary = profil["summary"]
                     profil_datum = datum
                 if profil.get("themes"):
                     themen_verlauf.append(
-                        {"datum": datum,
-                         "themen": [str(t) for t in profil["themes"]][:_MAX_THEMEN_JE_WOCHE]})
+                        {
+                            "datum": datum,
+                            "themen": [str(t) for t in profil["themes"]][
+                                :_MAX_THEMEN_JE_WOCHE
+                            ],
+                        }
+                    )
                 # Der Fehler des JEWEILS letzten Laufs - ein Teilausfall
                 # darf nicht aussehen wie ein ruhiger Wettbewerber.
                 fehler, fehler_datum = (profil.get("error") or ""), datum
-                for m in (profil.get("moves") or []):
+                for m in profil.get("moves") or []:
                     url = m.get("url") or ""
                     schluessel = _norm_url(url) or (m.get("title") or "")
                     if not schluessel or schluessel in chronik:
                         continue
                     chronik[schluessel] = _chronik_eintrag(
-                        datum, m.get("category") or "", m.get("title") or "",
-                        url, m.get("note") or "",
-                        urlsplit(url).netloc.removeprefix("www."), "profil")
+                        datum,
+                        m.get("category") or "",
+                        m.get("title") or "",
+                        url,
+                        m.get("note") or "",
+                        urlsplit(url).netloc.removeprefix("www."),
+                        "profil",
+                    )
 
         # Neueste Woche zuerst, und nur so weit zurueck, wie eine
         # Entwicklung ablesbar ist. Die oberste Zeile IST der aktuelle Stand -
@@ -356,46 +410,62 @@ def build_wettbewerb_view(wochen: list[dict], focus: list[dict],
 
         marken = _marken(promo_sources, muster)
         angebote = [e for e in aktive_angebote if (e.get("brand") or "") in marken]
-        angebote.sort(key=lambda e: (e.get("highlight") is True,
-                                     e.get("score") is not None,
-                                     e.get("score") or 0), reverse=True)
+        angebote.sort(
+            key=lambda e: (
+                e.get("highlight") is True,
+                e.get("score") is not None,
+                e.get("score") or 0,
+            ),
+            reverse=True,
+        )
 
         eintraege = list(chronik.values())
-        wettbewerber.append({
-            "name": name,
-            "anker": anker(name),
-            "summary": summary,
-            "profil_datum": profil_datum,
-            "themen_verlauf": themen_verlauf,
-            "fehler": fehler,
-            "fehler_datum": fehler_datum,
-            "monate": _nach_monaten(eintraege),
-            "n_chronik": len(eintraege),
-            # Seit wann diese Chronik reicht - das Datum der AELTESTEN
-            # Aufnahme, nicht der Beobachtungsbeginn des Projekts.
-            "seit": min((e["datum"] for e in eintraege), default=""),
-            "aktionen": [_aktion(e) for e in angebote[:_MAX_AKTIONEN]],
-            "aktionen_n": len(angebote),
-            "marken": sorted(marken),
-            "hebel": _hebel_je_wettbewerber(diff_bestand, muster,
-                                            theme_label or {}),
-        })
+        wettbewerber.append(
+            {
+                "name": name,
+                "anker": anker(name),
+                "summary": summary,
+                "profil_datum": profil_datum,
+                "themen_verlauf": themen_verlauf,
+                "fehler": fehler,
+                "fehler_datum": fehler_datum,
+                "monate": _nach_monaten(eintraege),
+                "n_chronik": len(eintraege),
+                # Seit wann diese Chronik reicht - das Datum der AELTESTEN
+                # Aufnahme, nicht der Beobachtungsbeginn des Projekts.
+                "seit": min((e["datum"] for e in eintraege), default=""),
+                "aktionen": [_aktion(e) for e in angebote[:_MAX_AKTIONEN]],
+                "aktionen_n": len(angebote),
+                "marken": sorted(marken),
+                "hebel": _hebel_je_wettbewerber(
+                    diff_bestand, muster, theme_label or {}
+                ),
+            }
+        )
 
     # Offene Flanken: Hebel, die ein ANDERER Fokus-Wettbewerber zieht und
     # dieser nicht. Erst im Nachgang berechenbar - vorher steht nicht fest,
     # was die anderen ziehen. Bewusst nur gegen die Fokus-Wettbewerber und
     # nicht gegen den Weltbestand: "Telkomsel hat das auch" ist im deutschen
     # Markt keine Flanke.
-    alle_hebel = {h["key"]: h["label"] for c in wettbewerber
-                  for h in c.get("hebel") or []}
+    alle_hebel = {
+        h["key"]: h["label"] for c in wettbewerber for h in c.get("hebel") or []
+    }
     for c in wettbewerber:
         eigene = {h["key"] for h in c.get("hebel") or []}
-        c["flanken"] = [{"key": k, "label": alle_hebel[k],
-                         "wer": sorted(
-                             a["name"] for a in wettbewerber
-                             if any(h["key"] == k
-                                    for h in a.get("hebel") or []))}
-                        for k in alle_hebel if k not in eigene]
+        c["flanken"] = [
+            {
+                "key": k,
+                "label": alle_hebel[k],
+                "wer": sorted(
+                    a["name"]
+                    for a in wettbewerber
+                    if any(h["key"] == k for h in a.get("hebel") or [])
+                ),
+            }
+            for k in alle_hebel
+            if k not in eigene
+        ]
         c["flanken"].sort(key=lambda f: (-len(f["wer"]), f["label"]))
 
     return {

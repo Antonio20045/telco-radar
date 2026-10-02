@@ -37,6 +37,7 @@ Moduls einmal gemacht worden.
 Die Zahl wird GERECHNET und nirgends festgeschrieben; steht sie naechste
 Woche bei fuenf, sagt die Seite fuenf, ohne dass jemand eine Zeile aendert.
 """
+
 from __future__ import annotations
 
 from .anbieter_farben import stil_fuer
@@ -174,8 +175,14 @@ def mehrdeutige_tage(listungen: list, historie) -> list[dict]:
         if not mehrdeutig:
             continue
         tage = sorted(mehrdeutig)
-        out.append({"anbieter": e.get("anbieter"), "listung_id": e.get("id"),
-                    "tage": tage, "betraege": {t: mehrdeutig[t] for t in tage}})
+        out.append(
+            {
+                "anbieter": e.get("anbieter"),
+                "listung_id": e.get("id"),
+                "tage": tage,
+                "betraege": {t: mehrdeutig[t] for t in tage},
+            }
+        )
     return out
 
 
@@ -196,13 +203,25 @@ def _punkte(listungen: list, historie) -> list[dict]:
         # in der Datenbank einer von beiden, und welcher, sagt niemand.
         eindeutig, mehrdeutig = messtage(historie.reihe(e.get("id") or ""))
         for datum, preis in sorted(eindeutig.items()):
-            punkte.append({"datum": datum, "anbieter": e.get("anbieter"),
-                           "preis": preis, "art": "gemessen"})
+            punkte.append(
+                {
+                    "datum": datum,
+                    "anbieter": e.get("anbieter"),
+                    "preis": preis,
+                    "art": "gemessen",
+                }
+            )
         letzt = e.get("last_verified")
         preis = e.get("preis_ohne_vertrag")
         if letzt and preis is not None and letzt not in mehrdeutig:
-            punkte.append({"datum": letzt, "anbieter": e.get("anbieter"),
-                           "preis": float(preis), "art": "bestaetigt"})
+            punkte.append(
+                {
+                    "datum": letzt,
+                    "anbieter": e.get("anbieter"),
+                    "preis": float(preis),
+                    "art": "bestaetigt",
+                }
+            )
     # Je (Anbieter, Tag) genau ein Punkt: zwei Farben desselben Geraets sind
     # zwei Listungen, aber EIN Preis auf der Kurve.
     #
@@ -231,8 +250,7 @@ def _punkte(listungen: list, historie) -> list[dict]:
         if bisher is None:
             je_tag[k] = p
             continue
-        besser = (rang[p["art"]], -p["preis"]) > (rang[bisher["art"]],
-                                                  -bisher["preis"])
+        besser = (rang[p["art"]], -p["preis"]) > (rang[bisher["art"]], -bisher["preis"])
         if besser:
             je_tag[k] = p
     return sorted(je_tag.values(), key=lambda p: (p["datum"], p["anbieter"]))
@@ -250,8 +268,9 @@ def _reihen(punkte: list) -> list[dict]:
     for p in punkte:
         je_anbieter.setdefault(p["anbieter"], []).append(p)
 
-    geordnet = sorted(je_anbieter.items(),
-                      key=lambda kv: (not _eigen(kv[0]), -len(kv[1]), kv[0]))
+    geordnet = sorted(
+        je_anbieter.items(), key=lambda kv: (not _eigen(kv[0]), -len(kv[1]), kv[0])
+    )
     # Die Farbe haengt jetzt fest am NAMEN (`anbieter_farben.ANBIETER_FARBE`,
     # zehn Marken mit je einer eigenen Farbe) - eine Kollisionsaufloesung wie
     # zu Hash-Palette-Zeiten braucht es nicht mehr: zwei bekannte Anbieter
@@ -260,13 +279,20 @@ def _reihen(punkte: list) -> list[dict]:
     reihen = []
     for name, ps in geordnet[:MAX_LINIEN]:
         stil = stil_fuer(name)
-        reihen.append({
-            "anbieter": name, "farbe": stil.farbe, "eigen": stil.eigen,
-            "slug": stil.slug, "marker_farbe": stil.marker_farbe,
-            "marker_rand": stil.marker_rand, "marker": stil.marker,
-            "strich": stil.strich, "bekannt": stil.bekannt,
-            "punkte": [{"datum": p["datum"], "preis": p["preis"]} for p in ps],
-        })
+        reihen.append(
+            {
+                "anbieter": name,
+                "farbe": stil.farbe,
+                "eigen": stil.eigen,
+                "slug": stil.slug,
+                "marker_farbe": stil.marker_farbe,
+                "marker_rand": stil.marker_rand,
+                "marker": stil.marker,
+                "strich": stil.strich,
+                "bekannt": stil.bekannt,
+                "punkte": [{"datum": p["datum"], "preis": p["preis"]} for p in ps],
+            }
+        )
     return reihen
 
 
@@ -283,9 +309,12 @@ def reihen_fuer_listungen(listungen: list, historie) -> list[dict]:
     nach `geraete_tco_karten.modell_schluessel`); diese Funktion rechnet
     nur noch die Reihen daraus, nicht die Gruppierung.
     """
-    passende = [e for e in listungen
-                if (e.get("zustand") or "neu") in VERGLEICHBARE_ZUSTAENDE
-                and e.get("preis_ohne_vertrag") is not None]
+    passende = [
+        e
+        for e in listungen
+        if (e.get("zustand") or "neu") in VERGLEICHBARE_ZUSTAENDE
+        and e.get("preis_ohne_vertrag") is not None
+    ]
     return _reihen(_punkte(passende, historie))
 
 
@@ -312,37 +341,54 @@ def geraete_mit_verlauf(eintraege: list, historie, katalog) -> list[dict]:
             continue
         alle = [p["preis"] for r in reihen for p in r["punkte"]]
         tage = sorted({p["datum"] for r in reihen for p in r["punkte"]})
-        geraete.append({
-            # Die Messluecken dieses Geraets, benannt: `app.js` schreibt
-            # daraus den Satz unter die Grafik.
-            "mehrdeutig": mehrdeutige_tage(listungen, historie),
-            "id": f"{gid}-{speicher or 0}",
-            "label": _label(g, speicher),
-            "hersteller": g.hersteller if g else "",
-            "speicher": speicher,
-            "suchtext": " ".join(filter(None, [
-                g.hersteller if g else "", g.modell if g else gid,
-                f"{speicher} GB" if speicher else "",
-                *sorted({(e.get("farbe_normalisiert") or e.get("farbe_roh") or "")
-                         for e in listungen}),
-            ])).lower(),
-            "reihen": reihen,
-            "min": min(alle), "max": max(alle),
-            "anbieter": len(reihen),
-            "messpunkte": len(alle),
-            # DIE ZAHL, DIE AUF DER SEITE STEHT. Bis zum 30.08.2026 zeigte
-            # die Kachel `messpunkte` unter der Ueberschrift "Messpunkte",
-            # waehrend der Satz darunter die globalen `messtermine` nannte:
-            # "4 Messpunkte" ueber "5 Messtermine", zwei Zahlen fuer etwas,
-            # das der Leser fuer dieselbe Sache haelt. `messpunkte` zaehlt
-            # Preispunkte ueber alle Anbieter, `messtermine` zaehlt TAGE -
-            # bei drei Anbietern an zwei Tagen sind das sechs und zwei.
-            # Die Kachel zeigt jetzt die Termine, weil daran auch haengt,
-            # ob ueberhaupt ein Diagramm entsteht.
-            "messtermine": len(tage),
-            "tage": tage,
-            "aktuell": _aktuell(reihen),
-        })
+        geraete.append(
+            {
+                # Die Messluecken dieses Geraets, benannt: `app.js` schreibt
+                # daraus den Satz unter die Grafik.
+                "mehrdeutig": mehrdeutige_tage(listungen, historie),
+                "id": f"{gid}-{speicher or 0}",
+                "label": _label(g, speicher),
+                "hersteller": g.hersteller if g else "",
+                "speicher": speicher,
+                "suchtext": " ".join(
+                    filter(
+                        None,
+                        [
+                            g.hersteller if g else "",
+                            g.modell if g else gid,
+                            f"{speicher} GB" if speicher else "",
+                            *sorted(
+                                {
+                                    (
+                                        e.get("farbe_normalisiert")
+                                        or e.get("farbe_roh")
+                                        or ""
+                                    )
+                                    for e in listungen
+                                }
+                            ),
+                        ],
+                    )
+                ).lower(),
+                "reihen": reihen,
+                "min": min(alle),
+                "max": max(alle),
+                "anbieter": len(reihen),
+                "messpunkte": len(alle),
+                # DIE ZAHL, DIE AUF DER SEITE STEHT. Bis zum 30.08.2026 zeigte
+                # die Kachel `messpunkte` unter der Ueberschrift "Messpunkte",
+                # waehrend der Satz darunter die globalen `messtermine` nannte:
+                # "4 Messpunkte" ueber "5 Messtermine", zwei Zahlen fuer etwas,
+                # das der Leser fuer dieselbe Sache haelt. `messpunkte` zaehlt
+                # Preispunkte ueber alle Anbieter, `messtermine` zaehlt TAGE -
+                # bei drei Anbietern an zwei Tagen sind das sechs und zwei.
+                # Die Kachel zeigt jetzt die Termine, weil daran auch haengt,
+                # ob ueberhaupt ein Diagramm entsteht.
+                "messtermine": len(tage),
+                "tage": tage,
+                "aktuell": _aktuell(reihen),
+            }
+        )
     return sorted(geraete, key=lambda x: (-x["messpunkte"], x["label"]))
 
 
@@ -363,11 +409,17 @@ def _aktuell(reihen: list) -> list[dict]:
         veraenderung = None
         if len(ps) > 1 and ps[0]["preis"] != letzt["preis"]:
             veraenderung = round(letzt["preis"] - ps[0]["preis"], 2)
-        zeilen.append({
-            "anbieter": r["anbieter"], "eigen": r["eigen"], "farbe": r["farbe"],
-            "preis": letzt["preis"], "stand": letzt["datum"],
-            "veraenderung": veraenderung, "messpunkte": len(ps),
-        })
+        zeilen.append(
+            {
+                "anbieter": r["anbieter"],
+                "eigen": r["eigen"],
+                "farbe": r["farbe"],
+                "preis": letzt["preis"],
+                "stand": letzt["datum"],
+                "veraenderung": veraenderung,
+                "messpunkte": len(ps),
+            }
+        )
     return sorted(zeilen, key=lambda z: z["preis"])
 
 
@@ -391,10 +443,16 @@ def aufbereiten(eintraege: list, historie, katalog) -> dict:
 
 
 def leer() -> dict:
-    return {"hat_daten": False, "geraete": [], "seit": "", "bis": "",
-            "messtermine": 0,
-            "diagramm_ab_terminen": DIAGRAMM_AB_TERMINEN,
-            "linien_abstand": LINIEN_ABSTAND,
-            "luecke_tage_schwelle": LUECKE_TAGE_SCHWELLE,
-            "max_linien": MAX_LINIEN, "max_datumsmarken": MAX_DATUMSMARKEN,
-            "verlauf_satz_max_termine": VERLAUF_SATZ_MAX_TERMINE}
+    return {
+        "hat_daten": False,
+        "geraete": [],
+        "seit": "",
+        "bis": "",
+        "messtermine": 0,
+        "diagramm_ab_terminen": DIAGRAMM_AB_TERMINEN,
+        "linien_abstand": LINIEN_ABSTAND,
+        "luecke_tage_schwelle": LUECKE_TAGE_SCHWELLE,
+        "max_linien": MAX_LINIEN,
+        "max_datumsmarken": MAX_DATUMSMARKEN,
+        "verlauf_satz_max_termine": VERLAUF_SATZ_MAX_TERMINE,
+    }

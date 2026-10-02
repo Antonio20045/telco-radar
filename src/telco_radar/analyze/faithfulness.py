@@ -26,6 +26,7 @@ Durchgang steht; ein fehlender Satz kostet dagegen nur eine Zeile. Die Zahl
 der so gefallenen Saetze steht im Laufprotokoll, damit ein stiller
 Dauerausfall auffaellt.
 """
+
 from __future__ import annotations
 
 import json
@@ -36,7 +37,7 @@ from .llm import complete, extract_json
 
 log = logging.getLogger(__name__)
 
-STAPEL = 10          # Saetze je Pruefaufruf
+STAPEL = 10  # Saetze je Pruefaufruf
 
 # Zahlen im Satz, die belegt sein muessen. Prozentangaben, Preise, Volumen.
 # Einstellige Zahlen bleiben aussen vor: "5G", "die ersten drei" und
@@ -73,8 +74,10 @@ Im Zweifel belegt=false.
 
 def _zahlen_gedeckt(satz: str, quelle: str) -> str | None:
     """Nennt der Satz eine Zahl, die in der Quelle nicht steht?"""
-    quelle_zahlen = {z.replace(".", "").replace(",", ".")
-                     for z in _ZAHL_IM_SATZ.findall(quelle or "")}
+    quelle_zahlen = {
+        z.replace(".", "").replace(",", ".")
+        for z in _ZAHL_IM_SATZ.findall(quelle or "")
+    }
     for roh in _ZAHL_IM_SATZ.findall(satz or ""):
         normal = roh.replace(".", "").replace(",", ".")
         if len(normal.replace(".", "")) <= 1:
@@ -88,8 +91,7 @@ def _zahlen_gedeckt(satz: str, quelle: str) -> str | None:
             wert = float(normal)
         except ValueError:
             return roh
-        if any(abs(wert - float(q)) < 1.0 for q in quelle_zahlen
-               if _ist_zahl(q)):
+        if any(abs(wert - float(q)) < 1.0 for q in quelle_zahlen if _ist_zahl(q)):
             continue
         return roh
     return None
@@ -104,16 +106,39 @@ def _ist_zahl(text: str) -> bool:
 
 
 def _uebertreibt(satz: str, quelle: str) -> bool:
-    """"sehr wahrscheinlich" ueber einer Quelle, die nur eine Absicht nennt."""
+    """ "sehr wahrscheinlich" ueber einer Quelle, die nur eine Absicht nennt."""
     if "sehr wahrscheinlich" not in (satz or "").lower():
         return False
     q = (quelle or "").lower()
-    absicht = ("prüft", "prueft", "erwägt", "erwaegt", "plant", "will ",
-               "könnte", "koennte", "denkt über", "considering", "explores",
-               "may ", "plans to")
-    entschieden = ("startet", "führt ein", "senkt", "erhöht", "kostet",
-                   "ab dem", "ab sofort", "launches", "cuts", "raises",
-                   "announced", "available from")
+    absicht = (
+        "prüft",
+        "prueft",
+        "erwägt",
+        "erwaegt",
+        "plant",
+        "will ",
+        "könnte",
+        "koennte",
+        "denkt über",
+        "considering",
+        "explores",
+        "may ",
+        "plans to",
+    )
+    entschieden = (
+        "startet",
+        "führt ein",
+        "senkt",
+        "erhöht",
+        "kostet",
+        "ab dem",
+        "ab sofort",
+        "launches",
+        "cuts",
+        "raises",
+        "announced",
+        "available from",
+    )
     return any(a in q for a in absicht) and not any(e in q for e in entschieden)
 
 
@@ -125,8 +150,7 @@ def pruefe(highlights: list[dict], *, model: str, use_llm: bool) -> dict:
     Berichts-JSON, damit sich nachlesen laesst, WARUM eine Zeile fehlt.
     """
     kandidaten = [h for h in highlights if (h.get("ctm_satz") or "").strip()]
-    bilanz = {"geprueft": len(kandidaten), "belegt": 0, "verworfen": 0,
-              "gruende": {}}
+    bilanz = {"geprueft": len(kandidaten), "belegt": 0, "verworfen": 0, "gruende": {}}
     if not kandidaten:
         return bilanz
 
@@ -161,23 +185,34 @@ def pruefe(highlights: list[dict], *, model: str, use_llm: bool) -> dict:
 
     # ---- Stufe 2: traegt die Quelle die Folgerung?
     for start in range(0, len(offen), STAPEL):
-        stapel = offen[start:start + STAPEL]
-        nutzlast = json.dumps([
-            {"id": i,
-             "titel": h.get("title") or "",
-             "zusammenfassung": (h.get("summary") or "")[:600],
-             "satz": h["ctm_satz"]}
-            for i, h in enumerate(stapel)], ensure_ascii=False)
+        stapel = offen[start : start + STAPEL]
+        nutzlast = json.dumps(
+            [
+                {
+                    "id": i,
+                    "titel": h.get("title") or "",
+                    "zusammenfassung": (h.get("summary") or "")[:600],
+                    "satz": h["ctm_satz"],
+                }
+                for i, h in enumerate(stapel)
+            ],
+            ensure_ascii=False,
+        )
         try:
             # 8000 ist die Untergrenze, die sich bewaehrt hat (Laeufe #83-85):
             # ein denkendes Modell ist mit einem kleineren Budget fertig,
             # bevor die Antwort anfaengt, und liefert einen leeren String.
             roh = complete(_SYSTEM, nutzlast, model=model, max_tokens=16000)
-            urteile = {int(u.get("id", -1)): u
-                       for u in (extract_json(roh).get("urteile") or [])}
+            urteile = {
+                int(u.get("id", -1)): u
+                for u in (extract_json(roh).get("urteile") or [])
+            }
         except (ValueError, RuntimeError, KeyError, TypeError) as exc:
-            log.warning("Beleg-Pruefung fehlgeschlagen (%s) - die Saetze "
-                        "dieses Stapels erscheinen NICHT", str(exc)[:140])
+            log.warning(
+                "Beleg-Pruefung fehlgeschlagen (%s) - die Saetze "
+                "dieses Stapels erscheinen NICHT",
+                str(exc)[:140],
+            )
             for h in stapel:
                 verwirf(h, "Prüfung nicht möglich")
             continue
@@ -189,12 +224,19 @@ def pruefe(highlights: list[dict], *, model: str, use_llm: bool) -> dict:
                 h["ctm_satz_geprueft"] = True
                 bilanz["belegt"] += 1
             else:
-                verwirf(h, " ".join(str(urteil.get("grund")
-                                        or "nicht belegt").split())[:60])
+                verwirf(
+                    h, " ".join(str(urteil.get("grund") or "nicht belegt").split())[:60]
+                )
 
-    log.info("Beleg-Pruefung: %d Saetze, %d belegt, %d verworfen (%s)",
-             bilanz["geprueft"], bilanz["belegt"], bilanz["verworfen"],
-             ", ".join(f"{g}: {n}" for g, n in
-                       sorted(bilanz["gruende"].items(),
-                              key=lambda kv: -kv[1])[:3]) or "keine")
+    log.info(
+        "Beleg-Pruefung: %d Saetze, %d belegt, %d verworfen (%s)",
+        bilanz["geprueft"],
+        bilanz["belegt"],
+        bilanz["verworfen"],
+        ", ".join(
+            f"{g}: {n}"
+            for g, n in sorted(bilanz["gruende"].items(), key=lambda kv: -kv[1])[:3]
+        )
+        or "keine",
+    )
     return bilanz

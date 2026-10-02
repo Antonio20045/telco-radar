@@ -4,6 +4,7 @@ Feeds are the operator's OWN feed (or a trade-press feed). There is deliberately
 no keyword news-search here: that pulled in off-topic noise with the wrong
 provenance and has been removed.
 """
+
 from __future__ import annotations
 
 import logging
@@ -78,7 +79,8 @@ def _entry_date(entry) -> datetime | None:
 # Datum in einem Pfad vorkommt. Bewusst NICHT sechsstellig (260806): das
 # faende jede Artikelnummer.
 _URL_DATUM = re.compile(
-    r"/(20\d{2})[-/_]?(0[1-9]|1[0-2])[-/_]?(0[1-9]|[12]\d|3[01])(?![\d])")
+    r"/(20\d{2})[-/_]?(0[1-9]|1[0-2])[-/_]?(0[1-9]|[12]\d|3[01])(?![\d])"
+)
 
 
 def _datum_aus_url(url: str) -> datetime | None:
@@ -86,8 +88,9 @@ def _datum_aus_url(url: str) -> datetime | None:
     if not m:
         return None
     try:
-        return datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)),
-                        tzinfo=timezone.utc)
+        return datetime(
+            int(m.group(1)), int(m.group(2)), int(m.group(3)), tzinfo=timezone.utc
+        )
     except ValueError:
         return None
 
@@ -104,18 +107,20 @@ def _entry_image(entry) -> str:
     vier probieren und leer zurueckgeben, wenn keine greift.
     """
     for feld in ("media_content", "media_thumbnail"):
-        for m in (entry.get(feld) or []):
+        for m in entry.get(feld) or []:
             url = (m.get("url") or "").strip()
             if url:
                 return url
-    for link in (entry.get("links") or []):
-        if (link.get("rel") == "enclosure"
-                and str(link.get("type") or "").startswith("image")):
+    for link in entry.get("links") or []:
+        if link.get("rel") == "enclosure" and str(link.get("type") or "").startswith(
+            "image"
+        ):
             url = (link.get("href") or "").strip()
             if url:
                 return url
     blob = (entry.get("summary") or "") + "".join(
-        c.get("value") or "" for c in (entry.get("content") or []))
+        c.get("value") or "" for c in (entry.get("content") or [])
+    )
     m = _IMG_IM_TEXT.search(blob)
     return m.group(1).strip() if m else ""
 
@@ -145,7 +150,7 @@ def _entry_volltext(entry, summary: str) -> str:
     und damit fuer den Analysten, nicht fuer dieses Feld.
     """
     bester = ""
-    for c in (entry.get("content") or []):
+    for c in entry.get("content") or []:
         wert = _strip_html(c.get("value") or "")
         if len(wert) > len(bester):
             bester = wert
@@ -154,9 +159,14 @@ def _entry_volltext(entry, summary: str) -> str:
     return bester if len(bester) >= VOLLTEXT_MINDESTLAENGE else ""
 
 
-def parse_feed_bytes(raw: bytes, source: Source, region: str,
-                     operator: str | None, origin: str,
-                     max_entries: int | None = None) -> list[Item]:
+def parse_feed_bytes(
+    raw: bytes,
+    source: Source,
+    region: str,
+    operator: str | None,
+    origin: str,
+    max_entries: int | None = None,
+) -> list[Item]:
     """Parse feed content into Items (separated from fetching for testability)."""
     feed = feedparser.parse(raw)
     if feed.bozo and not feed.entries:
@@ -164,7 +174,7 @@ def parse_feed_bytes(raw: bytes, source: Source, region: str,
 
     default_name = source.name or source.url
     items: list[Item] = []
-    for entry in feed.entries[:(max_entries or MAX_ENTRIES_PER_FEED)]:
+    for entry in feed.entries[: (max_entries or MAX_ENTRIES_PER_FEED)]:
         title = _strip_html(entry.get("title") or "")
         link = (entry.get("link") or "").strip()
         if not title or not link:
@@ -191,8 +201,9 @@ _PARSE_RETRIES = 2
 _PARSE_RETRY_WAIT = 1.5
 
 
-def collect_rss(source: Source, region: str, operator: str | None,
-                origin: str, http_cfg: dict) -> list[Item]:
+def collect_rss(
+    source: Source, region: str, operator: str | None, origin: str, http_cfg: dict
+) -> list[Item]:
     from .http import fetch
 
     # A feed can answer with HTTP 200 (or 202) and still not be a feed: Telecoms
@@ -206,9 +217,15 @@ def collect_rss(source: Source, region: str, operator: str | None,
         resp = fetch(source.url, http_cfg, source.timeout_seconds, source.headers)
         try:
             return parse_feed_bytes(
-                resp.content, source, region, operator, origin,
-                max_entries=int(http_cfg.get("max_entries_per_feed")
-                                or MAX_ENTRIES_PER_FEED))
+                resp.content,
+                source,
+                region,
+                operator,
+                origin,
+                max_entries=int(
+                    http_cfg.get("max_entries_per_feed") or MAX_ENTRIES_PER_FEED
+                ),
+            )
         except ValueError as exc:
             last_exc = exc
             if attempt < _PARSE_RETRIES:

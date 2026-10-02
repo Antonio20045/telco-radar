@@ -42,21 +42,31 @@ Die vier Regeln, die dieses Modul tragen
    ueber den Markt.** Sie sagt, welcher Posten je Anbieter schon gemessen
    ist - damit die leere Tafel erklaerbar ist, statt nur leer zu sein.
 """
+
 from __future__ import annotations
 
 import logging
 
 from . import geraete_tco_band, geraete_tco_grafik, geraete_tco_karten
 from . import geraete_vergleich
-from ..geraete_model import (VERGLEICHBARE_ZUSTAENDE, Ratenzahlung,
-                             normalisiere)
+from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, Ratenzahlung, normalisiere
 from ..tarif_model import PREISTYP_LIVE_SHOP, vertrag_basis
-from ..tco_model import (POSTEN_ANSCHLUSS, POSTEN_RABATTE, POSTEN_RATE,
-                         POSTEN_TARIF, POSTEN_ZUZAHLUNG, TCO_HORIZONT,
-                         _LUECKEN_OHNE_EINFLUSS_AUF_DIE_DIFFERENZ, Buendel,
-                         Rabatt, SimOnlyReferenz, aktionen_aus,
-                         geraeteanteil, sim_only_id,
-                         tco_24)
+from ..tco_model import (
+    POSTEN_ANSCHLUSS,
+    POSTEN_RABATTE,
+    POSTEN_RATE,
+    POSTEN_TARIF,
+    POSTEN_ZUZAHLUNG,
+    TCO_HORIZONT,
+    _LUECKEN_OHNE_EINFLUSS_AUF_DIE_DIFFERENZ,
+    Buendel,
+    Rabatt,
+    SimOnlyReferenz,
+    aktionen_aus,
+    geraeteanteil,
+    sim_only_id,
+    tco_24,
+)
 
 log = logging.getLogger(__name__)
 
@@ -116,6 +126,7 @@ def _label(katalog, device_id: str, speicher, rueckfall: str = "") -> str:
 # Die TCO-Zeilen - aus echten Buendeln, heute null Stueck
 # --------------------------------------------------------------------------
 
+
 def _zeile(buendel: Buendel, referenz, katalog, geraet_je_sku) -> dict:
     """Eine Zeile der Tafel aus EINEM Buendel.
 
@@ -141,9 +152,11 @@ def _zeile(buendel: Buendel, referenz, katalog, geraet_je_sku) -> dict:
         # Speichersegment, kein Schnitt am Bindestrich; eine Farbe mit
         # Bindestrich liegt dahinter). Dieselbe Regel wie in
         # `geraete_model`: die ID kommt aus dem Katalog, nie aus dem Text.
-        "geraet": _label(katalog, *geraet_je_sku.get(buendel.sku_id,
-                                                     ("", None)),
-                         rueckfall=buendel.sku_id),
+        "geraet": _label(
+            katalog,
+            *geraet_je_sku.get(buendel.sku_id, ("", None)),
+            rueckfall=buendel.sku_id,
+        ),
         "anbieter": buendel.anbieter,
         "eigen": _eigen(buendel.anbieter),
         "tarif": buendel.tarif_name,
@@ -154,17 +167,22 @@ def _zeile(buendel: Buendel, referenz, katalog, geraet_je_sku) -> dict:
         # Zeile ohne gemessene Geraeterate ist damit "belastbar" und im
         # Delta um den ganzen Geraetepreis zu billig. Dieselbe Schwelle wie
         # `tco_model.Geraeteanteil.belastbar`.
-        "delta_luecken": [n for n in ergebnis.luecken
-                          if n not in _LUECKEN_OHNE_EINFLUSS_AUF_DIE_DIFFERENZ],
+        "delta_luecken": [
+            n
+            for n in ergebnis.luecken
+            if n not in _LUECKEN_OHNE_EINFLUSS_AUF_DIE_DIFFERENZ
+        ],
         # Die zwei Zahlen der Seite (E2): TCO-24 gross, Ø/Monat daneben.
         # Beide nur bei belastbar - sonst waere die Zweitzahl der Beleg
         # dafuer, dass die Erstzahl doch eine ist.
         "gesamt": ergebnis.gesamt if ergebnis.belastbar else None,
         "monatlich": ergebnis.monatlich if ergebnis.belastbar else None,
-        "bestandteile": [{"name": n, "betrag": b}
-                         for n, b in ergebnis.bestandteile.items()],
-        "luecken": [{"name": n, "phase": PHASE_JE_LUECKE.get(n, "")}
-                    for n in ergebnis.luecken],
+        "bestandteile": [
+            {"name": n, "betrag": b} for n, b in ergebnis.bestandteile.items()
+        ],
+        "luecken": [
+            {"name": n, "phase": PHASE_JE_LUECKE.get(n, "")} for n in ergebnis.luecken
+        ],
         # Was jenseits des Horizonts liegt, steht NEBEN der Zahl statt aus
         # ihr herauszufallen (E2, gegen die CHECK24-Kappung aus § 5.4).
         #
@@ -192,8 +210,11 @@ def _vergleichbar(zeile: dict) -> bool:
     nicht das zweite - ihre Differenz zu einer vollstaendigen Zeile ist der
     fehlende Geraetepreis und kein Preisvorteil.
     """
-    return (zeile["belastbar"] and zeile["gesamt"] is not None
-            and not zeile["delta_luecken"])
+    return (
+        zeile["belastbar"]
+        and zeile["gesamt"] is not None
+        and not zeile["delta_luecken"]
+    )
 
 
 # O2 (11.09.2026): die Sortierung der Bündel-ZEILEN - der Entwurf führt
@@ -204,11 +225,13 @@ def _vergleichbar(zeile: dict) -> bool:
 # A3: alte Zeilen hinter allen frischen - sie bleiben sichtbar, aber
 # kein frisches Angebot steht unter einem alten.
 def _zeilen_rang(karte: dict) -> tuple:
-    return (not karte["belastbar"],
-            karte["naeherung"],
-            not karte.get("frisch", True),
-            karte["gesamt"] if karte["gesamt"] is not None else 9e9,
-            karte["anbieter"])
+    return (
+        not karte["belastbar"],
+        karte["naeherung"],
+        not karte.get("frisch", True),
+        karte["gesamt"] if karte["gesamt"] is not None else 9e9,
+        karte["anbieter"],
+    )
 
 
 def _wesentlich(differenz: float, bezug: float) -> bool:
@@ -220,8 +243,10 @@ def _wesentlich(differenz: float, bezug: float) -> bool:
     """
     abstand = abs(differenz)
     prozent = (abstand / bezug * 100) if bezug else 0.0
-    return (prozent >= geraete_vergleich.WESENTLICH_PROZENT
-            or abstand >= geraete_vergleich.WESENTLICH_EURO)
+    return (
+        prozent >= geraete_vergleich.WESENTLICH_PROZENT
+        or abstand >= geraete_vergleich.WESENTLICH_EURO
+    )
 
 
 def _delta(zeilen: list) -> list[dict]:
@@ -270,25 +295,30 @@ def _delta(zeilen: list) -> list[dict]:
         # bei uns".
         if not _wesentlich(differenz, unser["gesamt"]):
             continue
-        treffer.append({
-            "geraet": z["geraet"], "sku_id": z["sku_id"],
-            "anbieter": z["anbieter"], "tarif": z["tarif"],
-            "fremd": z["gesamt"], "eigen": unser["gesamt"],
-            "eigen_tarif": unser["tarif"],
-            # BEIDE Quelllinks. Das Banner ist eine Aussage ueber zwei
-            # Angebote, und dieses Portal belegt jede Aussage - die
-            # Tabelle darunter ist auf `SICHTBAR_MAX` gedeckelt, eine
-            # gemeldete Zeile steht also nicht zwingend darin. Ohne die
-            # Links waere der Deckel eine stille Beleglosigkeit.
-            "quelle_url": z["quelle_url"],
-            "eigen_quelle_url": unser["quelle_url"],
-            "differenz": differenz,
-            # "guenstiger" heisst: guenstiger ALS WIR. Das Vorzeichen steht
-            # damit einmal im Wort und einmal in der Zahl; wer nur eines
-            # liest, liest dasselbe.
-            "guenstiger": differenz < 0,
-            "abstand": abs(differenz),
-        })
+        treffer.append(
+            {
+                "geraet": z["geraet"],
+                "sku_id": z["sku_id"],
+                "anbieter": z["anbieter"],
+                "tarif": z["tarif"],
+                "fremd": z["gesamt"],
+                "eigen": unser["gesamt"],
+                "eigen_tarif": unser["tarif"],
+                # BEIDE Quelllinks. Das Banner ist eine Aussage ueber zwei
+                # Angebote, und dieses Portal belegt jede Aussage - die
+                # Tabelle darunter ist auf `SICHTBAR_MAX` gedeckelt, eine
+                # gemeldete Zeile steht also nicht zwingend darin. Ohne die
+                # Links waere der Deckel eine stille Beleglosigkeit.
+                "quelle_url": z["quelle_url"],
+                "eigen_quelle_url": unser["quelle_url"],
+                "differenz": differenz,
+                # "guenstiger" heisst: guenstiger ALS WIR. Das Vorzeichen steht
+                # damit einmal im Wort und einmal in der Zahl; wer nur eines
+                # liest, liest dasselbe.
+                "guenstiger": differenz < 0,
+                "abstand": abs(differenz),
+            }
+        )
     # Der groesste Abstand zuerst - das ist die Zeile, wegen der jemand
     # diese Tafel oeffnet.
     return sorted(treffer, key=lambda t: -t["abstand"])
@@ -297,6 +327,7 @@ def _delta(zeilen: list) -> list[dict]:
 # --------------------------------------------------------------------------
 # Die Bereitschaft - was von der TCO heute schon gemessen ist
 # --------------------------------------------------------------------------
+
 
 def _bereitschaft(eintraege: list) -> list[dict]:
     """Je Anbieter: welcher Posten der TCO steht schon, welcher fehlt.
@@ -315,10 +346,17 @@ def _bereitschaft(eintraege: list) -> list[dict]:
         if (e.get("zustand") or "neu") not in VERGLEICHBARE_ZUSTAENDE:
             continue
         name = e.get("anbieter") or "?"
-        satz = je_anbieter.setdefault(name, {
-            "anbieter": name, "eigen": _eigen(name), "listungen": 0,
-            "mit_raten": 0, "mit_betrag": 0, "raten_probe_ok": 0,
-        })
+        satz = je_anbieter.setdefault(
+            name,
+            {
+                "anbieter": name,
+                "eigen": _eigen(name),
+                "listungen": 0,
+                "mit_raten": 0,
+                "mit_betrag": 0,
+                "raten_probe_ok": 0,
+            },
+        )
         satz["listungen"] += 1
         if e.get("preis_ohne_vertrag") is not None:
             satz["mit_betrag"] += 1
@@ -350,11 +388,17 @@ def _bereitschaft(eintraege: list) -> list[dict]:
         # ist als Kassenzahl vollstaendig, taugt fuer die TCO aber nur, wenn
         # das Geraet ohne Vertrag gekauft wird - er steht deshalb als eigene
         # Preisform da und nicht als Mangel.
-        satz["preisform"] = ("Ratenzahlung" if satz["mit_raten"]
-                             else "Barkauf" if satz["mit_betrag"] else "-")
+        satz["preisform"] = (
+            "Ratenzahlung"
+            if satz["mit_raten"]
+            else "Barkauf"
+            if satz["mit_betrag"]
+            else "-"
+        )
         zeilen.append(satz)
-    return sorted(zeilen, key=lambda z: (not z["eigen"], -z["listungen"],
-                                         z["anbieter"]))
+    return sorted(
+        zeilen, key=lambda z: (not z["eigen"], -z["listungen"], z["anbieter"])
+    )
 
 
 def _raten(eintrag: dict):
@@ -370,9 +414,12 @@ def _raten(eintrag: dict):
     if anzahlung is None or rate is None or not laufzeit:
         return None
     try:
-        return Ratenzahlung(anzahlung=float(anzahlung), monatsrate=float(rate),
-                            laufzeit_monate=int(laufzeit),
-                            zins_effektiv=eintrag.get("zins_effektiv"))
+        return Ratenzahlung(
+            anzahlung=float(anzahlung),
+            monatsrate=float(rate),
+            laufzeit_monate=int(laufzeit),
+            zins_effektiv=eintrag.get("zins_effektiv"),
+        )
     except (TypeError, ValueError):
         # Ein kaputter Satz darf die Tafel nicht kosten. Er zaehlt dann als
         # "keine Ratenzahlung" und faellt in der Bereitschaft auf.
@@ -388,23 +435,42 @@ def _raten(eintrag: dict):
 # Felder fuehrt (`id`, `first_seen`, `last_verified`), die kein Feld des
 # Datensatzes sind - ein Sternchen daraus waere ein TypeError, sobald der
 # Store ein Betriebsfeld ergaenzt.
-_BUENDEL_FELDER = ("sku_id", "anbieter", "tarif_name", "tarif_id",
-                   "tarif_id_guete", "tarif_monatlich",
-                   "tarif_bindung_monate", "buendel_monatlich",
-                   "geraet_zuzahlung", "geraet_monatsrate", "laufzeit_monate",
-                   "anschlusspreis", "quelle_url", "abgerufen_am", "zustand")
+_BUENDEL_FELDER = (
+    "sku_id",
+    "anbieter",
+    "tarif_name",
+    "tarif_id",
+    "tarif_id_guete",
+    "tarif_monatlich",
+    "tarif_bindung_monate",
+    "buendel_monatlich",
+    "geraet_zuzahlung",
+    "geraet_monatsrate",
+    "laufzeit_monate",
+    "anschlusspreis",
+    "quelle_url",
+    "abgerufen_am",
+    "zustand",
+)
 
-_REFERENZ_FELDER = ("anbieter", "tarif_name", "tarif_id", "tarif_id_guete",
-                    "tarif_sim_only_monatlich",
-                    "anschlusspreis", "quelle_url", "abgerufen_am",
-                    "quelle_art")
+_REFERENZ_FELDER = (
+    "anbieter",
+    "tarif_name",
+    "tarif_id",
+    "tarif_id_guete",
+    "tarif_sim_only_monatlich",
+    "anschlusspreis",
+    "quelle_url",
+    "abgerufen_am",
+    "quelle_art",
+)
 
 
 def _rabatte(eintrag: dict) -> list:
     """Die Nachlaesse eines Datensatzes. Ein kaputter faellt weg, die
     uebrigen bleiben - ein Rabatt ohne Namen darf keine Zeile kosten."""
     fertig = []
-    for r in (eintrag.get("rabatte") or []):
+    for r in eintrag.get("rabatte") or []:
         try:
             fertig.append(Rabatt(**r))
         except (TypeError, ValueError):
@@ -435,8 +501,7 @@ def _aus_speicher(eintraege: list, typ, felder: tuple) -> list:
         try:
             satz = typ(**werte, rabatte=_rabatte(e))
         except (TypeError, ValueError) as exc:
-            log.warning("TCO-Datensatz %s uebergangen: %s",
-                        e.get("id", "?"), exc)
+            log.warning("TCO-Datensatz %s uebergangen: %s", e.get("id", "?"), exc)
             continue
         fertig.append(satz)
     return fertig
@@ -489,8 +554,9 @@ def _offene_posten(zeilen: list, massstab: list | None = None) -> list[dict]:
             # sobald EIN Tarif von fuenfundzwanzig ihn nennt.
             if all(z["anschlusspreis"] is not None for z in massstab):
                 offen.discard(POSTEN_ANSCHLUSS)
-    return [{"name": n, "phase": PHASE_JE_LUECKE[n]}
-            for n in PHASE_JE_LUECKE if n in offen]
+    return [
+        {"name": n, "phase": PHASE_JE_LUECKE[n]} for n in PHASE_JE_LUECKE if n in offen
+    ]
 
 
 def _referenztabelle(referenzen: list) -> list[dict]:
@@ -528,30 +594,30 @@ def _referenztabelle(referenzen: list) -> list[dict]:
         # und nicht im Template - ein Renderer, der multipliziert, ist
         # eine zweite Rechnung.
         kennzahl = tco_24(r.als_buendel())
-        zeilen.append({
-            "anbieter": r.anbieter,
-            "eigen": _eigen(r.anbieter),
-            "tarif": r.tarif_name,
-            "tarif_id": r.tarif_id,
-            "monatlich": r.tarif_sim_only_monatlich,
-            "ueber_horizont": (kennzahl.gesamt
-                               if kennzahl.belastbar else None),
-            # P0-B-h4: DER ZEITRAUM, DEN `ueber_horizont` TRAEGT - gelesen
-            # aus derselben Rechnung (`Tco.leitzahl_monate`, P0-B-h1), nie
-            # nachgerechnet. Eine SIM-only-Referenz laeuft immer ueber
-            # `als_buendel()` OHNE `buendel_monatlich` und traegt deshalb
-            # immer `TCO_HORIZONT` - aber DAS zu wissen ist die Aufgabe
-            # dieser Rechnung, nicht dieser Zeile: ein Leser, der 24
-            # hinschriebe, haette dieselbe Annahme gemacht, die bei den
-            # Buendeln 70 Zeilen falsch beschriftet hat.
-            "leitzahl_monate": kennzahl.leitzahl_monate,
-            "anschlusspreis": r.anschlusspreis,
-            "quelle_url": r.quelle_url,
-            "abgerufen_am": r.abgerufen_am,
-            "quelle_ist_dokument": r.quelle_art != PREISTYP_LIVE_SHOP,
-        })
-    return sorted(zeilen, key=lambda z: (not z["eigen"], z["anbieter"],
-                                         z["monatlich"]))
+        zeilen.append(
+            {
+                "anbieter": r.anbieter,
+                "eigen": _eigen(r.anbieter),
+                "tarif": r.tarif_name,
+                "tarif_id": r.tarif_id,
+                "monatlich": r.tarif_sim_only_monatlich,
+                "ueber_horizont": (kennzahl.gesamt if kennzahl.belastbar else None),
+                # P0-B-h4: DER ZEITRAUM, DEN `ueber_horizont` TRAEGT - gelesen
+                # aus derselben Rechnung (`Tco.leitzahl_monate`, P0-B-h1), nie
+                # nachgerechnet. Eine SIM-only-Referenz laeuft immer ueber
+                # `als_buendel()` OHNE `buendel_monatlich` und traegt deshalb
+                # immer `TCO_HORIZONT` - aber DAS zu wissen ist die Aufgabe
+                # dieser Rechnung, nicht dieser Zeile: ein Leser, der 24
+                # hinschriebe, haette dieselbe Annahme gemacht, die bei den
+                # Buendeln 70 Zeilen falsch beschriftet hat.
+                "leitzahl_monate": kennzahl.leitzahl_monate,
+                "anschlusspreis": r.anschlusspreis,
+                "quelle_url": r.quelle_url,
+                "abgerufen_am": r.abgerufen_am,
+                "quelle_ist_dokument": r.quelle_art != PREISTYP_LIVE_SHOP,
+            }
+        )
+    return sorted(zeilen, key=lambda z: (not z["eigen"], z["anbieter"], z["monatlich"]))
 
 
 # Die drei vom PM benannten Haendler ohne Tarifbuendel: EINE Liste und EINE
@@ -563,8 +629,14 @@ HAENDLER_OHNE_BUENDEL = geraete_tco_karten.HAENDLER_OHNE_BUENDEL
 _haendler_ohne_buendel_preise = geraete_tco_karten._haendler_geraetepreise
 
 
-def _export_zeilen(buendel: list, massstab: list, eintraege: list, katalog,
-                   band_je_tarif: dict, anbieter_typen: dict | None) -> dict:
+def _export_zeilen(
+    buendel: list,
+    massstab: list,
+    eintraege: list,
+    katalog,
+    band_je_tarif: dict,
+    anbieter_typen: dict | None,
+) -> dict:
     """Die Zeilen des TCO-Gesamtexports (O4) - WERTE, keine Form.
 
     Der Export filtert nicht selbst (Doktrin des Modulkopfs von
@@ -603,10 +675,10 @@ def _export_zeilen(buendel: list, massstab: list, eintraege: list, katalog,
     geraet_je_sku: dict = {}
     for e in eintraege:
         if e.get("sku_id"):
-            geraet_je_sku.setdefault(e["sku_id"], (e.get("device_id") or "",
-                                                   e.get("speicher_gb")))
-    geraete_tco_karten.ergaenze_geraete_aus_katalog(geraet_je_sku, buendel,
-                                                    katalog)
+            geraet_je_sku.setdefault(
+                e["sku_id"], (e.get("device_id") or "", e.get("speicher_gb"))
+            )
+    geraete_tco_karten.ergaenze_geraete_aus_katalog(geraet_je_sku, buendel, katalog)
     typen = anbieter_typen or {}
     # Die Stufe als LESEBARER Name (XS bis XL) - `band_label()` ist
     # dieselbe Ableitung, die der Chip der Vergleichsansicht trägt; ein
@@ -618,67 +690,77 @@ def _export_zeilen(buendel: list, massstab: list, eintraege: list, katalog,
     for b in buendel:
         if not isinstance(b, Buendel):
             continue
-        device_id, speicher = (geraet_je_sku.get(b.sku_id) or ("", None))
+        device_id, speicher = geraet_je_sku.get(b.sku_id) or ("", None)
         g = katalog.nach_id(device_id) if (katalog and device_id) else None
         kennzahl = tco_24(b)
-        zeilen.append({
-            "modell": (getattr(g, "modell", "") or device_id or b.sku_id),
-            "hersteller": getattr(g, "hersteller", "") if g else "",
-            "speicher": speicher,
-            "anbieter": b.anbieter,
-            "anbieter_typ": typen.get(b.anbieter, ""),
-            "tarif": b.tarif_name,
-            "band": band_von(band_je_tarif.get(b.tarif_id or "")),
-            "zustand": b.zustand or "",
-            "zuzahlung": b.geraet_zuzahlung,
-            "tarif_monatlich": b.tarif_monatlich,
-            "geraet_monatsrate": b.geraet_monatsrate,
-            "buendel_monatlich": b.buendel_monatlich,
-            "laufzeit": b.laufzeit_monate,
-            "anschlusspreis": b.anschlusspreis,
-            "tco24": kennzahl.gesamt if kennzahl.belastbar else None,
-            # P0-B-h4: DER ZEITRAUM DER LEITZAHL, GELESEN aus derselben
-            # Rechnung (`Tco.leitzahl_monate`, P0-B-h1) - nie aus
-            # `laufzeit` abgeleitet. Bei einem zusammengelegten
-            # Buendelmonatspreis (1&1) ist das die Ratenlaufzeit selbst
-            # (36 bei 74 Buendeln des Bestands vom 21.09.2026), bei der
-            # aufgeteilten Form immer `TCO_HORIZONT` (24) - unabhaengig
-            # von einer laengeren Ratenlaufzeit der Geraeterate (congstar:
-            # 36 Raten, 24 Monate Leitzahl). Dasselbe Feld, das Karte,
-            # Ø/Monat und Δ-Tor lesen - der Export liest es jetzt auch,
-            # statt den Spaltenkopf pauschal "24 Monate" sagen zu lassen.
-            "leitzahl_monate": kennzahl.leitzahl_monate,
-            "abgerufen_am": b.abgerufen_am,
-            "quelle_url": b.quelle_url,
-            # A4: das Unterscheidungsmerkmal der Farbvarianten - siehe
-            # Docstring. Ein Bündel ohne Gerät trägt sie leer, nicht
-            # geraten.
-            "sku_id": b.sku_id or "",
-        })
+        zeilen.append(
+            {
+                "modell": (getattr(g, "modell", "") or device_id or b.sku_id),
+                "hersteller": getattr(g, "hersteller", "") if g else "",
+                "speicher": speicher,
+                "anbieter": b.anbieter,
+                "anbieter_typ": typen.get(b.anbieter, ""),
+                "tarif": b.tarif_name,
+                "band": band_von(band_je_tarif.get(b.tarif_id or "")),
+                "zustand": b.zustand or "",
+                "zuzahlung": b.geraet_zuzahlung,
+                "tarif_monatlich": b.tarif_monatlich,
+                "geraet_monatsrate": b.geraet_monatsrate,
+                "buendel_monatlich": b.buendel_monatlich,
+                "laufzeit": b.laufzeit_monate,
+                "anschlusspreis": b.anschlusspreis,
+                "tco24": kennzahl.gesamt if kennzahl.belastbar else None,
+                # P0-B-h4: DER ZEITRAUM DER LEITZAHL, GELESEN aus derselben
+                # Rechnung (`Tco.leitzahl_monate`, P0-B-h1) - nie aus
+                # `laufzeit` abgeleitet. Bei einem zusammengelegten
+                # Buendelmonatspreis (1&1) ist das die Ratenlaufzeit selbst
+                # (36 bei 74 Buendeln des Bestands vom 21.09.2026), bei der
+                # aufgeteilten Form immer `TCO_HORIZONT` (24) - unabhaengig
+                # von einer laengeren Ratenlaufzeit der Geraeterate (congstar:
+                # 36 Raten, 24 Monate Leitzahl). Dasselbe Feld, das Karte,
+                # Ø/Monat und Δ-Tor lesen - der Export liest es jetzt auch,
+                # statt den Spaltenkopf pauschal "24 Monate" sagen zu lassen.
+                "leitzahl_monate": kennzahl.leitzahl_monate,
+                "abgerufen_am": b.abgerufen_am,
+                "quelle_url": b.quelle_url,
+                # A4: das Unterscheidungsmerkmal der Farbvarianten - siehe
+                # Docstring. Ein Bündel ohne Gerät trägt sie leer, nicht
+                # geraten.
+                "sku_id": b.sku_id or "",
+            }
+        )
     sim = []
     for r in massstab:
-        sim.append({
-            "anbieter": r["anbieter"],
-            "anbieter_typ": typen.get(r["anbieter"], ""),
-            "tarif": r["tarif"],
-            "band": band_von(band_je_tarif.get(r.get("tarif_id") or "")),
-            "tarif_monatlich": r["monatlich"],
-            "anschlusspreis": r["anschlusspreis"],
-            "tco24": r["ueber_horizont"],
-            # P0-B-h4: derselbe Zeitraum, GELESEN aus `_referenztabelle`
-            # (`Tco.leitzahl_monate` ueber `als_buendel()`) - siehe dort.
-            "leitzahl_monate": r["leitzahl_monate"],
-            "abgerufen_am": r["abgerufen_am"],
-            "quelle_url": r["quelle_url"],
-        })
+        sim.append(
+            {
+                "anbieter": r["anbieter"],
+                "anbieter_typ": typen.get(r["anbieter"], ""),
+                "tarif": r["tarif"],
+                "band": band_von(band_je_tarif.get(r.get("tarif_id") or "")),
+                "tarif_monatlich": r["monatlich"],
+                "anschlusspreis": r["anschlusspreis"],
+                "tco24": r["ueber_horizont"],
+                # P0-B-h4: derselbe Zeitraum, GELESEN aus `_referenztabelle`
+                # (`Tco.leitzahl_monate` ueber `als_buendel()`) - siehe dort.
+                "leitzahl_monate": r["leitzahl_monate"],
+                "abgerufen_am": r["abgerufen_am"],
+                "quelle_url": r["quelle_url"],
+            }
+        )
     return {"buendel": zeilen, "sim_only": sim}
 
 
-def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
-                lesbar: bool = True, tarife: dict | None = None,
-                anbieter_typen: dict | None = None,
-                tco_historie: dict | None = None,
-                heute: str = "") -> dict:
+def aufbereiten(
+    buendel: list,
+    referenzen: list,
+    eintraege: list,
+    katalog,
+    lesbar: bool = True,
+    tarife: dict | None = None,
+    anbieter_typen: dict | None = None,
+    tco_historie: dict | None = None,
+    heute: str = "",
+) -> dict:
     """Alles, was der Reiter "Was kostet es" braucht.
 
     `buendel` und `referenzen` sind die Datensaetze aus
@@ -722,8 +804,11 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
                 mehrdeutig.add(schluessel)
             referenz_je_id[schluessel] = r
     for schluessel in mehrdeutig:
-        log.info("SIM-only-Massstab fuer %s ist nicht eindeutig (%s) - "
-                 "kein Geraeteanteil", schluessel[1], schluessel[0])
+        log.info(
+            "SIM-only-Massstab fuer %s ist nicht eindeutig (%s) - kein Geraeteanteil",
+            schluessel[1],
+            schluessel[0],
+        )
         referenz_je_id.pop(schluessel, None)
 
     # sku_id -> (device_id, speicher). Beides steht an der Listung; ein
@@ -732,13 +817,12 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
     geraet_je_sku: dict[str, tuple] = {}
     for e in eintraege:
         if e.get("sku_id"):
-            geraet_je_sku.setdefault(e["sku_id"],
-                                     (e.get("device_id") or "",
-                                      e.get("speicher_gb")))
+            geraet_je_sku.setdefault(
+                e["sku_id"], (e.get("device_id") or "", e.get("speicher_gb"))
+            )
     # Buendel ohne Listung: das Geraet kommt aus dem Katalog, ueber die
     # Katalog-ID am Anfang der SKU (`geraete_tco_karten.geraet_aus_sku`).
-    geraete_tco_karten.ergaenze_geraete_aus_katalog(geraet_je_sku, buendel,
-                                                    katalog)
+    geraete_tco_karten.ergaenze_geraete_aus_katalog(geraet_je_sku, buendel, katalog)
 
     # ---- Phase R: die Hauptansicht -------------------------------------
     #
@@ -772,7 +856,8 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
             # Blatts zu entscheiden machte 473 Vodafone-Bündel um 48,00 EUR
             # zu niedrig und die Leitzahl mit der eigenen Karte unrechenbar.
             b.tarif_phasen = geraete_tco_karten.phasen_fuer_buendel(
-                satz, b.tarif_monatlich)
+                satz, b.tarif_monatlich
+            )
 
     zeilen = []
     for b in buendel:
@@ -783,25 +868,33 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         # Erst der Name, dann die ID - dieselbe Rangfolge wie in
         # `tarif_bezug.loese`: was auf der Seite stand, schlaegt die
         # aufgeloeste Zuordnung, wenn beide etwas sagen.
-        referenz = referenz_je_schluessel.get(
-            sim_only_id(b.anbieter, b.tarif_name))
+        referenz = referenz_je_schluessel.get(sim_only_id(b.anbieter, b.tarif_name))
         if referenz is None and (b.tarif_id or "").strip():
             referenz = referenz_je_id.get(
-                (normalisiere(b.anbieter), b.tarif_id.strip()))
+                (normalisiere(b.anbieter), b.tarif_id.strip())
+            )
         if referenz is None and (b.tarif_id or "").strip():
             # Ein Buendel haengt am Geraeteblatt ("... mit Smartphone"), sein
             # Massstab am Tarifblatt desselben Vertrags (P3, 28.09.2026).
             referenz = referenz_je_id.get(
-                (normalisiere(b.anbieter), vertrag_basis(b.tarif_id)))
+                (normalisiere(b.anbieter), vertrag_basis(b.tarif_id))
+            )
         zeilen.append(_zeile(b, referenz, katalog, geraet_je_sku))
 
-    zeilen.sort(key=lambda z: (not z["belastbar"], z["gesamt"] is None,
-                              z["gesamt"] or 0.0, z["geraet"]))
+    zeilen.sort(
+        key=lambda z: (
+            not z["belastbar"],
+            z["gesamt"] is None,
+            z["gesamt"] or 0.0,
+            z["geraet"],
+        )
+    )
     bereit = _bereitschaft(eintraege)
     massstab = _referenztabelle(referenzen)
 
-    modelle = geraete_tco_karten.modelle(buendel, eintraege, referenzen,
-                                         tarife, katalog, heute=heute)
+    modelle = geraete_tco_karten.modelle(
+        buendel, eintraege, referenzen, tarife, katalog, heute=heute
+    )
 
     # DIE LISTUNGEN JE MODELL, einmal vorab gruppiert: gebraucht fuer die
     # Händler-Preise ohne Bündel (A-R3, weiter unten) - statt je Modell
@@ -812,8 +905,9 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
     # eigenen Geräteauswahl gefallen, die Rechnung mit ihm.
     listungen_je_modell: dict[str, list] = {}
     for e in eintraege:
-        mid = geraete_tco_karten.modell_schluessel(e.get("device_id"),
-                                                    e.get("speicher_gb"))
+        mid = geraete_tco_karten.modell_schluessel(
+            e.get("device_id"), e.get("speicher_gb")
+        )
         listungen_je_modell.setdefault(mid, []).append(e)
 
     # GRAPH-1 (08.09.2026): der Tarifband-Index steht EINMAL fuer alle
@@ -828,8 +922,9 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
     # dritte Lesart. Es traegt die GB-Angabe je Karte und die Angabe in der
     # Band-Werteliste; getrennt von `band_je_tarif`, weil eine Karte ohne
     # Band sehr wohl ein Volumen haben kann (unbegrenzt, §7).
-    gb_je_tarif = {tid: (satz or {}).get("datenvolumen_gb")
-                   for tid, satz in (tarife or {}).items()}
+    gb_je_tarif = {
+        tid: (satz or {}).get("datenvolumen_gb") for tid, satz in (tarife or {}).items()
+    }
 
     for modell in modelle["modelle"]:
         # Die Grafik rechnet NUR Geometrie: die Betraege stehen schon in
@@ -844,13 +939,16 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         # "Beschaffung laeuft"-Auskunft zu wiederholen - dieselbe einzelne
         # Zahl, mit der auch die Vorlage die Zeitreihen-Legende entscheidet.
         modell["haendler_ohne_buendel"] = _haendler_ohne_buendel_preise(
-            listungen_je_modell.get(modell["id"], []))
+            listungen_je_modell.get(modell["id"], [])
+        )
         # Fertig gefiltert statt in der Vorlage nachgebaut: welche der drei
         # noch OHNE Preis sind, entscheidet dieselbe eine Zahl wie oben -
         # ein zweiter Filter im Template koennte auseinanderlaufen.
         modell["haendler_offen"] = [
-            h for h in HAENDLER_OHNE_BUENDEL
-            if modell["haendler_ohne_buendel"].get(h) is None]
+            h
+            for h in HAENDLER_OHNE_BUENDEL
+            if modell["haendler_ohne_buendel"].get(h) is None
+        ]
         # P1 (UX-1, 11.09.2026): JE Karte ihre Bandzugehoerigkeit - aus
         # demselben Bandindex wie der Graph, nicht aus einer zweiten
         # Gruppierung. Karten ohne Band (Händler ohne TCO, unbegrenzte
@@ -869,9 +967,13 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
             # Rechenweg-Aufklapper der Zeile.
             k["delta_kurz"] = (
                 geraete_tco_band.delta_text(
-                    k["delta"].get("betrag"), k["delta"].get("prozent"),
-                    ungefaehr=bool(k["delta"].get("ungefaehr")))
-                if k.get("delta") else None)
+                    k["delta"].get("betrag"),
+                    k["delta"].get("prozent"),
+                    ungefaehr=bool(k["delta"].get("ungefaehr")),
+                )
+                if k.get("delta")
+                else None
+            )
         # O2: die Zeilen der Tabelle - serverseitig sortiert (nach TCO-24
         # aufsteigend, wie der Entwurf), Karten ohne Zahl hinten. Die
         # Vorlage sortiert nichts: ein Renderer, der ordnet, ist eine
@@ -889,21 +991,25 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         # `sku_id` ist leer, WEIL sie kein Bündel ist).
         echte = [k for k in modell["karten"] if k.get("sku_id") or k["naeherung"]]
         modell["zeilen_band"] = sorted(
-            (k for k in echte if k.get("band")), key=_zeilen_rang)
+            (k for k in echte if k.get("band")), key=_zeilen_rang
+        )
         modell["zeilen_ohne_band"] = sorted(
-            (k for k in echte if not k.get("band")), key=_zeilen_rang)
+            (k for k in echte if not k.get("band")), key=_zeilen_rang
+        )
         # GRAPH-1 (BRIEF_GRAPH1, 08.09.2026): Geraet x Tarifniveau, eine
         # Linie je Anbieter mit echtem Buendel in diesem Band
         # (AUFTRAG_GERAETESEITE.md §2a/§7). Eigener Baustein, eigene Datei -
         # `report/geraete_tco_band.py`. P1: die Werteliste bekommt ihr
         # Datenvolumen aus derselben Lesart wie die Karten.
         modell["baender"] = geraete_tco_band.baender_fuer_modell(
-            modell, band_je_tarif, gb_je_tarif, leiter)
+            modell, band_je_tarif, gb_je_tarif, leiter
+        )
         # O1: der Leerlauf des Graphen für Modelle ohne ein einziges Band -
         # ein Satz, der an Modell (Vorlage) und JSON-Knoten (app.js)
         # dieselbe Stelle hat, statt zweimal im Code zu stehen.
-        modell["band_leer"] = (None if modell["baender"]
-                               else geraete_tco_band.band_leer_text(leiter))
+        modell["band_leer"] = (
+            None if modell["baender"] else geraete_tco_band.band_leer_text(leiter)
+        )
 
     # P2 (Antonio F4, 17.09.2026): der G2-Leser ist GEFALLEN - die Markt-
     # Historie (`geraete_tco_karten.historienreihen` +
@@ -927,46 +1033,59 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
     # ZWEITE RECHNUNG und keine zweite Formatierung: `app.js` setzt die
     # fertigen Zeichenketten, es liest keine Beträge.
     graph_daten = {
-        "stand": max((getattr(b, "abgerufen_am", "") or "" for b in buendel),
-                     default=""),
+        "stand": max(
+            (getattr(b, "abgerufen_am", "") or "" for b in buendel), default=""
+        ),
         "gesamt": modelle["gesamt"],
         "vorgabe": modelle["vorgabe"],
-        "modelle": [{
-            "id": modell["id"],
-            "titel": modell["titel"],
-            # Die Antwortzeile wechselt mit dem Modell - ihre Zahlen
-            # gehören zu ihm. Formatiert, mit None für eine fehlende Zahl
-            # (der JS-Teil versteckt den zugehörigen Block dann).
-            "antwort": {
-                "geraetepreis": (geraete_tco_grafik.euro(
-                    modell["antwort"]["geraetepreis"])
-                    if modell["antwort"]["geraetepreis"] is not None else None),
-                "geraetepreis_anbieter": modell["antwort"][
-                    "geraetepreis_anbieter"],
-                "tarif_gesamt": (geraete_tco_grafik.euro(
-                    modell["antwort"]["tarif_gesamt"])
-                    if modell["antwort"]["tarif_gesamt"] is not None else None),
-                "tarif_anbieter": modell["antwort"]["tarif_anbieter"],
-            },
-            "baender": {b["key"]: {
-                "label": b["label"], "bereich": b["bereich"],
-                "chip": b["chip"], "unterzeile": b["unterzeile"],
-                "zeilen": b["balken"]["zeilen"],
-                "luecke_text": b["balken"]["luecke_text"],
-                # O2: der Titel der Bündel-Tabelle je Band - in Python
-                # gebaut, `app.js` setzt ihn nur (kein zweiter Satzbaumeister
-                # im Browser, dieselbe Regel wie `luecke_text`).
-                "bnd_titel": (f"Alle Bündel im Band {b['label']} – "
-                              f"{modell['titel']}"),
-            } for b in modell.get("baender") or []},
-            "band_leer": modell.get("band_leer"),
-            # O3: der Titel der Bündel-Tabelle für den Fall OHNE Band -
-            # derselbe Satz, den die Vorlage für ein band-loses Vor-
-            # gabemodell rendert, hier als fertige Zeichenkette für den
-            # Modellwechsel (kein zweiter Satzbaumeister im Browser;
-            # dieselbe Regel wie `bnd_titel` je Band).
-            "bnd_titel_ohne": f"Alle Bündel – {modell['titel']}",
-        } for modell in modelle["modelle"]],
+        "modelle": [
+            {
+                "id": modell["id"],
+                "titel": modell["titel"],
+                # Die Antwortzeile wechselt mit dem Modell - ihre Zahlen
+                # gehören zu ihm. Formatiert, mit None für eine fehlende Zahl
+                # (der JS-Teil versteckt den zugehörigen Block dann).
+                "antwort": {
+                    "geraetepreis": (
+                        geraete_tco_grafik.euro(modell["antwort"]["geraetepreis"])
+                        if modell["antwort"]["geraetepreis"] is not None
+                        else None
+                    ),
+                    "geraetepreis_anbieter": modell["antwort"]["geraetepreis_anbieter"],
+                    "tarif_gesamt": (
+                        geraete_tco_grafik.euro(modell["antwort"]["tarif_gesamt"])
+                        if modell["antwort"]["tarif_gesamt"] is not None
+                        else None
+                    ),
+                    "tarif_anbieter": modell["antwort"]["tarif_anbieter"],
+                },
+                "baender": {
+                    b["key"]: {
+                        "label": b["label"],
+                        "bereich": b["bereich"],
+                        "chip": b["chip"],
+                        "unterzeile": b["unterzeile"],
+                        "zeilen": b["balken"]["zeilen"],
+                        "luecke_text": b["balken"]["luecke_text"],
+                        # O2: der Titel der Bündel-Tabelle je Band - in Python
+                        # gebaut, `app.js` setzt ihn nur (kein zweiter Satzbaumeister
+                        # im Browser, dieselbe Regel wie `luecke_text`).
+                        "bnd_titel": (
+                            f"Alle Bündel im Band {b['label']} – {modell['titel']}"
+                        ),
+                    }
+                    for b in modell.get("baender") or []
+                },
+                "band_leer": modell.get("band_leer"),
+                # O3: der Titel der Bündel-Tabelle für den Fall OHNE Band -
+                # derselbe Satz, den die Vorlage für ein band-loses Vor-
+                # gabemodell rendert, hier als fertige Zeichenkette für den
+                # Modellwechsel (kein zweiter Satzbaumeister im Browser;
+                # dieselbe Regel wie `bnd_titel` je Band).
+                "bnd_titel_ohne": f"Alle Bündel – {modell['titel']}",
+            }
+            for modell in modelle["modelle"]
+        ],
     }
 
     # DIE TABELLE ALLER BUENDEL gab es bis O2 als eigenes Rückgabefeld
@@ -1040,28 +1159,39 @@ def aufbereiten(buendel: list, referenzen: list, eintraege: list, katalog,
         # derselben Stelle wie die Tafel (Modellname, Band, TCO-24 aus
         # `tco_24`). Format macht `geraete_export.tco_csv`; was drinsteht,
         # entscheidet diese Funktion, nicht der Export.
-        "export": _export_zeilen(buendel, massstab, eintraege, katalog,
-                                 band_je_tarif, anbieter_typen),
+        "export": _export_zeilen(
+            buendel, massstab, eintraege, katalog, band_je_tarif, anbieter_typen
+        ),
         # O4: die Lage der Bündel-Historie - der ehrliche Satz im Verlaufs-
         # Reiter nennt ihr ECHTES Startdatum. Der Notzustand sagt "läuft
         # noch nicht" statt eines geratenen Datums.
-        "historie_lage": tco_historie if tco_historie is not None else {
-            "messtage": 0, "seit": "", "buendel": 0},
+        "historie_lage": tco_historie
+        if tco_historie is not None
+        else {"messtage": 0, "seit": "", "buendel": 0},
     }
 
 
 def leer() -> dict:
     """Der Zustand ohne lesbare Geraetedatenbank."""
-    return {"zeilen": [], "delta": [],
-            "bereitschaft": [], "lesbar": True,
-            "offene_posten": _offene_posten([]),
-            "referenzen": [], "referenzen_gesamt": 0, "referenzen_rest": [],
-            "horizont": TCO_HORIZONT,
-            "modelle": [], "modell_vorgabe": "",
-            "modelle_gesamt": 0, "ohne_zuordnung": [], "graph_daten": None,
-            "haendler_seit": geraete_tco_band.HAENDLER_SEIT,
-            "anbieter_erwartet": list(geraete_tco_karten.ANBIETER_REIHENFOLGE),
-            "baender_katalog": [],
-            "band_je_tarif": {},
-            "export": {"buendel": [], "sim_only": []},
-            "historie_lage": {"messtage": 0, "seit": "", "buendel": 0}}
+    return {
+        "zeilen": [],
+        "delta": [],
+        "bereitschaft": [],
+        "lesbar": True,
+        "offene_posten": _offene_posten([]),
+        "referenzen": [],
+        "referenzen_gesamt": 0,
+        "referenzen_rest": [],
+        "horizont": TCO_HORIZONT,
+        "modelle": [],
+        "modell_vorgabe": "",
+        "modelle_gesamt": 0,
+        "ohne_zuordnung": [],
+        "graph_daten": None,
+        "haendler_seit": geraete_tco_band.HAENDLER_SEIT,
+        "anbieter_erwartet": list(geraete_tco_karten.ANBIETER_REIHENFOLGE),
+        "baender_katalog": [],
+        "band_je_tarif": {},
+        "export": {"buendel": [], "sim_only": []},
+        "historie_lage": {"messtage": 0, "seit": "", "buendel": 0},
+    }

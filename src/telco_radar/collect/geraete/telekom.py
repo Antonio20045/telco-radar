@@ -262,6 +262,7 @@ Faellt der Abruf so aus, liefert die Nutzlast keine Geraete, und
 `sammle_anbieter` fuehrt die Seite als ungelesen - die Bestandsdaten altern
 dann NICHT. Genau dafuer ist die Unterscheidung gebaut.
 """
+
 from __future__ import annotations
 
 import json
@@ -274,6 +275,7 @@ from bs4 import BeautifulSoup
 
 from . import GeraeteAbrufFehler
 from ...geraete_model import probe_geht_auf
+
 # DIE EINE STELLE, die entscheidet, ob ein Rohwert eine Ratenlaufzeit IST
 # (Clean Code 1): dieselbe Pruefung, die `buendel_id` und `Buendel` lesen.
 from ...tco_model import laufzeit_in_monaten
@@ -286,8 +288,7 @@ _STATE_RE = re.compile(r"window\.__INITIAL_STATE__\s*=\s*")
 # Die Einheit steht am Ende und wird gebraucht: "silber-1-tb" ist 1 TB und
 # nicht 1 GB, und eine Zahl ohne ihre Einheit zu lesen waere derselbe
 # Fehler wie ein Preis ohne seine Preisform.
-_VARIANTE_RE = re.compile(r"^(?P<farbe>.+)-(?P<zahl>\d+)-(?P<einheit>gb|tb)$",
-                          re.I)
+_VARIANTE_RE = re.compile(r"^(?P<farbe>.+)-(?P<zahl>\d+)-(?P<einheit>gb|tb)$", re.I)
 
 
 def zustand(html: str) -> dict:
@@ -302,12 +303,12 @@ def zustand(html: str) -> dict:
     if not treffer:
         raise GeraeteAbrufFehler(
             "Telekom-Kategorieseite ohne window.__INITIAL_STATE__ "
-            f"({len(html or '')} Bytes) - Challenge oder neues Format")
+            f"({len(html or '')} Bytes) - Challenge oder neues Format"
+        )
     try:
         daten, _ = json.JSONDecoder().raw_decode(html, treffer.end())
     except (json.JSONDecodeError, ValueError) as exc:
-        raise GeraeteAbrufFehler(
-            f"Telekom-Zustandsobjekt unlesbar: {exc}") from exc
+        raise GeraeteAbrufFehler(f"Telekom-Zustandsobjekt unlesbar: {exc}") from exc
     if not isinstance(daten, dict):
         raise GeraeteAbrufFehler("Telekom-Zustandsobjekt ist kein Objekt")
     return daten
@@ -332,8 +333,10 @@ def _passende_adresse(eintrag: dict, links: list[str]) -> str:
     der geernteten Adressen, bleibt das Feld leer und der Satz erbt die
     Kategorieseite.
     """
-    teile = [str(eintrag.get(feld) or "").strip()
-             for feld in ("brandSlug", "productSlug", "variantSlug")]
+    teile = [
+        str(eintrag.get(feld) or "").strip()
+        for feld in ("brandSlug", "productSlug", "variantSlug")
+    ]
     if not all(teile):
         return ""
     for link in links:
@@ -379,8 +382,10 @@ def _preisformen(preis: dict) -> list[dict]:
     formen: list[dict] = []
     for plan in raten:
         if not isinstance(plan, dict):
-            log.info("Telekom: Eintrag in installments ist kein Objekt "
-                     "(%r) - uebergangen", plan)
+            log.info(
+                "Telekom: Eintrag in installments ist kein Objekt (%r) - uebergangen",
+                plan,
+            )
             continue
         # `laufzeit_in_monaten` ist DIE EINE STELLE, die entscheidet, ob ein
         # Rohwert eine Ratenlaufzeit IST (Clean Code 1) - eine eigene
@@ -395,20 +400,33 @@ def _preisformen(preis: dict) -> list[dict]:
             # BENANNT, nicht still: die Listung waehlt ihren Traeger aus
             # `formen` (siehe `_listungsplan`), ein lautlos verlorener Plan
             # verschoebe also Preis und Laufzeit der Listung.
-            log.info("Telekom: Ratenplan ohne lesbare Bestandteile "
-                     "(Raten %r, Rate %r, Gesamt %r) - uebergangen",
-                     plan.get("numberOfInstallments"),
-                     plan.get("recurringPrice"), plan.get("totalPrice"))
+            log.info(
+                "Telekom: Ratenplan ohne lesbare Bestandteile "
+                "(Raten %r, Rate %r, Gesamt %r) - uebergangen",
+                plan.get("numberOfInstallments"),
+                plan.get("recurringPrice"),
+                plan.get("totalPrice"),
+            )
             continue
         if not probe_geht_auf(anzahlung, monatsrate, laufzeit, gesamt):
             log.info(
                 "Telekom: Ratenplan ueber %r Monate ohne aufgehende "
                 "Rechenprobe (Anzahlung %s, Rate %s, Gesamt %s) - "
-                "verworfen", plan.get("numberOfInstallments"), anzahlung,
-                plan.get("recurringPrice"), plan.get("totalPrice"))
+                "verworfen",
+                plan.get("numberOfInstallments"),
+                anzahlung,
+                plan.get("recurringPrice"),
+                plan.get("totalPrice"),
+            )
             continue
-        formen.append({"anzahlung": anzahlung, "monatsrate": monatsrate,
-                       "laufzeit_monate": laufzeit, "gesamt": gesamt})
+        formen.append(
+            {
+                "anzahlung": anzahlung,
+                "monatsrate": monatsrate,
+                "laufzeit_monate": laufzeit,
+                "gesamt": gesamt,
+            }
+        )
     return formen
 
 
@@ -418,8 +436,7 @@ def _preisformen(preis: dict) -> list[dict]:
 # die diese Auswahl bestimmt (`preis_ohne_vertrag`); die Laufzeit ist nur
 # der Gleichstandsbrecher. Bis P0-B-h5 stand es umgekehrt - siehe
 # Modulkopf "DIE REGEL IST EINE WAHL".
-_LISTUNGSPLAN_REGEL = ("hoechster Gesamtbetrag, bei Gleichstand laengste "
-                       "Ratenlaufzeit")
+_LISTUNGSPLAN_REGEL = "hoechster Gesamtbetrag, bei Gleichstand laengste Ratenlaufzeit"
 
 
 def _plan_text(form: dict) -> str:
@@ -430,9 +447,11 @@ def _plan_text(form: dict) -> str:
     Mehrplan-Fall liesse sich aus dem Log nicht nachrechnen. Mit ihnen
     steht die Rechenprobe (`anzahlung + n x rate = gesamt`) in der Zeile.
     """
-    return (f"{form['laufzeit_monate']} Monate: "
-            f"{form['anzahlung']:.2f} + {form['laufzeit_monate']} x "
-            f"{form['monatsrate']:.2f} = {form['gesamt']:.2f} EUR")
+    return (
+        f"{form['laufzeit_monate']} Monate: "
+        f"{form['anzahlung']:.2f} + {form['laufzeit_monate']} x "
+        f"{form['monatsrate']:.2f} = {form['gesamt']:.2f} EUR"
+    )
 
 
 def _listungsplan(formen: list[dict], name: str) -> dict:
@@ -461,26 +480,28 @@ def _listungsplan(formen: list[dict], name: str) -> dict:
             "Telekom: %r nennt %d Ratenplaene - die LISTUNG traegt %s "
             "(Regel: %s, eine WAHL und keine Messung); NICHT erfasst, "
             "auch nicht im Buendelpfad: %s",
-            name, len(formen), _plan_text(traeger), _LISTUNGSPLAN_REGEL,
-            "; ".join(_plan_text(f) for f in uebergangen))
+            name,
+            len(formen),
+            _plan_text(traeger),
+            _LISTUNGSPLAN_REGEL,
+            "; ".join(_plan_text(f) for f in uebergangen),
+        )
     return traeger
 
 
 def lies(text: str, url: str = "") -> list[dict]:
     """Die Kategorieseite in Rohsaetze zerlegen. Sie IST die Nutzlast."""
     daten = zustand(text)
-    eintraege = ((daten.get("productList") or {}).get("data") or [])
+    eintraege = (daten.get("productList") or {}).get("data") or []
     if not isinstance(eintraege, list):
-        raise GeraeteAbrufFehler("Telekom-Nutzlast: productList.data ist "
-                                 "keine Liste")
+        raise GeraeteAbrufFehler("Telekom-Nutzlast: productList.data ist keine Liste")
     links = _produktlinks(text, url)
 
     out: list[dict] = []
     for eintrag in eintraege:
         if not isinstance(eintrag, dict):
             continue
-        name = str(eintrag.get("name") or eintrag.get("productName")
-                   or "").strip()
+        name = str(eintrag.get("name") or eintrag.get("productName") or "").strip()
         if not name:
             continue
         formen = _preisformen(eintrag.get("price") or {})
@@ -489,13 +510,12 @@ def lies(text: str, url: str = "") -> list[dict]:
             # eine unetikettierte Zahl immer noch ein `totalPrice` ist,
             # gibt es bei der Telekom NUR den Ratengesamtbetrag - ohne
             # seine Bestandteile waere er ein Barpreis, der er nicht ist.
-            log.info("Telekom: %r ohne nachrechenbare Ratenform - verworfen",
-                     name)
+            log.info("Telekom: %r ohne nachrechenbare Ratenform - verworfen", name)
             continue
         farbe, speicher = _variante(str(eintrag.get("variantSlug") or ""))
-        titel = " ".join(x for x in (name,
-                                     f"{speicher} GB" if speicher else "",
-                                     farbe) if x)
+        titel = " ".join(
+            x for x in (name, f"{speicher} GB" if speicher else "", farbe) if x
+        )
         adresse = _passende_adresse(eintrag, links)
         sku = str(eintrag.get("id") or "").strip()
         # EIN Geraet, EINE Listung - und der Plan, der sie traegt, wird
@@ -503,32 +523,36 @@ def lies(text: str, url: str = "") -> list[dict]:
         # `_listungsplan` und Modulkopf). Ein eigener Satz je Plan
         # kollidierte in `GeraeteDB.upsert` unter derselben `listung_id`.
         form = _listungsplan(formen, name)
-        out.append({
-            "titel": titel,
-            # Der strukturierte NAME (Feld `name`), unveraendert - die
-            # einzige Grundlage der E4-Auto-Erkennung. Der TITEL darueber
-            # ist zusammengesetzt (Name + Speicher + Farbe) und wuerde
-            # als Namensquelle Saegezahn-IDs erzeugen ("iPhone 18 Pro
-            # polar").
-            "strukturierter_name": name,
-            "preis": form["gesamt"],
-            "anzahlung": form["anzahlung"],
-            "monatsrate": form["monatsrate"],
-            "laufzeit_monate": form["laufzeit_monate"],
-            # Die Seite nennt keinen Zinssatz. `None` heisst unbekannt.
-            "zins_effektiv": None,
-            "waehrung": "EUR",
-            "verfuegbarkeit": ("lieferbar"
-                               if str(eintrag.get("availabilityStatus")
-                                      or "").upper() == "IN_STOCK"
-                               else "unbekannt"),
-            "sku": sku,
-            "ean": "",
-            "farbe": farbe,
-            "speicher_gb": speicher,
-            "url": adresse,
-            "quelle": "telekom_kategorie",
-        })
+        out.append(
+            {
+                "titel": titel,
+                # Der strukturierte NAME (Feld `name`), unveraendert - die
+                # einzige Grundlage der E4-Auto-Erkennung. Der TITEL darueber
+                # ist zusammengesetzt (Name + Speicher + Farbe) und wuerde
+                # als Namensquelle Saegezahn-IDs erzeugen ("iPhone 18 Pro
+                # polar").
+                "strukturierter_name": name,
+                "preis": form["gesamt"],
+                "anzahlung": form["anzahlung"],
+                "monatsrate": form["monatsrate"],
+                "laufzeit_monate": form["laufzeit_monate"],
+                # Die Seite nennt keinen Zinssatz. `None` heisst unbekannt.
+                "zins_effektiv": None,
+                "waehrung": "EUR",
+                "verfuegbarkeit": (
+                    "lieferbar"
+                    if str(eintrag.get("availabilityStatus") or "").upper()
+                    == "IN_STOCK"
+                    else "unbekannt"
+                ),
+                "sku": sku,
+                "ean": "",
+                "farbe": farbe,
+                "speicher_gb": speicher,
+                "url": adresse,
+                "quelle": "telekom_kategorie",
+            }
+        )
     return out
 
 
@@ -536,6 +560,7 @@ def lies(text: str, url: str = "") -> list[dict]:
 # DER BUENDELKATALOG - dieselbe Seite mit tariffId-Parameter (B2, siehe
 # Modulkopf)
 # --------------------------------------------------------------------------
+
 
 def _gleich(a: Optional[float], b: Optional[float]) -> bool:
     """Ein Cent ist kein Rundungsfehler - dieselbe Toleranz wie bei o2
@@ -564,12 +589,13 @@ def _selected_plan(product_list: dict) -> dict:
     if not isinstance(plan, dict):
         raise GeraeteAbrufFehler(
             "Telekom-Kategorieseite ohne productList.selectedPlan - keine "
-            "Buendelantwort (tariffId-Parameter fehlt?)")
-    if not str(plan.get("id") or "").strip() or \
-            not str(plan.get("name") or "").strip():
+            "Buendelantwort (tariffId-Parameter fehlt?)"
+        )
+    if not str(plan.get("id") or "").strip() or not str(plan.get("name") or "").strip():
         raise GeraeteAbrufFehler(
             "Telekom-selectedPlan ohne id oder name - kein Tarifname, "
-            "keine Buendelaussage")
+            "keine Buendelaussage"
+        )
     return plan
 
 
@@ -579,7 +605,7 @@ def _plan_preise(plan: dict) -> tuple[Optional[float], Optional[float]]:
     Reihenfolge in der Liste."""
     anschluss: Optional[float] = None
     monatlich: Optional[float] = None
-    for p in (plan.get("prices") or []):
+    for p in plan.get("prices") or []:
         if not isinstance(p, dict):
             continue
         wert = _preis(p.get("actualValue"))
@@ -595,8 +621,7 @@ def _plan_preise(plan: dict) -> tuple[Optional[float], Optional[float]]:
 # `proben` ist die Schnittstelle der Provider-Probe (FM-2, P5 - siehe
 # Adapter-Docstring in collect/geraete/__init__.py); dieser Adapter
 # traegt keine Feld-Proben hinein.
-def lies_buendel(text: str, url: str = "",
-                 proben: Optional[dict] = None) -> list[dict]:
+def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> list[dict]:
     """Die Kategorieseite MIT Tariffilter in Buendel-Rohsaetze zerlegen.
 
     Sie IST die Nutzlast (`kind: buendel`-Einstieg, kein `ernte`, keine
@@ -608,8 +633,7 @@ def lies_buendel(text: str, url: str = "",
     product_list = daten.get("productList") or {}
     eintraege = product_list.get("data")
     if not isinstance(eintraege, list):
-        raise GeraeteAbrufFehler("Telekom-Nutzlast: productList.data ist "
-                                 "keine Liste")
+        raise GeraeteAbrufFehler("Telekom-Nutzlast: productList.data ist keine Liste")
     plan = _selected_plan(product_list)
     tarif_id = str(plan.get("id") or "").strip()
     tarif_name = str(plan.get("name") or "").strip()
@@ -619,7 +643,8 @@ def lies_buendel(text: str, url: str = "",
         # waere eine Zuzahlung ohne die Gegenleistung, die sie erkauft.
         raise GeraeteAbrufFehler(
             f"Telekom-selectedPlan {tarif_name!r} ohne recurringFee - "
-            "keine Buendelaussage")
+            "keine Buendelaussage"
+        )
 
     links = _produktlinks(text, url)
     out: list[dict] = []
@@ -628,35 +653,42 @@ def lies_buendel(text: str, url: str = "",
             continue
         name = str(eintrag.get("name") or "").strip()
         if not name:
-            continue                      # Werbekachel, siehe Modulkopf
+            continue  # Werbekachel, siehe Modulkopf
 
         formen = _preisformen(eintrag.get("price") or {})
         if not formen:
-            log.info("Telekom-Buendel: %r ohne nachrechenbare Ratenform - "
-                     "verworfen", name)
+            log.info(
+                "Telekom-Buendel: %r ohne nachrechenbare Ratenform - verworfen", name
+            )
             continue
 
         # Die zwei Proben aus dem Modulkopf: der je-Geraet-Tarifpreis muss
         # zum selectedPlan gehoeren (ID) und ihm entsprechen (Betrag).
-        geraet_tarif = (((eintrag.get("formattedPrices") or {})
-                         .get("recurringTariffPrice") or {}).get("price")
-                        or {})
+        geraet_tarif = (
+            (eintrag.get("formattedPrices") or {}).get("recurringTariffPrice") or {}
+        ).get("price") or {}
         geraet_tarif_id = str(geraet_tarif.get("id") or "").strip()
         if not geraet_tarif_id.startswith(f"{tarif_id}-"):
-            log.info("Telekom-Buendel: %r nennt Tarifpreis %r statt "
-                     "selectedPlan %r - verworfen", name, geraet_tarif_id,
-                     tarif_id)
+            log.info(
+                "Telekom-Buendel: %r nennt Tarifpreis %r statt "
+                "selectedPlan %r - verworfen",
+                name,
+                geraet_tarif_id,
+                tarif_id,
+            )
             continue
-        if not _gleich(_preis(geraet_tarif.get("actualValue")),
-                       tarif_monatlich):
-            log.info("Telekom-Buendel: %r widerspricht dem selectedPlan-"
-                     "Tarifpreis - verworfen", name)
+        if not _gleich(_preis(geraet_tarif.get("actualValue")), tarif_monatlich):
+            log.info(
+                "Telekom-Buendel: %r widerspricht dem selectedPlan-"
+                "Tarifpreis - verworfen",
+                name,
+            )
             continue
 
         farbe, speicher = _variante(str(eintrag.get("variantSlug") or ""))
-        titel = " ".join(x for x in (name,
-                                     f"{speicher} GB" if speicher else "",
-                                     farbe) if x)
+        titel = " ".join(
+            x for x in (name, f"{speicher} GB" if speicher else "", farbe) if x
+        )
         adresse = _passende_adresse(eintrag, links)
         sku = str(eintrag.get("id") or "").strip()
         # JEDER Ratenplan wird ein EIGENES Buendel mit eigener
@@ -664,22 +696,24 @@ def lies_buendel(text: str, url: str = "",
         # im Schluessel, die Zahlweisen ueberschreiben sich also nicht mehr
         # gegenseitig (B1).
         for form in formen:
-            out.append({
-                "titel": titel,
-                "strukturierter_name": name,
-                "farbe": farbe,
-                "speicher_gb": speicher,
-                "sku": sku,
-                "tarif_name": tarif_name,
-                # Die MF-ID des Tarifs - die Ordnung des Anbieters, siehe
-                # Modulkopf ("WAS DER SLUG HIER IST").
-                "tarif_slug": tarif_id,
-                "tarif_monatlich": tarif_monatlich,
-                "geraet_zuzahlung": form["anzahlung"],
-                "geraet_monatsrate": form["monatsrate"],
-                "anschlusspreis": anschluss,
-                "laufzeit_monate": form["laufzeit_monate"],
-                "url": adresse,
-                "quelle": "telekom_buendel",
-            })
+            out.append(
+                {
+                    "titel": titel,
+                    "strukturierter_name": name,
+                    "farbe": farbe,
+                    "speicher_gb": speicher,
+                    "sku": sku,
+                    "tarif_name": tarif_name,
+                    # Die MF-ID des Tarifs - die Ordnung des Anbieters, siehe
+                    # Modulkopf ("WAS DER SLUG HIER IST").
+                    "tarif_slug": tarif_id,
+                    "tarif_monatlich": tarif_monatlich,
+                    "geraet_zuzahlung": form["anzahlung"],
+                    "geraet_monatsrate": form["monatsrate"],
+                    "anschlusspreis": anschluss,
+                    "laufzeit_monate": form["laufzeit_monate"],
+                    "url": adresse,
+                    "quelle": "telekom_buendel",
+                }
+            )
     return out

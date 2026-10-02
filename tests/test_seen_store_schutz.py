@@ -6,6 +6,7 @@ Stapel scheiterte mit HTTP 400 - und trotzdem wanderten 223 ungelesene
 Meldungen hinein. Beim naechsten Lauf mit Guthaben waeren sie fuer immer weg
 gewesen. Diese Tests halten die Absicherung fest.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -16,9 +17,16 @@ from telco_radar.models import Item
 
 
 def _item(url: str, region: str) -> Item:
-    return Item(title=f"Titel {url}", url=url, source_name="q", region=region,
-                operator="Op", published=datetime.now(timezone.utc),
-                summary="", origin="operator")
+    return Item(
+        title=f"Titel {url}",
+        url=url,
+        source_name="q",
+        region=region,
+        operator="Op",
+        published=datetime.now(timezone.utc),
+        summary="",
+        origin="operator",
+    )
 
 
 class _Seen:
@@ -59,21 +67,27 @@ def test_ohne_ausfall_wird_alles_gemerkt():
 
 def test_totalausfall_merkt_gar_nichts():
     """Der Fall aus Lauf #64: kein Guthaben, keine Region analysiert."""
-    items = [_item(f"u{n}", r) for n, r in
-             enumerate(["europe", "asia", "global", "north_america"])]
+    items = [
+        _item(f"u{n}", r)
+        for n, r in enumerate(["europe", "asia", "global", "north_america"])
+    ]
     seen = _Seen()
-    uebersprungen = _persistiere(items, {"europe", "asia", "global",
-                                         "north_america"}, seen)
+    uebersprungen = _persistiere(
+        items, {"europe", "asia", "global", "north_america"}, seen
+    )
     assert seen.gemerkt == []
     assert uebersprungen == 4
 
 
-@pytest.mark.parametrize("batches,batches_ok,gilt_als_ausgefallen", [
-    (4, 0, True),    # jeder Stapel gescheitert
-    (4, 1, False),   # teilweise durch - der Rest ist der alte Kompromiss
-    (0, 0, False),   # nichts zu tun, kein Ausfall
-    (1, 1, False),
-])
+@pytest.mark.parametrize(
+    "batches,batches_ok,gilt_als_ausgefallen",
+    [
+        (4, 0, True),  # jeder Stapel gescheitert
+        (4, 1, False),  # teilweise durch - der Rest ist der alte Kompromiss
+        (0, 0, False),  # nichts zu tun, kein Ausfall
+        (1, 1, False),
+    ],
+)
 def test_ausfallkriterium(batches, batches_ok, gilt_als_ausgefallen):
     """Genau das Kriterium, das die Pipeline auf der Telemetrie auswertet."""
     assert bool(batches and not batches_ok) is gilt_als_ausgefallen

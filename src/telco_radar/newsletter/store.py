@@ -30,6 +30,7 @@ DIE DREI STELLEN, AN DENEN EIN FEHLER HIER STILL ABOS LOESCHT:
    naechsten Anmeldeversuch wieder angeschrieben, und ein Widerruf, der nach
    vier Wochen verfaellt, ist keiner.
 """
+
 from __future__ import annotations
 
 import json
@@ -50,6 +51,7 @@ DOI_SPERRE_STUNDEN = 24
 
 # ==========================================================  JSONL lesen  ==
 
+
 def lies_jsonl(pfad: Path) -> list[dict]:
     """Zeilenweise, fehlertolerant. Eine kaputte Zeile kippt nicht die Datei.
 
@@ -61,15 +63,19 @@ def lies_jsonl(pfad: Path) -> list[dict]:
         return []
     aus = []
     for nummer, zeile in enumerate(
-            Path(pfad).read_text(encoding="utf-8").splitlines(), 1):
+        Path(pfad).read_text(encoding="utf-8").splitlines(), 1
+    ):
         zeile = zeile.strip()
         if not zeile:
             continue
         try:
             daten = json.loads(zeile)
         except json.JSONDecodeError:
-            log.error("Zeile %d nicht lesbar - uebersprungen (Inhalt nicht "
-                      "geloggt, dort steht eine Adresse)", nummer)
+            log.error(
+                "Zeile %d nicht lesbar - uebersprungen (Inhalt nicht "
+                "geloggt, dort steht eine Adresse)",
+                nummer,
+            )
             continue
         if isinstance(daten, dict):
             aus.append(daten)
@@ -79,11 +85,15 @@ def lies_jsonl(pfad: Path) -> list[dict]:
 def schreibe_jsonl(pfad: Path, zeilen) -> None:
     Path(pfad).parent.mkdir(parents=True, exist_ok=True)
     Path(pfad).write_text(
-        "".join(json.dumps(z, ensure_ascii=False, sort_keys=True) + "\n"
-                for z in zeilen), encoding="utf-8")
+        "".join(
+            json.dumps(z, ensure_ascii=False, sort_keys=True) + "\n" for z in zeilen
+        ),
+        encoding="utf-8",
+    )
 
 
 # ======================================================  Zusammenfuehren  ==
+
 
 def _zeitstempel(datensatz: dict) -> str:
     """Wann dieser Datensatz zuletzt etwas gesagt hat.
@@ -92,9 +102,11 @@ def _zeitstempel(datensatz: dict) -> str:
     juenger als die Anmeldung, und sie muss gewinnen.
     """
     bounce = (datensatz.get("bounce") or {}).get("last") or ""
-    return max(str(datensatz.get("created_at") or ""),
-               str(datensatz.get("confirmed_at") or ""),
-               str(bounce))
+    return max(
+        str(datensatz.get("created_at") or ""),
+        str(datensatz.get("confirmed_at") or ""),
+        str(bounce),
+    )
 
 
 def zusammenfuehren(unsere: list[dict], fremde: list[dict]) -> list[dict]:
@@ -116,10 +128,14 @@ def zusammenfuehren(unsere: list[dict], fremde: list[dict]) -> list[dict]:
         if vorhanden is None:
             nach_id[schluessel] = datensatz
             continue
-        meins = (_zeitstempel(datensatz),
-                 rang.get(str(datensatz.get("state") or ""), 0))
-        seins = (_zeitstempel(vorhanden),
-                 rang.get(str(vorhanden.get("state") or ""), 0))
+        meins = (
+            _zeitstempel(datensatz),
+            rang.get(str(datensatz.get("state") or ""), 0),
+        )
+        seins = (
+            _zeitstempel(vorhanden),
+            rang.get(str(vorhanden.get("state") or ""), 0),
+        )
         if meins > seins:
             nach_id[schluessel] = datensatz
     # Stabil nach id: der Store wird gepusht und mit sich selbst verglichen.
@@ -127,6 +143,7 @@ def zusammenfuehren(unsere: list[dict], fremde: list[dict]) -> list[dict]:
 
 
 # ============================================================  Der Store  ==
+
 
 class AboStore:
     """Der entschluesselte Verteiler - er lebt nur zur Laufzeit im Runner."""
@@ -192,19 +209,20 @@ class AboStore:
 # baut ihn an der einzigen Stelle ein, an der er sicher nicht wirkt.
 
 
-def doi_gesperrt(log_pfad: Path, adress_kennwert: str, *,
-                 heute: datetime | None = None) -> bool:
+def doi_gesperrt(
+    log_pfad: Path, adress_kennwert: str, *, heute: datetime | None = None
+) -> bool:
     """Hat diese Adresse in den letzten 24 Stunden schon eine Mail bekommen?"""
     if not adress_kennwert:
-        return True                     # ohne Kennwert keine Mail
-    grenze = (heute or datetime.now(timezone.utc)) - timedelta(
-        hours=DOI_SPERRE_STUNDEN)
+        return True  # ohne Kennwert keine Mail
+    grenze = (heute or datetime.now(timezone.utc)) - timedelta(hours=DOI_SPERRE_STUNDEN)
     for eintrag in lies_jsonl(log_pfad):
         if eintrag.get("addr_hmac") != adress_kennwert:
             continue
         try:
             wann = datetime.fromisoformat(
-                str(eintrag.get("at") or "").replace("Z", "+00:00"))
+                str(eintrag.get("at") or "").replace("Z", "+00:00")
+            )
         except ValueError:
             continue
         if wann.tzinfo is None:
@@ -214,24 +232,31 @@ def doi_gesperrt(log_pfad: Path, adress_kennwert: str, *,
     return False
 
 
-def doi_vermerken(log_pfad: Path, adress_kennwert: str, *,
-                  token_id: str = "", zeitpunkt: str = "") -> None:
+def doi_vermerken(
+    log_pfad: Path, adress_kennwert: str, *, token_id: str = "", zeitpunkt: str = ""
+) -> None:
     """Den Versand einer Bestaetigungsmail festhalten.
 
     Im Log steht NUR der Kennwert, nie die Adresse - diese Datei liegt zwar
     im privaten Repo, aber sie hat keinen Grund, mehr zu wissen als noetig.
     """
     Path(log_pfad).parent.mkdir(parents=True, exist_ok=True)
-    zeile = json.dumps({"addr_hmac": adress_kennwert,
-                        "token_id": token_id,
-                        "at": zeitpunkt or jetzt()},
-                       ensure_ascii=False, sort_keys=True)
+    zeile = json.dumps(
+        {
+            "addr_hmac": adress_kennwert,
+            "token_id": token_id,
+            "at": zeitpunkt or jetzt(),
+        },
+        ensure_ascii=False,
+        sort_keys=True,
+    )
     with open(log_pfad, "a", encoding="utf-8") as datei:
         datei.write(zeile + "\n")
 
 
-def doi_aufraeumen(log_pfad: Path, *, tage: int = 30,
-                   heute: datetime | None = None) -> int:
+def doi_aufraeumen(
+    log_pfad: Path, *, tage: int = 30, heute: datetime | None = None
+) -> int:
     """Alte Eintraege wegwerfen. Gibt zurueck, wie viele gefallen sind.
 
     Das Log beantwortet genau eine Frage ueber 24 Stunden; alles Aeltere ist
@@ -244,11 +269,12 @@ def doi_aufraeumen(log_pfad: Path, *, tage: int = 30,
     for eintrag in eintraege:
         try:
             wann = datetime.fromisoformat(
-                str(eintrag.get("at") or "").replace("Z", "+00:00"))
+                str(eintrag.get("at") or "").replace("Z", "+00:00")
+            )
             if wann.tzinfo is None:
                 wann = wann.replace(tzinfo=timezone.utc)
         except ValueError:
-            continue                    # unlesbar -> weg
+            continue  # unlesbar -> weg
         if wann > grenze:
             behalten.append(eintrag)
     if len(behalten) != len(eintraege):

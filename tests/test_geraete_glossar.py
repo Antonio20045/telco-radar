@@ -40,6 +40,7 @@ Geraetepreis): Sie traegt beide Zeilenarten MIT zwei Preisen (Barpreis-
 und Finanzierungszweig) plus eine Zeile ohne Geraetepreis als
 Gegenprobe.
 """
+
 from __future__ import annotations
 
 import json
@@ -47,8 +48,7 @@ import re
 
 from test_geraete_tco_zustand import _baue, vorlage_text
 
-BEGRIFFE = {"TCO-24", "Tarifband", "Bündel",
-            "Abweichungs-Vorzeichen (+/−) zu Vodafone"}
+BEGRIFFE = {"TCO-24", "Tarifband", "Bündel", "Abweichungs-Vorzeichen (+/−) zu Vodafone"}
 
 
 def _baue_mit_referenzen(tmp_path, weitere: int):
@@ -57,29 +57,38 @@ def _baue_mit_referenzen(tmp_path, weitere: int):
     Schritt pruefte der K1-Test sie an einer Fixture, die den Fall nie
     ausloest (Lookup-Falle: gruen und prueft nichts)."""
     from telco_radar.report.html import render_site
+
     s = _baue(tmp_path)
     pfad = tmp_path / "mit" / "data" / "state" / "geraete_tco.json"
     daten = json.loads(pfad.read_text(encoding="utf-8"))
     vorlage = daten["sim_only"][0]
     for i in range(weitere):
         eintrag = dict(vorlage)
-        eintrag.update({
-            "id": f"simonly--extra-{i}", "anbieter": "congstar",
-            "tarif_name": f"Congstar Home {i}", "tarif_id": f"cs:{i}",
-            "tarif_sim_only_monatlich": 10.0 + i,
-            "quelle_url": f"https://example.de/pib/cs-{i}"})
+        eintrag.update(
+            {
+                "id": f"simonly--extra-{i}",
+                "anbieter": "congstar",
+                "tarif_name": f"Congstar Home {i}",
+                "tarif_id": f"cs:{i}",
+                "tarif_sim_only_monatlich": 10.0 + i,
+                "quelle_url": f"https://example.de/pib/cs-{i}",
+            }
+        )
         daten["sim_only"].append(eintrag)
     pfad.write_text(json.dumps(daten), encoding="utf-8")
     root = tmp_path / "mit"
     render_site(root / "site", root / "data" / "reports")
     from bs4 import BeautifulSoup
-    return BeautifulSoup((root / "site" / "geraete.html").read_text(
-        encoding="utf-8"), "html.parser")
+
+    return BeautifulSoup(
+        (root / "site" / "geraete.html").read_text(encoding="utf-8"), "html.parser"
+    )
 
 
 # --------------------------------------------------------------------------
 # 1. Das Klapplabel (portiert: Massstabs-Klappen statt Kartenklappe)
 # --------------------------------------------------------------------------
+
 
 def test_das_klapplabel_nennt_handlung_und_zahl(tmp_path):
     """Jede Klappe, die eine MENGE verbergen, traegt "<N> <Ding> anzeigen"
@@ -94,8 +103,9 @@ def test_das_klapplabel_nennt_handlung_und_zahl(tmp_path):
     # Stelle weiter, an der sie erfunden wurde: die Zahl steht im ersten
     # Satz des Inhalts und zaehlt die Zeilen beider Tabellen.
     klappe = s.select_one("details#gr-massstab-datenlage")
-    assert klappe is not None, \
+    assert klappe is not None, (
         "die Fixture traegt keine Massstabs-Klappe (keine Referenzen)"
+    )
     summary = klappe.select_one("summary")
     text = re.sub(r"\s+", " ", summary.get_text(" ", strip=True))
     assert text == "Maßstab & Datenlage", f"falscher Klapname: {text!r}"
@@ -106,7 +116,8 @@ def test_das_klapplabel_nennt_handlung_und_zahl(tmp_path):
     assert zeilen, "Klappe ohne Tabellenzeilen - der Test prueft nichts"
     assert int(treffer.group(1)) == len(zeilen), (
         f"der Satz zaehlt {treffer.group(1)}, die Klappe traegt "
-        f"{len(zeilen)} Tarifzeilen")
+        f"{len(zeilen)} Tarifzeilen"
+    )
 
 
 def test_die_innere_klappe_nennt_handlung_und_zahl(tmp_path):
@@ -117,20 +128,18 @@ def test_die_innere_klappe_nennt_handlung_und_zahl(tmp_path):
     s = _baue_mit_referenzen(tmp_path, weitere=4)
     klappe = s.select_one("details#gr-massstab-datenlage")
     innere = klappe.select("details.gr-auf summary")
-    texte = [re.sub(r"\s+", " ", t.get_text(" ", strip=True))
-             for t in innere]
-    treffer = [t for t in texte
-               if re.search(r"\d+\s+weitere\s+Tarife\s+anzeigen", t)]
-    assert treffer, \
-        f"keine innere Klappe mit Handlung und Zahl: {texte!r} - die " \
+    texte = [re.sub(r"\s+", " ", t.get_text(" ", strip=True)) for t in innere]
+    treffer = [t for t in texte if re.search(r"\d+\s+weitere\s+Tarife\s+anzeigen", t)]
+    assert treffer, (
+        f"keine innere Klappe mit Handlung und Zahl: {texte!r} - die "
         "Fixture stellt mehr als vier Referenzen, der Fall MUSS eintreten"
+    )
     innere_klappe = klappe.select("details.gr-auf")[0]
     zeilen = innere_klappe.select("table.gr-ttab--simonly tbody tr")
     assert zeilen, "innere Klappe ohne eigene Tabellenzeilen"
-    assert re.search(rf"{len(zeilen)}\s+weitere\s+Tarife\s+anzeigen",
-                     treffer[0]), (
-        f"{treffer[0]!r} zaehlt nicht die {len(zeilen)} Zeilen ihrer "
-        "eigenen Tabelle")
+    assert re.search(rf"{len(zeilen)}\s+weitere\s+Tarife\s+anzeigen", treffer[0]), (
+        f"{treffer[0]!r} zaehlt nicht die {len(zeilen)} Zeilen ihrer eigenen Tabelle"
+    )
 
 
 def test_app_js_setzt_keine_klapplabels_mehr_nach():
@@ -142,20 +151,24 @@ def test_app_js_setzt_keine_klapplabels_mehr_nach():
     jemand wieder einen Label-Wortlaut im JS nach, taucht hier die
     Doppelung auf, gegen die der Ursprungstest gebaut war."""
     from pathlib import Path
-    app_js = (Path(__file__).resolve().parents[1]
-              / "src/telco_radar/report/templates/app.js").read_text(
-                  encoding="utf-8")
-    assert "Tarife anzeigen" not in app_js, \
-        "app.js setzt einen Klapplabel-Wortlaut nach - der lebt seit der " \
+
+    app_js = (
+        Path(__file__).resolve().parents[1] / "src/telco_radar/report/templates/app.js"
+    ).read_text(encoding="utf-8")
+    assert "Tarife anzeigen" not in app_js, (
+        "app.js setzt einen Klapplabel-Wortlaut nach - der lebt seit der "
         "Portierung nur im Template"
-    assert "Anbieterangebote anzeigen" not in app_js, \
-        "app.js setzt das alte Karten-Klapplabel nach - die Kartenklappe " \
+    )
+    assert "Anbieterangebote anzeigen" not in app_js, (
+        "app.js setzt das alte Karten-Klapplabel nach - die Kartenklappe "
         "ist seit O2 gefallen"
+    )
 
 
 # --------------------------------------------------------------------------
 # 2. Die Paradox-Zeile (portiert: Rechenweg der Buendel-Zeile)
 # --------------------------------------------------------------------------
+
 
 def _zeilen_mit_zwei_preisen(soup):
     """Belastbare Zeilen, die einen GERAETEPREIS tragen (Barpreis oder
@@ -185,34 +198,41 @@ def test_jede_zeile_mit_zwei_preisen_traegt_die_paradox_zeile(tmp_path):
     for zeile in zeilen:
         paradox = zeile.select_one(".gr-kk-paradox")
         assert paradox is not None, (
-            f"Zeile {zeile.get('data-anbieter')}: zwei Preise ohne "
-            "Erklaerzeile")
+            f"Zeile {zeile.get('data-anbieter')}: zwei Preise ohne Erklaerzeile"
+        )
         text = re.sub(r"\s+", " ", vorlage_text(paradox))
         assert "Gerät" in text and "Tarif" in text, text
         # Die Zeile steht DIREKT unter den zwei Zahlen des Rechenwegs:
         # nach der Leitzeile (TCO gesamt), vor der Oe-Bindungszeile -
         # nicht erst am Ende hinter Belegen und Luecken.
         html = str(zeile)
-        assert html.index("gr-bnd-rw-z") < html.index("gr-kk-paradox") \
-            < html.index("gr-kk-bau"), (
+        assert (
+            html.index("gr-bnd-rw-z")
+            < html.index("gr-kk-paradox")
+            < html.index("gr-kk-bau")
+        ), (
             f"Zeile {zeile.get('data-anbieter')}: Paradox-Zeile steht "
-            "nicht zwischen Leitzahl und Bau-Zeile")
+            "nicht zwischen Leitzahl und Bau-Zeile"
+        )
         # Sichtbar ohne WEITEREN Klick: kein eigener <details>-Block
         # zwischen Zeilengrenze und Satz - die Zeile selbst ist der EINE
         # Aufklapper, der sie sichtbar macht.
         for ahne in paradox.parents:
             if ahne.name == "details":
-                assert "gr-bnd" in (ahne.get("class") or []), \
+                assert "gr-bnd" in (ahne.get("class") or []), (
                     "die Paradox-Zeile steckt in einer weiteren Aufklappung"
+                )
     # Gegenprobe gegen die Lookup-Falle: die 1&1-Zeile der Fixture hat
     # KEINEN Geraetepreis (nur den kombinierten Monatspreis, 13.2) und
     # damit keine zwei Zahlen - sie darf die Erklaerzeile nicht tragen.
-    eins_und_eins = [z for z in s.select("#tafel-tco .gr-bnd")
-                     if z.get("data-anbieter") == "1&1"]
+    eins_und_eins = [
+        z for z in s.select("#tafel-tco .gr-bnd") if z.get("data-anbieter") == "1&1"
+    ]
     assert eins_und_eins, "die Fixture traegt keine 1&1-Zeile"
     for zeile in eins_und_eins:
-        assert zeile.select_one(".gr-kk-paradox") is None, \
+        assert zeile.select_one(".gr-kk-paradox") is None, (
             "1&1-Zeile ohne Geraetepreis traegt eine Paradox-Zeile"
+        )
 
 
 def test_die_paradox_zeile_nennt_den_zeitraum_ihrer_raten(tmp_path):
@@ -234,29 +254,33 @@ def test_die_paradox_zeile_nennt_den_zeitraum_ihrer_raten(tmp_path):
         fluss = re.sub(r"\s+", " ", vorlage_text(paradox))
         bau_fluss = re.sub(r"\s+", " ", vorlage_text(bau))
         raten = re.search(r"in (\d+) Raten", bau_fluss)
-        label_monate = re.search(r"über (\d+) Monate",
-                                 label.get_text(" ", strip=True))
+        label_monate = re.search(r"über (\d+) Monate", label.get_text(" ", strip=True))
         assert label_monate, label.get_text(" ", strip=True)
         monate = label_monate.group(1)
         if "Geräteraten plus" in fluss:
             geprueft += 1
             assert raten, f"Bau-Satz ohne Ratenzahl: {bau_fluss!r}"
-            assert f"alle {raten.group(1)} Geräteraten" in fluss \
-                and f"{monate} Monate Tarif" in fluss, (
+            assert (
+                f"alle {raten.group(1)} Geräteraten" in fluss
+                and f"{monate} Monate Tarif" in fluss
+            ), (
                 f"Zeile {zeile.get('data-anbieter')}: Bau sagt "
                 f"{raten.group(1)} Raten, Label {monate} Monate, "
-                f"Erklaerzeile {fluss!r}")
+                f"Erklaerzeile {fluss!r}"
+            )
         else:
             geprueft += 1
             assert f"Gerät + {monate} Monate Tarif" in fluss, (
                 f"Zeile {zeile.get('data-anbieter')}: Label "
-                f"{label_monate.group(0)}, aber Erklaerzeile {fluss!r}")
+                f"{label_monate.group(0)}, aber Erklaerzeile {fluss!r}"
+            )
     assert geprueft, "keine Zeile mit Erklearzeile - der Test prueft nichts"
 
 
 # --------------------------------------------------------------------------
 # 3. Das Glossar
 # --------------------------------------------------------------------------
+
 
 def test_das_glossar_ist_endgueltig_weg(tmp_path):
     """Antonio (16.09.2026, §3.1 AUFTRAG_GERAETE_EINE_SEITE_V2): „Ich will
@@ -267,15 +291,13 @@ def test_das_glossar_ist_endgueltig_weg(tmp_path):
     TCO-24 loest der Antwort-Satz selbst auf (§4.9), das Band nennt die
     Wahl-Leiste mit ihrer GB-Spanne."""
     s = _baue(tmp_path)
-    assert s.select_one("section#gr-glossar") is None, \
-        "das Glossar ist zurueckgekehrt"
+    assert s.select_one("section#gr-glossar") is None, "das Glossar ist zurueckgekehrt"
     text = s.select_one("#tafel-tco").get_text(" ", strip=True)
     assert "Begriffe erklärt" not in text
     assert "Wie gerechnet?" not in text
 
 
-def test_der_antwort_satz_und_die_wahl_leiste_erklaeren_die_begriffe(
-        tmp_path):
+def test_der_antwort_satz_und_die_wahl_leiste_erklaeren_die_begriffe(tmp_path):
     """Was das Glossar trug, steht jetzt am ORT seiner Zahl: die Leitzahl
     mit ihrem Namen im Antwort-Satz (seit A1 "Kosten über 24 Monate" -
     der Name ist seine eigene Aufloesung), das Tarifband mit GB-Spanne an
@@ -284,10 +306,12 @@ def test_der_antwort_satz_und_die_wahl_leiste_erklaeren_die_begriffe(
     tafel = s.select_one("#tafel-tco")
     antwort = tafel.select_one(".gr-zr-antwort").get_text(" ", strip=True)
     assert "Kosten über 24 Monate" in antwort
-    knoepfe = {k.get_text(" ", strip=True): k
-               for k in tafel.select("#gr-zr-baender button")}
+    knoepfe = {
+        k.get_text(" ", strip=True): k for k in tafel.select("#gr-zr-baender button")
+    }
     # P3-E1: die Knöpfe sind die Stufen der Vodafone-Tarifleiter und
     # nennen ihr Volumen (Testleiter: XS 5 GB, M 36 GB).
-    assert any("5 GB" in text for text in knoepfe), \
+    assert any("5 GB" in text for text in knoepfe), (
         "die Band-Knöpfe nennen kein Datenvolumen"
+    )
     assert any("36 GB" in text for text in knoepfe), knoepfe.keys()

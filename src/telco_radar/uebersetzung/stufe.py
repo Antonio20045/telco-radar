@@ -17,6 +17,7 @@ Und eine dritte, die aus der Natur der Sache kommt: **der Bericht darf nie
 an einer Uebersetzung scheitern.** Jeder Fehler eines einzelnen Artikels
 wird gezaehlt und protokolliert, nie weitergeworfen.
 """
+
 from __future__ import annotations
 
 import logging
@@ -46,8 +47,11 @@ def budget(settings: dict, verstrichen: float) -> float | None:
     """
     if not settings.get("uebersetzung_enabled", True):
         return None
-    rest = (float(settings.get("job_frist_sekunden", 3000)) - verstrichen
-            - float(settings.get("veroeffentlichung_reserve_sekunden", 420)))
+    rest = (
+        float(settings.get("job_frist_sekunden", 3000))
+        - verstrichen
+        - float(settings.get("veroeffentlichung_reserve_sekunden", 420))
+    )
     if rest < MINDESTBUDGET:
         return None
     return min(float(settings.get("uebersetzung_frist_sekunden", 600)), rest)
@@ -78,8 +82,9 @@ def berichtete_items(alle_highlights, by_url: dict) -> list:
     return raus
 
 
-def _kandidaten(items, store: UebersetzungsStore, deckel: int,
-                bilanz: dict | None = None):
+def _kandidaten(
+    items, store: UebersetzungsStore, deckel: int, bilanz: dict | None = None
+):
     """Was ueberhaupt in Frage kommt - vor jedem Abruf und jedem Modellaufruf.
 
     Die Vorauswahl laeuft auf dem, was ohne Netz da ist: Feed-Volltext oder
@@ -116,7 +121,8 @@ def _kandidaten(items, store: UebersetzungsStore, deckel: int,
                 if bilanz is not None:
                     bilanz["vorgefiltert"] += 1
                     bilanz["gruende"][
-                        f"nicht fremdsprachig ({kuerzel or 'unbestimmt'})"] += 1
+                        f"nicht fremdsprachig ({kuerzel or 'unbestimmt'})"
+                    ] += 1
                 continue
             sicher.append(item)
             continue
@@ -129,8 +135,14 @@ def _kandidaten(items, store: UebersetzungsStore, deckel: int,
     return raus
 
 
-def lauf(items, root: Path, settings: dict, modell: str,
-         frist_sekunden: float, heute: date | None = None) -> dict:
+def lauf(
+    items,
+    root: Path,
+    settings: dict,
+    modell: str,
+    frist_sekunden: float,
+    heute: date | None = None,
+) -> dict:
     """Die Stufe. Gibt die Bilanz zurueck, wirft nichts."""
     t0 = time.monotonic()
     heute = heute or date.today()
@@ -153,11 +165,20 @@ def lauf(items, root: Path, settings: dict, modell: str,
     deckel = int(settings.get("uebersetzung_max_je_lauf", 60))
 
     bilanz = {
-        "geprueft": 0, "uebersetzt": 0, "uebersprungen": 0, "gescheitert": 0,
-        "vorgefiltert": 0, "ueber_deckel": 0, "sicher_fremd": 0,
-        "aus_feed": 0, "aus_artikel": 0, "bestand": len(store),
+        "geprueft": 0,
+        "uebersetzt": 0,
+        "uebersprungen": 0,
+        "gescheitert": 0,
+        "vorgefiltert": 0,
+        "ueber_deckel": 0,
+        "sicher_fremd": 0,
+        "aus_feed": 0,
+        "aus_artikel": 0,
+        "bestand": len(store),
         "angeboten": len(items),
-        "gruende": Counter(), "sprachen": Counter(), "sekunden": 0.0,
+        "gruende": Counter(),
+        "sprachen": Counter(),
+        "sekunden": 0.0,
         "frist_erreicht": False,
     }
 
@@ -167,18 +188,27 @@ def lauf(items, root: Path, settings: dict, modell: str,
     # groesser sein kann als die der Kandidaten. Bei 193 berichteten
     # Meldungen und Deckel 40 ist genau das die Zeile, an der sonst niemand
     # mehr ablesen kann, wie viele sichere Treffer wirklich bearbeitet werden.
-    log.info("Uebersetzung: %d berichtete Meldungen -> %d Kandidaten "
-             "(erkannt fremdsprachig insgesamt: %d, ueber dem Deckel %d: %d), "
-             "Bestand %d",
-             len(items), len(kandidaten), bilanz["sicher_fremd"], deckel,
-             bilanz["ueber_deckel"], len(store))
+    log.info(
+        "Uebersetzung: %d berichtete Meldungen -> %d Kandidaten "
+        "(erkannt fremdsprachig insgesamt: %d, ueber dem Deckel %d: %d), "
+        "Bestand %d",
+        len(items),
+        len(kandidaten),
+        bilanz["sicher_fremd"],
+        deckel,
+        bilanz["ueber_deckel"],
+        len(store),
+    )
 
     for item in kandidaten:
         if time.monotonic() - t0 > frist_sekunden:
             bilanz["frist_erreicht"] = True
-            log.warning("Uebersetzung: Frist von %.0fs erreicht, %d "
-                        "Kandidaten nicht mehr bearbeitet.",
-                        frist_sekunden, len(kandidaten) - bilanz["geprueft"])
+            log.warning(
+                "Uebersetzung: Frist von %.0fs erreicht, %d "
+                "Kandidaten nicht mehr bearbeitet.",
+                frist_sekunden,
+                len(kandidaten) - bilanz["geprueft"],
+            )
             break
         bilanz["geprueft"] += 1
         try:
@@ -186,8 +216,7 @@ def lauf(items, root: Path, settings: dict, modell: str,
         except Exception as exc:  # noqa: BLE001 - ein Artikel kostet nie den Lauf
             bilanz["gescheitert"] += 1
             bilanz["gruende"][f"Fehler: {type(exc).__name__}"] += 1
-            log.warning("Uebersetzung fehlgeschlagen (%s): %s",
-                        item.url[:70], exc)
+            log.warning("Uebersetzung fehlgeschlagen (%s): %s", item.url[:70], exc)
 
     if bilanz["uebersetzt"]:
         store.speichern()
@@ -210,8 +239,7 @@ def _einer(item, store, http_cfg, artikelabruf, modell, heute, bilanz) -> None:
     fremd, kuerzel, _ = ist_fremdsprachig(ergebnis.text, item.title)
     if not fremd:
         bilanz["uebersprungen"] += 1
-        bilanz["gruende"][
-            f"nicht fremdsprachig ({kuerzel or 'unbestimmt'})"] += 1
+        bilanz["gruende"][f"nicht fremdsprachig ({kuerzel or 'unbestimmt'})"] += 1
         return
 
     if store.hat_aktuelle(item.id, ergebnis.text):
@@ -219,23 +247,24 @@ def _einer(item, store, http_cfg, artikelabruf, modell, heute, bilanz) -> None:
         bilanz["gruende"]["schon uebersetzt"] += 1
         return
 
-    titel_de, deutsche = uebersetze(ergebnis.text, kuerzel, modell,
-                                    titel=item.title)
-    store.add(Uebersetzung(
-        item_id=item.id,
-        quell_hash=text_hash(ergebnis.text),
-        titel_de=titel_de or item.title,
-        absaetze=deutsche,
-        sprache=kuerzel,
-        titel_original=item.title,
-        url=item.url,
-        quelle=item.source_name,
-        datum=item.published.date().isoformat() if item.published else "",
-        modell=modell,
-        erstellt_am=heute.isoformat(),
-        zeichen_original=len(ergebnis.text),
-        herkunft=ergebnis.herkunft,
-    ))
+    titel_de, deutsche = uebersetze(ergebnis.text, kuerzel, modell, titel=item.title)
+    store.add(
+        Uebersetzung(
+            item_id=item.id,
+            quell_hash=text_hash(ergebnis.text),
+            titel_de=titel_de or item.title,
+            absaetze=deutsche,
+            sprache=kuerzel,
+            titel_original=item.title,
+            url=item.url,
+            quelle=item.source_name,
+            datum=item.published.date().isoformat() if item.published else "",
+            modell=modell,
+            erstellt_am=heute.isoformat(),
+            zeichen_original=len(ergebnis.text),
+            herkunft=ergebnis.herkunft,
+        )
+    )
     item.sprache = kuerzel
     bilanz["uebersetzt"] += 1
     bilanz["sprachen"][kuerzel] += 1
@@ -249,10 +278,12 @@ def protokollzeile(bilanz: dict) -> str:
     fremdsprachig war, ob die Abrufe scheiterten oder ob das Modell
     zusammengefasst hat - und genau diese Frage stellt sich nach dem Lauf.
     """
-    gruende = ", ".join(f"{grund}: {n}" for grund, n
-                        in bilanz["gruende"].most_common(6))
-    sprachen = ", ".join(f"{sprachname(s)} {n}" for s, n
-                         in bilanz["sprachen"].most_common())
+    gruende = ", ".join(
+        f"{grund}: {n}" for grund, n in bilanz["gruende"].most_common(6)
+    )
+    sprachen = ", ".join(
+        f"{sprachname(s)} {n}" for s, n in bilanz["sprachen"].most_common()
+    )
     teile = [
         f"Uebersetzung: {bilanz['uebersetzt']} uebersetzt "
         f"({bilanz['aus_feed']} aus dem Feed, "

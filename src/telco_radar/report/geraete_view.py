@@ -32,6 +32,7 @@ Zuzahlung im Tarifbuendel ist keine vergleichbare Zahl (Teil C4); sie steht
 in der SKU-Matrix mit ihrem Tarif daneben, aber nie als Punkt neben einem
 Ladenpreis.
 """
+
 from __future__ import annotations
 
 import json
@@ -41,13 +42,22 @@ from pathlib import Path
 from typing import Optional
 
 from ..geraete_model import ratenhinweis_aus_eintrag, serie_aus_modell
-from . import (geraete_alarme, geraete_bereinigung, geraete_pruefung,
-               geraete_tco_karten, geraete_tco_view, geraete_vergleich,
-               geraete_verlauf, geraete_zeitreihe)
+from . import (
+    geraete_alarme,
+    geraete_bereinigung,
+    geraete_pruefung,
+    geraete_tco_karten,
+    geraete_tco_view,
+    geraete_vergleich,
+    geraete_verlauf,
+    geraete_zeitreihe,
+)
+
 # MonatNamen der Katalog-Datumsformatierung - keine zweite Tabelle (driftet).
 from .geraete_tco_band import _MONATE, band_label
 from ..analyze import geraete_lifecycle
 from ..analyze.tco_store import TcoDB
+
 # Der Zeitraum der TCO-Spalte und DIE EINE Regel, ob zwei Leitzahlen
 # gegeneinander gestellt werden duerfen (P0-B-h1) - der Katalog leitet
 # beides nicht ab, er liest es.
@@ -187,11 +197,20 @@ SCHWELLE_SKUS = 20
 
 def schwelle_erreicht(anbieter: int, skus: int, hersteller: int) -> bool:
     """Darf die Seite in die Navigation? Eine Stelle, kein zweiter Ort."""
-    return (anbieter >= SCHWELLE_ANBIETER and skus >= SCHWELLE_SKUS
-            and hersteller >= SCHWELLE_HERSTELLER)
+    return (
+        anbieter >= SCHWELLE_ANBIETER
+        and skus >= SCHWELLE_SKUS
+        and hersteller >= SCHWELLE_HERSTELLER
+    )
 
-SEGMENT_LABEL = {"flagship": "Flaggschiff", "premium": "Premium",
-                 "mid": "Mittelklasse", "entry": "Einstieg", "": "ohne Segment"}
+
+SEGMENT_LABEL = {
+    "flagship": "Flaggschiff",
+    "premium": "Premium",
+    "mid": "Mittelklasse",
+    "entry": "Einstieg",
+    "": "ohne Segment",
+}
 
 
 def _ist_eigen(anbieter: str) -> bool:
@@ -201,6 +220,7 @@ def _ist_eigen(anbieter: str) -> bool:
 # --------------------------------------------------------------------------
 # "Was diese Woche auffaellt"
 # --------------------------------------------------------------------------
+
 
 def zahlen_im_text(text: str) -> set:
     """JEDE Zahl eines Satzes, als Vergleichsform.
@@ -320,6 +340,7 @@ def _im_fenster(datum: str, heute: str, tage: int = FENSTER_TAGE) -> bool:
 
 def _tag(wert):
     from datetime import datetime
+
     try:
         return datetime.strptime(str(wert).strip(), "%Y-%m-%d").date()
     except (ValueError, TypeError):
@@ -383,8 +404,7 @@ def _spaeterer_tag(erster: str, zweiter: str) -> str:
 # Sektion stellt die Frage, sie beantwortet sie nicht vorab.
 
 
-def _nachfolger_leer_hinweis(eintraege: list, katalog,
-                             nachfolger: list) -> str:
+def _nachfolger_leer_hinweis(eintraege: list, katalog, nachfolger: list) -> str:
     """Warum "Was der Nachfolger mit dem Preis macht" heute leer ist - und
     wann sie es nicht mehr sein wird. Siehe Kommentar oben.
 
@@ -408,19 +428,22 @@ def _nachfolger_leer_hinweis(eintraege: list, katalog,
     # die an KEINER anderen Stelle der Seite steht.
     abstand = grenze - laengste
     if abstand > 0:
-        dauer_satz = (f"Der Abstand zur nötigen Beobachtungsdauer beträgt "
-                      f"heute noch {abstand} {'Tag' if abstand == 1 else 'Tage'}.")
+        dauer_satz = (
+            f"Der Abstand zur nötigen Beobachtungsdauer beträgt "
+            f"heute noch {abstand} {'Tag' if abstand == 1 else 'Tage'}."
+        )
     else:
-        dauer_satz = ("Die nötige Beobachtungsdauer ist für mindestens eine "
-                      "Listung bereits erreicht.")
+        dauer_satz = (
+            "Die nötige Beobachtungsdauer ist für mindestens eine "
+            "Listung bereits erreicht."
+        )
 
     # Geraete mit einem Nachfolger im Katalog, dem das Marktstart-Datum
     # fehlt - der Beleg gegen "mehr Katalogpflege loest das nicht" (siehe
     # Kommentar oben). Gezaehlt wird je GERAET, nicht je Listung: ein
     # Katalogeintrag fehlt einmal, unabhaengig davon, bei wie vielen
     # Anbietern er beobachtet wird.
-    geraete_ids = sorted({e.get("device_id") for e in eintraege
-                          if e.get("device_id")})
+    geraete_ids = sorted({e.get("device_id") for e in eintraege if e.get("device_id")})
     ohne_datum = 0
     for gid in geraete_ids:
         nf = katalog.nachfolger_von(gid)
@@ -432,7 +455,8 @@ def _nachfolger_leer_hinweis(eintraege: list, katalog,
         zusatz = (
             f" Bei {ohne_datum} {'Gerät fehlt' if ohne_datum == 1 else 'Geräten fehlt'} "
             f"dafür zusätzlich das Marktstart-Datum ihres Nachfolgers im "
-            f"Katalog.")
+            f"Katalog."
+        )
 
     return (
         "Diese Tabelle soll zeigen, wie lange ein Vorjahresmodell nach dem "
@@ -467,15 +491,18 @@ def _mit_beobachtungsbeleg(nachfolger: list) -> list:
     for n in nachfolger:
         beginn = _tag(n.get("beobachtet_seit"))
         ende = _tag(n.get("zuletzt_bestaetigt"))
-        beleg = ((ende - beginn).days
-                 if beginn is not None and ende is not None and ende >= beginn
-                 else None)
+        beleg = (
+            (ende - beginn).days
+            if beginn is not None and ende is not None and ende >= beginn
+            else None
+        )
         ergebnis.append({**n, "beobachtet_tage": beleg})
     return ergebnis
 
 
-def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
-                heute: str, laeufe: int = 0) -> dict:
+def _auffaellig(
+    eintraege: list, historie: Preishistorie, katalog, heute: str, laeufe: int = 0
+) -> dict:
     """Die groessten Bewegungen DIESES Zeitraums - aus den Deltas gerechnet.
 
     DER BEZUG IST DIE MESSUNG, NICHT DER BERICHTSTAG. Der Geraetezweig laeuft
@@ -490,8 +517,9 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
     # ("unbekannt") sortiert lexikalisch hinter jedes ISO-Datum, wuerde
     # Bezugstag und liesse `_im_fenster` fuer ALLES falsch werden - die
     # ganze Sektion verschwaende lautlos.
-    juengste = sorted(d for d in (_tag(p.get("datum"))
-                                  for p in historie.alle_punkte()) if d)
+    juengste = sorted(
+        d for d in (_tag(p.get("datum")) for p in historie.alle_punkte()) if d
+    )
     bezug = _tag(heute)
     if juengste and (bezug is None or juengste[-1] > bezug):
         heute = juengste[-1].isoformat()
@@ -507,24 +535,30 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
         if alt is None or neu is None or alt == 0 or alt == neu:
             continue
         g = katalog.nach_id(e.get("device_id"))
-        bewegungen.append({
-            "modell": g.modell if g else e.get("device_id"),
-            "anbieter": e.get("anbieter"),
-            "von": alt, "auf": neu,
-            "delta": round(neu - alt, 2),
-            "prozent": round((neu - alt) / alt * 100.0, 1),
-            "datum": reihe[-1].get("datum", ""),
-            "url": e.get("quelle_url", ""),
-        })
+        bewegungen.append(
+            {
+                "modell": g.modell if g else e.get("device_id"),
+                "anbieter": e.get("anbieter"),
+                "von": alt,
+                "auf": neu,
+                "delta": round(neu - alt, 2),
+                "prozent": round((neu - alt) / alt * 100.0, 1),
+                "datum": reihe[-1].get("datum", ""),
+                "url": e.get("quelle_url", ""),
+            }
+        )
     bewegungen.sort(key=lambda b: -abs(b["delta"]))
 
     # Ein Fenster, kein Stichtag. Der naechtliche Lauf schreibt an sechs von
     # sieben Tagen ein Datum, das nie ein Renderdatum ist - mit `== heute`
     # tauchte nur auf, was der Bericht selbst gefunden hat.
     neu_gelistet = [e for e in eintraege if _im_fenster(e.get("first_seen", ""), heute)]
-    verschwunden = [e for e in eintraege
-                    if e.get("status") == STATUS_AUSGELISTET
-                    and _im_fenster(e.get("ended_since", ""), heute)]
+    verschwunden = [
+        e
+        for e in eintraege
+        if e.get("status") == STATUS_AUSGELISTET
+        and _im_fenster(e.get("ended_since", ""), heute)
+    ]
 
     # W3 (29.08.2026): die Karte sagte "267 Geraete neu im Regal", waehrend
     # die Seite daneben 59 beobachtete Geraete auswies. Gezaehlt wurden
@@ -541,8 +575,15 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
     for b in bewegungen:
         erlaubt.update({abs(b["delta"]), b["von"], b["auf"], abs(b["prozent"])})
         erlaubt |= zahlen_der_namen(b["modell"], b["anbieter"])
-    erlaubt.update({len(neu_gelistet), len(verschwunden), len(bewegungen),
-                    len(neu_geraete), len(weg_geraete)})
+    erlaubt.update(
+        {
+            len(neu_gelistet),
+            len(verschwunden),
+            len(bewegungen),
+            len(neu_geraete),
+            len(weg_geraete),
+        }
+    )
 
     # Gibt es ueberhaupt einen Vorlauf zum Vergleichen? Dann zeigt die Karte,
     # was neu ERFASST wurde, und sagt das auch so - "keine Auffaelligkeiten"
@@ -562,8 +603,9 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
     # ganzen Sektion nicht.
     seit = juengste[0] if juengste else None
     bezug_tag = _tag(heute)
-    vorlauf_tage = ((bezug_tag - seit).days
-                    if seit and bezug_tag and bezug_tag >= seit else 0)
+    vorlauf_tage = (
+        (bezug_tag - seit).days if seit and bezug_tag and bezug_tag >= seit else 0
+    )
     kurzer_vorlauf = vorlauf_tage < VORLAUF_TAGE
 
     # DREI LAGEN, NICHT ZWEI - und die erste ist nicht die zweite.
@@ -586,14 +628,18 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
     if ohne_vorlauf:
         for b in bewegungen[:5]:
             richtung = "günstiger" if b["delta"] < 0 else "teurer"
-            saetze.append(f"{b['modell']} bei {b['anbieter']}: "
-                          f"{euro(abs(b['delta']))} {richtung} "
-                          f"({euro(b['von'])} auf {euro(b['auf'])}).")
+            saetze.append(
+                f"{b['modell']} bei {b['anbieter']}: "
+                f"{euro(abs(b['delta']))} {richtung} "
+                f"({euro(b['von'])} auf {euro(b['auf'])})."
+            )
         if neu_geraete:
-            saetze.append(f"{len(neu_geraete)} Gerät"
-                          f"{'e' if len(neu_geraete) != 1 else ''} erstmals "
-                          f"erfasst – es gibt noch keinen früheren Stand, gegen "
-                          f"den sich vergleichen ließe.")
+            saetze.append(
+                f"{len(neu_geraete)} Gerät"
+                f"{'e' if len(neu_geraete) != 1 else ''} erstmals "
+                f"erfasst – es gibt noch keinen früheren Stand, gegen "
+                f"den sich vergleichen ließe."
+            )
     elif kurzer_vorlauf and (neu_geraete or bewegungen or weg_geraete):
         # EIN SATZ STATT EINER TABELLE.
         #
@@ -613,19 +659,24 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
         wieviel = len(neu_geraete)
         # "4.8.", nicht "4.08." - dieselbe Schreibweise wie `tagDE` in
         # app.js und wie die Chronik der Wettbewerbsseite ("7.8.").
-        kopf = (f"Seit dem {seit.day}.{seit.month}. " if seit else "Bisher ")
-        satz = (f"{kopf}{'wurde' if wieviel == 1 else 'wurden'} {wieviel} "
-                f"Gerät{'' if wieviel == 1 else 'e'} erstmals erfasst; ")
+        kopf = f"Seit dem {seit.day}.{seit.month}. " if seit else "Bisher "
+        satz = (
+            f"{kopf}{'wurde' if wieviel == 1 else 'wurden'} {wieviel} "
+            f"Gerät{'' if wieviel == 1 else 'e'} erstmals erfasst; "
+        )
         if not bewegungen:
             satz += "eine Preisänderung ist dabei nicht aufgefallen."
         else:
-            teile = [f"{b['modell']} bei {b['anbieter']}, "
-                     f"{euro(b['von'])} → {euro(b['auf'])}"
-                     for b in bewegungen[:3]]
-            wieviele = ("eine Preisänderung ist aufgefallen"
-                        if len(bewegungen) == 1
-                        else f"{len(bewegungen)} Preisänderungen sind "
-                             f"aufgefallen")
+            teile = [
+                f"{b['modell']} bei {b['anbieter']}, "
+                f"{euro(b['von'])} → {euro(b['auf'])}"
+                for b in bewegungen[:3]
+            ]
+            wieviele = (
+                "eine Preisänderung ist aufgefallen"
+                if len(bewegungen) == 1
+                else f"{len(bewegungen)} Preisänderungen sind aufgefallen"
+            )
             satz += wieviele + ": " + "; ".join(teile)
             if len(bewegungen) > 3:
                 # DIE RESTZAHL MUSS ANGEMELDET SEIN. Sie ist gerechnet
@@ -651,19 +702,26 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
                 f"{len(weg_geraete)} "
                 f"Gerät{'' if len(weg_geraete) == 1 else 'e'} "
                 f"{'ist' if len(weg_geraete) == 1 else 'sind'} aus dem "
-                f"Portfolio gefallen.")
+                f"Portfolio gefallen."
+            )
     else:
         for b in bewegungen[:5]:
             richtung = "günstiger" if b["delta"] < 0 else "teurer"
-            saetze.append(f"{b['modell']} bei {b['anbieter']}: "
-                          f"{euro(abs(b['delta']))} {richtung} "
-                          f"({euro(b['von'])} auf {euro(b['auf'])}).")
+            saetze.append(
+                f"{b['modell']} bei {b['anbieter']}: "
+                f"{euro(abs(b['delta']))} {richtung} "
+                f"({euro(b['von'])} auf {euro(b['auf'])})."
+            )
         if neu_geraete:
-            saetze.append(f"{len(neu_geraete)} Gerät{'e' if len(neu_geraete) != 1 else ''} "
-                          f"neu im Regal.")
+            saetze.append(
+                f"{len(neu_geraete)} Gerät{'e' if len(neu_geraete) != 1 else ''} "
+                f"neu im Regal."
+            )
         if weg_geraete:
-            saetze.append(f"{len(weg_geraete)} Gerät{'e' if len(weg_geraete) != 1 else ''} "
-                          f"aus dem Portfolio gefallen.")
+            saetze.append(
+                f"{len(weg_geraete)} Gerät{'e' if len(weg_geraete) != 1 else ''} "
+                f"aus dem Portfolio gefallen."
+            )
 
     # Das Datum im Kopfsatz ist so wenig eine Behauptung ueber den Markt wie
     # ein Eigenname - aber der Waechter prueft JEDE Zahl, und ohne diese
@@ -678,8 +736,10 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
     # Editor davor, schon.
     geprueft = [s for s in saetze if pruefe_zahlen(s, erlaubt)]
     if len(geprueft) != len(saetze):
-        log.warning("Geraeteradar: %d Satz/Saetze mit ungedeckten Zahlen "
-                    "verworfen", len(saetze) - len(geprueft))
+        log.warning(
+            "Geraeteradar: %d Satz/Saetze mit ungedeckten Zahlen verworfen",
+            len(saetze) - len(geprueft),
+        )
 
     return {
         "saetze": geprueft,
@@ -693,16 +753,30 @@ def _auffaellig(eintraege: list, historie: Preishistorie, katalog,
         # sieben Spaltenkoepfe liest, um eine Zahl zu finden. Die Bewegungen
         # sind nicht verloren: sie stehen ausgeschrieben im Satz.
         "bewegungen": [] if kurzer_vorlauf else bewegungen[:12],
-        "neu": [{"modell": (katalog.nach_id(e.get("device_id")).modell
-                            if katalog.nach_id(e.get("device_id"))
-                            else e.get("device_id")),
-                 "anbieter": e.get("anbieter"), "url": e.get("quelle_url", "")}
-                for e in neu_gelistet[:12]],
-        "weg": [{"modell": (katalog.nach_id(e.get("device_id")).modell
-                            if katalog.nach_id(e.get("device_id"))
-                            else e.get("device_id")),
-                 "anbieter": e.get("anbieter"), "seit": e.get("ended_since", "")}
-                for e in verschwunden[:12]],
+        "neu": [
+            {
+                "modell": (
+                    katalog.nach_id(e.get("device_id")).modell
+                    if katalog.nach_id(e.get("device_id"))
+                    else e.get("device_id")
+                ),
+                "anbieter": e.get("anbieter"),
+                "url": e.get("quelle_url", ""),
+            }
+            for e in neu_gelistet[:12]
+        ],
+        "weg": [
+            {
+                "modell": (
+                    katalog.nach_id(e.get("device_id")).modell
+                    if katalog.nach_id(e.get("device_id"))
+                    else e.get("device_id")
+                ),
+                "anbieter": e.get("anbieter"),
+                "seit": e.get("ended_since", ""),
+            }
+            for e in verschwunden[:12]
+        ],
         # AN DAS, WAS WIRKLICH AUF DIE SEITE KOMMT. `bewegungen` ist die
         # lokale, ungefilterte Liste; im kurzen Vorlauf wird sie oben auf
         # [] gesetzt, und `geprueft` kann der Zahlenwaechter leeren. Beides
@@ -784,8 +858,12 @@ def _katalog_zeile_schluessel(z: dict):
     gleichem Schluessel die EINGABEreihenfolge beibehaelt und die haengt in
     Produktion an der Satzfolge in `geraete_db.json`.
     """
-    return (0 if z["zustand"] == "neu" else 1, _katalog_betrag(z),
-            z["anbieter"] or "", z["farbe"] or "")
+    return (
+        0 if z["zustand"] == "neu" else 1,
+        _katalog_betrag(z),
+        z["anbieter"] or "",
+        z["farbe"] or "",
+    )
 
 
 def _katalog_block_schluessel(block: dict):
@@ -799,9 +877,14 @@ def _katalog_block_schluessel(block: dict):
     dort ist sie eine echte Zahl (Galaxy S26 vor Galaxy S25).
     """
     gen = block["generation"]
-    return (_katalog_segment_rang(block["segment"]), block["serie"] or "",
-            0 if gen is not None else 1, -(gen or 0), block["modell"] or "",
-            block["speicher"] or 0)
+    return (
+        _katalog_segment_rang(block["segment"]),
+        block["serie"] or "",
+        0 if gen is not None else 1,
+        -(gen or 0),
+        block["modell"] or "",
+        block["speicher"] or 0,
+    )
 
 
 def _katalog_zeile(e: dict, katalog) -> dict:
@@ -903,11 +986,13 @@ TCO_LEER_ANDERE_LAUFZEIT = f"kein Bündel über {TCO_HORIZONT} Monate"
 TCO_DELTA_LEER_KEINE_REFERENZ = "keine Referenz"
 TCO_DELTA_GRUND_KEINE_REFERENZ = (
     "Vodafone listet dieses Modell nicht - deshalb ist kein Abstand "
-    "berechenbar (die Referenz fehlt)")
+    "berechenbar (die Referenz fehlt)"
+)
 TCO_DELTA_LEER_KEIN_WETTBEWERBER = "kein Wettbewerber-Angebot"
 TCO_DELTA_GRUND_KEIN_WETTBEWERBER = (
     "Vodafone listet dieses Modell, aber kein Wettbewerber-Angebot ist "
-    "vergleichbar erhoben - deshalb ist kein Abstand berechenbar")
+    "vergleichbar erhoben - deshalb ist kein Abstand berechenbar"
+)
 # P0-B-h2: der dritte Stumme dieser Zelle war der STRICH - und der heisst
 # auf dieser Seite "kein Angebot" (A2). Ein Wettbewerber-Angebot, dessen
 # Leitzahl einen anderen Zeitraum traegt als die Referenz, ist kein
@@ -923,7 +1008,8 @@ TCO_DELTA_GRUND_KEIN_WETTBEWERBER = (
 # mitbringt - stumm bleibt die Zelle nie (harte Regel 9).
 TCO_DELTA_GRUND_ANDERE_LAUFZEIT = (
     "Das günstigste Wettbewerber-Angebot trägt einen anderen Zeitraum als "
-    "die Vodafone-Referenz - über zwei Laufzeiten gibt es keinen Abstand")
+    "die Vodafone-Referenz - über zwei Laufzeiten gibt es keinen Abstand"
+)
 # Der vierte Stumme, beim Messen von P0-B-h2 gefunden: die Referenz
 # EXISTIERT, ist aber nicht aktuell erhoben - `geraete_tco_karten.modelle`
 # gibt sie dann keiner Karte als Massstab (S2-1), und keine Karte des
@@ -935,19 +1021,21 @@ TCO_DELTA_GRUND_ANDERE_LAUFZEIT = (
 TCO_DELTA_LEER_ALTE_REFERENZ = "kein aktueller Referenz-Stand"
 TCO_DELTA_GRUND_ALTE_REFERENZ = (
     "Die Vodafone-Referenz ist nicht aktuell erhoben - ein Abstand gegen "
-    "sie wäre kein Abstand von heute")
+    "sie wäre kein Abstand von heute"
+)
 # Die zweite Wand (S3c): ein Traeger MIT dem Zeitraum der Spalte, dem
 # trotzdem kein Abstand anhaengt. Nach dem Filter unten kann das nicht
 # mehr vorkommen - und WENN doch, steht der Zustand als Wort in der Zelle
 # und nicht als Strich.
 TCO_DELTA_LEER_UNBESTIMMT = "Abstand unbestimmt"
 TCO_DELTA_GRUND_UNBESTIMMT = (
-    "Zu diesem Wettbewerber-Angebot ist kein Abstand zur Vodafone-Referenz "
-    "gerechnet")
+    "Zu diesem Wettbewerber-Angebot ist kein Abstand zur Vodafone-Referenz gerechnet"
+)
 
 
-def _buendel_je_anbieter_modell(buendel: list, eintraege: list, katalog
-                                ) -> tuple[dict, dict]:
+def _buendel_je_anbieter_modell(
+    buendel: list, eintraege: list, katalog
+) -> tuple[dict, dict]:
     """Zwei Lesarten derselben Bündel-Aufloesung.
 
     1. `(Anbieter, modell_schluessel) -> das guenstigste Bündel mit
@@ -977,9 +1065,9 @@ def _buendel_je_anbieter_modell(buendel: list, eintraege: list, katalog
         sku = e.get("sku_id") or ""
         if sku:
             modell_je_sku[sku] = geraete_tco_karten.modell_schluessel(
-                e.get("device_id"), e.get("speicher_gb"))
-            geraet_je_sku[sku] = (e.get("device_id") or "",
-                                  e.get("speicher_gb"))
+                e.get("device_id"), e.get("speicher_gb")
+            )
+            geraet_je_sku[sku] = (e.get("device_id") or "", e.get("speicher_gb"))
     beste: dict = {}
     geraet_je_mid: dict[str, dict] = {}
     for b in buendel or []:
@@ -996,8 +1084,7 @@ def _buendel_je_anbieter_modell(buendel: list, eintraege: list, katalog
         # SKU eine Listung hat: `hat_buendel` der Katalog-Zeile haengt an
         # dieser Menge (iPhone 18 am 17.09.: 58 Listungen UND 105 Bündel
         # auf denselben SKUs, unter der Auto-Messtag-Schwelle der Wahl).
-        geraet_je_mid.setdefault(mid, {"device_id": geraet[0],
-                                       "speicher": geraet[1]})
+        geraet_je_mid.setdefault(mid, {"device_id": geraet[0], "speicher": geraet[1]})
         monat = b.get("buendel_monatlich")
         if monat is None:
             tarif, rate = b.get("tarif_monatlich"), b.get("geraet_monatsrate")
@@ -1005,8 +1092,7 @@ def _buendel_je_anbieter_modell(buendel: list, eintraege: list, katalog
                 continue
             monat = round(float(tarif) + float(rate), 2)
         monat = float(monat)
-        schluessel = (geraete_tco_karten.normalisiere(b.get("anbieter", "")),
-                      mid)
+        schluessel = (geraete_tco_karten.normalisiere(b.get("anbieter", "")), mid)
         bisher = beste.get(schluessel)
         if bisher is None or monat < bisher["monat"]:
             beste[schluessel] = {
@@ -1041,14 +1127,16 @@ def _buendel_aus_listungen(eintraege: list) -> list[dict]:
         monat = e.get("preis_mit_vertrag_ab")
         if monat is None:
             continue
-        saetze.append({
-            "sku_id": e.get("sku_id") or "",
-            "anbieter": e.get("anbieter") or "",
-            "buendel_monatlich": monat,
-            "tarif_name": (e.get("tarif_referenz") or "").strip(),
-            "quelle_url": e.get("quelle_url") or "",
-            "abgerufen_am": e.get("abgerufen_am") or "",
-        })
+        saetze.append(
+            {
+                "sku_id": e.get("sku_id") or "",
+                "anbieter": e.get("anbieter") or "",
+                "buendel_monatlich": monat,
+                "tarif_name": (e.get("tarif_referenz") or "").strip(),
+                "quelle_url": e.get("quelle_url") or "",
+                "abgerufen_am": e.get("abgerufen_am") or "",
+            }
+        )
     return saetze
 
 
@@ -1091,13 +1179,25 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
     Worte wie die Buendelzeile derselben Karte, und das ganze Buendel
     steht mit eigenem Etikett in der Vergleichsansicht.
     """
-    leer_delta = {"tco_delta": None, "tco_delta_prozent": None,
-                  "tco_delta_kurz": None, "tco_delta_anbieter": None,
-                  "tco_delta_leer": None, "tco_delta_leer_grund": None}
+    leer_delta = {
+        "tco_delta": None,
+        "tco_delta_prozent": None,
+        "tco_delta_kurz": None,
+        "tco_delta_anbieter": None,
+        "tco_delta_leer": None,
+        "tco_delta_leer_grund": None,
+    }
     if not modell_tco:
-        return {"tco_ab": None, "tco_anbieter": None, "tco_monat": None,
-                "tco_band": None, "tco_band_label": "", "tco_beleg": None,
-                "tco_leer": TCO_LEER_KEIN_BUNDEL, **leer_delta}
+        return {
+            "tco_ab": None,
+            "tco_anbieter": None,
+            "tco_monat": None,
+            "tco_band": None,
+            "tco_band_label": "",
+            "tco_beleg": None,
+            "tco_leer": TCO_LEER_KEIN_BUNDEL,
+            **leer_delta,
+        }
     # A3: NUR FRISCHE Karten stellen die Spalte (`frisch`, dieselbe
     # Definition wie die Tafel - Clean Code 7). Der Pool OHNE die
     # Frische entscheidet danach, ob die Lücke "kein vergleichbares
@@ -1105,9 +1205,14 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
     # der die andere ABGELEITET ist (S3e, Diff-Prüfung 21.09.2026): zwei
     # nebeneinander geschriebene Listen mit denselben Feldern driften
     # auseinander, sobald eine ein Feld mehr bekommt.
-    pool = [k for k in modell_tco.get("karten") or []
-            if k.get("vergleichbar") and k.get("belastbar")
-            and not k.get("naeherung") and k.get("gesamt") is not None]
+    pool = [
+        k
+        for k in modell_tco.get("karten") or []
+        if k.get("vergleichbar")
+        and k.get("belastbar")
+        and not k.get("naeherung")
+        and k.get("gesamt") is not None
+    ]
     kandidaten = [k for k in pool if k.get("frisch", True)]
     if not kandidaten:
         # Ein Bündel ohne vergleichbare Karte ist KEIN "kein Bündel": das
@@ -1117,10 +1222,17 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
         # Angabe" gegen "nicht gemessen" bei den Tarifen. Und seit A3 ein
         # dritter: alles da, nur alt - dann heißt die Lücke beim Stand,
         # nicht beim Bestand.
-        leer = (TCO_LEER_NUR_ALT if pool else TCO_LEER_KEIN_VERGLEICHBARES)
-        return {"tco_ab": None, "tco_anbieter": None, "tco_monat": None,
-                "tco_band": None, "tco_band_label": "", "tco_beleg": None,
-                "tco_leer": leer, **leer_delta}
+        leer = TCO_LEER_NUR_ALT if pool else TCO_LEER_KEIN_VERGLEICHBARES
+        return {
+            "tco_ab": None,
+            "tco_anbieter": None,
+            "tco_monat": None,
+            "tco_band": None,
+            "tco_band_label": "",
+            "tco_beleg": None,
+            "tco_leer": leer,
+            **leer_delta,
+        }
     # DER ZEITRAUM DER SPALTE (P0-B-h2). Hier stand der Kommentar "ein
     # Filter auf `karte['laufzeit'] == 24` ist bewusst NICHT gebaut ...
     # wird `laufzeit` je wieder variabel, MUSS an dieser Stelle auf 24
@@ -1132,33 +1244,46 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
     # mit der EINEN Vergleichsregel des Projekts
     # (`tco_model.zeitraum_vergleichbar`): ein unbekannter Zeitraum ist
     # NIE gleich und faellt heraus, statt als 24 zu gelten.
-    vergleichbare = [k for k in kandidaten
-                     if zeitraum_vergleichbar(k.get("leitzahl_monate"),
-                                              TCO_HORIZONT)]
+    vergleichbare = [
+        k
+        for k in kandidaten
+        if zeitraum_vergleichbar(k.get("leitzahl_monate"), TCO_HORIZONT)
+    ]
     if not vergleichbare:
         # Gemessene, aktuelle Buendel - aber keines ueber den Zeitraum
         # dieser Spalte (8 Modelle am 21.09.2026, alle nur mit einem
         # 1&1-Buendel ueber 36 Monate). Die Zahl steht mit ihrem eigenen
         # Etikett in der Vergleichsansicht; HIER waere sie eine
         # 36-Monats-Summe unter einem 24-Monats-Kopf.
-        return {"tco_ab": None, "tco_anbieter": None, "tco_monat": None,
-                "tco_band": None, "tco_band_label": "", "tco_beleg": None,
-                "tco_leer": TCO_LEER_ANDERE_LAUFZEIT, **leer_delta}
+        return {
+            "tco_ab": None,
+            "tco_anbieter": None,
+            "tco_monat": None,
+            "tco_band": None,
+            "tco_band_label": "",
+            "tco_beleg": None,
+            "tco_leer": TCO_LEER_ANDERE_LAUFZEIT,
+            **leer_delta,
+        }
     bester = min(vergleichbare, key=lambda k: k["gesamt"])
     # Der TRAEGER des Abstands: das guenstigste FREMDE Angebot. Nur wo
     # der Wettbewerb selbst fuehrt, ist der Traeger zugleich das beste
     # Angebot - dann sind Leitzahl und Abstand eine Karte wie bisher.
     fremde = [k for k in vergleichbare if not k.get("eigen")]
-    traeger = bester if not bester.get("eigen") else (
-        min(fremde, key=lambda k: k["gesamt"]) if fremde else None)
+    traeger = (
+        bester
+        if not bester.get("eigen")
+        else (min(fremde, key=lambda k: k["gesamt"]) if fremde else None)
+    )
     # Die fremden Angebote, die der Zeitraum der Spalte ausschliesst -
     # aus DERSELBEN Kandidatenmenge, nur die andere Seite des Filters
     # (Clean Code 7: eine Definition, zwei Lesarten). Sie sind der Grund,
     # aus dem die Δ-Zelle leer bleibt, und deshalb steht ihr Zustand
     # darin statt eines Strichs.
     im_zeitraum = {id(k) for k in vergleichbare}
-    andere_laufzeit = [k for k in kandidaten
-                       if not k.get("eigen") and id(k) not in im_zeitraum]
+    andere_laufzeit = [
+        k for k in kandidaten if not k.get("eigen") and id(k) not in im_zeitraum
+    ]
     referenz = modell_tco.get("referenz")
     if traeger is not None and traeger.get("delta_kurz"):
         delta_leer, delta_leer_grund = None, None
@@ -1186,12 +1311,11 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
         # die Buendelzeile beschriftet (`geraete_tco_karten.delta_zustand`)
         # - zwei Formulierungen fuer denselben Zustand waeren zwei
         # Zustaende.
-        zustand = (min(andere_laufzeit, key=lambda k: k["gesamt"])
-                   .get("delta_zustand") or {})
-        delta_leer = (zustand.get("kurz")
-                      or geraete_tco_karten.DELTA_ANDERE_LAUFZEIT)
-        delta_leer_grund = (zustand.get("satz")
-                            or TCO_DELTA_GRUND_ANDERE_LAUFZEIT)
+        zustand = (
+            min(andere_laufzeit, key=lambda k: k["gesamt"]).get("delta_zustand") or {}
+        )
+        delta_leer = zustand.get("kurz") or geraete_tco_karten.DELTA_ANDERE_LAUFZEIT
+        delta_leer_grund = zustand.get("satz") or TCO_DELTA_GRUND_ANDERE_LAUFZEIT
     elif traeger is None:
         # Vodafone fuehrt, und KEIN Wettbewerber ist vergleichbar erhoben
         # (4 Zeilen des Bestands am 20.09.) - die Referenz existiert, die
@@ -1219,17 +1343,21 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
         "tco_delta_kurz": (traeger or {}).get("delta_kurz"),
         # Der Traeger des Abstands, wo er ein ANDERES Angebot ist als das
         # der Leitzahl - der title der Zelle nennt ihn.
-        "tco_delta_anbieter": (traeger.get("anbieter")
-                               if bester.get("eigen") and traeger is not None
-                               else None),
+        "tco_delta_anbieter": (
+            traeger.get("anbieter")
+            if bester.get("eigen") and traeger is not None
+            else None
+        ),
         "tco_delta_leer": delta_leer,
         "tco_delta_leer_grund": delta_leer_grund,
         "tco_band": bester.get("band"),
         # Der Name der Stufe ("XS") aus derselben Ableitung wie Chip und
         # Export - die Vorlage formatiert ihn nicht selbst.
         "tco_band_label": band_label(bester.get("band")),
-        "tco_beleg": {"quelle_url": bester.get("quelle_url", ""),
-                      "abgerufen_am": bester.get("abgerufen_am", "")},
+        "tco_beleg": {
+            "quelle_url": bester.get("quelle_url", ""),
+            "abgerufen_am": bester.get("abgerufen_am", ""),
+        },
         "tco_leer": None,
     }
 
@@ -1249,8 +1377,10 @@ def _interleave_modelle_je_hersteller(modelle: list) -> list:
     gruppen: dict[str, list] = {}
     for m in modelle:
         gruppen.setdefault(m["hersteller"] or "", []).append(m)
-    geordnet = [sorted(gruppen[h], key=_katalog_block_schluessel)
-                for h in sorted(gruppen, key=lambda h: (h == "", h))]
+    geordnet = [
+        sorted(gruppen[h], key=_katalog_block_schluessel)
+        for h in sorted(gruppen, key=lambda h: (h == "", h))
+    ]
     ergebnis: list = []
     for runde in zip_longest(*geordnet):
         ergebnis.extend(m for m in runde if m is not None)
@@ -1267,14 +1397,24 @@ def katalog_leitzahl(katalog_modelle: list) -> float | None:
     heute", und dafuer reicht kein Abruf, der aelter ist als jeder
     Leser-Rhythmus (`geraete_tco_karten.ALT_AB_TAGEN`).
     """
-    return min((m["ab_preis"] for m in katalog_modelle
-                if m.get("ab_preis") is not None
-                and not m.get("ab_alt")), default=None)
+    return min(
+        (
+            m["ab_preis"]
+            for m in katalog_modelle
+            if m.get("ab_preis") is not None and not m.get("ab_alt")
+        ),
+        default=None,
+    )
 
 
-def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
-                         buendel=None, zr_erlaubt: dict | None = None,
-                         heute: str = "") -> list[dict]:
+def katalog_modellzeilen(
+    eintraege: list,
+    katalog,
+    tco_modelle=None,
+    buendel=None,
+    zr_erlaubt: dict | None = None,
+    heute: str = "",
+) -> list[dict]:
     """Der Katalog auf MODELL-Ebene: eine Zeile je (Geraet, Speicher).
 
     P3 (Strategie Geraete v3, 17.09.2026), Antonios Forderung 5 und 6: der
@@ -1337,7 +1477,8 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
     """
     belege = geraete_tco_karten.barpreise(eintraege)
     buendel_je, buendel_geraete = _buendel_je_anbieter_modell(
-        buendel, eintraege, katalog)
+        buendel, eintraege, katalog
+    )
     tco_je_id = {m.get("id"): m for m in (tco_modelle or [])}
 
     # Schritt 1: Listungszeilen (dieselbe Bauform wie Reiter 2) je Modell
@@ -1346,15 +1487,23 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
     gruppen: dict[str, dict] = {}
     for e in eintraege:
         zeile = _katalog_zeile(e, katalog)
-        mid = geraete_tco_karten.modell_schluessel(e.get("device_id"),
-                                                   e.get("speicher_gb"))
+        mid = geraete_tco_karten.modell_schluessel(
+            e.get("device_id"), e.get("speicher_gb")
+        )
         g = gruppen.get(mid)
         if g is None:
-            g = {"schluessel": mid, "device_id": e.get("device_id") or "",
-                 "modell": zeile["modell"], "hersteller": zeile["hersteller"],
-                 "generation": zeile["generation"], "serie": zeile["serie"],
-                 "segment": zeile["segment"], "speicher": zeile["speicher"],
-                 "eintraege": [], "zeilen": []}
+            g = {
+                "schluessel": mid,
+                "device_id": e.get("device_id") or "",
+                "modell": zeile["modell"],
+                "hersteller": zeile["hersteller"],
+                "generation": zeile["generation"],
+                "serie": zeile["serie"],
+                "segment": zeile["segment"],
+                "speicher": zeile["speicher"],
+                "eintraege": [],
+                "zeilen": [],
+            }
             gruppen[mid] = g
         g["eintraege"].append(e)
         g["zeilen"].append(zeile)
@@ -1377,14 +1526,17 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
             continue
         g = katalog.nach_id(geraet["device_id"]) if katalog else None
         gruppen[mid] = {
-            "schluessel": mid, "device_id": geraet["device_id"],
+            "schluessel": mid,
+            "device_id": geraet["device_id"],
             "modell": g.modell if g else geraet["device_id"],
             "hersteller": g.hersteller if g else "",
             "generation": g.generation if g else None,
             "serie": serie_aus_modell(g.modell) if g else "",
             "segment": g.segment if g else "",
             "speicher": geraet["speicher"],
-            "eintraege": [], "zeilen": []}
+            "eintraege": [],
+            "zeilen": [],
+        }
 
     ergebnis = []
     for mid, gruppe in gruppen.items():
@@ -1409,16 +1561,18 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
         for e in eintraege_modell:
             sku = e.get("sku_id") or ""
             for anbieter, beleg in belege.get(sku, {}).items():
-                ziel = (je_anbieter_alt
-                        if not geraete_tco_karten.ist_frisch(
-                            beleg.get("abgerufen_am", ""), heute)
-                        else je_anbieter)
+                ziel = (
+                    je_anbieter_alt
+                    if not geraete_tco_karten.ist_frisch(
+                        beleg.get("abgerufen_am", ""), heute
+                    )
+                    else je_anbieter
+                )
                 bisher = ziel.get(anbieter)
                 if bisher is None or beleg["betrag"] < bisher["betrag"]:
                     ziel[anbieter] = beleg
         auswahl = je_anbieter or je_anbieter_alt
-        ab_beleg = (min(auswahl.values(), key=lambda b: b["betrag"])
-                    if auswahl else None)
+        ab_beleg = min(auswahl.values(), key=lambda b: b["betrag"]) if auswahl else None
         # Der benannte Zustand "nichts aktuelles, aber ein letzter Stand":
         # die Vorlage graut den ab-Preis aus und haengt die Marke daran
         # (`geraete_tco_karten.alt_marke_fuer` - derselbe Satz wie an der
@@ -1437,10 +1591,9 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
             betraege = [b["betrag"] for b in auswahl.values()]
             von, bis = min(betraege), max(betraege)
             abstand = bis - von
-            if (abstand >= geraete_vergleich.WESENTLICH_EURO
-                    or (von > 0
-                        and abstand / von * 100 >=
-                        geraete_vergleich.WESENTLICH_PROZENT)):
+            if abstand >= geraete_vergleich.WESENTLICH_EURO or (
+                von > 0 and abstand / von * 100 >= geraete_vergleich.WESENTLICH_PROZENT
+            ):
                 spanne = [round(von, 2), round(bis, 2)]
 
         # Schritt 4: die Bündel-Angabe an den Zeilen OHNE Preis (die 37
@@ -1452,7 +1605,8 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
             if z["preis"] is not None or z["zuzahlung"] is not None:
                 continue
             treffer = buendel_je.get(
-                (geraete_tco_karten.normalisiere(z["anbieter"] or ""), mid))
+                (geraete_tco_karten.normalisiere(z["anbieter"] or ""), mid)
+            )
             if treffer is None:
                 continue
             z["buendel_monat"] = treffer["monat"]
@@ -1470,10 +1624,11 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
         # dem Bündel-Store desselben Modells.
         buendel_angabe = None
         if ab_beleg is None:
-            pool = (list(anbieter_mit_buendel.values())
-                    if anbieter_mit_buendel
-                    else [v for (_, m), v in buendel_je.items()
-                          if m == mid])
+            pool = (
+                list(anbieter_mit_buendel.values())
+                if anbieter_mit_buendel
+                else [v for (_, m), v in buendel_je.items() if m == mid]
+            )
             if pool:
                 buendel_angabe = min(pool, key=lambda b: b["monat"])
 
@@ -1489,69 +1644,78 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
         # Die Händler-Spalte zaehlt, WER das Geraet fuehrt. Ohne Listung
         # (P5-Auftrag 1) sind das die Bündel-Anbieter - "0 Händler" neben
         # "nur im Bündel bei congstar" widerspraeche der eigenen Zelle.
-        listen_anbieter = sorted({z["anbieter"] for z in zeilen
-                                  if z["anbieter"]})
+        listen_anbieter = sorted({z["anbieter"] for z in zeilen if z["anbieter"]})
         if not listen_anbieter:
-            listen_anbieter = sorted({v["anbieter"]
-                                      for (_, m), v in buendel_je.items()
-                                      if m == mid})
+            listen_anbieter = sorted(
+                {v["anbieter"] for (_, m), v in buendel_je.items() if m == mid}
+            )
 
-        ergebnis.append({
-            "schluessel": mid,
-            # P4 Schritt 2c: trifft der Graph-Sprung der Zeitreihe dieses
-            # Modell? (Siehe Docstring zu `zr_erlaubt` - gelesen, nie
-            # nachgerechnet.) Das Feld ist Teil des EINEN Schluesselraums:
-            # Katalog und Radar tragen denselben `modell_schluessel`, und
-            # `zr` sagt, ob der zweite Reiter (Vergleichs-Zeitreihe) zum
-            # selben Modell fuehrt.
-            "zr": bool(zr_erlaubt and zr_erlaubt.get(mid)),
-            # P5-Auftrag 1: hat dieses Modell ein Bündel (gleich welcher
-            # SKU)? Die Vorlage entscheidet daran die Luecke "noch keine
-            # Zeitreihe" - ein Modell MIT Bündel, das (noch) nicht waehlbar
-            # ist, hat eine Zeitreihe, die MIT DEM NAECHSTEN Messtag
-            # beginnt; eines ohne Bündel nennt die TCO-Spalte den Grund
-            # ("kein Bündel gemessen"), dort waere der Satz die zweite
-            # Aussage fuer dieselbe Tatsache.
-            "hat_buendel": mid in buendel_geraete,
-            "device_id": gruppe["device_id"],
-            "modell": gruppe["modell"],
-            "hersteller": gruppe["hersteller"],
-            "titel": geraete_tco_karten.titel(gruppe["hersteller"], name),
-            "generation": gruppe["generation"],
-            "serie": gruppe["serie"],
-            "segment": gruppe["segment"],
-            "speicher": gruppe["speicher"],
-            # ---- Ansicht Einzelgeraepreis ----
-            "ab_preis": ab_beleg["betrag"] if ab_beleg else None,
-            "ab_anbieter": ab_beleg["anbieter"] if ab_beleg else None,
-            "ab_beleg": ab_beleg,
-            # A3: der ab-Preis dieses Modells ist ein LETZTER STAND, kein
-            # aktueller (kein frischer Beleg seit ALT_AB_TAGEN). Die
-            # Zeile bleibt mit Preis, Anbieter und Datum - ausgegraut,
-            # mit Marke - und zaehlt nicht in die Leitzahl des Katalogs.
-            "ab_alt": ab_alt,
-            "ab_alt_marke": (geraete_tco_karten.alt_marke_fuer(
-                ab_beleg.get("abgerufen_am", ""))
-                if ab_alt and ab_beleg else ""),
-            "anbieterzahl": len(listen_anbieter),
-            "anbieter": listen_anbieter,
-            "farben": sorted({z["farbe"] for z in zeilen if z["farbe"]}),
-            "spanne": spanne,
-            # ---- Bündel-Zustand (statt "ohne Preis") ----
-            "nur_buendel": buendel_angabe is not None,
-            "buendel_monat": buendel_angabe["monat"] if buendel_angabe else None,
-            "buendel_anbieter": (buendel_angabe["anbieter"]
-                                 if buendel_angabe else None),
-            "buendel_tarif": buendel_angabe["tarif"] if buendel_angabe else "",
-            "buendel_beleg": ({"quelle_url": buendel_angabe["quelle_url"],
-                               "abgerufen_am": buendel_angabe["abgerufen_am"]}
-                              if buendel_angabe else None),
-            # ---- Ansicht TCO ----
-            **tco_felder,
-            # ---- Aufklapper (Listungs-Ebene, nichts geloescht) ----
-            "zeilen": zeilen,
-            "listungen": len(zeilen),
-        })
+        ergebnis.append(
+            {
+                "schluessel": mid,
+                # P4 Schritt 2c: trifft der Graph-Sprung der Zeitreihe dieses
+                # Modell? (Siehe Docstring zu `zr_erlaubt` - gelesen, nie
+                # nachgerechnet.) Das Feld ist Teil des EINEN Schluesselraums:
+                # Katalog und Radar tragen denselben `modell_schluessel`, und
+                # `zr` sagt, ob der zweite Reiter (Vergleichs-Zeitreihe) zum
+                # selben Modell fuehrt.
+                "zr": bool(zr_erlaubt and zr_erlaubt.get(mid)),
+                # P5-Auftrag 1: hat dieses Modell ein Bündel (gleich welcher
+                # SKU)? Die Vorlage entscheidet daran die Luecke "noch keine
+                # Zeitreihe" - ein Modell MIT Bündel, das (noch) nicht waehlbar
+                # ist, hat eine Zeitreihe, die MIT DEM NAECHSTEN Messtag
+                # beginnt; eines ohne Bündel nennt die TCO-Spalte den Grund
+                # ("kein Bündel gemessen"), dort waere der Satz die zweite
+                # Aussage fuer dieselbe Tatsache.
+                "hat_buendel": mid in buendel_geraete,
+                "device_id": gruppe["device_id"],
+                "modell": gruppe["modell"],
+                "hersteller": gruppe["hersteller"],
+                "titel": geraete_tco_karten.titel(gruppe["hersteller"], name),
+                "generation": gruppe["generation"],
+                "serie": gruppe["serie"],
+                "segment": gruppe["segment"],
+                "speicher": gruppe["speicher"],
+                # ---- Ansicht Einzelgeraepreis ----
+                "ab_preis": ab_beleg["betrag"] if ab_beleg else None,
+                "ab_anbieter": ab_beleg["anbieter"] if ab_beleg else None,
+                "ab_beleg": ab_beleg,
+                # A3: der ab-Preis dieses Modells ist ein LETZTER STAND, kein
+                # aktueller (kein frischer Beleg seit ALT_AB_TAGEN). Die
+                # Zeile bleibt mit Preis, Anbieter und Datum - ausgegraut,
+                # mit Marke - und zaehlt nicht in die Leitzahl des Katalogs.
+                "ab_alt": ab_alt,
+                "ab_alt_marke": (
+                    geraete_tco_karten.alt_marke_fuer(ab_beleg.get("abgerufen_am", ""))
+                    if ab_alt and ab_beleg
+                    else ""
+                ),
+                "anbieterzahl": len(listen_anbieter),
+                "anbieter": listen_anbieter,
+                "farben": sorted({z["farbe"] for z in zeilen if z["farbe"]}),
+                "spanne": spanne,
+                # ---- Bündel-Zustand (statt "ohne Preis") ----
+                "nur_buendel": buendel_angabe is not None,
+                "buendel_monat": buendel_angabe["monat"] if buendel_angabe else None,
+                "buendel_anbieter": (
+                    buendel_angabe["anbieter"] if buendel_angabe else None
+                ),
+                "buendel_tarif": buendel_angabe["tarif"] if buendel_angabe else "",
+                "buendel_beleg": (
+                    {
+                        "quelle_url": buendel_angabe["quelle_url"],
+                        "abgerufen_am": buendel_angabe["abgerufen_am"],
+                    }
+                    if buendel_angabe
+                    else None
+                ),
+                # ---- Ansicht TCO ----
+                **tco_felder,
+                # ---- Aufklapper (Listungs-Ebene, nichts geloescht) ----
+                "zeilen": zeilen,
+                "listungen": len(zeilen),
+            }
+        )
 
     # Schritt 7: Ordnung und Deckel - dieselben Regeln wie Reiter 2, nur
     # eine Ebene hoeher: Modellzeilen je Hersteller reihum
@@ -1574,6 +1738,7 @@ def katalog_modellzeilen(eintraege: list, katalog, tco_modelle=None,
 # laufen zu lassen und von keiner Vorlage lesen zu lassen waere derselbe
 # Befund wie `UEBERSICHT_MAX_ZEILEN` beim Review davor: lebendig klingende
 # Begruendung, keine Wirkung.
+
 
 def _heute_luecke(db: GeraeteDB, name: str, bezugstag, liefert: bool) -> bool:
     """Behauptet der Bestand etwas Gruenes, das heute niemand gemessen hat?
@@ -1693,16 +1858,24 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
         if a.methode == "kein_hardware":
             vermarktung = "nein"
         satz = {
-            "name": a.name, "typ": a.typ, "netz": a.netz, "gruppe": a.gruppe,
-            "rang": a.rang, "methode": a.methode, "eigen": a.eigen,
-            "aktiv": a.aktiv, "crawlbar": a.crawlbar, "grund": a.grund,
+            "name": a.name,
+            "typ": a.typ,
+            "netz": a.netz,
+            "gruppe": a.gruppe,
+            "rang": a.rang,
+            "methode": a.methode,
+            "eigen": a.eigen,
+            "aktiv": a.aktiv,
+            "crawlbar": a.crawlbar,
+            "grund": a.grund,
             "hinweis": a.hinweis,
-            "einstiege": [{"url": e.url, "label": e.label, "kind": e.kind}
-                          for e in a.crawled_einstiege],
+            "einstiege": [
+                {"url": e.url, "label": e.label, "kind": e.kind}
+                for e in a.crawled_einstiege
+            ],
             "geraete": sum(1 for e in eintraege if e.get("anbieter") == a.name),
             "liefert": a.name in mit_daten,
-            "heute_luecke": _heute_luecke(db, a.name, bezugstag,
-                                          a.name in mit_daten),
+            "heute_luecke": _heute_luecke(db, a.name, bezugstag, a.name in mit_daten),
             "hardware_vermarktung": vermarktung,
             "bilanz": db.laufbilanz(a.name),
             # Der Satz zum dritten Zustand: "heute nicht gelesen" allein
@@ -1732,9 +1905,13 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
         # eigentliche Befund (ein kaputter Extraktor) verschwand hinter dem
         # falschen Etikett. Der Auftrag nennt beide Faelle nebeneinander:
         # "technisch gesperrt, begruendet" und "ohne Fund, Ursache X".
-        satz["zustand"] = ("liefert" if satz["liefert"]
-                           else "ohne_hardware" if vermarktung == "nein"
-                           else "ohne_daten")
+        satz["zustand"] = (
+            "liefert"
+            if satz["liefert"]
+            else "ohne_hardware"
+            if vermarktung == "nein"
+            else "ohne_daten"
+        )
         if vermarktung == "nein":
             ohne_hardware.append(satz)
         else:
@@ -1746,16 +1923,24 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
     # durch, der verspricht, dass kein Anbieter stillschweigend fehlt.
     for name in sorted(n for n in mit_daten if n and n not in bekannt):
         fremd = {
-            "name": name, "typ": "", "netz": "", "gruppe": "", "rang": 999,
-            "methode": "nicht konfiguriert", "eigen": False, "aktiv": False,
+            "name": name,
+            "typ": "",
+            "netz": "",
+            "gruppe": "",
+            "rang": 999,
+            "methode": "nicht konfiguriert",
+            "eigen": False,
+            "aktiv": False,
             "crawlbar": False,
             "grund": "Steht mit Daten in der Datenbank, aber nicht in "
-                     "config/geraete_quellen.yaml - umbenannt oder entfernt. "
-                     "Die Bestandseinträge bleiben, werden aber nicht mehr "
-                     "aufgefrischt.",
-            "hinweis": "", "einstiege": [],
+            "config/geraete_quellen.yaml - umbenannt oder entfernt. "
+            "Die Bestandseinträge bleiben, werden aber nicht mehr "
+            "aufgefrischt.",
+            "hinweis": "",
+            "einstiege": [],
             "geraete": sum(1 for e in eintraege if e.get("anbieter") == name),
-            "liefert": True, "hardware_vermarktung": "ja",
+            "liefert": True,
+            "hardware_vermarktung": "ja",
             "heute_luecke": _heute_luecke(db, name, bezugstag, True),
             "zustand": "liefert",
             "bilanz": db.laufbilanz(name),
@@ -1789,8 +1974,9 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
         # konfigurierten Anbietern liefern". Der Zweig existiert genau fuer
         # diesen Fall; ihn in die Invariante zu ziehen hiesse, sie beim
         # ersten Umbenennen zu brechen.
-        "liefernd_konfiguriert": sum(1 for z in zeilen
-                                     if z["liefert"] and z["name"] in bekannt),
+        "liefernd_konfiguriert": sum(
+            1 for z in zeilen if z["liefert"] and z["name"] in bekannt
+        ),
         "ohne_daten": sum(1 for z in zeilen if z["zustand"] == "ohne_daten"),
         "ohne_hardware_zahl": len(ohne_hardware),
         "nicht_konfiguriert": sum(1 for z in zeilen if z["name"] not in bekannt),
@@ -1804,6 +1990,7 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
 # Der Einstieg
 # --------------------------------------------------------------------------
 
+
 def leer(fehler: str = "") -> dict:
     """Der Notzustand: die Seite entsteht trotzdem und sagt, was los ist.
 
@@ -1812,18 +1999,31 @@ def leer(fehler: str = "") -> dict:
     der Vorwoche stehen. Ein Totalausfall, der wie ein gruener Lauf aussieht.
     """
     return {
-        "hat_daten": False, "stand": "", "abgerufen_bis": "", "abgerufen_ab": "",
-        "fenster_tage": FENSTER_TAGE, "db_lesbar": not fehler,
+        "hat_daten": False,
+        "stand": "",
+        "abgerufen_bis": "",
+        "abgerufen_ab": "",
+        "fenster_tage": FENSTER_TAGE,
+        "db_lesbar": not fehler,
         "fehler": fehler,
-        "bilanz": {"geraete": 0, "listungen": 0, "skus": 0, "anbieter": 0,
-                   "ausgelistet": 0, "preispunkte": 0, "hersteller": 0,
-                   "schwelle_erreicht": False},
+        "bilanz": {
+            "geraete": 0,
+            "listungen": 0,
+            "skus": 0,
+            "anbieter": 0,
+            "ausgelistet": 0,
+            "preispunkte": 0,
+            "hersteller": 0,
+            "schwelle_erreicht": False,
+        },
         # Der Notzustand muss JEDES Feld tragen, das die Vorlage liest -
         # genau dafuer gibt es ihn. Die Alarme kommen aus derselben Funktion
         # wie im Normalfall, damit die zwei Schluesselmengen nicht
         # auseinanderlaufen koennen (ein Test haelt sie gegeneinander).
         "alarme": geraete_alarme.leer(),
-        "segmente": [], "segment_label": SEGMENT_LABEL, "speicherstufen": [],
+        "segmente": [],
+        "segment_label": SEGMENT_LABEL,
+        "speicherstufen": [],
         "verlauf": geraete_verlauf.leer(),
         "tco": geraete_tco_view.leer(),
         "zeitreihe": geraete_zeitreihe.leer(),
@@ -1837,32 +2037,70 @@ def leer(fehler: str = "") -> dict:
         "katalog_sichtbar": KATALOG_SICHTBAR,
         "lifecycle_sichtbar": LIFECYCLE_SICHTBAR,
         "nachfolger_sichtbar": NACHFOLGER_SICHTBAR,
-        "auffaellig": {"hat_daten": False, "saetze": [], "bewegungen": [],
-                       "neu": [], "weg": [], "kurzer_vorlauf": True,
-                       "vorlauf_tage": 0},
-        "bestand": [], "alle_punkte": [], "katalog_obj": None,
-        "export": {"stand": "", "aktuell": {"datei": "", "zeilen": 0, "bytes": 0},
-                   "historie": {"datei": "", "zeilen": 0, "bytes": 0}},
-        "vergleich": {"hat_daten": False, "standard": "ohne_vertrag",
-                      "ohne_vertrag": {"zeilen": [], "ohne_vodafone": [],
-                                       "hat_daten": False, "hat_vodafone": False,
-                                       "mit_vorteil": 0, "ohne_vorteil": 0,
-                                       "ohne_vodafone_gesamt": 0,
-                                       "groesste_differenz": None,
-                                       "preisart": "ohne_vertrag"},
-                      "mit_vertrag": {"zeilen": [], "ohne_vodafone": [],
-                                      "hat_daten": False, "hat_vodafone": False,
-                                      "mit_vorteil": 0, "ohne_vorteil": 0,
-                                      "ohne_vodafone_gesamt": 0,
-                                      "groesste_differenz": None,
-                                      "preisart": "mit_vertrag"}},
-        "lifecycle": {"duenn": True, "punkte": 0, "wochen": 0, "hinweis": "",
-                      "dauern": [], "verfaelle": [], "trends": [],
-                      "nachfolger": [], "nachfolger_hinweis": "",
-                      "portfolio": []},
-        "quellenlage": {"zeilen": [], "ohne_hardware": [], "liefernd": 0,
-                        "aufgefuehrt": 0, "konfiguriert": 0, "unbekannt": [],
-                        "seiten": 0},
+        "auffaellig": {
+            "hat_daten": False,
+            "saetze": [],
+            "bewegungen": [],
+            "neu": [],
+            "weg": [],
+            "kurzer_vorlauf": True,
+            "vorlauf_tage": 0,
+        },
+        "bestand": [],
+        "alle_punkte": [],
+        "katalog_obj": None,
+        "export": {
+            "stand": "",
+            "aktuell": {"datei": "", "zeilen": 0, "bytes": 0},
+            "historie": {"datei": "", "zeilen": 0, "bytes": 0},
+        },
+        "vergleich": {
+            "hat_daten": False,
+            "standard": "ohne_vertrag",
+            "ohne_vertrag": {
+                "zeilen": [],
+                "ohne_vodafone": [],
+                "hat_daten": False,
+                "hat_vodafone": False,
+                "mit_vorteil": 0,
+                "ohne_vorteil": 0,
+                "ohne_vodafone_gesamt": 0,
+                "groesste_differenz": None,
+                "preisart": "ohne_vertrag",
+            },
+            "mit_vertrag": {
+                "zeilen": [],
+                "ohne_vodafone": [],
+                "hat_daten": False,
+                "hat_vodafone": False,
+                "mit_vorteil": 0,
+                "ohne_vorteil": 0,
+                "ohne_vodafone_gesamt": 0,
+                "groesste_differenz": None,
+                "preisart": "mit_vertrag",
+            },
+        },
+        "lifecycle": {
+            "duenn": True,
+            "punkte": 0,
+            "wochen": 0,
+            "hinweis": "",
+            "dauern": [],
+            "verfaelle": [],
+            "trends": [],
+            "nachfolger": [],
+            "nachfolger_hinweis": "",
+            "portfolio": [],
+        },
+        "quellenlage": {
+            "zeilen": [],
+            "ohne_hardware": [],
+            "liefernd": 0,
+            "aufgefuehrt": 0,
+            "konfiguriert": 0,
+            "unbekannt": [],
+            "seiten": 0,
+        },
     }
 
 
@@ -1921,9 +2159,11 @@ def bestand_und_belastbar(sichtbar: list, katalog) -> tuple[dict, list, list]:
     Bestand heute nicht enthaelt.
     """
     pruefung = geraete_pruefung.pruefe(sichtbar, katalog)
-    return (pruefung,
-            geraete_bereinigung.bereinige(sichtbar),
-            geraete_bereinigung.bereinige(pruefung["sauber"]))
+    return (
+        pruefung,
+        geraete_bereinigung.bereinige(sichtbar),
+        geraete_bereinigung.bereinige(pruefung["sauber"]),
+    )
 
 
 def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
@@ -1964,13 +2204,16 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # (mobilcom-debitel/freenet) muessen EINE Spalte werden, sonst vergleicht
     # die Karte einen Laden mit sich selbst.
     laden = {a.name: (a.shop or a.name) for a in getattr(quellen, "anbieter", [])}
-    anzeige = {a.name: (a.anzeige or a.name)
-               for a in getattr(quellen, "anbieter", [])}
+    anzeige = {a.name: (a.anzeige or a.name) for a in getattr(quellen, "anbieter", [])}
     # Der Anzeigename haengt am LADEN, nicht am Markennamen: die Spalte heisst
     # nach dem Shop, und der Shop traegt den Namen, unter dem seine Quelle
     # erreichbar ist.
-    anzeige.update({(a.shop or a.name): (a.anzeige or a.name)
-                    for a in getattr(quellen, "anbieter", [])})
+    anzeige.update(
+        {
+            (a.shop or a.name): (a.anzeige or a.name)
+            for a in getattr(quellen, "anbieter", [])
+        }
+    )
 
     punkte_ohne_vertrag = []
     for e in belastbar:
@@ -1980,31 +2223,33 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         g = katalog.nach_id(e.get("device_id"))
         speicher = e.get("speicher_gb")
         name = e.get("anbieter")
-        punkte_ohne_vertrag.append({
-            "shop": laden.get(name, name),
-            "anbieter_anzeige": anzeige.get(name, name),
-            "sku_id": e.get("sku_id"),
-            "device_id": e.get("device_id"),
-            "hersteller": g.hersteller if g else "ohne Katalogeintrag",
-            "modell": g.modell if g else e.get("device_id"),
-            "generation": g.generation if g else None,
-            "segment": g.segment if g else "",
-            "anbieter": e.get("anbieter"),
-            "anbieter_typ": e.get("anbieter_typ", ""),
-            "preis": float(preis),
-            "speicher": speicher,
-            "farbe": e.get("farbe_normalisiert") or e.get("farbe_roh") or "",
-            # Ein refurbished Geraet ist nicht dasselbe Angebot wie ein neues
-            # - es gehoert in den Aggregationsschluessel, sonst schluckt der
-            # niedrigere Preis den hoeheren.
-            "zustand": e.get("zustand") or "neu",
-            "verfuegbarkeit": e.get("verfuegbarkeit", "unbekannt"),
-            "url": e.get("quelle_url", ""),
-            "abgerufen_am": e.get("abgerufen_am", ""),
-            "eigen": _ist_eigen(e.get("anbieter", "")),
-            "label": f"{g.modell if g else e.get('device_id')}"
-                     + (f" · {speicher} GB" if speicher else ""),
-        })
+        punkte_ohne_vertrag.append(
+            {
+                "shop": laden.get(name, name),
+                "anbieter_anzeige": anzeige.get(name, name),
+                "sku_id": e.get("sku_id"),
+                "device_id": e.get("device_id"),
+                "hersteller": g.hersteller if g else "ohne Katalogeintrag",
+                "modell": g.modell if g else e.get("device_id"),
+                "generation": g.generation if g else None,
+                "segment": g.segment if g else "",
+                "anbieter": e.get("anbieter"),
+                "anbieter_typ": e.get("anbieter_typ", ""),
+                "preis": float(preis),
+                "speicher": speicher,
+                "farbe": e.get("farbe_normalisiert") or e.get("farbe_roh") or "",
+                # Ein refurbished Geraet ist nicht dasselbe Angebot wie ein neues
+                # - es gehoert in den Aggregationsschluessel, sonst schluckt der
+                # niedrigere Preis den hoeheren.
+                "zustand": e.get("zustand") or "neu",
+                "verfuegbarkeit": e.get("verfuegbarkeit", "unbekannt"),
+                "url": e.get("quelle_url", ""),
+                "abgerufen_am": e.get("abgerufen_am", ""),
+                "eigen": _ist_eigen(e.get("anbieter", "")),
+                "label": f"{g.modell if g else e.get('device_id')}"
+                + (f" · {speicher} GB" if speicher else ""),
+            }
+        )
 
     # Die aktuelle Generation JE BAUREIHE, nicht je Hersteller. `generation`
     # ist die Nummer innerhalb einer Reihe: Samsungs Galaxy A57 traegt 57,
@@ -2021,9 +2266,9 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         schluessel = (p["hersteller"], p["serie"])
         hoechste[schluessel] = max(hoechste.get(schluessel, 0), p["generation"])
     for p in punkte_ohne_vertrag:
-        p["aktuelle_generation"] = (
-            p["generation"] is not None
-            and p["generation"] == hoechste.get((p["hersteller"], p["serie"])))
+        p["aktuelle_generation"] = p["generation"] is not None and p[
+            "generation"
+        ] == hoechste.get((p["hersteller"], p["serie"]))
 
     # Wie oft ist der Geraetezweig ueberhaupt schon gelaufen? Das ist die
     # Frage hinter "gibt es einen frueheren Stand" - und sie wird an den
@@ -2037,25 +2282,40 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     laeufe_je_anbieter: dict[str, int] = {}
     for name in {e.get("anbieter") for e in alle if e.get("anbieter")}:
         termine = set(db.messtermine(name))
-        termine.update(p.get("datum") for p in punkte_alle
-                       if p.get("anbieter") == name and p.get("datum"))
+        termine.update(
+            p.get("datum")
+            for p in punkte_alle
+            if p.get("anbieter") == name and p.get("datum")
+        )
         termine_je_anbieter[name] = sorted(termine)
         laeufe_je_anbieter[name] = int(db.laufbilanz(name).get("laeufe") or 0)
-    laeufe = max((max(len(t), laeufe_je_anbieter.get(n, 0))
-                  for n, t in termine_je_anbieter.items()), default=0)
+    laeufe = max(
+        (
+            max(len(t), laeufe_je_anbieter.get(n, 0))
+            for n, t in termine_je_anbieter.items()
+        ),
+        default=0,
+    )
     auffaellig = _auffaellig(alle, historie, katalog, heute, laeufe=laeufe)
     lifecycle = geraete_lifecycle.auswertung(
-        alle, punkte_alle, katalog, heute,
+        alle,
+        punkte_alle,
+        katalog,
+        heute,
         laeufe_je_anbieter=laeufe_je_anbieter,
-        termine_je_anbieter=termine_je_anbieter)
+        termine_je_anbieter=termine_je_anbieter,
+    )
     # P3: der Satz, der die leere Nachfolger-Sektion erklaert, und der Beleg
     # dafuer, wie viel einer gefuellten Zeile wirklich gemessen ist. Beides
     # entsteht HIER und nicht in `geraete_lifecycle.auswertung` - dort
     # arbeitet parallel ein anderes Paket an der Rechnung selbst.
-    lifecycle = {**lifecycle,
-                "nachfolger": _mit_beobachtungsbeleg(lifecycle["nachfolger"]),
-                "nachfolger_hinweis": _nachfolger_leer_hinweis(
-                    alle, katalog, lifecycle["nachfolger"])}
+    lifecycle = {
+        **lifecycle,
+        "nachfolger": _mit_beobachtungsbeleg(lifecycle["nachfolger"]),
+        "nachfolger_hinweis": _nachfolger_leer_hinweis(
+            alle, katalog, lifecycle["nachfolger"]
+        ),
+    }
 
     # Das ECHTE Abrufdatum. Faellt der naechtliche Lauf zwei Wochen aus,
     # behaelt die Datenbank ihre alten Werte - die Legende darf trotzdem
@@ -2064,8 +2324,8 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # Auf dem BESTAND, nicht auf dem Rohbestand: der Kopf sagt "Preise vom
     # ...", und gemeint sind die Preise, die auf dieser Seite stehen. Eine
     # zusammengefasste Zwillingshaelfte darf das Datum nicht setzen.
-    abrufdaten = sorted(e.get("abgerufen_am") for e in bestand
-                        if e.get("abgerufen_am"))
+    abrufdaten = sorted(e.get("abgerufen_am") for e in bestand if e.get("abgerufen_am"))
+
     # Gezaehlt werden LAEDEN, nicht Marken. Die dritte Frage der Seite lautet
     # "was kostet dasselbe Geraet bei wem" - und zwei Marken desselben Shops
     # (mobilcom-debitel/freenet) beantworten sie nicht. Mit Marken gezaehlt
@@ -2075,9 +2335,11 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         return {laden.get(e.get("anbieter"), e.get("anbieter")) for e in menge}
 
     def _hersteller(menge):
-        return {g.hersteller
-                for g in (katalog.nach_id(e.get("device_id")) for e in menge)
-                if g and g.hersteller}
+        return {
+            g.hersteller
+            for g in (katalog.nach_id(e.get("device_id")) for e in menge)
+            if g and g.hersteller
+        }
 
     # DIE VEROEFFENTLICHUNGSSCHWELLE RECHNET GEGEN DEN ROHBESTAND - als
     # einzige Zahl dieser Funktion. Bis zum 29.08.2026 nahm sie die
@@ -2093,7 +2355,8 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     erreicht = schwelle_erreicht(
         anbieter=len(_laeden(sichtbar)),
         skus=len({e.get("sku_id") for e in sichtbar}),
-        hersteller=len(_hersteller(sichtbar)))
+        hersteller=len(_hersteller(sichtbar)),
+    )
 
     # Die Betriebszahlen am Fuss der Seite stehen in EINEM Satz ("N Geraete
     # in M Varianten, zusammen L Listungen bei A Anbietern") - sie muessen
@@ -2106,10 +2369,10 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # sind zwei Zahlen). Die Ausreisser-Markierung kommt aus der Pruefung:
     # ein Ausreisser wird gemeldet statt geloescht, und gemeldet heisst DORT
     # sichtbar, wo jemand die Zahl liest.
-    vergleich = geraete_vergleich.beide_preisarten(belastbar, katalog,
-                                                   laeden=laden)
-    alarme = geraete_alarme.zeilen(vergleich["ohne_vertrag"],
-                                   pruefung.get("auffaellig"))
+    vergleich = geraete_vergleich.beide_preisarten(belastbar, katalog, laeden=laden)
+    alarme = geraete_alarme.zeilen(
+        vergleich["ohne_vertrag"], pruefung.get("auffaellig")
+    )
 
     # E2 (16.09.2026): die TCO-ZEITREIHE der Hauptansicht - eigene
     # Aufbereitung (Modell x Band x Anbieter x Messtag aus der rohen
@@ -2140,14 +2403,18 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # stellt die Uhr fuer die Frische der ab-Auswahl.
     bestand_heute = _spaeterer_tag(heute, db.updated) if heute else ""
     tco = geraete_tco_view.aufbereiten(
-        tco_db.buendel(), tco_db.referenzen(), belastbar, katalog,
+        tco_db.buendel(),
+        tco_db.referenzen(),
+        belastbar,
+        katalog,
         # B3 (21.09.2026): `je_id_aktuell`, nicht `je_id` - ein Buendel
         # loest immer auf den BARE `tarif_id` auf, und der bare Schluessel
         # gehoert oft dem Pflichtdokument (Bestandsschutz der Zeitreihe,
         # `tarif_bezug.Tarifbestand`). `je_id_aktuell` traegt dort die
         # Live-Shop-Lesart, wo es sie gibt - dieselbe Regel wie fuer die
         # SIM-only-Referenz nebenan.
-        lesbar=tco_db.lesbar, tarife=tarifbestand.je_id_aktuell,
+        lesbar=tco_db.lesbar,
+        tarife=tarifbestand.je_id_aktuell,
         # O4: der Anbietertyp fuer die Spalte des TCO-Exports (der
         # Store traegt ihn nicht) und die Lage der Buendel-Historie
         # fuer den ehrlichen Satz im Verlaufs-Reiter.
@@ -2155,7 +2422,8 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         tco_historie=tco_db.historie_lage(),
         # A3: der Bezugstag schaltet die Alterung ein - ohne ihn altert
         # nichts (`geraete_tco_karten.ist_frisch`).
-        heute=tco_heute)
+        heute=tco_heute,
+    )
     ausfaelle: list[Ausfall] = []
     try:
         # A1: derselbe Tarifbestand wie die Tafel - die Punkte der Historie
@@ -2163,10 +2431,12 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         # ueber dieselben Phasen (`phasen_fuer_buendel`, ohne Widerspruch
         # zur Messung).
         zeitreihe = geraete_zeitreihe.aufbereiten(
-            state_dir, tco, tarife=tarifbestand.je_id_aktuell)
-    except Exception as exc:                       # noqa: BLE001
-        log.error("Zeitreihen-Aufbereitung gescheitert: %s: %s",
-                  type(exc).__name__, exc)
+            state_dir, tco, tarife=tarifbestand.je_id_aktuell
+        )
+    except Exception as exc:  # noqa: BLE001
+        log.error(
+            "Zeitreihen-Aufbereitung gescheitert: %s: %s", type(exc).__name__, exc
+        )
         zeitreihe = geraete_zeitreihe.leer()
         ausfaelle.append(Ausfall.aus_ausnahme(ZEITREIHE_TEIL, exc))
 
@@ -2175,9 +2445,11 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # app.js waehlt - der Katalog-Graph-Sprung darf nur stehen, wo der
     # Sprung auch trifft. Ein Modell ohne Bündel oder unter der Auto-
     # Messtag-Schwelle ist dort nicht waehlbar; sein Link waere ein toter.
-    zr_erlaubt = {k: b for k, b in
-                  ((zeitreihe.get("daten") or {}).get("erlaubt") or {}).items()
-                  if b}
+    zr_erlaubt = {
+        k: b
+        for k, b in ((zeitreihe.get("daten") or {}).get("erlaubt") or {}).items()
+        if b
+    }
 
     # P4-Fix (Sicht-Pruefung 18.09., Falz 1): die Leitzahl des KATALOGS -
     # der guenstigste Einzelgeraetepreis des Regals, EINE Rechnung an
@@ -2186,13 +2458,15 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     # Katalog war der einzige Reiter ohne Falz-Antwort: die groesste
     # Schrift seiner Tafel war die h2.
     katalog_modelle = katalog_modellzeilen(
-        bestand, katalog, (tco or {}).get("modelle"),
-        tco_db.buendel() if tco_db.lesbar
-        else _buendel_aus_listungen(bestand),
+        bestand,
+        katalog,
+        (tco or {}).get("modelle"),
+        tco_db.buendel() if tco_db.lesbar else _buendel_aus_listungen(bestand),
         zr_erlaubt=zr_erlaubt,
         # A3: die Uhr der ab-Auswahl - der spaetere von Berichtstag und
         # Bestands-Stand (siehe `bestand_heute` oben).
-        heute=bestand_heute)
+        heute=bestand_heute,
+    )
     katalog_ab_preis = katalog_leitzahl(katalog_modelle)
 
     # P5-LIVE-PRUEFUNG R3 (18.09.2026): Wer im Zeitreihen-Suchfeld nach
@@ -2209,13 +2483,18 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         if not m.get("hat_buendel") or m.get("zr"):
             continue
         belege = sorted(
-            b.get("abgerufen_am") for b in
-            (m.get("ab_beleg"), m.get("buendel_beleg"))
-            if b and b.get("abgerufen_am"))
-        katalog_neu.append({
-            "id": m["schluessel"], "titel": m["titel"],
-            "datum": _neu_seit(belege[0]) if belege else "",
-            "iso": belege[0] if belege else ""})
+            b.get("abgerufen_am")
+            for b in (m.get("ab_beleg"), m.get("buendel_beleg"))
+            if b and b.get("abgerufen_am")
+        )
+        katalog_neu.append(
+            {
+                "id": m["schluessel"],
+                "titel": m["titel"],
+                "datum": _neu_seit(belege[0]) if belege else "",
+                "iso": belege[0] if belege else "",
+            }
+        )
     if isinstance((zeitreihe or {}).get("daten"), dict):
         zeitreihe["daten"]["katalog_neu"] = katalog_neu
 
@@ -2263,8 +2542,9 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
             "listungen": len(bestand),
             "skus": len({e.get("sku_id") for e in bestand}),
             "anbieter": len(laeden_mit_daten),
-            "ausgelistet": sum(1 for e in alle
-                               if e.get("status") == STATUS_AUSGELISTET),
+            "ausgelistet": sum(
+                1 for e in alle if e.get("status") == STATUS_AUSGELISTET
+            ),
             # Ohne einen frueheren Stand ist "0 ausgelistet" keine Aussage,
             # sondern eine Selbstverstaendlichkeit - die Kachel bleibt weg,
             # bis es etwas zu vergleichen gibt. Steht dort eine Zahl groesser
@@ -2280,8 +2560,9 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         "alarme": alarme,
         "segmente": sorted({p["segment"] for p in punkte_ohne_vertrag if p["segment"]}),
         "segment_label": SEGMENT_LABEL,
-        "speicherstufen": sorted({p["speicher"] for p in punkte_ohne_vertrag
-                                  if p["speicher"]}),
+        "speicherstufen": sorted(
+            {p["speicher"] for p in punkte_ohne_vertrag if p["speicher"]}
+        ),
         "auffaellig": auffaellig,
         # Fuer den CSV-Gesamtexport (report/geraete_export.py). Er entsteht
         # in `render_site`, weil er in `site/` schreibt und diese Funktion

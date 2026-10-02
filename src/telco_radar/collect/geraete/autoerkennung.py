@@ -46,6 +46,7 @@ schlaegt der Hand-Eintrag (gleiche device_id). Unbekannte Titel und Farben
 zaehlt data/state/geraete_unbekannt.jsonl - angelegt und erweitert vom
 Lauf, nie von Hand gepflegt.
 """
+
 import json
 import logging
 import re
@@ -53,8 +54,14 @@ from pathlib import Path
 from typing import Optional
 
 from ...geraete_model import (
-    Geraet, Katalog, device_id, ist_modellzusatz, ist_zubehoer, normalisiere,
-    serie_aus_modell, wortmarken,
+    Geraet,
+    Katalog,
+    device_id,
+    ist_modellzusatz,
+    ist_zubehoer,
+    normalisiere,
+    serie_aus_modell,
+    wortmarken,
 )
 
 log = logging.getLogger(__name__)
@@ -80,8 +87,9 @@ _SPEICHER_SEGMENT = re.compile(r"\b\d{1,4}\s*(?:gb|tb)\b", re.IGNORECASE)
 # ein Geraet sind die Saegezahn-Klasse, gegen die die ganze ID-Regel
 # gebaut ist.
 _FUNK_WORTE = frozenset("5g 4g lte".split())
-_FUNK_ZUSATZ = re.compile(r"\b(?:" + "|".join(sorted(_FUNK_WORTE)) + r")\b",
-                          re.IGNORECASE)
+_FUNK_ZUSATZ = re.compile(
+    r"\b(?:" + "|".join(sorted(_FUNK_WORTE)) + r")\b", re.IGNORECASE
+)
 
 
 def ist_funkzusatz(wort: str) -> bool:
@@ -113,8 +121,7 @@ def _serien_anker(katalog: Katalog) -> dict:
         hersteller = normalisiere(geraet.hersteller)
         kandidaten.setdefault(schluessel, set()).add(hersteller)
         originals.setdefault(hersteller, geraet.hersteller)
-    return {s: originals[next(iter(h))] for s, h in kandidaten.items()
-            if len(h) == 1}
+    return {s: originals[next(iter(h))] for s, h in kandidaten.items() if len(h) == 1}
 
 
 # FESTE FAMILIEN-ANKER (P5/E3, gemessen 17.09.2026): Vodafone nennt seine
@@ -137,8 +144,9 @@ _FESTE_FAMILIEN = {
 }
 
 
-def _anker_treffer(serie: Optional[str], anker: dict,
-                   katalog: Katalog) -> Optional[str]:
+def _anker_treffer(
+    serie: Optional[str], anker: dict, katalog: Katalog
+) -> Optional[str]:
     """Hersteller fuer eine normalisierte Baureihe: der Katalog-Anker
     zuerst, der feste Familien-Anker nur als Lueckenfueller.
 
@@ -156,9 +164,8 @@ def _anker_treffer(serie: Optional[str], anker: dict,
     treffer = anker.get(serie)
     if treffer is not None:
         return treffer
-    if any(normalisiere(serie_aus_modell(g.modell)) == serie
-           for g in katalog.geraete):
-        return None          # der Katalog kennt die Reihe - er entscheidet
+    if any(normalisiere(serie_aus_modell(g.modell)) == serie for g in katalog.geraete):
+        return None  # der Katalog kennt die Reihe - er entscheidet
     return _FESTE_FAMILIEN.get(serie.split("-")[0])
 
 
@@ -180,14 +187,14 @@ def schale(name: str, katalog: Katalog) -> Optional[tuple]:
     rest = name
     for kandidat in katalog.hersteller:
         if name.lower().startswith(kandidat.lower() + " "):
-            hersteller, rest = kandidat, name[len(kandidat) + 1:].strip()
+            hersteller, rest = kandidat, name[len(kandidat) + 1 :].strip()
             break
     if hersteller is None:
         anker = _serien_anker(katalog)
         serie = normalisiere(serie_aus_modell(name))
         treffer = _anker_treffer(serie, anker, katalog)
         if treffer is None:
-            return None                    # kein Hersteller, nichts geraten
+            return None  # kein Hersteller, nichts geraten
         hersteller, rest = treffer, name
 
     rest = _SPEICHER_SEGMENT.sub(" ", rest)
@@ -248,18 +255,21 @@ def kollidiert_fuzzy(modell: str, katalog: Katalog) -> Optional[str]:
     n = len(marken)
     for bestehend in katalog.geraete:
         if bestehend.auto:
-            continue                 # nur der Hand-Katalog schlaegt
+            continue  # nur der Hand-Katalog schlaegt
         for schreibweise in bestehend.schreibweisen:
             andere = wortmarken(schreibweise)
-            if len(andere) > n and andere[:n] == marken \
-                    and (ist_modellzusatz(andere[n])
-                         or ist_funkzusatz(andere[n])):
+            if (
+                len(andere) > n
+                and andere[:n] == marken
+                and (ist_modellzusatz(andere[n]) or ist_funkzusatz(andere[n]))
+            ):
                 return f"{bestehend.hersteller} {bestehend.modell}"
     return None
 
 
-def lege_an(name: str, katalog: Katalog, heute: str,
-            speicher_gb=None) -> Optional[Geraet]:
+def lege_an(
+    name: str, katalog: Katalog, heute: str, speicher_gb=None
+) -> Optional[Geraet]:
     """Aus einem strukturierten Namen einen Katalog-Eintrag anlegen.
 
     Gibt das (neue oder bereits existierende) Geraet zurueck oder None,
@@ -281,10 +291,14 @@ def lege_an(name: str, katalog: Katalog, heute: str,
 
     konflikt = kollidiert_fuzzy(modell, katalog)
     if konflikt is not None:
-        log.warning("Auto-Erkennung: %r ist der Stamm des Hand-Eintrags "
-                    "%r (Modellzusatz-Falle, CLAUDE.md) - nicht angelegt; "
-                    "ob es den Stamm als eigenes Geraet gibt, entscheidet "
-                    "die Katalog-Pflege", name, konflikt)
+        log.warning(
+            "Auto-Erkennung: %r ist der Stamm des Hand-Eintrags "
+            "%r (Modellzusatz-Falle, CLAUDE.md) - nicht angelegt; "
+            "ob es den Stamm als eigenes Geraet gibt, entscheidet "
+            "die Katalog-Pflege",
+            name,
+            konflikt,
+        )
         return None
 
     stufen: list = []
@@ -294,22 +308,34 @@ def lege_an(name: str, katalog: Katalog, heute: str,
     except (TypeError, ValueError):
         stufen = []
     geraet = Geraet(
-        hersteller=hersteller, modell=modell,
+        hersteller=hersteller,
+        modell=modell,
         generation=_generation(modell, hersteller, katalog),
-        speicher=stufen, auto=heute)
+        speicher=stufen,
+        auto=heute,
+    )
     if not katalog.ergaenze(geraet):
-        log.info("Auto-Erkennung: %r kollidiert mit einer bestehenden "
-                 "Schreibweise - nicht angelegt", name)
+        log.info(
+            "Auto-Erkennung: %r kollidiert mit einer bestehenden "
+            "Schreibweise - nicht angelegt",
+            name,
+        )
         return None
-    log.info("Auto-Erkennung: %s %s aus strukturiertem Namen angelegt "
-             "(auto:%s, %d Stufe(n) Speicher)", hersteller, modell, heute,
-             len(stufen))
+    log.info(
+        "Auto-Erkennung: %s %s aus strukturiertem Namen angelegt "
+        "(auto:%s, %d Stufe(n) Speicher)",
+        hersteller,
+        modell,
+        heute,
+        len(stufen),
+    )
     return geraet
 
 
 # --------------------------------------------------------------------------
 # Persistenz der Auto-Eintraege (STATE, nicht Config)
 # --------------------------------------------------------------------------
+
 
 def lade_auto_zusaetze(root: Path, katalog: Katalog) -> int:
     """Gespeicherte Auto-Eintraege in den Katalog mergen.
@@ -332,7 +358,7 @@ def lade_auto_zusaetze(root: Path, katalog: Katalog) -> int:
         log.warning("Auto-Katalog %s unlesbar (%s) - ignoriert", pfad, exc)
         return 0
     uebernommen = 0
-    for eintrag in (roh.get("geraete") or []):
+    for eintrag in roh.get("geraete") or []:
         if not isinstance(eintrag, dict):
             continue
         hersteller = str(eintrag.get("hersteller") or "").strip()
@@ -342,23 +368,39 @@ def lade_auto_zusaetze(root: Path, katalog: Katalog) -> int:
             continue
         generation = eintrag.get("generation")
         geraet = Geraet(
-            hersteller=hersteller, modell=modell, auto=auto,
+            hersteller=hersteller,
+            modell=modell,
+            auto=auto,
             generation=int(generation)
-            if str(generation or "").strip().isdigit() else None,
-            speicher=[int(s) for s in (eintrag.get("speicher") or [])
-                      if str(s).strip().isdigit()])
+            if str(generation or "").strip().isdigit()
+            else None,
+            speicher=[
+                int(s)
+                for s in (eintrag.get("speicher") or [])
+                if str(s).strip().isdigit()
+            ],
+        )
         konflikt = kollidiert_fuzzy(modell, katalog)
         if konflikt is not None:
-            log.info("Auto-Katalog: %s %s (auto:%s) verworfen - Stamm des "
-                     "Hand-Eintrags %s (Modellzusatz-Falle), der "
-                     "Hand-Eintrag schlaegt",
-                     hersteller, modell, auto, konflikt)
+            log.info(
+                "Auto-Katalog: %s %s (auto:%s) verworfen - Stamm des "
+                "Hand-Eintrags %s (Modellzusatz-Falle), der "
+                "Hand-Eintrag schlaegt",
+                hersteller,
+                modell,
+                auto,
+                konflikt,
+            )
             continue
         if not katalog.ergaenze(geraet):
-            log.info("Auto-Katalog: %s %s (auto:%s) verworfen - der "
-                     "Hand-Eintrag schlaegt (gleiche device_id oder "
-                     "nicht unterscheidbare Schreibweise)",
-                     hersteller, modell, auto)
+            log.info(
+                "Auto-Katalog: %s %s (auto:%s) verworfen - der "
+                "Hand-Eintrag schlaegt (gleiche device_id oder "
+                "nicht unterscheidbare Schreibweise)",
+                hersteller,
+                modell,
+                auto,
+            )
             continue
         uebernommen += 1
     return uebernommen
@@ -374,12 +416,25 @@ def speichere_auto_zusaetze(root: Path, katalog: Katalog) -> int:
     eintraege = [g for g in katalog.geraete if g.auto]
     pfad = Path(root) / "data" / "state" / _STATE_DATEI
     pfad.parent.mkdir(parents=True, exist_ok=True)
-    pfad.write_text(json.dumps({
-        "geraete": [{"hersteller": g.hersteller, "modell": g.modell,
-                     "generation": g.generation, "speicher": g.speicher,
-                     "auto": g.auto}
-                    for g in eintraege]}, ensure_ascii=False, indent=1),
-        encoding="utf-8")
+    pfad.write_text(
+        json.dumps(
+            {
+                "geraete": [
+                    {
+                        "hersteller": g.hersteller,
+                        "modell": g.modell,
+                        "generation": g.generation,
+                        "speicher": g.speicher,
+                        "auto": g.auto,
+                    }
+                    for g in eintraege
+                ]
+            },
+            ensure_ascii=False,
+            indent=1,
+        ),
+        encoding="utf-8",
+    )
     return len(eintraege)
 
 
@@ -421,8 +476,9 @@ def _ist_tarif_eintrag(eintrag: dict) -> bool:
     """Ein `unbekannt`-Satz ist Tarif-Rauschen, wenn er ein TITEL-Satz mit
     Tarifnamen ist - die gemeinsame Formel fuer neue Eintraege und fuer
     Bestandszeilen (eine zweite Kopie derselben Bedingung wuerde driften)."""
-    return eintrag.get("art") == "titel" \
-        and ist_tarif_titel(str(eintrag.get("wert") or ""))
+    return eintrag.get("art") == "titel" and ist_tarif_titel(
+        str(eintrag.get("wert") or "")
+    )
 
 
 def persistiere_unbekannte(root: Path, eintraege: list, heute: str) -> int:
@@ -445,10 +501,13 @@ def persistiere_unbekannte(root: Path, eintraege: list, heute: str) -> int:
     zeilen: list = []
     if pfad.exists():
         try:
-            zeilen = [json.loads(z) for z in
-                      pfad.read_text(encoding="utf-8").splitlines() if z.strip()]
+            zeilen = [
+                json.loads(z)
+                for z in pfad.read_text(encoding="utf-8").splitlines()
+                if z.strip()
+            ]
         except (json.JSONDecodeError, ValueError):
-            zeilen = []            # kaputte Datei: neu anfangen ist besser
+            zeilen = []  # kaputte Datei: neu anfangen ist besser
             # als stehenbleiben - die Haeufigkeit ist eine Zaehlung, keine
             # Buchfuehrung mit Rechtsfolge.
     bereinigt = sum(1 for z in zeilen if _ist_tarif_eintrag(z))
@@ -456,22 +515,32 @@ def persistiere_unbekannte(root: Path, eintraege: list, heute: str) -> int:
     neue = [e for e in eintraege if not _ist_tarif_eintrag(e)]
     verworfen = bereinigt + (len(eintraege) - len(neue))
     if verworfen:
-        log.info("Auto-Erkennung: %d Tarif-Titel aus der Arbeitsliste "
-                 "gefiltert (%d alte Zeilen bereinigt, %d neue verworfen) - "
-                 "die Liste bleibt Fruehindikator fuer Anker-Luecken (P5/E3)",
-                 verworfen, bereinigt, len(eintraege) - len(neue))
-    index = {(z.get("art"), z.get("wert"), z.get("anbieter")): i
-             for i, z in enumerate(zeilen)}
+        log.info(
+            "Auto-Erkennung: %d Tarif-Titel aus der Arbeitsliste "
+            "gefiltert (%d alte Zeilen bereinigt, %d neue verworfen) - "
+            "die Liste bleibt Fruehindikator fuer Anker-Luecken (P5/E3)",
+            verworfen,
+            bereinigt,
+            len(eintraege) - len(neue),
+        )
+    index = {
+        (z.get("art"), z.get("wert"), z.get("anbieter")): i
+        for i, z in enumerate(zeilen)
+    }
     for eintrag in neue:
-        schluessel = (eintrag.get("art"), eintrag.get("wert"),
-                      eintrag.get("anbieter"))
+        schluessel = (eintrag.get("art"), eintrag.get("wert"), eintrag.get("anbieter"))
         i = index.get(schluessel)
         if i is None:
-            zeilen.append({"art": eintrag.get("art"),
-                           "wert": eintrag.get("wert"),
-                           "anbieter": eintrag.get("anbieter"),
-                           "quelle": eintrag.get("quelle") or "",
-                           "datum": heute, "haeufigkeit": 1})
+            zeilen.append(
+                {
+                    "art": eintrag.get("art"),
+                    "wert": eintrag.get("wert"),
+                    "anbieter": eintrag.get("anbieter"),
+                    "quelle": eintrag.get("quelle") or "",
+                    "datum": heute,
+                    "haeufigkeit": 1,
+                }
+            )
             index[schluessel] = len(zeilen) - 1
             continue
         zeile = zeilen[i]

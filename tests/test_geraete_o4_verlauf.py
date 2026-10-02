@@ -23,6 +23,7 @@ Gemessen wird am ECHTEN Bestand (render_site), dieselbe Bauform wie
 `tests/test_geraete_o3_rollen.py`. Die Interaktion (die Auswahl steuert
 das EINZIGE Barpreis-Bild) misst `tests/test_geraete_o4_verlauf_browser.py`.
 """
+
 from __future__ import annotations
 
 import json
@@ -45,14 +46,16 @@ def site(tmp_path_factory) -> pathlib.Path:
 
 @pytest.fixture(scope="module")
 def geraete(site) -> BeautifulSoup:
-    return BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
-                         "html.parser")
+    return BeautifulSoup(
+        (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
+    )
 
 
 # --------------------------------------------------------------------------
 # E3-Fix: der Reiter trägt GENAU EIN Barpreis-Bild-System (die eigene
 # Auswahl) - kein G0-Block mehr
 # --------------------------------------------------------------------------
+
 
 def test_der_verlaufs_reiter_traegt_keine_zweite_barpreis_grafik(geraete):
     """G0 und die eigene Auswahl unten zeichneten beide den Barpreis
@@ -63,7 +66,8 @@ def test_der_verlaufs_reiter_traegt_keine_zweite_barpreis_grafik(geraete):
     assert verlauf is not None
     assert verlauf.select_one("#gr-g0-lager") is None, (
         "der G0-Block steht noch im Verlaufs-Reiter (Doppel-Darstellung "
-        "zur eigenen Geräteauswahl desselben Reiters)")
+        "zur eigenen Geräteauswahl desselben Reiters)"
+    )
     assert verlauf.select_one("svg.gr-g0") is None
 
 
@@ -74,12 +78,13 @@ def test_das_fragment_traegt_keine_g0_bloecke_mehr(site):
     trägt nur die Bündel-Zeilen."""
     fragment = site / "data" / "geraete-buendel.html"
     assert fragment.exists(), "Bündel-Fragment fehlt"
-    suppe = BeautifulSoup(fragment.read_text(encoding="utf-8"),
-                          "html.parser")
+    suppe = BeautifulSoup(fragment.read_text(encoding="utf-8"), "html.parser")
     assert not suppe.select(".gr-g0-lager"), (
-        "das Fragment trägt noch G0-Blöcke - niemand setzt sie ein")
+        "das Fragment trägt noch G0-Blöcke - niemand setzt sie ein"
+    )
     assert suppe.select(".gr-bnd-lager"), (
-        "die Bündel-Zeilen fehlen im Fragment (O3-Anbindung gerissen)")
+        "die Bündel-Zeilen fehlen im Fragment (O3-Anbindung gerissen)"
+    )
 
 
 def test_nur_die_zeitreihe_ist_svg_in_der_vergleichsansicht(geraete):
@@ -92,12 +97,14 @@ def test_nur_die_zeitreihe_ist_svg_in_der_vergleichsansicht(geraete):
     assert svgs, "die Zeitreihe (svg.gr-zr) fehlt"
     for svg in svgs:
         assert "gr-zr" in (svg.get("class") or []), (
-            "SVG ausser der Zeitreihe in der Vergleichsansicht")
+            "SVG ausser der Zeitreihe in der Vergleichsansicht"
+        )
 
 
 # --------------------------------------------------------------------------
 # Ehrliche Hinweise nach dem Entwurf
 # --------------------------------------------------------------------------
+
 
 def test_der_beginn_der_tco_historie_ist_der_echte(geraete):
     """E3 (S1) hat den TCO-Historie-Absatz dieses Reiters FALLEN lassen:
@@ -122,10 +129,12 @@ def test_der_beginn_der_tco_historie_ist_der_echte(geraete):
     knopf = geraete.select_one('.gr-reiter [data-tafel="tafel-verlauf"]')
     assert knopf is not None
     assert knopf.get_text(" ", strip=True) == "Ohne Vertrag", (
-        "der Verlaufs-Reiter benennt nicht die Barpreis-Frage (E3/S1)")
+        "der Verlaufs-Reiter benennt nicht die Barpreis-Frage (E3/S1)"
+    )
     assert "TCO-24-Historie" not in text, (
         "der TCO-Historie-Absatz ist zurückgekehrt (E3/S1: Doppel-"
-        "Darstellung zur Zeitreihe des Vergleichs-Reiters)")
+        "Darstellung zur Zeitreihe des Vergleichs-Reiters)"
+    )
     if not tage:
         pytest.skip("keine TCO-Historie im Bestand")
     seit = min(tage)
@@ -136,11 +145,11 @@ def test_der_beginn_der_tco_historie_ist_der_echte(geraete):
     erwartet = f"{int(d)}.{int(m)}."
     vergleich = geraete.select_one("#tafel-tco")
     assert vergleich is not None
-    achse = [t.get_text(strip=True)
-             for t in vergleich.select(".gr-zr-xtick")]
+    achse = [t.get_text(strip=True) for t in vergleich.select(".gr-zr-xtick")]
     assert erwartet in achse, (
         f"Der Vergleichs-Reiter nennt nicht den echten Beginn {seit} "
-        f"der TCO-Historie ({erwartet!r} fehlt in der Messtag-Zeile)")
+        f"der TCO-Historie ({erwartet!r} fehlt in der Messtag-Zeile)"
+    )
 
 
 def test_der_alte_falsche_satz_ist_weg(geraete):

@@ -21,6 +21,7 @@ Das Token kommt ueber eine DATEI, nicht ueber ein Argument: eine
 Kommandozeile steht in der Prozessliste und im Actions-Log, und im Token
 steckt die Adresse.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -33,12 +34,12 @@ WURZEL = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(WURZEL / "src"))
 sys.path.insert(0, str(WURZEL))
 
-from service.signup import tokens                                # noqa: E402
-from telco_radar.newsletter import store as st                   # noqa: E402
-from telco_radar.newsletter import subscription as sub           # noqa: E402
-from telco_radar.newsletter.config import lade_katalog           # noqa: E402
-from telco_radar.newsletter.filters import lies_filtersatz       # noqa: E402
-from telco_radar.report import rechtstexte                       # noqa: E402
+from service.signup import tokens  # noqa: E402
+from telco_radar.newsletter import store as st  # noqa: E402
+from telco_radar.newsletter import subscription as sub  # noqa: E402
+from telco_radar.newsletter.config import lade_katalog  # noqa: E402
+from telco_radar.newsletter.filters import lies_filtersatz  # noqa: E402
+from telco_radar.report import rechtstexte  # noqa: E402
 
 
 def maskiere(wert: str) -> None:
@@ -73,6 +74,7 @@ def _zahl(name: str, wert) -> None:
 
 # ----------------------------------------------------------------- doi -----
 
+
 def befehl_doi(args) -> int:
     """Bestaetigungsmail versenden - oder stillschweigend nicht.
 
@@ -83,8 +85,7 @@ def befehl_doi(args) -> int:
     fuer Dritte: jemand traegt eine fremde Adresse ein, so oft er mag, und
     das schlaegt direkt auf die Absenderreputation durch.
     """
-    daten = _token(args.token_datei, tokens.ZWECK_BESTAETIGUNG,
-                   tokens.TTL_BESTAETIGUNG)
+    daten = _token(args.token_datei, tokens.ZWECK_BESTAETIGUNG, tokens.TTL_BESTAETIGUNG)
     kennwert = str(daten.get("addr_hmac") or "")
     doi_log = Path(args.doi_log)
 
@@ -104,8 +105,9 @@ def befehl_doi(args) -> int:
     from telco_radar.newsletter.render import Nachricht
 
     chrome = lade_chrome()
-    basis = os.environ.get("SITE_BASE_URL",
-                           "https://telco-radar.onrender.com").rstrip("/")
+    basis = os.environ.get("SITE_BASE_URL", "https://telco-radar.onrender.com").rstrip(
+        "/"
+    )
     bestaetigen = args.confirm_url or f"{basis}/confirm/unbekannt"
     nachricht = Nachricht(
         betreff="Bitte bestätigen: Telco Radar",
@@ -114,7 +116,8 @@ def befehl_doi(args) -> int:
         # KEIN List-Unsubscribe: es gibt noch kein Abo, von dem man sich
         # abmelden koennte. Ein Header, der auf eine leere Handlung zeigt,
         # ist schlimmer als keiner.
-        headers={})
+        headers={},
+    )
 
     if args.trocken:
         transport = Trockenlauf()
@@ -123,7 +126,9 @@ def befehl_doi(args) -> int:
             api_key=os.environ.get("BREVO_API_KEY", ""),
             absender_name=chrome.get("absender_name", "Telco Radar"),
             absender_adresse=os.environ.get(
-                "MAIL_FROM", "antonio.fotiadis.francisco@gmail.com"))
+                "MAIL_FROM", "antonio.fotiadis.francisco@gmail.com"
+            ),
+        )
     ergebnis = transport.send(nachricht, adresse)
     _zahl("DOI", "versendet" if ergebnis.ok else f"gescheitert ({ergebnis.status})")
     if ergebnis.ok:
@@ -137,6 +142,7 @@ def befehl_doi(args) -> int:
 
 def _doi_html(bestaetigen: str, basis: str) -> str:
     import html as h
+
     return f"""<!DOCTYPE html><html lang=de><body style="margin:0;background:#f6f4ee">
 <table role=presentation width="100%" cellpadding=0 cellspacing=0 border=0><tr>
 <td align=center style="padding:28px 12px"><table role=presentation width=600
@@ -169,15 +175,16 @@ def _doi_text(bestaetigen: str, basis: str) -> str:
         "keine weitere Nachricht.\n\n"
         f"Angefordert über das Anmeldeformular auf {basis}.\n\n"
         f"Impressum: {basis}/impressum.html\n"
-        f"Datenschutzerklärung: {basis}/datenschutz.html\n")
+        f"Datenschutzerklärung: {basis}/datenschutz.html\n"
+    )
 
 
 # ------------------------------------------------------------- confirm -----
 
+
 def befehl_confirm(args) -> int:
     """Erst hier entsteht ein Abonnement - und das vollstaendige Protokoll."""
-    daten = _token(args.token_datei, tokens.ZWECK_BESTAETIGUNG,
-                   tokens.TTL_BESTAETIGUNG)
+    daten = _token(args.token_datei, tokens.ZWECK_BESTAETIGUNG, tokens.TTL_BESTAETIGUNG)
     pepper = os.environ.get("SIGNUP_PEPPER", "")
     if not pepper:
         raise SystemExit("::error::SIGNUP_PEPPER fehlt.")
@@ -189,8 +196,9 @@ def befehl_confirm(args) -> int:
 
     # Die Domain-Allowlist wird HIER ausgewertet, nicht nur im Dienst: der
     # Dienst kann ausgetauscht werden, der Store nicht.
-    erlaubte = [d for d in os.environ.get("ERLAUBTE_DOMAINS", "").split(",")
-                if d.strip()]
+    erlaubte = [
+        d for d in os.environ.get("ERLAUBTE_DOMAINS", "").split(",") if d.strip()
+    ]
     if not sub.erlaubt_nach_domainliste(adresse, erlaubte):
         _zahl("Bestaetigung", "abgewiesen (Domainliste)")
         return 0
@@ -221,16 +229,19 @@ def befehl_confirm(args) -> int:
     abo.email_hmac = kennwert
     abo.filter = lies_filtersatz(daten.get("filters") or {}, katalog)
     abo.consent = sub.Einwilligungsnachweis(
-        text_version=version, text_hash=hash_im_token,
+        text_version=version,
+        text_hash=hash_im_token,
         ip_hmac=str(daten.get("ip_hmac") or ""),
         user_agent_hmac=str(daten.get("ua_hmac") or ""),
-        confirm_token_id=args.token_id)
+        confirm_token_id=args.token_id,
+    )
     abo.created_at = abo.created_at or _iso(daten.get("iat"))
     abo.confirmed_at = sub.jetzt()
     abo.state = "active"
     if not abo.consent.vollstaendig:
-        raise SystemExit("::error::Einwilligungsnachweis unvollständig - "
-                         "kein Abo angelegt.")
+        raise SystemExit(
+            "::error::Einwilligungsnachweis unvollständig - kein Abo angelegt."
+        )
     store.setze(abo)
     store.speichern()
     _zahl("Bestaetigung", "aktiv")
@@ -240,14 +251,20 @@ def befehl_confirm(args) -> int:
 
 def _iso(iat) -> str:
     from datetime import datetime, timezone
+
     try:
-        return datetime.fromtimestamp(float(iat), timezone.utc).replace(
-            microsecond=0).isoformat().replace("+00:00", "Z")
+        return (
+            datetime.fromtimestamp(float(iat), timezone.utc)
+            .replace(microsecond=0)
+            .isoformat()
+            .replace("+00:00", "Z")
+        )
     except (TypeError, ValueError):
         return sub.jetzt()
 
 
 # --------------------------------------------------------- unsubscribe -----
+
 
 def befehl_unsubscribe(args) -> int:
     """Widerruf: Zustand setzen, ADRESSE LOESCHEN, Kennwert behalten.
@@ -256,13 +273,13 @@ def befehl_unsubscribe(args) -> int:
     Anmeldeversuch wieder angeschrieben wuerde - ein Widerruf, der nach vier
     Wochen von selbst verfaellt, ist keiner.
     """
-    daten = _token(args.token_datei, tokens.ZWECK_ABMELDUNG,
-                   10 * 365 * 24 * 3600)
+    daten = _token(args.token_datei, tokens.ZWECK_ABMELDUNG, 10 * 365 * 24 * 3600)
     katalog = lade_katalog(WURZEL)
     store = st.AboStore(Path(args.store), katalog)
 
-    abo = (store.finde(str(daten.get("sub_id") or ""))
-           or store.finde_ueber_kennwert(str(daten.get("addr_hmac") or "")))
+    abo = store.finde(str(daten.get("sub_id") or "")) or store.finde_ueber_kennwert(
+        str(daten.get("addr_hmac") or "")
+    )
     if abo is None:
         # Schon abgemeldet oder nie da gewesen. Kein Fehler: der Nutzer hat
         # auf der Seite bereits "Abgemeldet" gelesen, und das stimmt.
@@ -276,6 +293,7 @@ def befehl_unsubscribe(args) -> int:
 
 
 # ---------------------------------------------------------------- main -----
+
 
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__)
@@ -295,8 +313,11 @@ def main(argv=None) -> int:
             u.add_argument("--trocken", action="store_true")
 
     args = p.parse_args(argv)
-    return {"doi": befehl_doi, "confirm": befehl_confirm,
-            "unsubscribe": befehl_unsubscribe}[args.befehl](args)
+    return {
+        "doi": befehl_doi,
+        "confirm": befehl_confirm,
+        "unsubscribe": befehl_unsubscribe,
+    }[args.befehl](args)
 
 
 if __name__ == "__main__":

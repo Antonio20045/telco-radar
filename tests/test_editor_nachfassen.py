@@ -4,6 +4,7 @@ Im Lauf #63 (04.08.2026) hatte Sonnet 5 den Bericht geschrieben - Inhalt war
 da, nur die Gliederung stimmte nicht. Ergebnis war trotzdem der Roh-Digest auf
 der Startseite. Das ist die teuerste moegliche Reaktion auf einen Formfehler.
 """
+
 from __future__ import annotations
 
 import pytest

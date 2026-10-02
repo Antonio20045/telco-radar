@@ -22,6 +22,7 @@ Vier Befundarten, jede für sich rot:
 Eine belegte Lücke (Anbieter führt das Gerät nicht, Anbieter nicht
 erreichbar) ist kein Befund, sie steht aber mit ihrem Grund in der Matrix.
 """
+
 from __future__ import annotations
 
 import json
@@ -94,9 +95,11 @@ def lade_pflicht(pfad: Path) -> dict:
         modelle = eintrag.get("modelle") or ["*"]
         for modell in modelle:
             luecken[(eintrag["anbieter"], modell)] = grund
-    return {"anbieter": list(daten.get("pflicht_anbieter") or []),
-            "modelle": list(daten.get("pflicht_modelle") or []),
-            "luecken": luecken}
+    return {
+        "anbieter": list(daten.get("pflicht_anbieter") or []),
+        "modelle": list(daten.get("pflicht_modelle") or []),
+        "luecken": luecken,
+    }
 
 
 def _anbieter_aus_id(buendel_id: str, namen: dict) -> Optional[str]:
@@ -107,11 +110,12 @@ def _anbieter_aus_id(buendel_id: str, namen: dict) -> Optional[str]:
 def pruefe(tco: dict, historie: list[dict], pflicht: dict) -> Abdeckung:
     """Rechnet Matrix und Befunde. Rein: liest nur, was übergeben wird."""
     messtag = tco.get("updated")
-    ergebnis = Abdeckung(messtag=messtag, vortag=None,
-                         luecken=dict(pflicht["luecken"]))
-    heute = [b for b in tco.get("buendel") or []
-             if b.get("last_verified") == messtag
-             and (b.get("zustand") or "neu") == "neu"]
+    ergebnis = Abdeckung(messtag=messtag, vortag=None, luecken=dict(pflicht["luecken"]))
+    heute = [
+        b
+        for b in tco.get("buendel") or []
+        if b.get("last_verified") == messtag and (b.get("zustand") or "neu") == "neu"
+    ]
 
     for b in heute:
         modell, speicher = modell_und_speicher(b.get("sku_id"))
@@ -119,44 +123,59 @@ def pruefe(tco: dict, historie: list[dict], pflicht: dict) -> Abdeckung:
             continue
         zelle = ergebnis.matrix.setdefault(
             (modell, b["anbieter"]),
-            {"speicher": set(), "tarife": set(), "laufzeiten": set()})
+            {"speicher": set(), "tarife": set(), "laufzeiten": set()},
+        )
         zelle["speicher"].add(speicher)
         zelle["tarife"].add(b.get("tarif_name"))
         zelle["laufzeiten"].add(b.get("laufzeit_monate"))
-        ergebnis.anbieter_zahl[b["anbieter"]] = \
+        ergebnis.anbieter_zahl[b["anbieter"]] = (
             ergebnis.anbieter_zahl.get(b["anbieter"], 0) + 1
+        )
 
     def belegt(anbieter: str, modell: str) -> bool:
-        return ((anbieter, modell) in ergebnis.luecken
-                or (anbieter, "*") in ergebnis.luecken)
+        return (anbieter, modell) in ergebnis.luecken or (
+            anbieter,
+            "*",
+        ) in ergebnis.luecken
 
     for anbieter in pflicht["anbieter"]:
         if ergebnis.anbieter_zahl.get(anbieter):
             continue
         if belegt(anbieter, "*"):
             continue
-        ergebnis.befunde.append(Befund(
-            "anbieter_leer", anbieter,
-            f"{anbieter}: kein einziges Bündel am Messtag {messtag}"))
+        ergebnis.befunde.append(
+            Befund(
+                "anbieter_leer",
+                anbieter,
+                f"{anbieter}: kein einziges Bündel am Messtag {messtag}",
+            )
+        )
 
     for anbieter in pflicht["anbieter"]:
         if not ergebnis.anbieter_zahl.get(anbieter):
             continue
-        fehlend = [m for m in pflicht["modelle"]
-                   if (m, anbieter) not in ergebnis.matrix
-                   and not belegt(anbieter, m)]
+        fehlend = [
+            m
+            for m in pflicht["modelle"]
+            if (m, anbieter) not in ergebnis.matrix and not belegt(anbieter, m)
+        ]
         if fehlend:
-            ergebnis.befunde.append(Befund(
-                "modell_fehlt", anbieter,
-                f"{anbieter}: {len(fehlend)} Pflichtmodelle ohne Bündel "
-                f"und ohne belegte Lücke: {', '.join(fehlend[:BEISPIELE])}"))
+            ergebnis.befunde.append(
+                Befund(
+                    "modell_fehlt",
+                    anbieter,
+                    f"{anbieter}: {len(fehlend)} Pflichtmodelle ohne Bündel "
+                    f"und ohne belegte Lücke: {', '.join(fehlend[:BEISPIELE])}",
+                )
+            )
 
     _vergleiche_vortag(ergebnis, historie, pflicht["anbieter"], messtag)
     return ergebnis
 
 
-def _vergleiche_vortag(ergebnis: Abdeckung, historie: list[dict],
-                       anbieter_liste: list[str], messtag: str) -> None:
+def _vergleiche_vortag(
+    ergebnis: Abdeckung, historie: list[dict], anbieter_liste: list[str], messtag: str
+) -> None:
     namen = {normalisiere(a): a for a in anbieter_liste}
     je_tag: dict = defaultdict(lambda: defaultdict(dict))
     for zeile in historie:
@@ -176,13 +195,18 @@ def _vergleiche_vortag(ergebnis: Abdeckung, historie: list[dict],
         vortage.add(vortag)
         alt, neu = tage[vortag], tage[messtag]
         weg = sorted(set(alt) - set(neu))
-        if (len(weg) >= KOMBI_VERLUST_MINDEST
-                and len(weg) > KOMBI_VERLUST_ANTEIL * len(alt)):
-            ergebnis.befunde.append(Befund(
-                "kombis_weg", anbieter,
-                f"{anbieter}: {len(weg)} von {len(alt)} Kombinationen vom "
-                f"{vortag} fehlen am {messtag}, z. B. "
-                f"{', '.join(weg[:BEISPIELE])}"))
+        if len(weg) >= KOMBI_VERLUST_MINDEST and len(weg) > KOMBI_VERLUST_ANTEIL * len(
+            alt
+        ):
+            ergebnis.befunde.append(
+                Befund(
+                    "kombis_weg",
+                    anbieter,
+                    f"{anbieter}: {len(weg)} von {len(alt)} Kombinationen vom "
+                    f"{vortag} fehlen am {messtag}, z. B. "
+                    f"{', '.join(weg[:BEISPIELE])}",
+                )
+            )
         spruenge = []
         for bid in sorted(set(alt) & set(neu)):
             a, n = alt[bid], neu[bid]
@@ -191,11 +215,15 @@ def _vergleiche_vortag(ergebnis: Abdeckung, historie: list[dict],
             if abs(n - a) / a > PREISSPRUNG_ANTEIL:
                 spruenge.append(f"{bid} {a:.2f} → {n:.2f} €")
         if spruenge:
-            ergebnis.befunde.append(Befund(
-                "preissprung", anbieter,
-                f"{anbieter}: {len(spruenge)} Leitzahlen springen um mehr "
-                f"als {PREISSPRUNG_ANTEIL:.0%} gegenüber {vortag}: "
-                f"{'; '.join(spruenge[:BEISPIELE])}"))
+            ergebnis.befunde.append(
+                Befund(
+                    "preissprung",
+                    anbieter,
+                    f"{anbieter}: {len(spruenge)} Leitzahlen springen um mehr "
+                    f"als {PREISSPRUNG_ANTEIL:.0%} gegenüber {vortag}: "
+                    f"{'; '.join(spruenge[:BEISPIELE])}",
+                )
+            )
     ergebnis.vortag = max(vortage) if vortage else None
 
 
@@ -214,18 +242,22 @@ def lade_und_pruefe(root: Path) -> Abdeckung:
 def _zelle_text(zelle: Optional[dict]) -> str:
     if not zelle:
         return ""
-    laufzeiten = "/".join(str(z) for z in sorted(
-        z for z in zelle["laufzeiten"] if z is not None))
-    return (f"{len(zelle['speicher'])} Sp · {len(zelle['tarife'])} Tarife · "
-            f"{laufzeiten or '?'} M")
+    laufzeiten = "/".join(
+        str(z) for z in sorted(z for z in zelle["laufzeiten"] if z is not None)
+    )
+    return (
+        f"{len(zelle['speicher'])} Sp · {len(zelle['tarife'])} Tarife · "
+        f"{laufzeiten or '?'} M"
+    )
 
 
 def als_markdown(ergebnis: Abdeckung, pflicht: dict) -> str:
     anbieter = pflicht["anbieter"]
     zeilen = [f"# Bündelabdeckung am {ergebnis.messtag}", ""]
-    zeilen.append("**Ergebnis:** " + (
-        f"rot, {len(ergebnis.befunde)} Befunde" if ergebnis.rot
-        else "grün"))
+    zeilen.append(
+        "**Ergebnis:** "
+        + (f"rot, {len(ergebnis.befunde)} Befunde" if ergebnis.rot else "grün")
+    )
     zeilen.append("")
     zeilen.append("| Anbieter | Bündel am Messtag |")
     zeilen.append("|---|---:|")
@@ -239,8 +271,9 @@ def als_markdown(ergebnis: Abdeckung, pflicht: dict) -> str:
         for a in anbieter:
             text = _zelle_text(ergebnis.matrix.get((modell, a)))
             if not text:
-                grund = ergebnis.luecken.get((a, modell)) or \
-                    ergebnis.luecken.get((a, "*"))
+                grund = ergebnis.luecken.get((a, modell)) or ergebnis.luecken.get(
+                    (a, "*")
+                )
                 text = "belegt: " + grund if grund else "**fehlt**"
             zellen.append(text)
         zeilen.append(f"| {modell} | " + " | ".join(zellen) + " |")

@@ -44,6 +44,7 @@ Ein Test, der beim Einsammeln stirbt, beweist nichts.
 
 Kein Test haengt am heutigen Datum (CLAUDE.md Regel 11).
 """
+
 import json
 
 from telco_radar.analyze.geraete_store import GELESEN, GeraeteDB
@@ -64,19 +65,29 @@ def _bestand(tmp_path, naechte) -> GeraeteDB:
     aufgefallen ist.
     """
     pfad = tmp_path / "geraete_db.json"
-    pfad.write_text(json.dumps({
-        "updated": naechte[-1][0],
-        "anbieter": {_ANBIETER: {
-            "laeufe": len(naechte),
-            "funde_gesamt": sum(n[3] for n in naechte),
-            "letzter_lauf": naechte[-1][0],
-            "letzter_fund": naechte[-1][0],
-            "termine": [n[0] for n in naechte],
-            "funde_nach_tag": [[tag, zeilen, GELESEN, 0, versucht, tote]
-                               for tag, versucht, tote, zeilen in naechte],
-        }},
-        "listungen": [],
-    }, ensure_ascii=False), encoding="utf-8")
+    pfad.write_text(
+        json.dumps(
+            {
+                "updated": naechte[-1][0],
+                "anbieter": {
+                    _ANBIETER: {
+                        "laeufe": len(naechte),
+                        "funde_gesamt": sum(n[3] for n in naechte),
+                        "letzter_lauf": naechte[-1][0],
+                        "letzter_fund": naechte[-1][0],
+                        "termine": [n[0] for n in naechte],
+                        "funde_nach_tag": [
+                            [tag, zeilen, GELESEN, 0, versucht, tote]
+                            for tag, versucht, tote, zeilen in naechte
+                        ],
+                    }
+                },
+                "listungen": [],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
     return GeraeteDB(pfad)
 
 
@@ -85,18 +96,19 @@ def _bestand(tmp_path, naechte) -> GeraeteDB:
 # Viertel. Die Zeilen (rund drei je Seite) gehen im selben Takt zurueck -
 # jeder EINZELNE Tagesschritt bleibt unter 30 %.
 _FUENF_NAECHTE = [
-    (_tag(1), 45, 0, 133),      # der letzte heile Tag
-    (_tag(2), 45, 11, 100),     # 24,4 % tot - Schwelle haelt (0,756)
-    (_tag(3), 34, 8, 77),       # 23,5 % tot
-    (_tag(4), 26, 6, 59),       # 23,1 % tot
-    (_tag(5), 20, 5, 44),       # 25,0 % tot - genau an der Schwelle
-    (_tag(6), 15, 3, 36),       # 20,0 % tot
+    (_tag(1), 45, 0, 133),  # der letzte heile Tag
+    (_tag(2), 45, 11, 100),  # 24,4 % tot - Schwelle haelt (0,756)
+    (_tag(3), 34, 8, 77),  # 23,5 % tot
+    (_tag(4), 26, 6, 59),  # 23,1 % tot
+    (_tag(5), 20, 5, 44),  # 25,0 % tot - genau an der Schwelle
+    (_tag(6), 15, 3, 36),  # 20,0 % tot
 ]
 
 
 # --------------------------------------------------------------------------
 # 1. Der Fall aus dem Review: fuenf Naechte a 24 %
 # --------------------------------------------------------------------------
+
 
 def test_kein_einzelner_tagesschritt_reisst_eine_der_alten_schwellen(tmp_path):
     """Die Voraussetzung des Befunds, ausdruecklich nachgerechnet.
@@ -131,8 +143,9 @@ def test_fuenf_naechte_a_vierundzwanzig_prozent_loesen_alarm_aus(tmp_path):
     neuen Namens: ein Test, der beim Einsammeln stirbt, beweist nichts.
     """
     db = _bestand(tmp_path, _FUENF_NAECHTE)
-    gemeldet = {tag: db.abdeckungsalarm(_ANBIETER, tag)
-                for tag, _, _, _ in _FUENF_NAECHTE}
+    gemeldet = {
+        tag: db.abdeckungsalarm(_ANBIETER, tag) for tag, _, _, _ in _FUENF_NAECHTE
+    }
     laut = sorted(tag for tag, alarm in gemeldet.items() if alarm is not None)
     assert laut, "kein einziger Befund in fuenf Naechten mit 24 % Schwund"
     # Und zwar frueh: spaetestens in der dritten Nacht, mit noch 26 von
@@ -173,6 +186,7 @@ def test_der_befund_nennt_adressen_und_bezugstag(tmp_path):
 # 2. Eine STABILE Luecke ist keine Erosion
 # --------------------------------------------------------------------------
 
+
 def test_dieselben_neun_toten_adressen_jede_nacht_alarmieren_nicht(tmp_path):
     """Der Fall, fuer den das tote-Adressen-Paket gebaut wurde: freenets
     Sitemap fuehrt Nacht fuer Nacht dieselben neun Leichen, gelesen werden
@@ -190,21 +204,24 @@ def test_ein_gewachsenes_sortiment_alarmiert_nicht(tmp_path):
     """Gegenprobe nach oben: wer mehr Seiten liefert als vorige Woche, hat
     keinen Schwund. Ein Alarm, der auf einen Betrag statt auf ein
     Vorzeichen sieht, faellt hier."""
-    db = _bestand(tmp_path, [(_tag(1), 20, 0, 60), (_tag(2), 30, 0, 90),
-                             (_tag(3), 45, 0, 133)])
+    db = _bestand(
+        tmp_path, [(_tag(1), 20, 0, 60), (_tag(2), 30, 0, 90), (_tag(3), 45, 0, 133)]
+    )
     assert db.abdeckungsalarm(_ANBIETER, _tag(3)) is None
 
 
 def test_ein_tag_ohne_adressauskunft_faellt_aus_dem_vergleich(tmp_path):
-    """"Nicht versucht" ist nicht "null gelesen" (Clean Code 3/6).
+    """ "Nicht versucht" ist nicht "null gelesen" (Clean Code 3/6).
 
     Ein Anbieter, dessen Adapter an einem Tag keine Produktseite anfasst,
     schreibt `versucht: 0` und `tote: null`. Wuerde dieser Tag als "0
     gelesene Adressen" in den Vergleich eingehen, meldete jeder solche
     Tag 100 % Schwund - und die Meldung waere frei erfunden.
     """
-    db = _bestand(tmp_path, [(_tag(1), 45, 0, 133), (_tag(2), 45, 0, 133),
-                             (_tag(3), 0, None, 133)])
+    db = _bestand(
+        tmp_path,
+        [(_tag(1), 45, 0, 133), (_tag(2), 45, 0, 133), (_tag(3), 0, None, 133)],
+    )
     assert db.abdeckungsalarm(_ANBIETER, _tag(3)) is None
 
 
@@ -213,15 +230,27 @@ def test_der_altbestand_ohne_adressfelder_alarmiert_nicht(tmp_path):
     Adresszahlen nicht. Sie darf keinen Befund erzeugen - weder einen
     echten noch einen erfundenen."""
     pfad = tmp_path / "geraete_db.json"
-    pfad.write_text(json.dumps({
-        "updated": _tag(3),
-        "anbieter": {_ANBIETER: {
-            "laeufe": 3, "funde_gesamt": 399, "letzter_lauf": _tag(3),
-            "letzter_fund": _tag(3),
-            "funde_nach_tag": [[_tag(n), 133, GELESEN, 0] for n in (1, 2, 3)],
-        }},
-        "listungen": [],
-    }, ensure_ascii=False), encoding="utf-8")
+    pfad.write_text(
+        json.dumps(
+            {
+                "updated": _tag(3),
+                "anbieter": {
+                    _ANBIETER: {
+                        "laeufe": 3,
+                        "funde_gesamt": 399,
+                        "letzter_lauf": _tag(3),
+                        "letzter_fund": _tag(3),
+                        "funde_nach_tag": [
+                            [_tag(n), 133, GELESEN, 0] for n in (1, 2, 3)
+                        ],
+                    }
+                },
+                "listungen": [],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
     db = GeraeteDB(pfad)
     assert db.messtage(_ANBIETER)[-1].gelesene_adressen is None
     assert db.abdeckungsalarm(_ANBIETER, _tag(3)) is None
@@ -230,6 +259,7 @@ def test_der_altbestand_ohne_adressfelder_alarmiert_nicht(tmp_path):
 # --------------------------------------------------------------------------
 # 3. S2-1: die Einheit der Schwelle - und was sie wirklich nach unten haelt
 # --------------------------------------------------------------------------
+
 
 def test_der_waechter_rechnet_in_zeilen_die_schwelle_in_adressen(tmp_path):
     """Das Gegenbeispiel, an dem die alte Begruendung der 0,75 zerbricht.
@@ -268,13 +298,11 @@ def test_die_untergrenze_der_schwelle_ist_der_erosionsalarm(tmp_path):
     bleibt damit unter `ABDECKUNG_RUECKGANG` - der Waechter sieht nichts,
     und ohne den Erosionsalarm bliebe es dabei, bis der Anbieter leer ist.
     """
-    naechte = [(_tag(1), 48, 0, 144), (_tag(2), 48, 12, 108),
-               (_tag(3), 36, 9, 81)]
+    naechte = [(_tag(1), 48, 0, 144), (_tag(2), 48, 12, 108), (_tag(3), 36, 9, 81)]
     db = _bestand(tmp_path, naechte)
     assert db.abdeckungsalarm(_ANBIETER, _tag(2)) is None
     alarm = db.abdeckungsalarm(_ANBIETER, _tag(3))
-    assert alarm is not None, \
-        "genau an der Schwelle broeselt der Anbieter still weg"
+    assert alarm is not None, "genau an der Schwelle broeselt der Anbieter still weg"
     assert alarm.adressen_vortag == 48 and alarm.adressen == 27
 
     from telco_radar.analyze.geraete_store import ALARM_EROSION

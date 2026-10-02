@@ -21,6 +21,7 @@ Fixture: dieselbe `_baue()` wie in `test_geraete_rahmen.py` -
 `test_geraete_tco_zustand._baue`, ein Modell (iPhone 15 128 GB), o2 neu +
 erneuert, Vodafone als Referenzrechnung.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -33,6 +34,7 @@ from test_geraete_tco_zustand import _baue
 # --------------------------------------------------------------------------
 # Kriterium 1: G0 ist die einzige Grafik je Modellblock
 # --------------------------------------------------------------------------
+
 
 def test_der_eine_graph_ist_die_zeitreihe(tmp_path):
     """E2 (16.09.2026) dreht die Regel ein drittes Mal - diesmal auf
@@ -58,6 +60,7 @@ def test_der_eine_graph_ist_die_zeitreihe(tmp_path):
 # Kriterium 2: die Antwortzeile steht zwischen Auswahl und Graph
 # --------------------------------------------------------------------------
 
+
 def test_antwortzeile_steht_zwischen_auswahl_und_graph(tmp_path):
     """E2: dieselbe Invariante am neuen Aufbau - Wahl-Leiste, dann der
     Antwort-Satz, dann der Graph (§4.2: nichts dazwischen)."""
@@ -70,9 +73,11 @@ def test_antwortzeile_steht_zwischen_auswahl_und_graph(tmp_path):
     assert antwort is not None, "der Antwort-Satz fehlt"
     assert graph is not None, "der Zeitreihen-Graph fehlt"
     text = str(tafel)
-    assert text.index('id="gr-zr-wahl"') < \
-        text.index('class="gr-zr-antwort"') < \
-        text.index('class="gr-zr-graph"')
+    assert (
+        text.index('id="gr-zr-wahl"')
+        < text.index('class="gr-zr-antwort"')
+        < text.index('class="gr-zr-graph"')
+    )
 
 
 def test_der_antwort_satz_nennt_anbieter_und_die_leitzahl(tmp_path):
@@ -89,14 +94,16 @@ def test_der_antwort_satz_nennt_anbieter_und_die_leitzahl(tmp_path):
     assert "Kosten über 24 Monate" in text, text
     assert "TCO-24" not in text, text
     assert "€" in text
-    assert any(a in text for a in ("o2", "Vodafone", "1&1", "congstar")), \
+    assert any(a in text for a in ("o2", "Vodafone", "1&1", "congstar")), (
         f"kein Anbieter im Antwort-Satz: {text}"
+    )
 
 
 # --------------------------------------------------------------------------
 # Kriterium 3: die Titelzeile - siehe `test_geraete_rahmen.py`
 # (`test_die_ueberschrift_ist_sachlich_nicht_die_gescheiterte_frage`)
 # --------------------------------------------------------------------------
+
 
 def test_der_seitentitel_ist_sachlich(tmp_path):
     s = _baue(tmp_path)
@@ -112,14 +119,17 @@ def test_der_seitentitel_ist_sachlich(tmp_path):
 # der Tarifmaßstab weiterhin hinter einer Aufklappung steht.
 # --------------------------------------------------------------------------
 
+
 def test_die_vergleichsansicht_traegt_keine_alarmtafel_mehr(tmp_path):
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
-    assert tafel.select_one(".gr-chips") is None, \
+    assert tafel.select_one(".gr-chips") is None, (
         "die Ampel-Kacheln stehen noch in der Vergleichsansicht"
+    )
     assert tafel.select_one("#gr-alarme") is None
-    assert tafel.select_one("#gr-tco-tabelle") is None, \
+    assert tafel.select_one("#gr-tco-tabelle") is None, (
         "'Alle Bündel als Tabelle' ist in die Zeilen-Tabelle aufgegangen"
+    )
 
 
 def test_der_tarifmassstab_steht_in_einer_aufklappung(tmp_path):
@@ -134,8 +144,9 @@ def test_der_tarifmassstab_steht_in_einer_aufklappung(tmp_path):
         pytest.skip("keine Referenzen im Bestand der Fixture")
     assert massstab.name == "details"
     assert massstab.get("open") is None, "die Aufklappung ist offen"
-    assert tafel.select_one("#gr-massstab") is None, \
+    assert tafel.select_one("#gr-massstab") is None, (
         "der Massstab steht doppelt (alter Aufklapper zurueckgekehrt)"
+    )
 
 
 def test_die_buendel_zeilen_stehen_ausserhalb_jeder_aufklappung(tmp_path):
@@ -147,10 +158,10 @@ def test_die_buendel_zeilen_stehen_ausserhalb_jeder_aufklappung(tmp_path):
     for zeile in tafel.select("#gr-buendel .gr-bnd"):
         elter = zeile.parent
         while elter is not None and elter.name is not None:
-            if elter.name == "details" and \
-                    "gr-bnd" not in (elter.get("class") or []):
-                pytest.fail("Bündelzeile steckt in einer Aufklappung: "
-                            + str(elter)[:80])
+            if elter.name == "details" and "gr-bnd" not in (elter.get("class") or []):
+                pytest.fail(
+                    "Bündelzeile steckt in einer Aufklappung: " + str(elter)[:80]
+                )
             elter = elter.parent
 
 
@@ -158,6 +169,7 @@ def test_die_buendel_zeilen_stehen_ausserhalb_jeder_aufklappung(tmp_path):
 # Kriterium 5: Einzel-Punkt-Anbieter - Verdrahtung im HTML
 # (die Rechnung selbst: tests/test_geraete_zeitreihe.py)
 # --------------------------------------------------------------------------
+
 
 def test_haendler_ohne_preis_stehen_nicht_einzeln_da(tmp_path):
     """E2 (Antonio 9b.7 + §3.1): die 'Beschaffung läuft'-Legende ist mit
@@ -180,6 +192,7 @@ def test_haendler_ohne_preis_stehen_nicht_einzeln_da(tmp_path):
 # Kriterium 6: die Reiterleiste (E3: vier echte Tafeln auf EINER Seite)
 # --------------------------------------------------------------------------
 
+
 def test_die_reiterleiste_traegt_vergleich_radar_verlauf_katalog(tmp_path):
     """E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d): vier echte Tafeln in der
     Folge Vergleich · Radar · Preisverlauf · Gerätekatalog. Bis E3 war
@@ -189,16 +202,16 @@ def test_die_reiterleiste_traegt_vergleich_radar_verlauf_katalog(tmp_path):
     Tafel noch einen Seitenwechsel anbieten)."""
     s = _baue(tmp_path)
     knoepfe = s.select(".gr-reiter button[data-tafel]")
-    beschriftungen = [(k.get("data-tafel"), k.get_text(strip=True))
-                      for k in knoepfe]
+    beschriftungen = [(k.get("data-tafel"), k.get_text(strip=True)) for k in knoepfe]
     assert beschriftungen == [
         ("tafel-tco", "Mit Tarif"),
         ("tafel-verlauf", "Ohne Vertrag"),
         ("tafel-radar", "Übersicht"),
         ("tafel-katalog", "Katalog"),
     ]
-    assert s.select_one(".gr-reiter a") is None, \
+    assert s.select_one(".gr-reiter a") is None, (
         "die Reiterleiste trägt noch einen Link (E3: vier Tafeln)"
+    )
 
 
 def test_die_portfolio_tafel_ist_weg(tmp_path):

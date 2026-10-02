@@ -11,6 +11,7 @@ sondern eine leere Konfiguration. Die Geraetestufe tut dann nichts.
     config/farben.yaml            Schreibweise -> kanonische Farbe
     config/geraete_quellen.yaml   wer beobachtet wird und wie
 """
+
 from __future__ import annotations
 
 import logging
@@ -34,10 +35,22 @@ log = logging.getLogger(__name__)
 # INITIAL_STATE). Wer ihn als eine Methode implementiert haette, haette alle
 # fuenf gleichzeitig scharf geschaltet. Ein gebauter Adapter bekommt deshalb
 # einen EIGENEN Namen - dann sagt die Konfiguration, was wirklich gelesen wird.
-METHODEN = ("api", "ldjson", "shopify", "json_endpunkt", "html", "js",
-            "vodafone_api", "o2_katalog", "congstar_next",
-            "telekom_kategorie", "einsundeins_buendel", "saturn_brand",
-            "kein_hardware", "deaktiviert")
+METHODEN = (
+    "api",
+    "ldjson",
+    "shopify",
+    "json_endpunkt",
+    "html",
+    "js",
+    "vodafone_api",
+    "o2_katalog",
+    "congstar_next",
+    "telekom_kategorie",
+    "einsundeins_buendel",
+    "saturn_brand",
+    "kein_hardware",
+    "deaktiviert",
+)
 
 # Diese zwei sind gueltige Messergebnisse und keine Fehlkonfiguration, aber
 # es gibt nichts abzurufen. `kein_hardware` heisst "gemessen: der Anbieter
@@ -61,9 +74,10 @@ class Einstieg:
     verlinkt ist - nie eine hochgezaehlte ID. Dieselbe Regel und derselbe
     Grund wie beim Tarif-Sammler (§ 87b UrhG, Datenbankherstellerrecht).
     """
+
     url: str
     label: str = ""
-    kind: str = "static"          # static | sitemap | shopify | js
+    kind: str = "static"  # static | sitemap | shopify | js
     # Nur Links, deren Adresse das enthaelt. Ein String ODER eine Liste von
     # Strings, die ALLE enthalten sein muessen (UND) - die Liste braucht es,
     # weil freenets Sitemap unter dem Geraetemuster auch Tablets fuehrt und
@@ -93,8 +107,8 @@ class Anbieter:
     name: str
     typ: str = "handel"
     gruppe: str = ""
-    netz: str = ""                # nur bei typ=discount: in wessen Netz
-    rang: int = 99                # gepflegt, nicht gerechnet (wie promo rang)
+    netz: str = ""  # nur bei typ=discount: in wessen Netz
+    rang: int = 99  # gepflegt, nicht gerechnet (wie promo rang)
     # `rang` ist DIE REIHENFOLGE AUF DER SEITE (Marktgewicht, s.o.) - der
     # Sammler sortierte bis zum 24.09.2026 trotzdem danach, und das war die
     # zweite Ursache des Verhungerns von Lauf 52/53 (siehe collect/geraete/
@@ -107,8 +121,8 @@ class Anbieter:
     sammelrang: Optional[int] = None
     methode: str = "ldjson"
     aktiv: bool = True
-    grund: str = ""               # WARUM nicht aktiv - steht auf der Quellenseite
-    eigen: bool = False           # Vodafone: eigene Referenz, kein Wettbewerber
+    grund: str = ""  # WARUM nicht aktiv - steht auf der Quellenseite
+    eigen: bool = False  # Vodafone: eigene Referenz, kein Wettbewerber
     # Der LADEN hinter dem Namen. mobilcom-debitel und freenet sind derselbe
     # Shop unter zwei Marken - die Positionskarte darf sie nicht als zwei
     # Wettbewerber fuehren, sonst steht dasselbe Sortiment zweimal
@@ -119,8 +133,8 @@ class Anbieter:
     # freenet`, ist aber ein anderer Laden mit eigenem Sortiment. Aus der
     # Gruppe abgeleitet stuende dort "freenet (klarmobil)". Deshalb wird der
     # Laden ausdruecklich gesetzt, nicht erraten.
-    shop: str = ""                # leer = der Anbieter ist sein eigener Laden
-    anzeige: str = ""             # leer = der Name steht fuer sich
+    shop: str = ""  # leer = der Anbieter ist sein eigener Laden
+    anzeige: str = ""  # leer = der Name steht fuer sich
     basis_url: str = ""
     max_produkte: int = _MAX_PRODUKTE_STANDARD
     rate_limit_sekunden: float = _RATE_LIMIT_STANDARD
@@ -159,8 +173,11 @@ class Anbieter:
 
     @property
     def crawlbar(self) -> bool:
-        return bool(self.aktiv and self.methode not in _NICHT_CRAWLBAR
-                    and any(e.crawlable for e in self.einstiege))
+        return bool(
+            self.aktiv
+            and self.methode not in _NICHT_CRAWLBAR
+            and any(e.crawlable for e in self.einstiege)
+        )
 
     @property
     def crawled_einstiege(self) -> list:
@@ -196,6 +213,7 @@ class QuellenConfig:
 
 # --------------------------------------------------------------------------
 
+
 def lade_katalog(root: Path) -> Katalog:
     """config/geraete_katalog.yaml -> Katalog, MIT den Auto-Eintraegen aus
     dem STATE (data/state/geraete_katalog_auto.json, E4).
@@ -221,31 +239,45 @@ def lade_katalog(root: Path) -> Katalog:
         with open(path, "r", encoding="utf-8") as fh:
             raw = yaml.safe_load(fh) or {}
         geraete = []
-        for g in (raw.get("geraete") or []):
+        for g in raw.get("geraete") or []:
             if not isinstance(g, dict):
                 continue
             hersteller = str(g.get("hersteller") or "").strip()
             modell = str(g.get("modell") or "").strip()
             if not hersteller or not modell:
-                log.warning("geraete_katalog: Eintrag ohne hersteller/modell verworfen: %r", g)
+                log.warning(
+                    "geraete_katalog: Eintrag ohne hersteller/modell verworfen: %r", g
+                )
                 continue
             generation = g.get("generation")
-            geraete.append(Geraet(
-                hersteller=hersteller,
-                modell=modell,
-                marktstart=str(g.get("marktstart") or "").strip(),
-                generation=int(generation) if str(generation or "").strip().isdigit() else None,
-                vorgaenger=str(g.get("vorgaenger") or "").strip(),
-                segment=str(g.get("segment") or "").strip(),
-                speicher=[int(s) for s in (g.get("speicher") or [])
-                          if str(s).strip().isdigit()],
-                aliase=[str(a).strip() for a in (g.get("aliase") or []) if str(a).strip()],
-            ))
+            geraete.append(
+                Geraet(
+                    hersteller=hersteller,
+                    modell=modell,
+                    marktstart=str(g.get("marktstart") or "").strip(),
+                    generation=int(generation)
+                    if str(generation or "").strip().isdigit()
+                    else None,
+                    vorgaenger=str(g.get("vorgaenger") or "").strip(),
+                    segment=str(g.get("segment") or "").strip(),
+                    speicher=[
+                        int(s)
+                        for s in (g.get("speicher") or [])
+                        if str(s).strip().isdigit()
+                    ],
+                    aliase=[
+                        str(a).strip()
+                        for a in (g.get("aliase") or [])
+                        if str(a).strip()
+                    ],
+                )
+            )
         katalog = Katalog(geraete=geraete)
     # Lazy import: collect.geraete importiert seinerseits dieses Modul nicht,
     # aber das Paket-__init__ zieht httpx/bs4 - das gehoert nicht an die
     # Ladezeit dieser (leichtgewichtigen) Konfigurationsschicht.
     from .collect.geraete import autoerkennung
+
     autoerkennung.lade_auto_zusaetze(Path(root), katalog)
     return katalog
 
@@ -269,13 +301,17 @@ def lade_farben(root: Path) -> dict:
         if not knorm:
             continue
         tabelle[knorm] = knorm
-        for s in (schreibweisen or []):
+        for s in schreibweisen or []:
             snorm = normalisiere(str(s))
             if not snorm:
                 continue
             if snorm in tabelle and tabelle[snorm] != knorm:
-                log.warning("farben.yaml: %r steht unter %r UND %r - erste gewinnt",
-                            s, tabelle[snorm], knorm)
+                log.warning(
+                    "farben.yaml: %r steht unter %r UND %r - erste gewinnt",
+                    s,
+                    tabelle[snorm],
+                    knorm,
+                )
                 continue
             tabelle[snorm] = knorm
     return tabelle
@@ -291,7 +327,7 @@ EINSTIEG_ARTEN = ("static", "sitemap", "shopify", "js", "buendel")
 def _parse_einstiege(raw_liste, basis_url: str, anbieter: str = "") -> list:
     gesehen = set()
     out = []
-    for e in (raw_liste or []):
+    for e in raw_liste or []:
         if not isinstance(e, dict):
             continue
         url = str(e.get("url") or "").strip()
@@ -311,8 +347,13 @@ def _parse_einstiege(raw_liste, basis_url: str, anbieter: str = "") -> list:
             # Nicht still verwerfen: ein Tippfehler hier nimmt dem Anbieter
             # seine einzige Einstiegsseite, und er faellt danach als
             # "nicht crawlbar" durch, ohne dass jemand den Grund erfaehrt.
-            log.warning("geraete_quellen: %s hat Einstieg %s mit unbekannter "
-                        "Art %r - als static gefuehrt", anbieter, url, kind)
+            log.warning(
+                "geraete_quellen: %s hat Einstieg %s mit unbekannter "
+                "Art %r - als static gefuehrt",
+                anbieter,
+                url,
+                kind,
+            )
             kind = "static"
         roh_muster = e.get("pfadmuster")
         if isinstance(roh_muster, (list, tuple)):
@@ -324,9 +365,15 @@ def _parse_einstiege(raw_liste, basis_url: str, anbieter: str = "") -> list:
             ohne = tuple(str(m).strip() for m in roh_ohne if str(m).strip())
         else:
             ohne = (str(roh_ohne).strip(),) if str(roh_ohne or "").strip() else ()
-        out.append(Einstieg(
-            url=url, label=str(e.get("label") or "").strip(), kind=kind,
-            pfadmuster=pfadmuster, ohne_pfadmuster=ohne))
+        out.append(
+            Einstieg(
+                url=url,
+                label=str(e.get("label") or "").strip(),
+                kind=kind,
+                pfadmuster=pfadmuster,
+                ohne_pfadmuster=ohne,
+            )
+        )
     return out
 
 
@@ -339,8 +386,13 @@ def _als_zahl(wert, standard: float, anbieter: str, feld: str) -> float:
     try:
         return float(str(wert).replace(",", "."))
     except (TypeError, ValueError):
-        log.warning("geraete_quellen: %s hat %s=%r - kein Zahlenwert, "
-                    "es gilt %s", anbieter, feld, wert, standard)
+        log.warning(
+            "geraete_quellen: %s hat %s=%r - kein Zahlenwert, es gilt %s",
+            anbieter,
+            feld,
+            wert,
+            standard,
+        )
         return standard
 
 
@@ -357,21 +409,30 @@ def lade_quellen(root: Path) -> QuellenConfig:
     with open(path, "r", encoding="utf-8") as fh:
         raw = yaml.safe_load(fh) or {}
     out = []
-    for a in (raw.get("anbieter") or []):
+    for a in raw.get("anbieter") or []:
         if not isinstance(a, dict) or not str(a.get("name") or "").strip():
             continue
         methode = str(a.get("methode") or "ldjson").strip()
         aktiv = bool(a.get("aktiv", True))
         grund = str(a.get("grund") or "").strip()
         if methode not in METHODEN:
-            log.warning("geraete_quellen: %s hat unbekannte methode %r - deaktiviert",
-                        a.get("name"), methode)
-            grund = grund or f"unbekannte Beschaffungsmethode {methode!r} in der Konfiguration"
+            log.warning(
+                "geraete_quellen: %s hat unbekannte methode %r - deaktiviert",
+                a.get("name"),
+                methode,
+            )
+            grund = (
+                grund
+                or f"unbekannte Beschaffungsmethode {methode!r} in der Konfiguration"
+            )
             methode, aktiv = "deaktiviert", False
         typ = str(a.get("typ") or "handel").strip()
         if typ not in ANBIETER_TYPEN:
-            log.warning("geraete_quellen: %s hat unbekannten typ %r - als handel gefuehrt",
-                        a.get("name"), typ)
+            log.warning(
+                "geraete_quellen: %s hat unbekannten typ %r - als handel gefuehrt",
+                a.get("name"),
+                typ,
+            )
             typ = "handel"
         basis_url = str(a.get("basis_url") or "").strip()
         name = str(a["name"]).strip()
@@ -382,29 +443,43 @@ def lade_quellen(root: Path) -> QuellenConfig:
         # Anbieter verschwindet stillschweigend" haenge allein an einem Test
         # gegen die ausgelieferte Datei.
         if aktiv and methode not in _NICHT_CRAWLBAR and not einstiege:
-            grund = grund or ("keine Einstiegsseite konfiguriert - der "
-                              "Anbieter wird nicht abgefragt")
-        out.append(Anbieter(
-            name=name, typ=typ,
-            gruppe=str(a.get("gruppe") or "").strip(),
-            netz=str(a.get("netz") or "").strip(),
-            rang=int(a["rang"]) if str(a.get("rang", "")).strip().isdigit() else 99,
-            sammelrang=(int(a["sammelrang"])
-                        if str(a.get("sammelrang", "")).strip().isdigit() else None),
-            methode=methode, aktiv=aktiv, grund=grund,
-            eigen=bool(a.get("eigen", False)),
-            shop=str(a.get("shop") or "").strip() or name,
-            anzeige=str(a.get("anzeige") or "").strip() or name,
-            basis_url=basis_url,
-            max_produkte=int(a["max_produkte"]) if str(a.get("max_produkte", "")).strip().isdigit()
-            else _MAX_PRODUKTE_STANDARD,
-            rate_limit_sekunden=_als_zahl(a.get("rate_limit_sekunden"),
-                                          _RATE_LIMIT_STANDARD, name,
-                                          "rate_limit_sekunden"),
-            hinweis=str(a.get("hinweis") or "").strip(),
-            kopfzeilen={str(k): str(v) for k, v in
-                        (a.get("kopfzeilen") or {}).items()},
-            user_agent=str(a.get("user_agent") or "").strip(),
-            einstiege=einstiege,
-        ))
+            grund = grund or (
+                "keine Einstiegsseite konfiguriert - der Anbieter wird nicht abgefragt"
+            )
+        out.append(
+            Anbieter(
+                name=name,
+                typ=typ,
+                gruppe=str(a.get("gruppe") or "").strip(),
+                netz=str(a.get("netz") or "").strip(),
+                rang=int(a["rang"]) if str(a.get("rang", "")).strip().isdigit() else 99,
+                sammelrang=(
+                    int(a["sammelrang"])
+                    if str(a.get("sammelrang", "")).strip().isdigit()
+                    else None
+                ),
+                methode=methode,
+                aktiv=aktiv,
+                grund=grund,
+                eigen=bool(a.get("eigen", False)),
+                shop=str(a.get("shop") or "").strip() or name,
+                anzeige=str(a.get("anzeige") or "").strip() or name,
+                basis_url=basis_url,
+                max_produkte=int(a["max_produkte"])
+                if str(a.get("max_produkte", "")).strip().isdigit()
+                else _MAX_PRODUKTE_STANDARD,
+                rate_limit_sekunden=_als_zahl(
+                    a.get("rate_limit_sekunden"),
+                    _RATE_LIMIT_STANDARD,
+                    name,
+                    "rate_limit_sekunden",
+                ),
+                hinweis=str(a.get("hinweis") or "").strip(),
+                kopfzeilen={
+                    str(k): str(v) for k, v in (a.get("kopfzeilen") or {}).items()
+                },
+                user_agent=str(a.get("user_agent") or "").strip(),
+                einstiege=einstiege,
+            )
+        )
     return QuellenConfig(anbieter=out)

@@ -22,6 +22,7 @@ Dieselbe Bauform wie `tests/test_falz_browser.py`: eigener Server auf
 127.0.0.1 (kein file://, kein Netz), Chromium an beiden bekannten Orten
 gesucht, ein Browserstart je Testlauf.
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -53,26 +54,53 @@ REPO = Path(__file__).resolve().parents[1]
 # Zwei Hersteller im Wechsel, damit der Markenfilter wirklich trennt, und je
 # Geraet ein guenstigerer Wettbewerber, damit jede Zeile in die Alarmtabelle
 # kommt.
-_MODELLE = [(f"iPhone 1{n}" if n % 2 else f"Galaxy S2{n}",
-             "Apple" if n % 2 else "Samsung") for n in range(20)]
+_MODELLE = [
+    (f"iPhone 1{n}" if n % 2 else f"Galaxy S2{n}", "Apple" if n % 2 else "Samsung")
+    for n in range(20)
+]
 
-_KATALOG = {"geraete": [
-    {"hersteller": marke, "modell": modell, "generation": 20 + i,
-     "speicher": [256], "segment": "flagship"}
-    for i, (modell, marke) in enumerate(_MODELLE)
-]}
+_KATALOG = {
+    "geraete": [
+        {
+            "hersteller": marke,
+            "modell": modell,
+            "generation": 20 + i,
+            "speicher": [256],
+            "segment": "flagship",
+        }
+        for i, (modell, marke) in enumerate(_MODELLE)
+    ]
+}
 _FARBEN = {"farben": {"titan-natur": ["Titannatur"], "schwarz": ["Schwarz"]}}
-_QUELLEN = {"anbieter": [
-    {"name": "Vodafone", "typ": "netzbetreiber", "rang": 1, "eigen": True,
-     "methode": "ldjson", "basis_url": "https://www.vodafone.de",
-     "einstiege": [{"url": "https://www.vodafone.de/handys"}]},
-    {"name": "o2", "typ": "netzbetreiber", "rang": 2, "methode": "ldjson",
-     "basis_url": "https://www.o2online.de",
-     "einstiege": [{"url": "https://www.o2online.de/handys"}]},
-    {"name": "Medimax", "typ": "handel", "rang": 3, "methode": "ldjson",
-     "basis_url": "https://www.medimax.de",
-     "einstiege": [{"url": "https://www.medimax.de/c/116"}]},
-]}
+_QUELLEN = {
+    "anbieter": [
+        {
+            "name": "Vodafone",
+            "typ": "netzbetreiber",
+            "rang": 1,
+            "eigen": True,
+            "methode": "ldjson",
+            "basis_url": "https://www.vodafone.de",
+            "einstiege": [{"url": "https://www.vodafone.de/handys"}],
+        },
+        {
+            "name": "o2",
+            "typ": "netzbetreiber",
+            "rang": 2,
+            "methode": "ldjson",
+            "basis_url": "https://www.o2online.de",
+            "einstiege": [{"url": "https://www.o2online.de/handys"}],
+        },
+        {
+            "name": "Medimax",
+            "typ": "handel",
+            "rang": 3,
+            "methode": "ldjson",
+            "basis_url": "https://www.medimax.de",
+            "einstiege": [{"url": "https://www.medimax.de/c/116"}],
+        },
+    ]
+}
 
 
 def _kennung(modell: str) -> str:
@@ -90,8 +118,14 @@ def _kennung(modell: str) -> str:
 # Der 03. und der 04.08. liegen bewusst in DERSELBEN Kalenderwoche: daran
 # haengt der Test, dass der Rasterschalter die Zahl der Messtermine nicht
 # veraendert.
-_MESSTAGE = ("2026-08-03", "2026-08-04", "2026-08-11", "2026-08-18",
-             "2026-08-25", "2026-08-28")
+_MESSTAGE = (
+    "2026-08-03",
+    "2026-08-04",
+    "2026-08-11",
+    "2026-08-18",
+    "2026-08-25",
+    "2026-08-28",
+)
 
 
 # Medimax wird NUR an den ersten zwei Tagen gesehen.
@@ -109,24 +143,34 @@ _NUR_FRUEH = "Medimax"
 
 def _listung(anbieter, typ, sku, preis, gid, speicher=256):
     return {
-        "id": f"{anbieter.lower()}--{sku}", "sku_id": sku, "device_id": gid,
-        "anbieter": anbieter, "anbieter_typ": typ, "netz": "",
-        "speicher_gb": speicher, "farbe_roh": "Titannatur",
-        "farbe_normalisiert": "titan-natur", "zustand": "neu",
+        "id": f"{anbieter.lower()}--{sku}",
+        "sku_id": sku,
+        "device_id": gid,
+        "anbieter": anbieter,
+        "anbieter_typ": typ,
+        "netz": "",
+        "speicher_gb": speicher,
+        "farbe_roh": "Titannatur",
+        "farbe_normalisiert": "titan-natur",
+        "zustand": "neu",
         # `last_verified` MUSS zum letzten Messtag des Anbieters passen:
         # `geraete_verlauf._punkte` haengt daran den Bestaetigungstag an und
         # verlaengert die Kurve bis dorthin. Mit einem festen 11.08. fuer
         # alle bekam Medimax trotz seiner zwei Messtage einen dritten Punkt
         # mitten im verengten Fenster - und fiel deshalb nie heraus.
         "first_seen": "2026-08-01",
-        "last_verified": (_MESSTAGE[1] if anbieter == _NUR_FRUEH
-                          else _MESSTAGE[-1]),
-        "status": "aktiv", "missed_checks": 0, "preis_ohne_vertrag": preis,
-        "erstpreis": preis, "erstpreis_art": "ohne_vertrag",
+        "last_verified": (_MESSTAGE[1] if anbieter == _NUR_FRUEH else _MESSTAGE[-1]),
+        "status": "aktiv",
+        "missed_checks": 0,
+        "preis_ohne_vertrag": preis,
+        "erstpreis": preis,
+        "erstpreis_art": "ohne_vertrag",
         "erstpreis_am": "2026-08-01",
         "quelle_url": f"https://example.de/p/{sku}",
-        "abgerufen_am": "2026-08-11", "verfuegbarkeit": "lieferbar",
-        "confidence": "hoch", "einstiege": ["https://example.de/liste"],
+        "abgerufen_am": "2026-08-11",
+        "verfuegbarkeit": "lieferbar",
+        "confidence": "hoch",
+        "einstiege": ["https://example.de/liste"],
     }
 
 
@@ -149,11 +193,15 @@ def _bestand():
     return zeilen
 
 
-_DB = {"updated": "2026-08-11", "anbieter": {
-    "Vodafone": {"laeufe": 4, "funde_gesamt": 20},
-    "o2": {"laeufe": 4, "funde_gesamt": 10},
-    "Medimax": {"laeufe": 4, "funde_gesamt": 10},
-}, "listungen": _bestand()}
+_DB = {
+    "updated": "2026-08-11",
+    "anbieter": {
+        "Vodafone": {"laeufe": 4, "funde_gesamt": 20},
+        "o2": {"laeufe": 4, "funde_gesamt": 10},
+        "Medimax": {"laeufe": 4, "funde_gesamt": 10},
+    },
+    "listungen": _bestand(),
+}
 
 
 # Der TCO-Bestand der Fixture.
@@ -172,37 +220,53 @@ _DB = {"updated": "2026-08-11", "anbieter": {
 # `tco_24()` belastbar rechnet und die Leitzahl-Tabelle Zeilen bekommt -
 # der Zustand, den Phase 4 herstellen wird.
 _TCO_REFERENZEN = [
-    {"id": f"simonly--{a.lower()}--tarif-{i}", "anbieter": a,
-     "tarif_name": f"{a} Tarif {i}", "tarif_id": f"{a.lower()}:tarif-{i}",
-     "tarif_id_guete": "hoch", "tarif_sim_only_monatlich": 19.99 + i,
-     "anschlusspreis": None, "rabatte": [],
-     "quelle_url": f"https://example.de/pib/{a.lower()}-{i}",
-     "abgerufen_am": "2026-09-04", "first_seen": "2026-09-04",
-     "last_verified": "2026-09-04"}
+    {
+        "id": f"simonly--{a.lower()}--tarif-{i}",
+        "anbieter": a,
+        "tarif_name": f"{a} Tarif {i}",
+        "tarif_id": f"{a.lower()}:tarif-{i}",
+        "tarif_id_guete": "hoch",
+        "tarif_sim_only_monatlich": 19.99 + i,
+        "anschlusspreis": None,
+        "rabatte": [],
+        "quelle_url": f"https://example.de/pib/{a.lower()}-{i}",
+        "abgerufen_am": "2026-09-04",
+        "first_seen": "2026-09-04",
+        "last_verified": "2026-09-04",
+    }
     for i, a in enumerate(["Vodafone", "o2"] * 7)
 ]
 
 _TCO_BUENDEL = [
-    {"id": f"buendel--{sku}", "sku_id": sku, "anbieter": anb,
-     "tarif_name": f"{anb} Tarif {i}", "tarif_id": f"{anb.lower()}:tarif-{i}",
-     "tarif_id_guete": "hoch", "tarif_monatlich": 19.99 + i,
-     "geraet_zuzahlung": 1.0, "geraet_monatsrate": 20.0 + i,
-     "laufzeit_monate": 24, "anschlusspreis": None, "rabatte": [],
-     "quelle_url": f"https://example.de/p/{sku}",
-     "abgerufen_am": "2026-09-04", "first_seen": "2026-09-04",
-     "last_verified": "2026-09-04"}
+    {
+        "id": f"buendel--{sku}",
+        "sku_id": sku,
+        "anbieter": anb,
+        "tarif_name": f"{anb} Tarif {i}",
+        "tarif_id": f"{anb.lower()}:tarif-{i}",
+        "tarif_id_guete": "hoch",
+        "tarif_monatlich": 19.99 + i,
+        "geraet_zuzahlung": 1.0,
+        "geraet_monatsrate": 20.0 + i,
+        "laufzeit_monate": 24,
+        "anschlusspreis": None,
+        "rabatte": [],
+        "quelle_url": f"https://example.de/p/{sku}",
+        "abgerufen_am": "2026-09-04",
+        "first_seen": "2026-09-04",
+        "last_verified": "2026-09-04",
+    }
     for i, (anb, sku) in enumerate(
         # ZWEI ANBIETER ZU DEMSELBEN GERAET: `vf-1` und `o2-1` gehoeren
         # beide zur `device_id` mit Index 1 (siehe `_bestand`). Mit vier
         # verschiedenen Geraeten haette JEDES Modell nur einen Balken, G1
         # entstuende nach C.1 gar nicht - und der Browser-Test daneben
         # pruefte eine Grafik, die es nicht gibt.
-        [("Vodafone", "vf-1"), ("o2", "o2-1"),
-         ("Vodafone", "vf-3"), ("o2", "o2-3")])
+        [("Vodafone", "vf-1"), ("o2", "o2-1"), ("Vodafone", "vf-3"), ("o2", "o2-3")]
+    )
 ]
 
-_TCO = {"updated": "2026-09-04", "buendel": _TCO_BUENDEL,
-        "sim_only": _TCO_REFERENZEN}
+_TCO = {"updated": "2026-09-04", "buendel": _TCO_BUENDEL, "sim_only": _TCO_REFERENZEN}
 
 # DER TARIFBESTAND GEHOERT ZUR FIXTURE, seit die Leitzahl ueber die BINDUNG
 # rechnet (Phase R): die Mindestlaufzeit des Tarifs steht in `tarife.jsonl`
@@ -220,14 +284,23 @@ _TARIFE = [
     # Band und der Graph der Vergleichsansicht waere von keinem dieser
     # Tests gedeckt (derselbe Fixture-Fehler wie das fehlende
     # `geraete_tco.json` am 04.09.2026, eine Ebene weiter).
-    {"anbieter": a, "name": f"{a} Tarif {i}", "tarif_id": f"{a.lower()}:tarif-{i}",
-     "art": "mobilfunk", "grundgebuehr": 19.99 + i, "laufzeit_monate": 24,
-     "datenvolumen_gb": 10 + i * 10,
-     "preisphasen": [{"von_monat": 1, "bis_monat": 24, "betrag": 19.99 + i},
-                     {"von_monat": 25, "bis_monat": None,
-                      "betrag": 24.99 + i}],
-     "dokument_url": f"https://example.de/pib/{a.lower()}-{i}",
-     "abgerufen_am": "2026-09-04", "confidence": {}, "fundstellen": {}}
+    {
+        "anbieter": a,
+        "name": f"{a} Tarif {i}",
+        "tarif_id": f"{a.lower()}:tarif-{i}",
+        "art": "mobilfunk",
+        "grundgebuehr": 19.99 + i,
+        "laufzeit_monate": 24,
+        "datenvolumen_gb": 10 + i * 10,
+        "preisphasen": [
+            {"von_monat": 1, "bis_monat": 24, "betrag": 19.99 + i},
+            {"von_monat": 25, "bis_monat": None, "betrag": 24.99 + i},
+        ],
+        "dokument_url": f"https://example.de/pib/{a.lower()}-{i}",
+        "abgerufen_am": "2026-09-04",
+        "confidence": {},
+        "fundstellen": {},
+    }
     for i, a in enumerate(["Vodafone", "o2"] * 7)
 ]
 
@@ -237,13 +310,21 @@ def _historie():
     for e in _DB["listungen"]:
         tage = _MESSTAGE[:2] if e["anbieter"] == _NUR_FRUEH else _MESSTAGE
         for i, tag in enumerate(tage):
-            zeilen.append({
-                "listung_id": e["id"], "device_id": e["device_id"],
-                "anbieter": e["anbieter"], "datum": tag,
-                # Ein leicht fallender Preis: eine echte Bewegung, damit die
-                # Spalte "Veraenderung" etwas zu sagen hat.
-                "preis_ohne_vertrag": round(e["preis_ohne_vertrag"] + (3 - i) * 5.0, 2),
-                "verfuegbarkeit": "lieferbar", "quelle_url": e["quelle_url"]})
+            zeilen.append(
+                {
+                    "listung_id": e["id"],
+                    "device_id": e["device_id"],
+                    "anbieter": e["anbieter"],
+                    "datum": tag,
+                    # Ein leicht fallender Preis: eine echte Bewegung, damit die
+                    # Spalte "Veraenderung" etwas zu sagen hat.
+                    "preis_ohne_vertrag": round(
+                        e["preis_ohne_vertrag"] + (3 - i) * 5.0, 2
+                    ),
+                    "verfuegbarkeit": "lieferbar",
+                    "quelle_url": e["quelle_url"],
+                }
+            )
     return zeilen
 
 
@@ -263,9 +344,10 @@ def _historie():
 
 
 def _chromium():
-    for muster in ("/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-                   str(Path.home() / ".cache/ms-playwright"
-                       / "chromium*/chrome-linux*/chrome")):
+    for muster in (
+        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
+        str(Path.home() / ".cache/ms-playwright" / "chromium*/chrome-linux*/chrome"),
+    ):
         treffer = sorted(glob.glob(muster))
         if treffer:
             return treffer[-1]
@@ -278,8 +360,9 @@ def _server(site: Path):
     s.bind(("127.0.0.1", 0))
     port = s.getsockname()[1]
     s.close()
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler,
-                                directory=str(site))
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(site)
+    )
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     try:
@@ -340,7 +423,8 @@ def _zeige_tafel(seite, tafel_id):
         "document.querySelectorAll('.gr-reiter button[data-tafel]').forEach("
         "b => b.setAttribute('aria-selected', "
         "b.getAttribute('data-tafel') === id ? 'true' : 'false')); }",
-        tafel_id)
+        tafel_id,
+    )
 
 
 def _stelle_daten(seite, geraet):
@@ -352,7 +436,9 @@ def _stelle_daten(seite, geraet):
     """
     seite.evaluate(
         "(g) => { document.getElementById('gr-verlaufdaten').textContent ="
-        "           JSON.stringify([g]); }", geraet)
+        "           JSON.stringify([g]); }",
+        geraet,
+    )
     seite.set_content(seite.evaluate("document.documentElement.outerHTML"))
     seite.wait_for_timeout(150)
     _zeige_tafel(seite, "tafel-verlauf")
@@ -366,21 +452,25 @@ def _stelle_daten(seite, geraet):
 def _seite(tmp_path_factory):
     """Ein Browser, eine Seite - die Tests lesen daraus."""
     sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt").sync_playwright
+        "playwright.sync_api", reason="playwright fehlt"
+    ).sync_playwright
 
     root = tmp_path_factory.mktemp("reiter")
     (root / "config").mkdir()
-    for name, daten in (("geraete_katalog.yaml", _KATALOG),
-                        ("farben.yaml", _FARBEN),
-                        ("geraete_quellen.yaml", _QUELLEN)):
+    for name, daten in (
+        ("geraete_katalog.yaml", _KATALOG),
+        ("farben.yaml", _FARBEN),
+        ("geraete_quellen.yaml", _QUELLEN),
+    ):
         (root / "config" / name).write_text(
-            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
-            encoding="utf-8")
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False), encoding="utf-8"
+        )
     state = root / "data" / "state"
     state.mkdir(parents=True)
     (state / "geraete_db.json").write_text(json.dumps(_DB), encoding="utf-8")
     (state / "geraete_preise.jsonl").write_text(
-        "\n".join(json.dumps(z) for z in _historie()) + "\n", encoding="utf-8")
+        "\n".join(json.dumps(z) for z in _historie()) + "\n", encoding="utf-8"
+    )
     (state / "geraete_tco.json").write_text(json.dumps(_TCO), encoding="utf-8")
     # E2: die TCO-HISTORIE - ohne sie haette die Hauptansicht dieser
     # Fixture keine Zeitreihe (nur den Leer-Satz), und der Pflichtgrafik-
@@ -388,15 +478,18 @@ def _seite(tmp_path_factory):
     # Bündel des Bestands.
     _tco_historie = []
     for b in _TCO["buendel"][:2]:
-        for tag, gesamt in (("2026-09-02", 1000.0), ("2026-09-03", 990.0),
-                            ("2026-09-04", 980.0)):
+        for tag, gesamt in (
+            ("2026-09-02", 1000.0),
+            ("2026-09-03", 990.0),
+            ("2026-09-04", 980.0),
+        ):
             _tco_historie.append({**b, "datum": tag, "gesamt": gesamt})
     (state / "geraete_tco_historie.jsonl").write_text(
-        "\n".join(json.dumps(z) for z in _tco_historie) + "\n",
-        encoding="utf-8")
+        "\n".join(json.dumps(z) for z in _tco_historie) + "\n", encoding="utf-8"
+    )
     (state / "tarife.jsonl").write_text(
-        "\n".join(json.dumps(t) for t in mit_leiter(_TARIFE)) + "\n",
-        encoding="utf-8")
+        "\n".join(json.dumps(t) for t in mit_leiter(_TARIFE)) + "\n", encoding="utf-8"
+    )
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
     site = root / "site"
@@ -404,8 +497,7 @@ def _seite(tmp_path_factory):
 
     exe = _chromium()
     with _server(site) as basis, sync_playwright() as p:
-        browser = (p.chromium.launch(executable_path=exe) if exe
-                   else p.chromium.launch())
+        browser = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
         seite = browser.new_page(viewport={"width": 1440, "height": 900})
         seite.goto(f"{basis}/geraete.html", wait_until="load")
         yield seite
@@ -426,19 +518,22 @@ def _sichtbare_zeilen(seite, wurzel="#tafel-tco"):
     """
     return seite.eval_on_selector_all(
         f"{wurzel} .gr-a-zeile",
-        "e => e.filter(x => getComputedStyle(x).display !== 'none').length")
+        "e => e.filter(x => getComputedStyle(x).display !== 'none').length",
+    )
 
 
 def _sichtbare_marken(seite, wurzel="#tafel-tco"):
     return seite.eval_on_selector_all(
         f"{wurzel} .gr-a-zeile",
         "e => e.filter(x => getComputedStyle(x).display !== 'none')"
-        "      .map(x => x.dataset.marke)")
+        "      .map(x => x.dataset.marke)",
+    )
 
 
 # --------------------------------------------------------------------------
 # Die drei Regeln, die ueber allem stehen
 # --------------------------------------------------------------------------
+
 
 def test_die_startansicht_traegt_genau_die_pflichtgrafik(_seite):
     """UMGEKEHRT SEIT PHASE R, dann UMGEKEHRT SEIT BRIEF_FADEN.
@@ -466,30 +561,33 @@ def test_die_startansicht_traegt_genau_die_pflichtgrafik(_seite):
     # E2 dreht auch diese Zeile: die Zeitreihe IST ein SVG (Antonios
     # Graph-Entscheidung). Verboten bleibt jedes ANDERE SVG der Tafel -
     # G0 gehoert in den Verlaufs-Reiter, G1 ist ersatzlos gefallen.
-    fremde = _seite.eval_on_selector_all(
-        "#tafel-tco svg:not(.gr-zr)", "e => e.length")
+    fremde = _seite.eval_on_selector_all("#tafel-tco svg:not(.gr-zr)", "e => e.length")
     assert fremde == 0, f"{fremde} SVGs ausser der Zeitreihe in der Tafel"
-    assert _seite.eval_on_selector_all(
-        "#tafel-tco svg.gr-zr", "e => e.length") >= 1, \
+    assert _seite.eval_on_selector_all("#tafel-tco svg.gr-zr", "e => e.length") >= 1, (
         "die Zeitreihe des gewaehlten Modells steht nicht da"
+    )
     # Genau EIN sichtbares Bild: die breite und die schmale Variante
     # stehen im DOM, das Mediaquery zeigt eine (Spezifitaets-Falle, siehe
     # style.css) - ein zweites SICHTBARES waere der alte Panel-Stapel.
     sichtbar = _seite.eval_on_selector_all(
-        "#tafel-tco svg.gr-zr", "e => e.filter(s => "
-        "s.getBoundingClientRect().width > 0).length")
+        "#tafel-tco svg.gr-zr",
+        "e => e.filter(s => s.getBoundingClientRect().width > 0).length",
+    )
     assert sichtbar == 1, f"{sichtbar} sichtbare Graph-Bilder statt einem"
     # Kein Rest der geloeschten Preisgrafik.
-    assert _seite.eval_on_selector_all(
-        "#tafel-tco .gr-punkt, #tafel-tco .gr-etikett, #tafel-tco .gr-band",
-        "e => e.length") == 0
+    assert (
+        _seite.eval_on_selector_all(
+            "#tafel-tco .gr-punkt, #tafel-tco .gr-etikett, #tafel-tco .gr-band",
+            "e => e.length",
+        )
+        == 0
+    )
     # O2 (11.09.2026): die Alarmtabelle ist AUS der Vergleichsansicht auf
     # den Wettbewerbs-Radar gezogen - hier steht keine `.gr-alarm`-Tabelle
     # mehr. Der flache Katalog in Reiter 2 teilt sich Aussehen und
     # Filterlogik weiterhin mit ihr (auf dem Radar), und genau das haelt
     # `test_wettbewerbsradar_alarme.py` am neuen Ort fest.
-    assert _seite.eval_on_selector_all("#tafel-tco .gr-alarm",
-                                       "e => e.length") == 0
+    assert _seite.eval_on_selector_all("#tafel-tco .gr-alarm", "e => e.length") == 0
 
 
 def test_kein_gedrehter_text_auf_der_ganzen_seite(_seite):
@@ -550,6 +648,7 @@ def test_keine_beschriftung_wird_mit_punkten_abgeschnitten(_seite):
 # Die Reiter
 # --------------------------------------------------------------------------
 
+
 def test_der_reiter_blendet_ohne_neuladen_um(_seite):
     """O3 (STRATEGIE_GERAETE_OPTIK §3): DREI klickbare Tafeln in
     `.gr-reiter` - der Verlaufs-Reiter ist zurück (die Einzelgerät-
@@ -559,11 +658,13 @@ def test_der_reiter_blendet_ohne_neuladen_um(_seite):
         _seite.click(f".gr-reiter button[data-tafel='{tid}']")
         _seite.wait_for_timeout(60)
         sichtbar = _seite.eval_on_selector_all(
-            ".gr-tafel:not(.gr-tafel--aus)", "e => e.map(x => x.id)")
+            ".gr-tafel:not(.gr-tafel--aus)", "e => e.map(x => x.id)"
+        )
         assert sichtbar == [tid], tid
         aktiv = _seite.eval_on_selector_all(
             ".gr-reiter button[aria-selected='true']",
-            "e => e.map(x => x.getAttribute('data-tafel'))")
+            "e => e.map(x => x.getAttribute('data-tafel'))",
+        )
         assert aktiv == [tid], "genau ein Reiter ist ausgewaehlt"
 
 
@@ -571,19 +672,17 @@ def test_die_reiterleiste_traegt_vier_knoepfe_ohne_link(_seite):
     """E3 (§1d): vier echte Tafeln - der O3-Quasi-Reiter (Link auf
     wettbewerbsradar.html) ist der Tafel dieser Seite gewichen."""
     knoepfe = _seite.eval_on_selector_all(
-        ".gr-reiter button[data-tafel]",
-        "e => e.map(x => x.getAttribute('data-tafel'))")
+        ".gr-reiter button[data-tafel]", "e => e.map(x => x.getAttribute('data-tafel'))"
+    )
     # 28.09.2026 (Antonio: „ich verstehe den Unterschied zwischen
     # Vergleich und Preisverlauf nicht"): die Reiter heissen nach dem,
     # was sie messen, und die zwei Ein-Geraet-Reiter stehen nebeneinander.
-    assert knoepfe == ["tafel-tco", "tafel-verlauf", "tafel-radar",
-                       "tafel-katalog"]
+    assert knoepfe == ["tafel-tco", "tafel-verlauf", "tafel-radar", "tafel-katalog"]
     beschriftung = _seite.eval_on_selector_all(
-        ".gr-reiter button", "e => e.map(x => x.textContent.trim())")
-    assert beschriftung == ["Mit Tarif", "Ohne Vertrag", "Übersicht",
-                            "Katalog"]
-    links = _seite.eval_on_selector_all(
-        ".gr-reiter a", "e => e.length")
+        ".gr-reiter button", "e => e.map(x => x.textContent.trim())"
+    )
+    assert beschriftung == ["Mit Tarif", "Ohne Vertrag", "Übersicht", "Katalog"]
+    links = _seite.eval_on_selector_all(".gr-reiter a", "e => e.length")
     assert links == 0, "die Reiterleiste trägt noch einen Link (E3: Tafel)"
     _zeige_tafel(_seite, "tafel-tco")
 
@@ -595,17 +694,19 @@ def test_die_portfolio_tafel_ist_weg_der_verlauf_ist_verknuepft(_seite):
     _seite.click(".gr-reiter button[data-tafel='tafel-verlauf']")
     _seite.wait_for_timeout(60)
     sichtbar = _seite.eval_on_selector_all(
-        ".gr-tafel:not(.gr-tafel--aus)", "e => e.map(x => x.id)")
+        ".gr-tafel:not(.gr-tafel--aus)", "e => e.map(x => x.id)"
+    )
     assert sichtbar == ["tafel-verlauf"]
 
-    assert _seite.evaluate(
-        "() => !document.getElementById('tafel-portfolio')"), \
+    assert _seite.evaluate("() => !document.getElementById('tafel-portfolio')"), (
         "#tafel-portfolio steht noch auf der Geräteseite"
+    )
     _zeige_tafel(_seite, "tafel-tco")
 
 
-@pytest.mark.parametrize("tid", ["tafel-tco", "tafel-radar", "tafel-katalog",
-                                 "tafel-verlauf"])
+@pytest.mark.parametrize(
+    "tid", ["tafel-tco", "tafel-radar", "tafel-katalog", "tafel-verlauf"]
+)
 def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
     """Der Auftrag: unter 3.000 px auf 1440 px Breite. Die alte Seite war
     18.412 px hoch.
@@ -621,6 +722,7 @@ def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
 # --------------------------------------------------------------------------
 # Filter, Suche, Aufklapper
 # --------------------------------------------------------------------------
+
 
 def _radar_url(seite):
     """Die Adresse des Radar-REITERS derselben Seite. Bis E3 Schritt 3
@@ -640,8 +742,7 @@ def _frisch(seite):
     deshalb `goto` auf die volle Adresse statt `reload`, das trifft immer
     die richtige Seite.
     """
-    seite.goto(seite.url.rsplit("/", 1)[0] + "/geraete.html",
-               wait_until="load")
+    seite.goto(seite.url.rsplit("/", 1)[0] + "/geraete.html", wait_until="load")
     seite.click(".gr-reiter button[data-tafel='tafel-tco']")
     seite.wait_for_timeout(60)
 
@@ -676,6 +777,7 @@ def test_ohne_filter_greift_der_zeilendeckel(_seite):
     die 15 festhaelt, haette die Korrektur als Fehler gemeldet.
     """
     from telco_radar.report.geraete_alarme import SICHTBAR_MAX
+
     _radar_frisch(_seite)
     gesamt = _seite.eval_on_selector_all("#wr-alarme .gr-a-zeile", "e => e.length")
     assert gesamt > SICHTBAR_MAX, "die Fixture reisst den Deckel nicht"
@@ -701,7 +803,7 @@ def test_der_markenfilter_laesst_nur_die_passende_zeile(_seite):
 
 
 def test_ein_aktiver_filter_ist_rot_hinterlegt(_seite):
-    """"Aktive Filter werden rot hinterlegt mit weisser Schrift." Sie
+    """ "Aktive Filter werden rot hinterlegt mit weisser Schrift." Sie
     veraendern, was darunter steht, und das muss man sehen, ohne die Auswahl
     zu lesen."""
     # Der eigene Ausgangszustand. Die erste Fassung verliess sich darauf,
@@ -713,11 +815,13 @@ def test_ein_aktiver_filter_ist_rot_hinterlegt(_seite):
     _seite.wait_for_timeout(60)
     an = _seite.eval_on_selector(
         "#wr-alarme [data-filter='marke']",
-        "e => e.closest('label').classList.contains('gr-filter--an')")
+        "e => e.closest('label').classList.contains('gr-filter--an')",
+    )
     assert an is True
     farbe = _seite.eval_on_selector(
         "#wr-alarme [data-filter='marke']",
-        "e => getComputedStyle(e.closest('label')).backgroundColor")
+        "e => getComputedStyle(e.closest('label')).backgroundColor",
+    )
     assert farbe == "rgb(230, 0, 0)", farbe
 
 
@@ -741,7 +845,8 @@ def test_die_suche_grenzt_ein(_seite):
     treffer = _seite.eval_on_selector_all(
         "#wr-alarme .gr-a-zeile",
         "e => e.filter(x => getComputedStyle(x).display !== 'none')"
-        "      .map(x => x.textContent.toLowerCase().includes('medimax'))")
+        "      .map(x => x.textContent.toLowerCase().includes('medimax'))",
+    )
     assert all(treffer), "eine Zeile ohne den Suchbegriff ist sichtbar"
 
 
@@ -770,13 +875,15 @@ def test_der_klick_auf_eine_zeile_zeigt_alle_anbieter(_seite):
     _seite.wait_for_timeout(60)
     assert _seite.eval_on_selector(aufklapper, "e => e.offsetParent") is not None
     eintraege = _seite.eval_on_selector_all(
-        f"{aufklapper} .gr-a-liste li", "e => e.length")
+        f"{aufklapper} .gr-a-liste li", "e => e.length"
+    )
     assert eintraege >= 2, "der Aufklapper zeigt unseren Preis und den fremden"
 
 
 # --------------------------------------------------------------------------
 # "Alle anzeigen" - und was danach passiert
 # --------------------------------------------------------------------------
+
 
 def test_der_filter_wirkt_auch_nach_alle_anzeigen(_seite):
     """Der teuerste Befund des B2-Reviews, und kein statischer Test konnte ihn
@@ -813,18 +920,24 @@ def test_ein_aufklapper_verschwindet_mit_seiner_zeile(_seite):
     # Der Klick TOGGELT. Die Fixture hat Modulgueltigkeit, ein Test davor kann
     # denselben Aufklapper schon geoeffnet haben - dann klappt ein blinder
     # Klick ihn zu, und der Test misst das Gegenteil dessen, was er behauptet.
-    if _seite.eval_on_selector(aufklapper,
-                               "e => getComputedStyle(e).display") == "none":
+    if (
+        _seite.eval_on_selector(aufklapper, "e => getComputedStyle(e).display")
+        == "none"
+    ):
         _seite.click(f"{zeile} .gr-a-modell")
         _seite.wait_for_timeout(60)
     # Gegenprobe: er ist wirklich offen, sonst misst der Test nichts.
-    assert _seite.eval_on_selector(
-        aufklapper, "e => getComputedStyle(e).display") != "none"
+    assert (
+        _seite.eval_on_selector(aufklapper, "e => getComputedStyle(e).display")
+        != "none"
+    )
 
     _seite.fill("#wr-alarme [data-filter='suche']", "gibtesnichtwirklich")
     _seite.wait_for_timeout(60)
-    assert _seite.eval_on_selector(
-        aufklapper, "e => getComputedStyle(e).display") == "none"
+    assert (
+        _seite.eval_on_selector(aufklapper, "e => getComputedStyle(e).display")
+        == "none"
+    )
     _seite.fill("#wr-alarme [data-filter='suche']", "")
 
 
@@ -849,22 +962,27 @@ def test_eine_suche_ueber_eine_zunaechst_versteckte_zeile_zeigt_sie(_seite):
     """
     _radar_frisch(_seite)
     rest = _seite.eval_on_selector_all(
-        "#wr-alarme .gr-a-rest.gr-a-zeile", "e => e.length")
+        "#wr-alarme .gr-a-rest.gr-a-zeile", "e => e.length"
+    )
     assert rest, "die Fixture hat keine Zeilen hinter 'alle anzeigen'"
     suchwort = _seite.eval_on_selector(
-        "#wr-alarme .gr-a-rest.gr-a-zeile .gr-a-modell",
-        "e => e.textContent.trim()")
+        "#wr-alarme .gr-a-rest.gr-a-zeile .gr-a-modell", "e => e.textContent.trim()"
+    )
     _seite.fill("#wr-alarme [data-filter='suche']", suchwort)
     _seite.wait_for_timeout(60)
     assert _sichtbare_zeilen(_seite, "#wr-alarme") == 1, (
-        "der einzige Treffer der Suche bleibt versteckt")
-    assert _seite.eval_on_selector(
-        "#wr-alarme .gr-a-leer", "e => getComputedStyle(e).display") == "none"
+        "der einzige Treffer der Suche bleibt versteckt"
+    )
+    assert (
+        _seite.eval_on_selector(
+            "#wr-alarme .gr-a-leer", "e => getComputedStyle(e).display"
+        )
+        == "none"
+    )
     gefundenes_modell = _seite.eval_on_selector(
-        "#wr-alarme .gr-a-zeile:not([hidden]) .gr-a-modell",
-        "e => e.textContent.trim()")
-    assert gefundenes_modell == suchwort, (
-        "die sichtbare Zeile ist nicht die gesuchte")
+        "#wr-alarme .gr-a-zeile:not([hidden]) .gr-a-modell", "e => e.textContent.trim()"
+    )
+    assert gefundenes_modell == suchwort, "die sichtbare Zeile ist nicht die gesuchte"
     _seite.fill("#wr-alarme [data-filter='suche']", "")
 
 
@@ -881,15 +999,12 @@ def test_kein_aufklapper_steht_offen(_seite):
     """
     # NICHT ueber `_frisch`, aber mit expliziter Adresse: die gemeinsame
     # Seite kann nach einem Alarmtest gerade die RADAR-Seite zeigen.
-    _seite.goto(_seite.url.rsplit("/", 1)[0] + "/geraete.html",
-                wait_until="load")
+    _seite.goto(_seite.url.rsplit("/", 1)[0] + "/geraete.html", wait_until="load")
     _seite.wait_for_timeout(60)
-    for tid in ("tafel-tco", "tafel-katalog",
-                "tafel-verlauf", "tafel-portfolio"):
+    for tid in ("tafel-tco", "tafel-katalog", "tafel-verlauf", "tafel-portfolio"):
         _zeige_tafel(_seite, tid)
         _seite.wait_for_timeout(60)
-        offen = _seite.eval_on_selector_all(
-            f"#{tid} details[open]", "e => e.length")
+        offen = _seite.eval_on_selector_all(f"#{tid} details[open]", "e => e.length")
         assert offen == 0, tid
     _zeige_tafel(_seite, "tafel-tco")
 
@@ -915,16 +1030,22 @@ def test_die_seite_traegt_das_echte_abrufdatum(_seite):
     _radar_frisch(_seite)
     radar_text = _seite.eval_on_selector("#tafel-radar", "e => e.innerText")
     assert "11. August 2026" in radar_text, (
-        "das Abrufdatum der Listungen fehlt auf dem Wettbewerbs-Radar")
+        "das Abrufdatum der Listungen fehlt auf dem Wettbewerbs-Radar"
+    )
 
     _frisch(_seite)
-    _seite.evaluate("() => document.querySelectorAll("
-                    "'#tafel-tco details').forEach(d => d.open = true)")
+    _seite.evaluate(
+        "() => document.querySelectorAll("
+        "'#tafel-tco details').forEach(d => d.open = true)"
+    )
     text = _seite.eval_on_selector("body", "e => e.innerText")
-    _seite.evaluate("() => document.querySelectorAll("
-                    "'#tafel-tco details').forEach(d => d.open = false)")
+    _seite.evaluate(
+        "() => document.querySelectorAll("
+        "'#tafel-tco details').forEach(d => d.open = false)"
+    )
     assert "4. September 2026" in text, (
-        "das Abrufdatum der Bündel fehlt auf der Geräteseite")
+        "das Abrufdatum der Bündel fehlt auf der Geräteseite"
+    )
 
 
 # --------------------------------------------------------------------------
@@ -937,6 +1058,7 @@ def test_die_seite_traegt_das_echte_abrufdatum(_seite):
 # nur im Browser sichtbar - CLAUDE.md §6: "Eine Grafik ist erst fertig, wenn
 # sie jemand ANGESEHEN hat."
 # --------------------------------------------------------------------------
+
 
 def _waehle_geraet(seite, begriff="galaxy"):
     """Ein Geraet im Suchfeld auswaehlen. Gibt False, wenn die Fixture keins
@@ -974,9 +1096,10 @@ def test_ohne_klick_steht_das_diagramm_des_ersten_geraets_da(_seite):
     # ohne dass der Leser wüsste, wessen Preis er sieht.
     feldwert = _seite.eval_on_selector("#gr-vsuche", "e => e.value")
     assert feldwert, "das Suchfeld nennt das vorausgewählte Gerät nicht"
-    assert _seite.eval_on_selector(
-        "#gr-vleer", "e => getComputedStyle(e).display") == "none", (
-        "mit Auto-Vorauswahl steht der Leer-Satz nicht im Ausgangszustand")
+    assert (
+        _seite.eval_on_selector("#gr-vleer", "e => getComputedStyle(e).display")
+        == "none"
+    ), "mit Auto-Vorauswahl steht der Leer-Satz nicht im Ausgangszustand"
 
 
 # SICHTBARKEIT, NICHT DAS ATTRIBUT (P4b, Re-Check 18.09.2026): die erste
@@ -1019,9 +1142,11 @@ def test_die_leitzahl_und_die_kacheln_schweigen_in_beiden_leerzustaenden(_seite)
     # misst der Test einen Leerzustand, der nie gefüllt war).
     anfang = _seite.evaluate(_LEERZUSTAND_MESSUNG)
     assert anfang["gr-vleit"] and anfang["gr-vleit"]["sichtbar"], (
-        "Fixture-Voraussetzung: die Leitzahl steht im Ausgangszustand")
+        "Fixture-Voraussetzung: die Leitzahl steht im Ausgangszustand"
+    )
     assert anfang["gr-vkacheln"] and anfang["gr-vkacheln"]["sichtbar"], (
-        "Fixture-Voraussetzung: die Kachelreihe steht im Ausgangszustand")
+        "Fixture-Voraussetzung: die Kachelreihe steht im Ausgangszustand"
+    )
 
     # 1) Suchfeld ohne Treffer: Rückbau - Leitzahl und Kachelzahlen weg.
     _seite.fill("#gr-vsuche", "zzzz")
@@ -1031,10 +1156,12 @@ def test_die_leitzahl_und_die_kacheln_schweigen_in_beiden_leerzustaenden(_seite)
     assert not weg["gr-vleit"]["sichtbar"], (
         "unter 'Kein Gerät gefunden.' steht noch der Preis des vorherigen "
         f"Geräts (display:{weg['gr-vleit']['display']}, "
-        f"{weg['gr-vleit']['hoehe']} px) - die größte Zahl der Tafel lügt")
+        f"{weg['gr-vleit']['hoehe']} px) - die größte Zahl der Tafel lügt"
+    )
     assert not weg["gr-vkacheln"]["sichtbar"], (
         "im Leerzustand stehen noch die Kachelzahlen des vorherigen "
-        f"Geräts (display:{weg['gr-vkacheln']['display']}) - leer heißt leer")
+        f"Geräts (display:{weg['gr-vkacheln']['display']}) - leer heißt leer"
+    )
 
     # 2) Leeres Zeitfenster: derselbe Rückbau über den anderen Pfad.
     _frisch(_seite)
@@ -1047,10 +1174,12 @@ def test_die_leitzahl_und_die_kacheln_schweigen_in_beiden_leerzustaenden(_seite)
     assert not weg2["gr-vleit"]["sichtbar"], (
         "im leeren Zeitfenster steht noch der alte Preis "
         f"(display:{weg2['gr-vleit']['display']}) - dieselbe Lüge über "
-        "den zweiten Pfad")
+        "den zweiten Pfad"
+    )
     assert not weg2["gr-vkacheln"]["sichtbar"], (
         "im leeren Zeitfenster stehen noch die Kachelzahlen von gestern "
-        f"(display:{weg2['gr-vkacheln']['display']})")
+        f"(display:{weg2['gr-vkacheln']['display']})"
+    )
 
 
 def test_ein_deep_link_schlaegt_die_auto_vorauswahl(_seite):
@@ -1063,29 +1192,34 @@ def test_ein_deep_link_schlaegt_die_auto_vorauswahl(_seite):
     _seite.wait_for_timeout(150)
     geraete = _seite.eval_on_selector(
         "#gr-verlaufdaten",
-        "e => JSON.parse(e.textContent).map(g => ({id: g.id, label: g.label}))")
+        "e => JSON.parse(e.textContent).map(g => ({id: g.id, label: g.label}))",
+    )
     assert len(geraete) >= 2, "die Fixture braucht zwei waehlbare Geraete"
     letztes = geraete[-1]
     assert letztes["id"] != geraete[0]["id"], (
-        "die Fixture legt nur ein Geraet an - der Test prueft nichts")
+        "die Fixture legt nur ein Geraet an - der Test prueft nichts"
+    )
 
-    _seite.goto(_seite.url.rsplit("/", 1)[0] +
-                f"/geraete.html?modell={letztes['id']}",
-                wait_until="load")
+    _seite.goto(
+        _seite.url.rsplit("/", 1)[0] + f"/geraete.html?modell={letztes['id']}",
+        wait_until="load",
+    )
     _zeige_tafel(_seite, "tafel-verlauf")
     _seite.wait_for_timeout(200)
-    assert _seite.eval_on_selector("#gr-vsuche", "e => e.value") \
-        == letztes["label"], "der Deep-Link waehlt nicht sein Geraet"
+    assert _seite.eval_on_selector("#gr-vsuche", "e => e.value") == letztes["label"], (
+        "der Deep-Link waehlt nicht sein Geraet"
+    )
 
     # Unbekannte id: still aufs erste Geraet, kein Bruch.
-    _seite.goto(_seite.url.rsplit("/", 1)[0] +
-                "/geraete.html?modell=gibtesnicht-999",
-                wait_until="load")
+    _seite.goto(
+        _seite.url.rsplit("/", 1)[0] + "/geraete.html?modell=gibtesnicht-999",
+        wait_until="load",
+    )
     _zeige_tafel(_seite, "tafel-verlauf")
     _seite.wait_for_timeout(200)
-    assert _seite.eval_on_selector("#gr-vsuche", "e => e.value") \
-        == geraete[0]["label"], (
-        "eine unbekannte id muss still aufs erste Geraet fallen")
+    assert (
+        _seite.eval_on_selector("#gr-vsuche", "e => e.value") == geraete[0]["label"]
+    ), "eine unbekannte id muss still aufs erste Geraet fallen"
     # Die module-weite Seite fuer die Folgetests zuruecklassen: ohne
     # Parameter, Vergleichs-Reiter aktiv (Ladezustand).
     _frisch(_seite)
@@ -1109,16 +1243,19 @@ def test_hoechstens_acht_waagerechte_datumsmarken(_seite):
     marken = _seite.eval_on_selector_all(
         ".gr-vsvg text",
         "e => e.filter(t => !t.textContent.includes('\u20ac') "
-        "&& /[0-9]/.test(t.textContent)).length")
+        "&& /[0-9]/.test(t.textContent)).length",
+    )
     assert 0 < marken <= 8, marken
     gedreht = _seite.eval_on_selector_all(
         ".gr-vsvg text",
         "e => e.filter(t => /rotate|matrix/.test("
-        "(t.getAttribute('transform')||'') + getComputedStyle(t).transform)).length")
+        "(t.getAttribute('transform')||'') + getComputedStyle(t).transform)).length",
+    )
     assert gedreht == 0
     klein = _seite.eval_on_selector_all(
         ".gr-vsvg text",
-        "e => e.filter(t => parseFloat(getComputedStyle(t).fontSize) < 12).length")
+        "e => e.filter(t => parseFloat(getComputedStyle(t).fontSize) < 12).length",
+    )
     assert klein == 0
 
 
@@ -1142,12 +1279,14 @@ def test_die_achse_erfindet_keinen_preis(_seite):
         "      .map(t => parseFloat(t.textContent"
         "                 .replace(/[^0-9.,]/g, '')"
         "                 .replace(/\\./g, '')"
-        "                 .replace(',', '.')))")
+        "                 .replace(',', '.')))",
+    )
     assert all(w == w for w in achse), f"unlesbare Achsenmarke: {achse}"
     punkte = _seite.eval_on_selector_all(
         ".gr-vpunkt title",
         "e => e.map(t => parseFloat(t.textContent.replace(/[^0-9,]/g,'')"
-        "                                        .replace(',', '.')))")
+        "                                        .replace(',', '.')))",
+    )
     assert achse, "keine Preisachse"
     lo, hi = min(punkte), max(punkte)
     for wert in achse:
@@ -1175,21 +1314,29 @@ def test_die_tabelle_zeigt_dieselben_anbieter_wie_das_diagramm(_seite):
     assert _waehle_geraet(_seite)
 
     def anbieter_der_tabelle():
-        return set(_seite.eval_on_selector_all(
-            "#gr-vtabelle tbody tr td:first-child",
-            "e => e.map(x => x.textContent.trim())"))
+        return set(
+            _seite.eval_on_selector_all(
+                "#gr-vtabelle tbody tr td:first-child",
+                "e => e.map(x => x.textContent.trim())",
+            )
+        )
 
     def legende():
-        return set(_seite.eval_on_selector_all(
-            ".gr-vlegende-teil", "e => e.map(x => x.textContent.trim())"))
+        return set(
+            _seite.eval_on_selector_all(
+                ".gr-vlegende-teil", "e => e.map(x => x.textContent.trim())"
+            )
+        )
 
     # 1. Volles Fenster: das Diagramm steht, und beide nennen dasselbe.
     assert _seite.is_visible("#gr-vbild svg"), (
-        "ohne Diagramm prueft der erste Zweig nichts")
+        "ohne Diagramm prueft der erste Zweig nichts"
+    )
     voll = anbieter_der_tabelle()
     assert voll and voll == legende(), (voll, legende())
-    assert _seite.eval_on_selector("#gr-vanb", "e => e.textContent.trim()") \
-        == str(len(voll))
+    assert _seite.eval_on_selector("#gr-vanb", "e => e.textContent.trim()") == str(
+        len(voll)
+    )
 
     # 2. Fenster VERENGT, aber noch ueber der Schwelle: das Diagramm bleibt
     #    stehen, ein frueher Anbieter faellt heraus - und Legende und
@@ -1206,7 +1353,8 @@ def test_die_tabelle_zeigt_dieselben_anbieter_wie_das_diagramm(_seite):
     _seite.wait_for_timeout(200)
     assert _seite.is_visible("#gr-vbild svg"), (
         "nach der Verengung auf vier Messtage muss das Diagramm stehen "
-        "bleiben - sonst prueft dieser Zweig die Gleichheit gar nicht")
+        "bleiben - sonst prueft dieser Zweig die Gleichheit gar nicht"
+    )
     # GEGENPROBE AN DER LEGENDE, nicht an der Tabelle. Die Legende entsteht
     # aus den gezeichneten Reihen; die Tabelle ist der Verdaechtige dieses
     # Tests. Haengt die Gegenprobe an der Tabelle, meldet ein Fehler in
@@ -1216,20 +1364,28 @@ def test_die_tabelle_zeigt_dieselben_anbieter_wie_das_diagramm(_seite):
     im_bild = legende()
     assert im_bild < voll, (
         f"beim Verengen faellt kein Anbieter aus dem BILD ({im_bild} von "
-        f"{voll}) - der Test kann den Fall nicht ausloesen")
+        f"{voll}) - der Test kann den Fall nicht ausloesen"
+    )
     verengt = anbieter_der_tabelle()
     assert verengt == im_bild, (
         f"die Tabelle nennt {verengt}, das Bild zeigt {im_bild} - rechnet "
-        f"sie wieder ueber den vollen Zeitraum?")
-    tage = set(_seite.eval_on_selector_all(
-        "#gr-vtabelle tbody tr td:last-child",
-        "e => e.map(x => x.textContent.trim())"))
-    fenster = set(_seite.eval_on_selector_all(
-        "#gr-vbild .gr-vpunkt title",
-        "e => e.map(x => x.textContent.split(' am ')[1])"))
+        f"sie wieder ueber den vollen Zeitraum?"
+    )
+    tage = set(
+        _seite.eval_on_selector_all(
+            "#gr-vtabelle tbody tr td:last-child",
+            "e => e.map(x => x.textContent.trim())",
+        )
+    )
+    fenster = set(
+        _seite.eval_on_selector_all(
+            "#gr-vbild .gr-vpunkt title",
+            "e => e.map(x => x.textContent.split(' am ')[1])",
+        )
+    )
     assert tage <= fenster, (
-        f"die Tabelle nennt ein Datum, das im Bild nicht vorkommt: "
-        f"{tage - fenster}")
+        f"die Tabelle nennt ein Datum, das im Bild nicht vorkommt: {tage - fenster}"
+    )
 
     # 3. Fenster auf EINEN Tag: unter der Schwelle, also kein Bild - die
     #    Tabelle bleibt und folgt weiter dem Filter.
@@ -1237,17 +1393,19 @@ def test_die_tabelle_zeigt_dieselben_anbieter_wie_das_diagramm(_seite):
     _seite.fill("#gr-vvon", bis)
     _seite.wait_for_timeout(200)
     assert not _seite.is_visible("#gr-vbild svg"), (
-        "ein Tag ist kein Verlauf - hier darf kein Diagramm stehen")
+        "ein Tag ist kein Verlauf - hier darf kein Diagramm stehen"
+    )
     assert not legende(), "keine Legende ohne Diagramm"
     eng = anbieter_der_tabelle()
     assert eng, "die Tabelle verschwindet nicht mit dem Diagramm"
     assert eng <= voll, (eng, voll)
-    ein_tag = set(_seite.eval_on_selector_all(
-        "#gr-vtabelle tbody tr td:last-child",
-        "e => e.map(x => x.textContent.trim())"))
-    assert len(ein_tag) == 1, (
-        f"die Tabelle folgt dem Filter nicht: {ein_tag}")
-
+    ein_tag = set(
+        _seite.eval_on_selector_all(
+            "#gr-vtabelle tbody tr td:last-child",
+            "e => e.map(x => x.textContent.trim())",
+        )
+    )
+    assert len(ein_tag) == 1, f"die Tabelle folgt dem Filter nicht: {ein_tag}"
 
 
 def test_eine_neue_eingabe_raeumt_das_alte_diagramm_weg(_seite):
@@ -1258,8 +1416,10 @@ def test_eine_neue_eingabe_raeumt_das_alte_diagramm_weg(_seite):
     _seite.fill("#gr-vsuche", "zzzzgibtesnicht")
     _seite.wait_for_timeout(200)
     assert _seite.eval_on_selector_all("#gr-vbild svg", "e => e.length") == 0
-    assert _seite.eval_on_selector(
-        "#gr-vleer", "e => getComputedStyle(e).display") != "none"
+    assert (
+        _seite.eval_on_selector("#gr-vleer", "e => getComputedStyle(e).display")
+        != "none"
+    )
 
 
 def test_der_rueckbau_satz_steht_an_beiden_orten_gleich():
@@ -1281,8 +1441,8 @@ def test_der_rueckbau_satz_steht_an_beiden_orten_gleich():
     text = treffer.group(1).strip()
     assert text, "der Rückbau-Satz ist leer"
     assert f"leer.textContent = '{text}'" in js, (
-        f"app.js schreibt einen anderen Rückbau-Satz als die Vorlage "
-        f"({text!r})")
+        f"app.js schreibt einen anderen Rückbau-Satz als die Vorlage ({text!r})"
+    )
 
 
 def test_die_kurve_beginnt_im_ersten_viewport(_umgebung):
@@ -1315,9 +1475,12 @@ def test_die_kurve_beginnt_im_ersten_viewport(_umgebung):
         s = browser.new_page(viewport={"width": breite, "height": hoehe})
         try:
             s.goto(wurzel, wait_until="load")
-            s.add_style_tag(content=(
-                ".gr-reiter button,.gr-reiter .gr-reiter-seite"
-                "{letter-spacing:1px !important}"))
+            s.add_style_tag(
+                content=(
+                    ".gr-reiter button,.gr-reiter .gr-reiter-seite"
+                    "{letter-spacing:1px !important}"
+                )
+            )
             _zeige_tafel(s, "tafel-verlauf")
             s.wait_for_timeout(350)
             s.evaluate("window.scrollTo(0, 0)")
@@ -1343,20 +1506,23 @@ def test_die_kurve_beginnt_im_ersten_viewport(_umgebung):
     for breite, hoehe in sichten:
         mess = ergebnis[breite]
         assert mess, (
-            f"{breite}: die Auto-Vorauswahl zeichnet kein Diagramm "
-            f"(Fixture prüfen)")
+            f"{breite}: die Auto-Vorauswahl zeichnet kein Diagramm (Fixture prüfen)"
+        )
         assert mess["punkte"] >= 4, f"{breite}: {mess}"
         assert mess["reiterZeilen"] == 1, (
             f"{breite}: die Reiterleiste bricht in "
             f"{mess['reiterZeilen']} Zeilen um - das drueckt den Graphen "
-            "unter die Falz")
+            "unter die Falz"
+        )
         assert mess["svg"] <= hoehe, (
             f"{breite}: das SVG beginnt {mess['svg'] - hoehe} px unter der "
-            f"Falz - der Reiter öffnet wieder mit Gerüst statt Kurve")
+            f"Falz - der Reiter öffnet wieder mit Gerüst statt Kurve"
+        )
         if breite == 1440:
             assert mess["kurve"] is not None and mess["kurve"] < hoehe, (
                 f"1440: die erste Kurve beginnt erst bei {mess['kurve']} px "
-                f"- unter der Falz {hoehe}")
+                f"- unter der Falz {hoehe}"
+            )
 
 
 def test_kein_kachelbetrag_bricht_um(_umgebung):
@@ -1371,17 +1537,33 @@ def test_kein_kachelbetrag_bricht_um(_umgebung):
     browser, wurzel = _umgebung
     tage = list(_MESSTAGE)
     geraet = {
-        "id": "probe", "label": "Probefall 128 GB", "hersteller": "Probe",
-        "speicher": 128, "suchtext": "probefall", "min": 919, "max": 1171,
-        "anbieter": 2, "messpunkte": 2 * len(tage), "messtermine": len(tage),
-        "tage": tage, "aktuell": [],
+        "id": "probe",
+        "label": "Probefall 128 GB",
+        "hersteller": "Probe",
+        "speicher": 128,
+        "suchtext": "probefall",
+        "min": 919,
+        "max": 1171,
+        "anbieter": 2,
+        "messpunkte": 2 * len(tage),
+        "messtermine": len(tage),
+        "tage": tage,
+        "aktuell": [],
         "reihen": [
-            {"anbieter": "mobilcom-debitel", "farbe": "#2b5bd7",
-             "eigen": False,
-             "punkte": [{"datum": t, "preis": 1171.0} for t in tage]},
-            {"anbieter": "Vodafone", "farbe": "#e60000", "eigen": True,
-             "punkte": [{"datum": t, "preis": 919.0} for t in tage]},
-        ]}
+            {
+                "anbieter": "mobilcom-debitel",
+                "farbe": "#2b5bd7",
+                "eigen": False,
+                "punkte": [{"datum": t, "preis": 1171.0} for t in tage],
+            },
+            {
+                "anbieter": "Vodafone",
+                "farbe": "#e60000",
+                "eigen": True,
+                "punkte": [{"datum": t, "preis": 919.0} for t in tage],
+            },
+        ],
+    }
     for breite, hoehe in ((1440, 900), (390, 844)):
         s = browser.new_page(viewport={"width": breite, "height": hoehe})
         try:
@@ -1395,22 +1577,24 @@ def test_kein_kachelbetrag_bricht_um(_umgebung):
                                 hoehe: Math.round(
                                     b.getBoundingClientRect().height),
                                 fs: parseFloat(
-                                    getComputedStyle(b).fontSize)}))""")
+                                    getComputedStyle(b).fontSize)}))"""
+            )
             assert lage and any("1.171,00" in b["text"] for b in lage), (
-                f"{breite}: der lange Betrag steht nicht in der Kachel: "
-                f"{lage}")
+                f"{breite}: der lange Betrag steht nicht in der Kachel: {lage}"
+            )
             for b in lage:
                 assert b["hoehe"] <= b["fs"] * 1.6, (
                     f"{breite}: {b['text']!r} ist {b['hoehe']} px hoch bei "
-                    f"{b['fs']} px Schrift - der Betrag bricht um")
+                    f"{b['fs']} px Schrift - der Betrag bricht um"
+                )
         finally:
             s.close()
-
 
 
 # ==========================================================================
 # NACHBESSERUNG 30.08.2026 - im echten Chromium, weil es im HTML nicht steht
 # ==========================================================================
+
 
 def test_die_kachel_und_der_satz_nennen_dieselbe_zahl(_seite):
     """Antonios Befund: "Die Kachel sagt 4 Messpunkte, der Satz darunter
@@ -1425,7 +1609,8 @@ def test_die_kachel_und_der_satz_nennen_dieselbe_zahl(_seite):
     assert _waehle_geraet(_seite)
 
     kacheln = _seite.eval_on_selector_all(
-        ".gr-vkachel", "e => e.map(x => x.innerText.replace(/\\n/g, ' '))")
+        ".gr-vkachel", "e => e.map(x => x.innerText.replace(/\\n/g, ' '))"
+    )
     passend = [k for k in kacheln if "Messtermin" in k]
     assert len(passend) == 1, kacheln
     aus_kachel = int(re.search(r"\d+", passend[0]).group())
@@ -1453,9 +1638,11 @@ def test_das_raster_veraendert_die_zahl_der_messtermine_nicht(_seite):
     # koennte die Rasterung die Zahl gar nicht veraendern und der Test
     # prueft eine Regel, die nicht greifen kann.
     from datetime import date
+
     wochen = {date.fromisoformat(t).isocalendar()[:2] for t in _MESSTAGE}
     assert len(wochen) < len(_MESSTAGE), (
-        f"alle Messtage in verschiedenen Wochen: {_MESSTAGE}")
+        f"alle Messtage in verschiedenen Wochen: {_MESSTAGE}"
+    )
 
     def termine():
         return _seite.text_content("#gr-vpkt").strip()
@@ -1485,7 +1672,8 @@ def test_das_raster_veraendert_die_zahl_der_messtermine_nicht(_seite):
         # ist genau das, wogegen das Gatter gebaut ist.
         z = bild()
         assert not z["sichtbar"] or z["linien"] > 0, (
-            f"{raster}: Diagramm ohne eine einzige Linie - {z}")
+            f"{raster}: Diagramm ohne eine einzige Linie - {z}"
+        )
 
 
 def test_eine_verdeckte_linie_wird_sichtbar_gemacht(_eigene_seite):
@@ -1511,29 +1699,58 @@ def test_eine_verdeckte_linie_wird_sichtbar_gemacht(_eigene_seite):
     auseinander. Gerechnet wird trotzdem vom echten `app.js`."""
     seite = _eigene_seite
     tage = list(_MESSTAGE)
-    _stelle_daten(seite, {
-        "id": "probe", "label": "Probefall 128 GB", "hersteller": "Probe",
-        "speicher": 128, "suchtext": "probefall", "min": 793, "max": 1100,
-        "anbieter": 3, "messpunkte": 3 * len(tage), "messtermine": len(tage),
-        "tage": tage, "aktuell": [],
-        "reihen": [
-            {"anbieter": "mobilcom-debitel", "farbe": "#2b5bd7", "eigen": False,
-             "punkte": [{"datum": t, "preis": 1099.0} for t in tage]},
-            {"anbieter": "Vodafone", "farbe": "#e60000", "eigen": True,
-             "punkte": [{"datum": t, "preis": 1099.9} for t in tage]},
-            {"anbieter": "o2", "farbe": "#217a3c", "eigen": False,
-             "punkte": [{"datum": t, "preis": 793.0 + i * 35}
-                        for i, t in enumerate(tage)]},
-        ]})
+    _stelle_daten(
+        seite,
+        {
+            "id": "probe",
+            "label": "Probefall 128 GB",
+            "hersteller": "Probe",
+            "speicher": 128,
+            "suchtext": "probefall",
+            "min": 793,
+            "max": 1100,
+            "anbieter": 3,
+            "messpunkte": 3 * len(tage),
+            "messtermine": len(tage),
+            "tage": tage,
+            "aktuell": [],
+            "reihen": [
+                {
+                    "anbieter": "mobilcom-debitel",
+                    "farbe": "#2b5bd7",
+                    "eigen": False,
+                    "punkte": [{"datum": t, "preis": 1099.0} for t in tage],
+                },
+                {
+                    "anbieter": "Vodafone",
+                    "farbe": "#e60000",
+                    "eigen": True,
+                    "punkte": [{"datum": t, "preis": 1099.9} for t in tage],
+                },
+                {
+                    "anbieter": "o2",
+                    "farbe": "#217a3c",
+                    "eigen": False,
+                    "punkte": [
+                        {"datum": t, "preis": 793.0 + i * 35}
+                        for i, t in enumerate(tage)
+                    ],
+                },
+            ],
+        },
+    )
 
     striche = seite.eval_on_selector_all(
-        "#gr-vbild path", "e => e.map(x => x.getAttribute('stroke-dasharray'))")
+        "#gr-vbild path", "e => e.map(x => x.getAttribute('stroke-dasharray'))"
+    )
     assert len(striche) == 3, striche
     assert len([x for x in striche if x]) == 1, (
-        f"genau eine der drei Linien liegt verdeckt: {striche}")
+        f"genau eine der drei Linien liegt verdeckt: {striche}"
+    )
 
     etiketten = seite.eval_on_selector_all(
-        "#gr-vbild .gr-vetikett", "e => e.map(x => x.textContent)")
+        "#gr-vbild .gr-vetikett", "e => e.map(x => x.textContent)"
+    )
     assert len(etiketten) == 1, etiketten
     assert "Vodafone" in etiketten[0] and "1.099,90" in etiketten[0], etiketten
 
@@ -1565,18 +1782,19 @@ def test_eine_verdeckte_linie_wird_sichtbar_gemacht(_eigene_seite):
     # Ueberschneidung mit einem Punkt-Kreis.
     assert 6 < lage["abstand"] <= 26, (
         f"das Etikett steht {lage['abstand']} px vom eigenen Punkt - "
-        f"erwartet ein bewusster Versatz (22 px), keine 0 und keine 235")
+        f"erwartet ein bewusster Versatz (22 px), keine 0 und keine 235"
+    )
     assert not lage["schneidetKreis"], (
-        "das Etikett-Rechteck schneidet einen Punkt-Kreis")
-    assert "stroke" in lage["halo"], (
-        f"das Etikett traegt keinen Halo: {lage['halo']!r}")
+        "das Etikett-Rechteck schneidet einen Punkt-Kreis"
+    )
+    assert "stroke" in lage["halo"], f"das Etikett traegt keinen Halo: {lage['halo']!r}"
     assert lage["rechts"] <= lage["breite"], (
-        f"das Etikett laeuft aus dem Bild: {lage['rechts']} > {lage['breite']}")
+        f"das Etikett laeuft aus dem Bild: {lage['rechts']} > {lage['breite']}"
+    )
     assert lage["groesse"] >= MIN_SCHRIFT, lage["groesse"]
 
 
-def test_telekom_farbe_kommt_aus_der_einen_quelle_und_ist_magenta(
-        _eigene_seite):
+def test_telekom_farbe_kommt_aus_der_einen_quelle_und_ist_magenta(_eigene_seite):
     """P2/D1, BEFUND: die alte HASH-PALETTE in `geraete_verlauf.py`
     (`md5(anbietername) % 7`) traf fuer 'Telekom' auf `#217a3c` (Gruen) -
     die Telekom stand gruen im Preisverlauf, waehrend dieselbe Telekom in
@@ -1595,31 +1813,46 @@ def test_telekom_farbe_kommt_aus_der_einen_quelle_und_ist_magenta(
     tage = list(_MESSTAGE)
     punkte = []
     for i, t in enumerate(tage):
-        punkte.append({"datum": t, "anbieter": "Telekom",
-                       "preis": 600.0 + i, "art": "gemessen"})
-        punkte.append({"datum": t, "anbieter": "Vodafone",
-                       "preis": 650.0 - i, "art": "gemessen"})
+        punkte.append(
+            {"datum": t, "anbieter": "Telekom", "preis": 600.0 + i, "art": "gemessen"}
+        )
+        punkte.append(
+            {"datum": t, "anbieter": "Vodafone", "preis": 650.0 - i, "art": "gemessen"}
+        )
     reihen = verlauf._reihen(punkte)
     telekom = next(r for r in reihen if r["anbieter"] == "Telekom")
     assert telekom["farbe"] == "#e20074", (
-        "die EINE Quelle liefert nicht die erwartete Markenfarbe: "
-        + telekom["farbe"])
+        "die EINE Quelle liefert nicht die erwartete Markenfarbe: " + telekom["farbe"]
+    )
     assert telekom["slug"] == "telekom"
 
     seite = _eigene_seite
-    _stelle_daten(seite, {
-        "id": "probe-telekom", "label": "Farbprobe 128 GB",
-        "hersteller": "Probe", "speicher": 128, "suchtext": "farbprobe",
-        "min": 500, "max": 700, "anbieter": len(reihen),
-        "messpunkte": len(punkte), "messtermine": len(tage),
-        "tage": tage, "aktuell": [], "reihen": reihen})
+    _stelle_daten(
+        seite,
+        {
+            "id": "probe-telekom",
+            "label": "Farbprobe 128 GB",
+            "hersteller": "Probe",
+            "speicher": 128,
+            "suchtext": "farbprobe",
+            "min": 500,
+            "max": 700,
+            "anbieter": len(reihen),
+            "messpunkte": len(punkte),
+            "messtermine": len(tage),
+            "tage": tage,
+            "aktuell": [],
+            "reihen": reihen,
+        },
+    )
 
     farbe = seite.eval_on_selector(
-        "#gr-vbild path.gr-vlinie.gr-anb--telekom",
-        "e => getComputedStyle(e).stroke")
+        "#gr-vbild path.gr-vlinie.gr-anb--telekom", "e => getComputedStyle(e).stroke"
+    )
     assert farbe == "rgb(226, 0, 116)", farbe
     assert farbe != "rgb(33, 122, 60)", (
-        "das ist die alte Hash-Gruen-Farbe #217a3c - der Bug ist zurueck")
+        "das ist die alte Hash-Gruen-Farbe #217a3c - der Bug ist zurueck"
+    )
 
 
 def test_unter_vier_messterminen_steht_kein_diagramm(_seite):
@@ -1636,14 +1869,16 @@ def test_unter_vier_messterminen_steht_kein_diagramm(_seite):
     _frisch(_seite)
     assert _waehle_geraet(_seite)
     assert _seite.is_visible("#gr-vbild svg"), (
-        "ohne Diagramm im Ausgangszustand prueft der Test nicht die Aenderung")
+        "ohne Diagramm im Ausgangszustand prueft der Test nicht die Aenderung"
+    )
 
     _seite.fill("#gr-vvon", _MESSTAGE[0])
     _seite.fill("#gr-vbis", _MESSTAGE[1])
     _seite.wait_for_timeout(200)
 
     assert not _seite.is_visible("#gr-vbild svg"), (
-        "unter der Schwelle darf kein Diagramm stehen - auch kein leeres")
+        "unter der Schwelle darf kein Diagramm stehen - auch kein leeres"
+    )
     assert not _seite.eval_on_selector_all(".gr-vlegende-teil", "e => e.length")
     hinweis = (_seite.text_content("#gr-vzukurz") or "").strip()
     assert "2 Messtermine" in hinweis, hinweis
@@ -1652,17 +1887,22 @@ def test_unter_vier_messterminen_steht_kein_diagramm(_seite):
     # Und die Zahl steht nur EINMAL da.
     assert not _seite.is_visible("#gr-vstand")
     assert _seite.is_visible("#gr-vtabelle table"), (
-        "die Tabelle ersetzt das Diagramm, sie verschwindet nicht mit ihm")
+        "die Tabelle ersetzt das Diagramm, sie verschwindet nicht mit ihm"
+    )
 
 
-@pytest.mark.parametrize("tafel,knopf,schluessel", [
-    ("wr-alarme", "euro", "sEuro"),
-    ("wr-alarme", "prozent", "sProzent"),
-    ("tafel-katalog", "preis", "sPreis"),
-])
+@pytest.mark.parametrize(
+    "tafel,knopf,schluessel",
+    [
+        ("wr-alarme", "euro", "sEuro"),
+        ("wr-alarme", "prozent", "sProzent"),
+        ("tafel-katalog", "preis", "sPreis"),
+    ],
+)
 def test_ein_klick_auf_den_spaltenkopf_sortiert_nach_dem_rohwert(
-        _seite, tafel, knopf, schluessel):
-    """"Bei acht Spalten und 24 Zeilen ist Sortieren nach Euro-Abstand statt
+    _seite, tafel, knopf, schluessel
+):
+    """ "Bei acht Spalten und 24 Zeilen ist Sortieren nach Euro-Abstand statt
     Prozent die erste Frage, die jemand hat."
 
     Sortiert wird nach dem ROHWERT an der Zeile, nicht nach dem Zelltext:
@@ -1683,7 +1923,9 @@ def test_ein_klick_auf_den_spaltenkopf_sortiert_nach_dem_rohwert(
         return _seite.eval_on_selector_all(
             f"#{tafel} .gr-a-zeile",
             "(e, k) => e.filter(x => getComputedStyle(x).display !== 'none')"
-            "           .map(x => parseFloat(x.dataset[k]))", schluessel)
+            "           .map(x => parseFloat(x.dataset[k]))",
+            schluessel,
+        )
 
     wahl = f'#{tafel} .gr-sort[data-sort="{knopf}"]'
 
@@ -1712,8 +1954,7 @@ def test_ein_klick_auf_den_spaltenkopf_sortiert_nach_dem_rohwert(
     _seite.click(wahl)
     _seite.wait_for_timeout(150)
     zweite = geordnet()
-    assert erste != zweite, (
-        f"der zweite Klick dreht die Richtung nicht: {erste}")
+    assert erste != zweite, f"der zweite Klick dreht die Richtung nicht: {erste}"
 
 
 def test_die_sortierung_vergibt_den_zeilendeckel_neu(_seite):
@@ -1731,21 +1972,27 @@ def test_die_sortierung_vergibt_den_zeilendeckel_neu(_seite):
         return _seite.eval_on_selector_all(
             "#wr-alarme .gr-a-zeile",
             "(e, k) => e.filter(x => getComputedStyle(x).display !== 'none')"
-            "           .map(x => parseFloat(x.dataset[k]))", schluessel)
+            "           .map(x => parseFloat(x.dataset[k]))",
+            schluessel,
+        )
 
     def alle(schluessel):
         return _seite.eval_on_selector_all(
             "#wr-alarme .gr-a-zeile",
-            "(e, k) => e.map(x => parseFloat(x.dataset[k]))", schluessel)
+            "(e, k) => e.map(x => parseFloat(x.dataset[k]))",
+            schluessel,
+        )
 
     # Gegenprobe: der Deckel muss ueberhaupt greifen, sonst ist der Fall
     # nicht ausloesbar und der Test gruen ohne Aussage.
     assert len(sichtbar("sEuro")) < len(alle("sEuro")), (
-        "kein Deckel aktiv - dann prueft dieser Test nichts")
+        "kein Deckel aktiv - dann prueft dieser Test nichts"
+    )
     # Und die zwei Ordnungen muessen sich unterscheiden.
     nach_prozent = sorted(alle("sProzent"), reverse=True)
     assert nach_prozent != sorted(alle("sEuro"), reverse=True), (
-        "Prozent und Euro ordnen gleich - der Fall ist nicht ausloesbar")
+        "Prozent und Euro ordnen gleich - der Fall ist nicht ausloesbar"
+    )
 
     _seite.click('#wr-alarme .gr-sort[data-sort="euro"]')
     _seite.wait_for_timeout(150)
@@ -1753,7 +2000,8 @@ def test_die_sortierung_vergibt_den_zeilendeckel_neu(_seite):
     assert oben, "keine sichtbare Zeile nach dem Sortieren"
     assert max(oben) == max(alle("sEuro")), (
         "der groesste Euro-Abstand steht nicht unter den sichtbaren Zeilen - "
-        "der Deckel klebt an der alten Ordnung")
+        "der Deckel klebt an der alten Ordnung"
+    )
 
 
 def test_die_achse_beschriftet_keine_zwei_linien_gleich(_eigene_seite):
@@ -1767,33 +2015,68 @@ def test_die_achse_beschriftet_keine_zwei_linien_gleich(_eigene_seite):
     gebaut ist: eine Achse, der man nicht glauben kann."""
     seite = _eigene_seite
     tage = list(_MESSTAGE)
-    _stelle_daten(seite, {
-        "id": "eng", "label": "Engfall 128 GB", "hersteller": "Eng",
-        "speicher": 128, "suchtext": "engfall", "min": 900.0, "max": 900.2,
-        "anbieter": 3, "messpunkte": 3 * len(tage), "messtermine": len(tage),
-        "tage": tage, "aktuell": [],
-        "reihen": [
-            {"anbieter": "o2", "farbe": "#2b5bd7", "eigen": False,
-             "punkte": [{"datum": t, "preis": 900.0} for t in tage]},
-            {"anbieter": "Vodafone", "farbe": "#e60000", "eigen": True,
-             "punkte": [{"datum": t, "preis": 900.1} for t in tage]},
-            {"anbieter": "mobilcom-debitel", "farbe": "#217a3c", "eigen": False,
-             "punkte": [{"datum": t, "preis": 900.2} for t in tage]},
-        ]})
+    _stelle_daten(
+        seite,
+        {
+            "id": "eng",
+            "label": "Engfall 128 GB",
+            "hersteller": "Eng",
+            "speicher": 128,
+            "suchtext": "engfall",
+            "min": 900.0,
+            "max": 900.2,
+            "anbieter": 3,
+            "messpunkte": 3 * len(tage),
+            "messtermine": len(tage),
+            "tage": tage,
+            "aktuell": [],
+            "reihen": [
+                {
+                    "anbieter": "o2",
+                    "farbe": "#2b5bd7",
+                    "eigen": False,
+                    "punkte": [{"datum": t, "preis": 900.0} for t in tage],
+                },
+                {
+                    "anbieter": "Vodafone",
+                    "farbe": "#e60000",
+                    "eigen": True,
+                    "punkte": [{"datum": t, "preis": 900.1} for t in tage],
+                },
+                {
+                    "anbieter": "mobilcom-debitel",
+                    "farbe": "#217a3c",
+                    "eigen": False,
+                    "punkte": [{"datum": t, "preis": 900.2} for t in tage],
+                },
+            ],
+        },
+    )
 
     achse = seite.eval_on_selector_all(
         ".gr-vsvg text",
         "e => e.filter(t => t.textContent.includes('€'))"
-        "      .map(t => t.textContent.trim())")
+        "      .map(t => t.textContent.trim())",
+    )
     assert len(achse) > 1, (
-        f"nur {len(achse)} Achsenmarke(n) - der Fall ist nicht ausloesbar: {achse}")
+        f"nur {len(achse)} Achsenmarke(n) - der Fall ist nicht ausloesbar: {achse}"
+    )
     assert len(set(achse)) == len(achse), (
-        f"zwei Hilfslinien mit demselben Text: {achse}")
+        f"zwei Hilfslinien mit demselben Text: {achse}"
+    )
 
     # Und keine Marke liegt ausserhalb der Daten - die Regel von 30.08.2026
     # gilt weiter, sie wird nur genauer beschriftet.
-    werte = [float(t.replace("\u00a0", "").replace("€", "").strip()
-                    .replace(".", "").replace(",", ".")) for t in achse]
+    werte = [
+        float(
+            t.replace("\u00a0", "")
+            .replace("€", "")
+            .strip()
+            .replace(".", "")
+            .replace(",", ".")
+        )
+        for t in achse
+    ]
     assert min(werte) >= 900.0 - 0.01 and max(werte) <= 900.2 + 0.01, achse
 
 
@@ -1810,12 +2093,18 @@ def test_die_preiskacheln_stehen_so_im_datensatz(_seite):
     assert _waehle_geraet(_seite)
 
     def euro_zu_zahl(text):
-        return float(text.replace(" ", "").replace("€", "").strip()
-                     .replace(".", "").replace(",", "."))
+        return float(
+            text.replace(" ", "")
+            .replace("€", "")
+            .strip()
+            .replace(".", "")
+            .replace(",", ".")
+        )
 
     preise = _seite.eval_on_selector_all(
         "#gr-vbild .gr-vpunkt title",
-        "e => e.map(x => x.textContent.split(': ')[1].split(' am ')[0])")
+        "e => e.map(x => x.textContent.split(': ')[1].split(' am ')[0])",
+    )
     assert preise, "keine Messpunkte im Bild - der Test misst nichts"
     werte = [euro_zu_zahl(p) for p in preise]
 
@@ -1826,7 +2115,8 @@ def test_die_preiskacheln_stehen_so_im_datensatz(_seite):
     # Gegenprobe: die zwei Kacheln müssen sich unterscheiden, sonst sagt der
     # Test nichts darüber, ob min und max verwechselt sind.
     assert kachel_min != kachel_max, (
-        "alle Preise gleich - der Test kann eine Verwechslung nicht sehen")
+        "alle Preise gleich - der Test kann eine Verwechslung nicht sehen"
+    )
 
 
 # --------------------------------------------------------------------------
@@ -1851,21 +2141,37 @@ _B5_HERSTELLER = ("Apple", "Samsung", "Google", "Xiaomi")
 # sollen sollen. Mit sieben Geraeten fuellt "Apple" allein die ganze
 # sichtbare Flaeche, und nur ein echtes Reihum zeigt einen zweiten
 # Hersteller.
-_B5_KATALOG = {"geraete": [
-    {"hersteller": h, "modell": f"{h} Modell {n}", "generation": n,
-     "speicher": [256], "segment": "flagship"}
-    for h in ("Apple", "Samsung", "Google", "Xiaomi") for n in range(1, 8)
-]}
+_B5_KATALOG = {
+    "geraete": [
+        {
+            "hersteller": h,
+            "modell": f"{h} Modell {n}",
+            "generation": n,
+            "speicher": [256],
+            "segment": "flagship",
+        }
+        for h in ("Apple", "Samsung", "Google", "Xiaomi")
+        for n in range(1, 8)
+    ]
+}
 _B5_FARBEN = {"farben": {"schwarz": ["Schwarz"]}}
-_B5_QUELLEN = {"anbieter": [
-    {"name": "Medimax", "typ": "handel", "rang": 1, "methode": "ldjson",
-     "basis_url": "https://www.medimax.de",
-     "einstiege": [{"url": "https://www.medimax.de/c/116"}]},
-]}
+_B5_QUELLEN = {
+    "anbieter": [
+        {
+            "name": "Medimax",
+            "typ": "handel",
+            "rang": 1,
+            "methode": "ldjson",
+            "basis_url": "https://www.medimax.de",
+            "einstiege": [{"url": "https://www.medimax.de/c/116"}],
+        },
+    ]
+}
 
 
-def _b5_listung(modell: str, hersteller: str, preis: float,
-                zustand: str = "neu") -> dict:
+def _b5_listung(
+    modell: str, hersteller: str, preis: float, zustand: str = "neu"
+) -> dict:
     # `device_id()` aus `geraete_model`, NICHT eine eigene Nachbildung: eine
     # zweite Rechnung fuer dieselbe ID lief hier schon einmal auseinander
     # (Xiaomi/Redmi-Fall der ersten Nachbesserung) - `device_id()` kuerzt
@@ -1873,20 +2179,33 @@ def _b5_listung(modell: str, hersteller: str, preis: float,
     # ("Apple Modell 1" -> "apple-modell-1", NICHT
     # "apple-apple-modell-1"), und genau das tat diese Fixture nicht.
     from telco_radar.geraete_model import device_id
+
     gid = device_id(hersteller, modell)
     sku = f"{gid}-256gb-schwarz{'-ref' if zustand != 'neu' else ''}"
     return {
-        "id": f"medimax--{sku}", "sku_id": sku, "device_id": gid,
-        "anbieter": "Medimax", "anbieter_typ": "handel", "netz": "",
-        "speicher_gb": 256, "farbe_roh": "Schwarz",
-        "farbe_normalisiert": "schwarz", "zustand": zustand,
-        "first_seen": "2026-08-01", "last_verified": "2026-08-31",
-        "status": "aktiv", "missed_checks": 0, "preis_ohne_vertrag": preis,
-        "erstpreis": preis, "erstpreis_art": "ohne_vertrag",
+        "id": f"medimax--{sku}",
+        "sku_id": sku,
+        "device_id": gid,
+        "anbieter": "Medimax",
+        "anbieter_typ": "handel",
+        "netz": "",
+        "speicher_gb": 256,
+        "farbe_roh": "Schwarz",
+        "farbe_normalisiert": "schwarz",
+        "zustand": zustand,
+        "first_seen": "2026-08-01",
+        "last_verified": "2026-08-31",
+        "status": "aktiv",
+        "missed_checks": 0,
+        "preis_ohne_vertrag": preis,
+        "erstpreis": preis,
+        "erstpreis_art": "ohne_vertrag",
         "erstpreis_am": "2026-08-01",
         "quelle_url": f"https://example.de/p/{sku}",
-        "abgerufen_am": "2026-08-31", "verfuegbarkeit": "lieferbar",
-        "confidence": "hoch", "einstiege": ["https://example.de/liste"],
+        "abgerufen_am": "2026-08-31",
+        "verfuegbarkeit": "lieferbar",
+        "confidence": "hoch",
+        "einstiege": ["https://example.de/liste"],
     }
 
 
@@ -1899,17 +2218,19 @@ def _b5_bestand() -> list:
     nachdem die drei nicht-passenden herausgefiltert sind."""
     zeilen = []
     for g in _B5_KATALOG["geraete"]:
-        zeilen.append(_b5_listung(g["modell"], g["hersteller"],
-                                  1.0 * g["generation"] * 40))
+        zeilen.append(
+            _b5_listung(g["modell"], g["hersteller"], 1.0 * g["generation"] * 40)
+        )
     for h in ("Apple", "Samsung", "Xiaomi"):
-        zeilen.append(_b5_listung(f"{h} Modell 1", h, 55.0,
-                                  zustand="refurbished"))
+        zeilen.append(_b5_listung(f"{h} Modell 1", h, 55.0, zustand="refurbished"))
     return zeilen
 
 
-_B5_DB = {"updated": "2026-08-31",
-         "anbieter": {"Medimax": {"laeufe": 4, "funde_gesamt": 9}},
-         "listungen": _b5_bestand()}
+_B5_DB = {
+    "updated": "2026-08-31",
+    "anbieter": {"Medimax": {"laeufe": 4, "funde_gesamt": 9}},
+    "listungen": _b5_bestand(),
+}
 
 
 @pytest.fixture(scope="module")
@@ -1923,12 +2244,14 @@ def _b5_seite(_seite, tmp_path_factory):
     """
     root = tmp_path_factory.mktemp("b5")
     (root / "config").mkdir()
-    for name, daten in (("geraete_katalog.yaml", _B5_KATALOG),
-                        ("farben.yaml", _B5_FARBEN),
-                        ("geraete_quellen.yaml", _B5_QUELLEN)):
+    for name, daten in (
+        ("geraete_katalog.yaml", _B5_KATALOG),
+        ("farben.yaml", _B5_FARBEN),
+        ("geraete_quellen.yaml", _B5_QUELLEN),
+    ):
         (root / "config" / name).write_text(
-            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
-            encoding="utf-8")
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False), encoding="utf-8"
+        )
     state = root / "data" / "state"
     state.mkdir(parents=True)
     (state / "geraete_db.json").write_text(json.dumps(_B5_DB), encoding="utf-8")
@@ -1990,9 +2313,12 @@ def test_die_erste_bildschirmseite_zeigt_mindestens_drei_hersteller(_b5_seite):
         "  .filter(z => getComputedStyle(z).display !== 'none'"
         "             && z.getBoundingClientRect().top < hoehe"
         "             && z.getBoundingClientRect().top >= 0)"
-        "  .map(z => z.dataset.marke)", 900)
+        "  .map(z => z.dataset.marke)",
+        900,
+    )
     assert len(set(marken)) >= 3, (
-        f"nur {len(set(marken))} Hersteller ohne Scrollen: {marken}")
+        f"nur {len(set(marken))} Hersteller ohne Scrollen: {marken}"
+    )
 
 
 def test_der_ansichtsregler_steht_von_anfang_an_auf_barpreis(_b5_seite):
@@ -2008,7 +2334,8 @@ def test_der_ansichtsregler_steht_von_anfang_an_auf_barpreis(_b5_seite):
         "#tafel-katalog .gr-kansicht button[data-ansicht]",
         "e => e.map(k => ({ansicht: k.dataset.ansicht,"
         "                  aktiv: k.classList.contains('is-aktiv'),"
-        "                  gedrueckt: k.getAttribute('aria-pressed')}))")
+        "                  gedrueckt: k.getAttribute('aria-pressed')}))",
+    )
     assert {z["ansicht"] for z in zustaende} == {"barpreis", "tco"}, zustaende
     aktive = [z for z in zustaende if z["aktiv"]]
     assert len(aktive) == 1 and aktive[0]["ansicht"] == "barpreis", zustaende
@@ -2022,7 +2349,8 @@ def test_der_ansichtsregler_steht_von_anfang_an_auf_barpreis(_b5_seite):
     sichtbar = seite.eval_on_selector(
         "#gr-katalogtabelle .gr-k-zeile",
         "z => Array.from(z.cells)"
-        "      .map(c => getComputedStyle(c).display !== 'none')")
+        "      .map(c => getComputedStyle(c).display !== 'none')",
+    )
     assert sichtbar[:4] == [True, True, True, True], sichtbar
     assert not any(sichtbar[4:]), sichtbar
 
@@ -2037,9 +2365,11 @@ def test_die_vorbelegung_versteckt_serverseitig_keine_zeile(_b5_seite):
     oder Ansicht. (Bis P3 zaehlte dieser Test Listungszeilen.)"""
     seite = _b5_frisch(_b5_seite)
     anzahl = seite.eval_on_selector_all(
-        "#gr-katalogtabelle .gr-k-zeile", "e => e.length")
+        "#gr-katalogtabelle .gr-k-zeile", "e => e.length"
+    )
     assert anzahl == _b5_modellzahl(), (
-        f"{anzahl} Modellzeilen im DOM, erwartet {_b5_modellzahl()}")
+        f"{anzahl} Modellzeilen im DOM, erwartet {_b5_modellzahl()}"
+    )
     ueberschrift = seite.text_content(".gr-katalog h2 .rubrik-zahl").strip()
     assert ueberschrift == str(_b5_modellzahl()), ueberschrift
 
@@ -2097,7 +2427,8 @@ def test_der_rotdeckel_des_katalogs_ist_eine_messregel(_seite):
     # Fixture-Wache: ohne Sprung-Links pruefte der zweite Assert nichts
     # (die Entsättigung ist an genau dieser Link-Klasse gebunden).
     spruenge = _seite.eval_on_selector_all(
-        "#gr-katalogtabelle a.gr-sprung", "e => e.length")
+        "#gr-katalogtabelle a.gr-sprung", "e => e.length"
+    )
     assert spruenge >= 1, "kein gr-sprung im Katalog der Fixture"
     # Gegenprobe des Zaehlers selbst: ein gestellt rotes Element muss
     # gezaehlt werden - sonst zaehlte die Regel still nichts (derselbe
@@ -2110,28 +2441,32 @@ def test_der_rotdeckel_des_katalogs_ist_eine_messregel(_seite):
           k.style.color = 'var(--red)';
           k.textContent = 'gegenprobe';
           tafel.appendChild(k);
-        }""")
+        }"""
+    )
     mit_probe = _seite.evaluate(_ROT_ZAEHLER)
-    assert any(e["klasse"] == "" and "gegenprobe" in e["text"]
-               for e in mit_probe["elemente"]), (
-        "der Rot-Zaehler zaehlt kein gestellt rotes Element - er misst "
-        "nichts")
+    assert any(
+        e["klasse"] == "" and "gegenprobe" in e["text"] for e in mit_probe["elemente"]
+    ), "der Rot-Zaehler zaehlt kein gestellt rotes Element - er misst nichts"
     _seite.evaluate(
-        "() => document.querySelector('#tafel-katalog [data-rotprobe]')"
-        ".remove()")
+        "() => document.querySelector('#tafel-katalog [data-rotprobe]').remove()"
+    )
     # Die eigentlichen Zusicherungen (ohne das Gegenprobe-Element).
     erg = _seite.evaluate(_ROT_ZAEHLER)
     assert not any("gegenprobe" in e["text"] for e in erg["elemente"]), (
-        "die Gegenprobe klebt noch in der Tafel")
+        "die Gegenprobe klebt noch in der Tafel"
+    )
     rot = _seite.eval_on_selector(
-        "#gr-katalogtabelle a.gr-sprung", "e => getComputedStyle(e).color")
+        "#gr-katalogtabelle a.gr-sprung", "e => getComputedStyle(e).color"
+    )
     assert rot != erg["rot"], (
         f"Sprung-Link steht VOLLROT ({rot}) - Navigation ist kein Befund; "
         "die P4-Regel 'grau, Rot erst im Hover' wird von .src-table a "
-        "uebersteuert")
+        "uebersteuert"
+    )
     assert erg["n"] <= 10, (
         f"{erg['n']} vollrote Elemente im initialen Katalog (Deckel 10): "
-        f"{erg['elemente'][:6]}")
+        f"{erg['elemente'][:6]}"
+    )
 
 
 # --------------------------------------------------------------------------
@@ -2141,6 +2476,7 @@ def test_der_rotdeckel_des_katalogs_ist_eine_messregel(_seite):
 # zwei Klicks auf einen Spaltenkopf, der Deckel darf nicht kollabieren,
 # und der "alle anzeigen"-Knopf liefert seine genannte Zahl.
 # --------------------------------------------------------------------------
+
 
 def _b5_modellzahl() -> int:
     """Die Modellzahl der B5-Fixture, ALS ERWARTUNG ausgeschrieben:
@@ -2168,17 +2504,19 @@ def test_b2_zwei_sortierklicks_lassen_den_deckel_nicht_kollabieren(_b5_seite):
     > deckel statt ==).
     """
     from telco_radar.report.geraete_view import KATALOG_SICHTBAR
+
     seite = _b5_frisch(_b5_seite)
     for _ in range(2):
         seite.click('#gr-katalogtabelle .gr-sort[data-sort="preis"]')
         seite.wait_for_timeout(120)
         sichtbar = seite.eval_on_selector_all(
             "#gr-katalogtabelle .gr-a-zeile",
-            "e => e.filter(x => getComputedStyle(x).display !== 'none')"
-            "      .length")
+            "e => e.filter(x => getComputedStyle(x).display !== 'none')      .length",
+        )
         erwartet = min(KATALOG_SICHTBAR, _b5_modellzahl())
         assert sichtbar == erwartet, (
-            f"{sichtbar} sichtbar nach Sortierklicks, erwartet {erwartet}")
+            f"{sichtbar} sichtbar nach Sortierklicks, erwartet {erwartet}"
+        )
 
 
 def test_b3_alle_anzeigen_liefert_was_der_knopf_verspricht(_b5_seite):
@@ -2202,13 +2540,15 @@ def test_b3_alle_anzeigen_liefert_was_der_knopf_verspricht(_b5_seite):
     seite.wait_for_timeout(120)
     sichtbar = seite.eval_on_selector_all(
         "#gr-katalogtabelle .gr-a-zeile",
-        "e => e.filter(x => getComputedStyle(x).display !== 'none').length")
+        "e => e.filter(x => getComputedStyle(x).display !== 'none').length",
+    )
     assert sichtbar == versprochen, (
-        f"Knopf versprach {versprochen}, sichtbar sind {sichtbar}")
+        f"Knopf versprach {versprochen}, sichtbar sind {sichtbar}"
+    )
     assert versprochen == _b5_modellzahl(), (
         "der Knopf verspricht nicht die Zahl der MODELLZEILEN: "
-        f"{versprochen} != {_b5_modellzahl()}")
-
+        f"{versprochen} != {_b5_modellzahl()}"
+    )
 
 
 # --------------------------------------------------------------------------
@@ -2218,14 +2558,18 @@ def test_b3_alle_anzeigen_liefert_was_der_knopf_verspricht(_b5_seite):
 # Filterzustand und gelten fuer BEIDE Tabellen des echten Bestands.
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("tafel,anker", [
-    ("wr-alarme", "#wr-alarme .gr-a-quelle"),
-    # P3: die ANBIETERZELLE des Katalogs lebt im Zeilen-Aufklapper
-    # (`gr-k-listungen`) - in der Haupttabelle ist der Anker Teil der
-    # PREISzelle ("ab X € bei Y↗"), dort steht der Betrag vor dem Anker,
-    # was keine Rueckabwicklung ist (dafuer der eigene Test darunter).
-    ("tafel-katalog", "#tafel-katalog .gr-k-listungen .gr-a-quelle"),
-])
+
+@pytest.mark.parametrize(
+    "tafel,anker",
+    [
+        ("wr-alarme", "#wr-alarme .gr-a-quelle"),
+        # P3: die ANBIETERZELLE des Katalogs lebt im Zeilen-Aufklapper
+        # (`gr-k-listungen`) - in der Haupttabelle ist der Anker Teil der
+        # PREISzelle ("ab X € bei Y↗"), dort steht der Betrag vor dem Anker,
+        # was keine Rueckabwicklung ist (dafuer der eigene Test darunter).
+        ("tafel-katalog", "#tafel-katalog .gr-k-listungen .gr-a-quelle"),
+    ],
+)
 def test_b7_der_anbietername_liegt_im_anker(_seite, tafel, anker):
     """B7 (Runde 2): fuenf neue Tests der ersten Nachbesserung waren alle
     B5-Tests - keiner hielt B7 selbst. Eine Rueckabwicklung (Name wieder
@@ -2244,7 +2588,9 @@ def test_b7_der_anbietername_liegt_im_anker(_seite, tafel, anker):
         _frisch(_seite)
         _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
         _seite.wait_for_timeout(80)
-    ergebnis = _seite.eval_on_selector(anker, """
+    ergebnis = _seite.eval_on_selector(
+        anker,
+        """
       (a) => {
         var zelle = a.closest('td');
         var vorText = '';
@@ -2253,10 +2599,11 @@ def test_b7_der_anbietername_liegt_im_anker(_seite, tafel, anker):
         }
         return {vorText: vorText.trim(), ankerText: a.textContent.trim()};
       }
-    """)
+    """,
+    )
     assert ergebnis["vorText"] == "", (
-        f"{tafel}: Text VOR dem Anker in der Anbieterzelle: "
-        f"{ergebnis['vorText']!r}")
+        f"{tafel}: Text VOR dem Anker in der Anbieterzelle: {ergebnis['vorText']!r}"
+    )
     assert ergebnis["ankerText"], f"{tafel}: der Anker ist leer"
 
 
@@ -2270,13 +2617,15 @@ def test_p3_der_anker_der_modellzeile_traegt_den_haendlernamen(_seite):
     _seite.click(".gr-reiter button[data-tafel='tafel-katalog']")
     _seite.wait_for_timeout(80)
     ergebnisse = _seite.eval_on_selector_all(
-        "#gr-katalogtabelle .gr-k-zeile td .gr-a-quelle", """
+        "#gr-katalogtabelle .gr-k-zeile td .gr-a-quelle",
+        """
       (anker) => anker.map(a => ({
         ankerText: a.textContent.trim(),
         href: a.getAttribute('href'),
         zelle: a.closest('td').textContent.trim()
       }))
-    """)
+    """,
+    )
     assert ergebnisse, "keine belegten Modellzeilen-Anker in der Fixture"
     for e in ergebnisse:
         # Whitespace normalisieren: zwischen "bei" und dem Namen steht die
@@ -2284,9 +2633,9 @@ def test_p3_der_anker_der_modellzeile_traegt_den_haendlernamen(_seite):
         # zeichen, fuer textContent ein Zeilenumbruch.
         anker = " ".join(e["ankerText"].split())
         assert anker.startswith("bei ") and len(anker) > len("bei "), (
-            f"der Anker nennt den Haendler nicht beim Namen: {anker!r}")
-        assert e["href"] and e["href"] != "#", (
-            f"Modellzeilen-Anker ohne Ziel: {e!r}")
+            f"der Anker nennt den Haendler nicht beim Namen: {anker!r}"
+        )
+        assert e["href"] and e["href"] != "#", f"Modellzeilen-Anker ohne Ziel: {e!r}"
         # Der BETRAG steht in derselben Zelle (vor dem Anker) - die Zeile
         # zeigt Preis UND Haendler zusammen, beide belegt.
         assert "€" in e["zelle"], e["zelle"]
@@ -2311,7 +2660,9 @@ def test_b4_der_anker_traegt_keine_fremde_quellentabellen_typografie(_seite, taf
         _frisch(_seite)
         _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
         _seite.wait_for_timeout(80)
-    link = _seite.eval_on_selector(f"#{tafel} .gr-a-quelle", """
+    link = _seite.eval_on_selector(
+        f"#{tafel} .gr-a-quelle",
+        """
       (a) => ({
         fontSize: getComputedStyle(a).fontSize,
         textTransform: getComputedStyle(a).textTransform,
@@ -2319,13 +2670,16 @@ def test_b4_der_anker_traegt_keine_fremde_quellentabellen_typografie(_seite, taf
         zellFarbe: getComputedStyle(a.closest('td')).color,
         textDecorationLine: getComputedStyle(a).textDecorationLine,
       })
-    """)
+    """,
+    )
     assert link["fontSize"] == "14px", link
     assert link["textTransform"] == "none", link
     assert link["color"] == link["zellFarbe"], (
-        "der Link faerbt sich anders als sein Zelltext ohne Hover: " + str(link))
+        "der Link faerbt sich anders als sein Zelltext ohne Hover: " + str(link)
+    )
     assert link["textDecorationLine"] == "underline", (
-        "kein dauerhafter Hinweis auf einen Link ohne Hover: " + str(link))
+        "kein dauerhafter Hinweis auf einen Link ohne Hover: " + str(link)
+    )
 
 
 @pytest.mark.parametrize("tafel", ["wr-alarme", "tafel-katalog"])
@@ -2345,19 +2699,22 @@ def test_b5_enter_auf_dem_fokussierten_quelllink_wird_nicht_verhindert(_seite, t
         _frisch(_seite)
         _seite.click(f".gr-reiter button[data-tafel='{tafel}']")
         _seite.wait_for_timeout(80)
-    ergebnis = _seite.eval_on_selector(f"#{tafel} .gr-a-quelle", """
+    ergebnis = _seite.eval_on_selector(
+        f"#{tafel} .gr-a-quelle",
+        """
       (el) => {
         el.focus();
         var ev = new KeyboardEvent('keydown', {key: 'Enter', bubbles: true, cancelable: true});
         var nichtVerhindert = el.dispatchEvent(ev);
         return {defaultPrevented: !nichtVerhindert, fokussiert: document.activeElement === el};
       }
-    """)
+    """,
+    )
     assert ergebnis["fokussiert"], f"{tafel}: der Link laesst sich nicht fokussieren"
     assert not ergebnis["defaultPrevented"], (
         f"{tafel}: Enter auf dem Link wird verhindert - die Tastatur "
-        "kann ihn nicht ausloesen")
-
+        "kann ihn nicht ausloesen"
+    )
 
 
 # --------------------------------------------------------------------------
@@ -2370,6 +2727,7 @@ def test_b5_enter_auf_dem_fokussierten_quelllink_wird_nicht_verhindert(_seite, t
 # deshalb direkt gegen `data/state/geraete_db.json` und
 # `config/geraete_katalog.yaml` - keine eigene Erfindung mehr dazwischen.
 # --------------------------------------------------------------------------
+
 
 @pytest.fixture(scope="module")
 def _echte_seite(_seite, tmp_path_factory):
@@ -2385,10 +2743,10 @@ def _echte_seite(_seite, tmp_path_factory):
         shutil.copy(REPO / "config" / name, root / "config" / name)
     state = root / "data" / "state"
     state.mkdir(parents=True)
-    shutil.copy(REPO / "data" / "state" / "geraete_db.json",
-               state / "geraete_db.json")
-    shutil.copy(REPO / "data" / "state" / "geraete_preise.jsonl",
-               state / "geraete_preise.jsonl")
+    shutil.copy(REPO / "data" / "state" / "geraete_db.json", state / "geraete_db.json")
+    shutil.copy(
+        REPO / "data" / "state" / "geraete_preise.jsonl", state / "geraete_preise.jsonl"
+    )
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
     site = root / "site"
@@ -2407,7 +2765,8 @@ def _echte_seite(_seite, tmp_path_factory):
 
 
 def test_p1_die_erste_seite_zeigt_mindestens_drei_hersteller_an_echten_daten(
-        _echte_seite):
+    _echte_seite,
+):
     """Die Rueckweisung woertlich: an den echten Daten gemessen standen
     zwoelf sichtbare Zeilen fuer nur ZWEI Hersteller (iPhone 17 Pro x7,
     Fairphone 6 x5) - ein einzelner Geraeteblock fuellte mehr als die
@@ -2423,20 +2782,25 @@ def test_p1_die_erste_seite_zeigt_mindestens_drei_hersteller_an_echten_daten(
     """
     from telco_radar.geraete_config import lade_katalog
     from telco_radar.analyze.geraete_store import (
-        GeraeteDB, STATUS_AKTIV, STATUS_VERMUTLICH,
+        GeraeteDB,
+        STATUS_AKTIV,
+        STATUS_VERMUTLICH,
     )
     from telco_radar.report import geraete_view
 
     katalog = lade_katalog(REPO)
     db = GeraeteDB(REPO / "data" / "state" / "geraete_db.json")
     alle = db.eintraege()
-    sichtbar_roh = [e for e in alle
-                    if e.get("status") in (STATUS_AKTIV, STATUS_VERMUTLICH)]
+    sichtbar_roh = [
+        e for e in alle if e.get("status") in (STATUS_AKTIV, STATUS_VERMUTLICH)
+    ]
     _pruefung, bestand, _belastbar = geraete_view.bestand_und_belastbar(
-        sichtbar_roh, katalog)
+        sichtbar_roh, katalog
+    )
     modelle = geraete_view.katalog_modellzeilen(bestand, katalog)
 
     from collections import Counter
+
     je_hersteller = Counter(m["hersteller"] for m in modelle)
     groesster = max(je_hersteller.values())
     halbe_sichtflaeche = geraete_view.KATALOG_SICHTBAR / 2
@@ -2453,11 +2817,13 @@ def test_p1_die_erste_seite_zeigt_mindestens_drei_hersteller_an_echten_daten(
     marken = _echte_seite.eval_on_selector_all(
         "#gr-katalogtabelle .gr-a-zeile",
         "e => e.filter(x => getComputedStyle(x).display !== 'none')"
-        "      .map(x => x.dataset.marke)")
+        "      .map(x => x.dataset.marke)",
+    )
     assert len(marken) > 0, "keine einzige Zeile sichtbar - der Test misst nichts"
     assert len(set(marken)) >= 3, (
         f"nur {len(set(marken))} Hersteller unter den {len(marken)} "
-        f"sichtbaren Zeilen an den echten Daten: {sorted(set(marken))}")
+        f"sichtbaren Zeilen an den echten Daten: {sorted(set(marken))}"
+    )
 
 
 def test_p1_der_deckel_zaehlt_modelle_ohne_alle_anzeigen(_echte_seite):
@@ -2473,15 +2839,18 @@ def test_p1_der_deckel_zaehlt_modelle_ohne_alle_anzeigen(_echte_seite):
     zeilen = _echte_seite.eval_on_selector_all(
         "#gr-katalogtabelle .gr-a-zeile",
         "e => e.filter(x => getComputedStyle(x).display !== 'none')"
-        "      .map(x => x.dataset.sGeraet)")
+        "      .map(x => x.dataset.sGeraet)",
+    )
     assert zeilen, "keine Zeile sichtbar - der Test misst nichts"
     assert len(zeilen) <= geraete_view.KATALOG_SICHTBAR, (
         f"{len(zeilen)} sichtbare Modellzeilen ohne 'alle anzeigen', "
-        f"Deckel ist {geraete_view.KATALOG_SICHTBAR}")
+        f"Deckel ist {geraete_view.KATALOG_SICHTBAR}"
+    )
     # Und es sind MODELLZEILEN, keine Listungen: kein Geraet-Speicher-Paar
     # kommt zweimal vor (die 24 Zeilen des iPhone 17 Pro haetten bis P3
     # als 24 Zeilen gezaehlt).
     from collections import Counter
+
     doppel = {g: n for g, n in Counter(zeilen).items() if n > 1}
     assert not doppel, f"Modelle mit mehr als einer Zeile: {doppel}"
 
@@ -2509,7 +2878,8 @@ def test_p3_wertlose_sortierung_steht_unten_nicht_oben(_seite):
         _seite.click('#gr-katalogtabelle .gr-sort[data-sort="spanne"]')
         _seite.wait_for_timeout(120)
         lage = _seite.eval_on_selector_all(
-            "#gr-katalogtabelle .gr-a-zeile", """
+            "#gr-katalogtabelle .gr-a-zeile",
+            """
             (zeilen) => {
               var sichtbar = zeilen.filter(
                 z => getComputedStyle(z).display !== 'none');
@@ -2524,15 +2894,18 @@ def test_p3_wertlose_sortierung_steht_unten_nicht_oben(_seite):
                       letzte_wert: letzte_wert,
                       anzahl_sichtbar: sichtbar.length};
             }
-          """)
+          """,
+        )
         assert lage["anzahl_sichtbar"] > 0, "keine sichtbare Zeile"
         assert "" in lage["werte"], (
             "die Fixture spannt den Fall nicht auf - alle sichtbaren "
-            f"Zeilen haben eine Spanne: {lage['werte']}")
+            f"Zeilen haben eine Spanne: {lage['werte']}"
+        )
         assert lage["letzte_wert"] < lage["erste_leere"], (
             f"eine Zeile ohne Spanne steht ueber einer mit Wert "
             f"(erste leere bei Index {lage['erste_leere']}, letzte mit "
-            f"Wert bei {lage['letzte_wert']}): {lage['werte']}")
+            f"Wert bei {lage['letzte_wert']}): {lage['werte']}"
+        )
 
 
 def test_p3_der_ansichtwechsel_nimmt_die_sortierung_mit(_seite):
@@ -2558,7 +2931,8 @@ def test_p3_der_ansichtwechsel_nimmt_die_sortierung_mit(_seite):
     # vergliche zwei leere Listen (die "Test prueft nichts"-Falle).
     anfangs = _seite.eval_on_selector_all(
         "#gr-katalogtabelle .gr-a-zeile",
-        "z => z.map(r => r.getAttribute('data-s-geraet'))")
+        "z => z.map(r => r.getAttribute('data-s-geraet'))",
+    )
     assert all(anfangs), "kein Modellname an den Zeilen - der Test misst nichts"
 
     # --- Fall 1: Hauptpreisspalte wird gemappt (preis -> tco).
@@ -2567,7 +2941,8 @@ def test_p3_der_ansichtwechsel_nimmt_die_sortierung_mit(_seite):
     _seite.click("#tafel-katalog .gr-kansicht button[data-ansicht='tco']")
     _seite.wait_for_timeout(150)
     lage = _seite.eval_on_selector_all(
-        "#gr-katalogtabelle .gr-a-zeile", """
+        "#gr-katalogtabelle .gr-a-zeile",
+        """
         (zeilen) => {
           var sichtbar = zeilen.filter(
             z => getComputedStyle(z).display !== 'none');
@@ -2579,23 +2954,29 @@ def test_p3_der_ansichtwechsel_nimmt_die_sortierung_mit(_seite):
                     (v, i) => i === 0 || mit[i - 1] >= v),
                   anzahl_mit_zahl: mit.length};
         }
-      """)
+      """,
+    )
     # Der aktive Sortierkopf ist JETZT der TCO-Kopf - sichtbar und mit
     # Pfeil - und die TCO-Werte stehen monoton (Erstklick = absteigend).
     aktiv = _seite.eval_on_selector(
-        "#gr-katalogtabelle thead .gr-sort[data-vor]", """
+        "#gr-katalogtabelle thead .gr-sort[data-vor]",
+        """
         k => ({spalte: k ? k.getAttribute('data-sort') : null,
                richtung: k ? k.getAttribute('data-vor') : null})
-      """)
+      """,
+    )
     assert aktiv["spalte"] == "tco", (
         f"nach dem Wechsel sortiert noch {aktiv} - die unsichtbare "
-        "Preisspalte hätte gemappt werden müssen")
+        "Preisspalte hätte gemappt werden müssen"
+    )
     assert aktiv["richtung"] == "ab"
     assert lage["anzahl_mit_zahl"] >= 2, (
         "die Fixture spannt keine sortierbare TCO-Spalte auf - der Test "
-        f"misst nichts: {lage['werte']}")
+        f"misst nichts: {lage['werte']}"
+    )
     assert lage["monoton_fallend"], (
-        f"TCO-Werte nach dem Wechsel unsortiert: {lage['werte']}")
+        f"TCO-Werte nach dem Wechsel unsortiert: {lage['werte']}"
+    )
 
     # --- Fall 2: eine Spalte OHNE Entsprechung (delta nur in der
     # TCO-Ansicht) faellt auf die Server-Ordnung zurueck.
@@ -2604,16 +2985,19 @@ def test_p3_der_ansichtwechsel_nimmt_die_sortierung_mit(_seite):
     _seite.click("#tafel-katalog .gr-kansicht button[data-ansicht='barpreis']")
     _seite.wait_for_timeout(150)
     ohne_pfeil = _seite.eval_on_selector_all(
-        "#gr-katalogtabelle thead .gr-sort[data-vor]", "k => k.length > 0")
+        "#gr-katalogtabelle thead .gr-sort[data-vor]", "k => k.length > 0"
+    )
     jetzt = _seite.eval_on_selector_all(
         "#gr-katalogtabelle .gr-a-zeile",
-        "z => z.map(r => r.getAttribute('data-s-geraet'))")
+        "z => z.map(r => r.getAttribute('data-s-geraet'))",
+    )
     assert not ohne_pfeil, (
-        "ein Sortierpfeil haengt an einer Spalte, nach der niemand "
-        "sortieren konnte")
+        "ein Sortierpfeil haengt an einer Spalte, nach der niemand sortieren konnte"
+    )
     assert jetzt == anfangs, (
         "nach dem Wechsel steht nicht die Server-Ordnung: "
-        f"{jetzt[:4]} statt {anfangs[:4]}")
+        f"{jetzt[:4]} statt {anfangs[:4]}"
+    )
 
 
 # --------------------------------------------------------------------------
@@ -2624,18 +3008,34 @@ def test_p3_der_ansichtwechsel_nimmt_die_sortierung_mit(_seite):
 # geben kann.
 # --------------------------------------------------------------------------
 
+
 def _probe_mit_tiefpunkt(tage, tiefster: int):
     """Eine Reihe, deren billigster Tag feststeht - der an Position
     `tiefster`. Alle anderen Punkte liegen darueber."""
     return {
-        "id": "probe", "label": "Probefall 128 GB", "hersteller": "Probe",
-        "speicher": 128, "suchtext": "probefall", "min": 700, "max": 900,
-        "anbieter": 1, "messpunkte": len(tage), "messtermine": len(tage),
-        "tage": list(tage), "aktuell": [],
-        "reihen": [{"anbieter": "o2", "farbe": "#217a3c", "eigen": False,
-                    "punkte": [{"datum": t,
-                                "preis": 700.0 if i == tiefster else 900.0}
-                               for i, t in enumerate(tage)]}],
+        "id": "probe",
+        "label": "Probefall 128 GB",
+        "hersteller": "Probe",
+        "speicher": 128,
+        "suchtext": "probefall",
+        "min": 700,
+        "max": 900,
+        "anbieter": 1,
+        "messpunkte": len(tage),
+        "messtermine": len(tage),
+        "tage": list(tage),
+        "aktuell": [],
+        "reihen": [
+            {
+                "anbieter": "o2",
+                "farbe": "#217a3c",
+                "eigen": False,
+                "punkte": [
+                    {"datum": t, "preis": 700.0 if i == tiefster else 900.0}
+                    for i, t in enumerate(tage)
+                ],
+            }
+        ],
     }
 
 
@@ -2665,9 +3065,9 @@ def test_der_bestpreis_stempel_sitzt_auf_dem_billigsten_punkt(_eigene_seite):
     }""")
     assert lage is not None, "es gibt einen Bestpreis-Stempel"
     assert abs(lage["ry"] - lage["py"]) < 0.5, (
-        f"der Ring sitzt auf der Preishoehe des Tiefpunkts: {lage}")
-    assert abs(lage["rx"] - lage["px"]) < 0.5, (
-        f"und auf seinem Tag: {lage}")
+        f"der Ring sitzt auf der Preishoehe des Tiefpunkts: {lage}"
+    )
+    assert abs(lage["rx"] - lage["px"]) < 0.5, f"und auf seinem Tag: {lage}"
 
 
 def test_der_bestpreis_stempel_nennt_den_tag_und_nicht_den_preis(_eigene_seite):
@@ -2681,14 +3081,15 @@ def test_der_bestpreis_stempel_nennt_den_tag_und_nicht_den_preis(_eigene_seite):
     tage = list(_MESSTAGE)
     _stelle_daten(seite, _probe_mit_tiefpunkt(tage, tiefster=1))
 
-    text = seite.eval_on_selector("#gr-vbild .gr-vbestmarke",
-                                  "e => e.textContent")
+    text = seite.eval_on_selector("#gr-vbild .gr-vbestmarke", "e => e.textContent")
     assert "700" not in text and "€" not in text, (
-        f"der Stempel wiederholt den Preis der Kachel nicht: {text!r}")
+        f"der Stempel wiederholt den Preis der Kachel nicht: {text!r}"
+    )
     # Der zweite Messtag der Fixture, in der Schreibweise der Seite.
     tag, monat = tage[1].split("-")[2], tage[1].split("-")[1]
     assert f"{int(tag)}.{int(monat)}." in text, (
-        f"der Stempel nennt den billigsten Tag: {text!r} (erwartet {tage[1]})")
+        f"der Stempel nennt den billigsten Tag: {text!r} (erwartet {tage[1]})"
+    )
 
 
 def test_ohne_preisunterschied_gibt_es_keinen_bestpreis_stempel(_eigene_seite):
@@ -2706,9 +3107,9 @@ def test_ohne_preisunterschied_gibt_es_keinen_bestpreis_stempel(_eigene_seite):
     flach["min"] = flach["max"] = 900
     _stelle_daten(seite, flach)
 
-    assert seite.eval_on_selector_all("#gr-vbild .gr-vbest",
-                                      "e => e.length") == 0, (
-        "eine flache Reihe bekommt keinen Bestpreis-Stempel")
+    assert seite.eval_on_selector_all("#gr-vbild .gr-vbest", "e => e.length") == 0, (
+        "eine flache Reihe bekommt keinen Bestpreis-Stempel"
+    )
 
 
 @pytest.mark.parametrize("tiefster", range(len(_MESSTAGE)))
@@ -2744,12 +3145,12 @@ def test_der_bestpreis_stempel_bleibt_im_bild(_eigene_seite, tiefster):
         # ist die Reihe flach und traegt zu Recht keinen Stempel.
         pytest.skip("in diesem Raster gibt es keinen eigenen Tiefpunkt")
     assert lage["links"] >= 0, f"das Etikett beginnt im Bild: {lage}"
-    assert lage["rechts"] <= lage["breite"], (
-        f"und endet darin: {lage}")
+    assert lage["rechts"] <= lage["breite"], f"und endet darin: {lage}"
 
 
-@pytest.mark.parametrize("tid", ["tafel-tco", "tafel-katalog",
-                                 "tafel-verlauf", "tafel-portfolio"])
+@pytest.mark.parametrize(
+    "tid", ["tafel-tco", "tafel-katalog", "tafel-verlauf", "tafel-portfolio"]
+)
 def test_kein_reiter_rollt_auf_dem_telefon_waagerecht(_umgebung, tid):
     """Eine Seite, die waagerecht rollt, ist auf dem Telefon unbenutzbar.
 
@@ -2795,13 +3196,15 @@ def test_jede_breite_tabelle_liegt_in_ihrem_rollbehaelter(_seite):
     tabellen = _seite.evaluate(
         """() => Array.from(document.querySelectorAll('table.gr-ttab'))
                      .map(t => ({klassen: t.className,
-                                 drin: !!t.closest('.gr-scroll')}))""")
+                                 drin: !!t.closest('.gr-scroll')}))"""
+    )
     # Ohne diese Zeile prueft der Test bei leerem Reiter nichts und ist
     # trotzdem gruen - dieselbe Falle wie der Lookup, der 0 von 7 traf.
     # P2 (17.09.2026): es sind noch DREI Tabellen - die vierte war die
     # G2-Tabelle des Verlaufs-Reiters und ist mit dem Block gefallen.
     assert len(tabellen) >= 3, (
-        f"die Fixture muss alle Tabellen des TCO-Reiters zeigen: {tabellen}")
+        f"die Fixture muss alle Tabellen des TCO-Reiters zeigen: {tabellen}"
+    )
     ohne = [t["klassen"] for t in tabellen if not t["drin"]]
     assert not ohne, f"Tabellen ohne Rollbehaelter: {ohne}"
     # P2-Fix (Code-Prüfung S4-3): die dynamische Verlaufstabelle trägt nicht
@@ -2811,10 +3214,11 @@ def test_jede_breite_tabelle_liegt_in_ihrem_rollbehaelter(_seite):
     verlauf = _seite.evaluate(
         """() => Array.from(document.querySelectorAll('#gr-vtabelle table'))
                      .map(t => ({klassen: t.className,
-                                 drin: !!t.closest('.gr-vtabelle')}))""")
+                                 drin: !!t.closest('.gr-vtabelle')}))"""
+    )
     assert len(verlauf) >= 1, (
-        "die Auto-Vorauswahl muss die Verlaufstabelle füllen: "
-        f"{verlauf}")
+        f"die Auto-Vorauswahl muss die Verlaufstabelle füllen: {verlauf}"
+    )
     ohne_v = [t["klassen"] for t in verlauf if not t["drin"]]
     assert not ohne_v, f"Verlaufstabellen ohne Rollbehaelter: {ohne_v}"
 
@@ -2837,6 +3241,7 @@ def test_jede_breite_tabelle_liegt_in_ihrem_rollbehaelter(_seite):
 # Entscheidung 3) - die Zeilen stehen serverseitig nach TCO-24. Geprueft
 # wird jetzt ebendiese Ordnung im Browser.
 # ==========================================================================
+
 
 def test_die_zeilen_stehen_nach_tco24_sortiert(_seite):
     """Der Entwurf sortiert die Bandliste aufsteigend nach TCO-24 - im
@@ -2861,26 +3266,27 @@ def test_die_modellauswahl_blendet_ohne_neuladen_um(_seite):
     # ein Test, der einen anderen Reiter offen liess (auch auf main rot).
     _zeige_tafel(_seite, "tafel-tco")
     auswahl = _seite.eval_on_selector(
-        "#gr-zeitreihe-daten",
-        "k => Object.keys(JSON.parse(k.textContent).erlaubt)")
+        "#gr-zeitreihe-daten", "k => Object.keys(JSON.parse(k.textContent).erlaubt)"
+    )
     assert len(auswahl) >= 2, "die Fixture kennt nur ein Modell"
     vorgabe = _seite.eval_on_selector(
-        "#gr-zeitreihe-daten",
-        "k => JSON.parse(k.textContent).vorgabe")
+        "#gr-zeitreihe-daten", "k => JSON.parse(k.textContent).vorgabe"
+    )
     fremd = next(m for m in auswahl if m != vorgabe)
     waehle_modell(_seite, fremd)
-    antwort = _seite.eval_on_selector("#tafel-tco .gr-zr-antwort",
-                                      "e => e.textContent")
+    antwort = _seite.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
     assert antwort.strip(), "der Antwort-Satz des gewaehlten Modells fehlt"
     erwartete = _seite.evaluate(
         """(id) => Object.keys(JSON.parse(
              document.getElementById('gr-zeitreihe-daten').textContent)
            .bnd_titel[id])""",
-        fremd)
+        fremd,
+    )
     assert erwartete, "keine Bänder im Knoten"
     zeilen = _seite.eval_on_selector_all(
         "#gr-buendel .gr-bnd:not([hidden])",
-        "e => e.map(x => x.getAttribute('data-anbieter'))")
+        "e => e.map(x => x.getAttribute('data-anbieter'))",
+    )
     assert zeilen, "keine sichtbaren Bündel-Zeilen des gewaehlten Modells"
 
 
@@ -2907,12 +3313,12 @@ def test_jede_zeile_mit_zahl_beantwortet_die_leitfrage(_seite):
 # Netzwerkabruf sichtbar wird (statisch im Dokument, reines UI).
 # ==========================================================================
 
+
 def test_die_buendelzeilen_starten_geschlossen(_seite):
     """Der Anfangszustand ist der, den 11b misst: stünde eine Zeile im HTML
     offen (`open`-Attribut), klaffte ihr Rechenweg in der Anfangshöhe -
     die Kompaktheit wäre nur gerendert, nicht gebaut."""
-    _seite.goto(_seite.url.rsplit("/", 1)[0] + "/geraete.html",
-                wait_until="load")
+    _seite.goto(_seite.url.rsplit("/", 1)[0] + "/geraete.html", wait_until="load")
     _seite.click(".gr-reiter button[data-tafel='tafel-tco']")
     _seite.wait_for_timeout(60)
     zustand = _seite.evaluate("""() => {
@@ -2966,13 +3372,12 @@ def test_die_buendelzeile_oeffnet_ohne_netzwerk(_seite):
         # und ein spaeterer Test misst sonst eine aufgeklappte Zeile.
         _seite.evaluate(
             "() => document.querySelectorAll('.gr-bnd')"
-            ".forEach(z => { z.open = false; })")
+            ".forEach(z => { z.open = false; })"
+        )
     assert ergebnis is not None, "keine Bündelzeile im Modellblock"
     assert ergebnis["sichtbar"], "der Rechenweg bleibt unsichtbar"
-    assert ergebnis["hoehe"] > 60, \
-        f"der Rechenweg hat nur {ergebnis['hoehe']} px Höhe"
-    assert anfragen == [], \
-        f"das Oeffnen hat Netzwerkanfragen ausgeloest: {anfragen}"
+    assert ergebnis["hoehe"] > 60, f"der Rechenweg hat nur {ergebnis['hoehe']} px Höhe"
+    assert anfragen == [], f"das Oeffnen hat Netzwerkanfragen ausgeloest: {anfragen}"
 
 
 def test_die_alt_url_landet_im_radar_reiter(_umgebung):
@@ -2993,13 +3398,16 @@ def test_die_alt_url_landet_im_radar_reiter(_umgebung):
     seite = browser.new_page(viewport={"width": 1440, "height": 900})
     try:
         seite.goto(f"{basis}/wettbewerbsradar.html", wait_until="load")
-        seite.wait_for_timeout(1000)   # Meta-Refresh 0s + Reiter-Schaltung
-        assert "geraete.html" in seite.url, \
+        seite.wait_for_timeout(1000)  # Meta-Refresh 0s + Reiter-Schaltung
+        assert "geraete.html" in seite.url, (
             f"der Meta-Refresh hat nicht weitergeleitet: {seite.url}"
+        )
         aktiv = seite.evaluate(
             "() => document.querySelector(\".gr-reiter button[aria-selected='true']\")"
-            ".getAttribute('data-tafel')")
-        assert aktiv == "tafel-radar", \
+            ".getAttribute('data-tafel')"
+        )
+        assert aktiv == "tafel-radar", (
             f"die Alt-URL landet im Reiter {aktiv!r}, nicht im Radar-Reiter"
+        )
     finally:
         seite.close()

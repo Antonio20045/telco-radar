@@ -23,6 +23,7 @@ Regel 1 und 2). Fehlt der Bestand (Frisch-Checkout ohne Daten), springt
 der Test ueber - sein Lookup laeuft dann nicht ins Leere, sondern prueft
 bewusst nichts.
 """
+
 from __future__ import annotations
 
 import json
@@ -36,15 +37,16 @@ from telco_radar.tco_model import Buendel, TCO_HORIZONT, tco_24
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 ZUSTAND = WURZEL / "data" / "state"
 
-BESTAND_DA = ((ZUSTAND / "geraete_tco.json").exists()
-              and (ZUSTAND / "geraete_db.json").exists()
-              and (ZUSTAND / "tarife.jsonl").exists())
+BESTAND_DA = (
+    (ZUSTAND / "geraete_tco.json").exists()
+    and (ZUSTAND / "geraete_db.json").exists()
+    and (ZUSTAND / "tarife.jsonl").exists()
+)
 
 
 def _tarife() -> dict:
     tarife = {}
-    for zeile in (ZUSTAND / "tarife.jsonl").read_text(
-            encoding="utf-8").splitlines():
+    for zeile in (ZUSTAND / "tarife.jsonl").read_text(encoding="utf-8").splitlines():
         if zeile.strip():
             satz = json.loads(zeile)
             tarife[satz.get("tarif_id") or satz.get("id")] = satz
@@ -84,14 +86,15 @@ def test_keine_leitzahl_unter_dem_eigenen_barpreis():
     verletzungen = []
     for satz in tco.get("buendel") or []:
         if satz.get("rabatte"):
-            continue                      # belegter Rabatt darf unterbieten
+            continue  # belegter Rabatt darf unterbieten
         if (satz.get("zustand") or "") and satz["zustand"] != "neu":
             continue
         b = _buendel_aus_satz(satz)
         if b is None:
             continue
         b.tarif_phasen = karten.phasen_fuer_buendel(
-            tarife.get(b.tarif_id) or {}, b.tarif_monatlich)
+            tarife.get(b.tarif_id) or {}, b.tarif_monatlich
+        )
         kennzahl = tco_24(b)
         if not kennzahl.belastbar or kennzahl.gesamt is None:
             continue
@@ -103,11 +106,11 @@ def test_keine_leitzahl_unter_dem_eigenen_barpreis():
             verletzungen.append((satz.get("id"), kennzahl.gesamt, barpreis))
     # Gegenprobe: der Lauf hat wirklich eine Vergleichsmenge gesehen -
     # sonst waere die Zusicherung gruen, ohne etwas geprueft zu haben.
-    assert geprueft >= 600, \
-        f"unerwartet duenne Vergleichsmenge: {geprueft} Bündel"
-    assert verletzungen == [], \
-        f"{len(verletzungen)} Leitzahlen unter dem eigenen Barpreis, " \
+    assert geprueft >= 600, f"unerwartet duenne Vergleichsmenge: {geprueft} Bündel"
+    assert verletzungen == [], (
+        f"{len(verletzungen)} Leitzahlen unter dem eigenen Barpreis, "
         f"z. B. {verletzungen[:3]}"
+    )
 
 
 def _buendel_aus_satz(satz: dict) -> Buendel | None:
@@ -127,7 +130,8 @@ def _buendel_aus_satz(satz: dict) -> Buendel | None:
             anschlusspreis=satz.get("anschlusspreis"),
             zustand=satz.get("zustand") or "",
             quelle_url=satz.get("quelle_url") or "",
-            abgerufen_am=satz.get("abgerufen_am") or "")
+            abgerufen_am=satz.get("abgerufen_am") or "",
+        )
     except (TypeError, ValueError):
         return None
 
@@ -152,13 +156,18 @@ def test_widerspruch_pib_und_shopmessung_festgehaltene_messung():
     # Tarifbestand, und die Gegenprobe darunter haelt fest, dass es Phasen
     # hat.
     tarife = _tarife()
-    satz = {"anbieter": "Vodafone",
-            "sku_id": "samsung-galaxy-z-fold8-256gb-grau",
-            "tarif_name": "Mobil XS",
-            "tarif_id": "vodafone:vodafone-mobil-xs",
-            "tarif_monatlich": 31.95, "geraet_monatsrate": 42.5,
-            "geraet_zuzahlung": 0.99, "laufzeit_monate": 36,
-            "anschlusspreis": 0.0, "zustand": "neu"}
+    satz = {
+        "anbieter": "Vodafone",
+        "sku_id": "samsung-galaxy-z-fold8-256gb-grau",
+        "tarif_name": "Mobil XS",
+        "tarif_id": "vodafone:vodafone-mobil-xs",
+        "tarif_monatlich": 31.95,
+        "geraet_monatsrate": 42.5,
+        "geraet_zuzahlung": 0.99,
+        "laufzeit_monate": 36,
+        "anschlusspreis": 0.0,
+        "zustand": "neu",
+    }
     b = _buendel_aus_satz(satz)
     assert b is not None
     # Gegenprobe: das Blatt HAT Phasen, der Konflikt ist real - sonst
@@ -166,7 +175,8 @@ def test_widerspruch_pib_und_shopmessung_festgehaltene_messung():
     blatt = karten.phasen_aus_tarifsatz(tarife.get(b.tarif_id) or {})
     assert blatt, "das Blatt des Befundsfall hat keine Phasen mehr"
     b.tarif_phasen = karten.phasen_fuer_buendel(
-        tarife.get(b.tarif_id) or {}, b.tarif_monatlich)
+        tarife.get(b.tarif_id) or {}, b.tarif_monatlich
+    )
     assert b.tarif_phasen == [], "der Widerspruch wurde nicht erkannt"
     kennzahl = tco_24(b)
     assert kennzahl.bestandteile["Tarif über 24 Monate"] == 766.8
@@ -193,32 +203,42 @@ def test_kein_tarifposten_wider_die_gemessene_monatsrate():
     for satz in tco.get("buendel") or []:
         messung = satz.get("tarif_monatlich")
         blatt = karten.phasen_aus_tarifsatz(
-            tarife.get(satz.get("tarif_id") or "") or {})
+            tarife.get(satz.get("tarif_id") or "") or {}
+        )
         if messung is None or not blatt:
             continue
         b = _buendel_aus_satz(satz)
         if b is None:
             continue
         b.tarif_phasen = karten.phasen_fuer_buendel(
-            tarife.get(b.tarif_id) or {}, b.tarif_monatlich)
+            tarife.get(b.tarif_id) or {}, b.tarif_monatlich
+        )
         tarifposten = next(
-            (v for n, v in tco_24(b).bestandteile.items()
-             if n.startswith("Tarif über")), None)
+            (
+                v
+                for n, v in tco_24(b).bestandteile.items()
+                if n.startswith("Tarif über")
+            ),
+            None,
+        )
         if tarifposten is None:
             continue
         betraege = [p.betrag for p in blatt]
-        if (min(betraege) - karten._PREIS_TOLERANZ <= messung
-                <= max(betraege) + karten._PREIS_TOLERANZ):
+        if (
+            min(betraege) - karten._PREIS_TOLERANZ
+            <= messung
+            <= max(betraege) + karten._PREIS_TOLERANZ
+        ):
             mit_phasen += 1
-            continue        # das Blatt beschreibt dieses Angebot: erlaubt
+            continue  # das Blatt beschreibt dieses Angebot: erlaubt
         konflikte += 1
-        assert tarifposten == round(TCO_HORIZONT * messung, 2), \
-            f"{satz.get('id')}: Tarifposten {tarifposten} wider die " \
-            f"Messung {messung}"
-    assert konflikte >= 400, \
-        f"Konfliktmenge duenn ({konflikte}) - Literale pruefen"
-    assert mit_phasen >= 100, \
+        assert tarifposten == round(TCO_HORIZONT * messung, 2), (
+            f"{satz.get('id')}: Tarifposten {tarifposten} wider die Messung {messung}"
+        )
+    assert konflikte >= 400, f"Konfliktmenge duenn ({konflikte}) - Literale pruefen"
+    assert mit_phasen >= 100, (
         f"phasentragende Menge duenn ({mit_phasen}) - Literale pruefen"
+    )
 
 
 @pytest.mark.skipif(not BESTAND_DA, reason="kein ausgelieferter Bestand")
@@ -228,21 +248,27 @@ def test_der_pflichtfall_steht_wirklich_im_bestand():
     Pflichtfalls (1 € + 24 × 15,00 € + 36 × 30,50 € + 0 €), und die
     Leitzahl dafuer ist 1.459,00 € - nicht die gekappte 1.093,00 €."""
     tco = json.loads((ZUSTAND / "geraete_tco.json").read_text(encoding="utf-8"))
-    treffer = [s for s in tco.get("buendel") or []
-               if s.get("anbieter") == "congstar"
-               and "iphone-17-pro" in (s.get("sku_id") or "")
-               and s.get("tarif_monatlich") == 15.0
-               and s.get("geraet_monatsrate") == 30.5]
+    treffer = [
+        s
+        for s in tco.get("buendel") or []
+        if s.get("anbieter") == "congstar"
+        and "iphone-17-pro" in (s.get("sku_id") or "")
+        and s.get("tarif_monatlich") == 15.0
+        and s.get("geraet_monatsrate") == 30.5
+    ]
     assert treffer, "der Pflichtfall fehlt im Bestand - Literal pruefen"
     satz = treffer[0]
-    b = Buendel(sku_id=satz["sku_id"], anbieter=satz["anbieter"],
-                tarif_name=satz["tarif_name"],
-                tarif_id=satz.get("tarif_id", ""),
-                tarif_monatlich=satz["tarif_monatlich"],
-                geraet_zuzahlung=satz.get("geraet_zuzahlung"),
-                geraet_monatsrate=satz["geraet_monatsrate"],
-                laufzeit_monate=satz.get("laufzeit_monate", 24),
-                anschlusspreis=satz.get("anschlusspreis"))
+    b = Buendel(
+        sku_id=satz["sku_id"],
+        anbieter=satz["anbieter"],
+        tarif_name=satz["tarif_name"],
+        tarif_id=satz.get("tarif_id", ""),
+        tarif_monatlich=satz["tarif_monatlich"],
+        geraet_zuzahlung=satz.get("geraet_zuzahlung"),
+        geraet_monatsrate=satz["geraet_monatsrate"],
+        laufzeit_monate=satz.get("laufzeit_monate", 24),
+        anschlusspreis=satz.get("anschlusspreis"),
+    )
     kennzahl = tco_24(b)
     assert kennzahl.gesamt == 1459.0
     assert kennzahl.gesamt != 1093.0

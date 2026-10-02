@@ -19,6 +19,7 @@ sondern still Angebote loescht.
 
 Kein Netz, kein LLM.
 """
+
 from __future__ import annotations
 
 import json
@@ -40,12 +41,15 @@ def _yaml_schreiben(tmp_path, text: str):
 def test_marke_ohne_pages_verhaelt_sich_wie_vorher(tmp_path):
     """Der Bestand darf sich durch die Umstellung nicht aendern - kein
     einziger vorhandener YAML-Eintrag musste angefasst werden."""
-    cfg = _yaml_schreiben(tmp_path, f"""
+    cfg = _yaml_schreiben(
+        tmp_path,
+        f"""
 brands:
   - name: Marke
     url: {LEIT}
     kind: static
-""")
+""",
+    )
     src = cfg.sources[0]
     assert [p.url for p in src.pages] == [LEIT]
     assert src.crawlable is True
@@ -53,7 +57,9 @@ brands:
 
 
 def test_pages_kommen_hinter_die_leitseite(tmp_path):
-    cfg = _yaml_schreiben(tmp_path, f"""
+    cfg = _yaml_schreiben(
+        tmp_path,
+        f"""
 brands:
   - name: Marke
     url: {LEIT}
@@ -62,7 +68,8 @@ brands:
       - url: {ZWEIT}
         kind: static
         label: Handys
-""")
+""",
+    )
     src = cfg.sources[0]
     assert [p.url for p in src.pages] == [LEIT, ZWEIT]
     # kind gilt je Seite, nicht je Marke: eine statische Unterseite unter einer
@@ -76,14 +83,17 @@ def test_die_leitseite_wird_nicht_doppelt_abgefragt(tmp_path):
     """Steht die Leitseite versehentlich auch unter pages:, faellt sie raus -
     sonst liefe die LLM-Extraktion zweimal ueber denselben Text und die
     Angebote wuerden doppelt gezaehlt."""
-    cfg = _yaml_schreiben(tmp_path, f"""
+    cfg = _yaml_schreiben(
+        tmp_path,
+        f"""
 brands:
   - name: Marke
     url: {LEIT}
     pages:
       - url: {LEIT}/
       - url: {ZWEIT}
-""")
+""",
+    )
     assert [p.url for p in cfg.sources[0].pages] == [LEIT, ZWEIT]
 
 
@@ -91,7 +101,9 @@ def test_marke_ist_crawlbar_sobald_eine_seite_es_ist(tmp_path):
     """Eine Marke, deren Leitseite ein dokumentierter Sonderfall ist, deren
     Kampagnenseite sich aber abrufen laesst, wird beobachtet - sie darf auf
     der Uebersicht nicht als ungeprueft durchfallen."""
-    cfg = _yaml_schreiben(tmp_path, f"""
+    cfg = _yaml_schreiben(
+        tmp_path,
+        f"""
 brands:
   - name: Marke
     url: {LEIT}
@@ -99,7 +111,8 @@ brands:
     pages:
       - url: {ZWEIT}
         kind: static
-""")
+""",
+    )
     src = cfg.sources[0]
     assert src.crawlable is True
     assert [p.url for p in src.crawled_pages] == [ZWEIT]
@@ -125,8 +138,10 @@ def test_alter_markenschluessel_gilt_einmalig_weiter(tmp_path):
     Leitseite grundlos als veraendert gelten - eine komplette
     LLM-Neuextraktion ueber alle Marken, fuer nichts."""
     pfad = tmp_path / "snap.json"
-    pfad.write_text(json.dumps({"Marke": {"hash": "alt", "fetched_at": "2026-08-01"}}),
-                    encoding="utf-8")
+    pfad.write_text(
+        json.dumps({"Marke": {"hash": "alt", "fetched_at": "2026-08-01"}}),
+        encoding="utf-8",
+    )
     store = SnapshotStore(pfad)
     key = snapshot_key("Marke", LEIT)
     assert store.changed(key, "alt", legacy_key="Marke") is False
@@ -149,10 +164,16 @@ def test_prune_raeumt_alte_und_entfernte_schluessel_weg(tmp_path):
 # ---------------------------------------------------------------- mark_stale
 def _db_mit_zwei_seiten(tmp_path) -> PromoDB:
     db = PromoDB(tmp_path / "db.json")
-    db.upsert([{"brand": "Marke", "headline": "Bonus auf der Leitseite"}],
-              "2026-08-01", source_url=LEIT)
-    db.upsert([{"brand": "Marke", "headline": "Rabatt auf Geraete"}],
-              "2026-08-01", source_url=ZWEIT)
+    db.upsert(
+        [{"brand": "Marke", "headline": "Bonus auf der Leitseite"}],
+        "2026-08-01",
+        source_url=LEIT,
+    )
+    db.upsert(
+        [{"brand": "Marke", "headline": "Rabatt auf Geraete"}],
+        "2026-08-01",
+        source_url=ZWEIT,
+    )
     return db
 
 
@@ -167,28 +188,30 @@ def test_unveraenderte_seite_laesst_ihre_angebote_in_ruhe(tmp_path):
     gelesen, LEIT nicht. Das Angebot von LEIT steht folglich nicht unter den
     wiedergefundenen IDs - altern darf es trotzdem nicht."""
     db = _db_mit_zwei_seiten(tmp_path)
-    neu = db.upsert([{"brand": "Marke", "headline": "Rabatt auf Geraete"}],
-                    "2026-08-08", source_url=ZWEIT).gesehene_ids
-    db.mark_stale("Marke", neu, "2026-08-08",
-                  gepruefte_seiten={ZWEIT}, leitseite=LEIT)
+    neu = db.upsert(
+        [{"brand": "Marke", "headline": "Rabatt auf Geraete"}],
+        "2026-08-08",
+        source_url=ZWEIT,
+    ).gesehene_ids
+    db.mark_stale("Marke", neu, "2026-08-08", gepruefte_seiten={ZWEIT}, leitseite=LEIT)
     status = {e["headline"]: e["status"] for e in db.entries.values()}
-    assert status == {"Bonus auf der Leitseite": "aktiv",
-                      "Rabatt auf Geraete": "aktiv"}
+    assert status == {"Bonus auf der Leitseite": "aktiv", "Rabatt auf Geraete": "aktiv"}
 
 
 def test_angebot_der_gelesenen_seite_altert_weiterhin(tmp_path):
     """Die Gegenprobe - die Alterung darf nicht einfach abgeschaltet sein."""
     db = _db_mit_zwei_seiten(tmp_path)
-    db.mark_stale("Marke", set(), "2026-08-08",
-                  gepruefte_seiten={ZWEIT}, leitseite=LEIT)
+    db.mark_stale(
+        "Marke", set(), "2026-08-08", gepruefte_seiten={ZWEIT}, leitseite=LEIT
+    )
     status = {e["headline"]: e["status"] for e in db.entries.values()}
     assert status["Rabatt auf Geraete"] == "evtl. ausgelaufen"
     assert status["Bonus auf der Leitseite"] == "aktiv"
     # zweiter Fehltreffer in Folge -> beendet
-    db.mark_stale("Marke", set(), "2026-08-09",
-                  gepruefte_seiten={ZWEIT}, leitseite=LEIT)
-    assert db.entries and any(e["status"] == "ausgelaufen"
-                              for e in db.entries.values())
+    db.mark_stale(
+        "Marke", set(), "2026-08-09", gepruefte_seiten={ZWEIT}, leitseite=LEIT
+    )
+    assert db.entries and any(e["status"] == "ausgelaufen" for e in db.entries.values())
 
 
 def test_bestandseintrag_ohne_herkunft_haengt_an_der_leitseite(tmp_path):
@@ -197,13 +220,18 @@ def test_bestandseintrag_ohne_herkunft_haengt_an_der_leitseite(tmp_path):
     Wird die neu gelesen und das Angebot fehlt, altert es korrekt; wird nur
     eine andere Seite gelesen, bleibt es unangetastet."""
     db = PromoDB(tmp_path / "db.json")
-    db.entries["alt"] = {"id": "alt", "brand": "Marke", "headline": "Altbestand",
-                         "status": "aktiv", "missed_checks": 0}
-    db.mark_stale("Marke", set(), "2026-08-08",
-                  gepruefte_seiten={ZWEIT}, leitseite=LEIT)
+    db.entries["alt"] = {
+        "id": "alt",
+        "brand": "Marke",
+        "headline": "Altbestand",
+        "status": "aktiv",
+        "missed_checks": 0,
+    }
+    db.mark_stale(
+        "Marke", set(), "2026-08-08", gepruefte_seiten={ZWEIT}, leitseite=LEIT
+    )
     assert db.entries["alt"]["status"] == "aktiv"
-    db.mark_stale("Marke", set(), "2026-08-08",
-                  gepruefte_seiten={LEIT}, leitseite=LEIT)
+    db.mark_stale("Marke", set(), "2026-08-08", gepruefte_seiten={LEIT}, leitseite=LEIT)
     assert db.entries["alt"]["status"] == "evtl. ausgelaufen"
 
 
@@ -222,10 +250,12 @@ def test_die_echte_konfiguration_hat_mehrere_seiten_je_marke():
     (CLAUDE.md) - und diese Rubrik behauptet auf ihrer Quellenseite eine
     Seitenzahl."""
     from pathlib import Path
+
     cfg = load_promo_config(Path(__file__).resolve().parents[1])
     assert cfg.page_count > len(cfg.sources), (
         "Mindestens eine Marke muss mehr als ihre Leitseite haben - sonst ist "
-        "die Rubrik auf dem Stand vor dem 08.08.2026")
+        "die Rubrik auf dem Stand vor dem 08.08.2026"
+    )
     # Kein Duplikat ueber die gesamte Konfiguration: dieselbe URL zweimal
     # abgefragt kostet je Lauf einen LLM-Aufruf und bringt nichts.
     alle = [p.url for s in cfg.sources for p in s.pages]
@@ -235,8 +265,9 @@ def test_die_echte_konfiguration_hat_mehrere_seiten_je_marke():
         assert s.pages[0].url == s.url
 
 
-def test_leitseite_behaelt_ihren_hash_auch_wenn_sie_sich_nicht_aenderte(tmp_path,
-                                                                       monkeypatch):
+def test_leitseite_behaelt_ihren_hash_auch_wenn_sie_sich_nicht_aenderte(
+    tmp_path, monkeypatch
+):
     """Der Fehler aus Lauf #83, und er kostete jeden Lauf Geld.
 
     Die Leitseite galt ueber den alten Markenschluessel als unveraendert,
@@ -253,7 +284,8 @@ def test_leitseite_behaelt_ihren_hash_auch_wenn_sie_sich_nicht_aenderte(tmp_path
     from telco_radar.collect.promo_snapshot import content_hash
 
     (tmp_path / "config").mkdir()
-    (tmp_path / "config" / "promo_sources.yaml").write_text(f"""
+    (tmp_path / "config" / "promo_sources.yaml").write_text(
+        f"""
 brands:
   - name: Marke
     url: {LEIT}
@@ -261,20 +293,32 @@ brands:
     pages:
       - url: {ZWEIT}
         kind: static
-""", encoding="utf-8")
+""",
+        encoding="utf-8",
+    )
 
     seiten = {LEIT: "Text der Leitseite", ZWEIT: "Text der zweiten Seite"}
-    monkeypatch.setattr(promo_pipeline, "fetch_snapshot",
-                        lambda url, kind, cfg: {"text": seiten[url], "links": [],
-                                                "images": [], "image_url": None})
+    monkeypatch.setattr(
+        promo_pipeline,
+        "fetch_snapshot",
+        lambda url, kind, cfg: {
+            "text": seiten[url],
+            "links": [],
+            "images": [],
+            "image_url": None,
+        },
+    )
 
     # Ausgangslage wie vor der Umstellung: EIN Hash, unter dem reinen
     # Markenschluessel, und er passt zum aktuellen Text der Leitseite.
     zustand = tmp_path / "data" / "state"
     zustand.mkdir(parents=True)
     (zustand / "promo_snapshots.json").write_text(
-        json.dumps({"Marke": {"hash": content_hash(seiten[LEIT]),
-                              "fetched_at": "2026-08-01"}}), encoding="utf-8")
+        json.dumps(
+            {"Marke": {"hash": content_hash(seiten[LEIT]), "fetched_at": "2026-08-01"}}
+        ),
+        encoding="utf-8",
+    )
 
     ergebnis = promo_pipeline.run_promo_stage(tmp_path, {}, use_llm=False, model="x")
 
@@ -286,7 +330,9 @@ brands:
     # ... und trotzdem steht ihr Hash jetzt unter dem SEITENschluessel.
     gespeichert = json.loads((zustand / "promo_snapshots.json").read_text())
     assert snapshot_key("Marke", LEIT) in gespeichert
-    assert gespeichert[snapshot_key("Marke", LEIT)]["hash"] == content_hash(seiten[LEIT])
+    assert gespeichert[snapshot_key("Marke", LEIT)]["hash"] == content_hash(
+        seiten[LEIT]
+    )
     # Der alte Markenschluessel ist weg (prune), und er fehlt niemandem mehr.
     assert "Marke" not in gespeichert
     assert len(gespeichert) == 2
@@ -311,29 +357,45 @@ def test_gescheiterte_extraktion_altert_die_angebote_nicht(tmp_path, monkeypatch
     from telco_radar.analyze.promo_analyst import PromoExtractionError
 
     (tmp_path / "config").mkdir()
-    (tmp_path / "config" / "promo_sources.yaml").write_text(f"""
+    (tmp_path / "config" / "promo_sources.yaml").write_text(
+        f"""
 brands:
   - name: Marke
     url: {LEIT}
     kind: static
-""", encoding="utf-8")
+""",
+        encoding="utf-8",
+    )
     zustand = tmp_path / "data" / "state"
     zustand.mkdir(parents=True)
 
     db = PromoDB(zustand / "promo_db.json")
-    db.upsert([{"brand": "Marke", "headline": "Laufende Aktion"}],
-              "2026-08-01", source_url=LEIT)
+    db.upsert(
+        [{"brand": "Marke", "headline": "Laufende Aktion"}],
+        "2026-08-01",
+        source_url=LEIT,
+    )
     db.save("2026-08-01")
 
-    monkeypatch.setattr(promo_pipeline, "fetch_snapshot",
-                        lambda url, kind, cfg: {"text": "neuer Text", "links": [],
-                                                "images": [], "image_url": None})
-    monkeypatch.setattr(promo_pipeline, "extract_promos",
-                        lambda *a, **k: (_ for _ in ()).throw(
-                            PromoExtractionError("HTTPError: 529 overloaded")))
+    monkeypatch.setattr(
+        promo_pipeline,
+        "fetch_snapshot",
+        lambda url, kind, cfg: {
+            "text": "neuer Text",
+            "links": [],
+            "images": [],
+            "image_url": None,
+        },
+    )
+    monkeypatch.setattr(
+        promo_pipeline,
+        "extract_promos",
+        lambda *a, **k: (_ for _ in ()).throw(
+            PromoExtractionError("HTTPError: 529 overloaded")
+        ),
+    )
     # Die Bewertung braucht hier kein Modell.
-    monkeypatch.setattr(promo_pipeline.promo_ranker, "score_all",
-                        lambda *a, **k: {})
+    monkeypatch.setattr(promo_pipeline.promo_ranker, "score_all", lambda *a, **k: {})
 
     ergebnis = promo_pipeline.run_promo_stage(tmp_path, {}, use_llm=True, model="x")
 
@@ -353,22 +415,35 @@ def test_leere_extraktion_altert_sehr_wohl(tmp_path, monkeypatch):
     from telco_radar import promo_pipeline
 
     (tmp_path / "config").mkdir()
-    (tmp_path / "config" / "promo_sources.yaml").write_text(f"""
+    (tmp_path / "config" / "promo_sources.yaml").write_text(
+        f"""
 brands:
   - name: Marke
     url: {LEIT}
     kind: static
-""", encoding="utf-8")
+""",
+        encoding="utf-8",
+    )
     zustand = tmp_path / "data" / "state"
     zustand.mkdir(parents=True)
     db = PromoDB(zustand / "promo_db.json")
-    db.upsert([{"brand": "Marke", "headline": "Laufende Aktion"}],
-              "2026-08-01", source_url=LEIT)
+    db.upsert(
+        [{"brand": "Marke", "headline": "Laufende Aktion"}],
+        "2026-08-01",
+        source_url=LEIT,
+    )
     db.save("2026-08-01")
 
-    monkeypatch.setattr(promo_pipeline, "fetch_snapshot",
-                        lambda url, kind, cfg: {"text": "neuer Text", "links": [],
-                                                "images": [], "image_url": None})
+    monkeypatch.setattr(
+        promo_pipeline,
+        "fetch_snapshot",
+        lambda url, kind, cfg: {
+            "text": "neuer Text",
+            "links": [],
+            "images": [],
+            "image_url": None,
+        },
+    )
     monkeypatch.setattr(promo_pipeline, "extract_promos", lambda *a, **k: [])
     monkeypatch.setattr(promo_pipeline.promo_ranker, "score_all", lambda *a, **k: {})
 

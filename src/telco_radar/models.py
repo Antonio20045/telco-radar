@@ -1,4 +1,5 @@
 """Core data model: a single intelligence item (press release, news article)."""
+
 from __future__ import annotations
 
 import hashlib

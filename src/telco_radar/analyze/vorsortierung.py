@@ -51,6 +51,7 @@ hingesehen, hier schon. Wer die beiden verwechselt, baut entweder eine
 Endlosschleife (verworfene Meldungen kommen jeden Lauf wieder) oder einen
 stillen Verlust.
 """
+
 from __future__ import annotations
 
 import json
@@ -142,12 +143,14 @@ class CtmDurchlass:
         self.fokus = fokus
         worte = [re.escape(w) for w in (fokus.direkte_stichworte or []) if w]
         worte.sort(key=len, reverse=True)
-        self._stichworte = (re.compile(r"(?<!\w)(" + "|".join(worte) + ")", re.I)
-                            if worte else None)
+        self._stichworte = (
+            re.compile(r"(?<!\w)(" + "|".join(worte) + ")", re.I) if worte else None
+        )
 
     def trifft(self, item: Item) -> bool:
-        text = " ".join(str(getattr(item, f, "") or "")
-                        for f in ("operator", "title", "summary"))
+        text = " ".join(
+            str(getattr(item, f, "") or "") for f in ("operator", "title", "summary")
+        )
         if self.fokus.trifft_heimatmarkt(text):
             return True
         return bool(self._stichworte and self._stichworte.search(text))
@@ -163,8 +166,8 @@ class Bilanz:
     """
 
     angeboten: int = 0
-    durchlass: int = 0       # per CTM-Treffer an der Stufe vorbei
-    geprueft: int = 0        # dem Modell wirklich vorgelegt
+    durchlass: int = 0  # per CTM-Treffer an der Stufe vorbei
+    geprueft: int = 0  # dem Modell wirklich vorgelegt
     verworfen: int = 0
     batches: int = 0
     fehler_batches: int = 0  # Stapel, die ungefiltert durchgereicht wurden
@@ -211,10 +214,17 @@ def ist_eingeschaltet(settings: dict) -> bool:
 
 def _nutzlast(nummeriert: list[tuple[int, Item]]) -> str:
     return json.dumps(
-        [{"nr": nr, "titel": item.title, "quelle": item.source_name,
-          "text": analyst_text(item)[:TEXT_ZEICHEN]}
-         for nr, item in nummeriert],
-        ensure_ascii=False)
+        [
+            {
+                "nr": nr,
+                "titel": item.title,
+                "quelle": item.source_name,
+                "text": analyst_text(item)[:TEXT_ZEICHEN],
+            }
+            for nr, item in nummeriert
+        ],
+        ensure_ascii=False,
+    )
 
 
 # Was als "verwirf das" gilt. Alles andere - auch eine fehlende, leere oder
@@ -249,23 +259,27 @@ def _zeilen(parsed) -> list[dict]:
     return []
 
 
-def _ein_stapel(nummeriert: list[tuple[int, Item]], model: str
-                ) -> tuple[dict[int, str], bool]:
+def _ein_stapel(
+    nummeriert: list[tuple[int, Item]], model: str
+) -> tuple[dict[int, str], bool]:
     """Ein Aufruf. Liefert die Verwuerfe (Nummer -> Grund) und ob er scheiterte.
 
     Beide Rueckgaben werden gebraucht: ein leeres Ergebnis heisst "nichts
     auszusortieren", ein gescheiterter Aufruf heisst "wir wissen es nicht" -
     und das darf nie dasselbe sein.
     """
-    user = (f"{len(nummeriert)} Meldungen:\n"
-            + _nutzlast(nummeriert))
+    user = f"{len(nummeriert)} Meldungen:\n" + _nutzlast(nummeriert)
     try:
-        parsed = extract_json(complete(VORSORTIERER_SYSTEM, user, model=model,
-                                       max_tokens=MAX_TOKENS))
+        parsed = extract_json(
+            complete(VORSORTIERER_SYSTEM, user, model=model, max_tokens=MAX_TOKENS)
+        )
     except Exception as exc:  # noqa: BLE001 - Fehler-Durchlass, siehe Modulkopf
-        log.warning("Vorsortierung: Stapel mit %d Meldungen gescheitert (%s) - "
-                    "alle gehen ungefiltert zum Analysten",
-                    len(nummeriert), str(exc)[:160])
+        log.warning(
+            "Vorsortierung: Stapel mit %d Meldungen gescheitert (%s) - "
+            "alle gehen ungefiltert zum Analysten",
+            len(nummeriert),
+            str(exc)[:160],
+        )
         return {}, True
 
     bekannt = {nr for nr, _ in nummeriert}
@@ -280,9 +294,14 @@ def _ein_stapel(nummeriert: list[tuple[int, Item]], model: str
     return verwuerfe, False
 
 
-def sortiere_vor(items: list[Item], *, model: str, fokus: CtmFokus,
-                 use_llm: bool = True, deadline: float | None = None
-                 ) -> tuple[list[Item], Bilanz]:
+def sortiere_vor(
+    items: list[Item],
+    *,
+    model: str,
+    fokus: CtmFokus,
+    use_llm: bool = True,
+    deadline: float | None = None,
+) -> tuple[list[Item], Bilanz]:
     """Die offensichtlich Irrelevanten aussortieren - in der Eingabereihenfolge.
 
     Die Reihenfolge bleibt erhalten, weil sie traegt: `_interleave_by_source`
@@ -307,7 +326,7 @@ def sortiere_vor(items: list[Item], *, model: str, fokus: CtmFokus,
 
     verwuerfe: dict[int, str] = {}
     for start in range(0, len(zu_pruefen), BATCH_SIZE):
-        stapel = zu_pruefen[start:start + BATCH_SIZE]
+        stapel = zu_pruefen[start : start + BATCH_SIZE]
         bilanz.batches += 1
         if deadline is not None and time.monotonic() >= deadline:
             bilanz.frist_batches += 1
@@ -320,16 +339,24 @@ def sortiere_vor(items: list[Item], *, model: str, fokus: CtmFokus,
 
     bilanz.verworfen = len(verwuerfe)
     bilanz.stichprobe = [
-        {"titel": items[nr].title[:120], "quelle": items[nr].source_name,
-         "grund": grund}
-        for nr, grund in sorted(verwuerfe.items())][:STICHPROBE]
+        {
+            "titel": items[nr].title[:120],
+            "quelle": items[nr].source_name,
+            "grund": grund,
+        }
+        for nr, grund in sorted(verwuerfe.items())
+    ][:STICHPROBE]
     return [item for nr, item in enumerate(items) if nr not in verwuerfe], bilanz
 
 
-def sortiere_regionen_vor(items_by_region: dict[str, list[Item]], *,
-                          model: str, fokus: CtmFokus, workers: int = 1,
-                          deadline: float | None = None,
-                          ) -> tuple[dict[str, list[Item]], Bilanz]:
+def sortiere_regionen_vor(
+    items_by_region: dict[str, list[Item]],
+    *,
+    model: str,
+    fokus: CtmFokus,
+    workers: int = 1,
+    deadline: float | None = None,
+) -> tuple[dict[str, list[Item]], Bilanz]:
     """Die Stufe ueber alle Bereiche - je Region/Themenfeld ein eigener Lauf.
 
     Bereiche laufen nebenlaeufig, ihre Stapel nacheinander: dieselbe Aufteilung
@@ -345,13 +372,15 @@ def sortiere_regionen_vor(items_by_region: dict[str, list[Item]], *,
 
     def _einer(eintrag: tuple[str, list[Item]]) -> tuple[str, list[Item], Bilanz]:
         region_key, region_items = eintrag
-        behalten, bilanz = sortiere_vor(region_items, model=model, fokus=fokus,
-                                        deadline=deadline)
+        behalten, bilanz = sortiere_vor(
+            region_items, model=model, fokus=fokus, deadline=deadline
+        )
         return region_key, behalten, bilanz
 
     eintraege = list(items_by_region.items())
     if workers > 1 and len(eintraege) > 1:
         from concurrent.futures import ThreadPoolExecutor
+
         with ThreadPoolExecutor(max_workers=workers) as pool:
             teile = list(pool.map(_einer, eintraege))
     else:
@@ -362,11 +391,21 @@ def sortiere_regionen_vor(items_by_region: dict[str, list[Item]], *,
         if behalten:
             ergebnis[region_key] = behalten
 
-    log.info("Vorsortierung: %d von %d verworfen (CTM-Durchlass: %d, "
-             "Fehler-Durchlass: %d von %d Stapeln, Frist-Durchlass: %d)",
-             gesamt.verworfen, gesamt.angeboten, gesamt.durchlass,
-             gesamt.fehler_batches, gesamt.batches, gesamt.frist_batches)
+    log.info(
+        "Vorsortierung: %d von %d verworfen (CTM-Durchlass: %d, "
+        "Fehler-Durchlass: %d von %d Stapeln, Frist-Durchlass: %d)",
+        gesamt.verworfen,
+        gesamt.angeboten,
+        gesamt.durchlass,
+        gesamt.fehler_batches,
+        gesamt.batches,
+        gesamt.frist_batches,
+    )
     for eintrag in gesamt.stichprobe:
-        log.info("Vorsortierung verwarf: %s (%s) - %s",
-                 eintrag["titel"], eintrag["quelle"], eintrag["grund"])
+        log.info(
+            "Vorsortierung verwarf: %s (%s) - %s",
+            eintrag["titel"],
+            eintrag["quelle"],
+            eintrag["grund"],
+        )
     return ergebnis, gesamt

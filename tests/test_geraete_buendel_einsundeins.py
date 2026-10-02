@@ -49,6 +49,7 @@ DIE DREI REGELN, AN DENEN DIESES PAKET SCHEITERN KANN
    Dasselbe gilt für die Bereitstellungsgebühr: Ein Iframe ohne die Zeile
    (oder ein gescheiterter Abruf) setzt KEINEN Default.
 """
+
 import gzip
 import json
 from pathlib import Path
@@ -78,10 +79,12 @@ _WURZEL = Path(__file__).parent.parent
 
 _IPHONE_URL = "https://mobile.1und1.de/iphone-17-pro"
 _A57_URL = "https://mobile.1und1.de/samsung-galaxy-a57"
-_IFRAME_URL = ("https://mobile.1und1.de/details-all-net-flat-preisliste"
-               "?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1"
-               "&chosenDevice=hw-apple-iphone-17-pro&color=COSMIC_ORANGE"
-               "&size=256&lightbox=true&bk=false")
+_IFRAME_URL = (
+    "https://mobile.1und1.de/details-all-net-flat-preisliste"
+    "?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1"
+    "&chosenDevice=hw-apple-iphone-17-pro&color=COSMIC_ORANGE"
+    "&size=256&lightbox=true&bk=false"
+)
 
 _ROBOTS_FREI = (200, "User-agent: *\n")
 
@@ -94,8 +97,9 @@ def _fixture(name: str) -> str:
 
 
 def _saetze():
-    return lies_buendel(_fixture("einsundeins_produktseite_iphone_17_pro.html.gz"),
-                        url=_IPHONE_URL)
+    return lies_buendel(
+        _fixture("einsundeins_produktseite_iphone_17_pro.html.gz"), url=_IPHONE_URL
+    )
 
 
 @pytest.fixture(scope="module")
@@ -111,6 +115,7 @@ def farben():
 # ==========================================================================
 # lies_buendel(): Struktur der Sätze
 # ==========================================================================
+
 
 def test_drei_saetze_je_speichergroesse_und_eine_je_farbe():
     """Die Karte trägt 9 Schlüssel ohne Zubehör-Segment (3 Farben × 3
@@ -141,10 +146,13 @@ def test_der_iphone_satz_nach_rechnung():
     echten Satz des Bestands. Bis A1 (20.09.2026) kappte die Rechnung bei
     24 Raten (1.079,76) und stellte den Rest daneben."""
     s = next(x for x in _saetze() if x["speicher_gb"] == 256)
-    b = Buendel(sku_id="apple-iphone-17-pro-256gb-cosmic-orange",
-                anbieter="1&1", tarif_name=s["tarif_name"],
-                buendel_monatlich=s["buendel_monatlich"],
-                laufzeit_monate=s["laufzeit_monate"])
+    b = Buendel(
+        sku_id="apple-iphone-17-pro-256gb-cosmic-orange",
+        anbieter="1&1",
+        tarif_name=s["tarif_name"],
+        buendel_monatlich=s["buendel_monatlich"],
+        laufzeit_monate=s["laufzeit_monate"],
+    )
     tco = tco_24(b)
     assert s["buendel_monatlich"] == 44.99
     assert tco.gesamt == pytest.approx(36 * 44.99)
@@ -167,10 +175,12 @@ def test_keine_vorzeitige_aufspaltung_des_monatsbetrags():
     widerspricht dem Bündelpreis (44,99) - keine der beiden Zahlen darf
     als `geraet_monatsrate` oder `tarif_monatlich` in den Satz."""
     roh = _fixture("einsundeins_produktseite_iphone_17_pro.html.gz")
-    assert '"cost":45.00' in roh, \
+    assert '"cost":45.00' in roh, (
         "die Fixture muss die Datalayer-Hardware-Rate tragen (Gegenprobe)"
-    assert '"cost":14.99' in roh, \
+    )
+    assert '"cost":14.99' in roh, (
         "die Fixture muss den Datalayer-Tarifpreis tragen (Gegenprobe)"
+    )
     for s in _saetze():
         assert "tarif_monatlich" not in s
         assert "geraet_monatsrate" not in s
@@ -183,20 +193,22 @@ def test_zubehoer_schluessel_verfallen_ueber_die_form():
     Preis der NIEDRIGERE wäre. Gegenprobe an der echten Fixture: kein Satz
     trägt einen der Zubehör-Beträge."""
     saetze = _saetze()
-    zubehoer = {5399, 4999, 6099, 5699, 6799, 6399}    # Cent, gemessen
+    zubehoer = {5399, 4999, 6099, 5699, 6799, 6399}  # Cent, gemessen
     for s in saetze:
         assert round(s["buendel_monatlich"] * 100) not in zubehoer
     # Und der konstruierte Fall: ein Zubehör-Key mit STOLZ niedrigem Preis
     # verführt - er fällt trotzdem, weil das Anführungszeichen direkt
     # hinter der Speicherzahl gefordert wird.
-    seite = ('<script>function setHwdPrices() { hwdVariantsPrices = {'
-             "'product-SCHWARZ-128': [1599,],"
-             "'product-SCHWARZ-128-bundle-hw-x-309a2ab835d0-WEISS-0': [199,],"
-             '}; }</script>'
-             '<span id="tariff-description">1&1 All-Net-Flat S</span>'
-             "<script>window.currentHardwareOfferDuration = '36';</script>"
-             '<script type="application/ld+json">{"@type":"Product",'
-             '"name":"Testgerät","brand":"Testmarke"}</script>')
+    seite = (
+        "<script>function setHwdPrices() { hwdVariantsPrices = {"
+        "'product-SCHWARZ-128': [1599,],"
+        "'product-SCHWARZ-128-bundle-hw-x-309a2ab835d0-WEISS-0': [199,],"
+        "}; }</script>"
+        '<span id="tariff-description">1&1 All-Net-Flat S</span>'
+        "<script>window.currentHardwareOfferDuration = '36';</script>"
+        '<script type="application/ld+json">{"@type":"Product",'
+        '"name":"Testgerät","brand":"Testmarke"}</script>'
+    )
     satz = lies_buendel(seite, url="https://mobile.1und1.de/testgeraet")
     assert len(satz) == 1
     assert satz[0]["buendel_monatlich"] == 15.99
@@ -206,18 +218,25 @@ def test_zubehoer_schluessel_verfallen_ueber_die_form():
 # S2-C: die Geräte-Einmalzahlung (`hwdVariantsOneOffPaymentFees`)
 # ==========================================================================
 
+
 def test_die_einmalzahlung_je_variante_aus_der_echten_seite():
     """S2-C, Kriterium 1b: `hwdVariantsOneOffPaymentFees` steht in
     DEMSELBEN Response wie die Preiskarte, geschlüsselt über dieselben
     Produkt-Schlüssel. Werte der echten iPhone-Fixture: 360/450/530 €
     (der Spike nennt für TIEFBLAU/1024 wörtlich "530,–")."""
-    assert [(s["speicher_gb"], s["geraet_zuzahlung"])
-            for s in _saetze()] == [(256, 360.0), (512, 450.0), (1024, 530.0)]
+    assert [(s["speicher_gb"], s["geraet_zuzahlung"]) for s in _saetze()] == [
+        (256, 360.0),
+        (512, 450.0),
+        (1024, 530.0),
+    ]
     # Zweite echte Seite: die A57-Fixture, 140/160 €
     saetze = lies_buendel(
-        _fixture("einsundeins_produktseite_galaxy_a57.html.gz"), url=_A57_URL)
-    assert [(s["speicher_gb"], s["geraet_zuzahlung"]) for s in saetze] == \
-        [(128, 140.0), (256, 160.0)]
+        _fixture("einsundeins_produktseite_galaxy_a57.html.gz"), url=_A57_URL
+    )
+    assert [(s["speicher_gb"], s["geraet_zuzahlung"]) for s in saetze] == [
+        (128, 140.0),
+        (256, 160.0),
+    ]
 
 
 def test_fehlender_block_laesst_die_einmalzahlung_offen():
@@ -225,14 +244,17 @@ def test_fehlender_block_laesst_die_einmalzahlung_offen():
     === '36'`. Fehlt der Block (andere Laufzeit, anderes Angebot), bleibt
     `geraet_zuzahlung` None - "nicht genannt" ist keine Zahl und kein 0,00.
     Der Bündelsatz selbst bleibt vollständig: der Monatspreis steht."""
-    seite = ('<script>function setHwdPrices() { hwdVariantsPrices = {'
-             "'product-SCHWARZ-128': [1599,],}; }</script>"
-             '<span id="tariff-description">1&1 All-Net-Flat S</span>'
-             "<script>window.currentHardwareOfferDuration = '24';</script>"
-             '<script type="application/ld+json">{"@type":"Product",'
-             '"name":"Testgerät","brand":"Testmarke"}</script>')
-    assert "hwdVariantsOneOffPaymentFees" not in seite, \
+    seite = (
+        "<script>function setHwdPrices() { hwdVariantsPrices = {"
+        "'product-SCHWARZ-128': [1599,],}; }</script>"
+        '<span id="tariff-description">1&1 All-Net-Flat S</span>'
+        "<script>window.currentHardwareOfferDuration = '24';</script>"
+        '<script type="application/ld+json">{"@type":"Product",'
+        '"name":"Testgerät","brand":"Testmarke"}</script>'
+    )
+    assert "hwdVariantsOneOffPaymentFees" not in seite, (
         "die Gegenprobe braucht eine Seite OHNE den Block"
+    )
     saetze = lies_buendel(seite, url="https://mobile.1und1.de/testgeraet")
     assert len(saetze) == 1
     assert saetze[0]["geraet_zuzahlung"] is None
@@ -244,15 +266,17 @@ def test_die_einmalzahlung_gilt_nur_fuer_die_eigene_variante():
     wie die Preiskarte. Fehlt der der übernehmenden ersten Farbe, bleibt
     das Feld offen: der Betrag einer ANDEREN Farbe derselben Größe wäre
     eine Annahme, keine Messung."""
-    seite = ('<script>function setHwdPrices() { hwdVariantsPrices = {'
-             "'product-SCHWARZ-128': [1599,],"
-             "'product-BLAU-128': [1599,],}; }</script>"
-             "hwdVariantsOneOffPaymentFees = {"
-             "'product-BLAU-128': \"140,–\",};"
-             '<span id="tariff-description">1&1 All-Net-Flat S</span>'
-             "<script>window.currentHardwareOfferDuration = '36';</script>"
-             '<script type="application/ld+json">{"@type":"Product",'
-             '"name":"Testgerät","brand":"Testmarke"}</script>')
+    seite = (
+        "<script>function setHwdPrices() { hwdVariantsPrices = {"
+        "'product-SCHWARZ-128': [1599,],"
+        "'product-BLAU-128': [1599,],}; }</script>"
+        "hwdVariantsOneOffPaymentFees = {"
+        "'product-BLAU-128': \"140,–\",};"
+        '<span id="tariff-description">1&1 All-Net-Flat S</span>'
+        "<script>window.currentHardwareOfferDuration = '36';</script>"
+        '<script type="application/ld+json">{"@type":"Product",'
+        '"name":"Testgerät","brand":"Testmarke"}</script>'
+    )
     saetze = lies_buendel(seite, url="https://mobile.1und1.de/testgeraet")
     assert len(saetze) == 1
     assert saetze[0]["farbe"] == "schwarz"
@@ -266,16 +290,25 @@ def test_die_einmalzahlung_steht_in_der_leitzahl():
     dieselbe Regel wie beim Anschlusspreis. Ohne BEIDE bleibt die Zahl,
     die der Anbieter nennt."""
     komplett = Buendel(
-        sku_id="apple-iphone-17-pro-256gb-cosmic-orange", anbieter="1&1",
-        tarif_name="1&1 All-Net-Flat S", buendel_monatlich=44.99,
-        geraet_zuzahlung=360.0, anschlusspreis=39.9, laufzeit_monate=36)
+        sku_id="apple-iphone-17-pro-256gb-cosmic-orange",
+        anbieter="1&1",
+        tarif_name="1&1 All-Net-Flat S",
+        buendel_monatlich=44.99,
+        geraet_zuzahlung=360.0,
+        anschlusspreis=39.9,
+        laufzeit_monate=36,
+    )
     tco = tco_24(komplett)
     assert tco.gesamt == pytest.approx(36 * 44.99 + 360.0 + 39.9)
     assert POSTEN_ZUZAHLUNG not in tco.luecken
     ohne_zuzahlung = Buendel(
-        sku_id="apple-iphone-17-pro-256gb-cosmic-orange", anbieter="1&1",
-        tarif_name="1&1 All-Net-Flat S", buendel_monatlich=44.99,
-        anschlusspreis=39.9, laufzeit_monate=36)
+        sku_id="apple-iphone-17-pro-256gb-cosmic-orange",
+        anbieter="1&1",
+        tarif_name="1&1 All-Net-Flat S",
+        buendel_monatlich=44.99,
+        anschlusspreis=39.9,
+        laufzeit_monate=36,
+    )
     tco_offen = tco_24(ohne_zuzahlung)
     assert POSTEN_ZUZAHLUNG in tco_offen.luecken
     assert tco_offen.gesamt == pytest.approx(36 * 44.99 + 39.9)
@@ -284,6 +317,7 @@ def test_die_einmalzahlung_steht_in_der_leitzahl():
 # ==========================================================================
 # S2-C: die Bereitstellungsgebühr aus dem Tarifdetails-Iframe
 # ==========================================================================
+
 
 def test_tarifdetails_adresse_kommt_aus_dem_data_iframe_attribut():
     """Die Adresse nimmt der Adapter unverändert aus dem `data-iframe`-
@@ -298,26 +332,37 @@ def test_bereitstellungsgebuehr_mit_smartphone_aus_dem_echten_iframe():
     ("ohne Smartphone: 19,90 € / mit Smartphone: 39,90 €"). Erhoben wird
     der MIT-Smartphone-Preis - das Bündel hat immer ein Gerät; der 19,90-
     Preis gehört zum SIM-only-Tarif und steht im Tarifbestand."""
-    assert bereitstellungsgebuehr(
-        _fixture("einsundeins_tarifdetails_anf_s.html.gz")) == 39.9
+    assert (
+        bereitstellungsgebuehr(_fixture("einsundeins_tarifdetails_anf_s.html.gz"))
+        == 39.9
+    )
 
 
 def test_iframe_ohne_die_zeile_setzt_nichts():
     """E1: ein Iframe ohne die Zeile ist eine gültige Tarifseite - None,
     kein Default, keine 0,00."""
-    assert bereitstellungsgebuehr(
-        "<html><body>Tariftabelle ohne Bereitstellung</body></html>") is None
+    assert (
+        bereitstellungsgebuehr(
+            "<html><body>Tariftabelle ohne Bereitstellung</body></html>"
+        )
+        is None
+    )
 
 
 def _gebuhr_saetze() -> list[dict]:
     """Drei 1&1-Rohsätze auf einem Slug, einer ohne Slug - die Bauform,
     mit der `sammle_anbieter` die Bündel abliefert."""
-    basis = {"quelle": "einsundeins_buendel",
-             "tarif_slug": "tariff-anf-s-mvl",
-             "tarifdetails_url": _IFRAME_URL,
-             "buendel_monatlich": 44.99}
-    return [dict(basis), dict(basis), {**basis, "tarif_slug": "",
-                                       "tarifdetails_url": ""}]
+    basis = {
+        "quelle": "einsundeins_buendel",
+        "tarif_slug": "tariff-anf-s-mvl",
+        "tarifdetails_url": _IFRAME_URL,
+        "buendel_monatlich": 44.99,
+    }
+    return [
+        dict(basis),
+        dict(basis),
+        {**basis, "tarif_slug": "", "tarifdetails_url": ""},
+    ]
 
 
 def test_ergaenze_holt_ein_get_je_slug_und_setzt_alle_saetze():
@@ -344,6 +389,7 @@ def test_gescheiterter_abruf_setzt_keinen_default():
     """E1: ein Iframe mit HTTP 500 oder einer Ausnahme lässt die Sätze
     UNVERÄNDERT - kein Default, und ein einziger toter Iframe darf die
     Bündel des Laufs nicht kosten."""
+
     def hole_500(url, kopfzeilen=None):
         return 500, "server error"
 
@@ -360,8 +406,12 @@ def test_nur_einsundeins_saetze_werden_angefasst():
     """Hausregel: ein Satz eines ANDEREN Anbieters in derselben Liste
     bleibt unberührt - die Gebühr ist eine 1&1-Angabe, und die Felder
     anderer Anbieter stehen nicht zur Debatte."""
-    fremd = {"quelle": "o2_buendel", "tarif_slug": "tariff-anf-s-mvl",
-             "tarifdetails_url": _IFRAME_URL, "buendel_monatlich": 19.99}
+    fremd = {
+        "quelle": "o2_buendel",
+        "tarif_slug": "tariff-anf-s-mvl",
+        "tarifdetails_url": _IFRAME_URL,
+        "buendel_monatlich": 19.99,
+    }
     iframe = _fixture("einsundeins_tarifdetails_anf_s.html.gz")
 
     def hole(url, kopfzeilen=None):
@@ -374,6 +424,7 @@ def test_nur_einsundeins_saetze_werden_angefasst():
 # ==========================================================================
 # S2-C: gemessene Bündel schlagen die Listungs-Brücke desselben Angebots
 # ==========================================================================
+
 
 def test_die_listung_verdraengt_das_gemessene_buendel_nicht(katalog):
     """Der Befund des ersten Renderns nach S2-C: 1&1 steht dasselbe Angebot
@@ -390,31 +441,44 @@ def test_die_listung_verdraengt_das_gemessene_buendel_nicht(katalog):
     keine zweite mehr."""
     sku = "apple-iphone-15-128gb-schwarz"
     gemessen = Buendel(
-        sku_id=sku, anbieter="1&1", tarif_name="1&1 All-Net-Flat S",
+        sku_id=sku,
+        anbieter="1&1",
+        tarif_name="1&1 All-Net-Flat S",
         tarif_id="11:1-1-all-net-flat-s",
-        buendel_monatlich=44.99, geraet_zuzahlung=360.0,
-        anschlusspreis=39.9, laufzeit_monate=36, zustand="neu",
-        quelle_url=_IPHONE_URL, abgerufen_am="2026-09-09")
-    listung = {"sku_id": sku, "device_id": "apple-iphone-15",
-               "anbieter": "1&1", "speicher_gb": 128, "zustand": "neu",
-               "preis_mit_vertrag_ab": 44.99,
-               "tarif_referenz": "1&1 All-Net-Flat S",
-               "laufzeit_monate": 36,
-               "quelle_url": _IPHONE_URL, "abgerufen_am": "2026-09-08"}
-    ergebnis = modelle([gemessen], [listung], referenzen=[], tarife={},
-                       katalog=katalog)
-    karten = [k for m in ergebnis["modelle"] for k in m["karten"]
-              if k["anbieter"] == "1&1"]
+        buendel_monatlich=44.99,
+        geraet_zuzahlung=360.0,
+        anschlusspreis=39.9,
+        laufzeit_monate=36,
+        zustand="neu",
+        quelle_url=_IPHONE_URL,
+        abgerufen_am="2026-09-09",
+    )
+    listung = {
+        "sku_id": sku,
+        "device_id": "apple-iphone-15",
+        "anbieter": "1&1",
+        "speicher_gb": 128,
+        "zustand": "neu",
+        "preis_mit_vertrag_ab": 44.99,
+        "tarif_referenz": "1&1 All-Net-Flat S",
+        "laufzeit_monate": 36,
+        "quelle_url": _IPHONE_URL,
+        "abgerufen_am": "2026-09-08",
+    }
+    ergebnis = modelle([gemessen], [listung], referenzen=[], tarife={}, katalog=katalog)
+    karten = [
+        k for m in ergebnis["modelle"] for k in m["karten"] if k["anbieter"] == "1&1"
+    ]
     assert len(karten) == 1
     assert karten[0]["zuzahlung"] == 360.0
     assert karten[0]["anschlusspreis"] == 39.9
     assert karten[0]["tarif_id"] == "11:1-1-all-net-flat-s"
     # Gegenprobe: OHNE gemessenes Bündel bleibt die Listung die Karte -
     # die Brücke steht weiter (derselbe Aufruf, leerer erster Parameter).
-    nur_listung = modelle([], [listung], referenzen=[], tarife={},
-                          katalog=katalog)
-    karten2 = [k for m in nur_listung["modelle"] for k in m["karten"]
-               if k["anbieter"] == "1&1"]
+    nur_listung = modelle([], [listung], referenzen=[], tarife={}, katalog=katalog)
+    karten2 = [
+        k for m in nur_listung["modelle"] for k in m["karten"] if k["anbieter"] == "1&1"
+    ]
     assert len(karten2) == 1
     assert karten2[0]["zuzahlung"] is None
 
@@ -423,14 +487,16 @@ def test_zwei_preise_einer_groesse_bleiben_beim_ersten():
     """Gemessen trägt jede Farbe derselben Größe denselben Preis. Tut sie
     es nicht, bleibt der ERSTE Eintrag - still die billigste Farbe zu
     nehmen wäre eine Auswahl ohne Beleg."""
-    seite = ('<script>function setHwdPrices() { hwdVariantsPrices = {'
-             "'product-SCHWARZ-128': [1599,],"
-             "'product-BLAU-128': [1399,],"
-             '}; }</script>'
-             '<span id="tariff-description">1&1 All-Net-Flat S</span>'
-             "<script>window.currentHardwareOfferDuration = '36';</script>"
-             '<script type="application/ld+json">{"@type":"Product",'
-             '"name":"Testgerät","brand":"Testmarke"}</script>')
+    seite = (
+        "<script>function setHwdPrices() { hwdVariantsPrices = {"
+        "'product-SCHWARZ-128': [1599,],"
+        "'product-BLAU-128': [1399,],"
+        "}; }</script>"
+        '<span id="tariff-description">1&1 All-Net-Flat S</span>'
+        "<script>window.currentHardwareOfferDuration = '36';</script>"
+        '<script type="application/ld+json">{"@type":"Product",'
+        '"name":"Testgerät","brand":"Testmarke"}</script>'
+    )
     satz = lies_buendel(seite, url="https://mobile.1und1.de/testgeraet")
     assert len(satz) == 1
     assert satz[0]["buendel_monatlich"] == 15.99
@@ -449,15 +515,18 @@ def test_ohne_tarifnamen_gibt_es_keinen_satz():
     """Ein Bündel ohne benannten Tarif ist bedeutungslos (`lies()` wirft
     ihn aus demselben Grund weg) - hier als leere Ausbeute, nicht als
     Ausnahme, denn die Karte unter dem Namen kann noch liefern."""
-    seite = ('<script>function setHwdPrices() { hwdVariantsPrices = {'
-             "'product-SCHWARZ-128': [1599,],}; }</script>"
-             "<script>window.currentHardwareOfferDuration = '36';</script>")
+    seite = (
+        "<script>function setHwdPrices() { hwdVariantsPrices = {"
+        "'product-SCHWARZ-128': [1599,],}; }</script>"
+        "<script>window.currentHardwareOfferDuration = '36';</script>"
+    )
     assert lies_buendel(seite, url="x") == []
 
 
 # ==========================================================================
 # Der Weg in den Bestand: aus_rohsaetzen() gegen den echten tarife.jsonl
 # ==========================================================================
+
 
 def test_der_ganze_weg_bis_zum_buendel_mit_echtem_bestand():
     """Ende zu Ende gegen den echten tarife.jsonl-Bestand: der Name der
@@ -466,13 +535,14 @@ def test_der_ganze_weg_bis_zum_buendel_mit_echtem_bestand():
     tarif_id, nicht diesen Weg. Der aufgelöste Tarif trägt 10 GB und damit
     das Band XS: die Voraussetzung für Radar-Paare."""
     bestand = Tarifbestand.aus_datei(_WURZEL / "data" / "state" / "tarife.jsonl")
-    rohsaetze = [{**s, "anbieter": "1&1",
-                  "sku_id": f"sku-{i}", "quelle_url": s["url"]}
-                 for i, s in enumerate(_saetze())]
+    rohsaetze = [
+        {**s, "anbieter": "1&1", "sku_id": f"sku-{i}", "quelle_url": s["url"]}
+        for i, s in enumerate(_saetze())
+    ]
     bilanz = aus_rohsaetzen(rohsaetze, bestand, "2026-09-08")
     assert len(bilanz.buendel) == 3, (
-        f"{bilanz.ohne_tarif} ohne auflösbaren Tarif, "
-        f"häufigste: {bilanz.offene_tarife}")
+        f"{bilanz.ohne_tarif} ohne auflösbaren Tarif, häufigste: {bilanz.offene_tarife}"
+    )
     assert all(b.tarif_id == "11:1-1-all-net-flat-s" for b in bilanz.buendel)
     assert all(b.tarif_id_guete == "hoch" for b in bilanz.buendel)
     baender = tarif_baender(bestand.je_id)
@@ -487,16 +557,30 @@ def test_aus_rohsaetzen_reicht_buendel_monatlich_durch():
     mit EINEM Monatsbetrag still PREISLOS durch die Stufe - `Buendel`
     nimmt den Betrag nur an, wenn ihn jemand durchreicht (derselbe
     Fehlertyp wie die Positivliste `_MESSFELDER` im Store)."""
-    bestand = Tarifbestand([{
-        "tarif_id": "11:1-1-all-net-flat-s", "anbieter": "1&1",
-        "name": "1&1 All-Net-Flat S", "grundgebuehr": 14.99,
-    }])
-    bilanz = aus_rohsaetzen([{
-        "anbieter": "1&1", "tarif_name": "1&1 All-Net-Flat S",
-        "sku_id": "apple-iphone-17-pro-256gb-cosmic-orange",
-        "buendel_monatlich": 44.99, "laufzeit_monate": 36,
-        "quelle_url": _IPHONE_URL,
-    }], bestand, "2026-09-08")
+    bestand = Tarifbestand(
+        [
+            {
+                "tarif_id": "11:1-1-all-net-flat-s",
+                "anbieter": "1&1",
+                "name": "1&1 All-Net-Flat S",
+                "grundgebuehr": 14.99,
+            }
+        ]
+    )
+    bilanz = aus_rohsaetzen(
+        [
+            {
+                "anbieter": "1&1",
+                "tarif_name": "1&1 All-Net-Flat S",
+                "sku_id": "apple-iphone-17-pro-256gb-cosmic-orange",
+                "buendel_monatlich": 44.99,
+                "laufzeit_monate": 36,
+                "quelle_url": _IPHONE_URL,
+            }
+        ],
+        bestand,
+        "2026-09-08",
+    )
     assert len(bilanz.buendel) == 1
     assert bilanz.buendel[0].buendel_monatlich == 44.99
     # A1: alle 36 Bündelraten zaehlen - 36 x 44,99 (vorher 24 x 44,99).
@@ -515,7 +599,8 @@ def test_der_zustand_kommt_als_neu_aus_dem_titelweg(katalog, farben):
     # Kennzeichen wird "neu" GELEITET (Titelweg), nicht vergeblich
     # weggefasst, und mit Kennzeichen wäre ein fester "neu"-Default rot.
     seite = _fixture("einsundeins_produktseite_galaxy_a57.html.gz").replace(
-        "AWESOME_GRAY-128", "GRAU_ERNEUERT-128")
+        "AWESOME_GRAY-128", "GRAU_ERNEUERT-128"
+    )
 
     def hole(url, kopfzeilen=None, user_agent=None):
         if url.endswith("/robots.txt"):
@@ -524,8 +609,9 @@ def test_der_zustand_kommt_als_neu_aus_dem_titelweg(katalog, farben):
             return 200, _katalogseite(_A57_URL)
         return 200, seite
 
-    bilanz = sammle_anbieter(_anbieter(), katalog, farben, hole,
-                             "2026-09-08", RobotsWaechter(hole=hole))
+    bilanz = sammle_anbieter(
+        _anbieter(), katalog, farben, hole, "2026-09-08", RobotsWaechter(hole=hole)
+    )
     assert bilanz.status == "ok"
     assert [b["zustand"] for b in bilanz.buendel] == ["refurbished", "neu"]
     # Der Zustand ist dieselbe Erkennung, aus der die `-refurbished`-Strecke
@@ -538,19 +624,29 @@ def test_der_zustand_kommt_als_neu_aus_dem_titelweg(katalog, farben):
 # Die Verdrahtung: sammle_anbieter() auf den Produktseiten des Ernte-Wegs
 # ==========================================================================
 
+
 def _anbieter():
     return Anbieter(
-        name="1&1", typ="netzbetreiber", gruppe="United Internet",
-        methode="einsundeins_buendel", basis_url="https://mobile.1und1.de",
+        name="1&1",
+        typ="netzbetreiber",
+        gruppe="United Internet",
+        methode="einsundeins_buendel",
+        basis_url="https://mobile.1und1.de",
         rate_limit_sekunden=0,
-        einstiege=[Einstieg(url="https://mobile.1und1.de/smartphones",
-                            label="Smartphones", kind="static")])
+        einstiege=[
+            Einstieg(
+                url="https://mobile.1und1.de/smartphones",
+                label="Smartphones",
+                kind="static",
+            )
+        ],
+    )
 
 
 def _katalogseite(ziel: str) -> str:
     """Eine Kategorieseite mit EINER Kachel - die Klasse
     `hardware-box__heading` ist die Auswahl, die 1&1 selbst trifft."""
-    return (f'<a class="hardware-box__heading" href="{ziel}">Gerät</a>')
+    return f'<a class="hardware-box__heading" href="{ziel}">Gerät</a>'
 
 
 def test_sammle_liefert_listung_und_buendel_aus_einer_antwort(katalog, farben):
@@ -568,12 +664,13 @@ def test_sammle_liefert_listung_und_buendel_aus_einer_antwort(katalog, farben):
         abrufe.append(url)
         return 200, _fixture("einsundeins_produktseite_galaxy_a57.html.gz")
 
-    bilanz = sammle_anbieter(_anbieter(), katalog, farben, hole,
-                             "2026-09-08", RobotsWaechter(hole=hole))
+    bilanz = sammle_anbieter(
+        _anbieter(), katalog, farben, hole, "2026-09-08", RobotsWaechter(hole=hole)
+    )
     assert bilanz.status == "ok"
     assert abrufe == [_A57_URL]
-    assert len(bilanz.listungen) == 1          # die vorausgewählte Variante
-    assert len(bilanz.buendel) == 2            # 128 GB und 256 GB
+    assert len(bilanz.listungen) == 1  # die vorausgewählte Variante
+    assert len(bilanz.buendel) == 2  # 128 GB und 256 GB
     b = bilanz.buendel[0]
     assert b["anbieter"] == "1&1"
     assert b["tarif_name"] == "1&1 All-Net-Flat S"
@@ -599,6 +696,7 @@ def test_adapter_registry_traegt_den_buendelhaken():
     # 29.09.2026 laeuft davor die Herleitung der Tarifstufen im selben
     # Haken (`test_geraete_tarifstufen_einsundeins.py`).
     from telco_radar.collect.geraete.einsundeins import ergaenze_buendel
+
     assert adapter.ergaenze_buendel is ergaenze_buendel
 
 
@@ -609,6 +707,7 @@ def test_die_konfiguration_braucht_keinen_buendel_einstieg():
     `kind: buendel` auf einer Produktadresse wäre ein zweiter Abruf
     derselben Antwort."""
     from telco_radar.geraete_config import lade_quellen
+
     quellen = lade_quellen(_WURZEL)
     anbieter = next(a for a in quellen.anbieter if a.name == "1&1")
     assert [e.kind for e in anbieter.einstiege] == ["static"]

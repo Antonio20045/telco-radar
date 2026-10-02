@@ -5,6 +5,7 @@ Notzustand - nach aussen sah der Lauf gruen aus. Jetzt kommt eine Liste
 benannter Ausfaelle zurueck, die Seite nennt sie, `bauen` und `pipeline`
 enden mit einem eigenen Exit-Code.
 """
+
 from __future__ import annotations
 
 import json
@@ -26,10 +27,18 @@ def _render(tmp_path):
     root, _state = _baue(tmp_path)
     reports = root / "data" / "reports"
     reports.mkdir(parents=True, exist_ok=True)
-    (reports / f"{HEUTE}.json").write_text(json.dumps({
-        "date": HEUTE, "language": "de",
-        "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
-        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{HEUTE}.json").write_text(
+        json.dumps(
+            {
+                "date": HEUTE,
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     (reports / f"{HEUTE}.md").write_text("# B\n", encoding="utf-8")
     site = root / "site"
     ausfaelle = render_site(site, reports)
@@ -43,8 +52,7 @@ def _wirft(*_a, **_k):
 def test_kaputte_zeitreihe_ist_ein_benannter_ausfall(tmp_path, monkeypatch):
     monkeypatch.setattr(geraete_zeitreihe, "aufbereiten", _wirft)
     ausfaelle, site = _render(tmp_path)
-    assert ausfaelle == [Ausfall(teil=ZEITREIHE_TEIL,
-                                 grund=f"ValueError: {_MELDUNG}")]
+    assert ausfaelle == [Ausfall(teil=ZEITREIHE_TEIL, grund=f"ValueError: {_MELDUNG}")]
     geraete = (site / "geraete.html").read_text(encoding="utf-8")
     assert "Nicht neu gebaut" in geraete
     assert ZEITREIHE_TEIL in geraete
@@ -80,15 +88,16 @@ def _bauen(tmp_path, monkeypatch, ergebnis):
     monkeypatch.setattr(bauen, "render_site", _render_site)
     monkeypatch.setattr(bauen, "load_config", lambda root: None)
     code = bauen.main(["--root", str(tmp_path)])
-    assert gerufen == [(tmp_path.resolve() / "site",
-                        tmp_path.resolve() / "data" / "reports")]
+    assert gerufen == [
+        (tmp_path.resolve() / "site", tmp_path.resolve() / "data" / "reports")
+    ]
     return code, ausgabe.read_text(encoding="utf-8")
 
 
-def test_bauen_meldet_ausfall_mit_exit_1_und_gerendert(tmp_path, monkeypatch,
-                                                      capsys):
-    code, ausgabe = _bauen(tmp_path, monkeypatch,
-                           [Ausfall(ZEITREIHE_TEIL, "ValueError: x")])
+def test_bauen_meldet_ausfall_mit_exit_1_und_gerendert(tmp_path, monkeypatch, capsys):
+    code, ausgabe = _bauen(
+        tmp_path, monkeypatch, [Ausfall(ZEITREIHE_TEIL, "ValueError: x")]
+    )
     assert code == 1
     assert ausgabe.splitlines() == ["gerendert=true"]
     assert f"AUSFALL {ZEITREIHE_TEIL}: ValueError: x" in capsys.readouterr().err
@@ -112,14 +121,19 @@ def test_bauen_ohne_gerendert_wenn_render_site_wirft(tmp_path, monkeypatch):
     assert ausgabe.read_text(encoding="utf-8") == ""
 
 
-@pytest.mark.parametrize("ergebnis, erwartet", [
-    ([Ausfall(ZEITREIHE_TEIL, "ValueError: x")], 3),
-    ([], 0),
-])
-def test_pipeline_main_endet_mit_3_bei_ausfall(tmp_path, monkeypatch,
-                                               ergebnis, erwartet):
-    monkeypatch.setattr(pipeline, "run",
-                        lambda *_a, **_k: (tmp_path / "bericht.md", ergebnis))
+@pytest.mark.parametrize(
+    "ergebnis, erwartet",
+    [
+        ([Ausfall(ZEITREIHE_TEIL, "ValueError: x")], 3),
+        ([], 0),
+    ],
+)
+def test_pipeline_main_endet_mit_3_bei_ausfall(
+    tmp_path, monkeypatch, ergebnis, erwartet
+):
+    monkeypatch.setattr(
+        pipeline, "run", lambda *_a, **_k: (tmp_path / "bericht.md", ergebnis)
+    )
     assert pipeline.main(["--root", str(tmp_path)]) == erwartet
 
 

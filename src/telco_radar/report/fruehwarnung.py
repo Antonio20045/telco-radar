@@ -26,6 +26,7 @@ passiert gerade nichts. Diese Zeile wegzulassen waere der Fehler - dann
 sieht das Board jede Woche gleich voll aus, und niemand merkt, dass eine
 Frage zur Ruhe gekommen ist.
 """
+
 from __future__ import annotations
 
 import logging
@@ -57,8 +58,9 @@ class Indikator:
         self._marke = [_muster(m) for m in self.marken if m]
 
     def trifft(self, h: dict) -> bool:
-        text = " ".join(str(h.get(f) or "") for f in
-                        ("headline", "title", "summary", "schlagzeile")).lower()
+        text = " ".join(
+            str(h.get(f) or "") for f in ("headline", "title", "summary", "schlagzeile")
+        ).lower()
         if not any(p.search(text) for p in self._wort):
             return False
         if not self._marke:
@@ -88,23 +90,33 @@ def lade_fragen(root: Path) -> tuple[list[Frage], int]:
         return [], 4
     daten = yaml.safe_load(pfad.read_text(encoding="utf-8")) or {}
     fragen = []
-    for f in (daten.get("fragen") or []):
-        fragen.append(Frage(
-            frage=str(f.get("frage") or ""),
-            warum=" ".join(str(f.get("warum") or "").split()),
-            indikatoren=[Indikator(name=str(i.get("name") or ""),
-                                   stichworte=list(i.get("stichworte") or []),
-                                   marken=list(i.get("marken") or []))
-                         for i in (f.get("indikatoren") or [])]))
+    for f in daten.get("fragen") or []:
+        fragen.append(
+            Frage(
+                frage=str(f.get("frage") or ""),
+                warum=" ".join(str(f.get("warum") or "").split()),
+                indikatoren=[
+                    Indikator(
+                        name=str(i.get("name") or ""),
+                        stichworte=list(i.get("stichworte") or []),
+                        marken=list(i.get("marken") or []),
+                    )
+                    for i in (f.get("indikatoren") or [])
+                ],
+            )
+        )
     return fragen, int(daten.get("fenster_ausgaben", 4) or 4)
 
 
 def _beleg(h: dict, datum: str) -> dict:
-    return {"titel": (h.get("schlagzeile") or h.get("headline")
-                      or h.get("title") or "")[:120],
-            "url": h.get("url") or "",
-            "absender": h.get("operator") or h.get("source") or "",
-            "datum": datum}
+    return {
+        "titel": (h.get("schlagzeile") or h.get("headline") or h.get("title") or "")[
+            :120
+        ],
+        "url": h.get("url") or "",
+        "absender": h.get("operator") or h.get("source") or "",
+        "datum": datum,
+    }
 
 
 def aufbereiten(wochen: list[dict], root: Path) -> dict:
@@ -114,8 +126,9 @@ def aufbereiten(wochen: list[dict], root: Path) -> dict:
     if not fragen:
         return {"aktiv": False, "fragen": []}
 
-    sortiert = sorted((w for w in wochen if w.get("date")),
-                      key=lambda w: w["date"], reverse=True)
+    sortiert = sorted(
+        (w for w in wochen if w.get("date")), key=lambda w: w["date"], reverse=True
+    )
     if not sortiert:
         return {"aktiv": False, "fragen": []}
     aktuelle = sortiert[0]
@@ -125,28 +138,42 @@ def aufbereiten(wochen: list[dict], root: Path) -> dict:
     for frage in fragen:
         zeilen = []
         for ind in frage.indikatoren:
-            jetzt = [_beleg(h, aktuelle["date"])
-                     for h in (aktuelle.get("highlights") or []) if ind.trifft(h)]
-            davor = [_beleg(h, w["date"]) for w in frueher
-                     for h in (w.get("highlights") or []) if ind.trifft(h)]
+            jetzt = [
+                _beleg(h, aktuelle["date"])
+                for h in (aktuelle.get("highlights") or [])
+                if ind.trifft(h)
+            ]
+            davor = [
+                _beleg(h, w["date"])
+                for w in frueher
+                for h in (w.get("highlights") or [])
+                if ind.trifft(h)
+            ]
             zustand = AKTIV if jetzt else (BEOBACHTET if davor else RUHEND)
-            zeilen.append({
-                "name": ind.name,
-                "zustand": zustand,
-                "n_jetzt": len(jetzt),
-                "n_fenster": len(jetzt) + len(davor),
-                "belege": (jetzt or davor)[:MAX_BELEGE],
-            })
-        ausgabe.append({
-            "frage": frage.frage,
-            "warum": frage.warum,
-            "indikatoren": zeilen,
-            # Der Zustand der FRAGE ist der staerkste ihrer Indikatoren.
-            "zustand": (AKTIV if any(z["zustand"] == AKTIV for z in zeilen)
-                        else BEOBACHTET
-                        if any(z["zustand"] == BEOBACHTET for z in zeilen)
-                        else RUHEND),
-        })
+            zeilen.append(
+                {
+                    "name": ind.name,
+                    "zustand": zustand,
+                    "n_jetzt": len(jetzt),
+                    "n_fenster": len(jetzt) + len(davor),
+                    "belege": (jetzt or davor)[:MAX_BELEGE],
+                }
+            )
+        ausgabe.append(
+            {
+                "frage": frage.frage,
+                "warum": frage.warum,
+                "indikatoren": zeilen,
+                # Der Zustand der FRAGE ist der staerkste ihrer Indikatoren.
+                "zustand": (
+                    AKTIV
+                    if any(z["zustand"] == AKTIV for z in zeilen)
+                    else BEOBACHTET
+                    if any(z["zustand"] == BEOBACHTET for z in zeilen)
+                    else RUHEND
+                ),
+            }
+        )
 
     # Aktive Fragen zuerst, ruhende zuletzt - aber ALLE bleiben stehen. Eine
     # Frage, zu der seit Wochen nichts kommt, ist beantwortet, und genau das

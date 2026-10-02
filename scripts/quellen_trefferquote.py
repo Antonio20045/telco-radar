@@ -31,6 +31,7 @@ Aufruf:
     python scripts/quellen_trefferquote.py --json data/state/trefferquote.json
     python scripts/quellen_trefferquote.py --min-laeufe 3     # nur belastbare Zeilen
 """
+
 from __future__ import annotations
 
 import argparse
@@ -128,8 +129,9 @@ def _hat_kanalzuordnung(bericht: dict) -> bool:
     return False
 
 
-def _verbuchen(bilanzen: dict[str, Quellenbilanz], bericht: dict,
-               je_kanal: bool) -> None:
+def _verbuchen(
+    bilanzen: dict[str, Quellenbilanz], bericht: dict, je_kanal: bool
+) -> None:
     """Einen Lauf in die Bilanzen einrechnen.
 
     je_kanal=False schluesselt nach Anzeigename (funktioniert ueber das ganze
@@ -140,8 +142,9 @@ def _verbuchen(bilanzen: dict[str, Quellenbilanz], bericht: dict,
 
     def hole(schluessel: str, name: str) -> Quellenbilanz:
         if schluessel not in bilanzen:
-            bilanzen[schluessel] = Quellenbilanz(schluessel=schluessel,
-                                                 anzeigename=name)
+            bilanzen[schluessel] = Quellenbilanz(
+                schluessel=schluessel, anzeigename=name
+            )
         return bilanzen[schluessel]
 
     # --- Sammelseite: was das Laufprotokoll je Quelle festgehalten hat
@@ -190,9 +193,9 @@ def _verbuchen(bilanzen: dict[str, Quellenbilanz], bericht: dict,
                 b.im_bericht += 1
 
 
-def auswerten(berichte: list[dict]) -> tuple[dict[str, Quellenbilanz],
-                                             dict[str, Quellenbilanz],
-                                             list[str]]:
+def auswerten(
+    berichte: list[dict],
+) -> tuple[dict[str, Quellenbilanz], dict[str, Quellenbilanz], list[str]]:
     """Alle Laeufe verdichten.
 
     Liefert (nach_name, nach_kanal, kanal_laeufe). `nach_name` deckt das ganze
@@ -214,8 +217,7 @@ def auswerten(berichte: list[dict]) -> tuple[dict[str, Quellenbilanz],
     return nach_name, nach_kanal, kanal_laeufe
 
 
-def historie_ergaenzen(bilanzen: dict[str, Quellenbilanz],
-                       historie_pfad: Path) -> int:
+def historie_ergaenzen(bilanzen: dict[str, Quellenbilanz], historie_pfad: Path) -> int:
     """Fuer Quellen ohne `new` im Laufprotokoll den Altbestand nachtragen.
 
     Bis Lauf #67 hielt das Laufprotokoll nur fest, wie viele Meldungen eine
@@ -231,8 +233,9 @@ def historie_ergaenzen(bilanzen: dict[str, Quellenbilanz],
     """
     if not historie_pfad.exists():
         return 0
-    historie = {e["quelle"]: e
-                for e in json.loads(historie_pfad.read_text(encoding="utf-8"))}
+    historie = {
+        e["quelle"]: e for e in json.loads(historie_pfad.read_text(encoding="utf-8"))
+    }
     ergaenzt = 0
     for b in bilanzen.values():
         if b.neu_aus_protokoll:
@@ -248,16 +251,20 @@ def _pct(wert: float | None) -> str:
     return "—" if wert is None else f"{wert * 100:4.1f} %"
 
 
-def tabelle(bilanzen: dict[str, Quellenbilanz], min_laeufe: int = 1,
-            grenze: int | None = None) -> list[Quellenbilanz]:
+def tabelle(
+    bilanzen: dict[str, Quellenbilanz], min_laeufe: int = 1, grenze: int | None = None
+) -> list[Quellenbilanz]:
     zeilen = [b for b in bilanzen.values() if b.laeufe >= min_laeufe]
     zeilen.sort(key=lambda b: (-(b.trefferquote or -1), -b.gesammelt))
     return zeilen[:grenze] if grenze else zeilen
 
 
-def markdown(zeilen: list[Quellenbilanz], berichte: list[dict],
-             kanalzeilen: list[Quellenbilanz] | None = None,
-             kanal_laeufe: list[str] | None = None) -> str:
+def markdown(
+    zeilen: list[Quellenbilanz],
+    berichte: list[dict],
+    kanalzeilen: list[Quellenbilanz] | None = None,
+    kanal_laeufe: list[str] | None = None,
+) -> str:
     daten = [b.get("date", "?") for b in berichte]
     gesamt_gesammelt = sum(b.gesammelt for b in zeilen)
     gesamt_neu = sum(b.neu for b in zeilen)
@@ -280,11 +287,11 @@ def markdown(zeilen: list[Quellenbilanz], berichte: list[dict],
         "",
         "> **Trefferquote = bewertet / NEU**, nicht / gesammelt. Ein Newsroom",
         "> liefert bei jedem Abruf dieselben 30 Meldungen, ein Fachpresse-Feed",
-        "> jedes Mal andere - gegen „gesammelt\" gerechnet wuerde die Kennzahl die",
+        '> jedes Mal andere - gegen „gesammelt" gerechnet wuerde die Kennzahl die',
         "> Abrufhaeufigkeit messen statt den Wert der Quelle.",
         ">",
         "> Je ANZEIGENAME, nicht je Kanal: bis Lauf #67 trugen die Meldungen keine",
-        "> Quellen-URL. Die Spalte „Kan.\" zeigt, wie viele Kanaele in einer Zeile",
+        '> Quellen-URL. Die Spalte „Kan." zeigt, wie viele Kanaele in einer Zeile',
         "> zusammengefasst sind. Die feinere Auswertung je Kanal steht unten und",
         "> deckt nur die Laeufe ab, die source_url mitfuehren.",
         "",
@@ -302,8 +309,10 @@ def markdown(zeilen: list[Quellenbilanz], berichte: list[dict],
         n = sum(x.neu for x in gruppe)
         bw = sum(x.bewertet for x in gruppe)
         ib = sum(x.im_bericht for x in gruppe)
-        aus.append(f"| {ebene} | {len(gruppe)} | {g} | {n} | {bw} | "
-                   f"{_pct(bw / n if n else None)} | {ib} |")
+        aus.append(
+            f"| {ebene} | {len(gruppe)} | {g} | {n} | {bw} | "
+            f"{_pct(bw / n if n else None)} | {ib} |"
+        )
 
     aus += [
         "",
@@ -317,12 +326,12 @@ def markdown(zeilen: list[Quellenbilanz], berichte: list[dict],
         aus.append(
             f"| {b.anzeigename} | {b.origin} | {len(b.urls)} | {b.laeufe} | "
             f"{b.gesammelt} | {b.neu} | {b.bewertet} | {_pct(b.trefferquote)} | "
-            f"{b.rel3} | {b.im_bericht} | {b.laeufe_leer}/{b.laeufe_fehler} |")
+            f"{b.rel3} | {b.im_bericht} | {b.laeufe_leer}/{b.laeufe_fehler} |"
+        )
 
     MINDEST_NEU = 10
     tote = [b for b in zeilen if b.neu and not b.bewertet]
-    belastbar = sorted([b for b in tote if b.neu >= MINDEST_NEU],
-                       key=lambda x: -x.neu)
+    belastbar = sorted([b for b in tote if b.neu >= MINDEST_NEU], key=lambda x: -x.neu)
     duenn = sorted([b for b in tote if b.neu < MINDEST_NEU], key=lambda x: -x.neu)
     leere = [b for b in zeilen if not b.gesammelt]
     aus += [
@@ -332,27 +341,32 @@ def markdown(zeilen: list[Quellenbilanz], berichte: list[dict],
         f"**{len(tote)} Quellen** haben ueber alle Laeufe NEUE Meldungen "
         "geliefert, von denen KEINE je bewertet wurde. Getrennt nach der Frage, "
         "ob die Stichprobe das ueberhaupt hergibt: bei drei neuen Meldungen in "
-        "elf Laeufen ist „nie bewertet\" kein Befund, sondern Zufall.",
+        'elf Laeufen ist „nie bewertet" kein Befund, sondern Zufall.',
         "",
         f"### Belastbar (>= {MINDEST_NEU} neue Meldungen)",
         "",
     ]
-    aus += [f"- {b.anzeigename} ({b.neu} neue Meldungen in {b.laeufe} Laeufen)"
-            for b in belastbar] or ["- keine"]
+    aus += [
+        f"- {b.anzeigename} ({b.neu} neue Meldungen in {b.laeufe} Laeufen)"
+        for b in belastbar
+    ] or ["- keine"]
     aus += [
         "",
         f"### Zu duenne Datenlage (< {MINDEST_NEU} neue Meldungen) — nicht bewerten",
         "",
         "- " + ", ".join(f"{b.anzeigename} ({b.neu})" for b in duenn)
-        if duenn else "- keine",
+        if duenn
+        else "- keine",
     ]
     aus += [
         "",
         f"**{len(leere)} Quellen** haben in keinem Lauf eine Meldung geliefert:",
         "",
     ]
-    aus += [f"- {b.anzeigename} ({b.laeufe_fehler} Fehler, {b.laeufe_leer} leer)"
-            for b in leere] or ["- keine"]
+    aus += [
+        f"- {b.anzeigename} ({b.laeufe_fehler} Fehler, {b.laeufe_leer} leer)"
+        for b in leere
+    ] or ["- keine"]
 
     if kanalzeilen:
         aus += [
@@ -367,15 +381,18 @@ def markdown(zeilen: list[Quellenbilanz], berichte: list[dict],
             "|---|---|---|---:|---:|---:|---:|---:|",
         ]
         for b in kanalzeilen:
-            aus.append(f"| {b.schluessel[:60]} | {b.anzeigename} | {b.origin} | "
-                       f"{b.laeufe} | {b.gesammelt} | {b.neu} | {b.bewertet} | "
-                       f"{_pct(b.trefferquote)} |")
+            aus.append(
+                f"| {b.schluessel[:60]} | {b.anzeigename} | {b.origin} | "
+                f"{b.laeufe} | {b.gesammelt} | {b.neu} | {b.bewertet} | "
+                f"{_pct(b.trefferquote)} |"
+            )
     return "\n".join(aus) + "\n"
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(description=__doc__,
-                                formatter_class=argparse.RawDescriptionHelpFormatter)
+    p = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     p.add_argument("--root", type=Path, default=Path("."))
     p.add_argument("--md", type=Path, help="Markdown-Bericht hierhin schreiben")
     p.add_argument("--json", type=Path, help="Rohdaten als JSON hierhin schreiben")
@@ -389,10 +406,13 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     nach_name, nach_kanal, kanal_laeufe = auswerten(berichte)
     ergaenzt = historie_ergaenzen(
-        nach_name, args.root / "data" / "state" / "seen_historie_je_quelle.json")
+        nach_name, args.root / "data" / "state" / "seen_historie_je_quelle.json"
+    )
     if ergaenzt:
-        print(f"Hinweis: fuer {ergaenzt} Quellen kam der Nenner aus dem "
-              f"Altbestand des Seen-Stores (kein 'new' im Laufprotokoll).")
+        print(
+            f"Hinweis: fuer {ergaenzt} Quellen kam der Nenner aus dem "
+            f"Altbestand des Seen-Stores (kein 'new' im Laufprotokoll)."
+        )
     zeilen = tabelle(nach_name, args.min_laeufe, args.top)
     kanalzeilen = tabelle(nach_kanal, 1, args.top)
 
@@ -405,7 +425,8 @@ def main(argv: list[str] | None = None) -> int:
         args.json.parent.mkdir(parents=True, exist_ok=True)
         args.json.write_text(
             json.dumps([b.als_dict() for b in zeilen], ensure_ascii=False, indent=1),
-            encoding="utf-8")
+            encoding="utf-8",
+        )
         print(f"JSON geschrieben: {args.json}")
     if not args.md and not args.json:
         print(text)

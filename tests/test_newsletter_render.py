@@ -12,6 +12,7 @@ sein; Rahmentexte (Anrede, Kopfzeile, Abmeldehinweis, Impressumszeile,
 Stichwort-Markierung) kommen aus `templates/mail/chrome.yaml`, und die kennt
 er als Allowlist.
 """
+
 import json
 import re
 from pathlib import Path
@@ -25,20 +26,36 @@ from telco_radar.newsletter.quelle import aus_bericht
 
 BERICHT = {
     "date": "2026-08-11",
-    "regions": {"Europa": {"highlights": [
-        {"headline": "Telekom senkt Preise um zehn Prozent",
-         "summary": "Die Deutsche Telekom senkt zum 1. September die Preise "
+    "regions": {
+        "Europa": {
+            "highlights": [
+                {
+                    "headline": "Telekom senkt Preise um zehn Prozent",
+                    "summary": "Die Deutsche Telekom senkt zum 1. September die Preise "
                     "ihrer MagentaMobil-Tarife. Betroffen sind vier Tarife. "
                     "Der dritte Satz gehört nicht mehr in die Mail.",
-         "url": "https://fachpresse.test/telekom", "operator": "Deutsche Telekom",
-         "category": "Tarif/Pricing", "relevance": 3, "ctm_bezug": 3,
-         "source": "Mobile World Live", "date": "2026-08-10"},
-        {"headline": "Starlink startet Mobilfunkdienst",
-         "summary": "SpaceX schaltet Direct-to-Cell frei.",
-         "url": "https://fachpresse.test/starlink", "operator": "SpaceX",
-         "category": "Netz/Technologie", "relevance": 2, "ctm_bezug": 1,
-         "source": "Light Reading", "date": "2026-08-09"},
-    ]}},
+                    "url": "https://fachpresse.test/telekom",
+                    "operator": "Deutsche Telekom",
+                    "category": "Tarif/Pricing",
+                    "relevance": 3,
+                    "ctm_bezug": 3,
+                    "source": "Mobile World Live",
+                    "date": "2026-08-10",
+                },
+                {
+                    "headline": "Starlink startet Mobilfunkdienst",
+                    "summary": "SpaceX schaltet Direct-to-Cell frei.",
+                    "url": "https://fachpresse.test/starlink",
+                    "operator": "SpaceX",
+                    "category": "Netz/Technologie",
+                    "relevance": 2,
+                    "ctm_bezug": 1,
+                    "source": "Light Reading",
+                    "date": "2026-08-09",
+                },
+            ]
+        }
+    },
 }
 
 BASIS = "https://telco-radar.onrender.com"
@@ -48,26 +65,30 @@ def _treffer(*, stichwort=""):
     eintraege = aus_bericht(BERICHT, bericht_url=f"{BASIS}/reports/2026-08-11.html")
     aus = [Treffer(eintrag=e, grund="filter") for e in eintraege]
     if stichwort:
-        aus[-1] = Treffer(eintrag=eintraege[-1], grund="stichwort",
-                          stichwort=stichwort)
+        aus[-1] = Treffer(eintrag=eintraege[-1], grund="stichwort", stichwort=stichwort)
     return aus
 
 
 def _nachricht(**kw):
     treffer = kw.pop("treffer", None) or _treffer()
-    vorgabe = dict(datum_de="11. August 2026",
-                   bericht_url=f"{BASIS}/index.html",
-                   abmelde_url=f"{BASIS}/newsletter-abgemeldet.html?t=abc",
-                   seit_datum="1. August 2026", basis_url=BASIS)
+    vorgabe = dict(
+        datum_de="11. August 2026",
+        bericht_url=f"{BASIS}/index.html",
+        abmelde_url=f"{BASIS}/newsletter-abgemeldet.html?t=abc",
+        seit_datum="1. August 2026",
+        basis_url=BASIS,
+    )
     vorgabe.update(kw)
     return r.baue(treffer, **vorgabe)
 
 
 # ==============================================  DER TREUE-TEST  ===========
 
+
 def _bloecke(html: str) -> list[str]:
     """Jeder sichtbare Textblock der Mail, einzeln."""
     from bs4 import Doctype
+
     soup = BeautifulSoup(html, "html.parser")
     for weg in soup.select("title, style, script"):
         weg.decompose()
@@ -106,7 +127,8 @@ def test_jeder_inhaltstragende_block_steht_so_im_bericht():
     rahmen = _erlaubte_rahmen()
     # Zeichen, die keine Aussage sind: Trennzeichen, Nummerierung, URLs.
     unbedenklich = re.compile(
-        r"^(?:[\W\d\s]|https?://|&\w+;|Zur Quelle|Im Wochenbericht)+$")
+        r"^(?:[\W\d\s]|https?://|&\w+;|Zur Quelle|Im Wochenbericht)+$"
+    )
     erfunden = []
     gepruefte = 0
     for block in _bloecke(nachricht.html):
@@ -141,15 +163,18 @@ def test_der_treue_test_wuerde_einen_erfundenen_satz_finden():
     nachricht = _nachricht(treffer=treffer)
     quelle = _quelltext()
     rahmen = _erlaubte_rahmen()
-    bloecke = [b for b in _bloecke(nachricht.html)
-               if b not in quelle and not any(m.match(b) for m in rahmen)]
+    bloecke = [
+        b
+        for b in _bloecke(nachricht.html)
+        if b not in quelle and not any(m.match(b) for m in rahmen)
+    ]
     assert any("den es im Bericht nicht gibt" in b for b in bloecke)
 
 
 def test_die_zusammenfassung_wird_am_satz_gekuerzt_und_bleibt_teilstring():
     """Ohne Ellipse - sonst waere der Text kein Teilstring mehr, und der
     Treue-Test waere unerfuellbar."""
-    lang = ("Erster Satz. Zweiter Satz. Dritter Satz.")
+    lang = "Erster Satz. Zweiter Satz. Dritter Satz."
     gekuerzt = r.kuerze(lang)
     assert gekuerzt == "Erster Satz. Zweiter Satz."
     assert gekuerzt in lang
@@ -163,8 +188,10 @@ def test_ein_deutsches_datum_zerreisst_den_satz_nicht():
     Grossbuchstabe. Derselbe Schnitt trifft `_strip_vodafone_advice` im
     Wochenbericht, dort faellt dann eine Satzhaelfte als vermeintlicher Rat
     weg."""
-    text = ("Neukunden zahlen einmalig 1 Euro. Gültig bis 12. September 2026 "
-            "in allen Shops. Dritter Satz.")
+    text = (
+        "Neukunden zahlen einmalig 1 Euro. Gültig bis 12. September 2026 "
+        "in allen Shops. Dritter Satz."
+    )
     gekuerzt = r.kuerze(text)
     assert gekuerzt.endswith("in allen Shops.")
     assert gekuerzt in text
@@ -175,19 +202,28 @@ def test_ein_echtes_satzende_nach_einer_zahl_bleibt_eines():
     """Die Gegenprobe: geschuetzt wird nur vor einem MONATSNAMEN. Eine Regel,
     die jeden Grossbuchstaben nach einer Zahl schluckt, waere die teurere."""
     from telco_radar.textwerkzeug import saetze
+
     assert saetze("Die Zahl stieg auf 12. Vodafone reagierte.") == [
-        "Die Zahl stieg auf 12.", "Vodafone reagierte."]
+        "Die Zahl stieg auf 12.",
+        "Vodafone reagierte.",
+    ]
 
 
 def test_der_renderer_ruft_kein_modell_auf(monkeypatch):
     """Die Zusicherung wortwoertlich geprueft: ein LLM-Aufruf im Versandpfad
     wirft."""
     import telco_radar.analyze.llm as llm
+
     def darf_nicht(*a, **k):
         raise AssertionError("Modellaufruf im Renderpfad")
-    gesperrt = [n for n in dir(llm)
-                if callable(getattr(llm, n)) and not n.startswith("_")
-                and ("chat" in n or "call" in n or "complete" in n)]
+
+    gesperrt = [
+        n
+        for n in dir(llm)
+        if callable(getattr(llm, n))
+        and not n.startswith("_")
+        and ("chat" in n or "call" in n or "complete" in n)
+    ]
     assert gesperrt, "keine Modellfunktion gefunden - der Test prueft nichts"
     for name in gesperrt:
         monkeypatch.setattr(llm, name, darf_nicht)
@@ -199,13 +235,21 @@ def test_der_renderer_ruft_kein_modell_auf(monkeypatch):
 
 # ==================================================  E-Mail-Handwerk  ======
 
+
 def test_das_html_haelt_sich_an_email_recht():
     """Outlook rendert mit der Word-Engine: kein Flexbox, kein Grid, keine
     externen Stylesheets, keine Web Fonts, kein Hintergrundbild."""
     html = _nachricht().html
-    verboten = ("display:flex", "display:grid", "<link", "@import",
-                "background-image", "fonts.googleapis", "position:absolute",
-                "<script")
+    verboten = (
+        "display:flex",
+        "display:grid",
+        "<link",
+        "@import",
+        "background-image",
+        "fonts.googleapis",
+        "position:absolute",
+        "<script",
+    )
     for muster in verboten:
         assert muster not in html, muster
     # ... und positiv: Tabellenlayout mit Inline-CSS.
@@ -270,6 +314,7 @@ def test_beide_fassungen_tragen_dieselben_meldungen():
 
 # ==============================================  Links und Abmeldung  ======
 
+
 def test_jeder_eintrag_verlinkt_quelle_und_bericht():
     soup = BeautifulSoup(_nachricht().html, "html.parser")
     ziele = {a["href"] for a in soup.find_all("a")}
@@ -303,6 +348,7 @@ def test_impressum_und_datenschutz_stehen_im_fuss():
 
 # ================================================  Stichwort-Markierung  ===
 
+
 def _marker(stichwort: str) -> str:
     """Die Markierung aus chrome.yaml, nicht abgeschrieben.
 
@@ -335,8 +381,9 @@ def test_dasselbe_stichwort_wird_nur_beim_ersten_der_folge_genannt():
     Filtertreffern, gleiche Marken folgen also zwangslaeufig aufeinander.
     Viermal dieselbe Zeile erklaert nichts mehr, sie trommelt."""
     eintraege = aus_bericht(BERICHT)
-    treffer = [Treffer(eintrag=e, grund="stichwort", stichwort="Starlink")
-               for e in eintraege]
+    treffer = [
+        Treffer(eintrag=e, grund="stichwort", stichwort="Starlink") for e in eintraege
+    ]
     assert len(treffer) >= 2, "der Fall tritt sonst gar nicht ein"
     nachricht = _nachricht(treffer=treffer)
     assert nachricht.html.count(_marker("Starlink")) == 1
@@ -346,14 +393,17 @@ def test_dasselbe_stichwort_wird_nur_beim_ersten_der_folge_genannt():
 def test_ein_wechsel_des_stichworts_wird_wieder_genannt():
     """Die Gegenprobe: entdoppelt wird die FOLGE, nicht das Stichwort."""
     eintraege = aus_bericht(BERICHT)
-    treffer = [Treffer(eintrag=eintraege[0], grund="stichwort", stichwort="Tarif"),
-               Treffer(eintrag=eintraege[1], grund="stichwort", stichwort="Satellit")]
+    treffer = [
+        Treffer(eintrag=eintraege[0], grund="stichwort", stichwort="Tarif"),
+        Treffer(eintrag=eintraege[1], grund="stichwort", stichwort="Satellit"),
+    ]
     html = _nachricht(treffer=treffer).html
     assert _marker("Tarif") in html
     assert _marker("Satellit") in html
 
 
 # ==========================================================  Betreff  ======
+
 
 def test_der_betreff_traegt_die_staerkste_schlagzeile():
     """Nicht "Ihr Newsletter" - der Betreff ist die einzige Zeile, die JEDER
@@ -369,7 +419,7 @@ def test_der_betreff_bleibt_unter_achtzig_zeichen():
     treffer[0].eintrag.titel = "Ein " + "sehr " * 30 + "langer Titel"
     b = _nachricht(treffer=treffer).betreff
     assert len(b) <= 78
-    assert not b.endswith("seh")          # an der Wortgrenze gekuerzt
+    assert not b.endswith("seh")  # an der Wortgrenze gekuerzt
 
 
 def test_der_betreff_traegt_keinen_markennamen():
@@ -382,8 +432,10 @@ def test_der_betreff_traegt_keinen_markennamen():
 
 # =========================================================  Transport  =====
 
+
 def test_der_trockenlauf_verschickt_nichts_und_merkt_sich_alles():
     from telco_radar.newsletter.transport import Trockenlauf
+
     t = Trockenlauf()
     ergebnis = t.send(_nachricht(), "a@beispiel.test")
     assert ergebnis.ok and ergebnis.message_id.startswith("trocken-")
@@ -394,12 +446,14 @@ class _FakeHTTPError(Exception):
     def __init__(self, code, text=b"{}"):
         self.code = code
         self._text = text
+
     def read(self):
         return self._text
 
 
 def _brevo(monkeypatch, antwort):
     import telco_radar.newsletter.transport as tp
+
     monkeypatch.setattr(tp.urllib.error, "HTTPError", _FakeHTTPError)
     monkeypatch.setattr(tp.urllib.request, "urlopen", antwort)
     monkeypatch.setattr(tp.time, "sleep", lambda s: None)
@@ -410,10 +464,13 @@ class _Antwort:
     def __init__(self, koerper, status=201):
         self._k = json.dumps(koerper).encode()
         self.status = status
+
     def read(self):
         return self._k
+
     def __enter__(self):
         return self
+
     def __exit__(self, *a):
         return False
 
@@ -431,9 +488,11 @@ def test_ein_4xx_wird_nicht_wiederholt(monkeypatch):
     """Ein "invalid recipient" wird beim vierten Versuch nicht gueltiger -
     der Empfaenger gehoert markiert, nicht angefunkt."""
     versuche = []
+
     def wirft(*a, **k):
         versuche.append(1)
         raise _FakeHTTPError(400, b'{"message":"invalid recipient"}')
+
     t = _brevo(monkeypatch, wirft)
     ergebnis = t.send(_nachricht(), "a@beispiel.test")
     assert not ergebnis.ok and ergebnis.dauerhaft and not ergebnis.wiederholbar
@@ -444,9 +503,11 @@ def test_ein_429_wird_wiederholt(monkeypatch):
     """Die Ratengrenze ist voruebergehend. Wer sie wie ein 400 behandelt,
     wirft lebende Adressen weg."""
     versuche = []
+
     def wirft(*a, **k):
         versuche.append(1)
         raise _FakeHTTPError(429, b'{"message":"rate limit"}')
+
     t = _brevo(monkeypatch, wirft)
     ergebnis = t.send(_nachricht(), "a@beispiel.test")
     assert ergebnis.wiederholbar and not ergebnis.dauerhaft
@@ -455,16 +516,20 @@ def test_ein_429_wird_wiederholt(monkeypatch):
 
 def test_ein_401_nennt_den_90_tage_verfall(monkeypatch):
     """Die Ursache, die man sonst stundenlang im Code sucht."""
+
     def wirft(*a, **k):
         raise _FakeHTTPError(401, b'{"message":"unauthorized"}')
+
     ergebnis = _brevo(monkeypatch, wirft).send(_nachricht(), "a@beispiel.test")
     assert "90" in ergebnis.fehler and ergebnis.dauerhaft
 
 
 def test_die_adresse_steht_in_keiner_logzeile(monkeypatch, caplog):
     """In keinem Log darf je eine Adresse erscheinen."""
+
     def wirft(*a, **k):
         raise _FakeHTTPError(400, b'{"message":"nope"}')
+
     t = _brevo(monkeypatch, wirft)
     with caplog.at_level("DEBUG"):
         t.send(_nachricht(), "geheim@beispiel.test")
@@ -473,9 +538,11 @@ def test_die_adresse_steht_in_keiner_logzeile(monkeypatch, caplog):
 
 def test_ein_5xx_wird_wiederholt(monkeypatch):
     versuche = []
+
     def wirft(*a, **k):
         versuche.append(1)
         raise _FakeHTTPError(503, b"gateway")
+
     ergebnis = _brevo(monkeypatch, wirft).send(_nachricht(), "a@b.test")
     assert ergebnis.wiederholbar and len(versuche) == 3
 

@@ -33,6 +33,7 @@ Ohne das fragte jeder Lauf dieselben 40 Seiten erneut ab, die schon dreimal kein
 `og:image` hatten - bei zwei Laeufen die Woche und einem wachsenden Bestand ist
 das der Unterschied zwischen einer Minute und fuenf.
 """
+
 from __future__ import annotations
 
 import json
@@ -88,9 +89,13 @@ def lade_index(root: Path) -> dict:
 def schreibe_index(root: Path, index: dict, stand: str = "") -> None:
     pfad = indexdatei(root)
     pfad.parent.mkdir(parents=True, exist_ok=True)
-    pfad.write_text(json.dumps({"updated": stand or date.today().isoformat(),
-                                "bilder": index}, ensure_ascii=False),
-                    encoding="utf-8")
+    pfad.write_text(
+        json.dumps(
+            {"updated": stand or date.today().isoformat(), "bilder": index},
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
 
 
 def bild_aus_berichten(reports_dir: Path) -> dict[str, dict]:
@@ -102,6 +107,7 @@ def bild_aus_berichten(reports_dir: Path) -> dict[str, dict]:
     nur die letzten vier Ausgaben.
     """
     import re
+
     out: dict[str, dict] = {}
     for datei in sorted(Path(reports_dir).glob("*.json")):
         if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", datei.stem):
@@ -131,8 +137,9 @@ def _veraltet(eintrag: dict, heute: str) -> bool:
         return True
 
 
-def beschaffe(bestand: list[dict], root: Path, reports_dir: Path,
-              heute: str = "") -> dict:
+def beschaffe(
+    bestand: list[dict], root: Path, reports_dir: Path, heute: str = ""
+) -> dict:
     """Sorgt dafuer, dass moeglichst jeder Eintrag ein Bild hat.
 
     Aendert `bestand` NICHT - Ergebnis ist der Index, den `verteile()` beim
@@ -167,23 +174,31 @@ def beschaffe(bestand: list[dict], root: Path, reports_dir: Path,
         offen.append(url)
 
     if offen:
-        with httpx.Client(headers={"User-Agent": report_bilder._UA},
-                          timeout=_TIMEOUT, follow_redirects=True) as client:
+        with httpx.Client(
+            headers={"User-Agent": report_bilder._UA},
+            timeout=_TIMEOUT,
+            follow_redirects=True,
+        ) as client:
+
             def arbeite(url: str) -> tuple[str, dict]:
                 schluessel = normalize_url(url)
                 try:
                     og = report_bilder.og_bild(url, client)
                     if og:
                         abgelegt = report_bilder.lade_und_lege_ab(
-                            og, ordner, _BREIT, client)
+                            og, ordner, _BREIT, client
+                        )
                         if abgelegt:
                             name, breite, hoehe = abgelegt
-                            return schluessel, {"image": name, "image_w": breite,
-                                                "image_h": hoehe, "quelle": "og",
-                                                "geprueft": heute}
+                            return schluessel, {
+                                "image": name,
+                                "image_w": breite,
+                                "image_h": hoehe,
+                                "quelle": "og",
+                                "geprueft": heute,
+                            }
                 except Exception as exc:  # noqa: BLE001 - ein Bild kippt keinen Lauf
-                    log.debug("Differenzierungs-Bild fehlgeschlagen (%s): %s",
-                              url, exc)
+                    log.debug("Differenzierungs-Bild fehlgeschlagen (%s): %s", url, exc)
                 return schluessel, {"geprueft": heute}
 
             with ThreadPoolExecutor(max_workers=_GLEICHZEITIG) as pool:
@@ -210,14 +225,18 @@ def beschaffe(bestand: list[dict], root: Path, reports_dir: Path,
     schreibe_index(root, index, heute)
 
     mit_bild = sum(1 for v in index.values() if v.get("image"))
-    log.info("Differenzierungs-Bilder: %d von %d Beispielen haben eins (%s)",
-             mit_bild, len(bestand),
-             ", ".join(f"{k}={v}" for k, v in sorted(z.items())))
+    log.info(
+        "Differenzierungs-Bilder: %d von %d Beispielen haben eins (%s)",
+        mit_bild,
+        len(bestand),
+        ", ".join(f"{k}={v}" for k, v in sorted(z.items())),
+    )
     return dict(z, mit_bild=mit_bild, bestand=len(bestand))
 
 
-def verteile(bestand: list[dict], index: dict,
-             vorhandene_bilder: set[str] | None = None) -> int:
+def verteile(
+    bestand: list[dict], index: dict, vorhandene_bilder: set[str] | None = None
+) -> int:
     """Stempelt die Bildfelder aus dem Index in den Bestand. Gibt die Zahl der
     Eintraege mit Bild zurueck.
 

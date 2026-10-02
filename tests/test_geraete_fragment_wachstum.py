@@ -12,6 +12,7 @@ Hausregel: jede Funktion nimmt ihr Datum als Parameter (`heute=` bzw.
 der Anker aus der Historie) - deshalb ist die gesamte Rechnung hier
 deterministisch und zweimal identisch.
 """
+
 from __future__ import annotations
 
 import importlib.util
@@ -37,8 +38,7 @@ def _lade_skript():
     Kopie der Formel (zwei Umsetzungen derselben Rechnung waeren zwei
     Zahlen - CLAUDE.md 6).
     """
-    spec = importlib.util.spec_from_file_location("geraete_fragment_wachstum",
-                                                  SCRIPT)
+    spec = importlib.util.spec_from_file_location("geraete_fragment_wachstum", SCRIPT)
     modul = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(modul)
@@ -57,30 +57,37 @@ def _fixture(root: Path) -> None:
     zeilen = []
     for tag in ("2026-09-10", "2026-09-11", "2026-09-12"):
         for nr in range(10):
-            zeilen.append(json.dumps(
-                {"id": f"buendel--anbieter--modell-{nr}", "datum": tag,
-                 "gesamt": 100.0 + nr}))
+            zeilen.append(
+                json.dumps(
+                    {
+                        "id": f"buendel--anbieter--modell-{nr}",
+                        "datum": tag,
+                        "gesamt": 100.0 + nr,
+                    }
+                )
+            )
     # Dieselbe (id, datum)-Zeile noch einmal: die Historie ersetzt beim
     # zweiten Lauf desselben Tages - die Zaehlung muss das nachbilden.
     zeilen.append(zeilen[0])
     (zustand / "geraete_tco_historie.jsonl").write_text(
-        "\n".join(zeilen) + "\n", encoding="utf-8")
+        "\n".join(zeilen) + "\n", encoding="utf-8"
+    )
     site_daten = root / "site" / "data"
     site_daten.mkdir(parents=True)
-    (site_daten / "geraete-zeitreihe.html").write_text(
-        "x" * 30_000, encoding="utf-8")
-    (site_daten / "geraete-buendel.html").write_text(
-        "y" * 500_000, encoding="utf-8")
+    (site_daten / "geraete-zeitreihe.html").write_text("x" * 30_000, encoding="utf-8")
+    (site_daten / "geraete-buendel.html").write_text("y" * 500_000, encoding="utf-8")
 
 
 def test_historie_zaehlt_idempotent_und_je_messtag(tmp_path):
     _fixture(tmp_path)
-    bestand = lies_historie(
-        tmp_path / "data" / "state" / "geraete_tco_historie.jsonl")
+    bestand = lies_historie(tmp_path / "data" / "state" / "geraete_tco_historie.jsonl")
     assert bestand.messtage == 3
-    assert bestand.paare == 30            # die Dublette zaehlt nicht doppelt
-    assert bestand.tage == ((date(2026, 9, 10), 10), (date(2026, 9, 11), 10),
-                            (date(2026, 9, 12), 10))
+    assert bestand.paare == 30  # die Dublette zaehlt nicht doppelt
+    assert bestand.tage == (
+        (date(2026, 9, 10), 10),
+        (date(2026, 9, 11), 10),
+        (date(2026, 9, 12), 10),
+    )
     assert bestand.anker == date(2026, 9, 12)
     assert bestand.rate_je_messtag() == 10.0
     # Fehlt die Datei, ist das eine leere Messung und kein Fehler - der
@@ -92,11 +99,11 @@ def test_rate_ist_unbestimmt_mit_einem_messtag(tmp_path):
     zustand = tmp_path / "data" / "state"
     zustand.mkdir(parents=True)
     (zustand / "geraete_tco_historie.jsonl").write_text(
-        json.dumps({"id": "b--1", "datum": "2026-09-10"}) + "\n",
-        encoding="utf-8")
+        json.dumps({"id": "b--1", "datum": "2026-09-10"}) + "\n", encoding="utf-8"
+    )
     bestand = lies_historie(zustand / "geraete_tco_historie.jsonl")
     assert bestand.paare == 1
-    assert bestand.rate_je_messtag() is None   # keine Rate aus einem Punkt
+    assert bestand.rate_je_messtag() is None  # keine Rate aus einem Punkt
 
 
 def test_prognose_formel_ceil_ab_anker():
@@ -107,8 +114,12 @@ def test_prognose_formel_ceil_ab_anker():
     (z. B. 0,4) zaehlt als GANZER, denn halbe Laeufe gibt es nicht.
     """
     grenz_datum, tage, drueber = prognose(
-        bytes_je_paar=1_000.0, paare=30, rate=10.0,
-        grenze=5_000_000, anker=date(2026, 9, 12))
+        bytes_je_paar=1_000.0,
+        paare=30,
+        rate=10.0,
+        grenze=5_000_000,
+        anker=date(2026, 9, 12),
+    )
     assert (tage, drueber) == (497, False)
     assert grenz_datum == date(2026, 9, 12) + timedelta(days=497)
     assert grenz_datum == date(2028, 1, 22)
@@ -120,8 +131,7 @@ def test_prognose_formel_ceil_ab_anker():
     _, tage, _ = prognose(1_000.0, 30, 10.0, 40_000, date(2026, 9, 12))
     assert tage == 1
     # Bereits ueberschritten: der Anker selbst, ohne Frist.
-    grenz_datum, tage, drueber = prognose(
-        1_000.0, 30, 10.0, 29_000, date(2026, 9, 12))
+    grenz_datum, tage, drueber = prognose(1_000.0, 30, 10.0, 29_000, date(2026, 9, 12))
     assert (grenz_datum, tage, drueber) == (date(2026, 9, 12), 0, True)
 
 
@@ -135,17 +145,18 @@ def test_skript_rechnet_gegen_die_fixture(tmp_path, capsys):
     """
     _fixture(tmp_path)
     modul = _lade_skript()
-    rc = modul.main(["--root", str(tmp_path), "--heute", "2026-09-18",
-                     "--grenze-mb", "0.0324"])
+    rc = modul.main(
+        ["--root", str(tmp_path), "--heute", "2026-09-18", "--grenze-mb", "0.0324"]
+    )
     assert rc == 0
     text = capsys.readouterr().out
     assert "Stand 2026-09-18" in text
-    assert "2026-09-12" in text                    # Anker = letzter Messtag
+    assert "2026-09-12" in text  # Anker = letzter Messtag
     assert "10 Paare/Messtag" in text
-    assert "30,000 B" in text                      # gemessene Fragmentgroesse
+    assert "30,000 B" in text  # gemessene Fragmentgroesse
     assert "<-- GRENZE" in text
-    assert "erreicht am 2026-09-13" in text        # Anker + 1 Messtag
-    assert "NICHT gebaut" in text                  # der Deckel ist Empfehlung
+    assert "erreicht am 2026-09-13" in text  # Anker + 1 Messtag
+    assert "NICHT gebaut" in text  # der Deckel ist Empfehlung
 
 
 def test_bericht_ist_deterministisch(tmp_path):
@@ -156,7 +167,7 @@ def test_bericht_ist_deterministisch(tmp_path):
     zweiter = modul.bericht(tmp_path, heute=date(2026, 9, 18))
     assert erster == zweiter
     assert "5-MB-Grenze" in erster
-    assert "erreicht am 2028-01-22" in erster      # 497 Messtage, s. Formeltest
+    assert "erreicht am 2028-01-22" in erster  # 497 Messtage, s. Formeltest
 
 
 def test_protokollzeile_nennt_die_drei_zahlen(tmp_path):
@@ -164,17 +175,19 @@ def test_protokollzeile_nennt_die_drei_zahlen(tmp_path):
     Quelle wie das Skript (geraete_fragment.protokoll_zeile)."""
     _fixture(tmp_path)
     assert protokoll_zeile(tmp_path) == (
-        "Fragmentgroesse: 3 Messtage, 30 Messpaare, 517 KB Fragmente")
+        "Fragmentgroesse: 3 Messtage, 30 Messpaare, 517 KB Fragmente"
+    )
     # Fragmente fehlen (erster Lauf vor dem ersten Render): die Messzahlen
     # stehen trotzdem, die Reihe reisst nicht - aber ohne Zahl kein Punkt.
     nur_state = tmp_path / "ohne_site"
     (nur_state / "data" / "state").mkdir(parents=True)
     (nur_state / "data" / "state" / "geraete_tco_historie.jsonl").write_text(
-        json.dumps({"id": "b--1", "datum": "2026-09-10"}) + "\n",
-        encoding="utf-8")
+        json.dumps({"id": "b--1", "datum": "2026-09-10"}) + "\n", encoding="utf-8"
+    )
     assert protokoll_zeile(nur_state) == (
         "Fragmentgroesse: 1 Messtage, 1 Messpaare, "
-        "kein Fragment auf Platt (Render laeuft nach diesem Schritt)")
+        "kein Fragment auf Platt (Render laeuft nach diesem Schritt)"
+    )
     # Keine Historie: KEINE Zeile - 0/0/0 waere ein vorgetaeuschter
     # Messpunkt in der PM-6-Reihe.
     assert protokoll_zeile(tmp_path / "leer") is None

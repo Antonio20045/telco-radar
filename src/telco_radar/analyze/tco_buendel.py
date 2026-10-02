@@ -79,6 +79,7 @@ Dasselbe gilt fuer die 1&1-Aufspaltung (`collect/geraete/einsundeins.py`,
 (siehe `tco_model.Buendel`), und eine Aufspaltung ohne Beleg bleibt eine
 Erfindung.
 """
+
 from __future__ import annotations
 
 import logging
@@ -116,11 +117,10 @@ class Buendelbilanz:
 _BEISPIELE = 8
 
 
-def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str
-                   ) -> Buendelbilanz:
+def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str) -> Buendelbilanz:
     """Rohsaetze in Buendel verwandeln, soweit ihr Tarif aufloest."""
     bilanz = Buendelbilanz()
-    for satz in (rohsaetze or []):
+    for satz in rohsaetze or []:
         if not isinstance(satz, dict):
             bilanz.ungueltig += 1
             continue
@@ -137,60 +137,69 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str
 
         # Ein Buendel ist der Tarif MIT Geraet - es haengt am Geraeteblatt,
         # wo es eines gibt (Vodafone "... mit Smartphone", P3 28.09.2026).
-        bezug = bestand.loese(anbieter, tarif_name,
-                              slug=str(satz.get("tarif_slug") or ""),
-                              mit_geraet=True)
+        bezug = bestand.loese(
+            anbieter,
+            tarif_name,
+            slug=str(satz.get("tarif_slug") or ""),
+            mit_geraet=True,
+        )
         if bezug is None:
             bilanz.ohne_tarif += 1
             schluessel = tarif_name or str(satz.get("tarif_slug") or "?")
-            bilanz.offene_tarife[schluessel] = \
+            bilanz.offene_tarife[schluessel] = (
                 bilanz.offene_tarife.get(schluessel, 0) + 1
+            )
             continue
 
         try:
-            bilanz.buendel.append(Buendel(
-                sku_id=sku, anbieter=anbieter,
-                # Der Name bleibt der des ANBIETERS, die ID kommt aus dem
-                # Bestand - beides steht im Datensatz, und wenn die zwei
-                # auseinanderlaufen, ist genau das die Auskunft
-                # (`tco_model.Buendel`).
-                tarif_name=tarif_name,
-                tarif_id=bezug.tarif_id, tarif_id_guete=bezug.guete,
-                # DER GEMESSENE BETRAG DIESES BUENDELS, unveraendert. Kein
-                # Tausch gegen die SIM-only-Kachel desselben Tarifs, kein
-                # Rabatt daneben - siehe Modulkopf "KEIN BETRAG WIRD
-                # UMGERECHNET".
-                tarif_monatlich=satz.get("tarif_monatlich"),
-                # DER KOMBINIERTE MONATSBETRAG (§ 13.2, 1&1 seit B4): er
-                # tritt AN DIE STELLE von `tarif_monatlich` und `geraet_
-                # monatsrate`, und `Buendel.__post_init__` erzwingt genau
-                # das - ein Satz mit beidem wirft. Ohne diese Zeile waere
-                # ein 1&1-Satz still preislos durch diese Stufe gegangen
-                # (derselbe Fehlertyp wie die Positivliste `_MESSFELDER`
-                # im Store: ein Feld, das niemand durchreicht, existiert
-                # fuer den Bestand nicht).
-                buendel_monatlich=satz.get("buendel_monatlich"),
-                geraet_zuzahlung=satz.get("geraet_zuzahlung"),
-                geraet_monatsrate=satz.get("geraet_monatsrate"),
-                # DIE GEMESSENE RATENLAUFZEIT, ungeraten (P0-B-fix1).
-                # Bis hierher stand `int(... or 0) or 24`: ein Rohsatz ohne
-                # Laufzeit - 1&1 liefert ihn, wenn die Produktseite keine
-                # Dauer nennt - bekam still die ID `...--24m` und verschmolz
-                # mit dem ECHTEN 24-Monats-Angebot desselben Tarifs. Jetzt
-                # geht der Wert durch, wie er ist: `None` wird zur benannten
-                # Luecke (`tco_model.LAUFZEIT_LUECKE` in der ID,
-                # `POSTEN_LAUFZEIT` in der Kennzahl), eine unmoegliche Zahl
-                # (0, negativ, 24,5) wirft in `Buendel.__post_init__` und
-                # landet unten als `ungueltig` im Protokoll.
-                laufzeit_monate=satz.get("laufzeit_monate"),
-                anschlusspreis=satz.get("anschlusspreis"),
-                # P3-E3: benannte Vorteile mit Bedingung und Quelle - von
-                # keiner Kennzahl verrechnet (`tco_model.Aktion`).
-                aktionen=aktionen_aus(satz.get("aktionen")),
-                zustand=str(satz.get("zustand") or ""),
-                quelle_url=str(satz.get("quelle_url") or ""),
-                abgerufen_am=heute,
-                herleitung=str(satz.get("herleitung") or "")))
+            bilanz.buendel.append(
+                Buendel(
+                    sku_id=sku,
+                    anbieter=anbieter,
+                    # Der Name bleibt der des ANBIETERS, die ID kommt aus dem
+                    # Bestand - beides steht im Datensatz, und wenn die zwei
+                    # auseinanderlaufen, ist genau das die Auskunft
+                    # (`tco_model.Buendel`).
+                    tarif_name=tarif_name,
+                    tarif_id=bezug.tarif_id,
+                    tarif_id_guete=bezug.guete,
+                    # DER GEMESSENE BETRAG DIESES BUENDELS, unveraendert. Kein
+                    # Tausch gegen die SIM-only-Kachel desselben Tarifs, kein
+                    # Rabatt daneben - siehe Modulkopf "KEIN BETRAG WIRD
+                    # UMGERECHNET".
+                    tarif_monatlich=satz.get("tarif_monatlich"),
+                    # DER KOMBINIERTE MONATSBETRAG (§ 13.2, 1&1 seit B4): er
+                    # tritt AN DIE STELLE von `tarif_monatlich` und `geraet_
+                    # monatsrate`, und `Buendel.__post_init__` erzwingt genau
+                    # das - ein Satz mit beidem wirft. Ohne diese Zeile waere
+                    # ein 1&1-Satz still preislos durch diese Stufe gegangen
+                    # (derselbe Fehlertyp wie die Positivliste `_MESSFELDER`
+                    # im Store: ein Feld, das niemand durchreicht, existiert
+                    # fuer den Bestand nicht).
+                    buendel_monatlich=satz.get("buendel_monatlich"),
+                    geraet_zuzahlung=satz.get("geraet_zuzahlung"),
+                    geraet_monatsrate=satz.get("geraet_monatsrate"),
+                    # DIE GEMESSENE RATENLAUFZEIT, ungeraten (P0-B-fix1).
+                    # Bis hierher stand `int(... or 0) or 24`: ein Rohsatz ohne
+                    # Laufzeit - 1&1 liefert ihn, wenn die Produktseite keine
+                    # Dauer nennt - bekam still die ID `...--24m` und verschmolz
+                    # mit dem ECHTEN 24-Monats-Angebot desselben Tarifs. Jetzt
+                    # geht der Wert durch, wie er ist: `None` wird zur benannten
+                    # Luecke (`tco_model.LAUFZEIT_LUECKE` in der ID,
+                    # `POSTEN_LAUFZEIT` in der Kennzahl), eine unmoegliche Zahl
+                    # (0, negativ, 24,5) wirft in `Buendel.__post_init__` und
+                    # landet unten als `ungueltig` im Protokoll.
+                    laufzeit_monate=satz.get("laufzeit_monate"),
+                    anschlusspreis=satz.get("anschlusspreis"),
+                    # P3-E3: benannte Vorteile mit Bedingung und Quelle - von
+                    # keiner Kennzahl verrechnet (`tco_model.Aktion`).
+                    aktionen=aktionen_aus(satz.get("aktionen")),
+                    zustand=str(satz.get("zustand") or ""),
+                    quelle_url=str(satz.get("quelle_url") or ""),
+                    abgerufen_am=heute,
+                    herleitung=str(satz.get("herleitung") or ""),
+                )
+            )
         except (ValueError, TypeError) as exc:
             # `Buendel` prueft seine Posten selbst (negative Betraege, eine
             # Laufzeit von null, ein Geraetepreis ohne SKU). Ein Satz, der
@@ -200,11 +209,14 @@ def aus_rohsaetzen(rohsaetze, bestand: Tarifbestand, heute: str
             log.info("Buendel %s/%s verworfen: %s", anbieter, sku, exc)
 
     if bilanz.offene_tarife:
-        haeufigste = sorted(bilanz.offene_tarife.items(),
-                            key=lambda p: (-p[1], p[0]))[:_BEISPIELE]
+        haeufigste = sorted(bilanz.offene_tarife.items(), key=lambda p: (-p[1], p[0]))[
+            :_BEISPIELE
+        ]
         log.warning(
             "Buendel: %d Saetze ohne aufloesbaren Tarif verworfen - im "
             "Tarifbestand fehlen %d Tarife, haeufigste: %s",
-            bilanz.ohne_tarif, len(bilanz.offene_tarife),
-            ", ".join(f"{name} ({zahl}x)" for name, zahl in haeufigste))
+            bilanz.ohne_tarif,
+            len(bilanz.offene_tarife),
+            ", ".join(f"{name} ({zahl}x)" for name, zahl in haeufigste),
+        )
     return bilanz

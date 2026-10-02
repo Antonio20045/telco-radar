@@ -24,6 +24,7 @@ Diese Datei nagelt die Vereinheitlichung fest:
 Die Browser-Haelfte der Kette (Klick, Reiterwechsel, Filter, ?ansicht=)
 steht in `tests/test_geraete_radar_sprung_browser.py`.
 """
+
 from __future__ import annotations
 
 import json
@@ -45,15 +46,24 @@ def _rendern(root: pathlib.Path) -> BeautifulSoup:
     """Site in tmp_path bauen und geraete.html als Suppe zurückgeben."""
     reports = root / "data" / "reports"
     reports.mkdir(parents=True, exist_ok=True)
-    (reports / f"{HEUTE}.json").write_text(json.dumps({
-        "date": HEUTE, "language": "de",
-        "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
-        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{HEUTE}.json").write_text(
+        json.dumps(
+            {
+                "date": HEUTE,
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     (reports / f"{HEUTE}.md").write_text("# B\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
-    return BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
-                         "html.parser")
+    return BeautifulSoup(
+        (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
+    )
 
 
 def _seite(tmp_path: pathlib.Path) -> BeautifulSoup:
@@ -69,8 +79,7 @@ def _erlaubt(suppe: BeautifulSoup) -> set[str]:
     Menge, gegen die app.js einen Deep-Link prueft."""
     knoten = suppe.select_one("#gr-zeitreihe-daten")
     assert knoten is not None, "Zeitreihen-Knoten fehlt - Test prueft nichts"
-    return {k for k, v in json.loads(knoten.get_text())["erlaubt"].items()
-            if v}
+    return {k for k, v in json.loads(knoten.get_text())["erlaubt"].items() if v}
 
 
 def _text(el) -> str:
@@ -80,6 +89,7 @@ def _text(el) -> str:
 # --------------------------------------------------------------------------
 # 1. Der EINE Schluessel steht im Markup aller Reiter
 # --------------------------------------------------------------------------
+
 
 def test_jede_katalogzeile_traegt_ihren_modell_schluessel(tmp_path):
     """`data-modell` an der Katalog-Modellzeile ist der `schluessel` aus
@@ -97,14 +107,15 @@ def test_jede_katalogzeile_traegt_ihren_modell_schluessel(tmp_path):
     # Der Schluessel des Markups ist der gerechnete `modell_schluessel`:
     # nachgebaut aus derselben Fixture (device_id + Speicherstufe).
     root, _ = _baue_zeitreihe(tmp_path / "gegenprobe")
-    roh = json.loads((root / "data" / "state" / "geraete_db.json")
-                     .read_text(encoding="utf-8"))
-    erwartet = {f"{e['device_id']}-{int(e['speicher_gb'])}"
-                for e in roh["listungen"]}
+    roh = json.loads(
+        (root / "data" / "state" / "geraete_db.json").read_text(encoding="utf-8")
+    )
+    erwartet = {f"{e['device_id']}-{int(e['speicher_gb'])}" for e in roh["listungen"]}
     getroffen = {i for i in ids if i in erwartet}
-    assert len(getroffen) == len(set(ids)) == len(erwartet), \
-        f"Schluessel-Mengen weichen ab: nur {len(getroffen)} von " \
+    assert len(getroffen) == len(set(ids)) == len(erwartet), (
+        f"Schluessel-Mengen weichen ab: nur {len(getroffen)} von "
         f"{len(set(ids))} Zeilen treffen die {len(erwartet)} gerechneten"
+    )
 
 
 def test_radar_und_katalog_nutzen_denselben_schluesselraum(tmp_path):
@@ -114,35 +125,45 @@ def test_radar_und_katalog_nutzen_denselben_schluesselraum(tmp_path):
     jede Radar-Zeile mit Katalog-Zeile hat den Link, jede ohne die
     benannte Luecke."""
     s = _seite(tmp_path)
-    radar_ids = {a.get("data-modell") for a in
-                 s.select("#wr-abweichung a.gr-sprung[data-modell]")}
-    sprung_ids = {a.get("data-modell") for a in
-                  s.select("#wr-abweichung a.gr-ksprung[data-modell]")}
-    katalog_ids = {z.get("data-modell") for z in
-                   s.select("#gr-katalogtabelle tr.gr-k-zeile")}
+    radar_ids = {
+        a.get("data-modell")
+        for a in s.select("#wr-abweichung a.gr-sprung[data-modell]")
+    }
+    sprung_ids = {
+        a.get("data-modell")
+        for a in s.select("#wr-abweichung a.gr-ksprung[data-modell]")
+    }
+    katalog_ids = {
+        z.get("data-modell") for z in s.select("#gr-katalogtabelle tr.gr-k-zeile")
+    }
     assert radar_ids and katalog_ids, "Fixture zu duenn"
     # Derselbe Schluesselraum: die Sprungziele sind KEINE eigene Menge.
-    assert sprung_ids <= radar_ids & katalog_ids, \
+    assert sprung_ids <= radar_ids & katalog_ids, (
         "Katalog-Sprung zeigt auf einen Schluessel ausserhalb der Menge"
+    )
     # Beide Richtungen der Menge sind besetzt (Schnitt nicht leer UND
     # nicht deckungsgleich - sonst prueft die Fixture die Luecke nicht).
     assert radar_ids & katalog_ids, "kein gemeinsames Modell in der Fixture"
-    assert radar_ids - katalog_ids or katalog_ids - radar_ids, \
+    assert radar_ids - katalog_ids or katalog_ids - radar_ids, (
         "Fixture deckt keinen Differenzfall"
+    )
 
 
 # --------------------------------------------------------------------------
 # 2. Radar -> Katalog: jeder Sprung trifft, jede Luecke ist benannt
 # --------------------------------------------------------------------------
 
+
 def test_jeder_radar_katalog_sprung_trifft_seine_zeile(tmp_path):
     s = _seite(tmp_path)
-    katalog_ids = {z.get("data-modell") for z in
-                   s.select("#gr-katalogtabelle tr.gr-k-zeile")}
+    katalog_ids = {
+        z.get("data-modell") for z in s.select("#gr-katalogtabelle tr.gr-k-zeile")
+    }
     links = s.select("#wr-abweichung a.gr-ksprung[data-modell]")
     assert links, "kein Katalog-Sprung im Radar - der Test prueft nichts"
-    fehlende = [a.get("data-modell") for a in links
-                if a.get("data-modell") not in katalog_ids]
+    fehlende = [
+        a.get("data-modell") for a in links if a.get("data-modell") not in katalog_ids
+    ]
     assert not fehlende, f"Sprung ohne Zielzeile: {fehlende}"
 
 
@@ -153,13 +174,17 @@ def test_jede_radarzeile_hat_link_oder_benannte_luecke(tmp_path):
     zeilen = s.select("#wr-abweichung tr.gr-a-zeile[data-auf]")
     assert zeilen, "keine Radar-Modellzeile"
     mit_link = [z for z in zeilen if z.select_one("a.gr-ksprung")]
-    mit_luecke = [z for z in zeilen
-                  if z.select_one("td span.gr-a-klein")
-                  and z.select_one("td span.gr-a-klein").get_text(strip=True)
-                  == "nicht im Katalog"]
-    assert len(mit_link) + len(mit_luecke) == len(zeilen), \
-        f"{len(zeilen)} Zeilen, aber nur {len(mit_link)} Link + " \
+    mit_luecke = [
+        z
+        for z in zeilen
+        if z.select_one("td span.gr-a-klein")
+        and z.select_one("td span.gr-a-klein").get_text(strip=True)
+        == "nicht im Katalog"
+    ]
+    assert len(mit_link) + len(mit_luecke) == len(zeilen), (
+        f"{len(zeilen)} Zeilen, aber nur {len(mit_link)} Link + "
         f"{len(mit_luecke)} Luecke - es gibt einen stummen dritten Zustand"
+    )
 
 
 def test_reines_buendel_ohne_listung_steht_im_katalog(tmp_path):
@@ -180,50 +205,65 @@ def test_reines_buendel_ohne_listung_steht_im_katalog(tmp_path):
     nachgemessen), der Deep-Link faelle auf das Startgeraet - die Luecke
     heisst weiterhin 'noch keine Zeitreihe'."""
     s = _baue_zustand(tmp_path, graphloses_modell=True)
-    katalog_ids = {z.get("data-modell") for z in
-                   s.select("#gr-katalogtabelle tr.gr-k-zeile")}
+    katalog_ids = {
+        z.get("data-modell") for z in s.select("#gr-katalogtabelle tr.gr-k-zeile")
+    }
     ziel = "apple-iphone-16-pro-max-256"
-    assert ziel in katalog_ids, \
+    assert ziel in katalog_ids, (
         "Buendel ohne Listung ohne Katalog-Zeile - die P5-Regel greift nicht"
+    )
     erlaubt = _erlaubt(s)
-    assert ziel not in erlaubt, \
-        "Fixture-Voraussetzung: das Modell ist nicht waehlbar " \
+    assert ziel not in erlaubt, (
+        "Fixture-Voraussetzung: das Modell ist nicht waehlbar "
         f"(erlaubt enthaelt {ziel})"
+    )
 
     # Die Katalog-Zeile selbst: Buendel-Angabe statt Barpreis (die P3-Regel
     # „keine Modellzeile sagt ohne Preis" gilt seit P5 auch fuer den
     # Buendel-weg) und die benannte Luecke am Graph-Sprung.
-    kzeile = next(z for z in s.select("#gr-katalogtabelle tr.gr-k-zeile")
-                  if z.get("data-modell") == ziel)
+    kzeile = next(
+        z
+        for z in s.select("#gr-katalogtabelle tr.gr-k-zeile")
+        if z.get("data-modell") == ziel
+    )
     ktext = _text(kzeile)
-    assert "nur im Bündel" in ktext, \
-        f"Katalog-Zeile ohne Buendel-Angabe: {ktext[:200]}"
+    assert "nur im Bündel" in ktext, f"Katalog-Zeile ohne Buendel-Angabe: {ktext[:200]}"
     assert "€/Monat" in ktext, "Buendel-Angabe ohne Monatspreis"
-    assert kzeile.select_one("a.gr-sprung") is None, \
+    assert kzeile.select_one("a.gr-sprung") is None, (
         "Graph-Sprung auf ein nicht waehlbares Modell (toter Deep-Link)"
+    )
     assert "noch keine Zeitreihe" in ktext
 
     # Die Radar-Zeile: der Katalog-Sprung trifft jetzt (bis P5 stand hier
     # die benannte Luecke 'nicht im Katalog'), der Graph-Sprung bleibt
     # draussen.
-    zeile = next(z for z in s.select("#wr-abweichung tr.gr-a-zeile")
-                 if "iPhone 16 Pro Max" in _text(z.select_one("td")))
+    zeile = next(
+        z
+        for z in s.select("#wr-abweichung tr.gr-a-zeile")
+        if "iPhone 16 Pro Max" in _text(z.select_one("td"))
+    )
     assert zeile is not None, "Radar-Zeile des Modells fehlt"
     sprung = zeile.select_one("a.gr-ksprung")
-    assert sprung is not None and sprung.get("data-modell") == ziel, \
+    assert sprung is not None and sprung.get("data-modell") == ziel, (
         "Katalog-Sprung fehlt auf ein Modell MIT Katalog-Zeile"
-    assert zeile.select_one("a.gr-sprung") is None, \
+    )
+    assert zeile.select_one("a.gr-sprung") is None, (
         "Graph-Sprung auf ein nicht waehlbares Modell (toter Deep-Link)"
-    kleins = [" ".join(sp.get_text(" ", strip=True).split())
-              for sp in zeile.select("span.gr-a-klein")]
-    assert "nicht im Katalog" not in kleins, \
+    )
+    kleins = [
+        " ".join(sp.get_text(" ", strip=True).split())
+        for sp in zeile.select("span.gr-a-klein")
+    ]
+    assert "nicht im Katalog" not in kleins, (
         "die alte Luecke steht neben einer existierenden Katalog-Zeile"
+    )
     assert "noch keine Zeitreihe" in kleins
 
 
 # --------------------------------------------------------------------------
 # 3. Katalog -> Zeitreihe: der Link steht nur, wo der Sprung trifft
 # --------------------------------------------------------------------------
+
 
 def test_katalog_graph_sprung_trifft_die_wahlmenge(tmp_path):
     """Der Graph-Link am Katalog-Modellnamen zeigt auf `daten.erlaubt`
@@ -234,10 +274,10 @@ def test_katalog_graph_sprung_trifft_die_wahlmenge(tmp_path):
     erlaubt = _erlaubt(s)
     links = s.select("#gr-katalogtabelle a.gr-sprung[data-modell]")
     assert links, "kein Graph-Sprung im Katalog - der Test prueft nichts"
-    fehlende = [a.get("data-modell") for a in links
-                if a.get("data-modell") not in erlaubt]
-    assert not fehlende, \
-        f"Graph-Sprung ausserhalb der Wahlmenge: {fehlende}"
+    fehlende = [
+        a.get("data-modell") for a in links if a.get("data-modell") not in erlaubt
+    ]
+    assert not fehlende, f"Graph-Sprung ausserhalb der Wahlmenge: {fehlende}"
 
 
 def test_modell_ohne_buendel_hat_keinen_graph_sprung(tmp_path):
@@ -246,10 +286,12 @@ def test_modell_ohne_buendel_hat_keinen_graph_sprung(tmp_path):
     nennt den Grund („kein Bündel gemessen"), der Link schweigt."""
     s = _seite(tmp_path)
     zeile = s.select_one(
-        '#gr-katalogtabelle tr.gr-k-zeile[data-modell="google-pixel-11-128"]')
+        '#gr-katalogtabelle tr.gr-k-zeile[data-modell="google-pixel-11-128"]'
+    )
     assert zeile is not None, "Fixture-Voraussetzung: Pixel-11-Zeile fehlt"
-    assert zeile.select_one("a.gr-sprung") is None, \
+    assert zeile.select_one("a.gr-sprung") is None, (
         "Graph-Sprung auf ein Modell ohne Zeitreihe"
+    )
 
 
 def test_zr_feld_ohne_erlaubnis_bleibt_false(tmp_path):
@@ -260,27 +302,28 @@ def test_zr_feld_ohne_erlaubnis_bleibt_false(tmp_path):
     from telco_radar.report.geraete_view import katalog_modellzeilen
 
     root, _ = _baue_zeitreihe(tmp_path)
-    roh = json.loads((root / "data" / "state" / "geraete_db.json")
-                     .read_text(encoding="utf-8"))
+    roh = json.loads(
+        (root / "data" / "state" / "geraete_db.json").read_text(encoding="utf-8")
+    )
     eintraege = roh["listungen"]
     katalog = lade_katalog(root)
 
     ohne = katalog_modellzeilen(eintraege, katalog)
-    assert ohne and not any(m["zr"] for m in ohne), \
+    assert ohne and not any(m["zr"] for m in ohne), (
         "zr=True ohne zr_erlaubt - der Link stünde blind"
+    )
 
     schluessel = {m["schluessel"] for m in ohne}
     teil = schluessel - {"google-pixel-11-128"}
-    mit = katalog_modellzeilen(eintraege, katalog, zr_erlaubt=
-                               {k: ["xs"] for k in teil})
+    mit = katalog_modellzeilen(eintraege, katalog, zr_erlaubt={k: ["xs"] for k in teil})
     wahr = {m["schluessel"] for m in mit if m["zr"]}
-    assert wahr == teil, \
-        f"zr trifft nicht die uebergebene Menge: {wahr} != {teil}"
+    assert wahr == teil, f"zr trifft nicht die uebergebene Menge: {wahr} != {teil}"
 
 
 # --------------------------------------------------------------------------
 # 3b. Radar -> Zeitreihe: P4-Fix (Sicht-Pruefung 18.09.) - fail closed
 # --------------------------------------------------------------------------
+
 
 def test_radar_graph_sprung_ohne_zeitreihe_nennt_die_luecke(tmp_path):
     """Der Live-Befund der P4-Sichtpruefung: die Radar-Tabelle verlinkte
@@ -322,18 +365,20 @@ def test_radar_graph_sprung_ohne_zeitreihe_nennt_die_luecke(tmp_path):
     tote = [m for m in links if m not in erlaubt]
     assert not tote, f"Graph-Sprung ausserhalb der Wahlmenge: {tote}"
     # 2) Das nicht waehlbare iPhone 18 steht als BENANNTE Luecke da.
-    assert luecken, "keine Zeile mit 'noch keine Zeitreihe' - " \
-                    "die Fixture deckt den Fall nicht"
-    achtzehn = [z for z in luecken
-                if "iPhone 18" in _text(z.select_one("td"))]
+    assert luecken, (
+        "keine Zeile mit 'noch keine Zeitreihe' - die Fixture deckt den Fall nicht"
+    )
+    achtzehn = [z for z in luecken if "iPhone 18" in _text(z.select_one("td"))]
     assert achtzehn, "das Auto-iPhone-18 der Fixture hat keine Luecken-Zeile"
-    assert not any(z.select_one("a.gr-sprung") for z in luecken), \
+    assert not any(z.select_one("a.gr-sprung") for z in luecken), (
         "Luecken-Zeile mit Link - der dritte Zustand ist zurueck"
+    )
     # 3) Gegenprobe am SELBEN Bestand: das waehlbare iPhone 17 Pro
     # traegt den Link (die Luecke ist eine Aussage ueber das Modell,
     # nicht ein Rueckbau der ganzen Spalte).
-    assert any(m and "iphone-17-pro" in m for m in links), \
+    assert any(m and "iphone-17-pro" in m for m in links), (
         "waehlbares Modell ohne Graph-Sprung"
+    )
 
 
 if __name__ == "__main__":

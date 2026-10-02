@@ -58,6 +58,7 @@ Namen aus dem Hash der Quell-URL. Damit ist der Abruf ueber Laeufe hinweg
 zwischengespeichert, und `raeume_auf()` entfernt, was kein Angebot mehr
 braucht.
 """
+
 from __future__ import annotations
 
 import logging
@@ -90,10 +91,41 @@ _WORT_RE = re.compile(r"[A-Za-zÄÖÜäöüß0-9]{3,}")
 # Bewusst kurz gehalten: die Haeufigkeitsgewichtung unten entwertet haeufige
 # Woerter ohnehin: diese Liste faengt nur die ab, die auf EINER Seite selten
 # und trotzdem bedeutungslos sind.
-_STOPP = {"und", "der", "die", "das", "mit", "fuer", "für", "von", "den",
-          "dem", "ein", "eine", "einen", "bei", "auf", "aus", "zum", "zur",
-          "des", "ist", "sind", "wird", "werden", "sich", "auch", "nur",
-          "alle", "allen", "mehr", "jetzt", "neu", "neue", "neuen"}
+_STOPP = {
+    "und",
+    "der",
+    "die",
+    "das",
+    "mit",
+    "fuer",
+    "für",
+    "von",
+    "den",
+    "dem",
+    "ein",
+    "eine",
+    "einen",
+    "bei",
+    "auf",
+    "aus",
+    "zum",
+    "zur",
+    "des",
+    "ist",
+    "sind",
+    "wird",
+    "werden",
+    "sich",
+    "auch",
+    "nur",
+    "alle",
+    "allen",
+    "mehr",
+    "jetzt",
+    "neu",
+    "neue",
+    "neuen",
+}
 # Ab welchem Gewicht eine Textuebereinstimmung als Beleg gilt. Ein einzelnes
 # Wort, das auf der Seite nur einmal vorkommt, ergibt 1.0; zwei Woerter, die
 # je viermal vorkommen, ergeben 0.5. Die Schwelle verlangt also entweder ein
@@ -117,7 +149,9 @@ _MOTIV_MIND_BREITE = 700
 # fassen, und der ist bei Siegeln zuverlaessig gesetzt - er ist ihr Zweck.
 _SIEGEL_RE = re.compile(
     r"(siegel|testsieg|auszeichnung|ausgezeichnet|bewertung|tüv|tuev|"
-    r"note\s+sehr\s+gut|leserwahl|award)", re.I)
+    r"note\s+sehr\s+gut|leserwahl|award)",
+    re.I,
+)
 # Pflichtgrafiken. Sie sind gross, scharf, hochformatig und stehen bei jedem
 # Geraeteangebot - der Bildholer nimmt sie deshalb bereitwillig, und auf der
 # Uebersicht stand am 16.08.2026 das EU-Energielabel eines Galaxy S26 als
@@ -126,7 +160,9 @@ _SIEGEL_RE = re.compile(
 # sondern im Pfad: kein Haendler nennt diese Datei anders.
 _KEIN_MOTIV_RE = re.compile(
     r"(energielabel|energy[-_]?label|energieeffizienz|eprel|"
-    r"produktdatenblatt|datenblatt)", re.I)
+    r"produktdatenblatt|datenblatt)",
+    re.I,
+)
 
 
 def bildordner(root: Path) -> Path:
@@ -150,8 +186,9 @@ def _pfad_signatur(url: str) -> tuple[str, str]:
     return (teile.netloc.lower(), (teile.path or "/").rstrip("/").lower())
 
 
-def rangfolge(angebot: dict, kandidaten: list[dict],
-              haeufigkeit: dict[str, int] | None = None) -> list[tuple[float, dict]]:
+def rangfolge(
+    angebot: dict, kandidaten: list[dict], haeufigkeit: dict[str, int] | None = None
+) -> list[tuple[float, dict]]:
     """Die Bildkandidaten fuer EIN Angebot, bestes zuerst: [(guete, kand)].
 
     `guete` ist 3.x fuer einen Ankertreffer, 2.x fuer einen Pfadtreffer und
@@ -203,9 +240,13 @@ def _haeufigkeiten(kandidaten: list[dict]) -> dict[str, int]:
     return {w: (n if n <= deckel else 10_000) for w, n in zaehler.items()}
 
 
-def _seitenmotive(angebote: list[dict], kandidaten: list[dict],
-                  vergeben: set[str], ergebnis: dict[str, dict],
-                  leitseite: str) -> None:
+def _seitenmotive(
+    angebote: list[dict],
+    kandidaten: list[dict],
+    vergeben: set[str],
+    ergebnis: dict[str, dict],
+    leitseite: str,
+) -> None:
     """Stufe 4: das Buehnenbild JE AKTIONSSEITE an das staerkste noch
     unbebilderte Angebot DIESER Seite.
 
@@ -239,21 +280,25 @@ def _seitenmotive(angebote: list[dict], kandidaten: list[dict],
 
     def _taugt_als_motiv(k: dict) -> bool:
         breite = k.get("hint_w") or 0
-        return ((k.get("src") or "") not in vergeben
-                and (breite == 0 or breite >= _MOTIV_MIND_BREITE)
-                and not _SIEGEL_RE.search(k.get("context") or ""))
+        return (
+            (k.get("src") or "") not in vergeben
+            and (breite == 0 or breite >= _MOTIV_MIND_BREITE)
+            and not _SIEGEL_RE.search(k.get("context") or "")
+        )
 
     for seite, seiten_kandidaten in nach_seite.items():
         # Kein `page` an den Kandidaten (Bestand, Tests): dann ist "die
         # Seite" die Marke, und es bleibt bei einem Motiv - genau das
         # Verhalten von vor dem 08.08.2026.
         if seite:
-            passend = [a for a in angebote
-                       if (a.get("source_url") or leitseite) == seite]
+            passend = [
+                a for a in angebote if (a.get("source_url") or leitseite) == seite
+            ]
         else:
             passend = list(angebote)
-        ziel = next((a for a in passend
-                     if a.get("id") and not ergebnis.get(a["id"])), None)
+        ziel = next(
+            (a for a in passend if a.get("id") and not ergebnis.get(a["id"])), None
+        )
         if ziel is None:
             continue
         # Dokumentreihenfolge, nicht Groesse: das Buehnenbild steht oben auf
@@ -267,8 +312,9 @@ def _seitenmotive(angebote: list[dict], kandidaten: list[dict],
         vergeben.update(motive[:3])
 
 
-def zuordnen(angebote: list[dict], kandidaten: list[dict],
-             leitseite: str = "") -> dict[str, dict]:
+def zuordnen(
+    angebote: list[dict], kandidaten: list[dict], leitseite: str = ""
+) -> dict[str, dict]:
     """Ordnet den Angeboten EINER Marke ihre Bildkandidaten zu.
 
     Gibt {angebots-id: {"quellen": [url, ...], "art": "angebot"|"motiv"}}
@@ -302,9 +348,11 @@ def zuordnen(angebote: list[dict], kandidaten: list[dict],
     # Markenlogo, das auf jeder Seite ganz oben steht, den Kandidatenplatz
     # des Buehnenbilds (gemessen bei ALDI TALK - `aldilogo.png` stand vor
     # dem Back2School-Motiv und gewann Stufe 4).
-    kandidaten = [k for k in kandidaten
-                  if _taugt(k.get("src") or "")
-                  and not _KEIN_MOTIV_RE.search(k.get("src") or "")]
+    kandidaten = [
+        k
+        for k in kandidaten
+        if _taugt(k.get("src") or "") and not _KEIN_MOTIV_RE.search(k.get("src") or "")
+    ]
     if not kandidaten:
         return {}
     haeufigkeit = _haeufigkeiten(kandidaten)
@@ -340,8 +388,9 @@ def zuordnen(angebote: list[dict], kandidaten: list[dict],
     return ergebnis
 
 
-def hole_bilder(zuordnung: dict[str, dict], eintraege: dict[str, dict],
-                root: Path) -> Counter:
+def hole_bilder(
+    zuordnung: dict[str, dict], eintraege: dict[str, dict], root: Path
+) -> Counter:
     """Holt die zugeordneten Bilder und stempelt sie in die Eintraege.
 
     Setzt je Eintrag `image` (Dateiname im Bildordner), `image_w`,
@@ -356,8 +405,9 @@ def hole_bilder(zuordnung: dict[str, dict], eintraege: dict[str, dict],
     bilanz: Counter = Counter()
     if not zuordnung:
         return bilanz
-    with httpx.Client(headers={"User-Agent": _UA}, timeout=12.0,
-                      follow_redirects=True) as client:
+    with httpx.Client(
+        headers={"User-Agent": _UA}, timeout=12.0, follow_redirects=True
+    ) as client:
         for eid, wahl in zuordnung.items():
             eintrag = eintraege.get(eid)
             if eintrag is None:
@@ -367,19 +417,21 @@ def hole_bilder(zuordnung: dict[str, dict], eintraege: dict[str, dict],
             bilanz["geprueft"] += 1
             # Unveraendert und schon da: nichts tun. Der Abruf ist der teure
             # Teil, und eine Aktionsseite wechselt ihr Motiv selten.
-            if (eintrag.get("image_src") in quellen
-                    and eintrag.get("image")
-                    and (ordner / eintrag["image"]).exists()):
+            if (
+                eintrag.get("image_src") in quellen
+                and eintrag.get("image")
+                and (ordner / eintrag["image"]).exists()
+            ):
                 eintrag["image_kind"] = art
                 bilanz["unveraendert"] += 1
                 continue
-            for feld in ("image", "image_w", "image_h", "image_src",
-                         "image_kind"):
+            for feld in ("image", "image_w", "image_h", "image_src", "image_kind"):
                 eintrag.pop(feld, None)
             for quelle in quellen:
                 try:
-                    treffer = lade_und_lege_ab(quelle, ordner, BREITE, client,
-                                               mind_breite=MIND_BREITE)
+                    treffer = lade_und_lege_ab(
+                        quelle, ordner, BREITE, client, mind_breite=MIND_BREITE
+                    )
                 except Exception as exc:  # noqa: BLE001 - ein Bild kippt keinen Lauf
                     log.debug("Promo-Bild %s: %s", quelle, exc)
                     treffer = None
@@ -418,6 +470,7 @@ def raeume_auf(root: Path, eintraege: list[dict]) -> int:
             except OSError:
                 pass
     if geloescht:
-        log.info("Promo-Bilder aufgeraeumt: %d nicht mehr referenzierte geloescht",
-                 geloescht)
+        log.info(
+            "Promo-Bilder aufgeraeumt: %d nicht mehr referenzierte geloescht", geloescht
+        )
     return geloescht

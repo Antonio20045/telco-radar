@@ -19,6 +19,7 @@ Zweite Regel: **ein Grenzfall wird verworfen, nicht geraten.** Lieber kein
 roter Link als einer an einem englischen Artikel - eine Funktion, die
 sichtbar danebenliegt, ist schlimmer als eine, die seltener erscheint.
 """
+
 from __future__ import annotations
 
 import logging
@@ -58,20 +59,46 @@ MINDESTSICHERHEIT = 0.90
 # uebersetzt wird, gehoert trotzdem hier hinein: die Namen werden auch fuer
 # die reine ANZEIGE der erkannten Sprache gebraucht.
 SPRACHNAMEN = {
-    "ar": "Arabisch", "bg": "Bulgarisch", "cs": "Tschechisch",
-    "da": "Dänisch", "de": "Deutsch", "el": "Griechisch", "en": "Englisch",
+    "ar": "Arabisch",
+    "bg": "Bulgarisch",
+    "cs": "Tschechisch",
+    "da": "Dänisch",
+    "de": "Deutsch",
+    "el": "Griechisch",
+    "en": "Englisch",
     "es": "Spanisch",
-    "et": "Estnisch", "fa": "Persisch", "fi": "Finnisch",
-    "fr": "Französisch", "he": "Hebräisch", "hi": "Hindi",
-    "hr": "Kroatisch", "hu": "Ungarisch", "id": "Indonesisch",
-    "it": "Italienisch", "ja": "Japanisch", "ko": "Koreanisch",
-    "lt": "Litauisch", "lv": "Lettisch", "ms": "Malaiisch",
-    "nb": "Norwegisch", "nl": "Niederländisch", "nn": "Norwegisch",
-    "no": "Norwegisch", "pl": "Polnisch", "pt": "Portugiesisch",
-    "ro": "Rumänisch", "ru": "Russisch", "sk": "Slowakisch",
-    "sl": "Slowenisch", "sr": "Serbisch", "sv": "Schwedisch",
-    "th": "Thai", "tr": "Türkisch", "uk": "Ukrainisch",
-    "vi": "Vietnamesisch", "zh": "Chinesisch",
+    "et": "Estnisch",
+    "fa": "Persisch",
+    "fi": "Finnisch",
+    "fr": "Französisch",
+    "he": "Hebräisch",
+    "hi": "Hindi",
+    "hr": "Kroatisch",
+    "hu": "Ungarisch",
+    "id": "Indonesisch",
+    "it": "Italienisch",
+    "ja": "Japanisch",
+    "ko": "Koreanisch",
+    "lt": "Litauisch",
+    "lv": "Lettisch",
+    "ms": "Malaiisch",
+    "nb": "Norwegisch",
+    "nl": "Niederländisch",
+    "nn": "Norwegisch",
+    "no": "Norwegisch",
+    "pl": "Polnisch",
+    "pt": "Portugiesisch",
+    "ro": "Rumänisch",
+    "ru": "Russisch",
+    "sk": "Slowakisch",
+    "sl": "Slowenisch",
+    "sr": "Serbisch",
+    "sv": "Schwedisch",
+    "th": "Thai",
+    "tr": "Türkisch",
+    "uk": "Ukrainisch",
+    "vi": "Vietnamesisch",
+    "zh": "Chinesisch",
 }
 
 _MEHRFACH_LEER = re.compile(r"\s+")
@@ -116,8 +143,8 @@ def _langid():
     _ERKENNER_GEPRUEFT = True
     try:
         from py3langid.langid import LanguageIdentifier, MODEL_FILE
-        _ERKENNER = LanguageIdentifier.from_pickled_model(
-            MODEL_FILE, norm_probs=True)
+
+        _ERKENNER = LanguageIdentifier.from_pickled_model(MODEL_FILE, norm_probs=True)
     except Exception:  # noqa: BLE001 - fehlende Bibliothek ODER Modelldatei
         _ERKENNER = None
     return _ERKENNER
@@ -135,8 +162,10 @@ def erkenne_sprache(text: str, titel: str = "") -> tuple[str, float]:
         return "", 0.0
     erkenner = _langid()
     if erkenner is None:
-        log.warning("py3langid ist nicht verfuegbar - die Spracherkennung "
-                    "enthaelt sich, es wird nichts uebersetzt.")
+        log.warning(
+            "py3langid ist nicht verfuegbar - die Spracherkennung "
+            "enthaelt sich, es wird nichts uebersetzt."
+        )
         return "", 0.0
     probe = f"{titel.strip()}. {text}" if titel.strip() else text
     try:

@@ -8,6 +8,7 @@ hier gemessen - zusammen mit den beiden Faellen, die im Betrieb wirklich
 vorkommen: ein einzelner Bereich faellt aus, und die Chefredaktion liefert
 eine unbrauchbare Gliederung.
 """
+
 from __future__ import annotations
 
 import json
@@ -16,23 +17,34 @@ import pytest
 
 from telco_radar.analyze import editor
 from telco_radar.analyze.editor import (
-    EditorialBriefingError, synthesize_zweistufig, validate_editorial_briefing)
+    EditorialBriefingError,
+    synthesize_zweistufig,
+    validate_editorial_briefing,
+)
 from telco_radar.pipeline import _redaktion_zweistufig
 
 
 def _highlight(titel: str, betreiber: str, relevanz: int = 4) -> dict:
-    return {"title": titel, "operator": betreiber,
-            "url": f"https://beispiel.de/{titel.lower().replace(' ', '-')}",
-            "category": "Produktlaunch", "relevance": relevanz,
-            "summary": f"{betreiber} hat {titel} angekuendigt.",
-            "why_it_matters": "Vorlage fuer ein eigenes Angebot."}
+    return {
+        "title": titel,
+        "operator": betreiber,
+        "url": f"https://beispiel.de/{titel.lower().replace(' ', '-')}",
+        "category": "Produktlaunch",
+        "relevance": relevanz,
+        "summary": f"{betreiber} hat {titel} angekuendigt.",
+        "why_it_matters": "Vorlage fuer ein eigenes Angebot.",
+    }
 
 
 def _regional(bereiche: dict[str, int]) -> dict[str, dict]:
     return {
-        name: {"region_summary": f"Zusammenfassung {name}.",
-               "highlights": [_highlight(f"Meldung {name} {i}", f"Betreiber {i}")
-                              for i in range(anzahl)]}
+        name: {
+            "region_summary": f"Zusammenfassung {name}.",
+            "highlights": [
+                _highlight(f"Meldung {name} {i}", f"Betreiber {i}")
+                for i in range(anzahl)
+            ],
+        }
         for name, anzahl in bereiche.items()
     }
 
@@ -50,6 +62,7 @@ In {bereich} ging es diese Woche um Tarife. Betreiber 0 hat nachgelegt.
 ["Betreiber 0: Tarif in {bereich}"]
 """
 
+
 def _bereichsantwort(user: str) -> str:
     """Antwortet mit der Ueberschriftsebene, die der Auftrag verlangt -
     Themenfelder als H3, Regionen als H2. Ein Fake, der das ignoriert, wuerde
@@ -57,7 +70,8 @@ def _bereichsantwort(user: str) -> str:
     auftrag = json.loads(user)
     return BEREICHSANTWORT.format(
         bereich=auftrag["bereich"],
-        ueberschrift="###" if auftrag["ist_themenfeld"] else "##")
+        ueberschrift="###" if auftrag["ist_themenfeld"] else "##",
+    )
 
 
 CHEFANTWORT = """\
@@ -88,8 +102,9 @@ def antworten(monkeypatch):
     aufrufe: list[dict] = []
 
     def _complete(system, user, model, max_tokens=None, **kw):
-        aufrufe.append({"system": system, "user": user, "model": model,
-                        "max_tokens": max_tokens})
+        aufrufe.append(
+            {"system": system, "user": user, "model": model, "max_tokens": max_tokens}
+        )
         if "You are the chief editor" in system:
             return CHEFANTWORT
         return _bereichsantwort(user)
@@ -121,7 +136,11 @@ def test_chefeingabe_waechst_mit_bereichen_nicht_mit_meldungen(antworten):
     def chefeingabe(regional):
         antworten.clear()
         synthesize_zweistufig(regional, [], model="m")
-        return len([a for a in antworten if "You are the chief editor" in a["system"]][0]["user"])
+        return len(
+            [a for a in antworten if "You are the chief editor" in a["system"]][0][
+                "user"
+            ]
+        )
 
     klein = chefeingabe(_regional({"Europa": 5}))
     viel_mehr_meldungen = chefeingabe(_regional({"Europa": 60}))
@@ -136,8 +155,11 @@ def test_chefeingabe_waechst_mit_bereichen_nicht_mit_meldungen(antworten):
 def test_bereichsredakteur_bekommt_nur_seinen_bereich(antworten):
     regional = _regional({"Europa": 2, "Asien": 2})
     synthesize_zweistufig(regional, [], model="m")
-    europa = [a for a in antworten
-              if "You are the chief editor" not in a["system"] and "Europa" in a["system"]][0]
+    europa = [
+        a
+        for a in antworten
+        if "You are the chief editor" not in a["system"] and "Europa" in a["system"]
+    ][0]
     assert "Meldung Asien" not in europa["user"]
 
 
@@ -145,8 +167,12 @@ def test_bericht_haelt_die_pflichtgliederung_ein(antworten):
     regional = _regional({"Europa": 2, "Asien": 1})
     markdown, _ = synthesize_zweistufig(regional, [], model="m")
     validate_editorial_briefing(markdown)  # wirft sonst
-    for pflicht in ("## Auf einen Blick", "## Das Wichtigste",
-                    "## Die wichtigsten Signale", "## Muster der Woche"):
+    for pflicht in (
+        "## Auf einen Blick",
+        "## Das Wichtigste",
+        "## Die wichtigsten Signale",
+        "## Muster der Woche",
+    ):
         assert pflicht in markdown
 
 
@@ -154,23 +180,28 @@ def test_bereichsabschnitte_stehen_vor_den_mustern(antworten):
     """Sonst endet der Bericht mit seinem Fazit, bevor die Belege kommen."""
     regional = _regional({"Europa": 2, "Asien": 1})
     markdown, _ = synthesize_zweistufig(regional, [], model="m")
-    assert (markdown.index("## Die wichtigsten Signale")
-            < markdown.index("## Europa")
-            < markdown.index("## Muster der Woche"))
+    assert (
+        markdown.index("## Die wichtigsten Signale")
+        < markdown.index("## Europa")
+        < markdown.index("## Muster der Woche")
+    )
 
 
 def test_themenfelder_stehen_gemeinsam_unter_einer_ueberschrift(antworten):
     regional = _regional({"Europa": 2, "KI & Modelle": 2, "Chips & Modems": 1})
     markdown, _ = synthesize_zweistufig(
-        regional, [], model="m", themenbereiche=["KI & Modelle", "Chips & Modems"])
+        regional, [], model="m", themenbereiche=["KI & Modelle", "Chips & Modems"]
+    )
 
     assert "## Technologie, Geräte & Regulierung" in markdown
     # Themenfelder als H3 darunter, Regionen als H2 darueber
     assert "### KI & Modelle" in markdown
     assert "## Europa" in markdown
-    assert (markdown.index("## Europa")
-            < markdown.index("## Technologie, Geräte & Regulierung")
-            < markdown.index("### KI & Modelle"))
+    assert (
+        markdown.index("## Europa")
+        < markdown.index("## Technologie, Geräte & Regulierung")
+        < markdown.index("### KI & Modelle")
+    )
 
 
 def test_ohne_themenfelder_keine_themenueberschrift(antworten):
@@ -182,6 +213,7 @@ def test_ausgefallener_bereich_kommt_trotzdem_in_den_bericht(monkeypatch):
     """Ein gescheiterter Aufruf darf keinen ganzen Bereich verschwinden lassen:
     die Meldungen sind bewertet, und der Seen-Store merkt sie sich als
     erledigt - sie kaemen nie wieder."""
+
     def _complete(system, user, model, max_tokens=None, **kw):
         if "You are the chief editor" in system:
             return CHEFANTWORT
@@ -191,7 +223,8 @@ def test_ausgefallener_bereich_kommt_trotzdem_in_den_bericht(monkeypatch):
 
     monkeypatch.setattr(editor, "complete", _complete)
     markdown, topics = synthesize_zweistufig(
-        _regional({"Europa": 2, "Asien": 2}), [], model="m")
+        _regional({"Europa": 2, "Asien": 2}), [], model="m"
+    )
 
     assert "## Asien" in markdown
     assert "nicht redaktionell verdichtet" in markdown
@@ -233,6 +266,7 @@ def test_scheiternde_chefredaktion_wirft(monkeypatch):
     """Dann greift der Notfall-Digest der Pipeline - ein halb fertiger
     Wochenbericht ohne Ueberblicksteil waere schlechter als ein klar
     gekennzeichneter Rohbericht."""
+
     def _complete(system, user, model, max_tokens=None, **kw):
         if "You are the chief editor" in system:
             return "## Irgendwas\nKeine Gliederung."
@@ -245,7 +279,8 @@ def test_scheiternde_chefredaktion_wirft(monkeypatch):
 
 def test_topics_aus_beiden_stufen_ohne_dubletten(antworten):
     _, topics = synthesize_zweistufig(
-        _regional({"Europa": 2, "Asien": 1}), [], model="m")
+        _regional({"Europa": 2, "Asien": 1}), [], model="m"
+    )
     assert len(topics) == len(set(topics))
     assert any("Europa" in t for t in topics)
 
@@ -265,13 +300,17 @@ def test_ohne_bewertete_meldungen_wird_geworfen(antworten):
 
 # ------------------------------------------------------------ Modus-Schalter
 
-@pytest.mark.parametrize("settings,bewertete,erwartet", [
-    ({}, 36, False),                                    # heutiger Lauf
-    ({}, 650, True),                                    # 1000-Quellen-Lauf
-    ({"editor_zweistufig_ab_meldungen": 10}, 10, True),  # Schwelle inklusive
-    ({"editor_modus": "zweistufig"}, 1, True),
-    ({"editor_modus": "einstufig"}, 5000, False),
-    ({"editor_modus": "quatsch"}, 36, False),           # faellt auf auto zurueck
-])
+
+@pytest.mark.parametrize(
+    "settings,bewertete,erwartet",
+    [
+        ({}, 36, False),  # heutiger Lauf
+        ({}, 650, True),  # 1000-Quellen-Lauf
+        ({"editor_zweistufig_ab_meldungen": 10}, 10, True),  # Schwelle inklusive
+        ({"editor_modus": "zweistufig"}, 1, True),
+        ({"editor_modus": "einstufig"}, 5000, False),
+        ({"editor_modus": "quatsch"}, 36, False),  # faellt auf auto zurueck
+    ],
+)
 def test_moduswahl(settings, bewertete, erwartet):
     assert _redaktion_zweistufig(settings, bewertete) is erwartet

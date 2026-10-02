@@ -17,17 +17,25 @@ bleibt verworfen: Ausloeser ist allein das strukturierte Namensfeld
 (`strukturierter_name`), das nur Telekom `name`, o2 `description` und
 Vodafone `modelName` setzen.
 """
+
 import json
 from datetime import datetime, timezone
 from pathlib import Path
 
 from telco_radar.collect.geraete import (
-    autoerkennung, o2, sammle_anbieter, telekom, vodafone,
+    autoerkennung,
+    o2,
+    sammle_anbieter,
+    telekom,
+    vodafone,
 )
 from telco_radar.collect.geraete.robots import RobotsWaechter
 from telco_radar.geraete_config import Anbieter, Einstieg
 from telco_radar.geraete_model import (
-    Geraet, Katalog, device_id, erkenne_geraet,
+    Geraet,
+    Katalog,
+    device_id,
+    erkenne_geraet,
 )
 
 _TELEKOM_URL = "https://www.telekom.de/shop/geraete/smartphones/ohne-vertrag"
@@ -36,25 +44,33 @@ _FIX = Path(__file__).parent / "fixtures" / "geraete"
 
 
 def _eintrags(name, slug, rate, gesamt, gid):
-    return {"id": gid, "name": name, "variantSlug": slug,
-            "availabilityStatus": "IN_STOCK",
-            "price": {"upfrontPrice": 0,
-                      "installments": [{"numberOfInstallments": 36,
-                                        "recurringPrice": rate,
-                                        "totalPrice": gesamt}]}}
+    return {
+        "id": gid,
+        "name": name,
+        "variantSlug": slug,
+        "availabilityStatus": "IN_STOCK",
+        "price": {
+            "upfrontPrice": 0,
+            "installments": [
+                {
+                    "numberOfInstallments": 36,
+                    "recurringPrice": rate,
+                    "totalPrice": gesamt,
+                }
+            ],
+        },
+    }
 
 
 def _telekom_html(*eintraege):
     daten = {"productList": {"data": list(eintraege)}}
-    return ('<script>window.__INITIAL_STATE__ = '
-            + json.dumps(daten) + ';</script>')
+    return "<script>window.__INITIAL_STATE__ = " + json.dumps(daten) + ";</script>"
 
 
 # Der 15.09.-Beleg: das iPhone-Duo, das der Katalog noch nicht kannte.
 _BELEG_HTML = _telekom_html(
     _eintrags("iPhone 18 Pro", "polar-256-gb", 40.0, 1440.0, "hw-18-pro"),
-    _eintrags("iPhone 18 Pro Max", "schwarz-512-gb", 45.0, 1620.0,
-              "hw-18-pro-max"),
+    _eintrags("iPhone 18 Pro Max", "schwarz-512-gb", 45.0, 1620.0, "hw-18-pro-max"),
 )
 
 
@@ -66,22 +82,32 @@ def _mini_katalog() -> Katalog:
     kein „Apple" im name-Feld der 15.09.-Antwort) trotzdem eindeutig
     Apple zuordnet.
     """
-    return Katalog(geraete=[
-        Geraet(hersteller="Apple", modell="iPhone 17",
-               marktstart="2025-09-19", generation=17, speicher=[128, 256]),
-        Geraet(hersteller="Apple", modell="iPhone 16", generation=16),
-        # Ein Xiaomi-Modell, damit „Xiaomi" als Hersteller-Praefix bekannt
-        # ist (die Schaellung kennt nur Katalog-Hersteller - nichts geraten).
-        Geraet(hersteller="Xiaomi", modell="Redmi Note 17", generation=17),
-    ])
+    return Katalog(
+        geraete=[
+            Geraet(
+                hersteller="Apple",
+                modell="iPhone 17",
+                marktstart="2025-09-19",
+                generation=17,
+                speicher=[128, 256],
+            ),
+            Geraet(hersteller="Apple", modell="iPhone 16", generation=16),
+            # Ein Xiaomi-Modell, damit „Xiaomi" als Hersteller-Praefix bekannt
+            # ist (die Schaellung kennt nur Katalog-Hersteller - nichts geraten).
+            Geraet(hersteller="Xiaomi", modell="Redmi Note 17", generation=17),
+        ]
+    )
 
 
 def _anbieter() -> Anbieter:
-    return Anbieter(name="Telekom", typ="netzbetreiber",
-                    methode="telekom_kategorie",
-                    basis_url="https://www.telekom.de",
-                    einstiege=[Einstieg(url=_TELEKOM_URL, label="ohne Vertrag")],
-                    rate_limit_sekunden=0)
+    return Anbieter(
+        name="Telekom",
+        typ="netzbetreiber",
+        methode="telekom_kategorie",
+        basis_url="https://www.telekom.de",
+        einstiege=[Einstieg(url=_TELEKOM_URL, label="ohne Vertrag")],
+        rate_limit_sekunden=0,
+    )
 
 
 def _hole(html):
@@ -89,18 +115,26 @@ def _hole(html):
         if url.endswith("/robots.txt"):
             return (200, "User-agent: *\n")
         return (200, html)
+
     return hole
 
 
 def _sammle(html, katalog):
-    return sammle_anbieter(_anbieter(), katalog, {}, _hole(html), _HEUTE,
-                           RobotsWaechter(hole=_hole(html)),
-                           datetime(2026, 9, 15, 3, tzinfo=timezone.utc))
+    return sammle_anbieter(
+        _anbieter(),
+        katalog,
+        {},
+        _hole(html),
+        _HEUTE,
+        RobotsWaechter(hole=_hole(html)),
+        datetime(2026, 9, 15, 3, tzinfo=timezone.utc),
+    )
 
 
 # ==========================================================================
 # Der Beleg-Fall, Ende zu Ende (rot vor gruen bewiesen)
 # ==========================================================================
+
 
 def test_beleg_iphone_18_duo_wird_automatisch_angelegt():
     """Der 15.09.-Lauf, nachgebaut: statt Verwurf + Protokollzeile
@@ -115,8 +149,9 @@ def test_beleg_iphone_18_duo_wird_automatisch_angelegt():
     # unter „iPhone 18 Pro" verschmolzen - dieselbe Falle wie „Pixel 10
     # Pro Fold" gegen „Pixel 10 Pro").
     ids = sorted(l.device_id for l in bilanz.listungen)
-    erwartung = sorted([device_id("Apple", "iPhone 18 Pro"),
-                        device_id("Apple", "iPhone 18 Pro Max")])
+    erwartung = sorted(
+        [device_id("Apple", "iPhone 18 Pro"), device_id("Apple", "iPhone 18 Pro Max")]
+    )
     assert ids == erwartung
 
     eintrag = katalog.nach_id(device_id("Apple", "iPhone 18 Pro"))
@@ -131,8 +166,7 @@ def test_beleg_iphone_18_duo_wird_automatisch_angelegt():
     # generation NUR bei eindeutiger Serie: „iPhone" ist als Apple-Serie im
     # Katalog bekannt, die Zahl innerhalb der Serie ist 18.
     assert eintrag.generation == 18
-    assert katalog.nach_id(device_id("Apple", "iPhone 18 Pro Max")).auto \
-        == _HEUTE
+    assert katalog.nach_id(device_id("Apple", "iPhone 18 Pro Max")).auto == _HEUTE
 
 
 def test_beleg_titel_steht_nicht_mehr_in_der_arbeitsliste():
@@ -155,31 +189,39 @@ def test_beleg_listung_traegt_speicher_und_farbe():
     assert len(pro) == 1 and pro[0].farbe_roh == "polar"
     # Der Auto-Eintrag kennt die gemessene Stufe: sie ist der Filter, gegen
     # den ein spaeterer Titel ohne strukturiertes Speicherfeld gelesen wird.
-    assert katalog.nach_id(device_id("Apple", "iPhone 18 Pro")).speicher \
-        == [256]
+    assert katalog.nach_id(device_id("Apple", "iPhone 18 Pro")).speicher == [256]
 
 
 # ==========================================================================
 # Die Regeln der Anlage
 # ==========================================================================
 
+
 def test_hand_eintrag_schlaegt_auto():
     """Steht das Geraet als Hand-Eintrag im Katalog, wird KEIN zweiter
     angelegt - die Listung trifft den Hand-Eintrag, und der Katalog bleibt
     Hand-befaehrt (derselbe Lauf legt nur an, was niemand gepflegt hat)."""
     katalog = _mini_katalog()
-    hand = Geraet(hersteller="Apple", modell="iPhone 18 Pro",
-                  marktstart="2026-09-19", generation=18)
+    hand = Geraet(
+        hersteller="Apple",
+        modell="iPhone 18 Pro",
+        marktstart="2026-09-19",
+        generation=18,
+    )
     katalog.ergaenze(hand)
     # Nur das Pro-Geraet: der Pro Max steht weiterhin NICHT im Katalog und
     # wuerde die Aussage verwaessernn (er wird zu Recht auto-angelegt).
     html = _telekom_html(
-        _eintrags("iPhone 18 Pro", "polar-256-gb", 40.0, 1440.0, "hw-18-pro"))
+        _eintrags("iPhone 18 Pro", "polar-256-gb", 40.0, 1440.0, "hw-18-pro")
+    )
     bilanz = _sammle(html, katalog)
 
     assert [g for g in katalog.geraete if g.auto] == []
-    pro = [l for l in bilanz.listungen
-           if l.device_id == device_id("Apple", "iPhone 18 Pro")]
+    pro = [
+        l
+        for l in bilanz.listungen
+        if l.device_id == device_id("Apple", "iPhone 18 Pro")
+    ]
     assert len(pro) == 1
     assert hand.marktstart == "2026-09-19" and hand.auto == ""
 
@@ -189,8 +231,8 @@ def test_zubehoer_wird_nicht_angelegt():
     als Arbeitsliste (derselbe Schutz wie erkenne_geraet)."""
     katalog = _mini_katalog()
     html = _telekom_html(
-        _eintrags("Ladekabel fuer iPhone 18 Pro", "weiss-0-gb", 1.0, 36.0,
-                  "hw-kabel"))
+        _eintrags("Ladekabel fuer iPhone 18 Pro", "weiss-0-gb", 1.0, 36.0, "hw-kabel")
+    )
     bilanz = _sammle(html, katalog)
     assert bilanz.listungen == []
     assert any("Ladekabel" in t for t in bilanz.unbekannte_titel)
@@ -201,8 +243,7 @@ def test_unbekannter_hersteller_ohne_anker_wird_nicht_geraten():
     """Ein Name, dessen Hersteller weder als Praefex noch als Serie im
     Katalog bekannt ist, wird NICHT angelegt - geraten wird nichts."""
     katalog = _mini_katalog()
-    html = _telekom_html(
-        _eintrags("FooPhone X200", "grau-128-gb", 1.0, 36.0, "hw-foo"))
+    html = _telekom_html(_eintrags("FooPhone X200", "grau-128-gb", 1.0, 36.0, "hw-foo"))
     bilanz = _sammle(html, katalog)
     assert bilanz.listungen == []
     assert [g for g in katalog.geraete if g.auto] == []
@@ -214,8 +255,8 @@ def test_hersteller_pruefix_wird_geschaelt():
     Hand-Eintraege („iPhone 17", nicht „Apple iPhone 17")."""
     katalog = _mini_katalog()
     html = _telekom_html(
-        _eintrags("Apple iPhone 18 Air", "weiss-256-gb", 30.0, 1080.0,
-                  "hw-air"))
+        _eintrags("Apple iPhone 18 Air", "weiss-256-gb", 30.0, 1080.0, "hw-air")
+    )
     bilanz = _sammle(html, katalog)
     eintrag = katalog.nach_id(device_id("Apple", "iPhone 18 Air"))
     assert eintrag is not None and eintrag.auto == _HEUTE
@@ -230,8 +271,8 @@ def test_neue_serie_ohne_zahl_bekommt_keine_generation():
     bekannte Serie gibt es KEINE generation (nichts geraten)."""
     katalog = _mini_katalog()
     html = _telekom_html(
-        _eintrags("Xiaomi NeueReihe X1", "blau-128-gb", 10.0, 360.0,
-                  "hw-x1"))
+        _eintrags("Xiaomi NeueReihe X1", "blau-128-gb", 10.0, 360.0, "hw-x1")
+    )
     _sammle(html, katalog)
     eintrag = katalog.nach_id(device_id("Xiaomi", "NeueReihe X1"))
     assert eintrag is not None
@@ -244,28 +285,44 @@ def test_wortmarken_kollision_verhindert_die_anlage():
     unterscheidbar sind, legen NICHT an (derselbe Schutz, der den Hand-
     Katalog wirft) - der Titel geht in die Arbeitsliste."""
     katalog = _mini_katalog()
-    assert autoerkennung.lege_an("iPhone 18 Pro", katalog, _HEUTE, speicher_gb=256) is not None
+    assert (
+        autoerkennung.lege_an("iPhone 18 Pro", katalog, _HEUTE, speicher_gb=256)
+        is not None
+    )
     # „iPhone 18 Pro" noch einmal: keine zweite Anlage, derselbe Eintrag.
     zweite = autoerkennung.lege_an("iPhone 18 Pro", katalog, _HEUTE, speicher_gb=512)
     assert zweite.device_id == device_id("Apple", "iPhone 18 Pro")
     assert len([g for g in katalog.geraete if g.auto]) == 1
     # Die zweite Stufe erweitert die speicher-Liste DES Auto-Eintrags.
-    assert sorted(katalog.nach_id(device_id("Apple", "iPhone 18 Pro")).speicher) \
-        == [256, 512]
+    assert sorted(katalog.nach_id(device_id("Apple", "iPhone 18 Pro")).speicher) == [
+        256,
+        512,
+    ]
 
 
 # ==========================================================================
 # Persistenz
 # ==========================================================================
 
+
 def test_unbekannte_titel_und_farben_werden_gezaehlt(tmp_path):
     """data/state/geraete_unbekannt.jsonl: eine Zeile je Titel bzw. Farbe,
     mit Anbieter, Quelle des Feldes und Haeufigkeit - angelegt und erweitert
     vom Lauf, nicht von Hand."""
-    eintraege = [{"art": "titel", "wert": "FooPhone X200",
-                  "anbieter": "Telekom", "quelle": "telekom_kategorie"},
-                 {"art": "farbe", "wert": "polar",
-                  "anbieter": "Telekom", "quelle": "telekom_kategorie"}]
+    eintraege = [
+        {
+            "art": "titel",
+            "wert": "FooPhone X200",
+            "anbieter": "Telekom",
+            "quelle": "telekom_kategorie",
+        },
+        {
+            "art": "farbe",
+            "wert": "polar",
+            "anbieter": "Telekom",
+            "quelle": "telekom_kategorie",
+        },
+    ]
     autoerkennung.persistiere_unbekannte(tmp_path, eintraege, _HEUTE)
     autoerkennung.persistiere_unbekannte(tmp_path, eintraege[:1], _HEUTE)
 
@@ -311,8 +368,14 @@ def test_hand_schlaegt_auto_beim_laden(tmp_path):
 
     # Der Mensch pflegt dasselbe Geraet von Hand in die Config.
     hand_besitzend = _mini_katalog()
-    hand_besitzend.ergaenze(Geraet(hersteller="Apple", modell="iPhone 18 Pro",
-                                   marktstart="2026-09-19", generation=18))
+    hand_besitzend.ergaenze(
+        Geraet(
+            hersteller="Apple",
+            modell="iPhone 18 Pro",
+            marktstart="2026-09-19",
+            generation=18,
+        )
+    )
     autoerkennung.lade_auto_zusaetze(tmp_path, hand_besitzend)
     treffer = hand_besitzend.nach_id(device_id("Apple", "iPhone 18 Pro"))
     assert treffer.marktstart == "2026-09-19" and treffer.auto == ""
@@ -323,14 +386,20 @@ def test_hand_schlaegt_auto_beim_laden(tmp_path):
 # Nur strukturierte Felder loesen die Anlage aus
 # ==========================================================================
 
+
 def test_ohne_strukturiertes_namensfeld_gibt_es_keine_anlage():
     """Ein Titel allein (Option a) loest nichts aus: nur die drei Adapter
     mit strukturiertem Namensfeld setzen ‚strukturierter_name'."""
     katalog = _mini_katalog()
-    satz = {"titel": "iPhone 18 Pro 256 GB polar", "farbe": "polar",
-            "speicher_gb": 256, "quelle": "ldjson"}
-    ergebnis = autoerkennung.lege_an(satz.get("strukturierter_name", ""),
-                                     katalog, _HEUTE)
+    satz = {
+        "titel": "iPhone 18 Pro 256 GB polar",
+        "farbe": "polar",
+        "speicher_gb": 256,
+        "quelle": "ldjson",
+    }
+    ergebnis = autoerkennung.lege_an(
+        satz.get("strukturierter_name", ""), katalog, _HEUTE
+    )
     assert ergebnis is None
     assert [g for g in katalog.geraete if g.auto] == []
 
@@ -340,33 +409,52 @@ def test_die_drei_adapter_nennen_ihr_namensfeld():
     strukturierte Name reist als eigenes Feld, getrennt vom
     zusammengesetzten Titel."""
     saetze = telekom.lies(_BELEG_HTML, _TELEKOM_URL)
-    assert [s["strukturierter_name"] for s in saetze] \
-        == ["iPhone 18 Pro", "iPhone 18 Pro Max"]
+    assert [s["strukturierter_name"] for s in saetze] == [
+        "iPhone 18 Pro",
+        "iPhone 18 Pro Max",
+    ]
 
     # o2: der Name steht in `description`, der Titel wird daraus MIT
     # Speicher und Farbe aus dem Angebots-Slug zusammengesetzt.
-    o2_json = json.dumps({"hardware": [{
-        "description": "Apple iPhone 18 Pro",
-        "offerName": "privatkunden-apple-iphone-18-pro-256gb-polar-24xhigh",
-        "externalId": "o2-18-pro",
-        "price": {"totalPrice": 1000.0},
-    }]})
+    o2_json = json.dumps(
+        {
+            "hardware": [
+                {
+                    "description": "Apple iPhone 18 Pro",
+                    "offerName": "privatkunden-apple-iphone-18-pro-256gb-polar-24xhigh",
+                    "externalId": "o2-18-pro",
+                    "price": {"totalPrice": 1000.0},
+                }
+            ]
+        }
+    )
     o2_saetze = o2.lies(o2_json, "https://www.o2online.de/e-shop/")
     assert o2_saetze[0]["strukturierter_name"] == "Apple iPhone 18 Pro"
     assert o2_saetze[0]["titel"] == "Apple iPhone 18 Pro 256 GB polar"
 
     # Vodafone: der Name steht in `modelName` der Detailnutzlast.
-    vf_json = json.dumps({"modelName": "APPLE IPHONE 18 PRO",
-                          "hubpage": {"href": "/privat/handys/x.html"},
-                          "atomics": [{
-                              "hardwareId": "vf-18-pro",
-                              "capacity": {"displayLabel": "256 GB"},
-                              "color": {"displayLabel": "Polar"},
-                              "prices": {"hardware": {"priceByType": {
-                                  "rate": {"onetime": {
-                                      "withoutDiscounts": {
-                                          "gross": 1199.0}}}}}},
-                          }]})
+    vf_json = json.dumps(
+        {
+            "modelName": "APPLE IPHONE 18 PRO",
+            "hubpage": {"href": "/privat/handys/x.html"},
+            "atomics": [
+                {
+                    "hardwareId": "vf-18-pro",
+                    "capacity": {"displayLabel": "256 GB"},
+                    "color": {"displayLabel": "Polar"},
+                    "prices": {
+                        "hardware": {
+                            "priceByType": {
+                                "rate": {
+                                    "onetime": {"withoutDiscounts": {"gross": 1199.0}}
+                                }
+                            }
+                        }
+                    },
+                }
+            ],
+        }
+    )
     vf_saetze = vodafone.lies(vf_json, "https://api.vodafone.de/x")
     assert vf_saetze[0]["strukturierter_name"] == "APPLE IPHONE 18 PRO"
 
@@ -375,13 +463,15 @@ def test_die_drei_adapter_nennen_ihr_namensfeld():
 # Kollisionswaechter: die Modellzusatz-Falle (E4-Regeln, Bau 2)
 # ==========================================================================
 
+
 def _katalog_mit_pixel() -> Katalog:
     """_mini_katalog plus Google-Anker: die Serie „Pixel" ist damit als
     Google-Serie bekannt, und die Schaellung eines Namens ohne
     Hersteller-Praefix trifft sie."""
     katalog = _mini_katalog()
-    katalog.ergaenze(Geraet(hersteller="Google", modell="Pixel 9",
-                            generation=9, speicher=[128]))
+    katalog.ergaenze(
+        Geraet(hersteller="Google", modell="Pixel 9", generation=9, speicher=[128])
+    )
     return katalog
 
 
@@ -393,14 +483,22 @@ def test_stamm_eines_hand_eintrags_wird_nicht_angelegt(caplog):
     protokolliert (der Verwurf ist die Katalog-Pflege-Aufgabe, nicht ein
     stiller Fall in die Arbeitsliste)."""
     import logging
+
     katalog = _katalog_mit_pixel()
-    katalog.ergaenze(Geraet(hersteller="Google", modell="Pixel 10 Pro Fold",
-                            marktstart="2026-05-15", generation=10))
+    katalog.ergaenze(
+        Geraet(
+            hersteller="Google",
+            modell="Pixel 10 Pro Fold",
+            marktstart="2026-05-15",
+            generation=10,
+        )
+    )
     vorher = len(katalog.geraete)
 
     with caplog.at_level(logging.WARNING):
-        ergebnis = autoerkennung.lege_an("Pixel 10 Pro", katalog, _HEUTE,
-                                         speicher_gb=256)
+        ergebnis = autoerkennung.lege_an(
+            "Pixel 10 Pro", katalog, _HEUTE, speicher_gb=256
+        )
 
     assert ergebnis is None
     assert len(katalog.geraete) == vorher
@@ -415,13 +513,19 @@ def test_zusatz_ueber_lebendem_hand_stamm_wird_angelegt():
     Geraet - ein Live-Katalog erweitert Namen nicht, er kuerzt allenfalls.
     Die Sperre duerfte NUR in der Stamm-Richtung greifen."""
     katalog = _mini_katalog()
-    katalog.ergaenze(Geraet(hersteller="Apple", modell="iPhone 18 Pro",
-                            generation=18, marktstart="2026-09-19"))
-    ergebnis = autoerkennung.lege_an("iPhone 18 Pro Max", katalog, _HEUTE,
-                                     speicher_gb=512)
+    katalog.ergaenze(
+        Geraet(
+            hersteller="Apple",
+            modell="iPhone 18 Pro",
+            generation=18,
+            marktstart="2026-09-19",
+        )
+    )
+    ergebnis = autoerkennung.lege_an(
+        "iPhone 18 Pro Max", katalog, _HEUTE, speicher_gb=512
+    )
     assert ergebnis is not None and ergebnis.auto == _HEUTE
-    assert katalog.nach_id(device_id("Apple", "iPhone 18 Pro Max")) \
-        is not None
+    assert katalog.nach_id(device_id("Apple", "iPhone 18 Pro Max")) is not None
 
 
 def test_fuzzy_kollision_nur_gegen_hand_eintraege():
@@ -432,10 +536,14 @@ def test_fuzzy_kollision_nur_gegen_hand_eintraege():
     deshalb gegen den HAND-Katalog (der Auftrag: ein Hand-Eintrag schlaegt
     IMMER die Auto-Anlage), nicht gegen frisch Angelegte."""
     katalog = _mini_katalog()
-    assert autoerkennung.lege_an("iPhone 18 Pro Max", katalog, _HEUTE,
-                                 speicher_gb=512) is not None
-    assert autoerkennung.lege_an("iPhone 18 Pro", katalog, _HEUTE,
-                                 speicher_gb=256) is not None
+    assert (
+        autoerkennung.lege_an("iPhone 18 Pro Max", katalog, _HEUTE, speicher_gb=512)
+        is not None
+    )
+    assert (
+        autoerkennung.lege_an("iPhone 18 Pro", katalog, _HEUTE, speicher_gb=256)
+        is not None
+    )
     assert len([g for g in katalog.geraete if g.auto]) == 2
 
 
@@ -445,14 +553,16 @@ def test_hand_schlaegt_auto_auch_fuzzy_beim_laden(tmp_path, caplog):
     Laden verworfen und protokolliert - der Mensch hat entschieden, dass
     es dieses Stamms als eigenes Geraet (noch) nicht gibt."""
     import logging
+
     katalog = _katalog_mit_pixel()
-    assert autoerkennung.lege_an("Pixel 10", katalog, "2026-09-10",
-                                 speicher_gb=128) is not None
+    assert (
+        autoerkennung.lege_an("Pixel 10", katalog, "2026-09-10", speicher_gb=128)
+        is not None
+    )
     autoerkennung.speichere_auto_zusaetze(tmp_path, katalog)
 
     hand = _katalog_mit_pixel()
-    hand.ergaenze(Geraet(hersteller="Google", modell="Pixel 10 Pro",
-                         generation=10))
+    hand.ergaenze(Geraet(hersteller="Google", modell="Pixel 10 Pro", generation=10))
     with caplog.at_level(logging.INFO):
         autoerkennung.lade_auto_zusaetze(tmp_path, hand)
 
@@ -466,13 +576,20 @@ def test_verwurf_gleicher_device_id_beim_laden_protokolliert(tmp_path, caplog):
     uebernommen) steht im Protokoll - ein stiller Verwurf waere beim
     Nachvollzug des Auto-Bestands unsichtbar."""
     import logging
+
     katalog = _mini_katalog()
     autoerkennung.lege_an("iPhone 18 Pro", katalog, _HEUTE, speicher_gb=256)
     autoerkennung.speichere_auto_zusaetze(tmp_path, katalog)
 
     hand = _mini_katalog()
-    hand.ergaenze(Geraet(hersteller="Apple", modell="iPhone 18 Pro",
-                         marktstart="2026-09-19", generation=18))
+    hand.ergaenze(
+        Geraet(
+            hersteller="Apple",
+            modell="iPhone 18 Pro",
+            marktstart="2026-09-19",
+            generation=18,
+        )
+    )
     with caplog.at_level(logging.INFO):
         uebernommen = autoerkennung.lade_auto_zusaetze(tmp_path, hand)
 
@@ -485,6 +602,7 @@ def test_verwurf_gleicher_device_id_beim_laden_protokolliert(tmp_path, caplog):
 # EINE Quelle der Wahrheit: lade_katalog merged die Auto-Eintraege
 # ==========================================================================
 
+
 def test_lade_katalog_liefert_den_gemergten_katalog(tmp_path):
     """Der Render-Pfad (report/html.py) laedt den Katalog ueber
     geraete_config.lade_katalog - ohne den Merge wuerde der Lauf Listungen
@@ -492,23 +610,38 @@ def test_lade_katalog_liefert_den_gemergten_katalog(tmp_path):
     wie der Navigationseintrag am 11.08.: gebaut, geprueft, unsichtbar).
     Pipeline UND Seite sehen denselben Bestand."""
     import yaml
+
     root = tmp_path / "mitte"
     (root / "config").mkdir(parents=True)
     (root / "config" / "geraete_katalog.yaml").write_text(
-        yaml.safe_dump({"geraete": [
-            {"hersteller": "Apple", "modell": "iPhone 17",
-             "generation": 17, "speicher": [128]},
-            {"hersteller": "Xiaomi", "modell": "Redmi Note 17"},
-        ]}, allow_unicode=True), encoding="utf-8")
+        yaml.safe_dump(
+            {
+                "geraete": [
+                    {
+                        "hersteller": "Apple",
+                        "modell": "iPhone 17",
+                        "generation": 17,
+                        "speicher": [128],
+                    },
+                    {"hersteller": "Xiaomi", "modell": "Redmi Note 17"},
+                ]
+            },
+            allow_unicode=True,
+        ),
+        encoding="utf-8",
+    )
 
-    vorlage = Katalog(geraete=[
-        Geraet(hersteller="Apple", modell="iPhone 17", generation=17),
-        Geraet(hersteller="Xiaomi", modell="Redmi Note 17"),
-    ])
+    vorlage = Katalog(
+        geraete=[
+            Geraet(hersteller="Apple", modell="iPhone 17", generation=17),
+            Geraet(hersteller="Xiaomi", modell="Redmi Note 17"),
+        ]
+    )
     autoerkennung.lege_an("iPhone 18 Pro", vorlage, _HEUTE, speicher_gb=256)
     autoerkennung.speichere_auto_zusaetze(root, vorlage)
 
     from telco_radar.geraete_config import lade_katalog
+
     geladen = lade_katalog(root)
     eintrag = geladen.nach_id(device_id("Apple", "iPhone 18 Pro"))
     assert eintrag is not None and eintrag.auto == _HEUTE
@@ -529,20 +662,29 @@ def test_lade_katalog_liefert_den_gemergten_katalog(tmp_path):
 # Arbeitsliste. Zwei device_ids fuer ein Geraet sind die Saegezahn-Klasse,
 # gegen die die ganze ID-Regel gebaut ist.
 
+
 def test_funk_anhang_wird_aus_dem_modellnamen_geschaelt():
     """Der Zusatz ist keine Identitaet: 5G/4G/LTE werden wie das
     Speichersegment aus dem Modellnamen geschaelt - aus beiden Nennungen
     wird dieselbe device_id, egal welcher Anbieter sie wie schreibt."""
     katalog = _mini_katalog()
-    assert autoerkennung.schale("Xiaomi Redmi Note 18 Pro Max 5G", katalog) \
-        == ("Xiaomi", "Redmi Note 18 Pro Max")
-    assert autoerkennung.schale("Xiaomi Redmi Note 18 4G", katalog) \
-        == ("Xiaomi", "Redmi Note 18")
-    assert autoerkennung.schale("Xiaomi Redmi Note 18 LTE", katalog) \
-        == ("Xiaomi", "Redmi Note 18")
+    assert autoerkennung.schale("Xiaomi Redmi Note 18 Pro Max 5G", katalog) == (
+        "Xiaomi",
+        "Redmi Note 18 Pro Max",
+    )
+    assert autoerkennung.schale("Xiaomi Redmi Note 18 4G", katalog) == (
+        "Xiaomi",
+        "Redmi Note 18",
+    )
+    assert autoerkennung.schale("Xiaomi Redmi Note 18 LTE", katalog) == (
+        "Xiaomi",
+        "Redmi Note 18",
+    )
     # Nennung OHNE Zusatz bleibt unberuehrt (Telekom `name`-Schreibweise).
-    assert autoerkennung.schale("Redmi Note 18 Pro Max", katalog) \
-        == ("Xiaomi", "Redmi Note 18 Pro Max")
+    assert autoerkennung.schale("Redmi Note 18 Pro Max", katalog) == (
+        "Xiaomi",
+        "Redmi Note 18 Pro Max",
+    )
 
 
 def test_funk_variante_legt_kein_zweites_geraet_an():
@@ -554,13 +696,12 @@ def test_funk_variante_legt_kein_zweites_geraet_an():
     stamm = "Redmi Note 18 Pro Max"
     for erste, zweite in ((fuenf_g, stamm), (stamm, fuenf_g)):
         katalog = _mini_katalog()
-        a = autoerkennung.lege_an(erste, katalog, "2026-09-17",
-                                  speicher_gb=256)
-        b = autoerkennung.lege_an(zweite, katalog, "2026-09-18",
-                                  speicher_gb=512)
+        a = autoerkennung.lege_an(erste, katalog, "2026-09-17", speicher_gb=256)
+        b = autoerkennung.lege_an(zweite, katalog, "2026-09-18", speicher_gb=512)
         assert a is not None and b is not None
-        assert a.device_id == b.device_id \
-            == device_id("Xiaomi", "Redmi Note 18 Pro Max")
+        assert (
+            a.device_id == b.device_id == device_id("Xiaomi", "Redmi Note 18 Pro Max")
+        )
         assert len([g for g in katalog.geraete if g.auto]) == 1
         assert sorted(a.speicher) == [256, 512]
 
@@ -570,14 +711,15 @@ def test_titel_ohne_funkzusatz_trifft_den_aus_funknennung_entstandenen_eintrag()
     ohne „5G" die laengere Nadel - das Geraet waere nur bei o2 beobachtbar
     gewesen, „Wer ist guenstiger" und Preisverlauf haetten gespalten."""
     katalog = _mini_katalog()
-    autoerkennung.lege_an("Xiaomi Redmi Note 18 Pro Max 5G", katalog, _HEUTE,
-                          speicher_gb=256)
+    autoerkennung.lege_an(
+        "Xiaomi Redmi Note 18 Pro Max 5G", katalog, _HEUTE, speicher_gb=256
+    )
     ohne = erkenne_geraet("Redmi Note 18 Pro Max 256 GB obsidian", katalog)
-    mit = erkenne_geraet("Xiaomi Redmi Note 18 Pro Max 5G 256 GB obsidian",
-                         katalog)
+    mit = erkenne_geraet("Xiaomi Redmi Note 18 Pro Max 5G 256 GB obsidian", katalog)
     assert ohne is not None and mit is not None
-    assert ohne.device_id == mit.device_id \
-        == device_id("Xiaomi", "Redmi Note 18 Pro Max")
+    assert (
+        ohne.device_id == mit.device_id == device_id("Xiaomi", "Redmi Note 18 Pro Max")
+    )
 
 
 _O2_URL = "https://www.o2online.de/e-shop/handy/"
@@ -588,22 +730,30 @@ def _o2_payload(description, slug, slug_gb, farbe, gid, preis):
     """Nutzlast im Format der gespeicherten o2-Antwort: der strukturierte
     Name steht in `description`, Speicher und Farbe im Angebotsslug (Muster
     „privatkunden-google-pixel-11-pro-xl-256gb-canyon-24xhigh")."""
-    return json.dumps({"hardware": [{
-        "description": description,
-        "offerName": f"privatkunden-{slug}-{slug_gb}gb-{farbe}-24xhigh",
-        "externalId": gid,
-        "price": {"totalPrice": preis},
-    }]})
-
-
-
+    return json.dumps(
+        {
+            "hardware": [
+                {
+                    "description": description,
+                    "offerName": f"privatkunden-{slug}-{slug_gb}gb-{farbe}-24xhigh",
+                    "externalId": gid,
+                    "price": {"totalPrice": preis},
+                }
+            ]
+        }
+    )
 
 
 def _sammle_anbieter_nacht(anbieter, payload, katalog, heute):
     return sammle_anbieter(
-        anbieter, katalog, {}, _hole(payload), heute,
+        anbieter,
+        katalog,
+        {},
+        _hole(payload),
+        heute,
         RobotsWaechter(hole=_hole(payload)),
-        datetime(2026, 9, 17, 3, tzinfo=timezone.utc))
+        datetime(2026, 9, 17, 3, tzinfo=timezone.utc),
+    )
 
 
 def test_o2_nacht_mit_5g_und_telekom_nacht_ohne_bleiben_ein_geraet():
@@ -614,27 +764,42 @@ def test_o2_nacht_mit_5g_und_telekom_nacht_ohne_bleiben_ein_geraet():
     unbekannte_titel blieb leer (kein Signal an die Arbeitsliste)."""
     katalog = _mini_katalog()
     o2_anbieter = Anbieter(
-        name="o2", typ="netzbetreiber", methode="o2_katalog",
+        name="o2",
+        typ="netzbetreiber",
+        methode="o2_katalog",
         basis_url="https://www.o2online.de",
-        einstiege=[Einstieg(url=_O2_URL)], rate_limit_sekunden=0)
+        einstiege=[Einstieg(url=_O2_URL)],
+        rate_limit_sekunden=0,
+    )
 
     nacht1 = _sammle_anbieter_nacht(
         o2_anbieter,
-        _o2_payload("Xiaomi Redmi Note 18 Pro Max 5G",
-                    "xiaomi-redmi-note-18-pro-max", 256, "obsidian",
-                    "o2-note18pm", 899.0),
-        katalog, _NACHT1)
+        _o2_payload(
+            "Xiaomi Redmi Note 18 Pro Max 5G",
+            "xiaomi-redmi-note-18-pro-max",
+            256,
+            "obsidian",
+            "o2-note18pm",
+            899.0,
+        ),
+        katalog,
+        _NACHT1,
+    )
     assert nacht1.status == "ok"
-    assert [l.device_id for l in nacht1.listungen] \
-        == [device_id("Xiaomi", "Redmi Note 18 Pro Max")]
+    assert [l.device_id for l in nacht1.listungen] == [
+        device_id("Xiaomi", "Redmi Note 18 Pro Max")
+    ]
 
     html = _telekom_html(
-        _eintrags("Redmi Note 18 Pro Max", "obsidian-256-gb", 25.0, 900.0,
-                  "hw-note18pm"))
+        _eintrags(
+            "Redmi Note 18 Pro Max", "obsidian-256-gb", 25.0, 900.0, "hw-note18pm"
+        )
+    )
     nacht2 = _sammle_anbieter_nacht(_anbieter(), html, katalog, _NACHT2)
     assert nacht2.status == "ok"
-    assert [l.device_id for l in nacht2.listungen] \
-        == [device_id("Xiaomi", "Redmi Note 18 Pro Max")]
+    assert [l.device_id for l in nacht2.listungen] == [
+        device_id("Xiaomi", "Redmi Note 18 Pro Max")
+    ]
     assert nacht2.unbekannte_titel == []
 
     autos = [g for g in katalog.geraete if g.auto]
@@ -650,14 +815,17 @@ def test_stamm_eines_hand_eintrags_mit_funkzusatz_wird_nicht_angelegt(caplog):
     steht im Protokoll, und die Katalog-Pflege entscheidet (dieselbe
     Stamm-Richtung wie die Modellzusatz-Falle)."""
     import logging
+
     katalog = _mini_katalog()
-    katalog.ergaenze(Geraet(hersteller="Xiaomi", modell="Redmi Note 18 5G",
-                            generation=18))
+    katalog.ergaenze(
+        Geraet(hersteller="Xiaomi", modell="Redmi Note 18 5G", generation=18)
+    )
     vorher = len(katalog.geraete)
 
     with caplog.at_level(logging.WARNING):
-        ergebnis = autoerkennung.lege_an("Xiaomi Redmi Note 18", katalog,
-                                         _HEUTE, speicher_gb=128)
+        ergebnis = autoerkennung.lege_an(
+            "Xiaomi Redmi Note 18", katalog, _HEUTE, speicher_gb=128
+        )
 
     assert ergebnis is None
     assert len(katalog.geraete) == vorher
@@ -679,6 +847,7 @@ def test_stamm_eines_hand_eintrags_mit_funkzusatz_wird_nicht_angelegt(caplog):
 # tests/fixtures/geraete/unbekannte_titel_2026-09-17.jsonl (145 Titel-Zeilen,
 # Herkunft in _herkunft.json). NICHTS ist erfunden.
 
+
 def test_tarif_titel_erkennen():
     """Die Regel selbst, an den echten Werten: Wort ‚Tarif' UND keine Ziffer.
     Der einzige ziffernlose Geraetetitel des Bestands (Oakley, ld+json von
@@ -690,9 +859,11 @@ def test_tarif_titel_erkennen():
     # Echte Geraetetitel der selben Liste bleiben stehen - auch die von
     # ALDI TALK selbst (derselbe Anbieter wie das Rauschen).
     assert not autoerkennung.ist_tarif_titel(
-        "MOTOROLA moto g86 5G, 256 GB, Spellbound (XT2527-2)")
+        "MOTOROLA moto g86 5G, 256 GB, Spellbound (XT2527-2)"
+    )
     assert not autoerkennung.ist_tarif_titel(
-        "Oakley Meta - HSTN Prizm Polarized (AI Glasses)")
+        "Oakley Meta - HSTN Prizm Polarized (AI Glasses)"
+    )
     assert not autoerkennung.ist_tarif_titel("Samsung Galaxy A36 5G")
     assert not autoerkennung.ist_tarif_titel("")
     assert not autoerkennung.ist_tarif_titel(None)
@@ -703,29 +874,55 @@ def test_tarif_titel_werden_nicht_gespeichert(tmp_path):
     Farben desselben Laufs sehr wohl (echte Werte des ALDI-TALK-Kontingents
     vom 17.09.)."""
     eintraege = [
-        {"art": "titel", "wert": "Tarif S", "anbieter": "ALDI TALK",
-         "quelle": "microdata"},
-        {"art": "titel", "wert": "Tarif M", "anbieter": "ALDI TALK",
-         "quelle": "microdata"},
-        {"art": "titel", "wert": "Tarif L", "anbieter": "ALDI TALK",
-         "quelle": "microdata"},
-        {"art": "titel",
-         "wert": "MOTOROLA moto g86 5G, 256 GB, Spellbound (XT2527-2)",
-         "anbieter": "ALDI TALK", "quelle": "microdata"},
-        {"art": "titel", "wert": "SONIM XP400, 128 GB, Schwarz",
-         "anbieter": "ALDI TALK", "quelle": "microdata"},
-        {"art": "farbe", "wert": "Glacier Blue", "anbieter": "ALDI TALK",
-         "quelle": "microdata"},
+        {
+            "art": "titel",
+            "wert": "Tarif S",
+            "anbieter": "ALDI TALK",
+            "quelle": "microdata",
+        },
+        {
+            "art": "titel",
+            "wert": "Tarif M",
+            "anbieter": "ALDI TALK",
+            "quelle": "microdata",
+        },
+        {
+            "art": "titel",
+            "wert": "Tarif L",
+            "anbieter": "ALDI TALK",
+            "quelle": "microdata",
+        },
+        {
+            "art": "titel",
+            "wert": "MOTOROLA moto g86 5G, 256 GB, Spellbound (XT2527-2)",
+            "anbieter": "ALDI TALK",
+            "quelle": "microdata",
+        },
+        {
+            "art": "titel",
+            "wert": "SONIM XP400, 128 GB, Schwarz",
+            "anbieter": "ALDI TALK",
+            "quelle": "microdata",
+        },
+        {
+            "art": "farbe",
+            "wert": "Glacier Blue",
+            "anbieter": "ALDI TALK",
+            "quelle": "microdata",
+        },
     ]
     zeilen_gesamt = autoerkennung.persistiere_unbekannte(
-        tmp_path, eintraege, "2026-09-18")
+        tmp_path, eintraege, "2026-09-18"
+    )
 
     datei = tmp_path / "data" / "state" / "geraete_unbekannt.jsonl"
     zeilen = [json.loads(z) for z in datei.read_text().splitlines() if z]
     assert zeilen_gesamt == 3 == len(zeilen)
     assert {z["wert"] for z in zeilen} == {
         "MOTOROLA moto g86 5G, 256 GB, Spellbound (XT2527-2)",
-        "SONIM XP400, 128 GB, Schwarz", "Glacier Blue"}
+        "SONIM XP400, 128 GB, Schwarz",
+        "Glacier Blue",
+    }
     # Kein Tarifname steht irgendwo in der Liste.
     assert all("Tarif" not in z["wert"] for z in zeilen)
 
@@ -737,34 +934,71 @@ def test_bestaende_werden_beim_naechsten_schreiben_bereinigt(tmp_path):
     eine echte Farbe daneben - wird beim naechsten Schreiben einer EINZEN
     neuen Farbe um genau die 3 Rausch-Zeilen kleiner."""
     bestand = [
-        {"art": "titel", "wert": "Tarif S", "anbieter": "ALDI TALK",
-         "quelle": "microdata", "datum": "2026-09-17", "haeufigkeit": 29},
-        {"art": "titel", "wert": "Tarif M", "anbieter": "ALDI TALK",
-         "quelle": "microdata", "datum": "2026-09-17", "haeufigkeit": 29},
-        {"art": "titel", "wert": "Tarif L", "anbieter": "ALDI TALK",
-         "quelle": "microdata", "datum": "2026-09-17", "haeufigkeit": 29},
-        {"art": "titel", "wert": "iPad Pro 11 (2025)", "anbieter": "Vodafone",
-         "quelle": "vodafone_buendel", "datum": "2026-09-17",
-         "haeufigkeit": 2},
-        {"art": "farbe", "wert": "Burgunder", "anbieter": "Vodafone",
-         "quelle": "vodafone_api", "datum": "2026-09-17", "haeufigkeit": 40},
+        {
+            "art": "titel",
+            "wert": "Tarif S",
+            "anbieter": "ALDI TALK",
+            "quelle": "microdata",
+            "datum": "2026-09-17",
+            "haeufigkeit": 29,
+        },
+        {
+            "art": "titel",
+            "wert": "Tarif M",
+            "anbieter": "ALDI TALK",
+            "quelle": "microdata",
+            "datum": "2026-09-17",
+            "haeufigkeit": 29,
+        },
+        {
+            "art": "titel",
+            "wert": "Tarif L",
+            "anbieter": "ALDI TALK",
+            "quelle": "microdata",
+            "datum": "2026-09-17",
+            "haeufigkeit": 29,
+        },
+        {
+            "art": "titel",
+            "wert": "iPad Pro 11 (2025)",
+            "anbieter": "Vodafone",
+            "quelle": "vodafone_buendel",
+            "datum": "2026-09-17",
+            "haeufigkeit": 2,
+        },
+        {
+            "art": "farbe",
+            "wert": "Burgunder",
+            "anbieter": "Vodafone",
+            "quelle": "vodafone_api",
+            "datum": "2026-09-17",
+            "haeufigkeit": 40,
+        },
     ]
     pfad = tmp_path / "data" / "state" / "geraete_unbekannt.jsonl"
     pfad.parent.mkdir(parents=True)
-    pfad.write_text("".join(json.dumps(z, ensure_ascii=False) + "\n"
-                            for z in bestand), encoding="utf-8")
+    pfad.write_text(
+        "".join(json.dumps(z, ensure_ascii=False) + "\n" for z in bestand),
+        encoding="utf-8",
+    )
 
     # Der naechste Lauf meldet EINE neue echte Farbe (Polar, iPhone 18).
     autoerkennung.persistiere_unbekannte(
         tmp_path,
-        [{"art": "farbe", "wert": "Polar", "anbieter": "Vodafone",
-          "quelle": "vodafone_api"}],
-        "2026-09-18")
+        [
+            {
+                "art": "farbe",
+                "wert": "Polar",
+                "anbieter": "Vodafone",
+                "quelle": "vodafone_api",
+            }
+        ],
+        "2026-09-18",
+    )
 
     zeilen = [json.loads(z) for z in pfad.read_text().splitlines() if z]
     assert len(zeilen) == 3
-    assert {z["wert"] for z in zeilen} \
-        == {"iPad Pro 11 (2025)", "Burgunder", "Polar"}
+    assert {z["wert"] for z in zeilen} == {"iPad Pro 11 (2025)", "Burgunder", "Polar"}
     # Die gezaehlte Haeufigkeit der Rausch-Zeilen (29 je, Summe 87) verhindert
     # nicht ihr Verschwinden - sie war eine Zaehlung, keine Buchfuehrung.
     assert all("Tarif" not in z["wert"] for z in zeilen)
@@ -774,14 +1008,17 @@ def test_ueber_den_ganzen_echten_bestand_vom_17_09():
     """Die Wahrheitsprobe gegen ALLE 145 echten Titel-Zeilen des 17.09.
     (Fixture, s. _herkunft.json): die Regel trifft GENAU die drei ALDI-Tarife
     und keinen einzigen Geraetetitel - auch nicht die ziffernlosen."""
-    zeilen = [json.loads(z) for z in
-              (_FIX / "unbekannte_titel_2026-09-17.jsonl")
-              .read_text(encoding="utf-8").splitlines() if z.strip()]
-    assert len(zeilen) == 145          # die Fixture ist der ganze Bestand
+    zeilen = [
+        json.loads(z)
+        for z in (_FIX / "unbekannte_titel_2026-09-17.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
+        if z.strip()
+    ]
+    assert len(zeilen) == 145  # die Fixture ist der ganze Bestand
 
     rauschen = [z for z in zeilen if autoerkennung.ist_tarif_titel(z["wert"])]
-    assert sorted(z["wert"] for z in rauschen) == ["Tarif L", "Tarif M",
-                                                   "Tarif S"]
+    assert sorted(z["wert"] for z in rauschen) == ["Tarif L", "Tarif M", "Tarif S"]
     assert {z["anbieter"] for z in rauschen} == {"ALDI TALK"}
     assert sum(z.get("haeufigkeit", 0) for z in rauschen) == 87
 
@@ -789,8 +1026,10 @@ def test_ueber_den_ganzen_echten_bestand_vom_17_09():
     assert len(zeilen) - len(rauschen) == 142
     # Die ziffernlosen Geraetetitel des Bestands tragen kein ‚Tarif' und
     # fallen nicht durch die UND-Regel:
-    for titel in ("Oakley Meta - HSTN Prizm Polarized (AI Glasses)",
-                  "motorola edge 70"):
+    for titel in (
+        "Oakley Meta - HSTN Prizm Polarized (AI Glasses)",
+        "motorola edge 70",
+    ):
         assert any(z["wert"] == titel for z in zeilen)
         assert not autoerkennung.ist_tarif_titel(titel)
 
@@ -806,6 +1045,7 @@ def test_ueber_den_ganzen_echten_bestand_vom_17_09():
 # Familien-Anker ist Markennamen-Fakt, keine Raterei, und greift NUR, wo der
 # Katalog die Reihe nicht kennt (Hand schlaegt Auto bleibt).
 
+
 def test_ipad_ohne_hersteller_praefix_wird_ueber_familien_anker_angelegt():
     """Die echten Vodafone-modelNames vom 17.09. werden von _mini_katalog
     (der Katalog kennt KEIN iPad) aus Apple geschält - kuenftige iPads
@@ -813,8 +1053,9 @@ def test_ipad_ohne_hersteller_praefix_wird_ueber_familien_anker_angelegt():
     for name in ("iPad Pro 11 (2025)", "iPad (2025)", "iPad Pro 11 2024"):
         assert autoerkennung.schale(name, _mini_katalog()) == ("Apple", name)
 
-    eintrag = autoerkennung.lege_an("iPad Pro 11 (2025)", _mini_katalog(),
-                                    "2026-09-18", speicher_gb=256)
+    eintrag = autoerkennung.lege_an(
+        "iPad Pro 11 (2025)", _mini_katalog(), "2026-09-18", speicher_gb=256
+    )
     assert eintrag is not None
     assert eintrag.hersteller == "Apple"
     assert eintrag.modell == "iPad Pro 11 (2025)"
@@ -830,8 +1071,7 @@ def test_vodafone_ipad_titel_trifft_den_auto_eintrag():
     17.09., mit Speicher und Farbe) den Eintrag - derselbe Retry, den der
     Listungsweg macht."""
     katalog = _mini_katalog()
-    autoerkennung.lege_an("iPad Pro 11 (2025)", katalog, "2026-09-18",
-                          speicher_gb=256)
+    autoerkennung.lege_an("iPad Pro 11 (2025)", katalog, "2026-09-18", speicher_gb=256)
     treffer = erkenne_geraet("iPad Pro 11 (2025) 256 GB Silber", katalog)
     assert treffer is not None
     assert treffer.device_id == device_id("Apple", "iPad Pro 11 (2025)")
@@ -843,8 +1083,13 @@ def test_watch_und_airpods_ohne_praefix_werden_angelegt():
     congstars. Mit Praefix liefen sie ueber den Praefix-Pfad - der Anker
     traegt die Nennung OHNE nach."""
     katalog = _mini_katalog()
-    for name in ("Watch Ultra 4", "Watch Series 12 46 Aluminium",
-                 "AirPods 5", "AirPods Max 2", "AirPods Pro (3. Gen.)"):
+    for name in (
+        "Watch Ultra 4",
+        "Watch Series 12 46 Aluminium",
+        "AirPods 5",
+        "AirPods Max 2",
+        "AirPods Pro (3. Gen.)",
+    ):
         assert autoerkennung.schale(name, katalog) == ("Apple", name)
 
 
@@ -853,14 +1098,17 @@ def test_familien_anker_schlaegt_nicht_den_katalog():
     EINDEUTIG - auch von einem ANDEREN Hersteller -, entscheidet er; kennt er
     sie WIDERSPRUECHLICH, bleibt es beim Verwurf (nichts geraten). Der feste
     Apple-Anker darf beides nicht ueberschreiben."""
-    eindeutig_samsung = Katalog(geraete=[
-        Geraet(hersteller="Samsung", modell="Watch 7", generation=7)])
-    assert autoerkennung.schale("Watch 8", eindeutig_samsung) \
-        == ("Samsung", "Watch 8")
+    eindeutig_samsung = Katalog(
+        geraete=[Geraet(hersteller="Samsung", modell="Watch 7", generation=7)]
+    )
+    assert autoerkennung.schale("Watch 8", eindeutig_samsung) == ("Samsung", "Watch 8")
 
-    zweideutig = Katalog(geraete=[
-        Geraet(hersteller="Samsung", modell="Watch 7", generation=7),
-        Geraet(hersteller="Apple", modell="Watch 9", generation=9)])
+    zweideutig = Katalog(
+        geraete=[
+            Geraet(hersteller="Samsung", modell="Watch 7", generation=7),
+            Geraet(hersteller="Apple", modell="Watch 9", generation=9),
+        ]
+    )
     assert autoerkennung.schale("Watch 8", zweideutig) is None
     assert autoerkennung.lege_an("Watch 8", zweideutig, _HEUTE) is None
 

@@ -30,6 +30,7 @@ Nachpruefbarkeit jeder Aussage - ein Deck, das die Belege weglaesst, weil
 es huebscher aussieht, ist genau das Gegenteil davon. `baue()` hat keinen
 Schalter dafuer, und ein Test haelt das fest.
 """
+
 from __future__ import annotations
 
 import html as _html
@@ -43,14 +44,14 @@ log = logging.getLogger(__name__)
 # --------------------------------------------------------------------------- #
 # Die Budgets. Aus DESIGN_SPEC.md, Abschnitt 11 (Inhaltsbudgets).
 # --------------------------------------------------------------------------- #
-MAX_TITEL = 68           # Cover-Titel, 2 Zeilen bei 120 px
-MAX_KICKER = 42          # Cover-Kicker, UPPERCASE, eine Zeile
-MAX_HEADLINE = 62        # Content-Headline, 60 px, hoechstens 2 Zeilen
-MAX_PUNKT = 80           # Listenpunkt, eine Zeile
-MAX_PUNKTE = 3           # "Was passiert ist" hat drei Punkte
-MAX_LEDE = 240           # Fliesstext/Lede je Block
+MAX_TITEL = 68  # Cover-Titel, 2 Zeilen bei 120 px
+MAX_KICKER = 42  # Cover-Kicker, UPPERCASE, eine Zeile
+MAX_HEADLINE = 62  # Content-Headline, 60 px, hoechstens 2 Zeilen
+MAX_PUNKT = 80  # Listenpunkt, eine Zeile
+MAX_PUNKTE = 3  # "Was passiert ist" hat drei Punkte
+MAX_LEDE = 240  # Fliesstext/Lede je Block
 MAX_KONSEQUENZEN = 3
-MAX_QUELLEN = 12         # mehr passen nicht auf eine Folie
+MAX_QUELLEN = 12  # mehr passen nicht auf eine Folie
 MAX_QUELLE_TEXT = 84
 
 
@@ -64,9 +65,9 @@ def kuerze(text: str, grenze: int) -> str:
     s = " ".join(str(text or "").split())
     if len(s) <= grenze:
         return s
-    schnitt = s[:grenze - 1]
+    schnitt = s[: grenze - 1]
     if " " in schnitt:
-        schnitt = schnitt[:schnitt.rfind(" ")]
+        schnitt = schnitt[: schnitt.rfind(" ")]
     return schnitt.rstrip(" ,;:.–-") + "…"
 
 
@@ -88,7 +89,8 @@ def _akzent(headline: str) -> str:
         return sicher
     laengstes = max(woerter, key=len)
     return sicher.replace(
-        _e(laengstes), f'<span class="accent">{_e(laengstes)}</span>', 1)
+        _e(laengstes), f'<span class="accent">{_e(laengstes)}</span>', 1
+    )
 
 
 @dataclass
@@ -122,12 +124,19 @@ class Foliensatz:
             offen.append("was_heisst_das (Anzahl)")
         if len(self.quellen) > MAX_QUELLEN:
             offen.append("quellen (Anzahl)")
-        offen += [f"punkt {i}" for i, p in enumerate(self.was_passiert)
-                  if len(p) > MAX_PUNKT]
-        offen += [f"konsequenz {i}" for i, k in enumerate(self.was_heisst_das)
-                  if len(k) > MAX_LEDE]
-        offen += [f"quelle {i}" for i, q in enumerate(self.quellen)
-                  if len(q.text) > MAX_QUELLE_TEXT]
+        offen += [
+            f"punkt {i}" for i, p in enumerate(self.was_passiert) if len(p) > MAX_PUNKT
+        ]
+        offen += [
+            f"konsequenz {i}"
+            for i, k in enumerate(self.was_heisst_das)
+            if len(k) > MAX_LEDE
+        ]
+        offen += [
+            f"quelle {i}"
+            for i, q in enumerate(self.quellen)
+            if len(q.text) > MAX_QUELLE_TEXT
+        ]
         return offen
 
 
@@ -148,6 +157,7 @@ def _highlights(report: dict) -> list[dict]:
                 return int(wert)
             except (TypeError, ValueError):
                 return 0
+
         return (-zahl(h.get("ctm_bezug")), -zahl(h.get("relevance")))
 
     return sorted(alle, key=rang)
@@ -159,8 +169,7 @@ def inhalt(report: dict, *, titel: str = "") -> Foliensatz:
     meldungen = _highlights(report)
 
     satz = Foliensatz(
-        titel=kuerze(titel or "Was diese Woche im Markt passiert ist",
-                     MAX_TITEL),
+        titel=kuerze(titel or "Was diese Woche im Markt passiert ist", MAX_TITEL),
         kicker=kuerze("Telco Radar · Wochenbericht", MAX_KICKER),
         datum=datum,
     )
@@ -189,12 +198,16 @@ def inhalt(report: dict, *, titel: str = "") -> Foliensatz:
         if not url or url in gesehen:
             continue
         gesehen.add(url)
-        beschriftung = (h.get("source") or h.get("operator")
-                        or h.get("headline") or url)
-        satz.quellen.append(Folienquelle(
-            text=kuerze(f"{beschriftung}: {h.get('headline') or h.get('title') or ''}",
-                        MAX_QUELLE_TEXT),
-            url=url))
+        beschriftung = h.get("source") or h.get("operator") or h.get("headline") or url
+        satz.quellen.append(
+            Folienquelle(
+                text=kuerze(
+                    f"{beschriftung}: {h.get('headline') or h.get('title') or ''}",
+                    MAX_QUELLE_TEXT,
+                ),
+                url=url,
+            )
+        )
     return satz
 
 
@@ -306,7 +319,7 @@ def _folie(nummer: int, gesamt: int, inhalt_html: str, datum: str) -> str:
     return (
         f'<section class="slide" data-slide="{nummer}">\n{inhalt_html}\n'
         f'  <div class="footer"><span>Telco Radar{" · " + _e(datum) if datum else ""}</span>'
-        f'<span>{nummer:02d} / {gesamt:02d}</span></div>\n</section>\n'
+        f"<span>{nummer:02d} / {gesamt:02d}</span></div>\n</section>\n"
     )
 
 
@@ -327,38 +340,69 @@ def baue(report: dict, *, titel: str = "") -> str:
     teile = [_KOPF.format(titel=_e(satz.titel))]
 
     # 1 Cover
-    teile.append(_folie(1, gesamt,
-        f'  <p class="kicker">{_e(satz.kicker)}</p>\n'
-        f'  <h1 class="cover-title">{_akzent(satz.titel)}</h1>\n'
-        + (f'  <p class="cover-date">Stand {_e(satz.datum)}</p>\n'
-           if satz.datum else ""), satz.datum))
+    teile.append(
+        _folie(
+            1,
+            gesamt,
+            f'  <p class="kicker">{_e(satz.kicker)}</p>\n'
+            f'  <h1 class="cover-title">{_akzent(satz.titel)}</h1>\n'
+            + (
+                f'  <p class="cover-date">Stand {_e(satz.datum)}</p>\n'
+                if satz.datum
+                else ""
+            ),
+            satz.datum,
+        )
+    )
 
     # 2 Was passiert ist
     punkte = "".join(f"    <li>{_e(p)}</li>\n" for p in satz.was_passiert)
-    teile.append(_folie(2, gesamt,
-        f'  <h2 class="headline">{_akzent("Was diese Woche passiert ist")}</h2>\n'
-        f'  <ul class="checklist">\n{punkte}  </ul>\n', satz.datum))
+    teile.append(
+        _folie(
+            2,
+            gesamt,
+            f'  <h2 class="headline">{_akzent("Was diese Woche passiert ist")}</h2>\n'
+            f'  <ul class="checklist">\n{punkte}  </ul>\n',
+            satz.datum,
+        )
+    )
 
     # 3 Was das fuer uns heisst
     if satz.was_heisst_das:
-        saetze = "".join(f'  <p class="lede">{_e(k)}</p>\n'
-                         for k in satz.was_heisst_das)
+        saetze = "".join(
+            f'  <p class="lede">{_e(k)}</p>\n' for k in satz.was_heisst_das
+        )
     else:
-        saetze = ('  <p class="lede">Zu dieser Ausgabe liegt keine geprüfte '
-                  'Einordnung vor.</p>\n')
-    teile.append(_folie(3, gesamt,
-        f'  <h2 class="headline">{_akzent("Was das für uns bedeutet")}</h2>\n'
-        + saetze, satz.datum))
+        saetze = (
+            '  <p class="lede">Zu dieser Ausgabe liegt keine geprüfte '
+            "Einordnung vor.</p>\n"
+        )
+    teile.append(
+        _folie(
+            3,
+            gesamt,
+            f'  <h2 class="headline">{_akzent("Was das für uns bedeutet")}</h2>\n'
+            + saetze,
+            satz.datum,
+        )
+    )
 
     # 4 Quellen - Pflicht.
     zeilen = "".join(
         f'    <li>{_e(q.text)}<a href="{_e(q.url)}">{_e(q.url)}</a></li>\n'
-        for q in satz.quellen)
-    teile.append(_folie(4, gesamt,
-        f'  <h2 class="headline">{_akzent("Quellen zum Nachlesen")}</h2>\n'
-        f'  <ul class="quellen">\n{zeilen}  </ul>\n'
-        f'  <p class="fussnote">Jede Aussage dieses Foliensatzes steht in '
-        f'einer der oben verlinkten Quellen.</p>\n', satz.datum))
+        for q in satz.quellen
+    )
+    teile.append(
+        _folie(
+            4,
+            gesamt,
+            f'  <h2 class="headline">{_akzent("Quellen zum Nachlesen")}</h2>\n'
+            f'  <ul class="quellen">\n{zeilen}  </ul>\n'
+            f'  <p class="fussnote">Jede Aussage dieses Foliensatzes steht in '
+            f"einer der oben verlinkten Quellen.</p>\n",
+            satz.datum,
+        )
+    )
 
     teile.append(_FUSS)
     return "".join(teile)

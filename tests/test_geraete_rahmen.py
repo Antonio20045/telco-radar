@@ -14,6 +14,7 @@ Dieselbe Fixture wie `test_geraete_tco_zustand._baue` (ein Modell, o2
 neu+erneuert, Vodafone als Referenzrechnung) - sie deckt genau die zwei
 Kartenarten ab, die die Erklaerzeilen bisher trugen.
 """
+
 from __future__ import annotations
 
 import re
@@ -25,8 +26,12 @@ from test_geraete_tco_zustand import _baue
 # Wortlaut wie im Auftrag benannt (BRIEF_RAHMEN, Kriterium 1). Die
 # typografischen Anfuehrungszeichen sind Absicht - so steht der Satz im
 # Repo, ein glatter Apostroph traefe ihn nicht.
-VERBOTSMARKER = ("Gerechnet wird", "Die Grenze:", "Monatspreis „ab“",
-                  "Referenzrechnung, kein Angebot")
+VERBOTSMARKER = (
+    "Gerechnet wird",
+    "Die Grenze:",
+    "Monatspreis „ab“",
+    "Referenzrechnung, kein Angebot",
+)
 
 HAENDLER = ("Amazon", "Expert", "Saturn")
 
@@ -45,12 +50,14 @@ def _ohne_details(suppe: BeautifulSoup) -> str:
 # Kriterium 1: Erklaertexte raus
 # --------------------------------------------------------------------------
 
+
 def test_keine_erklaerung_steht_ausserhalb_einer_aufklappung(tmp_path):
     s = _baue(tmp_path)
     lesefluss = _ohne_details(s)
     treffer = {m: lesefluss.count(m) for m in VERBOTSMARKER}
     assert not any(treffer.values()), (
-        f"Erklaerung(en) ausserhalb einer Aufklappung: {treffer}")
+        f"Erklaerung(en) ausserhalb einer Aufklappung: {treffer}"
+    )
 
 
 def test_der_waechter_prueft_wirklich_etwas(tmp_path):
@@ -80,10 +87,10 @@ def test_wie_gerechnet_ist_weg_so_gerechnet_steht_genau_einmal(tmp_path):
     tafel = s.select_one("#tafel-tco")
     assert "Wie gerechnet?" not in tafel.get_text(" ")
     rechnung = tafel.select("details.gr-zr-rechnung")
-    assert len(rechnung) == 1, \
+    assert len(rechnung) == 1, (
         f"{len(rechnung)} Rechenschafts-Aufklapper statt genau einem"
-    assert rechnung[0].select_one("summary").get_text(strip=True) == \
-        "So gerechnet"
+    )
+    assert rechnung[0].select_one("summary").get_text(strip=True) == "So gerechnet"
     assert "Kosten über 24 Monate" in rechnung[0].get_text(" ")
     assert "TCO-24" not in rechnung[0].get_text(" ")
     # Die alte seitenweite Aufklappung bleibt verboten.
@@ -104,14 +111,16 @@ def test_ein_modell_ohne_band_ist_nicht_waehlbar(tmp_path):
     keine Band-Zeilen, es ist in der Wahl nicht vorhanden (erlaubt leer).
     Der Leerlauf-Satz für Paare ohne Messreihe steht je Paar im Fragment."""
     import json
+
     s = _baue(tmp_path, graphloses_modell=True)
     tafel = s.select_one("#tafel-tco")
-    assert tafel.select_one(".gr-tmodell") is None, \
+    assert tafel.select_one(".gr-tmodell") is None, (
         "der Modellblock-Div ist mit der Zeitreihe gefallen"
-    knoten = json.loads(
-        s.select_one("#gr-zeitreihe-daten").get_text())
-    assert knoten["erlaubt"].get("apple-iphone-16-pro-max-256") in \
-        (None, []), "das bandlose Modell duerfte nicht wählbar sein"
+    )
+    knoten = json.loads(s.select_one("#gr-zeitreihe-daten").get_text())
+    assert knoten["erlaubt"].get("apple-iphone-16-pro-max-256") in (None, []), (
+        "das bandlose Modell duerfte nicht wählbar sein"
+    )
 
 
 def test_die_buendel_stehen_als_zeilen_unter_dem_graphen(tmp_path):
@@ -126,14 +135,16 @@ def test_die_buendel_stehen_als_zeilen_unter_dem_graphen(tmp_path):
     # Modellblock-Div (der ist mit der Zeitreihe gefallen).
     block = tafel.select_one("#gr-buendel")
     assert block is not None, "der Test prüft nichts ohne Bündel-Abschnitt"
-    assert block.select_one("details.gr-karten-auf") is None, \
+    assert block.select_one("details.gr-karten-auf") is None, (
         "die Kartenklappe steht noch"
+    )
     assert not block.select(".gr-kkarte"), "Karten stehen noch"
     zeilen = block.select("#gr-bndliste .gr-bnd")
     assert zeilen, "die Zeilenliste ist leer"
     for zeile in zeilen:
-        assert not zeile.has_attr("open"), \
+        assert not zeile.has_attr("open"), (
             f"{zeile.get('data-anbieter')}: Zeile steht offen im HTML"
+        )
     # Keine Zähler in der Überschrift der Tabelle - eine Klammer, die
     # anders zählt als der Bestand darunter, bleibt verboten (O1-Regel,
     # jetzt an der Tabelle; der Modellname mit seiner GB-Zahl ist kein
@@ -147,6 +158,7 @@ def test_die_buendel_stehen_als_zeilen_unter_dem_graphen(tmp_path):
 # --------------------------------------------------------------------------
 # Kriterium 2: Haendler als benannte Luecke
 # --------------------------------------------------------------------------
+
 
 def test_haendler_ohne_preis_stehen_nicht_einzeln(tmp_path):
     """E2 (Antonio 9b.7): die 'Beschaffung läuft'-Legende der Balkenform
@@ -162,8 +174,9 @@ def test_haendler_ohne_preis_stehen_nicht_einzeln(tmp_path):
     assert "Beschaffung läuft" not in text
     for name in HAENDLER:
         assert name not in text, f"{name} steht einzeln in der Lesefläche"
-    assert not tafel.select(".gr-kkarte--haendler"), \
+    assert not tafel.select(".gr-kkarte--haendler"), (
         "Händlerplatzhalterkarten stehen noch"
+    )
 
 
 def test_die_grafik_nennt_nur_buendel_anbieter(tmp_path):
@@ -190,6 +203,7 @@ def test_die_grafik_nennt_nur_buendel_anbieter(tmp_path):
 # die neuere - derselbe Vorgang wie bei jeder umgekehrten Regel dieses
 # Projekts (CLAUDE.md §6: "eine falsche Vorgabe kassiert").
 # --------------------------------------------------------------------------
+
 
 def test_die_ueberschrift_ist_sachlich_nicht_die_gescheiterte_frage(tmp_path):
     s = _baue(tmp_path)

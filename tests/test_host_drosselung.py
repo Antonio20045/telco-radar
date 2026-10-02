@@ -6,6 +6,7 @@ der naechste Lauf mit 64 gleichzeitigen Verbindungen auf dieselbe Domain und
 handelt sich 429/403 ein - und zwar erst in Produktion, weil lokal niemand
 1000 Quellen abruft. Die Grenze wird deshalb hier gemessen, nicht geglaubt.
 """
+
 from __future__ import annotations
 
 import threading
@@ -66,8 +67,11 @@ def test_www_zaehlt_als_derselbe_host():
     """https://www.x.de und https://x.de sind derselbe Server - sonst
     umgeht jede Quelle die Grenze durch die Schreibweise ihrer URL."""
     gate = HostGate(max_parallel=1, min_interval=0.0)
-    urls = ["https://www.beispiel.de/a", "https://beispiel.de/b",
-            "https://www.beispiel.de/c"]
+    urls = [
+        "https://www.beispiel.de/a",
+        "https://beispiel.de/b",
+        "https://www.beispiel.de/c",
+    ]
     assert _durchlauf(gate, urls).maximum == 1
 
 
@@ -101,6 +105,7 @@ def test_slot_wird_auch_bei_fehler_freigegeben():
 def test_standardgate_drosselt_nicht():
     """Tests und Einzelabrufe sollen ohne Konfiguration laufen wie bisher."""
     from telco_radar.collect.http import active_gate
+
     assert active_gate().max_parallel > 1000
 
 
@@ -112,6 +117,7 @@ def test_standardgate_drosselt_nicht():
 # Sammelphase dauerte 303,7 s. Gegen den langsamsten Einzelfall hilft keine
 # Parallelitaet.
 # ======================================================================== #
+
 
 def test_frist_bricht_die_wiederholungen_ab(monkeypatch):
     import httpx

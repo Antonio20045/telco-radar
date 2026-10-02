@@ -14,6 +14,7 @@ das neueste Datum und wie viele Meldungen im Frischefenster liegen. Ohne
 --validate bleibt die Spalte leer, damit nie erfundene Zahlen im Dokument
 landen.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -58,18 +59,30 @@ def _validate(cfg) -> dict[str, str]:
                 # Sandbox ohne Headless-Browser: das sagt nichts ueber die
                 # Quelle aus, in GitHub Actions laeuft sie normal. Als Fehler
                 # ins Dokument zu schreiben waere schlicht falsch.
-                return name, source.url, ("hier nicht pruefbar (kein "
-                                          "Headless-Browser), laeuft in GitHub Actions")
+                return (
+                    name,
+                    source.url,
+                    (
+                        "hier nicht pruefbar (kein "
+                        "Headless-Browser), laeuft in GitHub Actions"
+                    ),
+                )
             return name, source.url, f"FEHLER: {type(exc).__name__}: {text[:60]}"
         dated = [i for i in items if i.published]
-        fresh = sum(1 for i in items if i.age_days() is not None
-                    and -1 <= i.age_days() <= lookback)
+        fresh = sum(
+            1
+            for i in items
+            if i.age_days() is not None and -1 <= i.age_days() <= lookback
+        )
         if not items:
             return name, source.url, "0 Meldungen"
         newest = max(i.published for i in dated).date().isoformat() if dated else "-"
-        return (name, source.url,
-                f"{len(items)} Meldungen, {len(dated)} datiert, neuestes {newest}, "
-                f"{fresh} im {lookback}-Tage-Fenster")
+        return (
+            name,
+            source.url,
+            f"{len(items)} Meldungen, {len(dated)} datiert, neuestes {newest}, "
+            f"{fresh} im {lookback}-Tage-Fenster",
+        )
 
     out: dict[str, str] = {}
     with ThreadPoolExecutor(max_workers=8) as pool:
@@ -82,8 +95,11 @@ def _validate(cfg) -> dict[str, str]:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--validate", action="store_true",
-                        help="jede Quelle live abrufen und belegen (dauert ~4 min)")
+    parser.add_argument(
+        "--validate",
+        action="store_true",
+        help="jede Quelle live abrufen und belegen (dauert ~4 min)",
+    )
     parser.add_argument("--out", type=Path, default=ROOT / "TELCO_RADAR_QUELLEN.md")
     args = parser.parse_args()
 
@@ -97,29 +113,43 @@ def main() -> int:
 
     L: list[str] = []
     L.append("# Telco Radar — Quellenliste (offizielle Betreiber-Quellen)\n")
-    L.append(f"Erzeugt am {date.today().strftime('%d.%m.%Y')} mit "
-             "`scripts/build_quellen_doc.py`"
-             + (" --validate" if args.validate else "")
-             + " aus `config/watchlist.yaml`.")
+    L.append(
+        f"Erzeugt am {date.today().strftime('%d.%m.%Y')} mit "
+        "`scripts/build_quellen_doc.py`"
+        + (" --validate" if args.validate else "")
+        + " aus `config/watchlist.yaml`."
+    )
     if not args.validate:
-        L.append("\n> Ohne `--validate` erzeugt: die Spalte Verifikation ist leer, "
-                 "weil nur echte Abrufe dort stehen sollen.")
-    L.append("\n**Primaerquelle jedes Betreibers ist seine eigene Domain.** "
-             "Ausnahmen sind im YAML kommentiert und unten in der Spalte "
-             "Verifikation erkennbar. Telco-Fachpresse ist eine separate zweite "
-             "Ebene (`config/news_sources.yaml`).\n")
+        L.append(
+            "\n> Ohne `--validate` erzeugt: die Spalte Verifikation ist leer, "
+            "weil nur echte Abrufe dort stehen sollen."
+        )
+    L.append(
+        "\n**Primaerquelle jedes Betreibers ist seine eigene Domain.** "
+        "Ausnahmen sind im YAML kommentiert und unten in der Spalte "
+        "Verifikation erkennbar. Telco-Fachpresse ist eine separate zweite "
+        "Ebene (`config/news_sources.yaml`).\n"
+    )
 
     L.append("## Ueberblick\n")
-    L.append(f"- **{len(cfg.operators)} Betreiber** in {len(cfg.region_names) - 1} Regionen.")
-    L.append(f"- Direkt maschinenlesbar (Feed/JSON): **{kinds.get('rss', 0) + kinds.get('json_api', 0)}** "
-             f"({kinds.get('rss', 0)}x RSS/Atom, {kinds.get('json_api', 0)}x JSON-API).")
+    L.append(
+        f"- **{len(cfg.operators)} Betreiber** in {len(cfg.region_names) - 1} Regionen."
+    )
+    L.append(
+        f"- Direkt maschinenlesbar (Feed/JSON): **{kinds.get('rss', 0) + kinds.get('json_api', 0)}** "
+        f"({kinds.get('rss', 0)}x RSS/Atom, {kinds.get('json_api', 0)}x JSON-API)."
+    )
     L.append(f"- Newsroom statisch: **{kinds.get('newsroom', 0)}**.")
     L.append(f"- Newsroom JS-gerendert: **{kinds.get('newsroom_js', 0)}**.")
-    L.append(f"- Nicht automatisiert (Referenz + Begruendung): **{kinds.get('official', 0)}**.")
+    L.append(
+        f"- Nicht automatisiert (Referenz + Begruendung): **{kinds.get('official', 0)}**."
+    )
     L.append(f"- Fachpresse: **{len(cfg.news_sources)}** Feeds.")
-    L.append(f"- Themenfelder (Technologie, Geraete, Regulierung): "
-             f"**{len(cfg.tech_sources)}** Quellen in {len(cfg.theme_names)} "
-             f"Themen (`config/tech_sources.yaml`).\n")
+    L.append(
+        f"- Themenfelder (Technologie, Geraete, Regulierung): "
+        f"**{len(cfg.tech_sources)}** Quellen in {len(cfg.theme_names)} "
+        f"Themen (`config/tech_sources.yaml`).\n"
+    )
 
     by_region: dict[str, list] = {}
     for op in cfg.operators:
@@ -135,17 +165,23 @@ def main() -> int:
                     extra = f" (item_selector: `{s.item_selector}`)"
                 note = checks.get(f"{op.name}|{s.url}", "")
                 if s.kind == "official" and s.plan:
-                    note = (note + " — " if note else "") + " ".join(s.plan.split())[:300]
-                L.append(f"| {op.name} | {op.country} | {op.website} | {s.url} | "
-                         f"{KIND_LABEL.get(s.kind, s.kind)}{extra} | {note} |")
+                    note = (note + " — " if note else "") + " ".join(s.plan.split())[
+                        :300
+                    ]
+                L.append(
+                    f"| {op.name} | {op.country} | {op.website} | {s.url} | "
+                    f"{KIND_LABEL.get(s.kind, s.kind)}{extra} | {note} |"
+                )
         L.append("")
 
     if cfg.tech_sources:
         L.append("## Themenfelder (dritte Ebene)\n")
-        L.append("Keine Netzbetreiber, sondern die Unternehmen und Behoerden, "
-                 "die den Rahmen setzen: KI-Anbieter, Geraete- und Chiphersteller, "
-                 "Netzausruester, Satellitenbetreiber, Regulierer. Eigener "
-                 "Analyst je Thema, eigener Abschnitt im Wochenbericht.\n")
+        L.append(
+            "Keine Netzbetreiber, sondern die Unternehmen und Behoerden, "
+            "die den Rahmen setzen: KI-Anbieter, Geraete- und Chiphersteller, "
+            "Netzausruester, Satellitenbetreiber, Regulierer. Eigener "
+            "Analyst je Thema, eigener Abschnitt im Wochenbericht.\n"
+        )
         for key, label in cfg.themes:
             quellen = [s for s in cfg.tech_sources if s.theme == key]
             if not quellen:
@@ -154,9 +190,11 @@ def main() -> int:
             L.append("| Quelle | Adresse | Anbindung | Verifikation |")
             L.append("|---|---|---|---|")
             for s in quellen:
-                L.append(f"| {s.name} | {s.url} | "
-                         f"{KIND_LABEL.get(s.kind, s.kind)} | "
-                         f"{checks.get(f'{s.name}|{s.url}', '')} |")
+                L.append(
+                    f"| {s.name} | {s.url} | "
+                    f"{KIND_LABEL.get(s.kind, s.kind)} | "
+                    f"{checks.get(f'{s.name}|{s.url}', '')} |"
+                )
             L.append("")
 
     L.append("## Fachpresse (zweite Ebene)\n")
@@ -167,10 +205,13 @@ def main() -> int:
     L.append("")
 
     args.out.write_text("\n".join(L), encoding="utf-8")
-    print(f"Geschrieben: {args.out} ({len(cfg.operators)} Betreiber, "
-          f"{len(cfg.news_sources)} Fachpresse-Feeds, "
-          f"{len(cfg.tech_sources)} Themenquellen"
-          + (", live geprueft" if args.validate else "") + ")")
+    print(
+        f"Geschrieben: {args.out} ({len(cfg.operators)} Betreiber, "
+        f"{len(cfg.news_sources)} Fachpresse-Feeds, "
+        f"{len(cfg.tech_sources)} Themenquellen"
+        + (", live geprueft" if args.validate else "")
+        + ")"
+    )
     return 0
 
 

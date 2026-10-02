@@ -13,6 +13,7 @@ vom 11.08.2026 (`claude/telco-radar` Handover §6): eine damals erfundene
 Fixture wurde erst durch einen zweiten, adversarischen Pruefdurchgang
 aufgedeckt.
 """
+
 import gzip
 from pathlib import Path
 
@@ -21,7 +22,13 @@ import pytest
 from telco_radar.collect.geraete import GeraeteAbrufFehler, ernte_links, sammle_anbieter
 from telco_radar.collect.geraete import congstar
 from telco_radar.collect.geraete.robots import RobotsWaechter
-from telco_radar.geraete_config import Anbieter, Einstieg, lade_farben, lade_katalog, lade_quellen
+from telco_radar.geraete_config import (
+    Anbieter,
+    Einstieg,
+    lade_farben,
+    lade_katalog,
+    lade_quellen,
+)
 from telco_radar.geraete_model import lies_listung, zustand_aus_feldern
 
 _FIX = Path(__file__).parent / "fixtures" / "geraete"
@@ -77,13 +84,17 @@ def farben():
 # Die Sitemap: nur echte, verlinkte Adressen (§ 87b UrhG)
 # ==========================================================================
 
+
 def test_sitemap_liefert_55_geraeteseiten():
     """Es wird ausschliesslich geerntet, was die Sitemap selbst nennt - keine
     hochgezaehlte ID. `ernte_links` ist die generische Funktion, congstar
     braucht dafuer keinen eigenen `ernte`."""
-    urls = ernte_links(_fixture("congstar_sitemap_devices.xml"),
-                       "https://www.congstar.de/sitemap/devices.xml",
-                       pfadmuster="/geraete/", kind="sitemap")
+    urls = ernte_links(
+        _fixture("congstar_sitemap_devices.xml"),
+        "https://www.congstar.de/sitemap/devices.xml",
+        pfadmuster="/geraete/",
+        kind="sitemap",
+    )
     assert len(urls) == 55
     assert all(u.startswith("https://www.congstar.de/geraete/") for u in urls)
     for eintrag in _PRODUKTE.values():
@@ -93,6 +104,7 @@ def test_sitemap_liefert_55_geraeteseiten():
 # ==========================================================================
 # Der Preis: `listed`, niemals `discounted`
 # ==========================================================================
+
 
 @pytest.mark.parametrize("dateiname", sorted(_PRODUKTE))
 def test_congstar_liest_oneTime_listed_nicht_discounted(dateiname):
@@ -113,7 +125,8 @@ def test_congstar_liest_oneTime_listed_nicht_discounted(dateiname):
         # Im Roh-HTML steht die JSON-Nutzlast escapt (\"discounted\":757).
         assert f'\\"discounted\\":{discounted}' in roh, (
             f"{dateiname}: die Fixture muss den discounted-Koeder fuer "
-            f"{speicher} GB enthalten, sonst ist die Gegenprobe wirkungslos")
+            f"{speicher} GB enthalten, sonst ist die Gegenprobe wirkungslos"
+        )
 
     for speicher, (listed, discounted) in speicherwerte.items():
         treffer = [s for s in saetze if s["speicher_gb"] == int(speicher)]
@@ -121,7 +134,8 @@ def test_congstar_liest_oneTime_listed_nicht_discounted(dateiname):
         preise = {s["preis"] for s in treffer}
         assert preise == {listed}, (
             f"{dateiname} ({speicher} GB): erwartet {listed} (oneTime.listed), "
-            f"bekommen {preise} - discounted waere {discounted}")
+            f"bekommen {preise} - discounted waere {discounted}"
+        )
         assert discounted not in preise
 
 
@@ -147,12 +161,14 @@ def test_discounted_gegenprobe_faellt_bei_der_falschen_zahl_durch():
     assert erwartete_listed <= gefundene_preise
     assert not (verbotene_discounted & gefundene_preise), (
         "mindestens ein discounted-Wert steht unter den gelesenen Preisen - "
-        "das ist die Falle aus dem Modulkopf")
+        "das ist die Falle aus dem Modulkopf"
+    )
 
 
 # ==========================================================================
 # Herstellerverteilung und Variantenzahl je Datei
 # ==========================================================================
+
 
 def test_variantenzahl_und_herstellerverteilung():
     """iPhone 17: 7 Varianten (5x 256GB, 2x 512GB); Galaxy S25: 5; Pixel 11:
@@ -178,14 +194,21 @@ def test_alle_vier_hersteller_treffen_den_katalog(katalog, farben):
     for dateiname, angaben in _PRODUKTE.items():
         for satz in congstar.lies(_fixture(dateiname), url=angaben["url"]):
             listung = lies_listung(
-                titel=satz["titel"], anbieter="congstar", anbieter_typ="discount",
-                netz="Telekom", quelle_url=satz["url"], abgerufen_am="2026-08-31",
-                katalog=katalog, farben=farben,
+                titel=satz["titel"],
+                anbieter="congstar",
+                anbieter_typ="discount",
+                netz="Telekom",
+                quelle_url=satz["url"],
+                abgerufen_am="2026-08-31",
+                katalog=katalog,
+                farben=farben,
                 verfuegbarkeit=satz["verfuegbarkeit"],
-                farbe_roh=satz["farbe"], ean=satz["ean"],
+                farbe_roh=satz["farbe"],
+                ean=satz["ean"],
                 speicher_gb=satz["speicher_gb"],
                 zustand_hinweis=satz.get("zustand_hinweis", ""),
-                preis_ohne_vertrag=satz["preis"])
+                preis_ohne_vertrag=satz["preis"],
+            )
             assert listung is not None, satz["titel"]
             hersteller_ids.add(listung.device_id.split("-")[0])
     assert hersteller_ids == {"apple", "samsung", "google", "xiaomi"}
@@ -195,17 +218,22 @@ def test_alle_vier_hersteller_treffen_den_katalog(katalog, farben):
 # Zustand: aus `condition` UND aus dem Titel, ueber zustand_aus_feldern
 # ==========================================================================
 
+
 def test_zustand_hinweis_traegt_das_rohe_condition_feld():
     """Der Adapter selbst schreibt keine zweite Zustandslogik - er reicht
     `condition` unveraendert als `zustand_hinweis` weiter."""
-    saetze = congstar.lies(_fixture("congstar_produkt_iphone17.html.gz"),
-                           url=_PRODUKTE["congstar_produkt_iphone17.html.gz"]["url"])
+    saetze = congstar.lies(
+        _fixture("congstar_produkt_iphone17.html.gz"),
+        url=_PRODUKTE["congstar_produkt_iphone17.html.gz"]["url"],
+    )
     assert all(s["zustand_hinweis"] == "NEW" for s in saetze)
     # Und zustand_aus_feldern() - dieselbe Funktion, die jeder andere
     # Adapter benutzt - liest daraus "neu".
     for s in saetze:
-        assert zustand_aus_feldern(s["titel"], s["farbe"], s["zustand_hinweis"],
-                                   s["url"]) == "neu"
+        assert (
+            zustand_aus_feldern(s["titel"], s["farbe"], s["zustand_hinweis"], s["url"])
+            == "neu"
+        )
 
 
 def test_zustand_refurbished_wird_aus_dem_condition_feld_erkannt():
@@ -217,35 +245,56 @@ def test_zustand_refurbished_wird_aus_dem_condition_feld_erkannt():
     dass die Weiterleitung wirklich verdrahtet ist und nicht nur zufaellig
     "neu" ergibt."""
     roh = _fixture("congstar_produkt_iphone17.html.gz")
-    assert '\\"condition\\":\\"NEW\\"' in roh, \
+    assert '\\"condition\\":\\"NEW\\"' in roh, (
         "die Fixture muss condition=NEW im escapten JSON tragen"
-    veraendert = roh.replace('\\"condition\\":\\"NEW\\"',
-                             '\\"condition\\":\\"REFURBISHED\\"')
-    saetze = congstar.lies(veraendert, url="https://www.congstar.de/geraete/apple/apple-iphone-17/")
+    )
+    veraendert = roh.replace(
+        '\\"condition\\":\\"NEW\\"', '\\"condition\\":\\"REFURBISHED\\"'
+    )
+    saetze = congstar.lies(
+        veraendert, url="https://www.congstar.de/geraete/apple/apple-iphone-17/"
+    )
     assert saetze and all(s["zustand_hinweis"] == "REFURBISHED" for s in saetze)
     for s in saetze:
-        assert zustand_aus_feldern(s["titel"], s["farbe"], s["zustand_hinweis"],
-                                   s["url"]) == "refurbished"
+        assert (
+            zustand_aus_feldern(s["titel"], s["farbe"], s["zustand_hinweis"], s["url"])
+            == "refurbished"
+        )
 
 
 # ==========================================================================
 # Die Geraete-ID kommt aus dem KATALOG, nie aus dem Titel (Teil E)
 # ==========================================================================
 
+
 def test_zwei_titelschreibweisen_ergeben_dieselbe_sku_id(katalog, farben):
-    a = {"titel": "Google Pixel 11 256 GB frost", "preis": 991.0,
-         "verfuegbarkeit": "lieferbar", "farbe": "frost", "speicher_gb": 256,
-         "zustand_hinweis": "NEW",
-         "url": "https://www.congstar.de/geraete/google/google-pixel-11/"}
+    a = {
+        "titel": "Google Pixel 11 256 GB frost",
+        "preis": 991.0,
+        "verfuegbarkeit": "lieferbar",
+        "farbe": "frost",
+        "speicher_gb": 256,
+        "zustand_hinweis": "NEW",
+        "url": "https://www.congstar.de/geraete/google/google-pixel-11/",
+    }
     b = dict(a, titel="Google Pixel 11 5G, 256GB, Frost")
 
     def _listung(satz):
         return lies_listung(
-            titel=satz["titel"], anbieter="congstar", anbieter_typ="discount",
-            netz="Telekom", quelle_url=satz["url"], abgerufen_am="2026-08-31",
-            katalog=katalog, farben=farben, verfuegbarkeit=satz["verfuegbarkeit"],
-            farbe_roh=satz["farbe"], speicher_gb=satz["speicher_gb"],
-            zustand_hinweis=satz["zustand_hinweis"], preis_ohne_vertrag=satz["preis"])
+            titel=satz["titel"],
+            anbieter="congstar",
+            anbieter_typ="discount",
+            netz="Telekom",
+            quelle_url=satz["url"],
+            abgerufen_am="2026-08-31",
+            katalog=katalog,
+            farben=farben,
+            verfuegbarkeit=satz["verfuegbarkeit"],
+            farbe_roh=satz["farbe"],
+            speicher_gb=satz["speicher_gb"],
+            zustand_hinweis=satz["zustand_hinweis"],
+            preis_ohne_vertrag=satz["preis"],
+        )
 
     la, lb = _listung(a), _listung(b)
     assert la is not None and lb is not None
@@ -255,6 +304,7 @@ def test_zwei_titelschreibweisen_ergeben_dieselbe_sku_id(katalog, farben):
 # ==========================================================================
 # Quelllink: absolut, und die abgerufene Seite ist ihr eigener Beleg
 # ==========================================================================
+
 
 @pytest.mark.parametrize("dateiname", sorted(_PRODUKTE))
 def test_quelllink_ist_die_absolut_abgerufene_menschenseite(dateiname):
@@ -270,29 +320,44 @@ def test_quelllink_ist_die_absolut_abgerufene_menschenseite(dateiname):
 # Verfuegbarkeit
 # ==========================================================================
 
+
 def _push_seite(variante: dict) -> str:
     """Eine Next.js-Flight-Seite mit EINER Variante - der Form, die
     congstars self.__next_f-Fragmente wirklich haben (json.dumps liefert
     die innere Escapung, die _PUSH_RE erwartet)."""
     import json as _json
+
     # Innen compact (keine Leerzeichen): _VARIANTE_START_RE sucht
     # {"id":1,"gtin":" wortwoertlich; aussen ebenso (_PUSH_RE, Komma).
-    return ('<script>self.__next_f.push('
-            + _json.dumps([1, _json.dumps(variante, separators=(",", ":"))],
-                          separators=(",", ":")) + ')</script>')
+    return (
+        "<script>self.__next_f.push("
+        + _json.dumps(
+            [1, _json.dumps(variante, separators=(",", ":"))], separators=(",", ":")
+        )
+        + ")</script>"
+    )
 
 
 def _tb_variante() -> dict:
     """Apples 1-TB-Schreibweise: `size` traegt die Zahl OHNE Einheit,
     `referenceGB` die in GB (Modulkopf congstar.py, Galaxy S26 Ultra)."""
-    return {"id": 1, "gtin": "0123456789012",
-            "title": "Apple iPhone 18 Pro 1 TB",
-            "memory": {"size": 1, "referenceGB": 1024},
-            "color": {"name": "schwarz"},
-            "availability": {"status": "IN_STOCK"},
-            "prices": {"paymentVariants": [
-                {"type": "ONE_TIME_PURCHASE", "contractDuration": 0,
-                 "oneTime": {"listed": 2199.0}}]}}
+    return {
+        "id": 1,
+        "gtin": "0123456789012",
+        "title": "Apple iPhone 18 Pro 1 TB",
+        "memory": {"size": 1, "referenceGB": 1024},
+        "color": {"name": "schwarz"},
+        "availability": {"status": "IN_STOCK"},
+        "prices": {
+            "paymentVariants": [
+                {
+                    "type": "ONE_TIME_PURCHASE",
+                    "contractDuration": 0,
+                    "oneTime": {"listed": 2199.0},
+                }
+            ]
+        },
+    }
 
 
 def test_listung_eines_1_tb_geraetes_traegt_1024_gb():
@@ -321,18 +386,23 @@ def test_ohne_referenceGB_waere_dieselbe_listung_1_gb():
 def test_verfuegbarkeit_wird_uebersetzt():
     """PRE_MARKETING (iPhone 17, mit Ankuendigung "wieder lieferbar in 5-6
     Wochen") -> nicht_lieferbar; IN_STOCK (die drei anderen) -> lieferbar."""
-    iphone = congstar.lies(_fixture("congstar_produkt_iphone17.html.gz"),
-                           url=_PRODUKTE["congstar_produkt_iphone17.html.gz"]["url"])
+    iphone = congstar.lies(
+        _fixture("congstar_produkt_iphone17.html.gz"),
+        url=_PRODUKTE["congstar_produkt_iphone17.html.gz"]["url"],
+    )
     assert all(s["verfuegbarkeit"] == "nicht_lieferbar" for s in iphone)
 
-    pixel = congstar.lies(_fixture("congstar_produkt_pixel11.html.gz"),
-                          url=_PRODUKTE["congstar_produkt_pixel11.html.gz"]["url"])
+    pixel = congstar.lies(
+        _fixture("congstar_produkt_pixel11.html.gz"),
+        url=_PRODUKTE["congstar_produkt_pixel11.html.gz"]["url"],
+    )
     assert all(s["verfuegbarkeit"] == "lieferbar" for s in pixel)
 
 
 # ==========================================================================
 # Ein gescheiterter Abruf ist nicht "nichts gefunden"
 # ==========================================================================
+
 
 def test_seite_ohne_next_f_nutzlast_wirft():
     with pytest.raises(GeraeteAbrufFehler):
@@ -356,8 +426,7 @@ def test_contractduration_als_zeichenkette_bleibt_ohne_vertrag():
     """
     roh = _fixture("congstar_produkt_iphone17.html.gz")
     assert '\\"contractDuration\\":0' in roh
-    als_text = roh.replace('\\"contractDuration\\":0',
-                           '\\"contractDuration\\":\\"0\\"')
+    als_text = roh.replace('\\"contractDuration\\":0', '\\"contractDuration\\":\\"0\\"')
     url = _PRODUKTE["congstar_produkt_iphone17.html.gz"]["url"]
     vorher = congstar.lies(roh, url=url)
     nachher = congstar.lies(als_text, url=url)
@@ -370,15 +439,14 @@ def test_eine_variante_ohne_barpreis_wird_benannt(caplog):
     Ergebnis, sondern eine benannte Luecke - sonst verliert diese Seite
     lautlos alle Saetze."""
     roh = _fixture("congstar_produkt_iphone17.html.gz")
-    ohne = roh.replace('\\"type\\":\\"ONE_TIME_PURCHASE\\"',
-                       '\\"type\\":\\"RATENKAUF_NEU\\"')
+    ohne = roh.replace(
+        '\\"type\\":\\"ONE_TIME_PURCHASE\\"', '\\"type\\":\\"RATENKAUF_NEU\\"'
+    )
     url = _PRODUKTE["congstar_produkt_iphone17.html.gz"]["url"]
-    with caplog.at_level("INFO",
-                         logger="telco_radar.collect.geraete.congstar"):
+    with caplog.at_level("INFO", logger="telco_radar.collect.geraete.congstar"):
         saetze = congstar.lies(ohne, url=url)
     assert saetze == []
-    benannt = [m for m in caplog.messages
-               if "ohne Einmalkauf-Zahlweise" in m]
+    benannt = [m for m in caplog.messages if "ohne Einmalkauf-Zahlweise" in m]
     assert len(benannt) == 7, caplog.messages
 
 
@@ -386,8 +454,10 @@ def test_eine_variante_ohne_barpreis_wird_benannt(caplog):
 # Konfiguration: die Methode ist registriert und aktiv
 # ==========================================================================
 
+
 def test_congstar_ist_registriert_und_aktiv_in_der_konfiguration():
     from telco_radar.collect.geraete import ADAPTER
+
     assert "congstar_next" in ADAPTER
     assert ADAPTER["congstar_next"].lies is congstar.lies
 
@@ -405,6 +475,7 @@ def test_congstar_ist_registriert_und_aktiv_in_der_konfiguration():
 # Ende-zu-Ende: robots -> Sitemap -> vier Produktseiten -> Listungen
 # ==========================================================================
 
+
 def test_sammle_anbieter_ende_zu_ende(katalog, farben):
     """Robots-Pruefung, Sitemap-Ernte und Produktabruf im Zusammenspiel.
 
@@ -419,9 +490,9 @@ def test_sammle_anbieter_ende_zu_ende(katalog, farben):
         assert f"<loc>{angaben['url']}</loc>" in echte_sitemap, angaben["url"]
     mini_sitemap = (
         '<?xml version="1.0" encoding="UTF-8"?>\n<urlset '
-        'xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
-        "".join(f"<url><loc>{a['url']}</loc></url>\n" for a in _PRODUKTE.values()) +
-        "</urlset>"
+        'xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        + "".join(f"<url><loc>{a['url']}</loc></url>\n" for a in _PRODUKTE.values())
+        + "</urlset>"
     )
 
     seiten = {angaben["url"]: dateiname for dateiname, angaben in _PRODUKTE.items()}
@@ -436,15 +507,32 @@ def test_sammle_anbieter_ende_zu_ende(katalog, farben):
         return (404, "")
 
     anbieter = Anbieter(
-        name="congstar", typ="discount", netz="Telekom", methode="congstar_next",
-        basis_url="https://www.congstar.de", rate_limit_sekunden=0,
-        einstiege=[Einstieg(url="https://www.congstar.de/sitemap/devices.xml",
-                            kind="sitemap", pfadmuster="/geraete/")])
+        name="congstar",
+        typ="discount",
+        netz="Telekom",
+        methode="congstar_next",
+        basis_url="https://www.congstar.de",
+        rate_limit_sekunden=0,
+        einstiege=[
+            Einstieg(
+                url="https://www.congstar.de/sitemap/devices.xml",
+                kind="sitemap",
+                pfadmuster="/geraete/",
+            )
+        ],
+    )
 
     from datetime import datetime, timezone
-    bilanz = sammle_anbieter(anbieter, katalog, farben, hole, "2026-08-31",
-                             RobotsWaechter(hole=hole),
-                             datetime(2026, 8, 31, 10, tzinfo=timezone.utc))
+
+    bilanz = sammle_anbieter(
+        anbieter,
+        katalog,
+        farben,
+        hole,
+        "2026-08-31",
+        RobotsWaechter(hole=hole),
+        datetime(2026, 8, 31, 10, tzinfo=timezone.utc),
+    )
 
     assert bilanz.status == "ok", (bilanz.status, bilanz.grund)
     assert len(bilanz.listungen) == 18, len(bilanz.listungen)

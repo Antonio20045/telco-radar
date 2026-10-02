@@ -4,6 +4,7 @@ Die Faelle stammen aus der ECHTEN Ausgabe vom 07.08.2026 - jener, an der die
 Doppelmeldungen aufgefallen sind. Ein Test, der sich seine Meldungen ausdenkt,
 prueft die Schwellen nicht, sondern die Fantasie des Autors.
 """
+
 from __future__ import annotations
 
 import json
@@ -17,11 +18,17 @@ from telco_radar.models import Item
 JETZT = datetime(2026, 8, 7, 9, 0, tzinfo=timezone.utc)
 
 
-def _item(titel, *, url=None, operator=None, quelle="Testquelle",
-          stunden=0, summary=""):
-    return Item(title=titel, url=url or f"https://x.test/{abs(hash(titel))}",
-                source_name=quelle, operator=operator,
-                published=JETZT - timedelta(hours=stunden), summary=summary)
+def _item(
+    titel, *, url=None, operator=None, quelle="Testquelle", stunden=0, summary=""
+):
+    return Item(
+        title=titel,
+        url=url or f"https://x.test/{abs(hash(titel))}",
+        source_name=quelle,
+        operator=operator,
+        published=JETZT - timedelta(hours=stunden),
+        summary=summary,
+    )
 
 
 def _gruppen_mit_mehreren(gruppen):
@@ -29,6 +36,7 @@ def _gruppen_mit_mehreren(gruppen):
 
 
 # --------------------------------------------------------------- Wortmengen
+
 
 def test_zahlen_mit_einheit_werden_normalisiert():
     z = C.zahlenmenge("Indosat launches 1 GW AI infra play with $800M backing")
@@ -40,7 +48,7 @@ def test_jahreszahl_ist_keine_kennzeichnende_zahl():
 
 
 def test_nackte_kleine_zahl_ist_keine_kennzeichnende_zahl():
-    """"600" und "5" stehen in jeder zweiten Ueberschrift. Ohne diese Regel
+    """ "600" und "5" stehen in jeder zweiten Ueberschrift. Ohne diese Regel
     entwerten sie SCHWELLE_MIT_ZAHL, die gerade auf Seltenheit beruht."""
     assert C.zahlenmenge("AT&T puts 600 to work for coverage") == frozenset()
     assert "34,95eur" in C.zahlenmenge("Telekom-Flat für 34,95 € im Monat")
@@ -54,16 +62,24 @@ def test_wortmenge_wirft_stoppwoerter_aus_allen_sprachen():
 
 # ------------------------------------------------ deterministischer Vorfilter
 
+
 def test_zayo_dreifachmeldung_wird_ein_ereignis():
     """Drei Fachmedien, dieselbe Nvidia-Partnerschaft. Der klarste Fall:
     fast identische Ueberschriften."""
     items = [
-        _item("Zayo teams with Nvidia to expand AI network capacity",
-              quelle="Light Reading"),
-        _item("Zayo teams with NVIDIA to scale network capacity for AI factories",
-              quelle="Telecoms.com"),
-        _item("Zayo Teams with NVIDIA to Scale Critical Network Capacity for "
-              "AI Factories", quelle="The Fast Mode"),
+        _item(
+            "Zayo teams with Nvidia to expand AI network capacity",
+            quelle="Light Reading",
+        ),
+        _item(
+            "Zayo teams with NVIDIA to scale network capacity for AI factories",
+            quelle="Telecoms.com",
+        ),
+        _item(
+            "Zayo Teams with NVIDIA to Scale Critical Network Capacity for "
+            "AI Factories",
+            quelle="The Fast Mode",
+        ),
     ]
     gruppen = C.gruppiere(items)
     assert len(gruppen) == 1
@@ -75,10 +91,14 @@ def test_indosat_wird_ueber_die_gemeinsame_zahl_gefunden():
     """Der Fall, den NUR der Zahlen-Abgleich faengt: 17 % gemeinsame Woerter,
     aber beide Meldungen nennen "1 GW"."""
     items = [
-        _item("Indosat launches 1 GW AI infra play with $800M Ooredoo backing",
-              operator="Ooredoo"),
-        _item("IOH makes 1GW Indonesian AI data centre play",
-              operator="Indosat Ooredoo Hutchison"),
+        _item(
+            "Indosat launches 1 GW AI infra play with $800M Ooredoo backing",
+            operator="Ooredoo",
+        ),
+        _item(
+            "IOH makes 1GW Indonesian AI data centre play",
+            operator="Indosat Ooredoo Hutchison",
+        ),
     ]
     gruppen = C.gruppiere(items)
     assert len(gruppen) == 1
@@ -92,10 +112,14 @@ def test_ohne_gemeinsamen_akteur_kein_ereignis():
     damit wie Eigennamen aus. Das Betreiberfeld entscheidet.
     """
     items = [
-        _item("Vodafone startet neuen Tarif mit unbegrenztem Datenvolumen",
-              operator="Vodafone"),
-        _item("Orange startet neuen Tarif mit unbegrenztem Datenvolumen",
-              operator="Orange"),
+        _item(
+            "Vodafone startet neuen Tarif mit unbegrenztem Datenvolumen",
+            operator="Vodafone",
+        ),
+        _item(
+            "Orange startet neuen Tarif mit unbegrenztem Datenvolumen",
+            operator="Orange",
+        ),
     ]
     assert len(C.gruppiere(items)) == 2
 
@@ -104,24 +128,38 @@ def test_folgeereignis_ausserhalb_des_zeitfensters_bleibt_getrennt():
     """Die wichtigste Sicherung: "Samsung stellt vor" und "Samsung startet
     den Verkauf" zwei Wochen spaeter sind ZWEI Ereignisse, auch wenn die
     Ueberschriften fast gleich lauten."""
-    a = _item("Samsung Officially Launches Galaxy Z Fold8 Ultra and Flip8",
-              operator="Samsung", stunden=0)
-    b = _item("Samsung Officially Launches Galaxy Z Fold8 Ultra and Flip8 "
-              "in Europe", operator="Samsung", stunden=14 * 24)
+    a = _item(
+        "Samsung Officially Launches Galaxy Z Fold8 Ultra and Flip8",
+        operator="Samsung",
+        stunden=0,
+    )
+    b = _item(
+        "Samsung Officially Launches Galaxy Z Fold8 Ultra and Flip8 in Europe",
+        operator="Samsung",
+        stunden=14 * 24,
+    )
     assert len(C.gruppiere([a, b])) == 2
 
 
 def test_haeufiger_name_verbindet_nicht():
     """Ohne die Seltenheitsrechnung verband "Networks"/"Cloud"/"Teams" im
     Testlauf ueber die Ausgabe vom 07.08.2026 146 Paare."""
-    items = [_item(f"Anbieter{i} Expands Cloud Networks for Enterprise "
-                   f"Customers in Region {i}") for i in range(20)]
+    items = [
+        _item(
+            f"Anbieter{i} Expands Cloud Networks for Enterprise Customers in Region {i}"
+        )
+        for i in range(20)
+    ]
     assert len(_gruppen_mit_mehreren(C.gruppiere(items))) == 0
 
 
 def test_gruppe_nimmt_nicht_unbegrenzt_auf():
-    items = [_item(f"Zayo teams with Nvidia to expand AI network capacity {i}",
-                   quelle=f"Q{i}") for i in range(20)]
+    items = [
+        _item(
+            f"Zayo teams with Nvidia to expand AI network capacity {i}", quelle=f"Q{i}"
+        )
+        for i in range(20)
+    ]
     for g in C.gruppiere(items):
         assert g.quellen <= C.MAX_MITGLIEDER
 
@@ -129,39 +167,57 @@ def test_gruppe_nimmt_nicht_unbegrenzt_auf():
 def test_vertreter_ist_die_erste_meldung_der_eingabe():
     """Die Pipeline sortiert vorher nach Datum absteigend - der Vertreter ist
     damit die frischeste Meldung, und ihre Belege stehen darunter."""
-    a = _item("Zayo teams with Nvidia to expand AI network capacity",
-              url="https://a.test/1")
-    b = _item("Zayo Teams with NVIDIA to Scale Network Capacity",
-              url="https://b.test/2")
+    a = _item(
+        "Zayo teams with Nvidia to expand AI network capacity", url="https://a.test/1"
+    )
+    b = _item(
+        "Zayo Teams with NVIDIA to Scale Network Capacity", url="https://b.test/2"
+    )
     gruppen = C.gruppiere([a, b])
     assert gruppen[0].vertreter.url == "https://a.test/1"
 
 
 # --------------------------------------------------------- ID und Stabilitaet
 
+
 def test_id_kommt_aus_der_url_nicht_aus_dem_titel():
     """Ein aus dem Titel gehashter Schluessel ist beim naechsten Lauf ein
     anderer, sobald eine Redaktion ihre Ueberschrift nachtraeglich aendert."""
-    a = C.Gruppe(vertreter=_item("Erste Fassung der Ueberschrift",
-                                 url="https://x.test/artikel-7"))
-    b = C.Gruppe(vertreter=_item("Nachtraeglich geaenderte Ueberschrift",
-                                 url="https://www.x.test/artikel-7/?utm_source=x"))
+    a = C.Gruppe(
+        vertreter=_item(
+            "Erste Fassung der Ueberschrift", url="https://x.test/artikel-7"
+        )
+    )
+    b = C.Gruppe(
+        vertreter=_item(
+            "Nachtraeglich geaenderte Ueberschrift",
+            url="https://www.x.test/artikel-7/?utm_source=x",
+        )
+    )
     assert a.id == b.id
 
 
 # ----------------------------------------------------------- LLM-Graubereich
+
 
 def test_digi_landet_im_graubereich_und_wird_zusammengelegt():
     """Der Grenzfall des Auftragsdokuments: gleicher Akteur, gleiches Thema,
     verschiedene Formulierungen. Der Vorfilter allein legt ihn NICHT
     zusammen - das Modell entscheidet."""
     items = [
-        _item("Tras Movistar, O2 y Orange, Digi estrena un filtro para "
-              "identificar las llamadas spam", operator="Digi"),
-        _item("Digi lanza un nuevo servicio gratis que te avisará cuando "
-              "recibas una llamada de spam", operator="Digi", stunden=20),
+        _item(
+            "Tras Movistar, O2 y Orange, Digi estrena un filtro para "
+            "identificar las llamadas spam",
+            operator="Digi",
+        ),
+        _item(
+            "Digi lanza un nuevo servicio gratis que te avisará cuando "
+            "recibas una llamada de spam",
+            operator="Digi",
+            stunden=20,
+        ),
     ]
-    assert len(C.gruppiere(items)) == 2      # ohne Modell: zwei Meldungen
+    assert len(C.gruppiere(items)) == 2  # ohne Modell: zwei Meldungen
 
     gefragt = []
 
@@ -170,6 +226,7 @@ def test_digi_landet_im_graubereich_und_wird_zusammengelegt():
         return '{"gleich": true}'
 
     import telco_radar.analyze.clustering as mod
+
     alt = mod.complete
     mod.complete = _ja
     try:
@@ -183,12 +240,20 @@ def test_digi_landet_im_graubereich_und_wird_zusammengelegt():
 
 def test_modell_sagt_nein_und_die_meldungen_bleiben_getrennt():
     items = [
-        _item("Tras Movistar, O2 y Orange, Digi estrena un filtro para "
-              "identificar las llamadas spam", operator="Digi"),
-        _item("Digi lanza un nuevo servicio gratis que te avisará cuando "
-              "recibas una llamada de spam", operator="Digi", stunden=20),
+        _item(
+            "Tras Movistar, O2 y Orange, Digi estrena un filtro para "
+            "identificar las llamadas spam",
+            operator="Digi",
+        ),
+        _item(
+            "Digi lanza un nuevo servicio gratis que te avisará cuando "
+            "recibas una llamada de spam",
+            operator="Digi",
+            stunden=20,
+        ),
     ]
     import telco_radar.analyze.clustering as mod
+
     alt = mod.complete
     mod.complete = lambda *a, **k: '{"gleich": false}'
     try:
@@ -199,12 +264,19 @@ def test_modell_sagt_nein_und_die_meldungen_bleiben_getrennt():
 
 def test_gescheiterter_modellaufruf_trennt_statt_zu_raten():
     items = [
-        _item("Disney+ annonce étudier le lancement d’une offre gratuite",
-              operator="Disney"),
-        _item("Josh D’Amaro, CEO de Disney: Estamos considerando una oferta "
-              "gratis para Disney+", operator="Disney", stunden=8),
+        _item(
+            "Disney+ annonce étudier le lancement d’une offre gratuite",
+            operator="Disney",
+        ),
+        _item(
+            "Josh D’Amaro, CEO de Disney: Estamos considerando una oferta "
+            "gratis para Disney+",
+            operator="Disney",
+            stunden=8,
+        ),
     ]
     import telco_radar.analyze.clustering as mod
+
     alt = mod.complete
 
     def _kaputt(*a, **k):
@@ -225,37 +297,57 @@ def test_deckel_waechst_mit_der_meldungsmenge():
 
 # --------------------------------------------------------------- ClusterStore
 
+
 def test_store_erkennt_den_nachdruck_eines_ereignisses(tmp_path):
     store = C.ClusterStore(tmp_path / "clusters.jsonl")
-    g = C.Gruppe(vertreter=_item(
-        "Zayo teams with Nvidia to expand AI network capacity",
-        operator="Zayo"))
+    g = C.Gruppe(
+        vertreter=_item(
+            "Zayo teams with Nvidia to expand AI network capacity", operator="Zayo"
+        )
+    )
     store.merke([g], JETZT.date().isoformat())
 
     frisch = C.ClusterStore(tmp_path / "clusters.jsonl")
     assert len(frisch) == 1
-    nachdruck = _item("Zayo teams with NVIDIA to expand AI network capacity",
-                      operator="Zayo")
+    nachdruck = _item(
+        "Zayo teams with NVIDIA to expand AI network capacity", operator="Zayo"
+    )
     assert frisch.zuordnen(nachdruck, JETZT) is not None
 
 
 def test_store_ordnet_ausserhalb_des_zeitfensters_nicht_mehr_zu(tmp_path):
     store = C.ClusterStore(tmp_path / "clusters.jsonl")
-    store.merke([C.Gruppe(vertreter=_item(
-        "Zayo teams with Nvidia to expand AI network capacity",
-        operator="Zayo"))], "2026-08-01")
-    spaeter = _item("Zayo teams with Nvidia to expand AI network capacity",
-                    operator="Zayo")
+    store.merke(
+        [
+            C.Gruppe(
+                vertreter=_item(
+                    "Zayo teams with Nvidia to expand AI network capacity",
+                    operator="Zayo",
+                )
+            )
+        ],
+        "2026-08-01",
+    )
+    spaeter = _item(
+        "Zayo teams with Nvidia to expand AI network capacity", operator="Zayo"
+    )
     assert store.zuordnen(spaeter, JETZT + timedelta(days=5)) is None
 
 
 def test_store_ordnet_eine_andere_meldung_desselben_absenders_nicht_zu(tmp_path):
     store = C.ClusterStore(tmp_path / "clusters.jsonl")
-    store.merke([C.Gruppe(vertreter=_item(
-        "Zayo teams with Nvidia to expand AI network capacity",
-        operator="Zayo"))], JETZT.date().isoformat())
-    anders = _item("Zayo meldet Quartalszahlen mit hoeherem Umsatz",
-                   operator="Zayo")
+    store.merke(
+        [
+            C.Gruppe(
+                vertreter=_item(
+                    "Zayo teams with Nvidia to expand AI network capacity",
+                    operator="Zayo",
+                )
+            )
+        ],
+        JETZT.date().isoformat(),
+    )
+    anders = _item("Zayo meldet Quartalszahlen mit hoeherem Umsatz", operator="Zayo")
     assert store.zuordnen(anders, JETZT) is None
 
 
@@ -276,6 +368,7 @@ def test_store_zaehlt_mitglieder_ueber_laeufe_hinweg(tmp_path):
 # ------------------------------------------------------------- echte Ausgabe
 
 # --------------------------------------------- Schutz des Seen-Stores
+
 
 def test_beleg_faellt_mit_seinem_vertreter_aus_dem_seen_store():
     """Die dritte Schutzstufe. Ohne sie waeren gebuendelte Meldungen der
@@ -307,22 +400,33 @@ def test_beleg_faellt_mit_der_region_seines_vertreters():
     v.region = "global"
     beleg = _item("Zayo Teams with NVIDIA", url="https://b.test/2")
     beleg.region = "europe"
-    merken = zu_merkende_meldungen([v, beleg], {v.id: v, beleg.id: v},
-                                   set(), {"global"})
+    merken = zu_merkende_meldungen(
+        [v, beleg], {v.id: v, beleg.id: v}, set(), {"global"}
+    )
     assert merken == []
 
 
 # ------------------------------------------------------------- echte Ausgabe
 
-@pytest.mark.parametrize("fall", [
-    ("SpaceX small cell plan serves up more Musk madness",
-     "Musk’s Starlink plots small cell rollout to rival US mobile operators"),
-    ("Improving GPT-5.6 Sol in ChatGPT and expanding access to GPT-5.6 Luna "
-     "for free users",
-     "ChatGPT cambia y elimina los límites en GPT-5.6 Luna para OpenAI"),
-    ("AST SpaceMobile targets beta D2D service with next BlueBird launch",
-     "D2D, Ast SpaceMobile lancia altri tre satelliti BlueBird"),
-])
+
+@pytest.mark.parametrize(
+    "fall",
+    [
+        (
+            "SpaceX small cell plan serves up more Musk madness",
+            "Musk’s Starlink plots small cell rollout to rival US mobile operators",
+        ),
+        (
+            "Improving GPT-5.6 Sol in ChatGPT and expanding access to GPT-5.6 Luna "
+            "for free users",
+            "ChatGPT cambia y elimina los límites en GPT-5.6 Luna para OpenAI",
+        ),
+        (
+            "AST SpaceMobile targets beta D2D service with next BlueBird launch",
+            "D2D, Ast SpaceMobile lancia altri tre satelliti BlueBird",
+        ),
+    ],
+)
 def test_belegte_dubletten_der_ausgabe_vom_7_august(fall):
     a, b = fall
     assert len(C.gruppiere([_item(a), _item(b, stunden=5)])) == 1
@@ -338,19 +442,30 @@ def test_zwei_wettbewerber_mit_derselben_satzschablone_sind_zwei_ereignisse():
     Die Testvoraussetzung ausgeschrieben: beide Seiten MUESSEN je einen
     eigenen Akteur tragen und ein gemeinsames seltenes Titelwort haben, sonst
     prueft der Test eine andere Regel."""
-    a = _item("Zain launches eSIM roaming bundle for travellers",
-              url="https://a.test/zain", quelle="Quelle A")
-    b = _item("Batelco launches eSIM roaming bundle for tourists",
-              url="https://b.test/batelco", quelle="Quelle B", stunden=3)
+    a = _item(
+        "Zain launches eSIM roaming bundle for travellers",
+        url="https://a.test/zain",
+        quelle="Quelle A",
+    )
+    b = _item(
+        "Batelco launches eSIM roaming bundle for tourists",
+        url="https://b.test/batelco",
+        quelle="Quelle B",
+        stunden=3,
+    )
 
     akteure = C._seltene_akteure([C.akteur_kandidaten(i) for i in (a, b)])
     selten = C._seltene_titelworte([C.wortmenge(i.title) for i in (a, b)])
-    pa, pb = (C._Profil.von(i, akteure=k, selten=s)
-              for i, k, s in zip((a, b), akteure, selten))
-    assert pa.akteure and pb.akteure and not (pa.akteure & pb.akteure), \
+    pa, pb = (
+        C._Profil.von(i, akteure=k, selten=s)
+        for i, k, s in zip((a, b), akteure, selten)
+    )
+    assert pa.akteure and pb.akteure and not (pa.akteure & pb.akteure), (
         "der Fall ohne Fix liegt nicht vor - beide brauchen EIGENE Akteure"
-    assert pa.selten & pb.selten, \
+    )
+    assert pa.selten & pb.selten, (
         "ohne gemeinsames seltenes Titelwort prueft der Test den falschen Pfad"
+    )
 
     assert C._urteil(pa, pb) == ("verschieden", 0.0)
     assert len(C.gruppiere([a, b])) == 2
@@ -380,32 +495,42 @@ def test_ee_slicing_dubletten_der_ausgabe_vom_27_august_werden_ein_ereignis():
     leer, kein Titelwort gilt als Akteur, und `_urteil` gab bisher sofort
     "verschieden" zurueck, OHNE die Titel je zu vergleichen."""
     slicing = [
-        _item("EE unveils UK’s first commercial 5G network slicing service",
-              url="https://www.mobileeurope.co.uk/ee-5g-network-slicing/",
-              quelle="Mobile Europe"),
-        _item("EE introduces premium ‘Fast Lane’ 5G network "
-              "slicing service",
-              url="https://totaltele.com/ee-introduces-premium-fast-lane-"
-                  "5g-network-slicing-service/",
-              quelle="Total Telecom", stunden=2),
-        _item("EE launches 5G+ network slice for consumers and small "
-              "businesses",
-              url="https://www.telecoms.com/5g-6g/ee-launches-5g-network-"
-                  "slice-for-consumers-and-small-businesses",
-              quelle="Telecoms.com", stunden=4),
-        _item("EE joins Europe's growing 5G slicing cohort with consumer "
-              "offer",
-              url="https://www.lightreading.com/5g/ee-joins-europe-s-"
-                  "growing-5g-slicing-cohort-with-consumer-offer",
-              quelle="Light Reading", stunden=6),
+        _item(
+            "EE unveils UK’s first commercial 5G network slicing service",
+            url="https://www.mobileeurope.co.uk/ee-5g-network-slicing/",
+            quelle="Mobile Europe",
+        ),
+        _item(
+            "EE introduces premium ‘Fast Lane’ 5G network slicing service",
+            url="https://totaltele.com/ee-introduces-premium-fast-lane-"
+            "5g-network-slicing-service/",
+            quelle="Total Telecom",
+            stunden=2,
+        ),
+        _item(
+            "EE launches 5G+ network slice for consumers and small businesses",
+            url="https://www.telecoms.com/5g-6g/ee-launches-5g-network-"
+            "slice-for-consumers-and-small-businesses",
+            quelle="Telecoms.com",
+            stunden=4,
+        ),
+        _item(
+            "EE joins Europe's growing 5G slicing cohort with consumer offer",
+            url="https://www.lightreading.com/5g/ee-joins-europe-s-"
+            "growing-5g-slicing-cohort-with-consumer-offer",
+            quelle="Light Reading",
+            stunden=6,
+        ),
     ]
     # Gegenprobe: eine fuenfte, ebenfalls echte EE-Meldung aus demselben
     # Zeitfenster - aber ueber ein anderes Thema (kein Slicing). Sie darf
     # NICHT mit hineinrutschen, sonst waere die neue Regel zu grob.
-    ryanair = _item("EE has flown the Ryanair model into 5G",
-                     url="https://www.lightreading.com/5g/ee-has-flown-"
-                         "the-ryanair-model-into-5g",
-                     quelle="Light Reading", stunden=8)
+    ryanair = _item(
+        "EE has flown the Ryanair model into 5G",
+        url="https://www.lightreading.com/5g/ee-has-flown-the-ryanair-model-into-5g",
+        quelle="Light Reading",
+        stunden=8,
+    )
 
     # Die Testvoraussetzung, ausgeschrieben: ohne diese Zeile pruefte der
     # Test nicht die Luecke, die er beheben soll, sondern etwas anderes -
@@ -414,12 +539,15 @@ def test_ee_slicing_dubletten_der_ausgabe_vom_27_august_werden_ein_ereignis():
     # gegriffen.
     p0, p1 = C._Profil.von(slicing[0]), C._Profil.von(slicing[1])
     assert not p0.betreiber and not p1.betreiber
-    assert not (p0.akteure & p1.akteure), \
+    assert not (p0.akteure & p1.akteure), (
         "EE ist hier als Akteur erkannt - der Test prueft die falsche Luecke"
+    )
 
     def _ja(system, user, model=None, max_tokens=None):
         return '{"gleich": true}'
+
     import telco_radar.analyze.clustering as mod
+
     alt = mod.complete
     mod.complete = _ja
     try:
@@ -432,13 +560,15 @@ def test_ee_slicing_dubletten_der_ausgabe_vom_27_august_werden_ein_ereignis():
     assert gebuendelt[0].quellen == 4
 
     andere = next(g for g in gruppen if g.vertreter.url == ryanair.url)
-    assert andere.quellen == 1, \
+    assert andere.quellen == 1, (
         "die inhaltlich andere EE-Meldung ist faelschlich hineingerutscht"
+    )
 
 
 # --------------------------------------------------------------------------- #
 # Der Absturz aus Lauf #86
 # --------------------------------------------------------------------------- #
+
 
 def test_zusammenlegen_verschiebt_keine_offenen_zweifelsfaelle(monkeypatch):
     """Lauf #86 starb mit "IndexError: list index out of range".
@@ -455,32 +585,42 @@ def test_zusammenlegen_verschiebt_keine_offenen_zweifelsfaelle(monkeypatch):
     # Zwoelf Themen zu je zwei Meldungen: die Paare liegen im Graubereich,
     # die Themen untereinander sind verschieden. So bleiben die Gruppen klein
     # genug, dass MAX_MITGLIEDER die Schleife nicht vorher abwuergt.
-    worte = ["alpha beta gamma delta", "epsilon zeta eta theta",
-             "iota kappa lambda my", "ny xi omikron pi"]
+    worte = [
+        "alpha beta gamma delta",
+        "epsilon zeta eta theta",
+        "iota kappa lambda my",
+        "ny xi omikron pi",
+    ]
     items = []
     for t in range(12):
         marke = f"Marke{t}"
         for k in range(2):
-            items.append(Item(
-                title=f"{marke} {worte[k % len(worte)]} thema{t}",
-                url=f"https://x.test/{t}-{k}", source_name="q", operator=marke,
-                published=JETZT - timedelta(hours=t),
-                summary=f"{marke} {worte[(k + 1) % len(worte)]} thema{t}"))
+            items.append(
+                Item(
+                    title=f"{marke} {worte[k % len(worte)]} thema{t}",
+                    url=f"https://x.test/{t}-{k}",
+                    source_name="q",
+                    operator=marke,
+                    published=JETZT - timedelta(hours=t),
+                    summary=f"{marke} {worte[(k + 1) % len(worte)]} thema{t}",
+                )
+            )
 
     # Die Reihenfolge der Zweifelsfaelle entscheidet, ob der Fehler auftritt:
     # es muss zuerst ein FRUEHER Index aufgeloest werden, damit die spaeteren
     # danebenzeigen. Der echte Rang haengt an den Profilen, hier wird er
     # deshalb erzwungen.
-    monkeypatch.setattr(C, "_grau_rang",
-                        lambda a, b, w: 1000.0 - abs(hash(a.item.url)) % 1000)
+    monkeypatch.setattr(
+        C, "_grau_rang", lambda a, b, w: 1000.0 - abs(hash(a.item.url)) % 1000
+    )
     monkeypatch.setattr(C, "_frage_modell", lambda a, b, m: True)
 
-    gruppen = C.gruppiere(items, model="m", use_llm=True,
-                                   max_llm_pruefungen=500)
+    gruppen = C.gruppiere(items, model="m", use_llm=True, max_llm_pruefungen=500)
 
     # Kein Absturz - und jede Meldung ist genau einmal vertreten.
-    gesehen = [g.vertreter.id for g in gruppen] + \
-              [m.id for g in gruppen for m in g.mitglieder]
+    gesehen = [g.vertreter.id for g in gruppen] + [
+        m.id for g in gruppen for m in g.mitglieder
+    ]
     assert len(gesehen) == len(set(gesehen)) == len(items)
 
 
@@ -488,20 +628,26 @@ def test_aufgeloeste_zielgruppe_nimmt_nichts_mehr_auf(monkeypatch):
     """Eine Gruppe, die selbst schon in eine andere gehaengt wurde, ist kein
     gueltiges Ziel mehr - sonst landet eine Meldung in einer Gruppe, die
     niemand zurueckgibt, und ist damit still verschwunden."""
-    worte = ["alpha beta gamma delta", "epsilon zeta eta theta",
-             "iota kappa lambda my"]
-    items = [Item(title=f"Marke{t} {worte[k % len(worte)]} thema{t}",
-                  url=f"https://x.test/{t}-{k}", source_name="q",
-                  operator=f"Marke{t}",
-                  published=JETZT - timedelta(hours=t),
-                  summary=f"Marke{t} {worte[(k + 1) % len(worte)]} thema{t}")
-             for t in range(8) for k in range(3)]
+    worte = ["alpha beta gamma delta", "epsilon zeta eta theta", "iota kappa lambda my"]
+    items = [
+        Item(
+            title=f"Marke{t} {worte[k % len(worte)]} thema{t}",
+            url=f"https://x.test/{t}-{k}",
+            source_name="q",
+            operator=f"Marke{t}",
+            published=JETZT - timedelta(hours=t),
+            summary=f"Marke{t} {worte[(k + 1) % len(worte)]} thema{t}",
+        )
+        for t in range(8)
+        for k in range(3)
+    ]
     monkeypatch.setattr(C, "_frage_modell", lambda a, b, m: True)
 
-    gruppen = C.gruppiere(items, model="m", use_llm=True,
-                                   max_llm_pruefungen=500)
+    gruppen = C.gruppiere(items, model="m", use_llm=True, max_llm_pruefungen=500)
 
-    alle = [g.vertreter.id for g in gruppen] + \
-           [m.id for g in gruppen for m in g.mitglieder]
-    assert len(alle) == len(set(alle)) == len(items), \
+    alle = [g.vertreter.id for g in gruppen] + [
+        m.id for g in gruppen for m in g.mitglieder
+    ]
+    assert len(alle) == len(set(alle)) == len(items), (
         "eine Meldung ist beim Zusammenlegen verloren gegangen oder doppelt"
+    )

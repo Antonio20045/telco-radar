@@ -6,6 +6,7 @@ press releases / news articles, optionally narrowed by a per-source CSS
 selector from the watchlist. Dates are parsed from the URL or nearby text
 when possible; undated items rely on the seen-store for novelty.
 """
+
 from __future__ import annotations
 
 import json
@@ -37,16 +38,15 @@ _SKIP_HINTS = re.compile(
     r"/stockholders?(?:/|$)|/capex(?:[-_/]|$)|/support(?:[-_/]|$)|"
     r"/articledetail(?:/|\?|$)|/official[-_]?(?:channels|website)(?:/|$)|"
     r"/ansprechpartner(?:/|$)|/frequently[-_]asked[-_]questions(?:/|$)|"
-    r"/social[-_]?media(?:/|$)|/press[-_]?conference[-_]?materials(?:/|$))", re.I
+    r"/social[-_]?media(?:/|$)|/press[-_]?conference[-_]?materials(?:/|$))",
+    re.I,
 )
 # Binary/document file extensions. Normally skipped (they're rarely articles),
 # but some operators (e.g. TPG Telecom) publish releases as a heading + a PDF
 # download with no separate HTML article page - there the PDF *is* the
 # article, so a configured item_selector (which already narrows the DOM to
 # verified article cards) is allowed to keep them.
-_SKIP_FILE_EXT = re.compile(
-    r"\.(pdf|jpg|jpeg|png|gif|svg|mp4|zip)$", re.I
-)
+_SKIP_FILE_EXT = re.compile(r"\.(pdf|jpg|jpeg|png|gif|svg|mp4|zip)$", re.I)
 # Third-party stock-exchange filing/IR vendors some operators route their
 # regulatory announcements through instead of hosting them on their own
 # domain (see the same-domain check below).
@@ -54,10 +54,34 @@ _TRUSTED_EXTERNAL_HOSTS = {"listedcompany.com"}
 # Multi-label public suffixes: without this guard, dropping one label off
 # "tim.com.br" would leave "com.br" and match every Brazilian site.
 _PUBLIC_SUFFIXES = {
-    "com.br", "com.au", "co.uk", "com.tr", "co.za", "com.mx", "co.nz",
-    "com.ar", "com.sa", "co.ke", "com.my", "com.ph", "com.sg", "co.th",
-    "com.cn", "co.jp", "co.kr", "com.tw", "com.hk", "com.eg", "com.pk",
-    "co.id", "com.vn", "com.co", "com.pe", "com.ng", "com.kw", "com.qa",
+    "com.br",
+    "com.au",
+    "co.uk",
+    "com.tr",
+    "co.za",
+    "com.mx",
+    "co.nz",
+    "com.ar",
+    "com.sa",
+    "co.ke",
+    "com.my",
+    "com.ph",
+    "com.sg",
+    "co.th",
+    "com.cn",
+    "co.jp",
+    "co.kr",
+    "com.tw",
+    "com.hk",
+    "com.eg",
+    "com.pk",
+    "co.id",
+    "com.vn",
+    "com.co",
+    "com.pe",
+    "com.ng",
+    "com.kw",
+    "com.qa",
 }
 
 
@@ -75,6 +99,8 @@ def _parent_site(host: str) -> str:
     if parent in _PUBLIC_SUFFIXES or len(parent.split(".")) < 2:
         return ""
     return parent
+
+
 # Date patterns inside URLs, e.g. /2026/07/ or /2026-07-14- or 20260714
 # The trailing (?![0-9]) matters: without it the numeric id in a slug like
 # ".../fifa-wm-2030-1116606" parses as 16 Nov 2030, and the item is then
@@ -90,25 +116,47 @@ _URL_DATE = re.compile(
 # Portuguese/Spanish ("30 de julho de 2026").
 _TEXT_DATE = re.compile(
     r"\b(0?[1-9]|[12]\d|3[01])(?:st|nd|rd|th)?[./\s]+(?:de\s+)?"
-    r"(0?[1-9]|1[0-2]|[^\W\d_]{3,12})[./\s,]+(?:de\s+)?(20\d{2})\b", re.I
+    r"(0?[1-9]|1[0-2]|[^\W\d_]{3,12})[./\s,]+(?:de\s+)?(20\d{2})\b",
+    re.I,
 )
 _TEXT_DATE_MDY = re.compile(
     r"\b(Jan\w*|Feb\w*|Mar\w*|Apr\w*|May|Jun\w*|Jul\w*|Aug\w*|"
     r"Sep\w*|Oct\w*|Nov\w*|Dec\w*)\s+(0?[1-9]|[12]\d|3[01])"
-    r"(?:st|nd|rd|th)?[./\s,]+(20\d{2})\b", re.I
+    r"(?:st|nd|rd|th)?[./\s,]+(20\d{2})\b",
+    re.I,
 )
 _TEXT_DATE_ISO = re.compile(
     r"\b(20\d{2})[-/.](0[1-9]|1[0-2])[-/.](0[1-9]|[12]\d|3[01])\b"
 )
 # Navigation / section labels that are not articles (exact-match, lowercased).
 _JUNK_EXACT = {
-    "frequently asked questions", "faq", "faqs", "perspectives", "newsroom",
-    "media center", "media centre", "media center landing", "press releases",
-    "press release", "our reports, studies, and publications", "sitemap",
-    "social media", "social media listing of all swisscom social media channels",
-    "press conference materials top", "emergency resource center", "read more",
-    "learn more", "see all", "view all", "all news", "back to top", "top",
-    "cookie policy", "privacy policy", "contact us", "media contacts",
+    "frequently asked questions",
+    "faq",
+    "faqs",
+    "perspectives",
+    "newsroom",
+    "media center",
+    "media centre",
+    "media center landing",
+    "press releases",
+    "press release",
+    "our reports, studies, and publications",
+    "sitemap",
+    "social media",
+    "social media listing of all swisscom social media channels",
+    "press conference materials top",
+    "emergency resource center",
+    "read more",
+    "learn more",
+    "see all",
+    "view all",
+    "all news",
+    "back to top",
+    "top",
+    "cookie policy",
+    "privacy policy",
+    "contact us",
+    "media contacts",
     "regulatory news service (regulatory)",
 }
 # Phrases that mark a non-article link when the title is short.
@@ -123,14 +171,35 @@ _JUNK_CONTAINS = re.compile(
 # headline. Anything else means the date sits INSIDE a real sentence
 # ("Vodafone announces on 15 July 2026 the launch of ...") and must stay.
 _LABEL_WORDS = {
-    "press", "release", "releases", "regulatory", "media", "news", "notice",
-    "announcement", "announcements", "update", "updates", "corporate",
-    "company", "group", "story", "article", "pressemitteilung", "presse",
-    "communique", "comunicado", "noticia", "bulteni", "bulten",
+    "press",
+    "release",
+    "releases",
+    "regulatory",
+    "media",
+    "news",
+    "notice",
+    "announcement",
+    "announcements",
+    "update",
+    "updates",
+    "corporate",
+    "company",
+    "group",
+    "story",
+    "article",
+    "pressemitteilung",
+    "presse",
+    "communique",
+    "comunicado",
+    "noticia",
+    "bulteni",
+    "bulten",
 }
 
 
-def _strip_leading_date_label(title: str, published, operator: str | None = None) -> str:
+def _strip_leading_date_label(
+    title: str, published, operator: str | None = None
+) -> str:
     """Drop a date/time label the card prints in front of the headline.
 
     Wire newsrooms and several CMS card layouts put the timestamp inside the
@@ -150,13 +219,17 @@ def _strip_leading_date_label(title: str, published, operator: str | None = None
         m = pattern.search(title[:70])
         if not m:
             continue
-        prefix_words = re.findall(r"[^\W\d_]+", title[:m.start()])
+        prefix_words = re.findall(r"[^\W\d_]+", title[: m.start()])
         if any(w.lower() not in allowed for w in prefix_words):
             continue  # the date sits inside a real sentence
-        rest = title[m.end():]
+        rest = title[m.end() :]
         # trailing time and timezone that belong to the same label
-        rest = re.sub(r"^,?\s*\d{1,2}[:.]\d{2}\s*(?:[APap]\.?[Mm]\.?)?"
-                      r"\s*(?:[A-Z]{2,4})?", "", rest)
+        rest = re.sub(
+            r"^,?\s*\d{1,2}[:.]\d{2}\s*(?:[APap]\.?[Mm]\.?)?"
+            r"\s*(?:[A-Z]{2,4})?",
+            "",
+            rest,
+        )
         rest = rest.lstrip(" \t-–—|:•·,")
         if len(rest) >= 25 and not _is_junk_title(rest):
             return rest
@@ -175,9 +248,25 @@ def _is_junk_title(title: str) -> bool:
     return False
 
 
-_MONTHS = {m: i + 1 for i, m in enumerate(
-    ["jan", "feb", "mar", "apr", "may", "jun",
-     "jul", "aug", "sep", "oct", "nov", "dec"])}
+_MONTHS = {
+    m: i + 1
+    for i, m in enumerate(
+        [
+            "jan",
+            "feb",
+            "mar",
+            "apr",
+            "may",
+            "jun",
+            "jul",
+            "aug",
+            "sep",
+            "oct",
+            "nov",
+            "dec",
+        ]
+    )
+}
 # Non-English month names, keyed by their first three letters. Only aliases
 # that don't already coincide with the English ones above are listed, and only
 # unambiguous ones - French "jui" is left out because it cannot tell juin (6)
@@ -185,15 +274,40 @@ _MONTHS = {m: i + 1 for i, m in enumerate(
 # language ("24 Temmuz 2026", Turk Telekom) yields undated items, and undated
 # items sort below the analyst's per-region cap - the source is collected and
 # then never read.
-_MONTHS.update({
-    "ene": 1, "abr": 4, "ago": 8, "set": 9, "dic": 12,          # es
-    "fev": 2, "mai": 5, "out": 10, "dez": 12,                    # pt
-    "mär": 3, "okt": 10,                                         # de
-    "mei": 5, "agu": 8, "des": 12,                               # id
-    "oca": 1, "şub": 2, "sub": 2, "nis": 4, "haz": 6, "tem": 7,  # tr
-    "ağu": 8, "eyl": 9, "eki": 10, "kas": 11, "ara": 12,         # tr
-    "fév": 2, "avr": 4, "aoû": 8, "aou": 8, "déc": 12,           # fr
-})
+_MONTHS.update(
+    {
+        "ene": 1,
+        "abr": 4,
+        "ago": 8,
+        "set": 9,
+        "dic": 12,  # es
+        "fev": 2,
+        "mai": 5,
+        "out": 10,
+        "dez": 12,  # pt
+        "mär": 3,
+        "okt": 10,  # de
+        "mei": 5,
+        "agu": 8,
+        "des": 12,  # id
+        "oca": 1,
+        "şub": 2,
+        "sub": 2,
+        "nis": 4,
+        "haz": 6,
+        "tem": 7,  # tr
+        "ağu": 8,
+        "eyl": 9,
+        "eki": 10,
+        "kas": 11,
+        "ara": 12,  # tr
+        "fév": 2,
+        "avr": 4,
+        "aoû": 8,
+        "aou": 8,
+        "déc": 12,  # fr
+    }
+)
 
 # Web-component "card" widgets (seen on Modyo/Andino-based CMSs, e.g. Entel)
 # embed the whole item list as a JSON array inside a custom element attribute
@@ -221,9 +335,14 @@ def _parse_badge_date(raw: str) -> datetime | None:
         return None
 
 
-def _extract_embedded_cards(html: str, source: Source, region: str,
-                            operator: str | None, origin: str,
-                            max_links: int) -> list[Item]:
+def _extract_embedded_cards(
+    html: str,
+    source: Source,
+    region: str,
+    operator: str | None,
+    origin: str,
+    max_links: int,
+) -> list[Item]:
     site_root = f"{urlsplit(source.url).scheme}://{urlsplit(source.url).netloc}"
     base_host = urlsplit(source.url).netloc.removeprefix("www.")
     items: list[Item] = []
@@ -242,7 +361,11 @@ def _extract_embedded_cards(html: str, source: Source, region: str,
             href = str(rec.get("href") or "").strip()
             if not title or not href:
                 continue
-            url = href if href.startswith("http") else urljoin(site_root + "/", href.lstrip("/"))
+            url = (
+                href
+                if href.startswith("http")
+                else urljoin(site_root + "/", href.lstrip("/"))
+            )
             host = urlsplit(url).netloc.removeprefix("www.")
             if host != base_host and not host.endswith("." + base_host):
                 continue
@@ -250,15 +373,17 @@ def _extract_embedded_cards(html: str, source: Source, region: str,
                 continue
             seen_urls.add(url)
             badge = rec.get("badge") or {}
-            items.append(Item(
-                title=title,
-                url=url,
-                source_name=source.name or base_host,
-                region=region,
-                operator=operator,
-                published=_parse_badge_date(str(badge.get("text") or "")),
-                origin=origin,
-            ))
+            items.append(
+                Item(
+                    title=title,
+                    url=url,
+                    source_name=source.name or base_host,
+                    region=region,
+                    operator=operator,
+                    published=_parse_badge_date(str(badge.get("text") or "")),
+                    origin=origin,
+                )
+            )
             if len(items) >= max_links:
                 return items
     return items
@@ -294,9 +419,14 @@ def _epoch_ms_to_date(value) -> datetime | None:
         return None
 
 
-def _extract_datamodel_articles(html: str, source: Source, region: str,
-                                operator: str | None, origin: str,
-                                max_links: int) -> list[Item]:
+def _extract_datamodel_articles(
+    html: str,
+    source: Source,
+    region: str,
+    operator: str | None,
+    origin: str,
+    max_links: int,
+) -> list[Item]:
     site_root = f"{urlsplit(source.url).scheme}://{urlsplit(source.url).netloc}"
     base_host = urlsplit(source.url).netloc.removeprefix("www.")
     items: list[Item] = []
@@ -318,7 +448,11 @@ def _extract_datamodel_articles(html: str, source: Source, region: str,
             href = _dm_first(rec, _DM_LINK_KEYS)
             if not title or not href:
                 continue
-            url = href if href.startswith("http") else urljoin(site_root + "/", href.lstrip("/"))
+            url = (
+                href
+                if href.startswith("http")
+                else urljoin(site_root + "/", href.lstrip("/"))
+            )
             host = urlsplit(url).netloc.removeprefix("www.")
             if host != base_host and not host.endswith("." + base_host):
                 continue
@@ -332,16 +466,20 @@ def _extract_datamodel_articles(html: str, source: Source, region: str,
             published = _date_from_text(_dm_first(rec, _DM_DATE_KEYS)[:60])
             if published is None:
                 published = _epoch_ms_to_date(rec.get("curatorAsDate"))
-            items.append(Item(
-                title=title,
-                url=url,
-                source_name=source.name or base_host,
-                region=region,
-                operator=operator,
-                published=published,
-                summary=" ".join(_TAG_RE.sub(" ", _dm_first(rec, _DM_DESC_KEYS)).split())[:600],
-                origin=origin,
-            ))
+            items.append(
+                Item(
+                    title=title,
+                    url=url,
+                    source_name=source.name or base_host,
+                    region=region,
+                    operator=operator,
+                    published=published,
+                    summary=" ".join(
+                        _TAG_RE.sub(" ", _dm_first(rec, _DM_DESC_KEYS)).split()
+                    )[:600],
+                    origin=origin,
+                )
+            )
             if len(items) >= max_links:
                 return items
     return items
@@ -373,8 +511,11 @@ def _heading_title_for(a, item_root) -> str:
         # <p class="...title..."> instead of a semantic heading tag - only
         # trust a <p> whose class name says "title" to avoid grabbing an
         # unrelated body paragraph.
-        headings = [p for p in node.find_all("p")
-                   if any("title" in c.lower() for c in (p.get("class") or []))]
+        headings = [
+            p
+            for p in node.find_all("p")
+            if any("title" in c.lower() for c in (p.get("class") or []))
+        ]
     if not headings:
         return ""
     # A card can carry more than one heading level - e.g. e& tiles have a
@@ -397,7 +538,8 @@ def _date_from_url(url: str) -> tuple[datetime | None, bool]:
         # Some official press pages use /07-2026/ instead of /2026/07/.
         reverse = re.search(
             r"(?:/|[-_])(0[1-9]|1[0-2])[-_](20\d{2})"
-            r"(?:[-_/](0[1-9]|[12]\d|3[01]))?", url
+            r"(?:[-_/](0[1-9]|[12]\d|3[01]))?",
+            url,
         )
         if not reverse:
             return None, False
@@ -438,23 +580,33 @@ def _date_from_text(text: str) -> datetime | None:
     m = _TEXT_DATE_ISO.search(text)
     if m:
         try:
-            return datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)), tzinfo=timezone.utc)
+            return datetime(
+                int(m.group(1)), int(m.group(2)), int(m.group(3)), tzinfo=timezone.utc
+            )
         except ValueError:
             pass
     return None
 
 
-def parse_newsroom_html(html: str, source: Source, region: str,
-                        operator: str | None, origin: str,
-                        max_links: int = 30) -> list[Item]:
+def parse_newsroom_html(
+    html: str,
+    source: Source,
+    region: str,
+    operator: str | None,
+    origin: str,
+    max_links: int = 30,
+) -> list[Item]:
     """Extract article-like links from a newsroom page (testable, no I/O)."""
     if "eds-card=" in html:
-        embedded = _extract_embedded_cards(html, source, region, operator, origin, max_links)
+        embedded = _extract_embedded_cards(
+            html, source, region, operator, origin, max_links
+        )
         if embedded:
             return embedded
     if "datamodel=" in html:
-        embedded = _extract_datamodel_articles(html, source, region, operator,
-                                               origin, max_links)
+        embedded = _extract_datamodel_articles(
+            html, source, region, operator, origin, max_links
+        )
         if embedded:
             return embedded
 
@@ -464,8 +616,9 @@ def parse_newsroom_html(html: str, source: Source, region: str,
     # <span class="pr-mobi-headers">Title</span>, which ended up glued to the
     # front of each extracted title.
     for hidden in soup.select(
-            '[class*=sr-only], [class*=visually-hidden], [class*=screen-reader],'
-            ' [class*=mobi-header], [class*=visuallyhidden]'):
+        "[class*=sr-only], [class*=visually-hidden], [class*=screen-reader],"
+        " [class*=mobi-header], [class*=visuallyhidden]"
+    ):
         hidden.decompose()
     scope = soup
     selector_matched = False
@@ -508,10 +661,10 @@ def parse_newsroom_html(html: str, source: Source, region: str,
         on_domain = host == base_host or host.endswith("." + base_host)
         if not on_domain:
             parent = _parent_site(base_host)
-            on_domain = bool(parent) and (host == parent
-                                          or host.endswith("." + parent))
+            on_domain = bool(parent) and (host == parent or host.endswith("." + parent))
         on_trusted_vendor = selector_matched and any(
-            host == d or host.endswith("." + d) for d in _TRUSTED_EXTERNAL_HOSTS)
+            host == d or host.endswith("." + d) for d in _TRUSTED_EXTERNAL_HOSTS
+        )
         if not on_domain and not on_trusted_vendor:
             continue
         # A configured item_selector already narrows the DOM to verified
@@ -534,7 +687,11 @@ def parse_newsroom_html(html: str, source: Source, region: str,
             title_el = a.select_one(".title")
             if title_el:
                 narrowed = " ".join(title_el.get_text(" ", strip=True).split())
-                if narrowed and 25 <= len(narrowed) <= 300 and not _is_junk_title(narrowed):
+                if (
+                    narrowed
+                    and 25 <= len(narrowed) <= 300
+                    and not _is_junk_title(narrowed)
+                ):
                     title = narrowed
         # Cards that print a metadata line inside the same anchor (Three UK:
         # "Press release 22nd Jul 2026 Deals <headline>") pass the length
@@ -552,8 +709,9 @@ def parse_newsroom_html(html: str, source: Source, region: str,
         # <h1>-<h6> inside the card and reserve the anchor text for a generic
         # "Read more"/"Load More" label - only worth searching once the
         # selector already narrowed us to a real article container.
-        if selector_matched and (len(title) < 25 or len(title) > 300
-                                  or _is_junk_title(title)):
+        if selector_matched and (
+            len(title) < 25 or len(title) > 300 or _is_junk_title(title)
+        ):
             # Table-style newsrooms (AT&T's IR release list) keep the headline
             # in a sibling cell and leave the link itself as a bare icon, so
             # the anchor carries no text at all. Look for a title-classed
@@ -565,22 +723,30 @@ def parse_newsroom_html(html: str, source: Source, region: str,
                     labelled = " ".join(cell.get_text(" ", strip=True).split())
                     if 25 <= len(labelled) <= 300 and not _is_junk_title(labelled):
                         title = labelled
-        if selector_matched and (len(title) < 25 or len(title) > 300
-                                  or _is_junk_title(title)):
+        if selector_matched and (
+            len(title) < 25 or len(title) > 300 or _is_junk_title(title)
+        ):
             heading_title = _heading_title_for(a, scope)
-            if heading_title and 25 <= len(heading_title) <= 300 \
-                    and not _is_junk_title(heading_title):
+            if (
+                heading_title
+                and 25 <= len(heading_title) <= 300
+                and not _is_junk_title(heading_title)
+            ):
                 title = heading_title
-        if selector_matched and (len(title) < 25 or len(title) > 300
-                                  or _is_junk_title(title)):
+        if selector_matched and (
+            len(title) < 25 or len(title) > 300 or _is_junk_title(title)
+        ):
             # Some icon-only links (e.g. Deutsche Telekom's media-link
             # anchors) carry the real headline only in a title/aria-label
             # attribute, often prefixed with a generic category label
             # ("Media information: <headline>") - strip that prefix.
             attr_title = (a.get("title") or a.get("aria-label") or "").strip()
             attr_title = re.sub(r"^[\w][\w \-]{2,30}:\s*", "", attr_title)
-            if attr_title and 25 <= len(attr_title) <= 300 \
-                    and not _is_junk_title(attr_title):
+            if (
+                attr_title
+                and 25 <= len(attr_title) <= 300
+                and not _is_junk_title(attr_title)
+            ):
                 title = attr_title
         # nav links are short; but some real content is legitimately terse
         # (e.g. RNS/regulatory-announcement titles like "Q1 Results") - a
@@ -653,10 +819,11 @@ def parse_newsroom_html(html: str, source: Source, region: str,
     return items
 
 
-def collect_newsroom(source: Source, region: str, operator: str | None,
-                     origin: str, http_cfg: dict) -> list[Item]:
+def collect_newsroom(
+    source: Source, region: str, operator: str | None, origin: str, http_cfg: dict
+) -> list[Item]:
     from .http import fetch
+
     resp = fetch(source.url, http_cfg, source.timeout_seconds, source.headers)
     max_links = int(http_cfg.get("max_links_per_newsroom", 30))
-    return parse_newsroom_html(resp.text, source, region, operator,
-                               origin, max_links)
+    return parse_newsroom_html(resp.text, source, region, operator, origin, max_links)

@@ -21,6 +21,7 @@ Und die Grenze aus Entscheidung 3: die Historie beginnt ehrlich mit dem
 ersten Lauf nach der Umstellung - nichts wird aus den alten Stand-Commits
 zurueckerfunden.
 """
+
 from __future__ import annotations
 
 import json
@@ -40,41 +41,64 @@ SKU = "apple-iphone-15-128gb-schwarz"
 # Bausteine
 # --------------------------------------------------------------------------
 
+
 def _o2(datum: str, rate: float = 20.0) -> Buendel:
     """Die aufgeteilte Preisform: Tarifgrundpreis und Geraeterate getrennt."""
-    return Buendel(sku_id=SKU, anbieter="o2",
-                   tarif_name="O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)",
-                   tarif_id="o2:on-demand-m", tarif_id_guete="hoch",
-                   tarif_monatlich=14.99, tarif_bindung_monate=24,
-                   geraet_zuzahlung=1.0, geraet_monatsrate=rate,
-                   laufzeit_monate=36, anschlusspreis=39.99, zustand="neu",
-                   quelle_url=f"https://example.de/o2/{SKU}",
-                   abgerufen_am=datum)
+    return Buendel(
+        sku_id=SKU,
+        anbieter="o2",
+        tarif_name="O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)",
+        tarif_id="o2:on-demand-m",
+        tarif_id_guete="hoch",
+        tarif_monatlich=14.99,
+        tarif_bindung_monate=24,
+        geraet_zuzahlung=1.0,
+        geraet_monatsrate=rate,
+        laufzeit_monate=36,
+        anschlusspreis=39.99,
+        zustand="neu",
+        quelle_url=f"https://example.de/o2/{SKU}",
+        abgerufen_am=datum,
+    )
 
 
 def _vodafone(datum: str, tarif: float = 29.95) -> Buendel:
-    return Buendel(sku_id=SKU, anbieter="Vodafone",
-                   tarif_name="Vodafone Mobil XS", tarif_id="vf:xs",
-                   tarif_id_guete="hoch", tarif_monatlich=tarif,
-                   tarif_bindung_monate=24, geraet_zuzahlung=0.0,
-                   geraet_monatsrate=25.0, laufzeit_monate=24,
-                   anschlusspreis=0.0, zustand="neu",
-                   quelle_url=f"https://example.de/vf/{SKU}",
-                   abgerufen_am=datum)
+    return Buendel(
+        sku_id=SKU,
+        anbieter="Vodafone",
+        tarif_name="Vodafone Mobil XS",
+        tarif_id="vf:xs",
+        tarif_id_guete="hoch",
+        tarif_monatlich=tarif,
+        tarif_bindung_monate=24,
+        geraet_zuzahlung=0.0,
+        geraet_monatsrate=25.0,
+        laufzeit_monate=24,
+        anschlusspreis=0.0,
+        zustand="neu",
+        quelle_url=f"https://example.de/vf/{SKU}",
+        abgerufen_am=datum,
+    )
 
 
 def _einsundeins(datum: str, monatlich: float = 44.99) -> Buendel:
     """Die zusammengefasste Preisform (§ 13.2): EIN Monatsbetrag fuer Tarif
     und Geraet plus Zuzahlung. P5 muss auch diese Reihe ueber die Zeit
     zeichnen koennen, deshalb steht die Form von Anfang an in der Historie."""
-    return Buendel(sku_id=SKU, anbieter="1&1",
-                   tarif_name="1&1 All-Net-Flat S",
-                   tarif_id="einsundeins:all-net-s", tarif_id_guete="hoch",
-                   buendel_monatlich=monatlich, laufzeit_monate=36,
-                   geraet_zuzahlung=360.0, anschlusspreis=39.90,
-                   zustand="neu",
-                   quelle_url=f"https://example.de/einsundeins/{SKU}",
-                   abgerufen_am=datum)
+    return Buendel(
+        sku_id=SKU,
+        anbieter="1&1",
+        tarif_name="1&1 All-Net-Flat S",
+        tarif_id="einsundeins:all-net-s",
+        tarif_id_guete="hoch",
+        buendel_monatlich=monatlich,
+        laufzeit_monate=36,
+        geraet_zuzahlung=360.0,
+        anschlusspreis=39.90,
+        zustand="neu",
+        quelle_url=f"https://example.de/einsundeins/{SKU}",
+        abgerufen_am=datum,
+    )
 
 
 def _lauf(pfad: pathlib.Path, buendel: list[Buendel], datum: str) -> None:
@@ -92,14 +116,17 @@ def _lauf(pfad: pathlib.Path, buendel: list[Buendel], datum: str) -> None:
 def _historie(pfad: pathlib.Path) -> list[dict]:
     historie = TcoDB(pfad).historie_path
     assert historie.exists(), f"{historie} fehlt"
-    return [json.loads(zeile) for zeile in
-            historie.read_text(encoding="utf-8").splitlines()
-            if zeile.strip()]
+    return [
+        json.loads(zeile)
+        for zeile in historie.read_text(encoding="utf-8").splitlines()
+        if zeile.strip()
+    ]
 
 
 # --------------------------------------------------------------------------
 # Erster Lauf, zweiter Lauf, anderer Tag
 # --------------------------------------------------------------------------
+
 
 def test_erster_lauf_schreibt_je_buendel_eine_zeile(tmp_path):
     pfad = tmp_path / "geraete_tco.json"
@@ -139,8 +166,9 @@ def test_zweiter_lauf_am_selben_tag_ersetzt_statt_zu_duplizieren(tmp_path):
     # Derselbe Tag, dieselben Werte: die Datei bleibt wortgleich.
     identisch = historie.read_text(encoding="utf-8")
     _lauf(pfad, [_o2(TAG1), _vodafone(TAG1)], TAG1)
-    assert historie.read_text(encoding="utf-8") == identisch, \
+    assert historie.read_text(encoding="utf-8") == identisch, (
         "ein wiederholter Lauf am selben Tag darf die Historie nicht aendern"
+    )
 
     # Derselbe Tag, korrigierte Werte: die Zeile wird aktualisiert - kein
     # zweiter Punkt fuer denselben Messtag (sonst luege die Reihe ab P5
@@ -150,11 +178,12 @@ def test_zweiter_lauf_am_selben_tag_ersetzt_statt_zu_duplizieren(tmp_path):
     assert len(zeilen) == 2
     nach_id = {z["id"]: z for z in zeilen}
     assert nach_id[_o2(TAG1).id]["geraet_monatsrate"] == 18.0
-    assert nach_id[_o2(TAG1).id]["gesamt"] == \
-        tco_24(_o2(TAG1, rate=18.0)).gesamt
+    assert nach_id[_o2(TAG1).id]["gesamt"] == tco_24(_o2(TAG1, rate=18.0)).gesamt
     assert nach_id[_vodafone(TAG1).id]["tarif_monatlich"] == 27.95
-    assert nach_id[_vodafone(TAG1, tarif=27.95).id]["gesamt"] == \
-        tco_24(_vodafone(TAG1, tarif=27.95)).gesamt
+    assert (
+        nach_id[_vodafone(TAG1, tarif=27.95).id]["gesamt"]
+        == tco_24(_vodafone(TAG1, tarif=27.95)).gesamt
+    )
 
 
 def test_lauf_mit_anderem_datum_haengt_an_und_laesst_alte_tage_ruhen(tmp_path):
@@ -169,8 +198,10 @@ def test_lauf_mit_anderem_datum_haengt_an_und_laesst_alte_tage_ruhen(tmp_path):
     # am folgenden Tag bleibt der gestrige Messtag der gemessene.
     assert zeilen[:2] == alte_zeilen
     assert {z["datum"] for z in zeilen[2:]} == {TAG2}
-    assert next(z for z in zeilen[2:] if z["id"] == _o2(TAG2).id)[
-        "geraet_monatsrate"] == 18.0
+    assert (
+        next(z for z in zeilen[2:] if z["id"] == _o2(TAG2).id)["geraet_monatsrate"]
+        == 18.0
+    )
 
 
 def test_zwei_laeufe_mit_verschiedenen_daten_ergeben_zwei_punkte(tmp_path):
@@ -178,10 +209,20 @@ def test_zwei_laeufe_mit_verschiedenen_daten_ergeben_zwei_punkte(tmp_path):
     zwei Messpunkte je Buendel - hier an drei Beispiel-Buendeln, je eine
     Preisform. Kein Netz, die Daten sind injiziert."""
     pfad = tmp_path / "geraete_tco.json"
-    _lauf(pfad, [_o2(TAG1, rate=20.0), _vodafone(TAG1),
-                 _einsundeins(TAG1, monatlich=44.99)], TAG1)
-    _lauf(pfad, [_o2(TAG2, rate=19.0), _vodafone(TAG2, tarif=28.95),
-                 _einsundeins(TAG2, monatlich=42.99)], TAG2)
+    _lauf(
+        pfad,
+        [_o2(TAG1, rate=20.0), _vodafone(TAG1), _einsundeins(TAG1, monatlich=44.99)],
+        TAG1,
+    )
+    _lauf(
+        pfad,
+        [
+            _o2(TAG2, rate=19.0),
+            _vodafone(TAG2, tarif=28.95),
+            _einsundeins(TAG2, monatlich=42.99),
+        ],
+        TAG2,
+    )
 
     je_id: dict[str, list[str]] = {}
     for zeile in _historie(pfad):
@@ -193,6 +234,7 @@ def test_zwei_laeufe_mit_verschiedenen_daten_ergeben_zwei_punkte(tmp_path):
 # --------------------------------------------------------------------------
 # Die Stand-Datei und der ehrliche Anfang
 # --------------------------------------------------------------------------
+
 
 def test_die_stand_datei_bleibt_ein_satz_je_buendel(tmp_path):
     """`geraete_tco.json` behaelt seine Semantik: aktueller Stand, eine
@@ -246,9 +288,10 @@ def test_eine_unlesbare_historie_wird_nicht_angefasst(tmp_path):
     muell = "{kein json\n"
     historie.write_text(muell, encoding="utf-8")
 
-    _lauf(pfad, [_o2(TAG2)], TAG2)   # darf nicht werfen
-    assert historie.read_text(encoding="utf-8") == muell, \
+    _lauf(pfad, [_o2(TAG2)], TAG2)  # darf nicht werfen
+    assert historie.read_text(encoding="utf-8") == muell, (
         "eine unlesbare Historie wird still ersatzlos ueberschrieben"
+    )
     # Der Stand ist trotzdem von heute - ein Historiesschaden kostet
     # keinen Messtag der Gegenwart.
     assert json.loads(pfad.read_text(encoding="utf-8"))["updated"] == TAG2

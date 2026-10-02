@@ -15,6 +15,7 @@ Diese Zahl ist deshalb die UNTERE Schranke fuer den Trend ueber die Ausgaben.
 Die belastbare Zahl liefert scripts/miss_volltext_quellen.py, das die Feeds
 wirklich abruft und auf Titel PLUS echtem Teaser misst.
 """
+
 from __future__ import annotations
 
 import json
@@ -39,7 +40,7 @@ def erkenne(text: str) -> tuple[str, float]:
 def meldungen(pfad: Path):
     daten = json.loads(pfad.read_text(encoding="utf-8"))
     for region in (daten.get("regions") or {}).values():
-        for h in (region.get("highlights") or []):
+        for h in region.get("highlights") or []:
             yield h
 
 
@@ -76,16 +77,21 @@ def main() -> int:
             sprachen_titel[s_beides] += 1
             sprachen_beides[s_beides] += 1
             if wert > -60 and s_beides not in BEKANNT and len(uneinig) < 25:
-                uneinig.append((s_beides, f"{wert:.0f}", titel[:70],
-                                (h.get("source") or "?")))
+                uneinig.append(
+                    (s_beides, f"{wert:.0f}", titel[:70], (h.get("source") or "?"))
+                )
 
             if s_beides not in BEKANNT and s_beides != "?":
                 fremd += 1
                 fremd_je_origin[h.get("origin") or "?"] += 1
                 if len(beispiele[s_beides]) < 3:
                     beispiele[s_beides].append(
-                        (h.get("source") or h.get("source_name") or "?",
-                         titel[:64], round(wert, 1)))
+                        (
+                            h.get("source") or h.get("source_name") or "?",
+                            titel[:64],
+                            round(wert, 1),
+                        )
+                    )
         je_ausgabe.append((pfad.stem, anzahl, fremd))
 
     print("=" * 72)
@@ -97,8 +103,10 @@ def main() -> int:
         print(f"{name:<14}{anzahl:>10}{fremd:>15}{quote:>9}")
     summe_fremd = sum(f for _, _, f in je_ausgabe)
     print("-" * 72)
-    print(f"{'SUMME':<14}{gesamt:>10}{summe_fremd:>15}"
-          f"{(summe_fremd / gesamt * 100 if gesamt else 0):>8.1f}%")
+    print(
+        f"{'SUMME':<14}{gesamt:>10}{summe_fremd:>15}"
+        f"{(summe_fremd / gesamt * 100 if gesamt else 0):>8.1f}%"
+    )
     schnitt = summe_fremd / len(je_ausgabe) if je_ausgabe else 0
     print(f"\nSchnitt je Ausgabe: {schnitt:.1f} fremdsprachige Meldungen")
     print("Gemessen wurde NUR auf der Ueberschrift - siehe Modulkopf.")

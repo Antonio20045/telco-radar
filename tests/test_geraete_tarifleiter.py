@@ -13,6 +13,7 @@ zurueckgezogen; Tarifseite und Geraeteseite lassen ihn aus.
 Die Saetze hier sind von Hand gebaut (Datum gesetzt, Regel 11); der eine
 Test gegen den echten Bestand rechnet seine Erwartung selbst aus der Datei.
 """
+
 from __future__ import annotations
 
 import json
@@ -31,9 +32,13 @@ INF = float("inf")
 
 
 def _satz(anbieter, name, gb, grund, tid=None):
-    return {"anbieter": anbieter, "name": name, "datenvolumen_gb": gb,
-            "grundgebuehr": grund,
-            "tarif_id": tid or f"{anbieter.lower()}:{name.lower()}"}
+    return {
+        "anbieter": anbieter,
+        "name": name,
+        "datenvolumen_gb": gb,
+        "grundgebuehr": grund,
+        "tarif_id": tid or f"{anbieter.lower()}:{name.lower()}",
+    }
 
 
 def _bestand(xl_gb=None) -> dict:
@@ -46,12 +51,13 @@ def _bestand(xl_gb=None) -> dict:
         _satz("Vodafone", "Vodafone Mobil M mit Smartphone", 60.0, 49.95),
         _satz("Vodafone", "Vodafone Mobil S mit Smartphone", 30.0, 39.95),
         # Die Tarife OHNE Geraet: andere Volumen, dieselben Stufen.
-        _satz("Vodafone", "Vodafone Mobil XS", 18.0, 29.95,
-              "vodafone:vodafone-mobil-xs"),
-        _satz("Vodafone", "Vodafone Mobil S", 35.0, 39.95,
-              "vodafone:vodafone-mobil-s"),
-        _satz("Vodafone", "Vodafone Mobil XL", None, 79.95,
-              "vodafone:vodafone-mobil-xl"),
+        _satz(
+            "Vodafone", "Vodafone Mobil XS", 18.0, 29.95, "vodafone:vodafone-mobil-xs"
+        ),
+        _satz("Vodafone", "Vodafone Mobil S", 35.0, 39.95, "vodafone:vodafone-mobil-s"),
+        _satz(
+            "Vodafone", "Vodafone Mobil XL", None, 79.95, "vodafone:vodafone-mobil-xl"
+        ),
         _satz("Telekom", "MagentaMobil XS", 20.0, 29.95, "telekom:xs"),
         _satz("Telekom", "MagentaMobil M", 50.0, 49.95, "telekom:m"),
         _satz("Telekom", "MagentaMobil XL", INF, 84.95, "telekom:xl"),
@@ -67,14 +73,14 @@ def _bestand(xl_gb=None) -> dict:
 # Die Leiter
 # --------------------------------------------------------------------------
 
+
 def test_leiter_sind_die_vodafone_tarife_mit_smartphone_nach_preis():
     leiter = band.tarifleiter(_bestand())
     assert [s.key for s in leiter] == ["xs", "s", "m", "l", "xl"]
     assert [s.label for s in leiter] == ["XS", "S", "M", "L", "XL"]
     # Das Volumen ist das des Blatts MIT Smartphone (XS 15, nicht 18 GB).
     assert [s.gb for s in leiter] == [15.0, 30.0, 60.0, 120.0, None]
-    assert [s.bereich for s in leiter] == ["15 GB", "30 GB", "60 GB",
-                                           "120 GB", ""]
+    assert [s.bereich for s in leiter] == ["15 GB", "30 GB", "60 GB", "120 GB", ""]
 
 
 def test_eine_stufe_unter_zwei_lesarten_steht_einmal_da():
@@ -92,28 +98,28 @@ def test_ohne_vodafone_satz_gibt_es_keine_leiter_und_einen_benannten_grund():
     assert band.tarif_baender(ohne) == {}
     assert band.band_leer_text(leiter) == band.LEITER_FEHLT_TEXT
     # Gegenprobe: mit Leiter ist es der Satz "kein Buendel".
-    assert (band.band_leer_text(band.tarifleiter(_bestand()))
-            == band.BAND_LEER_TEXT)
+    assert band.band_leer_text(band.tarifleiter(_bestand())) == band.BAND_LEER_TEXT
 
 
 # --------------------------------------------------------------------------
 # Zuordnung
 # --------------------------------------------------------------------------
 
+
 def test_wettbewerber_fallen_in_die_naechste_stufe():
     leiter = band.tarifleiter(_bestand())
     assert band.band_von_gb(10, leiter) == "xs"
-    assert band.band_von_gb(20, leiter) == "xs"      # 5 zu 15, 10 zu 30
+    assert band.band_von_gb(20, leiter) == "xs"  # 5 zu 15, 10 zu 30
     assert band.band_von_gb(25, leiter) == "s"
     assert band.band_von_gb(50, leiter) == "m"
     assert band.band_von_gb(125, leiter) == "l"
-    assert band.band_von_gb(200, leiter) == "l"      # XL hat kein Volumen
+    assert band.band_von_gb(200, leiter) == "l"  # XL hat kein Volumen
 
 
 def test_gleichstand_zaehlt_zur_groesseren_stufe():
     leiter = band.tarifleiter(_bestand())
-    assert band.band_von_gb(45, leiter) == "m"       # je 15 GB zu S und M
-    assert band.band_von_gb(22.5, leiter) == "s"     # je 7,5 GB zu XS und S
+    assert band.band_von_gb(45, leiter) == "m"  # je 15 GB zu S und M
+    assert band.band_von_gb(22.5, leiter) == "s"  # je 7,5 GB zu XS und S
 
 
 def test_fehlendes_volumen_hat_keine_stufe():
@@ -151,8 +157,8 @@ def test_tarif_baender_ordnet_wettbewerber_nach_volumen():
     assert index["congstar:m"] == "l"
     assert index["11:s"] == "xs"
     assert index["o2:m45"] == "m"
-    assert "telekom:xl" not in index        # unbegrenzt, XL ohne Volumen
-    assert "o2:um" not in index             # kein Volumen erhoben
+    assert "telekom:xl" not in index  # unbegrenzt, XL ohne Volumen
+    assert "o2:um" not in index  # kein Volumen erhoben
 
 
 def test_katalog_und_chip_tragen_die_leiter():
@@ -170,12 +176,12 @@ def test_leiter_am_echten_bestand():
     """Gegenprobe gegen die Datei selbst, ohne `tarifleiter`: jede Stufe ist
     genau ein Vodafone-Satz "mit Smartphone", mit seinem Volumen."""
     bestand = Tarifbestand.aus_datei(
-        WURZEL / "data" / "state" / "tarife.jsonl").je_id_aktuell
+        WURZEL / "data" / "state" / "tarife.jsonl"
+    ).je_id_aktuell
     erwartet = {}
     for satz in bestand.values():
-        name = (satz.get("name") or "")
-        if satz.get("anbieter") == "Vodafone" and name.endswith(
-                " mit Smartphone"):
+        name = satz.get("name") or ""
+        if satz.get("anbieter") == "Vodafone" and name.endswith(" mit Smartphone"):
             stufe = name.split()[2]
             erwartet[stufe.lower()] = satz.get("datenvolumen_gb")
     assert erwartet, "kein Vodafone-Satz 'mit Smartphone' im Bestand"
@@ -222,18 +228,24 @@ def _repo(tmp_path, ausschliessen):
         f'    einstieg: ["{EINSTIEG}"]\n'
         '    pfadmuster: ["produktinformationsblatt"]\n'
         + (f"    ausschliessen:{zeilen}\n" if ausschliessen else ""),
-        encoding="utf-8")
+        encoding="utf-8",
+    )
     return tmp_path
 
 
 def _netz():
-    text = (WURZEL / "tests" / "fixtures" / "tarif_pdfs"
-            / "congstar_allnet_flat_l.txt").read_text(encoding="utf-8")
-    return _Netz({
-        EINSTIEG: _Antwort(f'<a href="{BLATT}">Produktinformationsblatt '
-                           'congstar Allnet Flat L mit Upgrade-Versprechen</a>'),
-        BLATT: _Antwort(text, typ="text/plain"),
-    })
+    text = (
+        WURZEL / "tests" / "fixtures" / "tarif_pdfs" / "congstar_allnet_flat_l.txt"
+    ).read_text(encoding="utf-8")
+    return _Netz(
+        {
+            EINSTIEG: _Antwort(
+                f'<a href="{BLATT}">Produktinformationsblatt '
+                "congstar Allnet Flat L mit Upgrade-Versprechen</a>"
+            ),
+            BLATT: _Antwort(text, typ="text/plain"),
+        }
+    )
 
 
 def test_ausgeschlossenes_blatt_wird_nicht_geholt_und_zurueckgezogen(tmp_path):
@@ -277,23 +289,22 @@ def test_die_congstar_quelle_schliesst_genau_xl_und_xxl_aus():
     """Gegen die Linkbeschriftungen der congstar-Blattseite vom 28.09.2026:
     XL und XXL fallen, XS bis L bleiben."""
     from telco_radar.collect.tarif_crawler import lade_quellen
+
     quelle = next(q for q in lade_quellen(WURZEL) if q.anbieter == "congstar")
     texte = {
         "xs": "produktinformationsblatt congstar allnet flat xs mit gb+",
         "s": "produktinformationsblatt congstar allnet flat s flex mit gb+",
-        "m": "produktinformationsblatt congstar allnet flat m mit "
-             "upgrade-versprechen",
+        "m": "produktinformationsblatt congstar allnet flat m mit upgrade-versprechen",
         "l": "produktinformationsblatt congstar allnet flat l flex mit "
-             "upgrade-versprechen",
+        "upgrade-versprechen",
         "xl": "produktinformationsblatt congstar allnet flat xl mit "
-              "upgrade-versprechen",
+        "upgrade-versprechen",
         "xl flex": "produktinformationsblatt congstar allnet flat xl flex "
-                   "mit upgrade-versprechen",
+        "mit upgrade-versprechen",
         "xxl": "produktinformationsblatt congstar allnet flat xxl mit "
-               "upgrade-versprechen",
+        "upgrade-versprechen",
     }
-    raus = {k for k, t in texte.items()
-            if any(a in t for a in quelle.ausschliessen)}
+    raus = {k for k, t in texte.items() if any(a in t for a in quelle.ausschliessen)}
     assert raus == {"xl", "xl flex", "xxl"}
     assert quelle.max_dokumente == 8
 
@@ -304,5 +315,6 @@ def test_json_bleibt_lesbar_mit_unendlich():
     katalog = band.baender_katalog(band.tarifleiter(_bestand(xl_gb=INF)))
     assert katalog[-1]["bereich"] == "unbegrenzt"
     json.dumps(katalog, allow_nan=False)
-    assert not any(isinstance(v, float) and math.isinf(v)
-                   for b in katalog for v in b.values())
+    assert not any(
+        isinstance(v, float) and math.isinf(v) for b in katalog for v in b.values()
+    )

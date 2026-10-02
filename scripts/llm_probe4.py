@@ -14,6 +14,7 @@ ausgegeben, statt einen leeren Stream als Erfolg zu zaehlen.
 
 Gibt den Key niemals aus.
 """
+
 from __future__ import annotations
 
 import json
@@ -26,7 +27,9 @@ import httpx
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from llm_probe3 import editor_payload  # noqa: E402
 
-BASE = (os.environ.get("LLM_API_BASE") or "https://integrate.api.nvidia.com/v1").rstrip("/")
+BASE = (os.environ.get("LLM_API_BASE") or "https://integrate.api.nvidia.com/v1").rstrip(
+    "/"
+)
 KEY = (os.environ.get("LLM_API_KEY") or "").strip().strip('"').strip("'").strip()
 URL = f"{BASE}/chat/completions"
 HEADERS = {"Authorization": f"Bearer {KEY}", "Content-Type": "application/json"}
@@ -40,8 +43,7 @@ def attempt(model: str, payload: dict, label: str) -> dict:
     """Ein blockierender Request mit vollstaendiger Fehlererfassung."""
     p = dict(payload, model=model)
     t0 = time.monotonic()
-    out = {"label": label, "model": model, "ok": False, "seconds": 0.0,
-           "detail": ""}
+    out = {"label": label, "model": model, "ok": False, "seconds": 0.0, "detail": ""}
     try:
         r = httpx.post(URL, json=p, headers=HEADERS, timeout=TIMEOUT)
         out["seconds"] = time.monotonic() - t0
@@ -63,12 +65,16 @@ def attempt(model: str, payload: dict, label: str) -> dict:
         finish = choices[0].get("finish_reason")
         usage = data.get("usage") or {}
         if not content:
-            out["detail"] = (f"HTTP 200 mit leerem content, finish_reason="
-                             f"{finish}, usage={json.dumps(usage)}")
+            out["detail"] = (
+                f"HTTP 200 mit leerem content, finish_reason="
+                f"{finish}, usage={json.dumps(usage)}"
+            )
             return out
         out["ok"] = True
-        out["detail"] = (f"{len(content)} Zeichen, {usage.get('completion_tokens')} "
-                         f"Token, finish_reason={finish}")
+        out["detail"] = (
+            f"{len(content)} Zeichen, {usage.get('completion_tokens')} "
+            f"Token, finish_reason={finish}"
+        )
         out["content"] = content
         return out
     except httpx.ReadTimeout:
@@ -89,24 +95,26 @@ def series(model: str, payload: dict, label: str, n: int) -> None:
         res = attempt(model, payload, label)
         times.append(res["seconds"])
         flag = "OK  " if res["ok"] else "FEHL"
-        print(f"  {i}/{n} {flag} {res['seconds']:6.1f}s  {res['detail']}",
-              flush=True)
+        print(f"  {i}/{n} {flag} {res['seconds']:6.1f}s  {res['detail']}", flush=True)
         if res["ok"]:
             ok += 1
             if ok == 1:
                 first_lines = "\n      ".join(res["content"].splitlines()[:4])
                 print(f"      Anfang der Antwort: {first_lines}", flush=True)
-    print(f"  => {ok}/{n} erfolgreich, Zeiten "
-          f"{min(times):.0f}-{max(times):.0f}s", flush=True)
+    print(
+        f"  => {ok}/{n} erfolgreich, Zeiten {min(times):.0f}-{max(times):.0f}s",
+        flush=True,
+    )
 
 
 def main() -> None:
     if not KEY:
-        print("LLM_API_KEY leer"); sys.exit(1)
+        print("LLM_API_KEY leer")
+        sys.exit(1)
     print(f"Endpunkt: {BASE} | Key-Laenge {len(KEY)}")
 
-    full = editor_payload()                 # 6 Regionen, 15 Items, 300 Themen
-    slim = editor_payload(6, 8, 60)         # gekuerzt: weniger Items und Themen
+    full = editor_payload()  # 6 Regionen, 15 Items, 300 Themen
+    slim = editor_payload(6, 8, 60)  # gekuerzt: weniger Items und Themen
 
     print("\n" + "=" * 78)
     print("FLASH mit dem echten Editor-Prompt - die offene Frage")

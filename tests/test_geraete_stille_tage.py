@@ -20,6 +20,7 @@ Ein uebersprungener Anbieter (Besuchszeit, Fehler) ist keine Aussage und
 zaehlt weder fuer noch gegen ihn. Seit P1/C2 steht auch der nicht gelesene
 Tag im Bestand - sichtbar wird er hier trotzdem nicht.
 """
+
 import json
 
 from telco_radar.analyze.geraete_store import (
@@ -39,13 +40,13 @@ def _nulltage(db, n, start=2, erster="2026-09-01", funde=3):
     Tages ist beobachtet (vollstaendig=True, funde=0)."""
     db.protokolliere_lauf("o2", erster, funde=funde, vollstaendig=True)
     for tag in range(start, start + n):
-        db.protokolliere_lauf("o2", f"2026-09-{tag:02d}", funde=0,
-                              vollstaendig=True)
+        db.protokolliere_lauf("o2", f"2026-09-{tag:02d}", funde=0, vollstaendig=True)
 
 
 # --------------------------------------------------------------------------
 # Die Zaehlung
 # --------------------------------------------------------------------------
+
 
 def test_null_tage_werden_gezaehlt(tmp_path):
     db = _db(tmp_path)
@@ -60,8 +61,7 @@ def test_ein_fund_dazwischen_setzt_die_zaehlung_zurueck(tmp_path):
     _nulltage(db, 6, start=2, erster="2026-09-01")
     db.protokolliere_lauf("o2", "2026-09-08", funde=2, vollstaendig=True)
     for tag in range(9, 15):
-        db.protokolliere_lauf("o2", f"2026-09-{tag:02d}", funde=0,
-                              vollstaendig=True)
+        db.protokolliere_lauf("o2", f"2026-09-{tag:02d}", funde=0, vollstaendig=True)
     assert db.stille_tage("o2") == 6
 
 
@@ -78,8 +78,9 @@ def test_nie_gelieferte_anbieter_sind_nicht_still(tmp_path):
     """
     db = _db(tmp_path)
     for tag in range(1, 12):
-        db.protokolliere_lauf("winSIM", f"2026-09-{tag:02d}", funde=0,
-                              vollstaendig=True)
+        db.protokolliere_lauf(
+            "winSIM", f"2026-09-{tag:02d}", funde=0, vollstaendig=True
+        )
     assert db.stille_tage("winSIM") == 0
     assert db.ausfall_alarme(heute="2026-09-11") == []
     # Gegenprobe: derselbe Anbieter mit EINEM Liefertag davor alarmiert
@@ -87,8 +88,7 @@ def test_nie_gelieferte_anbieter_sind_nicht_still(tmp_path):
     # Fixture nichts hergibt (CLAUDE.md Regel 10).
     db.protokolliere_lauf("winSIM", "2026-09-12", funde=5, vollstaendig=True)
     db.protokolliere_lauf("winSIM", "2026-09-13", funde=0, vollstaendig=True)
-    assert [a.anbieter for a in
-            db.ausfall_alarme(heute="2026-09-13")] == ["winSIM"]
+    assert [a.anbieter for a in db.ausfall_alarme(heute="2026-09-13")] == ["winSIM"]
 
 
 def test_nicht_beobachtete_tage_zaehlen_nicht(tmp_path):
@@ -99,8 +99,7 @@ def test_nicht_beobachtete_tage_zaehlen_nicht(tmp_path):
     db = _db(tmp_path)
     db.protokolliere_lauf("o2", "2026-09-01", funde=3, vollstaendig=True)
     for tag in range(2, 20):
-        db.protokolliere_lauf("o2", f"2026-09-{tag:02d}", funde=0,
-                              vollstaendig=False)
+        db.protokolliere_lauf("o2", f"2026-09-{tag:02d}", funde=0, vollstaendig=False)
     assert [m.zustand for m in db.messtage("o2")][-1] == LESEFEHLER
     assert db.stille_tage("o2") == 0
 
@@ -110,8 +109,13 @@ def test_ein_nicht_gelesener_tag_zaehlt_nicht(tmp_path):
     db = _db(tmp_path)
     db.protokolliere_lauf("Medimax", "2026-09-01", funde=3, vollstaendig=True)
     for tag in range(2, 10):
-        db.protokolliere_lauf("Medimax", f"2026-09-{tag:02d}", funde=0,
-                              vollstaendig=False, zustand=NICHT_GELESEN)
+        db.protokolliere_lauf(
+            "Medimax",
+            f"2026-09-{tag:02d}",
+            funde=0,
+            vollstaendig=False,
+            zustand=NICHT_GELESEN,
+        )
     assert db.stille_tage("Medimax") == 0
 
 
@@ -128,16 +132,30 @@ def test_ein_teillauf_mit_funden_bricht_die_stille(tmp_path):
 # Altbestand und Zaehlfuehrung
 # --------------------------------------------------------------------------
 
+
 def _altbestand(tmp_path, termine, letzter_fund, funde_gesamt=100):
     """State in der Form VOR dem FM-2-Auftrag: keine `funde_nach_tag`, nur
     die Buchfuehrung, die es seit dem 28.08.2026 gibt."""
     pfad = tmp_path / "geraete_db.json"
-    pfad.write_text(json.dumps({
-        "updated": letzter_fund, "anbieter": {
-            "o2": {"laeufe": len(termine), "funde_gesamt": funde_gesamt,
-                   "letzte_funde": 0, "letzter_fund": letzter_fund,
-                   "termine": termine}},
-        "listungen": []}, ensure_ascii=False), encoding="utf-8")
+    pfad.write_text(
+        json.dumps(
+            {
+                "updated": letzter_fund,
+                "anbieter": {
+                    "o2": {
+                        "laeufe": len(termine),
+                        "funde_gesamt": funde_gesamt,
+                        "letzte_funde": 0,
+                        "letzter_fund": letzter_fund,
+                        "termine": termine,
+                    }
+                },
+                "listungen": [],
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
     return GeraeteDB(pfad)
 
 
@@ -145,9 +163,11 @@ def test_altbestand_ohne_historie_zaehlt_ueber_die_termine(tmp_path):
     """`letzter_fund` ist per Definition ein Tag MIT Funden, jeder
     `termine`-Eintrag danach ein beobachteter Tag ohne (sonst stuende er
     als letzter_fund darin)."""
-    db = _altbestand(tmp_path,
-                     termine=[f"2026-09-{tag:02d}" for tag in range(1, 9)],
-                     letzter_fund="2026-09-01")
+    db = _altbestand(
+        tmp_path,
+        termine=[f"2026-09-{tag:02d}" for tag in range(1, 9)],
+        letzter_fund="2026-09-01",
+    )
     assert db.stille_tage("o2") == 7
 
 
@@ -155,9 +175,12 @@ def test_altbestand_ohne_letzter_fund_wird_nicht_geraten(tmp_path):
     """Sehr alter Bestand ohne `letzter_fund`: aus den Terminen allein
     liesse sich nicht ableiten, welche Tage Funde hatten - dann zaehlt
     die Ableitung lieber nichts, statt zu raten."""
-    db = _altbestand(tmp_path,
-                     termine=[f"2026-09-{tag:02d}" for tag in range(1, 9)],
-                     letzter_fund="", funde_gesamt=100)
+    db = _altbestand(
+        tmp_path,
+        termine=[f"2026-09-{tag:02d}" for tag in range(1, 9)],
+        letzter_fund="",
+        funde_gesamt=100,
+    )
     assert db.stille_tage("o2") == 0
 
 

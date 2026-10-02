@@ -18,6 +18,7 @@ deepseek-v4-flash, das kuenftig fuer die Vorsortierung laeuft und schwaecher
 ist als pro), ist erst nach dem naechsten Actions-Lauf zu sehen (Strategie
 §4 Messplan, Punkt 6: "fuehrt die hoechste Prioritaet, sind die EE-artigen
 Dubletten gebuendelt?")."""
+
 from __future__ import annotations
 
 from telco_radar.analyze.agents import ANALYST_SYSTEM, TECH_ANALYST_SYSTEM

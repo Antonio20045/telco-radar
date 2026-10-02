@@ -12,6 +12,7 @@ Sprache und die ersten 160 Zeichen. Genau daran entscheidet sich Premortem 2
     python3 scripts/miss_artikelabruf.py --fremd 12
     python3 scripts/miss_artikelabruf.py --urls datei.txt
 """
+
 from __future__ import annotations
 
 import argparse
@@ -79,8 +80,15 @@ def sammle_kandidaten(cfg, http_cfg, nur_fremd: bool, deckel: int):
             s = sprache(f"{titel}. {teaser}")
             if nur_fremd and (s in BEKANNT or s == "?"):
                 continue
-            raus.append({"quelle": src.name, "titel": titel, "url": link,
-                         "teaser": len(teaser), "sprache": s})
+            raus.append(
+                {
+                    "quelle": src.name,
+                    "titel": titel,
+                    "url": link,
+                    "teaser": len(teaser),
+                    "sprache": s,
+                }
+            )
         return raus
 
     treffer = []
@@ -103,9 +111,15 @@ def hole_und_extrahiere(kand, http_cfg) -> dict:
         ergebnis["status"] = resp.status_code
         if resp.status_code >= 400:
             return ergebnis
-        text = trafilatura.extract(
-            resp.text, include_comments=False, include_tables=False,
-            favor_precision=True) or ""
+        text = (
+            trafilatura.extract(
+                resp.text,
+                include_comments=False,
+                include_tables=False,
+                favor_precision=True,
+            )
+            or ""
+        )
         text = " ".join(text.split())
         ergebnis["zeichen"] = len(text)
         ergebnis["extrakt"] = text[:160]
@@ -118,8 +132,12 @@ def hole_und_extrahiere(kand, http_cfg) -> dict:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--fremd", type=int, default=0,
-                    help="N fremdsprachige Artikel aus den Feeds ziehen")
+    ap.add_argument(
+        "--fremd",
+        type=int,
+        default=0,
+        help="N fremdsprachige Artikel aus den Feeds ziehen",
+    )
     ap.add_argument("--anzahl", type=int, default=12)
     ap.add_argument("--urls", type=Path, help="Datei mit je einer URL pro Zeile")
     args = ap.parse_args()
@@ -129,13 +147,17 @@ def main() -> int:
     http_cfg.setdefault("timeout_seconds", 25)
 
     if args.urls:
-        kandidaten = [{"quelle": "-", "titel": "-", "url": u.strip(),
-                       "teaser": 0, "sprache": "?"}
-                      for u in args.urls.read_text().splitlines() if u.strip()]
+        kandidaten = [
+            {"quelle": "-", "titel": "-", "url": u.strip(), "teaser": 0, "sprache": "?"}
+            for u in args.urls.read_text().splitlines()
+            if u.strip()
+        ]
     else:
         deckel = args.fremd or args.anzahl
-        print(f"Suche {deckel} Artikel"
-              f"{' (nur fremdsprachig)' if args.fremd else ''} in den Feeds ...")
+        print(
+            f"Suche {deckel} Artikel"
+            f"{' (nur fremdsprachig)' if args.fremd else ''} in den Feeds ..."
+        )
         kandidaten = sammle_kandidaten(cfg, http_cfg, bool(args.fremd), deckel)
 
     if not kandidaten:
@@ -144,49 +166,62 @@ def main() -> int:
 
     print(f"Rufe {len(kandidaten)} Artikelseiten ab ...\n")
     with ThreadPoolExecutor(max_workers=6) as pool:
-        ergebnisse = list(pool.map(
-            lambda k: hole_und_extrahiere(k, http_cfg), kandidaten))
+        ergebnisse = list(
+            pool.map(lambda k: hole_und_extrahiere(k, http_cfg), kandidaten)
+        )
 
     print("=" * 78)
     print("MESSAUFGABE 3 - Artikelabruf und Extraktion (trafilatura)")
     print("=" * 78)
-    print(f"{'Quelle':<24}{'Spr':>4}{'HTTP':>6}{'Teaser':>8}{'Extrakt':>9}"
-          f"{'Faktor':>8}")
+    print(
+        f"{'Quelle':<24}{'Spr':>4}{'HTTP':>6}{'Teaser':>8}{'Extrakt':>9}{'Faktor':>8}"
+    )
     for e in ergebnisse:
-        faktor = (f"{e['zeichen'] / e['teaser']:.1f}x"
-                  if e["teaser"] else "-")
-        print(f"{e['quelle'][:23]:<24}{e['sprache']:>4}{e['status']:>6}"
-              f"{e['teaser']:>8}{e['zeichen']:>9}{faktor:>8}")
+        faktor = f"{e['zeichen'] / e['teaser']:.1f}x" if e["teaser"] else "-"
+        print(
+            f"{e['quelle'][:23]:<24}{e['sprache']:>4}{e['status']:>6}"
+            f"{e['teaser']:>8}{e['zeichen']:>9}{faktor:>8}"
+        )
 
     n = len(ergebnisse)
     ok = [e for e in ergebnisse if e["status"] == 200 and e["zeichen"] >= 1200]
     duenn = [e for e in ergebnisse if e["status"] == 200 and e["zeichen"] < 1200]
     tot = [e for e in ergebnisse if e["status"] != 200]
-    besser = [e for e in ergebnisse
-              if e["teaser"] and e["zeichen"] >= 2 * e["teaser"]]
+    besser = [e for e in ergebnisse if e["teaser"] and e["zeichen"] >= 2 * e["teaser"]]
 
     print("\n" + "-" * 78)
-    print(f"  brauchbarer Fliesstext (>=1200 Zeichen)   {len(ok):>3} von {n}"
-          f"  ({len(ok) / n * 100:.0f}%)")
+    print(
+        f"  brauchbarer Fliesstext (>=1200 Zeichen)   {len(ok):>3} von {n}"
+        f"  ({len(ok) / n * 100:.0f}%)"
+    )
     print(f"  duenn (<1200, also kaum mehr als Teaser)  {len(duenn):>3} von {n}")
     print(f"  nicht abrufbar (403/404/Fehler)           {len(tot):>3} von {n}")
-    print(f"  mindestens doppelt so lang wie der Teaser {len(besser):>3} von {n}"
-          "   <- Premortem 1")
+    print(
+        f"  mindestens doppelt so lang wie der Teaser {len(besser):>3} von {n}"
+        "   <- Premortem 1"
+    )
 
-    abweichend = [e for e in ergebnisse
-                  if e["sprache"] != "?" and e["extrakt_sprache"] != "?"
-                  and e["sprache"] != e["extrakt_sprache"]]
-    print(f"  Sprache Teaser != Sprache Volltext        {len(abweichend):>3} von {n}"
-          "   <- Premortem 4")
+    abweichend = [
+        e
+        for e in ergebnisse
+        if e["sprache"] != "?"
+        and e["extrakt_sprache"] != "?"
+        and e["sprache"] != e["extrakt_sprache"]
+    ]
+    print(
+        f"  Sprache Teaser != Sprache Volltext        {len(abweichend):>3} von {n}"
+        "   <- Premortem 4"
+    )
     for e in abweichend[:6]:
-        print(f"      {e['sprache']} -> {e['extrakt_sprache']}  "
-              f"[{e['quelle'][:20]}] {e['titel'][:44]}")
+        print(
+            f"      {e['sprache']} -> {e['extrakt_sprache']}  "
+            f"[{e['quelle'][:20]}] {e['titel'][:44]}"
+        )
 
     if tot:
         print("\n  Nicht abrufbar im Einzelnen:")
         for e in tot:
-            print(f"   HTTP {e['status']:>4}  [{e['quelle'][:20]:<20}] "
-                  f"{e['url'][:56]}")
+            print(f"   HTTP {e['status']:>4}  [{e['quelle'][:20]:<20}] {e['url'][:56]}")
 
     print("\n" + "=" * 78)
     print("PROBE - die ersten 160 Zeichen je Extrakt (Navigation oder Artikel?)")
@@ -196,8 +231,10 @@ def main() -> int:
         print(f"  {e['titel'][:72]}")
         print(f"  > {e['extrakt'][:160]}")
 
-    print("\n  Sprachen der Extrakte:",
-          dict(Counter(e["extrakt_sprache"] for e in ergebnisse)))
+    print(
+        "\n  Sprachen der Extrakte:",
+        dict(Counter(e["extrakt_sprache"] for e in ergebnisse)),
+    )
     return 0
 
 

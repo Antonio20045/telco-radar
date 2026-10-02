@@ -7,6 +7,7 @@ irrelevant aussortieren zu muessen - das ist die Groessenordnung des
 Rauschens. Ein System mit vierzig Falschmeldungen die Woche wird nach zwei
 Wochen ignoriert, und dann ist es schlechter als keines.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -16,8 +17,9 @@ from telco_radar.collect import aenderungen as A
 
 JETZT = datetime(2026, 8, 8, 9, 0, tzinfo=timezone.utc)
 
-SEITE = A.Tarifseite(marke="o2", was="Tarifübersicht",
-                     url="https://www.o2online.de/tarife/")
+SEITE = A.Tarifseite(
+    marke="o2", was="Tarifübersicht", url="https://www.o2online.de/tarife/"
+)
 
 
 def _html(rumpf: str) -> str:
@@ -26,22 +28,31 @@ def _html(rumpf: str) -> str:
 
 # ------------------------------------------------------ was NICHT meldet
 
+
 def test_umsortierte_kacheln_sind_keine_aenderung():
     """Ein Anbieter, der seine Kacheln neu anordnet, aendert dieselbe
     Wertmenge - und loest deshalb nichts aus."""
-    a = A.werte(A._text(_html(
-        "<div>Mobile M 39,99 €</div><div>Mobile S 19,99 €</div>")))
-    b = A.werte(A._text(_html(
-        "<div>Mobile S 19,99 €</div><div>Mobile M 39,99 €</div>")))
+    a = A.werte(
+        A._text(_html("<div>Mobile M 39,99 €</div><div>Mobile S 19,99 €</div>"))
+    )
+    b = A.werte(
+        A._text(_html("<div>Mobile S 19,99 €</div><div>Mobile M 39,99 €</div>"))
+    )
     assert A.vergleiche(a, b) == ([], [])
 
 
 def test_uhrzeit_und_zaehler_sind_kein_wert():
     """Ohne diese Regel meldet JEDER Abruf eine Aenderung."""
-    a = A.werte(A._text(_html(
-        "Mobile M 39,99 € · Stand 08.08.2026 14:32 Uhr · 1200 Bewertungen")))
-    b = A.werte(A._text(_html(
-        "Mobile M 39,99 € · Stand 09.08.2026 07:05 Uhr · 1204 Bewertungen")))
+    a = A.werte(
+        A._text(
+            _html("Mobile M 39,99 € · Stand 08.08.2026 14:32 Uhr · 1200 Bewertungen")
+        )
+    )
+    b = A.werte(
+        A._text(
+            _html("Mobile M 39,99 € · Stand 09.08.2026 07:05 Uhr · 1204 Bewertungen")
+        )
+    )
     assert A.vergleiche(a, b) == ([], [])
 
 
@@ -52,10 +63,12 @@ def test_werbebanner_ohne_wert_loest_nichts_aus():
 
 
 def test_skripte_und_navigation_zaehlen_nicht():
-    html = ("<html><body><nav>Tarife 5 GB</nav>"
-            "<script>var p='99,99 €'</script>"
-            "<main>Mobile M 39,99 €</main>"
-            "<footer>Service 24 Monate</footer></body></html>")
+    html = (
+        "<html><body><nav>Tarife 5 GB</nav>"
+        "<script>var p='99,99 €'</script>"
+        "<main>Mobile M 39,99 €</main>"
+        "<footer>Service 24 Monate</footer></body></html>"
+    )
     w = A.werte(A._text(html))
     assert any("39.99€" in x for x in w)
     assert not any("99.99€" in x for x in w)
@@ -63,6 +76,7 @@ def test_skripte_und_navigation_zaehlen_nicht():
 
 
 # ------------------------------------------------------------ was meldet
+
 
 def test_gesenkter_anschlusspreis_wird_erkannt():
     """Der Beispielfall des Auftragsdokuments."""
@@ -88,6 +102,7 @@ def test_neues_datenvolumen_wird_erkannt():
 
 
 # ------------------------------------------------------------- Grundlinie
+
 
 def test_der_erste_abruf_meldet_nie(tmp_path, monkeypatch):
     """Sonst bestuende die erste Ausgabe nach dem Einbau aus vierzig "neuen"
@@ -117,20 +132,26 @@ def test_zweiter_abruf_ohne_aenderung_meldet_nicht(tmp_path, monkeypatch):
     assert items == [] and bilanz["geaendert"] == 0
 
 
-def test_ein_umbau_wird_nicht_als_vierzig_meldungen_ausgegeben(tmp_path,
-                                                               monkeypatch):
-    _bereite(tmp_path, "".join(f"<div>Tarif{i} {i},99 €</div>"
-                               for i in range(1, 11)), monkeypatch)
+def test_ein_umbau_wird_nicht_als_vierzig_meldungen_ausgegeben(tmp_path, monkeypatch):
+    _bereite(
+        tmp_path,
+        "".join(f"<div>Tarif{i} {i},99 €</div>" for i in range(1, 11)),
+        monkeypatch,
+    )
     A.sammle(tmp_path, {}, heute=JETZT)
-    _bereite(tmp_path, "".join(f"<div>Neu{i} {i}0,49 €</div>"
-                               for i in range(1, 11)), monkeypatch)
+    _bereite(
+        tmp_path,
+        "".join(f"<div>Neu{i} {i}0,49 €</div>" for i in range(1, 11)),
+        monkeypatch,
+    )
     items, bilanz = A.sammle(tmp_path, {}, heute=JETZT)
     assert items == []
     assert bilanz["umgebaut"] == 1
 
 
-def test_seite_ohne_werte_wird_nicht_als_alles_entfallen_gemeldet(tmp_path,
-                                                                  monkeypatch):
+def test_seite_ohne_werte_wird_nicht_als_alles_entfallen_gemeldet(
+    tmp_path, monkeypatch
+):
     """Die teuerste Falschmeldung, die dieser Radar produzieren kann: eine
     per JavaScript aufgebaute Seite meldet sonst jeden Preis als entfallen."""
     _bereite(tmp_path, _viele_werte(), monkeypatch)
@@ -141,19 +162,18 @@ def test_seite_ohne_werte_wird_nicht_als_alles_entfallen_gemeldet(tmp_path,
     assert bilanz["ohne_werte"] == 1
 
 
-def test_eine_handvoll_werte_aus_dem_fliesstext_reicht_nicht(tmp_path,
-                                                             monkeypatch):
+def test_eine_handvoll_werte_aus_dem_fliesstext_reicht_nicht(tmp_path, monkeypatch):
     """GEMESSEN ueber alle 16 Seiten am 08.08.2026: eine Uebersicht, die ihre
     Preistabelle wirklich ausliefert, bringt 16 bis 54 Werte. Drei Werte
     stammen aus der Prosa drumherum ("...sparst du 10 %") - ein Diff darauf
     meldet Textaenderungen als Preisaenderungen."""
-    _bereite(tmp_path, "<p>Du sparst 10 % und bekommst bis zu 1 GB.</p>",
-             monkeypatch)
+    _bereite(tmp_path, "<p>Du sparst 10 % und bekommst bis zu 1 GB.</p>", monkeypatch)
     items, bilanz = A.sammle(tmp_path, {}, heute=JETZT)
     assert bilanz["ohne_werte"] == 1 and bilanz["grundlinie"] == 0
 
 
 # ---------------------------------------------------------------- Kennung
+
 
 def test_die_kennung_kommt_aus_url_und_inhalt_nicht_aus_dem_titel():
     """Sonst haette der Seen-Store die zweite Preisaenderung derselben Seite
@@ -162,12 +182,17 @@ def test_die_kennung_kommt_aus_url_und_inhalt_nicht_aus_dem_titel():
     b = A.Aenderung(seite=SEITE, dazu=["preis|19.99€"], weg=["preis|29.99€"])
     assert a.kennung() != b.kennung()
     # ... und sie ist stabil.
-    assert a.kennung() == A.Aenderung(
-        seite=SEITE, dazu=["preis|29.99€"], weg=["preis|39.99€"]).kennung()
+    assert (
+        a.kennung()
+        == A.Aenderung(
+            seite=SEITE, dazu=["preis|29.99€"], weg=["preis|39.99€"]
+        ).kennung()
+    )
     assert A.als_item(a, JETZT).id == a.kennung()
 
 
 # ------------------------------------------------------------ Konfiguration
+
 
 def test_die_ausgelieferte_liste_bleibt_klein_und_deutsch():
     seiten = A.lade_seiten(Path(__file__).resolve().parents[1])
@@ -186,17 +211,19 @@ def test_fehlende_konfiguration_legt_nichts_lahm(tmp_path):
 
 # ------------------------------------------------------------------ Helfer
 
+
 def _viele_werte() -> str:
     """Eine Seite, die den Mindestumfang einer echten Tarifuebersicht hat."""
-    return "".join(f"<div>Tarif{i} {i},99 EUR mit {i}0 GB</div>"
-                   for i in range(1, 8))
+    return "".join(f"<div>Tarif{i} {i},99 EUR mit {i}0 GB</div>" for i in range(1, 8))
 
 
 def _bereite(root: Path, rumpf: str, monkeypatch) -> None:
     (root / "config").mkdir(parents=True, exist_ok=True)
     (root / "config" / "tarif_seiten.yaml").write_text(
         'seiten:\n  - marke: "o2"\n    was: "Tarifübersicht"\n'
-        '    url: "https://www.o2online.de/tarife/"\n', encoding="utf-8")
+        '    url: "https://www.o2online.de/tarife/"\n',
+        encoding="utf-8",
+    )
 
     class Antwort:
         text = _html(rumpf)

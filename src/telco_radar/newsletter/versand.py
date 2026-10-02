@@ -32,6 +32,7 @@ oder eine Testausgabe das Limit. Bei Ueberschreitung bricht der Lauf ab. Ein
 stiller Teilversand, bei dem die halbe Liste die Ausgabe bekommt und die
 andere nicht, ist der schlimmste moegliche Ausgang.
 """
+
 from __future__ import annotations
 
 import logging
@@ -68,6 +69,7 @@ class Sendeschluessel:
     muss beim Wiederanlauf denselben Wert ergeben, sonst haelt der Lauf
     seinen eigenen Sendeplan fuer einen fremden.
     """
+
     datum: str
     segment: str
     abo: str
@@ -79,15 +81,20 @@ class Sendeschluessel:
 @dataclass
 class Planposten:
     schluessel: Sendeschluessel
-    status: str = "geplant"            # geplant | gesendet | dauerhaft_fehl
+    status: str = "geplant"  # geplant | gesendet | dauerhaft_fehl
     message_id: str = ""
     at: str = ""
 
     def as_dict(self) -> dict:
-        return {"key": str(self.schluessel), "date": self.schluessel.datum,
-                "segment": self.schluessel.segment, "sub": self.schluessel.abo,
-                "status": self.status, "message_id": self.message_id,
-                "at": self.at}
+        return {
+            "key": str(self.schluessel),
+            "date": self.schluessel.datum,
+            "segment": self.schluessel.segment,
+            "sub": self.schluessel.abo,
+            "status": self.status,
+            "message_id": self.message_id,
+            "at": self.at,
+        }
 
 
 def baue_sendeplan(datum: str, segmente: list[Segment]) -> list[Planposten]:
@@ -102,13 +109,15 @@ def baue_sendeplan(datum: str, segmente: list[Segment]) -> list[Planposten]:
         if segment.leer:
             continue
         for abo_id in sorted(segment.abo_ids):
-            plan.append(Planposten(
-                schluessel=Sendeschluessel(datum, segment.hash, abo_id)))
+            plan.append(
+                Planposten(schluessel=Sendeschluessel(datum, segment.hash, abo_id))
+            )
     plan.sort(key=lambda p: str(p.schluessel))
     return plan
 
 
 # ==========================================  Was schon zugestellt wurde  ===
+
 
 def bereits_zugestellt(log_pfad: Path) -> set[str]:
     """Jeder Schluessel mit Zustellbestaetigung.
@@ -118,8 +127,11 @@ def bereits_zugestellt(log_pfad: Path) -> set[str]:
     dauerhaft gescheiterter Versuch als erledigt. Im Zweifel lieber eine Mail
     zu wenig als eine zu viel.
     """
-    return {str(e.get("key")) for e in lies_jsonl(log_pfad)
-            if e.get("status") in ("gesendet", "dauerhaft_fehl")}
+    return {
+        str(e.get("key"))
+        for e in lies_jsonl(log_pfad)
+        if e.get("status") in ("gesendet", "dauerhaft_fehl")
+    }
 
 
 def heute_versendet(log_pfad: Path, *, heute: str = "") -> int:
@@ -130,17 +142,20 @@ def heute_versendet(log_pfad: Path, *, heute: str = "") -> int:
     Folgetags, und eine nachgeholte Ausgabe vom Dienstag zaehlt am Mittwoch.
     """
     tag = heute or date.today().isoformat()
-    return sum(1 for e in lies_jsonl(log_pfad)
-               if e.get("status") == "gesendet"
-               and str(e.get("at") or "").startswith(tag))
+    return sum(
+        1
+        for e in lies_jsonl(log_pfad)
+        if e.get("status") == "gesendet" and str(e.get("at") or "").startswith(tag)
+    )
 
 
 class LimitGerissen(RuntimeError):
     """Der Lauf bricht ab, statt die halbe Liste zu bedienen."""
 
 
-def pruefe_limit(geplant: int, log_pfad: Path, *, heute: str = "",
-                 schwelle: int = SCHWELLE) -> int:
+def pruefe_limit(
+    geplant: int, log_pfad: Path, *, heute: str = "", schwelle: int = SCHWELLE
+) -> int:
     """Passt der Lauf ins Tageskontingent? Gibt den Abstand zum Limit zurueck.
 
     Wirft `LimitGerissen`, wenn nicht. Ein stiller Teilversand ist der
@@ -154,15 +169,18 @@ def pruefe_limit(geplant: int, log_pfad: Path, *, heute: str = "",
             f"{geplant} geplant + {schon} heute bereits versendet = {summe}, "
             f"Schwelle {schwelle} (Brevo Free: {TAGESLIMIT}/Tag). Der Lauf "
             f"bricht ab - ein Teilversand waere schlimmer. Ausbaustufe B "
-            f"(zwei Tage oder bezahlter Plan) steht in docs/mail-setup.md.")
+            f"(zwei Tage oder bezahlter Plan) steht in docs/mail-setup.md."
+        )
     return schwelle - summe
 
 
 # ===============================================================  Versand ==
 
+
 @dataclass
 class Lauf:
     """Was ein Versandlauf getan hat - die Zahlen fuer die Statuszeile."""
+
     datum: str
     segmente: int = 0
     geplant: int = 0
@@ -173,18 +191,32 @@ class Lauf:
     abstand_zum_limit: int = 0
 
     def as_dict(self) -> dict:
-        return {"date": self.datum, "segments": self.segmente,
-                "planned": self.geplant, "delivered": self.zugestellt,
-                "skipped": self.uebersprungen, "failed": self.fehler,
-                "hard_fail": len(self.dauerhaft_fehl),
-                "limit_left": self.abstand_zum_limit}
+        return {
+            "date": self.datum,
+            "segments": self.segmente,
+            "planned": self.geplant,
+            "delivered": self.zugestellt,
+            "skipped": self.uebersprungen,
+            "failed": self.fehler,
+            "hard_fail": len(self.dauerhaft_fehl),
+            "limit_left": self.abstand_zum_limit,
+        }
 
 
-def versende(plan: list[Planposten], nachrichten: dict, adressen: dict,
-             transport: Transport, *, log_pfad: Path, datum: str,
-             protokollieren=None, rate_je_minute: int = RATE_JE_MINUTE,
-             schwelle: int = SCHWELLE, heute: str = "",
-             schlafen=time.sleep) -> Lauf:
+def versende(
+    plan: list[Planposten],
+    nachrichten: dict,
+    adressen: dict,
+    transport: Transport,
+    *,
+    log_pfad: Path,
+    datum: str,
+    protokollieren=None,
+    rate_je_minute: int = RATE_JE_MINUTE,
+    schwelle: int = SCHWELLE,
+    heute: str = "",
+    schlafen=time.sleep,
+) -> Lauf:
     """Den Plan abarbeiten. `protokollieren(posten)` haengt ans Log an.
 
     `nachrichten` bildet `segment_hash -> Nachricht` ab, `adressen`
@@ -193,14 +225,18 @@ def versende(plan: list[Planposten], nachrichten: dict, adressen: dict,
     """
     erledigt = bereits_zugestellt(log_pfad)
     offen = [p for p in plan if str(p.schluessel) not in erledigt]
-    lauf = Lauf(datum=datum, geplant=len(plan),
-                uebersprungen=len(plan) - len(offen),
-                segmente=len({p.schluessel.segment for p in plan}))
+    lauf = Lauf(
+        datum=datum,
+        geplant=len(plan),
+        uebersprungen=len(plan) - len(offen),
+        segmente=len({p.schluessel.segment for p in plan}),
+    )
 
     # Der Waechter zaehlt die OFFENEN - was schon draussen ist, geht nicht
     # noch einmal aufs Kontingent.
-    lauf.abstand_zum_limit = pruefe_limit(len(offen), log_pfad, heute=heute,
-                                          schwelle=schwelle)
+    lauf.abstand_zum_limit = pruefe_limit(
+        len(offen), log_pfad, heute=heute, schwelle=schwelle
+    )
 
     pause = 60.0 / rate_je_minute if rate_je_minute > 0 else 0.0
     for i, posten in enumerate(offen):
@@ -210,8 +246,9 @@ def versende(plan: list[Planposten], nachrichten: dict, adressen: dict,
         # personalisierte Fassung deshalb unter dem vollen Sendeschluessel
         # ab; wo es nichts zu personalisieren gibt (Tests, Trockenlauf),
         # reicht der Segmentschluessel.
-        nachricht = (nachrichten.get(str(posten.schluessel))
-                     or nachrichten.get(posten.schluessel.segment))
+        nachricht = nachrichten.get(str(posten.schluessel)) or nachrichten.get(
+            posten.schluessel.segment
+        )
         adresse = adressen.get(posten.schluessel.abo)
         if nachricht is None or not adresse:
             # Ein Abo ohne Adresse ist abgemeldet, ein Segment ohne Nachricht
@@ -238,8 +275,9 @@ def versende(plan: list[Planposten], nachrichten: dict, adressen: dict,
             # Posten als `geplant` ohne Bestaetigung und versucht es erneut -
             # genau dafuer ist der Sendeplan da.
             lauf.fehler += 1
-            log.warning("Zustellung fehlgeschlagen (wiederholbar), Status %s",
-                        ergebnis.status)
+            log.warning(
+                "Zustellung fehlgeschlagen (wiederholbar), Status %s", ergebnis.status
+            )
             continue
         if protokollieren:
             protokollieren(posten)
@@ -253,8 +291,15 @@ def versende(plan: list[Planposten], nachrichten: dict, adressen: dict,
 # Ein Hard Bounce oder eine Beschwerde schaltet SOFORT ab. Soft Bounces erst
 # nach fuenf in Folge: ein volles Postfach ist in drei Tagen wieder leer, und
 # wer dafuer eine lebende Adresse wegwirft, verliert einen Leser fuer immer.
-HARTE_EREIGNISSE = {"hard_bounce", "hardBounce", "blocked", "spam",
-                    "complaint", "invalid_email", "unsubscribed"}
+HARTE_EREIGNISSE = {
+    "hard_bounce",
+    "hardBounce",
+    "blocked",
+    "spam",
+    "complaint",
+    "invalid_email",
+    "unsubscribed",
+}
 WEICHE_EREIGNISSE = {"soft_bounce", "softBounce", "deferred", "error"}
 SOFT_GRENZE = 5
 
@@ -267,8 +312,9 @@ class Bounceergebnis:
     letzter_zeitpunkt: str = ""
 
 
-def werte_ereignisse_aus(ereignisse, message_id_zu_abo: dict,
-                         bounce_stand: dict) -> Bounceergebnis:
+def werte_ereignisse_aus(
+    ereignisse, message_id_zu_abo: dict, bounce_stand: dict
+) -> Bounceergebnis:
     """Aus Brevo-Ereignissen wird "diese Abos sind tot".
 
     Zugeordnet wird ueber die **Message-ID** aus dem Sendeprotokoll, nicht

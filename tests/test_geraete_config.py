@@ -6,6 +6,7 @@ bei Fehlern), und die AUSGELIEFERTEN Dateien gegen ihre eigenen Zusicherungen
 zweite Sorte ist die wichtigere: eine Katalogzeile, die zwei Geraete
 ununterscheidbar macht, faellt in keinem Einheitstest auf.
 """
+
 from pathlib import Path
 
 import pytest
@@ -29,13 +30,15 @@ def _schreibe(tmp_path: Path, name: str, daten) -> Path:
         # bedeutungstragend ("die erste gewinnt"), ein sortierender Dump
         # wuerde genau das wegsortieren.
         yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
-        encoding="utf-8")
+        encoding="utf-8",
+    )
     return tmp_path
 
 
 # --------------------------------------------------------------------------
 # Loader-Verhalten
 # --------------------------------------------------------------------------
+
 
 def test_fehlende_dateien_sind_kein_fehler(tmp_path):
     """Failsafe wie bei load_promo_config: ohne Datei tut die Stufe nichts."""
@@ -45,20 +48,35 @@ def test_fehlende_dateien_sind_kein_fehler(tmp_path):
 
 
 def test_katalogeintrag_ohne_modell_wird_verworfen(tmp_path):
-    _schreibe(tmp_path, "geraete_katalog.yaml", {"geraete": [
-        {"hersteller": "Apple", "modell": "iPhone 17"},
-        {"hersteller": "Apple"},
-        {"modell": "irgendwas"},
-    ]})
+    _schreibe(
+        tmp_path,
+        "geraete_katalog.yaml",
+        {
+            "geraete": [
+                {"hersteller": "Apple", "modell": "iPhone 17"},
+                {"hersteller": "Apple"},
+                {"modell": "irgendwas"},
+            ]
+        },
+    )
     katalog = lade_katalog(tmp_path)
     assert [g.modell for g in katalog.geraete] == ["iPhone 17"]
 
 
 def test_speicherliste_nimmt_nur_zahlen(tmp_path):
-    _schreibe(tmp_path, "geraete_katalog.yaml", {"geraete": [
-        {"hersteller": "Apple", "modell": "iPhone 17",
-         "speicher": [128, "256", "viel"]},
-    ]})
+    _schreibe(
+        tmp_path,
+        "geraete_katalog.yaml",
+        {
+            "geraete": [
+                {
+                    "hersteller": "Apple",
+                    "modell": "iPhone 17",
+                    "speicher": [128, "256", "viel"],
+                },
+            ]
+        },
+    )
     assert lade_katalog(tmp_path).geraete[0].speicher == [128, 256]
 
 
@@ -73,40 +91,71 @@ def test_widersprechende_farbschreibweise_gewinnt_nicht_zweimal(tmp_path):
     # Dieselbe Schreibweise unter zwei kanonischen Farben: die erste gewinnt,
     # und es wird gemeldet. Still ueberschreiben waere schlimmer - dann
     # haengt die Zuordnung an der Reihenfolge der YAML.
-    _schreibe(tmp_path, "farben.yaml", {"farben": {
-        "schwarz": ["Midnight"], "blau": ["Midnight"]}})
+    _schreibe(
+        tmp_path,
+        "farben.yaml",
+        {"farben": {"schwarz": ["Midnight"], "blau": ["Midnight"]}},
+    )
     tabelle = lade_farben(tmp_path)
     assert tabelle["midnight"] == "schwarz"
 
 
 def test_unbekannte_methode_deaktiviert_den_anbieter(tmp_path):
     """Eine vertippte Zeile darf nicht als stumme Nulllieferung mitlaufen."""
-    _schreibe(tmp_path, "geraete_quellen.yaml", {"anbieter": [
-        {"name": "Testshop", "methode": "hellsehen",
-         "einstiege": [{"url": "https://example.de/handys"}]},
-    ]})
+    _schreibe(
+        tmp_path,
+        "geraete_quellen.yaml",
+        {
+            "anbieter": [
+                {
+                    "name": "Testshop",
+                    "methode": "hellsehen",
+                    "einstiege": [{"url": "https://example.de/handys"}],
+                },
+            ]
+        },
+    )
     a = lade_quellen(tmp_path).anbieter[0]
     assert a.aktiv is False and a.methode == "deaktiviert"
     assert "hellsehen" in a.grund
 
 
 def test_doppelter_einstieg_wird_nur_einmal_abgefragt(tmp_path):
-    _schreibe(tmp_path, "geraete_quellen.yaml", {"anbieter": [
-        {"name": "Testshop", "einstiege": [
-            {"url": "https://example.de/handys"},
-            {"url": "https://example.de/handys/"},
-            {"url": "https://example.de/tarife"},
-        ]},
-    ]})
+    _schreibe(
+        tmp_path,
+        "geraete_quellen.yaml",
+        {
+            "anbieter": [
+                {
+                    "name": "Testshop",
+                    "einstiege": [
+                        {"url": "https://example.de/handys"},
+                        {"url": "https://example.de/handys/"},
+                        {"url": "https://example.de/tarife"},
+                    ],
+                },
+            ]
+        },
+    )
     assert len(lade_quellen(tmp_path).anbieter[0].einstiege) == 2
 
 
 def test_deaktivierter_anbieter_ist_nicht_crawlbar_behaelt_aber_seinen_grund(tmp_path):
-    _schreibe(tmp_path, "geraete_quellen.yaml", {"anbieter": [
-        {"name": "Amazon", "methode": "deaktiviert", "aktiv": False,
-         "grund": "erfordert Product-Advertising-API-Zugang",
-         "einstiege": [{"url": "https://www.amazon.de/handys"}]},
-    ]})
+    _schreibe(
+        tmp_path,
+        "geraete_quellen.yaml",
+        {
+            "anbieter": [
+                {
+                    "name": "Amazon",
+                    "methode": "deaktiviert",
+                    "aktiv": False,
+                    "grund": "erfordert Product-Advertising-API-Zugang",
+                    "einstiege": [{"url": "https://www.amazon.de/handys"}],
+                },
+            ]
+        },
+    )
     a = lade_quellen(tmp_path).anbieter[0]
     assert a.crawlbar is False
     assert a.grund
@@ -116,17 +165,31 @@ def test_deaktivierter_anbieter_ist_nicht_crawlbar_behaelt_aber_seinen_grund(tmp
 
 
 def test_seiten_zahl_zaehlt_nur_was_wirklich_abgefragt_wird(tmp_path):
-    _schreibe(tmp_path, "geraete_quellen.yaml", {"anbieter": [
-        {"name": "A", "einstiege": [{"url": "https://a.de/1"}, {"url": "https://a.de/2"}]},
-        {"name": "B", "aktiv": False, "grund": "gesperrt",
-         "einstiege": [{"url": "https://b.de/1"}]},
-    ]})
+    _schreibe(
+        tmp_path,
+        "geraete_quellen.yaml",
+        {
+            "anbieter": [
+                {
+                    "name": "A",
+                    "einstiege": [{"url": "https://a.de/1"}, {"url": "https://a.de/2"}],
+                },
+                {
+                    "name": "B",
+                    "aktiv": False,
+                    "grund": "gesperrt",
+                    "einstiege": [{"url": "https://b.de/1"}],
+                },
+            ]
+        },
+    )
     assert lade_quellen(tmp_path).seiten_zahl == 2
 
 
 # --------------------------------------------------------------------------
 # Die ausgelieferten Dateien
 # --------------------------------------------------------------------------
+
 
 def test_ausgelieferter_katalog_laedt_und_ist_eindeutig():
     """Katalog.__post_init__ wirft bei doppelter device_id UND bei zwei
@@ -159,10 +222,12 @@ def test_katalog_hat_ueberhaupt_gepflegte_ketten():
 
 def test_marktstart_ist_entweder_leer_oder_ein_datum():
     import re
+
     katalog = lade_katalog(_ROOT)
     for g in katalog.geraete:
-        assert g.marktstart == "" or re.match(r"^\d{4}-\d{2}-\d{2}$", g.marktstart), \
+        assert g.marktstart == "" or re.match(r"^\d{4}-\d{2}-\d{2}$", g.marktstart), (
             f"{g.modell}: {g.marktstart!r}"
+        )
 
 
 def test_katalog_erkennt_echte_haendlertitel():
@@ -191,8 +256,14 @@ def test_katalog_erkennt_echte_haendlertitel():
 
 def test_katalog_verwechselt_die_nothing_geraete_nicht():
     katalog = lade_katalog(_ROOT)
-    assert erkenne_geraet("Nothing Phone (3a) 256 GB", katalog).modell == "Nothing Phone (3a)"
-    assert erkenne_geraet("Nothing Phone (3) 512 GB", katalog).modell == "Nothing Phone (3)"
+    assert (
+        erkenne_geraet("Nothing Phone (3a) 256 GB", katalog).modell
+        == "Nothing Phone (3a)"
+    )
+    assert (
+        erkenne_geraet("Nothing Phone (3) 512 GB", katalog).modell
+        == "Nothing Phone (3)"
+    )
 
 
 def test_ausgelieferte_farbtabelle_ist_widerspruchsfrei():
@@ -201,6 +272,7 @@ def test_ausgelieferte_farbtabelle_ist_widerspruchsfrei():
     with open(_ROOT / "config" / "farben.yaml", "r", encoding="utf-8") as fh:
         roh = yaml.safe_load(fh)["farben"]
     from telco_radar.geraete_model import normalisiere
+
     gesehen = {}
     doppelt = []
     for kanonisch, schreibweisen in roh.items():
@@ -280,23 +352,26 @@ def test_alle_drei_beobachtungsebenen_sind_besetzt(stufe):
 
 # device_id -> (marktstart, Beleg in Kurzform)
 BELEGTE_MARKTSTARTS = {
-    "google-pixel-11":           ("2026-08-20", "Vodafone UK / Three UK, 20.08.2026"),
-    "google-pixel-11-pro":       ("2026-08-20", "Vodafone UK / Three UK, 20.08.2026"),
-    "google-pixel-11-pro-xl":    ("2026-08-20", "Vodafone UK / Three UK, 20.08.2026"),
-    "google-pixel-11-pro-fold":  ("2026-08-20", "Vodafone UK, 20.08.2026"),
-    "samsung-galaxy-z-fold8":       ("2026-08-07", "Samsung Newsroom, 'ab dem 7. August'"),
-    "samsung-galaxy-z-fold8-ultra": ("2026-08-07", "Samsung Newsroom, 'ab dem 7. August'"),
-    "samsung-galaxy-z-flip8":       ("2026-08-07", "Samsung Newsroom, 'ab dem 7. August'"),
+    "google-pixel-11": ("2026-08-20", "Vodafone UK / Three UK, 20.08.2026"),
+    "google-pixel-11-pro": ("2026-08-20", "Vodafone UK / Three UK, 20.08.2026"),
+    "google-pixel-11-pro-xl": ("2026-08-20", "Vodafone UK / Three UK, 20.08.2026"),
+    "google-pixel-11-pro-fold": ("2026-08-20", "Vodafone UK, 20.08.2026"),
+    "samsung-galaxy-z-fold8": ("2026-08-07", "Samsung Newsroom, 'ab dem 7. August'"),
+    "samsung-galaxy-z-fold8-ultra": (
+        "2026-08-07",
+        "Samsung Newsroom, 'ab dem 7. August'",
+    ),
+    "samsung-galaxy-z-flip8": ("2026-08-07", "Samsung Newsroom, 'ab dem 7. August'"),
 }
 
 # Was an derselben Stelle NICHT stehen darf. Beides sind Daten, die im
 # Archiv prominenter auftreten als der Verkaufsstart - und beide wuerden die
 # Verweildauer systematisch zu lang und den Preisverfall zu frueh rechnen.
 VORSTELLUNGSTERMINE = {
-    "google-pixel-11":        "2026-08-12",   # Vorstellung der Pixel-11-Reihe
-    "google-pixel-11-pro":    "2026-08-12",
+    "google-pixel-11": "2026-08-12",  # Vorstellung der Pixel-11-Reihe
+    "google-pixel-11-pro": "2026-08-12",
     "google-pixel-11-pro-xl": "2026-08-12",
-    "samsung-galaxy-z-fold8": "2026-07-22",   # Galaxy Unpacked July 2026
+    "samsung-galaxy-z-fold8": "2026-07-22",  # Galaxy Unpacked July 2026
     "samsung-galaxy-z-flip8": "2026-07-22",
 }
 
@@ -310,7 +385,8 @@ def test_die_belegten_marktstarts_stehen_unveraendert_im_katalog():
             f"{g.modell}: erwartet {datum} ({beleg}), gefunden {g.marktstart!r}. "
             f"Wer das aendert, aendert jede Verweildauer und jedes "
             f"30/60/90-Tage-Fenster dieses Geraets - der Beleg steht ueber dem "
-            f"Eintrag in config/geraete_katalog.yaml.")
+            f"Eintrag in config/geraete_katalog.yaml."
+        )
 
 
 def test_kein_marktstart_ist_der_vorstellungstermin():
@@ -327,8 +403,8 @@ def test_kein_marktstart_ist_der_vorstellungstermin():
     for device_id, verboten in VORSTELLUNGSTERMINE.items():
         g = katalog.nach_id(device_id)
         assert g is not None and g.marktstart != verboten, (
-            f"{device_id}: {verboten} ist der Vorstellungs-, nicht der "
-            f"Verkaufstermin")
+            f"{device_id}: {verboten} ist der Vorstellungs-, nicht der Verkaufstermin"
+        )
 
 
 def test_die_belegten_daten_schalten_die_nachfolger_analyse_wirklich_ein():
@@ -340,21 +416,28 @@ def test_die_belegten_daten_schalten_die_nachfolger_analyse_wirklich_ein():
     Geprueft wird deshalb der Weg, den die Auswertung geht: vom VORGAENGER
     aus nach dem Nachfolger fragen und sein Datum vorfinden."""
     katalog = lade_katalog(_ROOT)
-    ketten = [(g.vorgaenger, g) for g in katalog.geraete
-              if g.device_id in BELEGTE_MARKTSTARTS and g.vorgaenger]
+    ketten = [
+        (g.vorgaenger, g)
+        for g in katalog.geraete
+        if g.device_id in BELEGTE_MARKTSTARTS and g.vorgaenger
+    ]
     # Ohne diese Zeile waere der Test auch dann gruen, wenn `vorgaenger`
     # ueberall leer waere und die Schleife nichts durchliefe.
-    assert len(ketten) == 6, ketten   # alle ausser dem Fold8 Ultra ohne Kette
+    assert len(ketten) == 6, ketten  # alle ausser dem Fold8 Ultra ohne Kette
     for _, nachfolger in ketten:
-        vorgaenger = next(v for v in katalog.geraete
-                          if v.hersteller == nachfolger.hersteller
-                          and v.modell == nachfolger.vorgaenger)
+        vorgaenger = next(
+            v
+            for v in katalog.geraete
+            if v.hersteller == nachfolger.hersteller
+            and v.modell == nachfolger.vorgaenger
+        )
         gefunden = katalog.nachfolger_von(vorgaenger.device_id)
         assert gefunden is not None and gefunden.device_id == nachfolger.device_id
         assert gefunden.marktstart, (
             f"{vorgaenger.modell}: der Nachfolger {gefunden.modell} hat keinen "
             f"marktstart - die Nachfolger-Analyse faellt fuer dieses Geraet "
-            f"still aus")
+            f"still aus"
+        )
 
 
 def test_ein_nachfolger_startet_nie_vor_seinem_vorgaenger():
@@ -366,19 +449,24 @@ def test_ein_nachfolger_startet_nie_vor_seinem_vorgaenger():
         if not (g.marktstart and g.vorgaenger):
             continue
         for v in katalog.geraete:
-            if (v.hersteller == g.hersteller and v.modell == g.vorgaenger
-                    and v.marktstart):
+            if (
+                v.hersteller == g.hersteller
+                and v.modell == g.vorgaenger
+                and v.marktstart
+            ):
                 paare.append((v, g))
     assert len(paare) >= 4, "keine vergleichbaren Paare - der Test prueft nichts"
     for vorgaenger, nachfolger in paare:
         assert nachfolger.marktstart > vorgaenger.marktstart, (
             f"{nachfolger.modell} ({nachfolger.marktstart}) startet nicht nach "
-            f"{vorgaenger.modell} ({vorgaenger.marktstart})")
+            f"{vorgaenger.modell} ({vorgaenger.marktstart})"
+        )
 
 
 # --------------------------------------------------------------------------
 # Die Buendel-Lesart in der ausgelieferten Konfiguration
 # --------------------------------------------------------------------------
+
 
 def test_buendel_ist_eine_crawlbare_einstiegsart():
     """`crawlable` liest `EINSTIEG_ARTEN` und zaehlt nicht selbst auf.
@@ -388,6 +476,7 @@ def test_buendel_ist_eine_crawlbare_einstiegsart():
     Einstieg verloren, ohne dass jemand den Grund erfaehrt.
     """
     from telco_radar.geraete_config import EINSTIEG_ARTEN, Einstieg
+
     assert "buendel" in EINSTIEG_ARTEN
     assert Einstieg(url="https://x.de/", kind="buendel").crawlable
 
@@ -399,6 +488,7 @@ def test_o2_traegt_beide_lesarten_derselben_adresse():
     hier je eine andere, ist eine davon geraten.
     """
     from telco_radar.geraete_config import lade_quellen
+
     o2 = lade_quellen(Path(__file__).resolve().parents[1]).nach_name("o2")
     je_art = {e.kind: e.url for e in o2.einstiege}
     assert set(je_art) == {"static", "buendel"}
@@ -410,6 +500,7 @@ def test_die_buendel_lesart_ist_gebaut():
     Einstiegsseite, die jede Nacht abgerufen und nie gelesen wird."""
     from telco_radar.collect.geraete import ADAPTER
     from telco_radar.geraete_config import lade_quellen
+
     quellen = lade_quellen(Path(__file__).resolve().parents[1])
     for anbieter in quellen.anbieter:
         if not any(e.kind == "buendel" for e in anbieter.einstiege):

@@ -44,6 +44,7 @@ Usage:
         --mode browser --url "https://www.saturn.de/de/brand/apple/iphone/iphone-17-pro" \
         --tag brand-iphone17pro-browser
 """
+
 from __future__ import annotations
 
 import argparse
@@ -90,7 +91,9 @@ def _pattern_to_regex(pattern: str) -> re.Pattern:
     return re.compile(re.escape(pattern).replace(r"\*", ".*"))
 
 
-_ROBOTS_DISALLOW_REGEXES = tuple((p, _pattern_to_regex(p)) for p in _ROBOTS_DISALLOW_PATTERNS)
+_ROBOTS_DISALLOW_REGEXES = tuple(
+    (p, _pattern_to_regex(p)) for p in _ROBOTS_DISALLOW_PATTERNS
+)
 
 _PRELOADED_STATE_MARK = "window.__PRELOADED_STATE__ = "
 
@@ -184,11 +187,13 @@ def _extract_ld_json_itemlist(html: str) -> list[dict]:
         for entry in data.get("itemListElement", []):
             item = entry.get("item", {})
             offers = item.get("offers") or {}
-            out.append({
-                "name": item.get("name"),
-                "price": offers.get("price"),
-                "priceCurrency": offers.get("priceCurrency"),
-            })
+            out.append(
+                {
+                    "name": item.get("name"),
+                    "price": offers.get("price"),
+                    "priceCurrency": offers.get("priceCurrency"),
+                }
+            )
     return out
 
 
@@ -220,25 +225,31 @@ def _price_features_from_state(state: dict) -> list[dict]:
     for key, val in apollo.items():
         if not key.startswith("CofrPriceFeature:"):
             continue
-        prod_id = val.get("id", "").split(":")[-1] if isinstance(val.get("id"), str) else None
+        prod_id = (
+            val.get("id", "").split(":")[-1] if isinstance(val.get("id"), str) else None
+        )
         product_key = f"GraphqlProduct:Saturn:de-DE:{prod_id}"
         product = apollo.get(product_key, {})
         price = val.get("price") or {}
         seller = val.get("marketplaceSeller") or {}
-        out.append({
-            "apollo_key": key,
-            "product_id": prod_id,
-            "title": product.get("title"),
-            "product_url": product.get("url"),
-            "amount_eur": price.get("amount"),
-            "currency": val.get("currency"),
-            "strike_price_eur": (val.get("strikePrice") or {}).get("amount"),
-            "shipping_cost_eur": price.get("shippingCost"),
-            "installment_present": price.get("installment") is not None,
-            "is_marketplace": val.get("isProductOfTypeMarketplace"),
-            "marketplace_seller_name": seller.get("sellerName"),
-            "breadcrumbs": [b.get("name") for b in (product.get("breadcrumbs") or [])],
-        })
+        out.append(
+            {
+                "apollo_key": key,
+                "product_id": prod_id,
+                "title": product.get("title"),
+                "product_url": product.get("url"),
+                "amount_eur": price.get("amount"),
+                "currency": val.get("currency"),
+                "strike_price_eur": (val.get("strikePrice") or {}).get("amount"),
+                "shipping_cost_eur": price.get("shippingCost"),
+                "installment_present": price.get("installment") is not None,
+                "is_marketplace": val.get("isProductOfTypeMarketplace"),
+                "marketplace_seller_name": seller.get("sellerName"),
+                "breadcrumbs": [
+                    b.get("name") for b in (product.get("breadcrumbs") or [])
+                ],
+            }
+        )
     return out
 
 
@@ -400,7 +411,9 @@ def run_browser(url: str, screenshot_path: str, network_log_path: str) -> int:
                 rtype = resp.request.resource_type
                 is_graphql = "graphql" in resp.url.lower()
                 if rtype in ("xhr", "fetch"):
-                    all_xhr.append({"url": resp.url, "status": resp.status, "ctype": ctype})
+                    all_xhr.append(
+                        {"url": resp.url, "status": resp.status, "ctype": ctype}
+                    )
                 # GraphQL-Antworten werden UNABHAENGIG vom Resource-Type
                 # gezaehlt (Review-Befund: Playwright klassifiziert nicht
                 # jeden GraphQL-Aufruf als "xhr"/"fetch"), damit
@@ -416,13 +429,24 @@ def run_browser(url: str, screenshot_path: str, network_log_path: str) -> int:
                             body_preview = body[:4000]
                         except Exception as exc:  # noqa: BLE001
                             body_preview = f"<body read failed: {exc}>"
-                    graphql_responses.append({
-                        "url": resp.url, "status": resp.status, "ctype": ctype,
-                        "resource_type": rtype, "body_len": body_len, "body_preview": body_preview,
-                    })
+                    graphql_responses.append(
+                        {
+                            "url": resp.url,
+                            "status": resp.status,
+                            "ctype": ctype,
+                            "resource_type": rtype,
+                            "body_len": body_len,
+                            "body_preview": body_preview,
+                        }
+                    )
 
             page.on("response", on_response)
-            page.on("console", lambda msg: console_errors.append(msg.text) if msg.type == "error" else None)
+            page.on(
+                "console",
+                lambda msg: (
+                    console_errors.append(msg.text) if msg.type == "error" else None
+                ),
+            )
 
             try:
                 page.goto(url, wait_until="domcontentloaded", timeout=30000)
@@ -432,8 +456,12 @@ def run_browser(url: str, screenshot_path: str, network_log_path: str) -> int:
             # Cookie-Banner: ein paar neutrale Versuche (kein Tarnungstrick,
             # nur die auf der Seite sichtbaren Knoepfe) - ohne Wegklicken
             # bleibt darunterliegender Inhalt teils verdeckt.
-            for sel in ("button:has-text('Alle zulassen')", "button:has-text('Alle akzeptieren')",
-                       "#onetrust-accept-btn-handler", "button:has-text('Akzeptieren')"):
+            for sel in (
+                "button:has-text('Alle zulassen')",
+                "button:has-text('Alle akzeptieren')",
+                "#onetrust-accept-btn-handler",
+                "button:has-text('Akzeptieren')",
+            ):
                 try:
                     page.click(sel, timeout=2000)
                     break
@@ -517,24 +545,43 @@ def run_browser(url: str, screenshot_path: str, network_log_path: str) -> int:
     with open(network_log_path, "w", encoding="utf-8") as fh:
         json.dump(report, fh, ensure_ascii=False, indent=2)
 
-    print(json.dumps(
-        {k: v for k, v in report.items() if k != "graphql_responses"},
-        ensure_ascii=False, indent=2,
-    ))
+    print(
+        json.dumps(
+            {k: v for k, v in report.items() if k != "graphql_responses"},
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
     print(f"\nVoller Report (inkl. GraphQL-Bodies): {network_log_path}")
-    print(f"Screenshot: {screenshot_path if not screenshot_error else '(fehlgeschlagen: ' + str(screenshot_error) + ')'}")
+    print(
+        f"Screenshot: {screenshot_path if not screenshot_error else '(fehlgeschlagen: ' + str(screenshot_error) + ')'}"
+    )
     if robots_audit_hits:
-        print(f"\n!!! ROBOTS-AUDIT: {len(robots_audit_hits)} beobachtete Requests treffen ein "
-              f"Disallow-Muster: {robots_audit_hits}")
+        print(
+            f"\n!!! ROBOTS-AUDIT: {len(robots_audit_hits)} beobachtete Requests treffen ein "
+            f"Disallow-Muster: {robots_audit_hits}"
+        )
     return 0
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--url", default=DEFAULT_URL, help="Zu ladende Saturn-Seite (Produkt-/Kategorie-/Markenpfad)")
-    parser.add_argument("--tag", default="default", help="Dateinamens-Suffix fuer Screenshot/Report unter /tmp (nur [A-Za-z0-9_-])")
-    parser.add_argument("--mode", choices=("static", "browser"), default="browser",
-                       help="static = reines HTTP (urllib, kein Playwright); browser = Chromium + Screenshot")
+    parser.add_argument(
+        "--url",
+        default=DEFAULT_URL,
+        help="Zu ladende Saturn-Seite (Produkt-/Kategorie-/Markenpfad)",
+    )
+    parser.add_argument(
+        "--tag",
+        default="default",
+        help="Dateinamens-Suffix fuer Screenshot/Report unter /tmp (nur [A-Za-z0-9_-])",
+    )
+    parser.add_argument(
+        "--mode",
+        choices=("static", "browser"),
+        default="browser",
+        help="static = reines HTTP (urllib, kein Playwright); browser = Chromium + Screenshot",
+    )
     args = parser.parse_args()
     tag = _sanitize_tag(args.tag)
 

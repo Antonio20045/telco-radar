@@ -13,6 +13,7 @@
 Fixture: vier Anbieter desselben Bündels - Vodafone (eigen, "unser
 Angebot"), Telekom (Abruf 9 Tage alt, "kein aktueller Stand seit …",
 ueber `geraete_tco_karten.ALT_AB_TAGEN`), o2 und 1&1 ohne Abzeichen."""
+
 from __future__ import annotations
 
 import contextlib
@@ -35,25 +36,56 @@ from telco_radar.report.html import render_site
 HEUTE = "2026-09-24"
 ALT_ABGERUFEN = "2026-09-15"  # 9 Tage vor HEUTE, > ALT_AB_TAGEN (3)
 
-_KATALOG = {"geraete": [
-    {"hersteller": "Apple", "modell": "iPhone 17 Pro", "generation": 17,
-     "marktstart": "2025-09-19", "speicher": [256], "segment": "premium"},
-]}
+_KATALOG = {
+    "geraete": [
+        {
+            "hersteller": "Apple",
+            "modell": "iPhone 17 Pro",
+            "generation": 17,
+            "marktstart": "2025-09-19",
+            "speicher": [256],
+            "segment": "premium",
+        },
+    ]
+}
 _FARBEN = {"farben": {"schwarz": ["Schwarz"]}}
-_QUELLEN = {"anbieter": [
-    {"name": "Vodafone", "typ": "netzbetreiber", "rang": 1, "eigen": True,
-     "methode": "ldjson", "basis_url": "https://www.vodafone.de",
-     "einstiege": [{"url": "https://www.vodafone.de/handys"}]},
-    {"name": "Telekom", "typ": "netzbetreiber", "rang": 2,
-     "methode": "ldjson", "basis_url": "https://www.telekom.de",
-     "einstiege": [{"url": "https://www.telekom.de/handys"}]},
-    {"name": "o2", "typ": "netzbetreiber", "rang": 3, "methode": "ldjson",
-     "basis_url": "https://www.o2online.de",
-     "einstiege": [{"url": "https://www.o2online.de/handys"}]},
-    {"name": "congstar", "typ": "netzbetreiber", "rang": 4,
-     "methode": "ldjson", "basis_url": "https://www.congstar.de",
-     "einstiege": [{"url": "https://www.congstar.de/handys"}]},
-]}
+_QUELLEN = {
+    "anbieter": [
+        {
+            "name": "Vodafone",
+            "typ": "netzbetreiber",
+            "rang": 1,
+            "eigen": True,
+            "methode": "ldjson",
+            "basis_url": "https://www.vodafone.de",
+            "einstiege": [{"url": "https://www.vodafone.de/handys"}],
+        },
+        {
+            "name": "Telekom",
+            "typ": "netzbetreiber",
+            "rang": 2,
+            "methode": "ldjson",
+            "basis_url": "https://www.telekom.de",
+            "einstiege": [{"url": "https://www.telekom.de/handys"}],
+        },
+        {
+            "name": "o2",
+            "typ": "netzbetreiber",
+            "rang": 3,
+            "methode": "ldjson",
+            "basis_url": "https://www.o2online.de",
+            "einstiege": [{"url": "https://www.o2online.de/handys"}],
+        },
+        {
+            "name": "congstar",
+            "typ": "netzbetreiber",
+            "rang": 4,
+            "methode": "ldjson",
+            "basis_url": "https://www.congstar.de",
+            "einstiege": [{"url": "https://www.congstar.de/handys"}],
+        },
+    ]
+}
 
 DEVICE = "apple-iphone-17-pro"
 SPEICHER = 256
@@ -76,75 +108,125 @@ def _sku(device_id, speicher):
 
 
 def _listung(anbieter, preis, abgerufen_am):
-    return {"id": f"{anbieter.lower()}--{_sku(DEVICE, SPEICHER)}",
-            "sku_id": _sku(DEVICE, SPEICHER), "device_id": DEVICE,
-            "anbieter": anbieter, "anbieter_typ": "netzbetreiber",
-            "netz": anbieter, "speicher_gb": SPEICHER, "farbe_roh": "Schwarz",
-            "farbe_normalisiert": "schwarz", "zustand": "neu",
-            "first_seen": "2026-08-01", "last_verified": abgerufen_am,
-            "status": "aktiv", "missed_checks": 0,
-            "preis_ohne_vertrag": preis, "erstpreis": preis,
-            "erstpreis_art": "ohne_vertrag", "erstpreis_am": "2026-08-01",
-            "quelle_url": f"https://example.de/{anbieter.lower()}/{DEVICE}",
-            "abgerufen_am": abgerufen_am, "verfuegbarkeit": "lieferbar",
-            "confidence": "hoch", "einstiege": ["https://example.de/liste"]}
+    return {
+        "id": f"{anbieter.lower()}--{_sku(DEVICE, SPEICHER)}",
+        "sku_id": _sku(DEVICE, SPEICHER),
+        "device_id": DEVICE,
+        "anbieter": anbieter,
+        "anbieter_typ": "netzbetreiber",
+        "netz": anbieter,
+        "speicher_gb": SPEICHER,
+        "farbe_roh": "Schwarz",
+        "farbe_normalisiert": "schwarz",
+        "zustand": "neu",
+        "first_seen": "2026-08-01",
+        "last_verified": abgerufen_am,
+        "status": "aktiv",
+        "missed_checks": 0,
+        "preis_ohne_vertrag": preis,
+        "erstpreis": preis,
+        "erstpreis_art": "ohne_vertrag",
+        "erstpreis_am": "2026-08-01",
+        "quelle_url": f"https://example.de/{anbieter.lower()}/{DEVICE}",
+        "abgerufen_am": abgerufen_am,
+        "verfuegbarkeit": "lieferbar",
+        "confidence": "hoch",
+        "einstiege": ["https://example.de/liste"],
+    }
 
 
 def _baue(tmp_path):
     root = tmp_path / "site_baum"
     (root / "config").mkdir(parents=True)
-    for name, daten in (("geraete_katalog.yaml", _KATALOG),
-                        ("farben.yaml", _FARBEN),
-                        ("geraete_quellen.yaml", _QUELLEN)):
+    for name, daten in (
+        ("geraete_katalog.yaml", _KATALOG),
+        ("farben.yaml", _FARBEN),
+        ("geraete_quellen.yaml", _QUELLEN),
+    ):
         (root / "config" / name).write_text(
-            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
-            encoding="utf-8")
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False), encoding="utf-8"
+        )
     state = root / "data" / "state"
     state.mkdir(parents=True)
-    listungen = [_listung(a, 1099.00 + i, ab)
-                 for i, (a, _t, _n, _r, ab) in enumerate(_BUENDEL)]
-    (state / "geraete_db.json").write_text(json.dumps({
-        "updated": HEUTE,
-        "anbieter": {a: {"laeufe": 4, "funde_gesamt": 1}
-                     for a, *_r in _BUENDEL},
-        "listungen": listungen}), encoding="utf-8")
+    listungen = [
+        _listung(a, 1099.00 + i, ab) for i, (a, _t, _n, _r, ab) in enumerate(_BUENDEL)
+    ]
+    (state / "geraete_db.json").write_text(
+        json.dumps(
+            {
+                "updated": HEUTE,
+                "anbieter": {
+                    a: {"laeufe": 4, "funde_gesamt": 1} for a, *_r in _BUENDEL
+                },
+                "listungen": listungen,
+            }
+        ),
+        encoding="utf-8",
+    )
     (state / "geraete_preise.jsonl").write_text("", encoding="utf-8")
     buendel = []
     for anbieter, tarif_id, tarif, rate, abgerufen_am in _BUENDEL:
-        buendel.append({
-            "id": f"buendel--{anbieter.lower()}--{_sku(DEVICE, SPEICHER)}"
-                  f"--{tarif_id}",
-            "sku_id": _sku(DEVICE, SPEICHER), "anbieter": anbieter,
-            "tarif_name": tarif, "tarif_id": tarif_id,
-            "tarif_id_guete": "hoch", "tarif_monatlich": 24.99,
-            "geraet_zuzahlung": 1.0, "geraet_monatsrate": rate,
-            "laufzeit_monate": 24, "anschlusspreis": 0.0,
-            "zustand": "neu", "rabatte": [],
-            "quelle_url": f"https://example.de/{anbieter.lower()}/{DEVICE}",
-            "abgerufen_am": abgerufen_am, "first_seen": HEUTE,
-            "last_verified": abgerufen_am})
-    (state / "geraete_tco.json").write_text(json.dumps({
-        "updated": HEUTE, "buendel": buendel, "sim_only": []}),
-        encoding="utf-8")
+        buendel.append(
+            {
+                "id": f"buendel--{anbieter.lower()}--{_sku(DEVICE, SPEICHER)}"
+                f"--{tarif_id}",
+                "sku_id": _sku(DEVICE, SPEICHER),
+                "anbieter": anbieter,
+                "tarif_name": tarif,
+                "tarif_id": tarif_id,
+                "tarif_id_guete": "hoch",
+                "tarif_monatlich": 24.99,
+                "geraet_zuzahlung": 1.0,
+                "geraet_monatsrate": rate,
+                "laufzeit_monate": 24,
+                "anschlusspreis": 0.0,
+                "zustand": "neu",
+                "rabatte": [],
+                "quelle_url": f"https://example.de/{anbieter.lower()}/{DEVICE}",
+                "abgerufen_am": abgerufen_am,
+                "first_seen": HEUTE,
+                "last_verified": abgerufen_am,
+            }
+        )
+    (state / "geraete_tco.json").write_text(
+        json.dumps({"updated": HEUTE, "buendel": buendel, "sim_only": []}),
+        encoding="utf-8",
+    )
     tarife = [
-        {"anbieter": anbieter, "name": tarif, "tarif_id": tarif_id,
-         "art": "mobilfunk", "grundgebuehr": 24.99, "laufzeit_monate": 24,
-         "datenvolumen_gb": 10,
-         "preisphasen": [{"von_monat": 1, "bis_monat": None,
-                          "betrag": 24.99}],
-         "dokument_url": f"https://example.de/pib/{tarif_id}",
-         "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}}
+        {
+            "anbieter": anbieter,
+            "name": tarif,
+            "tarif_id": tarif_id,
+            "art": "mobilfunk",
+            "grundgebuehr": 24.99,
+            "laufzeit_monate": 24,
+            "datenvolumen_gb": 10,
+            "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": 24.99}],
+            "dokument_url": f"https://example.de/pib/{tarif_id}",
+            "abgerufen_am": HEUTE,
+            "confidence": {},
+            "fundstellen": {},
+        }
         for anbieter, tarif_id, tarif, _r, _ab in _BUENDEL
     ]
     tarife = mit_leiter(tarife)
     (state / "tarife.jsonl").write_text(
-        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
+        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8"
+    )
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
-    (reports / f"{HEUTE}.json").write_text(json.dumps({
-        "date": HEUTE, "language": "de",
-        "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
-        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{HEUTE}.json").write_text(
+        json.dumps(
+            {
+                "date": HEUTE,
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     (reports / f"{HEUTE}.md").write_text("# Bericht\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
@@ -152,9 +234,14 @@ def _baue(tmp_path):
 
 
 def _chromium():
-    for m in ("/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-              str(pathlib.Path.home() / ".cache/ms-playwright"
-                  / "chromium*/chrome-linux*/chrome")):
+    for m in (
+        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
+        str(
+            pathlib.Path.home()
+            / ".cache/ms-playwright"
+            / "chromium*/chrome-linux*/chrome"
+        ),
+    ):
         t = sorted(glob.glob(m))
         if t:
             return t[-1]
@@ -167,8 +254,9 @@ def _server(site):
     s.bind(("127.0.0.1", 0))
     port = s.getsockname()[1]
     s.close()
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler,
-                                directory=str(site))
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(site)
+    )
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     try:
@@ -180,12 +268,12 @@ def _server(site):
 @pytest.fixture(scope="module")
 def zeilen(tmp_path_factory):
     sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt").sync_playwright
+        "playwright.sync_api", reason="playwright fehlt"
+    ).sync_playwright
     site = _baue(tmp_path_factory.mktemp("bnd390"))
     exe = _chromium()
     with _server(site) as wurzel, sync_playwright() as p:
-        browser = (p.chromium.launch(executable_path=exe) if exe
-                   else p.chromium.launch())
+        browser = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
         try:
             ctx = browser.new_context(viewport={"width": 390, "height": 1400})
             s = ctx.new_page()
@@ -224,7 +312,8 @@ def test_alle_preise_haben_dieselbe_rechte_kante(zeilen):
     assert len(zeilen) == 4, zeilen
     kanten = [round(z["tcoRight"]) for z in zeilen]
     assert max(kanten) - min(kanten) <= 1, (
-        f"die Preiszellen haben unterschiedliche rechte Kanten: {zeilen}")
+        f"die Preiszellen haben unterschiedliche rechte Kanten: {zeilen}"
+    )
 
 
 def test_der_preis_liegt_in_jeder_zeile_gleich_zum_namen(zeilen):
@@ -245,7 +334,8 @@ def test_der_preis_liegt_in_jeder_zeile_gleich_zum_namen(zeilen):
         abstaende = [round(z["tcoTop"] - z["nameTop"]) for z in gruppe]
         assert max(abstaende) - min(abstaende) <= 2, (
             f"Abstand Name->Preis unterscheidet sich innerhalb derselben "
-            f"Bauform (Abzeichen={hat_marke}): {gruppe}")
+            f"Bauform (Abzeichen={hat_marke}): {gruppe}"
+        )
 
 
 def test_das_abzeichen_steht_auf_einer_zeile(zeilen):
@@ -256,10 +346,13 @@ def test_das_abzeichen_steht_auf_einer_zeile(zeilen):
     passt auf EINE Zeile (Rechteckhoehe ~ eine Zeilenhoehe), nicht auf
     zwei bis vier enge Zeilen gestapelt."""
     mit_marke = [z for z in zeilen if z["marke"]]
-    assert len(mit_marke) == 1, zeilen  # Telekom (Vodafones „unser Angebot" ist am 28.09.2026 gefallen)
+    assert len(mit_marke) == 1, (
+        zeilen
+    )  # Telekom (Vodafones „unser Angebot" ist am 28.09.2026 gefallen)
     for z in mit_marke:
         assert z["markeHoehe"] <= z["zeilenhoehe"] * 1.5, (
-            f"das Abzeichen steht nicht auf einer Zeile: {z}")
+            f"das Abzeichen steht nicht auf einer Zeile: {z}"
+        )
 
 
 def test_die_alte_telekom_zeile_traegt_wirklich_die_alte_marke(zeilen):
@@ -268,7 +361,10 @@ def test_die_alte_telekom_zeile_traegt_wirklich_die_alte_marke(zeilen):
     einer Zeile ohne Marke vorbei."""
     telekom = [z for z in zeilen if z["name"] == "Telekom"]
     assert telekom, zeilen
-    assert telekom[0]["marke"] == geraete_tco_karten.alt_marke_fuer(
-        ALT_ABGERUFEN), telekom
-    assert geraete_tco_karten.alter_in_tagen(
-        ALT_ABGERUFEN, HEUTE) > geraete_tco_karten.ALT_AB_TAGEN
+    assert telekom[0]["marke"] == geraete_tco_karten.alt_marke_fuer(ALT_ABGERUFEN), (
+        telekom
+    )
+    assert (
+        geraete_tco_karten.alter_in_tagen(ALT_ABGERUFEN, HEUTE)
+        > geraete_tco_karten.ALT_AB_TAGEN
+    )

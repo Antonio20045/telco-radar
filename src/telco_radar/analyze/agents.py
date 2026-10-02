@@ -5,6 +5,7 @@ a structured assessment (relevance for Vodafone, category, why it matters).
 Keeping the intelligence in the delta layer and the judgment in small,
 focused agent calls is what makes this cheap and reliable.
 """
+
 from __future__ import annotations
 
 import json
@@ -265,24 +266,32 @@ def analyst_text(item: Item) -> str:
 def _items_payload(items: list[Item]) -> str:
     rows = []
     for item in items:
-        rows.append({
-            "title": item.title,
-            "operator": item.operator or "",
-            "source": item.source_name,
-            "date": item.published.date().isoformat() if item.published else None,
-            "url": item.url,
-            # "text", nicht "snippet": das Feld traegt seit dem 15.08.2026
-            # bis zu ANALYST_TEXT_ZEICHEN Zeichen Artikeltext. Unter dem
-            # alten Namen wuerde es der naechste Leser wieder kappen.
-            "text": analyst_text(item),
-        })
+        rows.append(
+            {
+                "title": item.title,
+                "operator": item.operator or "",
+                "source": item.source_name,
+                "date": item.published.date().isoformat() if item.published else None,
+                "url": item.url,
+                # "text", nicht "snippet": das Feld traegt seit dem 15.08.2026
+                # bis zu ANALYST_TEXT_ZEICHEN Zeichen Artikeltext. Unter dem
+                # alten Namen wuerde es der naechste Leser wieder kappen.
+                "text": analyst_text(item),
+            }
+        )
     return json.dumps(rows, ensure_ascii=False)
 
 
-def analyze_region(region_name: str, items: list[Item], model: str,
-                   language: str = "Deutsch", max_items: int | None = None,
-                   is_theme: bool = False, batch_workers: int = 1,
-                   ausweich: str = "") -> dict:
+def analyze_region(
+    region_name: str,
+    items: list[Item],
+    model: str,
+    language: str = "Deutsch",
+    max_items: int | None = None,
+    is_theme: bool = False,
+    batch_workers: int = 1,
+    ausweich: str = "",
+) -> dict:
     """Run one regional analyst (in batches). Returns the merged assessment.
 
     Items are processed in batches of BATCH_SIZE so the JSON response never
@@ -316,11 +325,14 @@ def analyze_region(region_name: str, items: list[Item], model: str,
     erledigt, egal ob ein Analyst sie gelesen hat.
     """
     vorlage = TECH_ANALYST_SYSTEM if is_theme else ANALYST_SYSTEM
-    system = vorlage.format(region=region_name, language=language,
-                            CTM_FELDER=CTM_FELDER.format(language=language),
-                            TEXTFELD=TEXTFELD)
+    system = vorlage.format(
+        region=region_name,
+        language=language,
+        CTM_FELDER=CTM_FELDER.format(language=language),
+        TEXTFELD=TEXTFELD,
+    )
     capped = items if not max_items else items[:max_items]
-    batches = [capped[i:i + BATCH_SIZE] for i in range(0, len(capped), BATCH_SIZE)]
+    batches = [capped[i : i + BATCH_SIZE] for i in range(0, len(capped), BATCH_SIZE)]
 
     def _ein_stapel(n: int, batch: list[Item]) -> dict | None:
         # Hier steht bewusst KEINE Kostenpruefung. Der Zaehler aus llm.py
@@ -332,8 +344,7 @@ def analyze_region(region_name: str, items: list[Item], model: str,
         # faengt der Anker die sichtbaren Stufen.
         user = (
             f"NEW items for region {region_name} "
-            f"(batch {n}/{len(batches)}, {len(batch)} items):\n"
-            + _items_payload(batch)
+            f"(batch {n}/{len(batches)}, {len(batch)} items):\n" + _items_payload(batch)
         )
         try:
             # Grosszuegig, nicht knapp: am 18.08.2026 dachte deepseek-v4-pro
@@ -343,21 +354,34 @@ def analyze_region(region_name: str, items: list[Item], model: str,
             # Woche. Dieselbe Fehlerklasse wie CLAUDE.md §6 (Laeufe #83-85).
             # Die Denkspur wird als Ausgabe abgerechnet, das Budget muss
             # Denken PLUS Antwort tragen.
-            raw = complete(system, user, model=model,
-                           max_tokens=ANALYST_MAX_TOKENS, ausweich=ausweich)
+            raw = complete(
+                system,
+                user,
+                model=model,
+                max_tokens=ANALYST_MAX_TOKENS,
+                ausweich=ausweich,
+            )
             return extract_json(raw)
         except (ValueError, RuntimeError, KeyError) as exc:
-            log.error("Analyst %s batch %d/%d failed: %s - skipping batch",
-                      region_name, n, len(batches), exc)
+            log.error(
+                "Analyst %s batch %d/%d failed: %s - skipping batch",
+                region_name,
+                n,
+                len(batches),
+                exc,
+            )
             return None
 
     if batch_workers > 1 and len(batches) > 1:
         with ThreadPoolExecutor(max_workers=batch_workers) as pool:
             # Reihenfolge erhalten: der Bericht sortiert zwar nach Relevanz,
             # aber ein Lauf soll bei gleicher Eingabe dieselbe Ausgabe liefern.
-            ergebnisse = list(pool.map(
-                lambda p: _ein_stapel(p[0], p[1]),
-                [(n, b) for n, b in enumerate(batches, 1)]))
+            ergebnisse = list(
+                pool.map(
+                    lambda p: _ein_stapel(p[0], p[1]),
+                    [(n, b) for n, b in enumerate(batches, 1)],
+                )
+            )
     else:
         ergebnisse = [_ein_stapel(n, b) for n, b in enumerate(batches, 1)]
 
@@ -381,10 +405,16 @@ def analyze_region(region_name: str, items: list[Item], model: str,
         if result.get("region_summary"):
             summaries.append(str(result["region_summary"]))
 
-    log.info("Analyst %-25s: %d items in %d batch(es, %d parallel) -> %d "
-             "highlights, %d ungelesen",
-             region_name, len(capped), len(batches), batch_workers,
-             len(highlights), len(ungelesen))
+    log.info(
+        "Analyst %-25s: %d items in %d batch(es, %d parallel) -> %d "
+        "highlights, %d ungelesen",
+        region_name,
+        len(capped),
+        len(batches),
+        batch_workers,
+        len(highlights),
+        len(ungelesen),
+    )
     return {
         "region_summary": " ".join(summaries),
         "highlights": highlights,

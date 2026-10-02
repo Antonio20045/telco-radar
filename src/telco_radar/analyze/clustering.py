@@ -62,6 +62,7 @@ dieselbe 1-je-Haeufigkeit-Rechnung wie beim roten Faden der Titelseite
 (report/html.py:_faden). Er ersetzt die Akteurspruefung nicht, er tritt nur
 ein, wenn sie mangels erkennbaren Akteurs gar nicht greifen konnte.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -115,21 +116,124 @@ _WORT = re.compile(r"[a-z0-9äöüß]+")
 # auch fr/es/it/pt). Eine gemeinsame "the" beweist nichts.
 _STOPP = {
     # de
-    "der", "die", "das", "den", "dem", "des", "ein", "eine", "einen", "einem",
-    "eines", "und", "oder", "mit", "fuer", "für", "von", "vom", "auf", "aus",
-    "bei", "nach", "ueber", "über", "unter", "zum", "zur", "ist", "sind",
-    "wird", "werden", "hat", "haben", "sich", "auch", "neue", "neuen", "neuer",
-    "neues", "mehr", "als", "wie", "nicht", "sein", "seine", "seinen", "ihre",
-    "ihren", "dass", "durch", "gegen", "beim", "kann", "koennen", "können",
+    "der",
+    "die",
+    "das",
+    "den",
+    "dem",
+    "des",
+    "ein",
+    "eine",
+    "einen",
+    "einem",
+    "eines",
+    "und",
+    "oder",
+    "mit",
+    "fuer",
+    "für",
+    "von",
+    "vom",
+    "auf",
+    "aus",
+    "bei",
+    "nach",
+    "ueber",
+    "über",
+    "unter",
+    "zum",
+    "zur",
+    "ist",
+    "sind",
+    "wird",
+    "werden",
+    "hat",
+    "haben",
+    "sich",
+    "auch",
+    "neue",
+    "neuen",
+    "neuer",
+    "neues",
+    "mehr",
+    "als",
+    "wie",
+    "nicht",
+    "sein",
+    "seine",
+    "seinen",
+    "ihre",
+    "ihren",
+    "dass",
+    "durch",
+    "gegen",
+    "beim",
+    "kann",
+    "koennen",
+    "können",
     # en
-    "the", "and", "for", "with", "from", "into", "that", "this", "will",
-    "has", "have", "are", "was", "were", "its", "new", "more", "than", "over",
-    "after", "before", "says", "said", "amid", "plans", "plan", "launches",
-    "launch", "announces", "announced", "announcement", "reports", "report",
+    "the",
+    "and",
+    "for",
+    "with",
+    "from",
+    "into",
+    "that",
+    "this",
+    "will",
+    "has",
+    "have",
+    "are",
+    "was",
+    "were",
+    "its",
+    "new",
+    "more",
+    "than",
+    "over",
+    "after",
+    "before",
+    "says",
+    "said",
+    "amid",
+    "plans",
+    "plan",
+    "launches",
+    "launch",
+    "announces",
+    "announced",
+    "announcement",
+    "reports",
+    "report",
     # es / pt / it / fr
-    "para", "por", "con", "las", "los", "del", "una", "unos", "unas", "que",
-    "sus", "sur", "les", "des", "aux", "dans", "pour", "avec", "sul", "nel",
-    "della", "delle", "dei", "com", "para", "não", "mais", "sobre",
+    "para",
+    "por",
+    "con",
+    "las",
+    "los",
+    "del",
+    "una",
+    "unos",
+    "unas",
+    "que",
+    "sus",
+    "sur",
+    "les",
+    "des",
+    "aux",
+    "dans",
+    "pour",
+    "avec",
+    "sul",
+    "nel",
+    "della",
+    "delle",
+    "dei",
+    "com",
+    "para",
+    "não",
+    "mais",
+    "sobre",
 }
 
 # Wortendungen, die eine Form von ihrer Grundform trennen. Bewusst KEIN echter
@@ -147,12 +251,21 @@ _ZAHL = re.compile(
     r"(\d+(?:[.,]\d+)*)\s*[-\s]?\s*"
     r"(gw|mw|kw|tb|gb|mb|gbit|mbit|mhz|ghz|khz|mrd|mio|bn|billion|billionen|"
     r"milliarden|millionen|million|prozent|%|eur|euro|€|usd|dollar|\$)?",
-    re.I)
+    re.I,
+)
 
 _EINHEIT_GLEICH = {
-    "€": "eur", "euro": "eur", "$": "usd", "dollar": "usd",
-    "milliarden": "mrd", "millionen": "mio", "million": "mio",
-    "billion": "mrd", "billionen": "mrd", "bn": "mrd", "prozent": "%",
+    "€": "eur",
+    "euro": "eur",
+    "$": "usd",
+    "dollar": "usd",
+    "milliarden": "mrd",
+    "millionen": "mio",
+    "million": "mio",
+    "billion": "mrd",
+    "billionen": "mrd",
+    "bn": "mrd",
+    "prozent": "%",
 }
 
 # Woerter, die als Akteur nichts unterscheiden. Sie stehen in englischen
@@ -163,21 +276,115 @@ _EINHEIT_GLEICH = {
 # die Haeufigkeit etwas aussagt (und den Weg ueber `ClusterStore.zuordnen`,
 # wo es gar keinen Stapel gibt).
 _KEIN_AKTEUR = {
-    "team", "teams", "expand", "expands", "launch", "launches", "add", "adds",
-    "sign", "signs", "unveil", "unveils", "select", "selects", "bet", "bets",
-    "move", "moves", "make", "makes", "put", "puts", "plot", "plots", "eye",
-    "eyes", "target", "targets", "boost", "boosts", "cut", "cuts", "rise",
-    "rises", "jump", "jumps", "soar", "soars", "help", "helps", "drive",
-    "drives", "scale", "achiev", "achieves", "enhanc", "enhances", "enabl",
-    "enables", "integrat", "integrates", "partner", "partners", "invest",
-    "invests", "network", "networks", "mobile", "telecom", "telecoms", "cloud",
-    "market", "report", "reports", "service", "services", "solution",
-    "solutions", "business", "group", "internet", "broadband", "data",
-    "digital", "wireless", "platform", "technology", "technologies", "global",
-    "international", "consumer", "customer", "customers", "revenue", "growth",
-    "million", "billion", "industry", "company", "corp", "inc", "gmbh",
-    "video", "interview", "news", "update", "week", "year", "first", "next",
-    "new", "more", "with", "for", "and", "the", "how", "why", "what",
+    "team",
+    "teams",
+    "expand",
+    "expands",
+    "launch",
+    "launches",
+    "add",
+    "adds",
+    "sign",
+    "signs",
+    "unveil",
+    "unveils",
+    "select",
+    "selects",
+    "bet",
+    "bets",
+    "move",
+    "moves",
+    "make",
+    "makes",
+    "put",
+    "puts",
+    "plot",
+    "plots",
+    "eye",
+    "eyes",
+    "target",
+    "targets",
+    "boost",
+    "boosts",
+    "cut",
+    "cuts",
+    "rise",
+    "rises",
+    "jump",
+    "jumps",
+    "soar",
+    "soars",
+    "help",
+    "helps",
+    "drive",
+    "drives",
+    "scale",
+    "achiev",
+    "achieves",
+    "enhanc",
+    "enhances",
+    "enabl",
+    "enables",
+    "integrat",
+    "integrates",
+    "partner",
+    "partners",
+    "invest",
+    "invests",
+    "network",
+    "networks",
+    "mobile",
+    "telecom",
+    "telecoms",
+    "cloud",
+    "market",
+    "report",
+    "reports",
+    "service",
+    "services",
+    "solution",
+    "solutions",
+    "business",
+    "group",
+    "internet",
+    "broadband",
+    "data",
+    "digital",
+    "wireless",
+    "platform",
+    "technology",
+    "technologies",
+    "global",
+    "international",
+    "consumer",
+    "customer",
+    "customers",
+    "revenue",
+    "growth",
+    "million",
+    "billion",
+    "industry",
+    "company",
+    "corp",
+    "inc",
+    "gmbh",
+    "video",
+    "interview",
+    "news",
+    "update",
+    "week",
+    "year",
+    "first",
+    "next",
+    "new",
+    "more",
+    "with",
+    "for",
+    "and",
+    "the",
+    "how",
+    "why",
+    "what",
 }
 
 
@@ -193,8 +400,10 @@ def _stamm(wort: str) -> str:
 def wortmenge(text: str) -> frozenset[str]:
     """Bedeutungstragende Wortstaemme eines Textes."""
     return frozenset(
-        _stamm(w) for w in _WORT.findall((text or "").lower())
-        if len(w) >= 3 and w not in _STOPP)
+        _stamm(w)
+        for w in _WORT.findall((text or "").lower())
+        if len(w) >= 3 and w not in _STOPP
+    )
 
 
 def zahlenmenge(text: str) -> frozenset[str]:
@@ -249,8 +458,12 @@ class _Profil:
     selten: frozenset[str] = frozenset()
 
     @classmethod
-    def von(cls, item: Item, akteure: frozenset[str] | None = None,
-             selten: frozenset[str] | None = None) -> "_Profil":
+    def von(
+        cls,
+        item: Item,
+        akteure: frozenset[str] | None = None,
+        selten: frozenset[str] | None = None,
+    ) -> "_Profil":
         # Der Titel traegt das Ereignis, die Zusammenfassung traegt die Zahlen.
         # Beide zusammen fuer die Woerter waere falsch: ein langer Teaser
         # verduennt jede Aehnlichkeit.
@@ -268,8 +481,10 @@ class _Profil:
 
 def _betreiber(item: Item) -> frozenset[str]:
     return frozenset(
-        _stamm(w) for w in _WORT.findall((item.operator or "").lower())
-        if len(w) >= 3 and w not in _STOPP and w not in _KEIN_AKTEUR)
+        _stamm(w)
+        for w in _WORT.findall((item.operator or "").lower())
+        if len(w) >= 3 and w not in _STOPP and w not in _KEIN_AKTEUR
+    )
 
 
 def akteur_kandidaten(item: Item) -> frozenset[str]:
@@ -286,8 +501,11 @@ def akteur_kandidaten(item: Item) -> frozenset[str]:
     """
     namen = set()
     if item.operator:
-        namen |= {_stamm(w) for w in _WORT.findall(item.operator.lower())
-                  if len(w) >= 3 and w not in _STOPP}
+        namen |= {
+            _stamm(w)
+            for w in _WORT.findall(item.operator.lower())
+            if len(w) >= 3 and w not in _STOPP
+        }
     # Auch das erste Wort. Es sieht nach Satzanfang aus und ist in einer
     # Schlagzeile fast immer der Handelnde: "SpaceX small cell plan ...",
     # "Zayo teams with Nvidia ...", "Indosat launches ...". Solange es
@@ -322,8 +540,9 @@ def _seltene_akteure(kandidaten: list[frozenset[str]]) -> list[frozenset[str]]:
         for name in menge:
             haeufigkeit[name] = haeufigkeit.get(name, 0) + 1
     deckel = max(3, len(kandidaten) // 8)
-    return [frozenset(n for n in menge if haeufigkeit[n] <= deckel)
-            for menge in kandidaten]
+    return [
+        frozenset(n for n in menge if haeufigkeit[n] <= deckel) for menge in kandidaten
+    ]
 
 
 def _seltene_titelworte(mengen: list[frozenset[str]]) -> list[frozenset[str]]:
@@ -353,8 +572,7 @@ def _seltene_titelworte(mengen: list[frozenset[str]]) -> list[frozenset[str]]:
         for w in menge:
             haeufigkeit[w] = haeufigkeit.get(w, 0) + 1
     deckel = max(3, min(SELTENHEITS_OBERGRENZE, len(mengen) // 8))
-    return [frozenset(w for w in menge if haeufigkeit[w] <= deckel)
-            for menge in mengen]
+    return [frozenset(w for w in menge if haeufigkeit[w] <= deckel) for menge in mengen]
 
 
 def _zeitlich_nah(a: Item, b: Item, stunden: int) -> bool:
@@ -411,9 +629,11 @@ def _urteil(a: _Profil, b: _Profil) -> tuple[str, float]:
         # 2. Verschiedene Quellen - eine Redaktion, die zweimal dasselbe
         #    Schema fuellt, ist kein Beleg.
         # 3. Ein gemeinsames SELTENES Titelwort (`_seltene_titelworte`).
-        if ((a.akteure and b.akteure)
-                or a.item.source_name == b.item.source_name
-                or not (a.selten & b.selten)):
+        if (
+            (a.akteure and b.akteure)
+            or a.item.source_name == b.item.source_name
+            or not (a.selten & b.selten)
+        ):
             return "verschieden", 0.0
     aehnlich = _jaccard(a.worte, b.worte)
     gemeinsame_zahl = bool(a.zahlen & b.zahlen)
@@ -456,7 +676,8 @@ class Gruppe:
     def id(self) -> str:
         # Aus der kanonischen URL, nie aus dem Titel - siehe Modulkopf.
         return hashlib.sha256(
-            normalize_url(self.vertreter.url).encode("utf-8")).hexdigest()[:16]
+            normalize_url(self.vertreter.url).encode("utf-8")
+        ).hexdigest()[:16]
 
     @property
     def quellen(self) -> int:
@@ -464,8 +685,10 @@ class Gruppe:
 
     def belege(self) -> list[dict]:
         """Die weiteren Quellen, wie sie unter der Meldung stehen."""
-        return [{"source": m.source_name, "url": m.url, "title": m.title}
-                for m in self.mitglieder]
+        return [
+            {"source": m.source_name, "url": m.url, "title": m.title}
+            for m in self.mitglieder
+        ]
 
 
 _PRUEF_SYSTEM = """\
@@ -488,12 +711,13 @@ Im Zweifel false.
 
 
 def _frage_modell(a: Item, b: Item, model: str) -> bool:
-    user = json.dumps({
-        "A": {"titel": a.title, "quelle": a.source_name,
-              "auszug": a.summary[:300]},
-        "B": {"titel": b.title, "quelle": b.source_name,
-              "auszug": b.summary[:300]},
-    }, ensure_ascii=False)
+    user = json.dumps(
+        {
+            "A": {"titel": a.title, "quelle": a.source_name, "auszug": a.summary[:300]},
+            "B": {"titel": b.title, "quelle": b.source_name, "auszug": b.summary[:300]},
+        },
+        ensure_ascii=False,
+    )
     # 8000 ist die Untergrenze, die sich bewaehrt hat: ein kleineres Budget
     # sieht wie eine tote Quelle aus, weil ein denkendes Modell damit fertig
     # ist, bevor die Antwort anfaengt (Laeufe #83-85).
@@ -513,10 +737,14 @@ def _deckel(items: int, vorgabe: int | None) -> int:
     return max(MAX_LLM_PRUEFUNGEN, min(120, items // 4))
 
 
-def gruppiere(items: list[Item], *, model: str | None = None,
-              use_llm: bool = False,
-              zeitfenster_stunden: int = ZEITFENSTER_STUNDEN,
-              max_llm_pruefungen: int | None = None) -> list[Gruppe]:
+def gruppiere(
+    items: list[Item],
+    *,
+    model: str | None = None,
+    use_llm: bool = False,
+    zeitfenster_stunden: int = ZEITFENSTER_STUNDEN,
+    max_llm_pruefungen: int | None = None,
+) -> list[Gruppe]:
     """Fasst Meldungen zu Ereignis-Gruppen zusammen.
 
     Die Reihenfolge der Eingabe entscheidet, wer Vertreter wird: die erste
@@ -561,8 +789,13 @@ def gruppiere(items: list[Item], *, model: str | None = None,
             gruppen[bestes[1]].mitglieder.append(item)
             continue
         if graubester is not None:
-            grau.append((_grau_rang(profile[graubester[1]], p, graubester[0]),
-                         gruppen[graubester[1]], p))
+            grau.append(
+                (
+                    _grau_rang(profile[graubester[1]], p, graubester[0]),
+                    gruppen[graubester[1]],
+                    p,
+                )
+            )
         gruppen.append(Gruppe(vertreter=item, akteure=namen))
         profile.append(p)
 
@@ -572,7 +805,7 @@ def gruppiere(items: list[Item], *, model: str | None = None,
         grau.sort(key=lambda t: -t[0])
         zusammengelegt = 0
         gefragt = 0
-        for wert, ziel, p in grau[:_deckel(len(items), max_llm_pruefungen)]:
+        for wert, ziel, p in grau[: _deckel(len(items), max_llm_pruefungen)]:
             # Die Zielgruppe kann in einer frueheren Runde selbst aufgeloest
             # und in eine andere gehaengt worden sein. Dann ist sie kein
             # gueltiges Ziel mehr - ihr etwas anzuhaengen hiesse, es in eine
@@ -586,8 +819,11 @@ def gruppiere(items: list[Item], *, model: str | None = None,
                 if not _frage_modell(ziel.vertreter, p.item, model):
                     continue
             except (ValueError, RuntimeError, KeyError) as exc:
-                log.warning("Ereignis-Pruefung fehlgeschlagen (%s) - die "
-                            "beiden Meldungen bleiben getrennt", str(exc)[:120])
+                log.warning(
+                    "Ereignis-Pruefung fehlgeschlagen (%s) - die "
+                    "beiden Meldungen bleiben getrennt",
+                    str(exc)[:120],
+                )
                 continue
             # Der Zweifelsfall hat oben eine eigene Gruppe bekommen; die wird
             # jetzt aufgeloest und ihr Inhalt umgehaengt.
@@ -599,8 +835,11 @@ def gruppiere(items: list[Item], *, model: str | None = None,
                     profile.pop(i)
                     zusammengelegt += 1
                     break
-        log.info("Ereignis-Pruefung: %d Zweifelsfaelle gefragt, %d zusammengelegt",
-                 gefragt, zusammengelegt)
+        log.info(
+            "Ereignis-Pruefung: %d Zweifelsfaelle gefragt, %d zusammengelegt",
+            gefragt,
+            zusammengelegt,
+        )
 
     return gruppen
 
@@ -660,9 +899,12 @@ class ClusterStore:
                 fh.write("# telco-radar Ereignis-Cluster - eine Gruppe je Zeile\n")
             for g in gruppen:
                 alt = self.cluster.get(g.id) or {}
-                mitglieder = sorted(set(
-                    (alt.get("member_urls") or [])
-                    + [normalize_url(m.url) for m in g.mitglieder]))
+                mitglieder = sorted(
+                    set(
+                        (alt.get("member_urls") or [])
+                        + [normalize_url(m.url) for m in g.mitglieder]
+                    )
+                )
                 rec = {
                     "cluster_id": g.id,
                     "canonical_url": normalize_url(g.vertreter.url),
@@ -676,8 +918,12 @@ class ClusterStore:
                 self.cluster[g.id] = rec
                 fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
-    def zuordnen(self, item: Item, heute: datetime,
-                 zeitfenster_stunden: int = ZEITFENSTER_STUNDEN) -> str | None:
+    def zuordnen(
+        self,
+        item: Item,
+        heute: datetime,
+        zeitfenster_stunden: int = ZEITFENSTER_STUNDEN,
+    ) -> str | None:
         """Gehoert diese Meldung zu einem Ereignis aus einem frueheren Lauf?
 
         Gleiche Pruefung wie im Lauf selbst, nur gegen den gespeicherten
@@ -699,7 +945,9 @@ class ClusterStore:
             akteure = frozenset(rec.get("akteure") or [])
             if not (akteure & p.akteure):
                 continue
-            if _jaccard(wortmenge(rec.get("canonical_title") or ""),
-                        p.worte) >= SCHWELLE_SICHER:
+            if (
+                _jaccard(wortmenge(rec.get("canonical_title") or ""), p.worte)
+                >= SCHWELLE_SICHER
+            ):
                 return rec["cluster_id"]
         return None

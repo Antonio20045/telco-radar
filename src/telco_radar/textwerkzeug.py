@@ -37,12 +37,14 @@ demselben Handwerkszeug (Satztrenner, Abkuerzungsschutz, Vodafone-Muster):
 Die drei Antworten sind absichtlich verschieden; das Handwerkszeug ist es
 nicht mehr.
 """
+
 from __future__ import annotations
 
 import re
 
-_SLUG_MAP = str.maketrans({"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss",
-                           "Ä": "ae", "Ö": "oe", "Ü": "ue"})
+_SLUG_MAP = str.maketrans(
+    {"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss", "Ä": "ae", "Ö": "oe", "Ü": "ue"}
+)
 
 # Vier Zeichen Mindestlaenge: kuerzer sind im Deutschen fast nur Fuellwoerter
 # ("der", "und", "mit"), und die traegt der Haeufigkeitsdeckel ohnehin aus.
@@ -99,6 +101,7 @@ def gewicht(woerter, haeufigkeit: dict[str, int]) -> float:
 # `kein_punkt_davor` blendet zusaetzlich Domainnamen aus: ohne das trifft
 # "o2" auch in "example.o2" und die Marke steht in jeder Fussnote.
 
+
 def begriffs_muster(begriffe, *, kein_punkt_davor: bool = False):
     """Ein Muster, das JEDEN der Begriffe an Wortgrenzen findet - oder None.
 
@@ -118,9 +121,27 @@ def begriffs_muster(begriffe, *, kein_punkt_davor: bool = False):
 # Abkuerzungen, deren Punkt kein Satzende ist. Ohne diesen Schutz zerlegt der
 # Satztrenner "z. B. Vodafone kann ..." in zwei Teile und wirft den halben
 # Satz weg.
-ABKUERZUNGEN = ("z. B.", "z.B.", "d. h.", "d.h.", "u. a.", "u.a.", "u. Ä.",
-                "bzw.", "ca.", "ggf.", "inkl.", "Mio.", "Mrd.", "Nr.",
-                "Abb.", "evtl.", "sog.", "Prof.", "Dr.")
+ABKUERZUNGEN = (
+    "z. B.",
+    "z.B.",
+    "d. h.",
+    "d.h.",
+    "u. a.",
+    "u.a.",
+    "u. Ä.",
+    "bzw.",
+    "ca.",
+    "ggf.",
+    "inkl.",
+    "Mio.",
+    "Mrd.",
+    "Nr.",
+    "Abb.",
+    "evtl.",
+    "sog.",
+    "Prof.",
+    "Dr.",
+)
 _SATZ_GRENZE = re.compile(r"(?<=[.!?])\s+(?=[«\"„*\[(A-ZÄÖÜ])")
 # Trennzeichen INNERHALB eines Satzes. Ein deutscher Analystensatz stellt
 # Befund und Folgerung regelmaessig so gegenueber: "Telkomsel macht seine App
@@ -140,14 +161,18 @@ _RAT_VERBEN = re.compile(
     r"kopieren|(?:ü|ue)bertragen|nachziehen|gegenhalten|kontern|"
     r"einf(?:ü|ue)hren|aufwerten|vermarkten|schn(?:ü|ue)ren|b(?:ü|ue)ndeln|"
     r"beobachten|anpassen|ausrichten|positionieren|nutzen|setzen|aufbauen|"
-    r"schaffen|erg(?:ä|ae)nzen)(?!\w)", re.I)
+    r"schaffen|erg(?:ä|ae)nzen)(?!\w)",
+    re.I,
+)
 # "Vorlage fuer Vodafone: ..." raet, ohne ein Verb zu brauchen - alle vier
 # Faelle im Bestand vom 08.08.2026 haben genau diese Form. Bewusst NICHT das
 # blosse "für Vodafone" (so steht es in `_ADVICE_PHRASES` des Wochenberichts):
 # "für Vodafone entsteht Druck" ist eine Folge, kein Rat.
 _RAT_MARKER = re.compile(
     r"(?<!\w)(?:vorlage|vorbild|modell|blaupause|anregung|impuls|lehre)"
-    r"\W+f(?:ü|ue)r\W+vodafones?(?!\w)", re.I)
+    r"\W+f(?:ü|ue)r\W+vodafones?(?!\w)",
+    re.I,
+)
 # Der deutsche Telegrammstil einer Empfehlung: der Satz endet auf dem blossen
 # Infinitiv ("Eigene Vodafone-Familie – das Mini-App-Modell nach Europa
 # übertragen."). Kein Teilsatz traegt hier Vodafone UND Verb, die Empfehlung
@@ -171,10 +196,21 @@ _NOTIZ_TRENNER = re.compile(r"\s*[;–—]\s+|\s+-\s+")
 # Geschuetzt wird BEWUSST nur vor einem Monatsnamen und nicht vor jedem
 # Grossbuchstaben: "Die Zahl stieg auf 12. Vodafone reagierte." ist ein
 # echtes Satzende, und eine Regel, die es verschluckt, waere die teurere.
-_MONATE = ("Januar", "Februar", "März", "April", "Mai", "Juni", "Juli",
-           "August", "September", "Oktober", "November", "Dezember")
-_ORDINALDATUM = re.compile(
-    r"(?<=\d)\.(?=\s+(?:" + "|".join(_MONATE) + r")\b)")
+_MONATE = (
+    "Januar",
+    "Februar",
+    "März",
+    "April",
+    "Mai",
+    "Juni",
+    "Juli",
+    "August",
+    "September",
+    "Oktober",
+    "November",
+    "Dezember",
+)
+_ORDINALDATUM = re.compile(r"(?<=\d)\.(?=\s+(?:" + "|".join(_MONATE) + r")\b)")
 _ORDINAL_MARKE = "\x00o\x00"
 
 
@@ -208,8 +244,7 @@ def ist_vodafone_rat(teil: str) -> bool:
     return bool(_RAT_VERBEN.search(teil) or _RAT_MARKER.search(teil))
 
 
-def _wieder_zusammen(teile: list[str], trenner: list[str],
-                     behalten: list[int]) -> str:
+def _wieder_zusammen(teile: list[str], trenner: list[str], behalten: list[int]) -> str:
     """Die behaltenen Teilsaetze wieder zu einem Satz.
 
     Standen sie im Original nebeneinander, bleibt ihr Trennzeichen stehen.
@@ -229,14 +264,14 @@ def _wieder_zusammen(teile: list[str], trenner: list[str],
             # Deutschen eine vollstaendige Aussage an. Ohne diese Bedingung
             # blieb von "..., ob ein Produkt - etwa ueber die Vodacom-Gruppe -
             # schnell umsetzbar ist" die Mitte uebrig.
-            if i and not (stueck[:1].isupper() or stueck[:1].isdigit()
-                          or trenner[i - 1] == ":"):
+            if i and not (
+                stueck[:1].isupper() or stueck[:1].isdigit() or trenner[i - 1] == ":"
+            ):
                 continue
             text = stueck[:1].upper() + stueck[1:] if i else stueck
         elif vorher == i - 1:
             zeichen = trenner[i - 1]
-            text += (f"{zeichen} {stueck}" if zeichen in ";:"
-                     else f" {zeichen} {stueck}")
+            text += f"{zeichen} {stueck}" if zeichen in ";:" else f" {zeichen} {stueck}"
         else:
             if not text.endswith((".", "!", "?")):
                 text = text.rstrip(" ,;:–—") + "."
@@ -273,7 +308,7 @@ def ohne_vodafone_rat(text: str) -> str:
         # Adressat und Verb auf zwei Teilsaetze verteilt.
         if _ADRESSAT.search(rest) and _RAT_SCHLUSS.search(rest):
             continue
-        if not rest.endswith((".", "!", "?", ")", "\"", "“")):
+        if not rest.endswith((".", "!", "?", ")", '"', "“")):
             rest += "."
         behalten_saetze.append(rest)
     return " ".join(behalten_saetze).strip()

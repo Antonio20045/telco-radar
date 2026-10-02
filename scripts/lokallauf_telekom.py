@@ -93,6 +93,7 @@ AUFRUF
 es sind kurze, direkte Abrufe). 180 Sekunden reichen: die Kategorieseite ist
 EIN Abruf (`direkt=True`), kein Linknetz.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -139,7 +140,8 @@ def _hole_mit_beleg(beleg: list):
             resp = getattr(exc, "response", None)
             eintrag["status"] = getattr(resp, "status_code", None)
             eintrag["user_agent"] = (
-                resp.request.headers.get("User-Agent") if resp is not None else None)
+                resp.request.headers.get("User-Agent") if resp is not None else None
+            )
             eintrag["fehler"] = type(exc).__name__
             beleg.append(eintrag)
             raise
@@ -155,6 +157,7 @@ def _nur_telekom_tarife(original_lade_quellen):
     def _gefiltert(root):
         quellen = original_lade_quellen(root)
         return [q for q in quellen if q.anbieter == "Telekom"]
+
     return _gefiltert
 
 
@@ -163,44 +166,68 @@ def _nur_telekom_geraete(original_lade_quellen):
         quellen = original_lade_quellen(root)
         quellen.anbieter = [a for a in quellen.anbieter if a.name == "Telekom"]
         return quellen
+
     return _gefiltert
 
 
-def _schreibe_beleg(root: Path, name: str, datum: str, beleg: list,
-                    log) -> Path:
+def _schreibe_beleg(root: Path, name: str, datum: str, beleg: list, log) -> Path:
     """Einen Laufzeitbeleg versioniert wegschreiben und ehrlich pruefen.
 
     Dieselbe Logik fuer T1 und T2 (seit B2): schreiben, zaehlen, und jeden
     Request melden, der NICHT mit `TelcoRadar/1.0` gesendet wurde - als
     ERROR, nicht als Erfolg. Gibt den Belegpfad zurueck.
     """
-    unehrlich = [e for e in beleg
-                 if not _ist_ehrliche_kennung(e.get("user_agent"))]
+    unehrlich = [e for e in beleg if not _ist_ehrliche_kennung(e.get("user_agent"))]
     beleg_datei = root / "outputs" / f"{name}-{datum}.json"
     beleg_datei.parent.mkdir(parents=True, exist_ok=True)
-    beleg_datei.write_text(json.dumps({
-        "datum": datum,
-        "anzahl_requests": len(beleg),
-        "alle_ehrlich": not unehrlich,
-        "requests": beleg,
-    }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    log.info("Laufzeitbeleg geschrieben: %s (%d Requests, alle_ehrlich=%s)",
-             beleg_datei, len(beleg), not unehrlich)
+    beleg_datei.write_text(
+        json.dumps(
+            {
+                "datum": datum,
+                "anzahl_requests": len(beleg),
+                "alle_ehrlich": not unehrlich,
+                "requests": beleg,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    log.info(
+        "Laufzeitbeleg geschrieben: %s (%d Requests, alle_ehrlich=%s)",
+        beleg_datei,
+        len(beleg),
+        not unehrlich,
+    )
     if unehrlich:
-        log.error("BEFUND: %d von %d Telekom-Requests wurden NICHT mit "
-                  "TelcoRadar/1.0 gesendet (Browser-Imitation oder UA-"
-                  "Wechsel). Details in %s. Das ist ein Abnahme-Befund, "
-                  "kein Erfolg.", len(unehrlich), len(beleg), beleg_datei)
+        log.error(
+            "BEFUND: %d von %d Telekom-Requests wurden NICHT mit "
+            "TelcoRadar/1.0 gesendet (Browser-Imitation oder UA-"
+            "Wechsel). Details in %s. Das ist ein Abnahme-Befund, "
+            "kein Erfolg.",
+            len(unehrlich),
+            len(beleg),
+            beleg_datei,
+        )
     else:
-        log.info("Alle %d Telekom-Requests bestaetigt mit ehrlichem "
-                 "TelcoRadar/1.0-Absender, reines HTTP-GET (kein Browser).",
-                 len(beleg))
+        log.info(
+            "Alle %d Telekom-Requests bestaetigt mit ehrlichem "
+            "TelcoRadar/1.0-Absender, reines HTTP-GET (kein Browser).",
+            len(beleg),
+        )
     return beleg_datei
 
 
-def _schreibe_manifest(root: Path, datum: str, run_id: str,
-                       beginn: datetime, log, exit_status: int,
-                       beleg_namen: tuple) -> Path:
+def _schreibe_manifest(
+    root: Path,
+    datum: str,
+    run_id: str,
+    beginn: datetime,
+    log,
+    exit_status: int,
+    beleg_namen: tuple,
+) -> Path:
     """Den Lauf-Manifest schreiben - der unveranderliche Nachweis, dass
     dieser Lauf GENAU EINMAL gelaufen ist (Befund Runde 2, 15.09.2026:
     ohne ihn waere die Tagesdatei bei einer Wiederholung desselben Tags
@@ -212,6 +239,7 @@ def _schreibe_manifest(root: Path, datum: str, run_id: str,
     ein gescheiterter Lauf hat genauso einen Nachweis wie ein gelungener.
     """
     import hashlib
+
     manifest = {
         "run_id": run_id,
         "start_utc": beginn.isoformat(),
@@ -229,23 +257,29 @@ def _schreibe_manifest(root: Path, datum: str, run_id: str,
             }
     manifest_datei = root / "outputs" / f"beleg-telekom-lokallauf-{datum}-run.json"
     manifest_datei.parent.mkdir(parents=True, exist_ok=True)
-    manifest_datei.write_text(json.dumps(manifest, ensure_ascii=False,
-                                         indent=2) + "\n", encoding="utf-8")
-    log.info("Lauf-Manifest geschrieben: %s (exit_status=%d)", manifest_datei,
-             exit_status)
+    manifest_datei.write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    log.info(
+        "Lauf-Manifest geschrieben: %s (exit_status=%d)", manifest_datei, exit_status
+    )
     return manifest_datei
 
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--root", default=".")
-    p.add_argument("--frist", type=float, default=180.0,
-                   help="Zeitbudget der Geraetestufe in Sekunden")
+    p.add_argument(
+        "--frist",
+        type=float,
+        default=180.0,
+        help="Zeitbudget der Geraetestufe in Sekunden",
+    )
     args = p.parse_args()
 
     logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+        level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
+    )
     log = logging.getLogger("lokallauf_telekom")
 
     root = Path(args.root)
@@ -258,6 +292,7 @@ def main() -> None:
     heute = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     beleg: list[dict] = []
     import uuid
+
     run_id = str(uuid.uuid4())
     beginn = datetime.now(timezone.utc)
     exit_status = 0
@@ -265,10 +300,10 @@ def main() -> None:
     try:
         # --- T1: Tarife, mit Laufzeitbeleg --------------------------------
         log.info("=== T1: Telekom-Tarife (Pflichtdokumente + Shop-Kacheln) ===")
-        tarif_crawler.lade_quellen = _nur_telekom_tarife(
-            tarif_crawler.lade_quellen)
+        tarif_crawler.lade_quellen = _nur_telekom_tarife(tarif_crawler.lade_quellen)
         items, bilanz_tarife = tarif_crawler.sammle(
-            root, http_cfg, hole=_hole_mit_beleg(beleg))
+            root, http_cfg, hole=_hole_mit_beleg(beleg)
+        )
         log.info("T1-Bilanz: %s", bilanz_tarife)
         log.info("Meldungen: %d", len(items))
 
@@ -284,6 +319,7 @@ def main() -> None:
         log.info("=== T2: Telekom-Geraetekategorie ===")
         beleg_t2: list[dict] = []
         from telco_radar.collect import http as _http_mod
+
         # Der Haken wird VOR dem Patchen gebaut: seine Closure haelt dann den
         # ECHTEN fetch fest, und das Patchen des Modul-Attributs kann ihn nicht
         # auf sich selbst zeigen lassen.
@@ -292,7 +328,8 @@ def main() -> None:
         _http_mod.fetch = _patch_fetch
         try:
             geraete_pipeline.lade_quellen = _nur_telekom_geraete(
-                geraete_config.lade_quellen)
+                geraete_config.lade_quellen
+            )
             # referenz_anbieter={"Telekom"}: der Lauf schreibt NUR Telekom in
             # die SIM-only-Referenzen und ruft die 1&1-SIM-only-Messung nicht
             # auf (Befund Runde 2, 15.09.2026: ohne den Scope datierte der
@@ -300,17 +337,28 @@ def main() -> None:
             # Anbietername aus dem Tarifbestand (tarife.jsonl), nicht der
             # aus geraete_quellen.yaml - beide sind hier "Telekom".
             bilanz_geraete = geraete_pipeline.run_geraete_stage(
-                root, http_cfg, heute, frist_sekunden=args.frist,
-                referenz_anbieter={"Telekom"})
+                root,
+                http_cfg,
+                heute,
+                frist_sekunden=args.frist,
+                referenz_anbieter={"Telekom"},
+            )
         finally:
             _http_mod.fetch = _echter_fetch
-        log.info("T2-Bilanz: %s", {k: v for k, v in bilanz_geraete.items()
-                                   if k not in ("unbekannte_titel",
-                                                "unbekannte_farben")})
+        log.info(
+            "T2-Bilanz: %s",
+            {
+                k: v
+                for k, v in bilanz_geraete.items()
+                if k not in ("unbekannte_titel", "unbekannte_farben")
+            },
+        )
         _schreibe_beleg(root, "beleg-telekom-geraete", heute, beleg_t2, log)
 
-        log.info("Fertig. Jetzt rendern (report.html.render_site) und "
-                 "committen - dieses Skript tut beides bewusst nicht.")
+        log.info(
+            "Fertig. Jetzt rendern (report.html.render_site) und "
+            "committen - dieses Skript tut beides bewusst nicht."
+        )
     except BaseException:
         exit_status = 1
         raise
@@ -318,9 +366,16 @@ def main() -> None:
         # Der Manifest gehoert zu JEDEM Lauf - auch zum gescheiterten
         # (exit_status=1). Ein Nachtrag von Hand, wie ihn Runde 2 fuer den
         # Lauf vom 15.09.2026 leisten musste, soll nicht wieder noetig sein.
-        _schreibe_manifest(root, heute, run_id, beginn, log, exit_status,
-                           ("beleg-telekom-lokallauf", "beleg-telekom-geraete"))
+        _schreibe_manifest(
+            root,
+            heute,
+            run_id,
+            beginn,
+            log,
+            exit_status,
+            ("beleg-telekom-lokallauf", "beleg-telekom-geraete"),
+        )
 
 
-if __name__ == "__main__":       # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     main()

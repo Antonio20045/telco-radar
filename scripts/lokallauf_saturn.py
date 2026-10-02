@@ -46,6 +46,7 @@ bei 10s Mindestabstand (Crawl-delay-Vorsicht gegenueber einem
 Cloudflare-Host, siehe `config/geraete_quellen.yaml`) sind rund 170s reiner
 Wartezeit plus Abrufzeit - 600s Voreinstellung lassen reichlich Luft.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -59,19 +60,24 @@ def _nur_saturn(original_lade_quellen):
         quellen = original_lade_quellen(root)
         quellen.anbieter = [a for a in quellen.anbieter if a.name == "Saturn"]
         return quellen
+
     return _gefiltert
 
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--root", default=".")
-    p.add_argument("--frist", type=float, default=600.0,
-                   help="Zeitbudget der Geraetestufe in Sekunden")
+    p.add_argument(
+        "--frist",
+        type=float,
+        default=600.0,
+        help="Zeitbudget der Geraetestufe in Sekunden",
+    )
     args = p.parse_args()
 
     logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+        level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
+    )
     log = logging.getLogger("lokallauf_saturn")
 
     root = Path(args.root)
@@ -85,14 +91,22 @@ def main() -> None:
     log.info("=== Saturn: Geraeteradar ueber alle konfigurierten Markenseiten ===")
     geraete_pipeline.lade_quellen = _nur_saturn(geraete_config.lade_quellen)
     bilanz = geraete_pipeline.run_geraete_stage(
-        root, http_cfg, heute, frist_sekunden=args.frist)
-    log.info("Saturn-Bilanz: %s", {k: v for k, v in bilanz.items()
-                                   if k not in ("unbekannte_titel",
-                                                "unbekannte_farben")})
+        root, http_cfg, heute, frist_sekunden=args.frist
+    )
+    log.info(
+        "Saturn-Bilanz: %s",
+        {
+            k: v
+            for k, v in bilanz.items()
+            if k not in ("unbekannte_titel", "unbekannte_farben")
+        },
+    )
 
-    log.info("Fertig. Jetzt rendern (report.html.render_site) und committen -"
-             " dieses Skript tut beides bewusst nicht.")
+    log.info(
+        "Fertig. Jetzt rendern (report.html.render_site) und committen -"
+        " dieses Skript tut beides bewusst nicht."
+    )
 
 
-if __name__ == "__main__":       # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     main()

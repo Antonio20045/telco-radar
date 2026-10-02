@@ -29,6 +29,7 @@ Repo wird nie angefasst.
     python scripts/schiess_screenshot.py --seite geraete.html \\
         --ausschnitt '#tafel-alarme'
 """
+
 from __future__ import annotations
 
 import argparse
@@ -58,9 +59,10 @@ def _chromium() -> str | None:
     wer nur den ersten kennt, bekommt auf der anderen Maschine ein Schweigen,
     das wie ein Erfolg aussieht.
     """
-    for muster in ("/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-                   str(Path.home() / ".cache/ms-playwright"
-                       / "chromium*/chrome-linux*/chrome")):
+    for muster in (
+        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
+        str(Path.home() / ".cache/ms-playwright" / "chromium*/chrome-linux*/chrome"),
+    ):
         treffer = sorted(glob.glob(muster))
         if treffer:
             return treffer[-1]
@@ -79,8 +81,9 @@ def _server(site: Path):
     s.bind(("127.0.0.1", 0))
     port = s.getsockname()[1]
     s.close()
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler,
-                                directory=str(site))
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(site)
+    )
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     try:
@@ -98,6 +101,7 @@ def _rendern(ziel: Path) -> Path:
     """
     from telco_radar.config import load_config
     from telco_radar.report.html import render_site
+
     render_site(ziel, REPO / "data" / "reports", load_config(REPO))
     return ziel
 
@@ -124,17 +128,22 @@ def _rendern(ziel: Path) -> Path:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--site", type=Path,
-                    help="fertiges site/-Verzeichnis; ohne das wird gerendert")
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    ap.add_argument(
+        "--site", type=Path, help="fertiges site/-Verzeichnis; ohne das wird gerendert"
+    )
     ap.add_argument("--seite", default="geraete.html")
-    ap.add_argument("--ausschnitt", default="",
-                    help="CSS-Auswahl, die zusaetzlich einzeln fotografiert wird")
-    ap.add_argument("--ziel", type=Path,
-                    default=Path("/tmp/telco-screenshots"))
-    ap.add_argument("--marke", default="",
-                    help="Namenszusatz, um zwei Staende zu vergleichen")
+    ap.add_argument(
+        "--ausschnitt",
+        default="",
+        help="CSS-Auswahl, die zusaetzlich einzeln fotografiert wird",
+    )
+    ap.add_argument("--ziel", type=Path, default=Path("/tmp/telco-screenshots"))
+    ap.add_argument(
+        "--marke", default="", help="Namenszusatz, um zwei Staende zu vergleichen"
+    )
     args = ap.parse_args()
 
     try:
@@ -147,6 +156,7 @@ def main() -> int:
     tmp = None
     if site is None:
         import tempfile
+
         tmp = tempfile.TemporaryDirectory()
         site = _rendern(Path(tmp.name) / "site")
     if not (site / args.seite).exists():
@@ -163,11 +173,11 @@ def main() -> int:
     with _server(site) as wurzel, sync_playwright() as p:
         browser = p.chromium.launch(
             **({"executable_path": pfad} if pfad else {}),
-            args=["--no-sandbox", "--disable-dev-shm-usage"])
+            args=["--no-sandbox", "--disable-dev-shm-usage"],
+        )
         try:
             for name, breite, hoehe in FORMATE:
-                seite = browser.new_page(
-                    viewport={"width": breite, "height": hoehe})
+                seite = browser.new_page(viewport={"width": breite, "height": hoehe})
                 seite.goto(f"{wurzel}/{args.seite}", wait_until="networkidle")
                 # Ohne das Durchscrollen bleiben lazy geladene Bilder leer -
                 # dieselbe Vorsichtsmassnahme wie in pruefe_portal.py.

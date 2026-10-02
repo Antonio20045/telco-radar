@@ -2,13 +2,27 @@
 
 Offline: kein Netz/LLM noetig.
 """
+
 from telco_radar.analyze.promo_store import PromoDB, SnapshotStore, entry_id
 
 
-def _item(brand="congstar", headline="10 GB Bonus", description="", valid_until=None,
-          url="https://example.test/aktion", image_url=None):
-    return {"brand": brand, "headline": headline, "description": description,
-            "valid_until": valid_until, "url": url, "tier": 2, "image_url": image_url}
+def _item(
+    brand="congstar",
+    headline="10 GB Bonus",
+    description="",
+    valid_until=None,
+    url="https://example.test/aktion",
+    image_url=None,
+):
+    return {
+        "brand": brand,
+        "headline": headline,
+        "description": description,
+        "valid_until": valid_until,
+        "url": url,
+        "tier": 2,
+        "image_url": image_url,
+    }
 
 
 def test_snapshot_store_change_detection(tmp_path):
@@ -48,17 +62,22 @@ def test_upsert_recognises_reworded_headline_as_same_offer(tmp_path):
     'neu' UND der alte Eintrag als 'moeglicherweise ausgelaufen' ein, obwohl
     sie ununterbrochen lief. Beispiel 1:1 aus den echten Produktivdaten."""
     db = PromoDB(tmp_path / "db.json")
-    db.upsert([_item(headline="iPhone 17 Pro mit unbegrenztem Datenvolumen")], "2026-07-27")
+    db.upsert(
+        [_item(headline="iPhone 17 Pro mit unbegrenztem Datenvolumen")], "2026-07-27"
+    )
     n, ids, _ = db.upsert(
         [_item(headline="iPhone 17 Pro mit Unlimited-Datenvolumen und 300 € Rabatt")],
-        "2026-07-28")
+        "2026-07-28",
+    )
     assert n == 0  # kein zweiter Eintrag
     assert len(db) == 1
     entry = list(db.entries.values())[0]
-    assert entry["first_seen"] == "2026-07-27"        # Historie bleibt erhalten
+    assert entry["first_seen"] == "2026-07-27"  # Historie bleibt erhalten
     assert entry["last_verified"] == "2026-07-28"
     assert entry["status"] == "aktiv"
-    assert entry["headline"] == "iPhone 17 Pro mit Unlimited-Datenvolumen und 300 € Rabatt"
+    assert (
+        entry["headline"] == "iPhone 17 Pro mit Unlimited-Datenvolumen und 300 € Rabatt"
+    )
     assert ids == {entry["id"]}
 
 
@@ -80,7 +99,9 @@ def test_mark_stale_flags_but_does_not_delete(tmp_path):
     """Ein einzelner Fehltreffer markiert nur (Kulanzfrist) - loescht nie und
     stoesst die andere, weiterhin bestaetigte Aktion nicht an."""
     db = PromoDB(tmp_path / "db.json")
-    db.upsert([_item(headline="Alte Aktion"), _item(headline="Neue Aktion")], "2026-07-25")
+    db.upsert(
+        [_item(headline="Alte Aktion"), _item(headline="Neue Aktion")], "2026-07-25"
+    )
     still_running = {entry_id("congstar", "Neue Aktion")}
     db.mark_stale("congstar", still_running, "2026-08-01")
     by_headline = {e["headline"]: e for e in db.entries.values()}
@@ -97,7 +118,9 @@ def test_mark_stale_needs_two_consecutive_misses_before_retiring(tmp_path):
     db = PromoDB(tmp_path / "db.json")
     db.upsert([_item(headline="Alte Aktion")], "2026-07-25")
     db.mark_stale("congstar", set(), "2026-08-01")
-    assert db.entries[entry_id("congstar", "Alte Aktion")]["status"] == "evtl. ausgelaufen"
+    assert (
+        db.entries[entry_id("congstar", "Alte Aktion")]["status"] == "evtl. ausgelaufen"
+    )
     db.mark_stale("congstar", set(), "2026-08-08")
     entry = db.entries[entry_id("congstar", "Alte Aktion")]
     assert entry["status"] == "ausgelaufen"
@@ -123,8 +146,10 @@ def test_reconfirmation_resets_missed_checks(tmp_path):
 
 def test_by_brand_groups(tmp_path):
     db = PromoDB(tmp_path / "db.json")
-    db.upsert([_item(brand="congstar"), _item(brand="o2", headline="anderes Angebot")],
-              "2026-07-25")
+    db.upsert(
+        [_item(brand="congstar"), _item(brand="o2", headline="anderes Angebot")],
+        "2026-07-25",
+    )
     bb = db.by_brand()
     assert len(bb["congstar"]) == 1 and len(bb["o2"]) == 1
 

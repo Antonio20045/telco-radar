@@ -38,6 +38,7 @@ VIER REGELN, DIE HIER ERZWUNGEN WERDEN
    gelesenen. Dieselbe Unterscheidung wie `PromoExtractionError` im
    Promo-Zweig, aus demselben Grund.
 """
+
 from __future__ import annotations
 
 import logging
@@ -139,6 +140,7 @@ class Adapter:
     in `Anbieterbilanz.proben` und wird protokolliert - er loest nichts
     aus, er meldet.
     """
+
     name: str
     lies: Callable
     ernte: Optional[Callable] = None
@@ -176,7 +178,6 @@ def umgesetzte_methoden() -> tuple:
     return tuple(sorted(ADAPTER))
 
 
-
 class GeraeteAbrufFehler(RuntimeError):
     """Der Abruf ist gescheitert - das ist NICHT dasselbe wie "keine Geraete
     auf der Seite". Eigene Klasse, damit der Aufrufer die Seite als ungelesen
@@ -200,8 +201,9 @@ class GeraeteAbrufFehler(RuntimeError):
 @dataclass
 class Anbieterbilanz:
     """Was ein Anbieter in diesem Lauf ergeben hat - und warum nicht mehr."""
+
     name: str
-    status: str = "ok"        # ok | leer | fehler | uebersprungen | frist | nicht_umgesetzt
+    status: str = "ok"  # ok | leer | fehler | uebersprungen | frist | nicht_umgesetzt
     grund: str = ""
     listungen: list = field(default_factory=list)
     # Rohsaetze aus Buendel-Einstiegen. Sie sind KEINE Listungen und werden
@@ -351,8 +353,10 @@ def _einstieg_gelesen(versucht: int, tot: int) -> bool:
 # Linkernte
 # --------------------------------------------------------------------------
 
-def ernte_links(inhalt: str, basis_url: str, pfadmuster="",
-                kind: str = "static") -> list[str]:
+
+def ernte_links(
+    inhalt: str, basis_url: str, pfadmuster="", kind: str = "static"
+) -> list[str]:
     """Produktadressen aus einer Einstiegsseite.
 
     `static` liest echte `<a href>`, `sitemap` die `<loc>`-Eintraege. Beides
@@ -366,8 +370,11 @@ def ernte_links(inhalt: str, basis_url: str, pfadmuster="",
     Crawl-delay einen zweistelligen Sekundenbetrag des Zeitbudgets, ohne je
     den Katalog treffen zu koennen.
     """
-    muster = ([pfadmuster] if isinstance(pfadmuster, str) else
-              [str(m) for m in (pfadmuster or [])])
+    muster = (
+        [pfadmuster]
+        if isinstance(pfadmuster, str)
+        else [str(m) for m in (pfadmuster or [])]
+    )
     muster = [m for m in muster if m]
     roh: list[str] = []
     if kind == "sitemap":
@@ -389,12 +396,12 @@ def ernte_links(inhalt: str, basis_url: str, pfadmuster="",
         if teile.scheme not in ("http", "https"):
             continue
         if basis_host and teile.netloc.lower() != basis_host:
-            continue          # Fremde Domain: nicht unser Beobachtungsraum
+            continue  # Fremde Domain: nicht unser Beobachtungsraum
         if muster and not all(m in url for m in muster):
             continue
         url = url.split("#", 1)[0]
         if url.rstrip("/") == (basis_url or "").rstrip("/"):
-            continue          # die Einstiegsseite selbst
+            continue  # die Einstiegsseite selbst
         if url in gesehen:
             continue
         gesehen.add(url)
@@ -407,31 +414,40 @@ def produkte_aus_shopify(nutzlast: str) -> list[dict]:
     dokumentierter, oeffentlicher Endpunkt, kein aufgemachter Innenweg.
     Je Variante ein Satz mit Titel, Preis und Verfuegbarkeit."""
     import json
+
     try:
         daten = json.loads(nutzlast or "")
     except (json.JSONDecodeError, ValueError) as exc:
         raise GeraeteAbrufFehler(f"products.json unlesbar: {exc}") from exc
     from .strukturdaten import lies_preis
+
     out = []
-    for produkt in (daten.get("products") or []):
+    for produkt in daten.get("products") or []:
         titel = str(produkt.get("title") or "").strip()
         handle = str(produkt.get("handle") or "").strip()
-        for variante in (produkt.get("variants") or []):
+        for variante in produkt.get("variants") or []:
             preis = lies_preis(variante.get("price"))
             bezeichnung = str(variante.get("title") or "").strip()
-            voller_titel = titel if bezeichnung in ("", "Default Title") \
+            voller_titel = (
+                titel
+                if bezeichnung in ("", "Default Title")
                 else f"{titel} {bezeichnung}"
-            out.append({
-                "titel": voller_titel,
-                "preis": preis,
-                "waehrung": "EUR",
-                "verfuegbarkeit": "lieferbar" if variante.get("available") else "ausverkauft",
-                "sku": str(variante.get("sku") or "").strip(),
-                "ean": str(variante.get("barcode") or "").strip(),
-                "farbe": "",
-                "url": f"/products/{handle}" if handle else "",
-                "quelle": "shopify",
-            })
+            )
+            out.append(
+                {
+                    "titel": voller_titel,
+                    "preis": preis,
+                    "waehrung": "EUR",
+                    "verfuegbarkeit": "lieferbar"
+                    if variante.get("available")
+                    else "ausverkauft",
+                    "sku": str(variante.get("sku") or "").strip(),
+                    "ean": str(variante.get("barcode") or "").strip(),
+                    "farbe": "",
+                    "url": f"/products/{handle}" if handle else "",
+                    "quelle": "shopify",
+                }
+            )
     return out
 
 
@@ -442,11 +458,17 @@ def produkte_aus_shopify(nutzlast: str) -> list[dict]:
 # ALDI TALK daran, das gar kein ld+json ausliefert. Der Methodenname ist
 # deshalb bewusst nicht "der Extraktor", sondern "die uebliche Lesart einer
 # gewoehnlichen Produktseite".
-registriere("ldjson", Adapter(name="ldjson",
-                              lies=lambda text, url="": produkte_aus_html(text)))
-registriere("shopify", Adapter(name="shopify",
-                               lies=lambda text, url="": produkte_aus_shopify(text),
-                               direkt=True))
+registriere(
+    "ldjson", Adapter(name="ldjson", lies=lambda text, url="": produkte_aus_html(text))
+)
+registriere(
+    "shopify",
+    Adapter(
+        name="shopify",
+        lies=lambda text, url="": produkte_aus_shopify(text),
+        direkt=True,
+    ),
+)
 
 
 def _registriere_anbieter_adapter() -> None:
@@ -462,29 +484,39 @@ def _registriere_anbieter_adapter() -> None:
     from . import telekom as telekom_modul
     from . import vodafone as vodafone_modul
 
-    registriere("vodafone_api", Adapter(name="vodafone_api",
-                                        lies=vodafone_modul.lies,
-                                        ernte=vodafone_modul.ernte,
-                                        # B1 (05.09.2026): dieselbe
-                                        # Detailantwort traegt unter
-                                        # `atomics[].prices.composition`
-                                        # auch die Buendelpreise - siehe
-                                        # Adapter-Docstring oben.
-                                        lies_buendel=vodafone_modul.lies_buendel,
-                                        loese_tarifnamen=vodafone_modul.loese_tarifnamen))
+    registriere(
+        "vodafone_api",
+        Adapter(
+            name="vodafone_api",
+            lies=vodafone_modul.lies,
+            ernte=vodafone_modul.ernte,
+            # B1 (05.09.2026): dieselbe
+            # Detailantwort traegt unter
+            # `atomics[].prices.composition`
+            # auch die Buendelpreise - siehe
+            # Adapter-Docstring oben.
+            lies_buendel=vodafone_modul.lies_buendel,
+            loese_tarifnamen=vodafone_modul.loese_tarifnamen,
+        ),
+    )
     # Zwei Lesarten derselben Adresse: `lies` fuer den Katalog ohne Tarif
     # (`?hwOnly=true`), `lies_buendel` fuer den mit. o2 gibt beide Adressen
     # in der Nutzlast von /e-shop/ selbst aus.
-    registriere("o2_katalog", Adapter(name="o2_katalog",
-                                      lies=o2_modul.lies,
-                                      lies_buendel=o2_modul.lies_buendel,
-                                      # 29.09.2026: jede Tarifstufe x
-                                      # Speicher x Laufzeit ueber die
-                                      # Schalter der Produktseite (o2.py,
-                                      # "DIE VERTIEFUNG").
-                                      vertiefe_buendel=o2_modul.vertiefe_buendel,
-                                      fuehre_zusammen=o2_modul.fuehre_zusammen,
-                                      direkt=True))
+    registriere(
+        "o2_katalog",
+        Adapter(
+            name="o2_katalog",
+            lies=o2_modul.lies,
+            lies_buendel=o2_modul.lies_buendel,
+            # 29.09.2026: jede Tarifstufe x
+            # Speicher x Laufzeit ueber die
+            # Schalter der Produktseite (o2.py,
+            # "DIE VERTIEFUNG").
+            vertiefe_buendel=o2_modul.vertiefe_buendel,
+            fuehre_zusammen=o2_modul.fuehre_zusammen,
+            direkt=True,
+        ),
+    )
     # Kein `ernte` noetig: die Sitemap traegt echte `<loc>`-Adressen, die
     # generische `ernte_links(kind="sitemap")` findet sie ohne Zutun. Nicht
     # `direkt`: die Einstiegsseite (Sitemap) ist nur ein Verzeichnis, die
@@ -503,9 +535,14 @@ def _registriere_anbieter_adapter() -> None:
     # Tarifseiten dagegen nur vier Aufmachergeraete - daran lag, dass
     # congstar nur zehn SKUs als Buendel lieferte. Die zweite Lesart laeuft
     # deshalb auf jeder Produktseite (Voreinstellung, wie bei Vodafone).
-    registriere("congstar_next", Adapter(name="congstar_next",
-                                         lies=congstar_modul.lies,
-                                         lies_buendel=congstar_modul.lies_buendel))
+    registriere(
+        "congstar_next",
+        Adapter(
+            name="congstar_next",
+            lies=congstar_modul.lies,
+            lies_buendel=congstar_modul.lies_buendel,
+        ),
+    )
     # Die Kategorieseite IST die Nutzlast (`direkt`): sie traegt die
     # absoluten Betraege serverseitig, und die zehn Produktadressen stehen
     # als echte `<a href>` darin - der Adapter liest sie aus demselben
@@ -516,10 +553,15 @@ def _registriere_anbieter_adapter() -> None:
     # Der Tarifname steht in derselben Antwort (`productList.selectedPlan`),
     # deshalb braucht Telekom anders als Vodafone keinen
     # `loese_tarifnamen`-Haken.
-    registriere("telekom_kategorie", Adapter(name="telekom_kategorie",
-                                             lies=telekom_modul.lies,
-                                             lies_buendel=telekom_modul.lies_buendel,
-                                             direkt=True))
+    registriere(
+        "telekom_kategorie",
+        Adapter(
+            name="telekom_kategorie",
+            lies=telekom_modul.lies,
+            lies_buendel=telekom_modul.lies_buendel,
+            direkt=True,
+        ),
+    )
     # NICHT `direkt`: die Kategorieseite `/smartphones` traegt kein
     # Produktschema, nur die verlinkten Produktseiten. Die Linkernte ist
     # ANBIETEREIGEN, weil die Seite neben ihren 42 Katalogkacheln 125
@@ -544,19 +586,24 @@ def _registriere_anbieter_adapter() -> None:
     # Tarifuebersichten und ihre Geraeteraster je Tarif und leitet daraus
     # die Saetze der uebrigen Tarife her (`einsundeins.ergaenze_
     # tarifstufen`, Rechnung und Gegenprobe im Modul).
-    registriere("einsundeins_buendel",
-                Adapter(name="einsundeins_buendel",
-                        lies=einsundeins_modul.lies,
-                        ernte=einsundeins_modul.ernte,
-                        lies_buendel=einsundeins_modul.lies_buendel,
-                        ergaenze_buendel=einsundeins_modul.ergaenze_buendel))
+    registriere(
+        "einsundeins_buendel",
+        Adapter(
+            name="einsundeins_buendel",
+            lies=einsundeins_modul.lies,
+            ernte=einsundeins_modul.ernte,
+            lies_buendel=einsundeins_modul.lies_buendel,
+            ergaenze_buendel=einsundeins_modul.ergaenze_buendel,
+        ),
+    )
     # Die Markenseite IST die Nutzlast (direkt): ld+json UND Apollo-Cache
     # stehen bereits in dieser einen Antwort, keine Produktseite wird
     # nachgeladen. Kein `ernte` noetig - die Beleglinks je Variante liest
     # der Adapter selbst aus dem Apollo-Cache (saturn.py).
-    registriere("saturn_brand", Adapter(name="saturn_brand",
-                                        lies=saturn_modul.lies,
-                                        direkt=True))
+    registriere(
+        "saturn_brand",
+        Adapter(name="saturn_brand", lies=saturn_modul.lies, direkt=True),
+    )
 
 
 _registriere_anbieter_adapter()
@@ -565,6 +612,7 @@ _registriere_anbieter_adapter()
 # --------------------------------------------------------------------------
 # Ein Anbieter
 # --------------------------------------------------------------------------
+
 
 def _preisfelder(anbieter, satz: dict) -> dict:
     """Welche der zwei Preisarten traegt diese Zahl? (Teil C4)
@@ -602,9 +650,12 @@ def _preisfelder(anbieter, satz: dict) -> dict:
     tarif = (satz.get("tarif") or "").strip()
 
     if zuzahlung is not None and tarif:
-        return {"preis_ohne_vertrag": None, "zuzahlung": float(zuzahlung),
-                "tarif_referenz": tarif,
-                "preis_mit_vertrag_ab": monatspreis}
+        return {
+            "preis_ohne_vertrag": None,
+            "zuzahlung": float(zuzahlung),
+            "tarif_referenz": tarif,
+            "preis_mit_vertrag_ab": monatspreis,
+        }
     if monatspreis is not None and tarif:
         # DER BUENDELPREIS OHNE ZUZAHLUNG (seit dem 04.09.2026, 1&1).
         # Bis dahin brauchte ein Buendel eine Zuzahlung, um ueberhaupt
@@ -623,17 +674,21 @@ def _preisfelder(anbieter, satz: dict) -> dict:
         #
         # Die Laufzeit wandert mit: eine Monatszahl ohne die Zahl der
         # Monate ist keine Aussage ueber die Bindung.
-        return {"preis_ohne_vertrag": None,
-                "preis_mit_vertrag_ab": float(monatspreis),
-                "tarif_referenz": tarif,
-                "laufzeit_monate": satz.get("laufzeit_monate")}
+        return {
+            "preis_ohne_vertrag": None,
+            "preis_mit_vertrag_ab": float(monatspreis),
+            "tarif_referenz": tarif,
+            "laufzeit_monate": satz.get("laufzeit_monate"),
+        }
     if preis is None or ist_lockpreis(preis):
         return {"preis_ohne_vertrag": None}
-    return {"preis_ohne_vertrag": preis,
-            "anzahlung": satz.get("anzahlung"),
-            "monatsrate": satz.get("monatsrate"),
-            "laufzeit_monate": satz.get("laufzeit_monate"),
-            "zins_effektiv": satz.get("zins_effektiv")}
+    return {
+        "preis_ohne_vertrag": preis,
+        "anzahlung": satz.get("anzahlung"),
+        "monatsrate": satz.get("monatsrate"),
+        "laufzeit_monate": satz.get("laufzeit_monate"),
+        "zins_effektiv": satz.get("zins_effektiv"),
+    }
 
 
 # --------------------------------------------------------------------------
@@ -688,8 +743,9 @@ _FENSTER_PUFFER_SEKUNDEN = 10.0
 _FRIST_GRUND_BUDGET = "Zeitbudget des Geraetezweigs erschoepft"
 
 
-def _fensterfrist(waechter: RobotsWaechter, url: str,
-                  jetzt: datetime) -> Optional[float]:
+def _fensterfrist(
+    waechter: RobotsWaechter, url: str, jetzt: datetime
+) -> Optional[float]:
     """Der monotone Zeitpunkt, zu dem das Besuchsfenster dieses Hosts zugeht.
 
     `None` heisst "dieser Host hat kein Fenster" - dann deckelt nichts. Ein
@@ -727,8 +783,12 @@ class Abrufschleuse:
     desselben Hosts ohnehin in denselben Cache.
     """
 
-    def __init__(self, waechter: RobotsWaechter, uhr: Callable[[], datetime],
-                 rate_limit_sekunden: float = 0.0):
+    def __init__(
+        self,
+        waechter: RobotsWaechter,
+        uhr: Callable[[], datetime],
+        rate_limit_sekunden: float = 0.0,
+    ):
         self._waechter = waechter
         self._uhr = uhr
         self._rate_limit = float(rate_limit_sekunden or 0.0)
@@ -746,8 +806,11 @@ class Abrufschleuse:
         """
         abstand = self._waechter.abstand(url, self._rate_limit)
         noch_kein_abruf = self._letzter_abruf == 0.0
-        warte = (0.0 if noch_kein_abruf else
-                 max(0.0, abstand - (time.monotonic() - self._letzter_abruf)))
+        warte = (
+            0.0
+            if noch_kein_abruf
+            else max(0.0, abstand - (time.monotonic() - self._letzter_abruf))
+        )
         zeitpunkt = self._uhr() + timedelta(seconds=warte)
         darf, grund = self._waechter.darf(url, zeitpunkt)
         if not darf:
@@ -761,9 +824,12 @@ class Abrufschleuse:
         self._letzter_abruf = time.monotonic()
 
 
-def hole_mit_robots(hole: Callable, waechter: RobotsWaechter,
-                    rate_limit_sekunden: float = 0.0,
-                    uhr: Optional[Callable[[], datetime]] = None) -> Callable:
+def hole_mit_robots(
+    hole: Callable,
+    waechter: RobotsWaechter,
+    rate_limit_sekunden: float = 0.0,
+    uhr: Optional[Callable[[], datetime]] = None,
+) -> Callable:
     """`hole` MIT robots-Pruefung - fuer Abrufe AUSSERHALB von `sammle()`.
 
     Die Nachbearbeitungs-Haken der Adapter (`loese_tarifnamen`,
@@ -779,8 +845,9 @@ def hole_mit_robots(hole: Callable, waechter: RobotsWaechter,
     `GeraeteAbrufFehler` - die Haken fangen das je Adresse ab und lassen
     das Feld offen, statt zu raten.
     """
-    schleuse = Abrufschleuse(waechter, uhr or (lambda: datetime.now(timezone.utc)),
-                             rate_limit_sekunden)
+    schleuse = Abrufschleuse(
+        waechter, uhr or (lambda: datetime.now(timezone.utc)), rate_limit_sekunden
+    )
 
     def gebremst(url: str, *args, **kwargs):
         schleuse.passiere(url)
@@ -789,12 +856,17 @@ def hole_mit_robots(hole: Callable, waechter: RobotsWaechter,
     return gebremst
 
 
-def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
-                    heute: str, waechter: RobotsWaechter,
-                    jetzt: Optional[datetime] = None,
-                    frist_bis: Optional[float] = None,
-                    uhr: Optional[Callable[[], datetime]] = None
-                    ) -> Anbieterbilanz:
+def sammle_anbieter(
+    anbieter,
+    katalog: Katalog,
+    farben: dict,
+    hole: Callable,
+    heute: str,
+    waechter: RobotsWaechter,
+    jetzt: Optional[datetime] = None,
+    frist_bis: Optional[float] = None,
+    uhr: Optional[Callable[[], datetime]] = None,
+) -> Anbieterbilanz:
     """Einen Anbieter abarbeiten. Wirft nie - Fehler stehen in der Bilanz.
 
     `hole(url) -> (status, text)`. Der Status wird gebraucht und nicht
@@ -824,7 +896,8 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
         bilanz.status = "nicht_umgesetzt"
         bilanz.grund = anbieter.grund or (
             f"Beschaffungsmethode {anbieter.methode!r} ist gemessen, aber noch "
-            f"nicht als Adapter gebaut")
+            f"nicht als Adapter gebaut"
+        )
         return bilanz
 
     erlaubt: set[str] = set()
@@ -853,8 +926,7 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
     # Kennung - die PM-Entscheidung zu settings.yaml steht weiter aus
     # (CLAUDE.md).
     if user_agent:
-        waechter = RobotsWaechter(
-            hole=lambda url: hole(url, user_agent=user_agent))
+        waechter = RobotsWaechter(hole=lambda url: hole(url, user_agent=user_agent))
 
     leitadresse = anbieter.basis_url or anbieter.einstiege[0].url
 
@@ -864,8 +936,9 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
     # sich durch Adressen zu arbeiten, die der Waechter eine nach der
     # anderen zurueckweist - Zeit, die dem naechsten Anbieter fehlt.
     fensterfrist = _fensterfrist(waechter, leitadresse, uhr())
-    frist_vom_fenster = (fensterfrist is not None
-                         and (frist_bis is None or fensterfrist < frist_bis))
+    frist_vom_fenster = fensterfrist is not None and (
+        frist_bis is None or fensterfrist < frist_bis
+    )
     if frist_vom_fenster:
         frist_bis = fensterfrist
 
@@ -905,7 +978,7 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
         except GeraeteAbrufFehler as exc:
             gruende.append(f"{einstieg.url}: {exc}")
             continue
-        except Exception as exc:                       # noqa: BLE001
+        except Exception as exc:  # noqa: BLE001
             gruende.append(f"{einstieg.url}: {type(exc).__name__}: {str(exc)[:120]}")
             continue
 
@@ -914,27 +987,40 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
         # an der Listungsstrecke vorbei in `bilanz.buendel`.
         if einstieg.kind == "buendel":
             if adapter.lies_buendel is None:
-                gruende.append(f"{einstieg.url}: die Methode "
-                               f"{anbieter.methode!r} kennt keine "
-                               f"Buendellesart")
+                gruende.append(
+                    f"{einstieg.url}: die Methode "
+                    f"{anbieter.methode!r} kennt keine "
+                    f"Buendellesart"
+                )
                 continue
             try:
-                roh = adapter.lies_buendel(inhalt, einstieg.url,
-                                           proben=bilanz.proben) or []
-                gemappt = _mit_sku(roh, anbieter, einstieg, katalog, farben,
-                                   heute, bilanz)
+                roh = (
+                    adapter.lies_buendel(inhalt, einstieg.url, proben=bilanz.proben)
+                    or []
+                )
+                gemappt = _mit_sku(
+                    roh, anbieter, einstieg, katalog, farben, heute, bilanz
+                )
                 if adapter.vertiefe_buendel is not None and gemappt:
-                    gemappt = _vertiefe(adapter, anbieter, einstieg,
-                                        gemappt, _hole, frist_bis, katalog,
-                                        farben, heute, bilanz)
+                    gemappt = _vertiefe(
+                        adapter,
+                        anbieter,
+                        einstieg,
+                        gemappt,
+                        _hole,
+                        frist_bis,
+                        katalog,
+                        farben,
+                        heute,
+                        bilanz,
+                    )
                 bilanz.buendel.extend(gemappt)
             except GeraeteAbrufFehler as exc:
                 # Laut, nicht still: eine Buendelantwort, die keine ist,
                 # heisst "das Nutzlastformat hat sich geaendert" - und ein
                 # leeres Ergebnis waere dafuer die falsche Meldung.
                 gruende.append(f"{einstieg.url}: {exc}")
-                log.warning("%s: Buendelkatalog nicht lesbar (%s)",
-                            anbieter.name, exc)
+                log.warning("%s: Buendelkatalog nicht lesbar (%s)", anbieter.name, exc)
                 continue
             bilanz.gelesene_einstiege.add(einstieg.url)
             continue
@@ -949,8 +1035,9 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
             except GeraeteAbrufFehler as exc:
                 gruende.append(f"{einstieg.url}: {exc}")
                 continue
-            _uebernimm(roh, anbieter, einstieg, einstieg.url, katalog, farben,
-                       heute, bilanz)
+            _uebernimm(
+                roh, anbieter, einstieg, einstieg.url, katalog, farben, heute, bilanz
+            )
             bilanz.gelesene_einstiege.add(einstieg.url)
             continue
 
@@ -958,11 +1045,13 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
         # Produktadressen in derselben JSON-Nutzlast wie die Preise, nicht als
         # `<a href>` - der beste Extraktor faende dort sonst null Seiten.
         if adapter.ernte is not None:
-            links = adapter.ernte(inhalt, einstieg.url, einstieg.pfadmuster,
-                                  einstieg.kind)
+            links = adapter.ernte(
+                inhalt, einstieg.url, einstieg.pfadmuster, einstieg.kind
+            )
         else:
-            links = ernte_links(inhalt, einstieg.url, einstieg.pfadmuster,
-                                einstieg.kind)
+            links = ernte_links(
+                inhalt, einstieg.url, einstieg.pfadmuster, einstieg.kind
+            )
         ohne = getattr(einstieg, "ohne_pfadmuster", ()) or ()
         if ohne:
             # VOR dem Deckel: eine ausgeschlossene Adresse ist keine
@@ -971,9 +1060,12 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
             # vollstaendig gelesen.
             behalten = [a for a in links if not any(m in a for m in ohne)]
             if len(behalten) < len(links):
-                log.info("%s: %d Adressen von %s ausgeschlossen "
-                         "(ohne_pfadmuster)", anbieter.name,
-                         len(links) - len(behalten), einstieg.url)
+                log.info(
+                    "%s: %d Adressen von %s ausgeschlossen (ohne_pfadmuster)",
+                    anbieter.name,
+                    len(links) - len(behalten),
+                    einstieg.url,
+                )
             links = behalten
         erlaubt.update(links)
         vollstaendig = True
@@ -987,11 +1079,17 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
             # und das Protokoll saehe normal aus.
             vollstaendig = False
             bilanz.gedeckelt.append(
-                f"{einstieg.url}: {len(links)} Adressen, {anbieter.max_produkte} abgerufen")
-            log.warning("%s: %s liefert %d Adressen, Deckel steht bei %d - "
-                        "die Seite gilt als unvollstaendig gelesen",
-                        anbieter.name, einstieg.url, len(links), anbieter.max_produkte)
-        for url in links[:anbieter.max_produkte]:
+                f"{einstieg.url}: {len(links)} Adressen, {anbieter.max_produkte} abgerufen"
+            )
+            log.warning(
+                "%s: %s liefert %d Adressen, Deckel steht bei %d - "
+                "die Seite gilt als unvollstaendig gelesen",
+                anbieter.name,
+                einstieg.url,
+                len(links),
+                anbieter.max_produkte,
+            )
+        for url in links[: anbieter.max_produkte]:
             if frist_bis is not None and time.monotonic() > frist_bis:
                 # Sauber abbrechen und das Teilergebnis behalten - aber die
                 # Seite gilt NICHT als gelesen, sonst altert ihr Rest.
@@ -1011,14 +1109,18 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
                     # zusammenkommen.
                     tot_hier += 1
                     bilanz.tote_adressen.append(f"{url}: {exc}")
-                    log.info("%s: %s tot (%s) - Adresse steht in der Quelle, "
-                             "die Seite gibt es nicht mehr",
-                             anbieter.name, url, exc)
+                    log.info(
+                        "%s: %s tot (%s) - Adresse steht in der Quelle, "
+                        "die Seite gibt es nicht mehr",
+                        anbieter.name,
+                        url,
+                        exc,
+                    )
                     continue
                 log.info("%s: %s uebersprungen (%s)", anbieter.name, url, exc)
                 vollstaendig = False
                 continue
-            except Exception as exc:                   # noqa: BLE001
+            except Exception as exc:  # noqa: BLE001
                 log.warning("%s: %s nicht abrufbar (%s)", anbieter.name, url, exc)
                 vollstaendig = False
                 continue
@@ -1031,10 +1133,8 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
                 log.info("%s: %s unlesbar (%s)", anbieter.name, url, exc)
                 vollstaendig = False
                 continue
-            _uebernimm(roh, anbieter, einstieg, url, katalog, farben, heute,
-                       bilanz)
-            if adapter.lies_buendel is not None \
-                    and adapter.buendel_auf_produktseite:
+            _uebernimm(roh, anbieter, einstieg, url, katalog, farben, heute, bilanz)
+            if adapter.lies_buendel is not None and adapter.buendel_auf_produktseite:
                 # ZWEITE LESART DERSELBEN SEITE (B1, Vodafone): dieselbe
                 # Antwort, die `lies()` gerade in Listungen zerlegt hat,
                 # traegt auch die Buendelpreise. Ein eigener `kind:
@@ -1045,20 +1145,28 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
                 # Produktseiten tragen keinen Plan, der Aufruf wuerde auf
                 # jeder von ihnen werfen).
                 try:
-                    roh_buendel = adapter.lies_buendel(seite, url,
-                                                       proben=bilanz.proben) or []
+                    roh_buendel = (
+                        adapter.lies_buendel(seite, url, proben=bilanz.proben) or []
+                    )
                 except GeraeteAbrufFehler as exc:
                     # Seit congstar seine Buendel NUR noch hier liest
                     # (29.09.2026), ist das kein Nebenbefund mehr: ein
                     # geaendertes Nutzlastformat kostete sonst still alle
                     # Buendel. Gezaehlt wird es als benannte Luecke.
-                    log.warning("%s: %s Buendel unlesbar (%s)",
-                                anbieter.name, url, exc)
+                    log.warning("%s: %s Buendel unlesbar (%s)", anbieter.name, url, exc)
                     buendel_unlesbar += 1
                 else:
                     bilanz.buendel.extend(
-                        _mit_sku(roh_buendel, anbieter, einstieg, katalog,
-                                farben, heute, bilanz))
+                        _mit_sku(
+                            roh_buendel,
+                            anbieter,
+                            einstieg,
+                            katalog,
+                            farben,
+                            heute,
+                            bilanz,
+                        )
+                    )
         if vollstaendig and not _einstieg_gelesen(versucht_hier, tot_hier):
             # Zu viele tote Adressen auf einmal. Das ist keine hinterher-
             # hinkende Sitemap mehr, sondern ein Umbau der Quelle - und der
@@ -1068,16 +1176,23 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
             gruende.append(
                 f"{einstieg.url}: {tot_hier} von {versucht_hier} "
                 f"Produktadressen tot, gelesen wurden weniger als "
-                f"{round(_MINDESTANTEIL_GELESENER_PRODUKTSEITEN * 100)} %")
-            log.warning("%s: %s - %d von %d Produktadressen tot, die Seite "
-                        "gilt als unvollstaendig gelesen",
-                        anbieter.name, einstieg.url, tot_hier, versucht_hier)
+                f"{round(_MINDESTANTEIL_GELESENER_PRODUKTSEITEN * 100)} %"
+            )
+            log.warning(
+                "%s: %s - %d von %d Produktadressen tot, die Seite "
+                "gilt als unvollstaendig gelesen",
+                anbieter.name,
+                einstieg.url,
+                tot_hier,
+                versucht_hier,
+            )
         if vollstaendig:
             bilanz.gelesene_einstiege.add(einstieg.url)
 
     if buendel_unlesbar:
         bilanz.gedeckelt.append(
-            f"{buendel_unlesbar} Produktseiten ohne lesbare Buendel")
+            f"{buendel_unlesbar} Produktseiten ohne lesbare Buendel"
+        )
 
     if frist_erreicht:
         bilanz.status = "frist"
@@ -1088,8 +1203,7 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
             # Besuchszeit ist eine Luecke, kein Ausfall.
             bilanz.ausserhalb_besuchszeit = True
             fenster = waechter.regeln(leitadresse).fenster_text
-            bilanz.grund = ("ausserhalb der Besuchszeit laut robots.txt "
-                            f"({fenster})")
+            bilanz.grund = f"ausserhalb der Besuchszeit laut robots.txt ({fenster})"
         else:
             bilanz.grund = _FRIST_GRUND_BUDGET
     elif bilanz.gelesene_einstiege:
@@ -1100,8 +1214,7 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
         # "leer" heisst "nichts gefunden", und neun Buendel sind nicht
         # nichts. (`vollstaendig` gilt fuer "ok" und "leer" gleichermassen -
         # die Auslistungslogik ruehrt ein reiner Buendellieferant nicht an.)
-        bilanz.status = ("ok" if (bilanz.listungen or bilanz.buendel)
-                         else "leer")
+        bilanz.status = "ok" if (bilanz.listungen or bilanz.buendel) else "leer"
         bilanz.grund = "; ".join(gruende)[:300]
     else:
         # Keine einzige Einstiegsseite vollstaendig gelesen. Der Anbieter
@@ -1116,24 +1229,35 @@ def sammle_anbieter(anbieter, katalog: Katalog, farben: dict, hole: Callable,
         bilanz.status = "fehler"
         teile = gruende + bilanz.gedeckelt
         if not teile and (bilanz.produkte_abgerufen or bilanz.listungen):
-            teile = [f"Einstieg gelesen, aber unvollstaendig ausgewertet: "
-                     f"{bilanz.produkte_abgerufen} Produktseiten abgerufen, "
-                     f"{len(bilanz.listungen)} Listungen"]
+            teile = [
+                f"Einstieg gelesen, aber unvollstaendig ausgewertet: "
+                f"{bilanz.produkte_abgerufen} Produktseiten abgerufen, "
+                f"{len(bilanz.listungen)} Listungen"
+            ]
         bilanz.grund = "; ".join(teile)[:300] or "kein Einstieg lesbar"
     bilanz.nicht_verlinkt = sorted(set(bilanz.besucht) - erlaubt)
     return bilanz
 
 
-def _uebernimm(rohsaetze, anbieter, einstieg, quelle_url: str, katalog: Katalog,
-               farben: dict, heute: str, bilanz: Anbieterbilanz) -> None:
+def _uebernimm(
+    rohsaetze,
+    anbieter,
+    einstieg,
+    quelle_url: str,
+    katalog: Katalog,
+    farben: dict,
+    heute: str,
+    bilanz: Anbieterbilanz,
+) -> None:
     bilanz.rohsaetze += len(rohsaetze or [])
     gelesen = []
     quellen: dict = {}
     for satz in rohsaetze:
         if satz.get("waehrung") and satz["waehrung"] not in ("EUR", ""):
-            continue          # ein Preis in fremder Waehrung ist kein Vergleichswert
-        listung = _als_listung_satz(satz, anbieter, einstieg, quelle_url,
-                                    katalog, farben, heute, bilanz)
+            continue  # ein Preis in fremder Waehrung ist kein Vergleichswert
+        listung = _als_listung_satz(
+            satz, anbieter, einstieg, quelle_url, katalog, farben, heute, bilanz
+        )
         if listung is not None:
             gelesen.append(listung)
             quellen[id(listung)] = satz.get("quelle") or ""
@@ -1142,13 +1266,26 @@ def _uebernimm(rohsaetze, anbieter, einstieg, quelle_url: str, katalog: Katalog,
         if listung.farbe_roh and listung.farbe_normalisiert is None:
             bilanz.unbekannte_farben.append(listung.farbe_roh)
             bilanz.unbekannt.append(
-                {"art": "farbe", "wert": listung.farbe_roh,
-                 "quelle": quellen.get(id(listung), "")})
+                {
+                    "art": "farbe",
+                    "wert": listung.farbe_roh,
+                    "quelle": quellen.get(id(listung), ""),
+                }
+            )
 
 
-def _vertiefe(adapter, anbieter, einstieg, gemappt: list, hole_text: Callable,
-              frist_bis: Optional[float], katalog: Katalog, farben: dict,
-              heute: str, bilanz: Anbieterbilanz) -> list:
+def _vertiefe(
+    adapter,
+    anbieter,
+    einstieg,
+    gemappt: list,
+    hole_text: Callable,
+    frist_bis: Optional[float],
+    katalog: Katalog,
+    farben: dict,
+    heute: str,
+    bilanz: Anbieterbilanz,
+) -> list:
     """Die Vertiefung eines Buendel-Einstiegs (siehe `Adapter`).
 
     Wirft nie: was die Vertiefung nicht schafft, fehlt als Zusatz, die
@@ -1162,37 +1299,60 @@ def _vertiefe(adapter, anbieter, einstieg, gemappt: list, hole_text: Callable,
         return frist_bis is None or time.monotonic() <= frist_bis
 
     try:
-        tief = adapter.vertiefe_buendel(hole_text, gemappt, weiter,
-                                        zaehler) or []
-    except Exception as exc:                          # noqa: BLE001
-        log.warning("%s: Buendel-Vertiefung gescheitert (%s: %s)",
-                    anbieter.name, type(exc).__name__, str(exc)[:160])
+        tief = adapter.vertiefe_buendel(hole_text, gemappt, weiter, zaehler) or []
+    except Exception as exc:  # noqa: BLE001
+        log.warning(
+            "%s: Buendel-Vertiefung gescheitert (%s: %s)",
+            anbieter.name,
+            type(exc).__name__,
+            str(exc)[:160],
+        )
         bilanz.gedeckelt.append(
-            f"{einstieg.url}: Buendel-Vertiefung gescheitert "
-            f"({type(exc).__name__})")
+            f"{einstieg.url}: Buendel-Vertiefung gescheitert ({type(exc).__name__})"
+        )
         return gemappt
-    tief_gemappt = _mit_sku(tief, anbieter, einstieg, katalog, farben, heute,
-                            bilanz)
-    zusammen = (adapter.fuehre_zusammen(gemappt, tief_gemappt)
-                if adapter.fuehre_zusammen else gemappt + tief_gemappt)
-    log.info("%s: Buendel-Vertiefung %d Geraete, %d Abrufe, %d gemessen, "
-             "%d abgeleitet, %d Rohsaetze (%d mit Geraet), zusammen %d "
-             "(Zaehler %s)", anbieter.name, zaehler.get("geraete", 0),
-             zaehler.get("abrufe", 0), zaehler.get("gemessen", 0),
-             zaehler.get("abgeleitet", 0), len(tief), len(tief_gemappt),
-             len(zusammen), dict(sorted(zaehler.items())))
+    tief_gemappt = _mit_sku(tief, anbieter, einstieg, katalog, farben, heute, bilanz)
+    zusammen = (
+        adapter.fuehre_zusammen(gemappt, tief_gemappt)
+        if adapter.fuehre_zusammen
+        else gemappt + tief_gemappt
+    )
+    log.info(
+        "%s: Buendel-Vertiefung %d Geraete, %d Abrufe, %d gemessen, "
+        "%d abgeleitet, %d Rohsaetze (%d mit Geraet), zusammen %d "
+        "(Zaehler %s)",
+        anbieter.name,
+        zaehler.get("geraete", 0),
+        zaehler.get("abrufe", 0),
+        zaehler.get("gemessen", 0),
+        zaehler.get("abgeleitet", 0),
+        len(tief),
+        len(tief_gemappt),
+        len(zusammen),
+        dict(sorted(zaehler.items())),
+    )
     if zaehler.get("frist"):
         bilanz.gedeckelt.append(
             f"{einstieg.url}: Buendel-Vertiefung an der Frist beendet "
-            f"({zaehler.get('geraete', 0)} Geraete vertieft)")
-        log.warning("%s: Buendel-Vertiefung an der Frist beendet - %d "
-                    "Geraete vertieft", anbieter.name,
-                    zaehler.get("geraete", 0))
+            f"({zaehler.get('geraete', 0)} Geraete vertieft)"
+        )
+        log.warning(
+            "%s: Buendel-Vertiefung an der Frist beendet - %d Geraete vertieft",
+            anbieter.name,
+            zaehler.get("geraete", 0),
+        )
     return zusammen
 
 
-def _mit_sku(rohsaetze, anbieter, einstieg, katalog: Katalog, farben: dict,
-             heute: str, bilanz: Anbieterbilanz) -> list[dict]:
+def _mit_sku(
+    rohsaetze,
+    anbieter,
+    einstieg,
+    katalog: Katalog,
+    farben: dict,
+    heute: str,
+    bilanz: Anbieterbilanz,
+) -> list[dict]:
     """Jedem Buendel-Rohsatz seine `sku_id` geben - oder ihn verwerfen.
 
     Ein Buendel zeigt auf ein GERAET, und der Schluessel dafuer ist
@@ -1215,11 +1375,14 @@ def _mit_sku(rohsaetze, anbieter, einstieg, katalog: Katalog, farben: dict,
     out: list[dict] = []
     for satz in rohsaetze:
         kwargs = dict(
-            titel=satz.get("titel", ""), anbieter=anbieter.name,
-            anbieter_typ=anbieter.typ, netz=anbieter.netz,
-            quelle_url=urljoin(einstieg.url, satz.get("url") or "")
-            or einstieg.url,
-            abgerufen_am=heute, katalog=katalog, farben=farben,
+            titel=satz.get("titel", ""),
+            anbieter=anbieter.name,
+            anbieter_typ=anbieter.typ,
+            netz=anbieter.netz,
+            quelle_url=urljoin(einstieg.url, satz.get("url") or "") or einstieg.url,
+            abgerufen_am=heute,
+            katalog=katalog,
+            farben=farben,
             confidence=_belegstufe(satz.get("quelle")),
             farbe_roh=satz.get("farbe") or "",
             speicher_gb=satz.get("speicher_gb"),
@@ -1229,37 +1392,52 @@ def _mit_sku(rohsaetze, anbieter, einstieg, katalog: Katalog, farben: dict,
             # strukturiert nennt, wurde darueber still als "neu" gelesen.
             # Rohsaetze ohne das Feld aendern nichts (`or ""`).
             zustand_hinweis=satz.get("zustand_hinweis") or "",
-            einstieg_url=einstieg.url)
+            einstieg_url=einstieg.url,
+        )
         listung = lies_listung(**kwargs)
         if listung is None and (satz.get("strukturierter_name") or "").strip():
             # E4-Auto-Erkennung, dieselbe Regel wie im Listungsweg: die
             # Buendel brauchen die sku_id desselben (neuen) Geraets - sonst
             # startete die Preishistorie auch hier erst beim zweiten Lauf.
-            if autoerkennung.lege_an(satz["strukturierter_name"], katalog,
-                                    heute,
-                                    speicher_gb=satz.get("speicher_gb")) \
-                    is not None:
+            if (
+                autoerkennung.lege_an(
+                    satz["strukturierter_name"],
+                    katalog,
+                    heute,
+                    speicher_gb=satz.get("speicher_gb"),
+                )
+                is not None
+            ):
                 listung = lies_listung(**kwargs)
         if listung is None:
             titel = (satz.get("titel") or "").strip()
             if titel:
                 bilanz.unbekannte_titel.append(titel)
                 bilanz.unbekannt.append(
-                    {"art": "titel", "wert": titel,
-                     "quelle": satz.get("quelle") or ""})
+                    {"art": "titel", "wert": titel, "quelle": satz.get("quelle") or ""}
+                )
             continue
         if listung.farbe_roh and listung.farbe_normalisiert is None:
             bilanz.unbekannte_farben.append(listung.farbe_roh)
             bilanz.unbekannt.append(
-                {"art": "farbe", "wert": listung.farbe_roh,
-                 "quelle": satz.get("quelle") or ""})
+                {
+                    "art": "farbe",
+                    "wert": listung.farbe_roh,
+                    "quelle": satz.get("quelle") or "",
+                }
+            )
         # Der ZUSTAND reist mit - er ist dieselbe Erkennung wie die, aus
         # der die `-refurbished`-Strecke der SKU entsteht, und die
         # TCO-Tafel braucht ihn als Feld, nicht als Suffix (QA-Befund B1).
-        out.append({**satz, "sku_id": listung.sku_id,
-                    "anbieter": anbieter.name,
-                    "zustand": listung.zustand,
-                    "quelle_url": listung.quelle_url})
+        out.append(
+            {
+                **satz,
+                "sku_id": listung.sku_id,
+                "anbieter": anbieter.name,
+                "zustand": listung.zustand,
+                "quelle_url": listung.quelle_url,
+            }
+        )
     return out
 
 
@@ -1277,8 +1455,11 @@ def _ohne_sammelknoten(listungen: list) -> list:
     Sammelknoten traegt, behaelt ihn.
     """
     mit_speicher = {l.device_id for l in listungen if l.speicher_gb is not None}
-    return [l for l in listungen
-            if l.speicher_gb is not None or l.device_id not in mit_speicher]
+    return [
+        l
+        for l in listungen
+        if l.speicher_gb is not None or l.device_id not in mit_speicher
+    ]
 
 
 def _belegstufe(quelle: str) -> str:
@@ -1291,20 +1472,26 @@ def _belegstufe(quelle: str) -> str:
     return "hoch" if quelle in ("ldjson", "shopify", "microdata") else "mittel"
 
 
-def _als_listung_satz(satz, anbieter, einstieg, quelle_url, katalog, farben,
-                      heute, bilanz):
+def _als_listung_satz(
+    satz, anbieter, einstieg, quelle_url, katalog, farben, heute, bilanz
+):
     kwargs = dict(
-        titel=satz.get("titel", ""), anbieter=anbieter.name,
-        anbieter_typ=anbieter.typ, netz=anbieter.netz,
+        titel=satz.get("titel", ""),
+        anbieter=anbieter.name,
+        anbieter_typ=anbieter.typ,
+        netz=anbieter.netz,
         quelle_url=urljoin(quelle_url, satz.get("url") or "") or quelle_url,
-        abgerufen_am=heute, katalog=katalog, farben=farben,
+        abgerufen_am=heute,
+        katalog=katalog,
+        farben=farben,
         verfuegbarkeit=satz.get("verfuegbarkeit") or "unbekannt",
         # Die Belegstufe kommt aus der REGISTRY, nicht aus einer Liste von
         # Namen an dieser Stelle: eine Liste hier haette jeder neue Adapter
         # stillschweigend verfehlt, und seine Listungen stuenden als
         # "mittel" da, obwohl sie aus strukturierten Daten stammen.
         confidence=_belegstufe(satz.get("quelle")),
-        farbe_roh=satz.get("farbe") or "", ean=satz.get("ean") or "",
+        farbe_roh=satz.get("farbe") or "",
+        ean=satz.get("ean") or "",
         zustand_hinweis=satz.get("zustand_hinweis") or "",
         # Strukturierte Daten schlagen Textextraktion - die Rangfolge aus
         # Teil C1. Vodafone und o2 nennen den Speicher als eigenes Feld
@@ -1313,7 +1500,8 @@ def _als_listung_satz(satz, anbieter, einstieg, quelle_url, katalog, farben,
         # Adapter selbst zusammengesetzt hat.
         speicher_gb=satz.get("speicher_gb"),
         einstieg_url=einstieg.url,
-        **_preisfelder(anbieter, satz))
+        **_preisfelder(anbieter, satz),
+    )
     listung = lies_listung(**kwargs)
     if listung is None and (satz.get("strukturierter_name") or "").strip():
         # E4-AUTO-ERKENNUNG: der Titel traf keinen Katalog-Eintrag, aber die
@@ -1323,16 +1511,23 @@ def _als_listung_satz(satz, anbieter, einstieg, quelle_url, katalog, farben,
         # Anlage, und der Retry darunter trifft ihn. Ohne dieses Feld
         # passiert genau wie bisher nichts (Titel-Heuristik bleibt
         # verworfen).
-        if autoerkennung.lege_an(satz["strukturierter_name"], katalog, heute,
-                                speicher_gb=satz.get("speicher_gb")) is not None:
+        if (
+            autoerkennung.lege_an(
+                satz["strukturierter_name"],
+                katalog,
+                heute,
+                speicher_gb=satz.get("speicher_gb"),
+            )
+            is not None
+        ):
             listung = lies_listung(**kwargs)
     if listung is None:
         titel = (satz.get("titel") or "").strip()
         if titel:
             bilanz.unbekannte_titel.append(titel)
             bilanz.unbekannt.append(
-                {"art": "titel", "wert": titel,
-                 "quelle": satz.get("quelle") or ""})
+                {"art": "titel", "wert": titel, "quelle": satz.get("quelle") or ""}
+            )
     return listung
 
 
@@ -1348,10 +1543,16 @@ def _als_listung_satz(satz, anbieter, einstieg, quelle_url, katalog, farben,
 _MINDEST_JE_ANBIETER = 120.0
 
 
-def sammle(quellen, katalog: Katalog, farben: dict, hole: Callable, heute: str,
-           jetzt: Optional[datetime] = None,
-           frist_sekunden: Optional[float] = None,
-           uhr: Optional[Callable[[], datetime]] = None) -> dict:
+def sammle(
+    quellen,
+    katalog: Katalog,
+    farben: dict,
+    hole: Callable,
+    heute: str,
+    jetzt: Optional[datetime] = None,
+    frist_sekunden: Optional[float] = None,
+    uhr: Optional[Callable[[], datetime]] = None,
+) -> dict:
     """Den ganzen Beobachtungsraum abarbeiten.
 
     Sequenziell, nicht nebenlaeufig: die Bremse ist ohnehin der Abstand je
@@ -1382,8 +1583,9 @@ def sammle(quellen, katalog: Katalog, farben: dict, hole: Callable, heute: str,
     # unberuehrt. `crawl_rang` faellt ohne eigenen `sammelrang` auf `rang`
     # zurueck - fuer die meisten Anbieter aendert sich dadurch nichts.
     sortiert = sorted(quellen.anbieter, key=lambda a: (a.crawl_rang, a.name))
-    crawlt = [a.name for a in sortiert
-              if a.crawlbar and ADAPTER.get(a.methode) is not None]
+    crawlt = [
+        a.name for a in sortiert if a.crawlbar and ADAPTER.get(a.methode) is not None
+    ]
 
     bilanzen = []
     for anbieter in sortiert:
@@ -1402,13 +1604,24 @@ def sammle(quellen, katalog: Katalog, farben: dict, hole: Callable, heute: str,
             #
             # `frist_bis` bleibt die harte Grenze: die Summe der Anteile
             # darf sie ueberschreiten, der einzelne Abruf nicht.
-            eigene_frist = min(frist_bis,
-                               time.monotonic()
-                               + max(_MINDEST_JE_ANBIETER,
-                                     rest - nach_mir * _MINDEST_JE_ANBIETER))
-        bilanzen.append(sammle_anbieter(
-            anbieter, katalog, farben, hole, heute, waechter, jetzt,
-            eigene_frist, uhr=uhr))
+            eigene_frist = min(
+                frist_bis,
+                time.monotonic()
+                + max(_MINDEST_JE_ANBIETER, rest - nach_mir * _MINDEST_JE_ANBIETER),
+            )
+        bilanzen.append(
+            sammle_anbieter(
+                anbieter,
+                katalog,
+                farben,
+                hole,
+                heute,
+                waechter,
+                jetzt,
+                eigene_frist,
+                uhr=uhr,
+            )
+        )
     return {
         "anbieter": bilanzen,
         "listungen": [l for b in bilanzen for l in b.listungen],
@@ -1417,6 +1630,7 @@ def sammle(quellen, katalog: Katalog, farben: dict, hole: Callable, heute: str,
         # Unbekannte Titel und Farben MIT Anbieter und Feldquelle - die
         # Zeilen von data/state/geraete_unbekannt.jsonl (E4). Angelegt und
         # gezaehlt vom Lauf, nie von Hand gepflegt.
-        "unbekannte": [{"anbieter": b.name, **e}
-                       for b in bilanzen for e in b.unbekannt],
+        "unbekannte": [
+            {"anbieter": b.name, **e} for b in bilanzen for e in b.unbekannt
+        ],
     }

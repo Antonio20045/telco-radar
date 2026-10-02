@@ -45,6 +45,7 @@ Eine freundlich formulierte Nicht-Antwort ist schlimmer als ein ehrliches
 "dazu steht nichts im Archiv": sie kostet dieselbe Zeit und hinterlaesst
 den Eindruck, die Frage sei beantwortet.
 """
+
 from __future__ import annotations
 
 import math
@@ -72,22 +73,99 @@ _WORT = re.compile(r"[a-zA-ZäöüßÄÖÜ0-9]{2,}")
 # Deutsche Stoppwoerter. Sie tragen keine Frage und wuerden bei kurzen
 # Eintraegen die Rangfolge dominieren.
 STOPP = {
-    "der", "die", "das", "den", "dem", "des", "ein", "eine", "einen", "einem",
-    "einer", "eines", "und", "oder", "aber", "auch", "mit", "von", "vom",
-    "für", "fuer", "auf", "aus", "bei", "nach", "über", "ueber", "unter",
-    "zwischen", "ist", "sind", "war", "waren", "wird", "werden", "wurde",
-    "wurden", "hat", "haben", "hatte", "sich", "nicht", "kein", "keine",
-    "als", "wie", "was", "wer", "wo", "wann", "warum", "welche", "welcher",
-    "welches", "sein", "seine", "ihr", "ihre", "im", "in", "an", "am", "zu",
-    "zum", "zur", "es", "sie", "er", "wir", "man", "mehr", "sehr", "schon",
-    "noch", "nur", "dass", "denn", "doch", "so", "the", "and", "for", "of",
+    "der",
+    "die",
+    "das",
+    "den",
+    "dem",
+    "des",
+    "ein",
+    "eine",
+    "einen",
+    "einem",
+    "einer",
+    "eines",
+    "und",
+    "oder",
+    "aber",
+    "auch",
+    "mit",
+    "von",
+    "vom",
+    "für",
+    "fuer",
+    "auf",
+    "aus",
+    "bei",
+    "nach",
+    "über",
+    "ueber",
+    "unter",
+    "zwischen",
+    "ist",
+    "sind",
+    "war",
+    "waren",
+    "wird",
+    "werden",
+    "wurde",
+    "wurden",
+    "hat",
+    "haben",
+    "hatte",
+    "sich",
+    "nicht",
+    "kein",
+    "keine",
+    "als",
+    "wie",
+    "was",
+    "wer",
+    "wo",
+    "wann",
+    "warum",
+    "welche",
+    "welcher",
+    "welches",
+    "sein",
+    "seine",
+    "ihr",
+    "ihre",
+    "im",
+    "in",
+    "an",
+    "am",
+    "zu",
+    "zum",
+    "zur",
+    "es",
+    "sie",
+    "er",
+    "wir",
+    "man",
+    "mehr",
+    "sehr",
+    "schon",
+    "noch",
+    "nur",
+    "dass",
+    "denn",
+    "doch",
+    "so",
+    "the",
+    "and",
+    "for",
+    "of",
 }
 
 
 def zerlege(text: str) -> list[str]:
     """Text in gewichtsfaehige Woerter. Stoppwoerter fliegen raus."""
-    return [w for w in (m.group(0).lower() for m in _WORT.finditer(text or ""))
-            if w not in STOPP]
+    return [
+        w
+        for w in (m.group(0).lower() for m in _WORT.finditer(text or ""))
+        if w not in STOPP
+    ]
 
 
 @dataclass
@@ -128,14 +206,24 @@ class ArchivIndex:
         self.dokumente: list[list[str]] = []
         self.haeufigkeit: list[Counter] = []
         for e in self.eintraege:
-            worte = zerlege(" ".join(str(e.get(f) or "") for f in
-                                     ("title", "summary", "operator",
-                                      "category", "source_label")))
+            worte = zerlege(
+                " ".join(
+                    str(e.get(f) or "")
+                    for f in (
+                        "title",
+                        "summary",
+                        "operator",
+                        "category",
+                        "source_label",
+                    )
+                )
+            )
             self.dokumente.append(worte)
             self.haeufigkeit.append(Counter(worte))
         self.n = len(self.dokumente)
         self.mittlere_laenge = (
-            sum(len(d) for d in self.dokumente) / self.n) if self.n else 0.0
+            (sum(len(d) for d in self.dokumente) / self.n) if self.n else 0.0
+        )
         self.dokumentfrequenz: Counter = Counter()
         for d in self.dokumente:
             self.dokumentfrequenz.update(set(d))
@@ -179,8 +267,13 @@ def _beleg(eintrag: dict, score: float, treffer: list[str]) -> Beleg:
     )
 
 
-def frage(index: ArchivIndex, text: str, *, max_belege: int = MAX_BELEGE,
-          mind_score: float = MIND_SCORE) -> Antwort:
+def frage(
+    index: ArchivIndex,
+    text: str,
+    *,
+    max_belege: int = MAX_BELEGE,
+    mind_score: float = MIND_SCORE,
+) -> Antwort:
     """Eine Frage gegen das Archiv. Belege oder ein ehrliches Nein.
 
     Es wird NICHTS formuliert, was nicht im Archiv steht - die Antwort
@@ -192,8 +285,7 @@ def frage(index: ArchivIndex, text: str, *, max_belege: int = MAX_BELEGE,
     antwort = Antwort(frage=" ".join(str(text or "").split()), gesucht=worte)
 
     if not worte:
-        antwort.begruendung = ("Die Frage enthält keine durchsuchbaren "
-                               "Begriffe.")
+        antwort.begruendung = "Die Frage enthält keine durchsuchbaren Begriffe."
         return antwort
     if not index.n:
         antwort.begruendung = "Das Archiv ist leer."
@@ -209,7 +301,8 @@ def frage(index: ArchivIndex, text: str, *, max_belege: int = MAX_BELEGE,
         antwort.begruendung = (
             "Dazu steht nichts im Archiv. Das heißt nicht, dass es nichts "
             "gibt — es heißt, dass keine der bisher erfassten Meldungen die "
-            "Frage berührt.")
+            "Frage berührt."
+        )
         return antwort
 
     # Absteigend nach Score, bei Gleichstand die juengere Meldung zuerst.
@@ -253,9 +346,17 @@ def als_dict(antwort: Antwort) -> dict:
         "begruendung": antwort.begruendung,
         "gesucht": antwort.gesucht,
         "verlauf": verlauf(antwort),
-        "belege": [{
-            "titel": b.titel, "text": b.text, "quelle": b.quelle,
-            "url": b.url, "datum": b.datum, "bereich": b.bereich,
-            "score": b.score, "treffer": b.treffer,
-        } for b in antwort.belege],
+        "belege": [
+            {
+                "titel": b.titel,
+                "text": b.text,
+                "quelle": b.quelle,
+                "url": b.url,
+                "datum": b.datum,
+                "bereich": b.bereich,
+                "score": b.score,
+                "treffer": b.treffer,
+            }
+            for b in antwort.belege
+        ],
     }

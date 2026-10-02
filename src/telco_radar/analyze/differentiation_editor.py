@@ -31,6 +31,7 @@ haengen an derselben Gliederung. Wer eine Ueberschrift aendert, aendert alle
 drei - sonst faellt der Bericht still auf den Notfall-Digest zurueck (dieselbe
 Kopplung wie beim Wochen-Editor, CLAUDE.md §6).
 """
+
 from __future__ import annotations
 
 import json
@@ -121,14 +122,26 @@ _REQUIRED_HEADINGS = (
 # normaler Absatz mit drei Belegen an.
 _MAX_ABSATZ_ZEICHEN = 1200
 _FORBIDDEN_EDITORIAL_PHRASES = (
-    "fuer vodafone", "für vodafone", "vodafone sollte", "vodafone könnte",
-    "vodafone koennte", "vodafone muss", "empfehlung", "handlungsaufforderung",
+    "fuer vodafone",
+    "für vodafone",
+    "vodafone sollte",
+    "vodafone könnte",
+    "vodafone koennte",
+    "vodafone muss",
+    "empfehlung",
+    "handlungsaufforderung",
 )
 
 
 def _heading_key(line: str) -> str:
-    return (line.strip().lower().replace("ä", "ae").replace("ö", "oe")
-            .replace("ü", "ue").replace("ß", "ss"))
+    return (
+        line.strip()
+        .lower()
+        .replace("ä", "ae")
+        .replace("ö", "oe")
+        .replace("ü", "ue")
+        .replace("ß", "ss")
+    )
 
 
 def _without_links(markdown: str) -> str:
@@ -138,57 +151,76 @@ def _without_links(markdown: str) -> str:
 
 def validate_briefing(markdown: str) -> None:
     """Reject an answer with the wrong structure or Vodafone advice."""
-    headings = {_heading_key(line) for line in markdown.splitlines()
-                if line.strip().startswith("## ")}
+    headings = {
+        _heading_key(line)
+        for line in markdown.splitlines()
+        if line.strip().startswith("## ")
+    }
     missing = set(_REQUIRED_HEADINGS) - headings
     if missing:
         raise DifferentiationBriefingError(
-            "Differenzierungsbericht unvollstaendig: " + ", ".join(sorted(missing)))
+            "Differenzierungsbericht unvollstaendig: " + ", ".join(sorted(missing))
+        )
     if "[" not in markdown or "](" not in markdown:
         raise DifferentiationBriefingError(
-            "Differenzierungsbericht enthaelt keine Quellenlinks")
+            "Differenzierungsbericht enthaelt keine Quellenlinks"
+        )
     plain = _without_links(markdown)
     if any(phrase in plain for phrase in _FORBIDDEN_EDITORIAL_PHRASES):
         raise DifferentiationBriefingError(
-            "Differenzierungsbericht enthaelt eine Vodafone-Empfehlung")
+            "Differenzierungsbericht enthaelt eine Vodafone-Empfehlung"
+        )
     # Der Rueckfall in die Aufzaehlung ist der wahrscheinlichste Fehlgriff:
     # das Modell bekommt 71 Beispiele geliefert und die alte Fassung hat sie
     # brav alle in einen Absatz gehaengt (gemessen am Bericht vom 07.08.2026:
     # 2 100 Zeichen in einem einzigen Absatz, zwoelf Moves mit Semikolon
     # getrennt). Ein Absatz dieser Laenge ist auf der Seite kein Text mehr,
     # sondern eine Wand - und genau der Zustand, den diese Gliederung ersetzt.
-    zu_lang = [a for a in re.split(r"\n\s*\n", _without_links(markdown))
-               if len(a.strip()) > _MAX_ABSATZ_ZEICHEN]
+    zu_lang = [
+        a
+        for a in re.split(r"\n\s*\n", _without_links(markdown))
+        if len(a.strip()) > _MAX_ABSATZ_ZEICHEN
+    ]
     if zu_lang:
         raise DifferentiationBriefingError(
             f"Differenzierungsbericht hat {len(zu_lang)} Absatz/Absaetze ueber "
-            f"{_MAX_ABSATZ_ZEICHEN} Zeichen - vermutlich wieder eine Aufzaehlung")
+            f"{_MAX_ABSATZ_ZEICHEN} Zeichen - vermutlich wieder eine Aufzaehlung"
+        )
 
 
 def _payload(entries: list[dict], theme_labels: dict[str, str]) -> str:
     rows = []
     for e in entries:
-        rows.append({
-            "thema": theme_labels.get(e.get("theme"), e.get("theme") or ""),
-            "betreiber": e.get("operator") or "",
-            "region": e.get("region") or "",
-            "konkretes_beispiel": e.get("what") or "",
-            "quelle": e.get("url") or "",
-            "quellendom": e.get("source") or "",
-            "datum": e.get("date") or "",
-            "zuletzt_geprueft": e.get("last_verified") or "",
-        })
+        rows.append(
+            {
+                "thema": theme_labels.get(e.get("theme"), e.get("theme") or ""),
+                "betreiber": e.get("operator") or "",
+                "region": e.get("region") or "",
+                "konkretes_beispiel": e.get("what") or "",
+                "quelle": e.get("url") or "",
+                "quellendom": e.get("source") or "",
+                "datum": e.get("date") or "",
+                "zuletzt_geprueft": e.get("last_verified") or "",
+            }
+        )
     return json.dumps(rows, ensure_ascii=False)
 
 
-def synthesize(entries: list[dict], theme_labels: dict[str, str], model: str,
-               language: str = "Deutsch") -> str:
+def synthesize(
+    entries: list[dict],
+    theme_labels: dict[str, str],
+    model: str,
+    language: str = "Deutsch",
+) -> str:
     """Run the dedicated market-observation editor and validate its Markdown."""
     if not entries:
         return build_digest(entries, theme_labels)
     raw = complete(
         DIFFERENTIATION_EDITOR_SYSTEM + f"\nBerichtssprache: {language}.",
-        _payload(entries, theme_labels), model=model, max_tokens=16000)
+        _payload(entries, theme_labels),
+        model=model,
+        max_tokens=16000,
+    )
     markdown = raw.strip()
     validate_briefing(markdown)
     return markdown
@@ -211,8 +243,7 @@ def _date_suffix(entry: dict) -> str:
 def _anbieter(entry: dict) -> list[str]:
     """Die einzelnen Betreiber eines Beispiels - ein Joint Venture von fuenf
     Konzernen steht als ein Feld mit Kommata da."""
-    return [t.strip() for t in str(entry.get("operator") or "").split(",")
-            if t.strip()]
+    return [t.strip() for t in str(entry.get("operator") or "").split(",") if t.strip()]
 
 
 def _aufzaehlung(namen: list[str]) -> str:
@@ -235,30 +266,34 @@ def build_digest(entries: list[dict], theme_labels: dict[str, str]) -> str:
     aus, aendert sich der Ton der Seite, nicht ihr Aufbau.
     """
     entries = [e for e in entries if e.get("url") and e.get("what")]
-    ordered = sorted(entries, key=lambda e: (e.get("last_verified") or "",
-                                             e.get("first_seen") or ""),
-                     reverse=True)
+    ordered = sorted(
+        entries,
+        key=lambda e: (e.get("last_verified") or "", e.get("first_seen") or ""),
+        reverse=True,
+    )
 
     if not ordered:
-        return ("## Das Bild\n\n"
-                "Im aktuellen Beobachtungszeitraum liegt noch kein belegtes "
-                "Beispiel vor.\n\n"
-                "## Muster\n\nNoch kein Muster belegbar.\n\n"
-                "## Einordnung\n\n")
+        return (
+            "## Das Bild\n\n"
+            "Im aktuellen Beobachtungszeitraum liegt noch kein belegtes "
+            "Beispiel vor.\n\n"
+            "## Muster\n\nNoch kein Muster belegbar.\n\n"
+            "## Einordnung\n\n"
+        )
 
     # Je Hebel: die Beispiele, die Anbieter, und ein Beleg je Anbieter.
     je_hebel: dict[str, list[dict]] = {}
     for e in ordered:
         je_hebel.setdefault(e.get("theme") or "", []).append(e)
-    nach_groesse = sorted(je_hebel.items(),
-                          key=lambda p: (len(p[1]), p[0]), reverse=True)
+    nach_groesse = sorted(
+        je_hebel.items(), key=lambda p: (len(p[1]), p[0]), reverse=True
+    )
 
     alle_anbieter: dict[str, set] = {}
     for e in ordered:
         for name in _anbieter(e):
             alle_anbieter.setdefault(name, set()).add(e.get("theme") or "")
-    breit = sorted(alle_anbieter.items(),
-                   key=lambda p: (len(p[1]), p[0]), reverse=True)
+    breit = sorted(alle_anbieter.items(), key=lambda p: (len(p[1]), p[0]), reverse=True)
 
     def label(key: str) -> str:
         return theme_labels.get(key, key or "Sonstiges")
@@ -287,7 +322,8 @@ def build_digest(entries: list[dict], theme_labels: dict[str, str]) -> str:
         f"stärksten bespielt ist {label(fuehrend[0])} mit "
         f"{len(fuehrend[1])} Beispielen, gefolgt von "
         f"{_aufzaehlung([label(k) for k, _ in nach_groesse[1:3]])}. "
-        f"Zuletzt hinzugekommen sind {belege(ordered, 3)}.")
+        f"Zuletzt hinzugekommen sind {belege(ordered, 3)}."
+    )
     zeilen.append("")
 
     zeilen += ["## Muster", ""]
@@ -300,7 +336,8 @@ def build_digest(entries: list[dict], theme_labels: dict[str, str]) -> str:
         gefunden = True
         zeilen.append(
             f"**{label(key)}** {len(items)} Beispiele von {len(anbieter)} "
-            f"Anbietern, darunter {belege(items, 2)}.")
+            f"Anbietern, darunter {belege(items, 2)}."
+        )
         zeilen.append("")
     if breit and len(breit[0][1]) > 1:
         name, hebel = breit[0]
@@ -308,11 +345,15 @@ def build_digest(entries: list[dict], theme_labels: dict[str, str]) -> str:
         zeilen.append(
             f"**Mehrere Hebel gleichzeitig** {name} taucht in "
             f"{len(hebel)} verschiedenen Hebeln auf: "
-            f"{_aufzaehlung([label(k) for k in sorted(hebel)])}.")
+            f"{_aufzaehlung([label(k) for k in sorted(hebel)])}."
+        )
         zeilen.append("")
     if not gefunden:
-        zeilen += ["Noch zeigt kein Hebel mehr als einen Anbieter - ein "
-                   "Muster laesst sich daraus nicht belegen.", ""]
+        zeilen += [
+            "Noch zeigt kein Hebel mehr als einen Anbieter - ein "
+            "Muster laesst sich daraus nicht belegen.",
+            "",
+        ]
 
     zeilen += ["## Einordnung", ""]
     for key, items in nach_groesse:
@@ -331,7 +372,8 @@ def build_digest(entries: list[dict], theme_labels: dict[str, str]) -> str:
         zeilen.append(
             f"{len(items)} belegte Beispiele, getragen von "
             f"{_aufzaehlung(genannt)}. "
-            f"Zuletzt gesehen: {belege(items, 1)}.")
+            f"Zuletzt gesehen: {belege(items, 1)}."
+        )
         zeilen.append("")
 
     return "\n".join(zeilen).strip() + "\n"

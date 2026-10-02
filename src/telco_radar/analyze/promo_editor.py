@@ -8,6 +8,7 @@ jede Zahl zu wiederholen, und verweist fuer den aktuellen Stand IMMER auf die
 Original-Aktionsseite statt einen Preis als dauerhaft gueltig zu behaupten
 (Stale-Preis-Risiko, siehe claude/promo-uebersicht-konzept.md Risiko d).
 """
+
 from __future__ import annotations
 
 import json
@@ -70,13 +71,24 @@ Regeln:
 """
 
 _REQUIRED_HEADINGS = ("## was diese woche auffaellt", "## quellenbasis")
-_FORBIDDEN_PHRASES = ("vodafone sollte", "vodafone könnte", "vodafone koennte",
-                      "vodafone muss", "empfehlung:")
+_FORBIDDEN_PHRASES = (
+    "vodafone sollte",
+    "vodafone könnte",
+    "vodafone koennte",
+    "vodafone muss",
+    "empfehlung:",
+)
 
 
 def _heading_key(line: str) -> str:
-    return (line.strip().lower().replace("ä", "ae").replace("ö", "oe")
-            .replace("ü", "ue").replace("ß", "ss"))
+    return (
+        line.strip()
+        .lower()
+        .replace("ä", "ae")
+        .replace("ö", "oe")
+        .replace("ü", "ue")
+        .replace("ß", "ss")
+    )
 
 
 def _without_links(markdown: str) -> str:
@@ -86,18 +98,19 @@ def _without_links(markdown: str) -> str:
 def validate_briefing(markdown: str) -> None:
     """Reject an answer with the wrong structure, missing source links, or
     prescriptive Vodafone advice."""
-    headings = {_heading_key(l) for l in markdown.splitlines()
-                if l.strip().startswith("## ")}
+    headings = {
+        _heading_key(l) for l in markdown.splitlines() if l.strip().startswith("## ")
+    }
     missing = set(_REQUIRED_HEADINGS) - headings
     if missing:
         raise PromoBriefingError(
-            "Promo-Bericht unvollstaendig: " + ", ".join(sorted(missing)))
+            "Promo-Bericht unvollstaendig: " + ", ".join(sorted(missing))
+        )
     if "[" not in markdown or "](" not in markdown:
         raise PromoBriefingError("Promo-Bericht enthaelt keine Quellenlinks")
     plain = _without_links(markdown)
     if any(p in plain for p in _FORBIDDEN_PHRASES):
-        raise PromoBriefingError(
-            "Promo-Bericht enthaelt eine Handlungsempfehlung")
+        raise PromoBriefingError("Promo-Bericht enthaelt eine Handlungsempfehlung")
 
 
 def _payload(entries: list[dict]) -> str:
@@ -131,11 +144,17 @@ def synthesize(entries: list[dict], model: str, language: str = "Deutsch") -> st
     # Kontext entscheidet die Reihenfolge mit darueber, worueber der Text
     # ueberhaupt schreibt. Unbewertete Eintraege bleiben hinten, statt sie zu
     # verwerfen - sie sind nicht unwichtig, nur noch nicht beurteilt.
-    active = sorted(active, key=lambda e: (e.get("score") is not None,
-                                           e.get("score") or 0), reverse=True)
+    active = sorted(
+        active,
+        key=lambda e: (e.get("score") is not None, e.get("score") or 0),
+        reverse=True,
+    )
     raw = complete(
         PROMO_EDITOR_SYSTEM + f"\nBerichtssprache: {language}.",
-        _payload(active), model=model, max_tokens=16000)
+        _payload(active),
+        model=model,
+        max_tokens=16000,
+    )
     markdown = raw.strip()
     validate_briefing(markdown)
     return markdown
@@ -161,21 +180,30 @@ DIGEST_MARKER = "Für diesen Lauf liegt kein Redaktionstext vor."
 
 def build_digest(entries: list[dict]) -> str:
     """Build a concrete summary without an LLM (rule-based fallback)."""
-    active = [e for e in entries if e.get("url") and e.get("headline")
-              and e.get("status") == "aktiv"]
+    active = [
+        e
+        for e in entries
+        if e.get("url") and e.get("headline") and e.get("status") == "aktiv"
+    ]
     ordered = sorted(
-        active, key=lambda e: (e.get("last_verified") or "", e.get("first_seen") or ""),
-        reverse=True)
+        active,
+        key=lambda e: (e.get("last_verified") or "", e.get("first_seen") or ""),
+        reverse=True,
+    )
 
     lines = ["## Was diese Woche auffaellt", ""]
     if not ordered:
         lines.append(
-            "Im aktuellen Beobachtungszeitraum liegt keine belegte aktive "
-            "Aktion vor.")
+            "Im aktuellen Beobachtungszeitraum liegt keine belegte aktive Aktion vor."
+        )
     else:
-        lines.extend([
-            DIGEST_MARKER + " Aufgelistet stehen die beobachteten Aktionen "
-            "je Anbieter, unredigiert und mit Quelle.", ""])
+        lines.extend(
+            [
+                DIGEST_MARKER + " Aufgelistet stehen die beobachteten Aktionen "
+                "je Anbieter, unredigiert und mit Quelle.",
+                "",
+            ]
+        )
         by_brand: dict[str, list[dict]] = {}
         for e in ordered:
             by_brand.setdefault(e["brand"], []).append(e)

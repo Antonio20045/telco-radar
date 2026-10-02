@@ -13,6 +13,7 @@ Handler anspringt statt nur neu zu laden.
 Bauform wie `test_geraete_zeitreihe_browser.py`: eigener Server auf
 127.0.0.1, kein file://, Chromium an beiden bekannten Orten.
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -29,10 +30,14 @@ from test_geraete_zeitreihe_browser import _baue_site
 
 
 def _chromium():
-    for muster in ("/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-                   str(__import__("pathlib").Path.home()
-                       / ".cache/ms-playwright/chromium*/chrome-linux*/chrome"),
-                   "/Applications/Chromium.app/Contents/MacOS/Chromium"):
+    for muster in (
+        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
+        str(
+            __import__("pathlib").Path.home()
+            / ".cache/ms-playwright/chromium*/chrome-linux*/chrome"
+        ),
+        "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    ):
         treffer = sorted(glob.glob(muster))
         if treffer:
             return treffer[-1]
@@ -45,8 +50,9 @@ def _server(site):
     s.bind(("127.0.0.1", 0))
     port = s.getsockname()[1]
     s.close()
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler,
-                                directory=str(site))
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(site)
+    )
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     try:
@@ -59,12 +65,14 @@ def _server(site):
 def paar(tmp_path_factory):
     import pathlib
     from playwright.sync_api import sync_playwright
+
     site = _baue_site(tmp_path_factory.mktemp("e3-radar"))
     with _server(site) as basis:
         with sync_playwright() as p:
             exe = _chromium()
-            browser = (p.chromium.launch(executable_path=exe) if exe
-                       else p.chromium.launch())
+            browser = (
+                p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
+            )
             seite = browser.new_page(viewport={"width": 1440, "height": 900})
             seite.goto(f"{basis}/geraete.html", wait_until="load")
             yield seite
@@ -99,10 +107,13 @@ def test_der_sprung_stellt_reiter_modell_und_band_ein(paar):
     ziel_band = links[0].get_attribute("data-band")
     links[0].click()
     paar.wait_for_timeout(150)
-    assert paar.eval_on_selector(
-        '.gr-reiter button[data-tafel="tafel-tco"]',
-        "e => e.getAttribute('aria-selected')") == "true", \
-        "der Vergleichs-Reiter ist nach dem Sprung nicht aktiv"
+    assert (
+        paar.eval_on_selector(
+            '.gr-reiter button[data-tafel="tafel-tco"]',
+            "e => e.getAttribute('aria-selected')",
+        )
+        == "true"
+    ), "der Vergleichs-Reiter ist nach dem Sprung nicht aktiv"
     url = paar.url
     assert f"modell={ziel_id}" in url, url
     assert f"band={ziel_band}" in url, url
@@ -116,13 +127,15 @@ def test_der_zeilenklick_oeffnet_die_detailzeile(paar):
     paar.goto(paar.url.split("#")[0], wait_until="load")
     _radar_zeigen(paar)
     zeile = paar.query_selector(
-        "#wr-abweichung table tbody tr.gr-a-zeile:not(.gr-a-rest)")
+        "#wr-abweichung table tbody tr.gr-a-zeile:not(.gr-a-rest)"
+    )
     assert zeile is not None
     auf_id = zeile.get_attribute("data-auf")
     zeile.click()
     paar.wait_for_timeout(60)
     offen = paar.eval_on_selector(
-        f"#{auf_id}", "e => e.classList.contains('gr-a-auf--an')")
+        f"#{auf_id}", "e => e.classList.contains('gr-a-auf--an')"
+    )
     assert offen is True, f"Detailzeile #{auf_id} öffnet nicht"
 
 
@@ -144,6 +157,7 @@ def test_alle_reiter_bleiben_ohne_js_fehler(paar):
 # tests/test_geraete_faden_schluessel.py.
 # ==========================================================================
 
+
 def test_der_katalog_sprung_legt_filter_und_zeile_frei(paar):
     """Klick auf „im Katalog“ einer Radar-Modellzeile: der Katalog-Reiter
     ist aktiv, die Zielzeile (derselbe `modell_schluessel` wie data-modell
@@ -155,32 +169,38 @@ def test_der_katalog_sprung_legt_filter_und_zeile_frei(paar):
     # Filter am KATALOG setzen (Samsung), der Sprung zielt auf ein Apple-
     # Modell - ohne Freilegen waere die Zeile versteckt.
     paar.click('.gr-reiter button[data-tafel="tafel-katalog"]')
-    paar.select_option('#tafel-katalog select[data-filter="marke"]',
-                       label="Samsung")
+    paar.select_option('#tafel-katalog select[data-filter="marke"]', label="Samsung")
     _radar_zeigen(paar)
-    link = next(a for a in paar.query_selector_all(
-        "#wr-abweichung a.gr-ksprung[data-modell]")
-        if "apple" in a.get_attribute("data-modell"))
+    link = next(
+        a
+        for a in paar.query_selector_all("#wr-abweichung a.gr-ksprung[data-modell]")
+        if "apple" in a.get_attribute("data-modell")
+    )
     ziel = link.get_attribute("data-modell")
     link.click()
     paar.wait_for_timeout(250)
-    assert paar.eval_on_selector(
-        '.gr-reiter button[data-tafel="tafel-katalog"]',
-        "e => e.getAttribute('aria-selected')") == "true", \
-        "der Katalog-Reiter ist nach dem Sprung nicht aktiv"
+    assert (
+        paar.eval_on_selector(
+            '.gr-reiter button[data-tafel="tafel-katalog"]',
+            "e => e.getAttribute('aria-selected')",
+        )
+        == "true"
+    ), "der Katalog-Reiter ist nach dem Sprung nicht aktiv"
     sichtbar = paar.eval_on_selector(
         f'#gr-katalogtabelle tr.gr-k-zeile[data-modell="{ziel}"]',
-        "e => !e.hidden && e.checkVisibility()")
-    assert sichtbar is True, \
-        f"Zielzeile {ziel} bleibt unter dem Filter unsichtbar"
+        "e => !e.hidden && e.checkVisibility()",
+    )
+    assert sichtbar is True, f"Zielzeile {ziel} bleibt unter dem Filter unsichtbar"
     markiert = paar.eval_on_selector(
         f'#gr-katalogtabelle tr.gr-k-zeile[data-modell="{ziel}"]',
-        "e => e.classList.contains('gr-k-ziel')")
+        "e => e.classList.contains('gr-k-ziel')",
+    )
     assert markiert is True, "die Zielzeile ist nicht markiert"
     # Der Filter ist zurueckgesetzt - der Leser sieht, was die Tabelle
     # gerade zeigt (dieselbe Regel wie der Filterleisten-Etikett-Satz).
     wert = paar.eval_on_selector(
-        '#tafel-katalog select[data-filter="marke"]', "e => e.value")
+        '#tafel-katalog select[data-filter="marke"]', "e => e.value"
+    )
     assert wert == "", f"Markenfilter bleibt auf {wert!r} stehen"
 
 
@@ -191,16 +211,21 @@ def test_der_katalog_graph_sprung_waehlt_das_modell(paar):
     paar.goto(paar.url.split("#")[0].split("?")[0], wait_until="load")
     paar.click('.gr-reiter button[data-tafel="tafel-katalog"]')
     link = paar.query_selector(
-        "#gr-katalogtabelle tr.gr-k-zeile a.gr-sprung[data-modell]")
-    assert link is not None, \
+        "#gr-katalogtabelle tr.gr-k-zeile a.gr-sprung[data-modell]"
+    )
+    assert link is not None, (
         "kein Graph-Sprung im Katalog der Fixture - der Test prueft nichts"
+    )
     ziel = link.get_attribute("data-modell")
     link.click()
     paar.wait_for_timeout(400)
-    assert paar.eval_on_selector(
-        '.gr-reiter button[data-tafel="tafel-tco"]',
-        "e => e.getAttribute('aria-selected')") == "true", \
-        "der Vergleichs-Reiter ist nach dem Sprung nicht aktiv"
+    assert (
+        paar.eval_on_selector(
+            '.gr-reiter button[data-tafel="tafel-tco"]',
+            "e => e.getAttribute('aria-selected')",
+        )
+        == "true"
+    ), "der Vergleichs-Reiter ist nach dem Sprung nicht aktiv"
     assert f"modell={ziel}" in paar.url, paar.url
     # Das Suchfeld nennt das gewaehlte Modell (Kacheln sind nur
     # Schnelleingang - das Ziel kann ausserhalb der 6 liegen).
@@ -215,18 +240,25 @@ def test_ansicht_deep_link_schaltet_und_ueberlebt(paar):
     stehen (bis P4 baute waehle() die URL neu auf und loeschte ihn)."""
     basis = paar.url.split("/geraete.html")[0] + "/geraete.html"
     paar.goto(basis + "?ansicht=tco", wait_until="load")
-    assert paar.eval_on_selector(
-        "#gr-katalogtabelle",
-        "e => e.classList.contains('gr-katalog--tco')") is True, \
-        "?ansicht=tco schaltet die TCO-Ansicht beim Laden nicht um"
-    assert paar.eval_on_selector(
-        '.gr-kansicht button[data-ansicht="tco"]',
-        "e => e.getAttribute('aria-pressed')") == "true"
+    assert (
+        paar.eval_on_selector(
+            "#gr-katalogtabelle", "e => e.classList.contains('gr-katalog--tco')"
+        )
+        is True
+    ), "?ansicht=tco schaltet die TCO-Ansicht beim Laden nicht um"
+    assert (
+        paar.eval_on_selector(
+            '.gr-kansicht button[data-ansicht="tco"]',
+            "e => e.getAttribute('aria-pressed')",
+        )
+        == "true"
+    )
     paar.click('.gr-reiter button[data-tafel="tafel-katalog"]')
     paar.click('.gr-kansicht button[data-ansicht="barpreis"]')
     paar.wait_for_timeout(120)
-    assert "ansicht=" not in paar.url, \
+    assert "ansicht=" not in paar.url, (
         f"ansicht-Parameter bleibt nach barpreis-Klick stehen: {paar.url}"
+    )
     # Modellwechsel der Zeitreihe: modell/band kommen dazu, ansicht bleibt
     paar.click('.gr-kansicht button[data-ansicht="tco"]')
     paar.wait_for_timeout(80)
@@ -234,8 +266,9 @@ def test_ansicht_deep_link_schaltet_und_ueberlebt(paar):
     paar.wait_for_timeout(80)
     paar.click("#gr-zr-baender button[data-band]:not([disabled])")
     paar.wait_for_timeout(200)
-    assert "ansicht=tco" in paar.url, \
+    assert "ansicht=tco" in paar.url, (
         f"ansicht-Parameter geht beim Band-/Modellwechsel verloren: {paar.url}"
+    )
     # Aufraeumen: URL ohne Parameter, damit nachfolgende Tests ein
     # sauberes Startgeraett sehen (die Fixture hat Modulgueltigkeit).
     paar.goto(basis, wait_until="load")

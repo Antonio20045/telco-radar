@@ -19,6 +19,7 @@ Fixture mit PREISHISTORIE:
   * samsung-galaxy-s26 256: ein Anbieter mit einem Messpunkt,
   * google-pixel-11 128: Bündel, aber KEINE Listung.
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -32,17 +33,22 @@ import yaml
 from telco_radar.report.html import render_site
 
 from test_geraete_browser_fixture import (
-    HEUTE, _chromium, _KATALOG, _FARBEN, _listung, _QUELLEN, _server, _sku)
+    HEUTE,
+    _chromium,
+    _KATALOG,
+    _FARBEN,
+    _listung,
+    _QUELLEN,
+    _server,
+    _sku,
+)
 from test_geraete_zeitreihe_browser import waehle_modell
 
 # (device_id, speicher, anbieter, tarif_id, tarif, gb, rate)
 _BUENDEL = [
-    ("apple-iphone-17-pro", 256, "o2", "o2:klein", "O2 Mobile Klein",
-     10, 18.0),
-    ("apple-iphone-17-pro", 256, "Vodafone", "vf:klein", "Vodafone Mobil XS",
-     18, 26.0),
-    ("samsung-galaxy-s26", 256, "1&1", "11:klein", "All-Net-Flat S",
-     10, 15.0),
+    ("apple-iphone-17-pro", 256, "o2", "o2:klein", "O2 Mobile Klein", 10, 18.0),
+    ("apple-iphone-17-pro", 256, "Vodafone", "vf:klein", "Vodafone Mobil XS", 18, 26.0),
+    ("samsung-galaxy-s26", 256, "1&1", "11:klein", "All-Net-Flat S", 10, 15.0),
     ("google-pixel-11", 128, "o2", "o2:ohne", "O2 Mobile Flex", None, 18.0),
 ]
 
@@ -61,12 +67,14 @@ _PUNKTE = [
 def _baue(tmp_path):
     root = tmp_path / "site_baum"
     (root / "config").mkdir(parents=True)
-    for name, daten in (("geraete_katalog.yaml", _KATALOG),
-                        ("farben.yaml", _FARBEN),
-                        ("geraete_quellen.yaml", _QUELLEN)):
+    for name, daten in (
+        ("geraete_katalog.yaml", _KATALOG),
+        ("farben.yaml", _FARBEN),
+        ("geraete_quellen.yaml", _QUELLEN),
+    ):
         (root / "config" / name).write_text(
-            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
-            encoding="utf-8")
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False), encoding="utf-8"
+        )
     state = root / "data" / "state"
     state.mkdir(parents=True)
     listungen = [
@@ -78,55 +86,98 @@ def _baue(tmp_path):
         # Tests unten.
         _listung("o2", "google-pixel-11", 128, 899.00),
     ]
-    (state / "geraete_db.json").write_text(json.dumps({
-        "updated": HEUTE,
-        "anbieter": {n: {"laeufe": 4, "funde_gesamt": 1}
-                     for n in ("Vodafone", "o2", "1&1")},
-        "listungen": listungen}), encoding="utf-8")
+    (state / "geraete_db.json").write_text(
+        json.dumps(
+            {
+                "updated": HEUTE,
+                "anbieter": {
+                    n: {"laeufe": 4, "funde_gesamt": 1}
+                    for n in ("Vodafone", "o2", "1&1")
+                },
+                "listungen": listungen,
+            }
+        ),
+        encoding="utf-8",
+    )
     (state / "geraete_preise.jsonl").write_text(
-        "\n".join(json.dumps({"listung_id": lid, "datum": tag,
-                              "preis_ohne_vertrag": preis,
-                              "preisart": "ohne_vertrag",
-                              "quelle_url": "https://example.de/beleg"})
-                  for lid, tag, preis in _PUNKTE) + "\n",
-        encoding="utf-8")
+        "\n".join(
+            json.dumps(
+                {
+                    "listung_id": lid,
+                    "datum": tag,
+                    "preis_ohne_vertrag": preis,
+                    "preisart": "ohne_vertrag",
+                    "quelle_url": "https://example.de/beleg",
+                }
+            )
+            for lid, tag, preis in _PUNKTE
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     buendel = []
     for device_id, speicher, anbieter, tarif_id, tarif, gb, rate in _BUENDEL:
-        buendel.append({
-            "id": f"buendel--{anbieter.lower()}--{_sku(device_id, speicher)}"
-                  f"--{tarif_id}",
-            "sku_id": _sku(device_id, speicher), "anbieter": anbieter,
-            "tarif_name": tarif, "tarif_id": tarif_id,
-            "tarif_id_guete": "hoch", "tarif_monatlich": 24.99,
-            "geraet_zuzahlung": 1.0, "geraet_monatsrate": rate,
-            "laufzeit_monate": 24, "anschlusspreis": 0.0,
-            "zustand": "neu", "rabatte": [],
-            "quelle_url": f"https://example.de/{anbieter.lower()}/{device_id}",
-            "abgerufen_am": HEUTE, "first_seen": HEUTE,
-            "last_verified": HEUTE})
-    (state / "geraete_tco.json").write_text(json.dumps({
-        "updated": HEUTE, "buendel": buendel, "sim_only": []}),
-        encoding="utf-8")
+        buendel.append(
+            {
+                "id": f"buendel--{anbieter.lower()}--{_sku(device_id, speicher)}"
+                f"--{tarif_id}",
+                "sku_id": _sku(device_id, speicher),
+                "anbieter": anbieter,
+                "tarif_name": tarif,
+                "tarif_id": tarif_id,
+                "tarif_id_guete": "hoch",
+                "tarif_monatlich": 24.99,
+                "geraet_zuzahlung": 1.0,
+                "geraet_monatsrate": rate,
+                "laufzeit_monate": 24,
+                "anschlusspreis": 0.0,
+                "zustand": "neu",
+                "rabatte": [],
+                "quelle_url": f"https://example.de/{anbieter.lower()}/{device_id}",
+                "abgerufen_am": HEUTE,
+                "first_seen": HEUTE,
+                "last_verified": HEUTE,
+            }
+        )
+    (state / "geraete_tco.json").write_text(
+        json.dumps({"updated": HEUTE, "buendel": buendel, "sim_only": []}),
+        encoding="utf-8",
+    )
     tarife = [
-        {"anbieter": anbieter, "name": tarif,
-         "tarif_id": tarif_id, "art": "mobilfunk",
-         "grundgebuehr": 24.99, "laufzeit_monate": 24,
-         "datenvolumen_gb": gb,
-         "preisphasen": [{"von_monat": 1, "bis_monat": None,
-                          "betrag": 24.99}],
-         "dokument_url": f"https://example.de/pib/{tarif_id}",
-         "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}}
+        {
+            "anbieter": anbieter,
+            "name": tarif,
+            "tarif_id": tarif_id,
+            "art": "mobilfunk",
+            "grundgebuehr": 24.99,
+            "laufzeit_monate": 24,
+            "datenvolumen_gb": gb,
+            "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": 24.99}],
+            "dokument_url": f"https://example.de/pib/{tarif_id}",
+            "abgerufen_am": HEUTE,
+            "confidence": {},
+            "fundstellen": {},
+        }
         for _d, _s, anbieter, tarif_id, tarif, gb, _r in _BUENDEL
     ]
     tarife = mit_leiter(tarife)
     (state / "tarife.jsonl").write_text(
-        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
+        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8"
+    )
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
-    (reports / f"{HEUTE}.json").write_text(json.dumps({
-        "date": HEUTE, "language": "de",
-        "briefing_md": "## Auf einen Blick\n\n- Nichts Besonderes.\n",
-        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{HEUTE}.json").write_text(
+        json.dumps(
+            {
+                "date": HEUTE,
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- Nichts Besonderes.\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     (reports / f"{HEUTE}.md").write_text("# Bericht\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
@@ -136,12 +187,12 @@ def _baue(tmp_path):
 @contextlib.contextmanager
 def _browser_ctx(tmp_path_factory):
     sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt").sync_playwright
+        "playwright.sync_api", reason="playwright fehlt"
+    ).sync_playwright
     site = _baue(tmp_path_factory.mktemp("o4verlauf"))
     exe = _chromium()
     with _server(site) as wurzel, sync_playwright() as p:
-        browser = (p.chromium.launch(executable_path=exe) if exe
-                   else p.chromium.launch())
+        browser = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
         try:
             yield site, wurzel, browser
         finally:
@@ -180,9 +231,9 @@ def test_kein_zweites_barpreisbild_und_die_eigene_wahl_zaehlt(lage):
     wurzel, seite = lage
     _oeffne_verlauf(wurzel, seite)
     # 1. Kein G0-Block mehr - auf der ganzen Seite, nicht nur unsichtbar.
-    assert seite.evaluate(
-        "() => document.querySelector('#gr-g0-lager')") is None, (
-        "der G0-Block steht noch im Verlaufs-Reiter (Doppel-Darstellung)")
+    assert seite.evaluate("() => document.querySelector('#gr-g0-lager')") is None, (
+        "der G0-Block steht noch im Verlaufs-Reiter (Doppel-Darstellung)"
+    )
     # 2. Die eigene Auswahl wählt das VORGABEMODELL (iPhone 17 Pro 256):
     #    zwei Anbieter, vier Messtage - der Graph entsteht.
     seite.fill("#gr-vsuche", "iPhone 17 Pro")
@@ -218,8 +269,8 @@ def test_kein_zweites_barpreisbild_und_die_eigene_wahl_zaehlt(lage):
     })""")
     assert nachher["g0"] is False, nachher
     assert "Galaxy S26" in nachher["feld"], (
-        'der Reiter „Ohne Vertrag" zeigt nicht das Geraet aus „Mit Tarif": '
-        f"{nachher}")
+        f'der Reiter „Ohne Vertrag" zeigt nicht das Geraet aus „Mit Tarif": {nachher}'
+    )
     # Genau EIN Bild - oder, bei zu wenigen Messterminen, der benannte
     # Satz statt eines Bildes; nie beides, nie keins von beiden.
     assert (nachher["bilder"] == 1) != nachher["zukurz"], nachher
@@ -235,8 +286,7 @@ def test_die_wahl_ohne_vertrag_gilt_auch_mit_tarif(lage):
     seite.wait_for_timeout(150)
     seite.click("#gr-vtreffer li:first-child")
     seite.wait_for_timeout(200)
-    gewaehlt = seite.evaluate(
-        "() => document.getElementById('gr-vsuche').value")
+    gewaehlt = seite.evaluate("() => document.getElementById('gr-vsuche').value")
     assert "Galaxy S26" in gewaehlt, gewaehlt
     seite.click('.gr-reiter [data-tafel="tafel-tco"]')
     seite.wait_for_timeout(400)
@@ -267,9 +317,9 @@ def test_ein_deep_link_ohne_buendel_bleibt_ohne_vertrag_stehen(lage):
     }""")
     assert ohne is not None, (
         "die Fixture hat kein Geraet mit Barpreis, aber ohne Buendel - "
-        "der Test liefe ins Leere")
-    seite.goto(f"{wurzel}/geraete.html?modell={ohne['id']}",
-               wait_until="load")
+        "der Test liefe ins Leere"
+    )
+    seite.goto(f"{wurzel}/geraete.html?modell={ohne['id']}", wait_until="load")
     seite.wait_for_timeout(300)
     seite.click('.gr-reiter [data-tafel="tafel-verlauf"]')
     seite.wait_for_timeout(200)

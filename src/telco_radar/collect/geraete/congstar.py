@@ -223,6 +223,7 @@ Katalogeintrag je trifft (dieselbe Falle wie "silber-1-tb" bei der Telekom,
 die dort die Einheit im Slug loest). `referenceGB` steht bei jeder Variante
 und stimmt mit der Einheit im Namen ueberein.
 """
+
 from __future__ import annotations
 
 import json
@@ -232,11 +233,16 @@ from typing import Optional
 
 from . import GeraeteAbrufFehler
 from ...geraete_model import probe_geht_auf
+
 # DIE EINE STELLE, die entscheidet, ob ein Rohwert eine Ratenlaufzeit IST
 # (Clean Code 1): dieselbe Pruefung, die `buendel_id` und `Buendel` lesen.
-from ...tco_model import (AKTION_ANSCHLUSS_ERLASSEN, AKTION_GERAETERABATT,
-                          AKTION_TARIFRABATT, AKTION_TRADE_IN,
-                          laufzeit_in_monaten)
+from ...tco_model import (
+    AKTION_ANSCHLUSS_ERLASSEN,
+    AKTION_GERAETERABATT,
+    AKTION_TARIFRABATT,
+    AKTION_TRADE_IN,
+    laufzeit_in_monaten,
+)
 
 log = logging.getLogger(__name__)
 
@@ -316,7 +322,7 @@ def _balanciertes_objekt(text: str, start: int) -> Optional[str]:
         elif zeichen in "}]":
             tiefe -= 1
             if tiefe == 0:
-                return text[start:i + 1]
+                return text[start : i + 1]
     return None
 
 
@@ -352,7 +358,7 @@ def _ist_ohne_vertrag(zahlweise: dict) -> bool:
     """
     wert = zahlweise.get("contractDuration")
     if isinstance(wert, bool):
-        return False                      # "ja" ist keine Dauer
+        return False  # "ja" ist keine Dauer
     try:
         return float(wert) == 0.0
     except (TypeError, ValueError):
@@ -392,7 +398,8 @@ def lies(text: str, url: str = "") -> list[dict]:
     nutzlast = _nutzlast(text)
     if not nutzlast:
         raise GeraeteAbrufFehler(
-            "congstar-Produktseite ohne Next.js-Flight-Nutzlast (self.__next_f)")
+            "congstar-Produktseite ohne Next.js-Flight-Nutzlast (self.__next_f)"
+        )
     varianten = _varianten(nutzlast)
     if not varianten:
         raise GeraeteAbrufFehler("congstar-Produktseite ohne Variantenobjekte")
@@ -407,9 +414,12 @@ def lies(text: str, url: str = "") -> list[dict]:
             # Keine Einmalkauf-Zahlweise ohne Vertrag - BENANNT, nicht
             # still: faellt das Feld `contractDuration` oder sein Typ
             # einmal aus, verliert diese Seite sonst lautlos alle Saetze.
-            log.info("congstar: Variante %r ohne Einmalkauf-Zahlweise "
-                     "(ONE_TIME_PURCHASE mit contractDuration 0) - kein "
-                     "Satz", titel)
+            log.info(
+                "congstar: Variante %r ohne Einmalkauf-Zahlweise "
+                "(ONE_TIME_PURCHASE mit contractDuration 0) - kein "
+                "Satz",
+                titel,
+            )
             continue
 
         # Derselbe Helfer wie im Buendel-Pfad (`_speicher_gb`: referenceGB
@@ -422,25 +432,27 @@ def lies(text: str, url: str = "") -> list[dict]:
         farbe = str((v.get("color") or {}).get("name") or "").strip()
         status = str((v.get("availability") or {}).get("status") or "").strip().upper()
 
-        out.append({
-            "titel": titel,
-            "preis": preis,
-            "waehrung": "EUR",
-            "verfuegbarkeit": _VERFUEGBARKEIT.get(status, "unbekannt"),
-            "sku": str(v.get("id") or "").strip(),
-            "ean": str(v.get("gtin") or "").strip(),
-            "farbe": farbe,
-            "speicher_gb": speicher_gb,
-            # Der einzige Traeger des Zustands bei congstar - anders als bei
-            # o2 (§29.08.2026) steht er hier NICHT in der Farbe, sondern in
-            # einem eigenen strukturierten Feld. Beides landet gleichwertig
-            # in der Pruefung, siehe Docstring.
-            "zustand_hinweis": str(v.get("condition") or ""),
-            # Die abgerufene Seite IST die Menschenseite - kein separater
-            # Beleglink noetig, siehe Modulkopf.
-            "url": url,
-            "quelle": "congstar_next",
-        })
+        out.append(
+            {
+                "titel": titel,
+                "preis": preis,
+                "waehrung": "EUR",
+                "verfuegbarkeit": _VERFUEGBARKEIT.get(status, "unbekannt"),
+                "sku": str(v.get("id") or "").strip(),
+                "ean": str(v.get("gtin") or "").strip(),
+                "farbe": farbe,
+                "speicher_gb": speicher_gb,
+                # Der einzige Traeger des Zustands bei congstar - anders als bei
+                # o2 (§29.08.2026) steht er hier NICHT in der Farbe, sondern in
+                # einem eigenen strukturierten Feld. Beides landet gleichwertig
+                # in der Pruefung, siehe Docstring.
+                "zustand_hinweis": str(v.get("condition") or ""),
+                # Die abgerufene Seite IST die Menschenseite - kein separater
+                # Beleglink noetig, siehe Modulkopf.
+                "url": url,
+                "quelle": "congstar_next",
+            }
+        )
     return out
 
 
@@ -503,8 +515,9 @@ def _pib_nummer(plan: dict) -> str:
     geraten).
     """
     pid = str(plan.get("id") or "").strip()
-    url = str(((plan.get("media") or {}).get("productInformationSheetUrl"))
-              or "").strip()
+    url = str(
+        ((plan.get("media") or {}).get("productInformationSheetUrl")) or ""
+    ).strip()
     treffer = _PIB_NR_RE.search(url)
     if not treffer or not pid or treffer.group(1) != pid:
         return ""
@@ -552,28 +565,38 @@ def _rabatt_aktionen(preis: dict, art: str, url: str) -> list[dict]:
         bedingung = str(rabatt.get("footnoteText") or "").strip()
         betrag = _preis(rabatt.get("amount"))
         if not bedingung or betrag is None or betrag <= 0:
-            log.info("congstar-Aktion ohne Fussnote oder Betrag - "
-                     "uebergangen: %r", rabatt)
+            log.info(
+                "congstar-Aktion ohne Fussnote oder Betrag - uebergangen: %r", rabatt
+            )
             continue
-        satz = {"art": art, "bedingung": bedingung, "quelle_url": url,
-                "eingerechnet": not rabatt.get("ignoreForPriceCalculation"),
-                "gueltig_bis": _gueltig_bis(bedingung)}
+        satz = {
+            "art": art,
+            "bedingung": bedingung,
+            "quelle_url": url,
+            "eingerechnet": not rabatt.get("ignoreForPriceCalculation"),
+            "gueltig_bis": _gueltig_bis(bedingung),
+        }
         typ = str(rabatt.get("iterationType") or "").upper()
         if typ == "ONGOING":
             satz["betrag_monatlich"] = betrag
-        elif (typ == "LIMITED" and (wiederholungen := laufzeit_in_monaten(
-                rabatt.get("iterations"))) is not None):
+        elif (
+            typ == "LIMITED"
+            and (wiederholungen := laufzeit_in_monaten(rabatt.get("iterations")))
+            is not None
+        ):
             satz["betrag"] = round(betrag * wiederholungen, 2)
         else:
-            log.info("congstar-Aktion mit unbekannter Dauer (%r, %r) - "
-                     "uebergangen", typ, rabatt.get("iterations"))
+            log.info(
+                "congstar-Aktion mit unbekannter Dauer (%r, %r) - uebergangen",
+                typ,
+                rabatt.get("iterations"),
+            )
             continue
         out.append(satz)
     return out
 
 
-def _trade_in_aktion(trade_in: dict, gesamt_ohne: float,
-                     url: str) -> Optional[dict]:
+def _trade_in_aktion(trade_in: dict, gesamt_ohne: float, url: str) -> Optional[dict]:
     """Die TRADE_IN-Zahlweise als Aktion (P3-E3) - NICHT eingerechnet, sie
     setzt die Einnahme eines Altgeraets voraus.
 
@@ -585,16 +608,25 @@ def _trade_in_aktion(trade_in: dict, gesamt_ohne: float,
     vorteil = _preis((trade_in.get("benefit") or {}).get("amount"))
     gesamt_mit = _preis(trade_in.get("total"))
     if vorteil is None or vorteil <= 0 or gesamt_mit is None:
-        log.info("congstar-Trade-in ohne Vorteil oder Gesamtbetrag - "
-                 "uebergangen")
+        log.info("congstar-Trade-in ohne Vorteil oder Gesamtbetrag - uebergangen")
         return None
     if abs((gesamt_ohne - gesamt_mit) - vorteil) > _TRADE_IN_TOLERANZ_EUR:
-        log.info("congstar-Trade-in: %.2f - %.2f ist nicht der genannte "
-                 "Vorteil %.2f - verworfen", gesamt_ohne, gesamt_mit, vorteil)
+        log.info(
+            "congstar-Trade-in: %.2f - %.2f ist nicht der genannte "
+            "Vorteil %.2f - verworfen",
+            gesamt_ohne,
+            gesamt_mit,
+            vorteil,
+        )
         return None
-    return {"art": AKTION_TRADE_IN, "bedingung": TRADE_IN_BEDINGUNG,
-            "quelle_url": url, "betrag": vorteil, "eingerechnet": False,
-            "gueltig_bis": ""}
+    return {
+        "art": AKTION_TRADE_IN,
+        "bedingung": TRADE_IN_BEDINGUNG,
+        "quelle_url": url,
+        "betrag": vorteil,
+        "eingerechnet": False,
+        "gueltig_bis": "",
+    }
 
 
 def _buendelzahlweisen(variante: dict, url: str = "") -> dict:
@@ -619,50 +651,70 @@ def _buendelzahlweisen(variante: dict, url: str = "") -> dict:
         if not isinstance(zahlweise, dict):
             continue
         if zahlweise.get("type") != "INSTALLMENT_PLAN":
-            continue          # ONE_TIME_PURCHASE ist der Barpreis (lies, oben)
+            continue  # ONE_TIME_PURCHASE ist der Barpreis (lies, oben)
         subtyp = str(zahlweise.get("subtype") or "").upper()
         if subtyp == "TRADE_IN":
             dauer_ti = laufzeit_in_monaten(zahlweise.get("contractDuration"))
             if dauer_ti is not None:
                 trade_in.setdefault(dauer_ti, zahlweise)
         if subtyp != "UNSPECIFIED":
-            continue          # TRADE_IN setzt die Einnahme eines Altgeraets voraus
+            continue  # TRADE_IN setzt die Einnahme eines Altgeraets voraus
         # Die Dauer wird als ZAHL gelesen, nicht am JSON-Typ gemessen:
         # "36" ist dieselbe Laufzeit wie 36 (Modulkopf, FIX3).
         dauer = laufzeit_in_monaten(zahlweise.get("contractDuration"))
         if dauer is None:
-            log.info("congstar-Buendel: Zahlweise ohne lesbare "
-                     "contractDuration (%r) - uebergangen",
-                     zahlweise.get("contractDuration"))
+            log.info(
+                "congstar-Buendel: Zahlweise ohne lesbare "
+                "contractDuration (%r) - uebergangen",
+                zahlweise.get("contractDuration"),
+            )
             continue
         if dauer not in _RATENLAUFZEITEN:
-            log.info("congstar-Buendel: Zahlweise ueber %d Monate steht "
-                     "nicht in den erhobenen Ratenlaufzeiten %s - "
-                     "uebergangen", dauer, list(_RATENLAUFZEITEN))
+            log.info(
+                "congstar-Buendel: Zahlweise ueber %d Monate steht "
+                "nicht in den erhobenen Ratenlaufzeiten %s - "
+                "uebergangen",
+                dauer,
+                list(_RATENLAUFZEITEN),
+            )
             continue
         if dauer in gefunden:
-            log.info("congstar-Buendel: zweite Zahlweise ueber %d Monate - "
-                     "die erste lesbare gilt, diese uebergangen", dauer)
+            log.info(
+                "congstar-Buendel: zweite Zahlweise ueber %d Monate - "
+                "die erste lesbare gilt, diese uebergangen",
+                dauer,
+            )
             continue
         anzahlung = _preis((zahlweise.get("oneTime") or {}).get("discounted"))
         rate = _preis((zahlweise.get("recurring") or {}).get("discounted"))
         gesamt = _preis(zahlweise.get("total"))
         if anzahlung is None or rate is None or gesamt is None:
-            log.info("congstar-Buendel: %d-Monats-Zahlweise ohne "
-                     "vollstaendige Betraege (Zuzahlung %r, Rate %r, "
-                     "Gesamt %r) - uebergangen", dauer, anzahlung, rate,
-                     gesamt)
+            log.info(
+                "congstar-Buendel: %d-Monats-Zahlweise ohne "
+                "vollstaendige Betraege (Zuzahlung %r, Rate %r, "
+                "Gesamt %r) - uebergangen",
+                dauer,
+                anzahlung,
+                rate,
+                gesamt,
+            )
             continue
         if not probe_geht_auf(anzahlung, rate, dauer, gesamt):
-            log.info("congstar-Buendel: %s-Monats-Zahlweise ohne "
-                     "aufgehende Rechenprobe - verworfen", dauer)
+            log.info(
+                "congstar-Buendel: %s-Monats-Zahlweise ohne "
+                "aufgehende Rechenprobe - verworfen",
+                dauer,
+            )
             continue
-        aktionen = (_rabatt_aktionen(zahlweise.get("oneTime"),
-                                     AKTION_GERAETERABATT, url)
-                    + _rabatt_aktionen(zahlweise.get("recurring"),
-                                       AKTION_GERAETERABATT, url))
-        gefunden[dauer] = {"zuzahlung": anzahlung, "rate": rate,
-                           "gesamt": gesamt, "aktionen": aktionen}
+        aktionen = _rabatt_aktionen(
+            zahlweise.get("oneTime"), AKTION_GERAETERABATT, url
+        ) + _rabatt_aktionen(zahlweise.get("recurring"), AKTION_GERAETERABATT, url)
+        gefunden[dauer] = {
+            "zuzahlung": anzahlung,
+            "rate": rate,
+            "gesamt": gesamt,
+            "aktionen": aktionen,
+        }
     for dauer, form in gefunden.items():
         if dauer in trade_in:
             aktion = _trade_in_aktion(trade_in[dauer], form["gesamt"], url)
@@ -742,40 +794,49 @@ def _produktseiten_plaene(nutzlast: str) -> Optional[list[dict]]:
     tarife = _json_unter(nutzlast, "prefetchedPlans")
     if not isinstance(geraet, dict) or not isinstance(tarife, list):
         return None
-    varianten = {v.get("id"): v for v in (geraet.get("variants") or [])
-                 if isinstance(v, dict)}
-    planvarianten = {pv.get("id"): pv for tarif in tarife
-                     if isinstance(tarif, dict)
-                     for pv in (tarif.get("variants") or [])
-                     if isinstance(pv, dict)}
+    varianten = {
+        v.get("id"): v for v in (geraet.get("variants") or []) if isinstance(v, dict)
+    }
+    planvarianten = {
+        pv.get("id"): pv
+        for tarif in tarife
+        if isinstance(tarif, dict)
+        for pv in (tarif.get("variants") or [])
+        if isinstance(pv, dict)
+    }
     out: list[dict] = []
     for tarif in preise:
-        for pv in ((tarif or {}).get("variants") or []):
+        for pv in (tarif or {}).get("variants") or []:
             if not isinstance(pv, dict):
                 continue
             plan = planvarianten.get(pv.get("id"))
             if plan is None:
-                log.info("congstar-Produktseite: Preise fuer PlanVariant %r "
-                         "ohne Tarifknoten - uebergangen", pv.get("id"))
+                log.info(
+                    "congstar-Produktseite: Preise fuer PlanVariant %r "
+                    "ohne Tarifknoten - uebergangen",
+                    pv.get("id"),
+                )
                 continue
             zusammen: list[dict] = []
-            for dev in (pv.get("devices") or []):
-                for v in ((dev or {}).get("variants") or []):
+            for dev in pv.get("devices") or []:
+                for v in (dev or {}).get("variants") or []:
                     if not isinstance(v, dict):
                         continue
                     meta = varianten.get(v.get("id"))
                     if meta is None:
-                        log.info("congstar-Produktseite: Preise fuer "
-                                 "Variante %r ohne Geraeteknoten - "
-                                 "uebergangen", v.get("id"))
+                        log.info(
+                            "congstar-Produktseite: Preise fuer "
+                            "Variante %r ohne Geraeteknoten - "
+                            "uebergangen",
+                            v.get("id"),
+                        )
                         continue
                     zusammen.append({**meta, "prices": v.get("prices")})
             out.append({**plan, "devices": [{"variants": zusammen}]})
     return out
 
 
-def lies_buendel(text: str, url: str = "",
-                 proben: Optional[dict] = None) -> list[dict]:
+def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> list[dict]:
     """Je (PlanVariant x Geraet x Speicher x Laufzeit) einen
     Buendel-Rohsatz - aus einer PRODUKTseite (die ganze Tarifmatrix eines
     Geraets, siehe `_produktseiten_plaene`) oder aus einer Tarifseite
@@ -791,7 +852,8 @@ def lies_buendel(text: str, url: str = "",
     nutzlast = _nutzlast(text)
     if not nutzlast:
         raise GeraeteAbrufFehler(
-            "congstar-Seite ohne Next.js-Flight-Nutzlast (self.__next_f)")
+            "congstar-Seite ohne Next.js-Flight-Nutzlast (self.__next_f)"
+        )
     plaene = _produktseiten_plaene(nutzlast)
     quelle = "congstar_produktseite"
     if plaene is None:
@@ -801,7 +863,8 @@ def lies_buendel(text: str, url: str = "",
         raise GeraeteAbrufFehler(
             "congstar-Seite weder mit prefetchedPlansWithDevicesPrices "
             "(Produktseite) noch mit prefetchedPlan.variants (Tarifseite) - "
-            "keine Buendelantwort")
+            "keine Buendelantwort"
+        )
 
     out: list[dict] = []
     for plan in plaene:
@@ -821,20 +884,21 @@ def _saetze_eines_plans(plan: dict, url: str, quelle: str) -> list[dict]:
     if tarif_monatlich is None:
         # Ohne Tarifpreis ist keine Buendelaussage moeglich - derselbe
         # Grund wie beim Telekom-selectedPlan ohne recurringFee.
-        log.info("congstar-Buendel: PlanVariant %r ohne Tarifpreis - "
-                 "uebersprungen", tarif_name)
+        log.info(
+            "congstar-Buendel: PlanVariant %r ohne Tarifpreis - uebersprungen",
+            tarif_name,
+        )
         return out
     anschluss = _preis((preise.get("activation") or {}).get("discounted"))
     tarif_slug = _pib_nummer(plan)
     # Die Aktionen des TARIFS (P3-E3): Grundpreisnachlass und
     # geschenkter Bereitstellungspreis - beide in `discounted` schon
     # enthalten, also `eingerechnet`.
-    tarif_aktionen = (_rabatt_aktionen(preise.get("recurring"),
-                                       AKTION_TARIFRABATT, url)
-                      + _rabatt_aktionen(preise.get("activation"),
-                                         AKTION_ANSCHLUSS_ERLASSEN, url))
+    tarif_aktionen = _rabatt_aktionen(
+        preise.get("recurring"), AKTION_TARIFRABATT, url
+    ) + _rabatt_aktionen(preise.get("activation"), AKTION_ANSCHLUSS_ERLASSEN, url)
 
-    for geraet in (plan.get("devices") or []):
+    for geraet in plan.get("devices") or []:
         if not isinstance(geraet, dict):
             continue
         # JE SPEICHERGROESSE (UND ZUSTAND) EIN SATZ: die Zahlweise ist
@@ -842,7 +906,7 @@ def _saetze_eines_plans(plan: dict, url: str, quelle: str) -> list[dict]:
         # vier Tarifseiten); die erste Variante mit lesbarer Zahlweise
         # vertritt den Satz - dedupliziert, wie der Auftrag es verlangt.
         gesehen: set = set()
-        for variante in (geraet.get("variants") or []):
+        for variante in geraet.get("variants") or []:
             if not isinstance(variante, dict):
                 continue
             speicher = _speicher_gb(variante.get("memory"))
@@ -856,8 +920,7 @@ def _saetze_eines_plans(plan: dict, url: str, quelle: str) -> list[dict]:
             if not titel:
                 continue
             gesehen.add((speicher, zustand))
-            farbe = str((variante.get("color") or {})
-                       .get("name") or "").strip()
+            farbe = str((variante.get("color") or {}).get("name") or "").strip()
             sku = str(variante.get("id") or "").strip()
             ean = str(variante.get("gtin") or "").strip()
             zustand_hinweis = str(variante.get("condition") or "")
@@ -868,35 +931,38 @@ def _saetze_eines_plans(plan: dict, url: str, quelle: str) -> list[dict]:
             # sich also nicht mehr.
             for laufzeit in sorted(formen):
                 form = formen[laufzeit]
-                out.append({
-                    "titel": titel,
-                    "farbe": farbe,
-                    "speicher_gb": speicher,
-                    "sku": sku,
-                    "ean": ean,
-                    # Dasselbe rohe `condition`-Feld wie im Listungsweg -
-                    # die Einordnung leistet `zustand_aus_feldern` ueber
-                    # `lies_listung`, siehe Docstring von `lies()`.
-                    "zustand_hinweis": zustand_hinweis,
-                    "tarif_name": tarif_name,
-                    # Die Pflichtblattnummer, siehe Modulkopf ("DER SLUG
-                    # IST DIE NUMMER DES PFLICHTBLATTS").
-                    "tarif_slug": tarif_slug,
-                    "tarif_monatlich": tarif_monatlich,
-                    "geraet_zuzahlung": form["zuzahlung"],
-                    "geraet_monatsrate": form["rate"],
-                    "anschlusspreis": anschluss,
-                    "laufzeit_monate": laufzeit,
-                    # P3-E3: was an diesem Preis haengt (Tarif und
-                    # Geraet) und was er mit Eintausch noch wird.
-                    "aktionen": [dict(a) for a in
-                                 tarif_aktionen + form["aktionen"]],
-                    # Die gelesene Seite (Produkt- oder Tarifseite) ist
-                    # die Seite, auf der diese Zahlen stehen - dieselbe
-                    # Regel wie bei der Telekom-Kategorie.
-                    "url": url,
-                    "quelle": quelle,
-                })
+                out.append(
+                    {
+                        "titel": titel,
+                        "farbe": farbe,
+                        "speicher_gb": speicher,
+                        "sku": sku,
+                        "ean": ean,
+                        # Dasselbe rohe `condition`-Feld wie im Listungsweg -
+                        # die Einordnung leistet `zustand_aus_feldern` ueber
+                        # `lies_listung`, siehe Docstring von `lies()`.
+                        "zustand_hinweis": zustand_hinweis,
+                        "tarif_name": tarif_name,
+                        # Die Pflichtblattnummer, siehe Modulkopf ("DER SLUG
+                        # IST DIE NUMMER DES PFLICHTBLATTS").
+                        "tarif_slug": tarif_slug,
+                        "tarif_monatlich": tarif_monatlich,
+                        "geraet_zuzahlung": form["zuzahlung"],
+                        "geraet_monatsrate": form["rate"],
+                        "anschlusspreis": anschluss,
+                        "laufzeit_monate": laufzeit,
+                        # P3-E3: was an diesem Preis haengt (Tarif und
+                        # Geraet) und was er mit Eintausch noch wird.
+                        "aktionen": [
+                            dict(a) for a in tarif_aktionen + form["aktionen"]
+                        ],
+                        # Die gelesene Seite (Produkt- oder Tarifseite) ist
+                        # die Seite, auf der diese Zahlen stehen - dieselbe
+                        # Regel wie bei der Telekom-Kategorie.
+                        "url": url,
+                        "quelle": quelle,
+                    }
+                )
     return out
 
 
@@ -916,8 +982,11 @@ def ergaenze_pib_slug(bestand) -> int:
     bleibt unberuehrt, und die Bruecke entsteht bei jedem Lauf neu aus der
     Blattnummer, die der Anbieter in beide Adressen schreibt.
     """
-    saetze = [s for s in bestand.je_id.values()
-              if str(s.get("anbieter") or "").lower() == "congstar"]
+    saetze = [
+        s
+        for s in bestand.je_id.values()
+        if str(s.get("anbieter") or "").lower() == "congstar"
+    ]
     nummern: dict[str, list] = {}
     for satz in saetze:
         treffer = _PIB_NR_RE.search(str(satz.get("dokument_url") or ""))

@@ -44,6 +44,7 @@ Quelle fest, wie viele ihrer Meldungen NEU waren ("new"), und genau daraus
 rechnet scripts/quellen_trefferquote.py. Der historische Bestand ist vor der
 Migration einmal nach data/state/quellen_register.json ausgewertet worden.
 """
+
 from __future__ import annotations
 
 import json
@@ -55,8 +56,9 @@ from .models import Item
 
 log = logging.getLogger(__name__)
 
-KOPFZEILE = ("# telco-radar seen-store v2 - ein Item-Hash je Zeile, '@' setzt "
-             "den Zeitstempel\n")
+KOPFZEILE = (
+    "# telco-radar seen-store v2 - ein Item-Hash je Zeile, '@' setzt den Zeitstempel\n"
+)
 
 
 class SeenStore:
@@ -86,8 +88,9 @@ class SeenStore:
                         try:
                             self._seen.add(json.loads(line)["id"])
                         except (json.JSONDecodeError, KeyError):
-                            log.warning("Ueberspringe defekte Zeile im "
-                                        "Seen-Store: %.80s", line)
+                            log.warning(
+                                "Ueberspringe defekte Zeile im Seen-Store: %.80s", line
+                            )
                         continue
                     self._seen.add(line)
 
@@ -145,7 +148,7 @@ class ReportedTopics:
                             pass
 
     def recent(self) -> list[str]:
-        return [t.get("topic", "") for t in self.topics[-self.max_entries:]]
+        return [t.get("topic", "") for t in self.topics[-self.max_entries :]]
 
     def add(self, topics: list[str], report_date: str) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)

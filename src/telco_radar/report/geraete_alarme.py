@@ -40,6 +40,7 @@ Auskunft, "niemand guenstiger" ist keine. Die Kachel "Gering" zaehlt sie,
 die Tabelle zeigt sie, und die Sortierung stellt sie ans Ende - dort kostet
 ihre Anwesenheit nichts.
 """
+
 from __future__ import annotations
 
 from typing import Optional
@@ -132,9 +133,15 @@ def kacheln(zeilen: list) -> list:
         if not _verglichen(z):
             continue
         gezaehlt[einstufung(_prozent(z))] += 1
-    return [{"schluessel": schluessel, "name": name, "schwelle": schwelle,
-             "zahl": gezaehlt[schluessel]}
-            for schluessel, name, schwelle in STUFEN]
+    return [
+        {
+            "schluessel": schluessel,
+            "name": name,
+            "schwelle": schwelle,
+            "zahl": gezaehlt[schluessel],
+        }
+        for schluessel, name, schwelle in STUFEN
+    ]
 
 
 def _bester(zeile: dict) -> Optional[dict]:
@@ -166,8 +173,9 @@ def zeilen(vergleich: dict, auffaellig: Optional[dict] = None) -> dict:
     """
     auffaellig = auffaellig or {}
     roh = [z for z in (vergleich.get("zeilen") or []) if _verglichen(z)]
-    ohne_wettbewerber = sum(1 for z in (vergleich.get("zeilen") or [])
-                            if not _verglichen(z))
+    ohne_wettbewerber = sum(
+        1 for z in (vergleich.get("zeilen") or []) if not _verglichen(z)
+    )
 
     gebaut = []
     for z in roh:
@@ -175,26 +183,27 @@ def zeilen(vergleich: dict, auffaellig: Optional[dict] = None) -> dict:
         stufe = einstufung(prozent)
         bester = _bester(z)
         alle = _alle_anbieter(z)
-        gebaut.append({
-            "device_id": z.get("device_id"),
-            "modell": z.get("modell"),
-            "hersteller": z.get("hersteller"),
-            "speicher": z.get("speicher"),
-            "zustand": z.get("zustand"),
-            "segment": z.get("segment"),
-            "unser": z.get("vodafone"),
-            "bester": bester,
-            "prozent": prozent,
-            "euro": _euro(z),
-            "stufe": stufe,
-            "stufe_name": dict((s, n) for s, n, _ in STUFEN)[stufe],
-            "alle": alle,
-            "anzahl_alle": len(alle),
-            # Die Markierung haengt am guenstigsten Wettbewerber: er traegt
-            # die Zahl, die in der Zeile steht.
-            "auffaellig": bool(bester
-                               and auffaellig.get(bester.get("listung_id"))),
-        })
+        gebaut.append(
+            {
+                "device_id": z.get("device_id"),
+                "modell": z.get("modell"),
+                "hersteller": z.get("hersteller"),
+                "speicher": z.get("speicher"),
+                "zustand": z.get("zustand"),
+                "segment": z.get("segment"),
+                "unser": z.get("vodafone"),
+                "bester": bester,
+                "prozent": prozent,
+                "euro": _euro(z),
+                "stufe": stufe,
+                "stufe_name": dict((s, n) for s, n, _ in STUFEN)[stufe],
+                "alle": alle,
+                "anzahl_alle": len(alle),
+                # Die Markierung haengt am guenstigsten Wettbewerber: er traegt
+                # die Zahl, die in der Zeile steht.
+                "auffaellig": bool(bester and auffaellig.get(bester.get("listung_id"))),
+            }
+        )
 
     # Nach dem PROZENTABSTAND, absteigend. Zeilen ohne Rueckstand stehen
     # nicht in der Tabelle - sie sind die Kachel "Bestpreis".
@@ -207,11 +216,9 @@ def zeilen(vergleich: dict, auffaellig: Optional[dict] = None) -> dict:
     # ein Fehler aus.
     return {
         "kacheln": kacheln(roh),
-        "marken": sorted({z["hersteller"] for z in mit_rueckstand
-                          if z["hersteller"]}),
+        "marken": sorted({z["hersteller"] for z in mit_rueckstand if z["hersteller"]}),
         "modelle": sorted({z["modell"] for z in mit_rueckstand if z["modell"]}),
-        "speicher": sorted({z["speicher"] for z in mit_rueckstand
-                            if z["speicher"]}),
+        "speicher": sorted({z["speicher"] for z in mit_rueckstand if z["speicher"]}),
         "sichtbar": mit_rueckstand[:SICHTBAR_MAX],
         "rest": mit_rueckstand[SICHTBAR_MAX:],
         "gesamt": len(mit_rueckstand),
@@ -227,8 +234,17 @@ def leer() -> dict:
     Die Vorlage darf nicht wissen muessen, ob es Daten gibt: ein fehlender
     Schluessel in Jinja ist kein Fehler, sondern eine stumm leere Seite.
     """
-    return {"kacheln": [{"schluessel": s, "name": n, "schwelle": w, "zahl": 0}
-                        for s, n, w in STUFEN],
-            "marken": [], "modelle": [], "speicher": [],
-            "sichtbar": [], "rest": [], "gesamt": 0, "verglichen": 0,
-            "ohne_wettbewerber": 0, "hat_daten": False}
+    return {
+        "kacheln": [
+            {"schluessel": s, "name": n, "schwelle": w, "zahl": 0} for s, n, w in STUFEN
+        ],
+        "marken": [],
+        "modelle": [],
+        "speicher": [],
+        "sichtbar": [],
+        "rest": [],
+        "gesamt": 0,
+        "verglichen": 0,
+        "ohne_wettbewerber": 0,
+        "hat_daten": False,
+    }

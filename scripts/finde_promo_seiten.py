@@ -34,6 +34,7 @@ faellt fuer sie automatisch auf reines HTTP zurueck und markiert das im
 Protokoll - ein JS-lastiger Anbieter liefert lokal also weniger Kandidaten
 als in GitHub Actions, aber nie einen falschen.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -57,22 +58,69 @@ from telco_radar.promo_config import _normalize_url, load_promo_config  # noqa: 
 # ("Jetzt zugreifen"), Pfade sind von Redaktionssystemen vergeben und folgen
 # der Struktur des Angebots.
 PFAD_SIGNALE = {
-    "aktion": 3, "aktionen": 3, "angebot": 3, "angebote": 3, "deal": 3,
-    "deals": 3, "promo": 3, "kampagne": 3, "sale": 3, "rabatt": 3,
-    "sparen": 2, "bonus": 2, "praemie": 2, "prämie": 2, "wechsel": 2,
-    "wechselbonus": 3, "wechseln": 2, "neukunden": 2, "black-friday": 3,
-    "blackfriday": 3, "weihnachten": 2, "sommer": 1, "winter": 1,
-    "tarife": 2, "tarif": 2, "handytarife": 2, "handyvertrag": 2,
-    "handys": 2, "smartphones": 2, "handy-mit-vertrag": 3, "prepaid": 2,
-    "esim": 1, "young": 2, "jung": 1, "studenten": 2, "familie": 1,
-    "vorteile": 1, "specials": 2, "special": 2, "highlights": 1,
-    "top-angebote": 3, "guenstig": 1, "günstig": 1,
+    "aktion": 3,
+    "aktionen": 3,
+    "angebot": 3,
+    "angebote": 3,
+    "deal": 3,
+    "deals": 3,
+    "promo": 3,
+    "kampagne": 3,
+    "sale": 3,
+    "rabatt": 3,
+    "sparen": 2,
+    "bonus": 2,
+    "praemie": 2,
+    "prämie": 2,
+    "wechsel": 2,
+    "wechselbonus": 3,
+    "wechseln": 2,
+    "neukunden": 2,
+    "black-friday": 3,
+    "blackfriday": 3,
+    "weihnachten": 2,
+    "sommer": 1,
+    "winter": 1,
+    "tarife": 2,
+    "tarif": 2,
+    "handytarife": 2,
+    "handyvertrag": 2,
+    "handys": 2,
+    "smartphones": 2,
+    "handy-mit-vertrag": 3,
+    "prepaid": 2,
+    "esim": 1,
+    "young": 2,
+    "jung": 1,
+    "studenten": 2,
+    "familie": 1,
+    "vorteile": 1,
+    "specials": 2,
+    "special": 2,
+    "highlights": 1,
+    "top-angebote": 3,
+    "guenstig": 1,
+    "günstig": 1,
 }
 # Woerter im Linktext. Schwaecher gewichtet als der Pfad, aber sie fangen die
 # Faelle, in denen der Pfad nur eine Kampagnen-ID ist.
-TEXT_SIGNALE = ("aktion", "angebot", "deal", "rabatt", "sparen", "bonus",
-                "prämie", "gratis", "kostenlos", "sale", "wechsel", "tarif",
-                "%", "€", "gb ")
+TEXT_SIGNALE = (
+    "aktion",
+    "angebot",
+    "deal",
+    "rabatt",
+    "sparen",
+    "bonus",
+    "prämie",
+    "gratis",
+    "kostenlos",
+    "sale",
+    "wechsel",
+    "tarif",
+    "%",
+    "€",
+    "gb ",
+)
 
 # Pfade, die NIE eine Aktionsseite sind. Ohne diese Liste erntet Stufe 1 vor
 # allem Rechtstexte und Servicebereiche - die tragen dieselben Werbewoerter im
@@ -83,7 +131,8 @@ PFAD_SPERRE = re.compile(
     r"bestell|hilfe|faq|support|kontakt|karriere|jobs|presse-?kontakt|"
     r"suche|search|sitemap|newsletter|filialen|shops?/|store-?finder|"
     r"netzabdeckung|verfuegbarkeit|störung|stoerung|blog/autor)",
-    re.I)
+    re.I,
+)
 # Dateiendungen, die keine Seite sind.
 ENDUNG_SPERRE = re.compile(r"\.(pdf|jpe?g|png|gif|svg|webp|zip|xml|css|js)$", re.I)
 
@@ -91,12 +140,29 @@ ENDUNG_SPERRE = re.compile(r"\.(pdf|jpe?g|png|gif|svg|webp|zip|xml|css|js)$", re
 # den 15 bereits konfigurierten Seiten (dort dominieren /angebote, /aktionen,
 # /handytarife und /deals).
 KANDIDATENPFADE = (
-    "/aktionen", "/angebote", "/deals", "/aktion", "/promotions",
-    "/handytarife", "/handytarife/angebote", "/tarife", "/tarife/aktionen",
-    "/handys", "/handy-mit-vertrag", "/smartphones", "/prepaid",
-    "/wechselbonus", "/wechseln", "/neukunden", "/specials",
-    "/unterwegs/aktionen", "/mobilfunk/aktionen", "/mobilfunk/angebote",
-    "/handytarife/aktionen", "/angebote/aktionen", "/top-angebote",
+    "/aktionen",
+    "/angebote",
+    "/deals",
+    "/aktion",
+    "/promotions",
+    "/handytarife",
+    "/handytarife/angebote",
+    "/tarife",
+    "/tarife/aktionen",
+    "/handys",
+    "/handy-mit-vertrag",
+    "/smartphones",
+    "/prepaid",
+    "/wechselbonus",
+    "/wechseln",
+    "/neukunden",
+    "/specials",
+    "/unterwegs/aktionen",
+    "/mobilfunk/aktionen",
+    "/mobilfunk/angebote",
+    "/handytarife/aktionen",
+    "/angebote/aktionen",
+    "/top-angebote",
 )
 # Deckel je Marke und Stufe. Ein Kandidat kostet spaeter einen vollen
 # Pruefabruf - Breite ist gewollt, Beliebigkeit nicht.
@@ -168,20 +234,26 @@ def ernte_links(html: str, basis_url: str) -> list[dict]:
             continue
         vorher = gefunden.get(url)
         if vorher is None or punkte > vorher["punkte"]:
-            gefunden[url] = {"url": url, "punkte": punkte, "text": text,
-                             "stufe": "linkernte"}
+            gefunden[url] = {
+                "url": url,
+                "punkte": punkte,
+                "text": text,
+                "stufe": "linkernte",
+            }
     return sorted(gefunden.values(), key=lambda k: -k["punkte"])
 
 
-def probiere_pfade(basis_url: str, http_cfg: dict, bekannt: set[str],
-                   workers: int = 6) -> list[dict]:
+def probiere_pfade(
+    basis_url: str, http_cfg: dict, bekannt: set[str], workers: int = 6
+) -> list[dict]:
     """Stufe 2: feste Kandidatenpfade auf der Markendomain durchprobieren.
     Laeuft nur, wenn Stufe 1 wenig brachte - sie erzeugt echten Traffic auf
     Seiten, die es vermutlich gar nicht gibt."""
     t = urlsplit(basis_url)
     wurzel = f"{t.scheme}://{t.netloc}"
-    ziele = [wurzel + p for p in KANDIDATENPFADE
-             if _normalize_url(wurzel + p) not in bekannt]
+    ziele = [
+        wurzel + p for p in KANDIDATENPFADE if _normalize_url(wurzel + p) not in bekannt
+    ]
 
     def einer(url):
         try:
@@ -196,8 +268,12 @@ def probiere_pfade(basis_url: str, http_cfg: dict, bekannt: set[str],
             return None
         if _normalize_url(ziel) in bekannt:
             return None
-        return {"url": ziel, "punkte": _pfad_punkte(ziel) + 2, "text": "",
-                "stufe": "pfadprobe"}
+        return {
+            "url": ziel,
+            "punkte": _pfad_punkte(ziel) + 2,
+            "text": "",
+            "stufe": "pfadprobe",
+        }
 
     with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
         roh = [r for r in pool.map(einer, ziele) if r]
@@ -207,12 +283,12 @@ def probiere_pfade(basis_url: str, http_cfg: dict, bekannt: set[str],
     return sorted(entdoppelt.values(), key=lambda k: -k["punkte"])
 
 
-def suche_fuer_marke(src, http_cfg: dict, je_marke: int,
-                     bekannt_global: set[str]) -> dict:
+def suche_fuer_marke(
+    src, http_cfg: dict, je_marke: int, bekannt_global: set[str]
+) -> dict:
     """Beide Stufen fuer eine Marke. Gibt Kandidaten im Eingabeformat von
     scripts/pruefe_promo_seite.py zurueck."""
-    bericht = {"marke": src.name, "seiten_gelesen": 0, "fehler": [],
-               "kandidaten": []}
+    bericht = {"marke": src.name, "seiten_gelesen": 0, "fehler": [], "kandidaten": []}
     bekannt = set(bekannt_global) | {_normalize_url(p.url) for p in src.pages}
 
     treffer: dict[str, dict] = {}
@@ -231,55 +307,75 @@ def suche_fuer_marke(src, http_cfg: dict, je_marke: int,
                 treffer[k["url"]] = k
 
     if len(treffer) < je_marke:
-        for k in probiere_pfade(src.url, http_cfg, bekannt | set(
-                _normalize_url(u) for u in treffer)):
+        for k in probiere_pfade(
+            src.url, http_cfg, bekannt | set(_normalize_url(u) for u in treffer)
+        ):
             treffer.setdefault(k["url"], k)
 
     beste = sorted(treffer.values(), key=lambda k: (-k["punkte"], k["url"]))[:je_marke]
     bericht["kandidaten"] = [
-        {"marke": src.name, "url": k["url"],
-         # Die Art der Leitseite ist die beste verfuegbare Annahme fuer eine
-         # weitere Seite derselben Marke: JS-Rendering ist eine Eigenschaft
-         # des Frontends, nicht der einzelnen Seite. Der Abnahme-Check misst
-         # danach ohnehin nach, ob unter dieser Annahme Text herauskommt.
-         "kind": src.kind,
-         "punkte": k["punkte"], "stufe": k["stufe"],
-         "begruendung": k["text"] or f"Pfadsignale: {_pfad_punkte(k['url'])}"}
-        for k in beste]
+        {
+            "marke": src.name,
+            "url": k["url"],
+            # Die Art der Leitseite ist die beste verfuegbare Annahme fuer eine
+            # weitere Seite derselben Marke: JS-Rendering ist eine Eigenschaft
+            # des Frontends, nicht der einzelnen Seite. Der Abnahme-Check misst
+            # danach ohnehin nach, ob unter dieser Annahme Text herauskommt.
+            "kind": src.kind,
+            "punkte": k["punkte"],
+            "stufe": k["stufe"],
+            "begruendung": k["text"] or f"Pfadsignale: {_pfad_punkte(k['url'])}",
+        }
+        for k in beste
+    ]
     return bericht
 
 
 def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--root", type=Path, default=Path("."))
-    p.add_argument("--marke", action="append", default=[],
-                   help="nur diese Marke(n); mehrfach angebbar")
+    p.add_argument(
+        "--marke",
+        action="append",
+        default=[],
+        help="nur diese Marke(n); mehrfach angebbar",
+    )
     p.add_argument("--je-marke", type=int, default=MAX_JE_MARKE)
-    p.add_argument("--yaml", type=Path,
-                   help="Kandidaten als Eingabedatei fuer pruefe_promo_seite.py")
+    p.add_argument(
+        "--yaml",
+        type=Path,
+        help="Kandidaten als Eingabedatei fuer pruefe_promo_seite.py",
+    )
     p.add_argument("--workers", type=int, default=4)
     args = p.parse_args()
 
     root = args.root.resolve()
     promo_cfg = load_promo_config(root)
     http_cfg = load_config(root).settings.get("http", {})
-    marken = [s for s in promo_cfg.crawled_sources
-              if not args.marke or s.name in args.marke]
-    bekannt_global = {_normalize_url(p.url) for s in promo_cfg.sources
-                      for p in s.pages}
+    marken = [
+        s for s in promo_cfg.crawled_sources if not args.marke or s.name in args.marke
+    ]
+    bekannt_global = {_normalize_url(p.url) for s in promo_cfg.sources for p in s.pages}
 
-    print(f"Suche weitere Aktionsseiten fuer {len(marken)} Marke(n) "
-          f"(Bestand: {promo_cfg.page_count} Seiten)\n")
+    print(
+        f"Suche weitere Aktionsseiten fuer {len(marken)} Marke(n) "
+        f"(Bestand: {promo_cfg.page_count} Seiten)\n"
+    )
     with ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
-        berichte = list(pool.map(
-            lambda s: suche_fuer_marke(s, http_cfg, args.je_marke, bekannt_global),
-            marken))
+        berichte = list(
+            pool.map(
+                lambda s: suche_fuer_marke(s, http_cfg, args.je_marke, bekannt_global),
+                marken,
+            )
+        )
 
     alle: list[dict] = []
     for b in sorted(berichte, key=lambda b: b["marke"]):
-        print(f"{b['marke']:24} {len(b['kandidaten']):>2} Kandidaten "
-              f"({b['seiten_gelesen']} Bestandsseite(n) gelesen)"
-              + (f"  FEHLER: {'; '.join(b['fehler'])}" if b["fehler"] else ""))
+        print(
+            f"{b['marke']:24} {len(b['kandidaten']):>2} Kandidaten "
+            f"({b['seiten_gelesen']} Bestandsseite(n) gelesen)"
+            + (f"  FEHLER: {'; '.join(b['fehler'])}" if b["fehler"] else "")
+        )
         for k in b["kandidaten"]:
             print(f"      {k['punkte']:>2}  [{k['stufe']:9}] {k['url']}")
         alle.extend(b["kandidaten"])
@@ -288,9 +384,9 @@ def main() -> int:
     if args.yaml:
         args.yaml.parent.mkdir(parents=True, exist_ok=True)
         args.yaml.write_text(
-            yaml.safe_dump({"kandidaten": alle}, allow_unicode=True,
-                           sort_keys=False),
-            encoding="utf-8")
+            yaml.safe_dump({"kandidaten": alle}, allow_unicode=True, sort_keys=False),
+            encoding="utf-8",
+        )
         print(f"Geschrieben: {args.yaml}")
         print(f"Weiter mit: python scripts/pruefe_promo_seite.py {args.yaml}")
     return 0

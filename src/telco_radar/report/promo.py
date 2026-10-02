@@ -38,6 +38,7 @@ Marken ohne bestaetigte Aktion erscheinen weiterhin - als Zeile, nicht als
 leerer Kasten. Sie belegen, dass hingesehen wurde; genau dafuer stehen sie
 auf der Seite (Luecken zeigen statt verstecken).
 """
+
 from __future__ import annotations
 
 import re
@@ -68,7 +69,9 @@ _SICHTBAR = ("aktiv", "evtl. ausgelaufen")
 # 08.08.2026 als Schriftkachel auf der Otelo-Karte.
 _ZAHL_RE = re.compile(
     r"\d[\d.,]*\s?(?:€|Euro|EUR|%|GB|TB|MBit/s|Mbit/s|MB/s|MB|Cent)"
-    r"(?![A-Za-zÄÖÜäöüß])", re.I)
+    r"(?![A-Za-zÄÖÜäöüß])",
+    re.I,
+)
 # Wo eine Ueberschrift ihren ersten Sinnabschnitt beendet. Nur zum
 # ABTRENNEN, nie zum Abschneiden mitten im Wort - die Kachel traegt kein
 # "…" (CLAUDE.md §5: keine gekuerzten Ueberschriften).
@@ -95,8 +98,12 @@ def _rang(src) -> tuple:
     rang = getattr(src, "rang", None)
     if rang:
         return (rang, 0, 0, "")
-    return (RANG_UNGESETZT, getattr(src, "tier", 2) or 2,
-            -(getattr(src, "reach", None) or 0), (getattr(src, "name", "") or "").lower())
+    return (
+        RANG_UNGESETZT,
+        getattr(src, "tier", 2) or 2,
+        -(getattr(src, "reach", None) or 0),
+        (getattr(src, "name", "") or "").lower(),
+    )
 
 
 def _initials(name: str) -> str:
@@ -189,10 +196,12 @@ def _ist_panorama(breite, hoehe) -> bool:
 def _sortierschluessel(offer: dict) -> tuple:
     """Bestes Angebot zuerst: bestaetigt vor Kulanzfrist, dann Score, dann
     zuletzt gesehen. Ein Angebot ohne Score sortiert hinter jedes mit."""
-    return (offer.get("status") == "aktiv",
-            offer.get("score") is not None,
-            offer.get("score") or 0,
-            offer.get("last_verified") or "")
+    return (
+        offer.get("status") == "aktiv",
+        offer.get("score") is not None,
+        offer.get("score") or 0,
+        offer.get("last_verified") or "",
+    )
 
 
 def _andere_mechanik(a: str, b: str) -> bool:
@@ -238,10 +247,15 @@ def _ohne_dubletten(sichtbar: list[dict]) -> list[dict]:
     for eintrag in sichtbar:
         kopf = eintrag.get("headline") or ""
         mech = eintrag.get("mechanic") or ""
-        zwilling = next((b for b in behalten
-                         if _same_offer(kopf, b.get("headline") or "")
-                         and not _andere_mechanik(mech, b.get("mechanic") or "")),
-                        None)
+        zwilling = next(
+            (
+                b
+                for b in behalten
+                if _same_offer(kopf, b.get("headline") or "")
+                and not _andere_mechanik(mech, b.get("mechanic") or "")
+            ),
+            None,
+        )
         if zwilling is None:
             behalten.append(eintrag)
             continue
@@ -304,17 +318,25 @@ def _mechanik_balken(marken: list[dict]) -> list[dict]:
             label = MECHANICS.get(key, "")
             if not label or key == "sonstiges":
                 continue
-            eintrag = zaehler.setdefault(key, {"key": key, "label": label,
-                                               "n": 0, "marken": set()})
+            eintrag = zaehler.setdefault(
+                key, {"key": key, "label": label, "n": 0, "marken": set()}
+            )
             eintrag["n"] += 1
             eintrag["marken"].add(b["name"])
-    balken = sorted(zaehler.values(),
-                    key=lambda z: (len(z["marken"]), z["n"]), reverse=True)
+    balken = sorted(
+        zaehler.values(), key=lambda z: (len(z["marken"]), z["n"]), reverse=True
+    )
     hoechste = max((len(z["marken"]) for z in balken), default=0)
-    return [{"key": z["key"], "label": z["label"], "n": z["n"],
-             "marken": len(z["marken"]),
-             "w": round(100 * len(z["marken"]) / hoechste) if hoechste else 0}
-            for z in balken]
+    return [
+        {
+            "key": z["key"],
+            "label": z["label"],
+            "n": z["n"],
+            "marken": len(z["marken"]),
+            "w": round(100 * len(z["marken"]) / hoechste) if hoechste else 0,
+        }
+        for z in balken
+    ]
 
 
 # Was die grosse Flaeche verlangt. Sie ist bei 1440 px Fensterbreite 579 px
@@ -349,9 +371,13 @@ def _block(brand: dict) -> dict:
     testet.
     """
     karten = [_karte(brand, o) for o in brand["active"]]
-    block = dict(brand, lead=karten[0] if karten else None,
-                 weitere=karten[1:], karten=karten,
-                 top_score=karten[0]["score"] if karten else None)
+    block = dict(
+        brand,
+        lead=karten[0] if karten else None,
+        weitere=karten[1:],
+        karten=karten,
+        top_score=karten[0]["score"] if karten else None,
+    )
     gewichte(block)
     return block
 
@@ -378,8 +404,9 @@ def gewichte(block: dict) -> None:
     weitere = len(block["karten"]) - 1
     # Eine Schriftkachel ist Text und in jeder Groesse scharf - nur ein
     # Rasterbild muss die Flaeche fuellen koennen.
-    bildtauglich = bool(lead) and (not lead["bild"]
-                                  or (lead["bild_w"] or 0) >= LEAD_MIND_BREITE)
+    bildtauglich = bool(lead) and (
+        not lead["bild"] or (lead["bild_w"] or 0) >= LEAD_MIND_BREITE
+    )
     hoch = bildtauglich and weitere >= _HOCH_AB_WEITEREN
     gross = bildtauglich and not (not hoch and weitere == 1)
     block["lead_gross"] = gross
@@ -410,8 +437,7 @@ def _entdoppele_bilder(karten: list[dict]) -> None:
         gesehen.add(k["bild"])
 
 
-def prepare_promo_view(db_entries: list[dict], sources: list,
-                       latest_date: str) -> dict:
+def prepare_promo_view(db_entries: list[dict], sources: list, latest_date: str) -> dict:
     """Baut die Anzeigedaten der Promo-Uebersicht aus den PromoDB-Eintraegen.
 
     "neu" = seit weniger als 10 Tagen zum ersten Mal gesehen, gleiche Regel
@@ -426,7 +452,11 @@ def prepare_promo_view(db_entries: list[dict], sources: list,
     zum Angebot, nicht zum Absender.
     """
     try:
-        cutoff = (datetime.fromisoformat(latest_date) - timedelta(days=10)).date().isoformat()
+        cutoff = (
+            (datetime.fromisoformat(latest_date) - timedelta(days=10))
+            .date()
+            .isoformat()
+        )
     except ValueError:
         cutoff = ""
 
@@ -449,8 +479,12 @@ def prepare_promo_view(db_entries: list[dict], sources: list,
     for src in crawlable:
         eintraege = by_brand_raw.get(src.name, [])
         sichtbar = _ohne_dubletten(
-            sorted((e for e in eintraege if e.get("status") in _SICHTBAR),
-                   key=_sortierschluessel, reverse=True))
+            sorted(
+                (e for e in eintraege if e.get("status") in _SICHTBAR),
+                key=_sortierschluessel,
+                reverse=True,
+            )
+        )
         bestaetigt = [e for e in sichtbar if e.get("status") == "aktiv"]
         beendet = [e for e in eintraege if e.get("status") == _RETIRED_STATUS]
 
@@ -458,27 +492,34 @@ def prepare_promo_view(db_entries: list[dict], sources: list,
             active_total += len(bestaetigt)
             brands_active += 1
 
-        marken.append({
-            "name": src.name, "tier": src.tier, "rang": _rang(src),
-            # Sprungziel fuer die Dossier-Suche: ein Treffer vom Typ "Aktion"
-            # verlinkt hierher. Die Rechnung steht in report/suchindex.py -
-            # dort wird der Link geschrieben, hier der Anker gesetzt, und wenn
-            # die zwei auseinanderlaufen, springt die Suche ins Leere.
-            "anker": marken_anker(src.name),
-            "tier_label": TIER_LABEL.get(src.tier, ""),
-            "color": _OWN_COLOR if src.internal_reference else TIER_COLOR.get(src.tier, "#3860be"),
-            "group": src.group, "url": src.url,
-            "internal_reference": src.internal_reference,
-            "initials": _initials(src.name),
-            "active": sichtbar, "stale": beendet,
-            "active_count": len(bestaetigt),
-            "has_offers": bool(sichtbar),
-        })
+        marken.append(
+            {
+                "name": src.name,
+                "tier": src.tier,
+                "rang": _rang(src),
+                # Sprungziel fuer die Dossier-Suche: ein Treffer vom Typ "Aktion"
+                # verlinkt hierher. Die Rechnung steht in report/suchindex.py -
+                # dort wird der Link geschrieben, hier der Anker gesetzt, und wenn
+                # die zwei auseinanderlaufen, springt die Suche ins Leere.
+                "anker": marken_anker(src.name),
+                "tier_label": TIER_LABEL.get(src.tier, ""),
+                "color": _OWN_COLOR
+                if src.internal_reference
+                else TIER_COLOR.get(src.tier, "#3860be"),
+                "group": src.group,
+                "url": src.url,
+                "internal_reference": src.internal_reference,
+                "initials": _initials(src.name),
+                "active": sichtbar,
+                "stale": beendet,
+                "active_count": len(bestaetigt),
+                "has_offers": bool(sichtbar),
+            }
+        )
 
     # Wettbewerber mit sichtbarem Angebot zuerst, dann nach Anbieterrang;
     # Vodafones eigene Referenzkarte immer als letzte.
-    marken.sort(key=lambda b: (b["internal_reference"], not b["has_offers"],
-                               b["rang"]))
+    marken.sort(key=lambda b: (b["internal_reference"], not b["has_offers"], b["rang"]))
 
     # ----------------------------------------------------------- Bloecke
     # Je Marke ein Block, WICHTIGSTER ANBIETER ZUERST (siehe _rang).
@@ -493,12 +534,14 @@ def prepare_promo_view(db_entries: list[dict], sources: list,
     #
     # Der Score ordnet weiterhin INNERHALB einer Marke (siehe
     # _sortierschluessel) und traegt die Hervorhebung "wichtig".
-    bloecke = [_block(b) for b in marken
-               if b["has_offers"] and not b["internal_reference"]]
+    bloecke = [
+        _block(b) for b in marken if b["has_offers"] and not b["internal_reference"]
+    ]
     bloecke.sort(key=lambda b: b["rang"])
 
-    eigene_marke = next((b for b in marken
-                         if b["internal_reference"] and b["has_offers"]), None)
+    eigene_marke = next(
+        (b for b in marken if b["internal_reference"] and b["has_offers"]), None
+    )
     eigen = _block(eigene_marke) if eigene_marke else None
 
     # Alle Wettbewerberkarten in Seitenreihenfolge - die Grundlage, gegen die
@@ -534,8 +577,13 @@ def prepare_promo_view(db_entries: list[dict], sources: list,
         "mit_bild": sum(1 for k in alle_karten if k["bild"]),
         "bilder_gesamt": sum(1 for b in marken for e in b["active"] if e.get("image")),
         "highlight_count": sum(1 for k in karten if k["highlight"]),
-        "scored_total": sum(1 for b in marken if not b["internal_reference"]
-                            for e in b["active"] if e.get("score") is not None),
+        "scored_total": sum(
+            1
+            for b in marken
+            if not b["internal_reference"]
+            for e in b["active"]
+            if e.get("score") is not None
+        ),
         "active_total": active_total,
         "brands_active": brands_active,
         "brands_tracked": len([s for s in crawlable if not s.internal_reference]),

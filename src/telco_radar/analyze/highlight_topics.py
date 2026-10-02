@@ -30,6 +30,7 @@ Beendete Themen bleiben im Speicher - als Gedaechtnis, damit derselbe
 Samsung-Launch nicht in der uebernaechsten Woche noch einmal als "neu"
 entdeckt wird.
 """
+
 from __future__ import annotations
 
 import itertools
@@ -92,24 +93,68 @@ UEBERLAPPUNG = 0.6
 # Bindewoertern und ganz ohne Ereignis-/Datumssprache ist unspezifisch, egal
 # ob die zwei Woerter zufaellig eine Firma buchstabieren oder etwas anderes -
 # das faengt _spezifitaet() unten pauschal ab.
-RAUSCH_WOERTER = frozenset({
-    "quartal", "quartals", "quartalszahlen", "halbjahr", "geschaeftsjahr",
-    "umsatz", "umsaetze", "ergebnis", "ergebnisse", "gewinn", "verlust",
-    "bilanz", "revenue", "milliarden", "millionen", "prozent",
-    "ersten", "zweiten", "dritten", "vierten",
-})
+RAUSCH_WOERTER = frozenset(
+    {
+        "quartal",
+        "quartals",
+        "quartalszahlen",
+        "halbjahr",
+        "geschaeftsjahr",
+        "umsatz",
+        "umsaetze",
+        "ergebnis",
+        "ergebnisse",
+        "gewinn",
+        "verlust",
+        "bilanz",
+        "revenue",
+        "milliarden",
+        "millionen",
+        "prozent",
+        "ersten",
+        "zweiten",
+        "dritten",
+        "vierten",
+    }
+)
 # Sprache, die ein Ereignis (statt einer Kategorie) benennt - dieselbe Liste
 # traegt den Spezifitaets-Bonus hier UND den Antizipations-Pfad unten
 # (_ankuendigungssprache). Monate zaehlen mit: eine Datumsangabe ist so gut
 # wie ein Eigenname ein Beleg fuer einen konkreten Vorgang statt einer
 # Dauerkategorie.
-_MONATE = ("januar", "februar", "märz", "april", "mai", "juni", "juli",
-          "august", "september", "oktober", "november", "dezember")
+_MONATE = (
+    "januar",
+    "februar",
+    "märz",
+    "april",
+    "mai",
+    "juni",
+    "juli",
+    "august",
+    "september",
+    "oktober",
+    "november",
+    "dezember",
+)
 _ANKUENDIGUNG_WOERTER = (
-    "keynote", "event", "launch", "vorstellung", "vorgestellt",
-    "praesentation", "praesentiert", "ankuendigung", "ankuendigt",
-    "erwartet", "vorbestellung", "vorbestellbar", "marktstart", "erscheint",
-    "unveil", "unveils", "unveiled", "unveiling",
+    "keynote",
+    "event",
+    "launch",
+    "vorstellung",
+    "vorgestellt",
+    "praesentation",
+    "praesentiert",
+    "ankuendigung",
+    "ankuendigt",
+    "erwartet",
+    "vorbestellung",
+    "vorbestellbar",
+    "marktstart",
+    "erscheint",
+    "unveil",
+    "unveils",
+    "unveiled",
+    "unveiling",
 )
 EREIGNIS_WOERTER = frozenset(_MONATE) | frozenset(_ANKUENDIGUNG_WOERTER)
 
@@ -127,11 +172,14 @@ _PRODUKTWORT = re.compile(r"\d")
 # als alle Datumsangaben zusammen. Fuer den Spezifitaets-Bonus zaehlen sie
 # weiter mit (EREIGNIS_WOERTER oben): dort geht es darum, ob ein Wort einen
 # VORGANG benennt, nicht ob er noch bevorsteht.
-_VORAUS_WOERTER = tuple(w for w in _ANKUENDIGUNG_WOERTER
-                        if w not in {"vorgestellt", "praesentiert",
-                                     "unveils", "unveiled"})
+_VORAUS_WOERTER = tuple(
+    w
+    for w in _ANKUENDIGUNG_WOERTER
+    if w not in {"vorgestellt", "praesentiert", "unveils", "unveiled"}
+)
 _ANKUENDIGUNG_WORTMUSTER = re.compile(
-    r"(?<!\w)(?:" + "|".join(_VORAUS_WOERTER) + r")(?!\w)", re.IGNORECASE)
+    r"(?<!\w)(?:" + "|".join(_VORAUS_WOERTER) + r")(?!\w)", re.IGNORECASE
+)
 
 # Eine Monatsangabe MIT Tageszahl, davor oder danach ("9. September" /
 # "September 9"). Ohne Tageszahl waere es keine Terminangabe, sondern eine
@@ -141,7 +189,8 @@ _ANKUENDIGUNG_WORTMUSTER = re.compile(
 _DATUM_MUSTER = re.compile(
     r"(?<!\w)(?P<m1>" + "|".join(_MONATE) + r")(?!\w)\s*(?P<t1>\d{1,2})\b"
     r"|\b(?P<t2>\d{1,2})\.\s*(?P<m2>" + "|".join(_MONATE) + r")(?!\w)",
-    re.IGNORECASE)
+    re.IGNORECASE,
+)
 
 # --- Antizipation -----------------------------------------------------------
 # Ein bevorstehendes Ereignis hat VOR dem Termin naturgemaess ein duennes
@@ -227,17 +276,21 @@ def lade_store(state_dir: Path) -> dict:
 def speichere_store(state_dir: Path, store: dict) -> None:
     pfad = store_pfad(state_dir)
     pfad.parent.mkdir(parents=True, exist_ok=True)
-    pfad.write_text(json.dumps(store, ensure_ascii=False, indent=1),
-                    encoding="utf-8")
+    pfad.write_text(json.dumps(store, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
 def aktive_themen(store: dict) -> list[dict]:
     """Die Themen, die eine Seite bekommen - neueste Aktivitaet zuerst."""
-    aktiv = [t for t in (store.get("topics") or [])
-             if t.get("status") == "aktiv" and t.get("items")]
-    return sorted(aktiv, key=lambda t: (t.get("last_active") or "",
-                                        len(t.get("items") or [])),
-                  reverse=True)
+    aktiv = [
+        t
+        for t in (store.get("topics") or [])
+        if t.get("status") == "aktiv" and t.get("items")
+    ]
+    return sorted(
+        aktiv,
+        key=lambda t: (t.get("last_active") or "", len(t.get("items") or [])),
+        reverse=True,
+    )
 
 
 def lade_themen(state_dir: Path) -> list[dict]:
@@ -246,8 +299,7 @@ def lade_themen(state_dir: Path) -> list[dict]:
 
 
 # ----------------------------------------------------------- Archivzugriff
-def _archiv_highlights(reports_dir: Path, heute: str,
-                       bekannt: set[str]) -> list[dict]:
+def _archiv_highlights(reports_dir: Path, heute: str, bekannt: set[str]) -> list[dict]:
     """Highlights der letzten Ausgaben, per URL entdoppelt gegen `bekannt`.
 
     Jede Meldung traegt ihr Ausgabedatum als `_woche` mit - im Themenspeicher
@@ -287,8 +339,10 @@ def _archiv_highlights(reports_dir: Path, heute: str,
 
 # -------------------------------------------------------- Kandidatensuche
 def _text(h: dict) -> str:
-    return (f"{h.get('headline') or ''} {h.get('operator') or ''} "
-            f"{h.get('title') or ''} {h.get('summary') or ''}")
+    return (
+        f"{h.get('headline') or ''} {h.get('operator') or ''} "
+        f"{h.get('title') or ''} {h.get('summary') or ''}"
+    )
 
 
 def _rang(h: dict) -> tuple:
@@ -323,8 +377,9 @@ def _seltenheitsdeckel(n: int, ausgaben: int = 1) -> int:
     return max(2 * MIND_MELDUNGEN, je_ausgabe // 5)
 
 
-def _gruppen(kandidaten_items: list[dict], *, mind_meldungen: int,
-            mind_quellen: int) -> tuple[list[dict], list[list[str]], dict[str, int]]:
+def _gruppen(
+    kandidaten_items: list[dict], *, mind_meldungen: int, mind_quellen: int
+) -> tuple[list[dict], list[list[str]], dict[str, int]]:
     """Wortpaar-Gruppen roh, ohne Aktualitaets- oder Rangfilter jenseits der
     uebergebenen Schwellen - die gemeinsame Mechanik von finde_kandidaten()
     und finde_antizipation(). Nur Gruppengroesse und Quellenzahl unterscheiden
@@ -345,9 +400,10 @@ def _gruppen(kandidaten_items: list[dict], *, mind_meldungen: int,
     haeufigkeit = haeufigkeiten(mengen)
     ausgaben = len({h.get("_woche") or "" for h in kandidaten_items})
     deckel = _seltenheitsdeckel(len(kandidaten_items), ausgaben)
-    selten = [sorted(w for w in m
-                     if MIND_WORTHAEUFIGKEIT <= haeufigkeit[w] <= deckel)
-              for m in mengen]
+    selten = [
+        sorted(w for w in m if MIND_WORTHAEUFIGKEIT <= haeufigkeit[w] <= deckel)
+        for m in mengen
+    ]
 
     paare: dict[tuple[str, ...], list[int]] = {}
     for i, woerter in enumerate(selten):
@@ -377,10 +433,16 @@ def _gruppen(kandidaten_items: list[dict], *, mind_meldungen: int,
     return gruppen, selten, haeufigkeit
 
 
-def _kandidat_aus_gruppe(kandidaten_items: list[dict], idx: set[int],
-                         worte: set[str], selten: list[list[str]],
-                         haeufigkeit: dict[str, int], *, mind_meldungen: int,
-                         mind_quellen: int) -> dict | None:
+def _kandidat_aus_gruppe(
+    kandidaten_items: list[dict],
+    idx: set[int],
+    worte: set[str],
+    selten: list[list[str]],
+    haeufigkeit: dict[str, int],
+    *,
+    mind_meldungen: int,
+    mind_quellen: int,
+) -> dict | None:
     """Eine Wortpaar-Gruppe zu Ende geprueft (Groesse, Quellen, Aktualitaet)
     und in die Kandidatenform gebracht - oder None, wenn sie an einer der
     Schwellen scheitert. `worte` traegt nur die Gewichtsrechnung; die
@@ -400,11 +462,17 @@ def _kandidat_aus_gruppe(kandidaten_items: list[dict], idx: set[int],
         return None
     zaehler = haeufigkeiten(selten[i] for i in idx)
     schwelle = max(2, len(idx) // 3)
-    tragend = sorted((w for w, n in zaehler.items() if n >= schwelle),
-                     key=lambda w: (-zaehler[w], haeufigkeit[w], w))[:8]
-    return {"items": items, "worte": tragend, "quellen": len(quellen),
-            "gewicht": gewicht(worte, haeufigkeit),
-            "spezifitaet": _spezifitaet(tragend)}
+    tragend = sorted(
+        (w for w, n in zaehler.items() if n >= schwelle),
+        key=lambda w: (-zaehler[w], haeufigkeit[w], w),
+    )[:8]
+    return {
+        "items": items,
+        "worte": tragend,
+        "quellen": len(quellen),
+        "gewicht": gewicht(worte, haeufigkeit),
+        "spezifitaet": _spezifitaet(tragend),
+    }
 
 
 def _spezifitaet(worte) -> float:
@@ -462,13 +530,20 @@ def finde_kandidaten(highlights: list[dict]) -> list[dict]:
     """
     kandidaten_items = [h for h in (highlights or []) if h.get("url")]
     gruppen, selten, haeufigkeit = _gruppen(
-        kandidaten_items, mind_meldungen=MIND_MELDUNGEN, mind_quellen=MIND_QUELLEN)
+        kandidaten_items, mind_meldungen=MIND_MELDUNGEN, mind_quellen=MIND_QUELLEN
+    )
 
     out: list[dict] = []
     for g in gruppen:
         kandidat = _kandidat_aus_gruppe(
-            kandidaten_items, g["idx"], g["worte"], selten, haeufigkeit,
-            mind_meldungen=MIND_MELDUNGEN, mind_quellen=MIND_QUELLEN)
+            kandidaten_items,
+            g["idx"],
+            g["worte"],
+            selten,
+            haeufigkeit,
+            mind_meldungen=MIND_MELDUNGEN,
+            mind_quellen=MIND_QUELLEN,
+        )
         if kandidat is not None:
             out.append(kandidat)
     out.sort(key=lambda g: (-g["spezifitaet"], -len(g["items"]), -g["gewicht"]))
@@ -498,7 +573,7 @@ def _kuenftiger_termin(text: str, heute: date | None) -> bool:
             nummer = _MONATE.index(monat) + 1
             termin = date(heute.year, nummer, int(tag))
         except ValueError:
-            continue                     # z.B. "31. Februar"
+            continue  # z.B. "31. Februar"
         if termin < heute:
             try:
                 termin = date(heute.year + 1, nummer, int(tag))
@@ -513,9 +588,12 @@ def _ankuendigungstreffer(items: list[dict], heute: date | None) -> int:
     """Wie viele Meldungen der Gruppe nach VORNE zeigen - Ankuendigungs-
     vokabular oder ein noch bevorstehender Termin, gemessen auf dem
     FLIESSTEXT (`_text(h)`), nicht auf den seltenen Bindewoertern."""
-    return sum(1 for h in items
-               if _ANKUENDIGUNG_WORTMUSTER.search(_text(h))
-               or _kuenftiger_termin(_text(h), heute))
+    return sum(
+        1
+        for h in items
+        if _ANKUENDIGUNG_WORTMUSTER.search(_text(h))
+        or _kuenftiger_termin(_text(h), heute)
+    )
 
 
 def _ankuendigungssprache(items: list[dict], heute: date | None = None) -> bool:
@@ -567,21 +645,32 @@ def finde_antizipation(highlights: list[dict], heute: str = "") -> list[dict]:
         stichtag = None
     kandidaten_items = [h for h in (highlights or []) if h.get("url")]
     gruppen, selten, haeufigkeit = _gruppen(
-        kandidaten_items, mind_meldungen=MIND_MELDUNGEN_ANTIZIPATION,
-        mind_quellen=MIND_QUELLEN_ANTIZIPATION)
+        kandidaten_items,
+        mind_meldungen=MIND_MELDUNGEN_ANTIZIPATION,
+        mind_quellen=MIND_QUELLEN_ANTIZIPATION,
+    )
 
     out: list[dict] = []
     for g in gruppen:
         kandidat = _kandidat_aus_gruppe(
-            kandidaten_items, g["idx"], g["worte"], selten, haeufigkeit,
+            kandidaten_items,
+            g["idx"],
+            g["worte"],
+            selten,
+            haeufigkeit,
             mind_meldungen=MIND_MELDUNGEN_ANTIZIPATION,
-            mind_quellen=MIND_QUELLEN_ANTIZIPATION)
-        if kandidat is not None and _ankuendigungssprache(kandidat["items"],
-                                                          stichtag):
+            mind_quellen=MIND_QUELLEN_ANTIZIPATION,
+        )
+        if kandidat is not None and _ankuendigungssprache(kandidat["items"], stichtag):
             kandidat["bevorstehend"] = True
             out.append(kandidat)
-    out.sort(key=lambda g: (-_ankuendigungsdichte(g, stichtag),
-                            -len(g["items"]), -g["gewicht"]))
+    out.sort(
+        key=lambda g: (
+            -_ankuendigungsdichte(g, stichtag),
+            -len(g["items"]),
+            -g["gewicht"],
+        )
+    )
     return out[:MAX_ANTIZIPATION]
 
 
@@ -646,8 +735,9 @@ def _einsortieren(thema: dict, highlights: list[dict], woche: str) -> int:
         bekannt.add(url)
         neu += 1
     if neu:
-        thema["items"] = sorted(thema["items"], key=_rang,
-                                reverse=True)[:MAX_ITEMS_JE_THEMA]
+        thema["items"] = sorted(thema["items"], key=_rang, reverse=True)[
+            :MAX_ITEMS_JE_THEMA
+        ]
     return neu
 
 
@@ -694,26 +784,40 @@ Kein weiterer Text.
 
 
 def _agent_payload(kandidaten: list[dict], laufende: list[dict]) -> str:
-    return json.dumps({
-        "laufende_themen": [
-            {"slug": t.get("slug"), "titel": t.get("title"),
-             "suchwoerter": t.get("keywords") or []}
-            for t in laufende],
-        "kandidaten": [
-            {"i": i,
-             "verbindende_woerter": k["worte"],
-             "bevorstehendes_ereignis": bool(k.get("bevorstehend")),
-             "meldungen": [
-                 {"titel": h.get("headline") or h.get("title") or "",
-                  "zusammenfassung": (h.get("summary") or "")[:300],
-                  "quelle": h.get("source") or ""}
-                 for h in k["items"][:12]]}
-            for i, k in enumerate(kandidaten)],
-    }, ensure_ascii=False)
+    return json.dumps(
+        {
+            "laufende_themen": [
+                {
+                    "slug": t.get("slug"),
+                    "titel": t.get("title"),
+                    "suchwoerter": t.get("keywords") or [],
+                }
+                for t in laufende
+            ],
+            "kandidaten": [
+                {
+                    "i": i,
+                    "verbindende_woerter": k["worte"],
+                    "bevorstehendes_ereignis": bool(k.get("bevorstehend")),
+                    "meldungen": [
+                        {
+                            "titel": h.get("headline") or h.get("title") or "",
+                            "zusammenfassung": (h.get("summary") or "")[:300],
+                            "quelle": h.get("source") or "",
+                        }
+                        for h in k["items"][:12]
+                    ],
+                }
+                for i, k in enumerate(kandidaten)
+            ],
+        },
+        ensure_ascii=False,
+    )
 
 
-def befrage_agent(kandidaten: list[dict], laufende: list[dict],
-                  model: str) -> list[dict]:
+def befrage_agent(
+    kandidaten: list[dict], laufende: list[dict], model: str
+) -> list[dict]:
     """Das Urteil des Themen-Agenten, ein Eintrag je Kandidat.
 
     max_tokens ist bewusst gross: bei Reasoning-Modellen frisst die Denkspur
@@ -721,8 +825,12 @@ def befrage_agent(kandidaten: list[dict], laufende: list[dict],
     (CLAUDE.md §6, Laeufe #83-85). 8000 ist die Untergrenze, die sich
     bewaehrt hat.
     """
-    roh = complete(_AGENT_SYSTEM, _agent_payload(kandidaten, laufende),
-                   model=model, max_tokens=_TOKENS)
+    roh = complete(
+        _AGENT_SYSTEM,
+        _agent_payload(kandidaten, laufende),
+        model=model,
+        max_tokens=_TOKENS,
+    )
     urteile = extract_json(roh)
     if not isinstance(urteile, list):
         raise ValueError("Themen-Agent lieferte kein JSON-Array")
@@ -868,10 +976,14 @@ def _passendes_thema(suchwoerter, themen: list[dict]) -> dict | None:
     return None
 
 
-def pflege_highlight_themen(highlights: list[dict], state_dir: Path,
-                            heute: str, model: str | None = None,
-                            use_llm: bool = False,
-                            reports_dir: Path | None = None) -> dict:
+def pflege_highlight_themen(
+    highlights: list[dict],
+    state_dir: Path,
+    heute: str,
+    model: str | None = None,
+    use_llm: bool = False,
+    reports_dir: Path | None = None,
+) -> dict:
     """Ein Lauf Themenpflege. Gibt eine Bilanz fuer das Protokoll zurueck.
 
     Failsafe an genau einer Stelle: scheitert der Agent, entstehen KEINE
@@ -898,21 +1010,27 @@ def pflege_highlight_themen(highlights: list[dict], state_dir: Path,
     basis = [h for h in (highlights or []) if h.get("url")]
     if reports_dir is not None:
         basis = basis + _archiv_highlights(
-            Path(reports_dir), heute, bekannt={h["url"] for h in basis})
+            Path(reports_dir), heute, bekannt={h["url"] for h in basis}
+        )
     kandidaten = finde_kandidaten(basis)
     # Der Antizipations-Pfad konkurriert nicht um MAX_KANDIDATEN - er wird
     # ZUSAETZLICH vorgelegt, aber nicht fuer eine Gruppe, die schon unter den
     # Top-Kandidaten steht (sonst saehe der Agent dieselbe Gruppe zweimal).
     kandidaten = kandidaten + [
-        k for k in finde_antizipation(basis, heute)
-        if not any(_ueberschneidet(k, vorhanden) for vorhanden in kandidaten)]
+        k
+        for k in finde_antizipation(basis, heute)
+        if not any(_ueberschneidet(k, vorhanden) for vorhanden in kandidaten)
+    ]
     # Was ein beendetes Thema schon einmal war, wird nicht noch einmal neu
     # entdeckt - genau dafuer bleiben beendete Themen im Speicher. Und was
     # ein AKTIVES Thema schon traegt, wird dem Agenten nicht erneut
     # vorgelegt.
-    kandidaten = [k for k in kandidaten
-                  if _passendes_thema(k["worte"], beendete) is None
-                  and not _schon_erfasst(k, laufende)]
+    kandidaten = [
+        k
+        for k in kandidaten
+        if _passendes_thema(k["worte"], beendete) is None
+        and not _schon_erfasst(k, laufende)
+    ]
 
     neu_angelegt: list[str] = []
     agent_fehler = ""
@@ -921,8 +1039,11 @@ def pflege_highlight_themen(highlights: list[dict], state_dir: Path,
             urteile = befrage_agent(kandidaten, laufende, model)
         except Exception as exc:  # noqa: BLE001
             agent_fehler = str(exc)[:200]
-            log.warning("Themen-Agent fehlgeschlagen (%s) - dieser Lauf legt "
-                        "kein neues Thema an", agent_fehler)
+            log.warning(
+                "Themen-Agent fehlgeschlagen (%s) - dieser Lauf legt "
+                "kein neues Thema an",
+                agent_fehler,
+            )
             urteile = []
         vergeben = {t.get("slug") for t in themen}
         for u in urteile:
@@ -933,7 +1054,9 @@ def pflege_highlight_themen(highlights: list[dict], state_dir: Path,
             if not (0 <= i < len(kandidaten)) or not u.get("thema"):
                 continue
             kandidat = kandidaten[i]
-            suchwoerter = [str(w) for w in (u.get("suchwoerter") or []) if str(w).strip()]
+            suchwoerter = [
+                str(w) for w in (u.get("suchwoerter") or []) if str(w).strip()
+            ]
             titel = " ".join(str(u.get("titel") or "").split())
             if not titel or len(suchwoerter) < MIND_GEMEINSAM:
                 continue
@@ -941,11 +1064,16 @@ def pflege_highlight_themen(highlights: list[dict], state_dir: Path,
             # Datum an einem bereits eingetretenen Ereignis darf die Alterung
             # nicht aussetzen (der Prompt verlangt das ohnehin, hier zaehlt
             # es doppelt).
-            event_datum = (_valid_iso_datum(u.get("event_datum"), heute)
-                           if u.get("bevorstehend") else "")
+            event_datum = (
+                _valid_iso_datum(u.get("event_datum"), heute)
+                if u.get("bevorstehend")
+                else ""
+            )
 
-            ziel = next((t for t in laufende
-                         if t.get("slug") == (u.get("gehoert_zu") or "")), None)
+            ziel = next(
+                (t for t in laufende if t.get("slug") == (u.get("gehoert_zu") or "")),
+                None,
+            )
             ziel = ziel or _passendes_thema(suchwoerter, laufende)
             if ziel is None and slug(titel) in vergeben:
                 # Gleicher Titel, andere Suchwoerter: das ist dasselbe Thema
@@ -955,12 +1083,17 @@ def pflege_highlight_themen(highlights: list[dict], state_dir: Path,
                     continue
             if ziel is not None:
                 bekannt = {i2.get("url") for i2 in ziel.get("items") or []}
-                fuer_ziel = [h for h in kandidat["items"]
-                             if h.get("url") and h["url"] not in bekannt]
+                fuer_ziel = [
+                    h
+                    for h in kandidat["items"]
+                    if h.get("url") and h["url"] not in bekannt
+                ]
                 ziel.setdefault("items", []).extend(
-                    _item(h, h.get("_woche") or heute) for h in fuer_ziel)
-                ziel["items"] = sorted(ziel["items"], key=_rang,
-                                       reverse=True)[:MAX_ITEMS_JE_THEMA]
+                    _item(h, h.get("_woche") or heute) for h in fuer_ziel
+                )
+                ziel["items"] = sorted(ziel["items"], key=_rang, reverse=True)[
+                    :MAX_ITEMS_JE_THEMA
+                ]
                 zuwachs[ziel["slug"]] = zuwachs.get(ziel["slug"], 0) + len(fuer_ziel)
                 # Ein Bestandsthema behaelt sein Datum - nur ein Thema OHNE
                 # eines bekommt hier eines nachgetragen.
@@ -971,13 +1104,17 @@ def pflege_highlight_themen(highlights: list[dict], state_dir: Path,
             s = _freier_slug(titel, vergeben)
             vergeben.add(s)
             thema = {
-                "slug": s, "title": titel,
+                "slug": s,
+                "title": titel,
                 "description": " ".join(str(u.get("leitsatz") or "").split()),
                 "keywords": suchwoerter[:8],
-                "first_seen": heute, "last_active": heute,
-                "runs_ohne_zuwachs": 0, "status": "aktiv",
-                "items": [_item(h, h.get("_woche") or heute)
-                          for h in kandidat["items"]],
+                "first_seen": heute,
+                "last_active": heute,
+                "runs_ohne_zuwachs": 0,
+                "status": "aktiv",
+                "items": [
+                    _item(h, h.get("_woche") or heute) for h in kandidat["items"]
+                ],
             }
             # event_datum bleibt UNGESETZT (nicht leer), wenn der Agent keins
             # nennt oder das Ereignis schon eingetreten ist - Bestandsthemen

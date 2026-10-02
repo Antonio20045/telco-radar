@@ -13,6 +13,7 @@ Fixture: `_baue_buendel_modell` aus der P5-Sichtbarkeits-Datei - ein
 Auto-Modell (iPad Pro 13) mit EINEM Bündel-Messtag, ohne Listung: der
 gemessene iPhone-18-Weg vom 17.09.
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -36,10 +37,18 @@ def _baue_site(tmp_path: pathlib.Path) -> pathlib.Path:
     root, _ = _baue_buendel_modell(tmp_path, ["2026-09-15"])
     reports = root / "data" / "reports"
     reports.mkdir(parents=True, exist_ok=True)
-    (reports / f"{HEUTE}.json").write_text(json.dumps({
-        "date": HEUTE, "language": "de",
-        "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
-        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{HEUTE}.json").write_text(
+        json.dumps(
+            {
+                "date": HEUTE,
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     (reports / f"{HEUTE}.md").write_text("# B\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
@@ -47,10 +56,15 @@ def _baue_site(tmp_path: pathlib.Path) -> pathlib.Path:
 
 
 def _chromium():
-    for muster in ("/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-                   str(pathlib.Path.home() / ".cache/ms-playwright"
-                       / "chromium*/chrome-linux*/chrome"),
-                   "/Applications/Chromium.app/Contents/MacOS/Chromium"):
+    for muster in (
+        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
+        str(
+            pathlib.Path.home()
+            / ".cache/ms-playwright"
+            / "chromium*/chrome-linux*/chrome"
+        ),
+        "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    ):
         treffer = sorted(glob.glob(muster))
         if treffer:
             return treffer[-1]
@@ -63,8 +77,9 @@ def _server(site: pathlib.Path):
     s.bind(("127.0.0.1", 0))
     port = s.getsockname()[1]
     s.close()
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler,
-                                directory=str(site))
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(site)
+    )
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     try:
@@ -77,12 +92,14 @@ def _server(site: pathlib.Path):
 def paar(tmp_path_factory):
     pytest.importorskip("playwright")
     from playwright.sync_api import sync_playwright
+
     site = _baue_site(tmp_path_factory.mktemp("p5-neu"))
     with _server(site) as basis:
         with sync_playwright() as p:
             exe = _chromium()
-            browser = (p.chromium.launch(executable_path=exe) if exe
-                       else p.chromium.launch())
+            browser = (
+                p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
+            )
             seite = browser.new_page(viewport={"width": 1440, "height": 900})
             seite.goto(f"{basis}/geraete.html", wait_until="load")
             yield seite
@@ -104,12 +121,14 @@ def _suche(seite, begriff):
 
 
 def test_null_treffer_mit_katalog_treffer_zeigt_den_neu_hinweis(paar):
-    """"ipad" in die Zeitreihen-Suche: die Wahl kennt das Modell nicht
+    """ "ipad" in die Zeitreihen-Suche: die Wahl kennt das Modell nicht
     (ein Messtag), der Katalog traegt es - der Hinweis nennt Datum und
     fuehrt auf die Katalog-Zeile, der Zaehler sagt "kein Treffer"."""
     _suche(paar, "ipad")
-    assert paar.eval_on_selector("#gr-zr-treffer", "e => e.textContent") \
-        .strip() == "kein Treffer"
+    assert (
+        paar.eval_on_selector("#gr-zr-treffer", "e => e.textContent").strip()
+        == "kein Treffer"
+    )
     hinweis = paar.query_selector(".gr-zr-vorschau a.gr-zr-v-neu")
     assert hinweis is not None, "Neu-Hinweis erscheint nicht"
     assert hinweis.get_attribute("data-modell") == _MID
@@ -123,22 +142,28 @@ def test_der_hinweis_springt_auf_die_katalog_zeile(paar):
     _suche(paar, "ipad")
     paar.click(".gr-zr-vorschau a.gr-zr-v-neu")
     paar.wait_for_timeout(200)
-    assert paar.eval_on_selector(
-        '.gr-reiter button[data-tafel="tafel-katalog"]',
-        "e => e.getAttribute('aria-selected')") == "true", \
-        "der Katalog-Reiter ist nach dem Klick nicht aktiv"
+    assert (
+        paar.eval_on_selector(
+            '.gr-reiter button[data-tafel="tafel-katalog"]',
+            "e => e.getAttribute('aria-selected')",
+        )
+        == "true"
+    ), "der Katalog-Reiter ist nach dem Klick nicht aktiv"
     ziel = paar.query_selector(f'tr.gr-k-zeile[data-modell="{_MID}"]')
     assert ziel is not None, "Katalog-Zeile des Modells fehlt"
-    assert "gr-k-ziel" in (ziel.get_attribute("class") or ""), \
+    assert "gr-k-ziel" in (ziel.get_attribute("class") or ""), (
         "die Zielzeile ist nach dem Sprung nicht markiert"
+    )
 
 
 def test_ohne_katalog_treffer_bleibt_die_vorschau_leer(paar):
     """Ein Begriff, den weder Wahl noch Katalog kennen: nur "kein
     Treffer", kein Zusatz - der Hinweis ist kein Dauerzustand."""
     _suche(paar, "qq")
-    assert paar.eval_on_selector("#gr-zr-treffer", "e => e.textContent") \
-        .strip() == "kein Treffer"
+    assert (
+        paar.eval_on_selector("#gr-zr-treffer", "e => e.textContent").strip()
+        == "kein Treffer"
+    )
     assert paar.query_selector(".gr-zr-vorschau a.gr-zr-v-neu") is None
 
 
@@ -149,5 +174,6 @@ def test_mit_wahl_treffer_steht_kein_neu_hinweis(paar):
     treffer = paar.eval_on_selector("#gr-zr-treffer", "e => e.textContent")
     assert "kein Treffer" not in treffer
     assert paar.query_selector(".gr-zr-vorschau a.gr-zr-v-neu") is None
-    assert paar.query_selector_all(".gr-zr-vorschau button"), \
+    assert paar.query_selector_all(".gr-zr-vorschau button"), (
         "die Trefferliste selbst fehlt - der Test prueft dann nichts"
+    )

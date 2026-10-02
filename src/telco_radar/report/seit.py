@@ -16,6 +16,7 @@ Zeilenliste, und die Vorlage zeigt wieder nur den Stand. Eine Zeile "0 neue
 Beispiele", die jede Woche gleich aussieht, ist Rauschen - dieselbe
 Ueberlegung wie beim Zwei-Minuten-Pfad, der bei leerer Lage ganz wegfaellt.
 """
+
 from __future__ import annotations
 
 # Wie viele Zeilen die Spalte hoechstens traegt. Drei, weil sie neben einer
@@ -53,9 +54,11 @@ def fuer_promo(promo_view: dict) -> dict:
     # die Karte traegt nur, was sie anzeigt.
     angebote = [k.get("offer") or {} for k in (promo_view.get("karten") or [])]
     neu = sum(1 for a in angebote if a.get("neu"))
-    weg = sum(1 for a in angebote
-              if (a.get("status") or "").startswith(("ausgelaufen",
-                                                     "evtl. ausgelaufen")))
+    weg = sum(
+        1
+        for a in angebote
+        if (a.get("status") or "").startswith(("ausgelaufen", "evtl. ausgelaufen"))
+    )
     return _zusammen(
         _zeile(neu, "neue Aktion", "neue Aktionen", "#marken"),
         _zeile(weg, "ausgelaufen", "ausgelaufen", "#marken"),
@@ -71,14 +74,18 @@ def fuer_wettbewerb(wettbewerb: dict, stand: str) -> dict:
     """
     n = 0
     betroffene = set()
-    for c in (wettbewerb.get("wettbewerber") or []):
-        for monat in (c.get("monate") or []):
-            for eintrag in (monat.get("eintraege") or []):
+    for c in wettbewerb.get("wettbewerber") or []:
+        for monat in c.get("monate") or []:
+            for eintrag in monat.get("eintraege") or []:
                 if (eintrag.get("datum") or "") == stand:
                     n += 1
                     betroffene.add(c.get("name"))
     return _zusammen(
         _zeile(n, "neue Meldung", "neue Meldungen", "#chronik"),
-        _zeile(len(betroffene), "Wettbewerber betroffen",
-               "Wettbewerber betroffen", "#chronik"),
+        _zeile(
+            len(betroffene),
+            "Wettbewerber betroffen",
+            "Wettbewerber betroffen",
+            "#chronik",
+        ),
     )

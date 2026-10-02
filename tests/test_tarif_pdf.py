@@ -13,6 +13,7 @@ Suite aus, sobald jemand sie woanders laufen laesst. Deshalb: die Logik
 arbeitet auf Text, und nur der eine Test, der die PDF-Schale prueft,
 ueberspringt sich ohne poppler.
 """
+
 from __future__ import annotations
 
 import shutil
@@ -22,7 +23,11 @@ import pytest
 
 from telco_radar.collect import tarif_pdf
 from telco_radar.collect.tarif_pdf import (
-    PDFNichtLesbar, dokument_hash, ist_tarifdokument, lies_pdf, lies_text,
+    PDFNichtLesbar,
+    dokument_hash,
+    ist_tarifdokument,
+    lies_pdf,
+    lies_text,
 )
 from telco_radar.tarif_model import HOCH, Preisphase, Tarif, normalisiere, zahl
 
@@ -56,6 +61,7 @@ def festnetz() -> Tarif:
 # --------------------------------------------------------------------------- #
 # Telekom MagentaMobil Basic - der vollstaendige Fall
 # --------------------------------------------------------------------------- #
+
 
 def test_basic_anbieter_und_name(basic):
     assert basic.anbieter == "Telekom"
@@ -102,7 +108,7 @@ def test_basic_geschwindigkeit(basic):
 
 
 def test_basic_vertrag(basic):
-    """"Kündigungsfrist ein Monat" - als WORT, nicht als Ziffer."""
+    """ "Kündigungsfrist ein Monat" - als WORT, nicht als Ziffer."""
     assert basic.laufzeit_monate == 24
     assert basic.kuendigungsfrist_monate == 1
 
@@ -119,6 +125,7 @@ def test_basic_ist_keine_quarantaene(basic):
 # MagentaMobil L - dasselbe Layout, andere Zahlen. Faengt Ueberanpassung ab.
 # --------------------------------------------------------------------------- #
 
+
 def test_l_zahlen(gross):
     assert gross.grundgebuehr == 59.95
     assert gross.datenvolumen_gb == 80.0
@@ -134,11 +141,19 @@ def test_l_staffel_trotz_anderer_einrueckung(gross):
     "ohne Smartphone Hardware". Die Spaltenbreite wird deshalb gemessen.
     """
     assert [g.kategorie for g in gross.geraetepreisstaffel] == [
-        "ohne Smartphone", "mit Smartphone", "mit Top-Smartphone",
-        "mit Premium-Smartphone", "mit Premium-Plus-Smartphone",
+        "ohne Smartphone",
+        "mit Smartphone",
+        "mit Top-Smartphone",
+        "mit Premium-Smartphone",
+        "mit Premium-Plus-Smartphone",
     ]
     assert [g.betrag for g in gross.geraetepreisstaffel] == [
-        59.95, 69.95, 79.95, 89.95, 99.95]
+        59.95,
+        69.95,
+        79.95,
+        89.95,
+        99.95,
+    ]
 
 
 def test_basic_und_l_unterscheiden_sich_wirklich(basic, gross):
@@ -151,6 +166,7 @@ def test_basic_und_l_unterscheiden_sich_wirklich(basic, gross):
 # o2 Mobile Unlimited M Flex - kein Volumen, keine Bindung, keine Staffel
 # --------------------------------------------------------------------------- #
 
+
 def test_unlimited_preis_und_name(unlimited):
     assert unlimited.anbieter == "o2"
     assert unlimited.grundgebuehr == 39.99
@@ -158,7 +174,7 @@ def test_unlimited_preis_und_name(unlimited):
 
 
 def test_flex_hat_laufzeit_null_nicht_none(unlimited):
-    """"Keine Mindestlaufzeit" ist eine AUSSAGE, kein fehlender Wert.
+    """ "Keine Mindestlaufzeit" ist eine AUSSAGE, kein fehlender Wert.
 
     Als None faellt der Tarif in die Quarantaene und aus jeder Rechnung; der
     Effektivpreis rechnete gegen 24 Monate, die es nicht gibt.
@@ -182,6 +198,7 @@ def test_unlimited_hat_keine_geraetestaffel(unlimited):
 # --------------------------------------------------------------------------- #
 # o2 Home L Flex - drei Produktvarianten in EINEM Dokument
 # --------------------------------------------------------------------------- #
+
 
 def test_festnetz_nimmt_den_groessten_maximalwert(festnetz):
     """Das Dokument beschreibt 175/250/300 in einem PDF.
@@ -215,10 +232,16 @@ def test_festnetz_erkennt_telefonie_flat(festnetz):
 # Die Regel, die das Modell traegt: kein Wert ohne Beleg
 # --------------------------------------------------------------------------- #
 
-@pytest.mark.parametrize("name", [
-    "telekom_magentamobil_basic", "telekom_magentamobil_l",
-    "o2_mobile_unlimited_m_flex", "o2_home_l_flex",
-])
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "telekom_magentamobil_basic",
+        "telekom_magentamobil_l",
+        "o2_mobile_unlimited_m_flex",
+        "o2_home_l_flex",
+    ],
+)
 def test_jeder_wert_hat_eine_fundstelle_im_rohtext(name):
     """Die zentrale Zusage dieses Moduls, gegen alle vier Dokumente."""
     t = lies_text(text(name))
@@ -254,6 +277,7 @@ def test_setze_ohne_beleg_setzt_nichts():
 # Quarantaene statt falscher Zahlen
 # --------------------------------------------------------------------------- #
 
+
 def test_unbekanntes_layout_geht_in_quarantaene():
     t = lies_text("Irgendein Flyer ohne jede Tarifangabe.\nRuf uns an!")
     assert t.ist_quarantaene
@@ -268,8 +292,7 @@ def test_leeres_dokument_stuerzt_nicht_ab():
 def test_ein_pflichtfeld_reicht_gegen_quarantaene():
     """Ein Flex-Tarif hat zu Recht keine Mindestlaufzeit - das darf ihn nicht
     in die Quarantaene schicken."""
-    t = lies_text("Produktinformationsblatt\nEntgelt für das Komplettprodukt\n"
-                  "39,99 €")
+    t = lies_text("Produktinformationsblatt\nEntgelt für das Komplettprodukt\n39,99 €")
     assert t.grundgebuehr == 39.99
     assert not t.ist_quarantaene
 
@@ -284,10 +307,19 @@ def test_kennzeichen_erkennt_tarifdokumente(basic):
 # Hilfsteile
 # --------------------------------------------------------------------------- #
 
-@pytest.mark.parametrize("roh,erwartet", [
-    ("24,95", 24.95), ("1.234,56", 1234.56), ("39,99 €", 39.99),
-    ("100", 100.0), ("", None), ("keine", None), (None, None),
-])
+
+@pytest.mark.parametrize(
+    "roh,erwartet",
+    [
+        ("24,95", 24.95),
+        ("1.234,56", 1234.56),
+        ("39,99 €", 39.99),
+        ("100", 100.0),
+        ("", None),
+        ("keine", None),
+        (None, None),
+    ],
+)
 def test_zahl_liest_deutsche_schreibweise(roh, erwartet):
     assert zahl(roh) == erwartet
 
@@ -326,8 +358,10 @@ def test_als_dict_laesst_den_rohtext_weg(basic):
 # Die PDF-Schale
 # --------------------------------------------------------------------------- #
 
-@pytest.mark.skipif(not shutil.which("pdftotext"),
-                    reason="poppler-utils nicht installiert")
+
+@pytest.mark.skipif(
+    not shutil.which("pdftotext"), reason="poppler-utils nicht installiert"
+)
 def test_pdf_pfad_liefert_dieselben_werte_wie_der_text():
     """Die Schale muss dasselbe ergeben wie das Textfixture - sonst laufen
     Tests und Wirklichkeit auseinander."""
@@ -356,6 +390,7 @@ def test_fehlendes_pdftotext_wirft_klar(monkeypatch, tmp_path):
 # traegt; congstar, weil sein Bezeichner den Produktnamen enthaelt
 # ("Entgelt Allnet Flat L (ohne Endgeraet)").
 # --------------------------------------------------------------------------- #
+
 
 @pytest.fixture(scope="module")
 def vodafone_m() -> Tarif:
@@ -386,7 +421,7 @@ def test_vodafone_grundgebuehr_ist_die_stufe_ohne_zusatz(vodafone_m):
 
 
 def test_vodafone_traegt_die_zwei_preisphasen_des_dokuments(vodafone_m):
-    """"Monat 1-24" und "ab Monat 25" sind zwei Spaltenueberschriften.
+    """ "Monat 1-24" und "ab Monat 25" sind zwei Spaltenueberschriften.
 
     Das ist die einzige Stelle im Bestand, an der ein Anbieter seine
     Preisphasen selbst auszeichnet. Bis zum 04.09.2026 stand in JEDEM
@@ -400,7 +435,7 @@ def test_vodafone_traegt_die_zwei_preisphasen_des_dokuments(vodafone_m):
 
 
 def test_das_offene_ende_ist_none_und_nicht_die_laufzeit(vodafone_m):
-    """"ab Monat 25" hat kein Enddatum - der Vertrag laeuft weiter.
+    """ "ab Monat 25" hat kein Enddatum - der Vertrag laeuft weiter.
 
     Als `bis_monat=24` (die Mindestlaufzeit) waere die Phase leer, und der
     Effektivpreis ueber einen laengeren Horizont fiele stillschweigend auf
@@ -413,15 +448,14 @@ def test_das_offene_ende_ist_none_und_nicht_die_laufzeit(vodafone_m):
 
 def test_vodafone_geraetestaffel_kommt_aus_den_zeilen(vodafone_m_smartphone):
     """Sechs Stufen, senkrecht gelesen - dieselbe Auskunft wie bei Telekom."""
-    staffel = {g.kategorie: g.betrag
-               for g in vodafone_m_smartphone.geraetepreisstaffel}
+    staffel = {g.kategorie: g.betrag for g in vodafone_m_smartphone.geraetepreisstaffel}
     assert staffel["ohne Smartphone"] == 49.95
     assert staffel["mit Top Smartphone"] == 89.95
     assert len(staffel) == 6
 
 
 def test_eine_tarifoption_ist_keine_geraetestufe(vodafone_m):
-    """"mit 5 Jahresversprechen" ist kein Telefon.
+    """ "mit 5 Jahresversprechen" ist kein Telefon.
 
     Vodafone stellt Tarifoptionen in dieselbe Tabellenform wie die
     Geraetestaffel. Sie als Geraetepreis abzulegen waere eine
@@ -433,7 +467,7 @@ def test_eine_tarifoption_ist_keine_geraetestufe(vodafone_m):
 
 
 def test_congstar_preis_haengt_an_der_monatsangabe(congstar_l):
-    """"Entgelt Allnet Flat L (ohne Endgerät) 29,00 € / Monat".
+    """ "Entgelt Allnet Flat L (ohne Endgerät) 29,00 € / Monat".
 
     Der Bezeichner traegt den Produktnamen statt des Wortes
     "Komplettprodukt". Erkannt wird die Zeile deshalb an der Monatsangabe
@@ -457,8 +491,9 @@ def test_congstar_ist_nicht_die_telekom(congstar_l):
     assert congstar_l.anbieter == "congstar"
 
 
-def test_die_neuen_fixtures_belegen_jeden_wert(vodafone_m, vodafone_m_smartphone,
-                                               congstar_l):
+def test_die_neuen_fixtures_belegen_jeden_wert(
+    vodafone_m, vodafone_m_smartphone, congstar_l
+):
     """Kein Feldwert ohne Fundstelle im Rohtext - die Regel des Modells.
 
     Sie greift hier besonders: der Beleg der Grundgebuehr ist die
@@ -477,18 +512,19 @@ def test_eine_geratene_phasenzuordnung_wird_nicht_abgelegt():
     ist jede Zuordnung geraten - und eine geratene Phase ist schlimmer als
     keine, weil sie aussieht wie eine Messung.
     """
-    roh = ("Produktinformationsblatt gemäß § 1 TK-Transparenzverordnung\n"
-           "Vodafone Mobil M\n"
-           "Vertragslaufzeiten 24 Monate\n"
-           "Listenpreis inkl. MwSt. Monat 1-6 Monat 7-24 ab Monat 25\n"
-           "ohne Smartphone 49,95 € 49,95 €\n"
-           "Vodafone GmbH • Ferdinand-Braun-Platz 1 • 40549 Düsseldorf\n")
+    roh = (
+        "Produktinformationsblatt gemäß § 1 TK-Transparenzverordnung\n"
+        "Vodafone Mobil M\n"
+        "Vertragslaufzeiten 24 Monate\n"
+        "Listenpreis inkl. MwSt. Monat 1-6 Monat 7-24 ab Monat 25\n"
+        "ohne Smartphone 49,95 € 49,95 €\n"
+        "Vodafone GmbH • Ferdinand-Braun-Platz 1 • 40549 Düsseldorf\n"
+    )
     t = lies_text(roh)
     assert t.grundgebuehr == 49.95
     # Die Ersatzphase aus `lies_text` - eine Phase ueber die ganze Laufzeit,
     # nicht drei erfundene.
-    assert t.preisphasen == [Preisphase(von_monat=1, bis_monat=None,
-                                        betrag=49.95)]
+    assert t.preisphasen == [Preisphase(von_monat=1, bis_monat=None, betrag=49.95)]
 
 
 def test_eine_gestaffelte_tabelle_ergibt_verschieden_hohe_phasen():
@@ -501,12 +537,14 @@ def test_eine_gestaffelte_tabelle_ergibt_verschieden_hohe_phasen():
     deshalb die LESEART und nicht einen Tarif: die Betraege unten sind
     veraendert, das Layout ist das gemessene.
     """
-    roh = ("Produktinformationsblatt gemäß § 1 TK-Transparenzverordnung\n"
-           "Vodafone Mobil M\n"
-           "Vertragslaufzeiten 24 Monate\n"
-           "Listenpreis inkl. MwSt. Monat 1-6 ab Monat 7\n"
-           "ohne Smartphone 19,95 € 49,95 €\n"
-           "Vodafone GmbH • Ferdinand-Braun-Platz 1 • 40549 Düsseldorf\n")
+    roh = (
+        "Produktinformationsblatt gemäß § 1 TK-Transparenzverordnung\n"
+        "Vodafone Mobil M\n"
+        "Vertragslaufzeiten 24 Monate\n"
+        "Listenpreis inkl. MwSt. Monat 1-6 ab Monat 7\n"
+        "ohne Smartphone 19,95 € 49,95 €\n"
+        "Vodafone GmbH • Ferdinand-Braun-Platz 1 • 40549 Düsseldorf\n"
+    )
     t = lies_text(roh)
     assert t.preisphasen == [
         Preisphase(von_monat=1, bis_monat=6, betrag=19.95),
@@ -524,19 +562,22 @@ def test_der_tabellenfuss_wird_nicht_als_preis_gelesen():
     Im normalisierten Text sind die Leerzeilen weg; ohne den Abbruch bei
     der ersten betragslosen Zeile liefe der Leser in den Dokumentfuss.
     """
-    roh = ("Produktinformationsblatt gemäß § 1 TK-Transparenzverordnung\n"
-           "Vodafone Mobil M\n"
-           "Listenpreis inkl. MwSt. Monat 1-24 ab Monat 25\n"
-           "ohne Smartphone 49,95 € 49,95 €\n"
-           "Vodafone GmbH • Ferdinand-Braun-Platz 1 • 40549 Düsseldorf\n"
-           "mit Top Smartphone 89,95 € 89,95 €\n")
+    roh = (
+        "Produktinformationsblatt gemäß § 1 TK-Transparenzverordnung\n"
+        "Vodafone Mobil M\n"
+        "Listenpreis inkl. MwSt. Monat 1-24 ab Monat 25\n"
+        "ohne Smartphone 49,95 € 49,95 €\n"
+        "Vodafone GmbH • Ferdinand-Braun-Platz 1 • 40549 Düsseldorf\n"
+        "mit Top Smartphone 89,95 € 89,95 €\n"
+    )
     t = lies_text(roh)
     assert t.grundgebuehr == 49.95
     assert t.geraetepreisstaffel == []
 
 
-@pytest.mark.skipif(not shutil.which("pdftotext"),
-                    reason="poppler-utils nicht installiert")
+@pytest.mark.skipif(
+    not shutil.which("pdftotext"), reason="poppler-utils nicht installiert"
+)
 def test_die_neuen_fixtures_kommen_aus_ihrem_pdf():
     """Text und PDF derselben Fixture muessen dasselbe ergeben.
 
@@ -545,13 +586,19 @@ def test_die_neuen_fixtures_kommen_aus_ihrem_pdf():
     Originaldokument nichts mehr zu tun hat. Genau diese Falle hat am
     11.08.2026 ein Bau-Subagent aufgestellt, der seine Fixture erfand.
     """
-    for name, grundgebuehr in (("vodafone_mobil_m", 49.95),
-                               ("congstar_allnet_flat_l", 29.0)):
+    for name, grundgebuehr in (
+        ("vodafone_mobil_m", 49.95),
+        ("congstar_allnet_flat_l", 29.0),
+    ):
         aus_pdf = lies_pdf(FIX / f"{name}.pdf")
         assert aus_pdf.grundgebuehr == grundgebuehr, name
-        assert aus_pdf.als_dict() | {"dokument_hash": "", "abgerufen_am": ""} \
-            == lies_text(text(name)).als_dict() | {"dokument_hash": "",
-                                                   "abgerufen_am": ""}
+        assert aus_pdf.als_dict() | {
+            "dokument_hash": "",
+            "abgerufen_am": "",
+        } == lies_text(text(name)).als_dict() | {
+            "dokument_hash": "",
+            "abgerufen_am": "",
+        }
 
 
 def test_ein_vierwochenpreis_ist_kein_monatspreis():
@@ -564,10 +611,12 @@ def test_ein_vierwochenpreis_ist_kein_monatspreis():
     EUR als Monatspreis im Bestand - gemessen am 04.09.2026, bevor die
     Sperre stand.
     """
-    roh = ("Produktinformationsblatt gem. §1 TK-Transparenzverordnung\n"
-           "CallYa Allnet Flat M\n"
-           "Vertragslaufszeiten 4 Wochen, Kündigungsfrist 1 Monat\n"
-           "Listenpreis inkl. MwSt. 14,99 € / 4 Wochen\n")
+    roh = (
+        "Produktinformationsblatt gem. §1 TK-Transparenzverordnung\n"
+        "CallYa Allnet Flat M\n"
+        "Vertragslaufszeiten 4 Wochen, Kündigungsfrist 1 Monat\n"
+        "Listenpreis inkl. MwSt. 14,99 € / 4 Wochen\n"
+    )
     t = lies_text(roh)
     assert t.grundgebuehr is None
     # Ohne Preis UND ohne Laufzeit ist es fuer dieses Modell kein Tarif -
@@ -582,10 +631,12 @@ def test_ein_einzelner_listenpreis_ohne_zeitachse_wird_gelesen():
     Ohne diesen Test bewiese der Test darueber nur, dass irgendetwas nicht
     gelesen wird - nicht, dass die Wochenangabe der Grund ist.
     """
-    roh = ("Produktinformationsblatt gem. §1 TK-Transparenzverordnung\n"
-           "Ein Tarif\n"
-           "Mindestvertragslaufzeit 24 Monate\n"
-           "Listenpreis inkl. MwSt. 14,99 €\n")
+    roh = (
+        "Produktinformationsblatt gem. §1 TK-Transparenzverordnung\n"
+        "Ein Tarif\n"
+        "Mindestvertragslaufzeit 24 Monate\n"
+        "Listenpreis inkl. MwSt. 14,99 €\n"
+    )
     t = lies_text(roh)
     assert t.grundgebuehr == 14.99
 
@@ -611,10 +662,12 @@ def test_eine_offene_klammer_am_zeilenende_ist_ein_umbruch():
     die Fundstelle: der Beleg bleibt die vollstaendige Zeile, sonst faende
     `fehlende_belege()` sie im Rohtext nicht wieder.
     """
-    roh = ("Produktinformationsblatt gem. § 1 TK-Transparenzverordnung\n"
-           "Allnet Flat XL mit Upgrade-Versprechen (Postpaid\n"
-           "Mindestvertragslaufzeit 24 Monate\n"
-           "Entgelt Allnet Flat XL (ohne Endgerät) 35,00 € / Monat\n")
+    roh = (
+        "Produktinformationsblatt gem. § 1 TK-Transparenzverordnung\n"
+        "Allnet Flat XL mit Upgrade-Versprechen (Postpaid\n"
+        "Mindestvertragslaufzeit 24 Monate\n"
+        "Entgelt Allnet Flat XL (ohne Endgerät) 35,00 € / Monat\n"
+    )
     t = lies_text(roh)
     assert t.name == "Allnet Flat XL mit Upgrade-Versprechen"
     assert t.fundstellen["name"].endswith("(Postpaid")
@@ -649,10 +702,12 @@ def test_die_wochensperre_haengt_an_der_vertragslaufzeit():
     "Kuendigungsfrist 4 Wochen" kommt in monatlich abgerechneten
     Vertraegen vor - eine Regel darauf loeschte deren Preis.
     """
-    roh = ("Produktinformationsblatt gem. § 1 TK-Transparenzverordnung\n"
-           "Ein Tarif\n"
-           "Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 4 Wochen\n"
-           "Listenpreis inkl. MwSt. 29,99 €\n")
+    roh = (
+        "Produktinformationsblatt gem. § 1 TK-Transparenzverordnung\n"
+        "Ein Tarif\n"
+        "Mindestvertragslaufzeit 24 Monate, Kündigungsfrist 4 Wochen\n"
+        "Listenpreis inkl. MwSt. 29,99 €\n"
+    )
     assert lies_text(roh).grundgebuehr == 29.99
 
 

@@ -22,6 +22,7 @@ nur bei einheitlichem Aufschlag, die Gegenprobe gegen den angezeigten
 Preis der Geräteseite, und dass das Zubehör-Bundle des Rasters (Galaxy
 Buds 4 am S26 Ultra) nicht im Bündelpreis landet.
 """
+
 import gzip
 from pathlib import Path
 
@@ -40,8 +41,15 @@ _ANF = "https://mobile.1und1.de/all-net-flat-vergleich"
 _UNL = "https://mobile.1und1.de/unbegrenztes-datenvolumen"
 _IPHONE = "https://mobile.1und1.de/iphone-18-pro"
 _S26U = "https://mobile.1und1.de/samsung-galaxy-s26-ultra"
-_RASTER = ("all-net-flat-s", "all-net-flat-m", "all-net-flat-l",
-           "unlimited-s", "unlimited-m", "unlimited-l", "unlimited-xl")
+_RASTER = (
+    "all-net-flat-s",
+    "all-net-flat-m",
+    "all-net-flat-l",
+    "unlimited-s",
+    "unlimited-m",
+    "unlimited-l",
+    "unlimited-xl",
+)
 
 
 def _fixture(name: str) -> str:
@@ -55,7 +63,8 @@ def _netz() -> dict:
     }
     for t in _RASTER:
         netz[f"https://mobile.1und1.de/smartphones-{t}"] = (
-            f"einsundeins_tarifraster_{t.replace('-', '_')}_{_TAG}.html.gz")
+            f"einsundeins_tarifraster_{t.replace('-', '_')}_{_TAG}.html.gz"
+        )
     return netz
 
 
@@ -78,19 +87,20 @@ def _basis():
     """Die Default-Tarif-Sätze zweier echter Geräteseiten, wie sie nach
     `_mit_sku` aussehen (sku_id aus dem Titel - hier nur ein Schlüssel)."""
     out = []
-    for url, name in ((_IPHONE, "iphone_18_pro"),
-                      (_S26U, "galaxy_s26_ultra")):
+    for url, name in ((_IPHONE, "iphone_18_pro"), (_S26U, "galaxy_s26_ultra")):
         for satz in E.lies_buendel(
-                _fixture(f"einsundeins_produktseite_{name}_{_TAG}.html.gz"),
-                url=url):
-            out.append({**satz, "anbieter": "1&1", "sku_id": satz["titel"],
-                        "quelle_url": url})
+            _fixture(f"einsundeins_produktseite_{name}_{_TAG}.html.gz"), url=url
+        ):
+            out.append(
+                {**satz, "anbieter": "1&1", "sku_id": satz["titel"], "quelle_url": url}
+            )
     return out
 
 
 def _satz(saetze, titel_teil, tarif):
-    treffer = [s for s in saetze
-               if titel_teil in s["titel"] and s["tarif_name"] == tarif]
+    treffer = [
+        s for s in saetze if titel_teil in s["titel"] and s["tarif_name"] == tarif
+    ]
     assert len(treffer) == 1, (titel_teil, tarif, len(treffer))
     return treffer[0]
 
@@ -99,12 +109,12 @@ def _satz(saetze, titel_teil, tarif):
 # Die Lesarten
 # ==========================================================================
 
+
 def test_die_uebersichten_verlinken_sieben_geraeteraster():
     adressen = set()
     for url in (_ANF, _UNL):
         adressen.update(E.tarifraster_adressen(_fixture(_netz()[url]), url))
-    assert adressen == {f"https://mobile.1und1.de/smartphones-{t}"
-                        for t in _RASTER}
+    assert adressen == {f"https://mobile.1und1.de/smartphones-{t}" for t in _RASTER}
     # Die Warenkorb-Parameter reisen nicht mit.
     assert not any("?" in a for a in adressen)
 
@@ -112,16 +122,17 @@ def test_die_uebersichten_verlinken_sieben_geraeteraster():
 def test_tarifdetails_je_tarif_aus_der_uebersicht():
     details = E.tarifdetails_je_tarif(_fixture(_netz()[_UNL]), _UNL)
     assert details["1&1 All-Net-Flat M"][1] == "tariff-anf-m-mvl"
-    assert details["1&1 Unlimited on demand L"][1] == \
-        "tariff-anf-xxl-unlimited-l-mvl"
+    assert details["1&1 Unlimited on demand L"][1] == "tariff-anf-xxl-unlimited-l-mvl"
     assert details["1&1 Unlimited XL"][1] == "tariff-anf-xxl-unlimited-xl-ovl"
     assert details["1&1 All-Net-Flat M"][0].startswith(
-        "https://mobile.1und1.de/details-all-net-flat-preisliste?")
+        "https://mobile.1und1.de/details-all-net-flat-preisliste?"
+    )
 
 
 def test_das_raster_nennt_tarif_laufzeit_und_je_geraet_einen_preis():
-    raster = E.lies_tarifraster(_fixture(_netz()[
-        "https://mobile.1und1.de/smartphones-all-net-flat-m"]))
+    raster = E.lies_tarifraster(
+        _fixture(_netz()["https://mobile.1und1.de/smartphones-all-net-flat-m"])
+    )
     assert raster["tarif_name"] == "1&1 All-Net-Flat M"
     assert len(raster["preise"]) == 43
     assert raster["preise"]["hw-apple-iphone-18-pro"] == (5499, 36)
@@ -134,10 +145,10 @@ def test_ein_raster_ohne_kachel_wirft():
 
 
 def test_tarifname_ohne_volumenklammer():
-    assert E.tarifname_bereinigt("1&amp;1 All-Net-Flat M (50 GB)") == \
-        "1&1 All-Net-Flat M"
-    assert E.tarifname_bereinigt("1&1 Unlimited XL (unlimited)") == \
-        "1&1 Unlimited XL"
+    assert (
+        E.tarifname_bereinigt("1&amp;1 All-Net-Flat M (50 GB)") == "1&1 All-Net-Flat M"
+    )
+    assert E.tarifname_bereinigt("1&1 Unlimited XL (unlimited)") == "1&1 Unlimited XL"
     assert E.tarifname_bereinigt("1&1 All-Net-Flat S") == "1&1 All-Net-Flat S"
 
 
@@ -147,13 +158,16 @@ def test_die_geraeteseite_nennt_vorauswahl_und_angezeigten_preis():
     vor = [s for s in iphone if s["vorausgewaehlt"]]
     assert [s["speicher_gb"] for s in vor] == [256]
     assert vor[0]["angezeigt_monatlich"] == 49.99
-    assert all(s["angezeigt_monatlich"] is None
-               for s in iphone if not s["vorausgewaehlt"])
+    assert all(
+        s["angezeigt_monatlich"] is None for s in iphone if not s["vorausgewaehlt"]
+    )
     # S26 Ultra: die Seite ZEIGT 44,99 (mit vorab angehakten Galaxy Buds 4),
     # die Preiskarte nennt 42,99 für das Gerät allein.
-    s26 = next(s for s in saetze
-               if s["hw_id"] == "hw-samsung-galaxy-s26-ultra"
-               and s["vorausgewaehlt"])
+    s26 = next(
+        s
+        for s in saetze
+        if s["hw_id"] == "hw-samsung-galaxy-s26-ultra" and s["vorausgewaehlt"]
+    )
     assert s26["angezeigt_monatlich"] == 44.99
     assert s26["buendel_monatlich"] == 42.99
 
@@ -161,6 +175,7 @@ def test_die_geraeteseite_nennt_vorauswahl_und_angezeigten_preis():
 # ==========================================================================
 # ergaenze_tarifstufen()
 # ==========================================================================
+
 
 def test_alle_tarife_mal_alle_speichergroessen():
     saetze = _basis()
@@ -172,10 +187,15 @@ def test_alle_tarife_mal_alle_speichergroessen():
     # Abrufe: zwei Übersichten, sieben Raster.
     assert len(hole.abgerufen) == 9
     tarife = {s["tarif_name"] for s in saetze}
-    assert tarife == {"1&1 All-Net-Flat S", "1&1 All-Net-Flat M",
-                      "1&1 All-Net-Flat L", "1&1 Unlimited on demand S",
-                      "1&1 Unlimited on demand M", "1&1 Unlimited on demand L",
-                      "1&1 Unlimited XL"}
+    assert tarife == {
+        "1&1 All-Net-Flat S",
+        "1&1 All-Net-Flat M",
+        "1&1 All-Net-Flat L",
+        "1&1 Unlimited on demand S",
+        "1&1 Unlimited on demand M",
+        "1&1 Unlimited on demand L",
+        "1&1 Unlimited XL",
+    }
 
 
 def test_der_aufschlag_kommt_auf_die_preiskarte_der_groesse():
@@ -187,17 +207,24 @@ def test_der_aufschlag_kommt_auf_die_preiskarte_der_groesse():
     assert m512["laufzeit_monate"] == 36
     # Die Einmalzahlung steht nur fuer den Default-Tarif auf der Seite.
     assert m512["geraet_zuzahlung"] is None
-    assert _satz(saetze, "iPhone 18 Pro 512 GB",
-                 "1&1 All-Net-Flat S")["geraet_zuzahlung"] == 510.0
+    assert (
+        _satz(saetze, "iPhone 18 Pro 512 GB", "1&1 All-Net-Flat S")["geraet_zuzahlung"]
+        == 510.0
+    )
     assert m512["tarif_slug"] == "tariff-anf-m-mvl"
     assert m512["herleitung"] == E.HERLEITUNG_TARIFAUFSCHLAG
-    assert m512["quelle_url"] == \
-        "https://mobile.1und1.de/smartphones-all-net-flat-m"
+    assert m512["quelle_url"] == "https://mobile.1und1.de/smartphones-all-net-flat-m"
     # Die vorausgewählte Größe trifft das Raster selbst (54,99).
-    assert _satz(saetze, "iPhone 18 Pro 256 GB",
-                 "1&1 All-Net-Flat M")["buendel_monatlich"] == 54.99
-    assert _satz(saetze, "iPhone 18 Pro 256 GB",
-                 "1&1 Unlimited on demand L")["buendel_monatlich"] == 64.99
+    assert (
+        _satz(saetze, "iPhone 18 Pro 256 GB", "1&1 All-Net-Flat M")["buendel_monatlich"]
+        == 54.99
+    )
+    assert (
+        _satz(saetze, "iPhone 18 Pro 256 GB", "1&1 Unlimited on demand L")[
+            "buendel_monatlich"
+        ]
+        == 64.99
+    )
     # Gegenprobe: der Default-Satz bleibt unangetastet.
     s512 = _satz(saetze, "iPhone 18 Pro 512 GB", "1&1 All-Net-Flat S")
     assert s512["buendel_monatlich"] == 56.99
@@ -220,10 +247,12 @@ def test_ein_geraeteabhaengiger_aufschlag_bleibt_bei_der_vorauswahl():
     saetze = _basis()
     E.ergaenze_tarifstufen(_Hole(), {}, saetze)
     xl = [s for s in saetze if s["tarif_name"] == "1&1 Unlimited XL"]
-    assert sorted((s["hw_id"], s["speicher_gb"], s["buendel_monatlich"])
-                  for s in xl) == [
+    assert sorted(
+        (s["hw_id"], s["speicher_gb"], s["buendel_monatlich"]) for s in xl
+    ) == [
         ("hw-apple-iphone-18-pro", 256, 74.99),
-        ("hw-samsung-galaxy-s26-ultra", 256, 72.99)]
+        ("hw-samsung-galaxy-s26-ultra", 256, 72.99),
+    ]
     assert all(s["geraet_zuzahlung"] is None for s in xl)
 
 
@@ -232,7 +261,9 @@ def test_ohne_default_raster_wird_nichts_hergeleitet():
     vorher = len(saetze)
     neu = E.ergaenze_tarifstufen(
         _Hole(fehlend={"https://mobile.1und1.de/smartphones-all-net-flat-s"}),
-        {}, saetze)
+        {},
+        saetze,
+    )
     assert neu == 0
     assert len(saetze) == vorher
 
@@ -243,11 +274,17 @@ def test_eine_unstimmige_gegenprobe_kostet_nur_dieses_geraet():
         if s["hw_id"] == "hw-apple-iphone-18-pro" and s["vorausgewaehlt"]:
             s["angezeigt_monatlich"] = 48.99
     E.ergaenze_tarifstufen(_Hole(), {}, saetze)
-    assert not [s for s in saetze if s.get("herleitung")
-                and s["hw_id"] == "hw-apple-iphone-18-pro"]
+    assert not [
+        s
+        for s in saetze
+        if s.get("herleitung") and s["hw_id"] == "hw-apple-iphone-18-pro"
+    ]
     # Gegenprobe: das andere Gerät bekommt seine Tarife.
-    assert [s for s in saetze if s.get("herleitung")
-            and s["hw_id"] == "hw-samsung-galaxy-s26-ultra"]
+    assert [
+        s
+        for s in saetze
+        if s.get("herleitung") and s["hw_id"] == "hw-samsung-galaxy-s26-ultra"
+    ]
 
 
 def test_ein_zweiter_lauf_verdoppelt_nichts():
@@ -267,8 +304,7 @@ def test_jeder_gelieferte_tarif_loest_im_echten_bestand_auf():
     assert len(bilanz.buendel) == len(saetze) == 7 + 37
     # Gegenprobe: der Name MIT Volumenklammer löst nicht auf - ohne die
     # Bereinigung wären die Sätze verworfen worden.
-    assert bestand.loese("1&1", "1&1 All-Net-Flat M (50 GB)",
-                         mit_geraet=True) is None
+    assert bestand.loese("1&1", "1&1 All-Net-Flat M (50 GB)", mit_geraet=True) is None
 
 
 def test_der_haken_setzt_danach_die_gebuehr_auf_alle_tarife(monkeypatch):

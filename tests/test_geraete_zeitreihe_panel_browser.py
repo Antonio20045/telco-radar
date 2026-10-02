@@ -19,6 +19,7 @@ waere „genau diese" auch mit dem falschen Template erfuellt.
 Bauform wie test_geraete_zeitreihe_browser.py (eigener Server auf
 127.0.0.1, kein file://, Chromium an allen drei bekannten Orten).
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -42,10 +43,18 @@ def _baue_site(tmp_path: pathlib.Path) -> pathlib.Path:
     root, _ = _baue(tmp_path)
     reports = root / "data" / "reports"
     reports.mkdir(parents=True, exist_ok=True)
-    (reports / f"{HEUTE}.json").write_text(json.dumps({
-        "date": HEUTE, "language": "de",
-        "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
-        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{HEUTE}.json").write_text(
+        json.dumps(
+            {
+                "date": HEUTE,
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     (reports / f"{HEUTE}.md").write_text("# B\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
@@ -53,10 +62,15 @@ def _baue_site(tmp_path: pathlib.Path) -> pathlib.Path:
 
 
 def _chromium():
-    for muster in ("/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-                   str(pathlib.Path.home() / ".cache/ms-playwright"
-                       / "chromium*/chrome-linux*/chrome"),
-                   "/Applications/Chromium.app/Contents/MacOS/Chromium"):
+    for muster in (
+        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
+        str(
+            pathlib.Path.home()
+            / ".cache/ms-playwright"
+            / "chromium*/chrome-linux*/chrome"
+        ),
+        "/Applications/Chromium.app/Contents/MacOS/Chromium",
+    ):
         treffer = sorted(glob.glob(muster))
         if treffer:
             return treffer[-1]
@@ -69,8 +83,9 @@ def _server(site: pathlib.Path):
     s.bind(("127.0.0.1", 0))
     port = s.getsockname()[1]
     s.close()
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler,
-                                directory=str(site))
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(site)
+    )
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     try:
@@ -82,12 +97,12 @@ def _server(site: pathlib.Path):
 @pytest.fixture(scope="module")
 def _browser_seite(tmp_path_factory):
     sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt").sync_playwright
+        "playwright.sync_api", reason="playwright fehlt"
+    ).sync_playwright
     site = _baue_site(tmp_path_factory.mktemp("zrpanel"))
     exe = _chromium()
     with _server(site) as basis, sync_playwright() as p:
-        browser = (p.chromium.launch(executable_path=exe) if exe
-                   else p.chromium.launch())
+        browser = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
         yield browser, basis
         browser.close()
 
@@ -95,8 +110,9 @@ def _browser_seite(tmp_path_factory):
 @contextlib.contextmanager
 def _ansicht(_browser_seite, breite=1440, hoehe=900, touch=False):
     browser, basis = _browser_seite
-    context = browser.new_context(viewport={"width": breite, "height": hoehe},
-                                  has_touch=touch)
+    context = browser.new_context(
+        viewport={"width": breite, "height": hoehe}, has_touch=touch
+    )
     s = context.new_page()
     fehler = konsole_sammeln(s)
     s.goto(f"{basis}/geraete.html", wait_until="load")
@@ -161,8 +177,7 @@ def _freier_punkt(seite, anb=None):
     Das Scrollen laeuft nativ per scrollIntoView: Playwrights eigenes
     scroll_into_view_if_needed unterstuetzt SVG-Kindkreise nicht.
     """
-    adresse = "circle.gr-zr-hit[data-m]" + (
-        f"[data-anb='{anb}']" if anb else "")
+    adresse = "circle.gr-zr-hit[data-m]" + (f"[data-anb='{anb}']" if anb else "")
     # Der LETZTE Kreis im DOM gehoert zum (per CSS versteckten) schmalen
     # SVG - scrollIntoView auf ein unsichtbares Element wirkt nicht. Ziel
     # ist der letzte KREIS MIT Flaeche, also der sichtbaren Variante.
@@ -170,7 +185,8 @@ def _freier_punkt(seite, anb=None):
         adresse,
         "els => { const da = els.filter("
         "e => e.getBoundingClientRect().width);"
-        "if (da.length) da[da.length - 1].scrollIntoView({block:'center'}); }")
+        "if (da.length) da[da.length - 1].scrollIntoView({block:'center'}); }",
+    )
     seite.wait_for_timeout(200)
     aus = seite.evaluate(_FREIER_PUNKT, anb)
     return aus[-1] if aus else None
@@ -190,7 +206,8 @@ def test_klick_auf_den_punkt_oeffnet_das_panel_dieser_messung(schreibtisch):
     # ist 'genau diese Messung' eine echte Unterscheidung.
     tage = seite.eval_on_selector_all(
         ".gr-zr-rechnungen template[data-anb='o2']",
-        "els => els.map(e => e.getAttribute('data-m'))")
+        "els => els.map(e => e.getAttribute('data-m'))",
+    )
     assert len(set(tage)) >= 2
     ziel = _freier_punkt(seite, "o2")
     assert ziel, "kein ueberlappungsfreier o2-Punkt im Startgraphen"
@@ -205,8 +222,8 @@ def test_klick_auf_den_punkt_oeffnet_das_panel_dieser_messung(schreibtisch):
     # Das ×-Muster der gesetzten Rechung (design.md Regel 6) - mindestens
     # ein Posten traegt "ANZAHL × BETRAG".
     posten = seite.eval_on_selector_all(
-        "#gr-zr-panel li.gr-zr-posten .gr-zr-pr",
-        "els => els.map(e => e.textContent)")
+        "#gr-zr-panel li.gr-zr-posten .gr-zr-pr", "els => els.map(e => e.textContent)"
+    )
     assert any("×" in p for p in posten), posten
     assert seite.inner_text("#gr-zr-panel .gr-zr-rsumme").strip()
 
@@ -221,15 +238,17 @@ def test_der_aktive_punkt_ist_in_beiden_svg_markiert(schreibtisch):
         "circle.gr-zr-punkt.gr-zr-aktiv",
         "els => els.map(e => [e.getAttribute('data-anb'), "
         "e.getAttribute('data-m'), "
-        "getComputedStyle(e).strokeWidth])")
+        "getComputedStyle(e).strokeWidth])",
+    )
     # BEIDE SVG-Varianten (breit + schmal; eine ist per CSS versteckt)
     # tragen die Markierung - sonst verschwaende sie beim Umklappen.
-    assert aktiv == [[ziel["anb"], ziel["m"], "2.8px"],
-                     [ziel["anb"], ziel["m"], "2.8px"]], aktiv
+    assert aktiv == [
+        [ziel["anb"], ziel["m"], "2.8px"],
+        [ziel["anb"], ziel["m"], "2.8px"],
+    ], aktiv
 
 
-def test_klick_auf_die_preiszahl_oeffnet_den_rechenweg_des_anbieters(
-        schreibtisch):
+def test_klick_auf_die_preiszahl_oeffnet_den_rechenweg_des_anbieters(schreibtisch):
     seite, _fehler = schreibtisch
     satz = seite.inner_text("#gr-zr-antwort")
     # Waechter: der Satz nennt den Guenstigsten im festen Wortlaut, an dem
@@ -274,8 +293,7 @@ def test_derselbe_klick_schliesst_ein_anderer_wechselt(schreibtisch):
     assert seite.evaluate(_PANEL_EQ_TEMPLATE, ziel) is True
 
 
-def test_der_schliessen_knopf_und_die_tastatur_oeffnen_und_schliessen(
-        schreibtisch):
+def test_der_schliessen_knopf_und_die_tastatur_oeffnen_und_schliessen(schreibtisch):
     seite, _fehler = schreibtisch
     ziel = _freier_punkt(seite, "o2")
     assert ziel
@@ -283,8 +301,10 @@ def test_der_schliessen_knopf_und_die_tastatur_oeffnen_und_schliessen(
     # traegt role=button und tabindex aus app.js).
     seite.evaluate(
         "(z) => document.querySelector("
-        "\"circle.gr-zr-hit[data-anb='\" + z.anb + \"'][data-m='\" + z.m"
-        "+ \"']\").focus()", ziel)
+        '"circle.gr-zr-hit[data-anb=\'" + z.anb + "\'][data-m=\'" + z.m'
+        '+ "\']").focus()',
+        ziel,
+    )
     seite.keyboard.press("Enter")
     seite.wait_for_timeout(250)
     assert _panel_offen(seite)
@@ -343,18 +363,19 @@ def test_keine_konsolenfehler_bei_den_klicks(schreibtisch):
 # geoeffneten Panel (Code-S3-1).
 # --------------------------------------------------------------------------
 
+
 def test_klick_auf_den_karten_preis_oeffnet_den_rechenweg(schreibtisch):
     """Sicht-A1: Antonios Geste ist „wenn man auf den Preis drueckt" - die
     Karten-Preiszahl ist der dritte Eingang des Panels. Der Klick auf den
     Preis der AKTIVEN Karte oeffnet den Rechenweg des Anbieters, den der
     Server am Band-Koerper nennt (data-anb), am LETZTEN Messtag."""
     seite, _fehler = schreibtisch
-    karte = seite.locator(
-        "#gr-zr-kacheln button[aria-pressed='true']").first
+    karte = seite.locator("#gr-zr-kacheln button[aria-pressed='true']").first
     span = karte.locator(".gr-zr-k-band[data-anb] .gr-zr-k-preis")
     assert span.count() >= 1
-    anb = karte.locator(".gr-zr-k-band[data-anb]:not([hidden])") \
-        .get_attribute("data-anb")
+    anb = karte.locator(".gr-zr-k-band[data-anb]:not([hidden])").get_attribute(
+        "data-anb"
+    )
     span.first.click()
     seite.wait_for_timeout(300)
 
@@ -362,14 +383,13 @@ def test_klick_auf_den_karten_preis_oeffnet_den_rechenweg(schreibtisch):
     assert anb in _kopf(seite)
     tage = seite.eval_on_selector_all(
         f".gr-zr-rechnungen template[data-anb='{anb}']",
-        "els => els.map(e => e.getAttribute('data-m')).sort()")
+        "els => els.map(e => e.getAttribute('data-m')).sort()",
+    )
     letzte = tage[-1]
-    assert seite.evaluate(
-        _PANEL_EQ_TEMPLATE, {"anb": anb, "m": letzte}) is True
+    assert seite.evaluate(_PANEL_EQ_TEMPLATE, {"anb": anb, "m": letzte}) is True
 
 
-def test_klick_auf_den_preis_einer_fremden_karte_waehlt_und_oeffnet(
-        schreibtisch):
+def test_klick_auf_den_preis_einer_fremden_karte_waehlt_und_oeffnet(schreibtisch):
     """Sicht-A1, Wunsch-Pfad: der Preis einer NICHT aktiven Karte bestellt
     Modell UND Band und oeffnet nach dem Laden den Rechenweg dieses
     Anbieters - der Klick ist nie wirkungslos, aber nie eine fremde
@@ -377,20 +397,21 @@ def test_klick_auf_den_preis_einer_fremden_karte_waehlt_und_oeffnet(
     Locator `:not([aria-pressed='true'])` zeigt nach dem Klick auf die
     ANDERE Karte - der Umschlag selbst wäre die Messung.)"""
     seite, _fehler = schreibtisch
-    fremd = seite.locator(
-        "#gr-zr-kacheln button:not([aria-pressed='true'])").first
+    fremd = seite.locator("#gr-zr-kacheln button:not([aria-pressed='true'])").first
     mid = fremd.get_attribute("data-modell")
-    anb = fremd.locator(".gr-zr-k-band[data-anb]:not([hidden])") \
-        .get_attribute("data-anb")
-    band = fremd.locator(".gr-zr-k-band[data-anb]:not([hidden])") \
-        .get_attribute("data-band")
+    anb = fremd.locator(".gr-zr-k-band[data-anb]:not([hidden])").get_attribute(
+        "data-anb"
+    )
+    band = fremd.locator(".gr-zr-k-band[data-anb]:not([hidden])").get_attribute(
+        "data-band"
+    )
     fremd.locator(".gr-zr-k-preis").first.click()
     seite.wait_for_timeout(700)
 
-    dauerhaft = seite.locator(
-        f"#gr-zr-kacheln button[data-modell='{mid}']")
-    assert dauerhaft.get_attribute("aria-pressed") == "true", \
+    dauerhaft = seite.locator(f"#gr-zr-kacheln button[data-modell='{mid}']")
+    assert dauerhaft.get_attribute("aria-pressed") == "true", (
         "der Preis-Klick einer fremden Karte waehlt das Modell"
+    )
     assert _panel_offen(seite)
     assert anb in _kopf(seite)
     # das Paar ist gewechselt: die URL nennt Modell und Band des Klicks
@@ -407,17 +428,18 @@ def test_der_bandwechsel_stellt_auch_die_karten_um(schreibtisch):
     seite, _fehler = schreibtisch
 
     def _sichtbarer_preis(karte):
-        return karte.locator(".gr-zr-k-band:not([hidden]) .gr-zr-k-preis"
-                             ).first.inner_text()
+        return karte.locator(
+            ".gr-zr-k-band:not([hidden]) .gr-zr-k-preis"
+        ).first.inner_text()
 
-    aktiv = seite.locator(
-        "#gr-zr-kacheln button[aria-pressed='true']").first
+    aktiv = seite.locator("#gr-zr-kacheln button[aria-pressed='true']").first
     vorher = _sichtbarer_preis(aktiv)
     seite.locator("#gr-zr-baender button[data-band='m']").click()
     seite.wait_for_timeout(600)
     nachher = _sichtbarer_preis(aktiv)
-    assert vorher != nachher, \
+    assert vorher != nachher, (
         f"die Karte zeigt nach dem Bandwechsel denselben Preis ({vorher})"
+    )
     # Die Bandlage der Karte ist die gewaehlte
     band = aktiv.locator(".gr-zr-k-band:not([hidden])").first
     assert band.get_attribute("data-band") == "m"
@@ -432,7 +454,8 @@ def test_fremder_punkt_ohne_vorlage_bekommt_den_leerhinweis(schreibtisch):
     seite, _fehler = schreibtisch
     seite.eval_on_selector_all(
         ".gr-zr-rechnungen template[data-anb='o2']",
-        "els => els.forEach(e => e.remove())")
+        "els => els.forEach(e => e.remove())",
+    )
     ziel = _freier_punkt(seite, "o2")
     assert ziel, "kein ueberlappungsfreier o2-Punkt"
     seite.mouse.click(ziel["x"], ziel["y"])
@@ -441,12 +464,12 @@ def test_fremder_punkt_ohne_vorlage_bekommt_den_leerhinweis(schreibtisch):
     assert _panel_offen(seite)
     text = seite.eval_on_selector("#gr-zr-panel", "e => e.innerText")
     assert "kein Rechenweg bereit" in text
-    assert "Referenzrechnung" not in text, \
+    assert "Referenzrechnung" not in text, (
         "fremde Messung fiel auf die Vodafone-Näherung (S3-2)"
+    )
 
 
-def test_im_geoeffneten_panel_gibt_es_keine_schrift_unter_zwoelf_pixel(
-        schreibtisch):
+def test_im_geoeffneten_panel_gibt_es_keine_schrift_unter_zwoelf_pixel(schreibtisch):
     """Code-S3-1: die 12-px-Regel gilt auch dem Panel - seine Texte
     entstehen erst nach dem Klick aus dem <template> (DocumentFragment),
     deshalb sahen die statischen Messungen die 11-px-Klassen nie. Hier

@@ -10,11 +10,16 @@ sich jetzt aus den Kampagnenmotiven der Aktionsseiten
 Zwei der 14 Screenshots zeigten das Cookie-Banner - die Dismiss-Logik war
 also durchaus getestet und trotzdem unzureichend, weil ein Test gegen ein
 Double nur belegt, dass der KNOWN Selektor geklickt wird."""
+
 import re
 
 from telco_radar.collect.promo_snapshot import (
-    _normalize_link_for_hash, content_hash, extract_hero_image,
-    extract_image_candidates, extract_link_candidates, extract_text,
+    _normalize_link_for_hash,
+    content_hash,
+    extract_hero_image,
+    extract_image_candidates,
+    extract_link_candidates,
+    extract_text,
 )
 
 
@@ -82,7 +87,8 @@ def test_content_hash_ignores_tracking_param_differences():
 
 def test_normalize_link_for_hash_strips_tracking_but_keeps_functional_params():
     normalized = _normalize_link_for_hash(
-        "https://www.o2online.de/e-shop/details?tarif=x&ratenzahlung=36&utm_source=news")
+        "https://www.o2online.de/e-shop/details?tarif=x&ratenzahlung=36&utm_source=news"
+    )
     assert "utm_source" not in normalized
     assert "tarif=x" in normalized
     assert "ratenzahlung=36" in normalized
@@ -155,9 +161,12 @@ def test_extract_link_candidates_dedupes_same_resolved_url():
 def test_extract_link_candidates_respects_max_candidates():
     links_html = "".join(
         f'<article><h2>Angebot {i}</h2><a href="/a{i}">Details</a></article>'
-        for i in range(80))
+        for i in range(80)
+    )
     html = f"<main>{links_html}</main>"
-    candidates = extract_link_candidates(html, "https://example.test/", max_candidates=10)
+    candidates = extract_link_candidates(
+        html, "https://example.test/", max_candidates=10
+    )
     assert len(candidates) == 10
 
 
@@ -190,6 +199,7 @@ def test_extract_hero_image_returns_none_without_meta_tags():
 # --------------------------------------------------------- Bildkandidaten
 # Die Grundlage der Bebilderung: was hier nicht als Kandidat herauskommt,
 # kann promo_bilder.py keinem Angebot zuordnen.
+
 
 def test_extract_image_candidates_findet_bild_mit_anker_und_kontext():
     html = """
@@ -259,9 +269,11 @@ def test_extract_image_candidates_verwirft_datenurls_und_vektoren():
 
 
 def test_extract_image_candidates_entdoppelt_und_deckelt():
-    html = "<body>" + "".join(
-        f'<img src="/b{i}.jpg" alt="Motiv {i}">' for i in range(10)
-    ) + '<img src="/b3.jpg" alt="nochmal"></body>'
+    html = (
+        "<body>"
+        + "".join(f'<img src="/b{i}.jpg" alt="Motiv {i}">' for i in range(10))
+        + '<img src="/b3.jpg" alt="nochmal"></body>'
+    )
     kand = extract_image_candidates(html, "https://marke.test/", max_candidates=4)
     assert len(kand) == 4
     assert len({k["src"] for k in kand}) == 4

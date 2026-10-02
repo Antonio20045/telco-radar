@@ -18,6 +18,7 @@ seit der Auslieferung des Feature auf einer eigenen Zeile.
 Kein statischer Test haette das gemeldet. Deshalb dieser hier, und deshalb an
 einem echten Browser.
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -34,8 +35,7 @@ import pytest
 
 from telco_radar.report import uebersetzung_view as uv
 from telco_radar.report.html import render_site
-from telco_radar.uebersetzung.store import (
-    UebersetzungsStore, Uebersetzung, text_hash)
+from telco_radar.uebersetzung.store import UebersetzungsStore, Uebersetzung, text_hash
 
 REPO = Path(__file__).resolve().parents[1]
 
@@ -51,9 +51,10 @@ def _chromium() -> str | None:
     """Beide Orte - Sandbox-Image und GitHub-Runner. Siehe
     tests/test_falz_browser.py: nur den ersten zu kennen heisst, dass der
     Test auf der Maschine schweigt, die Merges absichert."""
-    for muster in ("/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-                   str(Path.home() / ".cache/ms-playwright"
-                       / "chromium*/chrome-linux*/chrome")):
+    for muster in (
+        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
+        str(Path.home() / ".cache/ms-playwright" / "chromium*/chrome-linux*/chrome"),
+    ):
         treffer = sorted(glob.glob(muster))
         if treffer:
             return treffer[-1]
@@ -66,8 +67,9 @@ def _server(site: Path):
     s.bind(("127.0.0.1", 0))
     port = s.getsockname()[1]
     s.close()
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler,
-                                directory=str(site))
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(site)
+    )
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     try:
@@ -87,8 +89,12 @@ def _baue(tmp_path: Path) -> Path:
     if not berichte:
         pytest.skip("keine Berichte im Repo")
     daten = json.loads(berichte[-1].read_text(encoding="utf-8"))
-    urls = [h["url"] for region in (daten.get("regions") or {}).values()
-            for h in (region.get("highlights") or []) if h.get("url")]
+    urls = [
+        h["url"]
+        for region in (daten.get("regions") or {}).values()
+        for h in (region.get("highlights") or [])
+        if h.get("url")
+    ]
     if not urls:
         pytest.skip("keine Meldung mit URL")
 
@@ -102,11 +108,19 @@ def _baue(tmp_path: Path) -> Path:
     zustand.mkdir(parents=True)
     store = UebersetzungsStore(zustand / "uebersetzungen.jsonl")
     for u in urls:
-        store.add(Uebersetzung(
-            item_id=uv.id_fuer_url(u), quell_hash=text_hash(u),
-            titel_de="Deutsche Fassung", absaetze=["Ein Absatz."],
-            sprache="pl", url=u, quelle="Quelle", erstellt_am="2026-08-15",
-            herkunft="artikel"))
+        store.add(
+            Uebersetzung(
+                item_id=uv.id_fuer_url(u),
+                quell_hash=text_hash(u),
+                titel_de="Deutsche Fassung",
+                absaetze=["Ein Absatz."],
+                sprache="pl",
+                url=u,
+                quelle="Quelle",
+                erstellt_am="2026-08-15",
+                herkunft="artikel",
+            )
+        )
     store.speichern()
     # Die Bilder der echten Ausgabe: ohne sie waeren die Karten anders hoch,
     # und die mittlere Gewichtung entstuende gar nicht.
@@ -124,28 +138,26 @@ def _baue(tmp_path: Path) -> Path:
 def _links(tmp_path_factory):
     """Ein Browserstart, zwei Seiten, alle Linkmasse."""
     sync_playwright = pytest.importorskip(
-        "playwright.sync_api",
-        reason="playwright fehlt - Browser-Messung entfaellt").sync_playwright
+        "playwright.sync_api", reason="playwright fehlt - Browser-Messung entfaellt"
+    ).sync_playwright
     pfad = _chromium()
     site = _baue(tmp_path_factory.mktemp("ueblink"))
 
     messung: dict[str, list[dict]] = {}
     with _server(site) as wurzel, sync_playwright() as p:
         try:
-            browser = p.chromium.launch(
-                **({"executable_path": pfad} if pfad else {}))
-        except Exception as exc:                       # noqa: BLE001
+            browser = p.chromium.launch(**({"executable_path": pfad} if pfad else {}))
+        except Exception as exc:  # noqa: BLE001
             pytest.skip(f"Chromium startet nicht ({str(exc)[:80]})")
         try:
             for seite_name in ("index.html", "meldungen.html"):
-                seite = browser.new_page(
-                    viewport={"width": 1440, "height": 900})
+                seite = browser.new_page(viewport={"width": 1440, "height": 900})
                 seite.goto(f"{wurzel}/{seite_name}", wait_until="load")
                 # Die Ressortbloecke sind <details> und liefern zugeklappt
                 # keine Masse.
                 seite.evaluate(
-                    "document.querySelectorAll('details')"
-                    ".forEach(d=>d.open=true)")
+                    "document.querySelectorAll('details').forEach(d=>d.open=true)"
+                )
                 seite.wait_for_timeout(400)
                 messung[seite_name] = seite.evaluate("""(() => {
                     const raus = [];
@@ -178,22 +190,27 @@ def test_der_link_steht_ueberhaupt_auf_beiden_seiten(_links):
 
 def test_der_link_bleibt_an_jeder_gewichtung_einzeilig(_links):
     """Der Fehler vom 15.08.2026: 38 px auf der Aufmacher-Karte."""
-    zu_hoch = [l for seite in _links.values() for l in seite
-               if l["hoehe"] > HOECHSTHOEHE]
+    zu_hoch = [
+        l for seite in _links.values() for l in seite if l["hoehe"] > HOECHSTHOEHE
+    ]
     assert not zu_hoch, (
         f"{len(zu_hoch)} rote Links brechen um - der Pfeil steht auf einer "
-        f"eigenen Zeile: {zu_hoch[:3]}")
+        f"eigenen Zeile: {zu_hoch[:3]}"
+    )
 
 
 def test_der_link_ist_so_breit_wie_sein_text_nicht_wie_die_karte(_links):
     """Ein Flex-Kind streckt sich auf die Kartenbreite, und mit ihm die
     Unterstreichung - quer durch die ganze Karte statt unter dem Wort."""
-    gestreckt = [l for seite in _links.values() for l in seite
-                 if l["breite"] >= l["eltern_breite"]
-                 and l["eltern_breite"] > 260]
+    gestreckt = [
+        l
+        for seite in _links.values()
+        for l in seite
+        if l["breite"] >= l["eltern_breite"] and l["eltern_breite"] > 260
+    ]
     assert not gestreckt, (
-        f"{len(gestreckt)} rote Links sind so breit wie ihre Karte: "
-        f"{gestreckt[:3]}")
+        f"{len(gestreckt)} rote Links sind so breit wie ihre Karte: {gestreckt[:3]}"
+    )
 
 
 def test_der_link_passt_in_die_schmalste_karte(_links):
@@ -212,7 +229,8 @@ def test_der_link_passt_in_die_schmalste_karte(_links):
     schmalste = min(l["eltern_breite"] for l in alle)
     assert schmalste < 260, (
         "die schmalste Karte ist breiter als erwartet - dieser Test misst "
-        f"dann nicht mehr den engen Fall ({schmalste} px)")
+        f"dann nicht mehr den engen Fall ({schmalste} px)"
+    )
     zu_breit = [l for l in alle if l["breite"] > l["eltern_breite"]]
     assert not zu_breit, f"der Link laeuft aus seiner Karte: {zu_breit[:3]}"
 
@@ -235,10 +253,10 @@ def test_die_beschriftung_ist_an_beiden_orten_dieselbe():
     js = (vorlagen / "app.js").read_text(encoding="utf-8")
     # Die Beschriftung aus dem Makro herausziehen, nicht hier wiederholen:
     # eine dritte Kopie im Test waere derselbe Fehler noch einmal.
-    zeile = [z for z in makro.splitlines()
-             if 'class="ueb-link"' in z and "{{" in z]
+    zeile = [z for z in makro.splitlines() if 'class="ueb-link"' in z and "{{" in z]
     assert len(zeile) == 1, "das Makro traegt nicht genau eine Linkzeile"
     text = zeile[0].split("</a>")[0].rsplit(">", 1)[1]
     assert text.strip(), "die Beschriftung liess sich nicht auslesen"
-    assert f'>{text}</a>' in js, (
-        f"app.js beschriftet den Link anders als das Makro ({text!r})")
+    assert f">{text}</a>" in js, (
+        f"app.js beschriftet den Link anders als das Makro ({text!r})"
+    )

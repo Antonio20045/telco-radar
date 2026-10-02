@@ -21,6 +21,7 @@ Kein Test hier haengt am heutigen Datum (CLAUDE.md Regel 11), und keiner
 spricht mit einem Mailserver: `versand.sende_mail` ist die eine Stelle,
 die ersetzt wird.
 """
+
 import importlib.util
 import logging
 import sys
@@ -51,8 +52,9 @@ def _bestand(tmp_path, *, mit_alarm: bool) -> Path:
     (root / "data" / "state").mkdir(parents=True, exist_ok=True)
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
     db.protokolliere_lauf("Medimax", _tag(1), funde=20, vollstaendig=True)
-    db.protokolliere_lauf("Medimax", _tag(2), funde=0 if mit_alarm else 20,
-                          vollstaendig=True)
+    db.protokolliere_lauf(
+        "Medimax", _tag(2), funde=0 if mit_alarm else 20, vollstaendig=True
+    )
     db.save(_tag(2))
     return root
 
@@ -79,8 +81,8 @@ def _faengt_mail(monkeypatch) -> list:
 # Fall 1: kein Messtag
 # --------------------------------------------------------------------------
 
-def test_ohne_messtag_meldet_der_schritt_einen_ausfall(tmp_path, monkeypatch,
-                                                       caplog):
+
+def test_ohne_messtag_meldet_der_schritt_einen_ausfall(tmp_path, monkeypatch, caplog):
     """Ein Bestand ohne einen einzigen Messtag ist keine Entwarnung. Der
     Schritt geht rot aus und sagt warum - sonst ist der Tag, an dem der
     Lauf gar nichts geschrieben hat, von einem ruhigen Tag nicht zu
@@ -100,12 +102,13 @@ def test_ohne_messtag_meldet_der_schritt_einen_ausfall(tmp_path, monkeypatch,
 # Fall 2: ein Alarm liegt vor
 # --------------------------------------------------------------------------
 
+
 def test_mit_alarm_geht_genau_eine_mail_hinaus_und_der_schritt_ist_gruen(
-        tmp_path, monkeypatch, caplog):
+    tmp_path, monkeypatch, caplog
+):
     root = _bestand(tmp_path, mit_alarm=True)
     gesendet = _faengt_mail(monkeypatch)
-    with caplog.at_level(logging.WARNING,
-                         logger="telco_radar.geraete_pipeline"):
+    with caplog.at_level(logging.WARNING, logger="telco_radar.geraete_pipeline"):
         code = mail.main(["--root", str(root)])
     assert code == 0
     assert len(gesendet) == 1
@@ -131,8 +134,8 @@ def test_ohne_alarm_geht_keine_mail_hinaus(tmp_path, monkeypatch):
 # Fall 3: die Zustellung scheitert
 # --------------------------------------------------------------------------
 
-def test_ein_zustellfehler_faellt_mit_rueckgabecode_zwei(tmp_path, monkeypatch,
-                                                         caplog):
+
+def test_ein_zustellfehler_faellt_mit_rueckgabecode_zwei(tmp_path, monkeypatch, caplog):
     """Scheitern ist kein leeres Ergebnis (Clean Code 5): ein Alarmkanal,
     der still nicht zustellt, ist die Fehlerklasse, gegen die dieser
     Waechter gebaut ist."""
@@ -155,8 +158,10 @@ def test_ein_zustellfehler_faellt_mit_rueckgabecode_zwei(tmp_path, monkeypatch,
 # 24.09.2026) - NICHT dieselbe Fehlerklasse wie Fall 3 oben.
 # --------------------------------------------------------------------------
 
+
 def test_fehlende_smtp_secrets_faellen_nur_als_warnung_nicht_rot(
-        tmp_path, monkeypatch, capsys, caplog):
+    tmp_path, monkeypatch, capsys, caplog
+):
     """Solange dieses Repo keine SMTP-Secrets traegt, ist JEDER Lauf
     betroffen - ein Schritt, der dafuer rot ausfaellt, ist ein Signal, das
     immer an ist und deshalb keins mehr (dieselbe Fehlerklasse wie "50
@@ -167,7 +172,8 @@ def test_fehlende_smtp_secrets_faellen_nur_als_warnung_nicht_rot(
 
     def _nicht_eingerichtet(*a, **k):
         raise versand.VersandNichtEingerichtet(
-            "SMTP_HOST, MAIL_FROM oder MAIL_TO fehlen - keine Mail verschickt")
+            "SMTP_HOST, MAIL_FROM oder MAIL_TO fehlen - keine Mail verschickt"
+        )
 
     monkeypatch.setattr(versand, "sende_mail", _nicht_eingerichtet)
     with caplog.at_level(logging.WARNING, logger="geraete_abdeckung_mail"):
@@ -183,7 +189,8 @@ def test_fehlende_smtp_secrets_faellen_nur_als_warnung_nicht_rot(
 
 
 def test_ein_echter_zustellfehler_bleibt_von_der_warnung_unterscheidbar(
-        tmp_path, monkeypatch, caplog):
+    tmp_path, monkeypatch, caplog
+):
     """Gegenprobe zu Fall 3 und 3b zusammen: nur `VersandNichtEingerichtet`
     wird zur Warnung - ein gewoehnlicher `VersandFehler` (Kanal
     eingerichtet, SMTP antwortet trotzdem nicht) bleibt Exit 2 und rot,
@@ -217,8 +224,8 @@ def test_mit_trocken_wird_nichts_verschickt(tmp_path, monkeypatch):
 # Fall 4: ein Anbieter, den die Konfiguration nicht mehr kennt
 # --------------------------------------------------------------------------
 
-def test_ein_nicht_konfigurierter_anbieter_loest_keine_mail_aus(tmp_path,
-                                                                monkeypatch):
+
+def test_ein_nicht_konfigurierter_anbieter_loest_keine_mail_aus(tmp_path, monkeypatch):
     """`nur` grenzt auf die Anbieter der Konfiguration ein. Ein Anbieter,
     der aus `geraete_quellen.yaml` gefallen ist, wird nicht mehr
     beobachtet - sein eingefrorener Zaehlerstand darf keine
@@ -237,5 +244,4 @@ def test_ein_nicht_konfigurierter_anbieter_loest_keine_mail_aus(tmp_path,
     assert mail.main(["--root", str(root)]) == 0
     assert gesendet == []
     # Gegenprobe: der Alarm selbst ist da - nur eben nicht fuer diesen Lauf.
-    assert [a.anbieter for a in db.ausfall_alarme(heute=_tag(2))] == \
-        ["Gespenst"]
+    assert [a.anbieter for a in db.ausfall_alarme(heute=_tag(2))] == ["Gespenst"]

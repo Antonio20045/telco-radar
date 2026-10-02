@@ -3,6 +3,7 @@
 Usage:
     python -m telco_radar.pipeline [--root .] [--no-llm] [--lookback-days N]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -66,11 +67,15 @@ def geraete_budget(settings: dict, verstrichen: float):
     """
     if not settings.get("geraete_enabled", False):
         return None
-    rest = (float(settings.get("job_frist_sekunden", 3000)) - verstrichen
-            - float(settings.get("veroeffentlichung_reserve_sekunden", 420)))
+    rest = (
+        float(settings.get("job_frist_sekunden", 3000))
+        - verstrichen
+        - float(settings.get("veroeffentlichung_reserve_sekunden", 420))
+    )
     if rest < _GERAETE_MINDESTBUDGET:
         return None
     return min(float(settings.get("geraete_frist_sekunden", 600)), rest)
+
 
 # Anbieter, die das OpenAI-Chat-Protokoll sprechen, mit ihren
 # Konfigurationsschluesseln: (Basis-URL, Analyst-Modell, Editor-Modell).
@@ -79,8 +84,11 @@ def geraete_budget(settings: dict, verstrichen: float):
 # raten, zu welchem Endpunkt der hinterlegte Schluessel gehoert.
 OPENAI_KOMPATIBEL = {
     "openai": ("llm_api_base", "openai_analyst_model", "openai_editor_model"),
-    "deepseek": ("deepseek_api_base", "deepseek_analyst_model",
-                 "deepseek_editor_model"),
+    "deepseek": (
+        "deepseek_api_base",
+        "deepseek_analyst_model",
+        "deepseek_editor_model",
+    ),
 }
 
 ANBIETER = ("auto", "anthropic", "bedrock", *OPENAI_KOMPATIBEL)
@@ -120,12 +128,17 @@ def _waehle_anbieter(settings: dict) -> str:
     # Ein gewaehlter Anbieter ohne seinen Schluessel laesst jede Stufe
     # scheitern - das einmal deutlich sagen, statt es jeden Aufruf einzeln
     # herausfinden zu lassen.
-    fehlt = ((wanted == "bedrock" and not has_bedrock)
-             or (wanted in OPENAI_KOMPATIBEL and not (has_key and base_url))
-             or (wanted == "anthropic" and not os.environ.get("ANTHROPIC_API_KEY")))
+    fehlt = (
+        (wanted == "bedrock" and not has_bedrock)
+        or (wanted in OPENAI_KOMPATIBEL and not (has_key and base_url))
+        or (wanted == "anthropic" and not os.environ.get("ANTHROPIC_API_KEY"))
+    )
     if fehlt:
-        log.warning("llm_provider=%s, aber Schluessel oder Basis-URL fehlen - "
-                    "der Lauf faellt auf den Notfall-Digest zurueck", wanted)
+        log.warning(
+            "llm_provider=%s, aber Schluessel oder Basis-URL fehlen - "
+            "der Lauf faellt auf den Notfall-Digest zurueck",
+            wanted,
+        )
 
     if wanted != "bedrock":
         os.environ.pop("AWS_BEARER_TOKEN_BEDROCK", None)
@@ -156,8 +169,9 @@ def _waehle_anbieter(settings: dict) -> str:
     return wanted
 
 
-def _modelle_fuer_anbieter(settings: dict, anbieter: str,
-                           fallback_model: str) -> tuple[str, str]:
+def _modelle_fuer_anbieter(
+    settings: dict, anbieter: str, fallback_model: str
+) -> tuple[str, str]:
     """Liefert (Analystenmodell, Editormodell) des GEWAEHLTEN Anbieters.
 
     Als eigene Funktion herausgezogen, weil das Auseinanderlaufen von
@@ -173,18 +187,24 @@ def _modelle_fuer_anbieter(settings: dict, anbieter: str,
         # pinning one id, register the configured preference chain and let the
         # run settle on the best model that actually answers.
         chain_head = llm.set_model_chain(settings.get("bedrock_model_chain") or [])
-        return ((settings.get("bedrock_analyst_model") or chain_head or fallback_model),
-                (settings.get("bedrock_editor_model") or chain_head or fallback_model))
+        return (
+            (settings.get("bedrock_analyst_model") or chain_head or fallback_model),
+            (settings.get("bedrock_editor_model") or chain_head or fallback_model),
+        )
     if anbieter in OPENAI_KOMPATIBEL:
         # Die Basis-URL hat _waehle_anbieter bereits gesetzt; hier nur noch
         # die Modelle des gewaehlten Endpunkts. NIE die Schluessel eines
         # anderen OpenAI-kompatiblen Anbieters lesen - sie zeigen auf einen
         # Endpunkt, der gerade nicht aktiv ist.
         _, analyst_key, editor_key = OPENAI_KOMPATIBEL[anbieter]
-        return (settings.get(analyst_key) or fallback_model,
-                settings.get(editor_key) or fallback_model)
-    return (settings.get("analyst_model", fallback_model),
-            settings.get("editor_model", fallback_model))
+        return (
+            settings.get(analyst_key) or fallback_model,
+            settings.get(editor_key) or fallback_model,
+        )
+    return (
+        settings.get("analyst_model", fallback_model),
+        settings.get("editor_model", fallback_model),
+    )
 
 
 def _mechanik_modell(settings: dict, anbieter: str, fallback: str) -> str:
@@ -219,12 +239,15 @@ def anker_modelle(settings: dict) -> tuple[str, str]:
     """
     if not settings.get("llm_anker", True):
         return "", ""
-    return (str(settings.get("anker_redaktion_model", ANKER_REDAKTION) or "").strip(),
-            str(settings.get("anker_mechanik_model", ANKER_MECHANIK) or "").strip())
+    return (
+        str(settings.get("anker_redaktion_model", ANKER_REDAKTION) or "").strip(),
+        str(settings.get("anker_mechanik_model", ANKER_MECHANIK) or "").strip(),
+    )
 
 
-def _registriere_ausweichmodell(settings: dict, analyst_model: str,
-                                editor_model: str) -> bool:
+def _registriere_ausweichmodell(
+    settings: dict, analyst_model: str, editor_model: str
+) -> bool:
     """Das anbietereigene Ausweichmodell `editor -> analyst`, wenn es taugt.
 
     Es taugt genau dann NICHT, wenn der Claude-Anker aktiv ist: Analyst und
@@ -244,8 +267,9 @@ def _registriere_ausweichmodell(settings: dict, analyst_model: str,
     return True
 
 
-def _registriere_anker(settings: dict, analyst_model: str, editor_model: str,
-                       mechanik_model: str) -> dict[str, str]:
+def _registriere_anker(
+    settings: dict, analyst_model: str, editor_model: str, mechanik_model: str
+) -> dict[str, str]:
     """Haengt an das ENDE jeder Modellkette einen Claude-Anker.
 
     Der Anker greift NUR, wenn das Primaermodell hart gescheitert ist - im
@@ -282,14 +306,16 @@ def _registriere_anker(settings: dict, analyst_model: str, editor_model: str,
         return {}
     gesetzt: dict[str, str] = {}
     anker_namen = {redaktion, mechanik} - {""}
-    for modell, anker in ((editor_model, redaktion),
-                          (mechanik_model, mechanik),
-                          (analyst_model, mechanik)):
+    for modell, anker in (
+        (editor_model, redaktion),
+        (mechanik_model, mechanik),
+        (analyst_model, mechanik),
+    ):
         if not modell or not anker:
             continue
         kette = llm._chain_from(modell)
         if anker in kette:
-            continue                    # diese Kette ist schon verankert
+            continue  # diese Kette ist schon verankert
         ende = kette[-1]
         # Nie einen Anker hinter einen Anker haengen: dann fuehrte der
         # Ausfall des Anbieters ueber Sonnet nach Haiku statt direkt ins
@@ -309,24 +335,36 @@ def _protokolliere_kosten(kosten: dict) -> None:
     Zeile je Modell ist nicht zu sehen, an welcher.
     """
     modelle = kosten.get("modelle") or {}
-    log.info("Kosten: %.4f $ ueber %d Aufruf(e) in %d Modell(en)%s",
-             kosten.get("summe_usd", 0.0),
-             sum(m["aufrufe"] for m in modelle.values()), len(modelle),
-             f" - ohne Preiszeile: {', '.join(kosten['ohne_preis'])}"
-             if kosten.get("ohne_preis") else "")
+    log.info(
+        "Kosten: %.4f $ ueber %d Aufruf(e) in %d Modell(en)%s",
+        kosten.get("summe_usd", 0.0),
+        sum(m["aufrufe"] for m in modelle.values()),
+        len(modelle),
+        f" - ohne Preiszeile: {', '.join(kosten['ohne_preis'])}"
+        if kosten.get("ohne_preis")
+        else "",
+    )
     for name, m in modelle.items():
-        log.info("Kosten %-32s %5d Aufrufe, %9d ein / %9d aus -> %s",
-                 name, m["aufrufe"], m["prompt_tokens"], m["completion_tokens"],
-                 "?" if m.get("usd") is None else f"{m['usd']:.4f} $")
+        log.info(
+            "Kosten %-32s %5d Aufrufe, %9d ein / %9d aus -> %s",
+            name,
+            m["aufrufe"],
+            m["prompt_tokens"],
+            m["completion_tokens"],
+            "?" if m.get("usd") is None else f"{m['usd']:.4f} $",
+        )
     if kosten.get("budget_ueberschritten"):
         # Eine Warnung, kein Eingriff: der Lauf ist an dieser Stelle laengst
         # fertig. Sie steht hier, damit die Zahl nicht erst auffaellt, wenn
         # die Abrechnung kommt.
-        log.warning("Kosten: WARNSCHWELLE UEBERSCHRITTEN - %.4f $ gegen "
-                    "%.2f $ (llm_budget_usd). Der Lauf wurde nicht "
-                    "beschnitten; die Schwelle gehoert nachkalibriert oder "
-                    "der Umfang gesenkt.",
-                    kosten.get("summe_usd", 0.0), kosten["budget_usd"])
+        log.warning(
+            "Kosten: WARNSCHWELLE UEBERSCHRITTEN - %.4f $ gegen "
+            "%.2f $ (llm_budget_usd). Der Lauf wurde nicht "
+            "beschnitten; die Schwelle gehoert nachkalibriert oder "
+            "der Umfang gesenkt.",
+            kosten.get("summe_usd", 0.0),
+            kosten["budget_usd"],
+        )
 
 
 def _redaktion_zweistufig(settings: dict, bewertete: int) -> bool:
@@ -354,10 +392,12 @@ def _redaktion_zweistufig(settings: dict, bewertete: int) -> bool:
     return bewertete >= schwelle
 
 
-def zu_merkende_meldungen(new_items: list[Item],
-                          vertreter_item_von: dict[str, Item],
-                          ungelesene_meldungen: set[str],
-                          unanalysierte_regionen: set[str]) -> list[Item]:
+def zu_merkende_meldungen(
+    new_items: list[Item],
+    vertreter_item_von: dict[str, Item],
+    ungelesene_meldungen: set[str],
+    unanalysierte_regionen: set[str],
+) -> list[Item]:
     """Welche Meldungen als "gesehen" abgelegt werden duerfen.
 
     Der Seen-Store ist ein Einbahnschild: was hineingeht, gilt als erledigt
@@ -371,10 +411,13 @@ def zu_merkende_meldungen(new_items: list[Item],
     das Protokoll saehe normal aus. Als eigene Funktion herausgezogen, damit
     genau das ein Test halten kann.
     """
+
     def gelesen(item: Item) -> bool:
         chef = vertreter_item_von.get(item.id, item)
-        return (chef.id not in ungelesene_meldungen
-                and chef.region not in unanalysierte_regionen)
+        return (
+            chef.id not in ungelesene_meldungen
+            and chef.region not in unanalysierte_regionen
+        )
 
     return [i for i in new_items if gelesen(i)]
 
@@ -399,17 +442,25 @@ def vorsortierung_budget(settings: dict, verstrichen: float) -> float | None:
     """
     if not vorsortierung_mod.ist_eingeschaltet(settings):
         return None
-    rest = (float(settings.get("job_frist_sekunden", 3000)) - verstrichen
-            - float(settings.get("veroeffentlichung_reserve_sekunden", 420)))
+    rest = (
+        float(settings.get("job_frist_sekunden", 3000))
+        - verstrichen
+        - float(settings.get("veroeffentlichung_reserve_sekunden", 420))
+    )
     if rest < _VORSORTIERUNG_MINDESTBUDGET:
         return None
     return min(float(settings.get("vorsortierung_frist_sekunden", 480)), rest)
 
 
-def vorsortieren(items_by_region: dict[str, list[Item]], *, settings: dict,
-                 root: Path, model: str, use_llm: bool,
-                 verstrichen: float = 0.0
-                 ) -> tuple[dict[str, list[Item]], dict]:
+def vorsortieren(
+    items_by_region: dict[str, list[Item]],
+    *,
+    settings: dict,
+    root: Path,
+    model: str,
+    use_llm: bool,
+    verstrichen: float = 0.0,
+) -> tuple[dict[str, list[Item]], dict]:
     """Die Vorsortierung so, wie der Lauf sie aufruft - und nur deshalb eine
     eigene Funktion: der Aufrufer sitzt mitten in `run()`, und was dort steht,
     haelt kein Test. Dieselbe Ueberlegung wie bei `zu_merkende_meldungen`.
@@ -428,23 +479,32 @@ def vorsortieren(items_by_region: dict[str, list[Item]], *, settings: dict,
       Grund sein, dass der Lauf ausfaellt. Faellt sie aus, gehen alle
       Meldungen unveraendert zum Analysten; das ist teurer, aber vollstaendig.
     """
-    if not (use_llm and items_by_region
-            and vorsortierung_mod.ist_eingeschaltet(settings)):
+    if not (
+        use_llm and items_by_region and vorsortierung_mod.ist_eingeschaltet(settings)
+    ):
         return dict(items_by_region), {}
     frist = vorsortierung_budget(settings, verstrichen)
     if frist is None:
-        log.warning("Vorsortierung uebersprungen: unter %.0fs Restzeit im Job "
-                    "- alle Meldungen gehen ungefiltert zum Analysten",
-                    _VORSORTIERUNG_MINDESTBUDGET)
+        log.warning(
+            "Vorsortierung uebersprungen: unter %.0fs Restzeit im Job "
+            "- alle Meldungen gehen ungefiltert zum Analysten",
+            _VORSORTIERUNG_MINDESTBUDGET,
+        )
         return dict(items_by_region), {}
     try:
         behalten, bilanz = vorsortierung_mod.sortiere_regionen_vor(
-            dict(items_by_region), model=model, fokus=ctm_mod.lade_fokus(root),
+            dict(items_by_region),
+            model=model,
+            fokus=ctm_mod.lade_fokus(root),
             workers=int(settings.get("llm_max_workers", 4) or 1),
-            deadline=time.monotonic() + frist)
+            deadline=time.monotonic() + frist,
+        )
     except Exception as exc:  # noqa: BLE001
-        log.error("Vorsortierung fehlgeschlagen (%s) - alle Meldungen gehen "
-                  "ungefiltert zum Analysten", str(exc)[:200])
+        log.error(
+            "Vorsortierung fehlgeschlagen (%s) - alle Meldungen gehen "
+            "ungefiltert zum Analysten",
+            str(exc)[:200],
+        )
         return dict(items_by_region), {}
     return behalten, bilanz.als_dict()
 
@@ -515,8 +575,9 @@ def _interleave_by_source(items: list[Item]) -> list[Item]:
     return out
 
 
-def run(root: Path, use_llm: bool | None = None,
-        lookback_days: int | None = None) -> tuple[Path, list[Ausfall]]:
+def run(
+    root: Path, use_llm: bool | None = None, lookback_days: int | None = None
+) -> tuple[Path, list[Ausfall]]:
     """Execute one full radar run.
 
     Returns the report path and the parts of the site that were not rebuilt."""
@@ -528,7 +589,8 @@ def run(root: Path, use_llm: bool | None = None,
     fallback_model = cfg.settings.get("model", "claude-sonnet-5")
     anbieter = _waehle_anbieter(cfg.settings)
     analyst_model, editor_model = _modelle_fuer_anbieter(
-        cfg.settings, anbieter, fallback_model)
+        cfg.settings, anbieter, fallback_model
+    )
     # The editor model is the big one and the first to lose its slot when the
     # provider is oversubscribed: the connection is accepted and no token ever
     # arrives. Four stages run on it, so without a stand-in one provider outage
@@ -537,23 +599,31 @@ def run(root: Path, use_llm: bool | None = None,
     # the stand-in - used only after the editor model has failed hard once.
     mechanik_model = _mechanik_modell(cfg.settings, anbieter, analyst_model)
     ausweich_aktiv = _registriere_ausweichmodell(
-        cfg.settings, analyst_model, editor_model)
+        cfg.settings, analyst_model, editor_model
+    )
     # Danach, nicht davor: der Anker haengt sich ans ENDE derselben Kette
     # (siehe _registriere_anker).
     anker_redaktion, anker_mechanik = anker_modelle(cfg.settings)
-    anker = _registriere_anker(cfg.settings, analyst_model, editor_model,
-                               mechanik_model)
+    anker = _registriere_anker(
+        cfg.settings, analyst_model, editor_model, mechanik_model
+    )
     llm.kosten_reset()
-    llm.budget_setzen(cfg.settings.get("llm_budget_usd", 1.5),
-                      cfg.settings.get("llm_preise") or {})
-    log.info("LLM backend: %s | analyst=%s editor=%s mechanik=%s "
-             "(Ausweichmodell: %s, Anker: %s, Analystenanker: %s, "
-             "Warnschwelle: %s $)",
-             active_backend(), analyst_model, editor_model, mechanik_model,
-             analyst_model if ausweich_aktiv else "keins",
-             ", ".join(sorted(set(anker.values()))) or "keiner",
-             anker_mechanik or "keiner",
-             cfg.settings.get("llm_budget_usd", 1.5) or "keine")
+    llm.budget_setzen(
+        cfg.settings.get("llm_budget_usd", 1.5), cfg.settings.get("llm_preise") or {}
+    )
+    log.info(
+        "LLM backend: %s | analyst=%s editor=%s mechanik=%s "
+        "(Ausweichmodell: %s, Anker: %s, Analystenanker: %s, "
+        "Warnschwelle: %s $)",
+        active_backend(),
+        analyst_model,
+        editor_model,
+        mechanik_model,
+        analyst_model if ausweich_aktiv else "keins",
+        ", ".join(sorted(set(anker.values()))) or "keiner",
+        anker_mechanik or "keiner",
+        cfg.settings.get("llm_budget_usd", 1.5) or "keine",
+    )
     # 0 (oder fehlend) heisst: keine Kappung - jede neue Meldung wird bewertet.
     max_items = int(cfg.settings.get("max_items_per_region", 0) or 0) or None
 
@@ -595,8 +665,10 @@ def run(root: Path, use_llm: bool | None = None,
     if cfg.settings.get("lieferzeit_radar_aktiv", True):
         try:
             from .collect import lieferzeit as lieferzeit_radar
+
             lieferzeit_bilanz = lieferzeit_radar.sammle(
-                root, cfg.settings.get("http", {}))
+                root, cfg.settings.get("http", {})
+            )
         except Exception as exc:  # noqa: BLE001
             log.error("Lieferzeit-Radar uebersprungen: %s", exc)
 
@@ -604,8 +676,10 @@ def run(root: Path, use_llm: bool | None = None,
     if cfg.settings.get("aenderungsradar_aktiv", True):
         try:
             from .collect import aenderungen as aenderungsradar
+
             tarif_items, aenderungs_bilanz = aenderungsradar.sammle(
-                root, cfg.settings.get("http", {}))
+                root, cfg.settings.get("http", {})
+            )
             items.extend(tarif_items)
         except Exception as exc:  # noqa: BLE001
             log.error("Aenderungsradar uebersprungen: %s", exc)
@@ -619,8 +693,10 @@ def run(root: Path, use_llm: bool | None = None,
     if cfg.settings.get("tarif_radar_aktiv", True):
         try:
             from .collect import tarif_crawler
+
             dokument_items, tarif_bilanz = tarif_crawler.sammle(
-                root, cfg.settings.get("http", {}))
+                root, cfg.settings.get("http", {})
+            )
             items.extend(dokument_items)
         except Exception as exc:  # noqa: BLE001
             log.error("Tarif-Sammler uebersprungen: %s", exc)
@@ -634,13 +710,17 @@ def run(root: Path, use_llm: bool | None = None,
     if cfg.settings.get("ct_radar_aktiv", True):
         try:
             from .collect import ct_log
+
             # `use_llm` faellt erst weiter unten; hier zaehlt nur, ob ein
             # Backend ueberhaupt erreichbar ist. Ohne Modell laeuft der Radar
             # vollstaendig weiter, nur ohne die Aussortierstufe.
             ct_items, ct_bilanz = ct_log.sammle(
-                root, cfg.settings.get("http", {}),
-                modell=(mechanik_model if (use_llm is not False
-                                           and llm_available()) else ""))
+                root,
+                cfg.settings.get("http", {}),
+                modell=(
+                    mechanik_model if (use_llm is not False and llm_available()) else ""
+                ),
+            )
             items.extend(ct_items)
         except Exception as exc:  # noqa: BLE001
             log.error("CT-Radar uebersprungen: %s", exc)
@@ -649,12 +729,21 @@ def run(root: Path, use_llm: bool | None = None,
     n_empty = sum(1 for r in source_results if r["status"] == "empty")
     n_quarantaene = sum(1 for r in source_results if r["status"] == "quarantaene")
     n_fail = len(failed)
-    phase("Sammeln", time.monotonic() - tc,
-          f"{len(source_results) - n_quarantaene} Quellen abgefragt, "
-          f"{len(items)} Meldungen gefunden"
-          + (f", {n_quarantaene} stillgelegt" if n_quarantaene else ""))
-    log.info("Collected %d items (%d ok / %d leer / %d fehlgeschlagen / "
-             "%d stillgelegt)", len(items), n_ok, n_empty, n_fail, n_quarantaene)
+    phase(
+        "Sammeln",
+        time.monotonic() - tc,
+        f"{len(source_results) - n_quarantaene} Quellen abgefragt, "
+        f"{len(items)} Meldungen gefunden"
+        + (f", {n_quarantaene} stillgelegt" if n_quarantaene else ""),
+    )
+    log.info(
+        "Collected %d items (%d ok / %d leer / %d fehlgeschlagen / %d stillgelegt)",
+        len(items),
+        n_ok,
+        n_empty,
+        n_fail,
+        n_quarantaene,
+    )
 
     # -------------------------------------------------------------- dedupe
     td = time.monotonic()
@@ -675,15 +764,24 @@ def run(root: Path, use_llm: bool | None = None,
     # Erst JETZT verbuchen: die Quarantaene entscheidet an "hat geliefert",
     # und die Zahl der neuen Meldungen steht erst nach der Delta-Schicht fest.
     register_zusammenfassung = register.verbuche_lauf(
-        source_results, today_iso,
-        quarantaene_nach=int(cfg.settings.get(
-            "quellen_quarantaene_nach_laeufen", 6) or 6),
-        quellen_der_config=quellen_der_config(cfg))
+        source_results,
+        today_iso,
+        quarantaene_nach=int(
+            cfg.settings.get("quellen_quarantaene_nach_laeufen", 6) or 6
+        ),
+        quellen_der_config=quellen_der_config(cfg),
+    )
     register.speichern()
-    phase("Nur Neues", time.monotonic() - td,
-          f"{len(new_items)} neue Meldungen (Gedaechtnis: {len(seen)} bekannt)")
-    log.info("Novelty filter: %d new items (seen store: %d known ids)",
-             len(new_items), len(seen))
+    phase(
+        "Nur Neues",
+        time.monotonic() - td,
+        f"{len(new_items)} neue Meldungen (Gedaechtnis: {len(seen)} bekannt)",
+    )
+    log.info(
+        "Novelty filter: %d new items (seen store: %d known ids)",
+        len(new_items),
+        len(seen),
+    )
 
     # ------------------------------------------------------ Ereignis-Cluster
     # Der Seen-Store dedupliziert die URL, nicht das EREIGNIS. Drei Fachmedien
@@ -706,7 +804,8 @@ def run(root: Path, use_llm: bool | None = None,
         sorted(new_items, key=_sort_key, reverse=True),
         model=mechanik_model,
         use_llm=bool(use_llm and cfg.settings.get("cluster_llm_pruefung", True)),
-        max_llm_pruefungen=cfg.settings.get("cluster_max_llm_pruefungen"))
+        max_llm_pruefungen=cfg.settings.get("cluster_max_llm_pruefungen"),
+    )
 
     # Gruppen, deren Ereignis ein frueherer Lauf schon berichtet hat. Das
     # greift NUR bei praktisch gleicher Ueberschrift innerhalb von 72 Stunden
@@ -733,13 +832,20 @@ def run(root: Path, use_llm: bool | None = None,
         for m in g.mitglieder:
             vertreter_item_von[m.id] = g.vertreter
     zusammengefasst = len(new_items) - len(vertreter_items)
-    phase("Ereignisse buendeln", time.monotonic() - tk,
-          f"{len(vertreter_items)} Ereignisse aus {len(new_items)} Meldungen"
-          + (f", {len(nachklapp)} Nachklapp" if nachklapp else ""))
-    log.info("Ereignis-Cluster: %d Meldungen -> %d Ereignisse (%d gebuendelt, "
-             "%d Nachklapp zu frueher berichteten Ereignissen)",
-             len(new_items), len(vertreter_items), zusammengefasst,
-             len(nachklapp))
+    phase(
+        "Ereignisse buendeln",
+        time.monotonic() - tk,
+        f"{len(vertreter_items)} Ereignisse aus {len(new_items)} Meldungen"
+        + (f", {len(nachklapp)} Nachklapp" if nachklapp else ""),
+    )
+    log.info(
+        "Ereignis-Cluster: %d Meldungen -> %d Ereignisse (%d gebuendelt, "
+        "%d Nachklapp zu frueher berichteten Ereignissen)",
+        len(new_items),
+        len(vertreter_items),
+        zusammengefasst,
+        len(nachklapp),
+    )
 
     items_by_region: dict[str, list[Item]] = defaultdict(list)
     for item in sorted(vertreter_items, key=_sort_key, reverse=True):
@@ -757,14 +863,21 @@ def run(root: Path, use_llm: bool | None = None,
     # Modulkopf von analyze/vorsortierung.py.
     tvs = time.monotonic()
     items_by_region, vorsortierung_bilanz = vorsortieren(
-        items_by_region, settings=cfg.settings, root=root,
-        model=mechanik_model, use_llm=bool(use_llm and new_items),
-        verstrichen=time.monotonic() - t0)
+        items_by_region,
+        settings=cfg.settings,
+        root=root,
+        model=mechanik_model,
+        use_llm=bool(use_llm and new_items),
+        verstrichen=time.monotonic() - t0,
+    )
     if vorsortierung_bilanz:
-        phase("Vorsortieren", time.monotonic() - tvs,
-              f"{vorsortierung_bilanz['verworfen']} von "
-              f"{vorsortierung_bilanz['angeboten']} aussortiert, "
-              f"{vorsortierung_bilanz['durchlass']} direkt durchgelassen")
+        phase(
+            "Vorsortieren",
+            time.monotonic() - tvs,
+            f"{vorsortierung_bilanz['verworfen']} von "
+            f"{vorsortierung_bilanz['angeboten']} aussortiert, "
+            f"{vorsortierung_bilanz['durchlass']} direkt durchgelassen",
+        )
 
     # ------------------------------------------------------------- analyze
     topics_store = ReportedTopics(
@@ -799,14 +912,18 @@ def run(root: Path, use_llm: bool | None = None,
             region_name = cfg.bereich_names.get(region_key, region_key)
             try:
                 res = analyze_region(
-                    region_name, region_items, model=analyst_model,
-                    language=language, max_items=max_items,
+                    region_name,
+                    region_items,
+                    model=analyst_model,
+                    language=language,
+                    max_items=max_items,
                     is_theme=is_theme_key(region_key),
                     batch_workers=batch_workers,
                     # Der Analyst teilt sich seinen Modellnamen mit der
                     # Redaktion; sein Anker muss deshalb je AUFRUF mitgehen,
                     # sonst erbt er den Redaktionsanker (siehe llm._kette).
-                    ausweich=anker_mechanik)
+                    ausweich=anker_mechanik,
+                )
                 tel = dict(res.get("_telemetry", {}))
                 tel["region"] = region_name
                 if tel.get("batches") and not tel.get("batches_ok"):
@@ -814,23 +931,31 @@ def run(root: Path, use_llm: bool | None = None,
                     unanalysierte_regionen.add(region_key)
                 return region_name, res, tel
             except Exception as exc:  # noqa: BLE001
-                log.error("Analyst %s failed: %s - falling back to raw list",
-                          region_name, exc)
+                log.error(
+                    "Analyst %s failed: %s - falling back to raw list", region_name, exc
+                )
                 unanalysierte_regionen.add(region_key)
                 fallback = {
                     "region_summary": "",
                     "highlights": [
-                        {"title": i.title, "operator": i.operator or "",
-                         "url": i.url, "category": "Sonstiges", "relevance": 2,
-                         "summary": i.summary[:200], "why_it_matters": ""}
+                        {
+                            "title": i.title,
+                            "operator": i.operator or "",
+                            "url": i.url,
+                            "category": "Sonstiges",
+                            "relevance": 2,
+                            "summary": i.summary[:200],
+                            "why_it_matters": "",
+                        }
                         for i in region_items[:10]
                     ],
                 }
                 return region_name, fallback, None
 
         with ThreadPoolExecutor(max_workers=max(1, llm_workers)) as _pool:
-            _futs = [_pool.submit(_analyze_one, rk, ri)
-                     for rk, ri in items_by_region.items()]
+            _futs = [
+                _pool.submit(_analyze_one, rk, ri) for rk, ri in items_by_region.items()
+            ]
             for _fut in as_completed(_futs):
                 region_name, res, tel = _fut.result()
                 ungelesene_meldungen.update(res.pop("_ungelesen", []) or [])
@@ -841,7 +966,8 @@ def run(root: Path, use_llm: bool | None = None,
         # haben - sonst verlangt der Editor-Check eine Ueberschrift, zu der es
         # nichts zu schreiben gibt.
         themen_mit_inhalt = [
-            cfg.theme_names[tk] for tk in cfg.theme_names
+            cfg.theme_names[tk]
+            for tk in cfg.theme_names
             if regional.get(cfg.theme_names[tk], {}).get("highlights")
         ]
         bewertete = sum(len(r.get("highlights") or []) for r in regional.values())
@@ -849,16 +975,24 @@ def run(root: Path, use_llm: bool | None = None,
         try:
             if zweistufig:
                 body, covered = editor.synthesize_zweistufig(
-                    regional, topics_store.recent(), model=editor_model,
-                    language=language, themenbereiche=themen_mit_inhalt,
-                    workers=int(cfg.settings.get("llm_max_workers", 4)))
+                    regional,
+                    topics_store.recent(),
+                    model=editor_model,
+                    language=language,
+                    themenbereiche=themen_mit_inhalt,
+                    workers=int(cfg.settings.get("llm_max_workers", 4)),
+                )
             else:
                 body, covered = editor.synthesize(
-                    regional, topics_store.recent(), model=editor_model,
+                    regional,
+                    topics_store.recent(),
+                    model=editor_model,
                     language=language,
                     highlight_budget=int(
-                        cfg.settings.get("editor_max_highlights", 0) or 0),
-                    themenbereiche=themen_mit_inhalt)
+                        cfg.settings.get("editor_max_highlights", 0) or 0
+                    ),
+                    themenbereiche=themen_mit_inhalt,
+                )
             editor_used = True
         except Exception as exc:  # noqa: BLE001
             if cfg.settings.get("publish_requires_editorial_briefing", True):
@@ -868,10 +1002,15 @@ def run(root: Path, use_llm: bool | None = None,
                 ) from exc
             log.warning(
                 "Editorial synthesis failed (%s); publishing a labelled "
-                "source-linked fallback digest", str(exc)[:180])
+                "source-linked fallback digest",
+                str(exc)[:180],
+            )
             fallback, covered = editor.build_digest(
-                items_by_region, cfg.bereich_names, llm_was_available=False,
-                include_note=False)  # the Redaktions-Fallback note below says it
+                items_by_region,
+                cfg.bereich_names,
+                llm_was_available=False,
+                include_note=False,
+            )  # the Redaktions-Fallback note below says it
             body = (
                 "## Redaktions-Fallback\n\n"
                 "> Die aktuelle Quellenliste konnte wegen einer vorübergehenden "
@@ -882,8 +1021,11 @@ def run(root: Path, use_llm: bool | None = None,
             )
             editor_used = False
     else:
-        if (new_items and not llm_was_explicitly_disabled
-                and cfg.settings.get("publish_requires_editorial_briefing", True)):
+        if (
+            new_items
+            and not llm_was_explicitly_disabled
+            and cfg.settings.get("publish_requires_editorial_briefing", True)
+        ):
             raise RuntimeError(
                 "No editorial model is available; refusing to publish a raw "
                 "source digest. The previous briefing remains live."
@@ -895,24 +1037,37 @@ def run(root: Path, use_llm: bool | None = None,
             regional[region_name] = {
                 "region_summary": "",
                 "highlights": [
-                    {"title": i.title, "operator": i.operator or i.source_name,
-                     "url": i.url, "category": "Unbewertet", "relevance": None,
-                     "summary": i.summary[:220], "why_it_matters": ""}
-                    for i in (region_items if not max_items
-                              else region_items[:max_items])
+                    {
+                        "title": i.title,
+                        "operator": i.operator or i.source_name,
+                        "url": i.url,
+                        "category": "Unbewertet",
+                        "relevance": None,
+                        "summary": i.summary[:220],
+                        "why_it_matters": "",
+                    }
+                    for i in (
+                        region_items if not max_items else region_items[:max_items]
+                    )
                 ],
             }
         body, covered = editor.build_digest(
-            items_by_region, cfg.bereich_names, llm_was_available=bool(use_llm))
+            items_by_region, cfg.bereich_names, llm_was_available=bool(use_llm)
+        )
         if first_run:
             body = (
                 "> **Erster Lauf (Baseline):** Alle Quellen wurden initial "
                 "eingelesen. Ab dem naechsten Lauf erscheinen nur noch "
                 "wirklich neue Meldungen.\n\n" + body
             )
-    phase("Bewerten & Schreiben", time.monotonic() - ta,
-          f"{sum(len(r.get('highlights') or []) for r in regional.values())} "
-          f"bewertete Meldungen" if use_llm else "ohne KI (Roh-Digest)")
+    phase(
+        "Bewerten & Schreiben",
+        time.monotonic() - ta,
+        f"{sum(len(r.get('highlights') or []) for r in regional.values())} "
+        f"bewertete Meldungen"
+        if use_llm
+        else "ohne KI (Roh-Digest)",
+    )
 
     # ------------------------------------------------------------ CTM-Linse
     # Die zweite Bewertungsachse: nicht "ist das wichtig?", sondern "ist das
@@ -933,21 +1088,30 @@ def run(root: Path, use_llm: bool | None = None,
         alle = [h for r in regional.values() for h in r.get("highlights", [])]
         ctm_bilanz = ctm_mod.veredle(alle, fokus)
         beleg_bilanz = faithfulness.pruefe(
-            alle, model=mechanik_model,
-            use_llm=bool(use_llm and new_items
-                         and cfg.settings.get("ctm_belegpruefung", True)))
-        log.info("CTM-Linse: %d direkt / %d uebertragbar / %d Kontext / "
-                 "%d Hintergrund | Saetze: %d belegt, %d verworfen",
-                 ctm_bilanz.get("direkt", 0), ctm_bilanz.get("uebertragbar", 0),
-                 ctm_bilanz.get("kontext", 0), ctm_bilanz.get("hintergrund", 0),
-                 beleg_bilanz.get("belegt", 0),
-                 ctm_bilanz.get("saetze_verworfen", 0)
-                 + beleg_bilanz.get("verworfen", 0))
+            alle,
+            model=mechanik_model,
+            use_llm=bool(
+                use_llm and new_items and cfg.settings.get("ctm_belegpruefung", True)
+            ),
+        )
+        log.info(
+            "CTM-Linse: %d direkt / %d uebertragbar / %d Kontext / "
+            "%d Hintergrund | Saetze: %d belegt, %d verworfen",
+            ctm_bilanz.get("direkt", 0),
+            ctm_bilanz.get("uebertragbar", 0),
+            ctm_bilanz.get("kontext", 0),
+            ctm_bilanz.get("hintergrund", 0),
+            beleg_bilanz.get("belegt", 0),
+            ctm_bilanz.get("saetze_verworfen", 0) + beleg_bilanz.get("verworfen", 0),
+        )
     except Exception as exc:  # noqa: BLE001 - die Linse kippt keinen Lauf
         log.error("CTM-Linse uebersprungen: %s", exc)
-    phase("Einordnen für uns", time.monotonic() - tctm,
-          f"{ctm_bilanz.get('direkt', 0)} direkt handlungsrelevant, "
-          f"{beleg_bilanz.get('belegt', 0)} belegte Folgerungssätze")
+    phase(
+        "Einordnen für uns",
+        time.monotonic() - tctm,
+        f"{ctm_bilanz.get('direkt', 0)} direkt handlungsrelevant, "
+        f"{beleg_bilanz.get('belegt', 0)} belegte Folgerungssätze",
+    )
 
     # strip internal telemetry from the regional dict before it is stored
     for r in regional.values():
@@ -974,13 +1138,20 @@ def run(root: Path, use_llm: bool | None = None,
             # Unterschied keiner - er wird es, sobald sie auseinandergehen.
             comp_model = editor_model or analyst_model
             competitor_profiles = competitor_mod.analyze_all(
-                cfg.focus_competitors, items, comp_model, language,
-                max_workers=int(cfg.settings.get('llm_max_workers', 4)))
+                cfg.focus_competitors,
+                items,
+                comp_model,
+                language,
+                max_workers=int(cfg.settings.get("llm_max_workers", 4)),
+            )
         except Exception as exc:  # noqa: BLE001
             log.error("Competitor deep-dive failed: %s", exc)
-        phase("Wettbewerber-Analyse", time.monotonic() - tcomp,
-              f"{len(competitor_profiles)} Profile "
-              f"({sum(len(c.get('moves') or []) for c in competitor_profiles)} Moves)")
+        phase(
+            "Wettbewerber-Analyse",
+            time.monotonic() - tcomp,
+            f"{len(competitor_profiles)} Profile "
+            f"({sum(len(c.get('moves') or []) for c in competitor_profiles)} Moves)",
+        )
 
     # enrich highlights with date + source from the collected items
     by_url = {i.url: i for i in new_items}
@@ -988,8 +1159,10 @@ def run(root: Path, use_llm: bool | None = None,
         for h in region.get("highlights", []):
             item = by_url.get(h.get("url", ""))
             if item is not None:
-                h.setdefault("date", item.published.date().isoformat()
-                             if item.published else None)
+                h.setdefault(
+                    "date",
+                    item.published.date().isoformat() if item.published else None,
+                )
                 h.setdefault("source", item.source_name)
                 # Der Anzeigename allein reicht nicht: ein Betreiber mit
                 # Newsroom UND Investor Relations traegt in beiden denselben.
@@ -1031,8 +1204,11 @@ def run(root: Path, use_llm: bool | None = None,
         log.error("Bildbeschaffung fehlgeschlagen: %s", exc)
         bild_bilanz = {}
     n_bilder = bild_bilanz.get("geladen", 0)
-    phase("Bilder", time.monotonic() - tbild,
-          f"{n_bilder} von {len(alle_highlights)} Meldungen mit Bild")
+    phase(
+        "Bilder",
+        time.monotonic() - tbild,
+        f"{n_bilder} von {len(alle_highlights)} Meldungen mit Bild",
+    )
 
     # -------------------------------------------------- Highlight-Themen
     # Erkennt, wenn viele Meldungen dasselbe Ereignis meinen (Samsungs
@@ -1042,19 +1218,24 @@ def run(root: Path, use_llm: bool | None = None,
     # bricht den Lauf nie ab.
     try:
         themen_bilanz = highlight_topics.pflege_highlight_themen(
-            alle_highlights, state_dir, today_iso,
+            alle_highlights,
+            state_dir,
+            today_iso,
             # Das Redaktionsmodell: der Themen-Agent BENENNT ein Ereignis
             # und verwirft Firmen-Cluster - ein Urteil, keine Mechanik. Er
             # macht wenige Aufrufe je Lauf, und sein Ergebnis ist eine ganze
             # Seite.
             model=editor_model or analyst_model,
             use_llm=bool(use_llm and new_items),
-            reports_dir=reports_dir)
-        log.info("Highlight-Themen: %d aktiv, %d Kandidat(en), neu: %s, "
-                 "beendet: %s", themen_bilanz["aktiv"],
-                 themen_bilanz["kandidaten"],
-                 ", ".join(themen_bilanz["neu"]) or "keins",
-                 ", ".join(themen_bilanz["beendet"]) or "keins")
+            reports_dir=reports_dir,
+        )
+        log.info(
+            "Highlight-Themen: %d aktiv, %d Kandidat(en), neu: %s, beendet: %s",
+            themen_bilanz["aktiv"],
+            themen_bilanz["kandidaten"],
+            ", ".join(themen_bilanz["neu"]) or "keins",
+            ", ".join(themen_bilanz["beendet"]) or "keins",
+        )
     except Exception as exc:  # noqa: BLE001
         log.error("Highlight-Themen uebersprungen: %s", exc)
 
@@ -1080,10 +1261,17 @@ def run(root: Path, use_llm: bool | None = None,
                 flat_new.append(hh)
         diff_store = DiffStore(state_dir / "differentiation.jsonl")
         added = diff_curator.curate(
-            flat_new, diff_store, date.today().isoformat(),
-            model=mechanik_model, use_llm=bool(use_llm and new_items))
-        log.info("Differenzierung: %d neue Move(s) aufgenommen (Speicher: %d)",
-                 len(added), len(diff_store))
+            flat_new,
+            diff_store,
+            date.today().isoformat(),
+            model=mechanik_model,
+            use_llm=bool(use_llm and new_items),
+        )
+        log.info(
+            "Differenzierung: %d neue Move(s) aufgenommen (Speicher: %d)",
+            len(added),
+            len(diff_store),
+        )
     except Exception as exc:  # noqa: BLE001
         log.error("Differenzierungs-Kurator uebersprungen: %s", exc)
 
@@ -1094,8 +1282,12 @@ def run(root: Path, use_llm: bool | None = None,
     # (data/state/differentiation_db.json). Failsafe: bricht nie ab.
     try:
         category_sweep.run_sweep(
-            state_dir, os.environ.get("BRAVE_API_KEY", ""),
-            mechanik_model, bool(use_llm), date.today().isocalendar()[1])
+            state_dir,
+            os.environ.get("BRAVE_API_KEY", ""),
+            mechanik_model,
+            bool(use_llm),
+            date.today().isocalendar()[1],
+        )
     except Exception as exc:  # noqa: BLE001
         log.error("Kategorie-Sweep uebersprungen: %s", exc)
 
@@ -1109,13 +1301,22 @@ def run(root: Path, use_llm: bool | None = None,
     if cfg.settings.get("promo_enabled", True):
         try:
             from .promo_pipeline import run_promo_stage
+
             promo_result = run_promo_stage(
-                root, cfg.settings.get("http", {}), bool(use_llm),
-                editor_model, language=language, settings=cfg.settings,
+                root,
+                cfg.settings.get("http", {}),
+                bool(use_llm),
+                editor_model,
+                language=language,
+                settings=cfg.settings,
                 score_model=mechanik_model,
-                extract_model=mechanik_model)
-            log.info("Promo-Uebersicht: %s (%d aktive Aktionen)",
-                     promo_result.get("mode"), promo_result.get("active", 0))
+                extract_model=mechanik_model,
+            )
+            log.info(
+                "Promo-Uebersicht: %s (%d aktive Aktionen)",
+                promo_result.get("mode"),
+                promo_result.get("active", 0),
+            )
         except Exception as exc:  # noqa: BLE001
             log.error("Promo-Uebersicht uebersprungen: %s", exc)
 
@@ -1151,15 +1352,18 @@ def run(root: Path, use_llm: bool | None = None,
     _budget = geraete_budget(cfg.settings, time.monotonic() - t0)
     if _budget is None:
         if cfg.settings.get("geraete_enabled", False):
-            log.warning("Geraeteradar uebersprungen: zu wenig Jobzeit uebrig. "
-                        "Der naechtliche Lauf holt es nach - die "
-                        "Veroeffentlichung geht vor.")
+            log.warning(
+                "Geraeteradar uebersprungen: zu wenig Jobzeit uebrig. "
+                "Der naechtliche Lauf holt es nach - die "
+                "Veroeffentlichung geht vor."
+            )
     else:
         try:
             from .geraete_pipeline import run_geraete_stage
+
             geraete_bilanz = run_geraete_stage(
-                root, cfg.settings.get("http", {}), today_iso,
-                frist_sekunden=_budget)
+                root, cfg.settings.get("http", {}), today_iso, frist_sekunden=_budget
+            )
         except Exception as exc:  # noqa: BLE001
             log.error("Geraeteradar uebersprungen: %s", exc)
 
@@ -1176,14 +1380,17 @@ def run(root: Path, use_llm: bool | None = None,
     try:
         if use_llm and diff_entries:
             diff_body = differentiation_editor.synthesize(
-                diff_entries, theme_labels, model=editor_model, language=language)
+                diff_entries, theme_labels, model=editor_model, language=language
+            )
             diff_mode = "KI-Redaktion"
         else:
             diff_body = differentiation_editor.build_digest(diff_entries, theme_labels)
             diff_mode = "Regelbericht"
     except Exception as exc:  # noqa: BLE001
-        log.warning("Differenzierungsbericht-Agent fehlgeschlagen (%s) – "
-                    "verwende Regelbericht", str(exc)[:160])
+        log.warning(
+            "Differenzierungsbericht-Agent fehlgeschlagen (%s) – verwende Regelbericht",
+            str(exc)[:160],
+        )
         diff_body = differentiation_editor.build_digest(diff_entries, theme_labels)
         diff_mode = "Regelbericht (Fallback)"
     diff_report_path = diff_report_dir / f"{today.isoformat()}.md"
@@ -1200,18 +1407,25 @@ def run(root: Path, use_llm: bool | None = None,
     try:
         diff_store_fuer_bilder = DiffStore(state_dir / "differentiation.jsonl")
         diff_bestand = differenzierung_view.merge(
-            diff_entries, diff_store_fuer_bilder.entries())
-        bilanz = diff_bilder.beschaffe(diff_bestand, root, reports_dir,
-                                       today.isoformat())
-        log.info("Differenzierungs-Bilder: %d von %d Beispielen",
-                 bilanz.get("mit_bild", 0), bilanz.get("bestand", 0))
+            diff_entries, diff_store_fuer_bilder.entries()
+        )
+        bilanz = diff_bilder.beschaffe(
+            diff_bestand, root, reports_dir, today.isoformat()
+        )
+        log.info(
+            "Differenzierungs-Bilder: %d von %d Beispielen",
+            bilanz.get("mit_bild", 0),
+            bilanz.get("bestand", 0),
+        )
     except Exception as exc:  # noqa: BLE001
         log.error("Differenzierungs-Bilder uebersprungen: %s", exc)
 
     # -------------------------------------------------------------- report
-    total_sources = sum(len(op.crawled_sources) for op in cfg.operators) \
-        + len(cfg.news_sources) \
+    total_sources = (
+        sum(len(op.crawled_sources) for op in cfg.operators)
+        + len(cfg.news_sources)
         + sum(1 for s in cfg.tech_sources if s.crawlable)
+    )
     stats = {
         "sources_total": total_sources,
         "sources_ok": n_ok,
@@ -1231,8 +1445,9 @@ def run(root: Path, use_llm: bool | None = None,
         "ctm_direkt": ctm_bilanz.get("direkt", 0),
         "ctm_uebertragbar": ctm_bilanz.get("uebertragbar", 0),
         "ctm_saetze": beleg_bilanz.get("belegt", 0),
-        "ctm_saetze_verworfen": (ctm_bilanz.get("saetze_verworfen", 0)
-                                 + beleg_bilanz.get("verworfen", 0)),
+        "ctm_saetze_verworfen": (
+            ctm_bilanz.get("saetze_verworfen", 0) + beleg_bilanz.get("verworfen", 0)
+        ),
         # Aenderungsradar: was still auf einer Tarifseite anders wurde.
         "tarif_seiten": aenderungs_bilanz.get("gelesen", 0),
         "tarif_aenderungen": aenderungs_bilanz.get("geaendert", 0),
@@ -1306,7 +1521,9 @@ def run(root: Path, use_llm: bool | None = None,
         "phases": phases,
         "source_summary": {
             "total": len(source_results),
-            "ok": n_ok, "empty": n_empty, "failed": n_fail,
+            "ok": n_ok,
+            "empty": n_empty,
+            "failed": n_fail,
             "quarantaene": n_quarantaene,
             "by_kind": dict(kind_counts),
         },
@@ -1316,8 +1533,11 @@ def run(root: Path, use_llm: bool | None = None,
         "register": register_zusammenfassung,
         "sources": sorted(
             source_results,
-            key=lambda r: ({"fail": 0, "ok": 1, "empty": 2}.get(r["status"], 3),
-                           -r.get("count", 0))),
+            key=lambda r: (
+                {"fail": 0, "ok": 1, "empty": 2}.get(r["status"], 3),
+                -r.get("count", 0),
+            ),
+        ),
         "analysts": analyst_telemetry,
     }
 
@@ -1339,13 +1559,18 @@ def run(root: Path, use_llm: bool | None = None,
     # html.py faellt fuer Berichte von vor diesem Feld auf die Highlight-
     # Zaehlung zurueck (siehe `n_bewertet` in render_site()).
     stats["bewertete"] = redaktion_kontinuitaet.bewertete_meldungen(
-        {"regions": regional})
-    grund = ("es gab keine neuen Meldungen zu bewerten" if not new_items else
-             "eine vorübergehende Störung des Analyse-Dienstes")
+        {"regions": regional}
+    )
+    grund = (
+        "es gab keine neuen Meldungen zu bewerten"
+        if not new_items
+        else "eine vorübergehende Störung des Analyse-Dienstes"
+    )
     regional, body, competitor_profiles, redaktion_ausfall = (
         redaktion_kontinuitaet.uebernehmen(
-            regional, body, competitor_profiles, reports_dir,
-            today.isoformat(), grund))
+            regional, body, competitor_profiles, reports_dir, today.isoformat(), grund
+        )
+    )
 
     report_md = editor.report_header(today, stats) + body
     report_path = reports_dir / f"{today.isoformat()}.md"
@@ -1366,10 +1591,12 @@ def run(root: Path, use_llm: bool | None = None,
     # Er steht im Berichts-JSON, weil der Versand nur aus ihm rendert
     # (scripts/newsletter/send_digest.py); ein Ausfall steht als `error`.
     report_json["geraete_bewegung"] = geraete_bewegung.fuer_bericht(
-        root, today, reports_dir)
+        root, today, reports_dir
+    )
     json_path = reports_dir / f"{today.isoformat()}.json"
     json_path.write_text(
-        json.dumps(report_json, ensure_ascii=False, indent=1), encoding="utf-8")
+        json.dumps(report_json, ensure_ascii=False, indent=1), encoding="utf-8"
+    )
     log.info("Report written: %s (+ .json), run took %.1fs", report_path, duration)
 
     # ------------------------------------------------------ persist state
@@ -1385,31 +1612,35 @@ def run(root: Path, use_llm: bool | None = None,
     # Meldungen der teuerste Fall ueberhaupt - der Vertreter kaeme im naechsten
     # Lauf wieder, seine drei Belege nie.
     zu_merken = zu_merkende_meldungen(
-        new_items, vertreter_item_von, ungelesene_meldungen,
-        unanalysierte_regionen)
+        new_items, vertreter_item_von, ungelesene_meldungen, unanalysierte_regionen
+    )
     gemerkt = {i.id for i in zu_merken}
     uebersprungen = len(new_items) - len(zu_merken)
     if uebersprungen:
-        log.warning("%d Meldungen NICHT als gesehen markiert (%d Region(en) "
-                    "ganz ohne Analyse, %d Meldungen aus gescheiterten "
-                    "Stapeln) - der naechste Lauf holt sie erneut",
-                    uebersprungen, len(unanalysierte_regionen),
-                    len(ungelesene_meldungen))
+        log.warning(
+            "%d Meldungen NICHT als gesehen markiert (%d Region(en) "
+            "ganz ohne Analyse, %d Meldungen aus gescheiterten "
+            "Stapeln) - der naechste Lauf holt sie erneut",
+            uebersprungen,
+            len(unanalysierte_regionen),
+            len(ungelesene_meldungen),
+        )
     seen.add(zu_merken)
     # Der Ereignis-Speicher merkt sich nur, was auch gelesen wurde - sonst
     # gaelte ein Ereignis als berichtet, das nie im Bericht stand, und der
     # naechste Lauf wuerde seine Nachzuegler als Nachklapp verwerfen.
-    cluster_store.merke([g for g in aktuelle if g.vertreter.id in gemerkt],
-                        today_iso)
+    cluster_store.merke([g for g in aktuelle if g.vertreter.id in gemerkt], today_iso)
     # Dieselbe Logik fuer das Themengedaechtnis: Themen aus einem Notfall-
     # Digest als "schon berichtet" abzulegen wuerde die Redaktion daran
     # hindern, sie spaeter richtig zu behandeln.
     if covered and editor_used:
         topics_store.add(covered, today.isoformat())
     elif covered:
-        log.warning("%d Themen stammen aus dem Notfall-Digest, nicht aus der "
-                    "Redaktion - sie werden NICHT als berichtet gemerkt",
-                    len(covered))
+        log.warning(
+            "%d Themen stammen aus dem Notfall-Digest, nicht aus der "
+            "Redaktion - sie werden NICHT als berichtet gemerkt",
+            len(covered),
+        )
 
     # ------------------------------------------------------- Uebersetzung
     # Fremdsprachige Meldungen bekommen eine vollstaendige deutsche Fassung
@@ -1445,28 +1676,38 @@ def run(root: Path, use_llm: bool | None = None,
     # "deutsch" messen wuerde.
     _ueb_items = uebersetzung_stufe.berichtete_items(alle_highlights, by_url)
     if len(_ueb_items) < len(alle_highlights):
-        log.info("Uebersetzung: %d von %d berichteten Meldungen ohne "
-                 "zugehoeriges Item (Dubletten oder umgeschriebene Adresse)",
-                 len(alle_highlights) - len(_ueb_items), len(alle_highlights))
+        log.info(
+            "Uebersetzung: %d von %d berichteten Meldungen ohne "
+            "zugehoeriges Item (Dubletten oder umgeschriebene Adresse)",
+            len(alle_highlights) - len(_ueb_items),
+            len(alle_highlights),
+        )
     _ueb_budget = uebersetzung_stufe.budget(cfg.settings, time.monotonic() - t0)
     if _ueb_budget is None:
         if cfg.settings.get("uebersetzung_enabled", True):
-            log.warning("Uebersetzung uebersprungen: zu wenig Jobzeit uebrig. "
-                        "Die Veroeffentlichung geht vor.")
+            log.warning(
+                "Uebersetzung uebersprungen: zu wenig Jobzeit uebrig. "
+                "Die Veroeffentlichung geht vor."
+            )
     elif not llm.llm_available():
         log.info("Uebersetzung uebersprungen: kein Modellzugang.")
     else:
         try:
             uebersetzung_bilanz = uebersetzung_stufe.lauf(
-                _ueb_items, root, cfg.settings, mechanik_model,
-                frist_sekunden=_ueb_budget, heute=today)
+                _ueb_items,
+                root,
+                cfg.settings,
+                mechanik_model,
+                frist_sekunden=_ueb_budget,
+                heute=today,
+            )
             log.info("%s", uebersetzung_stufe.protokollzeile(uebersetzung_bilanz))
             run_log["uebersetzung"] = {
                 k: (dict(v) if isinstance(v, Counter) else v)
-                for k, v in uebersetzung_bilanz.items()}
+                for k, v in uebersetzung_bilanz.items()
+            }
         except Exception as exc:  # noqa: BLE001
-            log.error("Uebersetzung uebersprungen: %s: %s",
-                      type(exc).__name__, exc)
+            log.error("Uebersetzung uebersprungen: %s: %s", type(exc).__name__, exc)
 
     # ---------------------------------------------------------------- Kosten
     # Erst hier, nach der letzten Modellstufe - und VOR dem Rendern: die Seite
@@ -1476,7 +1717,8 @@ def run(root: Path, use_llm: bool | None = None,
     report_json["run"] = run_log
     _protokolliere_kosten(run_log["kosten"])
     json_path.write_text(
-        json.dumps(report_json, ensure_ascii=False, indent=1), encoding="utf-8")
+        json.dumps(report_json, ensure_ascii=False, indent=1), encoding="utf-8"
+    )
 
     # ---------------------------------------------------------------- site
     # Erst aufraeumen, dann rendern: render_site kopiert den Bildordner nach
@@ -1495,10 +1737,11 @@ def run(root: Path, use_llm: bool | None = None,
     # nichts).
     try:
         from .versand import versende
+
         run_log["versand"] = versende(root, report_json, cfg.settings)
         json_path.write_text(
-            json.dumps(report_json, ensure_ascii=False, indent=1),
-            encoding="utf-8")
+            json.dumps(report_json, ensure_ascii=False, indent=1), encoding="utf-8"
+        )
     except Exception as exc:  # noqa: BLE001
         log.error("Versand uebersprungen: %s", exc)
 
@@ -1507,10 +1750,15 @@ def run(root: Path, use_llm: bool | None = None,
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run the Telco Radar pipeline")
-    parser.add_argument("--root", type=Path, default=Path("."),
-                        help="project root (contains config/, data/, site/)")
-    parser.add_argument("--no-llm", action="store_true",
-                        help="skip LLM analysis, produce raw digest")
+    parser.add_argument(
+        "--root",
+        type=Path,
+        default=Path("."),
+        help="project root (contains config/, data/, site/)",
+    )
+    parser.add_argument(
+        "--no-llm", action="store_true", help="skip LLM analysis, produce raw digest"
+    )
     parser.add_argument("--lookback-days", type=int, default=None)
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args(argv)
@@ -1523,15 +1771,18 @@ def main(argv: list[str] | None = None) -> int:
     logging.getLogger("httpx").setLevel(logging.WARNING)
 
     try:
-        _, ausfaelle = run(args.root.resolve(),
-                           use_llm=False if args.no_llm else None,
-                           lookback_days=args.lookback_days)
+        _, ausfaelle = run(
+            args.root.resolve(),
+            use_llm=False if args.no_llm else None,
+            lookback_days=args.lookback_days,
+        )
     except Exception:  # noqa: BLE001
         log.exception("Pipeline failed")
         return 1
     for ausfall in ausfaelle:
-        log.error("Seite nicht vollständig neu gebaut: %s (%s)",
-                  ausfall.teil, ausfall.grund)
+        log.error(
+            "Seite nicht vollständig neu gebaut: %s (%s)", ausfall.teil, ausfall.grund
+        )
     return 3 if ausfaelle else 0
 
 

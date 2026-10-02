@@ -32,6 +32,7 @@ WAS HIER FESTGENAGELT IST
 Kein Test haengt am heutigen Datum (CLAUDE.md Regel 11); die Fixtures
 setzen ihr Datum selbst.
 """
+
 from pathlib import Path
 
 from telco_radar.analyze.geraete_store import GeraeteDB
@@ -47,10 +48,17 @@ from test_geraete_pipeline import _jetzt, _root
 _FIX = Path(__file__).parent / "fixtures" / "geraete"
 _PRODUKT = (_FIX / "medimax_produkt.html").read_text(encoding="utf-8")
 
-_KATALOG = Katalog(geraete=[
-    Geraet(hersteller="Apple", modell="iPhone 17 Pro Max", generation=17,
-           speicher=[256, 512, 1024], segment="flagship"),
-])
+_KATALOG = Katalog(
+    geraete=[
+        Geraet(
+            hersteller="Apple",
+            modell="iPhone 17 Pro Max",
+            generation=17,
+            speicher=[256, 512, 1024],
+            segment="flagship",
+        ),
+    ]
+)
 _FARBEN = {"titannatur": "titan-natur"}
 
 _EINSTIEG = "https://www.medimax.de/c/116/smartphones"
@@ -61,8 +69,7 @@ def _kategorie(urls) -> str:
     return f"<html><body>{anker}</body></html>"
 
 
-def _seiten(lebend: int, tot: int, einstieg: str = _EINSTIEG,
-            marke: str = "") -> dict:
+def _seiten(lebend: int, tot: int, einstieg: str = _EINSTIEG, marke: str = "") -> dict:
     """Eine Kategorieseite mit `lebend` erreichbaren und `tot` toten
     Produktadressen. Was nicht im dict steht, antwortet 404 - genau die
     Lage der freenet-Sitemap.
@@ -72,8 +79,10 @@ def _seiten(lebend: int, tot: int, einstieg: str = _EINSTIEG,
     Produkte, und ein Anbieter mit zwei Einstiegen waere in Wahrheit
     einer mit einem.
     """
-    lebende = [f"https://www.medimax.de/p/1{marke}0{i}/iphone-17-pro-max-256gb"
-               for i in range(lebend)]
+    lebende = [
+        f"https://www.medimax.de/p/1{marke}0{i}/iphone-17-pro-max-256gb"
+        for i in range(lebend)
+    ]
     tote = [f"https://www.medimax.de/p/9{marke}0{i}/weg" for i in range(tot)]
     seiten = {einstieg: _kategorie(lebende + tote)}
     for url in lebende:
@@ -82,10 +91,14 @@ def _seiten(lebend: int, tot: int, einstieg: str = _EINSTIEG,
 
 
 def _anbieter(**kw) -> Anbieter:
-    vor = {"name": "mobilcom-debitel", "typ": "handel", "methode": "ldjson",
-           "basis_url": "https://www.medimax.de", "rate_limit_sekunden": 0,
-           "einstiege": [Einstieg(url=_EINSTIEG, label="Smartphones",
-                                  pfadmuster="/p/")]}
+    vor = {
+        "name": "mobilcom-debitel",
+        "typ": "handel",
+        "methode": "ldjson",
+        "basis_url": "https://www.medimax.de",
+        "rate_limit_sekunden": 0,
+        "einstiege": [Einstieg(url=_EINSTIEG, label="Smartphones", pfadmuster="/p/")],
+    }
     vor.update(kw)
     return Anbieter(**vor)
 
@@ -93,6 +106,7 @@ def _anbieter(**kw) -> Anbieter:
 def _lauf(seiten: dict, antwort=None):
     """`antwort(url) -> (status, text) | None` haengt einzelne Statuscodes
     davor - fuer alles andere gilt: bekannt = 200, unbekannt = 404."""
+
     def hole(url):
         if url.endswith("/robots.txt"):
             return (200, "User-agent: *\nDisallow: /cart\n")
@@ -101,13 +115,21 @@ def _lauf(seiten: dict, antwort=None):
             return eigen
         return (200, seiten[url]) if url in seiten else (404, "")
 
-    return sammle_anbieter(_anbieter(), _KATALOG, _FARBEN, hole, "2026-08-11",
-                           RobotsWaechter(hole=hole), _jetzt())
+    return sammle_anbieter(
+        _anbieter(),
+        _KATALOG,
+        _FARBEN,
+        hole,
+        "2026-08-11",
+        RobotsWaechter(hole=hole),
+        _jetzt(),
+    )
 
 
 # --------------------------------------------------------------------------
 # 1. Neun tote Adressen kippen keinen gelesenen Lauf
 # --------------------------------------------------------------------------
+
 
 def test_tote_produktadressen_kippen_einen_gelesenen_lauf_nicht():
     """Der gemessene Fall, nachgebaut: 45 Adressen, 9 davon tot, 36
@@ -138,6 +160,7 @@ def test_ohne_tote_adressen_bleibt_die_liste_leer():
 # --------------------------------------------------------------------------
 # 2. Die Schwelle - und die Grenze genau
 # --------------------------------------------------------------------------
+
 
 def test_die_schwelle_ist_eine_benannte_konstante():
     from telco_radar.collect.geraete import (
@@ -181,6 +204,7 @@ def test_eine_tote_adresse_unter_zwei_reisst_die_schwelle():
 # 3. Nur eine Antwort des Anbieters ist eine tote Adresse
 # --------------------------------------------------------------------------
 
+
 def test_ein_serverfehler_ist_keine_tote_adresse():
     """HTTP 500 heisst "wir wissen nicht, was auf dieser Seite steht" -
     nicht gelesen ist nicht leer (Clean Code 6). Eine einzige solche
@@ -217,8 +241,15 @@ def test_eine_robots_sperre_ist_keine_tote_adresse():
             return (200, "User-agent: *\nDisallow: /p/\n")
         return (200, seiten[url]) if url in seiten else (404, "")
 
-    bilanz = sammle_anbieter(_anbieter(), _KATALOG, _FARBEN, hole,
-                             "2026-08-11", RobotsWaechter(hole=hole), _jetzt())
+    bilanz = sammle_anbieter(
+        _anbieter(),
+        _KATALOG,
+        _FARBEN,
+        hole,
+        "2026-08-11",
+        RobotsWaechter(hole=hole),
+        _jetzt(),
+    )
     assert bilanz.tote_adressen == []
     assert bilanz.gelesene_einstiege == set()
 
@@ -226,6 +257,7 @@ def test_eine_robots_sperre_ist_keine_tote_adresse():
 # --------------------------------------------------------------------------
 # 4. Der Einstieg selbst bleibt ein Fehler
 # --------------------------------------------------------------------------
+
 
 def test_ein_toter_einstieg_bleibt_ein_fehler():
     """Die Lockerung gilt fuer PRODUKTADRESSEN. Antwortet die
@@ -244,16 +276,32 @@ def test_ein_toter_einstieg_bleibt_ein_fehler():
 # 5. Die Zahl steht im Protokoll und auf der Quellenseite
 # --------------------------------------------------------------------------
 
-_QUELLEN_MIT_TOTER_ADRESSE = {"anbieter": [
-    {"name": "Medimax", "typ": "handel", "methode": "ldjson", "rang": 1,
-     "basis_url": "https://www.medimax.de", "rate_limit_sekunden": 0,
-     "einstiege": [{"url": _EINSTIEG, "label": "Smartphones",
-                    "pfadmuster": "/p/"}]},
-]}
+_QUELLEN_MIT_TOTER_ADRESSE = {
+    "anbieter": [
+        {
+            "name": "Medimax",
+            "typ": "handel",
+            "methode": "ldjson",
+            "rang": 1,
+            "basis_url": "https://www.medimax.de",
+            "rate_limit_sekunden": 0,
+            "einstiege": [
+                {"url": _EINSTIEG, "label": "Smartphones", "pfadmuster": "/p/"}
+            ],
+        },
+    ]
+}
 
 
-def _stufe(tmp_path, tag: str, lebend: int, tot: int, root=None,
-           robots: str = "User-agent: *\nDisallow: /cart\n", stunde: int = 3):
+def _stufe(
+    tmp_path,
+    tag: str,
+    lebend: int,
+    tot: int,
+    root=None,
+    robots: str = "User-agent: *\nDisallow: /cart\n",
+    stunde: int = 3,
+):
     """Ein Lauf der ganzen Stufe. `root` wiederverwendet einen bestehenden
     Bestand - so lassen sich zwei Naechte hintereinander messen."""
     import yaml
@@ -261,8 +309,11 @@ def _stufe(tmp_path, tag: str, lebend: int, tot: int, root=None,
     if root is None:
         root = _root(tmp_path)
         (root / "config" / "geraete_quellen.yaml").write_text(
-            yaml.safe_dump(_QUELLEN_MIT_TOTER_ADRESSE, allow_unicode=True,
-                           sort_keys=False), encoding="utf-8")
+            yaml.safe_dump(
+                _QUELLEN_MIT_TOTER_ADRESSE, allow_unicode=True, sort_keys=False
+            ),
+            encoding="utf-8",
+        )
     seiten = _seiten(lebend=lebend, tot=tot)
 
     def hole(url):
@@ -270,8 +321,7 @@ def _stufe(tmp_path, tag: str, lebend: int, tot: int, root=None,
             return (200, robots)
         return (200, seiten[url]) if url in seiten else (404, "")
 
-    return root, run_geraete_stage(root, {}, tag, jetzt=_jetzt(stunde),
-                                   hole=hole)
+    return root, run_geraete_stage(root, {}, tag, jetzt=_jetzt(stunde), hole=hole)
 
 
 def test_der_lauf_zaehlt_wieder_als_vollstaendiger_lauf(tmp_path):
@@ -306,17 +356,34 @@ def test_die_quellenseite_nennt_die_toten_adressen(tmp_path):
     from telco_radar.geraete_config import lade_katalog, lade_quellen
 
     root, _ = _stufe(tmp_path, "2026-08-11", lebend=36, tot=9)
-    daten = geraete_view.aufbereiten(root / "data" / "state",
-                                     lade_quellen(root), lade_katalog(root),
-                                     heute="2026-08-11")
+    daten = geraete_view.aufbereiten(
+        root / "data" / "state",
+        lade_quellen(root),
+        lade_katalog(root),
+        heute="2026-08-11",
+    )
     zeile = {z["name"]: z for z in daten["quellenlage"]["zeilen"]}["Medimax"]
     assert zeile["tote_satz"] == "9 verlinkte Produktseiten gibt es nicht mehr"
-    modul = _env().get_template("geraete_quellen.html.j2").make_module(
-        {"geraete": {"quellenlage": {"zeilen": [], "ohne_hardware": [],
-                                     "aufgefuehrt": 0, "liefernd": 0,
-                                     "seiten": 0},
-                     "stand": "", "pruefung": {}},
-         "prefix": ""})
+    modul = (
+        _env()
+        .get_template("geraete_quellen.html.j2")
+        .make_module(
+            {
+                "geraete": {
+                    "quellenlage": {
+                        "zeilen": [],
+                        "ohne_hardware": [],
+                        "aufgefuehrt": 0,
+                        "liefernd": 0,
+                        "seiten": 0,
+                    },
+                    "stand": "",
+                    "pruefung": {},
+                },
+                "prefix": "",
+            }
+        )
+    )
     assert "9 verlinkte Produktseiten gibt es nicht mehr" in modul.zeile(zeile)
 
 
@@ -326,9 +393,12 @@ def test_ohne_tote_adressen_steht_keine_null_auf_der_seite(tmp_path):
     from telco_radar.geraete_config import lade_katalog, lade_quellen
 
     root, _ = _stufe(tmp_path, "2026-08-11", lebend=36, tot=0)
-    daten = geraete_view.aufbereiten(root / "data" / "state",
-                                     lade_quellen(root), lade_katalog(root),
-                                     heute="2026-08-11")
+    daten = geraete_view.aufbereiten(
+        root / "data" / "state",
+        lade_quellen(root),
+        lade_katalog(root),
+        heute="2026-08-11",
+    )
     zeile = {z["name"]: z for z in daten["quellenlage"]["zeilen"]}["Medimax"]
     assert zeile["tote_satz"] == ""
 
@@ -336,6 +406,7 @@ def test_ohne_tote_adressen_steht_keine_null_auf_der_seite(tmp_path):
 # --------------------------------------------------------------------------
 # 6. Der Lesezustand: GELESEN, nicht TEILGELESEN
 # --------------------------------------------------------------------------
+
 
 def test_tote_adressen_ergeben_gelesen_und_nicht_teilgelesen(tmp_path):
     """Kein ZWEITER Teilzustand neben dem des Abdeckungswaechters
@@ -369,6 +440,7 @@ def test_unter_der_schwelle_ist_der_tag_ein_lesefehler(tmp_path):
 # --------------------------------------------------------------------------
 # 7. Was KEINE tote Adresse ist - die Wege, die keinen Statuscode haben
 # --------------------------------------------------------------------------
+
 
 def test_eine_abweisung_der_abrufschleuse_hat_keinen_statuscode():
     """Der Kern der Unterscheidung, am kleinsten Baustein gemessen.
@@ -413,9 +485,16 @@ def test_die_besuchszeit_beendet_den_lauf_ohne_tote_adresse():
             return (200, robots)
         return (200, seiten[url]) if url in seiten else (404, "")
 
-    bilanz = sammle_anbieter(_anbieter(), _KATALOG, _FARBEN, hole,
-                             "2026-08-11", RobotsWaechter(hole=hole),
-                             _jetzt(3), uhr=uhr)
+    bilanz = sammle_anbieter(
+        _anbieter(),
+        _KATALOG,
+        _FARBEN,
+        hole,
+        "2026-08-11",
+        RobotsWaechter(hole=hole),
+        _jetzt(3),
+        uhr=uhr,
+    )
     assert bilanz.tote_adressen == []
     assert bilanz.ausserhalb_besuchszeit is True
     assert bilanz.vollstaendig is False
@@ -433,8 +512,7 @@ def test_http_403_ist_keine_tote_adresse():
     seiten = _seiten(lebend=36, tot=0)
     gesperrt = "https://www.medimax.de/p/100/iphone-17-pro-max-256gb"
 
-    bilanz = _lauf(seiten,
-                   antwort=lambda u: (403, "") if u == gesperrt else None)
+    bilanz = _lauf(seiten, antwort=lambda u: (403, "") if u == gesperrt else None)
     assert bilanz.tote_adressen == []
     assert bilanz.gelesene_einstiege == set()
     assert bilanz.vollstaendig is False
@@ -452,9 +530,12 @@ def test_eine_202_challenge_ist_keine_tote_adresse():
     seiten = _seiten(lebend=36, tot=0)
     challenge = "https://www.medimax.de/p/100/iphone-17-pro-max-256gb"
 
-    bilanz = _lauf(seiten, antwort=lambda u: (202, "<html><body>Bitte "
-                                              "warten</body></html>")
-                   if u == challenge else None)
+    bilanz = _lauf(
+        seiten,
+        antwort=lambda u: (
+            (202, "<html><body>Bitte warten</body></html>") if u == challenge else None
+        ),
+    )
     assert bilanz.tote_adressen == []
     assert bilanz.produkte_abgerufen == 36
     assert bilanz.vollstaendig is True
@@ -481,20 +562,28 @@ def test_nur_der_einstieg_mit_zu_vielen_toten_adressen_faellt_aus():
     an dieser Menge.
     """
     seiten = _seiten(lebend=6, tot=4, einstieg=_EINSTIEG, marke="1")
-    seiten.update(_seiten(lebend=10, tot=0, einstieg=_EINSTIEG_ZWEI,
-                          marke="2"))
-    anbieter = _anbieter(einstiege=[
-        Einstieg(url=_EINSTIEG, label="Smartphones", pfadmuster="/p/"),
-        Einstieg(url=_EINSTIEG_ZWEI, label="Handys", pfadmuster="/p/"),
-    ])
+    seiten.update(_seiten(lebend=10, tot=0, einstieg=_EINSTIEG_ZWEI, marke="2"))
+    anbieter = _anbieter(
+        einstiege=[
+            Einstieg(url=_EINSTIEG, label="Smartphones", pfadmuster="/p/"),
+            Einstieg(url=_EINSTIEG_ZWEI, label="Handys", pfadmuster="/p/"),
+        ]
+    )
 
     def hole(url):
         if url.endswith("/robots.txt"):
             return (200, "User-agent: *\nDisallow: /cart\n")
         return (200, seiten[url]) if url in seiten else (404, "")
 
-    bilanz = sammle_anbieter(anbieter, _KATALOG, _FARBEN, hole, "2026-08-11",
-                             RobotsWaechter(hole=hole), _jetzt())
+    bilanz = sammle_anbieter(
+        anbieter,
+        _KATALOG,
+        _FARBEN,
+        hole,
+        "2026-08-11",
+        RobotsWaechter(hole=hole),
+        _jetzt(),
+    )
     assert bilanz.gelesene_einstiege == {_EINSTIEG_ZWEI}
     assert bilanz.status == "ok"
     assert bilanz.vollstaendig is True
@@ -508,8 +597,8 @@ def test_nur_der_einstieg_mit_zu_vielen_toten_adressen_faellt_aus():
 # 9. "Nicht gemessen" steht auch im PROTOKOLL als Luecke (Clean Code 3)
 # --------------------------------------------------------------------------
 
-def test_ein_lauf_ohne_produktseiten_bucht_auch_im_protokoll_keine_null(
-        tmp_path):
+
+def test_ein_lauf_ohne_produktseiten_bucht_auch_im_protokoll_keine_null(tmp_path):
     """Dieselbe Regel wie im Bestand - und bis zum 22.09.2026 stand im
     Protokoll-JSON genau die Entwarnung, die
     `test_ein_lauf_ohne_produktseiten_bucht_keine_null` fuer den Bestand
@@ -540,13 +629,24 @@ def test_eine_nacht_ohne_abruf_loescht_die_gemessene_luecke_nicht(tmp_path):
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
     assert db.laufbilanz("Medimax")["tote_adressen"] == 9
 
-    _stufe(tmp_path, "2026-08-12", lebend=36, tot=9, root=root, stunde=12,
-           robots="User-agent: *\nVisit-time: 0200-0800\n")
+    _stufe(
+        tmp_path,
+        "2026-08-12",
+        lebend=36,
+        tot=9,
+        root=root,
+        stunde=12,
+        robots="User-agent: *\nVisit-time: 0200-0800\n",
+    )
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
-    assert db.laufbilanz("Medimax")["tote_adressen"] == 9, \
+    assert db.laufbilanz("Medimax")["tote_adressen"] == 9, (
         "eine Nacht ohne Abruf hat die gemessene Luecke geloescht"
-    daten = geraete_view.aufbereiten(root / "data" / "state",
-                                     lade_quellen(root), lade_katalog(root),
-                                     heute="2026-08-12")
+    )
+    daten = geraete_view.aufbereiten(
+        root / "data" / "state",
+        lade_quellen(root),
+        lade_katalog(root),
+        heute="2026-08-12",
+    )
     zeile = {z["name"]: z for z in daten["quellenlage"]["zeilen"]}["Medimax"]
     assert zeile["tote_satz"] == "9 verlinkte Produktseiten gibt es nicht mehr"

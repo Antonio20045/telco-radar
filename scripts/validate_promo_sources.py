@@ -9,6 +9,7 @@ reads a different config file with a different schema.
 Usage: python scripts/validate_promo_sources.py [--root .]
 Exit code 0 always (informational tool); prints a table + summary.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -25,7 +26,11 @@ from telco_radar.promo_config import load_promo_config  # noqa: E402
 
 def check(page, http_cfg):
     if page.kind == "skip":
-        return ("SKIP", 0, page.note or "dokumentierter Sonderfall, nicht automatisiert")
+        return (
+            "SKIP",
+            0,
+            page.note or "dokumentierter Sonderfall, nicht automatisiert",
+        )
     try:
         snap = fetch_snapshot(page.url, page.kind, http_cfg)
         text = snap["text"]
@@ -59,20 +64,27 @@ def main() -> int:
             status, n, err = fut.result()
             counts[status] += 1
             je_marke.setdefault(src.name, []).append(status)
-            print(f"{status:7} {n:>6}  {src.tier:<4} {src.name[:24]:24} "
-                  f"{page.url}  {err}")
+            print(
+                f"{status:7} {n:>6}  {src.tier:<4} {src.name[:24]:24} {page.url}  {err}"
+            )
 
     total = sum(counts.values())
     print("-" * 110)
-    print(f"Seiten: {total} bei {len(promo_cfg.sources)} Marken | OK: {counts['OK']} "
-          f"| EMPTY: {counts['EMPTY']} | FAIL: {counts['FAIL']} | SKIP: {counts['SKIP']}")
+    print(
+        f"Seiten: {total} bei {len(promo_cfg.sources)} Marken | OK: {counts['OK']} "
+        f"| EMPTY: {counts['EMPTY']} | FAIL: {counts['FAIL']} | SKIP: {counts['SKIP']}"
+    )
     blind = [m for m, st in je_marke.items() if "OK" not in st]
     if blind:
-        print(f"\nMarken OHNE eine einzige lieferfaehige Seite ({len(blind)}): "
-              + ", ".join(sorted(blind)))
-    print("\nHinweis: EMPTY/FAIL bei 'js'-Quellen kann Bot-Schutz oder ein "
-          "geaendertes Seitenlayout bedeuten - nicht automatisch die Quelle "
-          "entfernen, siehe docs/archiv/TELCO_RADAR_HANDOVER.md Abschnitt zu Quellen.")
+        print(
+            f"\nMarken OHNE eine einzige lieferfaehige Seite ({len(blind)}): "
+            + ", ".join(sorted(blind))
+        )
+    print(
+        "\nHinweis: EMPTY/FAIL bei 'js'-Quellen kann Bot-Schutz oder ein "
+        "geaendertes Seitenlayout bedeuten - nicht automatisch die Quelle "
+        "entfernen, siehe docs/archiv/TELCO_RADAR_HANDOVER.md Abschnitt zu Quellen."
+    )
     return 0
 
 

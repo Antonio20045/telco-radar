@@ -51,11 +51,16 @@ def vergleiche(alt: str, neu: str | None, wurzel: Path | None = None) -> dict[st
     """Ordnet jeder geänderten ``.py``-Datei ``gleich``, ``verschieden``, ``neu`` oder ``entfernt`` zu."""
     if wurzel is None:
         oben = subprocess.run(
-            ["git", "rev-parse", "--show-toplevel"], check=True, capture_output=True, text=True
+            ["git", "rev-parse", "--show-toplevel"],
+            check=True,
+            capture_output=True,
+            text=True,
         )
         wurzel = Path(oben.stdout.strip())
     bereich = [alt] if neu is None else [alt, neu]
-    diff = _git(wurzel, "diff", "-z", "--no-renames", "--name-only", *bereich, "--", ":/*.py")
+    diff = _git(
+        wurzel, "diff", "-z", "--no-renames", "--name-only", *bereich, "--", ":/*.py"
+    )
     diff.check_returncode()
     pfade = [pfad for pfad in diff.stdout.decode("utf-8").split("\0") if pfad]
     befund: dict[str, str] = {}
@@ -82,7 +87,9 @@ def main(argumente: list[str]) -> int:
     for pfad, urteil in befund.items():
         print(f"{urteil:<11} {pfad}")
     abweichend = sum(urteil != "gleich" for urteil in befund.values())
-    print(f"{len(befund)} Dateien, {len(befund) - abweichend} gleich, {abweichend} abweichend")
+    print(
+        f"{len(befund)} Dateien, {len(befund) - abweichend} gleich, {abweichend} abweichend"
+    )
     return 1 if abweichend else 0
 
 

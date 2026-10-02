@@ -47,7 +47,8 @@ def test_die_einordnung_traegt_nur_hebel_mit_mehr_als_einem_beispiel():
     er wuerde die Karte darunter bloss wiederholen."""
     labels = {"ki": "KI & Assistenten", "gaming": "Gaming"}
     report = build_digest(
-        [_entry(), _entry(operator="O2"), _entry(theme="gaming")], labels)
+        [_entry(), _entry(operator="O2"), _entry(theme="gaming")], labels
+    )
     assert "### KI & Assistenten" in report
     assert "### Gaming" not in report
 
@@ -56,8 +57,11 @@ def test_ein_absatz_in_aufzaehlungslaenge_wird_abgelehnt():
     """Der wahrscheinlichste Rueckfall: das Modell haengt wieder alle
     Beispiele mit Semikolon in einen Absatz. Gemessen am Bericht vom
     07.08.2026 waren das 2100 Zeichen in EINEM Absatz."""
-    wand = "## Das Bild\n\n" + ("Ein Betreiber bietet etwas an; " * 60) \
+    wand = (
+        "## Das Bild\n\n"
+        + ("Ein Betreiber bietet etwas an; " * 60)
         + "[Q](https://example.com/x).\n\n## Muster\n\nText.\n\n## Einordnung\n"
+    )
     try:
         validate_briefing(wand)
     except Exception as exc:  # noqa: BLE001

@@ -38,6 +38,7 @@ Luecken wird nicht stillschweigend gegen einen vollstaendigen gestellt.
 Dieselbe Haltung wie ueberall in diesem Projekt: lieber eine sichtbare
 Luecke als eine unsichtbare Erfindung.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -56,7 +57,7 @@ class Qualitaetsflag:
 
     schluessel: str
     text: str
-    gut: Optional[bool] = None   # True gut, False schlecht, None neutral
+    gut: Optional[bool] = None  # True gut, False schlecht, None neutral
 
 
 @dataclass
@@ -92,9 +93,11 @@ def _flags(tarif: Tarif) -> list[Qualitaetsflag]:
     if tarif.datenvolumen_gb == float("inf"):
         flags.append(Qualitaetsflag("volumen", "Unbegrenztes Datenvolumen", True))
     elif tarif.datenvolumen_gb is not None:
-        menge = int(tarif.datenvolumen_gb) if \
-            tarif.datenvolumen_gb == int(tarif.datenvolumen_gb) \
+        menge = (
+            int(tarif.datenvolumen_gb)
+            if tarif.datenvolumen_gb == int(tarif.datenvolumen_gb)
             else tarif.datenvolumen_gb
+        )
         flags.append(Qualitaetsflag("volumen", f"{menge} GB Datenvolumen", None))
 
     if tarif.drossel_down is not None:
@@ -102,10 +105,14 @@ def _flags(tarif: Tarif) -> list[Qualitaetsflag]:
         # unbrauchbar - das ist der Unterschied zwischen "langsamer" und
         # "vorbei", und er gehoert neben den Preis.
         hart = tarif.drossel_down < 1000
-        wert = (f"{tarif.drossel_down / 1000:g} MBit/s" if tarif.drossel_down >= 1000
-                else f"{tarif.drossel_down:g} KBit/s")
-        flags.append(Qualitaetsflag(
-            "drossel", f"Nach dem Volumen nur noch {wert}", not hart))
+        wert = (
+            f"{tarif.drossel_down / 1000:g} MBit/s"
+            if tarif.drossel_down >= 1000
+            else f"{tarif.drossel_down:g} KBit/s"
+        )
+        flags.append(
+            Qualitaetsflag("drossel", f"Nach dem Volumen nur noch {wert}", not hart)
+        )
 
     if tarif.volumen_automatik:
         flags.append(Qualitaetsflag("automatik", tarif.volumen_automatik, True))
@@ -118,19 +125,25 @@ def _flags(tarif: Tarif) -> list[Qualitaetsflag]:
         # waere von derselben Zahl nicht mehr davon zu unterscheiden. Die
         # Mindestlaufzeit ist die des Tarifs, das Wort dafuer steht auch im
         # Abschnitt "Was diese Zahlen nicht koennen".
-        flags.append(Qualitaetsflag(
-            "laufzeit", f"{tarif.laufzeit_monate} Monate Mindestlaufzeit",
-            False))
+        flags.append(
+            Qualitaetsflag(
+                "laufzeit", f"{tarif.laufzeit_monate} Monate Mindestlaufzeit", False
+            )
+        )
 
     if tarif.allnet_flat:
         flags.append(Qualitaetsflag("allnet", "Allnet-Flat enthalten", True))
     return flags
 
 
-def rechne(tarif: Tarif, *, cashback: Optional[float] = None,
-           wechselbonus: Optional[float] = None,
-           geraetezuzahlung: Optional[float] = None,
-           horizont: int = VERGLEICHSMONATE) -> Effektivpreis:
+def rechne(
+    tarif: Tarif,
+    *,
+    cashback: Optional[float] = None,
+    wechselbonus: Optional[float] = None,
+    geraetezuzahlung: Optional[float] = None,
+    horizont: int = VERGLEICHSMONATE,
+) -> Effektivpreis:
     """Der Effektivpreis eines Tarifs, mit allem, was daran fehlt."""
     ergebnis = Effektivpreis(horizont=horizont, flags=_flags(tarif))
 
@@ -148,8 +161,7 @@ def rechne(tarif: Tarif, *, cashback: Optional[float] = None,
     if tarif.anschlusspreis is not None:
         ergebnis.bestandteile["Anschlusspreis"] = tarif.anschlusspreis
     elif tarif.anschlusspreis_nach_erstattung is not None:
-        ergebnis.bestandteile["Anschlusspreis"] = \
-            tarif.anschlusspreis_nach_erstattung
+        ergebnis.bestandteile["Anschlusspreis"] = tarif.anschlusspreis_nach_erstattung
     else:
         ergebnis.luecken.append("Anschlusspreis")
 
@@ -170,8 +182,7 @@ def rechne(tarif: Tarif, *, cashback: Optional[float] = None,
         if tarif.datenvolumen_gb == float("inf"):
             ergebnis.preis_je_gb = 0.0
         else:
-            ergebnis.preis_je_gb = round(
-                ergebnis.monatlich / tarif.datenvolumen_gb, 3)
+            ergebnis.preis_je_gb = round(ergebnis.monatlich / tarif.datenvolumen_gb, 3)
     return ergebnis
 
 
@@ -179,8 +190,8 @@ def rechne(tarif: Tarif, *, cashback: Optional[float] = None,
 # Die Fair-Value-Linie der Positionskarte
 # --------------------------------------------------------------------------- #
 
-def regression(punkte: list[tuple[float, float]]
-               ) -> Optional[tuple[float, float]]:
+
+def regression(punkte: list[tuple[float, float]]) -> Optional[tuple[float, float]]:
     """Ausgleichsgerade y = a + b*x ueber die Punktwolke.
 
     Sie ist die "faire" Erwartung: was ein Tarif bei diesem Datenvolumen
@@ -191,9 +202,11 @@ def regression(punkte: list[tuple[float, float]]
     Weniger als drei Punkte ergeben keine Gerade, sondern eine Verbindung.
     Eine senkrechte Wolke (alle Tarife mit demselben Volumen) auch nicht.
     """
-    sauber = [(x, y) for x, y in punkte
-              if x is not None and y is not None
-              and x not in (float("inf"), float("-inf"))]
+    sauber = [
+        (x, y)
+        for x, y in punkte
+        if x is not None and y is not None and x not in (float("inf"), float("-inf"))
+    ]
     n = len(sauber)
     if n < 3:
         return None

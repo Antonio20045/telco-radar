@@ -15,6 +15,7 @@ die Zahl dauerhaft fest, die der Querlink-Umbau gemessen hat: GENAU EINE
 Datei wettbewerbsradar.html im ganzen Site-Baum (die Weiterleitung selbst)
 und NULL href/src/action auf sie von irgendeiner anderen Datei.
 """
+
 import re
 from pathlib import Path
 
@@ -25,7 +26,8 @@ from test_geraete_seite import _baue
 # oder Suffix (#anker, ?query). Die Weiterleitungsdatei selbst ist die
 # einzige erlaubte Ausnahme: SIE darf (und muss) auf geraete.html zeigen.
 _ALT_URL = re.compile(
-    r"""(?:href|src|action)=["'][^"']*wettbewerbsradar\.html[^"']*["']""")
+    r"""(?:href|src|action)=["'][^"']*wettbewerbsradar\.html[^"']*["']"""
+)
 
 
 def _dateien(site: Path):
@@ -71,7 +73,7 @@ def test_die_weiterleitung_landet_auf_einem_anker_der_seite(tmp_path):
     Test den neuen Anker statt blind den alten."""
     site = _baue(tmp_path)
     weiter = (site / "wettbewerbsradar.html").read_text(encoding="utf-8")
-    ziel = re.search(r'url=([a-z0-9_.-]+\.html)(#[a-z0-9_-]+)?', weiter)
+    ziel = re.search(r"url=([a-z0-9_.-]+\.html)(#[a-z0-9_-]+)?", weiter)
     assert ziel is not None, "Weiterleitung nennt kein Ziel"
     datei, anker = ziel.group(1), (ziel.group(2) or "").lstrip("#")
     roh = (site / datei).read_text(encoding="utf-8")

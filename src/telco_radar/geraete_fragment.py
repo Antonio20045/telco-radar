@@ -32,6 +32,7 @@ gemessen. Vorlagewechsel (P1: +2,4 MB ueber Nacht ohne neuen Messtag)
 sind SPRUENGE, die die Prognose nicht kennt - sie steht deshalb IMMER
 mit ihrem Messdatum daneben.
 """
+
 from __future__ import annotations
 
 import gzip
@@ -117,8 +118,7 @@ def lies_historie(pfad: Path) -> Bestand:
     try:
         zeilen = pfad.read_text(encoding="utf-8").splitlines()
     except OSError as exc:
-        log.warning("%s unlesbar (%s) - Fragmentmessung ohne Historie",
-                    pfad.name, exc)
+        log.warning("%s unlesbar (%s) - Fragmentmessung ohne Historie", pfad.name, exc)
         return Bestand(tage=(), paare=0)
     for zeile in zeilen:
         if not zeile.strip():
@@ -175,13 +175,17 @@ def fragment_groessen(site_dir: Path) -> list[Fragment]:
         if not pfad.exists():
             continue
         roh = pfad.read_bytes()
-        out.append(Fragment(name=name, bytes=len(roh),
-                            gzip_bytes=len(gzip.compress(roh, mtime=0))))
+        out.append(
+            Fragment(
+                name=name, bytes=len(roh), gzip_bytes=len(gzip.compress(roh, mtime=0))
+            )
+        )
     return out
 
 
-def prognose(bytes_je_paar: float, paare: int, rate: float,
-             grenze: int, anker: date) -> tuple[date, int, bool]:
+def prognose(
+    bytes_je_paar: float, paare: int, rate: float, grenze: int, anker: date
+) -> tuple[date, int, bool]:
     """Erster Tag, an dem das Zeitreihen-Fragment die Grenze ERREICHT.
 
     Linear durch den Nullpunkt: bytes(d) = bytes_je_paar * (paare +
@@ -197,7 +201,7 @@ def prognose(bytes_je_paar: float, paare: int, rate: float,
     paare_grenze = grenze / bytes_je_paar
     if paare_grenze <= paare:
         return anker, 0, True
-    tage = -(-(paare_grenze - paare) // rate)   # ceil ohne float-Rundung
+    tage = -(-(paare_grenze - paare) // rate)  # ceil ohne float-Rundung
     return anker + timedelta(days=int(tage)), int(tage), False
 
 
@@ -219,5 +223,7 @@ def protokoll_zeile(root: Path) -> str | None:
         groesse = f"{sum(f.kb for f in fragmente)} KB Fragmente"
     else:
         groesse = "kein Fragment auf Platt (Render laeuft nach diesem Schritt)"
-    return (f"Fragmentgroesse: {bestand.messtage} Messtage, "
-            f"{bestand.paare} Messpaare, {groesse}")
+    return (
+        f"Fragmentgroesse: {bestand.messtage} Messtage, "
+        f"{bestand.paare} Messpaare, {groesse}"
+    )

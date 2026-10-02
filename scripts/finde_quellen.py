@@ -56,6 +56,7 @@ firmen.yaml:
         region: europe                # nur beschreibend, fuer den Eintrag
         country: "NO"
 """
+
 from __future__ import annotations
 
 import argparse
@@ -84,32 +85,62 @@ HTTP_CFG = {"timeout_seconds": 8}
 # Reihenfolge = Trefferwahrscheinlichkeit; die Liste bleibt bewusst kurz,
 # jeder Eintrag kostet einen Abruf je Ziel.
 KANDIDATENPFADE = (
-    "/feed", "/rss", "/feed/", "/rss.xml", "/feed.xml", "/atom.xml",
-    "/index.xml", "/news/feed", "/news/rss", "/blog/feed", "/blog/rss.xml",
-    "/?format=feed&type=rss", "/rss/news", "/en/feed", "/de/feed",
+    "/feed",
+    "/rss",
+    "/feed/",
+    "/rss.xml",
+    "/feed.xml",
+    "/atom.xml",
+    "/index.xml",
+    "/news/feed",
+    "/news/rss",
+    "/blog/feed",
+    "/blog/rss.xml",
+    "/?format=feed&type=rss",
+    "/rss/news",
+    "/en/feed",
+    "/de/feed",
     "/wp-json/wp/v2/posts?per_page=25&_embed=1",
     # Weitere Muster, die im Bestand nachweislich vorkommen bzw. bei
     # Telco-Newsrooms ueberdurchschnittlich oft treffen. Jeder Eintrag kostet
     # einen Abruf je Ziel - die Liste bleibt deshalb kurz und begruendet.
-    "/news/feed/", "/press/feed", "/presse/feed", "/media/feed",
-    "/newsroom/feed", "/newsroom/rss", "/news.xml", "/press-releases/feed",
-    "/en/rss.xml", "/rss/pressreleases.xml", "/feeds/news.xml",
-    "/sitemap-news.xml", "/api/news", "/blog/index.xml",
+    "/news/feed/",
+    "/press/feed",
+    "/presse/feed",
+    "/media/feed",
+    "/newsroom/feed",
+    "/newsroom/rss",
+    "/news.xml",
+    "/press-releases/feed",
+    "/en/rss.xml",
+    "/rss/pressreleases.xml",
+    "/feeds/news.xml",
+    "/sitemap-news.xml",
+    "/api/news",
+    "/blog/index.xml",
 )
 
 # Unterpfade, die AN DIE GENANNTE SEITE gehaengt werden (nicht an die Domain).
-_SEITEN_SUFFIXE = ("/feed", "/rss", "/feed/", "/rss.xml",
-                   "?format=feed&type=rss")
+_SEITEN_SUFFIXE = ("/feed", "/rss", "/feed/", "/rss.xml", "?format=feed&type=rss")
 
 # Newsroom-Pfade, die auf einer blossen Domain ueberhaupt erst gesucht werden
 # muessen: bei --firmen ist nur "telenor.no" bekannt, nicht wo dort die
 # Pressemeldungen liegen. Die rel=alternate-Suche braucht aber eine Seite.
 NEWSROOM_PFADE = (
-    "", "/news", "/en/news", "/newsroom", "/press", "/media",
+    "",
+    "/news",
+    "/en/news",
+    "/newsroom",
+    "/press",
+    "/media",
 )
 
-_FEED_TYPES = ("application/rss+xml", "application/atom+xml",
-               "application/feed+json", "application/json")
+_FEED_TYPES = (
+    "application/rss+xml",
+    "application/atom+xml",
+    "application/feed+json",
+    "application/json",
+)
 _FEED_ANKER = re.compile(r"(rss|feed|atom)", re.I)
 
 
@@ -117,16 +148,22 @@ def _ist_feed_inhalt(text: str, content_type: str) -> str:
     """Liefert den Quellentyp ('rss'/'json_api') oder '' wenn es keiner ist."""
     kopf = text[:2000].lstrip()
     ct = (content_type or "").lower()
-    if kopf.startswith("<?xml") or "<rss" in kopf[:400].lower() \
-            or "<feed" in kopf[:400].lower():
+    if (
+        kopf.startswith("<?xml")
+        or "<rss" in kopf[:400].lower()
+        or "<feed" in kopf[:400].lower()
+    ):
         return "rss"
     if "xml" in ct and ("<item" in text[:6000] or "<entry" in text[:6000]):
         return "rss"
     if kopf.startswith(("[", "{")) and ("json" in ct or True):
         # Nur als json_api melden, wenn ueberhaupt mehrere Datensaetze
         # drinstehen - eine Fehlerseite in JSON ist kein Feed.
-        if text.count('"title"') >= 3 or text.count('"headline"') >= 3 \
-                or text.count('"link"') >= 3:
+        if (
+            text.count('"title"') >= 3
+            or text.count('"headline"') >= 3
+            or text.count('"link"') >= 3
+        ):
             return "json_api"
     return ""
 
@@ -156,8 +193,10 @@ def _aus_html(seite: str) -> list[str]:
     for a in soup.find_all("a", href=True):
         href = a["href"]
         if _FEED_ANKER.search(href) and not href.startswith(("mailto:", "#")):
-            if href.lower().endswith((".xml", "/feed", "/feed/", "/rss")) \
-                    or "format=feed" in href.lower():
+            if (
+                href.lower().endswith((".xml", "/feed", "/feed/", "/rss"))
+                or "format=feed" in href.lower()
+            ):
                 gefunden.append(urljoin(str(resp.url), href))
     # Reihenfolge erhalten, Dubletten raus
     return list(dict.fromkeys(gefunden))
@@ -202,13 +241,15 @@ def _ziel_bearbeiten(ziel: dict, bekannt: set[str] | None = None) -> list[dict]:
 
     # --- Stufe 2: die ueblichen Pfade auf der Domain
     if not gefunden:
-        gefunden = _pruefe_viele([b + p for b in sorted(basen)
-                                  for p in KANDIDATENPFADE])
+        gefunden = _pruefe_viele(
+            [b + p for b in sorted(basen) for p in KANDIDATENPFADE]
+        )
 
     # --- Stufe 3: /feed & Co. an den genannten Seitenpfaden
     if not gefunden:
-        gefunden = _pruefe_viele([s.rstrip("/") + suffix for s in seiten
-                                  for suffix in _SEITEN_SUFFIXE])
+        gefunden = _pruefe_viele(
+            [s.rstrip("/") + suffix for s in seiten for suffix in _SEITEN_SUFFIXE]
+        )
 
     treffer: list[dict] = []
     gesehen: set[str] = set()
@@ -218,8 +259,7 @@ def _ziel_bearbeiten(ziel: dict, bekannt: set[str] | None = None) -> list[dict]:
             continue
         gesehen.add(schluessel)
         eintrag = {"url": url, "type": typ}
-        for feld in ("operator", "thema", "name", "website", "country",
-                     "region"):
+        for feld in ("operator", "thema", "name", "website", "country", "region"):
             if ziel.get(feld):
                 eintrag[feld] = ziel[feld]
         eintrag["begruendung"] = "mechanisch gefunden - noch nicht abgenommen"
@@ -253,18 +293,32 @@ def ziele_aus_watchlist(root: Path) -> list[dict]:
             # rel=alternate steht bei fast jedem CMS im <head> jeder Seite.
             # Dreizehn Ratepfade je Firma waren der Grund, warum ein
             # Durchgang ueber 112 Betreiber nicht fertig wurde.
-            basis = op.website if op.website.startswith("http") \
+            basis = (
+                op.website
+                if op.website.startswith("http")
                 else f"https://www.{op.website}"
+            )
             seiten.append(basis.rstrip("/"))
         if seiten:
-            ziele.append({"operator": op.name, "website": op.website,
-                          "country": op.country, "region": op.region_key,
-                          "seiten": list(dict.fromkeys(seiten)),
-                          "herkunft": "Zweitkanal (aus Watchlist)"})
+            ziele.append(
+                {
+                    "operator": op.name,
+                    "website": op.website,
+                    "country": op.country,
+                    "region": op.region_key,
+                    "seiten": list(dict.fromkeys(seiten)),
+                    "herkunft": "Zweitkanal (aus Watchlist)",
+                }
+            )
     for src in cfg.tech_sources:
-        ziele.append({"thema": src.theme.removeprefix("thema:"),
-                      "name": src.name, "seiten": [src.url],
-                      "herkunft": "Zweitkanal (aus tech_sources)"})
+        ziele.append(
+            {
+                "thema": src.theme.removeprefix("thema:"),
+                "name": src.name,
+                "seiten": [src.url],
+                "herkunft": "Zweitkanal (aus tech_sources)",
+            }
+        )
     return ziele
 
 
@@ -278,9 +332,11 @@ def ziele_aus_firmen(pfad: Path) -> list[dict]:
         if not domain:
             continue
         basis = domain if domain.startswith("http") else f"https://www.{domain}"
-        ziel = {"seiten": [basis.rstrip("/") + p for p in NEWSROOM_PFADE],
-                "website": domain,
-                "herkunft": f.get("herkunft", "Firmenliste")}
+        ziel = {
+            "seiten": [basis.rstrip("/") + p for p in NEWSROOM_PFADE],
+            "website": domain,
+            "herkunft": f.get("herkunft", "Firmenliste"),
+        }
         for feld in ("operator", "thema", "name", "country", "region"):
             if f.get(feld):
                 ziel[feld] = f[feld]
@@ -304,19 +360,26 @@ def bekannte_urls(root: Path) -> set[str]:
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     p.add_argument("ziele", type=Path, nargs="?")
     p.add_argument("--root", type=Path, default=Path("."))
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--workers", type=int, default=16)
-    p.add_argument("--aus-watchlist", action="store_true",
-                   help="Ziele aus der bestehenden Konfiguration bauen "
-                        "(Zweitkanaele) - keine Recherche noetig")
-    p.add_argument("--firmen", type=Path,
-                   help="YAML mit name+domain je Firma (neue Unternehmen)")
-    p.add_argument("--cache", type=Path,
-                   help="bereits bearbeitete Ziele ueberspringen "
-                        "(Wiederaufnahme nach Abbruch)")
+    p.add_argument(
+        "--aus-watchlist",
+        action="store_true",
+        help="Ziele aus der bestehenden Konfiguration bauen "
+        "(Zweitkanaele) - keine Recherche noetig",
+    )
+    p.add_argument(
+        "--firmen", type=Path, help="YAML mit name+domain je Firma (neue Unternehmen)"
+    )
+    p.add_argument(
+        "--cache",
+        type=Path,
+        help="bereits bearbeitete Ziele ueberspringen (Wiederaufnahme nach Abbruch)",
+    )
     p.add_argument("--limit", type=int, help="nur die ersten N Ziele")
     args = p.parse_args(argv)
 
@@ -343,19 +406,27 @@ def main(argv: list[str] | None = None) -> int:
         gespeichert = yaml.safe_load(args.cache.read_text(encoding="utf-8")) or {}
         alle = gespeichert.get("kandidaten") or []
         erledigt = set(gespeichert.get("erledigte_ziele") or [])
-        print(f"Cache: {len(erledigt)} Ziele erledigt, "
-              f"{len(alle)} Kandidaten bereits gefunden")
+        print(
+            f"Cache: {len(erledigt)} Ziele erledigt, "
+            f"{len(alle)} Kandidaten bereits gefunden"
+        )
 
     def _kennung(z: dict) -> str:
-        return z.get("operator") or z.get("name") or z.get("thema") or \
-            (z.get("seiten") or ["?"])[0]
+        return (
+            z.get("operator")
+            or z.get("name")
+            or z.get("thema")
+            or (z.get("seiten") or ["?"])[0]
+        )
 
     offen = [z for z in ziele if _kennung(z) not in erledigt]
     if args.limit:
-        offen = offen[:args.limit]
-    print(f"{len(offen)} Ziele werden bearbeitet "
-          f"({len(bekannt)} URLs sind bereits konfiguriert und werden "
-          f"uebersprungen)")
+        offen = offen[: args.limit]
+    print(
+        f"{len(offen)} Ziele werden bearbeitet "
+        f"({len(bekannt)} URLs sind bereits konfiguriert und werden "
+        f"uebersprungen)"
+    )
 
     fertig = 0
     with ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
@@ -377,9 +448,14 @@ def main(argv: list[str] | None = None) -> int:
             # Nach jedem Ziel sichern: bei 800 Zielen ist ein Abbruch die
             # Regel, nicht die Ausnahme.
             if args.cache and fertig % 10 == 0:
-                args.cache.write_text(yaml.safe_dump(
-                    {"kandidaten": alle, "erledigte_ziele": sorted(erledigt)},
-                    allow_unicode=True, sort_keys=False), encoding="utf-8")
+                args.cache.write_text(
+                    yaml.safe_dump(
+                        {"kandidaten": alle, "erledigte_ziele": sorted(erledigt)},
+                        allow_unicode=True,
+                        sort_keys=False,
+                    ),
+                    encoding="utf-8",
+                )
 
     # Dubletten unter den Funden selbst (mehrere Ziele finden denselben Feed)
     einmalig: dict[str, dict] = {}
@@ -390,14 +466,19 @@ def main(argv: list[str] | None = None) -> int:
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(
         yaml.safe_dump({"kandidaten": alle}, allow_unicode=True, sort_keys=False),
-        encoding="utf-8")
+        encoding="utf-8",
+    )
     if args.cache:
-        args.cache.write_text(yaml.safe_dump(
-            {"kandidaten": alle, "erledigte_ziele": sorted(erledigt)},
-            allow_unicode=True, sort_keys=False), encoding="utf-8")
+        args.cache.write_text(
+            yaml.safe_dump(
+                {"kandidaten": alle, "erledigte_ziele": sorted(erledigt)},
+                allow_unicode=True,
+                sort_keys=False,
+            ),
+            encoding="utf-8",
+        )
     print(f"\n{len(alle)} Kandidaten -> {args.out}")
-    print("Naechster Schritt: python scripts/pruefe_quellenvorschlag.py "
-          f"{args.out}")
+    print(f"Naechster Schritt: python scripts/pruefe_quellenvorschlag.py {args.out}")
     return 0
 
 

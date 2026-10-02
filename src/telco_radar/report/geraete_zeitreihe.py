@@ -37,6 +37,7 @@ bei Resize: der Prototyp rechnete die Geometrie im Browser neu - hier
 stehen beide fertigen Bilder im Dokument, und ein CSS-Mediaquery zeigt
 genau eines. `display:none` nimmt das andere aus dem Accessibility-Baum.
 """
+
 from __future__ import annotations
 
 import json
@@ -46,9 +47,16 @@ from datetime import date
 from pathlib import Path
 
 from ..analyze.tco_store import basis_aus_satz, id_aus_satz
-from ..tco_model import (Buendel, POSTEN_ANSCHLUSS, POSTEN_BUENDEL,
-                         POSTEN_RATE, POSTEN_ZUZAHLUNG, TCO_HORIZONT, tco_24,
-                         zeitraum_vergleichbar)
+from ..tco_model import (
+    Buendel,
+    POSTEN_ANSCHLUSS,
+    POSTEN_BUENDEL,
+    POSTEN_RATE,
+    POSTEN_ZUZAHLUNG,
+    TCO_HORIZONT,
+    tco_24,
+    zeitraum_vergleichbar,
+)
 from . import geraete_bewegung
 from .anbieter_farben import STRICHMUSTER, stil_fuer
 from .geraete_tco_band import ERWARTETE_ANBIETER, band_label
@@ -160,20 +168,23 @@ AUTO_SICHTBAR_AB_MESTAGEN = 2
 # Hinweis aus `_geraete_buendel.html.j2` („gr-kk-hinweis") - nicht neu
 # erfunden. Ein Test haelt beide zusammen, denn derselbe Vorbehalt an
 # zwei Orten driftet, sobald nur einer geaendert wird.
-_NAEHERUNG_SATZ = ("Referenzrechnung, kein Angebot: der Vodafone-Bündelpreis "
-                   "zu diesem Gerät ist noch nicht erhoben – gerechnet aus "
-                   "dem eigenen Barpreis des Geräts und dem Tarifgrundpreis "
-                   "aus dem Produktinformationsblatt")
-_NAEHERUNG_KEIN_WEG = (" Für die Näherung gibt es keine Messung je Messtag – "
-                       "deshalb steht hier keine Rechung.")
+_NAEHERUNG_SATZ = (
+    "Referenzrechnung, kein Angebot: der Vodafone-Bündelpreis "
+    "zu diesem Gerät ist noch nicht erhoben – gerechnet aus "
+    "dem eigenen Barpreis des Geräts und dem Tarifgrundpreis "
+    "aus dem Produktinformationsblatt"
+)
+_NAEHERUNG_KEIN_WEG = (
+    " Für die Näherung gibt es keine Messung je Messtag – "
+    "deshalb steht hier keine Rechung."
+)
 
 
 def _euro(betrag) -> str:
     """1.234,56 € - dieselbe Schreibweise wie ueberall auf der Seite."""
     if betrag is None:
         return ""
-    return f"{betrag:,.2f}".replace(",", " ").replace(
-        ".", ",").replace(" ", ".") + " €"
+    return f"{betrag:,.2f}".replace(",", " ").replace(".", ",").replace(" ", ".") + " €"
 
 
 def _euro0(betrag) -> str:
@@ -235,12 +246,12 @@ def _kurz_name(modell: dict) -> str:
     hersteller = modell.get("hersteller") or ""
     speicher = modell.get("speicher")
     if hersteller and titel.startswith(hersteller + " "):
-        titel = titel[len(hersteller) + 1:]
+        titel = titel[len(hersteller) + 1 :]
     if speicher:
         titel = titel.rstrip()
         suffix = f" {speicher} GB"
         if titel.endswith(suffix):
-            titel = titel[:-len(suffix)]
+            titel = titel[: -len(suffix)]
     return titel
 
 
@@ -256,20 +267,25 @@ def _satz_name(modell: dict) -> str:
     """
     kurz = _kurz_name(modell)
     hersteller = (modell.get("hersteller") or "").strip()
-    if not hersteller or kurz == hersteller or kurz.startswith(
-            hersteller + " "):
+    if not hersteller or kurz == hersteller or kurz.startswith(hersteller + " "):
         return kurz
     return f"{hersteller} {kurz}"
 
 
 def _esc(text: str) -> str:
-    return (str(text).replace("&", "&amp;").replace("<", "&lt;")
-            .replace(">", "&gt;").replace('"', "&quot;"))
+    return (
+        str(text)
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
 
 
 # --------------------------------------------------------------------------
 # Die Band-Zeilen - der Antwort-Satz und die Luecke lesen sie
 # --------------------------------------------------------------------------
+
 
 def _band_zeilen(modell: dict) -> dict:
     """Je Band des Modells: die Zeilen (beste je Anbieter) und Luecken.
@@ -296,10 +312,15 @@ def _band_zeilen(modell: dict) -> dict:
     fertig: dict[str, dict] = {}
     for band, satz in baender.items():
         brauchbar = sorted(
-            (k for k in satz["karten"]
-             if k.get("vergleichbar") and k.get("belastbar")
-             and k.get("gesamt") is not None),
-            key=lambda k: k["gesamt"])
+            (
+                k
+                for k in satz["karten"]
+                if k.get("vergleichbar")
+                and k.get("belastbar")
+                and k.get("gesamt") is not None
+            ),
+            key=lambda k: k["gesamt"],
+        )
         # P0-B-h3: DAS HORIZONT-TOR DER ZEILEN. Die Zeilen
         # dieser Tafel werden gegeneinander gestellt - der Antwort-Satz
         # nennt die guenstigste ("... Kosten über 24 Monate"), und
@@ -319,18 +340,22 @@ def _band_zeilen(modell: dict) -> dict:
         # Im GRAPHEN behaelt dasselbe Angebot seine Kurve (`_messwert`,
         # `_svg`) - dort steht sein Zeitraum am Kurvenende; das zweite
         # Tor dieses Moduls sitzt am Vorzeichen (`_bewegung`).
-        kandidaten = [k for k in brauchbar
-                      if zeitraum_vergleichbar(k.get("leitzahl_monate"),
-                                               TCO_HORIZONT)]
+        kandidaten = [
+            k
+            for k in brauchbar
+            if zeitraum_vergleichbar(k.get("leitzahl_monate"), TCO_HORIZONT)
+        ]
         # `fremd` sind nur FRISCHE Angebote fremden Zeitraums: ein altes
         # bleibt das, was es vorher war - ein alter Stand (`alt`, A3), und
         # der wird nie als heutiger Betrag genannt. Sonst stuende im
         # Antwort-Satz ein Preis von vorletzter Woche als heutiges
         # Angebot.
-        fremd = [k for k in brauchbar
-                 if k.get("frisch", True)
-                 and not zeitraum_vergleichbar(k.get("leitzahl_monate"),
-                                               TCO_HORIZONT)]
+        fremd = [
+            k
+            for k in brauchbar
+            if k.get("frisch", True)
+            and not zeitraum_vergleichbar(k.get("leitzahl_monate"), TCO_HORIZONT)
+        ]
         zeilen, alt, gesehen = [], [], set()
         for karte in (k for k in kandidaten if k.get("frisch", True)):
             if karte["anbieter"] in gesehen:
@@ -345,14 +370,24 @@ def _band_zeilen(modell: dict) -> dict:
                 continue
             gesehen.add(karte["anbieter"])
             alt.append(karte)
-        naeherung = next((k for k in satz["karten"] if k.get("naeherung")
-                          and k.get("gesamt") is not None), None)
+        naeherung = next(
+            (
+                k
+                for k in satz["karten"]
+                if k.get("naeherung") and k.get("gesamt") is not None
+            ),
+            None,
+        )
         if naeherung is not None and EIGEN not in gesehen:
             zeilen.append(naeherung)
             gesehen.add(EIGEN)
         zeilen.sort(key=lambda k: k["gesamt"])
-        fertig[band] = {"zeilen": zeilen, "karten": satz["karten"],
-                        "alt": alt, "fremd": fremd}
+        fertig[band] = {
+            "zeilen": zeilen,
+            "karten": satz["karten"],
+            "alt": alt,
+            "fremd": fremd,
+        }
     return fertig
 
 
@@ -384,24 +419,33 @@ def _alternativen(karten: list, band: str, anbieter: str) -> list[dict]:
         if not (karte.get("sku_id") or karte.get("naeherung")):
             continue
         b = karte.get("band")
-        if b is None or not karte.get("vergleichbar") \
-                or karte.get("gesamt") is None or b == band:
+        if (
+            b is None
+            or not karte.get("vergleichbar")
+            or karte.get("gesamt") is None
+            or b == band
+        ):
             continue
         monate = karte.get("leitzahl_monate")
         # Klein ist besser: erst der Horizont-Zeitraum, dann der
         # kuerzere gemessene Zeitraum, dann der Preis. Ein unlesbarer
         # Zeitraum sortiert ans Ende (nie angenommen, Clean Code 4).
-        rang = (0 if zeitraum_vergleichbar(monate, TCO_HORIZONT) else 1,
-                monate if monate is not None else 10 ** 6, karte["gesamt"])
+        rang = (
+            0 if zeitraum_vergleichbar(monate, TCO_HORIZONT) else 1,
+            monate if monate is not None else 10**6,
+            karte["gesamt"],
+        )
         if b not in beste or rang < beste[b]["rang"]:
-            beste[b] = {"rang": rang, "tco": karte["gesamt"],
-                        "monate": monate}
-    return [{"band": b, "tco": v["tco"], "monate": v["monate"]}
-            for b, v in sorted(beste.items())]
+            beste[b] = {"rang": rang, "tco": karte["gesamt"], "monate": monate}
+    return [
+        {"band": b, "tco": v["tco"], "monate": v["monate"]}
+        for b, v in sorted(beste.items())
+    ]
 
 
-def _luecken(zeilen: list, karten: list, band: str,
-             fremd: list | None = None) -> list[dict]:
+def _luecken(
+    zeilen: list, karten: list, band: str, fremd: list | None = None
+) -> list[dict]:
     """Je erwartetem Anbieter ohne Zeile: der Grund, in EINEM Satz zusammen.
 
     Antonio 9b.7: „Wenn es nichts gibt, dann brauchst du es nicht
@@ -437,14 +481,16 @@ def _luecken(zeilen: list, karten: list, band: str,
     for anbieter in ANBIETER_FOLGE:
         if anbieter in gesehen:
             continue
-        eigene = [k for k in karten if k["anbieter"] == anbieter
-                  and (k.get("sku_id") or k.get("naeherung"))]
+        eigene = [
+            k
+            for k in karten
+            if k["anbieter"] == anbieter and (k.get("sku_id") or k.get("naeherung"))
+        ]
         if not eigene:
             grund = "gar-kein-buendel"
         elif not any(k.get("band") == band for k in eigene):
             grund = "anderes-band"
-        elif not any(k.get("frisch", True)
-                     for k in eigene if k.get("band") == band):
+        elif not any(k.get("frisch", True) for k in eigene if k.get("band") == band):
             grund = "nur-alte"
         else:
             grund = "kein-belastbares"
@@ -461,19 +507,26 @@ def _luecken(zeilen: list, karten: list, band: str,
         # (`leitzahl_monate`), wird also nicht geraten; bei mehreren
         # nennt der Satz den kleinsten - die naechstliegende Zahl.
         monate = None
-        fremde = sorted(k["leitzahl_monate"] for k in (fremd or [])
-                        if k["anbieter"] == anbieter
-                        and k.get("leitzahl_monate") is not None)
+        fremde = sorted(
+            k["leitzahl_monate"]
+            for k in (fremd or [])
+            if k["anbieter"] == anbieter and k.get("leitzahl_monate") is not None
+        )
         if fremde:
             grund, monate = "anderer-zeitraum", fremde[0]
-        luecken.append({"anbieter": anbieter, "grund": grund,
-                        "monate": monate,
-                        "alternativ": _alternativen(karten, band, anbieter)})
+        luecken.append(
+            {
+                "anbieter": anbieter,
+                "grund": grund,
+                "monate": monate,
+                "alternativ": _alternativen(karten, band, anbieter),
+            }
+        )
     return luecken
 
 
 def _alt_zeitraum(monate) -> str:
-    """" über 36 Monate" - der Zeitraum eines Alternativ-Betrags, oder "".
+    """ " über 36 Monate" - der Zeitraum eines Alternativ-Betrags, oder "".
 
     Nur bei ABWEICHUNG vom Horizont: eine 24 hinter jeder Zahl in einem
     Satz, der ohnehin von 24 Monaten spricht, waere dieselbe Angabe
@@ -509,7 +562,8 @@ def _luecke_text(luecken: list, band_labels: dict) -> str | None:
                 f"{_stufe(band_labels, a['band'])} "
                 f"{_euro(a['tco'])}"
                 f"{_alt_zeitraum(a.get('monate'))}"
-                for a in l["alternativ"])
+                for a in l["alternativ"]
+            )
             name += f" ({alt})"
         if l["grund"] == "gar-kein-buendel":
             gar_nicht.append(name)
@@ -519,23 +573,30 @@ def _luecke_text(luecken: list, band_labels: dict) -> str | None:
             # P0-B-h3: der Zeitraum steht MIT dem Namen - "nicht
             # vergleichbar" allein liest sich wie ein Mangel des
             # Angebots, und die Zahl selbst ist richtig gemessen.
-            fremd.append(f"{l['anbieter']} ({l['monate']} Monate)"
-                         if l.get("monate") is not None else l["anbieter"])
+            fremd.append(
+                f"{l['anbieter']} ({l['monate']} Monate)"
+                if l.get("monate") is not None
+                else l["anbieter"]
+            )
         else:
             anderes.append(name)
     teile = []
     if anderes:
-        teile.append("Kein Bündel in diesem Band: " + ", ".join(anderes)
-                     + ".")
+        teile.append("Kein Bündel in diesem Band: " + ", ".join(anderes) + ".")
     if fremd:
-        teile.append(f"Nur über eine andere Laufzeit, nicht über "
-                     f"{TCO_HORIZONT} Monate: " + ", ".join(fremd) + ".")
+        teile.append(
+            f"Nur über eine andere Laufzeit, nicht über "
+            f"{TCO_HORIZONT} Monate: " + ", ".join(fremd) + "."
+        )
     if nur_alt:
         teile.append("Kein aktueller Stand: " + ", ".join(nur_alt) + ".")
     if gar_nicht:
-        teile.append(", ".join(gar_nicht) + " "
-                     + ("führt" if len(gar_nicht) == 1 else "führen")
-                     + " das Gerät gar nicht im Bündel.")
+        teile.append(
+            ", ".join(gar_nicht)
+            + " "
+            + ("führt" if len(gar_nicht) == 1 else "führen")
+            + " das Gerät gar nicht im Bündel."
+        )
     return " ".join(teile) or None
 
 
@@ -543,9 +604,15 @@ def _luecke_text(luecken: list, band_labels: dict) -> str | None:
 # Der Antwort-Satz und der Rechenschaftssatz
 # --------------------------------------------------------------------------
 
-def _antwort_html(modell: dict, band: str, zeilen: list,
-                  band_katalog: dict, alte: list | None = None,
-                  fremd: list | None = None) -> str:
+
+def _antwort_html(
+    modell: dict,
+    band: str,
+    zeilen: list,
+    band_katalog: dict,
+    alte: list | None = None,
+    fremd: list | None = None,
+) -> str:
     """Der Antwort-Satz des Paar-Blocks.
 
     Seit P4/D4 (STRATEGIE_GERAETE_V3, 18.09.2026) traegt er das
@@ -575,17 +642,26 @@ def _antwort_html(modell: dict, band: str, zeilen: list,
     klammer = f" ({bereich})" if bereich else ""
     if not zeilen:
         alte = alte or []
-        alt_seit = max((k.get("abgerufen_am") or "" for k in alte
-                        if kurz_datum(k.get("abgerufen_am") or "")),
-                       default="")
+        alt_seit = max(
+            (
+                k.get("abgerufen_am") or ""
+                for k in alte
+                if kurz_datum(k.get("abgerufen_am") or "")
+            ),
+            default="",
+        )
         if alte and alt_seit:
-            return (f"Beim {name} im Band {label}{klammer} liegt kein "
-                    f"aktueller Stand vor – die letzte Messung ist vom "
-                    f"{kurz_datum(alt_seit)}.")
+            return (
+                f"Beim {name} im Band {label}{klammer} liegt kein "
+                f"aktueller Stand vor – die letzte Messung ist vom "
+                f"{kurz_datum(alt_seit)}."
+            )
         if alte:
-            return (f"Beim {name} im Band {label}{klammer} liegt kein "
-                    f"aktueller Stand vor – das Abrufdatum der letzten "
-                    f"Bündel ist unbekannt.")
+            return (
+                f"Beim {name} im Band {label}{klammer} liegt kein "
+                f"aktueller Stand vor – das Abrufdatum der letzten "
+                f"Bündel ist unbekannt."
+            )
         fremd = fremd or []
         if fremd:
             # Die guenstigste der fremden Zahlen - dieselbe Ordnung wie
@@ -594,41 +670,53 @@ def _antwort_html(modell: dict, band: str, zeilen: list,
             # als 24-Monats-Preis, und genau das ist der Befund.
             beste_fremd = fremd[0]
             monate = beste_fremd.get("leitzahl_monate")
-            zeit = (f"{monate} Monate" if monate is not None
-                    else "eine nicht gemessene Laufzeit")
-            return (f"Beim {name} im Band {label}{klammer} führt nur "
-                    f"{_esc(beste_fremd['anbieter'])} – und nur über "
-                    f"{zeit}: <b class='gr-zr-zahl'>"
-                    f"{_euro(beste_fremd['gesamt'])}</b> "
-                    f"({_esc(beste_fremd.get('tarif') or '')}"
-                    f"{_gb_teil(beste_fremd)}). Über zwei Laufzeiten gibt "
-                    f"es keinen Vergleich mit {TCO_HORIZONT} Monaten.")
-        return (f"Beim {name} im Band {label}{klammer} führt kein Anbieter "
-                f"ein Bündel.")
+            zeit = (
+                f"{monate} Monate"
+                if monate is not None
+                else "eine nicht gemessene Laufzeit"
+            )
+            return (
+                f"Beim {name} im Band {label}{klammer} führt nur "
+                f"{_esc(beste_fremd['anbieter'])} – und nur über "
+                f"{zeit}: <b class='gr-zr-zahl'>"
+                f"{_euro(beste_fremd['gesamt'])}</b> "
+                f"({_esc(beste_fremd.get('tarif') or '')}"
+                f"{_gb_teil(beste_fremd)}). Über zwei Laufzeiten gibt "
+                f"es keinen Vergleich mit {TCO_HORIZONT} Monaten."
+            )
+        return f"Beim {name} im Band {label}{klammer} führt kein Anbieter ein Bündel."
     beste = zeilen[0]
     if len(zeilen) == 1 and beste["anbieter"] == EIGEN:
-        return (f"Beim {name} im Band {label}{klammer} führt nur Vodafone: "
-                f"<b class='gr-zr-zahl'>{_euro(beste['gesamt'])}</b> Kosten "
-                f"über {TCO_HORIZONT} Monate, Ø <b class='gr-zr-zahl'>"
-                f"{_schnitt(beste)}</b> ({_esc(beste.get('tarif') or '')}"
-                f"{_gb_teil(beste)}).")
-    satz = (f"Beim {name} im Band {label}{klammer} ist "
-            f"{_esc(beste['anbieter'])} am günstigsten: "
+        return (
+            f"Beim {name} im Band {label}{klammer} führt nur Vodafone: "
             f"<b class='gr-zr-zahl'>{_euro(beste['gesamt'])}</b> Kosten "
             f"über {TCO_HORIZONT} Monate, Ø <b class='gr-zr-zahl'>"
             f"{_schnitt(beste)}</b> ({_esc(beste.get('tarif') or '')}"
-            f"{_gb_teil(beste)})")
+            f"{_gb_teil(beste)})."
+        )
+    satz = (
+        f"Beim {name} im Band {label}{klammer} ist "
+        f"{_esc(beste['anbieter'])} am günstigsten: "
+        f"<b class='gr-zr-zahl'>{_euro(beste['gesamt'])}</b> Kosten "
+        f"über {TCO_HORIZONT} Monate, Ø <b class='gr-zr-zahl'>"
+        f"{_schnitt(beste)}</b> ({_esc(beste.get('tarif') or '')}"
+        f"{_gb_teil(beste)})"
+    )
     eigen = next((z for z in zeilen if z["anbieter"] == EIGEN), None)
     if eigen is beste:
         zweit = zeilen[1] if len(zeilen) > 1 else None
-        satz = (f"Beim {name} im Band {label}{klammer} führt Vodafone: "
-                f"<b class='gr-zr-zahl'>{_euro(beste['gesamt'])}</b> Kosten "
-                f"über {TCO_HORIZONT} Monate, Ø <b class='gr-zr-zahl'>"
-                f"{_schnitt(beste)}</b> ({_esc(beste.get('tarif') or '')}"
-                f"{_gb_teil(beste)})")
+        satz = (
+            f"Beim {name} im Band {label}{klammer} führt Vodafone: "
+            f"<b class='gr-zr-zahl'>{_euro(beste['gesamt'])}</b> Kosten "
+            f"über {TCO_HORIZONT} Monate, Ø <b class='gr-zr-zahl'>"
+            f"{_schnitt(beste)}</b> ({_esc(beste.get('tarif') or '')}"
+            f"{_gb_teil(beste)})"
+        )
         if zweit is not None:
-            satz += (f" Nächster Anbieter: {_esc(zweit['anbieter'])} "
-                     f"({_euro(zweit['gesamt'])}).")
+            satz += (
+                f" Nächster Anbieter: {_esc(zweit['anbieter'])} "
+                f"({_euro(zweit['gesamt'])})."
+            )
     elif eigen is None:
         satz += " — Vodafone führt in diesem Band kein Bündel."
     # eigen ist nicht None und nicht beste: KEIN Anhang mehr - das Delta
@@ -670,19 +758,23 @@ def _leitzahl_html(zeilen: list) -> str | None:
     delta = round(eigen["gesamt"] - beste["gesamt"], 2)
     # Das Label nennt, WER unter Vodafone liegt - wie die Leitzahl der
     # Übersicht; ohne Namen stand die groesste Zahl der Seite anonym da.
-    return (f"<b class='gr-leit-zahl'>{_euro(delta)}</b>"
-            f"<span class='gr-leit-label'>{_esc(beste['anbieter'])} "
-            f"unter Vodafone "
-            f"({_euro(eigen['gesamt'])}"
-            f"{', Näherung' if eigen.get('naeherung') else ''})</span>")
+    return (
+        f"<b class='gr-leit-zahl'>{_euro(delta)}</b>"
+        f"<span class='gr-leit-label'>{_esc(beste['anbieter'])} "
+        f"unter Vodafone "
+        f"({_euro(eigen['gesamt'])}"
+        f"{', Näherung' if eigen.get('naeherung') else ''})</span>"
+    )
 
 
 def _schnitt(karte: dict) -> str:
     monat = karte.get("schnitt_monat")
     if monat is None:
         return ""
-    return f"{monat:,.2f}".replace(",", " ").replace(
-        ".", ",").replace(" ", ".") + " €/Monat"
+    return (
+        f"{monat:,.2f}".replace(",", " ").replace(".", ",").replace(" ", ".")
+        + " €/Monat"
+    )
 
 
 def _gb_teil(karte: dict) -> str:
@@ -702,27 +794,32 @@ def _rechnung_html(zeilen: list) -> str:
         return ""
     beste = zeilen[0]
     url = beste.get("quelle_url") or ""
-    link = (f"<a href='{_esc(url)}' target='_blank' rel='noopener'>"
-            f"{_esc(beste['anbieter'])}&nbsp;↗</a>" if url
-            else _esc(beste["anbieter"]))
+    link = (
+        f"<a href='{_esc(url)}' target='_blank' rel='noopener'>"
+        f"{_esc(beste['anbieter'])}&nbsp;↗</a>"
+        if url
+        else _esc(beste["anbieter"])
+    )
     datum = beste.get("abgerufen_am") or ""
     datum_teil = f", abgerufen am {_datum_de(datum)}" if datum else ""
     # P0-B-h3: der Zeitraum kommt aus der Konstante der Rechnung, nicht
     # aus dem Satz - `_band_zeilen` laesst nur Zeilen DIESES Zeitraums zu,
     # und zwei Stellen mit derselben Zahl waeren zwei Definitionen.
-    return (f"So gerechnet: <code>Kosten über {TCO_HORIZONT} Monate = "
-            f"Anzahlung + "
-            f"{TCO_HORIZONT} × Tarifgrundpreis + alle Geräteraten + "
-            f"Anschlusspreis</code> — Boni bleiben außerhalb. Beleg des "
-            f"günstigsten Angebots: {link}{datum_teil}.")
+    return (
+        f"So gerechnet: <code>Kosten über {TCO_HORIZONT} Monate = "
+        f"Anzahlung + "
+        f"{TCO_HORIZONT} × Tarifgrundpreis + alle Geräteraten + "
+        f"Anschlusspreis</code> — Boni bleiben außerhalb. Beleg des "
+        f"günstigsten Angebots: {link}{datum_teil}."
+    )
 
 
 # --------------------------------------------------------------------------
 # P1: der Rechenweg EINER Messung - Postenliste und <template>-Bloecke
 # --------------------------------------------------------------------------
 
-def _buendel_aus_messung(messung: dict, tarife: dict | None = None) \
-        -> Buendel | None:
+
+def _buendel_aus_messung(messung: dict, tarife: dict | None = None) -> Buendel | None:
     """Das Buendel EINER Messung - aus Historien-Zeile und Stand.
 
     A1 (20.09.2026): die EINE Baustelle dafuer. `_rechung` (das Panel) und
@@ -760,20 +857,27 @@ def _buendel_aus_messung(messung: dict, tarife: dict | None = None) \
             anschlusspreis=satz.get("anschlusspreis"),
             zustand=satz.get("zustand") or "",
             quelle_url=satz.get("quelle_url") or "",
-            abgerufen_am=satz.get("abgerufen_am") or "")
+            abgerufen_am=satz.get("abgerufen_am") or "",
+        )
     except (ValueError, TypeError) as exc:
-        log.warning("Zeitreihe: Messung %s am %s nicht als Buendel lesbar "
-                    "(%s) - kein Punkt, kein Panel.",
-                    satz.get("id"), satz.get("datum"), exc)
+        log.warning(
+            "Zeitreihe: Messung %s am %s nicht als Buendel lesbar "
+            "(%s) - kein Punkt, kein Panel.",
+            satz.get("id"),
+            satz.get("datum"),
+            exc,
+        )
         return None
     if b.tarif_id:
         b.tarif_phasen = phasen_fuer_buendel(
-            (tarife or {}).get(b.tarif_id) or {}, b.tarif_monatlich)
+            (tarife or {}).get(b.tarif_id) or {}, b.tarif_monatlich
+        )
     return b
 
 
-def _messwert(messung: dict, tarife: dict | None = None) \
-        -> tuple[float | None, int | None]:
+def _messwert(
+    messung: dict, tarife: dict | None = None
+) -> tuple[float | None, int | None]:
     """`(Leitzahl, ihr Zeitraum in Monaten)` - EINE Messung, EINE Rechnung.
 
     Der Zeitraum wird GELESEN (`Tco.leitzahl_monate`, die eine Stelle aus
@@ -808,8 +912,7 @@ def _messwert(messung: dict, tarife: dict | None = None) \
     return t.gesamt, t.leitzahl_monate
 
 
-def _wert_aus_messung(messung: dict, tarife: dict | None = None) \
-        -> float | None:
+def _wert_aus_messung(messung: dict, tarife: dict | None = None) -> float | None:
     """Die HEUTIGE Leitzahl einer Messung - oder None, wenn sie keine hat.
 
     A1 (20.09.2026): der Graph haengt am Stand des MARKTS, nicht am Stand
@@ -858,23 +961,39 @@ def _rechung(messung: dict, tarife: dict | None = None) -> dict | None:
     def _posten(label: str, betrag, anzahl=None, einzeln=None, klammer=""):
         if betrag is None:
             return
-        posten.append({"label": label, "anzahl": anzahl, "einzeln": einzeln,
-                       "betrag": betrag, "klammer": klammer})
+        posten.append(
+            {
+                "label": label,
+                "anzahl": anzahl,
+                "einzeln": einzeln,
+                "betrag": betrag,
+                "klammer": klammer,
+            }
+        )
 
     _posten(POSTEN_ZUZAHLUNG, t.bestandteile.get(POSTEN_ZUZAHLUNG))
     _posten(POSTEN_ANSCHLUSS, t.bestandteile.get(POSTEN_ANSCHLUSS))
     if b.buendel_monatlich is not None:
-        _posten(POSTEN_BUENDEL,
-                t.bestandteile.get(f"{POSTEN_BUENDEL} über {lz} Monate"),
-                anzahl=lz, einzeln=b.buendel_monatlich)
+        _posten(
+            POSTEN_BUENDEL,
+            t.bestandteile.get(f"{POSTEN_BUENDEL} über {lz} Monate"),
+            anzahl=lz,
+            einzeln=b.buendel_monatlich,
+        )
     else:
-        _posten("Tarif", t.bestandteile.get(
-                    f"Tarif über {TCO_HORIZONT} Monate"),
-                anzahl=TCO_HORIZONT, einzeln=b.tarif_monatlich,
-                klammer="phasengewichtet" if b.tarif_phasen else "")
-        _posten(POSTEN_RATE, t.bestandteile.get(
-                    f"Geräteraten über {lz} Monate"),
-                anzahl=lz, einzeln=b.geraet_monatsrate)
+        _posten(
+            "Tarif",
+            t.bestandteile.get(f"Tarif über {TCO_HORIZONT} Monate"),
+            anzahl=TCO_HORIZONT,
+            einzeln=b.tarif_monatlich,
+            klammer="phasengewichtet" if b.tarif_phasen else "",
+        )
+        _posten(
+            POSTEN_RATE,
+            t.bestandteile.get(f"Geräteraten über {lz} Monate"),
+            anzahl=lz,
+            einzeln=b.geraet_monatsrate,
+        )
 
     # Die Gegenprobe (A1): die Posten muessen die EIGENE Nachrechnung
     # ergeben - nicht mehr das eingefrorene `gesamt` der Historie. Das ist
@@ -884,32 +1003,44 @@ def _rechung(messung: dict, tarife: dict | None = None) -> dict | None:
     # HEUTIGEN Rechnung, und die muss mit sich selbst aufgehen.
     summe = round(sum(p["betrag"] for p in posten), 2)
     if summe != t.gesamt:
-        log.warning("Rechenweg: Posten von %s am %s ergeben %s, gerechnet "
-                    "ist %s - die Zerlegung weicht von ihrer Rechnung ab.",
-                    satz.get("id"), satz.get("datum"), summe, t.gesamt)
+        log.warning(
+            "Rechenweg: Posten von %s am %s ergeben %s, gerechnet "
+            "ist %s - die Zerlegung weicht von ihrer Rechnung ab.",
+            satz.get("id"),
+            satz.get("datum"),
+            summe,
+            t.gesamt,
+        )
     # Die Restschuld nach Monat 24 (P1-Fix, Sicht-A3): sie ist IN der
     # Summe enthalten und wird zusaetzlich ausgewiesen - "davon nach
     # Monat 24 noch zu zahlen". Bei 24 Monaten Laufzeit gibt es sie nicht
     # (None heisst: nichts offen - eine ehrliche Aussage, kein fehlender
     # Wert).
     offen = None
-    monatlich = (b.geraet_monatsrate if b.buendel_monatlich is None
-                 else b.buendel_monatlich)
+    monatlich = (
+        b.geraet_monatsrate if b.buendel_monatlich is None else b.buendel_monatlich
+    )
     if lz > TCO_HORIZONT and monatlich is not None:
-        offen = {"anzahl": lz - TCO_HORIZONT, "einzeln": monatlich,
-                 "betrag": round((lz - TCO_HORIZONT) * monatlich, 2)}
-    return {"posten": posten, "gesamt": t.gesamt, "offen": offen,
-            "datum": satz.get("datum") or "",
-            "quelle_url": satz.get("quelle_url") or "",
-            "abgerufen_am": satz.get("abgerufen_am") or "",
-            # P1-Fix (Datenverlust-Befund): weitere Ratenlaufzeiten, die am
-            # selben Tag denselben `gesamt` tragen (`_messungen`) - gelesen,
-            # nicht hier ermittelt. Leer, wenn es keinen Gleichstand gibt.
-            "weitere_laufzeiten": messung.get("weitere_laufzeiten") or []}
+        offen = {
+            "anzahl": lz - TCO_HORIZONT,
+            "einzeln": monatlich,
+            "betrag": round((lz - TCO_HORIZONT) * monatlich, 2),
+        }
+    return {
+        "posten": posten,
+        "gesamt": t.gesamt,
+        "offen": offen,
+        "datum": satz.get("datum") or "",
+        "quelle_url": satz.get("quelle_url") or "",
+        "abgerufen_am": satz.get("abgerufen_am") or "",
+        # P1-Fix (Datenverlust-Befund): weitere Ratenlaufzeiten, die am
+        # selben Tag denselben `gesamt` tragen (`_messungen`) - gelesen,
+        # nicht hier ermittelt. Leer, wenn es keinen Gleichstand gibt.
+        "weitere_laufzeiten": messung.get("weitere_laufzeiten") or [],
+    }
 
 
-def _rechung_html(anbieter: str, messung: dict,
-                  tarife: dict | None = None) -> str:
+def _rechung_html(anbieter: str, messung: dict, tarife: dict | None = None) -> str:
     """EINE Messung als fertiger Block - die gesetzte Rechung.
 
     Struktur (fuer das Klick-Panel, siehe schnittstelle-rechenweg.md):
@@ -930,56 +1061,78 @@ def _rechung_html(anbieter: str, messung: dict,
     if r is None or not r["posten"]:
         return ""
     a = _esc(anbieter)
-    punkt = (f"<i class='gr-zr-rpunkt' style='background:"
-             f"{_zr_marker_farbe(anbieter)}' aria-hidden='true'>"
-             f"</i>")
-    teile = ["<div class='gr-zr-rech'>",
-             f"<p class='gr-zr-rkopf'>{punkt}<strong>{a}</strong> · Messung "
-             f"vom {_esc(_datum_de(r['datum']))}</p>",
-             "<ul class='gr-zr-posten'>"]
+    punkt = (
+        f"<i class='gr-zr-rpunkt' style='background:"
+        f"{_zr_marker_farbe(anbieter)}' aria-hidden='true'>"
+        f"</i>"
+    )
+    teile = [
+        "<div class='gr-zr-rech'>",
+        f"<p class='gr-zr-rkopf'>{punkt}<strong>{a}</strong> · Messung "
+        f"vom {_esc(_datum_de(r['datum']))}</p>",
+        "<ul class='gr-zr-posten'>",
+    ]
     for p in r["posten"]:
         if p["anzahl"] is not None and p["einzeln"] is not None:
-            ausdruck = (f"{p['anzahl']} × {_euro(p['einzeln'])} "
-                        f"<span class='gr-zr-pg'>= {_euro(p['betrag'])}"
-                        f"</span>")
+            ausdruck = (
+                f"{p['anzahl']} × {_euro(p['einzeln'])} "
+                f"<span class='gr-zr-pg'>= {_euro(p['betrag'])}"
+                f"</span>"
+            )
         else:
             ausdruck = _euro(p["betrag"])
-        klammer = (f" <span class='gr-zr-pk'>{_esc(p['klammer'])}</span>"
-                   if p["klammer"] else "")
-        anteil = (f"{p['betrag'] / r['gesamt'] * 100:.1f}%"
-                  if r["gesamt"] else "0%")
-        teile.append(f"<li class='gr-zr-posten'>"
-                     f"<span class='gr-zr-pn'>{_esc(p['label'])}</span>"
-                     f"<span class='gr-zr-pbar'><i style='width:{anteil}"
-                     f"'></i></span>"
-                     f"<span class='gr-zr-pr'>{ausdruck}{klammer}</span>"
-                     f"</li>")
+        klammer = (
+            f" <span class='gr-zr-pk'>{_esc(p['klammer'])}</span>"
+            if p["klammer"]
+            else ""
+        )
+        anteil = f"{p['betrag'] / r['gesamt'] * 100:.1f}%" if r["gesamt"] else "0%"
+        teile.append(
+            f"<li class='gr-zr-posten'>"
+            f"<span class='gr-zr-pn'>{_esc(p['label'])}</span>"
+            f"<span class='gr-zr-pbar'><i style='width:{anteil}"
+            f"'></i></span>"
+            f"<span class='gr-zr-pr'>{ausdruck}{klammer}</span>"
+            f"</li>"
+        )
     teile.append("</ul>")
-    teile.append(f"<p class='gr-zr-rsumme'>= <b>{_euro(r['gesamt'])}</b> "
-                 f"<span class='gr-zr-plabel'>Kosten über "
-                 f"{TCO_HORIZONT} Monate</span></p>")
+    teile.append(
+        f"<p class='gr-zr-rsumme'>= <b>{_euro(r['gesamt'])}</b> "
+        f"<span class='gr-zr-plabel'>Kosten über "
+        f"{TCO_HORIZONT} Monate</span></p>"
+    )
     if r["offen"] is not None:
-        teile.append(f"<p class='gr-zr-roffen'>davon nach Monat "
-                     f"{TCO_HORIZONT} noch zu zahlen: "
-                     f"{r['offen']['anzahl']} × {_euro(r['offen']['einzeln'])}"
-                     f" = {_euro(r['offen']['betrag'])}</p>")
+        teile.append(
+            f"<p class='gr-zr-roffen'>davon nach Monat "
+            f"{TCO_HORIZONT} noch zu zahlen: "
+            f"{r['offen']['anzahl']} × {_euro(r['offen']['einzeln'])}"
+            f" = {_euro(r['offen']['betrag'])}</p>"
+        )
     # P1-Fix (Datenverlust-Befund, 24.09.2026): eine zweite Zahlweise zum
     # selben Betrag wird NICHT still verworfen - sie steht hier, mit der
     # Restschuld, die sie (anders als die gezeigte, kuerzere Laufzeit)
     # nach TCO_HORIZONT noch offenlaesst.
     if r["weitere_laufzeiten"]:
-        teile.append(f"<p class='gr-zr-rweitere'>Zum selben Betrag auch "
-                     f"über {_zeitraum_wort(r['weitere_laufzeiten'])} "
-                     f"erhältlich – dabei bleibt nach Monat {TCO_HORIZONT} "
-                     f"eine Restschuld offen.</p>")
+        teile.append(
+            f"<p class='gr-zr-rweitere'>Zum selben Betrag auch "
+            f"über {_zeitraum_wort(r['weitere_laufzeiten'])} "
+            f"erhältlich – dabei bleibt nach Monat {TCO_HORIZONT} "
+            f"eine Restschuld offen.</p>"
+        )
     url = r["quelle_url"]
-    link = (f"<a href='{_esc(url)}' target='_blank' rel='noopener'>{a}"
-            f"&nbsp;↗</a>" if url else a)
+    link = (
+        f"<a href='{_esc(url)}' target='_blank' rel='noopener'>{a}&nbsp;↗</a>"
+        if url
+        else a
+    )
     # Das Abrufdatum in der Kurzform (15.09.2026): der Kopf nennt den
     # Messtag ausgeschrieben, hier zaehlt jede Byte-Wiederholung - das
     # Fragment traegt 1285 dieser Bloecke (PM-6).
-    datum_teil = (f", abgerufen {_esc(_datum_kurz(r['abgerufen_am']))}"
-                  if r["abgerufen_am"] else "")
+    datum_teil = (
+        f", abgerufen {_esc(_datum_kurz(r['abgerufen_am']))}"
+        if r["abgerufen_am"]
+        else ""
+    )
     teile.append(f"<p class='gr-zr-rbeleg'>Beleg: {link}{datum_teil}.</p>")
     teile.append("</div>")
     return "".join(teile)
@@ -994,15 +1147,18 @@ def _naeherung_html() -> str:
     ist wortgleich der Hinweis von der Bündel-Karte (`_NAEHERUNG_SATZ`),
     nur der Grund des Leerzustands kommt dazu.
     """
-    return (f"<div class='gr-zr-rech gr-zr-rech--leer' data-anb='{EIGEN}' "
-            f"data-m='naeherung'><p class='gr-zr-rkopf'><strong>{EIGEN}"
-            f"</strong> · Referenzrechnung</p>"
-            f"<p class='gr-zr-rleer'>{_esc(_NAEHERUNG_SATZ)}"
-            f"{_esc(_NAEHERUNG_KEIN_WEG)}</p></div>")
+    return (
+        f"<div class='gr-zr-rech gr-zr-rech--leer' data-anb='{EIGEN}' "
+        f"data-m='naeherung'><p class='gr-zr-rkopf'><strong>{EIGEN}"
+        f"</strong> · Referenzrechnung</p>"
+        f"<p class='gr-zr-rleer'>{_esc(_NAEHERUNG_SATZ)}"
+        f"{_esc(_NAEHERUNG_KEIN_WEG)}</p></div>"
+    )
 
 
-def _rechenwege_html(messungen_paar: dict, zeilen: list,
-                     tarife: dict | None = None) -> str:
+def _rechenwege_html(
+    messungen_paar: dict, zeilen: list, tarife: dict | None = None
+) -> str:
     """Je Serie/Messung ein <template data-m=...> unter dem SVG (V1).
 
     Der Server liefert die fertige Rechung JE MESSUNG als inerte Vorlage;
@@ -1020,20 +1176,24 @@ def _rechenwege_html(messungen_paar: dict, zeilen: list,
         for datum in sorted(saetze):
             inhalt = _rechung_html(anbieter, saetze[datum], tarife)
             if inhalt:
-                bloecke.append(f"<template data-anb='{_esc(anbieter)}' "
-                               f"data-m='{_esc(datum)}'>{inhalt}</template>")
+                bloecke.append(
+                    f"<template data-anb='{_esc(anbieter)}' "
+                    f"data-m='{_esc(datum)}'>{inhalt}</template>"
+                )
     if any(z.get("naeherung") for z in zeilen):
-        bloecke.append(f"<template data-anb='{EIGEN}' data-m='naeherung'>"
-                       f"{_naeherung_html()}</template>")
+        bloecke.append(
+            f"<template data-anb='{EIGEN}' data-m='naeherung'>"
+            f"{_naeherung_html()}</template>"
+        )
     if not bloecke:
         return ""
-    return ("<div class='gr-zr-rechnungen' hidden>" + "".join(bloecke)
-            + "</div>")
+    return "<div class='gr-zr-rechnungen' hidden>" + "".join(bloecke) + "</div>"
 
 
 # --------------------------------------------------------------------------
 # Die Zeitreihe selbst - Serien und SVG
 # --------------------------------------------------------------------------
+
 
 def buendel_schluessel(satz: dict) -> str | None:
     """Der Schluessel, unter dem Stand und Historie einander finden.
@@ -1120,8 +1280,7 @@ def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
                 if basis:
                     buendel_basis.setdefault(basis, b)
         except (json.JSONDecodeError, OSError) as exc:
-            log.warning("geraete_tco.json unlesbar fuer die Zeitreihe: %s",
-                        exc)
+            log.warning("geraete_tco.json unlesbar fuer die Zeitreihe: %s", exc)
 
     messungen: dict[tuple, dict] = {}
     historie = state_dir / "geraete_tco_historie.jsonl"
@@ -1165,8 +1324,7 @@ def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
         modell = sku_modell.get(b.get("sku_id"))
         if modell is None:
             continue
-        band = band_je_tarif.get(satz.get("tarif_id")
-                                 or b.get("tarif_id") or "")
+        band = band_je_tarif.get(satz.get("tarif_id") or b.get("tarif_id") or "")
         if not band:
             continue
         datum, gesamt = satz.get("datum"), satz.get("gesamt")
@@ -1184,8 +1342,9 @@ def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
             continue
         if not zeitraum_vergleichbar(monate, TCO_HORIZONT):
             fremder_zeitraum += 1
-        slot = (messungen.setdefault((modell, band), {})
-                .setdefault(b.get("anbieter") or "?", {}))
+        slot = messungen.setdefault((modell, band), {}).setdefault(
+            b.get("anbieter") or "?", {}
+        )
         alt = slot.get(datum)
         # DIE GEMESSENE RATENLAUFZEIT dieser Zeile (P1-Fix, Datenverlust-
         # Befund vom 24.09.2026): congstar bot am selben Tag 24 UND 36
@@ -1210,9 +1369,12 @@ def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
             # zusaetzlich sichtbar machen, siehe `tests/
             # test_geraete_zeitreihe_rechenweg.py::
             # test_zwei_messungen_ohne_laufzeit_am_selben_tag_verlieren_keine_zahlweise`.
-            return (kandidat is not None and kandidat["wert"] == wert
-                    and zeitraum_vergleichbar(monate, kandidat["monate"])
-                    and laufzeit != kandidat.get("laufzeit"))
+            return (
+                kandidat is not None
+                and kandidat["wert"] == wert
+                and zeitraum_vergleichbar(monate, kandidat["monate"])
+                and laufzeit != kandidat.get("laufzeit")
+            )
 
         # Je (Anbieter, Tag) das GUENSTIGSTE Buendel - aber nur INNERHALB
         # eines Zeitraums (P0-B-z1): "guenstiger" ueber zwei Laufzeiten
@@ -1235,35 +1397,54 @@ def _messungen(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
                 # offenlaesst. Die andere Zahlweise wird NICHT verschwiegen:
                 # sie steht als `weitere_laufzeiten` an der Messung, und
                 # `_rechung_html` nennt sie im Panel.
-                besser = (laufzeit is not None
-                          and (alt.get("laufzeit") is None
-                               or laufzeit < alt["laufzeit"]))
+                besser = laufzeit is not None and (
+                    alt.get("laufzeit") is None or laufzeit < alt["laufzeit"]
+                )
             else:
                 besser = False
         else:
             besser = zeitraum_vergleichbar(monate, TCO_HORIZONT)
         if besser:
-            weitere = set(alt.get("weitere_laufzeiten") or []) \
-                if _gleichstand(alt) else set()
+            weitere = (
+                set(alt.get("weitere_laufzeiten") or []) if _gleichstand(alt) else set()
+            )
             if _gleichstand(alt) and alt.get("laufzeit") is not None:
                 weitere.add(alt["laufzeit"])
-            slot[datum] = {"satz": satz, "stand": b, "wert": wert,
-                           "monate": monate, "laufzeit": laufzeit,
-                           "weitere_laufzeiten": sorted(weitere)}
+            slot[datum] = {
+                "satz": satz,
+                "stand": b,
+                "wert": wert,
+                "monate": monate,
+                "laufzeit": laufzeit,
+                "weitere_laufzeiten": sorted(weitere),
+            }
         elif _gleichstand(alt) and laufzeit is not None:
             bekannt = set(alt.get("weitere_laufzeiten") or [])
             bekannt.add(laufzeit)
             alt["weitere_laufzeiten"] = sorted(bekannt)
-    if (ohne_id or ohne_stand or ueber_basis or ohne_wert or stand_ohne_id
-            or fremder_zeitraum):
-        log.info("Zeitreihe: %d Historienzeile(n) ohne jede ID, %d ohne "
-                 "Buendel im heutigen Stand, %d ueber den laufzeitfreien "
-                 "Schluessel zugeordnet, %d ohne belastbare Leitzahl "
-                 "(kein Punkt), %d Punkt(e) mit Leitzahl ueber einen "
-                 "anderen Zeitraum als %d Monate (Kurve MIT Zeitraum am "
-                 "Ende); %d Stand-Eintrag/Eintraege ohne ID.",
-                 ohne_id, ohne_stand, ueber_basis, ohne_wert,
-                 fremder_zeitraum, TCO_HORIZONT, stand_ohne_id)
+    if (
+        ohne_id
+        or ohne_stand
+        or ueber_basis
+        or ohne_wert
+        or stand_ohne_id
+        or fremder_zeitraum
+    ):
+        log.info(
+            "Zeitreihe: %d Historienzeile(n) ohne jede ID, %d ohne "
+            "Buendel im heutigen Stand, %d ueber den laufzeitfreien "
+            "Schluessel zugeordnet, %d ohne belastbare Leitzahl "
+            "(kein Punkt), %d Punkt(e) mit Leitzahl ueber einen "
+            "anderen Zeitraum als %d Monate (Kurve MIT Zeitraum am "
+            "Ende); %d Stand-Eintrag/Eintraege ohne ID.",
+            ohne_id,
+            ohne_stand,
+            ueber_basis,
+            ohne_wert,
+            fremder_zeitraum,
+            TCO_HORIZONT,
+            stand_ohne_id,
+        )
     return messungen
 
 
@@ -1314,9 +1495,11 @@ def _zeitraeume_aus(messungen: dict, tarife: dict | None = None) -> dict:
         for an, werte in anbieter_.items():
             monate = set()
             for m in werte.values():
-                wert, mon = ((m.get("wert"), m.get("monate"))
-                             if m.get("monate") is not None
-                             else _messwert(m, tarife))
+                wert, mon = (
+                    (m.get("wert"), m.get("monate"))
+                    if m.get("monate") is not None
+                    else _messwert(m, tarife)
+                )
                 if wert is not None and mon is not None:
                     monate.add(mon)
             je_anbieter[an] = sorted(monate)
@@ -1343,8 +1526,7 @@ def _nice_step(spanne: float) -> float:
         return 1.0
     potenz = 10 ** math.floor(math.log10(spanne))
     n = spanne / potenz
-    stufe = 1 if n <= 1 else 2 if n <= 2 else 2.5 if n <= 2.5 \
-        else 5 if n <= 5 else 10
+    stufe = 1 if n <= 1 else 2 if n <= 2 else 2.5 if n <= 2.5 else 5 if n <= 5 else 10
     return stufe * potenz
 
 
@@ -1369,9 +1551,14 @@ def _y_schritt(y0: float, y1: float) -> float:
         return max(abs(y1), 1.0)
     basis = spanne / 4
     basis_potenz = 10 ** math.floor(math.log10(basis))
-    kandidaten = sorted({round(m * basis_potenz * (10 ** dek), 8)
-                         for dek in range(-3, 4) for m in _NICE_VIELFACH
-                         if m * basis_potenz * (10 ** dek) > 0})
+    kandidaten = sorted(
+        {
+            round(m * basis_potenz * (10**dek), 8)
+            for dek in range(-3, 4)
+            for m in _NICE_VIELFACH
+            if m * basis_potenz * (10**dek) > 0
+        }
+    )
     beste_rang, bester_schritt = None, None
     for schritt in kandidaten:
         erster = math.ceil(y0 / schritt) * schritt
@@ -1387,16 +1574,18 @@ def _y_schritt(y0: float, y1: float) -> float:
     return bester_schritt if bester_schritt else _nice_step(spanne / 4)
 
 
-def _xtick_x(iso: str, t0: date, t1: date, links: float, breite: float,
-             tage: list[str]) -> float:
+def _xtick_x(
+    iso: str, t0: date, t1: date, links: float, breite: float, tage: list[str]
+) -> float:
     if t1 == t0:
         return links + breite / 2
     tag = date.fromisoformat(iso)
     return links + (tag - t0).days / max(1, (t1 - t0).days) * breite
 
 
-def _x_marken(tage: list[str], x_v, mindestabstand: float = MIN_XTICK_ABSTAND
-              ) -> set[str]:
+def _x_marken(
+    tage: list[str], x_v, mindestabstand: float = MIN_XTICK_ABSTAND
+) -> set[str]:
     """Welche Messtage eine X-Achsen-BESCHRIFTUNG bekommen (`MIN_XTICK_ABSTAND`).
 
     Gierig von links: der erste Tag ist immer dabei, jeder weitere nur,
@@ -1440,9 +1629,11 @@ def _stufenpfad(punkte: list[tuple[float, float, float]]) -> str:
     return " ".join(teile)
 
 
-def _linien_laeufe(punkte: list[tuple[float, float, float]], tage: list[str],
-                    schwelle_tage: int = LUECKE_TAGE_SCHWELLE
-                    ) -> list[tuple[list[tuple[float, float, float]], bool]]:
+def _linien_laeufe(
+    punkte: list[tuple[float, float, float]],
+    tage: list[str],
+    schwelle_tage: int = LUECKE_TAGE_SCHWELLE,
+) -> list[tuple[list[tuple[float, float, float]], bool]]:
     """Zerlegt eine Punktreihe in (Teilstrecke, ist_luecke)-Laeufe.
 
     `tage` sind die ECHTEN Messtage (isoformat) parallel zu `punkte` -
@@ -1481,45 +1672,65 @@ def _form_pfad(marker: str, x: float, y: float, r: float) -> str | None:
     aendern sich damit (D1 hatte das deshalb offen gelassen); die Form
     ist eine reine Zusatzauskunft fuer Farbfehlsicht und Schwarzweiss."""
     if marker in ("kreis", "") or marker not in (
-            "quadrat", "dreieck", "dreieck--runter", "raute", "sechseck",
-            "ring", "kreuz"):
+        "quadrat",
+        "dreieck",
+        "dreieck--runter",
+        "raute",
+        "sechseck",
+        "ring",
+        "kreuz",
+    ):
         return None
     if marker == "quadrat":
         s = r * 0.86
-        return (f"<rect x='{x - s:.1f}' y='{y - s:.1f}' width='{2 * s:.1f}' "
-                f"height='{2 * s:.1f}'/>")
+        return (
+            f"<rect x='{x - s:.1f}' y='{y - s:.1f}' width='{2 * s:.1f}' "
+            f"height='{2 * s:.1f}'/>"
+        )
     if marker == "raute":
         s = r * 1.15
-        pkte = (f"{x:.1f},{y - s:.1f} {x + s:.1f},{y:.1f} "
-                f"{x:.1f},{y + s:.1f} {x - s:.1f},{y:.1f}")
+        pkte = (
+            f"{x:.1f},{y - s:.1f} {x + s:.1f},{y:.1f} "
+            f"{x:.1f},{y + s:.1f} {x - s:.1f},{y:.1f}"
+        )
         return f"<polygon points='{pkte}'/>"
     if marker in ("dreieck", "dreieck--runter"):
         s = r * 1.2
         if marker == "dreieck":
-            pkte = (f"{x:.1f},{y - s:.1f} {x + s:.1f},{y + s * 0.85:.1f} "
-                    f"{x - s:.1f},{y + s * 0.85:.1f}")
+            pkte = (
+                f"{x:.1f},{y - s:.1f} {x + s:.1f},{y + s * 0.85:.1f} "
+                f"{x - s:.1f},{y + s * 0.85:.1f}"
+            )
         else:
-            pkte = (f"{x:.1f},{y + s:.1f} {x + s:.1f},{y - s * 0.85:.1f} "
-                    f"{x - s:.1f},{y - s * 0.85:.1f}")
+            pkte = (
+                f"{x:.1f},{y + s:.1f} {x + s:.1f},{y - s * 0.85:.1f} "
+                f"{x - s:.1f},{y - s * 0.85:.1f}"
+            )
         return f"<polygon points='{pkte}'/>"
     if marker == "sechseck":
         pkte = " ".join(
             f"{x + r * 1.1 * math.cos(math.radians(60 * i - 30)):.1f},"
             f"{y + r * 1.1 * math.sin(math.radians(60 * i - 30)):.1f}"
-            for i in range(6))
+            for i in range(6)
+        )
         return f"<polygon points='{pkte}'/>"
     if marker == "ring":
         return f"<circle cx='{x:.1f}' cy='{y:.1f}' r='{r * 1.4:.1f}'/>"
     if marker == "kreuz":
         s = r * 1.15
-        return (f"<path d='M{x - s:.1f} {y:.1f}L{x + s:.1f} {y:.1f} "
-                f"M{x:.1f} {y - s:.1f}L{x:.1f} {y + s:.1f}'/>")
+        return (
+            f"<path d='M{x - s:.1f} {y:.1f}L{x + s:.1f} {y:.1f} "
+            f"M{x:.1f} {y - s:.1f}L{x:.1f} {y + s:.1f}'/>"
+        )
     return None
 
 
-def _svg(anbieter_serien: dict, breit: bool,
-         beleg_je: dict[str, tuple[str, str]],
-         zeitraeume: dict | None = None) -> str:
+def _svg(
+    anbieter_serien: dict,
+    breit: bool,
+    beleg_je: dict[str, tuple[str, str]],
+    zeitraeume: dict | None = None,
+) -> str:
     """DER EINE Graph - SVG-Koordinatensystem, fertig gerendert.
 
     Y = Kosten in € („runde" Ticks), X = das Datum in echter Distanz mit
@@ -1536,8 +1747,7 @@ def _svg(anbieter_serien: dict, breit: bool,
     nennt das Bild GAR KEINEN Zeitraum - lieber keine Angabe als eine
     angenommene (Clean Code 3/4).
     """
-    anbieter = [a for a in ANBIETER_FOLGE
-                if anbieter_serien.get(a)]
+    anbieter = [a for a in ANBIETER_FOLGE if anbieter_serien.get(a)]
     if not anbieter:
         return ""
     zeitraeume = zeitraeume or {}
@@ -1561,13 +1771,18 @@ def _svg(anbieter_serien: dict, breit: bool,
     # ~22 Einheiten ueber dem Punkt und bleibt innerhalb der Flaeche - der
     # 12-Prozent-Massstabs-Freiraum (y1) bleibt unangetastet. Breit
     # unveraendert: dort traegt das Bild die Erst-Wert-Labels selbst.
-    links, rechts, oben, unten = 58, (158 if breit else 96), \
-        (18 if breit else 10), 46
+    links, rechts, oben, unten = 58, (158 if breit else 96), (18 if breit else 10), 46
     pw, ph = w - links - rechts, h - oben - unten
 
     def x_v(iso: str) -> float:
-        return _xtick_x(iso, date.fromisoformat(tage[0]),
-                        date.fromisoformat(tage[-1]), links, pw, tage)
+        return _xtick_x(
+            iso,
+            date.fromisoformat(tage[0]),
+            date.fromisoformat(tage[-1]),
+            links,
+            pw,
+            tage,
+        )
 
     werte = [p for serie in anbieter_serien.values() for _d, p in serie]
     ymin, ymax = min(werte), max(werte)
@@ -1590,16 +1805,19 @@ def _svg(anbieter_serien: dict, breit: bool,
     teile.append(
         f"<svg class='gr-zr gr-zr--{'breit' if breit else 'schmal'}' "
         f"viewBox='0 0 {w} {h}' role='img' aria-label='{_esc(kopf)} "
-        f"je Messtag und Anbieter: {_esc(', '.join(anbieter))}'>")
+        f"je Messtag und Anbieter: {_esc(', '.join(anbieter))}'>"
+    )
     schritt = _y_schritt(y0, y1)
     wert = math.ceil(y0 / schritt) * schritt
     while wert <= y1 + 0.01:
         y = y_v(wert)
-        teile.append(f"<line class='gr-zr-raster' x1='{links}' y1="
-                     f"'{y:.1f}' x2='{w - rechts}' y2='{y:.1f}'/>"
-                     f"<text class='gr-zr-achse' x='{links - 8}' "
-                     f"y='{y + 4:.1f}' text-anchor='end'>"
-                     f"{_euro0(round(wert))}</text>")
+        teile.append(
+            f"<line class='gr-zr-raster' x1='{links}' y1="
+            f"'{y:.1f}' x2='{w - rechts}' y2='{y:.1f}'/>"
+            f"<text class='gr-zr-achse' x='{links - 8}' "
+            f"y='{y + 4:.1f}' text-anchor='end'>"
+            f"{_euro0(round(wert))}</text>"
+        )
         wert += schritt
     # P2/D2: DER ACHSENBRUCH. Die ECHTE Preisspanne (ymax-ymin, nicht die
     # um 12% gepolsterte Bild-Spanne y1-y0) klein gegen den hoechsten Wert
@@ -1613,19 +1831,24 @@ def _svg(anbieter_serien: dict, breit: bool,
             f"<g class='gr-zr-achsenbruch' transform='translate({links},"
             f"{by:.1f})' aria-hidden='true'>"
             f"<rect x='-9' y='-9' width='18' height='18'/>"
-            f"<path d='M-5 8 L-1 -4 L2 5 L6 -8'/></g>")
+            f"<path d='M-5 8 L-1 -4 L2 5 L6 -8'/></g>"
+        )
     for tag in tage:
         x = x_v(tag)
-        teile.append(f"<line class='gr-zr-raster' x1='{x:.1f}' y1='{oben}' "
-                     f"x2='{x:.1f}' y2='{oben + ph}'/>")
+        teile.append(
+            f"<line class='gr-zr-raster' x1='{x:.1f}' y1='{oben}' "
+            f"x2='{x:.1f}' y2='{oben + ph}'/>"
+        )
     beschriftet = _x_marken(tage, x_v)
     for tag in tage:
         if tag not in beschriftet:
             continue
         x = x_v(tag)
-        teile.append(f"<text class='gr-zr-xtick' x='{x:.1f}' "
-                     f"y='{h - unten + 22}' text-anchor='end'>"
-                     f"{_tag_monat(tag)}</text>")
+        teile.append(
+            f"<text class='gr-zr-xtick' x='{x:.1f}' "
+            f"y='{h - unten + 22}' text-anchor='end'>"
+            f"{_tag_monat(tag)}</text>"
+        )
 
     def _punkte(serie):
         return [(x_v(d), y_v(p), p) for d, p in serie]
@@ -1653,11 +1876,15 @@ def _svg(anbieter_serien: dict, breit: bool,
                     muster = f" stroke-dasharray='{luecken_muster}'"
                     klasse = "gr-zr-linie gr-zr-linie--luecke"
                 else:
-                    muster = (f" stroke-dasharray='{stil.muster}'"
-                              if stil.muster != "none" else "")
+                    muster = (
+                        f" stroke-dasharray='{stil.muster}'"
+                        if stil.muster != "none"
+                        else ""
+                    )
                     klasse = "gr-zr-linie"
-                teile.append(f"<path class='{klasse}' d='{pfad}' "
-                             f"stroke='{farbe}'{muster}/>")
+                teile.append(
+                    f"<path class='{klasse}' d='{pfad}' stroke='{farbe}'{muster}/>"
+                )
         for i, (d, wert) in enumerate(serie):
             x, y = x_v(d), y_v(wert)
             ende = i == len(serie) - 1
@@ -1673,14 +1900,17 @@ def _svg(anbieter_serien: dict, breit: bool,
             # (er haengt an der Laenge der Serie, nicht an einem Flag im
             # Store).
             if einzeln:
-                teile.append(f"<circle class='gr-zr-halo' cx='{x:.1f}' "
-                             f"cy='{y:.1f}' r='9.5' fill='none' "
-                             f"stroke='{marker_farbe}'/>")
+                teile.append(
+                    f"<circle class='gr-zr-halo' cx='{x:.1f}' "
+                    f"cy='{y:.1f}' r='9.5' fill='none' "
+                    f"stroke='{marker_farbe}'/>"
+                )
             teile.append(
                 f"<circle class='gr-zr-punkt"
                 f"{' gr-zr-ende' if ende else ''}' cx='{x:.1f}' "
                 f"cy='{y:.1f}' r='{r}' fill='{marker_farbe}'"
-                f"{daten}/>")
+                f"{daten}/>"
+            )
             # P2/D2: DIE MARKERFORM aus `Anbieterstil.marker` - ein offener
             # Umriss UM den Kreis (Quadrat/Dreieck/Raute/...), damit Farbe
             # nicht die einzige Unterscheidung zweier Kurven ist (siehe
@@ -1693,7 +1923,8 @@ def _svg(anbieter_serien: dict, breit: bool,
                 teile.append(
                     f"<g class='gr-zr-form gr-zr-form--{stil.marker}' "
                     f"fill='none' stroke='{marker_farbe}' "
-                    f"stroke-width='1.4'>{form}</g>")
+                    f"stroke-width='1.4'>{form}</g>"
+                )
             # ... und eine unsichtbare Trefferflaeche darueber (r=12 statt
             # 4,5 - Strategie P1): ein 4,5-px-Kreis ist auf dem Telefon
             # nicht zu treffen. `gr-zr-hit`, NICHT `gr-zr-treffer` - die
@@ -1702,11 +1933,13 @@ def _svg(anbieter_serien: dict, breit: bool,
             # Messtag und Betrag als fertige Zeichenkette - der Browser
             # zeigt sie als nativen Tooltip, nichts wird im Client gebaut.
             einmal = " · erstmals gemessen" if einzeln else ""
-            teile.append(f"<circle class='gr-zr-hit' cx='{x:.1f}' "
-                         f"cy='{y:.1f}' r='12' fill='transparent'"
-                         f"{daten}><title>{_esc(a)} · {_tag_monat(d)} · "
-                         f"{_euro0(wert)}{einmal}</title>"
-                         f"</circle>")
+            teile.append(
+                f"<circle class='gr-zr-hit' cx='{x:.1f}' "
+                f"cy='{y:.1f}' r='12' fill='transparent'"
+                f"{daten}><title>{_esc(a)} · {_tag_monat(d)} · "
+                f"{_euro0(wert)}{einmal}</title>"
+                f"</circle>"
+            )
 
     # Wert-Labels: der LETZTE Wert je Anbieter gross (links vom Punkt, im
     # Plotraum - rechts beginnen die Endnamen), der ERSTE klein - je Tag-
@@ -1727,6 +1960,7 @@ def _svg(anbieter_serien: dict, breit: bool,
 
             def frei(t: float) -> bool:
                 return all(abs(b - t) >= abstand for b in belegt)
+
             if not frei(ziel):
                 ziel = y - 11 if frei(y - 11) else y + 18
             schritte = 0
@@ -1734,9 +1968,11 @@ def _svg(anbieter_serien: dict, breit: bool,
                 ziel += 15 if ziel > y else -15
                 schritte += 1
             belegt.append(ziel)
-            teile.append(f"<text class='{klasse}' x='{x + dx:.1f}' "
-                         f"y='{ziel:.1f}' text-anchor='{anker}'>"
-                         f"{_euro0(text)}</text>")
+            teile.append(
+                f"<text class='{klasse}' x='{x + dx:.1f}' "
+                f"y='{ziel:.1f}' text-anchor='{anker}'>"
+                f"{_euro0(text)}</text>"
+            )
 
     # _punkte liefert (x, y, wert) - der LETZTE Punkt je Serie traegt
     # seinen Wert. NUR auf dem BREITEN Bild: am schmalen kollidierte er mit
@@ -1777,10 +2013,13 @@ def _svg(anbieter_serien: dict, breit: bool,
     # eine sichtbare Zuordnung; der Halo (oben, „erstmals gemessen")
     # bleibt der Hinweis, dass es (noch) keine Kurve ist - das Endlabel
     # sagt nur noch, WESSEN Punkt das ist.
-    enden = sorted(((_punkte(anbieter_serien[a])[-1][0],
-                     _punkte(anbieter_serien[a])[-1][1], a)
-                    for a in anbieter),
-                   key=lambda e: e[1])
+    enden = sorted(
+        (
+            (_punkte(anbieter_serien[a])[-1][0], _punkte(anbieter_serien[a])[-1][1], a)
+            for a in anbieter
+        ),
+        key=lambda e: e[1],
+    )
     letzte_y = -99.0
     for x, y, a in enden:
         # Der Stapelabstand richtet sich nach dem BEDARF des Eintrags:
@@ -1792,8 +2031,7 @@ def _svg(anbieter_serien: dict, breit: bool,
         # steht bei ALLEN Kurven des Bildes oder bei keiner (siehe
         # `mehrere_zeitraeume`), deshalb genuegt derselbe Zuschlag je
         # Eintrag.
-        mon_text = (_mon_kurz(mon_je.get(a) or [])
-                    if mehrere_zeitraeume else "")
+        mon_text = _mon_kurz(mon_je.get(a) or []) if mehrere_zeitraeume else ""
         if mon_text:
             bedarf += 13
         ty = max(y, letzte_y + bedarf)
@@ -1811,24 +2049,31 @@ def _svg(anbieter_serien: dict, breit: bool,
                 f"target='_blank' rel='noopener' aria-label='Beleg bei "
                 f"{_esc(a)} öffnen'><text class='gr-zr-name' "
                 f"x='{lx:.1f}' y='{ty + 4:.1f}' text-anchor='end' "
-                f"fill='{farbe}'>{name_html}</text></a>")
+                f"fill='{farbe}'>{name_html}</text></a>"
+            )
         else:
-            teile.append(f"<text class='gr-zr-name' x='{lx:.1f}' "
-                         f"y='{ty + 4:.1f}' text-anchor='end' "
-                         f"fill='{farbe}'>{_esc(a)}</text>")
+            teile.append(
+                f"<text class='gr-zr-name' x='{lx:.1f}' "
+                f"y='{ty + 4:.1f}' text-anchor='end' "
+                f"fill='{farbe}'>{_esc(a)}</text>"
+            )
         # Der ZEITRAUM steht unmittelbar unter dem Namen - am Ende DER
         # Kurve, zu der er gehoert (P0-B-z1). `gr-zr-mon` ist sein
         # eigener Name; die Optik (10,5 px, gedeckt) ist die des
         # Abrufdatums daneben, deshalb traegt er dessen Klasse mit.
         mon = 13 if mon_text else 0
         if mon_text:
-            teile.append(f"<text class='gr-zr-datum gr-zr-mon' "
-                         f"x='{lx:.1f}' y='{ty + 17:.1f}' "
-                         f"text-anchor='end'>{_esc(mon_text)}</text>")
+            teile.append(
+                f"<text class='gr-zr-datum gr-zr-mon' "
+                f"x='{lx:.1f}' y='{ty + 17:.1f}' "
+                f"text-anchor='end'>{_esc(mon_text)}</text>"
+            )
         if datum:
-            teile.append(f"<text class='gr-zr-datum' x='{lx:.1f}' "
-                         f"y='{ty + 17 + mon:.1f}' "
-                         f"text-anchor='end'>{_datum_kurz(datum)}</text>")
+            teile.append(
+                f"<text class='gr-zr-datum' x='{lx:.1f}' "
+                f"y='{ty + 17 + mon:.1f}' "
+                f"text-anchor='end'>{_datum_kurz(datum)}</text>"
+            )
     teile.append("</svg>")
     return "".join(teile)
 
@@ -1840,8 +2085,9 @@ def _anbieter_punkte(anbieter: list) -> str:
     die Anbieterzahl der Karte; ein zusaetzlicher Text \"N Anbieter\"
     waere dieselbe Zahl ein zweites Mal am selben Ort (Beruhigungsregel)."""
     return "".join(
-        f"<i style='background:{_zr_marker_farbe(a)}' "
-        f"title='{_esc(a)}'></i>" for a in anbieter)
+        f"<i style='background:{_zr_marker_farbe(a)}' title='{_esc(a)}'></i>"
+        for a in anbieter
+    )
 
 
 def _bewegung(serien: dict, zeitraeume: dict | None = None) -> dict | None:
@@ -1870,8 +2116,7 @@ def _bewegung(serien: dict, zeitraeume: dict | None = None) -> dict | None:
     tage = _messtage(serien)
     if len(tage) < 2:
         return None
-    spanne = (date.fromisoformat(tage[-1])
-              - date.fromisoformat(tage[0])).days
+    spanne = (date.fromisoformat(tage[-1]) - date.fromisoformat(tage[0])).days
     if spanne < 1:
         return None
 
@@ -1879,8 +2124,9 @@ def _bewegung(serien: dict, zeitraeume: dict | None = None) -> dict | None:
         return min(w for d, w in serien[anbieter] if d == tag)
 
     letzte, erste = tage[-1], tage[0]
-    kandidaten = [a for a, punkte in serien.items()
-                  if any(d == letzte for d, _ in punkte)]
+    kandidaten = [
+        a for a, punkte in serien.items() if any(d == letzte for d, _ in punkte)
+    ]
     # P0-B-z1: HIER steht das Horizont-Tor, nicht an der Sichtbarkeit der
     # Kurve. „Fuehrend" ist eine RANGFOLGE - ueber zwei Zeitraeume gibt
     # sie den Laengsten als den Teuersten aus, nicht den Teuersten.
@@ -1892,16 +2138,21 @@ def _bewegung(serien: dict, zeitraeume: dict | None = None) -> dict | None:
     zeitraeume = zeitraeume or {}
     monate_je = {a: (zeitraeume.get(a) or []) for a in kandidaten}
     if len({m for ms in monate_je.values() for m in ms}) > 1:
-        kandidaten = [a for a in kandidaten
-                      if any(zeitraum_vergleichbar(m, TCO_HORIZONT)
-                             for m in monate_je[a])]
+        kandidaten = [
+            a
+            for a in kandidaten
+            if any(zeitraum_vergleichbar(m, TCO_HORIZONT) for m in monate_je[a])
+        ]
     if not kandidaten:
         return None
     fuehrend = min(
         kandidaten,
-        key=lambda a: (_wert(a, letzte),
-                       ANBIETER_FOLGE.index(a) if a in ANBIETER_FOLGE
-                       else len(ANBIETER_FOLGE), a))
+        key=lambda a: (
+            _wert(a, letzte),
+            ANBIETER_FOLGE.index(a) if a in ANBIETER_FOLGE else len(ANBIETER_FOLGE),
+            a,
+        ),
+    )
     if not any(d == erste for d, _ in serien[fuehrend]):
         return None
     # Und das VORZEICHEN: wechselt der Fuehrende seine Ratenlaufzeit
@@ -1912,11 +2163,9 @@ def _bewegung(serien: dict, zeitraeume: dict | None = None) -> dict | None:
     delta = round(_wert(fuehrend, letzte) - _wert(fuehrend, erste), 2)
     zeit = f"in {spanne} Tag" if spanne == 1 else f"in {spanne} Tagen"
     if delta > 0:
-        return {"text": f"↑ +{_euro0(delta)} {zeit}",
-                "richtung": "steigt"}
+        return {"text": f"↑ +{_euro0(delta)} {zeit}", "richtung": "steigt"}
     if delta < 0:
-        return {"text": f"↓ −{_euro0(-delta)} {zeit}",
-                "richtung": "sinkt"}
+        return {"text": f"↓ −{_euro0(-delta)} {zeit}", "richtung": "sinkt"}
     return {"text": f"±0 € {zeit}", "richtung": "gleich"}
 
 
@@ -1931,8 +2180,14 @@ def _legende_html(anbieter_serien: dict, zeitraeume: dict | None = None) -> str:
     sich sonst als 24-Monats-Betrag. Gelesen wird derselbe Wert wie am
     Kurvenende (`_zeitraeume_aus`), nicht nachgerechnet."""
     zeitraeume = zeitraeume or {}
-    vorhanden = sorted({m for a, ms in zeitraeume.items()
-                        if anbieter_serien.get(a) for m in (ms or [])})
+    vorhanden = sorted(
+        {
+            m
+            for a, ms in zeitraeume.items()
+            if anbieter_serien.get(a)
+            for m in (ms or [])
+        }
+    )
     eintraege = []
     for anbieter in ANBIETER_FOLGE:
         serie = anbieter_serien.get(anbieter)
@@ -1942,16 +2197,21 @@ def _legende_html(anbieter_serien: dict, zeitraeume: dict | None = None) -> str:
         # Bild stehen die Werte HIER, das SVG bleibt kollisionsfrei; am
         # breiten zeigen sie die Labels im Bild, und der Wert-Span ist
         # ausgeblendet - eine Zahl steht je Ort genau EINMAL.
-        zusatz = (f" <span class='gr-zr-leg-wert'>ab {_euro0(serie[0][1])}"
-                  f" · zuletzt {_euro0(serie[-1][1])}</span>")
-        mon_text = (_mon_kurz(zeitraeume.get(anbieter) or [])
-                    if len(vorhanden) > 1 else "")
+        zusatz = (
+            f" <span class='gr-zr-leg-wert'>ab {_euro0(serie[0][1])}"
+            f" · zuletzt {_euro0(serie[-1][1])}</span>"
+        )
+        mon_text = (
+            _mon_kurz(zeitraeume.get(anbieter) or []) if len(vorhanden) > 1 else ""
+        )
         if mon_text:
-            zusatz += (f" <span class='gr-zr-leg-ab gr-zr-leg-mon'>· "
-                       f"{_esc(mon_text)}</span>")
+            zusatz += (
+                f" <span class='gr-zr-leg-ab gr-zr-leg-mon'>· {_esc(mon_text)}</span>"
+            )
         eintraege.append(
             f"<span><i style='background:{_zr_marker_farbe(anbieter)}'></i>"
-            f"{_esc(anbieter)}{zusatz}</span>")
+            f"{_esc(anbieter)}{zusatz}</span>"
+        )
     if not eintraege:
         return ""
     return "<div class='gr-zr-legende'>" + "".join(eintraege) + "</div>"
@@ -1960,6 +2220,7 @@ def _legende_html(anbieter_serien: dict, zeitraeume: dict | None = None) -> str:
 # --------------------------------------------------------------------------
 # Der Einstieg
 # --------------------------------------------------------------------------
+
 
 def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
     """Alles, was die Hauptansicht braucht.
@@ -1987,9 +2248,14 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
     # rechnet ihn nach (Clean Code 1).
     zeitraeume_alle = _zeitraeume_aus(messungen_alle, tarife)
     if messungen_alle:
-        log.info("Zeitreihe: %d Messungen gelesen.", sum(
-            len(saetze) for pa_ in messungen_alle.values()
-            for saetze in pa_.values()))
+        log.info(
+            "Zeitreihe: %d Messungen gelesen.",
+            sum(
+                len(saetze)
+                for pa_ in messungen_alle.values()
+                for saetze in pa_.values()
+            ),
+        )
 
     # E4/P5-SICHTBARKEIT: ein AUTO angelegtes Modell steht in der WAHL (Such-
     # index, Kacheln, Paare) erst ab AUTO_SICHTBAR_AB_MESTAGEN Bündel-
@@ -2003,19 +2269,24 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
     # der Messlage, keine Auswahl nach Listenposition.
     messtage_je_modell: dict[str, set] = {}
     for (mid, _band), anbieter_serien in serien_alle.items():
-        messtage_je_modell.setdefault(mid, set()).update(
-            _messtage(anbieter_serien))
-    wahl = [m for m in modelle
-            if not m.get("auto")
-            or len(messtage_je_modell.get(m["id"], ())) >=
-            AUTO_SICHTBAR_AB_MESTAGEN]
+        messtage_je_modell.setdefault(mid, set()).update(_messtage(anbieter_serien))
+    wahl = [
+        m
+        for m in modelle
+        if not m.get("auto")
+        or len(messtage_je_modell.get(m["id"], ())) >= AUTO_SICHTBAR_AB_MESTAGEN
+    ]
     wahl_ids = {m["id"] for m in wahl}
-    verdeckt = sorted(m.get("titel") or m["id"] for m in modelle
-                      if m["id"] not in wahl_ids)
+    verdeckt = sorted(
+        m.get("titel") or m["id"] for m in modelle if m["id"] not in wahl_ids
+    )
     if verdeckt:
-        log.info("Zeitreihe: %d Auto-Modell(e) unter %d Messtagen - noch "
-                 "nicht waehlbar: %s", len(verdeckt),
-                 AUTO_SICHTBAR_AB_MESTAGEN, ", ".join(verdeckt))
+        log.info(
+            "Zeitreihe: %d Auto-Modell(e) unter %d Messtagen - noch nicht waehlbar: %s",
+            len(verdeckt),
+            AUTO_SICHTBAR_AB_MESTAGEN,
+            ", ".join(verdeckt),
+        )
 
     # Die Paare: jedes (Modell, Band) mit mindestens einer Zeile - auch
     # ohne Historie (dann mit dem ehrlichen Leer-Satz).
@@ -2044,8 +2315,11 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
         # Auswahl folgt der Menge der ANGEBOTE - fiele das Band heraus,
         # verschwaende ein gemessenes Angebot ohne ein Wort (am Bestand
         # vom 21.09.2026 zwoelf (Modell, Band)-Tafeln).
-        bands = [b for b, s in zeilen_je_band.items()
-                 if s["zeilen"] or s.get("alt") or s.get("fremd")]
+        bands = [
+            b
+            for b, s in zeilen_je_band.items()
+            if s["zeilen"] or s.get("alt") or s.get("fremd")
+        ]
         erlaubt[modell["id"]] = bands
         for band in bands:
             satz = zeilen_je_band[band]
@@ -2062,12 +2336,25 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
             # (`fremd_text`). Vorher lag er in `alt_text` und bekam
             # dadurch dessen Beschriftung („kein aktueller Bündel-Stand")
             # ueber einem Angebot von heute.
-            eintrag = {"ab": None, "ab_monat": None, "anb": None,
-                       "delta_text": None, "delta_richtung": None,
-                       "punkte_html": "", "anbieter_text": "",
-                       "alt_text": None, "fremd_text": None}
-            echt = next((z for z in zeilen if not z.get("naeherung")
-                         and z.get("gesamt") is not None), None)
+            eintrag = {
+                "ab": None,
+                "ab_monat": None,
+                "anb": None,
+                "delta_text": None,
+                "delta_richtung": None,
+                "punkte_html": "",
+                "anbieter_text": "",
+                "alt_text": None,
+                "fremd_text": None,
+            }
+            echt = next(
+                (
+                    z
+                    for z in zeilen
+                    if not z.get("naeherung") and z.get("gesamt") is not None
+                ),
+                None,
+            )
             if echt is not None:
                 eintrag["ab"] = _euro(echt["gesamt"])
                 eintrag["ab_monat"] = _schnitt(echt)
@@ -2077,11 +2364,18 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
                 # Wort, sondern der alte Stand MIT Datum - nie geraten
                 # (kein lesbares Datum heisst „kein aktueller Stand").
                 alt_seit = max(
-                    (k.get("abgerufen_am") or "" for k in alte
-                     if kurz_datum(k.get("abgerufen_am") or "")), default="")
+                    (
+                        k.get("abgerufen_am") or ""
+                        for k in alte
+                        if kurz_datum(k.get("abgerufen_am") or "")
+                    ),
+                    default="",
+                )
                 eintrag["alt_text"] = (
                     f"kein aktueller Stand seit {kurz_datum(alt_seit)}"
-                    if alt_seit else "kein aktueller Stand")
+                    if alt_seit
+                    else "kein aktueller Stand"
+                )
             elif fremde:
                 # P0-B-h3: der Strich heisst auf dieser Seite "kein
                 # Angebot" (A2) - hier IST ein Angebot, es traegt nur
@@ -2095,7 +2389,8 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
                 eintrag["fremd_text"] = (
                     f"nur über {monate_fremd} Monate"
                     if monate_fremd is not None
-                    else "nur über eine andere Laufzeit")
+                    else "nur über eine andere Laufzeit"
+                )
             if serien:
                 band_anbieter = [a for a in ANBIETER_FOLGE if serien.get(a)]
                 eintrag["punkte_html"] = _anbieter_punkte(band_anbieter)
@@ -2106,61 +2401,81 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
                     eintrag["delta_richtung"] = bew["richtung"]
             karten_baender.setdefault(modell["id"], {})[band] = eintrag
             mess = messungen_alle.get((modell["id"], band), {})
-            luecken = _luecken(zeilen, modell.get("karten") or [], band,
-                               fremd=fremde)
-            beleg_je = {z["anbieter"]: (z.get("quelle_url") or "",
-                                        z.get("abgerufen_am") or "")
-                        for z in zeilen}
+            luecken = _luecken(zeilen, modell.get("karten") or [], band, fremd=fremde)
+            beleg_je = {
+                z["anbieter"]: (z.get("quelle_url") or "", z.get("abgerufen_am") or "")
+                for z in zeilen
+            }
             leer = None
             if not serien:
                 seit = tco.get("historie_lage") or {}
-                seit_text = (f"seit dem {_datum_de(seit['seit'])}"
-                             if seit.get("seit") else "")
-                leer = (f"Für {_satz_name(modell)} im Band "
-                        f"{band_katalog.get(band, {}).get('label', band)} "
-                        f"liegt noch keine Messreihe vor - die Zeitreihe "
-                        f"beginnt {seit_text} und wächst mit jedem "
-                        f"Messtag. Der Stand heute steht in den Bündel-"
-                        f"Zeilen darunter.")
-            paare.append({
-                "modell": modell["id"], "band": band,
-                "antwort_html": _antwort_html(
-                    modell, band, zeilen, band_katalog.get(band, {}),
-                    alte=satz.get("alt"), fremd=fremde),
-                # P4/D4: das Delta als Leitzahl ueber dem Satz (None ohne
-                # Delta - dann gibt es keine Leitzahl-Zeile, s. Docstring).
-                "leitzahl_html": _leitzahl_html(zeilen),
-                "rechnung_html": _rechnung_html(zeilen),
-                "legende_html": _legende_html(serien, zeitraeume),
-                # P0-B (22.09.2026, LEAD): der zugaengliche Name der
-                # GRAFIK-SEKTION stand bis hierher fest in der Vorlage
-                # ("Kosten über 24 Monate je Messtag und Anbieter") -
-                # auch dann, wenn im Bild eine 36-Monats-Kurve lag. z1 hat
-                # das aria-label IM Bild dynamisch gemacht und die Sektion
-                # darueber nicht gesehen; fuer einen Screenreader
-                # behauptete die Seite damit weiter genau das, was diese
-                # Phase abgeschafft hat. Gelesen wird DIESELBE Wortregel
-                # wie am Kurvenende (`_zeitraum_wort`), nicht eine zweite.
-                # `zeitraeume` ist {anbieter: [Monate, ...]} - die Liste,
-                # weil ein Anbieter seine Ratenlaufzeit zwischen zwei
-                # Messtagen wechseln kann. Hier zaehlt die Vereinigung
-                # ueber alle Kurven des Bildes.
-                "graph_beschriftung": (
-                    f"Kosten über {wort} je Messtag und Anbieter"
-                    if (wort := _zeitraum_wort(
-                        sorted({m for liste in zeitraeume.values()
-                                for m in (liste or [])})))
-                    else "Kosten je Messtag und Anbieter"),
-                "svg_breit": _svg(serien, True, beleg_je, zeitraeume),
-                "svg_schmal": _svg(serien, False, beleg_je, zeitraeume),
-                # P1: die fertige Rechung je Messung als <template>-Blöcke
-                # unter dem SVG - der Client montiert sie nur noch.
-                "rechenweg_html": _rechenwege_html(mess, zeilen, tarife),
-                "luecke_text": _luecke_text(luecken, band_katalog),
-                "leer_text": leer,
-                "anbieter": [a for a in ANBIETER_FOLGE if serien.get(a)],
-                "punkte": punkte,
-            })
+                seit_text = (
+                    f"seit dem {_datum_de(seit['seit'])}" if seit.get("seit") else ""
+                )
+                leer = (
+                    f"Für {_satz_name(modell)} im Band "
+                    f"{band_katalog.get(band, {}).get('label', band)} "
+                    f"liegt noch keine Messreihe vor - die Zeitreihe "
+                    f"beginnt {seit_text} und wächst mit jedem "
+                    f"Messtag. Der Stand heute steht in den Bündel-"
+                    f"Zeilen darunter."
+                )
+            paare.append(
+                {
+                    "modell": modell["id"],
+                    "band": band,
+                    "antwort_html": _antwort_html(
+                        modell,
+                        band,
+                        zeilen,
+                        band_katalog.get(band, {}),
+                        alte=satz.get("alt"),
+                        fremd=fremde,
+                    ),
+                    # P4/D4: das Delta als Leitzahl ueber dem Satz (None ohne
+                    # Delta - dann gibt es keine Leitzahl-Zeile, s. Docstring).
+                    "leitzahl_html": _leitzahl_html(zeilen),
+                    "rechnung_html": _rechnung_html(zeilen),
+                    "legende_html": _legende_html(serien, zeitraeume),
+                    # P0-B (22.09.2026, LEAD): der zugaengliche Name der
+                    # GRAFIK-SEKTION stand bis hierher fest in der Vorlage
+                    # ("Kosten über 24 Monate je Messtag und Anbieter") -
+                    # auch dann, wenn im Bild eine 36-Monats-Kurve lag. z1 hat
+                    # das aria-label IM Bild dynamisch gemacht und die Sektion
+                    # darueber nicht gesehen; fuer einen Screenreader
+                    # behauptete die Seite damit weiter genau das, was diese
+                    # Phase abgeschafft hat. Gelesen wird DIESELBE Wortregel
+                    # wie am Kurvenende (`_zeitraum_wort`), nicht eine zweite.
+                    # `zeitraeume` ist {anbieter: [Monate, ...]} - die Liste,
+                    # weil ein Anbieter seine Ratenlaufzeit zwischen zwei
+                    # Messtagen wechseln kann. Hier zaehlt die Vereinigung
+                    # ueber alle Kurven des Bildes.
+                    "graph_beschriftung": (
+                        f"Kosten über {wort} je Messtag und Anbieter"
+                        if (
+                            wort := _zeitraum_wort(
+                                sorted(
+                                    {
+                                        m
+                                        for liste in zeitraeume.values()
+                                        for m in (liste or [])
+                                    }
+                                )
+                            )
+                        )
+                        else "Kosten je Messtag und Anbieter"
+                    ),
+                    "svg_breit": _svg(serien, True, beleg_je, zeitraeume),
+                    "svg_schmal": _svg(serien, False, beleg_je, zeitraeume),
+                    # P1: die fertige Rechung je Messung als <template>-Blöcke
+                    # unter dem SVG - der Client montiert sie nur noch.
+                    "rechenweg_html": _rechenwege_html(mess, zeilen, tarife),
+                    "luecke_text": _luecke_text(luecken, band_katalog),
+                    "leer_text": leer,
+                    "anbieter": [a for a in ANBIETER_FOLGE if serien.get(a)],
+                    "punkte": punkte,
+                }
+            )
         # Bänder OHNE Angebot - weder frisch noch alt - kommen nicht in
         # die Auswahl; die Band-Wahl deaktiviert sie (Angebot, nicht
         # Existenz der Option). Ein Band mit NUR altem Angebot bleibt
@@ -2170,22 +2485,32 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
     # aus den Serien gerechnet, nichts hardcodiert (der Bestand wächst).
     vorlagen = sum(p["rechenweg_html"].count("<template") for p in paare)
     if vorlagen:
-        log.info("Zeitreihe: %d Rechenweg-Vorlagen (je Messung) gebaut, "
-                 "%d Punkte in den Serien.", vorlagen,
-                 sum(p["punkte"] for p in paare))
-    kandidaten = [(p["modell"], p["band"], len(p["anbieter"]), p["punkte"])
-                  for p in paare]
+        log.info(
+            "Zeitreihe: %d Rechenweg-Vorlagen (je Messung) gebaut, "
+            "%d Punkte in den Serien.",
+            vorlagen,
+            sum(p["punkte"] for p in paare),
+        )
+    kandidaten = [
+        (p["modell"], p["band"], len(p["anbieter"]), p["punkte"]) for p in paare
+    ]
     start = None
     if kandidaten:
         # Gleichstand bricht die Leiterfolge (XS vor M), nicht das
         # Alphabet - sonst stuende "m" vor "xs".
         rang = {b: i for i, b in enumerate(band_katalog)}
-        kandidaten.sort(key=lambda k: (-k[2], -k[3], k[0],
-                                       rang.get(k[1], len(rang)), k[1]))
+        kandidaten.sort(
+            key=lambda k: (-k[2], -k[3], k[0], rang.get(k[1], len(rang)), k[1])
+        )
         start = {"modell": kandidaten[0][0], "band": kandidaten[0][1]}
-    start_block = next((p for p in paare if start and
-                        p["modell"] == start["modell"]
-                        and p["band"] == start["band"]), None)
+    start_block = next(
+        (
+            p
+            for p in paare
+            if start and p["modell"] == start["modell"] and p["band"] == start["band"]
+        ),
+        None,
+    )
 
     # Der Suchindex: deterministisch vorsortiert (Bandabdeckung vor
     # Auslaufware, dann Anbieterzahl, dann Titel) - PM-7. Der JS-Teil
@@ -2203,15 +2528,17 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
         if not bands:
             continue
         echte = [k for k in modell.get("karten") or [] if k.get("sku_id")]
-        index_modelle.append({
-            "id": modell["id"], "titel": modell.get("titel") or modell["id"],
-            "hersteller": modell.get("hersteller") or "",
-            "speicher": modell.get("speicher"),
-            "anbieter_zahl": len({k["anbieter"] for k in echte}),
-            "band_zahl": len(bands),
-        })
-    index_modelle.sort(key=lambda m: (-m["band_zahl"], -m["anbieter_zahl"],
-                                      m["titel"]))
+        index_modelle.append(
+            {
+                "id": modell["id"],
+                "titel": modell.get("titel") or modell["id"],
+                "hersteller": modell.get("hersteller") or "",
+                "speicher": modell.get("speicher"),
+                "anbieter_zahl": len({k["anbieter"] for k in echte}),
+                "band_zahl": len(bands),
+            }
+        )
+    index_modelle.sort(key=lambda m: (-m["band_zahl"], -m["anbieter_zahl"], m["titel"]))
     suchindex = index_modelle
 
     # Die Kacheln: die haeufigsten Geraete - dasselbe Mass wie der
@@ -2228,6 +2555,7 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
     # ZWILLINGE. Der Kurzname bekommt die GB-Stufe angehaengt, sobald er
     # im Kachelsatz doppelt vorkommt.
     kurze_namen = [_kurz_name(titel_je[mid]) for mid in kachel_werte]
+
     def _kachel_name(mid: str) -> str:
         kurz = _kurz_name(titel_je[mid])
         if kurze_namen.count(kurz) > 1:
@@ -2235,6 +2563,7 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
             if speicher:
                 return f"{kurz} · {speicher} GB"
         return kurz
+
     # P1/F3 (A3) + P1-Fix (Sicht-B2): aus den einzeiligen Chips sind
     # MODELL-KARTEN geworden - der Schnelleingang traegt je Band seinen
     # ab-Preis, die Bewegung und die Anbieter-Punkte (alles aus DEM Band,
@@ -2245,20 +2574,24 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
     # Vorlage entscheidet das, hier ist ab einfach None.
     kacheln = []
     for mid in sorted(
-            kachel_werte,
-            key=lambda m: (-kachel_werte[m][0],
-                           -kachel_werte[m][1], m))[:KACHELN_MAX]:
+        kachel_werte, key=lambda m: (-kachel_werte[m][0], -kachel_werte[m][1], m)
+    )[:KACHELN_MAX]:
         if mid not in titel_je:
             continue
-        kacheln.append({
-            "id": mid, "kurz": _kachel_name(mid),
-            "titel": titel_je[mid].get("titel") or mid,
-            # Reihenfolge wie die Band-Knoepfe (die Tarifleiter, XS bis
-            # XL) - nie alphabetisch; der Band-Katalog ist die Quelle.
-            "baender": {b: karten_baender.get(mid, {}).get(b)
-                        for b in band_katalog
-                        if karten_baender.get(mid, {}).get(b)},
-        })
+        kacheln.append(
+            {
+                "id": mid,
+                "kurz": _kachel_name(mid),
+                "titel": titel_je[mid].get("titel") or mid,
+                # Reihenfolge wie die Band-Knoepfe (die Tarifleiter, XS bis
+                # XL) - nie alphabetisch; der Band-Katalog ist die Quelle.
+                "baender": {
+                    b: karten_baender.get(mid, {}).get(b)
+                    for b in band_katalog
+                    if karten_baender.get(mid, {}).get(b)
+                },
+            }
+        )
 
     # Der JSON-Knoten fuer den Client: NUR Titel, Zaehlungen und Erlaubnis
     # - keine Betraege (Regel 1). bnd_titel je Band, damit der Titel der
@@ -2279,20 +2612,24 @@ def aufbereiten(state_dir: Path, tco: dict, tarife: dict | None = None) -> dict:
         "titel": {m["id"]: m.get("titel") or m["id"] for m in modelle},
         "kurz": {m["id"]: _kurz_name(m) for m in modelle},
         "bnd_titel": {
-            m["id"]: {band: f"Alle Bündel im Band "
-                            f"{band_katalog.get(band, {}).get('label', band)}"
-                            f" – {m.get('titel') or m['id']}"
-                    for band in erlaubt.get(m["id"]) or []}
-            for m in modelle},
-        "bnd_titel_ohne": {m["id"]: f"Alle Bündel – {m.get('titel') or m['id']}"
-                           for m in modelle},
+            m["id"]: {
+                band: f"Alle Bündel im Band "
+                f"{band_katalog.get(band, {}).get('label', band)}"
+                f" – {m.get('titel') or m['id']}"
+                for band in erlaubt.get(m["id"]) or []
+            }
+            for m in modelle
+        },
+        "bnd_titel_ohne": {
+            m["id"]: f"Alle Bündel – {m.get('titel') or m['id']}" for m in modelle
+        },
     }
 
     # P4: der Bewegungsblock des Newsletters aus DERSELBEN Lesung der
     # Historie und derselben Wahl-Menge wie der Graph, den sein Link oeffnet.
     bewegung_woche = geraete_bewegung.bewegungen(
-        messungen_alle, erlaubt, daten["titel"], band_katalog,
-        buendel_schluessel)
+        messungen_alle, erlaubt, daten["titel"], band_katalog, buendel_schluessel
+    )
 
     return {
         # hat_daten heisst: es gibt mindestens EINEN Messpunkt - ohne
@@ -2319,12 +2656,27 @@ def leer() -> dict:
     (hat_daten False, paare leer), die übrigen Reiter der Seite bleiben
     davon unberührt - dieselbe Trennung wie `geraete_tco_view.leer()`.
     """
-    return {"hat_daten": False, "start": None, "start_block": None,
-            "paare": [], "kacheln": [], "baender": {}, "band_folge": [],
-            "bewegung_woche": geraete_bewegung.ausfall(
-                geraete_bewegung.AUSFALL_AUFBEREITUNG),
-            "suchindex": [], "daten": {"vorgabe": "", "start_band": "",
-                                       "modelle_gesamt": 0, "suchindex": [],
-                                       "erlaubt": {}, "titel": {},
-                                       "kurz": {}, "bnd_titel": {},
-                                       "bnd_titel_ohne": {}}}
+    return {
+        "hat_daten": False,
+        "start": None,
+        "start_block": None,
+        "paare": [],
+        "kacheln": [],
+        "baender": {},
+        "band_folge": [],
+        "bewegung_woche": geraete_bewegung.ausfall(
+            geraete_bewegung.AUSFALL_AUFBEREITUNG
+        ),
+        "suchindex": [],
+        "daten": {
+            "vorgabe": "",
+            "start_band": "",
+            "modelle_gesamt": 0,
+            "suchindex": [],
+            "erlaubt": {},
+            "titel": {},
+            "kurz": {},
+            "bnd_titel": {},
+            "bnd_titel_ohne": {},
+        },
+    }

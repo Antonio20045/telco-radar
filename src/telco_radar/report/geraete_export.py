@@ -60,6 +60,7 @@ eine Tabelle nach Preis sortiert, in der 49,95 (Zuzahlung) neben 1349,90
 (Ladenpreis) steht, bekommt eine Rangliste, die nichts bedeutet - dieselbe
 Disziplin wie im Preisvergleich.
 """
+
 from __future__ import annotations
 
 import csv
@@ -77,14 +78,35 @@ KODIERUNG = "utf-8-sig"
 TRENNER = ";"
 
 SPALTEN_AKTUELL = [
-    "Anbieter", "Anbietertyp", "Hersteller", "Modell", "Speicher GB", "Farbe",
-    "Zustand", "Preis EUR", "Preisart", "Tarifreferenz", "Verfuegbarkeit",
-    "Quelle", "Abgerufen am", "Listungs-ID", "SKU-ID",
+    "Anbieter",
+    "Anbietertyp",
+    "Hersteller",
+    "Modell",
+    "Speicher GB",
+    "Farbe",
+    "Zustand",
+    "Preis EUR",
+    "Preisart",
+    "Tarifreferenz",
+    "Verfuegbarkeit",
+    "Quelle",
+    "Abgerufen am",
+    "Listungs-ID",
+    "SKU-ID",
 ]
 
 SPALTEN_HISTORIE = [
-    "Listungs-ID", "SKU-ID", "Anbieter", "Hersteller", "Modell", "Datum",
-    "Preis EUR", "Preisart", "Tarifreferenz", "Verfuegbarkeit", "Quelle",
+    "Listungs-ID",
+    "SKU-ID",
+    "Anbieter",
+    "Hersteller",
+    "Modell",
+    "Datum",
+    "Preis EUR",
+    "Preisart",
+    "Tarifreferenz",
+    "Verfuegbarkeit",
+    "Quelle",
 ]
 
 # O4 (STRATEGIE_GERAETE_OPTIK §3): der TCO-Gesamtexport. Die Spalten der
@@ -161,8 +183,7 @@ def leitzahl_aus_zeile(zeile):
     Zeichenkette, wie sie in der Datei steht (deutsches Dezimalkomma), oder
     "" wenn die Zeile keine Leitzahl traegt - dann ist sie wirklich leer.
     """
-    return (zeile.get(SPALTE_UEBER_24)
-            or zeile.get(SPALTE_UEBER_LAUFZEIT) or "")
+    return zeile.get(SPALTE_UEBER_24) or zeile.get(SPALTE_UEBER_LAUFZEIT) or ""
 
 
 def _leitzahl_spalten(tco24, leitzahl_monate):
@@ -187,12 +208,26 @@ def _leitzahl_spalten(tco24, leitzahl_monate):
 
 
 SPALTEN_TCO = [
-    "Art", "Modell", "Speicher GB", "Anbieter", "Anbietertyp", "Tarif",
-    "Band", "Zustand", "Zuzahlung EUR", "Tarif/Monat EUR", "Geräterate EUR",
-    "Bündel/Monat EUR", "Laufzeit Monate", "Anschlusspreis EUR",
+    "Art",
+    "Modell",
+    "Speicher GB",
+    "Anbieter",
+    "Anbietertyp",
+    "Tarif",
+    "Band",
+    "Zustand",
+    "Zuzahlung EUR",
+    "Tarif/Monat EUR",
+    "Geräterate EUR",
+    "Bündel/Monat EUR",
+    "Laufzeit Monate",
+    "Anschlusspreis EUR",
     "Leitzahl-Zeitraum Monate",
-    SPALTE_UEBER_24, SPALTE_UEBER_LAUFZEIT, "Abgerufen am",
-    "Quelle", "SKU-ID",
+    SPALTE_UEBER_24,
+    SPALTE_UEBER_LAUFZEIT,
+    "Abgerufen am",
+    "Quelle",
+    "SKU-ID",
 ]
 
 # O4: der Radar-Export - TCO-24 der Netzbetreiber UND Händler-Barpreis in
@@ -213,9 +248,21 @@ SPALTEN_TCO = [
 # ein Minuszeichen trüge nichts bei); Status trägt die ALARM-STUFE
 # (Kritisch/Mittel/Gering), nicht den Vergleichsstatus der TCO-Zeilen.
 SPALTEN_RADAR = [
-    "Art", "Modell", "Hersteller", "Speicher GB", "Anbieter", "Tarif",
-    "Tarifband", "Status", "Abweichung %", "Wettbewerber-Preis EUR",
-    "Vodafone-Preis EUR", "Preisart", "Grund", "Abgerufen am", "Quelle",
+    "Art",
+    "Modell",
+    "Hersteller",
+    "Speicher GB",
+    "Anbieter",
+    "Tarif",
+    "Tarifband",
+    "Status",
+    "Abweichung %",
+    "Wettbewerber-Preis EUR",
+    "Vodafone-Preis EUR",
+    "Preisart",
+    "Grund",
+    "Abgerufen am",
+    "Quelle",
 ]
 
 # P3 (Strategie Geraete v3, 17.09.2026): der Katalog auf MODELL-Ebene hat
@@ -227,9 +274,18 @@ SPALTEN_RADAR = [
 # "Nur im Bündel ab EUR/Monat") und schließen einander je Zeile aus - eine
 # Rate steht nie in einer Preisspalte, die einen Kassenpreis nennt.
 SPALTEN_MODELL_BARPREIS = [
-    "Hersteller", "Modell", "Speicher GB", "Ab-Preis EUR",
-    "Anbieter (ab-Preis)", "Anbieterzahl", "Spanne von EUR", "Spanne bis EUR",
-    "Nur im Bündel ab EUR/Monat", "Bündel-Anbieter", "Abgerufen am", "Quelle",
+    "Hersteller",
+    "Modell",
+    "Speicher GB",
+    "Ab-Preis EUR",
+    "Anbieter (ab-Preis)",
+    "Anbieterzahl",
+    "Spanne von EUR",
+    "Spanne bis EUR",
+    "Nur im Bündel ab EUR/Monat",
+    "Bündel-Anbieter",
+    "Abgerufen am",
+    "Quelle",
 ]
 
 # Die TCO-Ansicht: eine Zeile je Modell, die Leitzahl des besten
@@ -237,9 +293,18 @@ SPALTEN_MODELL_BARPREIS = [
 # Statusspalte statt einer geratenen - dieselbe Sprache wie die
 # Radar-Datei. Abweichung nur mit Vodafone-Referenz (delta_kurz-Regel).
 SPALTEN_MODELL_TCO = [
-    "Hersteller", "Modell", "Speicher GB", "TCO ab EUR", "Bester Anbieter",
-    "Ø EUR/Monat", "Abweichung zu Vodafone EUR", "Abweichung %", "Tarifband",
-    "Status", "Abgerufen am", "Quelle",
+    "Hersteller",
+    "Modell",
+    "Speicher GB",
+    "TCO ab EUR",
+    "Bester Anbieter",
+    "Ø EUR/Monat",
+    "Abweichung zu Vodafone EUR",
+    "Abweichung %",
+    "Tarifband",
+    "Status",
+    "Abgerufen am",
+    "Quelle",
 ]
 
 # Die drei Zeilenarten der Radar-Datei - dieselben Wörter, mit denen die
@@ -288,8 +353,9 @@ def _preis_und_art(satz: dict) -> tuple[str, str, str]:
 
 def _schreibe(spalten: list, zeilen: list) -> str:
     puffer = io.StringIO()
-    schreiber = csv.writer(puffer, delimiter=TRENNER, lineterminator="\r\n",
-                           quoting=csv.QUOTE_MINIMAL)
+    schreiber = csv.writer(
+        puffer, delimiter=TRENNER, lineterminator="\r\n", quoting=csv.QUOTE_MINIMAL
+    )
     schreiber.writerow(spalten)
     schreiber.writerows(zeilen)
     return puffer.getvalue()
@@ -336,33 +402,58 @@ def tco_csv(zeilen: dict) -> tuple[str, int]:
     ausgabe = []
     for z in (zeilen or {}).get("buendel", []):
         lz_monate = z.get("leitzahl_monate")
-        ueber_24, ueber_laufzeit = _leitzahl_spalten(z.get("tco24"),
-                                                    lz_monate)
-        ausgabe.append([
-            "Bündel",
-            z.get("modell", ""), z.get("speicher", "") or "",
-            z.get("anbieter", ""), z.get("anbieter_typ", ""),
-            z.get("tarif", ""), z.get("band", ""), z.get("zustand", ""),
-            _zahl(z.get("zuzahlung")), _zahl(z.get("tarif_monatlich")),
-            _zahl(z.get("geraet_monatsrate")),
-            _zahl(z.get("buendel_monatlich")),
-            z.get("laufzeit", "") or "", _zahl(z.get("anschlusspreis")),
-            lz_monate or "", ueber_24, ueber_laufzeit,
-            z.get("abgerufen_am", ""),
-            z.get("quelle_url", ""), z.get("sku_id", ""),
-        ])
+        ueber_24, ueber_laufzeit = _leitzahl_spalten(z.get("tco24"), lz_monate)
+        ausgabe.append(
+            [
+                "Bündel",
+                z.get("modell", ""),
+                z.get("speicher", "") or "",
+                z.get("anbieter", ""),
+                z.get("anbieter_typ", ""),
+                z.get("tarif", ""),
+                z.get("band", ""),
+                z.get("zustand", ""),
+                _zahl(z.get("zuzahlung")),
+                _zahl(z.get("tarif_monatlich")),
+                _zahl(z.get("geraet_monatsrate")),
+                _zahl(z.get("buendel_monatlich")),
+                z.get("laufzeit", "") or "",
+                _zahl(z.get("anschlusspreis")),
+                lz_monate or "",
+                ueber_24,
+                ueber_laufzeit,
+                z.get("abgerufen_am", ""),
+                z.get("quelle_url", ""),
+                z.get("sku_id", ""),
+            ]
+        )
     for z in (zeilen or {}).get("sim_only", []):
         lz_monate = z.get("leitzahl_monate")
-        ueber_24, ueber_laufzeit = _leitzahl_spalten(z.get("tco24"),
-                                                    lz_monate)
-        ausgabe.append([
-            "SIM-only", "", "", z.get("anbieter", ""),
-            z.get("anbieter_typ", ""), z.get("tarif", ""), z.get("band", ""),
-            "", "", _zahl(z.get("tarif_monatlich")), "", "", "",
-            _zahl(z.get("anschlusspreis")),
-            lz_monate or "", ueber_24, ueber_laufzeit,
-            z.get("abgerufen_am", ""), z.get("quelle_url", ""), "",
-        ])
+        ueber_24, ueber_laufzeit = _leitzahl_spalten(z.get("tco24"), lz_monate)
+        ausgabe.append(
+            [
+                "SIM-only",
+                "",
+                "",
+                z.get("anbieter", ""),
+                z.get("anbieter_typ", ""),
+                z.get("tarif", ""),
+                z.get("band", ""),
+                "",
+                "",
+                _zahl(z.get("tarif_monatlich")),
+                "",
+                "",
+                "",
+                _zahl(z.get("anschlusspreis")),
+                lz_monate or "",
+                ueber_24,
+                ueber_laufzeit,
+                z.get("abgerufen_am", ""),
+                z.get("quelle_url", ""),
+                "",
+            ]
+        )
     return _schreibe(SPALTEN_TCO, ausgabe), len(ausgabe)
 
 
@@ -386,16 +477,29 @@ def _alarm_zeilen(alarme: dict) -> list[list[str]]:
     for z in zeilen:
         bester = z.get("bester") or {}
         unser = z.get("unser") or {}
-        ausgabe.append([
-            ART_ALARM, z.get("modell", ""), z.get("hersteller", ""),
-            z.get("speicher", "") or "", bester.get("laden", ""), "", "",
-            z.get("stufe_name", ""),
-            _prozent(z.get("prozent")), _zahl(bester.get("preis")),
-            _zahl(unser.get("preis")), "Gerätepreis ohne Vertrag",
-            ("ungewöhnlich großer Abstand – Quelle prüfen"
-             if z.get("auffaellig") else ""),
-            bester.get("abgerufen_am", ""), bester.get("url", ""),
-        ])
+        ausgabe.append(
+            [
+                ART_ALARM,
+                z.get("modell", ""),
+                z.get("hersteller", ""),
+                z.get("speicher", "") or "",
+                bester.get("laden", ""),
+                "",
+                "",
+                z.get("stufe_name", ""),
+                _prozent(z.get("prozent")),
+                _zahl(bester.get("preis")),
+                _zahl(unser.get("preis")),
+                "Gerätepreis ohne Vertrag",
+                (
+                    "ungewöhnlich großer Abstand – Quelle prüfen"
+                    if z.get("auffaellig")
+                    else ""
+                ),
+                bester.get("abgerufen_am", ""),
+                bester.get("url", ""),
+            ]
+        )
     return ausgabe
 
 
@@ -439,8 +543,11 @@ def _preisart_netz(z: dict, gruppe: dict) -> str:
     """
     vf = gruppe.get("vodafone") or {}
     monate = vf.get("monate")
-    if (z.get("status") == STATUS_VERGLEICHBAR and monate
-            and z.get("vf_gesamt") == vf.get("gesamt")):
+    if (
+        z.get("status") == STATUS_VERGLEICHBAR
+        and monate
+        and z.get("vf_gesamt") == vf.get("gesamt")
+    ):
         return f"Kosten über {monate} Monate"
     return "Kosten über die Bündellaufzeit"
 
@@ -504,24 +611,45 @@ def radar_csv(view: dict) -> tuple[str, int]:
     ausgabe = _alarm_zeilen((view or {}).get("alarme"))
     for g in (view or {}).get("gruppen", []):
         for z in g.get("zeilen", []):
-            ausgabe.append([
-                ART_NETZ, g.get("titel", ""),
-                g.get("hersteller", ""), g.get("speicher", "") or "",
-                z.get("anbieter", ""), z.get("tarif", ""),
-                z.get("band_label", ""), z.get("status", ""),
-                _prozent(z.get("prozent")), _zahl(z.get("gesamt")),
-                _zahl(z.get("vf_gesamt")), _preisart_netz(z, g),
-                _grund_netz(z, g), z.get("abgerufen_am", ""),
-                z.get("quelle_url", ""),
-            ])
+            ausgabe.append(
+                [
+                    ART_NETZ,
+                    g.get("titel", ""),
+                    g.get("hersteller", ""),
+                    g.get("speicher", "") or "",
+                    z.get("anbieter", ""),
+                    z.get("tarif", ""),
+                    z.get("band_label", ""),
+                    z.get("status", ""),
+                    _prozent(z.get("prozent")),
+                    _zahl(z.get("gesamt")),
+                    _zahl(z.get("vf_gesamt")),
+                    _preisart_netz(z, g),
+                    _grund_netz(z, g),
+                    z.get("abgerufen_am", ""),
+                    z.get("quelle_url", ""),
+                ]
+            )
     for z in (view or {}).get("haendler", []):
-        ausgabe.append([
-            ART_HAENDLER, z.get("modell", ""), z.get("hersteller", ""),
-            z.get("speicher", "") or "", z.get("anbieter", ""), "", "", "",
-            _prozent(z.get("prozent")), _zahl(z.get("preis")),
-            _zahl(z.get("vodafone_preis")), "Gerätepreis ohne Vertrag", "",
-            z.get("abgerufen_am", ""), z.get("url", ""),
-        ])
+        ausgabe.append(
+            [
+                ART_HAENDLER,
+                z.get("modell", ""),
+                z.get("hersteller", ""),
+                z.get("speicher", "") or "",
+                z.get("anbieter", ""),
+                "",
+                "",
+                "",
+                _prozent(z.get("prozent")),
+                _zahl(z.get("preis")),
+                _zahl(z.get("vodafone_preis")),
+                "Gerätepreis ohne Vertrag",
+                "",
+                z.get("abgerufen_am", ""),
+                z.get("url", ""),
+            ]
+        )
     return _schreibe(SPALTEN_RADAR, ausgabe), len(ausgabe)
 
 
@@ -540,17 +668,22 @@ def modell_barpreis_csv(modelle: list) -> tuple[str, int]:
     for m in modelle or []:
         beleg = m.get("ab_beleg") or {}
         buendel = m.get("buendel_beleg") or {}
-        ausgabe.append([
-            m.get("hersteller", ""), m.get("modell", ""),
-            m.get("speicher") or "",
-            _zahl(m.get("ab_preis")), m.get("ab_anbieter") or "",
-            m.get("anbieterzahl") or 0,
-            _zahl((m.get("spanne") or [None, None])[0]),
-            _zahl((m.get("spanne") or [None, None])[1]),
-            _zahl(m.get("buendel_monat")), m.get("buendel_anbieter") or "",
-            (beleg.get("abgerufen_am") or buendel.get("abgerufen_am") or ""),
-            (beleg.get("quelle_url") or buendel.get("quelle_url") or ""),
-        ])
+        ausgabe.append(
+            [
+                m.get("hersteller", ""),
+                m.get("modell", ""),
+                m.get("speicher") or "",
+                _zahl(m.get("ab_preis")),
+                m.get("ab_anbieter") or "",
+                m.get("anbieterzahl") or 0,
+                _zahl((m.get("spanne") or [None, None])[0]),
+                _zahl((m.get("spanne") or [None, None])[1]),
+                _zahl(m.get("buendel_monat")),
+                m.get("buendel_anbieter") or "",
+                (beleg.get("abgerufen_am") or buendel.get("abgerufen_am") or ""),
+                (beleg.get("quelle_url") or buendel.get("quelle_url") or ""),
+            ]
+        )
     return _schreibe(SPALTEN_MODELL_BARPREIS, ausgabe), len(ausgabe)
 
 
@@ -569,23 +702,29 @@ def modell_tco_csv(modelle: list) -> tuple[str, int]:
     ausgabe = []
     for m in modelle or []:
         beleg = m.get("tco_beleg") or {}
-        ausgabe.append([
-            m.get("hersteller", ""), m.get("modell", ""),
-            m.get("speicher") or "",
-            _zahl(m.get("tco_ab")), m.get("tco_anbieter") or "",
-            _zahl(m.get("tco_monat")), _zahl(m.get("tco_delta")),
-            # Klartext statt Rohschluessel (S4-1 der P3-Code-Pruefung):
-            # dieselbe Bezeichnung wie der Chip der Vergleichsansicht und
-            # die Band-Spalte des Katalogs - ein "xs" in der Spalte
-            # waere eine zweite Sprache fuer dieselbe Sache (O4-Regel).
-            _prozent(m.get("tco_delta_prozent")),
-            band_label(m.get("tco_band")),
-            # Zwei sich ausschliessende Leergruende, EINE Statusspalte:
-            # tco_leer steht nur ohne Leitzahl, tco_delta_leer nur mit
-            # Leitzahl (A2-Nachbesserung 20.09.2026).
-            m.get("tco_leer") or m.get("tco_delta_leer") or "",
-            beleg.get("abgerufen_am", ""), beleg.get("quelle_url", ""),
-        ])
+        ausgabe.append(
+            [
+                m.get("hersteller", ""),
+                m.get("modell", ""),
+                m.get("speicher") or "",
+                _zahl(m.get("tco_ab")),
+                m.get("tco_anbieter") or "",
+                _zahl(m.get("tco_monat")),
+                _zahl(m.get("tco_delta")),
+                # Klartext statt Rohschluessel (S4-1 der P3-Code-Pruefung):
+                # dieselbe Bezeichnung wie der Chip der Vergleichsansicht und
+                # die Band-Spalte des Katalogs - ein "xs" in der Spalte
+                # waere eine zweite Sprache fuer dieselbe Sache (O4-Regel).
+                _prozent(m.get("tco_delta_prozent")),
+                band_label(m.get("tco_band")),
+                # Zwei sich ausschliessende Leergruende, EINE Statusspalte:
+                # tco_leer steht nur ohne Leitzahl, tco_delta_leer nur mit
+                # Leitzahl (A2-Nachbesserung 20.09.2026).
+                m.get("tco_leer") or m.get("tco_delta_leer") or "",
+                beleg.get("abgerufen_am", ""),
+                beleg.get("quelle_url", ""),
+            ]
+        )
     return _schreibe(SPALTEN_MODELL_TCO, ausgabe), len(ausgabe)
 
 
@@ -598,21 +737,35 @@ def aktuell_csv(eintraege: list, katalog) -> tuple[str, int]:
     Zustandsspalte wird dafuer abgeleitet statt dem Store geglaubt.
     """
     zeilen = []
-    for e in sorted(eintraege, key=lambda x: (x.get("anbieter") or "",
-                                              x.get("device_id") or "",
-                                              x.get("speicher_gb") or 0)):
+    for e in sorted(
+        eintraege,
+        key=lambda x: (
+            x.get("anbieter") or "",
+            x.get("device_id") or "",
+            x.get("speicher_gb") or 0,
+        ),
+    ):
         preis, art, tarif = _preis_und_art(e)
         g = katalog.nach_id(e.get("device_id")) if katalog else None
-        zeilen.append([
-            e.get("anbieter", ""), e.get("anbieter_typ", ""),
-            g.hersteller if g else "", g.modell if g else e.get("device_id", ""),
-            e.get("speicher_gb") or "",
-            e.get("farbe_normalisiert") or e.get("farbe_roh") or "",
-            zustand_der_zeile(e),
-            preis, art, tarif,
-            e.get("verfuegbarkeit", ""), e.get("quelle_url", ""),
-            e.get("abgerufen_am", ""), e.get("id", ""), e.get("sku_id", ""),
-        ])
+        zeilen.append(
+            [
+                e.get("anbieter", ""),
+                e.get("anbieter_typ", ""),
+                g.hersteller if g else "",
+                g.modell if g else e.get("device_id", ""),
+                e.get("speicher_gb") or "",
+                e.get("farbe_normalisiert") or e.get("farbe_roh") or "",
+                zustand_der_zeile(e),
+                preis,
+                art,
+                tarif,
+                e.get("verfuegbarkeit", ""),
+                e.get("quelle_url", ""),
+                e.get("abgerufen_am", ""),
+                e.get("id", ""),
+                e.get("sku_id", ""),
+            ]
+        )
     return _schreibe(SPALTEN_AKTUELL, zeilen), len(zeilen)
 
 
@@ -634,27 +787,42 @@ def historie_csv(punkte: list, eintraege: list, katalog) -> tuple[str, int]:
     """
     nach_id = {e.get("id"): e for e in eintraege}
     zeilen = []
-    for p in sorted(punkte, key=lambda x: (x.get("datum") or "",
-                                           x.get("listung_id") or "")):
+    for p in sorted(
+        punkte, key=lambda x: (x.get("datum") or "", x.get("listung_id") or "")
+    ):
         if p.get("listung_id") not in nach_id:
             continue
         g = katalog.nach_id(p.get("device_id")) if katalog else None
         eintrag = nach_id.get(p.get("listung_id")) or {}
         preis, art, tarif = _preis_und_art(p)
-        zeilen.append([
-            p.get("listung_id", ""), p.get("sku_id", "") or eintrag.get("sku_id", ""),
-            p.get("anbieter", ""),
-            g.hersteller if g else "", g.modell if g else p.get("device_id", ""),
-            p.get("datum", ""), preis, art, tarif,
-            p.get("verfuegbarkeit", ""), p.get("quelle_url", ""),
-        ])
+        zeilen.append(
+            [
+                p.get("listung_id", ""),
+                p.get("sku_id", "") or eintrag.get("sku_id", ""),
+                p.get("anbieter", ""),
+                g.hersteller if g else "",
+                g.modell if g else p.get("device_id", ""),
+                p.get("datum", ""),
+                preis,
+                art,
+                tarif,
+                p.get("verfuegbarkeit", ""),
+                p.get("quelle_url", ""),
+            ]
+        )
     return _schreibe(SPALTEN_HISTORIE, zeilen), len(zeilen)
 
 
-def schreibe_exporte(site_dir: Path, eintraege: list, punkte: list, katalog,
-                     stand: str = "", tco: dict | None = None,
-                     radar: dict | None = None,
-                     modelle: list | None = None) -> dict:
+def schreibe_exporte(
+    site_dir: Path,
+    eintraege: list,
+    punkte: list,
+    katalog,
+    stand: str = "",
+    tco: dict | None = None,
+    radar: dict | None = None,
+    modelle: list | None = None,
+) -> dict:
     """Alle Export-Dateien nach `site/exporte/`. Gibt die Angaben fuer die Seite.
 
     `eintraege` ist der FERTIG gepruefte und bereinigte Bestand, also
@@ -690,43 +858,58 @@ def schreibe_exporte(site_dir: Path, eintraege: list, punkte: list, katalog,
     inhalt_t, zeilen_t = tco_csv(tco or {})
     (ordner / "geraete-tco.csv").write_text(inhalt_t, encoding=KODIERUNG)
     inhalt_r, zeilen_r = radar_csv(radar or {})
-    (ordner / "wettbewerbsradar.csv").write_text(inhalt_r,
-                                                 encoding=KODIERUNG)
+    (ordner / "wettbewerbsradar.csv").write_text(inhalt_r, encoding=KODIERUNG)
 
     # P3: die beiden Ansichten des Modell-Katalogs - je Ansicht EINE Datei
     # (kein Formatmix, dieselbe Regel wie oben). Auch leer zulässig: dann
     # entstehen sie mit Kopfzeile und Null Zeilen.
     inhalt_mb, zeilen_mb = modell_barpreis_csv(modelle or [])
-    (ordner / "geraete-modell-barpreis.csv").write_text(inhalt_mb,
-                                                        encoding=KODIERUNG)
+    (ordner / "geraete-modell-barpreis.csv").write_text(inhalt_mb, encoding=KODIERUNG)
     inhalt_mt, zeilen_mt = modell_tco_csv(modelle or [])
-    (ordner / "geraete-modell-tco.csv").write_text(inhalt_mt,
-                                                   encoding=KODIERUNG)
+    (ordner / "geraete-modell-tco.csv").write_text(inhalt_mt, encoding=KODIERUNG)
 
     return {
         "stand": stand,
-        "aktuell": {"datei": "exporte/geraete-aktuell.csv", "zeilen": zeilen_a,
-                    "bytes": len(inhalt_a.encode(KODIERUNG))},
-        "historie": {"datei": "exporte/geraete-historie.csv", "zeilen": zeilen_h,
-                     "bytes": len(inhalt_h.encode(KODIERUNG))},
-        "tco": {"datei": "exporte/geraete-tco.csv", "zeilen": zeilen_t,
-                "bytes": len(inhalt_t.encode(KODIERUNG))},
-        "radar": {"datei": "exporte/wettbewerbsradar.csv", "zeilen": zeilen_r,
-                  "bytes": len(inhalt_r.encode(KODIERUNG))},
-        "modell_barpreis": {"datei": "exporte/geraete-modell-barpreis.csv",
-                            "zeilen": zeilen_mb,
-                            "bytes": len(inhalt_mb.encode(KODIERUNG))},
-        "modell_tco": {"datei": "exporte/geraete-modell-tco.csv",
-                       "zeilen": zeilen_mt,
-                       "bytes": len(inhalt_mt.encode(KODIERUNG))},
+        "aktuell": {
+            "datei": "exporte/geraete-aktuell.csv",
+            "zeilen": zeilen_a,
+            "bytes": len(inhalt_a.encode(KODIERUNG)),
+        },
+        "historie": {
+            "datei": "exporte/geraete-historie.csv",
+            "zeilen": zeilen_h,
+            "bytes": len(inhalt_h.encode(KODIERUNG)),
+        },
+        "tco": {
+            "datei": "exporte/geraete-tco.csv",
+            "zeilen": zeilen_t,
+            "bytes": len(inhalt_t.encode(KODIERUNG)),
+        },
+        "radar": {
+            "datei": "exporte/wettbewerbsradar.csv",
+            "zeilen": zeilen_r,
+            "bytes": len(inhalt_r.encode(KODIERUNG)),
+        },
+        "modell_barpreis": {
+            "datei": "exporte/geraete-modell-barpreis.csv",
+            "zeilen": zeilen_mb,
+            "bytes": len(inhalt_mb.encode(KODIERUNG)),
+        },
+        "modell_tco": {
+            "datei": "exporte/geraete-modell-tco.csv",
+            "zeilen": zeilen_mt,
+            "bytes": len(inhalt_mt.encode(KODIERUNG)),
+        },
     }
 
 
 def leer() -> dict:
-    return {"stand": "",
-            "aktuell": {"datei": "", "zeilen": 0, "bytes": 0},
-            "historie": {"datei": "", "zeilen": 0, "bytes": 0},
-            "tco": {"datei": "", "zeilen": 0, "bytes": 0},
-            "radar": {"datei": "", "zeilen": 0, "bytes": 0},
-            "modell_barpreis": {"datei": "", "zeilen": 0, "bytes": 0},
-            "modell_tco": {"datei": "", "zeilen": 0, "bytes": 0}}
+    return {
+        "stand": "",
+        "aktuell": {"datei": "", "zeilen": 0, "bytes": 0},
+        "historie": {"datei": "", "zeilen": 0, "bytes": 0},
+        "tco": {"datei": "", "zeilen": 0, "bytes": 0},
+        "radar": {"datei": "", "zeilen": 0, "bytes": 0},
+        "modell_barpreis": {"datei": "", "zeilen": 0, "bytes": 0},
+        "modell_tco": {"datei": "", "zeilen": 0, "bytes": 0},
+    }

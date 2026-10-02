@@ -24,6 +24,7 @@ weiteren. Eine Marke ohne `pages:` verhaelt sich exakt wie vorher - alle
 bestehenden Eintraege bleiben gueltig, ohne dass eine Zeile geaendert werden
 muss.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -46,8 +47,9 @@ class PromoPage:
     Angebotsuebersicht statisch abrufbar, die Kampagnen-Landingpage aber
     JS-gerendert - eine Marke kann also beides gleichzeitig brauchen.
     """
+
     url: str
-    kind: str = "static"          # static | js | skip
+    kind: str = "static"  # static | js | skip
     label: str = ""
     note: str = ""
 
@@ -61,8 +63,8 @@ class PromoSource:
     name: str
     url: str
     tier: int = 2
-    kind: str = "static"          # static | js | skip  (Art der LEITSEITE)
-    group: str = ""               # Mutter-/Markenfamilie, sofern bekannt
+    kind: str = "static"  # static | js | skip  (Art der LEITSEITE)
+    group: str = ""  # Mutter-/Markenfamilie, sofern bekannt
     internal_reference: bool = False
     note: str = ""
     # Achse C des Wichtigkeits-Scores (analyze/promo_ranker.py): Marktreich-
@@ -94,8 +96,11 @@ class PromoSource:
     @property
     def pages(self) -> list[PromoPage]:
         """Alle Seiten dieser Marke, Leitseite zuerst."""
-        return [PromoPage(url=self.url, kind=self.kind,
-                          label=_LEITSEITE_LABEL, note=self.note)] + list(self.extra_pages)
+        return [
+            PromoPage(
+                url=self.url, kind=self.kind, label=_LEITSEITE_LABEL, note=self.note
+            )
+        ] + list(self.extra_pages)
 
     @property
     def crawled_pages(self) -> list[PromoPage]:
@@ -152,9 +157,14 @@ def _parse_pages(raw_pages, brand_url: str) -> list[PromoPage]:
         if key in seen:
             continue
         seen.add(key)
-        out.append(PromoPage(
-            url=url, kind=str(p.get("kind") or "static"),
-            label=str(p.get("label") or ""), note=str(p.get("note") or "")))
+        out.append(
+            PromoPage(
+                url=url,
+                kind=str(p.get("kind") or "static"),
+                label=str(p.get("label") or ""),
+                note=str(p.get("note") or ""),
+            )
+        )
     return out
 
 
@@ -165,7 +175,7 @@ def _normalize_url(url: str) -> str:
     u = (url or "").strip().lower()
     for prefix in ("https://", "http://"):
         if u.startswith(prefix):
-            u = u[len(prefix):]
+            u = u[len(prefix) :]
             break
     if u.startswith("www."):
         u = u[4:]
@@ -182,14 +192,20 @@ def load_promo_config(root: Path) -> PromoConfig:
         raw = yaml.safe_load(fh) or {}
     sources = [
         PromoSource(
-            name=b["name"], url=b["url"], tier=int(b.get("tier", 2)),
-            kind=b.get("kind", "static"), group=b.get("group", ""),
+            name=b["name"],
+            url=b["url"],
+            tier=int(b.get("tier", 2)),
+            kind=b.get("kind", "static"),
+            group=b.get("group", ""),
             internal_reference=bool(b.get("internal_reference", False)),
             note=b.get("note", ""),
-            reach=int(b["reach"]) if str(b.get("reach", "")).strip().isdigit() else None,
+            reach=int(b["reach"])
+            if str(b.get("reach", "")).strip().isdigit()
+            else None,
             rang=int(b["rang"]) if str(b.get("rang", "")).strip().isdigit() else None,
             extra_pages=_parse_pages(b.get("pages"), b["url"]),
         )
-        for b in (raw.get("brands") or []) if b.get("name") and b.get("url")
+        for b in (raw.get("brands") or [])
+        if b.get("name") and b.get("url")
     ]
     return PromoConfig(sources=sources)

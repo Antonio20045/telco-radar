@@ -11,6 +11,7 @@ Der Befund vom 06.08.2026, an der ausgelieferten Ausgabe gemessen:
 Beide Aussagen sind hier als Test festgehalten - ohne Netz, mit einem
 MockTransport und echten, mit Pillow erzeugten Bilddaten.
 """
+
 from __future__ import annotations
 
 import io
@@ -32,11 +33,15 @@ def _jpeg(breite: int, hoehe: int) -> bytes:
     scheitern lassen.
     """
     import random
+
     im = PIL.new("RGB", (breite, hoehe))
     zufall = random.Random(breite * hoehe)
-    im.putdata([(zufall.randrange(256), zufall.randrange(256),
-                 zufall.randrange(256))
-                for _ in range(breite * hoehe)])
+    im.putdata(
+        [
+            (zufall.randrange(256), zufall.randrange(256), zufall.randrange(256))
+            for _ in range(breite * hoehe)
+        ]
+    )
     puffer = io.BytesIO()
     im.save(puffer, "JPEG", quality=90)
     return puffer.getvalue()
@@ -44,7 +49,8 @@ def _jpeg(breite: int, hoehe: int) -> bytes:
 
 ARTIKEL_HTML = (
     '<html><head><meta property="og:image" '
-    'content="https://example.com/gross.jpg"></head><body>x</body></html>')
+    'content="https://example.com/gross.jpg"></head><body>x</body></html>'
+)
 
 
 def _client(antworten: dict[str, httpx.Response]) -> httpx.Client:
@@ -52,26 +58,32 @@ def _client(antworten: dict[str, httpx.Response]) -> httpx.Client:
         antwort = antworten.get(str(request.url))
         if antwort is None:
             return httpx.Response(404)
-        return httpx.Response(antwort.status_code, content=antwort.content,
-                              headers=antwort.headers)
+        return httpx.Response(
+            antwort.status_code, content=antwort.content, headers=antwort.headers
+        )
+
     return httpx.Client(transport=httpx.MockTransport(handler))
 
 
 def _bild_antwort(daten: bytes) -> httpx.Response:
-    return httpx.Response(200, content=daten,
-                          headers={"content-type": "image/jpeg"})
+    return httpx.Response(200, content=daten, headers={"content-type": "image/jpeg"})
 
 
 def test_das_groessere_bild_gewinnt_gegen_das_aus_dem_feed(tmp_path):
     """Der eigentliche Fehler: das Feed-Vorschaubild hatte Vorrang."""
-    h = {"url": "https://example.com/artikel",
-         "image_url": "https://example.com/thumb.jpg"}
-    client = _client({
-        "https://example.com/thumb.jpg": _bild_antwort(_jpeg(120, 90)),
-        "https://example.com/artikel": httpx.Response(
-            200, content=ARTIKEL_HTML, headers={"content-type": "text/html"}),
-        "https://example.com/gross.jpg": _bild_antwort(_jpeg(1200, 630)),
-    })
+    h = {
+        "url": "https://example.com/artikel",
+        "image_url": "https://example.com/thumb.jpg",
+    }
+    client = _client(
+        {
+            "https://example.com/thumb.jpg": _bild_antwort(_jpeg(120, 90)),
+            "https://example.com/artikel": httpx.Response(
+                200, content=ARTIKEL_HTML, headers={"content-type": "text/html"}
+            ),
+            "https://example.com/gross.jpg": _bild_antwort(_jpeg(1200, 630)),
+        }
+    )
     with client:
         bilanz = bilder._eine_meldung(h, tmp_path, client, bilder._BREIT_GROSS)
 
@@ -83,13 +95,17 @@ def test_das_groessere_bild_gewinnt_gegen_das_aus_dem_feed(tmp_path):
 def test_ein_grosses_feedbild_erspart_den_abruf_der_artikelseite(tmp_path):
     """Der teure Teil ist der zusaetzliche Abruf - er unterbleibt, wenn das
     Feed-Bild schon breit genug ist."""
-    h = {"url": "https://example.com/artikel",
-         "image_url": "https://example.com/gross-im-feed.jpg"}
-    client = _client({
-        "https://example.com/gross-im-feed.jpg": _bild_antwort(_jpeg(1400, 800)),
-        # Die Artikelseite ist absichtlich NICHT hinterlegt: wird sie doch
-        # abgerufen, kommt 404 und `kein_og` steht in der Bilanz.
-    })
+    h = {
+        "url": "https://example.com/artikel",
+        "image_url": "https://example.com/gross-im-feed.jpg",
+    }
+    client = _client(
+        {
+            "https://example.com/gross-im-feed.jpg": _bild_antwort(_jpeg(1400, 800)),
+            # Die Artikelseite ist absichtlich NICHT hinterlegt: wird sie doch
+            # abgerufen, kommt 404 und `kein_og` steht in der Bilanz.
+        }
+    )
     with client:
         bilanz = bilder._eine_meldung(h, tmp_path, client, bilder._BREIT_GROSS)
 
@@ -99,13 +115,18 @@ def test_ein_grosses_feedbild_erspart_den_abruf_der_artikelseite(tmp_path):
 
 def test_ein_zu_kleines_bild_wird_gar_nicht_erst_abgelegt(tmp_path):
     """Kein Platzhalter, kein hochskaliertes Vorschaubild - lieber Textsatz."""
-    h = {"url": "https://example.com/artikel",
-         "image_url": "https://example.com/winzig.jpg"}
-    client = _client({
-        "https://example.com/winzig.jpg": _bild_antwort(_jpeg(120, 90)),
-        "https://example.com/artikel": httpx.Response(
-            404, content=b"", headers={"content-type": "text/html"}),
-    })
+    h = {
+        "url": "https://example.com/artikel",
+        "image_url": "https://example.com/winzig.jpg",
+    }
+    client = _client(
+        {
+            "https://example.com/winzig.jpg": _bild_antwort(_jpeg(120, 90)),
+            "https://example.com/artikel": httpx.Response(
+                404, content=b"", headers={"content-type": "text/html"}
+            ),
+        }
+    )
     with client:
         bilanz = bilder._eine_meldung(h, tmp_path, client, bilder._BREIT_GROSS)
 
@@ -130,8 +151,11 @@ def test_ein_altes_bild_ueberlebt_einen_gescheiterten_versuch_nicht(tmp_path):
     """Sonst zeigt die Meldung auf eine Datei, die `raeume_auf()` beim
     naechsten Lauf loescht. Genau so entstanden am 06.08.2026 vier
     Meldungen mit `image`, aber ohne `image_w`."""
-    h = {"url": "https://example.com/a", "image": "aus-dem-vorlauf.jpg",
-         "image_url": "https://example.com/weg.jpg"}
+    h = {
+        "url": "https://example.com/a",
+        "image": "aus-dem-vorlauf.jpg",
+        "image_url": "https://example.com/weg.jpg",
+    }
     with _client({}) as client:
         bilder._eine_meldung(h, tmp_path, client, bilder._BREIT_GROSS)
     assert "image" not in h
@@ -155,11 +179,13 @@ def test_es_gibt_keinen_deckel_mehr(tmp_path, monkeypatch):
     def falsche_meldung(h, ordner, client, breite):
         versuche.append(h["url"])
         from collections import Counter
+
         return Counter(geprueft=1)
 
     monkeypatch.setattr(bilder, "_eine_meldung", falsche_meldung)
-    highlights = [{"url": f"https://example.com/{i}", "relevance": i % 5}
-                  for i in range(193)]
+    highlights = [
+        {"url": f"https://example.com/{i}", "relevance": i % 5} for i in range(193)
+    ]
     bilanz = bilder.hole_bilder(highlights, tmp_path)
 
     assert bilanz["geprueft"] == 193
@@ -171,6 +197,7 @@ def _png_mit_transparenz(breite=600, hoehe=400) -> bytes:
     DURCHSICHTIGEM Grund."""
     import io as _io
     from PIL import Image
+
     im = Image.new("RGBA", (breite, hoehe), (0, 0, 0, 0))
     for x in range(breite // 3, 2 * breite // 3):
         for y in range(hoehe // 3, 2 * hoehe // 3):
@@ -189,12 +216,12 @@ def test_transparenz_wird_auf_weiss_gelegt_nicht_auf_schwarz(tmp_path):
     Test: dort ist die Ecke (0, 0) rein schwarz.
     """
     from PIL import Image
+
     ziel = tmp_path / "motiv.jpg"
     bilder._schreibe(_png_mit_transparenz(), ziel, 1280)
     with Image.open(ziel) as fertig:
         ecke = fertig.convert("RGB").getpixel((2, 2))
-        mitte = fertig.convert("RGB").getpixel((fertig.width // 2,
-                                                fertig.height // 2))
+        mitte = fertig.convert("RGB").getpixel((fertig.width // 2, fertig.height // 2))
     assert min(ecke) > 230, f"durchsichtiger Grund wurde {ecke}, nicht weiss"
     assert mitte[0] > 150 and mitte[1] < 90, f"Motiv verfaelscht: {mitte}"
 
@@ -204,6 +231,7 @@ def test_ist_leer_misst_die_abgelegte_fassung():
     Weiss. Ein leerer durchsichtiger Rahmen ist leer, ein Freisteller nicht."""
     import io as _io
     from PIL import Image
+
     puffer = _io.BytesIO()
     Image.new("RGBA", (600, 400), (0, 0, 0, 0)).save(puffer, "PNG")
     assert bilder.ist_leer(puffer.getvalue())

@@ -10,6 +10,7 @@ Zwei Zusicherungen tragen dieses Modul, und beide sind teuer erkauft:
    dieser Fehler steht in CLAUDE.md §6 fuer den Tarif-Radar
    ("80 GB -> nicht angegeben waere die haeufigste Falschmeldung").
 """
+
 import json
 from pathlib import Path
 
@@ -25,22 +26,37 @@ from telco_radar.analyze.geraete_store import (
 from telco_radar.geraete_model import Listung
 
 
-def _listung(anbieter="expert", preis=1449.0, sku="apple-iphone-17-pro-max-256gb-titan-natur",
-             tag="2026-08-10", verfuegbarkeit="lieferbar", einstieg="https://e.de/handys",
-             device=None, **kw):
+def _listung(
+    anbieter="expert",
+    preis=1449.0,
+    sku="apple-iphone-17-pro-max-256gb-titan-natur",
+    tag="2026-08-10",
+    verfuegbarkeit="lieferbar",
+    einstieg="https://e.de/handys",
+    device=None,
+    **kw,
+):
     # Das Geraet wird aus der SKU abgeleitet, sonst traegt jede Testlistung
     # dieselbe device_id - und der Verwandtenabgleich (`_finde_verwandten`)
     # legte zwei absichtlich verschiedene Artikel zusammen.
-    return Listung(sku_id=sku, device_id=device or sku.split("-256gb")[0],
-                   anbieter=anbieter, anbieter_typ="handel",
-                   quelle_url=f"https://e.de/p/{sku}", abgerufen_am=tag,
-                   preis_ohne_vertrag=preis, verfuegbarkeit=verfuegbarkeit,
-                   einstieg_url=einstieg, **{"speicher_gb": 256, **kw})
+    return Listung(
+        sku_id=sku,
+        device_id=device or sku.split("-256gb")[0],
+        anbieter=anbieter,
+        anbieter_typ="handel",
+        quelle_url=f"https://e.de/p/{sku}",
+        abgerufen_am=tag,
+        preis_ohne_vertrag=preis,
+        verfuegbarkeit=verfuegbarkeit,
+        einstieg_url=einstieg,
+        **{"speicher_gb": 256, **kw},
+    )
 
 
 # --------------------------------------------------------------------------
 # Aufnahme
 # --------------------------------------------------------------------------
+
 
 def test_neue_listung_wird_aufgenommen(tmp_path):
     db = GeraeteDB(tmp_path / "geraete_db.json")
@@ -60,7 +76,7 @@ def test_dieselbe_listung_zweimal_ist_kein_neuzugang(tmp_path):
     e = db.eintraege()[0]
     assert e["preis_ohne_vertrag"] == 1399.0
     assert e["first_seen"] == "2026-08-10" and e["last_verified"] == "2026-08-17"
-    assert e["erstpreis"] == 1449.0        # der Einfuehrungspreis bleibt stehen
+    assert e["erstpreis"] == 1449.0  # der Einfuehrungspreis bleibt stehen
 
 
 def test_listung_ohne_quelle_kommt_gar_nicht_in_den_store(tmp_path):
@@ -68,9 +84,18 @@ def test_listung_ohne_quelle_kommt_gar_nicht_in_den_store(tmp_path):
     sie nicht bauen, der Store nimmt sie auch als rohes dict nicht an."""
     db = GeraeteDB(tmp_path / "geraete_db.json")
     with pytest.raises(ValueError, match="quelle_url"):
-        db.upsert([{"sku_id": "x", "device_id": "x", "anbieter": "expert",
-                    "anbieter_typ": "handel", "abgerufen_am": "2026-08-10"}],
-                  "2026-08-10")
+        db.upsert(
+            [
+                {
+                    "sku_id": "x",
+                    "device_id": "x",
+                    "anbieter": "expert",
+                    "anbieter_typ": "handel",
+                    "abgerufen_am": "2026-08-10",
+                }
+            ],
+            "2026-08-10",
+        )
 
 
 def test_speichern_und_wieder_laden(tmp_path):
@@ -92,6 +117,7 @@ def test_kaputte_datei_startet_leer_statt_zu_werfen(tmp_path):
 # --------------------------------------------------------------------------
 # Zwei-Stufen-Auslistung
 # --------------------------------------------------------------------------
+
 
 def test_ein_fehltreffer_listet_nicht_aus(tmp_path):
     db = GeraeteDB(tmp_path / "geraete_db.json")
@@ -128,7 +154,7 @@ def test_ein_ausgelistetes_geraet_altert_nicht_weiter(tmp_path):
     for tag in ("2026-08-17", "2026-08-24", "2026-08-31"):
         db.mark_stale("expert", set(), tag, {"https://e.de/handys"})
     e = db.eintraege()[0]
-    assert e["ended_since"] == "2026-08-24"   # nicht 08-31
+    assert e["ended_since"] == "2026-08-24"  # nicht 08-31
     assert e["missed_checks"] == 2
 
 
@@ -138,14 +164,17 @@ def test_ungelesene_einstiegsseite_altert_ihre_geraete_nicht(tmp_path):
     gescheiterte. Ohne diese Einschraenkung rueckten deren Geraete jedes Mal
     Richtung 'ausgelistet' - und das Protokoll saehe normal aus."""
     db = GeraeteDB(tmp_path / "geraete_db.json")
-    db.upsert([
-        _listung(sku="a-1-256gb-schwarz", einstieg="https://e.de/handys"),
-        _listung(sku="a-2-256gb-schwarz", einstieg="https://e.de/tarife"),
-    ], "2026-08-10")
+    db.upsert(
+        [
+            _listung(sku="a-1-256gb-schwarz", einstieg="https://e.de/handys"),
+            _listung(sku="a-2-256gb-schwarz", einstieg="https://e.de/tarife"),
+        ],
+        "2026-08-10",
+    )
     # Nur /handys wurde diesmal gelesen; /tarife ist ausgefallen.
     db.mark_stale("expert", set(), "2026-08-17", {"https://e.de/handys"})
     nach_einstieg = {e["einstiege"][0]: e["status"] for e in db.eintraege()}
-    assert len(nach_einstieg) == 2      # sonst prueft der Vergleich nichts
+    assert len(nach_einstieg) == 2  # sonst prueft der Vergleich nichts
     assert nach_einstieg["https://e.de/handys"] == STATUS_VERMUTLICH
     assert nach_einstieg["https://e.de/tarife"] == STATUS_AKTIV
 
@@ -154,17 +183,22 @@ def test_ohne_angabe_gelesener_einstiege_altert_alles(tmp_path):
     # Der Aufrufer sagt damit ausdruecklich "ich habe diesen Anbieter
     # vollstaendig gelesen".
     db = GeraeteDB(tmp_path / "geraete_db.json")
-    db.upsert([_listung(sku="a-1-256gb-schwarz"),
-               _listung(sku="a-2-256gb-schwarz", einstieg="https://e.de/tarife")],
-              "2026-08-10")
+    db.upsert(
+        [
+            _listung(sku="a-1-256gb-schwarz"),
+            _listung(sku="a-2-256gb-schwarz", einstieg="https://e.de/tarife"),
+        ],
+        "2026-08-10",
+    )
     db.mark_stale("expert", set(), "2026-08-17", None)
     assert {e["status"] for e in db.eintraege()} == {STATUS_VERMUTLICH}
 
 
 def test_fremder_anbieter_bleibt_unberuehrt(tmp_path):
     db = GeraeteDB(tmp_path / "geraete_db.json")
-    db.upsert([_listung(anbieter="expert"), _listung(anbieter="Euronics")],
-              "2026-08-10")
+    db.upsert(
+        [_listung(anbieter="expert"), _listung(anbieter="Euronics")], "2026-08-10"
+    )
     db.mark_stale("expert", set(), "2026-08-17", None)
     nach_anbieter = {e["anbieter"]: e["status"] for e in db.eintraege()}
     assert len(nach_anbieter) == 2
@@ -175,14 +209,21 @@ def test_fremder_anbieter_bleibt_unberuehrt(tmp_path):
 # Preishistorie
 # --------------------------------------------------------------------------
 
+
 def test_erste_messung_schreibt_eine_zeile(tmp_path):
     h = Preishistorie(tmp_path / "geraete_preise.jsonl")
     assert h.schreibe(_listung(), "2026-08-10") is True
     h.save()
-    zeilen = [json.loads(z) for z in
-              (tmp_path / "geraete_preise.jsonl").read_text(encoding="utf-8").splitlines()]
+    zeilen = [
+        json.loads(z)
+        for z in (tmp_path / "geraete_preise.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
+    ]
     assert len(zeilen) == 1
-    assert zeilen[0]["preis_ohne_vertrag"] == 1449.0 and zeilen[0]["datum"] == "2026-08-10"
+    assert (
+        zeilen[0]["preis_ohne_vertrag"] == 1449.0 and zeilen[0]["datum"] == "2026-08-10"
+    )
 
 
 def test_unveraenderter_preis_schreibt_keine_neue_zeile(tmp_path):
@@ -192,14 +233,19 @@ def test_unveraenderter_preis_schreibt_keine_neue_zeile(tmp_path):
     h.schreibe(_listung(tag="2026-08-10"), "2026-08-10")
     assert h.schreibe(_listung(tag="2026-08-17"), "2026-08-17") is False
     h.save()
-    assert len((tmp_path / "geraete_preise.jsonl").read_text().strip().splitlines()) == 1
+    assert (
+        len((tmp_path / "geraete_preise.jsonl").read_text().strip().splitlines()) == 1
+    )
 
 
 def test_geaenderter_preis_schreibt_eine_neue_zeile(tmp_path):
     h = Preishistorie(tmp_path / "geraete_preise.jsonl")
     h.schreibe(_listung(preis=1449.0), "2026-08-10")
     assert h.schreibe(_listung(preis=1399.0, tag="2026-08-17"), "2026-08-17") is True
-    assert [p["preis_ohne_vertrag"] for p in h.reihe(_listung().listung_id)] == [1449.0, 1399.0]
+    assert [p["preis_ohne_vertrag"] for p in h.reihe(_listung().listung_id)] == [
+        1449.0,
+        1399.0,
+    ]
 
 
 def test_fehlender_preis_ist_keine_preisaenderung(tmp_path):
@@ -208,10 +254,16 @@ def test_fehlender_preis_ist_keine_preisaenderung(tmp_path):
     Verfallskurve knickt auf null."""
     h = Preishistorie(tmp_path / "geraete_preise.jsonl")
     h.schreibe(_listung(preis=1449.0), "2026-08-10")
-    ohne = Listung(sku_id=_listung().sku_id, device_id="apple-iphone-17-pro-max",
-                   anbieter="expert", anbieter_typ="handel",
-                   quelle_url="https://e.de/p", abgerufen_am="2026-08-17",
-                   preis_ohne_vertrag=None, verfuegbarkeit="lieferbar")
+    ohne = Listung(
+        sku_id=_listung().sku_id,
+        device_id="apple-iphone-17-pro-max",
+        anbieter="expert",
+        anbieter_typ="handel",
+        quelle_url="https://e.de/p",
+        abgerufen_am="2026-08-17",
+        preis_ohne_vertrag=None,
+        verfuegbarkeit="lieferbar",
+    )
     assert h.schreibe(ohne, "2026-08-17") is False
     assert [p["preis_ohne_vertrag"] for p in h.reihe(_listung().listung_id)] == [1449.0]
 
@@ -219,8 +271,12 @@ def test_fehlender_preis_ist_keine_preisaenderung(tmp_path):
 def test_verfuegbarkeitswechsel_wird_festgehalten(tmp_path):
     h = Preishistorie(tmp_path / "geraete_preise.jsonl")
     h.schreibe(_listung(verfuegbarkeit="lieferbar"), "2026-08-10")
-    assert h.schreibe(_listung(verfuegbarkeit="ausverkauft", tag="2026-08-17"),
-                      "2026-08-17") is True
+    assert (
+        h.schreibe(
+            _listung(verfuegbarkeit="ausverkauft", tag="2026-08-17"), "2026-08-17"
+        )
+        is True
+    )
 
 
 def test_historie_wird_angehaengt_nicht_neu_geschrieben(tmp_path):
@@ -237,8 +293,11 @@ def test_historie_wird_angehaengt_nicht_neu_geschrieben(tmp_path):
 
 def test_kaputte_zeile_in_der_historie_kippt_den_lauf_nicht(tmp_path):
     pfad = tmp_path / "geraete_preise.jsonl"
-    pfad.write_text('{"listung_id": "a", "datum": "2026-08-01", "preis_ohne_vertrag": 9}\n'
-                    'das ist kein json\n', encoding="utf-8")
+    pfad.write_text(
+        '{"listung_id": "a", "datum": "2026-08-01", "preis_ohne_vertrag": 9}\n'
+        "das ist kein json\n",
+        encoding="utf-8",
+    )
     h = Preishistorie(pfad)
     assert len(h.reihe("a")) == 1
 
@@ -246,10 +305,16 @@ def test_kaputte_zeile_in_der_historie_kippt_den_lauf_nicht(tmp_path):
 def test_buendelpreis_und_ladenpreis_stehen_getrennt_in_der_historie(tmp_path):
     """Teil C4: die zwei Preisarten duerfen nie in derselben Zahl landen."""
     h = Preishistorie(tmp_path / "geraete_preise.jsonl")
-    buendel = Listung(sku_id="s", device_id="d", anbieter="Telekom",
-                      anbieter_typ="netzbetreiber", quelle_url="https://t.de/p",
-                      abgerufen_am="2026-08-10", zuzahlung=49.95,
-                      tarif_referenz="MagentaMobil M")
+    buendel = Listung(
+        sku_id="s",
+        device_id="d",
+        anbieter="Telekom",
+        anbieter_typ="netzbetreiber",
+        quelle_url="https://t.de/p",
+        abgerufen_am="2026-08-10",
+        zuzahlung=49.95,
+        tarif_referenz="MagentaMobil M",
+    )
     h.schreibe(buendel, "2026-08-10")
     zeile = h.reihe(buendel.listung_id)[0]
     assert zeile["zuzahlung"] == 49.95
@@ -260,6 +325,7 @@ def test_buendelpreis_und_ladenpreis_stehen_getrennt_in_der_historie(tmp_path):
 # --------------------------------------------------------------------------
 # Hardware-Vermarktung: ein abgeleiteter Befund, kein gepflegtes Feld
 # --------------------------------------------------------------------------
+
 
 def test_anbieter_ohne_funde_gilt_erst_nach_mehreren_laeufen_als_sim_only(tmp_path):
     """Viele Zweitmarken vermarkten ausschliesslich SIM-only. Das ist selbst
@@ -298,25 +364,34 @@ def test_laufbilanz_ueberlebt_das_speichern(tmp_path):
 # Die Befunde des Reviews vom 10.08.2026
 # --------------------------------------------------------------------------
 
+
 def test_fehlendes_farbfeld_spaltet_die_identitaet_nicht(tmp_path):
     """Befund 2, der teuerste am Store: Lauf 1 liest `color` aus dem ld+json,
     Lauf 2 nicht. Die Farbe steckt in der sku_id, also entstand eine NEUE ID -
     der Bericht meldete "1 neues Geraet, 1 vermutlich ausgelistet" statt einer
     Preissenkung, und die Historie zerfiel in zwei Reihen."""
     db = GeraeteDB(tmp_path / "geraete_db.json")
-    mit = _listung(sku="apple-iphone-17-pro-max-256gb-titan-natur", preis=1449.0,
-                   farbe_roh="Titannatur", farbe_normalisiert="titan-natur",
-                   speicher_gb=256)
+    mit = _listung(
+        sku="apple-iphone-17-pro-max-256gb-titan-natur",
+        preis=1449.0,
+        farbe_roh="Titannatur",
+        farbe_normalisiert="titan-natur",
+        speicher_gb=256,
+    )
     db.upsert([mit], "2026-08-10")
-    ohne = _listung(sku="apple-iphone-17-pro-max-256gb-ohne-farbe", preis=1399.0,
-                    tag="2026-08-17", speicher_gb=256)
+    ohne = _listung(
+        sku="apple-iphone-17-pro-max-256gb-ohne-farbe",
+        preis=1399.0,
+        tag="2026-08-17",
+        speicher_gb=256,
+    )
     neu, gesehen = db.upsert([ohne], "2026-08-17")
     assert neu == 0, "der Ausfall des Farbfeldes hat ein Phantomgeraet erzeugt"
     assert len(db.eintraege()) == 1
     e = db.eintraege()[0]
-    assert e["id"] == mit.listung_id      # die ID von der ersten Sichtung
+    assert e["id"] == mit.listung_id  # die ID von der ersten Sichtung
     assert e["preis_ohne_vertrag"] == 1399.0
-    assert e["farbe_normalisiert"] == "titan-natur"   # nicht geloescht
+    assert e["farbe_normalisiert"] == "titan-natur"  # nicht geloescht
     db.mark_stale("expert", gesehen, "2026-08-17", {"https://e.de/handys"})
     assert db.eintraege()[0]["status"] == STATUS_AKTIV
 
@@ -325,13 +400,17 @@ def test_nachgeliefertes_farbfeld_fuellt_die_luecke_ohne_die_id_zu_aendern(tmp_p
     db = GeraeteDB(tmp_path / "geraete_db.json")
     ohne = _listung(sku="apple-iphone-17-pro-max-256gb-ohne-farbe", speicher_gb=256)
     db.upsert([ohne], "2026-08-10")
-    mit = _listung(sku="apple-iphone-17-pro-max-256gb-titan-natur", tag="2026-08-17",
-                   farbe_roh="Titannatur", farbe_normalisiert="titan-natur",
-                   speicher_gb=256)
+    mit = _listung(
+        sku="apple-iphone-17-pro-max-256gb-titan-natur",
+        tag="2026-08-17",
+        farbe_roh="Titannatur",
+        farbe_normalisiert="titan-natur",
+        speicher_gb=256,
+    )
     neu, _ = db.upsert([mit], "2026-08-17")
     assert neu == 0 and len(db.eintraege()) == 1
     e = db.eintraege()[0]
-    assert e["id"] == ohne.listung_id     # die ID bleibt, sie ist ein Schluessel
+    assert e["id"] == ohne.listung_id  # die ID bleibt, sie ist ein Schluessel
     assert e["farbe_normalisiert"] == "titan-natur"
 
 
@@ -339,25 +418,51 @@ def test_zwei_belegte_farben_bleiben_zwei_skus(tmp_path):
     """Gegenprobe: der Verwandtenabgleich darf nicht zusammenlegen, was
     unterscheidbar ist."""
     db = GeraeteDB(tmp_path / "geraete_db.json")
-    db.upsert([
-        _listung(sku="apple-iphone-17-pro-max-256gb-titan-natur",
-                 farbe_normalisiert="titan-natur", speicher_gb=256),
-        _listung(sku="apple-iphone-17-pro-max-256gb-schwarz",
-                 farbe_normalisiert="schwarz", speicher_gb=256),
-    ], "2026-08-10")
+    db.upsert(
+        [
+            _listung(
+                sku="apple-iphone-17-pro-max-256gb-titan-natur",
+                farbe_normalisiert="titan-natur",
+                speicher_gb=256,
+            ),
+            _listung(
+                sku="apple-iphone-17-pro-max-256gb-schwarz",
+                farbe_normalisiert="schwarz",
+                speicher_gb=256,
+            ),
+        ],
+        "2026-08-10",
+    )
     assert len(db.eintraege()) == 2
 
 
 def test_bei_zwei_kandidaten_wird_nichts_geraten(tmp_path):
     db = GeraeteDB(tmp_path / "geraete_db.json")
-    db.upsert([
-        _listung(sku="apple-iphone-17-pro-max-256gb-titan-natur",
-                 farbe_normalisiert="titan-natur", speicher_gb=256),
-        _listung(sku="apple-iphone-17-pro-max-256gb-schwarz",
-                 farbe_normalisiert="schwarz", speicher_gb=256),
-    ], "2026-08-10")
-    neu, _ = db.upsert([_listung(sku="apple-iphone-17-pro-max-256gb-ohne-farbe",
-                                 tag="2026-08-17", speicher_gb=256)], "2026-08-17")
+    db.upsert(
+        [
+            _listung(
+                sku="apple-iphone-17-pro-max-256gb-titan-natur",
+                farbe_normalisiert="titan-natur",
+                speicher_gb=256,
+            ),
+            _listung(
+                sku="apple-iphone-17-pro-max-256gb-schwarz",
+                farbe_normalisiert="schwarz",
+                speicher_gb=256,
+            ),
+        ],
+        "2026-08-10",
+    )
+    neu, _ = db.upsert(
+        [
+            _listung(
+                sku="apple-iphone-17-pro-max-256gb-ohne-farbe",
+                tag="2026-08-17",
+                speicher_gb=256,
+            )
+        ],
+        "2026-08-17",
+    )
     # Zwei Kandidaten - die Zuordnung ist nicht belegbar, also ein eigener
     # Eintrag statt einer geratenen Verschmelzung.
     assert neu == 1 and len(db.eintraege()) == 3
@@ -368,12 +473,21 @@ def test_zwei_ununterscheidbare_saetze_desselben_laufs_kollidieren_nicht(tmp_pat
     Aenderungspunkte hin und zurueck - eine Saegezahnkurve, die aussieht wie
     ein Preiskampf."""
     db = GeraeteDB(tmp_path / "geraete_db.json")
-    neu, gesehen = db.upsert([
-        _listung(sku="apple-iphone-17-pro-max-256gb-ohne-farbe", preis=1449.0,
-                 speicher_gb=256),
-        _listung(sku="apple-iphone-17-pro-max-256gb-ohne-farbe", preis=1099.0,
-                 speicher_gb=256),
-    ], "2026-08-10")
+    neu, gesehen = db.upsert(
+        [
+            _listung(
+                sku="apple-iphone-17-pro-max-256gb-ohne-farbe",
+                preis=1449.0,
+                speicher_gb=256,
+            ),
+            _listung(
+                sku="apple-iphone-17-pro-max-256gb-ohne-farbe",
+                preis=1099.0,
+                speicher_gb=256,
+            ),
+        ],
+        "2026-08-10",
+    )
     assert neu == 1 and len(gesehen) == 1
     assert db.eintraege()[0]["preis_ohne_vertrag"] == 1449.0
     assert len(db.kollisionen) == 1
@@ -386,10 +500,14 @@ def test_unbekannte_verfuegbarkeit_ist_ein_ausfall_keine_aenderung(tmp_path):
     Lieferereignis, das es nie gab."""
     h = Preishistorie(tmp_path / "geraete_preise.jsonl")
     assert h.schreibe(_listung(verfuegbarkeit="lieferbar"), "2026-08-10") is True
-    assert h.schreibe(_listung(verfuegbarkeit="unbekannt", tag="2026-08-17"),
-                      "2026-08-17") is False
-    assert h.schreibe(_listung(verfuegbarkeit="lieferbar", tag="2026-08-24"),
-                      "2026-08-24") is False
+    assert (
+        h.schreibe(_listung(verfuegbarkeit="unbekannt", tag="2026-08-17"), "2026-08-17")
+        is False
+    )
+    assert (
+        h.schreibe(_listung(verfuegbarkeit="lieferbar", tag="2026-08-24"), "2026-08-24")
+        is False
+    )
     assert len(h.reihe(_listung().listung_id)) == 1
 
 
@@ -404,8 +522,12 @@ def test_ein_echter_verfuegbarkeitswechsel_wird_weiterhin_geschrieben(tmp_path):
     # Gegenprobe zum Test darueber.
     h = Preishistorie(tmp_path / "geraete_preise.jsonl")
     h.schreibe(_listung(verfuegbarkeit="lieferbar"), "2026-08-10")
-    assert h.schreibe(_listung(verfuegbarkeit="ausverkauft", tag="2026-08-17"),
-                      "2026-08-17") is True
+    assert (
+        h.schreibe(
+            _listung(verfuegbarkeit="ausverkauft", tag="2026-08-17"), "2026-08-17"
+        )
+        is True
+    )
 
 
 def test_eintrag_ohne_einstiegsangabe_haengt_an_der_leitseite(tmp_path):
@@ -415,8 +537,13 @@ def test_eintrag_ohne_einstiegsangabe_haengt_an_der_leitseite(tmp_path):
     db = GeraeteDB(tmp_path / "geraete_db.json")
     db.upsert([_listung(einstieg="")], "2026-08-10")
     assert db.eintraege()[0].get("einstiege") in (None, [])
-    db.mark_stale("expert", set(), "2026-08-17", {"https://e.de/handys"},
-                  leitseite="https://e.de/handys")
+    db.mark_stale(
+        "expert",
+        set(),
+        "2026-08-17",
+        {"https://e.de/handys"},
+        leitseite="https://e.de/handys",
+    )
     assert db.eintraege()[0]["status"] == STATUS_VERMUTLICH
 
 
@@ -428,8 +555,7 @@ def test_geraet_auf_zwei_einstiegsseiten_altert_nur_wenn_beide_gelesen_sind(tmp_
     assert db.eintraege()[0]["einstiege"] == ["https://e.de/A", "https://e.de/B"]
     db.mark_stale("expert", set(), "2026-08-17", {"https://e.de/A"})
     assert db.eintraege()[0]["status"] == STATUS_AKTIV
-    db.mark_stale("expert", set(), "2026-08-24",
-                  {"https://e.de/A", "https://e.de/B"})
+    db.mark_stale("expert", set(), "2026-08-24", {"https://e.de/A", "https://e.de/B"})
     assert db.eintraege()[0]["status"] == STATUS_VERMUTLICH
 
 
@@ -458,10 +584,16 @@ def test_erster_messpunkt_auch_bei_reinem_vertragspreis(tmp_path):
     """Befund 12: eine Listung, deren einziger Preis ein Vertragspreis ist,
     bekam NIE einen Historienpunkt - DB und Historie liefen auseinander."""
     h = Preishistorie(tmp_path / "geraete_preise.jsonl")
-    l = Listung(sku_id="s", device_id="d", anbieter="o2",
-                anbieter_typ="netzbetreiber", quelle_url="https://o2.de/p",
-                abgerufen_am="2026-08-10", preis_mit_vertrag_ab=1.00,
-                tarif_referenz="o2 Mobile M")
+    l = Listung(
+        sku_id="s",
+        device_id="d",
+        anbieter="o2",
+        anbieter_typ="netzbetreiber",
+        quelle_url="https://o2.de/p",
+        abgerufen_am="2026-08-10",
+        preis_mit_vertrag_ab=1.00,
+        tarif_referenz="o2 Mobile M",
+    )
     assert h.schreibe(l, "2026-08-10") is True
     assert h.reihe(l.listung_id)[0]["preis_mit_vertrag_ab"] == 1.0
 
@@ -479,8 +611,9 @@ def test_erster_messpunkt_auch_bei_reinem_vertragspreis(tmp_path):
 
 def test_teillauf_mit_funden_zaehlt_als_messtermin_aber_nicht_als_lauf(tmp_path):
     db = GeraeteDB(tmp_path / "geraete_db.json")
-    db.protokolliere_lauf("mobilcom-debitel", "2026-08-21", funde=68,
-                          vollstaendig=False)
+    db.protokolliere_lauf(
+        "mobilcom-debitel", "2026-08-21", funde=68, vollstaendig=False
+    )
     b = db.laufbilanz("mobilcom-debitel")
     assert b.get("laeufe", 0) == 0, "ein Teillauf ist kein vollstaendiger Lauf"
     assert "2026-08-21" in db.messtermine("mobilcom-debitel")
@@ -505,8 +638,7 @@ def test_messtermine_lesen_den_altbestand_aus_den_listungsdaten(tmp_path):
     die Zaehlung die vier echten Prueftermine des Bestands rekonstruieren."""
     db = GeraeteDB(tmp_path / "geraete_db.json")
     db.upsert([_listung(anbieter="mobilcom-debitel")], "2026-08-10")
-    db.upsert([_listung(anbieter="mobilcom-debitel", tag="2026-08-14")],
-              "2026-08-14")
+    db.upsert([_listung(anbieter="mobilcom-debitel", tag="2026-08-14")], "2026-08-14")
     # Die Bilanz absichtlich loeschen - so sieht der Altbestand aus, dessen
     # Laeufe vor der Termine-Buchfuehrung lagen.
     db._anbieter.clear()

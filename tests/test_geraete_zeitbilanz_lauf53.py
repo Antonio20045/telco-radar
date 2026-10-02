@@ -35,6 +35,7 @@ werden aus den echten Dateien gelesen (`.github/workflows/geraete.yml`,
 `config/geraete_quellen.yaml`) - der Test haengt so direkt am produktiven
 Stand und nicht an einer Kopie, die auseinanderlaufen kann.
 """
+
 import gzip
 import re
 from datetime import datetime, timezone
@@ -62,11 +63,16 @@ def _lies_geraete_frist_aus_workflow() -> float:
     """Der Wert, den `geraete.yml` einem CRON-ausgeloesten Lauf mitgibt -
     also genau der Pfad, ueber den Lauf 52/53 liefen (kein manueller
     `workflow_dispatch`, `github.event.inputs.frist` bleibt leer)."""
-    text = (_WURZEL / ".github" / "workflows" / "geraete.yml").read_text(encoding="utf-8")
+    text = (_WURZEL / ".github" / "workflows" / "geraete.yml").read_text(
+        encoding="utf-8"
+    )
     treffer = re.search(
         r"--frist\s+\"\$\{\{\s*github\.event\.inputs\.frist\s*\|\|\s*(\d+)\s*\}\}\"",
-        text)
-    assert treffer, "geraete.yml: die Frist-Fallback-Zeile fehlt oder hat sich geaendert"
+        text,
+    )
+    assert treffer, (
+        "geraete.yml: die Frist-Fallback-Zeile fehlt oder hat sich geaendert"
+    )
     return float(treffer.group(1))
 
 
@@ -80,27 +86,35 @@ _FUELLER_KOSTEN = [
     ("Telekom", 1, 52.0),
     ("Saturn", 2, 240.0),
     ("Vodafone", 2, 240.0),
-    ("ElectronicPartner", 3, 201.0),   # 07:45:30-07:48:51
-    ("Medimax", 3, 141.0),             # 07:48:51-07:51:12
+    ("ElectronicPartner", 3, 201.0),  # 07:45:30-07:48:51
+    ("Medimax", 3, 141.0),  # 07:48:51-07:51:12
     ("o2", 3, 50.0),
-    ("1&1", 4, 53.0),                  # o2+1&1 zusammen 103s (07:51:12-07:52:55)
-    ("mobilcom-debitel", 4, 284.0),    # 07:52:55-07:57:39
-    ("ALDI TALK", 33, 5.0),            # laeuft NACH congstar, kostet kaum etwas
+    ("1&1", 4, 53.0),  # o2+1&1 zusammen 103s (07:51:12-07:52:55)
+    ("mobilcom-debitel", 4, 284.0),  # 07:52:55-07:57:39
+    ("ALDI TALK", 33, 5.0),  # laeuft NACH congstar, kostet kaum etwas
 ]
 
 
 def _fueller_anbieter():
     anbieter, kosten = [], {}
     for name, rang, sekunden in _FUELLER_KOSTEN:
-        host = ("https://www.fueller-" +
-                re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-") +
-                ".invalid")
+        host = (
+            "https://www.fueller-"
+            + re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+            + ".invalid"
+        )
         url = f"{host}/kat"
-        anbieter.append(Anbieter(
-            name=name, typ="handel", methode="ldjson", rang=rang,
-            basis_url=host, rate_limit_sekunden=0,
-            einstiege=[Einstieg(url=url, kind="static", pfadmuster="/p/")],
-        ))
+        anbieter.append(
+            Anbieter(
+                name=name,
+                typ="handel",
+                methode="ldjson",
+                rang=rang,
+                basis_url=host,
+                rate_limit_sekunden=0,
+                einstiege=[Einstieg(url=url, kind="static", pfadmuster="/p/")],
+            )
+        )
         kosten[url] = sekunden
     return anbieter, kosten
 
@@ -119,6 +133,7 @@ _KOSTEN_JE_ABRUF_CONGSTAR = 2.2
 
 def _katalog_farben():
     from telco_radar.geraete_config import lade_farben, lade_katalog
+
     return lade_katalog(_WURZEL), lade_farben(_WURZEL)
 
 
@@ -140,8 +155,9 @@ def _congstar_bilanz(monkeypatch, frist_sekunden: float):
 
     sitemap_text = _fixture("congstar_sitemap_devices.xml")
     alle_urls = set(re.findall(r"<loc>\s*([^<\s]+)\s*</loc>", sitemap_text))
-    produkt_urls = {u for u in alle_urls
-                    if not any(m in u for m in sitemap.ohne_pfadmuster)}
+    produkt_urls = {
+        u for u in alle_urls if not any(m in u for m in sitemap.ohne_pfadmuster)
+    }
     assert len(produkt_urls) >= 40, "Sitemap-Fixtur: zu wenige Produktseiten"
 
     produkt_seite = _fixture("congstar_produkt_iphone17.html.gz")
@@ -161,9 +177,14 @@ def _congstar_bilanz(monkeypatch, frist_sekunden: float):
         return (404, "")
 
     quellen = QuellenConfig(anbieter=[*fueller, congstar])
-    ergebnis = sammle(quellen, *_katalog_farben(), hole, "2026-09-24",
-                      datetime(2026, 9, 24, 7, 36, 8, tzinfo=timezone.utc),
-                      frist_sekunden=frist_sekunden)
+    ergebnis = sammle(
+        quellen,
+        *_katalog_farben(),
+        hole,
+        "2026-09-24",
+        datetime(2026, 9, 24, 7, 36, 8, tzinfo=timezone.utc),
+        frist_sekunden=frist_sekunden,
+    )
     bilanz = next(b for b in ergebnis["anbieter"] if b.name == "congstar")
     return bilanz, produkt_urls
 
@@ -173,17 +194,21 @@ def _erwarte_vollstaendigen_congstar_lauf(bilanz, produkt_urls):
         f"congstar verhungert weiterhin: status={bilanz.status!r}, "
         f"grund={bilanz.grund!r}, "
         f"{bilanz.produkte_abgerufen} Produkte, "
-        f"{len(bilanz.buendel)} Buendel-Saetze")
-    assert bilanz.vollstaendig is True, \
+        f"{len(bilanz.buendel)} Buendel-Saetze"
+    )
+    assert bilanz.vollstaendig is True, (
         "ein nicht vollstaendig gelesener congstar darf nicht altern (Regel 6)"
+    )
 
     gelesene_buendel_urls = {s["url"] for s in bilanz.buendel}
     assert gelesene_buendel_urls == produkt_urls, (
         "nicht jede Produktseite hat ihre Buendelmatrix geliefert: "
-        f"fehlend={sorted(produkt_urls - gelesene_buendel_urls)[:5]}")
+        f"fehlend={sorted(produkt_urls - gelesene_buendel_urls)[:5]}"
+    )
     assert bilanz.produkte_abgerufen >= len(produkt_urls), (
         f"nicht alle {len(produkt_urls)} Produktseiten wurden gelesen "
-        f"({bilanz.produkte_abgerufen} Produkte extrahiert)")
+        f"({bilanz.produkte_abgerufen} Produkte extrahiert)"
+    )
 
 
 def test_congstar_bekommt_im_nachbau_von_lauf_53_einen_vollstaendigen_lauf(monkeypatch):

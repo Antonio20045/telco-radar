@@ -93,6 +93,7 @@ unter. Die Vorlage braucht dafuer eine Anbieterspalte.
 `ohne_bewegung` zurueck - die Zahl der Regalplaetze, die die Schwelle nehmen
 und ihren Preis nie bewegt haben.
 """
+
 from __future__ import annotations
 
 import logging
@@ -239,6 +240,7 @@ def _regal(gruppe: list) -> tuple:
 # Listungsdauer
 # --------------------------------------------------------------------------
 
+
 def listungsdauer(eintrag: dict) -> Optional[int]:
     """Tage von der ersten bis zur letzten BESTAETIGUNG.
 
@@ -255,6 +257,7 @@ def listungsdauer(eintrag: dict) -> Optional[int]:
 # --------------------------------------------------------------------------
 # Preisverfall
 # --------------------------------------------------------------------------
+
 
 def _aktueller_preis(eintrag: dict, art: str) -> Optional[float]:
     feld = "preis_ohne_vertrag" if art == "ohne_vertrag" else "zuzahlung"
@@ -292,7 +295,10 @@ def preisverfall(eintrag: dict) -> Optional[dict]:
 # Nachfolger-Effekt
 # --------------------------------------------------------------------------
 
-def _preis_am(punkte: list, stichtag: date, art: str = "preis_ohne_vertrag") -> Optional[float]:
+
+def _preis_am(
+    punkte: list, stichtag: date, art: str = "preis_ohne_vertrag"
+) -> Optional[float]:
     """Der zuletzt gemessene Preis AM oder VOR dem Stichtag.
 
     Eine Treppenfunktion, keine Interpolation: zwischen zwei
@@ -309,9 +315,12 @@ def _preis_am(punkte: list, stichtag: date, art: str = "preis_ohne_vertrag") -> 
     return gueltig
 
 
-def _eigene_punkte(punkte: list, device_id: str,
-                   anbieter: Optional[str] = None,
-                   listung_ids: Optional[set] = None) -> list:
+def _eigene_punkte(
+    punkte: list,
+    device_id: str,
+    anbieter: Optional[str] = None,
+    listung_ids: Optional[set] = None,
+) -> list:
     """Die Preispunkte, die zu dieser Preisreihe gehoeren.
 
     `listung_ids` ist der genaue Weg und der einzige, den `auswertung`
@@ -338,9 +347,12 @@ def _eigene_punkte(punkte: list, device_id: str,
     """
     if listung_ids is not None:
         return [p for p in punkte if p.get("listung_id") in listung_ids]
-    treffer = [p for p in punkte
-               if p.get("device_id") == device_id
-               and (anbieter is None or p.get("anbieter") == anbieter)]
+    treffer = [
+        p
+        for p in punkte
+        if p.get("device_id") == device_id
+        and (anbieter is None or p.get("anbieter") == anbieter)
+    ]
     if treffer:
         return treffer
     if anbieter is None:
@@ -348,10 +360,14 @@ def _eigene_punkte(punkte: list, device_id: str,
     return [p for p in punkte if p.get("anbieter") == anbieter]
 
 
-def nachfolger_effekt(device_id: str, katalog: Katalog, punkte: list,
-                      heute: Optional[str] = None,
-                      anbieter: Optional[str] = None,
-                      listung_ids: Optional[set] = None) -> Optional[dict]:
+def nachfolger_effekt(
+    device_id: str,
+    katalog: Katalog,
+    punkte: list,
+    heute: Optional[str] = None,
+    anbieter: Optional[str] = None,
+    listung_ids: Optional[set] = None,
+) -> Optional[dict]:
     """Was der Marktstart des Nachfolgers mit dem PREIS des Vorgaengers macht.
 
     Gibt None, wenn es keinen Nachfolger im Katalog gibt, wenn dessen
@@ -403,13 +419,14 @@ def nachfolger_effekt(device_id: str, katalog: Katalog, punkte: list,
 # Normalfall - eine Darstellung, die zwischen zwei Formen unterscheiden muss,
 # unterscheidet irgendwann falsch.
 def _leere_preisspalten() -> dict:
-    return {"basis": None,
-            "nach": {t: None for t in _FENSTER},
-            "prozent": {t: None for t in _FENSTER}}
+    return {
+        "basis": None,
+        "nach": {t: None for t in _FENSTER},
+        "prozent": {t: None for t in _FENSTER},
+    }
 
 
-def verweildauer_nach_nachfolger(eintraege: list,
-                                 katalog: Katalog) -> Optional[dict]:
+def verweildauer_nach_nachfolger(eintraege: list, katalog: Katalog) -> Optional[dict]:
     """Wie lange steht der Vorgaenger NACH dem Marktstart seines Nachfolgers?
 
     *eintraege* sind die Listungen EINER (Geraet, Anbieter, Zustand)-Gruppe -
@@ -471,9 +488,15 @@ def verweildauer_nach_nachfolger(eintraege: list,
     # Der Beobachtungsbeginn der GRUPPE. `erstpreis_am` zaehlt mit: bei einer
     # Listung, die aus einem Altbestand uebernommen wurde, ist es der aeltere
     # der beiden Belege.
-    anfaenge = [d for d in (_datum(e.get(feld))
-                            for e in eintraege
-                            for feld in ("first_seen", "erstpreis_am")) if d]
+    anfaenge = [
+        d
+        for d in (
+            _datum(e.get(feld))
+            for e in eintraege
+            for feld in ("first_seen", "erstpreis_am")
+        )
+        if d
+    ]
     beginn = min(anfaenge) if anfaenge else ende
 
     return {
@@ -496,6 +519,7 @@ def verweildauer_nach_nachfolger(eintraege: list,
 # Portfolio-Tiefe
 # --------------------------------------------------------------------------
 
+
 def portfolio_tiefe(eintraege: list, katalog: Katalog) -> list:
     """Wie viele GERAETE-Generationen fuehrt ein Anbieter gleichzeitig?
 
@@ -513,9 +537,16 @@ def portfolio_tiefe(eintraege: list, katalog: Katalog) -> list:
         if e.get("status") not in _SICHTBAR:
             continue
         name = e.get("anbieter") or ""
-        eintrag = je_anbieter.setdefault(name, {
-            "anbieter": name, "anbieter_typ": e.get("anbieter_typ", ""),
-            "geraete": set(), "skus": set(), "modelle": []})
+        eintrag = je_anbieter.setdefault(
+            name,
+            {
+                "anbieter": name,
+                "anbieter_typ": e.get("anbieter_typ", ""),
+                "geraete": set(),
+                "skus": set(),
+                "modelle": [],
+            },
+        )
         eintrag["geraete"].add(e.get("device_id"))
         eintrag["skus"].add(e.get("sku_id"))
 
@@ -524,12 +555,14 @@ def portfolio_tiefe(eintraege: list, katalog: Katalog) -> list:
         modelle = []
         for gid in sorted(roh["geraete"]):
             g = katalog.nach_id(gid)
-            modelle.append({
-                "device_id": gid,
-                "modell": g.modell if g else gid,
-                "hersteller": g.hersteller if g else "",
-                "generation": g.generation if g else None,
-            })
+            modelle.append(
+                {
+                    "device_id": gid,
+                    "modell": g.modell if g else gid,
+                    "hersteller": g.hersteller if g else "",
+                    "generation": g.generation if g else None,
+                }
+            )
         # W3 (29.08.2026): bis dahin stand hier `len(roh["geraete"])` - also
         # die Zahl verschiedener MODELLE unter der Ueberschrift
         # "Generationen". Die Seite meldete damit "o2 fuehrt 54
@@ -549,36 +582,47 @@ def portfolio_tiefe(eintraege: list, katalog: Katalog) -> list:
         # waeren als (Hersteller, Nummer) EINE Generation. Umgekehrt sind
         # Galaxy A57 und Galaxy S26 zwei Jahrgaenge zweier Reihen und keine
         # 31 Generationen Abstand.
-        jahrgaenge = {(m["hersteller"], serie_aus_modell(m["modell"]),
-                       m["generation"])
-                      for m in modelle if m["generation"] is not None}
-        out.append({
-            "anbieter": name,
-            "anbieter_typ": roh["anbieter_typ"],
-            # Der eigene Anbieter steht in dieser Liste MIT, und rot. Das ist
-            # der Punkt der Sektion: Wettbewerber lassen das Vorjahresmodell
-            # als guenstigen Einstieg im Regal, bei uns wird das alte Geraet
-            # meist direkt ersetzt. Eine Portfolio-Tiefe ohne uns beantwortet
-            # die Frage nicht, wegen der sie dasteht.
-            "eigen": (name or "").strip().lower() == "vodafone",
-            "generationen": len(jahrgaenge),
-            "modelle_anzahl": len(roh["geraete"]),
-            "skus": len(roh["skus"]),
-            "modelle": sorted(modelle, key=lambda m: (m["hersteller"],
-                                                      -(m["generation"] or 0))),
-        })
-    return sorted(out, key=lambda t: (-t["generationen"],
-                                      -t["modelle_anzahl"], t["anbieter"]))
+        jahrgaenge = {
+            (m["hersteller"], serie_aus_modell(m["modell"]), m["generation"])
+            for m in modelle
+            if m["generation"] is not None
+        }
+        out.append(
+            {
+                "anbieter": name,
+                "anbieter_typ": roh["anbieter_typ"],
+                # Der eigene Anbieter steht in dieser Liste MIT, und rot. Das ist
+                # der Punkt der Sektion: Wettbewerber lassen das Vorjahresmodell
+                # als guenstigen Einstieg im Regal, bei uns wird das alte Geraet
+                # meist direkt ersetzt. Eine Portfolio-Tiefe ohne uns beantwortet
+                # die Frage nicht, wegen der sie dasteht.
+                "eigen": (name or "").strip().lower() == "vodafone",
+                "generationen": len(jahrgaenge),
+                "modelle_anzahl": len(roh["geraete"]),
+                "skus": len(roh["skus"]),
+                "modelle": sorted(
+                    modelle, key=lambda m: (m["hersteller"], -(m["generation"] or 0))
+                ),
+            }
+        )
+    return sorted(
+        out, key=lambda t: (-t["generationen"], -t["modelle_anzahl"], t["anbieter"])
+    )
 
 
 # --------------------------------------------------------------------------
 # Die Gesamtauswertung
 # --------------------------------------------------------------------------
 
-def auswertung(eintraege: list, punkte: list, katalog: Katalog,
-               heute: Optional[str] = None,
-               laeufe_je_anbieter: Optional[dict] = None,
-               termine_je_anbieter: Optional[dict] = None) -> dict:
+
+def auswertung(
+    eintraege: list,
+    punkte: list,
+    katalog: Katalog,
+    heute: Optional[str] = None,
+    laeufe_je_anbieter: Optional[dict] = None,
+    termine_je_anbieter: Optional[dict] = None,
+) -> dict:
     """Alles zusammen, mitsamt der Aussage ueber die eigene Datenbasis.
 
     `termine_je_anbieter` ({anbieter: [ISO-Tage]}) ist die Quelle fuer die
@@ -643,7 +687,8 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
 
     termine_daten = {
         name: sorted({d for d in (_datum(t) for t in (tage or [])) if d})
-        for name, tage in termine_je_anbieter.items()}
+        for name, tage in termine_je_anbieter.items()
+    }
 
     # DIE ZURECHNUNG BRAUCHT EINEN VOLLSTAENDIGEN LAUF, sonst folgt aus dem
     # Ausbleiben der Alterung nichts.
@@ -714,8 +759,7 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
         bis zum 31.08.2026 lief sie durch KEIN Gatter und war damit die
         einzige Sektion, die aus zwei Messpunkten eine Aussage machte."""
         tage = listungsdauer(eintrag)
-        return (tage is not None and tage >= MIND_TAGE_JE_GERAET
-                and _oft_genug(eintrag))
+        return tage is not None and tage >= MIND_TAGE_JE_GERAET and _oft_genug(eintrag)
 
     # DIE VERWEILDAUER ZAEHLT REGALPLAETZE, KEINE FARBVARIANTEN.
     # (Geraet, Anbieter, Zustand) - derselbe Schluessel wie beim
@@ -727,9 +771,15 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
     # ist eine wahre Aussage, sie muss nur als solche gekennzeichnet sein.
     dauern = []
     for (gid, anbieter, zustand), gruppe in sorted(
-            _gruppiere(eintraege, lambda e: (e.get("device_id") or "",
-                                             e.get("anbieter") or "",
-                                             _zustand_etikett(e))).items()):
+        _gruppiere(
+            eintraege,
+            lambda e: (
+                e.get("device_id") or "",
+                e.get("anbieter") or "",
+                _zustand_etikett(e),
+            ),
+        ).items()
+    ):
         # Eine Zeile "0 Tage" ist kein Messergebnis, sondern der Beweis, dass
         # noch nicht lange genug gemessen wurde.
         _, _, tage = _regal(gruppe)
@@ -739,20 +789,26 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
             continue
         g = katalog.nach_id(gid)
         aktive = [e for e in gruppe if e.get("status") == STATUS_AKTIV]
-        dauern.append({
-            "device_id": gid,
-            "modell": g.modell if g else gid,
-            "anbieter": anbieter,
-            "zustand": zustand,
-            "varianten": len(gruppe),
-            "tage": tage,
-            # Der Regalplatz gilt als aktiv, solange EINE Variante aktiv ist.
-            # Sonst der Status der zuletzt bestaetigten - "ausgelistet" ist
-            # eine Aussage ueber den Platz, nicht ueber eine Farbe.
-            "status": (STATUS_AKTIV if aktive else
-                       max(gruppe, key=lambda e: str(e.get("last_verified") or ""))
-                       .get("status")),
-        })
+        dauern.append(
+            {
+                "device_id": gid,
+                "modell": g.modell if g else gid,
+                "anbieter": anbieter,
+                "zustand": zustand,
+                "varianten": len(gruppe),
+                "tage": tage,
+                # Der Regalplatz gilt als aktiv, solange EINE Variante aktiv ist.
+                # Sonst der Status der zuletzt bestaetigten - "ausgelistet" ist
+                # eine Aussage ueber den Platz, nicht ueber eine Farbe.
+                "status": (
+                    STATUS_AKTIV
+                    if aktive
+                    else max(
+                        gruppe, key=lambda e: str(e.get("last_verified") or "")
+                    ).get("status")
+                ),
+            }
+        )
 
     # DER PREISVERFALL ZAEHLT PREISE, KEINE FARBEN - und keine Nullzeilen.
     #
@@ -775,35 +831,53 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
     verfaelle = []
     ohne_bewegung = 0
     for schluessel, gruppe in sorted(
-            _gruppiere(eintraege, lambda e: (e.get("device_id") or "",
-                                             e.get("anbieter") or "",
-                                             _zustand_etikett(e),
-                                             e.get("speicher_gb"))).items(),
-            key=lambda kv: [str(t) for t in kv[0]]):
+        _gruppiere(
+            eintraege,
+            lambda e: (
+                e.get("device_id") or "",
+                e.get("anbieter") or "",
+                _zustand_etikett(e),
+                e.get("speicher_gb"),
+            ),
+        ).items(),
+        key=lambda kv: [str(t) for t in kv[0]],
+    ):
         gid, anbieter, zustand, speicher = schluessel
         # Der Vertreter ist die am LAENGSTEN beobachtete Variante, nicht die
         # billigste: "Der niedrigste Preis ist der wahrscheinlichste Fehler".
-        tauglich = [e for e in gruppe
-                    if preisverfall(e) is not None
-                    and (_spanne(e.get("erstpreis_am"), e.get("last_verified"))
-                         or 0) >= MIND_TAGE_JE_GERAET
-                    and _oft_genug(e)]
+        tauglich = [
+            e
+            for e in gruppe
+            if preisverfall(e) is not None
+            and (_spanne(e.get("erstpreis_am"), e.get("last_verified")) or 0)
+            >= MIND_TAGE_JE_GERAET
+            and _oft_genug(e)
+        ]
         if not tauglich:
             continue
-        e = max(tauglich, key=lambda x: (
-            _spanne(x.get("erstpreis_am"), x.get("last_verified")) or 0,
-            str(x.get("sku_id") or "")))
+        e = max(
+            tauglich,
+            key=lambda x: (
+                _spanne(x.get("erstpreis_am"), x.get("last_verified")) or 0,
+                str(x.get("sku_id") or ""),
+            ),
+        )
         v = preisverfall(e)
         if not v["absolut"]:
             ohne_bewegung += 1
             continue
         g = katalog.nach_id(gid)
-        verfaelle.append({**v, "device_id": gid,
-                          "modell": g.modell if g else gid,
-                          "anbieter": anbieter,
-                          "zustand": zustand,
-                          "speicher_gb": speicher,
-                          "varianten": len(tauglich)})
+        verfaelle.append(
+            {
+                **v,
+                "device_id": gid,
+                "modell": g.modell if g else gid,
+                "anbieter": anbieter,
+                "zustand": zustand,
+                "speicher_gb": speicher,
+                "varianten": len(tauglich),
+            }
+        )
     verfaelle.sort(key=lambda v: v["prozent"])
 
     # Duenn ist die Basis, solange KEINE Kennzahl etwas hergibt.
@@ -827,8 +901,9 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
         gid = e.get("device_id")
         if not gid or not _vergleichbar(e):
             continue
-        gruppen.setdefault((gid, e.get("anbieter") or "",
-                            _zustand_etikett(e)), []).append(e)
+        gruppen.setdefault(
+            (gid, e.get("anbieter") or "", _zustand_etikett(e)), []
+        ).append(e)
 
     effekte = []
     for (gid, name, _zust), gruppe in sorted(gruppen.items()):
@@ -840,11 +915,22 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
         # Die Preisreihe kommt ueber die LISTUNGS-IDs dieser Gruppe, nicht
         # ueber (Geraet, Anbieter): sonst holt sie sich den Gebrauchtpreis
         # desselben Tages als Basis (siehe `_eigene_punkte`).
-        preis = nachfolger_effekt(gid, katalog, punkte, heute, anbieter=name,
-                                  listung_ids={e.get("id") for e in gruppe})
+        preis = nachfolger_effekt(
+            gid,
+            katalog,
+            punkte,
+            heute,
+            anbieter=name,
+            listung_ids={e.get("id") for e in gruppe},
+        )
         g = katalog.nach_id(gid)
-        effekte.append({**(preis or _leere_preisspalten()), **verweil,
-                        "modell": g.modell if g else gid})
+        effekte.append(
+            {
+                **(preis or _leere_preisspalten()),
+                **verweil,
+                "modell": g.modell if g else gid,
+            }
+        )
 
     # Zahlwoerter beugen, Umlaute benutzen. Die alte Fassung schrieb an
     # prominenter Stelle "seit 1 Wochen" und "Messpunkte ueber 85 Listungen".
@@ -853,25 +939,30 @@ def auswertung(eintraege: list, punkte: list, katalog: Katalog,
 
     seit = min(daten).strftime("%d.%m.%Y") if daten else ""
     if duenn:
-        hinweis = (f"Datenbasis noch dünn: Preisverlauf wird seit dem {seit} "
-                   f"erfasst" if seit
-                   else "Datenbasis noch dünn: Preisverlauf wird noch nicht erfasst")
+        hinweis = (
+            f"Datenbasis noch dünn: Preisverlauf wird seit dem {seit} erfasst"
+            if seit
+            else "Datenbasis noch dünn: Preisverlauf wird noch nicht erfasst"
+        )
         # BEIDE Zahlen: wie lange schon, und wie lange noch. Ein Hinweis, der
         # nur "noch zu duenn" sagt, ist eine Ausrede statt einer Auskunft.
         # Bei einem einzigen Messtermin ist die Spanne null - und "0 Tage"
         # liest sich wie die Nullzeilen, die diese Schwelle gerade
         # abgeschafft hat.
-        spanne = (f" – {_n(beobachtungstage, 'Tag', 'Tage')}"
-                  if beobachtungstage else "")
-        hinweis += (f"{spanne}, bisher "
-                    f"{_n(len(termine), 'Messtermin', 'Messtermine')}. "
-                    f"Belastbare Aussagen zu Verweildauer und Preisverfall gibt "
-                    f"es ab etwa {MIND_WOCHEN} Wochen; bis dahin steht hier "
-                    f"keine Zahl, die noch keine ist.")
+        spanne = f" – {_n(beobachtungstage, 'Tag', 'Tage')}" if beobachtungstage else ""
+        hinweis += (
+            f"{spanne}, bisher "
+            f"{_n(len(termine), 'Messtermin', 'Messtermine')}. "
+            f"Belastbare Aussagen zu Verweildauer und Preisverfall gibt "
+            f"es ab etwa {MIND_WOCHEN} Wochen; bis dahin steht hier "
+            f"keine Zahl, die noch keine ist."
+        )
     else:
-        hinweis = (f"Preisverlauf seit {_n(wochen, 'Woche', 'Wochen')} "
-                   f"beobachtet, {_n(len(termine), 'Messtermin', 'Messtermine')} "
-                   f"über {_n(len(dauern), 'Listung', 'Listungen')}.")
+        hinweis = (
+            f"Preisverlauf seit {_n(wochen, 'Woche', 'Wochen')} "
+            f"beobachtet, {_n(len(termine), 'Messtermin', 'Messtermine')} "
+            f"über {_n(len(dauern), 'Listung', 'Listungen')}."
+        )
 
     return {
         "duenn": duenn,

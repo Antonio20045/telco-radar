@@ -14,6 +14,7 @@ Die drei Zusicherungen, an denen diese Ansicht haengt:
   * Kein Euro-Delta ueber verschiedene Bindungsdauern (A5.4).
   * Die Grafik zeichnet nur, was in den Karten steht - sie rechnet nichts.
 """
+
 from __future__ import annotations
 
 import json
@@ -39,30 +40,39 @@ def bestand():
     tarife = Tarifbestand.aus_datei(ZUSTAND / "tarife.jsonl").je_id
     buendel = []
     for satz in tco["buendel"]:
-        b = Buendel(sku_id=satz["sku_id"], anbieter=satz["anbieter"],
-                    tarif_name=satz["tarif_name"],
-                    tarif_id=satz.get("tarif_id", ""),
-                    tarif_monatlich=satz.get("tarif_monatlich"),
-                    buendel_monatlich=satz.get("buendel_monatlich"),
-                    geraet_zuzahlung=satz.get("geraet_zuzahlung"),
-                    geraet_monatsrate=satz.get("geraet_monatsrate"),
-                    laufzeit_monate=satz.get("laufzeit_monate", 24),
-                    anschlusspreis=satz.get("anschlusspreis"),
-                    quelle_url=satz.get("quelle_url", ""),
-                    abgerufen_am=satz.get("abgerufen_am", ""))
+        b = Buendel(
+            sku_id=satz["sku_id"],
+            anbieter=satz["anbieter"],
+            tarif_name=satz["tarif_name"],
+            tarif_id=satz.get("tarif_id", ""),
+            tarif_monatlich=satz.get("tarif_monatlich"),
+            buendel_monatlich=satz.get("buendel_monatlich"),
+            geraet_zuzahlung=satz.get("geraet_zuzahlung"),
+            geraet_monatsrate=satz.get("geraet_monatsrate"),
+            laufzeit_monate=satz.get("laufzeit_monate", 24),
+            anschlusspreis=satz.get("anschlusspreis"),
+            quelle_url=satz.get("quelle_url", ""),
+            abgerufen_am=satz.get("abgerufen_am", ""),
+        )
         satz_tarif = tarife.get(b.tarif_id) or {}
         if satz_tarif.get("laufzeit_monate"):
             b.tarif_bindung_monate = int(satz_tarif["laufzeit_monate"])
         buendel.append(b)
-    referenzen = [SimOnlyReferenz(
-        anbieter=r["anbieter"], tarif_name=r["tarif_name"],
-        tarif_id=r.get("tarif_id", ""),
-        tarif_sim_only_monatlich=r.get("tarif_sim_only_monatlich"),
-        anschlusspreis=r.get("anschlusspreis"),
-        quelle_url=r.get("quelle_url", ""),
-        abgerufen_am=r.get("abgerufen_am", "")) for r in tco["sim_only"]]
-    return karten.modelle(buendel, db["listungen"], referenzen, tarife,
-                          lade_katalog(WURZEL))
+    referenzen = [
+        SimOnlyReferenz(
+            anbieter=r["anbieter"],
+            tarif_name=r["tarif_name"],
+            tarif_id=r.get("tarif_id", ""),
+            tarif_sim_only_monatlich=r.get("tarif_sim_only_monatlich"),
+            anschlusspreis=r.get("anschlusspreis"),
+            quelle_url=r.get("quelle_url", ""),
+            abgerufen_am=r.get("abgerufen_am", ""),
+        )
+        for r in tco["sim_only"]
+    ]
+    return karten.modelle(
+        buendel, db["listungen"], referenzen, tarife, lade_katalog(WURZEL)
+    )
 
 
 def _modell(bestand, mid):
@@ -87,52 +97,88 @@ def _naeherungs_modell():
         Vodafone: 899,90 Barpreis + 24×19,99 Tarif (Mobil XS, guenstigster
                   von zwei Tarifen) = 1.379,66 - GERECHNET, kein Angebot
     """
-    buendel = [Buendel(sku_id="sku-x", anbieter="o2", tarif_name="O2 Mobile L",
-                       tarif_id="o2:l", tarif_monatlich=24.99,
-                       tarif_bindung_monate=24, geraet_zuzahlung=1.0,
-                       geraet_monatsrate=30.0, laufzeit_monate=36,
-                       anschlusspreis=0.0, quelle_url="https://o2.invalid/x",
-                       abgerufen_am="2026-09-08")]
+    buendel = [
+        Buendel(
+            sku_id="sku-x",
+            anbieter="o2",
+            tarif_name="O2 Mobile L",
+            tarif_id="o2:l",
+            tarif_monatlich=24.99,
+            tarif_bindung_monate=24,
+            geraet_zuzahlung=1.0,
+            geraet_monatsrate=30.0,
+            laufzeit_monate=36,
+            anschlusspreis=0.0,
+            quelle_url="https://o2.invalid/x",
+            abgerufen_am="2026-09-08",
+        )
+    ]
     listungen = [
-        {"id": "o2--sku-x", "sku_id": "sku-x", "device_id": "apple-iphone-17-pro",
-         "anbieter": "o2", "speicher_gb": 256, "zustand": "neu",
-         "status": "aktiv", "preis_ohne_vertrag": None, "quelle_url": "",
-         "abgerufen_am": ""},
-        {"id": "vodafone--sku-x", "sku_id": "sku-x",
-         "device_id": "apple-iphone-17-pro", "anbieter": "Vodafone",
-         "speicher_gb": 256, "zustand": "neu", "status": "aktiv",
-         "preis_ohne_vertrag": 899.90,
-         "quelle_url": "https://vodafone.invalid/p",
-         "abgerufen_am": "2026-09-08"},
+        {
+            "id": "o2--sku-x",
+            "sku_id": "sku-x",
+            "device_id": "apple-iphone-17-pro",
+            "anbieter": "o2",
+            "speicher_gb": 256,
+            "zustand": "neu",
+            "status": "aktiv",
+            "preis_ohne_vertrag": None,
+            "quelle_url": "",
+            "abgerufen_am": "",
+        },
+        {
+            "id": "vodafone--sku-x",
+            "sku_id": "sku-x",
+            "device_id": "apple-iphone-17-pro",
+            "anbieter": "Vodafone",
+            "speicher_gb": 256,
+            "zustand": "neu",
+            "status": "aktiv",
+            "preis_ohne_vertrag": 899.90,
+            "quelle_url": "https://vodafone.invalid/p",
+            "abgerufen_am": "2026-09-08",
+        },
     ]
     referenzen = [
-        SimOnlyReferenz(anbieter="Vodafone", tarif_name="Vodafone Mobil XS",
-                        tarif_id="vodafone:mobil-xs",
-                        tarif_sim_only_monatlich=19.99,
-                        quelle_url="https://vodafone.invalid/pib-xs",
-                        abgerufen_am="2026-09-08"),
+        SimOnlyReferenz(
+            anbieter="Vodafone",
+            tarif_name="Vodafone Mobil XS",
+            tarif_id="vodafone:mobil-xs",
+            tarif_sim_only_monatlich=19.99,
+            quelle_url="https://vodafone.invalid/pib-xs",
+            abgerufen_am="2026-09-08",
+        ),
         # Der teurere Tarif darf nicht gewinnen - die Referenz ist der
         # GUENSTIGSTE eigene Tarif (konservative Wahl).
-        SimOnlyReferenz(anbieter="Vodafone", tarif_name="Vodafone Mobil S",
-                        tarif_id="vodafone:mobil-s",
-                        tarif_sim_only_monatlich=29.99,
-                        quelle_url="https://vodafone.invalid/pib-s",
-                        abgerufen_am="2026-09-08"),
+        SimOnlyReferenz(
+            anbieter="Vodafone",
+            tarif_name="Vodafone Mobil S",
+            tarif_id="vodafone:mobil-s",
+            tarif_sim_only_monatlich=29.99,
+            quelle_url="https://vodafone.invalid/pib-s",
+            abgerufen_am="2026-09-08",
+        ),
     ]
-    tarife = {"vodafone:mobil-xs": {"preisphasen": [
-        {"von_monat": 1, "bis_monat": None, "betrag": 19.99}]}}
-    ergebnis = karten.modelle(buendel, listungen, referenzen, tarife,
-                              lade_katalog(WURZEL))
+    tarife = {
+        "vodafone:mobil-xs": {
+            "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": 19.99}]
+        }
+    }
+    ergebnis = karten.modelle(
+        buendel, listungen, referenzen, tarife, lade_katalog(WURZEL)
+    )
     modell = ergebnis["modelle"][0]
     # Gegenprobe: der Fall stellt sich WIRKLICH - eine echte Naeherungskarte.
-    assert any(k["naeherung"] for k in modell["karten"]), \
+    assert any(k["naeherung"] for k in modell["karten"]), (
         "die Fixture erzeugt keine Naeherungskarte - der Test prueft nichts"
+    )
     return modell
 
 
 # --------------------------------------------------------------------------
 # Die Karten
 # --------------------------------------------------------------------------
+
 
 def test_die_leitfrage_des_lastenhefts_ist_die_vorgabe(bestand):
     """Das Lastenheft stellt seine Frage an EINEM Geraet, und die Abnahme
@@ -151,8 +197,7 @@ def test_jedes_modell_zeigt_alle_vier_anbieter(bestand):
 
 
 def test_jede_karte_ohne_zahl_nennt_ihren_grund(bestand):
-    leer = [k for m in bestand["modelle"] for k in m["karten"]
-            if not k["belastbar"]]
+    leer = [k for m in bestand["modelle"] for k in m["karten"] if not k["belastbar"]]
     assert leer, "der Test prueft nichts, wenn es keine leere Karte gibt"
     for k in leer:
         assert k["leer_grund"].strip(), f"{k['anbieter']} ohne Begruendung"
@@ -257,17 +302,20 @@ def test_antwortzeile_bezieht_haendler_ohne_buendel_ins_minimum_ein(bestand):
     weil er kein Tarifbuendel fuehrt)."""
     import json as _json
 
-    listungen = _json.loads(
-        (ZUSTAND / "geraete_db.json").read_text(encoding="utf-8"))["listungen"]
+    listungen = _json.loads((ZUSTAND / "geraete_db.json").read_text(encoding="utf-8"))[
+        "listungen"
+    ]
     geprueft = 0
     for modell in bestand["modelle"]:
         antwort = modell["antwort"]
         if antwort["geraetepreis"] is None:
             continue
-        eigene = [e for e in listungen
-                 if karten.modell_schluessel(e.get("device_id"),
-                                             e.get("speicher_gb"))
-                 == modell["id"]]
+        eigene = [
+            e
+            for e in listungen
+            if karten.modell_schluessel(e.get("device_id"), e.get("speicher_gb"))
+            == modell["id"]
+        ]
         haendler = karten._haendler_geraetepreise(eigene)
         for name, eintrag in haendler.items():
             if eintrag is None:
@@ -275,7 +323,8 @@ def test_antwortzeile_bezieht_haendler_ohne_buendel_ins_minimum_ein(bestand):
             geprueft += 1
             assert antwort["geraetepreis"] <= eintrag["preis"], (
                 f"{modell['id']}: Antwortzeile {antwort['geraetepreis']} "
-                f"> {name} {eintrag['preis']}")
+                f"> {name} {eintrag['preis']}"
+            )
     # Gegenprobe: der Testlauf hat wirklich mindestens einen Haendlerpreis
     # gesehen - sonst prueft die Schleife oben nichts (Saturn fuehrt am
     # echten Bestand vom 05.09.2026 mindestens ein Modell).
@@ -290,20 +339,29 @@ def test_antwortzeile_bleibt_unveraendert_ohne_haendlerpreise(bestand):
     der drei Haendler."""
     modell = _modell(bestand, "fairphone-6-256")
     listungen = __import__("json").loads(
-        (ZUSTAND / "geraete_db.json").read_text(encoding="utf-8"))["listungen"]
-    eigene = [e for e in listungen
-             if karten.modell_schluessel(e.get("device_id"),
-                                         e.get("speicher_gb")) == modell["id"]]
+        (ZUSTAND / "geraete_db.json").read_text(encoding="utf-8")
+    )["listungen"]
+    eigene = [
+        e
+        for e in listungen
+        if karten.modell_schluessel(e.get("device_id"), e.get("speicher_gb"))
+        == modell["id"]
+    ]
     haendler = karten._haendler_geraetepreise(eigene)
     assert all(v is None for v in haendler.values()), (
-        "die Gegenprobe braucht ein Modell ohne Haendlerpreis")
+        "die Gegenprobe braucht ein Modell ohne Haendlerpreis"
+    )
     # Unveraendert: der guenstigste Kartenanbieter fuehrt weiter, exakt wie
     # vor der Erweiterung.
     antwort = modell["antwort"]
     guenstigste_karte = min(
-        (k for k in modell["karten"]
-         if k["vergleichbar"] and k["geraetepreis"] is not None),
-        key=lambda k: k["geraetepreis"])
+        (
+            k
+            for k in modell["karten"]
+            if k["vergleichbar"] and k["geraetepreis"] is not None
+        ),
+        key=lambda k: k["geraetepreis"],
+    )
     assert antwort["geraetepreis"] == guenstigste_karte["geraetepreis"]
     assert antwort["geraetepreis_anbieter"] == guenstigste_karte["anbieter"]
 
@@ -317,9 +375,12 @@ def test_antwortzeile_der_tarifgewinner_ist_kein_naeherungsangebot(bestand):
         antwort = modell["antwort"]
         if antwort["tarif_anbieter"] is None:
             continue
-        gewinner = next(k for k in modell["karten"]
-                        if k["anbieter"] == antwort["tarif_anbieter"]
-                        and k["gesamt"] == antwort["tarif_gesamt"])
+        gewinner = next(
+            k
+            for k in modell["karten"]
+            if k["anbieter"] == antwort["tarif_anbieter"]
+            and k["gesamt"] == antwort["tarif_gesamt"]
+        )
         assert gewinner["naeherung"] is False, modell["id"]
 
 
@@ -332,8 +393,11 @@ def test_die_rechenprobe_steht_auf_der_karte(bestand):
     1.794,76 EUR; die 12 Raten nach Monat 24 (438,00 EUR) stehen als
     `offen_nach_24` daneben und `gezahlt_nach_24` traegt die alte
     24-Monates-Summe weiter."""
-    karte = [k for k in _modell(bestand, "apple-iphone-17-pro-256")["karten"]
-             if k["anbieter"] == "o2"][0]
+    karte = [
+        k
+        for k in _modell(bestand, "apple-iphone-17-pro-256")["karten"]
+        if k["anbieter"] == "o2"
+    ][0]
     assert karte["label"] == "Kosten über 24 Monate"
     assert karte["gesamt"] == 1794.76
     assert karte["schnitt_monat"] == 74.78
@@ -371,8 +435,9 @@ def test_der_geraetepreis_fuehrt_wo_er_ausgewiesen_ist(bestand):
 
     einsundeins = [k for k in modell["karten"] if k["anbieter"] == "1&1"][0]
     assert einsundeins["belastbar"]
-    assert einsundeins["geraetepreis"] is None, \
+    assert einsundeins["geraetepreis"] is None, (
         "1&1 nennt nur einen Buendelpreis - eine Aufteilung waere erfunden"
+    )
 
     # Gegenprobe auf dem ganzen Bestand: wo ein Geraetepreis ausgewiesen
     # ist, ist er nie groesser als das, was am Ende insgesamt fuer das
@@ -394,8 +459,9 @@ def test_der_geraetepreis_fuehrt_wo_er_ausgewiesen_ist(bestand):
                 continue
             geprueft += 1
             grenze = k["gesamt"] + (k["offen_nach_24"] or 0.0)
-            assert k["geraetepreis"] <= grenze + 0.01, \
+            assert k["geraetepreis"] <= grenze + 0.01, (
                 f"{k['anbieter']} {m['id']}: Geraetepreis groesser als TCO-24 plus Restbetrag"
+            )
     assert geprueft >= 2, "der Test prueft nichts ohne echte Geraetepreise"
 
 
@@ -404,12 +470,18 @@ def test_eins_und_eins_wird_nicht_in_tarif_und_geraet_zerlegt(bestand):
     unsere Rechnung. Die beiden EINMALIGEN Posten der Karte (S2-C:
     Geräte-Einmalzahlung und Bereitstellungsgebühr) sind KEINE Aufteilung
     - sie stehen neben dem Bündelpreis, nicht in ihm."""
-    karte = [k for k in _modell(bestand, "apple-iphone-17-pro-256")["karten"]
-             if k["anbieter"] == "1&1"][0]
+    karte = [
+        k
+        for k in _modell(bestand, "apple-iphone-17-pro-256")["karten"]
+        if k["anbieter"] == "1&1"
+    ][0]
     assert karte["buendel_monatlich"] == 44.99
     assert karte["monatlich"] is None and karte["rate"] is None
-    assert [p["kategorie"] for p in karte["bestandteile"]] == \
-        ["buendel", "einmalig", "einmalig"]
+    assert [p["kategorie"] for p in karte["bestandteile"]] == [
+        "buendel",
+        "einmalig",
+        "einmalig",
+    ]
 
 
 def test_die_vodafone_referenz_ist_als_gerechnet_gekennzeichnet():
@@ -426,8 +498,7 @@ def test_die_vodafone_referenz_ist_als_gerechnet_gekennzeichnet():
     assert karte["gesamt"] == round(ref["tarif_summe"] + ref["geraet_betrag"], 2)
     assert karte["gesamt"] == 1379.66
     assert ref["tarif_quelle_url"] and ref["geraet_quelle_url"]
-    assert karte["leer_grund"] == "", \
-        "eine Karte mit Zahl darf keinen Leergrund tragen"
+    assert karte["leer_grund"] == "", "eine Karte mit Zahl darf keinen Leergrund tragen"
 
 
 def test_die_referenz_nimmt_den_guenstigsten_belegten_vodafone_tarif():
@@ -462,7 +533,7 @@ def test_die_referenzkarte_traegt_ihre_eigene_bindung():
 
 
 def test_die_spanne_des_bandes_ist_die_der_angebote():
-    """"TCO-36 von 1.120,75 bis 1.428,70 EUR" nannte als Obergrenze die
+    """ "TCO-36 von 1.120,75 bis 1.428,70 EUR" nannte als Obergrenze die
     Referenzrechnung - seit F-R2-2 eine TCO-24-Zahl. Die Spanne meint die
     Angebote, so wie ihr Zaehler.
 
@@ -472,8 +543,11 @@ def test_die_spanne_des_bandes_ist_die_der_angebote():
     Buendel, siehe Docstring der Fixture."""
     modell = _naeherungs_modell()
     ref = [k for k in modell["karten"] if k["naeherung"]][0]
-    angebote = [k["gesamt"] for k in modell["karten"]
-                if k["belastbar"] and not k["naeherung"] and k["vergleichbar"]]
+    angebote = [
+        k["gesamt"]
+        for k in modell["karten"]
+        if k["belastbar"] and not k["naeherung"] and k["vergleichbar"]
+    ]
     assert modell["spanne"] == [min(angebote), max(angebote)] == [1680.76, 1680.76]
     # A1: die Referenz (1.379,66, Barkauf plus Tarif) liegt seit der
     # Vollrechnung UNTER dem einzigen Angebot (1.680,76) - und taucht
@@ -504,9 +578,14 @@ def test_die_beschriftung_der_referenz_aendert_kein_delta(bestand):
     A1 (20.09.2026): die Kappung ist zurueckgenommen - die Deltas rechnen
     wieder mit ALLEN Geraeteraten (und Referenz-Buendeln ihrer eigenen
     Laufzeit), beide Werte sind neu gemessen."""
+
     def delta(mid, anbieter):
-        return [k["delta"] for k in _modell(bestand, mid)["karten"]
-                if k["anbieter"] == anbieter and k["zustand"] == "neu"][0]
+        return [
+            k["delta"]
+            for k in _modell(bestand, mid)["karten"]
+            if k["anbieter"] == anbieter and k["zustand"] == "neu"
+        ][0]
+
     assert delta("apple-iphone-17-pro-256", "o2")["betrag"] == -161.04
     assert delta("apple-iphone-15-128", "o2")["betrag"] == -349.05
     for modell in bestand["modelle"]:
@@ -515,11 +594,11 @@ def test_die_beschriftung_der_referenz_aendert_kein_delta(bestand):
             continue
         for k in modell["karten"]:
             if k.get("delta"):
-                assert k["delta"]["gleiche_laufzeit"] == \
-                    (k["laufzeit"] == ref["monate"])
+                assert k["delta"]["gleiche_laufzeit"] == (
+                    k["laufzeit"] == ref["monate"]
+                )
                 if k["laufzeit"] == ref["monate"]:
-                    assert k["delta"]["betrag"] == \
-                        round(k["gesamt"] - ref["gesamt"], 2)
+                    assert k["delta"]["betrag"] == round(k["gesamt"] - ref["gesamt"], 2)
 
 
 def test_g1_hat_fuer_die_referenz_keine_zweite_bindungsgruppe_mehr():
@@ -585,17 +664,20 @@ def test_jede_belastbare_karte_traegt_das_label_der_leitzahl(bestand):
                 continue
             geprueft += 1
             monate = karte["leitzahl_monate"]
-            assert monate is not None, \
+            assert monate is not None, (
                 f"{modell['id']}/{karte['anbieter']}: belastbar ohne Zeitraum"
-            assert karte["label"] == f"Kosten über {monate} Monate", \
+            )
+            assert karte["label"] == f"Kosten über {monate} Monate", (
                 f"{modell['id']}/{karte['anbieter']}: {karte['label']!r}"
+            )
             assert karte["laufzeit"] == 24
     assert geprueft, "kein belastbares Angebot - der Test prueft nichts"
 
 
 def test_das_delta_nennt_referenztarif_und_datum(bestand):
-    deltas = [k["delta"] for m in bestand["modelle"] for k in m["karten"]
-              if k.get("delta")]
+    deltas = [
+        k["delta"] for m in bestand["modelle"] for k in m["karten"] if k.get("delta")
+    ]
     assert deltas, "kein einziges Delta - der Test prueft nichts"
     for d in deltas:
         assert d["referenz_tarif"] and d["referenz_datum"]
@@ -603,21 +685,27 @@ def test_das_delta_nennt_referenztarif_und_datum(bestand):
         if d["gleiche_laufzeit"]:
             assert d["betrag"] is not None
         else:
-            assert d["betrag"] is None, \
+            assert d["betrag"] is None, (
                 "ueber zwei Bindungsdauern gibt es kein Euro-Delta (A5.4)"
+            )
 
 
 def test_kein_delta_an_der_referenz_selbst(bestand):
     for modell in bestand["modelle"]:
         for karte in modell["karten"]:
             if karte["naeherung"]:
-                assert not karte.get("delta"), \
+                assert not karte.get("delta"), (
                     "die Referenz kann nicht von sich selbst abweichen"
+                )
 
 
 def test_der_effektivpreis_nennt_seinen_barpreis(bestand):
-    mit_eff = [k for m in bestand["modelle"] for k in m["karten"]
-               if k["eff_ohne_geraet"] is not None]
+    mit_eff = [
+        k
+        for m in bestand["modelle"]
+        for k in m["karten"]
+        if k["eff_ohne_geraet"] is not None
+    ]
     assert mit_eff
     for k in mit_eff:
         assert k["eff_basis"]["betrag"] > 0
@@ -631,6 +719,7 @@ def test_der_effektivpreis_nennt_seinen_barpreis(bestand):
 # --------------------------------------------------------------------------
 # G1
 # --------------------------------------------------------------------------
+
 
 def test_g1_entsteht_erst_ab_zwei_zahlen(bestand):
     """C.1: unter zwei Anbietern mit gueltiger TCO gibt es eine Texttafel,
@@ -655,12 +744,16 @@ def test_g1_zeichnet_keine_karte_ohne_zahl(bestand):
     REGEL statt eines festen Modells: ein Modell MIT belastbarer
     Telekom-Karte zeichnet ihren Balken, ein Modell OHNE zeichnet keinen
     (ein Balken der Laenge null mit Namen liest sich als kostenlos)."""
-    mit = [m for m in bestand["modelle"]
-           if any(k["anbieter"] == "Telekom" and k["belastbar"]
-                  for k in m["karten"])]
-    ohne = [m for m in bestand["modelle"]
-            if any(k["anbieter"] == "Telekom" and not k["belastbar"]
-                   for k in m["karten"])]
+    mit = [
+        m
+        for m in bestand["modelle"]
+        if any(k["anbieter"] == "Telekom" and k["belastbar"] for k in m["karten"])
+    ]
+    ohne = [
+        m
+        for m in bestand["modelle"]
+        if any(k["anbieter"] == "Telekom" and not k["belastbar"] for k in m["karten"])
+    ]
     assert mit, "kein Modell mit Telekom-Bündel - der positive Fall fehlt"
     assert ohne, "kein Modell ohne Telekom-Bündel - der negative Fall fehlt"
 
@@ -668,10 +761,12 @@ def test_g1_zeichnet_keine_karte_ohne_zahl(bestand):
     assert "Telekom" in svg, "ein vorhandenes Bündel muss einen Balken haben"
 
     svg = grafik.balken(ohne[0])
-    assert "Telekom" not in svg, \
+    assert "Telekom" not in svg, (
         "ein Balken der Laenge null mit Namen liest sich als kostenlos"
-    assert svg.count('class="gr-g1-betrag"') >= 2, \
+    )
+    assert svg.count('class="gr-g1-betrag"') >= 2, (
         "die Grafik ist leer - der Test prueft nichts"
+    )
 
 
 def test_g1_trennt_die_laufzeiten_mit_eigener_nulllinie():
@@ -684,23 +779,31 @@ def test_g1_trennt_die_laufzeiten_mit_eigener_nulllinie():
     "gerechnet über 24 Monate"). Die Fixture traegt beide Felder wie eine
     echte Karte: `laufzeit` konstant, `leitzahl_monate` je Angebot.
     """
+
     def karte(anbieter, monate, gesamt):
-        return {"anbieter": anbieter, "tarif": f"Tarif {monate}",
-                "belastbar": True, "gesamt": gesamt, "laufzeit": 24,
-                "leitzahl_monate": monate,
-                "naeherung": False, "boni": [],
-                "bestandteile": [{"name": "Tarif", "betrag": gesamt,
-                                  "kategorie": "tarif"}]}
-    modell = {"name": "Testgerät", "referenz": None,
-              "karten": [karte("o2", 36, 1800.0), karte("Telekom", 24, 1200.0)]}
+        return {
+            "anbieter": anbieter,
+            "tarif": f"Tarif {monate}",
+            "belastbar": True,
+            "gesamt": gesamt,
+            "laufzeit": 24,
+            "leitzahl_monate": monate,
+            "naeherung": False,
+            "boni": [],
+            "bestandteile": [{"name": "Tarif", "betrag": gesamt, "kategorie": "tarif"}],
+        }
+
+    modell = {
+        "name": "Testgerät",
+        "referenz": None,
+        "karten": [karte("o2", 36, 1800.0), karte("Telekom", 24, 1200.0)],
+    }
     svg = grafik.balken(modell)
     assert svg.count("gr-g1-null") == 2, "je Laufzeitgruppe eine Nulllinie"
-    assert "gerechnet über 24 Monate" in svg \
-        and "gerechnet über 36 Monate" in svg
+    assert "gerechnet über 24 Monate" in svg and "gerechnet über 36 Monate" in svg
     # Die Ueberschrift der GANZEN Grafik nennt beide Zeitraeume - eine
     # feste 24 ueber einem 36-Monats-Balken war Befund 2.
-    assert 'aria-label="Kosten über 24 und 36 Monate für Testgerät ' \
-        'je Anbieter"' in svg
+    assert 'aria-label="Kosten über 24 und 36 Monate für Testgerät je Anbieter"' in svg
 
 
 def test_g1_gruppiert_am_zeitraum_der_leitzahl_nicht_an_der_tariflaufzeit(bestand):
@@ -733,11 +836,13 @@ def test_g1_gruppiert_am_zeitraum_der_leitzahl_nicht_an_der_tariflaufzeit(bestan
                 assert k["leitzahl_monate"] == monate, (
                     f"{modell['id']}/{k['anbieter']}: Balken ueber "
                     f"{k['leitzahl_monate']} Monate in der Gruppe "
-                    f"{monate}")
+                    f"{monate}"
+                )
     assert geprueft, "keine G1-Gruppe im Bestand - der Test prueft nichts"
     assert gruppen_mit_36, (
         "keine Gruppe mit abweichendem Zeitraum im Bestand - die "
-        "Trennung waere gruen ohne Fall (Datenlage ansehen)")
+        "Trennung waere gruen ohne Fall (Datenlage ansehen)"
+    )
 
 
 def test_g1_nennt_in_ueberschrift_und_gruppenkopf_den_echten_zeitraum(bestand):
@@ -752,18 +857,26 @@ def test_g1_nennt_in_ueberschrift_und_gruppenkopf_den_echten_zeitraum(bestand):
             continue
         # Die Zeitraeume, die die BALKEN tragen - aus den Karten, nicht
         # aus der Gruppierung (die ist der Prueflaufgegenstand).
-        monate = sorted({k["leitzahl_monate"] for k in modell["karten"]
-                         if k["belastbar"] and k["gesamt"] is not None
-                         and k["leitzahl_monate"] is not None})
+        monate = sorted(
+            {
+                k["leitzahl_monate"]
+                for k in modell["karten"]
+                if k["belastbar"]
+                and k["gesamt"] is not None
+                and k["leitzahl_monate"] is not None
+            }
+        )
         geprueft += 1
         label = re.search(r'aria-label="([^"]+)"', svg).group(1)
         for m in monate:
-            assert f"gerechnet über {m} Monate" in svg, \
+            assert f"gerechnet über {m} Monate" in svg, (
                 f"{modell['id']}: Gruppenkopf fuer {m} Monate fehlt"
+            )
             assert str(m) in label, f"{modell['id']}: {label!r} ohne {m}"
         wort = " und ".join(str(m) for m in monate)
-        assert label == (f"Kosten über {wort} Monate für "
-                         f"{modell.get('name') or ''} je Anbieter"), label
+        assert label == (
+            f"Kosten über {wort} Monate für {modell.get('name') or ''} je Anbieter"
+        ), label
     assert geprueft, "kein Modell mit G1-Grafik - der Test prueft nichts"
 
 
@@ -813,26 +926,32 @@ def test_die_balkenlaenge_entspricht_dem_betrag(bestand):
     # ihrem eigenen Etikett lesen (steht 18 px unter dem Reihenanfang).
     breite_je_y: dict[float, float] = {}
     for treffer in re.finditer(
-            r'<rect class="gr-g1-seg[^"]*"[^>]*y="([\d.]+)"[^>]*'
-            r'width="([\d.]+)"', svg):
+        r'<rect class="gr-g1-seg[^"]*"[^>]*y="([\d.]+)"[^>]*'
+        r'width="([\d.]+)"',
+        svg,
+    ):
         y = float(treffer.group(1))
         breite_je_y[y] = breite_je_y.get(y, 0.0) + float(treffer.group(2))
     betraege_je_y = {
-        float(t.group(1)): float(t.group(2).replace(".", "")
-                                 .replace(",", "."))
+        float(t.group(1)): float(t.group(2).replace(".", "").replace(",", "."))
         for t in re.finditer(
-            r'<text class="gr-g1-betrag"[^>]*y="([\d.]+)">([\d.,]+) €', svg)}
+            r'<text class="gr-g1-betrag"[^>]*y="([\d.]+)">([\d.,]+) €', svg
+        )
+    }
 
     verhaeltnisse = []
     for y, breite in breite_je_y.items():
-        betrag = next((b for ky, b in betraege_je_y.items()
-                       if 10 <= ky - y <= 25), None)
+        betrag = next(
+            (b for ky, b in betraege_je_y.items() if 10 <= ky - y <= 25), None
+        )
         if betrag:
             verhaeltnisse.append(breite / betrag)
-    assert len(verhaeltnisse) >= 2, \
+    assert len(verhaeltnisse) >= 2, (
         f"eine Gruppe braucht zwei Balken: {breite_je_y} / {betraege_je_y}"
-    assert max(verhaeltnisse) - min(verhaeltnisse) < 0.002, \
+    )
+    assert max(verhaeltnisse) - min(verhaeltnisse) < 0.002, (
         f"die Balken folgen nicht einem Massstab: {verhaeltnisse}"
+    )
 
 
 def test_die_grafik_rechnet_keine_eigene_zahl(bestand):
@@ -847,21 +966,45 @@ def test_die_grafik_rechnet_keine_eigene_zahl(bestand):
 def test_ein_bonus_verkuerzt_den_balken_statt_ihn_zu_verlaengern():
     """Der Bonus ist ein NEGATIVES Segment (C.1). Am Balkenende steht die
     Leitzahl, nicht die Summe vor Abzug."""
+
     def karte(name, gesamt, boni):
-        posten = [{"name": "Tarif", "betrag": gesamt + sum(
-            b["betrag"] for b in boni), "kategorie": "tarif"}]
-        posten += [{"name": f"Bonus · {b['name']}", "betrag": -b["betrag"],
-                    "kategorie": "bonus"} for b in boni]
+        posten = [
+            {
+                "name": "Tarif",
+                "betrag": gesamt + sum(b["betrag"] for b in boni),
+                "kategorie": "tarif",
+            }
+        ]
+        posten += [
+            {
+                "name": f"Bonus · {b['name']}",
+                "betrag": -b["betrag"],
+                "kategorie": "bonus",
+            }
+            for b in boni
+        ]
         # `leitzahl_monate` wie auf einer echten Karte (P0-B-h1) - die
         # Grafik gruppiert daran (P0-B-h3).
-        return {"anbieter": name, "tarif": "T", "belastbar": True,
-                "gesamt": gesamt, "laufzeit": 24, "leitzahl_monate": 24,
-                "naeherung": False,
-                "boni": boni, "bestandteile": posten}
-    modell = {"name": "X", "referenz": None,
-              "karten": [karte("o2", 950.0, [{"name": "Wechselbonus",
-                                              "betrag": 50.0}]),
-                         karte("1&1", 1000.0, [])]}
+        return {
+            "anbieter": name,
+            "tarif": "T",
+            "belastbar": True,
+            "gesamt": gesamt,
+            "laufzeit": 24,
+            "leitzahl_monate": 24,
+            "naeherung": False,
+            "boni": boni,
+            "bestandteile": posten,
+        }
+
+    modell = {
+        "name": "X",
+        "referenz": None,
+        "karten": [
+            karte("o2", 950.0, [{"name": "Wechselbonus", "betrag": 50.0}]),
+            karte("1&1", 1000.0, []),
+        ],
+    }
     svg = grafik.balken(modell)
     assert "gr-g1-bonus" in svg
     assert grafik.euro(950.0) in svg
@@ -876,15 +1019,26 @@ def test_ein_bonus_verkuerzt_den_balken_statt_ihn_zu_verlaengern():
 
 def test_die_anbieterfarbe_traegt_denselben_slug_ueberall(bestand):
     """C.3: eine Anbieterfarbe, konsistent ueber alle Grafiken und Karten."""
-    karte = [k for k in _modell(bestand, "apple-iphone-17-pro-256")["karten"]
-             if k["anbieter"] == "1&1"][0]
+    karte = [
+        k
+        for k in _modell(bestand, "apple-iphone-17-pro-256")["karten"]
+        if k["anbieter"] == "1&1"
+    ][0]
     assert karte["slug"] == grafik.anbieter_slug("1&1") == "1-1"
     # Bis P2 lief der Graph-Beleg ueber die G2-Historie; seit ihrem Fall
     # ueber die Zeitreihe (G0) - dieselbe Slug-Klasse am Linien-Pfad.
     # (Reihen-Form wie `geraete_verlauf._reihen`: anbieter, farbe, punkte.)
-    reihen = [{"anbieter": "1&1", "farbe": "#00589e", "eigen": False,
-               "punkte": [{"datum": "2026-08-29", "preis": 500.0},
-                          {"datum": "2026-09-03", "preis": 450.0}]}]
+    reihen = [
+        {
+            "anbieter": "1&1",
+            "farbe": "#00589e",
+            "eigen": False,
+            "punkte": [
+                {"datum": "2026-08-29", "preis": 500.0},
+                {"datum": "2026-09-03", "preis": 450.0},
+            ],
+        }
+    ]
     assert "gr-anb--1-1" in grafik.zeitreihe(reihen)["svg"]
 
 
@@ -896,14 +1050,20 @@ _SKU_OHNE_LISTUNG = "apple-iphone-16-pro-max-256gb-titan-weiss"
 
 
 def _buendel_ohne_listung(sku=_SKU_OHNE_LISTUNG, anbieter="o2"):
-    b = Buendel(sku_id=sku, anbieter=anbieter,
-                tarif_name="O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)",
-                tarif_id="o2:o2-mobile-on-demand-m", tarif_monatlich=14.99,
-                geraet_zuzahlung=1.0, geraet_monatsrate=42.0,
-                laufzeit_monate=36, anschlusspreis=39.99,
-                quelle_url="https://www.o2online.de/e-shop/apple/"
-                           "apple-iphone-16-pro-max-256gb-titan-weiss-details",
-                abgerufen_am="2026-09-04")
+    b = Buendel(
+        sku_id=sku,
+        anbieter=anbieter,
+        tarif_name="O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)",
+        tarif_id="o2:o2-mobile-on-demand-m",
+        tarif_monatlich=14.99,
+        geraet_zuzahlung=1.0,
+        geraet_monatsrate=42.0,
+        laufzeit_monate=36,
+        anschlusspreis=39.99,
+        quelle_url="https://www.o2online.de/e-shop/apple/"
+        "apple-iphone-16-pro-max-256gb-titan-weiss-details",
+        abgerufen_am="2026-09-04",
+    )
     b.tarif_bindung_monate = 24
     return b
 
@@ -916,17 +1076,27 @@ def test_geraet_aus_sku_loest_ueber_den_katalog():
     katalog = lade_katalog(WURZEL)
     f = karten.geraet_aus_sku
     assert f(_SKU_OHNE_LISTUNG, katalog) == ("apple-iphone-16-pro-max", 256)
-    assert f("apple-iphone-16-pro-256gb-titan-weiss", katalog) == \
-        ("apple-iphone-16-pro", 256)
-    assert f("google-pixel-10-pro-fold-256gb-obsidian", katalog) == \
-        ("google-pixel-10-pro-fold", 256)
-    assert f("google-pixel-10-pro-256gb-obsidian", katalog) == \
-        ("google-pixel-10-pro", 256)
+    assert f("apple-iphone-16-pro-256gb-titan-weiss", katalog) == (
+        "apple-iphone-16-pro",
+        256,
+    )
+    assert f("google-pixel-10-pro-fold-256gb-obsidian", katalog) == (
+        "google-pixel-10-pro-fold",
+        256,
+    )
+    assert f("google-pixel-10-pro-256gb-obsidian", katalog) == (
+        "google-pixel-10-pro",
+        256,
+    )
     assert f("apple-iphone-16e-128gb-weiss", katalog) == ("apple-iphone-16e", 128)
-    assert f("apple-iphone-16-128gb-space-grau-refurbished", katalog) == \
-        ("apple-iphone-16", 128)
-    assert f("apple-iphone-16-ohne-speicher-schwarz", katalog) == \
-        ("apple-iphone-16", None)
+    assert f("apple-iphone-16-128gb-space-grau-refurbished", katalog) == (
+        "apple-iphone-16",
+        128,
+    )
+    assert f("apple-iphone-16-ohne-speicher-schwarz", katalog) == (
+        "apple-iphone-16",
+        None,
+    )
     # Kein Treffer: fremde ID, oder eine Katalog-ID ohne Speichersegment.
     assert f("fremdmarke-modell-128gb-rot", katalog) == ("", None)
     assert f("apple-iphone-16-pro-max-titan-weiss", katalog) == ("", None)
@@ -937,8 +1107,9 @@ def test_ein_buendel_ohne_listung_steht_unter_seinem_katalognamen():
     """QA-Befund F-R2-3: das o2-Buendel zum iPhone 16 Pro Max 256 GB hat
     keine Listung im Geraetebestand und stand als Modell "ohne-geraet" im
     Auswahlfeld, als Ueberschrift und als `data-modell`."""
-    ergebnis = karten.modelle([_buendel_ohne_listung()], [], [], {},
-                              lade_katalog(WURZEL))
+    ergebnis = karten.modelle(
+        [_buendel_ohne_listung()], [], [], {}, lade_katalog(WURZEL)
+    )
     assert ergebnis["ohne_zuordnung"] == []
     assert [m["id"] for m in ergebnis["modelle"]] == ["apple-iphone-16-pro-max-256"]
     modell = ergebnis["modelle"][0]
@@ -953,8 +1124,13 @@ def test_ein_buendel_ohne_listung_steht_unter_seinem_katalognamen():
 def test_ein_buendel_ohne_katalogtreffer_faellt_benannt_heraus():
     """Weder Listung noch Katalog: kein Modell, sondern eine Zeile mit SKU,
     Anbieter und Grund - kein Slug als Geraetename."""
-    ergebnis = karten.modelle([_buendel_ohne_listung("fremdmarke-modell-128gb-rot")],
-                              [], [], {}, lade_katalog(WURZEL))
+    ergebnis = karten.modelle(
+        [_buendel_ohne_listung("fremdmarke-modell-128gb-rot")],
+        [],
+        [],
+        {},
+        lade_katalog(WURZEL),
+    )
     assert ergebnis["modelle"] == [] and ergebnis["gesamt"] == 0
     assert len(ergebnis["ohne_zuordnung"]) == 1
     offen = ergebnis["ohne_zuordnung"][0]
@@ -973,7 +1149,9 @@ def test_kein_slug_als_geraetename_am_echten_bestand(bestand):
         assert m["hersteller"], m["id"]
     for offen in bestand["ohne_zuordnung"]:
         assert offen["grund"] and offen["sku_id"] and offen["anbieter"]
-    treffer = [m for m in bestand["modelle"] if m["id"] == "apple-iphone-16-pro-max-256"]
+    treffer = [
+        m for m in bestand["modelle"] if m["id"] == "apple-iphone-16-pro-max-256"
+    ]
     assert treffer, "das o2-Buendel ohne Listung fehlt als Modell"
     assert treffer[0]["titel"] == "Apple iPhone 16 Pro Max 256 GB"
 
@@ -1004,11 +1182,16 @@ def test_die_referenz_des_iphone_17_ist_die_aktuelle_messung(bestand):
     # wandert mit dem Bot-Stand mit; der 20.09. waere beim naechsten
     # Stand rot gewesen.
     assert ref["tarif_abgerufen_am"] == max(
-        k["abgerufen_am"] for k in modell["karten"]
-        if k["anbieter"] == "Vodafone" and k.get("abgerufen_am"))
+        k["abgerufen_am"]
+        for k in modell["karten"]
+        if k["anbieter"] == "Vodafone" and k.get("abgerufen_am")
+    )
 
-    xs = [k for k in modell["karten"]
-          if k["anbieter"] == "Vodafone" and k["tarif"] == "Mobil XS"]
+    xs = [
+        k
+        for k in modell["karten"]
+        if k["anbieter"] == "Vodafone" and k["tarif"] == "Mobil XS"
+    ]
     assert len(xs) == 1, "vier Farben, ein Slot: eine Karte"
     assert xs[0]["gesamt"] == 1847.8
     # Die Karte des Slots traegt dieselbe Messung wie das Blatt des
@@ -1016,12 +1199,18 @@ def test_die_referenz_des_iphone_17_ist_die_aktuelle_messung(bestand):
     assert xs[0]["abgerufen_am"] == ref["tarif_abgerufen_am"]
     # Gegenprobe 1: die Geist-Messung vom 06.09. verdraengt KEIN aktuelles
     # Angebot mehr (ihre Zahl taucht auf keiner Vodafone-Karte des Modells).
-    assert all(k.get("abgerufen_am") != "2026-09-06"
-               for k in modell["karten"] if k["anbieter"] == "Vodafone")
+    assert all(
+        k.get("abgerufen_am") != "2026-09-06"
+        for k in modell["karten"]
+        if k["anbieter"] == "Vodafone"
+    )
     # Gegenprobe 2: die Referenz ist die guenstigste EIGENE Karte - das
     # Blatt des Modells sagt dasselbe wie die Karten darunter.
-    eigene = [k["gesamt"] for k in modell["karten"]
-              if k["anbieter"] == "Vodafone" and k["belastbar"]]
+    eigene = [
+        k["gesamt"]
+        for k in modell["karten"]
+        if k["anbieter"] == "Vodafone" and k["belastbar"]
+    ]
     assert ref["gesamt"] == min(eigene)
 
 
@@ -1034,42 +1223,75 @@ def test_ein_eigenes_buendel_verdraengt_die_naeherung():
     Vodafone-Karten nebeneinander, und der Leser muesste raten, welche
     "unser Preis" ist.
     """
-    buendel = [Buendel(sku_id="sku-1", anbieter="Vodafone",
-                       tarif_name="Vodafone Mobil M", tarif_id="vf:m",
-                       tarif_monatlich=49.95, tarif_bindung_monate=24,
-                       geraet_zuzahlung=1.0, geraet_monatsrate=20.0,
-                       laufzeit_monate=24, anschlusspreis=39.99,
-                       quelle_url="https://vodafone.invalid/x"),
-               Buendel(sku_id="sku-1", anbieter="o2", tarif_name="O2 L",
-                       tarif_id="o2:l", tarif_monatlich=24.99,
-                       tarif_bindung_monate=24, geraet_zuzahlung=1.0,
-                       geraet_monatsrate=25.0, laufzeit_monate=24,
-                       anschlusspreis=0.0,
-                       quelle_url="https://o2.invalid/x")]
-    listungen = [{"id": "vodafone--sku-1", "sku_id": "sku-1",
-                  "device_id": "apple-iphone-17-pro", "anbieter": "Vodafone",
-                  "speicher_gb": 256, "zustand": "neu", "status": "aktiv",
-                  "preis_ohne_vertrag": 1199.90,
-                  "quelle_url": "https://vodafone.invalid/p",
-                  "abgerufen_am": "2026-09-04"},
-                 # Seit dem 04.09.2026 (B1) gilt ein Buendel ohne belegten
-                 # Zustand als "unbekannt" und steht ausserhalb des
-                 # Vergleichs - ein Delta bekommt nur ein belegtes
-                 # Neugeraet. Die o2-Listung derselben SKU belegt ihn.
-                 {"id": "o2--sku-1", "sku_id": "sku-1",
-                  "device_id": "apple-iphone-17-pro", "anbieter": "o2",
-                  "speicher_gb": 256, "zustand": "neu", "status": "aktiv",
-                  "preis_ohne_vertrag": 1149.00,
-                  "quelle_url": "https://o2.invalid/p",
-                  "abgerufen_am": "2026-09-04"}]
-    referenzen = [SimOnlyReferenz(anbieter="Vodafone",
-                                  tarif_name="Vodafone Mobil XS",
-                                  tarif_id="vf:xs",
-                                  tarif_sim_only_monatlich=29.95,
-                                  quelle_url="https://vodafone.invalid/pib",
-                                  abgerufen_am="2026-09-04")]
-    ergebnis = karten.modelle(buendel, listungen, referenzen, {},
-                              lade_katalog(WURZEL))
+    buendel = [
+        Buendel(
+            sku_id="sku-1",
+            anbieter="Vodafone",
+            tarif_name="Vodafone Mobil M",
+            tarif_id="vf:m",
+            tarif_monatlich=49.95,
+            tarif_bindung_monate=24,
+            geraet_zuzahlung=1.0,
+            geraet_monatsrate=20.0,
+            laufzeit_monate=24,
+            anschlusspreis=39.99,
+            quelle_url="https://vodafone.invalid/x",
+        ),
+        Buendel(
+            sku_id="sku-1",
+            anbieter="o2",
+            tarif_name="O2 L",
+            tarif_id="o2:l",
+            tarif_monatlich=24.99,
+            tarif_bindung_monate=24,
+            geraet_zuzahlung=1.0,
+            geraet_monatsrate=25.0,
+            laufzeit_monate=24,
+            anschlusspreis=0.0,
+            quelle_url="https://o2.invalid/x",
+        ),
+    ]
+    listungen = [
+        {
+            "id": "vodafone--sku-1",
+            "sku_id": "sku-1",
+            "device_id": "apple-iphone-17-pro",
+            "anbieter": "Vodafone",
+            "speicher_gb": 256,
+            "zustand": "neu",
+            "status": "aktiv",
+            "preis_ohne_vertrag": 1199.90,
+            "quelle_url": "https://vodafone.invalid/p",
+            "abgerufen_am": "2026-09-04",
+        },
+        # Seit dem 04.09.2026 (B1) gilt ein Buendel ohne belegten
+        # Zustand als "unbekannt" und steht ausserhalb des
+        # Vergleichs - ein Delta bekommt nur ein belegtes
+        # Neugeraet. Die o2-Listung derselben SKU belegt ihn.
+        {
+            "id": "o2--sku-1",
+            "sku_id": "sku-1",
+            "device_id": "apple-iphone-17-pro",
+            "anbieter": "o2",
+            "speicher_gb": 256,
+            "zustand": "neu",
+            "status": "aktiv",
+            "preis_ohne_vertrag": 1149.00,
+            "quelle_url": "https://o2.invalid/p",
+            "abgerufen_am": "2026-09-04",
+        },
+    ]
+    referenzen = [
+        SimOnlyReferenz(
+            anbieter="Vodafone",
+            tarif_name="Vodafone Mobil XS",
+            tarif_id="vf:xs",
+            tarif_sim_only_monatlich=29.95,
+            quelle_url="https://vodafone.invalid/pib",
+            abgerufen_am="2026-09-04",
+        )
+    ]
+    ergebnis = karten.modelle(buendel, listungen, referenzen, {}, lade_katalog(WURZEL))
     modell = ergebnis["modelle"][0]
     vodafone = [k for k in modell["karten"] if k["anbieter"] == "Vodafone"]
     assert len(vodafone) == 1, "Vodafone steht je Modell genau einmal"

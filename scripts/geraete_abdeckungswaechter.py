@@ -8,6 +8,7 @@ GitHub Actions zusätzlich in die Job-Zusammenfassung) und endet mit
 Rückgabecode 1, sobald es einen Befund gibt. Rechnet nichts selbst, das
 macht `analyze/buendel_abdeckung.py`.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -36,7 +37,8 @@ def main(argv=None) -> int:
 
     ergebnis = lade_und_pruefe(root)
     text = als_markdown(
-        ergebnis, lade_pflicht(root / "config" / "geraete_abdeckung.yaml"))
+        ergebnis, lade_pflicht(root / "config" / "geraete_abdeckung.yaml")
+    )
     if args.bericht:
         Path(args.bericht).write_text(text, encoding="utf-8")
     else:

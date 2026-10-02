@@ -24,6 +24,7 @@ Drei weitere Punkte desselben Auftrags, an derselben Fixture:
     zur Leitzahl, und die Restschuld trägt ein eigenes (schraffiertes)
     Segment.
 """
+
 from __future__ import annotations
 
 import json
@@ -36,7 +37,14 @@ from bs4 import BeautifulSoup
 
 from telco_radar.report.html import render_site
 
-from test_geraete_browser_fixture import HEUTE, _KATALOG, _FARBEN, _QUELLEN, _listung, _sku
+from test_geraete_browser_fixture import (
+    HEUTE,
+    _KATALOG,
+    _FARBEN,
+    _QUELLEN,
+    _listung,
+    _sku,
+)
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 DEVICE = "apple-iphone-17-pro"
@@ -53,14 +61,24 @@ SOLL_RESTSCHULD = {24: 0.0, 36: 366.00}
 def _congstar_buendel(laufzeit: int) -> dict:
     return {
         "id": f"buendel--congstar--{_sku(DEVICE, 256)}--cs-xs--{laufzeit}",
-        "sku_id": _sku(DEVICE, 256), "anbieter": "congstar",
-        "tarif_name": "Allnet Flat XS", "tarif_id": "cs:xs",
-        "tarif_id_guete": "hoch", "tarif_monatlich": TARIF_MONATLICH,
-        "tarif_bindung_monate": 24, "geraet_zuzahlung": ZUZAHLUNG,
-        "geraet_monatsrate": RATEN[laufzeit], "laufzeit_monate": laufzeit,
-        "anschlusspreis": 0.0, "zustand": "neu", "rabatte": [],
+        "sku_id": _sku(DEVICE, 256),
+        "anbieter": "congstar",
+        "tarif_name": "Allnet Flat XS",
+        "tarif_id": "cs:xs",
+        "tarif_id_guete": "hoch",
+        "tarif_monatlich": TARIF_MONATLICH,
+        "tarif_bindung_monate": 24,
+        "geraet_zuzahlung": ZUZAHLUNG,
+        "geraet_monatsrate": RATEN[laufzeit],
+        "laufzeit_monate": laufzeit,
+        "anschlusspreis": 0.0,
+        "zustand": "neu",
+        "rabatte": [],
         "quelle_url": "https://example.de/congstar/17pro",
-        "abgerufen_am": HEUTE, "first_seen": HEUTE, "last_verified": HEUTE}
+        "abgerufen_am": HEUTE,
+        "first_seen": HEUTE,
+        "last_verified": HEUTE,
+    }
 
 
 def _vodafone_buendel() -> dict:
@@ -69,21 +87,30 @@ def _vodafone_buendel() -> dict:
     # greift und ein echtes Δ entsteht.
     return {
         "id": f"buendel--vodafone--{_sku(DEVICE, 256)}--vf-xs--24",
-        "sku_id": _sku(DEVICE, 256), "anbieter": "Vodafone",
-        "tarif_name": "Vodafone Mobil XS", "tarif_id": "vf:xs",
-        "tarif_id_guete": "hoch", "tarif_monatlich": 26.0,
-        "tarif_bindung_monate": 24, "geraet_zuzahlung": 1.0,
-        "geraet_monatsrate": 54.0, "laufzeit_monate": 24,
-        "anschlusspreis": 0.0, "zustand": "neu", "rabatte": [],
+        "sku_id": _sku(DEVICE, 256),
+        "anbieter": "Vodafone",
+        "tarif_name": "Vodafone Mobil XS",
+        "tarif_id": "vf:xs",
+        "tarif_id_guete": "hoch",
+        "tarif_monatlich": 26.0,
+        "tarif_bindung_monate": 24,
+        "geraet_zuzahlung": 1.0,
+        "geraet_monatsrate": 54.0,
+        "laufzeit_monate": 24,
+        "anschlusspreis": 0.0,
+        "zustand": "neu",
+        "rabatte": [],
         "quelle_url": "https://example.de/vodafone/17pro",
-        "abgerufen_am": HEUTE, "first_seen": HEUTE, "last_verified": HEUTE}
+        "abgerufen_am": HEUTE,
+        "first_seen": HEUTE,
+        "last_verified": HEUTE,
+    }
 
 
 def _bestand() -> dict:
     """Bündel + Vodafone-Barpreis, roh (wie `geraete_tco.json`/`geraete_db.json`)."""
     return {
-        "buendel": [_congstar_buendel(24), _congstar_buendel(36),
-                   _vodafone_buendel()],
+        "buendel": [_congstar_buendel(24), _congstar_buendel(36), _vodafone_buendel()],
         "listung": _listung("Vodafone", DEVICE, 256, 1199.90),
     }
 
@@ -91,30 +118,49 @@ def _bestand() -> dict:
 def _baue(tmp_path: pathlib.Path, bestand: dict) -> pathlib.Path:
     root = tmp_path / "site_baum"
     (root / "config").mkdir(parents=True)
-    for name, daten in (("geraete_katalog.yaml", _KATALOG),
-                        ("farben.yaml", _FARBEN),
-                        ("geraete_quellen.yaml", _QUELLEN)):
+    for name, daten in (
+        ("geraete_katalog.yaml", _KATALOG),
+        ("farben.yaml", _FARBEN),
+        ("geraete_quellen.yaml", _QUELLEN),
+    ):
         (root / "config" / name).write_text(
-            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
-            encoding="utf-8")
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False), encoding="utf-8"
+        )
     state = root / "data" / "state"
     state.mkdir(parents=True)
-    (state / "geraete_db.json").write_text(json.dumps({
-        "updated": HEUTE,
-        "anbieter": {n: {"laeufe": 4, "funde_gesamt": 1}
-                     for n in ("Vodafone", "congstar")},
-        "listungen": [bestand["listung"]]}), encoding="utf-8")
+    (state / "geraete_db.json").write_text(
+        json.dumps(
+            {
+                "updated": HEUTE,
+                "anbieter": {
+                    n: {"laeufe": 4, "funde_gesamt": 1}
+                    for n in ("Vodafone", "congstar")
+                },
+                "listungen": [bestand["listung"]],
+            }
+        ),
+        encoding="utf-8",
+    )
     (state / "geraete_preise.jsonl").write_text("", encoding="utf-8")
-    (state / "geraete_tco.json").write_text(json.dumps({
-        "updated": HEUTE, "buendel": bestand["buendel"], "sim_only": []}),
-        encoding="utf-8")
+    (state / "geraete_tco.json").write_text(
+        json.dumps({"updated": HEUTE, "buendel": bestand["buendel"], "sim_only": []}),
+        encoding="utf-8",
+    )
     (state / "tarife.jsonl").write_text("", encoding="utf-8")
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
-    (reports / f"{HEUTE}.json").write_text(json.dumps({
-        "date": HEUTE, "language": "de",
-        "briefing_md": "## Auf einen Blick\n\n- Nichts Besonderes.\n",
-        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{HEUTE}.json").write_text(
+        json.dumps(
+            {
+                "date": HEUTE,
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- Nichts Besonderes.\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     (reports / f"{HEUTE}.md").write_text("# Bericht\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
@@ -128,7 +174,9 @@ def site(tmp_path_factory):
 
 _ZEILE_RE = re.compile(
     r'(<details class="gr-bnd[^"]*"[^>]*data-anbieter="congstar"[^>]*>)'
-    r'(.*?)</details>', re.S)
+    r"(.*?)</details>",
+    re.S,
+)
 
 
 def _congstar_zeilen(html: str) -> dict:
@@ -166,7 +214,8 @@ def test_lookup_greift(site):
     html = (site / "geraete.html").read_text(encoding="utf-8")
     zeilen = _congstar_zeilen(html)
     assert set(zeilen) == {24, 36}, (
-        f"gefunden: {sorted(zeilen)} - erwartet beide Zahlweisen 24 und 36")
+        f"gefunden: {sorted(zeilen)} - erwartet beide Zahlweisen 24 und 36"
+    )
 
 
 def test_punkt1_zeilen_sind_zugeklappt_unterscheidbar(site):
@@ -181,21 +230,29 @@ def test_punkt1_zeilen_sind_zugeklappt_unterscheidbar(site):
 
     assert text24 != text36, (
         "beide Zahlweisen sind zugeklappt weiterhin wortgleich:\n"
-        f"  24 Raten: {text24!r}\n  36 Raten: {text36!r}")
+        f"  24 Raten: {text24!r}\n  36 Raten: {text36!r}"
+    )
     assert "24 Raten" in text24 and "36 Raten" not in text24
     assert "36 Raten" in text36 and "24 Raten" not in text36
     assert "Restschuld 366,00 €" in text36, (
-        f"36-Raten-Zeile nennt die Restschuld nicht: {text36!r}")
+        f"36-Raten-Zeile nennt die Restschuld nicht: {text36!r}"
+    )
     assert "Restschuld" not in text24, (
-        f"24-Raten-Zeile (0 EUR Restschuld) nennt trotzdem eine "
-        f"Restschuld: {text24!r}")
+        f"24-Raten-Zeile (0 EUR Restschuld) nennt trotzdem eine Restschuld: {text24!r}"
+    )
     # Gegenprobe: beide Leitzahlen bleiben gleich (congstar finanziert
     # zum Nulltarif) - der Unterschied ist NUR die Ratenzahl/Restschuld,
     # nicht ein zweiter, unbeabsichtigter Textdrift.
-    assert f"{SOLL_GESAMT:,.2f}".replace(",", "#").replace(".", ",").replace(
-        "#", ".") + " €" in text24
-    assert f"{SOLL_GESAMT:,.2f}".replace(",", "#").replace(".", ",").replace(
-        "#", ".") + " €" in text36
+    assert (
+        f"{SOLL_GESAMT:,.2f}".replace(",", "#").replace(".", ",").replace("#", ".")
+        + " €"
+        in text24
+    )
+    assert (
+        f"{SOLL_GESAMT:,.2f}".replace(",", "#").replace(".", ",").replace("#", ".")
+        + " €"
+        in text36
+    )
 
 
 def _congstar_xs_summarys(html: str) -> list:
@@ -205,8 +262,11 @@ def _congstar_xs_summarys(html: str) -> list:
     Funktion zwei textlich IDENTISCHE Eintraege."""
     texte = []
     for m in re.finditer(
-            r'<details class="gr-bnd[^"]*"[^>]*data-anbieter="congstar"'
-            r'[^>]*>(.*?)</details>', html, re.S):
+        r'<details class="gr-bnd[^"]*"[^>]*data-anbieter="congstar"'
+        r"[^>]*>(.*?)</details>",
+        html,
+        re.S,
+    ):
         block = m.group(0)
         if "Allnet Flat XS" not in block or "Flex" in block:
             continue
@@ -241,15 +301,13 @@ def test_punkt1_rot_gegen_den_alten_stand(tmp_path, monkeypatch):
     for datei in live.iterdir():
         if datei.is_file():
             (alt_dir / datei.name).write_bytes(datei.read_bytes())
-    (alt_dir / "_geraete_buendel.html.j2").write_bytes(
-        _ALTE_VORLAGE.read_bytes())
+    (alt_dir / "_geraete_buendel.html.j2").write_bytes(_ALTE_VORLAGE.read_bytes())
     monkeypatch.setattr(html_mod, "_TEMPLATES", alt_dir)
 
     alt_site = _baue(tmp_path / "alt", _bestand())
     html = (alt_site / "geraete.html").read_text(encoding="utf-8")
     texte = _congstar_xs_summarys(html)
-    assert len(texte) == 2, (
-        f"Fixture greift auch gegen den alten Stand nicht: {texte}")
+    assert len(texte) == 2, f"Fixture greift auch gegen den alten Stand nicht: {texte}"
 
     # DIE KERNASSERTION GEGEN DEN ALTEN STAND: dort SIND beide Zeilen
     # zugeklappt wortgleich - das ist der eingefrorene Befund, kein
@@ -258,7 +316,8 @@ def test_punkt1_rot_gegen_den_alten_stand(tmp_path, monkeypatch):
     assert texte[0] == texte[1], (
         "die Fixture (Stand vor D3) ist entgegen der Annahme nicht mehr "
         f"wortgleich - stimmt _ALTE_VORLAGE wirklich mit Commit 58446de "
-        f"überein?\n  Zeile 1: {texte[0]!r}\n  Zeile 2: {texte[1]!r}")
+        f"überein?\n  Zeile 1: {texte[0]!r}\n  Zeile 2: {texte[1]!r}"
+    )
 
 
 def test_punkt2_delta_spalte_traegt_die_feste_zahl(site):
@@ -273,8 +332,9 @@ def test_punkt2_delta_spalte_traegt_die_feste_zahl(site):
     zeilen = _congstar_zeilen(html)
     delta = round(SOLL_GESAMT - (1 + 24 * 26.0 + 24 * 54.0), 2)
     assert delta < 0
-    betrag_text = (f"{abs(delta):,.2f} €"
-                  .replace(",", "#").replace(".", ",").replace("#", "."))
+    betrag_text = (
+        f"{abs(delta):,.2f} €".replace(",", "#").replace(".", ",").replace("#", ".")
+    )
     for n in (24, 36):
         _klassen, _text, block = zeilen[n]
         soup = BeautifulSoup(block, "html.parser")
@@ -282,13 +342,15 @@ def test_punkt2_delta_spalte_traegt_die_feste_zahl(site):
         assert zelle is not None, f"{n} Raten: keine Δ-Spalte im Markup"
         delta_text = zelle.get_text(strip=True)
         assert "≈" not in delta_text, (
-            f"{n} Raten: ein wesentlicher Abstand traegt ein '≈' - "
-            f"{delta_text!r}")
+            f"{n} Raten: ein wesentlicher Abstand traegt ein '≈' - {delta_text!r}"
+        )
         assert betrag_text in delta_text, (
             f"{n} Raten: Δ-Betrag fehlt oder falsch - {delta_text!r}, "
-            f"erwartet {betrag_text!r}")
+            f"erwartet {betrag_text!r}"
+        )
         assert "gr-bnd-delta--wert" in (zelle.get("class") or []), (
-            f"{n} Raten: gr-bnd-delta--wert fehlt an einem echten Δ-Wert")
+            f"{n} Raten: gr-bnd-delta--wert fehlt an einem echten Δ-Wert"
+        )
 
 
 def test_punkt3_anbieterfarbe_steht_an_der_zeile(site):
@@ -308,26 +370,35 @@ def test_punkt3_anbieterfarbe_steht_an_der_zeile(site):
         assert f'style="--anb:{erwartet}"' in opentag, (
             f"{n} Raten: Zeile traegt {opentag!r}, erwartet den "
             f"Custom-Property-Wert {erwartet!r} (sonst bleibt die "
-            "Anbieterfarbe der graue Rueckfall)")
+            "Anbieterfarbe der graue Rueckfall)"
+        )
         # GEGENPROBE (Regel 5 des Orakeltests): das class-Attribut bleibt
         # UNVERAENDERT "gr-bnd" - eine zusaetzliche Klasse haette den
         # Orakeltest zerstoert (`class="gr-bnd"` woertlich gesucht).
         assert re.search(r'class="gr-bnd"', opentag), (
             f"{n} Raten: das class-Attribut ist nicht mehr woertlich "
-            f'"gr-bnd" - der Orakeltest wuerde brechen: {opentag!r}')
+            f'"gr-bnd" - der Orakeltest wuerde brechen: {opentag!r}'
+        )
 
 
 _SEG_RE = re.compile(
     r'<span\s+class="gr-bnd-zerl-seg([^"]*)"\s+style="width:([\d.]+)%"\s+'
-    r'title="([^"]*): ([\d.,]+) €"', re.S)
+    r'title="([^"]*): ([\d.,]+) €"',
+    re.S,
+)
 
 
 def _zerlegung(block: str) -> list:
     out = []
     for klassen, pct, name, betrag in _SEG_RE.findall(block):
-        out.append({"offen": "gr-bnd-zerl-seg--offen" in klassen,
-                    "pct": float(pct), "name": name,
-                    "betrag": float(betrag.replace(".", "").replace(",", "."))})
+        out.append(
+            {
+                "offen": "gr-bnd-zerl-seg--offen" in klassen,
+                "pct": float(pct),
+                "name": name,
+                "betrag": float(betrag.replace(".", "").replace(",", ".")),
+            }
+        )
     return out
 
 
@@ -344,7 +415,8 @@ def test_punkt4_zerlegungsbalken_summiert_exakt_zur_leitzahl(site):
         summe = round(sum(s["betrag"] for s in seg), 2)
         assert summe == pytest.approx(SOLL_GESAMT, abs=0.005), (
             f"{n} Raten: Segmente summieren zu {summe} EUR, "
-            f"Leitzahl ist {SOLL_GESAMT} EUR")
+            f"Leitzahl ist {SOLL_GESAMT} EUR"
+        )
         pct_summe = round(sum(s["pct"] for s in seg), 1)
         assert pct_summe == pytest.approx(100.0, abs=0.2)
 
@@ -359,15 +431,14 @@ def test_punkt4_restschuld_ist_schraffiertes_segment(site):
         offen = [s for s in seg if s["offen"]]
         if SOLL_RESTSCHULD[n]:
             assert len(offen) == 1, (
-                f"{n} Raten: erwartet EIN offenes Segment, gefunden "
-                f"{len(offen)}")
-            assert offen[0]["betrag"] == pytest.approx(
-                SOLL_RESTSCHULD[n], abs=0.005)
+                f"{n} Raten: erwartet EIN offenes Segment, gefunden {len(offen)}"
+            )
+            assert offen[0]["betrag"] == pytest.approx(SOLL_RESTSCHULD[n], abs=0.005)
             assert offen[0]["name"] == "Restschuld nach Monat 24"
         else:
             assert not offen, (
-                f"{n} Raten: eine erfundene Restschuld steht im Balken "
-                f"({offen})")
+                f"{n} Raten: eine erfundene Restschuld steht im Balken ({offen})"
+            )
 
 
 # --------------------------------------------------------------------------
@@ -376,12 +447,14 @@ def test_punkt4_restschuld_ist_schraffiertes_segment(site):
 # nur ein grüner Test, der nichts prüft.
 # --------------------------------------------------------------------------
 
+
 def test_mutationsprobe_punkt1_erkennt_wortgleiche_zeilen():
     """`test_punkt1_...` MUSS scheitern, wenn zwei Texte wortgleich sind
     (die Ur-Form des Befunds) - eine direkte Mutationsprobe der
     Kernassertion, ohne den ganzen Seitenaufbau."""
-    text24 = text36 = ("congstar · Allnet Flat XS · 15 GB · 1.459,00 € · "
-                       "−462,00 € · −24,0 %")
+    text24 = text36 = (
+        "congstar · Allnet Flat XS · 15 GB · 1.459,00 € · −462,00 € · −24,0 %"
+    )
     with pytest.raises(AssertionError):
         assert text24 != text36
 
@@ -395,8 +468,7 @@ def test_mutationsprobe_punkt4_erkennt_falsche_segmentsumme():
     bestandteile = [
         {"name": "Tarif über 24 Monate", "betrag": 360.0, "kategorie": "tarif"},
         {"name": "Gerätezuzahlung", "betrag": 1.0, "kategorie": "einmalig"},
-        {"name": "Geräteraten über 36 Monate", "betrag": 1098.0,
-         "kategorie": "raten"},
+        {"name": "Geräteraten über 36 Monate", "betrag": 1098.0, "kategorie": "raten"},
         {"name": "Anschlusspreis", "betrag": 0.0, "kategorie": "einmalig"},
     ]
     seg = zerlegung_balken(bestandteile, restbetrag=366.0, gesamt=1459.0)
@@ -432,14 +504,24 @@ SOLL_ABSTAND_U = round(SOLL_REFERENZ_GESAMT_U - SOLL_GESAMT_U, 2)  # 8,00 €
 def _congstar_buendel_ungefaehr() -> dict:
     return {
         "id": f"buendel--congstar--{_sku(DEVICE_U, 256)}--cs-xs-u--24",
-        "sku_id": _sku(DEVICE_U, 256), "anbieter": "congstar",
-        "tarif_name": "Allnet Flat XS", "tarif_id": "cs:xs-u",
-        "tarif_id_guete": "hoch", "tarif_monatlich": TARIF_MONATLICH_U,
-        "tarif_bindung_monate": 24, "geraet_zuzahlung": ZUZAHLUNG_U,
-        "geraet_monatsrate": RATE_U, "laufzeit_monate": 24,
-        "anschlusspreis": 0.0, "zustand": "neu", "rabatte": [],
+        "sku_id": _sku(DEVICE_U, 256),
+        "anbieter": "congstar",
+        "tarif_name": "Allnet Flat XS",
+        "tarif_id": "cs:xs-u",
+        "tarif_id_guete": "hoch",
+        "tarif_monatlich": TARIF_MONATLICH_U,
+        "tarif_bindung_monate": 24,
+        "geraet_zuzahlung": ZUZAHLUNG_U,
+        "geraet_monatsrate": RATE_U,
+        "laufzeit_monate": 24,
+        "anschlusspreis": 0.0,
+        "zustand": "neu",
+        "rabatte": [],
         "quelle_url": "https://example.de/congstar/s26",
-        "abgerufen_am": HEUTE, "first_seen": HEUTE, "last_verified": HEUTE}
+        "abgerufen_am": HEUTE,
+        "first_seen": HEUTE,
+        "last_verified": HEUTE,
+    }
 
 
 def _vodafone_buendel_ungefaehr() -> dict:
@@ -449,28 +531,36 @@ def _vodafone_buendel_ungefaehr() -> dict:
     # (< 15 € UND < 3 % von 1.921,00 €).
     return {
         "id": f"buendel--vodafone--{_sku(DEVICE_U, 256)}--vf-xs-u--24",
-        "sku_id": _sku(DEVICE_U, 256), "anbieter": "Vodafone",
-        "tarif_name": "Vodafone Mobil XS", "tarif_id": "vf:xs-u",
-        "tarif_id_guete": "hoch", "tarif_monatlich": 26.0,
-        "tarif_bindung_monate": 24, "geraet_zuzahlung": 1.0,
-        "geraet_monatsrate": 54.0, "laufzeit_monate": 24,
-        "anschlusspreis": 0.0, "zustand": "neu", "rabatte": [],
+        "sku_id": _sku(DEVICE_U, 256),
+        "anbieter": "Vodafone",
+        "tarif_name": "Vodafone Mobil XS",
+        "tarif_id": "vf:xs-u",
+        "tarif_id_guete": "hoch",
+        "tarif_monatlich": 26.0,
+        "tarif_bindung_monate": 24,
+        "geraet_zuzahlung": 1.0,
+        "geraet_monatsrate": 54.0,
+        "laufzeit_monate": 24,
+        "anschlusspreis": 0.0,
+        "zustand": "neu",
+        "rabatte": [],
         "quelle_url": "https://example.de/vodafone/s26",
-        "abgerufen_am": HEUTE, "first_seen": HEUTE, "last_verified": HEUTE}
+        "abgerufen_am": HEUTE,
+        "first_seen": HEUTE,
+        "last_verified": HEUTE,
+    }
 
 
 def _bestand_ungefaehr() -> dict:
     return {
-        "buendel": [_congstar_buendel_ungefaehr(),
-                   _vodafone_buendel_ungefaehr()],
+        "buendel": [_congstar_buendel_ungefaehr(), _vodafone_buendel_ungefaehr()],
         "listung": _listung("Vodafone", DEVICE_U, 256, 999.00),
     }
 
 
 @pytest.fixture(scope="module")
 def site_ungefaehr(tmp_path_factory):
-    return _baue(tmp_path_factory.mktemp("d3s2ungefaehr"),
-                _bestand_ungefaehr())
+    return _baue(tmp_path_factory.mktemp("d3s2ungefaehr"), _bestand_ungefaehr())
 
 
 def test_review_fix_s2_gegenprobe_wesentlich_bleibt_fest():
@@ -483,12 +573,12 @@ def test_review_fix_s2_gegenprobe_wesentlich_bleibt_fest():
 
     assert SOLL_ABSTAND_U == pytest.approx(8.00)
     assert SOLL_ABSTAND_U < geraete_vergleich.WESENTLICH_EURO
-    assert (SOLL_ABSTAND_U / SOLL_REFERENZ_GESAMT_U * 100) \
-        < geraete_vergleich.WESENTLICH_PROZENT
+    assert (
+        SOLL_ABSTAND_U / SOLL_REFERENZ_GESAMT_U * 100
+    ) < geraete_vergleich.WESENTLICH_PROZENT
 
 
-def test_review_fix_s2_delta_spalte_behauptet_keine_fuehrerschaft(
-        site_ungefaehr):
+def test_review_fix_s2_delta_spalte_behauptet_keine_fuehrerschaft(site_ungefaehr):
     """C1 (QA-Fix 24.09.2026): `.gr-bnd-subjekt` ist gefallen - der
     urspruengliche Review-Fix S2 gilt jetzt der Δ-Spalte selbst
     (`.gr-bnd-delta`), der einzigen verbliebenen Stelle des Betrags.
@@ -499,19 +589,24 @@ def test_review_fix_s2_delta_spalte_behauptet_keine_fuehrerschaft(
     html = (site_ungefaehr / "geraete.html").read_text(encoding="utf-8")
     treffer = _ZEILE_RE.findall(html)
     assert len(treffer) == 1, (
-        f"erwartet genau eine congstar-Zeile, gefunden {len(treffer)}")
+        f"erwartet genau eine congstar-Zeile, gefunden {len(treffer)}"
+    )
     block = treffer[0][1]
     soup = BeautifulSoup(block, "html.parser")
     zelle = soup.select_one(".gr-bnd-delta")
     assert zelle is not None, "keine Δ-Spalte im Markup der Annäherungs-Zeile"
     text = zelle.get_text(strip=True)
-    soll_text = f"≈ −{SOLL_ABSTAND_U:,.2f} €".replace(
-        ",", "#").replace(".", ",").replace("#", ".")
+    soll_text = (
+        f"≈ −{SOLL_ABSTAND_U:,.2f} €".replace(",", "#")
+        .replace(".", ",")
+        .replace("#", ".")
+    )
     assert text == soll_text, (
-        f"Δ-Spalte der Annäherungs-Zeile: {text!r}, erwartet {soll_text!r}")
+        f"Δ-Spalte der Annäherungs-Zeile: {text!r}, erwartet {soll_text!r}"
+    )
     assert "gr-bnd-delta--wert" not in (zelle.get("class") or []), (
-        "die Annäherung traegt das Δ-Praefix, obwohl sie kein fester "
-        "Wert ist")
+        "die Annäherung traegt das Δ-Praefix, obwohl sie kein fester Wert ist"
+    )
 
 
 # --------------------------------------------------------------------------
@@ -519,6 +614,7 @@ def test_review_fix_s2_delta_spalte_behauptet_keine_fuehrerschaft(
 # ohne vollen Seitenaufbau - Punkt 1 (Truthiness statt `is not None`) und
 # Punkt 2 (kein 0,00-€-Phantomsegment).
 # --------------------------------------------------------------------------
+
 
 def test_review_fix_s3_1_restbetrag_none_erzeugt_keinen_phantom_split():
     """`restbetrag=None` heisst "nicht bestimmbar" (Clean Code 3) - KEIN
@@ -530,16 +626,16 @@ def test_review_fix_s3_1_restbetrag_none_erzeugt_keinen_phantom_split():
 
     bestandteile = [
         {"name": "Tarif über 24 Monate", "betrag": 360.0, "kategorie": "tarif"},
-        {"name": "Geräteraten über 30 Monate", "betrag": 1000.0,
-         "kategorie": "raten"},
+        {"name": "Geräteraten über 30 Monate", "betrag": 1000.0, "kategorie": "raten"},
     ]
     seg_none = zerlegung_balken(bestandteile, restbetrag=None, gesamt=1360.0)
     assert not any(s["offen"] for s in seg_none), (
-        f"restbetrag=None erzeugt trotzdem ein offenes Segment: {seg_none}")
+        f"restbetrag=None erzeugt trotzdem ein offenes Segment: {seg_none}"
+    )
     assert all(s["kategorie"] != "restschuld" for s in seg_none), (
-        f"restbetrag=None erfindet eine Restschuld: {seg_none}")
-    assert round(sum(s["betrag"] for s in seg_none), 2) \
-        == pytest.approx(1360.0)
+        f"restbetrag=None erfindet eine Restschuld: {seg_none}"
+    )
+    assert round(sum(s["betrag"] for s in seg_none), 2) == pytest.approx(1360.0)
 
     seg_null = zerlegung_balken(bestandteile, restbetrag=0.0, gesamt=1360.0)
     assert not any(s["offen"] for s in seg_null)
@@ -548,7 +644,8 @@ def test_review_fix_s3_1_restbetrag_none_erzeugt_keinen_phantom_split():
     seg_echt = zerlegung_balken(bestandteile, restbetrag=200.0, gesamt=1360.0)
     offen = [s for s in seg_echt if s["offen"]]
     assert len(offen) == 1 and offen[0]["betrag"] == pytest.approx(200.0), (
-        f"eine echte Restschuld splittet nicht mehr: {seg_echt}")
+        f"eine echte Restschuld splittet nicht mehr: {seg_echt}"
+    )
 
 
 def test_review_fix_s3_2_nullbetrag_posten_ohne_balkenteil():
@@ -562,21 +659,20 @@ def test_review_fix_s3_2_nullbetrag_posten_ohne_balkenteil():
         {"name": "Tarif über 24 Monate", "betrag": 360.0, "kategorie": "tarif"},
         {"name": "Gerätezuzahlung", "betrag": 0.0, "kategorie": "einmalig"},
         {"name": "Anschlusspreis", "betrag": 0.0, "kategorie": "einmalig"},
-        {"name": "Geräteraten über 24 Monate", "betrag": 1000.0,
-         "kategorie": "raten"},
+        {"name": "Geräteraten über 24 Monate", "betrag": 1000.0, "kategorie": "raten"},
     ]
     seg = zerlegung_balken(bestandteile, restbetrag=0.0, gesamt=1360.0)
     namen = {s["name"] for s in seg}
     assert "Gerätezuzahlung" not in namen and "Anschlusspreis" not in namen, (
-        f"ein 0,00-€-Posten hat trotzdem ein Segment: {seg}")
-    assert "Tarif über 24 Monate" in namen and \
-        "Geräteraten über 24 Monate" in namen, (
-        f"ein echter Posten fehlt: {seg}")
+        f"ein 0,00-€-Posten hat trotzdem ein Segment: {seg}"
+    )
+    assert "Tarif über 24 Monate" in namen and "Geräteraten über 24 Monate" in namen, (
+        f"ein echter Posten fehlt: {seg}"
+    )
     assert round(sum(s["betrag"] for s in seg), 2) == pytest.approx(1360.0)
 
 
-def test_ausfall_restbetrag_groesser_als_posten_zeichnet_keinen_balken(
-        caplog):
+def test_ausfall_restbetrag_groesser_als_posten_zeichnet_keinen_balken(caplog):
     """S3-Nachtrag (gemessen): eine Restschuld, die groesser ist als der
     Posten, aus dem sie stammt (ein widerspruechlicher Bestand), darf
     NIE ein negatives Balkensegment erzeugen (Clean Code 5) - der alte
@@ -590,18 +686,19 @@ def test_ausfall_restbetrag_groesser_als_posten_zeichnet_keinen_balken(
     from telco_radar.report.geraete_tco_karten import zerlegung_balken
 
     bestandteile = [
-        {"name": "Geräteraten über 36 Monate", "betrag": 400.0,
-         "kategorie": "raten"},
+        {"name": "Geräteraten über 36 Monate", "betrag": 400.0, "kategorie": "raten"},
     ]
     with caplog.at_level("WARNING"):
         seg = zerlegung_balken(bestandteile, restbetrag=500.0, gesamt=400.0)
     assert seg == [], (
-        f"eine Restschuld ueber dem Posten erzeugt trotzdem einen "
-        f"Balken: {seg}")
-    assert any("restbetrag" in r.message and "500" in r.message
-              for r in caplog.records), (
+        f"eine Restschuld ueber dem Posten erzeugt trotzdem einen Balken: {seg}"
+    )
+    assert any(
+        "restbetrag" in r.message and "500" in r.message for r in caplog.records
+    ), (
         "kein Protokolleintrag zum Ausfall - Regel 5 verlangt ein "
-        "Protokoll, kein stilles leeres Ergebnis ohne Spur")
+        "Protokoll, kein stilles leeres Ergebnis ohne Spur"
+    )
 
 
 def test_review_fix_s3_2_voll_offene_raten_ohne_faelliges_nullsegment():
@@ -612,9 +709,10 @@ def test_review_fix_s3_2_voll_offene_raten_ohne_faelliges_nullsegment():
     from telco_radar.report.geraete_tco_karten import zerlegung_balken
 
     seg = zerlegung_balken(
-        [{"name": "Geräteraten über 36 Monate", "betrag": 500.0,
-          "kategorie": "raten"}],
-        restbetrag=500.0, gesamt=500.0)
+        [{"name": "Geräteraten über 36 Monate", "betrag": 500.0, "kategorie": "raten"}],
+        restbetrag=500.0,
+        gesamt=500.0,
+    )
     faellig = [s for s in seg if not s["offen"]]
     assert not faellig, f"ein 0,00-€ 'fälliger' Teil steht im Balken: {seg}"
     offen = [s for s in seg if s["offen"]]

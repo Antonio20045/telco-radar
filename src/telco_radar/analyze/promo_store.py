@@ -31,6 +31,7 @@ individual visible card). Any re-confirmation at any point resets straight
 back to "aktiv" with missed_checks=0 - a single blip never accumulates
 towards retirement. Nothing is ever deleted from the JSON itself.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -58,6 +59,7 @@ class UpsertBilanz(NamedTuple):
     neu: int
     gesehene_ids: set[str]
     bestaetigt: int = 0
+
 
 # Ab diesem Wort-Ueberlappungswert gilt eine neu extrahierte Ueberschrift als
 # dieselbe Aktion wie ein bestehender Eintrag, nur umformuliert - siehe
@@ -154,12 +156,14 @@ class SnapshotStore:
     def save(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.path.write_text(
-            json.dumps(self._by_key, ensure_ascii=False, indent=1),
-            encoding="utf-8")
+            json.dumps(self._by_key, ensure_ascii=False, indent=1), encoding="utf-8"
+        )
 
 
 def entry_id(brand: str, headline: str) -> str:
-    basis = f"{(brand or '').strip().lower()}|{' '.join((headline or '').lower().split())}"
+    basis = (
+        f"{(brand or '').strip().lower()}|{' '.join((headline or '').lower().split())}"
+    )
     return hashlib.sha1(basis.encode("utf-8")).hexdigest()[:16]
 
 
@@ -175,7 +179,9 @@ class PromoDB:
                 raw = json.loads(self.path.read_text(encoding="utf-8"))
                 self.updated = raw.get("updated")
                 for e in raw.get("entries", []):
-                    eid = e.get("id") or entry_id(e.get("brand", ""), e.get("headline", ""))
+                    eid = e.get("id") or entry_id(
+                        e.get("brand", ""), e.get("headline", "")
+                    )
                     if eid:
                         self.entries[eid] = e
             except (json.JSONDecodeError, OSError):
@@ -204,8 +210,9 @@ class PromoDB:
                 best_id, best_overlap = eid, overlap
         return best_id
 
-    def upsert(self, items: list[dict], today: str,
-               source_url: str = "") -> "UpsertBilanz":
+    def upsert(
+        self, items: list[dict], today: str, source_url: str = ""
+    ) -> "UpsertBilanz":
         """Neue Aktionen aufnehmen bzw. bekannte re-verifizieren (gleicher
         Brand + gleiche oder nur umformulierte Kernaussage taucht im neuen
         Snapshot wieder auf - siehe _find_existing_id()).
@@ -264,23 +271,32 @@ class PromoDB:
                     e["image_url"] = it["image_url"]
             else:
                 self.entries[eid] = {
-                    "id": eid, "brand": brand, "tier": it.get("tier"),
+                    "id": eid,
+                    "brand": brand,
+                    "tier": it.get("tier"),
                     "headline": headline,
                     "description": it.get("description", ""),
                     "valid_until": it.get("valid_until"),
                     "url": it.get("url", ""),
                     "image_url": it.get("image_url"),
                     "source_url": source_url,
-                    "first_seen": today, "last_verified": today,
-                    "status": "aktiv", "missed_checks": 0,
+                    "first_seen": today,
+                    "last_verified": today,
+                    "status": "aktiv",
+                    "missed_checks": 0,
                 }
                 new += 1
             matched_ids.add(eid)
         return UpsertBilanz(new, matched_ids, bestaetigt)
 
-    def mark_stale(self, brand: str, checked_ids: set, today: str,
-                   gepruefte_seiten: set | None = None,
-                   leitseite: str = "") -> None:
+    def mark_stale(
+        self,
+        brand: str,
+        checked_ids: set,
+        today: str,
+        gepruefte_seiten: set | None = None,
+        leitseite: str = "",
+    ) -> None:
         """Nach einem Snapshot-Wechsel fuer *brand*: Eintraege dieses Brands,
         die NICHT unter *checked_ids* sind (im neuen Snapshot nicht mehr
         wiedergefunden), ruecken einen Schritt in Richtung "beendet" -
@@ -338,7 +354,8 @@ class PromoDB:
         for k in out:
             out[k].sort(
                 key=lambda e: (e.get("status") == "aktiv", e.get("first_seen") or ""),
-                reverse=True)
+                reverse=True,
+            )
         return out
 
     def save(self, today: str) -> None:
@@ -347,7 +364,9 @@ class PromoDB:
             "updated": today,
             "entries": sorted(
                 self.entries.values(),
-                key=lambda e: (e.get("brand") or "", e.get("first_seen") or "")),
+                key=lambda e: (e.get("brand") or "", e.get("first_seen") or ""),
+            ),
         }
         self.path.write_text(
-            json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
+            json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8"
+        )

@@ -13,6 +13,7 @@ erhalten, nur die Namen der Stufen sind neu (klein -> xs, mittel -> m,
 gross -> l). Die Grundgebuehren sind krumm, damit ein Betrag-Nachschlag
 (`Tarifbestand.ueber_betrag`) nie zufaellig hier trifft.
 """
+
 from __future__ import annotations
 
 _STUFEN = (("XS", 5, 29.93), ("M", 36, 49.93), ("L", 85, 59.93))
@@ -20,15 +21,20 @@ _STUFEN = (("XS", 5, 29.93), ("M", 36, 49.93), ("L", 85, 59.93))
 
 def _satz(stufe: str, gb: float, grund: float, abgerufen_am: str) -> dict:
     tid = f"vodafone:leiter-{stufe.lower()}-mit-smartphone"
-    return {"anbieter": "Vodafone",
-            "name": f"Vodafone Mobil {stufe} mit Smartphone",
-            "tarif_id": tid, "art": "mobilfunk", "grundgebuehr": grund,
-            "laufzeit_monate": 24, "datenvolumen_gb": gb,
-            "preisphasen": [{"von_monat": 1, "bis_monat": None,
-                             "betrag": grund}],
-            "dokument_url": f"https://example.de/pib/{tid}",
-            "abgerufen_am": abgerufen_am, "confidence": {},
-            "fundstellen": {}}
+    return {
+        "anbieter": "Vodafone",
+        "name": f"Vodafone Mobil {stufe} mit Smartphone",
+        "tarif_id": tid,
+        "art": "mobilfunk",
+        "grundgebuehr": grund,
+        "laufzeit_monate": 24,
+        "datenvolumen_gb": gb,
+        "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": grund}],
+        "dokument_url": f"https://example.de/pib/{tid}",
+        "abgerufen_am": abgerufen_am,
+        "confidence": {},
+        "fundstellen": {},
+    }
 
 
 def leiter_saetze(abgerufen_am: str = "2026-09-28") -> list[dict]:

@@ -10,6 +10,7 @@ Excel mit deutschem Gebietsschema per Doppelklick oeffnen. Ohne BOM wird
 aus "Groesse" -> "GrÃ¶ÃŸe", mit Komma statt Semikolon landet die ganze Zeile
 in Spalte A, und mit Dezimalpunkt liest Excel 1349.90 als Text.
 """
+
 import csv
 import io
 from pathlib import Path
@@ -21,20 +22,31 @@ from telco_radar.report import geraete_bereinigung, geraete_pruefung
 from telco_radar.report import geraete_export as ex
 from telco_radar.report import geraete_view
 
-_KATALOG = Katalog(geraete=[
-    Geraet(hersteller="Apple", modell="iPhone 17 Pro Max", generation=17,
-           speicher=[256, 512], segment="flagship"),
-])
+_KATALOG = Katalog(
+    geraete=[
+        Geraet(
+            hersteller="Apple",
+            modell="iPhone 17 Pro Max",
+            generation=17,
+            speicher=[256, 512],
+            segment="flagship",
+        ),
+    ]
+)
 
 
 def _e(anbieter="Vodafone", preis=1349.9, **kw):
     satz = {
         "id": f"{anbieter.lower()}--apple-iphone-17-pro-max-256gb-tiefblau",
         "sku_id": "apple-iphone-17-pro-max-256gb-tiefblau",
-        "device_id": "apple-iphone-17-pro-max", "anbieter": anbieter,
-        "anbieter_typ": "netzbetreiber", "status": "aktiv",
-        "speicher_gb": 256, "farbe_normalisiert": "tiefblau",
-        "zustand": "neu", "preis_ohne_vertrag": preis,
+        "device_id": "apple-iphone-17-pro-max",
+        "anbieter": anbieter,
+        "anbieter_typ": "netzbetreiber",
+        "status": "aktiv",
+        "speicher_gb": 256,
+        "farbe_normalisiert": "tiefblau",
+        "zustand": "neu",
+        "preis_ohne_vertrag": preis,
         "verfuegbarkeit": "lieferbar",
         "quelle_url": "https://www.vodafone.de/privat/handys/iphone-17-pro-max.html",
         "abgerufen_am": "2026-08-29",
@@ -44,11 +56,16 @@ def _e(anbieter="Vodafone", preis=1349.9, **kw):
 
 
 def _p(datum="2026-08-29", preis=1349.9, **kw):
-    satz = {"listung_id": "vodafone--apple-iphone-17-pro-max-256gb-tiefblau",
-            "sku_id": "apple-iphone-17-pro-max-256gb-tiefblau",
-            "device_id": "apple-iphone-17-pro-max", "anbieter": "Vodafone",
-            "datum": datum, "preis_ohne_vertrag": preis,
-            "verfuegbarkeit": "lieferbar", "quelle_url": "https://v.de/p"}
+    satz = {
+        "listung_id": "vodafone--apple-iphone-17-pro-max-256gb-tiefblau",
+        "sku_id": "apple-iphone-17-pro-max-256gb-tiefblau",
+        "device_id": "apple-iphone-17-pro-max",
+        "anbieter": "Vodafone",
+        "datum": datum,
+        "preis_ohne_vertrag": preis,
+        "verfuegbarkeit": "lieferbar",
+        "quelle_url": "https://v.de/p",
+    }
     satz.update(kw)
     return satz
 
@@ -61,18 +78,21 @@ def _lies(inhalt: str) -> list:
 # Excel im deutschen Gebietsschema
 # ==========================================================================
 
+
 def test_die_datei_traegt_ein_bom(tmp_path):
     angaben = ex.schreibe_exporte(tmp_path, [_e()], [_p()], _KATALOG)
     roh = (tmp_path / "exporte" / "geraete-aktuell.csv").read_bytes()
-    assert roh.startswith(b"\xef\xbb\xbf"), \
+    assert roh.startswith(b"\xef\xbb\xbf"), (
         "ohne BOM liest Excel UTF-8 als Windows-1252"
+    )
     assert angaben["aktuell"]["zeilen"] == 1
 
 
 def test_semikolon_trennt_die_spalten(tmp_path):
     ex.schreibe_exporte(tmp_path, [_e()], [_p()], _KATALOG)
     text = (tmp_path / "exporte" / "geraete-aktuell.csv").read_text(
-        encoding="utf-8-sig")
+        encoding="utf-8-sig"
+    )
     kopf = text.splitlines()[0]
     assert kopf.count(";") >= 10
     assert "," not in kopf, "das Komma ist im deutschen Excel der Dezimaltrenner"
@@ -81,17 +101,18 @@ def test_semikolon_trennt_die_spalten(tmp_path):
 def test_preise_tragen_ein_dezimalkomma(tmp_path):
     ex.schreibe_exporte(tmp_path, [_e(preis=1349.9)], [_p()], _KATALOG)
     text = (tmp_path / "exporte" / "geraete-aktuell.csv").read_text(
-        encoding="utf-8-sig")
+        encoding="utf-8-sig"
+    )
     zeilen = _lies(text)
     spalte = zeilen[0].index("Preis EUR")
     assert zeilen[1][spalte] == "1349,90"
 
 
 def test_umlaute_ueberleben_den_umweg(tmp_path):
-    ex.schreibe_exporte(tmp_path, [_e(farbe_normalisiert="grün")], [_p()],
-                        _KATALOG)
+    ex.schreibe_exporte(tmp_path, [_e(farbe_normalisiert="grün")], [_p()], _KATALOG)
     text = (tmp_path / "exporte" / "geraete-aktuell.csv").read_text(
-        encoding="utf-8-sig")
+        encoding="utf-8-sig"
+    )
     assert "grün" in text
 
 
@@ -99,42 +120,72 @@ def test_umlaute_ueberleben_den_umweg(tmp_path):
 # Der Inhalt
 # ==========================================================================
 
+
 def test_der_aktuelle_export_traegt_alle_geforderten_spalten(tmp_path):
     ex.schreibe_exporte(tmp_path, [_e()], [_p()], _KATALOG)
-    kopf = _lies((tmp_path / "exporte" / "geraete-aktuell.csv").read_text(
-        encoding="utf-8-sig"))[0]
-    for spalte in ("Anbieter", "Modell", "Speicher GB", "Farbe", "Preis EUR",
-                   "Preisart", "Tarifreferenz", "Verfuegbarkeit", "Quelle",
-                   "Abgerufen am"):
+    kopf = _lies(
+        (tmp_path / "exporte" / "geraete-aktuell.csv").read_text(encoding="utf-8-sig")
+    )[0]
+    for spalte in (
+        "Anbieter",
+        "Modell",
+        "Speicher GB",
+        "Farbe",
+        "Preis EUR",
+        "Preisart",
+        "Tarifreferenz",
+        "Verfuegbarkeit",
+        "Quelle",
+        "Abgerufen am",
+    ):
         assert spalte in kopf, spalte
 
 
 def test_die_preisart_steht_in_einer_eigenen_spalte(tmp_path):
     """Wer eine Tabelle nach Preis sortiert, in der 49,95 Zuzahlung neben
     1349,90 Ladenpreis steht, bekommt eine Rangliste, die nichts bedeutet."""
-    ex.schreibe_exporte(tmp_path, [
-        _e(),
-        _e(anbieter="o2", preis=None, preis_ohne_vertrag=None, zuzahlung=49.95,
-           tarif_referenz="o2 Mobile M",
-           id="o2--apple-iphone-17-pro-max-256gb-tiefblau"),
-    ], [], _KATALOG)
-    zeilen = _lies((tmp_path / "exporte" / "geraete-aktuell.csv").read_text(
-        encoding="utf-8-sig"))
+    ex.schreibe_exporte(
+        tmp_path,
+        [
+            _e(),
+            _e(
+                anbieter="o2",
+                preis=None,
+                preis_ohne_vertrag=None,
+                zuzahlung=49.95,
+                tarif_referenz="o2 Mobile M",
+                id="o2--apple-iphone-17-pro-max-256gb-tiefblau",
+            ),
+        ],
+        [],
+        _KATALOG,
+    )
+    zeilen = _lies(
+        (tmp_path / "exporte" / "geraete-aktuell.csv").read_text(encoding="utf-8-sig")
+    )
     kopf = zeilen[0]
-    arten = {z[kopf.index("Anbieter")]: (z[kopf.index("Preis EUR")],
-                                         z[kopf.index("Preisart")],
-                                         z[kopf.index("Tarifreferenz")])
-             for z in zeilen[1:]}
+    arten = {
+        z[kopf.index("Anbieter")]: (
+            z[kopf.index("Preis EUR")],
+            z[kopf.index("Preisart")],
+            z[kopf.index("Tarifreferenz")],
+        )
+        for z in zeilen[1:]
+    }
     assert arten["Vodafone"] == ("1349,90", "ohne Vertrag", "")
     assert arten["o2"] == ("49,95", "Zuzahlung im Tarifbuendel", "o2 Mobile M")
 
 
 def test_eine_zuzahlung_ohne_tarifreferenz_erscheint_ohne_preis(tmp_path):
-    ex.schreibe_exporte(tmp_path, [
-        _e(preis=None, preis_ohne_vertrag=None, zuzahlung=49.95,
-           tarif_referenz="")], [], _KATALOG)
-    zeilen = _lies((tmp_path / "exporte" / "geraete-aktuell.csv").read_text(
-        encoding="utf-8-sig"))
+    ex.schreibe_exporte(
+        tmp_path,
+        [_e(preis=None, preis_ohne_vertrag=None, zuzahlung=49.95, tarif_referenz="")],
+        [],
+        _KATALOG,
+    )
+    zeilen = _lies(
+        (tmp_path / "exporte" / "geraete-aktuell.csv").read_text(encoding="utf-8-sig")
+    )
     kopf = zeilen[0]
     assert zeilen[1][kopf.index("Preis EUR")] == ""
 
@@ -155,18 +206,23 @@ def test_der_export_waehlt_nicht_selbst_aus(tmp_path):
     erreicht, misst `test_geraete_seite.py` an der gerenderten Seite.
     """
     angaben = ex.schreibe_exporte(
-        tmp_path, [_e(), _e(anbieter="o2", status="ausgelistet",
-                            id="o2--x")], [], _KATALOG)
+        tmp_path,
+        [_e(), _e(anbieter="o2", status="ausgelistet", id="o2--x")],
+        [],
+        _KATALOG,
+    )
     assert angaben["aktuell"]["zeilen"] == 2
 
 
 def test_die_historie_nennt_hersteller_und_modell_statt_nur_kennungen(tmp_path):
     """Eine Tabelle mit einer Spalte voller device_ids ist in Excel
     unbrauchbar."""
-    ex.schreibe_exporte(tmp_path, [_e()], [_p(), _p(datum="2026-08-21",
-                                                   preis=1399.0)], _KATALOG)
-    zeilen = _lies((tmp_path / "exporte" / "geraete-historie.csv").read_text(
-        encoding="utf-8-sig"))
+    ex.schreibe_exporte(
+        tmp_path, [_e()], [_p(), _p(datum="2026-08-21", preis=1399.0)], _KATALOG
+    )
+    zeilen = _lies(
+        (tmp_path / "exporte" / "geraete-historie.csv").read_text(encoding="utf-8-sig")
+    )
     kopf = zeilen[0]
     assert zeilen[1][kopf.index("Hersteller")] == "Apple"
     assert zeilen[1][kopf.index("Modell")] == "iPhone 17 Pro Max"
@@ -179,12 +235,17 @@ def test_die_zeilenzahl_stimmt_mit_der_datei_ueberein(tmp_path):
     """Die Zahl steht neben dem Link auf der Seite. Sie muss aus der
     wirklich geschriebenen Datei stammen, nicht aus einer Rechnung."""
     angaben = ex.schreibe_exporte(
-        tmp_path, [_e(), _e(anbieter="o2", id="o2--x")],
-        [_p(), _p(datum="2026-08-21")], _KATALOG)
-    for schluessel, name in (("aktuell", "geraete-aktuell.csv"),
-                             ("historie", "geraete-historie.csv")):
+        tmp_path,
+        [_e(), _e(anbieter="o2", id="o2--x")],
+        [_p(), _p(datum="2026-08-21")],
+        _KATALOG,
+    )
+    for schluessel, name in (
+        ("aktuell", "geraete-aktuell.csv"),
+        ("historie", "geraete-historie.csv"),
+    ):
         text = (tmp_path / "exporte" / name).read_text(encoding="utf-8-sig")
-        echte = len(_lies(text)) - 1          # ohne Kopfzeile
+        echte = len(_lies(text)) - 1  # ohne Kopfzeile
         assert angaben[schluessel]["zeilen"] == echte, name
 
 
@@ -192,15 +253,16 @@ def test_leerer_bestand_erzeugt_trotzdem_gueltige_dateien(tmp_path):
     angaben = ex.schreibe_exporte(tmp_path, [], [], _KATALOG)
     assert angaben["aktuell"]["zeilen"] == 0
     text = (tmp_path / "exporte" / "geraete-aktuell.csv").read_text(
-        encoding="utf-8-sig")
+        encoding="utf-8-sig"
+    )
     assert _lies(text)[0] == ex.SPALTEN_AKTUELL, "die Kopfzeile bleibt"
 
 
 def test_ein_semikolon_im_text_zerreisst_die_zeile_nicht(tmp_path):
-    ex.schreibe_exporte(tmp_path, [_e(farbe_normalisiert="blau; matt")], [],
-                        _KATALOG)
-    zeilen = _lies((tmp_path / "exporte" / "geraete-aktuell.csv").read_text(
-        encoding="utf-8-sig"))
+    ex.schreibe_exporte(tmp_path, [_e(farbe_normalisiert="blau; matt")], [], _KATALOG)
+    zeilen = _lies(
+        (tmp_path / "exporte" / "geraete-aktuell.csv").read_text(encoding="utf-8-sig")
+    )
     assert len(zeilen[1]) == len(ex.SPALTEN_AKTUELL)
     assert zeilen[1][ex.SPALTEN_AKTUELL.index("Farbe")] == "blau; matt"
 
@@ -221,6 +283,7 @@ def test_ein_semikolon_im_text_zerreisst_die_zeile_nicht(tmp_path):
 # Datei genommen, auf die der Pruefbericht namentlich verweist. Die
 # Zusicherung dieses Abschnitts ist deshalb enger geworden: nicht "die
 # Giftzeile fehlt", sondern "die Giftzeile sagt, was sie ist".
+
 
 def _gebraucht_aber_als_neu_gespeichert():
     """Die Giftzeile aus dem echten Bestand, nachgebaut - OHNE ihren Zwilling.
@@ -243,12 +306,15 @@ def _gebraucht_aber_als_neu_gespeichert():
     fuer die heutige Datenlage gilt, ist aber keine, und deshalb steht er
     hier.
     """
-    return _e(anbieter="o2", preis=577.0,
-              id="o2--apple-iphone-17-pro-max-256gb-erneuert",
-              sku_id="apple-iphone-17-pro-max-256gb-space-schwarz-refurbished",
-              farbe_roh="Space Schwarz erneuert",
-              farbe_normalisiert="space schwarz erneuert",
-              zustand="neu")
+    return _e(
+        anbieter="o2",
+        preis=577.0,
+        id="o2--apple-iphone-17-pro-max-256gb-erneuert",
+        sku_id="apple-iphone-17-pro-max-256gb-space-schwarz-refurbished",
+        farbe_roh="Space Schwarz erneuert",
+        farbe_normalisiert="space schwarz erneuert",
+        zustand="neu",
+    )
 
 
 def _ids(eintraege) -> set:
@@ -281,11 +347,14 @@ def test_die_pruefung_laeuft_vor_der_bereinigung():
     gesund = _e()
 
     _pruefung, _bestand, belastbar = geraete_view.bestand_und_belastbar(
-        [gesund, gift], _KATALOG)
-    assert gift["id"] not in _ids(belastbar), \
+        [gesund, gift], _KATALOG
+    )
+    assert gift["id"] not in _ids(belastbar), (
         "der Gebrauchtpreis haette aus der belastbaren Menge fallen muessen"
-    assert gesund["id"] in _ids(belastbar), \
+    )
+    assert gesund["id"] in _ids(belastbar), (
         "die gesunde Zeile darf die Pruefung nicht mitnehmen"
+    )
 
     # In der richtigen Reihenfolge wird der Befund auch GEMELDET - er steht
     # als Zeile im Pruefbericht auf /geraete-quellen.html.
@@ -293,21 +362,24 @@ def test_die_pruefung_laeuft_vor_der_bereinigung():
 
     # Gegenprobe 1: vertauscht - erst bereinigen, dann pruefen.
     andersherum = geraete_pruefung.pruefe(
-        geraete_bereinigung.bereinige([gesund, gift]), _KATALOG)
-    assert gift["id"] in _ids(andersherum["sauber"]), \
-        ("in dieser Reihenfolge findet die Pruefung das Zustandswort nicht "
-         "mehr - genau deshalb steht sie vorne")
-    assert andersherum["zahlen"]["zustand_veraltet"] == 0, \
-        ("und sie meldet den Befund nicht mehr: ein Fehler, den niemand "
-         "meldet, ist der Fehler, den beim naechsten Mal niemand findet")
+        geraete_bereinigung.bereinige([gesund, gift]), _KATALOG
+    )
+    assert gift["id"] in _ids(andersherum["sauber"]), (
+        "in dieser Reihenfolge findet die Pruefung das Zustandswort nicht "
+        "mehr - genau deshalb steht sie vorne"
+    )
+    assert andersherum["zahlen"]["zustand_veraltet"] == 0, (
+        "und sie meldet den Befund nicht mehr: ein Fehler, den niemand "
+        "meldet, ist der Fehler, den beim naechsten Mal niemand findet"
+    )
 
     # Gegenprobe 2: ohne das Wort in der Farbe laesst die Pruefung die Zeile
     # stehen. Sie entfernt sie also wirklich WEGEN des Wortes, und nicht aus
     # einem anderen Grund, den dieser Fall zufaellig mittraegt.
-    ohne_wort = dict(gift, farbe_roh="Space Schwarz",
-                     farbe_normalisiert="space schwarz")
-    stehen_geblieben = geraete_pruefung.pruefe([gesund, ohne_wort],
-                                               _KATALOG)["sauber"]
+    ohne_wort = dict(
+        gift, farbe_roh="Space Schwarz", farbe_normalisiert="space schwarz"
+    )
+    stehen_geblieben = geraete_pruefung.pruefe([gesund, ohne_wort], _KATALOG)["sauber"]
     assert gift["id"] in _ids(stehen_geblieben)
 
 
@@ -335,16 +407,20 @@ def test_kein_gebrauchtpreis_steht_als_neupreis_in_der_datei(tmp_path):
     gift = _gebraucht_aber_als_neu_gespeichert()
     gesund = _e()
     _pruefung, bestand, belastbar = geraete_view.bestand_und_belastbar(
-        [gesund, gift], _KATALOG)
+        [gesund, gift], _KATALOG
+    )
 
     # 1. Der Bestand: beide Zeilen, und die Giftzeile sagt, was sie ist.
     angaben = ex.schreibe_exporte(tmp_path, bestand, [], _KATALOG)
     assert angaben["aktuell"]["zeilen"] == 2
-    zeilen = _lies((tmp_path / "exporte" / "geraete-aktuell.csv").read_text(
-        encoding="utf-8-sig"))
+    zeilen = _lies(
+        (tmp_path / "exporte" / "geraete-aktuell.csv").read_text(encoding="utf-8-sig")
+    )
     kopf = zeilen[0]
     assert {z[kopf.index("Listungs-ID")] for z in zeilen[1:]} == {
-        gesund["id"], gift["id"]}
+        gesund["id"],
+        gift["id"],
+    }
     for zeile in zeilen[1:]:
         if zeile[kopf.index("Preis EUR")] == "577,00":
             assert zeile[kopf.index("Zustand")] == "refurbished", zeile
@@ -357,8 +433,9 @@ def test_kein_gebrauchtpreis_steht_als_neupreis_in_der_datei(tmp_path):
     # 2. Die belastbare Menge: die Giftzeile ist gar nicht darin.
     angaben = ex.schreibe_exporte(tmp_path, belastbar, [], _KATALOG)
     assert angaben["aktuell"]["zeilen"] == 1
-    zeilen = _lies((tmp_path / "exporte" / "geraete-aktuell.csv").read_text(
-        encoding="utf-8-sig"))
+    zeilen = _lies(
+        (tmp_path / "exporte" / "geraete-aktuell.csv").read_text(encoding="utf-8-sig")
+    )
     kopf = zeilen[0]
     assert {z[kopf.index("Listungs-ID")] for z in zeilen[1:]} == {gesund["id"]}
     for zeile in zeilen[1:]:
@@ -377,8 +454,9 @@ def test_die_historie_fuehrt_nur_listungen_des_bestands(tmp_path):
     angaben = ex.schreibe_exporte(tmp_path, [_e()], [_p(), fremd], _KATALOG)
     assert angaben["historie"]["zeilen"] == 1
 
-    zeilen = _lies((tmp_path / "exporte" / "geraete-historie.csv").read_text(
-        encoding="utf-8-sig"))
+    zeilen = _lies(
+        (tmp_path / "exporte" / "geraete-historie.csv").read_text(encoding="utf-8-sig")
+    )
     kopf = zeilen[0]
     gefuehrt = {z[kopf.index("Listungs-ID")] for z in zeilen[1:]}
     assert gefuehrt == {_e()["id"]}
@@ -392,6 +470,7 @@ def test_die_historie_fuehrt_nur_listungen_des_bestands(tmp_path):
 # Farben und Anbietern.
 # ==========================================================================
 
+
 def _modellzeilen(eintraege):
     return geraete_view.katalog_modellzeilen(eintraege, _KATALOG)
 
@@ -400,21 +479,28 @@ def test_die_modell_exports_nennen_die_modellzahl(tmp_path):
     """Zwei Listungen EINES Modells sind im Listungs-Export zwei Zeilen
     und im Modell-Export EINE - die Zeilenzahl neben dem Knopf ist die
     Modellzahl, und sie stimmt mit der geschriebenen Datei ueberein."""
-    eintraege = [_e(), _e(anbieter="o2", id="o2--x",
-                          sku_id="apple-iphone-17-pro-max-256gb-anders")]
+    eintraege = [
+        _e(),
+        _e(anbieter="o2", id="o2--x", sku_id="apple-iphone-17-pro-max-256gb-anders"),
+    ]
     modelle = _modellzeilen(eintraege)
     assert len(modelle) == 1, "die Fixture aggregiert nicht - Test misst nichts"
-    angaben = ex.schreibe_exporte(tmp_path, eintraege, [_p()], _KATALOG,
-                                  modelle=modelle)
+    angaben = ex.schreibe_exporte(
+        tmp_path, eintraege, [_p()], _KATALOG, modelle=modelle
+    )
     assert angaben["aktuell"]["zeilen"] == len(eintraege), (
-        "der Listungs-Export hat nicht eine Zeile je Listung")
-    for schluessel, name in (("modell_barpreis", "geraete-modell-barpreis.csv"),
-                             ("modell_tco", "geraete-modell-tco.csv")):
+        "der Listungs-Export hat nicht eine Zeile je Listung"
+    )
+    for schluessel, name in (
+        ("modell_barpreis", "geraete-modell-barpreis.csv"),
+        ("modell_tco", "geraete-modell-tco.csv"),
+    ):
         text = (tmp_path / "exporte" / name).read_text(encoding="utf-8-sig")
-        echte = len(_lies(text)) - 1            # ohne Kopfzeile
+        echte = len(_lies(text)) - 1  # ohne Kopfzeile
         assert angaben[schluessel]["zeilen"] == echte == len(modelle), (
             f"{name}: Knopf nennt {angaben[schluessel]['zeilen']}, Datei "
-            f"hat {echte}, Modellzahl ist {len(modelle)}")
+            f"hat {echte}, Modellzahl ist {len(modelle)}"
+        )
 
 
 def test_die_modell_exports_oeffnen_sich_in_deutschem_excel(tmp_path):
@@ -422,23 +508,29 @@ def test_die_modell_exports_oeffnen_sich_in_deutschem_excel(tmp_path):
     eine Datei waere die andere benutzbar: BOM gegen den Umlaut-Fehler,
     Semikolon gegen die Ein-Spalalte-Zeile, Dezimalkomma gegen den
     Text-Betrag."""
-    eintraege = [_e(), _e(anbieter="o2", id="o2--x",
-                          sku_id="apple-iphone-17-pro-max-256gb-anders")]
-    ex.schreibe_exporte(tmp_path, eintraege, [_p()], _KATALOG,
-                        modelle=_modellzeilen(eintraege))
+    eintraege = [
+        _e(),
+        _e(anbieter="o2", id="o2--x", sku_id="apple-iphone-17-pro-max-256gb-anders"),
+    ]
+    ex.schreibe_exporte(
+        tmp_path, eintraege, [_p()], _KATALOG, modelle=_modellzeilen(eintraege)
+    )
     for name, spalten in (
-            ("geraete-modell-barpreis.csv", ex.SPALTEN_MODELL_BARPREIS),
-            ("geraete-modell-tco.csv", ex.SPALTEN_MODELL_TCO)):
+        ("geraete-modell-barpreis.csv", ex.SPALTEN_MODELL_BARPREIS),
+        ("geraete-modell-tco.csv", ex.SPALTEN_MODELL_TCO),
+    ):
         roh = (tmp_path / "exporte" / name).read_bytes()
         assert roh[:3] == b"\xef\xbb\xbf", f"{name} ohne BOM"
         zeilen = _lies(roh.decode("utf-8-sig"))
         assert zeilen[0] == spalten, name
         assert all(len(z) == len(spalten) for z in zeilen), name
-    barpreis = _lies((tmp_path / "exporte" /
-                      "geraete-modell-barpreis.csv").read_text("utf-8-sig"))
+    barpreis = _lies(
+        (tmp_path / "exporte" / "geraete-modell-barpreis.csv").read_text("utf-8-sig")
+    )
     spalte = ex.SPALTEN_MODELL_BARPREIS.index("Ab-Preis EUR")
     assert barpreis[1][spalte] == "1349,90", (
-        f"Preis ohne Dezimalkomma: {barpreis[1][spalte]!r}")
+        f"Preis ohne Dezimalkomma: {barpreis[1][spalte]!r}"
+    )
 
 
 def test_ohne_modelle_bleiben_die_modell_dateien_korrektes_leer(tmp_path):
@@ -450,8 +542,9 @@ def test_ohne_modelle_bleiben_die_modell_dateien_korrektes_leer(tmp_path):
     assert angaben["modell_barpreis"]["zeilen"] == 0
     assert angaben["modell_tco"]["zeilen"] == 0
     for name, spalten in (
-            ("geraete-modell-barpreis.csv", ex.SPALTEN_MODELL_BARPREIS),
-            ("geraete-modell-tco.csv", ex.SPALTEN_MODELL_TCO)):
+        ("geraete-modell-barpreis.csv", ex.SPALTEN_MODELL_BARPREIS),
+        ("geraete-modell-tco.csv", ex.SPALTEN_MODELL_TCO),
+    ):
         zeilen = _lies((tmp_path / "exporte" / name).read_text("utf-8-sig"))
         assert zeilen and zeilen[0] == spalten, name
         assert len(zeilen) == 1, f"{name} hat Zeilen ohne Modell-Bestand"

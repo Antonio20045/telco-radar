@@ -11,6 +11,7 @@ Rechnung mit sich selbst übereinstimmt, hier soll sie mit dem echten
 Bestand übereinstimmen. Stand der Zahlen: 08.09.2026 (siehe
 outputs/phase-graph1-2026-09-08.md).
 """
+
 from __future__ import annotations
 
 import json
@@ -36,6 +37,7 @@ VORGABE_MODELL = "apple-iphone-17-pro-256"
 # (a) Bandableitung aus echten tarife.jsonl-Datenvolumina
 # --------------------------------------------------------------------------
 
+
 @pytest.fixture(scope="module")
 def tarife():
     return Tarifbestand.aus_datei(ZUSTAND / "tarife.jsonl").je_id
@@ -50,10 +52,10 @@ def test_drei_echte_tarifsaetze_treffen_ihre_stufe(tarife):
     assert leiter, "keine Vodafone-Tarifleiter im Bestand"
     index = band.tarif_baender(tarife, leiter)
     faelle = [
-        ("o2:o2-mobile-unlimited-m-flex", None),   # unbegrenzt (Infinity)
-        ("vodafone:vodafone-mobil-xs", "xs"),      # 18 GB, ueber den Namen
-        ("vodafone:vodafone-mobil-m", "m"),        # 60 GB
-        ("o2:o2-mobile-l", "l"),                    # 150 GB
+        ("o2:o2-mobile-unlimited-m-flex", None),  # unbegrenzt (Infinity)
+        ("vodafone:vodafone-mobil-xs", "xs"),  # 18 GB, ueber den Namen
+        ("vodafone:vodafone-mobil-m", "m"),  # 60 GB
+        ("o2:o2-mobile-l", "l"),  # 150 GB
     ]
     geprueft = 0
     for tarif_id, erwartet in faelle:
@@ -68,6 +70,7 @@ def test_drei_echte_tarifsaetze_treffen_ihre_stufe(tarife):
 # (b)-(d) Modell x Band am echten Bestand
 # --------------------------------------------------------------------------
 
+
 @pytest.fixture(scope="module")
 def bestand():
     tco = json.loads((ZUSTAND / "geraete_tco.json").read_text(encoding="utf-8"))
@@ -76,18 +79,21 @@ def bestand():
     tarife = tarifbestand.je_id
     buendel = []
     for satz in tco["buendel"]:
-        b = Buendel(sku_id=satz["sku_id"], anbieter=satz["anbieter"],
-                    tarif_name=satz["tarif_name"],
-                    tarif_id=satz.get("tarif_id", ""),
-                    tarif_monatlich=satz.get("tarif_monatlich"),
-                    geraet_zuzahlung=satz.get("geraet_zuzahlung"),
-                    geraet_monatsrate=satz.get("geraet_monatsrate"),
-                    buendel_monatlich=satz.get("buendel_monatlich"),
-                    laufzeit_monate=satz.get("laufzeit_monate", 24),
-                    anschlusspreis=satz.get("anschlusspreis"),
-                    zustand=satz.get("zustand") or "",
-                    quelle_url=satz.get("quelle_url", ""),
-                    abgerufen_am=satz.get("abgerufen_am", ""))
+        b = Buendel(
+            sku_id=satz["sku_id"],
+            anbieter=satz["anbieter"],
+            tarif_name=satz["tarif_name"],
+            tarif_id=satz.get("tarif_id", ""),
+            tarif_monatlich=satz.get("tarif_monatlich"),
+            geraet_zuzahlung=satz.get("geraet_zuzahlung"),
+            geraet_monatsrate=satz.get("geraet_monatsrate"),
+            buendel_monatlich=satz.get("buendel_monatlich"),
+            laufzeit_monate=satz.get("laufzeit_monate", 24),
+            anschlusspreis=satz.get("anschlusspreis"),
+            zustand=satz.get("zustand") or "",
+            quelle_url=satz.get("quelle_url", ""),
+            abgerufen_am=satz.get("abgerufen_am", ""),
+        )
         # Dieselbe Anreicherung wie `geraete_tco_view.aufbereiten`: die
         # Tarifbindung steht nicht in der Geraetenutzlast, sondern im
         # Tarifbestand (A5.5).
@@ -95,18 +101,27 @@ def bestand():
         if satz_tarif.get("laufzeit_monate"):
             b.tarif_bindung_monate = int(satz_tarif["laufzeit_monate"])
         buendel.append(b)
-    referenzen = [SimOnlyReferenz(
-        anbieter=r["anbieter"], tarif_name=r["tarif_name"],
-        tarif_id=r.get("tarif_id", ""),
-        tarif_sim_only_monatlich=r.get("tarif_sim_only_monatlich"),
-        anschlusspreis=r.get("anschlusspreis"),
-        quelle_url=r.get("quelle_url", ""),
-        abgerufen_am=r.get("abgerufen_am", "")) for r in tco["sim_only"]]
-    modelle = karten.modelle(buendel, db["listungen"], referenzen, tarife,
-                             lade_katalog(WURZEL))
+    referenzen = [
+        SimOnlyReferenz(
+            anbieter=r["anbieter"],
+            tarif_name=r["tarif_name"],
+            tarif_id=r.get("tarif_id", ""),
+            tarif_sim_only_monatlich=r.get("tarif_sim_only_monatlich"),
+            anschlusspreis=r.get("anschlusspreis"),
+            quelle_url=r.get("quelle_url", ""),
+            abgerufen_am=r.get("abgerufen_am", ""),
+        )
+        for r in tco["sim_only"]
+    ]
+    modelle = karten.modelle(
+        buendel, db["listungen"], referenzen, tarife, lade_katalog(WURZEL)
+    )
     leiter = band.tarifleiter(tarife)
-    return {"modelle": modelle, "leiter": leiter,
-            "band_je_tarif": band.tarif_baender(tarife, leiter)}
+    return {
+        "modelle": modelle,
+        "leiter": leiter,
+        "band_je_tarif": band.tarif_baender(tarife, leiter),
+    }
 
 
 def _modell(bestand, mid):
@@ -121,8 +136,9 @@ def test_vorgabefall_zeigt_genau_die_anbieter_mit_echten_buendeln(bestand):
     jedes Band zeigt genau die Anbieter, fuer die es ein ECHTES Buendel
     gibt, keinen mehr."""
     modell = _modell(bestand, VORGABE_MODELL)
-    baender = band.baender_fuer_modell(modell, bestand["band_je_tarif"],
-                                     leiter=bestand["leiter"])
+    baender = band.baender_fuer_modell(
+        modell, bestand["band_je_tarif"], leiter=bestand["leiter"]
+    )
     je_band = {b["key"]: b for b in baender}
     assert set(je_band) <= {s.key for s in bestand["leiter"]}
     assert je_band, "kein einziges Band mit Buendel - Datenlage geprueft?"
@@ -151,8 +167,9 @@ def test_telekom_congstar_und_11_stehen_als_benannte_luecke(bestand):
     Anbieter - und beide Telekom-Zustaende treten wirklich ein
     (Lookup-Zeile, sonst pruefte der Test nur einen von beiden)."""
     modell = _modell(bestand, VORGABE_MODELL)
-    baender = band.baender_fuer_modell(modell, bestand["band_je_tarif"],
-                                     leiter=bestand["leiter"])
+    baender = band.baender_fuer_modell(
+        modell, bestand["band_je_tarif"], leiter=bestand["leiter"]
+    )
     assert baender, "kein Band vorhanden - Test prueft nichts"
     je_band = band.karten_je_band(modell, bestand["band_je_tarif"])
     telekom_gezeichnet = telekom_fehlend = 0
@@ -160,10 +177,12 @@ def test_telekom_congstar_und_11_stehen_als_benannte_luecke(bestand):
         gezeichnet = set(je_band.get(eintrag["key"]) or {})
         namen = {f["anbieter"] for f in eintrag["fehlend"]}
         # gezeichnet ODER benannt - niemand wird still weggelassen
-        assert gezeichnet | namen >= set(band.ERWARTETE_ANBIETER), \
+        assert gezeichnet | namen >= set(band.ERWARTETE_ANBIETER), (
             f"Band {eintrag['key']}: {set(band.ERWARTETE_ANBIETER) - gezeichnet - namen} fehlt still"
-        assert not (gezeichnet & namen), \
+        )
+        assert not (gezeichnet & namen), (
             f"Band {eintrag['key']}: {gezeichnet & namen} ist gezeichnet UND fehlend"
+        )
         for f in eintrag["fehlend"]:
             assert f["grund"], f"{f['anbieter']} hat keinen Grund"
         if "Telekom" in gezeichnet:
@@ -189,45 +208,59 @@ def test_leerzustand_modell_ohne_buendel_in_keinem_band(bestand, tarife):
     dass die leere Bandliste am TARIF liegt und nicht an einer kaputten
     Fixture."""
     sku = "apple-iphone-15-999gb-schwarz"
-    listung = {"sku_id": sku, "device_id": "apple-iphone-15",
-               "speicher_gb": 999, "anbieter": "1&1",
-               "abgerufen_am": "2026-09-08"}
+    listung = {
+        "sku_id": sku,
+        "device_id": "apple-iphone-15",
+        "speicher_gb": 999,
+        "anbieter": "1&1",
+        "abgerufen_am": "2026-09-08",
+    }
 
     def _modell_mit(tarif_id: str, tarif_name: str):
-        buendel = [Buendel(sku_id=sku, anbieter="1&1",
-                           tarif_name=tarif_name, tarif_id=tarif_id,
-                           buendel_monatlich=54.99, laufzeit_monate=36,
-                           abgerufen_am="2026-09-08")]
-        modelle = karten.modelle(buendel, [listung], [], tarife,
-                                 lade_katalog(WURZEL))
+        buendel = [
+            Buendel(
+                sku_id=sku,
+                anbieter="1&1",
+                tarif_name=tarif_name,
+                tarif_id=tarif_id,
+                buendel_monatlich=54.99,
+                laufzeit_monate=36,
+                abgerufen_am="2026-09-08",
+            )
+        ]
+        modelle = karten.modelle(buendel, [listung], [], tarife, lade_katalog(WURZEL))
         assert modelle["modelle"], "das konstruierte Modell muss entstehen"
         return modelle["modelle"][0]
 
     ohne = _modell_mit("11:1-1-unlimited-xl", "1&1 Unlimited XL")
-    echte = [k for k in ohne["karten"]
-             if k["belastbar"] and not k["naeherung"]]
+    echte = [k for k in ohne["karten"] if k["belastbar"] and not k["naeherung"]]
     assert echte, "das konstruierte Modell hat kein echtes Buendel - kein Fall"
-    assert band.baender_fuer_modell(ohne, bestand["band_je_tarif"],
-                                     leiter=bestand["leiter"]) == [], \
-        "ein Tarif ohne Datenvolumen darf kein Band gebaeren"
+    assert (
+        band.baender_fuer_modell(
+            ohne, bestand["band_je_tarif"], leiter=bestand["leiter"]
+        )
+        == []
+    ), "ein Tarif ohne Datenvolumen darf kein Band gebaeren"
 
     mit_band = _modell_mit("11:1-1-all-net-flat-s", "1&1 All-Net-Flat S")
-    assert band.baender_fuer_modell(mit_band, bestand["band_je_tarif"],
-                                     leiter=bestand["leiter"]), \
-        "Gegenprobe: die All-Net-Flat S (10 GB) muss Stufe XS gebaeren"
+    assert band.baender_fuer_modell(
+        mit_band, bestand["band_je_tarif"], leiter=bestand["leiter"]
+    ), "Gegenprobe: die All-Net-Flat S (10 GB) muss Stufe XS gebaeren"
 
 
 # --------------------------------------------------------------------------
 # (c) Kein TCO-36 im gerenderten Artefakt
 # --------------------------------------------------------------------------
 
+
 def test_kein_tco36_in_keinem_bandgraphen(bestand):
     """(c) TICKET TCO24-1 gilt auch fuer GRAPH-1: die Y-Achse ist TCO-24,
     kein Bandgraph darf eine TCO-36-Zahl oder -Beschriftung tragen."""
     geprueft = 0
     for modell in bestand["modelle"]["modelle"]:
-        for eintrag in band.baender_fuer_modell(modell, bestand["band_je_tarif"],
-                                     leiter=bestand["leiter"]):
+        for eintrag in band.baender_fuer_modell(
+            modell, bestand["band_je_tarif"], leiter=bestand["leiter"]
+        ):
             svg = eintrag["grafik"]["svg"]
             if not svg:
                 continue

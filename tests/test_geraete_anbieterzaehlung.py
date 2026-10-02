@@ -21,6 +21,7 @@ Diese Datei sichert seither zwei Dinge:
   b) Die EINE Rechnung bleibt: `zeitreihe()` liefert seine Reihenzahl als
      Feld - dieselbe Zahl wie im aria-label. O4 liest sie wieder.
 """
+
 from __future__ import annotations
 
 import pathlib
@@ -45,12 +46,14 @@ _OPTION_RE = re.compile(r"\d+\s*Anbieter")
 # Am echten Bestand: die ganze Seite, gerendert gegen data/state + config
 # --------------------------------------------------------------------------
 
+
 @pytest.fixture(scope="module")
 def seite(tmp_path_factory) -> BeautifulSoup:
     site = tmp_path_factory.mktemp("f5-anbieterzaehlung") / "site"
     render_site(site, WURZEL / "data" / "reports")
-    return BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
-                         "html.parser")
+    return BeautifulSoup(
+        (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
+    )
 
 
 def test_keine_dropdown_option_nennt_eine_anbieterzahl_mehr(seite):
@@ -70,18 +73,19 @@ def test_keine_dropdown_option_nennt_eine_anbieterzahl_mehr(seite):
     # Knoten als erlaubt traegt. Dieselben Zusicherungen am neuen Ort:
     # keine Anbieterzahl im NAMEN, eindeutige IDs fuer den Deep-Link.
     import json
-    knoten = json.loads(
-        seite.select_one("#gr-zeitreihe-daten").get_text())
+
+    knoten = json.loads(seite.select_one("#gr-zeitreihe-daten").get_text())
     ids = list(knoten["erlaubt"])
     assert len(ids) >= 3, "am echten Bestand stehen mehr Modelle"
     assert all(ids), "eine Modell-ID ist leer"
-    assert len(ids) == len(set(ids)), \
-        f"Modell-IDs nicht eindeutig: " \
-        f"{sorted(v for v in ids if ids.count(v) > 1)[:3]}"
+    assert len(ids) == len(set(ids)), (
+        f"Modell-IDs nicht eindeutig: {sorted(v for v in ids if ids.count(v) > 1)[:3]}"
+    )
     titel = knoten["titel"]
     for mid in ids:
-        assert not _OPTION_RE.search(titel.get(mid, "")), \
+        assert not _OPTION_RE.search(titel.get(mid, "")), (
             f"Titel traegt noch eine Anbieterzahl: {titel.get(mid)!r}"
+        )
 
 
 def test_der_startzustand_ist_derselbe_im_knoten_und_im_serverblock(seite):
@@ -90,20 +94,23 @@ def test_der_startzustand_ist_derselbe_im_knoten_und_im_serverblock(seite):
     aus den Daten). Der JSON-Knoten traegt dieselbe Vorgabe wie der
     Server-First-Paint: app.js und Server starten im selben Modell."""
     import json
-    knoten = json.loads(
-        seite.select_one("#gr-zeitreihe-daten").get_text())
+
+    knoten = json.loads(seite.select_one("#gr-zeitreihe-daten").get_text())
     vorgabe = knoten["vorgabe"]
-    assert vorgabe and vorgabe in knoten["erlaubt"], \
+    assert vorgabe and vorgabe in knoten["erlaubt"], (
         "die Start-Vorgabe ist kein wählbares Modell"
+    )
     titel = knoten["titel"][vorgabe]
     antwort = seite.select_one("#tafel-tco .gr-zr-antwort")
     assert antwort is not None, "der Server-Startblock fehlt"
     # Der Antwort-Satz nennt das Startgeraet beim Kurznamen - der Titel
     # ist "Hersteller Modell Speicher GB"; geprueft wird das Modellstück.
-    modell_stueck = " ".join(titel.split()[1:-2]) if titel.split()[-1] == \
-        "GB" else titel
-    assert modell_stueck in antwort.get_text(" ", strip=True), \
+    modell_stueck = (
+        " ".join(titel.split()[1:-2]) if titel.split()[-1] == "GB" else titel
+    )
+    assert modell_stueck in antwort.get_text(" ", strip=True), (
         f"Server-Block nennt nicht das Startgeraet {titel!r}"
+    )
 
 
 def test_modell_ohne_zeitreihe_steht_ohne_widerspruch_da(tmp_path):
@@ -119,19 +126,26 @@ def test_modell_ohne_zeitreihe_steht_ohne_widerspruch_da(tmp_path):
     # Band-Zeilen. Der Katalog zeigt seine Listungen; die Modell-Liste der
     # Seite kommt mit E3 (S2: die Abweichungstabelle).
     import json
-    knoten = json.loads(
-        s.select_one("#gr-zeitreihe-daten").get_text())
-    assert knoten["erlaubt"].get(graphlos) in (None, []), \
+
+    knoten = json.loads(s.select_one("#gr-zeitreihe-daten").get_text())
+    assert knoten["erlaubt"].get(graphlos) in (None, []), (
         "das bandlose Modell duerfte nicht wählbar sein"
+    )
     assert graphlos not in {e["id"] for e in knoten["suchindex"]}
+
 
 # --------------------------------------------------------------------------
 # Die eine Rechnung: `zeitreihe()` liefert ihre Reihenzahl als Feld
 # --------------------------------------------------------------------------
 
+
 def _reihe(anbieter, punkte):
-    return {"anbieter": anbieter, "farbe": "#123456", "eigen": False,
-            "punkte": [{"datum": d, "preis": p} for d, p in punkte]}
+    return {
+        "anbieter": anbieter,
+        "farbe": "#123456",
+        "eigen": False,
+        "punkte": [{"datum": d, "preis": p} for d, p in punkte],
+    }
 
 
 def test_zeitreihe_liefert_ihre_eigene_reihenzahl_als_feld():

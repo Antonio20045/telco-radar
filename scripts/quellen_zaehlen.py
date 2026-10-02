@@ -26,6 +26,7 @@ NICHT mitgezaehlt, und zwar jeweils mit Grund:
     python scripts/quellen_zaehlen.py
     python scripts/quellen_zaehlen.py --verlauf     # ueber das Berichtsarchiv
 """
+
 from __future__ import annotations
 
 import argparse
@@ -49,6 +50,7 @@ def zaehle(root: Path) -> dict:
     promo_pfad = root / "config" / "promo_sources.yaml"
     if promo_pfad.exists():
         import yaml
+
         roh = yaml.safe_load(promo_pfad.read_text(encoding="utf-8")) or {}
         promo = len(roh.get("brands") or [])
 
@@ -75,21 +77,29 @@ def verlauf(root: Path) -> list[dict]:
         except json.JSONDecodeError:
             continue
         s = d.get("stats") or {}
-        aus.append({"datum": d.get("date", "?"),
-                    "quellen": s.get("sources_total"),
-                    "betreiber": s.get("operators"),
-                    "themenfelder": s.get("themes"),
-                    "gesammelt": s.get("collected"),
-                    "neu": s.get("new")})
+        aus.append(
+            {
+                "datum": d.get("date", "?"),
+                "quellen": s.get("sources_total"),
+                "betreiber": s.get("operators"),
+                "themenfelder": s.get("themes"),
+                "gesammelt": s.get("collected"),
+                "neu": s.get("new"),
+            }
+        )
     return aus
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(description=__doc__,
-                                formatter_class=argparse.RawDescriptionHelpFormatter)
+    p = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     p.add_argument("--root", type=Path, default=Path("."))
-    p.add_argument("--verlauf", action="store_true",
-                   help="Entwicklung ueber alle protokollierten Laeufe")
+    p.add_argument(
+        "--verlauf",
+        action="store_true",
+        help="Entwicklung ueber alle protokollierten Laeufe",
+    )
     p.add_argument("--json", action="store_true")
     args = p.parse_args(argv)
 
@@ -99,39 +109,59 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     print(f"\n  QUELLEN: {z['crawlbar_gesamt']}\n")
-    print(f"    {z['betreiberquellen']:>4}  Betreiberquellen "
-          f"({z['betreiber']} Betreiber in {z['regionen']} Regionen)")
+    print(
+        f"    {z['betreiberquellen']:>4}  Betreiberquellen "
+        f"({z['betreiber']} Betreiber in {z['regionen']} Regionen)"
+    )
     print(f"    {z['fachpresse']:>4}  Fachpresse")
-    print(f"    {z['themenquellen']:>4}  Themenquellen "
-          f"(in {z['themenfelder']} Themenfeldern)")
+    print(
+        f"    {z['themenquellen']:>4}  Themenquellen "
+        f"(in {z['themenfelder']} Themenfeldern)"
+    )
     print(f"    {'':>4}  " + "-" * 40)
     print(f"    {z['crawlbar_gesamt']:>4}  crawlbar gesamt  <- DIESE ZAHL\n")
     print("  nicht mitgezaehlt:")
-    print(f"    {z['official_referenzen']:>4}  official-Referenzen "
-          "(bot-geschuetzt, werden nie abgerufen)")
-    print(f"    {z['promo_seiten']:>4}  Promo-Seiten "
-          "(eigener Anwendungsfall, eigene Pipeline)")
+    print(
+        f"    {z['official_referenzen']:>4}  official-Referenzen "
+        "(bot-geschuetzt, werden nie abgerufen)"
+    )
+    print(
+        f"    {z['promo_seiten']:>4}  Promo-Seiten "
+        "(eigener Anwendungsfall, eigene Pipeline)"
+    )
 
     lauf = verlauf(args.root.resolve())
     if lauf:
         letzter = lauf[-1]
         stimmt = letzter["quellen"] == z["crawlbar_gesamt"]
-        print(f"\n  letzter Lauf ({letzter['datum']}): "
-              f"{letzter['quellen']} Quellen abgefragt"
-              + ("  ✓ deckt sich mit der Konfiguration" if stimmt else
-                 "  ! weicht von der Konfiguration ab - seither geaendert?"))
+        print(
+            f"\n  letzter Lauf ({letzter['datum']}): "
+            f"{letzter['quellen']} Quellen abgefragt"
+            + (
+                "  ✓ deckt sich mit der Konfiguration"
+                if stimmt
+                else "  ! weicht von der Konfiguration ab - seither geaendert?"
+            )
+        )
 
     if args.verlauf:
         print("\n  Verlauf (aus stats.sources_total der Laeufe):\n")
-        print(f"    {'Datum':12} {'Quellen':>8} {'Betreiber':>10} "
-              f"{'Themen':>7} {'gesammelt':>10} {'neu':>6}")
+        print(
+            f"    {'Datum':12} {'Quellen':>8} {'Betreiber':>10} "
+            f"{'Themen':>7} {'gesammelt':>10} {'neu':>6}"
+        )
         vorher = None
         for e in lauf:
-            delta = ("" if vorher is None or e["quellen"] is None
-                     else f"  {e['quellen'] - vorher:+d}")
-            print(f"    {e['datum']:12} {str(e['quellen']):>8} "
-                  f"{str(e['betreiber']):>10} {str(e['themenfelder']):>7} "
-                  f"{str(e['gesammelt']):>10} {str(e['neu']):>6}{delta}")
+            delta = (
+                ""
+                if vorher is None or e["quellen"] is None
+                else f"  {e['quellen'] - vorher:+d}"
+            )
+            print(
+                f"    {e['datum']:12} {str(e['quellen']):>8} "
+                f"{str(e['betreiber']):>10} {str(e['themenfelder']):>7} "
+                f"{str(e['gesammelt']):>10} {str(e['neu']):>6}{delta}"
+            )
             vorher = e["quellen"]
     print()
     return 0

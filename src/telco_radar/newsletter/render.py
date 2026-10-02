@@ -22,6 +22,7 @@ unerreichbar, und der maschinelle Aufruf mit kurzem Timeout wuerde in den
 Render-Kaltstart laufen und still fehlschlagen: der Nutzer haelt sich fuer
 abgemeldet, die naechste Ausgabe kommt trotzdem.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -51,6 +52,7 @@ MAX_SAETZE = 2
 @dataclass
 class Nachricht:
     """Eine fertige Mail - unabhaengig davon, wer sie zustellt."""
+
     betreff: str
     html: str
     text: str
@@ -66,9 +68,11 @@ def _env() -> Environment:
     # (derselbe Fehler wie am 04.08.2026 im Seiten-Renderer).
     env = Environment(
         loader=FileSystemLoader(_VORLAGEN),
-        autoescape=select_autoescape(enabled_extensions=("html.j2",),
-                                     default_for_string=False, default=False),
-        keep_trailing_newline=True)
+        autoescape=select_autoescape(
+            enabled_extensions=("html.j2",), default_for_string=False, default=False
+        ),
+        keep_trailing_newline=True,
+    )
     return env
 
 
@@ -105,6 +109,7 @@ def rahmentexte(chrome: dict | None = None) -> set[str]:
 
 # ==========================================================  Kuerzen  ======
 
+
 def kuerze(text: str, anzahl: int = MAX_SAETZE) -> str:
     """Die ersten `anzahl` Saetze - unveraendert, ohne Ellipse.
 
@@ -124,16 +129,15 @@ def kuerze(text: str, anzahl: int = MAX_SAETZE) -> str:
 
 # ======================================================  Geraeteblock  ====
 
+
 def _euro(betrag: float, cent: bool = False) -> str:
     """„1.234 €" - ganze Euro wie am Bewegungs-Abzeichen der Geraeteseite,
     kaufmaennisch gerundet; mit `cent` „50,40 €"."""
     wert = Decimal(str(abs(betrag)))
     if cent:
         text = f"{wert.quantize(Decimal('0.01'), ROUND_HALF_UP):,.2f}"
-        return (text.replace(",", "X").replace(".", ",")
-                .replace("X", ".") + " €")
-    return f"{wert.quantize(Decimal('1'), ROUND_HALF_UP):,.0f}".replace(
-        ",", ".") + " €"
+        return text.replace(",", "X").replace(".", ",").replace("X", ".") + " €"
+    return f"{wert.quantize(Decimal('1'), ROUND_HALF_UP):,.0f}".replace(",", ".") + " €"
 
 
 def _tag(iso: str) -> str:
@@ -149,8 +153,7 @@ def _abstand(betrag: float, texte: dict) -> str:
     return texte[wort].replace("{betrag}", _euro(betrag))
 
 
-def bewegung_kontext(block: dict | None, basis: str,
-                     chrome: dict) -> dict | None:
+def bewegung_kontext(block: dict | None, basis: str, chrome: dict) -> dict | None:
     """Der Geraeteblock fuer die Vorlage - oder None, wenn er fehlt.
 
     Kein Block, wenn der Bericht keinen traegt (Berichte vor P4) oder er
@@ -160,13 +163,24 @@ def bewegung_kontext(block: dict | None, basis: str,
     """
     if not block or not block.get("im_newsletter"):
         return None
-    from ..report.geraete_bewegung import (AUSFALL_AUFBEREITUNG,
-                                           BEWEGUNG_EURO, BEWEGUNG_PROZENT)
+    from ..report.geraete_bewegung import (
+        AUSFALL_AUFBEREITUNG,
+        BEWEGUNG_EURO,
+        BEWEGUNG_PROZENT,
+    )
+
     texte = chrome["bewegung"]
     basis = (basis or "").rstrip("/")
     seite = f"{basis}/geraete.html" if basis else "geraete.html"
-    aus = {"titel": texte["titel"], "zeitraum": "", "zeilen": [],
-           "leer": "", "ausfall": "", "weitere": "", "seite": seite}
+    aus = {
+        "titel": texte["titel"],
+        "zeitraum": "",
+        "zeilen": [],
+        "leer": "",
+        "ausfall": "",
+        "weitere": "",
+        "seite": seite,
+    }
     try:
         von, bis = block["vergleichstag"], block["stichtag"]
         zeilen = list(block["zeilen"])
@@ -180,56 +194,65 @@ def bewegung_kontext(block: dict | None, basis: str,
     if block.get("error"):
         aus["ausfall"] = texte["ausfall"].replace("{grund}", block["error"])
         return aus
-    aus["zeitraum"] = (texte["zeitraum"].replace("{von}", _tag(von))
-                       .replace("{bis}", _tag(bis)))
+    aus["zeitraum"] = (
+        texte["zeitraum"].replace("{von}", _tag(von)).replace("{bis}", _tag(bis))
+    )
     for z in zeilen:
         if round(z["fremd_delta"]) and round(z["eigen_delta"]):
             bewegt = texte["bewegt_beide"]
         elif round(z["eigen_delta"]):
             bewegt = texte["bewegt_eigen"]
         else:
-            bewegt = texte["bewegt_fremd"].replace("{anbieter}",
-                                                   z["anbieter"])
-        aus["zeilen"].append({
-            # Nahe der Schwelle mit Cent: „50 €" neben „über 50 €" im
-            # Leersatz waere ein Widerspruch.
-            "betrag": _euro(z["delta"],
-                            cent=abs(z["delta"]) < BEWEGUNG_EURO + 1),
-            "richtung": texte["zugunsten"].replace(
-                "{anbieter}",
-                z["anbieter"] if z["delta"] < 0 else "Vodafone"),
-            "anbieter": z["anbieter"],
-            "farbe": farbe_fuer(z["anbieter"]),
-            "geraet": z["geraet"], "band": z["band_label"],
-            "vorher": texte["vorher"].replace(
-                "{abstand}", _abstand(z["abstand_vorher"], texte)),
-            "jetzt": texte["jetzt"].replace(
-                "{abstand}", _abstand(z["abstand_jetzt"], texte)),
-            "bewegt": bewegt,
-            "link": f"{basis}/{z['link']}" if basis else z["link"],
-            "quelle": z["quelle_url"],
-            "quelle_text": texte["link_angebot"].replace("{anbieter}",
-                                                         z["anbieter"]),
-            "eigen_quelle": z["eigen_quelle_url"],
-            "eigen_quelle_text": texte["link_angebot"].replace(
-                "{anbieter}", "Vodafone"),
-        })
+            bewegt = texte["bewegt_fremd"].replace("{anbieter}", z["anbieter"])
+        aus["zeilen"].append(
+            {
+                # Nahe der Schwelle mit Cent: „50 €" neben „über 50 €" im
+                # Leersatz waere ein Widerspruch.
+                "betrag": _euro(z["delta"], cent=abs(z["delta"]) < BEWEGUNG_EURO + 1),
+                "richtung": texte["zugunsten"].replace(
+                    "{anbieter}", z["anbieter"] if z["delta"] < 0 else "Vodafone"
+                ),
+                "anbieter": z["anbieter"],
+                "farbe": farbe_fuer(z["anbieter"]),
+                "geraet": z["geraet"],
+                "band": z["band_label"],
+                "vorher": texte["vorher"].replace(
+                    "{abstand}", _abstand(z["abstand_vorher"], texte)
+                ),
+                "jetzt": texte["jetzt"].replace(
+                    "{abstand}", _abstand(z["abstand_jetzt"], texte)
+                ),
+                "bewegt": bewegt,
+                "link": f"{basis}/{z['link']}" if basis else z["link"],
+                "quelle": z["quelle_url"],
+                "quelle_text": texte["link_angebot"].replace(
+                    "{anbieter}", z["anbieter"]
+                ),
+                "eigen_quelle": z["eigen_quelle_url"],
+                "eigen_quelle_text": texte["link_angebot"].replace(
+                    "{anbieter}", "Vodafone"
+                ),
+            }
+        )
     if not aus["zeilen"]:
-        aus["leer"] = (texte["leer"].replace("{von}", _tag(von))
-                       .replace("{euro}", _euro(BEWEGUNG_EURO))
-                       .replace("{prozent}", f"{BEWEGUNG_PROZENT:g} %")
-                       .replace("{geprueft}", str(geprueft))
-                       .replace("{gesamt}", str(geprueft + ohne)))
+        aus["leer"] = (
+            texte["leer"]
+            .replace("{von}", _tag(von))
+            .replace("{euro}", _euro(BEWEGUNG_EURO))
+            .replace("{prozent}", f"{BEWEGUNG_PROZENT:g} %")
+            .replace("{geprueft}", str(geprueft))
+            .replace("{gesamt}", str(geprueft + ohne))
+        )
     if block.get("weitere"):
-        aus["weitere"] = texte["weitere"].replace("{n}",
-                                                  str(block["weitere"]))
+        aus["weitere"] = texte["weitere"].replace("{n}", str(block["weitere"]))
     return aus
 
 
 # ============================================================  Betreff  ====
 
+
 def betreff(datum_de: str, treffer: list[Treffer], chrome: dict) -> str:
-    """"Telco Radar, 11. August: Telekom senkt Preise (+3 weitere)".
+    """ "Telco Radar, 11. August: Telekom senkt Preise (+3 weitere)".
 
     Die staerkste Schlagzeile im Betreff, nicht "Ihr Newsletter" - der
     Betreff ist die einzige Zeile, die JEDER Empfaenger sieht, auch der, der
@@ -253,6 +276,7 @@ def betreff(datum_de: str, treffer: list[Treffer], chrome: dict) -> str:
 
 # ==========================================================  Zusammenbau  ==
 
+
 def _items(treffer: list[Treffer]) -> list[dict]:
     """Die inhaltstragenden Bloecke - und NUR sie.
 
@@ -275,19 +299,31 @@ def _items(treffer: list[Treffer]) -> list[dict]:
         stichwort = t.stichwort if t.ueber_stichwort else ""
         zeigen = stichwort if stichwort != vorheriges_stichwort else ""
         vorheriges_stichwort = stichwort
-        aus.append({"titel": t.eintrag.titel,
-                    "text": kuerze(t.eintrag.text),
-                    "absender": t.eintrag.absender,
-                    "url": t.eintrag.url,
-                    "anker": t.eintrag.anker,
-                    "stichwort": zeigen})
+        aus.append(
+            {
+                "titel": t.eintrag.titel,
+                "text": kuerze(t.eintrag.text),
+                "absender": t.eintrag.absender,
+                "url": t.eintrag.url,
+                "anker": t.eintrag.anker,
+                "stichwort": zeigen,
+            }
+        )
     return aus
 
 
-def baue(treffer: list[Treffer], *, datum_de: str, bericht_url: str,
-         abmelde_url: str, seit_datum: str = "", basis_url: str = "",
-         chrome: dict | None = None, mit_filter: bool = True,
-         bewegung: dict | None = None) -> Nachricht:
+def baue(
+    treffer: list[Treffer],
+    *,
+    datum_de: str,
+    bericht_url: str,
+    abmelde_url: str,
+    seit_datum: str = "",
+    basis_url: str = "",
+    chrome: dict | None = None,
+    mit_filter: bool = True,
+    bewegung: dict | None = None,
+) -> Nachricht:
     """Die fertige Nachricht - HTML, Text und Kopfzeilen.
 
     `bewegung` ist der Block `geraete_bewegung` aus dem Bericht-JSON."""
@@ -304,8 +340,9 @@ def baue(treffer: list[Treffer], *, datum_de: str, bericht_url: str,
         "abmelde_url": abmelde_url,
         "impressum_url": f"{basis}/impressum.html" if basis else "",
         "datenschutz_url": f"{basis}/datenschutz.html" if basis else "",
-        "einleitung": (chrome["einleitung_filter"] if mit_filter
-                       else chrome["einleitung_alles"]),
+        "einleitung": (
+            chrome["einleitung_filter"] if mit_filter else chrome["einleitung_alles"]
+        ),
         "breite": BREITE,
     }
     env = _env()
@@ -313,7 +350,8 @@ def baue(treffer: list[Treffer], *, datum_de: str, bericht_url: str,
         betreff=ctx["betreff"],
         html=env.get_template("digest.html.j2").render(**ctx),
         text=env.get_template("digest.txt.j2").render(**ctx),
-        headers=kopfzeilen(abmelde_url))
+        headers=kopfzeilen(abmelde_url),
+    )
 
 
 def kopfzeilen(abmelde_url: str) -> dict:

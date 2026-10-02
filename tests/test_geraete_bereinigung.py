@@ -14,6 +14,7 @@ mit einem Paar, das sich NUR in diesem einen Feld unterscheidet; auf den
 echten Daten ist das bei acht von neun folgenlos, und genau darum steht der
 Fall hier gebaut und nicht gemessen.
 """
+
 import json
 from copy import deepcopy
 from pathlib import Path
@@ -21,25 +22,44 @@ from pathlib import Path
 import pytest
 
 from telco_radar.geraete_config import lade_katalog
-from telco_radar.report.geraete_bereinigung import (_zwillingsschluessel,
-                                                    bereinige)
+from telco_radar.report.geraete_bereinigung import _zwillingsschluessel, bereinige
 from telco_radar.report.geraete_pruefung import pruefe
 
 _WURZEL = Path(__file__).resolve().parents[1]
 
 
-def _e(anbieter="o2", gid="apple-iphone-15", speicher=128, farbe_roh="schwarz",
-       farbe_norm=None, zustand="refurbished", status="aktiv", preis=613.0,
-       zuzahlung=None, tarif=None, url=None, abgerufen="2026-08-30",
-       titel=None, first_seen="2026-08-30", kennung=None):
+def _e(
+    anbieter="o2",
+    gid="apple-iphone-15",
+    speicher=128,
+    farbe_roh="schwarz",
+    farbe_norm=None,
+    zustand="refurbished",
+    status="aktiv",
+    preis=613.0,
+    zuzahlung=None,
+    tarif=None,
+    url=None,
+    abgerufen="2026-08-30",
+    titel=None,
+    first_seen="2026-08-30",
+    kennung=None,
+):
     return {
         "id": kennung or f"{anbieter}--{gid}-{speicher}-{farbe_roh}",
-        "anbieter": anbieter, "device_id": gid, "speicher_gb": speicher,
-        "farbe_roh": farbe_roh, "farbe_normalisiert": farbe_norm,
-        "zustand": zustand, "status": status, "preis_ohne_vertrag": preis,
-        "zuzahlung": zuzahlung, "tarif_referenz": tarif,
+        "anbieter": anbieter,
+        "device_id": gid,
+        "speicher_gb": speicher,
+        "farbe_roh": farbe_roh,
+        "farbe_normalisiert": farbe_norm,
+        "zustand": zustand,
+        "status": status,
+        "preis_ohne_vertrag": preis,
+        "zuzahlung": zuzahlung,
+        "tarif_referenz": tarif,
         "quelle_url": url or f"https://www.o2online.de/e-shop/{gid}-details",
-        "abgerufen_am": abgerufen, "titel_roh": titel or "",
+        "abgerufen_am": abgerufen,
+        "titel_roh": titel or "",
         "first_seen": first_seen,
     }
 
@@ -59,12 +79,14 @@ def _beide_bleiben(a, b):
         if feld != "id":
             zwilling[feld] = wert
     assert len(bereinige([a, zwilling])) == 1, (
-        "der Fall loest gar keine Zusammenfassung aus - der Test misst nichts")
+        "der Fall loest gar keine Zusammenfassung aus - der Test misst nichts"
+    )
 
 
 # --------------------------------------------------------------------------
 # 1. Die Farbe ohne Zustandswort
 # --------------------------------------------------------------------------
+
 
 def test_das_zustandswort_faellt_aus_der_rohfarbe():
     (raus,) = bereinige([_e(farbe_roh="space schwarz erneuert")])
@@ -76,21 +98,23 @@ def test_das_zustandswort_faellt_auch_aus_der_kanonischen_farbe():
     das kanonische Feld ungereinigt, stuende das Wort ueber den Vorrang der
     ersten Haelfte wieder auf der Seite - heute traegt es keins, der naechste
     Adapter kann es."""
-    (raus,) = bereinige([_e(farbe_roh="grau erneuert",
-                            farbe_norm="grau gebraucht")])
+    (raus,) = bereinige([_e(farbe_roh="grau erneuert", farbe_norm="grau gebraucht")])
     assert raus["farbe_normalisiert"] == "grau"
     assert raus["farbe_roh"] == "grau"
 
 
-@pytest.mark.parametrize("farbe", [
-    "Titanium Black",
-    # Der Fall, an dem die unbedingte Interpunktionsreinigung eine Farbe
-    # beschaedigt hat, die nie ein Kennzeichen trug. Steht so im Livebestand
-    # (mobilcom-debitel, Galaxy S25 128 GB).
-    "Silver Shadow (Enterprise Edition)",
-    "Blau/Grau",
-    "sunset-gold",
-])
+@pytest.mark.parametrize(
+    "farbe",
+    [
+        "Titanium Black",
+        # Der Fall, an dem die unbedingte Interpunktionsreinigung eine Farbe
+        # beschaedigt hat, die nie ein Kennzeichen trug. Steht so im Livebestand
+        # (mobilcom-debitel, Galaxy S25 128 GB).
+        "Silver Shadow (Enterprise Edition)",
+        "Blau/Grau",
+        "sunset-gold",
+    ],
+)
 def test_eine_farbe_ohne_zustandswort_bleibt_zeichengenau_stehen(farbe):
     (raus,) = bereinige([_e(farbe_roh=farbe, farbe_norm=farbe)])
     assert raus["farbe_roh"] == farbe
@@ -109,11 +133,16 @@ def test_eine_farbe_die_nur_aus_dem_zustandswort_besteht_bleibt_stehen():
 # 2. Zwillinge - und die Reihenfolge der zwei Schritte
 # --------------------------------------------------------------------------
 
+
 def test_der_zwilling_einer_umbenannten_listung_faellt_weg():
     """Der gemessene Regelfall: dieselbe Adresse, derselbe Preis, die alte
     Schreibweise gealtert daneben."""
-    alt = _e(farbe_roh="mitternacht erneuert", status="vermutlich ausgelistet",
-             abgerufen="2026-08-29", preis=445.0)
+    alt = _e(
+        farbe_roh="mitternacht erneuert",
+        status="vermutlich ausgelistet",
+        abgerufen="2026-08-29",
+        preis=445.0,
+    )
     neu = _e(farbe_roh="mitternacht", farbe_norm="schwarz", preis=445.0)
     raus = bereinige([alt, neu])
     assert len(raus) == 1
@@ -125,18 +154,24 @@ def test_erst_die_farbe_bereinigen_dann_die_zwillinge_suchen():
     die beiden Zeilen zwei verschiedene Schluessel, und nur weil Schritt 1
     vorher laeuft, treffen sie sich. Liefe die Zwillingssuche zuerst, waere
     die zweite Zusicherung dieses Moduls stumm abgeschaltet."""
-    alt = _e(farbe_roh="mitternacht erneuert", status="vermutlich ausgelistet",
-             abgerufen="2026-08-29")
+    alt = _e(
+        farbe_roh="mitternacht erneuert",
+        status="vermutlich ausgelistet",
+        abgerufen="2026-08-29",
+    )
     neu = _e(farbe_roh="mitternacht", farbe_norm="schwarz")
     assert _zwillingsschluessel(alt) != _zwillingsschluessel(neu)
     assert len(bereinige([alt, neu])) == 1
 
 
 def test_der_aktive_eintrag_ueberlebt_den_gealterten():
-    alt = _e(farbe_roh="blau erneuert", status="vermutlich ausgelistet",
-             abgerufen="2026-08-31", kennung="alt")
-    neu = _e(farbe_roh="blau", status="aktiv", abgerufen="2026-08-29",
-             kennung="neu")
+    alt = _e(
+        farbe_roh="blau erneuert",
+        status="vermutlich ausgelistet",
+        abgerufen="2026-08-31",
+        kennung="alt",
+    )
+    neu = _e(farbe_roh="blau", status="aktiv", abgerufen="2026-08-29", kennung="neu")
     # Das juengere Datum liegt absichtlich beim GEALTERTEN: sonst gewaenne
     # der aktive Eintrag auch ohne die Statusregel.
     for reihenfolge in ([alt, neu], [neu, alt]):
@@ -156,8 +191,12 @@ def test_der_ueberlebende_erbt_das_fruehere_first_seen():
     """Eine umbenannte Listung ist nicht neu. Ohne diese Zeile zaehlte die
     Verweildauer im Portfolio-Reiter jede Umbenennung als Zugang - genau der
     Schaden, den das Bereinigen beim Lesen vermeiden soll."""
-    alt = _e(farbe_roh="mitternacht erneuert", status="vermutlich ausgelistet",
-             abgerufen="2026-08-29", first_seen="2026-08-12")
+    alt = _e(
+        farbe_roh="mitternacht erneuert",
+        status="vermutlich ausgelistet",
+        abgerufen="2026-08-29",
+        first_seen="2026-08-12",
+    )
     neu = _e(farbe_roh="mitternacht", first_seen="2026-08-30")
     (raus,) = bereinige([alt, neu])
     assert raus["first_seen"] == "2026-08-12"
@@ -167,8 +206,12 @@ def test_die_kennung_des_aufgeloesten_zwillings_bleibt_auffindbar():
     """Seine Preispunkte haengen an ihr. Wer sie im Export halten will,
     braucht die Angabe von hier - nur diese Funktion weiss, welche Zeile
     welche abgeloest hat."""
-    alt = _e(farbe_roh="mitternacht erneuert", status="vermutlich ausgelistet",
-             abgerufen="2026-08-29", kennung="alt")
+    alt = _e(
+        farbe_roh="mitternacht erneuert",
+        status="vermutlich ausgelistet",
+        abgerufen="2026-08-29",
+        kennung="alt",
+    )
     neu = _e(farbe_roh="mitternacht", kennung="neu")
     (raus,) = bereinige([alt, neu])
     assert raus["zwilling_ids"] == ["alt"]
@@ -186,6 +229,7 @@ def test_eine_einzelne_listung_bekommt_kein_zwillingsfeld():
 # Die neun Bestandteile des Schluessels, je einer je Test
 # --------------------------------------------------------------------------
 
+
 def test_zwei_anbieter_sind_zwei_angebote():
     _beide_bleiben(_e(anbieter="o2"), _e(anbieter="Vodafone"))
 
@@ -196,8 +240,9 @@ def test_zwei_geraete_sind_zwei_angebote():
     die zwei schon an der URL unterschieden, und der Test haette die
     device_id nur behauptet."""
     seite = "https://www.o2online.de/e-shop/apple-details"
-    _beide_bleiben(_e(gid="apple-iphone-15", url=seite),
-                   _e(gid="apple-iphone-16", url=seite))
+    _beide_bleiben(
+        _e(gid="apple-iphone-15", url=seite), _e(gid="apple-iphone-16", url=seite)
+    )
 
 
 def test_zwei_speichergroessen_sind_zwei_angebote():
@@ -211,7 +256,8 @@ def test_neu_und_gebraucht_sind_zwei_angebote():
     Gebrauchtpreis mit dem Neupreis zusammen."""
     _beide_bleiben(
         _e(zustand="neu", titel="Apple iPhone 15 128 GB"),
-        _e(zustand="neu", titel="Apple iPhone 15 128 GB (gebraucht)"))
+        _e(zustand="neu", titel="Apple iPhone 15 128 GB (gebraucht)"),
+    )
 
 
 def test_der_gespeicherte_zustand_haelt_den_zwilling_nicht_am_leben():
@@ -220,13 +266,26 @@ def test_der_gespeicherte_zustand_haelt_den_zwilling_nicht_am_leben():
     derselbe Artikel unter derselben Adresse `...-erneuert-details`. Auf den
     GESPEICHERTEN Zustand geschluesselt blieben genau die zwei stehen, bei
     denen die falsche Haelfte als Neugeraet in den Preisvergleich ginge."""
-    url = ("https://www.o2online.de/e-shop/apple/"
-           "apple-iphone-14-pro-128gb-space-schwarz-erneuert-details")
-    alt = _e(gid="apple-iphone-14-pro", farbe_roh="space schwarz erneuert",
-             zustand="neu", status="vermutlich ausgelistet",
-             abgerufen="2026-08-29", preis=577.0, url=url)
-    neu = _e(gid="apple-iphone-14-pro", farbe_roh="space schwarz",
-             zustand="refurbished", preis=577.0, url=url)
+    url = (
+        "https://www.o2online.de/e-shop/apple/"
+        "apple-iphone-14-pro-128gb-space-schwarz-erneuert-details"
+    )
+    alt = _e(
+        gid="apple-iphone-14-pro",
+        farbe_roh="space schwarz erneuert",
+        zustand="neu",
+        status="vermutlich ausgelistet",
+        abgerufen="2026-08-29",
+        preis=577.0,
+        url=url,
+    )
+    neu = _e(
+        gid="apple-iphone-14-pro",
+        farbe_roh="space schwarz",
+        zustand="refurbished",
+        preis=577.0,
+        url=url,
+    )
     (raus,) = bereinige([alt, neu])
     assert raus["zustand"] == "refurbished"
 
@@ -243,16 +302,20 @@ def test_zwei_zuzahlungen_sind_zwei_angebote():
 
 
 def test_dieselbe_zuzahlung_zu_zwei_tarifen_sind_zwei_angebote():
-    _beide_bleiben(_e(preis=None, zuzahlung=1.0, tarif="Blau Allnet L"),
-                   _e(preis=None, zuzahlung=1.0, tarif="Blau Allnet XL"))
+    _beide_bleiben(
+        _e(preis=None, zuzahlung=1.0, tarif="Blau Allnet L"),
+        _e(preis=None, zuzahlung=1.0, tarif="Blau Allnet XL"),
+    )
 
 
 def test_zwei_adressen_sind_zwei_angebote():
     """Gleiche Farbe, gleicher Preis, verschiedene Adresse: das ist keine
     umbenannte Listung, sondern eine zweite - der Vergleich soll sie
     sehen."""
-    _beide_bleiben(_e(url="https://www.o2online.de/e-shop/a-details"),
-                   _e(url="https://www.o2online.de/e-shop/b-details"))
+    _beide_bleiben(
+        _e(url="https://www.o2online.de/e-shop/a-details"),
+        _e(url="https://www.o2online.de/e-shop/b-details"),
+    )
 
 
 def test_zwei_farben_sind_zwei_angebote():
@@ -263,6 +326,7 @@ def test_zwei_farben_sind_zwei_angebote():
 # Die Falle: echte Farbvarianten
 # --------------------------------------------------------------------------
 
+
 def test_fuenf_vodafone_farbvarianten_ueberleben_alle():
     """Vodafone fuehrt das iPhone 17 256 GB in fuenf Farben zu identischen
     949,90 EUR - unter EINER Produktadresse. Die naheliegende
@@ -270,22 +334,34 @@ def test_fuenf_vodafone_farbvarianten_ueberleben_alle():
     also nicht; was sie trennt, ist die Farbe selbst."""
     url = "https://www.vodafone.de/privat/handys/iphone-17.html"
     varianten = [
-        _e(anbieter="Vodafone", gid="apple-iphone-17", speicher=256,
-           farbe_roh=farbe, zustand="neu", preis=949.9, url=url)
+        _e(
+            anbieter="Vodafone",
+            gid="apple-iphone-17",
+            speicher=256,
+            farbe_roh=farbe,
+            zustand="neu",
+            preis=949.9,
+            url=url,
+        )
         for farbe in ("Salbei", "Nebelblau", "Schwarz", "Lavendel", "Weiß")
     ]
     raus = bereinige(varianten)
     assert len(raus) == 5
-    assert _farben(raus) == sorted(["Salbei", "Nebelblau", "Schwarz",
-                                    "Lavendel", "Weiß"])
+    assert _farben(raus) == sorted(
+        ["Salbei", "Nebelblau", "Schwarz", "Lavendel", "Weiß"]
+    )
 
 
 def test_eine_farbvariante_ueberlebt_neben_einem_zwillingspaar():
     """Der gemischte Fall - sonst koennte die Regel "immer alles behalten"
     heissen und der Test darueber trotzdem gruen sein."""
     url = "https://www.o2online.de/e-shop/iphone-15-mitternacht-erneuert-details"
-    alt = _e(farbe_roh="mitternacht erneuert", status="vermutlich ausgelistet",
-             abgerufen="2026-08-29", url=url)
+    alt = _e(
+        farbe_roh="mitternacht erneuert",
+        status="vermutlich ausgelistet",
+        abgerufen="2026-08-29",
+        url=url,
+    )
     neu = _e(farbe_roh="mitternacht", farbe_norm="schwarz", url=url)
     andere = _e(farbe_roh="blau", farbe_norm="blau", url=url)
     raus = bereinige([alt, neu, andere])
@@ -297,13 +373,18 @@ def test_eine_farbvariante_ueberlebt_neben_einem_zwillingspaar():
 # Der Store bleibt unangetastet
 # --------------------------------------------------------------------------
 
+
 def test_die_eingabe_wird_nicht_veraendert():
     """Eine geaenderte Farbe im Store aenderte die `sku_id`: der Altbestand
     gaelte als ausgelistet und entstuende neu, Listungsdauer und
     Preisverlauf begaennen bei null. Bereinigt wird beim LESEN."""
     eingabe = [
-        _e(farbe_roh="mitternacht erneuert", status="vermutlich ausgelistet",
-           abgerufen="2026-08-29", first_seen="2026-08-12"),
+        _e(
+            farbe_roh="mitternacht erneuert",
+            status="vermutlich ausgelistet",
+            abgerufen="2026-08-29",
+            first_seen="2026-08-12",
+        ),
         _e(farbe_roh="mitternacht", farbe_norm="schwarz"),
     ]
     vorher = deepcopy(eingabe)
@@ -322,11 +403,16 @@ def test_das_ergebnis_teilt_seine_dicts_nicht_mit_der_eingabe():
 
 
 def test_die_reihenfolge_der_eingabe_bleibt():
-    eingabe = [_e(gid="apple-iphone-17", farbe_roh="schwarz"),
-               _e(gid="apple-iphone-15", farbe_roh="blau"),
-               _e(gid="apple-iphone-16", farbe_roh="weiss")]
+    eingabe = [
+        _e(gid="apple-iphone-17", farbe_roh="schwarz"),
+        _e(gid="apple-iphone-15", farbe_roh="blau"),
+        _e(gid="apple-iphone-16", farbe_roh="weiss"),
+    ]
     assert [e["device_id"] for e in bereinige(eingabe)] == [
-        "apple-iphone-17", "apple-iphone-15", "apple-iphone-16"]
+        "apple-iphone-17",
+        "apple-iphone-15",
+        "apple-iphone-16",
+    ]
 
 
 def test_ein_leerer_bestand_bleibt_leer():
@@ -337,10 +423,14 @@ def test_ein_leerer_bestand_bleibt_leer():
 # Gegen die echten Daten
 # --------------------------------------------------------------------------
 
+
 def _echter_bestand():
     db = json.loads((_WURZEL / "data" / "state" / "geraete_db.json").read_text())
-    return [e for e in db["listungen"]
-            if e.get("status") in ("aktiv", "vermutlich ausgelistet")]
+    return [
+        e
+        for e in db["listungen"]
+        if e.get("status") in ("aktiv", "vermutlich ausgelistet")
+    ]
 
 
 def _ids(eintraege):
@@ -384,12 +474,14 @@ def test_die_kette_der_auslieferung_nimmt_nur_weg_was_sie_meldet():
     gestrichen = _ids(sichtbar) - _ids(geprueft)
     assert len(gestrichen) == bericht["zahlen"]["aussortiert"]
     assert bool(gestrichen) == any(b["entfernt"] for b in bericht["befunde"]), (
-        "gestrichen ohne Befund oder Befund ohne Streichung")
+        "gestrichen ohne Befund oder Befund ohne Streichung"
+    )
 
     ueberlebende = {_zwillingsschluessel(e) for e in fertig}
     for weg in (e for e in geprueft if e["id"] not in _ids(fertig)):
         assert _zwillingsschluessel(weg) in ueberlebende, (
-            f"{weg['id']} ist keine doppelt gefuehrte Zeile, sondern weg")
+            f"{weg['id']} ist keine doppelt gefuehrte Zeile, sondern weg"
+        )
 
     assert len(fertig) <= len(bereinige(sichtbar))
 
@@ -409,23 +501,49 @@ def test_die_kette_haelt_ihre_zwei_zahlen_an_einer_gestellten_lage():
     Zwillingssuche es sieht.
     """
     url = "https://www.o2online.de/e-shop/iphone-15-mitternacht-erneuert-details"
-    zwilling_alt = _e(farbe_roh="mitternacht erneuert", preis=445.0, url=url,
-                      status="vermutlich ausgelistet", abgerufen="2026-08-29",
-                      kennung="o2-alt")
-    zwilling_neu = _e(farbe_roh="mitternacht", farbe_norm="schwarz",
-                      preis=445.0, url=url, kennung="o2-neu")
+    zwilling_alt = _e(
+        farbe_roh="mitternacht erneuert",
+        preis=445.0,
+        url=url,
+        status="vermutlich ausgelistet",
+        abgerufen="2026-08-29",
+        kennung="o2-alt",
+    )
+    zwilling_neu = _e(
+        farbe_roh="mitternacht",
+        farbe_norm="schwarz",
+        preis=445.0,
+        url=url,
+        kennung="o2-neu",
+    )
     # Zwei Preise fuer dieselbe Farbe desselben Geraets: ein Widerspruch mit
     # sich selbst, den `pruefe()` als Doppelpreis herauswirft - beide
     # Haelften, weil der Datensatz nicht sagt, welche stimmt.
-    doppel = [_e(gid="apple-iphone-16", farbe_roh="blau", farbe_norm="blau",
-                 zustand="neu", preis=preis, kennung=f"doppel-{preis:.0f}",
-                 url=f"https://www.o2online.de/e-shop/iphone-16-{preis:.0f}")
-              for preis in (699.0, 899.0)]
+    doppel = [
+        _e(
+            gid="apple-iphone-16",
+            farbe_roh="blau",
+            farbe_norm="blau",
+            zustand="neu",
+            preis=preis,
+            kennung=f"doppel-{preis:.0f}",
+            url=f"https://www.o2online.de/e-shop/iphone-16-{preis:.0f}",
+        )
+        for preis in (699.0, 899.0)
+    ]
     varianten = [
-        _e(anbieter="Vodafone", gid="apple-iphone-17", speicher=256,
-           farbe_roh=farbe, zustand="neu", preis=949.9, kennung=f"vf-{farbe}",
-           url="https://www.vodafone.de/privat/handys/iphone-17.html")
-        for farbe in ("Salbei", "Nebelblau")]
+        _e(
+            anbieter="Vodafone",
+            gid="apple-iphone-17",
+            speicher=256,
+            farbe_roh=farbe,
+            zustand="neu",
+            preis=949.9,
+            kennung=f"vf-{farbe}",
+            url="https://www.vodafone.de/privat/handys/iphone-17.html",
+        )
+        for farbe in ("Salbei", "Nebelblau")
+    ]
 
     sichtbar = [zwilling_alt, zwilling_neu, *doppel, *varianten]
     bericht = pruefe(sichtbar, lade_katalog(_WURZEL))
@@ -438,10 +556,15 @@ def test_die_kette_haelt_ihre_zwei_zahlen_an_einer_gestellten_lage():
 
 def test_am_echten_bestand_bleibt_keine_farbe_mit_zustandswort():
     fertig = bereinige(_echter_bestand())
-    uebrig = [e for e in fertig
-              for feld in ("farbe_roh", "farbe_normalisiert")
-              if any(wort in str(e.get(feld) or "").lower()
-                     for wort in ("erneuert", "gebraucht", "refurbished"))]
+    uebrig = [
+        e
+        for e in fertig
+        for feld in ("farbe_roh", "farbe_normalisiert")
+        if any(
+            wort in str(e.get(feld) or "").lower()
+            for wort in ("erneuert", "gebraucht", "refurbished")
+        )
+    ]
     assert uebrig == []
 
 
@@ -465,18 +588,41 @@ def test_der_zwilling_faellt_und_die_echte_ware_daneben_bleibt():
     einebnete.
     """
     url = "https://www.o2online.de/e-shop/iphone-15-mitternacht-erneuert-details"
-    alt = _e(farbe_roh="mitternacht erneuert", status="vermutlich ausgelistet",
-             abgerufen="2026-08-29", preis=445.0, url=url, kennung="o2-alt")
-    neu = _e(farbe_roh="mitternacht", farbe_norm="schwarz", preis=445.0,
-             url=url, kennung="o2-neu")
-    andere_adresse = _e(farbe_roh="blau", farbe_norm="blau", preis=445.0,
-                        url="https://www.o2online.de/e-shop/iphone-15-blau",
-                        kennung="o2-blau")
+    alt = _e(
+        farbe_roh="mitternacht erneuert",
+        status="vermutlich ausgelistet",
+        abgerufen="2026-08-29",
+        preis=445.0,
+        url=url,
+        kennung="o2-alt",
+    )
+    neu = _e(
+        farbe_roh="mitternacht",
+        farbe_norm="schwarz",
+        preis=445.0,
+        url=url,
+        kennung="o2-neu",
+    )
+    andere_adresse = _e(
+        farbe_roh="blau",
+        farbe_norm="blau",
+        preis=445.0,
+        url="https://www.o2online.de/e-shop/iphone-15-blau",
+        kennung="o2-blau",
+    )
     varianten = [
-        _e(anbieter="Vodafone", gid="apple-iphone-17", speicher=256,
-           farbe_roh=farbe, zustand="neu", preis=949.9, kennung=f"vf-{farbe}",
-           url="https://www.vodafone.de/privat/handys/iphone-17.html")
-        for farbe in ("Salbei", "Nebelblau")]
+        _e(
+            anbieter="Vodafone",
+            gid="apple-iphone-17",
+            speicher=256,
+            farbe_roh=farbe,
+            zustand="neu",
+            preis=949.9,
+            kennung=f"vf-{farbe}",
+            url="https://www.vodafone.de/privat/handys/iphone-17.html",
+        )
+        for farbe in ("Salbei", "Nebelblau")
+    ]
 
     bestand = [alt, neu, andere_adresse, *varianten]
     behalten = _ids(bereinige(bestand))
@@ -485,10 +631,15 @@ def test_der_zwilling_faellt_und_die_echte_ware_daneben_bleibt():
     assert {e["anbieter"] for e in weg} == {"o2"}
 
     # Gegenprobe: ohne die Zwillingseigenschaft faellt keine Zeile.
-    kein_zwilling = [{**alt, "preis_ohne_vertrag": 399.0}, neu,
-                     andere_adresse, *varianten]
+    kein_zwilling = [
+        {**alt, "preis_ohne_vertrag": 399.0},
+        neu,
+        andere_adresse,
+        *varianten,
+    ]
     assert len(bereinige(kein_zwilling)) == len(kein_zwilling), (
-        "der gestellte Fall loest gar keine Zusammenfassung aus")
+        "der gestellte Fall loest gar keine Zusammenfassung aus"
+    )
 
 
 def test_am_echten_bestand_faellt_kein_fremder_anbieter():
@@ -524,16 +675,20 @@ def test_am_echten_bestand_hat_jede_weggefallene_zeile_ihren_ueberlebenden():
     sichtbar = _echter_bestand()
     fertig = bereinige(sichtbar)
     behalten = {e["id"] for e in fertig}
-    geblieben = {(e["quelle_url"], e.get("preis_ohne_vertrag"))
-                 for e in fertig}
+    geblieben = {(e["quelle_url"], e.get("preis_ohne_vertrag")) for e in fertig}
     for weg in (e for e in sichtbar if e["id"] not in behalten):
         assert (weg["quelle_url"], weg.get("preis_ohne_vertrag")) in geblieben
 
 
 def test_am_echten_bestand_ueberleben_die_vodafone_farbvarianten():
     fertig = bereinige(_echter_bestand())
-    vf = [e for e in fertig if e["anbieter"] == "Vodafone"
-          and e["device_id"] == "apple-iphone-17" and e["speicher_gb"] == 256]
+    vf = [
+        e
+        for e in fertig
+        if e["anbieter"] == "Vodafone"
+        and e["device_id"] == "apple-iphone-17"
+        and e["speicher_gb"] == 256
+    ]
     assert len(vf) == 5
     assert len({e["farbe_roh"] for e in vf}) == 5
 
@@ -550,8 +705,11 @@ def test_am_echten_bestand_bleibt_die_klammerfarbe_unversehrt():
     Die Behauptung ist dieselbe - `bereinige` laesst die Klammerfarbe
     stehen -, nur haengt sie nicht mehr am Listungsstatus."""
     db = json.loads((_WURZEL / "data" / "state" / "geraete_db.json").read_text())
-    zeile = [e for e in db["listungen"]
-             if e.get("farbe_roh") == "Silver Shadow (Enterprise Edition)"]
+    zeile = [
+        e
+        for e in db["listungen"]
+        if e.get("farbe_roh") == "Silver Shadow (Enterprise Edition)"
+    ]
     assert zeile, "die Klammerfarbe steht nicht mehr im Bestand - Test prueft nichts"
     farben = {e.get("farbe_roh") for e in bereinige(zeile)}
     assert "Silver Shadow (Enterprise Edition)" in farben

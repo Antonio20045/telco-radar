@@ -33,6 +33,7 @@ achtzig.
 Gemessen an vier echten Dokumenten (2x Telekom, 2x o2, Stand 08.08.2026),
 die als Fixtures beiliegen.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -43,7 +44,13 @@ import subprocess
 from pathlib import Path
 
 from ..tarif_model import (
-    HOCH, MITTEL, Geraetepreis, Preisphase, Tarif, normalisiere, zahl,
+    HOCH,
+    MITTEL,
+    Geraetepreis,
+    Preisphase,
+    Tarif,
+    normalisiere,
+    zahl,
 )
 
 log = logging.getLogger(__name__)
@@ -51,11 +58,10 @@ log = logging.getLogger(__name__)
 # Ein Dokument, das keinen dieser Saetze traegt, ist kein PIB und keine
 # Vertragszusammenfassung.
 _KENNZEICHEN = re.compile(
-    r"Produktinformationsblatt|Vertragszusammenfassung|TK-Transparenzverordnung",
-    re.I)
+    r"Produktinformationsblatt|Vertragszusammenfassung|TK-Transparenzverordnung", re.I
+)
 
 _GELD = r"(\d{1,3}(?:\.\d{3})*,\d{2}|\d+,\d{2}|\d+)\s*(?:€|EUR)"
-
 
 
 class PDFNichtLesbar(RuntimeError):
@@ -71,18 +77,21 @@ def text_aus_pdf(pfad: Path) -> str:
     ist weg.
     """
     if not shutil.which("pdftotext"):
-        raise PDFNichtLesbar(
-            "pdftotext fehlt (Paket poppler-utils) - PDF nicht lesbar")
+        raise PDFNichtLesbar("pdftotext fehlt (Paket poppler-utils) - PDF nicht lesbar")
     try:
         fertig = subprocess.run(
             ["pdftotext", "-layout", str(pfad), "-"],
-            capture_output=True, timeout=60, check=False)
+            capture_output=True,
+            timeout=60,
+            check=False,
+        )
     except (OSError, subprocess.SubprocessError) as exc:
         raise PDFNichtLesbar(f"{pfad}: {exc}") from exc
     if fertig.returncode != 0 and not fertig.stdout:
         raise PDFNichtLesbar(
             f"{pfad}: pdftotext meldet {fertig.returncode}: "
-            f"{fertig.stderr.decode('utf-8', 'replace')[:200]}")
+            f"{fertig.stderr.decode('utf-8', 'replace')[:200]}"
+        )
     return fertig.stdout.decode("utf-8", "replace")
 
 
@@ -106,6 +115,7 @@ def dokument_hash(rohdaten: bytes | str) -> str:
 # Die einzelnen Felder
 # --------------------------------------------------------------------------- #
 
+
 def _zeile_mit(text: str, muster: re.Pattern) -> str:
     for zeile in text.splitlines():
         if muster.search(zeile):
@@ -124,8 +134,8 @@ def _name_und_art(text: str, t: Tarif) -> None:
     leer, und ein Tarif ohne Art faellt aus jeder Filterung heraus.
     """
     muster = re.compile(
-        r"^(.{3,80}?)\s*\((?:(?:Post|Pre)paid\s+)?(Mobilfunk|Festnetz)\)\s*$",
-        re.I)
+        r"^(.{3,80}?)\s*\((?:(?:Post|Pre)paid\s+)?(Mobilfunk|Festnetz)\)\s*$", re.I
+    )
     for zeile in text.splitlines():
         treffer = muster.match(zeile.strip())
         if treffer:
@@ -136,8 +146,12 @@ def _name_und_art(text: str, t: Tarif) -> None:
     # Fliesstext ist.
     for zeile in text.splitlines():
         z = zeile.strip()
-        if (3 < len(z) < 80 and not _KENNZEICHEN.search(z)
-                and not z.endswith(".") and re.search(r"[A-Za-zÄÖÜ]", z)):
+        if (
+            3 < len(z) < 80
+            and not _KENNZEICHEN.search(z)
+            and not z.endswith(".")
+            and re.search(r"[A-Za-zÄÖÜ]", z)
+        ):
             # Eine offene Klammer am Ende ist ein Zeilenumbruch im PDF,
             # kein Namensbestandteil: congstars XL-Blatt bricht
             # "(Postpaid Mobilfunk)" um, und auf der Seite stand
@@ -156,18 +170,21 @@ def _laufzeit(text: str, t: Tarif) -> None:
     ist die Aussage, nicht die Abwesenheit einer Aussage - und der
     Effektivpreis rechnet sonst gegen 24 Monate, die es nicht gibt.
     """
-    keine = re.compile(r"(Keine\s+Mindest(?:vertrags)?laufzeit"
-                       r"|hat\s+keine\s+Mindestlaufzeit)", re.I)
+    keine = re.compile(
+        r"(Keine\s+Mindest(?:vertrags)?laufzeit"
+        r"|hat\s+keine\s+Mindestlaufzeit)",
+        re.I,
+    )
     zeile = _zeile_mit(text, keine)
     if zeile:
         t.setze("laufzeit_monate", 0, zeile)
     else:
         muster = re.compile(
-            r"Mindest(?:vertrags)?laufzeit\D{0,20}?(\d{1,2})\s*Monat", re.I)
+            r"Mindest(?:vertrags)?laufzeit\D{0,20}?(\d{1,2})\s*Monat", re.I
+        )
         treffer = muster.search(text)
         if treffer:
-            t.setze("laufzeit_monate", int(treffer.group(1)),
-                    _zeile_mit(text, muster))
+            t.setze("laufzeit_monate", int(treffer.group(1)), _zeile_mit(text, muster))
 
     # Kuendigungsfrist. Zwei Satzstellungen kommen vor, und beide muessen
     # getroffen werden:
@@ -178,10 +195,16 @@ def _laufzeit(text: str, t: Tarif) -> None:
     worte = {"einem": 1, "einer": 1, "ein": 1, "zwei": 2, "drei": 3}
     for muster in (
         re.compile(r"Frist\s+von\s+(\d{1,2}|einem|einer|ein)\s*Monat", re.I),
-        re.compile(r"Kündigungsfrist\D{0,20}?"
-                   r"(\d{1,2}|einem|einer|ein|zwei|drei)\s*Monat", re.I),
-        re.compile(r"(\d{1,2}|einem|einer|ein)\s*Monat\D{0,30}?"
-                   r"(?:gekündigt|kündbar)", re.I),
+        re.compile(
+            r"Kündigungsfrist\D{0,20}?"
+            r"(\d{1,2}|einem|einer|ein|zwei|drei)\s*Monat",
+            re.I,
+        ),
+        re.compile(
+            r"(\d{1,2}|einem|einer|ein)\s*Monat\D{0,30}?"
+            r"(?:gekündigt|kündbar)",
+            re.I,
+        ),
     ):
         treffer = muster.search(text)
         if not treffer:
@@ -201,13 +224,11 @@ def _geschwindigkeit(text: str, t: Tarif) -> None:
     Treffer waere die kleinste, und die Positionskarte (A6) zeigte den
     Anbieter dauerhaft zu schwach.
     """
-    muster = re.compile(
-        r"^(?:Geschätzter\s+Maximalwert|Maximal)\b(.*)$", re.I | re.M)
+    muster = re.compile(r"^(?:Geschätzter\s+Maximalwert|Maximal)\b(.*)$", re.I | re.M)
     unten, oben, beleg = [], [], ""
     for treffer in muster.finditer(text):
         rest = treffer.group(1)
-        raten = re.findall(r"(\d+(?:[.,]\d+)?)\s*(MBit/s|GBit/s|KBit/s)", rest,
-                           re.I)
+        raten = re.findall(r"(\d+(?:[.,]\d+)?)\s*(MBit/s|GBit/s|KBit/s)", rest, re.I)
         if len(raten) < 1:
             continue
         beleg = beleg or treffer.group(0)
@@ -240,8 +261,7 @@ def _drossel(text: str, t: Tarif) -> None:
     zuverlaessiger als aus dem Marketingtext - hier ist es die Schwelle, ab
     der gedrosselt wird, und die ist rechtlich definiert.
     """
-    muster = re.compile(
-        r"Ab\s+Verbrauch\s+von\s+(\d+(?:[.,]\d+)?)\s*(GB|MB|TB)", re.I)
+    muster = re.compile(r"Ab\s+Verbrauch\s+von\s+(\d+(?:[.,]\d+)?)\s*(GB|MB|TB)", re.I)
     treffer = muster.search(text)
     if not treffer:
         return
@@ -259,7 +279,7 @@ def _drossel(text: str, t: Tarif) -> None:
     for i, zeile in enumerate(zeilen):
         if not muster.search(zeile):
             continue
-        block = " ".join(zeilen[i:i + 3])
+        block = " ".join(zeilen[i : i + 3])
         raten = re.findall(r"(\d+(?:[.,]\d+)?)\s*(KBit/s|MBit/s)", block, re.I)
         werte = []
         for wert, einheit in raten[:2]:
@@ -280,7 +300,9 @@ def _drossel(text: str, t: Tarif) -> None:
 # Volumen des Tarifs - danach wird je MB berechnet, nicht gedrosselt.
 _UNBEGRENZT = re.compile(
     r"\bUnlimited\b|\bUnlimitierte?s?\s+(?:Highspeed-)?Daten"
-    r"|unbegrenzt(?:es)?\s+Datenvolumen", re.I)
+    r"|unbegrenzt(?:es)?\s+Datenvolumen",
+    re.I,
+)
 
 
 def _volumen_ohne_drossel(text: str, t: Tarif) -> None:
@@ -291,18 +313,18 @@ def _volumen_ohne_drossel(text: str, t: Tarif) -> None:
         # Unlimited ist eine Aussage, kein fehlender Wert. Als None waere der
         # Tarif aus jeder Preis-je-GB-Rechnung gefallen - richtig -, aber auch
         # aus der Positionskarte, und dort gehoert er hin.
-        t.setze("datenvolumen_gb", float("inf"),
-                _zeile_mit(text, _UNBEGRENZT))
+        t.setze("datenvolumen_gb", float("inf"), _zeile_mit(text, _UNBEGRENZT))
         return
     muster = re.compile(r"(\d+(?:[.,]\d+)?)\s*GB\b(?![^\n]*Verbrauch)", re.I)
     treffer = muster.search(text)
     if treffer:
-        t.setze("datenvolumen_gb", zahl(treffer.group(1)),
-                _zeile_mit(text, muster), MITTEL)
+        t.setze(
+            "datenvolumen_gb", zahl(treffer.group(1)), _zeile_mit(text, muster), MITTEL
+        )
 
 
 def _volumen_automatik(text: str, t: Tarif) -> None:
-    """"Volumen steigt alle 12 Monate um 5 GB, max. 150 GB".
+    """ "Volumen steigt alle 12 Monate um 5 GB, max. 150 GB".
 
     Der Fall aus dem Auftrag. Er landet als Satz im Feld, nicht als Zahl:
     die Mechanik ist dreiteilig (Takt, Schrittweite, Deckel) und in eine
@@ -310,23 +332,32 @@ def _volumen_automatik(text: str, t: Tarif) -> None:
     """
     muster = re.compile(
         r"[^\n]{0,80}(?:steigt|erhöht|wächst)[^\n]{0,120}?"
-        r"\d+\s*(?:GB|Monate)[^\n]{0,120}", re.I)
+        r"\d+\s*(?:GB|Monate)[^\n]{0,120}",
+        re.I,
+    )
     treffer = muster.search(text)
     if treffer:
-        t.setze("volumen_automatik", " ".join(treffer.group(0).split())[:250],
-                treffer.group(0))
+        t.setze(
+            "volumen_automatik",
+            " ".join(treffer.group(0).split())[:250],
+            treffer.group(0),
+        )
 
 
 def _flatrates(text: str, t: Tarif) -> None:
-    if re.search(r"Allnet[- ]?Flat|Flatrate für Gespräche|Telefonie-?Flat",
-                 text, re.I):
-        t.setze("allnet_flat", True,
-                _zeile_mit(text, re.compile(
-                    r"Allnet[- ]?Flat|Flatrate für Gespräche|Telefonie-?Flat",
-                    re.I)))
+    if re.search(r"Allnet[- ]?Flat|Flatrate für Gespräche|Telefonie-?Flat", text, re.I):
+        t.setze(
+            "allnet_flat",
+            True,
+            _zeile_mit(
+                text,
+                re.compile(
+                    r"Allnet[- ]?Flat|Flatrate für Gespräche|Telefonie-?Flat", re.I
+                ),
+            ),
+        )
     if re.search(r"SMS[- ]?Flat", text, re.I):
-        t.setze("sms_flat", True,
-                _zeile_mit(text, re.compile(r"SMS[- ]?Flat", re.I)))
+        t.setze("sms_flat", True, _zeile_mit(text, re.compile(r"SMS[- ]?Flat", re.I)))
 
 
 def _preis(text: str, t: Tarif, rohzeilen: list[str] | None = None) -> None:
@@ -357,7 +388,7 @@ def _preis(text: str, t: Tarif, rohzeilen: list[str] | None = None) -> None:
         # normalisierten Text weg.
         roh = rohzeilen if rohzeilen is not None else zeilen
         roh_kopf = _kopfzeile(roh)
-        for zeile in roh[roh_kopf:roh_kopf + 12] if roh_kopf is not None else []:
+        for zeile in roh[roh_kopf : roh_kopf + 12] if roh_kopf is not None else []:
             betraege = re.findall(r"\b(\d{1,3},\d{2})\b", zeile)
             if len(betraege) >= 3:
                 kategorien = _kategorien_aus_spalten(roh, roh_kopf, zeile)
@@ -366,13 +397,11 @@ def _preis(text: str, t: Tarif, rohzeilen: list[str] | None = None) -> None:
                     wert = zahl(betrag)
                     if wert is None:
                         continue
-                    name = (kategorien[nr] if nr < len(kategorien)
-                            else f"Stufe {nr + 1}")
+                    name = kategorien[nr] if nr < len(kategorien) else f"Stufe {nr + 1}"
                     staffel.append(Geraetepreis(kategorie=name, betrag=wert))
                 if staffel:
                     t.setze("geraetepreisstaffel", staffel, zeile)
-                    t.setze("grundgebuehr", min(g.betrag for g in staffel),
-                            zeile)
+                    t.setze("grundgebuehr", min(g.betrag for g in staffel), zeile)
                 return
 
     # 2) Die senkrechte Tabellenform (Vodafone): Zeilen sind Kategorien,
@@ -384,12 +413,14 @@ def _preis(text: str, t: Tarif, rohzeilen: list[str] | None = None) -> None:
         return
 
     # 3) Ein einzelner Betrag unter dem Entgelt-Bezeichner.
-    muster = re.compile(r"(?:Entgelt für das|exkl\. Hardware|Monatlich)"
-                        r"[^\n]{0,60}?" + _GELD, re.I)
+    muster = re.compile(
+        r"(?:Entgelt für das|exkl\. Hardware|Monatlich)"
+        r"[^\n]{0,60}?" + _GELD,
+        re.I,
+    )
     treffer = muster.search(text)
     if treffer:
-        t.setze("grundgebuehr", zahl(treffer.group(1)),
-                _zeile_mit(text, muster))
+        t.setze("grundgebuehr", zahl(treffer.group(1)), _zeile_mit(text, muster))
         return
 
     # 4) Der Entgelt-Bezeichner traegt den PRODUKTNAMEN statt des Wortes
@@ -398,12 +429,12 @@ def _preis(text: str, t: Tarif, rohzeilen: list[str] | None = None) -> None:
     #    verlangt deshalb die Monatsangabe HINTER dem Betrag - sie ist es,
     #    die aus der Zahl einen Grundpreis macht und sie von einem
     #    einmaligen Entgelt unterscheidet.
-    muster = re.compile(r"Entgelt\b[^\n]{0,70}?" + _GELD
-                        + r"\s*(?:/|pro|je)\s*Monat", re.I)
+    muster = re.compile(
+        r"Entgelt\b[^\n]{0,70}?" + _GELD + r"\s*(?:/|pro|je)\s*Monat", re.I
+    )
     treffer = muster.search(text)
     if treffer:
-        t.setze("grundgebuehr", zahl(treffer.group(1)),
-                _zeile_mit(text, muster))
+        t.setze("grundgebuehr", zahl(treffer.group(1)), _zeile_mit(text, muster))
         return
 
     # 5) Ein einzelner Listenpreis ohne Phasenspalten. Vodafones
@@ -417,12 +448,11 @@ def _preis(text: str, t: Tarif, rohzeilen: list[str] | None = None) -> None:
     treffer = muster.search(text)
     if treffer:
         zeile = _zeile_mit(text, muster)
-        if not (_ABRECHNUNG_IN_WOCHEN.search(zeile)
-                or _VERTRAG_IN_WOCHEN.search(text)):
+        if not (_ABRECHNUNG_IN_WOCHEN.search(zeile) or _VERTRAG_IN_WOCHEN.search(text)):
             t.setze("grundgebuehr", zahl(treffer.group(1)), zeile)
         return
     if kopf is not None:
-        for zeile in zeilen[kopf:kopf + 12]:
+        for zeile in zeilen[kopf : kopf + 12]:
             treffer = re.search(_GELD, zeile)
             if treffer:
                 t.setze("grundgebuehr", zahl(treffer.group(1)), zeile)
@@ -444,12 +474,15 @@ def _zellen(zeile: str) -> list[tuple[int, str]]:
     die `pdftotext -layout` erzeugt. Ein einzelnes Leerzeichen trennt Woerter
     innerhalb einer Zelle ("mit Top-Smartphone").
     """
-    return [(t.start(), t.group().strip())
-            for t in re.finditer(r"\S(?:[^\s]|\s(?!\s))*", zeile)]
+    return [
+        (t.start(), t.group().strip())
+        for t in re.finditer(r"\S(?:[^\s]|\s(?!\s))*", zeile)
+    ]
 
 
-def _kategorien_aus_spalten(rohzeilen: list[str], kopf: int,
-                            preiszeile: str) -> list[str]:
+def _kategorien_aus_spalten(
+    rohzeilen: list[str], kopf: int, preiszeile: str
+) -> list[str]:
     """Die Spaltenueberschriften der Geraetestaffel, SPALTENWEISE gelesen.
 
     Der Kopf steht ueber drei Zeilen, und er steht in Spalten:
@@ -468,8 +501,9 @@ def _kategorien_aus_spalten(rohzeilen: list[str], kopf: int,
     Ueberlegung wie die Blockgrenze im Aenderungsradar - ein Etikett darf
     nicht aus der Nachbarspalte stammen.
     """
-    anker = [pos for pos, wort in _zellen(preiszeile)
-             if re.fullmatch(r"\d{1,3},\d{2}", wort)]
+    anker = [
+        pos for pos, wort in _zellen(preiszeile) if re.fullmatch(r"\d{1,3},\d{2}", wort)
+    ]
     if not anker:
         return []
 
@@ -500,7 +534,7 @@ def _kategorien_aus_spalten(rohzeilen: list[str], kopf: int,
     namen = []
     for pos in anker:
         teile = []
-        for zeile in rohzeilen[kopf:kopf + 8]:
+        for zeile in rohzeilen[kopf : kopf + 8]:
             if zeile.strip() == preiszeile.strip():
                 break
             for wort in re.finditer(r"\S+", zeile):
@@ -594,8 +628,7 @@ _PREISKOPF = re.compile(r"Listenpreis|Monatlicher Preis|Monatspreis", re.I)
 # irgendwo: "Kuendigungsfrist 4 Wochen" kommt in monatlich abgerechneten
 # Vertraegen vor, und eine Regel darauf loeschte deren Preis.
 _ABRECHNUNG_IN_WOCHEN = re.compile(r"(?:/|pro|je)\s*\d*\s*Woche", re.I)
-_VERTRAG_IN_WOCHEN = re.compile(r"Vertragslaufs?zeiten?[^\n]{0,30}?\d+\s*Wochen",
-                                re.I)
+_VERTRAG_IN_WOCHEN = re.compile(r"Vertragslaufs?zeiten?[^\n]{0,30}?\d+\s*Wochen", re.I)
 
 # Wie viele Zeilen unter einem Tabellenkopf noch zur Tabelle gehoeren
 # koennen. Gemessen: die laengste Staffel im Bestand hat sechs Zeilen
@@ -603,8 +636,7 @@ _VERTRAG_IN_WOCHEN = re.compile(r"Vertragslaufs?zeiten?[^\n]{0,30}?\d+\s*Wochen"
 # ist eine Notbremse, die eigentliche Grenze ist die erste betragslose
 # Zeile nach der ersten Preiszeile.
 _TABELLENTIEFE = 15
-_MONATSSPALTE = re.compile(r"(ab\s+)?Monat\s*(\d{1,3})(?:\s*[-–]\s*(\d{1,3}))?",
-                           re.I)
+_MONATSSPALTE = re.compile(r"(ab\s+)?Monat\s*(\d{1,3})(?:\s*[-–]\s*(\d{1,3}))?", re.I)
 
 
 def _phasenspalten(kopfzeile: str) -> list[tuple[int, int | None]]:
@@ -629,8 +661,7 @@ def _phasenspalten(kopfzeile: str) -> list[tuple[int, int | None]]:
     return spalten
 
 
-def _tabellenzeilen(zeilen: list[str],
-                    kopf: int) -> list[tuple[str, list[float], str]]:
+def _tabellenzeilen(zeilen: list[str], kopf: int) -> list[tuple[str, list[float], str]]:
     """Die Preiszeilen unter einem Tabellenkopf: (Etikett, Betraege, Zeile).
 
     Die ZEILE wandert mit, weil sie der Beleg ist. Sie aus Etikett und
@@ -646,13 +677,13 @@ def _tabellenzeilen(zeilen: list[str],
     Hausnummer als Preis.
     """
     posten: list[tuple[str, list[float], str]] = []
-    for zeile in zeilen[kopf + 1:kopf + 1 + _TABELLENTIEFE]:
+    for zeile in zeilen[kopf + 1 : kopf + 1 + _TABELLENTIEFE]:
         treffer = list(_BETRAG_MIT_WAEHRUNG.finditer(zeile))
         if not treffer:
             if posten:
                 break
             continue
-        etikett = " ".join(zeile[:treffer[0].start()].split())
+        etikett = " ".join(zeile[: treffer[0].start()].split())
         betraege = [zahl(t.group(1)) for t in treffer]
         if not etikett or any(b is None for b in betraege):
             continue
@@ -690,13 +721,20 @@ def _preis_zeilenweise(text: str, t: Tarif) -> bool:
         # geratene Phase ist schlimmer als gar keine: sie sieht aus wie eine
         # Messung. Dann bleibt es bei der Ersatzphase aus `lies_text`.
         if len(spalten) == len(betraege):
-            t.setze("preisphasen",
-                    [Preisphase(von_monat=von, bis_monat=bis, betrag=betrag)
-                     for (von, bis), betrag in zip(spalten, betraege)],
-                    zeile)
+            t.setze(
+                "preisphasen",
+                [
+                    Preisphase(von_monat=von, bis_monat=bis, betrag=betrag)
+                    for (von, bis), betrag in zip(spalten, betraege)
+                ],
+                zeile,
+            )
 
-        staffel = [Geraetepreis(kategorie=name, betrag=werte[0])
-                   for name, werte, _z in posten if _GERAETESTUFE.search(name)]
+        staffel = [
+            Geraetepreis(kategorie=name, betrag=werte[0])
+            for name, werte, _z in posten
+            if _GERAETESTUFE.search(name)
+        ]
         if len(staffel) >= 2:
             t.setze("geraetepreisstaffel", staffel, zeile)
         return True
@@ -706,11 +744,12 @@ def _preis_zeilenweise(text: str, t: Tarif) -> bool:
 def _anschlusspreis(text: str, t: Tarif) -> None:
     muster = re.compile(
         r"(?:Anschlusspreis|Bereitstellungspreis|einmalige[sn]?\s+Entgelt)"
-        r"[^\n]{0,60}?" + _GELD, re.I)
+        r"[^\n]{0,60}?" + _GELD,
+        re.I,
+    )
     treffer = muster.search(text)
     if treffer:
-        t.setze("anschlusspreis", zahl(treffer.group(1)),
-                _zeile_mit(text, muster))
+        t.setze("anschlusspreis", zahl(treffer.group(1)), _zeile_mit(text, muster))
 
 
 def _versionsstand(text: str, t: Tarif) -> None:
@@ -721,8 +760,7 @@ def _versionsstand(text: str, t: Tarif) -> None:
     ):
         treffer = muster.search(text)
         if treffer:
-            t.setze("versionsstand", treffer.group(1).strip(),
-                    _zeile_mit(text, muster))
+            t.setze("versionsstand", treffer.group(1).strip(), _zeile_mit(text, muster))
             return
 
 
@@ -749,8 +787,10 @@ def _anbieter(text: str, t: Tarif) -> None:
 
 # --------------------------------------------------------------------------- #
 
-def lies_text(text: str, *, url: str = "", hash_: str = "",
-              abgerufen_am: str = "") -> Tarif:
+
+def lies_text(
+    text: str, *, url: str = "", hash_: str = "", abgerufen_am: str = ""
+) -> Tarif:
     """Ein Tarifdokument als Text in Felder zerlegen.
 
     Erwartet TEXT, nicht PDF - siehe Modul-Docstring. Der Rohtext bleibt am
@@ -760,8 +800,9 @@ def lies_text(text: str, *, url: str = "", hash_: str = "",
     # Die Rohzeilen behalten ihre Spaltenausrichtung - nur die unsichtbaren
     # Zeichen fliegen raus. Ohne sie ist die Geraetestaffel nicht zuzuordnen.
     rohzeilen = (text or "").replace("​", "").replace("­", "").splitlines()
-    t = Tarif(dokument_url=url, dokument_hash=hash_,
-              abgerufen_am=abgerufen_am, rohtext=sauber)
+    t = Tarif(
+        dokument_url=url, dokument_hash=hash_, abgerufen_am=abgerufen_am, rohtext=sauber
+    )
     if not sauber:
         return t
 
@@ -781,8 +822,7 @@ def lies_text(text: str, *, url: str = "", hash_: str = "",
         # Ein PIB nennt den Listenpreis ohne Rabattphasen. Eine Phase ueber
         # die ganze Laufzeit ist die ehrliche Darstellung - und der
         # Effektivpreis rechnet damit ohne Sonderfall.
-        t.preisphasen = [Preisphase(von_monat=1, bis_monat=None,
-                                    betrag=t.grundgebuehr)]
+        t.preisphasen = [Preisphase(von_monat=1, bis_monat=None, betrag=t.grundgebuehr)]
     return t
 
 
@@ -790,5 +830,9 @@ def lies_pdf(pfad: Path, *, url: str = "", abgerufen_am: str = "") -> Tarif:
     """Ein Tarifdokument als Datei. Duenne Schale um `lies_text`."""
     pfad = Path(pfad)
     rohdaten = pfad.read_bytes()
-    return lies_text(text_aus_pdf(pfad), url=url,
-                     hash_=dokument_hash(rohdaten), abgerufen_am=abgerufen_am)
+    return lies_text(
+        text_aus_pdf(pfad),
+        url=url,
+        hash_=dokument_hash(rohdaten),
+        abgerufen_am=abgerufen_am,
+    )

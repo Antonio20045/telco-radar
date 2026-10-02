@@ -6,6 +6,7 @@ die Legende wirklich JEDEN gezeichneten Anbieter mit seiner Hausfarbe
 nennt (`report/anbieter_farben.py`, EINE Quelle) - dieser Test haelt das
 fest, am selben Sechs-Anbieter-Gerät wie
 `test_geraete_verlauf_chart_mobil_browser.py`."""
+
 from __future__ import annotations
 
 import pytest
@@ -32,11 +33,13 @@ def seite(tmp_path_factory):
 
 def test_die_legende_nennt_jeden_gezeichneten_anbieter(seite):
     namen = seite.eval_on_selector_all(
-        ".gr-vlegende-teil", "es => es.map(e => e.textContent.trim())")
+        ".gr-vlegende-teil", "es => es.map(e => e.textContent.trim())"
+    )
     erwartet = {a for a, _p in _REIHEN}
     assert erwartet <= set(namen), (
         f"die Legende nennt nicht alle Anbieter: {namen}, erwartet "
-        f"mindestens {erwartet}")
+        f"mindestens {erwartet}"
+    )
 
 
 def test_telekom_ist_magenta_in_der_legende(seite):
@@ -45,11 +48,14 @@ def test_telekom_ist_magenta_in_der_legende(seite):
     aus einer zweiten Palette in app.js."""
     farbe = seite.eval_on_selector(
         ".gr-vlegende-teil:has-text('Telekom') .gr-vlegende-punkt",
-        "e => getComputedStyle(e).backgroundColor")
+        "e => getComputedStyle(e).backgroundColor",
+    )
     assert farbe, "kein Telekom-Legendenpunkt gefunden"
     erwartet = anbieter_farben.farbe_fuer("Telekom")
     assert erwartet.lower() == "#e20074", (
-        f"anbieter_farben.py hat sich geaendert: {erwartet!r}")
+        f"anbieter_farben.py hat sich geaendert: {erwartet!r}"
+    )
     # rgb(226, 0, 116) == #e20074
     assert farbe.replace(" ", "") in ("rgb(226,0,116)", "rgba(226,0,116,1)"), (
-        f"die Legendenfarbe ist nicht Telekom-Magenta: {farbe!r}")
+        f"die Legendenfarbe ist nicht Telekom-Magenta: {farbe!r}"
+    )

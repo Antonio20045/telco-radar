@@ -39,6 +39,7 @@ Die drei Regeln, die dieses Modul traegt
    nicht weggelassen - dasselbe Muster wie die Haendler-Luecken am
    Zeitreihen-Block (`gr-g0-haendler`).
 """
+
 from __future__ import annotations
 
 import datetime as _dt
@@ -50,8 +51,7 @@ from typing import Optional
 
 from . import geraete_tco_grafik
 from .anbieter_farben import farbe_fuer
-from .geraete_tco_karten import (ANBIETER_REIHENFOLGE,
-                                 HAENDLER_OHNE_BUENDEL)
+from .geraete_tco_karten import ANBIETER_REIHENFOLGE, HAENDLER_OHNE_BUENDEL
 
 log = logging.getLogger(__name__)
 
@@ -68,29 +68,33 @@ log = logging.getLogger(__name__)
 # ist derselbe Name klein geschrieben ("xs") - `band_label` kehrt das um,
 # ohne dass ein Leser die Leiter kennen muss.
 _VODAFONE_MIT_SMARTPHONE = re.compile(
-    r"^Vodafone Mobil (?P<stufe>[A-Z]{1,4}) mit Smartphone$")
+    r"^Vodafone Mobil (?P<stufe>[A-Z]{1,4}) mit Smartphone$"
+)
 # Vodafones eigene Tarife werden ueber den NAMEN zugeordnet, nicht ueber
 # das Volumen: "Vodafone Mobil XS" (ohne Geraet, 18 GB) ist die Stufe XS,
 # auch wenn ihr Volumen naeher an einer anderen laege. Und "Vodafone Mobil
 # XL" gehoert zu XL, auch solange sein Volumen nicht erhoben ist.
 _VODAFONE_STUFE = re.compile(
-    r"^Vodafone Mobil (?P<stufe>[A-Z]{1,4})(?: mit Smartphone)?$")
+    r"^Vodafone Mobil (?P<stufe>[A-Z]{1,4})(?: mit Smartphone)?$"
+)
 
 
 @dataclass(frozen=True)
 class Stufe:
     """Eine Sprosse der Tarifleiter: ein Vodafone-Tarif "mit Smartphone"."""
-    key: str                  # "xs"
-    label: str                # "XS"
-    gb: Optional[float]       # erhobenes Volumen, inf = unbegrenzt, None = fehlt
+
+    key: str  # "xs"
+    label: str  # "XS"
+    gb: Optional[float]  # erhobenes Volumen, inf = unbegrenzt, None = fehlt
     tarif_id: str
-    name: str                 # "Vodafone Mobil XS mit Smartphone"
+    name: str  # "Vodafone Mobil XS mit Smartphone"
     grundgebuehr: Optional[float]
 
     @property
     def bereich(self) -> str:
         """Das Volumen der Stufe als Text ("15 GB"), leer wenn es fehlt."""
         return gb_text(self.gb)
+
 
 # Dieselben Anbieter wie die vier festen Karten der Hauptansicht
 # (`geraete_tco_karten.ANBIETER_REIHENFOLGE`), UM CONGSTAR ERWEITERT: die
@@ -141,16 +145,30 @@ def tarifleiter(tarife: dict) -> tuple[Stufe, ...]:
         if key in je_key:
             continue
         je_key[key] = Stufe(
-            key=key, label=label, gb=_zahl(satz.get("datenvolumen_gb")),
-            tarif_id=tarif_id, name=satz["name"].strip(),
-            grundgebuehr=_zahl(satz.get("grundgebuehr")))
+            key=key,
+            label=label,
+            gb=_zahl(satz.get("datenvolumen_gb")),
+            tarif_id=tarif_id,
+            name=satz["name"].strip(),
+            grundgebuehr=_zahl(satz.get("grundgebuehr")),
+        )
     if not je_key:
-        log.warning("Tarifleiter: kein Vodafone-Tarif 'mit Smartphone' im "
-                    "Tarifbestand - keine Tarifbaender.")
-    return tuple(sorted(
-        je_key.values(),
-        key=lambda s: (s.grundgebuehr is None, s.grundgebuehr or 0.0,
-                       s.gb is None, s.gb or 0.0, s.key)))
+        log.warning(
+            "Tarifleiter: kein Vodafone-Tarif 'mit Smartphone' im "
+            "Tarifbestand - keine Tarifbaender."
+        )
+    return tuple(
+        sorted(
+            je_key.values(),
+            key=lambda s: (
+                s.grundgebuehr is None,
+                s.grundgebuehr or 0.0,
+                s.gb is None,
+                s.gb or 0.0,
+                s.key,
+            ),
+        )
+    )
 
 
 def band_von_gb(gb, leiter: tuple[Stufe, ...]) -> Optional[str]:
@@ -190,8 +208,7 @@ def _eigene_stufe(satz: dict, leiter: tuple[Stufe, ...]) -> Optional[str]:
     return key if any(s.key == key for s in leiter) else None
 
 
-def tarif_baender(tarife: dict,
-                  leiter: Optional[tuple[Stufe, ...]] = None) -> dict:
+def tarif_baender(tarife: dict, leiter: Optional[tuple[Stufe, ...]] = None) -> dict:
     """tarif_id -> Stufe der Tarifleiter, aus demselben Tarifbestand.
 
     `tarife` ist derselbe Bestand, den `geraete_tco_view.aufbereiten` schon
@@ -206,8 +223,9 @@ def tarif_baender(tarife: dict,
     out: dict = {}
     for tarif_id, tarif in (tarife or {}).items():
         tarif = tarif or {}
-        band = (_eigene_stufe(tarif, leiter)
-                or band_von_gb(tarif.get("datenvolumen_gb"), leiter))
+        band = _eigene_stufe(tarif, leiter) or band_von_gb(
+            tarif.get("datenvolumen_gb"), leiter
+        )
         if band:
             out[tarif_id] = band
     return out
@@ -219,8 +237,7 @@ def baender_katalog(leiter: tuple[Stufe, ...]) -> list[dict]:
     EINMAL hier gebaut, damit Vorlage, Zeitreihe und Radar dieselben
     Stufen in derselben Reihenfolge nennen.
     """
-    return [{"key": s.key, "label": s.label, "bereich": s.bereich}
-            for s in leiter]
+    return [{"key": s.key, "label": s.label, "bereich": s.bereich} for s in leiter]
 
 
 def gb_text(gb) -> str:
@@ -258,10 +275,12 @@ def _reihe(anbieter: str, karte: dict) -> dict:
     (`anbieter`/`farbe`/`eigen`/`punkte`), damit `geraete_tco_grafik.
     zeitreihe()` ohne Sonderfall zeichnet."""
     return {
-        "anbieter": anbieter, "farbe": farbe_fuer(anbieter),
+        "anbieter": anbieter,
+        "farbe": farbe_fuer(anbieter),
         "eigen": _eigen(anbieter),
-        "punkte": [{"datum": karte.get("abgerufen_am") or "",
-                    "preis": karte["gesamt"]}],
+        "punkte": [
+            {"datum": karte.get("abgerufen_am") or "", "preis": karte["gesamt"]}
+        ],
         "tarif": karte.get("tarif", ""),
         "quelle_url": karte.get("quelle_url", ""),
     }
@@ -280,8 +299,9 @@ def _grund(anbieter: str, hat_irgendein_buendel: bool) -> str:
     return f"{anbieter} führt für dieses Gerät kein Bündel in diesem Band."
 
 
-def alle_karten_je_band(modell: dict,
-                        band_je_tarif: dict) -> dict[str, dict[str, list]]:
+def alle_karten_je_band(
+    modell: dict, band_je_tarif: dict
+) -> dict[str, dict[str, list]]:
     """Je Band ALLE echten Karten jedes Anbieters, nach Gesamt sortiert.
 
     Rueckgabe: `{band_key: {anbieter: [karte, ...]}}` - nur Baender mit
@@ -298,15 +318,20 @@ def alle_karten_je_band(modell: dict,
     # kein Angebot. Und seit A3 nur FRISCHE: Balken-JSON und Radar lesen
     # hier ihre guenstigste Karte je Anbieter, und ein altes Angebot ist
     # keine Zahl von heute (`geraete_tco_karten.ist_frisch`, Clean Code 7).
-    echte = [k for k in (modell.get("karten") or [])
-             if k.get("belastbar") and not k.get("naeherung")
-             and k.get("gesamt") is not None and k.get("frisch", True)]
+    echte = [
+        k
+        for k in (modell.get("karten") or [])
+        if k.get("belastbar")
+        and not k.get("naeherung")
+        and k.get("gesamt") is not None
+        and k.get("frisch", True)
+    ]
 
     je_band: dict[str, dict[str, list]] = {}
     for k in echte:
         band = band_je_tarif.get(k.get("tarif_id") or "")
         if not band:
-            continue          # kein Datenvolumen erhoben oder unbegrenzt
+            continue  # kein Datenvolumen erhoben oder unbegrenzt
         je_band.setdefault(band, {}).setdefault(k["anbieter"], []).append(k)
     for je_anbieter in je_band.values():
         for karten in je_anbieter.values():
@@ -328,22 +353,27 @@ def karten_je_band(modell: dict, band_je_tarif: dict) -> dict[str, dict]:
     # Linie - dieselbe Wahl wie ueberall auf dieser Seite (ein
     # Anbieter, eine Zahl je Ort). `alle_karten_je_band` sortiert nach
     # Gesamt, also ist ks[0] genau diese Karte.
-    return {band: {anbieter: ks[0] for anbieter, ks in je_anbieter.items()}
-            for band, je_anbieter in alle.items()}
+    return {
+        band: {anbieter: ks[0] for anbieter, ks in je_anbieter.items()}
+        for band, je_anbieter in alle.items()
+    }
 
 
 def anbieter_mit_irgendeinem_buendel(modell: dict) -> set:
     """Wer fuer dieses Geraet UEBERHAUPT ein echtes Buendel fuehrt - in
     IRGENDEINEM Band. Getrennt von `karten_je_band`, weil `_grund` beide
     Mengen braucht (siehe dort)."""
-    return {k["anbieter"] for k in (modell.get("karten") or [])
-            if k.get("belastbar") and not k.get("naeherung")
-            and k.get("gesamt") is not None}
+    return {
+        k["anbieter"]
+        for k in (modell.get("karten") or [])
+        if k.get("belastbar") and not k.get("naeherung") and k.get("gesamt") is not None
+    }
 
 
 # --------------------------------------------------------------------------
 # O1 (STRATEGIE_GERAETE_OPTIK, 11.09.2026): der EINE Balkengraph
 # --------------------------------------------------------------------------
+
 
 def _minus(zahl: float) -> str:
     """Das echte Minus (U+2212), nicht der Bindestrich der Tastatur.
@@ -352,8 +382,7 @@ def _minus(zahl: float) -> str:
     der Zahl und wird nicht durch einen Trennstrich ersetzt. Dieselbe
     Konvention wie im Rest des Portals (SVG-Marker, G2-Pfeile).
     """
-    return f"{abs(zahl):,.2f}".replace(",", "#").replace(".", ",") \
-        .replace("#", ".")
+    return f"{abs(zahl):,.2f}".replace(",", "#").replace(".", ",").replace("#", ".")
 
 
 # Der Beginn der Beschaffung bei Händlern ohne Tarifbündel - dieselbe
@@ -364,8 +393,20 @@ def _minus(zahl: float) -> str:
 # erfunden).
 HAENDLER_SEIT = "2026-09-05"
 
-_MONATE = ("Januar", "Februar", "März", "April", "Mai", "Juni", "Juli",
-           "August", "September", "Oktober", "November", "Dezember")
+_MONATE = (
+    "Januar",
+    "Februar",
+    "März",
+    "April",
+    "Mai",
+    "Juni",
+    "Juli",
+    "August",
+    "September",
+    "Oktober",
+    "November",
+    "Dezember",
+)
 
 
 def _datum_de(iso: str) -> str:
@@ -379,9 +420,10 @@ def _datum_de(iso: str) -> str:
         return iso
 
 
-def delta_text(euro: Optional[float], prozent: Optional[float],
-               ungefaehr: bool = False) -> Optional[str]:
-    """"−466,80 € · −29,9 %" - EINE Stelle für dieses Format.
+def delta_text(
+    euro: Optional[float], prozent: Optional[float], ungefaehr: bool = False
+) -> Optional[str]:
+    """ "−466,80 € · −29,9 %" - EINE Stelle für dieses Format.
 
     Diese Zeichenkette entsteht hier in Python und wird von Vorlage UND
     `app.js` nur noch gesetzt - eine zweite Formatierung im Browser waere
@@ -409,8 +451,9 @@ def delta_text(euro: Optional[float], prozent: Optional[float],
     return text
 
 
-def _balken(je_anbieter: dict[str, list], gb_je_tarif: dict,
-            haendler_preise: dict | None) -> dict:
+def _balken(
+    je_anbieter: dict[str, list], gb_je_tarif: dict, haendler_preise: dict | None
+) -> dict:
     """Zeilen, Referenz und Lücken des EINEN Graphen - ein Band.
 
     O1 (STRATEGIE_GERAETE_OPTIK §2): sortierte horizontale Balken
@@ -440,7 +483,7 @@ def _balken(je_anbieter: dict[str, list], gb_je_tarif: dict,
     for anbieter, karten in je_anbieter.items():
         neu = [k for k in karten if k.get("vergleichbar")]
         if neu:
-            zeilen_je_anbieter[anbieter] = neu[0]   # sortiert nach gesamt
+            zeilen_je_anbieter[anbieter] = neu[0]  # sortiert nach gesamt
         else:
             erneuert.add(anbieter)
 
@@ -450,29 +493,37 @@ def _balken(je_anbieter: dict[str, list], gb_je_tarif: dict,
     zeilen = []
     for anbieter, karte in zeilen_je_anbieter.items():
         ist_ref = referenz is not None and karte is referenz
-        delta_euro = (None if referenz is None or ist_ref else
-                      round(karte["gesamt"] - referenz["gesamt"], 2))
-        delta_prozent = (None if delta_euro is None else
-                         round(abs(delta_euro) / referenz["gesamt"] * 100, 1))
-        zeilen.append({
-            "anbieter": anbieter,
-            "slug": geraete_tco_grafik.anbieter_slug(anbieter),
-            "eigen": _eigen(anbieter),
-            "tarif": karte.get("tarif", ""),
-            "gb": gb_text((gb_je_tarif or {}).get(karte.get("tarif_id") or "")),
-            # DSELBE Zahl wie Karte und Tabelle - `gesamt` ist schon
-            # `tco_24().gesamt` (Regel 1 des Modulkopfs).
-            "gesamt": karte["gesamt"],
-            "gesamt_text": geraete_tco_grafik.euro(karte["gesamt"]),
-            # Balkenbreite proportional zum Wert; der laengste ist 100 %
-            # (gesetzt, sobald alle Zeilen stehen - siehe unten).
-            "breite": 0.0,
-            "delta_euro": delta_euro,
-            "delta_prozent": delta_prozent,
-            "delta_text": delta_text(delta_euro, delta_prozent),
-            "referenz": ist_ref,
-            "zustand_etikett": karte.get("zustand_etikett") or "",
-        })
+        delta_euro = (
+            None
+            if referenz is None or ist_ref
+            else round(karte["gesamt"] - referenz["gesamt"], 2)
+        )
+        delta_prozent = (
+            None
+            if delta_euro is None
+            else round(abs(delta_euro) / referenz["gesamt"] * 100, 1)
+        )
+        zeilen.append(
+            {
+                "anbieter": anbieter,
+                "slug": geraete_tco_grafik.anbieter_slug(anbieter),
+                "eigen": _eigen(anbieter),
+                "tarif": karte.get("tarif", ""),
+                "gb": gb_text((gb_je_tarif or {}).get(karte.get("tarif_id") or "")),
+                # DSELBE Zahl wie Karte und Tabelle - `gesamt` ist schon
+                # `tco_24().gesamt` (Regel 1 des Modulkopfs).
+                "gesamt": karte["gesamt"],
+                "gesamt_text": geraete_tco_grafik.euro(karte["gesamt"]),
+                # Balkenbreite proportional zum Wert; der laengste ist 100 %
+                # (gesetzt, sobald alle Zeilen stehen - siehe unten).
+                "breite": 0.0,
+                "delta_euro": delta_euro,
+                "delta_prozent": delta_prozent,
+                "delta_text": delta_text(delta_euro, delta_prozent),
+                "referenz": ist_ref,
+                "zustand_etikett": karte.get("zustand_etikett") or "",
+            }
+        )
     zeilen.sort(key=lambda z: z["gesamt"])
     maximum = max((z["gesamt"] for z in zeilen), default=0.0)
     for z in zeilen:
@@ -481,10 +532,14 @@ def _balken(je_anbieter: dict[str, list], gb_je_tarif: dict,
     # Die EINE Legendenzeile: Namen, gruppiert nach Grund - kein Satz je
     # Anbieter mehr (die 145 "fuehrt kein Buendel in diesem Band"-
     # Einzelizeilen der alten Band-Panels entfallen mit dem Graphen).
-    ohne = sorted(a for a in ERWARTETE_ANBIETER
-                  if a not in zeilen_je_anbieter and a not in erneuert)
-    haendler = sorted(h for h in HAENDLER_OHNE_BUENDEL
-                      if not (haendler_preise or {}).get(h))
+    ohne = sorted(
+        a
+        for a in ERWARTETE_ANBIETER
+        if a not in zeilen_je_anbieter and a not in erneuert
+    )
+    haendler = sorted(
+        h for h in HAENDLER_OHNE_BUENDEL if not (haendler_preise or {}).get(h)
+    )
     # Der fertige Satz der EINEN Legendenzeile - in Python gebaut, weil
     # Vorlage UND app.js ihn nur setzen (keine zweite Satzbaustelle im
     # Browser). Keine Lücke, keine Zeile - dann steht auch kein leeres
@@ -495,13 +550,20 @@ def _balken(je_anbieter: dict[str, list], gb_je_tarif: dict,
     if erneuert:
         teile.append("Nur erneuerte Geräte im Band: " + ", ".join(sorted(erneuert)))
     if haendler:
-        teile.append("Beschaffung läuft seit "
-                     + _datum_de(HAENDLER_SEIT) + ": " + ", ".join(haendler))
+        teile.append(
+            "Beschaffung läuft seit "
+            + _datum_de(HAENDLER_SEIT)
+            + ": "
+            + ", ".join(haendler)
+        )
     return {
         "zeilen": zeilen,
         "referenz_da": referenz is not None,
-        "luecke": {"kein_buendel": ohne, "nur_erneuert": sorted(erneuert),
-                   "haendler": haendler},
+        "luecke": {
+            "kein_buendel": ohne,
+            "nur_erneuert": sorted(erneuert),
+            "haendler": haendler,
+        },
         "luecke_text": " · ".join(teile) or None,
     }
 
@@ -516,10 +578,14 @@ def _unterzeile(balken: dict) -> str:
     Erhebung, keine Feststellung über das Sortiment.
     """
     if balken["referenz_da"]:
-        return ("Günstigstes Bündel je Anbieter im gewählten Band · "
-                "Δ = Abstand zur Vodafone-Referenz")
-    return ("Günstigstes Bündel je Anbieter im gewählten Band · Vodafone "
-            "fehlt in diesem Band – keine Δ-Angabe")
+        return (
+            "Günstigstes Bündel je Anbieter im gewählten Band · "
+            "Δ = Abstand zur Vodafone-Referenz"
+        )
+    return (
+        "Günstigstes Bündel je Anbieter im gewählten Band · Vodafone "
+        "fehlt in diesem Band – keine Δ-Angabe"
+    )
 
 
 # Der Leerlauf des Graphen für ein Modell ohne ein einziges Band - der
@@ -529,8 +595,10 @@ def _unterzeile(balken: dict) -> str:
 # genau dieser Konstanten).
 # Die Leiter selbst fehlt: dann gibt es fuer KEIN Geraet eine Stufe, und
 # der Grund ist die Erhebung, nicht das Sortiment (Regel 9 aus CLAUDE.md).
-LEITER_FEHLT_TEXT = ("Vodafone-Tarifleiter nicht erhoben – ohne sie gibt es "
-                     "keine Tarifstufen zum Vergleich.")
+LEITER_FEHLT_TEXT = (
+    "Vodafone-Tarifleiter nicht erhoben – ohne sie gibt es "
+    "keine Tarifstufen zum Vergleich."
+)
 
 
 def band_leer_text(leiter: tuple[Stufe, ...]) -> str:
@@ -538,15 +606,16 @@ def band_leer_text(leiter: tuple[Stufe, ...]) -> str:
     return BAND_LEER_TEXT if leiter else LEITER_FEHLT_TEXT
 
 
-BAND_LEER_TEXT = ("Für dieses Gerät liegt in keinem Tarifband ein Bündel "
-                  "vor – die Tarifband-Auswahl entsteht, sobald ein Anbieter "
-                  "einen Tarif mit erhobenem Datenvolumen ausweist.")
+BAND_LEER_TEXT = (
+    "Für dieses Gerät liegt in keinem Tarifband ein Bündel "
+    "vor – die Tarifband-Auswahl entsteht, sobald ein Anbieter "
+    "einen Tarif mit erhobenem Datenvolumen ausweist."
+)
 
 
 def _chip(stufe: Stufe) -> str:
-    """"Band XS · 15 GB" - ohne erhobenes Volumen nur "Band XL"."""
-    return f"Band {stufe.label}" + (f" · {stufe.bereich}" if stufe.bereich
-                                    else "")
+    """ "Band XS · 15 GB" - ohne erhobenes Volumen nur "Band XL"."""
+    return f"Band {stufe.label}" + (f" · {stufe.bereich}" if stufe.bereich else "")
 
 
 def band_label(band) -> str:
@@ -560,9 +629,12 @@ def band_label(band) -> str:
     return str(band).upper() if band else ""
 
 
-def baender_fuer_modell(modell: dict, band_je_tarif: dict,
-                        gb_je_tarif: dict | None = None,
-                        leiter: tuple[Stufe, ...] = ()) -> list[dict]:
+def baender_fuer_modell(
+    modell: dict,
+    band_je_tarif: dict,
+    gb_je_tarif: dict | None = None,
+    leiter: tuple[Stufe, ...] = (),
+) -> list[dict]:
     """Je Modell die Baender, fuer die es ECHTE Buendel gibt (§7/Aufgabe 1).
 
     Rueckgabe: eine Liste, EIN Eintrag je Band MIT mindestens einem echten
@@ -593,48 +665,62 @@ def baender_fuer_modell(modell: dict, band_je_tarif: dict,
         key, label, bereich = stufe.key, stufe.label, stufe.bereich
         karten_je_anbieter = je_band.get(key)
         if not karten_je_anbieter:
-            continue           # kein einziges Buendel in diesem Band
+            continue  # kein einziges Buendel in diesem Band
         # DSELBE Ordnung wie die Reihen der Grafik: der eigene Anbieter
         # zuerst, dann nach Name - Werteliste und Chart nennen dieselben
         # Anbieter in derselben Reihenfolge, sonst sucht der Leser eine
         # Zahl an der falschen Stelle.
-        geordnet = sorted(karten_je_anbieter.items(),
-                          key=lambda kv: (not _eigen(kv[0]), kv[0]))
+        geordnet = sorted(
+            karten_je_anbieter.items(), key=lambda kv: (not _eigen(kv[0]), kv[0])
+        )
         reihen = [_reihe(anbieter, karte) for anbieter, karte in geordnet]
         vorhanden = set(karten_je_anbieter)
-        fehlend = [{"anbieter": a,
-                    "grund": _grund(a, a in mit_irgendeinem_buendel)}
-                   for a in ERWARTETE_ANBIETER if a not in vorhanden]
+        fehlend = [
+            {"anbieter": a, "grund": _grund(a, a in mit_irgendeinem_buendel)}
+            for a in ERWARTETE_ANBIETER
+            if a not in vorhanden
+        ]
         # O1: der EINE Balkengraph dieses Bandes. Die Händlerpreise stehen
         # am Modell (`geraete_tco_view` setzt sie VOR den Bändern) - ein
         # Händler mit Preis gehört nicht in die Legende, er steht als
         # Händlerkarte in der Kartenklappe.
-        balken = _balken(alle_je_band.get(key) or {}, gb_je_tarif,
-                         modell.get("haendler_ohne_buendel"))
-        ergebnis.append({
-            "key": key, "label": label, "bereich": bereich,
-            "grafik": geraete_tco_grafik.zeitreihe(
-                reihen, messgroesse="Kosten über 24 Monate",
-                klasse="gr-tcoband"),
-            "fehlend": fehlend,
-            "werte": [{
-                "anbieter": anbieter,
-                "slug": geraete_tco_grafik.anbieter_slug(anbieter),
-                "eigen": _eigen(anbieter),
-                "tarif": karte.get("tarif", ""),
-                "gb": gb_text((gb_je_tarif or {}).get(
-                    karte.get("tarif_id") or "")),
-                # DSELBE Zahl wie Graph, Karte und Tabelle - `gesamt` ist
-                # schon `tco_24().gesamt` (Regel 1 des Modulkopfs).
-                "gesamt": karte["gesamt"],
-                "abgerufen_am": karte.get("abgerufen_am", ""),
-            } for anbieter, karte in geordnet],
-            # ---- O1 (11.09.2026): der EINE Balkengraph ----------------
-            # `grafik`/`werte`/`fehlend` bleiben gefuellt: Deren Renderer
-            # ist in der Vorlage gekappt (O1), die Felder bleiben fuer
-            # O4 erreichbar - dieselbe Kappe wie bei G1 (BRIEF_FADEN).
-            "balken": balken,
-            "unterzeile": _unterzeile(balken),
-            "chip": _chip(stufe),
-        })
+        balken = _balken(
+            alle_je_band.get(key) or {},
+            gb_je_tarif,
+            modell.get("haendler_ohne_buendel"),
+        )
+        ergebnis.append(
+            {
+                "key": key,
+                "label": label,
+                "bereich": bereich,
+                "grafik": geraete_tco_grafik.zeitreihe(
+                    reihen, messgroesse="Kosten über 24 Monate", klasse="gr-tcoband"
+                ),
+                "fehlend": fehlend,
+                "werte": [
+                    {
+                        "anbieter": anbieter,
+                        "slug": geraete_tco_grafik.anbieter_slug(anbieter),
+                        "eigen": _eigen(anbieter),
+                        "tarif": karte.get("tarif", ""),
+                        "gb": gb_text(
+                            (gb_je_tarif or {}).get(karte.get("tarif_id") or "")
+                        ),
+                        # DSELBE Zahl wie Graph, Karte und Tabelle - `gesamt` ist
+                        # schon `tco_24().gesamt` (Regel 1 des Modulkopfs).
+                        "gesamt": karte["gesamt"],
+                        "abgerufen_am": karte.get("abgerufen_am", ""),
+                    }
+                    for anbieter, karte in geordnet
+                ],
+                # ---- O1 (11.09.2026): der EINE Balkengraph ----------------
+                # `grafik`/`werte`/`fehlend` bleiben gefuellt: Deren Renderer
+                # ist in der Vorlage gekappt (O1), die Felder bleiben fuer
+                # O4 erreichbar - dieselbe Kappe wie bei G1 (BRIEF_FADEN).
+                "balken": balken,
+                "unterzeile": _unterzeile(balken),
+                "chip": _chip(stufe),
+            }
+        )
     return ergebnis

@@ -44,13 +44,18 @@ Kommentarblock weiter unten (vor content_hash) haelt fest, warum.
 extract_hero_image() (og:image/twitter:image) bleibt als letzte Absicherung
 je Marke - meist ein generisches Markenlogo, deshalb nur die letzte.
 """
+
 from __future__ import annotations
 
 import hashlib
 import logging
 import re
 from urllib.parse import (
-    parse_qsl, urlencode, urljoin, urlsplit, urlunsplit,
+    parse_qsl,
+    urlencode,
+    urljoin,
+    urlsplit,
+    urlunsplit,
 )
 
 from bs4 import BeautifulSoup
@@ -60,8 +65,17 @@ from .newsroom_js import render_html
 
 log = logging.getLogger(__name__)
 
-_STRIP_TAGS = ("script", "style", "noscript", "svg", "nav", "footer", "header",
-               "form", "iframe")
+_STRIP_TAGS = (
+    "script",
+    "style",
+    "noscript",
+    "svg",
+    "nav",
+    "footer",
+    "header",
+    "form",
+    "iframe",
+)
 _WS_RE = re.compile(r"[ \t]+")
 _BLANK_RE = re.compile(r"\n{3,}")
 
@@ -99,10 +113,17 @@ _MAX_IMAGE_CANDIDATES = 60
 # steht sehr oft genau dort (o2online.de, otelo.de, congstar.de - alle drei
 # fuehren mit einem Buehnenbild im Kopfbereich). Wer header mitentfernt,
 # wirft zuerst das beste Bild der Seite weg.
-_IMG_STRIP_TAGS = ("script", "style", "noscript", "svg", "iframe", "form",
-                   "nav", "footer")
-_IMG_SRC_ATTRS = ("src", "data-src", "data-lazy-src", "data-original",
-                  "data-image-src")
+_IMG_STRIP_TAGS = (
+    "script",
+    "style",
+    "noscript",
+    "svg",
+    "iframe",
+    "form",
+    "nav",
+    "footer",
+)
+_IMG_SRC_ATTRS = ("src", "data-src", "data-lazy-src", "data-original", "data-image-src")
 _IMG_SRCSET_ATTRS = ("srcset", "data-srcset")
 # Dateiendungen, die als Bild taugen. Ein Pfad ohne Endung (CDN mit
 # Query-Parametern) faellt NICHT durch - der Download misst ohnehin nach.
@@ -180,8 +201,9 @@ def _link_context(a_tag) -> str:
     return _WS_RE.sub(" ", context).strip()[:200]
 
 
-def extract_link_candidates(html: str, base_url: str,
-                            max_candidates: int = _MAX_LINK_CANDIDATES) -> list[dict]:
+def extract_link_candidates(
+    html: str, base_url: str, max_candidates: int = _MAX_LINK_CANDIDATES
+) -> list[dict]:
     """Same-origin link candidates an individual offer might deep-link to:
     [{"href": <absolute url>, "text": <short context>}, ...].
 
@@ -303,8 +325,9 @@ def _naechster_anker(img) -> str:
     return ""
 
 
-def extract_image_candidates(html: str, base_url: str,
-                             max_candidates: int = _MAX_IMAGE_CANDIDATES) -> list[dict]:
+def extract_image_candidates(
+    html: str, base_url: str, max_candidates: int = _MAX_IMAGE_CANDIDATES
+) -> list[dict]:
     """Bildkandidaten der Seite:
     [{"src": <absolut>, "context": <alt + naechste Ueberschrift>,
       "anchor": <absoluter href des umgebenden <a> oder "">,
@@ -369,8 +392,11 @@ def _normalize_link_for_hash(href: str) -> str:
         parts = urlsplit(href)
     except ValueError:
         return href
-    kept = [(k, v) for k, v in parse_qsl(parts.query, keep_blank_values=True)
-            if not _HASH_TRACKING_PARAM_RE.match(k)]
+    kept = [
+        (k, v)
+        for k, v in parse_qsl(parts.query, keep_blank_values=True)
+        if not _HASH_TRACKING_PARAM_RE.match(k)
+    ]
     return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(kept), ""))
 
 
@@ -381,8 +407,9 @@ def fetch_snapshot(url: str, kind: str, http_cfg: dict) -> dict:
     Raises on failure - the caller is responsible for catching and recording
     it as a source failure, exactly like the other collectors."""
     if kind == "js":
-        timeout_s = float(http_cfg.get("render_timeout_seconds",
-                                        http_cfg.get("timeout_seconds", 25)))
+        timeout_s = float(
+            http_cfg.get("render_timeout_seconds", http_cfg.get("timeout_seconds", 25))
+        )
         ua = http_cfg.get("user_agent", BROWSER_UA)
         html = render_html(url, timeout_s, ua)
     else:
@@ -434,7 +461,8 @@ def content_hash(text: str, links: list[dict] | None = None) -> str:
     - see the konzept doc's "Nächste Schritte", not a bug)."""
     basis = text
     if links:
-        signature = "\n".join(sorted(
-            _normalize_link_for_hash(link.get("href") or "") for link in links))
+        signature = "\n".join(
+            sorted(_normalize_link_for_hash(link.get("href") or "") for link in links)
+        )
         basis = f"{text}\n\x00LINKS\x00\n{signature}"
     return hashlib.sha256(basis.encode("utf-8")).hexdigest()

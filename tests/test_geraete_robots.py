@@ -6,6 +6,7 @@ Anbieter hat gezeigt, dass `Disallow` die falsche Haelfte ist - erlaubt ist
 dort alles Relevante, aber nur zwischen 02:00 und 08:00 UTC und mit zehn
 Sekunden Abstand. Der Wochenlauf startet um 08:30.
 """
+
 from datetime import datetime, timezone
 
 import pytest
@@ -52,21 +53,29 @@ def _um(stunde: int, minute: int = 0) -> datetime:
 
 # --------------------------------------------------------------------------
 
+
 def test_host_ohne_www():
     assert host_von("https://www.medimax.de/c/116/x") == "medimax.de"
-    assert host_von("https://bestellung.norma-connect.de/p") == "bestellung.norma-connect.de"
+    assert (
+        host_von("https://bestellung.norma-connect.de/p")
+        == "bestellung.norma-connect.de"
+    )
 
 
 def test_produktstrecke_ist_erlaubt_warenkorb_nicht():
     r = lies_robots(_MEDIMAX)
-    assert r.erlaubt("https://www.medimax.de/c/116/telefon-navi/handy-smartphone/smartphones")
+    assert r.erlaubt(
+        "https://www.medimax.de/c/116/telefon-navi/handy-smartphone/smartphones"
+    )
     assert r.erlaubt("https://www.medimax.de/p/1518897/galaxy-a57-5g")
     assert not r.erlaubt("https://www.medimax.de/cart")
-    assert not r.erlaubt("https://www.medimax.de/de/cart")   # /*/cart
+    assert not r.erlaubt("https://www.medimax.de/de/cart")  # /*/cart
 
 
 def test_stern_und_endanker():
-    r = lies_robots("User-agent: *\nDisallow: */b/smartphones*\nDisallow: /shop/*?sort=*\n")
+    r = lies_robots(
+        "User-agent: *\nDisallow: */b/smartphones*\nDisallow: /shop/*?sort=*\n"
+    )
     assert not r.erlaubt("https://www.freenet.de/handys-smartphones/b/smartphones/x")
     assert r.erlaubt("https://www.freenet.de/handys-smartphones/p/P-M-4206120")
     assert not r.erlaubt("https://www.freenet.de/shop/liste?sort=preis")
@@ -108,10 +117,18 @@ def test_besuchszeit_wird_gelesen():
     assert r.fenster_text == "02:00-08:00 UTC"
 
 
-@pytest.mark.parametrize("stunde,minute,drin", [
-    (1, 59, False), (2, 0, True), (3, 10, True), (7, 59, True),
-    (8, 0, False), (8, 30, False), (23, 0, False),
-])
+@pytest.mark.parametrize(
+    "stunde,minute,drin",
+    [
+        (1, 59, False),
+        (2, 0, True),
+        (3, 10, True),
+        (7, 59, True),
+        (8, 0, False),
+        (8, 30, False),
+        (23, 0, False),
+    ],
+)
 def test_besuchsfenster(stunde, minute, drin):
     assert lies_robots(_MEDIMAX).im_fenster(_um(stunde, minute)) is drin
 
@@ -142,6 +159,7 @@ def test_mehrere_user_agent_zeilen_hintereinander_bilden_eine_gruppe():
 # Der Waechter
 # --------------------------------------------------------------------------
 
+
 def _waechter(antworten):
     aufrufe = []
 
@@ -155,7 +173,9 @@ def _waechter(antworten):
 
 def test_gesperrter_pfad_wird_nicht_abgerufen():
     """Akzeptanzkriterium aus Teil E."""
-    w, aufrufe = _waechter({"https://x.de/robots.txt": (200, "User-agent: *\nDisallow: /shop/\n")})
+    w, aufrufe = _waechter(
+        {"https://x.de/robots.txt": (200, "User-agent: *\nDisallow: /shop/\n")}
+    )
     darf, grund = w.darf("https://x.de/shop/handy", _um(12))
     assert darf is False and "gesperrt" in grund
     # Es wurde ausschliesslich die robots.txt geholt, nicht die Seite.
@@ -195,6 +215,7 @@ def test_verweigerte_robots_sperrt():
 def test_netzfehler_beim_holen_sperrt_ebenfalls():
     def hole(url):
         raise OSError("connection reset")
+
     w = RobotsWaechter(hole=hole)
     darf, grund = w.darf("https://x.de/shop", _um(12))
     assert darf is False and "OSError" in grund

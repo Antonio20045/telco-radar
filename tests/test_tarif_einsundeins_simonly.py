@@ -23,6 +23,7 @@ Kein Tarif traegt eine Bindungsdauer: Weder die Seite noch das
 Tarifdetails-Dokument ordnen dem Preis eine Laufzeit zu (beide nennen
 die Varianten "mit"/"ohne" nur unverbunden nebeneinander).
 """
+
 from __future__ import annotations
 
 import gzip
@@ -32,14 +33,19 @@ from pathlib import Path
 import pytest
 
 from telco_radar.collect.tarif_einsundeins_simonly import (
-    SEITEN_URL, anschlusspreis_aus_details, kacheln, referenzen_aus_html,
-    sammle)
+    SEITEN_URL,
+    anschlusspreis_aus_details,
+    kacheln,
+    referenzen_aus_html,
+    sammle,
+)
 from telco_radar.tco_model import sim_only_id
 
 _FIX = Path(__file__).parent / "fixtures" / "tarife"
-_SLUG_ANF_S = ("tariff-anf-s-mvl-bundle-anf-s-mvl-oos-group-0")
-_SLUG_XL = ("tariff-anf-xxl-unlimited-xl-ovl-bundle-"
-            "tariff-anf-xxl-unlimited-xl-ovl-oos-group-1")
+_SLUG_ANF_S = "tariff-anf-s-mvl-bundle-anf-s-mvl-oos-group-0"
+_SLUG_XL = (
+    "tariff-anf-xxl-unlimited-xl-ovl-bundle-tariff-anf-xxl-unlimited-xl-ovl-oos-group-1"
+)
 
 # (Name, Monatspreis, Volumen in GB oder None, Aktionsphase oder None)
 _ERWARTET = [
@@ -54,18 +60,21 @@ _ERWARTET = [
 
 
 def _seite() -> str:
-    with gzip.open(_FIX / "1und1_handytarife_ohne_handy.html.gz", "rt",
-                   encoding="utf-8") as fh:
+    with gzip.open(
+        _FIX / "1und1_handytarife_ohne_handy.html.gz", "rt", encoding="utf-8"
+    ) as fh:
         return fh.read()
 
 
 def _details_anf_s() -> str:
-    with gzip.open(_FIX / "1und1_details_all_net_flat_s.html.gz", "rt",
-                   encoding="utf-8") as fh:
+    with gzip.open(
+        _FIX / "1und1_details_all_net_flat_s.html.gz", "rt", encoding="utf-8"
+    ) as fh:
         return fh.read()
 
 
 # ------------------------------------------------------------- die Kacheln
+
 
 def test_die_echte_seite_liefert_alle_sieben_tarife():
     """Der Kern des Abnahmekriteriums 2: JEDE gelistete Auspraegung.
@@ -81,8 +90,7 @@ def test_die_echte_seite_liefert_alle_sieben_tarife():
 
 
 @pytest.mark.parametrize("name,preis,volumen,aktion", _ERWARTET)
-def test_preis_volumen_und_aktionsphase_je_tarif(name, preis, volumen,
-                                                 aktion):
+def test_preis_volumen_und_aktionsphase_je_tarif(name, preis, volumen, aktion):
     """Jeder Wert einzeln gegen die Messung - Sabotage am Parser (falsche
     Selektoren, geloeschte Phasen-Extraktion) faellt je Taruf auf."""
     kachel = next(k for k in kacheln(_seite()) if k["name"] == name)
@@ -97,7 +105,8 @@ def test_die_details_url_steht_nur_mit_verlinkter_adresse_daran():
     kachel = next(k for k in kacheln(_seite()) if k["name"] == "1&1 All-Net-Flat S")
     assert kachel["details_url"].startswith(
         "https://mobile.1und1.de/details-all-net-flat-preisliste"
-        "?chosenTariff=tariff-anf-s-mvl")
+        "?chosenTariff=tariff-anf-s-mvl"
+    )
 
 
 def test_eine_leere_oder_unlesbare_seite_liefert_keine_kacheln():
@@ -106,6 +115,7 @@ def test_eine_leere_oder_unlesbare_seite_liefert_keine_kacheln():
 
 
 # ---------------------------------------------------------- die Referenzen
+
 
 def test_referenzen_treffen_die_ids_und_preise_des_bestands():
     """Abnahmekriterium 3: die neuen Saetze muessen auf DENSELBEN Schluesseln
@@ -166,8 +176,8 @@ def test_anschlusspreis_kommt_nur_aus_dem_eigenen_tarifdetails():
     assert s.anschlusspreis is None
 
     mit = referenzen_aus_html(
-        _seite(), details={_SLUG_ANF_S: _details_anf_s()},
-        abgerufen_am="2026-09-09")
+        _seite(), details={_SLUG_ANF_S: _details_anf_s()}, abgerufen_am="2026-09-09"
+    )
     s = next(r for r in mit if r.tarif_name == "1&1 All-Net-Flat S")
     assert s.anschlusspreis == 19.90
     m = next(r for r in mit if r.tarif_name == "1&1 All-Net-Flat M")
@@ -175,9 +185,11 @@ def test_anschlusspreis_kommt_nur_aus_dem_eigenen_tarifdetails():
 
 
 def test_aktionsphase_ist_ein_rabatt_und_kein_preis():
-    s = next(r for r in referenzen_aus_html(_seite(),
-                                            abgerufen_am="2026-09-09")
-             if r.tarif_name == "1&1 All-Net-Flat S")
+    s = next(
+        r
+        for r in referenzen_aus_html(_seite(), abgerufen_am="2026-09-09")
+        if r.tarif_name == "1&1 All-Net-Flat S"
+    )
     assert len(s.rabatte) == 1
     rabatt = s.rabatte[0]
     assert rabatt.von_monat == 1
@@ -190,8 +202,7 @@ def test_aktionsphase_ist_ein_rabatt_und_kein_preis():
 
 
 def test_details_ohne_gebuehrzeile_liefert_keinen_anschlusspreis():
-    text = ("<td><strong>Allgemeines</strong></td>"
-            "<td>hier steht keine Gebühr</td>")
+    text = "<td><strong>Allgemeines</strong></td><td>hier steht keine Gebühr</td>"
     assert anschlusspreis_aus_details(text) is None
     assert anschlusspreis_aus_details("") is None
 
@@ -209,6 +220,7 @@ def test_widerspruch_zwischen_kachel_und_ldjson_laesst_den_tarif_weg():
 
 # ----------------------------------------------------------------- sammle
 
+
 class _Attrappe:
     """Netzattrappe fuer `sammle` - robots erlauben alles."""
 
@@ -223,14 +235,16 @@ class _Attrappe:
 
 def test_sammle_holt_details_nur_fuer_verlinkte_slug_adressen():
     seite, details = _seite(), _details_anf_s()
-    attrappe = _Attrappe({
-        SEITEN_URL: (200, seite),
-        "https://mobile.1und1.de/robots.txt": (200, ""),
-        "https://www.1und1.de/robots.txt": (200, ""),
-        "https://mobile.1und1.de/details-all-net-flat-preisliste"
-        "?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true"
-        "&bk=false": (200, details),
-    })
+    attrappe = _Attrappe(
+        {
+            SEITEN_URL: (200, seite),
+            "https://mobile.1und1.de/robots.txt": (200, ""),
+            "https://www.1und1.de/robots.txt": (200, ""),
+            "https://mobile.1und1.de/details-all-net-flat-preisliste"
+            "?chosenTariff=tariff-anf-s-mvl&chosenNet=1u1&lightbox=true"
+            "&bk=false": (200, details),
+        }
+    )
     refs, protokoll = sammle(attrappe, "2026-09-09", abstand_sekunden=0)
     assert len(refs) == 7
     assert protokoll["details"] == 1
@@ -238,9 +252,11 @@ def test_sammle_holt_details_nur_fuer_verlinkte_slug_adressen():
     # Nur verlinkte Adressen (§ 87b): jeder Abruf ist die Seite selbst,
     # eine robots.txt oder eine Details-Adresse aus einem data-iframe
     # derselben Antwort - nichts kombiniert, nichts hochgezaehlt.
-    erlaubt = {SEITEN_URL, "https://www.1und1.de/robots.txt",
-               "https://mobile.1und1.de/robots.txt"} | {
-        k["details_url"] for k in kacheln(seite) if k["details_url"]}
+    erlaubt = {
+        SEITEN_URL,
+        "https://www.1und1.de/robots.txt",
+        "https://mobile.1und1.de/robots.txt",
+    } | {k["details_url"] for k in kacheln(seite) if k["details_url"]}
     assert set(attrappe.abrufe) <= erlaubt
     s = next(r for r in refs if r.tarif_name == "1&1 All-Net-Flat S")
     assert s.anschlusspreis == 19.90
@@ -250,20 +266,26 @@ def test_sammle_holt_details_nur_fuer_verlinkte_slug_adressen():
 def test_sammle_ohne_erlaubnis_holt_gar_nichts():
     """Robots sperrt die Seite -> kein einziger Abruf, keine Referenz -
     eine dokumentierte Messgrenze statt einer Umgehung."""
-    gesperrt = _Attrappe({
-        "https://www.1und1.de/robots.txt": (
-            200, "User-agent: *\nDisallow: /handytarife-ohne-handy\n"),
-    })
+    gesperrt = _Attrappe(
+        {
+            "https://www.1und1.de/robots.txt": (
+                200,
+                "User-agent: *\nDisallow: /handytarife-ohne-handy\n",
+            ),
+        }
+    )
     refs, protokoll = sammle(gesperrt, "2026-09-09", abstand_sekunden=0)
     assert refs == []
     assert gesperrt.abrufe == ["https://www.1und1.de/robots.txt"]
 
 
 def test_sammle_mit_http_fehler_liefert_keine_referenzen():
-    kaputt = _Attrappe({
-        "https://www.1und1.de/robots.txt": (200, "User-agent: *\n"),
-        SEITEN_URL: (503, ""),
-    })
+    kaputt = _Attrappe(
+        {
+            "https://www.1und1.de/robots.txt": (200, "User-agent: *\n"),
+            SEITEN_URL: (503, ""),
+        }
+    )
     refs, _protokoll = sammle(kaputt, "2026-09-09", abstand_sekunden=0)
     assert refs == []
 

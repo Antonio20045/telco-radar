@@ -31,6 +31,7 @@ ein zweiter Lauf am selben Tag dieselbe Mail noch einmal, und eine
 Wiederholung ist bei Push teurer als bei Pull: sie kostet nicht einen Blick,
 sondern das Vertrauen in den Kanal.
 """
+
 from __future__ import annotations
 
 import json
@@ -78,6 +79,7 @@ class VersandNichtEingerichtet(VersandFehler):
 
 # --------------------------------------------------------------- Gedaechtnis
 
+
 class Zustellbuch:
     """Was schon hinaus ist - je Kanal und je Ausgabe."""
 
@@ -88,8 +90,7 @@ class Zustellbuch:
             try:
                 self.daten.update(json.loads(pfad.read_text(encoding="utf-8")))
             except json.JSONDecodeError:
-                log.warning("versand.json unlesbar - beginne mit leerem "
-                            "Zustellbuch")
+                log.warning("versand.json unlesbar - beginne mit leerem Zustellbuch")
 
     def schon_raus(self, kanal: str, schluessel: str) -> bool:
         return schluessel in (self.daten.get(kanal) or {})
@@ -97,18 +98,23 @@ class Zustellbuch:
     def merke(self, kanal: str, schluessel: str, notiz: str = "") -> None:
         self.daten.setdefault(kanal, {})[schluessel] = {
             "gesendet": datetime.now().isoformat(timespec="seconds"),
-            "notiz": notiz}
+            "notiz": notiz,
+        }
         self.pfad.parent.mkdir(parents=True, exist_ok=True)
         self.pfad.write_text(
-            json.dumps(self.daten, ensure_ascii=False, indent=1),
-            encoding="utf-8")
+            json.dumps(self.daten, ensure_ascii=False, indent=1), encoding="utf-8"
+        )
 
 
 # ------------------------------------------------------------------ Inhalte
 
+
 def _highlights(report: dict) -> list[dict]:
-    return [h for r in (report.get("regions") or {}).values()
-            for h in (r.get("highlights") or [])]
+    return [
+        h
+        for r in (report.get("regions") or {}).values()
+        for h in (r.get("highlights") or [])
+    ]
 
 
 def zwei_minuten_zeilen(report: dict) -> list[dict]:
@@ -125,19 +131,35 @@ def zwei_minuten_zeilen(report: dict) -> list[dict]:
     `ctm.kurzpfad()` - eine Auswahl, ein Ort.
     """
     from .analyze.ctm import kurzpfad
+
     return kurzpfad(_highlights(report))
 
 
 def ausnahmen(report: dict) -> list[dict]:
     """Was eine Sofortmeldung rechtfertigt - beide Bedingungen zusammen."""
-    return [h for h in _highlights(report)
-            if int(h.get("ctm_bezug") or 0) >= TEAMS_CTM
-            and int(h.get("relevance") or 0) >= TEAMS_PRIORITAET]
+    return [
+        h
+        for h in _highlights(report)
+        if int(h.get("ctm_bezug") or 0) >= TEAMS_CTM
+        and int(h.get("relevance") or 0) >= TEAMS_PRIORITAET
+    ]
 
 
 def _datum_de(iso: str) -> str:
-    monate = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli",
-              "August", "September", "Oktober", "November", "Dezember"]
+    monate = [
+        "Januar",
+        "Februar",
+        "März",
+        "April",
+        "Mai",
+        "Juni",
+        "Juli",
+        "August",
+        "September",
+        "Oktober",
+        "November",
+        "Dezember",
+    ]
     try:
         d = date.fromisoformat(iso)
     except ValueError:
@@ -156,72 +178,92 @@ def baue_mail(report: dict, site_url: str = SITE_URL) -> tuple[str, str, str]:
     zeilen = zwei_minuten_zeilen(report)
     stats = report.get("stats") or {}
 
-    betreff = (f"Telco Radar, {datum}: "
-               + (f"{len(zeilen)} Sache{'n' if len(zeilen) != 1 else ''} für "
-                  "das Portfolio" if zeilen else "diese Woche nichts Direktes"))
+    betreff = f"Telco Radar, {datum}: " + (
+        f"{len(zeilen)} Sache{'n' if len(zeilen) != 1 else ''} für das Portfolio"
+        if zeilen
+        else "diese Woche nichts Direktes"
+    )
 
-    kopf = (f"Telco Radar – Ausgabe vom {datum}\n"
-            f"{stats.get('events', stats.get('new', 0))} Ereignisse aus "
-            f"{stats.get('sources_total', 0)} Quellen.\n\n")
+    kopf = (
+        f"Telco Radar – Ausgabe vom {datum}\n"
+        f"{stats.get('events', stats.get('new', 0))} Ereignisse aus "
+        f"{stats.get('sources_total', 0)} Quellen.\n\n"
+    )
     if zeilen:
         rumpf = "IN ZWEI MINUTEN\n\n" + "\n\n".join(
             f"{i}. {h.get('ctm_satz')}\n"
             f"   {h.get('operator') or h.get('source') or ''} – {h.get('url')}"
-            for i, h in enumerate(zeilen, 1))
+            for i, h in enumerate(zeilen, 1)
+        )
     else:
         # Ein Befund, keine Luecke - und er wird als Befund geschrieben.
-        rumpf = ("Diese Woche gab es keine Meldung mit direktem Bezug zum "
-                 "eigenen Portfolio. Die Ausgabe steht trotzdem online.")
+        rumpf = (
+            "Diese Woche gab es keine Meldung mit direktem Bezug zum "
+            "eigenen Portfolio. Die Ausgabe steht trotzdem online."
+        )
     text = kopf + rumpf + f"\n\nGanze Ausgabe: {site_url}/\n"
 
     def esc(s: str) -> str:
-        return (str(s or "").replace("&", "&amp;").replace("<", "&lt;")
-                .replace(">", "&gt;"))
+        return (
+            str(s or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        )
 
     if zeilen:
         punkte = "".join(
             f'<li style="margin:0 0 16px"><div style="font-size:16px;'
             f'line-height:1.45;color:#14120f">{esc(h.get("ctm_satz"))}</div>'
             f'<div style="font-size:12px;color:#8a8479;margin-top:4px">'
-            f'{esc(h.get("operator") or h.get("source"))} · '
+            f"{esc(h.get('operator') or h.get('source'))} · "
             f'<a href="{esc(h.get("url"))}" style="color:#5e594f">'
-            f'{esc(h.get("headline") or h.get("title"))}</a></div></li>'
-            for h in zeilen)
-        inhalt = (f'<p style="font-size:11px;letter-spacing:.09em;'
-                  f'text-transform:uppercase;color:#8a8479;margin:0 0 10px">'
-                  f'In zwei Minuten</p><ol style="padding-left:18px;margin:0">'
-                  f'{punkte}</ol>')
+            f"{esc(h.get('headline') or h.get('title'))}</a></div></li>"
+            for h in zeilen
+        )
+        inhalt = (
+            f'<p style="font-size:11px;letter-spacing:.09em;'
+            f'text-transform:uppercase;color:#8a8479;margin:0 0 10px">'
+            f'In zwei Minuten</p><ol style="padding-left:18px;margin:0">'
+            f"{punkte}</ol>"
+        )
     else:
-        inhalt = ('<p style="font-size:16px;color:#33302a;margin:0">Diese '
-                  'Woche gab es keine Meldung mit direktem Bezug zum eigenen '
-                  'Portfolio.</p>')
+        inhalt = (
+            '<p style="font-size:16px;color:#33302a;margin:0">Diese '
+            "Woche gab es keine Meldung mit direktem Bezug zum eigenen "
+            "Portfolio.</p>"
+        )
 
     html = (
-        '<div style="font-family:Georgia,\'Source Serif 4\',serif;'
+        "<div style=\"font-family:Georgia,'Source Serif 4',serif;"
         'max-width:620px;margin:0 auto;padding:24px;background:#f6f4ee">'
         f'<div style="border-top:3px solid #14120f;padding-top:10px;'
         f'margin-bottom:22px"><div style="font-size:22px;font-weight:700">'
         f'Telco Radar</div><div style="font-size:11px;color:#8a8479;'
         f'letter-spacing:.06em">Ausgabe vom {esc(datum)}</div></div>'
-        f'{inhalt}'
+        f"{inhalt}"
         f'<p style="margin:26px 0 0;border-top:1px solid #e6e2d8;'
         f'padding-top:12px;font-size:12px">'
         f'<a href="{esc(site_url)}/" style="color:#e60000">Ganze Ausgabe '
-        f'öffnen</a></p></div>')
+        f"öffnen</a></p></div>"
+    )
     return betreff, text, html
 
 
-def baue_teams_karte(report: dict, treffer: list[dict],
-                     site_url: str = SITE_URL) -> dict:
+def baue_teams_karte(
+    report: dict, treffer: list[dict], site_url: str = SITE_URL
+) -> dict:
     """Die Nutzlast fuer einen eingehenden Teams-Webhook (MessageCard).
 
     Bewusst das alte, schlichte Format: es wird von jedem Connector
     angenommen und braucht kein Schema-Handshake.
     """
-    zeilen = [{"name": (h.get("operator") or h.get("source") or "")[:60],
-               "value": (h.get("ctm_satz") or h.get("headline")
-                         or h.get("title") or "")[:300]}
-              for h in treffer[:3]]
+    zeilen = [
+        {
+            "name": (h.get("operator") or h.get("source") or "")[:60],
+            "value": (h.get("ctm_satz") or h.get("headline") or h.get("title") or "")[
+                :300
+            ],
+        }
+        for h in treffer[:3]
+    ]
     return {
         "@type": "MessageCard",
         "@context": "https://schema.org/extensions",
@@ -229,16 +271,20 @@ def baue_teams_karte(report: dict, treffer: list[dict],
         "summary": "Telco Radar: direkt portfoliorelevante Meldung",
         "title": "Direkt für das Portfolio",
         "sections": [{"facts": zeilen, "markdown": False}],
-        "potentialAction": [{
-            "@type": "OpenUri", "name": "Ausgabe öffnen",
-            "targets": [{"os": "default", "uri": f"{site_url}/"}]}],
+        "potentialAction": [
+            {
+                "@type": "OpenUri",
+                "name": "Ausgabe öffnen",
+                "targets": [{"os": "default", "uri": f"{site_url}/"}],
+            }
+        ],
     }
 
 
 # ------------------------------------------------------------------ Zustellen
 
-def sende_mail(betreff: str, text: str, html: str, *, trocken: bool = False
-               ) -> str:
+
+def sende_mail(betreff: str, text: str, html: str, *, trocken: bool = False) -> str:
     """Verschickt ueber SMTP. Zugangsdaten kommen aus der Umgebung.
 
     Fehlt eine davon, wird NICHT verschickt und auch nicht so getan: der
@@ -247,11 +293,13 @@ def sende_mail(betreff: str, text: str, html: str, *, trocken: bool = False
     """
     host = os.environ.get("SMTP_HOST", "")
     absender = os.environ.get("MAIL_FROM", "")
-    empfaenger = [e.strip() for e in
-                  os.environ.get("MAIL_TO", "").split(",") if e.strip()]
+    empfaenger = [
+        e.strip() for e in os.environ.get("MAIL_TO", "").split(",") if e.strip()
+    ]
     if not (host and absender and empfaenger):
         raise VersandNichtEingerichtet(
-            "SMTP_HOST, MAIL_FROM oder MAIL_TO fehlen - keine Mail verschickt")
+            "SMTP_HOST, MAIL_FROM oder MAIL_TO fehlen - keine Mail verschickt"
+        )
 
     nachricht = EmailMessage()
     nachricht["Subject"] = betreff
@@ -268,8 +316,9 @@ def sende_mail(betreff: str, text: str, html: str, *, trocken: bool = False
     passwort = os.environ.get("SMTP_PASSWORD", "")
     try:
         if port == 465:
-            server = smtplib.SMTP_SSL(host, port, timeout=30,
-                                      context=ssl.create_default_context())
+            server = smtplib.SMTP_SSL(
+                host, port, timeout=30, context=ssl.create_default_context()
+            )
         else:
             server = smtplib.SMTP(host, port, timeout=30)
         with server:
@@ -299,12 +348,19 @@ def sende_teams(karte: dict, *, trocken: bool = False) -> str:
 
 # ------------------------------------------------------------------ Steuerung
 
+
 def ist_versandtag(heute: date, wochentag: int) -> bool:
     return heute.weekday() == int(wochentag)
 
 
-def versende(root: Path, report: dict, settings: dict, *,
-             trocken: bool = False, erzwinge: bool = False) -> dict:
+def versende(
+    root: Path,
+    report: dict,
+    settings: dict,
+    *,
+    trocken: bool = False,
+    erzwinge: bool = False,
+) -> dict:
     """Der eine Einstiegspunkt. Liefert die Bilanz fuers Laufprotokoll.
 
     `erzwinge` uebergeht Wochentag und Zustellgedaechtnis - fuer den ersten
@@ -339,19 +395,26 @@ def versende(root: Path, report: dict, settings: dict, *,
 
     # ---- Teams: nur die Ausnahme, und jede Meldung genau einmal.
     if versand_cfg.get("teams_aktiv", True):
-        treffer = [h for h in ausnahmen(report)
-                   if erzwinge or not buch.schon_raus("teams", h.get("url", ""))]
+        treffer = [
+            h
+            for h in ausnahmen(report)
+            if erzwinge or not buch.schon_raus("teams", h.get("url", ""))
+        ]
         if not treffer:
             bilanz["teams"] = "keine Ausnahme"
         else:
             try:
                 bilanz["teams"] = (
                     f"{sende_teams(baue_teams_karte(report, treffer, site_url), trocken=trocken)}"
-                    f" ({len(treffer)} Meldung(en))")
+                    f" ({len(treffer)} Meldung(en))"
+                )
                 if not trocken:
                     for h in treffer:
-                        buch.merke("teams", h.get("url", ""),
-                                   h.get("headline") or h.get("title") or "")
+                        buch.merke(
+                            "teams",
+                            h.get("url", ""),
+                            h.get("headline") or h.get("title") or "",
+                        )
             except VersandFehler as exc:
                 bilanz["teams"] = f"FEHLER: {exc}"
                 log.error("Teams-Sofortmeldung: %s", exc)
@@ -366,14 +429,20 @@ def main(argv: list[str] | None = None) -> int:
     from .config import load_config
 
     p = argparse.ArgumentParser(
-        description="Wochendigest per Mail, Ausnahmen per Teams")
+        description="Wochendigest per Mail, Ausnahmen per Teams"
+    )
     p.add_argument("--root", type=Path, default=Path("."))
-    p.add_argument("--trocken", action="store_true",
-                   help="baut alles, verschickt nichts")
-    p.add_argument("--erzwinge", action="store_true",
-                   help="ohne Ruecksicht auf Wochentag und Zustellbuch")
-    p.add_argument("--zeige", action="store_true",
-                   help="die Textfassung auf die Konsole")
+    p.add_argument(
+        "--trocken", action="store_true", help="baut alles, verschickt nichts"
+    )
+    p.add_argument(
+        "--erzwinge",
+        action="store_true",
+        help="ohne Ruecksicht auf Wochentag und Zustellbuch",
+    )
+    p.add_argument(
+        "--zeige", action="store_true", help="die Textfassung auf die Konsole"
+    )
     args = p.parse_args(argv)
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
@@ -385,8 +454,13 @@ def main(argv: list[str] | None = None) -> int:
     report = json.loads(berichte[-1].read_text(encoding="utf-8"))
     if args.zeige:
         print(baue_mail(report)[1])
-    bilanz = versende(root, report, load_config(root).settings,
-                      trocken=args.trocken, erzwinge=args.erzwinge)
+    bilanz = versende(
+        root,
+        report,
+        load_config(root).settings,
+        trocken=args.trocken,
+        erzwinge=args.erzwinge,
+    )
     print(json.dumps(bilanz, ensure_ascii=False, indent=1))
     return 0
 

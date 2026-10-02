@@ -12,6 +12,7 @@ Datensaetze gekuerzt - keine nachgebaute Struktur. Das ist die Lehre vom
 `application/ld+json` auf Telekoms Produktseite, wo live null Treffer
 stehen), und nur der adversarische Pruefdurchgang hat es aufgedeckt.
 """
+
 import json
 from pathlib import Path
 
@@ -41,33 +42,46 @@ def farben():
 
 def _listung(satz, anbieter, katalog, farben, basis=""):
     return lies_listung(
-        titel=satz["titel"], anbieter=anbieter, anbieter_typ="netzbetreiber",
+        titel=satz["titel"],
+        anbieter=anbieter,
+        anbieter_typ="netzbetreiber",
         quelle_url=(basis + satz["url"]) or "https://example.de/p",
-        abgerufen_am="2026-08-28", katalog=katalog, farben=farben,
-        verfuegbarkeit=satz["verfuegbarkeit"], farbe_roh=satz["farbe"],
+        abgerufen_am="2026-08-28",
+        katalog=katalog,
+        farben=farben,
+        verfuegbarkeit=satz["verfuegbarkeit"],
+        farbe_roh=satz["farbe"],
         speicher_gb=satz.get("speicher_gb"),
-        preis_ohne_vertrag=satz["preis"])
+        preis_ohne_vertrag=satz["preis"],
+    )
 
 
 # ==========================================================================
 # Vodafone
 # ==========================================================================
 
+
 def test_vodafone_erntet_nur_ids_die_die_liste_selbst_nennt():
     """Die Regel "nur verlinkte Adressen, nie hochgezaehlte IDs" (§ 87b UrhG)
     gilt auch, wenn die Adressen in einer JSON-Nutzlast statt in `<a href>`
     stehen."""
-    urls = vodafone.ernte(_fixture("vodafone_hardware_liste.json"),
-                          "https://api.vodafone.de/glados/v2/hardware/v2?a=1")
+    urls = vodafone.ernte(
+        _fixture("vodafone_hardware_liste.json"),
+        "https://api.vodafone.de/glados/v2/hardware/v2?a=1",
+    )
     ids = {u.split("/virtualItem/")[1].split("?")[0] for u in urls}
-    echte = {str(g["virtualItemId"]) for g in
-             json.loads(_fixture("vodafone_hardware_liste.json"))["data"]["devices"]}
+    echte = {
+        str(g["virtualItemId"])
+        for g in json.loads(_fixture("vodafone_hardware_liste.json"))["data"]["devices"]
+    }
     assert ids == echte, "es wird genau das geerntet, was die Liste nennt"
     assert all(u.startswith("https://api.vodafone.de/") for u in urls)
     # Die Pflichtparameter muessen mit - ohne sie antwortet die
     # Schnittstelle mit HTTP 400 und nennt das fehlende Feld beim Namen.
-    assert all("businessTransaction=newContract" in u
-               and "salesChannel=Online.Consumer" in u for u in urls)
+    assert all(
+        "businessTransaction=newContract" in u and "salesChannel=Online.Consumer" in u
+        for u in urls
+    )
 
 
 def test_vodafone_liest_den_preis_ohne_vertrag_je_variante(katalog, farben):
@@ -88,12 +102,14 @@ def test_vodafone_baut_den_titel_aus_dem_modellnamen_nicht_aus_dem_label(katalog
     Katalogeintrag nie wieder."""
     roh = json.loads(_fixture("vodafone_virtualitem.json"))["data"]
     labels = [a["label"] for a in roh["atomics"]]
-    assert any("Pixel Hibiscus" in x for x in labels), \
+    assert any("Pixel Hibiscus" in x for x in labels), (
         "die Fixture muss den Fall enthalten, sonst prueft der Test nichts"
+    )
 
     saetze = vodafone.lies(_fixture("vodafone_virtualitem.json"))
-    assert all(erkenne_geraet(s["titel"], katalog) is not None for s in saetze), \
-        [s["titel"] for s in saetze]
+    assert all(erkenne_geraet(s["titel"], katalog) is not None for s in saetze), [
+        s["titel"] for s in saetze
+    ]
     # Gegenprobe: aus dem ROHEN label faende die Erkennung nichts.
     schlecht = [x for x in labels if "Pixel Hibiscus" in x][0]
     assert erkenne_geraet(schlecht, katalog) is None
@@ -112,9 +128,14 @@ def test_vodafone_zwei_schreibweisen_ergeben_dieselbe_id(katalog, farben):
     """Teil E, unverhandelbar: die sku_id kommt aus dem KATALOG, nie aus
     einem Titel-Hash. Sonst entstuenden jede Woche neue Geraete, die
     Listungsdauer waere immer eine Woche und der Preisverfall immer null."""
-    a = {"titel": "Google Pixel 11 256 GB Frost", "preis": 999.9,
-         "verfuegbarkeit": "lieferbar", "farbe": "Frost", "speicher_gb": 256,
-         "url": "/privat/handys/google-pixel-11.html"}
+    a = {
+        "titel": "Google Pixel 11 256 GB Frost",
+        "preis": 999.9,
+        "verfuegbarkeit": "lieferbar",
+        "farbe": "Frost",
+        "speicher_gb": 256,
+        "url": "/privat/handys/google-pixel-11.html",
+    }
     b = dict(a, titel="Google Pixel 11 5G 256GB, Frost")
     la = _listung(a, "Vodafone", katalog, farben, "https://www.vodafone.de")
     lb = _listung(b, "Vodafone", katalog, farben, "https://www.vodafone.de")
@@ -136,12 +157,14 @@ def test_vodafone_quelle_zeigt_auf_die_menschenseite(katalog, farben):
     saetze = vodafone.lies(_fixture("vodafone_virtualitem.json"))
     assert saetze
     for s in saetze:
-        assert s["url"].startswith("https://www.vodafone.de/privat/handys/"), \
-            s["url"]
+        assert s["url"].startswith("https://www.vodafone.de/privat/handys/"), s["url"]
     # Und er ueberlebt den urljoin des Collectors gegen die API-Adresse.
     from urllib.parse import urljoin
-    api = ("https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/287"
-           "?businessTransaction=newContract")
+
+    api = (
+        "https://api.vodafone.de/glados/v2/hardware/v2/virtualItem/287"
+        "?businessTransaction=newContract"
+    )
     assert urljoin(api, saetze[0]["url"]).startswith("https://www.vodafone.de/")
 
 
@@ -164,6 +187,7 @@ def test_vodafone_terabyte_wird_richtig_umgerechnet():
 # ==========================================================================
 # o2
 # ==========================================================================
+
 
 def test_o2_liest_den_geraetepreis_und_nicht_die_anzahlung(katalog, farben):
     saetze = o2.lies(_fixture("o2_katalog.json"))
@@ -205,9 +229,14 @@ def test_o2_liest_speicher_und_farbe_aus_dem_angebotsnamen(katalog, farben):
 
 def test_o2_zwei_schreibweisen_ergeben_dieselbe_id(katalog, farben):
     """Teil E fuer den zweiten neuen Adapter."""
-    a = {"titel": "Apple iPhone 17 Pro Max 256 GB tiefblau", "preis": 1459.0,
-         "verfuegbarkeit": "unbekannt", "farbe": "tiefblau",
-         "speicher_gb": 256, "url": "https://www.o2online.de/e-shop/a"}
+    a = {
+        "titel": "Apple iPhone 17 Pro Max 256 GB tiefblau",
+        "preis": 1459.0,
+        "verfuegbarkeit": "unbekannt",
+        "farbe": "tiefblau",
+        "speicher_gb": 256,
+        "url": "https://www.o2online.de/e-shop/a",
+    }
     b = dict(a, titel="Apple iPhone 17 Pro Max 5G 256GB - Tiefblau")
     la, lb = (_listung(x, "o2", katalog, farben) for x in (a, b))
     assert la is not None and lb is not None
@@ -233,25 +262,29 @@ def test_o2_quelle_zeigt_auf_die_seite_ohne_tarif():
 # Der Katalog gegen die LIVE-Namen der zwei Quellen
 # ==========================================================================
 
-@pytest.mark.parametrize("titel,erwartet", [
-    # Die 800-Euro-Saegezahn-Falle vom 10.08.2026, jetzt vierfach:
-    ("Google Pixel 11 Pro XL", "google-pixel-11-pro-xl"),
-    ("Google Pixel 11 Pro Fold", "google-pixel-11-pro-fold"),
-    ("Google Pixel 11 Pro", "google-pixel-11-pro"),
-    ("Google Pixel 11", "google-pixel-11"),
-    # Dieselbe Falle bei Xiaomi: "Pro Max" darf nicht auf "Pro" fallen.
-    ("Xiaomi Redmi Note 17 Pro Max 5G", "xiaomi-redmi-note-17-pro-max"),
-    ("Xiaomi Redmi Note 17 Pro 5G", "xiaomi-redmi-note-17-pro"),
-    # und bei Samsung
-    ("Samsung Galaxy Z Fold8 Ultra", "samsung-galaxy-z-fold8-ultra"),
-    ("Samsung Galaxy Z Fold8", "samsung-galaxy-z-fold8"),
-    # Schreibweisen, die die zwei Quellen unterschiedlich fuehren
-    ("Samsung Galaxy S26+", "samsung-galaxy-s26-plus"),
-    ("Samsung Galaxy A57 5G", "samsung-galaxy-a57"),
-    ("Fairphone (Gen.6)", "fairphone-6"),
-    ("iPhone Air", "apple-iphone-air"),
-    ("Apple iPhone 17e", "apple-iphone-17e"),
-])
+
+@pytest.mark.parametrize(
+    "titel,erwartet",
+    [
+        # Die 800-Euro-Saegezahn-Falle vom 10.08.2026, jetzt vierfach:
+        ("Google Pixel 11 Pro XL", "google-pixel-11-pro-xl"),
+        ("Google Pixel 11 Pro Fold", "google-pixel-11-pro-fold"),
+        ("Google Pixel 11 Pro", "google-pixel-11-pro"),
+        ("Google Pixel 11", "google-pixel-11"),
+        # Dieselbe Falle bei Xiaomi: "Pro Max" darf nicht auf "Pro" fallen.
+        ("Xiaomi Redmi Note 17 Pro Max 5G", "xiaomi-redmi-note-17-pro-max"),
+        ("Xiaomi Redmi Note 17 Pro 5G", "xiaomi-redmi-note-17-pro"),
+        # und bei Samsung
+        ("Samsung Galaxy Z Fold8 Ultra", "samsung-galaxy-z-fold8-ultra"),
+        ("Samsung Galaxy Z Fold8", "samsung-galaxy-z-fold8"),
+        # Schreibweisen, die die zwei Quellen unterschiedlich fuehren
+        ("Samsung Galaxy S26+", "samsung-galaxy-s26-plus"),
+        ("Samsung Galaxy A57 5G", "samsung-galaxy-a57"),
+        ("Fairphone (Gen.6)", "fairphone-6"),
+        ("iPhone Air", "apple-iphone-air"),
+        ("Apple iPhone 17e", "apple-iphone-17e"),
+    ],
+)
 def test_die_live_namen_treffen_den_richtigen_katalogeintrag(titel, erwartet, katalog):
     """Jeder dieser Namen stand am 28.08.2026 wirklich im Katalog von
     Vodafone oder o2. Vor der Katalogerweiterung traf KEINER von ihnen."""
@@ -282,8 +315,7 @@ def test_die_erkennung_folgt_dem_katalog_nicht_der_geraeteklasse(katalog):
     # Der Stand-Commit-Fall: der Auto-Eintrag wird erkannt (Vorher-rot:
     # derselbe Titel stand in der alten None-Liste dieses Tests).
     tab = erkenne_geraet("Samsung Galaxy Tab S11 Ultra", katalog)
-    assert tab is not None, \
-        "Auto-Eintrag Galaxy Tab S11 Ultra wird nicht erkannt"
+    assert tab is not None, "Auto-Eintrag Galaxy Tab S11 Ultra wird nicht erkannt"
     assert tab.device_id == "samsung-galaxy-tab-s11-ultra", tab.device_id
     assert tab.auto, "der Stand-Commit-Fall ist ein Auto-Eintrag"
 
@@ -299,14 +331,16 @@ def test_die_erkennung_folgt_dem_katalog_nicht_der_geraeteklasse(katalog):
     # die Lücke bewusst NICHT fest.)
     for titel in ("iPad Pro 13 (2025)", "Apple iPad (2025)"):
         treffer = erkenne_geraet(titel, katalog)
-        assert treffer is None or "ipad" in treffer.device_id, \
+        assert treffer is None or "ipad" in treffer.device_id, (
             f"{titel!r} fiel fuzzig auf {treffer.device_id}"
+        )
 
 
 # ==========================================================================
 # Kopfzeilen: die zwei Schnittstellen verlangen sie, und ohne sie
 # antworten sie mit 404 statt mit Daten
 # ==========================================================================
+
 
 def test_pflichtkopfzeilen_erreichen_den_abruf(katalog, farben):
     """o2 antwortet auf `Accept: application/json` mit einer Weiterleitung
@@ -328,14 +362,25 @@ def test_pflichtkopfzeilen_erreichen_den_abruf(katalog, farben):
         return (200, _fixture("o2_katalog.json"))
 
     anbieter = Anbieter(
-        name="o2", typ="netzbetreiber", methode="o2_katalog",
-        basis_url="https://www.o2online.de", rate_limit_sekunden=0,
+        name="o2",
+        typ="netzbetreiber",
+        methode="o2_katalog",
+        basis_url="https://www.o2online.de",
+        rate_limit_sekunden=0,
         kopfzeilen={"Accept": "application/vnd.commerce.message+json"},
-        einstiege=[Einstieg(url="https://www.o2online.de/e-shop/rest/catalog/x",
-                            kind="static")])
-    bilanz = sammle_anbieter(anbieter, katalog, farben, hole, "2026-08-28",
-                             RobotsWaechter(hole=hole),
-                             datetime(2026, 8, 28, 3, tzinfo=timezone.utc))
+        einstiege=[
+            Einstieg(url="https://www.o2online.de/e-shop/rest/catalog/x", kind="static")
+        ],
+    )
+    bilanz = sammle_anbieter(
+        anbieter,
+        katalog,
+        farben,
+        hole,
+        "2026-08-28",
+        RobotsWaechter(hole=hole),
+        datetime(2026, 8, 28, 3, tzinfo=timezone.utc),
+    )
     assert bilanz.status == "ok" and bilanz.listungen
     katalogabruf = gesehen["https://www.o2online.de/e-shop/rest/catalog/x"]
     assert katalogabruf["Accept"] == "application/vnd.commerce.message+json"
@@ -351,19 +396,30 @@ def test_ohne_konfigurierte_kopfzeilen_bleibt_der_alte_vertrag_gueltig(katalog, 
     from telco_radar.collect.geraete.robots import RobotsWaechter
     from telco_radar.geraete_config import Anbieter, Einstieg
 
-    def hole(url):                      # EIN Parameter, wie ueberall sonst
+    def hole(url):  # EIN Parameter, wie ueberall sonst
         if url.endswith("/robots.txt"):
             return (200, "User-agent: *\n")
         return (200, _fixture("o2_katalog.json"))
 
     anbieter = Anbieter(
-        name="o2", typ="netzbetreiber", methode="o2_katalog",
-        basis_url="https://www.o2online.de", rate_limit_sekunden=0,
-        einstiege=[Einstieg(url="https://www.o2online.de/e-shop/rest/catalog/x",
-                            kind="static")])
-    bilanz = sammle_anbieter(anbieter, katalog, farben, hole, "2026-08-28",
-                             RobotsWaechter(hole=hole),
-                             datetime(2026, 8, 28, 3, tzinfo=timezone.utc))
+        name="o2",
+        typ="netzbetreiber",
+        methode="o2_katalog",
+        basis_url="https://www.o2online.de",
+        rate_limit_sekunden=0,
+        einstiege=[
+            Einstieg(url="https://www.o2online.de/e-shop/rest/catalog/x", kind="static")
+        ],
+    )
+    bilanz = sammle_anbieter(
+        anbieter,
+        katalog,
+        farben,
+        hole,
+        "2026-08-28",
+        RobotsWaechter(hole=hole),
+        datetime(2026, 8, 28, 3, tzinfo=timezone.utc),
+    )
     assert bilanz.status == "ok" and bilanz.listungen
 
 
@@ -380,6 +436,7 @@ def test_der_rohsatz_zaehler_trennt_zwei_ausfaelle(katalog, farben):
     # Ein Katalog, den KEINES der Geraete trifft - die Seite gibt sehr wohl
     # Preissaetze her.
     from telco_radar.geraete_model import Katalog
+
     leer = Katalog(geraete=[])
 
     def hole(url, kopfzeilen=None):
@@ -388,14 +445,26 @@ def test_der_rohsatz_zaehler_trennt_zwei_ausfaelle(katalog, farben):
         return (200, _fixture("o2_katalog.json"))
 
     anbieter = Anbieter(
-        name="o2", typ="netzbetreiber", methode="o2_katalog",
-        basis_url="https://www.o2online.de", rate_limit_sekunden=0,
+        name="o2",
+        typ="netzbetreiber",
+        methode="o2_katalog",
+        basis_url="https://www.o2online.de",
+        rate_limit_sekunden=0,
         kopfzeilen={"Accept": "x"},
-        einstiege=[Einstieg(url="https://www.o2online.de/e-shop/rest/catalog/x",
-                            kind="static")])
-    bilanz = sammle_anbieter(anbieter, leer, farben, hole, "2026-08-28",
-                             RobotsWaechter(hole=hole),
-                             datetime(2026, 8, 28, 3, tzinfo=timezone.utc))
+        einstiege=[
+            Einstieg(url="https://www.o2online.de/e-shop/rest/catalog/x", kind="static")
+        ],
+    )
+    bilanz = sammle_anbieter(
+        anbieter,
+        leer,
+        farben,
+        hole,
+        "2026-08-28",
+        RobotsWaechter(hole=hole),
+        datetime(2026, 8, 28, 3, tzinfo=timezone.utc),
+    )
     assert bilanz.listungen == [], "kein Katalogtreffer"
-    assert bilanz.rohsaetze > 0, \
+    assert bilanz.rohsaetze > 0, (
         "die Seite gab Preissaetze her - das unterscheidet den Ausfall"
+    )

@@ -24,6 +24,7 @@ Jeder Test prüft das GERENDERTE Markup - ein Dict-Vergleich sähe einen
 fehlenden Vorlagen-Zweig nicht (CLAUDE.md §6: der Fehler entstand zwischen
 aufbereiten() und der Vorlage).
 """
+
 from __future__ import annotations
 
 import json
@@ -38,51 +39,108 @@ from telco_radar.report.html import render_site
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 HEUTE = "2026-09-17"
 
-_KATALOG = {"geraete": [
-    {"hersteller": "Apple", "modell": "iPhone 15", "generation": 15,
-     "marktstart": "2023-09-22", "speicher": [128], "segment": "premium"},
-]}
+_KATALOG = {
+    "geraete": [
+        {
+            "hersteller": "Apple",
+            "modell": "iPhone 15",
+            "generation": 15,
+            "marktstart": "2023-09-22",
+            "speicher": [128],
+            "segment": "premium",
+        },
+    ]
+}
 _FARBEN = {"farben": {"schwarz": ["Schwarz", "Black"]}}
-_QUELLEN = {"anbieter": [
-    {"name": "o2", "typ": "netzbetreiber", "rang": 1,
-     "methode": "json_endpunkt", "basis_url": "https://www.o2online.de",
-     "einstiege": [{"url": "https://www.o2online.de/e-shop/",
-                    "label": "Katalog", "kind": "static"}]},
-    {"name": "Vodafone", "typ": "netzbetreiber", "rang": 2, "eigen": True,
-     "methode": "json_endpunkt", "basis_url": "https://www.vodafone.de",
-     "einstiege": [{"url": "https://api.vodafone.de/glados/v2/hardware",
-                    "label": "Liste", "kind": "static"}]},
-    {"name": "Saturn", "typ": "handel", "gruppe": "Ceconomy", "rang": 2,
-     "methode": "saturn_brand", "aktiv": True,
-     "basis_url": "https://www.saturn.de",
-     "einstiege": [{"url": "https://www.saturn.de/handys",
-                    "label": "Handys", "kind": "static"}]},
-]}
+_QUELLEN = {
+    "anbieter": [
+        {
+            "name": "o2",
+            "typ": "netzbetreiber",
+            "rang": 1,
+            "methode": "json_endpunkt",
+            "basis_url": "https://www.o2online.de",
+            "einstiege": [
+                {
+                    "url": "https://www.o2online.de/e-shop/",
+                    "label": "Katalog",
+                    "kind": "static",
+                }
+            ],
+        },
+        {
+            "name": "Vodafone",
+            "typ": "netzbetreiber",
+            "rang": 2,
+            "eigen": True,
+            "methode": "json_endpunkt",
+            "basis_url": "https://www.vodafone.de",
+            "einstiege": [
+                {
+                    "url": "https://api.vodafone.de/glados/v2/hardware",
+                    "label": "Liste",
+                    "kind": "static",
+                }
+            ],
+        },
+        {
+            "name": "Saturn",
+            "typ": "handel",
+            "gruppe": "Ceconomy",
+            "rang": 2,
+            "methode": "saturn_brand",
+            "aktiv": True,
+            "basis_url": "https://www.saturn.de",
+            "einstiege": [
+                {
+                    "url": "https://www.saturn.de/handys",
+                    "label": "Handys",
+                    "kind": "static",
+                }
+            ],
+        },
+    ]
+}
 
 SKU = "apple-iphone-15-128gb-schwarz"
-DATEIEN = ("geraete-aktuell.csv", "geraete-historie.csv", "geraete-tco.csv",
-           "wettbewerbsradar.csv",
-           # P3: die zwei Modell-Exporte des Katalogs (je Ansicht eine
-           # Datei, eine Zeile je Modell)
-           "geraete-modell-barpreis.csv", "geraete-modell-tco.csv")
+DATEIEN = (
+    "geraete-aktuell.csv",
+    "geraete-historie.csv",
+    "geraete-tco.csv",
+    "wettbewerbsradar.csv",
+    # P3: die zwei Modell-Exporte des Katalogs (je Ansicht eine
+    # Datei, eine Zeile je Modell)
+    "geraete-modell-barpreis.csv",
+    "geraete-modell-tco.csv",
+)
 
 
 def _listung(anbieter, sku, preis):
     speicher = int(sku.split("-")[-2].replace("gb", ""))
-    return {"id": f"{anbieter.lower()}--{sku}", "sku_id": sku,
-            "device_id": "-".join(sku.split("-")[:-2]),
-            "anbieter": anbieter,
-            "anbieter_typ": ("handel" if anbieter == "Saturn"
-                             else "netzbetreiber"),
-            "speicher_gb": speicher, "farbe_roh": "Schwarz",
-            "farbe_normalisiert": "schwarz", "zustand": "neu",
-            "first_seen": "2026-08-20", "last_verified": HEUTE,
-            "status": "aktiv", "missed_checks": 0,
-            "preis_ohne_vertrag": preis, "erstpreis": preis,
-            "erstpreis_art": "ohne_vertrag", "erstpreis_am": "2026-08-20",
-            "quelle_url": f"https://example.de/{anbieter.lower()}/{sku}",
-            "abgerufen_am": HEUTE, "verfuegbarkeit": "lieferbar",
-            "confidence": "hoch", "einstiege": ["https://example.de/l"]}
+    return {
+        "id": f"{anbieter.lower()}--{sku}",
+        "sku_id": sku,
+        "device_id": "-".join(sku.split("-")[:-2]),
+        "anbieter": anbieter,
+        "anbieter_typ": ("handel" if anbieter == "Saturn" else "netzbetreiber"),
+        "speicher_gb": speicher,
+        "farbe_roh": "Schwarz",
+        "farbe_normalisiert": "schwarz",
+        "zustand": "neu",
+        "first_seen": "2026-08-20",
+        "last_verified": HEUTE,
+        "status": "aktiv",
+        "missed_checks": 0,
+        "preis_ohne_vertrag": preis,
+        "erstpreis": preis,
+        "erstpreis_art": "ohne_vertrag",
+        "erstpreis_am": "2026-08-20",
+        "quelle_url": f"https://example.de/{anbieter.lower()}/{sku}",
+        "abgerufen_am": HEUTE,
+        "verfuegbarkeit": "lieferbar",
+        "confidence": "hoch",
+        "einstiege": ["https://example.de/l"],
+    }
 
 
 def _text(knoten) -> str:
@@ -99,39 +157,67 @@ def _seite(tmp_path: pathlib.Path, listungen: list) -> dict:
     ist der Ohne-Alarm-Fall (Vodafone ist am günstigsten)."""
     root = tmp_path / "leer-seite"
     (root / "config").mkdir(parents=True)
-    for name, daten in (("geraete_katalog.yaml", _KATALOG),
-                        ("farben.yaml", _FARBEN),
-                        ("geraete_quellen.yaml", _QUELLEN)):
+    for name, daten in (
+        ("geraete_katalog.yaml", _KATALOG),
+        ("farben.yaml", _FARBEN),
+        ("geraete_quellen.yaml", _QUELLEN),
+    ):
         (root / "config" / name).write_text(
-            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
-            encoding="utf-8")
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False), encoding="utf-8"
+        )
     state = root / "data" / "state"
     state.mkdir(parents=True)
-    (state / "geraete_db.json").write_text(json.dumps({
-        "updated": HEUTE,
-        "anbieter": {n: {"laeufe": 4, "funde_gesamt": 1}
-                     for n in ("Vodafone", "Saturn")} if listungen else {},
-        "listungen": listungen}), encoding="utf-8")
+    (state / "geraete_db.json").write_text(
+        json.dumps(
+            {
+                "updated": HEUTE,
+                "anbieter": {
+                    n: {"laeufe": 4, "funde_gesamt": 1} for n in ("Vodafone", "Saturn")
+                }
+                if listungen
+                else {},
+                "listungen": listungen,
+            }
+        ),
+        encoding="utf-8",
+    )
     (state / "geraete_preise.jsonl").write_text(
-        "".join(json.dumps({"listung_id": e["id"], "datum": HEUTE,
-                            "preis_ohne_vertrag": e["preis_ohne_vertrag"],
-                            "quelle_url": e["quelle_url"]}) + "\n"
-                for e in listungen), encoding="utf-8")
+        "".join(
+            json.dumps(
+                {
+                    "listung_id": e["id"],
+                    "datum": HEUTE,
+                    "preis_ohne_vertrag": e["preis_ohne_vertrag"],
+                    "quelle_url": e["quelle_url"],
+                }
+            )
+            + "\n"
+            for e in listungen
+        ),
+        encoding="utf-8",
+    )
     (state / "geraete_tco.json").write_text(
-        json.dumps({"updated": HEUTE, "buendel": [], "sim_only": []}),
-        encoding="utf-8")
+        json.dumps({"updated": HEUTE, "buendel": [], "sim_only": []}), encoding="utf-8"
+    )
     (state / "tarife.jsonl").write_text("", encoding="utf-8")
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
-    (reports / f"{HEUTE}.json").write_text(json.dumps({
-        "date": HEUTE, "language": "de",
-        "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
-        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{HEUTE}.json").write_text(
+        json.dumps(
+            {
+                "date": HEUTE,
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     (reports / f"{HEUTE}.md").write_text("# B\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
-    return {"html": (site / "geraete.html").read_text(encoding="utf-8"),
-            "site": site}
+    return {"html": (site / "geraete.html").read_text(encoding="utf-8"), "site": site}
 
 
 @pytest.fixture(scope="module")
@@ -147,14 +233,18 @@ def ohne_alarm(tmp_path_factory) -> BeautifulSoup:
     """Bestand MIT Daten, aber Vodafone ist überall am günstigsten: die
     Alarm-Sektion steht mit Nullern und ihrem Leer-Satz da - 'kein
     Wettbewerber günstiger' ist eine Aussage, keine kaputte Tafel."""
-    seite = _seite(tmp_path_factory.mktemp("leer-alarm"), [
-        _listung("Vodafone", SKU, 679.90),
-        _listung("Saturn", SKU, 709.90),
-    ])
+    seite = _seite(
+        tmp_path_factory.mktemp("leer-alarm"),
+        [
+            _listung("Vodafone", SKU, 679.90),
+            _listung("Saturn", SKU, 709.90),
+        ],
+    )
     return BeautifulSoup(seite["html"], "html.parser")
 
 
 # ---- 1. Zeitreihe/TCO-Vergleich ohne Bündel -------------------------------
+
 
 def test_zeitreihe_ohne_buendel_nennt_den_leerzustand(ohne_alarm):
     """Der Vergleichs-Reiter sagt BENANNT, dass es nichts zu rechnen
@@ -166,14 +256,18 @@ def test_zeitreihe_ohne_buendel_nennt_den_leerzustand(ohne_alarm):
     assert tafel is not None, "#tafel-tco fehlt - der Test prüft nichts"
     text = _text(tafel)
     assert "kein einziges Bündel aus Gerät und Tarif" in text, (
-        "der benannte Leerzustand des Vergleichs-Reiters fehlt")
+        "der benannte Leerzustand des Vergleichs-Reiters fehlt"
+    )
     assert not ohne_alarm.select("#gr-zr-gruppe svg"), (
-        "ohne Bündel steht ein Graph da - gezeichnet aus nichts")
+        "ohne Bündel steht ein Graph da - gezeichnet aus nichts"
+    )
     assert not ohne_alarm.select("#gr-zr-gruppe .gr-zr-antwort"), (
-        "ohne Bündel steht ein Antwort-Satz da - gerechnet aus nichts")
+        "ohne Bündel steht ein Antwort-Satz da - gerechnet aus nichts"
+    )
 
 
 # ---- 2. Radar ohne Alarme ---------------------------------------------------
+
 
 def test_radar_ohne_alarme_nennt_den_leerzustand(ohne_alarm):
     """Die drei WARN-Kacheln zeigen Null, und der Leer-Satz steht OFFEN
@@ -182,31 +276,36 @@ def test_radar_ohne_alarme_nennt_den_leerzustand(ohne_alarm):
     darf dabei zählen - sie ist die ehrliche Gegenseite derselben
     Menge, nicht ein Alarm."""
     sektion = ohne_alarm.select_one("#wr-alarme")
-    assert sektion is not None, (
-        "die Alarm-Sektion fehlt komplett - stiller Leerzustand")
-    chips = {c.select_one("span").get_text(strip=True):
-             c.select_one("b").get_text(strip=True)
-             for c in sektion.select(".gr-chip")}
+    assert sektion is not None, "die Alarm-Sektion fehlt komplett - stiller Leerzustand"
+    chips = {
+        c.select_one("span").get_text(strip=True): c.select_one("b").get_text(
+            strip=True
+        )
+        for c in sektion.select(".gr-chip")
+    }
     assert set(chips) == {"Kritisch", "Mittel", "Gering", "Bestpreis"}, chips
-    assert chips["Kritisch"] == chips["Mittel"] == chips["Gering"] == "0", (
-        chips)
+    assert chips["Kritisch"] == chips["Mittel"] == chips["Gering"] == "0", chips
     assert chips["Bestpreis"] != "0", (
         "die Gegenprobe fehlt: Vodafone ist am günstigsten, die Kachel "
         "muss es zählen - sonst prüft der Test einen Bestand ohne jede "
-        "Vergleichung")
+        "Vergleichung"
+    )
     leer_satz = sektion.select_one(".gr-a-leer")
     assert leer_satz is not None, "der Leer-Satz der Alarmtabelle fehlt"
     assert not leer_satz.has_attr("hidden"), (
         "der Leer-Satz steht versteckt da - bei null Alarmen ist er die "
-        "Aussage, kein Filterfall")
+        "Aussage, kein Filterfall"
+    )
     assert "ein Wettbewerber günstiger" in _text(leer_satz), (
-        "der Leer-Satz nennt nicht den Grund (kein Wettbewerber günstiger)")
+        "der Leer-Satz nennt nicht den Grund (kein Wettbewerber günstiger)"
+    )
     # Der Satz NENNT die Vergleichsmenge - die Tafel ist nicht leer,
     # weil nichts gemessen wurde.
     assert "stehen einem Wettbewerber gegenüber" in _text(sektion)
 
 
 # ---- 3. Radar ohne Abweichungszeilen ---------------------------------------
+
 
 def test_radar_ohne_abweichung_nennt_den_leerzustand(ohne_alarm):
     """Ohne Bündel rendert die Abweichungs-Sektion ihren benannten
@@ -216,15 +315,19 @@ def test_radar_ohne_abweichung_nennt_den_leerzustand(ohne_alarm):
     sektion = ohne_alarm.select_one("#wr-abweichung")
     assert sektion is not None, (
         "die Abweichungs-Sektion fehlt ohne Bündel - genau der stille "
-        "Leerzustand, den die E5-Sicherung verbietet")
+        "Leerzustand, den die E5-Sicherung verbietet"
+    )
     text = _text(sektion)
     assert "Noch keine Modelle mit Bündeldaten erhoben" in text, (
-        "der benannte Leerzustand der Abweichungs-Liste fehlt")
+        "der benannte Leerzustand der Abweichungs-Liste fehlt"
+    )
     assert not sektion.select("tr.gr-a-zeile"), (
-        "ohne Bündel stehen Zeilen in der Abweichungs-Liste")
+        "ohne Bündel stehen Zeilen in der Abweichungs-Liste"
+    )
 
 
 # ---- 4. Katalog leer -------------------------------------------------------
+
 
 def test_katalog_leer_nennt_den_leerzustand(leer, ohne_alarm):
     """Ohne jeden Bestand sagt die SEITE benannt, dass nichts erfasst
@@ -234,9 +337,11 @@ def test_katalog_leer_nennt_den_leerzustand(leer, ohne_alarm):
     Filterung steuert - beides wird hier zusammen geprüft."""
     text = _text(leer)
     assert "Noch keine Geräte erfasst" in text, (
-        "der Seiten-Leerzustand fehlt - die Seite steht still leer")
+        "der Seiten-Leerzustand fehlt - die Seite steht still leer"
+    )
     assert not leer.select("#gr-katalogtabelle .gr-k-zeile"), (
-        "der Katalog trägt Zeilen, obwohl kein Bestand da ist")
+        "der Katalog trägt Zeilen, obwohl kein Bestand da ist"
+    )
 
     # Gegenprobe am Bestand MIT Zeilen: der Leer-Satz der Tafel ist
     # versteckt (Filter-Satz), die Tabelle trägt ihre Zeile.
@@ -244,13 +349,16 @@ def test_katalog_leer_nennt_den_leerzustand(leer, ohne_alarm):
     assert satz is not None, "der Filter-Leersatz fehlt am vollen Katalog"
     assert satz.has_attr("hidden"), (
         "am vollen Katalog steht der Leer-Satz offen - er gehört der "
-        "Filterung, nicht dem Vorgabestand")
+        "Filterung, nicht dem Vorgabestand"
+    )
     assert ohne_alarm.select("#gr-katalogtabelle .gr-k-zeile"), (
         "der Katalog trägt keine Zeile, obwohl der Bestand eine hat - "
-        "Lookup ins Leere, der Test würde sonst nichts prüfen")
+        "Lookup ins Leere, der Test würde sonst nichts prüfen"
+    )
 
 
 # ---- 5. Export ohne Zeilen -------------------------------------------------
+
 
 def test_export_ohne_zeilen_nennt_die_null(leer):
     """Alle Export-Dateien mit Kopfspur und null Zeilen - und die SEITE
@@ -263,10 +371,12 @@ def test_export_ohne_zeilen_nennt_die_null(leer):
     links = leer.select("section.gr-export-fuss a[href^='exporte/']")
     assert len(links) == len(DATEIEN), (
         f"{len(links)} Export-Links im Leerzustand - {len(DATEIEN)} Dateien "
-        "gehören da hin")
+        "gehören da hin"
+    )
     for a in links:
         assert "0" in a.get_text(), (
-            f"Link ohne Null neben der Zeilenzahl: {a.get_text(strip=True)}")
+            f"Link ohne Null neben der Zeilenzahl: {a.get_text(strip=True)}"
+        )
     # Sechs Links, sechs verschiedene Dateien - keine fehlt, keine doppelt.
     ziele = {a.get("href") for a in links}
     assert ziele == {f"exporte/{n}" for n in DATEIEN}, ziele
@@ -287,4 +397,5 @@ def test_export_dateien_haben_im_leerzustand_nur_die_kopfspur(leer_site):
         assert roh[:3] == b"\xef\xbb\xbf", f"kein BOM: {name}"
         zeilen = roh.decode("utf-8-sig").splitlines()
         assert len(zeilen) == 1 and zeilen[0].count(";") >= 5, (
-            f"{name}: {len(zeilen)} Zeilen statt einer Kopfspur")
+            f"{name}: {len(zeilen)} Zeilen statt einer Kopfspur"
+        )

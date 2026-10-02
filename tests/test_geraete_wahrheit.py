@@ -13,25 +13,57 @@ Zeile, die `_zustand_veraltet` bereits verurteilt hatte, stand fuer
 `_doppelpreise` trotzdem noch in ihrer Gruppe - und riss den gesunden
 Nachbarn mit hinaus.
 """
+
 import pytest
 
-from telco_radar.geraete_model import (Geraet, Katalog, farbschluessel,
-                                       zustand_aus_feldern, zustand_aus_titel)
+from telco_radar.geraete_model import (
+    Geraet,
+    Katalog,
+    farbschluessel,
+    zustand_aus_feldern,
+    zustand_aus_titel,
+)
 from telco_radar.report import geraete_vergleich
 from telco_radar.report.geraete_pruefung import pruefe
 
-_KATALOG = Katalog(geraete=[
-    Geraet(hersteller="Samsung", modell="Galaxy S25", generation=25,
-           speicher=[128, 256], segment="premium"),
-    Geraet(hersteller="Samsung", modell="Galaxy S26 FE", generation=26,
-           speicher=[128, 256], segment="premium"),
-    Geraet(hersteller="Apple", modell="iPhone 14 Pro", generation=14,
-           speicher=[128, 256], segment="flagship"),
-])
+_KATALOG = Katalog(
+    geraete=[
+        Geraet(
+            hersteller="Samsung",
+            modell="Galaxy S25",
+            generation=25,
+            speicher=[128, 256],
+            segment="premium",
+        ),
+        Geraet(
+            hersteller="Samsung",
+            modell="Galaxy S26 FE",
+            generation=26,
+            speicher=[128, 256],
+            segment="premium",
+        ),
+        Geraet(
+            hersteller="Apple",
+            modell="iPhone 14 Pro",
+            generation=14,
+            speicher=[128, 256],
+            segment="flagship",
+        ),
+    ]
+)
 
 
-def _e(gid, preis, farbe_roh, *, kennung, zustand="neu", speicher=128,
-       titel="", anbieter="o2"):
+def _e(
+    gid,
+    preis,
+    farbe_roh,
+    *,
+    kennung,
+    zustand="neu",
+    speicher=128,
+    titel="",
+    anbieter="o2",
+):
     """Eine o2-Listung so, wie sie im Store steht.
 
     `zustand` ist absichtlich vorbelegt mit "neu": das ist der Fehler, den
@@ -39,9 +71,14 @@ def _e(gid, preis, farbe_roh, *, kennung, zustand="neu", speicher=128,
     der naechste erfolgreiche Crawl ihn ueberschreibt.
     """
     return {
-        "id": kennung, "anbieter": anbieter, "device_id": gid,
-        "speicher_gb": speicher, "zustand": zustand, "status": "aktiv",
-        "farbe_roh": farbe_roh, "farbe_normalisiert": None,
+        "id": kennung,
+        "anbieter": anbieter,
+        "device_id": gid,
+        "speicher_gb": speicher,
+        "zustand": zustand,
+        "status": "aktiv",
+        "farbe_roh": farbe_roh,
+        "farbe_normalisiert": None,
         "preis_ohne_vertrag": preis,
         "titel_roh": titel or f"{gid} {speicher} GB {farbe_roh}",
         "quelle_url": f"https://www.o2online.de/p/{kennung}",
@@ -61,9 +98,9 @@ _FAELLE = [
 
 
 @pytest.mark.parametrize("gid,gb,gebraucht,farbe,neu", _FAELLE)
-def test_ein_gebrauchtgeraet_gewinnt_keinen_neupreisvergleich(gid, gb,
-                                                              gebraucht,
-                                                              farbe, neu):
+def test_ein_gebrauchtgeraet_gewinnt_keinen_neupreisvergleich(
+    gid, gb, gebraucht, farbe, neu
+):
     """Der Kernfall. Das Kennzeichen steht NUR in der Farbe, und der
     gespeicherte Zustand sagt "neu" - trotzdem darf der Gebrauchtpreis
     nicht in den Vergleich."""
@@ -73,13 +110,14 @@ def test_ein_gebrauchtgeraet_gewinnt_keinen_neupreisvergleich(gid, gb,
     ]
     sauber = {e["id"] for e in pruefe(eintraege, _KATALOG)["sauber"]}
     assert "gebraucht" not in sauber, (
-        f"{gebraucht} EUR ist ein Gebrauchtpreis und stand als Sieger auf der Seite")
+        f"{gebraucht} EUR ist ein Gebrauchtpreis und stand als Sieger auf der Seite"
+    )
 
 
 @pytest.mark.parametrize("gid,gb,gebraucht,farbe,neu", _FAELLE)
-def test_der_echte_neupreis_ueberlebt_seinen_gebrauchten_nachbarn(gid, gb,
-                                                                  gebraucht,
-                                                                  farbe, neu):
+def test_der_echte_neupreis_ueberlebt_seinen_gebrauchten_nachbarn(
+    gid, gb, gebraucht, farbe, neu
+):
     """Der teuerste Nebeneffekt, und er war unsichtbar.
 
     Bis zum 30.08.2026 liefen die Pruefungen unabhaengig: `_zustand_veraltet`
@@ -97,18 +135,21 @@ def test_der_echte_neupreis_ueberlebt_seinen_gebrauchten_nachbarn(gid, gb,
     sauber = {e["id"] for e in erg["sauber"]}
     assert "echt" in sauber, (
         f"der echte Neupreis {neu} EUR wurde von seinem gebrauchten "
-        f"Nachbarn mitgerissen")
+        f"Nachbarn mitgerissen"
+    )
     assert erg["zahlen"]["doppelpreise"] == 0, (
         "nach der Zustandspruefung steht nur noch ein Preis in der Gruppe - "
-        "es gibt keinen Doppelpreis mehr zu finden")
+        "es gibt keinen Doppelpreis mehr zu finden"
+    )
 
 
 def test_ein_ausschliesslich_gebraucht_gelistetes_geraet_faellt_auch():
     """Ohne Neugeraet daneben findet die Doppelpreisregel nichts - dann traegt
     die Zustandspruefung den Fall allein. Genau dieser Fall hatte bis zum
     29.08.2026 kein Netz unter sich."""
-    eintraege = [_e("samsung-galaxy-s25", 577.0, "grau erneuert",
-                    kennung="nur-gebraucht")]
+    eintraege = [
+        _e("samsung-galaxy-s25", 577.0, "grau erneuert", kennung="nur-gebraucht")
+    ]
     assert pruefe(eintraege, _KATALOG)["sauber"] == []
 
 
@@ -116,20 +157,19 @@ def test_ein_ausschliesslich_gebraucht_gelistetes_geraet_faellt_auch():
 # Die Farbe als Vergleichsschluessel
 # --------------------------------------------------------------------------
 
+
 def test_ein_kuerzel_am_ende_macht_keine_zweite_farbe():
-    """"pistachio" und "pistachio bk" sind ein Geraet (Auftrag, Abschnitt 1).
+    """ "pistachio" und "pistachio bk" sind ein Geraet (Auftrag, Abschnitt 1).
     Als zwei Farben gelesen waeren die 144 EUR Abstand ein legitimer
     Farbaufschlag, und der Vergleich naehme kommentarlos die 667 EUR."""
-    assert farbschluessel(None, "pistachio bk") == farbschluessel(None,
-                                                                  "pistachio")
+    assert farbschluessel(None, "pistachio bk") == farbschluessel(None, "pistachio")
 
 
 def test_ein_ganzes_wort_am_ende_macht_sehr_wohl_eine_zweite_farbe():
     """Die Laengengrenze ist der ganze Schutz der Regel. Ohne sie waeren
     "titan natur" und "titan schwarz" derselbe Schluessel - zwei echte Farben
     eines Geraets saehen wie ein Doppelpreis aus."""
-    assert farbschluessel(None, "titan natur") != farbschluessel(None,
-                                                                 "titan schwarz")
+    assert farbschluessel(None, "titan natur") != farbschluessel(None, "titan schwarz")
 
 
 def test_zwei_schreibweisen_derselben_farbe_sind_ein_doppelpreis():
@@ -157,7 +197,8 @@ def test_die_rohschreibweise_traegt_den_schluessel():
     dem 30.08.2026 ohne Spannengrenze.
     """
     assert farbschluessel("schwarz", "Obsidian") != farbschluessel(
-        "schwarz", "Mitternacht")
+        "schwarz", "Mitternacht"
+    )
     # Ohne Rohschreibweise traegt die kanonische Farbe weiter.
     assert farbschluessel("navy", "") == farbschluessel("navy", "")
     assert farbschluessel("navy", "") == "navy"
@@ -166,6 +207,7 @@ def test_die_rohschreibweise_traegt_den_schluessel():
 # --------------------------------------------------------------------------
 # Der ausgelieferte Datensatz
 # --------------------------------------------------------------------------
+
 
 def test_der_gepruefte_datensatz_traegt_keine_widersprueche_mehr():
     """Die Zusicherung des Auftrags, Abschnitt 6: null Doppelpreise, null
@@ -191,12 +233,13 @@ def test_der_gepruefte_datensatz_traegt_keine_widersprueche_mehr():
     for e in sauber:
         farbe = farbschluessel(e.get("farbe_normalisiert"), e["farbe_roh"])
         je_farbe.setdefault(
-            (e["anbieter"], e["device_id"], e["speicher_gb"], e["zustand"],
-             farbe), set()).add(e["preis_ohne_vertrag"])
-        reihe = je_reihe.setdefault((e["anbieter"], e["device_id"],
-                                     e["zustand"]), {})
-        reihe[e["speicher_gb"]] = min(reihe.get(e["speicher_gb"], 1e9),
-                                      e["preis_ohne_vertrag"])
+            (e["anbieter"], e["device_id"], e["speicher_gb"], e["zustand"], farbe),
+            set(),
+        ).add(e["preis_ohne_vertrag"])
+        reihe = je_reihe.setdefault((e["anbieter"], e["device_id"], e["zustand"]), {})
+        reihe[e["speicher_gb"]] = min(
+            reihe.get(e["speicher_gb"], 1e9), e["preis_ohne_vertrag"]
+        )
 
     assert all(len(p) == 1 for p in je_farbe.values()), "Doppelpreis geblieben"
     for stufen in je_reihe.values():
@@ -209,24 +252,31 @@ def test_der_gepruefte_datensatz_traegt_keine_widersprueche_mehr():
 # Der Zustand steht nicht immer im Titel
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("feld,wert", [
-    ("Farbe", "space schwarz erneuert"),
-    ("itemCondition", "https://schema.org/RefurbishedCondition"),
-    ("Kategoriepfad", "Startseite / Gebrauchte Handys"),
-    ("Rubrik", "Erneuerte Geräte"),
-])
+
+@pytest.mark.parametrize(
+    "feld,wert",
+    [
+        ("Farbe", "space schwarz erneuert"),
+        ("itemCondition", "https://schema.org/RefurbishedCondition"),
+        ("Kategoriepfad", "Startseite / Gebrauchte Handys"),
+        ("Rubrik", "Erneuerte Geräte"),
+    ],
+)
 def test_ein_kennzeichen_zaehlt_egal_in_welchem_feld_es_steht(feld, wert):
     """Der Auftrag, Abschnitt 1: die Wörter schlagen durch, egal in welchem
     Feld sie stehen. o2 schrieb "erneuert" AUSSCHLIESSLICH in die Farbe."""
     assert zustand_aus_feldern("Apple iPhone 14 Pro 128 GB", wert) != "neu", feld
 
 
-@pytest.mark.parametrize("titel", [
-    "Gebrauchsanweisung liegt bei",
-    "iPhone 17 Erneuerbare Energien Edition",
-    "Neuheit im Sortiment",
-    "Refurbishment-Programm ab 2027",
-])
+@pytest.mark.parametrize(
+    "titel",
+    [
+        "Gebrauchsanweisung liegt bei",
+        "iPhone 17 Erneuerbare Energien Edition",
+        "Neuheit im Sortiment",
+        "Refurbishment-Programm ab 2027",
+    ],
+)
 def test_die_gebeugten_formen_sind_keine_praefixsuche(titel):
     """Die Beugungsregel haengt Endungen an, sie sucht keinen Praefix. Sonst
     faenge "gebraucht" das Wort "Gebrauchsanweisung" und "erneuert" das Wort
@@ -236,7 +286,7 @@ def test_die_gebeugten_formen_sind_keine_praefixsuche(titel):
 
 
 def test_ein_unklares_kennzeichen_wird_nicht_zu_neu_geraten():
-    """"Nicht sicher bestimmbar heißt zustand: unbekannt und fällt aus dem
+    """ "Nicht sicher bestimmbar heißt zustand: unbekannt und fällt aus dem
     Vergleich. Nie neu annehmen." (Auftrag, Abschnitt 1)
 
     Gemessen wird am VERGLEICH, nicht an `pruefe`: die Pruefung gibt in
@@ -247,18 +297,18 @@ def test_ein_unklares_kennzeichen_wird_nicht_zu_neu_geraten():
     """
     assert zustand_aus_feldern("iPhone 15 128 GB", "schwarz neuwertig") == "unbekannt"
 
-    billiger_aber_unklar = _e("samsung-galaxy-s25", 399.0, "schwarz",
-                              kennung="unklar", zustand="unbekannt")
+    billiger_aber_unklar = _e(
+        "samsung-galaxy-s25", 399.0, "schwarz", kennung="unklar", zustand="unbekannt"
+    )
     eintraege = [
-        _e("samsung-galaxy-s25", 849.90, "navy", kennung="wir",
-           anbieter="Vodafone"),
+        _e("samsung-galaxy-s25", 849.90, "navy", kennung="wir", anbieter="Vodafone"),
         billiger_aber_unklar,
     ]
+
     def guenstiger(zustand: str) -> set:
         billiger_aber_unklar["zustand"] = zustand
         erg = geraete_vergleich.vergleich(eintraege, _KATALOG)
-        return {a["anbieter"] for z in erg["zeilen"]
-                for a in z.get("guenstiger", [])}
+        return {a["anbieter"] for z in erg["zeilen"] for a in z.get("guenstiger", [])}
 
     # Gegenprobe zuerst: als Neugeraet WUERDE o2 den Vergleich gewinnen. Ohne
     # sie misst der Test nur, dass ein Schluessel fehlt - genau die Falle aus
@@ -267,7 +317,8 @@ def test_ein_unklares_kennzeichen_wird_nicht_zu_neu_geraten():
     assert guenstiger("neu") == {"o2"}, "die Fixture spannt den Fall nicht auf"
     assert guenstiger("unbekannt") == set(), (
         "der niedrigste Preis ist der wahrscheinlichste Fehler - ein Zustand, "
-        "den die Quelle nicht deckt, darf keinen Vergleich gewinnen")
+        "den die Quelle nicht deckt, darf keinen Vergleich gewinnen"
+    )
     assert guenstiger("refurbished") == set()
 
 
@@ -285,13 +336,16 @@ _LDJSON = """<html><head><script type="application/ld+json">
 </script></head><body></body></html>"""
 
 
-@pytest.mark.parametrize("marke,erwartet", [
-    ("https://schema.org/UsedCondition", "refurbished"),
-    ("https://schema.org/RefurbishedCondition", "refurbished"),
-    ("https://schema.org/refurbishedcondition", "refurbished"),
-    ("https://schema.org/DamagedCondition", "b-ware"),
-    ("https://schema.org/NewCondition", "neu"),
-])
+@pytest.mark.parametrize(
+    "marke,erwartet",
+    [
+        ("https://schema.org/UsedCondition", "refurbished"),
+        ("https://schema.org/RefurbishedCondition", "refurbished"),
+        ("https://schema.org/refurbishedcondition", "refurbished"),
+        ("https://schema.org/DamagedCondition", "b-ware"),
+        ("https://schema.org/NewCondition", "neu"),
+    ],
+)
 def test_der_zustand_kommt_vom_schema_bis_an_die_listung(marke, erwartet):
     """Die ganze Kette, nicht nur ihr letztes Glied.
 
@@ -309,11 +363,17 @@ def test_der_zustand_kommt_vom_schema_bis_an_die_listung(marke, erwartet):
     assert saetze, "die Fixture liefert keinen Produktsatz"
 
     listung = lies_listung(
-        titel=saetze[0]["titel"], anbieter="o2", anbieter_typ="netzbetreiber",
-        quelle_url="https://www.o2online.de/p/x", abgerufen_am="2026-08-30",
-        katalog=_KATALOG, farben={}, farbe_roh=saetze[0].get("farbe") or "",
+        titel=saetze[0]["titel"],
+        anbieter="o2",
+        anbieter_typ="netzbetreiber",
+        quelle_url="https://www.o2online.de/p/x",
+        abgerufen_am="2026-08-30",
+        katalog=_KATALOG,
+        farben={},
+        farbe_roh=saetze[0].get("farbe") or "",
         zustand_hinweis=saetze[0].get("zustand_hinweis") or "",
-        preis_ohne_vertrag=577.0)
+        preis_ohne_vertrag=577.0,
+    )
     assert listung is not None, "der Titel trifft keinen Katalogeintrag"
     assert listung.zustand == erwartet
 
@@ -380,7 +440,8 @@ def test_ein_entfernter_muellpreis_zieht_den_median_nicht():
     assert "lock" not in {e["id"] for e in erg["sauber"]}
     assert erg["auffaellig"] == {}, (
         "eine gesunde Zeile ist als Ausreisser markiert - der Median hat den "
-        "entfernten Muellpreis mitgerechnet")
+        "entfernten Muellpreis mitgerechnet"
+    )
 
 
 def test_zwei_marketingfarben_derselben_grundfarbe_sind_zwei_farben():
@@ -389,30 +450,40 @@ def test_zwei_marketingfarben_derselben_grundfarbe_sind_zwei_farben():
     Mitternacht. Auf die kanonische Farbe geschluesselt waeren zwei echte
     Farbpreise EIN Doppelpreis, und seit der ohne Spannengrenze entfernt,
     floegen beide aus dem Vergleich."""
-    a = dict(_e("samsung-galaxy-s25", 899.0, "Obsidian", kennung="a"),
-             farbe_normalisiert="schwarz")
-    b = dict(_e("samsung-galaxy-s25", 949.0, "Mitternacht", kennung="b"),
-             farbe_normalisiert="schwarz")
+    a = dict(
+        _e("samsung-galaxy-s25", 899.0, "Obsidian", kennung="a"),
+        farbe_normalisiert="schwarz",
+    )
+    b = dict(
+        _e("samsung-galaxy-s25", 949.0, "Mitternacht", kennung="b"),
+        farbe_normalisiert="schwarz",
+    )
     erg = pruefe([a, b], _KATALOG)
     assert len(erg["sauber"]) == 2
     assert erg["zahlen"]["doppelpreise"] == 0
 
 
-@pytest.mark.parametrize("eine,andere", [
-    ("titan rot", "titan"),
-    ("ocean ice", "ocean"),
-    ("midnight sky", "midnight"),
-])
+@pytest.mark.parametrize(
+    "eine,andere",
+    [
+        ("titan rot", "titan"),
+        ("ocean ice", "ocean"),
+        ("midnight sky", "midnight"),
+    ],
+)
 def test_ein_dreibuchstabiges_farbwort_ist_kein_kuerzel(eine, andere):
     """Die erste Fassung strich jedes Anhaengsel bis drei Zeichen und traf
     damit echte Farbwoerter. Gestrichen wird nur, was keinen Vokal hat."""
     assert farbschluessel(None, eine) != farbschluessel(None, andere)
 
 
-@pytest.mark.parametrize("eine,andere", [
-    ("farbe 0", "farbe 1"),
-    ("blau 2", "blau 3"),
-])
+@pytest.mark.parametrize(
+    "eine,andere",
+    [
+        ("farbe 0", "farbe 1"),
+        ("blau 2", "blau 3"),
+    ],
+)
 def test_eine_ziffer_am_ende_ist_kein_kuerzel(eine, andere):
     """Eine Ziffer ist keine Abkuerzung, sondern Teil des Namens. Ohne diese
     Haelfte der Regel fielen 24 verschiedene Farben einer Fixture auf denselben
@@ -432,8 +503,10 @@ def test_die_pruefung_sieht_dieselben_zeilen_wie_der_vergleich():
     den diese Datei beschreibt, durch eine Hintertür.
     """
     from telco_radar.report import geraete_pruefung
+
     assert set(geraete_vergleich._SICHTBAR) <= set(geraete_pruefung._SICHTBAR), (
-        "der Vergleich zeigt Zeilen, die die Prüfung nie ansieht")
+        "der Vergleich zeigt Zeilen, die die Prüfung nie ansieht"
+    )
 
 
 def test_ein_gebrauchtpreis_auf_dem_weg_zur_auslistung_faellt_auch():

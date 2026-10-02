@@ -15,6 +15,7 @@ Usage:
     python scripts/rescue_sources.py [--root .] [--names "AT&T,Zain"]
     (default: every source with kind == official)
 """
+
 from __future__ import annotations
 
 import argparse
@@ -33,11 +34,29 @@ from telco_radar.collect.http import BROWSER_UA, BOT_UA  # noqa: E402
 from telco_radar.config import Config, Operator, Source, load_config  # noqa: E402
 
 COMMON_FEED_PATHS = [
-    "feed", "feed/", "rss", "rss/", "rss.xml", "atom.xml", "index.rss",
-    "index.xml", "news/feed", "news/rss", "news/rss.xml",
-    "press/feed", "press/rss", "press-releases/feed", "press-releases/rss",
-    "media/feed", "media/rss", "newsroom/feed", "newsroom/rss",
-    "?feed=rss2", "?feed=rss", "feeds/posts/default", "rss/news",
+    "feed",
+    "feed/",
+    "rss",
+    "rss/",
+    "rss.xml",
+    "atom.xml",
+    "index.rss",
+    "index.xml",
+    "news/feed",
+    "news/rss",
+    "news/rss.xml",
+    "press/feed",
+    "press/rss",
+    "press-releases/feed",
+    "press-releases/rss",
+    "media/feed",
+    "media/rss",
+    "newsroom/feed",
+    "newsroom/rss",
+    "?feed=rss2",
+    "?feed=rss",
+    "feeds/posts/default",
+    "rss/news",
 ]
 
 _HEADERS_UA = (BROWSER_UA, BOT_UA)
@@ -47,7 +66,9 @@ def _get(url: str, timeout: float = 15.0) -> httpx.Response | None:
     for ua in _HEADERS_UA:
         try:
             resp = httpx.get(
-                url, timeout=timeout, follow_redirects=True,
+                url,
+                timeout=timeout,
+                follow_redirects=True,
                 headers={
                     "User-Agent": ua,
                     "Accept": "text/html,application/xhtml+xml,application/xml,*/*",
@@ -138,9 +159,12 @@ def rescue_one(op: Operator, source: Source) -> list[str]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path("."))
-    parser.add_argument("--names", default="",
-                       help="Comma-separated operator names to check "
-                            "(default: every kind=official source)")
+    parser.add_argument(
+        "--names",
+        default="",
+        help="Comma-separated operator names to check "
+        "(default: every kind=official source)",
+    )
     args = parser.parse_args()
 
     cfg: Config = load_config(args.root.resolve())

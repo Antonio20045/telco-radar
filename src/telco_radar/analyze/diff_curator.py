@@ -19,6 +19,7 @@ Meldungen:
 Aufgenommene Moves werden angehängt (dedupliziert per normalisierter URL) und
 pro Hebel gedeckelt, damit der Speicher schlank bleibt.
 """
+
 from __future__ import annotations
 
 import json
@@ -33,8 +34,18 @@ log = logging.getLogger(__name__)
 
 # Felder eines Highlights, die für Anzeige (build_differentiation) UND Speicher
 # gebraucht werden.
-_KEEP_FIELDS = ("title", "summary", "url", "operator", "region", "date",
-                "category", "relevance", "why_it_matters", "source")
+_KEEP_FIELDS = (
+    "title",
+    "summary",
+    "url",
+    "operator",
+    "region",
+    "date",
+    "category",
+    "relevance",
+    "why_it_matters",
+    "source",
+)
 
 # Ab dieser Bewertung (1–5) gilt ein klassifizierter Move als aufnahmewürdig,
 # wenn kein LLM-Kurator läuft. Unbewertete Items (relevance None, z. B. --no-llm)
@@ -145,33 +156,46 @@ def _llm_judge(candidates: list[dict], model: str) -> list[dict]:
     """LLM-Kurator: filtert die Kandidaten. Failsafe – bei jedem Fehler werden
     alle Kandidaten behalten (deterministischer Rückfall)."""
     payload = [
-        {"i": i,
-         "operator": c.get("operator") or c.get("source") or "",
-         "titel": (c.get("title") or "")[:200],
-         "zusammenfassung": (c.get("summary") or "")[:400],
-         "hebel": c.get("theme")}
+        {
+            "i": i,
+            "operator": c.get("operator") or c.get("source") or "",
+            "titel": (c.get("title") or "")[:200],
+            "zusammenfassung": (c.get("summary") or "")[:400],
+            "hebel": c.get("theme"),
+        }
         for i, c in enumerate(candidates)
     ]
     try:
-        raw = complete(_CURATOR_SYSTEM,
-                       json.dumps(payload, ensure_ascii=False),
-                       model=model, max_tokens=16000)
+        raw = complete(
+            _CURATOR_SYSTEM,
+            json.dumps(payload, ensure_ascii=False),
+            model=model,
+            max_tokens=16000,
+        )
         verdicts = extract_json(raw)
-        keep_idx = {int(v["i"]) for v in verdicts
-                    if isinstance(v, dict) and v.get("keep")}
+        keep_idx = {
+            int(v["i"]) for v in verdicts if isinstance(v, dict) and v.get("keep")
+        }
         kept = [c for i, c in enumerate(candidates) if i in keep_idx]
-        log.info("Diff-Kurator: %d/%d Kandidaten behalten",
-                 len(kept), len(candidates))
+        log.info("Diff-Kurator: %d/%d Kandidaten behalten", len(kept), len(candidates))
         return kept
     except Exception as exc:  # noqa: BLE001
-        log.warning("Diff-Kurator (LLM) fehlgeschlagen (%s) – behalte alle "
-                    "Kandidaten deterministisch", str(exc)[:160])
+        log.warning(
+            "Diff-Kurator (LLM) fehlgeschlagen (%s) – behalte alle "
+            "Kandidaten deterministisch",
+            str(exc)[:160],
+        )
         return candidates
 
 
-def curate(new_highlights: list[dict], store: DiffStore, report_date: str,
-           model: str | None = None, use_llm: bool = False,
-           min_relevance: int = MIN_RELEVANCE) -> list[dict]:
+def curate(
+    new_highlights: list[dict],
+    store: DiffStore,
+    report_date: str,
+    model: str | None = None,
+    use_llm: bool = False,
+    min_relevance: int = MIN_RELEVANCE,
+) -> list[dict]:
     """Prüfe die neuen Highlights der Woche und nimm aufnahmewürdige
     Differenzierungs-Moves in den Speicher auf. Gibt die neu aufgenommenen
     Einträge zurück."""

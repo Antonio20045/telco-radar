@@ -32,6 +32,7 @@ Die Seiten selbst werden trotzdem gebaut und zeigen die offene Stelle
 sichtbar an. Ein Impressum, das seine Luecke benennt, ist ehrlicher als eines,
 das sie versteckt - und es ist die Arbeitsliste fuer den Menschen.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -94,8 +95,9 @@ def lade(root: Path, schluessel: str) -> Rechtstext | None:
     # nackter Text im Fliesstext stehen). Der Titel der Seite steht in
     # SEITEN - eine Ueberschrift an zwei Orten waeren zwei Titel.
     text = re.sub(r"\A#\s+.*\n+", "", text)
-    return Rechtstext(schluessel=schluessel, titel=titel, markdown=text,
-                      luecken=luecken)
+    return Rechtstext(
+        schluessel=schluessel, titel=titel, markdown=text, luecken=luecken
+    )
 
 
 def alle(root: Path) -> list[Rechtstext]:
@@ -132,6 +134,7 @@ def offene_stellen(root: Path) -> list[tuple[str, str]]:
 
 # ------------------------------------------------------------ Einwilligung --
 
+
 @dataclass
 class Einwilligung:
     version: str
@@ -159,8 +162,9 @@ def einwilligungs_fassungen(root: Path) -> list[Einwilligung]:
         return []
     fassungen = []
     for datei in sorted(ordner.glob("*.md")):
-        fassungen.append(Einwilligung(version=datei.stem,
-                                      text=datei.read_text(encoding="utf-8")))
+        fassungen.append(
+            Einwilligung(version=datei.stem, text=datei.read_text(encoding="utf-8"))
+        )
     return fassungen
 
 

@@ -20,6 +20,7 @@ unter `herkunft`.
 17 512 GB, je Tarif und Laufzeit eine - das Geraet mit dem staerksten
 geraeteabhaengigen Tarifrabatt (on Demand M Plus 8,49 statt 14,99 EUR).
 """
+
 import copy
 import gzip
 import json
@@ -58,6 +59,7 @@ def _hole_aus(mitschnitt, protokoll=None):
         if url not in mitschnitt["antworten"]:
             raise GeraeteAbrufFehler("nicht im Mitschnitt", status=404)
         return mitschnitt["antworten"][url]
+
     return hole
 
 
@@ -66,16 +68,17 @@ def _katalogsaetze(mitschnitt):
 
 
 def _vertieft(mitschnitt, weiter=None, zaehler=None):
-    return o2.vertiefe_buendel(_hole_aus(mitschnitt),
-                               _katalogsaetze(mitschnitt), weiter, zaehler)
+    return o2.vertiefe_buendel(
+        _hole_aus(mitschnitt), _katalogsaetze(mitschnitt), weiter, zaehler
+    )
 
 
 # --------------------------------------------------------------- Umfang
 
+
 def test_zwoelf_tarife_zwei_speicher_zwei_laufzeiten(mitschnitt):
     saetze = _vertieft(mitschnitt)
-    kombis = {(s["speicher_gb"], s["laufzeit_monate"], s["tarif_slug"])
-              for s in saetze}
+    kombis = {(s["speicher_gb"], s["laufzeit_monate"], s["tarif_slug"]) for s in saetze}
     assert len(saetze) == len(kombis) == 48
     assert {s["speicher_gb"] for s in saetze} == {256, 512}
     assert {s["laufzeit_monate"] for s in saetze} == {24, 36}
@@ -86,8 +89,7 @@ def test_zwoelf_tarife_zwei_speicher_zwei_laufzeiten(mitschnitt):
 
 def test_abrufe_je_geraet_und_nur_verlinkte_adressen(mitschnitt):
     protokoll = []
-    o2.vertiefe_buendel(_hole_aus(mitschnitt, protokoll),
-                        _katalogsaetze(mitschnitt))
+    o2.vertiefe_buendel(_hole_aus(mitschnitt, protokoll), _katalogsaetze(mitschnitt))
     # 1 Produktseite + 1 Speicher + 2 Laufzeitschalter + 11 Referenztarife
     assert len(protokoll) == 15
     assert all(u in mitschnitt["antworten"] for u in protokoll)
@@ -96,8 +98,12 @@ def test_abrufe_je_geraet_und_nur_verlinkte_adressen(mitschnitt):
 
 def test_jeder_satz_traegt_seine_posten(mitschnitt):
     for s in _vertieft(mitschnitt):
-        for feld in ("tarif_monatlich", "geraet_monatsrate",
-                     "geraet_zuzahlung", "anschlusspreis"):
+        for feld in (
+            "tarif_monatlich",
+            "geraet_monatsrate",
+            "geraet_zuzahlung",
+            "anschlusspreis",
+        ):
             assert isinstance(s[feld], float), (feld, s)
         assert s["tarif_name"] and s["tarif_slug"]
         assert s["url"].startswith("https://www.o2online.de/e-shop/")
@@ -105,10 +111,14 @@ def test_jeder_satz_traegt_seine_posten(mitschnitt):
 
 # ------------------------------------------------ gemessene Einzelwerte
 
+
 def _satz(saetze, speicher, laufzeit, slug):
-    treffer = [s for s in saetze if (s["speicher_gb"], s["laufzeit_monate"],
-                                     s["tarif_slug"]) == (speicher, laufzeit,
-                                                          slug)]
+    treffer = [
+        s
+        for s in saetze
+        if (s["speicher_gb"], s["laufzeit_monate"], s["tarif_slug"])
+        == (speicher, laufzeit, slug)
+    ]
     assert len(treffer) == 1
     return treffer[0]
 
@@ -119,26 +129,35 @@ def test_iphone_17_pro_256_zwei_tarife_gegen_die_seite(mitschnitt):
     L) bzw. 14,99 (Mobile S), Anzahlung 1,00, Anschluss 0,00 / 39,99."""
     saetze = _vertieft(mitschnitt)
     ul = _satz(saetze, 256, 36, "o2-mobile-unlimited-l")
-    assert (ul["geraet_monatsrate"], ul["tarif_monatlich"],
-            ul["geraet_zuzahlung"], ul["anschlusspreis"]) == \
-        (36.5, 39.99, 1.0, 0.0)
+    assert (
+        ul["geraet_monatsrate"],
+        ul["tarif_monatlich"],
+        ul["geraet_zuzahlung"],
+        ul["anschlusspreis"],
+    ) == (36.5, 39.99, 1.0, 0.0)
     s = _satz(saetze, 256, 36, "o2-mobile-s")
     assert (s["tarif_monatlich"], s["anschlusspreis"]) == (14.99, 39.99)
     # 24 Raten: eigene Rate und eigene Anzahlung, derselbe Tarifbetrag
     s24 = _satz(saetze, 256, 24, "o2-mobile-unlimited-m-plus")
-    assert (s24["geraet_monatsrate"], s24["geraet_zuzahlung"],
-            s24["tarif_monatlich"]) == (54.5, 7.0, 19.99)
+    assert (
+        s24["geraet_monatsrate"],
+        s24["geraet_zuzahlung"],
+        s24["tarif_monatlich"],
+    ) == (54.5, 7.0, 19.99)
 
 
 def test_512_gb_hat_eigene_rate_und_anzahlung(mitschnitt):
     saetze = _vertieft(mitschnitt)
     s = _satz(saetze, 512, 36, "o2-mobile-unlimited-m-plus")
     assert (s["geraet_monatsrate"], s["geraet_zuzahlung"]) == (43.5, 25.0)
-    assert _satz(saetze, 256, 36, "o2-mobile-unlimited-m-plus")[
-        "geraet_monatsrate"] == 36.5
+    assert (
+        _satz(saetze, 256, 36, "o2-mobile-unlimited-m-plus")["geraet_monatsrate"]
+        == 36.5
+    )
 
 
 # ---------------------------------------------------- die Ableitung
+
 
 def test_abgeleiteter_tarifbetrag_trifft_die_messung(xiaomi):
     """Der Kernbefund, an 22 echten Antworten: fuer JEDEN Tarif T ist
@@ -146,8 +165,11 @@ def test_abgeleiteter_tarifbetrag_trifft_die_messung(xiaomi):
     Laufzeit genau der Tarifbetrag, den die Antwort MIT T ausgewaehlt misst
     - obwohl der Rabatt geraete- und laufzeitabhaengig ist (8,49 EUR)."""
     for laufzeit in (24, 36):
-        seiten = [pv for pv in xiaomi
-                  if pv["hardware"]["offerName"].endswith(f"-{laufzeit}xhigh")]
+        seiten = [
+            pv
+            for pv in xiaomi
+            if pv["hardware"]["offerName"].endswith(f"-{laufzeit}xhigh")
+        ]
         assert len(seiten) >= 10
         referenz = o2.referenz_aus(seiten)
         assert referenz is not None
@@ -162,21 +184,28 @@ def test_abgeleiteter_tarifbetrag_trifft_die_messung(xiaomi):
                 if g is None:
                     continue
                 verglichen += 1
-                for feld in ("tarif_monatlich", "geraet_monatsrate",
-                             "geraet_zuzahlung", "anschlusspreis",
-                             "tarif_name"):
+                for feld in (
+                    "tarif_monatlich",
+                    "geraet_monatsrate",
+                    "geraet_zuzahlung",
+                    "anschlusspreis",
+                    "tarif_name",
+                ):
                     assert s[feld] == g[feld], (laufzeit, s["tarif_slug"], feld)
         assert verglichen > 80
-    rabatt = [s for s in (o2.saetze_aus_konfiguration(pv, {}, None, "u")[0]
-                          for pv in xiaomi)
-              if s["tarif_slug"] == "o2-mobile-on-demand-m-plus"
-              and s["laufzeit_monate"] == 36]
+    rabatt = [
+        s
+        for s in (o2.saetze_aus_konfiguration(pv, {}, None, "u")[0] for pv in xiaomi)
+        if s["tarif_slug"] == "o2-mobile-on-demand-m-plus"
+        and s["laufzeit_monate"] == 36
+    ]
     assert rabatt and rabatt[0]["tarif_monatlich"] == 8.49
 
 
 def test_tarifabhaengige_rate_verhindert_jede_ableitung(xiaomi):
-    seiten = copy.deepcopy([pv for pv in xiaomi if pv["hardware"]["offerName"]
-                            .endswith("-36xhigh")])
+    seiten = copy.deepcopy(
+        [pv for pv in xiaomi if pv["hardware"]["offerName"].endswith("-36xhigh")]
+    )
     # Eine Antwort mit anderer Rate, in sich stimmig (Probe geht auf).
     pv = seiten[1]
     attr = pv["ecommerceProductValue"]["attributes"]
@@ -190,20 +219,28 @@ def test_tarifabhaengige_rate_verhindert_jede_ableitung(xiaomi):
 
 def test_ohne_referenz_nur_der_gemessene_satz(mitschnitt):
     start = o2.lies_konfiguration(
-        mitschnitt["antworten"][_katalogsaetze(mitschnitt)[0]["url"]])
+        mitschnitt["antworten"][_katalogsaetze(mitschnitt)[0]["url"]]
+    )
     assert len(o2.saetze_aus_konfiguration(start, {}, None, "u")) == 1
 
 
 def test_widerspricht_die_antwort_der_referenz_wird_nicht_abgeleitet(mitschnitt):
     start = o2.lies_konfiguration(
-        mitschnitt["antworten"][_katalogsaetze(mitschnitt)[0]["url"]])
-    anzeige = [o["displayValue"] for o in start["tariff"]["tariffOptions"]
-               if o["selected"]][0]
+        mitschnitt["antworten"][_katalogsaetze(mitschnitt)[0]["url"]]
+    )
+    anzeige = [
+        o["displayValue"] for o in start["tariff"]["tariffOptions"] if o["selected"]
+    ][0]
     from telco_radar.collect.geraete.o2 import _ohne_markup
-    referenz = {_ohne_markup(o["displayValue"]): {"slug": "x", "anschluss": 0.0}
-                for o in start["tariff"]["tariffOptions"]}
-    referenz[_ohne_markup(anzeige)] = {"slug": "o2-mobile-unlimited-m-plus",
-                                       "anschluss": 39.99}
+
+    referenz = {
+        _ohne_markup(o["displayValue"]): {"slug": "x", "anschluss": 0.0}
+        for o in start["tariff"]["tariffOptions"]
+    }
+    referenz[_ohne_markup(anzeige)] = {
+        "slug": "o2-mobile-unlimited-m-plus",
+        "anschluss": 39.99,
+    }
     z = {}
     assert len(o2.saetze_aus_konfiguration(start, {}, referenz, "u", z)) == 1
     assert z["referenz_widerspricht"] == 1
@@ -211,22 +248,33 @@ def test_widerspricht_die_antwort_der_referenz_wird_nicht_abgeleitet(mitschnitt)
 
 # ------------------------------------------------ Frist und Zusammenfuehren
 
+
 def test_ohne_zeit_kein_abruf(mitschnitt):
     protokoll, z = [], {}
-    tief = o2.vertiefe_buendel(_hole_aus(mitschnitt, protokoll),
-                               _katalogsaetze(mitschnitt), lambda: False, z)
+    tief = o2.vertiefe_buendel(
+        _hole_aus(mitschnitt, protokoll), _katalogsaetze(mitschnitt), lambda: False, z
+    )
     assert tief == [] and protokoll == [] and z["frist"] == 1
 
 
 def test_katalogname_und_vertiefung_ergeben_dieselbe_buendel_id(mitschnitt):
     katalog = _katalogsaetze(mitschnitt)
     tief = _vertieft(mitschnitt)
-    gleich = [s for s in tief if (s["angebot"], s["tarif_slug"]) ==
-              (katalog[0]["angebot"], katalog[0]["tarif_slug"])]
+    gleich = [
+        s
+        for s in tief
+        if (s["angebot"], s["tarif_slug"])
+        == (katalog[0]["angebot"], katalog[0]["tarif_slug"])
+    ]
     assert len(gleich) == 1
     assert gleich[0]["tarif_name"] == katalog[0]["tarif_name"]
-    for feld in ("tarif_monatlich", "geraet_monatsrate", "geraet_zuzahlung",
-                 "anschlusspreis", "laufzeit_monate"):
+    for feld in (
+        "tarif_monatlich",
+        "geraet_monatsrate",
+        "geraet_zuzahlung",
+        "anschlusspreis",
+        "laufzeit_monate",
+    ):
         assert gleich[0][feld] == katalog[0][feld], feld
     zusammen = o2.fuehre_zusammen(katalog, tief)
     assert len(zusammen) == 48
@@ -236,11 +284,13 @@ def test_katalogname_und_vertiefung_ergeben_dieselbe_buendel_id(mitschnitt):
 def test_der_sammler_vertieft_und_vergibt_die_sku(mitschnitt):
     from telco_radar.collect.geraete import sammle_anbieter
     from telco_radar.collect.geraete.robots import RobotsWaechter
-    from telco_radar.geraete_config import (Anbieter, Einstieg, lade_farben,
-                                            lade_katalog)
-    katalog_url = ("https://www.o2online.de/e-shop/rest/catalog/o2shop/"
-                   "privatkunden/ratenzahlung/default/__not-specified__/"
-                   "__not-specified__/__not-specified__")
+    from telco_radar.geraete_config import Anbieter, Einstieg, lade_farben, lade_katalog
+
+    katalog_url = (
+        "https://www.o2online.de/e-shop/rest/catalog/o2shop/"
+        "privatkunden/ratenzahlung/default/__not-specified__/"
+        "__not-specified__/__not-specified__"
+    )
     antworten = dict(mitschnitt["antworten"])
     antworten[katalog_url] = json.dumps(mitschnitt["katalog"])
 
@@ -252,14 +302,23 @@ def test_der_sammler_vertieft_und_vergibt_die_sku(mitschnitt):
         return (200, antworten[url])
 
     anbieter = Anbieter(
-        name="o2", typ="netzbetreiber", methode="o2_katalog",
-        basis_url="https://www.o2online.de", rate_limit_sekunden=0,
+        name="o2",
+        typ="netzbetreiber",
+        methode="o2_katalog",
+        basis_url="https://www.o2online.de",
+        rate_limit_sekunden=0,
         kopfzeilen={"Accept": "application/vnd.commerce.message+json"},
-        einstiege=[Einstieg(url=katalog_url, kind="buendel")])
-    bilanz = sammle_anbieter(anbieter, lade_katalog(_WURZEL),
-                             lade_farben(_WURZEL), hole, "2026-09-29",
-                             RobotsWaechter(hole=hole),
-                             datetime(2026, 9, 29, 3, tzinfo=timezone.utc))
+        einstiege=[Einstieg(url=katalog_url, kind="buendel")],
+    )
+    bilanz = sammle_anbieter(
+        anbieter,
+        lade_katalog(_WURZEL),
+        lade_farben(_WURZEL),
+        hole,
+        "2026-09-29",
+        RobotsWaechter(hole=hole),
+        datetime(2026, 9, 29, 3, tzinfo=timezone.utc),
+    )
     assert len(bilanz.buendel) == 48
     skus = {b["sku_id"] for b in bilanz.buendel}
     assert len(skus) == 2
@@ -268,6 +327,7 @@ def test_der_sammler_vertieft_und_vergibt_die_sku(mitschnitt):
 
 
 # ------------------------------------------------ iPhone 18 Pro: TB, Tracking
+
 
 def test_terabyte_bekommt_eigenen_speicher():
     """Vor dem Fix fielen 1 TB und 2 TB beide auf `speicher_gb=None` -
@@ -285,31 +345,51 @@ def test_die_preiszusammenfassung_schlaegt_den_trackingblock():
     'Tarif mtl. 24,99' - und nur 65,00 + 24,99 ergibt die typisierte
     Summe 89,99. Vorher fiel die Antwort ganz heraus (Probe gegen metric2)."""
     m = _lade("o2_vertiefung_iphone18pro.json.gz")
-    seite = [o2.lies_konfiguration(t) for t in m["antworten"].values()
-             if "256gb-burgunder-24xhigh" in t
-             and '"metric2": "34.99"' in t]
+    seite = [
+        o2.lies_konfiguration(t)
+        for t in m["antworten"].values()
+        if "256gb-burgunder-24xhigh" in t and '"metric2": "34.99"' in t
+    ]
     assert seite, "der Widerspruchsfall fehlt in der Fixture"
     s = o2.saetze_aus_konfiguration(seite[0], {}, None, "u")
     assert len(s) == 1
-    assert (s[0]["geraet_monatsrate"], s[0]["tarif_monatlich"],
-            s[0]["laufzeit_monate"]) == (65.0, 24.99, 24)
+    assert (
+        s[0]["geraet_monatsrate"],
+        s[0]["tarif_monatlich"],
+        s[0]["laufzeit_monate"],
+    ) == (65.0, 24.99, 24)
 
 
 # ------------------------------------------------ Tarifbezug
 
+
 def _bestand():
     zeile = dict(anbieter="o2", preistyp="live_shop", abgerufen_am="2026-09-29")
-    return Tarifbestand([
-        {**zeile, "tarif_id": "o2:o2-mobile-unlimited-m",
-         "name": "O2 Mobile Unlimited M", "grundgebuehr": 29.99,
-         "buendel_slug": "o2-mobile-unlimited-m-plus"},
-        {**zeile, "tarif_id": "o2:o2-mobile-unlimited-l",
-         "name": "O2 Mobile Unlimited L", "grundgebuehr": 39.99,
-         "buendel_slug": "o2-mobile-unlimited-l"},
-        {**zeile, "tarif_id": "o2:o2-mobile-on-demand-m",
-         "name": "O2 Mobile on Demand M", "grundgebuehr": 19.99,
-         "buendel_slug": "o2-mobile-on-demand-m-plus"},
-    ])
+    return Tarifbestand(
+        [
+            {
+                **zeile,
+                "tarif_id": "o2:o2-mobile-unlimited-m",
+                "name": "O2 Mobile Unlimited M",
+                "grundgebuehr": 29.99,
+                "buendel_slug": "o2-mobile-unlimited-m-plus",
+            },
+            {
+                **zeile,
+                "tarif_id": "o2:o2-mobile-unlimited-l",
+                "name": "O2 Mobile Unlimited L",
+                "grundgebuehr": 39.99,
+                "buendel_slug": "o2-mobile-unlimited-l",
+            },
+            {
+                **zeile,
+                "tarif_id": "o2:o2-mobile-on-demand-m",
+                "name": "O2 Mobile on Demand M",
+                "grundgebuehr": 19.99,
+                "buendel_slug": "o2-mobile-on-demand-m-plus",
+            },
+        ]
+    )
 
 
 def test_der_tarif_ohne_plus_loest_ueber_seine_tarif_id_auf():
@@ -317,10 +397,17 @@ def test_der_tarif_ohne_plus_loest_ueber_seine_tarif_id_auf():
     und "O2 Mobile Unlimited M mit 100 MBit/s (24 Mon.)" (2x) verworfen."""
     b = _bestand()
     for name, slug, ziel in (
-            ("O2 Mobile on Demand M mit 50 GB+ (24 Mon.)",
-             "o2-mobile-on-demand-m", "o2:o2-mobile-on-demand-m"),
-            ("O2 Mobile Unlimited M mit 100 MBit/s (24 Mon.)",
-             "o2-mobile-unlimited-m", "o2:o2-mobile-unlimited-m")):
+        (
+            "O2 Mobile on Demand M mit 50 GB+ (24 Mon.)",
+            "o2-mobile-on-demand-m",
+            "o2:o2-mobile-on-demand-m",
+        ),
+        (
+            "O2 Mobile Unlimited M mit 100 MBit/s (24 Mon.)",
+            "o2-mobile-unlimited-m",
+            "o2:o2-mobile-unlimited-m",
+        ),
+    ):
         bezug = b.loese("o2", name, slug=slug)
         assert bezug is not None and bezug.tarif_id == ziel
         assert bezug.guete == HOCH
@@ -328,8 +415,14 @@ def test_der_tarif_ohne_plus_loest_ueber_seine_tarif_id_auf():
 
 def test_plus_wird_nie_auf_den_tarif_ohne_plus_geraten():
     b = _bestand()
-    assert b.loese("o2", "O2 Mobile Unlimited L Plus mit 300 MBit/s (24 Mon.)",
-                   slug="o2-mobile-unlimited-l-plus") is None
+    assert (
+        b.loese(
+            "o2",
+            "O2 Mobile Unlimited L Plus mit 300 MBit/s (24 Mon.)",
+            slug="o2-mobile-unlimited-l-plus",
+        )
+        is None
+    )
     assert b.loese("o2", "x", slug="o2-mobile-unlimited") is None
     # Der Kachel-Slug bleibt der staerkere Weg
     bezug = b.loese("o2", "x", slug="o2-mobile-unlimited-m-plus")

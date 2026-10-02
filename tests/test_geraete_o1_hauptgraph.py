@@ -22,6 +22,7 @@ DIE DREI REGELN, DIE HIER PRUEFBAR SIND
    EINER Stelle in Python - `app.js` setzt sie nur, der Browser-Test hält
    Server-Render und JS-Render gegen denselben JSON-Knoten zusammen.
 """
+
 from __future__ import annotations
 
 import json
@@ -43,41 +44,54 @@ ZUSTAND = WURZEL / "data" / "state"
 # Fixtures
 # --------------------------------------------------------------------------
 
+
 @pytest.fixture(scope="module")
 def bestand():
     """Der ECHTE Bestand aus data/state - dieselbe Quelle wie die Seite."""
     tco = json.loads((ZUSTAND / "geraete_tco.json").read_text(encoding="utf-8"))
     db = json.loads((ZUSTAND / "geraete_db.json").read_text(encoding="utf-8"))
     tarife = Tarifbestand.aus_datei(ZUSTAND / "tarife.jsonl").je_id
-    buendel = [Buendel(
-        sku_id=s["sku_id"], anbieter=s["anbieter"],
-        tarif_name=s["tarif_name"], tarif_id=s.get("tarif_id", ""),
-        tarif_monatlich=s.get("tarif_monatlich"),
-        buendel_monatlich=s.get("buendel_monatlich"),
-        geraet_zuzahlung=s.get("geraet_zuzahlung"),
-        geraet_monatsrate=s.get("geraet_monatsrate"),
-        laufzeit_monate=s.get("laufzeit_monate", 24),
-        anschlusspreis=s.get("anschlusspreis"),
-        zustand=s.get("zustand") or "",
-        quelle_url=s.get("quelle_url", ""),
-        abgerufen_am=s.get("abgerufen_am", "")) for s in tco["buendel"]]
-    referenzen = [SimOnlyReferenz(
-        anbieter=r["anbieter"], tarif_name=r["tarif_name"],
-        tarif_id=r.get("tarif_id", ""),
-        tarif_sim_only_monatlich=r.get("tarif_sim_only_monatlich"),
-        anschlusspreis=r.get("anschlusspreis"),
-        quelle_url=r.get("quelle_url", ""),
-        abgerufen_am=r.get("abgerufen_am", "")) for r in tco["sim_only"]]
-    return karten.modelle(buendel, db["listungen"], referenzen, tarife,
-                          lade_katalog(WURZEL))
+    buendel = [
+        Buendel(
+            sku_id=s["sku_id"],
+            anbieter=s["anbieter"],
+            tarif_name=s["tarif_name"],
+            tarif_id=s.get("tarif_id", ""),
+            tarif_monatlich=s.get("tarif_monatlich"),
+            buendel_monatlich=s.get("buendel_monatlich"),
+            geraet_zuzahlung=s.get("geraet_zuzahlung"),
+            geraet_monatsrate=s.get("geraet_monatsrate"),
+            laufzeit_monate=s.get("laufzeit_monate", 24),
+            anschlusspreis=s.get("anschlusspreis"),
+            zustand=s.get("zustand") or "",
+            quelle_url=s.get("quelle_url", ""),
+            abgerufen_am=s.get("abgerufen_am", ""),
+        )
+        for s in tco["buendel"]
+    ]
+    referenzen = [
+        SimOnlyReferenz(
+            anbieter=r["anbieter"],
+            tarif_name=r["tarif_name"],
+            tarif_id=r.get("tarif_id", ""),
+            tarif_sim_only_monatlich=r.get("tarif_sim_only_monatlich"),
+            anschlusspreis=r.get("anschlusspreis"),
+            quelle_url=r.get("quelle_url", ""),
+            abgerufen_am=r.get("abgerufen_am", ""),
+        )
+        for r in tco["sim_only"]
+    ]
+    return karten.modelle(
+        buendel, db["listungen"], referenzen, tarife, lade_katalog(WURZEL)
+    )
 
 
 def _baender(modell, tarife):
-    gb = {tid: (satz or {}).get("datenvolumen_gb")
-          for tid, satz in tarife.items()}
+    gb = {tid: (satz or {}).get("datenvolumen_gb") for tid, satz in tarife.items()}
     leiter = bandmod.tarifleiter(tarife)
     return bandmod.baender_fuer_modell(
-        modell, bandmod.tarif_baender(tarife, leiter), gb, leiter)
+        modell, bandmod.tarif_baender(tarife, leiter), gb, leiter
+    )
 
 
 def _balken(modell, tarife, key="xs"):
@@ -103,6 +117,7 @@ def _mit_zwei_anbietern(bestand):
 # Regel 1: Ordnung, Breite, Δ - gegen den echten Bestand
 # --------------------------------------------------------------------------
 
+
 def test_die_zeilen_stehen_nach_gesamtkosten_sortiert(bestand):
     """Der günstigste Anbieter zuerst (O1-Auftrag: "sortierte horizontale
     Balken (günstigster zuerst)"). Die alte Band-Werteliste ordnete den
@@ -110,8 +125,9 @@ def test_die_zeilen_stehen_nach_gesamtkosten_sortiert(bestand):
     modell, tarife, band = _mit_zwei_anbietern(bestand)
     zeilen = band["balken"]["zeilen"]
     betraege = [z["gesamt"] for z in zeilen]
-    assert betraege == sorted(betraege), \
+    assert betraege == sorted(betraege), (
         f"{modell['titel']} / {band['key']}: {betraege}"
+    )
 
 
 def test_der_laengste_balken_ist_hundert_prozent(bestand):
@@ -139,8 +155,9 @@ def test_genau_eine_referenzzeile_und_deltas_dagegen(bestand):
     modell, tarife, band = _mit_zwei_anbietern(bestand)
     balken = band["balken"]
     referenz = [z for z in balken["zeilen"] if z["referenz"]]
-    assert len(referenz) == bool(balken["referenz_da"]), \
+    assert len(referenz) == bool(balken["referenz_da"]), (
         "referenz_da und die Zahl der Referenzzeilen fallen auseinander"
+    )
     if not balken["referenz_da"]:
         assert all(z["delta_text"] is None for z in balken["zeilen"])
         assert "keine Δ-Angabe" in band["unterzeile"]
@@ -153,11 +170,12 @@ def test_genau_eine_referenzzeile_und_deltas_dagegen(bestand):
             continue
         assert z["delta_euro"] == round(z["gesamt"] - ref["gesamt"], 2)
         assert z["delta_prozent"] == round(
-            abs(z["delta_euro"]) / ref["gesamt"] * 100, 1)
+            abs(z["delta_euro"]) / ref["gesamt"] * 100, 1
+        )
 
 
 def test_die_delta_texte_sind_deutsch_und_vorzeichenbehaftet(bestand):
-    """"−466,80 € · −29,9 %" - echtes Minus (U+2212), deutsches Komma,
+    """ "−466,80 € · −29,9 %" - echtes Minus (U+2212), deutsches Komma,
     Prozent mit einer Nachkommastelle. Diese Strings entstehen EINMAL hier
     in Python; app.js und Vorlage setzen sie nur."""
     modell, tarife, band = _mit_zwei_anbietern(bestand)
@@ -178,23 +196,31 @@ def test_die_werte_sind_cent_genau_gedruckt(bestand):
         assert z["gesamt_text"].endswith(" €")
         # Zwei Nachkommastellen, Tausenderpunkt - das `euro`-Format des
         # Portals, nicht eine zweite Beschriftung.
-        assert z["gesamt_text"] == f"{z['gesamt']:,.2f}".replace(
-            ",", "#").replace(".", ",").replace("#", ".") + " €"
+        assert (
+            z["gesamt_text"]
+            == f"{z['gesamt']:,.2f}".replace(",", "#")
+            .replace(".", ",")
+            .replace("#", ".")
+            + " €"
+        )
 
 
 # --------------------------------------------------------------------------
 # Regel 2: keine Näherung, kein erneuertes Gerät als Zeile
 # --------------------------------------------------------------------------
 
+
 def test_naeherung_und_erneuerte_stehen_nie_als_zeile(bestand):
     tarife = Tarifbestand.aus_datei(ZUSTAND / "tarife.jsonl").je_id
     for modell in bestand["modelle"]:
         for band in _baender(modell, tarife):
             for z in band["balken"]["zeilen"]:
-                assert not z.get("naeherung"), \
+                assert not z.get("naeherung"), (
                     "die Referenzrechnung steht als Anbieter-Zeile im Graph"
-                assert not z["zustand_etikett"], \
+                )
+                assert not z["zustand_etikett"], (
                     f"{z['anbieter']}: erneuertes Gerät trägt die Anbieter-Zeile"
+                )
 
 
 def test_die_luecke_nennt_namen_ohne_einzelsaetze():
@@ -205,59 +231,89 @@ def test_die_luecke_nennt_namen_ohne_einzelsaetze():
         # Ein echtes o2-Bündel im Band XS und ein ERNEUERTES Telekom-
         # Bündel im selben Band: o2 trägt die Zeile, Telekom steht als
         # "nur erneuert" in der Lücke, 1&1 und Vodafone als "kein Bündel".
-        Buendel(sku_id="apple-iphone-17-pro-256gb-schwarz", anbieter="o2",
-                tarif_name="O2 Klein", tarif_id="o2:klein",
-                tarif_monatlich=20.0, geraet_zuzahlung=1.0,
-                geraet_monatsrate=20.0, laufzeit_monate=24,
-                anschlusspreis=0.0, zustand="neu",
-                quelle_url="https://o2.invalid/x",
-                abgerufen_am="2026-09-11"),
-        Buendel(sku_id="apple-iphone-17-pro-256gb-schwarz", anbieter="Telekom",
-                tarif_name="TK Klein", tarif_id="tk:klein",
-                tarif_monatlich=20.0, geraet_zuzahlung=1.0,
-                geraet_monatsrate=10.0, laufzeit_monate=24,
-                anschlusspreis=0.0, zustand="refurbished",
-                quelle_url="https://tk.invalid/x",
-                abgerufen_am="2026-09-11"),
+        Buendel(
+            sku_id="apple-iphone-17-pro-256gb-schwarz",
+            anbieter="o2",
+            tarif_name="O2 Klein",
+            tarif_id="o2:klein",
+            tarif_monatlich=20.0,
+            geraet_zuzahlung=1.0,
+            geraet_monatsrate=20.0,
+            laufzeit_monate=24,
+            anschlusspreis=0.0,
+            zustand="neu",
+            quelle_url="https://o2.invalid/x",
+            abgerufen_am="2026-09-11",
+        ),
+        Buendel(
+            sku_id="apple-iphone-17-pro-256gb-schwarz",
+            anbieter="Telekom",
+            tarif_name="TK Klein",
+            tarif_id="tk:klein",
+            tarif_monatlich=20.0,
+            geraet_zuzahlung=1.0,
+            geraet_monatsrate=10.0,
+            laufzeit_monate=24,
+            anschlusspreis=0.0,
+            zustand="refurbished",
+            quelle_url="https://tk.invalid/x",
+            abgerufen_am="2026-09-11",
+        ),
     ]
     listungen = [
-        {"id": "o2--s", "sku_id": "apple-iphone-17-pro-256gb-schwarz",
-         "device_id": "apple-iphone-17-pro", "anbieter": "o2",
-         "speicher_gb": 256, "zustand": "neu", "status": "aktiv",
-         "preis_ohne_vertrag": None, "quelle_url": "",
-         "abgerufen_am": ""},
+        {
+            "id": "o2--s",
+            "sku_id": "apple-iphone-17-pro-256gb-schwarz",
+            "device_id": "apple-iphone-17-pro",
+            "anbieter": "o2",
+            "speicher_gb": 256,
+            "zustand": "neu",
+            "status": "aktiv",
+            "preis_ohne_vertrag": None,
+            "quelle_url": "",
+            "abgerufen_am": "",
+        },
     ]
     tarife = {
         "o2:klein": {"datenvolumen_gb": 10},
         "tk:klein": {"datenvolumen_gb": 15},
         # P3-E1: die Stufe, in die beide fallen - Vodafone XS.
-        "vf:xs-sp": {"anbieter": "Vodafone", "datenvolumen_gb": 15,
-                     "name": "Vodafone Mobil XS mit Smartphone",
-                     "grundgebuehr": 29.95},
+        "vf:xs-sp": {
+            "anbieter": "Vodafone",
+            "datenvolumen_gb": 15,
+            "name": "Vodafone Mobil XS mit Smartphone",
+            "grundgebuehr": 29.95,
+        },
     }
-    modell = karten.modelle(buendel, listungen, [], tarife,
-                            lade_katalog(WURZEL))["modelle"][0]
+    modell = karten.modelle(buendel, listungen, [], tarife, lade_katalog(WURZEL))[
+        "modelle"
+    ][0]
     balken = _baender(modell, tarife)[0]["balken"]
     assert [z["anbieter"] for z in balken["zeilen"]] == ["o2"]
     assert balken["luecke"]["nur_erneuert"] == ["Telekom"]
-    assert sorted(balken["luecke"]["kein_buendel"]) == \
-        ["1&1", "Vodafone", "congstar"]
+    assert sorted(balken["luecke"]["kein_buendel"]) == ["1&1", "Vodafone", "congstar"]
 
 
 # --------------------------------------------------------------------------
 # Der JSON-Knoten für den Selektor: alle Modelle, dieselben Zahlen
 # --------------------------------------------------------------------------
 
+
 def _aufbereitung():
     """Die volle Aufbereitung gegen den echten Bestand - so, wie sie
     `render_site` aufruft."""
     from telco_radar.report import geraete_tco_view
+
     tco = json.loads((ZUSTAND / "geraete_tco.json").read_text(encoding="utf-8"))
     db = json.loads((ZUSTAND / "geraete_db.json").read_text(encoding="utf-8"))
     tarife = Tarifbestand.aus_datei(ZUSTAND / "tarife.jsonl").je_id
     return geraete_tco_view.aufbereiten(
-        tco["buendel"], tco["sim_only"], db["listungen"],
-        lade_katalog(WURZEL), tarife=tarife)
+        tco["buendel"],
+        tco["sim_only"],
+        db["listungen"],
+        lade_katalog(WURZEL),
+        tarife=tarife,
+    )
 
 
 def test_der_graph_knoten_traegt_alle_modelle():
@@ -288,8 +344,9 @@ def test_der_graph_knoten_traegt_dieselben_zahlen_wie_die_balken():
             im_knoten = knoten[modell["id"]]["baender"][band["key"]]
             assert im_knoten["zeilen"] == band["balken"]["zeilen"]
             geprueft += 1
-    assert geprueft >= 100, \
+    assert geprueft >= 100, (
         f"nur {geprueft} Modell×Band-Paare geprüft - der Bestand hat mehr"
+    )
 
 
 def test_der_stand_der_fussnote_ist_der_der_buendel():
@@ -297,6 +354,5 @@ def test_der_stand_der_fussnote_ist_der_der_buendel():
     nicht der Berichtstag (derselbe Fehler wie das Kopfdatum am 30.08.)."""
     daten = _aufbereitung()
     tco = json.loads((ZUSTAND / "geraete_tco.json").read_text(encoding="utf-8"))
-    erwartet = max((b.get("abgerufen_am") or "" for b in tco["buendel"]),
-                   default="")
+    erwartet = max((b.get("abgerufen_am") or "" for b in tco["buendel"]), default="")
     assert daten["graph_daten"]["stand"] == erwartet

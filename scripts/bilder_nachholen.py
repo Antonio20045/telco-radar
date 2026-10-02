@@ -16,6 +16,7 @@ Masse gehoeren mit hinein: die Titelseite entscheidet anhand der BREITE, ob
 eine Meldung gross stehen darf, und ein Renderlauf soll dafuer nicht 190
 Dateien oeffnen muessen.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -36,8 +37,11 @@ def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("datum", nargs="?", help="Berichtsdatum (Vorgabe: neuester)")
     p.add_argument("--root", default=".", help="Projektwurzel")
-    p.add_argument("--trocken", action="store_true",
-                   help="nur messen, Bericht nicht zurueckschreiben")
+    p.add_argument(
+        "--trocken",
+        action="store_true",
+        help="nur messen, Bericht nicht zurueckschreiben",
+    )
     args = p.parse_args()
 
     root = Path(args.root).resolve()
@@ -45,8 +49,9 @@ def main() -> int:
     if args.datum:
         pfad = reports / f"{args.datum}.json"
     else:
-        kandidaten = sorted(f for f in reports.glob("*.json")
-                            if _DATUM.fullmatch(f.stem))
+        kandidaten = sorted(
+            f for f in reports.glob("*.json") if _DATUM.fullmatch(f.stem)
+        )
         if not kandidaten:
             print("Kein Bericht gefunden.", file=sys.stderr)
             return 1
@@ -56,8 +61,11 @@ def main() -> int:
         return 1
 
     bericht = json.loads(pfad.read_text(encoding="utf-8"))
-    highlights = [h for r in (bericht.get("regions") or {}).values()
-                  for h in r.get("highlights") or []]
+    highlights = [
+        h
+        for r in (bericht.get("regions") or {}).values()
+        for h in r.get("highlights") or []
+    ]
     vorher = sum(1 for h in highlights if h.get("image"))
     print(f"{pfad.name}: {len(highlights)} Meldungen, {vorher} mit Bild")
 
@@ -69,8 +77,10 @@ def main() -> int:
     print(f"\nDauer: {dauer:.1f}s")
     for k in sorted(bilanz):
         print(f"  {k:18s} {bilanz[k]}")
-    print(f"\n{nachher} von {len(highlights)} Meldungen mit Bild "
-          f"({100 * nachher / max(1, len(highlights)):.0f} %)")
+    print(
+        f"\n{nachher} von {len(highlights)} Meldungen mit Bild "
+        f"({100 * nachher / max(1, len(highlights)):.0f} %)"
+    )
 
     if args.trocken:
         print("\n--trocken: Bericht nicht geaendert.")
@@ -83,12 +93,13 @@ def main() -> int:
     for phase in phasen:
         if phase.get("name") == "Bilder":
             phase["seconds"] = round(dauer, 1)
-            phase["detail"] = (f"{nachher} von {len(highlights)} Meldungen "
-                               f"mit Bild (nachtraeglich beschafft)")
+            phase["detail"] = (
+                f"{nachher} von {len(highlights)} Meldungen "
+                f"mit Bild (nachtraeglich beschafft)"
+            )
             break
 
-    pfad.write_text(json.dumps(bericht, ensure_ascii=False, indent=2),
-                    encoding="utf-8")
+    pfad.write_text(json.dumps(bericht, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"\n{pfad} aktualisiert (Bericht und Laufprotokoll).")
     return 0
 

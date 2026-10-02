@@ -25,6 +25,7 @@ Teilausfall, ein Fristablauf, eine gesperrte oder ausserhalb ihrer Besuchszeit
 liegende Quelle - alles das heisst "nicht gelesen", und was nicht gelesen
 wurde, altert nicht.
 """
+
 from __future__ import annotations
 
 import logging
@@ -54,6 +55,7 @@ from .collect.geraete import autoerkennung
 from .collect.geraete.congstar import ergaenze_pib_slug
 from .collect.tarif_einsundeins_simonly import ANBIETER as SIMONLY_ANBIETER
 from .collect.tarif_einsundeins_simonly import sammle as sammle_simonly
+
 # PM-6 (P5): nur fuer die Protokollzeile 'Fragmentgroesse:' - rein lesend,
 # kein eigener Importpfad in die Collector/Store-Schichten.
 from . import geraete_fragment
@@ -93,8 +95,9 @@ def _hole_fabrik(http_cfg: dict) -> Callable:
 
     from .collect.http import fetch
 
-    def hole(url: str, kopfzeilen: Optional[dict] = None,
-             user_agent: Optional[str] = None):
+    def hole(
+        url: str, kopfzeilen: Optional[dict] = None, user_agent: Optional[str] = None
+    ):
         # `user_agent` ist der PER-ANBIETER-UEBERSCHREIBER (Anbieter.
         # user_agent, siehe geraete_config.py) - er baut ein EIGENES
         # http_cfg nur fuer diesen Aufruf, das globale `http_cfg` (aus
@@ -131,6 +134,7 @@ def _hole_fabrik(http_cfg: dict) -> Callable:
 # jetzt zusaetzlich auf die Quellenseite (`report/geraete_view.py`) und
 # per Mail hinaus (`sende_alarm_mail`, Versandschritt in geraete.yml).
 # Alle drei sagen denselben Satz - er entsteht einmal, im Alarmobjekt.
+
 
 def _abdeckungszustand(bilanz) -> str:
     """Wie ist dieser Anbieter heute gelesen worden? EINE Definition.
@@ -196,8 +200,7 @@ def _abdeckungszustand(bilanz) -> str:
         # "Gar nicht angefasst" heisst: keine gelesene Einstiegsseite,
         # keine Listung, kein Buendelsatz. Alles drei, nicht nur die
         # Listungen - die Telekom liefert ausschliesslich Buendel.
-        gelesen = (bilanz.gelesene_einstiege or bilanz.listungen
-                   or bilanz.buendel)
+        gelesen = bilanz.gelesene_einstiege or bilanz.listungen or bilanz.buendel
         return TEILGELESEN if gelesen else NICHT_GELESEN
     return GELESEN if bilanz.vollstaendig else LESEFEHLER
 
@@ -233,8 +236,10 @@ def melde_ausfall(alarme: list) -> None:
     dasselbe (Clean Code 7).
     """
     for alarm in alarme:
-        log.warning("Geraeteradar-Abdeckung: %s (Quelle pruefen: "
-                    "geraete-quellen.html)", alarm.satz)
+        log.warning(
+            "Geraeteradar-Abdeckung: %s (Quelle pruefen: geraete-quellen.html)",
+            alarm.satz,
+        )
 
 
 def baue_alarm_mail(alarme: list, tag: str) -> tuple:
@@ -248,14 +253,20 @@ def baue_alarm_mail(alarme: list, tag: str) -> tuple:
     """
     datum = tag_de(tag)
     seite = f"{versand.SITE_URL}/geraete-quellen.html"
-    betreff = (f"Geräteradar {datum}: {len(alarme)} Anbieter heute nicht "
-               f"vollständig erfasst")
+    betreff = (
+        f"Geräteradar {datum}: {len(alarme)} Anbieter heute nicht vollständig erfasst"
+    )
     zeilen = [a.satz for a in alarme]
-    text = "\n".join([f"Stand {datum}", ""] + [f"- {z}" for z in zeilen]
-                     + ["", f"Quellenseite: {seite}"])
-    inhalt = (f"<html><body><p>Stand {escape(datum)}</p><ul>"
-              + "".join(f"<li>{escape(z)}</li>" for z in zeilen)
-              + f'</ul><p><a href="{seite}">Quellenseite</a></p></body></html>')
+    text = "\n".join(
+        [f"Stand {datum}", ""]
+        + [f"- {z}" for z in zeilen]
+        + ["", f"Quellenseite: {seite}"]
+    )
+    inhalt = (
+        f"<html><body><p>Stand {escape(datum)}</p><ul>"
+        + "".join(f"<li>{escape(z)}</li>" for z in zeilen)
+        + f'</ul><p><a href="{seite}">Quellenseite</a></p></body></html>'
+    )
     return betreff, text, inhalt
 
 
@@ -275,8 +286,9 @@ def sende_alarm_mail(alarme: list, tag: str, *, trocken: bool = False) -> str:
         return "keine Abdeckungsalarme - keine Mail"
     betreff, text, html = baue_alarm_mail(alarme, tag)
     ergebnis = versand.sende_mail(betreff, text, html, trocken=trocken)
-    log.warning("Geraeteradar-Abdeckung: %d Alarme per Mail (%s)",
-                len(alarme), ergebnis)
+    log.warning(
+        "Geraeteradar-Abdeckung: %d Alarme per Mail (%s)", len(alarme), ergebnis
+    )
     return ergebnis
 
 
@@ -304,23 +316,38 @@ def melde_proben(bilanzen: list) -> None:
         # "100 %" - bei 199 von 200 als "100 %" zu melden waere Perfektion
         # fuer einen Einzelfehler (S3 der P5-Codepruefung).
         prozent = int(100.0 * bestanden / erwartete)
-        ebenen = ", ".join(f"{wert}x {name}"
-                           for name, wert in sorted(proben.items())
-                           if name not in ("kandidaten", "bestanden")
-                           and int(wert) > 0)
+        ebenen = ", ".join(
+            f"{wert}x {name}"
+            for name, wert in sorted(proben.items())
+            if name not in ("kandidaten", "bestanden") and int(wert) > 0
+        )
         if prozent >= 100:
-            log.info("Geraeteradar-Probe: %s liefert %d von %d erwarteten "
-                     "Saetzen noch ihre Felder (%d %%)",
-                     satz["anbieter"], bestanden, erwartete, prozent)
+            log.info(
+                "Geraeteradar-Probe: %s liefert %d von %d erwarteten "
+                "Saetzen noch ihre Felder (%d %%)",
+                satz["anbieter"],
+                bestanden,
+                erwartete,
+                prozent,
+            )
         else:
-            log.warning("Geraeteradar-Probe: %s liefert %d von %d erwarteten "
-                        "Saetzen noch ihre Felder (%d %%) - gescheitert an: %s",
-                        satz["anbieter"], bestanden, erwartete, prozent,
-                        ebenen or "unbekannt")
+            log.warning(
+                "Geraeteradar-Probe: %s liefert %d von %d erwarteten "
+                "Saetzen noch ihre Felder (%d %%) - gescheitert an: %s",
+                satz["anbieter"],
+                bestanden,
+                erwartete,
+                prozent,
+                ebenen or "unbekannt",
+            )
 
 
-def nachsammle_buendel(bilanzen: list, quellen, hole: Callable,
-                       uhr: Optional[Callable[[], datetime]] = None) -> None:
+def nachsammle_buendel(
+    bilanzen: list,
+    quellen,
+    hole: Callable,
+    uhr: Optional[Callable[[], datetime]] = None,
+) -> None:
     """Die Nachbearbeitungs-Haken der Adapter ueber die Buendel laufen
     lassen. Wirft nie - ein Fehler hier darf den Bestand nicht kosten,
     er ist an dieser Stelle laengst gespeichert.
@@ -361,45 +388,66 @@ def nachsammle_buendel(bilanzen: list, quellen, hole: Callable,
         # Absender des letzten Anbieters.
         waechter = RobotsWaechter(
             hole=(lambda url, ua=user_agent: hole(url, user_agent=ua))
-            if user_agent else hole)
+            if user_agent
+            else hole
+        )
         # DIE HAKEN-ABRUFE TRAGEN DENSELBEN ABSENDER (29.09.2026). Bis
         # hierher ging nur der robots-Abruf mit dem Absender des Anbieters
         # hinaus; was der Haken selbst holte, trug die globale Kennung aus
         # settings.yaml. Seit 1&1s Haken neun Seiten mehr holt
         # (Tarifstufen), waere das der groessere Teil seiner Abrufe.
-        hole_anbieter = ((lambda url, *args, ua=user_agent, **kwargs:
-                          hole(url, *args, user_agent=ua, **kwargs))
-                         if user_agent else hole)
+        hole_anbieter = (
+            (
+                lambda url, *args, ua=user_agent, **kwargs: hole(
+                    url, *args, user_agent=ua, **kwargs
+                )
+            )
+            if user_agent
+            else hole
+        )
         gebremst = hole_mit_robots(
-            hole_anbieter, waechter,
-            getattr(anbieter, "rate_limit_sekunden", 0.0) or 0.0, uhr)
+            hole_anbieter,
+            waechter,
+            getattr(anbieter, "rate_limit_sekunden", 0.0) or 0.0,
+            uhr,
+        )
         for haken, meldung in (
-                (adapter.loese_tarifnamen,
-                 "%s: %d von %d Buendel-Tarifnamen ueber die "
-                 "Tarifschnittstelle aufgeloest"),
-                (adapter.ergaenze_buendel,
-                 "%s: %d Buendel-Saetze um die Bereitstellungsgebuehr "
-                 "ergaenzt (%d Rohsaetze)")):
+            (
+                adapter.loese_tarifnamen,
+                "%s: %d von %d Buendel-Tarifnamen ueber die "
+                "Tarifschnittstelle aufgeloest",
+            ),
+            (
+                adapter.ergaenze_buendel,
+                "%s: %d Buendel-Saetze um die Bereitstellungsgebuehr "
+                "ergaenzt (%d Rohsaetze)",
+            ),
+        ):
             if haken is None:
                 continue
             try:
                 gesetzt = haken(
                     gebremst,
                     dict(getattr(anbieter, "kopfzeilen", None) or {}),
-                    bilanz.buendel)
+                    bilanz.buendel,
+                )
                 if gesetzt:
-                    log.info(meldung, bilanz.name, gesetzt,
-                             len(bilanz.buendel))
-            except Exception as exc:                      # noqa: BLE001
-                log.warning("%s: Buendel-Nachsammeln gescheitert (%s)",
-                            bilanz.name, exc)
+                    log.info(meldung, bilanz.name, gesetzt, len(bilanz.buendel))
+            except Exception as exc:  # noqa: BLE001
+                log.warning(
+                    "%s: Buendel-Nachsammeln gescheitert (%s)", bilanz.name, exc
+                )
 
 
-def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
-                      jetzt: Optional[datetime] = None,
-                      frist_sekunden: Optional[float] = FRIST_STANDARD,
-                      hole: Optional[Callable] = None,
-                      referenz_anbieter: Optional[set] = None) -> dict:
+def run_geraete_stage(
+    root: Path,
+    http_cfg: dict,
+    heute: str,
+    jetzt: Optional[datetime] = None,
+    frist_sekunden: Optional[float] = FRIST_STANDARD,
+    hole: Optional[Callable] = None,
+    referenz_anbieter: Optional[set] = None,
+) -> dict:
     """Sammeln, aufnehmen, altern, speichern. Gibt die Bilanz zurueck.
 
     `referenz_anbieter` grenzt die SIM-only-Referenzstufe ein (Menge von
@@ -431,12 +479,18 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
     farben = lade_farben(root)
     quellen = lade_quellen(root)
     if not quellen.anbieter or not katalog.geraete:
-        return {"status": "keine Konfiguration", "anbieter": [],
-                "listungen": 0, "neu": 0, "gealtert": 0}
+        return {
+            "status": "keine Konfiguration",
+            "anbieter": [],
+            "listungen": 0,
+            "neu": 0,
+            "gealtert": 0,
+        }
 
     hole = hole or _hole_fabrik(http_cfg)
-    ergebnis = sammle(quellen, katalog, farben, hole, heute, jetzt,
-                      frist_sekunden=frist_sekunden)
+    ergebnis = sammle(
+        quellen, katalog, farben, hole, heute, jetzt, frist_sekunden=frist_sekunden
+    )
 
     zustand = root / "data" / "state"
     db = GeraeteDB(zustand / "geraete_db.json")
@@ -468,12 +522,18 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
         # am Ende der Schleife stand nur die Liste des letzten Anbieters.
         kollisionen.extend(getattr(db, "kollisionen", []))
         if bilanz.vollstaendig:
-            leitseite = (anbieter.crawled_einstiege[0].url
-                         if anbieter and anbieter.crawled_einstiege else "")
+            leitseite = (
+                anbieter.crawled_einstiege[0].url
+                if anbieter and anbieter.crawled_einstiege
+                else ""
+            )
             gealtert_gesamt += db.mark_stale(
-                bilanz.name, gesehen, heute,
+                bilanz.name,
+                gesehen,
+                heute,
                 gelesene_einstiege=bilanz.gelesene_einstiege,
-                leitseite=leitseite)
+                leitseite=leitseite,
+            )
         # Die Buchfuehrung unterscheidet zwei Dinge, die vorher in einem
         # Handgriff steckten: `laeufe` (zaehlt nur VOLLSTAENDIGE Laeufe -
         # ein ausgefallener Abruf darf keine Marke zum SIM-only-Anbieter
@@ -491,38 +551,43 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
         # ihre alten Bedingungen gebunden (im Store), nur das Journal
         # bekommt jeden Tag.
         versucht, tote = _adressbilanz(bilanz)
-        db.protokolliere_lauf(bilanz.name, heute,
-                              funde=len(bilanz.listungen),
-                              vollstaendig=bilanz.vollstaendig,
-                              zustand=_abdeckungszustand(bilanz),
-                              buendel=len(bilanz.buendel),
-                              tote_adressen=tote,
-                              produkte_versucht=versucht)
-        bilanzen.append({
-            "anbieter": bilanz.name,
-            "status": bilanz.status,
-            "grund": bilanz.grund,
-            "listungen": len(bilanz.listungen),
-            "neu": neu,
-            "seiten": bilanz.seiten_versucht,
-            "gelesen": len(bilanz.gelesene_einstiege),
-            "produkte_abgerufen": bilanz.produkte_abgerufen,
-            "rohsaetze": bilanz.rohsaetze,
-            # FM-2: die Zaehler der Provider-Probe (leer, wenn der Adapter
-            # keine kennt) - gemeldet wird sie unten, siehe `melde_proben`.
-            "proben": dict(bilanz.proben),
-            "gedeckelt": bilanz.gedeckelt,
-            "vollstaendig": bilanz.vollstaendig,
-            "nicht_verlinkt": bilanz.nicht_verlinkt,
-            # Die tote-Adressen-Zahl gehoert ins Protokoll und nicht nur
-            # ins Log: sie ist der Grund, warum ein Lauf mit Luecken
-            # trotzdem vollstaendig heisst, und ohne sie sieht eine
-            # veraltete Sitemap wie ein sauberer Lauf aus. Dieselben zwei
-            # Werte wie im Bestand, aus derselben Rechnung - zwei
-            # Ausdruecke waeren zwei Wahrheiten (Clean Code 7).
-            "produkte_versucht": versucht,
-            "tote_adressen": tote,
-        })
+        db.protokolliere_lauf(
+            bilanz.name,
+            heute,
+            funde=len(bilanz.listungen),
+            vollstaendig=bilanz.vollstaendig,
+            zustand=_abdeckungszustand(bilanz),
+            buendel=len(bilanz.buendel),
+            tote_adressen=tote,
+            produkte_versucht=versucht,
+        )
+        bilanzen.append(
+            {
+                "anbieter": bilanz.name,
+                "status": bilanz.status,
+                "grund": bilanz.grund,
+                "listungen": len(bilanz.listungen),
+                "neu": neu,
+                "seiten": bilanz.seiten_versucht,
+                "gelesen": len(bilanz.gelesene_einstiege),
+                "produkte_abgerufen": bilanz.produkte_abgerufen,
+                "rohsaetze": bilanz.rohsaetze,
+                # FM-2: die Zaehler der Provider-Probe (leer, wenn der Adapter
+                # keine kennt) - gemeldet wird sie unten, siehe `melde_proben`.
+                "proben": dict(bilanz.proben),
+                "gedeckelt": bilanz.gedeckelt,
+                "vollstaendig": bilanz.vollstaendig,
+                "nicht_verlinkt": bilanz.nicht_verlinkt,
+                # Die tote-Adressen-Zahl gehoert ins Protokoll und nicht nur
+                # ins Log: sie ist der Grund, warum ein Lauf mit Luecken
+                # trotzdem vollstaendig heisst, und ohne sie sieht eine
+                # veraltete Sitemap wie ein sauberer Lauf aus. Dieselben zwei
+                # Werte wie im Bestand, aus derselben Rechnung - zwei
+                # Ausdruecke waeren zwei Wahrheiten (Clean Code 7).
+                "produkte_versucht": versucht,
+                "tote_adressen": tote,
+            }
+        )
 
     historie.save()
     db.save(heute)
@@ -563,8 +628,9 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
     # an die Rohsaetze schreiben, landet im selben Zug im Bestand.
     nachsammle_buendel(ergebnis["anbieter"], quellen, hole)
 
-    rohbuendel = [b for bilanz in ergebnis["anbieter"]
-                  for b in getattr(bilanz, "buendel", [])]
+    rohbuendel = [
+        b for bilanz in ergebnis["anbieter"] for b in getattr(bilanz, "buendel", [])
+    ]
     referenzen: list = []
     tarife = 0
     neue_buendel = 0
@@ -597,9 +663,12 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
             # `promo_store.mark_stale` ohne `gepruefte_seiten` und beim
             # `PromoExtractionError`, beide in CLAUDE.md § 6 als teuer
             # dokumentiert.
-            log.warning("Tarif-Referenzen: der Tarifbestand liefert keine "
-                        "einzige Referenz (%d Saetze gelesen) - der "
-                        "bisherige Massstab bleibt unangetastet", tarife)
+            log.warning(
+                "Tarif-Referenzen: der Tarifbestand liefert keine "
+                "einzige Referenz (%d Saetze gelesen) - der "
+                "bisherige Massstab bleibt unangetastet",
+                tarife,
+            )
         else:
             # S-5 (09.09.2026): 1&1-SIM-only-Referenzen von der SIM-only-Seite
             # des Anbieters. Bis heute entstanden sie als Ableitung aus dem
@@ -624,17 +693,21 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
                 # Lokallauf, der 1&1 nicht misst, ruft 1&1 auch nicht ab
                 # (Befund Runde 2: 10 Requests an 1und1.de aus dem
                 # Telekom-Lauf vom 15.09.2026).
-                if referenz_anbieter is not None \
-                        and SIMONLY_ANBIETER not in referenz_anbieter:
+                if (
+                    referenz_anbieter is not None
+                    and SIMONLY_ANBIETER not in referenz_anbieter
+                ):
                     simonly_refs = []
                     simonly_protokoll = {}
                 else:
-                    simonly_refs, simonly_protokoll = sammle_simonly(
-                        hole, heute)
-            except Exception as exc:                 # noqa: BLE001
+                    simonly_refs, simonly_protokoll = sammle_simonly(hole, heute)
+            except Exception as exc:  # noqa: BLE001
                 simonly_refs = []
-                log.warning("1&1 SIM-only-Messung gescheitert (%s) - die "
-                            "Bestandsableitung bleibt stehen", exc)
+                log.warning(
+                    "1&1 SIM-only-Messung gescheitert (%s) - die "
+                    "Bestandsableitung bleibt stehen",
+                    exc,
+                )
             if simonly_refs:
                 # NUR ERSETZEN, WAS DIE MESSUNG AUCH MISST (Review B3,
                 # 09.09.2026): Wirft das Kreuzzeug einzelne Tarife weg
@@ -648,28 +721,35 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
                 # im Protokoll.
                 gemessen = {r.tarif_name for r in simonly_refs}
                 zurueckgefallen = sum(
-                    1 for r in referenzen
-                    if r.anbieter == SIMONLY_ANBIETER
-                    and r.tarif_name not in gemessen)
-                referenzen = [r for r in referenzen
-                              if r.anbieter != SIMONLY_ANBIETER
-                              or r.tarif_name not in gemessen] + simonly_refs
-                log.info("1&1 SIM-only: %d Referenzen von der SIM-only-Seite "
-                         "(%s, %d Tarifdetails gelesen%s)",
-                         len(simonly_refs),
-                         simonly_protokoll.get("seite", ""),
-                         simonly_protokoll.get("details", 0),
-                         f", {zurueckgefallen} nur im Bestand"
-                         if zurueckgefallen else "")
+                    1
+                    for r in referenzen
+                    if r.anbieter == SIMONLY_ANBIETER and r.tarif_name not in gemessen
+                )
+                referenzen = [
+                    r
+                    for r in referenzen
+                    if r.anbieter != SIMONLY_ANBIETER or r.tarif_name not in gemessen
+                ] + simonly_refs
+                log.info(
+                    "1&1 SIM-only: %d Referenzen von der SIM-only-Seite "
+                    "(%s, %d Tarifdetails gelesen%s)",
+                    len(simonly_refs),
+                    simonly_protokoll.get("seite", ""),
+                    simonly_protokoll.get("details", 0),
+                    f", {zurueckgefallen} nur im Bestand" if zurueckgefallen else "",
+                )
             tco = TcoDB(zustand / "geraete_tco.json")
             # ERSETZEN, nicht ergaenzen: die Referenzen sind abgeleitet und
             # entstehen bei jedem Lauf neu. Ergaenzt wuechse der Bestand bei
             # jeder Umbenennung eines Tarifs - siehe `ersetze_referenzen`.
-            _, entfernt = tco.ersetze_referenzen(referenzen, heute,
-                                                 anbieter=referenz_anbieter)
+            _, entfernt = tco.ersetze_referenzen(
+                referenzen, heute, anbieter=referenz_anbieter
+            )
             if entfernt:
-                log.info("Tarif-Referenzen: %d nicht mehr im Tarifbestand - "
-                         "entfernt", entfernt)
+                log.info(
+                    "Tarif-Referenzen: %d nicht mehr im Tarifbestand - entfernt",
+                    entfernt,
+                )
             if rohbuendel:
                 # AUFFRISCHEN, nicht ersetzen - anders als die Referenzen.
                 # Ein Buendel ist eine MESSUNG an einer Anbieterseite, keine
@@ -679,8 +759,7 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
                 # nichts loescht.
                 buendelbilanz = aus_rohsaetzen(rohbuendel, bestand, heute)
                 if buendelbilanz.buendel:
-                    neue_buendel, _ = tco.upsert_buendel(
-                        buendelbilanz.buendel, heute)
+                    neue_buendel, _ = tco.upsert_buendel(buendelbilanz.buendel, heute)
             tco.save(heute)
             # ERST HIER. `save()` kann werfen (Platte, Rechte, Pfad), und
             # der Auffangboden unten faengt das ab - eine Bilanz, die schon
@@ -692,29 +771,37 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
         # zu diesem Zeitpunkt schon gespeichert, und ein Messtag ist nicht
         # nachholbar (Lauf 31422689829).
         log.warning("SIM-only-Referenzen nicht geschrieben: %s", exc)
-    log.info("Tarif-Referenzen: %d SIM-only-Referenzen aus %d Tarifen%s",
-             len(referenzen), tarife,
-             "" if geschrieben else " - NICHT GESCHRIEBEN")
+    log.info(
+        "Tarif-Referenzen: %d SIM-only-Referenzen aus %d Tarifen%s",
+        len(referenzen),
+        tarife,
+        "" if geschrieben else " - NICHT GESCHRIEBEN",
+    )
     # Die Buendelzeile steht AUCH da, wenn nichts ankam: "0 von 0" heisst
     # "kein Anbieter liefert Buendel", "0 von 63" heisst "der Tarifbestand
     # traegt ihre Tarife nicht" - zwei ganz verschiedene Arbeitslisten, und
     # ohne beide Zahlen sind sie nicht zu unterscheiden.
-    log.info("Buendel: %d von %d Rohsaetzen uebernommen (%d neu)%s%s",
-             len(buendelbilanz.buendel) if buendelbilanz else 0,
-             len(rohbuendel), neue_buendel,
-             f", {buendelbilanz.verworfen} verworfen" if buendelbilanz
-             and buendelbilanz.verworfen else "",
-             "" if geschrieben else " - NICHT GESCHRIEBEN")
+    log.info(
+        "Buendel: %d von %d Rohsaetzen uebernommen (%d neu)%s%s",
+        len(buendelbilanz.buendel) if buendelbilanz else 0,
+        len(rohbuendel),
+        neue_buendel,
+        f", {buendelbilanz.verworfen} verworfen"
+        if buendelbilanz and buendelbilanz.verworfen
+        else "",
+        "" if geschrieben else " - NICHT GESCHRIEBEN",
+    )
 
     if kollisionen:
         # Die Arbeitsliste fuer den Katalog: zwei Artikel auf einer ID sind
         # zwei Produkte, die der Katalog nicht auseinanderhaelt.
-        log.warning("Geraeteradar: %d Kollisionen - zwei Artikel desselben "
-                    "Laufs auf einer Listungs-ID, der zweite ist weder "
-                    "eingetragen noch in der Historie: %s",
-                    len(kollisionen),
-                    "; ".join(f"{lid} <- {titel!r}"
-                              for lid, titel in kollisionen[:12]))
+        log.warning(
+            "Geraeteradar: %d Kollisionen - zwei Artikel desselben "
+            "Laufs auf einer Listungs-ID, der zweite ist weder "
+            "eingetragen noch in der Historie: %s",
+            len(kollisionen),
+            "; ".join(f"{lid} <- {titel!r}" for lid, titel in kollisionen[:12]),
+        )
 
     # E4-AUTO-ERKENNUNG: den gewachsenen Katalog und die unbekannten
     # Titel/Farben persistieren. Beides ist STATE und wird vom Lauf
@@ -724,18 +811,26 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
     if auto_eintraege:
         autoerkennung.speichere_auto_zusaetze(root, katalog)
     if auto_neu:
-        log.info("Geraeteradar: Auto-Erkennung hat %d neue Katalog-"
-                 "Eintraege angelegt (Auto-Bestand %d, Stand via data/state/"
-                 "geraete_katalog_auto.json): %s",
-                 auto_neu, len(auto_eintraege),
-                 " | ".join(f"{g.hersteller} {g.modell} (auto:{g.auto})"
-                            for g in auto_eintraege[-auto_neu:]))
+        log.info(
+            "Geraeteradar: Auto-Erkennung hat %d neue Katalog-"
+            "Eintraege angelegt (Auto-Bestand %d, Stand via data/state/"
+            "geraete_katalog_auto.json): %s",
+            auto_neu,
+            len(auto_eintraege),
+            " | ".join(
+                f"{g.hersteller} {g.modell} (auto:{g.auto})"
+                for g in auto_eintraege[-auto_neu:]
+            ),
+        )
     unbekannte = ergebnis.get("unbekannte") or []
     if unbekannte:
         zeilen = autoerkennung.persistiere_unbekannte(root, unbekannte, heute)
-        log.info("Geraeteradar: %d unbekannte Titel/Farben in data/state/"
-                 "geraete_unbekannt.jsonl gezaehlt (%d Zeilen Bestand)",
-                 len(unbekannte), zeilen)
+        log.info(
+            "Geraeteradar: %d unbekannte Titel/Farben in data/state/"
+            "geraete_unbekannt.jsonl gezaehlt (%d Zeilen Bestand)",
+            len(unbekannte),
+            zeilen,
+        )
     bilanz = {
         "status": "ok",
         "anbieter": bilanzen,
@@ -749,8 +844,9 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
         # Lauf mit 300 unerkannten Titeln genau 40 davon und sieht harmlos aus.
         "unbekannte_titel": ergebnis["unbekannte_titel"][:40],
         "unbekannte_titel_gesamt": len(ergebnis["unbekannte_titel"]),
-        "unbekannte_farben": sorted({f for b in ergebnis["anbieter"]
-                                     for f in b.unbekannte_farben})[:40],
+        "unbekannte_farben": sorted(
+            {f for b in ergebnis["anbieter"] for f in b.unbekannte_farben}
+        )[:40],
         # Zwei Zahlen, nicht eine: `rohbuendel` sagt, was die Anbieter
         # geliefert haben, `buendel` was davon einen Tarif im Bestand hat.
         "rohbuendel": len(rohbuendel),
@@ -769,21 +865,33 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
         "tarife_im_bestand": tarife,
         "sekunden": round(time.monotonic() - beginn, 1),
     }
-    log.info("Geraeteradar: %d Anbieter abgefragt, %d Listungen (%d neu), "
-             "%d Preispunkte, %d gealtert, Bestand %d, %.1fs",
-             bilanz["abgefragt"], bilanz["listungen"], bilanz["neu"],
-             punkte, gealtert_gesamt, bilanz["bestand"], bilanz["sekunden"])
+    log.info(
+        "Geraeteradar: %d Anbieter abgefragt, %d Listungen (%d neu), "
+        "%d Preispunkte, %d gealtert, Bestand %d, %.1fs",
+        bilanz["abgefragt"],
+        bilanz["listungen"],
+        bilanz["neu"],
+        punkte,
+        gealtert_gesamt,
+        bilanz["bestand"],
+        bilanz["sekunden"],
+    )
     for satz in bilanzen:
         if satz["status"] != "ok":
             # Die Zahlen gehoeren in DIESE Zeile. Ein Anbieter, der 84
             # Listungen liefert und trotzdem "fehler" heisst, ist erklaerbar
             # (der Einstieg galt als unvollstaendig gelesen) - aber nur, wenn
             # das Protokoll die 84 auch nennt.
-            log.info("Geraeteradar: %s -> %s, %d Listungen aus %d Produktseiten "
-                     "(%d Preissaetze gelesen) (%s)",
-                     satz["anbieter"], satz["status"], satz["listungen"],
-                     satz["produkte_abgerufen"], satz["rohsaetze"],
-                     satz["grund"][:160])
+            log.info(
+                "Geraeteradar: %s -> %s, %d Listungen aus %d Produktseiten "
+                "(%d Preissaetze gelesen) (%s)",
+                satz["anbieter"],
+                satz["status"],
+                satz["listungen"],
+                satz["produkte_abgerufen"],
+                satz["rohsaetze"],
+                satz["grund"][:160],
+            )
         if satz["tote_adressen"]:
             # EIGENE ZEILE, und zwar auch fuer einen Anbieter mit Status
             # "ok": genau dort steht sie sonst nirgends. Ein Lauf, der als
@@ -791,12 +899,16 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
             # Leere zeigt, muss das sagen - sonst waechst die Luecke still,
             # bis sie die Schwelle reisst und der Anbieter ueber Nacht als
             # Ausfall dasteht.
-            log.info("Geraeteradar: %s -> %d von %d Produktadressen tot "
-                     "(HTTP 404/410, von der Quelle selbst verlinkt), %d "
-                     "Produktseiten gelesen, Lauf %s",
-                     satz["anbieter"], satz["tote_adressen"],
-                     satz["produkte_versucht"], satz["produkte_abgerufen"],
-                     "vollständig" if satz["vollstaendig"] else "unvollständig")
+            log.info(
+                "Geraeteradar: %s -> %d von %d Produktadressen tot "
+                "(HTTP 404/410, von der Quelle selbst verlinkt), %d "
+                "Produktseiten gelesen, Lauf %s",
+                satz["anbieter"],
+                satz["tote_adressen"],
+                satz["produkte_versucht"],
+                satz["produkte_abgerufen"],
+                "vollständig" if satz["vollstaendig"] else "unvollständig",
+            )
     # FM-2 / P1-C2: Quellentod darf nicht still bleiben. Beide Meldungen
     # greifen in nichts ein - der Alarm altert nicht und loest nichts (die
     # Auslistung bleibt allein an `vollstaendig` gebunden), die Probe
@@ -808,8 +920,7 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
     # Tag, nicht nach dem juengsten im Bestand. Ein Lauf, der einen
     # nachgereichten aelteren Tag schreibt, soll auch dessen Abdeckung
     # beurteilen.
-    alarme = db.ausfall_alarme(nur={satz["anbieter"] for satz in bilanzen},
-                               heute=heute)
+    alarme = db.ausfall_alarme(nur={satz["anbieter"] for satz in bilanzen}, heute=heute)
     melde_ausfall(alarme)
     # In die Bilanz, nicht nur ins Log: der Tageslauf gibt sie an
     # `run_geraete_stage`s Aufrufer zurueck (der Wochenlauf legt sie in
@@ -821,14 +932,18 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
         # Die Arbeitsliste fuer config/geraete_katalog.yaml. Sie stand bisher
         # nur in der Rueckgabe - und der naechtliche Lauf gibt an niemanden
         # zurueck, sein einziger Kanal ist dieses Protokoll.
-        log.info("Geraeteradar: %d Titel ohne Katalogtreffer (Arbeitsliste "
-                 "fuer config/geraete_katalog.yaml): %s",
-                 bilanz["unbekannte_titel_gesamt"],
-                 " | ".join(bilanz["unbekannte_titel"][:25]))
+        log.info(
+            "Geraeteradar: %d Titel ohne Katalogtreffer (Arbeitsliste "
+            "fuer config/geraete_katalog.yaml): %s",
+            bilanz["unbekannte_titel_gesamt"],
+            " | ".join(bilanz["unbekannte_titel"][:25]),
+        )
     if bilanz["unbekannte_farben"]:
-        log.info("Geraeteradar: unbekannte Farbschreibweisen (Arbeitsliste "
-                 "fuer config/farben.yaml): %s",
-                 ", ".join(bilanz["unbekannte_farben"]))
+        log.info(
+            "Geraeteradar: unbekannte Farbschreibweisen (Arbeitsliste "
+            "fuer config/farben.yaml): %s",
+            ", ".join(bilanz["unbekannte_farben"]),
+        )
     # Zwei Katalog-Arbeitslisten: Modelle ohne belegtes Marktstartdatum
     # (ohne sie gibt es keine Nachfolger-Analyse) und Vorgaenger-Bezuege,
     # die auf kein Katalogmodell zeigen (Konfigurationsfehler). Beide
@@ -840,17 +955,25 @@ def run_geraete_stage(root: Path, http_cfg: dict, heute: str,
     # verschwunden.
     ohne_start = [g.modell for g in katalog.geraete if not g.marktstart]
     if ohne_start:
-        log.info("Geraeteradar: %d von %d Katalogmodellen ohne Marktstartdatum "
-                 "(Arbeitsliste fuer config/geraete_katalog.yaml, keine "
-                 "Nachfolger-Analyse): %s",
-                 len(ohne_start), len(katalog.geraete),
-                 " | ".join(ohne_start[:25]))
-    ohn_kette = [g.modell for g in katalog.geraete
-                 if g.vorgaenger and katalog.nach_id(g.vorgaenger_device_id) is None]
+        log.info(
+            "Geraeteradar: %d von %d Katalogmodellen ohne Marktstartdatum "
+            "(Arbeitsliste fuer config/geraete_katalog.yaml, keine "
+            "Nachfolger-Analyse): %s",
+            len(ohne_start),
+            len(katalog.geraete),
+            " | ".join(ohne_start[:25]),
+        )
+    ohn_kette = [
+        g.modell
+        for g in katalog.geraete
+        if g.vorgaenger and katalog.nach_id(g.vorgaenger_device_id) is None
+    ]
     if ohn_kette:
-        log.warning("Geraeteradar: Vorgaenger-Bezug ohne Katalogziel in "
-                    "config/geraete_katalog.yaml: %s",
-                    " | ".join(ohn_kette[:25]))
+        log.warning(
+            "Geraeteradar: Vorgaenger-Bezug ohne Katalogziel in "
+            "config/geraete_katalog.yaml: %s",
+            " | ".join(ohn_kette[:25]),
+        )
     # PM-6 / P5 Auftrag 4 (18.09.2026): die taegliche Fragmentgroesse als
     # EINE einzeilige Protokollzeile - die drei Zahlen (Messtage, Messpaare,
     # Fragment-KB), aus EINER Quelle wie das Skript
@@ -880,14 +1003,16 @@ def main() -> None:
     p.add_argument("--frist", type=float, default=FRIST_STANDARD)
     args = p.parse_args()
 
-    logging.basicConfig(level=logging.INFO,
-                        format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
+    )
     root = Path(args.root)
     cfg = load_config(root)
     heute = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    run_geraete_stage(root, cfg.settings.get("http", {}), heute,
-                      frist_sekunden=args.frist)
+    run_geraete_stage(
+        root, cfg.settings.get("http", {}), heute, frist_sekunden=args.frist
+    )
 
 
-if __name__ == "__main__":       # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     main()

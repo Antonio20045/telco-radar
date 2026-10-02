@@ -19,6 +19,7 @@ echten Browser gegen die WIRKLICHE style.css gemessen, nicht gegen ihre
 Quelltext-Existenz: eine Regel, die niemanden färbt, wäre grün und
 prüfte nichts.
 """
+
 from __future__ import annotations
 
 import glob
@@ -31,7 +32,8 @@ from bs4 import BeautifulSoup
 REPO = Path(__file__).resolve().parents[1]
 
 _spec = importlib.util.spec_from_file_location(
-    "pruefe_portal", REPO / "scripts" / "pruefe_portal.py")
+    "pruefe_portal", REPO / "scripts" / "pruefe_portal.py"
+)
 pp = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(pp)
 
@@ -42,32 +44,37 @@ def _mini(html: str) -> BeautifulSoup:
 
 # ---- 1. Fließtext-Deckel: die Zählweise -------------------------------
 
+
 def test_deckel_zaehlt_sichtbare_und_aufklapp_absaetze():
     """FM 4 nennt den Preis-Klick den Härtetest - "gerät er zum
     Textblock, ist FM 4 sofort zurück". Deshalb zählt der Deckel Text
     hinter Klicks MIT: ein Deckel, der nur den ersten Bildschirm misst,
     sähe genau diesen Rückschlag nicht."""
-    soup = _mini('<div id="t"><p>Erste Zeile.</p>'
-                 '<details><summary>mehr</summary>'
-                 '<p>Und der Aufklapp-Text.</p></details></div>')
+    soup = _mini(
+        '<div id="t"><p>Erste Zeile.</p>'
+        "<details><summary>mehr</summary>"
+        "<p>Und der Aufklapp-Text.</p></details></div>"
+    )
     tafel = soup.select_one("#t")
-    assert pp.fliesstext_zeichen(tafel) == \
-        len("Erste Zeile.") + len("Und der Aufklapp-Text.")
+    assert pp.fliesstext_zeichen(tafel) == len("Erste Zeile.") + len(
+        "Und der Aufklapp-Text."
+    )
 
 
 def test_deckel_zaehlt_templates_nicht():
     """Templates sind nie sichtbar (der P1-Rechenweg-Pool wird erst per
     Klick zum DOM montiert) - sie belongen zu keiner Tafel-Ruhe."""
-    soup = _mini('<div id="t"><p>sichtbar</p>'
-                 '<template data-m="x"><p>70,00 € × 24 = 1 680 €</p>'
-                 '</template></div>')
+    soup = _mini(
+        '<div id="t"><p>sichtbar</p>'
+        '<template data-m="x"><p>70,00 € × 24 = 1 680 €</p>'
+        "</template></div>"
+    )
     assert pp.fliesstext_zeichen(soup.select_one("#t")) == len("sichtbar")
 
 
 def test_deckel_normalisiert_leerraum():
     soup = _mini('<div id="t"><p>  viel   Leer\ntraum\t  hier  </p></div>')
-    assert pp.fliesstext_zeichen(soup.select_one("#t")) == \
-        len("viel Leer traum hier")
+    assert pp.fliesstext_zeichen(soup.select_one("#t")) == len("viel Leer traum hier")
 
 
 def test_deckel_ignoriert_leere_absaetze():
@@ -86,19 +93,25 @@ def test_jeder_reiter_hat_einen_deckel():
 
 # ---- 2. Kein Fließblock unter Grafiken --------------------------------
 
+
 def test_absatz_nach_svg_wird_gemessen():
-    soup = _mini('<div id="t"><svg></svg><p>Der Datenblock unter dem '
-                 'Graph, der die Kurve als Text wiederholt.</p></div>')
+    soup = _mini(
+        '<div id="t"><svg></svg><p>Der Datenblock unter dem '
+        "Graph, der die Kurve als Text wiederholt.</p></div>"
+    )
     n, _ = pp.max_absatz_nach_svg(soup.select_one("#t"))
-    assert n == len("Der Datenblock unter dem Graph, "
-                    "der die Kurve als Text wiederholt.")
+    assert n == len(
+        "Der Datenblock unter dem Graph, der die Kurve als Text wiederholt."
+    )
 
 
 def test_absatz_im_container_nach_svg_wird_gemessen():
     """Graph-Wrapper-Struktur: svg und der Absatz stehen Geschwister in
     einem div - der Absatz ist erstes Element seines Containers."""
-    soup = _mini('<div id="t"><svg></svg><div class="gr-vbild-wrap">'
-                 '<p>Bildunterschrift.</p></div></div>')
+    soup = _mini(
+        '<div id="t"><svg></svg><div class="gr-vbild-wrap">'
+        "<p>Bildunterschrift.</p></div></div>"
+    )
     n, _ = pp.max_absatz_nach_svg(soup.select_one("#t"))
     assert n == len("Bildunterschrift.")
 
@@ -107,17 +120,21 @@ def test_versteckter_absatz_nach_svg_zaehlt_nicht():
     """Initial hidden (die JS-gefüllten Verlaufs-Sätze) oder hinter
     zugeklapptem details - die Regel misst, was der Leser unter der
     Grafik SIEHT, nicht was im DOM liegt."""
-    soup = _mini('<div id="t"><svg></svg>'
-                 '<p hidden>versteckt</p>'
-                 '<details><summary>z</summary><svg></svg>'
-                 '<p>im Aufklapper</p></details></div>')
+    soup = _mini(
+        '<div id="t"><svg></svg>'
+        "<p hidden>versteckt</p>"
+        "<details><summary>z</summary><svg></svg>"
+        "<p>im Aufklapper</p></details></div>"
+    )
     n, _ = pp.max_absatz_nach_svg(soup.select_one("#t"))
     assert n == 0
 
 
 def test_absatz_ohne_svg_davor_zaehlt_nicht():
-    soup = _mini('<div id="t"><h3>Titel</h3><p>Ganz normaler Absatz, '
-                 'der niemanden stört.</p></div>')
+    soup = _mini(
+        '<div id="t"><h3>Titel</h3><p>Ganz normaler Absatz, '
+        "der niemanden stört.</p></div>"
+    )
     assert pp.max_absatz_nach_svg(soup.select_one("#t"))[0] == 0
 
 
@@ -129,22 +146,25 @@ def test_die_200_zeichen_grenze_ist_genau_der_datenblock_fall():
     kurz = "a" * pp._MAX_ABSATZ_NACH_SVG
     lang = "a" * (pp._MAX_ABSATZ_NACH_SVG + 1)
     soup = _mini(f'<div id="t"><svg></svg><p>{kurz}</p></div>')
-    assert pp.max_absatz_nach_svg(soup.select_one("#t"))[0] \
-        <= pp._MAX_ABSATZ_NACH_SVG
+    assert pp.max_absatz_nach_svg(soup.select_one("#t"))[0] <= pp._MAX_ABSATZ_NACH_SVG
     soup = _mini(f'<div id="t"><svg></svg><p>{lang}</p></div>')
-    assert pp.max_absatz_nach_svg(soup.select_one("#t"))[0] \
-        > pp._MAX_ABSATZ_NACH_SVG
+    assert pp.max_absatz_nach_svg(soup.select_one("#t"))[0] > pp._MAX_ABSATZ_NACH_SVG
 
 
 # ---- 3. Klickbarkeit zeigt sich (echter Browser, echte style.css) -----
 
+
 def _chromium() -> str | None:
-    for muster in ("/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-                   str(Path.home() / "Library/Caches/ms-playwright"
-                       / "chromium*/chrome-mac*/Google Chrome for Testing.app"
-                       / "Contents/MacOS/Google Chrome for Testing"),
-                   str(Path.home() / ".cache/ms-playwright"
-                       / "chromium*/chrome-linux*/chrome")):
+    for muster in (
+        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
+        str(
+            Path.home()
+            / "Library/Caches/ms-playwright"
+            / "chromium*/chrome-mac*/Google Chrome for Testing.app"
+            / "Contents/MacOS/Google Chrome for Testing"
+        ),
+        str(Path.home() / ".cache/ms-playwright" / "chromium*/chrome-linux*/chrome"),
+    ):
         treffer = sorted(glob.glob(muster))
         if treffer:
             return treffer[-1]
@@ -155,8 +175,9 @@ def _chromium() -> str | None:
 
 
 def _style() -> str:
-    return (REPO / "src" / "telco_radar" / "report" / "templates"
-            / "style.css").read_text(encoding="utf-8")
+    return (
+        REPO / "src" / "telco_radar" / "report" / "templates" / "style.css"
+    ).read_text(encoding="utf-8")
 
 
 @pytest.fixture(scope="module")
@@ -205,7 +226,8 @@ def test_je_summary_der_geraeteseite_zeiger_und_caret(seite):
                   nackt: {cursor: getComputedStyle(woanders).cursor,
                           caret: (getComputedStyle(woanders, '::after').content
                                   || 'none') !== 'none'}};
-        }""")
+        }"""
+    )
     assert len(ergebnis["inTafel"]) == 3
     for e in ergebnis["inTafel"]:
         assert e["cursor"] == "pointer", ergebnis

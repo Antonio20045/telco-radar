@@ -10,6 +10,7 @@ Drei Ebenen, von unten nach oben:
      der im Brief verlangte Testfall. Das lauft OHNE jeden LLM-Aufruf, weil
      `new_items` dabei leer ist (pipeline.py: `if use_llm and new_items`).
 """
+
 from __future__ import annotations
 
 import json
@@ -26,14 +27,17 @@ from telco_radar.report.html import render_site
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
-def _bericht(datum: str, *, editor_used: bool = True,
-             highlights: list[dict] | None = None,
-             redaktion_ausfall: dict | None = None) -> dict:
+def _bericht(
+    datum: str,
+    *,
+    editor_used: bool = True,
+    highlights: list[dict] | None = None,
+    redaktion_ausfall: dict | None = None,
+) -> dict:
     d = {
         "date": datum,
         "generated_with_llm": True,
-        "stats": {"new": 12, "collected": 12, "sources_ok": 1,
-                  "sources_failed": 0},
+        "stats": {"new": 12, "collected": 12, "sources_ok": 1, "sources_failed": 0},
         "briefing_md": (
             "## Auf einen Blick\n"
             "- Der Testbetreiber senkt den Preis für Unlimited-Tarife.\n\n"
@@ -42,22 +46,35 @@ def _bericht(datum: str, *, editor_used: bool = True,
         "regions": {
             "Europa": {
                 "region_summary": "",
-                "highlights": highlights if highlights is not None else [
-                    {"title": "Testbetreiber senkt Preis für Unlimited-Tarife",
-                     "headline": "Testbetreiber senkt Preis für Unlimited-Tarife",
-                     "operator": "Testbetreiber", "url": "https://example.de/a",
-                     "source": "Testpresse", "relevance": 4, "ctm_bezug": 2,
-                     "category": "Tarif/Pricing", "date": datum},
+                "highlights": highlights
+                if highlights is not None
+                else [
+                    {
+                        "title": "Testbetreiber senkt Preis für Unlimited-Tarife",
+                        "headline": "Testbetreiber senkt Preis für Unlimited-Tarife",
+                        "operator": "Testbetreiber",
+                        "url": "https://example.de/a",
+                        "source": "Testpresse",
+                        "relevance": 4,
+                        "ctm_bezug": 2,
+                        "category": "Tarif/Pricing",
+                        "date": datum,
+                    },
                 ],
             },
         },
         "competitors": [],
         "run": {
-            "editor_used": editor_used, "duration_seconds": 1.0,
-            "models": {"analyst": "m" if editor_used else None,
-                      "editor": "m" if editor_used else None},
+            "editor_used": editor_used,
+            "duration_seconds": 1.0,
+            "models": {
+                "analyst": "m" if editor_used else None,
+                "editor": "m" if editor_used else None,
+            },
             "source_summary": {"total": 1, "ok": 1, "empty": 0, "failed": 0},
-            "phases": [], "sources": [], "analysts": [],
+            "phases": [],
+            "sources": [],
+            "analysts": [],
         },
     }
     if redaktion_ausfall:
@@ -69,6 +86,7 @@ def _bericht(datum: str, *, editor_used: bool = True,
 # 1. Die reine Logik
 # --------------------------------------------------------------------------- #
 
+
 def test_bewertete_meldungen_zaehlt_ueber_alle_regionen():
     bericht = _bericht("2026-08-01", highlights=[{"url": "a"}, {"url": "b"}])
     assert rk.bewertete_meldungen(bericht) == 2
@@ -78,26 +96,30 @@ def test_bewertete_meldungen_zaehlt_ueber_alle_regionen():
 
 def test_ist_gueltige_redaktion_braucht_editor_und_meldungen():
     assert rk.ist_gueltige_redaktion(_bericht("2026-08-01"))
-    assert not rk.ist_gueltige_redaktion(
-        _bericht("2026-08-01", editor_used=False))
-    assert not rk.ist_gueltige_redaktion(
-        _bericht("2026-08-01", highlights=[]))
+    assert not rk.ist_gueltige_redaktion(_bericht("2026-08-01", editor_used=False))
+    assert not rk.ist_gueltige_redaktion(_bericht("2026-08-01", highlights=[]))
 
 
 def test_ist_gueltige_redaktion_verwirft_eine_uebernahme():
     """Eine Kette von Uebernahmen zeigt immer auf den echten Ursprung."""
-    bericht = _bericht("2026-08-01",
-                       redaktion_ausfall={"stand": "2026-07-20", "grund": "x"})
+    bericht = _bericht(
+        "2026-08-01", redaktion_ausfall={"stand": "2026-07-20", "grund": "x"}
+    )
     assert not rk.ist_gueltige_redaktion(bericht)
 
 
 def test_letzte_gueltige_redaktion_findet_den_juengsten_treffer(tmp_path):
     reports = tmp_path / "reports"
     reports.mkdir()
-    for datum, gueltig in (("2026-08-01", True), ("2026-08-05", False),
-                          ("2026-08-10", True), ("2026-08-15", True)):
+    for datum, gueltig in (
+        ("2026-08-01", True),
+        ("2026-08-05", False),
+        ("2026-08-10", True),
+        ("2026-08-15", True),
+    ):
         (reports / f"{datum}.json").write_text(
-            json.dumps(_bericht(datum, editor_used=gueltig)), encoding="utf-8")
+            json.dumps(_bericht(datum, editor_used=gueltig)), encoding="utf-8"
+        )
 
     treffer = rk.letzte_gueltige_redaktion(reports, "2026-08-20")
     assert treffer is not None
@@ -115,8 +137,8 @@ def test_letzte_gueltige_redaktion_ohne_treffer_ist_none(tmp_path):
     assert rk.letzte_gueltige_redaktion(reports, "2026-08-01") is None
     # Auch wenn es Berichte gibt, aber keiner davon gueltig ist.
     (reports / "2026-07-01.json").write_text(
-        json.dumps(_bericht("2026-07-01", editor_used=False)),
-        encoding="utf-8")
+        json.dumps(_bericht("2026-07-01", editor_used=False)), encoding="utf-8"
+    )
     assert rk.letzte_gueltige_redaktion(reports, "2026-08-01") is None
 
 
@@ -124,13 +146,19 @@ def test_uebernehmen_greift_nur_bei_null_bewerteten_meldungen(tmp_path):
     reports = tmp_path / "reports"
     reports.mkdir()
     (reports / "2026-08-01.json").write_text(
-        json.dumps(_bericht("2026-08-01")), encoding="utf-8")
+        json.dumps(_bericht("2026-08-01")), encoding="utf-8"
+    )
 
     # Die aktuelle Runde hat selbst etwas geliefert - nichts wird ersetzt.
     eigene = [{"url": "https://example.de/heute", "title": "Heute"}]
     regional, body, comp, ausfall = rk.uebernehmen(
-        {"Europa": {"highlights": eigene}}, "eigener Text", [], reports,
-        "2026-08-10", "grund")
+        {"Europa": {"highlights": eigene}},
+        "eigener Text",
+        [],
+        reports,
+        "2026-08-10",
+        "grund",
+    )
     assert ausfall is None
     assert regional == {"Europa": {"highlights": eigene}}
     assert body == "eigener Text"
@@ -140,10 +168,12 @@ def test_uebernehmen_holt_die_letzte_gueltige_redaktion(tmp_path):
     reports = tmp_path / "reports"
     reports.mkdir()
     (reports / "2026-08-01.json").write_text(
-        json.dumps(_bericht("2026-08-01")), encoding="utf-8")
+        json.dumps(_bericht("2026-08-01")), encoding="utf-8"
+    )
 
     regional, body, comp, ausfall = rk.uebernehmen(
-        {}, "", [], reports, "2026-08-10", "keine neuen Meldungen")
+        {}, "", [], reports, "2026-08-10", "keine neuen Meldungen"
+    )
     assert ausfall == {"stand": "2026-08-01", "grund": "keine neuen Meldungen"}
     assert rk.bewertete_meldungen({"regions": regional}) == 1
     assert "Auf einen Blick" in body
@@ -153,7 +183,8 @@ def test_uebernehmen_ohne_vorgeschichte_bleibt_unveraendert(tmp_path):
     reports = tmp_path / "reports"
     reports.mkdir()
     regional, body, comp, ausfall = rk.uebernehmen(
-        {}, "", [], reports, "2026-08-01", "grund")
+        {}, "", [], reports, "2026-08-01", "grund"
+    )
     assert ausfall is None
     assert regional == {}
     assert body == ""
@@ -163,18 +194,20 @@ def test_uebernehmen_ohne_vorgeschichte_bleibt_unveraendert(tmp_path):
 # 2. Das Rendern: Kriterium 1 + 2 des Briefs
 # --------------------------------------------------------------------------- #
 
+
 def test_titelseite_zeigt_die_uebernommene_redaktion_mit_stand(tmp_path):
     reports = tmp_path / "data" / "reports"
     reports.mkdir(parents=True)
     (reports / "2026-08-01.json").write_text(
-        json.dumps(_bericht("2026-08-01")), encoding="utf-8")
+        json.dumps(_bericht("2026-08-01")), encoding="utf-8"
+    )
     # Die leere Runde, schon so geschrieben wie pipeline.py es taete.
-    ausfall = {"stand": "2026-08-01",
-               "grund": "es gab in dieser Runde keine neuen Meldungen "
-                        "zu bewerten"}
+    ausfall = {
+        "stand": "2026-08-01",
+        "grund": "es gab in dieser Runde keine neuen Meldungen zu bewerten",
+    }
     leer = _bericht("2026-08-10", highlights=[], redaktion_ausfall=ausfall)
-    leer["regions"] = json.loads(
-        (reports / "2026-08-01.json").read_text())["regions"]
+    leer["regions"] = json.loads((reports / "2026-08-01.json").read_text())["regions"]
     leer["run"]["editor_used"] = False
     (reports / "2026-08-10.json").write_text(json.dumps(leer), encoding="utf-8")
 
@@ -195,18 +228,17 @@ def test_titelseite_zeigt_die_uebernommene_redaktion_mit_stand(tmp_path):
     assert "Roh-Digest" not in html
 
 
-def test_transparenzseite_behauptet_keine_bewertung_die_nicht_stattfand(
-        tmp_path):
+def test_transparenzseite_behauptet_keine_bewertung_die_nicht_stattfand(tmp_path):
     """E1: die eine Seite, die "kann ich dem Ding trauen" beantwortet, darf
     die uebernommenen Meldungen nicht als Ausbeute DIESER Runde zeigen."""
     reports = tmp_path / "data" / "reports"
     reports.mkdir(parents=True)
     (reports / "2026-08-01.json").write_text(
-        json.dumps(_bericht("2026-08-01")), encoding="utf-8")
+        json.dumps(_bericht("2026-08-01")), encoding="utf-8"
+    )
     ausfall = {"stand": "2026-08-01", "grund": "keine neuen Meldungen"}
     leer = _bericht("2026-08-10", highlights=[], redaktion_ausfall=ausfall)
-    leer["regions"] = json.loads(
-        (reports / "2026-08-01.json").read_text())["regions"]
+    leer["regions"] = json.loads((reports / "2026-08-01.json").read_text())["regions"]
     leer["run"]["editor_used"] = False
     leer["stats"]["bewertete"] = 0  # was pipeline.py VOR der Uebernahme setzt
     (reports / "2026-08-10.json").write_text(json.dumps(leer), encoding="utf-8")
@@ -231,7 +263,8 @@ def test_normale_woche_zeigt_keinen_ausfall_hinweis(tmp_path):
     reports = tmp_path / "data" / "reports"
     reports.mkdir(parents=True)
     (reports / "2026-08-10.json").write_text(
-        json.dumps(_bericht("2026-08-10")), encoding="utf-8")
+        json.dumps(_bericht("2026-08-10")), encoding="utf-8"
+    )
     site = tmp_path / "site"
     render_site(site, reports)
     html = (site / "index.html").read_text(encoding="utf-8")
@@ -245,7 +278,8 @@ def test_meldungenseite_normale_woche_ohne_hinweis(tmp_path):
     reports = tmp_path / "data" / "reports"
     reports.mkdir(parents=True)
     (reports / "2026-08-10.json").write_text(
-        json.dumps(_bericht("2026-08-10")), encoding="utf-8")
+        json.dumps(_bericht("2026-08-10")), encoding="utf-8"
+    )
     site = tmp_path / "site"
     render_site(site, reports)
     meldungen = (site / "meldungen.html").read_text(encoding="utf-8")
@@ -260,13 +294,14 @@ def test_meldungenseite_zeigt_die_uebernommene_redaktion_mit_stand(tmp_path):
     reports = tmp_path / "data" / "reports"
     reports.mkdir(parents=True)
     (reports / "2026-08-01.json").write_text(
-        json.dumps(_bericht("2026-08-01")), encoding="utf-8")
-    ausfall = {"stand": "2026-08-01",
-               "grund": "es gab in dieser Runde keine neuen Meldungen "
-                        "zu bewerten"}
+        json.dumps(_bericht("2026-08-01")), encoding="utf-8"
+    )
+    ausfall = {
+        "stand": "2026-08-01",
+        "grund": "es gab in dieser Runde keine neuen Meldungen zu bewerten",
+    }
     leer = _bericht("2026-08-10", highlights=[], redaktion_ausfall=ausfall)
-    leer["regions"] = json.loads(
-        (reports / "2026-08-01.json").read_text())["regions"]
+    leer["regions"] = json.loads((reports / "2026-08-01.json").read_text())["regions"]
     leer["run"]["editor_used"] = False
     (reports / "2026-08-10.json").write_text(json.dumps(leer), encoding="utf-8")
 
@@ -286,6 +321,7 @@ def test_meldungenseite_zeigt_die_uebernommene_redaktion_mit_stand(tmp_path):
 # 3. pipeline.run() mit quellen=[] - die im Brief verlangte Simulation
 # --------------------------------------------------------------------------- #
 
+
 @pytest.fixture()
 def leeres_projekt(tmp_path, monkeypatch):
     """Eine Projektwurzel ganz ohne Quellen - "quellen=[]"."""
@@ -297,15 +333,22 @@ def leeres_projekt(tmp_path, monkeypatch):
     )
     (tmp_path / "config" / "settings.yaml").write_text(settings, encoding="utf-8")
     (tmp_path / "config" / "watchlist.yaml").write_text(
-        "regions: {}\n", encoding="utf-8")
+        "regions: {}\n", encoding="utf-8"
+    )
     (tmp_path / "config" / "news_sources.yaml").write_text(
-        "news_sources: []\n", encoding="utf-8")
+        "news_sources: []\n", encoding="utf-8"
+    )
     (tmp_path / "config" / "tech_sources.yaml").write_text(
-        "themen: {}\n", encoding="utf-8")
+        "themen: {}\n", encoding="utf-8"
+    )
     # Kein API-Schluessel in der Umgebung - die Runde darf keinen echten
     # Netzaufruf machen, auch keinen versehentlichen.
-    for var in ("ANTHROPIC_API_KEY", "OPENAI_API_KEY", "OPENAI_BASE_URL",
-               "AWS_BEDROCK_REGION"):
+    for var in (
+        "ANTHROPIC_API_KEY",
+        "OPENAI_API_KEY",
+        "OPENAI_BASE_URL",
+        "AWS_BEDROCK_REGION",
+    ):
         monkeypatch.delenv(var, raising=False)
     return tmp_path
 
@@ -316,12 +359,12 @@ def test_pipeline_behaelt_redaktion_bei_leerer_quellenliste(leeres_projekt):
     reports_dir = leeres_projekt / "data" / "reports"
     reports_dir.mkdir(parents=True)
     (reports_dir / f"{stand}.json").write_text(
-        json.dumps(_bericht(stand)), encoding="utf-8")
+        json.dumps(_bericht(stand)), encoding="utf-8"
+    )
 
     report_path, _ = pipeline.run(leeres_projekt, use_llm=True, lookback_days=8)
 
-    daten = json.loads(report_path.with_suffix(".json").read_text(
-        encoding="utf-8"))
+    daten = json.loads(report_path.with_suffix(".json").read_text(encoding="utf-8"))
     # Kriterium 3: kein Datenverlust - die alte Ausgabe liegt unveraendert
     # weiter im Archiv.
     alte = json.loads((reports_dir / f"{stand}.json").read_text())

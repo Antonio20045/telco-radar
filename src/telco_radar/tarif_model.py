@@ -35,6 +35,7 @@ Ein Dokument, dessen Pflichtfelder alle `niedrig` sind, ist kein Tarif,
 sondern ein unbekanntes Layout. Es geht in Quarantaene statt mit falschen
 Zahlen in die Datenbank (`ist_quarantaene`).
 """
+
 from __future__ import annotations
 
 import re
@@ -115,8 +116,7 @@ def zeitreihen_basis(tid: str) -> str:
 # damit die Dublette unter den SIM-only-Massstaeben, `tarif_bezug` haengt
 # ein Buendel an das Geraeteblatt, und `vertrag_basis` fuehrt beide IDs auf
 # denselben Vertrag zurueck.
-GERAETEBLATT_ZUSATZ = re.compile(
-    r"\s+mit\s+(?:Smartphone|Handy|Endger[aä]t)\s*$", re.I)
+GERAETEBLATT_ZUSATZ = re.compile(r"\s+mit\s+(?:Smartphone|Handy|Endger[aä]t)\s*$", re.I)
 _GERAETEBLATT_ID = re.compile(r"-mit-(?:smartphone|handy|endgeraet)$")
 
 
@@ -151,8 +151,9 @@ def ist_geraeteblatt_von(blatt: dict, tarif: dict) -> bool:
     ohne = GERAETEBLATT_ZUSATZ.sub("", name)
     if ohne == name:
         return False
-    if ((blatt.get("anbieter") or "").strip().lower()
-            != (tarif.get("anbieter") or "").strip().lower()):
+    if (blatt.get("anbieter") or "").strip().lower() != (
+        tarif.get("anbieter") or ""
+    ).strip().lower():
         return False
     if ohne.lower() != (tarif.get("name") or "").strip().lower():
         return False
@@ -176,7 +177,7 @@ class Preisphase:
     und nicht zwei Felder. Ein Tarif mit drei Phasen kommt vor.
     """
 
-    von_monat: int          # 1-basiert, einschliesslich
+    von_monat: int  # 1-basiert, einschliesslich
     bis_monat: Optional[int]  # einschliesslich; None = bis Vertragsende
     betrag: float
 
@@ -199,7 +200,7 @@ class Tarif:
 
     anbieter: str = ""
     name: str = ""
-    art: str = ""                      # "mobilfunk" | "festnetz" | ""
+    art: str = ""  # "mobilfunk" | "festnetz" | ""
 
     # --- Preis
     grundgebuehr: Optional[float] = None
@@ -212,9 +213,9 @@ class Tarif:
     # --- Leistung
     datenvolumen_gb: Optional[float] = None
     volumen_automatik: str = ""
-    speed_down_max: Optional[float] = None    # MBit/s
+    speed_down_max: Optional[float] = None  # MBit/s
     speed_up_max: Optional[float] = None
-    drossel_down: Optional[float] = None      # KBit/s
+    drossel_down: Optional[float] = None  # KBit/s
     drossel_up: Optional[float] = None
     allnet_flat: Optional[bool] = None
     sms_flat: Optional[bool] = None
@@ -244,7 +245,7 @@ class Tarif:
     preistyp: str = PREISTYP_DOKUMENT
 
     # --- Nachweis
-    confidence: dict = field(default_factory=dict)   # feld -> hoch/mittel/niedrig
+    confidence: dict = field(default_factory=dict)  # feld -> hoch/mittel/niedrig
     fundstellen: dict = field(default_factory=dict)  # feld -> Textzeile
 
     # ------------------------------------------------------------------ #
@@ -282,7 +283,8 @@ class Tarif:
         offen = self.fehlende_belege()
         if offen:
             raise ValueError(
-                "Feldwerte ohne Fundstelle im Rohtext: " + ", ".join(offen))
+                "Feldwerte ohne Fundstelle im Rohtext: " + ", ".join(offen)
+            )
 
     @property
     def ist_quarantaene(self) -> bool:
@@ -324,10 +326,7 @@ def normalisiere(text: str) -> str:
     * **Spaltenabstaende.** `-layout` polstert mit bis zu vierzig Leerzeichen;
       ohne Zusammenziehen braeuchte jeder Regex ein `\\s{1,40}`.
     """
-    text = (text.replace("​", "")
-                .replace("­", "")
-                .replace(" ", " ")
-                .replace("‑", "-"))
+    text = text.replace("​", "").replace("­", "").replace(" ", " ").replace("‑", "-")
     zeilen = [" ".join(z.split()) for z in text.splitlines()]
     return "\n".join(z for z in zeilen if z)
 

@@ -21,6 +21,7 @@ Die GEGENPROBEN stehen je Test: eine Fixture ohne 36-Monats-Zeile waere
 mit jeder Sortierung gruen, und ein Kopf ohne Monatszahl ist nur dann eine
 Aussage, wenn die Zeilen darunter ihren Zeitraum selbst nennen.
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -36,7 +37,15 @@ from bs4 import BeautifulSoup
 from telco_radar.report.html import _env, render_site
 
 from test_geraete_browser_fixture import (
-    HEUTE, _KATALOG, _FARBEN, _QUELLEN, _chromium, _listung, _server, _sku)
+    HEUTE,
+    _KATALOG,
+    _FARBEN,
+    _QUELLEN,
+    _chromium,
+    _listung,
+    _server,
+    _sku,
+)
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 DEVICE = "apple-iphone-17-pro"
@@ -54,83 +63,135 @@ MODELL = "apple-iphone-17-pro-256"
 #
 # Eine Sortierung nach dem Betrag allein schiebt 1&1 also zwischen o2 und
 # Vodafone - das ist der Befund, und daran wird gemessen.
-_RATEN = [("o2", "o2:klein", "O2 Mobile Klein", 10, 18.0),
-          ("congstar", "cs:klein", "Allnet Flat XS", 15, 10.0),
-          ("Vodafone", "vf:klein", "Vodafone Mobil XS", 18, 26.0)]
+_RATEN = [
+    ("o2", "o2:klein", "O2 Mobile Klein", 10, 18.0),
+    ("congstar", "cs:klein", "Allnet Flat XS", 15, 10.0),
+    ("Vodafone", "vf:klein", "Vodafone Mobil XS", 18, 26.0),
+]
 _ZUSAMMEN = ("1&1", "11:klein", "All-Net-Flat S", 12, 30.0, 100.0, 36)
 
-_SOLL = {"congstar": 840.76, "o2": 1032.76, "1&1": 1180.00,
-         "Vodafone": 1224.76}
+_SOLL = {"congstar": 840.76, "o2": 1032.76, "1&1": 1180.00, "Vodafone": 1224.76}
 
 
 def _baue(tmp_path: pathlib.Path) -> pathlib.Path:
     root = tmp_path / "site_baum"
     (root / "config").mkdir(parents=True)
-    for name, daten in (("geraete_katalog.yaml", _KATALOG),
-                        ("farben.yaml", _FARBEN),
-                        ("geraete_quellen.yaml", _QUELLEN)):
+    for name, daten in (
+        ("geraete_katalog.yaml", _KATALOG),
+        ("farben.yaml", _FARBEN),
+        ("geraete_quellen.yaml", _QUELLEN),
+    ):
         (root / "config" / name).write_text(
-            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
-            encoding="utf-8")
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False), encoding="utf-8"
+        )
     state = root / "data" / "state"
     state.mkdir(parents=True)
-    (state / "geraete_db.json").write_text(json.dumps({
-        "updated": HEUTE,
-        "anbieter": {n: {"laeufe": 4, "funde_gesamt": 1}
-                     for n in ("Vodafone", "o2", "1&1", "congstar")},
-        "listungen": [_listung("Vodafone", DEVICE, 256, 1199.90),
-                      _listung("o2", DEVICE, 256, 1099.00)]}),
-        encoding="utf-8")
+    (state / "geraete_db.json").write_text(
+        json.dumps(
+            {
+                "updated": HEUTE,
+                "anbieter": {
+                    n: {"laeufe": 4, "funde_gesamt": 1}
+                    for n in ("Vodafone", "o2", "1&1", "congstar")
+                },
+                "listungen": [
+                    _listung("Vodafone", DEVICE, 256, 1199.90),
+                    _listung("o2", DEVICE, 256, 1099.00),
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
     (state / "geraete_preise.jsonl").write_text("", encoding="utf-8")
     buendel = []
     for anbieter, tarif_id, tarif, _gb, rate in _RATEN:
-        buendel.append({
-            "id": f"buendel--{anbieter.lower()}--{_sku(DEVICE, 256)}"
-                  f"--{tarif_id}--24",
-            "sku_id": _sku(DEVICE, 256), "anbieter": anbieter,
-            "tarif_name": tarif, "tarif_id": tarif_id,
-            "tarif_id_guete": "hoch", "tarif_monatlich": 24.99,
-            "tarif_bindung_monate": 24,
-            "geraet_zuzahlung": 1.0, "geraet_monatsrate": rate,
-            "laufzeit_monate": 24, "anschlusspreis": 0.0,
-            "zustand": "neu", "rabatte": [],
-            "quelle_url": f"https://example.de/{anbieter.lower()}/{DEVICE}",
-            "abgerufen_am": HEUTE, "first_seen": HEUTE,
-            "last_verified": HEUTE})
+        buendel.append(
+            {
+                "id": f"buendel--{anbieter.lower()}--{_sku(DEVICE, 256)}"
+                f"--{tarif_id}--24",
+                "sku_id": _sku(DEVICE, 256),
+                "anbieter": anbieter,
+                "tarif_name": tarif,
+                "tarif_id": tarif_id,
+                "tarif_id_guete": "hoch",
+                "tarif_monatlich": 24.99,
+                "tarif_bindung_monate": 24,
+                "geraet_zuzahlung": 1.0,
+                "geraet_monatsrate": rate,
+                "laufzeit_monate": 24,
+                "anschlusspreis": 0.0,
+                "zustand": "neu",
+                "rabatte": [],
+                "quelle_url": f"https://example.de/{anbieter.lower()}/{DEVICE}",
+                "abgerufen_am": HEUTE,
+                "first_seen": HEUTE,
+                "last_verified": HEUTE,
+            }
+        )
     anbieter, tarif_id, tarif, _gb, monatlich, zuzahlung, laufzeit = _ZUSAMMEN
-    buendel.append({
-        "id": f"buendel--1und1--{_sku(DEVICE, 256)}--{tarif_id}--{laufzeit}",
-        "sku_id": _sku(DEVICE, 256), "anbieter": anbieter,
-        "tarif_name": tarif, "tarif_id": tarif_id, "tarif_id_guete": "hoch",
-        # EIN Betrag fuer Tarif UND Geraet (§ 13.2) - kein `tarif_monatlich`,
-        # keine `geraet_monatsrate`.
-        "buendel_monatlich": monatlich, "tarif_bindung_monate": 24,
-        "geraet_zuzahlung": zuzahlung, "laufzeit_monate": laufzeit,
-        "anschlusspreis": 0.0, "zustand": "neu", "rabatte": [],
-        "quelle_url": "https://example.de/1und1/anf-s",
-        "abgerufen_am": HEUTE, "first_seen": HEUTE, "last_verified": HEUTE})
-    (state / "geraete_tco.json").write_text(json.dumps({
-        "updated": HEUTE, "buendel": buendel, "sim_only": []}),
-        encoding="utf-8")
+    buendel.append(
+        {
+            "id": f"buendel--1und1--{_sku(DEVICE, 256)}--{tarif_id}--{laufzeit}",
+            "sku_id": _sku(DEVICE, 256),
+            "anbieter": anbieter,
+            "tarif_name": tarif,
+            "tarif_id": tarif_id,
+            "tarif_id_guete": "hoch",
+            # EIN Betrag fuer Tarif UND Geraet (§ 13.2) - kein `tarif_monatlich`,
+            # keine `geraet_monatsrate`.
+            "buendel_monatlich": monatlich,
+            "tarif_bindung_monate": 24,
+            "geraet_zuzahlung": zuzahlung,
+            "laufzeit_monate": laufzeit,
+            "anschlusspreis": 0.0,
+            "zustand": "neu",
+            "rabatte": [],
+            "quelle_url": "https://example.de/1und1/anf-s",
+            "abgerufen_am": HEUTE,
+            "first_seen": HEUTE,
+            "last_verified": HEUTE,
+        }
+    )
+    (state / "geraete_tco.json").write_text(
+        json.dumps({"updated": HEUTE, "buendel": buendel, "sim_only": []}),
+        encoding="utf-8",
+    )
     tarife = [
-        {"anbieter": a, "name": t, "tarif_id": tid, "art": "mobilfunk",
-         "grundgebuehr": 24.99, "laufzeit_monate": 24, "datenvolumen_gb": gb,
-         "preisphasen": [{"von_monat": 1, "bis_monat": None,
-                          "betrag": 24.99}],
-         "dokument_url": f"https://example.de/pib/{tid}",
-         "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}}
-        for a, tid, t, gb in
-        [(a, tid, t, gb) for a, tid, t, gb, _r in _RATEN]
-        + [(_ZUSAMMEN[0], _ZUSAMMEN[1], _ZUSAMMEN[2], _ZUSAMMEN[3])]]
+        {
+            "anbieter": a,
+            "name": t,
+            "tarif_id": tid,
+            "art": "mobilfunk",
+            "grundgebuehr": 24.99,
+            "laufzeit_monate": 24,
+            "datenvolumen_gb": gb,
+            "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": 24.99}],
+            "dokument_url": f"https://example.de/pib/{tid}",
+            "abgerufen_am": HEUTE,
+            "confidence": {},
+            "fundstellen": {},
+        }
+        for a, tid, t, gb in [(a, tid, t, gb) for a, tid, t, gb, _r in _RATEN]
+        + [(_ZUSAMMEN[0], _ZUSAMMEN[1], _ZUSAMMEN[2], _ZUSAMMEN[3])]
+    ]
     tarife = mit_leiter(tarife)
     (state / "tarife.jsonl").write_text(
-        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
+        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8"
+    )
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
-    (reports / f"{HEUTE}.json").write_text(json.dumps({
-        "date": HEUTE, "language": "de",
-        "briefing_md": "## Auf einen Blick\n\n- Nichts Besonderes.\n",
-        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{HEUTE}.json").write_text(
+        json.dumps(
+            {
+                "date": HEUTE,
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- Nichts Besonderes.\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     (reports / f"{HEUTE}.md").write_text("# Bericht\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
@@ -144,8 +205,9 @@ def site(tmp_path_factory):
 
 @pytest.fixture(scope="module")
 def suppe(site):
-    return BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
-                         "html.parser")
+    return BeautifulSoup(
+        (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
+    )
 
 
 def _zeilen(suppe):
@@ -165,6 +227,7 @@ def _etikett_monate(zeile) -> int | None:
 # Die Fixture selbst - ohne diese Gegenprobe prueft der Rest nichts
 # --------------------------------------------------------------------------
 
+
 def test_die_fixture_mischt_wirklich_zwei_zeitraeume(suppe):
     """GEGENPROBE zu allem, was folgt: vier Zeilen in EINEM Band, drei mit
     24 und eine mit 36 Monaten - und die 36er faellt nach Betrag MITTEN in
@@ -175,8 +238,7 @@ def test_die_fixture_mischt_wirklich_zwei_zeitraeume(suppe):
     betraege = {z["data-anbieter"]: float(z["data-gesamt"]) for z in zeilen}
     assert betraege == pytest.approx(_SOLL), betraege
     monate = {z["data-anbieter"]: _etikett_monate(z) for z in zeilen}
-    assert monate == {"congstar": 24, "o2": 24, "Vodafone": 24, "1&1": 36}, \
-        monate
+    assert monate == {"congstar": 24, "o2": 24, "Vodafone": 24, "1&1": 36}, monate
     # Nach Betrag allein stuende 1&1 an Platz 3 von 4 - nicht am Rand, wo
     # eine Gruppierung ohnehin landet.
     rang = sorted(betraege, key=lambda a: betraege[a])
@@ -186,6 +248,7 @@ def test_die_fixture_mischt_wirklich_zwei_zeitraeume(suppe):
 # --------------------------------------------------------------------------
 # 1. Der Spaltenkopf behauptet keinen Zeitraum, den er nicht halten kann
 # --------------------------------------------------------------------------
+
 
 def test_der_spaltenkopf_der_buendeltafel_nennt_keine_monatszahl(suppe):
     """Gegen den alten Stand rot: dort stand fest "Kosten über 24 Monate"
@@ -219,10 +282,8 @@ def test_auch_die_gruppe_ohne_tarifband_nennt_die_spalte_ohne_zeitraum(site):
         datei = site / pfad
         if not datei.exists():
             continue
-        suppe = BeautifulSoup(datei.read_text(encoding="utf-8"),
-                              "html.parser")
-        texte += [k.get_text(" ", strip=True)
-                  for k in suppe.select(".gr-bnd-kopf")]
+        suppe = BeautifulSoup(datei.read_text(encoding="utf-8"), "html.parser")
+        texte += [k.get_text(" ", strip=True) for k in suppe.select(".gr-bnd-kopf")]
     assert texte, "kein einziger Spaltenkopf gefunden - Lookup leer"
     assert all("Monate" not in t for t in texte), texte
     assert all("Kosten mit Tarif" in t for t in texte), texte
@@ -231,6 +292,7 @@ def test_auch_die_gruppe_ohne_tarifband_nennt_die_spalte_ohne_zeitraum(site):
 # --------------------------------------------------------------------------
 # 2. Der Zeitraum steht als Attribut an der Zeile - gelesen, nicht gebaut
 # --------------------------------------------------------------------------
+
 
 def test_jede_zeile_traegt_ihren_zeitraum_als_sortiergruppe(suppe):
     """`data-leitzahl-monate` ist das Feld, das app.js liest - es MUSS
@@ -241,35 +303,61 @@ def test_jede_zeile_traegt_ihren_zeitraum_als_sortiergruppe(suppe):
     laufzeit` daneben ist fuer JEDE Zeile 24 - auch fuer die 36er.
     """
     zeilen = _zeilen(suppe)
-    paare = [(z.get("data-leitzahl-monate"), _etikett_monate(z))
-             for z in zeilen]
+    paare = [(z.get("data-leitzahl-monate"), _etikett_monate(z)) for z in zeilen]
     assert all(a for a, _e in paare), paare
     assert all(int(a) == e for a, e in paare), paare
     # GEGENPROBE: `data-laufzeit` taugt nicht als Gruppe - es ist die
     # Tariflaufzeit der Rechnung und ueberall 24.
-    assert {z.get("data-laufzeit") for z in zeilen} == {"24"}, \
-        [z.get("data-laufzeit") for z in zeilen]
+    assert {z.get("data-laufzeit") for z in zeilen} == {"24"}, [
+        z.get("data-laufzeit") for z in zeilen
+    ]
 
 
 def test_ohne_gemessenen_zeitraum_bleibt_die_sortiergruppe_leer():
     """Eine Zeile ohne belastbare Zahl hat keinen Zeitraum - das Attribut
     steht LEER da, nicht auf 0 und nicht auf 24 (Clean Code 3: 0 nur, wo 0
     eine Aussage ist)."""
-    leer = {"anbieter": "Telekom", "tarif": "", "zustand": "",
-            "zustand_etikett": "", "belastbar": False, "label": "",
-            "gesamt": None, "schnitt_monat": None, "laufzeit": None,
-            "leitzahl_monate": None, "raten_laufzeit": None,
-            "tarif_bindung": None, "geraetepreis": None,
-            "geraetepreis_art": None, "zuzahlung": None, "monatlich": None,
-            "buendel_monatlich": None, "naeherung": False, "eigen": False,
-            "delta": None, "delta_kurz": "", "delta_zustand": None,
-            "sku_id": "", "quelle_url": "", "abgerufen_am": "",
-            "leer_grund": "Kein Bündel erhoben", "alt_marke": "",
-            "frisch": True, "band": "xs", "band_gb_text": ""}
-    zeile = BeautifulSoup(_env().from_string(
-        '{% from "_geraete_buendel.html.j2" import buendelzeile %}'
-        "{{ buendelzeile(k) }}").render(k=leer),
-        "html.parser").select_one(".gr-bnd")
+    leer = {
+        "anbieter": "Telekom",
+        "tarif": "",
+        "zustand": "",
+        "zustand_etikett": "",
+        "belastbar": False,
+        "label": "",
+        "gesamt": None,
+        "schnitt_monat": None,
+        "laufzeit": None,
+        "leitzahl_monate": None,
+        "raten_laufzeit": None,
+        "tarif_bindung": None,
+        "geraetepreis": None,
+        "geraetepreis_art": None,
+        "zuzahlung": None,
+        "monatlich": None,
+        "buendel_monatlich": None,
+        "naeherung": False,
+        "eigen": False,
+        "delta": None,
+        "delta_kurz": "",
+        "delta_zustand": None,
+        "sku_id": "",
+        "quelle_url": "",
+        "abgerufen_am": "",
+        "leer_grund": "Kein Bündel erhoben",
+        "alt_marke": "",
+        "frisch": True,
+        "band": "xs",
+        "band_gb_text": "",
+    }
+    zeile = BeautifulSoup(
+        _env()
+        .from_string(
+            '{% from "_geraete_buendel.html.j2" import buendelzeile %}'
+            "{{ buendelzeile(k) }}"
+        )
+        .render(k=leer),
+        "html.parser",
+    ).select_one(".gr-bnd")
     assert zeile.get("data-leitzahl-monate") == "", zeile.attrs
     assert zeile.get("data-gesamt") == "", zeile.attrs
     # GEGENPROBE: die Zeile steht da, mit ihrem Grund - sie wird nicht
@@ -281,16 +369,19 @@ def test_ohne_gemessenen_zeitraum_bleibt_die_sortiergruppe_leer():
 # 3. Die Sortierung im echten Chromium
 # --------------------------------------------------------------------------
 
+
 @contextlib.contextmanager
 def _browser_ctx(site):
     sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt").sync_playwright
+        "playwright.sync_api", reason="playwright fehlt"
+    ).sync_playwright
     exe = _chromium()
     with _server(site) as wurzel, sync_playwright() as p:
         try:
-            browser = (p.chromium.launch(executable_path=exe) if exe
-                       else p.chromium.launch())
-        except Exception:                    # noqa: BLE001
+            browser = (
+                p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
+            )
+        except Exception:  # noqa: BLE001
             pytest.skip("kein Chromium gefunden")
         try:
             yield wurzel, browser
@@ -321,7 +412,8 @@ def _reihe(s):
         "#gr-bndliste .gr-bnd:not([hidden])",
         "e => e.map(z => [z.dataset.anbieter, "
         "z.getAttribute('data-leitzahl-monate'), "
-        "parseFloat(z.dataset.gesamt)])")
+        "parseFloat(z.dataset.gesamt)])",
+    )
 
 
 def test_die_sortierung_stellt_zwei_zeitraeume_nicht_in_einen_rang(seite):
@@ -336,8 +428,7 @@ def test_die_sortierung_stellt_zwei_zeitraeume_nicht_in_einen_rang(seite):
     seite.click("#gr-buendel .gr-bnd-kopf button[data-bsort='tco']")
     seite.wait_for_timeout(120)
     reihe = _reihe(seite)
-    assert [z[0] for z in reihe] == ["congstar", "o2", "Vodafone", "1&1"], \
-        reihe
+    assert [z[0] for z in reihe] == ["congstar", "o2", "Vodafone", "1&1"], reihe
     # Erst der Zeitraum, dann der Betrag INNERHALB des Zeitraums.
     assert [z[1] for z in reihe] == ["24", "24", "24", "36"], reihe
     je_zeitraum = {}
@@ -350,7 +441,8 @@ def test_die_sortierung_stellt_zwei_zeitraeume_nicht_in_einen_rang(seite):
     assert len(reihe) == 4, reihe
     etikett = seite.eval_on_selector_all(
         "#gr-bndliste .gr-bnd:not([hidden]) .gr-bnd-label",
-        "e => e.map(x => x.textContent.trim())")
+        "e => e.map(x => x.textContent.trim())",
+    )
     assert etikett[-1] == "Kosten über 36 Monate", etikett
 
 
@@ -365,8 +457,7 @@ def test_die_umgekehrte_richtung_dreht_nur_innerhalb_des_zeitraums(seite):
     seite.click(knopf)
     seite.wait_for_timeout(120)
     reihe = _reihe(seite)
-    assert [z[0] for z in reihe] == ["Vodafone", "o2", "congstar", "1&1"], \
-        reihe
+    assert [z[0] for z in reihe] == ["Vodafone", "o2", "congstar", "1&1"], reihe
     assert [z[1] for z in reihe] == ["24", "24", "24", "36"], reihe
 
 
@@ -379,7 +470,8 @@ def test_eine_zeile_ohne_gemessenen_zeitraum_rangiert_hinten_und_bleibt(seite):
     die Sortierung muss ihn trotzdem tragen."""
     seite.eval_on_selector(
         "#gr-bndliste .gr-bnd[data-anbieter='congstar']",
-        "z => z.setAttribute('data-leitzahl-monate', '')")
+        "z => z.setAttribute('data-leitzahl-monate', '')",
+    )
     seite.click("#gr-buendel .gr-bnd-kopf button[data-bsort='tco']")
     seite.wait_for_timeout(120)
     reihe = _reihe(seite)
@@ -403,13 +495,20 @@ def test_die_anbieter_sortierung_bleibt_eine_reine_namensfolge(seite):
 # 4. MITNEHMEN: kein Rueckfall auf die Konstante 24 im Markup
 # --------------------------------------------------------------------------
 
+
 def _zeile_text(karte: dict) -> str:
     """Der Text EINER Buendelzeile am ECHTEN Makro - auch der im
     `<template>`, wo der Rechenweg seit dem P4-Fix liegt (dieselbe Lesart
     wie `tests/test_geraete_laufzeit_auf_der_seite.vorlage_text`)."""
-    zeile = BeautifulSoup(_env().from_string(
-        '{% from "_geraete_buendel.html.j2" import buendelzeile %}'
-        "{{ buendelzeile(k) }}").render(k=karte), "html.parser")
+    zeile = BeautifulSoup(
+        _env()
+        .from_string(
+            '{% from "_geraete_buendel.html.j2" import buendelzeile %}'
+            "{{ buendelzeile(k) }}"
+        )
+        .render(k=karte),
+        "html.parser",
+    )
     return " ".join("".join(zeile.find_all(string=True)).split())
 
 
@@ -418,23 +517,52 @@ def _finanzierungskarte(raten_laufzeit) -> dict:
     ihre `geraetepreis_art` aus dem Quellbuendel uebernimmt
     (`geraete_tco_karten._referenzkarte`) und dabei KEINE Ratenlaufzeit
     mitbringt."""
-    return {"anbieter": "Vodafone", "tarif": "Vodafone Mobil XS",
-            "zustand": "neu", "zustand_etikett": "", "belastbar": True,
-            "label": "Kosten über 24 Monate", "gesamt": 1500.0,
-            "schnitt_monat": 62.5, "laufzeit": 24, "leitzahl_monate": 24,
-            "raten_laufzeit": raten_laufzeit, "tarif_bindung": 24,
-            "geraetepreis": 900.0, "geraetepreis_art": "finanzierung",
-            "zuzahlung": 1.0, "monatlich": 24.99, "rate": 37.46,
-            "raten_summe": 899.0, "buendel_monatlich": None,
-            "anschlusspreis": None, "nach_bindung": 29.99,
-            "gezahlt_nach_24": 1500.0, "offen_nach_24": None,
-            "offene_raten": 0, "eff_ohne_geraet": None, "eff_basis": None,
-            "bestandteile": [], "luecken": [], "boni": [], "delta": None,
-            "delta_kurz": "", "delta_zustand": None, "naeherung": False,
-            "eigen": True, "frisch": True, "alt_marke": "", "sku_id": "x",
-            "quelle_url": "", "abgerufen_am": "", "tarif_quelle_url": "",
-            "band": "xs", "band_gb_text": "", "ab_preis": False,
-            "leer_grund": ""}
+    return {
+        "anbieter": "Vodafone",
+        "tarif": "Vodafone Mobil XS",
+        "zustand": "neu",
+        "zustand_etikett": "",
+        "belastbar": True,
+        "label": "Kosten über 24 Monate",
+        "gesamt": 1500.0,
+        "schnitt_monat": 62.5,
+        "laufzeit": 24,
+        "leitzahl_monate": 24,
+        "raten_laufzeit": raten_laufzeit,
+        "tarif_bindung": 24,
+        "geraetepreis": 900.0,
+        "geraetepreis_art": "finanzierung",
+        "zuzahlung": 1.0,
+        "monatlich": 24.99,
+        "rate": 37.46,
+        "raten_summe": 899.0,
+        "buendel_monatlich": None,
+        "anschlusspreis": None,
+        "nach_bindung": 29.99,
+        "gezahlt_nach_24": 1500.0,
+        "offen_nach_24": None,
+        "offene_raten": 0,
+        "eff_ohne_geraet": None,
+        "eff_basis": None,
+        "bestandteile": [],
+        "luecken": [],
+        "boni": [],
+        "delta": None,
+        "delta_kurz": "",
+        "delta_zustand": None,
+        "naeherung": False,
+        "eigen": True,
+        "frisch": True,
+        "alt_marke": "",
+        "sku_id": "x",
+        "quelle_url": "",
+        "abgerufen_am": "",
+        "tarif_quelle_url": "",
+        "band": "xs",
+        "band_gb_text": "",
+        "ab_preis": False,
+        "leer_grund": "",
+    }
 
 
 def test_ohne_gemessene_ratenzahl_steht_keine_24_im_paradox_satz():
@@ -457,9 +585,15 @@ def test_ohne_gemessene_ratenzahl_steht_keine_24_am_buendelmonatspreis():
     gemessene Laufzeit stand dort "24 Monate" - eine Zahl, die dieser
     Betrag nie getragen hat."""
     karte = _finanzierungskarte(None)
-    karte.update({"buendel_monatlich": 30.0, "geraetepreis": None,
-                  "geraetepreis_art": None, "rate": None,
-                  "raten_summe": None})
+    karte.update(
+        {
+            "buendel_monatlich": 30.0,
+            "geraetepreis": None,
+            "geraetepreis_art": None,
+            "rate": None,
+            "raten_summe": None,
+        }
+    )
     text = _zeile_text(karte)
     assert "zusammen · 24 Monate" not in text, text
     assert "None" not in text, text

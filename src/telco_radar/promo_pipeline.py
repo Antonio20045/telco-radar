@@ -9,6 +9,7 @@ data/state/promo_db.json). Failsafe wie die Differenzierungs-Zweige: ein
 Fehler hier bricht den Gesamtlauf nie ab (siehe pipeline.py, wo dieser Aufruf
 in try/except steht).
 """
+
 from __future__ import annotations
 
 import logging
@@ -36,9 +37,14 @@ def _fetch_one(src, page, http_cfg: dict) -> dict:
     Protokolleintrag beides - `brand` fuer die Zuordnung, `url`/`label` fuer
     die Seite. `leitseite` markiert die Seite, die die Marke auf der
     Uebersicht verlinkt."""
-    rec = {"brand": src.name, "url": page.url, "tier": src.tier,
-           "kind": page.kind, "label": page.label,
-           "leitseite": page.url == src.url}
+    rec = {
+        "brand": src.name,
+        "url": page.url,
+        "tier": src.tier,
+        "kind": page.kind,
+        "label": page.label,
+        "leitseite": page.url == src.url,
+    }
     try:
         snap = fetch_snapshot(page.url, page.kind, http_cfg)
         rec["text"] = snap["text"]
@@ -88,11 +94,17 @@ def _angebote_bestaetigt(results: list[dict]) -> int:
     return sum(r.get("confirmed_items") or 0 for r in results)
 
 
-def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
-                    language: str = "Deutsch", max_workers: int = 4,
-                    settings: dict | None = None,
-                    score_model: str | None = None,
-                    extract_model: str | None = None) -> dict:
+def run_promo_stage(
+    root: Path,
+    http_cfg: dict,
+    use_llm: bool,
+    model: str,
+    language: str = "Deutsch",
+    max_workers: int = 4,
+    settings: dict | None = None,
+    score_model: str | None = None,
+    extract_model: str | None = None,
+) -> dict:
     """Fuehrt den Promo-Uebersicht-Zweig aus. Gibt einen Status-Dict fuer das
     Protokoll zurueck. Wirft nur bei fatalen Konfigurationsfehlern - einzelne
     Quellenfehler werden pro Quelle abgefangen und geloggt.
@@ -118,8 +130,9 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
     auftraege = [(src, page) for src in sources for page in src.crawled_pages]
     fetched: list[dict] = []
     with ThreadPoolExecutor(max_workers=max(1, max_workers)) as pool:
-        futures = [pool.submit(_fetch_one, src, page, http_cfg)
-                   for src, page in auftraege]
+        futures = [
+            pool.submit(_fetch_one, src, page, http_cfg) for src, page in auftraege
+        ]
         for fut in as_completed(futures):
             fetched.append(fut.result())
     fetched.sort(key=lambda r: (r["brand"], not r["leitseite"], r["url"]))
@@ -143,8 +156,12 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
     results: list[dict] = []
     for rec in fetched:
         if rec.get("status") == "fail":
-            log.warning("Promo-Snapshot fehlgeschlagen (%s / %s): %s",
-                       rec["brand"], rec["url"], rec.get("error"))
+            log.warning(
+                "Promo-Snapshot fehlgeschlagen (%s / %s): %s",
+                rec["brand"],
+                rec["url"],
+                rec.get("error"),
+            )
             results.append(rec)
             continue
         src_name, text, h = rec["brand"], rec.pop("text"), rec.pop("hash")
@@ -168,7 +185,9 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
         # weiterhin genau ein Motiv.
         seiten_bilder = rec.pop("images", []) + (
             [{"src": image_url, "anchor": "", "context": "", "hint_w": 0}]
-            if image_url else [])
+            if image_url
+            else []
+        )
         for kandidat in seiten_bilder:
             kandidat["page"] = page_url
         bild_kandidaten.setdefault(src_name, []).extend(seiten_bilder)
@@ -199,8 +218,9 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
                 # Promo-Redaktion unten (promo_editor.synthesize) bleibt auf
                 # dem Redaktionsmodell - dieselbe Trennung wie in der
                 # Hauptpipeline (_mechanik_modell).
-                items = extract_promos(src_name, text,
-                                       extract_model or model, links=links)
+                items = extract_promos(
+                    src_name, text, extract_model or model, links=links
+                )
                 for it in items:
                     it["tier"] = rec["tier"]
                     it["url"] = _resolve_item_url(it.get("url"), page_url)
@@ -221,26 +241,39 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
             # API-Aussetzers Richtung "ausgelaufen" zu schieben.
             rec["status"] = "extraktion_fehlgeschlagen"
             rec["error"] = str(exc)
-            log.warning("Promo-Extraktion fehlgeschlagen (%s / %s): %s - "
-                        "Angebote dieser Seite bleiben unveraendert",
-                        src_name, page_url, rec["error"])
+            log.warning(
+                "Promo-Extraktion fehlgeschlagen (%s / %s): %s - "
+                "Angebote dieser Seite bleiben unveraendert",
+                src_name,
+                page_url,
+                rec["error"],
+            )
         except Exception as exc:  # noqa: BLE001
             rec["status"] = "fail"
             rec["error"] = f"{type(exc).__name__}: {str(exc)[:140]}"
-            log.warning("Promo-Verarbeitung fehlgeschlagen (%s / %s): %s",
-                       src_name, page_url, rec["error"])
+            log.warning(
+                "Promo-Verarbeitung fehlgeschlagen (%s / %s): %s",
+                src_name,
+                page_url,
+                rec["error"],
+            )
         results.append(rec)
 
     # Alterung erst NACH allen Seiten einer Marke, und nur fuer die Seiten,
     # die diesmal wirklich neu gelesen wurden (siehe PromoDB.mark_stale).
     for brand, seiten in gepruefte_seiten.items():
         src = by_name.get(brand)
-        db.mark_stale(brand, gesehene_ids.get(brand, set()), today,
-                      gepruefte_seiten=seiten,
-                      leitseite=src.url if src else "")
+        db.mark_stale(
+            brand,
+            gesehene_ids.get(brand, set()),
+            today,
+            gepruefte_seiten=seiten,
+            leitseite=src.url if src else "",
+        )
 
     entfernt = snap_store.prune(
-        snapshot_key(s.name, p.url) for s in sources for p in s.crawled_pages)
+        snapshot_key(s.name, p.url) for s in sources for p in s.crawled_pages
+    )
     if entfernt:
         log.info("Promo-Snapshots: %d veraltete Schluessel entfernt", entfernt)
     snap_store.save()
@@ -256,15 +289,24 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
     score_summary: dict = {}
     try:
         score_summary = promo_ranker.score_all(
-            list(db.entries.values()), promo_cfg.sources, today,
-            model=score_model or model, use_llm=use_llm, settings=settings,
-            max_workers=max_workers)
-        log.info("Promo-Bewertung: %d Angebote bewertet, %d neu beurteilt, "
-                 "%d ohne Urteil, %d Highlights (Schwelle %d/%d)",
-                 score_summary.get("scored", 0), score_summary.get("judged_new", 0),
-                 score_summary.get("judged_failed", 0),
-                 score_summary.get("highlights", 0),
-                 score_summary.get("enter", 0), score_summary.get("exit", 0))
+            list(db.entries.values()),
+            promo_cfg.sources,
+            today,
+            model=score_model or model,
+            use_llm=use_llm,
+            settings=settings,
+            max_workers=max_workers,
+        )
+        log.info(
+            "Promo-Bewertung: %d Angebote bewertet, %d neu beurteilt, "
+            "%d ohne Urteil, %d Highlights (Schwelle %d/%d)",
+            score_summary.get("scored", 0),
+            score_summary.get("judged_new", 0),
+            score_summary.get("judged_failed", 0),
+            score_summary.get("highlights", 0),
+            score_summary.get("enter", 0),
+            score_summary.get("exit", 0),
+        )
     except Exception as exc:  # noqa: BLE001
         log.warning("Promo-Bewertung uebersprungen: %s", str(exc)[:160])
 
@@ -279,25 +321,32 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
         if not kandidaten:
             continue
         sichtbar = sorted(
-            (e for e in db.entries.values()
-             if e.get("brand") == brand
-             and e.get("status") in ("aktiv", "evtl. ausgelaufen")),
-            key=lambda e: -(e.get("score") or 0))
+            (
+                e
+                for e in db.entries.values()
+                if e.get("brand") == brand
+                and e.get("status") in ("aktiv", "evtl. ausgelaufen")
+            ),
+            key=lambda e: -(e.get("score") or 0),
+        )
         if not sichtbar:
             continue
         try:
             zuordnung = promo_bilder.zuordnen(
-                sichtbar, kandidaten,
-                leitseite=by_name[brand].url if brand in by_name else "")
-            bilder_bilanz.update(
-                promo_bilder.hole_bilder(zuordnung, db.entries, root))
+                sichtbar,
+                kandidaten,
+                leitseite=by_name[brand].url if brand in by_name else "",
+            )
+            bilder_bilanz.update(promo_bilder.hole_bilder(zuordnung, db.entries, root))
         except Exception as exc:  # noqa: BLE001
             log.warning("Promo-Bilder (%s) uebersprungen: %s", brand, str(exc)[:160])
     if bilder_bilanz:
-        log.info("Promo-Bilder: %d von %d Angeboten haben eins (%s)",
-                 bilder_bilanz["geladen"] + bilder_bilanz["unveraendert"],
-                 bilder_bilanz["geprueft"],
-                 ", ".join(f"{k}={v}" for k, v in sorted(bilder_bilanz.items())))
+        log.info(
+            "Promo-Bilder: %d von %d Angeboten haben eins (%s)",
+            bilder_bilanz["geladen"] + bilder_bilanz["unveraendert"],
+            bilder_bilanz["geprueft"],
+            ", ".join(f"{k}={v}" for k, v in sorted(bilder_bilanz.items())),
+        )
     promo_bilder.raeume_auf(root, list(db.entries.values()))
 
     db.save(today)
@@ -311,43 +360,65 @@ def run_promo_stage(root: Path, http_cfg: dict, use_llm: bool, model: str,
             body = promo_editor.build_digest(entries)
             mode = "Regelbericht"
     except Exception as exc:  # noqa: BLE001
-        log.warning("Promo-Redaktion fehlgeschlagen (%s) - verwende Regelbericht",
-                   str(exc)[:160])
+        log.warning(
+            "Promo-Redaktion fehlgeschlagen (%s) - verwende Regelbericht",
+            str(exc)[:160],
+        )
         body = promo_editor.build_digest(entries)
         mode = "Regelbericht (Fallback)"
 
     (reports_dir / f"{today}.md").write_text(body, encoding="utf-8")
     active = sum(1 for e in entries if e.get("status") == "aktiv")
     zaehler = Counter(r.get("status") for r in results)
-    log.info("Promo-Uebersicht: %s (%d aktive Aktionen, %d Marken / %d Seiten "
-             "abgefragt: %s)",
-             mode, active, len(sources), len(auftraege),
-             ", ".join(f"{n}x {s}" for s, n in sorted(zaehler.items())))
+    log.info(
+        "Promo-Uebersicht: %s (%d aktive Aktionen, %d Marken / %d Seiten "
+        "abgefragt: %s)",
+        mode,
+        active,
+        len(sources),
+        len(auftraege),
+        ", ".join(f"{n}x {s}" for s, n in sorted(zaehler.items())),
+    )
     # Gescheiterte Extraktionen einzeln benennen. Ein Sammelzaehler reicht
     # hier nicht: nach Lauf #83 war unklar, ob Telekom nichts LIEFERTE oder
     # ob die Extraktion scheiterte - und genau diese Frage entscheidet, ob
     # eine Quelle taugt oder nur gerade Pech hatte.
     gescheitert = [r for r in results if r.get("status") == "extraktion_fehlgeschlagen"]
     if gescheitert:
-        log.warning("Promo: %d Seite(n) mit gescheiterter Extraktion - ihre "
-                    "Angebote wurden NICHT gealtert: %s", len(gescheitert),
-                    "; ".join(f"{r['brand']} {r['url']} ({r.get('error','')})"
-                              for r in gescheitert))
+        log.warning(
+            "Promo: %d Seite(n) mit gescheiterter Extraktion - ihre "
+            "Angebote wurden NICHT gealtert: %s",
+            len(gescheitert),
+            "; ".join(
+                f"{r['brand']} {r['url']} ({r.get('error', '')})" for r in gescheitert
+            ),
+        )
     # Wie viele Seiten haben wirklich etwas beigetragen? Die Zahl beantwortet
     # die Frage, um die es beim Ausbau geht - eine Seite, die ueber Wochen
     # 0 Angebote liefert, ist Ballast.
     ergiebig = sum(1 for r in results if r.get("extracted"))
-    log.info("Promo-Ergiebigkeit: %d von %d gelesenen Seiten lieferten "
-             "mindestens ein Angebot", ergiebig, zaehler.get("ok", 0))
+    log.info(
+        "Promo-Ergiebigkeit: %d von %d gelesenen Seiten lieferten "
+        "mindestens ein Angebot",
+        ergiebig,
+        zaehler.get("ok", 0),
+    )
     # Drei Zahlen fuers Laufprotokoll (pipeline.py::stats, siehe dort): der
     # Ausfall seit dem 14.08.2026 (Strategie 2026-08-27, B6) stand sonst in
     # KEINER Statistik, nur im Actions-Log, das niemand liest.
-    return {"mode": mode, "sources": results, "db_size": len(db), "active": active,
-            "images": dict(bilder_bilanz),
-            "brands": len(sources), "pages": len(auftraege),
-            "status": dict(zaehler), "ergiebig": ergiebig,
-            "extraktion_fehlgeschlagen": len(gescheitert),
-            "seiten_gelesen": _seiten_gelesen(zaehler, len(auftraege)),
-            "angebote_neu": _angebote_neu(results),
-            "angebote_bestaetigt": _angebote_bestaetigt(results),
-            "score": score_summary}
+    return {
+        "mode": mode,
+        "sources": results,
+        "db_size": len(db),
+        "active": active,
+        "images": dict(bilder_bilanz),
+        "brands": len(sources),
+        "pages": len(auftraege),
+        "status": dict(zaehler),
+        "ergiebig": ergiebig,
+        "extraktion_fehlgeschlagen": len(gescheitert),
+        "seiten_gelesen": _seiten_gelesen(zaehler, len(auftraege)),
+        "angebote_neu": _angebote_neu(results),
+        "angebote_bestaetigt": _angebote_bestaetigt(results),
+        "score": score_summary,
+    }

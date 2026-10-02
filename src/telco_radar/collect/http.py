@@ -9,6 +9,7 @@ shared cloud IPs with 429/503. We retry those a couple of times with a short
 backoff, which clears the transient throttling that happens when many feeds
 fire at once. A UA swap cannot fix a 5xx, so we do not waste a second UA on it.
 """
+
 from __future__ import annotations
 
 import logging
@@ -22,8 +23,10 @@ import httpx
 
 log = logging.getLogger(__name__)
 
-BROWSER_UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-              "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36")
+BROWSER_UA = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+)
 BOT_UA = "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
 
 # Kopfzeilen, die ein echter Chrome mitschickt und ein Skript typischerweise
@@ -54,6 +57,7 @@ _CLIENT_HINTS = {
     "Upgrade-Insecure-Requests": "1",
 }
 
+
 # --------------------------------------------------------------------------- #
 # Wurzelzertifikate
 #
@@ -69,15 +73,16 @@ _CLIENT_HINTS = {
 def _ca_bundle():
     try:
         import certifi
+
         return certifi.where()
     except ImportError:  # pragma: no cover - certifi steht in requirements.txt
         log.warning("certifi fehlt - benutze den Zertifikatsspeicher des Systems")
         return True
 
 
-_UA_SWAP_STATUSES = {403, 406}            # try the other UA
+_UA_SWAP_STATUSES = {403, 406}  # try the other UA
 _BACKOFF_STATUSES = {429, 500, 502, 503}  # transient -> retry same UA, then give up
-_BACKOFF_WAITS = (4.0, 9.0)               # waits used *between* retries
+_BACKOFF_WAITS = (4.0, 9.0)  # waits used *between* retries
 
 
 def _ist_ehrliche_kennung(ua: str) -> bool:
@@ -120,6 +125,7 @@ def _ist_ehrliche_kennung(ua: str) -> bool:
 # Collectors (rss.py holt bei kaputtem XML bis zu drei Mal) und die
 # Folgeabrufe der Newsroom-Parser mitgezaehlt werden.
 # --------------------------------------------------------------------------- #
+
 
 class HostGate:
     """Begrenzt gleichzeitige Abrufe je Host und haelt einen Mindestabstand."""
@@ -181,8 +187,11 @@ def configure_throttle(max_parallel: int, min_interval: float) -> HostGate:
     """Host-Drosselung fuer diesen Prozess setzen (aus settings.yaml)."""
     global _gate
     _gate = HostGate(max_parallel=max_parallel, min_interval=min_interval)
-    log.info("Host-Drosselung: max. %d gleichzeitig je Host, min. %.1fs Abstand",
-             _gate.max_parallel, _gate.min_interval)
+    log.info(
+        "Host-Drosselung: max. %d gleichzeitig je Host, min. %.1fs Abstand",
+        _gate.max_parallel,
+        _gate.min_interval,
+    )
     return _gate
 
 
@@ -227,10 +236,13 @@ def _frist_abgelaufen() -> bool:
     return ende is not None and time.monotonic() >= ende
 
 
-def fetch(url: str, http_cfg: dict,
-          timeout_override: float | None = None,
-          extra_headers: dict | None = None,
-          schnell: bool = False) -> httpx.Response:
+def fetch(
+    url: str,
+    http_cfg: dict,
+    timeout_override: float | None = None,
+    extra_headers: dict | None = None,
+    schnell: bool = False,
+) -> httpx.Response:
     """GET with UA fallback + short backoff on rate limits.
 
     `schnell=True` schaltet beides ab: ein User-Agent, ein Versuch, kein
@@ -259,7 +271,7 @@ def fetch(url: str, http_cfg: dict,
         headers = {
             "User-Agent": ua,
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,"
-                      "application/rss+xml;q=0.9,application/atom+xml;q=0.9,*/*;q=0.8",
+            "application/rss+xml;q=0.9,application/atom+xml;q=0.9,*/*;q=0.8",
             # Deutsch zuerst. Die Quellenliste ist seit Session 5 mehrsprachig,
             # und eine Seite, die nach Accept-Language ausliefert, gab bisher
             # ihre englische Fassung heraus - auch bei einer deutschen Quelle.
@@ -284,17 +296,26 @@ def fetch(url: str, http_cfg: dict,
                 break
             try:
                 with _gate.slot(url):
-                    resp = httpx.get(url, timeout=timeout, headers=headers,
-                                     follow_redirects=True, verify=_ca_bundle())
+                    resp = httpx.get(
+                        url,
+                        timeout=timeout,
+                        headers=headers,
+                        follow_redirects=True,
+                        verify=_ca_bundle(),
+                    )
                 if resp.status_code in _UA_SWAP_STATUSES:
                     last_exc = httpx.HTTPStatusError(
                         f"{resp.status_code} with UA '{ua[:24]}...'",
-                        request=resp.request, response=resp)
+                        request=resp.request,
+                        response=resp,
+                    )
                     break  # try the other UA (no backoff)
                 if resp.status_code in _BACKOFF_STATUSES:
                     last_exc = httpx.HTTPStatusError(
                         f"status {resp.status_code}",
-                        request=resp.request, response=resp)
+                        request=resp.request,
+                        response=resp,
+                    )
                     continue  # transient -> back off and retry same UA
                 resp.raise_for_status()
                 return resp
@@ -302,9 +323,11 @@ def fetch(url: str, http_cfg: dict,
                 last_exc = exc
                 continue
         # if the last failure was a transient 5xx/429, a UA swap won't help
-        if isinstance(last_exc, httpx.HTTPStatusError) and \
-                last_exc.response is not None and \
-                last_exc.response.status_code in _BACKOFF_STATUSES:
+        if (
+            isinstance(last_exc, httpx.HTTPStatusError)
+            and last_exc.response is not None
+            and last_exc.response.status_code in _BACKOFF_STATUSES
+        ):
             break
         if _frist_abgelaufen():
             break

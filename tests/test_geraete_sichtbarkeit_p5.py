@@ -22,6 +22,7 @@ Der Live-Fall iPhone 18 am echten Bestand steht in der Notiz
 `outputs/strategie-geraete-v3-2026-09-17/p5/notiz-e1-sichtbarkeit.md`;
 diese Datei ist die Fixture-Seite derselben Regel.
 """
+
 from __future__ import annotations
 
 import json
@@ -37,40 +38,59 @@ from test_geraete_zeitreihe_ansicht import HEUTE, _baue, _sku
 
 # Dasselbe Auto-Eintrag-Format wie in test_geraete_zeitreihe_ansicht: State,
 # nicht Config - der Produktionsweg der E4-Auto-Erkennung.
-_AUTO_EINTRAG = {"hersteller": "Apple", "modell": "iPad Pro 13",
-                 "generation": None, "speicher": [256], "auto": "2026-09-15"}
+_AUTO_EINTRAG = {
+    "hersteller": "Apple",
+    "modell": "iPad Pro 13",
+    "generation": None,
+    "speicher": [256],
+    "auto": "2026-09-15",
+}
 _GID, _SPEICHER = "apple-ipad-pro-13", 256
 _MID = f"{_GID}-{_SPEICHER}"
 _TARIF_ID, _TARIF = "o2:klein", "O2 Mobile Klein"
 
 
-def _baue_buendel_modell(tmp_path: pathlib.Path, messtage: list[str],
-                         mit_listung: bool = False):
+def _baue_buendel_modell(
+    tmp_path: pathlib.Path, messtage: list[str], mit_listung: bool = False
+):
     """Ein AUTO-Modell mit o2-Bündel im Band XS, N Bündel-Messtagen und
     (wahlweise) OHNE jede Listung - der gemessene iPhone-18-Weg vom 17.09.:
     die Bündel kamen an, die Listung stand noch nicht."""
     root, state = _baue(tmp_path)
     (state / "geraete_katalog_auto.json").write_text(
-        json.dumps({"geraete": [_AUTO_EINTRAG]}, ensure_ascii=False),
-        encoding="utf-8")
+        json.dumps({"geraete": [_AUTO_EINTRAG]}, ensure_ascii=False), encoding="utf-8"
+    )
 
     if mit_listung:
         db = json.loads((state / "geraete_db.json").read_text(encoding="utf-8"))
-        db["listungen"].append({
-            "id": f"o2--{_sku(_GID, _SPEICHER)}",
-            "sku_id": _sku(_GID, _SPEICHER), "device_id": _GID,
-            "anbieter": "o2", "anbieter_typ": "netzbetreiber", "netz": "o2",
-            "speicher_gb": _SPEICHER, "farbe_roh": "Silber",
-            "farbe_normalisiert": "silber", "zustand": "neu",
-            "first_seen": "2026-09-15", "last_verified": HEUTE,
-            "status": "aktiv", "missed_checks": 0,
-            "preis_ohne_vertrag": 1199.00, "erstpreis": 1199.00,
-            "erstpreis_art": "ohne_vertrag", "erstpreis_am": "2026-09-15",
-            "quelle_url": "https://example.de/o2/ipad-pro-13",
-            "abgerufen_am": HEUTE, "verfuegbarkeit": "lieferbar",
-            "confidence": "hoch", "einstiege": ["https://example.de/l"]})
-        (state / "geraete_db.json").write_text(json.dumps(db),
-                                               encoding="utf-8")
+        db["listungen"].append(
+            {
+                "id": f"o2--{_sku(_GID, _SPEICHER)}",
+                "sku_id": _sku(_GID, _SPEICHER),
+                "device_id": _GID,
+                "anbieter": "o2",
+                "anbieter_typ": "netzbetreiber",
+                "netz": "o2",
+                "speicher_gb": _SPEICHER,
+                "farbe_roh": "Silber",
+                "farbe_normalisiert": "silber",
+                "zustand": "neu",
+                "first_seen": "2026-09-15",
+                "last_verified": HEUTE,
+                "status": "aktiv",
+                "missed_checks": 0,
+                "preis_ohne_vertrag": 1199.00,
+                "erstpreis": 1199.00,
+                "erstpreis_art": "ohne_vertrag",
+                "erstpreis_am": "2026-09-15",
+                "quelle_url": "https://example.de/o2/ipad-pro-13",
+                "abgerufen_am": HEUTE,
+                "verfuegbarkeit": "lieferbar",
+                "confidence": "hoch",
+                "einstiege": ["https://example.de/l"],
+            }
+        )
+        (state / "geraete_db.json").write_text(json.dumps(db), encoding="utf-8")
 
     tco = json.loads((state / "geraete_tco.json").read_text(encoding="utf-8"))
     buendel_id = f"buendel--o2--{_sku(_GID, _SPEICHER)}--{_TARIF_ID}"
@@ -80,42 +100,79 @@ def _baue_buendel_modell(tmp_path: pathlib.Path, messtage: list[str],
     # nach der Heimregel "Tag 1 ist gespeichert" kommt sie im Bestand
     # nicht vor.)
     if messtage:
-        tco["buendel"].append({
-            "id": buendel_id, "sku_id": _sku(_GID, _SPEICHER),
-            "anbieter": "o2", "tarif_name": _TARIF, "tarif_id": _TARIF_ID,
-            "tarif_id_guete": "hoch", "tarif_monatlich": 20.0,
-            "geraet_zuzahlung": 1.0, "geraet_monatsrate": 25.0,
-            "laufzeit_monate": 24, "anschlusspreis": 0.0, "zustand": "neu",
-            "rabatte": [], "quelle_url": "https://example.de/o2/ipad",
-            "abgerufen_am": HEUTE, "first_seen": "2026-09-15",
-            "last_verified": HEUTE})
-        (state / "geraete_tco.json").write_text(json.dumps(tco),
-                                                encoding="utf-8")
+        tco["buendel"].append(
+            {
+                "id": buendel_id,
+                "sku_id": _sku(_GID, _SPEICHER),
+                "anbieter": "o2",
+                "tarif_name": _TARIF,
+                "tarif_id": _TARIF_ID,
+                "tarif_id_guete": "hoch",
+                "tarif_monatlich": 20.0,
+                "geraet_zuzahlung": 1.0,
+                "geraet_monatsrate": 25.0,
+                "laufzeit_monate": 24,
+                "anschlusspreis": 0.0,
+                "zustand": "neu",
+                "rabatte": [],
+                "quelle_url": "https://example.de/o2/ipad",
+                "abgerufen_am": HEUTE,
+                "first_seen": "2026-09-15",
+                "last_verified": HEUTE,
+            }
+        )
+        (state / "geraete_tco.json").write_text(json.dumps(tco), encoding="utf-8")
 
-    zeilen = (state / "geraete_tco_historie.jsonl") \
-        .read_text(encoding="utf-8").splitlines()
+    zeilen = (
+        (state / "geraete_tco_historie.jsonl").read_text(encoding="utf-8").splitlines()
+    )
     for tag in messtage:
-        zeilen.append(json.dumps({
-            "id": buendel_id, "datum": tag, "tarif_id": _TARIF_ID,
-            "tarif_id_guete": "hoch", "tarif_monatlich": 20.0,
-            "geraet_zuzahlung": 1.0, "geraet_monatsrate": 25.0,
-            "laufzeit_monate": 24, "anschlusspreis": 0.0,
-            "quelle_url": "https://example.de/o2/ipad", "abgerufen_am": tag,
-            "zustand": "neu", "gesamt": 1400.00,
-            "sku_id": _sku(_GID, _SPEICHER)}))
+        zeilen.append(
+            json.dumps(
+                {
+                    "id": buendel_id,
+                    "datum": tag,
+                    "tarif_id": _TARIF_ID,
+                    "tarif_id_guete": "hoch",
+                    "tarif_monatlich": 20.0,
+                    "geraet_zuzahlung": 1.0,
+                    "geraet_monatsrate": 25.0,
+                    "laufzeit_monate": 24,
+                    "anschlusspreis": 0.0,
+                    "quelle_url": "https://example.de/o2/ipad",
+                    "abgerufen_am": tag,
+                    "zustand": "neu",
+                    "gesamt": 1400.00,
+                    "sku_id": _sku(_GID, _SPEICHER),
+                }
+            )
+        )
     (state / "geraete_tco_historie.jsonl").write_text(
-        "\n".join(z for z in zeilen if z) + "\n", encoding="utf-8")
+        "\n".join(z for z in zeilen if z) + "\n", encoding="utf-8"
+    )
 
     tarife = (state / "tarife.jsonl").read_text(encoding="utf-8").splitlines()
-    tarife.append(json.dumps({
-        "anbieter": "o2", "name": _TARIF, "tarif_id": _TARIF_ID,
-        "art": "mobilfunk", "grundgebuehr": 20.0, "laufzeit_monate": 24,
-        "datenvolumen_gb": 10,
-        "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": 20.0}],
-        "dokument_url": "https://example.de/pib/klein",
-        "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}}))
+    tarife.append(
+        json.dumps(
+            {
+                "anbieter": "o2",
+                "name": _TARIF,
+                "tarif_id": _TARIF_ID,
+                "art": "mobilfunk",
+                "grundgebuehr": 20.0,
+                "laufzeit_monate": 24,
+                "datenvolumen_gb": 10,
+                "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": 20.0}],
+                "dokument_url": "https://example.de/pib/klein",
+                "abgerufen_am": HEUTE,
+                "confidence": {},
+                "fundstellen": {},
+            }
+        )
+    )
     (state / "tarife.jsonl").write_text(
-        "\n".join(z for z in tarife if z) + "\n", encoding="utf-8")
+        "\n".join(z for z in tarife if z) + "\n", encoding="utf-8"
+    )
     return root, state
 
 
@@ -123,15 +180,24 @@ def _rendern(root: pathlib.Path) -> tuple[BeautifulSoup, dict]:
     """Site rendern und (geraete.html als Suppe, Zeitreihen-Wahl-Knoten)."""
     reports = root / "data" / "reports"
     reports.mkdir(parents=True, exist_ok=True)
-    (reports / f"{HEUTE}.json").write_text(json.dumps({
-        "date": HEUTE, "language": "de",
-        "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
-        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{HEUTE}.json").write_text(
+        json.dumps(
+            {
+                "date": HEUTE,
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     (reports / f"{HEUTE}.md").write_text("# B\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
-    suppe = BeautifulSoup((site / "geraete.html").read_text(encoding="utf-8"),
-                          "html.parser")
+    suppe = BeautifulSoup(
+        (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
+    )
     knoten = suppe.select_one("#gr-zeitreihe-daten")
     assert knoten is not None, "Zeitreihen-Knoten fehlt - Test prueft nichts"
     return suppe, json.loads(knoten.get_text())
@@ -142,13 +208,20 @@ def _text(el) -> str:
 
 
 def _katalog_zeile(suppe, mid: str):
-    return next((z for z in suppe.select("#gr-katalogtabelle tr.gr-k-zeile")
-                 if z.get("data-modell") == mid), None)
+    return next(
+        (
+            z
+            for z in suppe.select("#gr-katalogtabelle tr.gr-k-zeile")
+            if z.get("data-modell") == mid
+        ),
+        None,
+    )
 
 
 # ==========================================================================
 # (a) Der KATALOG: Bündel ODER Listung genügt
 # ==========================================================================
+
 
 def test_buendel_ohne_listung_mit_einem_mestag_steht_im_katalog(tmp_path):
     """DER gemessene Fall des 17.09. (iPhone 18: 105 Bündel, keine Listung)
@@ -158,13 +231,14 @@ def test_buendel_ohne_listung_mit_einem_mestag_steht_im_katalog(tmp_path):
     Preis" gilt seit P5 auch für den Bündel-weg) und OHNE toten
     Graph-Sprung: es ist nicht waehlbar, die Luecke heisst beim Namen."""
     root, state = _baue_buendel_modell(tmp_path, ["2026-09-15"])
-    g = geraete_view.aufbereiten(state, lade_quellen(root),
-                                 lade_katalog(root), heute=HEUTE)
+    g = geraete_view.aufbereiten(
+        state, lade_quellen(root), lade_katalog(root), heute=HEUTE
+    )
 
-    zeile = next((z for z in g["katalog_modelle"]
-                  if z["schluessel"] == _MID), None)
-    assert zeile is not None, \
+    zeile = next((z for z in g["katalog_modelle"] if z["schluessel"] == _MID), None)
+    assert zeile is not None, (
         "Bündel ohne Listung ohne Katalog-Zeile - die P5-Regel greift nicht"
+    )
     assert zeile["nur_buendel"] is True
     assert zeile["buendel_monat"] == 45.0, zeile["buendel_monat"]
     assert zeile["buendel_anbieter"] == "o2"
@@ -190,8 +264,9 @@ def test_buendel_ohne_listung_gerendert_luecke_statt_totem_link(tmp_path):
     assert zeile is not None, "Katalog-Zeile fehlt im gerenderten HTML"
     text = _text(zeile)
     assert "nur im Bündel" in text and "€/Monat" in text
-    assert zeile.select_one("a.gr-sprung") is None, \
+    assert zeile.select_one("a.gr-sprung") is None, (
         "toter Graph-Sprung auf ein nicht waehlbares Modell"
+    )
     assert "noch keine Zeitreihe" in text
     # keine Detailzeile: data-auf trifft ins Leere (app.js bewacht das mit
     # `if (p.auf)`), und die Zeile zeigt keinen Aufklapp-Zeiger.
@@ -211,8 +286,9 @@ def test_ab_dem_zweiten_mestag_ist_das_modell_waehlbar_und_verlinkt(tmp_path):
     also mit dem zweiten Nachtlauf VON SELBST in der Zeitreihe: genau die
     Automatik von Antonios Forderung 8."""
     root, state = _baue_buendel_modell(tmp_path, ["2026-09-15", "2026-09-16"])
-    g = geraete_view.aufbereiten(state, lade_quellen(root),
-                                 lade_katalog(root), heute=HEUTE)
+    g = geraete_view.aufbereiten(
+        state, lade_quellen(root), lade_katalog(root), heute=HEUTE
+    )
     suppe, daten = _rendern(root)
 
     erlaubt = {k for k, v in daten["erlaubt"].items() if v}
@@ -223,14 +299,16 @@ def test_ab_dem_zweiten_mestag_ist_das_modell_waehlbar_und_verlinkt(tmp_path):
     sprung = zeile.select_one("a.gr-sprung")
     assert sprung is not None and sprung.get("data-modell") == _MID
     assert "noch keine Zeitreihe" not in _text(zeile)
-    assert next(z for z in g["katalog_modelle"]
-                if z["schluessel"] == _MID)["zr"] is True
+    assert (
+        next(z for z in g["katalog_modelle"] if z["schluessel"] == _MID)["zr"] is True
+    )
 
 
 # ==========================================================================
 # (b) Die Zeitreihen-WAHL: erst ab 2 Bündel-Messtagen - und die 12
 #     bündellosen Auto-Modelle (Watches, Tabs, AirPods) bleiben draussen
 # ==========================================================================
+
 
 def test_buendelloses_auto_modell_mit_listung_steht_nur_im_katalog(tmp_path):
     """Der FM-6.4-Fall: ein Auto-Modell MIT Listung (Tag 1) und OHNE jedes
@@ -242,12 +320,12 @@ def test_buendelloses_auto_modell_mit_listung_steht_nur_im_katalog(tmp_path):
     gemessen"), und derselbe Satz am Modellnamen wäre die zweite Aussage
     für dieselbe Tatsache (Beruhigungsregel: eine Aussage je Ort EINMAL)."""
     root, state = _baue_buendel_modell(tmp_path, [], mit_listung=True)
-    g = geraete_view.aufbereiten(state, lade_quellen(root),
-                                 lade_katalog(root), heute=HEUTE)
+    g = geraete_view.aufbereiten(
+        state, lade_quellen(root), lade_katalog(root), heute=HEUTE
+    )
     suppe, daten = _rendern(root)
 
-    zeile = next((z for z in g["katalog_modelle"]
-                  if z["schluessel"] == _MID), None)
+    zeile = next((z for z in g["katalog_modelle"] if z["schluessel"] == _MID), None)
     assert zeile is not None, "erste Listung genügt für den Katalog"
     assert zeile["listungen"] == 1
     assert zeile["hat_buendel"] is False
@@ -256,19 +334,23 @@ def test_buendelloses_auto_modell_mit_listung_steht_nur_im_katalog(tmp_path):
     erlaubt = {k for k, v in daten["erlaubt"].items() if v}
     assert _MID not in erlaubt
     assert _MID not in {m["id"] for m in daten["suchindex"]}
-    assert all(p["modell"] != _MID for p in
-               geraete_zeitreihe.aufbereiten(state, g["tco"])["paare"])
+    assert all(
+        p["modell"] != _MID
+        for p in geraete_zeitreihe.aufbereiten(state, g["tco"])["paare"]
+    )
 
     gerendert = _katalog_zeile(suppe, _MID)
     assert gerendert is not None
-    assert "noch keine Zeitreihe" not in _text(gerendert), \
+    assert "noch keine Zeitreihe" not in _text(gerendert), (
         "die Lücke verspricht eine Reihe, die ohne Bündel nicht beginnt"
+    )
     assert gerendert.select_one("a.gr-sprung") is None
 
 
 # ==========================================================================
 # (c) R3 der P5-Live-Pruefung: der Neu-Hinweis am Ort der Wahl
 # ==========================================================================
+
 
 def test_wahl_knoten_traegt_die_neuen_modelle_mit_datum(tmp_path):
     """Der Wahl-Knoten (#gr-zeitreihe-daten) traegt die "noch keine
@@ -281,8 +363,7 @@ def test_wahl_knoten_traegt_die_neuen_modelle_mit_datum(tmp_path):
 
     neu = daten.get("katalog_neu") or []
     treffer = [n for n in neu if n["id"] == _MID]
-    assert len(treffer) == 1, \
-        "das hat_buendel-und-nicht-zr-Modell fehlt im Wahl-Knoten"
+    assert len(treffer) == 1, "das hat_buendel-und-nicht-zr-Modell fehlt im Wahl-Knoten"
     n = treffer[0]
     assert "iPad Pro 13" in n["titel"]
     assert n["iso"] == HEUTE, n

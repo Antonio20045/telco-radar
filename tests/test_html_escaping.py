@@ -12,6 +12,7 @@ dieses Projekt. Mit dem Quellen-Ausbau sind es rund 130 Absender.
 Die vier Stellen mit absichtlich fertigem HTML tragen "| safe" - dieser Test
 haelt beides zusammen fest: Fremdtext wird escaped, die Redaktionsprosa nicht.
 """
+
 from __future__ import annotations
 
 import json
@@ -28,29 +29,44 @@ def test_vorlagen_escapen_wirklich():
     assert env.autoescape("transparenz.html.j2") is True
     assert env.autoescape("woche.html.j2") is True
     assert env.from_string("{{ x }}").render(x="<b>&</b>") in (
-        "&lt;b&gt;&amp;&lt;/b&gt;", "&lt;b&gt;&amp;&lt;/b&gt;")
+        "&lt;b&gt;&amp;&lt;/b&gt;",
+        "&lt;b&gt;&amp;&lt;/b&gt;",
+    )
 
 
 def _bericht(tmp_path, briefing_md: str = "## Auf einen Blick\n\nText.") -> str:
     reports = tmp_path / "reports"
     reports.mkdir(parents=True)
-    (reports / "2026-08-04.json").write_text(json.dumps({
-        "date": "2026-08-04",
-        "generated_with_llm": True,
-        "stats": {"new": 1},
-        "briefing_md": briefing_md,
-        "regions": {"Europa": {"region_summary": "", "highlights": [{
-            "title": BOESER_TITEL,
-            "operator": "Beispiel",
-            "url": "https://example.com/a",
-            "category": "Tarif/Pricing",
-            "relevance": 5,
-            "summary": BOESER_TITEL,
-            "why_it_matters": "Preisdruck.",
-            "date": "2026-08-04",
-            "source": "Beispiel",
-        }]}},
-    }, ensure_ascii=False), encoding="utf-8")
+    (reports / "2026-08-04.json").write_text(
+        json.dumps(
+            {
+                "date": "2026-08-04",
+                "generated_with_llm": True,
+                "stats": {"new": 1},
+                "briefing_md": briefing_md,
+                "regions": {
+                    "Europa": {
+                        "region_summary": "",
+                        "highlights": [
+                            {
+                                "title": BOESER_TITEL,
+                                "operator": "Beispiel",
+                                "url": "https://example.com/a",
+                                "category": "Tarif/Pricing",
+                                "relevance": 5,
+                                "summary": BOESER_TITEL,
+                                "why_it_matters": "Preisdruck.",
+                                "date": "2026-08-04",
+                                "source": "Beispiel",
+                            }
+                        ],
+                    }
+                },
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
     render_site(tmp_path / "site", reports)
     return (tmp_path / "site" / "index.html").read_text(encoding="utf-8")
 
@@ -85,7 +101,9 @@ def test_explorer_json_bleibt_lesbar(tmp_path):
     der Berichtsseite - die Landeseite trug 78,5 KB JSON fuer einen
     zugeklappten Aufklapper."""
     _bericht(tmp_path)
-    html = (tmp_path / "site" / "reports" / "2026-08-04.html").read_text(encoding="utf-8")
+    html = (tmp_path / "site" / "reports" / "2026-08-04.html").read_text(
+        encoding="utf-8"
+    )
     m = re.search(r'id="explorer-data">(.*?)</script>', html, re.S)
     assert m, "Explorer-Daten fehlen"
     daten = json.loads(m.group(1))

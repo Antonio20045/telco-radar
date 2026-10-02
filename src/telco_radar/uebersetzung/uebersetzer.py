@@ -15,6 +15,7 @@ sich in diesem Projekt bewaehrt hat: die Laeufe #83-85 verloren 15 von 19
 Promo-Seiten an Budgets von 1800 bis 3200, weil das Modell seine Denkspur
 mitrechnet und fertig ist, bevor die Antwort anfaengt.
 """
+
 from __future__ import annotations
 
 import logging
@@ -79,7 +80,8 @@ _ABSATZ = re.compile(r"\n\s*\n")
 # Vorreden, die Modelle trotz klarer Anweisung gelegentlich voranstellen.
 _VORREDE = re.compile(
     r"^\s*(hier ist|hier die|uebersetzung|übersetzung|translation)\b[^\n]{0,60}?:\s*",
-    re.I)
+    re.I,
+)
 
 
 def absaetze(text: str) -> list[str]:
@@ -124,7 +126,8 @@ def _pruefe(original: str, deutsch: str) -> None:
     if len(deutsch) < MINDESTANTEIL * len(original):
         raise UebersetzungFehlgeschlagen(
             f"zusammengefasst statt uebersetzt ({len(deutsch)} gegen "
-            f"{len(original)} Zeichen)")
+            f"{len(original)} Zeichen)"
+        )
 
 
 def uebersetze_titel(titel: str, sprache: str, modell: str) -> str:
@@ -135,18 +138,23 @@ def uebersetze_titel(titel: str, sprache: str, modell: str) -> str:
     schlimmer.
     """
     try:
-        antwort = _saeubern(llm.complete(
-            TITEL_SYSTEM,
-            f"Ueberschrift ({sprachname(sprache)}):\n{titel}",
-            modell, max_tokens=16000))
+        antwort = _saeubern(
+            llm.complete(
+                TITEL_SYSTEM,
+                f"Ueberschrift ({sprachname(sprache)}):\n{titel}",
+                modell,
+                max_tokens=16000,
+            )
+        )
     except Exception as exc:  # noqa: BLE001
         log.debug("Titeluebersetzung fehlgeschlagen: %s", exc)
         return ""
     return antwort.splitlines()[0].strip() if antwort else ""
 
 
-def uebersetze(text: str, sprache: str, modell: str,
-               titel: str = "") -> tuple[str, list[str]]:
+def uebersetze(
+    text: str, sprache: str, modell: str, titel: str = ""
+) -> tuple[str, list[str]]:
     """(deutscher Titel, deutsche Absaetze).
 
     Wirft `UebersetzungFehlgeschlagen`, wenn ein Abschnitt ausfaellt oder
@@ -165,13 +173,19 @@ def uebersetze(text: str, sprache: str, modell: str,
         roh = "\n\n".join(abschnitt)
         hinweis = ""
         if len(buendel) > 1:
-            hinweis = (f"\n\n(Dies ist Abschnitt {nr} von {len(buendel)} "
-                       f"eines laengeren Artikels. Uebersetze NUR diesen "
-                       f"Abschnitt, ohne Einleitung und ohne Schlusssatz.)")
-        antwort = _saeubern(llm.complete(
-            SYSTEM,
-            f"Artikeltext ({quelle}):{hinweis}\n\n{roh}",
-            modell, max_tokens=MAX_TOKENS))
+            hinweis = (
+                f"\n\n(Dies ist Abschnitt {nr} von {len(buendel)} "
+                f"eines laengeren Artikels. Uebersetze NUR diesen "
+                f"Abschnitt, ohne Einleitung und ohne Schlusssatz.)"
+            )
+        antwort = _saeubern(
+            llm.complete(
+                SYSTEM,
+                f"Artikeltext ({quelle}):{hinweis}\n\n{roh}",
+                modell,
+                max_tokens=MAX_TOKENS,
+            )
+        )
         _pruefe(roh, antwort)
         ergebnis.extend(absaetze(antwort))
 

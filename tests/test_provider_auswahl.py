@@ -4,6 +4,7 @@ Unter "auto" gewinnt der zuerst gefundene Schluessel. Solange der NVIDIA-
 Schluessel im Repo liegt, kaeme Anthropic damit nie zum Zug - deshalb muss ein
 Anbieterwechsel eine Konfigurationszeile sein und kein Loeschen von Secrets.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -46,8 +47,10 @@ def _aktives_backend(settings: dict) -> str:
     return llm.active_backend()
 
 
-BASIS = {"llm_api_base": "https://nvidia.invalid/v1",
-         "deepseek_api_base": "https://deepseek.invalid"}
+BASIS = {
+    "llm_api_base": "https://nvidia.invalid/v1",
+    "deepseek_api_base": "https://deepseek.invalid",
+}
 
 
 def test_anthropic_gewinnt_trotz_gesetztem_nvidia_schluessel(umgebung):
@@ -61,15 +64,13 @@ def test_openai_erzwingbar_obwohl_bedrock_token_da_ist(umgebung):
 def test_deepseek_benutzt_seine_eigene_basis_url(umgebung):
     """deepseek und openai teilen LLM_API_KEY - nur die URL unterscheidet sie.
     Waere sie falsch, ginge der DeepSeek-Schluessel an NVIDIA."""
-    assert "deepseek.invalid" in _aktives_backend({**BASIS,
-                                                   "llm_provider": "deepseek"})
+    assert "deepseek.invalid" in _aktives_backend({**BASIS, "llm_provider": "deepseek"})
 
 
 def test_wechsel_ueberschreibt_eine_alte_basis_url(umgebung, monkeypatch):
     """Ohne Ueberschreiben bliebe beim Wechsel die alte URL stehen."""
     monkeypatch.setenv("LLM_API_BASE", "https://nvidia.invalid/v1")
-    assert "deepseek.invalid" in _aktives_backend({**BASIS,
-                                                   "llm_provider": "deepseek"})
+    assert "deepseek.invalid" in _aktives_backend({**BASIS, "llm_provider": "deepseek"})
 
 
 def test_deepseek_ohne_basis_url_weicht_nicht_auf_nvidia_aus(umgebung):
@@ -87,8 +88,9 @@ def test_deepseek_ohne_basis_url_weicht_nicht_auf_nvidia_aus(umgebung):
     """
     from telco_radar.pipeline import _waehle_anbieter
 
-    _waehle_anbieter({"llm_api_base": "https://nvidia.invalid/v1",
-                      "llm_provider": "deepseek"})
+    _waehle_anbieter(
+        {"llm_api_base": "https://nvidia.invalid/v1", "llm_provider": "deepseek"}
+    )
     assert not llm._use_openai(), "still auf den NVIDIA-Endpunkt ausgewichen"
     assert not llm._use_bedrock()
 
@@ -100,8 +102,7 @@ def test_deepseek_weicht_nicht_auf_anthropic_aus(umgebung):
     der Prozessumgebung, ein zweiter Aufruf saehe also eine halb abgeraeumte
     Umgebung. Ein Lauf waehlt genau einmal.
     """
-    assert "deepseek.invalid" in _aktives_backend({**BASIS,
-                                                   "llm_provider": "deepseek"})
+    assert "deepseek.invalid" in _aktives_backend({**BASIS, "llm_provider": "deepseek"})
 
 
 def test_bedrock_erzwingbar(umgebung):

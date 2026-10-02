@@ -22,6 +22,7 @@ Zwei getrennte Fehler, beide hier festgenagelt:
 Dazu die dritte Zusicherung, die Antonio am 15.08.2026 verlangt hat: der
 Analyst bekommt den Artikeltext, nicht nur die Ueberschrift.
 """
+
 from __future__ import annotations
 
 import json
@@ -50,10 +51,13 @@ def _highlight(item: Item, **kw) -> dict:
     Die `summary` ist DEUTSCH - das ist der Punkt. Der Analyst schreibt seine
     Bewertung in der Zielsprache, auch zu einem spanischen Artikel.
     """
-    h = {"title": item.title, "url": item.url,
-         "summary": "Der Betreiber hat nach eigenen Angaben eine neue "
-                    "Tarifstruktur mit hoeherem Datenvolumen vorgestellt.",
-         "relevance": 4}
+    h = {
+        "title": item.title,
+        "url": item.url,
+        "summary": "Der Betreiber hat nach eigenen Angaben eine neue "
+        "Tarifstruktur mit hoeherem Datenvolumen vorgestellt.",
+        "relevance": 4,
+    }
     h.update(kw)
     return h
 
@@ -69,7 +73,8 @@ def test_nur_berichtete_meldungen_kommen_in_die_stufe():
 
     assert [i.url for i in raus] == [berichtet.url]
     assert nicht_berichtet not in raus, (
-        "eine Meldung ohne Karte hat keinen Ort fuer den roten Link")
+        "eine Meldung ohne Karte hat keinen Ort fuer den roten Link"
+    )
 
 
 def test_die_zuordnung_trifft_wirklich_und_ist_nicht_bloss_leer():
@@ -78,8 +83,9 @@ def test_die_zuordnung_trifft_wirklich_und_ist_nicht_bloss_leer():
     Ohne diese Zeile wuerde der Test oben auch dann bestehen, wenn
     `berichtete_items` grundsaetzlich `[]` zurueckgaebe.
     """
-    items = [_item(url=f"https://beispiel.test/a/{i}", volltext=SPANISCH)
-             for i in range(5)]
+    items = [
+        _item(url=f"https://beispiel.test/a/{i}", volltext=SPANISCH) for i in range(5)
+    ]
     by_url = {i.url: i for i in items}
     highlights = [_highlight(i) for i in items]
 
@@ -95,8 +101,7 @@ def test_die_reihenfolge_folgt_dem_bericht():
     # Der Bericht sortiert nach Relevanz - die Stufe darf nicht umsortieren.
     reihenfolge = [items[2], items[0], items[3], items[1]]
 
-    raus = stufe_mod.berichtete_items(
-        [_highlight(i) for i in reihenfolge], by_url)
+    raus = stufe_mod.berichtete_items([_highlight(i) for i in reihenfolge], by_url)
 
     assert [i.url for i in raus] == [i.url for i in reihenfolge]
 
@@ -107,8 +112,7 @@ def test_dieselbe_meldung_zweimal_im_bericht_wird_einmal_uebersetzt():
     item = _item(volltext=SPANISCH)
     by_url = {item.url: item}
 
-    raus = stufe_mod.berichtete_items(
-        [_highlight(item), _highlight(item)], by_url)
+    raus = stufe_mod.berichtete_items([_highlight(item), _highlight(item)], by_url)
 
     assert len(raus) == 1
 
@@ -118,7 +122,8 @@ def test_ein_highlight_ohne_item_faellt_weg_statt_zu_werfen():
     item = _item(url="https://beispiel.test/a/1")
     raus = stufe_mod.berichtete_items(
         [_highlight(item), {"url": "https://umgeschrieben.test/x"}, {}],
-        {item.url: item})
+        {item.url: item},
+    )
     assert [i.url for i in raus] == [item.url]
 
 
@@ -139,6 +144,7 @@ def test_die_spracherkennung_bekommt_das_item_nicht_das_highlight():
     # Gegenprobe, dass der Fall wirklich eintritt: die deutsche Fassung des
     # Analysten ist lang genug, dass die Vorauswahl auf ihr messen WUERDE.
     from telco_radar.uebersetzung.sprache import ist_fremdsprachig
+
     assert not ist_fremdsprachig(h["summary"] * 3, h["title"])[0]
     assert ist_fremdsprachig(raus.volltext, raus.title)[0]
 
@@ -152,39 +158,47 @@ def test_der_deckel_schneidet_erst_nach_dem_scan(tmp_path, monkeypatch):
     dieser Test: dort war die Schleife nach drei Kandidaten fertig und der
     spanische Artikel nie gesehen.
     """
-    monkeypatch.setattr(stufe_mod, "uebersetze",
-                        lambda *a, **k: ("Deutscher Titel", ["Ein Absatz."]))
-    monkeypatch.setattr(stufe_mod, "hole_volltext",
-                        lambda item, *a, **k: _feed_ergebnis(item))
+    monkeypatch.setattr(
+        stufe_mod, "uebersetze", lambda *a, **k: ("Deutscher Titel", ["Ein Absatz."])
+    )
+    monkeypatch.setattr(
+        stufe_mod, "hole_volltext", lambda item, *a, **k: _feed_ergebnis(item)
+    )
     textlos = [_item(url=f"https://beispiel.test/leer/{i}") for i in range(9)]
     spanisch = _item(url="https://beispiel.test/es/1", volltext=SPANISCH)
 
-    bilanz = stufe_mod.lauf(textlos + [spanisch], tmp_path,
-                            {"uebersetzung_max_je_lauf": 3}, "modell",
-                            frist_sekunden=30, heute=date(2026, 8, 15))
+    bilanz = stufe_mod.lauf(
+        textlos + [spanisch],
+        tmp_path,
+        {"uebersetzung_max_je_lauf": 3},
+        "modell",
+        frist_sekunden=30,
+        heute=date(2026, 8, 15),
+    )
 
     assert bilanz["uebersetzt"] == 1
     gespeichert = UebersetzungsStore(
-        tmp_path / "data" / "state" / "uebersetzungen.jsonl")
+        tmp_path / "data" / "state" / "uebersetzungen.jsonl"
+    )
     assert gespeichert.get(spanisch.id) is not None, (
         "der einzige fremdsprachige Artikel darf nicht hinter textlosen "
-        "Meldungen im Deckel verhungern")
+        "Meldungen im Deckel verhungern"
+    )
 
 
 def _feed_ergebnis(item):
     """`hole_volltext` ohne Netz: nimmt, was am Item steht."""
     from telco_radar.uebersetzung.volltext import VolltextErgebnis
+
     if item.volltext:
         return VolltextErgebnis(text=item.volltext, herkunft="feed")
     return VolltextErgebnis(grund="kein Fliesstext erkannt")
 
 
-def test_sicher_fremdsprachige_stehen_vor_den_unbestimmten(tmp_path,
-                                                           monkeypatch):
+def test_sicher_fremdsprachige_stehen_vor_den_unbestimmten(tmp_path, monkeypatch):
     """Wer erkannt fremdsprachig ist, wartet nicht hinter einem
     "vielleicht"."""
-    monkeypatch.setattr(stufe_mod, "uebersetze",
-                        lambda *a, **k: ("T", ["A"]))
+    monkeypatch.setattr(stufe_mod, "uebersetze", lambda *a, **k: ("T", ["A"]))
     abgerufen = []
 
     def _merke(item, *a, **k):
@@ -195,22 +209,26 @@ def test_sicher_fremdsprachige_stehen_vor_den_unbestimmten(tmp_path,
     textlos = [_item(url=f"https://beispiel.test/leer/{i}") for i in range(3)]
     spanisch = _item(url="https://beispiel.test/es/1", volltext=SPANISCH)
 
-    stufe_mod.lauf(textlos + [spanisch], tmp_path, {}, "modell",
-                   frist_sekunden=30, heute=date(2026, 8, 15))
+    stufe_mod.lauf(
+        textlos + [spanisch],
+        tmp_path,
+        {},
+        "modell",
+        frist_sekunden=30,
+        heute=date(2026, 8, 15),
+    )
 
     assert abgerufen[0] == spanisch.url
 
 
-def test_englische_kandidaten_stehen_vor_den_unbestimmten(tmp_path,
-                                                           monkeypatch):
+def test_englische_kandidaten_stehen_vor_den_unbestimmten(tmp_path, monkeypatch):
     """Dieselbe Zusicherung wie oben, jetzt fuer Englisch (E5, 27.08.2026).
 
     Vor der Entscheidung war ein englischer Artikel gar kein Kandidat -
     dieser Test haette also gegen den alten Stand keinen englischen Abruf
     gesehen und waere trivial gruen gewesen. Er prueft deshalb zusaetzlich,
     dass der englische Artikel ueberhaupt abgerufen UND uebersetzt wird."""
-    monkeypatch.setattr(stufe_mod, "uebersetze",
-                        lambda *a, **k: ("T", ["A"]))
+    monkeypatch.setattr(stufe_mod, "uebersetze", lambda *a, **k: ("T", ["A"]))
     abgerufen = []
 
     def _merke(item, *a, **k):
@@ -221,27 +239,42 @@ def test_englische_kandidaten_stehen_vor_den_unbestimmten(tmp_path,
     textlos = [_item(url=f"https://beispiel.test/leer/{i}") for i in range(3)]
     englisch = _item(url="https://beispiel.test/en/1", volltext=ENGLISCH)
 
-    bilanz = stufe_mod.lauf(textlos + [englisch], tmp_path, {}, "modell",
-                            frist_sekunden=30, heute=date(2026, 8, 15))
+    bilanz = stufe_mod.lauf(
+        textlos + [englisch],
+        tmp_path,
+        {},
+        "modell",
+        frist_sekunden=30,
+        heute=date(2026, 8, 15),
+    )
 
     assert abgerufen[0] == englisch.url
     assert bilanz["uebersetzt"] == 1
 
 
-def test_deckel_kommt_aus_settings_und_faellt_auf_sechzig_zurueck(tmp_path,
-                                                                   monkeypatch):
+def test_deckel_kommt_aus_settings_und_faellt_auf_sechzig_zurueck(
+    tmp_path, monkeypatch
+):
     """Der Deckel wuchs am 27.08.2026 mit dem Kandidatenstrom von 40 auf 60
     (settings-Schluessel `uebersetzung_max_je_lauf`). Gegen den alten Stand
     (Vorgabe 40) faellt dieser Test: die 45. bis 60. Meldung waeren dort
     ueber dem Deckel geblieben."""
     monkeypatch.setattr(stufe_mod, "uebersetze", lambda *a, **k: ("T", ["A"]))
-    monkeypatch.setattr(stufe_mod, "hole_volltext",
-                        lambda item, *a, **k: _feed_ergebnis(item))
-    items = [_item(url=f"https://beispiel.test/es/{i}", volltext=SPANISCH)
-             for i in range(50)]
+    monkeypatch.setattr(
+        stufe_mod, "hole_volltext", lambda item, *a, **k: _feed_ergebnis(item)
+    )
+    items = [
+        _item(url=f"https://beispiel.test/es/{i}", volltext=SPANISCH) for i in range(50)
+    ]
 
-    bilanz = stufe_mod.lauf(items, tmp_path / "vorgabe", {}, "modell",
-                            frist_sekunden=30, heute=date(2026, 8, 15))
+    bilanz = stufe_mod.lauf(
+        items,
+        tmp_path / "vorgabe",
+        {},
+        "modell",
+        frist_sekunden=30,
+        heute=date(2026, 8, 15),
+    )
 
     assert bilanz["ueber_deckel"] == 0
     assert bilanz["uebersetzt"] == 50
@@ -250,30 +283,42 @@ def test_deckel_kommt_aus_settings_und_faellt_auf_sechzig_zurueck(tmp_path,
     # Eigener Store-Pfad, sonst gelten die 50 Meldungen von oben schon als
     # "schon uebersetzt" und die Vorauswahl sieht sie nie wieder an.
     bilanz_explizit = stufe_mod.lauf(
-        items, tmp_path / "explizit", {"uebersetzung_max_je_lauf": 3},
-        "modell", frist_sekunden=30, heute=date(2026, 8, 15))
+        items,
+        tmp_path / "explizit",
+        {"uebersetzung_max_je_lauf": 3},
+        "modell",
+        frist_sekunden=30,
+        heute=date(2026, 8, 15),
+    )
     assert bilanz_explizit["ueber_deckel"] == 47
 
 
-def test_ueber_deckel_zaehlt_nur_was_wirklich_wegfaellt(tmp_path,
-                                                        monkeypatch):
+def test_ueber_deckel_zaehlt_nur_was_wirklich_wegfaellt(tmp_path, monkeypatch):
     """`ueber_deckel: 887` bei 40 bearbeiteten Meldungen war die Zahl, an der
     der Fehler zu sehen war - sie muss stimmen."""
     monkeypatch.setattr(stufe_mod, "uebersetze", lambda *a, **k: ("T", ["A"]))
-    monkeypatch.setattr(stufe_mod, "hole_volltext",
-                        lambda item, *a, **k: _feed_ergebnis(item))
+    monkeypatch.setattr(
+        stufe_mod, "hole_volltext", lambda item, *a, **k: _feed_ergebnis(item)
+    )
     # Fuenf spanische, zwei deutsche. Die deutschen werden vorgefiltert und
     # stehen deshalb NICHT ueber dem Deckel. (Bis zum 27.08.2026 stand hier
     # Englisch - seit MUTTERSPRACHEN nur noch "de" enthaelt, waere ein
     # englisches Beispiel selbst sicher fremdsprachig, siehe der Test unten.)
-    items = [_item(url=f"https://beispiel.test/es/{i}", volltext=SPANISCH)
-             for i in range(5)]
-    items += [_item(url=f"https://beispiel.test/de/{i}", volltext=DEUTSCH)
-              for i in range(2)]
+    items = [
+        _item(url=f"https://beispiel.test/es/{i}", volltext=SPANISCH) for i in range(5)
+    ]
+    items += [
+        _item(url=f"https://beispiel.test/de/{i}", volltext=DEUTSCH) for i in range(2)
+    ]
 
-    bilanz = stufe_mod.lauf(items, tmp_path, {"uebersetzung_max_je_lauf": 2},
-                            "modell", frist_sekunden=30,
-                            heute=date(2026, 8, 15))
+    bilanz = stufe_mod.lauf(
+        items,
+        tmp_path,
+        {"uebersetzung_max_je_lauf": 2},
+        "modell",
+        frist_sekunden=30,
+        heute=date(2026, 8, 15),
+    )
 
     assert bilanz["angeboten"] == 7
     assert bilanz["vorgefiltert"] == 2
@@ -281,14 +326,16 @@ def test_ueber_deckel_zaehlt_nur_was_wirklich_wegfaellt(tmp_path,
     assert bilanz["uebersetzt"] == 2
     assert bilanz["ueber_deckel"] == 3, (
         "gezaehlt wird, was der Deckel wegschneidet - nicht, was die "
-        "Vorauswahl ohnehin verworfen hat")
+        "Vorauswahl ohnehin verworfen hat"
+    )
 
 
 def test_die_protokollzeile_nennt_die_angebotene_menge():
     """Ohne diese Zahl war im Protokoll nicht zu sehen, dass die Stufe auf
     der falschen Menge lief."""
-    bilanz = stufe_mod.lauf([], "/tmp", {}, "modell", frist_sekunden=1,
-                            heute=date(2026, 8, 15))
+    bilanz = stufe_mod.lauf(
+        [], "/tmp", {}, "modell", frist_sekunden=1, heute=date(2026, 8, 15)
+    )
     assert "berichteten Meldungen" in stufe_mod.protokollzeile(bilanz)
 
 
@@ -320,7 +367,8 @@ def test_ein_langer_artikel_wird_auf_die_grenze_gekappt():
     lang = SPANISCH * 5
     assert len(lang) > agents.ANALYST_TEXT_ZEICHEN, (
         "die Textprobe muss laenger sein als die Grenze, sonst prueft der "
-        "Test die Grenze nicht")
+        "Test die Grenze nicht"
+    )
     item = _item(volltext=lang)
     snippet = json.loads(agents._items_payload([item]))[0]["text"]
     assert len(snippet) == agents.ANALYST_TEXT_ZEICHEN
@@ -356,13 +404,16 @@ def test_ein_stapel_bleibt_im_eingabebudget():
     obwohl das Eingabefenster derselbe geblieben war - der Test haette eine
     Kostenmassnahme als Ueberlauf gemeldet.
     """
-    items = [_item(url=f"https://beispiel.test/a/{i}", volltext="Z" * 40000)
-             for i in range(agents.BATCH_SIZE)]
+    items = [
+        _item(url=f"https://beispiel.test/a/{i}", volltext="Z" * 40000)
+        for i in range(agents.BATCH_SIZE)
+    ]
     nutzlast = agents._items_payload(items)
     # Je Meldung der gekappte Text plus die Metafelder.
     obergrenze = agents.BATCH_SIZE * (agents.ANALYST_TEXT_ZEICHEN + 500)
     assert len(nutzlast) < obergrenze, (
-        "ein Stapel darf das Eingabefenster nicht sprengen")
+        "ein Stapel darf das Eingabefenster nicht sprengen"
+    )
     # Und absolut: ~4 Zeichen je Token, die konfigurierten Modelle tragen
     # 1M Kontext - ein Stapel muss weit darunter bleiben.
     assert len(nutzlast) < 200_000

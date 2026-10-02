@@ -89,6 +89,7 @@ Buendelpreis ohne Tarif zu speichern (verboten, `TcoDB.upsert_buendel`)
 oder den Kachelpreis unter dem Katalognamen abzulegen (eine Zuordnung,
 die keine Quelle so herstellt).
 """
+
 from __future__ import annotations
 
 import logging
@@ -197,8 +198,7 @@ def _laufzeit(kachel) -> tuple[Optional[int], str]:
         if not eingabe.has_attr("checked"):
             continue
         beschriftung = eingabe.find_next("label")
-        titel = _text(beschriftung.find(class_="radio-title")
-                      if beschriftung else None)
+        titel = _text(beschriftung.find(class_="radio-title") if beschriftung else None)
         treffer = _LAUFZEIT_RE.search(titel)
         if treffer:
             return int(treffer.group(1)), titel
@@ -224,8 +224,9 @@ def _buendel_slug(kachel) -> tuple[str, str]:
     return "", ""
 
 
-def tarif_aus_kachel(kachel, *, anbieter: str, seiten_url: str,
-                     abgerufen_am: str) -> Optional[tuple[Tarif, str]]:
+def tarif_aus_kachel(
+    kachel, *, anbieter: str, seiten_url: str, abgerufen_am: str
+) -> Optional[tuple[Tarif, str]]:
     """Eine Preiskachel wird ein Tarif - oder nichts.
 
     Nichts wird sie, wenn Name oder Betrag fehlen oder wenn die Kachel
@@ -242,11 +243,17 @@ def tarif_aus_kachel(kachel, *, anbieter: str, seiten_url: str,
         return None
 
     slug, slug_href = _buendel_slug(kachel)
-    bestellweg = any("directbuy/offer" in (a.get("href") or "")
-                     for a in kachel.find_all("a", href=True))
+    bestellweg = any(
+        "directbuy/offer" in (a.get("href") or "")
+        for a in kachel.find_all("a", href=True)
+    )
     if not slug and not bestellweg:
-        log.info("Preiskachel %r auf %s traegt keinen Bestellweg - kein "
-                 "Tarif dieses Anbieters", name, seiten_url)
+        log.info(
+            "Preiskachel %r auf %s traegt keinen Bestellweg - kein "
+            "Tarif dieses Anbieters",
+            name,
+            seiten_url,
+        )
         return None
 
     preistext = _slot(kachel, "price")
@@ -261,9 +268,13 @@ def tarif_aus_kachel(kachel, *, anbieter: str, seiten_url: str,
     if slug_href:
         rohtext = f"{rohtext} | Handy hinzufügen: {slug_href}"
 
-    tarif = Tarif(anbieter=anbieter, abgerufen_am=abgerufen_am,
-                  rohtext=rohtext, preistyp=PREISTYP_LIVE_SHOP,
-                  dokument_url=seiten_url)
+    tarif = Tarif(
+        anbieter=anbieter,
+        abgerufen_am=abgerufen_am,
+        rohtext=rohtext,
+        preistyp=PREISTYP_LIVE_SHOP,
+        dokument_url=seiten_url,
+    )
     tarif.setze("name", name, name, HOCH)
     tarif.setze("grundgebuehr", betrag, preistext, HOCH)
 
@@ -273,8 +284,7 @@ def tarif_aus_kachel(kachel, *, anbieter: str, seiten_url: str,
 
     volumen = _VOLUMEN_RE.search(volumenzeile)
     if volumen:
-        tarif.setze("datenvolumen_gb", zahl(volumen.group(1)),
-                    volumenzeile, HOCH)
+        tarif.setze("datenvolumen_gb", zahl(volumen.group(1)), volumenzeile, HOCH)
     elif _UNBEGRENZT_RE.match(volumenzeile):
         tarif.setze("datenvolumen_gb", float("inf"), volumenzeile, HOCH)
 
@@ -282,8 +292,7 @@ def tarif_aus_kachel(kachel, *, anbieter: str, seiten_url: str,
         tarif.setze("laufzeit_monate", laufzeit, laufzeittext, HOCH)
 
     if slug:
-        tarif.setze("buendel_slug", slug,
-                    f"Handy hinzufügen: {slug_href}", HOCH)
+        tarif.setze("buendel_slug", slug, f"Handy hinzufügen: {slug_href}", HOCH)
 
     # Der Fingerabdruck haengt an der KACHEL, nicht an der Seite - genau
     # wie in `tarif_ldjson` am Knoten. Zwoelf Tarife auf einer Seite
@@ -294,8 +303,9 @@ def tarif_aus_kachel(kachel, *, anbieter: str, seiten_url: str,
     return tarif, hash_
 
 
-def tarife_aus_html(html: str, *, anbieter: str, seiten_url: str,
-                    abgerufen_am: str) -> list[tuple[Tarif, str]]:
+def tarife_aus_html(
+    html: str, *, anbieter: str, seiten_url: str, abgerufen_am: str
+) -> list[tuple[Tarif, str]]:
     """Alle Tarife, die die Seite in ihren Preiskacheln zeigt.
 
     Gleiche Signatur wie `tarif_ldjson.tarife_aus_html` - der Sammler
@@ -307,9 +317,9 @@ def tarife_aus_html(html: str, *, anbieter: str, seiten_url: str,
     out: list[tuple[Tarif, str]] = []
     gesehen: set[str] = set()
     for kachel in suppe.find_all(class_=_KACHEL_KLASSE):
-        ergebnis = tarif_aus_kachel(kachel, anbieter=anbieter,
-                                    seiten_url=seiten_url,
-                                    abgerufen_am=abgerufen_am)
+        ergebnis = tarif_aus_kachel(
+            kachel, anbieter=anbieter, seiten_url=seiten_url, abgerufen_am=abgerufen_am
+        )
         if ergebnis is None:
             continue
         tarif, hash_ = ergebnis

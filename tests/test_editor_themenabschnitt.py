@@ -10,6 +10,7 @@ Der Abschnitt ist deshalb bedingt: Prompt UND Pflichtpruefung haengen am
 selben Schalter. Ein Lauf ohne Themenmeldungen darf keine Ueberschrift
 verlangen, zu der es nichts zu schreiben gibt.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -33,7 +34,8 @@ Ein Muster.
 MIT_THEMEN = BASIS.replace(
     "## Muster der Woche",
     "## Technologie, Geräte & Regulierung\nQualcomm liefert. "
-    "[Quelle](https://example.com/b)\n\n## Muster der Woche")
+    "[Quelle](https://example.com/b)\n\n## Muster der Woche",
+)
 
 REGIONAL = {"Europa": {"highlights": [{"title": "x"}]}}
 
@@ -45,12 +47,14 @@ def test_ohne_themen_bleibt_die_pflicht_unveraendert():
 def test_mit_themen_ist_der_abschnitt_pflicht():
     with pytest.raises(editor.EditorialBriefingError) as exc:
         editor.validate_editorial_briefing(
-            BASIS, frozenset({editor.THEMEN_UEBERSCHRIFT}))
+            BASIS, frozenset({editor.THEMEN_UEBERSCHRIFT})
+        )
     assert "technologie" in str(exc.value).lower()
 
     # Mit Abschnitt geht derselbe Bericht durch.
     editor.validate_editorial_briefing(
-        MIT_THEMEN, frozenset({editor.THEMEN_UEBERSCHRIFT}))
+        MIT_THEMEN, frozenset({editor.THEMEN_UEBERSCHRIFT})
+    )
 
 
 def test_synthesize_setzt_abschnitt_nur_bei_themen(monkeypatch):
@@ -65,8 +69,9 @@ def test_synthesize_setzt_abschnitt_nur_bei_themen(monkeypatch):
     editor.synthesize(REGIONAL, [], model="m")
     assert "## Technologie, Geräte & Regulierung" not in gesehen[-1]
 
-    editor.synthesize(REGIONAL, [], model="m",
-                      themenbereiche=["KI-Anbieter", "Chips & Modems"])
+    editor.synthesize(
+        REGIONAL, [], model="m", themenbereiche=["KI-Anbieter", "Chips & Modems"]
+    )
     assert "## Technologie, Geräte & Regulierung" in gesehen[-1]
     # Die aktiven Themenfelder stehen namentlich im Prompt, damit der Editor
     # weiss, worueber er den Abschnitt schreibt.
@@ -82,8 +87,9 @@ def test_fehlender_themenabschnitt_loest_korrekturversuch_aus(monkeypatch):
         return antworten.pop(0)
 
     monkeypatch.setattr(editor, "complete", fake_complete)
-    markdown, _ = editor.synthesize(REGIONAL, [], model="m",
-                                    themenbereiche=["KI-Anbieter"])
+    markdown, _ = editor.synthesize(
+        REGIONAL, [], model="m", themenbereiche=["KI-Anbieter"]
+    )
 
     assert "## Technologie, Geräte & Regulierung" in markdown
     assert not antworten  # beide Versuche wurden gebraucht

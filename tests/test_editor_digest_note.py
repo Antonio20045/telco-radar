@@ -4,6 +4,7 @@ Am 25.07.2026 stand auf der oeffentlichen Berichtsseite "ANTHROPIC_API_KEY ist
 nicht gesetzt", obwohl der Key vorhanden war und nur der Provider nicht
 antwortete.
 """
+
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -15,10 +16,19 @@ REGIONS = {"europa": "Europa"}
 
 
 def _items():
-    return {"europa": [Item(
-        title="Testmeldung", url="https://example.com/a",
-        source_name="Test", region="europa", operator="Vodafone",
-        published=datetime(2026, 7, 25, tzinfo=timezone.utc), summary="Text")]}
+    return {
+        "europa": [
+            Item(
+                title="Testmeldung",
+                url="https://example.com/a",
+                source_name="Test",
+                region="europa",
+                operator="Vodafone",
+                published=datetime(2026, 7, 25, tzinfo=timezone.utc),
+                summary="Text",
+            )
+        ]
+    }
 
 
 def test_kein_key_konfiguriert_nennt_die_konfiguration(monkeypatch):

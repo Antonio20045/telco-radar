@@ -1,4 +1,5 @@
 """Benannte Ausfälle beim Bauen der Website."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

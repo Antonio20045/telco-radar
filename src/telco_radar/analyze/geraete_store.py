@@ -25,6 +25,7 @@ DIE ZWEI REGELN, DIE DIESES MODUL TRAGEN
    keinen Preis, schreibt die Historie NICHTS - kein Aenderungspunkt, kein
    "auf null gefallen". Dieselbe Lehre wie beim Tarif-Radar (CLAUDE.md §6).
 """
+
 from __future__ import annotations
 
 import json
@@ -65,10 +66,10 @@ _LAEUFE_BIS_SIM_ONLY = 3
 # entscheidende Frage nicht beantwortet: 0 Zeilen heisst entweder "gelesen,
 # nichts gefunden" - das ist ein Ausfall - oder "gar nicht angefasst" - und
 # das ist keine Aussage, sondern eine Luecke (CLAUDE.md Clean Code 4 und 6).
-GELESEN = "gelesen"                # Einstieg vollstaendig gelesen
-NICHT_GELESEN = "nicht gelesen"    # nicht angefasst: Besuchszeit, nicht
-                                   # crawlbar, kein Adapter
-LESEFEHLER = "lesefehler"          # Leseversuch gescheitert oder abgebrochen
+GELESEN = "gelesen"  # Einstieg vollstaendig gelesen
+NICHT_GELESEN = "nicht gelesen"  # nicht angefasst: Besuchszeit, nicht
+# crawlbar, kein Adapter
+LESEFEHLER = "lesefehler"  # Leseversuch gescheitert oder abgebrochen
 
 # DER VIERTE ZUSTAND (S2-1, 22.09.2026). Bis hierher machte EIN einziger am
 # Besuchsfenster abgewiesener Abruf den GANZEN Anbieter zu NICHT_GELESEN -
@@ -91,8 +92,8 @@ LESEFEHLER = "lesefehler"          # Leseversuch gescheitert oder abgebrochen
 TEILGELESEN = "teilweise gelesen"
 
 # Die drei Alarmarten. Alle sind MELDUNG und greifen in nichts ein.
-ALARM_AUSFALL = "ausfall"          # gestern Zeilen, heute keine
-ALARM_RUECKGANG = "rueckgang"      # heute deutlich weniger Zeilen
+ALARM_AUSFALL = "ausfall"  # gestern Zeilen, heute keine
+ALARM_RUECKGANG = "rueckgang"  # heute deutlich weniger Zeilen
 # DIE DRITTE ART (S2-B, 22.09.2026). Ein Vergleich, der keine Basis mehr
 # hat, ist kein ruhiger Tag - er ist ein blinder Waechter, und das ist
 # selbst eine meldepflichtige Lage. Ohne diese Art verstummte der Kanal
@@ -100,7 +101,7 @@ ALARM_RUECKGANG = "rueckgang"      # heute deutlich weniger Zeilen
 # fiel: ein Anbieter, der nur noch Teiltage liefert, hat nach
 # `_FUND_HISTORIE_TAGE` Tagen keine Basis mehr, und ein echter
 # Totalausfall danach loeste nichts mehr aus.
-ALARM_OHNE_BASIS = "ohne_basis"    # seit Tagen kein vollstaendiger Tag
+ALARM_OHNE_BASIS = "ohne_basis"  # seit Tagen kein vollstaendiger Tag
 # DIE VIERTE ART (S2-2, 22.09.2026). Seit tote Produktadressen eine
 # benannte Luecke sind und keinen Lauf mehr kippen
 # (`collect.geraete._MINDESTANTEIL_GELESENER_PRODUKTSEITEN`), kann ein
@@ -112,7 +113,7 @@ ALARM_OHNE_BASIS = "ohne_basis"    # seit Tagen kein vollstaendiger Tag
 # laut wuerde es erst bei null Zeilen (`ALARM_AUSFALL`), also als Nachruf.
 # Diese Art meldet deshalb den VERLAUF: nicht "heute weniger als gestern",
 # sondern "seit dem aeltesten Messtag im Fenster ist zu viel weg".
-ALARM_EROSION = "erosion"          # Sortiment broeselt ueber Tage weg
+ALARM_EROSION = "erosion"  # Sortiment broeselt ueber Tage weg
 
 # Ab welchem ANTEIL Rueckgang gegenueber dem letzten Liefertag gemeldet
 # wird. 0.30 und ECHT groesser: Sortiments- und Verfuegbarkeitsrauschen
@@ -163,8 +164,14 @@ _EROSION_FENSTER_TAGE = 7
 _FUND_HISTORIE_TAGE = 30
 
 # Die Felder, deren Aenderung einen neuen Historienpunkt rechtfertigt.
-_HISTORIENFELDER = ("preis_ohne_vertrag", "uvp", "preis_mit_vertrag_ab",
-                    "zuzahlung", "tarif_referenz", "verfuegbarkeit")
+_HISTORIENFELDER = (
+    "preis_ohne_vertrag",
+    "uvp",
+    "preis_mit_vertrag_ab",
+    "zuzahlung",
+    "tarif_referenz",
+    "verfuegbarkeit",
+)
 
 # Welche davon ueberhaupt ein Preis sind - der allererste Messpunkt einer
 # Listung wird nur geschrieben, wenn EINER davon einen Wert hat. Frueher
@@ -175,8 +182,7 @@ _PREISFELDER = ("preis_ohne_vertrag", "uvp", "preis_mit_vertrag_ab", "zuzahlung"
 # Die Felder, die die PREISFORM von `preis_ohne_vertrag` beschreiben. Sie
 # gehoeren zusammen und zu genau der Zahl, mit der sie gemessen wurden -
 # siehe `GeraeteDB.upsert`.
-_PREISFORMFELDER = ("anzahlung", "monatsrate", "laufzeit_monate",
-                    "zins_effektiv")
+_PREISFORMFELDER = ("anzahlung", "monatsrate", "laufzeit_monate", "zins_effektiv")
 
 
 def tag_de(iso: str) -> str:
@@ -200,6 +206,7 @@ class Messtag:
     war der Anlass dieses Waechters. Die Summe steht deshalb an genau
     EINER Stelle, hier.
     """
+
     tag: str
     funde: int
     buendel: int
@@ -294,6 +301,7 @@ class Abdeckungsalarm:
     und in der Mail - drei Kanaele, EIN Satz (`satz`), damit die Seite nicht
     etwas anderes behauptet als das Log.
     """
+
     anbieter: str
     art: str
     tag: str
@@ -344,23 +352,31 @@ class Abdeckungsalarm:
     @property
     def satz(self) -> str:
         if self.art == ALARM_OHNE_BASIS:
-            return (f"{self.anbieter}: {self.kurz} – {self.zeilen} Zeilen, "
-                    f"seit {self.ohne_basis_tage} beobachteten Tagen kein "
-                    f"vollständig gelesener Tag; der Vergleich hat keine "
-                    f"Basis (Zustand {self.zustand}).")
+            return (
+                f"{self.anbieter}: {self.kurz} – {self.zeilen} Zeilen, "
+                f"seit {self.ohne_basis_tage} beobachteten Tagen kein "
+                f"vollständig gelesener Tag; der Vergleich hat keine "
+                f"Basis (Zustand {self.zustand})."
+            )
         if self.art == ALARM_AUSFALL:
-            return (f"{self.anbieter}: {self.kurz} – 0 Zeilen, am "
-                    f"{tag_de(self.vortag)} waren es {self.zeilen_vortag} "
-                    f"(Zustand {self.zustand}).")
-        if self.art == ALARM_EROSION:
-            return (f"{self.anbieter}: {self.kurz} – von "
-                    f"{self.adressen_vortag} gelesenen Produktseiten am "
-                    f"{tag_de(self.vortag)} sind heute {self.adressen} übrig "
-                    f"({self.prozent} % weniger), aktuell {self.zeilen} "
-                    f"Zeilen.")
-        return (f"{self.anbieter}: {self.kurz} – {self.zeilen} Zeilen, am "
+            return (
+                f"{self.anbieter}: {self.kurz} – 0 Zeilen, am "
                 f"{tag_de(self.vortag)} waren es {self.zeilen_vortag} "
-                f"({self.prozent} % weniger).")
+                f"(Zustand {self.zustand})."
+            )
+        if self.art == ALARM_EROSION:
+            return (
+                f"{self.anbieter}: {self.kurz} – von "
+                f"{self.adressen_vortag} gelesenen Produktseiten am "
+                f"{tag_de(self.vortag)} sind heute {self.adressen} übrig "
+                f"({self.prozent} % weniger), aktuell {self.zeilen} "
+                f"Zeilen."
+            )
+        return (
+            f"{self.anbieter}: {self.kurz} – {self.zeilen} Zeilen, am "
+            f"{tag_de(self.vortag)} waren es {self.zeilen_vortag} "
+            f"({self.prozent} % weniger)."
+        )
 
     def als_dict(self) -> dict:
         """Fuer die Seite: die Felder plus die zwei abgeleiteten Saetze.
@@ -368,14 +384,22 @@ class Abdeckungsalarm:
         Die Vorlage bekommt fertige Wortformen und rechnet nichts - sonst
         stuenden Pruefung und Anzeige auf zwei Definitionen (Clean Code 7).
         """
-        return {"anbieter": self.anbieter, "art": self.art, "tag": self.tag,
-                "zeilen": self.zeilen, "zustand": self.zustand,
-                "vortag": self.vortag, "zeilen_vortag": self.zeilen_vortag,
-                "prozent": self.prozent, "stille_tage": self.stille_tage,
-                "ohne_basis_tage": self.ohne_basis_tage,
-                "adressen": self.adressen,
-                "adressen_vortag": self.adressen_vortag,
-                "kurz": self.kurz, "satz": self.satz}
+        return {
+            "anbieter": self.anbieter,
+            "art": self.art,
+            "tag": self.tag,
+            "zeilen": self.zeilen,
+            "zustand": self.zustand,
+            "vortag": self.vortag,
+            "zeilen_vortag": self.zeilen_vortag,
+            "prozent": self.prozent,
+            "stille_tage": self.stille_tage,
+            "ohne_basis_tage": self.ohne_basis_tage,
+            "adressen": self.adressen,
+            "adressen_vortag": self.adressen_vortag,
+            "kurz": self.kurz,
+            "satz": self.satz,
+        }
 
 
 def _befundschluessel(alarm: Abdeckungsalarm) -> tuple:
@@ -460,6 +484,7 @@ def _als_listung(x) -> Listung:
 # Aktueller Stand
 # --------------------------------------------------------------------------
 
+
 class GeraeteDB:
     """data/state/geraete_db.json - je Listung eine Zeile ihres Lebens.
 
@@ -486,7 +511,7 @@ class GeraeteDB:
                 self.lesbar = False
                 roh = {}
             self.updated = roh.get("updated", "")
-            for e in (roh.get("listungen") or []):
+            for e in roh.get("listungen") or []:
                 if e.get("id"):
                     self._eintraege[e["id"]] = e
             self._anbieter = dict(roh.get("anbieter") or {})
@@ -527,16 +552,23 @@ class GeraeteDB:
         neu_farbe = listung.farbe_normalisiert or (listung.farbe_roh or "").lower()
         passend = []
         for e in self._eintraege.values():
-            if (e.get("anbieter") != listung.anbieter
-                    or e.get("device_id") != listung.device_id
-                    or e.get("zustand", "neu") != listung.zustand
-                    or e.get("status") not in (STATUS_AKTIV, STATUS_VERMUTLICH)):
+            if (
+                e.get("anbieter") != listung.anbieter
+                or e.get("device_id") != listung.device_id
+                or e.get("zustand", "neu") != listung.zustand
+                or e.get("status") not in (STATUS_AKTIV, STATUS_VERMUTLICH)
+            ):
                 continue
             alt_speicher = e.get("speicher_gb")
-            if (alt_speicher is not None and listung.speicher_gb is not None
-                    and alt_speicher != listung.speicher_gb):
+            if (
+                alt_speicher is not None
+                and listung.speicher_gb is not None
+                and alt_speicher != listung.speicher_gb
+            ):
                 continue
-            alt_farbe = e.get("farbe_normalisiert") or (e.get("farbe_roh") or "").lower()
+            alt_farbe = (
+                e.get("farbe_normalisiert") or (e.get("farbe_roh") or "").lower()
+            )
             if neu_farbe and alt_farbe and neu_farbe != alt_farbe:
                 continue
             passend.append(e)
@@ -609,7 +641,9 @@ class GeraeteDB:
                     # die zwei Preisarten in einer Rechnung, genau das, was
                     # Teil C4 verbietet.
                     "erstpreis": listung.preis,
-                    "erstpreis_art": listung.preisart if listung.preis is not None else "",
+                    "erstpreis_art": listung.preisart
+                    if listung.preis is not None
+                    else "",
                     "erstpreis_am": today if listung.preis is not None else "",
                 }
                 self._eintraege[lid] = eintrag
@@ -640,7 +674,9 @@ class GeraeteDB:
             eintrag["abgerufen_am"] = listung.abgerufen_am
             # "unbekannt" heisst "diesmal nicht gelesen", nicht "nicht mehr
             # lieferbar". Ein Ausfall darf den bekannten Wert nicht loeschen.
-            if listung.verfuegbarkeit != "unbekannt" or not eintrag.get("verfuegbarkeit"):
+            if listung.verfuegbarkeit != "unbekannt" or not eintrag.get(
+                "verfuegbarkeit"
+            ):
                 eintrag["verfuegbarkeit"] = listung.verfuegbarkeit
             eintrag["confidence"] = listung.confidence
             # Ein Geraet kann auf mehreren Einstiegsseiten eines Anbieters
@@ -660,11 +696,12 @@ class GeraeteDB:
             # Etikett "in 24 Raten (0 %)" vom Vortag - genau die
             # Verwechslung, gegen die die Kennzeichnung gebaut ist. Ein
             # falsches Etikett ist schlimmer als keins.
-            if (listung.laufzeit_monate is None
-                    and listung.preis_ohne_vertrag is not None
-                    and eintrag.get("preis_ohne_vertrag") is not None
-                    and eintrag["preis_ohne_vertrag"]
-                    != listung.preis_ohne_vertrag):
+            if (
+                listung.laufzeit_monate is None
+                and listung.preis_ohne_vertrag is not None
+                and eintrag.get("preis_ohne_vertrag") is not None
+                and eintrag["preis_ohne_vertrag"] != listung.preis_ohne_vertrag
+            ):
                 for feld in _PREISFORMFELDER:
                     eintrag.pop(feld, None)
             # Preisfelder: ein Wert, den der Extraktor diesmal NICHT fand,
@@ -675,8 +712,12 @@ class GeraeteDB:
             # dieselbe bleibt (siehe oben). Sie beschreibt den AKTUELLEN
             # Preis; die Historie in `geraete_preise.jsonl` wird davon
             # nicht angefasst und kein alter Preispunkt umgedeutet.
-            for feld in ("preis_ohne_vertrag", "uvp", "preis_mit_vertrag_ab",
-                         "zuzahlung") + _PREISFORMFELDER:
+            for feld in (
+                "preis_ohne_vertrag",
+                "uvp",
+                "preis_mit_vertrag_ab",
+                "zuzahlung",
+            ) + _PREISFORMFELDER:
                 wert = getattr(listung, feld)
                 if wert is not None:
                     eintrag[feld] = wert
@@ -684,9 +725,14 @@ class GeraeteDB:
                 eintrag["tarif_referenz"] = listung.tarif_referenz
         return neu, gesehen
 
-    def mark_stale(self, anbieter: str, gesehene_ids: set, today: str,
-                   gelesene_einstiege: Optional[set] = None,
-                   leitseite: str = "") -> int:
+    def mark_stale(
+        self,
+        anbieter: str,
+        gesehene_ids: set,
+        today: str,
+        gelesene_einstiege: Optional[set] = None,
+        leitseite: str = "",
+    ) -> int:
         """Zwei-Stufen-Auslistung fuer EINEN Anbieter.
 
         `gelesene_einstiege` nennt die Einstiegsseiten, die in diesem Lauf
@@ -732,12 +778,17 @@ class GeraeteDB:
 
     # ------------------------------------------------- Hardware-Vermarktung
 
-    def protokolliere_lauf(self, anbieter: str, today: str, funde: int,
-                           vollstaendig: bool = True,
-                           zustand: Optional[str] = None,
-                           buendel: int = 0,
-                           tote_adressen: Optional[int] = None,
-                           produkte_versucht: Optional[int] = None) -> None:
+    def protokolliere_lauf(
+        self,
+        anbieter: str,
+        today: str,
+        funde: int,
+        vollstaendig: bool = True,
+        zustand: Optional[str] = None,
+        buendel: int = 0,
+        tote_adressen: Optional[int] = None,
+        produkte_versucht: Optional[int] = None,
+    ) -> None:
         """Buch darueber, wie oft ein Anbieter abgefragt wurde und was dabei
         herauskam. Grundlage von `hardware_vermarktung()` und `messtermine()`.
 
@@ -803,13 +854,14 @@ class GeraeteDB:
         # Gleicher Tag ersetzt seinen Eintrag (idempotent, dieselbe Regel
         # wie die TCO-Historie), ein neuer Tag haengt an; gedeckelt auf den
         # Diagnose-Rand. Eintragsform: [Tag, Funde, Zustand, Buendel].
-        historie = [list(e) for e in (b.get("funde_nach_tag") or [])
-                    if not (isinstance(e, (list, tuple)) and e
-                            and str(e[0]) == today)]
+        historie = [
+            list(e)
+            for e in (b.get("funde_nach_tag") or [])
+            if not (isinstance(e, (list, tuple)) and e and str(e[0]) == today)
+        ]
         versucht = 0 if produkte_versucht is None else int(produkte_versucht)
         tote = None if tote_adressen is None else int(tote_adressen)
-        historie.append([today, int(funde), zustand, int(buendel), versucht,
-                         tote])
+        historie.append([today, int(funde), zustand, int(buendel), versucht, tote])
         b["funde_nach_tag"] = historie[-_FUND_HISTORIE_TAGE:]
         # DIE LETZTE MESSUNG WIRD NICHT VON EINER NICHT-MESSUNG GELOESCHT
         # (S3, 22.09.2026). Vorher stand hier eine unbedingte Zuweisung:
@@ -852,13 +904,14 @@ class GeraeteDB:
         # gelesenen im Journal (der Abdeckungswaechter braucht sie); sie
         # sind hier so unsichtbar wie vorher, als sie gar nicht erst
         # geschrieben wurden - "nicht gelesen" ist nicht "leer".
-        paare: dict[str, int] = {m.tag: m.funde for m in self.messtage(anbieter)
-                                 if m.fundtag}
+        paare: dict[str, int] = {
+            m.tag: m.funde for m in self.messtage(anbieter) if m.fundtag
+        }
         letzter_fund = str(b.get("letzter_fund") or "")
         if letzter_fund and letzter_fund not in paare:
-            paare[letzter_fund] = 1              # per Definition > 0
+            paare[letzter_fund] = 1  # per Definition > 0
         if letzter_fund:
-            for t in (b.get("termine") or []):
+            for t in b.get("termine") or []:
                 t = str(t)
                 if t > letzter_fund and t not in paare:
                     paare[t] = 0
@@ -899,11 +952,13 @@ class GeraeteDB:
         still erzeugter Muell statt eines Protokolleintrags (Clean Code 5).
         """
         journal = []
-        for eintrag in (self._anbieter.get(anbieter, {}).get("funde_nach_tag")
-                        or []):
+        for eintrag in self._anbieter.get(anbieter, {}).get("funde_nach_tag") or []:
             if not isinstance(eintrag, (list, tuple)) or len(eintrag) < 2:
-                log.warning("Geraeteradar: unlesbarer Messtag bei %s (%r) - "
-                            "uebergangen", anbieter, eintrag)
+                log.warning(
+                    "Geraeteradar: unlesbarer Messtag bei %s (%r) - uebergangen",
+                    anbieter,
+                    eintrag,
+                )
                 continue
             try:
                 tag, funde = str(eintrag[0]), int(eintrag[1])
@@ -913,12 +968,22 @@ class GeraeteDB:
                 roh_tote = eintrag[5] if len(eintrag) > 5 else None
                 tote = None if roh_tote is None else int(roh_tote)
             except (TypeError, ValueError):
-                log.warning("Geraeteradar: unlesbarer Messtag bei %s (%r) - "
-                            "uebergangen", anbieter, eintrag)
+                log.warning(
+                    "Geraeteradar: unlesbarer Messtag bei %s (%r) - uebergangen",
+                    anbieter,
+                    eintrag,
+                )
                 continue
-            journal.append(Messtag(tag=tag, funde=funde, buendel=buendel,
-                                   zustand=zustand, versucht=versucht,
-                                   tote=tote))
+            journal.append(
+                Messtag(
+                    tag=tag,
+                    funde=funde,
+                    buendel=buendel,
+                    zustand=zustand,
+                    versucht=versucht,
+                    tote=tote,
+                )
+            )
         return sorted(journal, key=lambda m: m.tag)
 
     def letzter_messtag(self) -> Optional[str]:
@@ -928,8 +993,7 @@ class GeraeteDB:
         tage = [m.tag for name in self._anbieter for m in self.messtage(name)]
         return max(tage) if tage else None
 
-    def lesezustand(self, anbieter: str,
-                    tag: Optional[str] = None) -> Optional[str]:
+    def lesezustand(self, anbieter: str, tag: Optional[str] = None) -> Optional[str]:
         """Der LESEZUSTAND eines Anbieters am Bezugstag - oder `None`.
 
         Dieselbe Auskunft, aus der auch `abdeckungsalarm` seine Tore baut,
@@ -947,8 +1011,9 @@ class GeraeteDB:
         heutige = [m for m in self.messtage(anbieter) if m.tag == bezug]
         return heutige[-1].zustand if heutige else None
 
-    def _befund(self, anbieter: str, journal: list,
-                heute: Messtag) -> Optional[Abdeckungsalarm]:
+    def _befund(
+        self, anbieter: str, journal: list, heute: Messtag
+    ) -> Optional[Abdeckungsalarm]:
         """Die LAGE eines Anbieters an EINEM Tag - noch ohne die Frage, ob
         sie an diesem Tag auch gemeldet wird (das entscheidet
         `_alarmlauf`).
@@ -990,11 +1055,17 @@ class GeraeteDB:
             if len(beobachtet) < _OHNE_BASIS_TAGE:
                 return None
             return Abdeckungsalarm(
-                anbieter=anbieter, art=ALARM_OHNE_BASIS, tag=heute.tag,
-                zeilen=heute.zeilen, zustand=heute.zustand, vortag=None,
-                zeilen_vortag=None, rueckgang=None,
+                anbieter=anbieter,
+                art=ALARM_OHNE_BASIS,
+                tag=heute.tag,
+                zeilen=heute.zeilen,
+                zustand=heute.zustand,
+                vortag=None,
+                zeilen_vortag=None,
+                rueckgang=None,
                 stille_tage=self.stille_tage(anbieter),
-                ohne_basis_tage=len(beobachtet))
+                ohne_basis_tage=len(beobachtet),
+            )
         vortag = vortage[-1]
         if vortag.zeilen > 0:
             rueckgang = (vortag.zeilen - heute.zeilen) / vortag.zeilen
@@ -1005,15 +1076,21 @@ class GeraeteDB:
                 art = ALARM_RUECKGANG
             if art is not None:
                 return Abdeckungsalarm(
-                    anbieter=anbieter, art=art, tag=heute.tag,
-                    zeilen=heute.zeilen, zustand=heute.zustand,
-                    vortag=vortag.tag, zeilen_vortag=vortag.zeilen,
+                    anbieter=anbieter,
+                    art=art,
+                    tag=heute.tag,
+                    zeilen=heute.zeilen,
+                    zustand=heute.zustand,
+                    vortag=vortag.tag,
+                    zeilen_vortag=vortag.zeilen,
                     rueckgang=rueckgang,
-                    stille_tage=self.stille_tage(anbieter))
+                    stille_tage=self.stille_tage(anbieter),
+                )
         return self._erosionsbefund(anbieter, journal, heute)
 
-    def _erosionsbefund(self, anbieter: str, journal: list,
-                        heute: Messtag) -> Optional[Abdeckungsalarm]:
+    def _erosionsbefund(
+        self, anbieter: str, journal: list, heute: Messtag
+    ) -> Optional[Abdeckungsalarm]:
         """Broeselt das Sortiment dieses Anbieters ueber TAGE weg?
 
         DIE LUECKE, DIE DAS SCHLIESST (22.09.2026). Tote Produktadressen
@@ -1046,8 +1123,9 @@ class GeraeteDB:
         genau so soll es sein. Gemeldet wird die BEWEGUNG, nicht die
         Luecke; die Luecke steht als Zahl auf der Quellenseite.
         """
-        gemessen = [m for m in journal
-                    if m.tag <= heute.tag and m.gelesene_adressen is not None]
+        gemessen = [
+            m for m in journal if m.tag <= heute.tag and m.gelesene_adressen is not None
+        ]
         fenster = gemessen[-_EROSION_FENSTER_TAGE:]
         if len(fenster) < 2 or fenster[-1].tag != heute.tag:
             return None
@@ -1056,20 +1134,26 @@ class GeraeteDB:
             # Kein Nenner, kein Anteil - und aus einem Anbieter, der schon
             # damals nichts gelesen hat, wird kein Einbruch konstruiert.
             return None
-        schwund = ((basis.gelesene_adressen - heute.gelesene_adressen)
-                   / basis.gelesene_adressen)
+        schwund = (
+            basis.gelesene_adressen - heute.gelesene_adressen
+        ) / basis.gelesene_adressen
         if schwund <= ABDECKUNG_RUECKGANG:
             return None
         return Abdeckungsalarm(
-            anbieter=anbieter, art=ALARM_EROSION, tag=heute.tag,
-            zeilen=heute.zeilen, zustand=heute.zustand, vortag=basis.tag,
-            zeilen_vortag=basis.zeilen, rueckgang=schwund,
+            anbieter=anbieter,
+            art=ALARM_EROSION,
+            tag=heute.tag,
+            zeilen=heute.zeilen,
+            zustand=heute.zustand,
+            vortag=basis.tag,
+            zeilen_vortag=basis.zeilen,
+            rueckgang=schwund,
             stille_tage=self.stille_tage(anbieter),
             adressen=heute.gelesene_adressen,
-            adressen_vortag=basis.gelesene_adressen)
+            adressen_vortag=basis.gelesene_adressen,
+        )
 
-    def abdeckungsalarm(self, anbieter: str,
-                        tag: str) -> Optional[Abdeckungsalarm]:
+    def abdeckungsalarm(self, anbieter: str, tag: str) -> Optional[Abdeckungsalarm]:
         """Der Alarm EINES Anbieters an EINEM Tag - oder `None`.
 
         `None` heisst "heute nichts zu melden" und nie "in Ordnung":
@@ -1106,13 +1190,15 @@ class GeraeteDB:
         if not vorherige or _ist_wiederholungstag(tag):
             return befund
         gestern = self._befund(anbieter, journal, vorherige[-1])
-        if gestern is not None and _befundschluessel(gestern) == \
-                _befundschluessel(befund):
+        if gestern is not None and _befundschluessel(gestern) == _befundschluessel(
+            befund
+        ):
             return None
         return befund
 
-    def ausfall_alarme(self, nur: Optional[Iterable[str]] = None,
-                       heute: Optional[str] = None) -> list:
+    def ausfall_alarme(
+        self, nur: Optional[Iterable[str]] = None, heute: Optional[str] = None
+    ) -> list:
         """Alle Anbieter, deren Abdeckung heute gegenueber dem Vortag
         eingebrochen ist: `[Abdeckungsalarm, ...]`, groesster Rueckgang
         zuerst.
@@ -1157,7 +1243,9 @@ class GeraeteDB:
         Abgeleitet wird nur, was wirklich gespeichert wurde - ein Lauf,
         dessen Bestaetigung von einem spaeteren ueberschrieben wurde, ist
         verloren und wird NICHT erfunden."""
-        termine = {str(t) for t in (self._anbieter.get(anbieter, {}).get("termine") or [])}
+        termine = {
+            str(t) for t in (self._anbieter.get(anbieter, {}).get("termine") or [])
+        }
         for feld in ("letzter_lauf", "letzter_fund"):
             wert = self._anbieter.get(anbieter, {}).get(feld)
             if wert:
@@ -1206,13 +1294,15 @@ class GeraeteDB:
             "anbieter": self._anbieter,
             "listungen": self.eintraege(),
         }
-        self.path.write_text(json.dumps(daten, ensure_ascii=False, indent=1),
-                             encoding="utf-8")
+        self.path.write_text(
+            json.dumps(daten, ensure_ascii=False, indent=1), encoding="utf-8"
+        )
 
 
 # --------------------------------------------------------------------------
 # Preishistorie
 # --------------------------------------------------------------------------
+
 
 class Preishistorie:
     """data/state/geraete_preise.jsonl - append-only, nur Aenderungspunkte."""
@@ -1236,12 +1326,15 @@ class Preishistorie:
                 if lid:
                     self._reihen.setdefault(lid, []).append(satz)
             if kaputt:
-                log.warning("geraete_preise.jsonl: %d unlesbare Zeilen uebersprungen",
-                            kaputt)
+                log.warning(
+                    "geraete_preise.jsonl: %d unlesbare Zeilen uebersprungen", kaputt
+                )
 
     def reihe(self, listung_id: str) -> list[dict]:
         """Die Aenderungspunkte einer Listung, aelteste zuerst."""
-        return sorted(self._reihen.get(listung_id, []), key=lambda s: s.get("datum", ""))
+        return sorted(
+            self._reihen.get(listung_id, []), key=lambda s: s.get("datum", "")
+        )
 
     def letzter(self, listung_id: str) -> Optional[dict]:
         reihe = self.reihe(listung_id)
@@ -1279,7 +1372,7 @@ class Preishistorie:
             for feld in _HISTORIENFELDER:
                 neu, alt = satz.get(feld), vorher.get(feld)
                 if _ist_ausfall(feld, neu) and not _ist_ausfall(feld, alt):
-                    continue          # Ausfall, keine Aenderung
+                    continue  # Ausfall, keine Aenderung
                 if neu != alt:
                     geaendert = True
             if not geaendert:
@@ -1288,7 +1381,9 @@ class Preishistorie:
             # loeschen: der neue Punkt erbt jeden Wert, den dieser Lauf nicht
             # messen konnte.
             for feld in _HISTORIENFELDER:
-                if _ist_ausfall(feld, satz.get(feld)) and not _ist_ausfall(feld, vorher.get(feld)):
+                if _ist_ausfall(feld, satz.get(feld)) and not _ist_ausfall(
+                    feld, vorher.get(feld)
+                ):
                     satz[feld] = vorher[feld]
         elif not any(satz.get(f) is not None for f in _PREISFELDER):
             # Allererster Messpunkt ohne jeden Preis: das ist eine Listung,
@@ -1319,5 +1414,7 @@ class Preishistorie:
 
     def alle_punkte(self) -> list:
         """Alle Aenderungspunkte, aeltester zuerst - fuer die Auswertung."""
-        return sorted((p for reihe in self._reihen.values() for p in reihe),
-                      key=lambda s: (s.get("datum", ""), s.get("listung_id", "")))
+        return sorted(
+            (p for reihe in self._reihen.values() for p in reihe),
+            key=lambda s: (s.get("datum", ""), s.get("listung_id", "")),
+        )

@@ -7,6 +7,7 @@ der Versand nie einloest - und beide sind fuer sich gruen. Dieselbe Falle wie
 beim Archiv-Dialog in app.js, wo zwei Tests Konstanten und Stoppwoerter
 zusammenhalten.
 """
+
 import json
 import os
 import re
@@ -43,8 +44,7 @@ def _rechtstexte_zustand(wurzel: Path, *, vollstaendig: bool) -> None:
     """
     for datei in ("impressum.md", "datenschutz.md"):
         pfad = wurzel / "content" / "legal" / datei
-        text = _PLATZHALTER.sub(_MUSTERANSCHRIFT,
-                                pfad.read_text(encoding="utf-8"))
+        text = _PLATZHALTER.sub(_MUSTERANSCHRIFT, pfad.read_text(encoding="utf-8"))
         if not vollstaendig:
             text += "\n\nZustellanschrift: {{ANSCHRIFT}}\n"
         pfad.write_text(text, encoding="utf-8")
@@ -68,6 +68,7 @@ def katalog():
 
 
 # =====================================  Veroeffentlichungsschwelle  ========
+
 
 def test_das_fixture_stellt_beide_zustaende_wirklich_her(tmp_path):
     """Die Zusicherung unter der Zusicherung.
@@ -109,8 +110,9 @@ def test_ohne_vollstaendiges_impressum_kein_nav_eintrag(tmp_path):
     steht im CODE, nicht in einem Test: eine Regel, die nur ein Test kennt,
     schaltet keine Navigation."""
     site = _projekt(tmp_path, vollstaendig=False)
-    nav = BeautifulSoup((site / "index.html").read_text(encoding="utf-8"),
-                        "html.parser").select(".subnav a")
+    nav = BeautifulSoup(
+        (site / "index.html").read_text(encoding="utf-8"), "html.parser"
+    ).select(".subnav a")
     assert "newsletter.html" not in {a["href"] for a in nav}
 
 
@@ -119,8 +121,9 @@ def test_mit_vollstaendigem_impressum_steht_der_eintrag_da(tmp_path):
     NIE erscheint."""
     site = _projekt(tmp_path, vollstaendig=True)
     for seite in ("index.html", "meldungen.html", "transparenz.html"):
-        nav = BeautifulSoup((site / seite).read_text(encoding="utf-8"),
-                            "html.parser").select(".subnav a")
+        nav = BeautifulSoup(
+            (site / seite).read_text(encoding="utf-8"), "html.parser"
+        ).select(".subnav a")
         assert "newsletter.html" in {a["href"] for a in nav}, seite
 
 
@@ -137,8 +140,9 @@ def test_die_seite_wird_auch_unterhalb_der_schwelle_gebaut(tmp_path):
 
 def test_oberhalb_der_schwelle_nimmt_die_seite_entgegen(tmp_path):
     site = _projekt(tmp_path, vollstaendig=True, dienst="https://x.invalid")
-    soup = BeautifulSoup((site / "newsletter.html").read_text(encoding="utf-8"),
-                         "html.parser")
+    soup = BeautifulSoup(
+        (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
+    )
     assert not soup.select_one("#nl-submit").has_attr("disabled")
     assert soup.select_one("form#nl-form").get("data-gesperrt") is None
     # Der Sperrkasten im <noscript> bleibt - er beschreibt einen anderen Fall.
@@ -151,8 +155,9 @@ def test_ohne_dienst_url_kann_die_seite_nichts_absenden(tmp_path):
     posten."""
     site = _projekt(tmp_path, vollstaendig=True, dienst="")
     html = (site / "newsletter.html").read_text(encoding="utf-8")
-    konfig = json.loads(BeautifulSoup(html, "html.parser")
-                        .select_one("#nl-config").text)
+    konfig = json.loads(
+        BeautifulSoup(html, "html.parser").select_one("#nl-config").text
+    )
     assert konfig["dienst"] == ""
     assert konfig["frei"] is True
 
@@ -169,8 +174,9 @@ def test_der_fehlende_dienst_steht_ueber_dem_formular(tmp_path):
     der Navigation, und der Weg wird begangen.
     """
     site = _projekt(tmp_path, vollstaendig=True, dienst="")
-    soup = BeautifulSoup((site / "newsletter.html").read_text(encoding="utf-8"),
-                         "html.parser")
+    soup = BeautifulSoup(
+        (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
+    )
     kasten = soup.select_one(".nl-gesperrt")
     assert kasten is not None, "kein Hinweis auf den fehlenden Dienst"
     assert "noch nicht möglich" in kasten.get_text()
@@ -185,24 +191,28 @@ def test_mit_dienst_url_steht_kein_sperrkasten_mehr(tmp_path):
     """Die Gegenprobe - ohne sie belegt der Test oben nur, dass der Kasten
     IMMER dasteht."""
     site = _projekt(tmp_path, vollstaendig=True, dienst="https://x.invalid")
-    soup = BeautifulSoup((site / "newsletter.html").read_text(encoding="utf-8"),
-                         "html.parser")
+    soup = BeautifulSoup(
+        (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
+    )
     # Der Kasten im <noscript> beschreibt einen anderen Fall und bleibt.
-    ausserhalb = [k for k in soup.select(".nl-gesperrt")
-                  if not k.find_parent("noscript")]
+    ausserhalb = [
+        k for k in soup.select(".nl-gesperrt") if not k.find_parent("noscript")
+    ]
     assert ausserhalb == []
 
 
 # ================================================  Inhalt des Formulars  ===
 
+
 def test_alle_vier_dimensionen_stehen_auf_der_seite(tmp_path, katalog):
     site = _projekt(tmp_path, vollstaendig=True)
-    soup = BeautifulSoup((site / "newsletter.html").read_text(encoding="utf-8"),
-                         "html.parser")
+    soup = BeautifulSoup(
+        (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
+    )
     from telco_radar.newsletter.config import FELD_JE_DIMENSION
+
     for dimension, feld in FELD_JE_DIMENSION.items():
-        gezeigt = {i["value"] for i in
-                   soup.select(f'input[name="{feld}"]')}
+        gezeigt = {i["value"] for i in soup.select(f'input[name="{feld}"]')}
         assert gezeigt == katalog.schluessel(dimension), dimension
 
 
@@ -211,13 +221,16 @@ def test_neben_jeder_dimension_steht_dass_leer_alles_heisst(tmp_path):
     anderen. Deshalb steht es da: das ist keine Bedienhilfe, sondern die
     Regel selbst."""
     site = _projekt(tmp_path, vollstaendig=True)
-    soup = BeautifulSoup((site / "newsletter.html").read_text(encoding="utf-8"),
-                         "html.parser")
+    soup = BeautifulSoup(
+        (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
+    )
     # Nur die vier Dimensionsbloecke - der Stichwortblock traegt denselben
     # Hinweistext-Stil, sagt aber etwas anderes (Stichwoerter sind ADDITIV,
     # dort waere "leer heisst alles" schlicht falsch).
-    hinweise = [h.get_text(" ", strip=True)
-                for h in soup.select('.nl-block:has(input[type="checkbox"]) .nl-hinweis')]
+    hinweise = [
+        h.get_text(" ", strip=True)
+        for h in soup.select('.nl-block:has(input[type="checkbox"]) .nl-hinweis')
+    ]
     assert len(hinweise) == 4, [h[:40] for h in hinweise]
     for text in hinweise:
         assert "alles" in text.lower(), text
@@ -226,8 +239,9 @@ def test_neben_jeder_dimension_steht_dass_leer_alles_heisst(tmp_path):
 def test_die_einwilligung_ist_nicht_vorausgewaehlt(tmp_path):
     """Eine vorangekreuzte Einwilligung ist keine."""
     site = _projekt(tmp_path, vollstaendig=True)
-    soup = BeautifulSoup((site / "newsletter.html").read_text(encoding="utf-8"),
-                         "html.parser")
+    soup = BeautifulSoup(
+        (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
+    )
     assert not soup.select_one("#nl-consent").has_attr("checked")
 
 
@@ -235,9 +249,11 @@ def test_der_einwilligungstext_steht_im_wortlaut_daneben(tmp_path):
     """Nicht eine gekuerzte Fassung: eine Zustimmung zu einem Text, den der
     Nutzer nie gesehen hat, ist keine."""
     from telco_radar.report import rechtstexte
+
     site = _projekt(tmp_path, vollstaendig=True)
-    soup = BeautifulSoup((site / "newsletter.html").read_text(encoding="utf-8"),
-                         "html.parser")
+    soup = BeautifulSoup(
+        (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
+    )
     auf_der_seite = soup.select_one(".nl-consent-text").get_text(" ", strip=True)
     fassung = rechtstexte.aktuelle_einwilligung(WURZEL)
     for absatz in ns.einwilligung_absaetze(fassung.text):
@@ -252,15 +268,18 @@ def test_der_einwilligungstext_traegt_nicht_die_umbrueche_der_datei():
     Satzfehler."""
     roh = "Ein Satz, der über\nzwei Zeilen läuft.\n\nEin zweiter Absatz.\n"
     assert ns.einwilligung_absaetze(roh) == [
-        "Ein Satz, der über zwei Zeilen läuft.", "Ein zweiter Absatz."]
+        "Ein Satz, der über zwei Zeilen läuft.",
+        "Ein zweiter Absatz.",
+    ]
 
 
 def test_das_honeypot_feld_ist_kein_hidden_feld(tmp_path):
     """Skripte fuellen `type=hidden` gezielt NICHT aus. Ein sichtbares Feld,
     das aus dem Bild geschoben ist, fuellen sie - und Menschen sehen es nie."""
     site = _projekt(tmp_path, vollstaendig=True)
-    soup = BeautifulSoup((site / "newsletter.html").read_text(encoding="utf-8"),
-                         "html.parser")
+    soup = BeautifulSoup(
+        (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
+    )
     feld = soup.select_one('input[name="website"]')
     assert feld is not None and feld["type"] == "text"
     assert soup.select_one(".nl-hp")["aria-hidden"] == "true"
@@ -271,9 +290,12 @@ def test_das_honeypot_feld_ist_kein_hidden_feld(tmp_path):
 def test_impressum_und_datenschutz_stehen_auf_der_anmeldeseite(tmp_path):
     """Art. 13 DSGVO verlangt die Information dort, wo erhoben wird."""
     site = _projekt(tmp_path, vollstaendig=True)
-    ziele = {a["href"] for a in BeautifulSoup(
-        (site / "newsletter.html").read_text(encoding="utf-8"),
-        "html.parser").find_all("a")}
+    ziele = {
+        a["href"]
+        for a in BeautifulSoup(
+            (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
+        ).find_all("a")
+    }
     assert "impressum.html" in ziele and "datenschutz.html" in ziele
 
 
@@ -286,12 +308,13 @@ def test_ohne_javascript_ist_wenigstens_sichtbar_dass_es_ihn_gibt(tmp_path):
 
 # ===============================================  Die Abschlussseiten  =====
 
+
 def test_die_abschlussseiten_sind_statisch_und_ohne_dienst(tmp_path):
     """DER Punkt: wer auf den Abmeldelink klickt, waehrend Render die
     Instanz schlafen laesst, wartet sonst eine Minute vor einem Spinner - und
     haelt sich trotzdem fuer abgemeldet. Der Abmeldelink ist der EINZIGE
     Abmeldeweg."""
-    site = _projekt(tmp_path, vollstaendig=False)      # sogar unterhalb der Schwelle
+    site = _projekt(tmp_path, vollstaendig=False)  # sogar unterhalb der Schwelle
     for name in ("newsletter-bestaetigt.html", "newsletter-abgemeldet.html"):
         datei = site / name
         assert datei.exists(), name
@@ -305,9 +328,12 @@ def test_die_abschlussseiten_sind_statisch_und_ohne_dienst(tmp_path):
 
 # =====================================  Vorschau: Browser gegen Python  ====
 
+
 def _browser():
-    for kandidat in ("/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
-                     os.environ.get("CHROMIUM_PFAD", "")):
+    for kandidat in (
+        "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+        os.environ.get("CHROMIUM_PFAD", ""),
+    ):
         if kandidat and Path(kandidat).exists():
             return kandidat
     return None
@@ -326,14 +352,19 @@ def _index_zum_stichtag(tmp_path, site):
     """
     from datetime import date
     from telco_radar.newsletter.filters import baue_stichwort_index
+
     reports = tmp_path / "data" / "reports"
-    daten = sorted(f.stem for f in reports.glob("*.json")
-                   if re.fullmatch(r"\d{4}-\d{2}-\d{2}", f.stem))
+    daten = sorted(
+        f.stem
+        for f in reports.glob("*.json")
+        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", f.stem)
+    )
     assert daten, "keine Berichte - der Test prueft sonst nichts"
     stand = date.fromisoformat(daten[-1])
     index = baue_stichwort_index(reports, tage=30, heute=stand)
     (site / "data" / "keyword-index.json").write_text(
-        json.dumps(index, ensure_ascii=False), encoding="utf-8")
+        json.dumps(index, ensure_ascii=False), encoding="utf-8"
+    )
     return index, reports, stand
 
 
@@ -374,18 +405,22 @@ def test_die_browser_vorschau_sagt_dasselbe_wie_python(tmp_path, begriff):
                    .filter(w => w.length >= minLaenge);
                  if (!teile.length) return null;
                  return Math.min(...teile.map(w => idx.woerter[w] || 0));
-               }""", [index, begriff, 4])
+               }""",
+            [index, begriff, 4],
+        )
         browser.close()
 
     in_python = vorschau(begriff, reports, tage=index["tage"], heute=stand)
     assert im_browser == in_python, (
-        f"{begriff}: Browser {im_browser}, Python {in_python}")
+        f"{begriff}: Browser {im_browser}, Python {in_python}"
+    )
 
 
 def test_wenigstens_ein_begriff_trifft_ueberhaupt(tmp_path):
     """Ohne diese Gegenprobe bestuende der Test oben auch dann, wenn beide
     Seiten konsequent null zaehlen."""
     from telco_radar.newsletter.filters import vorschau
+
     site = _projekt(tmp_path, vollstaendig=True)
     index, reports, stand = _index_zum_stichtag(tmp_path, site)
     treffer = vorschau("telekom", reports, tage=index["tage"], heute=stand)

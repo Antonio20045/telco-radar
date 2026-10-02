@@ -18,6 +18,7 @@ entwurf-v2.html, DOM-bewiesen) als SERVERSEITIGE Produktion:
 
 Alle Zahlen entstehen in Python; der Client setzt nur fertige Knoten.
 """
+
 from __future__ import annotations
 
 import json
@@ -34,23 +35,56 @@ from telco_radar.report import geraete_view, geraete_zeitreihe
 
 HEUTE = "2026-09-16"
 
-_KATALOG = {"geraete": [
-    {"hersteller": "Apple", "modell": "iPhone 17 Pro", "generation": 17,
-     "marktstart": "2025-09-19", "speicher": [256], "segment": "premium"},
-    {"hersteller": "Samsung", "modell": "Galaxy S26", "generation": 26,
-     "marktstart": "2026-01-30", "speicher": [256], "segment": "premium"},
-    {"hersteller": "Google", "modell": "Pixel 11", "generation": 11,
-     "marktstart": "2026-08-20", "speicher": [128], "segment": "premium"},
-]}
+_KATALOG = {
+    "geraete": [
+        {
+            "hersteller": "Apple",
+            "modell": "iPhone 17 Pro",
+            "generation": 17,
+            "marktstart": "2025-09-19",
+            "speicher": [256],
+            "segment": "premium",
+        },
+        {
+            "hersteller": "Samsung",
+            "modell": "Galaxy S26",
+            "generation": 26,
+            "marktstart": "2026-01-30",
+            "speicher": [256],
+            "segment": "premium",
+        },
+        {
+            "hersteller": "Google",
+            "modell": "Pixel 11",
+            "generation": 11,
+            "marktstart": "2026-08-20",
+            "speicher": [128],
+            "segment": "premium",
+        },
+    ]
+}
 _FARBEN = {"farben": {"schwarz": ["Schwarz"]}}
-_QUELLEN = {"anbieter": [
-    {"name": "Vodafone", "typ": "netzbetreiber", "rang": 1, "eigen": True,
-     "methode": "ldjson", "basis_url": "https://www.vodafone.de",
-     "einstiege": [{"url": "https://www.vodafone.de/handys"}]},
-    {"name": "o2", "typ": "netzbetreiber", "rang": 2, "methode": "ldjson",
-     "basis_url": "https://www.o2online.de",
-     "einstiege": [{"url": "https://www.o2online.de/handys"}]},
-]}
+_QUELLEN = {
+    "anbieter": [
+        {
+            "name": "Vodafone",
+            "typ": "netzbetreiber",
+            "rang": 1,
+            "eigen": True,
+            "methode": "ldjson",
+            "basis_url": "https://www.vodafone.de",
+            "einstiege": [{"url": "https://www.vodafone.de/handys"}],
+        },
+        {
+            "name": "o2",
+            "typ": "netzbetreiber",
+            "rang": 2,
+            "methode": "ldjson",
+            "basis_url": "https://www.o2online.de",
+            "einstiege": [{"url": "https://www.o2online.de/handys"}],
+        },
+    ]
+}
 
 # (device_id, speicher, anbieter, tarif_id, tarif, gb, rate)
 _BUENDEL = [
@@ -81,7 +115,7 @@ _BUENDEL = [
 _HISTORIE = [
     (0, "", "2026-09-12", 18.0),
     (0, "", "2026-09-13", 17.0),
-    (0, "-blau", "2026-09-13", 19.0),   # zweite Farbe: verworfen (937,00)
+    (0, "-blau", "2026-09-13", 19.0),  # zweite Farbe: verworfen (937,00)
     (0, "", "2026-09-14", 18.0),
     (1, "", "2026-09-12", 22.0),
     # congstar fehlt am 13. UND 14. nicht - aber der 13. fehlt: Luecke.
@@ -105,97 +139,153 @@ def _sku(device_id, speicher):
 def _baue(tmp_path: pathlib.Path):
     root = tmp_path / "zeitreihe"
     (root / "config").mkdir(parents=True)
-    for name, daten in (("geraete_katalog.yaml", _KATALOG),
-                        ("farben.yaml", _FARBEN),
-                        ("geraete_quellen.yaml", _QUELLEN)):
+    for name, daten in (
+        ("geraete_katalog.yaml", _KATALOG),
+        ("farben.yaml", _FARBEN),
+        ("geraete_quellen.yaml", _QUELLEN),
+    ):
         (root / "config" / name).write_text(
-            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
-            encoding="utf-8")
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False), encoding="utf-8"
+        )
     state = root / "data" / "state"
     state.mkdir(parents=True)
 
     def _listung(anbieter, device_id, speicher, preis):
-        return {"id": f"{anbieter.lower()}--{_sku(device_id, speicher)}",
-                "sku_id": _sku(device_id, speicher), "device_id": device_id,
-                "anbieter": anbieter, "anbieter_typ": "netzbetreiber",
-                "netz": anbieter, "speicher_gb": speicher,
-                "farbe_roh": "Schwarz", "farbe_normalisiert": "schwarz",
-                "zustand": "neu", "first_seen": "2026-09-01",
-                "last_verified": HEUTE, "status": "aktiv", "missed_checks": 0,
-                "preis_ohne_vertrag": preis, "erstpreis": preis,
-                "erstpreis_art": "ohne_vertrag", "erstpreis_am": "2026-09-01",
-                "quelle_url": f"https://example.de/{anbieter.lower()}/{device_id}",
-                "abgerufen_am": HEUTE, "verfuegbarkeit": "lieferbar",
-                "confidence": "hoch", "einstiege": ["https://example.de/l"]}
+        return {
+            "id": f"{anbieter.lower()}--{_sku(device_id, speicher)}",
+            "sku_id": _sku(device_id, speicher),
+            "device_id": device_id,
+            "anbieter": anbieter,
+            "anbieter_typ": "netzbetreiber",
+            "netz": anbieter,
+            "speicher_gb": speicher,
+            "farbe_roh": "Schwarz",
+            "farbe_normalisiert": "schwarz",
+            "zustand": "neu",
+            "first_seen": "2026-09-01",
+            "last_verified": HEUTE,
+            "status": "aktiv",
+            "missed_checks": 0,
+            "preis_ohne_vertrag": preis,
+            "erstpreis": preis,
+            "erstpreis_art": "ohne_vertrag",
+            "erstpreis_am": "2026-09-01",
+            "quelle_url": f"https://example.de/{anbieter.lower()}/{device_id}",
+            "abgerufen_am": HEUTE,
+            "verfuegbarkeit": "lieferbar",
+            "confidence": "hoch",
+            "einstiege": ["https://example.de/l"],
+        }
 
-    (state / "geraete_db.json").write_text(json.dumps({
-        "updated": HEUTE,
-        "anbieter": {"Vodafone": {"laeufe": 4, "funde_gesamt": 1},
-                     "o2": {"laeufe": 4, "funde_gesamt": 2}},
-        "listungen": [_listung("Vodafone", "apple-iphone-17-pro", 256, 1199.90),
-                      _listung("o2", "apple-iphone-17-pro", 256, 1099.00),
-                      _listung("1&1", "samsung-galaxy-s26", 256, 1049.00),
-                      _listung("Telekom", "samsung-galaxy-s26", 256, 1079.00),
-                      _listung("o2", "google-pixel-11", 128, 799.00)]}),
-        encoding="utf-8")
+    (state / "geraete_db.json").write_text(
+        json.dumps(
+            {
+                "updated": HEUTE,
+                "anbieter": {
+                    "Vodafone": {"laeufe": 4, "funde_gesamt": 1},
+                    "o2": {"laeufe": 4, "funde_gesamt": 2},
+                },
+                "listungen": [
+                    _listung("Vodafone", "apple-iphone-17-pro", 256, 1199.90),
+                    _listung("o2", "apple-iphone-17-pro", 256, 1099.00),
+                    _listung("1&1", "samsung-galaxy-s26", 256, 1049.00),
+                    _listung("Telekom", "samsung-galaxy-s26", 256, 1079.00),
+                    _listung("o2", "google-pixel-11", 128, 799.00),
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
     (state / "geraete_preise.jsonl").write_text("", encoding="utf-8")
 
     buendel = []
-    for i, (device_id, speicher, anbieter, tarif_id, tarif, gb, rate) \
-            in enumerate(_BUENDEL):
-        buendel.append({
-            "id": f"buendel--{anbieter.lower()}--{_sku(device_id, speicher)}"
-                  f"--{tarif_id}",
-            "sku_id": _sku(device_id, speicher), "anbieter": anbieter,
-            "tarif_name": tarif, "tarif_id": tarif_id,
-            "tarif_id_guete": "hoch", "tarif_monatlich": 20.0,
-            "geraet_zuzahlung": 1.0, "geraet_monatsrate": rate,
-            "laufzeit_monate": 24, "anschlusspreis": 0.0,
-            "zustand": "neu", "rabatte": [],
-            "quelle_url": f"https://example.de/{anbieter.lower()}/{device_id}",
-            "abgerufen_am": HEUTE, "first_seen": HEUTE,
-            "last_verified": HEUTE})
-    (state / "geraete_tco.json").write_text(json.dumps(
-        {"updated": HEUTE, "buendel": buendel, "sim_only": []}),
-        encoding="utf-8")
+    for i, (device_id, speicher, anbieter, tarif_id, tarif, gb, rate) in enumerate(
+        _BUENDEL
+    ):
+        buendel.append(
+            {
+                "id": f"buendel--{anbieter.lower()}--{_sku(device_id, speicher)}"
+                f"--{tarif_id}",
+                "sku_id": _sku(device_id, speicher),
+                "anbieter": anbieter,
+                "tarif_name": tarif,
+                "tarif_id": tarif_id,
+                "tarif_id_guete": "hoch",
+                "tarif_monatlich": 20.0,
+                "geraet_zuzahlung": 1.0,
+                "geraet_monatsrate": rate,
+                "laufzeit_monate": 24,
+                "anschlusspreis": 0.0,
+                "zustand": "neu",
+                "rabatte": [],
+                "quelle_url": f"https://example.de/{anbieter.lower()}/{device_id}",
+                "abgerufen_am": HEUTE,
+                "first_seen": HEUTE,
+                "last_verified": HEUTE,
+            }
+        )
+    (state / "geraete_tco.json").write_text(
+        json.dumps({"updated": HEUTE, "buendel": buendel, "sim_only": []}),
+        encoding="utf-8",
+    )
 
     zeilen = []
     for idx, suffix, tag, rate in _HISTORIE:
         b = buendel[idx]
         farbe = "schwarz" + suffix
-        zeilen.append({"id": b["id"] + suffix, "datum": tag,
-                       "tarif_id": b["tarif_id"],
-                       "tarif_id_guete": "hoch", "tarif_monatlich": 20.0,
-                       "geraet_zuzahlung": 1.0, "geraet_monatsrate": rate,
-                       "laufzeit_monate": 24, "anschlusspreis": 0.0,
-                       "quelle_url": b["quelle_url"], "abgerufen_am": tag,
-                       "zustand": "neu",
-                       "gesamt": round(1.0 + 24 * 20.0 + 24 * rate, 2),
-                       "sku_id": b["sku_id"].replace("schwarz", farbe)})
+        zeilen.append(
+            {
+                "id": b["id"] + suffix,
+                "datum": tag,
+                "tarif_id": b["tarif_id"],
+                "tarif_id_guete": "hoch",
+                "tarif_monatlich": 20.0,
+                "geraet_zuzahlung": 1.0,
+                "geraet_monatsrate": rate,
+                "laufzeit_monate": 24,
+                "anschlusspreis": 0.0,
+                "quelle_url": b["quelle_url"],
+                "abgerufen_am": tag,
+                "zustand": "neu",
+                "gesamt": round(1.0 + 24 * 20.0 + 24 * rate, 2),
+                "sku_id": b["sku_id"].replace("schwarz", farbe),
+            }
+        )
     (state / "geraete_tco_historie.jsonl").write_text(
-        "\n".join(json.dumps(z) for z in zeilen) + "\n", encoding="utf-8")
+        "\n".join(json.dumps(z) for z in zeilen) + "\n", encoding="utf-8"
+    )
 
     tarife = []
     for device_id, speicher, anbieter, tarif_id, tarif, gb, rate in _BUENDEL:
-        tarife.append({
-            "anbieter": anbieter, "name": tarif, "tarif_id": tarif_id,
-            "art": "mobilfunk", "grundgebuehr": 20.0,
-            "laufzeit_monate": 24, "datenvolumen_gb": gb,
-            "preisphasen": [{"von_monat": 1, "bis_monat": None,
-                             "betrag": 20.0}],
-            "dokument_url": f"https://example.de/pib/{tarif_id}",
-            "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}})
+        tarife.append(
+            {
+                "anbieter": anbieter,
+                "name": tarif,
+                "tarif_id": tarif_id,
+                "art": "mobilfunk",
+                "grundgebuehr": 20.0,
+                "laufzeit_monate": 24,
+                "datenvolumen_gb": gb,
+                "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": 20.0}],
+                "dokument_url": f"https://example.de/pib/{tarif_id}",
+                "abgerufen_am": HEUTE,
+                "confidence": {},
+                "fundstellen": {},
+            }
+        )
     tarife = mit_leiter(tarife, HEUTE)
     (state / "tarife.jsonl").write_text(
-        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
+        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8"
+    )
     return root, state
 
 
 @pytest.fixture(scope="module")
 def ansicht(tmp_path_factory):
     root, state = _baue(tmp_path_factory.mktemp("zr"))
-    g = geraete_view.aufbereiten(state, lade_quellen(root), lade_katalog(root),
-                                 heute=HEUTE)
+    g = geraete_view.aufbereiten(
+        state, lade_quellen(root), lade_katalog(root), heute=HEUTE
+    )
     return geraete_zeitreihe.aufbereiten(state, g["tco"])
 
 
@@ -204,8 +294,9 @@ def ansicht_state(tmp_path_factory):
     """Aufbereitung UND state-Pfad in EINEM Rendern - fuer Wahrheitstests,
     die gegen die rohen JSONL-Dateien gegenrechnen (P1/F3)."""
     root, state = _baue(tmp_path_factory.mktemp("zrstate"))
-    g = geraete_view.aufbereiten(state, lade_quellen(root), lade_katalog(root),
-                                 heute=HEUTE)
+    g = geraete_view.aufbereiten(
+        state, lade_quellen(root), lade_katalog(root), heute=HEUTE
+    )
     return geraete_zeitreihe.aufbereiten(state, g["tco"]), state
 
 
@@ -221,22 +312,23 @@ def _paar(ansicht, modell_band):
 # Der Startzustand - aus den Daten, nicht hardcodiert
 # --------------------------------------------------------------------------
 
+
 def test_der_startzustand_hat_die_meisten_anbieter_dann_punkte(ansicht):
     # iPhone 17 Pro x klein: 4 Anbieter, 9 Punkte - gegenueber S26 x klein
     # (1 Anbieter) und apple x mittel (1 Anbieter). Die alte Vorgabe aus
     # `geraete_tco_karten` (die meisten Bündel-Anbieter) trifft hier
     # dasselbe Geraet, aber die RECHNUNG ist eine andere: sie zaehlt
     # Historie-Anbieter und -Punkte.
-    assert ansicht["start"] == {"modell": "apple-iphone-17-pro-256",
-                                "band": "xs"}
+    assert ansicht["start"] == {"modell": "apple-iphone-17-pro-256", "band": "xs"}
 
 
 def test_der_startzustand_ist_deterministisch(tmp_path):
     # Gleiche Ausbeute, zwei Kandidaten: der aufsteigende Schluessel bricht
     # den Gleichstand - kein Wuerfeln je Rendern.
     root, state = _baue(tmp_path)
-    g = geraete_view.aufbereiten(state, lade_quellen(root),
-                                 lade_katalog(root), heute=HEUTE)
+    g = geraete_view.aufbereiten(
+        state, lade_quellen(root), lade_katalog(root), heute=HEUTE
+    )
     a = geraete_zeitreihe.aufbereiten(state, g["tco"])
     b = geraete_zeitreihe.aufbereiten(state, g["tco"])
     assert a["start"] == b["start"]
@@ -251,6 +343,7 @@ def test_der_startblock_ist_das_startpaar(ansicht):
 # Die Serien - guenstigstes Buendel je Tag, nichts interpoliert
 # --------------------------------------------------------------------------
 
+
 def test_zwei_buendel_desselben_tages_zaehlen_das_minimum(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     svg = paar["svg_breit"]
@@ -261,13 +354,14 @@ def test_zwei_buendel_desselben_tages_zaehlen_das_minimum(ansicht):
     # also die GROESSERE Y-Koordinate; haette der 937,00-er Satz gewonnen,
     # laege er darueber. Der verworfene Betrag steht nie als Label, der
     # des LETZTEN Punkts (913,00 am 14.9.) steht als Label.
-    werte = {t.get_text(strip=True)
-             for t in suppe.select("text.gr-zr-wert")}
+    werte = {t.get_text(strip=True) for t in suppe.select("text.gr-zr-wert")}
     assert "913 €" in werte
     assert "937 €" not in werte
-    o2 = sorted((float(c["cx"]), float(c["cy"]))
-                for c in suppe.select("circle.gr-zr-punkt")
-                if c.get("fill") == "#0019a5")
+    o2 = sorted(
+        (float(c["cx"]), float(c["cy"]))
+        for c in suppe.select("circle.gr-zr-punkt")
+        if c.get("fill") == "#0019a5"
+    )
     assert len(o2) == 3, "o2 traegt drei Messtage - sonst prueft der Test nichts"
     assert o2[1][1] > o2[0][1], o2
 
@@ -277,8 +371,9 @@ def test_unter_zwei_punkten_gibt_es_keinen_linienzug(ansicht):
     suppe = __import__("bs4").BeautifulSoup(paar["svg_breit"], "html.parser")
     # 1&1 hat genau einen Messtag (12.9.): ein Kreis, kein Pfad - Luecken
     # sind Informationen, nichts wird interpoliert.
-    punkte_1u1 = [c for c in suppe.select("circle.gr-zr-punkt")
-                  if c.get("fill") == "#2f7fd1"]
+    punkte_1u1 = [
+        c for c in suppe.select("circle.gr-zr-punkt") if c.get("fill") == "#2f7fd1"
+    ]
     pfade = suppe.select("path.gr-zr-linie")
     assert len(punkte_1u1) == 1
     # 4 Anbieter, aber nur 3 mit >= 2 Punkten -> hoechstens 3 Linien.
@@ -290,11 +385,13 @@ def test_der_fehlende_messtag_bleibt_punktlos(ansicht):
     suppe = __import__("bs4").BeautifulSoup(paar["svg_breit"], "html.parser")
     # congstar fehlt am 13.9. - an der X-Position des 13.9. steht kein
     # congstar-Punkt (gelber Marker #ffed00 auf der schwarzen Linie).
-    xticks = {t.get_text(strip=True): float(t["x"])
-              for t in suppe.select("text.gr-zr-xtick")}
+    xticks = {
+        t.get_text(strip=True): float(t["x"]) for t in suppe.select("text.gr-zr-xtick")
+    }
     x13 = xticks["13.9."]
-    congstar = [c for c in suppe.select("circle.gr-zr-punkt")
-                if c.get("fill") == "#ffed00"]
+    congstar = [
+        c for c in suppe.select("circle.gr-zr-punkt") if c.get("fill") == "#ffed00"
+    ]
     assert all(abs(float(c["cx"]) - x13) > 0.5 for c in congstar)
 
 
@@ -302,11 +399,11 @@ def test_der_fehlende_messtag_bleibt_punktlos(ansicht):
 # Die Achsen - echte Messtage, echte Datumsabstaende
 # --------------------------------------------------------------------------
 
+
 def test_die_x_achse_traegt_die_echten_messtage_als_ticks(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     suppe = __import__("bs4").BeautifulSoup(paar["svg_breit"], "html.parser")
-    texte = [t.get_text(strip=True)
-             for t in suppe.select("text.gr-zr-xtick")]
+    texte = [t.get_text(strip=True) for t in suppe.select("text.gr-zr-xtick")]
     # Union der Messtage DIESER Serien: 12., 13., 14., 15.9.
     assert texte == ["12.9.", "13.9.", "14.9.", "15.9."]
 
@@ -314,8 +411,9 @@ def test_die_x_achse_traegt_die_echten_messtage_als_ticks(ansicht):
 def test_die_x_abstaende_sind_datumsabstaende_keine_ordinalachse(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     suppe = __import__("bs4").BeautifulSoup(paar["svg_breit"], "html.parser")
-    xticks = {t.get_text(strip=True): float(t["x"])
-              for t in suppe.select("text.gr-zr-xtick")}
+    xticks = {
+        t.get_text(strip=True): float(t["x"]) for t in suppe.select("text.gr-zr-xtick")
+    }
     eins = xticks["13.9."] - xticks["12.9."]
     zwei = xticks["15.9."] - xticks["13.9."]
     # Ein Tag Abstand gegen zwei Tage Abstand: der doppelte Weg.
@@ -333,6 +431,7 @@ def test_die_y_achse_traegt_betraege_als_ticks(ansicht):
 # Antwort-Satz, Messtag-Zeile, Lueckensatz
 # --------------------------------------------------------------------------
 
+
 def test_der_antwort_satz_nennt_die_leitzahl_beim_namen(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     text = __import__("re").sub(r"<[^>]+>", "", paar["antwort_html"])
@@ -343,8 +442,7 @@ def test_der_antwort_satz_nennt_die_leitzahl_beim_namen(ansicht):
     assert "TCO-24" not in text, text
 
 
-def test_der_antwort_satz_nennt_geraet_band_anbieter_zahl_und_schnitt(
-        ansicht):
+def test_der_antwort_satz_nennt_geraet_band_anbieter_zahl_und_schnitt(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     text = __import__("re").sub(r"<[^>]+>", "", paar["antwort_html"])
     text = text.replace("&amp;", "&").replace("&nbsp;", " ")
@@ -395,14 +493,18 @@ def test_der_antwort_satz_endet_auf_genau_einem_punkt(ansicht):
     # _antwort_html schliessen den Satz selbst, der Abschluss der
     # Funktion setzte einen ZWEITEN Punkt dahinter. Der Satzschluss-
     # punkt steht genau EINMAL, an keiner Stelle ein "..".
-    saetze = {f"{p['modell']}/{p['band']}":
-              __import__("re").sub(r"<[^>]+>", "", p["antwort_html"]).strip()
-              for p in ansicht["paare"]}
+    saetze = {
+        f"{p['modell']}/{p['band']}": __import__("re")
+        .sub(r"<[^>]+>", "", p["antwort_html"])
+        .strip()
+        for p in ansicht["paare"]
+    }
     # Scharfheits-Beweis (P4/D4): die Fixture enthaelt wirklich einen
     # Fall mit Leitzahl (sonst pruefte der Test einen leeren Fall) - das
     # Delta ist der Pfad mit den Anhaengseln, die den ".."-Fehler trugen.
     assert any(p["leitzahl_html"] for p in ansicht["paare"]), (
-        "kein Paar mit Leitzahl - die Fixture prueft den Delta-Fall nicht")
+        "kein Paar mit Leitzahl - die Fixture prueft den Delta-Fall nicht"
+    )
     for schluessel, text in saetze.items():
         assert text.endswith("."), schluessel
         assert not text.endswith(".."), schluessel
@@ -411,8 +513,13 @@ def test_der_antwort_satz_endet_auf_genau_einem_punkt(ansicht):
 
 # --- E5: der Antwort-Satz nennt den Hersteller aus dem Katalog ----------
 
-_ZEILE = {"anbieter": "o2", "gesamt": 1000.0, "tarif": "O2 Mobile M",
-          "schnitt_monat": 41.67, "band_gb_text": "30 GB"}
+_ZEILE = {
+    "anbieter": "o2",
+    "gesamt": 1000.0,
+    "tarif": "O2 Mobile M",
+    "schnitt_monat": 41.67,
+    "band_gb_text": "30 GB",
+}
 
 
 def _text(html):
@@ -424,10 +531,13 @@ def test_der_antwort_satz_nennt_den_hersteller_wenn_der_katalog_ihn_kennt():
     # und laesst "17" - im Fliesstext liest sich "Beim 17 im Band M"
     # als Zahl ohne Bezug. Der Satz praefigiert den Hersteller aus dem
     # Katalog-Eintrag des Modells.
-    modell = {"id": "xiaomi-17", "titel": "Xiaomi 17",
-              "hersteller": "Xiaomi", "speicher": None}
-    html = geraete_zeitreihe._antwort_html(
-        modell, "m", [dict(_ZEILE)], {"label": "M"})
+    modell = {
+        "id": "xiaomi-17",
+        "titel": "Xiaomi 17",
+        "hersteller": "Xiaomi",
+        "speicher": None,
+    }
+    html = geraete_zeitreihe._antwort_html(modell, "m", [dict(_ZEILE)], {"label": "M"})
     assert "Beim Xiaomi 17 im Band M" in _text(html), _text(html)
 
 
@@ -435,8 +545,7 @@ def test_ohne_katalog_hersteller_bleibt_der_kurzname_geraten_wird_nichts():
     # Fehlt der Hersteller im Eintrag, bleibt es beim Kurznamen - E5-Regel:
     # Quelle ist der Katalog-/Auto-Eintrag, keine Vermutung.
     modell = {"id": "17", "titel": "17", "hersteller": "", "speicher": None}
-    html = geraete_zeitreihe._antwort_html(
-        modell, "m", [dict(_ZEILE)], {"label": "M"})
+    html = geraete_zeitreihe._antwort_html(modell, "m", [dict(_ZEILE)], {"label": "M"})
     assert "Beim 17 im Band M" in _text(html), _text(html)
     assert "Beim  17" not in _text(html)
 
@@ -446,10 +555,10 @@ def test_der_antwort_satz_mit_hersteller_die_kachel_ohne(ansicht):
     # die KACHEL-Vorschau bleibt kurz ("iPhone 17 Pro") - dieselbe
     # Aufbereitung, zwei Lesarten je Ort.
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
-    assert "Beim Apple iPhone 17 Pro im Band XS" in _text(
-        paar["antwort_html"]), _text(paar["antwort_html"])
-    assert ansicht["daten"]["kurz"]["apple-iphone-17-pro-256"] == \
-        "iPhone 17 Pro"
+    assert "Beim Apple iPhone 17 Pro im Band XS" in _text(paar["antwort_html"]), _text(
+        paar["antwort_html"]
+    )
+    assert ansicht["daten"]["kurz"]["apple-iphone-17-pro-256"] == "iPhone 17 Pro"
 
 
 def test_ein_lueckensatz_mit_alternativbaendern_statt_zeilen(ansicht):
@@ -478,6 +587,7 @@ def test_der_lueckensatz_nennt_nur_anbieter_ohne_zeile(ansicht):
 # Belege - echte URL je Anbieter am Linienende
 # --------------------------------------------------------------------------
 
+
 def test_jede_linie_endet_in_einem_beleglink_mit_datum(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     suppe = __import__("bs4").BeautifulSoup(paar["svg_breit"], "html.parser")
@@ -503,20 +613,24 @@ def test_auch_ein_punkt_anbieter_bekommt_ein_endlabel(ansicht):
     bleiben."""
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     suppe = __import__("bs4").BeautifulSoup(paar["svg_breit"], "html.parser")
-    namen = {t.get_text(strip=True).rstrip("↗ ") for t in
-             suppe.select("text.gr-zr-name")}
+    namen = {
+        t.get_text(strip=True).rstrip("↗ ") for t in suppe.select("text.gr-zr-name")
+    }
     assert "1&1" in namen
-    einundeins = [c for c in suppe.select("circle.gr-zr-punkt")
-                  if c.get("fill") == "#2f7fd1"]
+    einundeins = [
+        c for c in suppe.select("circle.gr-zr-punkt") if c.get("fill") == "#2f7fd1"
+    ]
     assert len(einundeins) == 1
     assert suppe.select("circle.gr-zr-halo")
-    link = next(a for a in suppe.select("a.gr-zr-link")
-               if a.get_text(strip=True).startswith("1&1"))
+    link = next(
+        a
+        for a in suppe.select("a.gr-zr-link")
+        if a.get_text(strip=True).startswith("1&1")
+    )
     assert (link.get("href") or "").startswith("https://")
 
 
-def test_ein_geraet_mit_nur_ein_punkt_serien_ist_trotzdem_beschriftet(
-        ansicht):
+def test_ein_geraet_mit_nur_ein_punkt_serien_ist_trotzdem_beschriftet(ansicht):
     """Das explizite Kriterium des Befunds: ein Modell/Band, dessen
     EINZIGER Anbieter nur einen Messtag traegt (Galaxy S26, Band XS:
     ausschliesslich 1&1, ein Messtag), bekommt trotzdem ein sichtbares
@@ -524,8 +638,9 @@ def test_ein_geraet_mit_nur_ein_punkt_serien_ist_trotzdem_beschriftet(
     paar = _paar(ansicht, ("samsung-galaxy-s26-256", "xs"))
     assert paar is not None
     suppe = __import__("bs4").BeautifulSoup(paar["svg_breit"], "html.parser")
-    namen = {t.get_text(strip=True).rstrip("↗ ") for t in
-             suppe.select("text.gr-zr-name")}
+    namen = {
+        t.get_text(strip=True).rstrip("↗ ") for t in suppe.select("text.gr-zr-name")
+    }
     assert namen == {"1&1"}
     assert suppe.select("circle.gr-zr-punkt")
     assert suppe.select("circle.gr-zr-halo")
@@ -537,8 +652,9 @@ def test_vodafone_ist_rot_ohne_zusatzetikett(ansicht):
     Unterkommentare)."""
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     suppe = __import__("bs4").BeautifulSoup(paar["svg_breit"], "html.parser")
-    vf_punkte = [c for c in suppe.select("circle.gr-zr-punkt")
-                 if c.get("fill") == "#e60000"]
+    vf_punkte = [
+        c for c in suppe.select("circle.gr-zr-punkt") if c.get("fill") == "#e60000"
+    ]
     assert vf_punkte
     assert "Vodafone" in suppe.get_text(" ")
     assert "unser Angebot" not in paar["svg_breit"]
@@ -550,8 +666,9 @@ def test_kein_beleglink_ohne_echte_url(tmp_path):
     roh = json.loads((state / "geraete_tco.json").read_text())
     roh["buendel"][0]["quelle_url"] = None
     (state / "geraete_tco.json").write_text(json.dumps(roh), encoding="utf-8")
-    g = geraete_view.aufbereiten(state, lade_quellen(root),
-                                 lade_katalog(root), heute=HEUTE)
+    g = geraete_view.aufbereiten(
+        state, lade_quellen(root), lade_katalog(root), heute=HEUTE
+    )
     a = geraete_zeitreihe.aufbereiten(state, g["tco"])
     paar = _paar(a, ("apple-iphone-17-pro-256", "xs"))
     suppe = __import__("bs4").BeautifulSoup(paar["svg_breit"], "html.parser")
@@ -563,12 +680,12 @@ def test_kein_beleglink_ohne_echte_url(tmp_path):
 # Suchvorschau und Kacheln - deterministisch, ohne Preise im Client
 # --------------------------------------------------------------------------
 
+
 def test_der_suchindex_ist_deterministisch_vorsortiert(ansicht):
     idx = ansicht["suchindex"]
-    schluessel = [(-e["band_zahl"], -e["anbieter_zahl"], e["titel"])
-                  for e in idx]
+    schluessel = [(-e["band_zahl"], -e["anbieter_zahl"], e["titel"]) for e in idx]
     assert schluessel == sorted(schluessel)
-    assert len(idx) == 2               # zwei Modelle mit Karten/Zeilen
+    assert len(idx) == 2  # zwei Modelle mit Karten/Zeilen
 
 
 def _erweitere_um_modelle(root, n: int) -> None:
@@ -578,60 +695,110 @@ def _erweitere_um_modelle(root, n: int) -> None:
     damit als Modell mit erlaubtem Band und MUSS im Suchindex stehen, egal
     wie weit hinten es sortiert ist."""
     katalog = yaml.safe_load(
-        (root / "config" / "geraete_katalog.yaml").read_text(encoding="utf-8"))
+        (root / "config" / "geraete_katalog.yaml").read_text(encoding="utf-8")
+    )
     db = json.loads(
-        (root / "data" / "state" / "geraete_db.json").read_text(encoding="utf-8"))
+        (root / "data" / "state" / "geraete_db.json").read_text(encoding="utf-8")
+    )
     tco = json.loads(
-        (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8"))
-    tarife = [json.loads(z) for z in
-              (root / "data" / "state" / "tarife.jsonl")
-              .read_text(encoding="utf-8").splitlines() if z.strip()]
+        (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
+    )
+    tarife = [
+        json.loads(z)
+        for z in (root / "data" / "state" / "tarife.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
+        if z.strip()
+    ]
     for i in range(n):
         device_id = f"samsung-galaxy-x{i}"
         sku = f"{device_id}-256gb-schwarz"
         katalog["geraete"].append(
-            {"hersteller": "Samsung", "modell": f"Galaxy X{i}",
-             "generation": i, "marktstart": "2026-01-30", "speicher": [256],
-             "segment": "budget"})
-        db["listungen"].append({
-            "id": f"o2--{sku}", "sku_id": sku, "device_id": device_id,
-            "anbieter": "o2", "anbieter_typ": "netzbetreiber", "netz": "o2",
-            "speicher_gb": 256, "farbe_roh": "Schwarz",
-            "farbe_normalisiert": "schwarz", "zustand": "neu",
-            "first_seen": "2026-09-01", "last_verified": HEUTE,
-            "status": "aktiv", "missed_checks": 0, "preis_ohne_vertrag": 299.0,
-            "erstpreis": 299.0, "erstpreis_art": "ohne_vertrag",
-            "erstpreis_am": "2026-09-01",
-            "quelle_url": f"https://example.de/o2/{device_id}",
-            "abgerufen_am": HEUTE, "verfuegbarkeit": "lieferbar",
-            "confidence": "hoch", "einstiege": ["https://example.de/l"]})
-        tco["buendel"].append({
-            "id": f"buendel--o2--{sku}--x{i}:klein", "sku_id": sku,
-            "anbieter": "o2", "tarif_name": f"X{i} Klein",
-            "tarif_id": f"x{i}:klein", "tarif_id_guete": "hoch",
-            "tarif_monatlich": 20.0, "geraet_zuzahlung": 1.0,
-            "geraet_monatsrate": 15.0, "laufzeit_monate": 24,
-            "anschlusspreis": 0.0, "zustand": "neu", "rabatte": [],
-            "quelle_url": f"https://example.de/o2/{device_id}",
-            "abgerufen_am": HEUTE, "first_seen": HEUTE,
-            "last_verified": HEUTE})
-        tarife.append({
-            "anbieter": "o2", "name": f"X{i} Klein", "tarif_id": f"x{i}:klein",
-            "art": "mobilfunk", "grundgebuehr": 20.0, "laufzeit_monate": 24,
-            "datenvolumen_gb": 10,
-            "preisphasen": [{"von_monat": 1, "bis_monat": None,
-                             "betrag": 20.0}],
-            "dokument_url": f"https://example.de/pib/x{i}",
-            "abgerufen_am": HEUTE, "confidence": {}, "fundstellen": {}})
+            {
+                "hersteller": "Samsung",
+                "modell": f"Galaxy X{i}",
+                "generation": i,
+                "marktstart": "2026-01-30",
+                "speicher": [256],
+                "segment": "budget",
+            }
+        )
+        db["listungen"].append(
+            {
+                "id": f"o2--{sku}",
+                "sku_id": sku,
+                "device_id": device_id,
+                "anbieter": "o2",
+                "anbieter_typ": "netzbetreiber",
+                "netz": "o2",
+                "speicher_gb": 256,
+                "farbe_roh": "Schwarz",
+                "farbe_normalisiert": "schwarz",
+                "zustand": "neu",
+                "first_seen": "2026-09-01",
+                "last_verified": HEUTE,
+                "status": "aktiv",
+                "missed_checks": 0,
+                "preis_ohne_vertrag": 299.0,
+                "erstpreis": 299.0,
+                "erstpreis_art": "ohne_vertrag",
+                "erstpreis_am": "2026-09-01",
+                "quelle_url": f"https://example.de/o2/{device_id}",
+                "abgerufen_am": HEUTE,
+                "verfuegbarkeit": "lieferbar",
+                "confidence": "hoch",
+                "einstiege": ["https://example.de/l"],
+            }
+        )
+        tco["buendel"].append(
+            {
+                "id": f"buendel--o2--{sku}--x{i}:klein",
+                "sku_id": sku,
+                "anbieter": "o2",
+                "tarif_name": f"X{i} Klein",
+                "tarif_id": f"x{i}:klein",
+                "tarif_id_guete": "hoch",
+                "tarif_monatlich": 20.0,
+                "geraet_zuzahlung": 1.0,
+                "geraet_monatsrate": 15.0,
+                "laufzeit_monate": 24,
+                "anschlusspreis": 0.0,
+                "zustand": "neu",
+                "rabatte": [],
+                "quelle_url": f"https://example.de/o2/{device_id}",
+                "abgerufen_am": HEUTE,
+                "first_seen": HEUTE,
+                "last_verified": HEUTE,
+            }
+        )
+        tarife.append(
+            {
+                "anbieter": "o2",
+                "name": f"X{i} Klein",
+                "tarif_id": f"x{i}:klein",
+                "art": "mobilfunk",
+                "grundgebuehr": 20.0,
+                "laufzeit_monate": 24,
+                "datenvolumen_gb": 10,
+                "preisphasen": [{"von_monat": 1, "bis_monat": None, "betrag": 20.0}],
+                "dokument_url": f"https://example.de/pib/x{i}",
+                "abgerufen_am": HEUTE,
+                "confidence": {},
+                "fundstellen": {},
+            }
+        )
     (root / "config" / "geraete_katalog.yaml").write_text(
-        yaml.safe_dump(katalog, allow_unicode=True, sort_keys=False),
-        encoding="utf-8")
+        yaml.safe_dump(katalog, allow_unicode=True, sort_keys=False), encoding="utf-8"
+    )
     (root / "data" / "state" / "geraete_db.json").write_text(
-        json.dumps(db), encoding="utf-8")
+        json.dumps(db), encoding="utf-8"
+    )
     (root / "data" / "state" / "geraete_tco.json").write_text(
-        json.dumps(tco), encoding="utf-8")
+        json.dumps(tco), encoding="utf-8"
+    )
     (root / "data" / "state" / "tarife.jsonl").write_text(
-        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8")
+        "\n".join(json.dumps(t) for t in tarife) + "\n", encoding="utf-8"
+    )
 
 
 def test_der_suchindex_traegt_jedes_modell_mit_band(tmp_path):
@@ -646,26 +813,34 @@ def test_der_suchindex_traegt_jedes_modell_mit_band(tmp_path):
     auch das alphabetisch letzte."""
     root, state = _baue(tmp_path)
     _erweitere_um_modelle(root, 40)
-    g = geraete_view.aufbereiten(state, lade_quellen(root), lade_katalog(root),
-                                 heute=HEUTE)
+    g = geraete_view.aufbereiten(
+        state, lade_quellen(root), lade_katalog(root), heute=HEUTE
+    )
     a = geraete_zeitreihe.aufbereiten(state, g["tco"])
     idx = a["daten"]["suchindex"]
     ids = {e["id"] for e in idx}
-    assert len(idx) == 42, \
-        f"Suchindex haelt {len(idx)} von 42 Modellen mit Band bereit"
-    assert "samsung-galaxy-x39-256" in ids, \
+    assert len(idx) == 42, f"Suchindex haelt {len(idx)} von 42 Modellen mit Band bereit"
+    assert "samsung-galaxy-x39-256" in ids, (
         "das hinterste Modell fehlt - ein Vorratsdeckel waehlt nach Listenposition"
+    )
 
 
 def test_der_client_knoten_traegt_keine_preise(ansicht):
     daten = json.dumps(ansicht["daten"], ensure_ascii=False)
     assert "€" not in daten, "keine Beträge im Client-Knoten"
-    assert '"gesamt"' not in daten and '"tco"' not in daten, \
+    assert '"gesamt"' not in daten and '"tco"' not in daten, (
         "keine Preisfelder im Client-Knoten"
+    )
     # Die Vorschau-Angaben je Modell: Titel + Zaehlungen, kein Betrag.
     for eintrag in ansicht["daten"]["suchindex"]:
-        assert set(eintrag) <= {"id", "titel", "hersteller", "speicher",
-                                "anbieter_zahl", "band_zahl"}
+        assert set(eintrag) <= {
+            "id",
+            "titel",
+            "hersteller",
+            "speicher",
+            "anbieter_zahl",
+            "band_zahl",
+        }
 
 
 def test_die_kacheln_sind_die_haeufigsten_geraete_mit_kurznamen(ansicht):
@@ -718,29 +893,32 @@ def test_das_karten_delta_ist_die_bewegung_des_fuehrenden_anbieters(ansicht_stat
     ansicht, state = ansicht_state
     k = ansicht["kacheln"][0]
     assert k["id"] == "apple-iphone-17-pro-256"
-    tco = json.loads((pathlib.Path(state) / "geraete_tco.json")
-                     .read_text(encoding="utf-8"))
+    tco = json.loads(
+        (pathlib.Path(state) / "geraete_tco.json").read_text(encoding="utf-8")
+    )
     anbieter_je_id = {b["id"]: b["anbieter"] for b in tco["buendel"]}
     je_anbieter: dict[str, dict[str, float]] = {}
     pfad = pathlib.Path(state) / "geraete_tco_historie.jsonl"
     for zeile in pfad.read_text(encoding="utf-8").splitlines():
         satz = json.loads(zeile)
         if not satz["tarif_id"].endswith(":klein"):
-            continue                       # die Karte zeigt Band XS
+            continue  # die Karte zeigt Band XS
         if satz["id"] not in anbieter_je_id:
-            continue                       # Farbdublette ohne Store-Satz
+            continue  # Farbdublette ohne Store-Satz
         je = je_anbieter.setdefault(anbieter_je_id[satz["id"]], {})
         if satz["datum"] not in je or satz["gesamt"] < je[satz["datum"]]:
             je[satz["datum"]] = satz["gesamt"]
     tage = sorted({d for je in je_anbieter.values() for d in je})
     assert (tage[0], tage[-1]) == ("2026-09-12", "2026-09-15")
-    fuehrend = min((a for a in je_anbieter if tage[-1] in je_anbieter[a]),
-                   key=lambda a: (je_anbieter[a][tage[-1]], a))
+    fuehrend = min(
+        (a for a in je_anbieter if tage[-1] in je_anbieter[a]),
+        key=lambda a: (je_anbieter[a][tage[-1]], a),
+    )
     assert fuehrend == "congstar"
-    assert tage[0] in je_anbieter[fuehrend], \
+    assert tage[0] in je_anbieter[fuehrend], (
         "ohne Messung am ersten Tag gaebe es keine Bewegung (A2)"
-    delta = round(je_anbieter[fuehrend][tage[-1]]
-                  - je_anbieter[fuehrend][tage[0]], 2)
+    )
+    delta = round(je_anbieter[fuehrend][tage[-1]] - je_anbieter[fuehrend][tage[0]], 2)
     assert delta == 0.0
     assert k["baender"]["xs"]["delta_text"] == "±0 € in 3 Tagen"
     assert k["baender"]["xs"]["delta_richtung"] == "gleich"
@@ -762,23 +940,28 @@ def test_bewegung_traegt_alle_richtungen():
     letzten Messtag fuehrt, nie der Wert des ersten Anbieters der
     Schleife."""
     steigt = geraete_zeitreihe._bewegung(
-        {"a": [["2026-09-12", 100.0], ["2026-09-14", 120.0]]})
+        {"a": [["2026-09-12", 100.0], ["2026-09-14", 120.0]]}
+    )
     assert steigt == {"text": "↑ +20 € in 2 Tagen", "richtung": "steigt"}
     sinkt = geraete_zeitreihe._bewegung(
-        {"a": [["2026-09-12", 100.0], ["2026-09-13", 90.0]]})
+        {"a": [["2026-09-12", 100.0], ["2026-09-13", 90.0]]}
+    )
     assert sinkt == {"text": "↓ −10 € in 1 Tag", "richtung": "sinkt"}
     gleich = geraete_zeitreihe._bewegung(
-        {"a": [["2026-09-12", 100.0], ["2026-09-13", 100.0]]})
+        {"a": [["2026-09-12", 100.0], ["2026-09-13", 100.0]]}
+    )
     assert gleich == {"text": "±0 € in 1 Tag", "richtung": "gleich"}
     # A2: fuehrt am letzten Tag ein Anbieter, der am ersten FEHLT (b: 90),
     # gibt es KEINE Bewegung. Die Front haette b (90) gegen a (100)
     # gestellt - zwei Angebote gegeneinander, keine Preisaenderung.
     front = geraete_zeitreihe._bewegung(
-        {"a": [["2026-09-12", 100.0], ["2026-09-13", 110.0]],
-         "b": [["2026-09-13", 90.0]]})
+        {
+            "a": [["2026-09-12", 100.0], ["2026-09-13", 110.0]],
+            "b": [["2026-09-13", 90.0]],
+        }
+    )
     assert front is None
-    assert geraete_zeitreihe._bewegung(
-        {"a": [["2026-09-12", 100.0]]}) is None
+    assert geraete_zeitreihe._bewegung({"a": [["2026-09-12", 100.0]]}) is None
 
 
 def test_wechselt_der_guenstigste_anbieter_ohne_preisaenderung_gibt_es_keine_bewegung():
@@ -790,15 +973,24 @@ def test_wechselt_der_guenstigste_anbieter_ohne_preisaenderung_gibt_es_keine_bew
     Differenz der zwei Angebote."""
     # Der Produktionsfall in Zahlen: congstar 1.009 EUR (12.9.),
     # 1&1 1.396 EUR (18.9.) - 387 EUR Front-Differenz, null Preisaenderung.
-    assert geraete_zeitreihe._bewegung(
-        {"congstar": [["2026-09-12", 1009.0]],
-         "1&1": [["2026-09-18", 1396.0]]}) is None
+    assert (
+        geraete_zeitreihe._bewegung(
+            {"congstar": [["2026-09-12", 1009.0]], "1&1": [["2026-09-18", 1396.0]]}
+        )
+        is None
+    )
     # Dieselbe Fehlerklasse, andersherum: der bisher Fuehrende bleibt
     # weiter gemessen und unveraendert, ein NOCH guenstigerer Anbieter
     # kommt hinzu - die Front faellt, kein Preis hat sich bewegt.
-    assert geraete_zeitreihe._bewegung(
-        {"congstar": [["2026-09-12", 1009.0], ["2026-09-18", 1009.0]],
-         "1&1": [["2026-09-18", 900.0]]}) is None
+    assert (
+        geraete_zeitreihe._bewegung(
+            {
+                "congstar": [["2026-09-12", 1009.0], ["2026-09-18", 1009.0]],
+                "1&1": [["2026-09-18", 900.0]],
+            }
+        )
+        is None
+    )
 
 
 def test_die_bewegung_misst_den_fuehrenden_anbieter_an_beiden_endtagen():
@@ -808,30 +1000,40 @@ def test_die_bewegung_misst_den_fuehrenden_anbieter_an_beiden_endtagen():
     Wuerfeln je Rendern)."""
     # b fuehrt am letzten Tag (94 < 95) und stand am ersten bei 90: +4.
     steigt = geraete_zeitreihe._bewegung(
-        {"a": [["2026-09-12", 100.0], ["2026-09-13", 95.0]],
-         "b": [["2026-09-12", 90.0], ["2026-09-13", 94.0]]})
+        {
+            "a": [["2026-09-12", 100.0], ["2026-09-13", 95.0]],
+            "b": [["2026-09-12", 90.0], ["2026-09-13", 94.0]],
+        }
+    )
     assert steigt == {"text": "↑ +4 € in 1 Tag", "richtung": "steigt"}
     # o2 ist am letzten Tag die einzige (und damit fuehrende) Messung;
     # 1&1 war am ersten guenstiger, fehlt aber am letzten - o2s eigene
     # Reihe ist unveraendert: ±0, nicht 1&1s niedrigerer alter Preis.
     gleich = geraete_zeitreihe._bewegung(
-        {"o2": [["2026-09-12", 100.0], ["2026-09-13", 100.0]],
-         "1&1": [["2026-09-12", 80.0]]})
+        {
+            "o2": [["2026-09-12", 100.0], ["2026-09-13", 100.0]],
+            "1&1": [["2026-09-12", 80.0]],
+        }
+    )
     assert gleich == {"text": "±0 € in 1 Tag", "richtung": "gleich"}
     # Gleichstand am letzten Tag (beide 100): die ANBIETER_FOLGE bricht
     # den Tie - o2 (Position 3) vor 1&1 (Position 4). Die Bewegung ist
     # o2s eigene (120 -> 100), nicht 1&1s (80 -> 100).
     tie = geraete_zeitreihe._bewegung(
-        {"1&1": [["2026-09-12", 80.0], ["2026-09-13", 100.0]],
-         "o2": [["2026-09-12", 120.0], ["2026-09-13", 100.0]]})
+        {
+            "1&1": [["2026-09-12", 80.0], ["2026-09-13", 100.0]],
+            "o2": [["2026-09-12", 120.0], ["2026-09-13", 100.0]],
+        }
+    )
     assert tie == {"text": "↓ −20 € in 1 Tag", "richtung": "sinkt"}
 
 
 def test_ohne_historie_gibt_es_den_ehrlichen_leersatz(tmp_path):
     root, state = _baue(tmp_path)
     (state / "geraete_tco_historie.jsonl").write_text("", encoding="utf-8")
-    g = geraete_view.aufbereiten(state, lade_quellen(root),
-                                 lade_katalog(root), heute=HEUTE)
+    g = geraete_view.aufbereiten(
+        state, lade_quellen(root), lade_katalog(root), heute=HEUTE
+    )
     a = geraete_zeitreihe.aufbereiten(state, g["tco"])
     assert a["hat_daten"] is False
     paar = _paar(a, ("apple-iphone-17-pro-256", "xs"))
@@ -846,10 +1048,12 @@ def test_die_schmalvariante_zeigt_dieselben_werte_weniger_labels(ansicht):
     schmal = __import__("bs4").BeautifulSoup(paar["svg_schmal"], "html.parser")
     # Punkte und X-Ticks identisch (dieselben Messungen), Erst-Werte-Labels
     # nur auf dem breiten Bild.
-    assert len(schmal.select("circle.gr-zr-punkt")) == \
-        len(breit.select("circle.gr-zr-punkt"))
-    assert len(schmal.select("text.gr-zr-xtick")) == \
-        len(breit.select("text.gr-zr-xtick"))
+    assert len(schmal.select("circle.gr-zr-punkt")) == len(
+        breit.select("circle.gr-zr-punkt")
+    )
+    assert len(schmal.select("text.gr-zr-xtick")) == len(
+        breit.select("text.gr-zr-xtick")
+    )
     assert len(schmal.select(".gr-zr-wert--erst")) == 0
 
 
@@ -861,8 +1065,13 @@ def test_die_schmalvariante_zeigt_dieselben_werte_weniger_labels(ansicht):
 # die Auswahl füllt).
 # ==========================================================================
 
-_AUTO_EINTRAG = {"hersteller": "Apple", "modell": "iPhone 18 Pro",
-                 "generation": 18, "speicher": [256], "auto": "2026-09-15"}
+_AUTO_EINTRAG = {
+    "hersteller": "Apple",
+    "modell": "iPhone 18 Pro",
+    "generation": 18,
+    "speicher": [256],
+    "auto": "2026-09-15",
+}
 
 
 def _baue_mit_auto(tmp_path: pathlib.Path, messtage: list[str]):
@@ -871,58 +1080,100 @@ def _baue_mit_auto(tmp_path: pathlib.Path, messtage: list[str]):
     root, state = _baue(tmp_path)
 
     (state / "geraete_katalog_auto.json").write_text(
-        json.dumps({"geraete": [_AUTO_EINTRAG]}, ensure_ascii=False),
-        encoding="utf-8")
+        json.dumps({"geraete": [_AUTO_EINTRAG]}, ensure_ascii=False), encoding="utf-8"
+    )
 
     db = json.loads((state / "geraete_db.json").read_text(encoding="utf-8"))
     gid, speicher = "apple-iphone-18-pro", 256
-    db["listungen"].append({
-        "id": f"o2--{_sku(gid, speicher)}", "sku_id": _sku(gid, speicher),
-        "device_id": gid, "anbieter": "o2", "anbieter_typ": "netzbetreiber",
-        "netz": "o2", "speicher_gb": speicher, "farbe_roh": "Schwarz",
-        "farbe_normalisiert": "schwarz", "zustand": "neu",
-        "first_seen": "2026-09-15", "last_verified": HEUTE, "status": "aktiv",
-        "missed_checks": 0, "preis_ohne_vertrag": 1199.00,
-        "erstpreis": 1199.00, "erstpreis_art": "ohne_vertrag",
-        "erstpreis_am": "2026-09-15",
-        "quelle_url": "https://example.de/o2/iphone-18-pro",
-        "abgerufen_am": HEUTE, "verfuegbarkeit": "lieferbar",
-        "confidence": "hoch", "einstiege": ["https://example.de/l"]})
+    db["listungen"].append(
+        {
+            "id": f"o2--{_sku(gid, speicher)}",
+            "sku_id": _sku(gid, speicher),
+            "device_id": gid,
+            "anbieter": "o2",
+            "anbieter_typ": "netzbetreiber",
+            "netz": "o2",
+            "speicher_gb": speicher,
+            "farbe_roh": "Schwarz",
+            "farbe_normalisiert": "schwarz",
+            "zustand": "neu",
+            "first_seen": "2026-09-15",
+            "last_verified": HEUTE,
+            "status": "aktiv",
+            "missed_checks": 0,
+            "preis_ohne_vertrag": 1199.00,
+            "erstpreis": 1199.00,
+            "erstpreis_art": "ohne_vertrag",
+            "erstpreis_am": "2026-09-15",
+            "quelle_url": "https://example.de/o2/iphone-18-pro",
+            "abgerufen_am": HEUTE,
+            "verfuegbarkeit": "lieferbar",
+            "confidence": "hoch",
+            "einstiege": ["https://example.de/l"],
+        }
+    )
     (state / "geraete_db.json").write_text(json.dumps(db), encoding="utf-8")
 
     tco = json.loads((state / "geraete_tco.json").read_text(encoding="utf-8"))
     buendel_id = f"buendel--o2--{_sku(gid, speicher)}--o2:klein"
-    tco["buendel"].append({
-        "id": buendel_id, "sku_id": _sku(gid, speicher), "anbieter": "o2",
-        "tarif_name": "O2 Mobile Klein", "tarif_id": "o2:klein",
-        "tarif_id_guete": "hoch", "tarif_monatlich": 20.0,
-        "geraet_zuzahlung": 1.0, "geraet_monatsrate": 18.0,
-        "laufzeit_monate": 24, "anschlusspreis": 0.0, "zustand": "neu",
-        "rabatte": [], "quelle_url": "https://example.de/o2/18pro",
-        "abgerufen_am": HEUTE, "first_seen": "2026-09-15",
-        "last_verified": HEUTE})
+    tco["buendel"].append(
+        {
+            "id": buendel_id,
+            "sku_id": _sku(gid, speicher),
+            "anbieter": "o2",
+            "tarif_name": "O2 Mobile Klein",
+            "tarif_id": "o2:klein",
+            "tarif_id_guete": "hoch",
+            "tarif_monatlich": 20.0,
+            "geraet_zuzahlung": 1.0,
+            "geraet_monatsrate": 18.0,
+            "laufzeit_monate": 24,
+            "anschlusspreis": 0.0,
+            "zustand": "neu",
+            "rabatte": [],
+            "quelle_url": "https://example.de/o2/18pro",
+            "abgerufen_am": HEUTE,
+            "first_seen": "2026-09-15",
+            "last_verified": HEUTE,
+        }
+    )
     (state / "geraete_tco.json").write_text(json.dumps(tco), encoding="utf-8")
 
-    zeilen = (state / "geraete_tco_historie.jsonl") \
-        .read_text(encoding="utf-8").splitlines()
+    zeilen = (
+        (state / "geraete_tco_historie.jsonl").read_text(encoding="utf-8").splitlines()
+    )
     for tag in messtage:
-        zeilen.append(json.dumps({
-            "id": buendel_id, "datum": tag, "tarif_id": "o2:klein",
-            "tarif_id_guete": "hoch", "tarif_monatlich": 20.0,
-            "geraet_zuzahlung": 1.0, "geraet_monatsrate": 18.0,
-            "laufzeit_monate": 24, "anschlusspreis": 0.0,
-            "quelle_url": "https://example.de/o2/18pro", "abgerufen_am": tag,
-            "zustand": "neu", "gesamt": 1600.00,
-            "sku_id": _sku(gid, speicher)}))
+        zeilen.append(
+            json.dumps(
+                {
+                    "id": buendel_id,
+                    "datum": tag,
+                    "tarif_id": "o2:klein",
+                    "tarif_id_guete": "hoch",
+                    "tarif_monatlich": 20.0,
+                    "geraet_zuzahlung": 1.0,
+                    "geraet_monatsrate": 18.0,
+                    "laufzeit_monate": 24,
+                    "anschlusspreis": 0.0,
+                    "quelle_url": "https://example.de/o2/18pro",
+                    "abgerufen_am": tag,
+                    "zustand": "neu",
+                    "gesamt": 1600.00,
+                    "sku_id": _sku(gid, speicher),
+                }
+            )
+        )
     (state / "geraete_tco_historie.jsonl").write_text(
-        "\n".join(z for z in zeilen if z) + "\n", encoding="utf-8")
+        "\n".join(z for z in zeilen if z) + "\n", encoding="utf-8"
+    )
     return root, state
 
 
 def test_auto_modell_mit_einem_mestag_steht_nicht_in_der_wahl(tmp_path):
     root, state = _baue_mit_auto(tmp_path, ["2026-09-15"])
-    g = geraete_view.aufbereiten(state, lade_quellen(root),
-                                 lade_katalog(root), heute=HEUTE)
+    g = geraete_view.aufbereiten(
+        state, lade_quellen(root), lade_katalog(root), heute=HEUTE
+    )
     a = geraete_zeitreihe.aufbereiten(state, g["tco"])
 
     ids = {m["id"] for m in a["suchindex"]}
@@ -935,8 +1186,10 @@ def test_auto_modell_mit_einem_mestag_steht_nicht_in_der_wahl(tmp_path):
     # eine Quelle der Wahrheit, zwei Sichtbarkeitsregeln. Seit P3 ist der
     # Katalog eine Zeile je Modell - der Listungs-Bestand lebt im
     # Aufklapper derselben Modellzeile.
-    assert any(z["modell"] == "iPhone 18 Pro" and z["listungen"] >= 1
-               for z in g["katalog_modelle"])
+    assert any(
+        z["modell"] == "iPhone 18 Pro" and z["listungen"] >= 1
+        for z in g["katalog_modelle"]
+    )
 
     # Gegenprobe: ein HAND-Eintrag mit EINEM Messtag bleibt waehlbar -
     # die Regel gilt nur fuer Auto-Eintraege (Galaxy S26 hat hier genau
@@ -946,8 +1199,9 @@ def test_auto_modell_mit_einem_mestag_steht_nicht_in_der_wahl(tmp_path):
 
 def test_auto_modell_mit_zwei_mestagen_steht_in_der_wahl(tmp_path):
     root, state = _baue_mit_auto(tmp_path, ["2026-09-15", "2026-09-16"])
-    g = geraete_view.aufbereiten(state, lade_quellen(root),
-                                 lade_katalog(root), heute=HEUTE)
+    g = geraete_view.aufbereiten(
+        state, lade_quellen(root), lade_katalog(root), heute=HEUTE
+    )
     a = geraete_zeitreihe.aufbereiten(state, g["tco"])
     ids = {m["id"] for m in a["suchindex"]}
     assert "apple-iphone-18-pro-256" in ids
@@ -970,15 +1224,25 @@ def test_auto_modell_mit_zwei_mestagen_steht_in_der_wahl(tmp_path):
 # traegt genau EIN svg.gr-zr (test_geraete_reiter_browser).
 # ==========================================================================
 
+
 def _h3_karte(anbieter, gesamt, monate, band="xs", frisch=True):
     """Eine Kartenzeile in der Form, die `_band_zeilen` liest."""
-    return {"anbieter": anbieter, "gesamt": gesamt, "schnitt_monat":
-            round(gesamt / monate, 2), "leitzahl_monate": monate,
-            "tarif": f"{anbieter} Tarif", "band": band,
-            "band_gb_text": "15 GB", "vergleichbar": True,
-            "belastbar": True, "frisch": frisch, "sku_id": f"sku-{anbieter}",
-            "naeherung": False, "quelle_url": f"https://x.invalid/{anbieter}",
-            "abgerufen_am": HEUTE}
+    return {
+        "anbieter": anbieter,
+        "gesamt": gesamt,
+        "schnitt_monat": round(gesamt / monate, 2),
+        "leitzahl_monate": monate,
+        "tarif": f"{anbieter} Tarif",
+        "band": band,
+        "band_gb_text": "15 GB",
+        "vergleichbar": True,
+        "belastbar": True,
+        "frisch": frisch,
+        "sku_id": f"sku-{anbieter}",
+        "naeherung": False,
+        "quelle_url": f"https://x.invalid/{anbieter}",
+        "abgerufen_am": HEUTE,
+    }
 
 
 def test_h3_eine_36_monats_karte_ist_keine_zeile_dieser_tafel():
@@ -986,21 +1250,27 @@ def test_h3_eine_36_monats_karte_ist_keine_zeile_dieser_tafel():
     Monate) als GUENSTIGSTE Zeile vor Vodafones 1.433,80 EUR (24 Monate)
     - der Antwort-Satz nannte sie "Kosten über 24 Monate", und
     `_leitzahl_html` zog die zwei Zahlen voneinander ab."""
-    modell = {"id": "m", "titel": "Testgerät", "hersteller": "Test",
-              "speicher": 256,
-              "karten": [_h3_karte("1&1", 1299.54, 36),
-                         _h3_karte("Vodafone", 1433.80, 24)]}
+    modell = {
+        "id": "m",
+        "titel": "Testgerät",
+        "hersteller": "Test",
+        "speicher": 256,
+        "karten": [_h3_karte("1&1", 1299.54, 36), _h3_karte("Vodafone", 1433.80, 24)],
+    }
     satz = geraete_zeitreihe._band_zeilen(modell)["xs"]
     assert [z["anbieter"] for z in satz["zeilen"]] == ["Vodafone"]
     # Sie ist nicht weg, sie liegt im eigenen Eimer - MIT ihrem Zeitraum.
-    assert [(k["anbieter"], k["leitzahl_monate"]) for k in satz["fremd"]] \
-        == [("1&1", 36)]
+    assert [(k["anbieter"], k["leitzahl_monate"]) for k in satz["fremd"]] == [
+        ("1&1", 36)
+    ]
     # Kein Delta ueber zwei Zeitraeume: Vodafone fuehrt selbst, also gibt
     # es keine Leitzahl-Zeile (vorher: 1.433,80 - 1.299,54 = 134,26 EUR).
     assert geraete_zeitreihe._leitzahl_html(satz["zeilen"]) is None
-    text = _text(geraete_zeitreihe._antwort_html(
-        modell, "xs", satz["zeilen"], {"label": "XS"},
-        fremd=satz["fremd"]))
+    text = _text(
+        geraete_zeitreihe._antwort_html(
+            modell, "xs", satz["zeilen"], {"label": "XS"}, fremd=satz["fremd"]
+        )
+    )
     assert "führt nur Vodafone" in text and "1.433,80 €" in text
     assert "1.299,54" not in text
 
@@ -1008,18 +1278,23 @@ def test_h3_eine_36_monats_karte_ist_keine_zeile_dieser_tafel():
 def test_h3_der_luecken_satz_nennt_anbieter_und_zeitraum():
     """Der Anbieter faellt aus den Zeilen - und wird GENANNT. "Kein
     Bündel in diesem Band" waere gelogen (harte Regel 9)."""
-    modell = {"id": "m", "titel": "Testgerät", "hersteller": "Test",
-              "speicher": 256,
-              "karten": [_h3_karte("1&1", 1299.54, 36),
-                         _h3_karte("Vodafone", 1433.80, 24)]}
+    modell = {
+        "id": "m",
+        "titel": "Testgerät",
+        "hersteller": "Test",
+        "speicher": 256,
+        "karten": [_h3_karte("1&1", 1299.54, 36), _h3_karte("Vodafone", 1433.80, 24)],
+    }
     satz = geraete_zeitreihe._band_zeilen(modell)["xs"]
     luecken = geraete_zeitreihe._luecken(
-        satz["zeilen"], modell["karten"], "xs", fremd=satz["fremd"])
+        satz["zeilen"], modell["karten"], "xs", fremd=satz["fremd"]
+    )
     eins = next(l for l in luecken if l["anbieter"] == "1&1")
     assert (eins["grund"], eins["monate"]) == ("anderer-zeitraum", 36)
     text = geraete_zeitreihe._luecke_text(luecken, {})
-    assert "Nur über eine andere Laufzeit, nicht über 24 Monate: " \
-        "1&1 (36 Monate)" in text, text
+    assert (
+        "Nur über eine andere Laufzeit, nicht über 24 Monate: 1&1 (36 Monate)" in text
+    ), text
     assert "Kein Bündel in diesem Band: 1&1" not in text
 
 
@@ -1028,21 +1303,32 @@ def test_h3_ein_band_mit_nur_fremdem_zeitraum_verschwindet_nicht():
     EINZIGES Angebot 36 Monate traegt, hat keine Zeile - "führt kein
     Anbieter ein Bündel" waere falsch, und das Band ganz aus der Auswahl
     zu nehmen waere ein gemessenes Angebot ohne ein Wort."""
-    modell = {"id": "m", "titel": "Testgerät", "hersteller": "Test",
-              "speicher": 256, "karten": [_h3_karte("1&1", 2019.54, 36)]}
+    modell = {
+        "id": "m",
+        "titel": "Testgerät",
+        "hersteller": "Test",
+        "speicher": 256,
+        "karten": [_h3_karte("1&1", 2019.54, 36)],
+    }
     satz = geraete_zeitreihe._band_zeilen(modell)["xs"]
     assert satz["zeilen"] == [] and satz["alt"] == []
     assert satz["fremd"], "das Angebot ist verloren gegangen"
-    text = _text(geraete_zeitreihe._antwort_html(
-        modell, "xs", satz["zeilen"], {"label": "XS"},
-        alte=satz["alt"], fremd=satz["fremd"]))
+    text = _text(
+        geraete_zeitreihe._antwort_html(
+            modell,
+            "xs",
+            satz["zeilen"],
+            {"label": "XS"},
+            alte=satz["alt"],
+            fremd=satz["fremd"],
+        )
+    )
     assert "führt kein Anbieter ein Bündel" not in text
     assert "führt nur 1&amp;1" in text and "nur über 36 Monate" in text
     assert "2.019,54 €" in text, text
 
 
-def test_z1_die_beschriftung_behauptet_nur_zeitraeume_die_im_bild_stehen(
-        ansicht):
+def test_z1_die_beschriftung_behauptet_nur_zeitraeume_die_im_bild_stehen(ansicht):
     """P0-B-z1: Graph und Beschriftung sagen dasselbe - ohne Kappung.
 
     ROT gegen den vorigen Stand (P0-B-h3): der verlangte hier, dass ein
@@ -1070,11 +1356,13 @@ def test_z1_die_beschriftung_behauptet_nur_zeitraeume_die_im_bild_stehen(
                 assert len(monate) == kurven, (
                     f"{p['modell']}/{p['band']}: {kopf!r} nennt mehrere "
                     f"Zeitraeume, aber nur {len(monate)} von {kurven} "
-                    f"Kurven tragen ihren")
+                    f"Kurven tragen ihren"
+                )
             else:
                 assert not monate, (
                     f"{p['modell']}/{p['band']}: {kopf!r} gilt fuer alle "
-                    f"Kurven - das Etikett {monate} steht doppelt")
+                    f"Kurven - das Etikett {monate} steht doppelt"
+                )
     assert mit_svg, "kein Graph im Bestand - der Test prueft nichts"
 
 
@@ -1083,22 +1371,24 @@ def test_z1_der_alternativ_betrag_nennt_seinen_abweichenden_zeitraum():
     als Alternative OHNE seinen Zeitraum - mitten in einem Satz, der von
     24 Monaten spricht. ROT gegen den alten Stand: dort stand nur
     "mittel 2.019,54 €"."""
-    karten = [_h3_karte("1&1", 2019.54, 36, band="m"),
-              _h3_karte("Vodafone", 1433.80, 24, band="xs")]
+    karten = [
+        _h3_karte("1&1", 2019.54, 36, band="m"),
+        _h3_karte("Vodafone", 1433.80, 24, band="xs"),
+    ]
     alternativen = geraete_zeitreihe._alternativen(karten, "xs", "1&1")
-    assert alternativen == [{"band": "m", "tco": 2019.54,
-                             "monate": 36}]
-    luecken = geraete_zeitreihe._luecken(
-        [{"anbieter": "Vodafone"}], karten, "xs")
+    assert alternativen == [{"band": "m", "tco": 2019.54, "monate": 36}]
+    luecken = geraete_zeitreihe._luecken([{"anbieter": "Vodafone"}], karten, "xs")
     text = geraete_zeitreihe._luecke_text(luecken, {})
     assert "1&1 (M 2.019,54 € über 36 Monate)" in text, text
     # Gegenprobe: beim Zeitraum des Satzes selbst bleibt die Angabe weg -
     # eine 24 hinter jeder Zahl waere dieselbe Aussage zweimal.
-    karten24 = [_h3_karte("1&1", 1700.00, 24, band="m"),
-                _h3_karte("Vodafone", 1433.80, 24, band="xs")]
+    karten24 = [
+        _h3_karte("1&1", 1700.00, 24, band="m"),
+        _h3_karte("Vodafone", 1433.80, 24, band="xs"),
+    ]
     text24 = geraete_zeitreihe._luecke_text(
-        geraete_zeitreihe._luecken([{"anbieter": "Vodafone"}], karten24,
-                                   "xs"), {})
+        geraete_zeitreihe._luecken([{"anbieter": "Vodafone"}], karten24, "xs"), {}
+    )
     assert "1&1 (M 1.700,00 €)" in text24, text24
 
 
@@ -1107,11 +1397,14 @@ def test_z1_die_alternative_vergleicht_nur_innerhalb_eines_zeitraums():
     nicht ueber zwei Laufzeiten gewaehlt werden. ROT gegen den alten
     Stand: dort gewann das Minimum (1.200,00 € über 36 Monate) gegen die
     vergleichbare 24-Monats-Zahl."""
-    karten = [_h3_karte("1&1", 1200.00, 36, band="m"),
-              _h3_karte("1&1", 1500.00, 24, band="m"),
-              _h3_karte("Vodafone", 1433.80, 24, band="xs")]
-    assert geraete_zeitreihe._alternativen(karten, "xs", "1&1") == \
-        [{"band": "m", "tco": 1500.00, "monate": 24}]
+    karten = [
+        _h3_karte("1&1", 1200.00, 36, band="m"),
+        _h3_karte("1&1", 1500.00, 24, band="m"),
+        _h3_karte("Vodafone", 1433.80, 24, band="xs"),
+    ]
+    assert geraete_zeitreihe._alternativen(karten, "xs", "1&1") == [
+        {"band": "m", "tco": 1500.00, "monate": 24}
+    ]
 
 
 def test_z1_die_bewegung_geht_nie_ueber_zwei_zeitraeume():
@@ -1122,21 +1415,30 @@ def test_z1_die_bewegung_geht_nie_ueber_zwei_zeitraeume():
     Stand: dort waehlte `_bewegung` den Fuehrenden ueber beide Zeitraeume
     (1&1) und meldete dessen ±0 als Bewegung des Bandes.
     """
-    serien = {"congstar": [("2026-09-12", 1459.0), ("2026-09-15", 1409.0)],
-              "1&1": [("2026-09-12", 1299.54), ("2026-09-15", 1299.54)]}
+    serien = {
+        "congstar": [("2026-09-12", 1459.0), ("2026-09-15", 1409.0)],
+        "1&1": [("2026-09-12", 1299.54), ("2026-09-15", 1299.54)],
+    }
     zeitraeume = {"congstar": [24], "1&1": [36]}
-    assert geraete_zeitreihe._bewegung(serien, zeitraeume) == \
-        {"text": "↓ −50 € in 3 Tagen", "richtung": "sinkt"}
+    assert geraete_zeitreihe._bewegung(serien, zeitraeume) == {
+        "text": "↓ −50 € in 3 Tagen",
+        "richtung": "sinkt",
+    }
     # Gegenprobe, dass der Unterschied am Tor haengt und nicht an den
     # Zahlen: OHNE Zeitraum-Wissen fuehrt 1&1 - genau die Rangfolge, die
     # der alte Stand gemeldet hat.
-    assert geraete_zeitreihe._bewegung(serien) == \
-        {"text": "±0 € in 3 Tagen", "richtung": "gleich"}
+    assert geraete_zeitreihe._bewegung(serien) == {
+        "text": "±0 € in 3 Tagen",
+        "richtung": "gleich",
+    }
     # Und wechselt der Fuehrende selbst die Laufzeit, ist die Stufe in
     # seiner Kurve keine Preisaenderung: kein Delta (Clean Code 4).
-    assert geraete_zeitreihe._bewegung(
-        {"1&1": [("2026-09-12", 1000.0), ("2026-09-15", 1500.0)]},
-        {"1&1": [24, 36]}) is None
+    assert (
+        geraete_zeitreihe._bewegung(
+            {"1&1": [("2026-09-12", 1000.0), ("2026-09-15", 1500.0)]}, {"1&1": [24, 36]}
+        )
+        is None
+    )
 
 
 def test_z1_der_fremde_zeitraum_hat_sein_eigenes_kachel_feld(tmp_path):
@@ -1146,16 +1448,24 @@ def test_z1_der_fremde_zeitraum_hat_sein_eigenes_kachel_feld(tmp_path):
     gegen den alten Stand: dort war `alt_text` gesetzt und `fremd_text`
     gab es nicht.
     """
-    tco = {"modelle": [{"id": "m", "titel": "Testgerät 256 GB",
-                        "hersteller": "Test", "speicher": 256,
-                        "karten": [_h3_karte("1&1", 2019.54, 36)]}],
-           "baender_katalog": [{"key": "xs", "label": "XS"}],
-           "band_je_tarif": {}, "historie_lage": {}}
+    tco = {
+        "modelle": [
+            {
+                "id": "m",
+                "titel": "Testgerät 256 GB",
+                "hersteller": "Test",
+                "speicher": 256,
+                "karten": [_h3_karte("1&1", 2019.54, 36)],
+            }
+        ],
+        "baender_katalog": [{"key": "xs", "label": "XS"}],
+        "band_je_tarif": {},
+        "historie_lage": {},
+    }
     a = geraete_zeitreihe.aufbereiten(tmp_path, tco)
     kachel = a["kacheln"][0]["baender"]["xs"]
     assert kachel["fremd_text"] == "nur über 36 Monate"
-    assert kachel["alt_text"] is None, \
-        "der fremde Zeitraum ist kein alter Stand"
+    assert kachel["alt_text"] is None, "der fremde Zeitraum ist kein alter Stand"
     assert kachel["ab"] is None, "kein Betrag ohne vergleichbaren Zeitraum"
 
 
@@ -1164,28 +1474,45 @@ def test_z1_der_fremde_zeitraum_hat_sein_eigenes_kachel_feld(tmp_path):
 # verliert die zweite Zahlweise nicht mehr still.
 # ==========================================================================
 
+
 def _p1_zeile(bid, datum, laufzeit, rate):
-    return {"id": bid, "datum": datum, "tarif_id": "tarif-x",
-            "tarif_monatlich": 20.0, "geraet_zuzahlung": 0.0,
-            "geraet_monatsrate": rate, "laufzeit_monate": laufzeit,
-            "anschlusspreis": 0.0,
-            # 24 Monate x 30 EUR == 36 Monate x 20 EUR == 720 EUR
-            # Geraeteanteil; TCO-24 (Tarif 24x20 + Geraet) ist fuer beide
-            # Zahlweisen also 1.200,00 EUR - genau der Gleichstand, den der
-            # Befund beschreibt (congstar: 24 UND 36 Raten zum selben
-            # `gesamt`).
-            "gesamt": 1200.0, "quelle_url": "https://example.de/congstar",
-            "abgerufen_am": datum}
+    return {
+        "id": bid,
+        "datum": datum,
+        "tarif_id": "tarif-x",
+        "tarif_monatlich": 20.0,
+        "geraet_zuzahlung": 0.0,
+        "geraet_monatsrate": rate,
+        "laufzeit_monate": laufzeit,
+        "anschlusspreis": 0.0,
+        # 24 Monate x 30 EUR == 36 Monate x 20 EUR == 720 EUR
+        # Geraeteanteil; TCO-24 (Tarif 24x20 + Geraet) ist fuer beide
+        # Zahlweisen also 1.200,00 EUR - genau der Gleichstand, den der
+        # Befund beschreibt (congstar: 24 UND 36 Raten zum selben
+        # `gesamt`).
+        "gesamt": 1200.0,
+        "quelle_url": "https://example.de/congstar",
+        "abgerufen_am": datum,
+    }
 
 
 def _p1_buendel(bid, laufzeit, rate):
-    return {"id": bid, "sku_id": "sku-x", "anbieter": "congstar",
-            "tarif_name": "Allnet Flat XS", "tarif_id": "tarif-x",
-            "tarif_id_guete": "hoch", "tarif_monatlich": 20.0,
-            "geraet_zuzahlung": 0.0, "geraet_monatsrate": rate,
-            "laufzeit_monate": laufzeit, "anschlusspreis": 0.0,
-            "zustand": "neu", "quelle_url": "https://example.de/congstar",
-            "abgerufen_am": "2026-09-22"}
+    return {
+        "id": bid,
+        "sku_id": "sku-x",
+        "anbieter": "congstar",
+        "tarif_name": "Allnet Flat XS",
+        "tarif_id": "tarif-x",
+        "tarif_id_guete": "hoch",
+        "tarif_monatlich": 20.0,
+        "geraet_zuzahlung": 0.0,
+        "geraet_monatsrate": rate,
+        "laufzeit_monate": laufzeit,
+        "anschlusspreis": 0.0,
+        "zustand": "neu",
+        "quelle_url": "https://example.de/congstar",
+        "abgerufen_am": "2026-09-22",
+    }
 
 
 def _p1_state(tmp_path):
@@ -1193,13 +1520,19 @@ def _p1_state(tmp_path):
     state.mkdir()
     id24 = "buendel--congstar--sku-x--tarif-x--24"
     id36 = "buendel--congstar--sku-x--tarif-x--36"
-    (state / "geraete_tco.json").write_text(json.dumps({
-        "buendel": [_p1_buendel(id24, 24, 30.0),
-                    _p1_buendel(id36, 36, 20.0)]}), encoding="utf-8")
-    zeilen = [_p1_zeile(id24, "2026-09-22", 24, 30.0),
-             _p1_zeile(id36, "2026-09-22", 36, 20.0)]
+    (state / "geraete_tco.json").write_text(
+        json.dumps(
+            {"buendel": [_p1_buendel(id24, 24, 30.0), _p1_buendel(id36, 36, 20.0)]}
+        ),
+        encoding="utf-8",
+    )
+    zeilen = [
+        _p1_zeile(id24, "2026-09-22", 24, 30.0),
+        _p1_zeile(id36, "2026-09-22", 36, 20.0),
+    ]
     (state / "geraete_tco_historie.jsonl").write_text(
-        "\n".join(json.dumps(z) for z in zeilen) + "\n", encoding="utf-8")
+        "\n".join(json.dumps(z) for z in zeilen) + "\n", encoding="utf-8"
+    )
     # DIESELBE Karte dient beiden Zwecken: `_messungen` findet ueber ihre
     # `sku_id` das Modell, `_band_zeilen`/`_luecken` brauchen dieselbe
     # Karte vollstaendig (Anbieter, Band, Betrag) fuer eine echte
@@ -1207,14 +1540,15 @@ def _p1_state(tmp_path):
     # kein Paar.
     karte = _h3_karte("congstar", 1200.0, 24)
     karte["sku_id"] = "sku-x"
-    tco = {"modelle": [{"id": "modell-x", "karten": [karte]}],
-           "band_je_tarif": {"tarif-x": "xs"},
-           "baender_katalog": [{"key": "xs", "label": "XS"}]}
+    tco = {
+        "modelle": [{"id": "modell-x", "karten": [karte]}],
+        "band_je_tarif": {"tarif-x": "xs"},
+        "baender_katalog": [{"key": "xs", "label": "XS"}],
+    }
     return state, tco
 
 
-def test_p1_gleichstand_zweier_ratenlaufzeiten_verliert_die_zweite_nicht(
-        tmp_path):
+def test_p1_gleichstand_zweier_ratenlaufzeiten_verliert_die_zweite_nicht(tmp_path):
     """ROT vor dem Fix: `besser = wert < alt["wert"]` (strikt) verwarf die
     zweite Zeile still, sobald beide denselben `wert` trugen - welche der
     beiden ueberlebte, entschied nur die Dateireihenfolge, und die
@@ -1240,18 +1574,20 @@ def test_p1_der_rechenweg_nennt_die_zweite_zahlweise(tmp_path):
     assert "Restschuld" in paar["rechenweg_html"]
 
 
-def test_p1_bei_reihenfolgetausch_bleibt_dieselbe_zahlweise_gewinnen(
-        tmp_path):
+def test_p1_bei_reihenfolgetausch_bleibt_dieselbe_zahlweise_gewinnen(tmp_path):
     """Die Regel ist FEST (kuerzere Laufzeit gewinnt), nicht von der
     Dateireihenfolge abhaengig - dieselbe Pruefung mit vertauschten Zeilen
     muss dasselbe Ergebnis liefern."""
     state, tco = _p1_state(tmp_path)
     id24 = "buendel--congstar--sku-x--tarif-x--24"
     id36 = "buendel--congstar--sku-x--tarif-x--36"
-    zeilen = [_p1_zeile(id36, "2026-09-22", 36, 20.0),
-             _p1_zeile(id24, "2026-09-22", 24, 30.0)]
+    zeilen = [
+        _p1_zeile(id36, "2026-09-22", 36, 20.0),
+        _p1_zeile(id24, "2026-09-22", 24, 30.0),
+    ]
     (state / "geraete_tco_historie.jsonl").write_text(
-        "\n".join(json.dumps(z) for z in zeilen) + "\n", encoding="utf-8")
+        "\n".join(json.dumps(z) for z in zeilen) + "\n", encoding="utf-8"
+    )
     messungen = geraete_zeitreihe._messungen(state, tco)
     slot = messungen[("modell-x", "xs")]["congstar"]["2026-09-22"]
     assert slot["laufzeit"] == 24

@@ -45,6 +45,7 @@ AUFRUF
 ------
     PYTHONPATH=src python3 scripts/lokallauf_einsundeins_simonly.py [--root .]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -82,7 +83,8 @@ def _hole_mit_beleg(beleg: list):
             resp = getattr(exc, "response", None)
             eintrag["status"] = getattr(resp, "status_code", None)
             eintrag["user_agent"] = (
-                resp.request.headers.get("User-Agent") if resp is not None else None)
+                resp.request.headers.get("User-Agent") if resp is not None else None
+            )
             eintrag["fehler"] = type(exc).__name__
             beleg.append(eintrag)
             raise
@@ -100,8 +102,8 @@ def main() -> None:
     args = p.parse_args()
 
     logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+        level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
+    )
     log = logging.getLogger("lokallauf_einsundeins_simonly")
 
     root = Path(args.root)
@@ -109,8 +111,7 @@ def main() -> None:
     from telco_radar import geraete_pipeline
     from telco_radar.analyze.tco_store import TcoDB
     from telco_radar.collect import http as _http_mod
-    from telco_radar.collect.tarif_einsundeins_simonly import (
-        sammle as sammle_simonly)
+    from telco_radar.collect.tarif_einsundeins_simonly import sammle as sammle_simonly
 
     cfg = load_config(root)
     http_cfg = cfg.settings.get("http", {})
@@ -140,44 +141,69 @@ def main() -> None:
             tco = TcoDB(root / "data" / "state" / "geraete_tco.json")
             neu = tco.setze_referenzen(referenzen, heute)
             geschrieben = tco.save(heute)
-            log.info("Geräte-TCO: %d 1&1-SIM-only-Referenzen aufgefrischt "
-                     "(%d neu), Datei geschrieben: %s",
-                     len(referenzen), neu, geschrieben)
+            log.info(
+                "Geräte-TCO: %d 1&1-SIM-only-Referenzen aufgefrischt "
+                "(%d neu), Datei geschrieben: %s",
+                len(referenzen),
+                neu,
+                geschrieben,
+            )
         else:
-            log.warning("Keine Referenzen erhoben - geraete_tco.json bleibt "
-                        "unangetastet (%s)", protokoll)
+            log.warning(
+                "Keine Referenzen erhoben - geraete_tco.json bleibt unangetastet (%s)",
+                protokoll,
+            )
     finally:
         _http_mod.fetch = _echter_fetch
         # Der Beleg wird AUCH bei einem Absturz geschrieben: die robots-
         # Abrufe stehen dann bereits in der Liste, und ein gescheiterter
         # Lauf ohne Laufzeitbeleg ist nicht mehr nachvollziehbar.
-        unehrlich = [e for e in beleg
-                     if not _ist_ehrliche_kennung(e.get("user_agent"))]
-        beleg_datei = root / "outputs" / \
-            f"beleg-einsundeins-simonly-{heute}.json"
+        unehrlich = [e for e in beleg if not _ist_ehrliche_kennung(e.get("user_agent"))]
+        beleg_datei = root / "outputs" / f"beleg-einsundeins-simonly-{heute}.json"
         beleg_datei.parent.mkdir(parents=True, exist_ok=True)
-        beleg_datei.write_text(json.dumps({
-            "datum": heute,
-            "anzahl_requests": len(beleg),
-            "alle_ehrlich": not unehrlich,
-            "requests": beleg,
-        }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        log.info("Laufzeitbeleg geschrieben: %s (%d Requests, "
-                 "alle_ehrlich=%s)", beleg_datei, len(beleg), not unehrlich)
+        beleg_datei.write_text(
+            json.dumps(
+                {
+                    "datum": heute,
+                    "anzahl_requests": len(beleg),
+                    "alle_ehrlich": not unehrlich,
+                    "requests": beleg,
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        log.info(
+            "Laufzeitbeleg geschrieben: %s (%d Requests, alle_ehrlich=%s)",
+            beleg_datei,
+            len(beleg),
+            not unehrlich,
+        )
         log.info("Protokoll: %s", protokoll)
         if unehrlich:
-            log.error("BEFUND: %d von %d 1&1-Requests wurden NICHT mit "
-                      "TelcoRadar/1.0 gesendet. Details in %s. Das ist ein "
-                      "Abnahme-Befund, kein Erfolg.",
-                      len(unehrlich), len(beleg), beleg_datei)
+            log.error(
+                "BEFUND: %d von %d 1&1-Requests wurden NICHT mit "
+                "TelcoRadar/1.0 gesendet. Details in %s. Das ist ein "
+                "Abnahme-Befund, kein Erfolg.",
+                len(unehrlich),
+                len(beleg),
+                beleg_datei,
+            )
         elif beleg:
-            log.info("Alle %d 1&1-Requests bestätigt mit ehrlichem "
-                     "TelcoRadar/1.0-Absender, reines HTTP-GET "
-                     "(kein Browser).", len(beleg))
+            log.info(
+                "Alle %d 1&1-Requests bestätigt mit ehrlichem "
+                "TelcoRadar/1.0-Absender, reines HTTP-GET "
+                "(kein Browser).",
+                len(beleg),
+            )
 
-    log.info("Fertig. Jetzt rendern (report.html.render_site) und "
-             "committen - dieses Skript tut beides bewusst nicht.")
+    log.info(
+        "Fertig. Jetzt rendern (report.html.render_site) und "
+        "committen - dieses Skript tut beides bewusst nicht."
+    )
 
 
-if __name__ == "__main__":       # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     main()

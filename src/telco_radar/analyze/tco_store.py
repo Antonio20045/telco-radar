@@ -81,6 +81,7 @@ zeichnen kann, ohne die Rechnung frueherer Laeufe nachzubauen) und
   (Entscheidung 3 im Strategiedokument): die Reihe beginnt ehrlich mit
   dem ersten Lauf nach der Umstellung.
 """
+
 from __future__ import annotations
 
 import json
@@ -89,8 +90,14 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Optional
 
-from ..tco_model import (Buendel, SimOnlyReferenz, buendel_id_aktuell,
-                         buendel_id_ohne_laufzeit, sim_only_id, tco_24)
+from ..tco_model import (
+    Buendel,
+    SimOnlyReferenz,
+    buendel_id_aktuell,
+    buendel_id_ohne_laufzeit,
+    sim_only_id,
+    tco_24,
+)
 
 log = logging.getLogger(__name__)
 
@@ -105,20 +112,37 @@ log = logging.getLogger(__name__)
 # `zustand` seit dem 04.09.2026 (QA-Befund B1): der Geraetezustand ist eine
 # Preisdimension, und ein Buendel, das ihn nicht mitfuehrt, sieht in der
 # Tafel aus wie ein Neugeraet.
-_MESSFELDER = ("tarif_id", "tarif_id_guete", "tarif_monatlich",
-               "tarif_bindung_monate", "buendel_monatlich",
-               "geraet_zuzahlung", "geraet_monatsrate",
-               "laufzeit_monate", "anschlusspreis", "quelle_url",
-               "abgerufen_am", "zustand", "herleitung")
+_MESSFELDER = (
+    "tarif_id",
+    "tarif_id_guete",
+    "tarif_monatlich",
+    "tarif_bindung_monate",
+    "buendel_monatlich",
+    "geraet_zuzahlung",
+    "geraet_monatsrate",
+    "laufzeit_monate",
+    "anschlusspreis",
+    "quelle_url",
+    "abgerufen_am",
+    "zustand",
+    "herleitung",
+)
 
 # `bindung_monate` und `volumen_gb` seit S-5 (09.09.2026): dieselbe
 # Positivliste-Pflicht wie bei `_MESSFELDER` - ein Messfeld, das hier
 # fehlt, wuerde beim naechsten Lauf still geleert, obwohl die Quelle es
 # weiterhin nennt.
-_REFERENZ_MESSFELDER = ("tarif_id", "tarif_id_guete",
-                        "tarif_sim_only_monatlich", "anschlusspreis",
-                        "quelle_url", "abgerufen_am", "quelle_art",
-                        "bindung_monate", "volumen_gb")
+_REFERENZ_MESSFELDER = (
+    "tarif_id",
+    "tarif_id_guete",
+    "tarif_sim_only_monatlich",
+    "anschlusspreis",
+    "quelle_url",
+    "abgerufen_am",
+    "quelle_art",
+    "bindung_monate",
+    "volumen_gb",
+)
 
 # Die Append-Historie liegt NEBEN der Stand-Datei (P2, 11.09.2026) - siehe
 # Modulkopf. Ihr Name ist fest, weil der naechtliche Lauf sie namentlich
@@ -143,15 +167,17 @@ def id_aus_satz(satz: dict) -> Optional[str]:
     zaehlt solche Saetze und nennt sie, statt sie still fallen zu lassen.
     """
     if not isinstance(satz, dict):
-        log.warning("Lesemigration B1: Satz ist kein Woerterbuch (%s)",
-                    type(satz).__name__)
+        log.warning(
+            "Lesemigration B1: Satz ist kein Woerterbuch (%s)", type(satz).__name__
+        )
         return None
-    neu_ = buendel_id_aktuell(satz.get("id") or "",
-                              satz.get("laufzeit_monate"))
+    neu_ = buendel_id_aktuell(satz.get("id") or "", satz.get("laufzeit_monate"))
     if neu_ is None:
-        log.warning("Lesemigration B1: ID %r hat weder die alte noch die "
-                    "heutige Form - nicht zuordenbar",
-                    satz.get("id"))
+        log.warning(
+            "Lesemigration B1: ID %r hat weder die alte noch die "
+            "heutige Form - nicht zuordenbar",
+            satz.get("id"),
+        )
     return neu_
 
 
@@ -181,8 +207,11 @@ class TcoDB:
 
     def __init__(self, path: Path, historie_path: Optional[Path] = None):
         self.path = Path(path)
-        self.historie_path = (Path(historie_path) if historie_path is not None
-                              else self.path.parent / _HISTORIE_NAME)
+        self.historie_path = (
+            Path(historie_path)
+            if historie_path is not None
+            else self.path.parent / _HISTORIE_NAME
+        )
         self._buendel: dict[str, dict] = {}
         self._referenzen: dict[str, dict] = {}
         self.updated = ""
@@ -212,7 +241,7 @@ class TcoDB:
         # doppelt. Die DATEI wird davon nicht angefasst - sie bekommt die
         # neuen IDs erst durch das naechste regulaere `save()`.
         migriert = 0
-        for eintrag in (roh.get("buendel") or []):
+        for eintrag in roh.get("buendel") or []:
             bid = id_aus_satz(eintrag)
             if bid is None:
                 # Nicht zuordenbar: der Eintrag bleibt unter seiner
@@ -227,23 +256,31 @@ class TcoDB:
                 eintrag["id"] = bid
             self._buendel[bid] = eintrag
         if migriert:
-            log.info("Lesemigration B1: %d von %d Buendel-Eintraegen auf "
-                     "die Laufzeit-ID gehoben (%s bleibt bis zum naechsten "
-                     "save() unveraendert)", migriert, len(self._buendel),
-                     self.path.name)
-        for eintrag in (roh.get("sim_only") or []):
+            log.info(
+                "Lesemigration B1: %d von %d Buendel-Eintraegen auf "
+                "die Laufzeit-ID gehoben (%s bleibt bis zum naechsten "
+                "save() unveraendert)",
+                migriert,
+                len(self._buendel),
+                self.path.name,
+            )
+        for eintrag in roh.get("sim_only") or []:
             if eintrag.get("id"):
                 self._referenzen[eintrag["id"]] = eintrag
 
     # -------------------------------------------------------------- lesen
 
     def buendel(self) -> list[dict]:
-        return sorted(self._buendel.values(),
-                      key=lambda e: (e.get("anbieter", ""), e.get("id", "")))
+        return sorted(
+            self._buendel.values(),
+            key=lambda e: (e.get("anbieter", ""), e.get("id", "")),
+        )
 
     def referenzen(self) -> list[dict]:
-        return sorted(self._referenzen.values(),
-                      key=lambda e: (e.get("anbieter", ""), e.get("id", "")))
+        return sorted(
+            self._referenzen.values(),
+            key=lambda e: (e.get("anbieter", ""), e.get("id", "")),
+        )
 
     def nach_id(self, buendel_id: str) -> Optional[dict]:
         return self._buendel.get(buendel_id)
@@ -290,8 +327,11 @@ class TcoDB:
                     ids.add(bid)
                 elif satz.get("id"):
                     ids.add(str(satz["id"]))
-        return {"messtage": len(tage), "seit": min(tage) if tage else "",
-                "buendel": len(ids)}
+        return {
+            "messtage": len(tage),
+            "seit": min(tage) if tage else "",
+            "buendel": len(ids),
+        }
 
     # ------------------------------------------------------------ schreiben
 
@@ -312,14 +352,15 @@ class TcoDB:
         for satz in buendel:
             if not isinstance(satz, Buendel):
                 raise TypeError(f"kein Buendel: {type(satz).__name__}")
-            if (satz.geraet_zuzahlung is not None
-                    or satz.geraet_monatsrate is not None
-                    # Ein Buendelmonatspreis IST ein Geraetepreis - er
-                    # traegt Tarif und Geraet in einer Zahl. Ohne ihn hier
-                    # haette ein 1&1-Satz die Regel unterlaufen und einen
-                    # Preis ohne nachschlagbaren Tarif abgelegt.
-                    or satz.buendel_monatlich is not None) \
-                    and not (satz.tarif_id or "").strip():
+            if (
+                satz.geraet_zuzahlung is not None
+                or satz.geraet_monatsrate is not None
+                # Ein Buendelmonatspreis IST ein Geraetepreis - er
+                # traegt Tarif und Geraet in einer Zahl. Ohne ihn hier
+                # haette ein 1&1-Satz die Regel unterlaufen und einen
+                # Preis ohne nachschlagbaren Tarif abgelegt.
+                or satz.buendel_monatlich is not None
+            ) and not (satz.tarif_id or "").strip():
                 # Phase 6, Abnahmekriterium 3: kein Buendelpreis im Bestand
                 # ohne aufloesbaren Tarif. Die Regel steht HIER und nicht im
                 # Datensatz, weil "im Bestand" genau diese Datei meint - ein
@@ -332,16 +373,20 @@ class TcoDB:
                 raise ValueError(
                     f"Geraetepreis ohne aufloesbaren Tarif: {satz.id} "
                     f"(tarif_name={satz.tarif_name!r}). Ein Buendelpreis "
-                    f"ohne tarif_id wird verworfen, nicht gespeichert.")
+                    f"ohne tarif_id wird verworfen, nicht gespeichert."
+                )
 
         for satz in buendel:
             bid = satz.id
             eintrag = self._buendel.get(bid)
             if eintrag is None:
-                eintrag = {"id": bid, "sku_id": satz.sku_id,
-                           "anbieter": satz.anbieter,
-                           "tarif_name": satz.tarif_name,
-                           "first_seen": today}
+                eintrag = {
+                    "id": bid,
+                    "sku_id": satz.sku_id,
+                    "anbieter": satz.anbieter,
+                    "tarif_name": satz.tarif_name,
+                    "first_seen": today,
+                }
                 self._buendel[bid] = eintrag
                 neu += 1
             gesehen.add(bid)
@@ -356,12 +401,12 @@ class TcoDB:
             # dieses Aufrufs, nicht am `save()`-Datum: die Zeile gehoert dem
             # Lauf, der sie gemessen hat. Der Schluessel ersetzt bei
             # wiederholtem Upsert denselben Tag still (idempotent).
-            self._historie_pendente[(bid, today)] = self._historie_zeile(
-                satz, today)
+            self._historie_pendente[(bid, today)] = self._historie_zeile(satz, today)
         return neu, gesehen
 
-    def setze_referenzen(self, referenzen, today: str,
-                         anbieter: Optional[set] = None) -> int:
+    def setze_referenzen(
+        self, referenzen, today: str, anbieter: Optional[set] = None
+    ) -> int:
         """SIM-only-Referenzen aufnehmen oder auffrischen. Gibt die Zahl der
         neu aufgenommenen zurueck.
 
@@ -376,13 +421,16 @@ class TcoDB:
             if anbieter is not None and satz.anbieter not in anbieter:
                 continue
             if not isinstance(satz, SimOnlyReferenz):
-                raise TypeError(f"keine SimOnlyReferenz: "
-                                f"{type(satz).__name__}")
+                raise TypeError(f"keine SimOnlyReferenz: {type(satz).__name__}")
             rid = satz.id
             eintrag = self._referenzen.get(rid)
             if eintrag is None:
-                eintrag = {"id": rid, "anbieter": satz.anbieter,
-                           "tarif_name": satz.tarif_name, "first_seen": today}
+                eintrag = {
+                    "id": rid,
+                    "anbieter": satz.anbieter,
+                    "tarif_name": satz.tarif_name,
+                    "first_seen": today,
+                }
                 self._referenzen[rid] = eintrag
                 neu += 1
             self._schreibe_messung(eintrag, satz, _REFERENZ_MESSFELDER)
@@ -390,8 +438,9 @@ class TcoDB:
             eintrag["last_verified"] = today
         return neu
 
-    def ersetze_referenzen(self, referenzen, today: str,
-                           anbieter: Optional[set] = None) -> tuple[int, int]:
+    def ersetze_referenzen(
+        self, referenzen, today: str, anbieter: Optional[set] = None
+    ) -> tuple[int, int]:
         """Den Referenzbestand VOLLSTAENDIG neu setzen. Gibt (neu, entfernt).
 
         Warum hier ersetzt und sonst nirgends in diesem Projekt gelöscht
@@ -428,9 +477,11 @@ class TcoDB:
         neu = self.setze_referenzen(referenzen, today, anbieter=anbieter)
         gewuenscht = {satz.id for satz in referenzen}
         veraltet = [
-            rid for rid, eintrag in self._referenzen.items()
+            rid
+            for rid, eintrag in self._referenzen.items()
             if rid not in gewuenscht
-            and (anbieter is None or eintrag.get("anbieter") in anbieter)]
+            and (anbieter is None or eintrag.get("anbieter") in anbieter)
+        ]
         for rid in veraltet:
             del self._referenzen[rid]
         return neu, len(veraltet)
@@ -479,10 +530,14 @@ class TcoDB:
             return False
         self.updated = today
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        daten = {"updated": today, "buendel": self.buendel(),
-                 "sim_only": self.referenzen()}
-        self.path.write_text(json.dumps(daten, ensure_ascii=False, indent=1),
-                             encoding="utf-8")
+        daten = {
+            "updated": today,
+            "buendel": self.buendel(),
+            "sim_only": self.referenzen(),
+        }
+        self.path.write_text(
+            json.dumps(daten, ensure_ascii=False, indent=1), encoding="utf-8"
+        )
         self._schreibe_historie()
         return True
 
@@ -504,22 +559,29 @@ class TcoDB:
         if self.historie_path.exists():
             try:
                 text = self.historie_path.read_text(encoding="utf-8")
-                saetze = [json.loads(zeile) for zeile in text.splitlines()
-                          if zeile.strip()]
+                saetze = [
+                    json.loads(zeile) for zeile in text.splitlines() if zeile.strip()
+                ]
             except (json.JSONDecodeError, OSError) as exc:
-                log.warning("%s unlesbar (%s) - Historie NICHT angefasst, "
-                            "nur der Stand geschrieben",
-                            self.historie_path.name, exc)
+                log.warning(
+                    "%s unlesbar (%s) - Historie NICHT angefasst, "
+                    "nur der Stand geschrieben",
+                    self.historie_path.name,
+                    exc,
+                )
                 return False
-            if any(not isinstance(satz, dict)
-                   or not (satz.get("id") or "").strip()
-                   or not (satz.get("datum") or "").strip()
-                   for satz in saetze):
+            if any(
+                not isinstance(satz, dict)
+                or not (satz.get("id") or "").strip()
+                or not (satz.get("datum") or "").strip()
+                for satz in saetze
+            ):
                 # Eine Zeile ohne Schluessel liesse sich nicht zusammen-
                 # fuehren; sie ueberspringen hiesse sie loeschen.
-                log.warning("%s enthaelt Zeilen ohne (id, datum) - "
-                            "Historie NICHT angefasst",
-                            self.historie_path.name)
+                log.warning(
+                    "%s enthaelt Zeilen ohne (id, datum) - Historie NICHT angefasst",
+                    self.historie_path.name,
+                )
                 return False
             for satz in saetze:
                 # Bestehende Reihenfolge bleibt stehen; ein Doppel-Schluessel
@@ -531,7 +593,10 @@ class TcoDB:
         zusammen.update(self._historie_pendente)
         self.historie_path.parent.mkdir(parents=True, exist_ok=True)
         self.historie_path.write_text(
-            "".join(json.dumps(satz, ensure_ascii=False) + "\n"
-                    for satz in zusammen.values()),
-            encoding="utf-8")
+            "".join(
+                json.dumps(satz, ensure_ascii=False) + "\n"
+                for satz in zusammen.values()
+            ),
+            encoding="utf-8",
+        )
         return True

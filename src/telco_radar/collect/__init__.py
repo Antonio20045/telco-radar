@@ -1,4 +1,5 @@
 """Collectors: fetch items from RSS feeds and HTML newsroom pages."""
+
 from __future__ import annotations
 
 import logging
@@ -36,15 +37,17 @@ _QUELLEN_FRIST = 75.0
 _JS_GLEICHZEITIG = threading.BoundedSemaphore(4)
 
 
-def _collect_source(source: Source, region: str, operator: str | None,
-                    origin: str, http_cfg: dict) -> list[Item]:
+def _collect_source(
+    source: Source, region: str, operator: str | None, origin: str, http_cfg: dict
+) -> list[Item]:
     """Dispatch a source to the right collector based on its kind."""
     with deadline(_QUELLEN_FRIST):
         return _dispatch(source, region, operator, origin, http_cfg)
 
 
-def _dispatch(source: Source, region: str, operator: str | None,
-              origin: str, http_cfg: dict) -> list[Item]:
+def _dispatch(
+    source: Source, region: str, operator: str | None, origin: str, http_cfg: dict
+) -> list[Item]:
     if source.kind in ("rss", "trade_press"):
         items = collect_rss(source, region, operator, origin, http_cfg)
     elif source.kind == "json_api":
@@ -68,8 +71,13 @@ def _dispatch(source: Source, region: str, operator: str | None,
     return items
 
 
-def collect_source(source: Source, region: str, operator: str | None = None,
-                   origin: str = "operator", http_cfg: dict | None = None) -> list[Item]:
+def collect_source(
+    source: Source,
+    region: str,
+    operator: str | None = None,
+    origin: str = "operator",
+    http_cfg: dict | None = None,
+) -> list[Item]:
     """Public entry point for a single source - same path the pipeline takes.
 
     Tools that check sources (validate_sources.py, build_quellen_doc.py) must
@@ -80,8 +88,9 @@ def collect_source(source: Source, region: str, operator: str | None = None,
     return _collect_source(source, region, operator, origin, http_cfg or {})
 
 
-def collect_all(cfg: Config, max_workers: int | None = None,
-                register=None) -> tuple[list[Item], list[dict]]:
+def collect_all(
+    cfg: Config, max_workers: int | None = None, register=None
+) -> tuple[list[Item], list[dict]]:
     """Fetch every configured (crawlable) source concurrently.
 
     Returns (items, source_results). Each source_result is a dict describing
@@ -138,16 +147,27 @@ def collect_all(cfg: Config, max_workers: int | None = None,
                 aktiv.append(job)
             else:
                 e = register.eintrag(src.url)
-                uebersprungen.append({
-                    "name": job[2] or src.name, "operator": job[2],
-                    "region": job[1], "url": src.url, "kind": src.kind,
-                    "label": src.label or src.kind, "origin": job[3],
-                    "status": "quarantaene", "count": 0, "seconds": 0.0,
-                    "error": e.quarantaene_grund if e else "",
-                })
+                uebersprungen.append(
+                    {
+                        "name": job[2] or src.name,
+                        "operator": job[2],
+                        "region": job[1],
+                        "url": src.url,
+                        "kind": src.kind,
+                        "label": src.label or src.kind,
+                        "origin": job[3],
+                        "status": "quarantaene",
+                        "count": 0,
+                        "seconds": 0.0,
+                        "error": e.quarantaene_grund if e else "",
+                    }
+                )
         if uebersprungen:
-            log.info("Quarantaene: %d von %d Quellen werden nicht abgerufen",
-                     len(uebersprungen), len(jobs))
+            log.info(
+                "Quarantaene: %d von %d Quellen werden nicht abgerufen",
+                len(uebersprungen),
+                len(jobs),
+            )
         jobs = aktiv
 
     def _timed(src, region, operator, origin):
@@ -170,8 +190,12 @@ def collect_all(cfg: Config, max_workers: int | None = None,
     t_start = time.monotonic()
     with ThreadPoolExecutor(max_workers=max_workers) as pool:
         futures = {
-            pool.submit(_timed, src, region, operator, origin):
-                (src, region, operator, origin)
+            pool.submit(_timed, src, region, operator, origin): (
+                src,
+                region,
+                operator,
+                origin,
+            )
             for src, region, operator, origin in jobs
         }
         for fut in as_completed(futures):
@@ -191,33 +215,55 @@ def collect_all(cfg: Config, max_workers: int | None = None,
                 rec["status"] = "fail"
                 rec["count"] = 0
                 rec["error"] = f"{type(exc).__name__}: {str(exc)[:140]}"
-                log.warning("FAIL  %-22s %-45s -> %s (%.1fs)",
-                            (operator or src.name)[:22], src.url[:45],
-                            rec["error"], dauer)
+                log.warning(
+                    "FAIL  %-22s %-45s -> %s (%.1fs)",
+                    (operator or src.name)[:22],
+                    src.url[:45],
+                    rec["error"],
+                    dauer,
+                )
             else:
                 items.extend(got)
                 rec["status"] = "ok" if got else "empty"
                 rec["count"] = len(got)
-                log.info("%-5s %-22s %-45s -> %d items (%.1fs)",
-                         rec["status"].upper(), (operator or src.name)[:22],
-                         src.url[:45], len(got), dauer)
+                log.info(
+                    "%-5s %-22s %-45s -> %d items (%.1fs)",
+                    rec["status"].upper(),
+                    (operator or src.name)[:22],
+                    src.url[:45],
+                    len(got),
+                    dauer,
+                )
             results.append(rec)
 
     results.extend(uebersprungen)
     wanduhr = time.monotonic() - t_start
     arbeit = sum(r.get("seconds", 0.0) for r in results)
-    log.info("Sammelphase: %d Quellen in %.1fs Wanduhr (%.1fs Arbeit, Faktor "
-             "%.1f bei %d Workern, max. %d je Host)",
-             len(results), wanduhr, arbeit,
-             arbeit / wanduhr if wanduhr else 0.0, max_workers,
-             int(cfg.settings.get("collect_host_max_parallel", 2) or 2))
+    log.info(
+        "Sammelphase: %d Quellen in %.1fs Wanduhr (%.1fs Arbeit, Faktor "
+        "%.1f bei %d Workern, max. %d je Host)",
+        len(results),
+        wanduhr,
+        arbeit,
+        arbeit / wanduhr if wanduhr else 0.0,
+        max_workers,
+        int(cfg.settings.get("collect_host_max_parallel", 2) or 2),
+    )
     return items, results
 
 
 # Single words that are too ambiguous in headlines to identify an operator
 # on their own (multi-word terms containing them are still fine).
 _AMBIGUOUS_TERMS = {
-    "spark", "tim", "globe", "smart", "bell", "one", "free", "vi", "au",
+    "spark",
+    "tim",
+    "globe",
+    "smart",
+    "bell",
+    "one",
+    "free",
+    "vi",
+    "au",
 }
 
 

@@ -1,26 +1,58 @@
 """Tests fuer die Board-Datenaufbereitung (report/promo.py) - reine
 Datentransformation, offline, kein Netz/LLM noetig."""
+
 from telco_radar.promo_config import PromoSource
 from telco_radar.report.promo import prepare_promo_view
 
 
-def _src(name="congstar", tier=2, group="", internal_reference=False, kind="static",
-         rang=None):
-    return PromoSource(name=name, url="https://example.test/", tier=tier,
-                       kind=kind, group=group, internal_reference=internal_reference,
-                       rang=rang)
+def _src(
+    name="congstar",
+    tier=2,
+    group="",
+    internal_reference=False,
+    kind="static",
+    rang=None,
+):
+    return PromoSource(
+        name=name,
+        url="https://example.test/",
+        tier=tier,
+        kind=kind,
+        group=group,
+        internal_reference=internal_reference,
+        rang=rang,
+    )
 
 
-def _entry(brand="congstar", headline="10 GB Bonus", status="aktiv",
-          first_seen="2026-07-20", last_verified="2026-07-25", image=None,
-          image_kind=None):
-    e = {"id": f"{brand}:{headline}", "brand": brand, "headline": headline,
-         "description": "", "valid_until": None,
-         "url": "https://example.test/aktion", "status": status,
-         "first_seen": first_seen, "last_verified": last_verified}
+def _entry(
+    brand="congstar",
+    headline="10 GB Bonus",
+    status="aktiv",
+    first_seen="2026-07-20",
+    last_verified="2026-07-25",
+    image=None,
+    image_kind=None,
+):
+    e = {
+        "id": f"{brand}:{headline}",
+        "brand": brand,
+        "headline": headline,
+        "description": "",
+        "valid_until": None,
+        "url": "https://example.test/aktion",
+        "status": status,
+        "first_seen": first_seen,
+        "last_verified": last_verified,
+    }
     if image:
-        e.update({"image": image, "image_w": 1280, "image_h": 720,
-                  "image_kind": image_kind or "angebot"})
+        e.update(
+            {
+                "image": image,
+                "image_w": 1280,
+                "image_h": 720,
+                "image_kind": image_kind or "angebot",
+            }
+        )
     return e
 
 
@@ -44,17 +76,20 @@ def test_internal_reference_excluded_from_competitor_counts_but_still_shown():
     sources = [_src("congstar"), _src("Vodafone Deutschland", internal_reference=True)]
     entries = [_entry(brand="congstar"), _entry(brand="Vodafone Deutschland")]
     view = prepare_promo_view(entries, sources, "2026-07-25")
-    assert view["brands_tracked"] == 1          # Vodafone selbst zaehlt nicht
+    assert view["brands_tracked"] == 1  # Vodafone selbst zaehlt nicht
     assert view["brands_active"] == 1
     assert view["active_total"] == 1
     names = {b["name"] for b in view["brands"]}
-    assert "Vodafone Deutschland" in names       # wird trotzdem angezeigt
+    assert "Vodafone Deutschland" in names  # wird trotzdem angezeigt
     vf = next(b for b in view["brands"] if b["name"] == "Vodafone Deutschland")
     assert vf["internal_reference"] is True
 
 
 def test_vodafone_card_sorts_last():
-    sources = [_src("Vodafone Deutschland", tier=1, internal_reference=True), _src("congstar")]
+    sources = [
+        _src("Vodafone Deutschland", tier=1, internal_reference=True),
+        _src("congstar"),
+    ]
     entries = [_entry(brand="Vodafone Deutschland"), _entry(brand="congstar")]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert view["brands"][-1]["name"] == "Vodafone Deutschland"
@@ -70,7 +105,10 @@ def test_stale_entries_are_kept_separate_from_active():
     """Nur wirklich 'ausgelaufen' (zweimal in Folge nicht bestaetigt) landet
     in der separaten stale-Liste (Fussnote) und faellt aus active_count."""
     sources = [_src("congstar")]
-    entries = [_entry(headline="Laeuft"), _entry(headline="Beendet", status="ausgelaufen")]
+    entries = [
+        _entry(headline="Laeuft"),
+        _entry(headline="Beendet", status="ausgelaufen"),
+    ]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     card = view["brands"][0]
     assert card["active_count"] == 1
@@ -96,7 +134,9 @@ def test_grace_period_entries_stay_visible_but_flagged():
 
 def test_brand_with_only_grace_entries_does_not_sort_as_empty():
     sources = [_src("klarmobil"), _src("congstar")]
-    entries = [_entry(brand="klarmobil", headline="Vermutlich weg", status="evtl. ausgelaufen")]
+    entries = [
+        _entry(brand="klarmobil", headline="Vermutlich weg", status="evtl. ausgelaufen")
+    ]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     # klarmobil hat ein sichtbares (wenn auch verblassendes) Angebot,
     # congstar gar keins - klarmobil soll deshalb zuerst stehen.
@@ -105,8 +145,10 @@ def test_brand_with_only_grace_entries_does_not_sort_as_empty():
 
 def test_neu_badge_uses_ten_day_cutoff():
     sources = [_src("congstar")]
-    entries = [_entry(headline="Frisch", first_seen="2026-07-24"),
-              _entry(headline="Alt", first_seen="2026-06-01")]
+    entries = [
+        _entry(headline="Frisch", first_seen="2026-07-24"),
+        _entry(headline="Alt", first_seen="2026-06-01"),
+    ]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     by_headline = {e["headline"]: e for e in view["brands"][0]["active"]}
     assert by_headline["Frisch"]["neu"] is True
@@ -118,10 +160,13 @@ def test_neu_badge_uses_ten_day_cutoff():
 # Marke hat bis zu acht Aktionen, und ein Screenshot ihrer Startseite als
 # Bild fuer jede einzelne davon beantwortet die Frage der Seite nicht.
 
+
 def test_das_bild_kommt_vom_angebot_nicht_von_der_marke():
     sources = [_src("congstar")]
-    entries = [_scored(headline="Mit Bild", score=80, image="abc-1280.jpg"),
-               _scored(headline="Ohne Bild", score=70)]
+    entries = [
+        _scored(headline="Mit Bild", score=80, image="abc-1280.jpg"),
+        _scored(headline="Ohne Bild", score=70),
+    ]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     karte = view["karten"][0]
     assert karte["offer"]["headline"] == "Mit Bild"
@@ -135,8 +180,7 @@ def test_ohne_bild_bleibt_das_feld_leer_statt_auf_ein_marken_bild_zu_zeigen():
     bekommt die Mechanik als Schriftkachel, und dafuer muss die Vorlage die
     Luecke sehen."""
     sources = [_src("congstar")]
-    view = prepare_promo_view([_scored(headline="A", score=80)], sources,
-                              "2026-07-25")
+    view = prepare_promo_view([_scored(headline="A", score=80)], sources, "2026-07-25")
     assert view["karten"][0]["bild"] == ""
     assert view["mit_bild"] == 0
 
@@ -147,8 +191,7 @@ def test_ein_seitenmotiv_wird_als_solches_gekennzeichnet():
     schreibt es dazu; ohne die Kennzeichnung behauptet sie mehr, als belegt
     ist."""
     sources = [_src("congstar")]
-    entries = [_scored(headline="A", score=80, image="x-1280.jpg",
-                       image_kind="motiv")]
+    entries = [_scored(headline="A", score=80, image="x-1280.jpg", image_kind="motiv")]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert view["karten"][0]["bild_ist_motiv"] is True
     entries = [_scored(headline="A", score=80, image="x-1280.jpg")]
@@ -162,11 +205,25 @@ def test_ein_seitenmotiv_wird_als_solches_gekennzeichnet():
 # wird nur geprueft, dass die Anzeige das Ergebnis respektiert und nichts
 # eigenes dazuerfindet.
 
-def _scored(brand="congstar", headline="A", score=80, highlight=True,
-            reason="Weil.", mechanic="wechselpraemie", **kw):
+
+def _scored(
+    brand="congstar",
+    headline="A",
+    score=80,
+    highlight=True,
+    reason="Weil.",
+    mechanic="wechselpraemie",
+    **kw,
+):
     e = _entry(brand=brand, headline=headline, **kw)
-    e.update({"score": score, "highlight": highlight, "score_reason": reason,
-              "mechanic": mechanic})
+    e.update(
+        {
+            "score": score,
+            "highlight": highlight,
+            "score_reason": reason,
+            "mechanic": mechanic,
+        }
+    )
     return e
 
 
@@ -174,14 +231,22 @@ def test_karten_folgen_der_anbieterrangfolge():
     """Die Karten stehen in Seitenreihenfolge, und die ist seit dem
     08.08.2026 die Rangfolge der ANBIETER - innerhalb einer Marke sortiert
     weiterhin der Score (siehe test_die_karten_einer_marke_stehen_nach_score)."""
-    sources = [_src("congstar", rang=3), _src("klarmobil", rang=1),
-               _src("Blau", rang=2)]
-    entries = [_scored(brand="congstar", score=71),
-               _scored(brand="klarmobil", score=88),
-               _scored(brand="Blau", score=79)]
+    sources = [
+        _src("congstar", rang=3),
+        _src("klarmobil", rang=1),
+        _src("Blau", rang=2),
+    ]
+    entries = [
+        _scored(brand="congstar", score=71),
+        _scored(brand="klarmobil", score=88),
+        _scored(brand="Blau", score=79),
+    ]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert [k["brand"]["name"] for k in view["karten"]] == [
-        "klarmobil", "Blau", "congstar"]
+        "klarmobil",
+        "Blau",
+        "congstar",
+    ]
     assert view["karten"][0]["reason"] == "Weil."
     assert view["karten"][0]["mechanic"] == "Wechsel- oder Altgerätprämie"
 
@@ -193,15 +258,20 @@ def test_je_marke_ein_block_mit_allen_ihren_aktionen():
     unten in einer Zeilenwand - wer eine Marke verstehen wollte, musste
     zwischen beiden springen."""
     sources = [_src("Telekom", rang=1), _src("congstar", rang=2)]
-    entries = [_scored(brand="Telekom", headline="Gerät A", score=90),
-               _scored(brand="Telekom", headline="Gerät B", score=88),
-               _scored(brand="Telekom", headline="Gerät C", score=86),
-               _scored(brand="congstar", headline="Bonus", score=70)]
+    entries = [
+        _scored(brand="Telekom", headline="Gerät A", score=90),
+        _scored(brand="Telekom", headline="Gerät B", score=88),
+        _scored(brand="Telekom", headline="Gerät C", score=86),
+        _scored(brand="congstar", headline="Bonus", score=70),
+    ]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     telekom = view["bloecke"][0]
     assert telekom["name"] == "Telekom"
     assert telekom["lead"]["offer"]["headline"] == "Gerät A"
-    assert [k["offer"]["headline"] for k in telekom["weitere"]] == ["Gerät B", "Gerät C"]
+    assert [k["offer"]["headline"] for k in telekom["weitere"]] == [
+        "Gerät B",
+        "Gerät C",
+    ]
     assert [b["name"] for b in view["bloecke"]] == ["Telekom", "congstar"]
 
 
@@ -213,12 +283,17 @@ def test_die_bloecke_stehen_nach_dem_rang_des_anbieters():
     groessten Anbieter wie Telekom etc. an erster Stelle."
 
     Der Score ordnet weiterhin INNERHALB einer Marke."""
-    sources = [_src("congstar", rang=2), _src("Blau", rang=3),
-               _src("klarmobil", rang=1)]
-    entries = [_scored(brand="congstar", headline="A", score=71),
-               _scored(brand="congstar", headline="B", score=99),
-               _scored(brand="Blau", headline="C", score=88),
-               _scored(brand="klarmobil", headline="D", score=40)]
+    sources = [
+        _src("congstar", rang=2),
+        _src("Blau", rang=3),
+        _src("klarmobil", rang=1),
+    ]
+    entries = [
+        _scored(brand="congstar", headline="A", score=71),
+        _scored(brand="congstar", headline="B", score=99),
+        _scored(brand="Blau", headline="C", score=88),
+        _scored(brand="klarmobil", headline="D", score=40),
+    ]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert [b["name"] for b in view["bloecke"]] == ["klarmobil", "congstar", "Blau"]
     assert [b["top_score"] for b in view["bloecke"]] == [40, 99, 88]
@@ -231,18 +306,27 @@ def test_ohne_gepflegten_rang_entscheiden_tier_und_reichweite():
     """Eine frisch eingetragene Marke ohne `rang` faellt hinter jede
     gepflegte - und steht dort nicht nach Zufall, sondern nach Tier,
     Reichweite und Name."""
-    sources = [_src("Neuling Online", tier=2), _src("Neuling Netz", tier=1),
-               _src("Gepflegt", tier=2, rang=7)]
+    sources = [
+        _src("Neuling Online", tier=2),
+        _src("Neuling Netz", tier=1),
+        _src("Gepflegt", tier=2, rang=7),
+    ]
     entries = [_entry(brand=n) for n in ("Neuling Online", "Neuling Netz", "Gepflegt")]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert [b["name"] for b in view["bloecke"]] == [
-        "Gepflegt", "Neuling Netz", "Neuling Online"]
+        "Gepflegt",
+        "Neuling Netz",
+        "Neuling Online",
+    ]
 
 
 def test_jede_sichtbare_aktion_steht_genau_einmal():
     sources = [_src("congstar")]
-    entries = [_scored(headline="Stark", score=90), _scored(headline="Schwach", score=40),
-               _entry(headline="Beendet", status="ausgelaufen")]
+    entries = [
+        _scored(headline="Stark", score=90),
+        _scored(headline="Schwach", score=40),
+        _entry(headline="Beendet", status="ausgelaufen"),
+    ]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert [k["offer"]["headline"] for k in view["karten"]] == ["Stark", "Schwach"]
     assert len({k["offer"]["id"] for k in view["karten"]}) == 2
@@ -254,8 +338,10 @@ def test_das_highlight_flag_wird_gelesen_nicht_nachgebaut():
     nachbilden. Es ordnet die Seite aber NICHT: sortiert wird nach dem Rang
     des Anbieters, sonst haette die Hysterese zwei Wirkungen statt einer."""
     sources = [_src("congstar", rang=1), _src("Blau", rang=2)]
-    entries = [_scored(brand="congstar", score=95, highlight=False),
-               _scored(brand="Blau", score=70, highlight=True)]
+    entries = [
+        _scored(brand="congstar", score=95, highlight=False),
+        _scored(brand="Blau", score=70, highlight=True),
+    ]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert [b["name"] for b in view["bloecke"]] == ["congstar", "Blau"]
     assert view["highlight_count"] == 1
@@ -275,8 +361,10 @@ def test_eine_unbewertete_marke_faellt_hinter_jede_bewertete():
 
 def test_das_eigene_angebot_steht_in_einem_eigenen_block():
     sources = [_src("congstar"), _src("Vodafone Deutschland", internal_reference=True)]
-    entries = [_scored(brand="congstar", score=71),
-               _scored(brand="Vodafone Deutschland", headline="Eigenes", score=99)]
+    entries = [
+        _scored(brand="congstar", score=71),
+        _scored(brand="Vodafone Deutschland", headline="Eigenes", score=99),
+    ]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert [b["name"] for b in view["bloecke"]] == ["congstar"]
     assert view["eigen"]["name"] == "Vodafone Deutschland"
@@ -287,10 +375,14 @@ def test_das_eigene_angebot_steht_in_einem_eigenen_block():
 
 def test_der_eigene_block_nimmt_das_beste_eigene_angebot_zuerst():
     sources = [_src("Vodafone Deutschland", internal_reference=True)]
-    entries = [_scored(brand="Vodafone Deutschland", headline="schwach", score=20,
-                       highlight=False),
-               _scored(brand="Vodafone Deutschland", headline="stark", score=77,
-                       highlight=False)]
+    entries = [
+        _scored(
+            brand="Vodafone Deutschland", headline="schwach", score=20, highlight=False
+        ),
+        _scored(
+            brand="Vodafone Deutschland", headline="stark", score=77, highlight=False
+        ),
+    ]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert view["eigen"]["lead"]["offer"]["headline"] == "stark"
     assert [k["offer"]["headline"] for k in view["eigen"]["weitere"]] == ["schwach"]
@@ -301,7 +393,7 @@ def test_marken_ohne_aktion_stehen_getrennt_und_zaehlen_nicht_mit():
     view = prepare_promo_view([_scored(brand="congstar")], sources, "2026-07-25")
     assert [b["name"] for b in view["bloecke"]] == ["congstar"]
     assert [b["name"] for b in view["ohne_aktion"]] == ["klarmobil"]
-    assert view["brands_tracked"] == 2      # beobachtet werden beide
+    assert view["brands_tracked"] == 2  # beobachtet werden beide
 
 
 # ------------------------------------------------------- Motiv & Kachel
@@ -310,12 +402,20 @@ def test_marken_ohne_aktion_stehen_getrennt_und_zaehlen_nicht_mit():
 # identischem Text ('Wechsel- oder Altgeraetpraemie' x4) - sieht nach Fehler
 # aus."
 
+
 def test_die_schriftkachel_traegt_die_zahlen_des_angebots():
     from telco_radar.report.promo import _kachel_text
 
-    assert _kachel_text({"headline": "Blau Allnet S: 20 GB für 6,99 € monatlich"},
-                        "Preisnachlass auf den Tarif") == "20 GB · 6,99 €"
-    assert _kachel_text({"headline": "100 Mbit/s statt 50"}, "sonstiges") == "100 Mbit/s"
+    assert (
+        _kachel_text(
+            {"headline": "Blau Allnet S: 20 GB für 6,99 € monatlich"},
+            "Preisnachlass auf den Tarif",
+        )
+        == "20 GB · 6,99 €"
+    )
+    assert (
+        _kachel_text({"headline": "100 Mbit/s statt 50"}, "sonstiges") == "100 Mbit/s"
+    )
 
 
 def test_die_schriftkachel_faellt_erst_auf_den_kern_der_ueberschrift_zurueck():
@@ -324,16 +424,26 @@ def test_die_schriftkachel_faellt_erst_auf_den_kern_der_ueberschrift_zurueck():
     fahren koennen und vier gleiche Kacheln wie ein Fehler aussehen."""
     from telco_radar.report.promo import _kachel_text
 
-    assert _kachel_text(
-        {"headline": "Junge-Leute-Rabatt auf Magenta Mobil Young 5G Tarife"},
-        "Zielgruppentarif") == "Junge-Leute-Rabatt"
+    assert (
+        _kachel_text(
+            {"headline": "Junge-Leute-Rabatt auf Magenta Mobil Young 5G Tarife"},
+            "Zielgruppentarif",
+        )
+        == "Junge-Leute-Rabatt"
+    )
     # Die GANZE Ueberschrift taugt nicht - sie steht zwei Zeilen tiefer noch
     # einmal, und dieselbe Aussage zweimal untereinander liest sich als Panne.
-    assert _kachel_text({"headline": "Dauerhaft mehr Daten"}, "mehr Datenvolumen") \
+    assert (
+        _kachel_text({"headline": "Dauerhaft mehr Daten"}, "mehr Datenvolumen")
         == "mehr Datenvolumen"
-    assert _kachel_text(
-        {"headline": "Ein ausserordentlich weitschweifig formulierter Sonderfall"},
-        "Zielgruppentarif") == "Zielgruppentarif"
+    )
+    assert (
+        _kachel_text(
+            {"headline": "Ein ausserordentlich weitschweifig formulierter Sonderfall"},
+            "Zielgruppentarif",
+        )
+        == "Zielgruppentarif"
+    )
     assert _kachel_text({"headline": ""}, "") == "Aktion"
 
 
@@ -344,9 +454,11 @@ def test_kein_motiv_steht_zweimal_auf_der_seite():
     anderen Angebot auf, stuende dasselbe Motiv zweimal auf der Seite (am
     08.08.2026 bei O2 gemessen: derselbe Router unter zwei Schlagzeilen)."""
     sources = [_src("congstar"), _src("Blau")]
-    entries = [_scored(brand="congstar", headline="A", score=90, image="x-1280.jpg"),
-               _scored(brand="congstar", headline="B", score=80, image="x-1280.jpg"),
-               _scored(brand="Blau", headline="C", score=70, image="x-1280.jpg")]
+    entries = [
+        _scored(brand="congstar", headline="A", score=90, image="x-1280.jpg"),
+        _scored(brand="congstar", headline="B", score=80, image="x-1280.jpg"),
+        _scored(brand="Blau", headline="C", score=70, image="x-1280.jpg"),
+    ]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     bilder = [k["bild"] for k in view["karten"] if k["bild"]]
     assert bilder == ["images/x-1280.jpg"]
@@ -373,6 +485,7 @@ def test_ein_banner_wird_als_banner_erkannt_und_nicht_beschnitten():
 # ------------------------------------------------------------- Mechaniken
 # "Was der Markt gerade faehrt" - die Balken zaehlen MARKEN, nicht Angebote.
 
+
 def test_mechanik_balken_zaehlen_marken_nicht_angebote():
     sources = [_src("congstar"), _src("Blau"), _src("klarmobil")]
     entries = [
@@ -393,7 +506,7 @@ def test_mechanik_balken_zaehlen_marken_nicht_angebote():
 
 
 def test_mechanik_sonstiges_taucht_nicht_als_balken_auf():
-    """"sonstiges" ist die Auffangkategorie des Rankers - als Balken waere
+    """ "sonstiges" ist die Auffangkategorie des Rankers - als Balken waere
     sie eine Aussage ueber den Markt, die niemand getroffen hat."""
     sources = [_src("congstar")]
     entries = [_scored(mechanic="sonstiges")]
@@ -405,6 +518,7 @@ def test_mechanik_sonstiges_taucht_nicht_als_balken_auf():
 # Zwei Karten, die dieselbe Aktion zeigen, und zwei Kacheln mit demselben
 # Text nebeneinander - beides liest sich als Fehler, nicht als Angebot.
 
+
 def test_dasselbe_angebot_steht_nur_einmal_im_block():
     """PromoDB.upsert erkennt eine Umformulierung und aktualisiert den
     bestehenden Eintrag. Was vor dieser Erkennung entstand, liegt trotzdem
@@ -412,22 +526,30 @@ def test_dasselbe_angebot_steht_nur_einmal_im_block():
     "SMART Tarife mit 5G und Flatrate" neben "SMART-Tarife mit 5G und
     Flatrate". Auf der Seite standen sie als zwei Karten nebeneinander."""
     sources = [_src("Lidl Connect")]
-    entries = [_scored(brand="Lidl Connect", headline="SMART Tarife mit 5G und Flatrate",
-                       score=60),
-               _scored(brand="Lidl Connect", headline="SMART-Tarife mit 5G und Flatrate",
-                       score=40),
-               _scored(brand="Lidl Connect", headline="10 € Startguthaben", score=30)]
+    entries = [
+        _scored(
+            brand="Lidl Connect", headline="SMART Tarife mit 5G und Flatrate", score=60
+        ),
+        _scored(
+            brand="Lidl Connect", headline="SMART-Tarife mit 5G und Flatrate", score=40
+        ),
+        _scored(brand="Lidl Connect", headline="10 € Startguthaben", score=30),
+    ]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert [k["offer"]["headline"] for k in view["karten"]] == [
-        "SMART Tarife mit 5G und Flatrate", "10 € Startguthaben"]
+        "SMART Tarife mit 5G und Flatrate",
+        "10 € Startguthaben",
+    ]
 
 
 def test_zwei_verschiedene_angebote_bleiben_zwei_karten():
     """Der Zahlenwaechter aus dem Store gilt auch hier: "10 GB Bonus" und
     "20 GB Bonus" teilen sich fast jedes Wort und sind zwei Angebote."""
     sources = [_src("congstar")]
-    entries = [_scored(headline="10 GB Bonus für Neukunden", score=60),
-               _scored(headline="20 GB Bonus für Neukunden", score=50)]
+    entries = [
+        _scored(headline="10 GB Bonus für Neukunden", score=60),
+        _scored(headline="20 GB Bonus für Neukunden", score=50),
+    ]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert len(view["karten"]) == 2
 
@@ -437,10 +559,15 @@ def test_die_dublette_vererbt_ihr_motiv_an_die_bleibende_karte():
     auch der anderen. Ohne das verliert die Seite ein Motiv, nur weil die
     schwaechere Schreibweise es hielt."""
     sources = [_src("Lidl Connect")]
-    entries = [_scored(brand="Lidl Connect", headline="Jahrestarife: einmal zahlen",
-                       score=60),
-               _scored(brand="Lidl Connect", headline="Jahrestarife – einmal zahlen",
-                       score=40, image="jahr-1280.jpg")]
+    entries = [
+        _scored(brand="Lidl Connect", headline="Jahrestarife: einmal zahlen", score=60),
+        _scored(
+            brand="Lidl Connect",
+            headline="Jahrestarife – einmal zahlen",
+            score=40,
+            image="jahr-1280.jpg",
+        ),
+    ]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert len(view["karten"]) == 1
     assert view["karten"][0]["bild"] == "images/jahr-1280.jpg"
@@ -452,9 +579,15 @@ def test_keine_zwei_gleichen_schriftkacheln_in_einem_block():
     untereinander ist genau der Eindruck, den der Umbau beseitigen soll -
     die zweite Karte nimmt die naechste Stufe ihrer eigenen Liste."""
     sources = [_src("winSIM")]
-    entries = [_scored(brand="winSIM", headline="1 GB extra im Sommer", score=60),
-               _scored(brand="winSIM", headline="1 GB geschenkt für Bestandskunden",
-                       score=50, mechanic="datenbonus")]
+    entries = [
+        _scored(brand="winSIM", headline="1 GB extra im Sommer", score=60),
+        _scored(
+            brand="winSIM",
+            headline="1 GB geschenkt für Bestandskunden",
+            score=50,
+            mechanic="datenbonus",
+        ),
+    ]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     kacheln = [k["kachel"] for k in view["karten"]]
     assert kacheln[0] == "1 GB"
@@ -462,12 +595,14 @@ def test_keine_zwei_gleichen_schriftkacheln_in_einem_block():
 
 
 def test_die_kachel_sagt_nie_sonstiges():
-    """"sonstiges" ist der Sammelschluessel des Bewertungsagenten. Als
+    """ "sonstiges" ist der Sammelschluessel des Bewertungsagenten. Als
     groesster Text einer Karte sagt er einem Leser nichts."""
     from telco_radar.report.promo import _kachel_text
 
-    assert _kachel_text({"headline": "SMART Tarife mit 5G und Flatrate"},
-                        "sonstiges") == "Aktion"
+    assert (
+        _kachel_text({"headline": "SMART Tarife mit 5G und Flatrate"}, "sonstiges")
+        == "Aktion"
+    )
 
 
 def test_der_rang_kommt_aus_der_konfiguration():
@@ -485,11 +620,18 @@ def test_der_rang_kommt_aus_der_konfiguration():
 # gerechnet, nicht in der Vorlage.
 # --------------------------------------------------------------------------
 
+
 def _mit_bild(brand, headline, breite, score):
     e = _entry(brand=brand, headline=headline)
-    e.update({"image": f"{headline}.jpg", "image_w": breite,
-              "image_h": int(breite * 0.56), "image_kind": "angebot",
-              "score": score})
+    e.update(
+        {
+            "image": f"{headline}.jpg",
+            "image_w": breite,
+            "image_h": int(breite * 0.56),
+            "image_kind": "angebot",
+            "score": score,
+        }
+    )
     return e
 
 
@@ -504,9 +646,13 @@ def test_ein_zu_schmales_motiv_traegt_die_grosse_flaeche_nicht():
     nicht hochskaliert - es ist trotzdem unscharf, und genau so stand es am
     16.08.2026 bei Blau und Penny Mobil auf der Seite. Die Aktion fuehrt
     ihren Block weiterhin an, nur eben in der kleinen Flaeche."""
-    block = _block_von([_mit_bild("congstar", "Schmal", 620, 90),
-                        _mit_bild("congstar", "Zweite", 1280, 40)])
-    assert block["lead"]["offer"]["headline"] == "Schmal"   # Reihenfolge bleibt
+    block = _block_von(
+        [
+            _mit_bild("congstar", "Schmal", 620, 90),
+            _mit_bild("congstar", "Zweite", 1280, 40),
+        ]
+    )
+    assert block["lead"]["offer"]["headline"] == "Schmal"  # Reihenfolge bleibt
     assert block["lead_gross"] is False
     assert block["lead_hoch"] is False
 
@@ -522,9 +668,10 @@ def test_ein_breites_motiv_und_eine_schriftkachel_tragen_sie():
 
 def _block_mit_weiteren(n: int):
     """Ein Block mit einer breiten Aufmacherkarte und `n` weiteren Karten."""
-    return _block_von([_mit_bild("congstar", "Erste", 1280, 90)]
-                      + [_mit_bild("congstar", f"Nr{i}", 1280, 80 - i)
-                         for i in range(n)])
+    return _block_von(
+        [_mit_bild("congstar", "Erste", 1280, 90)]
+        + [_mit_bild("congstar", f"Nr{i}", 1280, 80 - i) for i in range(n)]
+    )
 
 
 def test_zwei_zeilen_hoch_erst_ab_vier_weiteren_karten():
@@ -540,7 +687,8 @@ def test_zwei_zeilen_hoch_erst_ab_vier_weiteren_karten():
     drei = _block_mit_weiteren(3)
     assert drei["lead_gross"] is True and drei["lead_hoch"] is False, (
         "drei weitere Karten fuellen die 2x2-Flaeche nicht vollstaendig "
-        "(ALDI TALK, 27.08.2026)")
+        "(ALDI TALK, 27.08.2026)"
+    )
     vier = _block_mit_weiteren(4)
     assert vier["lead_gross"] is True and vier["lead_hoch"] is True
 
@@ -585,11 +733,11 @@ def test_die_gewichtung_wird_nach_dem_entdoppeln_neu_gerechnet():
     """
     doppelt = [_mit_bild("congstar", "Stark", 1280, 90)]
     schmal = _mit_bild("klarmobil", "Dieselbe Datei", 620, 95)
-    schmal["image"] = "Stark.jpg"                  # dasselbe Motiv
+    schmal["image"] = "Stark.jpg"  # dasselbe Motiv
     doppelt.append(schmal)
-    view = prepare_promo_view(doppelt, [_src("congstar", rang=1),
-                                        _src("klarmobil", rang=2)],
-                              "2026-07-25")
+    view = prepare_promo_view(
+        doppelt, [_src("congstar", rang=1), _src("klarmobil", rang=2)], "2026-07-25"
+    )
     bloecke = {b["name"]: b for b in view["bloecke"]}
     # Der Fall tritt wirklich ein: die zweite Karte hat ihr Bild verloren.
     assert bloecke["klarmobil"]["lead"]["bild"] == ""
@@ -601,6 +749,7 @@ def test_die_gewichtung_wird_nach_dem_entdoppeln_neu_gerechnet():
 # --------------------------------------------------------------------------
 # Die Entdopplung darf keine ZWEI Angebote zusammenwerfen (29.08.2026)
 # --------------------------------------------------------------------------
+
 
 def test_zwei_mechaniken_sind_zwei_angebote_auch_bei_aehnlicher_ueberschrift():
     """Der Befund, den `test_die_zahl_der_marktlage_stimmt_mit_der_datenbank`
@@ -616,13 +765,15 @@ def test_zwei_mechaniken_sind_zwei_angebote_auch_bei_aehnlicher_ueberschrift():
     from telco_radar.analyze.promo_store import _same_offer
     from telco_radar.report.promo import _ohne_dubletten
 
-    geraet = {"headline": "Geräterabatt mit Allnet Flat M",
-              "mechanic": "datenbonus"}
-    partner = {"headline": "Partnerkarte: 11 € Rabatt auf Allnet Flat M",
-               "mechanic": "preisnachlass"}
+    geraet = {"headline": "Geräterabatt mit Allnet Flat M", "mechanic": "datenbonus"}
+    partner = {
+        "headline": "Partnerkarte: 11 € Rabatt auf Allnet Flat M",
+        "mechanic": "preisnachlass",
+    }
     # Die Voraussetzung des Falls: der Wortvergleich haelt sie fuer gleich.
-    assert _same_offer(geraet["headline"], partner["headline"]) is True, \
+    assert _same_offer(geraet["headline"], partner["headline"]) is True, (
         "ohne diesen Fehltreffer prueft der Test nichts"
+    )
 
     behalten = _ohne_dubletten([geraet, partner])
     assert len(behalten) == 2, "zwei Mechaniken sind zwei Angebote"
@@ -633,10 +784,8 @@ def test_die_echte_dublette_faellt_weiterhin_weg():
     Fall, fuer den die Entdopplung am 08.08.2026 gebaut wurde."""
     from telco_radar.report.promo import _ohne_dubletten
 
-    a = {"headline": "SMART Tarife mit 5G und Flatrate",
-         "mechanic": "preisnachlass"}
-    b = {"headline": "SMART-Tarife mit 5G und Flatrate",
-         "mechanic": "preisnachlass"}
+    a = {"headline": "SMART Tarife mit 5G und Flatrate", "mechanic": "preisnachlass"}
+    b = {"headline": "SMART-Tarife mit 5G und Flatrate", "mechanic": "preisnachlass"}
     assert len(_ohne_dubletten([a, b])) == 1
 
 

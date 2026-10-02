@@ -8,6 +8,7 @@ https://www.telekom.de/shop/tarife/handyvertrag vom 05.09.2026 (HTTP 200,
 2.267.192 Bytes, Absender `TelcoRadar/1.0`). Herkunft und sha256 stehen in
 `tests/fixtures/tarife/_herkunft.json`.
 """
+
 import gzip
 from pathlib import Path
 
@@ -26,13 +27,17 @@ def _seite() -> str:
 
 def _tarife(html=None):
     return tarif_telekom_kacheln.tarife_aus_html(
-        html if html is not None else _seite(), anbieter="Telekom",
-        seiten_url=_URL, abgerufen_am="2026-09-05")
+        html if html is not None else _seite(),
+        anbieter="Telekom",
+        seiten_url=_URL,
+        abgerufen_am="2026-09-05",
+    )
 
 
 # --------------------------------------------------------------------------
 # Die gemessene Seite
 # --------------------------------------------------------------------------
+
 
 def test_die_fuenf_kacheln_der_seite():
     """Fuenf Tarife mit dem DURCHGESTRICHENEN Preis - so gemessen am 05.09.2026.
@@ -95,17 +100,22 @@ def test_xl_ist_unbegrenzt_die_anderen_tragen_ein_gb_volumen():
 # Gestellte Faelle
 # --------------------------------------------------------------------------
 
-def _kachel(name="MagentaMobil M", oben='<span class="Price__value">39,95 €</span>',
-            strike='<span class="strike-price-value">49,95 €</span>',
-            link='<a class="Button" href="https://www.telekom.de/shop/tarife/'
-                 'smartphone-tarife?tariffId=MF_17791#js-tileSectionRef">'
-                 'Tarif auswählen</a>') -> str:
+
+def _kachel(
+    name="MagentaMobil M",
+    oben='<span class="Price__value">39,95 €</span>',
+    strike='<span class="strike-price-value">49,95 €</span>',
+    link='<a class="Button" href="https://www.telekom.de/shop/tarife/'
+    'smartphone-tarife?tariffId=MF_17791#js-tileSectionRef">'
+    "Tarif auswählen</a>",
+) -> str:
     return (
         '<div class="Tile TariffTileModified_TariffTileModified__3XAAl">'
         f'<div class="TariffTile__name-wrapper"><strong>{name}</strong></div>'
         f'<div class="price-wrapper">{oben}</div>'
         f'<p class="strike-price">{strike}</p>'
-        f'{link}</div>')
+        f"{link}</div>"
+    )
 
 
 def test_ohne_durchgestrichenen_preis_wird_die_kachel_verworfen():

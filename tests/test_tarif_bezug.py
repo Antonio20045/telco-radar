@@ -5,6 +5,7 @@ Gemessen am echten Bestand (`data/state/tarife.jsonl`, Stand 04.09.2026:
 beweist, dass die Namen dieses Marktes wirklich treffen; die gestellten
 Faelle beweisen die Regeln, die heute zufaellig nicht eintreten.
 """
+
 from __future__ import annotations
 
 import json
@@ -38,10 +39,16 @@ def _satz(anbieter: str, name: str, grundgebuehr=None, **kw) -> dict:
     aus dem falschen Grund - genau das ist beim ersten Anlauf passiert.
     """
     tid = tarif_id(anbieter, name)
-    satz = {"tarif_id": tid, "anbieter": anbieter, "name": name,
-            "grundgebuehr": grundgebuehr, "art": "mobilfunk",
-            "dokument_url": f"https://x.de/{tid}.pdf",
-            "abgerufen_am": "2026-09-04", "preisphasen": []}
+    satz = {
+        "tarif_id": tid,
+        "anbieter": anbieter,
+        "name": name,
+        "grundgebuehr": grundgebuehr,
+        "art": "mobilfunk",
+        "dokument_url": f"https://x.de/{tid}.pdf",
+        "abgerufen_am": "2026-09-04",
+        "preisphasen": [],
+    }
     satz.update(kw)
     return satz
 
@@ -55,6 +62,7 @@ def echt() -> Tarifbestand:
 # Der Weg ueber den Namen
 # --------------------------------------------------------------------------
 
+
 def test_der_echte_bestand_traegt_vier_anbieter(echt):
     """Das Abnahmekriterium der Phase 6, gegen die Datei gemessen.
 
@@ -67,16 +75,19 @@ def test_der_echte_bestand_traegt_vier_anbieter(echt):
     assert {"Telekom", "Vodafone", "congstar", "o2"} <= anbieter
 
 
-@pytest.mark.parametrize("anbieter,referenz,erwartet", [
-    ("Telekom", "MagentaMobil L", "telekom:magentamobil-l"),
-    # Der Klammerzusatz ist eine Einordnung des Blattes, kein Produktname.
-    ("Telekom", "MagentaMobil L (Mobilfunk)", "telekom:magentamobil-l"),
-    ("Vodafone", "Vodafone Mobil M", "vodafone:vodafone-mobil-m"),
-    # Auf der Produktseite steht der Anbietername nicht noch einmal.
-    ("Vodafone", "Mobil M", "vodafone:vodafone-mobil-m"),
-    # congstar schreibt "(Postpaid Mobilfunk)" ins Blatt.
-    ("congstar", "Allnet Flat L", "congstar:allnet-flat-l"),
-])
+@pytest.mark.parametrize(
+    "anbieter,referenz,erwartet",
+    [
+        ("Telekom", "MagentaMobil L", "telekom:magentamobil-l"),
+        # Der Klammerzusatz ist eine Einordnung des Blattes, kein Produktname.
+        ("Telekom", "MagentaMobil L (Mobilfunk)", "telekom:magentamobil-l"),
+        ("Vodafone", "Vodafone Mobil M", "vodafone:vodafone-mobil-m"),
+        # Auf der Produktseite steht der Anbietername nicht noch einmal.
+        ("Vodafone", "Mobil M", "vodafone:vodafone-mobil-m"),
+        # congstar schreibt "(Postpaid Mobilfunk)" ins Blatt.
+        ("congstar", "Allnet Flat L", "congstar:allnet-flat-l"),
+    ],
+)
 def test_echte_tarifnamen_treffen(echt, anbieter, referenz, erwartet):
     bezug = echt.ueber_namen(anbieter, referenz)
     assert bezug is not None, f"{anbieter} / {referenz}"
@@ -85,7 +96,7 @@ def test_echte_tarifnamen_treffen(echt, anbieter, referenz, erwartet):
 
 
 def test_ein_tarif_den_es_nicht_gibt_loest_nicht_auf(echt):
-    """"GigaMobil M" ist Vodafones ALTE Portfolio-Bezeichnung.
+    """ "GigaMobil M" ist Vodafones ALTE Portfolio-Bezeichnung.
 
     Eine Zuordnung auf den naechstbesten Tarif waere hier das Schlimmste,
     was passieren kann: die TCO truege dann einen fremden Grundpreis, und
@@ -103,6 +114,7 @@ def test_ein_leerer_name_ist_keine_referenz(echt):
 # Der Weg ueber den Betrag - Guete `mittel`, nie `hoch`
 # --------------------------------------------------------------------------
 
+
 def test_ein_eindeutiger_betrag_gibt_guete_mittel():
     """Das Abnahmekriterium: Betragszuordnung ist `mittel`, nie `hoch`.
 
@@ -111,14 +123,19 @@ def test_ein_eindeutiger_betrag_gibt_guete_mittel():
     Preis machte die Zuordnung falsch, ohne dass sich hier etwas aendert.
     Genau dieser Unterschied ist `mittel`.
     """
-    bestand = Tarifbestand([
-        _satz("Vodafone", "Tarif A", 41.95),
-        _satz("Vodafone", "Tarif B", 29.95),
-    ])
+    bestand = Tarifbestand(
+        [
+            _satz("Vodafone", "Tarif A", 41.95),
+            _satz("Vodafone", "Tarif B", 29.95),
+        ]
+    )
     bezug = bestand.ueber_betrag("Vodafone", 41.95)
-    assert bezug == Bezug(tarif_id=tarif_id("Vodafone", "Tarif A"),
-                          tarif_name="Tarif A", guete=MITTEL,
-                          grund=bezug.grund)
+    assert bezug == Bezug(
+        tarif_id=tarif_id("Vodafone", "Tarif A"),
+        tarif_name="Tarif A",
+        guete=MITTEL,
+        grund=bezug.grund,
+    )
     assert bezug.guete == MITTEL
     assert not bezug.belastbar
     # Und die Gegenprobe im selben Test: ueber den NAMEN waere es `hoch`.
@@ -134,10 +151,12 @@ def test_zwei_tarife_mit_demselben_preis_ergeben_keine_zuordnung():
     demselben Grundpreis. Ein Betrag trifft dort also regelmaessig zwei
     Datensaetze.
     """
-    bestand = Tarifbestand([
-        _satz("Vodafone", "Vodafone Mobil M", 49.95),
-        _satz("Vodafone", "Vodafone Mobil M mit Smartphone", 49.95),
-    ])
+    bestand = Tarifbestand(
+        [
+            _satz("Vodafone", "Vodafone Mobil M", 49.95),
+            _satz("Vodafone", "Vodafone Mobil M mit Smartphone", 49.95),
+        ]
+    )
     assert bestand.ueber_betrag("Vodafone", 49.95) is None
 
 
@@ -154,24 +173,24 @@ def test_ein_betrag_der_nicht_vorkommt_wird_nicht_gerundet():
 
 def test_der_betrag_eines_anderen_anbieters_zaehlt_nicht():
     """Sonst truege ein o2-Geraet den Grundpreis eines Telekom-Tarifs."""
-    bestand = Tarifbestand([_satz("Telekom", "MagentaMobil L",
-                                  59.95)])
+    bestand = Tarifbestand([_satz("Telekom", "MagentaMobil L", 59.95)])
     assert bestand.ueber_betrag("o2", 59.95) is None
 
 
 def test_der_name_schlaegt_den_betrag():
     """Eine Messung wird nicht durch eine Wahrscheinlichkeit ersetzt."""
-    bestand = Tarifbestand([
-        _satz("Telekom", "MagentaMobil L", 59.95),
-        _satz("Telekom", "Ein anderer", 12.34),
-    ])
+    bestand = Tarifbestand(
+        [
+            _satz("Telekom", "MagentaMobil L", 59.95),
+            _satz("Telekom", "Ein anderer", 12.34),
+        ]
+    )
     bezug = bestand.loese("Telekom", "MagentaMobil L", betrag=12.34)
     assert bezug.tarif_id == "telekom:magentamobil-l" and bezug.guete == HOCH
 
 
 def test_ohne_namen_bleibt_der_betrag():
-    bestand = Tarifbestand([_satz("Telekom", "Ein anderer",
-                                  12.34)])
+    bestand = Tarifbestand([_satz("Telekom", "Ein anderer", 12.34)])
     bezug = bestand.loese("Telekom", "", betrag=12.34)
     assert bezug.tarif_id == tarif_id("Telekom", "Ein anderer")
     assert bezug.guete == MITTEL
@@ -181,6 +200,7 @@ def test_ohne_namen_bleibt_der_betrag():
 # Der Bestand als Zeitreihe
 # --------------------------------------------------------------------------
 
+
 def test_von_zwei_staenden_desselben_tarifs_gilt_der_letzte():
     """`tarife.jsonl` ist eine Zeitreihe, keine Tabelle.
 
@@ -188,10 +208,12 @@ def test_von_zwei_staenden_desselben_tarifs_gilt_der_letzte():
     ist kein zweiter Tarif. Ohne diese Regel meldete die Betragssuche bei
     jedem geaenderten Preis "nicht eindeutig".
     """
-    bestand = Tarifbestand([
-        _satz("Telekom", "MagentaMobil L", 54.95),
-        _satz("Telekom", "MagentaMobil L", 59.95),
-    ])
+    bestand = Tarifbestand(
+        [
+            _satz("Telekom", "MagentaMobil L", 54.95),
+            _satz("Telekom", "MagentaMobil L", 59.95),
+        ]
+    )
     assert len(bestand) == 1
     assert bestand.ueber_betrag("Telekom", 59.95) is not None
     assert bestand.ueber_betrag("Telekom", 54.95) is None
@@ -199,8 +221,9 @@ def test_von_zwei_staenden_desselben_tarifs_gilt_der_letzte():
 
 def test_eine_kaputte_zeile_kostet_nicht_den_bestand(tmp_path):
     p = tmp_path / "tarife.jsonl"
-    p.write_text('{"tarif_id":"a","anbieter":"o2","name":"A"}\nkaputt\n\n',
-                 encoding="utf-8")
+    p.write_text(
+        '{"tarif_id":"a","anbieter":"o2","name":"A"}\nkaputt\n\n', encoding="utf-8"
+    )
     assert len(Tarifbestand.aus_datei(p)) == 1
 
 
@@ -223,13 +246,26 @@ def test_eine_fehlende_datei_ist_ein_leerer_bestand(tmp_path):
 # Zeitreihe) an die Geraeteseite durch - die Karte zeigte deshalb IMMER
 # das Pflichtdokument, auch wenn eine aktuellere Live-Shop-Lesart vorlag.
 
+
 def test_je_id_aktuell_zeigt_die_live_shop_lesart_am_bare_schluessel():
     """Die Karte soll das GB der Live-Shop-Kachel sehen, nicht des Blatts."""
-    pib = _satz("Telekom", "MagentaMobil S", 39.95, datenvolumen_gb=6.0,
-                versionsstand="21.11.2021", abgerufen_am="2026-09-15")
-    kachel = _satz("Telekom", "MagentaMobil S", 39.95, datenvolumen_gb=30.0,
-                   preistyp="live_shop", abgerufen_am="2026-09-15")
-    kachel["tarif_id"] += "#live_shop"       # so trennt sie der Speicher
+    pib = _satz(
+        "Telekom",
+        "MagentaMobil S",
+        39.95,
+        datenvolumen_gb=6.0,
+        versionsstand="21.11.2021",
+        abgerufen_am="2026-09-15",
+    )
+    kachel = _satz(
+        "Telekom",
+        "MagentaMobil S",
+        39.95,
+        datenvolumen_gb=30.0,
+        preistyp="live_shop",
+        abgerufen_am="2026-09-15",
+    )
+    kachel["tarif_id"] += "#live_shop"  # so trennt sie der Speicher
 
     bestand = Tarifbestand([pib, kachel])
     bare = tarif_id("Telekom", "MagentaMobil S")
@@ -246,8 +282,9 @@ def test_je_id_aktuell_zeigt_die_live_shop_lesart_am_bare_schluessel():
 
 def test_je_id_aktuell_ist_unabhaengig_von_der_reihenfolge():
     pib = _satz("Telekom", "MagentaMobil M", 49.95, datenvolumen_gb=12.0)
-    kachel = _satz("Telekom", "MagentaMobil M", 49.95, datenvolumen_gb=50.0,
-                   preistyp="live_shop")
+    kachel = _satz(
+        "Telekom", "MagentaMobil M", 49.95, datenvolumen_gb=50.0, preistyp="live_shop"
+    )
     kachel["tarif_id"] += "#live_shop"
     bare = tarif_id("Telekom", "MagentaMobil M")
 
@@ -273,10 +310,22 @@ def test_je_id_aktuell_ist_auch_unter_dem_eigenen_schluessel_erreichbar():
     Schluessel; ein Nachschlag mit der eigenen ID der Referenz ging ins
     Leere, obwohl `je_id_aktuell` fuer denselben Vertrag laengst die
     Live-Shop-Lesart trug."""
-    pib = _satz("Telekom", "MagentaMobil S", 39.95, datenvolumen_gb=6.0,
-                versionsstand="21.11.2021", abgerufen_am="2026-09-15")
-    kachel = _satz("Telekom", "MagentaMobil S", 39.95, datenvolumen_gb=30.0,
-                   preistyp="live_shop", abgerufen_am="2026-09-15")
+    pib = _satz(
+        "Telekom",
+        "MagentaMobil S",
+        39.95,
+        datenvolumen_gb=6.0,
+        versionsstand="21.11.2021",
+        abgerufen_am="2026-09-15",
+    )
+    kachel = _satz(
+        "Telekom",
+        "MagentaMobil S",
+        39.95,
+        datenvolumen_gb=30.0,
+        preistyp="live_shop",
+        abgerufen_am="2026-09-15",
+    )
     kachel["tarif_id"] += "#live_shop"
 
     bestand = Tarifbestand([pib, kachel])
@@ -309,13 +358,16 @@ def test_je_id_aktuell_am_echten_bestand_telekom_s_m_l():
         assert bestand.je_id_aktuell[bare]["preistyp"] == "live_shop", bare
         # Derselbe Grundpreis in beiden Lesarten - kein Verdacht auf eine
         # Erfassungsluecke (CLAUDE.md § 16), sondern zwei echte Lesarten.
-        assert (bestand.je_id[bare]["grundgebuehr"]
-                == bestand.je_id_aktuell[bare]["grundgebuehr"])
+        assert (
+            bestand.je_id[bare]["grundgebuehr"]
+            == bestand.je_id_aktuell[bare]["grundgebuehr"]
+        )
 
 
 # --------------------------------------------------------------------------
 # Die SIM-only-Referenzen aus dem Bestand
 # --------------------------------------------------------------------------
+
 
 def test_der_echte_bestand_ergibt_referenzen_mit_belegtem_preis(echt):
     """Der Massstab, den Phase 6 liefert.
@@ -332,10 +384,12 @@ def test_der_echte_bestand_ergibt_referenzen_mit_belegtem_preis(echt):
 
 
 def test_ein_festnetztarif_ist_kein_massstab_fuer_ein_smartphone():
-    bestand = Tarifbestand([
-        _satz("o2", "O2 Home L", 44.99, art="festnetz"),
-        _satz("o2", "O2 Mobile M", 39.99, art="mobilfunk"),
-    ])
+    bestand = Tarifbestand(
+        [
+            _satz("o2", "O2 Home L", 44.99, art="festnetz"),
+            _satz("o2", "O2 Mobile M", 39.99, art="mobilfunk"),
+        ]
+    )
     ids = {r.tarif_id for r in aus_bestand(bestand)}
     assert ids == {tarif_id("o2", "O2 Mobile M")}
 
@@ -352,15 +406,24 @@ def test_die_erste_preisphase_gilt_und_nicht_ihr_durchschnitt():
     Monat 25"). Steht dort einmal eine echte Staffelung, ist der Mittelwert
     beider Phasen eine Zahl, die auf keinem Dokument steht.
     """
-    bestand = Tarifbestand([_satz(
-        "Vodafone", "Mobil M", 19.95,
-        preisphasen=[{"von_monat": 1, "bis_monat": 6, "betrag": 19.95},
-                     {"von_monat": 7, "bis_monat": None, "betrag": 49.95}])])
+    bestand = Tarifbestand(
+        [
+            _satz(
+                "Vodafone",
+                "Mobil M",
+                19.95,
+                preisphasen=[
+                    {"von_monat": 1, "bis_monat": 6, "betrag": 19.95},
+                    {"von_monat": 7, "bis_monat": None, "betrag": 49.95},
+                ],
+            )
+        ]
+    )
     assert aus_bestand(bestand)[0].tarif_sim_only_monatlich == 19.95
 
 
 def test_ein_fehlender_anschlusspreis_bleibt_none_und_wird_nicht_null():
-    """"Kein Anschlusspreis bekannt" heisst nicht "kostenlos"."""
+    """ "Kein Anschlusspreis bekannt" heisst nicht "kostenlos"."""
     bestand = Tarifbestand([_satz("X", "A", 10.0)])
     assert aus_bestand(bestand)[0].anschlusspreis is None
 
@@ -374,8 +437,11 @@ def test_der_ausgelieferte_bestand_erfuellt_das_abnahmekriterium():
     nach einem Baseline-Reset). Alles Verhalten haengt an der Fixture
     daneben.
     """
-    zeilen = [json.loads(z) for z in
-              _BESTAND.read_text(encoding="utf-8").splitlines() if z.strip()]
+    zeilen = [
+        json.loads(z)
+        for z in _BESTAND.read_text(encoding="utf-8").splitlines()
+        if z.strip()
+    ]
     assert all(z.get("tarif_id") for z in zeilen)
     assert len({z["anbieter"] for z in zeilen}) >= 3
 
@@ -387,10 +453,15 @@ def test_fixture_und_betriebsdatei_sind_dasselbe_format():
     der Datei abweichen, die der Sammler wirklich schreibt - dieselbe
     Ueberlegung wie beim Test, der PDF und Textfixture gegeneinander haelt.
     """
+
     def felder(pfad):
-        zeilen = [json.loads(z) for z in
-                  pfad.read_text(encoding="utf-8").splitlines() if z.strip()]
+        zeilen = [
+            json.loads(z)
+            for z in pfad.read_text(encoding="utf-8").splitlines()
+            if z.strip()
+        ]
         return set().union(*(set(z) for z in zeilen)) if zeilen else set()
+
     assert felder(_FIXTURE) == felder(_BESTAND)
 
 
@@ -403,10 +474,12 @@ def test_das_geraeteblatt_eines_tarifs_ist_keine_zweite_referenz():
     untereinander mit demselben Betrag; das ist eine Dublette und keine
     Auskunft.
     """
-    bestand = Tarifbestand([
-        _satz("Vodafone", "Vodafone Mobil M", 49.95),
-        _satz("Vodafone", "Vodafone Mobil M mit Smartphone", 49.95),
-    ])
+    bestand = Tarifbestand(
+        [
+            _satz("Vodafone", "Vodafone Mobil M", 49.95),
+            _satz("Vodafone", "Vodafone Mobil M mit Smartphone", 49.95),
+        ]
+    )
     namen = [r.tarif_name for r in aus_bestand(bestand)]
     assert namen == ["Vodafone Mobil M"]
 
@@ -418,19 +491,23 @@ def test_zwei_tarife_mit_demselben_preis_bleiben_zwei_referenzen():
     sind trotzdem zwei Tarife - der eine mit Mindestlaufzeit, der andere
     ohne. Eine Regel ueber Namenspraefixe haette den zweiten geloescht.
     """
-    bestand = Tarifbestand([
-        _satz("Telekom", "MagentaMobil S", 39.95),
-        _satz("Telekom", "MagentaMobil S Flex", 39.95),
-    ])
+    bestand = Tarifbestand(
+        [
+            _satz("Telekom", "MagentaMobil S", 39.95),
+            _satz("Telekom", "MagentaMobil S Flex", 39.95),
+        ]
+    )
     assert len(aus_bestand(bestand)) == 2
 
 
 def test_das_geraeteblatt_bleibt_wenn_sein_preis_abweicht():
     """Gleicher Name plus Zusatz, aber anderer Betrag: zwei Aussagen."""
-    bestand = Tarifbestand([
-        _satz("Vodafone", "Vodafone Mobil M", 49.95),
-        _satz("Vodafone", "Vodafone Mobil M mit Smartphone", 59.95),
-    ])
+    bestand = Tarifbestand(
+        [
+            _satz("Vodafone", "Vodafone Mobil M", 49.95),
+            _satz("Vodafone", "Vodafone Mobil M mit Smartphone", 59.95),
+        ]
+    )
     assert len(aus_bestand(bestand)) == 2
 
 
@@ -448,26 +525,34 @@ def test_der_echte_bestand_traegt_jeden_massstab_genau_einmal():
 # Nachtrag aus dem Review vom 04.09.2026
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("anbieter,referenz", [
-    # Die Marke steht im Blatt, nicht auf der Produktseite (Vodafone).
-    ("Vodafone", "Mobil M"),
-    ("Vodafone", "Vodafone Mobil M"),
-])
+
+@pytest.mark.parametrize(
+    "anbieter,referenz",
+    [
+        # Die Marke steht im Blatt, nicht auf der Produktseite (Vodafone).
+        ("Vodafone", "Mobil M"),
+        ("Vodafone", "Vodafone Mobil M"),
+    ],
+)
 def test_die_marke_darf_auf_der_einen_seite_fehlen(echt, anbieter, referenz):
     assert echt.ueber_namen(anbieter, referenz) is not None
 
 
-@pytest.mark.parametrize("anbieter,referenz,erwartet", [
-    # ... und andersherum: im Blatt steht sie NICHT, auf der Produktseite
-    # schon. Das ist bei Telekom und congstar der Regelfall - und genau die
-    # Richtung, die die erste Fassung nicht aufloeste. Weil
-    # `TcoDB.upsert_buendel` ohne `tarif_id` wirft, haette Phase 4 fuer
-    # beide Anbieter keinen einzigen Buendelpreis speichern koennen.
-    ("Telekom", "Telekom MagentaMobil L", "telekom:magentamobil-l"),
-    ("congstar", "congstar Allnet Flat L", "congstar:allnet-flat-l"),
-])
-def test_die_marke_darf_auch_auf_der_anderen_seite_stehen(echt, anbieter,
-                                                          referenz, erwartet):
+@pytest.mark.parametrize(
+    "anbieter,referenz,erwartet",
+    [
+        # ... und andersherum: im Blatt steht sie NICHT, auf der Produktseite
+        # schon. Das ist bei Telekom und congstar der Regelfall - und genau die
+        # Richtung, die die erste Fassung nicht aufloeste. Weil
+        # `TcoDB.upsert_buendel` ohne `tarif_id` wirft, haette Phase 4 fuer
+        # beide Anbieter keinen einzigen Buendelpreis speichern koennen.
+        ("Telekom", "Telekom MagentaMobil L", "telekom:magentamobil-l"),
+        ("congstar", "congstar Allnet Flat L", "congstar:allnet-flat-l"),
+    ],
+)
+def test_die_marke_darf_auch_auf_der_anderen_seite_stehen(
+    echt, anbieter, referenz, erwartet
+):
     bezug = echt.ueber_namen(anbieter, referenz)
     assert bezug is not None, f"{anbieter} / {referenz}"
     assert bezug.tarif_id == erwartet
@@ -479,8 +564,10 @@ def test_die_marke_verbindet_keine_verschiedenen_tarife(echt):
     Sie darf Schreibweisen zusammenfuehren, nicht Tarife. Ohne diese Zeile
     bewiese der Test darueber nur, dass die Regel etwas findet.
     """
-    assert echt.ueber_namen("Telekom", "Telekom MagentaMobil XL") \
-        .tarif_id == "telekom:magentamobil-xl"
+    assert (
+        echt.ueber_namen("Telekom", "Telekom MagentaMobil XL").tarif_id
+        == "telekom:magentamobil-xl"
+    )
     assert echt.ueber_namen("Telekom", "Telekom MagentaMobil Gibtsnicht") is None
 
 
@@ -495,7 +582,7 @@ def test_zwei_tarife_mit_derselben_titelzeile_ergeben_einen_massstab():
     ersterer = _satz("o2", "O2 Mobile L 175/250/300 Flex", 44.99)
     ersterer["dokument_url"] = "https://x.de/erstes.pdf"
     zweiter = _satz("o2", "O2 Mobile L 175/250/300 Flex", 54.99)
-    zweiter["tarif_id"] += "#abcd1234"      # so trennt sie der Tarifspeicher
+    zweiter["tarif_id"] += "#abcd1234"  # so trennt sie der Tarifspeicher
     zweiter["dokument_url"] = "https://x.de/zweites.pdf"
     referenzen = aus_bestand(Tarifbestand([ersterer, zweiter]))
     assert len(referenzen) == 1
@@ -512,15 +599,27 @@ def test_die_live_shop_lesart_schlaegt_das_pflichtdokument():
     Die Shop-Kachel gewinnt die Referenz - unabhaengig davon, in welcher
     Reihenfolge die zwei Saetze im Bestand stehen.
     """
-    pdf = _satz("Telekom", "MagentaMobil S", 39.95,
-                dokument_url=("https://www.telekom.de/produktinformations"
-                              "blatt/mobilfunk-magentamobil-s-20211121"),
-                abgerufen_am="2026-09-04")
-    kachel = _satz("Telekom", "MagentaMobil S", 39.95, preistyp="live_shop",
-                   dokument_url=("https://www.telekom.de/shop/tarife/"
-                                 "smartphone-tarife?tariffId=MF_17785"),
-                   abgerufen_am="2026-09-05")
-    kachel["tarif_id"] += "#live_shop"        # so trennt sie der Speicher
+    pdf = _satz(
+        "Telekom",
+        "MagentaMobil S",
+        39.95,
+        dokument_url=(
+            "https://www.telekom.de/produktinformations"
+            "blatt/mobilfunk-magentamobil-s-20211121"
+        ),
+        abgerufen_am="2026-09-04",
+    )
+    kachel = _satz(
+        "Telekom",
+        "MagentaMobil S",
+        39.95,
+        preistyp="live_shop",
+        dokument_url=(
+            "https://www.telekom.de/shop/tarife/smartphone-tarife?tariffId=MF_17785"
+        ),
+        abgerufen_am="2026-09-05",
+    )
+    kachel["tarif_id"] += "#live_shop"  # so trennt sie der Speicher
 
     for bestand in (Tarifbestand([pdf, kachel]), Tarifbestand([kachel, pdf])):
         referenzen = aus_bestand(bestand)
@@ -542,19 +641,17 @@ _O2_KACHEL = dict(buendel_slug="o2-mobile-on-demand-m-plus")
 
 
 def test_der_slug_loest_auf_wo_der_name_es_nicht_kann():
-    bestand = Tarifbestand([
-        _satz("o2", "O2 Mobile on Demand M", 19.99, **_O2_KACHEL)])
+    bestand = Tarifbestand([_satz("o2", "O2 Mobile on Demand M", 19.99, **_O2_KACHEL)])
     katalogname = "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)"
     # Der Name trifft NICHT - und das ist richtig so: "M" und "M Plus"
     # sind verschiedene Zeichenketten, und eine Heuristik, die "Plus"
     # wegwirft, wuerfe beim naechsten Tarif etwas Bedeutungstragendes weg.
     assert bestand.ueber_namen("o2", katalogname) is None
-    bezug = bestand.loese("o2", katalogname,
-                          slug="o2-mobile-on-demand-m-plus")
+    bezug = bestand.loese("o2", katalogname, slug="o2-mobile-on-demand-m-plus")
     assert bezug is not None
     assert bezug.tarif_id == "o2:o2-mobile-on-demand-m"
     assert bezug.guete == HOCH and bezug.belastbar
-    assert "Handy" not in bezug.grund      # der Grund nennt die Sache, nicht den Knopf
+    assert "Handy" not in bezug.grund  # der Grund nennt die Sache, nicht den Knopf
     assert "o2-mobile-on-demand-m-plus" in bezug.grund
 
 
@@ -563,10 +660,12 @@ def test_der_name_gewinnt_ueber_den_slug():
 
     Beides ist belegt; das Pflichtdokument ist die staerkere Quelle.
     """
-    bestand = Tarifbestand([
-        _satz("o2", "O2 Mobile L", 24.99, buendel_slug="o2-mobile-l-plus"),
-        _satz("o2", "O2 Mobile L Plus", 29.99,
-              buendel_slug="o2-mobile-l-plus-2")])
+    bestand = Tarifbestand(
+        [
+            _satz("o2", "O2 Mobile L", 24.99, buendel_slug="o2-mobile-l-plus"),
+            _satz("o2", "O2 Mobile L Plus", 29.99, buendel_slug="o2-mobile-l-plus-2"),
+        ]
+    )
     bezug = bestand.loese("o2", "O2 Mobile L Plus", slug="o2-mobile-l-plus")
     assert bezug.tarif_id == "o2:o2-mobile-l-plus"
     assert "Produktinformationsblatt" in bezug.grund
@@ -575,16 +674,21 @@ def test_der_name_gewinnt_ueber_den_slug():
 def test_zwei_tarife_mit_demselben_slug_loesen_nicht_auf():
     """Zwei Treffer sind keine schwache Zuordnung, sondern gar keine -
     dieselbe Regel wie beim Betrag."""
-    bestand = Tarifbestand([
-        _satz("o2", "O2 Mobile L", 24.99, buendel_slug="o2-mobile-l-plus"),
-        _satz("o2", "O2 Mobile L Zweitfassung", 24.99,
-              buendel_slug="o2-mobile-l-plus")])
+    bestand = Tarifbestand(
+        [
+            _satz("o2", "O2 Mobile L", 24.99, buendel_slug="o2-mobile-l-plus"),
+            _satz(
+                "o2", "O2 Mobile L Zweitfassung", 24.99, buendel_slug="o2-mobile-l-plus"
+            ),
+        ]
+    )
     assert bestand.ueber_slug("o2", "o2-mobile-l-plus") is None
 
 
 def test_der_slug_gilt_nur_innerhalb_des_anbieters():
-    bestand = Tarifbestand([
-        _satz("o2", "O2 Mobile L", 24.99, buendel_slug="o2-mobile-l-plus")])
+    bestand = Tarifbestand(
+        [_satz("o2", "O2 Mobile L", 24.99, buendel_slug="o2-mobile-l-plus")]
+    )
     assert bestand.ueber_slug("Vodafone", "o2-mobile-l-plus") is None
 
 
@@ -598,11 +702,15 @@ def test_ein_leerer_slug_loest_nichts_auf():
 
 def test_der_slug_kommt_vor_dem_betrag():
     """Ein Betrag ist ein schwacher Schluessel - der Slug ist eine Angabe."""
-    bestand = Tarifbestand([
-        _satz("o2", "O2 Mobile on Demand M", 19.99, **_O2_KACHEL),
-        _satz("o2", "O2 Mobile S", 14.99)])
-    bezug = bestand.loese("o2", "Gibtsnicht", betrag=14.99,
-                          slug="o2-mobile-on-demand-m-plus")
+    bestand = Tarifbestand(
+        [
+            _satz("o2", "O2 Mobile on Demand M", 19.99, **_O2_KACHEL),
+            _satz("o2", "O2 Mobile S", 14.99),
+        ]
+    )
+    bezug = bestand.loese(
+        "o2", "Gibtsnicht", betrag=14.99, slug="o2-mobile-on-demand-m-plus"
+    )
     assert bezug.tarif_id == "o2:o2-mobile-on-demand-m"
     assert bezug.guete == HOCH
 
@@ -610,6 +718,7 @@ def test_der_slug_kommt_vor_dem_betrag():
 # --------------------------------------------------------------------------
 # Das Geraeteblatt (P3, 28.09.2026)
 # --------------------------------------------------------------------------
+
 
 def test_ein_buendel_haengt_am_geraeteblatt_des_tarifs(echt):
     """Vodafone "Mobil M" auf der Produktseite ist mit Geraet der Tarif
@@ -630,35 +739,49 @@ def test_ohne_geraeteblatt_bleibt_der_bezug(echt):
 
 def test_ein_geraeteblatt_mit_anderem_preis_ist_ein_anderer_tarif():
     """Nur bei gleichem Grundpreis ist das Geraeteblatt derselbe Vertrag."""
-    bestand = Tarifbestand([
-        _satz("Vodafone", "Vodafone Mobil M", 49.95),
-        _satz("Vodafone", "Vodafone Mobil M mit Smartphone", 54.95)])
+    bestand = Tarifbestand(
+        [
+            _satz("Vodafone", "Vodafone Mobil M", 49.95),
+            _satz("Vodafone", "Vodafone Mobil M mit Smartphone", 54.95),
+        ]
+    )
     bezug = bestand.loese("Vodafone", "Mobil M", mit_geraet=True)
     assert bezug.tarif_id == "vodafone:vodafone-mobil-m"
-    gleich = Tarifbestand([
-        _satz("Vodafone", "Vodafone Mobil M", 49.95),
-        _satz("Vodafone", "Vodafone Mobil M mit Smartphone", 49.95)])
-    assert gleich.loese("Vodafone", "Mobil M", mit_geraet=True).tarif_id \
+    gleich = Tarifbestand(
+        [
+            _satz("Vodafone", "Vodafone Mobil M", 49.95),
+            _satz("Vodafone", "Vodafone Mobil M mit Smartphone", 49.95),
+        ]
+    )
+    assert (
+        gleich.loese("Vodafone", "Mobil M", mit_geraet=True).tarif_id
         == "vodafone:vodafone-mobil-m-mit-smartphone"
+    )
 
 
 def test_vertrag_basis_fuehrt_beide_blaetter_zusammen():
     from telco_radar.tarif_model import vertrag_basis
-    assert vertrag_basis("vodafone:vodafone-mobil-m-mit-smartphone") \
+
+    assert (
+        vertrag_basis("vodafone:vodafone-mobil-m-mit-smartphone")
         == "vodafone:vodafone-mobil-m"
-    assert vertrag_basis("telekom:magentamobil-l#live_shop") \
-        == "telekom:magentamobil-l"
+    )
+    assert vertrag_basis("telekom:magentamobil-l#live_shop") == "telekom:magentamobil-l"
     # Ein Hash-Zusatz trennt zwei Produkte und bleibt.
-    assert vertrag_basis("o2:o2-home-l-flex#f43139ef") \
-        == "o2:o2-home-l-flex#f43139ef"
+    assert vertrag_basis("o2:o2-home-l-flex#f43139ef") == "o2:o2-home-l-flex#f43139ef"
 
 
 def test_zwei_geraeteblaetter_sind_keine_zuordnung():
-    """"mit Smartphone" und "mit Handy" zum selben Preis: welches gilt,
+    """ "mit Smartphone" und "mit Handy" zum selben Preis: welches gilt,
     entschiede die Reihenfolge der Datei - also keines."""
-    bestand = Tarifbestand([
-        _satz("Vodafone", "Vodafone Mobil M", 49.95),
-        _satz("Vodafone", "Vodafone Mobil M mit Smartphone", 49.95),
-        _satz("Vodafone", "Vodafone Mobil M mit Handy", 49.95)])
-    assert bestand.loese("Vodafone", "Mobil M", mit_geraet=True).tarif_id \
+    bestand = Tarifbestand(
+        [
+            _satz("Vodafone", "Vodafone Mobil M", 49.95),
+            _satz("Vodafone", "Vodafone Mobil M mit Smartphone", 49.95),
+            _satz("Vodafone", "Vodafone Mobil M mit Handy", 49.95),
+        ]
+    )
+    assert (
+        bestand.loese("Vodafone", "Mobil M", mit_geraet=True).tarif_id
         == "vodafone:vodafone-mobil-m"
+    )

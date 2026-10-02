@@ -10,6 +10,7 @@ real <a href> (useful for card layouts where the title is not itself a link).
 Usage:
     python scripts/inspect_dom.py --names "KT,Optus" [--root .] [--timeout 30]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -47,12 +48,16 @@ def dump_source(op_name: str, source, timeout: float) -> None:
     base_host = urlsplit(source.url).netloc.removeprefix("www.")
     all_links = soup.find_all("a", href=True)
     same_host = [
-        a for a in all_links
+        a
+        for a in all_links
         if (urlsplit(a["href"]).netloc.removeprefix("www.") or base_host)
-        in (base_host, "") or base_host in urlsplit(a["href"]).netloc
+        in (base_host, "")
+        or base_host in urlsplit(a["href"]).netloc
     ]
-    print(f"  DOM size: {len(html)} chars | <a> tags: {len(all_links)} "
-          f"| same-host-ish: {len(same_host)}")
+    print(
+        f"  DOM size: {len(html)} chars | <a> tags: {len(all_links)} "
+        f"| same-host-ish: {len(same_host)}"
+    )
 
     print("  --- sample anchors (first 60 with non-trivial text) ---")
     shown = 0
@@ -66,13 +71,16 @@ def dump_source(op_name: str, source, timeout: float) -> None:
         if shown >= 60:
             break
     if shown == 0:
-        print("    (no anchor had >=10 chars of text - likely icon-only nav "
-              "or a card layout where the title lives outside the <a>)")
+        print(
+            "    (no anchor had >=10 chars of text - likely icon-only nav "
+            "or a card layout where the title lives outside the <a>)"
+        )
 
     if source.item_selector:
         matched = soup.select(source.item_selector)
-        print(f"  --- item_selector {source.item_selector!r}: "
-              f"{len(matched)} matches ---")
+        print(
+            f"  --- item_selector {source.item_selector!r}: {len(matched)} matches ---"
+        )
         for i, node in enumerate(matched[:5]):
             print(f"    [{i}] raw: {str(node)[:300]}")
             if not node.find("a", href=True):
@@ -81,9 +89,11 @@ def dump_source(op_name: str, source, timeout: float) -> None:
                 )
                 if ancestor is not None:
                     link = ancestor.find("a", href=True)
-                    print(f"        nearest ancestor <a>: "
-                          f"href={link['href'][:90]!r} "
-                          f"text={link.get_text(' ', strip=True)[:70]!r}")
+                    print(
+                        f"        nearest ancestor <a>: "
+                        f"href={link['href'][:90]!r} "
+                        f"text={link.get_text(' ', strip=True)[:70]!r}"
+                    )
                 else:
                     print("        no ancestor with <a href> found either")
 
@@ -91,8 +101,7 @@ def dump_source(op_name: str, source, timeout: float) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path("."))
-    parser.add_argument("--names", required=True,
-                       help="Comma-separated operator names")
+    parser.add_argument("--names", required=True, help="Comma-separated operator names")
     parser.add_argument("--timeout", type=float, default=30.0)
     args = parser.parse_args()
 

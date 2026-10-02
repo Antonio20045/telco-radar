@@ -26,6 +26,7 @@ erst bemerkt, wenn man beide Seiten nebeneinander legt.
 Gesucht wird im Browser (`app.js`), nicht hier - es gibt keinen Suchserver. Der
 Index ist ein JSON-Array, das die Seite einmal laedt und dann filtert.
 """
+
 from __future__ import annotations
 
 from urllib.parse import urlsplit
@@ -56,17 +57,18 @@ def _bild(quelle: dict, ordner: str = "images") -> dict:
     name = quelle.get("image")
     if not name:
         return {}
-    return {"image": f"{ordner}/{name}",
-            "image_w": quelle.get("image_w") or 0,
-            "image_h": quelle.get("image_h") or 0}
+    return {
+        "image": f"{ordner}/{name}",
+        "image_w": quelle.get("image_w") or 0,
+        "image_h": quelle.get("image_h") or 0,
+    }
 
 
 def eintrag_bericht(h: dict, report_date: str) -> dict:
     """Eine bewertete Meldung einer Ausgabe."""
     return {
         "kind": "bericht",
-        "title": _text(h.get("schlagzeile") or h.get("title")
-                       or h.get("de_title")),
+        "title": _text(h.get("schlagzeile") or h.get("title") or h.get("de_title")),
         "summary": _text(h.get("summary")),
         "operator": _text(h.get("operator") or h.get("source_label")),
         "region": _text(h.get("region")),
@@ -77,8 +79,9 @@ def eintrag_bericht(h: dict, report_date: str) -> dict:
         # Ausgabetag den Eintrag; ohne Datum faellt er aus dem Verlauf.
         "date": _text(h.get("date")) or report_date,
         "relevance": h.get("relevance") or 0,
-        "source_label": _text(h.get("source_label") or h.get("source")
-                              or _domain(h.get("url"))),
+        "source_label": _text(
+            h.get("source_label") or h.get("source") or _domain(h.get("url"))
+        ),
         "url": h.get("url") or "",
         "deep_link": f"reports/{report_date}.html",
         **_bild(h),
@@ -122,7 +125,8 @@ def eintrag_promo(a: dict, mechanik_label: str, marken_anker: str) -> dict:
         "status": "ausgelaufen" if ausgelaufen else "",
         "source_label": _domain(a.get("url")) or _text(a.get("brand")),
         "url": a.get("url") or "",
-        "deep_link": f"promo/index.html#{marken_anker}" if marken_anker
+        "deep_link": f"promo/index.html#{marken_anker}"
+        if marken_anker
         else "promo/index.html",
         **_bild(a, "promo/images"),
     }
@@ -144,9 +148,13 @@ def marken_anker(name: str) -> str:
     return "marke-" + "".join(rein).strip("-")
 
 
-def bauen(wochen: list[dict], diff_bestand: list[dict],
-          hebel_label: dict[str, str], promo_aktionen: list[dict] | None = None,
-          mechanik_label: dict[str, str] | None = None) -> list[dict]:
+def bauen(
+    wochen: list[dict],
+    diff_bestand: list[dict],
+    hebel_label: dict[str, str],
+    promo_aktionen: list[dict] | None = None,
+    mechanik_label: dict[str, str] | None = None,
+) -> list[dict]:
     """Der komplette Index.
 
     `wochen` ist die Liste `[{"date": ..., "highlights": [...]}]`, die
@@ -163,14 +171,21 @@ def bauen(wochen: list[dict], diff_bestand: list[dict],
             oeffentlich = {k: v for k, v in h.items() if k != "why_it_matters"}
             out.append(eintrag_bericht(oeffentlich, woche["date"]))
     for e in diff_bestand or []:
-        out.append(eintrag_differenzierung(
-            e, hebel_label.get(e.get("theme") or "", e.get("theme") or "")))
+        out.append(
+            eintrag_differenzierung(
+                e, hebel_label.get(e.get("theme") or "", e.get("theme") or "")
+            )
+        )
     for a in promo_aktionen or []:
         if not (a.get("headline") and a.get("url")):
             continue
-        out.append(eintrag_promo(
-            a, mechanik_label.get(a.get("mechanic") or "", ""),
-            marken_anker(a.get("brand") or "")))
+        out.append(
+            eintrag_promo(
+                a,
+                mechanik_label.get(a.get("mechanic") or "", ""),
+                marken_anker(a.get("brand") or ""),
+            )
+        )
     return out
 
 
@@ -187,6 +202,7 @@ def haeufigste_absender(index: list[dict], anzahl: int = 12) -> list[str]:
     beobachteten Aktionsseiten, nicht der Themen des Archivs.
     """
     from collections import Counter
+
     zaehler: Counter = Counter()
     for e in index:
         if e.get("kind") == "promo":

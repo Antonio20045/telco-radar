@@ -16,6 +16,7 @@ Fixture: dieselben sechs Anbieter, Tage und Preise wie am realen
 iPhone 17 256 GB (16 Messtermine, `data-verlaufdaten` am 24.09.2026
 gemessen) - keine erfundenen Zahlen, damit der Test dieselbe
 Ueberlappung trifft wie der QA-Screenshot."""
+
 from __future__ import annotations
 
 import contextlib
@@ -31,19 +32,40 @@ from test_geraete_browser_fixture import _chromium, _server
 
 HEUTE = "2026-09-24"
 
-_KATALOG = {"geraete": [
-    {"hersteller": "Apple", "modell": "iPhone 17", "generation": 17,
-     "marktstart": "2025-09-19", "speicher": [256], "segment": "premium"},
-]}
+_KATALOG = {
+    "geraete": [
+        {
+            "hersteller": "Apple",
+            "modell": "iPhone 17",
+            "generation": 17,
+            "marktstart": "2025-09-19",
+            "speicher": [256],
+            "segment": "premium",
+        },
+    ]
+}
 _FARBEN = {"farben": {"schwarz": ["Schwarz"]}}
-_QUELLEN = {"anbieter": [
-    {"name": "Vodafone", "typ": "netzbetreiber", "rang": 1, "eigen": True,
-     "methode": "ldjson", "basis_url": "https://www.vodafone.de",
-     "einstiege": [{"url": "https://www.vodafone.de/handys"}]},
-    {"name": "o2", "typ": "netzbetreiber", "rang": 2, "methode": "ldjson",
-     "basis_url": "https://www.o2online.de",
-     "einstiege": [{"url": "https://www.o2online.de/handys"}]},
-]}
+_QUELLEN = {
+    "anbieter": [
+        {
+            "name": "Vodafone",
+            "typ": "netzbetreiber",
+            "rang": 1,
+            "eigen": True,
+            "methode": "ldjson",
+            "basis_url": "https://www.vodafone.de",
+            "einstiege": [{"url": "https://www.vodafone.de/handys"}],
+        },
+        {
+            "name": "o2",
+            "typ": "netzbetreiber",
+            "rang": 2,
+            "methode": "ldjson",
+            "basis_url": "https://www.o2online.de",
+            "einstiege": [{"url": "https://www.o2online.de/handys"}],
+        },
+    ]
+}
 
 DEVICE = "apple-iphone-17"
 SPEICHER = 256
@@ -52,19 +74,34 @@ SPEICHER = 256
 # realen iPhone 17 256 GB (sechs Anbieter, zehn Termine je Reihe gemischt,
 # 16 EINDEUTIGE Tage insgesamt - "16 Messtermine").
 _REIHEN = [
-    ("Vodafone", [("2026-08-29", 949.90), ("2026-09-12", 1099.90),
-                  ("2026-09-24", 1099.90)]),
-    ("Saturn", [("2026-09-05", 939.99), ("2026-09-13", 949.99),
-                ("2026-09-14", 959.99), ("2026-09-15", 999.99),
-                ("2026-09-16", 1089.00), ("2026-09-19", 1089.00),
-                ("2026-09-20", 1089.00), ("2026-09-21", 1089.00),
-                ("2026-09-23", 1089.00), ("2026-09-24", 1089.00)]),
-    ("congstar", [("2026-09-03", 919.00), ("2026-09-21", 1081.00),
-                  ("2026-09-24", 1081.00)]),
-    ("mobilcom-debitel", [("2026-08-10", 949.00), ("2026-09-11", 1099.00),
-                          ("2026-09-24", 1099.00)]),
-    ("o2", [("2026-08-29", 1027.00), ("2026-09-17", 1171.00),
-            ("2026-09-24", 1171.00)]),
+    (
+        "Vodafone",
+        [("2026-08-29", 949.90), ("2026-09-12", 1099.90), ("2026-09-24", 1099.90)],
+    ),
+    (
+        "Saturn",
+        [
+            ("2026-09-05", 939.99),
+            ("2026-09-13", 949.99),
+            ("2026-09-14", 959.99),
+            ("2026-09-15", 999.99),
+            ("2026-09-16", 1089.00),
+            ("2026-09-19", 1089.00),
+            ("2026-09-20", 1089.00),
+            ("2026-09-21", 1089.00),
+            ("2026-09-23", 1089.00),
+            ("2026-09-24", 1089.00),
+        ],
+    ),
+    (
+        "congstar",
+        [("2026-09-03", 919.00), ("2026-09-21", 1081.00), ("2026-09-24", 1081.00)],
+    ),
+    (
+        "mobilcom-debitel",
+        [("2026-08-10", 949.00), ("2026-09-11", 1099.00), ("2026-09-24", 1099.00)],
+    ),
+    ("o2", [("2026-08-29", 1027.00), ("2026-09-17", 1171.00), ("2026-09-24", 1171.00)]),
     ("Telekom", [("2026-09-05", 948.60), ("2026-09-15", 1096.20)]),
 ]
 
@@ -74,59 +111,98 @@ def _sku(device_id, speicher):
 
 
 def _listung(anbieter, preis):
-    return {"id": f"{anbieter.lower()}--{_sku(DEVICE, SPEICHER)}",
-            "sku_id": _sku(DEVICE, SPEICHER), "device_id": DEVICE,
-            "anbieter": anbieter, "anbieter_typ": "netzbetreiber",
-            "netz": anbieter, "speicher_gb": SPEICHER, "farbe_roh": "Schwarz",
-            "farbe_normalisiert": "schwarz", "zustand": "neu",
-            "first_seen": "2026-08-01", "last_verified": HEUTE,
-            "status": "aktiv", "missed_checks": 0,
-            "preis_ohne_vertrag": preis, "erstpreis": preis,
-            "erstpreis_art": "ohne_vertrag", "erstpreis_am": "2026-08-01",
-            "quelle_url": f"https://example.de/{anbieter.lower()}/{DEVICE}",
-            "abgerufen_am": HEUTE, "verfuegbarkeit": "lieferbar",
-            "confidence": "hoch", "einstiege": ["https://example.de/liste"]}
+    return {
+        "id": f"{anbieter.lower()}--{_sku(DEVICE, SPEICHER)}",
+        "sku_id": _sku(DEVICE, SPEICHER),
+        "device_id": DEVICE,
+        "anbieter": anbieter,
+        "anbieter_typ": "netzbetreiber",
+        "netz": anbieter,
+        "speicher_gb": SPEICHER,
+        "farbe_roh": "Schwarz",
+        "farbe_normalisiert": "schwarz",
+        "zustand": "neu",
+        "first_seen": "2026-08-01",
+        "last_verified": HEUTE,
+        "status": "aktiv",
+        "missed_checks": 0,
+        "preis_ohne_vertrag": preis,
+        "erstpreis": preis,
+        "erstpreis_art": "ohne_vertrag",
+        "erstpreis_am": "2026-08-01",
+        "quelle_url": f"https://example.de/{anbieter.lower()}/{DEVICE}",
+        "abgerufen_am": HEUTE,
+        "verfuegbarkeit": "lieferbar",
+        "confidence": "hoch",
+        "einstiege": ["https://example.de/liste"],
+    }
 
 
 def _baue(tmp_path):
     root = tmp_path / "site_baum"
     (root / "config").mkdir(parents=True)
-    for name, daten in (("geraete_katalog.yaml", _KATALOG),
-                        ("farben.yaml", _FARBEN),
-                        ("geraete_quellen.yaml", _QUELLEN)):
+    for name, daten in (
+        ("geraete_katalog.yaml", _KATALOG),
+        ("farben.yaml", _FARBEN),
+        ("geraete_quellen.yaml", _QUELLEN),
+    ):
         (root / "config" / name).write_text(
-            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
-            encoding="utf-8")
+            yaml.safe_dump(daten, allow_unicode=True, sort_keys=False), encoding="utf-8"
+        )
     state = root / "data" / "state"
     state.mkdir(parents=True)
     listungen = [_listung(a, punkte[-1][1]) for a, punkte in _REIHEN]
-    (state / "geraete_db.json").write_text(json.dumps({
-        "updated": HEUTE,
-        "anbieter": {a: {"laeufe": 8, "funde_gesamt": len(p)}
-                     for a, p in _REIHEN},
-        "listungen": listungen}), encoding="utf-8")
+    (state / "geraete_db.json").write_text(
+        json.dumps(
+            {
+                "updated": HEUTE,
+                "anbieter": {
+                    a: {"laeufe": 8, "funde_gesamt": len(p)} for a, p in _REIHEN
+                },
+                "listungen": listungen,
+            }
+        ),
+        encoding="utf-8",
+    )
     preiszeilen = []
     for anbieter, punkte in _REIHEN:
         listung_id = f"{anbieter.lower()}--{_sku(DEVICE, SPEICHER)}"
         for datum, preis in punkte:
-            preiszeilen.append(json.dumps({
-                "listung_id": listung_id, "datum": datum,
-                "preis_ohne_vertrag": preis, "preisart": "ohne_vertrag",
-                "quelle_url": "https://example.de/beleg"}))
+            preiszeilen.append(
+                json.dumps(
+                    {
+                        "listung_id": listung_id,
+                        "datum": datum,
+                        "preis_ohne_vertrag": preis,
+                        "preisart": "ohne_vertrag",
+                        "quelle_url": "https://example.de/beleg",
+                    }
+                )
+            )
     (state / "geraete_preise.jsonl").write_text(
-        "\n".join(preiszeilen) + "\n", encoding="utf-8")
+        "\n".join(preiszeilen) + "\n", encoding="utf-8"
+    )
     # KEIN Bündel noetig - der Verlaufs-Reiter braucht nur Listungen und
     # Preishistorie; ein leeres TCO-Bündel haelt das Gatter der Tafel 1
     # (Vergleich) aus dem Weg, ohne diesen Test zu verkomplizieren.
-    (state / "geraete_tco.json").write_text(json.dumps({
-        "updated": HEUTE, "buendel": [], "sim_only": []}), encoding="utf-8")
+    (state / "geraete_tco.json").write_text(
+        json.dumps({"updated": HEUTE, "buendel": [], "sim_only": []}), encoding="utf-8"
+    )
     (state / "tarife.jsonl").write_text("", encoding="utf-8")
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
-    (reports / f"{HEUTE}.json").write_text(json.dumps({
-        "date": HEUTE, "language": "de",
-        "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
-        "stats": {}, "regions": []}), encoding="utf-8")
+    (reports / f"{HEUTE}.json").write_text(
+        json.dumps(
+            {
+                "date": HEUTE,
+                "language": "de",
+                "briefing_md": "## Auf einen Blick\n\n- Nichts.\n",
+                "stats": {},
+                "regions": [],
+            }
+        ),
+        encoding="utf-8",
+    )
     (reports / f"{HEUTE}.md").write_text("# Bericht\n", encoding="utf-8")
     site = root / "site"
     render_site(site, reports)
@@ -136,12 +212,12 @@ def _baue(tmp_path):
 @contextlib.contextmanager
 def _browser_ctx(tmp_path_factory):
     sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt").sync_playwright
+        "playwright.sync_api", reason="playwright fehlt"
+    ).sync_playwright
     site = _baue(tmp_path_factory.mktemp("verlaufmobil"))
     exe = _chromium()
     with _server(site) as wurzel, sync_playwright() as p:
-        browser = (p.chromium.launch(executable_path=exe) if exe
-                   else p.chromium.launch())
+        browser = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
         try:
             yield wurzel, browser
         finally:
@@ -232,7 +308,8 @@ def test_das_svg_passt_in_den_container_mobil(seite):
     assert m["svg"]["left"] >= m["bild"]["left"] - 1, m
     assert m["svg"]["right"] <= m["bild"]["right"] + 1, (
         f"SVG rechts ({m['svg']['right']}) ragt aus dem Container "
-        f"({m['bild']['right']}): {m}")
+        f"({m['bild']['right']}): {m}"
+    )
 
 
 def test_der_letzte_messpunkt_ist_sichtbar_mobil(seite):
@@ -242,7 +319,8 @@ def test_der_letzte_messpunkt_ist_sichtbar_mobil(seite):
     m = _messen(seite)
     assert m["letzterKreisRechts"] <= m["bild"]["right"] + 1, (
         f"der rechteste Messpunkt ({m['letzterKreisRechts']}) liegt "
-        f"ausserhalb des Containers ({m['bild']['right']})")
+        f"ausserhalb des Containers ({m['bild']['right']})"
+    )
     assert m["letzterKreisLinks"] >= m["bild"]["left"] - 1, m
 
 
@@ -258,7 +336,8 @@ def test_keine_zwei_x_achsen_marken_ueberlappen(_wurzel_browser, breite):
     for a, b in zip(marken, marken[1:]):
         assert a["right"] <= b["left"] + 0.5, (
             f"zwei Datumsmarken ueberlappen bei {breite} px: {a} vs {b} "
-            f"(alle Marken: {marken})")
+            f"(alle Marken: {marken})"
+        )
 
 
 def test_die_achsenschrift_ist_lesbar_mobil(seite):
@@ -273,7 +352,8 @@ def test_die_achsenschrift_ist_lesbar_mobil(seite):
     assert m["achsenmarkeHoehe"] is not None, "keine X-Achsen-Marke gefunden"
     assert m["achsenmarkeHoehe"] >= 9, (
         f"die Achsenbeschriftung ist nur {m['achsenmarkeHoehe']} px hoch "
-        "- das SVG wurde vermutlich noch herunterskaliert")
+        "- das SVG wurde vermutlich noch herunterskaliert"
+    )
 
 
 def test_die_bestmarke_traegt_einen_halo(seite):
@@ -294,7 +374,8 @@ def test_der_satz_schweigt_bei_dieser_vielen_terminen(seite):
     m = _messen(seite)
     assert m["satz"] is not None, "kein #gr-vstand-Knoten"
     assert m["satz"]["hidden"], (
-        f"der Satz steht trotz 16 Messterminen: {m['satz']['text']!r}")
+        f"der Satz steht trotz 16 Messterminen: {m['satz']['text']!r}"
+    )
 
 
 def test_die_schwelle_ist_eine_zahl_aus_python():
@@ -306,7 +387,8 @@ def test_die_schwelle_ist_eine_zahl_aus_python():
 
 @pytest.mark.parametrize("breite", [390, 1440])
 def test_das_verdeckt_endlabel_schneidet_keinen_punkt_und_hat_einen_halo(
-        _wurzel_browser, breite):
+    _wurzel_browser, breite
+):
     """Lead-Befund 24.09.2026 (Nachtrag): "mobilcom-debitel 1.099,00 €"
     lag auf 1440 UND 390 px direkt auf der eigenen gestrichelten
     Vodafone-Linie und ihren Endpunkt-Kreisen - durchgestrichen. Der
@@ -318,7 +400,8 @@ def test_das_verdeckt_endlabel_schneidet_keinen_punkt_und_hat_einen_halo(
     s.context.close()
     assert m["endlabel"], f"kein Verdeckt-Endlabel gezeichnet ({breite} px)"
     assert not m["endlabel"]["schneidetKreis"], (
-        f"das Endlabel schneidet einen Punkt-Kreis bei {breite} px: "
-        f"{m['endlabel']}")
+        f"das Endlabel schneidet einen Punkt-Kreis bei {breite} px: {m['endlabel']}"
+    )
     assert "stroke" in m["endlabel"]["paintOrder"], (
-        f"das Endlabel traegt keinen Halo bei {breite} px: {m['endlabel']}")
+        f"das Endlabel traegt keinen Halo bei {breite} px: {m['endlabel']}"
+    )

@@ -16,6 +16,7 @@ dahin wird sie gebaut, sagt sichtbar warum sie gesperrt ist, und steht nicht
 in der Navigation - dieselbe Veroeffentlichungsschwelle wie bei der
 Geraeteseite.
 """
+
 from __future__ import annotations
 
 import json
@@ -32,31 +33,39 @@ _LEER = "Nichts angekreuzt = alles."
 HINWEISE = {
     "bereiche": f"Welche Rubrik des Portals. {_LEER}",
     "regionen": f"Welche Weltregionen. {_LEER}",
-    "wettbewerber": ("Nur Meldungen, in denen einer dieser Anbieter vorkommt. "
-                     + _LEER),
+    "wettbewerber": (
+        "Nur Meldungen, in denen einer dieser Anbieter vorkommt. " + _LEER
+    ),
     "kategorien": f"Worum es gehen soll. {_LEER}",
 }
 
 
 def dimensionen(katalog: NewsletterKatalog) -> list[dict]:
     """Die vier Achsen fuer die Vorlage - Reihenfolge wie im Katalog."""
-    label = {"bereiche": "Bereich", "regionen": "Regionen",
-             "wettbewerber": "Wettbewerber", "kategorien": "Themen"}
+    label = {
+        "bereiche": "Bereich",
+        "regionen": "Regionen",
+        "wettbewerber": "Wettbewerber",
+        "kategorien": "Themen",
+    }
     aus = []
     for dimension, feld in FELD_JE_DIMENSION.items():
-        aus.append({
-            "key": dimension,
-            "feld": feld,
-            "label": label[dimension],
-            "hinweis": HINWEISE[dimension],
-            "optionen": [{"key": a.key, "label": a.label}
-                         for a in katalog.eintraege(dimension)],
-        })
+        aus.append(
+            {
+                "key": dimension,
+                "feld": feld,
+                "label": label[dimension],
+                "hinweis": HINWEISE[dimension],
+                "optionen": [
+                    {"key": a.key, "label": a.label}
+                    for a in katalog.eintraege(dimension)
+                ],
+            }
+        )
     return aus
 
 
-def konfiguration(katalog: NewsletterKatalog, *, dienst_url: str,
-                  frei: bool) -> str:
+def konfiguration(katalog: NewsletterKatalog, *, dienst_url: str, frei: bool) -> str:
     """Was `app.js` ueber das Formular wissen muss - als JSON im Seitenkopf.
 
     Bewusst KEIN zweiter Ort fuer die Grenzen: sie stehen in
@@ -64,14 +73,17 @@ def konfiguration(katalog: NewsletterKatalog, *, dienst_url: str,
     gelesen. Zwei Zahlen fuer dieselbe Grenze waeren zwei Grenzen, und die
     strengere gaebe es nur auf einer Seite.
     """
-    return json.dumps({
-        "dienst": dienst_url.rstrip("/"),
-        "frei": bool(frei),
-        "max_stichwoerter": katalog.grenzen.max_stichwoerter,
-        "min_laenge": katalog.grenzen.min_stichwort_laenge,
-        "warnung_ab": katalog.grenzen.vorschau_warnung_ab,
-        "vorschau_tage": katalog.grenzen.vorschau_tage,
-    }, ensure_ascii=False)
+    return json.dumps(
+        {
+            "dienst": dienst_url.rstrip("/"),
+            "frei": bool(frei),
+            "max_stichwoerter": katalog.grenzen.max_stichwoerter,
+            "min_laenge": katalog.grenzen.min_stichwort_laenge,
+            "warnung_ab": katalog.grenzen.vorschau_warnung_ab,
+            "vorschau_tage": katalog.grenzen.vorschau_tage,
+        },
+        ensure_ascii=False,
+    )
 
 
 # ============================================  die zwei statischen Seiten ==
@@ -82,12 +94,14 @@ _ABSCHLUSS = {
         "Du bekommst den Telco Radar ab der nächsten Ausgabe — dienstags "
         "oder freitags, und nur dann, wenn es zu deinen Themen wirklich "
         "etwas Neues gibt.",
-        "Zur aktuellen Ausgabe"),
+        "Zur aktuellen Ausgabe",
+    ),
     "abgemeldet": (
         "Abgemeldet",
         "Du bekommst keine weiteren Ausgaben, deine E-Mail-Adresse wird "
         "gelöscht. Du kannst dich jederzeit wieder anmelden.",
-        "Zur aktuellen Ausgabe"),
+        "Zur aktuellen Ausgabe",
+    ),
 }
 
 

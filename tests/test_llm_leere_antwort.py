@@ -15,6 +15,7 @@ Sichtbar war davon nur ein "JSONDecodeError: Expecting value: line 1 column 1
 (char 0)" auf einem leeren String - eine Meldung, aus der niemand den Grund
 ableiten kann. Genau das pruefen die Tests hier.
 """
+
 from __future__ import annotations
 
 import json
@@ -38,9 +39,11 @@ def _antwort(monkeypatch, message: dict, finish_reason: str = "length"):
 
     def fake_post(url, json=None, headers=None, timeout=None):
         return httpx.Response(
-            200, content=_dumps(nutzlast),
+            200,
+            content=_dumps(nutzlast),
             headers={"content-type": "application/json"},
-            request=httpx.Request("POST", url))
+            request=httpx.Request("POST", url),
+        )
 
     monkeypatch.setattr(httpx, "post", fake_post)
 
@@ -50,11 +53,13 @@ def _dumps(obj) -> bytes:
 
 
 def test_leere_antwort_mit_denkspur_nennt_das_token_budget(monkeypatch):
-    _antwort(monkeypatch, {"content": "",
-                           "reasoning_content": "Ich ueberlege lange. " * 40})
+    _antwort(
+        monkeypatch, {"content": "", "reasoning_content": "Ich ueberlege lange. " * 40}
+    )
     with pytest.raises(ValueError) as fehler:
-        llm._complete_openai("system", "user", "deepseek-v4-pro",
-                             max_tokens=1800, retries=2)
+        llm._complete_openai(
+            "system", "user", "deepseek-v4-pro", max_tokens=1800, retries=2
+        )
     text = str(fehler.value)
     # Die Meldung muss die drei Dinge nennen, die man zum Handeln braucht:
     # dass nur gedacht wurde, wie knapp das Budget war, und was zu tun ist.
@@ -66,8 +71,9 @@ def test_leere_antwort_mit_denkspur_nennt_das_token_budget(monkeypatch):
 def test_leere_antwort_ohne_denkspur_meldet_sich_trotzdem(monkeypatch):
     _antwort(monkeypatch, {"content": ""}, finish_reason="stop")
     with pytest.raises(ValueError) as fehler:
-        llm._complete_openai("system", "user", "deepseek-v4-pro",
-                             max_tokens=8000, retries=2)
+        llm._complete_openai(
+            "system", "user", "deepseek-v4-pro", max_tokens=8000, retries=2
+        )
     assert "leere Antwort" in str(fehler.value)
 
 
@@ -77,29 +83,44 @@ def test_leere_antwort_wird_NICHT_wiederholt(monkeypatch):
     nur teurer und wuerde am Ende dieselbe leere Antwort liefern."""
     versuche = []
 
-    nutzlast = {"choices": [{"message": {"content": "",
-                                         "reasoning_content": "denk denk"},
-                             "finish_reason": "length"}]}
+    nutzlast = {
+        "choices": [
+            {
+                "message": {"content": "", "reasoning_content": "denk denk"},
+                "finish_reason": "length",
+            }
+        ]
+    }
 
     def fake_post(url, json=None, headers=None, timeout=None):
         versuche.append(1)
-        return httpx.Response(200, content=_dumps(nutzlast),
-                              headers={"content-type": "application/json"},
-                              request=httpx.Request("POST", url))
+        return httpx.Response(
+            200,
+            content=_dumps(nutzlast),
+            headers={"content-type": "application/json"},
+            request=httpx.Request("POST", url),
+        )
 
     monkeypatch.setattr(httpx, "post", fake_post)
     with pytest.raises(ValueError):
-        llm._complete_openai("system", "user", "deepseek-v4-pro",
-                             max_tokens=1800, retries=5)
+        llm._complete_openai(
+            "system", "user", "deepseek-v4-pro", max_tokens=1800, retries=5
+        )
     assert len(versuche) == 1
 
 
 def test_normale_antwort_kommt_unveraendert_durch(monkeypatch):
-    _antwort(monkeypatch, {"content": '[{"headline": "Aktion"}]',
-                           "reasoning_content": "kurz gedacht"},
-             finish_reason="stop")
-    assert llm._complete_openai("system", "user", "deepseek-v4-pro",
-                               max_tokens=8000, retries=2) == '[{"headline": "Aktion"}]'
+    _antwort(
+        monkeypatch,
+        {"content": '[{"headline": "Aktion"}]', "reasoning_content": "kurz gedacht"},
+        finish_reason="stop",
+    )
+    assert (
+        llm._complete_openai(
+            "system", "user", "deepseek-v4-pro", max_tokens=8000, retries=2
+        )
+        == '[{"headline": "Aktion"}]'
+    )
 
 
 def test_die_stufen_mit_kleinem_budget_sind_hochgezogen():
@@ -112,9 +133,13 @@ def test_die_stufen_mit_kleinem_budget_sind_hochgezogen():
     from telco_radar.analyze import category_sweep, promo_analyst, promo_ranker
     import inspect
 
-    assert inspect.signature(
-        promo_analyst.extract_promos).parameters["max_tokens"].default >= 16000
-    assert inspect.signature(
-        promo_ranker.judge_offers).parameters["max_tokens"].default >= 16000
+    assert (
+        inspect.signature(promo_analyst.extract_promos).parameters["max_tokens"].default
+        >= 16000
+    )
+    assert (
+        inspect.signature(promo_ranker.judge_offers).parameters["max_tokens"].default
+        >= 16000
+    )
     quelle = inspect.getsource(category_sweep)
     assert "max_tokens=16000" in quelle

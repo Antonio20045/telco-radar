@@ -6,6 +6,7 @@ kann: einen Kampagnennamen (`adventskalender`), eine Zweitmarke
 (`jamobil-news`), reine Infrastruktur (`sso`, `cdn`, `mail`) und ein Wildcard
 (`*.congstar.de`).
 """
+
 from __future__ import annotations
 
 import json
@@ -17,8 +18,18 @@ import pytest
 
 from telco_radar.collect import ct_log
 from telco_radar.collect.ct_log import (
-    CTFehler, CTSpeicher, CTZeitueberschreitung, Domain, Fund, als_item,
-    bewerte, hole, ist_technisch, lade_domains, namen_aus_antwort, sammle,
+    CTFehler,
+    CTSpeicher,
+    CTZeitueberschreitung,
+    Domain,
+    Fund,
+    als_item,
+    bewerte,
+    hole,
+    ist_technisch,
+    lade_domains,
+    namen_aus_antwort,
+    sammle,
 )
 
 FIXTURE = Path(__file__).parent / "fixtures" / "ct" / "certspotter_congstar.json"
@@ -33,6 +44,7 @@ def antwort() -> list:
 # --------------------------------------------------------------------------- #
 # Namen aus der Antwort
 # --------------------------------------------------------------------------- #
+
 
 def test_namen_aus_echter_antwort(antwort):
     namen = namen_aus_antwort(antwort)
@@ -74,19 +86,30 @@ def test_muell_in_der_liste_wird_uebersprungen():
 RAUSCHEN = ["sso", "mail", "cdn", "staging", "test", "api"]
 
 
-@pytest.mark.parametrize("name", [
-    "sso.congstar.de", "mail.congstar.de", "cdn.congstar.de",
-    "staging.congstar.de", "api.o2online.de",
-])
+@pytest.mark.parametrize(
+    "name",
+    [
+        "sso.congstar.de",
+        "mail.congstar.de",
+        "cdn.congstar.de",
+        "staging.congstar.de",
+        "api.o2online.de",
+    ],
+)
 def test_technische_namen_werden_erkannt(name):
     assert ist_technisch(name, RAUSCHEN)
 
 
-@pytest.mark.parametrize("name", [
-    "jamobil-news.congstar.de", "adventskalender.congstar.de",
-    "freundewerben.congstar.de", "handyankauf.congstar.de",
-    "pennymobil.congstarnews.de",
-])
+@pytest.mark.parametrize(
+    "name",
+    [
+        "jamobil-news.congstar.de",
+        "adventskalender.congstar.de",
+        "freundewerben.congstar.de",
+        "handyankauf.congstar.de",
+        "pennymobil.congstarnews.de",
+    ],
+)
 def test_kampagnennamen_ueberleben_den_filter(name):
     assert not ist_technisch(name, RAUSCHEN)
 
@@ -114,6 +137,7 @@ def test_leere_rauschliste_filtert_nichts():
 # Speicher und Grundlinie
 # --------------------------------------------------------------------------- #
 
+
 def test_speicher_haelt_ueber_neuladen(tmp_path):
     p = tmp_path / "ct_seen.jsonl"
     s = CTSpeicher(p)
@@ -128,8 +152,9 @@ def test_speicher_haelt_ueber_neuladen(tmp_path):
 
 def test_speicher_ueberliest_kaputte_zeilen(tmp_path):
     p = tmp_path / "ct_seen.jsonl"
-    p.write_text('{"domain":"a.de","namen":["x.a.de"]}\nkein json\n\n',
-                 encoding="utf-8")
+    p.write_text(
+        '{"domain":"a.de","namen":["x.a.de"]}\nkein json\n\n', encoding="utf-8"
+    )
     s = CTSpeicher(p)
     assert s.namen("a.de") == {"x.a.de"}
 
@@ -137,6 +162,7 @@ def test_speicher_ueberliest_kaputte_zeilen(tmp_path):
 # --------------------------------------------------------------------------- #
 # hole(): der Timeout ist eine eigene Klasse, kein leeres Ergebnis
 # --------------------------------------------------------------------------- #
+
 
 class _Client:
     def __init__(self, wirkung):
@@ -162,8 +188,9 @@ def _antwort(status=200, daten=None, text=None):
 def test_timeout_wirft_eigene_klasse():
     client = _Client(httpx.TimeoutException("zu langsam"))
     with pytest.raises(CTZeitueberschreitung):
-        hole(Domain(marke="Telekom", domain="telekom.de", gross=True), {},
-             client=client)
+        hole(
+            Domain(marke="Telekom", domain="telekom.de", gross=True), {}, client=client
+        )
 
 
 def test_timeout_ist_kein_ct_fehler_zufall():
@@ -174,8 +201,7 @@ def test_timeout_ist_kein_ct_fehler_zufall():
 
 def test_grosse_domain_bekommt_laengere_frist():
     client = _Client(_antwort(daten=[]))
-    hole(Domain(marke="Telekom", domain="telekom.de", gross=True), {},
-         client=client)
+    hole(Domain(marke="Telekom", domain="telekom.de", gross=True), {}, client=client)
     assert client.gesehen[0]["timeout"] == ct_log.FRIST_GROSS
 
     client2 = _Client(_antwort(daten=[]))
@@ -185,14 +211,16 @@ def test_grosse_domain_bekommt_laengere_frist():
 
 def test_drosselung_wird_als_fehler_gemeldet():
     with pytest.raises(CTFehler, match="429"):
-        hole(Domain(marke="x", domain="x.de"), {},
-             client=_Client(_antwort(status=429)))
+        hole(Domain(marke="x", domain="x.de"), {}, client=_Client(_antwort(status=429)))
 
 
 def test_kein_json_wirft():
     with pytest.raises(CTFehler, match="kein JSON"):
-        hole(Domain(marke="x", domain="x.de"), {},
-             client=_Client(_antwort(text="<html>")))
+        hole(
+            Domain(marke="x", domain="x.de"),
+            {},
+            client=_Client(_antwort(text="<html>")),
+        )
 
 
 def test_abfrage_nutzt_subdomains_und_expand():
@@ -209,12 +237,14 @@ def test_abfrage_nutzt_subdomains_und_expand():
 # sammle(): Grundlinie, Delta, Deckel
 # --------------------------------------------------------------------------- #
 
+
 def _repo(tmp_path: Path, domains: str, rauschen: list[str]) -> Path:
     (tmp_path / "config").mkdir(parents=True, exist_ok=True)
     (tmp_path / "data" / "state").mkdir(parents=True, exist_ok=True)
     rausch_yaml = "\n".join(f"  - {r}" for r in rauschen)
     (tmp_path / "config" / "ct_domains.yaml").write_text(
-        f"domains:\n{domains}\nrauschen:\n{rausch_yaml}\n", encoding="utf-8")
+        f"domains:\n{domains}\nrauschen:\n{rausch_yaml}\n", encoding="utf-8"
+    )
     return tmp_path
 
 
@@ -225,8 +255,9 @@ def test_erster_lauf_meldet_nichts_und_legt_grundlinie(tmp_path, antwort):
     """Ohne diese Regel bestuende die erste Ausgabe aus 47 'neuen' Subdomains,
     die alle seit Jahren existieren."""
     root = _repo(tmp_path, EINE, ["sso", "cdn"])
-    items, bilanz = sammle(root, {}, jetzt=JETZT,
-                           client=_Client(_antwort(daten=antwort)))
+    items, bilanz = sammle(
+        root, {}, jetzt=JETZT, client=_Client(_antwort(daten=antwort))
+    )
     assert items == []
     assert bilanz["grundlinie"] == 1
     assert (root / "data" / "state" / "ct_seen.jsonl").exists()
@@ -236,12 +267,16 @@ def test_zweiter_lauf_meldet_nur_den_zuwachs(tmp_path, antwort):
     root = _repo(tmp_path, EINE, ["sso", "cdn", "mail"])
     sammle(root, {}, jetzt=JETZT, client=_Client(_antwort(daten=antwort)))
 
-    plus = antwort + [{"dns_names": ["wechselbonus2027.congstar.de"],
-                       "not_before": "2026-08-07T10:00:00Z"}]
-    items, bilanz = sammle(root, {}, jetzt=JETZT,
-                           client=_Client(_antwort(daten=plus)))
+    plus = antwort + [
+        {
+            "dns_names": ["wechselbonus2027.congstar.de"],
+            "not_before": "2026-08-07T10:00:00Z",
+        }
+    ]
+    items, bilanz = sammle(root, {}, jetzt=JETZT, client=_Client(_antwort(daten=plus)))
     assert [i.title for i in items] == [
-        "congstar: neue Subdomain wechselbonus2027.congstar.de"]
+        "congstar: neue Subdomain wechselbonus2027.congstar.de"
+    ]
     assert bilanz["neu_roh"] == 1
 
 
@@ -249,10 +284,10 @@ def test_technischer_zuwachs_wird_unterdrueckt(tmp_path, antwort):
     root = _repo(tmp_path, EINE, ["grafana"])
     sammle(root, {}, jetzt=JETZT, client=_Client(_antwort(daten=antwort)))
 
-    plus = antwort + [{"dns_names": ["grafana.congstar.de"],
-                       "not_before": "2026-08-07T10:00:00Z"}]
-    items, bilanz = sammle(root, {}, jetzt=JETZT,
-                           client=_Client(_antwort(daten=plus)))
+    plus = antwort + [
+        {"dns_names": ["grafana.congstar.de"], "not_before": "2026-08-07T10:00:00Z"}
+    ]
+    items, bilanz = sammle(root, {}, jetzt=JETZT, client=_Client(_antwort(daten=plus)))
     assert items == []
     assert bilanz["technisch"] == 1
 
@@ -263,16 +298,15 @@ def test_zeitueberschreitung_laesst_die_grundlinie_unberuehrt(tmp_path, antwort)
     Lauf meldete alle 47 Namen als neu."""
     root = _repo(tmp_path, EINE, [])
     sammle(root, {}, jetzt=JETZT, client=_Client(_antwort(daten=antwort)))
-    vorher = CTSpeicher(root / "data" / "state" / "ct_seen.jsonl").namen(
-        "congstar.de")
+    vorher = CTSpeicher(root / "data" / "state" / "ct_seen.jsonl").namen("congstar.de")
     assert vorher
 
-    items, bilanz = sammle(root, {}, jetzt=JETZT,
-                           client=_Client(httpx.TimeoutException("zu lang")))
+    items, bilanz = sammle(
+        root, {}, jetzt=JETZT, client=_Client(httpx.TimeoutException("zu lang"))
+    )
     assert items == []
     assert bilanz["zeitueberschreitung"] == 1
-    nachher = CTSpeicher(root / "data" / "state" / "ct_seen.jsonl").namen(
-        "congstar.de")
+    nachher = CTSpeicher(root / "data" / "state" / "ct_seen.jsonl").namen("congstar.de")
     assert nachher == vorher
 
 
@@ -280,11 +314,11 @@ def test_umbau_wird_nicht_gemeldet(tmp_path, antwort):
     root = _repo(tmp_path, EINE, [])
     sammle(root, {}, jetzt=JETZT, client=_Client(_antwort(daten=antwort)))
 
-    viele = antwort + [{"dns_names": [f"neu{i}.congstar.de"],
-                        "not_before": "2026-08-07T10:00:00Z"}
-                       for i in range(ct_log.MAX_JE_DOMAIN + 1)]
-    items, bilanz = sammle(root, {}, jetzt=JETZT,
-                           client=_Client(_antwort(daten=viele)))
+    viele = antwort + [
+        {"dns_names": [f"neu{i}.congstar.de"], "not_before": "2026-08-07T10:00:00Z"}
+        for i in range(ct_log.MAX_JE_DOMAIN + 1)
+    ]
+    items, bilanz = sammle(root, {}, jetzt=JETZT, client=_Client(_antwort(daten=viele)))
     assert items == []
     assert bilanz["zu_viele"] == 1
 
@@ -296,9 +330,11 @@ def test_fehlende_config_ist_kein_absturz(tmp_path):
 
 
 def test_lade_domains_liest_gross_flag(tmp_path):
-    root = _repo(tmp_path,
-                 "  - marke: Telekom\n    domain: telekom.de\n    gross: true\n",
-                 ["sso"])
+    root = _repo(
+        tmp_path,
+        "  - marke: Telekom\n    domain: telekom.de\n    gross: true\n",
+        ["sso"],
+    )
     domains, rauschen = lade_domains(root)
     assert domains[0].gross and domains[0].frist == ct_log.FRIST_GROSS
     assert rauschen == ["sso"]
@@ -320,6 +356,7 @@ def test_echte_config_ist_ladbar():
 # Modellstufe
 # --------------------------------------------------------------------------- #
 
+
 def _fund(name: str) -> Fund:
     return Fund(domain=Domain(marke="congstar", domain="congstar.de"), name=name)
 
@@ -328,12 +365,22 @@ def test_modell_sortiert_infrastruktur_aus():
     funde = [_fund("adventskalender.congstar.de"), _fund("acs.congstar.de")]
 
     def fake(system, user, modell, max_tokens):
-        return json.dumps({"namen": [
-            {"name": "adventskalender.congstar.de", "art": "kampagne",
-             "begruendung": "Aktionsname"},
-            {"name": "acs.congstar.de", "art": "infrastruktur",
-             "begruendung": "Auto Config Server"},
-        ]})
+        return json.dumps(
+            {
+                "namen": [
+                    {
+                        "name": "adventskalender.congstar.de",
+                        "art": "kampagne",
+                        "begruendung": "Aktionsname",
+                    },
+                    {
+                        "name": "acs.congstar.de",
+                        "art": "infrastruktur",
+                        "begruendung": "Auto Config Server",
+                    },
+                ]
+            }
+        )
 
     uebrig = bewerte(funde, "m", komplett=fake)
     assert [f.name for f in uebrig] == ["adventskalender.congstar.de"]
@@ -345,10 +392,14 @@ def test_modell_darf_nichts_hinzufuegen():
     funde = [_fund("a.congstar.de")]
 
     def fake(system, user, modell, max_tokens):
-        return json.dumps({"namen": [
-            {"name": "a.congstar.de", "art": "kampagne"},
-            {"name": "erfunden.congstar.de", "art": "kampagne"},
-        ]})
+        return json.dumps(
+            {
+                "namen": [
+                    {"name": "a.congstar.de", "art": "kampagne"},
+                    {"name": "erfunden.congstar.de", "art": "kampagne"},
+                ]
+            }
+        )
 
     assert [f.name for f in bewerte(funde, "m", komplett=fake)] == ["a.congstar.de"]
 
@@ -363,7 +414,8 @@ def test_vom_modell_uebergangener_name_bleibt_drin():
     uebrig = bewerte(funde, "m", komplett=fake)
     assert {f.name for f in uebrig} == {"a.congstar.de", "b.congstar.de"}
     assert [f.einschaetzung for f in uebrig if f.name == "b.congstar.de"] == [
-        "unbewertet"]
+        "unbewertet"
+    ]
 
 
 def test_unklar_bleibt_drin():
@@ -389,10 +441,12 @@ def test_gescheitertes_modell_verwirft_nichts():
 def test_ohne_modell_laeuft_die_stufe_gar_nicht(tmp_path, antwort):
     root = _repo(tmp_path, EINE, [])
     sammle(root, {}, jetzt=JETZT, client=_Client(_antwort(daten=antwort)))
-    plus = antwort + [{"dns_names": ["neu.congstar.de"],
-                       "not_before": "2026-08-07T10:00:00Z"}]
-    items, _ = sammle(root, {}, jetzt=JETZT, modell="",
-                      client=_Client(_antwort(daten=plus)))
+    plus = antwort + [
+        {"dns_names": ["neu.congstar.de"], "not_before": "2026-08-07T10:00:00Z"}
+    ]
+    items, _ = sammle(
+        root, {}, jetzt=JETZT, modell="", client=_Client(_antwort(daten=plus))
+    )
     assert len(items) == 1
     assert "unbestätigt" in items[0].summary
 
@@ -400,6 +454,7 @@ def test_ohne_modell_laeuft_die_stufe_gar_nicht(tmp_path, antwort):
 # --------------------------------------------------------------------------- #
 # Das Item
 # --------------------------------------------------------------------------- #
+
 
 def test_item_traegt_den_vorbehalt_im_text():
     """Nicht als Fussnote daneben - wer die Zeile kopiert, kopiert ihn mit."""

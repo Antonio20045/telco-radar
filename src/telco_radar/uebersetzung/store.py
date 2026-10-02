@@ -12,6 +12,7 @@ Uebersetzung noch in einem Jahr; ein Aufraeumen nach Alter waere genau
 Premortem 6 - tote Links im Archiv. Der Speicher waechst dafuer langsam:
 gemessen rund 20-30 Uebersetzungen je Ausgabe.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -25,8 +26,9 @@ log = logging.getLogger(__name__)
 
 def text_hash(text: str) -> str:
     """Kurzer, stabiler Fingerabdruck des Quelltexts."""
-    return hashlib.sha256(" ".join((text or "").split()).encode("utf-8")
-                          ).hexdigest()[:12]
+    return hashlib.sha256(" ".join((text or "").split()).encode("utf-8")).hexdigest()[
+        :12
+    ]
 
 
 @dataclass
@@ -45,7 +47,7 @@ class Uebersetzung:
     modell: str = ""
     erstellt_am: str = ""
     zeichen_original: int = 0
-    herkunft: str = ""          # "feed" | "artikel"
+    herkunft: str = ""  # "feed" | "artikel"
 
     @property
     def zeichen(self) -> int:
@@ -86,8 +88,7 @@ class UebersetzungsStore:
             try:
                 u = Uebersetzung.from_dict(json.loads(zeile))
             except (json.JSONDecodeError, TypeError) as exc:
-                log.warning("Uebersetzungsspeicher: Zeile uebersprungen (%s)",
-                            exc)
+                log.warning("Uebersetzungsspeicher: Zeile uebersprungen (%s)", exc)
                 continue
             self._eintraege[u.item_id] = u
 
@@ -119,7 +120,10 @@ class UebersetzungsStore:
         beim naechsten Laden gewaenne dann die zufaellige Reihenfolge.
         """
         self.pfad.parent.mkdir(parents=True, exist_ok=True)
-        zeilen = [json.dumps(u.to_dict(), ensure_ascii=False)
-                  for u in self._eintraege.values()]
-        self.pfad.write_text("\n".join(zeilen) + ("\n" if zeilen else ""),
-                             encoding="utf-8")
+        zeilen = [
+            json.dumps(u.to_dict(), ensure_ascii=False)
+            for u in self._eintraege.values()
+        ]
+        self.pfad.write_text(
+            "\n".join(zeilen) + ("\n" if zeilen else ""), encoding="utf-8"
+        )

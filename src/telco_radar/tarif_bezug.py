@@ -54,6 +54,7 @@ festzuschreiben, die zufaellig passt. Ein Buendelpreis ohne aufloesbaren
 Tarif wird verworfen - die Regel aus `geraete_model.py` bleibt, sie
 bekommt hier nur ihr Ziel.
 """
+
 from __future__ import annotations
 
 import json
@@ -63,9 +64,15 @@ from pathlib import Path
 from typing import Optional
 
 from .collect.tarif_crawler import tarif_id
-from .tarif_model import (HOCH, MITTEL, PREISTYP_LIVE_SHOP,
-                          ist_geraeteblatt_von, ist_zurueckgezogen,
-                          vertrag_basis, zeitreihen_basis)
+from .tarif_model import (
+    HOCH,
+    MITTEL,
+    PREISTYP_LIVE_SHOP,
+    ist_geraeteblatt_von,
+    ist_zurueckgezogen,
+    vertrag_basis,
+    zeitreihen_basis,
+)
 
 log = logging.getLogger(__name__)
 
@@ -86,7 +93,7 @@ def _ohne_marke(tid: str, anbieter: str) -> str:
         return tid
     kopf, _, rumpf = tid.partition(":")
     if rumpf.startswith(f"{marke}-"):
-        rumpf = rumpf[len(marke) + 1:]
+        rumpf = rumpf[len(marke) + 1 :]
     return f"{kopf}:{rumpf}"
 
 
@@ -150,8 +157,10 @@ def _aktuelle_lesart(bisher: Optional[dict], satz: dict) -> dict:
     """
     if bisher is None:
         return satz
-    if (bisher.get("preistyp") != PREISTYP_LIVE_SHOP
-            and satz.get("preistyp") == PREISTYP_LIVE_SHOP):
+    if (
+        bisher.get("preistyp") != PREISTYP_LIVE_SHOP
+        and satz.get("preistyp") == PREISTYP_LIVE_SHOP
+    ):
         return satz
     return bisher
 
@@ -202,14 +211,18 @@ class Tarifbestand:
                 self.je_id[satz["tarif_id"]] = satz
         # P3-E1: ein zurueckgezogener Tarif (juengster Stand traegt den
         # Rueckzug) ist kein Bezugsziel mehr.
-        self.je_id = {tid: satz for tid, satz in self.je_id.items()
-                      if not ist_zurueckgezogen(satz)}
+        self.je_id = {
+            tid: satz
+            for tid, satz in self.je_id.items()
+            if not ist_zurueckgezogen(satz)
+        }
 
         self.je_id_aktuell: dict[str, dict] = {}
         for tid, satz in self.je_id.items():
             kern = zeitreihen_basis(tid)
             self.je_id_aktuell[kern] = _aktuelle_lesart(
-                self.je_id_aktuell.get(kern), satz)
+                self.je_id_aktuell.get(kern), satz
+            )
         # Zweite Passe (FIX4): dieselbe gewaehlte Lesart je Vertrag auch
         # unter JEDER Zeitreihen-ID erreichbar machen, die zu ihrem baren
         # Schluessel gehoert - nicht nur unter dem baren selbst. Ohne sie
@@ -244,8 +257,11 @@ class Tarifbestand:
         if not anbieter:
             return list(self.je_id.values())
         marke = tarif_id(anbieter, "")
-        return [s for s in self.je_id.values()
-                if tarif_id(s.get("anbieter", ""), "") == marke]
+        return [
+            s
+            for s in self.je_id.values()
+            if tarif_id(s.get("anbieter", ""), "") == marke
+        ]
 
     # ------------------------------------------------------------- Namen
 
@@ -280,10 +296,12 @@ class Tarifbestand:
                     break
         if satz is None:
             return None
-        return Bezug(tarif_id=gesucht, tarif_name=satz.get("name", ""),
-                     guete=HOCH,
-                     grund=f"Name im Produktinformationsblatt: "
-                           f"{satz.get('name', '')}")
+        return Bezug(
+            tarif_id=gesucht,
+            tarif_name=satz.get("name", ""),
+            guete=HOCH,
+            grund=f"Name im Produktinformationsblatt: {satz.get('name', '')}",
+        )
 
     # -------------------------------------------------------------- Slug
 
@@ -315,24 +333,35 @@ class Tarifbestand:
         if not gesucht:
             return None
         marke = tarif_id(anbieter, "")
-        treffer = [s for s in self.je_id.values()
-                   if str(s.get("buendel_slug") or "").strip().lower() == gesucht
-                   and tarif_id(s.get("anbieter", ""), "") == marke]
+        treffer = [
+            s
+            for s in self.je_id.values()
+            if str(s.get("buendel_slug") or "").strip().lower() == gesucht
+            and tarif_id(s.get("anbieter", ""), "") == marke
+        ]
         if not treffer:
             return self._slug_ist_tarif_id(anbieter, gesucht)
         if len(treffer) != 1:
             if treffer:
-                log.info("Tarifbezug ueber den Slug %r bei %s ist nicht "
-                         "eindeutig (%d Tarife) - verworfen", gesucht,
-                         anbieter, len(treffer))
+                log.info(
+                    "Tarifbezug ueber den Slug %r bei %s ist nicht "
+                    "eindeutig (%d Tarife) - verworfen",
+                    gesucht,
+                    anbieter,
+                    len(treffer),
+                )
             return None
         satz = treffer[0]
         return Bezug(
-            tarif_id=satz["tarif_id"], tarif_name=satz.get("name", ""),
+            tarif_id=satz["tarif_id"],
+            tarif_name=satz.get("name", ""),
             guete=HOCH,
-            grund=(f"Der Anbieter verlinkt von der SIM-only-Kachel "
-                   f"{satz.get('name', '')!r} aus genau diesen Buendeltarif "
-                   f"({gesucht})"))
+            grund=(
+                f"Der Anbieter verlinkt von der SIM-only-Kachel "
+                f"{satz.get('name', '')!r} aus genau diesen Buendeltarif "
+                f"({gesucht})"
+            ),
+        )
 
     def _slug_ist_tarif_id(self, anbieter: str, slug: str) -> Optional[Bezug]:
         """Der Slug IST die Tarif-ID des Bestands - der Tarif ohne "Plus".
@@ -366,15 +395,18 @@ class Tarifbestand:
         if satz is None or not satz.get("tarif_id"):
             return None
         return Bezug(
-            tarif_id=satz["tarif_id"], tarif_name=satz.get("name", ""),
+            tarif_id=satz["tarif_id"],
+            tarif_name=satz.get("name", ""),
             guete=HOCH,
-            grund=(f"Der Buendel-Slug {slug!r} ist die Tarif-ID von "
-                   f"{satz.get('name', '')!r} im Bestand"))
+            grund=(
+                f"Der Buendel-Slug {slug!r} ist die Tarif-ID von "
+                f"{satz.get('name', '')!r} im Bestand"
+            ),
+        )
 
     # ------------------------------------------------------------ Betrag
 
-    def ueber_betrag(self, anbieter: str, betrag: Optional[float]
-                     ) -> Optional[Bezug]:
+    def ueber_betrag(self, anbieter: str, betrag: Optional[float]) -> Optional[Bezug]:
         """Der Weg mit Guete `mittel` - und nur bei EINDEUTIGKEIT.
 
         Treffen zwei Tarife desselben Anbieters denselben Monatsbetrag, ist
@@ -384,21 +416,32 @@ class Tarifbestand:
         """
         if betrag is None:
             return None
-        treffer = [s for s in self.saetze(anbieter)
-                   if s.get("grundgebuehr") is not None
-                   and abs(float(s["grundgebuehr"]) - float(betrag)) < _CENT]
+        treffer = [
+            s
+            for s in self.saetze(anbieter)
+            if s.get("grundgebuehr") is not None
+            and abs(float(s["grundgebuehr"]) - float(betrag)) < _CENT
+        ]
         if len(treffer) != 1:
             if treffer:
-                log.info("Tarifbezug ueber Betrag %.2f bei %s ist nicht "
-                         "eindeutig (%d Tarife) - verworfen",
-                         float(betrag), anbieter, len(treffer))
+                log.info(
+                    "Tarifbezug ueber Betrag %.2f bei %s ist nicht "
+                    "eindeutig (%d Tarife) - verworfen",
+                    float(betrag),
+                    anbieter,
+                    len(treffer),
+                )
             return None
         satz = treffer[0]
         return Bezug(
-            tarif_id=satz["tarif_id"], tarif_name=satz.get("name", ""),
+            tarif_id=satz["tarif_id"],
+            tarif_name=satz.get("name", ""),
             guete=MITTEL,
-            grund=(f"Monatsbetrag {float(betrag):.2f} EUR trifft im Bestand "
-                   f"genau einen Tarif dieses Anbieters"))
+            grund=(
+                f"Monatsbetrag {float(betrag):.2f} EUR trifft im Bestand "
+                f"genau einen Tarif dieses Anbieters"
+            ),
+        )
 
     # ------------------------------------------------------------ beides
 
@@ -418,25 +461,38 @@ class Tarifbestand:
         if not tarif:
             return bezug
         treffer = sorted(
-            tid for tid in self.je_id
-            if tid != bezug.tarif_id and zeitreihen_basis(tid) == tid
+            tid
+            for tid in self.je_id
+            if tid != bezug.tarif_id
+            and zeitreihen_basis(tid) == tid
             and vertrag_basis(tid) == vertrag_basis(bezug.tarif_id)
-            and ist_geraeteblatt_von(self.je_id_aktuell[tid], tarif))
+            and ist_geraeteblatt_von(self.je_id_aktuell[tid], tarif)
+        )
         if len(treffer) != 1:
             if len(treffer) > 1:
-                log.info("Geraeteblatt fuer %s nicht eindeutig (%s) - "
-                         "Buendel bleibt am Tarifblatt", bezug.tarif_id,
-                         ", ".join(treffer))
+                log.info(
+                    "Geraeteblatt fuer %s nicht eindeutig (%s) - "
+                    "Buendel bleibt am Tarifblatt",
+                    bezug.tarif_id,
+                    ", ".join(treffer),
+                )
             return bezug
         blatt = self.je_id_aktuell[treffer[0]]
-        return Bezug(tarif_id=treffer[0], tarif_name=blatt.get("name", ""),
-                     guete=bezug.guete,
-                     grund=f"{bezug.grund}; Geraeteblatt: "
-                           f"{blatt.get('name', '')}")
+        return Bezug(
+            tarif_id=treffer[0],
+            tarif_name=blatt.get("name", ""),
+            guete=bezug.guete,
+            grund=f"{bezug.grund}; Geraeteblatt: {blatt.get('name', '')}",
+        )
 
-    def loese(self, anbieter: str, referenz: str = "",
-              betrag: Optional[float] = None,
-              slug: str = "", mit_geraet: bool = False) -> Optional[Bezug]:
+    def loese(
+        self,
+        anbieter: str,
+        referenz: str = "",
+        betrag: Optional[float] = None,
+        slug: str = "",
+        mit_geraet: bool = False,
+    ) -> Optional[Bezug]:
         """Erst der Name, dann der Slug, dann der Betrag. Nie umgekehrt.
 
         Ein Name, der trifft, ist die staerkere Aussage; ihn zugunsten
@@ -452,9 +508,11 @@ class Tarifbestand:
         `mit_geraet` (ein Buendel, P3 28.09.2026): der Bezug wandert auf das
         Geraeteblatt desselben Tarifs, wenn es eines gibt (`geraeteblatt`).
         """
-        bezug = (self.ueber_namen(anbieter, referenz)
-                 or self.ueber_slug(anbieter, slug)
-                 or self.ueber_betrag(anbieter, betrag))
+        bezug = (
+            self.ueber_namen(anbieter, referenz)
+            or self.ueber_slug(anbieter, slug)
+            or self.ueber_betrag(anbieter, betrag)
+        )
         if bezug is not None and mit_geraet:
             return self.geraeteblatt(bezug)
         return bezug

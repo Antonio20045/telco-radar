@@ -56,6 +56,7 @@ weitere Sektionen). Gezaehlt wird je Tarif-SLUG genau einmal; ein
 zweiter Fund mit abweichendem Preis waere eine Mehrdeutigkeit und
 wird gemeldet, nicht gemittelt.
 """
+
 from __future__ import annotations
 
 import html as html_modul
@@ -101,8 +102,7 @@ _AKTION_RE = re.compile(r"(\d+)\s*Monate?\s+je\s*([0-9][0-9.,]*)")
 # schon im Geraetezweig; hier ist die OHNE-Smartphone-Zeile die richtige
 # - eine SIM-only-Referenz hat kein Geraet).
 _GEBUEHR_RE = re.compile(r"Einmalige Bereitstellungsgebühr")
-_OHNE_SMARTPHONE_RE = re.compile(
-    r"Tarif ohne Smartphone:?\s*</strong>\s*([^<]{1,40})")
+_OHNE_SMARTPHONE_RE = re.compile(r"Tarif ohne Smartphone:?\s*</strong>\s*([^<]{1,40})")
 _GEBUEHR_FENSTER = 2000
 
 
@@ -116,8 +116,9 @@ def anschlusspreis_aus_details(text: str) -> Optional[float]:
     anfang = _GEBUEHR_RE.search(roh)
     if not anfang:
         return None
-    treffer = _OHNE_SMARTPHONE_RE.search(roh, anfang.end(),
-                                         anfang.end() + _GEBUEHR_FENSTER)
+    treffer = _OHNE_SMARTPHONE_RE.search(
+        roh, anfang.end(), anfang.end() + _GEBUEHR_FENSTER
+    )
     if not treffer:
         return None
     return zahl(html_modul.unescape(treffer.group(1)))
@@ -180,9 +181,13 @@ def kacheln(html: str) -> list[dict]:
         slug = str(marke["value"]).strip()
         details_url = _preisliste_url(kachel)
         titel = kachel.select_one("[title^='Tarifdetails']")
-        name = html_modul.unescape(
-            re.sub(r"^Tarifdetails\s*", "", titel.get("title", ""))
-        ).strip() if titel else ""
+        name = (
+            html_modul.unescape(
+                re.sub(r"^Tarifdetails\s*", "", titel.get("title", ""))
+            ).strip()
+            if titel
+            else ""
+        )
         if not name:
             # Ohne kanonischen Namen keine stabile `sim_only_id` - der
             # Slug allein ist eine interne Abkuerzung, kein Name.
@@ -210,22 +215,27 @@ def kacheln(html: str) -> list[dict]:
         aktion_text = kachel.select_one(".text-with-bg-secondary")
         if aktion_text is not None:
             aktion = _AKTION_RE.search(
-                html_modul.unescape(aktion_text.get_text(" ", strip=True)))
+                html_modul.unescape(aktion_text.get_text(" ", strip=True))
+            )
             if aktion:
-                eintrag["aktion"] = (int(aktion.group(1)),
-                                     zahl(aktion.group(2)))
+                eintrag["aktion"] = (int(aktion.group(1)), zahl(aktion.group(2)))
         vorher = gesehen.get(slug)
         if vorher is None:
             gesehen[slug] = eintrag
-        elif any(vorher.get(f) != eintrag.get(f)
-                 for f in ("name", "dauerpreis", "aktion", "volumen_gb")):
+        elif any(
+            vorher.get(f) != eintrag.get(f)
+            for f in ("name", "dauerpreis", "aktion", "volumen_gb")
+        ):
             # Der ganze Messwert, nicht nur der Preis: dieselbe Kachel mit
             # einer ANDEREN Aktionsphase oder einem anderen Volumen ist
             # genausowenig eindeutig wie mit einem anderen Preis.
             mehrdeutig.add(slug)
     for slug in mehrdeutig:
-        log.warning("1&1 SIM-only: Kachel %s nennt auf der Seite zwei "
-                    "unterschiedliche Preise - Tarif bleibt weg", slug)
+        log.warning(
+            "1&1 SIM-only: Kachel %s nennt auf der Seite zwei "
+            "unterschiedliche Preise - Tarif bleibt weg",
+            slug,
+        )
         gesehen.pop(slug, None)
     return list(gesehen.values())
 
@@ -242,18 +252,21 @@ def _ldjson_zeugen(html: str) -> dict[str, float]:
     eine zweite Rechnung fuer dieselbe Zahl.
     """
     zeugen: dict[str, float] = {}
-    for tarif, _hash in tarife_aus_html(html, anbieter=ANBIETER,
-                                        seiten_url=SEITEN_URL,
-                                        abgerufen_am=""):
+    for tarif, _hash in tarife_aus_html(
+        html, anbieter=ANBIETER, seiten_url=SEITEN_URL, abgerufen_am=""
+    ):
         if tarif.grundgebuehr is not None:
             zeugen.setdefault(tarif.name, tarif.grundgebuehr)
     return zeugen
 
 
-def referenzen_aus_html(html: str, *, seiten_url: str = SEITEN_URL,
-                        details: Optional[dict[str, str]] = None,
-                        abgerufen_am: str = ""
-                        ) -> list[SimOnlyReferenz]:
+def referenzen_aus_html(
+    html: str,
+    *,
+    seiten_url: str = SEITEN_URL,
+    details: Optional[dict[str, str]] = None,
+    abgerufen_am: str = "",
+) -> list[SimOnlyReferenz]:
     """Die SIM-only-Referenzen einer Seitenantwort.
 
     `details` ordnet je Tarif-Slug den Text des verlinkten
@@ -268,20 +281,25 @@ def referenzen_aus_html(html: str, *, seiten_url: str = SEITEN_URL,
         preis = kachel["dauerpreis"]
         zeuge = zeugen.get(name)
         if preis is None:
-            log.info("1&1 SIM-only: Kachel %r nennt keinen Preis - "
-                     "bleibt weg", name)
+            log.info("1&1 SIM-only: Kachel %r nennt keinen Preis - bleibt weg", name)
             continue
         if zeuge is None:
             # Das Kreuzzeug ist weg (ld+json-Namen driften von den
             # Kacheltiteln) - der Preis steht dann allein. Er bleibt
             # stehen, aber der Verfall der Gegenprobe wird gemeldet, sonst
             # faelle er erst auf, wenn er laengst nichts mehr absichert.
-            log.warning("1&1 SIM-only: kein ld+json-Zeuge fuer %r - "
-                        "Kachelpreis ungegengeprobt", name)
+            log.warning(
+                "1&1 SIM-only: kein ld+json-Zeuge fuer %r - Kachelpreis ungegengeprobt",
+                name,
+            )
         elif abs(zeuge - preis) > 0.005:
-            log.warning("1&1 SIM-only: Kachel sagt %s €, ld+json %s € fuer "
-                        "%r - mehrdeutig, Tarif bleibt weg",
-                        preis, zeuge, name)
+            log.warning(
+                "1&1 SIM-only: Kachel sagt %s €, ld+json %s € fuer "
+                "%r - mehrdeutig, Tarif bleibt weg",
+                preis,
+                zeuge,
+                name,
+            )
             continue
         anschluss = None
         details_text = (details or {}).get(kachel["slug"])
@@ -290,31 +308,41 @@ def referenzen_aus_html(html: str, *, seiten_url: str = SEITEN_URL,
         rabatte = []
         if kachel["aktion"]:
             monate, betrag = kachel["aktion"]
-            rabatte.append(Rabatt(
-                name=f"Aktionspreis: {monate} Monate je "
-                     f"{betrag:.2f} €".replace(".", ","),
-                von_monat=1, bis_monat=monate, beleg_url=seiten_url))
-        referenzen.append(SimOnlyReferenz(
-            anbieter=ANBIETER,
-            tarif_name=name,
-            tarif_id=tarif_id(ANBIETER, name),
-            tarif_id_guete=HOCH,
-            tarif_sim_only_monatlich=preis,
-            anschlusspreis=anschluss,
-            rabatte=rabatte,
-            quelle_url=seiten_url,
-            abgerufen_am=abgerufen_am,
-            quelle_art=PREISTYP_LIVE_SHOP,
-            bindung_monate=None,
-            volumen_gb=kachel["volumen_gb"],
-        ))
+            rabatte.append(
+                Rabatt(
+                    name=f"Aktionspreis: {monate} Monate je {betrag:.2f} €".replace(
+                        ".", ","
+                    ),
+                    von_monat=1,
+                    bis_monat=monate,
+                    beleg_url=seiten_url,
+                )
+            )
+        referenzen.append(
+            SimOnlyReferenz(
+                anbieter=ANBIETER,
+                tarif_name=name,
+                tarif_id=tarif_id(ANBIETER, name),
+                tarif_id_guete=HOCH,
+                tarif_sim_only_monatlich=preis,
+                anschlusspreis=anschluss,
+                rabatte=rabatte,
+                quelle_url=seiten_url,
+                abgerufen_am=abgerufen_am,
+                quelle_art=PREISTYP_LIVE_SHOP,
+                bindung_monate=None,
+                volumen_gb=kachel["volumen_gb"],
+            )
+        )
     return referenzen
 
 
-def sammle(hole: Callable, abgerufen_am: str,
-           robots: Optional[RobotsWaechter] = None,
-           abstand_sekunden: Optional[float] = None
-           ) -> tuple[list[SimOnlyReferenz], dict]:
+def sammle(
+    hole: Callable,
+    abgerufen_am: str,
+    robots: Optional[RobotsWaechter] = None,
+    abstand_sekunden: Optional[float] = None,
+) -> tuple[list[SimOnlyReferenz], dict]:
     """Die ehrliche Messung: Seite je Tarif-Slug einmal, Details je Slug.
 
     `hole(url, kopfzeilen=None, user_agent=None) -> (status, text)` ist
@@ -332,20 +360,19 @@ def sammle(hole: Callable, abgerufen_am: str,
         # stellt, tut das am Modul-Attribut - ein Default, der die Zahl
         # zur Definitionszeit einfriert, wuerde das still ignorieren.
         abstand_sekunden = _ABSTAND_SEKUNDEN
-    protokoll = {"seite": "", "details": 0, "details_gescheitert": 0,
-                 "ohne_details": 0}
+    protokoll = {"seite": "", "details": 0, "details_gescheitert": 0, "ohne_details": 0}
     if robots is None:
         robots = RobotsWaechter(lambda url: hole(url, user_agent=USER_AGENT))
     erlaubt, grund = robots.darf(SEITEN_URL)
     if not erlaubt:
-        log.warning("1&1 SIM-only: %s nicht abrufbar (%s) - Messgrenze",
-                    SEITEN_URL, grund)
+        log.warning(
+            "1&1 SIM-only: %s nicht abrufbar (%s) - Messgrenze", SEITEN_URL, grund
+        )
         return [], protokoll
     try:
         status, html = hole(SEITEN_URL, user_agent=USER_AGENT)
-    except Exception as exc:                        # noqa: BLE001
-        log.warning("1&1 SIM-only: Seitenabruf gescheitert (%s) - "
-                    "Messgrenze", exc)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("1&1 SIM-only: Seitenabruf gescheitert (%s) - Messgrenze", exc)
         return [], protokoll
     if not (200 <= int(status) < 300):
         log.warning("1&1 SIM-only: Seite mit HTTP %s - Messgrenze", status)
@@ -363,30 +390,40 @@ def sammle(hole: Callable, abgerufen_am: str,
         adresse = urljoin(SEITEN_URL, html_modul.unescape(adresse))
         erlaubt, grund = robots.darf(adresse)
         if not erlaubt:
-            log.warning("1&1 SIM-only: Tarifdetails %s uebergangen (%s) - "
-                        "Anschlusspreis bleibt offen", adresse, grund)
+            log.warning(
+                "1&1 SIM-only: Tarifdetails %s uebergangen (%s) - "
+                "Anschlusspreis bleibt offen",
+                adresse,
+                grund,
+            )
             continue
-        warte = robots.abstand(adresse, abstand_sekunden) \
-            - (time.monotonic() - letzter)
+        warte = robots.abstand(adresse, abstand_sekunden) - (time.monotonic() - letzter)
         if letzter and warte > 0:
             time.sleep(warte)
         letzter = time.monotonic()
         try:
             dstatus, dtext = hole(adresse, user_agent=USER_AGENT)
-        except Exception as exc:                    # noqa: BLE001
+        except Exception as exc:  # noqa: BLE001
             protokoll["details_gescheitert"] += 1
-            log.info("1&1 SIM-only: Tarifdetails zu %s gescheitert (%s) - "
-                     "Anschlusspreis bleibt offen", kachel["slug"], exc)
+            log.info(
+                "1&1 SIM-only: Tarifdetails zu %s gescheitert (%s) - "
+                "Anschlusspreis bleibt offen",
+                kachel["slug"],
+                exc,
+            )
             continue
         if 200 <= int(dstatus) < 300:
             details[kachel["slug"]] = dtext
             protokoll["details"] += 1
         else:
             protokoll["details_gescheitert"] += 1
-            log.info("1&1 SIM-only: Tarifdetails zu %s mit HTTP %s - "
-                     "Anschlusspreis bleibt offen", kachel["slug"], dstatus)
+            log.info(
+                "1&1 SIM-only: Tarifdetails zu %s mit HTTP %s - "
+                "Anschlusspreis bleibt offen",
+                kachel["slug"],
+                dstatus,
+            )
 
-    referenzen = referenzen_aus_html(html, details=details,
-                                     abgerufen_am=abgerufen_am)
+    referenzen = referenzen_aus_html(html, details=details, abgerufen_am=abgerufen_am)
     protokoll["tarife"] = len(referenzen)
     return referenzen, protokoll

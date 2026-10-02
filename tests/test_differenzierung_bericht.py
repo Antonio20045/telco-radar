@@ -9,10 +9,14 @@ zaehlen: die NEUE Gliederung wird korrekt verteilt, und ein ALTER Bericht
 (davon liegen Monate in data/reports/differenzierung/) faellt sauber auf den
 Aufklapper zurueck, statt eine leere Seite zu hinterlassen.
 """
+
 from telco_radar.report.differenzierung_bericht import zerlegen
 
-LABELS = {"ki": "KI & Assistenten", "entertainment": "Entertainment & Streaming",
-          "garantie": "Garantie & Service-Versprechen"}
+LABELS = {
+    "ki": "KI & Assistenten",
+    "entertainment": "Entertainment & Streaming",
+    "garantie": "Garantie & Service-Versprechen",
+}
 
 NEU = """## Das Bild
 
@@ -51,8 +55,10 @@ ALT = """## Konkrete Entwicklungen
 def test_die_neue_gliederung_wird_in_drei_teile_zerlegt():
     t = zerlegen(NEU, LABELS)
     assert t["lage"].startswith("Die Anbieter legen")
-    assert [m["titel"] for m in t["muster"]] == ["Premium-KI als Zugabe",
-                                                 "Garantie statt Rabatt"]
+    assert [m["titel"] for m in t["muster"]] == [
+        "Premium-KI als Zugabe",
+        "Garantie statt Rabatt",
+    ]
     assert set(t["einordnung"]) == {"ki", "garantie"}
     assert t["einordnung"]["ki"].startswith("Indien treibt das Feld")
     # Nichts bleibt fuer den Aufklapper uebrig - der Bericht steht verteilt
@@ -70,15 +76,19 @@ def test_die_einordnung_haengt_am_hebel_namen_nicht_an_der_reihenfolge():
 
 
 def test_eine_unbekannte_h3_wird_verworfen_statt_falsch_zugeordnet():
-    md = ("## Das Bild\n\nText.\n\n## Muster\n\nText.\n\n"
-          "## Einordnung\n\n### Etwas ganz anderes\n\nSatz.\n")
+    md = (
+        "## Das Bild\n\nText.\n\n## Muster\n\nText.\n\n"
+        "## Einordnung\n\n### Etwas ganz anderes\n\nSatz.\n"
+    )
     assert zerlegen(md, LABELS)["einordnung"] == {}
 
 
 def test_ein_musterabsatz_ohne_fettes_leitwort_geht_nicht_verloren():
     """Ihn zu verwerfen hiesse, eine Aussage wegen ihrer Formatierung zu
     unterschlagen."""
-    md = "## Das Bild\n\nA.\n\n## Muster\n\nEin Muster ohne Leitwort.\n\n## Einordnung\n"
+    md = (
+        "## Das Bild\n\nA.\n\n## Muster\n\nEin Muster ohne Leitwort.\n\n## Einordnung\n"
+    )
     muster = zerlegen(md, LABELS)["muster"]
     assert muster == [{"titel": "", "text": "Ein Muster ohne Leitwort."}]
 
@@ -101,8 +111,12 @@ def test_die_quellenbasis_allein_macht_einen_bericht_nicht_verteilbar():
 
 
 def test_leerer_bericht_bricht_nicht():
-    assert zerlegen("", LABELS) == {"lage": "", "muster": [], "einordnung": {},
-                                    "alt_md": ""}
+    assert zerlegen("", LABELS) == {
+        "lage": "",
+        "muster": [],
+        "einordnung": {},
+        "alt_md": "",
+    }
 
 
 def test_der_notfall_digest_wird_von_derselben_zerlegung_verstanden():
@@ -110,11 +124,20 @@ def test_der_notfall_digest_wird_von_derselben_zerlegung_verstanden():
     haengen an EINER Gliederung. Faellt der Redakteur aus, aendert sich der
     Ton der Seite, nicht ihr Aufbau."""
     from telco_radar.analyze.differentiation_editor import build_digest
+
     eintraege = [
-        {"theme": "ki", "operator": op, "region": "Asien", "what": "Etwas.",
-         "url": f"https://example.com/{op}", "source": "example.com",
-         "first_seen": "2026-07-01", "last_verified": "2026-07-01"}
-        for op in ("Airtel", "SK Telecom")]
+        {
+            "theme": "ki",
+            "operator": op,
+            "region": "Asien",
+            "what": "Etwas.",
+            "url": f"https://example.com/{op}",
+            "source": "example.com",
+            "first_seen": "2026-07-01",
+            "last_verified": "2026-07-01",
+        }
+        for op in ("Airtel", "SK Telecom")
+    ]
     t = zerlegen(build_digest(eintraege, LABELS), LABELS)
     assert t["lage"] and t["muster"] and t["einordnung"].get("ki")
     assert t["alt_md"] == ""

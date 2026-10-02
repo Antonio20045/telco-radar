@@ -18,6 +18,7 @@ seit D4a eine Methodik-Sektion (`#methodik`), die dieselben Sätze sinngleich
 wiederholt, und der EINE Fußzeilen-Link "Methodik" auf geraete.html führt
 dorthin.
 """
+
 from __future__ import annotations
 
 import pathlib
@@ -34,8 +35,7 @@ def _gebaut(tmp_path: pathlib.Path) -> tuple[BeautifulSoup, BeautifulSoup]:
     seiten = _seite(tmp_path)
     geraete = BeautifulSoup(seiten["geraete.html"], "html.parser")
     quellen_pfad = tmp_path / "site-bau" / "site" / "geraete-quellen.html"
-    quellen = BeautifulSoup(quellen_pfad.read_text(encoding="utf-8"),
-                             "html.parser")
+    quellen = BeautifulSoup(quellen_pfad.read_text(encoding="utf-8"), "html.parser")
     return geraete, quellen
 
 
@@ -72,8 +72,8 @@ def test_keine_lesehilfe_steht_noch_sichtbar_auf_der_geraeteseite(tmp_path):
     sichtbar = _sichtbarer_text(geraete)
     treffer = [satz for satz in _ENTFERNTE_LESEHILFEN if satz in sichtbar]
     assert not treffer, (
-        "Lesehilfe(n) stehen noch sichtbar auf der Geräteseite: "
-        f"{treffer}")
+        f"Lesehilfe(n) stehen noch sichtbar auf der Geräteseite: {treffer}"
+    )
 
 
 def test_die_entfernten_lesehilfen_stehen_nicht_im_nichts(tmp_path):
@@ -95,8 +95,9 @@ def test_die_entfernten_lesehilfen_stehen_nicht_im_nichts(tmp_path):
     # Der Fußzeilen-Link zeigt auf GENAU diesen Anker (nicht nur auf die
     # Seite) - sonst landet ein Handy-Leser auf der Quellenübersicht,
     # nie bei der Methodik selbst.
-    methodik_links = [a for a in geraete.select("a")
-                      if a.get_text(strip=True) == "Methodik"]
+    methodik_links = [
+        a for a in geraete.select("a") if a.get_text(strip=True) == "Methodik"
+    ]
     assert methodik_links, "kein Fußzeilen-Link 'Methodik' auf geraete.html"
     assert methodik_links[0]["href"].endswith("geraete-quellen.html#methodik")
 
@@ -105,56 +106,47 @@ def test_die_entfernten_lesehilfen_stehen_nicht_im_nichts(tmp_path):
     # wurde (Ab-Preis, Nachfolger-Spalte), steht das Fragment, das die
     # gleiche Auskunft in der Methodik-Formulierung traegt.
     fragmente = {
-        "Ein fehlender Punkt heißt":
-            "Ein fehlender Punkt heißt",
+        "Ein fehlender Punkt heißt": "Ein fehlender Punkt heißt",
         # P3-E1: seit der Tarifleiter mit neuem Wortlaut.
-        "Unbegrenzte Tarife und Tarife ohne erhobenes Datenvolumen":
-            "Tarife ohne erhobenes Datenvolumen und unbegrenzte Tarife",
-        "Balkenlänge = Abstand in Euro zum Vodafone-Preis":
-            "Balkenlänge = Abstand in Euro zum Vodafone-Preis",
-        "Diese Geräte führen nur":
-            "nennt den günstigsten Anbieter, der das Gerät führt",
-        "jede Zeile ein Modell, gerechnet gegen Vodafone im selben Tarifband":
-            "jede Zeile ein Modell, gerechnet gegen Vodafone in derselben "
-            "Stufe der Tarifleiter",
-        "Abweichung je Zeile = Wettbewerber-Kosten":
-            "Abweichung je Zeile = Wettbewerber-Kosten",
-        "Fachhändler verkaufen ohne eigenen Tarif":
-            "Fachhändler verkaufen ohne eigenen Tarif",
-        "Gezählt werden Jahrgänge, nicht Varianten":
-            "Gezählt werden Jahrgänge, nicht Varianten",
-        "Bleibt ein Vorjahresmodell nach dem Start seines":
-            "Zählt die Tage seit dem Marktstart des Nachfolgers",
-        "Verglichen werden ausschließlich Neugeräte ohne Tarifvertrag":
-            "Verglichen werden ausschließlich Neugeräte ohne Tarifvertrag",
-        "Eine Zeile je Modell; der Umschalter darüber wählt":
-            "Eine Zeile je Modell; der Umschalter darüber wählt",
+        "Unbegrenzte Tarife und Tarife ohne erhobenes Datenvolumen": "Tarife ohne erhobenes Datenvolumen und unbegrenzte Tarife",
+        "Balkenlänge = Abstand in Euro zum Vodafone-Preis": "Balkenlänge = Abstand in Euro zum Vodafone-Preis",
+        "Diese Geräte führen nur": "nennt den günstigsten Anbieter, der das Gerät führt",
+        "jede Zeile ein Modell, gerechnet gegen Vodafone im selben Tarifband": "jede Zeile ein Modell, gerechnet gegen Vodafone in derselben "
+        "Stufe der Tarifleiter",
+        "Abweichung je Zeile = Wettbewerber-Kosten": "Abweichung je Zeile = Wettbewerber-Kosten",
+        "Fachhändler verkaufen ohne eigenen Tarif": "Fachhändler verkaufen ohne eigenen Tarif",
+        "Gezählt werden Jahrgänge, nicht Varianten": "Gezählt werden Jahrgänge, nicht Varianten",
+        "Bleibt ein Vorjahresmodell nach dem Start seines": "Zählt die Tage seit dem Marktstart des Nachfolgers",
+        "Verglichen werden ausschließlich Neugeräte ohne Tarifvertrag": "Verglichen werden ausschließlich Neugeräte ohne Tarifvertrag",
+        "Eine Zeile je Modell; der Umschalter darüber wählt": "Eine Zeile je Modell; der Umschalter darüber wählt",
     }
     assert set(fragmente) == set(_ENTFERNTE_LESEHILFEN), (
         "die Fragmente-Liste deckt nicht mehr dieselben Sätze wie die "
-        "Negativliste oben ab")
-    fehlend = [satz for satz, fragment in fragmente.items()
-              if fragment not in methodik_text]
+        "Negativliste oben ab"
+    )
+    fehlend = [
+        satz for satz, fragment in fragmente.items() if fragment not in methodik_text
+    ]
     assert not fehlend, (
         "Lesehilfe(n) stehen NICHT (mehr nur als title) in der "
         f"Methodik-Sektion - die Auskunft ist auf dem Handy verloren: "
-        f"{fehlend}")
+        f"{fehlend}"
+    )
 
 
 def test_geraeteseite_verlinkt_genau_einmal_auf_die_methodik(tmp_path):
     """Die Geräteseite bekommt höchstens EINEN Fußzeilen-Link 'Methodik'
     (Auftrag D4a) - kein Wissen geht verloren, es zieht nur um."""
     geraete, _ = _gebaut(tmp_path)
-    links = [a for a in geraete.select("a")
-             if a.get_text(strip=True) == "Methodik"]
+    links = [a for a in geraete.select("a") if a.get_text(strip=True) == "Methodik"]
     assert len(links) == 1, f"{len(links)} Methodik-Links statt genau einem"
-    assert links[0]["href"].endswith("geraete-quellen.html#methodik"), \
-        links[0]["href"]
+    assert links[0]["href"].endswith("geraete-quellen.html#methodik"), links[0]["href"]
 
 
 # ---------------------------------------------------------------------------
 # Die Daten-Aussagen, die bleiben MÜSSEN (Positivliste, Gegenprobe)
 # ---------------------------------------------------------------------------
+
 
 def test_daten_aussagen_bleiben_sichtbar_auf_der_geraeteseite(tmp_path):
     """POSITIVLISTE. Ohne diese Gegenprobe wäre die Negativliste oben
@@ -176,29 +168,31 @@ def test_daten_aussagen_bleiben_sichtbar_auf_der_geraeteseite(tmp_path):
         echte_basis.append(len(zeilen))
         return zeilen
 
-    with mock.patch.object(geraete_radar, "grafik_zeilen",
-                           side_effect=_erfasst):
+    with mock.patch.object(geraete_radar, "grafik_zeilen", side_effect=_erfasst):
         geraete, _ = _gebaut(tmp_path)
-    assert echte_basis, ("grafik_zeilen() wurde beim Bauen der Seite nicht "
-                         "aufgerufen - der Test prüfte nichts")
+    assert echte_basis, (
+        "grafik_zeilen() wurde beim Bauen der Seite nicht "
+        "aufgerufen - der Test prüfte nichts"
+    )
     erwartete_basis = echte_basis[-1]
 
     grafik_meta = geraete.select_one("#wr-grafik .gr-v-meta")
     assert grafik_meta is not None, (
         "die gezählte Modellzahl (wr.grafik.basis) an der Radar-Grafik "
         "fehlt - sie ist beim Kürzen des Achslabels nirgends mehr "
-        "sichtbar")
+        "sichtbar"
+    )
     assert str(erwartete_basis) in _sichtbarer_text(grafik_meta), (
         f"die sichtbare Zahl ({_sichtbarer_text(grafik_meta)!r}) stimmt "
-        f"nicht mit dem echten len(alle) = {erwartete_basis} überein")
+        f"nicht mit dem echten len(alle) = {erwartete_basis} überein"
+    )
 
     sichtbar = _sichtbarer_text(geraete)
 
     # Die Kachel-Summe der Alarmtabelle bleibt als Datensatz stehen - nur
     # ihr methodischer Nachsatz ("Verglichen werden ausschließlich …")
     # ist gefallen (siehe Negativliste).
-    assert "Modelle mit ihren Speichergrößen stehen einem Wettbewerber" \
-        in sichtbar
+    assert "Modelle mit ihren Speichergrößen stehen einem Wettbewerber" in sichtbar
 
     # Die Händler-Sektion nennt weiterhin den echten Händlernamen und die
     # echten Preise/Prozente der Fixture (Saturn, iPhone 15) - keine
@@ -232,5 +226,6 @@ def test_methodik_sektion_traegt_die_umgezogenen_saetze(tmp_path):
     ueberschrift = methodik.select_one("h2")
     assert ueberschrift is not None and len(ueberschrift.get_text(strip=True)) > 5
     eintraege = methodik.select("li.list-row")
-    assert len(eintraege) >= 8, \
+    assert len(eintraege) >= 8, (
         f"nur {len(eintraege)} Methodik-Einträge - fehlt eine umgezogene Regel?"
+    )

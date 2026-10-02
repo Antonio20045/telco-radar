@@ -63,13 +63,13 @@ UND Grafik, bleibt aber im CSV-Export und in der SKU-Ansicht. Was nicht
 verglichen werden kann, verschwindet nicht - es wird nur nicht gegen etwas
 gerechnet, das es nicht ist.
 """
+
 from __future__ import annotations
 
 from statistics import median
 
 from ..analyze.geraete_store import STATUS_AKTIV, STATUS_VERMUTLICH
-from ..geraete_model import (VERGLEICHBARE_ZUSTAENDE, farbschluessel,
-                             zustand_aus_titel)
+from ..geraete_model import VERGLEICHBARE_ZUSTAENDE, farbschluessel, zustand_aus_titel
 
 # Ab dieser Spanne ueber die FARBEN eines Geraets wird der Fall berichtet -
 # nicht aussortiert. Kein Farbaufschlag ist ein Viertel des Geraetepreises;
@@ -148,9 +148,11 @@ def _vergleichbar(e: dict) -> bool:
     Grafik kommt, damit der Bericht keine Befunde ueber Zeilen meldet, die
     niemand sieht.
     """
-    return (e.get("status") in _SICHTBAR
-            and (e.get("zustand") or "neu") in VERGLEICHBARE_ZUSTAENDE
-            and _preis(e) is not None)
+    return (
+        e.get("status") in _SICHTBAR
+        and (e.get("zustand") or "neu") in VERGLEICHBARE_ZUSTAENDE
+        and _preis(e) is not None
+    )
 
 
 def _label(e: dict, katalog) -> str:
@@ -181,22 +183,25 @@ def _zustand_veraltet(eintraege: list, katalog) -> tuple[set, list]:
     """
     raus, befunde = set(), []
     for e in eintraege:
-        quelle = " ".join(str(e.get(feld) or "") for feld in
-                          ("titel_roh", "farbe_roh", "quelle_url"))
+        quelle = " ".join(
+            str(e.get(feld) or "") for feld in ("titel_roh", "farbe_roh", "quelle_url")
+        )
         if not quelle.strip():
             continue
         jetzt = zustand_aus_titel(quelle)
         if jetzt in VERGLEICHBARE_ZUSTAENDE:
             continue
         raus.add(_schluessel(e))
-        befunde.append({
-            "art": "zustand_veraltet",
-            "anbieter": e.get("anbieter"),
-            "geraet": _label(e, katalog),
-            "gespeichert": e.get("zustand") or "neu",
-            "erkannt": jetzt,
-            "entfernt": True,
-        })
+        befunde.append(
+            {
+                "art": "zustand_veraltet",
+                "anbieter": e.get("anbieter"),
+                "geraet": _label(e, katalog),
+                "gespeichert": e.get("zustand") or "neu",
+                "erkannt": jetzt,
+                "entfernt": True,
+            }
+        )
     return raus, befunde
 
 
@@ -222,8 +227,15 @@ def _doppelpreise(eintraege: list, katalog) -> tuple[set, list]:
     gruppen: dict[tuple, list] = {}
     for e in eintraege:
         gruppen.setdefault(
-            (e.get("anbieter"), e.get("device_id"), e.get("speicher_gb"),
-             e.get("zustand") or "neu", _farbe(e)), []).append(e)
+            (
+                e.get("anbieter"),
+                e.get("device_id"),
+                e.get("speicher_gb"),
+                e.get("zustand") or "neu",
+                _farbe(e),
+            ),
+            [],
+        ).append(e)
 
     raus, befunde = set(), []
     for (anbieter, _gid, _sp, _zu, farbe), gruppe in gruppen.items():
@@ -232,16 +244,19 @@ def _doppelpreise(eintraege: list, katalog) -> tuple[set, list]:
             continue
         lo, hi = min(preise), max(preise)
         raus.update(_schluessel(e) for e in gruppe)
-        befunde.append({
-            "art": "doppelpreis",
-            "anbieter": anbieter,
-            "geraet": _label(gruppe[0], katalog),
-            "spanne": round((hi - lo) / lo * 100, 1) if lo else 0.0,
-            "preise": sorted(preise),
-            "farben": sorted({(e.get("farbe_roh") or farbe or "?")
-                              for e in gruppe}),
-            "entfernt": True,
-        })
+        befunde.append(
+            {
+                "art": "doppelpreis",
+                "anbieter": anbieter,
+                "geraet": _label(gruppe[0], katalog),
+                "spanne": round((hi - lo) / lo * 100, 1) if lo else 0.0,
+                "preise": sorted(preise),
+                "farben": sorted(
+                    {(e.get("farbe_roh") or farbe or "?") for e in gruppe}
+                ),
+                "entfernt": True,
+            }
+        )
     return raus, befunde
 
 
@@ -258,8 +273,12 @@ def _farbspannen(eintraege: list, katalog) -> tuple[set, list]:
     gruppen: dict[tuple, dict] = {}
     beispiele: dict[tuple, dict] = {}
     for e in eintraege:
-        schluessel = (e.get("anbieter"), e.get("device_id"),
-                      e.get("speicher_gb"), e.get("zustand") or "neu")
+        schluessel = (
+            e.get("anbieter"),
+            e.get("device_id"),
+            e.get("speicher_gb"),
+            e.get("zustand") or "neu",
+        )
         # Der Beispieleintrag wird beim AUFBAU mitgefuehrt, nicht hinterher
         # gesucht. Die erste Fassung suchte ihn per `next()` ueber Anbieter
         # und Geraet - ohne Speicher und Zustand, also aus einer anderen
@@ -280,19 +299,28 @@ def _farbspannen(eintraege: list, katalog) -> tuple[set, list]:
             continue
         entfernt = spanne > FARBSPANNE_UNMOEGLICH
         if entfernt:
-            raus.update(_schluessel(e) for e in eintraege
-                        if (e.get("anbieter"), e.get("device_id"),
-                            e.get("speicher_gb"),
-                            e.get("zustand") or "neu") == schluessel)
-        befunde.append({
-            "art": "farbspanne",
-            "anbieter": schluessel[0],
-            "geraet": _label(beispiele[schluessel], katalog),
-            "spanne": round(spanne * 100, 1),
-            "preise": sorted(je_farbe.values()),
-            "farben": sorted(je_farbe),
-            "entfernt": entfernt,
-        })
+            raus.update(
+                _schluessel(e)
+                for e in eintraege
+                if (
+                    e.get("anbieter"),
+                    e.get("device_id"),
+                    e.get("speicher_gb"),
+                    e.get("zustand") or "neu",
+                )
+                == schluessel
+            )
+        befunde.append(
+            {
+                "art": "farbspanne",
+                "anbieter": schluessel[0],
+                "geraet": _label(beispiele[schluessel], katalog),
+                "spanne": round(spanne * 100, 1),
+                "preise": sorted(je_farbe.values()),
+                "farben": sorted(je_farbe),
+                "entfernt": entfernt,
+            }
+        )
     return raus, befunde
 
 
@@ -302,8 +330,7 @@ def _speicherinversionen(eintraege: list, katalog) -> tuple[set, list]:
         gb = e.get("speicher_gb")
         if not gb:
             continue
-        schluessel = (e.get("anbieter"), e.get("device_id"),
-                      e.get("zustand") or "neu")
+        schluessel = (e.get("anbieter"), e.get("device_id"), e.get("zustand") or "neu")
         je_reihe.setdefault(schluessel, {}).setdefault(int(gb), []).append(e)
 
     raus, befunde = set(), []
@@ -316,16 +343,19 @@ def _speicherinversionen(eintraege: list, katalog) -> tuple[set, list]:
                 continue
             # Beide Stufen fliegen: die Inversion sagt, dass EINE von beiden
             # falsch gelesen ist, aber nicht welche.
-            raus.update(_schluessel(e)
-                        for e in stufen[kleiner] + stufen[groesser])
-            befunde.append({
-                "art": "speicherinversion",
-                "anbieter": anbieter,
-                "geraet": _label(stufen[kleiner][0], katalog),
-                "klein_gb": kleiner, "klein_preis": teuer,
-                "gross_gb": groesser, "gross_preis": billig,
-                "entfernt": True,
-            })
+            raus.update(_schluessel(e) for e in stufen[kleiner] + stufen[groesser])
+            befunde.append(
+                {
+                    "art": "speicherinversion",
+                    "anbieter": anbieter,
+                    "geraet": _label(stufen[kleiner][0], katalog),
+                    "klein_gb": kleiner,
+                    "klein_preis": teuer,
+                    "gross_gb": groesser,
+                    "gross_preis": billig,
+                    "entfernt": True,
+                }
+            )
     return raus, befunde
 
 
@@ -333,8 +363,8 @@ def _ausreisser(eintraege: list, katalog) -> tuple[set, list]:
     gruppen: dict[tuple, list] = {}
     for e in eintraege:
         gruppen.setdefault(
-            (e.get("device_id"), e.get("speicher_gb"),
-             e.get("zustand") or "neu"), []).append(e)
+            (e.get("device_id"), e.get("speicher_gb"), e.get("zustand") or "neu"), []
+        ).append(e)
 
     raus, befunde = set(), []
     for _gruppenschluessel, gruppe in gruppen.items():
@@ -357,16 +387,18 @@ def _ausreisser(eintraege: list, katalog) -> tuple[set, list]:
             # unter dem Median liegt, ist genau das Signal, wegen dem diese
             # Seite existiert - ihn als Datenfehler zu loeschen hiesse, den
             # Befund gegen die Erwartung zu verwerfen.
-            befunde.append({
-                "art": "ausreisser",
-                "listung_id": _schluessel(e),
-                "anbieter": e.get("anbieter"),
-                "geraet": _label(e, katalog),
-                "preis": _preis(e),
-                "median": mitte,
-                "abweichung": round(abweichung * 100, 1),
-                "entfernt": False,
-            })
+            befunde.append(
+                {
+                    "art": "ausreisser",
+                    "listung_id": _schluessel(e),
+                    "anbieter": e.get("anbieter"),
+                    "geraet": _label(e, katalog),
+                    "preis": _preis(e),
+                    "median": mitte,
+                    "abweichung": round(abweichung * 100, 1),
+                    "entfernt": False,
+                }
+            )
     return raus, befunde
 
 
@@ -420,8 +452,12 @@ def pruefe(eintraege: list, katalog=None) -> dict:
     raus: set = set()
     befunde: list = []
     uebrig = kandidaten
-    for pruefung in (_zustand_veraltet, _doppelpreise, _speicherinversionen,
-                     _farbspannen):
+    for pruefung in (
+        _zustand_veraltet,
+        _doppelpreise,
+        _speicherinversionen,
+        _farbspannen,
+    ):
         weg, gefunden = pruefung(uebrig, katalog)
         raus |= weg
         befunde.extend(gefunden)
@@ -455,21 +491,27 @@ def pruefe(eintraege: list, katalog=None) -> dict:
     # Discounter 60 % unter dem Median ist das Signal, nicht der Fehler. Er
     # wird deshalb nicht geloescht, sondern an seiner Vergleichszeile
     # markiert, damit ein Mensch die Quelle aufruft und entscheidet.
-    auffaellig = {b["listung_id"]: b for b in befunde
-                  if b["art"] == "ausreisser" and b.get("listung_id")}
+    auffaellig = {
+        b["listung_id"]: b
+        for b in befunde
+        if b["art"] == "ausreisser" and b.get("listung_id")
+    }
     return {
         "sauber": sauber,
         "auffaellig": auffaellig,
-        "befunde": sorted(befunde, key=lambda b: (b["art"], b["anbieter"] or "",
-                                                  b["geraet"])),
+        "befunde": sorted(
+            befunde, key=lambda b: (b["art"], b["anbieter"] or "", b["geraet"])
+        ),
         "zahlen": {
             "geprueft": len(kandidaten),
             "aussortiert": len(raus),
-            "zustand_veraltet": sum(1 for b in befunde
-                                    if b["art"] == "zustand_veraltet"),
+            "zustand_veraltet": sum(
+                1 for b in befunde if b["art"] == "zustand_veraltet"
+            ),
             "doppelpreise": sum(1 for b in befunde if b["art"] == "doppelpreis"),
-            "speicherinversionen": sum(1 for b in befunde
-                                       if b["art"] == "speicherinversion"),
+            "speicherinversionen": sum(
+                1 for b in befunde if b["art"] == "speicherinversion"
+            ),
             "farbspannen": sum(1 for b in befunde if b["art"] == "farbspanne"),
             "ausreisser": sum(1 for b in befunde if b["art"] == "ausreisser"),
             "befunde": len(befunde),
