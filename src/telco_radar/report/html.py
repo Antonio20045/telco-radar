@@ -15,6 +15,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from bs4 import BeautifulSoup
 
 from . import anbieter_farben as _anbieter_farben
+from .ausfall import Ausfall
 from . import bilder as report_bilder
 from . import diff_bilder
 from . import differenzierung_bericht
@@ -1173,8 +1174,11 @@ def _prep_competitors(report: dict) -> list[dict]:
 
 
 # ------------------------------------------------------------------- render
-def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
+def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
+    """Rendert die ganze Website und gibt die Teile zurück, die nicht neu gebaut wurden."""
     env = _env()
+    ausfaelle: list[Ausfall] = []
+    env.globals["ausfaelle"] = ausfaelle
     site_dir.mkdir(parents=True, exist_ok=True)
     (site_dir / "reports").mkdir(exist_ok=True)
     # Ein Foliensatz je Ausgabe, neben dem Bericht. Nicht in der Navigation:
@@ -1302,6 +1306,8 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         log.error("Geraetedaten nicht aufbereitbar: %s: %s",
                   type(exc).__name__, exc)
         geraete = geraete_view_mod.leer(f"{type(exc).__name__}: {exc}")
+        ausfaelle.append(Ausfall.aus_ausnahme("Gerätedaten", exc))
+    ausfaelle.extend(geraete["ausfaelle"])
     env.globals["geraete_verlinkt"] = bool(
         geraete["bilanz"].get("schwelle_erreicht"))
 
@@ -1332,6 +1338,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         log.error("Wettbewerbs-Radar nicht aufbereitbar: %s: %s",
                   type(exc).__name__, exc)
         radar_view = _geraete_radar_mod.leer()
+        ausfaelle.append(Ausfall.aus_ausnahme("Wettbewerbs-Radar", exc))
     env.globals["radar_verlinkt"] = bool(
         radar_view["hat_vergleichbare_zeilen"])
 
@@ -1511,6 +1518,8 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         except Exception as exc:  # noqa: BLE001
             log.error("Foliensatz fuer %s nicht erzeugt: %s",
                       report["date"], exc)
+            ausfaelle.append(Ausfall.aus_ausnahme(
+                f"Foliensatz {report['date']}", exc))
         if i == 0:
             latest_ctx = ctx
             (site_dir / "index.html").write_text(
@@ -1906,8 +1915,9 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
     try:
         from ..collect.tarif_crawler import lade_quellen as _lade_tarifquellen
         tarif_quellen = _lade_tarifquellen(reports_dir.parent.parent)
-    except Exception:  # noqa: BLE001 - eine fehlende Config kippt keine Seite
+    except Exception as exc:  # noqa: BLE001 - eine fehlende Config kippt keine Seite
         tarif_quellen = []
+        ausfaelle.append(Ausfall.aus_ausnahme("Tarifquellen", exc))
     tarife = tarife_view_mod.aufbereiten(
         state_dir / "tarife.jsonl", tarif_quellen,
         heute=latest["date"] if latest else "")
@@ -1973,6 +1983,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         from . import geraete_export as _geraete_export
         geraete["export"] = _geraete_export.leer()
         radar_view["export"] = _geraete_export.leer()["radar"]
+        ausfaelle.append(Ausfall.aus_ausnahme("Geräte-Export", exc))
     else:
         # Der Radar nennt Zeilenzahl und Groesse SEINER Datei an seinem
         # eigenen zentralen Ort (Kopfzeile) - dieselbe Zahl, die in der
@@ -2139,3 +2150,6 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> None:
         (site_dir / alt).write_text(_redirect_html(ziel), encoding="utf-8")
 
     log.info("Site rendered: %d report(s) -> %s", len(reports), site_dir)
+    for ausfall in ausfaelle:
+        log.error("Nicht neu gebaut: %s (%s)", ausfall.teil, ausfall.grund)
+    return ausfaelle

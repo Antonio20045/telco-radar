@@ -318,7 +318,7 @@ def test_pipeline_behaelt_redaktion_bei_leerer_quellenliste(leeres_projekt):
     (reports_dir / f"{stand}.json").write_text(
         json.dumps(_bericht(stand)), encoding="utf-8")
 
-    report_path = pipeline.run(leeres_projekt, use_llm=True, lookback_days=8)
+    report_path, _ = pipeline.run(leeres_projekt, use_llm=True, lookback_days=8)
 
     daten = json.loads(report_path.with_suffix(".json").read_text(
         encoding="utf-8"))

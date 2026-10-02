@@ -87,7 +87,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version-file: .python-version
           cache: pip
 
       - name: Install dependencies
@@ -151,6 +151,7 @@ jobs:
           if [ -n "$ANTHROPIC_API_KEY" ]; then echo "ANTHROPIC_API_KEY fallback is present"; else echo "ANTHROPIC_API_KEY fallback is missing"; fi
 
       - name: Run pipeline
+        id: pipeline
         if: ${{ github.event.inputs.sources_only != 'true' && github.event.inputs.inspect_sources == '' }}
         env:
           # If MOONSHOT_API_KEY is set, the pipeline uses Moonshot/Kimi
@@ -173,9 +174,12 @@ jobs:
           PYTHONPATH: src
         run: |
           set -o pipefail
+          rc=0
           python -m telco_radar.pipeline --root . \
             --lookback-days "${{ github.event.inputs.lookback_days || 8 }}" \
-            2>&1 | tee pipeline.log
+            2>&1 | tee pipeline.log || rc=$?
+          if [ "$rc" -eq 3 ]; then echo "render_ausfall=true" >> "$GITHUB_OUTPUT"; fi
+          exit "$rc"
 
       - name: Expose pipeline failure details
         # cancelled() matters: a job killed by timeout-minutes is "cancelled",
@@ -207,7 +211,8 @@ jobs:
           if-no-files-found: warn
 
       - name: Commit state, report and site
-        if: ${{ github.event.inputs.sources_only != 'true' && github.event.inputs.inspect_sources == '' }}
+        id: commit
+        if: ${{ !cancelled() && (success() || steps.pipeline.outputs.render_ausfall == 'true') && github.event.inputs.sources_only != 'true' && github.event.inputs.inspect_sources == '' }}
         run: |
           git config user.name "telco-radar-bot"
           git config user.email "actions@users.noreply.github.com"
@@ -235,28 +240,10 @@ jobs:
           fi
 
       - name: Trigger Render deploy
-        if: ${{ success() && github.event.inputs.sources_only != 'true' && github.event.inputs.inspect_sources == '' }}
-        continue-on-error: true   # a transient Render hiccup must not red-fail the run
+        if: ${{ !cancelled() && steps.commit.outcome == 'success' && github.event.inputs.sources_only != 'true' && github.event.inputs.inspect_sources == '' }}
         env:
           HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
-        run: |
-          if [ -z "$HOOK" ]; then
-            echo "RENDER_DEPLOY_HOOK not set - skipping"; exit 0
-          fi
-          sleep 15  # let the git push propagate before Render clones
-          for attempt in 1 2 3 4 5; do
-            code=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$HOOK")
-            # 202 = "Accepted": Render hat den Deploy angenommen und faehrt
-            # ihn asynchron. Ohne diesen Fall lief die Schleife fuenfmal
-            # durch und stiess dabei fuenf Deploys an - fuer einen Hook, der
-            # beim ersten Mal richtig geantwortet hatte.
-            if [ "$code" = "200" ] || [ "$code" = "201" ] || [ "$code" = "202" ]; then
-              echo "Render deploy triggered (HTTP $code)"; exit 0
-            fi
-            echo "Render hook returned HTTP $code (attempt $attempt/5) - retrying in 30s"
-            sleep 30
-          done
-          echo "Render hook still failing - latest commit is pushed; Render will pick it up on its next deploy"
+        run: scripts/render_deploy.sh index.html
 
       - name: Newsletter anstossen
         # NACH dem Deploy und ausdruecklich `continue-on-error`. Der Bericht

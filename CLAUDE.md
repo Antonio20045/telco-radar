@@ -18,7 +18,7 @@ Telco Radar ist ein automatisches Competitive-Intelligence-System für Vodafone-
 - Repo: https://github.com/Antonio20045/telco-radar (öffentlich).
 - `radar.yml` läuft Mi und Fr 11:00 UTC sowie manuell, committet `data/` und `site/` und löst den Render-Deploy-Hook aus.
 - `geraete.yml` läuft täglich 02:17 UTC und pflegt den Gerätestand.
-- `ci.yml` führt bei jedem Push auf `main` und bei Pull Requests `pytest -q` aus.
+- `ci.yml` läuft nur von Hand (`workflow_dispatch`); lokal `make venv`, Python aus `.python-version`.
 - Ein Push auf `main` ist kein Deploy; erst Bot-Commit plus Render-Hook bringen einen neuen Live-Stand.
 - Den Live-Stand bestätigt nur das ausgelieferte HTML (`curl -L -sS …/index.html`), nicht ein grüner Actions-Status.
 - GitHub Pages bleibt aus.
@@ -108,7 +108,7 @@ from telco_radar.report.html import render_site; render_site(Path('/tmp/site'), 
 
 **Betrieb und Deploy**
 - Ein Push mit dem `GITHUB_TOKEN` aus einem Workflow startet keine weiteren Workflows. Jeder Workflow, der `site/` committet, ruft den Render-Hook selbst auf (wie `radar.yml` und `geraete.yml`).
-- Render klont sofort; zwischen `git push` und Hook-Aufruf 15 s warten. Nach einem Push den Ausgang von `deploy.yml` prüfen, Gegenprobe ist `md5sum` der Live-Seite gegen `site/index.html`.
+- Den Hook ruft nur `scripts/render_deploy.sh` (15 s Vorlauf, prüft das Tagesdatum live); Exit-Codes und Ablauf in `docs/betrieb.md`.
 - Ein Job-Timeout erscheint in GitHub als „cancelled“, nicht als „failed“. Nebenstufen vor `render_site()` können so den ganzen Bericht kosten; lange Zweige bekommen eigene Jobs, und der Bestand wird vor dem Rendern committet.
 - Laufzeit wird aus `run.phases` im Berichts-JSON beurteilt, nicht aus Faustzahlen. Das Pipeline-Log wird auch bei Erfolg als Artefakt abgelegt.
 - In der Cloud-Sandbox erreicht Chromium das Netz nicht und Google Fonts laden nicht: `newsroom_js`-Quellen melden dort FAIL, gemessene Breiten gelten nur für die Rückfallschrift. Layout-Tests prüfen deshalb Eigenschaften (kein Überlauf bei verbreitertem Text), keine Pixelbreiten.

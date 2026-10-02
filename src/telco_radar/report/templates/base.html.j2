@@ -126,6 +126,7 @@
   </header>
   <main>
     <div class="{{ wrap_class | default('wrap') }}">
+      {% if ausfaelle %}<p class="ausfall-hinweis" id="ausfaelle">Nicht neu gebaut: {% for a in ausfaelle %}{{ a.teil }} ({{ a.grund | truncate(160) }}){% if not loop.last %} · {% endif %}{% endfor %}</p>{% endif %}
       {% block content %}{% endblock %}
     </div>
   </main>

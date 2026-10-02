@@ -598,8 +598,8 @@ def test_die_bilanz_steht_im_bericht_json(vorsortier_projekt, fake_http, monkeyp
 
     monkeypatch.setattr(llm, "_dispatch", fake_dispatch)
     monkeypatch.setenv("ANTHROPIC_API_KEY", "test")
-    bericht = pipeline.run(vorsortier_projekt, use_llm=True,
-                           lookback_days=FIXTURE_LOOKBACK)
+    bericht, _ = pipeline.run(vorsortier_projekt, use_llm=True,
+                              lookback_days=FIXTURE_LOOKBACK)
 
     daten = json.loads(bericht.with_suffix(".json").read_text(encoding="utf-8"))
     bilanz = daten["run"]["vorsortierung"]

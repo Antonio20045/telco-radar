@@ -146,13 +146,17 @@ def test_seitenaufbau_und_seitencommit_schlucken_keinen_fehler():
         assert _schritt(name).get("continue-on-error") in (None, False), name
 
 
-def test_der_render_hook_darf_weiter_scheitern():
-    """Die Gegenprobe, damit der Test oben nicht einfach "nirgendwo
-    continue-on-error" behauptet: der Hook-Aufruf ist die EINE Stelle, an
-    der ein Fehlschlag folgenlos bleiben soll - Render zieht sich den
-    Stand beim naechsten Deploy ohnehin.
-    """
-    assert _schritt("Trigger Render deploy").get("continue-on-error") is True
+def test_der_render_hook_schluckt_keinen_fehler_und_prueft_die_live_seite():
+    """Paket 2: der Hook ist rot, wenn die Live-Seite das heutige Datum nicht
+    zeigt (scripts/render_deploy.sh), und laeuft nur nach gebauter Seite."""
+    hook = _schritt("Trigger Render deploy")
+    assert hook.get("continue-on-error") in (None, False)
+    assert "steps.commit_site.outcome == 'success'" in hook["if"]
+    assert "render_deploy.sh geraete.html" in hook["run"]
+    skript = (Path(__file__).resolve().parents[1] / "scripts"
+              / "render_deploy.sh").read_text(encoding="utf-8")
+    assert "for versuch in 1 2 3" in skript and "date -u +%Y-%m-%d" in skript
+    assert skript.rstrip().splitlines()[-1].endswith("exit 1")
 
 
 def test_der_neuaufbau_im_wiederholungsweg_bricht_laut_ab():

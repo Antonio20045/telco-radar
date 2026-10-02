@@ -53,6 +53,7 @@ from ..analyze.tco_store import TcoDB
 # beides nicht ab, er liest es.
 from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
 from ..tarif_bezug import Tarifbestand
+from .ausfall import Ausfall
 from ..analyze.geraete_store import (
     GELESEN,
     GeraeteDB,
@@ -82,6 +83,7 @@ _SICHTBAR = (STATUS_AKTIV, STATUS_VERMUTLICH)
 # Bericht erscheint zweimal woechentlich, und ein ausgefallener naechtlicher
 # Lauf darf eine echte Bewegung nicht verschlucken.
 FENSTER_TAGE = 14
+ZEITREIHE_TEIL = "Zeitreihe der Geräteseite"
 
 # Ab wann "neu im Regal" eine Marktbewegung meint und nicht die eigene
 # Messdauer (30.08.2026).
@@ -1825,6 +1827,7 @@ def leer(fehler: str = "") -> dict:
         "verlauf": geraete_verlauf.leer(),
         "tco": geraete_tco_view.leer(),
         "zeitreihe": geraete_zeitreihe.leer(),
+        "ausfaelle": [],
         "katalog_modelle": [],
         # P4-Fix (Sicht-Pruefung 18.09.): die Katalog-Leitzahl auch im
         # Notzustand - der Schluesselmengen-Test haelt Normal- und Not-
@@ -2153,6 +2156,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         # A3: der Bezugstag schaltet die Alterung ein - ohne ihn altert
         # nichts (`geraete_tco_karten.ist_frisch`).
         heute=tco_heute)
+    ausfaelle: list[Ausfall] = []
     try:
         # A1: derselbe Tarifbestand wie die Tafel - die Punkte der Historie
         # rechnet die Zeitreihe mit der HEUTIGEN Leitzahl, phasengewichtet
@@ -2164,6 +2168,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         log.error("Zeitreihen-Aufbereitung gescheitert: %s: %s",
                   type(exc).__name__, exc)
         zeitreihe = geraete_zeitreihe.leer()
+        ausfaelle.append(Ausfall.aus_ausnahme(ZEITREIHE_TEIL, exc))
 
     # P4 Schritt 2c (18.09.2026): die WAHL-Menge der Zeitreihe (Modell ->
     # nicht-leere Bänder-Liste), gelesen aus DEMSELBEN Knoten, aus dem
@@ -2217,6 +2222,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     return {
         "tco": tco,
         "zeitreihe": zeitreihe,
+        "ausfaelle": ausfaelle,
         # Der Verlauf rechnet auf `belastbar`, nicht auf `sichtbar`: ein
         # falsch gespeicherter Gebrauchtpreis in derselben Kurve ist ein
         # zweites Produkt in einer Linie, und der Sprung dazwischen saehe

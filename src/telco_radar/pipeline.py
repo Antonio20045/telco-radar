@@ -42,6 +42,7 @@ from .report import bilder as report_bilder
 from .report import diff_bilder
 from .report import differenzierung_view
 from .report import geraete_bewegung
+from .report.ausfall import Ausfall
 from .report.html import render_site
 
 log = logging.getLogger("telco_radar")
@@ -515,8 +516,10 @@ def _interleave_by_source(items: list[Item]) -> list[Item]:
 
 
 def run(root: Path, use_llm: bool | None = None,
-        lookback_days: int | None = None) -> Path:
-    """Execute one full radar run. Returns the path of the written report."""
+        lookback_days: int | None = None) -> tuple[Path, list[Ausfall]]:
+    """Execute one full radar run.
+
+    Returns the report path and the parts of the site that were not rebuilt."""
     t0 = time.monotonic()
     started_at = datetime.now(timezone.utc)
     cfg = load_config(root)
@@ -1482,7 +1485,7 @@ def run(root: Path, use_llm: bool | None = None,
         report_bilder.raeume_auf(root, reports_dir)
     except Exception as exc:  # noqa: BLE001
         log.error("Bilder-Aufraeumen fehlgeschlagen: %s", exc)
-    render_site(root / "site", reports_dir, cfg)
+    ausfaelle = render_site(root / "site", reports_dir, cfg)
 
     # ------------------------------------------------------------- Versand
     # Ganz zuletzt und failsafe: eine Mail, die nicht hinausgeht, ist
@@ -1499,7 +1502,7 @@ def run(root: Path, use_llm: bool | None = None,
     except Exception as exc:  # noqa: BLE001
         log.error("Versand uebersprungen: %s", exc)
 
-    return report_path
+    return report_path, ausfaelle
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -1520,13 +1523,16 @@ def main(argv: list[str] | None = None) -> int:
     logging.getLogger("httpx").setLevel(logging.WARNING)
 
     try:
-        run(args.root.resolve(),
-            use_llm=False if args.no_llm else None,
-            lookback_days=args.lookback_days)
+        _, ausfaelle = run(args.root.resolve(),
+                           use_llm=False if args.no_llm else None,
+                           lookback_days=args.lookback_days)
     except Exception:  # noqa: BLE001
         log.exception("Pipeline failed")
         return 1
-    return 0
+    for ausfall in ausfaelle:
+        log.error("Seite nicht vollständig neu gebaut: %s (%s)",
+                  ausfall.teil, ausfall.grund)
+    return 3 if ausfaelle else 0
 
 
 if __name__ == "__main__":
