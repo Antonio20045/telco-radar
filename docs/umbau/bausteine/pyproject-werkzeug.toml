@@ -1,0 +1,47 @@
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src", "tests", "scripts"]
+extend-exclude = ["site", "data", "_to_delete", "mail_repo"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "SIM", "C90", "I", "UP", "DTZ", "BLE", "S110", "S112", "PGH", "TID251", "D1"]
+ignore = ["D105", "D107"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 12
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+"httpx".msg = "Quellen nur ueber telco_radar.collect.http abrufen, siehe CLAUDE.md, Abschnitt Schichten"
+"requests".msg = "Quellen nur ueber telco_radar.collect.http abrufen, siehe CLAUDE.md, Abschnitt Schichten"
+"urllib.request".msg = "Quellen nur ueber telco_radar.collect.http abrufen, siehe CLAUDE.md, Abschnitt Schichten"
+
+[tool.ruff.lint.per-file-ignores]
+"src/telco_radar/collect/http.py" = ["TID251"]
+"src/telco_radar/analyze/llm.py" = ["TID251"]
+"src/telco_radar/newsletter/transport.py" = ["TID251"]
+"src/telco_radar/versand.py" = ["TID251"]
+"tests/**" = ["D1", "TID251"]
+"scripts/**" = ["D1"]
+
+[tool.mypy]
+python_version = "3.11"
+mypy_path = "src"
+packages = ["telco_radar"]
+check_untyped_defs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+no_implicit_optional = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+addopts = "-q --strict-markers --disable-socket --allow-hosts=127.0.0.1 -n auto --dist worksteal -m 'not netz'"
+markers = [
+  "seite: rendert HTML aus einem Schnappschuss",
+  "browser: braucht Chromium",
+  "langsam: laenger als 5 s, nur im pre-push",
+  "golden: goldener Lauf, nur im pre-push",
+  "netz: echter Abruf, laeuft nie automatisch",
+]

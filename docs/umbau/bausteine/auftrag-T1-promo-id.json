@@ -1,0 +1,20 @@
+{
+  "id": "T1",
+  "art": "verhalten",
+  "ziel": "Ein umformuliertes Angebot derselben Marke auf derselben Aktionsseite behaelt seine ID und ist nie zugleich aktiv und ausgelaufen",
+  "bereich": "src/telco_radar/analyze/",
+  "erwarteteDateien": ["src/telco_radar/analyze/promo_store.py"],
+  "vorbild": "src/telco_radar/analyze/clustering.py",
+  "seite": ["promo/index.html"],
+  "datenquelle": {"dateien": ["data/state/promo_db.json"], "botCommit": "7ee3f59", "schnappschuss": "tests/fixtures/bestand/2026-09-30/"},
+  "abnahme": "tests/test_promo_identitaet.py",
+  "erwarteterFehler": "lidl connect: erwartet 1 Eintrag, erhalten 2 (aktiv und ausgelaufen)",
+  "abhaengigVon": [],
+  "migration": "PromoDB liest Eintraege mit alter ID und bildet sie beim Laden auf die neue ID ab; bei zwei alten Eintraegen mit derselben neuen ID gewinnt der juengere last_verified, der aeltere bleibt als Verlauf erhalten",
+  "wasDarfNiePassieren": {
+    "wiederholung": "ein zweiter Lauf mit denselben Seiten erzeugt keinen neuen Eintrag und aendert keinen Status",
+    "gleichzeitig": "zwei Angebote derselben Marke auf derselben Seite bleiben zwei Eintraege",
+    "zeitueberschreitung": "eine nicht gelesene Seite altert keinen ihrer Eintraege (CLAUDE.md Clean Code 6)",
+    "abbruch": "bricht der Lauf nach dem Lesen und vor dem Speichern ab, ist promo_db.json unveraendert"
+  }
+}

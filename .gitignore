@@ -17,6 +17,9 @@ tmp_nachpruef/
 # INNERHALB des Repos ab (.claude/worktrees/<lauf-id>/), und jeder ist ein
 # vollstaendiger zweiter Checkout - ein `git add` darauf naehme das ganze
 # Repo doppelt mit, inklusive site/ und data/state/ (harte Regeln 2/3).
-# CLAUDE.md Regel 17 loescht diese Zweige nach dem Uebernehmen der
-# Aenderungen; sie sind Wegwerfstaende und gehoeren nie in einen Commit.
+# Sie sind Wegwerfstaende und gehoeren nie in einen Commit.
 .claude/worktrees/
+
+# Abgelegter Ballast; der Ordner wurde im Umbau-Paket 1 geloescht und darf
+# nicht wieder eingecheckt werden.
+_to_delete/
