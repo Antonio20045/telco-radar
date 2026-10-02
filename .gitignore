@@ -27,3 +27,10 @@ _to_delete/
 .mypy_cache/
 .ruff_cache/
 .import_linter_cache/
+mutants/
+.mutmut-cache
+.claude/settings.local.json
+.hypothesis/
+.coverage
+.coverage.*
+htmlcov/
