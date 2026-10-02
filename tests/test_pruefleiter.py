@@ -2,6 +2,7 @@ import importlib.util
 import json
 import subprocess
 import sys
+import time
 from collections import Counter
 from pathlib import Path
 
@@ -111,7 +112,22 @@ def test_ruff_json_wird_relativ_zur_wurzel():
 _KOPF = "==== short test summary info ====\n"
 
 
-def _lauf_mit(monkeypatch, returncode, stdout, stderr=""):
+@pytest.fixture(autouse=True)
+def _untergrenze(tmp_path, monkeypatch):
+    pfad = tmp_path / "tests-anzahl.txt"
+    pfad.write_text("2\n", encoding="utf-8")
+    monkeypatch.setattr(pruefleiter, "TESTS_ANZAHL", pfad)
+    obergrenze = tmp_path / "tests-uebersprungen.txt"
+    obergrenze.write_text("1\n", encoding="utf-8")
+    monkeypatch.setattr(pruefleiter, "TESTS_UEBERSPRUNGEN", obergrenze)
+    return pfad
+
+
+def _lauf_mit(monkeypatch, returncode, stdout, stderr="", gesammelt=2, uebersprungen=1):
+    if gesammelt is not None:
+        stdout = f"created: 4/4 workers\n4 workers [{gesammelt} items]\n" + stdout
+        stdout += f"==== 1 passed, {uebersprungen} skipped in 0.12s ====\n"
+
     def falscher_lauf(log, befehl):
         return subprocess.CompletedProcess(befehl, returncode, stdout, stderr)
 
@@ -225,7 +241,7 @@ def test_ohne_liste_der_bekannt_roten_ist_jeder_rote_test_rot(tmp_path, monkeypa
     ],
 )
 def test_abbruch_eines_werkzeugs_ist_rot(monkeypatch, stufe, code, stdout, erste_zeile):
-    _lauf_mit(monkeypatch, code, stdout, "kaputte Konfiguration\n")
+    _lauf_mit(monkeypatch, code, stdout, "kaputte Konfiguration\n", gesammelt=None)
     ergebnis = getattr(pruefleiter, stufe)(None)
     assert not ergebnis.gruen
     assert ergebnis.zeilen[0] == erste_zeile
@@ -257,3 +273,248 @@ def test_main_endet_rot_mit_log_und_zeiten(tmp_path, monkeypatch, capsys):
     assert "a.py:1 [F401] neu" in (tmp_path / "letzter-lauf.log").read_text("utf-8")
     assert (tmp_path / "zeiten.csv").read_text("utf-8").endswith(",1 Lint,0.0,rot\n")
     assert capsys.readouterr().out.startswith("Prüfleiter rot in Stufe 1 Lint")
+
+
+def test_weniger_gesammelte_tests_als_die_untergrenze_sind_rot(
+    tmp_path, monkeypatch, _untergrenze
+):
+    _bekannt(tmp_path, monkeypatch)
+    _lauf_mit(monkeypatch, 0, _KOPF + "PASSED tests/a.py::t\n", gesammelt=1)
+    ergebnis = pruefleiter.stufe_tests(None)
+    assert not ergebnis.gruen
+    assert ergebnis.zeilen[0].startswith("1 Tests gesammelt, erwartet mindestens 2")
+    assert _untergrenze.read_text(encoding="utf-8") == "2\n"
+
+
+def test_mehr_gesammelte_tests_heben_die_untergrenze(
+    tmp_path, monkeypatch, _untergrenze
+):
+    _bekannt(tmp_path, monkeypatch)
+    _lauf_mit(monkeypatch, 0, _KOPF + "PASSED tests/a.py::t\n", gesammelt=5)
+    ergebnis = pruefleiter.stufe_tests(None)
+    assert ergebnis.gruen
+    assert ergebnis.angehoben == [str(_untergrenze)]
+    assert _untergrenze.read_text(encoding="utf-8") == "5\n"
+    assert "angehoben" in pruefleiter.zusammenfassung([ergebnis])[0]
+
+
+def test_rote_stufe_hebt_die_untergrenze_nicht(tmp_path, monkeypatch, _untergrenze):
+    _bekannt(tmp_path, monkeypatch)
+    _lauf_mit(monkeypatch, 1, _KOPF + "FAILED tests/a.py::t - x\n", gesammelt=5)
+    assert not pruefleiter.stufe_tests(None).gruen
+    assert _untergrenze.read_text(encoding="utf-8") == "2\n"
+
+
+def test_unlesbare_testzahl_ist_rot(tmp_path, monkeypatch):
+    _bekannt(tmp_path, monkeypatch)
+    _lauf_mit(monkeypatch, 0, _KOPF + "PASSED tests/a.py::t\n", gesammelt=None)
+    ergebnis = pruefleiter.stufe_tests(None)
+    assert not ergebnis.gruen
+    assert ergebnis.zeilen == ["Zahl der gesammelten Tests nicht lesbar"]
+
+
+@pytest.mark.parametrize(
+    ("ausgabe", "anzahl"),
+    [
+        ("created: 1/1 worker\n1 worker [1 item]\n", 1),
+        ("collected 3 items / 1 deselected / 2 selected\n", 2),
+        ("collected 7 items\n", 7),
+        ("bringing up nodes...\n", None),
+    ],
+)
+def test_gesammelte_tests_aus_der_kopfzeile(ausgabe, anzahl):
+    assert pruefleiter.gesammelte_tests(ausgabe) == anzahl
+
+
+def test_werkzeuge_sehen_keine_steuernde_umgebung(tmp_path, monkeypatch):
+    for name, wert in [
+        ("PYTEST_ADDOPTS", "-k irgendwas"),
+        ("PYTEST_PLUGINS", "fremd"),
+        ("PYTEST_DISABLE_PLUGIN_AUTOLOAD", "1"),
+        ("RUFF_OUTPUT_FORMAT", "concise"),
+        ("MYPYPATH", "/fremd"),
+        ("PYTHONPATH", "/fremd"),
+        ("PY_COLORS", "1"),
+    ]:
+        monkeypatch.setenv(name, wert)
+    monkeypatch.setenv("HOME_BLEIBT", "ja")
+    befehl = [
+        sys.executable,
+        "-c",
+        "import json, os; print(json.dumps(dict(os.environ)))",
+    ]
+    with (tmp_path / "log").open("w") as log:
+        lauf = pruefleiter._lauf(log, befehl)
+    gesehen = json.loads(lauf.stdout)
+    assert not [n for n in gesehen if n.startswith(("PYTEST_", "RUFF_", "MYPY", "PY_"))]
+    assert gesehen["PYTHONPATH"] == str(pruefleiter.WURZEL / "src")
+    assert gesehen["HOME_BLEIBT"] == "ja"
+
+
+def test_ueberschrittene_stufenfrist_bricht_den_lauf_rot_ab(tmp_path, monkeypatch):
+    monkeypatch.setattr(pruefleiter, "STUFE_FRIST_SEKUNDEN", 1)
+    befehl = [
+        sys.executable,
+        "-c",
+        "import time; print('los', flush=True); time.sleep(60)",
+    ]
+    start = time.monotonic()
+    with (tmp_path / "log").open("w") as log:
+        lauf = pruefleiter._lauf(log, befehl)
+    assert time.monotonic() - start < 30
+    assert lauf.returncode not in (0, 1)
+    assert lauf.stdout == "los\n"
+    assert lauf.stderr.endswith("abgebrochen nach 1 s\n")
+
+
+@pytest.fixture()
+def kleines_projekt(tmp_path, monkeypatch):
+    """Ein Projekt mit zwei grünen und einem roten Test; die Leiter läuft echt darin."""
+    wurzel = tmp_path / "projekt"
+    (wurzel / "tests").mkdir(parents=True)
+    (wurzel / "pytest.ini").write_text("[pytest]\ntestpaths = tests\n", "utf-8")
+    (wurzel / "tests" / "test_gruen.py").write_text(
+        "def test_eins():\n    pass\n\n\ndef test_zwei():\n    pass\n", "utf-8"
+    )
+    (wurzel / "tests" / "test_rot.py").write_text(
+        "def test_kaputt():\n    assert 1 == 2\n", "utf-8"
+    )
+    pruef = tmp_path / "pruef"
+    pruef.mkdir()
+    (pruef / "rot-bekannt.txt").write_text("", "utf-8")
+    (pruef / "tests-anzahl.txt").write_text("3\n", "utf-8")
+    (pruef / "tests-uebersprungen.txt").write_text("0\n", "utf-8")
+    monkeypatch.setattr(pruefleiter, "WURZEL", wurzel)
+    monkeypatch.setattr(pruefleiter, "ROT_BEKANNT", pruef / "rot-bekannt.txt")
+    monkeypatch.setattr(pruefleiter, "TESTS_ANZAHL", pruef / "tests-anzahl.txt")
+    monkeypatch.setattr(
+        pruefleiter, "TESTS_UEBERSPRUNGEN", pruef / "tests-uebersprungen.txt"
+    )
+    return wurzel
+
+
+def test_testauswahl_ueber_die_umgebung_versteckt_keinen_roten_test(
+    kleines_projekt, monkeypatch, tmp_path
+):
+    monkeypatch.setenv("PYTEST_ADDOPTS", "-k 'eins or zwei'")
+    with (tmp_path / "log").open("w") as log:
+        ergebnis = pruefleiter.stufe_tests(log)
+    assert not ergebnis.gruen
+    assert [z.split(" - ")[0] for z in ergebnis.zeilen] == [
+        "FAILED tests/test_rot.py::test_kaputt"
+    ]
+
+
+def test_geloeschter_test_macht_die_teststufe_rot(kleines_projekt, tmp_path):
+    (kleines_projekt / "tests" / "test_rot.py").unlink()
+    (tmp_path / "pruef" / "tests-anzahl.txt").write_text("3\n", "utf-8")
+    with (tmp_path / "log").open("w") as log:
+        ergebnis = pruefleiter.stufe_tests(log)
+    assert not ergebnis.gruen
+    assert ergebnis.zeilen[0].startswith("2 Tests gesammelt, erwartet mindestens 3")
+    # Gegenprobe: mit beiden grünen Tests als Untergrenze ist dieselbe Suite grün.
+    (tmp_path / "pruef" / "tests-anzahl.txt").write_text("2\n", "utf-8")
+    with (tmp_path / "log").open("a") as log:
+        assert pruefleiter.stufe_tests(log).gruen
+
+
+def test_haengender_test_wird_rot_statt_die_leiter_anzuhalten(
+    kleines_projekt, monkeypatch, tmp_path
+):
+    (kleines_projekt / "tests" / "test_rot.py").write_text(
+        "import time\n\n\ndef test_haengt():\n    time.sleep(60)\n", "utf-8"
+    )
+    monkeypatch.setattr(pruefleiter, "TEST_FRIST_SEKUNDEN", 2)
+    start = time.monotonic()
+    with (tmp_path / "log").open("w") as log:
+        ergebnis = pruefleiter.stufe_tests(log)
+    assert time.monotonic() - start < 50
+    assert not ergebnis.gruen
+    assert ergebnis.zeilen[0].startswith("FAILED tests/test_rot.py::test_haengt")
+
+
+def _obergrenze():
+    return pruefleiter.TESTS_UEBERSPRUNGEN.read_text(encoding="utf-8")
+
+
+def test_mehr_uebersprungene_tests_als_die_obergrenze_sind_rot(tmp_path, monkeypatch):
+    _bekannt(tmp_path, monkeypatch)
+    _lauf_mit(monkeypatch, 0, _KOPF + "PASSED tests/a.py::t\n", uebersprungen=2)
+    ergebnis = pruefleiter.stufe_tests(None)
+    assert not ergebnis.gruen
+    assert ergebnis.zeilen[0].startswith("2 Tests übersprungen oder xfail")
+    assert _obergrenze() == "1\n"
+
+
+def test_weniger_uebersprungene_tests_senken_die_obergrenze(tmp_path, monkeypatch):
+    _bekannt(tmp_path, monkeypatch)
+    _lauf_mit(monkeypatch, 0, _KOPF + "PASSED tests/a.py::t\n", uebersprungen=0)
+    ergebnis = pruefleiter.stufe_tests(None)
+    assert ergebnis.gruen
+    assert ergebnis.gesenkt == [str(pruefleiter.TESTS_UEBERSPRUNGEN)]
+    assert _obergrenze() == "0\n"
+
+
+@pytest.mark.parametrize(
+    ("ausgabe", "anzahl"),
+    [
+        (
+            "== 20 failed, 4024 passed, 6 skipped, 11 warnings in 238.18s (0:03:58) ==",
+            6,
+        ),
+        ("=== 1 passed, 2 skipped, 3 xfailed, 1 xpassed in 0.33s ===", 5),
+        ("==== 3 passed in 0.12s ====", 0),
+        ("3 passed, 9 skipped\n", None),
+    ],
+)
+def test_nicht_ausgefuehrte_tests_aus_der_schlusszeile(ausgabe, anzahl):
+    assert pruefleiter.nicht_ausgefuehrte_tests(ausgabe) == anzahl
+
+
+def test_stufenfrist_beendet_auch_kindprozesse(tmp_path, monkeypatch):
+    monkeypatch.setattr(pruefleiter, "STUFE_FRIST_SEKUNDEN", 1)
+    pid_datei = tmp_path / "kind.pid"
+    eltern = (
+        "import subprocess, sys, time\n"
+        "schlaf = 'import time; time.sleep(60)'\n"
+        "kind = subprocess.Popen([sys.executable, '-c', schlaf])\n"
+        f"open({str(pid_datei)!r}, 'w').write(str(kind.pid))\n"
+        "time.sleep(60)\n"
+    )
+    start = time.monotonic()
+    with (tmp_path / "log").open("w") as log:
+        lauf = pruefleiter._lauf(log, [sys.executable, "-c", eltern])
+    assert time.monotonic() - start < 30
+    assert lauf.returncode not in (0, 1)
+    kind = int(pid_datei.read_text())
+    for _ in range(50):
+        if not Path(f"/proc/{kind}").exists() or "Z" in _zustand(kind):
+            break
+        time.sleep(0.1)
+    else:
+        pytest.fail(f"Kindprozess {kind} lebt nach dem Abbruch weiter")
+
+
+def _zustand(pid):
+    try:
+        return Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()[0]
+    except FileNotFoundError:
+        return "Z"
+
+
+def test_uebersprungene_tests_aus_einer_conftest_machen_die_stufe_rot(
+    kleines_projekt, tmp_path
+):
+    (kleines_projekt / "tests" / "test_rot.py").unlink()
+    (tmp_path / "pruef" / "tests-anzahl.txt").write_text("2\n", "utf-8")
+    (kleines_projekt / "tests" / "conftest.py").write_text(
+        "import pytest\n\n\n"
+        "def pytest_collection_modifyitems(items):\n"
+        "    for item in items:\n"
+        "        item.add_marker(pytest.mark.skip)\n",
+        "utf-8",
+    )
+    with (tmp_path / "log").open("w") as log:
+        ergebnis = pruefleiter.stufe_tests(log)
+    assert not ergebnis.gruen
+    assert ergebnis.zeilen[0].startswith("2 Tests übersprungen oder xfail")

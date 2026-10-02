@@ -2,19 +2,25 @@
 
 Aufruf: ``python scripts/pruefleiter.py --voll``. Grün ist eine Zeile, Rot höchstens 60;
 das volle Protokoll steht in ``.pruefleiter/letzter-lauf.log``. Bestandsbefunde stehen
-unter ``pruef/``; die Leiter senkt diese Basen selbst und erhöht sie nie.
+unter ``pruef/``; die Leiter senkt diese Basen selbst und erhöht sie nie. Die Zahl der
+gesammelten Tests ist eine Untergrenze, die nur steigt; die Zahl der übersprungenen
+und ``xfail``-Tests eine Obergrenze, die nur sinkt. Variablen der Umgebung, die
+Auswahl, Strenge oder Ausgabe der Werkzeuge ändern, erreichen die Werkzeuge nicht.
 """
 
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
+import re
+import signal
 import subprocess
 import sys
 import time
 from collections import Counter
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TextIO
@@ -24,9 +30,36 @@ BIN = Path(sys.executable).parent
 RUFF_BASIS = WURZEL / "pruef" / "ruff-basis.json"
 MYPY_BASIS = WURZEL / "pruef" / "mypy-basis.txt"
 ROT_BEKANNT = WURZEL / "pruef" / "rot-bekannt.txt"
+TESTS_ANZAHL = WURZEL / "pruef" / "tests-anzahl.txt"
+TESTS_UEBERSPRUNGEN = WURZEL / "pruef" / "tests-uebersprungen.txt"
 LAUF_ORDNER = WURZEL / ".pruefleiter"
 MAX_ROT_ZEILEN = 60
 _MYPY_FEHLER = ": error: "
+TEST_FRIST_SEKUNDEN = 300
+STUFE_FRIST_SEKUNDEN = 1800
+NACHLAUF_SEKUNDEN = 10
+# Präfixe der Variablen, die pytest, ruff, mypy oder Python selbst lesen und mit denen
+# sich Tests abwählen, Regeln lockern oder die Ausgabe für die Auswertung verbiegen
+# ließe (PYTEST_ADDOPTS, PYTEST_PLUGINS, RUFF_*, MYPYPATH, PYTHON*, Farben).
+_FREMDE_UMGEBUNG = (
+    "PYTEST_",
+    "PYTHON",
+    "RUFF_",
+    "MYPY",
+    "PY_COLORS",
+    "PY_IGNORE",
+    "FORCE_COLOR",
+    "NO_COLOR",
+    "CLICOLOR",
+)
+_GESAMMELT = re.compile(
+    r"^\d+ workers? \[(\d+) items?\]$"
+    r"|^collected \d+ items?(?: / \d+ deselected)? / (\d+) selected"
+    r"|^collected (\d+) items?$",
+    re.MULTILINE,
+)
+_SCHLUSSZEILE = re.compile(r"^=+ (.+) in [\d.]+s(?: \([\d:]+\))? =+$", re.MULTILINE)
+_NICHT_AUSGEFUEHRT = re.compile(r"(\d+) (?:skipped|xfailed)\b")
 
 Schluessel = tuple[str, str]
 
@@ -54,6 +87,7 @@ class Ergebnis:
     gruen: bool
     zeilen: list[str] = field(default_factory=list)
     gesenkt: list[str] = field(default_factory=list)
+    angehoben: list[str] = field(default_factory=list)
     sekunden: float = 0.0
 
 
@@ -114,6 +148,29 @@ def pytest_ausgang(ausgabe: str) -> tuple[dict[str, str], set[str]]:
         elif art == "PASSED":
             gruen.add(rest)
     return rot, gruen
+
+
+def gesammelte_tests(ausgabe: str) -> int | None:
+    """Liest, wie viele Tests pytest nach Auswahl ausführt; ``None`` heißt unlesbar."""
+    treffer = _GESAMMELT.search(ausgabe)
+    if treffer is None:
+        return None
+    return int(next(gruppe for gruppe in treffer.groups() if gruppe is not None))
+
+
+def nicht_ausgefuehrte_tests(ausgabe: str) -> int | None:
+    """Zählt übersprungene und ``xfail``-Tests der Schlusszeile; ``None``: unlesbar."""
+    zeilen = _SCHLUSSZEILE.findall(ausgabe)
+    if not zeilen:
+        return None
+    return sum(int(n) for n in _NICHT_AUSGEFUEHRT.findall(zeilen[-1]))
+
+
+def umgebung(basis: Mapping[str, str]) -> dict[str, str]:
+    """Gibt die Umgebung der Werkzeuge zurück: ohne fremde Steuerung, mit ``src``."""
+    sauber = {k: v for k, v in basis.items() if not k.startswith(_FREMDE_UMGEBUNG)}
+    sauber["PYTHONPATH"] = str(WURZEL / "src")
+    return sauber
 
 
 def lies_zaehlbasis(pfad: Path) -> Counter[Schluessel]:
@@ -203,34 +260,61 @@ def stufe_schichten(log: TextIO) -> Ergebnis:
 
 
 def stufe_tests(log: TextIO) -> Ergebnis:
-    """Volle Suite; rot ist jeder gescheiterte Test, der nicht bekannt rot ist."""
+    """Volle Suite; rot ist jeder unbekannt rote Test und jeder fehlende Test."""
     befehl = [
         sys.executable,
         "-m",
         "pytest",
-        "-q",
         "-n",
         "auto",
         "--dist",
         "worksteal",
         "-rfEp",
+        f"--timeout={TEST_FRIST_SEKUNDEN}",
     ]
     lauf = _lauf(log, befehl)
     rot, gruen = pytest_ausgang(lauf.stdout)
     if lauf.returncode not in (0, 1) or (lauf.returncode == 1 and not rot):
         ende = lauf.stdout.splitlines()[-20:] + lauf.stderr.splitlines()[-20:]
         return Ergebnis("Tests", False, [f"pytest endet mit {lauf.returncode}:", *ende])
+    anzahl = gesammelte_tests(lauf.stdout)
+    untergrenze = int(TESTS_ANZAHL.read_text(encoding="utf-8"))
+    if anzahl is None:
+        return Ergebnis("Tests", False, ["Zahl der gesammelten Tests nicht lesbar"])
+    if anzahl < untergrenze:
+        meldung = (
+            f"{anzahl} Tests gesammelt, erwartet mindestens {untergrenze}"
+            f" ({_relativ(TESTS_ANZAHL)}): Tests gelöscht oder abgewählt"
+        )
+        return Ergebnis("Tests", False, [meldung])
+    uebersprungen = nicht_ausgefuehrte_tests(lauf.stdout)
+    obergrenze = int(TESTS_UEBERSPRUNGEN.read_text(encoding="utf-8"))
+    if uebersprungen is None:
+        return Ergebnis("Tests", False, ["Schlusszeile von pytest nicht lesbar"])
+    if uebersprungen > obergrenze:
+        meldung = (
+            f"{uebersprungen} Tests übersprungen oder xfail, erlaubt höchstens"
+            f" {obergrenze} ({_relativ(TESTS_UEBERSPRUNGEN)})"
+        )
+        return Ergebnis("Tests", False, [meldung])
     bekannt = []
     if ROT_BEKANNT.exists():
         bekannt = ROT_BEKANNT.read_text(encoding="utf-8").splitlines()
     unbekannt = [zeile for test, zeile in rot.items() if test not in bekannt]
     if unbekannt:
         return Ergebnis("Tests", False, unbekannt)
+    ergebnis = Ergebnis("Tests", True)
+    if anzahl > untergrenze:
+        TESTS_ANZAHL.write_text(f"{anzahl}\n", encoding="utf-8")
+        ergebnis.angehoben.append(_relativ(TESTS_ANZAHL))
+    if uebersprungen < obergrenze:
+        TESTS_UEBERSPRUNGEN.write_text(f"{uebersprungen}\n", encoding="utf-8")
+        ergebnis.gesenkt.append(_relativ(TESTS_UEBERSPRUNGEN))
     rest = [test for test in bekannt if test in rot or test not in gruen]
-    if rest == bekannt:
-        return Ergebnis("Tests", True)
-    ROT_BEKANNT.write_text("".join(f"{test}\n" for test in rest), encoding="utf-8")
-    return Ergebnis("Tests", True, gesenkt=[_relativ(ROT_BEKANNT)])
+    if rest != bekannt:
+        ROT_BEKANNT.write_text("".join(f"{test}\n" for test in rest), encoding="utf-8")
+        ergebnis.gesenkt.append(_relativ(ROT_BEKANNT))
+    return ergebnis
 
 
 STUFEN_VOLL: list[Callable[[TextIO], Ergebnis]] = [
@@ -262,10 +346,12 @@ def zusammenfassung(ergebnisse: list[Ergebnis]) -> list[str]:
     """Grün ist eine Zeile, Rot höchstens ``MAX_ROT_ZEILEN`` samt Verweis aufs Log."""
     zeiten = ", ".join(f"{e.stufe} {e.sekunden:.0f} s" for e in ergebnisse)
     gesenkt = [pfad for e in ergebnisse for pfad in e.gesenkt]
+    angehoben = [pfad for e in ergebnisse for pfad in e.angehoben]
     letzte = ergebnisse[-1]
     if letzte.gruen:
         senkung = f"; gesenkt: {', '.join(gesenkt)}" if gesenkt else ""
-        return [f"Prüfleiter grün ({zeiten}{senkung})"]
+        hebung = f"; angehoben: {', '.join(angehoben)}" if angehoben else ""
+        return [f"Prüfleiter grün ({zeiten}{senkung}{hebung})"]
     kopf = f"Prüfleiter rot in Stufe {letzte.stufe} ({zeiten})"
     fuss = f"Volles Protokoll: {_relativ(LAUF_ORDNER / 'letzter-lauf.log')}"
     platz = MAX_ROT_ZEILEN - 2
@@ -303,13 +389,29 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _lauf(log: TextIO, befehl: list[str]) -> subprocess.CompletedProcess[str]:
-    lauf = subprocess.run(
+    # Eigene Prozessgruppe: Bei überschrittener Frist sterben auch die Worker von
+    # pytest-xdist, sonst hielten sie die Pipes offen und die Leiter hinge mit.
+    with subprocess.Popen(
         befehl,
         cwd=WURZEL,
-        env={**os.environ, "PYTHONPATH": str(WURZEL / "src")},
-        capture_output=True,
+        env=umgebung(os.environ),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         text=True,
-    )
+        start_new_session=True,
+    ) as prozess:
+        try:
+            stdout, stderr = prozess.communicate(timeout=STUFE_FRIST_SEKUNDEN)
+        except subprocess.TimeoutExpired:
+            with contextlib.suppress(ProcessLookupError):
+                os.killpg(prozess.pid, signal.SIGKILL)
+            try:
+                stdout, stderr = prozess.communicate(timeout=NACHLAUF_SEKUNDEN)
+            except subprocess.TimeoutExpired:
+                # Ein Enkel in eigener Sitzung hält die Pipe; die Ausgabe ist verloren.
+                stdout, stderr = "", ""
+            stderr += f"\nabgebrochen nach {STUFE_FRIST_SEKUNDEN} s\n"
+        lauf = subprocess.CompletedProcess(befehl, prozess.wait(), stdout, stderr)
     log.write(
         f"$ {' '.join(befehl)}\n-> Exit {lauf.returncode}\n{lauf.stdout}{lauf.stderr}\n"
     )

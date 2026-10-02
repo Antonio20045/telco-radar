@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import shutil
+import socket
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -330,6 +331,10 @@ def leeres_projekt(tmp_path, monkeypatch):
     settings += (
         "\nfocus_competitors: []\npromo_enabled: false\n"
         "geraete_enabled: false\ncrawl_newsrooms: false\n"
+        # Die Nebenstufen lesen eigene Konfigurationen (Tarifseiten, CT-Log,
+        # Warenkoerbe) und gingen sonst ins Netz; ohne Netz hing der Test.
+        "lieferzeit_radar_aktiv: false\naenderungsradar_aktiv: false\n"
+        "tarif_radar_aktiv: false\nct_radar_aktiv: false\n"
     )
     (tmp_path / "config" / "settings.yaml").write_text(settings, encoding="utf-8")
     (tmp_path / "config" / "watchlist.yaml").write_text(
@@ -350,7 +355,12 @@ def leeres_projekt(tmp_path, monkeypatch):
         "AWS_BEDROCK_REGION",
     ):
         monkeypatch.delenv(var, raising=False)
+    monkeypatch.setattr(socket.socket, "connect", _kein_netz)
     return tmp_path
+
+
+def _kein_netz(*_args, **_kwargs):
+    raise OSError("Test ohne Netz: Verbindungsaufbau verboten")
 
 
 def test_pipeline_behaelt_redaktion_bei_leerer_quellenliste(leeres_projekt):
