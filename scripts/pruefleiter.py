@@ -25,6 +25,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TextIO
 
+import waechter
+from waechter import lies_zaehlbasis, schreibe_zaehlbasis
+
 WURZEL = Path(__file__).resolve().parents[1]
 BIN = Path(sys.executable).parent
 RUFF_BASIS = WURZEL / "pruef" / "ruff-basis.json"
@@ -32,6 +35,7 @@ MYPY_BASIS = WURZEL / "pruef" / "mypy-basis.txt"
 ROT_BEKANNT = WURZEL / "pruef" / "rot-bekannt.txt"
 TESTS_ANZAHL = WURZEL / "pruef" / "tests-anzahl.txt"
 TESTS_UEBERSPRUNGEN = WURZEL / "pruef" / "tests-uebersprungen.txt"
+KANARIE = "tests/kanarie_leiter.py"
 LAUF_ORDNER = WURZEL / ".pruefleiter"
 MAX_ROT_ZEILEN = 60
 _MYPY_FEHLER = ": error: "
@@ -61,7 +65,7 @@ _GESAMMELT = re.compile(
 _SCHLUSSZEILE = re.compile(r"^=+ (.+) in [\d.]+s(?: \([\d:]+\))? =+$", re.MULTILINE)
 _NICHT_AUSGEFUEHRT = re.compile(r"(\d+) (?:skipped|xfailed)\b")
 
-Schluessel = tuple[str, str]
+Schluessel = waechter.Schluessel
 
 
 @dataclass(frozen=True)
@@ -93,8 +97,7 @@ class Ergebnis:
 
 def neue_befunde(befunde: list[Befund], basis: Counter[Schluessel]) -> list[Befund]:
     """Gibt die Befunde der Schlüssel zurück, die öfter vorkommen als in der Basis."""
-    zaehlung = Counter(b.schluessel for b in befunde)
-    ueber = {k for k, n in zaehlung.items() if n > basis[k]}
+    ueber = set(waechter.ueber_basis(Counter(b.schluessel for b in befunde), basis))
     return [b for b in befunde if b.schluessel in ueber]
 
 
@@ -102,8 +105,7 @@ def gesenkte_basis(
     befunde: list[Befund], basis: Counter[Schluessel]
 ) -> Counter[Schluessel]:
     """Gibt die Basis zurück, in der kein Schlüssel öfter steht als heute gefunden."""
-    zaehlung = Counter(b.schluessel for b in befunde)
-    return Counter({k: min(n, zaehlung[k]) for k, n in basis.items() if zaehlung[k]})
+    return waechter.gesenkt(Counter(b.schluessel for b in befunde), basis)
 
 
 def ruff_befunde(ausgabe: str) -> list[Befund]:
@@ -173,32 +175,6 @@ def umgebung(basis: Mapping[str, str]) -> dict[str, str]:
     return sauber
 
 
-def lies_zaehlbasis(pfad: Path) -> Counter[Schluessel]:
-    """Liest eine Basis: JSON je Datei und Code oder Zeilen ``pfad code anzahl``."""
-    if pfad.suffix == ".json":
-        roh = json.loads(pfad.read_text(encoding="utf-8"))
-        return Counter(
-            {(p, c): n for p, codes in roh.items() for c, n in codes.items()}
-        )
-    basis: Counter[Schluessel] = Counter()
-    for zeile in pfad.read_text(encoding="utf-8").splitlines():
-        p, c, n = zeile.split()
-        basis[(p, c)] = int(n)
-    return basis
-
-
-def schreibe_zaehlbasis(pfad: Path, basis: Counter[Schluessel]) -> None:
-    """Schreibt eine Basis sortiert im Format, das ``lies_zaehlbasis`` liest."""
-    if pfad.suffix == ".json":
-        roh: dict[str, dict[str, int]] = {}
-        for (p, c), n in sorted(basis.items()):
-            roh.setdefault(p, {})[c] = n
-        text = json.dumps(roh, indent=1, sort_keys=True, ensure_ascii=False) + "\n"
-    else:
-        text = "".join(f"{p} {c} {n}\n" for (p, c), n in sorted(basis.items()))
-    pfad.write_text(text, encoding="utf-8")
-
-
 def vergleiche(stufe: str, befunde: list[Befund], basis_pfad: Path) -> Ergebnis:
     """Hält Befunde gegen ihre Basis: Neues ist rot, Weniger senkt die Basis."""
     basis = lies_zaehlbasis(basis_pfad)
@@ -216,6 +192,18 @@ def vergleiche(stufe: str, befunde: list[Befund], basis_pfad: Path) -> Ergebnis:
         return Ergebnis(stufe, True)
     schreibe_zaehlbasis(basis_pfad, gesenkt)
     return Ergebnis(stufe, True, gesenkt=[_relativ(basis_pfad)])
+
+
+def stufe_waechter(log: TextIO) -> Ergebnis:
+    """Stufe 0: Zählungen gegen ihre Basen, keine Liste lockerer als im Verlauf."""
+    befehl = [str(BIN / "ruff"), "check", "--preview", "--select", "PLC2701"]
+    lauf = _lauf(log, [*befehl, "--output-format", "json"])
+    if lauf.returncode not in (0, 1):
+        meldung = ["ruff bricht ab:", *lauf.stderr.splitlines()]
+        return Ergebnis("0 Wächter", False, meldung)
+    privat = Counter(b.schluessel for b in ruff_befunde(lauf.stdout))
+    rot, geschrieben = waechter.pruefe(WURZEL, privat)
+    return Ergebnis("0 Wächter", not rot, rot, [_relativ(p) for p in geschrieben])
 
 
 def stufe_lint(log: TextIO) -> Ergebnis:
@@ -271,6 +259,8 @@ def stufe_tests(log: TextIO) -> Ergebnis:
         "worksteal",
         "-rfEp",
         f"--timeout={TEST_FRIST_SEKUNDEN}",
+        "-o",
+        f"python_files=test_*.py *_test.py {Path(KANARIE).name}",
     ]
     lauf = _lauf(log, befehl)
     rot, gruen = pytest_ausgang(lauf.stdout)
@@ -297,6 +287,10 @@ def stufe_tests(log: TextIO) -> Ergebnis:
             f" {obergrenze} ({_relativ(TESTS_UEBERSPRUNGEN)})"
         )
         return Ergebnis("Tests", False, [meldung])
+    gescheitert = rot.pop(f"{KANARIE}::test_muss_scheitern", None)
+    if gescheitert is None or f"{KANARIE}::test_muss_bestehen" not in gruen:
+        meldung = f"{KANARIE}: Ergebnisse werden umgeschrieben oder abgewählt"
+        return Ergebnis("Tests", False, [meldung])
     bekannt = []
     if ROT_BEKANNT.exists():
         bekannt = ROT_BEKANNT.read_text(encoding="utf-8").splitlines()
@@ -318,6 +312,7 @@ def stufe_tests(log: TextIO) -> Ergebnis:
 
 
 STUFEN_VOLL: list[Callable[[TextIO], Ergebnis]] = [
+    stufe_waechter,
     stufe_lint,
     stufe_typen,
     stufe_schichten,

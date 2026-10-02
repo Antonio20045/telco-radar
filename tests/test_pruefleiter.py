@@ -1,5 +1,6 @@
 import importlib.util
 import json
+import os
 import subprocess
 import sys
 import time
@@ -9,6 +10,7 @@ from pathlib import Path
 import pytest
 
 _PFAD = Path(__file__).resolve().parents[1] / "scripts" / "pruefleiter.py"
+sys.path.insert(0, str(_PFAD.parent))
 _spec = importlib.util.spec_from_file_location("pruefleiter", _PFAD)
 pruefleiter = importlib.util.module_from_spec(_spec)
 sys.modules["pruefleiter"] = pruefleiter
@@ -109,7 +111,11 @@ def test_ruff_json_wird_relativ_zur_wurzel():
     ]
 
 
-_KOPF = "==== short test summary info ====\n"
+_KANARIE = (
+    f"FAILED {pruefleiter.KANARIE}::test_muss_scheitern - AssertionError\n"
+    f"PASSED {pruefleiter.KANARIE}::test_muss_bestehen\n"
+)
+_KOPF = "==== short test summary info ====\n" + _KANARIE
 
 
 @pytest.fixture(autouse=True)
@@ -379,10 +385,12 @@ def kleines_projekt(tmp_path, monkeypatch):
     (wurzel / "tests" / "test_rot.py").write_text(
         "def test_kaputt():\n    assert 1 == 2\n", "utf-8"
     )
+    kanarie = Path(__file__).with_name("kanarie_leiter.py").read_text("utf-8")
+    (wurzel / pruefleiter.KANARIE).write_text(kanarie, "utf-8")
     pruef = tmp_path / "pruef"
     pruef.mkdir()
     (pruef / "rot-bekannt.txt").write_text("", "utf-8")
-    (pruef / "tests-anzahl.txt").write_text("3\n", "utf-8")
+    (pruef / "tests-anzahl.txt").write_text("5\n", "utf-8")
     (pruef / "tests-uebersprungen.txt").write_text("0\n", "utf-8")
     monkeypatch.setattr(pruefleiter, "WURZEL", wurzel)
     monkeypatch.setattr(pruefleiter, "ROT_BEKANNT", pruef / "rot-bekannt.txt")
@@ -407,13 +415,13 @@ def test_testauswahl_ueber_die_umgebung_versteckt_keinen_roten_test(
 
 def test_geloeschter_test_macht_die_teststufe_rot(kleines_projekt, tmp_path):
     (kleines_projekt / "tests" / "test_rot.py").unlink()
-    (tmp_path / "pruef" / "tests-anzahl.txt").write_text("3\n", "utf-8")
+    (tmp_path / "pruef" / "tests-anzahl.txt").write_text("5\n", "utf-8")
     with (tmp_path / "log").open("w") as log:
         ergebnis = pruefleiter.stufe_tests(log)
     assert not ergebnis.gruen
-    assert ergebnis.zeilen[0].startswith("2 Tests gesammelt, erwartet mindestens 3")
+    assert ergebnis.zeilen[0].startswith("4 Tests gesammelt, erwartet mindestens 5")
     # Gegenprobe: mit beiden grünen Tests als Untergrenze ist dieselbe Suite grün.
-    (tmp_path / "pruef" / "tests-anzahl.txt").write_text("2\n", "utf-8")
+    (tmp_path / "pruef" / "tests-anzahl.txt").write_text("4\n", "utf-8")
     with (tmp_path / "log").open("a") as log:
         assert pruefleiter.stufe_tests(log).gruen
 
@@ -488,7 +496,7 @@ def test_stufenfrist_beendet_auch_kindprozesse(tmp_path, monkeypatch):
     assert lauf.returncode not in (0, 1)
     kind = int(pid_datei.read_text())
     for _ in range(50):
-        if not Path(f"/proc/{kind}").exists() or "Z" in _zustand(kind):
+        if _zustand(kind) in ("", "Z"):
             break
         time.sleep(0.1)
     else:
@@ -496,10 +504,16 @@ def test_stufenfrist_beendet_auch_kindprozesse(tmp_path, monkeypatch):
 
 
 def _zustand(pid):
-    try:
-        return Path(f"/proc/{pid}/stat").read_text().rsplit(")", 1)[1].split()[0]
-    except FileNotFoundError:
-        return "Z"
+    """Gibt den Prozesszustand aus ``ps`` zurück (Linux und macOS); leer: beendet."""
+    lauf = subprocess.run(
+        ["ps", "-o", "stat=", "-p", str(pid)], capture_output=True, text=True
+    )
+    assert lauf.returncode in (0, 1), lauf.stderr
+    return lauf.stdout.strip()[:1]
+
+
+def test_prozesszustand_erkennt_einen_lebenden_prozess():
+    assert _zustand(os.getpid()) not in ("", "Z")
 
 
 def test_uebersprungene_tests_aus_einer_conftest_machen_die_stufe_rot(
@@ -517,4 +531,44 @@ def test_uebersprungene_tests_aus_einer_conftest_machen_die_stufe_rot(
     with (tmp_path / "log").open("w") as log:
         ergebnis = pruefleiter.stufe_tests(log)
     assert not ergebnis.gruen
-    assert ergebnis.zeilen[0].startswith("2 Tests übersprungen oder xfail")
+    assert ergebnis.zeilen[0].startswith("4 Tests übersprungen oder xfail")
+
+
+_UMSCHREIBEN = (
+    "import pytest\n\n\n"
+    "@pytest.hookimpl(hookwrapper=True)\n"
+    "def pytest_runtest_makereport(item, call):\n"
+    "    ergebnis = yield\n"
+    "    bericht = ergebnis.get_result()\n"
+    "    if bericht.failed:\n"
+    "        bericht.outcome = 'passed'\n"
+)
+
+
+def test_conftest_die_scheitern_zu_bestanden_umschreibt_macht_die_stufe_rot(
+    kleines_projekt, tmp_path
+):
+    (kleines_projekt / "tests" / "conftest.py").write_text(_UMSCHREIBEN, "utf-8")
+    with (tmp_path / "log").open("w") as log:
+        ergebnis = pruefleiter.stufe_tests(log)
+    assert not ergebnis.gruen
+    assert ergebnis.zeilen == [
+        "tests/kanarie_leiter.py: Ergebnisse werden umgeschrieben oder abgewählt"
+    ]
+    # Gegenprobe: ohne den Hook ist der rote Test rot gemeldet, nicht der Kanarienvogel.
+    (kleines_projekt / "tests" / "conftest.py").unlink()
+    (kleines_projekt / "tests" / "test_rot.py").unlink()
+    (tmp_path / "pruef" / "tests-anzahl.txt").write_text("4\n", "utf-8")
+    with (tmp_path / "log").open("a") as log:
+        assert pruefleiter.stufe_tests(log).gruen
+
+
+def test_kanarienvogel_laeuft_nicht_im_direkten_pytest_aufruf(kleines_projekt):
+    lauf = subprocess.run(
+        [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider"],
+        cwd=kleines_projekt,
+        capture_output=True,
+        text=True,
+    )
+    assert "3 items" in lauf.stdout or "1 failed, 2 passed" in lauf.stdout
+    assert "kanarie" not in lauf.stdout

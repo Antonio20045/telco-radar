@@ -9,3 +9,7 @@ venv:
 .PHONY: pruefen
 pruefen:
 	.venv/bin/python scripts/pruefleiter.py --voll
+
+.PHONY: stand
+stand:
+	.venv/bin/python scripts/stand.py
