@@ -1,0 +1,1235 @@
+{
+ "scripts/ast_gleich.py": {
+  "E501": 5
+ },
+ "scripts/build_quellen_doc.py": {
+  "C901": 1,
+  "DTZ011": 1,
+  "E501": 2
+ },
+ "scripts/build_sources.py": {
+  "B007": 5,
+  "E401": 1,
+  "E501": 21,
+  "F401": 2,
+  "F841": 1,
+  "I001": 1,
+  "UP009": 1
+ },
+ "scripts/finde_quellen.py": {
+  "C901": 1,
+  "SIM102": 2,
+  "SIM222": 1
+ },
+ "scripts/geraete_fragment_wachstum.py": {
+  "DTZ011": 1,
+  "E501": 1,
+  "F541": 1
+ },
+ "scripts/hook_gezielte_tests.py": {
+  "BLE001": 1
+ },
+ "scripts/kostenrechnung.py": {
+  "E501": 2
+ },
+ "scripts/llm_probe.py": {
+  "TID251": 1
+ },
+ "scripts/llm_probe2.py": {
+  "TID251": 1
+ },
+ "scripts/llm_probe3.py": {
+  "E501": 1,
+  "TID251": 1
+ },
+ "scripts/llm_probe4.py": {
+  "TID251": 1
+ },
+ "scripts/lokallauf_congstar.py": {
+  "I001": 1,
+  "UP017": 1
+ },
+ "scripts/lokallauf_einsundeins.py": {
+  "I001": 1,
+  "UP017": 1
+ },
+ "scripts/lokallauf_einsundeins_simonly.py": {
+  "I001": 1,
+  "UP017": 1
+ },
+ "scripts/lokallauf_saturn.py": {
+  "I001": 1,
+  "UP017": 1
+ },
+ "scripts/lokallauf_telekom.py": {
+  "I001": 1,
+  "UP017": 3
+ },
+ "scripts/migriere_seen_store.py": {
+  "E501": 1
+ },
+ "scripts/miss_artikelabruf.py": {
+  "C901": 1,
+  "I001": 1
+ },
+ "scripts/miss_fremdsprachen.py": {
+  "C901": 1,
+  "UP028": 1
+ },
+ "scripts/miss_sammelphase.py": {
+  "E501": 1
+ },
+ "scripts/miss_volltext_quellen.py": {
+  "F401": 1,
+  "I001": 1
+ },
+ "scripts/newsletter/abo.py": {
+  "E501": 9,
+  "F401": 1,
+  "I001": 1,
+  "UP017": 1
+ },
+ "scripts/newsletter/send_digest.py": {
+  "I001": 1
+ },
+ "scripts/pruefe_portal.py": {
+  "C901": 2,
+  "E501": 4
+ },
+ "scripts/pruefe_promo_seite.py": {
+  "F841": 2
+ },
+ "scripts/pruefe_quellenvorschlag.py": {
+  "C901": 2,
+  "S110": 2,
+  "S112": 1,
+  "SIM103": 1
+ },
+ "scripts/quellen_trefferquote.py": {
+  "C901": 1,
+  "I001": 1
+ },
+ "scripts/quellen_zaehlen.py": {
+  "B904": 1
+ },
+ "scripts/rescue_sources.py": {
+  "I001": 1,
+  "TID251": 1
+ },
+ "scripts/schiess_screenshot.py": {
+  "F401": 1
+ },
+ "scripts/sniff_xhr.py": {
+  "BLE001": 2,
+  "E501": 1,
+  "S112": 1
+ },
+ "scripts/spike_saturn_geraetepreis.py": {
+  "BLE001": 2,
+  "C901": 1,
+  "E501": 5,
+  "S112": 1,
+  "TID251": 3,
+  "UP017": 4
+ },
+ "scripts/validate_sources.py": {
+  "F401": 2
+ },
+ "service/__init__.py": {
+  "D104": 1
+ },
+ "service/signup/__init__.py": {
+  "D104": 1
+ },
+ "service/signup/app.py": {
+  "D102": 1,
+  "E501": 1,
+  "I001": 1,
+  "TID251": 3
+ },
+ "service/signup/ratelimit.py": {
+  "D102": 1
+ },
+ "src/telco_radar/analyze/__init__.py": {
+  "D104": 1
+ },
+ "src/telco_radar/analyze/agents.py": {
+  "B905": 1,
+  "E501": 10
+ },
+ "src/telco_radar/analyze/buendel_abdeckung.py": {
+  "D101": 2,
+  "D102": 1,
+  "D103": 3,
+  "UP045": 6
+ },
+ "src/telco_radar/analyze/category_sweep.py": {
+  "D103": 1,
+  "DTZ011": 1,
+  "E501": 4,
+  "F401": 1,
+  "TID251": 3
+ },
+ "src/telco_radar/analyze/clustering.py": {
+  "B007": 1,
+  "B033": 2,
+  "B905": 1,
+  "C901": 1,
+  "D102": 3,
+  "SIM102": 2,
+  "UP015": 1,
+  "UP017": 4,
+  "UP037": 1
+ },
+ "src/telco_radar/analyze/competitors.py": {
+  "D103": 1,
+  "E501": 3
+ },
+ "src/telco_radar/analyze/ctm.py": {
+  "D102": 2
+ },
+ "src/telco_radar/analyze/diff_curator.py": {
+  "D102": 1,
+  "F401": 1,
+  "I001": 1,
+  "UP015": 1
+ },
+ "src/telco_radar/analyze/diff_db.py": {
+  "D102": 2
+ },
+ "src/telco_radar/analyze/differentiation_editor.py": {
+  "C901": 1
+ },
+ "src/telco_radar/analyze/editor.py": {
+  "D103": 1
+ },
+ "src/telco_radar/analyze/faithfulness.py": {
+  "C901": 1,
+  "E501": 1
+ },
+ "src/telco_radar/analyze/geraete_lifecycle.py": {
+  "C901": 1,
+  "DTZ007": 1,
+  "DTZ011": 2,
+  "UP045": 16
+ },
+ "src/telco_radar/analyze/geraete_store.py": {
+  "C901": 1,
+  "D102": 9,
+  "UP035": 1,
+  "UP045": 24
+ },
+ "src/telco_radar/analyze/highlight_topics.py": {
+  "C901": 1,
+  "I001": 1
+ },
+ "src/telco_radar/analyze/llm.py": {
+  "B904": 4,
+  "B905": 1,
+  "D103": 2
+ },
+ "src/telco_radar/analyze/promo_analyst.py": {
+  "F401": 1
+ },
+ "src/telco_radar/analyze/promo_editor.py": {
+  "E741": 1
+ },
+ "src/telco_radar/analyze/promo_ranker.py": {
+  "B905": 1,
+  "C901": 1
+ },
+ "src/telco_radar/analyze/promo_store.py": {
+  "D102": 4,
+  "D103": 1,
+  "SIM103": 1,
+  "UP037": 1
+ },
+ "src/telco_radar/analyze/tco_buendel.py": {
+  "D102": 1
+ },
+ "src/telco_radar/analyze/tco_store.py": {
+  "D102": 3,
+  "UP045": 7
+ },
+ "src/telco_radar/analyze/themen_store.py": {
+  "D103": 2
+ },
+ "src/telco_radar/analyze/vorsortierung.py": {
+  "D102": 4,
+  "UP037": 1
+ },
+ "src/telco_radar/collect/__init__.py": {
+  "C901": 1,
+  "I001": 1,
+  "UP037": 1
+ },
+ "src/telco_radar/collect/aenderungen.py": {
+  "D101": 1,
+  "D102": 5,
+  "D103": 1,
+  "UP017": 1
+ },
+ "src/telco_radar/collect/ct_log.py": {
+  "D102": 5,
+  "F401": 1,
+  "TID251": 1,
+  "UP017": 1
+ },
+ "src/telco_radar/collect/geraete/__init__.py": {
+  "C901": 1,
+  "D103": 2,
+  "E501": 1,
+  "E741": 3,
+  "SIM102": 2,
+  "UP017": 3,
+  "UP035": 1,
+  "UP045": 16
+ },
+ "src/telco_radar/collect/geraete/autoerkennung.py": {
+  "SIM905": 1,
+  "UP009": 1,
+  "UP045": 7
+ },
+ "src/telco_radar/collect/geraete/congstar.py": {
+  "C901": 1,
+  "I001": 1,
+  "UP045": 7
+ },
+ "src/telco_radar/collect/geraete/einsundeins.py": {
+  "C901": 2,
+  "I001": 1,
+  "UP035": 1,
+  "UP045": 5
+ },
+ "src/telco_radar/collect/geraete/o2.py": {
+  "C901": 2,
+  "I001": 1,
+  "UP045": 20
+ },
+ "src/telco_radar/collect/geraete/robots.py": {
+  "C901": 1,
+  "D102": 3,
+  "D103": 1,
+  "SIM105": 1,
+  "UP017": 1,
+  "UP035": 1,
+  "UP045": 6
+ },
+ "src/telco_radar/collect/geraete/strukturdaten.py": {
+  "D103": 1,
+  "UP045": 3
+ },
+ "src/telco_radar/collect/geraete/telekom.py": {
+  "I001": 1,
+  "UP045": 9
+ },
+ "src/telco_radar/collect/geraete/vodafone.py": {
+  "C901": 1,
+  "I001": 1,
+  "UP035": 1,
+  "UP045": 11
+ },
+ "src/telco_radar/collect/http.py": {
+  "C901": 1,
+  "D102": 2,
+  "D103": 1
+ },
+ "src/telco_radar/collect/json_api.py": {
+  "D103": 2,
+  "I001": 1,
+  "UP017": 4
+ },
+ "src/telco_radar/collect/lieferzeit.py": {
+  "D101": 3,
+  "D102": 6,
+  "D103": 1,
+  "I001": 1,
+  "UP017": 1
+ },
+ "src/telco_radar/collect/newsroom.py": {
+  "C901": 1,
+  "D103": 1,
+  "F401": 1,
+  "SIM103": 1,
+  "TID251": 1,
+  "UP017": 7
+ },
+ "src/telco_radar/collect/newsroom_js.py": {
+  "D103": 1,
+  "I001": 1,
+  "S112": 1
+ },
+ "src/telco_radar/collect/promo_snapshot.py": {
+  "I001": 1
+ },
+ "src/telco_radar/collect/rss.py": {
+  "D103": 1,
+  "UP017": 2
+ },
+ "src/telco_radar/collect/tarif_crawler.py": {
+  "C901": 1,
+  "D101": 2,
+  "D102": 5,
+  "D103": 1,
+  "I001": 1,
+  "UP017": 1
+ },
+ "src/telco_radar/collect/tarif_einsundeins_simonly.py": {
+  "UP035": 1,
+  "UP045": 5
+ },
+ "src/telco_radar/collect/tarif_kacheln.py": {
+  "UP045": 2
+ },
+ "src/telco_radar/collect/tarif_ldjson.py": {
+  "UP045": 1
+ },
+ "src/telco_radar/collect/tarif_pdf.py": {
+  "B905": 2,
+  "C901": 1,
+  "D103": 1,
+  "E501": 3,
+  "F401": 1
+ },
+ "src/telco_radar/collect/tarif_telekom_kacheln.py": {
+  "UP045": 1
+ },
+ "src/telco_radar/config.py": {
+  "D101": 3,
+  "D102": 5,
+  "D103": 1,
+  "UP015": 1,
+  "UP037": 1
+ },
+ "src/telco_radar/dedupe.py": {
+  "D102": 5,
+  "SIM105": 1,
+  "UP015": 2,
+  "UP017": 1
+ },
+ "src/telco_radar/geraete_config.py": {
+  "D101": 2,
+  "D102": 7,
+  "UP015": 3,
+  "UP045": 1
+ },
+ "src/telco_radar/geraete_fragment.py": {
+  "D102": 3
+ },
+ "src/telco_radar/geraete_model.py": {
+  "C901": 1,
+  "D101": 3,
+  "D102": 8,
+  "SIM905": 3,
+  "UP035": 1,
+  "UP045": 44
+ },
+ "src/telco_radar/geraete_pipeline.py": {
+  "C901": 1,
+  "I001": 1,
+  "TID251": 1,
+  "UP017": 2,
+  "UP035": 1,
+  "UP045": 7
+ },
+ "src/telco_radar/models.py": {
+  "D102": 3,
+  "I001": 1,
+  "UP017": 2,
+  "UP037": 1,
+  "UP045": 4
+ },
+ "src/telco_radar/newsletter/config.py": {
+  "D101": 2,
+  "D102": 4
+ },
+ "src/telco_radar/newsletter/filters.py": {
+  "D101": 1,
+  "D102": 5,
+  "DTZ011": 2,
+  "F401": 1
+ },
+ "src/telco_radar/newsletter/quelle.py": {
+  "D103": 1
+ },
+ "src/telco_radar/newsletter/segments.py": {
+  "D101": 1,
+  "D103": 1
+ },
+ "src/telco_radar/newsletter/store.py": {
+  "D102": 4,
+  "D103": 1,
+  "UP017": 4
+ },
+ "src/telco_radar/newsletter/subscription.py": {
+  "D101": 2,
+  "D102": 2,
+  "D103": 4,
+  "F401": 1,
+  "UP017": 1,
+  "UP037": 1
+ },
+ "src/telco_radar/newsletter/transport.py": {
+  "D102": 4,
+  "I001": 1
+ },
+ "src/telco_radar/newsletter/versand.py": {
+  "D101": 2,
+  "D102": 2,
+  "DTZ011": 1,
+  "F401": 2
+ },
+ "src/telco_radar/pipeline.py": {
+  "C901": 1,
+  "D103": 1,
+  "DTZ011": 3,
+  "I001": 1,
+  "UP017": 3
+ },
+ "src/telco_radar/promo_bilder.py": {
+  "D103": 1,
+  "TID251": 1
+ },
+ "src/telco_radar/promo_config.py": {
+  "D101": 2,
+  "D102": 4,
+  "UP015": 1
+ },
+ "src/telco_radar/promo_pipeline.py": {
+  "C901": 1,
+  "DTZ011": 1
+ },
+ "src/telco_radar/quellen_register.py": {
+  "C901": 1,
+  "D101": 1,
+  "D102": 5,
+  "DTZ011": 1,
+  "F401": 1,
+  "I001": 1
+ },
+ "src/telco_radar/report/__init__.py": {
+  "D104": 1
+ },
+ "src/telco_radar/report/anbieter_farben.py": {
+  "D103": 1
+ },
+ "src/telco_radar/report/archiv_dossier.py": {
+  "D101": 1,
+  "D102": 2,
+  "D103": 1
+ },
+ "src/telco_radar/report/ausfall.py": {
+  "UP037": 1
+ },
+ "src/telco_radar/report/bilder.py": {
+  "C901": 1,
+  "D103": 1,
+  "TID251": 1
+ },
+ "src/telco_radar/report/diff_bilder.py": {
+  "C901": 1,
+  "D103": 3,
+  "DTZ011": 2,
+  "TID251": 1
+ },
+ "src/telco_radar/report/differentiation.py": {
+  "E501": 22
+ },
+ "src/telco_radar/report/effektivpreis.py": {
+  "D101": 1,
+  "UP045": 9
+ },
+ "src/telco_radar/report/folien.py": {
+  "D101": 1,
+  "E501": 2,
+  "F401": 1
+ },
+ "src/telco_radar/report/fruehwarnung.py": {
+  "D101": 2,
+  "D102": 1,
+  "D103": 1
+ },
+ "src/telco_radar/report/geraete_alarme.py": {
+  "UP045": 5
+ },
+ "src/telco_radar/report/geraete_bereinigung.py": {
+  "UP045": 1
+ },
+ "src/telco_radar/report/geraete_export.py": {
+  "D103": 1,
+  "F401": 1
+ },
+ "src/telco_radar/report/geraete_pruefung.py": {
+  "B905": 1
+ },
+ "src/telco_radar/report/geraete_radar.py": {
+  "D103": 1,
+  "I001": 1,
+  "UP045": 5
+ },
+ "src/telco_radar/report/geraete_tco_band.py": {
+  "E501": 1,
+  "UP045": 9
+ },
+ "src/telco_radar/report/geraete_tco_grafik.py": {
+  "B007": 1,
+  "B905": 4,
+  "C901": 1,
+  "F841": 1,
+  "UP045": 2
+ },
+ "src/telco_radar/report/geraete_tco_karten.py": {
+  "C901": 1,
+  "E741": 3,
+  "I001": 1,
+  "SIM103": 1,
+  "UP045": 27
+ },
+ "src/telco_radar/report/geraete_tco_view.py": {
+  "C901": 1,
+  "E741": 1,
+  "I001": 1
+ },
+ "src/telco_radar/report/geraete_vergleich.py": {
+  "UP045": 6
+ },
+ "src/telco_radar/report/geraete_verlauf.py": {
+  "D103": 1,
+  "I001": 1
+ },
+ "src/telco_radar/report/geraete_view.py": {
+  "C901": 3,
+  "DTZ007": 1,
+  "E501": 2,
+  "F401": 2,
+  "I001": 1,
+  "SIM105": 2
+ },
+ "src/telco_radar/report/geraete_zeitreihe.py": {
+  "B007": 1,
+  "B023": 3,
+  "C901": 3,
+  "E501": 1,
+  "E741": 1,
+  "F401": 1,
+  "I001": 1
+ },
+ "src/telco_radar/report/html.py": {
+  "B007": 1,
+  "B905": 1,
+  "C901": 2,
+  "DTZ011": 1,
+  "E501": 2,
+  "E741": 1,
+  "I001": 3
+ },
+ "src/telco_radar/report/lieferzeit_view.py": {
+  "F401": 1
+ },
+ "src/telco_radar/report/luecken.py": {
+  "D101": 1,
+  "D102": 4,
+  "D103": 1
+ },
+ "src/telco_radar/report/newsletter_protokoll.py": {
+  "D101": 1,
+  "D102": 2
+ },
+ "src/telco_radar/report/newsletter_seite.py": {
+  "D103": 1
+ },
+ "src/telco_radar/report/promo.py": {
+  "I001": 1
+ },
+ "src/telco_radar/report/rechtstexte.py": {
+  "D101": 2,
+  "D102": 1,
+  "D103": 1
+ },
+ "src/telco_radar/report/uebersetzung_view.py": {
+  "D103": 2
+ },
+ "src/telco_radar/report/wettbewerb.py": {
+  "C901": 1
+ },
+ "src/telco_radar/tarif_bezug.py": {
+  "D102": 1,
+  "UP037": 1,
+  "UP045": 8
+ },
+ "src/telco_radar/tarif_model.py": {
+  "D102": 3,
+  "I001": 1,
+  "UP045": 17
+ },
+ "src/telco_radar/tco_model.py": {
+  "C901": 2,
+  "D102": 2,
+  "E741": 2,
+  "F401": 1,
+  "UP045": 45
+ },
+ "src/telco_radar/uebersetzung/__init__.py": {
+  "I001": 1
+ },
+ "src/telco_radar/uebersetzung/sprache.py": {
+  "D103": 1,
+  "I001": 1
+ },
+ "src/telco_radar/uebersetzung/store.py": {
+  "D102": 6,
+  "I001": 1,
+  "UP037": 1
+ },
+ "src/telco_radar/uebersetzung/stufe.py": {
+  "DTZ011": 1,
+  "F401": 1,
+  "I001": 1,
+  "UP034": 1
+ },
+ "src/telco_radar/uebersetzung/volltext.py": {
+  "D102": 1
+ },
+ "src/telco_radar/versand.py": {
+  "D102": 2,
+  "D103": 3,
+  "DTZ005": 1,
+  "DTZ011": 2,
+  "E501": 1,
+  "I001": 1
+ },
+ "tests/browser_konsole.py": {
+  "UP045": 2
+ },
+ "tests/test_aenderungsradar.py": {
+  "UP017": 1
+ },
+ "tests/test_analyst_budget.py": {
+  "UP017": 1
+ },
+ "tests/test_anbieter_farben.py": {
+  "I001": 1
+ },
+ "tests/test_archiv_dossier.py": {
+  "F401": 2,
+  "UP031": 1
+ },
+ "tests/test_bilder.py": {
+  "I001": 2
+ },
+ "tests/test_category_sweep.py": {
+  "I001": 1
+ },
+ "tests/test_clustering.py": {
+  "B905": 1,
+  "UP017": 1
+ },
+ "tests/test_collect.py": {
+  "E501": 9,
+  "I001": 2,
+  "UP017": 7
+ },
+ "tests/test_ct_log.py": {
+  "UP017": 2
+ },
+ "tests/test_dedupe.py": {
+  "UP017": 1
+ },
+ "tests/test_diff_curator.py": {
+  "I001": 1
+ },
+ "tests/test_differentiation.py": {
+  "I001": 1
+ },
+ "tests/test_editor_digest_note.py": {
+  "UP017": 1
+ },
+ "tests/test_editor_nachfassen.py": {
+  "I001": 1
+ },
+ "tests/test_effektivpreis.py": {
+  "F401": 1
+ },
+ "tests/test_folien.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_abdeckung.py": {
+  "B905": 1,
+  "I001": 1
+ },
+ "tests/test_geraete_abdeckung_mail.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_adapter_congstar.py": {
+  "B007": 2,
+  "E741": 2,
+  "I001": 1,
+  "UP017": 1
+ },
+ "tests/test_geraete_adapter_netzbetreiber.py": {
+  "B033": 1,
+  "E741": 1,
+  "I001": 1,
+  "UP017": 3
+ },
+ "tests/test_geraete_adapter_saturn.py": {
+  "E741": 1,
+  "I001": 1,
+  "UP017": 2
+ },
+ "tests/test_geraete_adapter_telekom_1und1.py": {
+  "E741": 5,
+  "I001": 1,
+  "UP017": 3
+ },
+ "tests/test_geraete_aktionen.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_anbieterzaehlung.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_autoerkennung.py": {
+  "E741": 5,
+  "F841": 1,
+  "UP009": 1,
+  "UP017": 2
+ },
+ "tests/test_geraete_besuchsfenster.py": {
+  "E741": 1,
+  "I001": 1,
+  "UP017": 1
+ },
+ "tests/test_geraete_bewegung.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_browser_fixture.py": {
+  "B007": 1,
+  "F401": 1,
+  "I001": 1
+ },
+ "tests/test_geraete_buendel_congstar.py": {
+  "F401": 1
+ },
+ "tests/test_geraete_buendel_einsundeins.py": {
+  "F401": 1
+ },
+ "tests/test_geraete_buendel_kopf_zeitraum.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_buendel_mobil_abzeichen_browser.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_buendel_o2.py": {
+  "SIM115": 1
+ },
+ "tests/test_geraete_buendel_o2_vertiefung.py": {
+  "UP017": 1
+ },
+ "tests/test_geraete_buendel_zeilenkopf_d3.py": {
+  "I001": 1,
+  "SIM300": 1
+ },
+ "tests/test_geraete_collect.py": {
+  "E501": 2,
+  "E741": 4,
+  "F401": 1,
+  "F541": 1,
+  "UP017": 1
+ },
+ "tests/test_geraete_config.py": {
+  "B007": 1,
+  "I001": 1,
+  "UP015": 1
+ },
+ "tests/test_geraete_erosion.py": {
+  "B905": 1
+ },
+ "tests/test_geraete_export.py": {
+  "F401": 2,
+  "I001": 1
+ },
+ "tests/test_geraete_export_mobil_browser.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_faden.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_faden_schluessel.py": {
+  "F401": 1,
+  "I001": 1
+ },
+ "tests/test_geraete_glossar.py": {
+  "F841": 1
+ },
+ "tests/test_geraete_haendler_ohne_buendel.py": {
+  "F401": 1,
+  "I001": 1
+ },
+ "tests/test_geraete_jobbudget.py": {
+  "E501": 1,
+  "I001": 1
+ },
+ "tests/test_geraete_karten_band_browser.py": {
+  "F401": 1,
+  "F541": 1,
+  "I001": 1
+ },
+ "tests/test_geraete_katalog_modelle.py": {
+  "F401": 1,
+  "I001": 1
+ },
+ "tests/test_geraete_laufzeit_auf_der_seite.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_laufzeit_filter.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_lifecycle.py": {
+  "E731": 1,
+  "I001": 1
+ },
+ "tests/test_geraete_methodik_umzug.py": {
+  "E501": 10,
+  "I001": 1
+ },
+ "tests/test_geraete_model.py": {
+  "E741": 6,
+  "I001": 1
+ },
+ "tests/test_geraete_o2_zeilen.py": {
+  "F401": 1,
+  "F811": 1,
+  "F841": 1,
+  "I001": 1
+ },
+ "tests/test_geraete_o2_zeilen_browser.py": {
+  "B007": 1,
+  "I001": 1
+ },
+ "tests/test_geraete_o3_rollen.py": {
+  "F401": 1
+ },
+ "tests/test_geraete_o3_rollen_browser.py": {
+  "B007": 1,
+  "E501": 2,
+  "F401": 1,
+  "I001": 1
+ },
+ "tests/test_geraete_o4_export.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_o4_verlauf_browser.py": {
+  "B007": 1,
+  "I001": 1
+ },
+ "tests/test_geraete_pipeline.py": {
+  "E402": 2,
+  "E501": 1,
+  "I001": 1,
+  "UP017": 1,
+  "UP031": 1
+ },
+ "tests/test_geraete_preis_mehrdeutig.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_provider_probe.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_pruefung.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_radar_sprung_browser.py": {
+  "F401": 1,
+  "I001": 2,
+  "SIM117": 1
+ },
+ "tests/test_geraete_radar_tafel.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_rahmen.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_reiter_browser.py": {
+  "E501": 2,
+  "I001": 2
+ },
+ "tests/test_geraete_robots.py": {
+  "UP017": 1
+ },
+ "tests/test_geraete_seite.py": {
+  "B905": 1,
+  "E501": 2,
+  "E741": 1,
+  "F401": 1,
+  "F841": 1,
+  "SIM212": 1,
+  "SIM300": 2
+ },
+ "tests/test_geraete_sichtbarkeit_p5.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_stille_tage.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_store.py": {
+  "E741": 1,
+  "F401": 1,
+  "I001": 1
+ },
+ "tests/test_geraete_tarifleiter.py": {
+  "UP017": 1
+ },
+ "tests/test_geraete_tco_alterung.py": {
+  "E741": 1,
+  "I001": 1
+ },
+ "tests/test_geraete_tco_band.py": {
+  "B007": 1,
+  "B011": 1,
+  "E501": 1,
+  "E741": 1
+ },
+ "tests/test_geraete_tco_band_browser.py": {
+  "F401": 1,
+  "I001": 1
+ },
+ "tests/test_geraete_tco_hauptansicht.py": {
+  "E501": 1
+ },
+ "tests/test_geraete_tco_historie.py": {
+  "F841": 1
+ },
+ "tests/test_geraete_tco_orakel.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_tco_terminologie.py": {
+  "F401": 2,
+  "I001": 1
+ },
+ "tests/test_geraete_tco_view.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_tco_zustand.py": {
+  "E741": 1,
+  "F541": 1,
+  "I001": 1
+ },
+ "tests/test_geraete_tote_adressen.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_vergleich.py": {
+  "F401": 1
+ },
+ "tests/test_geraete_verlauf.py": {
+  "B905": 1,
+  "E731": 1
+ },
+ "tests/test_geraete_verlauf_chart_mobil_browser.py": {
+  "B905": 1,
+  "I001": 1,
+  "SIM300": 1
+ },
+ "tests/test_geraete_verlauf_legende_browser.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_verlauf_stufenlinie_browser.py": {
+  "I001": 1,
+  "SIM300": 2
+ },
+ "tests/test_geraete_wahrheit.py": {
+  "B905": 1
+ },
+ "tests/test_geraete_zeitbilanz_lauf53.py": {
+  "I001": 1,
+  "UP017": 1
+ },
+ "tests/test_geraete_zeitreihe.py": {
+  "E741": 1
+ },
+ "tests/test_geraete_zeitreihe_ansicht.py": {
+  "B007": 5,
+  "E741": 1,
+  "I001": 1
+ },
+ "tests/test_geraete_zeitreihe_browser.py": {
+  "B905": 1,
+  "E741": 2,
+  "I001": 1
+ },
+ "tests/test_geraete_zeitreihe_panel_browser.py": {
+  "I001": 1
+ },
+ "tests/test_geraete_zeitreihe_rechenweg.py": {
+  "B905": 1,
+  "E501": 1,
+  "F401": 2,
+  "I001": 1
+ },
+ "tests/test_geraete_zeitreihe_seite.py": {
+  "E741": 1,
+  "F401": 3,
+  "I001": 1
+ },
+ "tests/test_geraete_zeitreihe_xtick_browser.py": {
+  "B905": 2,
+  "E741": 1
+ },
+ "tests/test_geraete_zr_neu_hinweis_browser.py": {
+  "I001": 1,
+  "SIM117": 1
+ },
+ "tests/test_highlight_themen.py": {
+  "E501": 1,
+  "F541": 1,
+  "F841": 1
+ },
+ "tests/test_host_drosselung.py": {
+  "I001": 2,
+  "SIM117": 2
+ },
+ "tests/test_json_api.py": {
+  "UP017": 4
+ },
+ "tests/test_lieferzeit.py": {
+  "UP017": 1
+ },
+ "tests/test_llm_anker_und_kosten.py": {
+  "I001": 1,
+  "UP017": 1
+ },
+ "tests/test_llm_leere_antwort.py": {
+  "I001": 1
+ },
+ "tests/test_luecken.py": {
+  "F401": 1
+ },
+ "tests/test_marke.py": {
+  "F401": 1
+ },
+ "tests/test_newsletter_filters.py": {
+  "I001": 1
+ },
+ "tests/test_newsletter_render.py": {
+  "F401": 2,
+  "I001": 1
+ },
+ "tests/test_newsletter_segments.py": {
+  "F401": 2,
+  "I001": 1
+ },
+ "tests/test_newsletter_seite.py": {
+  "I001": 2
+ },
+ "tests/test_newsletter_versand.py": {
+  "I001": 1,
+  "UP017": 3
+ },
+ "tests/test_pipeline.py": {
+  "DTZ011": 1,
+  "E501": 1,
+  "UP017": 3
+ },
+ "tests/test_promo_seite.py": {
+  "I001": 1
+ },
+ "tests/test_promo_snapshot.py": {
+  "E501": 3,
+  "F401": 1
+ },
+ "tests/test_provider_auswahl.py": {
+  "I001": 1
+ },
+ "tests/test_pruefe_quellenvorschlag.py": {
+  "UP017": 3
+ },
+ "tests/test_quellen_register.py": {
+  "I001": 1
+ },
+ "tests/test_redaktion_kontinuitaet.py": {
+  "DTZ011": 1
+ },
+ "tests/test_render_ausfall.py": {
+  "I001": 1
+ },
+ "tests/test_sammelprotokoll.py": {
+  "F401": 1,
+  "I001": 5
+ },
+ "tests/test_seen_store_schutz.py": {
+  "UP017": 1
+ },
+ "tests/test_seit.py": {
+  "F401": 1,
+  "I001": 1
+ },
+ "tests/test_seiten_zahlen.py": {
+  "B007": 1,
+  "B905": 2,
+  "C901": 1,
+  "E402": 8,
+  "E501": 1,
+  "F401": 2,
+  "F541": 1,
+  "F841": 2,
+  "I001": 10,
+  "SIM115": 2,
+  "UP037": 2
+ },
+ "tests/test_signup_service.py": {
+  "I001": 1
+ },
+ "tests/test_startseite_kurzpfad.py": {
+  "B905": 1
+ },
+ "tests/test_tagging.py": {
+  "I001": 2
+ },
+ "tests/test_tarif_crawler.py": {
+  "B905": 1,
+  "F401": 1,
+  "UP017": 1,
+  "UP031": 1
+ },
+ "tests/test_tarif_kacheln.py": {
+  "SIM115": 1
+ },
+ "tests/test_tco_model.py": {
+  "I001": 1
+ },
+ "tests/test_uebersetzung.py": {
+  "I001": 1,
+  "SIM300": 1
+ },
+ "tests/test_uebersetzung_auswahl.py": {
+  "I001": 1
+ },
+ "tests/test_uebersetzung_link_browser.py": {
+  "E741": 8,
+  "I001": 1
+ },
+ "tests/test_uebersetzung_seite.py": {
+  "E501": 2,
+  "I001": 1
+ },
+ "tests/test_versand.py": {
+  "F401": 1
+ },
+ "tests/test_volltext_feed.py": {
+  "I001": 1,
+  "UP012": 2
+ },
+ "tests/test_vorsortierung.py": {
+  "DTZ011": 1,
+  "I001": 1
+ },
+ "tests/test_wettbewerb.py": {
+  "F401": 1
+ },
+ "tests/test_wettbewerbsradar.py": {
+  "B905": 1,
+  "I001": 1
+ },
+ "tests/test_wettbewerbsradar_alarme.py": {
+  "I001": 1
+ }
+}

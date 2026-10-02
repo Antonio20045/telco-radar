@@ -30,6 +30,7 @@ Kodiert wird base64url OHNE Polsterung: das Token steht in einem
 PFADSEGMENT, und "=" waere dort zwar zulaessig, aber jeder zweite
 Mailclient und jedes zweite Gateway macht daraus etwas anderes.
 """
+
 from __future__ import annotations
 
 import base64
@@ -79,20 +80,27 @@ def _signatur(key: str, zweck: str, koerper: bytes) -> str:
     # liesse sich ein gueltiges Token durch Umschreiben eines Feldes fuer
     # einen anderen Endpunkt verwenden.
     nachricht = zweck.encode("ascii") + b"." + koerper
-    return _b64(hmac.new(key.encode("utf-8"), nachricht,
-                         hashlib.sha256).digest())
+    return _b64(hmac.new(key.encode("utf-8"), nachricht, hashlib.sha256).digest())
 
 
 def schreibe(key: str, zweck: str, daten: dict, *, jetzt: float | None = None) -> str:
     """`<nutzlast>.<signatur>` - beides base64url ohne Polsterung."""
     nutzlast = dict(daten, iat=int(jetzt if jetzt is not None else time.time()))
-    koerper = json.dumps(nutzlast, sort_keys=True, separators=(",", ":"),
-                         ensure_ascii=False).encode("utf-8")
+    koerper = json.dumps(
+        nutzlast, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    ).encode("utf-8")
     return f"{_b64(koerper)}.{_signatur(key, zweck, koerper)}"
 
 
-def lies(key: str, zweck: str, token: str, *, max_alter: int,
-         min_alter: int = 0, jetzt: float | None = None) -> dict:
+def lies(
+    key: str,
+    zweck: str,
+    token: str,
+    *,
+    max_alter: int,
+    min_alter: int = 0,
+    jetzt: float | None = None,
+) -> dict:
     """Signatur und Alter pruefen, dann die Nutzlast zurueckgeben."""
     if not token or token.count(".") != 1:
         raise TokenFehler("Form")

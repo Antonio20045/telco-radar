@@ -2,3 +2,4 @@
 pytest-xdist>=3.5
 ruff==0.15.20
 import-linter==2.15
+mypy==2.4.0

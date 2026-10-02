@@ -16,6 +16,7 @@ Mailbomben-Nutzung, bei der jemand ein fremdes Postfach zumuellt.
 Wer das hier fuer die Schutzmassnahme haelt, baut die Sperre an der einzigen
 Stelle ein, an der sie sicher nicht wirkt.
 """
+
 from __future__ import annotations
 
 import time
@@ -25,8 +26,7 @@ from collections import deque
 class IPBremse:
     """Hoechstens `erlaubt` Anfragen je Absender im gleitenden Fenster."""
 
-    def __init__(self, erlaubt: int = 5, fenster: int = 600,
-                 max_absender: int = 5000):
+    def __init__(self, erlaubt: int = 5, fenster: int = 600, max_absender: int = 5000):
         self.erlaubt = erlaubt
         self.fenster = fenster
         # Deckel gegen den einfachsten Speicherangriff: ohne ihn legt eine
@@ -53,8 +53,9 @@ class IPBremse:
         # Alles wegwerfen, was aus dem Fenster gelaufen ist. Reicht das
         # nicht, faellt der aelteste Rest mit - eine zu grosszuegige Bremse
         # ist besser als eine Instanz, die nicht mehr antwortet.
-        veraltet = [a for a, s in self._spuren.items()
-                    if not s or jetzt - s[-1] > self.fenster]
+        veraltet = [
+            a for a, s in self._spuren.items() if not s or jetzt - s[-1] > self.fenster
+        ]
         for a in veraltet:
             self._spuren.pop(a, None)
         while len(self._spuren) > self.max_absender:

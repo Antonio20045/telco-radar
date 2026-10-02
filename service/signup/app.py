@@ -35,6 +35,7 @@ Die Antwort auf `/subscribe` ist IMMER dieselbe neutrale Meldung. Wer daraus
 ablesen koennte, ob eine Adresse bekannt ist, haette einen Abfragedienst fuer
 fremde Postfaecher.
 """
+
 from __future__ import annotations
 
 import json
@@ -55,12 +56,12 @@ from fastapi.responses import HTMLResponse, JSONResponse
 # ausgecheckt.
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
-from telco_radar.newsletter.config import lade_katalog          # noqa: E402
-from telco_radar.newsletter import subscription as sub          # noqa: E402
-from telco_radar.report import rechtstexte                      # noqa: E402
+from telco_radar.newsletter.config import lade_katalog  # noqa: E402
+from telco_radar.newsletter import subscription as sub  # noqa: E402
+from telco_radar.report import rechtstexte  # noqa: E402
 
-from . import tokens                                            # noqa: E402
-from .ratelimit import IPBremse                                 # noqa: E402
+from . import tokens  # noqa: E402
+from .ratelimit import IPBremse  # noqa: E402
 
 log = logging.getLogger("signup")
 
@@ -76,8 +77,9 @@ WURZEL = Path(__file__).resolve().parents[2]
 # unterwegs"; der Vorbehalt las sich fuer den Angemeldeten wie ein Zweifel an
 # seiner eigenen Eingabe und half niemandem. Wer hier umformuliert, darf nur
 # eines nicht tun: die Antwort vom Ausgang abhaengig machen.
-NEUTRAL = ("Gleich kommt eine E-Mail. Klick den Link darin — "
-           "erst dann bist du angemeldet.")
+NEUTRAL = (
+    "Gleich kommt eine E-Mail. Klick den Link darin — erst dann bist du angemeldet."
+)
 
 
 def _env(name: str, vorgabe: str = "") -> str:
@@ -92,10 +94,12 @@ class Einstellungen:
         self.pepper = _env("SIGNUP_PEPPER")
         self.github_token = _env("GITHUB_DISPATCH_TOKEN")
         # Das LEERE Dispatch-Repo, nicht der Store. Siehe Modulkopf.
-        self.dispatch_repo = _env("GITHUB_DISPATCH_REPO",
-                                  "Antonio20045/telco-radar-inbox")
-        self.basis_url = _env("SITE_BASE_URL",
-                              "https://telco-radar.onrender.com").rstrip("/")
+        self.dispatch_repo = _env(
+            "GITHUB_DISPATCH_REPO", "Antonio20045/telco-radar-inbox"
+        )
+        self.basis_url = _env(
+            "SITE_BASE_URL", "https://telco-radar.onrender.com"
+        ).rstrip("/")
         # Die Adresse DIESES Dienstes - nicht die der Website. Der
         # Unterschied ist keine Feinheit: `/confirm/...` und
         # `/unsubscribe/...` sind Routen hier, die Website ist eine Static
@@ -103,10 +107,12 @@ class Einstellungen:
         # Bestaetigungslink auf `SITE_BASE_URL` - jede Bestaetigungsmail
         # fuehrte damit auf ein 404, und die Anmeldung konnte niemand
         # abschliessen.
-        self.dienst_url = _env("DIENST_BASE_URL",
-                               "https://telco-radar-signup.onrender.com").rstrip("/")
-        self.erlaubte_domains = [d for d in _env("ERLAUBTE_DOMAINS", "").split(",")
-                                 if d.strip()]
+        self.dienst_url = _env(
+            "DIENST_BASE_URL", "https://telco-radar-signup.onrender.com"
+        ).rstrip("/")
+        self.erlaubte_domains = [
+            d for d in _env("ERLAUBTE_DOMAINS", "").split(",") if d.strip()
+        ]
 
     @property
     def einsatzbereit(self) -> bool:
@@ -149,8 +155,9 @@ katalog = lade_katalog(WURZEL)
 # oder gar nicht, dann greift die Freigabe stillschweigend nicht - der
 # Preflight antwortet brav 200, nur eben ohne Kopf, und das Formular ist
 # wieder tot. `/gesund` gibt die Liste deshalb aus.
-ERLAUBTE_HERKUENFTE = sorted({einstellungen.basis_url,
-                              "https://telco-radar.onrender.com"})
+ERLAUBTE_HERKUENFTE = sorted(
+    {einstellungen.basis_url, "https://telco-radar.onrender.com"}
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -166,6 +173,7 @@ app.add_middleware(
 
 
 # ------------------------------------------------------------- Handwerk ----
+
 
 def _absender(anfrage: Request) -> str:
     """Die Adresse des Aufrufers - hinter Renders Proxy im Header.
@@ -195,14 +203,20 @@ def _dispatch(ereignis: str, nutzlast: dict) -> bool:
     Dispatch-Payload landet in der Ereignisliste des Repos.
     """
     ziel = f"https://api.github.com/repos/{einstellungen.dispatch_repo}/dispatches"
-    koerper = json.dumps({"event_type": ereignis,
-                          "client_payload": nutzlast}).encode("utf-8")
+    koerper = json.dumps({"event_type": ereignis, "client_payload": nutzlast}).encode(
+        "utf-8"
+    )
     anfrage = urllib.request.Request(
-        ziel, data=koerper, method="POST",
-        headers={"Authorization": f"Bearer {einstellungen.github_token}",
-                 "Accept": "application/vnd.github+json",
-                 "X-GitHub-Api-Version": "2022-11-28",
-                 "Content-Type": "application/json"})
+        ziel,
+        data=koerper,
+        method="POST",
+        headers={
+            "Authorization": f"Bearer {einstellungen.github_token}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "Content-Type": "application/json",
+        },
+    )
     try:
         with urllib.request.urlopen(anfrage, timeout=10) as antwort:
             return 200 <= antwort.status < 300
@@ -210,8 +224,7 @@ def _dispatch(ereignis: str, nutzlast: dict) -> bool:
         log.error("Dispatch %s abgelehnt: HTTP %s", ereignis, fehler.code)
         return False
     except OSError as fehler:
-        log.error("Dispatch %s nicht zustellbar: %s", ereignis,
-                  type(fehler).__name__)
+        log.error("Dispatch %s nicht zustellbar: %s", ereignis, type(fehler).__name__)
         return False
 
 
@@ -222,18 +235,22 @@ def _seite(titel: str, text: str, *, ziel: str = "") -> HTMLResponse:
     die Static Site gerade nicht erreichbar ist - sonst haette der Nutzer
     nach dem Bestaetigen eine leere Seite vor sich."""
     import html as h
-    weiter = (f'<p><a href="{h.escape(ziel, True)}">Weiter zum Portal</a></p>'
-              if ziel else "")
+
+    weiter = (
+        f'<p><a href="{h.escape(ziel, True)}">Weiter zum Portal</a></p>' if ziel else ""
+    )
     return HTMLResponse(
         "<!DOCTYPE html><html lang=de><head><meta charset=utf-8>"
         "<meta name=viewport content='width=device-width,initial-scale=1'>"
         f"<title>{h.escape(titel)}</title></head>"
         "<body style='font:16px/1.6 Georgia,serif;max-width:38em;margin:8vh auto;padding:0 1.2em'>"
         f"<h1 style='font-size:1.6em'>{h.escape(titel)}</h1>"
-        f"<p>{h.escape(text)}</p>{weiter}</body></html>")
+        f"<p>{h.escape(text)}</p>{weiter}</body></html>"
+    )
 
 
 # --------------------------------------------------------- die Endpunkte ---
+
 
 @app.get("/gesund")
 def gesund() -> dict:
@@ -248,9 +265,12 @@ def gesund() -> dict:
     keine Geheimnisse, sondern genau die zwei Angaben, die eine
     Fehlersuche am Formular zuerst braucht.
     """
-    return {"ok": True, "einsatzbereit": einstellungen.einsatzbereit,
-            "version": _env("RENDER_GIT_COMMIT", "unbekannt")[:8],
-            "cors_fuer": ERLAUBTE_HERKUENFTE}
+    return {
+        "ok": True,
+        "einsatzbereit": einstellungen.einsatzbereit,
+        "version": _env("RENDER_GIT_COMMIT", "unbekannt")[:8],
+        "cors_fuer": ERLAUBTE_HERKUENFTE,
+    }
 
 
 @app.get("/form-token")
@@ -268,17 +288,20 @@ def form_token(antwort: Response) -> dict:
     kaum auf.
     """
     _sicherheitskopfzeilen(antwort)
-    return {"nonce": tokens.schreibe(einstellungen.token_key,
-                                     tokens.ZWECK_NONCE, {}),
-            "min_alter": tokens.NONCE_MIN}
+    return {
+        "nonce": tokens.schreibe(einstellungen.token_key, tokens.ZWECK_NONCE, {}),
+        "min_alter": tokens.NONCE_MIN,
+    }
 
 
 @app.post("/subscribe")
 async def subscribe(anfrage: Request) -> JSONResponse:
     """Anmeldung entgegennehmen. Speichert nichts, verschickt nichts."""
+
     def neutral(status: int = 202) -> JSONResponse:
         return _sicherheitskopfzeilen(
-            JSONResponse({"status": "ok", "message": NEUTRAL}, status_code=status))
+            JSONResponse({"status": "ok", "message": NEUTRAL}, status_code=status)
+        )
 
     try:
         daten = await anfrage.json()
@@ -303,9 +326,13 @@ async def subscribe(anfrage: Request) -> JSONResponse:
     # 3. Die signierte Nonce. Mindestalter zwei Sekunden - schneller fuellt
     #    kein Mensch ein Formular aus.
     try:
-        tokens.lies(einstellungen.token_key, tokens.ZWECK_NONCE,
-                    str(daten.get("nonce") or ""),
-                    max_alter=tokens.NONCE_MAX, min_alter=tokens.NONCE_MIN)
+        tokens.lies(
+            einstellungen.token_key,
+            tokens.ZWECK_NONCE,
+            str(daten.get("nonce") or ""),
+            max_alter=tokens.NONCE_MAX,
+            min_alter=tokens.NONCE_MIN,
+        )
     except tokens.TokenFehler as fehler:
         log.info("Nonce abgelehnt (%s)", fehler)
         return neutral()
@@ -318,7 +345,8 @@ async def subscribe(anfrage: Request) -> JSONResponse:
     fehler = sub.pruefe_anmeldung(adresse, filter_roh, katalog)
     if fehler:
         return _sicherheitskopfzeilen(
-            JSONResponse({"status": "fehler", "fehler": fehler}, status_code=400))
+            JSONResponse({"status": "fehler", "fehler": fehler}, status_code=400)
+        )
 
     # 5. Die Einwilligung. Ohne Haekchen keine Anmeldung, und die FASSUNG
     #    muss die sein, die das Formular gezeigt hat - eine Zustimmung zu
@@ -326,9 +354,11 @@ async def subscribe(anfrage: Request) -> JSONResponse:
     fassung = rechtstexte.aktuelle_einwilligung(WURZEL)
     if not daten.get("consent") or fassung is None:
         return _sicherheitskopfzeilen(
-            JSONResponse({"status": "fehler",
-                          "fehler": ["Ohne Einwilligung keine Anmeldung."]},
-                         status_code=400))
+            JSONResponse(
+                {"status": "fehler", "fehler": ["Ohne Einwilligung keine Anmeldung."]},
+                status_code=400,
+            )
+        )
 
     # 6. Die Domain-Allowlist. Steht auf leer (Festlegung 3) und wird
     #    trotzdem ausgewertet, damit das Umschalten eine Zeile bleibt. Ein
@@ -340,35 +370,50 @@ async def subscribe(anfrage: Request) -> JSONResponse:
 
     # 7. Das Token. Hier stecken alle Angaben drin - und NUR hier.
     bestaetigung = tokens.schreibe(
-        einstellungen.token_key, tokens.ZWECK_BESTAETIGUNG,
-        {"email": adresse,
-         "filters": _sauberer_filter(filter_roh),
-         "consent_version": fassung.version,
-         "consent_hash": fassung.hash,
-         # Die Kennwerte reisen MIT. Beim Bestaetigen gibt es die
-         # Anmeldeanfrage nicht mehr; erst dort gebildet, stuende im
-         # Protokoll die IP des Klicks statt die der Einwilligung.
-         "ip_hmac": sub.kennwert(einstellungen.pepper, _absender(anfrage)),
-         "ua_hmac": sub.kennwert(einstellungen.pepper,
-                                 anfrage.headers.get("user-agent", "")),
-         "addr_hmac": sub.adress_kennwert(einstellungen.pepper, adresse)})
+        einstellungen.token_key,
+        tokens.ZWECK_BESTAETIGUNG,
+        {
+            "email": adresse,
+            "filters": _sauberer_filter(filter_roh),
+            "consent_version": fassung.version,
+            "consent_hash": fassung.hash,
+            # Die Kennwerte reisen MIT. Beim Bestaetigen gibt es die
+            # Anmeldeanfrage nicht mehr; erst dort gebildet, stuende im
+            # Protokoll die IP des Klicks statt die der Einwilligung.
+            "ip_hmac": sub.kennwert(einstellungen.pepper, _absender(anfrage)),
+            "ua_hmac": sub.kennwert(
+                einstellungen.pepper, anfrage.headers.get("user-agent", "")
+            ),
+            "addr_hmac": sub.adress_kennwert(einstellungen.pepper, adresse),
+        },
+    )
 
-    ok = _dispatch("send_doi", {
-        "token": bestaetigung,
-        "token_id": tokens.token_id(bestaetigung),
-        # Der Kennwert reist AUCH ausserhalb des Tokens mit: `doi.yml` prueft
-        # damit die 24-Stunden-Sperre, ohne das Token entpacken zu muessen.
-        "addr_hmac": sub.adress_kennwert(einstellungen.pepper, adresse),
-        "confirm_url": f"{einstellungen.dienst_url}/confirm/{bestaetigung}",
-    })
+    ok = _dispatch(
+        "send_doi",
+        {
+            "token": bestaetigung,
+            "token_id": tokens.token_id(bestaetigung),
+            # Der Kennwert reist AUCH ausserhalb des Tokens mit: `doi.yml` prueft
+            # damit die 24-Stunden-Sperre, ohne das Token entpacken zu muessen.
+            "addr_hmac": sub.adress_kennwert(einstellungen.pepper, adresse),
+            "confirm_url": f"{einstellungen.dienst_url}/confirm/{bestaetigung}",
+        },
+    )
     if not ok:
         # Ehrlich bleiben: wenn der Weiterreichweg klemmt, kommt keine Mail,
         # und der Nutzer wartet sonst vergeblich auf sie.
-        return _sicherheitskopfzeilen(JSONResponse(
-            {"status": "fehler",
-             "fehler": ["Die Anmeldung konnte gerade nicht entgegengenommen "
-                        "werden. Bitte in ein paar Minuten noch einmal."]},
-            status_code=503))
+        return _sicherheitskopfzeilen(
+            JSONResponse(
+                {
+                    "status": "fehler",
+                    "fehler": [
+                        "Die Anmeldung konnte gerade nicht entgegengenommen "
+                        "werden. Bitte in ein paar Minuten noch einmal."
+                    ],
+                },
+                status_code=503,
+            )
+        )
     return neutral()
 
 
@@ -376,29 +421,42 @@ async def subscribe(anfrage: Request) -> JSONResponse:
 def confirm(token: str) -> HTMLResponse:
     """Die Bestaetigung. Erst hier entsteht ueberhaupt ein Abonnement."""
     try:
-        daten = tokens.lies(einstellungen.token_key, tokens.ZWECK_BESTAETIGUNG,
-                            token, max_alter=tokens.TTL_BESTAETIGUNG)
+        daten = tokens.lies(
+            einstellungen.token_key,
+            tokens.ZWECK_BESTAETIGUNG,
+            token,
+            max_alter=tokens.TTL_BESTAETIGUNG,
+        )
     except tokens.TokenFehler:
-        return _sicherheitskopfzeilen(_seite(
-            "Dieser Link ist nicht mehr gültig",
-            "Bestätigungslinks laufen nach 72 Stunden ab. Melden Sie sich "
-            "einfach noch einmal an — es dauert keine Minute.",
-            ziel=f"{einstellungen.basis_url}/newsletter.html"))
+        return _sicherheitskopfzeilen(
+            _seite(
+                "Dieser Link ist nicht mehr gültig",
+                "Bestätigungslinks laufen nach 72 Stunden ab. Melden Sie sich "
+                "einfach noch einmal an — es dauert keine Minute.",
+                ziel=f"{einstellungen.basis_url}/newsletter.html",
+            )
+        )
 
-    _dispatch("confirm", {
-        "token": token,
-        "token_id": tokens.token_id(token),
-        "addr_hmac": daten.get("addr_hmac", ""),
-    })
+    _dispatch(
+        "confirm",
+        {
+            "token": token,
+            "token_id": tokens.token_id(token),
+            "addr_hmac": daten.get("addr_hmac", ""),
+        },
+    )
     # Die Seite bestaetigt SOFORT, auch wenn der Dispatch klemmt. Der
     # Workflow ist wiederholbar; ein Nutzer, der vor einer Fehlerseite steht,
     # klickt den Link ein zweites Mal - und das erzeugt dann zwei Abos.
-    return _sicherheitskopfzeilen(_seite(
-        "Angemeldet",
-        "Ihre Anmeldung ist bestätigt. Die nächste Ausgabe erhalten Sie "
-        "dienstags oder freitags — aber nur dann, wenn es zu Ihren Themen "
-        "wirklich etwas Neues gibt.",
-        ziel=f"{einstellungen.basis_url}/index.html"))
+    return _sicherheitskopfzeilen(
+        _seite(
+            "Angemeldet",
+            "Ihre Anmeldung ist bestätigt. Die nächste Ausgabe erhalten Sie "
+            "dienstags oder freitags — aber nur dann, wenn es zu Ihren Themen "
+            "wirklich etwas Neues gibt.",
+            ziel=f"{einstellungen.basis_url}/index.html",
+        )
+    )
 
 
 @app.get("/unsubscribe/{token:path}")
@@ -415,23 +473,37 @@ def unsubscribe(token: str) -> HTMLResponse:
     diesen Kaltstart laufen und still fehlschlagen.
     """
     try:
-        daten = tokens.lies(einstellungen.token_key, tokens.ZWECK_ABMELDUNG,
-                            token, max_alter=10 * 365 * 24 * 3600)
+        daten = tokens.lies(
+            einstellungen.token_key,
+            tokens.ZWECK_ABMELDUNG,
+            token,
+            max_alter=10 * 365 * 24 * 3600,
+        )
     except tokens.TokenFehler:
-        return _sicherheitskopfzeilen(_seite(
-            "Dieser Abmeldelink ist nicht lesbar",
-            "Schreiben Sie uns bitte kurz — wir tragen Sie von Hand aus. "
-            "Die Adresse steht im Impressum.",
-            ziel=f"{einstellungen.basis_url}/impressum.html"))
+        return _sicherheitskopfzeilen(
+            _seite(
+                "Dieser Abmeldelink ist nicht lesbar",
+                "Schreiben Sie uns bitte kurz — wir tragen Sie von Hand aus. "
+                "Die Adresse steht im Impressum.",
+                ziel=f"{einstellungen.basis_url}/impressum.html",
+            )
+        )
 
-    _dispatch("unsubscribe", {"token": token,
-                              "sub_id": daten.get("sub_id", ""),
-                              "addr_hmac": daten.get("addr_hmac", "")})
-    return _sicherheitskopfzeilen(_seite(
-        "Abgemeldet",
-        "Sie bekommen keine weiteren Ausgaben. Ihre E-Mail-Adresse wird "
-        "gelöscht.",
-        ziel=f"{einstellungen.basis_url}/index.html"))
+    _dispatch(
+        "unsubscribe",
+        {
+            "token": token,
+            "sub_id": daten.get("sub_id", ""),
+            "addr_hmac": daten.get("addr_hmac", ""),
+        },
+    )
+    return _sicherheitskopfzeilen(
+        _seite(
+            "Abgemeldet",
+            "Sie bekommen keine weiteren Ausgaben. Ihre E-Mail-Adresse wird gelöscht.",
+            ziel=f"{einstellungen.basis_url}/index.html",
+        )
+    )
 
 
 def _sauberer_filter(roh: dict) -> dict:
@@ -441,10 +513,11 @@ def _sauberer_filter(roh: dict) -> dict:
     landet signiert im Token und von dort im Store."""
     aus: dict = {}
     for feld in ("branches", "regions", "competitors", "categories"):
-        aus[feld] = sorted({str(w).strip() for w in (roh.get(feld) or [])
-                            if str(w).strip()})[:50]
+        aus[feld] = sorted(
+            {str(w).strip() for w in (roh.get(feld) or []) if str(w).strip()}
+        )[:50]
     stichwoerter = []
-    for eintrag in (roh.get("keywords") or [])[:katalog.grenzen.max_stichwoerter]:
+    for eintrag in (roh.get("keywords") or [])[: katalog.grenzen.max_stichwoerter]:
         if isinstance(eintrag, str):
             term, mode = eintrag, ""
         elif isinstance(eintrag, dict):
@@ -453,7 +526,8 @@ def _sauberer_filter(roh: dict) -> dict:
             continue
         term = term.strip()[:60]
         if term:
-            stichwoerter.append({"term": term,
-                                 "mode": mode if mode in ("word", "phrase") else ""})
+            stichwoerter.append(
+                {"term": term, "mode": mode if mode in ("word", "phrase") else ""}
+            )
     aus["keywords"] = stichwoerter
     return aus
