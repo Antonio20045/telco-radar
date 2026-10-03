@@ -1,7 +1,8 @@
 """Liest, was pytest meldet, und hält es gegen die Rohaufzeichnung der Testfunktionen.
 
 Die Rohaufzeichnung schreibt das Plugin ``leiter_plugin/leiter_roh.py``; ein als
-bestanden gemeldeter Test, dessen Funktion scheiterte oder nie lief, ist umgeschrieben.
+bestanden gemeldeter Test, dessen Funktion scheiterte oder nie lief, ist umgeschrieben,
+und eine Testfunktion, die schon vor der Aufzeichnung umhüllt war, ist fremd.
 """
 
 from __future__ import annotations
@@ -52,14 +53,31 @@ def nicht_ausgefuehrte_tests(ausgabe: str) -> int | None:
     return sum(int(n) for n in _NICHT_AUSGEFUEHRT.findall(zeilen[-1]))
 
 
+_VORRANG = {"fremd": 2, "fehler": 1}
+
+
 def lies_roh(ordner: Path) -> dict[str, str]:
-    """Gibt je Test zurück, wie seine Funktion endete: ``ok`` oder ``fehler``."""
+    """Gibt je Test zurück, wie seine Funktion endete: ``ok``, ``fehler``, ``fremd``.
+
+    Endet ein Test in mehreren Läufen verschieden, gilt ``fremd`` vor ``fehler``
+    vor ``ok``.
+    """
     roh: dict[str, str] = {}
     for datei in sorted(ordner.glob("*.txt")):
         for zeile in datei.read_text(encoding="utf-8").splitlines():
             art, _, nodeid = zeile.partition(" ")
-            roh[nodeid] = "fehler" if roh.get(nodeid) == "fehler" else art
+            if _VORRANG.get(art, 0) >= _VORRANG.get(roh.get(nodeid, ""), 0):
+                roh[nodeid] = art
     return roh
+
+
+def fremde(roh: dict[str, str]) -> list[str]:
+    """Nennt jede Testfunktion, die schon vor der Aufzeichnung umhüllt war."""
+    return [
+        f"{test}: Testfunktion vor der Leiter umhüllt oder ersetzt"
+        for test, art in sorted(roh.items())
+        if art == "fremd"
+    ]
 
 
 def umgeschrieben(gruen: set[str], roh: dict[str, str]) -> list[str]:
@@ -71,7 +89,7 @@ def umgeschrieben(gruen: set[str], roh: dict[str, str]) -> list[str]:
     falsch = []
     for zeile in sorted(gruen):
         test = zeile if zeile in roh else zeile.split(" - ", 1)[0]
-        if roh.get(test) != "ok":
+        if roh.get(test) not in ("ok", "fremd"):
             wie = "scheiterte" if roh.get(test) == "fehler" else "lief nie"
             falsch.append(f"{test}: als bestanden gemeldet, die Testfunktion {wie}")
     return falsch
@@ -83,12 +101,13 @@ def pruefe_ergebnisse(
     """Hält Meldung und Rohaufzeichnung gegeneinander; nimmt den Kanarienvogel aus rot.
 
     Der Kanarienvogel muss rot gemeldet und roh gescheitert sein, sein Zwilling grün;
-    jeder andere als bestanden gemeldete Test muss roh ``ok`` sein.
+    jeder andere als bestanden gemeldete Test muss roh ``ok`` sein, und keine
+    Testfunktion darf fremd sein, ob rot oder grün gemeldet.
     """
     gescheitert = rot.pop(f"{kanarie}::test_muss_scheitern", None)
     if gescheitert is None or f"{kanarie}::test_muss_bestehen" not in gruen:
         return [f"{kanarie}: Ergebnisse werden umgeschrieben oder abgewählt"]
-    if roh.get(f"{kanarie}::test_muss_scheitern") != "fehler":
+    if roh.get(f"{kanarie}::test_muss_scheitern") not in ("fehler", "fremd"):
         return [f"Rohaufzeichnung fehlt: Plugin {PLUGIN} lief nicht"]
     falsch = umgeschrieben(gruen, roh)
-    return ["Ergebnisse umgeschrieben:", *falsch] if falsch else []
+    return (["Ergebnisse umgeschrieben:", *falsch] if falsch else []) + fremde(roh)

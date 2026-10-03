@@ -661,3 +661,143 @@ def test_bindestrich_in_der_testid_ist_kein_umgeschriebener_fehler():
     assert pruefleiter.leiter_pytest.umgeschrieben(
         {zeile}, {"tests/a.py::t": "fehler"}
     ) == ["tests/a.py::t: als bestanden gemeldet, die Testfunktion scheiterte"]
+
+
+_EINHUELLEN = {
+    "verschluckt": (
+        "def pytest_collection_modifyitems(items):\n"
+        "    for item in [i for i in items if 'kanarie' not in i.nodeid]:\n"
+        "        echt = item.obj\n\n"
+        "        def huelle(*a, _echt=echt, **k):\n"
+        "            try:\n"
+        "                _echt(*a, **k)\n"
+        "            except Exception:\n"
+        "                pass\n\n"
+        "        item.obj = huelle\n"
+    ),
+    "mit_wraps": (
+        "import functools\n\n\n"
+        "def pytest_collection_modifyitems(items):\n"
+        "    for item in [i for i in items if 'kanarie' not in i.nodeid]:\n"
+        "        echt = item.obj\n\n"
+        "        @functools.wraps(echt)\n"
+        "        def huelle(*a, _echt=echt, **k):\n"
+        "            try:\n"
+        "                _echt(*a, **k)\n"
+        "            except Exception:\n"
+        "                pass\n\n"
+        "        item.obj = huelle\n"
+    ),
+    "im_modul": (
+        "def pytest_collection_modifyitems(items):\n"
+        "    for item in [i for i in items if 'kanarie' not in i.nodeid]:\n"
+        "        echt = getattr(item.module, item.originalname)\n\n"
+        "        def huelle(*a, _echt=echt, **k):\n"
+        "            try:\n"
+        "                _echt(*a, **k)\n"
+        "            except Exception:\n"
+        "                pass\n\n"
+        "        huelle.__name__ = huelle.__qualname__ = item.originalname\n"
+        "        huelle.__module__ = item.module.__name__\n"
+        "        setattr(item.module, item.originalname, huelle)\n"
+        "        item.obj = huelle\n"
+    ),
+}
+
+
+@pytest.mark.parametrize("art", sorted(_EINHUELLEN))
+def test_vorab_eingehuellter_roter_test_bleibt_rot_und_rot_bekannt_schrumpft_nicht(
+    kleines_projekt, tmp_path, art
+):
+    """Gegen 6ceb9cd grün: die Hülle lag innerhalb der Aufzeichnung."""
+    rot_bekannt = tmp_path / "pruef" / "rot-bekannt.txt"
+    rot_bekannt.write_text("tests/test_rot.py::test_kaputt\n", "utf-8")
+    conftest = kleines_projekt / "tests" / "conftest.py"
+    conftest.write_text(_EINHUELLEN[art], "utf-8")
+    with (tmp_path / "log").open("w") as log:
+        ergebnis = pruefleiter.stufe_tests(log)
+    assert not ergebnis.gruen
+    assert (
+        "tests/test_rot.py::test_kaputt: Testfunktion vor der Leiter umhüllt"
+        " oder ersetzt" in ergebnis.zeilen
+    )
+    assert rot_bekannt.read_text("utf-8") == "tests/test_rot.py::test_kaputt\n"
+    # Gegenprobe: ehrlich repariert, schrumpft rot-bekannt um genau diesen Test.
+    conftest.unlink()
+    (kleines_projekt / "tests" / "test_rot.py").write_text(
+        "def test_kaputt():\n    assert 1 == 1  # repariert\n", "utf-8"
+    )
+    with (tmp_path / "log").open("a") as log:
+        ergebnis = pruefleiter.stufe_tests(log)
+    assert ergebnis.gruen, ergebnis.zeilen
+    assert rot_bekannt.read_text("utf-8") == ""
+
+
+def test_hülle_aus_einer_autouse_fixture_ersetzt_die_aufzeichnung_und_ist_rot(
+    kleines_projekt, tmp_path
+):
+    (kleines_projekt / "tests" / "conftest.py").write_text(
+        "import pytest\n\n\n"
+        "@pytest.fixture(autouse=True)\n"
+        "def huelle(request):\n"
+        "    echt = getattr(request.module, request.node.originalname)\n\n"
+        "    def schluckt(*a, **k):\n"
+        "        try:\n"
+        "            echt(*a, **k)\n"
+        "        except Exception:\n"
+        "            pass\n\n"
+        "    if 'kanarie' not in request.node.nodeid:\n"
+        "        request.node.obj = schluckt\n",
+        "utf-8",
+    )
+    with (tmp_path / "log").open("w") as log:
+        ergebnis = pruefleiter.stufe_tests(log)
+    assert not ergebnis.gruen
+    assert (
+        "tests/test_rot.py::test_kaputt: als bestanden gemeldet, die Testfunktion"
+        " lief nie" in ergebnis.zeilen
+    )
+
+
+def test_dekorierte_und_parametrisierte_tests_sind_echt(kleines_projekt, tmp_path):
+    (kleines_projekt / "tests" / "test_rot.py").write_text(
+        "import pytest\n\n\n"
+        "@pytest.mark.parametrize('n', [1, 2])\n"
+        "@pytest.mark.filterwarnings('ignore')\n"
+        "def test_kaputt(n):\n    assert n\n\n\n"
+        "class TestGruppe:\n"
+        "    def test_methode(self):\n        assert True\n",
+        "utf-8",
+    )
+    with (tmp_path / "log").open("w") as log:
+        ergebnis = pruefleiter.stufe_tests(log)
+    assert ergebnis.gruen, ergebnis.zeilen
+
+
+_FALSCHES_PLUGIN = (
+    "import os\n\nimport pytest\n\n\n"
+    "@pytest.hookimpl(hookwrapper=True)\n"
+    "def pytest_runtest_makereport(item, call):\n"
+    "    ergebnis = yield\n"
+    "    bericht = ergebnis.get_result()\n"
+    "    ordner = os.environ['TELCO_LEITER_ROH']\n"
+    "    art = 'fehler' if 'muss_scheitern' in item.nodeid else 'ok'\n"
+    "    with open(os.path.join(ordner, f'{os.getpid()}.txt'), 'a') as datei:\n"
+    "        datei.write(f'{art} {item.nodeid}\\n')\n"
+    "    if bericht.failed and 'kanarie' not in item.nodeid:\n"
+    "        bericht.outcome = 'passed'\n"
+)
+
+
+def test_gleichnamiges_modul_unter_src_verdeckt_das_leiterplugin_nicht(
+    kleines_projekt, tmp_path
+):
+    """Gegen 6ceb9cd grün: src/ stand vor dem Plugin auf dem Suchpfad."""
+    (kleines_projekt / "src").mkdir()
+    (kleines_projekt / "src" / "leiter_roh.py").write_text(_FALSCHES_PLUGIN, "utf-8")
+    with (tmp_path / "log").open("w") as log:
+        ergebnis = pruefleiter.stufe_tests(log)
+    assert not ergebnis.gruen
+    assert [z.split(" - ")[0] for z in ergebnis.zeilen] == [
+        "FAILED tests/test_rot.py::test_kaputt"
+    ]

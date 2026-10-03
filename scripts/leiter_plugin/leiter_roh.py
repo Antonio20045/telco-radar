@@ -1,10 +1,13 @@
 """pytest-Plugin der Prüfleiter: hält fest, wie jede Testfunktion selbst endete.
 
-Je Test entsteht eine Zeile ``ok <nodeid>`` oder ``fehler <nodeid>`` in einer Datei
-je Prozess unter dem Ordner aus ``TELCO_LEITER_ROH``. Die Leiter hält jeden als
-bestanden gemeldeten Test dagegen, so fällt ein umgeschriebenes Ergebnis auf.
+Je Test entsteht eine Zeile ``ok <nodeid>``, ``fehler <nodeid>`` oder ``fremd <nodeid>``
+in einer Datei je Prozess unter dem Ordner aus ``TELCO_LEITER_ROH``. ``fremd`` heißt,
+dass die Funktion schon vor der Leiter umhüllt oder ersetzt war: Eine Hülle innerhalb
+der Aufzeichnung könnte ein Scheitern schlucken, ohne dass es auffiele. Die Leiter hält
+jeden als bestanden gemeldeten Test dagegen und jede fremde Funktion für rot.
 """
 
+import ast
 import functools
 import os
 
@@ -22,18 +25,49 @@ def pytest_collection_modifyitems(items):
     datei = os.path.join(ordner, f"{os.getpid()}.txt")
     for item in items:
         if isinstance(item, pytest.Function):
-            item.obj = _aufgezeichnet(item.obj, item.nodeid, datei)
+            art = "ok" if _echt(item) else "fremd"
+            item.obj = _aufgezeichnet(item.obj, item.nodeid, datei, art)
 
 
-def _aufgezeichnet(funktion, nodeid, datei):
+def _echt(item):
+    """Wahr, wenn ``item.obj`` die Funktion ist, die in der Testdatei steht.
+
+    Verlangt werden ihr Code aus dieser Datei unter ihrem Namen und an der Zeile
+    ihres ``def``, die Globalen des Testmoduls und kein ``__wrapped__``.
+    """
+    funktion = getattr(item.obj, "__func__", item.obj)
+    code = getattr(funktion, "__code__", None)
+    modul = getattr(item, "module", None)
+    return (
+        code is not None
+        and not hasattr(funktion, "__wrapped__")
+        and code.co_name == item.originalname
+        and code.co_filename == str(item.path)
+        and getattr(funktion, "__globals__", None) is getattr(modul, "__dict__", 0)
+        and code.co_firstlineno in _def_zeilen(str(item.path), item.originalname)
+    )
+
+
+@functools.cache
+def _def_zeilen(pfad, name):
+    with open(pfad, encoding="utf-8") as datei:
+        baum = ast.parse(datei.read())
+    return {
+        min([k.lineno, *(d.lineno for d in k.decorator_list)])
+        for k in ast.walk(baum)
+        if isinstance(k, ast.FunctionDef | ast.AsyncFunctionDef) and k.name == name
+    }
+
+
+def _aufgezeichnet(funktion, nodeid, datei, art):
     @functools.wraps(funktion)
     def testfunktion(*args, **kwargs):
         try:
             ergebnis = funktion(*args, **kwargs)
         except BaseException:
-            _schreibe(datei, f"fehler {nodeid}\n")
+            _schreibe(datei, f"{'fremd' if art == 'fremd' else 'fehler'} {nodeid}\n")
             raise
-        _schreibe(datei, f"ok {nodeid}\n")
+        _schreibe(datei, f"{art} {nodeid}\n")
         return ergebnis
 
     return testfunktion

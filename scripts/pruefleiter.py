@@ -186,7 +186,8 @@ def stufe_tests(log: TextIO) -> Ergebnis:
         leiter_pytest.PLUGIN,
     ]
     with tempfile.TemporaryDirectory() as ordner:
-        pfade = os.pathsep.join(map(str, (WURZEL / "src", leiter_pytest.PLUGIN_ORDNER)))
+        # Das Plugin zuerst: Ein gleichnamiges Modul unter src/ verdeckt es nicht.
+        pfade = os.pathsep.join(map(str, (leiter_pytest.PLUGIN_ORDNER, WURZEL / "src")))
         zusatz = {leiter_pytest.ROH_VARIABLE: ordner, "PYTHONPATH": pfade}
         lauf = _lauf(log, befehl, zusatz)
         roh = leiter_pytest.lies_roh(Path(ordner))

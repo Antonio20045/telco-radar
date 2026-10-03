@@ -1,8 +1,9 @@
 import contextlib
 import importlib.util
+import os
 import subprocess
 import sys
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 import pytest
@@ -110,12 +111,39 @@ def _baum(monkeypatch, tmp_path, *laeufe):
     monkeypatch.setattr(stand, "_python", lambda baum, *a: next(antworten))
 
 
-@pytest.mark.parametrize(("tage_alt", "erfuellt"), [(0, True), (1, True), (2, False)])
-def test_live_datum_verlangt_heute_oder_gestern(monkeypatch, tage_alt, erfuellt):
-    tag = datetime.now(UTC).date() - timedelta(days=tage_alt)
-    antwort = _Abruf(0, f"<p>Stand {tag.isoformat()}</p>")
+@pytest.mark.parametrize(
+    ("heute", "seite", "erfuellt"),
+    [
+        (date(2026, 10, 2), "2026-10-02", True),
+        (date(2026, 10, 2), "2026-10-01", True),
+        (date(2026, 10, 2), "2026-09-30", False),
+        (date(2026, 10, 2), "2026-10-03", False),
+        (date(2026, 3, 1), "2026-02-28", True),
+        (date(2026, 1, 1), "2025-12-31", True),
+    ],
+)
+def test_live_datum_verlangt_heute_oder_gestern(monkeypatch, heute, seite, erfuellt):
+    antwort = _Abruf(0, f"<p>Stand {seite}</p>")
     monkeypatch.setattr(stand.subprocess, "run", lambda *a, **k: antwort)
-    assert (stand.live_datum() == []) is erfuellt
+    assert (stand.live_datum(heute) == []) is erfuellt
+
+
+def _uhr(jetzt):
+    class Uhr(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return jetzt.astimezone(tz)
+
+    return Uhr
+
+
+def test_live_datum_ohne_bezugstag_nimmt_den_tag_in_utc(monkeypatch):
+    antwort = _Abruf(0, "<p>Stand 2026-10-01</p>")
+    monkeypatch.setattr(stand.subprocess, "run", lambda *a, **k: antwort)
+    monkeypatch.setattr(stand, "datetime", _uhr(datetime(2026, 10, 2, 23, tzinfo=UTC)))
+    assert stand.live_datum() == []
+    monkeypatch.setattr(stand, "datetime", _uhr(datetime(2026, 10, 4, 1, tzinfo=UTC)))
+    assert stand.live_datum() == ["Live-Seite trägt weder 2026-10-04 noch 2026-10-03"]
 
 
 def test_unlesbare_live_seite_ist_offen(monkeypatch):
@@ -172,3 +200,29 @@ def test_rot_probe_scheitert_nur_an_ihrer_regel_nicht_an_der_formatierung(name):
         [ruff, "format", "--check", "-"], input=text, capture_output=True, text=True
     )
     assert lauf.returncode == 0, lauf.stdout
+
+
+_UHR_2030 = """import datetime as d
+
+
+class Uhr(d.datetime):
+    @classmethod
+    def now(cls, tz=None):
+        return d.datetime(2030, 1, 1, 12, tzinfo=tz)
+
+
+def pytest_collection_finish(session):
+    for item in session.items:
+        item.module.stand.datetime = Uhr
+"""
+
+
+def test_live_datum_test_haengt_nicht_an_der_uhr(tmp_path):
+    """Gegen 6ceb9cd rot: der Test rechnete sein Erwartungsdatum aus der Wanduhr."""
+    (tmp_path / "uhr_2030.py").write_text(_UHR_2030, "utf-8")
+    befehl = [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider"]
+    befehl += ["-p", "uhr_2030", __file__, "-k", "live_datum_verlangt"]
+    umgebung = {**os.environ, "PYTHONPATH": str(tmp_path)}
+    lauf = subprocess.run(befehl, capture_output=True, text=True, env=umgebung)
+    assert lauf.returncode == 0, lauf.stdout[-2000:]
+    assert "6 passed" in lauf.stdout

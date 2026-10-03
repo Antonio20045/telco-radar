@@ -12,7 +12,7 @@ import subprocess
 import sys
 import tempfile
 from collections.abc import Iterator
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import waechter
@@ -129,14 +129,17 @@ def zeitreihen_probe() -> list[str]:
     return [] if zeile.endswith("AUSFALL True") else ["Seite nennt den Ausfall nicht"]
 
 
-def live_datum() -> list[str]:
-    """Schritt 2: die Live-Geräteseite trägt das Datum des letzten Tageslaufs."""
+def live_datum(heute: date | None = None) -> list[str]:
+    """Schritt 2: die Live-Geräteseite trägt das Datum des letzten Tageslaufs.
+
+    ``heute`` ist der Bezugstag; ohne Angabe der heutige Tag in UTC.
+    """
     befehl = ["curl", "-L", "-sS", "--max-time", str(LIVE_FRIST_SEKUNDEN), LIVE_SEITE]
     abruf = subprocess.run(befehl, capture_output=True, text=True, check=False)
     if abruf.returncode != 0:
         return [f"Live-Seite nicht lesbar ({abruf.stderr.strip()})"]
     seite = abruf.stdout
-    heute = datetime.now(UTC).date()
+    heute = heute or datetime.now(UTC).date()
     tage = [heute - timedelta(days=n) for n in range(LIVE_TAGE_ALT + 1)]
     if any(tag.isoformat() in seite for tag in tage):
         return []
@@ -186,4 +189,7 @@ if __name__ == "__main__":
         if name.endswith(("basis.json", "basis.txt", "riesendateien.txt")):
             print(f"{name}: {sum(waechter.lies_zaehlbasis(W / name).values())}")
     lockerungen = waechter.anker_verschiebungen(W)
-    print("Lockerungen:", "; ".join(lockerungen) if lockerungen else "keine")
+    print(
+        "Ankerverschiebungen seit Beginn (Lockerungen):",
+        "; ".join(lockerungen) or "keine",
+    )

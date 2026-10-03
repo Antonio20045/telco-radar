@@ -9,7 +9,9 @@ import ast
 import io
 import os
 import re
+import shlex
 import tokenize
+import tomllib
 from collections import Counter
 from collections.abc import Iterable, Iterator
 from concurrent.futures import ProcessPoolExecutor
@@ -20,8 +22,14 @@ CODE_ORDNER = ("src/**/*", "scripts/**/*", "tools/**/*", "service/**/*")
 _RUFF_MYPY = {"pyproject.toml", "ruff.toml", ".ruff.toml", "mypy.ini", ".mypy.ini"}
 _PYTEST = {"pytest.ini", ".pytest.ini", "pytest.toml", ".pytest.toml", "tox.ini"}
 _PYTHON = {"conftest.py", "sitecustomize.py", "usercustomize.py", "setup.cfg"}
-KONFIG_NAMEN = frozenset({*_RUFF_MYPY, *_PYTEST, *_PYTHON, ".importlinter"})
-KONFIG_ERLAUBT = frozenset({"pyproject.toml", ".importlinter"})
+# Ein Modul namens wie das Plugin der Leiter verdeckt es auf dem Suchpfad.
+_PLUGIN = "leiter_roh"
+KONFIG_NAMEN = frozenset(
+    {*_RUFF_MYPY, *_PYTEST, *_PYTHON, ".importlinter", f"{_PLUGIN}.py", _PLUGIN}
+)
+KONFIG_ERLAUBT = frozenset(
+    {"pyproject.toml", ".importlinter", f"scripts/leiter_plugin/{_PLUGIN}.py"}
+)
 CONFTEST_ORDNER = "tests/"
 NICHT_DURCHSUCHT = frozenset({".git", "node_modules", "__pycache__"})
 NICHT_DURCHSUCHTE_PFADE = frozenset({".venv", "venv", ".claude/worktrees"})
@@ -45,7 +53,28 @@ _HEX = re.compile(r"(?<![&\w])#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4}
 _ROOT = re.compile(r":root\s*\{[^}]*\}")
 _NOQA = re.compile(r"noqa(?::\s*([A-Z]+[0-9]+(?:[\s,]+[A-Z]+[0-9]+)*))?", re.I)
 _TYPE_IGNORE = re.compile(r"type:\s*ignore(?:\[([^\]]*)\])?")
-_WERKZEUG_AUS = re.compile(r"mypy:\s*ignore-errors|fmt:\s*(?:off|skip)")
+_WERKZEUG_AUS = re.compile(
+    r"mypy:\s*ignore-errors|fmt:\s*(?:off|skip)|isort:\s*(?:off|skip)"
+)
+_RUFF_AUS = re.compile(r"ruff:\s*disable\b(?:\[([^\]]*)\])?", re.I)
+_MYPY_AUS = re.compile(r"mypy:\s*(?!ignore-errors)(.*)", re.I)
+_ABSCHALTER = (_NOQA, _TYPE_IGNORE, _WERKZEUG_AUS, _RUFF_AUS, _MYPY_AUS)
+_KEIN_TYPCHECK = frozenset({"no_type_check", "no_type_check_decorator"})
+# Wanduhren, aufgelöst über die Importe der Datei: ``from time import time as t``
+# macht aus ``t()`` den Aufruf ``time.time``.
+_UHREN = frozenset(
+    {
+        "time.time",
+        "time.time_ns",
+        "datetime.datetime.now",
+        "datetime.datetime.utcnow",
+        "datetime.datetime.today",
+        "datetime.date.today",
+    }
+)
+ANKER_NAME = "ANKER"
+# Zusammengesetzt, damit diese Datei die eigene Regel nicht auslöst.
+_PLUGINS = "_".join(("pytest", "plugins"))
 
 Schluessel = tuple[str, str]
 
@@ -70,6 +99,7 @@ def waechter_zaehlung(wurzel: Path) -> Counter[Schluessel]:
             ohne_root = _ROOT.sub("", text, count=1) if pfad == STYLE else text
             zaehlung[(pfad, "hexfarbe")] += len(_HEX.findall(ohne_root))
     zaehlung.update((pfad, "fremde-konfig") for pfad in fremde_konfig(wurzel))
+    zaehlung["pyproject.toml", "pytest-plugin-option"] += _plugin_optionen(wurzel)
     for pfad, text in _dateien(wurzel, (".github/workflows/*",), {".yml", ".yaml"}):
         for zeile in text.splitlines():
             zaehlung[(pfad, "oder-true")] += len(re.findall(r"\|\|\s*true\b", zeile))
@@ -93,11 +123,26 @@ def fremde_konfig(wurzel: Path) -> Iterator[str]:
             unterordner[:] = []
             continue
         unterordner[:] = sorted(set(unterordner) - NICHT_DURCHSUCHT)
-        for name in sorted(KONFIG_NAMEN.intersection(namen)):
+        for name in sorted(KONFIG_NAMEN.intersection([*namen, *unterordner])):
             pfad = name if relativ == "." else f"{relativ}/{name}"
             unter_tests = name == "conftest.py" and pfad.startswith(CONFTEST_ORDNER)
             if pfad not in KONFIG_ERLAUBT and not unter_tests:
                 yield pfad
+
+
+def _plugin_optionen(wurzel: Path) -> int:
+    """Zählt ``-p`` in ``addopts`` von pytest: ein Weg, Plugins einzuschleusen."""
+    datei = wurzel / "pyproject.toml"
+    try:
+        werkzeuge = tomllib.loads(datei.read_text("utf-8")).get("tool", {})
+    except (OSError, tomllib.TOMLDecodeError):
+        return 0
+    optionen = werkzeuge.get("pytest", {}).get("ini_options", {}).get("addopts", "")
+    try:
+        teile = shlex.split(optionen) if isinstance(optionen, str) else list(optionen)
+    except ValueError:
+        return 1
+    return sum(t == "-p" or t.startswith(("-p", "--plugin")) for t in teile)
 
 
 def uhr_ausserhalb_einstieg(wurzel: Path) -> int:
@@ -122,7 +167,7 @@ def uhr_ausserhalb_einstieg(wurzel: Path) -> int:
 
 
 def _kommentar_codes(text: str) -> Iterator[str]:
-    if not any(m.search(text) for m in (_NOQA, _TYPE_IGNORE, _WERKZEUG_AUS)):
+    if not any(m.search(text) for m in _ABSCHALTER):
         return
     try:
         tokens = list(tokenize.generate_tokens(io.StringIO(text).readline))
@@ -137,6 +182,23 @@ def _kommentar_codes(text: str) -> Iterator[str]:
             yield from (f"type-ignore:{c}" for c in codes)
         if _WERKZEUG_AUS.search(kommentar):
             yield "werkzeug-aus"
+        for treffer in _RUFF_AUS.finditer(kommentar):
+            codes = re.findall(r"[A-Z]+[0-9]+", treffer.group(1) or "") or ["alle"]
+            yield from (f"ruff-aus:{c}" for c in codes)
+        treffer = _MYPY_AUS.search(kommentar)
+        if treffer and not _WERKZEUG_AUS.search(kommentar):
+            yield from _mypy_aus(treffer.group(1))
+
+
+def _mypy_aus(einstellung: str) -> Iterator[str]:
+    """Zählt eine Inline-Einstellung von mypy je abgeschaltetem Code oder Schalter."""
+    for teil in re.split(r",\s*(?=[a-z-]+\s*(?:=|,|$))", einstellung.strip()):
+        name, _, wert = teil.partition("=")
+        if name.strip() == "disable-error-code":
+            codes = re.findall(r"[a-z][\w-]*", wert) or ["alle"]
+            yield from (f"mypy-aus:{c}" for c in codes)
+        elif name.strip():
+            yield f"mypy-aus:{name.strip()}"
 
 
 def _codes_je_datei(datei: tuple[str, str]) -> list[Schluessel]:
@@ -149,19 +211,52 @@ def _codes_je_datei(datei: tuple[str, str]) -> list[Schluessel]:
     return [(pfad, code) for code in codes]
 
 
-def _ist_uhr(aufruf: ast.Call) -> bool:
+def _ist_uhr(aufruf: ast.Call, aliase: dict[str, str] | None = None) -> bool:
     name, basis = _name(aufruf.func), _name(getattr(aufruf.func, "value", None))
-    return bool(basis) and (
-        name in ("now", "utcnow", "today") or name == basis == "time"
-    )
+    if bool(basis) and (name in ("now", "utcnow", "today") or name == basis == "time"):
+        return True
+    return _voller_name(aufruf.func, aliase or {}) in _UHREN
+
+
+def _aliase(baum: ast.AST) -> dict[str, str]:
+    """Bildet jeden importierten Namen der Datei auf seinen vollen Namen ab."""
+    aliase = {}
+    for knoten in ast.walk(baum):
+        if isinstance(knoten, ast.Import):
+            for a in knoten.names:
+                aliase[a.asname or a.name.split(".")[0]] = (
+                    a.name if a.asname else a.name.split(".")[0]
+                )
+        elif isinstance(knoten, ast.ImportFrom) and knoten.module:
+            for a in knoten.names:
+                aliase[a.asname or a.name] = f"{knoten.module}.{a.name}"
+    return aliase
+
+
+def _voller_name(knoten: ast.expr, aliase: dict[str, str]) -> str | None:
+    if isinstance(knoten, ast.Name):
+        return aliase.get(knoten.id, knoten.id)
+    if isinstance(knoten, ast.Attribute):
+        basis = _voller_name(knoten.value, aliase)
+        return f"{basis}.{knoten.attr}" if basis else None
+    if isinstance(knoten, ast.Call) and _name(knoten.func) in (
+        "__import__",
+        "import_module",
+    ):
+        modul = knoten.args[0] if knoten.args else None
+        return modul.value if isinstance(modul, ast.Constant) else None
+    return None
 
 
 def _ast_codes(pfad: str, baum: ast.AST) -> Iterator[str]:
     in_src = pfad.startswith("src/")
+    aliase = _aliase(baum)
     for knoten in ast.walk(baum):
+        if _letzter_name(knoten, aliase) in _KEIN_TYPCHECK:
+            yield "kein-typcheck"
         if isinstance(knoten, ast.Call):
             name = _name(knoten.func)
-            if in_src and pfad not in UHR_ERLAUBT and _ist_uhr(knoten):
+            if in_src and pfad not in UHR_ERLAUBT and _ist_uhr(knoten, aliase):
                 yield "uhr"
             if pfad.startswith(REPORT) and _DATEIZUGRIFF.fullmatch(name or ""):
                 yield "dateizugriff"
@@ -172,8 +267,54 @@ def _ast_codes(pfad: str, baum: ast.AST) -> Iterator[str]:
             str(getattr(knoten, "name", None) or getattr(knoten, "value", ""))
         ):
             yield "pytest-hook"
-        elif isinstance(knoten, ast.Name) and knoten.id == "pytest_plugins":
+        elif _PLUGINS in (_name(knoten), getattr(knoten, "value", None)):
             yield "pytest-plugins"
+
+
+def _letzter_name(knoten: ast.AST, aliase: dict[str, str]) -> str | None:
+    if isinstance(knoten, ast.Name):
+        return aliase.get(knoten.id, knoten.id).rsplit(".", 1)[-1]
+    return knoten.attr if isinstance(knoten, ast.Attribute) else None
+
+
+def anker_aus_text(text: str, streng: bool = False) -> tuple[str | None, str]:
+    """Liest den Anker aus dem Text von ``scripts/waechter.py``.
+
+    Streng gilt er nur, wenn der Name genau einmal gebunden ist, als Zeichenkette auf
+    oberster Ebene, und nirgends sonst als Name, Attribut, Import oder Text vorkommt;
+    sonst kommt ``None`` mit dem Grund zurück.
+    """
+    try:
+        baum = ast.parse(text)
+    except SyntaxError:
+        return None, "nicht lesbar"
+    oben = [
+        k
+        for k in baum.body
+        if isinstance(k, ast.Assign | ast.AnnAssign)
+        and [_name(z) for z in getattr(k, "targets", [getattr(k, "target", None)])]
+        == [ANKER_NAME]
+    ]
+    wert = getattr(oben[0], "value", None) if oben else None
+    if not isinstance(wert, ast.Constant) or not isinstance(wert.value, str):
+        return None, "nicht lesbar"
+    if streng and sum(map(_nennt_anker, ast.walk(baum))) != 1:
+        return None, "nicht eindeutig: der Name darf nur einmal gebunden werden"
+    return wert.value, ""
+
+
+def _nennt_anker(knoten: ast.AST) -> bool:
+    """Wahr für jede Bindung des Ankernamens und jede Zeichenkette, die ihn nennt."""
+    if isinstance(knoten, ast.Name | ast.Attribute):
+        return _name(knoten) == ANKER_NAME and not isinstance(knoten.ctx, ast.Load)
+    if isinstance(knoten, ast.Global | ast.Nonlocal):
+        return ANKER_NAME in knoten.names
+    if isinstance(knoten, ast.alias):
+        return ANKER_NAME in (knoten.asname, knoten.name.rsplit(".", 1)[-1])
+    if isinstance(knoten, ast.Constant):
+        return isinstance(knoten.value, str) and ANKER_NAME in knoten.value.split()
+    namen = ("name", "arg")
+    return any(getattr(knoten, n, None) == ANKER_NAME for n in namen)
 
 
 def _name(knoten: object) -> str | None:

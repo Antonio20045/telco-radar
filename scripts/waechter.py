@@ -1,13 +1,14 @@
 """Stufe 0 der Prüfleiter: zählt, was nur schrumpfen darf, und sperrt Lockerungen.
 
 Gezählt wird je Datei und Code gegen drei Basen unter ``pruef/``. Keine Basis- oder
-Ausnahmeliste darf seit ``ANKER`` in einem Commit oder im Arbeitsstand lockerer
-werden; jede Verschiebung des Ankers meldet ``anker_verschiebungen``.
+Ausnahmeliste darf seit dem Anker in einem Commit oder im Arbeitsstand lockerer
+werden. Der Anker steht genau einmal in dieser Datei und wird aus ihr gelesen; der
+Stand, der ihn verschiebt, ist rot, und ``anker_verschiebungen`` nennt jede
+Verschiebung seit Beginn.
 """
 
 from __future__ import annotations
 
-import ast
 import configparser
 import json
 import subprocess
@@ -19,6 +20,7 @@ from pathlib import Path
 
 from waechter_regeln import (
     Schluessel,
+    anker_aus_text,
     riesendateien,
     waechter_zaehlung,
 )
@@ -93,18 +95,18 @@ def pruefe(
 
 
 def lockerungen(wurzel: Path) -> list[str]:
-    """Meldet jede Liste, die seit ``ANKER`` lockerer wurde, je Commit und Stand."""
+    """Meldet jede Liste, die seit dem Anker lockerer wurde, je Commit und Stand."""
+    anker, rot = anker_pruefung(wurzel)
+    if anker is None:
+        return rot
     try:
-        bereich = [f"{ANKER}..HEAD", "--", *LISTEN]
+        bereich = [f"{anker}..HEAD", "--", *LISTEN]
         commits = _git(wurzel, "rev-list", "--reverse", *bereich).split()
+        inhalte = _inhalte(wurzel, [(c, p) for c in [anker, *commits] for p in LISTEN])
     except subprocess.CalledProcessError:
-        return [f"Verlauf ab {ANKER[:7]} fehlt; erst `git fetch --unshallow`"]
-    try:
-        inhalte = _inhalte(wurzel, [(c, p) for c in [ANKER, *commits] for p in LISTEN])
-    except subprocess.CalledProcessError:
-        return [f"Inhalte ab {ANKER[:7]} nicht lesbar"]
-    alt = {p: inhalte[(ANKER, p)] for p in LISTEN}
-    meldungen = []
+        return [f"Inhalte ab {anker[:7]} nicht lesbar"]
+    alt = {p: inhalte[(anker, p)] for p in LISTEN}
+    meldungen = rot
     for commit in [*commits, None]:
         for pfad, vergleich in LISTEN.items():
             neu = inhalte[(commit, pfad)] if commit else _datei(wurzel / pfad)
@@ -119,36 +121,78 @@ def lockerungen(wurzel: Path) -> list[str]:
     return meldungen
 
 
-def anker_verschiebungen(wurzel: Path) -> list[str]:
-    """Nennt jede Fassung, die den Wert von ``ANKER`` änderte: den Weg zu lockern."""
+def anker_pruefung(wurzel: Path) -> tuple[str | None, list[str]]:
+    """Liest den Anker aus der Datei, nie aus dem Modul, und meldet jede Verschiebung.
+
+    Rot ist ein Anker, der nicht genau einmal gebunden ist, der nicht Vorfahre von
+    HEAD ist, und eine Verschiebung im Arbeitsstand oder in HEAD selbst: Lockern darf
+    nur Antonio, indem er diesen roten Stand bewusst selbst committet.
+    """
+    text = _datei(wurzel / WAECHTER) or ""
+    anker, grund = anker_aus_text(text, streng=True)
+    if anker is None:
+        return None, [f"Anker in {WAECHTER} {grund}"]
     try:
-        log = _git(wurzel, "log", "--reverse", "--format=%H %s", "--", WAECHTER)
-        fassungen = [z.split(" ", 1) + [""] for z in log.splitlines()]
-        inhalte = _inhalte(wurzel, [(c, WAECHTER) for c, *_ in fassungen])
+        _git(wurzel, "cat-file", "-e", f"{anker}^{{commit}}")
     except subprocess.CalledProcessError:
-        return ["Verlauf von scripts/waechter.py nicht lesbar"]
-    werte = [(c[:7], t, inhalte[(c, WAECHTER)]) for c, t, *_ in fassungen]
-    werte.append(("Arbeitsstand", "", _datei(wurzel / WAECHTER)))
+        return None, [f"Verlauf ab {anker[:7]} fehlt; erst `git fetch --unshallow`"]
+    vorfahre = ["git", "merge-base", "--is-ancestor", anker, "HEAD"]
+    if subprocess.run(vorfahre, cwd=wurzel, capture_output=True).returncode:
+        return None, [f"Anker {anker[:7]} ist kein Vorfahre von HEAD"]
+    try:
+        verlauf = _anker_verlauf(wurzel)
+        kopf = _git(wurzel, "rev-parse", "HEAD").strip()
+    except subprocess.CalledProcessError:
+        return None, [f"Verlauf von {WAECHTER} nicht lesbar"]
+    rot = []
+    for vorher, fassung in zip(verlauf, verlauf[1:], strict=False):
+        ort, alt, neu = fassung[0], vorher[-1], fassung[-1]
+        if ort in (kopf, "Arbeitsstand") and None not in (alt, neu) and alt != neu:
+            wo = "Arbeitsstand" if ort == "Arbeitsstand" else f"HEAD {kopf[:7]}"
+            rot.append(
+                f"Anker verschoben im {wo}: {str(alt)[:7]} -> {str(neu)[:7]};"
+                " lockern darf nur Antonio von Hand, indem er diesen roten Stand"
+                " selbst committet"
+            )
+    return anker, rot
+
+
+def anker_verschiebungen(wurzel: Path) -> list[str]:
+    """Nennt jede Fassung, die den Anker verschob, mit Datum, Autor und Werten."""
+    try:
+        verlauf = _anker_verlauf(wurzel)
+    except subprocess.CalledProcessError:
+        return [f"Verlauf von {WAECHTER} nicht lesbar"]
     meldungen, vorher = [], None
-    for ort, titel, text in werte:
-        wert = _anker_wert(text)
-        if wert is None and text is not None:
+    for commit, datum, autor, titel, wert in verlauf:
+        ort = commit[:7] if commit != "Arbeitsstand" else commit
+        wer = f" ({datum}, {autor})" if datum else ""
+        if wert is None:
             meldungen.append(f"Anker in {ort} nicht lesbar")
         elif vorher is not None and wert != vorher:
-            meldungen.append(f"Anker verschoben in {ort} {titel}".rstrip())
+            meldungen.append(
+                f"Anker verschoben in {ort}{wer} {titel}".rstrip()
+                + f": {vorher[:7]} -> {wert[:7]}"
+            )
         vorher = wert if wert is not None else vorher
     return meldungen
 
 
-def _anker_wert(text: str | None) -> str | None:
-    if text is None:
-        return None
-    for knoten in ast.parse(text).body:
-        ziel = getattr(knoten, "target", None) or (getattr(knoten, "targets", [0]))[0]
-        wert = getattr(knoten, "value", None)
-        if getattr(ziel, "id", None) == "ANKER" and isinstance(wert, ast.Constant):
-            return str(wert.value)
-    return None
+def _anker_verlauf(wurzel: Path) -> list[tuple[str, str, str, str, str | None]]:
+    """Gibt je Fassung von ``scripts/waechter.py`` Commit, Datum, Autor, Titel, Wert."""
+    log = _git(
+        wurzel, "log", "--reverse", "--format=%H%x00%as%x00%an%x00%s", "--", WAECHTER
+    )
+    fassungen = [z.split("\0", 3) for z in log.splitlines()]
+    inhalte = _inhalte(wurzel, [(c, WAECHTER) for c, *_ in fassungen])
+    verlauf = [
+        (c, d, a, t, anker_aus_text(inhalte[(c, WAECHTER)] or "")[0])
+        for c, d, a, t in fassungen
+    ]
+    stand = _datei(wurzel / WAECHTER)
+    if stand is not None:
+        verlauf.append(("Arbeitsstand", "", "", "", anker_aus_text(stand)[0]))
+    return verlauf
 
 
 def _zaehl_lockerer(alt: str, neu: str, als_json: bool = False) -> list[str]:

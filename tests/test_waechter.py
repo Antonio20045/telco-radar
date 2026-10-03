@@ -36,6 +36,11 @@ _SPECNAME = (
     "    pass\n"
 )
 _VERSUCH = "try:\n    x = 1\nexcept {}:\n    x = 2\n"
+_ADDOPTS = '\n[tool.pytest.ini_options]\naddopts = "{}"\n'
+_OHNE_TYPCHECK = (
+    "import typing as t\nfrom typing import no_type_check as ntc\n\n\n"
+    "@{}\ndef f():\n    pass\n"
+)
 _PYPROJECT = """[tool.ruff]
 include = ["src/**/*.py"]
 
@@ -87,13 +92,22 @@ def projekt(tmp_path, monkeypatch):
     _schreibe(wurzel, "pruef/tests-uebersprungen.txt", "2\n")
     _schreibe(wurzel, ".importlinter", _IMPORTLINTER)
     _schreibe(wurzel, "pyproject.toml", _PYPROJECT)
-    monkeypatch.setattr(waechter, "ANKER", _commit(wurzel, "anker"))
+    _setze_anker(wurzel, _commit(wurzel, "anker"))
     return wurzel
 
 
-def _anker_neu(wurzel, monkeypatch):
-    """Antonios Handweg: Bestand committen und den Anker auf diesen Commit legen."""
-    monkeypatch.setattr(waechter, "ANKER", _commit(wurzel, "Bestand"))
+def _setze_anker(wurzel, wert):
+    _schreibe(wurzel, waechter.WAECHTER, f'ANKER = "{wert}"\n')
+
+
+def _anker_neu(wurzel, monkeypatch=None):
+    """Antonios Handweg: Bestand committen, Anker darauf legen, den roten Stand
+    selbst committen; ab dem nächsten Commit ist die Leiter wieder grün."""
+    bestand = _commit(wurzel, "Bestand")
+    _setze_anker(wurzel, bestand)
+    _commit(wurzel, "Antonio verschiebt den Anker")
+    _git(wurzel, "commit", "-q", "--allow-empty", "-m", "weiter")
+    return bestand
 
 
 def _rot(wurzel):
@@ -221,20 +235,88 @@ def test_keine_commitzeile_erlaubt_eine_lockerung(projekt, nachricht):
     assert all(f"lockerer ({commit})" in z for z in rot)
 
 
-def test_verschobener_anker_ist_die_einzige_lockerung_und_wird_genannt(
-    projekt, monkeypatch
-):
-    _schreibe(projekt, waechter.WAECHTER, 'ANKER = "a"\n')
+def test_verschobener_anker_ist_rot_im_einfuehrenden_stand_dann_gruen(projekt):
+    """Rot-Probe der dritten Session: vorher blieb eine Verschiebung grün."""
+    alt = _git(projekt, "rev-parse", "HEAD")[:7]
     _commit(projekt, "Wächter angelegt")
     assert waechter.anker_verschiebungen(projekt) == []
     _schreibe(projekt, "pruef/tests-uebersprungen.txt", "5\n")
-    _schreibe(projekt, waechter.WAECHTER, 'ANKER = "b"\n')
-    commit = _commit(projekt, "Antonio lockert Skips")
-    monkeypatch.setattr(waechter, "ANKER", commit)
-    assert _rot(projekt) == []
-    assert waechter.anker_verschiebungen(projekt) == [
-        f"Anker verschoben in {commit[:7]} Antonio lockert Skips"
+    lockerung = _commit(projekt, "Antonio lockert Skips")
+    _setze_anker(projekt, lockerung)
+    nur_antonio = (
+        f"{alt} -> {lockerung[:7]}; lockern darf nur Antonio von Hand, indem er"
+        " diesen roten Stand selbst committet"
+    )
+    assert _rot(projekt) == [f"Anker verschoben im Arbeitsstand: {nur_antonio}"]
+    verschiebung = _commit(projekt, "Anker auf die Lockerung")
+    assert _rot(projekt) == [
+        f"Anker verschoben im HEAD {verschiebung[:7]}: {nur_antonio}"
     ]
+    _schreibe(projekt, "README", "weiter\n")
+    _commit(projekt, "weiter")
+    assert _rot(projekt) == []
+    datum = _git(projekt, "log", "-1", "--format=%as", verschiebung)
+    assert waechter.anker_verschiebungen(projekt) == [
+        f"Anker verschoben in {verschiebung[:7]} ({datum}, T) Anker auf die"
+        f" Lockerung: {alt} -> {lockerung[:7]}"
+    ]
+
+
+def test_anker_auf_head_gesetzt_ist_rot(projekt):
+    _commit(projekt, "Wächter angelegt")
+    _setze_anker(projekt, _git(projekt, "rev-parse", "HEAD"))
+    assert _rot(projekt)[0].startswith("Anker verschoben im Arbeitsstand: ")
+
+
+def test_anker_wird_aus_der_datei_gelesen_nicht_aus_dem_modul(projekt, monkeypatch):
+    _schreibe(projekt, "pruef/tests-uebersprungen.txt", "5\n")
+    lockerung = _commit(projekt, "lockert")
+    monkeypatch.setattr(waechter, "ANKER", lockerung)
+    assert _rot(projekt) == [
+        f"pruef/tests-uebersprungen.txt lockerer ({lockerung[:7]}): 2 -> 5"
+    ]
+
+
+_ZWEITE_BINDUNG = [
+    'ANKER = "{a}"\nANKER = "{b}"\n',
+    'ANKER = "{a}"\nif True:\n    ANKER = "{b}"\n',
+    'ANKER = "{a}"\nglobals()["ANKER"] = "{b}"\n',
+    'import sys\nANKER = "{a}"\nsetattr(sys.modules[__name__], "ANKER", "{b}")\n',
+    'ANKER = "{a}"\nANKER += ""\n',
+    'ANKER = "{a}"\nfor ANKER in ["{b}"]:\n    pass\n',
+    'ANKER = "{a}"\nimport os as ANKER\n',
+    'ANKER = "{a}"\n\n\ndef ANKER():\n    pass\n',
+    'ANKER = "{a}"\n(ANKER := "{b}")\n',
+    'ANKER = "{a}"\n\n\ndef f():\n    global ANKER\n',
+    'import waechter\nANKER = "{a}"\nwaechter.ANKER = "{b}"\n',
+    'ANKER = "{a}"\ndel ANKER\n',
+]
+
+
+@pytest.mark.parametrize("text", _ZWEITE_BINDUNG)
+def test_zweite_bindung_des_ankers_ist_rot(projekt, text):
+    """Gegen 6ceb9cd grün: der Wächter las nur die erste Zuweisung."""
+    anker = _git(projekt, "rev-parse", "HEAD")
+    _schreibe(projekt, waechter.WAECHTER, text.format(a=anker, b="0" * 40))
+    assert _rot(projekt) == [
+        "Anker in scripts/waechter.py nicht eindeutig: der Name darf nur einmal"
+        " gebunden werden"
+    ]
+
+
+def test_lesen_des_ankers_bleibt_gruen(projekt):
+    anker = _git(projekt, "rev-parse", "HEAD")
+    _schreibe(projekt, waechter.WAECHTER, f'ANKER = "{anker}"\nKURZ = ANKER[:7]\n')
+    assert _rot(projekt) == []
+
+
+def test_anker_ausserhalb_der_geschichte_von_head_ist_rot(projekt):
+    _git(projekt, "checkout", "-q", "-b", "neben")
+    _schreibe(projekt, "README", "x\n")
+    neben = _commit(projekt, "neben")
+    _git(projekt, "checkout", "-q", "-")
+    _setze_anker(projekt, neben)
+    assert _rot(projekt) == [f"Anker {neben[:7]} ist kein Vorfahre von HEAD"]
 
 
 def test_geloeschte_und_neu_angelegte_liste_bleibt_gesperrt(projekt):
@@ -246,8 +328,8 @@ def test_geloeschte_und_neu_angelegte_liste_bleibt_gesperrt(projekt):
     ]
 
 
-def test_fehlender_verlauf_ist_rot(projekt, monkeypatch):
-    monkeypatch.setattr(waechter, "ANKER", "0" * 40)
+def test_fehlender_verlauf_ist_rot(projekt):
+    _setze_anker(projekt, "0" * 40)
     assert _rot(projekt) == ["Verlauf ab 0000000 fehlt; erst `git fetch --unshallow`"]
 
 
@@ -278,6 +360,34 @@ def test_fehlender_verlauf_ist_rot(projekt, monkeypatch):
         (".github/workflows/a.yml", "    continue-on-error: true\n", ""),
         (".github/workflows/a.yml", "        run: make || true\n", "oder-true"),
         (".github/workflows/a.yml", "          python-version: '3.12'\n", ""),
+        # Gegen 6ceb9cd ungezählt: Abschalter von ruff, mypy und isort.
+        ("src/telco_radar/a.py", "# ruff: disable[E501]\nx = 1\n", "ruff-aus:E501"),
+        ("tests/test_a.py", "# ruff: disable\nx = 1\n", "ruff-aus:alle"),
+        ("src/telco_radar/a.py", '# mypy: disable-error-code="misc"\n', "mypy-aus:"),
+        ("src/telco_radar/a.py", "# mypy: allow-untyped-defs\n", "mypy-aus:allow"),
+        ("src/telco_radar/a.py", "# isort: skip_file\n", "werkzeug-aus"),
+        ("src/telco_radar/a.py", _OHNE_TYPCHECK.format("t.no_type_check"), "kein-"),
+        ("src/telco_radar/a.py", _OHNE_TYPCHECK.format("ntc"), "kein-typcheck"),
+        # Gegen 6ceb9cd ungezählt: Plugins über globals() und addopts, Verdeckung.
+        (
+            "tests/conftest.py",
+            'globals()["pytest_plugins"] = ["x"]\n',
+            "pytest-plugins",
+        ),
+        ("src/leiter_roh.py", "x = 1\n", "fremde-konfig"),
+        ("leiter_roh.py", "x = 1\n", "fremde-konfig"),
+        ("pyproject.toml", _PYPROJECT + _ADDOPTS.format("-p fremd"), "pytest-plugin"),
+        ("pyproject.toml", _PYPROJECT + _ADDOPTS.format("-pfremd"), "pytest-plugin"),
+        # Gegen 6ceb9cd ungezählt: Uhr über Importaliase.
+        ("src/telco_radar/a.py", "from time import time\nx = time()\n", "uhr"),
+        ("src/telco_radar/a.py", "from time import time as t\nx = t()\n", "uhr"),
+        ("src/telco_radar/a.py", "import time as t\nx = t.time_ns()\n", "uhr"),
+        ("src/telco_radar/a.py", "x = __import__('time').time()\n", "uhr"),
+        (
+            "src/telco_radar/a.py",
+            "from datetime import date as d\nx = d.today()\n",
+            "uhr",
+        ),
     ],
 )
 def test_neuer_befund_der_waechter_basis_ist_rot(projekt, pfad, text, code):
@@ -301,6 +411,12 @@ def test_neuer_befund_der_waechter_basis_ist_rot(projekt, pfad, text, code):
         ("tests/conftest.py", "def pytest_collection_modifyitems(items):\n    pass\n"),
         (".github/workflows/a.yml", "    continue-on-error: false\n"),
         (".github/workflows/a.yml", "  python-version-file: .python-version\n"),
+        ("src/telco_radar/a.py", "from time import monotonic\nx = monotonic()\n"),
+        ("src/telco_radar/a.py", "from time import sleep\nsleep(0)\n"),
+        ("src/telco_radar/a.py", "def time():\n    pass\n\n\ntime()\n"),
+        ("src/telco_radar/a.py", "x = 1  # ruff ist hier nicht abgeschaltet\n"),
+        ("pyproject.toml", _PYPROJECT + _ADDOPTS.format("--strict-markers")),
+        ("scripts/leiter_plugin/leiter_roh.py", "x = 1\n"),
     ],
 )
 def test_erlaubte_stellen_bleiben_gruen(projekt, pfad, text):
@@ -400,10 +516,11 @@ def test_anker_meldet_den_wert_nicht_die_schreibweise(projekt):
     assert waechter.anker_verschiebungen(projekt) == []
     _schreibe(projekt, waechter.WAECHTER, 'ANKER: str = "b"\n')
     commit = _commit(projekt, "verschoben")
+    datum = _git(projekt, "log", "-1", "--format=%as")
     _schreibe(projekt, waechter.WAECHTER, 'ANKER = "c"\n')
     assert waechter.anker_verschiebungen(projekt) == [
-        f"Anker verschoben in {commit[:7]} verschoben",
-        "Anker verschoben in Arbeitsstand",
+        f"Anker verschoben in {commit[:7]} ({datum}, T) verschoben: a -> b",
+        "Anker verschoben in Arbeitsstand: b -> c",
     ]
     _schreibe(projekt, waechter.WAECHTER, 'ANKER = "b" + "c"\n')
     assert (
@@ -417,7 +534,7 @@ def test_unlesbarer_verlauf_ist_rot_statt_keine_lockerung(projekt, monkeypatch):
         raise waechter.subprocess.CalledProcessError(128, ["git", "cat-file"])
 
     monkeypatch.setattr(waechter, "_inhalte", kaputt)
-    assert _rot(projekt) == [f"Inhalte ab {waechter.ANKER[:7]} nicht lesbar"]
+    assert _rot(projekt) == ["Verlauf von scripts/waechter.py nicht lesbar"]
 
 
 def test_uhr_ausserhalb_der_einstiegsfunktion_wird_gezaehlt(projekt):
@@ -434,3 +551,8 @@ def test_uhr_ausserhalb_der_einstiegsfunktion_wird_gezaehlt(projekt):
     )
     assert _rot(projekt) == []
     assert waechter_regeln.uhr_ausserhalb_einstieg(projekt) == 2
+
+
+def test_paket_namens_wie_das_leiterplugin_ist_rot(projekt):
+    _schreibe(projekt, "src/leiter_roh/__init__.py", "")
+    assert _rot(projekt)[0].startswith("src/leiter_roh [fremde-konfig]")
