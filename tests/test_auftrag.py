@@ -438,6 +438,11 @@ def test_hoechstens_zwei_auftraege_und_kein_gleicher_bereich(repo, capsys):
         ({"bereich": "src/telco_radar/gibtsnicht/"}, "bereich ist kein Unterordner"),
         ({"bereich": "src/telco_radar/"}, "bereich ist kein Unterordner"),
         ({"bereich": "src/telco_radar/rechnen"}, "bereich ist kein Unterordner"),
+        ({"bereich": "src/telco_radar/fehlt.py"}, "bereich ist kein Unterordner"),
+        (
+            {"bereich": "src/telco_radar/rechnen/kern.txt"},
+            "bereich ist kein Unterordner",
+        ),
         (
             {"wasDarfNiePassieren": AUFTRAG["wasDarfNiePassieren"] | {"abbruch": 1}},
             "wasDarfNiePassieren.abbruch fehlt",
@@ -458,6 +463,8 @@ def test_formatfehler_akzeptiert_einen_vollstaendigen_auftrag(repo):
     assert auftrag.format_.formatfehler(AUFTRAG, repo) == []
     umbau = AUFTRAG | {"art": "umbau", "erwarteterFehler": None}
     assert auftrag.format_.formatfehler(umbau, repo) == []
+    modul = AUFTRAG | {"bereich": "src/telco_radar/rechnen/kern.py"}
+    assert auftrag.format_.formatfehler(modul, repo) == []
 
 
 def test_stand_schritt_6_verlangt_einen_echten_agenten_bis_zum_merge(

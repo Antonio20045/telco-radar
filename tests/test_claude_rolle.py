@@ -240,3 +240,28 @@ def test_gescheiterter_hook_sperrt():
     ereignis = ereignis[:-1] + ', "cwd": "/gibt/es/nicht"}'
 
     assert rolle_.main(lambda: ereignis, {"TELCO_ROLLE": "bau"}) == rolle_.BLOCKIERT
+
+
+@pytest.mark.parametrize(
+    ("pfad", "erlaubt"),
+    [
+        (f"{BEREICH}kern.py", True),
+        (f"{BEREICH}kern.pyc", False),
+        (f"{BEREICH}nachbar.py", False),
+        ("scripts/leiter.py", False),
+        ("tests/test_neu.py", True),
+    ],
+)
+def test_bau_mit_einem_modul_als_bereich_schreibt_nur_dieses_modul(repo, pfad, erlaubt):
+    ziel = rolle_.Ziel("bau", f"{BEREICH}kern.py", ABNAHME)
+
+    verstoss = rolle_.verstoss(ziel, repo, Path(pfad), neu=pfad.startswith("tests/"))
+
+    assert (verstoss is None) is erlaubt, verstoss
+
+
+@pytest.mark.parametrize("bereich", ["src/telco_radar/", "src/", "", "tests/"])
+def test_bau_ohne_gueltigen_bereich_schreibt_kein_produktmodul(repo, bereich):
+    ziel = rolle_.Ziel("bau", bereich, ABNAHME)
+
+    assert rolle_.verstoss(ziel, repo, Path(f"{BEREICH}kern.py"), neu=False)

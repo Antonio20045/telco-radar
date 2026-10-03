@@ -100,12 +100,15 @@ def formatfehler(auftrag: object, wurzel: Path) -> list[str]:
     ]
     bereich, art = auftrag["bereich"], auftrag["art"]
     erwartet = auftrag.get("erwarteterFehler")
-    im_bereich = bereich.startswith(BEREICH_WURZEL) and bereich.endswith("/")
-    im_bereich &= bereich != BEREICH_WURZEL and (wurzel / bereich).is_dir()
+    ordner = bereich.endswith("/") and (wurzel / bereich).is_dir()
+    modul = bereich.endswith(".py") and (wurzel / bereich).is_file()
+    im_bereich = bereich.startswith(BEREICH_WURZEL) and bereich != BEREICH_WURZEL
+    im_bereich &= ordner or modul
     pruefungen = {
         "id nur aus Buchstaben, Ziffern, - und _": ID_MUSTER.fullmatch(auftrag["id"]),
         f"art ist weder {' noch '.join(ARTEN)}": art in ARTEN,
-        f"bereich ist kein Unterordner von {BEREICH_WURZEL} mit /": im_bereich,
+        f"bereich ist kein Unterordner von {BEREICH_WURZEL} mit / und kein Modul"
+        " .py darin": im_bereich,
         "abnahme ist keine Datei tests/…/test_*.py": ABNAHME_MUSTER.fullmatch(
             auftrag["abnahme"]
         ),

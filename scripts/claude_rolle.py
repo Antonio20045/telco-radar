@@ -153,15 +153,23 @@ def verstoss(ziel: Ziel, wurzel: Path, pfad: Path, neu: bool) -> str | None:
         frei = absolut.is_relative_to(os.path.realpath(tempfile.gettempdir()))
         return None if frei and not neben and ziel.rolle != "suchen" else regel
     neuer_test = neu and relativ.startswith(TESTS) and absolut.name not in NIE_NEU
-    bereich = ziel.bereich or ""
-    im_bereich = bereich.startswith(BEREICH_WURZEL) and bereich.endswith("/")
     erlaubt = {
         "test": neuer_test or relativ == ziel.abnahme,
-        "bau": neuer_test or (im_bereich and relativ.startswith(bereich)),
+        "bau": neuer_test or im_bereich(relativ, ziel.bereich or ""),
         "entwurf": relativ.startswith(ENTWURF),
         "suchen": False,
     }[ziel.rolle]
     return None if erlaubt else regel.replace(str(absolut), relativ)
+
+
+def im_bereich(relativ: str, bereich: str) -> bool:
+    """Wahr, wenn ``relativ`` im Bereich liegt: einem Unterordner mit ``/`` oder
+    genau einem Modul ``.py`` unter ``src/telco_radar/``."""
+    if not bereich.startswith(BEREICH_WURZEL) or bereich == BEREICH_WURZEL:
+        return False
+    if bereich.endswith("/"):
+        return relativ.startswith(bereich)
+    return bereich.endswith(".py") and relativ == bereich
 
 
 def ist_neu(wurzel: Path, pfad: Path) -> bool:

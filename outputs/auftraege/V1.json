@@ -1,0 +1,28 @@
+{
+  "id": "V1",
+  "art": "verhalten",
+  "ziel": "Das Zustellbuch merkt den Versandzeitpunkt mit Zeitzone (UTC), damit Mail- und Teams-Einträge über Sommer- und Winterzeit und zwischen Rechnern vergleichbar bleiben",
+  "bereich": "src/telco_radar/versand.py",
+  "erwarteteDateien": [
+    "src/telco_radar/versand.py"
+  ],
+  "vorbild": "src/telco_radar/versand.py",
+  "seite": [],
+  "datenquelle": {
+    "dateien": [
+      "data/state/versand.json"
+    ],
+    "botCommit": null,
+    "schnappschuss": null
+  },
+  "abnahme": "tests/test_versand_zeitzone.py",
+  "erwarteterFehler": "gesendet ohne Zeitzone",
+  "abhaengigVon": [],
+  "migration": null,
+  "wasDarfNiePassieren": {
+    "wiederholung": "ein zweites merke für denselben Kanal und Schlüssel ersetzt nur diesen Eintrag; schon_raus bleibt wahr, andere Einträge bleiben unverändert",
+    "gleichzeitig": "Einträge für mail und teams mit demselben Schlüssel bleiben zwei getrennte Einträge",
+    "zeitueberschreitung": "merke ruft kein Netz und wartet auf nichts",
+    "abbruch": "schlägt das Schreiben von versand.json fehl, geht die Ausnahme an den Aufrufer weiter und wird nicht verschluckt"
+  }
+}
