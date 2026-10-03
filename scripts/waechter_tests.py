@@ -14,6 +14,7 @@ import tomllib
 from collections import Counter
 from pathlib import Path
 
+import waechter_speicher
 from waechter_regeln import Schluessel, importnamen, ist_uhr, uhr_verweise
 
 TESTS_BASIS = "pruef/tests-basis.txt"
@@ -45,12 +46,10 @@ def tests_zaehlung(wurzel: Path) -> Counter[Schluessel]:
         pfad = datei.relative_to(wurzel).as_posix()
         if pfad == CONFTEST or "__pycache__" in datei.parts:
             continue
-        try:
-            baum = ast.parse(datei.read_text(encoding="utf-8", errors="replace"))
-        except SyntaxError:
-            zaehlung[(pfad, "syntaxfehler")] += 1
-            continue
-        codes = _codes(baum)
+        text = datei.read_text(encoding="utf-8", errors="replace")
+        codes = waechter_speicher.hole(
+            "tests", pfad, text, lambda t=text: _codes_aus(t)
+        )
         if pfad in HERMETIK_ERLAUBT:
             codes = [c for c in codes if c != "hermetik-eingriff"]
         zaehlung.update((pfad, code) for code in codes)
@@ -59,6 +58,13 @@ def tests_zaehlung(wurzel: Path) -> Counter[Schluessel]:
         relativ = ordner.relative_to(wurzel).as_posix()
         zaehlung[(relativ, "schnappschuss-veraendert")] += _veraendert(ordner)
     return +zaehlung
+
+
+def _codes_aus(text: str) -> list[str]:
+    try:
+        return _codes(ast.parse(text))
+    except SyntaxError:
+        return ["syntaxfehler"]
 
 
 def _codes(baum: ast.AST) -> list[str]:

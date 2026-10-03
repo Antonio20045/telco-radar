@@ -1,8 +1,9 @@
 """Verträge der Stufe 0, die ohne Basis gelten: jeder Verstoß ist rot.
 
-CLAUDE.md bleibt klein, jede Fixture unter ``tests/fixtures/`` ist ein belegter
-Abruf, kein Test liest Quelltext über ``inspect``, und die Workflows halten die
-Griffe, an denen Datenläufe still grün enden würden, gegen Code und Konfiguration.
+CLAUDE.md bleibt klein, die Git-Hooks rufen nur die Leiter, jede Fixture unter
+``tests/fixtures/`` ist ein belegter Abruf, kein Test liest Quelltext über
+``inspect``, und die Workflows halten die Griffe, an denen Datenläufe still grün
+enden würden, gegen Code und Konfiguration.
 """
 
 from __future__ import annotations
@@ -11,13 +12,25 @@ import ast
 import gzip
 import hashlib
 import json
+import os
 import re
 from collections.abc import Callable, Iterator
 from pathlib import Path
 
+import waechter_speicher
 import yaml
 
 CLAUDE_MD = "CLAUDE.md"
+HOOKS = ".githooks"
+HOOK_INHALT = {
+    "pre-commit": (
+        "#!/bin/sh\n"
+        "exec .venv/bin/python scripts/pruefleiter.py --schnell --nur-vorgemerkt\n"
+    ),
+    "pre-push": (
+        '#!/bin/sh\nexec .venv/bin/python scripts/pruefleiter.py --vor-push "$@"\n'
+    ),
+}
 CLAUDE_MD_ZEILEN = 200
 CLAUDE_MD_BYTES = 20000
 FIXTURES = "tests/fixtures"
@@ -54,7 +67,28 @@ def pruefe(wurzel: Path) -> list[str]:
         *fixture_herkunft(wurzel),
         *quelltext_in_tests(wurzel),
         *workflows(wurzel),
+        *git_hooks(wurzel),
     ]
+
+
+def git_hooks(wurzel: Path) -> list[str]:
+    """Jeder Hook unter ``.githooks`` ist ausführbar und ruft nur die Leiter.
+
+    Ein fehlender Hook ist hier kein Verstoß, ``make stand`` nennt ihn.
+    """
+    meldungen = []
+    for name, inhalt in HOOK_INHALT.items():
+        pfad = wurzel / HOOKS / name
+        if not pfad.exists():
+            continue
+        if pfad.read_text(encoding="utf-8", errors="replace") != inhalt:
+            meldungen.append(f"{HOOKS}/{name} weicht vom Hook der Leiter ab")
+        if not os.access(pfad, os.X_OK):
+            meldungen.append(f"{HOOKS}/{name} ist nicht ausführbar")
+    for fremd in sorted((wurzel / HOOKS).glob("*")):
+        if fremd.name not in HOOK_INHALT:
+            meldungen.append(f"{HOOKS}/{fremd.name} ist kein Hook der Leiter")
+    return meldungen
 
 
 def claude_md(wurzel: Path) -> list[str]:
@@ -135,16 +169,26 @@ def quelltext_in_tests(wurzel: Path) -> list[str]:
     for datei in sorted((wurzel / "tests").rglob("*.py")):
         if "__pycache__" in datei.parts:
             continue
-        try:
-            baum = ast.parse(datei.read_text(encoding="utf-8", errors="replace"))
-        except SyntaxError:
-            continue
+        text = datei.read_text(encoding="utf-8", errors="replace")
         relativ = datei.relative_to(wurzel).as_posix()
         meldungen += [
-            f"{relativ}:{zeile}: liest Quelltext über {name}"
-            for zeile, name in _quelltext_leser(baum)
+            f"{relativ}:{fund}"
+            for fund in waechter_speicher.hole(
+                "quelltext", relativ, text, lambda t=text: _quelltext_funde(t)
+            )
         ]
     return meldungen
+
+
+def _quelltext_funde(text: str) -> list[str]:
+    try:
+        baum = ast.parse(text)
+    except SyntaxError:
+        return []
+    return [
+        f"{zeile}: liest Quelltext über {name}"
+        for zeile, name in _quelltext_leser(baum)
+    ]
 
 
 def _quelltext_leser(baum: ast.AST) -> Iterator[tuple[int, str]]:

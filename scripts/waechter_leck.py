@@ -12,6 +12,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import waechter_speicher
+
 BREVO_SCHLUESSEL = re.compile(rb"x(?:key|smtp)sib-[A-Za-z0-9]")
 ADRESSE = re.compile(rb"[A-Za-z0-9_.+-]+@[A-Za-z][A-Za-z0-9-]*\.[A-Za-z]{2,}")
 ADRESSEN_ORDNER = "data/"
@@ -42,16 +44,30 @@ def lecks(wurzel: Path) -> list[str]:
         return ["Leckprüfung: getrackte Dateien nicht lesbar (git ls-files)"]
     meldungen = []
     for eintrag in sorted(eintraege):
-        name = eintrag[0]
-        pfad = wurzel / name
-        inhalte = [blobs[eintrag]] if eintrag in blobs else []
-        if not pfad.is_symlink() and pfad.is_file():
-            inhalte.append(pfad.read_bytes())
-        if any(BREVO_SCHLUESSEL.search(i) for i in inhalte):
+        name, sha, _ = eintrag
+        if eintrag in blobs:
+            funde = _funde(wurzel, name, [blobs[eintrag]])
+        else:
+            funde = waechter_speicher.hole(
+                "leck", name, sha, lambda n=name: _funde(wurzel, n, [])
+            )
+        if "schluessel" in funde:
             meldungen.append(f"{name}: Brevo-Schlüssel im Repo (gehört in ein Secret)")
-        if _adressdatei(name) and any(ADRESSE.search(i) for i in inhalte):
+        if "adresse" in funde:
             meldungen.append(f"{name}: E-Mail-Adresse in Bot-Daten")
     return meldungen + ungepruefte_commits(wurzel)
+
+
+def _funde(wurzel: Path, name: str, inhalte: list[bytes]) -> list[str]:
+    pfad = wurzel / name
+    if not pfad.is_symlink() and pfad.is_file():
+        inhalte = [*inhalte, pfad.read_bytes()]
+    funde = []
+    if any(BREVO_SCHLUESSEL.search(i) for i in inhalte):
+        funde.append("schluessel")
+    if _adressdatei(name) and any(ADRESSE.search(i) for i in inhalte):
+        funde.append("adresse")
+    return funde
 
 
 def ungepruefte_commits(wurzel: Path) -> list[str]:

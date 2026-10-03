@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
+import json
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from pathlib import Path
 
 import waechter
 
 Schluessel = waechter.Schluessel
 _MYPY_FEHLER = ": error: "
+WURZEL = Path(__file__).resolve().parents[1]
 
 
 @dataclass(frozen=True)
@@ -24,6 +27,19 @@ class Befund:
     def schluessel(self) -> Schluessel:
         """Datei und Code, unter denen die Basis den Befund zählt."""
         return (self.pfad, self.code)
+
+
+@dataclass
+class Ergebnis:
+    """Ausgang einer Stufe: grün oder rot mit den Zeilen, die Rot begründen."""
+
+    stufe: str
+    gruen: bool
+    zeilen: list[str] = field(default_factory=list)
+    gesenkt: list[str] = field(default_factory=list)
+    angehoben: list[str] = field(default_factory=list)
+    hinweise: list[str] = field(default_factory=list)
+    sekunden: float = 0.0
 
 
 def neue_befunde(befunde: list[Befund], basis: Counter[Schluessel]) -> list[Befund]:
@@ -54,3 +70,21 @@ def mypy_befunde(ausgabe: str) -> list[Befund]:
         zeile_nr = int(nummer) if nummer.isdigit() else 0
         befunde.append(Befund(pfad, zeile_nr, code[:-1], text))
     return befunde
+
+
+def ruff_befunde(ausgabe: str) -> list[Befund]:
+    """Liest ``ruff check --output-format json`` in Befunde mit relativen Pfaden."""
+    return [
+        Befund(
+            _relativ(eintrag["filename"]),
+            eintrag["location"]["row"],
+            eintrag["code"] or "syntax",
+            eintrag["message"],
+        )
+        for eintrag in json.loads(ausgabe)
+    ]
+
+
+def _relativ(pfad: str) -> str:
+    datei = Path(pfad)
+    return str(datei.relative_to(WURZEL)) if datei.is_relative_to(WURZEL) else pfad

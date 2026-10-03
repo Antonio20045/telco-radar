@@ -9,12 +9,14 @@ jeden als bestanden gemeldeten Test dagegen und jede fremde Funktion für rot.
 Daneben entsteht je Test, dessen Ablauf pytest beginnt, eine Zeile ``lief <nodeid>``
 in einer eigenen Datei je Prozess. Die Leiter hält diese Menge gegen die rohe Sammlung
 ohne Projekteinstellungen und conftest: Ein Test, der dort steht und hier fehlt, wurde
-abgewählt.
+abgewählt. Der Zeitpunkt jedes Ablaufbeginns steht in ``<pid>.zeit``; der Abstand zum
+nächsten Test desselben Prozesses ist seine Dauer.
 """
 
 import ast
 import functools
 import os
+import time
 
 import pytest
 
@@ -39,6 +41,8 @@ def pytest_runtest_logstart(nodeid, location):
     ordner = os.environ.get(ROH_VARIABLE)
     if ordner:
         _schreibe(os.path.join(ordner, f"{os.getpid()}.lief"), f"lief {nodeid}\n")
+        zeit = f"{time.monotonic():.3f} {nodeid}\n"
+        _schreibe(os.path.join(ordner, f"{os.getpid()}.zeit"), zeit)
 
 
 def _echt(item):

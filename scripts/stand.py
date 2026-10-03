@@ -8,6 +8,7 @@ import ast
 import contextlib
 import os
 import shutil
+import statistics
 import subprocess
 import sys
 import tempfile
@@ -15,6 +16,7 @@ from collections.abc import Iterator
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
+import pruefstempel
 import waechter
 import waechter_regeln
 import waechter_tests
@@ -24,6 +26,9 @@ LIVE_SEITE = "https://telco-radar.onrender.com/geraete.html"
 LIVE_FRIST_SEKUNDEN = 20
 LIVE_TAGE_ALT = 1
 TESTZEIT_ZIEL = 240
+VORCOMMIT_ZIEL = 5
+VORCOMMIT_LAEUFE = 20
+HOOKS = ".githooks"
 _DOC = '"""Rotprobe."""\n\n'
 ROT_PROBEN = {
     "unbenutzter Import": (
@@ -88,12 +93,58 @@ def _testzeit() -> list[str]:
     """Hält die letzte Teststufe aus ``.pruefleiter/zeiten.csv`` gegen das Zeitziel."""
     datei = W / ".pruefleiter" / "zeiten.csv"
     zeilen = datei.read_text("utf-8").splitlines() if datei.is_file() else []
-    tests = [z.split(",") for z in zeilen if z.split(",")[1:2] == ["Tests"]]
+    stufen = (["Tests"], ["5 Voll"])
+    tests = [z.split(",") for z in zeilen if z.split(",")[1:2] in stufen]
     if not tests:
         return ["keine Teststufe in .pruefleiter/zeiten.csv"]
     return _mehr(
         "Sekunden der letzten Teststufe", round(float(tests[-1][2])), TESTZEIT_ZIEL
     )
+
+
+def _vorcommit_median() -> list[str]:
+    """Hält den Median der letzten grünen pre-commit-Läufe gegen ``VORCOMMIT_ZIEL``.
+
+    Rote Läufe brechen früh ab und würden den Median schönen.
+    """
+    datei = W / ".pruefleiter" / "zeiten.csv"
+    zeilen = datei.read_text("utf-8").splitlines() if datei.is_file() else []
+    laeufe = [z.split(",") for z in zeilen]
+    sekunden = [
+        float(z[2]) for z in laeufe if z[1:2] == ["--pre-commit"] and z[3:] == ["gruen"]
+    ]
+    if not sekunden:
+        return ["kein grüner pre-commit-Lauf in .pruefleiter/zeiten.csv"]
+    median = statistics.median(sekunden[-VORCOMMIT_LAEUFE:])
+    if median < VORCOMMIT_ZIEL:
+        return []
+    return [f"pre-commit im Median {median:.1f} s, Ziel unter {VORCOMMIT_ZIEL} s"]
+
+
+def _hooks() -> list[str]:
+    """Die Git-Hooks liegen in ``.githooks`` und sind eingerichtet."""
+    lauf = subprocess.run(
+        ["git", "config", "core.hooksPath"], cwd=W, capture_output=True, text=True
+    )
+    gruende = _fehlt(f"{HOOKS}/pre-commit", f"{HOOKS}/pre-push")
+    if lauf.stdout.strip() != HOOKS:
+        gruende.append(f"core.hooksPath ist nicht {HOOKS} (make einrichten)")
+    return gruende
+
+
+def ungepruefte() -> list[str]:
+    """Nennt Commits auf ``origin/main`` seit dem jüngsten Prüfstempel."""
+    try:
+        befund = pruefstempel.ungestempelte(W)
+    except pruefstempel.StempelFehler as fehler:
+        return [f"Prüfstempel nicht lesbar ({fehler})"]
+    if not befund.commits:
+        return []
+    anzahl = len(befund.commits)
+    kurz = ", ".join(c[:7] for c in befund.commits[:10])
+    mehr = f" und {anzahl - 10} weitere" if anzahl > 10 else ""
+    ohne = "" if befund.stempel_gefunden else ", kein Stempel in diesem Klon"
+    return [f"{anzahl} ungeprüfte Commits ({kurz}{mehr}{ohne})"]
 
 
 def _fehlt(*pfade: str) -> list[str]:
@@ -186,7 +237,10 @@ def offen() -> dict[str, list[str]]:
         ]
         + _testzeit()
         + _fehlt("tests/fixtures/bestand"),
-        "5 Hooks, CLAUDE.md": _fehlt(".githooks/pre-push", ".claude/hooks")
+        "5 Hooks, CLAUDE.md": _hooks()
+        + _fehlt(".claude/hooks")
+        + ungepruefte()
+        + _vorcommit_median()
         + _mehr("Zeilen CLAUDE.md", _zeilen("CLAUDE.md"), 100),
         "6 Auftragsablauf": _fehlt("tools/auftrag.py", "outputs/auftraege/kosten.csv"),
         "7 Kommentarabbau": _fehlt("pruef/kommentar-basis.txt"),

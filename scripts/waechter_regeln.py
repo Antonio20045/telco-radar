@@ -14,8 +14,9 @@ import tokenize
 import tomllib
 from collections import Counter
 from collections.abc import Iterable, Iterator
-from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
+
+import waechter_speicher
 
 RIESEN_GRENZE = 400
 CODE_ORDNER = ("src/**/*", "scripts/**/*", "tools/**/*", "service/**/*")
@@ -40,7 +41,6 @@ EINSTIEG = {
 }
 UHR_ERLAUBT = frozenset(EINSTIEG)
 PARALLEL_AB = 64
-PARALLEL_STUECK = 16
 FARBEN_ERLAUBT = "src/telco_radar/report/anbieter_farben.py"
 STYLE = "src/telco_radar/report/templates/style.css"
 FARB_ENDUNGEN = frozenset({".py", ".j2", ".css", ".js", ".html"})
@@ -97,14 +97,9 @@ def riesendateien(wurzel: Path) -> Counter[Schluessel]:
 
 def waechter_zaehlung(wurzel: Path) -> Counter[Schluessel]:
     zaehlung: Counter[Schluessel] = Counter()
-    dateien = list(_dateien(wurzel, (*CODE_ORDNER, "tests/**/*"), {".py"}))
-    if len(dateien) < PARALLEL_AB:
-        codes = map(_codes_je_datei, dateien)
-        zaehlung.update(k for je_datei in codes for k in je_datei)
-    else:
-        with ProcessPoolExecutor() as pool:
-            codes = pool.map(_codes_je_datei, dateien, chunksize=PARALLEL_STUECK)
-            zaehlung.update(k for je_datei in codes for k in je_datei)
+    alle = list(_dateien(wurzel, (*CODE_ORDNER, "tests/**/*"), {".py"}))
+    codes = waechter_speicher.je_datei("regeln", alle, _codes_je_datei, PARALLEL_AB)
+    zaehlung.update((p, c) for (p, _), je in zip(alle, codes, strict=True) for c in je)
     for pfad, text in _dateien(wurzel, ("src/**/*",), FARB_ENDUNGEN):
         if pfad != FARBEN_ERLAUBT:
             ohne_root = _ROOT.sub("", text, count=1) if pfad == STYLE else text
@@ -223,14 +218,14 @@ def _mypy_aus(einstellung: str) -> Iterator[str]:
             yield f"mypy-aus:{name.strip()}"
 
 
-def _codes_je_datei(datei: tuple[str, str]) -> list[Schluessel]:
+def _codes_je_datei(datei: tuple[str, str]) -> list[str]:
     pfad, text = datei
     codes = list(_kommentar_codes(text))
     try:
         codes += _ast_codes(pfad, ast.parse(text))
     except SyntaxError:
         codes.append("syntaxfehler")
-    return [(pfad, code) for code in codes]
+    return codes
 
 
 def ist_uhr(aufruf: ast.Call, aliase: dict[str, str] | None = None) -> bool:

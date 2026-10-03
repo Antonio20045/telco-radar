@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import argparse
 import contextlib
-import json
 import os
 import signal
 import subprocess
@@ -21,14 +20,22 @@ import tempfile
 import time
 from collections import Counter
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TextIO
 
 import leiter_pytest
+import leiter_schnell
+import pruefstempel
 import waechter
 import waechter_vertraege
-from leiter_befunde import Befund, gesenkte_basis, mypy_befunde, neue_befunde
+from leiter_befunde import (
+    Befund,
+    Ergebnis,
+    gesenkte_basis,
+    mypy_befunde,
+    neue_befunde,
+    ruff_befunde,
+)
 from leiter_pytest import (
     gesammelte_ids,
     gesammelte_tests,
@@ -44,6 +51,7 @@ MYPY_BASIS = WURZEL / "pruef" / "mypy-basis.txt"
 TESTS_ANZAHL = WURZEL / "pruef" / "tests-anzahl.txt"
 TESTS_UEBERSPRUNGEN = WURZEL / "pruef" / "tests-uebersprungen.txt"
 KANARIE = "tests/kanarie_leiter.py"
+VOLL = "5 Voll"
 LAUF_ORDNER = WURZEL / ".pruefleiter"
 MAX_ROT_ZEILEN = 60
 TEST_FRIST_SEKUNDEN = 300
@@ -51,10 +59,11 @@ STUFE_FRIST_SEKUNDEN = 1800
 NACHLAUF_SEKUNDEN = 10
 # Präfixe der Variablen, die pytest, ruff, mypy oder Python selbst lesen und mit denen
 # sich Tests abwählen, Regeln lockern oder die Ausgabe für die Auswertung verbiegen
-# ließe (PYTEST_ADDOPTS, PYTEST_PLUGINS, RUFF_*, MYPYPATH, PYTHON*, Farben).
+# ließe (PYTEST_ADDOPTS, PYTEST_PLUGINS, RUFF_*, MYPYPATH, PYTHON*, Farben, GIT_*).
 _FREMDE_UMGEBUNG = (
     "PYTEST_",
     "PYTHON",
+    "GIT_",
     "RUFF_",
     "MYPY",
     "PY_COLORS",
@@ -64,32 +73,6 @@ _FREMDE_UMGEBUNG = (
     "CLICOLOR",
 )
 Schluessel = waechter.Schluessel
-
-
-@dataclass
-class Ergebnis:
-    """Ausgang einer Stufe: grün oder rot mit den Zeilen, die Rot begründen."""
-
-    stufe: str
-    gruen: bool
-    zeilen: list[str] = field(default_factory=list)
-    gesenkt: list[str] = field(default_factory=list)
-    angehoben: list[str] = field(default_factory=list)
-    hinweise: list[str] = field(default_factory=list)
-    sekunden: float = 0.0
-
-
-def ruff_befunde(ausgabe: str) -> list[Befund]:
-    """Liest ``ruff check --output-format json`` in Befunde mit relativen Pfaden."""
-    return [
-        Befund(
-            _relativ(eintrag["filename"]),
-            eintrag["location"]["row"],
-            eintrag["code"] or "syntax",
-            eintrag["message"],
-        )
-        for eintrag in json.loads(ausgabe)
-    ]
 
 
 def umgebung(basis: Mapping[str, str]) -> dict[str, str]:
@@ -202,40 +185,41 @@ def stufe_tests(log: TextIO) -> Ergebnis:
             "COLUMNS": "1000",
         }
         lauf = _lauf(log, befehl, zusatz)
+        leiter_schnell.schreibe_testzeiten(Path(ordner), WURZEL / leiter_schnell.ZEITEN)
         roh = leiter_pytest.lies_roh(Path(ordner))
         gelaufen = leiter_pytest.lies_gelaufen(Path(ordner))
     rot, gruen = pytest_ausgang(lauf.stdout)
     if lauf.returncode not in (0, 1) or (lauf.returncode == 1 and not rot):
         ende = lauf.stdout.splitlines()[-20:] + lauf.stderr.splitlines()[-20:]
-        return Ergebnis("Tests", False, [f"pytest endet mit {lauf.returncode}:", *ende])
+        return Ergebnis(VOLL, False, [f"pytest endet mit {lauf.returncode}:", *ende])
     anzahl = gesammelte_tests(lauf.stdout)
     untergrenze = int(TESTS_ANZAHL.read_text(encoding="utf-8"))
     if anzahl is None:
-        return Ergebnis("Tests", False, ["Zahl der gesammelten Tests nicht lesbar"])
+        return Ergebnis(VOLL, False, ["Zahl der gesammelten Tests nicht lesbar"])
     if anzahl < untergrenze:
         meldung = (
             f"{anzahl} Tests gesammelt, erwartet mindestens {untergrenze}"
             f" ({_relativ(TESTS_ANZAHL)}): Tests gelöscht oder abgewählt"
         )
-        return Ergebnis("Tests", False, [meldung])
+        return Ergebnis(VOLL, False, [meldung])
     uebersprungen = nicht_ausgefuehrte_tests(lauf.stdout)
     obergrenze = int(TESTS_UEBERSPRUNGEN.read_text(encoding="utf-8"))
     if uebersprungen is None:
-        return Ergebnis("Tests", False, ["Schlusszeile von pytest nicht lesbar"])
+        return Ergebnis(VOLL, False, ["Schlusszeile von pytest nicht lesbar"])
     if uebersprungen > obergrenze:
         meldung = (
             f"{uebersprungen} Tests übersprungen oder xfail, erlaubt höchstens"
             f" {obergrenze} ({_relativ(TESTS_UEBERSPRUNGEN)})"
         )
-        return Ergebnis("Tests", False, [meldung])
+        return Ergebnis(VOLL, False, [meldung])
     falsch = _abgewaehlt(log, python_files, gelaufen)
     falsch += leiter_pytest.ohne_ergebnis(gelaufen, roh, rot, uebersprungen)
     falsch += leiter_pytest.pruefe_ergebnisse(rot, gruen, roh, KANARIE)
     if falsch:
-        return Ergebnis("Tests", False, falsch)
+        return Ergebnis(VOLL, False, falsch)
     if rot:
-        return Ergebnis("Tests", False, list(rot.values()))
-    ergebnis = Ergebnis("Tests", True)
+        return Ergebnis(VOLL, False, list(rot.values()))
+    ergebnis = Ergebnis(VOLL, True)
     if anzahl > untergrenze:
         TESTS_ANZAHL.write_text(f"{anzahl}\n", encoding="utf-8")
         ergebnis.angehoben.append(_relativ(TESTS_ANZAHL))
@@ -312,30 +296,68 @@ def zusammenfassung(ergebnisse: list[Ergebnis]) -> list[str]:
     return [kopf, *zeilen, fuss]
 
 
+def stufen_schnell(nur_vorgemerkt: bool) -> list[Callable[[TextIO], Ergebnis]]:
+    """Stufen 0, 1 und 4 für pre-commit, 1 und 4 auf den geänderten Dateien."""
+    dateien = leiter_schnell.geaenderte_dateien(WURZEL, nur_vorgemerkt)
+    ruff, zeiten = str(BIN / "ruff"), WURZEL / leiter_schnell.ZEITEN
+    return [
+        leiter_schnell.mit_speicher(stufe_waechter, LAUF_ORDNER / "speicher.json"),
+        lambda log: leiter_schnell.stufe_lint(log, _lauf, ruff, dateien, RUFF_BASIS),
+        lambda log: leiter_schnell.stufe_betroffen(log, _lauf, WURZEL, dateien, zeiten),
+    ]
+
+
 def main(argv: list[str] | None = None) -> int:
     """Startet die Leiter; Exit 0 heißt grün, 1 rot."""
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     art = parser.add_mutually_exclusive_group(required=True)
-    art.add_argument("--voll", action="store_true", help="Stufen 0 bis 3, alle Tests")
+    art.add_argument("--voll", action="store_true", help="Stufen 0 bis 3 und 5")
     art.add_argument("--statisch", action="store_true", help="Stufen 0 bis 3")
+    art.add_argument("--schnell", action="store_true", help="Stufen 0, 1 und 4")
+    art.add_argument("--vor-push", action="store_true", help="pre-push, dann --voll")
+    parser.add_argument("--nur-vorgemerkt", action="store_true")
+    parser.add_argument("hook", nargs="*", help="Argumente des pre-push-Hooks")
     args = parser.parse_args(argv)
+    if args.vor_push and (abbruch := pruefstempel.vor_push(WURZEL, _stdin())):
+        print(abbruch[1])
+        return abbruch[0]
+    art_name = "schnell" if args.schnell else "statisch" if args.statisch else "voll"
+    art_name = "pre-commit" if args.schnell and args.nur_vorgemerkt else art_name
+    stufen = STUFEN_VOLL if art_name == "voll" else STUFEN_STATISCH
+    if args.schnell:
+        stufen = stufen_schnell(args.nur_vorgemerkt)
+    baum = pruefstempel.baum_oder_nichts(WURZEL) if art_name == "voll" else None
     LAUF_ORDNER.mkdir(exist_ok=True)
     with (LAUF_ORDNER / "letzter-lauf.log").open("w", encoding="utf-8") as log:
-        ergebnisse = fuehre_aus(STUFEN_VOLL if args.voll else STUFEN_STATISCH, log)
+        ergebnisse = fuehre_aus(stufen, log)
+        letzte, dauer = ergebnisse[-1], sum(e.sekunden for e in ergebnisse)
+        gesamt = Ergebnis(f"--{art_name}", letzte.gruen, sekunden=dauer)
+        if letzte.gruen and art_name == "voll":
+            geschrieben = [p for e in ergebnisse for p in e.gesenkt + e.angehoben]
+            letzte.hinweise.append(pruefstempel.stemple_lauf(WURZEL, baum, geschrieben))
+        if args.schnell:
+            letzte.hinweise += leiter_schnell.budget_warnung(dauer)
         ausgabe = zusammenfassung(ergebnisse)
         log.writelines(f"{zeile}\n" for zeile in ausgabe)
+    stempel = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     with (LAUF_ORDNER / "zeiten.csv").open("a", encoding="utf-8") as zeiten:
-        stempel = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         zeiten.writelines(
             f"{stempel},{e.stufe},{e.sekunden:.1f},{'gruen' if e.gruen else 'rot'}\n"
-            for e in ergebnisse
+            for e in [gesamt, *ergebnisse]
         )
     print("\n".join(ausgabe))
-    return 0 if ergebnisse[-1].gruen else 1
+    return 0 if letzte.gruen else 1
+
+
+def _stdin() -> list[str]:
+    return [] if sys.stdin is None or sys.stdin.isatty() else sys.stdin.readlines()
 
 
 def _lauf(
-    log: TextIO, befehl: list[str], zusatz: Mapping[str, str] | None = None
+    log: TextIO,
+    befehl: list[str],
+    zusatz: Mapping[str, str] | None = None,
+    frist: int | None = None,
 ) -> subprocess.CompletedProcess[str]:
     # Eigene Prozessgruppe: Bei überschrittener Frist sterben auch die Worker von
     # pytest-xdist, sonst hielten sie die Pipes offen und die Leiter hinge mit.
@@ -349,7 +371,7 @@ def _lauf(
         start_new_session=True,
     ) as prozess:
         try:
-            stdout, stderr = prozess.communicate(timeout=STUFE_FRIST_SEKUNDEN)
+            stdout, stderr = prozess.communicate(timeout=frist or STUFE_FRIST_SEKUNDEN)
         except subprocess.TimeoutExpired:
             with contextlib.suppress(ProcessLookupError):
                 os.killpg(prozess.pid, signal.SIGKILL)
@@ -358,7 +380,7 @@ def _lauf(
             except subprocess.TimeoutExpired:
                 # Ein Enkel in eigener Sitzung hält die Pipe; die Ausgabe ist verloren.
                 stdout, stderr = "", ""
-            stderr += f"\nabgebrochen nach {STUFE_FRIST_SEKUNDEN} s\n"
+            stderr += f"\nabgebrochen nach {frist or STUFE_FRIST_SEKUNDEN} s\n"
         lauf = subprocess.CompletedProcess(befehl, prozess.wait(), stdout, stderr)
     log.write(
         f"$ {' '.join(befehl)}\n-> Exit {lauf.returncode}\n{lauf.stdout}{lauf.stderr}\n"

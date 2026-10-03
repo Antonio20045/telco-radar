@@ -914,3 +914,15 @@ def test_ein_gebrochener_vertrag_macht_stufe_null_rot_und_schreibt_keine_basis(
     assert ergebnis.gruen is gruen
     assert ergebnis.zeilen == vertraege
     assert aufrufe == [gruen]
+
+
+def test_testzeiten_landen_im_geprueften_projekt(kleines_projekt):
+    import io
+
+    pruefleiter.stufe_tests(io.StringIO())
+    zeiten = pruefleiter.leiter_schnell.lies_testzeiten(
+        kleines_projekt / pruefleiter.leiter_schnell.ZEITEN
+    )
+    assert {"tests/test_gruen.py::test_eins", "tests/test_rot.py::test_kaputt"} <= set(
+        zeiten
+    )
