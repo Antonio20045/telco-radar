@@ -6,3 +6,4 @@ ruff==0.15.20
 import-linter==2.15
 mypy==2.4.0
 time-machine==3.5.1
+mutmut==3.8.0

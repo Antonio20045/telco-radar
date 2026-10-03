@@ -2,6 +2,7 @@ import csv
 import importlib
 import json
 import os
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -241,9 +242,14 @@ def test_ersatzagent_laeuft_vom_roten_test_bis_zum_merge(repo):
         ("test", "1"),
         ("bau", "1"),
         ("pruefer", "1"),
+        ("mutation", "0"),
         ("ende", "0"),
     ]
     assert zeilen[1]["kosten_usd"] == "0.25" and zeilen[1]["token_ein"] == "100"
+    mutation = zeilen[3]
+    assert mutation["agent"] == "mutmut" and mutation["exit"] == "0"
+    assert re.fullmatch(r"\d+ von \d+ Mutanten erkannt.*", mutation["ergebnis"])
+    assert float(mutation["sekunden"]) > 0
     assert zeilen[-1]["ergebnis"] == auftrag.GEMERGT
     assert _git(repo, "status", "--porcelain") == ""
 
@@ -341,7 +347,7 @@ def test_vorhandener_roter_abnahmetest_braucht_keinen_testagenten(repo):
 
     assert _starte(repo) == auftrag.Ende.GEMERGT
 
-    assert [z["rolle"] for z in _kosten(repo)] == ["bau", "pruefer", "ende"]
+    assert [z["rolle"] for z in _kosten(repo)] == ["bau", "pruefer", "mutation", "ende"]
 
 
 def test_zwei_rote_runden_enden_mit_notiz(repo):
@@ -531,9 +537,9 @@ def test_bau_kann_bestehende_tests_und_die_sammlung_nicht_aendern(repo, modus, f
     ("art", "ende", "rollen"),
     [
         ("rot", auftrag.Ende.NOTIZ, ["test", "bau", "pruefer", "bau", "pruefer"]),
-        ("gruen", auftrag.Ende.GEMERGT, ["test", "bau", "pruefer"]),
-        ("import", auftrag.Ende.GEMERGT, ["test", "bau", "pruefer"]),
-        ("ohne", auftrag.Ende.GEMERGT, ["test", "bau", "pruefer"]),
+        ("gruen", auftrag.Ende.GEMERGT, ["test", "bau", "pruefer", "mutation"]),
+        ("import", auftrag.Ende.GEMERGT, ["test", "bau", "pruefer", "mutation"]),
+        ("ohne", auftrag.Ende.GEMERGT, ["test", "bau", "pruefer", "mutation"]),
         ("kaputt", auftrag.Ende.NOTIZ, ["test", "bau", "pruefer", "bau", "pruefer"]),
         ("worktree", auftrag.Ende.NOTIZ, ["test", "bau", "pruefer", "bau", "pruefer"]),
     ],

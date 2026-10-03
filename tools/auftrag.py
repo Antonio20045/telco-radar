@@ -30,6 +30,7 @@ format_ = importlib.import_module("auftrag_format")
 pruefer_ = importlib.import_module("auftrag_pruefer")
 rolle_ = importlib.import_module("claude_rolle")
 git_ = importlib.import_module("auftrag_git")
+mutation_ = importlib.import_module("mutation")
 AUFTRAEGE, KOSTEN, GEMERGT = format_.AUFTRAEGE, format_.KOSTEN, format_.GEMERGT
 
 RUNDEN = 2
@@ -271,10 +272,8 @@ def _urteil(lauf: Lauf, runde: int, code: int, summe: str) -> str:
         return f"schnelle Leiter rot (Exit {code})\n{_tail(ausgabe)}"
     if befund := _pruefer(lauf, runde):
         return befund
-    nachricht, rot = (
-        lauf.datei(LAUFDATEIEN["TELCO_COMMIT_NACHRICHT"]),
-        lauf.datei(ROT_BELEG),
-    )
+    nachricht = lauf.datei(LAUFDATEIEN["TELCO_COMMIT_NACHRICHT"])
+    rot = lauf.datei(ROT_BELEG)
     titel = nachricht.read_text("utf-8").strip() if nachricht.is_file() else ""
     titel = titel or f"auftrag({lauf.auftrag['id']}): {lauf.auftrag['ziel']}"
     if rot.is_file():
@@ -291,6 +290,8 @@ def _bauphase(lauf: Lauf) -> tuple[Ende, list[str]]:
             return Ende.VORAUSSETZUNG, [voraussetzung.read_text("utf-8").strip()]
         befunde.append(_urteil(lauf, runde, code, summe))
         if not befunde[-1]:
+            p = mutation_.probe(lauf.wt, lauf.start, lauf.datei("mutation.log"))
+            _zeile(lauf, "mutation", 0, p.exit, agent="mutmut", **p.spalten())
             return Ende.GEMERGT, []
     return Ende.NOTIZ, befunde[1:]
 

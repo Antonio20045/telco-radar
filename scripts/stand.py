@@ -6,9 +6,11 @@ Wegwerf-Worktree auf ``HEAD``: kaputter Zeitreihen-Render, Live-Datum, Rot-Probe
 
 import ast
 import contextlib
+import csv
 import importlib
 import json
 import os
+import re
 import shutil
 import statistics
 import subprocess
@@ -28,6 +30,8 @@ import waechter_tests
 W = waechter.WURZEL
 sys.path.insert(0, str(W / "tools"))
 auftrag_format = importlib.import_module("auftrag_format")
+MUTATION_ENTFAELLT = "entfällt: "
+MUTATION_ERKANNT = re.compile(r"\d+ von \d+ Mutanten erkannt")
 ROLLENDATEIEN = tuple(f".claude/agents/{r}.md" for r in ("test", "bau", "pruefer"))
 LIVE_SEITE = "https://telco-radar.onrender.com/geraete.html"
 LIVE_FRIST_SEKUNDEN = 20
@@ -163,6 +167,29 @@ def echter_auftrag() -> list[str]:
     if auftrag_format.echte_auftraege(W):
         return []
     return ["kein Auftrag, dessen Bau und Prüfer ein Claude-Modell bis zum Merge waren"]
+
+
+def mutationsprobe() -> list[str]:
+    """Verlangt zu einem echten Auftrag eine Mutationsprobe mit Zeit oder Grund."""
+    datei = W / auftrag_format.KOSTEN
+    if datei.is_file():
+        echte = auftrag_format.echte_auftraege(W)
+        with datei.open(encoding="utf-8") as f:
+            zeilen = [z for z in csv.DictReader(f) if z["auftrag"] in echte]
+        if any(z["rolle"] == "mutation" and _probe_belegt(z) for z in zeilen):
+            return []
+    return ["keine Mutationsprobe mit Zeit oder Grund zu einem echten Auftrag"]
+
+
+def _probe_belegt(zeile: dict[str, str]) -> bool:
+    ergebnis = zeile.get("ergebnis") or ""
+    if ergebnis.startswith(MUTATION_ENTFAELLT):
+        return len(ergebnis) > len(MUTATION_ENTFAELLT)
+    try:
+        sekunden = float(zeile.get("sekunden") or "")
+    except ValueError:
+        return False
+    return sekunden > 0 and MUTATION_ERKANNT.match(ergebnis) is not None
 
 
 def rollen_sperren() -> list[str]:
@@ -314,7 +341,8 @@ def offen() -> dict[str, list[str]]:
         + _mehr("Zeilen CLAUDE.md", _zeilen("CLAUDE.md"), 100),
         "6 Auftragsablauf": _fehlt("tools/auftrag.py", *ROLLENDATEIEN)
         + rollen_sperren()
-        + echter_auftrag(),
+        + echter_auftrag()
+        + mutationsprobe(),
         "7 Kommentarabbau": _fehlt("pruef/kommentar-basis.txt"),
         "8 Promo-IDs": _fehlt("outputs/auftraege/T1.json", "tests/orakel"),
         "9 Lader, render_site": _mehr("Hex-Farben", summe.get("hexfarbe", 0))
