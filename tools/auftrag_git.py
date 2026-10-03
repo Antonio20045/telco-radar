@@ -5,7 +5,7 @@ from __future__ import annotations
 import fcntl
 import hashlib
 import importlib
-from collections.abc import Iterator
+from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -39,9 +39,13 @@ def kopf(ort: Path) -> tuple[str, str]:
     return name, _git(ort, "rev-parse", "HEAD").strip()
 
 
-def pruefsumme(datei: Path) -> str:
-    """SHA-256 einer Datei, leer, wenn sie fehlt."""
-    return hashlib.sha256(datei.read_bytes()).hexdigest() if datei.is_file() else ""
+def pruefsummen(ort: Path, pfade: Iterable[str]) -> dict[str, str]:
+    """SHA-256 je Pfad unter ``ort``, leer, wenn die Datei fehlt."""
+    dateien = {p: ort / p for p in pfade}
+    return {
+        p: hashlib.sha256(d.read_bytes()).hexdigest() if d.is_file() else ""
+        for p, d in dateien.items()
+    }
 
 
 @contextmanager
@@ -76,3 +80,8 @@ def committen(ort: Path, titel: str, pfade: list[str]) -> None:
     """Committet genau ``pfade``; anderes Gestagtes bleibt draußen."""
     _git(ort, "add", "--", *pfade)
     _git(ort, "commit", "-q", "-m", titel, "--", *pfade)
+
+
+def veraendert(ort: Path, summen: dict[str, str]) -> list[str]:
+    """Pfade, deren Prüfsumme nicht mehr der in ``summen`` gleicht."""
+    return [p for p, s in pruefsummen(ort, summen).items() if s != summen[p]]

@@ -51,7 +51,7 @@ LAUFDATEIEN = {
 ROT_BELEG = "rot.txt"
 BASEN = "pruef/"
 SPERRE = "main.sperre"
-FACHLICH = re.compile(r"\bAssertionError\b|\bFailed: ")
+FACHLICH = re.compile(r"\bAssertionError\b|\bFailed: |^.+?:\d+: assert ")
 GRUEN = 0
 TESTS_ROT = 1
 
@@ -253,13 +253,13 @@ def _commit(lauf: Lauf, titel: str, dateien: list[str]) -> str:
     return f"Commit abgelehnt (Exit {code})\n{_tail(ausgabe)}" if code else ""
 
 
-def _urteil(lauf: Lauf, runde: int, code: int, summe: str) -> str:
+def _urteil(lauf: Lauf, runde: int, code: int, summe: dict[str, str]) -> str:
     alt, neu = git_.geaendert(lauf.wt, lauf.start)
     zeilen = git_.produktzeilen(lauf.wt, lauf.start)
     if code:
         return f"Agent Exit {code}"
-    if git_.pruefsumme(lauf.wt / lauf.auftrag["abnahme"]) != summe:
-        return "Abnahmetest geändert oder gelöscht"
+    if anders := git_.veraendert(lauf.wt, summe):
+        return f"Abnahmetest geändert oder gelöscht: {', '.join(anders)}"
     if fremd := _ausserhalb(lauf, "bau"):
         return fremd
     if zeilen > DIFF_GRENZE:
@@ -282,7 +282,8 @@ def _urteil(lauf: Lauf, runde: int, code: int, summe: str) -> str:
 
 
 def _bauphase(lauf: Lauf) -> tuple[Ende, list[str]]:
-    summe, befunde = git_.pruefsumme(lauf.wt / lauf.auftrag["abnahme"]), [""]
+    testphase = [lauf.auftrag["abnahme"], *sum(git_.geaendert(lauf.wt, lauf.start), [])]
+    summe, befunde = git_.pruefsummen(lauf.wt, testphase), [""]
     voraussetzung = lauf.datei(LAUFDATEIEN["TELCO_VORAUSSETZUNG"])
     for runde in range(1, RUNDEN + 1):
         code, _ = _agent(lauf, "bau", runde, befunde[-1])

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import io
 import re
 from pathlib import Path
 
@@ -130,15 +131,28 @@ def zahl(quelle: object, schluessel: str) -> object:
 
 
 def kosten_schreiben(zeilen: list[dict[str, object]], ort: Path) -> Path:
-    """Hängt Zeilen an die Kostendatei unter ``ort`` an, mit Kopf bei neuer Datei."""
+    """Hängt Zeilen an die Kostendatei an; mit altem Kopf wird sie umgeschrieben."""
     datei = ort / KOSTEN
     datei.parent.mkdir(parents=True, exist_ok=True)
+    alte: list[dict[str, object]] = []
     neu = not datei.is_file()
-    with datei.open("a", encoding="utf-8", newline="") as f:
-        schreiber = csv.DictWriter(f, fieldnames=SPALTEN)
-        if neu:
-            schreiber.writeheader()
-        schreiber.writerows(zeilen)
+    if not neu:
+        with datei.open(encoding="utf-8", newline="") as f:
+            leser = csv.DictReader(f)
+            alte = [dict.fromkeys(SPALTEN, "") | z for z in leser]
+            neu = tuple(leser.fieldnames or ()) != SPALTEN
+    puffer = io.StringIO()
+    schreiber = csv.DictWriter(puffer, fieldnames=SPALTEN)
+    if neu:
+        schreiber.writeheader()
+    schreiber.writerows([*alte, *zeilen] if neu else zeilen)
+    zwischen = datei.with_name(f"{datei.name}.neu")
+    if neu:
+        zwischen.write_text(puffer.getvalue(), "utf-8", newline="")
+        zwischen.replace(datei)
+    else:
+        with datei.open("a", encoding="utf-8", newline="") as f:
+            f.write(puffer.getvalue())
     return datei
 
 

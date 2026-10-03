@@ -104,6 +104,14 @@ if rolle == "test":
     )
     if modus == "testfremd":
         Path("tests/test_basis.py").write_text("def test_basis():\\n    pass\\n")
+    if modus == "nackt":
+        abnahme.write_text(abnahme.read_text().replace(", 'verdopple: erw", "  # "))
+    if modus == "hilfe":
+        Path("tests/hilfe_soll.py").write_text("SOLL = 4\\n")
+        text = abnahme.read_text().replace("== 4,", "== SOLL,")
+        abnahme.write_text("from hilfe_soll import SOLL\\n" + text)
+elif modus == "hilfe":
+    Path("tests/hilfe_soll.py").write_text("SOLL = 2\\n")
 elif modus == "voraussetzung":
     Path(os.environ["TELCO_VORAUSSETZUNG"]).write_text("collect braucht eine Naht")
 elif modus == "schummeln":
@@ -656,3 +664,49 @@ def test_merge_und_leiter_laufen_unter_einer_sperre(repo, monkeypatch):
     monkeypatch.setenv("ERSATZ_SPERRE", str(sperre))
 
     assert _starte(repo) == auftrag.Ende.GEMERGT
+
+
+def test_nacktes_assert_belegt_den_roten_abnahmetest(repo):
+    assert _starte(repo, "nackt", erwarteterFehler="assert 2 == 4") == (
+        auftrag.Ende.GEMERGT
+    )
+
+    assert "assert 2 == 4" in _git(repo, "log", "-1", "--format=%B", "HEAD~1")
+
+
+def test_bau_aendert_keine_hilfsdatei_der_testphase(repo):
+    assert _starte(repo, "hilfe") == auftrag.Ende.NOTIZ
+
+    notiz = (repo / auftrag.AUFTRAEGE / "A1-notiz.md").read_text()
+    assert "Abnahmetest geändert oder gelöscht: tests/hilfe_soll.py" in notiz
+
+
+def test_alte_kostendatei_bekommt_den_neuen_kopf(tmp_path):
+    datei = tmp_path / auftrag.KOSTEN
+    datei.parent.mkdir(parents=True)
+    datei.write_text("datum,auftrag,rolle,ergebnis\n2026-10-01,A0,ende,gemergt\n")
+    zeile = dict.fromkeys(auftrag.format_.SPALTEN, "") | {"auftrag": "A1"}
+
+    auftrag.format_.kosten_schreiben([zeile], tmp_path)
+
+    with datei.open(encoding="utf-8") as f:
+        leser = csv.DictReader(f)
+        zeilen = list(leser)
+    assert tuple(leser.fieldnames) == auftrag.format_.SPALTEN
+    assert [(z["auftrag"], z["ergebnis"]) for z in zeilen] == [
+        ("A0", "gemergt"),
+        ("A1", ""),
+    ]
+
+
+def test_kostendatei_mit_unbekannter_spalte_bleibt_unveraendert(tmp_path):
+    datei = tmp_path / auftrag.KOSTEN
+    datei.parent.mkdir(parents=True)
+    alt = "datum,auftrag,preis\n2026-10-01,A0,3\n"
+    datei.write_text(alt)
+    zeile = dict.fromkeys(auftrag.format_.SPALTEN, "") | {"auftrag": "A1"}
+
+    with pytest.raises(ValueError, match="preis"):
+        auftrag.format_.kosten_schreiben([zeile], tmp_path)
+
+    assert datei.read_text() == alt
