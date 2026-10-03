@@ -37,6 +37,7 @@ _SPECNAME = (
 )
 _VERSUCH = "try:\n    x = 1\nexcept {}:\n    x = 2\n"
 _ADDOPTS = '\n[tool.pytest.ini_options]\naddopts = "{}"\n'
+_NATIV = "\n[tool.pytest]\naddopts = [{}]\n"
 _OHNE_TYPCHECK = (
     "import typing as t\nfrom typing import no_type_check as ntc\n\n\n"
     "@{}\ndef f():\n    pass\n"
@@ -378,6 +379,17 @@ def test_fehlender_verlauf_ist_rot(projekt):
         ("leiter_roh.py", "x = 1\n", "fremde-konfig"),
         ("pyproject.toml", _PYPROJECT + _ADDOPTS.format("-p fremd"), "pytest-plugin"),
         ("pyproject.toml", _PYPROJECT + _ADDOPTS.format("-pfremd"), "pytest-plugin"),
+        ("pyproject.toml", _PYPROJECT + _NATIV.format('"-p", "x"'), "pytest-plugin"),
+        # Gegen 6ceb9cd ungezählt: Eingriffe in pytest und die Leiter.
+        ("tests/conftest.py", "import _pytest.assertion.rewrite\n", "leiter-eingriff"),
+        ("tests/conftest.py", "def f(i, c):\n    i.obj.__code__ = c\n", "leiter-"),
+        ("tests/conftest.py", "import sys\n\nsys.modules['x'].y = 1\n", "leiter-"),
+        ("tests/test_a.py", "from pluggy import HookimplMarker\n", "leiter-eingriff"),
+        ("tests/test_a.py", "x = __import__('_pytest.runner')\n", "leiter-eingriff"),
+        # Gegen 6ceb9cd ungezählt: weitergereichte Uhr, Uhren ohne Zeitangabe.
+        ("src/telco_radar/a.py", "import time\n\njetzt = time.time\n", "uhr"),
+        ("src/telco_radar/a.py", "import time\n\nx = time.localtime()\n", "uhr"),
+        ("src/telco_radar/a.py", "import time\n\nx = time.strftime('%Y')\n", "uhr"),
         # Gegen 6ceb9cd ungezählt: Uhr über Importaliase.
         ("src/telco_radar/a.py", "from time import time\nx = time()\n", "uhr"),
         ("src/telco_radar/a.py", "from time import time as t\nx = t()\n", "uhr"),
@@ -417,6 +429,11 @@ def test_neuer_befund_der_waechter_basis_ist_rot(projekt, pfad, text, code):
         ("src/telco_radar/a.py", "x = 1  # ruff ist hier nicht abgeschaltet\n"),
         ("pyproject.toml", _PYPROJECT + _ADDOPTS.format("--strict-markers")),
         ("scripts/leiter_plugin/leiter_roh.py", "x = 1\n"),
+        ("src/telco_radar/a.py", "import time\n\nx = time.localtime(0)\n"),
+        ("src/telco_radar/a.py", "x = tag.strftime('%Y')\n"),
+        ("src/telco_radar/a.py", "x = 1  # siehe mypy: Doku\n"),
+        ("src/telco_radar/a.py", "# Hinweis: ruff: disable[E501] nie nutzen\n"),
+        ("tests/test_a.py", "import sys\n\nsys.modules['x'] = None\n"),
     ],
 )
 def test_erlaubte_stellen_bleiben_gruen(projekt, pfad, text):
@@ -529,6 +546,33 @@ def test_anker_meldet_den_wert_nicht_die_schreibweise(projekt):
     )
 
 
+def test_unlesbare_listen_im_verlauf_sind_rot(projekt, monkeypatch):
+    echt = waechter._inhalte
+
+    def kaputt(wurzel, paare):
+        if any(p in waechter.LISTEN for _, p in paare):
+            raise waechter.subprocess.CalledProcessError(128, ["git", "cat-file"])
+        return echt(wurzel, paare)
+
+    monkeypatch.setattr(waechter, "_inhalte", kaputt)
+    anker = _git(projekt, "rev-parse", "HEAD")
+    assert _rot(projekt) == [f"Inhalte ab {anker[:7]} nicht lesbar"]
+
+
+def test_unlesbare_zwischenfassung_versteckt_keine_ankerverschiebung(projekt):
+    alt = _git(projekt, "rev-parse", "HEAD")
+    _commit(projekt, "Wächter angelegt")
+    _schreibe(projekt, waechter.WAECHTER, "ANKER = WERT\n")
+    _commit(projekt, "unlesbar")
+    _schreibe(projekt, "pruef/tests-uebersprungen.txt", "5\n")
+    lockerung = _commit(projekt, "lockert")
+    _setze_anker(projekt, lockerung)
+    kopf = _commit(projekt, "Anker auf die Lockerung")
+    assert _rot(projekt)[0].startswith(
+        f"Anker verschoben im HEAD {kopf[:7]}: {alt[:7]} -> {lockerung[:7]};"
+    )
+
+
 def test_unlesbarer_verlauf_ist_rot_statt_keine_lockerung(projekt, monkeypatch):
     def kaputt(wurzel, paare):
         raise waechter.subprocess.CalledProcessError(128, ["git", "cat-file"])
@@ -550,6 +594,12 @@ def test_uhr_ausserhalb_der_einstiegsfunktion_wird_gezaehlt(projekt):
         "x = time.time()\n\n\ndef run_geraete_stage():\n    y = time.monotonic()\n",
     )
     assert _rot(projekt) == []
+    assert waechter_regeln.uhr_ausserhalb_einstieg(projekt) == 2
+    _schreibe(
+        projekt,
+        "src/telco_radar/geraete_pipeline.py",
+        "import time as t\n\nSTART = t.time()\n",
+    )
     assert waechter_regeln.uhr_ausserhalb_einstieg(projekt) == 2
 
 

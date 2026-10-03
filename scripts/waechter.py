@@ -144,9 +144,9 @@ def anker_pruefung(wurzel: Path) -> tuple[str | None, list[str]]:
         kopf = _git(wurzel, "rev-parse", "HEAD").strip()
     except subprocess.CalledProcessError:
         return None, [f"Verlauf von {WAECHTER} nicht lesbar"]
-    rot = []
-    for vorher, fassung in zip(verlauf, verlauf[1:], strict=False):
-        ort, alt, neu = fassung[0], vorher[-1], fassung[-1]
+    rot, alt = [], None
+    for fassung in verlauf:
+        ort, neu = fassung[0], fassung[-1]
         if ort in (kopf, "Arbeitsstand") and None not in (alt, neu) and alt != neu:
             wo = "Arbeitsstand" if ort == "Arbeitsstand" else f"HEAD {kopf[:7]}"
             rot.append(
@@ -154,6 +154,9 @@ def anker_pruefung(wurzel: Path) -> tuple[str | None, list[str]]:
                 " lockern darf nur Antonio von Hand, indem er diesen roten Stand"
                 " selbst committet"
             )
+        # Verglichen wird mit dem letzten lesbaren Wert: eine unlesbare Zwischenfassung
+        # versteckt keine Verschiebung.
+        alt = neu if neu is not None else alt
     return anker, rot
 
 

@@ -56,8 +56,8 @@ _TYPE_IGNORE = re.compile(r"type:\s*ignore(?:\[([^\]]*)\])?")
 _WERKZEUG_AUS = re.compile(
     r"mypy:\s*ignore-errors|fmt:\s*(?:off|skip)|isort:\s*(?:off|skip)"
 )
-_RUFF_AUS = re.compile(r"ruff:\s*disable\b(?:\[([^\]]*)\])?", re.I)
-_MYPY_AUS = re.compile(r"mypy:\s*(?!ignore-errors)(.*)", re.I)
+_RUFF_AUS = re.compile(r"^#\s*ruff:\s*disable\b(?:\[([^\]]*)\])?", re.I | re.M)
+_MYPY_AUS = re.compile(r"^#\s*mypy:\s*(?!ignore-errors)(.*)", re.I | re.M)
 _ABSCHALTER = (_NOQA, _TYPE_IGNORE, _WERKZEUG_AUS, _RUFF_AUS, _MYPY_AUS)
 _KEIN_TYPCHECK = frozenset({"no_type_check", "no_type_check_decorator"})
 # Wanduhren, aufgelöst über die Importe der Datei: ``from time import time as t``
@@ -71,6 +71,17 @@ _UHREN = frozenset(
         "datetime.datetime.today",
         "datetime.date.today",
     }
+)
+_UHR_OHNE_ZEIT = frozenset(
+    {"time.localtime", "time.gmtime", "time.ctime", "time.asctime"}
+)
+# Eingriffe in pytest oder die Leiter selbst; erlaubt nur in den Dateien der Leiter.
+_EINGRIFF_MODULE = ("_pytest", "pluggy", "leiter_roh")
+_EINGRIFF_TEXTE = frozenset({"leiter_roh", "TELCO_LEITER_ROH"})
+EINGRIFF_ERLAUBT = (
+    "scripts/leiter_plugin/",
+    "scripts/leiter_pytest.py",
+    "scripts/waechter_regeln.py",
 )
 ANKER_NAME = "ANKER"
 # Zusammengesetzt, damit diese Datei die eigene Regel nicht auslöst.
@@ -137,12 +148,22 @@ def _plugin_optionen(wurzel: Path) -> int:
         werkzeuge = tomllib.loads(datei.read_text("utf-8")).get("tool", {})
     except (OSError, tomllib.TOMLDecodeError):
         return 0
-    optionen = werkzeuge.get("pytest", {}).get("ini_options", {}).get("addopts", "")
-    try:
-        teile = shlex.split(optionen) if isinstance(optionen, str) else list(optionen)
-    except ValueError:
-        return 1
-    return sum(t == "-p" or t.startswith(("-p", "--plugin")) for t in teile)
+    pytest = werkzeuge.get("pytest", {})
+    anzahl = 0
+    # pytest liest addopts aus [tool.pytest.ini_options] und aus [tool.pytest] selbst.
+    for optionen in (
+        pytest.get("ini_options", {}).get("addopts", ""),
+        pytest.get("addopts", ""),
+    ):
+        try:
+            teile = (
+                shlex.split(optionen) if isinstance(optionen, str) else list(optionen)
+            )
+        except ValueError:
+            anzahl += 1
+            continue
+        anzahl += sum(str(t).startswith(("-p", "--plugin")) for t in teile)
+    return anzahl
 
 
 def uhr_ausserhalb_einstieg(wurzel: Path) -> int:
@@ -158,8 +179,9 @@ def uhr_ausserhalb_einstieg(wurzel: Path) -> int:
             and f.name == funktion
             for k in ast.walk(f)
         }
+        aliase = _aliase(baum)
         anzahl += sum(
-            _ist_uhr(k) and id(k) not in innen
+            _ist_uhr(k, aliase) and id(k) not in innen
             for k in ast.walk(baum)
             if isinstance(k, ast.Call)
         )
@@ -215,7 +237,45 @@ def _ist_uhr(aufruf: ast.Call, aliase: dict[str, str] | None = None) -> bool:
     name, basis = _name(aufruf.func), _name(getattr(aufruf.func, "value", None))
     if bool(basis) and (name in ("now", "utcnow", "today") or name == basis == "time"):
         return True
-    return _voller_name(aufruf.func, aliase or {}) in _UHREN
+    voll = _voller_name(aufruf.func, aliase or {})
+    return voll in _UHREN or (
+        (voll in _UHR_OHNE_ZEIT and not aufruf.args)
+        or (voll == "time.strftime" and len(aufruf.args) == 1)
+    )
+
+
+def _uhr_verweise(baum: ast.AST, aliase: dict[str, str]) -> int:
+    """Zählt Uhren, die ohne Aufruf weitergereicht werden: ``jetzt = time.time``."""
+    aufgerufen = {id(k.func) for k in ast.walk(baum) if isinstance(k, ast.Call)}
+    return sum(
+        isinstance(k, ast.Name | ast.Attribute)
+        and id(k) not in aufgerufen
+        and _voller_name(k, aliase) in _UHREN
+        for k in ast.walk(baum)
+    )
+
+
+def _eingriffe(pfad: str, baum: ast.AST) -> int:
+    """Zählt Importe von pytest-Interna, Zuweisungen an ``__code__``, Nennungen des
+    Leiterplugins und, in ``conftest.py``, Zugriffe auf ``sys.modules``."""
+    if pfad.startswith(EINGRIFF_ERLAUBT):
+        return 0
+    anzahl = 0
+    for k in ast.walk(baum):
+        module = (
+            [a.name for a in getattr(k, "names", [])]
+            if isinstance(k, ast.Import)
+            else []
+        )
+        if isinstance(k, ast.ImportFrom):
+            module = [k.module or ""]
+        anzahl += sum(m.split(".")[0] in _EINGRIFF_MODULE for m in module)
+        if isinstance(k, ast.Attribute):
+            anzahl += k.attr == "__code__" and not isinstance(k.ctx, ast.Load)
+            anzahl += k.attr == "modules" and pfad.endswith("conftest.py")
+        if isinstance(k, ast.Constant) and isinstance(k.value, str):
+            anzahl += k.value in _EINGRIFF_TEXTE or k.value.startswith("_pytest")
+    return anzahl
 
 
 def _aliase(baum: ast.AST) -> dict[str, str]:
@@ -251,6 +311,9 @@ def _voller_name(knoten: ast.expr, aliase: dict[str, str]) -> str | None:
 def _ast_codes(pfad: str, baum: ast.AST) -> Iterator[str]:
     in_src = pfad.startswith("src/")
     aliase = _aliase(baum)
+    yield from ["leiter-eingriff"] * _eingriffe(pfad, baum)
+    if in_src and pfad not in UHR_ERLAUBT:
+        yield from ["uhr"] * _uhr_verweise(baum, aliase)
     for knoten in ast.walk(baum):
         if _letzter_name(knoten, aliase) in _KEIN_TYPCHECK:
             yield "kein-typcheck"
