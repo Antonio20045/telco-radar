@@ -45,15 +45,15 @@ def _tag(n: int) -> str:
 def _bestand(tmp_path, *, mit_alarm: bool) -> Path:
     """Ein Wurzelverzeichnis mit Konfiguration UND Bestand.
 
-    `Medimax` steht in `_QUELLEN` des Pipeline-Tests - der Alarm wird nur
+    `Haendler` steht in `_QUELLEN` des Pipeline-Tests - der Alarm wird nur
     fuer konfigurierte Anbieter gemeldet, ein Bestand allein reicht nicht.
     """
     root = _root(tmp_path)
     (root / "data" / "state").mkdir(parents=True, exist_ok=True)
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
-    db.protokolliere_lauf("Medimax", _tag(1), funde=20, vollstaendig=True)
+    db.protokolliere_lauf("Haendler", _tag(1), funde=20, vollstaendig=True)
     db.protokolliere_lauf(
-        "Medimax", _tag(2), funde=0 if mit_alarm else 20, vollstaendig=True
+        "Haendler", _tag(2), funde=0 if mit_alarm else 20, vollstaendig=True
     )
     db.save(_tag(2))
     return root
@@ -116,9 +116,9 @@ def test_mit_alarm_geht_genau_eine_mail_hinaus_und_der_schritt_ist_gruen(
     # OHNE `--trocken` geht die Mail WIRKLICH hinaus.
     assert trocken is False
     assert "02.09.2026" in betreff
-    assert "Medimax: heute nicht erfasst" in text
+    assert "Haendler: heute nicht erfasst" in text
     # Derselbe Satz steht im Protokoll - drei Kanaele, eine Wortform.
-    assert "Medimax: heute nicht erfasst" in caplog.text
+    assert "Haendler: heute nicht erfasst" in caplog.text
 
 
 def test_ohne_alarm_geht_keine_mail_hinaus(tmp_path, monkeypatch):
@@ -234,8 +234,8 @@ def test_ein_nicht_konfigurierter_anbieter_loest_keine_mail_aus(tmp_path, monkey
     root = _root(tmp_path)
     (root / "data" / "state").mkdir(parents=True, exist_ok=True)
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
-    db.protokolliere_lauf("Medimax", _tag(1), funde=20, vollstaendig=True)
-    db.protokolliere_lauf("Medimax", _tag(2), funde=20, vollstaendig=True)
+    db.protokolliere_lauf("Haendler", _tag(1), funde=20, vollstaendig=True)
+    db.protokolliere_lauf("Haendler", _tag(2), funde=20, vollstaendig=True)
     # "Gespenst" steht nicht in der Konfiguration des Testwurzelordners.
     db.protokolliere_lauf("Gespenst", _tag(1), funde=40, vollstaendig=True)
     db.protokolliere_lauf("Gespenst", _tag(2), funde=0, vollstaendig=True)

@@ -27,6 +27,7 @@ from typing import TextIO
 
 import leiter_pytest
 import waechter
+import waechter_vertraege
 from leiter_befunde import Befund, gesenkte_basis, mypy_befunde, neue_befunde
 from leiter_pytest import (
     gesammelte_ids,
@@ -125,7 +126,9 @@ def stufe_waechter(log: TextIO) -> Ergebnis:
         meldung = ["ruff bricht ab:", *lauf.stderr.splitlines()]
         return Ergebnis("0 Wächter", False, meldung)
     privat = Counter(b.schluessel for b in ruff_befunde(lauf.stdout))
-    rot, geschrieben = waechter.pruefe(WURZEL, privat)
+    vertraege = waechter_vertraege.pruefe(WURZEL)
+    rot, geschrieben = waechter.pruefe(WURZEL, privat, schreiben=not vertraege)
+    rot = vertraege + rot
     ergebnis = Ergebnis("0 Wächter", not rot, rot, [_relativ(p) for p in geschrieben])
     ergebnis.hinweise = waechter.anker_verschiebungen(WURZEL)
     return ergebnis

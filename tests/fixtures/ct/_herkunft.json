@@ -1,0 +1,17 @@
+{
+  "zweck": "Belegte Fixtures dieses Ordners; sha256_roh gilt fuer den entpackten Inhalt. Nachgetragen in Paket 11 aus Commit, Inhalt und Testdokumentation.",
+  "eintraege": [
+    {
+      "datei": "certspotter_congstar.json",
+      "abgerufen_am": "2026-08-08",
+      "commit": "3023ed45",
+      "filter": "gekuerzt bzw. neu formatiert, siehe beleg",
+      "quelle": "Commit 3023ed45, siehe beleg",
+      "beleg": "Echte certspotter-Antwort, aber GEKUERZT: tests/test_ct_log.py-Docstring 'ECHTE Antwort vom 08.08.2026 fuer congstar.de, nur um Dubletten gekuerzt'; zudem mit Einrueckung neu serialisiert (472 Zeilen). Commit 3023ed45 'Gemessen am 08.08.2026 gegen congstar.de'. Endpunkt API aus collect/ct_log.py (https://api.certspotter.com/v1/issuances), genaue Query-Parameter nicht belegt.",
+      "gzip": false,
+      "bytes_roh": 16810,
+      "sha256_roh": "39a150c8c8312a233a1f9ebdaa15e4d01efb51608952685441b795f3a68d9fff",
+      "nachgetragen": "Paket 11: Herkunft aus Commit, Inhalt und Testdokumentation belegt, nicht neu abgerufen"
+    }
+  ]
+}

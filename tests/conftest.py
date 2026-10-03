@@ -13,6 +13,7 @@ import glob
 import json
 import os
 import sys
+import sysconfig
 from pathlib import Path
 
 import pytest
@@ -25,6 +26,35 @@ REGEL_BESTAND = (
     "Regel hermetisch: Tests lesen nur Schnappschüsse, siehe tests/fixtures/bestand"
 )
 REGEL_NETZ = "Regel hermetisch: Tests rufen kein Netz, erlaubt ist nur 127.0.0.1"
+REGEL_QUELLTEXT = (
+    "Regel Verhalten: Tests lesen keinen Code, keine Vorlagen, Workflows oder Doku"
+    " als Text; die Regel dahinter wird Vertrag, Stufe-0-Prüfung oder Verhaltenstest"
+)
+QUELLTEXT = tuple(
+    f"{WURZEL / name}"
+    for name in (
+        "src",
+        "scripts",
+        "tools",
+        "service",
+        "docs",
+        "outputs",
+        ".github",
+        ".claude",
+        ".githooks",
+        "CLAUDE.md",
+        "Makefile",
+        "pyproject.toml",
+        ".importlinter",
+        "README.md",
+        "TELCO_RADAR_QUELLEN.md",
+    )
+)
+_STDLIB = sysconfig.get_path("stdlib")
+STDLIB = tuple({f"{ort}{os.sep}" for ort in (_STDLIB, str(Path(_STDLIB).resolve()))})
+BIBLIOTHEKEN = tuple(
+    {f"{sysconfig.get_path(art)}{os.sep}" for art in ("purelib", "platlib")}
+)
 PROXY_VARIABLEN = frozenset({"http_proxy", "https_proxy", "all_proxy"})
 LOKAL = frozenset({"127.0.0.1", "localhost", "::1", ""})
 DATEI_EREIGNISSE = frozenset(
@@ -87,10 +117,26 @@ def _testdatei() -> str | None:
     return gefunden
 
 
-def _gesperrt(name: str) -> str | None:
+def _gesperrt(name: str, gesperrt: tuple[str, ...] = GESPERRT) -> str | None:
     for pfad in {os.path.abspath(name), os.path.realpath(name)}:
-        if any(pfad == g or pfad.startswith(f"{g}{os.sep}") for g in GESPERRT):
+        if any(pfad == g or pfad.startswith(f"{g}{os.sep}") for g in gesperrt):
             return pfad
+    return None
+
+
+def _liest_der_test_selbst() -> str | None:
+    """Nennt die Testdatei, wenn der nächste Rahmen außerhalb der Standardbibliothek
+    ein Test ist; ein Import oder eine Bibliothek wie Jinja liest für den Code."""
+    rahmen = sys._getframe(2)
+    while rahmen is not None:
+        name = rahmen.f_code.co_filename
+        if name.startswith("<frozen importlib"):
+            return None
+        if not name.startswith(("<", *STDLIB)) or name.startswith(BIBLIOTHEKEN):
+            if name.startswith(TESTS) and not name.endswith(f"{os.sep}conftest.py"):
+                return Path(os.path.relpath(name, WURZEL)).as_posix()
+            return None
+        rahmen = rahmen.f_back
     return None
 
 
@@ -145,6 +191,11 @@ def _verstoss(meldung: str) -> None:
 def _hermetik(ereignis: str, argumente: tuple[object, ...]) -> None:
     if not _aktiv[0]:
         return
+    if ereignis == "open" and isinstance(argumente[0], str | bytes | os.PathLike):
+        pfad = _gesperrt(os.fsdecode(argumente[0]), QUELLTEXT)
+        if pfad is not None and (datei := _liest_der_test_selbst()) is not None:
+            relativ = os.path.relpath(pfad, WURZEL)
+            _verstoss(f"{REGEL_QUELLTEXT} ({datei} las {relativ})")
     if ereignis in DATEI_EREIGNISSE or ereignis == "subprocess.Popen":
         if ereignis == "subprocess.Popen":
             pfad = _kindprozess_pfad(argumente)

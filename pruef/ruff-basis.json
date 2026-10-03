@@ -704,9 +704,6 @@
  "tests/test_aenderungsradar.py": {
   "UP017": 1
  },
- "tests/test_analyst_budget.py": {
-  "UP017": 1
- },
  "tests/test_anbieter_farben.py": {
   "I001": 1
  },
@@ -771,7 +768,6 @@
  },
  "tests/test_geraete_besuchsfenster.py": {
   "E741": 1,
-  "I001": 1,
   "UP017": 1
  },
  "tests/test_geraete_bewegung.py": {
@@ -791,14 +787,8 @@
  "tests/test_geraete_buendel_o2.py": {
   "SIM115": 1
  },
- "tests/test_geraete_buendel_zeilenkopf_d3.py": {
-  "I001": 1,
-  "SIM300": 1
- },
  "tests/test_geraete_collect.py": {
-  "E501": 2,
-  "E741": 4,
-  "F401": 1,
+  "E741": 2,
   "F541": 1,
   "UP017": 1
  },
@@ -822,15 +812,8 @@
   "F401": 1,
   "I001": 1
  },
- "tests/test_geraete_glossar.py": {
-  "F841": 1
- },
  "tests/test_geraete_haendler_ohne_buendel.py": {
   "F401": 1,
-  "I001": 1
- },
- "tests/test_geraete_jobbudget.py": {
-  "E501": 1,
   "I001": 1
  },
  "tests/test_geraete_karten_band_browser.py": {
@@ -879,7 +862,6 @@
  "tests/test_geraete_pipeline.py": {
   "E402": 2,
   "E501": 1,
-  "I001": 1,
   "UP017": 1,
   "UP031": 1
  },
@@ -957,9 +939,6 @@
   "E741": 1,
   "F541": 1
  },
- "tests/test_geraete_tote_adressen.py": {
-  "I001": 1
- },
  "tests/test_geraete_vergleich.py": {
   "F401": 1
  },
@@ -974,10 +953,6 @@
  },
  "tests/test_geraete_verlauf_legende_browser.py": {
   "I001": 1
- },
- "tests/test_geraete_verlauf_stufenlinie_browser.py": {
-  "I001": 1,
-  "SIM300": 2
  },
  "tests/test_geraete_wahrheit.py": {
   "B905": 1
@@ -1000,9 +975,7 @@
  },
  "tests/test_geraete_zeitreihe_rechenweg.py": {
   "B905": 1,
-  "E501": 1,
-  "F401": 2,
-  "I001": 1
+  "E501": 1
  },
  "tests/test_geraete_zeitreihe_seite.py": {
   "E741": 1,
@@ -1035,20 +1008,10 @@
   "I001": 1,
   "UP017": 1
  },
- "tests/test_llm_leere_antwort.py": {
-  "I001": 1
- },
  "tests/test_luecken.py": {
   "F401": 1
  },
- "tests/test_marke.py": {
-  "F401": 1
- },
  "tests/test_newsletter_filters.py": {
-  "I001": 1
- },
- "tests/test_newsletter_render.py": {
-  "F401": 2,
   "I001": 1
  },
  "tests/test_newsletter_segments.py": {

@@ -115,9 +115,14 @@ def _baue(tmp_path: Path) -> Path:
 
 
 @pytest.fixture(scope="module")
-def _links(tmp_path_factory, chromium):
+def _site(tmp_path_factory):
+    return _baue(tmp_path_factory.mktemp("ueblink"))
+
+
+@pytest.fixture(scope="module")
+def _links(_site, chromium):
     """Ein Browserstart, zwei Seiten, alle Linkmasse."""
-    site = _baue(tmp_path_factory.mktemp("ueblink"))
+    site = _site
 
     messung: dict[str, list[dict]] = {}
     with _server(site) as wurzel:
@@ -212,22 +217,48 @@ def test_der_link_ist_rot_und_kein_flex_kind(_links):
     assert {lk["farbe"] for lk in alle} == {"rgb(230, 0, 0)"}
 
 
-def test_die_beschriftung_ist_an_beiden_orten_dieselbe():
+def test_die_beschriftung_ist_an_beiden_orten_dieselbe(_site, chromium):
     """Der rote Link entsteht ZWEIMAL: als Jinja-Makro fuer die gerenderten
     Seiten und in `app.js` fuer den Explorer der Archivwochen, der seine
     Meldungen im Browser baut. Zwei Umsetzungen derselben Sache laufen
     auseinander - dann heisst der Link auf der Meldungsseite anders als im
-    Archiv, und beide sind fuer sich gruen.
+    Archiv, und beide sind fuer sich gruen. Im Browser wird der Explorer
+    bedient und sein Link gegen den serverseitig gerenderten gehalten.
     """
-    vorlagen = REPO / "src" / "telco_radar" / "report" / "templates"
-    makro = (vorlagen / "_uebersetzung.html.j2").read_text(encoding="utf-8")
-    js = (vorlagen / "app.js").read_text(encoding="utf-8")
-    # Die Beschriftung aus dem Makro herausziehen, nicht hier wiederholen:
-    # eine dritte Kopie im Test waere derselbe Fehler noch einmal.
-    zeile = [z for z in makro.splitlines() if 'class="ueb-link"' in z and "{{" in z]
-    assert len(zeile) == 1, "das Makro traegt nicht genau eine Linkzeile"
-    text = zeile[0].split("</a>")[0].rsplit(">", 1)[1]
-    assert text.strip(), "die Beschriftung liess sich nicht auslesen"
-    assert f">{text}</a>" in js, (
-        f"app.js beschriftet den Link anders als das Makro ({text!r})"
+    from bs4 import BeautifulSoup
+
+    vom_server = {
+        a.get_text(strip=True)
+        for name in ("index.html", "meldungen.html")
+        for a in BeautifulSoup(
+            (_site / name).read_text(encoding="utf-8"), "html.parser"
+        ).select(".ueb-link a")
+    }
+    assert len(vom_server) == 1, vom_server
+    archiv = sorted((_site / "reports").glob("2*.html"))
+    assert archiv, "keine Archivwoche gerendert"
+
+    with _server(_site) as wurzel:
+        seite = chromium.new_page(viewport={"width": 1440, "height": 900})
+        try:
+            seite.goto(f"{wurzel}/reports/{archiv[-1].name}", wait_until="load")
+            seite.evaluate(
+                "document.querySelectorAll('details.evidence')"
+                ".forEach(d => d.open = true)"
+            )
+            zeilen = seite.locator(".ex-row")
+            assert zeilen.count() >= 2, "der Explorer zeigt keine Meldungen"
+            vom_js = []
+            for i in (0, zeilen.count() - 1):
+                zeilen.nth(i).click()
+                link = seite.locator("#ex-detail .ueb-link a")
+                assert link.count() == 1, f"Meldung {i}: kein Link im Explorer"
+                ziel = link.evaluate("e => e.href")
+                status = seite.evaluate("async u => (await fetch(u)).status", ziel)
+                assert status == 200, f"der JS-Link zeigt ins Leere: {ziel}"
+                vom_js.append(link.inner_text().strip())
+        finally:
+            seite.close()
+    assert set(vom_js) == vom_server, (
+        f"app.js beschriftet den Link {vom_js!r}, die Vorlage {vom_server!r}"
     )

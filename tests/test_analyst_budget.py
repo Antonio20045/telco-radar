@@ -13,7 +13,7 @@ Sperre war gebaut, und sie wieder einzubauen waere eine Zeile.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -37,7 +37,7 @@ def _items(n: int) -> list[Item]:
             title=f"Meldung {i}",
             url=f"https://example.com/{i}",
             source_name="Quelle",
-            published=datetime(2026, 8, 27, tzinfo=timezone.utc),
+            published=datetime(2026, 8, 27, tzinfo=UTC),
             region="Europa",
         )
         for i in range(n)
@@ -77,13 +77,21 @@ def test_eine_ueberschrittene_schwelle_stoppt_keinen_stapel(monkeypatch):
 
 
 def test_der_analyst_fragt_den_zaehler_gar_nicht(monkeypatch):
-    """Gegenprobe auf der Code-Ebene: haette die Sperre einen anderen Namen,
-    fiele der Test oben nicht auf sie herein - dieser hier schon."""
-    import inspect
+    """Gegenprobe: jede Frage nach dem Budget wirft, der Analyst liest trotzdem
+    alle Stapel; eine Sperre unter anderem Namen fiele hier auf."""
 
-    quelle = inspect.getsource(agents)
-    assert "budget_ueberschritten" not in quelle
-    assert "budget_erschoepft" not in quelle
+    def gesperrt(*_a, **_k):
+        raise AssertionError("der Analyst fragt den Budgetzaehler")
+
+    for name in [
+        n for n in dir(llm) if n.startswith("budget_") and n != "budget_setzen"
+    ]:
+        monkeypatch.setattr(llm, name, gesperrt)
+        monkeypatch.setattr(agents, name, gesperrt, raising=False)
+    aufrufe = _stapelweise(monkeypatch)
+    ergebnis = agents.analyze_region("Europa", _items(agents.BATCH_SIZE * 2), model="m")
+    assert len(aufrufe) == 2
+    assert ergebnis["_telemetry"]["batches_ok"] == 2
 
 
 def test_grosse_stapel_sparen_denkspur(monkeypatch):

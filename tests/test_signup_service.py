@@ -11,6 +11,9 @@ Die Tests laufen gegen einen gemockten GitHub-Endpunkt, nie gegen das Netz.
 """
 
 import json
+import os
+import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -22,6 +25,8 @@ from fastapi.testclient import TestClient  # noqa: E402
 from service.signup import app as app_mod  # noqa: E402
 from service.signup import tokens  # noqa: E402
 from service.signup.ratelimit import IPBremse  # noqa: E402
+
+WURZEL = Path(__file__).resolve().parents[1]
 
 KEY = "test-token-key"
 PEPPER = "test-pepper"
@@ -442,61 +447,55 @@ def test_der_dienst_schreibt_nichts_auf_die_platte(dienst, tmp_path, monkeypatch
 
 
 def test_der_dienst_kennt_keinen_versandweg():
-    """Kein SMTP, kein Brevo-Aufruf, kein API-Key. Der Key soll nicht auf
-    einer oeffentlich erreichbaren Instanz liegen."""
-    ordner = Path(app_mod.__file__).parent
-    for datei in ordner.glob("*.py"):
-        quelle = datei.read_text(encoding="utf-8")
-        for verboten in (
-            "smtplib",
-            "brevo",
-            "BREVO",
-            "api.brevo.com",
-            "sendmail",
-            "starttls",
-        ):
-            assert verboten not in quelle, f"{datei.name}: {verboten}"
+    """Kein SMTP, kein Brevo-Aufruf, kein API-Key: der Dienst laedt ohne
+    ``smtplib``, und seine Einstellungen kennen keinen Brevo-Schluessel."""
+    lauf = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import sys\nsys.modules['smtplib'] = None\n"
+            "from service.signup import app, ratelimit, tokens\n"
+            "print(sorted(vars(app.einstellungen)))",
+        ],
+        capture_output=True,
+        text=True,
+        cwd=WURZEL,
+        env={**os.environ, "PYTHONPATH": str(WURZEL)},
+        timeout=60,
+    )
+    assert lauf.returncode == 0, lauf.stderr
+    felder = lauf.stdout.lower()
+    assert "dispatch_repo" in felder
+    assert "brevo" not in felder and "smtp" not in felder, felder
 
 
-def test_das_dispatch_ziel_ist_das_leere_inbox_repo():
+def test_das_dispatch_ziel_ist_das_leere_inbox_repo(monkeypatch):
     """Ein Token mit contents:write auf telco-radar-mail koennte
     scripts/send_digest.py ueberschreiben - genau die Datei, die der Workflow
-    danach MIT dem Entschluesselungsschluessel ausfuehrt."""
+    danach MIT dem Entschluesselungsschluessel ausfuehrt. Geprueft wird die
+    Adresse, an die ein Dispatch wirklich geht."""
     assert app_mod.einstellungen.dispatch_repo.endswith("telco-radar-inbox")
-    # Geprueft wird der CODE, nicht der Kommentar - im Modulkopf steht die
-    # Begruendung, und die muss den Namen nennen duerfen. Also: keine
-    # Zeichenkette im Programmtext nennt das Store-Repo.
-    import ast
+    ziele = []
 
-    baum = ast.parse(Path(app_mod.__file__).read_text(encoding="utf-8"))
-    # Docstrings sind Dokumentation, kein Programmtext - sie muessen den
-    # Namen nennen duerfen, sonst laesst sich die Regel nicht begruenden.
-    docs = set()
-    for knoten in ast.walk(baum):
-        if isinstance(
-            knoten, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
-        ):
-            koerper = getattr(knoten, "body", [])
-            if (
-                koerper
-                and isinstance(koerper[0], ast.Expr)
-                and isinstance(koerper[0].value, ast.Constant)
-                and isinstance(koerper[0].value.value, str)
-            ):
-                docs.add(id(koerper[0].value))
-    texte = [
-        k.value
-        for k in ast.walk(baum)
-        if isinstance(k, ast.Constant)
-        and isinstance(k.value, str)
-        and id(k) not in docs
-    ]
-    assert texte, "keine Zeichenketten gefunden - der Test prueft nichts"
-    assert any("telco-radar-inbox" in t for t in texte), (
-        "das Inbox-Repo kommt gar nicht vor - der Test prueft nichts"
-    )
-    treffer = [t for t in texte if "telco-radar-mail" in t]
-    assert not treffer, treffer
+    class Antwort:
+        status = 204
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            return False
+
+    def urlopen(anfrage, timeout=None):
+        ziele.append(anfrage.full_url)
+        return Antwort()
+
+    monkeypatch.setattr(app_mod.urllib.request, "urlopen", urlopen)
+    assert app_mod._dispatch("anmeldung", {"t": "x"}) is True
+    assert len(ziele) == 1
+    assert ziele[0].startswith("https://api.github.com/repos/")
+    assert ziele[0].endswith("/telco-radar-inbox/dispatches")
+    assert "telco-radar-mail" not in ziele[0]
 
 
 def test_alle_antworten_tragen_die_sicherheitskopfzeilen(dienst):

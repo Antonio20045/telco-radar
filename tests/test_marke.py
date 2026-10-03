@@ -146,17 +146,37 @@ def test_die_alten_seiten_leiten_unter_dem_neuen_namen_weiter(tmp_path):
         assert MARKE in text, alt
 
 
-def test_kein_alter_name_mehr_in_den_vorlagen():
-    """Gegen die Quelle, nicht gegen die Ausgabe: eine Vorlage, die heute
-    nicht gerendert wird (thema/, folien/), faellt sonst durch jedes Raster."""
-    from pathlib import Path
+def test_kein_alter_name_mehr_in_den_vorlagen(tmp_path):
+    """Gegen die ganze Website, nicht nur gegen die Startseite: der Bestand
+    des Schnappschusses mit aktivem Thema rendert auch die Seiten, die ein
+    leerer Render auslässt (Themen, Archiv, Promo, Übersetzungen), und keine
+    Datei der Ausgabe trägt den alten Namen."""
+    import json
 
-    wurzel = Path(__file__).resolve().parent.parent / "src" / "telco_radar"
-    reste = []
-    for datei in [*wurzel.rglob("*.j2"), *wurzel.rglob("*.py"), *wurzel.rglob("*.css")]:
-        text = datei.read_text(encoding="utf-8")
-        for treffer in re.finditer(r"Vodafone Insights", text):
-            reste.append(f"{datei.name}:{text[: treffer.start()].count(chr(10)) + 1}")
+    from bestand_pfad import abbild
+
+    from telco_radar.config import load_config
+
+    reports = abbild(tmp_path)
+    themen_pfad = tmp_path / "data" / "state" / "highlight_topics.json"
+    themen = json.loads(themen_pfad.read_text(encoding="utf-8"))
+    for thema in themen["topics"]:
+        thema["status"] = "aktiv"
+    themen_pfad.write_text(json.dumps(themen, ensure_ascii=False), encoding="utf-8")
+    site = tmp_path / "site"
+    render_site(site, reports, load_config(tmp_path))
+
+    dateien = [
+        d
+        for d in site.rglob("*")
+        if d.is_file() and d.suffix in {".html", ".css", ".js", ".json", ".xml"}
+    ]
+    texte = {d.relative_to(site).as_posix(): d.read_text("utf-8") for d in dateien}
+    mit_marke = [n for n, t in texte.items() if MARKE in t]
+    unterordner = {n.split("/")[0] for n in mit_marke if "/" in n}
+    assert {"thema", "promo", "reports"} <= unterordner, sorted(unterordner)
+    assert len(mit_marke) >= len(SEITEN), mit_marke
+    reste = [n for n, t in texte.items() if "Vodafone Insights" in t]
     assert not reste, f"alter Name uebrig: {reste}"
 
 
@@ -184,7 +204,6 @@ def test_der_kopf_laeuft_auch_mit_breiterer_schrift_nicht_aus_dem_bild(
     Ein Test, der die echte Schrift braeuchte, waere in der Sandbox gruen und
     in CI rot, also genau so viel wert wie keiner.
     """
-    import contextlib
     import functools
     import http.server
     import socket

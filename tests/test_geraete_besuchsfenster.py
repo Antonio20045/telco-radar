@@ -23,15 +23,14 @@ from collections import namedtuple
 from datetime import datetime, timedelta, timezone
 
 import pytest
+from test_geraete_collect import _FARBEN, _KATALOG, _KATEGORIE, _SEITEN
 
 import telco_radar.collect.geraete as G
 from telco_radar.collect.geraete import sammle_anbieter
 from telco_radar.collect.geraete.robots import RobotsWaechter, lies_robots
 from telco_radar.geraete_config import Anbieter, Einstieg
 
-from test_geraete_collect import _FARBEN, _KATALOG, _SEITEN, _fixture
-
-_EINSTIEG = "https://www.medimax.de/c/116/smartphones"
+_EINSTIEG = "https://www.haendler.test/c/116/smartphones"
 _ROBOTS_MIT_FENSTER = (
     "User-agent: *\n"
     "Disallow: /cart\n"
@@ -79,10 +78,10 @@ class _Laufzeit:
 
 def _anbieter(einstiege=None, **kw):
     vor = {
-        "name": "Medimax",
+        "name": "Haendler",
         "typ": "handel",
         "methode": "ldjson",
-        "basis_url": "https://www.medimax.de",
+        "basis_url": "https://www.haendler.test",
         "rate_limit_sekunden": 0,
         "einstiege": einstiege
         or [
@@ -256,9 +255,9 @@ def test_teilweise_gelesen_altert_nur_die_wirklich_gelesene_seite(monkeypatch):
     prueft. Der zweite steht nicht darin, also altert nichts aus ihm
     (CLAUDE.md Clean Code 6: "nicht gelesen" ist nicht "leer").
     """
-    zweiter = "https://www.medimax.de/c/117/mehr-smartphones"
+    zweiter = "https://www.haendler.test/c/117/mehr-smartphones"
     seiten = dict(_SEITEN)
-    seiten[zweiter] = _fixture("medimax_kategorie.html")
+    seiten[zweiter] = _KATEGORIE
     anbieter = _anbieter(
         einstiege=[
             Einstieg(
@@ -300,7 +299,7 @@ def test_fensterfrist_deckelt_auf_das_fensterende(monkeypatch):
         return (200, _ROBOTS_MIT_FENSTER.format(delay=10))
 
     waechter = RobotsWaechter(hole=hole)
-    frist = G._fensterfrist(waechter, "https://www.medimax.de/p/1", _um(7, 55))
+    frist = G._fensterfrist(waechter, "https://www.haendler.test/p/1", _um(7, 55))
     assert frist == pytest.approx(
         laufzeit.monotonic() + 300 - G._FENSTER_PUFFER_SEKUNDEN
     )
@@ -314,7 +313,7 @@ def test_ohne_fenster_deckelt_nichts(monkeypatch):
         return (200, "User-agent: *\nDisallow: /cart\n")
 
     waechter = RobotsWaechter(hole=hole)
-    assert G._fensterfrist(waechter, "https://x.de/p/1", _um(7, 55)) is None
+    assert G._fensterfrist(waechter, "https://x.test/p/1", _um(7, 55)) is None
 
 
 def test_geschlossenes_fenster_deckelt_die_frist_in_die_vergangenheit(monkeypatch):
@@ -328,7 +327,7 @@ def test_geschlossenes_fenster_deckelt_die_frist_in_die_vergangenheit(monkeypatc
         return (200, _ROBOTS_MIT_FENSTER.format(delay=10))
 
     waechter = RobotsWaechter(hole=hole)
-    frist = G._fensterfrist(waechter, "https://www.medimax.de/p/1", _um(9, 0))
+    frist = G._fensterfrist(waechter, "https://www.haendler.test/p/1", _um(9, 0))
     assert frist < laufzeit.monotonic()
 
 
@@ -338,9 +337,9 @@ def test_fristablauf_am_fenster_heisst_besuchszeit_und_nicht_budget(monkeypatch)
     "Budget alle" und "Tuer zu" sind fuer den Abdeckungswaechter zwei
     verschiedene Auskuenfte - die eine ein Ausfall, die andere eine Luecke.
     """
-    zweiter = "https://www.medimax.de/c/117/mehr-smartphones"
+    zweiter = "https://www.haendler.test/c/117/mehr-smartphones"
     seiten = dict(_SEITEN)
-    seiten[zweiter] = _fixture("medimax_kategorie.html")
+    seiten[zweiter] = _KATEGORIE
     anbieter = _anbieter(
         einstiege=[
             Einstieg(
@@ -382,9 +381,9 @@ def test_kein_einziger_abruf_verlaesst_das_fenster(monkeypatch):
     Gegen den alten Stand UND gegen jede Fassung, die die Uhr wieder
     einfriert, geht dieser Abruf hinaus.
     """
-    zweiter = "https://www.medimax.de/c/117/mehr-smartphones"
+    zweiter = "https://www.haendler.test/c/117/mehr-smartphones"
     seiten = dict(_SEITEN)
-    seiten[zweiter] = _fixture("medimax_kategorie.html")
+    seiten[zweiter] = _KATEGORIE
     anbieter = _anbieter(
         einstiege=[
             Einstieg(
@@ -432,9 +431,9 @@ def test_der_teillauf_am_fenster_gilt_als_teilweise_gelesen(monkeypatch):
     from telco_radar.analyze.geraete_store import TEILGELESEN
     from telco_radar.geraete_pipeline import _abdeckungszustand
 
-    zweiter = "https://www.medimax.de/c/117/mehr-smartphones"
+    zweiter = "https://www.haendler.test/c/117/mehr-smartphones"
     seiten = dict(_SEITEN)
-    seiten[zweiter] = _fixture("medimax_kategorie.html")
+    seiten[zweiter] = _KATEGORIE
     anbieter = _anbieter(
         einstiege=[
             Einstieg(

@@ -215,35 +215,3 @@ def test_config_laedt_und_verlangt_gruende(tmp_path):
     kaputt.write_text("belegte_luecken:\n  - anbieter: X\n", encoding="utf-8")
     with pytest.raises(ValueError):
         lade_pflicht(kaputt)
-
-
-def _workflow():
-    import yaml
-
-    pfad = Path(__file__).resolve().parents[1] / ".github" / "workflows" / "geraete.yml"
-    return yaml.safe_load(pfad.read_text(encoding="utf-8"))
-
-
-def test_workflow_hat_ersatztermine_und_misst_nur_einmal_am_tag():
-    wf = _workflow()
-    # `on:` liest YAML als True.
-    termine = [t["cron"] for t in wf[True]["schedule"]]
-    assert len(termine) >= 3
-    schritte = wf["jobs"]["geraete"]["steps"]
-    namen = [s.get("name") for s in schritte]
-    pruef = namen.index("Heute schon gemessen?")
-    for schritt in schritte[pruef + 1 :]:
-        assert "steps.heute.outputs.fertig != 'true'" in schritt.get("if", ""), (
-            schritt.get("name") or schritt.get("uses")
-        )
-
-
-def test_workflow_endet_mit_dem_buendelwaechter():
-    schritte = _workflow()["jobs"]["geraete"]["steps"]
-    letzter = schritte[-1]
-    assert letzter["name"] == "Buendelabdeckung pruefen"
-    assert letzter["if"].startswith("always()")
-    assert "continue-on-error" not in letzter
-    assert "geraete_abdeckungswaechter.py" in letzter["run"]
-    # Der Wächter verschickt nichts: keine Mail-Secrets in seiner Umgebung.
-    assert not any("SMTP" in k or "MAIL" in k for k in (letzter.get("env") or {}))

@@ -8,8 +8,6 @@ Code, nicht in einem Test (eine Regel, die nur ein Test kennt, schaltet keine
 Navigation; siehe Geraeteseite, CLAUDE.md §5).
 """
 
-import re
-
 import pytest
 from bs4 import BeautifulSoup
 
@@ -263,43 +261,3 @@ def test_das_echte_repo_hat_beide_pflichtseiten():
     for schluessel in ("impressum", "datenschutz"):
         assert rechtstexte.lade(echt, schluessel) is not None, schluessel
     assert rechtstexte.aktuelle_einwilligung(echt) is not None
-
-
-def test_der_api_key_steht_in_keiner_datei_des_repos():
-    """Der Brevo-Key gehoert ausschliesslich in ein GitHub-Secret. Ein Key im
-    Repo ist oeffentlich, sobald das Repo es ist - und dieses ist es.
-
-    Gelesen wird der Quellbaum ohne die Ordner `data/` und `site/`: das sind
-    Betriebsdaten, auf die kein Test zugreifen darf. Deren Form liegt als
-    Schnappschuss unter `tests/fixtures/bestand/` und wird hier mitgelesen."""
-    from pathlib import Path
-
-    wurzel = Path(__file__).resolve().parents[1]
-    # Brevo-Keys beginnen mit "xkeysib-" (API v3) bzw. "xsmtpsib-" (SMTP).
-    muster = re.compile(r"xkeysib-[A-Za-z0-9]|xsmtpsib-[A-Za-z0-9]")
-    treffer = []
-    oberste = [p for p in wurzel.iterdir() if p.name not in {"data", "site"}]
-    kandidaten = [p for o in oberste for p in ([o] if o.is_file() else o.rglob("*"))]
-    for pfad in kandidaten:
-        if not pfad.is_file() or ".git/" in str(pfad):
-            continue
-        if pfad.suffix not in {
-            ".py",
-            ".yml",
-            ".yaml",
-            ".md",
-            ".json",
-            ".j2",
-            ".js",
-            ".css",
-            ".txt",
-            ".sh",
-        }:
-            continue
-        try:
-            inhalt = pfad.read_text(encoding="utf-8")
-        except (UnicodeDecodeError, OSError):
-            continue
-        if muster.search(inhalt):
-            treffer.append(str(pfad.relative_to(wurzel)))
-    assert not treffer, f"Brevo-Key im Repo: {treffer}"

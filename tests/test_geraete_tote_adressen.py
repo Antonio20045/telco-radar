@@ -33,7 +33,7 @@ Kein Test haengt am heutigen Datum (CLAUDE.md Regel 11); die Fixtures
 setzen ihr Datum selbst.
 """
 
-from pathlib import Path
+from test_geraete_pipeline import _jetzt, _root
 
 from telco_radar.analyze.geraete_store import GeraeteDB
 from telco_radar.collect.geraete import sammle_anbieter
@@ -43,10 +43,15 @@ from telco_radar.geraete_model import Geraet, Katalog
 from telco_radar.geraete_pipeline import run_geraete_stage
 from telco_radar.report import geraete_view
 from telco_radar.report.html import _env
-from test_geraete_pipeline import _jetzt, _root
 
-_FIX = Path(__file__).parent / "fixtures" / "geraete"
-_PRODUKT = (_FIX / "medimax_produkt.html").read_text(encoding="utf-8")
+_PRODUKT = (
+    '<html><head><script type="application/ld+json">'
+    '{"@context":"https://schema.org","@type":"Product",'
+    '"name":"Apple iPhone 17 Pro Max 256GB Titannatur","color":"Titannatur",'
+    '"offers":{"@type":"Offer","priceCurrency":"EUR","price":"1449.00",'
+    '"availability":"http://schema.org/InStock"}}'
+    "</script></head><body></body></html>"
+)
 
 _KATALOG = Katalog(
     geraete=[
@@ -61,7 +66,7 @@ _KATALOG = Katalog(
 )
 _FARBEN = {"titannatur": "titan-natur"}
 
-_EINSTIEG = "https://www.medimax.de/c/116/smartphones"
+_EINSTIEG = "https://www.haendler.test/c/116/smartphones"
 
 
 def _kategorie(urls) -> str:
@@ -80,10 +85,10 @@ def _seiten(lebend: int, tot: int, einstieg: str = _EINSTIEG, marke: str = "") -
     einer mit einem.
     """
     lebende = [
-        f"https://www.medimax.de/p/1{marke}0{i}/iphone-17-pro-max-256gb"
+        f"https://www.haendler.test/p/1{marke}0{i}/iphone-17-pro-max-256gb"
         for i in range(lebend)
     ]
-    tote = [f"https://www.medimax.de/p/9{marke}0{i}/weg" for i in range(tot)]
+    tote = [f"https://www.haendler.test/p/9{marke}0{i}/weg" for i in range(tot)]
     seiten = {einstieg: _kategorie(lebende + tote)}
     for url in lebende:
         seiten[url] = _PRODUKT
@@ -92,10 +97,10 @@ def _seiten(lebend: int, tot: int, einstieg: str = _EINSTIEG, marke: str = "") -
 
 def _anbieter(**kw) -> Anbieter:
     vor = {
-        "name": "mobilcom-debitel",
+        "name": "Haendler",
         "typ": "handel",
         "methode": "ldjson",
-        "basis_url": "https://www.medimax.de",
+        "basis_url": "https://www.haendler.test",
         "rate_limit_sekunden": 0,
         "einstiege": [Einstieg(url=_EINSTIEG, label="Smartphones", pfadmuster="/p/")],
     }
@@ -211,7 +216,7 @@ def test_ein_serverfehler_ist_keine_tote_adresse():
     Seite macht den Einstieg unvollstaendig, obwohl 35 von 36 Seiten
     durchkamen."""
     seiten = _seiten(lebend=36, tot=0)
-    kaputt = "https://www.medimax.de/p/100/iphone-17-pro-max-256gb"
+    kaputt = "https://www.haendler.test/p/100/iphone-17-pro-max-256gb"
 
     bilanz = _lauf(seiten, antwort=lambda u: (500, "") if u == kaputt else None)
     assert bilanz.tote_adressen == []
@@ -223,7 +228,7 @@ def test_gone_ist_eine_tote_adresse():
     """410 ist die ausdrueckliche Auskunft "gibt es nicht mehr" - noch
     eindeutiger als 404 und deshalb ebenso eine Luecke, kein Ausfall."""
     seiten = _seiten(lebend=36, tot=0)
-    weg = "https://www.medimax.de/p/100/iphone-17-pro-max-256gb"
+    weg = "https://www.haendler.test/p/100/iphone-17-pro-max-256gb"
 
     bilanz = _lauf(seiten, antwort=lambda u: (410, "") if u == weg else None)
     assert len(bilanz.tote_adressen) == 1
@@ -279,11 +284,11 @@ def test_ein_toter_einstieg_bleibt_ein_fehler():
 _QUELLEN_MIT_TOTER_ADRESSE = {
     "anbieter": [
         {
-            "name": "Medimax",
+            "name": "Haendler",
             "typ": "handel",
             "methode": "ldjson",
             "rang": 1,
-            "basis_url": "https://www.medimax.de",
+            "basis_url": "https://www.haendler.test",
             "rate_limit_sekunden": 0,
             "einstiege": [
                 {"url": _EINSTIEG, "label": "Smartphones", "pfadmuster": "/p/"}
@@ -330,12 +335,12 @@ def test_der_lauf_zaehlt_wieder_als_vollstaendiger_lauf(tmp_path):
     ankamen."""
     root, bilanz = _stufe(tmp_path, "2026-08-11", lebend=36, tot=9)
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
-    gebucht = db.laufbilanz("Medimax")
+    gebucht = db.laufbilanz("Haendler")
     assert gebucht["laeufe"] == 1
     assert gebucht["letzter_lauf"] == "2026-08-11"
     # Und die Luecke ist gebucht, nicht verschwiegen.
     assert gebucht["tote_adressen"] == 9
-    satz = [a for a in bilanz["anbieter"] if a["anbieter"] == "Medimax"][0]
+    satz = [a for a in bilanz["anbieter"] if a["anbieter"] == "Haendler"][0]
     assert satz["status"] == "ok"
     assert satz["tote_adressen"] == 9
     assert satz["produkte_versucht"] == 45
@@ -347,7 +352,7 @@ def test_ein_lauf_ohne_produktseiten_bucht_keine_null(tmp_path):
     Entwarnung, die niemand gemessen hat."""
     root, _ = _stufe(tmp_path, "2026-08-11", lebend=0, tot=0)
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
-    assert db.laufbilanz("Medimax")["tote_adressen"] is None
+    assert db.laufbilanz("Haendler")["tote_adressen"] is None
 
 
 def test_die_quellenseite_nennt_die_toten_adressen(tmp_path):
@@ -362,7 +367,7 @@ def test_die_quellenseite_nennt_die_toten_adressen(tmp_path):
         lade_katalog(root),
         heute="2026-08-11",
     )
-    zeile = {z["name"]: z for z in daten["quellenlage"]["zeilen"]}["Medimax"]
+    zeile = {z["name"]: z for z in daten["quellenlage"]["zeilen"]}["Haendler"]
     assert zeile["tote_satz"] == "9 verlinkte Produktseiten gibt es nicht mehr"
     modul = (
         _env()
@@ -399,7 +404,7 @@ def test_ohne_tote_adressen_steht_keine_null_auf_der_seite(tmp_path):
         lade_katalog(root),
         heute="2026-08-11",
     )
-    zeile = {z["name"]: z for z in daten["quellenlage"]["zeilen"]}["Medimax"]
+    zeile = {z["name"]: z for z in daten["quellenlage"]["zeilen"]}["Haendler"]
     assert zeile["tote_satz"] == ""
 
 
@@ -421,7 +426,7 @@ def test_tote_adressen_ergeben_gelesen_und_nicht_teilgelesen(tmp_path):
 
     root, _ = _stufe(tmp_path, "2026-08-11", lebend=36, tot=9)
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
-    tag = db.messtage("Medimax")[-1]
+    tag = db.messtage("Haendler")[-1]
     assert tag.zustand == GELESEN
     assert tag.zustand != TEILGELESEN
     assert tag.vergleichsbasis is True
@@ -434,7 +439,7 @@ def test_unter_der_schwelle_ist_der_tag_ein_lesefehler(tmp_path):
 
     root, _ = _stufe(tmp_path, "2026-08-11", lebend=6, tot=4)
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
-    assert db.messtage("Medimax")[-1].zustand == LESEFEHLER
+    assert db.messtage("Haendler")[-1].zustand == LESEFEHLER
 
 
 # --------------------------------------------------------------------------
@@ -510,7 +515,7 @@ def test_http_403_ist_keine_tote_adresse():
     Sortiment, das es noch gibt.
     """
     seiten = _seiten(lebend=36, tot=0)
-    gesperrt = "https://www.medimax.de/p/100/iphone-17-pro-max-256gb"
+    gesperrt = "https://www.haendler.test/p/100/iphone-17-pro-max-256gb"
 
     bilanz = _lauf(seiten, antwort=lambda u: (403, "") if u == gesperrt else None)
     assert bilanz.tote_adressen == []
@@ -528,7 +533,7 @@ def test_eine_202_challenge_ist_keine_tote_adresse():
     Abdeckungswaechter.
     """
     seiten = _seiten(lebend=36, tot=0)
-    challenge = "https://www.medimax.de/p/100/iphone-17-pro-max-256gb"
+    challenge = "https://www.haendler.test/p/100/iphone-17-pro-max-256gb"
 
     bilanz = _lauf(
         seiten,
@@ -545,7 +550,7 @@ def test_eine_202_challenge_ist_keine_tote_adresse():
 # 8. Mehrere Einstiege: die Schwelle rechnet je Einstieg
 # --------------------------------------------------------------------------
 
-_EINSTIEG_ZWEI = "https://www.medimax.de/c/117/handys"
+_EINSTIEG_ZWEI = "https://www.haendler.test/c/117/handys"
 
 
 def test_nur_der_einstieg_mit_zu_vielen_toten_adressen_faellt_aus():
@@ -606,11 +611,11 @@ def test_ein_lauf_ohne_produktseiten_bucht_auch_im_protokoll_keine_null(tmp_path
     einen Anbieter, der keine einzige Produktseite versucht hat. Zwei
     Kanaele, eine Wahrheit (Clean Code 7)."""
     root, bilanz = _stufe(tmp_path, "2026-08-11", lebend=0, tot=0)
-    satz = [a for a in bilanz["anbieter"] if a["anbieter"] == "Medimax"][0]
+    satz = [a for a in bilanz["anbieter"] if a["anbieter"] == "Haendler"][0]
     assert satz["tote_adressen"] is None
     assert satz["produkte_versucht"] is None
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
-    assert db.laufbilanz("Medimax")["tote_adressen"] is None
+    assert db.laufbilanz("Haendler")["tote_adressen"] is None
 
 
 def test_eine_nacht_ohne_abruf_loescht_die_gemessene_luecke_nicht(tmp_path):
@@ -627,7 +632,7 @@ def test_eine_nacht_ohne_abruf_loescht_die_gemessene_luecke_nicht(tmp_path):
 
     root, _ = _stufe(tmp_path, "2026-08-11", lebend=36, tot=9)
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
-    assert db.laufbilanz("Medimax")["tote_adressen"] == 9
+    assert db.laufbilanz("Haendler")["tote_adressen"] == 9
 
     _stufe(
         tmp_path,
@@ -639,7 +644,7 @@ def test_eine_nacht_ohne_abruf_loescht_die_gemessene_luecke_nicht(tmp_path):
         robots="User-agent: *\nVisit-time: 0200-0800\n",
     )
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
-    assert db.laufbilanz("Medimax")["tote_adressen"] == 9, (
+    assert db.laufbilanz("Haendler")["tote_adressen"] == 9, (
         "eine Nacht ohne Abruf hat die gemessene Luecke geloescht"
     )
     daten = geraete_view.aufbereiten(
@@ -648,5 +653,5 @@ def test_eine_nacht_ohne_abruf_loescht_die_gemessene_luecke_nicht(tmp_path):
         lade_katalog(root),
         heute="2026-08-12",
     )
-    zeile = {z["name"]: z for z in daten["quellenlage"]["zeilen"]}["Medimax"]
+    zeile = {z["name"]: z for z in daten["quellenlage"]["zeilen"]}["Haendler"]
     assert zeile["tote_satz"] == "9 verlinkte Produktseiten gibt es nicht mehr"

@@ -331,18 +331,3 @@ def test_die_zeitreihe_liefert_den_block_aus_ihrer_historie(tmp_path):
     )
     assert z["link"] == ("geraete.html?modell=" + z["modell"] + "&band=" + z["band"])
     assert z["band"] in g["zeitreihe"]["daten"]["erlaubt"][z["modell"]]
-
-
-def test_die_pipeline_schreibt_den_block_ins_berichts_json():
-    """Die Verdrahtung in `pipeline.run` - am Quelltext, weil der Lauf selbst
-    sammelt. Der Block muss VOR dem ersten Schreiben des JSON stehen."""
-    from pathlib import Path
-
-    quelle = (
-        Path(__file__).resolve().parents[1] / "src/telco_radar/pipeline.py"
-    ).read_text(encoding="utf-8")
-    setzen = quelle.index(
-        'report_json["geraete_bewegung"] = geraete_bewegung.fuer_bericht('
-    )
-    schreiben = quelle.index("json_path.write_text(")
-    assert setzen < schreiben

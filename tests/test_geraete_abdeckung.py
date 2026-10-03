@@ -138,9 +138,9 @@ def test_wer_nicht_gelesen_wurde_ist_kein_ausfall(tmp_path):
     from telco_radar.analyze.geraete_store import NICHT_GELESEN
 
     db = _db(tmp_path)
-    db.protokolliere_lauf("Medimax", _tag(1), funde=20, vollstaendig=True)
+    db.protokolliere_lauf("Haendler", _tag(1), funde=20, vollstaendig=True)
     db.protokolliere_lauf(
-        "Medimax", _tag(2), funde=0, vollstaendig=False, zustand=NICHT_GELESEN
+        "Haendler", _tag(2), funde=0, vollstaendig=False, zustand=NICHT_GELESEN
     )
     assert db.ausfall_alarme(heute=_tag(2)) == []
 
@@ -151,12 +151,12 @@ def test_ein_lesefehler_ist_sehr_wohl_ein_ausfall(tmp_path):
     from telco_radar.analyze.geraete_store import LESEFEHLER
 
     db = _db(tmp_path)
-    db.protokolliere_lauf("Medimax", _tag(1), funde=20, vollstaendig=True)
+    db.protokolliere_lauf("Haendler", _tag(1), funde=20, vollstaendig=True)
     db.protokolliere_lauf(
-        "Medimax", _tag(2), funde=0, vollstaendig=False, zustand=LESEFEHLER
+        "Haendler", _tag(2), funde=0, vollstaendig=False, zustand=LESEFEHLER
     )
     alarme = db.ausfall_alarme(heute=_tag(2))
-    assert [a.anbieter for a in alarme] == ["Medimax"]
+    assert [a.anbieter for a in alarme] == ["Haendler"]
     assert alarme[0].zustand == "lesefehler"
 
 
@@ -166,14 +166,14 @@ def test_ein_nicht_gelesener_tag_zaehlt_auch_nicht_als_vortag(tmp_path):
     from telco_radar.analyze.geraete_store import NICHT_GELESEN
 
     db = _db(tmp_path)
-    db.protokolliere_lauf("Medimax", _tag(1), funde=20, vollstaendig=True)
+    db.protokolliere_lauf("Haendler", _tag(1), funde=20, vollstaendig=True)
     db.protokolliere_lauf(
-        "Medimax", _tag(2), funde=0, vollstaendig=False, zustand=NICHT_GELESEN
+        "Haendler", _tag(2), funde=0, vollstaendig=False, zustand=NICHT_GELESEN
     )
-    db.protokolliere_lauf("Medimax", _tag(3), funde=0, vollstaendig=True)
+    db.protokolliere_lauf("Haendler", _tag(3), funde=0, vollstaendig=True)
     alarme = db.ausfall_alarme(heute=_tag(3))
     assert [(a.anbieter, a.vortag, a.zeilen_vortag) for a in alarme] == [
-        ("Medimax", _tag(1), 20)
+        ("Haendler", _tag(1), 20)
     ]
 
 
@@ -309,11 +309,11 @@ def test_ein_abgeschalteter_collector_loest_den_alarm_aus(tmp_path, caplog):
             root, {}, "2026-08-12", jetzt=_jetzt(), hole=_hole({})
         )
     assert (
-        "Geraeteradar-Abdeckung: Medimax: heute nicht erfasst – 0 Zeilen, "
+        "Geraeteradar-Abdeckung: Haendler: heute nicht erfasst – 0 Zeilen, "
         "am 11.08.2026 waren es 2 (Zustand lesefehler). "
         "(Quelle pruefen: geraete-quellen.html)"
     ) in caplog.text
-    assert [a["anbieter"] for a in bilanz["abdeckung_alarme"]] == ["Medimax"]
+    assert [a["anbieter"] for a in bilanz["abdeckung_alarme"]] == ["Haendler"]
     assert bilanz["abdeckung_alarme"][0]["kurz"] == "heute nicht erfasst"
     # Der Alarm ist Meldung, kein Griff: nichts ist gealtert.
     assert bilanz["gealtert"] == 0
@@ -326,12 +326,12 @@ def test_eine_leer_gelesene_seite_loest_den_alarm_ebenfalls_aus(tmp_path, caplog
     root = _root(tmp_path)
     run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
     leer = dict(_SEITEN)
-    leer["https://www.medimax.de/c/116/smartphones"] = "<html><body></body></html>"
+    leer["https://www.haendler.test/c/116/smartphones"] = "<html><body></body></html>"
     with caplog.at_level(logging.WARNING, logger=_LOGGER):
         bilanz = run_geraete_stage(
             root, {}, "2026-08-12", jetzt=_jetzt(), hole=_hole(leer)
         )
-    assert "Medimax: heute nicht erfasst" in caplog.text
+    assert "Haendler: heute nicht erfasst" in caplog.text
     assert bilanz["abdeckung_alarme"][0]["zustand"] == "gelesen"
 
 
@@ -349,20 +349,20 @@ def test_ausserhalb_der_besuchszeit_bleibt_der_waechter_still(tmp_path, caplog):
 
     with caplog.at_level(logging.WARNING, logger=_LOGGER):
         bilanz = run_geraete_stage(root, {}, "2026-08-12", jetzt=_jetzt(8), hole=hole)
-    medimax = [a for a in bilanz["anbieter"] if a["anbieter"] == "Medimax"][0]
+    medimax = [a for a in bilanz["anbieter"] if a["anbieter"] == "Haendler"][0]
     assert medimax["listungen"] == 0  # nichts geholt
     assert bilanz["abdeckung_alarme"] == []
     assert "Geraeteradar-Abdeckung" not in caplog.text
 
 
 def test_ein_uebersprungener_anbieter_alarmiert_nie(tmp_path):
-    """Amazon ist `methode: deaktiviert` - der Lauf fasst ihn nie an. Er
+    """Die Plattform ist `methode: deaktiviert` - der Lauf fasst ihn nie an. Er
     darf weder alarmieren noch als "in Ordnung" durchgehen."""
     root = _root(tmp_path)
     run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
     run_geraete_stage(root, {}, "2026-08-12", jetzt=_jetzt(), hole=_hole())
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
-    assert [m.zustand for m in db.messtage("Amazon")] == [
+    assert [m.zustand for m in db.messtage("Plattform")] == [
         "nicht gelesen",
         "nicht gelesen",
     ]
@@ -394,10 +394,10 @@ def _seitenzeile(tmp_path):
 
 def test_der_alarm_steht_auf_der_quellenseite(tmp_path):
     zeilen = _seitenzeile(tmp_path)
-    assert zeilen["Medimax"]["abdeckung"]["kurz"] == "heute nicht erfasst"
-    assert "11.08.2026" in zeilen["Medimax"]["abdeckung"]["satz"]
+    assert zeilen["Haendler"]["abdeckung"]["kurz"] == "heute nicht erfasst"
+    assert "11.08.2026" in zeilen["Haendler"]["abdeckung"]["satz"]
     # Gegenprobe: der uebersprungene Anbieter traegt KEINE leere Huelle.
-    assert zeilen["Amazon"]["abdeckung"] is None
+    assert zeilen["Plattform"]["abdeckung"] is None
 
 
 def test_die_vorlage_zeigt_heute_nicht_erfasst(tmp_path):
@@ -426,11 +426,11 @@ def test_die_vorlage_zeigt_heute_nicht_erfasst(tmp_path):
             }
         )
     )
-    html = modul.zeile(zeilen["Medimax"])
+    html = modul.zeile(zeilen["Haendler"])
     assert "heute nicht erfasst" in html
     assert "sdot fail" in html
     # Gegenprobe: ohne Alarm steht der Dauerzustand da, nicht der Satz.
-    ohne = modul.zeile(zeilen["Amazon"])
+    ohne = modul.zeile(zeilen["Plattform"])
     assert "heute nicht erfasst" not in ohne
 
 
@@ -525,7 +525,7 @@ def test_ein_zustellfehler_wird_nicht_geschluckt(tmp_path, monkeypatch):
 def _bilanz(**kw):
     from telco_radar.collect.geraete import Anbieterbilanz
 
-    b = Anbieterbilanz(name=kw.pop("name", "Medimax"))
+    b = Anbieterbilanz(name=kw.pop("name", "Haendler"))
     for feld, wert in kw.items():
         setattr(b, feld, wert)
     return b
@@ -538,7 +538,7 @@ def test_ein_teillauf_am_fenster_ist_nicht_nicht_gelesen():
     bilanz = _bilanz(
         status="frist",
         ausserhalb_besuchszeit=True,
-        gelesene_einstiege={"https://www.medimax.de/c/116"},
+        gelesene_einstiege={"https://www.haendler.test/c/116"},
         listungen=[1, 2, 3],
     )
     assert _abdeckungszustand(bilanz) == "teilweise gelesen"
@@ -570,12 +570,12 @@ def test_der_teiltag_faellt_nicht_aus_dem_vergleich(tmp_path):
     from telco_radar.analyze.geraete_store import ALARM_AUSFALL
 
     db = _db(tmp_path)
-    db.protokolliere_lauf("Medimax", _tag(1), funde=20, vollstaendig=True)
+    db.protokolliere_lauf("Haendler", _tag(1), funde=20, vollstaendig=True)
     db.protokolliere_lauf(
-        "Medimax", _tag(2), funde=0, vollstaendig=False, zustand="teilweise gelesen"
+        "Haendler", _tag(2), funde=0, vollstaendig=False, zustand="teilweise gelesen"
     )
     alarme = db.ausfall_alarme(heute=_tag(2))
-    assert [(a.anbieter, a.art) for a in alarme] == [("Medimax", ALARM_AUSFALL)]
+    assert [(a.anbieter, a.art) for a in alarme] == [("Haendler", ALARM_AUSFALL)]
 
 
 def test_ein_teiltag_senkt_die_vergleichsbasis_nicht(tmp_path):
@@ -587,14 +587,14 @@ def test_ein_teiltag_senkt_die_vergleichsbasis_nicht(tmp_path):
     er auffallen koennte (3 statt 100 Zeilen im Alarm, oder bei 0 Zeilen
     am Teiltag gar kein Alarm)."""
     db = _db(tmp_path)
-    db.protokolliere_lauf("Medimax", _tag(1), funde=100, vollstaendig=True)
+    db.protokolliere_lauf("Haendler", _tag(1), funde=100, vollstaendig=True)
     db.protokolliere_lauf(
-        "Medimax", _tag(2), funde=3, vollstaendig=False, zustand="teilweise gelesen"
+        "Haendler", _tag(2), funde=3, vollstaendig=False, zustand="teilweise gelesen"
     )
-    db.protokolliere_lauf("Medimax", _tag(3), funde=0, vollstaendig=True)
+    db.protokolliere_lauf("Haendler", _tag(3), funde=0, vollstaendig=True)
     alarme = db.ausfall_alarme(heute=_tag(3))
     assert [(a.anbieter, a.vortag, a.zeilen_vortag) for a in alarme] == [
-        ("Medimax", _tag(1), 100)
+        ("Haendler", _tag(1), 100)
     ]
 
 
@@ -677,8 +677,8 @@ def test_die_kennzahl_zaehlt_nur_wer_heute_gelesen_wurde(tmp_path):
     quellenlage = _quellenlage_ausserhalb(tmp_path)
     zeilen = {z["name"]: z for z in quellenlage["zeilen"]}
     # Die Lage: der Bestand SAGT "liefert", gelesen hat heute niemand.
-    assert zeilen["Medimax"]["liefert"] is True
-    assert zeilen["Medimax"]["heute_luecke"] is True
+    assert zeilen["Haendler"]["liefert"] is True
+    assert zeilen["Haendler"]["heute_luecke"] is True
     makro = _quellenmakro()
     gruen = sum(1 for z in quellenlage["zeilen"] if "sdot ok" in makro.zeile(z))
     assert quellenlage["liefernd"] == gruen
@@ -727,11 +727,11 @@ def test_wer_heute_nicht_gelesen_wurde_bekommt_keinen_gruenen_punkt(tmp_path):
             }
         )
     )
-    html = modul.zeile(zeilen["Medimax"])
+    html = modul.zeile(zeilen["Haendler"])
     # Gegenprobe: der Bestand SAGT weiter "liefert" - genau daher kam der
     # gruene Punkt.
-    assert zeilen["Medimax"]["liefert"] is True
-    assert zeilen["Medimax"]["abdeckung"] is None
+    assert zeilen["Haendler"]["liefert"] is True
+    assert zeilen["Haendler"]["abdeckung"] is None
     assert "sdot ok" not in html
     assert "heute nicht gelesen" in html
 
@@ -759,7 +759,7 @@ def test_wer_heute_gelesen_wurde_behaelt_seinen_gruenen_punkt(tmp_path):
             }
         )
     )
-    html = modul.zeile(zeilen["Medimax"])
+    html = modul.zeile(zeilen["Haendler"])
     assert "sdot ok" in html and "liefert" in html
     assert "heute nicht gelesen" not in html
 
@@ -845,9 +845,9 @@ def test_heute_nicht_gelesen_sagt_auch_seit_wann(tmp_path):
             }
         )
     )
-    html = modul.zeile(zeilen["Medimax"])
+    html = modul.zeile(zeilen["Haendler"])
     assert (
-        zeilen["Medimax"]["heute_satz"] == "zuletzt vollständig gelesen am 11.08.2026"
+        zeilen["Haendler"]["heute_satz"] == "zuletzt vollständig gelesen am 11.08.2026"
     )
     assert "zuletzt vollständig gelesen am 11.08.2026" in html
 
@@ -894,14 +894,14 @@ def _fuenfundvierzig_tage(tmp_path):
     gemeldet = {}
     for n in range(1, 46):
         if n == 1:
-            db.protokolliere_lauf("Medimax", _datum(n), funde=100, vollstaendig=True)
+            db.protokolliere_lauf("Haendler", _datum(n), funde=100, vollstaendig=True)
         elif n < 45:
             db.protokolliere_lauf(
-                "Medimax", _datum(n), funde=3, vollstaendig=False, zustand=TEILGELESEN
+                "Haendler", _datum(n), funde=3, vollstaendig=False, zustand=TEILGELESEN
             )
         else:
             db.protokolliere_lauf(
-                "Medimax", _datum(n), funde=0, vollstaendig=False, zustand=LESEFEHLER
+                "Haendler", _datum(n), funde=0, vollstaendig=False, zustand=LESEFEHLER
             )
         alarme = db.ausfall_alarme(heute=_datum(n))
         if alarme:
@@ -932,7 +932,7 @@ def test_der_waechter_verstummt_nicht_wenn_die_basis_aus_dem_journal_faellt(tmp_
 
     db, gemeldet = _fuenfundvierzig_tage(tmp_path)
     # Die Gegenprobe zur Lage: es GIBT keine Vergleichsbasis mehr.
-    assert [m.tag for m in db.messtage("Medimax") if m.vergleichsbasis] == []
+    assert [m.tag for m in db.messtage("Haendler") if m.vergleichsbasis] == []
     # Nach dem Wegfall der Basis bleibt der Kanal laut - regelmaessig,
     # nicht taeglich: nie laenger als eine Woche am Stueck still.
     spaete = sorted(n for n in gemeldet if n > 30)

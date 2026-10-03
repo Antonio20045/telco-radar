@@ -25,7 +25,7 @@ import threading
 from datetime import date, timedelta
 
 from telco_radar.report import geraete_zeitreihe as gz
-from telco_radar.report.anbieter_farben import in_stylesheet
+from telco_radar.report.html import schreibe_statische_dateien
 
 
 @contextlib.contextmanager
@@ -62,9 +62,7 @@ def _dichte_seite(tmp_path: pathlib.Path, breit: bool) -> pathlib.Path:
         f"style='width:{breite}px'>{svg}</div></body></html>"
     )
     (tmp_path / "index.html").write_text(html, encoding="utf-8")
-    css_pfad = pathlib.Path(gz.__file__).parent / "templates" / "style.css"
-    css = in_stylesheet(css_pfad.read_text(encoding="utf-8"))
-    (tmp_path / "style.css").write_text(css, encoding="utf-8")
+    schreibe_statische_dateien(tmp_path)
     return tmp_path
 
 

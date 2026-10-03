@@ -43,12 +43,35 @@ Gegenprobe.
 
 from __future__ import annotations
 
+import contextlib
+import functools
+import http.server
 import json
 import re
+import socket
+import threading
 
 from test_geraete_tco_zustand import _baue, vorlage_text
 
 BEGRIFFE = {"TCO-24", "Tarifband", "Bündel", "Abweichungs-Vorzeichen (+/−) zu Vodafone"}
+
+
+@contextlib.contextmanager
+def _server(site):
+    """Ein lokaler Server statt file://, damit ``fetch()`` die Fragmente lädt."""
+    s = socket.socket()
+    s.bind(("127.0.0.1", 0))
+    port = s.getsockname()[1]
+    s.close()
+    handler = functools.partial(
+        http.server.SimpleHTTPRequestHandler, directory=str(site)
+    )
+    httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    try:
+        yield f"http://127.0.0.1:{port}"
+    finally:
+        httpd.shutdown()
 
 
 def _baue_mit_referenzen(tmp_path, weitere: int):
@@ -58,7 +81,7 @@ def _baue_mit_referenzen(tmp_path, weitere: int):
     ausloest (Lookup-Falle: gruen und prueft nichts)."""
     from telco_radar.report.html import render_site
 
-    s = _baue(tmp_path)
+    _baue(tmp_path)
     pfad = tmp_path / "mit" / "data" / "state" / "geraete_tco.json"
     daten = json.loads(pfad.read_text(encoding="utf-8"))
     vorlage = daten["sim_only"][0]
@@ -142,27 +165,43 @@ def test_die_innere_klappe_nennt_handlung_und_zahl(tmp_path):
     )
 
 
-def test_app_js_setzt_keine_klapplabels_mehr_nach():
-    """Nachfolger des SQ67-Tests 'app.js baut dasselbe Klapplabel nach':
-    Der Karten-Sortierer, der das Karten-Klapplabel im gefilterten
-    Zustand neu setzte, ist mit der Klappe in O2 gefallen - der Wortlaut
-    lebt NUR NOCH im Template, es gibt keine zweite Stelle, die mit ihm
-    auseinanderlaufen koennte. Dieser Test haelt genau das fest: setzt
-    jemand wieder einen Label-Wortlaut im JS nach, taucht hier die
-    Doppelung auf, gegen die der Ursprungstest gebaut war."""
-    from pathlib import Path
+def _summary_texte(seite) -> list[str]:
+    return seite.eval_on_selector_all(
+        "#gr-massstab-datenlage summary",
+        "els => els.map(e => e.textContent.replace(/\\s+/g, ' ').trim())",
+    )
 
-    app_js = (
-        Path(__file__).resolve().parents[1] / "src/telco_radar/report/templates/app.js"
-    ).read_text(encoding="utf-8")
-    assert "Tarife anzeigen" not in app_js, (
-        "app.js setzt einen Klapplabel-Wortlaut nach - der lebt seit der "
-        "Portierung nur im Template"
-    )
-    assert "Anbieterangebote anzeigen" not in app_js, (
-        "app.js setzt das alte Karten-Klapplabel nach - die Kartenklappe "
-        "ist seit O2 gefallen"
-    )
+
+def test_app_js_setzt_keine_klapplabels_mehr_nach(tmp_path, chromium):
+    """Nachfolger des SQ67-Tests 'app.js baut dasselbe Klapplabel nach': Der
+    Wortlaut der Klapplabels lebt nur in der Vorlage. Im Browser stehen nach
+    dem Laden und nach jedem Auf- und Zuklappen dieselben Labels wie im
+    ausgelieferten HTML, und das alte Karten-Klapplabel taucht nirgends auf."""
+    s = _baue_mit_referenzen(tmp_path, weitere=4)
+    vom_server = [
+        " ".join(t.get_text(" ").split())
+        for t in s.select("#gr-massstab-datenlage summary")
+    ]
+    assert len(vom_server) >= 2, vom_server
+    assert any(re.search(r"\d+ weitere Tarife anzeigen", t) for t in vom_server)
+
+    site = tmp_path / "mit" / "site"
+    with _server(site) as basis:
+        seite = chromium.new_page()
+        try:
+            seite.goto(f"{basis}/geraete.html", wait_until="load")
+            assert _summary_texte(seite) == vom_server
+            klappen = seite.locator("#gr-massstab-datenlage summary")
+            for i in range(klappen.count()):
+                klappen.nth(i).click()
+                assert _summary_texte(seite) == vom_server, f"nach Klick {i}"
+            for i in reversed(range(klappen.count())):
+                klappen.nth(i).click()
+                assert _summary_texte(seite) == vom_server, f"nach Zuklappen {i}"
+            koerper = seite.inner_text("body")
+        finally:
+            seite.close()
+    assert "Anbieterangebote anzeigen" not in koerper
 
 
 # --------------------------------------------------------------------------

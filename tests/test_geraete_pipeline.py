@@ -13,13 +13,11 @@ from pathlib import Path
 import yaml
 
 from telco_radar.analyze.geraete_store import (
-    GeraeteDB,
     STATUS_AKTIV,
     STATUS_VERMUTLICH,
+    GeraeteDB,
 )
 from telco_radar.geraete_pipeline import run_geraete_stage
-
-_FIX = Path(__file__).parent / "fixtures" / "geraete"
 
 _KATALOG = {
     "geraete": [
@@ -45,22 +43,22 @@ _FARBEN = {"farben": {"titan-natur": ["Titannatur"], "schwarz": ["Black"]}}
 _QUELLEN = {
     "anbieter": [
         {
-            "name": "Medimax",
+            "name": "Haendler",
             "typ": "handel",
             "methode": "ldjson",
             "rang": 1,
-            "basis_url": "https://www.medimax.de",
+            "basis_url": "https://www.haendler.test",
             "rate_limit_sekunden": 0,
             "einstiege": [
                 {
-                    "url": "https://www.medimax.de/c/116/smartphones",
+                    "url": "https://www.haendler.test/c/116/smartphones",
                     "label": "Smartphones",
                     "pfadmuster": "/p/",
                 }
             ],
         },
         {
-            "name": "Amazon",
+            "name": "Plattform",
             "typ": "handel",
             "methode": "deaktiviert",
             "rang": 2,
@@ -70,17 +68,36 @@ _QUELLEN = {
     ]
 }
 
+_KATEGORIE = """<!doctype html><html lang="de"><body>
+<nav><a href="/cart">Warenkorb</a></nav><ul>
+  <li><a href="/p/1518897/galaxy-a57-5g-a576b-128gb">Galaxy A57 5G 128GB</a></li>
+  <li><a href="/p/1514136/iphone-17-pro-max-256gb">iPhone 17 Pro Max 256GB</a></li>
+  <li><a href="/p/1514200/huelle-iphone-17">Schutzhuelle fuer iPhone 17 Pro Max</a></li>
+  <li><a href="https://www.anderer-laden.test/p/1/etwas">Fremder Shop</a></li>
+</ul></body></html>"""
+
+
+def _produktseite(name: str, preis: str, farbe: str) -> str:
+    """Konstruierte Produktseite mit einem JSON-LD-Product-Knoten."""
+    return (
+        '<html><head><script type="application/ld+json">'
+        '{"@context":"https://schema.org","@type":"Product",'
+        f'"name":"{name}","color":"{farbe}",'
+        '"offers":{"@type":"Offer","priceCurrency":"EUR",'
+        f'"price":"{preis}","availability":"http://schema.org/InStock"}}}}'
+        "</script></head><body></body></html>"
+    )
+
+
 _SEITEN = {
-    "https://www.medimax.de/c/116/smartphones": (
-        _FIX / "medimax_kategorie.html"
-    ).read_text(encoding="utf-8"),
-    "https://www.medimax.de/p/1518897/galaxy-a57-5g-a576b-128gb": (
-        _FIX / "medimax_produkt_a57.html"
-    ).read_text(encoding="utf-8"),
-    "https://www.medimax.de/p/1514136/iphone-17-pro-max-256gb": (
-        _FIX / "medimax_produkt.html"
-    ).read_text(encoding="utf-8"),
-    "https://www.medimax.de/p/1514200/huelle-iphone-17": "<html><body>Zubehör</body></html>",
+    "https://www.haendler.test/c/116/smartphones": _KATEGORIE,
+    "https://www.haendler.test/p/1518897/galaxy-a57-5g-a576b-128gb": _produktseite(
+        "Samsung Galaxy A57 5G 128GB Black", "349.00", "Black"
+    ),
+    "https://www.haendler.test/p/1514136/iphone-17-pro-max-256gb": _produktseite(
+        "Apple iPhone 17 Pro Max 256GB Titannatur", "1449.00", "Titannatur"
+    ),
+    "https://www.haendler.test/p/1514200/huelle-iphone-17": "<html><body>Zubehör</body></html>",
 }
 
 
@@ -158,8 +175,8 @@ def test_jeder_anbieter_taucht_in_der_bilanz_auf(tmp_path):
         _root(tmp_path), {}, "2026-08-11", jetzt=_jetzt(), hole=_hole()
     )
     namen = {a["anbieter"] for a in bilanz["anbieter"]}
-    assert namen == {"Medimax", "Amazon"}
-    amazon = [a for a in bilanz["anbieter"] if a["anbieter"] == "Amazon"][0]
+    assert namen == {"Haendler", "Plattform"}
+    amazon = [a for a in bilanz["anbieter"] if a["anbieter"] == "Plattform"][0]
     assert amazon["status"] == "uebersprungen" and amazon["grund"]
 
 
@@ -167,7 +184,7 @@ def test_zweiter_lauf_ohne_treffer_altert_nur_eine_stufe(tmp_path):
     root = _root(tmp_path)
     run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
     leer = dict(_SEITEN)
-    leer["https://www.medimax.de/c/116/smartphones"] = "<html><body></body></html>"
+    leer["https://www.haendler.test/c/116/smartphones"] = "<html><body></body></html>"
     bilanz = run_geraete_stage(root, {}, "2026-08-14", jetzt=_jetzt(), hole=_hole(leer))
     assert bilanz["gealtert"] == 2
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
@@ -183,7 +200,7 @@ def test_ein_ausgefallener_anbieter_altert_nichts(tmp_path):
     assert bilanz["gealtert"] == 0
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
     assert {e["status"] for e in db.eintraege()} == {STATUS_AKTIV}
-    medimax = [a for a in bilanz["anbieter"] if a["anbieter"] == "Medimax"][0]
+    medimax = [a for a in bilanz["anbieter"] if a["anbieter"] == "Haendler"][0]
     assert medimax["status"] == "fehler" and medimax["vollstaendig"] is False
 
 
@@ -229,7 +246,7 @@ def test_zeitbudget_bricht_sauber_ab(tmp_path):
     bilanz = run_geraete_stage(
         root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole(), frist_sekunden=0.0001
     )
-    medimax = [a for a in bilanz["anbieter"] if a["anbieter"] == "Medimax"][0]
+    medimax = [a for a in bilanz["anbieter"] if a["anbieter"] == "Haendler"][0]
     assert medimax["status"] == "frist"
     assert medimax["vollstaendig"] is False
     assert bilanz["gealtert"] == 0
@@ -249,17 +266,17 @@ def test_hardware_vermarktung_zaehlt_nur_gelesene_laeufe(tmp_path):
     for tag in ("2026-08-11", "2026-08-14", "2026-08-18"):
         run_geraete_stage(root, {}, tag, jetzt=_jetzt(), hole=_hole({}))
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
-    assert db.hardware_vermarktung("Medimax") == "unbekannt"
+    assert db.hardware_vermarktung("Haendler") == "unbekannt"
 
 
 def test_drei_leere_aber_gelesene_laeufe_ergeben_sim_only(tmp_path):
     root = _root(tmp_path)
     leer = dict(_SEITEN)
-    leer["https://www.medimax.de/c/116/smartphones"] = "<html><body></body></html>"
+    leer["https://www.haendler.test/c/116/smartphones"] = "<html><body></body></html>"
     for tag in ("2026-08-11", "2026-08-14", "2026-08-18"):
         run_geraete_stage(root, {}, tag, jetzt=_jetzt(), hole=_hole(leer))
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
-    assert db.hardware_vermarktung("Medimax") == "nein"
+    assert db.hardware_vermarktung("Haendler") == "nein"
 
 
 def _seite_mit_titel(titel: str, preis: str = "299.00") -> str:
@@ -281,7 +298,7 @@ def test_unerkannte_titel_stehen_im_protokoll(tmp_path, caplog):
     obwohl von 27 abgerufenen ALDI-TALK-Seiten genau EINE eine Listung
     ergab."""
     seiten = dict(_SEITEN)
-    seiten["https://www.medimax.de/p/1514200/huelle-iphone-17"] = _seite_mit_titel(
+    seiten["https://www.haendler.test/p/1514200/huelle-iphone-17"] = _seite_mit_titel(
         "Nothing Phone (3a) 128GB"
     )
     with caplog.at_level("INFO", logger="telco_radar.geraete_pipeline"):
@@ -307,7 +324,7 @@ def test_protokoll_nennt_die_listungen_eines_gescheiterten_anbieters(tmp_path, c
     von 3 Seiten unter der Leseschwelle liegen - mit einer vierten Seite
     im Fixture waere er gruen gewesen und haette etwas anderes geprueft,
     als sein Text behauptet."""
-    kaputt = "https://www.medimax.de/p/1518897/galaxy-a57-5g-a576b-128gb"
+    kaputt = "https://www.haendler.test/p/1518897/galaxy-a57-5g-a576b-128gb"
     with caplog.at_level("INFO", logger="telco_radar.geraete_pipeline"):
         bilanz = run_geraete_stage(
             _root(tmp_path),
@@ -316,9 +333,9 @@ def test_protokoll_nennt_die_listungen_eines_gescheiterten_anbieters(tmp_path, c
             jetzt=_jetzt(),
             hole=_hole(serverfehler={kaputt}),
         )
-    medimax = [a for a in bilanz["anbieter"] if a["anbieter"] == "Medimax"][0]
+    medimax = [a for a in bilanz["anbieter"] if a["anbieter"] == "Haendler"][0]
     assert medimax["status"] == "fehler" and medimax["listungen"] == 1
-    assert "Medimax -> fehler, 1 Listungen aus 2 Produktseiten" in caplog.text
+    assert "Haendler -> fehler, 1 Listungen aus 2 Produktseiten" in caplog.text
 
 
 def test_nichts_wird_ausserhalb_von_data_state_geschrieben(tmp_path):
@@ -347,7 +364,7 @@ def test_teillauf_mit_listungen_landet_in_der_messtermin_buchfuehrung(tmp_path):
     # seit dem 22.09.2026 eine tote Adresse und damit eine benannte
     # Luecke - der Test haette dann die Leseschwelle gemessen statt des
     # Teillaufs, um den es hier geht.
-    kaputt = "https://www.medimax.de/p/1514200/huelle-iphone-17"
+    kaputt = "https://www.haendler.test/p/1514200/huelle-iphone-17"
     run_geraete_stage(
         root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole(serverfehler={kaputt})
     )
@@ -355,11 +372,11 @@ def test_teillauf_mit_listungen_landet_in_der_messtermin_buchfuehrung(tmp_path):
     from telco_radar.analyze.geraete_store import GeraeteDB
 
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
-    assert db.messtermine("Medimax") == ["2026-08-11"]
-    assert db.laufbilanz("Medimax").get("laeufe", 0) == 0, (
+    assert db.messtermine("Haendler") == ["2026-08-11"]
+    assert db.laufbilanz("Haendler").get("laeufe", 0) == 0, (
         "ein Teillauf zaehlt nicht als vollstaendiger Lauf"
     )
-    assert db.hardware_vermarktung("Medimax") == "ja"
+    assert db.hardware_vermarktung("Haendler") == "ja"
 
 
 def test_die_hole_fabrik_gibt_den_statuscode_zurueck_statt_zu_werfen():
@@ -836,16 +853,16 @@ def test_ein_kollidierender_satz_bekommt_keinen_historienpunkt(tmp_path):
     und ihr Preis ist der der Datenbank.
     """
     root = _root(tmp_path)
-    produkt = _SEITEN["https://www.medimax.de/p/1514136/iphone-17-pro-max-256gb"]
+    produkt = _SEITEN["https://www.haendler.test/p/1514136/iphone-17-pro-max-256gb"]
     zweit = produkt.replace("1449", "1099")
     assert zweit != produkt, "die Fixture muss den Preis 1449 tragen"
-    kategorie = _SEITEN["https://www.medimax.de/c/116/smartphones"].replace(
+    kategorie = _SEITEN["https://www.haendler.test/c/116/smartphones"].replace(
         "/p/1518897/galaxy-a57-5g-a576b-128gb",
         "/p/1514137/iphone-17-pro-max-256gb-zweit",
     )
     seiten = dict(_SEITEN)
-    seiten["https://www.medimax.de/c/116/smartphones"] = kategorie
-    seiten["https://www.medimax.de/p/1514137/iphone-17-pro-max-256gb-zweit"] = zweit
+    seiten["https://www.haendler.test/c/116/smartphones"] = kategorie
+    seiten["https://www.haendler.test/p/1514137/iphone-17-pro-max-256gb-zweit"] = zweit
 
     bilanz = run_geraete_stage(
         root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole(seiten)
@@ -1041,7 +1058,7 @@ def test_scoped_lauf_datiert_keine_fremdanbieter_und_ruft_sie_nicht_ab(
     assert vorher["MagentaMobil L"]["last_verified"] == "2026-09-14"
 
     # Zweiter Lauf MIT Scope auf Telekom - und mit Recorder an `hole`:
-    # kein einziger Abruf darf hinausgehen, der nicht Telekom/Medimax
+    # kein einziger Abruf darf hinausgehen, der nicht Telekom/Haendler
     # gilt (insbesondere keiner gegen 1und1.de).
     abrufe: list = []
     run_geraete_stage(

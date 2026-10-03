@@ -34,17 +34,16 @@ import re
 import pytest
 import yaml
 from bs4 import BeautifulSoup
-
-from telco_radar.report.html import render_site
-
 from test_geraete_browser_fixture import (
-    HEUTE,
-    _KATALOG,
     _FARBEN,
+    _KATALOG,
     _QUELLEN,
+    HEUTE,
     _listung,
     _sku,
 )
+
+from telco_radar.report.html import render_site
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 DEVICE = "apple-iphone-17-pro"
@@ -275,49 +274,40 @@ def _congstar_xs_summarys(html: str) -> list:
     return texte
 
 
-# Wortgetreue Kopie der Vorlage von VOR Paket D3 (Commit 58446de, siehe
-# Dateikopf der Fixture) - eingefroren im Repo, statt per `git show HEAD:...`
-# gelesen. Ein `git show HEAD:...` wird nach dem Commit dieses Fixes selbst
-# zum NEUEN Stand und der Test würde grün werden, ohne dass sich am
-# geprüften Verhalten etwas ändert (CLAUDE.md: ein Test darf nicht vom
-# Git-Stand abhängen). Die Datei wird nie nachgeführt.
-_ALTE_VORLAGE = WURZEL / "tests" / "fixtures" / "geraete_buendel_vor_d3.html.j2"
+def test_punkt1_ohne_ratenzahl_waeren_die_zeilen_wortgleich(site, chromium):
+    """Der Befund vor D3 am heutigen Render: nimmt man den Ratenteil
+    (`.gr-bnd-raten`) aus den zugeklappten Zeilen, sind 24er- und 36er-Zeile
+    wortgleich. Der Ratenteil ist also das Einzige, was sie unterscheidet, und
+    er ist zugeklappt im Browser sichtbar, am Schreibtisch und am Telefon."""
+    html = (site / "geraete.html").read_text(encoding="utf-8")
+    ohne_raten = []
+    for _opentag, _text, block in _congstar_zeilen(html).values():
+        summary = BeautifulSoup(block, "html.parser").select_one("summary")
+        raten = summary.select(".gr-bnd-raten")
+        assert len(raten) == 1, f"kein Ratenteil im Zeilenkopf: {summary}"
+        raten[0].decompose()
+        ohne_raten.append(" ".join(summary.get_text(" ").split()))
+    assert len(ohne_raten) == 2 and ohne_raten[0] == ohne_raten[1], ohne_raten
 
-
-def test_punkt1_rot_gegen_den_alten_stand(tmp_path, monkeypatch):
-    """Beweis, dass der Kerntest gegen den ALTEN Stand (vor Paket D3,
-    eingefroren in `_ALTE_VORLAGE`) rot ist: dort sind die 24er- und die
-    36er-Zeile zugeklappt wortgleich - genau der Befund, den D3 behebt.
-    Stabil gegen künftige Commits: die Fixture ändert sich nie, es wird
-    kein `git show` mehr zur Laufzeit gelesen."""
-    import telco_radar.report.html as html_mod
-
-    alt_dir = tmp_path / "alte_vorlagen"
-    alt_dir.mkdir()
-    # Alle Vorlagen des Pakets kopieren (Jinja-Includes brauchen die
-    # ganzen Nachbardateien), NUR die Bündelzeile durch den alten Stand
-    # ersetzen.
-    live = pathlib.Path(html_mod._TEMPLATES)
-    for datei in live.iterdir():
-        if datei.is_file():
-            (alt_dir / datei.name).write_bytes(datei.read_bytes())
-    (alt_dir / "_geraete_buendel.html.j2").write_bytes(_ALTE_VORLAGE.read_bytes())
-    monkeypatch.setattr(html_mod, "_TEMPLATES", alt_dir)
-
-    alt_site = _baue(tmp_path / "alt", _bestand())
-    html = (alt_site / "geraete.html").read_text(encoding="utf-8")
-    texte = _congstar_xs_summarys(html)
-    assert len(texte) == 2, f"Fixture greift auch gegen den alten Stand nicht: {texte}"
-
-    # DIE KERNASSERTION GEGEN DEN ALTEN STAND: dort SIND beide Zeilen
-    # zugeklappt wortgleich - das ist der eingefrorene Befund, kein
-    # `pytest.raises`-Umweg mehr nötig, weil die Fixture nie wieder den
-    # neuen (gefixten) Text tragen kann.
-    assert texte[0] == texte[1], (
-        "die Fixture (Stand vor D3) ist entgegen der Annahme nicht mehr "
-        f"wortgleich - stimmt _ALTE_VORLAGE wirklich mit Commit 58446de "
-        f"überein?\n  Zeile 1: {texte[0]!r}\n  Zeile 2: {texte[1]!r}"
-    )
+    for breite in (1440, 390):
+        seite = chromium.new_page(viewport={"width": breite, "height": 900})
+        try:
+            seite.goto((site / "geraete.html").as_uri())
+            gemessen = seite.eval_on_selector_all(
+                'details.gr-bnd[data-anbieter="congstar"]:not([open]) '
+                "summary .gr-bnd-raten",
+                """els => els.map(e => ({text: e.textContent.trim(),
+                    hoehe: e.getBoundingClientRect().height,
+                    display: getComputedStyle(e).display,
+                    sicht: getComputedStyle(e).visibility}))""",
+            )
+        finally:
+            seite.close()
+        texte = sorted(g["text"].split(" ")[0] for g in gemessen)
+        assert texte == ["24", "36"], (breite, gemessen)
+        for g in gemessen:
+            assert g["display"] != "none" and g["sicht"] == "visible", (breite, g)
+            assert g["hoehe"] > 0, (breite, g)
 
 
 def test_punkt2_delta_spalte_traegt_die_feste_zahl(site):
@@ -571,7 +561,7 @@ def test_review_fix_s2_gegenprobe_wesentlich_bleibt_fest():
     wie die Hauptfixture."""
     from telco_radar.report import geraete_vergleich
 
-    assert SOLL_ABSTAND_U == pytest.approx(8.00)
+    assert pytest.approx(8.00) == SOLL_ABSTAND_U
     assert SOLL_ABSTAND_U < geraete_vergleich.WESENTLICH_EURO
     assert (
         SOLL_ABSTAND_U / SOLL_REFERENZ_GESAMT_U * 100

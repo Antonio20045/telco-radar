@@ -2,7 +2,7 @@
 
 ## Pflege dieser Datei
 
-- Höchstens 200 Zeilen und 20.000 Bytes; `tests/test_claude_md_groesse.py` erzwingt das.
+- Höchstens 200 Zeilen und 20.000 Bytes; Stufe 0 (`scripts/waechter_vertraege.py`) erzwingt das.
 - Hier stehen nur dauerhaft gültige Regeln, Befehle und Pfade.
 - Sitzungsberichte, Messungen mit Datum, Phasenstände und Auftragstexte gehören nach `outputs/` oder `docs/`, nicht hierher.
 - Wer etwas ergänzt, entfernt dafür etwas Veraltetes.

@@ -21,7 +21,6 @@ promo_db.json und im Bildordner steht.
 from __future__ import annotations
 
 import json
-import re
 import shutil
 from pathlib import Path
 
@@ -463,24 +462,36 @@ def test_die_seite_zeigt_kein_motiv_zweimal(promo_site):
         )
 
 
-def test_ein_ungeladenes_bild_malt_keinen_grauen_kasten():
+def _bildkaesten(seite) -> list[dict]:
+    return seite.eval_on_selector_all(
+        ".pk-bild img",
+        """els => els.map(e => ({
+            geladen: e.complete && e.naturalWidth > 0,
+            farbe: getComputedStyle(e).backgroundColor,
+            bild: getComputedStyle(e).backgroundImage,
+            hoehe: e.getBoundingClientRect().height}))""",
+    )
+
+
+def test_ein_ungeladenes_bild_malt_keinen_grauen_kasten(promo_site, chromium):
     """Der "leere Bildkasten", den Antonio auf der simplytel-Karte sah:
     `loading="lazy"` laesst ein Bild ausserhalb des Sichtfensters ungeladen,
     und eine Hintergrundfarbe auf dem <img> macht daraus einen grauen
-    16:9-Kasten. Gemessen an der fertigen Seite waren 31 von 36 Bildern in
-    diesem Zustand, solange nicht gescrollt wurde - und in jedem Screenshot
-    dauerhaft. Ohne Fuellung bleibt dort Zeitungspapier."""
-    css = (
-        Path(__file__).resolve().parent.parent
-        / "src"
-        / "telco_radar"
-        / "report"
-        / "templates"
-        / "style.css"
-    ).read_text(encoding="utf-8")
-    regel = re.search(r"\.pk-bild img\{([^}]*)\}", css)
-    assert regel, "Die Bildregel der Promo-Karte fehlt"
-    assert "background" not in regel.group(1)
+    16:9-Kasten. Im Browser gemessen, ohne zu scrollen: kein Bild der
+    Promo-Seite, geladen oder nicht, malt eine Fuellung."""
+    seite = chromium.new_page(viewport={"width": 1440, "height": 900})
+    try:
+        seite.goto((promo_site / "promo" / "index.html").as_uri(), wait_until="load")
+        kaesten = _bildkaesten(seite)
+    finally:
+        seite.close()
+    assert len(kaesten) >= 10, kaesten
+    ungeladen = [k for k in kaesten if not k["geladen"]]
+    assert ungeladen, "jedes Bild ist geladen - der Fall wird nicht geprüft"
+    assert any(k["hoehe"] > 0 for k in ungeladen), ungeladen
+    for k in kaesten:
+        assert k["farbe"] == "rgba(0, 0, 0, 0)", k
+        assert k["bild"] == "none", k
 
 
 def test_die_promo_quellenseite_bleibt(promo_site):

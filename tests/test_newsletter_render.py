@@ -14,15 +14,20 @@ er als Allowlist.
 """
 
 import json
+import os
 import re
+import subprocess
+import sys
+import textwrap
 from pathlib import Path
 
-import pytest
 from bs4 import BeautifulSoup
 
-from telco_radar.newsletter.filters import Eintrag, Treffer
 from telco_radar.newsletter import render as r
+from telco_radar.newsletter.filters import Treffer
 from telco_radar.newsletter.quelle import aus_bericht
+
+WURZEL = Path(__file__).resolve().parents[1]
 
 BERICHT = {
     "date": "2026-08-11",
@@ -228,9 +233,37 @@ def test_der_renderer_ruft_kein_modell_auf(monkeypatch):
     for name in gesperrt:
         monkeypatch.setattr(llm, name, darf_nicht)
     _nachricht()
-    # ... und im Modul steht auch kein Import darauf.
-    quelle = Path(r.__file__).read_text(encoding="utf-8")
-    assert "llm" not in quelle
+
+
+def _ohne_modul(gesperrt: str, code: str) -> subprocess.CompletedProcess:
+    """Fuehrt ``code`` in einem Prozess aus, der ``gesperrt`` nicht importieren kann."""
+    vorspann = f"import sys\nsys.modules[{gesperrt!r}] = None\n"
+    return subprocess.run(
+        [sys.executable, "-c", vorspann + textwrap.dedent(code)],
+        capture_output=True,
+        text=True,
+        env={**os.environ, "PYTHONPATH": str(WURZEL / "src")},
+        timeout=60,
+    )
+
+
+def test_der_renderer_laeuft_ohne_modellschicht():
+    """Der Renderer importiert die Modellschicht auch nicht auf Umwegen: ist sie
+    nicht importierbar, baut er die Mail trotzdem."""
+    lauf = _ohne_modul(
+        "telco_radar.analyze.llm",
+        """
+        from telco_radar.newsletter import render
+        from telco_radar.newsletter.filters import Eintrag, Treffer
+        print(callable(render.baue))
+        """,
+    )
+    assert lauf.returncode == 0, lauf.stderr
+    assert lauf.stdout.strip() == "True"
+    gegenprobe = _ohne_modul(
+        "telco_radar.analyze.llm", "import telco_radar.analyze.agents"
+    )
+    assert gegenprobe.returncode != 0
 
 
 # ==================================================  E-Mail-Handwerk  ======
@@ -550,6 +583,34 @@ def test_ein_5xx_wird_wiederholt(monkeypatch):
 def test_es_gibt_keinen_smtp_pfad():
     """Kein SMTP, auch nicht als Rueckfall - Render Free sperrt 25/465/587,
     und ein zweiter Versandweg waere ein zweiter Ort fuer Absenderdaten."""
-    quelle = (Path(r.__file__).parent / "transport.py").read_text(encoding="utf-8")
-    for verboten in ("smtplib", "SMTP(", "starttls", "sendmail"):
-        assert verboten not in quelle, verboten
+    lauf = _ohne_modul(
+        "smtplib",
+        """
+        import urllib.request
+        from telco_radar.newsletter import transport
+        from telco_radar.newsletter.render import Nachricht
+
+        ziele = []
+
+        class Antwort:
+            status = 201
+            def read(self):
+                return b'{"messageId": "m"}'
+            def __enter__(self):
+                return self
+            def __exit__(self, *a):
+                return False
+
+        def urlopen(anfrage, timeout=None):
+            ziele.append(anfrage.full_url)
+            return Antwort()
+
+        transport.urllib.request.urlopen = urlopen
+        n = Nachricht(betreff="b", html="<p>h</p>", text="t", headers={})
+        brevo = transport.BrevoTransport(api_key="k", absender_adresse="a@x.test")
+        ergebnis = brevo.send(n, "e@x.test")
+        print(ergebnis.ok, ziele)
+        """,
+    )
+    assert lauf.returncode == 0, lauf.stderr
+    assert lauf.stdout.strip() == "True ['https://api.brevo.com/v3/smtp/email']"

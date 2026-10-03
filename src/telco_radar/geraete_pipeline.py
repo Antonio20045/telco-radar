@@ -63,10 +63,10 @@ from .geraete_config import lade_farben, lade_katalog, lade_quellen
 
 log = logging.getLogger(__name__)
 
-# Voreinstellung des Zeitbudgets. Bewusst grosszuegig fuer den naechtlichen
-# Lauf und knapp fuer den Tageslauf (der Aufrufer setzt es): bei zehn
-# Sekunden Abstand je Abruf sind 20 Produktseiten allein drei Minuten.
+# Voreinstellung des Zeitbudgets; geraete.yml uebergibt FRIST_TAGESLAUF (Stufe 0
+# haelt beide Werte des Workflows daran). Zehn Sekunden je Abruf.
 FRIST_STANDARD = 900.0
+FRIST_TAGESLAUF = 1500.0
 
 
 def _hole_fabrik(http_cfg: dict) -> Callable:

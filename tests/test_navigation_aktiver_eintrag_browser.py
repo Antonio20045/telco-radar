@@ -22,8 +22,7 @@ import pathlib
 import socket
 import threading
 
-from telco_radar.report import geraete_zeitreihe as gz
-from telco_radar.report.anbieter_farben import in_stylesheet
+from telco_radar.report.html import schreibe_statische_dateien
 
 # Wortgetreu die Struktur der Rubrikleiste aus `base.html.j2` (die fuenf
 # Eintraege der Marktrecherche, "Geräte" als aktiver/letzter Eintrag -
@@ -63,12 +62,7 @@ def _seite(tmp_path: pathlib.Path) -> pathlib.Path:
         f"<body>{_NAV}<script src='app.js'></script></body></html>"
     )
     (tmp_path / "index.html").write_text(html, encoding="utf-8")
-    tmpl_dir = pathlib.Path(gz.__file__).parent / "templates"
-    css = in_stylesheet((tmpl_dir / "style.css").read_text(encoding="utf-8"))
-    (tmp_path / "style.css").write_text(css, encoding="utf-8")
-    (tmp_path / "app.js").write_text(
-        (tmpl_dir / "app.js").read_text(encoding="utf-8"), encoding="utf-8"
-    )
+    schreibe_statische_dateien(tmp_path)
     return tmp_path
 
 

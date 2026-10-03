@@ -153,10 +153,12 @@ def test_die_200_zeichen_grenze_ist_genau_der_datenblock_fall():
 # ---- 3. Klickbarkeit zeigt sich (echter Browser, echte style.css) -----
 
 
-def _style() -> str:
-    return (
-        REPO / "src" / "telco_radar" / "report" / "templates" / "style.css"
-    ).read_text(encoding="utf-8")
+def _style(ordner: Path) -> str:
+    """Das Stylesheet, wie die Website es ausliefert."""
+    from telco_radar.report.html import schreibe_statische_dateien
+
+    schreibe_statische_dateien(ordner)
+    return (ordner / "style.css").read_text(encoding="utf-8")
 
 
 @pytest.fixture(scope="module")
@@ -168,12 +170,12 @@ def seite(chromium):
         page.close()
 
 
-def test_je_summary_der_geraeteseite_zeiger_und_caret(seite):
+def test_je_summary_der_geraeteseite_zeiger_und_caret(seite, tmp_path):
     """Gegenprobe inklusive: .mressort (Meldungsseite) trägt sein EIGENES
     ▾ aus der Vor-P4-Regel, und ein NACKTES summary außerhalb von
     .gr-tafel bekommt von der neuen Regel nichts - das Scoping ist
     Absicht, keine Nebenwirkung auf andere Seiten."""
-    html = f"""<!doctype html><html><head><style>{_style()}</style></head>
+    html = f"""<!doctype html><html><head><style>{_style(tmp_path)}</style></head>
     <body>
     <div class="gr-tafel" id="t1">
       <details><summary>Maßstab &amp; Datenlage</summary><p>x</p></details>

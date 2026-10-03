@@ -21,23 +21,21 @@ from __future__ import annotations
 import contextlib
 import json
 import re
-from pathlib import Path
 
 import pytest
 import yaml
-
-from telco_radar.report import geraete_zeitreihe
-from telco_radar.report.html import render_site
-
 from test_geraete_browser_fixture import (
-    HEUTE,
-    _KATALOG,
     _FARBEN,
-    _listung,
+    _KATALOG,
     _QUELLEN,
+    HEUTE,
+    _listung,
     _server,
     _sku,
 )
+
+from telco_radar.report import geraete_zeitreihe
+from telco_radar.report.html import render_site
 
 DEVICE = "apple-iphone-17-pro"
 SPEICHER = 256
@@ -292,20 +290,80 @@ def test_der_abschnitt_ueber_der_schwelle_ist_gepunktet_der_andere_nicht(seite):
         assert not p["luecke"], p
 
 
-def test_app_js_traegt_kein_rueckfall_literal_fuer_die_schwellen():
-    """CLAUDE.md Clean Code 3: ein fehlender Wert ist eine benannte Luecke,
-    nie ein geratener Wert - `app.js` darf `LUECKE_TAGE`/`SATZ_MAX_TERMINE`
-    nicht still mit 10/8 ausfuellen, falls das data-Attribut fehlt."""
-    quelltext = (
-        Path(__file__).parent.parent
-        / "src"
-        / "telco_radar"
-        / "report"
-        / "templates"
-        / "app.js"
-    ).read_text("utf-8")
-    assert "|| '10'" not in quelltext and '|| "10"' not in quelltext
-    assert "|| '8'" not in quelltext and '|| "8"' not in quelltext
+def _lade_mit(browser, wurzel, ersetze):
+    """Lädt die Geräteseite mit umgeschriebenem HTML und wählt das Gerät."""
+    ctx = browser.new_context()
+    ctx.route(
+        "**/geraete.html",
+        lambda route: route.fulfill(
+            body=ersetze(route.fetch().text()), content_type="text/html"
+        ),
+    )
+    s = ctx.new_page()
+    meldungen = []
+    s.on("console", lambda m: meldungen.append((m.type, m.text)))
+    s.on("pageerror", lambda e: meldungen.append(("pageerror", str(e))))
+    s.goto(f"{wurzel}/geraete.html", wait_until="networkidle")
+    s.click('.gr-reiter [data-tafel="tafel-verlauf"]')
+    s.wait_for_timeout(120)
+    s.fill("#gr-vsuche", "iPhone 17 Pro")
+    s.wait_for_timeout(150)
+    s.click("#gr-vtreffer li:first-child")
+    s.wait_for_timeout(300)
+    return ctx, s, meldungen
+
+
+def test_app_js_traegt_kein_rueckfall_literal_fuer_die_schwellen(_browser_paar):
+    """Clean Code 3: ein fehlender Wert ist eine benannte Lücke, nie ein
+    geratener. Fehlt nur eine der beiden Schwellen, fällt genau ihre Wirkung
+    aus und `app.js` meldet sie beim Namen; die andere wirkt weiter. Und ein
+    anderer Wert im Attribut ändert das Bild, die Schwelle steht also nur dort."""
+    wurzel, browser = _browser_paar
+    ohne = {
+        name: (lambda html, n=name: re.sub(rf' data-{n}="\d+"', "", html))
+        for name in ("luecke-tage", "satzmaxtermine")
+    }
+
+    ctx, s, meldungen = _lade_mit(browser, wurzel, ohne["luecke-tage"])
+    try:
+        assert s.eval_on_selector("#gr-vstand", "e => e.dataset.lueckeTage") is None
+        pfade = _pfade(s)
+        assert pfade and not any(p["luecke"] for p in pfade), pfade
+        assert s.eval_on_selector("#gr-vstand", "e => e.hidden") is False
+    finally:
+        ctx.close()
+    fehler = [t for art, t in meldungen if art == "error"]
+    assert any("data-luecke-tage fehlt" in t for t in fehler), meldungen
+    assert not any("data-satzmaxtermine fehlt" in t for t in fehler), meldungen
+
+    ctx, s, meldungen = _lade_mit(browser, wurzel, ohne["satzmaxtermine"])
+    try:
+        pfade = _pfade(s)
+        assert [p["luecke"] for p in pfade].count(True) == 1, pfade
+        assert s.eval_on_selector("#gr-vstand", "e => e.hidden") is True
+    finally:
+        ctx.close()
+    fehler = [t for art, t in meldungen if art == "error"]
+    assert any("data-satzmaxtermine fehlt" in t for t in fehler), meldungen
+    assert not any("data-luecke-tage fehlt" in t for t in fehler), meldungen
+
+    schwelle = geraete_zeitreihe.LUECKE_TAGE_SCHWELLE
+    groesste_luecke = 11
+    assert schwelle < groesste_luecke
+    ctx, s, _ = _lade_mit(
+        browser,
+        wurzel,
+        lambda html: html.replace(
+            f'data-luecke-tage="{schwelle}"', f'data-luecke-tage="{groesste_luecke}"'
+        ),
+    )
+    try:
+        assert s.eval_on_selector("#gr-vstand", "e => e.dataset.lueckeTage") == str(
+            groesste_luecke
+        )
+        assert not any(p["luecke"] for p in _pfade(s))
+    finally:
+        ctx.close()
 
 
 def test_ohne_attribut_keine_ausnahme_und_keine_luecken_punktierung(_browser_paar):
@@ -362,5 +420,5 @@ def test_grenzfall_zehn_tage_gegenprobe_am_python_wert():
         f"sich geaendert ({schwelle}), die Fixture-Abstaende oben "
         "muessen mitziehen"
     )
-    assert not (10 > schwelle)
-    assert 11 > schwelle
+    assert not (schwelle < 10)
+    assert schwelle < 11

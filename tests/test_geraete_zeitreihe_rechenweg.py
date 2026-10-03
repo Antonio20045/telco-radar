@@ -25,17 +25,14 @@ from __future__ import annotations
 
 import json
 import pathlib
-import re
 
 import pytest
 from bs4 import BeautifulSoup
-
-from telco_radar.geraete_config import lade_katalog, lade_quellen
-from telco_radar.report import geraete_zeitreihe as zr
-from telco_radar.tco_model import tco_24
-from telco_radar.report.html import render_site
-
 from test_geraete_zeitreihe_ansicht import HEUTE, _baue
+
+from telco_radar.report import geraete_zeitreihe as zr
+from telco_radar.report.html import render_site
+from telco_radar.tco_model import tco_24
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 
@@ -447,17 +444,61 @@ def test_der_rechnungskopf_traegt_den_farbpunkt_des_anbieters():
     assert "background:#2f7fd1" in html11
 
 
-def test_der_klammer_text_und_das_label_erfuellen_die_12_px_regel():
-    """Code-S3-1: die Klammer („24 von 36 Raten") erklaert den Faktor und
-    das „TCO-24"-Etikett die Summe - lesende Labels, die im Panel erst
-    nach dem Klick entstehen (Template-Inhalt): 13 bzw. 12 px."""
-    css = (
-        WURZEL / "src" / "telco_radar" / "report" / "templates" / "style.css"
-    ).read_text(encoding="utf-8")
-    klammer = re.search(r"\.gr-zr-pk\{[^}]*font-size:(\d+(?:\.\d+)?)px", css)
-    label = re.search(r"\.gr-zr-plabel\{[^}]*font-size:(\d+(?:\.\d+)?)px", css)
-    assert klammer and float(klammer.group(1)) >= 12, "Klammer unter 12 px"
-    assert label and float(label.group(1)) >= 12, "TCO-Label unter 12 px"
+def test_der_klammer_text_und_das_label_erfuellen_die_12_px_regel(
+    tmp_path, monkeypatch, chromium
+):
+    """Code-S3-1: die Klammer (etwa „24 von 36 Raten") erklärt den Faktor und
+    das Etikett die Summe. Beide entstehen im Panel erst nach dem Klick aus
+    dem Template; im Browser montiert, mit dem ausgelieferten Stylesheet,
+    sind sie auf Schreibtisch und Telefon mindestens 12 px groß."""
+    from telco_radar.report.html import schreibe_statische_dateien
+
+    original = zr._rechung
+
+    def mit_klammer(*args, **kwargs):
+        r = original(*args, **kwargs)
+        for p in r["posten"]:
+            if p["anzahl"] == 36:
+                p["klammer"] = "24 von 36 Raten"
+        return r
+
+    monkeypatch.setattr(zr, "_rechung", mit_klammer)
+    html = zr._rechenwege_html({"o2": {"2026-09-12": _messung(O2_MESSUNG)}}, [])
+    assert "gr-zr-pk" in html and "gr-zr-plabel" in html
+    schreibe_statische_dateien(tmp_path)
+    (tmp_path / "panel.html").write_text(
+        "<!doctype html><html><head><meta charset='utf-8'>"
+        "<link rel='stylesheet' href='style.css'></head>"
+        f"<body><div class='gr-tafel'>{html}</div></body></html>",
+        encoding="utf-8",
+    )
+    for breite in (1440, 390):
+        seite = chromium.new_page(viewport={"width": breite, "height": 900})
+        try:
+            seite.goto((tmp_path / "panel.html").as_uri())
+            gemessen = seite.evaluate(
+                """() => {
+                  document.querySelectorAll('.gr-zr-rechnungen').forEach(c => {
+                    c.hidden = false;
+                    c.querySelectorAll('template').forEach(
+                      t => c.appendChild(t.content.cloneNode(true)));
+                  });
+                  return ['.gr-zr-pk', '.gr-zr-plabel'].map(sel => {
+                    const e = document.querySelector(sel);
+                    return e && {text: e.textContent.trim(),
+                                 px: parseFloat(getComputedStyle(e).fontSize),
+                                 hoehe: e.getBoundingClientRect().height};
+                  });
+                }"""
+            )
+        finally:
+            seite.close()
+        klammer, label = gemessen
+        assert klammer and klammer["text"] == "24 von 36 Raten", (breite, gemessen)
+        assert label and label["text"] == "Kosten über 24 Monate", (breite, gemessen)
+        for e in gemessen:
+            assert e["hoehe"] > 0, (breite, e)
+            assert e["px"] >= 12, f"{e['text']!r} bei {breite} px: {e['px']} px"
 
 
 def test_der_block_traegt_anbieter_messtag_und_beleg_dieses_tages():
@@ -502,20 +543,31 @@ def test_die_naeherung_bekommt_einen_benannten_leerzustand():
     assert leer.select(".gr-zr-posten") == []
 
 
-def test_der_leerzustands_text_steht_woertlich_in_der_buendel_vorlage():
-    """Der Satz ist der Hinweis von der Bündel-Karte (`gr-kk-hinweis`),
-    nicht neu erfunden - und dieser Test meldet, wenn einer der beiden
-    Orte geändert wird und der andere driftet."""
-    vorlage = (
-        WURZEL
-        / "src"
-        / "telco_radar"
-        / "report"
-        / "templates"
-        / "_geraete_buendel.html.j2"
-    ).read_text(encoding="utf-8")
+def test_der_leerzustands_text_steht_woertlich_in_der_buendel_vorlage(tmp_path):
+    """Der Satz ist der Hinweis von der Bündel-Karte (`gr-kk-hinweis`), nicht
+    neu erfunden: in einem Render stehen die Referenzkarte der Geräteseite
+    und der Leerzustand im Zeitreihen-Fragment wortgleich mit ihm da."""
+    import test_geraete_tco_zustand as tco_zustand
+
+    vorlage_text = tco_zustand.vorlage_text
+    seite = tco_zustand._baue(tmp_path)
+    hinweis = seite.select_one(
+        '#tafel-tco .gr-bnd[data-anbieter="Vodafone"] .gr-kk-hinweis'
+    )
+    assert hinweis is not None, "die Fixture trägt keine Referenzkarte"
+    fragment = BeautifulSoup(
+        (tmp_path / "mit" / "site" / "data" / "geraete-zeitreihe.html").read_text(
+            encoding="utf-8"
+        ),
+        "html.parser",
+    )
+    leer = [vorlage_text(e) for e in fragment.select(".gr-zr-rleer")]
+    assert leer, "das Fragment trägt keinen Leerzustand der Näherung"
+
     kompakt = " ".join(zr._NAEHERUNG_SATZ.split())
-    assert kompakt in " ".join(vorlage.split())
+    assert vorlage_text(hinweis).startswith(kompakt), vorlage_text(hinweis)
+    for text in leer:
+        assert text.startswith(kompakt), text
 
 
 def test_zwei_preisformen_am_selben_tag_bleiben_zwei_templates():

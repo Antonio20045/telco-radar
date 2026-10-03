@@ -271,3 +271,71 @@ def test_uhr_der_tests_ist_der_schnappschuss(jetzt, heute, herkunft, bestand):
     assert heute == dt.date.fromisoformat(bestand.name)
     assert herkunft["autor"] == "telco-radar-bot"
     assert json.loads((bestand / "_herkunft.json").read_text("utf-8")) == herkunft
+
+
+def _quelltext_probe(tmp_path, rumpf):
+    """Eine Testdatei im Wegwerfordner, die als Test gilt und ``rumpf`` ausführt."""
+    tests = tmp_path / "tests"
+    tests.mkdir()
+    (tests / "test_probe.py").write_text(
+        "import inspect, shutil\nfrom pathlib import Path\n\n\n"
+        f"def test_x(w, ziel):\n    {rumpf}\n"
+    )
+    return _lauf(
+        f"""
+        hermetik.TESTS = {str(tests)!r} + os.sep
+        sys.path.insert(0, {str(tests)!r})
+        import test_probe
+        test_probe.test_x(W, Path({str(tmp_path)!r}))
+        """
+    )
+
+
+@pytest.mark.parametrize(
+    ("rumpf", "pfad"),
+    [
+        (
+            "(w / 'src/telco_radar/report/templates/app.js').read_text()",
+            "src/telco_radar/report/templates/app.js",
+        ),
+        (
+            "open(w / '.github/workflows/geraete.yml').read()",
+            ".github/workflows/geraete.yml",
+        ),
+        ("(w / 'CLAUDE.md').read_bytes()", "CLAUDE.md"),
+        ("(w / 'docs/umbau/plan.md').read_text()", "docs/umbau/plan.md"),
+        (
+            "shutil.copy(w / 'src/telco_radar/report/templates/style.css', ziel)",
+            "src/telco_radar/report/templates/style.css",
+        ),
+    ],
+)
+def test_quelltext_als_text_lesen_scheitert_mit_regel(tmp_path, rumpf, pfad):
+    lauf = _quelltext_probe(tmp_path, rumpf)
+    assert lauf.returncode != 0
+    assert "HermetikVerstoss: Regel Verhalten: Tests lesen keinen Code" in lauf.stderr
+    assert f"las {pfad})" in lauf.stderr
+
+
+def test_inspect_getsource_scheitert_mit_regel(tmp_path):
+    lauf = _quelltext_probe(
+        tmp_path,
+        "import telco_radar.report.anbieter_farben as m; inspect.getsource(m)",
+    )
+    assert "Regel Verhalten" in lauf.stderr
+    assert "las src/telco_radar/report/anbieter_farben.py)" in lauf.stderr
+
+
+@pytest.mark.parametrize(
+    "rumpf",
+    [
+        "import telco_radar.report.geraete_tco_band",
+        "(w / 'config/settings.yaml').read_text()",
+        "(w / 'tests/fixtures/tarife/_herkunft.json').read_text()",
+        "__import__('telco_radar.report.html', fromlist=['x'])"
+        ".schreibe_statische_dateien(ziel)",
+    ],
+)
+def test_code_der_selbst_liest_und_daten_bleiben_offen(tmp_path, rumpf):
+    lauf = _quelltext_probe(tmp_path, rumpf)
+    assert lauf.returncode == 0, lauf.stderr

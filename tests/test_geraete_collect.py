@@ -1,19 +1,21 @@
 """Der Geraete-Collector: Linkernte, strukturierte Daten, Zeitbudget.
 
-Die Fixtures unter tests/fixtures/geraete/ bilden nach, was am 10.08.2026
-wirklich gemessen wurde: Medimax und freenet liefern Product/offers als
-JSON-LD (freenet mitsamt Varianten unter `isSimilarTo`), ALDI TALK
-schema.org-Microdata, Shopify-Shops ihren Katalog als products.json.
-Kein Test fasst das Netz an.
+Das Parsen anbieterbezogener Seiten laeuft gegen echte Abrufe mit Eintrag in
+tests/fixtures/geraete/_herkunft.json (congstar JSON-LD, smartmobil
+Microdata, EDEKA smart products.json, congstar-Sitemap, klarmobil-
+Kategorieseite). Die Crawler-Mechanik laeuft gegen sichtbar konstruierte
+Seiten unter der neutralen Domain haendler.test. Kein Test fasst das Netz an.
 """
 
+import gzip
+import json
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import urlparse
 
 import pytest
 
 from telco_radar.collect.geraete import (
-    Anbieterbilanz,
     GeraeteAbrufFehler,
     ernte_links,
     produkte_aus_shopify,
@@ -35,8 +37,69 @@ from telco_radar.geraete_model import Geraet, Katalog
 _FIX = Path(__file__).parent / "fixtures" / "geraete"
 
 
-def _fixture(name: str) -> str:
-    return (_FIX / name).read_text(encoding="utf-8")
+def _echt(name: str) -> str:
+    """Ein echter Abruf aus tests/fixtures/geraete/ (gzip wird entpackt)."""
+    roh = (_FIX / name).read_bytes()
+    if name.endswith(".gz"):
+        roh = gzip.decompress(roh)
+    return roh.decode("utf-8")
+
+
+def _herkunft_url(name: str) -> str:
+    eintraege = json.loads((_FIX / "_herkunft.json").read_text(encoding="utf-8"))
+    return next(e["url"] for e in eintraege["eintraege"] if e["datei"] == name)
+
+
+def _ldjson_seite(name: str, preis: str, farbe: str = "", waehrung: str = "EUR") -> str:
+    """Eine konstruierte Produktseite mit genau einem Product-Knoten."""
+    produkt = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": name,
+        "offers": {
+            "@type": "Offer",
+            "priceCurrency": waehrung,
+            "price": preis,
+            "availability": "http://schema.org/InStock",
+        },
+    }
+    if farbe:
+        produkt["color"] = farbe
+    return (
+        '<html><head><script type="application/ld+json">'
+        f"{json.dumps(produkt)}</script></head><body></body></html>"
+    )
+
+
+_BASIS = "https://www.haendler.test"
+_EINSTIEG = f"{_BASIS}/c/116/smartphones"
+_KATEGORIE = """<!doctype html><html lang="de"><head><title>Smartphones</title></head>
+<body><nav><a href="/cart">Warenkorb</a><a href="/my-account">Konto</a></nav>
+<ul>
+  <li><a href="/p/1518897/galaxy-a57-5g-128gb">Galaxy A57 5G 128GB</a></li>
+  <li><a href="/p/1514136/iphone-17-pro-max-256gb">iPhone 17 Pro Max 256GB</a></li>
+  <li><a href="/p/1514200/huelle-iphone-17">Schutzhuelle fuer iPhone 17 Pro Max</a></li>
+  <li><a href="https://www.anderer-laden.test/p/1/etwas">Fremder Shop</a></li>
+  <li><a href="/c/117/tablets">Tablets</a></li>
+</ul></body></html>"""
+_IPHONE_SEITE = _ldjson_seite(
+    "Apple iPhone 17 Pro Max 256GB Titannatur", "1449.00", "Titannatur"
+)
+_A57_SEITE = _ldjson_seite("Samsung Galaxy A57 5G 128GB Blau", "349.00", "Blau")
+_PRODUKT_MIT_VARIANTEN = """<html><head>
+<script type="application/ld+json">{"@type":"BreadcrumbList"}</script>
+<script type="application/ld+json">
+{"@type":"Product","name":"Google Pixel 10 Pro","color":"Obsidian",
+ "offers":{"@type":"Offer","priceCurrency":"EUR","price":"1099",
+           "availability":"http://schema.org/InStock"},
+ "isSimilarTo":[
+  {"@type":"Product","name":"Google Pixel 10 Pro 256 GB","color":"Porcelain",
+   "offers":{"@type":"Offer","priceCurrency":"EUR","price":"1199",
+             "availability":"http://schema.org/InStock"}},
+  {"@type":"Product","name":"Google Pixel 10 Pro 128 GB","color":"Moonstone",
+   "offers":{"@type":"Offer","priceCurrency":"EUR","price":"1099",
+             "availability":"http://schema.org/OutOfStock"}}]}
+</script></head><body></body></html>"""
 
 
 _KATALOG = Katalog(
@@ -155,18 +218,28 @@ def test_lockpreis_erkannt():
 
 
 def test_ldjson_produkt():
-    saetze = produkte_aus_ldjson(_fixture("medimax_produkt.html"))
+    """Echter Abruf congstar Pixel 11 (31.08.2026). Der einzige Product-Knoten
+    der Seite traegt "price":646, "priceCurrency":"EUR",
+    "availability":"https://schema.org/InStock", "color":"Frost",
+    "gtin":"0840353956216", "sku":"540_304720"; die BreadcrumbList der Seite
+    ist kein Produkt und zaehlt nicht."""
+    html = _echt("congstar_produkt_pixel11.html.gz")
+    assert html.count('"@type":"Product"') == 1
+    saetze = produkte_aus_ldjson(html)
     assert len(saetze) == 1
     s = saetze[0]
-    assert s["preis"] == 1449.0 and s["waehrung"] == "EUR"
+    assert s["preis"] == 646.0 and s["waehrung"] == "EUR"
     assert s["verfuegbarkeit"] == "lieferbar"
-    assert s["farbe"] == "Titannatur" and s["ean"] == "0194253000000"
+    assert s["farbe"] == "Frost" and s["ean"] == "0840353956216"
+    assert s["sku"] == "540_304720" and s["titel"] == "Google Pixel 11"
 
 
 def test_varianten_unter_issimilarto_kommen_mit():
-    """freenet haengt Speicher- und Farbvarianten mit eigenem Preis dorthin -
-    genau die Granularitaet, die eine SKU-Matrix braucht."""
-    saetze = produkte_aus_ldjson(_fixture("freenet_produkt.html"))
+    """Speicher- und Farbvarianten mit eigenem Preis unter `isSimilarTo` -
+    die Granularitaet, die eine SKU-Matrix braucht. Keine echte Fixture mit
+    Herkunft fuehrt diese Spielart, deshalb ein konstruiertes Literal:
+    Hauptknoten 1099 + Varianten 1199 und 1099 (OutOfStock)."""
+    saetze = produkte_aus_ldjson(_PRODUKT_MIT_VARIANTEN)
     assert len(saetze) == 3
     assert sorted(s["preis"] for s in saetze) == [1099.0, 1099.0, 1199.0]
     assert {s["farbe"] for s in saetze} == {"Obsidian", "Porcelain", "Moonstone"}
@@ -174,17 +247,26 @@ def test_varianten_unter_issimilarto_kommen_mit():
 
 
 def test_microdata_wenn_kein_ldjson():
-    html = _fixture("alditalk_produkt.html")
+    """Echter Abruf smartmobil iPhone 17 (31.08.2026): kein Product-JSON-LD,
+    aber vier Product-itemscope-Bloecke (je Tarifbuendel einer) mit
+    itemprop price 89.98, 59.98, 59.98 und 30.99, color "Lavendel"."""
+    html = _echt("smartmobil_produkt_iphone17.html.gz")
     assert produkte_aus_ldjson(html) == []
+    assert html.count('itemtype="https://schema.org/Offer"') == 4
     saetze = produkte_aus_microdata(html)
-    assert len(saetze) == 1
-    assert saetze[0]["preis"] == 189.99 and saetze[0]["farbe"] == "Blau"
+    assert len(saetze) == 4
+    assert [s["preis"] for s in saetze] == [89.98, 59.98, 59.98, 30.99]
+    assert {s["farbe"] for s in saetze} == {"Lavendel"}
 
 
 def test_kaskade_nimmt_ldjson_zuerst():
-    assert produkte_aus_html(_fixture("medimax_produkt.html"))[0]["quelle"] == "ldjson"
     assert (
-        produkte_aus_html(_fixture("alditalk_produkt.html"))[0]["quelle"] == "microdata"
+        produkte_aus_html(_echt("congstar_produkt_pixel11.html.gz"))[0]["quelle"]
+        == "ldjson"
+    )
+    assert (
+        produkte_aus_html(_echt("smartmobil_produkt_iphone17.html.gz"))[0]["quelle"]
+        == "microdata"
     )
 
 
@@ -207,9 +289,16 @@ def test_kein_rueckfall_auf_textextraktion():
 
 
 def test_shopify_katalog():
-    saetze = produkte_aus_shopify(_fixture("shopify_products.json"))
-    assert len(saetze) == 2
-    assert saetze[0]["preis"] == 99.99 and saetze[0]["url"] == "/products/bundle"
+    """Echter Abruf EDEKA smart products.json (31.08.2026): 17 Produkte mit je
+    einer Variante, also 17 Saetze. Das erste Produkt ist "EDEKA smart
+    Smartphone-Tarif-Bundle", handle "bundle", Variante "Default Title" zu
+    "149.95" - der Titel bleibt ohne Zusatz, die Adresse /products/bundle."""
+    roh = _echt("edeka_smart_products.json")
+    varianten = sum(len(p["variants"]) for p in json.loads(roh)["products"])
+    saetze = produkte_aus_shopify(roh)
+    assert len(saetze) == varianten == 17
+    assert saetze[0]["preis"] == 149.95 and saetze[0]["url"] == "/products/bundle"
+    assert saetze[0]["titel"] == "EDEKA smart Smartphone-Tarif-Bundle"
 
 
 def test_kaputtes_shopify_json_wirft_statt_leer_zurueckzugeben():
@@ -224,70 +313,84 @@ def test_kaputtes_shopify_json_wirft_statt_leer_zurueckzugeben():
 # --------------------------------------------------------------------------
 
 
+_KLARMOBIL_KAT = "klarmobil_kategorie_handy_kaufen.html.gz"
+_CONGSTAR_SITEMAP = "congstar_sitemap_devices.xml"
+
+
 def test_linkernte_aus_html_mit_pfadmuster():
-    links = ernte_links(
-        _fixture("medimax_kategorie.html"),
-        "https://www.medimax.de/c/116/smartphones",
-        "/p/",
-    )
+    """Echter Abruf der klarmobil-Kategorieseite (31.08.2026): zwoelf
+    `href` mit "/P-M-", jede Produktadresse steht zweimal (Bild und Titel).
+    Entdoppelt in Seitenreihenfolge bleiben sechs absolute Adressen."""
+    links = ernte_links(_echt(_KLARMOBIL_KAT), _herkunft_url(_KLARMOBIL_KAT), "/P-M-")
+    basis = "https://www.klarmobil.de/handy-kaufen/"
     assert links == [
-        "https://www.medimax.de/p/1518897/galaxy-a57-5g-a576b-128gb",
-        "https://www.medimax.de/p/1514136/iphone-17-pro-max-256gb",
-        "https://www.medimax.de/p/1514200/huelle-iphone-17",
+        basis + "samsung/samsung-galaxy-s26-ultra/P-M-4475373/",
+        basis + "samsung/samsung-galaxy-s26/P-M-4466891/",
+        basis + "apple/iphone-17/P-M-4234655/",
+        basis + "samsung/samsung-galaxy-s26-tab-a11/P-M-4599675/",
+        basis + "apple/iphone-17e/P-M-4506544/",
+        basis + "apple/iphone-17-pro/P-M-4234664/",
     ]
 
 
 def test_fremde_domain_faellt_raus():
-    links = ernte_links(
-        _fixture("medimax_kategorie.html"),
-        "https://www.medimax.de/c/116/smartphones",
-        "",
-    )
-    assert not any("fremd.de" in l for l in links)
+    """Dieselbe echte Seite verlinkt auch www.freenet.de, www.facebook.com und
+    weitere fremde Hosts; ohne Muster bleibt nur www.klarmobil.de."""
+    html = _echt(_KLARMOBIL_KAT)
+    assert 'href="https://www.freenet.de' in html  # Gegenprobe: es gibt sie
+    links = ernte_links(html, _herkunft_url(_KLARMOBIL_KAT), "")
+    assert links
+    assert {urlparse(link).netloc for link in links} == {"www.klarmobil.de"}
 
 
 def test_linkernte_aus_sitemap():
-    # Das Geraetemuster allein trifft auch das Tablet - genau die Streuung,
-    # fuer die es die Musterliste (Test darunter) braucht.
+    """Echte congstar-Sitemap /sitemap/devices.xml (31.08.2026): 16 der 55
+    `<loc>` liegen unter /geraete/apple/ - sieben iPhones, aber auch fuenf
+    iPads, zwei AirPods und zwei Watches. Ein Muster allein trifft diese
+    Streuung, fuer die es die Musterliste (Test darunter) braucht."""
     links = ernte_links(
-        _fixture("freenet_sitemap.xml"),
-        "https://www.freenet.de/sitemap.xml",
-        "-ohne-vertrag/p/P-M-",
+        _echt(_CONGSTAR_SITEMAP),
+        _herkunft_url(_CONGSTAR_SITEMAP),
+        "/geraete/apple/",
         kind="sitemap",
     )
-    assert links == [
-        "https://www.freenet.de/handys-smartphones/google/"
-        "google-pixel-10-pro-ohne-vertrag/p/P-M-4206120",
-        "https://www.freenet.de/tablets/samsung/"
-        "samsung-galaxy-tab-a11-5g-ohne-vertrag/p/P-M-4538346",
-    ]
+    assert len(links) == 16
+    assert sum("-ipad-" in link for link in links) == 5
+    assert sum("/airpods-" in link for link in links) == 2
+    assert sum("-watch-" in link for link in links) == 2
+    assert sum("-iphone-" in link for link in links) == 7
 
 
 def test_musterliste_verlangt_alle_teile():
-    """Eine Liste von Pfadmustern ist ein UND. freenets Sitemap fuehrt unter
-    dem Geraetemuster auch Tablets; jede dieser Seiten kostet Crawl-delay-
-    Sekunden des Zeitbudgets, ohne je den Katalog treffen zu koennen -
-    das war die halbe Ursache des verhungerten Nachtlaufs (G0, 28.08.2026)."""
+    """Eine Liste von Pfadmustern ist ein UND. Aus den 16 Apple-Adressen der
+    echten congstar-Sitemap bleiben mit ["/geraete/apple/", "-iphone-"] nur
+    die sieben iPhones; jede andere Seite kostete Crawl-delay-Sekunden des
+    Zeitbudgets, ohne je den Katalog treffen zu koennen."""
     links = ernte_links(
-        _fixture("freenet_sitemap.xml"),
-        "https://www.freenet.de/sitemap.xml",
-        ["/handys-smartphones/", "-ohne-vertrag/p/P-M-"],
+        _echt(_CONGSTAR_SITEMAP),
+        _herkunft_url(_CONGSTAR_SITEMAP),
+        ["/geraete/apple/", "-iphone-"],
         kind="sitemap",
     )
+    basis = "https://www.congstar.de/geraete/apple/apple-iphone-"
     assert links == [
-        "https://www.freenet.de/handys-smartphones/google/"
-        "google-pixel-10-pro-ohne-vertrag/p/P-M-4206120"
+        basis + "16/",
+        basis + "16e/",
+        basis + "17-pro-max/",
+        basis + "17-pro/",
+        basis + "17/",
+        basis + "17e/",
+        basis + "air/",
     ]
 
 
 def test_sitemap_ohne_muster_nimmt_alles_der_domain():
-    links = ernte_links(
-        _fixture("freenet_sitemap.xml"),
-        "https://www.freenet.de/sitemap.xml",
-        "",
-        kind="sitemap",
-    )
-    assert len(links) == 5
+    """Alle 55 `<loc>` der echten congstar-Sitemap liegen auf www.congstar.de
+    und sind verschieden; ohne Muster kommen alle 55."""
+    roh = _echt(_CONGSTAR_SITEMAP)
+    links = ernte_links(roh, _herkunft_url(_CONGSTAR_SITEMAP), "", kind="sitemap")
+    assert roh.count("<loc>https://www.congstar.de/") == roh.count("<loc>") == 55
+    assert len(links) == 55
 
 
 # --------------------------------------------------------------------------
@@ -300,14 +403,14 @@ _ROBOTS_FREI = (200, "User-agent: *\nDisallow: /cart\n")
 def _anbieter(**kw):
     grund = kw.pop("einstieg_kind", "static")
     vor = {
-        "name": "Medimax",
+        "name": "Haendler",
         "typ": "handel",
         "methode": "ldjson",
-        "basis_url": "https://www.medimax.de",
+        "basis_url": _BASIS,
         "rate_limit_sekunden": 0,
         "einstiege": [
             Einstieg(
-                url="https://www.medimax.de/c/116/smartphones",
+                url=_EINSTIEG,
                 label="Smartphones",
                 kind=grund,
                 pfadmuster="/p/",
@@ -331,15 +434,13 @@ def _hole_fabrik(seiten, protokoll=None):
     return hole
 
 
+_IPHONE_URL = f"{_BASIS}/p/1514136/iphone-17-pro-max-256gb"
+_HUELLE_URL = f"{_BASIS}/p/1514200/huelle-iphone-17"
 _SEITEN = {
-    "https://www.medimax.de/c/116/smartphones": _fixture("medimax_kategorie.html"),
-    "https://www.medimax.de/p/1518897/galaxy-a57-5g-a576b-128gb": _fixture(
-        "medimax_produkt.html"
-    ),
-    "https://www.medimax.de/p/1514136/iphone-17-pro-max-256gb": _fixture(
-        "medimax_produkt.html"
-    ),
-    "https://www.medimax.de/p/1514200/huelle-iphone-17": "<html><body>Zubehör ohne strukturierte Daten</body></html>",
+    _EINSTIEG: _KATEGORIE,
+    f"{_BASIS}/p/1518897/galaxy-a57-5g-128gb": _A57_SEITE,
+    _IPHONE_URL: _IPHONE_SEITE,
+    _HUELLE_URL: "<html><body>Zubehoer ohne strukturierte Daten</body></html>",
 }
 
 
@@ -363,17 +464,19 @@ def test_ende_zu_ende_ergibt_belegte_listungen():
     assert bilanz.status == "ok"
     assert bilanz.produkte_abgerufen == 3
     assert len(bilanz.listungen) == 2  # die Huelle liefert nichts
-    l = bilanz.listungen[0]
-    assert l.preis_ohne_vertrag == 1449.0
-    assert l.sku_id == "apple-iphone-17-pro-max-256gb-titan-natur"
-    assert l.quelle_url.startswith("https://www.medimax.de/p/")
-    assert l.abgerufen_am == "2026-08-11"
-    assert l.confidence == "hoch"
-    assert l.einstieg_url == "https://www.medimax.de/c/116/smartphones"
+    a57, iphone = bilanz.listungen
+    assert a57.sku_id == "samsung-galaxy-a57-128gb-blau"
+    assert a57.preis_ohne_vertrag == 349.0
+    assert iphone.preis_ohne_vertrag == 1449.0
+    assert iphone.sku_id == "apple-iphone-17-pro-max-256gb-titan-natur"
+    assert iphone.quelle_url.startswith(f"{_BASIS}/p/")
+    assert iphone.abgerufen_am == "2026-08-11"
+    assert iphone.confidence == "hoch"
+    assert iphone.einstieg_url == _EINSTIEG
 
 
 def test_einstiegsseite_gilt_als_gelesen():
-    assert _lauf().gelesene_einstiege == {"https://www.medimax.de/c/116/smartphones"}
+    assert _lauf().gelesene_einstiege == {_EINSTIEG}
 
 
 def test_es_wird_nur_abgerufen_was_verlinkt_war():
@@ -381,8 +484,8 @@ def test_es_wird_nur_abgerufen_was_verlinkt_war():
     eine erreichbare, aber NICHT verlinkte Adresse darf nicht angefasst
     werden."""
     seiten = dict(_SEITEN)
-    falle = "https://www.medimax.de/p/1514137/nicht-verlinkt"
-    seiten[falle] = _fixture("medimax_produkt.html")
+    falle = f"{_BASIS}/p/1514137/nicht-verlinkt"
+    seiten[falle] = _IPHONE_SEITE
     protokoll = []
     bilanz = _lauf(seiten=seiten, protokoll=protokoll)
     assert bilanz.nicht_verlinkt == []
@@ -464,7 +567,7 @@ def test_zeitbudget_bricht_sauber_ab_und_altert_nichts():
 
 def test_unbekannte_titel_werden_gemeldet_statt_verworfen():
     seiten = dict(_SEITEN)
-    seiten["https://www.medimax.de/p/1514200/huelle-iphone-17"] = (
+    seiten[_HUELLE_URL] = (
         '<script type="application/ld+json">{"@type":"Product",'
         '"name":"Fairphone 6 256 GB","offers":{"price":"599.00","priceCurrency":"EUR"}}'
         "</script>"
@@ -475,7 +578,7 @@ def test_unbekannte_titel_werden_gemeldet_statt_verworfen():
 
 def test_fremde_waehrung_wird_nicht_uebernommen():
     seiten = dict(_SEITEN)
-    seiten["https://www.medimax.de/p/1514136/iphone-17-pro-max-256gb"] = (
+    seiten[_IPHONE_URL] = (
         '<script type="application/ld+json">{"@type":"Product",'
         '"name":"Apple iPhone 17 Pro Max 256GB Titannatur",'
         '"offers":{"price":"1449.00","priceCurrency":"CHF"}}</script>'
@@ -488,7 +591,7 @@ def test_lockpreis_wird_nicht_als_ladenpreis_gefuehrt():
     """Die gemessene Falle: WinSIM, o2 und Blau tragen im voellig korrekten
     offers.price die Zahl 1 - die Zuzahlung im Buendel."""
     seiten = dict(_SEITEN)
-    seiten["https://www.medimax.de/p/1514136/iphone-17-pro-max-256gb"] = (
+    seiten[_IPHONE_URL] = (
         '<script type="application/ld+json">{"@type":"Product",'
         '"name":"Apple iPhone 17 Pro Max 256GB Titannatur",'
         '"offers":{"price":"1.00","priceCurrency":"EUR"}}</script>'
@@ -518,7 +621,9 @@ def test_nicht_umgesetzte_methode_sagt_das_und_ruehrt_nichts_an():
     protokoll = []
     bilanz = _lauf(
         _anbieter(
-            name="Telekom", methode="json_endpunkt", grund="Preis nur im Zustandsobjekt"
+            name="Zustandsshop",
+            methode="json_endpunkt",
+            grund="Preis nur im Zustandsobjekt",
         ),
         protokoll=protokoll,
     )
@@ -531,7 +636,7 @@ def test_nicht_umgesetzte_methode_sagt_das_und_ruehrt_nichts_an():
 def test_deaktivierter_anbieter_behaelt_seinen_grund():
     bilanz = _lauf(
         _anbieter(
-            name="Amazon",
+            name="Plattform",
             aktiv=False,
             methode="deaktiviert",
             grund="erfordert Product-Advertising-API-Zugang",
@@ -551,14 +656,14 @@ def test_sammle_geht_alle_anbieter_durch_und_meldet_jeden():
         anbieter=[
             _anbieter(rang=1),
             _anbieter(
-                name="Amazon",
+                name="Plattform",
                 rang=2,
                 aktiv=False,
                 methode="deaktiviert",
                 grund="API nötig",
             ),
             _anbieter(
-                name="fraenk",
+                name="Nur-SIM",
                 rang=3,
                 methode="kein_hardware",
                 grund="vermarktet keine Hardware",
@@ -569,7 +674,11 @@ def test_sammle_geht_alle_anbieter_durch_und_meldet_jeden():
         quellen, _KATALOG, _FARBEN, _hole_fabrik(_SEITEN), "2026-08-11", _jetzt()
     )
     assert len(ergebnis["anbieter"]) == 3
-    assert {b.name for b in ergebnis["anbieter"]} == {"Medimax", "Amazon", "fraenk"}
+    assert {b.name for b in ergebnis["anbieter"]} == {
+        "Haendler",
+        "Plattform",
+        "Nur-SIM",
+    }
     assert len(ergebnis["listungen"]) == 2
     # Kein Anbieter faellt stillschweigend weg: jeder nicht gelaufene nennt
     # einen Grund (Akzeptanzkriterium Teil E).
@@ -633,8 +742,8 @@ def test_sammelknoten_einer_produktseite_wird_verworfen():
     als eigene Listung geschrieben kollidiert er mit jeder Variante, deren
     Speicher nicht gelesen werden konnte."""
     seiten = {
-        "https://www.medimax.de/c/116/smartphones": '<a href="/p/1/pixel">Pixel</a>',
-        "https://www.medimax.de/p/1/pixel": _fixture("freenet_produkt.html"),
+        _EINSTIEG: '<a href="/p/1/pixel">Pixel</a>',
+        f"{_BASIS}/p/1/pixel": _PRODUKT_MIT_VARIANTEN,
     }
     bilanz = _lauf(seiten=seiten)
     speicher = sorted(l.speicher_gb for l in bilanz.listungen)
@@ -643,8 +752,8 @@ def test_sammelknoten_einer_produktseite_wird_verworfen():
 
 def test_seite_mit_nur_einem_sammelknoten_behaelt_ihn():
     seiten = {
-        "https://www.medimax.de/c/116/smartphones": '<a href="/p/1/x">X</a>',
-        "https://www.medimax.de/p/1/x": '<script type="application/ld+json">{"@type":"Product",'
+        _EINSTIEG: '<a href="/p/1/x">X</a>',
+        f"{_BASIS}/p/1/x": '<script type="application/ld+json">{"@type":"Product",'
         '"name":"Apple iPhone 17 Pro Max","offers":{"price":"1449.00",'
         '"priceCurrency":"EUR"}}</script>',
     }
@@ -657,7 +766,7 @@ def test_unbekannte_farbe_der_quelle_landet_in_der_arbeitsliste():
     """Die Arbeitsliste fuer config/farben.yaml - der Farbbericht am
     Seitenende speist sich daraus."""
     seiten = dict(_SEITEN)
-    seiten["https://www.medimax.de/p/1514136/iphone-17-pro-max-256gb"] = (
+    seiten[_IPHONE_URL] = (
         '<script type="application/ld+json">{"@type":"Product",'
         '"name":"Apple iPhone 17 Pro Max 256GB","color":"Desert Mocha",'
         '"offers":{"price":"1449.00","priceCurrency":"EUR"}}</script>'
@@ -690,13 +799,13 @@ def test_ein_grosser_anbieter_laesst_den_naechsten_nicht_verhungern(monkeypatch)
         '"offers":{"price":"1449.00","priceCurrency":"EUR"}}</script>'
     )
     seiten = {
-        "https://www.gross.de/kat": "".join(
+        "https://www.gross.test/kat": "".join(
             f'<a href="/p/{i}">P{i}</a>' for i in range(20)
         ),
-        "https://www.klein.de/kat": '<a href="/p/1">P1</a>',
-        "https://www.klein.de/p/1": produkt,
+        "https://www.klein.test/kat": '<a href="/p/1">P1</a>',
+        "https://www.klein.test/p/1": produkt,
     }
-    seiten.update({f"https://www.gross.de/p/{i}": produkt for i in range(20)})
+    seiten.update({f"https://www.gross.test/p/{i}": produkt for i in range(20)})
 
     def hole(url):
         uhr["t"] += 30.0  # jeder Abruf kostet 30 Sekunden
@@ -709,20 +818,24 @@ def test_ein_grosser_anbieter_laesst_den_naechsten_nicht_verhungern(monkeypatch)
             _anbieter(
                 name="Gross",
                 rang=1,
-                basis_url="https://www.gross.de",
+                basis_url="https://www.gross.test",
                 einstiege=[
                     Einstieg(
-                        url="https://www.gross.de/kat", kind="static", pfadmuster="/p/"
+                        url="https://www.gross.test/kat",
+                        kind="static",
+                        pfadmuster="/p/",
                     )
                 ],
             ),
             _anbieter(
                 name="Klein",
                 rang=2,
-                basis_url="https://www.klein.de",
+                basis_url="https://www.klein.test",
                 einstiege=[
                     Einstieg(
-                        url="https://www.klein.de/kat", kind="static", pfadmuster="/p/"
+                        url="https://www.klein.test/kat",
+                        kind="static",
+                        pfadmuster="/p/",
                     )
                 ],
             ),
@@ -761,7 +874,7 @@ def test_bei_knappem_budget_verhungert_nicht_jeder_ausser_dem_letzten(monkeypatc
     )
     seiten, anbieter = {}, []
     for i in range(4):
-        host = f"https://www.a{i}.de"
+        host = f"https://www.a{i}.test"
         seiten[f"{host}/kat"] = f'<a href="/p/1">P</a>'
         seiten[f"{host}/p/1"] = produkt
         anbieter.append(

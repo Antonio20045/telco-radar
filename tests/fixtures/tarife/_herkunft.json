@@ -61,6 +61,27 @@
       "gzip": true,
       "absender": "TelcoRadar/1.0",
       "bytes_abgelegt": 11157
+    },
+    {
+      "datei": "bestand_2026-09-04.jsonl",
+      "abgerufen_am": "2026-09-04",
+      "commit": "f546849d",
+      "quelle": "data/state/tarife.jsonl @e37cb297, vollstaendig (44 Zeilen, byte-gleich); zugleich Teilmenge von data/state/tarife.jsonl @040d5510 (Bot-Lauf 2026-09-04), Filter: anbieter != '1&1'",
+      "beleg": "Unveraenderte Kopie von Lauf-State: Fassung 1 (f546849d, 32 Zeilen) byte-gleich mit data/state/tarife.jsonl @4f9dacb3; jetzige Fassung (e37cb297, 44 Zeilen, sha256 f08c4f80...) byte-gleich mit data/state/tarife.jsonl @e37cb297 (Lokallauf Antonio, kein Bot). Alle 44 Zeilen stehen unveraendert in data/state/tarife.jsonl @040d5510 (Bot 'radar: run 2026-09-04', 51 Zeilen); fehlend dort nur die 7 1&1-Zeilen. Aenderung nach Aufnahme = Neukopie des ganzen State, keine Handbearbeitung. Test test_tarif_bezug.py 'Die MESSUNG vom 04.09.2026, als Fixture'. git --follow zeigt Bot-Commits nur ueber die Umbenennungserkennung.",
+      "gzip": false,
+      "bytes_roh": 75922,
+      "sha256_roh": "f08c4f803b058e0f0d567e3ec971db2881af8291ac638c806d82e0c032d4b9ba",
+      "nachgetragen": "Paket 11: Herkunft aus Commit, Inhalt und Testdokumentation belegt, nicht neu abgerufen"
+    },
+    {
+      "datei": "beleg-telekom-lokallauf-2026-09-15.json",
+      "quelle": "outputs/beleg-telekom-lokallauf-2026-09-15.json, Commit 316eb692 (Tageslauf 2026-09-15), byte-gleich kopiert",
+      "abgerufen_am": "2026-09-15",
+      "commit": "316eb692",
+      "gzip": false,
+      "bytes_roh": 3368,
+      "sha256_roh": "20091f3b73c2673a01dc063ee3efd1d9d8a0c220969addca0e3d92824ab4bf05",
+      "nachgetragen": "Paket 11: Laufzeitbeleg als Fixture, damit kein Test outputs/ liest"
     }
   ]
 }

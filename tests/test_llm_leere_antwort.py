@@ -123,15 +123,16 @@ def test_normale_antwort_kommt_unveraendert_durch(monkeypatch):
     )
 
 
-def test_die_stufen_mit_kleinem_budget_sind_hochgezogen():
+def test_die_stufen_mit_kleinem_budget_sind_hochgezogen(monkeypatch):
     """Die eigentliche Behebung von #84 - als Zahl festgehalten, damit sie
     niemand versehentlich zurueckdreht. 8000 war das Budget, mit dem der
     Analyst damals zuverlaessig durchlief; seit dem 18.08.2026 ist die
     Untergrenze 16000, weil deepseek-v4-pro je Aufruf ~31.000 Zeichen
     Denkspur schreibt und mit 8000 fertig war, BEVOR die Antwort begann
     (Lauf #97: 41 von ~60 Stapeln mit finish_reason=length)."""
-    from telco_radar.analyze import category_sweep, promo_analyst, promo_ranker
     import inspect
+
+    from telco_radar.analyze import category_sweep, promo_analyst, promo_ranker
 
     assert (
         inspect.signature(promo_analyst.extract_promos).parameters["max_tokens"].default
@@ -141,5 +142,13 @@ def test_die_stufen_mit_kleinem_budget_sind_hochgezogen():
         inspect.signature(promo_ranker.judge_offers).parameters["max_tokens"].default
         >= 16000
     )
-    quelle = inspect.getsource(category_sweep)
-    assert "max_tokens=16000" in quelle
+    gesehen: list[int] = []
+
+    def complete(system, user, model, max_tokens=4096, **_):
+        gesehen.append(max_tokens)
+        return "[]"
+
+    monkeypatch.setattr(category_sweep, "complete", complete)
+    treffer = [{"title": "t", "url": "https://x.test/a", "description": "d"}]
+    assert category_sweep._llm_extract("ki", treffer, model="m") == []
+    assert gesehen and min(gesehen) >= 16000, gesehen

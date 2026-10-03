@@ -43,7 +43,7 @@ from bestand_pfad import BILDER_ZUSTAND, abbild
 
 from telco_radar.config import load_config
 from telco_radar.promo_config import PromoSource
-from telco_radar.report.html import _env, render_site
+from telco_radar.report.html import _env, render_site, schreibe_statische_dateien
 from telco_radar.report.promo import prepare_promo_view
 
 REPO = Path(__file__).resolve().parents[1]
@@ -267,9 +267,7 @@ def _rasterluecken_bloecke(tmp_path_factory, chromium):
 
     site = tmp_path_factory.mktemp("promoraster_synth") / "site"
     site.mkdir(parents=True)
-    templates_dir = REPO / "src" / "telco_radar" / "report" / "templates"
-    shutil.copyfile(templates_dir / "style.css", site / "style.css")
-    shutil.copyfile(templates_dir / "logo.png", site / "logo.png")
+    schreibe_statische_dateien(site)
     html = (
         _env()
         .get_template("promo_index.html.j2")

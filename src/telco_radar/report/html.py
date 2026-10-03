@@ -1363,6 +1363,19 @@ def _prep_competitors(report: dict) -> list[dict]:
 # eine 1400-Zeilen-Datei ist der falsche Ort fuer ein Datenformat.
 
 
+def schreibe_statische_dateien(site_dir: Path) -> None:
+    """Schreibt ``style.css``, ``app.js`` und Logo, wie die Website sie ausliefert."""
+    for asset in ("style.css", "app.js"):
+        inhalt = (_TEMPLATES / asset).read_text(encoding="utf-8")
+        if asset == "style.css":
+            inhalt = _anbieter_farben.in_stylesheet(inhalt)
+        (site_dir / asset).write_text(inhalt, encoding="utf-8")
+    for binasset in ("logo.png",):
+        src = _TEMPLATES / binasset
+        if src.exists():
+            shutil.copy(src, site_dir / binasset)
+
+
 # ------------------------------------------------------------------- render
 def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     """Rendert die ganze Website und gibt die Teile zurück, die nicht neu gebaut wurden."""
@@ -1377,21 +1390,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     folien_dir = site_dir / "folien"
     folien_dir.mkdir(exist_ok=True)
     (site_dir / ".nojekyll").write_text("")
-    for asset in ("style.css", "app.js"):
-        inhalt = (_TEMPLATES / asset).read_text(encoding="utf-8")
-        # Die EINE Quelle der Anbieterfarben setzt ihren Block an die
-        # Stelle des Platzhalters (report/anbieter_farben.py) - der
-        # Platzhalter im Repo bleibt lesbar, die Zeilen im Site-Output
-        # sind erzeugt. Fehlt der Platzhalter, wirft das laut
-        # (`AnbieterfarbenFehlen`), statt still ohne Anbieterfarben zu
-        # rendern.
-        if asset == "style.css":
-            inhalt = _anbieter_farben.in_stylesheet(inhalt)
-        (site_dir / asset).write_text(inhalt, encoding="utf-8")
-    for binasset in ("logo.png",):
-        src = _TEMPLATES / binasset
-        if src.exists():
-            shutil.copy(src, site_dir / binasset)
+    schreibe_statische_dateien(site_dir)
     # Meldungsbilder sind Pipeline-State (data/state/report_images/), nicht
     # Site-Quelltext - sie werden bei jedem Rendern kopiert, genau wie die
     # Promo-Screenshots. Nie von Hand unter site/ ablegen.

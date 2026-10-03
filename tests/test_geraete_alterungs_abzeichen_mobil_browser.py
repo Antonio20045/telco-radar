@@ -27,8 +27,7 @@ import pathlib
 import socket
 import threading
 
-from telco_radar.report import geraete_zeitreihe as gz
-from telco_radar.report.anbieter_farben import in_stylesheet
+from telco_radar.report.html import schreibe_statische_dateien
 
 # Wortgetreu aus einem echten `render_site()`-Lauf (data/reports, Stand
 # 24.09.2026) kopiert: der Buendel-Kopf einer ALTEN o2-Zeile in der
@@ -78,9 +77,7 @@ def _seite(tmp_path: pathlib.Path) -> pathlib.Path:
         f"</html>"
     )
     (tmp_path / "index.html").write_text(html, encoding="utf-8")
-    css_pfad = pathlib.Path(gz.__file__).parent / "templates" / "style.css"
-    css = in_stylesheet(css_pfad.read_text(encoding="utf-8"))
-    (tmp_path / "style.css").write_text(css, encoding="utf-8")
+    schreibe_statische_dateien(tmp_path)
     return tmp_path
 
 

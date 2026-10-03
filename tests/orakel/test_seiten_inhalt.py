@@ -22,7 +22,6 @@ from __future__ import annotations
 
 import json
 import re
-from pathlib import Path
 
 import pytest
 from bs4 import BeautifulSoup
@@ -170,6 +169,42 @@ def _schlagzeilen(html: str, wurzel: str = "") -> list[str]:
     if bereich is None:
         return []
     return [e.get_text(" ", strip=True) for e in bereich.select(".szl")]
+
+
+@pytest.fixture
+def undefiniert(monkeypatch) -> set[str]:
+    """Namen, die eine Vorlage beim Rendern nachschlug, ohne dass sie gesetzt waren."""
+    from jinja2 import Undefined, UndefinedError
+    from jinja2.utils import missing
+
+    from telco_radar.report import html as html_mod
+
+    namen: set[str] = set()
+
+    class Aufzeichnend(Undefined):
+        def __init__(self, hint=None, obj=missing, name=None, exc=UndefinedError):
+            super().__init__(hint, obj, name, exc)
+            if name is not None:
+                namen.add(name)
+
+    original = html_mod._env
+
+    def env():
+        umgebung = original()
+        umgebung.undefined = Aufzeichnend
+        return umgebung
+
+    monkeypatch.setattr(html_mod, "_env", env)
+    return namen
+
+
+def _gegenprobe_aufzeichnung(namen: set[str], name: str) -> None:
+    """Eine Vorlage, die ``name`` liest, landet in der Aufzeichnung."""
+    from telco_radar.report import html as html_mod
+
+    html_mod._env().from_string(f"{{{{ {name} }}}}").render()
+    assert name in namen, f"Aufzeichnung übersieht {name}"
+    namen.discard(name)
 
 
 def lies_seite(site, name: str) -> str:
@@ -860,7 +895,7 @@ def faden_highlights(quasar_relevance: int = 5) -> list[dict]:
     return hs
 
 
-def test_der_vorspann_ueber_der_ausgabe_ist_weg(tmp_path):
+def test_der_vorspann_ueber_der_ausgabe_ist_weg(tmp_path, undefiniert):
     """Der Faden ordnet die Seite weiter, er wird nur nicht mehr abgeschrieben.
 
     Ueber der Ausgabe stand bis zum 07.08.2026 der erste Satz des Berichts
@@ -884,20 +919,17 @@ def test_der_vorspann_ueber_der_ausgabe_ist_weg(tmp_path):
     assert "front-faden" not in lies_seite(site, "style.css")
 
     assert not hasattr(html_mod, "_briefing_lead")
-    vorlagen = Path(html_mod.__file__).parent / "templates"
-    for tpl in vorlagen.glob("*.j2"):
-        text = re.sub(r"(?s)\{#.*?#\}", "", tpl.read_text(encoding="utf-8"))
-        assert "briefing_lead" not in text, f"{tpl.name} liest briefing_lead"
+    assert "briefing_lead" not in undefiniert
+    _gegenprobe_aufzeichnung(undefiniert, "briefing_lead")
 
 
 # ------------------------------------------------- Was die Seite NICHT mehr traegt
-def test_die_datumszeile_ist_auf_keiner_seite_mehr_da(tmp_path):
+def test_die_datumszeile_ist_auf_keiner_seite_mehr_da(tmp_path, undefiniert):
     """Abnahmekriterium 1. Antonio: "Loesch diese Zeile, das ist unnoetig."
 
     Geprueft wird auch, dass keine tote Variable zurueckgeblieben ist -
     diese Codebasis hat schon einmal sechs berechnete Werte mitgeschleppt,
     die keine Vorlage benutzte."""
-    from telco_radar.report import html as html_mod
 
     site = render(tmp_path, highlights=PORTAL)
     for name in (
@@ -913,15 +945,9 @@ def test_die_datumszeile_ist_auf_keiner_seite_mehr_da(tmp_path):
     assert "dateline" not in lies_seite(site, "style.css")
     # Und keine Vorlage fragt die Werte noch ab - sie werden nicht mehr
     # berechnet, ein Zugriff waere also still leer statt laut falsch.
-    from pathlib import Path
-
-    vorlagen = Path(html_mod.__file__).parent / "templates"
-    for tpl in vorlagen.glob("*.j2"):
-        # Ohne Jinja-Kommentare: dass in einem {# ... #} steht, WARUM die
-        # Werte weg sind, ist Dokumentation und kein Zugriff.
-        text = re.sub(r"(?s)\{#.*?#\}", "", tpl.read_text(encoding="utf-8"))
-        for tot in ("ausgabe_datum", "ausgabe_quellen"):
-            assert tot not in text, f"{tpl.name} liest die tote Variable {tot}"
+    for tot in ("ausgabe_datum", "ausgabe_quellen"):
+        assert tot not in undefiniert, f"eine Vorlage liest die tote Variable {tot}"
+        _gegenprobe_aufzeichnung(undefiniert, tot)
 
 
 def test_die_wochenseite_traegt_die_doppelten_formen_nicht_mehr(tmp_path):
@@ -1216,7 +1242,7 @@ def test_hebel_ohne_beispiel_stehen_nicht_auf_der_seite(tmp_path):
     )
 
 
-def test_die_statuszeile_der_differenzierung_ist_weg(tmp_path):
+def test_die_statuszeile_der_differenzierung_ist_weg(tmp_path, undefiniert):
     """Antonio: die Seite wirkt unruhig durch die vielen Kommentare. Geprueft
     wird auch, dass keine tote Vorlagen-Variable und kein toter CSS-Block
     zurueckgeblieben ist."""
@@ -1234,15 +1260,9 @@ def test_die_statuszeile_der_differenzierung_ist_weg(tmp_path):
     stil = lies_seite(site, "style.css")
     for tot in ("dz-status", "theme-grid", "theme-card", "dz-move", "dz-card"):
         assert tot not in stil, f"toter CSS-Block {tot}"
-
-    from telco_radar.report import html as html_mod
-
-    vorlage = (
-        Path(html_mod.__file__).parent / "templates" / "differenzierung.html.j2"
-    ).read_text(encoding="utf-8")
-    vorlage = re.sub(r"(?s)\{#.*?#\}", "", vorlage)
     for tot in ("diff_stats", "diff_themes"):
-        assert tot not in vorlage, f"Vorlage liest die tote Variable {tot}"
+        assert tot not in undefiniert, f"Vorlage liest die tote Variable {tot}"
+        _gegenprobe_aufzeichnung(undefiniert, tot)
 
 
 def test_neu_auf_dem_radar_zeigt_nur_junge_funde(tmp_path):

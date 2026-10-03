@@ -558,9 +558,8 @@ def test_beleg_deckt_alle_konfigurierten_telekom_einstiege_ab():
     erwartet = {u for q in quellen for u in q.einstieg}
     assert erwartet, "Config traegt keine Telekom-Einstiegs-URL mehr"
 
-    belege = sorted((root / "outputs").glob("beleg-telekom-lokallauf-*.json"))
-    assert belege, "kein Laufzeitbeleg unter outputs/ committet"
-    beleg = json.loads(belege[-1].read_text(encoding="utf-8"))
+    beleg_pfad = root / "tests/fixtures/tarife/beleg-telekom-lokallauf-2026-09-15.json"
+    beleg = json.loads(beleg_pfad.read_text(encoding="utf-8"))
     beleg_urls = {r["url"] for r in beleg["requests"]}
 
     fehlend = erwartet - beleg_urls

@@ -1,17 +1,102 @@
 """Tests for RSS + newsroom parsing (fixtures, no network)."""
 
 from datetime import datetime, timezone
-from pathlib import Path
 
 from telco_radar.collect.newsroom import parse_newsroom_html
 from telco_radar.collect.rss import parse_feed_bytes
 from telco_radar.config import Source
 
-FIXTURES = Path(__file__).parent / "fixtures"
+# Sichtbar konstruierte Eingaben fuer die generischen RSS- und Newsroom-
+# Parser; alle Domains sind Beispieldomains.
+SAMPLE_FEED = """<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Sample Telco News</title>
+    <link>https://example-telconews.com</link>
+    <item>
+      <title>Vodafone launches new eSIM roaming pass for travellers</title>
+      <link>https://example-telconews.com/2026/07/vodafone-esim-roaming-pass?utm_source=rss</link>
+      <pubDate>Tue, 14 Jul 2026 09:00:00 GMT</pubDate>
+      <description>Vodafone introduced a daily eSIM roaming pass.</description>
+    </item>
+    <item>
+      <title>Jio unveils AI-powered family plan with cloud gaming bundle</title>
+      <link>https://example-telconews.com/2026/07/jio-ai-family-plan</link>
+      <pubDate>Mon, 13 Jul 2026 14:30:00 GMT</pubDate>
+      <description>Reliance Jio announced a new family tariff.</description>
+    </item>
+    <item>
+      <title>Old story that should be filtered by freshness</title>
+      <link>https://example-telconews.com/2024/01/old-story</link>
+      <pubDate>Mon, 01 Jan 2024 08:00:00 GMT</pubDate>
+      <description>Ancient news.</description>
+    </item>
+  </channel>
+</rss>
+"""
+
+SAMPLE_NEWSROOM = """<!DOCTYPE html>
+<html>
+<head><title>Press Releases | Example Telco</title></head>
+<body>
+  <nav>
+    <a href="/about">About us</a>
+    <a href="/contact">Contact</a>
+    <a href="/news">News</a>
+  </nav>
+  <main class="press-list">
+    <article>
+      <span class="date">14 Jul 2026</span>
+      <a href="/news/2026/07/example-telco-unlimited-5g-plus-satellite-fallback">
+        Example Telco launches Unlimited 5G+ tariff with satellite fallback
+      </a>
+    </article>
+    <article>
+      <span class="date">10 Jul 2026</span>
+      <a href="https://www.example-telco.com/news/2026/07/example-telco-partners-with-streamco-for-bundled-entertainment">
+        Example Telco partners with StreamCo for bundled entertainment offer
+      </a>
+    </article>
+    <article>
+      <a href="https://othersite.com/news/should-be-skipped-external-domain-article-here">
+        External article that must be skipped because of the domain rule
+      </a>
+    </article>
+    <article>
+      <a href="/news/short">Too short</a>
+    </article>
+  </main>
+  <footer>
+    <a href="/privacy">Privacy policy</a>
+    <a href="/careers">Careers at Example Telco - join our team today</a>
+  </footer>
+</body>
+</html>
+"""
+
+SAMPLE_CARD_NEWSROOM = """<!DOCTYPE html>
+<html>
+<head><title>Press Release Browser | Example Telco</title></head>
+<body>
+  <nav>
+    <a href="/about-example">About Example</a>
+    <a href="mailto:media@example-telco.com">media@example-telco.com</a>
+  </nav>
+  <main>
+    <a class="card card--wide" href="/content/example-telco-summer-offer/">
+      Press release 28th May 2026 Deal Example Telco unveils summer offer
+    </a>
+    <a class="card" href="/content/example-telco-network-upgrade/">
+      Press release 20th Mar 2026 Network Example Telco completes network upgrade
+    </a>
+  </main>
+</body>
+</html>
+"""
 
 
 def test_rss_parsing():
-    raw = (FIXTURES / "sample_feed.xml").read_bytes()
+    raw = SAMPLE_FEED.encode("utf-8")
     src = Source(
         type="rss", url="https://example-telconews.com/feed", name="Sample Telco News"
     )
@@ -25,7 +110,7 @@ def test_rss_parsing():
 
 
 def test_rss_tracking_params_do_not_change_id():
-    raw = (FIXTURES / "sample_feed.xml").read_bytes()
+    raw = SAMPLE_FEED.encode("utf-8")
     src = Source(type="rss", url="https://example-telconews.com/feed", name="S")
     items = parse_feed_bytes(raw, src, "global", None, "industry_news")
     from telco_radar.models import Item
@@ -39,7 +124,7 @@ def test_rss_tracking_params_do_not_change_id():
 
 
 def test_newsroom_parsing():
-    html = (FIXTURES / "sample_newsroom.html").read_text()
+    html = SAMPLE_NEWSROOM
     src = Source(
         type="newsroom", url="https://www.example-telco.com/news", name="Example Telco"
     )
@@ -56,7 +141,7 @@ def test_newsroom_parsing():
 
 
 def test_newsroom_respects_item_selector():
-    html = (FIXTURES / "sample_newsroom.html").read_text()
+    html = SAMPLE_NEWSROOM
     src = Source(
         type="newsroom",
         url="https://www.example-telco.com/news",
@@ -71,7 +156,7 @@ def test_newsroom_item_selector_bypasses_url_keyword_heuristic():
     # Some CMS card layouts (e.g. Presspage) use opaque slugs with no
     # news/press/media keyword in the path - only a configured item_selector
     # can tell these apart from navigation, since the URL heuristic can't.
-    html = (FIXTURES / "sample_card_newsroom.html").read_text()
+    html = SAMPLE_CARD_NEWSROOM
     src = Source(
         type="newsroom_js",
         url="https://www.example-telco.com/press-browser/",
@@ -84,7 +169,7 @@ def test_newsroom_item_selector_bypasses_url_keyword_heuristic():
 
 
 def test_newsroom_item_selector_still_applies_skip_hints():
-    html = (FIXTURES / "sample_card_newsroom.html").read_text()
+    html = SAMPLE_CARD_NEWSROOM
     src = Source(
         type="newsroom_js",
         url="https://www.example-telco.com/press-browser/",

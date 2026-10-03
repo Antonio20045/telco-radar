@@ -1,13 +1,16 @@
 """End-to-end pipeline test with mocked HTTP (no network, no LLM)."""
 
+import json
 import shutil
 from datetime import date
 from pathlib import Path
 
 import httpx
 import pytest
+from test_collect import SAMPLE_FEED, SAMPLE_NEWSROOM
 
 from telco_radar import pipeline
+from telco_radar.report import geraete_bewegung
 
 # Die Fixture-Meldungen tragen feste Daten (13./14. Juli 2026, plus eine alte
 # von 2024, an der der Freshness-Filter geprueft wird). Ein fest verdrahtetes
@@ -18,7 +21,6 @@ from telco_radar import pipeline
 # waechst mit dem Kalender mit, die Meldung von 2024 bleibt trotzdem draussen.
 FIXTURE_LOOKBACK = (date.today() - date(2026, 7, 13)).days + 1
 
-FIXTURES = Path(__file__).parent / "fixtures"
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -68,8 +70,8 @@ news_sources:
 
 @pytest.fixture()
 def fake_http(monkeypatch):
-    feed = (FIXTURES / "sample_feed.xml").read_bytes()
-    newsroom = (FIXTURES / "sample_newsroom.html").read_text()
+    feed = SAMPLE_FEED.encode("utf-8")
+    newsroom = SAMPLE_NEWSROOM
 
     def fake_get(url, **kwargs):
         request = httpx.Request("GET", url)
@@ -103,6 +105,23 @@ def test_full_run_no_llm(project, fake_http):
 
     # state persisted
     assert (project / "data" / "state" / "seen.jsonl").exists()
+
+
+def test_berichts_json_traegt_den_geraetebewegungsblock(project, fake_http):
+    """Der Versand rendert nur aus dem Berichts-JSON; ohne den Schluessel
+    "geraete_bewegung" fehlt der Mail der Wochenblock der Geraeteseite.
+    Erwartung: derselbe Block, den `fuer_bericht` fuer diesen Projektstand
+    und dieses Berichtsdatum unabhaengig liefert."""
+    report, _ = pipeline.run(project, use_llm=False, lookback_days=FIXTURE_LOOKBACK)
+    daten = json.loads(report.with_suffix(".json").read_text(encoding="utf-8"))
+    assert daten["date"] == report.stem
+    assert "geraete_bewegung" in daten
+    erwartet = geraete_bewegung.fuer_bericht(
+        project, date.fromisoformat(report.stem), report.parent
+    )
+    assert daten["geraete_bewegung"] == json.loads(
+        json.dumps(erwartet, ensure_ascii=False)
+    )
 
 
 def test_second_run_reports_nothing_new(project, fake_http):

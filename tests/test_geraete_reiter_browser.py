@@ -1407,26 +1407,36 @@ def test_eine_neue_eingabe_raeumt_das_alte_diagramm_weg(_seite):
     )
 
 
-def test_der_rueckbau_satz_steht_an_beiden_orten_gleich():
-    """P2-Fix (Code-Prüfung S3-1, 17.09.2026): Der Rückbau-Satz entsteht
-    ZWEIMAL - als initial hidden-Text der Vorlage und als `leer.textContent`
-    in `app.js`, wenn das Tippen im Suchfeld die Auswahl löst. Zwei
-    Umsetzungen derselben Sache laufen auseinander, ohne dass es ein Test
-    merkt - dasselbe Muster wie beim Übersetzungs-Link
-    (`test_die_beschriftung_ist_an_beiden_orten_dieselbe`). Der Text wird
-    aus der VORLAGE ausgelesen und im JS gesucht, nicht hier wiederholt:
-    eine dritte Kopie im Test wäre derselbe Fehler noch einmal."""
-    vorlagen = REPO / "src" / "telco_radar" / "report" / "templates"
-    template = (vorlagen / "geraete.html.j2").read_text(encoding="utf-8")
-    js = (vorlagen / "app.js").read_text(encoding="utf-8")
-    zeile = [z for z in template.splitlines() if 'id="gr-vleer"' in z]
-    assert len(zeile) == 1, "die Vorlage trägt nicht genau eine gr-vleer-Zeile"
-    treffer = re.search(r'id="gr-vleer"[^>]*>(.*?)</p>', zeile[0])
-    assert treffer, "der Rückbau-Satz ließ sich nicht aus der Vorlage auslesen"
-    text = treffer.group(1).strip()
-    assert text, "der Rückbau-Satz ist leer"
-    assert f"leer.textContent = '{text}'" in js, (
-        f"app.js schreibt einen anderen Rückbau-Satz als die Vorlage ({text!r})"
+def test_der_rueckbau_satz_steht_an_beiden_orten_gleich(_seite):
+    """P2-Fix (Code-Prüfung S3-1): Der Rückbau-Satz entsteht zweimal, als
+    verborgener Text der ausgelieferten Seite und als Text, den `app.js`
+    schreibt, wenn das Tippen im Suchfeld die Auswahl löst. Im Browser wird der
+    JS-Weg ausgeführt und sein Text gegen den serverseitig gerenderten
+    gehalten, ohne den Satz hier ein drittes Mal hinzuschreiben."""
+    _frisch(_seite)
+    vom_server = _seite.evaluate(
+        """async (url) => {
+            const html = await (await fetch(url)).text();
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            const el = doc.getElementById('gr-vleer');
+            return el ? {text: el.textContent.trim(), hidden: el.hidden} : null;
+        }""",
+        _seite.url,
+    )
+    assert vom_server is not None, "die ausgelieferte Seite trägt kein #gr-vleer"
+    assert vom_server["text"], "der Rückbau-Satz der Seite ist leer"
+    assert vom_server["hidden"] is True
+
+    assert _waehle_geraet(_seite)
+    assert _seite.eval_on_selector("#gr-vleer", "e => e.hidden") is True
+    _seite.fill("#gr-vsuche", "zzzzgibtesnicht")
+    _seite.wait_for_timeout(200)
+    vom_js = _seite.eval_on_selector(
+        "#gr-vleer", "e => ({text: e.textContent.trim(), hidden: e.hidden})"
+    )
+    assert vom_js["hidden"] is False, "app.js zeigt den Rückbau-Satz nicht"
+    assert vom_js["text"] == vom_server["text"], (
+        f"app.js schreibt {vom_js['text']!r}, die Seite trägt {vom_server['text']!r}"
     )
 
 

@@ -30,10 +30,9 @@ Nicht-Smartphones der Sitemap schliesst `ohne_pfadmuster` vorher aus.
 Vollstaendig heisst deshalb jetzt: jede verbleibende Produktseite hat ihre
 Buendel geliefert.
 
-Frist und Reihenfolge kommen NICHT hartkodiert in diese Datei, sondern
-werden aus den echten Dateien gelesen (`.github/workflows/geraete.yml`,
-`config/geraete_quellen.yaml`) - der Test haengt so direkt am produktiven
-Stand und nicht an einer Kopie, die auseinanderlaufen kann.
+Frist und Reihenfolge kommen NICHT hartkodiert in diese Datei: die Frist ist
+`geraete_pipeline.FRIST_TAGESLAUF`, den Stufe 0 gegen `geraete.yml` haelt, die
+Reihenfolge kommt aus `config/geraete_quellen.yaml`.
 """
 
 import gzip
@@ -46,6 +45,7 @@ from bestand_pfad import lese_wurzel
 import telco_radar.collect.geraete as g
 from telco_radar.collect.geraete import sammle
 from telco_radar.geraete_config import Anbieter, Einstieg, QuellenConfig, lade_quellen
+from telco_radar.geraete_pipeline import FRIST_TAGESLAUF
 
 _FIX = Path(__file__).parent / "fixtures" / "geraete"
 _WURZEL = Path(__file__).parent.parent
@@ -59,23 +59,6 @@ def _fixture(name: str) -> str:
     if pfad.suffix == ".gz":
         return gzip.open(pfad, "rb").read().decode("utf-8", "replace")
     return pfad.read_text(encoding="utf-8")
-
-
-def _lies_geraete_frist_aus_workflow() -> float:
-    """Der Wert, den `geraete.yml` einem CRON-ausgeloesten Lauf mitgibt -
-    also genau der Pfad, ueber den Lauf 52/53 liefen (kein manueller
-    `workflow_dispatch`, `github.event.inputs.frist` bleibt leer)."""
-    text = (_WURZEL / ".github" / "workflows" / "geraete.yml").read_text(
-        encoding="utf-8"
-    )
-    treffer = re.search(
-        r"--frist\s+\"\$\{\{\s*github\.event\.inputs\.frist\s*\|\|\s*(\d+)\s*\}\}\"",
-        text,
-    )
-    assert treffer, (
-        "geraete.yml: die Frist-Fallback-Zeile fehlt oder hat sich geaendert"
-    )
-    return float(treffer.group(1))
 
 
 # --------------------------------------------------------------------------
@@ -214,10 +197,10 @@ def _erwarte_vollstaendigen_congstar_lauf(bilanz, produkt_urls):
 
 
 def test_congstar_bekommt_im_nachbau_von_lauf_53_einen_vollstaendigen_lauf(monkeypatch):
-    """End-to-End mit dem AUSGELIEFERTEN Budget (gelesen aus geraete.yml -
-    heute 1800s). Deckt beide Teile der Abhilfe zusammen ab: Reihenfolge
-    UND groesseres Budget."""
-    frist = _lies_geraete_frist_aus_workflow()
+    """End-to-End mit dem AUSGELIEFERTEN Budget (``FRIST_TAGESLAUF``, das
+    Stufe 0 gegen geraete.yml haelt). Deckt beide Teile der Abhilfe zusammen
+    ab: Reihenfolge UND groesseres Budget."""
+    frist = FRIST_TAGESLAUF
     bilanz, produkt_urls = _congstar_bilanz(monkeypatch, frist)
     _erwarte_vollstaendigen_congstar_lauf(bilanz, produkt_urls)
 
