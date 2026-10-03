@@ -1,31 +1,33 @@
 {
   "permissions": {
     "allow": [
+      "Bash(make pruefen)",
+      "Bash(make schnell)",
+      "Bash(make stand)",
+      "Bash(make:*)",
+      "Bash(.venv/bin/python -m pytest*)",
       "Bash(PYTHONPATH=src pytest*)",
       "Bash(python scripts/validate_sources.py*)",
       "Bash(git status*)",
       "Bash(git diff*)",
       "Bash(git log*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git fetch:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(pytest:*)",
       "Bash(pdftotext*)",
+      "Bash(gh workflow run:*)",
       "Read(src/**)",
       "Read(config/**)",
       "Read(tests/**)",
       "Edit(src/**)",
       "Edit(tests/**)",
       "Edit(config/**)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git push:*)",
-      "Bash(git pull:*)",
-      "Bash(git fetch:*)",
-      "Bash(git status:*)",
-      "Bash(git diff:*)",
-      "Bash(git log:*)",
-      "Bash(python:*)",
-      "Bash(python3:*)",
-      "Bash(pytest:*)",
-      "Bash(make:*)",
-      "Bash(gh workflow run:*)",
+      "Edit(outputs/**)",
       "Edit(.github/**)",
       "Write(.github/**)",
       "Edit(.python-version)",
@@ -33,25 +35,80 @@
     ],
     "deny": [
       "Read(.env*)",
+      "Read(docs/archiv/**)",
       "Edit(site/**)",
-      "Write(site/**)",
-      "Edit(data/state/**)",
-      "Write(data/state/**)",
+      "Edit(data/**)",
+      "Edit(pruef/**)",
+      "Edit(.githooks/**)",
+      "Edit(.claude/settings.json)",
+      "Edit(.importlinter)",
+      "Edit(pyproject.toml)",
+      "Edit(tests/fixtures/bestand/**)",
       "Bash(git add -A*)",
       "Bash(git add .*)",
-      "Bash(rm -rf*)",
-      "Bash(git push --force*)"
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(*--no-verify*)",
+      "Bash(git commit -n*)",
+      "Bash(git config core.hooksPath*)",
+      "Bash(git checkout -- *)",
+      "Bash(git reset --hard*)",
+      "Bash(rm -rf*)"
     ]
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/scripts/claude_hooks.py sitzung",
+            "timeout": 600
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/scripts/claude_hooks.py befehl",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/scripts/claude_hooks.py datei_lesen",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"$CLAUDE_PROJECT_DIR\" && python3 scripts/hook_gezielte_tests.py",
-            "timeout": 120
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.venv/bin/python \"$CLAUDE_PROJECT_DIR\"/scripts/claude_hooks.py nach_edit",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/scripts/claude_hooks.py stop",
+            "timeout": 300
           }
         ]
       }

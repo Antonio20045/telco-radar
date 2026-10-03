@@ -1,30 +1,18 @@
 ---
 name: commit-sicher
-description: Committet die aktuelle Arbeit nach den Regeln dieses Repos, mit allen Prüfungen davor.
+description: Committet die aktuelle Arbeit nach den Regeln dieses Repos, mit der vollen Prüfleiter davor.
 disable-model-invocation: true
 ---
 
 Führe in dieser Reihenfolge aus und brich bei jedem Fehler ab:
 
-1. `git status --short --branch` — zeige mir, was sich geändert hat
-2. Prüfe: Sind Dateien unter `site/`, `data/state/` oder `data/reports/`
-   dabei? Falls ja, STOPP und frage nach. Das sind fast immer Artefakte
-   eines lokalen Laufs und gehören nicht in den Commit.
-3. `git diff --check`
-4. `PYTHONPATH=src pytest -q`
-5. `git add` nur der gezielt genannten Dateien. Niemals `-A` oder `.`
-6. Commit mit einer Nachricht in der Form `bereich: kurze beschreibung`
-7. Auf den AKTUELLEN Branch pushen, nicht blind auf `main`:
-   ```bash
-   BRANCH=$(git rev-parse --abbrev-ref HEAD)
-   git pull --rebase origin "$BRANCH" 2>/dev/null || true
-   git push -u origin "$BRANCH"
-   ```
-   Sitzungen dieses Repos arbeiten auf `claude/…`-Branches. Ein
-   hartverdrahtetes `origin main` würde Feature-Arbeit auf den
-   Hauptzweig schieben — deshalb wird der Branch gelesen, nicht geraten.
-   Schlägt der Push mit einem Netzwerkfehler fehl: bis zu vier Versuche
-   mit 2 s, 4 s, 8 s, 16 s Wartezeit.
-8. Danach: Nenne mir den Commit-Hash und was als Nächstes zu prüfen ist.
+1. `git status --short --branch`: zeige, was sich geändert hat.
+2. Liegen Dateien unter `site/` oder `data/` darin, STOPP: das sind Artefakte eines lokalen Laufs.
+3. `make pruefen`: grün ist nur Exit 0. Bei Rot die gemeldete Stufe beheben, nie umgehen.
+4. `git add` nur mit Dateinamen, nie `-A` oder `.`.
+5. Commit mit einer Nachricht der Form `bereich: kurze beschreibung`.
+6. `git pull --rebase origin main`, dann `git push origin HEAD:main`; der pre-push prüft erneut.
+   Bei einem Netzfehler bis zu vier Versuche mit 2, 4, 8 und 16 s Pause.
+7. Nenne den Commit-Hash und die Zeile zu Schritt 5 aus `make stand`.
 
 $ARGUMENTS enthält, falls gesetzt, die gewünschte Commit-Nachricht.

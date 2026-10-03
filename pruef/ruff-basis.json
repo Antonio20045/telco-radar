@@ -26,9 +26,6 @@
   "E501": 1,
   "F541": 1
  },
- "scripts/hook_gezielte_tests.py": {
-  "BLE001": 1
- },
  "scripts/kostenrechnung.py": {
   "E501": 2
  },
