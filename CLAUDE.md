@@ -21,6 +21,7 @@ make schnell                     # Leiter Stufen 0, 1, 4 auf den geänderten Dat
 make pruefen                     # volle Leiter 0–3 und 5; grün stempelt den Stand
 make stand                       # zehn Umbauschritte: erfüllt oder offen, weil …
 .venv/bin/python scripts/pruefleiter.py --statisch      # Stufen 0–3
+.venv/bin/python tools/auftrag.py outputs/auftraege/<id>.json   # Auftrag vom roten Test bis zum Merge
 PYTHONPATH=src .venv/bin/python -m pytest -q tests/test_geraete_seite.py
 python -m telco_radar.pipeline --no-llm --root .        # E2E ohne Key, verändert data/ und site/
 python scripts/quellen_zaehlen.py                       # die einzige gültige Quellenzahl

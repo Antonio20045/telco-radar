@@ -6,6 +6,8 @@ Wegwerf-Worktree auf ``HEAD``: kaputter Zeitreihen-Render, Live-Datum, Rot-Probe
 
 import ast
 import contextlib
+import csv
+import importlib
 import json
 import os
 import shutil
@@ -24,6 +26,8 @@ import waechter_regeln
 import waechter_tests
 
 W = waechter.WURZEL
+sys.path.insert(0, str(W / "tools"))
+auftrag_format = importlib.import_module("auftrag_format")
 LIVE_SEITE = "https://telco-radar.onrender.com/geraete.html"
 LIVE_FRIST_SEKUNDEN = 20
 LIVE_TAGE_ALT = 1
@@ -148,6 +152,19 @@ def ungepruefte() -> list[str]:
     mehr = f" und {anzahl - 10} weitere" if anzahl > 10 else ""
     ohne = "" if befund.stempel_gefunden else ", kein Stempel in diesem Klon"
     return [f"{anzahl} ungeprüfte Commits ({kurz}{mehr}{ohne})"]
+
+
+def echter_auftrag() -> list[str]:
+    """Verlangt einen Auftrag, den ein echter Agent bis zum Merge brachte."""
+    datei = W / auftrag_format.KOSTEN
+    if not datei.is_file():
+        return [f"{auftrag_format.KOSTEN} fehlt"]
+    with datei.open(encoding="utf-8") as f:
+        zeilen = list(csv.DictReader(f))
+    echt = (auftrag_format.GEMERGT, auftrag_format.ECHTER_AGENT)
+    if any((z.get("ergebnis"), z.get("agent")) == echt for z in zeilen):
+        return []
+    return ["kein Auftrag eines echten Agenten bis zum Merge"]
 
 
 def _fehlt(*pfade: str) -> list[str]:
@@ -281,7 +298,7 @@ def offen() -> dict[str, list[str]]:
         + ungepruefte()
         + _vorcommit_median()
         + _mehr("Zeilen CLAUDE.md", _zeilen("CLAUDE.md"), 100),
-        "6 Auftragsablauf": _fehlt("tools/auftrag.py", "outputs/auftraege/kosten.csv"),
+        "6 Auftragsablauf": _fehlt("tools/auftrag.py") + echter_auftrag(),
         "7 Kommentarabbau": _fehlt("pruef/kommentar-basis.txt"),
         "8 Promo-IDs": _fehlt("outputs/auftraege/T1.json", "tests/orakel"),
         "9 Lader, render_site": _mehr("Hex-Farben", summe.get("hexfarbe", 0))
