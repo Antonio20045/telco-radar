@@ -1,6 +1,7 @@
 [importlinter]
 root_packages =
     telco_radar
+    tests
 include_external_packages = True
 
 [importlinter:contract:schichten]
@@ -82,3 +83,31 @@ ignore_imports =
     telco_radar.collect.geraete -> telco_radar.collect.geraete.saturn
     telco_radar.collect.geraete -> telco_radar.collect.geraete.telekom
     telco_radar.collect.geraete -> telco_radar.collect.geraete.vodafone
+
+[importlinter:contract:orakel]
+name = Orakel rechnen ohne den Code, den sie pruefen
+type = forbidden
+source_modules =
+    tests.orakel
+forbidden_modules =
+    telco_radar.analyze
+    telco_radar.collect
+    telco_radar.dedupe
+    telco_radar.geraete_config
+    telco_radar.geraete_fragment
+    telco_radar.geraete_model
+    telco_radar.geraete_pipeline
+    telco_radar.models
+    telco_radar.newsletter
+    telco_radar.pipeline
+    telco_radar.promo_bilder
+    telco_radar.promo_config
+    telco_radar.promo_pipeline
+    telco_radar.quellen_register
+    telco_radar.tarif_bezug
+    telco_radar.tarif_model
+    telco_radar.tco_model
+    telco_radar.textwerkzeug
+    telco_radar.uebersetzung
+    telco_radar.versand
+allow_indirect_imports = True
