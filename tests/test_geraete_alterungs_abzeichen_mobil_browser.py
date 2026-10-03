@@ -22,13 +22,10 @@ from __future__ import annotations
 
 import contextlib
 import functools
-import glob
 import http.server
 import pathlib
 import socket
 import threading
-
-import pytest
 
 from telco_radar.report import geraete_zeitreihe as gz
 from telco_radar.report.anbieter_farben import in_stylesheet
@@ -54,21 +51,6 @@ _BUNDLE_KOPF = """
 </details>
 </div>
 """
-
-
-def _chromium():
-    for muster in (
-        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-        str(
-            pathlib.Path.home()
-            / ".cache/ms-playwright"
-            / "chromium*/chrome-linux*/chrome"
-        ),
-    ):
-        treffer = sorted(glob.glob(muster))
-        if treffer:
-            return treffer[-1]
-    return None
 
 
 @contextlib.contextmanager
@@ -102,18 +84,12 @@ def _seite(tmp_path: pathlib.Path) -> pathlib.Path:
     return tmp_path
 
 
-def test_das_abzeichen_bleibt_ein_zusammenhaengender_rahmen(tmp_path):
-    sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt"
-    ).sync_playwright
+def test_das_abzeichen_bleibt_ein_zusammenhaengender_rahmen(tmp_path, chromium):
     root = _seite(tmp_path)
-    exe = _chromium()
-    with _server(root) as basis, sync_playwright() as p:
-        browser = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
+    with _server(root) as basis:
+        kontext = chromium.new_context(viewport={"width": 390, "height": 400})
         try:
-            page = browser.new_context(
-                viewport={"width": 390, "height": 400}
-            ).new_page()
+            page = kontext.new_page()
             page.goto(f"{basis}/index.html", wait_until="load")
             rechtecke = page.eval_on_selector(
                 ".gr-kk-marke--alt", "e => e.getClientRects().length"
@@ -122,7 +98,7 @@ def test_das_abzeichen_bleibt_ein_zusammenhaengender_rahmen(tmp_path):
                 ".gr-kk-marke--alt", "e => getComputedStyle(e).display"
             )
         finally:
-            browser.close()
+            kontext.close()
     # QA-Fix 24.09.2026 (Punkt 7): INNERHALB `.gr-bnd-an` ist das Abzeichen
     # jetzt `block` statt `inline-block` (volle Zeilenbreite, siehe
     # `test_geraete_buendel_mobil_abzeichen_browser.py`) - beide sind

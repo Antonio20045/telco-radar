@@ -18,33 +18,14 @@ from __future__ import annotations
 
 import contextlib
 import functools
-import glob
 import http.server
 import pathlib
 import socket
 import threading
 from datetime import date, timedelta
 
-import pytest
-
 from telco_radar.report import geraete_zeitreihe as gz
 from telco_radar.report.anbieter_farben import in_stylesheet
-
-
-def _chromium():
-    for muster in (
-        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-        str(
-            pathlib.Path.home()
-            / ".cache/ms-playwright"
-            / "chromium*/chrome-linux*/chrome"
-        ),
-        "/Applications/Chromium.app/Contents/MacOS/Chromium",
-    ):
-        treffer = sorted(glob.glob(muster))
-        if treffer:
-            return treffer[-1]
-    return None
 
 
 @contextlib.contextmanager
@@ -87,16 +68,11 @@ def _dichte_seite(tmp_path: pathlib.Path, breit: bool) -> pathlib.Path:
     return tmp_path
 
 
-def _messe_ueberlapp(tmp_path, breite_px, breit):
-    sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt"
-    ).sync_playwright
+def _messe_ueberlapp(tmp_path, chromium, breite_px, breit):
     root = _dichte_seite(tmp_path, breit)
-    exe = _chromium()
-    with _server(root) as basis, sync_playwright() as p:
-        browser = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
+    with _server(root) as basis:
+        context = chromium.new_context(viewport={"width": breite_px, "height": 700})
         try:
-            context = browser.new_context(viewport={"width": breite_px, "height": 700})
             page = context.new_page()
             page.goto(f"{basis}/index.html", wait_until="load")
             boxen = page.eval_on_selector_all(
@@ -107,12 +83,12 @@ def _messe_ueberlapp(tmp_path, breite_px, breit):
                 "text: e.textContent};})",
             )
         finally:
-            browser.close()
+            context.close()
     return boxen
 
 
-def test_x_labels_ueberlappen_nicht_schmal_390px(tmp_path):
-    boxen = _messe_ueberlapp(tmp_path, 390, breit=False)
+def test_x_labels_ueberlappen_nicht_schmal_390px(tmp_path, chromium):
+    boxen = _messe_ueberlapp(tmp_path, chromium, 390, breit=False)
     assert len(boxen) >= 2, "zu wenige X-Labels fuer eine Ueberlapp-Probe"
     boxen.sort(key=lambda b: b["links"])
     for a, b in zip(boxen, boxen[1:]):
@@ -123,8 +99,8 @@ def test_x_labels_ueberlappen_nicht_schmal_390px(tmp_path):
         )
 
 
-def test_x_labels_ueberlappen_nicht_breit_1440px(tmp_path):
-    boxen = _messe_ueberlapp(tmp_path, 1440, breit=True)
+def test_x_labels_ueberlappen_nicht_breit_1440px(tmp_path, chromium):
+    boxen = _messe_ueberlapp(tmp_path, chromium, 1440, breit=True)
     assert len(boxen) >= 2, "zu wenige X-Labels fuer eine Ueberlapp-Probe"
     boxen.sort(key=lambda b: b["links"])
     for a, b in zip(boxen, boxen[1:]):

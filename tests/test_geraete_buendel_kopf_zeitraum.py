@@ -41,7 +41,6 @@ from test_geraete_browser_fixture import (
     _KATALOG,
     _FARBEN,
     _QUELLEN,
-    _chromium,
     _listung,
     _server,
     _sku,
@@ -371,27 +370,14 @@ def test_ohne_gemessenen_zeitraum_bleibt_die_sortiergruppe_leer():
 
 
 @contextlib.contextmanager
-def _browser_ctx(site):
-    sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt"
-    ).sync_playwright
-    exe = _chromium()
-    with _server(site) as wurzel, sync_playwright() as p:
-        try:
-            browser = (
-                p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
-            )
-        except Exception:  # noqa: BLE001
-            pytest.skip("kein Chromium gefunden")
-        try:
-            yield wurzel, browser
-        finally:
-            browser.close()
+def _browser_ctx(site, chromium):
+    with _server(site) as wurzel:
+        yield wurzel, chromium
 
 
 @pytest.fixture(scope="module")
-def ctx(site):
-    with _browser_ctx(site) as c:
+def ctx(site, chromium):
+    with _browser_ctx(site, chromium) as c:
         yield c
 
 

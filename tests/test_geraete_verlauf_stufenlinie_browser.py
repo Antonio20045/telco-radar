@@ -31,7 +31,6 @@ from telco_radar.report.html import render_site
 
 from test_geraete_browser_fixture import (
     HEUTE,
-    _chromium,
     _KATALOG,
     _FARBEN,
     _listung,
@@ -168,26 +167,18 @@ def _baue(tmp_path):
 
 
 @contextlib.contextmanager
-def _browser_ctx(tmp_path_factory):
-    sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt"
-    ).sync_playwright
+def _browser_ctx(tmp_path_factory, chromium):
     site = _baue(tmp_path_factory.mktemp("stufenlinie"))
-    exe = _chromium()
-    with _server(site) as wurzel, sync_playwright() as p:
-        browser = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
-        try:
-            yield wurzel, browser
-        finally:
-            browser.close()
+    with _server(site) as wurzel:
+        yield wurzel, chromium
 
 
 @pytest.fixture(scope="module")
-def _browser_paar(tmp_path_factory):
-    # EIN sync_playwright()-Kontext je Modul: ein zweiter, gleichzeitig
-    # offener stoesst auf "Sync API inside the asyncio loop" (siehe
-    # `test_ohne_attribut_keine_ausnahme_und_keine_luecken_punktierung`).
-    with _browser_ctx(tmp_path_factory) as (wurzel, browser):
+def _browser_paar(tmp_path_factory, chromium):
+    # EIN Playwright-Start je Sitzung (Fixture `chromium`): ein zweiter,
+    # gleichzeitig offener stoesst auf "Sync API inside the asyncio loop"
+    # (siehe `test_ohne_attribut_keine_ausnahme_und_keine_luecken_punktierung`).
+    with _browser_ctx(tmp_path_factory, chromium) as (wurzel, browser):
         yield wurzel, browser
 
 

@@ -1477,24 +1477,6 @@ def test_zaehlwerte_tragen_die_hausklasse(tmp_path):
 # --------------------------------------------------------------------------
 
 
-def _chromium():
-    """Dieselbe Suche wie in tests/test_falz_browser.py - zwei Orte, weil es
-    zwei Maschinen gibt (Sandbox und GitHub-Runner). Nur den ersten zu
-    kennen hiesse, dass dieser Test auf der Maschine schweigt, die Merges
-    absichert - und ein Skip sieht im Protokoll aus wie ein Erfolg."""
-    import glob
-
-    for muster in (
-        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-        str(Path.home() / ".cache/ms-playwright" / "chromium*/chrome-linux*/chrome"),
-        "/Applications/Chromium.app/Contents/MacOS/Chromium",
-    ):
-        treffer = sorted(glob.glob(muster))
-        if treffer:
-            return treffer[-1]
-    return None
-
-
 @pytest.fixture(scope="module")
 def _gebaut(tmp_path_factory):
     return _baue(tmp_path_factory.mktemp("geraete-browser"))
@@ -1502,7 +1484,7 @@ def _gebaut(tmp_path_factory):
 
 @pytest.mark.parametrize("seite", ["geraete.html", "geraete-quellen.html"])
 @pytest.mark.parametrize("breite,hoehe", [(1440, 900), (390, 844)])
-def test_keine_seite_rollt_waagerecht(_gebaut, seite, breite, hoehe):
+def test_keine_seite_rollt_waagerecht(_gebaut, chromium, seite, breite, hoehe):
     """Die Preistabelle und die Bewegungsliste sind breiter als ein Telefon.
     Sie muessen IN SICH rollen - eine Seite, die waagerecht rollt, ist auf
     dem Telefon unbenutzbar. Gemessen, weil man es im HTML nicht sieht:
@@ -1514,13 +1496,6 @@ def test_keine_seite_rollt_waagerecht(_gebaut, seite, breite, hoehe):
     import socket
     import threading
 
-    pytest.importorskip("playwright.sync_api")
-    from playwright.sync_api import sync_playwright
-
-    exe = _chromium()
-    if exe is None:
-        pytest.skip("kein Chromium gefunden")
-
     s = socket.socket()
     s.bind(("127.0.0.1", 0))
     port = s.getsockname()[1]
@@ -1531,11 +1506,8 @@ def test_keine_seite_rollt_waagerecht(_gebaut, seite, breite, hoehe):
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", port), handler)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     try:
-        with sync_playwright() as pw:
-            browser = pw.chromium.launch(
-                executable_path=exe, args=["--no-sandbox", "--disable-dev-shm-usage"]
-            )
-            page = browser.new_page(viewport={"width": breite, "height": hoehe})
+        page = chromium.new_page(viewport={"width": breite, "height": hoehe})
+        try:
             page.goto(f"http://127.0.0.1:{port}/{seite}")
             page.wait_for_timeout(250)
             rollt = page.evaluate(
@@ -1550,7 +1522,8 @@ def test_keine_seite_rollt_waagerecht(_gebaut, seite, breite, hoehe):
                      .map(e => e.tagName + '.' + (e.className.baseVal !== undefined
                                                   ? e.className.baseVal : e.className))"""
             )
-            browser.close()
+        finally:
+            page.close()
     finally:
         httpd.shutdown()
     assert not rollt, f"{seite} bei {breite}px: waagerechter Ueberlauf ({schuldige})"

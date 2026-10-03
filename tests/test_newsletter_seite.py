@@ -9,7 +9,6 @@ zusammenhalten.
 """
 
 import json
-import os
 import re
 import shutil
 from pathlib import Path
@@ -329,16 +328,6 @@ def test_die_abschlussseiten_sind_statisch_und_ohne_dienst(tmp_path):
 # =====================================  Vorschau: Browser gegen Python  ====
 
 
-def _browser():
-    for kandidat in (
-        "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
-        os.environ.get("CHROMIUM_PFAD", ""),
-    ):
-        if kandidat and Path(kandidat).exists():
-            return kandidat
-    return None
-
-
 def _index_zum_stichtag(tmp_path, site):
     """Den Index auf den TAG DER JUENGSTEN AUSGABE stellen.
 
@@ -377,7 +366,7 @@ def test_der_index_liegt_neben_der_seite(tmp_path):
 
 
 @pytest.mark.parametrize("begriff", ["telekom", "netz", "starlink", "tarif"])
-def test_die_browser_vorschau_sagt_dasselbe_wie_python(tmp_path, begriff):
+def test_die_browser_vorschau_sagt_dasselbe_wie_python(tmp_path, chromium, begriff):
     """Der Test, um den es geht.
 
     Die Seite kann `vorschau()` nicht aufrufen - sie zaehlt im Browser gegen
@@ -385,18 +374,13 @@ def test_die_browser_vorschau_sagt_dasselbe_wie_python(tmp_path, begriff):
     falsche steht auf der Seite. Gemessen wird deshalb im ECHTEN Browser
     gegen die ECHTE Indexdatei, nicht gegen eine nachgebaute Rechnung.
     """
-    pfad = _browser()
-    if not pfad:
-        pytest.skip("kein Chromium")
-    from playwright.sync_api import sync_playwright
     from telco_radar.newsletter.filters import vorschau
 
     site = _projekt(tmp_path, vollstaendig=True, dienst="https://x.invalid")
     index, reports, stand = _index_zum_stichtag(tmp_path, site)
 
-    with sync_playwright() as pw:
-        browser = pw.chromium.launch(executable_path=pfad)
-        seite = browser.new_page()
+    seite = chromium.new_page()
+    try:
         seite.goto("file://" + str((site / "newsletter.html").resolve()))
         # Die Rechnung des Browsers, mit dem Index aus der Datei gefuettert.
         im_browser = seite.evaluate(
@@ -408,7 +392,8 @@ def test_die_browser_vorschau_sagt_dasselbe_wie_python(tmp_path, begriff):
                }""",
             [index, begriff, 4],
         )
-        browser.close()
+    finally:
+        seite.close()
 
     in_python = vorschau(begriff, reports, tage=index["tage"], heute=stand)
     assert im_browser == in_python, (

@@ -34,7 +34,6 @@ from telco_radar.report.html import render_site
 
 from test_geraete_browser_fixture import (
     HEUTE,
-    _chromium,
     _KATALOG,
     _FARBEN,
     _listung,
@@ -185,24 +184,20 @@ def _baue(tmp_path):
 
 
 @contextlib.contextmanager
-def _browser_ctx(tmp_path_factory):
-    sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt"
-    ).sync_playwright
+def _browser_ctx(tmp_path_factory, chromium):
     site = _baue(tmp_path_factory.mktemp("o4verlauf"))
-    exe = _chromium()
-    with _server(site) as wurzel, sync_playwright() as p:
-        browser = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
-        try:
-            yield site, wurzel, browser
-        finally:
-            browser.close()
+    with _server(site) as wurzel:
+        yield site, wurzel, chromium
 
 
 @pytest.fixture(scope="module")
-def lage(tmp_path_factory):
-    with _browser_ctx(tmp_path_factory) as (site, wurzel, browser):
-        yield wurzel, browser.new_page()
+def lage(tmp_path_factory, chromium):
+    with _browser_ctx(tmp_path_factory, chromium) as (site, wurzel, browser):
+        seite = browser.new_page()
+        try:
+            yield wurzel, seite
+        finally:
+            seite.close()
 
 
 def _oeffne_verlauf(wurzel, seite, modell=None):

@@ -32,7 +32,6 @@ from __future__ import annotations
 
 import contextlib
 import functools
-import glob
 import http.server
 import shutil
 import socket
@@ -54,19 +53,6 @@ REPO = Path(__file__).resolve().parents[1]
 # waere eine Wette (CLAUDE.md zum Zeitungskopf). Der Fehler, um den es geht,
 # war 110 px gross.
 TOLERANZ = 4
-
-
-def _chromium() -> str | None:
-    """Beide Orte - Sandbox-Image und GitHub-Runner. Siehe
-    tests/test_falz_browser.py."""
-    for muster in (
-        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-        str(Path.home() / ".cache/ms-playwright" / "chromium*/chrome-linux*/chrome"),
-    ):
-        treffer = sorted(glob.glob(muster))
-        if treffer:
-            return treffer[-1]
-    return None
 
 
 @contextlib.contextmanager
@@ -113,14 +99,10 @@ _MESSUNG = """() => {
 
 
 @pytest.fixture(scope="module")
-def _bloecke(tmp_path_factory):
+def _bloecke(tmp_path_factory, chromium):
     """Ein Browserstart, die echte Promo Uebersicht, alle Kartenmasse."""
-    sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt - Browser-Messung entfaellt"
-    ).sync_playwright
     if not (REPO / "data" / "state" / "promo_db.json").exists():
         pytest.skip("kein Promo-Bestand im Repo")
-    pfad = _chromium()
     site = tmp_path_factory.mktemp("promoraster") / "site"
     # Gegen die WIRKLICHEN Daten und mit `cfg` - ohne den dritten Parameter
     # rendert render_site() eine stillschweigend halbe Seite (CLAUDE.md §6).
@@ -128,13 +110,9 @@ def _bloecke(tmp_path_factory):
     if not (site / "promo" / "index.html").exists():
         pytest.skip("keine Promo Uebersicht gerendert")
 
-    with _server(site) as wurzel, sync_playwright() as p:
+    with _server(site) as wurzel:
+        seite = chromium.new_page(viewport={"width": 1440, "height": 900})
         try:
-            browser = p.chromium.launch(**({"executable_path": pfad} if pfad else {}))
-        except Exception as exc:  # noqa: BLE001
-            pytest.skip(f"Chromium startet nicht ({str(exc)[:80]})")
-        try:
-            seite = browser.new_page(viewport={"width": 1440, "height": 900})
             seite.goto(f"{wurzel}/promo/index.html", wait_until="networkidle")
             # Ohne Durchscrollen bleiben die `loading="lazy"`-Bilder
             # ungeladen, und `naturalWidth` ist dann 0.
@@ -146,7 +124,7 @@ def _bloecke(tmp_path_factory):
             seite.wait_for_timeout(1200)
             daten = seite.evaluate(_MESSUNG)
         finally:
-            browser.close()
+            seite.close()
     if not daten:
         pytest.skip("keine Markenbloecke auf der Seite")
     return daten
@@ -266,14 +244,10 @@ def _synth_entry(brand: str, n: int) -> dict:
 
 
 @pytest.fixture(scope="module")
-def _rasterluecken_bloecke(tmp_path_factory):
+def _rasterluecken_bloecke(tmp_path_factory, chromium):
     """Zwei kuenstliche Markenbloecke: eine mit genau EINER, eine mit genau
     DREI weiteren Karten - die beiden live gemessenen Bugfaelle vom
     27.08.2026, unabhaengig vom aktuellen Datenbestand nachgebaut."""
-    sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt - Browser-Messung entfaellt"
-    ).sync_playwright
-    pfad = _chromium()
 
     sources = [
         PromoSource(
@@ -308,17 +282,13 @@ def _rasterluecken_bloecke(tmp_path_factory):
     )
     (site / "index.html").write_text(html, encoding="utf-8")
 
-    with _server(site) as wurzel, sync_playwright() as p:
+    with _server(site) as wurzel:
+        seite = chromium.new_page(viewport={"width": 1440, "height": 900})
         try:
-            browser = p.chromium.launch(**({"executable_path": pfad} if pfad else {}))
-        except Exception as exc:  # noqa: BLE001
-            pytest.skip(f"Chromium startet nicht ({str(exc)[:80]})")
-        try:
-            seite = browser.new_page(viewport={"width": 1440, "height": 900})
             seite.goto(f"{wurzel}/index.html", wait_until="networkidle")
             daten = seite.evaluate(_MESSUNG_RASTER)
         finally:
-            browser.close()
+            seite.close()
     if not daten:
         pytest.skip("keine Markenbloecke gerendert")
     return {b["marke"]: b for b in daten}

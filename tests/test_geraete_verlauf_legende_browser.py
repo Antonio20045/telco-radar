@@ -17,8 +17,8 @@ from test_geraete_verlauf_chart_mobil_browser import _REIHEN, _browser_ctx
 
 
 @pytest.fixture(scope="module")
-def seite(tmp_path_factory):
-    with _browser_ctx(tmp_path_factory) as (wurzel, browser):
+def seite(tmp_path_factory, chromium):
+    with _browser_ctx(tmp_path_factory, chromium) as (wurzel, browser):
         ctx = browser.new_context(viewport={"width": 1440, "height": 900})
         s = ctx.new_page()
         s.goto(f"{wurzel}/geraete.html", wait_until="networkidle")

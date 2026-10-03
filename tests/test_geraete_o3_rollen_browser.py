@@ -28,7 +28,6 @@ from telco_radar.report.html import render_site
 
 from test_geraete_browser_fixture import (
     HEUTE,
-    _chromium,
     _KATALOG,
     _FARBEN,
     _listung,
@@ -164,31 +163,15 @@ def _baue(tmp_path):
 
 
 @contextlib.contextmanager
-def _browser_ctx(tmp_path_factory):
-    sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt"
-    ).sync_playwright
+def _browser_ctx(tmp_path_factory, chromium):
     site = _baue(tmp_path_factory.mktemp("o3rollen"))
-    exe = _chromium()
-    with _server(site) as wurzel, sync_playwright() as p:
-        # Dasselbe Muster wie der O1-Browsertest: `launch()` ohne Pfad
-        # nimmt den von Playwright verwalteten Browser (auf dem Mac der
-        # einzige Fund - `_chromium()` kennt nur die Linux-Ablagen).
-        try:
-            browser = (
-                p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
-            )
-        except Exception:  # noqa: BLE001
-            pytest.skip("kein Chromium gefunden")
-        try:
-            yield site, wurzel, browser
-        finally:
-            browser.close()
+    with _server(site) as wurzel:
+        yield site, wurzel, chromium
 
 
 @pytest.fixture(scope="module")
-def ctx(tmp_path_factory):
-    with _browser_ctx(tmp_path_factory) as c:
+def ctx(tmp_path_factory, chromium):
+    with _browser_ctx(tmp_path_factory, chromium) as c:
         yield c
 
 

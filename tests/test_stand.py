@@ -40,6 +40,12 @@ def projekt(tmp_path, monkeypatch):
     (tmp_path / "pruef/waechter-basis.txt").write_text(
         "src/a.py uhr 2\nsrc/b.py uhr 1\nsrc/a.py breite-ausnahme 40\n", "utf-8"
     )
+    (tmp_path / "pruef/tests-basis.txt").write_text(
+        "tests/test_a.py uhr 2\ntests/test_b.py uhr 1\n"
+        "tests/test_a.py chromium-eigenes 1\n",
+        "utf-8",
+    )
+    (tmp_path / "pruef/tests-mit-bestand.txt").write_text("tests/test_a.py\n", "utf-8")
     (tmp_path / ".importlinter").write_text(_VERTRAEGE, "utf-8")
     monkeypatch.setattr(stand, "W", tmp_path)
     monkeypatch.setattr(stand, "rot_proben", lambda: ["Rot-Proben gemessen"])
@@ -78,6 +84,28 @@ def test_gruende_nennen_die_gemessenen_zahlen(projekt):
         "breite except 40, Ziel 39",
     ]
     assert "src/telco_radar/report/html.py fehlt" in offen["9 Lader, render_site"]
+
+
+def test_hermetische_tests_nennen_altlasten_umgehungen_und_laufzeit(projekt):
+    assert stand.offen()["4 Hermetische Tests"] == [
+        "Testdateien mit Bestand 1, Ziel 0",
+        "chromium-eigenes in Tests 1, Ziel 0",
+        "uhr in Tests 3, Ziel 0",
+        "keine Teststufe in .pruefleiter/zeiten.csv",
+        "tests/fixtures/bestand fehlt",
+    ]
+    (projekt / ".pruefleiter").mkdir()
+    (projekt / ".pruefleiter/zeiten.csv").write_text(
+        "t1,Tests,250.4,gruen\nt2,1 Lint,3.0,gruen\nt3,Tests,239.6,gruen\n", "utf-8"
+    )
+    (projekt / "tests/fixtures/bestand").mkdir(parents=True)
+    (projekt / "pruef/tests-mit-bestand.txt").write_text("", "utf-8")
+    (projekt / "pruef/tests-basis.txt").write_text("", "utf-8")
+    assert stand.offen()["4 Hermetische Tests"] == []
+    (projekt / ".pruefleiter/zeiten.csv").write_text("t1,Tests,240.6,rot\n", "utf-8")
+    assert stand.offen()["4 Hermetische Tests"] == [
+        "Sekunden der letzten Teststufe 241, Ziel 240"
+    ]
 
 
 def test_uhr_in_der_einstiegsdatei_ausserhalb_der_funktion_zaehlt_mit(projekt):

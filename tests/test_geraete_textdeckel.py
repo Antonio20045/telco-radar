@@ -22,7 +22,6 @@ prüfte nichts.
 
 from __future__ import annotations
 
-import glob
 import importlib.util
 from pathlib import Path
 
@@ -154,26 +153,6 @@ def test_die_200_zeichen_grenze_ist_genau_der_datenblock_fall():
 # ---- 3. Klickbarkeit zeigt sich (echter Browser, echte style.css) -----
 
 
-def _chromium() -> str | None:
-    for muster in (
-        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-        str(
-            Path.home()
-            / "Library/Caches/ms-playwright"
-            / "chromium*/chrome-mac*/Google Chrome for Testing.app"
-            / "Contents/MacOS/Google Chrome for Testing"
-        ),
-        str(Path.home() / ".cache/ms-playwright" / "chromium*/chrome-linux*/chrome"),
-    ):
-        treffer = sorted(glob.glob(muster))
-        if treffer:
-            return treffer[-1]
-    # None heisst "nimm den Browser, den Playwright selbst verwaltet" -
-    # dieselbe Rueckfalloption wie pruefe_portal (Phase 6a: ein
-    # uebersprungenes Kriterium sieht in der Bilanz aus wie ein bestandenes).
-    return None
-
-
 def _style() -> str:
     return (
         REPO / "src" / "telco_radar" / "report" / "templates" / "style.css"
@@ -181,18 +160,12 @@ def _style() -> str:
 
 
 @pytest.fixture(scope="module")
-def seite():
-    playwright = pytest.importorskip("playwright.sync_api")
+def seite(chromium):
+    page = chromium.new_page(viewport={"width": 1440, "height": 900})
     try:
-        ctx = playwright.sync_playwright()
-        pw = ctx.start()
-        browser = pw.chromium.launch(executable_path=_chromium())
-    except Exception as exc:  # noqa: BLE001 - kein Browser, kein Messwert
-        pytest.skip(f"Chromium startet nicht ({type(exc).__name__})")
-    page = browser.new_page(viewport={"width": 1440, "height": 900})
-    yield page
-    browser.close()
-    pw.stop()
+        yield page
+    finally:
+        page.close()
 
 
 def test_je_summary_der_geraeteseite_zeiger_und_caret(seite):

@@ -17,7 +17,6 @@ from __future__ import annotations
 
 import contextlib
 import functools
-import glob
 import http.server
 import json
 import pathlib
@@ -54,22 +53,6 @@ def _baue_site(tmp_path: pathlib.Path) -> pathlib.Path:
     return site
 
 
-def _chromium():
-    for muster in (
-        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-        str(
-            pathlib.Path.home()
-            / ".cache/ms-playwright"
-            / "chromium*/chrome-linux*/chrome"
-        ),
-        "/Applications/Chromium.app/Contents/MacOS/Chromium",
-    ):
-        treffer = sorted(glob.glob(muster))
-        if treffer:
-            return treffer[-1]
-    return None
-
-
 @contextlib.contextmanager
 def _server(site: pathlib.Path):
     s = socket.socket()
@@ -88,16 +71,10 @@ def _server(site: pathlib.Path):
 
 
 @pytest.fixture(scope="module")
-def _browser_seite(tmp_path_factory):
-    sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt"
-    ).sync_playwright
+def _browser_seite(tmp_path_factory, chromium):
     site = _baue_site(tmp_path_factory.mktemp("zrbrowser"))
-    exe = _chromium()
-    with _server(site) as basis, sync_playwright() as p:
-        browser = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
-        yield browser, basis
-        browser.close()
+    with _server(site) as basis:
+        yield chromium, basis
 
 
 @contextlib.contextmanager

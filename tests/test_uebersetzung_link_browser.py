@@ -23,7 +23,6 @@ from __future__ import annotations
 
 import contextlib
 import functools
-import glob
 import http.server
 import json
 import shutil
@@ -45,20 +44,6 @@ REPO = Path(__file__).resolve().parents[1]
 # Ruecklaufschrift, und eine Kalibrierung auf eine Schrift ist eine Wette
 # (siehe CLAUDE.md zum Zeitungskopf).
 HOECHSTHOEHE = 22
-
-
-def _chromium() -> str | None:
-    """Beide Orte - Sandbox-Image und GitHub-Runner. Siehe
-    tests/test_falz_browser.py: nur den ersten zu kennen heisst, dass der
-    Test auf der Maschine schweigt, die Merges absichert."""
-    for muster in (
-        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-        str(Path.home() / ".cache/ms-playwright" / "chromium*/chrome-linux*/chrome"),
-    ):
-        treffer = sorted(glob.glob(muster))
-        if treffer:
-            return treffer[-1]
-    return None
 
 
 @contextlib.contextmanager
@@ -135,23 +120,15 @@ def _baue(tmp_path: Path) -> Path:
 
 
 @pytest.fixture(scope="module")
-def _links(tmp_path_factory):
+def _links(tmp_path_factory, chromium):
     """Ein Browserstart, zwei Seiten, alle Linkmasse."""
-    sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt - Browser-Messung entfaellt"
-    ).sync_playwright
-    pfad = _chromium()
     site = _baue(tmp_path_factory.mktemp("ueblink"))
 
     messung: dict[str, list[dict]] = {}
-    with _server(site) as wurzel, sync_playwright() as p:
-        try:
-            browser = p.chromium.launch(**({"executable_path": pfad} if pfad else {}))
-        except Exception as exc:  # noqa: BLE001
-            pytest.skip(f"Chromium startet nicht ({str(exc)[:80]})")
-        try:
-            for seite_name in ("index.html", "meldungen.html"):
-                seite = browser.new_page(viewport={"width": 1440, "height": 900})
+    with _server(site) as wurzel:
+        for seite_name in ("index.html", "meldungen.html"):
+            seite = chromium.new_page(viewport={"width": 1440, "height": 900})
+            try:
                 seite.goto(f"{wurzel}/{seite_name}", wait_until="load")
                 # Die Ressortbloecke sind <details> und liefern zugeklappt
                 # keine Masse.
@@ -176,9 +153,8 @@ def _links(tmp_path_factory):
                             farbe: s.color});
                     });
                     return raus;})()""")
+            finally:
                 seite.close()
-        finally:
-            browser.close()
     return messung
 
 

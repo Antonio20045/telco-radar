@@ -14,6 +14,7 @@ from pathlib import Path
 PLUGIN_ORDNER = Path(__file__).resolve().parent / "leiter_plugin"
 PLUGIN = "leiter_roh"
 ROH_VARIABLE = "TELCO_LEITER_ROH"
+BESTAND_VARIABLE = "TELCO_TESTS_BESTAND_PROTOKOLL"
 _GESAMMELT = re.compile(
     r"^\d+ workers? \[(\d+) items?\]$"
     r"|^collected \d+ items?(?: / \d+ deselected)? / (\d+) selected"
@@ -22,6 +23,10 @@ _GESAMMELT = re.compile(
 )
 _SCHLUSSZEILE = re.compile(r"^=+ (.+) in [\d.]+s(?: \([\d:]+\))? =+$", re.MULTILINE)
 _NICHT_AUSGEFUEHRT = re.compile(r"(\d+) (?:skipped|xfailed)\b")
+# Diese Kanarienvögel greifen auf den Bestand und ins Netz; ihr Scheitern muss die Regel
+# der Testumgebung nennen, sonst ist die Hermetik aus tests/conftest.py abgeschaltet.
+HERMETIK_KANARIEN = ("test_bestand_muss_scheitern", "test_netz_muss_scheitern")
+HERMETIK_REGEL = "Regel hermetisch"
 _PARAMETER = re.compile(r"^(?P<basis>[^\[]+)(?:\[(?P<id>.*)\])?$")
 
 
@@ -161,6 +166,11 @@ def lies_roh(ordner: Path) -> dict[str, str]:
     return roh
 
 
+def lies_zugriffe(ordner: Path) -> set[str]:
+    """Die Testdateien, die laut ``tests/conftest.py`` auf den Bestand zugriffen."""
+    return {z for d in ordner.glob("*.txt") for z in d.read_text("utf-8").split()}
+
+
 def fremde(roh: dict[str, str]) -> list[str]:
     """Nennt jede Testfunktion, die schon vor der Aufzeichnung umhüllt war."""
     return [
@@ -190,7 +200,8 @@ def pruefe_ergebnisse(
 ) -> list[str]:
     """Hält Meldung und Rohaufzeichnung gegeneinander; nimmt den Kanarienvogel aus rot.
 
-    Der Kanarienvogel muss rot gemeldet und roh gescheitert sein, sein Zwilling grün;
+    Der Kanarienvogel muss rot gemeldet und roh gescheitert sein, sein Zwilling grün,
+    die Hermetik-Kanarien rot mit der Regel der Testumgebung;
     jeder andere als bestanden gemeldete Test muss roh ``ok`` sein, und keine
     Testfunktion darf fremd sein, ob rot oder grün gemeldet.
     """
@@ -199,5 +210,12 @@ def pruefe_ergebnisse(
         return [f"{kanarie}: Ergebnisse werden umgeschrieben oder abgewählt"]
     if roh.get(f"{kanarie}::test_muss_scheitern") not in ("fehler", "fremd"):
         return [f"Rohaufzeichnung fehlt: Plugin {PLUGIN} lief nicht"]
+    aus = [
+        f"{kanarie}::{name}: scheitert nicht an der {HERMETIK_REGEL}: Hermetik aus"
+        for name in HERMETIK_KANARIEN
+        if HERMETIK_REGEL not in rot.pop(f"{kanarie}::{name}", "")
+    ]
     falsch = umgeschrieben(gruen, roh)
-    return (["Ergebnisse umgeschrieben:", *falsch] if falsch else []) + fremde(roh)
+    return (
+        aus + (["Ergebnisse umgeschrieben:", *falsch] if falsch else []) + fremde(roh)
+    )

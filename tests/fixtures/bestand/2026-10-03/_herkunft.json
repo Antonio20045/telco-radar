@@ -1,0 +1,92 @@
+{
+ "autor": "telco-radar-bot",
+ "commit": "9a9b6837a17c0c48313abfed012bba4184a1094b",
+ "dateien": {
+  "reports/2026-10-02.json": {
+   "filter": null,
+   "quelle": "data/reports/2026-10-02.json",
+   "sha256": "b22d37c7f7638d439247120a88f06185f6f97d7d8584be948ed2df18a29d25d5"
+  },
+  "reports/2026-10-02.md": {
+   "filter": null,
+   "quelle": "data/reports/2026-10-02.md",
+   "sha256": "9d1150059e38464b6b7b6948301a1d710a3e82e05cca89e126220cb8e28b9e1a"
+  },
+  "reports/differenzierung/2026-10-02.md": {
+   "filter": null,
+   "quelle": "data/reports/differenzierung/2026-10-02.md",
+   "sha256": "40a0f445dab13be3bfb9fd038134f5bf8319f96c0e7e228442adbad2e21dab28"
+  },
+  "reports/promo/2026-10-02.md": {
+   "filter": null,
+   "quelle": "data/reports/promo/2026-10-02.md",
+   "sha256": "8207061f5e6e13b735185fca6343e53255aad64d933082d11b42f06e80394346"
+  },
+  "state/diff_bilder.json": {
+   "filter": null,
+   "quelle": "data/state/diff_bilder.json",
+   "sha256": "2bf0842104bf29b7cc7a48b753c1df3dcd49af0f9f38cb32f512438fac938fa5"
+  },
+  "state/differentiation.jsonl": {
+   "filter": null,
+   "quelle": "data/state/differentiation.jsonl",
+   "sha256": "478c7713bbf0f72f1fc2bee9ef5588c5db08e14fcc641758c2cbb55ba0efe5d6"
+  },
+  "state/differentiation_db.json": {
+   "filter": null,
+   "quelle": "data/state/differentiation_db.json",
+   "sha256": "ce2840a9b4c293243d3881e5e76e51012359fe3f3b6f174d4ae4ccb1f2699a46"
+  },
+  "state/geraete_db.json": {
+   "filter": null,
+   "quelle": "data/state/geraete_db.json",
+   "sha256": "b4e898d56fd89b94f8d2fa18a6b61e52098199f0f5aea02e2f22d4adc772e4b3"
+  },
+  "state/geraete_katalog_auto.json": {
+   "filter": null,
+   "quelle": "data/state/geraete_katalog_auto.json",
+   "sha256": "f844cb39f44d6a906315d1bf4898fe78d7a55e9c0c22a71b40b4708b2cc4777f"
+  },
+  "state/geraete_preise.jsonl": {
+   "filter": null,
+   "quelle": "data/state/geraete_preise.jsonl",
+   "sha256": "848c8b758dbc48de82af5b5a925b437977c64f70bd4ed3e19eb4bba99b13aa55"
+  },
+  "state/geraete_tco.json": {
+   "filter": null,
+   "quelle": "data/state/geraete_tco.json",
+   "sha256": "da318f91cf3ceba89e233d78af8dbcb82b762377764ccecd377e5d7546362fee"
+  },
+  "state/geraete_tco_historie.jsonl": {
+   "filter": "\"id\": \"[^\"]*(apple-iphone-17-256gb|apple-iphone-18-pro-256gb|samsung-galaxy-s26-ultra-256gb|google-pixel-11-256gb)-",
+   "quelle": "data/state/geraete_tco_historie.jsonl",
+   "sha256": "e1c25844567f113625038eec44873316acefdabd1371b8ec484047666d85c995"
+  },
+  "state/highlight_topics.json": {
+   "filter": null,
+   "quelle": "data/state/highlight_topics.json",
+   "sha256": "d7ec601eed284b4565c813864350993ad05c8d47f84032f550db83adbd461795"
+  },
+  "state/lieferzeit.json": {
+   "filter": null,
+   "quelle": "data/state/lieferzeit.json",
+   "sha256": "241759319f850cb67b7183dccb007f974b756e952b03b951b27bda2fc25047bd"
+  },
+  "state/promo_db.json": {
+   "filter": null,
+   "quelle": "data/state/promo_db.json",
+   "sha256": "7def1eeabef307b626b0ab190d3377ae9824c66ec53214989d52b17e9bdf21aa"
+  },
+  "state/tarife.jsonl": {
+   "filter": null,
+   "quelle": "data/state/tarife.jsonl",
+   "sha256": "e356ef37c1b83202538b80615b56561681144d03e3bf5313723c0e17ccbf0e19"
+  },
+  "state/uebersetzungen.jsonl": {
+   "filter": null,
+   "quelle": "data/state/uebersetzungen.jsonl",
+   "sha256": "2db5d97ea4352a44cbcc9a762c6bcbc2e179742aa76259c311a4e4d1bb2493b8"
+  }
+ },
+ "zeit": "2026-10-03T08:32:53+00:00"
+}

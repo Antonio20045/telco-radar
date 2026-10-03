@@ -28,7 +28,7 @@ import yaml
 from telco_radar.report import geraete_verlauf
 from telco_radar.report.html import render_site
 
-from test_geraete_browser_fixture import _chromium, _server
+from test_geraete_browser_fixture import _server
 
 HEUTE = "2026-09-24"
 
@@ -210,23 +210,15 @@ def _baue(tmp_path):
 
 
 @contextlib.contextmanager
-def _browser_ctx(tmp_path_factory):
-    sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt"
-    ).sync_playwright
+def _browser_ctx(tmp_path_factory, chromium):
     site = _baue(tmp_path_factory.mktemp("verlaufmobil"))
-    exe = _chromium()
-    with _server(site) as wurzel, sync_playwright() as p:
-        browser = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
-        try:
-            yield wurzel, browser
-        finally:
-            browser.close()
+    with _server(site) as wurzel:
+        yield wurzel, chromium
 
 
 @pytest.fixture(scope="module")
-def _wurzel_browser(tmp_path_factory):
-    with _browser_ctx(tmp_path_factory) as paar:
+def _wurzel_browser(tmp_path_factory, chromium):
+    with _browser_ctx(tmp_path_factory, chromium) as paar:
         yield paar
 
 
@@ -249,7 +241,11 @@ def _oeffne(browser, wurzel, breite):
 @pytest.fixture(scope="module")
 def seite(_wurzel_browser):
     wurzel, browser = _wurzel_browser
-    yield _oeffne(browser, wurzel, 390)
+    s = _oeffne(browser, wurzel, 390)
+    try:
+        yield s
+    finally:
+        s.context.close()
 
 
 def _messen(seite):

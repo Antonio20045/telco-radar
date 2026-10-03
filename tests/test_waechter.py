@@ -89,6 +89,8 @@ def projekt(tmp_path, monkeypatch):
     for name in ("privat-basis", "riesendateien", "waechter-basis"):
         _schreibe(wurzel, f"pruef/{name}.txt", "")
     _schreibe(wurzel, "pruef/rot-bekannt.txt", "tests/test_a.py::test_x\n")
+    _schreibe(wurzel, "pruef/tests-basis.txt", "pyproject.toml pytest-pflicht 3\n")
+    _schreibe(wurzel, "pruef/tests-mit-bestand.txt", "tests/test_a.py\n")
     _schreibe(wurzel, "pruef/tests-anzahl.txt", "10\n")
     _schreibe(wurzel, "pruef/tests-uebersprungen.txt", "2\n")
     _schreibe(wurzel, ".importlinter", _IMPORTLINTER)
@@ -161,6 +163,16 @@ def test_gelistete_riesendatei_darf_nicht_wachsen_und_sinkt_selbst(
         ),
         ("pruef/mypy-basis.txt", "src/b.py misc 1\nsrc/a.py attr-defined 1\n", "misc"),
         ("pruef/rot-bekannt.txt", "tests/test_a.py::test_x\nt::neu\n", "neu: t::neu"),
+        (
+            "pruef/tests-mit-bestand.txt",
+            "tests/test_a.py\ntests/test_neu.py\n",
+            "neu: tests/test_neu.py",
+        ),
+        (
+            "pruef/tests-basis.txt",
+            "pyproject.toml pytest-pflicht 3\ntests/test_a.py uhr 1\n",
+            "tests/test_a.py uhr von 0 auf 1",
+        ),
         ("pruef/tests-anzahl.txt", "9\n", "10 -> 9"),
         ("pruef/tests-uebersprungen.txt", "3\n", "2 -> 3"),
         ("pruef/tests-anzahl.txt", None, "10 -> fehlt"),
@@ -485,7 +497,9 @@ def test_verschaerfte_pytest_einstellungen_bleiben_gruen_und_ihr_entfernen_ist_r
     _schreibe(projekt, "pyproject.toml", scharf.replace("--strict-markers ", ""))
     assert _rot(projekt) == [
         "pyproject.toml lockerer (Arbeitsstand): pytest addopts entfernt:"
-        " --strict-markers"
+        " --strict-markers",
+        "pyproject.toml [pytest-pflicht] erwartet höchstens 0, gefunden 1"
+        " (pruef/tests-basis.txt)",
     ]
 
 

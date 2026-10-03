@@ -18,10 +18,8 @@ from __future__ import annotations
 
 import contextlib
 import functools
-import glob
 import http.server
 import json
-import pathlib
 import socket
 import threading
 
@@ -233,21 +231,6 @@ def _baue(tmp_path):
     return site
 
 
-def _chromium():
-    for m in (
-        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-        str(
-            pathlib.Path.home()
-            / ".cache/ms-playwright"
-            / "chromium*/chrome-linux*/chrome"
-        ),
-    ):
-        t = sorted(glob.glob(m))
-        if t:
-            return t[-1]
-    return None
-
-
 @contextlib.contextmanager
 def _server(site):
     s = socket.socket()
@@ -266,16 +249,11 @@ def _server(site):
 
 
 @pytest.fixture(scope="module")
-def zeilen(tmp_path_factory):
-    sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt"
-    ).sync_playwright
+def zeilen(tmp_path_factory, chromium):
     site = _baue(tmp_path_factory.mktemp("bnd390"))
-    exe = _chromium()
-    with _server(site) as wurzel, sync_playwright() as p:
-        browser = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
+    with _server(site) as wurzel:
+        ctx = chromium.new_context(viewport={"width": 390, "height": 1400})
         try:
-            ctx = browser.new_context(viewport={"width": 390, "height": 1400})
             s = ctx.new_page()
             s.goto(f"{wurzel}/geraete.html", wait_until="networkidle")
             s.wait_for_timeout(300)
@@ -305,7 +283,7 @@ def zeilen(tmp_path_factory):
             }""")
             yield daten
         finally:
-            browser.close()
+            ctx.close()
 
 
 def test_alle_preise_haben_dieselbe_rechte_kante(zeilen):

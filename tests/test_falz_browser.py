@@ -22,7 +22,6 @@ from __future__ import annotations
 
 import contextlib
 import functools
-import glob
 import http.server
 import shutil
 import socket
@@ -40,26 +39,6 @@ AUSGABE = "2026-08-08"
 # strengere: dort liegt die rechte Spalte UNTER dem Aufmacher, der Kasten
 # kann die Schlagzeile also nur noch verdraengen, wenn er ueber ihr steht.
 FORMATE = [("Schreibtisch", 1440, 900), ("Telefon", 390, 844)]
-
-
-def _chromium() -> str | None:
-    """Wo der Browser liegt - oder None, wenn Playwright ihn selbst findet.
-
-    Zwei Orte, weil es zwei Maschinen gibt: das Sandbox-Image legt Chromium
-    unter /opt/pw-browsers ab (daher der Pfad in scripts/pruefe_portal.py),
-    `playwright install` auf einem GitHub-Runner unter
-    ~/.cache/ms-playwright. Nur den ersten zu kennen hiesse, dass genau der
-    Test, der diese Runde absichert, auf der Maschine schweigt, die Merges
-    absichert - und zwar lautlos, weil ein Skip wie ein Erfolg aussieht.
-    """
-    for muster in (
-        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-        str(Path.home() / ".cache/ms-playwright" / "chromium*/chrome-linux*/chrome"),
-    ):
-        treffer = sorted(glob.glob(muster))
-        if treffer:
-            return treffer[-1]
-    return None
 
 
 @contextlib.contextmanager
@@ -106,24 +85,16 @@ def _baue(tmp_path: Path) -> Path:
 
 
 @pytest.fixture(scope="module")
-def _gemessen(tmp_path_factory):
+def _gemessen(tmp_path_factory, chromium):
     """Ein Browserstart je Testlauf, nicht je Format: Chromium hochzufahren
     kostet mehr als die Messung selbst."""
-    sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt - Browser-Messung entfaellt"
-    ).sync_playwright
-    pfad = _chromium()
     site = _baue(tmp_path_factory.mktemp("falz"))
 
     werte: dict[str, dict] = {}
-    with _server(site) as wurzel, sync_playwright() as p:
-        try:
-            browser = p.chromium.launch(**({"executable_path": pfad} if pfad else {}))
-        except Exception as exc:  # noqa: BLE001
-            pytest.skip(f"Chromium startet nicht ({str(exc)[:80]})")
-        try:
-            for name, breite, hoehe in FORMATE:
-                seite = browser.new_page(viewport={"width": breite, "height": hoehe})
+    with _server(site) as wurzel:
+        for name, breite, hoehe in FORMATE:
+            seite = chromium.new_page(viewport={"width": breite, "height": hoehe})
+            try:
                 seite.goto(f"{wurzel}/index.html", wait_until="load")
                 # Ohne das misst die Pruefung die Platzhalterhoehe der
                 # noch nicht geladenen Bilder oberhalb der Falz.
@@ -144,9 +115,8 @@ def _gemessen(tmp_path_factory):
                         else None
                     ),
                 }
+            finally:
                 seite.close()
-        finally:
-            browser.close()
     return werte
 
 

@@ -26,6 +26,7 @@ from waechter_regeln import (
     riesendateien,
     waechter_zaehlung,
 )
+from waechter_tests import TESTS_BASIS, tests_zaehlung
 
 WURZEL = Path(__file__).resolve().parents[1]
 RIESEN_BASIS = "pruef/riesendateien.txt"
@@ -78,6 +79,7 @@ def pruefe(
         (RIESEN_BASIS, riesendateien(wurzel)),
         (PRIVAT_BASIS, privat),
         (WAECHTER_BASIS, waechter_zaehlung(wurzel)),
+        (TESTS_BASIS, tests_zaehlung(wurzel)),
     ]
     neu = []
     for name, zaehlung in paare:
@@ -309,6 +311,8 @@ LISTEN: dict[str, Callable[[str, str], list[str]]] = {
     PRIVAT_BASIS: _zaehl_lockerer,
     RIESEN_BASIS: _zaehl_lockerer,
     WAECHTER_BASIS: _zaehl_lockerer,
+    TESTS_BASIS: _zaehl_lockerer,
+    "pruef/tests-mit-bestand.txt": _menge_lockerer,
     "pruef/rot-bekannt.txt": _menge_lockerer,
     "pruef/tests-anzahl.txt": partial(_grenze_lockerer, richtung=1),
     "pruef/tests-uebersprungen.txt": partial(_grenze_lockerer, richtung=-1),

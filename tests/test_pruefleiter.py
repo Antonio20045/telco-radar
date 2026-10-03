@@ -114,8 +114,12 @@ def test_ruff_json_wird_relativ_zur_wurzel():
 _KANARIE = (
     f"FAILED {pruefleiter.KANARIE}::test_muss_scheitern - AssertionError\n"
     f"PASSED {pruefleiter.KANARIE}::test_muss_bestehen\n"
+    f"FAILED {pruefleiter.KANARIE}::test_bestand_muss_scheitern - Regel hermetisch\n"
+    f"FAILED {pruefleiter.KANARIE}::test_netz_muss_scheitern - Regel hermetisch\n"
 )
 _KOPF = "==== short test summary info ====\n" + _KANARIE
+# Die Hermetik aus tests/conftest.py; Angriffe im Wegwerfprojekt hängen sich dahinter.
+_HERMETIK = Path(__file__).with_name("conftest.py").read_text("utf-8")
 
 
 @pytest.fixture(autouse=True)
@@ -126,6 +130,9 @@ def _untergrenze(tmp_path, monkeypatch):
     obergrenze = tmp_path / "tests-uebersprungen.txt"
     obergrenze.write_text("1\n", encoding="utf-8")
     monkeypatch.setattr(pruefleiter, "TESTS_UEBERSPRUNGEN", obergrenze)
+    altlasten = tmp_path / "tests-mit-bestand.txt"
+    altlasten.write_text("", encoding="utf-8")
+    monkeypatch.setattr(pruefleiter, "TESTS_MIT_BESTAND", altlasten)
     return pfad
 
 
@@ -405,16 +412,23 @@ def kleines_projekt(tmp_path, monkeypatch):
     )
     kanarie = Path(__file__).with_name("kanarie_leiter.py").read_text("utf-8")
     (wurzel / pruefleiter.KANARIE).write_text(kanarie, "utf-8")
+    (wurzel / "tests" / "conftest.py").write_text(_HERMETIK, "utf-8")
     pruef = tmp_path / "pruef"
     pruef.mkdir()
     (pruef / "rot-bekannt.txt").write_text("", "utf-8")
-    (pruef / "tests-anzahl.txt").write_text("5\n", "utf-8")
+    (pruef / "tests-anzahl.txt").write_text("7\n", "utf-8")
     (pruef / "tests-uebersprungen.txt").write_text("0\n", "utf-8")
+    (pruef / "tests-mit-bestand.txt").write_text("", "utf-8")
+    # tests/conftest.py liest die Altlasten aus <wurzel>/pruef wie die Leiter.
+    (wurzel / "pruef").symlink_to(pruef)
     monkeypatch.setattr(pruefleiter, "WURZEL", wurzel)
     monkeypatch.setattr(pruefleiter, "ROT_BEKANNT", pruef / "rot-bekannt.txt")
     monkeypatch.setattr(pruefleiter, "TESTS_ANZAHL", pruef / "tests-anzahl.txt")
     monkeypatch.setattr(
         pruefleiter, "TESTS_UEBERSPRUNGEN", pruef / "tests-uebersprungen.txt"
+    )
+    monkeypatch.setattr(
+        pruefleiter, "TESTS_MIT_BESTAND", pruef / "tests-mit-bestand.txt"
     )
     return wurzel
 
@@ -431,13 +445,48 @@ def test_testauswahl_ueber_die_umgebung_versteckt_keinen_roten_test(
     ]
 
 
-def test_geloeschter_test_macht_die_teststufe_rot(kleines_projekt, tmp_path):
+def test_altlast_ohne_zugriff_wird_gestrichen():
+    altlasten = pruefleiter.TESTS_MIT_BESTAND
+    altlasten.write_text("tests/test_a.py\ntests/test_b.py\n", encoding="utf-8")
+    assert pruefleiter.senke_altlasten({"tests/test_b.py", "tests/test_neu.py"})
+    assert altlasten.read_text(encoding="utf-8") == "tests/test_b.py\n"
+    assert not pruefleiter.senke_altlasten({"tests/test_b.py"})
+
+
+def test_gruener_lauf_streicht_altlasten_und_ohne_eintrag_scheitert_der_zugriff(
+    kleines_projekt, tmp_path
+):
+    (kleines_projekt / "data").mkdir()
+    (kleines_projekt / "data" / "x.txt").write_text("x", "utf-8")
+    (kleines_projekt / "tests" / "test_alt.py").write_text(
+        "from pathlib import Path\n\n\ndef test_liest():\n"
+        "    assert (Path(__file__).parents[1] / 'data/x.txt').read_text() == 'x'\n",
+        "utf-8",
+    )
     (kleines_projekt / "tests" / "test_rot.py").unlink()
-    (tmp_path / "pruef" / "tests-anzahl.txt").write_text("5\n", "utf-8")
+    pruef = tmp_path / "pruef"
+    altlasten = pruef / "tests-mit-bestand.txt"
+    altlasten.write_text("tests/test_alt.py\ntests/test_gruen.py\n", "utf-8")
+    with (tmp_path / "log").open("w") as log:
+        ergebnis = pruefleiter.stufe_tests(log)
+    assert ergebnis.gruen, ergebnis.zeilen
+    assert str(altlasten) in ergebnis.gesenkt
+    assert altlasten.read_text("utf-8") == "tests/test_alt.py\n"
+    altlasten.write_text("", "utf-8")
     with (tmp_path / "log").open("w") as log:
         ergebnis = pruefleiter.stufe_tests(log)
     assert not ergebnis.gruen
-    assert ergebnis.zeilen[0].startswith("4 Tests gesammelt, erwartet mindestens 5")
+    assert " tests/test_alt.py::test_liest - " in ergebnis.zeilen[0]
+    assert "Regel hermetisch: Tests lesen nur Schnappschüsse" in ergebnis.zeilen[0]
+
+
+def test_geloeschter_test_macht_die_teststufe_rot(kleines_projekt, tmp_path):
+    (kleines_projekt / "tests" / "test_rot.py").unlink()
+    (tmp_path / "pruef" / "tests-anzahl.txt").write_text("7\n", "utf-8")
+    with (tmp_path / "log").open("w") as log:
+        ergebnis = pruefleiter.stufe_tests(log)
+    assert not ergebnis.gruen
+    assert ergebnis.zeilen[0].startswith("6 Tests gesammelt, erwartet mindestens 7")
     # Gegenprobe: mit beiden grünen Tests als Untergrenze ist dieselbe Suite grün.
     (tmp_path / "pruef" / "tests-anzahl.txt").write_text("4\n", "utf-8")
     with (tmp_path / "log").open("a") as log:
@@ -540,7 +589,7 @@ def test_uebersprungene_tests_aus_einer_conftest_machen_die_stufe_rot(
     (kleines_projekt / "tests" / "test_rot.py").unlink()
     (tmp_path / "pruef" / "tests-anzahl.txt").write_text("2\n", "utf-8")
     (kleines_projekt / "tests" / "conftest.py").write_text(
-        "import pytest\n\n\n"
+        _HERMETIK + "import pytest\n\n\n"
         "def pytest_collection_modifyitems(items):\n"
         "    for item in items:\n"
         "        item.add_marker(pytest.mark.skip)\n",
@@ -549,7 +598,7 @@ def test_uebersprungene_tests_aus_einer_conftest_machen_die_stufe_rot(
     with (tmp_path / "log").open("w") as log:
         ergebnis = pruefleiter.stufe_tests(log)
     assert not ergebnis.gruen
-    assert ergebnis.zeilen[0].startswith("4 Tests übersprungen oder xfail")
+    assert ergebnis.zeilen[0].startswith("6 Tests übersprungen oder xfail")
 
 
 _UMSCHREIBEN = (
@@ -566,7 +615,9 @@ _UMSCHREIBEN = (
 def test_conftest_die_scheitern_zu_bestanden_umschreibt_macht_die_stufe_rot(
     kleines_projekt, tmp_path
 ):
-    (kleines_projekt / "tests" / "conftest.py").write_text(_UMSCHREIBEN, "utf-8")
+    (kleines_projekt / "tests" / "conftest.py").write_text(
+        _HERMETIK + _UMSCHREIBEN, "utf-8"
+    )
     with (tmp_path / "log").open("w") as log:
         ergebnis = pruefleiter.stufe_tests(log)
     assert not ergebnis.gruen
@@ -574,7 +625,7 @@ def test_conftest_die_scheitern_zu_bestanden_umschreibt_macht_die_stufe_rot(
         "tests/kanarie_leiter.py: Ergebnisse werden umgeschrieben oder abgewählt"
     ]
     # Gegenprobe: ohne den Hook ist der rote Test rot gemeldet, nicht der Kanarienvogel.
-    (kleines_projekt / "tests" / "conftest.py").unlink()
+    (kleines_projekt / "tests" / "conftest.py").write_text(_HERMETIK, "utf-8")
     (kleines_projekt / "tests" / "test_rot.py").unlink()
     (tmp_path / "pruef" / "tests-anzahl.txt").write_text("4\n", "utf-8")
     with (tmp_path / "log").open("a") as log:
@@ -609,7 +660,7 @@ def test_versteckter_hook_der_den_kanarienvogel_auslaesst_macht_die_stufe_rot(
     kleines_projekt, tmp_path
 ):
     conftest = kleines_projekt / "tests" / "conftest.py"
-    conftest.write_text(_UMSCHREIBEN_VERSTECKT, "utf-8")
+    conftest.write_text(_HERMETIK + _UMSCHREIBEN_VERSTECKT, "utf-8")
     with (tmp_path / "log").open("w") as log:
         ergebnis = pruefleiter.stufe_tests(log)
     assert not ergebnis.gruen
@@ -632,7 +683,7 @@ def test_fehlende_rohaufzeichnung_ist_rot():
 
 def test_ausgelassene_testfunktion_ist_umgeschrieben(kleines_projekt, tmp_path):
     (kleines_projekt / "tests" / "conftest.py").write_text(
-        "import pytest\n\n\n"
+        _HERMETIK + "import pytest\n\n\n"
         "@pytest.hookimpl(tryfirst=True)\n"
         "def pytest_pyfunc_call(pyfuncitem):\n"
         "    return 'kanarie' not in pyfuncitem.nodeid or None\n",
@@ -672,7 +723,7 @@ _ABWAHL = {
     ),
     "conftest_entfernt": (
         "tests/conftest.py",
-        "def pytest_collection_modifyitems(items):\n"
+        _HERMETIK + "\n\ndef pytest_collection_modifyitems(items):\n"
         "    items[:] = [i for i in items if 'kaputt' not in i.nodeid]\n",
     ),
 }
@@ -701,7 +752,7 @@ def test_vorgetaeuschter_ablaufbeginn_versteckt_keinen_abgewaehlten_test(
     kleines_projekt, tmp_path
 ):
     (kleines_projekt / "tests" / "conftest.py").write_text(
-        "def pytest_collection_modifyitems(config, items):\n"
+        _HERMETIK + "\n\ndef pytest_collection_modifyitems(config, items):\n"
         "    for i in [i for i in items if 'kaputt' in i.nodeid]:\n"
         "        config.hook.pytest_runtest_logstart(\n"
         "            nodeid=i.nodeid, location=i.location\n"
@@ -725,7 +776,7 @@ def test_vorgetaeuschter_ablaufbeginn_versteckt_keinen_abgewaehlten_test(
 def test_rohe_sammlung_die_scheitert_ist_rot(kleines_projekt, tmp_path):
     (kleines_projekt / "tests" / "test_rot.py").unlink()
     (kleines_projekt / "tests" / "conftest.py").write_text(
-        "def pytest_ignore_collect(collection_path, config):\n"
+        _HERMETIK + "\n\ndef pytest_ignore_collect(collection_path, config):\n"
         "    return collection_path.name == 'test_kaputt_import.py' or None\n",
         "utf-8",
     )
@@ -813,7 +864,7 @@ def test_vorab_eingehuellter_roter_test_bleibt_rot_und_rot_bekannt_schrumpft_nic
     rot_bekannt = tmp_path / "pruef" / "rot-bekannt.txt"
     rot_bekannt.write_text("tests/test_rot.py::test_kaputt\n", "utf-8")
     conftest = kleines_projekt / "tests" / "conftest.py"
-    conftest.write_text(_EINHUELLEN[art], "utf-8")
+    conftest.write_text(_HERMETIK + _EINHUELLEN[art], "utf-8")
     with (tmp_path / "log").open("w") as log:
         ergebnis = pruefleiter.stufe_tests(log)
     assert not ergebnis.gruen
@@ -823,7 +874,7 @@ def test_vorab_eingehuellter_roter_test_bleibt_rot_und_rot_bekannt_schrumpft_nic
     )
     assert rot_bekannt.read_text("utf-8") == "tests/test_rot.py::test_kaputt\n"
     # Gegenprobe: ehrlich repariert, schrumpft rot-bekannt um genau diesen Test.
-    conftest.unlink()
+    conftest.write_text(_HERMETIK, "utf-8")
     (kleines_projekt / "tests" / "test_rot.py").write_text(
         "def test_kaputt():\n    assert 1 == 1  # repariert\n", "utf-8"
     )
@@ -837,7 +888,7 @@ def test_hülle_aus_einer_autouse_fixture_ersetzt_die_aufzeichnung_und_ist_rot(
     kleines_projekt, tmp_path
 ):
     (kleines_projekt / "tests" / "conftest.py").write_text(
-        "import pytest\n\n\n"
+        _HERMETIK + "import pytest\n\n\n"
         "@pytest.fixture(autouse=True)\n"
         "def huelle(request):\n"
         "    echt = getattr(request.module, request.node.originalname)\n\n"

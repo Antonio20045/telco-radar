@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import contextlib
 import functools
-import glob
 import http.server
 import json
 import pathlib
@@ -200,21 +199,6 @@ def _baue(tmp_path: pathlib.Path):
     return site
 
 
-def _chromium():
-    for muster in (
-        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-        str(
-            pathlib.Path.home()
-            / ".cache/ms-playwright"
-            / "chromium*/chrome-linux*/chrome"
-        ),
-    ):
-        treffer = sorted(glob.glob(muster))
-        if treffer:
-            return treffer[-1]
-    return None
-
-
 @contextlib.contextmanager
 def _server(site: pathlib.Path):
     s = socket.socket()
@@ -233,22 +217,19 @@ def _server(site: pathlib.Path):
 
 
 @pytest.fixture(scope="module")
-def _seite(tmp_path_factory):
-    sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt"
-    ).sync_playwright
+def _seite(tmp_path_factory, chromium):
 
     tmp_path = tmp_path_factory.mktemp("tcoband")
     site = _baue(tmp_path)
 
-    exe = _chromium()
-    with _server(site) as basis, sync_playwright() as p:
-        browser = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
-        seite = browser.new_page(viewport={"width": 1440, "height": 900})
-        seite.goto(f"{basis}/geraete.html", wait_until="load")
-        seite.click('[data-tafel="tafel-tco"]')
-        yield seite
-        browser.close()
+    with _server(site) as basis:
+        seite = chromium.new_page(viewport={"width": 1440, "height": 900})
+        try:
+            seite.goto(f"{basis}/geraete.html", wait_until="load")
+            seite.click('[data-tafel="tafel-tco"]')
+            yield seite
+        finally:
+            seite.close()
 
 
 def test_beide_auswahlen_stehen_sichtbar_nebeneinander(_seite):

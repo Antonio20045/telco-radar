@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import contextlib
 import functools
-import glob
 import http.server
 import json
 import pathlib
@@ -233,21 +232,6 @@ def _baue(tmp_path: pathlib.Path):
     site = root / "site"
     render_site(site, reports)
     return site
-
-
-def _chromium():
-    for muster in (
-        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-        str(
-            pathlib.Path.home()
-            / ".cache/ms-playwright"
-            / "chromium*/chrome-linux*/chrome"
-        ),
-    ):
-        treffer = sorted(glob.glob(muster))
-        if treffer:
-            return treffer[-1]
-    return None
 
 
 @contextlib.contextmanager

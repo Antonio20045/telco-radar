@@ -165,14 +165,8 @@ tests/test_diff_bilder.py noqa:ANN002 1
 tests/test_diff_bilder.py noqa:ANN003 1
 tests/test_differentiation_editor.py noqa:B018 1
 tests/test_differentiation_editor.py noqa:BLE001 3
-tests/test_falz_browser.py noqa:BLE001 1
 tests/test_geraete_adapter_congstar.py noqa:alle 1
 tests/test_geraete_besuchsfenster.py noqa:BLE001 1
-tests/test_geraete_buendel_kopf_zeitraum.py noqa:BLE001 1
-tests/test_geraete_o3_rollen_browser.py noqa:BLE001 1
-tests/test_geraete_textdeckel.py noqa:BLE001 1
-tests/test_promo_raster_browser.py noqa:BLE001 2
 tests/test_seen_store_format.py noqa:E402 1
 tests/test_signup_service.py noqa:E402 4
 tests/test_trefferquote.py noqa:E402 1
-tests/test_uebersetzung_link_browser.py noqa:BLE001 1

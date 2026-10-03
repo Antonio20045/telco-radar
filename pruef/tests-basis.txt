@@ -1,0 +1,7 @@
+tests/test_dedupe.py uhr 1
+tests/test_pipeline.py uhr 1
+tests/test_pruefe_quellenvorschlag.py uhr 3
+tests/test_redaktion_kontinuitaet.py uhr 1
+tests/test_seen_store_schutz.py uhr 1
+tests/test_signup_service.py uhr 7
+tests/test_vorsortierung.py uhr 1

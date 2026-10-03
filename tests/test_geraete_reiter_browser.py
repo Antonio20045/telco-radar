@@ -27,7 +27,6 @@ from __future__ import annotations
 
 import contextlib
 import functools
-import glob
 import http.server
 import json
 import re
@@ -343,17 +342,6 @@ def _historie():
 # Zahl der MESSTERMINE nicht veraendert.
 
 
-def _chromium():
-    for muster in (
-        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-        str(Path.home() / ".cache/ms-playwright" / "chromium*/chrome-linux*/chrome"),
-    ):
-        treffer = sorted(glob.glob(muster))
-        if treffer:
-            return treffer[-1]
-    return None
-
-
 @contextlib.contextmanager
 def _server(site: Path):
     s = socket.socket()
@@ -449,11 +437,8 @@ def _stelle_daten(seite, geraet):
 
 
 @pytest.fixture(scope="module")
-def _seite(tmp_path_factory):
+def _seite(tmp_path_factory, chromium):
     """Ein Browser, eine Seite - die Tests lesen daraus."""
-    sync_playwright = pytest.importorskip(
-        "playwright.sync_api", reason="playwright fehlt"
-    ).sync_playwright
 
     root = tmp_path_factory.mktemp("reiter")
     (root / "config").mkdir()
@@ -495,13 +480,13 @@ def _seite(tmp_path_factory):
     site = root / "site"
     render_site(site, reports, cfg=None)
 
-    exe = _chromium()
-    with _server(site) as basis, sync_playwright() as p:
-        browser = p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
-        seite = browser.new_page(viewport={"width": 1440, "height": 900})
-        seite.goto(f"{basis}/geraete.html", wait_until="load")
-        yield seite
-        browser.close()
+    with _server(site) as basis:
+        seite = chromium.new_page(viewport={"width": 1440, "height": 900})
+        try:
+            seite.goto(f"{basis}/geraete.html", wait_until="load")
+            yield seite
+        finally:
+            seite.close()
 
 
 def _sichtbare_zeilen(seite, wurzel="#tafel-tco"):
@@ -2236,9 +2221,9 @@ _B5_DB = {
 @pytest.fixture(scope="module")
 def _b5_seite(_seite, tmp_path_factory):
     """Eine eigene Seite, aber im SELBEN Browser wie `_seite` - ein zweiter
-    `sync_playwright()`-Kontext im selben Prozess scheitert ("It looks like
+    Playwright-Start im selben Prozess scheitert ("It looks like
     you are using Playwright Sync API inside the asyncio loop"), solange der
-    erste noch offen ist (Modulgueltigkeit von `_seite`). Dieselbe
+    erste noch offen ist (Sitzung der Fixture `chromium`). Dieselbe
     Wiederverwendung wie bei `_umgebung`/`_eigene_seite`, nur mit einem
     EIGENEN lokalen Server fuer den abweichenden Bestand.
     """
@@ -2734,7 +2719,7 @@ def _echte_seite(_seite, tmp_path_factory):
     """Dieselbe Seite wie `_seite`, aber aus dem ECHTEN Bestand des Repos
     gerendert - nicht aus `_KATALOG`/`_DB`. Wiederverwendet den Browser von
     `_seite` aus demselben Grund wie `_b5_seite`: ein zweiter
-    `sync_playwright()`-Kontext im selben Prozess scheitert, solange der
+    Playwright-Start im selben Prozess scheitert, solange der
     erste noch offen ist.
     """
     root = tmp_path_factory.mktemp("echt")

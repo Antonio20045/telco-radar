@@ -179,9 +179,9 @@ def uhr_ausserhalb_einstieg(wurzel: Path) -> int:
             and f.name == funktion
             for k in ast.walk(f)
         }
-        aliase = _aliase(baum)
+        aliase = importnamen(baum)
         anzahl += sum(
-            _ist_uhr(k, aliase) and id(k) not in innen
+            ist_uhr(k, aliase) and id(k) not in innen
             for k in ast.walk(baum)
             if isinstance(k, ast.Call)
         )
@@ -233,7 +233,7 @@ def _codes_je_datei(datei: tuple[str, str]) -> list[Schluessel]:
     return [(pfad, code) for code in codes]
 
 
-def _ist_uhr(aufruf: ast.Call, aliase: dict[str, str] | None = None) -> bool:
+def ist_uhr(aufruf: ast.Call, aliase: dict[str, str] | None = None) -> bool:
     name, basis = _name(aufruf.func), _name(getattr(aufruf.func, "value", None))
     if bool(basis) and (name in ("now", "utcnow", "today") or name == basis == "time"):
         return True
@@ -244,7 +244,7 @@ def _ist_uhr(aufruf: ast.Call, aliase: dict[str, str] | None = None) -> bool:
     )
 
 
-def _uhr_verweise(baum: ast.AST, aliase: dict[str, str]) -> int:
+def uhr_verweise(baum: ast.AST, aliase: dict[str, str]) -> int:
     """Zählt Uhren, die ohne Aufruf weitergereicht werden: ``jetzt = time.time``."""
     aufgerufen = {id(k.func) for k in ast.walk(baum) if isinstance(k, ast.Call)}
     return sum(
@@ -278,7 +278,7 @@ def _eingriffe(pfad: str, baum: ast.AST) -> int:
     return anzahl
 
 
-def _aliase(baum: ast.AST) -> dict[str, str]:
+def importnamen(baum: ast.AST) -> dict[str, str]:
     """Bildet jeden importierten Namen der Datei auf seinen vollen Namen ab."""
     aliase = {}
     for knoten in ast.walk(baum):
@@ -310,16 +310,16 @@ def _voller_name(knoten: ast.expr, aliase: dict[str, str]) -> str | None:
 
 def _ast_codes(pfad: str, baum: ast.AST) -> Iterator[str]:
     in_src = pfad.startswith("src/")
-    aliase = _aliase(baum)
+    aliase = importnamen(baum)
     yield from ["leiter-eingriff"] * _eingriffe(pfad, baum)
     if in_src and pfad not in UHR_ERLAUBT:
-        yield from ["uhr"] * _uhr_verweise(baum, aliase)
+        yield from ["uhr"] * uhr_verweise(baum, aliase)
     for knoten in ast.walk(baum):
         if _letzter_name(knoten, aliase) in _KEIN_TYPCHECK:
             yield "kein-typcheck"
         if isinstance(knoten, ast.Call):
             name = _name(knoten.func)
-            if in_src and pfad not in UHR_ERLAUBT and _ist_uhr(knoten, aliase):
+            if in_src and pfad not in UHR_ERLAUBT and ist_uhr(knoten, aliase):
                 yield "uhr"
             if pfad.startswith(REPORT) and _DATEIZUGRIFF.fullmatch(name or ""):
                 yield "dateizugriff"

@@ -22,8 +22,6 @@ Test kann sie nicht sehen.
 
 import re
 
-import pytest
-
 from telco_radar.report.html import render_site
 
 MARKE = "Vodafone Product and Services Insights"
@@ -167,20 +165,9 @@ def test_kein_alter_name_mehr_in_den_vorlagen():
 # sondern dass ihre Breite gegen EINE Schrift kalibriert war.
 
 
-def _chromium():
-    import os
-
-    for kandidat in (
-        "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
-        os.path.expanduser("~/.cache/ms-playwright/chromium-1194/chrome-linux/chrome"),
-        os.environ.get("CHROMIUM_PFAD", ""),
-    ):
-        if kandidat and os.path.exists(kandidat):
-            return kandidat
-    return None
-
-
-def test_der_kopf_laeuft_auch_mit_breiterer_schrift_nicht_aus_dem_bild(tmp_path):
+def test_der_kopf_laeuft_auch_mit_breiterer_schrift_nicht_aus_dem_bild(
+    tmp_path, chromium
+):
     """Die Regressionsprobe zu CI-Lauf #159.
 
     Bis zum 12.08.2026 trug `.brand-name` auch auf dem Telefon
@@ -203,13 +190,6 @@ def test_der_kopf_laeuft_auch_mit_breiterer_schrift_nicht_aus_dem_bild(tmp_path)
     import socket
     import threading
 
-    pytest.importorskip("playwright.sync_api")
-    from playwright.sync_api import sync_playwright
-
-    exe = _chromium()
-    if exe is None:
-        pytest.skip("kein Chromium gefunden")
-
     site_dir = _site(tmp_path)
     s = socket.socket()
     s.bind(("127.0.0.1", 0))
@@ -222,12 +202,9 @@ def test_der_kopf_laeuft_auch_mit_breiterer_schrift_nicht_aus_dem_bild(tmp_path)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     gemessen = {}
     try:
-        with sync_playwright() as pw:
-            browser = pw.chromium.launch(
-                executable_path=exe, args=["--no-sandbox", "--disable-dev-shm-usage"]
-            )
-            for aufschlag in (0, 1.2, 3.0):
-                page = browser.new_page(viewport={"width": 390, "height": 844})
+        for aufschlag in (0, 1.2, 3.0):
+            page = chromium.new_page(viewport={"width": 390, "height": 844})
+            try:
                 page.goto(f"http://127.0.0.1:{port}/index.html")
                 # Der Aufschlag macht den Namen breiter, ohne eine bestimmte
                 # Schrift vorauszusetzen. 3 px je Zeichen sind rund 40 % mehr
@@ -246,8 +223,8 @@ def test_der_kopf_laeuft_auch_mit_breiterer_schrift_nicht_aus_dem_bild(tmp_path)
                                    .getBoundingClientRect().right),
                        })"""
                 )
+            finally:
                 page.close()
-            browser.close()
     finally:
         httpd.shutdown()
 

@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import contextlib
 import functools
-import glob
 import http.server
 import socket
 import threading
@@ -27,21 +26,6 @@ import pytest
 
 from browser_konsole import konsole_sammeln
 from test_geraete_zeitreihe_browser import _baue_site
-
-
-def _chromium():
-    for muster in (
-        "/opt/pw-browsers/chromium-*/chrome-linux/chrome",
-        str(
-            __import__("pathlib").Path.home()
-            / ".cache/ms-playwright/chromium*/chrome-linux*/chrome"
-        ),
-        "/Applications/Chromium.app/Contents/MacOS/Chromium",
-    ):
-        treffer = sorted(glob.glob(muster))
-        if treffer:
-            return treffer[-1]
-    return None
 
 
 @contextlib.contextmanager
@@ -62,21 +46,17 @@ def _server(site):
 
 
 @pytest.fixture(scope="module")
-def paar(tmp_path_factory):
+def paar(tmp_path_factory, chromium):
     import pathlib
-    from playwright.sync_api import sync_playwright
 
     site = _baue_site(tmp_path_factory.mktemp("e3-radar"))
     with _server(site) as basis:
-        with sync_playwright() as p:
-            exe = _chromium()
-            browser = (
-                p.chromium.launch(executable_path=exe) if exe else p.chromium.launch()
-            )
-            seite = browser.new_page(viewport={"width": 1440, "height": 900})
+        seite = chromium.new_page(viewport={"width": 1440, "height": 900})
+        try:
             seite.goto(f"{basis}/geraete.html", wait_until="load")
             yield seite
-            browser.close()
+        finally:
+            seite.close()
 
 
 def _radar_zeigen(seite):

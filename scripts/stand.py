@@ -17,11 +17,13 @@ from pathlib import Path
 
 import waechter
 import waechter_regeln
+import waechter_tests
 
 W = waechter.WURZEL
 LIVE_SEITE = "https://telco-radar.onrender.com/geraete.html"
 LIVE_FRIST_SEKUNDEN = 20
 LIVE_TAGE_ALT = 1
+TESTZEIT_ZIEL = 240
 _DOC = '"""Rotprobe."""\n\n'
 ROT_PROBEN = {
     "unbenutzter Import": (
@@ -75,6 +77,23 @@ def _ausnahmen(vertrag: str) -> int:
 
 def _mehr(was: str, wert: int, ziel: int = 0) -> list[str]:
     return [f"{was} {wert}, Ziel {ziel}"] if wert > ziel else []
+
+
+def _tests_summe() -> dict[str, int]:
+    basis = waechter.lies_zaehlbasis(W / waechter_tests.TESTS_BASIS)
+    return {c: sum(n for (_, k), n in basis.items() if k == c) for _, c in basis}
+
+
+def _testzeit() -> list[str]:
+    """Hält die letzte Teststufe aus ``.pruefleiter/zeiten.csv`` gegen das Zeitziel."""
+    datei = W / ".pruefleiter" / "zeiten.csv"
+    zeilen = datei.read_text("utf-8").splitlines() if datei.is_file() else []
+    tests = [z.split(",") for z in zeilen if z.split(",")[1:2] == ["Tests"]]
+    if not tests:
+        return ["keine Teststufe in .pruefleiter/zeiten.csv"]
+    return _mehr(
+        "Sekunden der letzten Teststufe", round(float(tests[-1][2])), TESTZEIT_ZIEL
+    )
 
 
 def _fehlt(*pfade: str) -> list[str]:
@@ -163,6 +182,9 @@ def offen() -> dict[str, list[str]]:
         + live_datum(),
         "3 Format, Werkzeuge, Basen": rot_proben(),
         "4 Hermetische Tests": _mehr("rot-bekannt", _zeilen("pruef/rot-bekannt.txt"))
+        + _mehr("Testdateien mit Bestand", _zeilen("pruef/tests-mit-bestand.txt"))
+        + [f"{c} in Tests {n}, Ziel 0" for c, n in sorted(_tests_summe().items())]
+        + _testzeit()
         + _fehlt("tests/fixtures/bestand"),
         "5 Hooks, CLAUDE.md": _fehlt(".githooks/pre-push", ".claude/hooks")
         + _mehr("Zeilen CLAUDE.md", _zeilen("CLAUDE.md"), 100),

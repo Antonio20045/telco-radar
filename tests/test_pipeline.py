@@ -78,6 +78,9 @@ def fake_http(monkeypatch):
         return httpx.Response(200, text=newsroom, request=request)
 
     monkeypatch.setattr(httpx, "get", fake_get)
+    # Die Artikelseiten der Beispielquelle haben kein og:image; ohne diese Zeile
+    # fragte report/bilder.py sie über einen eigenen httpx.Client im Netz ab.
+    monkeypatch.setattr(pipeline.report_bilder, "og_bild", lambda url, client: "")
 
 
 def test_full_run_no_llm(project, fake_http):
