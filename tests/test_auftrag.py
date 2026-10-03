@@ -52,6 +52,25 @@ ERSATZAGENT = """import json, os, sys
 from pathlib import Path
 modus, rolle = sys.argv[1], os.environ["TELCO_ROLLE"]
 sys.stdin.read()
+with (Path(__file__).parent / "argv.jsonl").open("a") as f:
+    f.write(json.dumps([rolle, *sys.argv[2:]]) + "\\n")
+if rolle == "pruefer":
+    ordner, art = Path(os.environ["TELCO_PRUEFER_ORDNER"]), os.environ.get("PRUEFER")
+    koerper = {"rot": "assert 2 == 3, 'Fehlwert als 0'", "gruen": "assert True"}
+    koerper["import"] = "import gibt_es_nicht"
+    repro = f"python -m pytest {ordner}/test_repro.py::test_repro"
+    if art in koerper:
+        quelle = f"def test_repro():\\n    {koerper[art]}\\n"
+        (ordner / "test_repro.py").write_text(quelle)
+    if art == "worktree":
+        Path("src/telco_radar/rechnen/kern.py").write_text("X = 1\\n")
+    befund = {"schwere": "blocker", "datei_zeile": "kern.py:2"}
+    befund["beschreibung"] = "Fehlwert"
+    befunde = [befund | {"reproduktion": "" if art == "ohne" else repro}] if art else []
+    text = "kein JSON" if art == "kaputt" else json.dumps({"befunde": befunde})
+    modelle = {"modelUsage": {"claude-opus-test": {}}}
+    print(json.dumps({"result": text, "total_cost_usd": 0.5} | modelle))
+    sys.exit(0)
 abnahme = Path("tests/test_abnahme.py")
 kern = Path("src/telco_radar/rechnen/kern.py")
 soll = {"falsch": 5, "umbau": 2}.get(modus, 4)
@@ -74,15 +93,30 @@ elif modus == "fremd":
     Path("src/telco_radar/sonst.py").write_text("X = 1\\n")
 elif modus == "leiter":
     Path("scripts/pruefleiter.py").write_text("raise SystemExit(0)\\n")
+elif modus == "testaendern":
+    Path("tests/test_basis.py").write_text("def test_basis():\\n    assert 1\\n")
 else:
     faktor = {"rot": 3, "umbau": 1}.get(modus, 2)
     kern.write_text(f"def verdopple(x):\\n    return x * {faktor}\\n")
     Path(os.environ["TELCO_COMMIT_NACHRICHT"]).write_text("rechnen: verdopple richtig")
     if modus == "gross":
         Path("src/telco_radar/rechnen/gross.py").write_text("X = 1\\n" * 400)
+    if modus == "sammlung":
+        Path("tests/orakel").mkdir(exist_ok=True)
+        vorlage = Path(__file__).parent / "alles_bestanden.py"
+        Path("tests/orakel/conftest.py").write_text(vorlage.read_text())
 bericht = {"total_cost_usd": 0.25, "usage": {"input_tokens": 100, "output_tokens": 20}}
 print(json.dumps(bericht))
 sys.exit(3 if modus == "absturz" and rolle == "bau" else 0)
+"""
+
+ALLES_BESTANDEN = """import pytest
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    bericht = (yield).get_result()
+    bericht.outcome = "passed"
 """
 
 DATEIEN = {
@@ -142,6 +176,7 @@ def _starte(repo, modus="gut", **aenderung):
     datei.write_text(json.dumps(AUFTRAG | aenderung))
     agent = f"{sys.executable} {repo.parent / 'ersatz.py'} {modus}"
     (repo.parent / "ersatz.py").write_text(ERSATZAGENT)
+    (repo.parent / "alles_bestanden.py").write_text(ALLES_BESTANDEN)
     return auftrag.main([str(datei), "--wurzel", str(repo), "--agent", agent])
 
 
@@ -170,6 +205,7 @@ def test_ersatzagent_laeuft_vom_roten_test_bis_zum_merge(repo):
     assert [(z["rolle"], z["runde"]) for z in zeilen] == [
         ("test", "1"),
         ("bau", "1"),
+        ("pruefer", "1"),
         ("ende", "0"),
     ]
     assert zeilen[1]["kosten_usd"] == "0.25" and zeilen[1]["token_ein"] == "100"
@@ -270,7 +306,7 @@ def test_vorhandener_roter_abnahmetest_braucht_keinen_testagenten(repo):
 
     assert _starte(repo) == auftrag.Ende.GEMERGT
 
-    assert [z["rolle"] for z in _kosten(repo)] == ["bau", "ende"]
+    assert [z["rolle"] for z in _kosten(repo)] == ["bau", "pruefer", "ende"]
 
 
 def test_zwei_rote_runden_enden_mit_notiz(repo):
@@ -389,13 +425,98 @@ def test_stand_schritt_6_verlangt_einen_echten_agenten_bis_zum_merge(
     stand = importlib.import_module("stand")
     monkeypatch.setattr(stand, "W", tmp_path)
     assert stand.echter_auftrag() == [f"{auftrag.KOSTEN} fehlt"]
+    leer = ["kein Auftrag, dessen Bau und Prüfer ein Claude-Modell bis zum Merge waren"]
 
-    def zeile(agent, ergebnis):
-        werte = {"auftrag": "A1", "rolle": "ende", "agent": agent, "ergebnis": ergebnis}
+    def zeile(kennung, rolle, agent="claude", modell="claude-opus-x", kosten="0.4"):
+        werte = {"auftrag": kennung, "rolle": rolle, "agent": agent, "modell": modell}
+        werte |= {"kosten_usd": kosten, "ergebnis": auftrag.GEMERGT * (rolle == "ende")}
         return dict.fromkeys(auftrag.format_.SPALTEN, "") | werte
 
-    auftrag.format_.kosten_schreiben([zeile("python3", "gemergt")], tmp_path)
-    auftrag.format_.kosten_schreiben([zeile("claude", "notiz")], tmp_path)
-    assert stand.echter_auftrag() == ["kein Auftrag eines echten Agenten bis zum Merge"]
-    auftrag.format_.kosten_schreiben([zeile("claude", "gemergt")], tmp_path)
+    falsch = {
+        "E1": {"agent": "python3"},
+        "E2": {"modell": ""},
+        "E3": {"modell": "ersatz"},
+        "E4": {"kosten": ""},
+        "E5": {"kosten": "0"},
+    }
+    for kennung, abweichung in falsch.items():
+        zeilen = [zeile(kennung, "bau", **abweichung), zeile(kennung, "pruefer")]
+        auftrag.format_.kosten_schreiben([*zeilen, zeile(kennung, "ende")], tmp_path)
+    ohne_pruefer = [zeile("E6", "test"), zeile("E6", "bau"), zeile("E6", "ende")]
+    auftrag.format_.kosten_schreiben(ohne_pruefer, tmp_path)
+    nicht_gemergt = [zeile("E7", "bau"), zeile("E7", "pruefer")]
+    auftrag.format_.kosten_schreiben(nicht_gemergt, tmp_path)
+    assert stand.echter_auftrag() == leer
+    assert auftrag.format_.echte_auftraege(tmp_path) == set()
+
+    echt = [zeile("E8", "bau"), zeile("E8", "pruefer"), zeile("E8", "ende")]
+    auftrag.format_.kosten_schreiben(echt, tmp_path)
     assert stand.echter_auftrag() == []
+    assert auftrag.format_.echte_auftraege(tmp_path) == {"E8"}
+
+
+def test_agent_startet_mit_rollendatei_und_rolleneinstellungen(repo):
+    assert _starte(repo) == auftrag.Ende.GEMERGT
+
+    aufrufe = [
+        json.loads(z) for z in (repo.parent / "argv.jsonl").read_text().splitlines()
+    ]
+    assert [a[0] for a in aufrufe] == ["test", "bau", "pruefer"]
+    for rolle, *argumente in aufrufe:
+        assert argumente[:3] == ["--agent", rolle, "--settings"]
+        einstellungen = json.loads(argumente[3])
+        assert einstellungen["env"] == {"TELCO_ROLLE": rolle}
+        haken = einstellungen["hooks"]["PreToolUse"][0]
+        assert {"Bash", "Edit", "Write"} <= set(haken["matcher"].split("|"))
+        assert "scripts/claude_rolle.py" in haken["hooks"][0]["command"]
+        assert "Bash(git commit*)" in einstellungen["permissions"]["deny"]
+    pruefer = [z for z in _kosten(repo) if z["rolle"] == "pruefer"]
+    assert pruefer[0]["modell"] == "claude-opus-test"
+    assert pruefer[0]["kosten_usd"] == "0.5"
+
+
+@pytest.mark.parametrize(
+    ("modus", "fremd"),
+    [
+        ("sammlung", "tests/orakel/conftest.py"),
+        ("testaendern", "tests/test_basis.py"),
+    ],
+)
+def test_bau_kann_bestehende_tests_und_die_sammlung_nicht_aendern(repo, modus, fremd):
+    vorher = _git(repo, "rev-parse", "main")
+
+    assert _starte(repo, modus) == auftrag.Ende.NOTIZ
+
+    notiz = (repo / auftrag.AUFTRAEGE / "A1-notiz.md").read_text()
+    assert f"Rolle bau darf nicht ändern: {fremd}" in notiz
+    assert _git(repo, "rev-parse", "main") == vorher
+
+
+@pytest.mark.parametrize(
+    ("art", "ende", "rollen"),
+    [
+        ("rot", auftrag.Ende.NOTIZ, ["test", "bau", "pruefer", "bau", "pruefer"]),
+        ("gruen", auftrag.Ende.GEMERGT, ["test", "bau", "pruefer"]),
+        ("import", auftrag.Ende.GEMERGT, ["test", "bau", "pruefer"]),
+        ("ohne", auftrag.Ende.GEMERGT, ["test", "bau", "pruefer"]),
+        ("kaputt", auftrag.Ende.NOTIZ, ["test", "bau", "pruefer", "bau", "pruefer"]),
+        ("worktree", auftrag.Ende.NOTIZ, ["test", "bau", "pruefer", "bau", "pruefer"]),
+    ],
+)
+def test_prueferbefund_zaehlt_nur_mit_scheiternder_reproduktion(
+    repo, monkeypatch, art, ende, rollen
+):
+    monkeypatch.setenv("PRUEFER", art)
+
+    assert _starte(repo) == ende
+
+    assert [z["rolle"] for z in _kosten(repo)][:-1] == rollen
+    if ende is auftrag.Ende.GEMERGT:
+        return
+    notiz = (repo / auftrag.AUFTRAEGE / "A1-notiz.md").read_text()
+    erwartet = {
+        "rot": "Prüfer: 1 Blocker mit scheiternder Reproduktion",
+        "kaputt": "Prüfer ohne lesbares Urteil: kein JSON",
+        "worktree": "Prüfer hat den Worktree geändert",
+    }[art]
+    assert erwartet in notiz

@@ -6,7 +6,6 @@ Wegwerf-Worktree auf ``HEAD``: kaputter Zeitreihen-Render, Live-Datum, Rot-Probe
 
 import ast
 import contextlib
-import csv
 import importlib
 import json
 import os
@@ -19,6 +18,7 @@ from collections.abc import Iterator
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
+import claude_rolle
 import pruefstempel
 import waechter
 import waechter_claude
@@ -28,6 +28,7 @@ import waechter_tests
 W = waechter.WURZEL
 sys.path.insert(0, str(W / "tools"))
 auftrag_format = importlib.import_module("auftrag_format")
+ROLLENDATEIEN = tuple(f".claude/agents/{r}.md" for r in ("test", "bau", "pruefer"))
 LIVE_SEITE = "https://telco-radar.onrender.com/geraete.html"
 LIVE_FRIST_SEKUNDEN = 20
 LIVE_TAGE_ALT = 1
@@ -159,12 +160,25 @@ def echter_auftrag() -> list[str]:
     datei = W / auftrag_format.KOSTEN
     if not datei.is_file():
         return [f"{auftrag_format.KOSTEN} fehlt"]
-    with datei.open(encoding="utf-8") as f:
-        zeilen = list(csv.DictReader(f))
-    echt = (auftrag_format.GEMERGT, auftrag_format.ECHTER_AGENT)
-    if any((z.get("ergebnis"), z.get("agent")) == echt for z in zeilen):
+    if auftrag_format.echte_auftraege(W):
         return []
-    return ["kein Auftrag eines echten Agenten bis zum Merge"]
+    return ["kein Auftrag, dessen Bau und Prüfer ein Claude-Modell bis zum Merge waren"]
+
+
+def rollen_sperren() -> list[str]:
+    """Probt den Rollen-Hook: ``bau`` darf einen bestehenden Test nicht ändern."""
+    ziel = claude_rolle.Ziel("bau", "src/telco_radar/analyze/", "tests/test_neu.py")
+    test = W / "tests/test_auftrag.py"
+    befehle = (f"echo x >> {test}", f"nice sed -i s/a/b/ {test}", "env git stash")
+    gruende = [("Edit", claude_rolle.verstoss(ziel, W, test, neu=False))]
+    gruende += [
+        ("Bash", claude_rolle.befehl_verstoss(ziel, W, W, b, _alt)) for b in befehle
+    ]
+    return [f"Rolle bau ändert per {w} einen Test" for w, g in gruende if not g]
+
+
+def _alt(_wurzel: Path, _pfad: Path) -> bool:
+    return False
 
 
 def _fehlt(*pfade: str) -> list[str]:
@@ -298,7 +312,9 @@ def offen() -> dict[str, list[str]]:
         + ungepruefte()
         + _vorcommit_median()
         + _mehr("Zeilen CLAUDE.md", _zeilen("CLAUDE.md"), 100),
-        "6 Auftragsablauf": _fehlt("tools/auftrag.py") + echter_auftrag(),
+        "6 Auftragsablauf": _fehlt("tools/auftrag.py", *ROLLENDATEIEN)
+        + rollen_sperren()
+        + echter_auftrag(),
         "7 Kommentarabbau": _fehlt("pruef/kommentar-basis.txt"),
         "8 Promo-IDs": _fehlt("outputs/auftraege/T1.json", "tests/orakel"),
         "9 Lader, render_site": _mehr("Hex-Farben", summe.get("hexfarbe", 0))

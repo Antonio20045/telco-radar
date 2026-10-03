@@ -41,6 +41,7 @@ from telco_radar.report.html import render_site; render_site(Path('/tmp/site'), 
 
 - Grün ist der Exit-Code von `scripts/pruefleiter.py`, nie eine Selbstauskunft; es gibt keinen zweiten Testweg. pre-commit ruft `--schnell`, pre-push `--vor-push`, der Stop-Hook `--schnell` über `scripts/claude_hooks.py stop` (rot heißt weiterarbeiten, nach drei erzwungenen Fortsetzungen endet die Sitzung mit `.pruefleiter/stop-befund.txt`).
 - Basen und Ausnahmelisten unter `pruef/` und in `.importlinter` dürfen nur schrumpfen; die Leiter senkt sie selbst. Lockern kann nur Antonio von Hand.
+- Auftragsagenten laufen als Rolle `test`, `bau` oder `pruefer` (`.claude/agents/`, `TELCO_ROLLE`, `--settings` aus `scripts/claude_rolle.py`); ein Prüferbefund zählt nur, wenn seine Reproduktion fachlich scheitert.
 - Die Claude-Hooks stehen in `scripts/claude_hooks.py`: große Dateien nur mit `limit`, ruff nach jedem Edit, keine Befehle, die Git-Hooks abschalten.
 
 ## Dateikarte
@@ -82,7 +83,6 @@ from telco_radar.report.html import render_site; render_site(Path('/tmp/site'), 
 6. „Nicht gelesen“ ist nicht „leer“: Altern und Ersetzen nur für wirklich gelesene Seiten.
 7. Prüfung und Anzeige teilen eine Definition der Sichtbarkeit; Grenzen sind benannte Konstanten im Modul.
 8. Neues Verhalten braucht einen Test, der gegen den alten Stand rot wird; Optik prüfen `pruefe_portal.py` und Screenshots.
-9. Vor jedem Commit prüft der Agent `diff-reviewer` mit `docs/clean-code-referenz.md` den Diff; S1 und S2 blockieren.
 
 ## Antonios Stil und Abnahme
 

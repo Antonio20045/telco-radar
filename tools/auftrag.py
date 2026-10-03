@@ -17,6 +17,7 @@ import re
 import shlex
 import subprocess
 import sys
+import tempfile
 import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -27,6 +28,8 @@ WURZEL = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(WURZEL / "scripts"))
 pruefstempel = importlib.import_module("pruefstempel")
 format_ = importlib.import_module("auftrag_format")
+pruefer_ = importlib.import_module("auftrag_pruefer")
+rolle_ = importlib.import_module("claude_rolle")
 AUFTRAEGE, KOSTEN, GEMERGT = format_.AUFTRAEGE, format_.KOSTEN, format_.GEMERGT
 
 RUNDEN = 2
@@ -167,15 +170,19 @@ def _zeile(lauf: Lauf, rolle: str, runde: int, code: object, **mehr: object) -> 
     lauf.zeilen.append(dict.fromkeys(format_.SPALTEN, "") | werte)
 
 
-def _agent(lauf: Lauf, rolle: str, runde: int, befund: str) -> int:
+def _agent(
+    lauf: Lauf, rolle: str, runde: int, befund: str, **extra: str
+) -> tuple[int, object]:
     auftrag = lauf.auftrag
     soll = format_.SOLL[auftrag["art"]].format(auftrag.get("erwarteterFehler"))
     werte = {"abnahme": auftrag["abnahme"], "bereich": auftrag["bereich"]}
     prompt = format_.PROMPT[rolle].format(**werte, grenze=DIFF_GRENZE, soll=soll)
     prompt += f"\n\nBefund der letzten Runde:\n{befund}" if befund else ""
     pfade = {name: str(lauf.datei(datei)) for name, datei in LAUFDATEIEN.items()}
+    einstellungen = json.dumps(rolle_.einstellungen(rolle))
+    befehl = [*lauf.agent, "--agent", rolle, "--settings", einstellungen]
     start = time.monotonic()
-    ergebnis = _prozess(lauf.agent, lauf.wt, prompt, TELCO_ROLLE=rolle, **pfade)
+    ergebnis = _prozess(befehl, lauf.wt, prompt, TELCO_ROLLE=rolle, **pfade | extra)
     sekunden, code = round(time.monotonic() - start, 1), ergebnis.returncode
     protokoll = ergebnis.stdout + ergebnis.stderr
     try:
@@ -183,14 +190,8 @@ def _agent(lauf: Lauf, rolle: str, runde: int, befund: str) -> int:
     except json.JSONDecodeError as fehler:
         bericht, protokoll = {}, f"{protokoll}\nKostenbericht nicht lesbar: {fehler}"
     lauf.datei(f"{rolle}-{runde}.log").write_text(protokoll, "utf-8")
-    nutzung = bericht.get("usage") if isinstance(bericht, dict) else None
-    _zeile(lauf, rolle, runde, code, sekunden=sekunden)
-    lauf.zeilen[-1] |= {
-        "kosten_usd": format_.zahl(bericht, "total_cost_usd"),
-        "token_ein": format_.zahl(nutzung, "input_tokens"),
-        "token_aus": format_.zahl(nutzung, "output_tokens"),
-    }
-    return code
+    _zeile(lauf, rolle, runde, code, sekunden=sekunden, **format_.verbrauch(bericht))
+    return code, bericht
 
 
 def _geaendert(ort: Path) -> tuple[list[str], list[str]]:
@@ -200,12 +201,20 @@ def _geaendert(ort: Path) -> tuple[list[str], list[str]]:
 
 def _ausserhalb(lauf: Lauf, rolle: str) -> str:
     alt, neu = _geaendert(lauf.wt)
-    bereich = lauf.auftrag["bereich"]
-    eigene = (lauf.auftrag["abnahme"],) if rolle == "test" else (bereich,)
-    neue = ("tests/",) if rolle == "test" else ("tests/", bereich)
-    fremd = [p for p in alt if not p.startswith(eigene)]
-    fremd += [p for p in neu if not p.startswith(neue)]
+    ziel = rolle_.Ziel(rolle, lauf.auftrag["bereich"], lauf.auftrag["abnahme"])
+    fremd = [p for p in alt + neu if rolle_.verstoss(ziel, lauf.wt, Path(p), p in neu)]
     return f"Rolle {rolle} darf nicht ändern: {', '.join(sorted(fremd))}" * bool(fremd)
+
+
+def _pruefer(lauf: Lauf, runde: int) -> str:
+    ordner = Path(tempfile.mkdtemp(prefix=f"pruefer-{lauf.auftrag['id']}-"))
+    vorher = _geaendert(lauf.wt), _git(lauf.wt, "diff", "HEAD")
+    code, bericht = _agent(lauf, "pruefer", runde, "", TELCO_PRUEFER_ORDNER=str(ordner))
+    if (_geaendert(lauf.wt), _git(lauf.wt, "diff", "HEAD")) != vorher:
+        return "Prüfer hat den Worktree geändert"
+    urteil = pruefer_.urteilen(bericht, ordner, lauf.wt)
+    lauf.datei(f"pruefer-{runde}-urteil.txt").write_text(urteil.protokoll, "utf-8")
+    return f"Prüfer Exit {code}" if code else urteil.befund
 
 
 def _abnahme_befund(lauf: Lauf) -> str:
@@ -229,7 +238,7 @@ def _testphase(lauf: Lauf) -> str:
         if not befund:
             return ""
     for versuch in range(1, TESTVERSUCHE + 1):
-        code = _agent(lauf, "test", versuch, befund)
+        code, _ = _agent(lauf, "test", versuch, befund)
         befund = f"Agent Exit {code}" if code else _ausserhalb(lauf, "test")
         befund = befund or _abnahme_befund(lauf)
         if not befund:
@@ -255,7 +264,7 @@ def _produktzeilen(ort: Path) -> int:
     return anzahl + sum(len((ort / p).read_bytes().splitlines()) for p in neu)
 
 
-def _urteil(lauf: Lauf, code: int, summe: str) -> str:
+def _urteil(lauf: Lauf, runde: int, code: int, summe: str) -> str:
     alt, neu = _geaendert(lauf.wt)
     zeilen = _produktzeilen(lauf.wt)
     if code:
@@ -272,6 +281,8 @@ def _urteil(lauf: Lauf, code: int, summe: str) -> str:
     code, ausgabe = _leiter(lauf.wt, "schnell")
     if code != GRUEN:
         return f"schnelle Leiter rot (Exit {code})\n{_tail(ausgabe)}"
+    if befund := _pruefer(lauf, runde):
+        return befund
     nachricht, rot = (
         lauf.datei(LAUFDATEIEN["TELCO_COMMIT_NACHRICHT"]),
         lauf.datei(ROT_BELEG),
@@ -287,23 +298,13 @@ def _bauphase(lauf: Lauf) -> tuple[Ende, list[str]]:
     summe, befunde = _pruefsumme(lauf), [""]
     voraussetzung = lauf.datei(LAUFDATEIEN["TELCO_VORAUSSETZUNG"])
     for runde in range(1, RUNDEN + 1):
-        code = _agent(lauf, "bau", runde, befunde[-1])
+        code, _ = _agent(lauf, "bau", runde, befunde[-1])
         if voraussetzung.is_file():
             return Ende.VORAUSSETZUNG, [voraussetzung.read_text("utf-8").strip()]
-        befunde.append(_urteil(lauf, code, summe))
+        befunde.append(_urteil(lauf, runde, code, summe))
         if not befunde[-1]:
             return Ende.GEMERGT, []
     return Ende.NOTIZ, befunde[1:]
-
-
-def _notiz(lauf: Lauf, ende: Ende, befunde: list[str]) -> Path:
-    datei = lauf.wurzel / AUFTRAEGE / f"{lauf.auftrag['id']}-notiz.md"
-    datei.parent.mkdir(parents=True, exist_ok=True)
-    teile = [f"# Auftrag {lauf.auftrag['id']}: {ende.name.lower()}"]
-    teile += [f"Ziel: {lauf.auftrag['ziel']}", f"Worktree: {lauf.wt}"]
-    teile += [f"## Befund {n}\n\n```\n{b}\n```" for n, b in enumerate(befunde, 1)]
-    datei.write_text("\n\n".join(teile) + "\n", "utf-8")
-    return datei
 
 
 def _zusammenfuehren(lauf: Lauf) -> tuple[Ende, list[str]]:
@@ -365,7 +366,10 @@ def ausfuehren(lauf: Lauf) -> Ende:
     if ende is not Ende.GEMERGT:
         _zeile(lauf, "ende", 0, "", ergebnis=ende.name.lower())
         format_.kosten_schreiben(lauf.zeilen, lauf.wurzel)
-        print(f"Notiz: {_notiz(lauf, ende, befunde)}")
+        notiz = format_.notiz(
+            lauf.wurzel, lauf.auftrag, lauf.wt, ende.name.lower(), befunde
+        )
+        print(f"Notiz: {notiz}")
     return ende
 
 

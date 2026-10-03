@@ -108,3 +108,61 @@ def test_fehlende_pytest_konfiguration_fehlt_ganz(projekt):
     (projekt / "pyproject.toml").write_text("[tool.ruff]\n", encoding="utf-8")
     zaehlung = waechter_tests.tests_zaehlung(projekt)
     assert zaehlung[("pyproject.toml", "pytest-pflicht")] == 3
+
+
+@pytest.mark.parametrize(
+    ("name", "text"),
+    [
+        ("tests/test_x.py", "class TestA:\n    __test__ = False\n"),
+        ("tests/test_x.py", "def test_a(): ...\n\n\ntest_a.__test__ = False\n"),
+        (
+            "tests/test_x.py",
+            "import pytest\npytest.skip('x', allow_module_level=True)\n",
+        ),
+        ("tests/build/test_x.py", "def test_a():\n    assert False\n"),
+        ("tests/.weg/test_x.py", "def test_a():\n    assert False\n"),
+        ("tests/geraete/venv/test_x.py", "def test_a():\n    assert False\n"),
+        ("tests/pruef_x.py", "def test_a():\n    assert False\n"),
+        ("tests/x.py", "class TestA:\n    def test_a(self): ...\n"),
+    ],
+)
+def test_vor_pytest_versteckter_test_zaehlt(projekt, name, text):
+    (projekt / name).parent.mkdir(parents=True, exist_ok=True)
+
+    zaehlung = _zaehle(projekt, text, name)
+
+    assert zaehlung == {(name, "test-versteckt"): 1}
+
+
+@pytest.mark.parametrize(
+    ("name", "text"),
+    [
+        ("tests/helfer.py", "def hilfe():\n    return 1\n"),
+        ("tests/geraete/test_x.py", "def test_a():\n    assert True\n"),
+        ("tests/x_test.py", "def test_a():\n    assert True\n"),
+        ("tests/kanarie_leiter.py", "def test_muss_scheitern():\n    assert False\n"),
+    ],
+)
+def test_gesammelter_test_und_hilfsmodul_zaehlen_nicht(projekt, name, text):
+    (projekt / name).parent.mkdir(parents=True, exist_ok=True)
+
+    assert _zaehle(projekt, text, name) == {}
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "import test_alt\n\ntest_alt.test_x = lambda: None\n",
+        "import test_alt as t\n\ndel t.test_x\n",
+        "from tests import test_alt\n\nsetattr(test_alt, 'test_x', None)\n",
+        "import test_alt\n\n\ndef test_a(monkeypatch):\n"
+        "    monkeypatch.setattr(test_alt, 'WERT', 1)\n",
+    ],
+)
+def test_ueberschriebenes_testmodul_zaehlt(projekt, text):
+    assert _zaehle(projekt, text) == {("tests/test_x.py", "test-versteckt"): 1}
+
+
+def test_gelesenes_testmodul_zaehlt_nicht(projekt):
+    text = "from test_alt import HEUTE\nimport test_b\n\nX = getattr(test_b, 'Y')\n"
+    assert _zaehle(projekt, text) == {}
