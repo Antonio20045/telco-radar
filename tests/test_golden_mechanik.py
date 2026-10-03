@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import importlib
+import sys
 from datetime import UTC, datetime
+from pathlib import Path
 
 import httpx
 import pytest
@@ -11,6 +14,9 @@ from telco_radar import golden
 from telco_radar.analyze import llm
 from telco_radar.collect import http
 from telco_radar.naehte import PRODUKTION, Naehte
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+golden_aufnehmen = importlib.import_module("golden_aufnehmen")
 
 QUELLE = "https://quelle.example/rss"
 
@@ -131,3 +137,26 @@ def test_umleitung_wird_aufgenommen_und_wiedergegeben(tmp_path):
 
     assert http.fetch("https://quelle.example/alt", {}, schnell=True).text == "<rss/>"
     assert band.fehlend == []
+
+
+def _antworten(*eintraege: dict) -> golden.Band:
+    band = golden.Band()
+    for nr, eintrag in enumerate(eintraege):
+        band.merke(("editor", "modell-a", str(nr)), eintrag)
+    return band
+
+
+def test_ausfall_wird_nur_mit_dem_schalter_aufgenommen():
+    abgelehnt = _antworten({"fehler": "LLMFatalError"})
+
+    with pytest.raises(SystemExit, match="--llm-ausfall"):
+        golden_aufnehmen.llm_pruefen(abgelehnt, llm_ausfall=False)
+    golden_aufnehmen.llm_pruefen(abgelehnt, llm_ausfall=True)
+
+
+def test_schalter_ausfall_verweigert_einen_lauf_mit_antwort():
+    beantwortet = _antworten({"fehler": "LLMFatalError"}, {"antwort": "ja"})
+
+    with pytest.raises(SystemExit, match="hat geantwortet"):
+        golden_aufnehmen.llm_pruefen(beantwortet, llm_ausfall=True)
+    golden_aufnehmen.llm_pruefen(beantwortet, llm_ausfall=False)

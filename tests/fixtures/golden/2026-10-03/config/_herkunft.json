@@ -1,134 +1,134 @@
 {
  "eintraege": [
   {
-   "abgeleitet_aus": "config/ct_domains.yaml @ 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "config/ct_domains.yaml @ 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "ct_domains.yaml",
    "filter": null,
    "sha256_roh": "55dac33de00600b8b57ad6a4a0967bb876a277e8230610f5f34129d4a8fb28c3"
   },
   {
-   "abgeleitet_aus": "config/ctm_fokus.yaml @ 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "config/ctm_fokus.yaml @ 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "ctm_fokus.yaml",
    "filter": null,
    "sha256_roh": "8af9ed5b264ff3a17e17be22df55dfde1ca9d8d23cedb556d41995277dce1380"
   },
   {
-   "abgeleitet_aus": "config/farben.yaml @ 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "config/farben.yaml @ 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "farben.yaml",
    "filter": null,
    "sha256_roh": "f7b5d4f9b18964c7c91ba177deb464cc6fdaaad2a7db59bad0826e37442dab32"
   },
   {
-   "abgeleitet_aus": "config/fruehwarnung.yaml @ 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "config/fruehwarnung.yaml @ 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "fruehwarnung.yaml",
    "filter": null,
    "sha256_roh": "ba449a3d15228997d26a62c94e1a6735d5c03dcff09176269408d1a466ff6141"
   },
   {
-   "abgeleitet_aus": "config/geraete_abdeckung.yaml @ 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "config/geraete_abdeckung.yaml @ 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "geraete_abdeckung.yaml",
    "filter": null,
    "sha256_roh": "ee4406aca04037537d1bc27d8003e8d9dd93d6e900c292eeec7cf5e3b03648c9"
   },
   {
-   "abgeleitet_aus": "config/geraete_katalog.yaml @ 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "config/geraete_katalog.yaml @ 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "geraete_katalog.yaml",
    "filter": null,
    "sha256_roh": "3f2e0b4b6072ad4502c10b0d41aa09466ea5ec649d6a861ed7ff9fa2f34cd10f"
   },
   {
-   "abgeleitet_aus": "config/geraete_quellen.yaml @ 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "config/geraete_quellen.yaml @ 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "geraete_quellen.yaml",
    "filter": null,
    "sha256_roh": "e35b029529c8528b36a8bab0d03cda774b059ac987c6632ed8b34ada484dd300"
   },
   {
-   "abgeleitet_aus": "config/kandidaten_firmen.yaml @ 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "config/kandidaten_firmen.yaml @ 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "kandidaten_firmen.yaml",
    "filter": null,
    "sha256_roh": "f9c42ca0b660f80972c20d8142e84f07f37dff08c512912078f0731492550dae"
   },
   {
-   "abgeleitet_aus": "config/lieferzeit_warenkorb.yaml @ 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "config/lieferzeit_warenkorb.yaml @ 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "lieferzeit_warenkorb.yaml",
    "filter": null,
    "sha256_roh": "7d71dbe221affc80c64d5ad86b51222934f7e0caf865e67c68bf941778f6e7b2"
   },
   {
-   "abgeleitet_aus": "config/news_sources.yaml @ 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "config/news_sources.yaml @ 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "news_sources.yaml",
    "filter": "nur Telecom Handel, teltarif",
    "sha256_roh": "008a6ac0ce1119f325d7f55b6ea1793565a1ffb6fb9a2a0679ad90b6c31a08e5"
   },
   {
-   "abgeleitet_aus": "config/newsletter.yaml @ 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "config/newsletter.yaml @ 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "newsletter.yaml",
    "filter": null,
    "sha256_roh": "fa1cbe03a116fbbfca88d7e9a903d2fa9858b7170cb30ea482bfbd58cab401aa"
   },
   {
-   "abgeleitet_aus": "config/promo_sources.yaml @ 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "config/promo_sources.yaml @ 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "promo_sources.yaml",
    "filter": null,
    "sha256_roh": "b98a624671c1b0d44fb941f36ed6f9c85b98926dee56b0eae97db80b47b205ae"
   },
   {
-   "abgeleitet_aus": "config/settings.yaml @ 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "config/settings.yaml @ 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "settings.yaml",
    "filter": "{\"aenderungsradar_aktiv\": false, \"analyst_batch_workers\": 1, \"collect_max_workers\": 1, \"ct_radar_aktiv\": false, \"geraete_enabled\": false, \"lieferzeit_radar_aktiv\": false, \"llm_max_workers\": 1, \"lookback_days\": 3, \"promo_enabled\": false, \"tarif_radar_aktiv\": false}",
    "sha256_roh": "4333f8e81ed584f6ef3da4e6658c955383d9ccb8e8575c3e067e468f61ca36ad"
   },
   {
-   "abgeleitet_aus": "config/tarif_quellen.yaml @ 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "config/tarif_quellen.yaml @ 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "tarif_quellen.yaml",
    "filter": null,
    "sha256_roh": "6ecf55bdfd64c0153d400bddd5452efc6d347ac78add06d1f713ab7a6bd1c87c"
   },
   {
-   "abgeleitet_aus": "config/tarif_seiten.yaml @ 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "config/tarif_seiten.yaml @ 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "tarif_seiten.yaml",
    "filter": null,
    "sha256_roh": "b58a33cca41d8ae44cc92b99eaf322e53df220ed69d39bb4ec84f0c4cdb7e7a9"
   },
   {
-   "abgeleitet_aus": "config/tech_sources.yaml @ 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "config/tech_sources.yaml @ 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "tech_sources.yaml",
    "filter": "nur Apple, OpenAI",
    "sha256_roh": "8099153fff3d9a8c5fdd0859a35afd8313e8b7829eed51bd59a0dee743bdd0ad"
   },
   {
-   "abgeleitet_aus": "config/vodafone_hebel.yaml @ 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "config/vodafone_hebel.yaml @ 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "vodafone_hebel.yaml",
    "filter": null,
    "sha256_roh": "033279a2ee8840cc79cd2fb54d9710540b6c36242c9a0217ab02ddcb258aa3d2"
   },
   {
-   "abgeleitet_aus": "config/watchlist.yaml @ 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "config/watchlist.yaml @ 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "watchlist.yaml",
    "filter": "nur RSS von Deutsche Telekom, O2 Telefónica Deutschland, Vodafone Deutschland",
    "sha256_roh": "668edb247891132cd683658ea666be63f1abd0b8973d241ef7d1a9ee2ed2b3f2"
   },
   {
-   "abgeleitet_aus": "config/watchlist_extra.yaml @ 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "config/watchlist_extra.yaml @ 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "watchlist_extra.yaml",
    "filter": null,
    "sha256_roh": "3e0cb30c1fc3d852891bfd81a082b8e73ec5f9509f4be1912b2d658a032d8a54"

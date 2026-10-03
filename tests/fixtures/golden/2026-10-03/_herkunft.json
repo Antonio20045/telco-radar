@@ -1,30 +1,38 @@
 {
+ "abgeleitet_aus": "Aufnahme aus Lauf 37134812406, Code 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
  "bestand": "tests/fixtures/bestand/2026-10-03",
- "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+ "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
  "eintraege": [
   {
    "abgeleitet_aus": "zwei Wiedergaben der Aufnahme, gleiche Seiten",
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "erwartet.json",
    "filter": null,
-   "sha256_roh": "6ca1080085f14809c9e7b582624f3c2d943184f1e1097e7f573c21dcd297f013"
+   "sha256_roh": "67ea81d9dcb2c903ce079710b7ab107777a05eb6b3f1cb217beb97a0ce6ccd41"
   },
   {
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "goldener Lauf 2026-10-03T15:53:29+00:00, Lauf 37134812406",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "http.jsonl.gz",
    "filter": null,
-   "quelle": "goldener Lauf 2026-10-03T15:53:29+00:00, Lauf 37134812406",
-   "sha256_roh": "26560110e85f370aa60c958134c1c34e20a4039db72888694a4ae533d3b1a7e8"
+   "sha256_roh": "283a968edaa58c5432d8780fc73c83dadf05961b5c70a22a82e3602a86d48b47"
   },
   {
-   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "abgeleitet_aus": "goldener Lauf 2026-10-03T15:53:29+00:00, Lauf 37134812406",
+   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
    "datei": "llm.jsonl.gz",
    "filter": null,
-   "quelle": "goldener Lauf 2026-10-03T15:53:29+00:00, Lauf 37134812406",
    "sha256_roh": "2c407aecd0964c157732929ea449e999ac274339536f0d4544b7b3807bb5559c"
   }
  ],
  "lauf": "37134812406",
+ "llm": "jede LLM-Anfrage abgelehnt, aufgenommen ist der Weg ohne LLM",
+ "luecken": [
+  "HTTP-Antwort für GET https://newsroom.vodafone.de/rss fehlt, neu aufnehmen mit make golden-aufnehmen",
+  "HTTP-Antwort für GET https://unternehmen.vodafone.de/newsroom/rss fehlt, neu aufnehmen mit make golden-aufnehmen",
+  "HTTP-Antwort für GET https://www.telekom.com/en/investor-relations.rss.feed.427676.xml fehlt, neu aufnehmen mit make golden-aufnehmen",
+  "HTTP-Antwort für GET https://www.telekom.com/service/rss/427676/feed.rss fehlt, neu aufnehmen mit make golden-aufnehmen"
+ ],
  "umgebung": [
   "LLM_API_KEY"
  ],

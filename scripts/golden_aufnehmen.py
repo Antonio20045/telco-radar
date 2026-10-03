@@ -4,7 +4,11 @@ Startet nur Antonio, über ``make golden-aufnehmen`` oder den Workflow ``golden.
 Braucht Netz und den LLM-Schlüssel. Schreibt ``tests/fixtures/golden/<tag>/`` neu,
 nie über eine bestehende Aufnahme, und gibt sie erst frei, wenn zwei Wiedergaben
 in frischen Prozessen ohne Lücke dieselben Seiten ergeben; erst dann entsteht
-``erwartet.json``. ``--pruefen ORDNER`` ist diese Wiedergabe allein. Läuft mit
+``erwartet.json``. ``--pruefen ORDNER`` ist diese Wiedergabe allein. Lehnt das LLM
+jede Anfrage ab, bricht die Aufnahme ab; nur ``--llm-ausfall`` nimmt diesen Weg
+ausdrücklich auf und vermerkt ihn in ``_herkunft.json``. ``--ableiten ALT`` nimmt
+ohne Netz aus der Aufnahme ALT neu auf, wenn sich der Code geändert hat; was ALT
+nicht kennt, landet als Verbindungsfehler und unter ``luecken``. Läuft mit
 ``PYTHONPATH=src``.
 """
 
@@ -51,6 +55,7 @@ EINSTELLUNGEN = {
     "analyst_batch_workers": 1,
 }
 LLM_PFADE = ("/completions", "/messages")
+LLM_AUSFALL = "jede LLM-Anfrage abgelehnt, aufgenommen ist der Weg ohne LLM"
 
 
 def konfiguration(ziel: Path) -> dict[str, str]:
@@ -99,8 +104,13 @@ def aufnehmen(
     uhr: datetime,
     http_innen: http.Transport | None = None,
     llm_innen: golden.LlmClient | None = None,
+    llm_ausfall: bool = False,
+    zusatz: dict | None = None,
 ) -> None:
-    """Ein echter Lauf mit fester Uhr; Netz und LLM landen auf den Bändern."""
+    """Ein echter Lauf mit fester Uhr; Netz und LLM landen auf den Bändern.
+
+    ``zusatz`` kommt aus ``ableiten`` und ersetzt Umgebung und Lauf der Herkunft.
+    """
     filter_je_datei = konfiguration(ordner / "config")
     netz, antworten = golden.Band(), golden.Band()
     tag = uhr.date().isoformat()
@@ -112,6 +122,8 @@ def aufnehmen(
         stoppuhr=lambda: 0.0,
     )
     vorhanden = [name for name in golden.SCHLUESSEL if os.environ.get(name)]
+    if zusatz:
+        vorhanden = zusatz["umgebung"]
     with tempfile.TemporaryDirectory() as tmp:
         wurzel = golden.wurzel_bauen(Path(tmp), ordner, WURZEL / BESTAND)
         try:
@@ -122,8 +134,7 @@ def aufnehmen(
                 pipeline.run(wurzel, use_llm=True, naehte=naehte)
         finally:
             PRODUKTION.setzen()
-    if not any("antwort" in e for liste in antworten.eintraege.values() for e in liste):
-        sys.exit("Keine einzige LLM-Antwort; ein Ausfall ist kein goldener Lauf")
+    llm_pruefen(antworten, llm_ausfall)
     for schluessel in [k for k in netz.eintraege if k[1].endswith(LLM_PFADE)]:
         del netz.eintraege[schluessel]
     golden.schreibe_band(ordner / golden.HTTP_DATEI, netz)
@@ -138,9 +149,20 @@ def aufnehmen(
         "bestand": BESTAND,
         "umgebung": vorhanden,
         "lauf": os.environ.get("GITHUB_RUN_ID", "lokal"),
+        "llm": LLM_AUSFALL if llm_ausfall else "beantwortet",
+        **(zusatz or {}),
         "eintraege": [],
     }
     schreibe_herkunft(ordner, angaben, filter_je_datei)
+
+
+def llm_pruefen(antworten: golden.Band, llm_ausfall: bool) -> None:
+    """Ein Ausfall wird nur mit ``--llm-ausfall`` golden, und nur ein ganzer."""
+    beantwortet = any("antwort" in e for v in antworten.eintraege.values() for e in v)
+    if not beantwortet and not llm_ausfall:
+        sys.exit("Keine einzige LLM-Antwort; den Ausfall nimmt nur --llm-ausfall auf")
+    if beantwortet and llm_ausfall:
+        sys.exit("--llm-ausfall, aber das LLM hat geantwortet; ohne Schalter aufnehmen")
 
 
 def ohne_geheimnis(ordner: Path, vorhanden: list[str]) -> None:
@@ -148,7 +170,8 @@ def ohne_geheimnis(ordner: Path, vorhanden: list[str]) -> None:
     for pfad in [p for p in ordner.rglob("*") if p.is_file()]:
         roh = pfad.read_bytes()
         roh = golden.gzip.decompress(roh) if pfad.suffix == ".gz" else roh
-        if any(os.environ[name].encode() in roh for name in vorhanden):
+        werte = [os.environ[name] for name in vorhanden if os.environ.get(name)]
+        if any(wert.encode() in roh for wert in werte):
             shutil.rmtree(ordner)
             sys.exit(f"Schlüssel in {pfad.name}; Aufnahme verworfen")
 
@@ -157,6 +180,7 @@ def schreibe_herkunft(ordner: Path, angaben: dict, filter_je_datei: dict) -> Non
     """Je Ordner ``_herkunft.json`` mit sha256 und Beleg je Datei, wie Stufe 0 es
     für Fixtures verlangt; im Aufnahmeordner zusätzlich Uhr, Umgebung, Bestand."""
     aufnahme = f"goldener Lauf {angaben['zeit']}, Lauf {angaben['lauf']}"
+    quelle = "abgeleitet_aus" if "abgeleitet_aus" in angaben else "quelle"
     je_ordner: dict[Path, list[dict]] = {ordner: []}
     for pfad in sorted(p for p in ordner.rglob("*") if p.is_file()):
         if pfad.name == golden.HERKUNFT:
@@ -169,7 +193,7 @@ def schreibe_herkunft(ordner: Path, angaben: dict, filter_je_datei: dict) -> Non
         elif pfad.name == ERWARTET:
             beleg = {"abgeleitet_aus": "zwei Wiedergaben der Aufnahme, gleiche Seiten"}
         else:
-            beleg = {"quelle": aufnahme}
+            beleg = {quelle: aufnahme}
         je_ordner.setdefault(pfad.parent, []).append(
             {
                 "datei": pfad.name,
@@ -184,6 +208,38 @@ def schreibe_herkunft(ordner: Path, angaben: dict, filter_je_datei: dict) -> Non
         inhalt.setdefault("eintraege", eintraege)
         text = json.dumps(inhalt, indent=1, sort_keys=True, ensure_ascii=False)
         (ziel / golden.HERKUNFT).write_text(text + "\n", encoding="utf-8")
+
+
+def ableiten(alt: Path, ordner: Path) -> None:
+    """Neue Aufnahme ohne Netz aus ALT, deren LLM jede Anfrage abgelehnt hat.
+
+    Quellen antworten aus ALT; Anfragen, die ALT nicht kennt, scheitern als
+    Verbindungsfehler und stehen unter ``luecken``. Das LLM lehnt ab wie in ALT.
+    """
+    angaben = golden.herkunft(alt)
+    netz = golden.lies_band(alt / golden.HTTP_DATEI)
+    fehler = {
+        e.get("fehler")
+        for v in golden.lies_band(alt / golden.LLM_DATEI).eintraege.values()
+        for e in v
+    }
+    if fehler != {"LLMFatalError"}:
+        sys.exit(f"{alt} hat LLM-Antworten {sorted(map(str, fehler))}; nur Ablehnungen")
+
+    def abgelehnt(*_: object) -> str:
+        raise llm.LLMFatalError(f"abgelehnt wie in Lauf {angaben['lauf']}")
+
+    lauf, code = angaben["lauf"], angaben["commit"]
+    zusatz = {
+        "umgebung": angaben["umgebung"],
+        "lauf": lauf,
+        "abgeleitet_aus": f"Aufnahme aus Lauf {lauf}, Code {code}",
+    }
+    uhr = datetime.fromisoformat(angaben["zeit"])
+    aufnehmen(ordner, uhr, http.Wiedergabe(netz), abgelehnt, True, zusatz)
+    angaben = {**golden.herkunft(ordner), "luecken": sorted(set(netz.fehlend))}
+    alt_filter = golden.herkunft(ordner / "config")["eintraege"]
+    schreibe_herkunft(ordner, angaben, {e["datei"]: e["filter"] for e in alt_filter})
 
 
 def pruefen(ordner: Path) -> dict[str, str]:
@@ -238,9 +294,23 @@ def freigeben(ordner: Path) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--pruefen", type=Path, help="nur wiedergeben, Seiten als JSON")
+    parser.add_argument("--llm-ausfall", action="store_true", help=LLM_AUSFALL)
+    parser.add_argument("--ableiten", type=Path, help="ohne Netz aus dieser Aufnahme")
     args = parser.parse_args()
     if args.pruefen:
         print(json.dumps(pruefen(args.pruefen), sort_keys=True))
+        return 0
+    if args.ableiten:
+        if not args.llm_ausfall:
+            sys.exit("--ableiten gibt es nur mit --llm-ausfall")
+        alt = args.ableiten.resolve()
+        with tempfile.TemporaryDirectory() as tmp:
+            neu = Path(tmp) / alt.name
+            ableiten(alt, neu)
+            freigeben(neu)
+            shutil.rmtree(alt)
+            shutil.copytree(neu, alt)
+        print(f"Aufnahme abgeleitet und freigegeben: {alt.relative_to(WURZEL)}")
         return 0
     if not os.environ.get("LLM_API_KEY"):
         sys.exit("LLM_API_KEY fehlt; die Aufnahme ist ein echter Lauf")
@@ -248,7 +318,7 @@ def main() -> int:
     ordner = ZIEL / uhr.date().isoformat()
     if ordner.exists():
         sys.exit(f"{ordner} gibt es schon; Aufnahmen werden ersetzt, nicht geändert")
-    aufnehmen(ordner, uhr)
+    aufnehmen(ordner, uhr, llm_ausfall=args.llm_ausfall)
     freigeben(ordner)
     print(f"Aufnahme freigegeben: {ordner.relative_to(WURZEL)}")
     return 0
