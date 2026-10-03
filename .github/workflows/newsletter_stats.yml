@@ -81,6 +81,7 @@ jobs:
           git config user.name "telco-radar-bot"
           git config user.email "bot@users.noreply.github.com"
           git add data/state/newsletter_stats.jsonl site/
+          python scripts/waechter_leck.py
           git diff --cached --quiet && { echo "Nichts geaendert."; exit 0; }
           git commit -m "newsletter: Zahlen der Ausgabe ${{ github.event.client_payload.date }}"
           for versuch in 1 2 3; do

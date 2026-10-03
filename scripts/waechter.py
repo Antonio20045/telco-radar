@@ -20,6 +20,7 @@ from collections.abc import Callable
 from functools import partial
 from pathlib import Path
 
+from waechter_leck import lecks
 from waechter_regeln import (
     Schluessel,
     anker_aus_text,
@@ -80,6 +81,7 @@ def pruefe(
         for name in ABGESCHAFFT
         if (wurzel / name).exists()
     ]
+    rot += lecks(wurzel)
     paare = [
         (RIESEN_BASIS, riesendateien(wurzel)),
         (PRIVAT_BASIS, privat),

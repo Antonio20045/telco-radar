@@ -209,6 +209,7 @@ jobs:
           if [ -f data/state/geraete_unbekannt.jsonl ]; then
             git add data/state/geraete_unbekannt.jsonl
           fi
+          python scripts/waechter_leck.py
           if git diff --cached --quiet; then
             echo "Keine Aenderung am Geraetebestand."
             exit 0
@@ -243,6 +244,7 @@ jobs:
             grep -qx 'gerendert=true' "$out"
           }
           git add site
+          python scripts/waechter_leck.py
           if git diff --cached --quiet; then
             echo "Keine Aenderung an der Seite."
             exit 0
@@ -262,6 +264,7 @@ jobs:
             git reset --hard "origin/$BRANCH"
             neu_bauen || { echo "Neuaufbau nach dem Zuruecksetzen gescheitert"; exit 1; }
             git add site
+            python scripts/waechter_leck.py
             git diff --cached --quiet && exit 0
             git commit -m "geraeteradar: Seite neu gebaut $(date -u +%Y-%m-%d)"
             echo "Push fehlgeschlagen, Versuch $i - Seite neu gebaut"
