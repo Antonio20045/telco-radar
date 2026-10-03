@@ -39,7 +39,7 @@ import logging
 import os
 import smtplib
 import ssl
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from email.message import EmailMessage
 from pathlib import Path
 
@@ -97,7 +97,7 @@ class Zustellbuch:
 
     def merke(self, kanal: str, schluessel: str, notiz: str = "") -> None:
         self.daten.setdefault(kanal, {})[schluessel] = {
-            "gesendet": datetime.now().isoformat(timespec="seconds"),
+            "gesendet": datetime.now(UTC).isoformat(timespec="seconds"),
             "notiz": notiz,
         }
         self.pfad.parent.mkdir(parents=True, exist_ok=True)
