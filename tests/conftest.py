@@ -55,7 +55,9 @@ STDLIB = tuple({f"{ort}{os.sep}" for ort in (_STDLIB, str(Path(_STDLIB).resolve(
 IMPORT_RAHMEN = frozenset(
     {"get_code", "exec_module", "_load_unlocked", "_find_and_load"}
 )
-RENDER_RAHMEN = frozenset({"_load_template"})
+# Eine Bibliothek, die selbst Quelltext liest (Vorlagen rendern, Aufrufstapel für
+# Fehlermeldungen), ist kein Lesen des Tests; nur ihre Ladefunktionen reichen durch.
+LESE_RAHMEN = frozenset({"get_source", "get_data", "open_resource", "read_text"})
 SHELLS = frozenset({"sh", "bash", "zsh", "dash"})
 LESER_IM_KIND = frozenset(
     {"cat", "head", "tail", "less", "more", "grep", "egrep", "rg", "sed", "awk"}
@@ -134,8 +136,8 @@ def _gesperrt(name: str, gesperrt: tuple[str, ...] = GESPERRT) -> str | None:
 
 
 def _liest_der_test_selbst() -> str | None:
-    """Nennt die Testdatei, wenn der Zugriff aus ihr kommt: über Standardbibliothek
-    und Bibliotheken hinweg, außer ein Import oder das Rendern einer Vorlage liest."""
+    """Nennt die Testdatei, wenn der Zugriff aus ihr kommt: über die Standardbibliothek
+    und die Ladefunktionen von Bibliotheken hinweg, nicht aber durch einen Import."""
     rahmen = sys._getframe(2)
     while rahmen is not None:
         name = rahmen.f_code.co_filename
@@ -144,7 +146,7 @@ def _liest_der_test_selbst() -> str | None:
             if funktion in IMPORT_RAHMEN:
                 return None
         elif name.startswith(BIBLIOTHEKEN):
-            if funktion in RENDER_RAHMEN:
+            if funktion not in LESE_RAHMEN:
                 return None
         elif not name.startswith(("<", *STDLIB)):
             if name.startswith(TESTS) and not name.endswith(f"{os.sep}conftest.py"):
