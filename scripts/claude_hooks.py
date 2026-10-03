@@ -11,8 +11,10 @@ from __future__ import annotations
 
 import io
 import json
+import os
 import re
 import shlex
+import shutil
 import subprocess
 import sys
 from collections.abc import Callable
@@ -24,6 +26,8 @@ GROSS_AB_ZEILEN = 800
 BINAER_PROBE = 8192
 STOP_HOECHSTENS_ROT = 3
 STOP_ZAEHLER = "stop-rot.json"
+STOP_SITZUNGEN = 20
+NACH_EDIT_SEKUNDEN = 25
 STOP_BEFUND = "stop-befund.txt"
 HOOKS = ".githooks"
 NIE_UEBERSPRINGEN = "--no-verify"
@@ -140,10 +144,33 @@ def datei_lesen(ereignis: dict) -> str | None:
 
 
 def nach_edit(ereignis: dict, wurzel: Path = WURZEL) -> str | None:
-    """PostToolUse Edit/Write: ruff format und ruff check auf die eine Datei."""
+    """PostToolUse Edit/Write: ruff format und ruff check auf die eine Datei.
+
+    Läuft der Hook nicht im ``.venv``, ruft er sich dort auf; ohne ``.venv`` prüft er
+    nichts, das meldet ``sitzung``.
+    """
     pfad = Path(str(ereignis.get("tool_input", {}).get("file_path", "")))
     if pfad.suffix != ".py" or not pfad.is_file() or not pfad.is_relative_to(wurzel):
         return None
+    eigenes_venv = sys.prefix != sys.base_prefix
+    if not (eigenes_venv and (Path(sys.executable).parent / "ruff").exists()):
+        venv = wurzel / ".venv" / "bin"
+        if not (venv / "python").exists() or not (venv / "ruff").exists():
+            return None
+        aufruf = [str(venv / "python"), str(Path(__file__).resolve()), "nach_edit"]
+        try:
+            lauf = subprocess.run(
+                aufruf,
+                input=json.dumps(ereignis),
+                capture_output=True,
+                text=True,
+                timeout=NACH_EDIT_SEKUNDEN,
+            )
+        except subprocess.TimeoutExpired:
+            return f"ruff im .venv nach {NACH_EDIT_SEKUNDEN} s abgebrochen"
+        if lauf.returncode == 0:
+            return None
+        return lauf.stderr.strip() or f"nach_edit im .venv endet mit {lauf.returncode}"
     import pruefleiter
     from leiter_schnell import stufe_lint
 
@@ -162,8 +189,12 @@ def sitzung(ereignis: dict, wurzel: Path = WURZEL) -> str | None:
         lauf = subprocess.run(
             ["make", "venv"], cwd=wurzel, capture_output=True, text=True
         )
+        letzte = (lauf.stdout + lauf.stderr).strip().splitlines()[-1:]
         zeilen.append(
-            "make venv " + ("fertig" if lauf.returncode == 0 else "gescheitert")
+            "make venv fertig"
+            if lauf.returncode == 0
+            else f"make venv gescheitert ({''.join(letzte)}{_python_fehlt(wurzel)}),"
+            " Edit- und Stop-Hook prüfen nichts"
         )
     if (wurzel / HOOKS / "pre-commit").exists():
         subprocess.run(
@@ -182,11 +213,24 @@ def sitzung(ereignis: dict, wurzel: Path = WURZEL) -> str | None:
     return None
 
 
+def _python_fehlt(wurzel: Path) -> str:
+    """Gibt den Installationshinweis, wenn das Python aus ``.python-version`` fehlt."""
+    try:
+        version = (wurzel / ".python-version").read_text("utf-8").strip()
+    except OSError:
+        return ""
+    if not version or shutil.which(f"python{version}"):
+        return ""
+    return f"; python{version} fehlt, auf dem Mac: brew install python@{version}"
+
+
 def stop_ausgang(ordner: Path, gruen: bool, ausgabe: list[str], ereignis: dict) -> int:
     """Gibt den Exit-Code des Stop-Hooks: 2, solange die schnelle Leiter rot ist.
 
-    Nach ``STOP_HOECHSTENS_ROT`` roten Stopps derselben Sitzung in Folge endet die
-    Sitzung doch, und der Befund steht in ``STOP_BEFUND``; sonst wäre Rot eine Schleife.
+    Jede Sitzung zählt ihre roten Stopps selbst; ein Stopp, den kein Hook erzwungen
+    hat (``stop_hook_active`` falsch), beginnt neu. Nach ``STOP_HOECHSTENS_ROT``
+    erzwungenen Fortsetzungen endet die Sitzung doch, und der Befund steht in
+    ``STOP_BEFUND``; sonst wäre Rot eine Schleife.
     """
     zaehler = ordner / STOP_ZAEHLER
     sitzung_id = str(ereignis.get("session_id", ""))
@@ -194,17 +238,21 @@ def stop_ausgang(ordner: Path, gruen: bool, ausgabe: list[str], ereignis: dict) 
         stand = json.loads(zaehler.read_text("utf-8"))
     except (OSError, ValueError):
         stand = {}
-    rot = stand.get("rot", 0) if stand.get("sitzung") == sitzung_id else 0
+    stand = stand if isinstance(stand, dict) else {}
+    bisher = stand.pop(sitzung_id, 0)
+    weiter = ereignis.get("stop_hook_active") is not False
+    rot = bisher if weiter and isinstance(bisher, int) else 0
     ordner.mkdir(parents=True, exist_ok=True)
-    if gruen:
-        zaehler.unlink(missing_ok=True)
-        return 0
-    rot += 1
-    if rot >= STOP_HOECHSTENS_ROT:
-        zaehler.unlink(missing_ok=True)
+    if not gruen and rot >= STOP_HOECHSTENS_ROT:
         (ordner / STOP_BEFUND).write_text("\n".join(ausgabe) + "\n", "utf-8")
+    elif not gruen:
+        stand[sitzung_id] = rot + 1
+    behalten = dict(list(stand.items())[-STOP_SITZUNGEN:])
+    neu = zaehler.with_suffix(f".{os.getpid()}")
+    neu.write_text(json.dumps(behalten), "utf-8")
+    os.replace(neu, zaehler)
+    if gruen or rot >= STOP_HOECHSTENS_ROT:
         return 0
-    zaehler.write_text(json.dumps({"sitzung": sitzung_id, "rot": rot}), "utf-8")
     print("\n".join(ausgabe), file=sys.stderr)
     return BLOCKIERT
 
@@ -214,8 +262,9 @@ def stop(ereignis: dict, wurzel: Path = WURZEL) -> int:
     python = wurzel / ".venv" / "bin" / "python"
     ordner = wurzel / ".pruefleiter"
     if not python.exists():
-        fehlt = [f"{python} fehlt, die Leiter kann nicht laufen: make venv"]
-        return stop_ausgang(ordner, False, fehlt, ereignis)
+        hinweis = f"{python} fehlt, die Leiter lief nicht: make venv"
+        print(json.dumps({"systemMessage": hinweis}))
+        return 0
     leiter = [str(python), str(wurzel / "scripts" / "pruefleiter.py"), "--schnell"]
     lauf = subprocess.run(leiter, cwd=wurzel, capture_output=True, text=True)
     ausgabe = (lauf.stdout + lauf.stderr).splitlines()

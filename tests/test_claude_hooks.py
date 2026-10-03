@@ -1,5 +1,7 @@
 import importlib
 import json
+import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -122,17 +124,52 @@ def test_nach_edit_ueberspringt_andere_dateien(tmp_path):
     )
 
 
-def test_stop_ist_rot_bis_zum_dritten_mal_dann_endet_die_sitzung(tmp_path, capsys):
-    ereignis = {"session_id": "s1"}
+def test_stop_ist_dreimal_rot_dann_endet_die_sitzung(tmp_path, capsys):
+    ereignis = {"session_id": "s1", "stop_hook_active": True}
     ausgabe = ["Prüfleiter rot in Stufe 1 Lint", "a.py:1 [F401]"]
     codes = [
-        claude_hooks.stop_ausgang(tmp_path, False, ausgabe, ereignis) for _ in "123"
+        claude_hooks.stop_ausgang(tmp_path, False, ausgabe, ereignis) for _ in "1234"
     ]
-    assert codes == [2, 2, 0]
+    assert codes == [2, 2, 2, 0]
     assert "[F401]" in capsys.readouterr().err
     befund = (tmp_path / claude_hooks.STOP_BEFUND).read_text("utf-8")
     assert befund.splitlines() == ausgabe
     assert claude_hooks.stop_ausgang(tmp_path, False, ausgabe, ereignis) == 2
+
+
+def test_zwei_sitzungen_zaehlen_getrennt_und_enden_beide(tmp_path):
+    codes = [
+        claude_hooks.stop_ausgang(tmp_path, False, [], {"session_id": sitzung})
+        for _ in "1234"
+        for sitzung in ("s1", "s2")
+    ]
+    assert codes == [2, 2, 2, 2, 2, 2, 0, 0]
+
+
+def test_neuer_stopp_ohne_erzwungene_fortsetzung_zaehlt_von_vorn(tmp_path):
+    def stopp(aktiv):
+        ereignis = {"session_id": "s1", "stop_hook_active": aktiv}
+        return claude_hooks.stop_ausgang(tmp_path, False, [], ereignis)
+
+    assert [stopp(False), stopp(True), stopp(False)] == [2, 2, 2]
+    assert [stopp(True), stopp(True), stopp(True)] == [2, 2, 0]
+
+
+def test_zaehler_behaelt_nur_die_juengsten_sitzungen(tmp_path):
+    for nummer in range(claude_hooks.STOP_SITZUNGEN + 5):
+        claude_hooks.stop_ausgang(tmp_path, False, [], {"session_id": f"s{nummer}"})
+    stand = json.loads((tmp_path / claude_hooks.STOP_ZAEHLER).read_text("utf-8"))
+    assert len(stand) == claude_hooks.STOP_SITZUNGEN
+    assert "s0" not in stand
+    assert stand[f"s{claude_hooks.STOP_SITZUNGEN + 4}"] == 1
+
+
+@pytest.mark.parametrize("inhalt", ["kaputt", "[1]", '{"s1": "x"}'])
+def test_unlesbarer_zaehler_zaehlt_von_vorn(tmp_path, inhalt):
+    (tmp_path / claude_hooks.STOP_ZAEHLER).write_text(inhalt, "utf-8")
+    ereignis = {"session_id": "s1"}
+    codes = [claude_hooks.stop_ausgang(tmp_path, False, [], ereignis) for _ in "1234"]
+    assert codes == [2, 2, 2, 0]
 
 
 def test_gruener_stop_setzt_den_zaehler_zurueck(tmp_path):
@@ -144,9 +181,35 @@ def test_gruener_stop_setzt_den_zaehler_zurueck(tmp_path):
     assert claude_hooks.stop_ausgang(tmp_path, False, [], {"session_id": "s2"}) == 2
 
 
-def test_stop_ohne_venv_ist_rot_mit_hinweis(tmp_path, capsys):
-    assert claude_hooks.stop({"session_id": "s"}, tmp_path) == 2
-    assert "make venv" in capsys.readouterr().err
+def test_stop_ohne_venv_endet_mit_hinweis_an_den_nutzer(tmp_path, capsys):
+    assert claude_hooks.stop({"session_id": "s"}, tmp_path) == 0
+    meldung = json.loads(capsys.readouterr().out)
+    assert "make venv" in meldung["systemMessage"]
+
+
+def _python_ohne_ruff(tmp_path, monkeypatch):
+    fremd = tmp_path / "fremd" / "python3"
+    fremd.parent.mkdir()
+    monkeypatch.setattr(claude_hooks.sys, "executable", str(fremd))
+    datei = tmp_path / "a.py"
+    datei.write_text("import os\n", "utf-8")
+    return {"tool_input": {"file_path": str(datei)}}
+
+
+def test_nach_edit_ohne_venv_blockiert_nicht(tmp_path, monkeypatch):
+    ereignis = _python_ohne_ruff(tmp_path, monkeypatch)
+    assert claude_hooks.nach_edit(ereignis, tmp_path) is None
+
+
+def test_nach_edit_ausserhalb_des_venv_ruft_sich_im_venv(tmp_path, monkeypatch):
+    ereignis = _python_ohne_ruff(tmp_path, monkeypatch)
+    python = tmp_path / ".venv" / "bin" / "python"
+    python.parent.mkdir(parents=True)
+    python.write_text("#!/bin/sh\ncat >&2\nexit 2\n", "utf-8")
+    python.chmod(0o755)
+    assert claude_hooks.nach_edit(ereignis, tmp_path) is None
+    (python.parent / "ruff").touch()
+    assert json.loads(claude_hooks.nach_edit(ereignis, tmp_path)) == ereignis
 
 
 def test_unlesbares_ereignis_ist_leer():
@@ -165,7 +228,8 @@ def _einstellungen(tmp_path, hooks, deny):
 def _volle_hooks():
     hooks = {}
     for ereignis, matcher, befehl in waechter_claude.PFLICHT_HOOKS:
-        gruppe = {"hooks": [{"type": "command", "command": f"python {befehl}"}]}
+        hook = {"type": "command", "command": f"python {befehl}", "timeout": 300}
+        gruppe = {"hooks": [hook]}
         if matcher:
             gruppe["matcher"] = matcher
         hooks.setdefault(ereignis, []).append(gruppe)
@@ -216,6 +280,18 @@ def test_entschaerfter_hook_bricht_den_vertrag(tmp_path, zusatz):
     assert "Hook Stop" in meldung
 
 
+@pytest.mark.parametrize("frist", [200, None])
+def test_zu_kurze_frist_des_stop_hooks_ist_rot(tmp_path, frist):
+    _ordner(tmp_path)
+    hooks = _volle_hooks()
+    hooks["Stop"][0]["hooks"][0]["timeout"] = frist
+    _einstellungen(tmp_path, hooks, list(waechter_claude.PFLICHT_SPERREN))
+    (meldung,) = waechter_claude.vertrag(tmp_path)
+    assert meldung == (
+        f".claude/settings.json: Stop-Hook hat {frist} s, braucht mindestens 285 s"
+    )
+
+
 def test_projektpfad_im_hook_ist_erlaubt(tmp_path):
     _ordner(tmp_path)
     hooks = _volle_hooks()
@@ -234,6 +310,65 @@ def test_alte_einstellungen_meldet_nur_der_stand(tmp_path):
     ) + len(waechter_claude.PFLICHT_SPERREN)
 
 
+def _git(ort, *argumente):
+    rein = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    subprocess.run(
+        ["git", "-c", "user.name=t", "-c", "user.email=t@example.invalid", *argumente],
+        cwd=ort,
+        env=rein,
+        capture_output=True,
+        check=True,
+    )
+
+
+def _commit(ort, *pfade):
+    _git(ort, "add", *pfade)
+    _git(ort, "commit", "-q", "-m", "x")
+
+
+@pytest.fixture()
+def eingerichtet(tmp_path):
+    _ordner(tmp_path)
+    skript = tmp_path / waechter_claude.HOOK_SKRIPT
+    skript.parent.mkdir()
+    skript.write_text("", "utf-8")
+    _einstellungen(tmp_path, _volle_hooks(), list(waechter_claude.PFLICHT_SPERREN))
+    _git(tmp_path, "init", "-q", "-b", "main")
+    _commit(tmp_path, waechter_claude.HOOK_SKRIPT, waechter_claude.EINSTELLUNGEN)
+    return tmp_path
+
+
+def test_entfernte_hooks_bleiben_pflicht(eingerichtet):
+    _einstellungen(eingerichtet, {}, list(waechter_claude.PFLICHT_SPERREN))
+    _commit(eingerichtet, waechter_claude.EINSTELLUNGEN)
+    meldungen = waechter_claude.vertrag(eingerichtet)
+    assert len(meldungen) == len(waechter_claude.PFLICHT_HOOKS)
+    assert all("ruft nicht scripts/claude_hooks.py" in m for m in meldungen)
+
+
+def test_geloeschte_einstellungen_bleiben_pflicht(eingerichtet):
+    (eingerichtet / waechter_claude.EINSTELLUNGEN).unlink()
+    assert waechter_claude.vertrag(eingerichtet) == [
+        ".claude/settings.json nicht lesbar (FileNotFoundError)"
+    ]
+
+
+def test_ohne_hook_skript_gilt_die_historie_nicht(eingerichtet):
+    _einstellungen(eingerichtet, {}, [])
+    (eingerichtet / waechter_claude.HOOK_SKRIPT).unlink()
+    assert waechter_claude.vertrag(eingerichtet) == []
+
+
+def test_nie_eingerichtete_einstellungen_meldet_nur_der_stand(tmp_path):
+    _ordner(tmp_path)
+    (tmp_path / "scripts").mkdir()
+    (tmp_path / waechter_claude.HOOK_SKRIPT).write_text("", "utf-8")
+    _einstellungen(tmp_path, {}, [])
+    _git(tmp_path, "init", "-q", "-b", "main")
+    _commit(tmp_path, waechter_claude.HOOK_SKRIPT, waechter_claude.EINSTELLUNGEN)
+    assert waechter_claude.vertrag(tmp_path) == []
+
+
 def test_ordner_claude_md_fehlt_oder_ist_zu_lang(tmp_path):
     _ordner(tmp_path)
     (tmp_path / waechter_claude.ORDNER_CLAUDE_MD[1] / "CLAUDE.md").unlink()
@@ -244,3 +379,17 @@ def test_ordner_claude_md_fehlt_oder_ist_zu_lang(tmp_path):
         "src/telco_radar/analyze/CLAUDE.md fehlt",
         "src/x/CLAUDE.md hat 41 Zeilen, erlaubt 40",
     ]
+
+
+def test_sitzung_ohne_venv_nennt_das_scheitern_und_die_folge(tmp_path, capsys):
+    assert claude_hooks.sitzung({}, tmp_path) is None
+    zeile = capsys.readouterr().out
+    assert "make venv gescheitert (" in zeile
+    assert "Edit- und Stop-Hook prüfen nichts" in zeile
+
+
+def test_sitzung_nennt_das_fehlende_python_aus_python_version(tmp_path, capsys):
+    (tmp_path / ".python-version").write_text("2.9\n", "utf-8")
+    claude_hooks.sitzung({}, tmp_path)
+    zeile = capsys.readouterr().out
+    assert "python2.9 fehlt, auf dem Mac: brew install python@2.9" in zeile

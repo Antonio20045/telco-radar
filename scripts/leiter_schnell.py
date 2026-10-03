@@ -4,7 +4,7 @@ Stufe 4 wählt die Tests, die ein geändertes Modul direkt importieren, ohne die
 Marker ``browser``, ``langsam``, ``golden`` und ``netz``; als langsam zählt auch
 jeder Test, der im letzten Volllauf länger als ``LANGSAM_SEKUNDEN`` lief. Von den
 gemessenen Tests laufen die schnellsten, bis ``TESTBUDGET_SEKUNDEN`` gefüllt ist,
-Tests geänderter Testdateien zuerst; den Rest prüft Stufe 5 im pre-push.
+Tests geänderter Testdateien zuerst; selbst geänderte laufen immer (``nachlauf``).
 Vorlagen, ``style.css`` und ``app.js`` ziehen die Tests mit Marker ``seite`` und die,
 die ``report.html`` importieren. ``config/``, ``pyproject.toml``,
 ``requirements*.txt`` und jede ``conftest.py`` betreffen alle Tests; das prüft
@@ -27,7 +27,8 @@ from typing import TextIO
 
 import pruefstempel
 import waechter_speicher
-from leiter_befunde import WURZEL, Ergebnis, neue_befunde, ruff_befunde
+from geaenderte_tests import geaenderte_tests, nachlauf, ohne
+from leiter_befunde import WURZEL, Ergebnis, neue_befunde, rote_zeilen, ruff_befunde
 from waechter import lies_zaehlbasis
 
 PARALLEL_AB_SEKUNDEN = 4.0
@@ -359,7 +360,8 @@ def stufe_betroffen(
         return Ergebnis("4 Betroffen", True, hinweise=hinweise)
     gemessen = lies_testzeiten(zeiten)
     vorrang = [d for d in dateien if d in auswahl.dateien]
-    abgewaehlt = abwahl(auswahl.dateien, gemessen, vorrang)
+    praefixe = geaenderte_tests(wurzel, vorrang)
+    abgewaehlt = ohne(abwahl(auswahl.dateien, gemessen, vorrang), praefixe)
     geschaetzt = schaetzung(auswahl.dateien, gemessen, abgewaehlt)
     if abgewaehlt:
         hinweise.append(
@@ -369,6 +371,8 @@ def stufe_betroffen(
     befehl = pytest_befehl(auswahl.dateien, geschaetzt, abgewaehlt)
     ergebnis = lauf(log, befehl, {"COLUMNS": "1000"}, KAPPE_SEKUNDEN)
     if ergebnis.returncode == -signal.SIGKILL and ABGEBROCHEN in ergebnis.stderr:
+        if rot := nachlauf(log, lauf, praefixe, gemessen, pytest_befehl):
+            return rot
         hinweise.append(
             f"Warnung: Stufe 4 nach {KAPPE_SEKUNDEN} s gekappt"
             f" ({len(auswahl.dateien)} Dateien, geschätzt {geschaetzt:.0f} s),"
@@ -382,11 +386,6 @@ def stufe_betroffen(
         *_zeilen(ergebnis)[-20:],
     ]
     return Ergebnis("4 Betroffen", False, rot, hinweise=hinweise)
-
-
-def rote_zeilen(ausgabe: str) -> list[str]:
-    """Gibt die Kurzzeilen ``FAILED``/``ERROR`` aus der Zusammenfassung von pytest."""
-    return [z for z in ausgabe.splitlines() if z.startswith(("FAILED ", "ERROR "))]
 
 
 def _zeilen(lauf: subprocess.CompletedProcess[str]) -> list[str]:

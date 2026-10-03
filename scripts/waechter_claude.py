@@ -1,15 +1,18 @@
 """Stufe-0-Verträge für die Claude-Einstellungen und die Ordner-CLAUDE.md.
 
 ``.claude/settings.json`` muss jeden Hook aus ``PFLICHT_HOOKS`` und jede Sperre aus
-``PFLICHT_SPERREN`` tragen, sobald sie die Hooks der Leiter überhaupt nennt; fehlen sie
-ganz, meldet ``make stand`` Schritt 5 als offen. Jede CLAUDE.md unter ``src/`` bleibt
+``PFLICHT_SPERREN`` tragen, sobald sie ``scripts/claude_hooks.py`` nennt oder je in
+der Git-Historie genannt hat und das Skript im Repo liegt; vorher meldet nur
+``make stand`` Schritt 5 als offen. Jede CLAUDE.md unter ``src/`` bleibt
 klein, und die Ordner aus ``ORDNER_CLAUDE_MD`` haben eine.
 """
 
 from __future__ import annotations
 
 import json
+import os
 import re
+import subprocess
 from pathlib import Path
 
 EINSTELLUNGEN = ".claude/settings.json"
@@ -49,14 +52,33 @@ ORDNER_CLAUDE_MD = (
     "src/telco_radar/report",
 )
 ORDNER_ZEILEN = 40
+STOP_RESERVE_SEKUNDEN = 60
 
 
 def vertrag(wurzel: Path) -> list[str]:
     """Stufe 0: Ordner-CLAUDE.md und, sobald eingerichtet, die vollen Einstellungen."""
+    return ordner_claude_md(wurzel) + (
+        einstellungen(wurzel) if eingerichtet(wurzel) else []
+    )
+
+
+def eingerichtet(wurzel: Path) -> bool:
+    """Wahr, wenn die Einstellungen die Hooks nennen oder einmal genannt haben.
+
+    Ein Commit, der die Hooks wieder entfernt, hebt den Vertrag nicht auf; ohne
+    lesbare Historie (kein Repo) zählt nur der Arbeitsstand.
+    """
     pfad = wurzel / EINSTELLUNGEN
-    text = pfad.read_text("utf-8") if pfad.is_file() else ""
-    eingerichtet = HOOK_SKRIPT in text
-    return ordner_claude_md(wurzel) + (einstellungen(wurzel) if eingerichtet else [])
+    if pfad.is_file() and HOOK_SKRIPT in pfad.read_text("utf-8", "replace"):
+        return True
+    if not (wurzel / HOOK_SKRIPT).is_file():
+        return False
+    suche = ["git", "log", "-1", "--format=%H", "-S", HOOK_SKRIPT, "--", EINSTELLUNGEN]
+    umgebung = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    lauf = subprocess.run(
+        suche, cwd=wurzel, env=umgebung, capture_output=True, text=True, check=False
+    )
+    return lauf.returncode == 0 and bool(lauf.stdout.strip())
 
 
 def einstellungen(wurzel: Path) -> list[str]:
@@ -71,6 +93,7 @@ def einstellungen(wurzel: Path) -> list[str]:
         for ereignis, matcher, befehl in PFLICHT_HOOKS
         if not _hat_hook(hooks.get(ereignis, []), matcher, befehl)
     ]
+    meldungen += stop_frist(hooks.get("Stop", []))
     rechte = daten.get("permissions", {}) if isinstance(daten, dict) else {}
     sperren = set(rechte.get("deny", []))
     meldungen += [
@@ -79,6 +102,27 @@ def einstellungen(wurzel: Path) -> list[str]:
         if s not in sperren
     ]
     return meldungen
+
+
+def stop_frist(gruppen: list) -> list[str]:
+    """Der Stop-Hook hat Zeit für die gekappte Stufe 4, ihren Nachlauf und eine Reserve;
+    sonst bricht Claude Code ihn ab, und ein roter geänderter Test bleibt unbemerkt."""
+    from geaenderte_tests import NACHLAUF_SEKUNDEN
+    from leiter_schnell import KAPPE_SEKUNDEN
+
+    noetig = KAPPE_SEKUNDEN + NACHLAUF_SEKUNDEN + STOP_RESERVE_SEKUNDEN
+    fristen = [
+        hook.get("timeout")
+        for gruppe in (gruppen if isinstance(gruppen, list) else [])
+        if isinstance(gruppe, dict)
+        for hook in gruppe.get("hooks", [])
+        if isinstance(hook, dict) and HOOK_SKRIPT in str(hook.get("command", ""))
+    ]
+    return [
+        f"{EINSTELLUNGEN}: Stop-Hook hat {frist} s, braucht mindestens {noetig} s"
+        for frist in fristen
+        if not isinstance(frist, int) or frist < noetig
+    ]
 
 
 def _hat_hook(gruppen: list, matcher: str, befehl: str) -> bool:

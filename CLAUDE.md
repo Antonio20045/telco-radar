@@ -11,6 +11,7 @@ Automatisches Competitive-Intelligence-System für Vodafone-Manager ohne Technik
 - Website https://telco-radar.onrender.com (Render Static Site aus `site/`), Repo https://github.com/Antonio20045/telco-radar (öffentlich). GitHub Pages bleibt aus.
 - `radar.yml` Mi und Fr 11:00 UTC und manuell, `geraete.yml` täglich 02:17 UTC; beide committen `data/` und `site/` und rufen den Render-Hook über `scripts/render_deploy.sh` (Ablauf in `docs/betrieb.md`). `ci.yml` nur von Hand.
 - Ein Push auf `main` ist kein Deploy. Den Live-Stand bestätigt nur das ausgelieferte HTML (`curl -L -sS …/index.html`).
+- Actions laufen mit Python 3.11 (`.python-version`): keine Syntax erst ab 3.12, etwa Zeilenumbrüche oder gleiche Anführungszeichen in f-String-Feldern.
 - Ein Workflow-Push mit `GITHUB_TOKEN` startet keine weiteren Workflows. Ein Job-Timeout heißt in GitHub „cancelled“. Laufzeit steht in `run.phases` im Berichts-JSON.
 
 ## Befehle
@@ -38,7 +39,7 @@ from telco_radar.report.html import render_site; render_site(Path('/tmp/site'), 
 
 ## Prüfleiter und Hooks
 
-- Grün ist der Exit-Code von `scripts/pruefleiter.py`, nie eine Selbstauskunft; es gibt keinen zweiten Testweg. pre-commit ruft `--schnell`, pre-push `--vor-push`, der Stop-Hook `--schnell` über `scripts/claude_hooks.py stop` (rot heißt weiterarbeiten, nach drei roten Stopps endet die Sitzung mit `.pruefleiter/stop-befund.txt`).
+- Grün ist der Exit-Code von `scripts/pruefleiter.py`, nie eine Selbstauskunft; es gibt keinen zweiten Testweg. pre-commit ruft `--schnell`, pre-push `--vor-push`, der Stop-Hook `--schnell` über `scripts/claude_hooks.py stop` (rot heißt weiterarbeiten, nach drei erzwungenen Fortsetzungen endet die Sitzung mit `.pruefleiter/stop-befund.txt`).
 - Basen und Ausnahmelisten unter `pruef/` und in `.importlinter` dürfen nur schrumpfen; die Leiter senkt sie selbst. Lockern kann nur Antonio von Hand.
 - Die Claude-Hooks stehen in `scripts/claude_hooks.py`: große Dateien nur mit `limit`, ruff nach jedem Edit, keine Befehle, die Git-Hooks abschalten.
 

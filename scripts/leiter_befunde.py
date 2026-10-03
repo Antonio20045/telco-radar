@@ -88,3 +88,8 @@ def ruff_befunde(ausgabe: str) -> list[Befund]:
 def _relativ(pfad: str) -> str:
     datei = Path(pfad)
     return str(datei.relative_to(WURZEL)) if datei.is_relative_to(WURZEL) else pfad
+
+
+def rote_zeilen(ausgabe: str) -> list[str]:
+    """Gibt die Kurzzeilen ``FAILED``/``ERROR`` aus der Zusammenfassung von pytest."""
+    return [z for z in ausgabe.splitlines() if z.startswith(("FAILED ", "ERROR "))]
