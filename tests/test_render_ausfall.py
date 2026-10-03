@@ -8,23 +8,29 @@ enden mit einem eigenen Exit-Code.
 
 from __future__ import annotations
 
+import dataclasses
 import json
+import shutil
+from pathlib import Path
 
 import pytest
+from test_geraete_zeitreihe_ansicht import HEUTE, _baue
 
 from telco_radar import pipeline
+from telco_radar.config import load_config
 from telco_radar.report import bauen, geraete_zeitreihe
-from telco_radar.report.ausfall import Ausfall
+from telco_radar.report.ausfall import KONFIGURATION_TEIL, NEWSLETTER_TEIL, Ausfall
 from telco_radar.report.geraete_view import ZEITREIHE_TEIL
 from telco_radar.report.html import render_site
 
-from test_geraete_zeitreihe_ansicht import HEUTE, _baue
-
+_ECHTE_CONFIG = Path(__file__).resolve().parent.parent / "config"
 _MELDUNG = "Testfehler in der Zeitreihe"
 
 
-def _render(tmp_path):
+def _render(tmp_path, mit_newsletter=True):
     root, _state = _baue(tmp_path)
+    if mit_newsletter:
+        shutil.copy(_ECHTE_CONFIG / "newsletter.yaml", root / "config")
     reports = root / "data" / "reports"
     reports.mkdir(parents=True, exist_ok=True)
     (reports / f"{HEUTE}.json").write_text(
@@ -140,3 +146,47 @@ def test_pipeline_main_endet_mit_3_bei_ausfall(
 def test_pipeline_main_bleibt_bei_1_wenn_run_scheitert(tmp_path, monkeypatch):
     monkeypatch.setattr(pipeline, "run", _wirft)
     assert pipeline.main(["--root", str(tmp_path)]) == 1
+
+
+def _teile(ausfaelle):
+    return [a.teil for a in ausfaelle]
+
+
+def test_fehlende_config_ist_ein_benannter_ausfall(tmp_path):
+    reports = tmp_path / "data" / "reports"
+    reports.mkdir(parents=True)
+    site = tmp_path / "site"
+    ausfaelle = render_site(site, reports)
+    assert _teile(ausfaelle).count(KONFIGURATION_TEIL) == 1
+    assert [a.grund for a in ausfaelle if a.teil == KONFIGURATION_TEIL] == [
+        f"config/ fehlt unter {tmp_path}"
+    ]
+    seite = (site / "index.html").read_text(encoding="utf-8")
+    assert "Nicht neu gebaut" in seite
+    assert KONFIGURATION_TEIL in seite
+
+
+def test_vorhandene_config_meldet_keinen_konfigurationsausfall(tmp_path):
+    ausfaelle, _site = _render(tmp_path)
+    assert KONFIGURATION_TEIL not in _teile(ausfaelle)
+
+
+def test_fehlende_newsletter_yaml_ist_ein_benannter_ausfall(tmp_path):
+    ausfaelle, _site = _render(tmp_path, mit_newsletter=False)
+    assert not (tmp_path / "zeitreihe" / "config" / "newsletter.yaml").exists()
+    teile = _teile(ausfaelle)
+    assert teile.count(NEWSLETTER_TEIL) == 1
+    assert KONFIGURATION_TEIL not in teile
+
+
+def test_konfiguration_kommt_aus_der_wurzel_der_cfg(tmp_path):
+    ausfaelle, _site = _render(tmp_path)
+    root = tmp_path / "zeitreihe"
+    anderswo = tmp_path / "anderswo" / "berichte"
+    anderswo.mkdir(parents=True)
+    site = tmp_path / "site2"
+    cfg = dataclasses.replace(load_config(_ECHTE_CONFIG.parent), root=root)
+    ausfaelle = render_site(site, anderswo, cfg)
+    assert KONFIGURATION_TEIL not in _teile(ausfaelle)
+    ohne_cfg = render_site(tmp_path / "site3", anderswo)
+    assert KONFIGURATION_TEIL in _teile(ohne_cfg)

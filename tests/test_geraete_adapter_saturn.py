@@ -18,13 +18,18 @@ nicht zuverlaessig herbeimessen kann.
 """
 
 import gzip
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
+from bestand_pfad import lese_wurzel
 
-from telco_radar.collect.geraete import ADAPTER, GeraeteAbrufFehler, sammle_anbieter
-from telco_radar.collect.geraete import saturn
+from telco_radar.collect.geraete import (
+    ADAPTER,
+    GeraeteAbrufFehler,
+    sammle_anbieter,
+    saturn,
+)
 from telco_radar.collect.geraete.robots import RobotsWaechter
 from telco_radar.geraete_config import lade_farben, lade_katalog, lade_quellen
 from telco_radar.geraete_model import farbe_aus_titel
@@ -53,7 +58,7 @@ def iphone17_html():
 
 @pytest.fixture(scope="module")
 def katalog():
-    return lade_katalog(_WURZEL)
+    return lade_katalog(lese_wurzel())
 
 
 @pytest.fixture(scope="module")
@@ -273,7 +278,7 @@ def test_landet_als_listung_im_bestand(
         hole,
         "2026-09-05",
         RobotsWaechter(hole=hole),
-        datetime(2026, 9, 5, 12, tzinfo=timezone.utc),
+        datetime(2026, 9, 5, 12, tzinfo=UTC),
     )
     assert bilanz.status == "ok"
     assert bilanz.gelesene_einstiege == {_URL_17_PRO, _URL_17}
@@ -450,7 +455,7 @@ def test_saturn_anbieter_reicht_seine_ehrliche_kennung_bis_zur_kopfzeile(monkeyp
         hole=hole,
         heute="2026-09-05",
         waechter=RobotsWaechter(hole=hole),
-        jetzt=datetime(2026, 9, 5, 12, tzinfo=timezone.utc),
+        jetzt=datetime(2026, 9, 5, 12, tzinfo=UTC),
     )
 
     assert bilanz.status == "leer"  # leere Apollo-State, kein Fehler

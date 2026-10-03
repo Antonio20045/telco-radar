@@ -29,14 +29,14 @@ import json
 import shutil
 from pathlib import Path
 
-import pytest
+from bestand_pfad import BILDER_BESTAND, verlinke_neben_data
 from bs4 import BeautifulSoup
 
 from telco_radar.analyze import ctm
 from telco_radar.report import html
 from telco_radar.report.html import render_site
 
-REPO = Path(__file__).resolve().parents[1]
+BERICHT_DIR = BILDER_BESTAND / "reports"
 AUSGABE = "2026-08-08"
 
 
@@ -191,21 +191,19 @@ def baue_seite(tmp_path: Path, datum: str = AUSGABE) -> Path:
     Test ueber die Titelseite maesse eine Seite, die so nie ausgeliefert
     wird.
 
-    Der Zustandsordner wird VERKNUEPFT, nicht kopiert: 325 Bilder je Test
-    waeren teuer, und `render_site` liest dort nur (das Aufraeumen macht die
-    Pipeline, nicht der Renderer). Geschrieben wird ausschliesslich nach
-    site/ im tmp-Baum.
+    Bericht und die 52 Bilder dieser Ausgabe kommen aus dem Schnappschuss
+    `BILDER_BESTAND` und werden nach tmp_path kopiert. Geschrieben wird
+    ausschliesslich im tmp-Baum.
     """
-    quelle = REPO / "data" / "reports" / f"{datum}.json"
-    if not quelle.exists():
-        pytest.skip(f"Ausgabe {datum} liegt nicht im Archiv")
     reports = tmp_path / "data" / "reports"
     reports.mkdir(parents=True)
     for endung in (".json", ".md"):
-        auch = REPO / "data" / "reports" / f"{datum}{endung}"
-        if auch.exists():
-            shutil.copy(auch, reports / auch.name)
-    (tmp_path / "data" / "state").symlink_to(REPO / "data" / "state")
+        shutil.copy(BERICHT_DIR / f"{datum}{endung}", reports / f"{datum}{endung}")
+    shutil.copytree(
+        BILDER_BESTAND / "state" / "report_images",
+        tmp_path / "data" / "state" / "report_images",
+    )
+    verlinke_neben_data(tmp_path)
     site = tmp_path / "site"
     render_site(site, reports, cfg=None)
     return site
@@ -365,9 +363,7 @@ def test_mail_und_seite_zeigen_dieselben_zeilen():
     in der Mail. Beide holen ihren Zuschnitt jetzt aus `ctm.kurzpfad()`."""
     from telco_radar import versand
 
-    daten = json.loads(
-        (REPO / "data" / "reports" / f"{AUSGABE}.json").read_text(encoding="utf-8")
-    )
+    daten = json.loads((BERICHT_DIR / f"{AUSGABE}.json").read_text(encoding="utf-8"))
     seite = [h["url"] for h in ctm.kurzpfad(html._flatten(daten))]
     mail = [h["url"] for h in versand.zwei_minuten_zeilen(daten)]
     assert seite and mail == seite
@@ -388,9 +384,7 @@ def test_die_digest_spalte_folgt_der_ctm_achse(tmp_path):
     gruen blieb. Die Zeile `assert len(stufen) == len(gezeigt)` ist die
     Lehre daraus: ein Lookup, der ins Leere geht, muss auffallen."""
     soup = _render(tmp_path)
-    daten = json.loads(
-        (REPO / "data" / "reports" / f"{AUSGABE}.json").read_text(encoding="utf-8")
-    )
+    daten = json.loads((BERICHT_DIR / f"{AUSGABE}.json").read_text(encoding="utf-8"))
     bezug = {
         h["schlagzeile"]: int(h.get("ctm_bezug") or 0) for h in html._flatten(daten)
     }
@@ -403,7 +397,9 @@ def test_die_digest_spalte_folgt_der_ctm_achse(tmp_path):
     assert len(stufen) == len(gezeigt), (
         f"{len(gezeigt) - len(stufen)} Zeilen nicht zugeordnet - falscher Schlüssel?"
     )
-    assert stufen == sorted(stufen, reverse=True), list(zip(gezeigt, stufen))
+    assert stufen == sorted(stufen, reverse=True), list(
+        zip(gezeigt, stufen, strict=False)
+    )
 
 
 def test_breko_steht_nicht_vor_den_meldungen_mit_hoeherem_ctm_bezug(tmp_path):
@@ -435,9 +431,7 @@ def test_breko_steht_nicht_vor_den_meldungen_mit_hoeherem_ctm_bezug(tmp_path):
     Ordners gehangen, den ein Aufraeumlauf jederzeit beschneiden darf. Genau
     so ist er beim Schreiben einmal gekippt. Die Bildbreite kommt hier aus
     dem Bericht selbst und ist damit so stabil wie die Ausgabe."""
-    daten = json.loads(
-        (REPO / "data" / "reports" / f"{AUSGABE}.json").read_text(encoding="utf-8")
-    )
+    daten = json.loads((BERICHT_DIR / f"{AUSGABE}.json").read_text(encoding="utf-8"))
     highlights = html._flatten(daten)
     front = html._titelseite(
         highlights,

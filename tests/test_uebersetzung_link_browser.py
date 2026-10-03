@@ -31,10 +31,11 @@ import threading
 from pathlib import Path
 
 import pytest
+from bestand_pfad import BILDER_BESTAND, verlinke_neben_data
 
 from telco_radar.report import uebersetzung_view as uv
 from telco_radar.report.html import render_site
-from telco_radar.uebersetzung.store import UebersetzungsStore, Uebersetzung, text_hash
+from telco_radar.uebersetzung.store import Uebersetzung, UebersetzungsStore, text_hash
 
 REPO = Path(__file__).resolve().parents[1]
 
@@ -64,31 +65,28 @@ def _server(site: Path):
 
 
 def _baue(tmp_path: Path) -> Path:
-    """Die jüngste echte Ausgabe, und JEDE Meldung bekommt eine Uebersetzung.
+    """Die Ausgabe 2026-08-08 aus `BILDER_BESTAND` mit Bildern, und JEDE Meldung
+    bekommt eine Uebersetzung.
 
     Alle Gewichtungen auf einmal: nur so ist zu messen, ob der Link an der
     Zeile anders sitzt als an der Aufmacher-Karte - und genau darin lag der
     Fehler.
     """
-    berichte = sorted((REPO / "data" / "reports").glob("*.json"))
-    if not berichte:
-        pytest.skip("keine Berichte im Repo")
-    daten = json.loads(berichte[-1].read_text(encoding="utf-8"))
+    bericht = BILDER_BESTAND / "reports" / "2026-08-08.json"
+    daten = json.loads(bericht.read_text(encoding="utf-8"))
     urls = [
         h["url"]
         for region in (daten.get("regions") or {}).values()
         for h in (region.get("highlights") or [])
         if h.get("url")
     ]
-    if not urls:
-        pytest.skip("keine Meldung mit URL")
+    assert urls
 
     reports = tmp_path / "data" / "reports"
     reports.mkdir(parents=True)
     for endung in (".json", ".md"):
-        auch = berichte[-1].with_suffix(endung)
-        if auch.exists():
-            shutil.copy(auch, reports / auch.name)
+        auch = bericht.with_suffix(endung)
+        shutil.copy(auch, reports / auch.name)
     zustand = tmp_path / "data" / "state"
     zustand.mkdir(parents=True)
     store = UebersetzungsStore(zustand / "uebersetzungen.jsonl")
@@ -107,13 +105,10 @@ def _baue(tmp_path: Path) -> Path:
             )
         )
     store.speichern()
-    # Die Bilder der echten Ausgabe: ohne sie waeren die Karten anders hoch,
-    # und die mittlere Gewichtung entstuende gar nicht.
-    bilder = REPO / "site" / "images"
-    if bilder.exists():
-        (tmp_path / "site").mkdir(parents=True, exist_ok=True)
-        with contextlib.suppress(OSError):
-            (tmp_path / "site" / "images").symlink_to(bilder)
+    shutil.copytree(
+        BILDER_BESTAND / "state" / "report_images", zustand / "report_images"
+    )
+    verlinke_neben_data(tmp_path)
     site = tmp_path / "site"
     render_site(site, reports, cfg=None)
     return site
@@ -167,7 +162,7 @@ def test_der_link_steht_ueberhaupt_auf_beiden_seiten(_links):
 def test_der_link_bleibt_an_jeder_gewichtung_einzeilig(_links):
     """Der Fehler vom 15.08.2026: 38 px auf der Aufmacher-Karte."""
     zu_hoch = [
-        l for seite in _links.values() for l in seite if l["hoehe"] > HOECHSTHOEHE
+        lk for seite in _links.values() for lk in seite if lk["hoehe"] > HOECHSTHOEHE
     ]
     assert not zu_hoch, (
         f"{len(zu_hoch)} rote Links brechen um - der Pfeil steht auf einer "
@@ -179,10 +174,10 @@ def test_der_link_ist_so_breit_wie_sein_text_nicht_wie_die_karte(_links):
     """Ein Flex-Kind streckt sich auf die Kartenbreite, und mit ihm die
     Unterstreichung - quer durch die ganze Karte statt unter dem Wort."""
     gestreckt = [
-        l
+        lk
         for seite in _links.values()
-        for l in seite
-        if l["breite"] >= l["eltern_breite"] and l["eltern_breite"] > 260
+        for lk in seite
+        if lk["breite"] >= lk["eltern_breite"] and lk["eltern_breite"] > 260
     ]
     assert not gestreckt, (
         f"{len(gestreckt)} rote Links sind so breit wie ihre Karte: {gestreckt[:3]}"
@@ -201,20 +196,20 @@ def test_der_link_passt_in_die_schmalste_karte(_links):
     echte Schrift laedt in der Sandbox nicht, ein Pixelmass waere eine Wette
     auf die Ruecklaufschrift (CLAUDE.md, Zeitungskopf).
     """
-    alle = [l for seite in _links.values() for l in seite]
-    schmalste = min(l["eltern_breite"] for l in alle)
+    alle = [lk for seite in _links.values() for lk in seite]
+    schmalste = min(lk["eltern_breite"] for lk in alle)
     assert schmalste < 260, (
         "die schmalste Karte ist breiter als erwartet - dieser Test misst "
         f"dann nicht mehr den engen Fall ({schmalste} px)"
     )
-    zu_breit = [l for l in alle if l["breite"] > l["eltern_breite"]]
+    zu_breit = [lk for lk in alle if lk["breite"] > lk["eltern_breite"]]
     assert not zu_breit, f"der Link laeuft aus seiner Karte: {zu_breit[:3]}"
 
 
 def test_der_link_ist_rot_und_kein_flex_kind(_links):
-    alle = [l for seite in _links.values() for l in seite]
-    assert {l["display"] for l in alle} == {"inline"}
-    assert {l["farbe"] for l in alle} == {"rgb(230, 0, 0)"}
+    alle = [lk for seite in _links.values() for lk in seite]
+    assert {lk["display"] for lk in alle} == {"inline"}
+    assert {lk["farbe"] for lk in alle} == {"rgb(230, 0, 0)"}
 
 
 def test_die_beschriftung_ist_an_beiden_orten_dieselbe():

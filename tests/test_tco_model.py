@@ -22,21 +22,22 @@ import shutil
 from pathlib import Path
 
 import pytest
+from bestand_pfad import ZUSTAND
 
 from telco_radar.analyze.geraete_store import GeraeteDB
 from telco_radar.analyze.tco_store import TcoDB
 from telco_radar.geraete_model import Ratenzahlung, listung_id, probe_geht_auf
 from telco_radar.tarif_model import Preisphase
 from telco_radar.tco_model import (
-    Buendel,
-    Geraeteanteil,
     LAUFZEIT_LUECKE,
     POSTEN_LAUFZEIT,
     POSTEN_RATE,
-    Rabatt,
-    SimOnlyReferenz,
     TCO_HORIZONT,
     UNGLEICHER_ZEITRAUM,
+    Buendel,
+    Geraeteanteil,
+    Rabatt,
+    SimOnlyReferenz,
     buendel_id,
     buendel_id_aktuell,
     buendel_id_ohne_laufzeit,
@@ -1167,17 +1168,13 @@ def test_ein_altbestand_ueberlebt_laden_und_speichern_wertgleich(tmp_path):
     assert danach["updated"] == "2026-09-04"
 
 
-@pytest.mark.skipif(
-    not (_WURZEL / "data/state/geraete_db.json").exists(),
-    reason="kein ausgelieferter Bestand im Arbeitsverzeichnis",
-)
 def test_der_echte_bestand_behaelt_jede_id_und_jeden_betrag(tmp_path):
-    """Dieselbe Probe am wirklich ausgelieferten Bestand (391 Listungen).
+    """Dieselbe Probe am Schnappschuss 2026-10-03 (737 Listungen in geraete_db.json).
 
     Gelesen wird das Original, geschrieben wird in ein temporaeres
-    Verzeichnis - `data/state/` wird von einem Test nicht angefasst.
+    Verzeichnis - der Schnappschuss wird nie beschrieben.
     """
-    original = _WURZEL / "data/state/geraete_db.json"
+    original = ZUSTAND / "geraete_db.json"
     unberuehrt = original.read_bytes()
     kopie = tmp_path / "geraete_db.json"
     shutil.copy(original, kopie)
@@ -1187,9 +1184,9 @@ def test_der_echte_bestand_behaelt_jede_id_und_jeden_betrag(tmp_path):
     bestand.save("2026-09-04")
     danach = json.loads(kopie.read_text(encoding="utf-8"))
 
-    assert len(vorher["listungen"]) > 100, "der Bestand ist unerwartet duenn"
+    assert len(vorher["listungen"]) == 737, "Listungen in state/geraete_db.json"
     assert _nach_id(danach["listungen"]) == _nach_id(vorher["listungen"])
-    assert original.read_bytes() == unberuehrt, "data/state/ angefasst"
+    assert original.read_bytes() == unberuehrt, "Schnappschuss angefasst"
 
 
 # --------------------------------------------------------------------------

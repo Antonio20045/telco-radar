@@ -31,8 +31,8 @@ import json
 import pathlib
 
 import yaml
+from bestand_pfad import lese_wurzel
 from bs4 import BeautifulSoup
-
 from tarifleiter_testbestand import mit_leiter
 
 from telco_radar.geraete_config import lade_katalog, lade_quellen
@@ -41,7 +41,6 @@ from telco_radar.report import geraete_view, geraete_zeitreihe
 from telco_radar.report.html import _env
 from telco_radar.tco_model import Buendel, SimOnlyReferenz
 
-WURZEL = pathlib.Path(__file__).resolve().parents[1]
 HEUTE = "2026-09-20"
 SKU = "apple-iphone-17-pro-256gb-schwarz"
 DEVICE = "apple-iphone-17-pro"
@@ -224,7 +223,7 @@ def _modell(buendel, listungen=None):
         listungen or [_listung("Vodafone", 1199.9)],
         _referenzen(),
         _tarife(),
-        lade_katalog(WURZEL),
+        lade_katalog(lese_wurzel()),
         heute=HEUTE,
     )
     treffer = [m for m in ergebnis["modelle"] if m["id"] == MODELL]
@@ -393,7 +392,7 @@ def test_eine_listung_ohne_laufzeit_bekommt_keine_geratene_24():
         b[0],
         None,
         None,
-        lade_katalog(WURZEL),
+        lade_katalog(lese_wurzel()),
         {SKU: (DEVICE, 256)},
         zustand="neu",
         heute=HEUTE,
@@ -419,7 +418,7 @@ def test_eine_listung_ohne_laufzeit_bekommt_keine_geratene_24():
         mit,
         None,
         None,
-        lade_katalog(WURZEL),
+        lade_katalog(lese_wurzel()),
         {SKU: (DEVICE, 256)},
         zustand="neu",
         heute=HEUTE,
@@ -454,7 +453,7 @@ def test_eine_rate_ohne_laufzeit_wirft_keinen_typeerror():
         b,
         None,
         None,
-        lade_katalog(WURZEL),
+        lade_katalog(lese_wurzel()),
         {SKU: (DEVICE, 256)},
         zustand="neu",
         heute=HEUTE,
@@ -474,7 +473,7 @@ def test_eine_rate_ohne_laufzeit_wirft_keinen_typeerror():
         b,
         None,
         None,
-        lade_katalog(WURZEL),
+        lade_katalog(lese_wurzel()),
         {SKU: (DEVICE, 256)},
         zustand="neu",
         heute=HEUTE,

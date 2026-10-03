@@ -30,19 +30,20 @@ ehrlich herbeimessen kann.
 import gzip
 import json
 import tempfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
+from bestand_pfad import lese_wurzel
 
 from telco_radar.analyze.geraete_store import GeraeteDB
 from telco_radar.collect.geraete import (
     GeraeteAbrufFehler,
+    _preisfelder,
     einsundeins,
     sammle_anbieter,
     telekom,
 )
-from telco_radar.collect.geraete import _preisfelder
 from telco_radar.collect.geraete.robots import RobotsWaechter
 from telco_radar.geraete_config import (
     Anbieter,
@@ -83,7 +84,7 @@ def ee_produkt():
 
 @pytest.fixture(scope="module")
 def katalog():
-    return lade_katalog(_WURZEL)
+    return lade_katalog(lese_wurzel())
 
 
 @pytest.fixture(scope="module")
@@ -431,7 +432,7 @@ def test_telekom_zwei_plaene_kollidieren_nicht_mehr_im_bestand(
         hole,
         "2026-09-21",
         RobotsWaechter(hole=hole),
-        datetime(2026, 9, 21, 3, tzinfo=timezone.utc),
+        datetime(2026, 9, 21, 3, tzinfo=UTC),
     )
     assert bilanz.status == "ok"
     pro = [
@@ -609,7 +610,7 @@ def test_telekom_landet_als_listung_mit_preisform_im_bestand(
         hole,
         "2026-09-04",
         RobotsWaechter(hole=hole),
-        datetime(2026, 9, 4, 3, tzinfo=timezone.utc),
+        datetime(2026, 9, 4, 3, tzinfo=UTC),
     )
     assert bilanz.status == "ok"
     # `direkt=True`: die Kategorieseite ist die Nutzlast, es wird KEINE
@@ -760,7 +761,7 @@ def test_einsundeins_landet_als_buendellistung_im_bestand(
         hole,
         "2026-09-04",
         RobotsWaechter(hole=hole),
-        datetime(2026, 9, 4, 3, tzinfo=timezone.utc),
+        datetime(2026, 9, 4, 3, tzinfo=UTC),
     )
     # 42 Kacheln, alle abgerufen - der Deckel von 45 greift nicht. Die
     # einzige benannte Luecke sind die 41 Stub-Seiten ohne Buendelkatalog

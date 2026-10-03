@@ -14,6 +14,7 @@ import shutil
 from pathlib import Path
 
 import pytest
+from bestand_pfad import abbild, lese_wurzel
 from bs4 import BeautifulSoup
 
 from telco_radar.config import load_config
@@ -49,21 +50,51 @@ def _rechtstexte_zustand(wurzel: Path, *, vollstaendig: bool) -> None:
         pfad.write_text(text, encoding="utf-8")
 
 
-def _projekt(tmp_path, *, vollstaendig: bool, dienst: str = ""):
-    """Eine Projektwurzel mit echten Configs und echten Berichten."""
-    for name in ("content", "config", "data"):
-        shutil.copytree(WURZEL / name, tmp_path / name)
-    _rechtstexte_zustand(tmp_path, vollstaendig=vollstaendig)
-    cfg = load_config(tmp_path)
+def _wurzel_bauen(ziel: Path, *, vollstaendig: bool) -> Path:
+    """Eine Projektwurzel aus echten Configs und dem Berichtsschnappschuss.
+
+    ``abbild`` kopiert den Schnappschuss als ``data/``; ``content`` wird eine echte
+    Kopie, weil ``_rechtstexte_zustand`` die Rechtstexte darin beschreibt.
+    """
+    abbild(ziel)
+    (ziel / "content").unlink()
+    shutil.copytree(WURZEL / "content", ziel / "content")
+    _rechtstexte_zustand(ziel, vollstaendig=vollstaendig)
+    return ziel
+
+
+def _rendern(wurzel: Path, *, dienst: str) -> Path:
+    cfg = load_config(wurzel)
     cfg.settings["newsletter_dienst_url"] = dienst
-    site = tmp_path / "site"
-    render_site(site, tmp_path / "data" / "reports", cfg=cfg)
+    site = wurzel / "site"
+    render_site(site, wurzel / "data" / "reports", cfg=cfg)
     return site
+
+
+_GERENDERT: dict[tuple[bool, str], Path] = {}
+
+
+def _projekt(tmp_path_factory, *, vollstaendig: bool, dienst: str = ""):
+    """Die Seite je Variante genau einmal gerendert; nur lesen, nie beschreiben."""
+    schluessel = (vollstaendig, dienst)
+    if schluessel not in _GERENDERT:
+        wurzel = _wurzel_bauen(
+            tmp_path_factory.mktemp("variante"), vollstaendig=vollstaendig
+        )
+        _GERENDERT[schluessel] = _rendern(wurzel, dienst=dienst)
+    return _GERENDERT[schluessel]
+
+
+def _projekt_kopie(tmp_path, tmp_path_factory, *, vollstaendig: bool, dienst: str = ""):
+    """Eine eigene Kopie der gerenderten Variante für Tests, die sie verändern."""
+    site = _projekt(tmp_path_factory, vollstaendig=vollstaendig, dienst=dienst)
+    shutil.copytree(site.parent, tmp_path / "p", symlinks=True)
+    return tmp_path / "p" / "site"
 
 
 @pytest.fixture(scope="module")
 def katalog():
-    return lade_katalog(WURZEL)
+    return lade_katalog(lese_wurzel())
 
 
 # =====================================  Veroeffentlichungsschwelle  ========
@@ -79,8 +110,9 @@ def test_das_fixture_stellt_beide_zustaende_wirklich_her(tmp_path):
     vollstaendige Seite. Ohne diesen Test faellt so etwas erst auf, wenn
     jemand das Gegenteil behauptet und der Test trotzdem gruen bleibt.
     """
-    for name in ("content", "config", "data"):
-        shutil.copytree(WURZEL / name, tmp_path / name)
+    abbild(tmp_path)
+    (tmp_path / "content").unlink()
+    shutil.copytree(WURZEL / "content", tmp_path / "content")
 
     _rechtstexte_zustand(tmp_path, vollstaendig=True)
     assert rechtstexte.vollstaendig(tmp_path) is True
@@ -103,22 +135,22 @@ def test_die_echten_rechtstexte_trage_keine_offene_stelle():
     assert rechtstexte.vollstaendig(WURZEL) is True
 
 
-def test_ohne_vollstaendiges_impressum_kein_nav_eintrag(tmp_path):
+def test_ohne_vollstaendiges_impressum_kein_nav_eintrag(tmp_path_factory):
     """Art. 13 DSGVO verlangt die Information ZUM ZEITPUNKT der Erhebung.
     Ohne sie darf diese Seite keine Adresse entgegennehmen - und die Regel
     steht im CODE, nicht in einem Test: eine Regel, die nur ein Test kennt,
     schaltet keine Navigation."""
-    site = _projekt(tmp_path, vollstaendig=False)
+    site = _projekt(tmp_path_factory, vollstaendig=False)
     nav = BeautifulSoup(
         (site / "index.html").read_text(encoding="utf-8"), "html.parser"
     ).select(".subnav a")
     assert "newsletter.html" not in {a["href"] for a in nav}
 
 
-def test_mit_vollstaendigem_impressum_steht_der_eintrag_da(tmp_path):
+def test_mit_vollstaendigem_impressum_steht_der_eintrag_da(tmp_path_factory):
     """Die Gegenprobe - ohne sie belegt der Test oben nur, dass der Eintrag
     NIE erscheint."""
-    site = _projekt(tmp_path, vollstaendig=True)
+    site = _projekt(tmp_path_factory, vollstaendig=True)
     for seite in ("index.html", "meldungen.html", "transparenz.html"):
         nav = BeautifulSoup(
             (site / seite).read_text(encoding="utf-8"), "html.parser"
@@ -126,10 +158,10 @@ def test_mit_vollstaendigem_impressum_steht_der_eintrag_da(tmp_path):
         assert "newsletter.html" in {a["href"] for a in nav}, seite
 
 
-def test_die_seite_wird_auch_unterhalb_der_schwelle_gebaut(tmp_path):
+def test_die_seite_wird_auch_unterhalb_der_schwelle_gebaut(tmp_path_factory):
     """Gebaut, getestet, ueber ihren direkten Link erreichbar - nur nicht
     verlinkt. Dieselbe Regel wie bei Tarif- und Lieferzeitseite."""
-    site = _projekt(tmp_path, vollstaendig=False)
+    site = _projekt(tmp_path_factory, vollstaendig=False)
     assert (site / "newsletter.html").exists()
     html = (site / "newsletter.html").read_text(encoding="utf-8")
     soup = BeautifulSoup(html, "html.parser")
@@ -137,8 +169,8 @@ def test_die_seite_wird_auch_unterhalb_der_schwelle_gebaut(tmp_path):
     assert soup.select_one("#nl-submit").has_attr("disabled")
 
 
-def test_oberhalb_der_schwelle_nimmt_die_seite_entgegen(tmp_path):
-    site = _projekt(tmp_path, vollstaendig=True, dienst="https://x.invalid")
+def test_oberhalb_der_schwelle_nimmt_die_seite_entgegen(tmp_path_factory):
+    site = _projekt(tmp_path_factory, vollstaendig=True, dienst="https://x.invalid")
     soup = BeautifulSoup(
         (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
     )
@@ -148,11 +180,11 @@ def test_oberhalb_der_schwelle_nimmt_die_seite_entgegen(tmp_path):
     assert soup.select_one("form .nl-gesperrt") is None
 
 
-def test_ohne_dienst_url_kann_die_seite_nichts_absenden(tmp_path):
+def test_ohne_dienst_url_kann_die_seite_nichts_absenden(tmp_path_factory):
     """Zwei unabhaengige Bedingungen: die Rechtstexte UND ein erreichbarer
     Dienst. Fehlt die Adresse, sagt das Formular es - statt ins Leere zu
     posten."""
-    site = _projekt(tmp_path, vollstaendig=True, dienst="")
+    site = _projekt(tmp_path_factory, vollstaendig=True, dienst="")
     html = (site / "newsletter.html").read_text(encoding="utf-8")
     konfig = json.loads(
         BeautifulSoup(html, "html.parser").select_one("#nl-config").text
@@ -161,7 +193,7 @@ def test_ohne_dienst_url_kann_die_seite_nichts_absenden(tmp_path):
     assert konfig["frei"] is True
 
 
-def test_der_fehlende_dienst_steht_ueber_dem_formular(tmp_path):
+def test_der_fehlende_dienst_steht_ueber_dem_formular(tmp_path_factory):
     """Nicht nur DASS es dasteht, sondern WO.
 
     Bis zum 12.08.2026 kam dieser Hinweis allein aus `app.js` und stand
@@ -172,7 +204,7 @@ def test_der_fehlende_dienst_steht_ueber_dem_formular(tmp_path):
     die Seite ohnehin niemand; mit der eingetragenen Anschrift steht sie in
     der Navigation, und der Weg wird begangen.
     """
-    site = _projekt(tmp_path, vollstaendig=True, dienst="")
+    site = _projekt(tmp_path_factory, vollstaendig=True, dienst="")
     soup = BeautifulSoup(
         (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
     )
@@ -186,10 +218,10 @@ def test_der_fehlende_dienst_steht_ueber_dem_formular(tmp_path):
     assert "Impressum" not in kasten.get_text()
 
 
-def test_mit_dienst_url_steht_kein_sperrkasten_mehr(tmp_path):
+def test_mit_dienst_url_steht_kein_sperrkasten_mehr(tmp_path_factory):
     """Die Gegenprobe - ohne sie belegt der Test oben nur, dass der Kasten
     IMMER dasteht."""
-    site = _projekt(tmp_path, vollstaendig=True, dienst="https://x.invalid")
+    site = _projekt(tmp_path_factory, vollstaendig=True, dienst="https://x.invalid")
     soup = BeautifulSoup(
         (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
     )
@@ -203,8 +235,8 @@ def test_mit_dienst_url_steht_kein_sperrkasten_mehr(tmp_path):
 # ================================================  Inhalt des Formulars  ===
 
 
-def test_alle_vier_dimensionen_stehen_auf_der_seite(tmp_path, katalog):
-    site = _projekt(tmp_path, vollstaendig=True)
+def test_alle_vier_dimensionen_stehen_auf_der_seite(tmp_path_factory, katalog):
+    site = _projekt(tmp_path_factory, vollstaendig=True)
     soup = BeautifulSoup(
         (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
     )
@@ -215,11 +247,11 @@ def test_alle_vier_dimensionen_stehen_auf_der_seite(tmp_path, katalog):
         assert gezeigt == katalog.schluessel(dimension), dimension
 
 
-def test_neben_jeder_dimension_steht_dass_leer_alles_heisst(tmp_path):
+def test_neben_jeder_dimension_steht_dass_leer_alles_heisst(tmp_path_factory):
     """Die Erwartung fast aller Nutzer - und es ist NICHT die Erwartung der
     anderen. Deshalb steht es da: das ist keine Bedienhilfe, sondern die
     Regel selbst."""
-    site = _projekt(tmp_path, vollstaendig=True)
+    site = _projekt(tmp_path_factory, vollstaendig=True)
     soup = BeautifulSoup(
         (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
     )
@@ -235,21 +267,21 @@ def test_neben_jeder_dimension_steht_dass_leer_alles_heisst(tmp_path):
         assert "alles" in text.lower(), text
 
 
-def test_die_einwilligung_ist_nicht_vorausgewaehlt(tmp_path):
+def test_die_einwilligung_ist_nicht_vorausgewaehlt(tmp_path_factory):
     """Eine vorangekreuzte Einwilligung ist keine."""
-    site = _projekt(tmp_path, vollstaendig=True)
+    site = _projekt(tmp_path_factory, vollstaendig=True)
     soup = BeautifulSoup(
         (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
     )
     assert not soup.select_one("#nl-consent").has_attr("checked")
 
 
-def test_der_einwilligungstext_steht_im_wortlaut_daneben(tmp_path):
+def test_der_einwilligungstext_steht_im_wortlaut_daneben(tmp_path_factory):
     """Nicht eine gekuerzte Fassung: eine Zustimmung zu einem Text, den der
     Nutzer nie gesehen hat, ist keine."""
     from telco_radar.report import rechtstexte
 
-    site = _projekt(tmp_path, vollstaendig=True)
+    site = _projekt(tmp_path_factory, vollstaendig=True)
     soup = BeautifulSoup(
         (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
     )
@@ -272,10 +304,10 @@ def test_der_einwilligungstext_traegt_nicht_die_umbrueche_der_datei():
     ]
 
 
-def test_das_honeypot_feld_ist_kein_hidden_feld(tmp_path):
+def test_das_honeypot_feld_ist_kein_hidden_feld(tmp_path_factory):
     """Skripte fuellen `type=hidden` gezielt NICHT aus. Ein sichtbares Feld,
     das aus dem Bild geschoben ist, fuellen sie - und Menschen sehen es nie."""
-    site = _projekt(tmp_path, vollstaendig=True)
+    site = _projekt(tmp_path_factory, vollstaendig=True)
     soup = BeautifulSoup(
         (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
     )
@@ -286,9 +318,9 @@ def test_das_honeypot_feld_ist_kein_hidden_feld(tmp_path):
     assert re.search(r"\.nl-hp\{[^}]*left:-9999px", css)
 
 
-def test_impressum_und_datenschutz_stehen_auf_der_anmeldeseite(tmp_path):
+def test_impressum_und_datenschutz_stehen_auf_der_anmeldeseite(tmp_path_factory):
     """Art. 13 DSGVO verlangt die Information dort, wo erhoben wird."""
-    site = _projekt(tmp_path, vollstaendig=True)
+    site = _projekt(tmp_path_factory, vollstaendig=True)
     ziele = {
         a["href"]
         for a in BeautifulSoup(
@@ -298,8 +330,8 @@ def test_impressum_und_datenschutz_stehen_auf_der_anmeldeseite(tmp_path):
     assert "impressum.html" in ziele and "datenschutz.html" in ziele
 
 
-def test_ohne_javascript_ist_wenigstens_sichtbar_dass_es_ihn_gibt(tmp_path):
-    site = _projekt(tmp_path, vollstaendig=True)
+def test_ohne_javascript_ist_wenigstens_sichtbar_dass_es_ihn_gibt(tmp_path_factory):
+    site = _projekt(tmp_path_factory, vollstaendig=True)
     html = (site / "newsletter.html").read_text(encoding="utf-8")
     assert "<noscript>" in html
     assert "JavaScript" in html.split("<noscript>")[1].split("</noscript>")[0]
@@ -308,12 +340,12 @@ def test_ohne_javascript_ist_wenigstens_sichtbar_dass_es_ihn_gibt(tmp_path):
 # ===============================================  Die Abschlussseiten  =====
 
 
-def test_die_abschlussseiten_sind_statisch_und_ohne_dienst(tmp_path):
+def test_die_abschlussseiten_sind_statisch_und_ohne_dienst(tmp_path, tmp_path_factory):
     """DER Punkt: wer auf den Abmeldelink klickt, waehrend Render die
     Instanz schlafen laesst, wartet sonst eine Minute vor einem Spinner - und
     haelt sich trotzdem fuer abgemeldet. Der Abmeldelink ist der EINZIGE
     Abmeldeweg."""
-    site = _projekt(tmp_path, vollstaendig=False)  # sogar unterhalb der Schwelle
+    site = _projekt_kopie(tmp_path, tmp_path_factory, vollstaendig=False)
     for name in ("newsletter-bestaetigt.html", "newsletter-abgemeldet.html"):
         datei = site / name
         assert datei.exists(), name
@@ -328,7 +360,7 @@ def test_die_abschlussseiten_sind_statisch_und_ohne_dienst(tmp_path):
 # =====================================  Vorschau: Browser gegen Python  ====
 
 
-def _index_zum_stichtag(tmp_path, site):
+def _index_zum_stichtag(site):
     """Den Index auf den TAG DER JUENGSTEN AUSGABE stellen.
 
     `render_site()` rechnet mit `date.today()`, und die Berichte im Repo
@@ -340,9 +372,10 @@ def _index_zum_stichtag(tmp_path, site):
     `test_newsletter_versand.py` passiert.
     """
     from datetime import date
+
     from telco_radar.newsletter.filters import baue_stichwort_index
 
-    reports = tmp_path / "data" / "reports"
+    reports = site.parent / "data" / "reports"
     daten = sorted(
         f.stem
         for f in reports.glob("*.json")
@@ -357,16 +390,18 @@ def _index_zum_stichtag(tmp_path, site):
     return index, reports, stand
 
 
-def test_der_index_liegt_neben_der_seite(tmp_path):
-    site = _projekt(tmp_path, vollstaendig=True)
-    index, _reports, _stand = _index_zum_stichtag(tmp_path, site)
+def test_der_index_liegt_neben_der_seite(tmp_path, tmp_path_factory):
+    site = _projekt_kopie(tmp_path, tmp_path_factory, vollstaendig=True)
+    index, _reports, _stand = _index_zum_stichtag(site)
     assert index["woerter"] and index["meldungen"] > 0
     # Das Formular zeigt auf genau diesen relativen Pfad.
     assert "data/keyword-index.json" in (site / "app.js").read_text(encoding="utf-8")
 
 
 @pytest.mark.parametrize("begriff", ["telekom", "netz", "starlink", "tarif"])
-def test_die_browser_vorschau_sagt_dasselbe_wie_python(tmp_path, chromium, begriff):
+def test_die_browser_vorschau_sagt_dasselbe_wie_python(
+    tmp_path, tmp_path_factory, chromium, begriff
+):
     """Der Test, um den es geht.
 
     Die Seite kann `vorschau()` nicht aufrufen - sie zaehlt im Browser gegen
@@ -376,8 +411,10 @@ def test_die_browser_vorschau_sagt_dasselbe_wie_python(tmp_path, chromium, begri
     """
     from telco_radar.newsletter.filters import vorschau
 
-    site = _projekt(tmp_path, vollstaendig=True, dienst="https://x.invalid")
-    index, reports, stand = _index_zum_stichtag(tmp_path, site)
+    site = _projekt_kopie(
+        tmp_path, tmp_path_factory, vollstaendig=True, dienst="https://x.invalid"
+    )
+    index, reports, stand = _index_zum_stichtag(site)
 
     seite = chromium.new_page()
     try:
@@ -401,12 +438,12 @@ def test_die_browser_vorschau_sagt_dasselbe_wie_python(tmp_path, chromium, begri
     )
 
 
-def test_wenigstens_ein_begriff_trifft_ueberhaupt(tmp_path):
+def test_wenigstens_ein_begriff_trifft_ueberhaupt(tmp_path, tmp_path_factory):
     """Ohne diese Gegenprobe bestuende der Test oben auch dann, wenn beide
     Seiten konsequent null zaehlen."""
     from telco_radar.newsletter.filters import vorschau
 
-    site = _projekt(tmp_path, vollstaendig=True)
-    index, reports, stand = _index_zum_stichtag(tmp_path, site)
+    site = _projekt_kopie(tmp_path, tmp_path_factory, vollstaendig=True)
+    index, reports, stand = _index_zum_stichtag(site)
     treffer = vorschau("telekom", reports, tage=index["tage"], heute=stand)
     assert treffer > 0, "der Vergleichstest prueft sonst nur Nullen"

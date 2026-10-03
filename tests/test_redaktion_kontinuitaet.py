@@ -20,6 +20,7 @@ from datetime import date, timedelta
 from pathlib import Path
 
 import pytest
+from bestand_pfad import verlinke_neben_data
 
 from telco_radar import pipeline
 from telco_radar.analyze import redaktion_kontinuitaet as rk
@@ -263,6 +264,7 @@ def test_normale_woche_zeigt_keinen_ausfall_hinweis(tmp_path):
     """Der Hinweis darf nur bei einer echten Uebernahme erscheinen."""
     reports = tmp_path / "data" / "reports"
     reports.mkdir(parents=True)
+    verlinke_neben_data(tmp_path)
     (reports / "2026-08-10.json").write_text(
         json.dumps(_bericht("2026-08-10")), encoding="utf-8"
     )
@@ -278,6 +280,7 @@ def test_meldungenseite_normale_woche_ohne_hinweis(tmp_path):
     damit beide Seiten unabhaengig fassbar sind (R2-Befund des Evaluators)."""
     reports = tmp_path / "data" / "reports"
     reports.mkdir(parents=True)
+    verlinke_neben_data(tmp_path)
     (reports / "2026-08-10.json").write_text(
         json.dumps(_bericht("2026-08-10")), encoding="utf-8"
     )

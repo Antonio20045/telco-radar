@@ -12,6 +12,12 @@ WURZEL = Path(__file__).resolve().parents[1]
 BESTAND = WURZEL / "tests" / "fixtures" / "bestand" / "2026-10-03"
 ZUSTAND = BESTAND / "state"
 BERICHTE = BESTAND / "reports"
+BILDER_BESTAND = WURZEL / "tests" / "fixtures" / "bestand" / "2026-08-08"
+"""Die Ausgabe 2026-08-08 mit den 52 Meldungsbildern, auf die sie zeigt."""
+BILDER_ZUSTAND = WURZEL / "tests" / "fixtures" / "bestand" / "2026-10-02" / "state"
+"""Promo- und Meldungsbilder zum Bestand 2026-10-03 (``promo_db.json`` ist gleich)."""
+ARCHIV = BILDER_ZUSTAND.parent / "reports"
+"""Alle Ausgaben ab 2026-08-06, seit die Berichte Bildbreiten tragen."""
 NEBEN_DATA = ("config", "content")
 AUTO_KATALOG = "geraete_katalog_auto.json"
 

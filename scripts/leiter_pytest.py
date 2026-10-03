@@ -14,7 +14,6 @@ from pathlib import Path
 PLUGIN_ORDNER = Path(__file__).resolve().parent / "leiter_plugin"
 PLUGIN = "leiter_roh"
 ROH_VARIABLE = "TELCO_LEITER_ROH"
-BESTAND_VARIABLE = "TELCO_TESTS_BESTAND_PROTOKOLL"
 _GESAMMELT = re.compile(
     r"^\d+ workers? \[(\d+) items?\]$"
     r"|^collected \d+ items?(?: / \d+ deselected)? / (\d+) selected"
@@ -164,11 +163,6 @@ def lies_roh(ordner: Path) -> dict[str, str]:
             if _VORRANG.get(art, 0) >= _VORRANG.get(roh.get(nodeid, ""), 0):
                 roh[nodeid] = art
     return roh
-
-
-def lies_zugriffe(ordner: Path) -> set[str]:
-    """Die Testdateien, die laut ``tests/conftest.py`` auf den Bestand zugriffen."""
-    return {z for d in ordner.glob("*.txt") for z in d.read_text("utf-8").split()}
 
 
 def fremde(roh: dict[str, str]) -> list[str]:

@@ -22,9 +22,11 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 from pathlib import Path
 
 import pytest
+from bestand_pfad import BILDER_ZUSTAND, WURZEL, ZUSTAND, abbild
 from bs4 import BeautifulSoup
 
 from telco_radar.analyze.promo_ranker import MECHANICS
@@ -222,8 +224,9 @@ def test_ein_leerer_screenshot_wird_erkannt():
     from telco_radar.report.bilder import ist_leer
 
     pytest.importorskip("PIL")
-    from PIL import Image
     import io
+
+    from PIL import Image
 
     def als_jpeg(im):
         puffer = io.BytesIO()
@@ -255,12 +258,8 @@ def test_die_echten_screenshots_bestehen_die_pruefung():
     Aufnahme ein Problem."""
     from telco_radar.report.bilder import ist_leer
 
-    ordner = Path(__file__).resolve().parent.parent / "data" / "state" / "promo_images"
-    if not ordner.exists():
-        pytest.skip("Kein Screenshot-Bestand im Arbeitsverzeichnis")
+    ordner = BILDER_ZUSTAND / "promo_images"
     bilder = sorted(p for p in ordner.iterdir() if p.suffix == ".jpg")
-    if not bilder:
-        pytest.skip("Kein Screenshot-Bestand im Arbeitsverzeichnis")
     leer = [p.name for p in bilder if ist_leer(p.read_bytes())]
     gut = len(bilder) - len(leer)
     assert gut >= 10, (
@@ -333,11 +332,11 @@ def promo_site(tmp_path):
     Screenshot nie gefunden."""
     from telco_radar.config import load_config
 
-    wurzel = Path(__file__).resolve().parent.parent
-    if not (wurzel / "data" / "state" / "promo_db.json").exists():
-        pytest.skip("Kein Promo-Bestand im Arbeitsverzeichnis")
+    berichte = abbild(tmp_path)
+    for name in ("promo_images", "report_images"):
+        shutil.copytree(BILDER_ZUSTAND / name, tmp_path / "data" / "state" / name)
     site = tmp_path / "site"
-    render_site(site, wurzel / "data" / "reports", load_config(wurzel))
+    render_site(site, berichte, load_config(tmp_path))
     return site
 
 
@@ -406,12 +405,9 @@ def test_die_zahl_der_marktlage_stimmt_mit_der_datenbank(promo_site):
     from telco_radar.config import load_config
     from telco_radar.promo_config import load_promo_config
 
-    wurzel = Path(__file__).resolve().parent.parent
-    cfg = load_config(wurzel)
+    cfg = load_config(WURZEL)
     promo_cfg = load_promo_config(cfg.root)
-    db = json.loads(
-        (wurzel / "data" / "state" / "promo_db.json").read_text(encoding="utf-8")
-    )
+    db = json.loads((ZUSTAND / "promo_db.json").read_text(encoding="utf-8"))
     intern = {s.name for s in promo_cfg.sources if s.internal_reference}
     crawlbar = {s.name for s in promo_cfg.sources if getattr(s, "crawlable", True)}
     sichtbar = [
@@ -455,6 +451,7 @@ def test_die_seite_zeigt_kein_motiv_zweimal(promo_site):
     # Kachel, und ueber 13 Bloecke hinweg kosten zwei verschiedene Angebote
     # zweier verschiedener Anbieter nun einmal beide "10 €". Nebeneinander
     # stehen sie nie; als Fehler liest sich nur die Wiederholung IM Block.
+    assert soup.select(".pmarke .pk-bild--typo"), "keine Schriftkachel, nichts geprueft"
     for block in soup.select(".pmarke"):
         kacheln = [
             k.get_text(" ", strip=True)

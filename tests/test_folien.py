@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 
 import pytest
+from bestand_pfad import BERICHTE
 
 from telco_radar.report import folien
 from telco_radar.report.folien import (
@@ -13,8 +13,8 @@ from telco_radar.report.folien import (
     MAX_LEDE,
     MAX_PUNKT,
     MAX_PUNKTE,
-    MAX_QUELLEN,
     MAX_QUELLE_TEXT,
+    MAX_QUELLEN,
     MAX_TITEL,
     baue,
     inhalt,
@@ -337,11 +337,9 @@ def test_zu_langer_titel_wird_gekuerzt():
 
 
 def test_deck_laeuft_gegen_einen_echten_bericht():
-    """Gegen die zuletzt ausgelieferte Ausgabe, nicht gegen ein Konstrukt."""
-    pfad = Path(__file__).resolve().parents[1] / "data" / "reports"
-    echte = sorted(pfad.glob("2*.json")) if pfad.exists() else []
-    if not echte:
-        pytest.skip("kein Bericht im Archiv")
+    """Gegen die Ausgabe 2026-10-02 im Schnappschuss, nicht gegen ein Konstrukt."""
+    echte = sorted(BERICHTE.glob("2*.json"))
+    assert echte
     bericht = json.loads(echte[-1].read_text(encoding="utf-8"))
     satz = inhalt(bericht)
     assert satz.ueberlaeufe() == []

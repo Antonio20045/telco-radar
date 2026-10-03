@@ -3,7 +3,9 @@
 Offline: kein Brave/LLM nötig (upsert/dedup/rotation).
 """
 
-from telco_radar.analyze.category_sweep import DiffDB, rotation_slice, THEMES
+from bestand_pfad import ZUSTAND
+
+from telco_radar.analyze.category_sweep import THEMES, DiffDB, rotation_slice
 
 
 def _item(url, theme="ki", op="Op", what="tut etwas"):
@@ -65,15 +67,6 @@ def test_rotation_covers_all_over_weeks():
 
 
 def test_seed_db_loads():
-    # Der ausgelieferte Startbestand muss ladbar und nicht leer sein.
-    from pathlib import Path
-
-    p = (
-        Path(__file__).resolve().parents[1]
-        / "data"
-        / "state"
-        / "differentiation_db.json"
-    )
-    if p.exists():
-        db = DiffDB(p)
-        assert len(db) > 10
+    """Der Startbestand im Schnappschuss ist ladbar und hat mehr als 10 Einträge."""
+    db = DiffDB(ZUSTAND / "differentiation_db.json")
+    assert len(db) > 10

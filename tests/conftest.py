@@ -1,10 +1,9 @@
 """Rahmen der Tests: hermetisch, Uhr aus dem Schnappschuss, Chromium je Worker.
 
-Ein Audit-Hook lässt jeden Zugriff auf ``data/`` und ``site/`` scheitern, außer aus den
-Testdateien in ``pruef/tests-mit-bestand.txt``, und jede Namensauflösung oder Verbindung
-außer zu 127.0.0.1. Ein geschluckter Verstoß macht den Test im Abbau rot. Tests lesen
-den Bestand aus ``tests/fixtures/bestand/<datum>/`` (``scripts/schnappschuss.py``), die
-Uhr kommt aus dessen ``_herkunft.json``.
+Ein Audit-Hook lässt jeden Zugriff auf ``data/`` und ``site/`` scheitern, und jede
+Namensauflösung oder Verbindung außer zu 127.0.0.1. Ein geschluckter Verstoß macht den
+Test im Abbau rot. Tests lesen den Bestand aus ``tests/fixtures/bestand/<datum>/``
+(``scripts/schnappschuss.py``), die Uhr kommt aus dessen ``_herkunft.json``.
 """
 
 from __future__ import annotations
@@ -21,9 +20,7 @@ import pytest
 WURZEL = Path(__file__).resolve().parents[1]
 TESTS = f"{WURZEL / 'tests'}{os.sep}"
 GESPERRT = tuple(f"{WURZEL / name}" for name in ("data", "site"))
-ALTLASTEN = WURZEL / "pruef" / "tests-mit-bestand.txt"
 SCHNAPPSCHUSS = WURZEL / "tests" / "fixtures" / "bestand" / "2026-10-03"
-PROTOKOLL_VARIABLE = "TELCO_TESTS_BESTAND_PROTOKOLL"
 REGEL_BESTAND = (
     "Regel hermetisch: Tests lesen nur Schnappschüsse, siehe tests/fixtures/bestand"
 )
@@ -69,12 +66,8 @@ class HermetikVerstoss(RuntimeError):
     """Ein Test griff auf den echten Bestand oder ins Netz."""
 
 
-_altlasten = frozenset(
-    ALTLASTEN.read_text(encoding="utf-8").split() if ALTLASTEN.exists() else ()
-)
 _verstoesse: list[str] = []
 _gemeldet = [0]
-_protokolliert: set[str] = set()
 _aktiv = [True]
 
 
@@ -144,22 +137,6 @@ def _fremder_host(ereignis: str, argumente: tuple[object, ...]) -> str | None:
     return None if name in LOKAL else name
 
 
-def _protokolliere(datei: str) -> None:
-    ordner = os.environ.get(PROTOKOLL_VARIABLE)
-    if not ordner or datei in _protokolliert:
-        return
-    _protokolliert.add(datei)
-    kennung = os.open(
-        os.path.join(ordner, f"{os.getpid()}.txt"),
-        os.O_WRONLY | os.O_APPEND | os.O_CREAT,
-        0o600,
-    )
-    try:
-        os.write(kennung, f"{datei}\n".encode())
-    finally:
-        os.close(kennung)
-
-
 def _verstoss(meldung: str) -> None:
     _verstoesse.append(meldung)
     raise HermetikVerstoss(meldung)
@@ -176,9 +153,6 @@ def _hermetik(ereignis: str, argumente: tuple[object, ...]) -> None:
         if pfad is None:
             return
         datei = _testdatei()
-        if datei in _altlasten:
-            _protokolliere(datei)
-            return
         relativ = os.path.relpath(pfad, os.path.dirname(GESPERRT[0]))
         _verstoss(f"{REGEL_BESTAND} ({datei or 'unbekannt'} griff auf {relativ})")
     elif ereignis in NETZ_EREIGNISSE:

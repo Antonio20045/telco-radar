@@ -181,9 +181,9 @@ def offen() -> dict[str, list[str]]:
         + zeitreihen_probe()
         + live_datum(),
         "3 Format, Werkzeuge, Basen": rot_proben(),
-        "4 Hermetische Tests": _mehr("rot-bekannt", _zeilen("pruef/rot-bekannt.txt"))
-        + _mehr("Testdateien mit Bestand", _zeilen("pruef/tests-mit-bestand.txt"))
-        + [f"{c} in Tests {n}, Ziel 0" for c, n in sorted(_tests_summe().items())]
+        "4 Hermetische Tests": [
+            f"{c} in Tests {n}, Ziel 0" for c, n in sorted(_tests_summe().items())
+        ]
         + _testzeit()
         + _fehlt("tests/fixtures/bestand"),
         "5 Hooks, CLAUDE.md": _fehlt(".githooks/pre-push", ".claude/hooks")

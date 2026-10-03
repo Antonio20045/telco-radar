@@ -28,6 +28,7 @@ import json
 from pathlib import Path
 
 import pytest
+from bestand_pfad import lese_wurzel
 
 from telco_radar.analyze.geraete_store import GeraeteDB, Preishistorie
 from telco_radar.collect.geraete import o2, sammle_anbieter
@@ -73,7 +74,7 @@ def _katalogantwort(*hardware) -> str:
 
 @pytest.fixture(scope="module")
 def katalog():
-    return lade_katalog(_WURZEL)
+    return lade_katalog(lese_wurzel())
 
 
 @pytest.fixture(scope="module")

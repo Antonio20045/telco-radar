@@ -130,9 +130,6 @@ def _untergrenze(tmp_path, monkeypatch):
     obergrenze = tmp_path / "tests-uebersprungen.txt"
     obergrenze.write_text("1\n", encoding="utf-8")
     monkeypatch.setattr(pruefleiter, "TESTS_UEBERSPRUNGEN", obergrenze)
-    altlasten = tmp_path / "tests-mit-bestand.txt"
-    altlasten.write_text("", encoding="utf-8")
-    monkeypatch.setattr(pruefleiter, "TESTS_MIT_BESTAND", altlasten)
     return pfad
 
 
@@ -165,32 +162,22 @@ def _roh_wie_gemeldet(ordner, stdout):
     (ordner / "1.lief").write_text(gelaufen, encoding="utf-8")
 
 
-def _bekannt(tmp_path, monkeypatch, *tests):
-    pfad = tmp_path / "rot-bekannt.txt"
-    pfad.write_text("".join(f"{t}\n" for t in tests), encoding="utf-8")
-    monkeypatch.setattr(pruefleiter, "ROT_BEKANNT", pfad)
-    return pfad
-
-
-def test_bekannt_roter_test_bleibt_gruen_und_geheilter_faellt_aus_der_liste(
-    tmp_path, monkeypatch
-):
-    pfad = _bekannt(tmp_path, monkeypatch, "tests/a.py::t1", "tests/a.py::t2")
+def test_frueher_bekannt_roter_test_macht_die_stufe_rot(monkeypatch, tmp_path):
+    liste = tmp_path / "rot-bekannt.txt"
+    liste.write_text("tests/a.py::t1\n", "utf-8")
+    monkeypatch.setattr(pruefleiter, "ROT_BEKANNT", liste, raising=False)
     _lauf_mit(
         monkeypatch,
         1,
-        "ERROR    telco_radar.x:x.py:1 Protokollzeile im Fehlerbericht\n"
-        + _KOPF
-        + "PASSED tests/a.py::t2\nPASSED tests/b.py::t[x - y]\n"
-        "FAILED tests/a.py::t1 - AssertionError: 1 != 2\n",
+        _KOPF
+        + "PASSED tests/a.py::t2\nFAILED tests/a.py::t1 - AssertionError: 1 != 2\n",
     )
     ergebnis = pruefleiter.stufe_tests(None)
-    assert ergebnis.gruen
-    assert pfad.read_text(encoding="utf-8") == "tests/a.py::t1\n"
+    assert not ergebnis.gruen
+    assert ergebnis.zeilen == ["FAILED tests/a.py::t1 - AssertionError: 1 != 2"]
 
 
-def test_neuer_roter_test_ist_rot_und_die_liste_bleibt(tmp_path, monkeypatch):
-    pfad = _bekannt(tmp_path, monkeypatch, "tests/a.py::t1")
+def test_neuer_roter_test_ist_rot(monkeypatch):
     _lauf_mit(
         monkeypatch,
         1,
@@ -199,14 +186,12 @@ def test_neuer_roter_test_ist_rot_und_die_liste_bleibt(tmp_path, monkeypatch):
     ergebnis = pruefleiter.stufe_tests(None)
     assert not ergebnis.gruen
     assert ergebnis.zeilen == ["ERROR tests/c.py - ImportError: x"]
-    assert pfad.read_text(encoding="utf-8") == "tests/a.py::t1\n"
 
 
 @pytest.mark.parametrize(
     ("code", "ausgabe"), [(2, "Interrupted"), (1, "kaputt"), (5, "")]
 )
 def test_abbruch_von_pytest_ist_nie_gruen(tmp_path, monkeypatch, code, ausgabe):
-    _bekannt(tmp_path, monkeypatch)
     _lauf_mit(monkeypatch, code, ausgabe)
     assert not pruefleiter.stufe_tests(None).gruen
 
@@ -217,7 +202,7 @@ def test_rot_hat_hoechstens_sechzig_zeilen_gruen_eine():
     assert len(zeilen) == pruefleiter.MAX_ROT_ZEILEN
     assert zeilen[0].startswith("Prüfleiter rot in Stufe 2 Typen")
     assert zeilen[-2] == "… und 443 weitere Zeilen"
-    gruen = pruefleiter.Ergebnis("Tests", True, gesenkt=["pruef/rot-bekannt.txt"])
+    gruen = pruefleiter.Ergebnis("Tests", True, gesenkt=["pruef/tests-anzahl.txt"])
     assert len(pruefleiter.zusammenfassung([gruen])) == 1
 
 
@@ -238,26 +223,15 @@ def test_leiter_bricht_nach_der_ersten_roten_stufe_ab(tmp_path):
     assert not ergebnisse[-1].gruen
 
 
-def test_bekannt_roter_test_mit_teardown_fehler_bleibt_in_der_liste(
-    tmp_path, monkeypatch
-):
-    pfad = _bekannt(tmp_path, monkeypatch, "tests/a.py::t1")
+def test_teardown_fehler_eines_gruenen_tests_macht_die_stufe_rot(monkeypatch):
     _lauf_mit(
         monkeypatch,
         1,
         _KOPF + "PASSED tests/a.py::t1\nERROR tests/a.py::t1 - teardown\n",
     )
-    assert pruefleiter.stufe_tests(None).gruen
-    assert pfad.read_text(encoding="utf-8") == "tests/a.py::t1\n"
-
-
-def test_ohne_liste_der_bekannt_roten_ist_jeder_rote_test_rot(tmp_path, monkeypatch):
-    monkeypatch.setattr(pruefleiter, "ROT_BEKANNT", tmp_path / "fehlt.txt")
-    _lauf_mit(monkeypatch, 1, _KOPF + "FAILED tests/a.py::t - x\n")
     assert not pruefleiter.stufe_tests(None).gruen
     _lauf_mit(monkeypatch, 0, _KOPF + "PASSED tests/a.py::t\n")
     assert pruefleiter.stufe_tests(None).gruen
-    assert not (tmp_path / "fehlt.txt").exists()
 
 
 @pytest.mark.parametrize(
@@ -309,7 +283,6 @@ def test_main_endet_rot_mit_log_und_zeiten(tmp_path, monkeypatch, capsys):
 def test_weniger_gesammelte_tests_als_die_untergrenze_sind_rot(
     tmp_path, monkeypatch, _untergrenze
 ):
-    _bekannt(tmp_path, monkeypatch)
     _lauf_mit(monkeypatch, 0, _KOPF + "PASSED tests/a.py::t\n", gesammelt=1)
     ergebnis = pruefleiter.stufe_tests(None)
     assert not ergebnis.gruen
@@ -320,7 +293,6 @@ def test_weniger_gesammelte_tests_als_die_untergrenze_sind_rot(
 def test_mehr_gesammelte_tests_heben_die_untergrenze(
     tmp_path, monkeypatch, _untergrenze
 ):
-    _bekannt(tmp_path, monkeypatch)
     _lauf_mit(monkeypatch, 0, _KOPF + "PASSED tests/a.py::t\n", gesammelt=5)
     ergebnis = pruefleiter.stufe_tests(None)
     assert ergebnis.gruen
@@ -330,14 +302,12 @@ def test_mehr_gesammelte_tests_heben_die_untergrenze(
 
 
 def test_rote_stufe_hebt_die_untergrenze_nicht(tmp_path, monkeypatch, _untergrenze):
-    _bekannt(tmp_path, monkeypatch)
     _lauf_mit(monkeypatch, 1, _KOPF + "FAILED tests/a.py::t - x\n", gesammelt=5)
     assert not pruefleiter.stufe_tests(None).gruen
     assert _untergrenze.read_text(encoding="utf-8") == "2\n"
 
 
 def test_unlesbare_testzahl_ist_rot(tmp_path, monkeypatch):
-    _bekannt(tmp_path, monkeypatch)
     _lauf_mit(monkeypatch, 0, _KOPF + "PASSED tests/a.py::t\n", gesammelt=None)
     ergebnis = pruefleiter.stufe_tests(None)
     assert not ergebnis.gruen
@@ -415,20 +385,12 @@ def kleines_projekt(tmp_path, monkeypatch):
     (wurzel / "tests" / "conftest.py").write_text(_HERMETIK, "utf-8")
     pruef = tmp_path / "pruef"
     pruef.mkdir()
-    (pruef / "rot-bekannt.txt").write_text("", "utf-8")
     (pruef / "tests-anzahl.txt").write_text("7\n", "utf-8")
     (pruef / "tests-uebersprungen.txt").write_text("0\n", "utf-8")
-    (pruef / "tests-mit-bestand.txt").write_text("", "utf-8")
-    # tests/conftest.py liest die Altlasten aus <wurzel>/pruef wie die Leiter.
-    (wurzel / "pruef").symlink_to(pruef)
     monkeypatch.setattr(pruefleiter, "WURZEL", wurzel)
-    monkeypatch.setattr(pruefleiter, "ROT_BEKANNT", pruef / "rot-bekannt.txt")
     monkeypatch.setattr(pruefleiter, "TESTS_ANZAHL", pruef / "tests-anzahl.txt")
     monkeypatch.setattr(
         pruefleiter, "TESTS_UEBERSPRUNGEN", pruef / "tests-uebersprungen.txt"
-    )
-    monkeypatch.setattr(
-        pruefleiter, "TESTS_MIT_BESTAND", pruef / "tests-mit-bestand.txt"
     )
     return wurzel
 
@@ -445,17 +407,7 @@ def test_testauswahl_ueber_die_umgebung_versteckt_keinen_roten_test(
     ]
 
 
-def test_altlast_ohne_zugriff_wird_gestrichen():
-    altlasten = pruefleiter.TESTS_MIT_BESTAND
-    altlasten.write_text("tests/test_a.py\ntests/test_b.py\n", encoding="utf-8")
-    assert pruefleiter.senke_altlasten({"tests/test_b.py", "tests/test_neu.py"})
-    assert altlasten.read_text(encoding="utf-8") == "tests/test_b.py\n"
-    assert not pruefleiter.senke_altlasten({"tests/test_b.py"})
-
-
-def test_gruener_lauf_streicht_altlasten_und_ohne_eintrag_scheitert_der_zugriff(
-    kleines_projekt, tmp_path
-):
+def test_zugriff_auf_den_bestand_ist_ohne_ausnahme_rot(kleines_projekt, tmp_path):
     (kleines_projekt / "data").mkdir()
     (kleines_projekt / "data" / "x.txt").write_text("x", "utf-8")
     (kleines_projekt / "tests" / "test_alt.py").write_text(
@@ -464,15 +416,10 @@ def test_gruener_lauf_streicht_altlasten_und_ohne_eintrag_scheitert_der_zugriff(
         "utf-8",
     )
     (kleines_projekt / "tests" / "test_rot.py").unlink()
-    pruef = tmp_path / "pruef"
-    altlasten = pruef / "tests-mit-bestand.txt"
-    altlasten.write_text("tests/test_alt.py\ntests/test_gruen.py\n", "utf-8")
-    with (tmp_path / "log").open("w") as log:
-        ergebnis = pruefleiter.stufe_tests(log)
-    assert ergebnis.gruen, ergebnis.zeilen
-    assert str(altlasten) in ergebnis.gesenkt
-    assert altlasten.read_text("utf-8") == "tests/test_alt.py\n"
-    altlasten.write_text("", "utf-8")
+    (kleines_projekt / "pruef").mkdir()
+    (kleines_projekt / "pruef" / "tests-mit-bestand.txt").write_text(
+        "tests/test_alt.py\n", "utf-8"
+    )
     with (tmp_path / "log").open("w") as log:
         ergebnis = pruefleiter.stufe_tests(log)
     assert not ergebnis.gruen
@@ -513,7 +460,6 @@ def _obergrenze():
 
 
 def test_mehr_uebersprungene_tests_als_die_obergrenze_sind_rot(tmp_path, monkeypatch):
-    _bekannt(tmp_path, monkeypatch)
     _lauf_mit(monkeypatch, 0, _KOPF + "PASSED tests/a.py::t\n", uebersprungen=2)
     ergebnis = pruefleiter.stufe_tests(None)
     assert not ergebnis.gruen
@@ -522,7 +468,6 @@ def test_mehr_uebersprungene_tests_als_die_obergrenze_sind_rot(tmp_path, monkeyp
 
 
 def test_weniger_uebersprungene_tests_senken_die_obergrenze(tmp_path, monkeypatch):
-    _bekannt(tmp_path, monkeypatch)
     _lauf_mit(monkeypatch, 0, _KOPF + "PASSED tests/a.py::t\n", uebersprungen=0)
     ergebnis = pruefleiter.stufe_tests(None)
     assert ergebnis.gruen
@@ -857,12 +802,8 @@ _EINHUELLEN = {
 
 
 @pytest.mark.parametrize("art", sorted(_EINHUELLEN))
-def test_vorab_eingehuellter_roter_test_bleibt_rot_und_rot_bekannt_schrumpft_nicht(
-    kleines_projekt, tmp_path, art
-):
+def test_vorab_eingehuellter_roter_test_bleibt_rot(kleines_projekt, tmp_path, art):
     """Gegen 6ceb9cd grün: die Hülle lag innerhalb der Aufzeichnung."""
-    rot_bekannt = tmp_path / "pruef" / "rot-bekannt.txt"
-    rot_bekannt.write_text("tests/test_rot.py::test_kaputt\n", "utf-8")
     conftest = kleines_projekt / "tests" / "conftest.py"
     conftest.write_text(_HERMETIK + _EINHUELLEN[art], "utf-8")
     with (tmp_path / "log").open("w") as log:
@@ -872,8 +813,6 @@ def test_vorab_eingehuellter_roter_test_bleibt_rot_und_rot_bekannt_schrumpft_nic
         "tests/test_rot.py::test_kaputt: Testfunktion vor der Leiter umhüllt"
         " oder ersetzt" in ergebnis.zeilen
     )
-    assert rot_bekannt.read_text("utf-8") == "tests/test_rot.py::test_kaputt\n"
-    # Gegenprobe: ehrlich repariert, schrumpft rot-bekannt um genau diesen Test.
     conftest.write_text(_HERMETIK, "utf-8")
     (kleines_projekt / "tests" / "test_rot.py").write_text(
         "def test_kaputt():\n    assert 1 == 1  # repariert\n", "utf-8"
@@ -881,7 +820,6 @@ def test_vorab_eingehuellter_roter_test_bleibt_rot_und_rot_bekannt_schrumpft_nic
     with (tmp_path / "log").open("a") as log:
         ergebnis = pruefleiter.stufe_tests(log)
     assert ergebnis.gruen, ergebnis.zeilen
-    assert rot_bekannt.read_text("utf-8") == ""
 
 
 def test_hülle_aus_einer_autouse_fixture_ersetzt_die_aufzeichnung_und_ist_rot(

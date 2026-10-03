@@ -144,3 +144,17 @@ def test_veraenderter_schnappschuss_zaehlt_in_stufe_0(repo, eingriff, anzahl):
     zaehlung = waechter_tests.tests_zaehlung(repo)
     schluessel = ("tests/fixtures/bestand/2026-01-03", "schnappschuss-veraendert")
     assert zaehlung[schluessel] == anzahl
+
+
+def test_ohne_zeilen_zieht_keine_standardhistorie(monkeypatch):
+    gerufen = []
+
+    def _ziehe(commit, dateien, zeilen):
+        gerufen.append(zeilen)
+        return schnappschuss.WURZEL / "tests" / "fixtures" / "bestand" / "x"
+
+    monkeypatch.setattr(schnappschuss, "ziehe", _ziehe)
+    assert schnappschuss.main(["abc", "--datei", "data/state/a.json"]) == 0
+    assert schnappschuss.main(["abc", "--ohne-zeilen"]) == 0
+    assert gerufen[0] == dict(z.split("=", 1) for z in schnappschuss.STANDARD_ZEILEN)
+    assert gerufen[1] == {}

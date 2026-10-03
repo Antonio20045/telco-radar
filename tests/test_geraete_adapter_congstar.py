@@ -15,12 +15,18 @@ aufgedeckt.
 """
 
 import gzip
+from datetime import UTC
 from pathlib import Path
 
 import pytest
+from bestand_pfad import lese_wurzel
 
-from telco_radar.collect.geraete import GeraeteAbrufFehler, ernte_links, sammle_anbieter
-from telco_radar.collect.geraete import congstar
+from telco_radar.collect.geraete import (
+    GeraeteAbrufFehler,
+    congstar,
+    ernte_links,
+    sammle_anbieter,
+)
 from telco_radar.collect.geraete.robots import RobotsWaechter
 from telco_radar.geraete_config import (
     Anbieter,
@@ -72,7 +78,7 @@ def _fixture(name: str) -> str:
 
 @pytest.fixture(scope="module")
 def katalog():
-    return lade_katalog(_WURZEL)
+    return lade_katalog(lese_wurzel())
 
 
 @pytest.fixture(scope="module")
@@ -522,7 +528,7 @@ def test_sammle_anbieter_ende_zu_ende(katalog, farben):
         ],
     )
 
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     bilanz = sammle_anbieter(
         anbieter,
@@ -531,7 +537,7 @@ def test_sammle_anbieter_ende_zu_ende(katalog, farben):
         hole,
         "2026-08-31",
         RobotsWaechter(hole=hole),
-        datetime(2026, 8, 31, 10, tzinfo=timezone.utc),
+        datetime(2026, 8, 31, 10, tzinfo=UTC),
     )
 
     assert bilanz.status == "ok", (bilanz.status, bilanz.grund)

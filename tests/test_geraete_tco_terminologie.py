@@ -8,12 +8,10 @@ tmp_path). Gemessen wird am gerenderten HTML, weil die Woerter dort stehen.
 from __future__ import annotations
 
 from bs4 import BeautifulSoup
+from test_geraete_tco_zustand import _baue, _modell, vorlage_text
 
-from telco_radar.geraete_config import lade_katalog
 from telco_radar.report import geraete_tco_grafik as grafik
 from telco_radar.report import geraete_tco_karten as karten
-
-from test_geraete_tco_zustand import WURZEL, _baue, _modell, vorlage_text
 
 
 def test_der_hersteller_steht_nicht_zweimal_im_titel():

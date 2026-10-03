@@ -88,9 +88,7 @@ def projekt(tmp_path, monkeypatch):
     _schreibe(wurzel, "pruef/mypy-basis.txt", "src/a.py attr-defined 1\n")
     for name in ("privat-basis", "riesendateien", "waechter-basis"):
         _schreibe(wurzel, f"pruef/{name}.txt", "")
-    _schreibe(wurzel, "pruef/rot-bekannt.txt", "tests/test_a.py::test_x\n")
     _schreibe(wurzel, "pruef/tests-basis.txt", "pyproject.toml pytest-pflicht 3\n")
-    _schreibe(wurzel, "pruef/tests-mit-bestand.txt", "tests/test_a.py\n")
     _schreibe(wurzel, "pruef/tests-anzahl.txt", "10\n")
     _schreibe(wurzel, "pruef/tests-uebersprungen.txt", "2\n")
     _schreibe(wurzel, ".importlinter", _IMPORTLINTER)
@@ -162,12 +160,6 @@ def test_gelistete_riesendatei_darf_nicht_wachsen_und_sinkt_selbst(
             "src/a.py F401 von 2 auf 3",
         ),
         ("pruef/mypy-basis.txt", "src/b.py misc 1\nsrc/a.py attr-defined 1\n", "misc"),
-        ("pruef/rot-bekannt.txt", "tests/test_a.py::test_x\nt::neu\n", "neu: t::neu"),
-        (
-            "pruef/tests-mit-bestand.txt",
-            "tests/test_a.py\ntests/test_neu.py\n",
-            "neu: tests/test_neu.py",
-        ),
         (
             "pruef/tests-basis.txt",
             "pyproject.toml pytest-pflicht 3\ntests/test_a.py uhr 1\n",
@@ -221,7 +213,6 @@ def test_von_hand_gelockerte_liste_ist_rot_im_arbeitsstand_und_committet(
 
 def test_strengere_listen_sind_gruen(projekt):
     _schreibe(projekt, "pruef/ruff-basis.json", '{"src/a.py": {"F401": 1}}\n')
-    _schreibe(projekt, "pruef/rot-bekannt.txt", "")
     _schreibe(projekt, "pruef/tests-anzahl.txt", "12\n")
     _schreibe(projekt, "pruef/tests-uebersprungen.txt", "0\n")
     _schreibe(projekt, ".importlinter", _IMPORTLINTER.rsplit("ignore_imports", 1)[0])
@@ -232,7 +223,6 @@ def test_strengere_listen_sind_gruen(projekt):
 _LOCKERUNG = (
     ("src/telco_radar/a.py", "import os  # noqa: F401\n"),
     ("pruef/waechter-basis.txt", "src/telco_radar/a.py noqa:F401 1\n"),
-    ("pruef/rot-bekannt.txt", "tests/test_a.py::test_x\nt::neu\n"),
     ("pruef/tests-anzahl.txt", "1\n"),
     ("pruef/tests-uebersprungen.txt", "999\n"),
     (
@@ -337,13 +327,21 @@ def test_anker_ausserhalb_der_geschichte_von_head_ist_rot(projekt):
     assert _rot(projekt) == [f"Anker {neben[:7]} ist kein Vorfahre von HEAD"]
 
 
-def test_geloeschte_und_neu_angelegte_liste_bleibt_gesperrt(projekt):
-    (projekt / "pruef/rot-bekannt.txt").unlink()
-    _commit(projekt)
-    _schreibe(projekt, "pruef/rot-bekannt.txt", "tests/test_a.py::test_x\n")
+@pytest.mark.parametrize("pfad", waechter.ABGESCHAFFT)
+@pytest.mark.parametrize("inhalt", ["", "tests/test_a.py::test_x\n"])
+def test_abgeschaffte_liste_wieder_anlegen_ist_rot_auch_leer(projekt, pfad, inhalt):
+    _schreibe(projekt, pfad, inhalt)
     assert _rot(projekt) == [
-        "pruef/rot-bekannt.txt lockerer (Arbeitsstand): neu: tests/test_a.py::test_x"
+        f"{pfad} ist abgeschafft; rote Tests werden repariert, nicht gelistet"
     ]
+
+
+@pytest.mark.parametrize("pfad", waechter.ABGESCHAFFT)
+def test_abgeschaffte_liste_mit_eintrag_meldet_auch_lockerer(projekt, pfad):
+    _schreibe(projekt, pfad, "")
+    _setze_anker(projekt, _commit(projekt, "Liste"))
+    _schreibe(projekt, pfad, "tests/test_a.py\n")
+    assert f"{pfad} lockerer (Arbeitsstand): neu: tests/test_a.py" in _rot(projekt)
 
 
 def test_fehlender_verlauf_ist_rot(projekt):

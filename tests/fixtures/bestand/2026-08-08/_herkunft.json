@@ -1,0 +1,287 @@
+{
+ "autor": "telco-radar-bot",
+ "commit": "2477566a7becffc86645d5ee9bcc24bfd5735e2e",
+ "dateien": {
+  "reports/2026-08-08.json": {
+   "filter": null,
+   "quelle": "data/reports/2026-08-08.json",
+   "sha256": "cb7ab77d2c0a45f86ee1239ac67c5f10173461c277b6fe5105cbcaae4c41f83f"
+  },
+  "reports/2026-08-08.md": {
+   "filter": null,
+   "quelle": "data/reports/2026-08-08.md",
+   "sha256": "dd7767359b696e7745e5ec4d4395225c069e0bfea04dd30c618c804f63b01c3e"
+  },
+  "reports/differenzierung/2026-08-08.md": {
+   "filter": null,
+   "quelle": "data/reports/differenzierung/2026-08-08.md",
+   "sha256": "27d65dfa2f26815b26b5ba6ae618b37fa915ec0a5db5a2fdfb85764c098d484f"
+  },
+  "reports/promo/2026-08-08.md": {
+   "filter": null,
+   "quelle": "data/reports/promo/2026-08-08.md",
+   "sha256": "d52d0a605500911cf1c14cad895c9a3ead7af06c07a9a5a65603d3cb781bfe92"
+  },
+  "state/report_images/002fe1aed44a1085-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/002fe1aed44a1085-1280.jpg",
+   "sha256": "6e0cca5bab471e1ce7117ed9f8cfeab114eb4480d89e97899857190c70450f9c"
+  },
+  "state/report_images/0ca94d1a0f170b00-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/0ca94d1a0f170b00-1280.jpg",
+   "sha256": "2123e72e2cd691e50849f29350216aed8d9050e452a323981a487b63bffdba54"
+  },
+  "state/report_images/0ec32f99c3327e04-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/0ec32f99c3327e04-800.jpg",
+   "sha256": "10fb9550bcee3fcd0d237e3dc80766c9af4b8dba4c9fe9f049da921ae2d3ffef"
+  },
+  "state/report_images/0fd9981f7fb66b40-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/0fd9981f7fb66b40-1280.jpg",
+   "sha256": "c4f02453a97fe6205cf6a757ce4a799ab07693b238408b138046023a285676fb"
+  },
+  "state/report_images/16da74f08d4f4d25-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/16da74f08d4f4d25-800.jpg",
+   "sha256": "fe84aa3aafe8c2e305d2538d265e10ddd35f9236643b56efe0546852ff7871e6"
+  },
+  "state/report_images/184a28a525bd9596-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/184a28a525bd9596-1280.jpg",
+   "sha256": "4b0e732cf8cd5b3a108bfcfa3d0f915ea641e8a9595b5f23d34fd0a9fc26c581"
+  },
+  "state/report_images/184c25fe53e4b751-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/184c25fe53e4b751-800.jpg",
+   "sha256": "a070dab3788947edbb129e8687cfbe5380347a8a4946fb1725aed585218a412e"
+  },
+  "state/report_images/1e3c8859835cd210-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/1e3c8859835cd210-1280.jpg",
+   "sha256": "c43a6ba43f7b6b44dfdb2ad0e65f63860406e84ad48c621023d7702e1f914632"
+  },
+  "state/report_images/1e90ebf187e9ae1c-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/1e90ebf187e9ae1c-1280.jpg",
+   "sha256": "85e185945bec878b9488e97a575126c63620d98958461c296c2df7fe2db5399e"
+  },
+  "state/report_images/2f3ae88a33aba9f9-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/2f3ae88a33aba9f9-800.jpg",
+   "sha256": "c800cf144c5699861910b19eaa383fc2b5b43bbf237e3214dd5f5619a73ade1f"
+  },
+  "state/report_images/3796adf36964d4c4-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/3796adf36964d4c4-1280.jpg",
+   "sha256": "512463ad929f9ad30e0ced6b57c14a6c54d61bb0f8708f836e1f54518f6ea674"
+  },
+  "state/report_images/3df5f5f6fffc4a85-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/3df5f5f6fffc4a85-800.jpg",
+   "sha256": "4afd6643dfbcc3620585bfb72d2e8a402b3df8b3ac791943535e0c93b910dc8f"
+  },
+  "state/report_images/406a7ab16e916f0c-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/406a7ab16e916f0c-1280.jpg",
+   "sha256": "2505acad815e52277cd55ba20fa47905765f8b2c1cfb375c67e2b057364b698a"
+  },
+  "state/report_images/475bef12a6769866-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/475bef12a6769866-1280.jpg",
+   "sha256": "feda101d6eec931950326f03ba92ce50aa7f99309e64589540ebda557df14547"
+  },
+  "state/report_images/4b072fb65c270438-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/4b072fb65c270438-800.jpg",
+   "sha256": "4564a696d33b04e1bfb2eaf13a44afa86579560bff823b8e5e4501dfc8682314"
+  },
+  "state/report_images/4b732105e1da004f-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/4b732105e1da004f-800.jpg",
+   "sha256": "4f8bc8bcbdfb2bfc9e412634f754abf6def1af9f8c84ea83004d1bc2db83bf18"
+  },
+  "state/report_images/4e2b8fea2d5c3b0f-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/4e2b8fea2d5c3b0f-800.jpg",
+   "sha256": "8e3d33553307f0c2a924e26a84ed4af69f07b66d944f231e0034229be7002d8d"
+  },
+  "state/report_images/4f491df3e73241cc-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/4f491df3e73241cc-800.jpg",
+   "sha256": "c2761370d651ae2bde62c53f97930b4c0800fd7e0558b90e328a216340047626"
+  },
+  "state/report_images/5b846679e2462d43-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/5b846679e2462d43-800.jpg",
+   "sha256": "5afda4941f5f4b0a96bcdfd6d61030f38b270cadb033b113af1ecd886bfefe5b"
+  },
+  "state/report_images/5bb671b68376c1e5-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/5bb671b68376c1e5-1280.jpg",
+   "sha256": "5ac53226e806b5f145f318f9c85032bc52a865307c65aba14700d2b4af152f9c"
+  },
+  "state/report_images/5ca1e7c035bd0ddf-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/5ca1e7c035bd0ddf-800.jpg",
+   "sha256": "f7c0cd5e19efe45aad3d8e0269b648b0f8d9022cd788d5d536b0fbf00fa555a7"
+  },
+  "state/report_images/5cd86a18360f0ab7-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/5cd86a18360f0ab7-1280.jpg",
+   "sha256": "ee8dc251b132087e48e35071781b56b98de4e9e85d762e9464a6a1848c8a259e"
+  },
+  "state/report_images/695f596ee7adbf82-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/695f596ee7adbf82-1280.jpg",
+   "sha256": "dede3348a55a999cc952a118a2ab534b6ef4f558e146990346f4f771e35f8823"
+  },
+  "state/report_images/832c7718c8687094-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/832c7718c8687094-800.jpg",
+   "sha256": "ff7fbcef19ff97c139d1ec7cb2a8f088035e325b8230376062533d12aebda940"
+  },
+  "state/report_images/86b1e3e37190416b-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/86b1e3e37190416b-800.jpg",
+   "sha256": "286cab74b70559e26c0107170cd693697cef8c5efd4ae0b306e6bf1654f7843a"
+  },
+  "state/report_images/8af448b04fb673ef-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/8af448b04fb673ef-1280.jpg",
+   "sha256": "ff6a22cc7f0811f33162ccb58a2423183a54e6bf7ab1b58d49ccf042876aeecd"
+  },
+  "state/report_images/8e3ededc3f883455-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/8e3ededc3f883455-800.jpg",
+   "sha256": "7c1b6e4ece5f98b91159cd00b7fe8dbf0a819e8d667a4e2ef5669c1d0175c7ea"
+  },
+  "state/report_images/8edb591fe52be802-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/8edb591fe52be802-1280.jpg",
+   "sha256": "ad2b5e07e5977b5532f4ecec7bff95f29cf2fd8a91131705a7c97c09ecc0b915"
+  },
+  "state/report_images/9adf776f5d7246c4-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/9adf776f5d7246c4-1280.jpg",
+   "sha256": "47f4e98439f86e564b907ad1095512f1bc7086311555c82273d94e5a2d669934"
+  },
+  "state/report_images/9ea5bfdfe16bb883-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/9ea5bfdfe16bb883-1280.jpg",
+   "sha256": "cf08d37ce403bbf41cb619fc029d677eb3cd883bedc3533fad27b80393bbfea0"
+  },
+  "state/report_images/9f518f4e1cf44b6a-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/9f518f4e1cf44b6a-800.jpg",
+   "sha256": "c8d4ec61571d0eb375d1275dde35b3a5286ced8606c73f21987b2c59aaee6715"
+  },
+  "state/report_images/a30cdd0071ddde75-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/a30cdd0071ddde75-1280.jpg",
+   "sha256": "14c98e1b9882f0d08650ddfe7afb9a018cfc16bd00235ea804f37ee0a0c1dacf"
+  },
+  "state/report_images/a4b8ac5c62109762-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/a4b8ac5c62109762-1280.jpg",
+   "sha256": "0dc2343fc50f297164f599a3d9a3016300b59c64338434739ab0fe87db92977c"
+  },
+  "state/report_images/aa1668fe02993289-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/aa1668fe02993289-800.jpg",
+   "sha256": "a34f8b91a50e0b4c61bec6da7dd18f5f29e260c5d5a5773dd2a085f3b20a43d2"
+  },
+  "state/report_images/ac2cd38baed4d20f-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/ac2cd38baed4d20f-800.jpg",
+   "sha256": "aabbd225b2dfa4c47ac0b4804f38af2fb3132cacf9c2c75b78ac44d8e2b42250"
+  },
+  "state/report_images/ac5fd2e95f931116-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/ac5fd2e95f931116-1280.jpg",
+   "sha256": "e83d6b064f7e118449fd9e4a61bad67dc6e2715d76211aae455c5f0d058d28f9"
+  },
+  "state/report_images/aec212cb88c6ae33-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/aec212cb88c6ae33-1280.jpg",
+   "sha256": "0f76876cf72e1ab0ecd07d0a2bebba654a53ca2da1f3fcc2765dfc93d4877286"
+  },
+  "state/report_images/b2da01500420f418-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/b2da01500420f418-1280.jpg",
+   "sha256": "d9b6a2dcc6e45b52e543c57e7ee886693a4cc7598172c59785d901cdadafd605"
+  },
+  "state/report_images/bb5e81ceeaba3d9c-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/bb5e81ceeaba3d9c-800.jpg",
+   "sha256": "f9d6fa6f7f851015ae7498de6b73366e85a79e199e9ac9666f10481610ffa408"
+  },
+  "state/report_images/be0e1d6bae3b3b47-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/be0e1d6bae3b3b47-1280.jpg",
+   "sha256": "b8952a7c015f80d1451f4d7ec1fcb3d0208915113495a5d8c7b8baec43dc612f"
+  },
+  "state/report_images/c3774458ba772920-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/c3774458ba772920-1280.jpg",
+   "sha256": "314b5070d82bc88e75df620006da2d696c7ba30e3b6f047d6d5da374ef61e55f"
+  },
+  "state/report_images/c5edc0d0ba337d5e-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/c5edc0d0ba337d5e-800.jpg",
+   "sha256": "f94f98de9c5f1de240da492bd2001d2cebe6f2d70829cab3d7abf0a0942b48bd"
+  },
+  "state/report_images/c668b7044e3b1173-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/c668b7044e3b1173-800.jpg",
+   "sha256": "ab0cc29ff797bb0c254f2fbe52715414e8d70e9ab3fca09422c9012e40cc00a1"
+  },
+  "state/report_images/cd968fcc3bbb08ee-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/cd968fcc3bbb08ee-800.jpg",
+   "sha256": "5ddc7248bbee90016da5f45fcea0519e4b50f8a6f2e87d3c81e1af9396de76f9"
+  },
+  "state/report_images/d41a768101c9e004-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/d41a768101c9e004-800.jpg",
+   "sha256": "86388b4ddd5db1b3e58ba01e6005a701d47487202c5368f7fc1f7031f95e975c"
+  },
+  "state/report_images/dd136cbbffe8f5fd-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/dd136cbbffe8f5fd-1280.jpg",
+   "sha256": "6f2912411b520d16fbee5c5cb3ad8ee8b5bf48efdd194f34bf68d6df83473ef7"
+  },
+  "state/report_images/e8301b6bd9251d7a-800.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/e8301b6bd9251d7a-800.jpg",
+   "sha256": "9778ac19cd509238ce167e60ae39afc4465a92694bf6c20a5c6a68e4b66a1d8a"
+  },
+  "state/report_images/e8a160d99d11e699-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/e8a160d99d11e699-1280.jpg",
+   "sha256": "cd8a3ea113aff07916b38ff1dc67d2d30e89ead17ed49dab38b94f7c4f7f4c6a"
+  },
+  "state/report_images/efc1022c2da2c338-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/efc1022c2da2c338-1280.jpg",
+   "sha256": "adb45f5568e4f9630112c10cbb07e432119a32a893e5d6e812912c6a384daa6e"
+  },
+  "state/report_images/f0ff4ce0eebd0e60-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/f0ff4ce0eebd0e60-1280.jpg",
+   "sha256": "da83113c3234bb6de210e08a0e58d4a0d03aa02ed36c02bbd06853f2fd355e12"
+  },
+  "state/report_images/f33bbb2d60c92c29-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/f33bbb2d60c92c29-1280.jpg",
+   "sha256": "14b6d96a953c1958d5f1f9063cc56d1ef4a446958026378733ee71c7c2a7fd49"
+  },
+  "state/report_images/f72fbc41619d7893-1280.jpg": {
+   "filter": null,
+   "quelle": "data/state/report_images/f72fbc41619d7893-1280.jpg",
+   "sha256": "cdb3e0418dcd17dd7bcb4fe22b87b9af4030ae5c4ee84aaa31c3ea2331232b50"
+  }
+ },
+ "zeit": "2026-08-08T20:56:04+00:00"
+}

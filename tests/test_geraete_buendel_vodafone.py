@@ -34,6 +34,7 @@ import json
 from pathlib import Path
 
 import pytest
+from bestand_pfad import lese_wurzel
 
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
 from telco_radar.collect.geraete import ADAPTER, GeraeteAbrufFehler, sammle_anbieter
@@ -63,7 +64,7 @@ def _fixture(name: str) -> str:
 
 @pytest.fixture(scope="module")
 def katalog():
-    return lade_katalog(_WURZEL)
+    return lade_katalog(lese_wurzel())
 
 
 @pytest.fixture(scope="module")

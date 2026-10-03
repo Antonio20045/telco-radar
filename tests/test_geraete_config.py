@@ -11,12 +11,13 @@ from pathlib import Path
 
 import pytest
 import yaml
+from bestand_pfad import lese_wurzel
 
 from telco_radar.geraete_config import (
+    METHODEN,
     lade_farben,
     lade_katalog,
     lade_quellen,
-    METHODEN,
 )
 from telco_radar.geraete_model import erkenne_geraet, normalisiere_farbe
 
@@ -195,7 +196,7 @@ def test_ausgelieferter_katalog_laedt_und_ist_eindeutig():
     """Katalog.__post_init__ wirft bei doppelter device_id UND bei zwei
     Geraeten mit derselben Wortmarkenfolge. Dass die Datei laedt, ist also
     schon die halbe Zusicherung."""
-    katalog = lade_katalog(_ROOT)
+    katalog = lade_katalog(lese_wurzel())
     assert len(katalog.geraete) >= 30
     assert len(katalog.hersteller) >= 8
 
@@ -203,7 +204,7 @@ def test_ausgelieferter_katalog_laedt_und_ist_eindeutig():
 def test_jede_vorgaengerkette_zeigt_auf_ein_geraet_im_katalog():
     """Ein `vorgaenger`, den es im Katalog nicht gibt, ist ein Tippfehler,
     der sich als 'kein Nachfolger-Effekt messbar' tarnt."""
-    katalog = lade_katalog(_ROOT)
+    katalog = lade_katalog(lese_wurzel())
     kaputt = [
         f"{g.hersteller} {g.modell} -> {g.vorgaenger}"
         for g in katalog.geraete
@@ -215,7 +216,7 @@ def test_jede_vorgaengerkette_zeigt_auf_ein_geraet_im_katalog():
 def test_katalog_hat_ueberhaupt_gepflegte_ketten():
     # Gegenprobe zum Test darueber: der waere auch gruen, wenn KEIN Geraet
     # einen Vorgaenger traegt.
-    katalog = lade_katalog(_ROOT)
+    katalog = lade_katalog(lese_wurzel())
     mit_kette = [g for g in katalog.geraete if g.vorgaenger]
     assert len(mit_kette) >= 10
 
@@ -223,7 +224,7 @@ def test_katalog_hat_ueberhaupt_gepflegte_ketten():
 def test_marktstart_ist_entweder_leer_oder_ein_datum():
     import re
 
-    katalog = lade_katalog(_ROOT)
+    katalog = lade_katalog(lese_wurzel())
     for g in katalog.geraete:
         assert g.marktstart == "" or re.match(r"^\d{4}-\d{2}-\d{2}$", g.marktstart), (
             f"{g.modell}: {g.marktstart!r}"
@@ -233,7 +234,7 @@ def test_marktstart_ist_entweder_leer_oder_ein_datum():
 def test_katalog_erkennt_echte_haendlertitel():
     """Die eigentliche Abnahme des Katalogs: trifft er, was in einem Shop
     steht? Titel in der Schreibweise, wie deutsche Haendler sie fuehren."""
-    katalog = lade_katalog(_ROOT)
+    katalog = lade_katalog(lese_wurzel())
     faelle = {
         "Apple iPhone 16 Pro Max 256GB Titanschwarz": "iPhone 16 Pro Max",
         "APPLE iPhone 16 128 GB Ultramarine Dual-SIM": "iPhone 16",
@@ -255,7 +256,7 @@ def test_katalog_erkennt_echte_haendlertitel():
 
 
 def test_katalog_verwechselt_die_nothing_geraete_nicht():
-    katalog = lade_katalog(_ROOT)
+    katalog = lade_katalog(lese_wurzel())
     assert (
         erkenne_geraet("Nothing Phone (3a) 256 GB", katalog).modell
         == "Nothing Phone (3a)"
@@ -269,7 +270,7 @@ def test_katalog_verwechselt_die_nothing_geraete_nicht():
 def test_ausgelieferte_farbtabelle_ist_widerspruchsfrei():
     """Jede Schreibweise darf nur EINE kanonische Farbe haben - sonst haengt
     die Zuordnung an der Reihenfolge der Datei."""
-    with open(_ROOT / "config" / "farben.yaml", "r", encoding="utf-8") as fh:
+    with open(_ROOT / "config" / "farben.yaml", encoding="utf-8") as fh:
         roh = yaml.safe_load(fh)["farben"]
     from telco_radar.geraete_model import normalisiere
 
@@ -377,7 +378,7 @@ VORSTELLUNGSTERMINE = {
 
 
 def test_die_belegten_marktstarts_stehen_unveraendert_im_katalog():
-    katalog = lade_katalog(_ROOT)
+    katalog = lade_katalog(lese_wurzel())
     for device_id, (datum, beleg) in BELEGTE_MARKTSTARTS.items():
         g = katalog.nach_id(device_id)
         assert g is not None, f"{device_id} fehlt im Katalog"
@@ -399,7 +400,7 @@ def test_kein_marktstart_ist_der_vorstellungstermin():
     12.08.2026 ("Google hat am 12. August 2026 die Pixel-11-Serie
     vorgestellt") und zwei vom 20.08.2026 - wer die Mehrheit nimmt, liegt um
     acht Tage daneben."""
-    katalog = lade_katalog(_ROOT)
+    katalog = lade_katalog(lese_wurzel())
     for device_id, verboten in VORSTELLUNGSTERMINE.items():
         g = katalog.nach_id(device_id)
         assert g is not None and g.marktstart != verboten, (
@@ -415,7 +416,7 @@ def test_die_belegten_daten_schalten_die_nachfolger_analyse_wirklich_ein():
 
     Geprueft wird deshalb der Weg, den die Auswertung geht: vom VORGAENGER
     aus nach dem Nachfolger fragen und sein Datum vorfinden."""
-    katalog = lade_katalog(_ROOT)
+    katalog = lade_katalog(lese_wurzel())
     ketten = [
         (g.vorgaenger, g)
         for g in katalog.geraete
@@ -443,7 +444,7 @@ def test_die_belegten_daten_schalten_die_nachfolger_analyse_wirklich_ein():
 def test_ein_nachfolger_startet_nie_vor_seinem_vorgaenger():
     """Eine vertauschte oder verrutschte Jahreszahl faellt sonst nirgends
     auf. Geprueft werden nur Paare, bei denen BEIDE Daten gepflegt sind."""
-    katalog = lade_katalog(_ROOT)
+    katalog = lade_katalog(lese_wurzel())
     paare = []
     for g in katalog.geraete:
         if not (g.marktstart and g.vorgaenger):

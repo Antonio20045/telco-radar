@@ -710,15 +710,8 @@
  "tests/test_anbieter_farben.py": {
   "I001": 1
  },
- "tests/test_archiv_dossier.py": {
-  "F401": 2,
-  "UP031": 1
- },
  "tests/test_bilder.py": {
   "I001": 2
- },
- "tests/test_category_sweep.py": {
-  "I001": 1
  },
  "tests/test_clustering.py": {
   "B905": 1,
@@ -747,12 +740,6 @@
  "tests/test_editor_nachfassen.py": {
   "I001": 1
  },
- "tests/test_effektivpreis.py": {
-  "F401": 1
- },
- "tests/test_folien.py": {
-  "I001": 1
- },
  "tests/test_geraete_abdeckung.py": {
   "B905": 1,
   "I001": 1
@@ -762,25 +749,16 @@
  },
  "tests/test_geraete_adapter_congstar.py": {
   "B007": 2,
-  "E741": 2,
-  "I001": 1,
-  "UP017": 1
+  "E741": 2
  },
  "tests/test_geraete_adapter_netzbetreiber.py": {
-  "B033": 1,
-  "E741": 1,
-  "I001": 1,
-  "UP017": 3
+  "E741": 1
  },
  "tests/test_geraete_adapter_saturn.py": {
-  "E741": 1,
-  "I001": 1,
-  "UP017": 2
+  "E741": 1
  },
  "tests/test_geraete_adapter_telekom_1und1.py": {
-  "E741": 5,
-  "I001": 1,
-  "UP017": 3
+  "E741": 5
  },
  "tests/test_geraete_aktionen.py": {
   "I001": 1
@@ -813,9 +791,6 @@
  "tests/test_geraete_buendel_o2.py": {
   "SIM115": 1
  },
- "tests/test_geraete_buendel_o2_vertiefung.py": {
-  "UP017": 1
- },
  "tests/test_geraete_buendel_zeilenkopf_d3.py": {
   "I001": 1,
   "SIM300": 1
@@ -828,9 +803,7 @@
   "UP017": 1
  },
  "tests/test_geraete_config.py": {
-  "B007": 1,
-  "I001": 1,
-  "UP015": 1
+  "B007": 1
  },
  "tests/test_geraete_erosion.py": {
   "B905": 1
@@ -867,9 +840,6 @@
  },
  "tests/test_geraete_katalog_modelle.py": {
   "F401": 1,
-  "I001": 1
- },
- "tests/test_geraete_laufzeit_auf_der_seite.py": {
   "I001": 1
  },
  "tests/test_geraete_laufzeit_filter.py": {
@@ -933,8 +903,7 @@
   "I001": 1
  },
  "tests/test_geraete_reiter_browser.py": {
-  "E501": 2,
-  "I001": 2
+  "E501": 2
  },
  "tests/test_geraete_robots.py": {
   "UP017": 1
@@ -963,8 +932,7 @@
   "UP017": 1
  },
  "tests/test_geraete_tco_alterung.py": {
-  "E741": 1,
-  "I001": 1
+  "E741": 1
  },
  "tests/test_geraete_tco_band.py": {
   "B007": 1,
@@ -982,17 +950,12 @@
  "tests/test_geraete_tco_historie.py": {
   "F841": 1
  },
- "tests/test_geraete_tco_terminologie.py": {
-  "F401": 2,
-  "I001": 1
- },
  "tests/test_geraete_tco_view.py": {
   "I001": 1
  },
  "tests/test_geraete_tco_zustand.py": {
   "E741": 1,
-  "F541": 1,
-  "I001": 1
+  "F541": 1
  },
  "tests/test_geraete_tote_adressen.py": {
   "I001": 1
@@ -1018,10 +981,6 @@
  },
  "tests/test_geraete_wahrheit.py": {
   "B905": 1
- },
- "tests/test_geraete_zeitbilanz_lauf53.py": {
-  "I001": 1,
-  "UP017": 1
  },
  "tests/test_geraete_zeitreihe.py": {
   "E741": 1
@@ -1096,20 +1055,13 @@
   "F401": 2,
   "I001": 1
  },
- "tests/test_newsletter_seite.py": {
-  "I001": 1
- },
  "tests/test_newsletter_versand.py": {
-  "I001": 1,
   "UP017": 3
  },
  "tests/test_pipeline.py": {
   "DTZ011": 1,
   "E501": 1,
   "UP017": 3
- },
- "tests/test_promo_seite.py": {
-  "I001": 1
  },
  "tests/test_promo_snapshot.py": {
   "E501": 3,
@@ -1126,9 +1078,6 @@
  },
  "tests/test_redaktion_kontinuitaet.py": {
   "DTZ011": 1
- },
- "tests/test_render_ausfall.py": {
-  "I001": 1
  },
  "tests/test_sammelprotokoll.py": {
   "F401": 1,
@@ -1150,9 +1099,6 @@
  "tests/test_signup_service.py": {
   "I001": 1
  },
- "tests/test_startseite_kurzpfad.py": {
-  "B905": 1
- },
  "tests/test_tagging.py": {
   "I001": 2
  },
@@ -1165,18 +1111,11 @@
  "tests/test_tarif_kacheln.py": {
   "SIM115": 1
  },
- "tests/test_tco_model.py": {
-  "I001": 1
- },
  "tests/test_uebersetzung.py": {
   "I001": 1,
   "SIM300": 1
  },
  "tests/test_uebersetzung_auswahl.py": {
-  "I001": 1
- },
- "tests/test_uebersetzung_link_browser.py": {
-  "E741": 8,
   "I001": 1
  },
  "tests/test_uebersetzung_seite.py": {

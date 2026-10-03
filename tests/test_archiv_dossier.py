@@ -12,9 +12,9 @@ import json
 from pathlib import Path
 
 import pytest
+from bestand_pfad import BERICHTE
 
 from telco_radar.report.archiv_dossier import (
-    MIND_SCORE,
     ArchivIndex,
     als_dict,
     frage,
@@ -240,12 +240,10 @@ def test_mind_score_ist_wirksam(index):
 
 
 def test_laeuft_gegen_den_echten_bestand():
-    """Nicht gegen ein Konstrukt: gegen die Meldungen, die wirklich im
-    Archiv stehen."""
-    pfad = Path(__file__).resolve().parents[1] / "data" / "reports"
-    berichte = sorted(pfad.glob("2*.json")) if pfad.exists() else []
-    if not berichte:
-        pytest.skip("kein Bericht im Archiv")
+    """Nicht gegen ein Konstrukt: gegen die Meldungen der Ausgabe 2026-10-02
+    im Schnappschuss `BERICHTE`."""
+    berichte = sorted(BERICHTE.glob("2*.json"))
+    assert berichte
 
     from telco_radar.report import suchindex
 
@@ -255,8 +253,7 @@ def test_laeuft_gegen_den_echten_bestand():
     for inhalt in regionen.values() if isinstance(regionen, dict) else regionen:
         for h in (inhalt or {}).get("highlights") or []:
             eintraege.append(suchindex.eintrag_bericht(h, bericht["date"]))
-    if not eintraege:
-        pytest.skip("Ausgabe ohne Meldungen")
+    assert eintraege
 
     idx = ArchivIndex(eintraege)
     # Eine Frage, zu der es nichts geben kann.
@@ -296,9 +293,8 @@ def test_js_fassung_nutzt_dieselben_konstanten():
 
     js = _app_js()
     assert (
-        "var K1 = %s, B = %s, MIND_SCORE = %s, MAX_BELEGE = %d;"
-        % (ad.K1, ad.B, ad.MIND_SCORE, ad.MAX_BELEGE)
-        in js
+        f"var K1 = {ad.K1}, B = {ad.B}, MIND_SCORE = {ad.MIND_SCORE}, "
+        f"MAX_BELEGE = {ad.MAX_BELEGE};" in js
     )
 
 
@@ -312,7 +308,6 @@ def test_js_fassung_kennt_dieselben_stoppwoerter():
 
 
 def test_js_fassung_sagt_dasselbe_wenn_nichts_gefunden():
-    from telco_radar.report import archiv_dossier as ad
 
     leer = frage(ArchivIndex([]), "x")
     js = _app_js()

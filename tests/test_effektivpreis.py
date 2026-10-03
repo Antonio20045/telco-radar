@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
+from bestand_pfad import ZUSTAND
 
 from telco_radar.report import tarife_view
 from telco_radar.report.effektivpreis import (
@@ -433,7 +433,7 @@ def test_die_bilanz_zaehlt_was_ihr_etikett_sagt(tmp_path):
 
 def test_die_stat_zeile_am_echten_bestand():
     """S-Q2 (09.09.2026): dieselben vier Zahlen wie der gestellte Test
-    oben, aber gegen den committeten Bestand in data/state/tarife.jsonl
+    oben, aber gegen den Schnappschuss 2026-10-03 (state/tarife.jsonl)
     gerechnet (F5-Muster: eine Fixture beweist nur, dass die Rechnung mit
     sich selbst stimmt). Zwei Zusicherungen kommen hinzu, die nur der
     echte Bestand pruefen kann:
@@ -446,7 +446,7 @@ def test_die_stat_zeile_am_echten_bestand():
     * jeder Tarif hat GENAU EINEN Grund, Punkt der Karte zu sein oder
       nicht - niemand wird doppelt gezaehlt oder vergessen.
     """
-    p = Path(__file__).resolve().parents[1] / "data" / "state" / "tarife.jsonl"
+    p = ZUSTAND / "tarife.jsonl"
     view = tarife_view.aufbereiten(p, [])
     assert view["hat_daten"], "der committete Bestand ist leer"
     b, zeilen, karte = view["bilanz"], view["zeilen"], view["karte"]

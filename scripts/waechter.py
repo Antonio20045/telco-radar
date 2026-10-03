@@ -34,6 +34,7 @@ PRIVAT_BASIS = "pruef/privat-basis.txt"
 WAECHTER_BASIS = "pruef/waechter-basis.txt"
 ANKER = "77d68537c80134513dd784d005136a561a6b467b"
 WAECHTER = "scripts/waechter.py"
+ABGESCHAFFT = ("pruef/tests-mit-bestand.txt", "pruef/rot-bekannt.txt")
 
 
 def zaehlbasis_aus_text(text: str, als_json: bool) -> Counter[Schluessel]:
@@ -74,7 +75,11 @@ def pruefe(
     wurzel: Path, privat: Counter[Schluessel], schreiben: bool = True
 ) -> tuple[list[str], list[Path]]:
     """Gibt rote Zeilen und gesenkte Basen zurück; gesenkt wird nur bei Grün."""
-    rot = lockerungen(wurzel)
+    rot = lockerungen(wurzel) + [
+        f"{name} ist abgeschafft; rote Tests werden repariert, nicht gelistet"
+        for name in ABGESCHAFFT
+        if (wurzel / name).exists()
+    ]
     paare = [
         (RIESEN_BASIS, riesendateien(wurzel)),
         (PRIVAT_BASIS, privat),

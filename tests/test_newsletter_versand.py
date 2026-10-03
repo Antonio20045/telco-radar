@@ -11,18 +11,20 @@ Zwei Fehler sind hier teurer als alle anderen:
 """
 
 import json
+import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
+from bestand_pfad import BESTAND, lese_wurzel
 
+from telco_radar.newsletter import store as st
+from telco_radar.newsletter import subscription as sub
+from telco_radar.newsletter import versand as v
 from telco_radar.newsletter.config import lade_katalog
 from telco_radar.newsletter.filters import Eintrag, Filtersatz, Treffer
 from telco_radar.newsletter.render import Nachricht
 from telco_radar.newsletter.segments import Segment
-from telco_radar.newsletter import store as st
-from telco_radar.newsletter import subscription as sub
-from telco_radar.newsletter import versand as v
 from telco_radar.newsletter.transport import Ergebnis, Trockenlauf
 
 WURZEL = Path(__file__).resolve().parents[1]
@@ -30,7 +32,7 @@ WURZEL = Path(__file__).resolve().parents[1]
 
 @pytest.fixture(scope="module")
 def katalog():
-    return lade_katalog(WURZEL)
+    return lade_katalog(lese_wurzel())
 
 
 def _nachricht(t="Betreff"):
@@ -616,10 +618,22 @@ def test_keine_jsonl_im_repo_enthaelt_ein_adressmuster():
     # Die eigene Adresse des Absenders steht bewusst in den Rechtstexten und
     # im Absender - sie ist kein Abonnent.
     erlaubt = {"antonio.fotiadis.francisco@gmail.com", "noreply@anthropic.com"}
+    getrackt = subprocess.run(
+        ["git", "ls-files", "-z", "--", "*.jsonl"],
+        cwd=WURZEL,
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.split("\0")
+    kandidaten = [
+        WURZEL / name
+        for name in getrackt
+        if name and name.split("/")[0] not in {"data", "site"}
+    ]
+    kandidaten += sorted(BESTAND.rglob("*.jsonl"))
+    assert any(p.is_relative_to(BESTAND) for p in kandidaten)
     treffer = []
-    for pfad in WURZEL.rglob("*.jsonl"):
-        if ".git/" in str(pfad):
-            continue
+    for pfad in kandidaten:
         try:
             inhalt = pfad.read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError):

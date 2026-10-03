@@ -35,6 +35,7 @@ import json
 from pathlib import Path
 
 import pytest
+from bestand_pfad import ZUSTAND
 
 from telco_radar.collect import tarif_kacheln
 from telco_radar.collect.tarif_crawler import tarif_id
@@ -143,7 +144,7 @@ def test_der_kachelpreis_trifft_das_produktinformationsblatt():
     die Rechtsseite verlinkt. Die Kachel derselben Seite nennt denselben
     Betrag. Zwei getrennte Wege, dieselbe Zahl.
     """
-    bestand = Path(__file__).resolve().parents[1] / "data" / "state" / "tarife.jsonl"
+    bestand = ZUSTAND / "tarife.jsonl"
     aus_blatt = None
     for zeile in bestand.read_text(encoding="utf-8").splitlines():
         if not zeile.strip():

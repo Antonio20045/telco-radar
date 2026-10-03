@@ -40,10 +40,8 @@ WURZEL = Path(__file__).resolve().parents[1]
 BIN = Path(sys.executable).parent
 RUFF_BASIS = WURZEL / "pruef" / "ruff-basis.json"
 MYPY_BASIS = WURZEL / "pruef" / "mypy-basis.txt"
-ROT_BEKANNT = WURZEL / "pruef" / "rot-bekannt.txt"
 TESTS_ANZAHL = WURZEL / "pruef" / "tests-anzahl.txt"
 TESTS_UEBERSPRUNGEN = WURZEL / "pruef" / "tests-uebersprungen.txt"
-TESTS_MIT_BESTAND = WURZEL / "pruef" / "tests-mit-bestand.txt"
 KANARIE = "tests/kanarie_leiter.py"
 LAUF_ORDNER = WURZEL / ".pruefleiter"
 MAX_ROT_ZEILEN = 60
@@ -192,19 +190,17 @@ def stufe_tests(log: TextIO) -> Ergebnis:
         "-p",
         leiter_pytest.PLUGIN,
     ]
-    with tempfile.TemporaryDirectory() as ordner, tempfile.TemporaryDirectory() as alt:
+    with tempfile.TemporaryDirectory() as ordner:
         # Das Plugin zuerst: Ein gleichnamiges Modul unter src/ verdeckt es nicht.
         pfade = os.pathsep.join(map(str, (leiter_pytest.PLUGIN_ORDNER, WURZEL / "src")))
         zusatz = {
             leiter_pytest.ROH_VARIABLE: ordner,
-            leiter_pytest.BESTAND_VARIABLE: alt,
             "PYTHONPATH": pfade,
             "COLUMNS": "1000",
         }
         lauf = _lauf(log, befehl, zusatz)
         roh = leiter_pytest.lies_roh(Path(ordner))
         gelaufen = leiter_pytest.lies_gelaufen(Path(ordner))
-        zugriffe = leiter_pytest.lies_zugriffe(Path(alt))
     rot, gruen = pytest_ausgang(lauf.stdout)
     if lauf.returncode not in (0, 1) or (lauf.returncode == 1 and not rot):
         ende = lauf.stdout.splitlines()[-20:] + lauf.stderr.splitlines()[-20:]
@@ -234,12 +230,8 @@ def stufe_tests(log: TextIO) -> Ergebnis:
     falsch += leiter_pytest.pruefe_ergebnisse(rot, gruen, roh, KANARIE)
     if falsch:
         return Ergebnis("Tests", False, falsch)
-    bekannt = []
-    if ROT_BEKANNT.exists():
-        bekannt = ROT_BEKANNT.read_text(encoding="utf-8").splitlines()
-    unbekannt = [zeile for test, zeile in rot.items() if test not in bekannt]
-    if unbekannt:
-        return Ergebnis("Tests", False, unbekannt)
+    if rot:
+        return Ergebnis("Tests", False, list(rot.values()))
     ergebnis = Ergebnis("Tests", True)
     if anzahl > untergrenze:
         TESTS_ANZAHL.write_text(f"{anzahl}\n", encoding="utf-8")
@@ -247,11 +239,6 @@ def stufe_tests(log: TextIO) -> Ergebnis:
     if uebersprungen < obergrenze:
         TESTS_UEBERSPRUNGEN.write_text(f"{uebersprungen}\n", encoding="utf-8")
         ergebnis.gesenkt.append(_relativ(TESTS_UEBERSPRUNGEN))
-    ergebnis.gesenkt += [_relativ(TESTS_MIT_BESTAND)] * senke_altlasten(zugriffe)
-    rest = [test for test in bekannt if test in rot or test not in gruen]
-    if rest != bekannt:
-        ROT_BEKANNT.write_text("".join(f"{test}\n" for test in rest), encoding="utf-8")
-        ergebnis.gesenkt.append(_relativ(ROT_BEKANNT))
     return ergebnis
 
 
@@ -270,15 +257,6 @@ def _abgewaehlt(log: TextIO, python_files: str, gelaufen: set[str]) -> list[str]
         )
         return [kopf, *ende]
     return leiter_pytest.abgewaehlt(gesammelte_ids(sammlung.stdout), gelaufen)
-
-
-def senke_altlasten(zugriffe: set[str]) -> bool:
-    """Streicht jede Testdatei mit Bestand, die im grünen Volllauf nicht zugriff."""
-    altlasten = TESTS_MIT_BESTAND.read_text(encoding="utf-8").split()
-    bleibt = [datei for datei in altlasten if datei in zugriffe]
-    if bleibt != altlasten:
-        TESTS_MIT_BESTAND.write_text("".join(f"{d}\n" for d in bleibt), "utf-8")
-    return bleibt != altlasten
 
 
 STUFEN_STATISCH: list[Callable[[TextIO], Ergebnis]] = [

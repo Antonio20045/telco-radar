@@ -27,6 +27,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
+from bestand_pfad import ARCHIV
 from bs4 import BeautifulSoup
 from orakel.test_geraete_bestand import (
     gw_cent,
@@ -515,9 +516,8 @@ def test_die_bildstufen_stehen_in_der_rangfolge():
         _titelseite,
     )
 
-    repo = Path(__file__).resolve().parents[1]
     geprueft = 0
-    for datei in sorted((repo / "data" / "reports").glob("*.json")):
+    for datei in sorted(ARCHIV.glob("*.json")):
         hs = _flatten(json.loads(datei.read_text(encoding="utf-8")))
         if len(hs) < 14:
             continue  # zu klein fuer alle Stufen
@@ -554,14 +554,7 @@ def test_die_bildstufen_stehen_in_der_rangfolge():
         ]
         assert not ueber, f"{datei.name}: dritte Reihe ueberragt die zweite: {ueber}"
         geprueft += 1
-    # Die Anti-Leerlauf-Zeile. Gemessen werden nur Ausgaben AB dem
-    # 06.08.2026 - davor trugen die Berichte keine Bildbreiten (bilder.py
-    # ist an dem Tag neu geschrieben worden), und ohne Bild gibt es keine
-    # Bildstufe zu pruefen. Es sind aktuell fuenf, und die Zahl waechst mit
-    # jeder Ausgabe; sie kann nicht schrumpfen, weil `_flatten` die Breite
-    # aus dem BERICHT liest und nicht aus dem Bildordner, den ein
-    # Aufraeumlauf beschneiden darf.
-    assert geprueft >= 4, f"nur {geprueft} Ausgaben gemessen"
+    assert geprueft == 18, f"{geprueft} statt 18 der 21 Ausgaben im Archiv gemessen"
 
 
 def test_die_spalte_nimmt_den_bildstufen_keine_bessere_meldung_weg(tmp_path):

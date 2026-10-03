@@ -31,6 +31,7 @@ import json
 from pathlib import Path
 
 import pytest
+from bestand_pfad import ZUSTAND
 
 from telco_radar.collect.tarif_einsundeins_simonly import (
     SEITEN_URL,
@@ -142,11 +143,11 @@ def test_die_ids_treffen_den_tarifbestand_des_repos():
     die Umbenennung würde sonst die alte Referenz-ID löschen, eine neue
     anlegen (`first_seen` resettet) und Bündel am alten `tarif_id` ihren
     Massstab verlieren, ohne dass ein anderer Test etwas meldet. Der
-    Join geht gegen `data/state/tarife.jsonl`, die Quelle, aus der die
+    Join geht gegen `state/tarife.jsonl` des Schnappschusses, die Quelle, aus der die
     Bestandsableitung stammt.
     """
     bestand: dict[str, str] = {}
-    pfad = Path(__file__).parent.parent / "data" / "state" / "tarife.jsonl"
+    pfad = ZUSTAND / "tarife.jsonl"
     for zeile in pfad.read_text(encoding="utf-8").splitlines():
         satz = json.loads(zeile)
         if satz.get("anbieter") == "1&1":

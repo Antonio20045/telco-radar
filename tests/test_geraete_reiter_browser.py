@@ -36,10 +36,10 @@ import threading
 from pathlib import Path
 
 import pytest
-
+import yaml
+from bestand_pfad import ZUSTAND, lese_wurzel
 from tarifleiter_testbestand import mit_leiter
 from test_geraete_zeitreihe_browser import waehle_modell
-import yaml
 
 from telco_radar.report.html import render_site
 
@@ -2728,10 +2728,8 @@ def _echte_seite(_seite, tmp_path_factory):
         shutil.copy(REPO / "config" / name, root / "config" / name)
     state = root / "data" / "state"
     state.mkdir(parents=True)
-    shutil.copy(REPO / "data" / "state" / "geraete_db.json", state / "geraete_db.json")
-    shutil.copy(
-        REPO / "data" / "state" / "geraete_preise.jsonl", state / "geraete_preise.jsonl"
-    )
+    shutil.copy(ZUSTAND / "geraete_db.json", state / "geraete_db.json")
+    shutil.copy(ZUSTAND / "geraete_preise.jsonl", state / "geraete_preise.jsonl")
     reports = root / "data" / "reports"
     reports.mkdir(parents=True)
     site = root / "site"
@@ -2765,16 +2763,16 @@ def test_p1_die_erste_seite_zeigt_mindestens_drei_hersteller_an_echten_daten(
     wuerde der Hersteller mit den meisten Modellen die sichtbaren
     Modellzeilen allein fuellen.
     """
-    from telco_radar.geraete_config import lade_katalog
     from telco_radar.analyze.geraete_store import (
-        GeraeteDB,
         STATUS_AKTIV,
         STATUS_VERMUTLICH,
+        GeraeteDB,
     )
+    from telco_radar.geraete_config import lade_katalog
     from telco_radar.report import geraete_view
 
-    katalog = lade_katalog(REPO)
-    db = GeraeteDB(REPO / "data" / "state" / "geraete_db.json")
+    katalog = lade_katalog(lese_wurzel())
+    db = GeraeteDB(ZUSTAND / "geraete_db.json")
     alle = db.eintraege()
     sichtbar_roh = [
         e for e in alle if e.get("status") in (STATUS_AKTIV, STATUS_VERMUTLICH)
@@ -2818,7 +2816,8 @@ def test_p1_der_deckel_zaehlt_modelle_ohne_alle_anzeigen(_echte_seite):
     stehen komplett im Aufklapper. Was bleibt, ist die Kehrseite des
     Deckels an echten Daten: ohne "alle anzeigen" sind hoechstens
     `KATALOG_SICHTBAR` MODELLZEILEN sichtbar - unabhaengig davon, wie
-    voll das Regal eines Herstellers ist (111 Modelle im echten Bestand)."""
+    voll das Regal eines Herstellers ist (112 Modelle im Schnappschuss
+    2026-10-03, gezaehlt mit `katalog_modellzeilen`)."""
     from telco_radar.report import geraete_view
 
     zeilen = _echte_seite.eval_on_selector_all(

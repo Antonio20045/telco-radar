@@ -39,6 +39,7 @@ import threading
 from pathlib import Path
 
 import pytest
+from bestand_pfad import BILDER_ZUSTAND, abbild
 
 from telco_radar.config import load_config
 from telco_radar.promo_config import PromoSource
@@ -101,14 +102,13 @@ _MESSUNG = """() => {
 @pytest.fixture(scope="module")
 def _bloecke(tmp_path_factory, chromium):
     """Ein Browserstart, die echte Promo Uebersicht, alle Kartenmasse."""
-    if not (REPO / "data" / "state" / "promo_db.json").exists():
-        pytest.skip("kein Promo-Bestand im Repo")
-    site = tmp_path_factory.mktemp("promoraster") / "site"
-    # Gegen die WIRKLICHEN Daten und mit `cfg` - ohne den dritten Parameter
-    # rendert render_site() eine stillschweigend halbe Seite (CLAUDE.md §6).
-    render_site(site, REPO / "data" / "reports", load_config(REPO))
-    if not (site / "promo" / "index.html").exists():
-        pytest.skip("keine Promo Uebersicht gerendert")
+    wurzel_ziel = tmp_path_factory.mktemp("promoraster")
+    berichte = abbild(wurzel_ziel)
+    for name in ("promo_images", "report_images"):
+        shutil.copytree(BILDER_ZUSTAND / name, wurzel_ziel / "data" / "state" / name)
+    site = wurzel_ziel / "site"
+    render_site(site, berichte, load_config(wurzel_ziel))
+    assert (site / "promo" / "index.html").exists()
 
     with _server(site) as wurzel:
         seite = chromium.new_page(viewport={"width": 1440, "height": 900})
@@ -125,8 +125,7 @@ def _bloecke(tmp_path_factory, chromium):
             daten = seite.evaluate(_MESSUNG)
         finally:
             seite.close()
-    if not daten:
-        pytest.skip("keine Markenbloecke auf der Seite")
+    assert daten, "keine Markenbloecke auf der Seite"
     return daten
 
 
@@ -175,6 +174,10 @@ def test_kein_motiv_wird_hochskaliert(_bloecke):
     Regel, dass nur in eine Flaeche darf, wer sie fuellen kann
     (promo.LEAD_MIND_BREITE fuer die grosse, die Mindestbreite des
     Bildholers fuer die kleine). Dieser Test haelt sie."""
+    geprueft = [
+        k for b in _bloecke for k in b["karten"] if k["bild"] and k["bild"]["nat"]
+    ]
+    assert geprueft, "kein geladenes Motiv auf der Seite - der Test misst nichts"
     zu_gross = [
         (b["marke"], k["bild"])
         for b in _bloecke

@@ -12,9 +12,9 @@ gleichsetzt, addiert zwoelf Tarifmonate, die niemand schuldet.
 from __future__ import annotations
 
 import json
-import pathlib
 
 import pytest
+from bestand_pfad import ZUSTAND
 
 from telco_radar.tco_model import (
     LEITFRAGE_MONATE,
@@ -28,8 +28,6 @@ from telco_radar.tco_model import (
     effektiv_ohne_geraet,
     tco_bindung,
 )
-
-WURZEL = pathlib.Path(__file__).resolve().parents[1]
 
 
 def o2_iphone17pro() -> Buendel:
@@ -209,10 +207,12 @@ def test_kein_effektivpreis_ohne_belastbare_kennzahl():
 
 
 def test_am_echten_bestand_traegt_jede_o2_zeile_ihre_zwei_laufzeiten():
-    """Gegen `data/state/geraete_tco.json`, nicht gegen eine Fixture.
+    """Gegen `state/geraete_tco.json` des Schnappschusses, nicht gegen eine Fixture.
 
     Der Tarifbestand liefert die Bindung; ohne ihn stuende hier fuer JEDES
-    der 62 o2-Buendel eine Luecke, und der ganze Reiter waere leer.
+    der 1730 o2-Buendel des Schnappschusses eine Luecke
+    (Rechenweg: Saetze in state/geraete_tco.json mit anbieter == "o2"
+    zaehlen), und der ganze Reiter waere leer.
 
     REGRESSION B1 R3 (06.09.2026): der Test filterte bisher NICHT nach
     Anbieter, obwohl sein eigener Name "jede o2 Zeile" sagt - das fiel nie
@@ -224,9 +224,9 @@ def test_am_echten_bestand_traegt_jede_o2_zeile_ihre_zwei_laufzeiten():
     Test darf sie nicht mitpruefen. Der Filter macht aus dem Test wieder
     das, was sein Name immer schon behauptet hat.
     """
-    tco = json.loads((WURZEL / "data/state/geraete_tco.json").read_text())
+    tco = json.loads((ZUSTAND / "geraete_tco.json").read_text())
     bindung_je_tarif = {}
-    for zeile in (WURZEL / "data/state/tarife.jsonl").read_text().splitlines():
+    for zeile in (ZUSTAND / "tarife.jsonl").read_text().splitlines():
         satz = json.loads(zeile)
         if satz.get("tarif_id") and satz.get("laufzeit_monate"):
             bindung_je_tarif[satz["tarif_id"]] = satz["laufzeit_monate"]
@@ -256,7 +256,7 @@ def test_am_echten_bestand_traegt_jede_o2_zeile_ihre_zwei_laufzeiten():
         assert e.bindung == laufzeit and e.tarif_bindung == 24
         assert e.offen_nach_24 == round(satz["geraet_monatsrate"] * (laufzeit - 24), 2)
         geprueft += 1
-    assert geprueft == len(o2_saetze) >= 62, (
+    assert geprueft == len(o2_saetze) == 1730, (
         "der Test muss ALLE o2-Saetze angefasst haben, sonst prueft er nichts"
     )
 

@@ -23,16 +23,18 @@ from __future__ import annotations
 import contextlib
 import functools
 import http.server
+import json
 import shutil
 import socket
 import threading
 from pathlib import Path
 
 import pytest
+from bestand_pfad import BILDER_BESTAND, ZUSTAND, verlinke_neben_data
 
 from telco_radar.report.html import render_site
 
-REPO = Path(__file__).resolve().parents[1]
+BERICHT_DIR = BILDER_BESTAND / "reports"
 AUSGABE = "2026-08-08"
 
 # Dieselben zwei Formate, die im Auftrag stehen. Das Telefon ist das
@@ -65,20 +67,27 @@ def _server(site: Path):
 
 
 def _baue(tmp_path: Path) -> Path:
-    """Die echte Ausgabe mit ihren echten Bildern - siehe
+    """Die Ausgabe 2026-08-08 mit ihren Bildern aus `BILDER_BESTAND` - siehe
     `tests/test_startseite_kurzpfad.py`, wo dieselbe Rechnung steht. Ohne
     Bilder waere jede Meldung gleich hoch und der Aufmacher zu kurz, um die
-    Frage ueberhaupt zu stellen."""
-    quelle = REPO / "data" / "reports" / f"{AUSGABE}.json"
-    if not quelle.exists():
-        pytest.skip(f"Ausgabe {AUSGABE} liegt nicht im Archiv")
+    Frage ueberhaupt zu stellen. Das Thema aus `highlight_topics.json` des
+    Schnappschusses 2026-10-03 (dort `beendet`) laeuft hier als `aktiv`, damit
+    das Fokusband entsteht, dessen Hoehe gemessen wird."""
     reports = tmp_path / "data" / "reports"
     reports.mkdir(parents=True)
     for endung in (".json", ".md"):
-        auch = REPO / "data" / "reports" / f"{AUSGABE}{endung}"
-        if auch.exists():
-            shutil.copy(auch, reports / auch.name)
-    (tmp_path / "data" / "state").symlink_to(REPO / "data" / "state")
+        shutil.copy(BERICHT_DIR / f"{AUSGABE}{endung}", reports / f"{AUSGABE}{endung}")
+    shutil.copytree(
+        BILDER_BESTAND / "state" / "report_images",
+        tmp_path / "data" / "state" / "report_images",
+    )
+    themen = json.loads((ZUSTAND / "highlight_topics.json").read_text("utf-8"))
+    for thema in themen["topics"]:
+        thema["status"] = "aktiv"
+    (tmp_path / "data" / "state" / "highlight_topics.json").write_text(
+        json.dumps(themen, ensure_ascii=False), encoding="utf-8"
+    )
+    verlinke_neben_data(tmp_path)
     site = tmp_path / "site"
     render_site(site, reports, cfg=None)
     return site
@@ -154,8 +163,7 @@ def test_der_kurzpfad_steht_nicht_ueber_der_schlagzeile(_gemessen, format_name):
     8. August."""
     messung = _gemessen[format_name]
     kurzpfad = messung["kurzpfad"]
-    if kurzpfad is None:
-        pytest.skip("diese Ausgabe hat keinen Kurzpfad")
+    assert kurzpfad is not None, "diese Ausgabe hat keinen Kurzpfad"
     unterkante = kurzpfad["y"] + kurzpfad["height"]
     assert unterkante > messung["kasten"]["y"], (
         f"{format_name}: der Kurzpfad endet bei {unterkante:.0f} px, bevor "
@@ -186,8 +194,7 @@ def test_das_fokusband_steht_ohne_scrollen_da(_gemessen, format_name):
     `pruefe_portal.py` Kriterium 1."""
     messung = _gemessen[format_name]
     kasten = messung["fokusband"]
-    if kasten is None:
-        pytest.skip("diese Ausgabe hat kein laufendes Thema")
+    assert kasten is not None, "diese Ausgabe hat kein laufendes Thema"
     unterkante = kasten["y"] + kasten["height"]
     assert unterkante <= messung["hoehe"], (
         f"{format_name}: das Fokusband endet bei {unterkante:.0f} px und "
@@ -202,8 +209,7 @@ def test_das_fokusband_verdraengt_die_schlagzeile_nicht(_gemessen, format_name):
     erfuellbar, das die Ausgabe aus dem Bild schiebt. Genau der Tausch war
     der Fehler vom 09.08.2026."""
     messung = _gemessen[format_name]
-    if messung["fokusband"] is None:
-        pytest.skip("diese Ausgabe hat kein laufendes Thema")
+    assert messung["fokusband"] is not None, "kein laufendes Thema"
     kasten = messung["kasten"]
     assert kasten is not None, "die Titelseite hat keinen Aufmacher"
     unterkante = kasten["y"] + kasten["height"]

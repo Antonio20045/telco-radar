@@ -24,10 +24,11 @@ geraeteabhaengigen Tarifrabatt (on Demand M Plus 8,49 statt 14,99 EUR).
 import copy
 import gzip
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
+from bestand_pfad import lese_wurzel
 
 from telco_radar.collect.geraete import GeraeteAbrufFehler, o2
 from telco_radar.tarif_bezug import Tarifbestand
@@ -312,12 +313,12 @@ def test_der_sammler_vertieft_und_vergibt_die_sku(mitschnitt):
     )
     bilanz = sammle_anbieter(
         anbieter,
-        lade_katalog(_WURZEL),
+        lade_katalog(lese_wurzel()),
         lade_farben(_WURZEL),
         hole,
         "2026-09-29",
         RobotsWaechter(hole=hole),
-        datetime(2026, 9, 29, 3, tzinfo=timezone.utc),
+        datetime(2026, 9, 29, 3, tzinfo=UTC),
     )
     assert len(bilanz.buendel) == 48
     skus = {b["sku_id"] for b in bilanz.buendel}

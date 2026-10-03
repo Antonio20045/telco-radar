@@ -5,6 +5,7 @@ ersetzt. ``_herkunft.json`` nennt Commit, Zeit, Quelle, Zeilenfilter und sha256 
 Datei; Stufe 0 hält die Dateien dagegen.
 
     python scripts/schnappschuss.py <commit> [--datei PFAD] [--zeilen PFAD=REGEX]
+                                    [--ohne-zeilen]
 """
 
 from __future__ import annotations
@@ -111,9 +112,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("commit")
     parser.add_argument("--datei", action="append")
     parser.add_argument("--zeilen", action="append", help="PFAD=REGEX")
+    parser.add_argument("--ohne-zeilen", action="store_true")
     argumente = parser.parse_args(argv)
     dateien = argumente.datei or list(STANDARD_DATEIEN)
-    paare = argumente.zeilen or list(STANDARD_ZEILEN)
+    paare = argumente.zeilen or ([] if argumente.ohne_zeilen else list(STANDARD_ZEILEN))
     zeilen = dict(paar.split("=", 1) for paar in paare)
     try:
         ordner = ziehe(argumente.commit, dateien, zeilen)

@@ -14,12 +14,14 @@ stehen), und nur der adversarische Pruefdurchgang hat es aufgedeckt.
 """
 
 import json
+from datetime import UTC
 from pathlib import Path
 
 import pytest
+from bestand_pfad import lese_wurzel
 
 from telco_radar.collect.geraete import GeraeteAbrufFehler, o2, vodafone
-from telco_radar.geraete_config import lade_katalog, lade_farben
+from telco_radar.geraete_config import lade_farben, lade_katalog
 from telco_radar.geraete_model import erkenne_geraet, lies_listung
 
 _FIX = Path(__file__).parent / "fixtures" / "geraete"
@@ -32,7 +34,7 @@ def _fixture(name: str) -> str:
 
 @pytest.fixture(scope="module")
 def katalog():
-    return lade_katalog(_WURZEL)
+    return lade_katalog(lese_wurzel())
 
 
 @pytest.fixture(scope="module")
@@ -194,7 +196,7 @@ def test_o2_liest_den_geraetepreis_und_nicht_die_anzahlung(katalog, farben):
     assert saetze
     roh = json.loads(_fixture("o2_katalog.json"))["hardware"]
     anzahlungen = {h["price"]["oneTimePrice"] for h in roh}
-    assert anzahlungen & {1, 1.0, 7.0}, "die Fixture muss Anzahlungen enthalten"
+    assert anzahlungen & {1, 7.0}, "die Fixture muss Anzahlungen enthalten"
     for s in saetze:
         assert s["preis"] > 100, f"{s['titel']}: {s['preis']} ist eine Anzahlung"
     # Der Preis ist nachrechenbar: Anzahlung plus 24 Monatsraten.
@@ -347,7 +349,7 @@ def test_pflichtkopfzeilen_erreichen_den_abruf(katalog, farben):
     in die 404-Seite, Vodafones Schnittstelle verlangt den oeffentlichen
     Browser-Schluessel. Beides steht in der Anbieterkonfiguration - und muss
     beim Abruf ankommen, sonst liefert der Adapter still nichts."""
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     from telco_radar.collect.geraete import sammle_anbieter
     from telco_radar.collect.geraete.robots import RobotsWaechter
@@ -379,7 +381,7 @@ def test_pflichtkopfzeilen_erreichen_den_abruf(katalog, farben):
         hole,
         "2026-08-28",
         RobotsWaechter(hole=hole),
-        datetime(2026, 8, 28, 3, tzinfo=timezone.utc),
+        datetime(2026, 8, 28, 3, tzinfo=UTC),
     )
     assert bilanz.status == "ok" and bilanz.listungen
     katalogabruf = gesehen["https://www.o2online.de/e-shop/rest/catalog/x"]
@@ -390,7 +392,7 @@ def test_ohne_konfigurierte_kopfzeilen_bleibt_der_alte_vertrag_gueltig(katalog, 
     """Jede bestehende Testattrappe ist `hole(url)` mit EINEM Parameter.
     Ein Anbieter ohne Kopfzeilen darf sie deshalb weiterhin so aufrufen -
     sonst waeren alle vorhandenen Collector-Tests kaputt."""
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     from telco_radar.collect.geraete import sammle_anbieter
     from telco_radar.collect.geraete.robots import RobotsWaechter
@@ -418,7 +420,7 @@ def test_ohne_konfigurierte_kopfzeilen_bleibt_der_alte_vertrag_gueltig(katalog, 
         hole,
         "2026-08-28",
         RobotsWaechter(hole=hole),
-        datetime(2026, 8, 28, 3, tzinfo=timezone.utc),
+        datetime(2026, 8, 28, 3, tzinfo=UTC),
     )
     assert bilanz.status == "ok" and bilanz.listungen
 
@@ -427,7 +429,7 @@ def test_der_rohsatz_zaehler_trennt_zwei_ausfaelle(katalog, farben):
     """Medimax lieferte 16 Naechte lang "20 Produktseiten, 0 Listungen", und
     das Protokoll sagte nicht, ob die Seiten nichts hergaben oder ob nichts
     davon im Katalog stand. Der Zaehler beantwortet genau das."""
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     from telco_radar.collect.geraete import sammle_anbieter
     from telco_radar.collect.geraete.robots import RobotsWaechter
@@ -462,7 +464,7 @@ def test_der_rohsatz_zaehler_trennt_zwei_ausfaelle(katalog, farben):
         hole,
         "2026-08-28",
         RobotsWaechter(hole=hole),
-        datetime(2026, 8, 28, 3, tzinfo=timezone.utc),
+        datetime(2026, 8, 28, 3, tzinfo=UTC),
     )
     assert bilanz.listungen == [], "kein Katalogtreffer"
     assert bilanz.rohsaetze > 0, (

@@ -38,11 +38,13 @@ Stand und nicht an einer Kopie, die auseinanderlaufen kann.
 
 import gzip
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
-from telco_radar.collect.geraete import sammle
+from bestand_pfad import lese_wurzel
+
 import telco_radar.collect.geraete as g
+from telco_radar.collect.geraete import sammle
 from telco_radar.geraete_config import Anbieter, Einstieg, QuellenConfig, lade_quellen
 
 _FIX = Path(__file__).parent / "fixtures" / "geraete"
@@ -134,7 +136,7 @@ _KOSTEN_JE_ABRUF_CONGSTAR = 2.2
 def _katalog_farben():
     from telco_radar.geraete_config import lade_farben, lade_katalog
 
-    return lade_katalog(_WURZEL), lade_farben(_WURZEL)
+    return lade_katalog(lese_wurzel()), lade_farben(_WURZEL)
 
 
 def _congstar_bilanz(monkeypatch, frist_sekunden: float):
@@ -182,7 +184,7 @@ def _congstar_bilanz(monkeypatch, frist_sekunden: float):
         *_katalog_farben(),
         hole,
         "2026-09-24",
-        datetime(2026, 9, 24, 7, 36, 8, tzinfo=timezone.utc),
+        datetime(2026, 9, 24, 7, 36, 8, tzinfo=UTC),
         frist_sekunden=frist_sekunden,
     )
     bilanz = next(b for b in ergebnis["anbieter"] if b.name == "congstar")

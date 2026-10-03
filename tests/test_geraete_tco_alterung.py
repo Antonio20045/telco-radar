@@ -44,17 +44,18 @@ Ersten ist die interessante Richtung, nicht der umgekehrte).
 
 from __future__ import annotations
 
-import pathlib
+from bestand_pfad import lese_wurzel
 
 from telco_radar.geraete_config import lade_katalog
-from telco_radar.report import geraete_tco_band
+from telco_radar.report import (
+    geraete_tco_band,
+    geraete_tco_view,
+    geraete_view,
+    geraete_zeitreihe,
+)
 from telco_radar.report import geraete_tco_karten as karten
-from telco_radar.report import geraete_tco_view, geraete_view
-from telco_radar.report import geraete_zeitreihe
 from telco_radar.report.html import _env
 from telco_radar.tco_model import Buendel, SimOnlyReferenz
-
-WURZEL = pathlib.Path(__file__).resolve().parents[1]
 
 HEUTE = "2026-09-20"
 TAG_3 = "2026-09-17"  # Grenzfall: 3 Tage alt -> noch frisch
@@ -68,7 +69,7 @@ _KATALOG = None
 def _katalog():
     global _KATALOG
     if _KATALOG is None:
-        _KATALOG = lade_katalog(WURZEL)
+        _KATALOG = lade_katalog(lese_wurzel())
     return _KATALOG
 
 

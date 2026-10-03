@@ -16,7 +16,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from bs4 import BeautifulSoup
 
 from . import anbieter_farben as _anbieter_farben
-from .ausfall import Ausfall
+from .ausfall import NEWSLETTER_TEIL, Ausfall, ohne_konfiguration
 from . import bilder as report_bilder
 from . import diff_bilder
 from . import differenzierung_bericht
@@ -1367,7 +1367,8 @@ def _prep_competitors(report: dict) -> list[dict]:
 def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     """Rendert die ganze Website und gibt die Teile zurück, die nicht neu gebaut wurden."""
     env = _env()
-    ausfaelle: list[Ausfall] = []
+    _wurzel = getattr(cfg, "root", None) or reports_dir.parent.parent
+    ausfaelle: list[Ausfall] = ohne_konfiguration(_wurzel)
     env.globals["ausfaelle"] = ausfaelle
     site_dir.mkdir(parents=True, exist_ok=True)
     (site_dir / "reports").mkdir(exist_ok=True)
@@ -1478,7 +1479,6 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     from ..geraete_config import lade_katalog, lade_quellen as _lade_geraetequellen
     from . import geraete_view as geraete_view_mod
 
-    _wurzel = getattr(cfg, "root", None) or reports_dir.parent.parent
     try:
         # `heute` ist der Berichtstag (radar.yml, Mi/Fr) - NICHT die Uhr der
         # Geräteseite: geraete.yml rendert täglich und fasst die Berichte
@@ -1756,9 +1756,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     # waere, `wochen` vor der Schleife ein zweites Mal zu berechnen (14 x
     # _flatten(), der teuerste Teil des Rendervorgangs).
     if latest_ctx is not None:
-        latest_ctx["fruehwarnung"] = fruehwarnung_mod.aufbereiten(
-            wochen, reports_dir.parent.parent
-        )
+        latest_ctx["fruehwarnung"] = fruehwarnung_mod.aufbereiten(wochen, _wurzel)
         (site_dir / "index.html").write_text(
             woche_tpl.render(prefix="", show_explorer=False, **latest_ctx),
             encoding="utf-8",
@@ -1823,7 +1821,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             luecken=luecken_mod.bauen(
                 diff["bestand"],
                 theme_label_map,
-                luecken_mod.lade_eigene_hebel(reports_dir.parent.parent),
+                luecken_mod.lade_eigene_hebel(_wurzel),
             ),
             date_de=_fmt_date_de(latest["date"]) if latest else "",
             diff_lage_html=_md_to_html(diff_teile["lage"])
@@ -2097,6 +2095,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
         nl_katalog = _lade_nl_katalog(_wurzel)
     except (FileNotFoundError, ValueError) as exc:
         log.error("newsletter.yaml nicht lesbar (%s) - keine Anmeldeseite", exc)
+        ausfaelle.append(Ausfall.aus_ausnahme(NEWSLETTER_TEIL, exc))
         nl_katalog = None
     if nl_katalog is not None:
         fassung = rechtstexte_mod.aktuelle_einwilligung(_wurzel)
@@ -2192,7 +2191,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
             log.warning("lieferzeit.json unlesbar - rendere leere Seite")
     lieferzeit_view = lieferzeit_view_mod.aufbereiten(
         lieferzeit_daten,
-        lade_warenkorb(reports_dir.parent.parent),
+        lade_warenkorb(_wurzel),
         heute=latest["date"] if latest else "",
     )
     (site_dir / "lieferzeit.html").write_text(
@@ -2212,7 +2211,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     try:
         from ..collect.tarif_crawler import lade_quellen as _lade_tarifquellen
 
-        tarif_quellen = _lade_tarifquellen(reports_dir.parent.parent)
+        tarif_quellen = _lade_tarifquellen(_wurzel)
     except Exception as exc:  # noqa: BLE001 - eine fehlende Config kippt keine Seite
         tarif_quellen = []
         ausfaelle.append(Ausfall.aus_ausnahme("Tarifquellen", exc))
@@ -2433,7 +2432,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
                 }
                 for s in (3, 2, 1, 0)
             ],
-            sicherheitsskala=ctm.lade_fokus(reports_dir.parent.parent).sicherheitsskala,
+            sicherheitsskala=ctm.lade_fokus(_wurzel).sicherheitsskala,
             # Der Newsletter-Abschnitt: NUR Zahlen, nie Adressen. Ein
             # CI-Test prueft die Statistikdatei gegen ein Adressmuster.
             newsletter=newsletter_protokoll.aufbereiten(

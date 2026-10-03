@@ -40,6 +40,11 @@ def _lauf(code, test="tests/test_neu.py::test_x (call)", **umgebung):
     )
 
 
+def test_zugriff_ueber_den_helfer_einer_anderen_testdatei_scheitert(tmp_path):
+    code = _stapel(tmp_path) + "test_neu.test_x(W)\n"
+    assert "Regel hermetisch" in _lauf(code).stderr
+
+
 @pytest.mark.parametrize(
     ("zugriff", "pfad"),
     [
@@ -74,33 +79,8 @@ def test_andere_pfade_und_schnappschuss_bleiben_offen(tmp_path):
     assert lauf.returncode == 0, lauf.stderr
 
 
-def test_altlast_darf_lesen_und_wird_protokolliert(tmp_path):
-    lauf = _lauf(
-        """
-        hermetik._altlasten = frozenset({'tests/test_alt.py'})
-        (W / 'data/state/seen.jsonl').read_bytes()
-        (W / 'data/state/seen.jsonl').read_bytes()
-        """,
-        test="tests/test_alt.py::test_x (call)",
-        TELCO_TESTS_BESTAND_PROTOKOLL=str(tmp_path),
-    )
-    assert lauf.returncode == 0, lauf.stderr
-    zeilen = [z for d in tmp_path.iterdir() for z in d.read_text().splitlines()]
-    assert zeilen == ["tests/test_alt.py"]
-
-
-def test_altlast_gilt_nur_fuer_ihre_datei():
-    lauf = _lauf(
-        """
-        hermetik._altlasten = frozenset({'tests/test_alt.py'})
-        (W / 'data/state/seen.jsonl').read_bytes()
-        """
-    )
-    assert "Regel hermetisch" in lauf.stderr
-
-
 def _stapel(tmp_path):
-    """Eine Altlast-Datei mit Helfer und eine neue Datei, die ihn ruft."""
+    """Eine Datei mit Helfer und eine neue Datei, die ihn ruft."""
     tests = tmp_path / "tests"
     tests.mkdir()
     (tests / "test_alt.py").write_text(
@@ -112,7 +92,6 @@ def _stapel(tmp_path):
     return f"""
         hermetik.TESTS = {str(tests)!r} + os.sep
         hermetik.WURZEL = Path({str(tmp_path)!r})
-        hermetik._altlasten = frozenset({{'tests/test_alt.py'}})
         sys.path.insert(0, {str(tests)!r})
         import test_neu
         """
@@ -121,13 +100,6 @@ def _stapel(tmp_path):
 def test_beim_sammeln_zaehlt_die_aeusserste_testdatei(tmp_path):
     lauf = _lauf(_stapel(tmp_path) + "test_neu.test_x(W)\n", test="")
     assert "(tests/test_neu.py griff auf data/state/seen.jsonl)" in lauf.stderr
-
-
-def test_im_test_zaehlt_der_laufende_test_nicht_der_helfer(tmp_path):
-    code = _stapel(tmp_path) + "test_neu.test_x(W)\n"
-    assert "Regel hermetisch" in _lauf(code).stderr
-    lauf = _lauf(code, test="tests/test_alt.py::test_y (call)")
-    assert lauf.returncode == 0, lauf.stderr
 
 
 @pytest.mark.parametrize(

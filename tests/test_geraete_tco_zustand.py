@@ -29,9 +29,10 @@ import json
 import pathlib
 
 import yaml
+from bestand_pfad import lese_wurzel
 from bs4 import BeautifulSoup
-
 from tarifleiter_testbestand import mit_leiter
+
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
 from telco_radar.analyze.tco_store import TcoDB
 from telco_radar.geraete_config import lade_katalog
@@ -41,8 +42,6 @@ from telco_radar.report import geraete_tco_view as view
 from telco_radar.report.html import render_site
 from telco_radar.tarif_bezug import Tarifbestand
 from telco_radar.tco_model import Buendel, SimOnlyReferenz
-
-WURZEL = pathlib.Path(__file__).resolve().parents[1]
 
 
 def vorlage_text(el) -> str:
@@ -198,7 +197,7 @@ def _modell(erneuert=True):
     if erneuert:
         buendel.append(_buendel(SKU_ERNEUERT, 17.0))
     ergebnis = karten.modelle(
-        buendel, _listungen(), _referenzen(), tarife, lade_katalog(WURZEL)
+        buendel, _listungen(), _referenzen(), tarife, lade_katalog(lese_wurzel())
     )
     assert len(ergebnis["modelle"]) == 1
     return ergebnis["modelle"][0]
@@ -252,7 +251,7 @@ def test_ohne_beleg_gilt_der_zustand_als_unbekannt_nicht_als_neu():
     tarife = {t["tarif_id"]: t for t in _tarife()}
     fremd = _buendel("apple-iphone-15-256gb-blau", 22.0)
     ergebnis = karten.modelle(
-        [fremd], _listungen(), _referenzen(), tarife, lade_katalog(WURZEL)
+        [fremd], _listungen(), _referenzen(), tarife, lade_katalog(lese_wurzel())
     )
     karte = next(
         k
@@ -314,7 +313,7 @@ def test_ein_erneuertes_eigenes_buendel_wird_nicht_zur_referenz():
         listungen,
         _referenzen(),
         tarife,
-        lade_katalog(WURZEL),
+        lade_katalog(lese_wurzel()),
     )
     modell = ergebnis["modelle"][0]
     assert not modell["referenz"].get("aus_buendel"), (
@@ -815,7 +814,11 @@ def test_eine_veraltete_messung_verdraengt_kein_aktuelles_angebot():
         "apple-iphone-15-128gb-weiss", 26.0, "2026-09-06", zuzahlung=0.99
     )
     modell = karten.modelle(
-        [frisch, geist], _listungen(), _referenzen(), tarife, lade_katalog(WURZEL)
+        [frisch, geist],
+        _listungen(),
+        _referenzen(),
+        tarife,
+        lade_katalog(lese_wurzel()),
     )["modelle"][0]
     xs = [k for k in modell["karten"] if k["anbieter"] == "Vodafone"]
     assert len(xs) == 1, "mehrere Farben, ein Slot: eine Karte"
@@ -834,7 +837,7 @@ def test_eine_veraltete_messung_verdraengt_kein_aktuelles_angebot():
     # eigenen Zahl - die Neuigkeits-Stufe stellt keine Weiche, sie bricht
     # nur den Gleichstand verschiedener Messungen desselben Slots.
     allein = karten.modelle(
-        [geist], _listungen(), _referenzen(), tarife, lade_katalog(WURZEL)
+        [geist], _listungen(), _referenzen(), tarife, lade_katalog(lese_wurzel())
     )["modelle"][0]
     geist_karte = [k for k in allein["karten"] if k["anbieter"] == "Vodafone"][0]
     assert geist_karte["abgerufen_am"] == "2026-09-06"
@@ -850,7 +853,7 @@ def test_eine_veraltete_messung_verdraengt_kein_aktuelles_angebot():
         _listungen(),
         _referenzen(),
         tarife,
-        lade_katalog(WURZEL),
+        lade_katalog(lese_wurzel()),
     )["modelle"][0]
     assert [k for k in gleich_alt["karten"] if k["anbieter"] == "Vodafone"][0][
         "gesamt"
@@ -896,7 +899,7 @@ def test_ein_kleiner_abstand_erscheint_als_ungefaehr_statt_strich():
         _listungen(),
         _referenzen(),
         tarife,
-        lade_katalog(WURZEL),
+        lade_katalog(lese_wurzel()),
     )["modelle"][0]
     o2 = [k for k in modell["karten"] if k["anbieter"] == "o2"][0]
     assert o2["gesamt"] == 1810.8
@@ -914,7 +917,7 @@ def test_ein_kleiner_abstand_erscheint_als_ungefaehr_statt_strich():
         _listungen(),
         _referenzen(),
         tarife,
-        lade_katalog(WURZEL),
+        lade_katalog(lese_wurzel()),
     )["modelle"][0]
     d0 = [k for k in gleich["karten"] if k["anbieter"] == "o2"][0]["delta"]
     assert d0["ungefaehr"] is True
@@ -928,7 +931,7 @@ def test_ein_kleiner_abstand_erscheint_als_ungefaehr_statt_strich():
         _listungen(),
         _referenzen(),
         tarife,
-        lade_katalog(WURZEL),
+        lade_katalog(lese_wurzel()),
     )["modelle"][0]
     dw = [k for k in deutlich["karten"] if k["anbieter"] == "o2"][0]["delta"]
     assert dw["ungefaehr"] is False
@@ -943,7 +946,7 @@ def test_ein_kleiner_abstand_erscheint_als_ungefaehr_statt_strich():
         ohne_vodafone,
         _referenzen(),
         tarife,
-        lade_katalog(WURZEL),
+        lade_katalog(lese_wurzel()),
     )["modelle"][0]
     assert [k for k in ohne["karten"] if k["anbieter"] == "o2"][0]["delta"] is None
 
@@ -960,7 +963,7 @@ def test_delta_kurz_und_der_graph_traegen_das_ungefaehr():
         [_speicherform(referenz), _speicherform(_knapp_o2(30.25, 2.0))],
         [],
         _listungen(),
-        lade_katalog(WURZEL),
+        lade_katalog(lese_wurzel()),
         tarife=tarife,
     )
     o2 = next(
@@ -1062,7 +1065,11 @@ def test_ueber_zwei_zeitraeume_steht_kein_betrag_sondern_der_zustand():
         abgerufen_am=HEUTE,
     )
     modell = karten.modelle(
-        [referenz, o2_24], _listungen(), _referenzen(), tarife, lade_katalog(WURZEL)
+        [referenz, o2_24],
+        _listungen(),
+        _referenzen(),
+        tarife,
+        lade_katalog(lese_wurzel()),
     )["modelle"][0]
     karte = next(k for k in modell["karten"] if k["anbieter"] == "o2")
     # Eine Referenz, deren Zahl 36 Monate traegt (1&1s Bauform) - hier

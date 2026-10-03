@@ -38,6 +38,7 @@ import re
 from pathlib import Path
 
 import pytest
+from bestand_pfad import lese_wurzel
 
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
 from telco_radar.collect.geraete import (
@@ -75,7 +76,7 @@ def _saetze():
 
 @pytest.fixture(scope="module")
 def katalog():
-    return lade_katalog(_WURZEL)
+    return lade_katalog(lese_wurzel())
 
 
 @pytest.fixture(scope="module")
