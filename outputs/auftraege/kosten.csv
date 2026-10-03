@@ -1,0 +1,6 @@
+datum,auftrag,rolle,runde,agent,exit,sekunden,kosten_usd,token_ein,token_aus,modell,ergebnis
+2026-10-03,V1,test,1,claude,0,147.8,0.6169836000000001,46,9887,claude-haiku-4-5-20251001 claude-opus-5-5,
+2026-10-03,V1,bau,1,claude,0,63.7,0.33764439999999996,28,4177,claude-haiku-4-5-20251001 claude-opus-5-5,
+2026-10-03,V1,pruefer,1,claude,0,99.6,0.5733834000000001,44,7347,claude-haiku-4-5-20251001 claude-opus-5-5,
+2026-10-03,V1,mutation,0,mutmut,0,19.8,,,,,"22 von 34 Mutanten erkannt, überlebt: Zustellbuch.merke#1 Zustellbuch.merke#4 Zustellbuch.merke#6 Zustellbuch.merke#22 Zustellbuch.merke#24 …"
+2026-10-03,V1,ende,0,claude,,,,,,,gemergt
