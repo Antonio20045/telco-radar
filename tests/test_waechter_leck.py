@@ -211,3 +211,46 @@ def test_ein_git_add_nach_dem_scan_verlangt_einen_neuen(repo):
         ".github/workflows/lauf.yml:6: git commit ohne vorherigen"
         " scripts/waechter_leck.py"
     ]
+
+
+_OHNE_SCAN = (
+    ".github/workflows/lauf.yml:{}: git commit ohne vorherigen scripts/waechter_leck.py"
+)
+
+
+@pytest.mark.parametrize(
+    "scan",
+    [
+        "      # python scripts/waechter_leck.py\n",
+        "      python scripts/waechter_leck.py || true\n",
+        "      echo scripts/waechter_leck.py\n",
+        "      python scripts/waechter_leck.py; true\n",
+    ],
+)
+def test_ein_scheinaufruf_gilt_nicht_als_scan(repo, scan):
+    _getrackt(repo, ".github/workflows/lauf.yml", _WORKFLOW.format(scan))
+    assert waechter_leck.lecks(repo) == [_OHNE_SCAN.format(5)]
+
+
+@pytest.mark.parametrize(
+    "commit",
+    [
+        "git -c user.name=bot commit -m lauf",
+        "git -C . commit -m lauf",
+        "git --no-pager commit -am lauf",
+        "git  commit -m lauf",
+    ],
+)
+def test_ein_commit_mit_git_optionen_zaehlt(repo, commit):
+    text = f"steps:\n  - run: |\n      git -c a=b add data/\n      {commit}\n"
+    _getrackt(repo, ".github/workflows/lauf.yml", text)
+    assert waechter_leck.lecks(repo) == [_OHNE_SCAN.format(4)]
+
+
+def test_ein_commit_ohne_vorheriges_add_braucht_einen_scan(repo):
+    text = "steps:\n  - run: git commit -am lauf\n"
+    _getrackt(repo, ".github/workflows/lauf.yml", text)
+    assert waechter_leck.lecks(repo) == [_OHNE_SCAN.format(2)]
+    text = "steps:\n  - run: python scripts/waechter_leck.py\n" + text[7:]
+    _getrackt(repo, ".github/workflows/lauf.yml", text)
+    assert waechter_leck.lecks(repo) == []

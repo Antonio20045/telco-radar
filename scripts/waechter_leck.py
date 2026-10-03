@@ -18,6 +18,12 @@ ADRESSEN_ORDNER = "data/"
 ADRESSEN_ENDUNG = ".jsonl"
 WORKFLOWS = ".github/workflows"
 SCAN_AUFRUF = "scripts/waechter_leck.py"
+_GIT = r"\bgit(?:\s+(?:-[cC]\s+\S+|--?[\w-]+(?:=\S+)?))*\s+"
+GIT_COMMIT = re.compile(_GIT + r"commit\b")
+GIT_VORMERKEN = re.compile(_GIT + r"(?:add|stage)\b")
+SCAN_ZEILE = re.compile(
+    r"^\s*(?:-\s+)?(?:run:\s+)?(?:\S*python3?\s+)?scripts/waechter_leck\.py\s*$"
+)
 UNTERMODUL = b"160000"
 SYMLINK = b"120000"
 
@@ -49,18 +55,18 @@ def lecks(wurzel: Path) -> list[str]:
 
 
 def ungepruefte_commits(wurzel: Path) -> list[str]:
-    """Meldet jedes ``git commit`` in einem Workflow, vor dem seit dem letzten
-    ``git add`` kein Aufruf des Leckscans steht."""
+    """Meldet jedes ``git commit`` in einem Workflow, vor dem seit Dateibeginn
+    oder dem letzten ``git add`` keine Zeile steht, die nur den Leckscan ruft."""
     meldungen = []
     for datei in sorted((wurzel / WORKFLOWS).glob("*.y*ml")):
-        geprueft = True
+        geprueft = False
         zeilen = datei.read_text(encoding="utf-8").splitlines()
         for nummer, zeile in enumerate(zeilen, 1):
-            if "git add" in zeile:
+            if GIT_VORMERKEN.search(zeile):
                 geprueft = False
-            if SCAN_AUFRUF in zeile:
+            if SCAN_ZEILE.match(zeile):
                 geprueft = True
-            if "git commit" in zeile and not geprueft:
+            if GIT_COMMIT.search(zeile) and not geprueft:
                 ort = f"{WORKFLOWS}/{datei.name}:{nummer}"
                 meldungen.append(f"{ort}: git commit ohne vorherigen {SCAN_AUFRUF}")
     return meldungen
