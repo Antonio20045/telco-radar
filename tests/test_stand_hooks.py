@@ -1,3 +1,4 @@
+import contextlib
 import importlib.util
 import sys
 from pathlib import Path
@@ -56,3 +57,41 @@ def test_ohne_ungepruefte_commits_nichts_offen(monkeypatch):
     befund = stand.pruefstempel.Ungeprueft([], stempel_gefunden=True)
     monkeypatch.setattr(stand.pruefstempel, "ungestempelte", lambda w: befund)
     assert stand.ungepruefte() == []
+
+
+class _Lauf:
+    def __init__(self, code, stderr=""):
+        self.returncode, self.stderr = code, stderr
+
+
+def _hook_antworten(monkeypatch, tmp_path, befehl, lesen, stop):
+    def antwort(baum, ereignis, *argumente):
+        return {"befehl": befehl, "datei_lesen": lesen, "stop": stop}[argumente[-1]]
+
+    (tmp_path / "src/telco_radar").mkdir(parents=True)
+    monkeypatch.setattr(stand, "_hook", antwort)
+    monkeypatch.setattr(
+        stand, "_wegwerf_baum", lambda: contextlib.nullcontext(tmp_path)
+    )
+
+
+def test_hook_proben_sperren_ist_erfuellt(monkeypatch, tmp_path):
+    _hook_antworten(monkeypatch, tmp_path, _Lauf(2), _Lauf(2), _Lauf(2, "x [F401] y"))
+    assert stand.hook_proben() == []
+
+
+def test_hook_proben_nennen_jede_luecke(monkeypatch, tmp_path):
+    _hook_antworten(monkeypatch, tmp_path, _Lauf(0), _Lauf(0), _Lauf(2, "Stufe 0"))
+    assert stand.hook_proben() == [
+        "--no-verify nicht gesperrt",
+        "Read von html.py ohne limit nicht gesperrt",
+        "Stop mit rotem Lint lässt die Sitzung enden",
+    ]
+
+
+def test_hook_probe_ruft_das_echte_skript():
+    befehl = {"tool_input": {"command": "git commit --no-verify -m probe"}}
+    hook = "scripts/claude_hooks.py"
+    assert stand._hook(stand.W, befehl, hook, "befehl").returncode == stand.BLOCKIERT
+    frei = {"tool_input": {"command": "git status"}}
+    assert stand._hook(stand.W, frei, hook, "befehl").returncode == 0

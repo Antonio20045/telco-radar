@@ -51,6 +51,7 @@ def projekt(tmp_path, monkeypatch):
     monkeypatch.setattr(stand, "zeitreihen_probe", lambda: ["Zeitreihe gemessen"])
     monkeypatch.setattr(stand, "live_datum", lambda: [])
     monkeypatch.setattr(stand, "ungepruefte", lambda: ["Stempel gemessen"])
+    monkeypatch.setattr(stand, "hook_proben", lambda: ["Hooks gemessen"])
     _origin(monkeypatch, "main")
     return tmp_path
 

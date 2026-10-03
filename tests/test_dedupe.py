@@ -5,11 +5,13 @@ from datetime import datetime, timedelta, timezone
 from telco_radar.dedupe import ReportedTopics, SeenStore, filter_fresh
 from telco_radar.models import Item, normalize_url
 
+JETZT = datetime(2026, 7, 15, 12, 0, tzinfo=timezone.utc)
+
 
 def _item(title, url, days_old=None):
     published = None
     if days_old is not None:
-        published = datetime.now(timezone.utc) - timedelta(days=days_old)
+        published = JETZT - timedelta(days=days_old)
     return Item(title=title, url=url, source_name="test", published=published)
 
 
@@ -45,13 +47,13 @@ def test_filter_fresh():
     fresh = _item("fresh", "https://x.com/1", days_old=2)
     stale = _item("stale", "https://x.com/2", days_old=30)
     undated = _item("undated", "https://x.com/3")
-    kept = filter_fresh([fresh, stale, undated], lookback_days=8)
+    kept = filter_fresh([fresh, stale, undated], lookback_days=8, jetzt=JETZT)
     assert fresh in kept and undated in kept and stale not in kept
 
 
 def test_filter_fresh_rejects_far_future_dates():
     future = _item("scheduled", "https://x.com/future", days_old=-3)
-    assert future not in filter_fresh([future], lookback_days=8)
+    assert future not in filter_fresh([future], lookback_days=8, jetzt=JETZT)
 
 
 def test_reported_topics_memory(tmp_path):

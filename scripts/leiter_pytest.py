@@ -22,10 +22,15 @@ _GESAMMELT = re.compile(
 )
 _SCHLUSSZEILE = re.compile(r"^=+ (.+) in [\d.]+s(?: \([\d:]+\))? =+$", re.MULTILINE)
 _NICHT_AUSGEFUEHRT = re.compile(r"(\d+) (?:skipped|xfailed)\b")
-# Diese Kanarienvögel greifen auf den Bestand und ins Netz; ihr Scheitern muss die Regel
-# der Testumgebung nennen, sonst ist die Hermetik aus tests/conftest.py abgeschaltet.
-HERMETIK_KANARIEN = ("test_bestand_muss_scheitern", "test_netz_muss_scheitern")
+# Kanarien auf Bestand, Netz und Quelltext müssen an ihrer Regel aus tests/conftest.py
+# scheitern, sonst ist die Sperre dort abgeschaltet.
 HERMETIK_REGEL = "Regel hermetisch"
+VERHALTEN_REGEL = "Regel Verhalten"
+SPERR_KANARIEN = {
+    "test_bestand_muss_scheitern": HERMETIK_REGEL,
+    "test_netz_muss_scheitern": HERMETIK_REGEL,
+    "test_quelltext_muss_scheitern": VERHALTEN_REGEL,
+}
 _PARAMETER = re.compile(r"^(?P<basis>[^\[]+)(?:\[(?P<id>.*)\])?$")
 
 
@@ -195,7 +200,7 @@ def pruefe_ergebnisse(
     """Hält Meldung und Rohaufzeichnung gegeneinander; nimmt den Kanarienvogel aus rot.
 
     Der Kanarienvogel muss rot gemeldet und roh gescheitert sein, sein Zwilling grün,
-    die Hermetik-Kanarien rot mit der Regel der Testumgebung;
+    die Sperr-Kanarien rot mit ihrer Regel der Testumgebung;
     jeder andere als bestanden gemeldete Test muss roh ``ok`` sein, und keine
     Testfunktion darf fremd sein, ob rot oder grün gemeldet.
     """
@@ -205,9 +210,9 @@ def pruefe_ergebnisse(
     if roh.get(f"{kanarie}::test_muss_scheitern") not in ("fehler", "fremd"):
         return [f"Rohaufzeichnung fehlt: Plugin {PLUGIN} lief nicht"]
     aus = [
-        f"{kanarie}::{name}: scheitert nicht an der {HERMETIK_REGEL}: Hermetik aus"
-        for name in HERMETIK_KANARIEN
-        if HERMETIK_REGEL not in rot.pop(f"{kanarie}::{name}", "")
+        f"{kanarie}::{name}: scheitert nicht an der {regel}: Sperre aus"
+        for name, regel in SPERR_KANARIEN.items()
+        if regel not in rot.pop(f"{kanarie}::{name}", "")
     ]
     falsch = umgeschrieben(gruen, roh)
     return (

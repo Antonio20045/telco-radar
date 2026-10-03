@@ -6,6 +6,7 @@ Wegwerf-Worktree auf ``HEAD``: kaputter Zeitreihen-Render, Live-Datum, Rot-Probe
 
 import ast
 import contextlib
+import json
 import os
 import shutil
 import statistics
@@ -18,6 +19,7 @@ from pathlib import Path
 
 import pruefstempel
 import waechter
+import waechter_claude
 import waechter_regeln
 import waechter_tests
 
@@ -29,6 +31,7 @@ TESTZEIT_ZIEL = 240
 VORCOMMIT_ZIEL = 5
 VORCOMMIT_LAEUFE = 20
 HOOKS = ".githooks"
+BLOCKIERT = 2
 _DOC = '"""Rotprobe."""\n\n'
 ROT_PROBEN = {
     "unbenutzter Import": (
@@ -189,6 +192,41 @@ def rot_proben() -> list[str]:
         return gruende
 
 
+def _hook(
+    baum: Path, ereignis: dict, *argumente: str
+) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(
+        [sys.executable, *argumente],
+        cwd=baum,
+        input=json.dumps(ereignis),
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+
+def hook_proben() -> list[str]:
+    """Schritt 5: Claude-Hooks sperren ``--no-verify`` und ganze große Dateien,
+    und ein Stop mit rotem Lint lässt die Sitzung weiterlaufen."""
+    hook = "scripts/claude_hooks.py"
+    gruende = []
+    befehl = {"tool_input": {"command": "git commit --no-verify -m probe"}}
+    if _hook(W, befehl, hook, "befehl").returncode != BLOCKIERT:
+        gruende.append("--no-verify nicht gesperrt")
+    lesen = {"tool_input": {"file_path": str(W / "src/telco_radar/report/html.py")}}
+    if _hook(W, lesen, hook, "datei_lesen").returncode != BLOCKIERT:
+        gruende.append("Read von html.py ohne limit nicht gesperrt")
+    pfad, text, (_, befund) = ROT_PROBEN["unbenutzter Import"]
+    with _wegwerf_baum() as baum:
+        (baum / pfad).write_text(text, encoding="utf-8")
+        (baum / ".venv").symlink_to(W / ".venv")
+        stop = {"session_id": "stand-probe", "hook_event_name": "Stop"}
+        lauf = _hook(baum, stop, hook, "stop")
+    if lauf.returncode != BLOCKIERT or befund not in lauf.stderr:
+        gruende.append("Stop mit rotem Lint lässt die Sitzung enden")
+    return gruende
+
+
 def zeitreihen_probe() -> list[str]:
     """Schritt 2: kaputte Zeitreihe gibt Exit ≠ 0, und die Seite nennt den Ausfall."""
     with _wegwerf_baum() as baum:
@@ -238,7 +276,8 @@ def offen() -> dict[str, list[str]]:
         + _testzeit()
         + _fehlt("tests/fixtures/bestand"),
         "5 Hooks, CLAUDE.md": _hooks()
-        + _fehlt(".claude/hooks")
+        + waechter_claude.einstellungen(W)
+        + hook_proben()
         + ungepruefte()
         + _vorcommit_median()
         + _mehr("Zeilen CLAUDE.md", _zeilen("CLAUDE.md"), 100),

@@ -20,6 +20,8 @@ import pytest
 from telco_radar.config import Source
 from telco_radar.models import Item, normalize_url
 
+JETZT = datetime(2026, 7, 15, 12, 0, tzinfo=timezone.utc)
+
 _PFAD = Path(__file__).resolve().parents[1] / "scripts" / "pruefe_quellenvorschlag.py"
 _spec = importlib.util.spec_from_file_location("pruefe_quellenvorschlag", _PFAD)
 pq = importlib.util.module_from_spec(_spec)
@@ -57,7 +59,7 @@ def _items(
 ):
     """n Meldungen, davon `datiert` mit Datum und `frisch` im Fenster."""
     datiert = n if datiert is None else datiert
-    jetzt = datetime.now(timezone.utc)
+    jetzt = JETZT
     out = []
     for i in range(n):
         if i < frisch:
@@ -90,7 +92,9 @@ def _pruefe(
 
     pq.collect_source = fake
     try:
-        return pq._pruefe_einen(kand, bestand or FakeBestand(), 8, overlap, zweimal)
+        return pq._pruefe_einen(
+            kand, bestand or FakeBestand(), 8, overlap, zweimal, jetzt=JETZT
+        )
     finally:
         pq.collect_source = original
 
@@ -225,7 +229,7 @@ def test_navigationslabels_fallen_durch():
             title=t,
             url=f"https://example.com/n{i}",
             source_name="X",
-            published=datetime.now(timezone.utc),
+            published=JETZT,
         )
         for i, t in enumerate(
             [
@@ -255,14 +259,12 @@ def test_identische_titel_fallen_durch():
         website="example.com",
         ausnahme_domain="SEC EDGAR",
     )
-    from datetime import datetime, timezone
-
     formulare = [
         Item(
             title="8-K - Current report",
             url=f"https://www.sec.gov/e{i}",
             source_name="X",
-            published=datetime.now(timezone.utc),
+            published=JETZT,
         )
         for i in range(20)
     ]
@@ -503,6 +505,7 @@ def test_dublette_wird_gegen_den_index_erkannt(monkeypatch):
         bestand,
         8,
         True,
+        jetzt=JETZT,
     )
 
     dublette = [k for k in befund.kriterien if k["name"] == "keine Inhaltsdublette"]
@@ -532,6 +535,7 @@ def test_ohne_index_wird_live_verglichen(monkeypatch):
         bestand,
         8,
         True,
+        jetzt=JETZT,
     )
     assert "https://alpha.de/presse" in abrufe
 
@@ -564,6 +568,7 @@ def test_dublette_wird_ueber_die_domain_erkannt(monkeypatch):
         bestand,
         8,
         True,
+        jetzt=JETZT,
     )
 
     assert not befund.bestanden
@@ -591,6 +596,7 @@ def test_zweiter_kanal_derselben_domain_bleibt_erlaubt(monkeypatch):
         bestand,
         8,
         True,
+        jetzt=JETZT,
     )
     assert befund.bestanden, befund.durchgefallen
 
@@ -614,6 +620,7 @@ def test_nicht_pruefbare_dublette_ist_kein_pass(monkeypatch):
         bestand,
         8,
         True,
+        jetzt=JETZT,
     )
     assert not befund.bestanden
     dublette = [k for k in befund.kriterien if k["name"] == "keine Inhaltsdublette"]
@@ -634,6 +641,7 @@ def test_domain_ganz_ohne_bestand_bleibt_erlaubt(monkeypatch):
         bestand,
         8,
         True,
+        jetzt=JETZT,
     )
     assert befund.bestanden, befund.durchgefallen
 
@@ -660,6 +668,7 @@ def test_obermenge_einer_bestehenden_quelle_ist_eine_dublette(monkeypatch):
         bestand,
         8,
         True,
+        jetzt=JETZT,
     )
     assert not befund.bestanden
     dublette = [k for k in befund.kriterien if k["name"] == "keine Inhaltsdublette"]

@@ -14,8 +14,8 @@ import json
 import os
 import subprocess
 import sys
-import time
 from pathlib import Path
+from types import SimpleNamespace
 from urllib.parse import urlsplit
 
 import pytest
@@ -32,6 +32,13 @@ ECHTER_DISPATCH = app_mod._dispatch
 
 KEY = "test-token-key"
 PEPPER = "test-pepper"
+JETZT = 1_784_000_000.0
+
+
+@pytest.fixture(autouse=True)
+def feste_uhr(monkeypatch):
+    """Tokens rechnen ihr Alter gegen JETZT, nie gegen die echte Uhr."""
+    monkeypatch.setattr(tokens, "time", SimpleNamespace(time=lambda: JETZT))
 
 
 @pytest.fixture()
@@ -55,7 +62,7 @@ def _anmeldung(klient, **kw):
     nonce = klient.get("/form-token").json()["nonce"]
     # Die Nonce hat ein MINDESTALTER von zwei Sekunden. Statt zu warten wird
     # sie mit einem Ausstellungszeitpunkt in der Vergangenheit gebaut.
-    nonce = tokens.schreibe(KEY, tokens.ZWECK_NONCE, {}, jetzt=time.time() - 30)
+    nonce = tokens.schreibe(KEY, tokens.ZWECK_NONCE, {}, jetzt=JETZT - 30)
     koerper = {
         "email": "vorname@beispiel.test",
         "nonce": nonce,
@@ -103,7 +110,7 @@ def test_ein_abgelaufenes_token_faellt_durch():
         KEY,
         tokens.ZWECK_BESTAETIGUNG,
         {},
-        jetzt=time.time() - tokens.TTL_BESTAETIGUNG - 10,
+        jetzt=JETZT - tokens.TTL_BESTAETIGUNG - 10,
     )
     with pytest.raises(tokens.TokenFehler):
         tokens.lies(
@@ -113,14 +120,12 @@ def test_ein_abgelaufenes_token_faellt_durch():
 
 def test_das_ablaufdatum_steht_im_signierten_teil():
     """Ein Ablauf neben der Signatur waere frei aenderbar."""
-    token = tokens.schreibe(
-        KEY, tokens.ZWECK_BESTAETIGUNG, {}, jetzt=time.time() - 1000
-    )
+    token = tokens.schreibe(KEY, tokens.ZWECK_BESTAETIGUNG, {}, jetzt=JETZT - 1000)
     import base64
 
     koerper, signatur = token.split(".")
     daten = json.loads(base64.urlsafe_b64decode(koerper + "==").decode())
-    daten["iat"] = int(time.time())  # "verlaengern"
+    daten["iat"] = int(JETZT)
     gefaelscht = (
         base64.urlsafe_b64encode(
             json.dumps(daten, sort_keys=True, separators=(",", ":")).encode()
@@ -141,9 +146,7 @@ def test_ein_token_aus_der_zukunft_faellt_durch():
         tokens.lies(
             KEY,
             tokens.ZWECK_BESTAETIGUNG,
-            tokens.schreibe(
-                KEY, tokens.ZWECK_BESTAETIGUNG, {}, jetzt=time.time() + 7200
-            ),
+            tokens.schreibe(KEY, tokens.ZWECK_BESTAETIGUNG, {}, jetzt=JETZT + 7200),
             max_alter=3600,
         )
 
@@ -186,7 +189,7 @@ def test_form_token_liefert_eine_pruefbare_nonce(dienst):
         tokens.ZWECK_NONCE,
         nonce,
         max_alter=tokens.NONCE_MAX,
-        jetzt=time.time() + tokens.NONCE_MIN + 1,
+        jetzt=JETZT + tokens.NONCE_MIN + 1,
     )
     assert "iat" in daten
     assert antwort.headers["Referrer-Policy"] == "no-referrer"
@@ -430,7 +433,7 @@ def test_ein_abmeldelink_laeuft_nicht_ab(dienst):
         KEY,
         tokens.ZWECK_ABMELDUNG,
         {"sub_id": "s"},
-        jetzt=time.time() - 3 * 365 * 24 * 3600,
+        jetzt=JETZT - 3 * 365 * 24 * 3600,
     )
     assert "Abgemeldet" in dienst.get(f"/unsubscribe/{alt}").text
 

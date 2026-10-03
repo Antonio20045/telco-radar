@@ -27,6 +27,13 @@ from telco_radar.analyze import redaktion_kontinuitaet as rk
 from telco_radar.report.html import render_site
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+HEUTE = date(2026, 7, 20)
+
+
+class _FesterTag(date):
+    @classmethod
+    def today(cls):
+        return HEUTE
 
 
 def _bericht(
@@ -366,9 +373,11 @@ def _kein_netz(*_args, **_kwargs):
     raise OSError("Test ohne Netz: Verbindungsaufbau verboten")
 
 
-def test_pipeline_behaelt_redaktion_bei_leerer_quellenliste(leeres_projekt):
-    heute = date.today()
-    stand = (heute - timedelta(days=5)).isoformat()
+def test_pipeline_behaelt_redaktion_bei_leerer_quellenliste(
+    leeres_projekt, monkeypatch
+):
+    monkeypatch.setattr(pipeline, "date", _FesterTag)
+    stand = (HEUTE - timedelta(days=5)).isoformat()
     reports_dir = leeres_projekt / "data" / "reports"
     reports_dir.mkdir(parents=True)
     (reports_dir / f"{stand}.json").write_text(
@@ -376,6 +385,7 @@ def test_pipeline_behaelt_redaktion_bei_leerer_quellenliste(leeres_projekt):
     )
 
     report_path, _ = pipeline.run(leeres_projekt, use_llm=True, lookback_days=8)
+    assert report_path.stem == HEUTE.isoformat()
 
     daten = json.loads(report_path.with_suffix(".json").read_text(encoding="utf-8"))
     # Kriterium 3: kein Datenverlust - die alte Ausgabe liegt unveraendert

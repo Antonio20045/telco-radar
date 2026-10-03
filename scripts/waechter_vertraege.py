@@ -1,8 +1,8 @@
 """Verträge der Stufe 0, die ohne Basis gelten: jeder Verstoß ist rot.
 
-CLAUDE.md bleibt klein, die Git-Hooks rufen nur die Leiter, jede Fixture unter
-``tests/fixtures/`` ist ein belegter Abruf, kein Test liest Quelltext über
-``inspect``, und die Workflows halten die Griffe, an denen Datenläufe still grün
+CLAUDE.md bleibt klein, die Git- und Claude-Hooks rufen nur die Leiter, jede
+Fixture unter ``tests/fixtures/`` ist ein belegter Abruf, kein Test liest Quelltext
+über ``inspect``, und die Workflows halten die Griffe, an denen Datenläufe still grün
 enden würden, gegen Code und Konfiguration.
 """
 
@@ -17,6 +17,7 @@ import re
 from collections.abc import Callable, Iterator
 from pathlib import Path
 
+import waechter_claude
 import waechter_speicher
 import yaml
 
@@ -31,8 +32,8 @@ HOOK_INHALT = {
         '#!/bin/sh\nexec .venv/bin/python scripts/pruefleiter.py --vor-push "$@"\n'
     ),
 }
-CLAUDE_MD_ZEILEN = 200
-CLAUDE_MD_BYTES = 20000
+CLAUDE_MD_ZEILEN = 100
+CLAUDE_MD_BYTES = 10000
 FIXTURES = "tests/fixtures"
 BESTAND = "tests/fixtures/bestand"
 HERKUNFT = "_herkunft.json"
@@ -68,6 +69,7 @@ def pruefe(wurzel: Path) -> list[str]:
         *quelltext_in_tests(wurzel),
         *workflows(wurzel),
         *git_hooks(wurzel),
+        *waechter_claude.vertrag(wurzel),
     ]
 
 

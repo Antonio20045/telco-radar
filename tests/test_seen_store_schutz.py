@@ -23,7 +23,7 @@ def _item(url: str, region: str) -> Item:
         source_name="q",
         region=region,
         operator="Op",
-        published=datetime.now(timezone.utc),
+        published=datetime(2026, 7, 14, 9, 0, tzinfo=timezone.utc),
         summary="",
         origin="operator",
     )

@@ -116,6 +116,7 @@ _KANARIE = (
     f"PASSED {pruefleiter.KANARIE}::test_muss_bestehen\n"
     f"FAILED {pruefleiter.KANARIE}::test_bestand_muss_scheitern - Regel hermetisch\n"
     f"FAILED {pruefleiter.KANARIE}::test_netz_muss_scheitern - Regel hermetisch\n"
+    f"FAILED {pruefleiter.KANARIE}::test_quelltext_muss_scheitern - Regel Verhalten\n"
 )
 _KOPF = "==== short test summary info ====\n" + _KANARIE
 # Die Hermetik aus tests/conftest.py; Angriffe im Wegwerfprojekt hängen sich dahinter.
@@ -385,7 +386,7 @@ def kleines_projekt(tmp_path, monkeypatch):
     (wurzel / "tests" / "conftest.py").write_text(_HERMETIK, "utf-8")
     pruef = tmp_path / "pruef"
     pruef.mkdir()
-    (pruef / "tests-anzahl.txt").write_text("7\n", "utf-8")
+    (pruef / "tests-anzahl.txt").write_text("8\n", "utf-8")
     (pruef / "tests-uebersprungen.txt").write_text("0\n", "utf-8")
     monkeypatch.setattr(pruefleiter, "WURZEL", wurzel)
     monkeypatch.setattr(pruefleiter, "TESTS_ANZAHL", pruef / "tests-anzahl.txt")
@@ -429,11 +430,11 @@ def test_zugriff_auf_den_bestand_ist_ohne_ausnahme_rot(kleines_projekt, tmp_path
 
 def test_geloeschter_test_macht_die_teststufe_rot(kleines_projekt, tmp_path):
     (kleines_projekt / "tests" / "test_rot.py").unlink()
-    (tmp_path / "pruef" / "tests-anzahl.txt").write_text("7\n", "utf-8")
+    (tmp_path / "pruef" / "tests-anzahl.txt").write_text("8\n", "utf-8")
     with (tmp_path / "log").open("w") as log:
         ergebnis = pruefleiter.stufe_tests(log)
     assert not ergebnis.gruen
-    assert ergebnis.zeilen[0].startswith("6 Tests gesammelt, erwartet mindestens 7")
+    assert ergebnis.zeilen[0].startswith("7 Tests gesammelt, erwartet mindestens 8")
     # Gegenprobe: mit beiden grünen Tests als Untergrenze ist dieselbe Suite grün.
     (tmp_path / "pruef" / "tests-anzahl.txt").write_text("4\n", "utf-8")
     with (tmp_path / "log").open("a") as log:
@@ -543,7 +544,7 @@ def test_uebersprungene_tests_aus_einer_conftest_machen_die_stufe_rot(
     with (tmp_path / "log").open("w") as log:
         ergebnis = pruefleiter.stufe_tests(log)
     assert not ergebnis.gruen
-    assert ergebnis.zeilen[0].startswith("6 Tests übersprungen oder xfail")
+    assert ergebnis.zeilen[0].startswith("7 Tests übersprungen oder xfail")
 
 
 _UMSCHREIBEN = (

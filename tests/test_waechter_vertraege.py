@@ -101,6 +101,8 @@ def _eintrag(datei: str, roh: bytes, **mehr) -> dict:
 @pytest.fixture
 def projekt(tmp_path: Path) -> Path:
     _schreibe(tmp_path, wv.CLAUDE_MD, "# Regeln\n")
+    for ordner in wv.waechter_claude.ORDNER_CLAUDE_MD:
+        _schreibe(tmp_path, f"{ordner}/CLAUDE.md", "# Ordner\n")
     _schreibe(tmp_path, wv.RADAR, RADAR)
     _schreibe(tmp_path, wv.GERAETE, GERAETE)
     _schreibe(tmp_path, wv.SETTINGS, "job_frist_sekunden: 3600\n")
@@ -125,19 +127,19 @@ def test_das_beispielprojekt_haelt_alle_vertraege(projekt):
     assert wv.pruefe(projekt) == []
 
 
-def test_claude_md_mit_201_zeilen_ist_rot(projekt):
-    _schreibe(projekt, wv.CLAUDE_MD, "x\n" * 201)
-    assert wv.pruefe(projekt) == ["CLAUDE.md hat 201 Zeilen, erlaubt 200"]
+def test_claude_md_mit_101_zeilen_ist_rot(projekt):
+    _schreibe(projekt, wv.CLAUDE_MD, "x\n" * 101)
+    assert wv.pruefe(projekt) == ["CLAUDE.md hat 101 Zeilen, erlaubt 100"]
 
 
-def test_claude_md_mit_200_zeilen_ist_gruen(projekt):
-    _schreibe(projekt, wv.CLAUDE_MD, "x\n" * 200)
+def test_claude_md_mit_100_zeilen_ist_gruen(projekt):
+    _schreibe(projekt, wv.CLAUDE_MD, "x\n" * 100)
     assert wv.pruefe(projekt) == []
 
 
-def test_claude_md_ueber_20000_bytes_ist_rot(projekt):
-    _schreibe(projekt, wv.CLAUDE_MD, "x" * 20001)
-    assert wv.pruefe(projekt) == ["CLAUDE.md hat 20001 Bytes, erlaubt 20000"]
+def test_claude_md_ueber_10000_bytes_ist_rot(projekt):
+    _schreibe(projekt, wv.CLAUDE_MD, "x" * 10001)
+    assert wv.pruefe(projekt) == ["CLAUDE.md hat 10001 Bytes, erlaubt 10000"]
 
 
 def test_fehlende_claude_md_ist_rot(projekt):
@@ -416,3 +418,8 @@ def test_fehlender_workflow_ist_rot(projekt):
     meldungen = wv.pruefe(projekt)
     assert meldungen and all("nicht prüfbar" in m for m in meldungen)
     assert len(meldungen) == len(wv.REGELN) - 1
+
+
+def test_fehlende_ordner_claude_md_ist_rot(projekt):
+    (projekt / wv.waechter_claude.ORDNER_CLAUDE_MD[2] / "CLAUDE.md").unlink()
+    assert wv.pruefe(projekt) == ["src/telco_radar/report/CLAUDE.md fehlt"]

@@ -2,24 +2,19 @@
 
 import json
 import shutil
-from datetime import date
+from datetime import UTC, date, datetime
+from functools import partial
 from pathlib import Path
 
 import httpx
 import pytest
 from test_collect import SAMPLE_FEED, SAMPLE_NEWSROOM
 
-from telco_radar import pipeline
+from telco_radar import dedupe, pipeline
 from telco_radar.report import geraete_bewegung
 
-# Die Fixture-Meldungen tragen feste Daten (13./14. Juli 2026, plus eine alte
-# von 2024, an der der Freshness-Filter geprueft wird). Ein fest verdrahtetes
-# lookback_days laeuft mit dem Kalender zwangslaeufig irgendwann aus dem
-# Fenster - genau das ist am 28.07.2026 passiert, als der Test mit
-# lookback_days=FIXTURE_LOOKBACK ploetzlich rot wurde, ohne dass sich Code geaendert hatte.
-# Stattdessen relativ zum aeltesten frischen Fixture-Datum rechnen: das Fenster
-# waechst mit dem Kalender mit, die Meldung von 2024 bleibt trotzdem draussen.
-FIXTURE_LOOKBACK = (date.today() - date(2026, 7, 13)).days + 1
+JETZT = datetime(2026, 7, 15, 12, 0, tzinfo=UTC)
+FIXTURE_LOOKBACK = (JETZT.date() - date(2026, 7, 13)).days + 1
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
@@ -83,6 +78,9 @@ def fake_http(monkeypatch):
     # Die Artikelseiten der Beispielquelle haben kein og:image; ohne diese Zeile
     # fragte report/bilder.py sie über einen eigenen httpx.Client im Netz ab.
     monkeypatch.setattr(pipeline.report_bilder, "og_bild", lambda url, client: "")
+    monkeypatch.setattr(
+        pipeline, "filter_fresh", partial(dedupe.filter_fresh, jetzt=JETZT)
+    )
 
 
 def test_full_run_no_llm(project, fake_http):
@@ -137,7 +135,6 @@ def test_interleave_gives_every_source_a_slot():
     """The analyst only reads the first `max_items_per_region` items, so one
     high-volume feed must not take the whole budget from the operator
     newsrooms."""
-    from datetime import datetime, timezone
 
     from telco_radar.models import Item
     from telco_radar.pipeline import _interleave_by_source
@@ -149,7 +146,7 @@ def test_interleave_gives_every_source_a_slot():
             source_name=source,
             region="europa",
             operator=operator,
-            published=datetime(2026, 7, day, tzinfo=timezone.utc),
+            published=datetime(2026, 7, day, tzinfo=UTC),
         )
 
     items = [mk("Light Reading", d) for d in (31, 30, 29, 28, 27)]
@@ -165,7 +162,6 @@ def test_interleave_gives_every_source_a_slot():
 
 
 def test_interleave_keeps_dated_sources_ahead_of_undated():
-    from datetime import datetime, timezone
 
     from telco_radar.models import Item
     from telco_radar.pipeline import _interleave_by_source
@@ -176,7 +172,7 @@ def test_interleave_keeps_dated_sources_ahead_of_undated():
         source_name="A",
         region="europa",
         operator="A",
-        published=datetime(2026, 7, 30, tzinfo=timezone.utc),
+        published=datetime(2026, 7, 30, tzinfo=UTC),
     )
     undated = Item(
         title="undated",
@@ -225,7 +221,6 @@ def test_analyst_reads_every_item_when_uncapped():
 
 
 def _mk_item(n):
-    from datetime import datetime, timezone
 
     from telco_radar.models import Item
 
@@ -235,7 +230,7 @@ def _mk_item(n):
         source_name="S",
         region="europa",
         operator=f"Op{n}",
-        published=datetime(2026, 7, 30, tzinfo=timezone.utc),
+        published=datetime(2026, 7, 30, tzinfo=UTC),
     )
 
 

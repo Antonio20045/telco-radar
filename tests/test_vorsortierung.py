@@ -11,23 +11,22 @@ from __future__ import annotations
 
 import json
 import shutil
-from datetime import date
+from datetime import UTC, date, datetime
+from functools import partial
 from pathlib import Path
 
 import httpx
 import pytest
 
-from telco_radar import pipeline
+from telco_radar import dedupe, pipeline
 from telco_radar.analyze import ctm as ctm_mod
 from telco_radar.analyze import vorsortierung as vs
 from telco_radar.models import Item
 from telco_radar.pipeline import vorsortieren, zu_merkende_meldungen
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-# Dieselbe Rechnung wie in test_pipeline.py: ein fest verdrahtetes Fenster
-# laeuft mit dem Kalender irgendwann aus, der Test meldete dann die Uhr statt
-# einen Umbau (CLAUDE.md §6).
-FIXTURE_LOOKBACK = (date.today() - date(2026, 7, 13)).days + 1
+JETZT = datetime(2026, 7, 15, 12, 0, tzinfo=UTC)
+FIXTURE_LOOKBACK = (JETZT.date() - date(2026, 7, 13)).days + 1
 
 
 FOKUS = ctm_mod.CtmFokus(
@@ -106,6 +105,9 @@ def fake_http(monkeypatch):
         return httpx.Response(200, content=_FEED.encode("utf-8"), request=request)
 
     monkeypatch.setattr(httpx, "get", fake_get)
+    monkeypatch.setattr(
+        pipeline, "filter_fresh", partial(dedupe.filter_fresh, jetzt=JETZT)
+    )
 
 
 def _antwort(entscheidungen: dict[int, bool]) -> str:

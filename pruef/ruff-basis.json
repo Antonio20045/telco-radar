@@ -1021,11 +1021,6 @@
  "tests/test_newsletter_versand.py": {
   "UP017": 3
  },
- "tests/test_pipeline.py": {
-  "DTZ011": 1,
-  "E501": 1,
-  "UP017": 3
- },
  "tests/test_promo_snapshot.py": {
   "E501": 3,
   "F401": 1
@@ -1034,13 +1029,10 @@
   "I001": 1
  },
  "tests/test_pruefe_quellenvorschlag.py": {
-  "UP017": 3
+  "UP017": 1
  },
  "tests/test_quellen_register.py": {
   "I001": 1
- },
- "tests/test_redaktion_kontinuitaet.py": {
-  "DTZ011": 1
  },
  "tests/test_sammelprotokoll.py": {
   "F401": 1,
@@ -1092,7 +1084,6 @@
   "UP012": 2
  },
  "tests/test_vorsortierung.py": {
-  "DTZ011": 1,
   "I001": 1
  },
  "tests/test_wettbewerb.py": {

@@ -51,6 +51,7 @@ import re
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -419,6 +420,7 @@ def _pruefe_einen(
     lookback: int,
     ueberlappung_pruefen: bool,
     zweimal: bool = False,
+    jetzt: datetime | None = None,
 ) -> Befund:
     b = Befund(kandidat=kand)
     http_cfg = bestand.http_cfg
@@ -534,9 +536,7 @@ def _pruefe_einen(
     b.n_datiert = len(datiert)
     if datiert:
         b.neuestes = max(i.published for i in datiert).date().isoformat()
-    b.n_frisch = sum(
-        1 for i in items if i.age_days() is not None and -1 <= i.age_days() <= lookback
-    )
+    b.n_frisch = sum(-1 <= i.age_days(jetzt) <= lookback for i in datiert)
     b.titelprobe = [i.title for i in items[:3]]
 
     # --- Kriterium 2: genug Meldungen
