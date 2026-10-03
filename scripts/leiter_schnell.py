@@ -2,7 +2,9 @@
 
 Stufe 4 wählt die Tests, die ein geändertes Modul direkt importieren, ohne die
 Marker ``browser``, ``langsam``, ``golden`` und ``netz``; als langsam zählt auch
-jeder Test, der im letzten Volllauf länger als ``LANGSAM_SEKUNDEN`` lief.
+jeder Test, der im letzten Volllauf länger als ``LANGSAM_SEKUNDEN`` lief. Von den
+gemessenen Tests laufen die schnellsten, bis ``TESTBUDGET_SEKUNDEN`` gefüllt ist,
+Tests geänderter Testdateien zuerst; den Rest prüft Stufe 5 im pre-push.
 Vorlagen, ``style.css`` und ``app.js`` ziehen die Tests mit Marker ``seite`` und die,
 die ``report.html`` importieren. ``config/``, ``pyproject.toml``,
 ``requirements*.txt`` und jede ``conftest.py`` betreffen alle Tests; das prüft
@@ -28,7 +30,8 @@ import waechter_speicher
 from leiter_befunde import WURZEL, Ergebnis, neue_befunde, ruff_befunde
 from waechter import lies_zaehlbasis
 
-PARALLEL_AB_SEKUNDEN = 10.0
+PARALLEL_AB_SEKUNDEN = 4.0
+TESTBUDGET_SEKUNDEN = 8.0
 KAPPE_SEKUNDEN = 45
 ZEITEN = ".pruefleiter/testzeiten.json"
 ABGEBROCHEN = f"abgebrochen nach {KAPPE_SEKUNDEN} s"
@@ -158,16 +161,38 @@ def _merkmale(text: str) -> list[str]:
         return [KAPUTT]
 
 
-def schaetzung(dateien: Iterable[str], zeiten: Mapping[str, float]) -> float:
+def schaetzung(
+    dateien: Iterable[str], zeiten: Mapping[str, float], abgewaehlt: Iterable[str]
+) -> float:
     """Summiert die gemessene Laufzeit der Tests, die Stufe 4 laufen lässt.
 
-    Langsame Tests zählen nicht, eine Datei ohne Messung zählt eine Sekunde.
+    Wie in ``abwahl`` kostet der erste laufende Test einer Datei ihren Einstieg
+    (``einstiege``), eine Datei ohne Messung ``UNBEKANNT_SEKUNDEN``.
     """
+    gewaehlt, ohne = list(dateien), set(abgewaehlt)
+    einstieg = einstiege(gewaehlt, zeiten)
     summe = 0.0
-    for datei in dateien:
-        eigene = [s for t, s in zeiten.items() if t.partition("::")[0] == datei]
-        summe += sum(s for s in eigene if s <= LANGSAM_SEKUNDEN) if eigene else 1.0
+    for datei in gewaehlt:
+        eigene = {t: s for t, s in zeiten.items() if t.partition("::")[0] == datei}
+        behalten = sorted(s for t, s in eigene.items() if t not in ohne)
+        if not eigene:
+            summe += UNBEKANNT_SEKUNDEN
+        elif behalten:
+            summe += max(einstieg[datei], behalten[0]) + sum(behalten[1:])
     return summe
+
+
+def einstiege(dateien: Iterable[str], zeiten: Mapping[str, float]) -> dict[str, float]:
+    """Gibt je Datei den teuersten Test bis ``LANGSAM_SEKUNDEN``: so viel kostet ihr
+    erster Test, weil er die gemeinsamen Fixtures der Datei aufbaut."""
+    gewaehlt = set(dateien)
+    einstieg: dict[str, float] = {}
+    for nodeid, sekunden in zeiten.items():
+        datei = nodeid.partition("::")[0]
+        if datei in gewaehlt:
+            schnell = sekunden if sekunden <= LANGSAM_SEKUNDEN else 0.0
+            einstieg[datei] = max(einstieg.get(datei, 0.0), schnell)
+    return einstieg
 
 
 def langsame(dateien: Iterable[str], zeiten: Mapping[str, float]) -> list[str]:
@@ -181,6 +206,38 @@ def langsame(dateien: Iterable[str], zeiten: Mapping[str, float]) -> list[str]:
         for t, s in zeiten.items()
         if s > LANGSAM_SEKUNDEN and t.partition("::")[0] in gewaehlt
     )
+
+
+def abwahl(
+    dateien: Iterable[str], zeiten: Mapping[str, float], vorrang: Iterable[str] = ()
+) -> list[str]:
+    """Gibt die gemessenen Tests der Dateien, die Stufe 4 nicht laufen lässt.
+
+    Das sind die langsamen und alle, die nach den schnellsten nicht mehr in
+    ``TESTBUDGET_SEKUNDEN`` passen; Tests der Dateien in ``vorrang`` kommen zuerst.
+    Der erste Test einer Datei kostet ihren Einstieg (``einstiege``). Ungemessene
+    Tests laufen immer, weil sie sich nicht abwählen lassen; eine ungemessene Datei
+    belegt vorab ``UNBEKANNT_SEKUNDEN``. Was hier fehlt, prüft Stufe 5 im pre-push.
+    """
+    gewaehlt, zuerst = set(dateien), set(vorrang)
+    lang = set(langsame(gewaehlt, zeiten))
+    einstieg = einstiege(gewaehlt, zeiten)
+    kandidaten = sorted(
+        (t.partition("::")[0] not in zuerst, s, t)
+        for t, s in zeiten.items()
+        if t.partition("::")[0] in gewaehlt and t not in lang
+    )
+    summe = UNBEKANNT_SEKUNDEN * len(gewaehlt - set(einstieg))
+    betreten, ueber = set[str](), list[str]()
+    for _, sekunden, nodeid in kandidaten:
+        datei = nodeid.partition("::")[0]
+        kosten = sekunden if datei in betreten else max(einstieg[datei], sekunden)
+        if summe + kosten > TESTBUDGET_SEKUNDEN:
+            ueber.append(nodeid)
+        else:
+            summe += kosten
+            betreten.add(datei)
+    return sorted(lang | set(ueber))
 
 
 def lies_testzeiten(datei: Path) -> dict[str, float]:
@@ -301,9 +358,15 @@ def stufe_betroffen(
     if not auswahl.dateien:
         return Ergebnis("4 Betroffen", True, hinweise=hinweise)
     gemessen = lies_testzeiten(zeiten)
-    geschaetzt = schaetzung(auswahl.dateien, gemessen)
-    abwahl = langsame(auswahl.dateien, gemessen)
-    befehl = pytest_befehl(auswahl.dateien, geschaetzt, abwahl)
+    vorrang = [d for d in dateien if d in auswahl.dateien]
+    abgewaehlt = abwahl(auswahl.dateien, gemessen, vorrang)
+    geschaetzt = schaetzung(auswahl.dateien, gemessen, abgewaehlt)
+    if abgewaehlt:
+        hinweise.append(
+            f"Stufe 4: {len(abgewaehlt)} langsame oder über {TESTBUDGET_SEKUNDEN:g} s"
+            " Budget, Stufe 5 im pre-push"
+        )
+    befehl = pytest_befehl(auswahl.dateien, geschaetzt, abgewaehlt)
     ergebnis = lauf(log, befehl, {"COLUMNS": "1000"}, KAPPE_SEKUNDEN)
     if ergebnis.returncode == -signal.SIGKILL and ABGEBROCHEN in ergebnis.stderr:
         hinweise.append(

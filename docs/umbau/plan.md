@@ -28,7 +28,7 @@ Billig vor teuer, Abbruch bei der ersten roten Stufe. Zeitziele für den M4 Pro.
 | 1 Lint | `ruff check` | nur neue Befunde gegen `pruef/ruff-basis.json` | < 2 s |
 | 2 Typen | `mypy` | Fehler je Datei und Code gegen `pruef/mypy-basis.txt` (237, ohne Zeilen) | 10–20 s |
 | 3 Schichten | `lint-imports` | Verträge unten | < 3 s |
-| 4 Betroffen | `pytest` | Tests, die ein geändertes Modul direkt importieren, ohne `browser`/`langsam`/`golden`; ab 10 s Schätzung `-n 4`, Kappe 45 s ist Warnung | < 15 s |
+| 4 Betroffen | `pytest` | Tests, die ein geändertes Modul direkt importieren, ohne `browser`/`langsam`/`golden`; davon die schnellsten bis 8 s gemessener Testzeit (Fixture-Aufbau je Datei eingerechnet, geänderte Testdateien zuerst), den Rest prüft Stufe 5 im pre-push; ab 4 s Schätzung `-n 4`, Kappe 45 s ist Warnung | < 5 s |
 | 5 Voll | `pytest -n auto --dist worksteal` | alles außer `netz` | < 4 min (gerechnet 2,3) |
 
 Vorlagen, `style.css`, `app.js` ziehen Marker `seite` in Stufe 4; `config/`, `pyproject.toml`, `conftest.py` springen in Stufe 5. Ausgabe: Grün eine Zeile, Rot höchstens 60 (Stufe, Datei:Zeile, Erwartung, Ergebnis); volles Log in `.pruefleiter/letzter-lauf.log`, Zeiten in `.pruefleiter/zeiten.csv`. pre-commit = `--schnell` (0, 1, 4 auf vorgemerkten Dateien, Budget 30 s), pre-push = `--voll` und verlangt, dass HEAD `origin/main` enthält.

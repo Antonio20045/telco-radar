@@ -110,18 +110,110 @@ def test_konfiguration_betrifft_alle_tests(projekt, pfad):
     assert leiter_schnell.betroffene(projekt, [pfad]).alle == [pfad]
 
 
-def test_schaetzung_ohne_langsame_tests_und_mit_einer_sekunde_je_unbekannter_datei():
+def test_schaetzung_ohne_langsame_tests_und_mit_einer_sekunde_je_unbekannter_datei(
+    monkeypatch,
+):
+    monkeypatch.setattr(leiter_schnell, "TESTBUDGET_SEKUNDEN", 100.0)
     zeiten = {
         "tests/test_a.py::eins": 2.5,
         "tests/test_a.py::zwei": 5.0,
         "tests/test_a.py::lang": 5.1,
         "tests/test_b.py::fremd": 9.0,
     }
-    assert leiter_schnell.schaetzung(["tests/test_a.py", "tests/neu.py"], zeiten) == (
-        8.5
-    )
+    dateien = ["tests/test_a.py", "tests/neu.py"]
+    abwahl = leiter_schnell.abwahl(dateien, zeiten)
+    assert abwahl == ["tests/test_a.py::lang"]
+    # Der erste laufende Test von test_a kostet den teuersten schnellen
+    # (Fixture-Aufbau), der zweite seine eigene Zeit, die neue Datei eine Sekunde.
+    assert leiter_schnell.schaetzung(dateien, zeiten, abwahl) == 5.0 + 5.0 + 1.0
     assert leiter_schnell.langsame(["tests/test_a.py"], zeiten) == [
         "tests/test_a.py::lang"
+    ]
+
+
+def test_ueber_dem_budget_laufen_die_schnellsten_und_der_rest_im_pre_push(
+    monkeypatch,
+):
+    monkeypatch.setattr(leiter_schnell, "TESTBUDGET_SEKUNDEN", 1.0)
+    zeiten = {
+        "tests/test_a.py::eins": 0.4,
+        "tests/test_a.py::zwei": 0.5,
+        "tests/test_a.py::drei": 0.3,
+        "tests/test_a.py::lang": 5.1,
+        "tests/test_b.py::fremd": 0.1,
+    }
+    # Der Einstieg in test_a kostet 0,5 s (teuerster schnelle Test); der langsame
+    # läuft ohnehin nicht und sperrt die übrigen nicht.
+    abwahl = leiter_schnell.abwahl(["tests/test_a.py"], zeiten)
+    assert abwahl == ["tests/test_a.py::lang", "tests/test_a.py::zwei"]
+    assert leiter_schnell.schaetzung(["tests/test_a.py"], zeiten, abwahl) == 0.9
+
+
+def test_teurer_fixture_aufbau_nimmt_die_ganze_datei_aus_dem_budget(monkeypatch):
+    monkeypatch.setattr(leiter_schnell, "TESTBUDGET_SEKUNDEN", 1.0)
+    zeiten = {
+        "tests/test_seite.py::aufbau": 4.0,
+        "tests/test_seite.py::billig": 0.01,
+        "tests/test_logik.py::eins": 0.2,
+    }
+    dateien = ["tests/test_logik.py", "tests/test_seite.py"]
+    assert leiter_schnell.abwahl(dateien, zeiten) == [
+        "tests/test_seite.py::aufbau",
+        "tests/test_seite.py::billig",
+    ]
+
+
+def test_ein_langsamer_test_sperrt_die_schnellen_seiner_datei_nicht(monkeypatch):
+    monkeypatch.setattr(leiter_schnell, "TESTBUDGET_SEKUNDEN", 1.0)
+    zeiten = {"tests/test_a.py::lang": 30.0, "tests/test_a.py::schnell": 0.2}
+    assert leiter_schnell.abwahl(["tests/test_a.py"], zeiten) == [
+        "tests/test_a.py::lang"
+    ]
+
+
+def test_ungemessene_dateien_belegen_vorab_budget(monkeypatch):
+    monkeypatch.setattr(leiter_schnell, "TESTBUDGET_SEKUNDEN", 1.5)
+    zeiten = {"tests/test_a.py::eins": 0.6}
+    assert leiter_schnell.abwahl(["tests/test_a.py"], zeiten) == []
+    dateien = ["tests/test_a.py", "tests/test_neu.py"]
+    assert leiter_schnell.abwahl(dateien, zeiten) == ["tests/test_a.py::eins"]
+
+
+def test_geaenderte_testdateien_gehen_im_budget_vor(monkeypatch):
+    monkeypatch.setattr(leiter_schnell, "TESTBUDGET_SEKUNDEN", 1.0)
+    zeiten = {"tests/test_alt.py::a": 0.1, "tests/test_neu.py::b": 0.95}
+    dateien = ["tests/test_alt.py", "tests/test_neu.py"]
+    assert leiter_schnell.abwahl(dateien, zeiten) == ["tests/test_neu.py::b"]
+    vorrang = ["tests/test_neu.py"]
+    assert leiter_schnell.abwahl(dateien, zeiten, vorrang) == ["tests/test_alt.py::a"]
+
+
+def test_stufe_vier_laesst_die_geaenderte_testdatei_zuerst_laufen(projekt, monkeypatch):
+    monkeypatch.setattr(leiter_schnell, "TESTBUDGET_SEKUNDEN", 1.0)
+    zeiten = projekt / "zeiten.json"
+    gemessen = {"tests/test_html.py::a": 0.95, "tests/test_modelle.py::b": 0.1}
+    zeiten.write_text(json.dumps({"tests": gemessen}), "utf-8")
+    lauf, aufrufe = _lauf_mit(0)
+    geaendert = ["src/telco_radar/models.py", "tests/test_html.py"]
+    leiter_schnell.stufe_betroffen(None, lauf, projekt, geaendert, zeiten)
+    assert "--deselect=tests/test_modelle.py::b" in aufrufe[0][0]
+    assert "--deselect=tests/test_html.py::a" not in aufrufe[0][0]
+
+
+def test_stufe_vier_waehlt_ueber_dem_budget_ab_und_sagt_es(projekt, monkeypatch):
+    monkeypatch.setattr(leiter_schnell, "TESTBUDGET_SEKUNDEN", 0.5)
+    zeiten = projekt / "zeiten.json"
+    zeiten.write_text(
+        json.dumps({"tests": {"tests/test_modelle.py::test_a": 0.6}}), "utf-8"
+    )
+    lauf, aufrufe = _lauf_mit(0)
+    ergebnis = leiter_schnell.stufe_betroffen(
+        None, lauf, projekt, ["src/telco_radar/models.py"], zeiten
+    )
+    assert ergebnis.gruen
+    assert "--deselect=tests/test_modelle.py::test_a" in aufrufe[0][0]
+    assert ergebnis.hinweise == [
+        "Stufe 4: 1 langsame oder über 0.5 s Budget, Stufe 5 im pre-push"
     ]
 
 
@@ -136,9 +228,9 @@ def test_kaputte_zeitdatei_heisst_keine_messung(tmp_path):
     assert leiter_schnell.lies_testzeiten(tmp_path / "fehlt.json") == {}
 
 
-def test_ab_zehn_sekunden_schaetzung_mit_vier_workern():
-    assert leiter_schnell.pytest_befehl(["t.py"], 9.9)[-3:] == ["-n", "0", "t.py"]
-    assert leiter_schnell.pytest_befehl(["t.py"], 10.0)[-3:] == ["-n", "4", "t.py"]
+def test_ab_vier_sekunden_schaetzung_mit_vier_workern():
+    assert leiter_schnell.pytest_befehl(["t.py"], 3.9)[-3:] == ["-n", "0", "t.py"]
+    assert leiter_schnell.pytest_befehl(["t.py"], 4.0)[-3:] == ["-n", "4", "t.py"]
     befehl = leiter_schnell.pytest_befehl(["t.py"], 1.0)
     auswahl = "not browser and not langsam and not golden and not netz"
     assert befehl[befehl.index(auswahl) - 1] == "-m"
