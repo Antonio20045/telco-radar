@@ -21,6 +21,7 @@ from functools import partial
 from pathlib import Path
 
 from waechter_leck import lecks
+from waechter_pruefrumpf import leere_tests
 from waechter_regeln import (
     Schluessel,
     anker_aus_text,
@@ -82,6 +83,7 @@ def pruefe(
         if (wurzel / name).exists()
     ]
     rot += lecks(wurzel)
+    rot += leere_tests(wurzel)
     paare = [
         (RIESEN_BASIS, riesendateien(wurzel)),
         (PRIVAT_BASIS, privat),

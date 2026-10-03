@@ -41,6 +41,7 @@ HERMETIK_ERLAUBT = frozenset({"tests/test_hermetik.py", "tests/test_pruefleiter.
 PLAYWRIGHT_START = frozenset({"sync_playwright", "async_playwright"})
 VERSTECKT = "test-versteckt"
 SETZEN = frozenset({"setattr", "delattr"})
+NAMENSRAEUME = frozenset({"globals", "vars", "locals"})
 VERSTECK_NAMEN = frozenset({"__test__", "allow_module_level"})
 # Vorgabe von pytest für norecursedirs und python_files.
 NICHT_GESAMMELT = ("*.egg", ".*", "_darcs", "build", "CVS", "dist", "node_modules")
@@ -115,8 +116,19 @@ def _versteck_codes(baum: ast.AST) -> list[str]:
         for alias in knoten.names
         if alias.name.rsplit(".", 1)[-1].startswith("test")
     }
+    module |= {
+        knoten.name
+        for knoten in ast.walk(baum)
+        if isinstance(knoten, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef)
+        and knoten.name.lower().startswith("test")
+    }
     codes = [VERSTECKT] * sum(map(lambda k: _ueberschreibt(k, module), ast.walk(baum)))
     for knoten in ast.walk(baum):
+        if (
+            isinstance(knoten, ast.Call)
+            and getattr(knoten.func, "id", None) in NAMENSRAEUME
+        ):
+            codes.append(VERSTECKT)
         name = getattr(knoten, "id", None) or getattr(knoten, "attr", None)
         if isinstance(knoten, ast.Constant) and isinstance(knoten.value, str):
             name = knoten.value
@@ -130,7 +142,8 @@ def _versteck_codes(baum: ast.AST) -> list[str]:
 
 
 def _ueberschreibt(knoten: ast.AST, module: set[str]) -> bool:
-    """Eine Zuweisung, Löschung oder ``setattr`` an einem importierten Testmodul."""
+    """Eine Zuweisung, Löschung oder ``setattr`` an einem Testmodul, einer Testfunktion
+    oder einem Modul aus ``sys.modules``."""
     ziele: list[ast.expr] = []
     if isinstance(knoten, ast.Assign | ast.Delete):
         ziele = list(knoten.targets)
@@ -140,8 +153,19 @@ def _ueberschreibt(knoten: ast.AST, module: set[str]) -> bool:
         name = getattr(knoten.func, "id", None) or getattr(knoten.func, "attr", "")
         ziele = [ast.Attribute(knoten.args[0])] if name in SETZEN else []
     return any(
-        isinstance(z, ast.Attribute) and getattr(z.value, "id", None) in module
+        (isinstance(z, ast.Name) and z.id in module)
+        or (
+            isinstance(z, ast.Attribute)
+            and (getattr(z.value, "id", None) in module or _sys_modules(z.value))
+        )
         for z in ziele
+    )
+
+
+def _sys_modules(ausdruck: ast.expr) -> bool:
+    """Ein Ausdruck, der in ``sys.modules`` greift."""
+    return any(
+        isinstance(k, ast.Attribute) and k.attr == "modules" for k in ast.walk(ausdruck)
     )
 
 

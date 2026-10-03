@@ -54,11 +54,24 @@ GIT_OPTIONEN_MIT_WERT = frozenset({"-c", "-C", "--git-dir", "--work-tree"})
 ALLE_ZIELE = frozenset(
     {"rm", "mv", "tee", "truncate", "touch", "chmod", "chown", "mkdir", "unlink"}
     | {"rmdir", "shred", "patch"}
+    | {"ed", "ex", "vi", "vim", "nvim", "emacs", "nano"}
 )
 LETZTES_ZIEL = frozenset({"cp", "ln", "install", "rsync"})
-ZIEL_OPTIONEN = ("--target-directory=", "--output=", "-t")
+ZIEL_OPTIONEN = {
+    "cp": ("-t", "--target-directory"),
+    "mv": ("-t", "--target-directory"),
+    "ln": ("-t", "--target-directory"),
+    "install": ("-t", "--target-directory"),
+    "git": ("--output",),
+    "curl": ("-o", "--output", "--output-dir"),
+    "wget": ("-O", "--output-document", "-P", "--directory-prefix"),
+    "tar": ("-C", "--directory"),
+    "unzip": ("-d",),
+}
+HIER_AUSPACKEN = frozenset({"tar", "unzip", "wget", "curl"})
 LOESCHT = frozenset({"-delete", "-exec", "-execdir", "-fprint", "-fprintf", "-fls"})
-IM_ORT = frozenset({"sed", "perl"})
+IM_ORT = frozenset({"sed", "perl", "ruby"})
+UNBERECHENBAR = frozenset({"eval", "source", ".", "exec"})
 UMLEITUNG = frozenset({">", ">>", ">|", "&>", "&>>"})
 KEIN_ZIEL = frozenset({"/dev/null", "/dev/stdout", "/dev/stderr"})
 TRENNZEICHEN = frozenset(";&|()\n")
@@ -66,6 +79,9 @@ INTERPRETER = re.compile(r"^(python3?(\.\d+)?|perl|ruby|node|sh|bash|zsh)$")
 AWK = frozenset({"awk", "gawk", "mawk"})
 SCHREIB_API = re.compile(
     r"write|open\(|unlink|rename|replace|rmtree|remove|shutil|truncate|chmod|symlink"
+    r"|subprocess|system|exec|popen|spawn|fork|__import__|importlib|pathlib|Path\b"
+    r"|eval|compile|getattr|ctypes|pty|os\.",
+    re.IGNORECASE,
 )
 GIT_SPERREN = tuple(
     f"Bash(git {befehl}*)"
@@ -225,13 +241,41 @@ def _schreibziele(befehl: list[str]) -> list[str]:
         ziele += [a[3:] for a in argumente if a.startswith("of=")]
     elif name == "find" and LOESCHT & set(argumente):
         ziele += pfade
-    for stelle, wort in enumerate(argumente):
-        for option in ZIEL_OPTIONEN:
-            if wort.startswith(option) and wort != option:
-                ziele.append(wort[len(option) :])
-            elif wort == option.rstrip("=") and stelle + 1 < len(argumente):
-                ziele.append(argumente[stelle + 1])
+    optionen = _optionswerte(argumente, ZIEL_OPTIONEN.get(name, ()))
+    ziele += optionen
+    if name in HIER_AUSPACKEN and not optionen and _packt_hier_aus(name, argumente):
+        ziele.append(".")
     return ziele
+
+
+def _optionswerte(argumente: list[str], optionen: tuple[str, ...]) -> list[str]:
+    werte = []
+    for stelle, wort in enumerate(argumente):
+        for option in optionen:
+            kurz = len(option) == 2 and not wort.startswith("--")
+            gebuendelt = kurz and wort.startswith("-") and wort.endswith(option[1])
+            if (wort == option or gebuendelt) and stelle + 1 < len(argumente):
+                werte.append(argumente[stelle + 1])
+            elif option.startswith("--") and wort.startswith(option + "="):
+                werte.append(wort[len(option) + 1 :])
+            elif len(option) == 2 and wort.startswith(option) and len(wort) > 2:
+                werte.append(wort[2:])
+    return werte
+
+
+def _packt_hier_aus(name: str, argumente: list[str]) -> bool:
+    if name == "tar":
+        modus = next((a for a in argumente if not a.startswith("--")), "")
+        return "x" in modus or bool({"--extract", "--get"} & set(argumente))
+    if name == "curl":
+        return any(
+            a in {"-O", "--remote-name", "--remote-name-all"}
+            or (a.startswith("-") and not a.startswith("--") and "O" in a)
+            for a in argumente
+        )
+    if name == "unzip":
+        return not {"-l", "-t", "-v", "-Z", "-p", "-z"} & set(argumente)
+    return True
 
 
 def befehl_verstoss(
@@ -243,8 +287,15 @@ def befehl_verstoss(
 ) -> str | None:
     """PreToolUse Bash einer Rolle: kein schreibendes Git, kein Schreiben außerhalb
     der Rolle über Umleitung, Dateibefehl oder eingebetteten Interpretercode."""
+    if "`" in text or "$(" in text or "<(" in text or ">(" in text:
+        return f"Rolle {ziel.rolle}: Befehlsersetzung ist gesperrt; schreib sie aus"
     for befehl in filter(None, map(_ohne_vorsatz, _befehle(text))):
         name = Path(befehl[0]).name
+        if name in UNBERECHENBAR or any(z in befehl[0] for z in "$`"):
+            return (
+                f"Rolle {ziel.rolle}: ein Befehl aus Variable, Ersetzung oder eval"
+                " ist gesperrt; schreib ihn aus"
+            )
         if name == "git":
             unter = _git_unterbefehl(befehl[1:])
             if unter not in GIT_LESEN:

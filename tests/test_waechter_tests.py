@@ -131,7 +131,7 @@ def test_vor_pytest_versteckter_test_zaehlt(projekt, name, text):
 
     zaehlung = _zaehle(projekt, text, name)
 
-    assert zaehlung == {(name, "test-versteckt"): 1}
+    assert set(zaehlung) == {(name, "test-versteckt")}
 
 
 @pytest.mark.parametrize(
@@ -166,3 +166,19 @@ def test_ueberschriebenes_testmodul_zaehlt(projekt, text):
 def test_gelesenes_testmodul_zaehlt_nicht(projekt):
     text = "from test_alt import HEUTE\nimport test_b\n\nX = getattr(test_b, 'Y')\n"
     assert _zaehle(projekt, text) == {}
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "def test_a():\n    assert 0\n\n\nglobals()['test_a'] = lambda *a: None\n",
+        "def test_a():\n    assert 0\n\n\nglobals()['__te' + 'st__'] = False\n",
+        "def test_a():\n    assert 0\n\n\nvars()['test_a'] = None\n",
+        "def test_a():\n    assert 0\n\n\ntest_a = lambda: None\n",
+        "def test_a():\n    assert 0\n\n\nsetattr(test_a, '__te' + 'st__', False)\n",
+        "import sys\n\nsetattr(sys.modules[__name__], 'test_a', None)\n",
+        "import sys\n\nsys.modules['test_alt'].test_a = None\n",
+    ],
+)
+def test_umgebogener_namensraum_zaehlt(projekt, text):
+    assert ("tests/test_x.py", "test-versteckt") in _zaehle(projekt, text)
