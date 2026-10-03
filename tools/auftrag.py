@@ -9,7 +9,6 @@ der Auftrag mit einer Notiz unter ``outputs/auftraege/``; ein grüner Auftrag ko
 from __future__ import annotations
 
 import argparse
-import hashlib
 import importlib
 import json
 import os
@@ -30,6 +29,7 @@ pruefstempel = importlib.import_module("pruefstempel")
 format_ = importlib.import_module("auftrag_format")
 pruefer_ = importlib.import_module("auftrag_pruefer")
 rolle_ = importlib.import_module("claude_rolle")
+git_ = importlib.import_module("auftrag_git")
 AUFTRAEGE, KOSTEN, GEMERGT = format_.AUFTRAEGE, format_.KOSTEN, format_.GEMERGT
 
 RUNDEN = 2
@@ -48,6 +48,8 @@ LAUFDATEIEN = {
     "TELCO_AUFTRAG": "auftrag.json",
 }
 ROT_BELEG = "rot.txt"
+BASEN = "pruef/"
+SPERRE = "main.sperre"
 FACHLICH = re.compile(r"\bAssertionError\b|\bFailed: ")
 GRUEN = 0
 TESTS_ROT = 1
@@ -72,6 +74,7 @@ class Lauf:
     auftrag: dict
     agent: list[str]
     zeilen: list[dict[str, object]] = field(default_factory=list)
+    start: str = ""
 
     @property
     def wt(self) -> Path:
@@ -194,23 +197,20 @@ def _agent(
     return code, bericht
 
 
-def _geaendert(ort: Path) -> tuple[list[str], list[str]]:
-    alt = _git(ort, "diff", "--name-only", "HEAD").split()
-    return alt, _git(ort, "ls-files", "--others", "--exclude-standard").split()
-
-
 def _ausserhalb(lauf: Lauf, rolle: str) -> str:
-    alt, neu = _geaendert(lauf.wt)
+    alt, neu = git_.geaendert(lauf.wt, lauf.start)
     ziel = rolle_.Ziel(rolle, lauf.auftrag["bereich"], lauf.auftrag["abnahme"])
     fremd = [p for p in alt + neu if rolle_.verstoss(ziel, lauf.wt, Path(p), p in neu)]
+    if git_.kopf(lauf.wt) != (f"refs/heads/{ZWEIG}{lauf.auftrag['id']}", lauf.start):
+        fremd.append("HEAD (eigener Commit oder Zweig)")
     return f"Rolle {rolle} darf nicht ändern: {', '.join(sorted(fremd))}" * bool(fremd)
 
 
 def _pruefer(lauf: Lauf, runde: int) -> str:
     ordner = Path(tempfile.mkdtemp(prefix=f"pruefer-{lauf.auftrag['id']}-"))
-    vorher = _geaendert(lauf.wt), _git(lauf.wt, "diff", "HEAD")
+    vorher = git_.stand(lauf.wt, lauf.start)
     code, bericht = _agent(lauf, "pruefer", runde, "", TELCO_PRUEFER_ORDNER=str(ordner))
-    if (_geaendert(lauf.wt), _git(lauf.wt, "diff", "HEAD")) != vorher:
+    if git_.stand(lauf.wt, lauf.start) != vorher:
         return "Prüfer hat den Worktree geändert"
     urteil = pruefer_.urteilen(bericht, ordner, lauf.wt)
     lauf.datei(f"pruefer-{runde}-urteil.txt").write_text(urteil.protokoll, "utf-8")
@@ -246,30 +246,18 @@ def _testphase(lauf: Lauf) -> str:
     return f"Abnahmetest nach {TESTVERSUCHE} Versuchen nicht wie verlangt:\n{befund}"
 
 
-def _pruefsumme(lauf: Lauf) -> str:
-    datei = lauf.wt / lauf.auftrag["abnahme"]
-    return hashlib.sha256(datei.read_bytes()).hexdigest() if datei.is_file() else ""
-
-
 def _commit(lauf: Lauf, titel: str, dateien: list[str]) -> str:
     _git(lauf.wt, "add", "--", *dateien)
     code, ausgabe = _ausfuehren(["git", "commit", "-q", "-m", titel], lauf.wt)
     return f"Commit abgelehnt (Exit {code})\n{_tail(ausgabe)}" if code else ""
 
 
-def _produktzeilen(ort: Path) -> int:
-    zahlen = _git(ort, "diff", "--numstat", "HEAD", "--", "src").splitlines()
-    neu = _git(ort, "ls-files", "--others", "--exclude-standard", "--", "src").split()
-    anzahl = sum(int(z.split("\t")[0]) for z in zahlen if z.split("\t")[0].isdigit())
-    return anzahl + sum(len((ort / p).read_bytes().splitlines()) for p in neu)
-
-
 def _urteil(lauf: Lauf, runde: int, code: int, summe: str) -> str:
-    alt, neu = _geaendert(lauf.wt)
-    zeilen = _produktzeilen(lauf.wt)
+    alt, neu = git_.geaendert(lauf.wt, lauf.start)
+    zeilen = git_.produktzeilen(lauf.wt, lauf.start)
     if code:
         return f"Agent Exit {code}"
-    if _pruefsumme(lauf) != summe:
+    if git_.pruefsumme(lauf.wt / lauf.auftrag["abnahme"]) != summe:
         return "Abnahmetest geändert oder gelöscht"
     if fremd := _ausserhalb(lauf, "bau"):
         return fremd
@@ -295,7 +283,7 @@ def _urteil(lauf: Lauf, runde: int, code: int, summe: str) -> str:
 
 
 def _bauphase(lauf: Lauf) -> tuple[Ende, list[str]]:
-    summe, befunde = _pruefsumme(lauf), [""]
+    summe, befunde = git_.pruefsumme(lauf.wt / lauf.auftrag["abnahme"]), [""]
     voraussetzung = lauf.datei(LAUFDATEIEN["TELCO_VORAUSSETZUNG"])
     for runde in range(1, RUNDEN + 1):
         code, _ = _agent(lauf, "bau", runde, befunde[-1])
@@ -308,7 +296,15 @@ def _bauphase(lauf: Lauf) -> tuple[Ende, list[str]]:
 
 
 def _zusammenfuehren(lauf: Lauf) -> tuple[Ende, list[str]]:
-    zweig = ZWEIG + lauf.auftrag["id"]
+    """Merge, Leiter und Basen-Commit laufen für alle Aufträge nacheinander."""
+    with git_.sperre(lauf.datei("").parent / SPERRE):
+        return _unter_sperre(lauf)
+
+
+def _unter_sperre(lauf: Lauf) -> tuple[Ende, list[str]]:
+    zweig, frei = ZWEIG + lauf.auftrag["id"], AUFTRAEGE + "/"
+    if befund := git_.hauptbaum_befund(lauf.wurzel, frei):
+        return Ende.ABGEBROCHEN, [befund]
     code, ausgabe = _ausfuehren(["git", "rebase", "main"], lauf.wt)
     if code:
         _ausfuehren(["git", "rebase", "--abort"], lauf.wt)
@@ -323,18 +319,19 @@ def _zusammenfuehren(lauf: Lauf) -> tuple[Ende, list[str]]:
     code, ausgabe = _ausfuehren(["git", "merge", "--ff-only", "-q", zweig], lauf.wurzel)
     if code:
         return Ende.NOTIZ, [f"merge --ff-only gescheitert\n{_tail(ausgabe)}"]
+    gemergt = git_.kopf(lauf.wurzel)[1]
     code, ausgabe = _leiter(lauf.wurzel, "voll")
-    if code != GRUEN:
-        zurueck = _ausfuehren(["git", "reset", "--keep", vorher], lauf.wurzel)
+    basen = git_.schmutz(lauf.wurzel, frei)
+    if code != GRUEN or (fremd := [p for p in basen if not p.startswith(BASEN)]):
+        grund = f"Leiter änderte {', '.join(fremd)}" if not code else "Leiter rot"
+        zurueck = (1, "main hat sich während der Leiter bewegt, nicht zurückgesetzt")
+        if git_.kopf(lauf.wurzel)[1] == gemergt:
+            zurueck = _ausfuehren(["git", "reset", "--keep", vorher], lauf.wurzel)
         rueck = f"main zurück auf {vorher[:7]}" if not zurueck[0] else zurueck[1]
-        return Ende.MAIN_ROT, [f"volle Leiter auf main rot; {rueck}\n{_tail(ausgabe)}"]
-    basen = [z[3:] for z in _git(lauf.wurzel, "status", "--porcelain").splitlines()]
+        return Ende.MAIN_ROT, [f"{grund} auf main; {rueck}\n{_tail(ausgabe)}"]
     if basen:
-        _git(lauf.wurzel, "add", "--", *basen)
         titel = f"auftrag({lauf.auftrag['id']}): Basen der Leiter"
-        code, ausgabe = _ausfuehren(["git", "commit", "-q", "-m", titel], lauf.wurzel)
-        if code:
-            return Ende.ABGEBROCHEN, [f"Basen nicht committet\n{_tail(ausgabe)}"]
+        git_.committen(lauf.wurzel, titel, basen)
     _git(lauf.wurzel, "worktree", "remove", "--force", str(lauf.wt))
     _git(lauf.wurzel, "branch", "-d", zweig)
     return Ende.GEMERGT, []
@@ -343,6 +340,7 @@ def _zusammenfuehren(lauf: Lauf) -> tuple[Ende, list[str]]:
 def _ablauf(lauf: Lauf) -> tuple[Ende, list[str]]:
     zweig = ZWEIG + lauf.auftrag["id"]
     _git(lauf.wurzel, "worktree", "add", "-q", "-b", zweig, str(lauf.wt), "main")
+    lauf.start = _git(lauf.wt, "rev-parse", "HEAD").strip()
     code, ausgabe = _ausfuehren(["make", "venv"], lauf.wt)
     if code:
         return Ende.VORAUSSETZUNG, [f"make venv: Exit {code}\n{_tail(ausgabe)}"]

@@ -39,7 +39,25 @@ LEITER = f"""import os, subprocess, sys
 from pathlib import Path
 sys.path.insert(0, {str(SKRIPTE)!r})
 import pruefstempel
-if sys.argv[1] == "--voll" and os.environ.get("ERSATZ_VOLL_ROT"):
+voll = sys.argv[1] == "--voll"
+if voll and os.environ.get("ERSATZ_SPERRE"):
+    import fcntl
+    with open(os.environ["ERSATZ_SPERRE"], "a") as sperre:
+        try:
+            fcntl.flock(sperre, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            sys.exit(1)
+        except BlockingIOError:
+            pass
+if voll and os.environ.get("ERSATZ_MENSCH"):
+    Path("mensch.txt").write_text("vom Menschen")
+    subprocess.run(["git", "add", "mensch.txt"], check=True)
+    subprocess.run(["git", "commit", "-qm", "Mensch"], check=True)
+if voll and os.environ.get("ERSATZ_BASIS"):
+    Path("pruef").mkdir(exist_ok=True)
+    Path("pruef/basis ä.txt").write_text("1\\n")
+if voll and os.environ.get("ERSATZ_FREMD"):
+    Path("scripts/fremd.txt").write_text("von der Leiter")
+if voll and os.environ.get("ERSATZ_VOLL_ROT"):
     sys.exit(1)
 befehl = [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", "tests"]
 code = subprocess.run(befehl).returncode
@@ -48,7 +66,7 @@ if code == 0 and sys.argv[1] == "--voll":
 sys.exit(code)
 """
 
-ERSATZAGENT = """import json, os, sys
+ERSATZAGENT = """import json, os, subprocess, sys
 from pathlib import Path
 modus, rolle = sys.argv[1], os.environ["TELCO_ROLLE"]
 sys.stdin.read()
@@ -96,6 +114,23 @@ elif modus == "leiter":
 elif modus == "testaendern":
     Path("tests/test_basis.py").write_text("def test_basis():\\n    assert 1\\n")
 else:
+    if modus == "selbstcommit":
+        Path("scripts/pruefleiter.py").write_text("raise SystemExit(0)\\n")
+        subprocess.run(["git", "commit", "-qam", "eigener Commit"])
+    if modus == "umbenennen":
+        ziel = "src/telco_radar/rechnen/basis.py"
+        subprocess.run(["git", "mv", "tests/test_basis.py", ziel], check=True)
+    if modus == "haupt":
+        haupt = Path(os.environ["TELCO_AUFTRAG"]).parents[3] / "scripts/pruefleiter.py"
+        haupt.write_text(haupt.read_text() + "# vom Bauagenten\\n")
+    if modus == "hauptcommit":
+        haupt = Path(os.environ["TELCO_AUFTRAG"]).parents[3]
+        (haupt / "scripts/pruefleiter.py").write_text("raise SystemExit(0)\\n")
+        subprocess.run(["git", "-C", str(haupt), "commit", "-qam", "Agent"], check=True)
+    if modus == "parallel":
+        notiz = Path(os.environ["TELCO_AUFTRAG"]).parents[3] / "outputs/auftraege"
+        notiz.mkdir(parents=True, exist_ok=True)
+        (notiz / "B1-notiz.md").write_text("Notiz eines parallelen Auftrags")
     faktor = {"rot": 3, "umbau": 1}.get(modus, 2)
     kern.write_text(f"def verdopple(x):\\n    return x * {faktor}\\n")
     Path(os.environ["TELCO_COMMIT_NACHRICHT"]).write_text("rechnen: verdopple richtig")
@@ -520,3 +555,91 @@ def test_prueferbefund_zaehlt_nur_mit_scheiternder_reproduktion(
         "worktree": "Prüfer hat den Worktree geändert",
     }[art]
     assert erwartet in notiz
+
+
+@pytest.mark.parametrize(
+    ("modus", "befund"),
+    [
+        ("selbstcommit", "scripts/pruefleiter.py"),
+        ("selbstcommit", "HEAD"),
+        ("umbenennen", "Rolle bau darf nicht ändern: tests/test_basis.py"),
+    ],
+)
+def test_eigener_commit_oder_umbenennung_versteckt_nichts(repo, modus, befund):
+    leiter = (repo / "scripts/pruefleiter.py").read_text()
+
+    assert _starte(repo, modus) == auftrag.Ende.NOTIZ
+
+    assert befund in (repo / auftrag.AUFTRAEGE / "A1-notiz.md").read_text()
+    assert _git(repo, "show", "main:scripts/pruefleiter.py") + "\n" == leiter
+    assert _git(repo, "ls-tree", "main", "tests/test_basis.py")
+
+
+@pytest.mark.parametrize(
+    ("modus", "befund"),
+    [
+        (
+            "haupt",
+            "Hauptbaum vor dem Merge verändert: scripts/pruefleiter.py",
+        ),
+        ("hauptcommit", "ungestempelte Commits auf main"),
+    ],
+)
+def test_bauagent_im_hauptbaum_kommt_nicht_auf_main(repo, modus, befund):
+    assert _starte(repo, modus) == auftrag.Ende.ABGEBROCHEN
+
+    assert befund in (repo / auftrag.AUFTRAEGE / "A1-notiz.md").read_text()
+    assert "x * 2" not in _git(repo, "show", "main:src/telco_radar/rechnen/kern.py")
+
+
+def test_notiz_eines_parallelen_auftrags_haelt_den_merge_nicht_auf(repo):
+    assert _starte(repo, "parallel") == auftrag.Ende.GEMERGT
+
+    assert (repo / auftrag.AUFTRAEGE / "B1-notiz.md").is_file()
+    assert _git(repo, "ls-tree", "main", "outputs/auftraege/B1-notiz.md") == ""
+
+
+def test_leiter_aendert_ausserhalb_der_basen_setzt_main_zurueck(repo, monkeypatch):
+    vorher = _git(repo, "rev-parse", "main")
+    monkeypatch.setenv("ERSATZ_FREMD", "1")
+
+    assert _starte(repo) == auftrag.Ende.MAIN_ROT
+
+    assert _git(repo, "rev-parse", "main") == vorher
+    notiz = (repo / auftrag.AUFTRAEGE / "A1-notiz.md").read_text()
+    assert "Leiter änderte scripts/fremd.txt" in notiz
+
+
+def test_basen_der_leiter_kommen_mit_jedem_namen_auf_main(repo, monkeypatch):
+    (repo / "pruef").mkdir()
+    (repo / "pruef/basis ä.txt").write_text("2\n")
+    _git(repo, "add", "--", "pruef")
+    _git(repo, "commit", "-q", "-m", "Basis")
+    _leiter_voll(repo)
+    monkeypatch.setenv("ERSATZ_BASIS", "1")
+
+    assert _starte(repo) == auftrag.Ende.GEMERGT
+
+    zeigen = ("-c", "core.quotePath=false", "show", "--name-only", "--format=%s")
+    assert _git(repo, *zeigen, "main") == (
+        "auftrag(A1): Basen der Leiter\n\npruef/basis ä.txt"
+    )
+    assert _git(repo, "status", "--porcelain") == ""
+
+
+def test_rote_leiter_laesst_einen_commit_des_menschen_stehen(repo, monkeypatch):
+    monkeypatch.setenv("ERSATZ_VOLL_ROT", "1")
+    monkeypatch.setenv("ERSATZ_MENSCH", "1")
+
+    assert _starte(repo) == auftrag.Ende.MAIN_ROT
+
+    assert _git(repo, "log", "-1", "--format=%s", "main") == "Mensch"
+    notiz = (repo / auftrag.AUFTRAEGE / "A1-notiz.md").read_text()
+    assert "nicht zurückgesetzt" in notiz
+
+
+def test_merge_und_leiter_laufen_unter_einer_sperre(repo, monkeypatch):
+    sperre = repo / ".git" / "auftraege" / "main.sperre"
+    monkeypatch.setenv("ERSATZ_SPERRE", str(sperre))
+
+    assert _starte(repo) == auftrag.Ende.GEMERGT
