@@ -20,6 +20,10 @@ PROJEKT = '"$CLAUDE_PROJECT_DIR"'
 LOKAL = ".claude/settings.local.json"
 ALLE_AUS = "disableAllHooks"
 HOOK_FELDER = frozenset({"type", "command", "timeout"})
+# ``env`` könnte PATH oder PYTHONPATH umbiegen und den Hook-Ausgang fälschen.
+VERBOTEN = frozenset({ALLE_AUS, "env"})
+# Sekunden je Unterbefehl; ``make venv`` im Sitzungsstart braucht am längsten.
+MINDESTFRIST = {"sitzung": 300, "befehl": 5, "datei_lesen": 5, "nach_edit": 30}
 # Erlaubte Aufrufer eines Hooks; danach folgt genau Skriptpfad und Unterbefehl.
 AUFRUFER = ("python3", f"{PROJEKT}/.venv/bin/python")
 PFLICHT_HOOKS = (
@@ -92,17 +96,23 @@ def einstellungen(wurzel: Path) -> list[str]:
         daten = json.loads((wurzel / EINSTELLUNGEN).read_text("utf-8"))
     except (OSError, ValueError) as fehler:
         return [f"{EINSTELLUNGEN} nicht lesbar ({type(fehler).__name__})"]
-    hooks = daten.get("hooks", {}) if isinstance(daten, dict) else {}
-    meldungen = [
+    daten = daten if isinstance(daten, dict) else {}
+    hooks = daten.get("hooks", {})
+    meldungen = (
+        [] if isinstance(hooks, dict) else [f"{EINSTELLUNGEN}: hooks kein Objekt"]
+    )
+    hooks = hooks if isinstance(hooks, dict) else {}
+    meldungen += [
         f"{EINSTELLUNGEN}: Hook {ereignis} {matcher or '*'} ruft nicht {befehl}"
         for ereignis, matcher, befehl in PFLICHT_HOOKS
         if not _hat_hook(hooks.get(ereignis, []), matcher, befehl)
     ]
-    meldungen += fremde_hooks(hooks if isinstance(hooks, dict) else {})
-    meldungen += stop_frist(hooks.get("Stop", []))
-    if isinstance(daten, dict) and daten.get(ALLE_AUS) is not None:
-        meldungen.append(f"{EINSTELLUNGEN}: {ALLE_AUS} ist verboten")
-    rechte = daten.get("permissions", {}) if isinstance(daten, dict) else {}
+    meldungen += fremde_hooks(hooks)
+    meldungen += [
+        f"{EINSTELLUNGEN}: {schluessel} ist verboten"
+        for schluessel in sorted(VERBOTEN & set(daten))
+    ]
+    rechte = daten.get("permissions", {})
     sperren = set(rechte.get("deny", []))
     meldungen += [
         f"{EINSTELLUNGEN}: Sperre {s} fehlt"
@@ -112,46 +122,44 @@ def einstellungen(wurzel: Path) -> list[str]:
     return meldungen
 
 
-def stop_frist(gruppen: list) -> list[str]:
-    """Der Stop-Hook hat Zeit für die gekappte Stufe 4, ihren Nachlauf und eine Reserve;
-    sonst bricht Claude Code ihn ab, und ein roter geänderter Test bleibt unbemerkt."""
-    from geaenderte_tests import NACHLAUF_SEKUNDEN
-    from leiter_schnell import KAPPE_SEKUNDEN
+def mindestfrist(befehl: str) -> int:
+    """Sekunden, die der Hook ``befehl`` braucht; der Stop-Hook Zeit für die gekappte
+    Stufe 4, ihren Nachlauf und eine Reserve, sonst bricht Claude Code ihn ab."""
+    if befehl.endswith(" stop"):
+        from geaenderte_tests import NACHLAUF_SEKUNDEN
+        from leiter_schnell import KAPPE_SEKUNDEN
 
-    noetig = KAPPE_SEKUNDEN + NACHLAUF_SEKUNDEN + STOP_RESERVE_SEKUNDEN
-    fristen = [
-        hook.get("timeout")
-        for gruppe in (gruppen if isinstance(gruppen, list) else [])
-        if isinstance(gruppe, dict)
-        for hook in gruppe.get("hooks", [])
-        if isinstance(hook, dict) and HOOK_SKRIPT in str(hook.get("command", ""))
-    ]
-    return [
-        f"{EINSTELLUNGEN}: Stop-Hook hat {frist} s, braucht mindestens {noetig} s"
-        for frist in fristen
-        if not isinstance(frist, int) or frist < noetig
-    ]
+        return KAPPE_SEKUNDEN + NACHLAUF_SEKUNDEN + STOP_RESERVE_SEKUNDEN
+    return MINDESTFRIST[befehl.rsplit(" ", 1)[-1]]
+
+
+def _frist_reicht(hook: dict, befehl: str) -> bool:
+    """Ohne ``timeout`` gilt die Vorgabe von Claude Code (600 s)."""
+    frist = hook.get("timeout")
+    if frist is None:
+        return True
+    zahl = isinstance(frist, int) and not isinstance(frist, bool)
+    return zahl and frist >= mindestfrist(befehl)
 
 
 def fremde_hooks(hooks: dict) -> list[str]:
-    """Jeder Hook ruft einen Unterbefehl des Hook-Skripts, nur mit ``HOOK_FELDER``;
-    ein fremder Hook daneben (etwa ``{"continue": false}``) könnte die Leiter
-    entschärfen."""
-    erlaubt = {befehl for _, _, befehl in PFLICHT_HOOKS}
+    """Jeder Hook ruft einen Unterbefehl des Hook-Skripts, nur mit ``HOOK_FELDER`` und
+    genug Frist; ein fremder Hook daneben (etwa ``{"continue": false}``) könnte die
+    Leiter entschärfen."""
+    erlaubt = [befehl for _, _, befehl in PFLICHT_HOOKS]
     meldungen = []
     for ereignis, gruppen in sorted(hooks.items()):
         for gruppe in gruppen if isinstance(gruppen, list) else [gruppen]:
             liste = gruppe.get("hooks", []) if isinstance(gruppe, dict) else [gruppe]
             for hook in liste if isinstance(liste, list) else [liste]:
-                kommando = (
-                    str(hook.get("command", "")) if isinstance(hook, dict) else ""
-                )
-                if not (
-                    isinstance(hook, dict)
-                    and set(hook) <= HOOK_FELDER
-                    and any(_ruft_nur(kommando, befehl) for befehl in erlaubt)
-                ):
+                befehl = _befehl(hook, erlaubt) if isinstance(hook, dict) else None
+                if befehl is None:
                     meldungen.append(f"{EINSTELLUNGEN}: fremder Hook unter {ereignis}")
+                elif not _frist_reicht(hook, befehl):
+                    meldungen.append(
+                        f"{EINSTELLUNGEN}: Frist von {befehl} unter"
+                        f" {mindestfrist(befehl)} s"
+                    )
     return meldungen
 
 
@@ -163,7 +171,7 @@ def lokal(wurzel: Path) -> list[str]:
     except (OSError, ValueError) as fehler:
         return [f"{LOKAL} nicht lesbar ({type(fehler).__name__})"]
     verboten = sorted(
-        {"hooks", ALLE_AUS} & set(daten if isinstance(daten, dict) else {})
+        ({"hooks"} | VERBOTEN) & set(daten if isinstance(daten, dict) else {})
     )
     return [f"{LOKAL}: {schluessel} ist verboten" for schluessel in verboten]
 
@@ -178,14 +186,18 @@ def _hat_hook(gruppen: list, matcher: str, befehl: str) -> bool:
         hooks = gruppe.get("hooks", [])
         if not isinstance(hooks, list) or len(hooks) != 1:
             continue
-        hook = hooks[0]
-        if (
-            isinstance(hook, dict)
-            and set(hook) <= HOOK_FELDER
-            and _ruft_nur(str(hook.get("command", "")), befehl)
-        ):
+        if isinstance(hooks[0], dict) and _befehl(hooks[0], [befehl]):
             return True
     return False
+
+
+def _befehl(hook: dict, befehle: list[str]) -> str | None:
+    """Gibt den Befehl aus ``befehle``, den der Hook ruft, wenn er ``type: command``
+    ist und nur ``HOOK_FELDER`` trägt; sonst ``None``."""
+    if set(hook) - HOOK_FELDER or hook.get("type") != "command":
+        return None
+    kommando = str(hook.get("command", ""))
+    return next((b for b in befehle if _ruft_nur(kommando, b)), None)
 
 
 def _ruft_nur(kommando: str, befehl: str) -> bool:

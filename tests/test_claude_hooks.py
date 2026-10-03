@@ -297,16 +297,74 @@ def test_entschaerfter_hook_bricht_den_vertrag(tmp_path, zusatz):
     assert fremd == ".claude/settings.json: fremder Hook unter Stop"
 
 
-@pytest.mark.parametrize("frist", [200, None])
-def test_zu_kurze_frist_des_stop_hooks_ist_rot(tmp_path, frist):
+@pytest.mark.parametrize(
+    ("ereignis", "stelle", "frist", "befehl", "noetig"),
+    [
+        ("Stop", 0, 200, "stop", 285),
+        ("Stop", 0, "300", "stop", 285),
+        ("PostToolUse", 0, 1, "nach_edit", 30),
+        ("PreToolUse", 0, 0, "befehl", 5),
+        ("PreToolUse", 1, True, "datei_lesen", 5),
+        ("SessionStart", 0, 60, "sitzung", 300),
+    ],
+)
+def test_zu_kurze_frist_eines_hooks_ist_rot(
+    tmp_path, ereignis, stelle, frist, befehl, noetig
+):
     _ordner(tmp_path)
     hooks = _volle_hooks()
-    hooks["Stop"][0]["hooks"][0]["timeout"] = frist
+    hooks[ereignis][stelle]["hooks"][0]["timeout"] = frist
     _einstellungen(tmp_path, hooks, list(waechter_claude.PFLICHT_SPERREN))
-    (meldung,) = waechter_claude.vertrag(tmp_path)
-    assert meldung == (
-        f".claude/settings.json: Stop-Hook hat {frist} s, braucht mindestens 285 s"
-    )
+    assert waechter_claude.vertrag(tmp_path) == [
+        f".claude/settings.json: Frist von scripts/claude_hooks.py {befehl}"
+        f" unter {noetig} s"
+    ]
+
+
+def test_fehlende_frist_gilt_als_vorgabe_von_claude_code(tmp_path):
+    _ordner(tmp_path)
+    hooks = _volle_hooks()
+    for gruppen in hooks.values():
+        for gruppe in gruppen:
+            del gruppe["hooks"][0]["timeout"]
+    _einstellungen(tmp_path, hooks, list(waechter_claude.PFLICHT_SPERREN))
+    assert waechter_claude.vertrag(tmp_path) == []
+
+
+def test_frist_des_edit_hooks_deckt_seinen_unterlauf():
+    nach_edit = waechter_claude.MINDESTFRIST["nach_edit"]
+    assert nach_edit > claude_hooks.NACH_EDIT_SEKUNDEN
+
+
+@pytest.mark.parametrize("art", ["prompt", "bogus", None])
+def test_hook_ohne_type_command_ist_rot(tmp_path, art):
+    _ordner(tmp_path)
+    hooks = _volle_hooks()
+    hooks["Stop"][0]["hooks"][0]["type"] = art
+    _einstellungen(tmp_path, hooks, list(waechter_claude.PFLICHT_SPERREN))
+    assert waechter_claude.vertrag(tmp_path) == [
+        ".claude/settings.json: Hook Stop * ruft nicht scripts/claude_hooks.py stop",
+        ".claude/settings.json: fremder Hook unter Stop",
+    ]
+
+
+@pytest.mark.parametrize("datei", ["settings.json", "settings.local.json"])
+def test_env_in_den_einstellungen_ist_rot(tmp_path, datei):
+    umgebung = {"env": {"PYTHONPATH": "/tmp/x"}}
+    if datei == "settings.local.json":
+        (tmp_path / ".claude").mkdir()
+        (tmp_path / ".claude" / datei).write_text(json.dumps(umgebung), "utf-8")
+        meldungen = _voll_mit(tmp_path, lambda d: None)
+    else:
+        meldungen = _voll_mit(tmp_path, lambda d: d.update(umgebung))
+    assert meldungen == [f".claude/{datei}: env ist verboten"]
+
+
+def test_hooks_als_liste_ist_rot_statt_absturz(tmp_path):
+    _voll_mit(tmp_path, lambda d: d.update(hooks=[]))
+    meldungen = waechter_claude.einstellungen(tmp_path)
+    assert meldungen[0] == ".claude/settings.json: hooks kein Objekt"
+    assert len(meldungen) == 1 + len(waechter_claude.PFLICHT_HOOKS)
 
 
 @pytest.mark.parametrize(
