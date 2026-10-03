@@ -2,7 +2,8 @@
 
 Die Rohaufzeichnung schreibt das Plugin ``leiter_plugin/leiter_roh.py``; ein als
 bestanden gemeldeter Test, dessen Funktion scheiterte oder nie lief, ist umgeschrieben,
-und eine Testfunktion, die schon vor der Aufzeichnung umhüllt war, ist fremd.
+und eine Testfunktion, die schon vor der Aufzeichnung umhüllt war, ist fremd. Die rohe
+Sammlung ohne Projekteinstellungen und ohne conftest ist die Menge, die laufen muss.
 """
 
 from __future__ import annotations
@@ -21,6 +22,95 @@ _GESAMMELT = re.compile(
 )
 _SCHLUSSZEILE = re.compile(r"^=+ (.+) in [\d.]+s(?: \([\d:]+\))? =+$", re.MULTILINE)
 _NICHT_AUSGEFUEHRT = re.compile(r"(\d+) (?:skipped|xfailed)\b")
+_PARAMETER = re.compile(r"^(?P<basis>[^\[]+)(?:\[(?P<id>.*)\])?$")
+
+
+def rohe_sammlung_ini(wurzel: Path, python_files: str) -> str:
+    """Gibt eine eigene ini zurück, mit der die rohe Sammlung pyproject.toml umgeht.
+
+    Sie setzt nur, was die Leiter selbst vorgibt: Testordner, Dateimuster und die
+    Importpfade; ``addopts``, ``testpaths`` und die übrigen Muster bleiben Vorgabe.
+    """
+    return (
+        "[pytest]\n"
+        f"python_files = {python_files}\n"
+        f"pythonpath = {wurzel / 'src'} {wurzel}\n"
+    )
+
+
+def rohe_sammlung_befehl(python: str, ini: Path, wurzel: Path) -> list[str]:
+    """Sammelt ``tests/`` ohne conftest, ohne pyproject.toml und ohne ``addopts``."""
+    return [
+        python,
+        "-m",
+        "pytest",
+        "--collect-only",
+        "-q",
+        "--noconftest",
+        "-c",
+        str(ini),
+        "--rootdir",
+        str(wurzel),
+        "-p",
+        "no:cacheprovider",
+        str(wurzel / "tests"),
+    ]
+
+
+def gesammelte_ids(ausgabe: str) -> set[str]:
+    """Liest die Node-IDs aus ``pytest --collect-only -q``: alles vor der Leerzeile."""
+    ids, _, _ = ausgabe.partition("\n\n")
+    return {zeile for zeile in ids.splitlines() if "::" in zeile}
+
+
+def lies_gelaufen(ordner: Path) -> set[str]:
+    """Gibt jeden Test zurück, dessen Ablaufbeginn das Plugin aufgezeichnet hat."""
+    return {
+        zeile.partition(" ")[2]
+        for datei in sorted(ordner.glob("*.lief"))
+        for zeile in datei.read_text(encoding="utf-8").splitlines()
+        if zeile.startswith("lief ")
+    }
+
+
+def ohne_ergebnis(
+    gestartet: set[str], roh: dict[str, str], rot: dict[str, str], nicht_gelaufen: int
+) -> list[str]:
+    """Nennt Tests, deren Ablauf begann, ohne dass ihre Funktion lief oder rot endete.
+
+    Erlaubt sind so viele, wie pytest übersprungene und ``xfail``-Tests meldet; mehr
+    heißt, dass ein Ablaufbeginn ohne Lauf gemeldet wurde, etwa von einer conftest.
+    """
+    ohne = sorted(gestartet - set(roh) - set(rot))
+    if len(ohne) <= nicht_gelaufen:
+        return []
+    kopf = (
+        f"{len(ohne)} Tests begannen ohne Lauf und ohne rotes Ergebnis, übersprungen"
+        f" oder xfail sind nur {nicht_gelaufen}:"
+    )
+    return [kopf, *ohne]
+
+
+def abgewaehlt(roh: set[str], gelaufen: set[str]) -> list[str]:
+    """Nennt jeden Test der rohen Sammlung, dessen Ablauf im Lauf nie begann.
+
+    Parameter aus einer conftest fehlen in der rohen Sammlung; ein roher Test gilt
+    deshalb auch als gelaufen, wenn ein Lauf derselben Funktion seine Parameter-ID als
+    ganzes Glied zwischen ``-`` enthält oder er selbst keine hat.
+    """
+    je_basis: dict[str, list[str]] = {}
+    for test in gelaufen:
+        teile = _PARAMETER.match(test)
+        if teile:
+            je_basis.setdefault(teile["basis"], []).append(teile["id"] or "")
+    fehlend = []
+    for test in sorted(roh - gelaufen):
+        teile = _PARAMETER.match(test)
+        ids = je_basis.get(teile["basis"], []) if teile else []
+        eigene = (teile["id"] or "") if teile else ""
+        if not any(not eigene or f"-{eigene}-" in f"-{i}-" for i in ids):
+            fehlend.append(f"{test}: steht im Repo, lief aber nicht (abgewählt)")
+    return fehlend
 
 
 def pytest_ausgang(ausgabe: str) -> tuple[dict[str, str], set[str]]:

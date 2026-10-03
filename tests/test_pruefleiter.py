@@ -135,6 +135,10 @@ def _lauf_mit(monkeypatch, returncode, stdout, stderr="", gesammelt=2, ueberspru
         stdout += f"==== 1 passed, {uebersprungen} skipped in 0.12s ====\n"
 
     def falscher_lauf(log, befehl, zusatz=None):
+        if "--collect-only" in befehl:
+            rot, gruen = pruefleiter.pytest_ausgang(stdout)
+            ids = "".join(f"{t}\n" for t in sorted({*rot, *gruen}))
+            return subprocess.CompletedProcess(befehl, 0, ids + "\n", "")
         if zusatz:
             _roh_wie_gemeldet(
                 Path(zusatz[pruefleiter.leiter_pytest.ROH_VARIABLE]), stdout
@@ -150,6 +154,8 @@ def _roh_wie_gemeldet(ordner, stdout):
     zeilen = [f"fehler {t}\n" for t in rot if t not in gruen]
     zeilen += [f"ok {t}\n" for t in gruen]
     (ordner / "1.txt").write_text("".join(zeilen), encoding="utf-8")
+    gelaufen = "".join(f"lief {t}\n" for t in sorted({*rot, *gruen}))
+    (ordner / "1.lief").write_text(gelaufen, encoding="utf-8")
 
 
 def _bekannt(tmp_path, monkeypatch, *tests):
@@ -652,6 +658,100 @@ def test_ehrlicher_lauf_mit_xdist_zeichnet_jeden_test_roh_auf(
         "4 workers" in (tmp_path / "log").read_text()
         or "created:" in (tmp_path / "log").read_text()
     )
+
+
+_ABWAHL = {
+    "addopts_deselect": (
+        "pytest.ini",
+        "[pytest]\ntestpaths = tests\n"
+        "addopts = --deselect tests/test_rot.py::test_kaputt\n",
+    ),
+    "addopts_k": (
+        "pytest.ini",
+        "[pytest]\ntestpaths = tests\naddopts = -k 'not kaputt'\n",
+    ),
+    "conftest_entfernt": (
+        "tests/conftest.py",
+        "def pytest_collection_modifyitems(items):\n"
+        "    items[:] = [i for i in items if 'kaputt' not in i.nodeid]\n",
+    ),
+}
+
+
+@pytest.mark.parametrize("art", sorted(_ABWAHL))
+def test_abgewaehlter_roter_test_macht_die_teststufe_rot(
+    kleines_projekt, tmp_path, art
+):
+    pfad, text = _ABWAHL[art]
+    (kleines_projekt / pfad).write_text(text, "utf-8")
+    (tmp_path / "pruef" / "tests-anzahl.txt").write_text("4\n", "utf-8")
+    with (tmp_path / "log").open("w") as log:
+        ergebnis = pruefleiter.stufe_tests(log)
+    assert not ergebnis.gruen
+    assert ergebnis.zeilen == [
+        "tests/test_rot.py::test_kaputt: steht im Repo, lief aber nicht (abgewählt)"
+    ]
+    # Gegenprobe: ohne den roten Test ist dieselbe Auswahl grün.
+    (kleines_projekt / "tests" / "test_rot.py").unlink()
+    with (tmp_path / "log").open("a") as log:
+        assert pruefleiter.stufe_tests(log).gruen
+
+
+def test_vorgetaeuschter_ablaufbeginn_versteckt_keinen_abgewaehlten_test(
+    kleines_projekt, tmp_path
+):
+    (kleines_projekt / "tests" / "conftest.py").write_text(
+        "def pytest_collection_modifyitems(config, items):\n"
+        "    for i in [i for i in items if 'kaputt' in i.nodeid]:\n"
+        "        config.hook.pytest_runtest_logstart(\n"
+        "            nodeid=i.nodeid, location=i.location\n"
+        "        )\n"
+        "    items[:] = [i for i in items if 'kaputt' not in i.nodeid]\n",
+        "utf-8",
+    )
+    (kleines_projekt / "tests" / "test_fueller.py").write_text(
+        "def test_fueller():\n    pass\n", "utf-8"
+    )
+    with (tmp_path / "log").open("w") as log:
+        ergebnis = pruefleiter.stufe_tests(log)
+    assert not ergebnis.gruen
+    assert ergebnis.zeilen == [
+        "1 Tests begannen ohne Lauf und ohne rotes Ergebnis, übersprungen oder xfail"
+        " sind nur 0:",
+        "tests/test_rot.py::test_kaputt",
+    ]
+
+
+def test_rohe_sammlung_die_scheitert_ist_rot(kleines_projekt, tmp_path):
+    (kleines_projekt / "tests" / "test_rot.py").unlink()
+    (kleines_projekt / "tests" / "conftest.py").write_text(
+        "def pytest_ignore_collect(collection_path, config):\n"
+        "    return collection_path.name == 'test_kaputt_import.py' or None\n",
+        "utf-8",
+    )
+    (kleines_projekt / "tests" / "test_kaputt_import.py").write_text(
+        "def test_x(:\n", "utf-8"
+    )
+    (tmp_path / "pruef" / "tests-anzahl.txt").write_text("4\n", "utf-8")
+    with (tmp_path / "log").open("w") as log:
+        ergebnis = pruefleiter.stufe_tests(log)
+    assert not ergebnis.gruen
+    assert any(
+        z.startswith("rohe Sammlung ohne Projekteinstellungen und conftest endet mit")
+        for z in ergebnis.zeilen
+    ), ergebnis.zeilen
+
+
+def test_parameter_aus_einer_conftest_sind_keine_abwahl():
+    abgewaehlt = pruefleiter.leiter_pytest.abgewaehlt
+    roh = {"t.py::a", "t.py::b[1]"}
+    assert abgewaehlt(roh, {"t.py::a[x]", "t.py::b[1-x]"}) == []
+    assert abgewaehlt(roh, {"t.py::a[x]", "t.py::b[11-x]"}) == [
+        "t.py::b[1]: steht im Repo, lief aber nicht (abgewählt)"
+    ]
+    assert abgewaehlt(roh, {"t.py::b[1]"}) == [
+        "t.py::a: steht im Repo, lief aber nicht (abgewählt)"
+    ]
 
 
 def test_bindestrich_in_der_testid_ist_kein_umgeschriebener_fehler():

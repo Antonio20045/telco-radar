@@ -28,7 +28,12 @@ from typing import TextIO
 import leiter_pytest
 import waechter
 from leiter_befunde import Befund, gesenkte_basis, mypy_befunde, neue_befunde
-from leiter_pytest import gesammelte_tests, nicht_ausgefuehrte_tests, pytest_ausgang
+from leiter_pytest import (
+    gesammelte_ids,
+    gesammelte_tests,
+    nicht_ausgefuehrte_tests,
+    pytest_ausgang,
+)
 from waechter import lies_zaehlbasis, schreibe_zaehlbasis
 
 WURZEL = Path(__file__).resolve().parents[1]
@@ -169,7 +174,8 @@ def stufe_schichten(log: TextIO) -> Ergebnis:
 
 
 def stufe_tests(log: TextIO) -> Ergebnis:
-    """Volle Suite; rot ist jeder unbekannt rote Test und jeder fehlende Test."""
+    """Volle Suite; rot ist jeder unbekannt rote, fehlende und abgewählte Test."""
+    python_files = f"test_*.py *_test.py {Path(KANARIE).name}"
     befehl = [
         sys.executable,
         "-m",
@@ -181,7 +187,7 @@ def stufe_tests(log: TextIO) -> Ergebnis:
         "-rfEp",
         f"--timeout={TEST_FRIST_SEKUNDEN}",
         "-o",
-        f"python_files=test_*.py *_test.py {Path(KANARIE).name}",
+        f"python_files={python_files}",
         "-p",
         leiter_pytest.PLUGIN,
     ]
@@ -191,6 +197,7 @@ def stufe_tests(log: TextIO) -> Ergebnis:
         zusatz = {leiter_pytest.ROH_VARIABLE: ordner, "PYTHONPATH": pfade}
         lauf = _lauf(log, befehl, zusatz)
         roh = leiter_pytest.lies_roh(Path(ordner))
+        gelaufen = leiter_pytest.lies_gelaufen(Path(ordner))
     rot, gruen = pytest_ausgang(lauf.stdout)
     if lauf.returncode not in (0, 1) or (lauf.returncode == 1 and not rot):
         ende = lauf.stdout.splitlines()[-20:] + lauf.stderr.splitlines()[-20:]
@@ -215,7 +222,9 @@ def stufe_tests(log: TextIO) -> Ergebnis:
             f" {obergrenze} ({_relativ(TESTS_UEBERSPRUNGEN)})"
         )
         return Ergebnis("Tests", False, [meldung])
-    falsch = leiter_pytest.pruefe_ergebnisse(rot, gruen, roh, KANARIE)
+    falsch = _abgewaehlt(log, python_files, gelaufen)
+    falsch += leiter_pytest.ohne_ergebnis(gelaufen, roh, rot, uebersprungen)
+    falsch += leiter_pytest.pruefe_ergebnisse(rot, gruen, roh, KANARIE)
     if falsch:
         return Ergebnis("Tests", False, falsch)
     bekannt = []
@@ -236,6 +245,23 @@ def stufe_tests(log: TextIO) -> Ergebnis:
         ROT_BEKANNT.write_text("".join(f"{test}\n" for test in rest), encoding="utf-8")
         ergebnis.gesenkt.append(_relativ(ROT_BEKANNT))
     return ergebnis
+
+
+def _abgewaehlt(log: TextIO, python_files: str, gelaufen: set[str]) -> list[str]:
+    """Hält die rohe Sammlung ohne Projekteinstellungen gegen die gelaufenen Tests."""
+    with tempfile.TemporaryDirectory() as ordner:
+        ini = Path(ordner) / "roh.ini"
+        ini.write_text(leiter_pytest.rohe_sammlung_ini(WURZEL, python_files), "utf-8")
+        befehl = leiter_pytest.rohe_sammlung_befehl(sys.executable, ini, WURZEL)
+        sammlung = _lauf(log, befehl)
+    if sammlung.returncode != 0:
+        ende = sammlung.stdout.splitlines()[-20:] + sammlung.stderr.splitlines()[-20:]
+        kopf = (
+            f"rohe Sammlung ohne Projekteinstellungen und conftest endet mit"
+            f" {sammlung.returncode}:"
+        )
+        return [kopf, *ende]
+    return leiter_pytest.abgewaehlt(gesammelte_ids(sammlung.stdout), gelaufen)
 
 
 STUFEN_STATISCH: list[Callable[[TextIO], Ergebnis]] = [

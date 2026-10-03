@@ -5,6 +5,11 @@ in einer Datei je Prozess unter dem Ordner aus ``TELCO_LEITER_ROH``. ``fremd`` h
 dass die Funktion schon vor der Leiter umhüllt oder ersetzt war: Eine Hülle innerhalb
 der Aufzeichnung könnte ein Scheitern schlucken, ohne dass es auffiele. Die Leiter hält
 jeden als bestanden gemeldeten Test dagegen und jede fremde Funktion für rot.
+
+Daneben entsteht je Test, dessen Ablauf pytest beginnt, eine Zeile ``lief <nodeid>``
+in einer eigenen Datei je Prozess. Die Leiter hält diese Menge gegen die rohe Sammlung
+ohne Projekteinstellungen und conftest: Ein Test, der dort steht und hier fehlt, wurde
+abgewählt.
 """
 
 import ast
@@ -27,6 +32,13 @@ def pytest_collection_modifyitems(items):
         if isinstance(item, pytest.Function):
             art = "ok" if _echt(item) else "fremd"
             item.obj = _aufgezeichnet(item.obj, item.nodeid, datei, art)
+
+
+def pytest_runtest_logstart(nodeid, location):
+    """Hält jeden Test fest, dessen Ablauf pytest beginnt, ob bestanden oder nicht."""
+    ordner = os.environ.get(ROH_VARIABLE)
+    if ordner:
+        _schreibe(os.path.join(ordner, f"{os.getpid()}.lief"), f"lief {nodeid}\n")
 
 
 def _echt(item):

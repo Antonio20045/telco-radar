@@ -181,6 +181,11 @@ def test_gelistete_riesendatei_darf_nicht_wachsen_und_sinkt_selbst(
             _PYPROJECT.replace("true", "false"),
             "mypy geändert",
         ),
+        (
+            "pyproject.toml",
+            _PYPROJECT + '[tool.pytest.ini_options]\naddopts = "--deselect t::x"\n',
+            "pytest addopts neu: --deselect",
+        ),
     ],
 )
 def test_von_hand_gelockerte_liste_ist_rot_im_arbeitsstand_und_committet(
@@ -404,7 +409,8 @@ def test_fehlender_verlauf_ist_rot(projekt):
 )
 def test_neuer_befund_der_waechter_basis_ist_rot(projekt, pfad, text, code):
     _schreibe(projekt, pfad, text)
-    rot = _rot(projekt)
+    lockerung = "pyproject.toml lockerer (Arbeitsstand): pytest addopts neu: "
+    rot = [z for z in _rot(projekt) if not z.startswith(lockerung)]
     assert len(rot) == 1
     assert rot[0].startswith(f"{pfad} [{code}")
     assert rot[0].endswith("(pruef/waechter-basis.txt)")
@@ -439,6 +445,48 @@ def test_neuer_befund_der_waechter_basis_ist_rot(projekt, pfad, text, code):
 def test_erlaubte_stellen_bleiben_gruen(projekt, pfad, text):
     _schreibe(projekt, pfad, text)
     assert _rot(projekt) == []
+
+
+_SCHAERFER = "--strict-markers --disable-socket --allow-hosts=127.0.0.1 -n auto"
+_MARKER = '\nmarkers = ["seite: x", "netz: y"]\n'
+
+
+@pytest.mark.parametrize(
+    ("ini", "erwartet"),
+    [
+        (_ADDOPTS.format("--deselect t::x"), ["addopts neu: --deselect", "t::x"]),
+        (_ADDOPTS.format("-k 'not x'"), ["addopts neu: -k", "not x"]),
+        (_ADDOPTS.format("-m 'not netz'"), ["addopts neu: -m", "not netz"]),
+        (_ADDOPTS.format("--ignore=tests/a.py"), ["addopts neu: --ignore=tests/a.py"]),
+        (_ADDOPTS.format("--allow-hosts=10.0.0.1"), ["addopts neu: --allow-hosts=10"]),
+        (
+            '[tool.pytest.ini_options]\ntestpaths = ["tests/a"]\n',
+            ["testpaths geändert"],
+        ),
+        ('[tool.pytest.ini_options]\npython_functions = "x_*"\n', ["python_functions"]),
+        ('[tool.pytest]\nnorecursedirs = ["tests"]\n', ["norecursedirs geändert"]),
+        (_NATIV.format('"--deselect", "t::x"'), ["addopts neu: --deselect"]),
+    ],
+)
+def test_abwahl_in_den_pytest_einstellungen_ist_eine_lockerung(projekt, ini, erwartet):
+    _schreibe(projekt, "pyproject.toml", _PYPROJECT + ini)
+    rot = [z for z in _rot(projekt) if "pyproject.toml lockerer" in z]
+    assert rot
+    assert all(any(e in z for z in rot) for e in erwartet), rot
+
+
+def test_verschaerfte_pytest_einstellungen_bleiben_gruen_und_ihr_entfernen_ist_rot(
+    projekt,
+):
+    scharf = _PYPROJECT + _ADDOPTS.format(_SCHAERFER + " --dist worksteal") + _MARKER
+    _schreibe(projekt, "pyproject.toml", scharf)
+    assert _rot(projekt) == []
+    _commit(projekt)
+    _schreibe(projekt, "pyproject.toml", scharf.replace("--strict-markers ", ""))
+    assert _rot(projekt) == [
+        "pyproject.toml lockerer (Arbeitsstand): pytest addopts entfernt:"
+        " --strict-markers"
+    ]
 
 
 def test_hexfarbe_nur_im_root_block_von_style_css_erlaubt(projekt):

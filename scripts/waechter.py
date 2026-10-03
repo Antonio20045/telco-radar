@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import configparser
 import json
+import re
+import shlex
 import subprocess
 import tomllib
 from collections import Counter
@@ -237,7 +239,53 @@ def _vertraege_lockerer(alt: str, neu: str) -> list[str]:
 def _werkzeuge_lockerer(alt: str, neu: str) -> list[str]:
     vorher, nachher = (tomllib.loads(t).get("tool", {}) for t in (alt, neu))
     namen = ("ruff", "mypy", "importlinter")
-    return [f"{k} geändert" for k in namen if vorher.get(k) != nachher.get(k)]
+    meldungen = [f"{k} geändert" for k in namen if vorher.get(k) != nachher.get(k)]
+    alt_pytest, neu_pytest = vorher.get("pytest", {}), nachher.get("pytest", {})
+    for a, n in ((alt_pytest, neu_pytest), _ini(alt_pytest, neu_pytest)):
+        meldungen += _pytest_lockerer(a, n)
+    return meldungen
+
+
+def _ini(alt: dict, neu: dict) -> tuple[dict, dict]:
+    return alt.get("ini_options", {}), neu.get("ini_options", {})
+
+
+def _pytest_lockerer(alt: dict, neu: dict) -> list[str]:
+    """Meldet jede Einstellung von pytest, die Tests abwählen oder Strenge nehmen kann.
+
+    Durch geht nur, was verschärft: neue Marker und in ``addopts`` neue Optionen aus
+    ``PYTEST_STRENGER``; jede andere geänderte Einstellung und jede entfernte strenge
+    Option oder Socket-Sperre ist eine Lockerung.
+    """
+    meldungen = [
+        f"pytest {k} geändert"
+        for k in sorted({*alt, *neu} - {"addopts", "markers", "ini_options"})
+        if alt.get(k) != neu.get(k)
+    ]
+    vorher, nachher = _optionen(alt.get("addopts")), _optionen(neu.get("addopts"))
+    if vorher is None or nachher is None:
+        return [*meldungen, "pytest addopts nicht lesbar"]
+    dazu = [o for o in nachher if o not in vorher and not PYTEST_STRENGER.fullmatch(o)]
+    weg = [
+        o
+        for o in vorher
+        if o not in nachher and o.startswith(("--strict", "--disable-socket"))
+    ]
+    if dazu:
+        meldungen.append(f"pytest addopts neu: {' '.join(dazu)}")
+    if weg:
+        meldungen.append(f"pytest addopts entfernt: {' '.join(weg)}")
+    return meldungen
+
+
+def _optionen(addopts: object) -> list[str] | None:
+    if not addopts:
+        return []
+    try:
+        teile = shlex.split(addopts) if isinstance(addopts, str) else addopts
+    except ValueError:
+        return None
+    return [str(t) for t in teile] if isinstance(teile, list) else None
 
 
 def _neu_in(alt: str, neu: str) -> list[str]:
@@ -247,6 +295,14 @@ def _neu_in(alt: str, neu: str) -> list[str]:
     return sorted(z for z in zeilen if z)
 
 
+# Optionen in addopts, die nur verschärfen: strenge Marker und Konfiguration, die
+# Socket-Sperre bis auf die lokale Adresse, Parallelität und die Frist je Test.
+PYTEST_STRENGER = re.compile(
+    r"--strict-markers|--strict-config|--disable-socket"
+    r"|--allow-hosts=(127\.0\.0\.1|localhost)(,(127\.0\.0\.1|localhost))*"
+    r"|-n|--numprocesses|auto|logical|\d+|--dist|load|loadscope|loadfile|worksteal"
+    r"|--timeout=\d+"
+)
 LISTEN: dict[str, Callable[[str, str], list[str]]] = {
     "pruef/ruff-basis.json": partial(_zaehl_lockerer, als_json=True),
     "pruef/mypy-basis.txt": _zaehl_lockerer,
