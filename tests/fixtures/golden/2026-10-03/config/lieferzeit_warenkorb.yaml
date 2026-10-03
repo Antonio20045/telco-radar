@@ -1,0 +1,100 @@
+# =============================================================================
+# LIEFERZEIT-RADAR - der Standard-Warenkorb
+# =============================================================================
+#
+# Warum das ueberhaupt jemand baut
+# --------------------------------
+# Es existiert **keine oeffentliche Studie, die Lieferzeiten der deutschen
+# Telko-Anbieter systematisch vergleicht.** Was existiert, sind
+# Selbstauskuenfte auf Hilfeseiten (o2 nennt "2-3 Werktage" fuer sofort
+# lieferbare Geraete, Vodafone "2-4 Werktage"), Beschwerdethreads in
+# Communities und Launch-Tag-Berichterstattung. Wer das systematisch erfasst,
+# hat Wissen, das sonst niemand hat - und genau das rechtfertigt den Aufwand.
+#
+# Der Warenkorb ist FEST
+# ----------------------
+# Nicht das Sortiment, sondern ein kleiner Satz, der ueber Monate stabil
+# bleibt. Der Grund ist die Variantenexplosion: Farbe x Speicher x
+# Vertragstyp erzeugt je Geraet schnell zwanzig Kombinationen, und ein
+# Vergleich ueber wechselnde Varianten vergleicht nichts. Deshalb je Produkt
+# EINE festgelegte Variante.
+#
+# Was hier bewusst NICHT gemessen wird
+# ------------------------------------
+#   * Bestandskundenpreise hinter dem Login. Erfasst wird nur der oeffentlich
+#     sichtbare Listenpreis. Das ist keine Luecke, sondern eine dokumentierte
+#     Grenze - und die Seite nennt sie.
+#   * Mehrere Postleitzahlen. Eine feste Test-PLZ, konsistent verwendet.
+#     Dutzende durchzuprobieren waere ein anderer Eingriff.
+#
+# Was zur Lieferzeit gehoert und gern vergessen wird
+# --------------------------------------------------
+# Die effektive Wartezeit haengt stark am IDENT-Verfahren: bei Video-Ident
+# kommt die Vertragsfreigabe oft erst danach, und wer nur die Versandzeit
+# misst, misst am Kundenerlebnis vorbei. Ebenso die GETRENNTEN SENDUNGSWEGE -
+# o2 verschickt Geraet per Paket und SIM separat per Brief, und der spaetere
+# der beiden bestimmt den Aktivierungszeitpunkt. Beides steht deshalb je
+# Anbieter als Feld dabei und wird auf der Seite genannt.
+
+# Duesseldorf. Eine feste PLZ, konsistent verwendet, offen genannt.
+test_plz: "40213"
+
+produkte:
+  - ref: "iphone-topmodell"
+    name: "Apple iPhone 17 Pro"
+    variante: "256 GB"
+    typ: "Gerät (Flaggschiff)"
+  - ref: "samsung-flaggschiff"
+    name: "Samsung Galaxy S26 Ultra"
+    variante: "256 GB"
+    typ: "Gerät (Flaggschiff)"
+  - ref: "sim-only"
+    name: "SIM-Only-Tarif"
+    variante: "ohne Gerät"
+    typ: "Referenzfall ohne Gerätelogistik"
+
+# Je Anbieter: die Seiten des Warenkorbs, das Ident-Verfahren und ob Geraet
+# und SIM getrennt verschickt werden.
+#
+# STAND DER PRUEFUNG (08.08.2026, reines HTTP ohne Browser): winSIM und
+# PremiumSIM liefern ihre Verfuegbarkeit im ausgelieferten HTML ("Sofort
+# lieferbar"), otelo traegt sie in einem JavaScript-Woerterbuch mit
+# Platzhaltern ("Lieferzeit ca. {DELIVERY_TIME} Tage") und braucht deshalb
+# den gerenderten DOM. Telekom, congstar und mobilcom-debitel haben unter den
+# geprobten Adressen keine Produktseite ausgeliefert.
+#
+# **JSON-LD traegt die Lieferzeit NICHT.** Gemessen: winSIM liefert ein
+# sauberes schema.org-`Product` samt `Offer`, aber ohne
+# `OfferShippingDetails` und ohne `deliveryTime`. Die im Review erhoffte
+# stabilste Stufe der Kaskade steht also nicht zur Verfuegung; die Arbeit
+# liegt beim gerenderten DOM und beim Text.
+anbieter:
+  - marke: "winSIM"
+    ident: "Video-Ident oder eID"
+    getrennte_sendung: false
+    seiten:
+      - produkt: "iphone-topmodell"
+        url: "https://www.winsim.de/handys/apple/iphone-17-pro"
+      - produkt: "samsung-flaggschiff"
+        url: "https://www.winsim.de/handys/samsung/galaxy-s26-ultra"
+      - produkt: "sim-only"
+        url: "https://www.winsim.de/5g-tarife"
+
+  - marke: "PremiumSIM"
+    ident: "Video-Ident oder eID"
+    getrennte_sendung: false
+    seiten:
+      - produkt: "iphone-topmodell"
+        url: "https://www.premiumsim.de/handys/apple/iphone-17-pro"
+      - produkt: "sim-only"
+        url: "https://www.premiumsim.de/"
+
+  - marke: "otelo"
+    ident: "Video-Ident"
+    getrennte_sendung: false
+    # Die Lieferzeit steht hier in einem JS-Woerterbuch - ohne gerenderten
+    # DOM kommt nur der Platzhalter an. In GitHub Actions rendert Playwright.
+    seiten:
+      - produkt: "iphone-topmodell"
+        url: "https://www.otelo.de/handy-mit-vertrag/apple"
+        braucht_browser: true

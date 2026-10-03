@@ -1,0 +1,52 @@
+regions:
+  africa_middle_east:
+    name: Afrika & Naher Osten
+    operators: []
+  asia:
+    name: Asien
+    operators: []
+  europe:
+    name: Europa
+    operators:
+    - country: DE
+      name: Vodafone Deutschland
+      sources:
+      - type: rss
+        url: https://newsroom.vodafone.de/rss
+      website: vodafone.de
+    - aliases:
+      - Telekom
+      - T-Systems
+      - T-Mobile
+      - Magenta
+      country: DE
+      name: Deutsche Telekom
+      sources:
+      - type: rss
+        url: https://www.telekom.com/service/rss/427676/feed.rss
+      website: telekom.com
+    - aliases:
+      - O2 Telefonica
+      - Telefónica Deutschland
+      - O2
+      country: DE
+      name: O2 Telefónica Deutschland
+      sources:
+      - abgenommen: '2026-08-05'
+        herkunft: Breitensuche (Kandidatenpfad)
+        type: rss
+        url: https://www.telefonica.de/o2/rss/news?group_id=62;pubdate=1
+      - type: rss
+        url: https://www.telefonica.de/o2/rss/news?category_id=10;pubdate=1
+      - type: rss
+        url: https://www.telefonica.de/o2/rss/news?category_id=11;pubdate=1
+      website: telefonica.de
+  latin_america:
+    name: Lateinamerika
+    operators: []
+  north_america:
+    name: Nordamerika
+    operators: []
+  oceania:
+    name: Ozeanien
+    operators: []

@@ -1,0 +1,764 @@
+# =============================================================================
+# TELCO RADAR - Geraete- und Preisradar: der verfolgte Gerätekatalog
+# =============================================================================
+# Hand-gepflegt. Das hier ist NICHT der Markt, sondern die Liste der Modelle,
+# deren Preise verfolgt werden - Flaggschiffe und Volumenmodelle. Ein Gerät,
+# das hier nicht steht, wird von `geraete_model.erkenne_geraet()` nicht
+# erkannt und landet nicht in der Datenbank. Das ist Absicht: ein Katalog,
+# der alles aufnimmt, was in einer Shop-Kategorie steht, füllt die
+# Positionskarte mit Zubehör und Auslaufware.
+#
+# -----------------------------------------------------------------------------
+# DIE FELDER
+# -----------------------------------------------------------------------------
+#   hersteller   Pflicht. Geht in die device_id ein.
+#   modell       Pflicht. Geht in die device_id ein. So schreiben, wie der
+#                Hersteller es schreibt - Händlerschreibweisen kommen unter
+#                `aliase`.
+#   generation   Zahl, für die Sortierung "aktuelle Generation / mit Vorgängern".
+#   vorgaenger   MODELLNAME des Vorgängers desselben Herstellers. Das Feld, an
+#                dem die ganze Lifecycle-Auswertung hängt. Ohne gepflegte Kette
+#                gibt es keine Nachfolger-Analyse - und zwar still, denn eine
+#                fehlende Kette sieht aus wie "kein Effekt gemessen".
+#   marktstart   YYYY-MM-DD. SIEHE UNTEN.
+#   aliase       weitere Schreibweisen, unter denen Händler das Gerät führen.
+#                Groß-/Kleinschreibung und Sonderzeichen sind egal (alles läuft
+#                durch `wortmarken()`); nötig sind Aliase nur, wenn sich die
+#                WORTFOLGE unterscheidet ("iPhone 17 ProMax" ist KEIN Alias -
+#                "ProMax" zerfällt ohnehin nicht -, "Galaxy Fold 7" ohne das
+#                "Z" dagegen schon).
+#   speicher     die angebotenen Stufen in GB. Wird als Filter benutzt: eine
+#                Zahl im Titel, die hier nicht steht, gilt nicht als Speicher.
+#   segment      flagship | premium | mid | entry. Ordnet die Positionskarte.
+#
+# -----------------------------------------------------------------------------
+# WARUM VIELE `marktstart`-FELDER LEER SIND - und was das kostet
+# -----------------------------------------------------------------------------
+# Ein Marktstartdatum wird hier NUR eingetragen, wenn es belegt ist. Ein
+# geratenes Datum ist schlimmer als ein fehlendes: der Nachfolger-Effekt
+# rechnet Preisbewegungen in den 30/60/90 Tagen NACH dem Start des Nachfolgers,
+# und ein um zwei Monate verschobenes Datum erzeugt genau die Art Zahl, die
+# plausibel aussieht und falsch ist.
+#
+# Ein leeres Feld schaltet für dieses Gerät die Nachfolger-Analyse ab
+# (`geraete_lifecycle.nachfolger_effekt` gibt dann None statt einer Kurve).
+# Listungsdauer, Preisverfall und Portfolio-Tiefe laufen weiter - die brauchen
+# nur die eigene Zeitreihe. Wie viele Modelle betroffen sind, steht auf
+# /geraete.html unter "Datenbasis und Lücken"; die Zeile ist der Auftrag an
+# den Menschen, der diese Datei pflegt.
+#
+# Eintragen kann man ein Datum aus der Pressemitteilung des Herstellers
+# (Verkaufsstart, nicht Ankündigung) - eine Zeile pro Recherche, keine
+# Massenpflege.
+#
+# -----------------------------------------------------------------------------
+# AM 31.08.2026 IM BERICHTSARCHIV GESUCHT UND NICHT BELEGBAR
+# -----------------------------------------------------------------------------
+# Durchsucht wurden alle `data/reports/*.json` (16.07.-28.08.2026), Meldungen
+# und Prosaberichte samt der Veröffentlichungsdaten in der Quellenliste. Belegt
+# und eingetragen wurden dabei die Pixel-11-Reihe (2026-08-20) und die
+# Z-Fold8-/Z-Flip8-Reihe (2026-08-07); die Begründungen stehen jeweils über den
+# Einträgen. NICHT belegbar waren:
+#
+#   iPhone 17, iPhone 17 Pro   Marktstart liegt VOR dem Archivbeginn. Das
+#                              Archiv kennt sie nur als etablierte Geräte -
+#                              Bericht 2026-08-27 führt das iPhone 17 als
+#                              meistverkauftes Smartphone des 2. Quartals 2026.
+#   iPhone 17e                 kommt im ganzen Archiv KEIN einziges Mal vor.
+#   Galaxy S26, S26 Ultra      ebenfalls vor Archivbeginn; das S26 Ultra steht
+#                              im selben Quartalsranking, das S26 taucht nur in
+#                              Rabatt- und Gebrauchtmeldungen auf.
+#   Galaxy A57                 nur Preismeldungen (Bericht 2026-08-15: Rabatt
+#                              bei PcComponentes; 2026-08-25: Preiserhöhung in
+#                              Indien) - kein Launch.
+#   Galaxy S26 FE              ist am 31.08.2026 noch GAR NICHT auf dem Markt.
+#                              Bericht 2026-08-19: "die Markteinführung wird
+#                              Anfang kommenden Monats erwartet"; Bericht
+#                              2026-08-21 nennt den 27. August als Termin der
+#                              Vorstellung. Frühestens nach dem September-Lauf
+#                              nachtragen - und dann den VERKAUFS-, nicht den
+#                              Vorstellungstag.
+#
+# Wer hier nachpflegt: die Veröffentlichungsdaten der einzelnen Meldungen
+# stehen NICHT an den Highlights (die tragen nur das Berichtsdatum), sondern in
+# der Quellenliste "Wochenueberblick" des Prosaberichts (`briefing_md`), je
+# Zeile in Klammern hinter dem Link.
+# =============================================================================
+
+geraete:
+
+  # ------------------------------------------------------------------ Apple
+  - hersteller: Apple
+    modell: iPhone 15
+    generation: 15
+    marktstart: 2023-09-22
+    speicher: [128, 256, 512]
+    segment: premium
+
+  - hersteller: Apple
+    modell: iPhone 15 Pro Max
+    generation: 15
+    marktstart: 2023-09-22
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Apple
+    modell: iPhone 16
+    generation: 16
+    vorgaenger: iPhone 15
+    marktstart: 2024-09-20
+    speicher: [128, 256, 512]
+    segment: premium
+
+  - hersteller: Apple
+    modell: iPhone 16 Plus
+    generation: 16
+    marktstart: 2024-09-20
+    speicher: [128, 256, 512]
+    segment: premium
+
+  - hersteller: Apple
+    modell: iPhone 16 Pro
+    generation: 16
+    marktstart: 2024-09-20
+    speicher: [128, 256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Apple
+    modell: iPhone 16 Pro Max
+    generation: 16
+    vorgaenger: iPhone 15 Pro Max
+    marktstart: 2024-09-20
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Apple
+    modell: iPhone 16e
+    generation: 16
+    marktstart: 2025-02-28
+    speicher: [128, 256, 512]
+    segment: mid
+
+  # Die 17er-Reihe: Marktstart bewusst leer, siehe Kopf. Die Modelle stehen
+  # trotzdem im Katalog, weil sie im Handel liegen - ohne Eintrag würde jede
+  # ihrer Listungen verworfen.
+  - hersteller: Apple
+    modell: iPhone 17
+    generation: 17
+    vorgaenger: iPhone 16
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: Apple
+    modell: iPhone 17 Pro
+    generation: 17
+    vorgaenger: iPhone 16 Pro
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Apple
+    modell: iPhone 17 Pro Max
+    generation: 17
+    vorgaenger: iPhone 16 Pro Max
+    speicher: [256, 512, 1024, 2048]
+    segment: flagship
+
+  # ---------------------------------------------------------------- Samsung
+  - hersteller: Samsung
+    modell: Galaxy S24
+    generation: 24
+    marktstart: 2024-01-31
+    speicher: [128, 256, 512]
+    segment: premium
+
+  - hersteller: Samsung
+    modell: Galaxy S24 Ultra
+    generation: 24
+    marktstart: 2024-01-31
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy S25
+    generation: 25
+    vorgaenger: Galaxy S24
+    marktstart: 2025-02-07
+    speicher: [128, 256, 512]
+    segment: premium
+
+  - hersteller: Samsung
+    modell: Galaxy S25 Plus
+    generation: 25
+    marktstart: 2025-02-07
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: Samsung
+    modell: Galaxy S25 Ultra
+    generation: 25
+    vorgaenger: Galaxy S24 Ultra
+    marktstart: 2025-02-07
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy S26
+    generation: 26
+    vorgaenger: Galaxy S25
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: Samsung
+    modell: Galaxy S26 Ultra
+    generation: 26
+    vorgaenger: Galaxy S25 Ultra
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy Z Fold 6
+    generation: 6
+    marktstart: 2024-07-24
+    aliase: ["Galaxy Fold 6"]
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy Z Fold 7
+    generation: 7
+    vorgaenger: Galaxy Z Fold 6
+    aliase: ["Galaxy Fold 7"]
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy Z Flip 6
+    generation: 6
+    marktstart: 2024-07-24
+    aliase: ["Galaxy Flip 6"]
+    speicher: [256, 512]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy Z Flip 7
+    generation: 7
+    vorgaenger: Galaxy Z Flip 6
+    aliase: ["Galaxy Flip 7"]
+    speicher: [256, 512]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy A56
+    generation: 56
+    speicher: [128, 256]
+    segment: mid
+
+  # ----------------------------------------------------------------- Google
+  - hersteller: Google
+    modell: Pixel 9
+    generation: 9
+    marktstart: 2024-08-22
+    speicher: [128, 256]
+    segment: premium
+
+  - hersteller: Google
+    modell: Pixel 9 Pro
+    generation: 9
+    marktstart: 2024-08-22
+    speicher: [128, 256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Google
+    modell: Pixel 9 Pro XL
+    generation: 9
+    marktstart: 2024-08-22
+    speicher: [128, 256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Google
+    modell: Pixel 10
+    generation: 10
+    vorgaenger: Pixel 9
+    speicher: [128, 256]
+    segment: premium
+
+  - hersteller: Google
+    modell: Pixel 10 Pro
+    generation: 10
+    vorgaenger: Pixel 9 Pro
+    speicher: [128, 256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Google
+    modell: Pixel 10 Pro XL
+    generation: 10
+    vorgaenger: Pixel 9 Pro XL
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  # ----------------------------------------------------------------- Xiaomi
+  - hersteller: Xiaomi
+    modell: Xiaomi 14
+    generation: 14
+    marktstart: 2024-02-25
+    aliase: ["Mi 14"]
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: Xiaomi
+    modell: Xiaomi 15
+    generation: 15
+    vorgaenger: Xiaomi 14
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: Xiaomi
+    modell: Xiaomi 15 Ultra
+    generation: 15
+    speicher: [512, 1024]
+    segment: flagship
+
+  - hersteller: Xiaomi
+    modell: Redmi Note 14 Pro
+    generation: 14
+    speicher: [128, 256, 512]
+    segment: mid
+
+  # --------------------------------------------------------------- Motorola
+  - hersteller: Motorola
+    modell: Motorola edge 50 pro
+    generation: 50
+    marktstart: 2024-04-16
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: Motorola
+    modell: Motorola edge 60 pro
+    generation: 60
+    vorgaenger: Motorola edge 50 pro
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: Motorola
+    modell: Motorola moto g85
+    generation: 85
+    speicher: [128, 256]
+    segment: mid
+
+  # ------------------------------------------------------------------ HONOR
+  - hersteller: HONOR
+    modell: HONOR Magic6 Pro
+    generation: 6
+    marktstart: 2024-03-18
+    speicher: [256, 512]
+    segment: flagship
+
+  - hersteller: HONOR
+    modell: HONOR Magic7 Pro
+    generation: 7
+    vorgaenger: HONOR Magic6 Pro
+    speicher: [256, 512]
+    segment: flagship
+
+  - hersteller: HONOR
+    modell: HONOR 200 Pro
+    generation: 200
+    speicher: [256, 512]
+    segment: premium
+
+  # ----------------------------------------------------------------- realme
+  - hersteller: realme
+    modell: realme GT 6
+    generation: 6
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: realme
+    modell: realme GT 7 Pro
+    generation: 7
+    vorgaenger: realme GT 6
+    speicher: [256, 512]
+    segment: flagship
+
+  # ---------------------------------------------------------------- OnePlus
+  - hersteller: OnePlus
+    modell: OnePlus 12
+    generation: 12
+    marktstart: 2024-01-23
+    speicher: [256, 512]
+    segment: flagship
+
+  - hersteller: OnePlus
+    modell: OnePlus 13
+    generation: 13
+    vorgaenger: OnePlus 12
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: OnePlus
+    modell: OnePlus 13R
+    generation: 13
+    speicher: [256, 512]
+    segment: premium
+
+  # ---------------------------------------------------------------- Nothing
+  # Achtung: "Phone (3a)" und "Phone (3)" sind zwei Geräte. Die Klammern
+  # fallen bei der Normalisierung weg, die Ziffer-Buchstabe-Folge "3a" bleibt
+  # aber zusammen (`wortmarken`) - genau deshalb verwechselt der Erkenner die
+  # beiden nicht.
+  - hersteller: Nothing
+    modell: Nothing Phone (2a)
+    generation: 2
+    marktstart: 2024-03-12
+    speicher: [128, 256]
+    segment: mid
+
+  - hersteller: Nothing
+    modell: Nothing Phone (3a)
+    generation: 3
+    vorgaenger: Nothing Phone (2a)
+    speicher: [128, 256]
+    segment: mid
+
+  - hersteller: Nothing
+    modell: Nothing Phone (3)
+    generation: 3
+    speicher: [256, 512]
+    segment: premium
+
+  # ===========================================================================
+  # NACHGELEGT AM 28.08.2026 - aus den LIVE-Katalogen von Vodafone und o2
+  # ===========================================================================
+  # Anlass: die Fachkollegen haben "Google fehlt" als erste von vier Lücken
+  # benannt. Nachgemessen an den 126 Modellnamen, die Vodafones
+  # Geräteschnittstelle (51) und o2s Katalog (93, ohne Zubehörbündel) am
+  # 28.08.2026 wirklich führten: 67 davon trafen keinen Katalogeintrag. Der
+  # Katalog stand eine ganze Gerätegeneration hinter dem Markt - Pixel 11,
+  # Galaxy S26 FE, Z Fold8, Xiaomi 17 und iPhone Air waren live und hier
+  # unbekannt, also unsichtbar.
+  #
+  # Jede Zeile unten steht so, wie mindestens eine der zwei Quellen sie
+  # führt. Was NICHT nachgelegt wurde: Tablets (iPad, Galaxy Tab), Router
+  # (GigaCube, MiFi) und Wearables - dieser Katalog verfolgt Smartphones.
+  # `marktstart` bleibt leer, wo er nicht belegt ist; die Regel oben gilt
+  # unverändert, ein geratenes Datum wäre schlimmer als keines.
+
+  # ------------------------------------------------------------------ Apple
+  - hersteller: Apple
+    modell: iPhone Air
+    generation: 17
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Apple
+    modell: iPhone 17e
+    generation: 17
+    vorgaenger: iPhone 16e
+    speicher: [128, 256, 512]
+    segment: mid
+
+  - hersteller: Apple
+    modell: iPhone 15 Plus
+    generation: 15
+    speicher: [128, 256, 512]
+    segment: premium
+
+  - hersteller: Apple
+    modell: iPhone 15 Pro
+    generation: 15
+    speicher: [128, 256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Apple
+    modell: iPhone 14
+    generation: 14
+    speicher: [128, 256, 512]
+    segment: premium
+
+  - hersteller: Apple
+    modell: iPhone 14 Pro
+    generation: 14
+    speicher: [128, 256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Apple
+    modell: iPhone 14 Pro Max
+    generation: 14
+    speicher: [128, 256, 512, 1024]
+    segment: flagship
+
+  # ----------------------------------------------------------------- Google
+  # Die Marke, die in den Price Alerts der internen Lösung ganz fehlt.
+
+  # ---------------------------------------------------------------------------
+  # MARKTSTART DER PIXEL-11-REIHE: 2026-08-20, belegt aus dem Berichtsarchiv
+  # ---------------------------------------------------------------------------
+  # Vorgestellt am 12.08.2026 (Bericht 2026-08-19, Google Pixel: "Google hat am
+  # 12. August 2026 die Pixel-11-Serie vorgestellt") - das ist NICHT der
+  # Marktstart. Die Vorbestellphase ist bis zum 19./20.08. belegt: Bericht
+  # 2026-08-14 (Charter/Spectrum Mobile, "nimmt bis 19. August Vorbestellungen
+  # ... an"), Bericht 2026-08-19 (Xataka Movil, MediaMarkt Spanien "bei
+  # Vorbestellung ... bis 20. August").
+  #
+  # Erster belegter VERKAUFSTAG ist der 20.08.2026 - zwei unabhaengige
+  # Pressemitteilungen desselben Tages (Veroeffentlichungsdatum aus der
+  # Quellenliste des Berichts vom 2026-08-25):
+  #   Vodafone UK, 2026-08-20: "The new Google Pixel 11, Pixel 11 Pro Fold,
+  #     Pixel 11 Pro and Pixel 11 Pro XL now available with Vodafone"
+  #   Three UK, 2026-08-20: "Get the latest Google Pixel 11 range on Three
+  #     Mobile today"
+  # Bestaetigt am Folgetag durch Univers Freebox, 2026-08-21: "Free Mobile
+  # vermarktet nach den Vorbestellungen jetzt Google Pixel 11 ... direkt".
+  #
+  # WIDERSPRUCH, bewusst hier notiert statt weggelassen: Googles eigener
+  # Beitrag "You can officially buy the Pixel 11 phones and Pixel Watch 5."
+  # ist auf den 25.08.2026 datiert (Bericht 2026-08-26). Der Vorrang des
+  # 20.08. ist keine Abwaegung nach Gefuehl, sondern eine Reihenfolge: ein
+  # Haendler kann nicht vor dem Marktstart verkaufen, also ist der 20.08. eine
+  # obere Schranke, waehrend der 25.08. nur eine spaete Meldung sein kann.
+  # Wer lieber dem Hersteller folgt, aendert die vier Zeilen unten auf
+  # 2026-08-25 - die Belege stehen dafuer hier beisammen.
+  - hersteller: Google
+    modell: Pixel 11
+    generation: 11
+    vorgaenger: Pixel 10
+    marktstart: 2026-08-20   # siehe Block oben (Vodafone UK / Three UK, 20.08.2026)
+    speicher: [256, 512]
+    segment: flagship
+
+  - hersteller: Google
+    modell: Pixel 11 Pro
+    generation: 11
+    vorgaenger: Pixel 10 Pro
+    marktstart: 2026-08-20   # siehe Block oben (Vodafone UK / Three UK, 20.08.2026)
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Google
+    modell: Pixel 11 Pro XL
+    generation: 11
+    vorgaenger: Pixel 10 Pro XL
+    marktstart: 2026-08-20   # siehe Block oben (Vodafone UK / Three UK, 20.08.2026)
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  # "Pro Fold" ist ein EIGENER Eintrag und kein Alias von "Pro": beide stehen
+  # beim selben Händler und liegen mehrere hundert Euro auseinander. Genau
+  # diese Verwechslung hat am 10.08.2026 die 800-Euro-Sägezahnkurve erzeugt.
+  - hersteller: Google
+    modell: Pixel 11 Pro Fold
+    generation: 11
+    vorgaenger: Pixel 10 Pro Fold
+    # Dieselbe Vodafone-UK-Mitteilung vom 20.08.2026 nennt das Pro Fold
+    # ausdruecklich beim Namen - siehe Block oben.
+    marktstart: 2026-08-20
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Google
+    modell: Pixel 10 Pro Fold
+    generation: 10
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Google
+    modell: Pixel 10a
+    generation: 10
+    speicher: [128, 256]
+    segment: mid
+
+  # ---------------------------------------------------------------- Samsung
+  - hersteller: Samsung
+    modell: Galaxy S26 Plus
+    generation: 26
+    vorgaenger: Galaxy S25 Plus
+    aliase: ["Galaxy S26+"]
+    speicher: [256, 512]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy S26 FE
+    generation: 26
+    vorgaenger: Galaxy S25 FE
+    speicher: [128, 256, 512]
+    segment: premium
+
+  - hersteller: Samsung
+    modell: Galaxy S25 FE
+    generation: 25
+    speicher: [128, 256, 512]
+    segment: premium
+
+  # ---------------------------------------------------------------------------
+  # MARKTSTART DER Z-FOLD8-/Z-FLIP8-REIHE: 2026-08-07, belegt aus dem Archiv
+  # ---------------------------------------------------------------------------
+  # Der seltene Fall, in dem der Tag WOERTLICH in einer Meldung steht. Bericht
+  # 2026-08-07, Samsung Newsroom, "Samsung Officially Launches Galaxy Z Fold8
+  # Ultra, Fold8, Flip8, Watch Ultra2 and Watch9":
+  #   "Die neuen Foldables Galaxy Z Fold8 Ultra, Fold8, Flip8 sowie die
+  #    Smartwatches Watch Ultra2 und Watch9 sind ab dem 7. August weltweit bei
+  #    Mobilfunkanbietern und im Handel erhaeltlich."
+  #
+  # Vorgestellt wurden sie am 22.07.2026 (Bericht 2026-08-07, Samsung: "Am
+  # 22. Juli wurden auf dem Galaxy Unpacked Event das Galaxy Z Fold8 Ultra,
+  # Galaxy Z Fold8 und Galaxy Z Flip8 vorgestellt") - das ist der
+  # Vorstellungstermin und gehoert NICHT in dieses Feld.
+  #
+  # Drei unabhaengige Bestaetigungen desselben Verkaufsstarts:
+  #   Three UK (Bericht 2026-08-07): "Galaxy Z Fold8, Z Fold8 Ultra and Z Flip8
+  #     now available" (so auch die Adresse der Mitteilung)
+  #   Univers Freebox (Bericht 2026-08-08): "Free Mobile lance officiellement
+  #     les nouveaux Galaxy Z Fold8 et Z Flip8"
+  #   Telepolis (Bericht 2026-08-08): "Samsung hat in Polen ... in den freien
+  #     Verkauf gebracht"
+  # Und die Gegenprobe zur Abgrenzung: Telepolis meldet am 2026-08-07 noch
+  # Rekord-Vorbestellungen "vor dem offiziellen Verkaufsstart".
+  - hersteller: Samsung
+    modell: Galaxy Z Fold8
+    generation: 8
+    vorgaenger: Galaxy Z Fold 7
+    marktstart: 2026-08-07   # siehe Block oben (Samsung Newsroom, "ab dem 7. August")
+    aliase: ["Galaxy Z Fold 8"]
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy Z Fold8 Ultra
+    generation: 8
+    marktstart: 2026-08-07   # dieselbe Mitteilung wie beim Fold8, siehe Block oben
+    aliase: ["Galaxy Z Fold 8 Ultra"]
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy Z Flip8
+    generation: 8
+    vorgaenger: Galaxy Z Flip 7
+    marktstart: 2026-08-07   # siehe Block oben (Samsung Newsroom, "ab dem 7. August")
+    aliase: ["Galaxy Z Flip 8"]
+    speicher: [256, 512]
+    segment: flagship
+
+  - hersteller: Samsung
+    modell: Galaxy A57
+    generation: 57
+    vorgaenger: Galaxy A56
+    speicher: [128, 256]
+    segment: mid
+
+  - hersteller: Samsung
+    modell: Galaxy A37
+    generation: 37
+    speicher: [128, 256]
+    segment: mid
+
+  - hersteller: Samsung
+    modell: Galaxy A27
+    generation: 27
+    speicher: [128, 256]
+    segment: entry
+
+  - hersteller: Samsung
+    modell: Galaxy A17
+    generation: 17
+    speicher: [128, 256]
+    segment: entry
+
+  - hersteller: Samsung
+    modell: Galaxy S23
+    generation: 23
+    speicher: [128, 256, 512]
+    segment: premium
+
+  # ----------------------------------------------------------------- Xiaomi
+  # Die zweite von den Kollegen genannte Marke. Der Bestand kannte bis hier
+  # genau vier Xiaomi-Modelle, alle aus der 14er/15er-Reihe.
+  - hersteller: Xiaomi
+    modell: Xiaomi 17
+    generation: 17
+    vorgaenger: Xiaomi 15
+    speicher: [256, 512]
+    segment: flagship
+
+  - hersteller: Xiaomi
+    modell: Xiaomi 17 Ultra
+    generation: 17
+    vorgaenger: Xiaomi 15 Ultra
+    speicher: [256, 512, 1024]
+    segment: flagship
+
+  - hersteller: Xiaomi
+    modell: Xiaomi 17T
+    generation: 17
+    speicher: [256, 512]
+    segment: premium
+
+  - hersteller: Xiaomi
+    modell: Xiaomi 17T Pro
+    generation: 17
+    speicher: [256, 512, 1024]
+    segment: premium
+
+  - hersteller: Xiaomi
+    modell: Redmi Note 17
+    generation: 17
+    speicher: [128, 256]
+    segment: mid
+
+  - hersteller: Xiaomi
+    modell: Redmi Note 17 Pro
+    generation: 17
+    vorgaenger: Redmi Note 14 Pro
+    speicher: [256, 512]
+    segment: mid
+
+  # Eigener Eintrag, kein Alias: "Pro Max" wird vom Modellzusatz-Wächter
+  # sonst gegen "Redmi Note 17 Pro" gesperrt und fiele ganz heraus.
+  - hersteller: Xiaomi
+    modell: Redmi Note 17 Pro Max
+    generation: 17
+    speicher: [256, 512]
+    segment: mid
+
+  - hersteller: Xiaomi
+    modell: Redmi Note 15
+    generation: 15
+    speicher: [128, 256]
+    segment: mid
+
+  - hersteller: Xiaomi
+    modell: Redmi Note 15 Pro
+    generation: 15
+    speicher: [256, 512]
+    segment: mid
+
+  - hersteller: Xiaomi
+    modell: Redmi 17
+    generation: 17
+    speicher: [128, 256]
+    segment: entry
+
+  # ---------------------------------------------------------------- Nothing
+  - hersteller: Nothing
+    modell: Nothing Phone (4a)
+    generation: 4
+    vorgaenger: Nothing Phone (3a)
+    speicher: [128, 256]
+    segment: mid
+
+  - hersteller: Nothing
+    modell: Nothing Phone (4a) Pro
+    generation: 4
+    speicher: [256]
+    segment: mid
+
+  # -------------------------------------------------------------- Fairphone
+  # Neuer Hersteller im Bestand: beide Netzbetreiber führen ihn, und er ist
+  # das einzige Nachhaltigkeitsgerät im Sortiment - für eine Seite über
+  # Differenzierung kein Randfall.
+  - hersteller: Fairphone
+    modell: Fairphone 6
+    generation: 6
+    aliase: ["Fairphone (Gen.6)"]
+    speicher: [256]
+    segment: mid

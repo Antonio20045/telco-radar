@@ -1,0 +1,90 @@
+# =============================================================================
+# AENDERUNGSRADAR - Tarifseiten der Wettbewerber
+# =============================================================================
+#
+# Warum das mehr bringt als weitere Newsquellen
+# ---------------------------------------------
+# Die wichtigsten Preisbewegungen im Endkundengeschaeft werden NIE per
+# Pressemitteilung kommuniziert. Eine geaenderte Option, ein neuer
+# Anschlusspreis, ein still verschwundener Aktionstarif - das steht nur auf
+# der Seite. Newsmonitoring erwischt es strukturell nicht, egal wie viele
+# Feeds dazukommen.
+#
+# Umfang: bewusst klein. 15-25 URLs, je Anbieter die Tarifuebersicht und die
+# Aktionsseite. Das ist ueberschaubar zu pflegen und deckt den Grossteil ab;
+# ein breiter Scrape des ganzen Sortiments waere eine andere Sache, technisch
+# wie rechtlich (siehe collect/aenderungen.py, Abschnitt "Rahmen").
+#
+# Was hier NICHT hineingehoert
+# ----------------------------
+# Aktionsseiten mit Endkundenangeboten stehen in config/promo_sources.yaml und
+# laufen ueber die Promo-Pipeline. Diese Datei ist fuer die DAUERTARIFE - die
+# Seite, auf der der Normalpreis steht. Genau dort passiert die stille
+# Aenderung, die keine Aktion ist.
+#
+# `selector` ist optional. Ohne ihn wird der Hauptinhalt der Seite gelesen;
+# mit ihm nur der genannte Bereich, was das Rauschen weiter senkt.
+
+seiten:
+  # ---------------------------------------------------------- Deutsche Telekom
+  - marke: "Telekom"
+    was: "Mobilfunk-Tarifübersicht"
+    url: "https://www.telekom.de/mobilfunk/tarife"
+  - marke: "Telekom"
+    was: "MagentaMobil Zusatzoptionen"
+    url: "https://www.telekom.de/mobilfunk/tarife/zusatzoptionen"
+  - marke: "congstar"
+    was: "Tarifübersicht"
+    url: "https://www.congstar.de/handytarife/"
+
+  # ------------------------------------------------------------------- O2
+  - marke: "o2"
+    was: "Mobilfunk-Tarifübersicht"
+    url: "https://www.o2online.de/tarife/"
+  - marke: "o2"
+    was: "Prepaid-Tarife"
+    url: "https://www.o2online.de/mobilfunk/prepaid/"
+  - marke: "Blau"
+    was: "Tarifübersicht"
+    url: "https://www.blau.de/tarife/"
+
+  # ------------------------------------------------------------------- 1&1
+  - marke: "1&1"
+    was: "Mobilfunk-Tarifübersicht"
+    url: "https://www.1und1.de/handytarife"
+  - marke: "winSIM"
+    was: "Tarifübersicht"
+    url: "https://www.winsim.de/5g-tarife"
+  - marke: "PremiumSIM"
+    was: "Tarifübersicht"
+    url: "https://www.premiumsim.de/"
+
+  # -------------------------------------------------------------- freenet
+  - marke: "mobilcom-debitel"
+    was: "Tarifübersicht"
+    url: "https://www.mobilcom-debitel.de/handytarife/"
+  - marke: "klarmobil"
+    was: "Tarifübersicht"
+    url: "https://www.klarmobil.de/handytarife"
+
+  # ------------------------------------------------------------- Discounter
+  - marke: "ALDI TALK"
+    was: "Tarifübersicht"
+    url: "https://www.alditalk.de/handytarife"
+  - marke: "Lidl Connect"
+    was: "Tarifübersicht"
+    url: "https://www.lidl-connect.de/tarife"
+  - marke: "Penny Mobil"
+    was: "Tarifübersicht"
+    url: "https://www.pennymobil.de/tarife"
+
+  # ----------------------------------------------------------- Vodafone selbst
+  # Der eigene Vergleichsanker. Ohne ihn ist jede Zahl der anderen ein Wert
+  # ohne Bezugsgroesse - dieselbe Ueberlegung, aus der die Promo-Uebersicht
+  # Vodafone mitfuehrt.
+  - marke: "Vodafone"
+    was: "Mobilfunk-Tarifübersicht"
+    url: "https://www.vodafone.de/privat/handys-tablets-tarife/alle-tarife-mit-vertrag.html"
+  - marke: "otelo"
+    was: "Tarifübersicht"
+    url: "https://www.otelo.de/allnet-flat"

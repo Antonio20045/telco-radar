@@ -1,0 +1,441 @@
+# =============================================================================
+# TELCO RADAR - Firmenliste fuer die mechanische Breitensuche
+# =============================================================================
+# Eingabe fuer `scripts/finde_quellen.py --firmen`. Hier steht NUR, WO gesucht
+# wird - Name und Domain. Ob es dort eine brauchbare Quelle gibt, entscheidet
+# die Suche (liefert die Adresse ueberhaupt einen Feed?) und danach allein
+# scripts/pruefe_quellenvorschlag.py. Eine Zeile hier ist also keine Aussage
+# ueber die Qualitaet einer Quelle, sondern ein Suchauftrag.
+#
+# Deshalb darf diese Liste auch Fehlgriffe enthalten: eine Domain ohne Feed
+# kostet ein paar Abrufe und faellt aus der Kandidatenliste, bevor sie
+# irgendwo eingetragen wird. Was NICHT passieren darf, ist der umgekehrte
+# Fehler - eine Quelle in die Watchlist zu schreiben, die nie durch den
+# Abnahme-Check gelaufen ist.
+#
+# KEINE QUOTEN. Der Auftrag verbietet ausdruecklich, die Mischung vorab
+# festzulegen (AUFTRAG_SKALIERUNG_1000.md Abschnitt 4 und 9). Die Kategorien
+# unten sind das Suchinventar aus dem Auftrag - eine Liste von Fundorten,
+# damit keine vergessen wird, nicht eine Zielverteilung. Welche davon taugt,
+# entscheidet die Trefferquote (scripts/quellen_trefferquote.py) nach den
+# ersten Laeufen.
+#
+# Felder:
+#   name     Anzeigename
+#   domain   Unternehmensdomain OHNE Schema ("telenor.no")
+#   region   nur fuer Netzbetreiber: europe|north_america|latin_america|
+#            africa_middle_east|asia|oceania  (Schluessel der Watchlist)
+#   country  ISO-Kuerzel, nur beschreibend
+#   thema    fuer Nicht-Betreiber: ki|geraete|chips|netzausruester|satellit|
+#            regulierung  (Schluessel aus tech_sources.yaml)
+#            plus die in dieser Session ergaenzten Felder, siehe unten
+# =============================================================================
+
+firmen:
+
+  # ===========================================================================
+  # NETZBETREIBER - Europa
+  # Landesgesellschaften und mittelgrosse Anbieter, die heute fehlen. Der
+  # Bestand deckt die Konzernmutter ab; die Landesgesellschaft meldet aber das
+  # Endkundenangebot, und genau das ist fuer die Kollegin interessant.
+  # ===========================================================================
+  - {name: "Telenor Norge", domain: "telenor.no", region: europe, country: "NO"}
+  - {name: "Telia Sverige", domain: "telia.se", region: europe, country: "SE"}
+  - {name: "Telenor Sverige", domain: "telenor.se", region: europe, country: "SE"}
+  - {name: "Tele2 Sverige", domain: "tele2.se", region: europe, country: "SE"}
+  - {name: "TDC / Nuuday", domain: "nuuday.dk", region: europe, country: "DK"}
+  - {name: "DNA Finnland", domain: "dna.fi", region: europe, country: "FI"}
+  - {name: "Telenor Danmark", domain: "telenor.dk", region: europe, country: "DK"}
+  - {name: "Vodafone Italia", domain: "vodafone.it", region: europe, country: "IT"}
+  - {name: "WindTre", domain: "windtre.it", region: europe, country: "IT"}
+  - {name: "Iliad Italia", domain: "iliad.it", region: europe, country: "IT"}
+  - {name: "Fastweb", domain: "fastweb.it", region: europe, country: "IT"}
+  - {name: "Orange España", domain: "orange.es", region: europe, country: "ES"}
+  - {name: "MasOrange", domain: "masorange.es", region: europe, country: "ES"}
+  - {name: "Digi España", domain: "digimobil.es", region: europe, country: "ES"}
+  - {name: "Vodafone España", domain: "vodafone.es", region: europe, country: "ES"}
+  - {name: "NOS Portugal", domain: "nos.pt", region: europe, country: "PT"}
+  - {name: "MEO / Altice Portugal", domain: "telecom.pt", region: europe, country: "PT"}
+  - {name: "Orange Polska", domain: "orange.pl", region: europe, country: "PL"}
+  - {name: "Play / P4", domain: "play.pl", region: europe, country: "PL"}
+  - {name: "Plus / Polkomtel", domain: "plus.pl", region: europe, country: "PL"}
+  - {name: "T-Mobile Polska", domain: "t-mobile.pl", region: europe, country: "PL"}
+  - {name: "O2 Czech Republic", domain: "o2.cz", region: europe, country: "CZ"}
+  - {name: "T-Mobile Czech", domain: "t-mobile.cz", region: europe, country: "CZ"}
+  - {name: "Magyar Telekom", domain: "telekom.hu", region: europe, country: "HU"}
+  - {name: "Yettel Hungary", domain: "yettel.hu", region: europe, country: "HU"}
+  - {name: "Orange Romania", domain: "orange.ro", region: europe, country: "RO"}
+  - {name: "Digi Romania", domain: "digi.ro", region: europe, country: "RO"}
+  - {name: "A1 Bulgaria", domain: "a1.bg", region: europe, country: "BG"}
+  - {name: "Vivacom", domain: "vivacom.bg", region: europe, country: "BG"}
+  - {name: "Hrvatski Telekom", domain: "t.ht.hr", region: europe, country: "HR"}
+  - {name: "Telekom Slovenije", domain: "telekom.si", region: europe, country: "SI"}
+  - {name: "Turkcell Investor", domain: "turkcell.com.tr", region: europe, country: "TR"}
+  - {name: "Sunrise Schweiz", domain: "sunrise.ch", region: europe, country: "CH"}
+  - {name: "Salt Mobile", domain: "salt.ch", region: europe, country: "CH"}
+  - {name: "Magenta Telekom", domain: "magenta.at", region: europe, country: "AT"}
+  - {name: "Drei Österreich", domain: "drei.at", region: europe, country: "AT"}
+  - {name: "Odido", domain: "odido.nl", region: europe, country: "NL"}
+  - {name: "VodafoneZiggo", domain: "vodafoneziggo.nl", region: europe, country: "NL"}
+  - {name: "Telenet", domain: "telenet.be", region: europe, country: "BE"}
+  - {name: "Orange Belgium", domain: "orange.be", region: europe, country: "BE"}
+  - {name: "SFR", domain: "sfr.com", region: europe, country: "FR"}
+  - {name: "Altice France", domain: "alticefrance.com", region: europe, country: "FR"}
+  - {name: "EE", domain: "ee.co.uk", region: europe, country: "GB"}
+  - {name: "Sky UK", domain: "skygroup.sky", region: europe, country: "GB"}
+  - {name: "Eir Irland", domain: "eir.ie", region: europe, country: "IE"}
+  - {name: "Three Ireland", domain: "three.ie", region: europe, country: "IE"}
+  - {name: "Elisa Estland", domain: "elisa.ee", region: europe, country: "EE"}
+  - {name: "LMT Lettland", domain: "lmt.lv", region: europe, country: "LV"}
+  - {name: "Telia Lietuva", domain: "telia.lt", region: europe, country: "LT"}
+  - {name: "Siminn Island", domain: "siminn.is", region: europe, country: "IS"}
+  - {name: "Cosmote / OTE Group", domain: "ote.gr", region: europe, country: "GR"}
+  - {name: "Nova Greece", domain: "nova.gr", region: europe, country: "GR"}
+  - {name: "Cyta Zypern", domain: "cyta.com.cy", region: europe, country: "CY"}
+  - {name: "Proximus Group", domain: "proximus.com", region: europe, country: "BE"}
+
+  # ===========================================================================
+  # NETZBETREIBER - Nordamerika
+  # ===========================================================================
+  - {name: "T-Mobile US", domain: "t-mobile.com", region: north_america, country: "US"}
+  - {name: "Cox Communications", domain: "cox.com", region: north_america, country: "US"}
+  - {name: "Altice USA", domain: "alticeusa.com", region: north_america, country: "US"}
+  - {name: "Frontier Communications", domain: "frontier.com", region: north_america, country: "US"}
+  - {name: "Lumen Technologies", domain: "lumen.com", region: north_america, country: "US"}
+  - {name: "Windstream", domain: "windstream.com", region: north_america, country: "US"}
+  - {name: "Consolidated Communications", domain: "consolidated.com", region: north_america, country: "US"}
+  - {name: "Cable One", domain: "cableone.net", region: north_america, country: "US"}
+  - {name: "Mediacom", domain: "mediacomcable.com", region: north_america, country: "US"}
+  - {name: "Videotron", domain: "videotron.com", region: north_america, country: "CA"}
+  - {name: "Shaw / Rogers Business", domain: "rogers.com", region: north_america, country: "CA"}
+  - {name: "SaskTel", domain: "sasktel.com", region: north_america, country: "CA"}
+  - {name: "Eastlink", domain: "eastlink.ca", region: north_america, country: "CA"}
+  - {name: "Telcel / América Móvil", domain: "americamovil.com", region: north_america, country: "MX"}
+  - {name: "AT&T México", domain: "att.com.mx", region: north_america, country: "MX"}
+
+  # ===========================================================================
+  # NETZBETREIBER - Lateinamerika
+  # ===========================================================================
+  - {name: "Claro Brasil", domain: "claro.com.br", region: latin_america, country: "BR"}
+  - {name: "Vivo / Telefônica Brasil", domain: "telefonica.com.br", region: latin_america, country: "BR"}
+  - {name: "TIM Brasil", domain: "tim.com.br", region: latin_america, country: "BR"}
+  - {name: "Oi", domain: "oi.com.br", region: latin_america, country: "BR"}
+  - {name: "Algar Telecom", domain: "algartelecom.com.br", region: latin_america, country: "BR"}
+  - {name: "Movistar Argentina", domain: "movistar.com.ar", region: latin_america, country: "AR"}
+  - {name: "Personal / Telecom Argentina", domain: "telecom.com.ar", region: latin_america, country: "AR"}
+  - {name: "Entel Chile", domain: "entel.cl", region: latin_america, country: "CL"}
+  - {name: "Movistar Chile", domain: "movistar.cl", region: latin_america, country: "CL"}
+  - {name: "Claro Chile", domain: "clarochile.cl", region: latin_america, country: "CL"}
+  - {name: "Tigo Colombia", domain: "tigo.com.co", region: latin_america, country: "CO"}
+  - {name: "Claro Colombia", domain: "claro.com.co", region: latin_america, country: "CO"}
+  - {name: "Movistar Perú", domain: "movistar.com.pe", region: latin_america, country: "PE"}
+  - {name: "Antel Uruguay", domain: "antel.com.uy", region: latin_america, country: "UY"}
+  - {name: "Digicel", domain: "digicelgroup.com", region: latin_america, country: "JM"}
+  - {name: "Liberty Latin America", domain: "lla.com", region: latin_america, country: "PR"}
+
+  # ===========================================================================
+  # NETZBETREIBER - Afrika & Naher Osten
+  # ===========================================================================
+  - {name: "MTN Nigeria", domain: "mtnonline.com", region: africa_middle_east, country: "NG"}
+  - {name: "Airtel Nigeria", domain: "airtel.com.ng", region: africa_middle_east, country: "NG"}
+  - {name: "Glo / Globacom", domain: "gloworld.com", region: africa_middle_east, country: "NG"}
+  - {name: "Vodacom South Africa", domain: "vodacom.co.za", region: africa_middle_east, country: "ZA"}
+  - {name: "MTN South Africa", domain: "mtn.co.za", region: africa_middle_east, country: "ZA"}
+  - {name: "Telkom South Africa", domain: "telkom.co.za", region: africa_middle_east, country: "ZA"}
+  - {name: "Rain South Africa", domain: "rain.co.za", region: africa_middle_east, country: "ZA"}
+  - {name: "Orange Egypt", domain: "orange.eg", region: africa_middle_east, country: "EG"}
+  - {name: "Telecom Egypt", domain: "te.eg", region: africa_middle_east, country: "EG"}
+  - {name: "Etisalat Misr", domain: "etisalat.eg", region: africa_middle_east, country: "EG"}
+  - {name: "Ooredoo Qatar", domain: "ooredoo.qa", region: africa_middle_east, country: "QA"}
+  - {name: "Mobily", domain: "mobily.com.sa", region: africa_middle_east, country: "SA"}
+  - {name: "Zain KSA", domain: "sa.zain.com", region: africa_middle_east, country: "SA"}
+  - {name: "Batelco / Beyon", domain: "beyon.com", region: africa_middle_east, country: "BH"}
+  - {name: "Omantel", domain: "omantel.om", region: africa_middle_east, country: "OM"}
+  - {name: "Turk Telekom", domain: "turktelekom.com.tr", region: africa_middle_east, country: "TR"}
+  - {name: "Partner Communications", domain: "partner.co.il", region: africa_middle_east, country: "IL"}
+  - {name: "Cellcom Israel", domain: "cellcom.co.il", region: africa_middle_east, country: "IL"}
+  - {name: "Safaricom Kenia", domain: "safaricom.co.ke", region: africa_middle_east, country: "KE"}
+  - {name: "Airtel Kenya", domain: "airtelkenya.com", region: africa_middle_east, country: "KE"}
+  - {name: "Ethio Telecom", domain: "ethiotelecom.et", region: africa_middle_east, country: "ET"}
+  - {name: "Maroc Telecom", domain: "iam.ma", region: africa_middle_east, country: "MA"}
+  - {name: "Inwi", domain: "inwi.ma", region: africa_middle_east, country: "MA"}
+  - {name: "Ooredoo Tunisie", domain: "ooredoo.tn", region: africa_middle_east, country: "TN"}
+  - {name: "Sonatel", domain: "sonatel.sn", region: africa_middle_east, country: "SN"}
+
+  # ===========================================================================
+  # NETZBETREIBER - Asien
+  # ===========================================================================
+  - {name: "China Unicom", domain: "chinaunicom.com.hk", region: asia, country: "CN"}
+  - {name: "China Telecom Global", domain: "chinatelecomglobal.com", region: asia, country: "CN"}
+  - {name: "HKT Hongkong", domain: "hkt.com", region: asia, country: "HK"}
+  - {name: "CK Hutchison / 3 HK", domain: "three.com.hk", region: asia, country: "HK"}
+  - {name: "SmarTone", domain: "smartone.com", region: asia, country: "HK"}
+  - {name: "Chunghwa Telecom", domain: "cht.com.tw", region: asia, country: "TW"}
+  - {name: "Taiwan Mobile", domain: "taiwanmobile.com", region: asia, country: "TW"}
+  - {name: "Far EasTone", domain: "fetnet.net", region: asia, country: "TW"}
+  - {name: "LG Uplus", domain: "uplus.co.kr", region: asia, country: "KR"}
+  - {name: "NTT Group", domain: "group.ntt", region: asia, country: "JP"}
+  - {name: "Rakuten Group", domain: "global.rakuten.com", region: asia, country: "JP"}
+  - {name: "Jio Platforms", domain: "jio.com", region: asia, country: "IN"}
+  - {name: "Vodafone Idea", domain: "myvi.in", region: asia, country: "IN"}
+  - {name: "BSNL", domain: "bsnl.co.in", region: asia, country: "IN"}
+  - {name: "Tata Communications", domain: "tatacommunications.com", region: asia, country: "IN"}
+  - {name: "Jazz Pakistan", domain: "jazz.com.pk", region: asia, country: "PK"}
+  - {name: "Grameenphone", domain: "grameenphone.com", region: asia, country: "BD"}
+  - {name: "Robi Axiata", domain: "robi.com.bd", region: asia, country: "BD"}
+  - {name: "Dialog Axiata", domain: "dialog.lk", region: asia, country: "LK"}
+  - {name: "Axiata Group", domain: "axiata.com", region: asia, country: "MY"}
+  - {name: "Maxis", domain: "maxis.com.my", region: asia, country: "MY"}
+  - {name: "U Mobile", domain: "u.com.my", region: asia, country: "MY"}
+  - {name: "Telkom Indonesia", domain: "telkom.co.id", region: asia, country: "ID"}
+  - {name: "XL Axiata / XLSmart", domain: "xlaxiata.co.id", region: asia, country: "ID"}
+  - {name: "Smartfren", domain: "smartfren.com", region: asia, country: "ID"}
+  - {name: "Globe Telecom", domain: "globe.com.ph", region: asia, country: "PH"}
+  - {name: "PLDT", domain: "pldt.com", region: asia, country: "PH"}
+  - {name: "DITO Telecommunity", domain: "dito.ph", region: asia, country: "PH"}
+  - {name: "True Corporation", domain: "truecorp.co.th", region: asia, country: "TH"}
+  - {name: "AIS Thailand", domain: "ais.th", region: asia, country: "TH"}
+  - {name: "Viettel", domain: "viettel.com.vn", region: asia, country: "VN"}
+  - {name: "VNPT", domain: "vnpt.com.vn", region: asia, country: "VN"}
+  - {name: "Singtel Group", domain: "singtel.com", region: asia, country: "SG"}
+  - {name: "StarHub", domain: "starhub.com", region: asia, country: "SG"}
+  - {name: "M1 Singapur", domain: "m1.com.sg", region: asia, country: "SG"}
+  - {name: "Kazakhtelecom", domain: "telecom.kz", region: asia, country: "KZ"}
+  - {name: "Beeline Kazakhstan", domain: "beeline.kz", region: asia, country: "KZ"}
+
+  # ===========================================================================
+  # NETZBETREIBER - Ozeanien
+  # ===========================================================================
+  - {name: "Optus", domain: "optus.com.au", region: oceania, country: "AU"}
+  - {name: "TPG Telecom", domain: "tpgtelecom.com.au", region: oceania, country: "AU"}
+  - {name: "NBN Co", domain: "nbnco.com.au", region: oceania, country: "AU"}
+  - {name: "Chorus NZ", domain: "chorus.co.nz", region: oceania, country: "NZ"}
+  - {name: "Spark New Zealand", domain: "sparknz.co.nz", region: oceania, country: "NZ"}
+  - {name: "Telstra Exchange", domain: "telstra.com.au", region: oceania, country: "AU"}
+  - {name: "Digicel Pacific", domain: "digicelgroup.com", region: oceania, country: "PG"}
+
+  # ===========================================================================
+  # FACHPRESSE - international, REGIONAL UND ANDERSSPRACHIG
+  # Der Auftrag nennt das die auffaelligste Luecke im Bestand: alle 14
+  # bestehenden Feeds sind englischsprachig. Der Analyst versteht andere
+  # Sprachen; nur der Datums-Parser in collect/newsroom.py kennt nicht jedes
+  # Monatsformat - deshalb faellt eine Quelle mit unlesbarem Datum ohnehin
+  # durch Kriterium 3 und kommt gar nicht erst hinein.
+  # ===========================================================================
+  - {name: "Golem Telekommunikation", domain: "golem.de", thema: fachpresse}
+  - {name: "heise online", domain: "heise.de", thema: fachpresse}
+  - {name: "teltarif", domain: "teltarif.de", thema: fachpresse}
+  - {name: "connect", domain: "connect.de", thema: fachpresse}
+  - {name: "ZDNet Deutschland", domain: "zdnet.de", thema: fachpresse}
+  - {name: "Telecom Handel", domain: "telecom-handel.de", thema: fachpresse}
+  - {name: "Le Monde Informatique", domain: "lemondeinformatique.fr", thema: fachpresse}
+  - {name: "Univers Freebox", domain: "universfreebox.com", thema: fachpresse}
+  - {name: "ZDNet France", domain: "zdnet.fr", thema: fachpresse}
+  - {name: "Xataka Móvil", domain: "xatakamovil.com", thema: fachpresse}
+  - {name: "ADSLZone", domain: "adslzone.net", thema: fachpresse}
+  - {name: "Expansión Tecnología", domain: "expansion.com", thema: fachpresse}
+  - {name: "Telecom Italia Corriere", domain: "corrierecomunicazioni.it", thema: fachpresse}
+  - {name: "Key4biz", domain: "key4biz.it", thema: fachpresse}
+  - {name: "Telecompaper", domain: "telecompaper.com", thema: fachpresse}
+  - {name: "Nordic Telecom News", domain: "telecompaper.com", thema: fachpresse}
+  - {name: "Teleco.com.br", domain: "teleco.com.br", thema: fachpresse}
+  - {name: "TeleSíntese", domain: "telesintese.com.br", thema: fachpresse}
+  - {name: "Convergencia Latina", domain: "convergencialatina.com", thema: fachpresse}
+  - {name: "TeleSemana", domain: "telesemana.com", thema: fachpresse}
+  - {name: "DigiAnalysys", domain: "digianalysys.com", thema: fachpresse}
+  - {name: "Communications Today India", domain: "communicationstoday.co.in", thema: fachpresse}
+  - {name: "Telecom Review Asia", domain: "telecomreviewasia.com", thema: fachpresse}
+  - {name: "Telecom Review Africa", domain: "telecomreviewafrica.com", thema: fachpresse}
+  - {name: "ITWeb Telecoms", domain: "itweb.co.za", thema: fachpresse}
+  - {name: "TechCentral SA", domain: "techcentral.co.za", thema: fachpresse}
+  - {name: "Capacity Media", domain: "capacitymedia.com", thema: fachpresse}
+  - {name: "TelecomTV", domain: "telecomtv.com", thema: fachpresse}
+  - {name: "Telecoms.com", domain: "telecoms.com", thema: fachpresse}
+  - {name: "Mobile World Live Asia", domain: "mobileworldlive.com", thema: fachpresse}
+  - {name: "5G Radar", domain: "5gradar.com", thema: fachpresse}
+  - {name: "Broadband Communities", domain: "bbcmag.com", thema: fachpresse}
+  - {name: "Data Center Dynamics", domain: "datacenterdynamics.com", thema: fachpresse}
+  - {name: "Light Reading Europe", domain: "lightreading.com", thema: fachpresse}
+  - {name: "Telecoms Tech News", domain: "telecomstechnews.com", thema: fachpresse}
+  - {name: "Rethink Research", domain: "rethinkresearch.biz", thema: fachpresse}
+  - {name: "Policy Tracker", domain: "policytracker.com", thema: fachpresse}
+  - {name: "Ookla Insights", domain: "ookla.com", thema: fachpresse}
+  - {name: "Opensignal", domain: "opensignal.com", thema: fachpresse}
+
+  # ===========================================================================
+  # REGULIERUNG, NORMUNG, VERBAENDE (heute 6 Quellen)
+  # ===========================================================================
+  - {name: "Bundesnetzagentur", domain: "bundesnetzagentur.de", thema: regulierung}
+  - {name: "Ofcom", domain: "ofcom.org.uk", thema: regulierung}
+  - {name: "ARCEP", domain: "arcep.fr", thema: regulierung}
+  - {name: "AGCOM", domain: "agcom.it", thema: regulierung}
+  - {name: "BEREC", domain: "berec.europa.eu", thema: regulierung}
+  - {name: "FCC", domain: "fcc.gov", thema: regulierung}
+  - {name: "NTIA", domain: "ntia.gov", thema: regulierung}
+  - {name: "CRTC Kanada", domain: "crtc.gc.ca", thema: regulierung}
+  - {name: "ACMA Australien", domain: "acma.gov.au", thema: regulierung}
+  - {name: "ComCom Neuseeland", domain: "comcom.govt.nz", thema: regulierung}
+  - {name: "TRAI Indien", domain: "trai.gov.in", thema: regulierung}
+  - {name: "IMDA Singapur", domain: "imda.gov.sg", thema: regulierung}
+  - {name: "ICASA Suedafrika", domain: "icasa.org.za", thema: regulierung}
+  - {name: "NCC Nigeria", domain: "ncc.gov.ng", thema: regulierung}
+  - {name: "ANATEL Brasilien", domain: "gov.br", thema: regulierung}
+  - {name: "RTR Österreich", domain: "rtr.at", thema: regulierung}
+  - {name: "BAKOM Schweiz", domain: "bakom.admin.ch", thema: regulierung}
+  - {name: "PTS Schweden", domain: "pts.se", thema: regulierung}
+  - {name: "Nkom Norwegen", domain: "nkom.no", thema: regulierung}
+  - {name: "Traficom Finnland", domain: "traficom.fi", thema: regulierung}
+  - {name: "ACM Niederlande", domain: "acm.nl", thema: regulierung}
+  - {name: "BIPT Belgien", domain: "bipt.be", thema: regulierung}
+  - {name: "ANACOM Portugal", domain: "anacom.pt", thema: regulierung}
+  - {name: "UKE Polen", domain: "uke.gov.pl", thema: regulierung}
+  - {name: "ETSI", domain: "etsi.org", thema: regulierung}
+  - {name: "3GPP", domain: "3gpp.org", thema: regulierung}
+  - {name: "ITU", domain: "itu.int", thema: regulierung}
+  - {name: "GSMA", domain: "gsma.com", thema: regulierung}
+  - {name: "O-RAN Alliance", domain: "o-ran.org", thema: regulierung}
+  - {name: "TM Forum", domain: "tmforum.org", thema: regulierung}
+  - {name: "Broadband Forum", domain: "broadband-forum.org", thema: regulierung}
+  - {name: "Wi-Fi Alliance", domain: "wi-fi.org", thema: regulierung}
+  - {name: "Linux Foundation Networking", domain: "lfnetworking.org", thema: regulierung}
+  - {name: "Telecom Infra Project", domain: "telecominfraproject.com", thema: regulierung}
+  - {name: "ETNO", domain: "etno.eu", thema: regulierung}
+  - {name: "Connect Europe", domain: "connecteurope.org", thema: regulierung}
+  - {name: "CTIA", domain: "ctia.org", thema: regulierung}
+  - {name: "NCTA", domain: "ncta.com", thema: regulierung}
+  - {name: "Bitkom", domain: "bitkom.org", thema: regulierung}
+  - {name: "VATM", domain: "vatm.de", thema: regulierung}
+
+  # ===========================================================================
+  # NETZAUSRUESTER UND ZULIEFERER (heute 3 Quellen)
+  # ===========================================================================
+  - {name: "Nokia", domain: "nokia.com", thema: netzausruester}
+  - {name: "Ericsson", domain: "ericsson.com", thema: netzausruester}
+  - {name: "Huawei Carrier", domain: "huawei.com", thema: netzausruester}
+  - {name: "ZTE", domain: "zte.com.cn", thema: netzausruester}
+  - {name: "Samsung Networks", domain: "samsung.com", thema: netzausruester}
+  - {name: "Ciena", domain: "ciena.com", thema: netzausruester}
+  - {name: "Infinera", domain: "infinera.com", thema: netzausruester}
+  - {name: "Adtran", domain: "adtran.com", thema: netzausruester}
+  - {name: "Casa Systems", domain: "casa-systems.com", thema: netzausruester}
+  - {name: "Mavenir", domain: "mavenir.com", thema: netzausruester}
+  - {name: "Rakuten Symphony", domain: "symphony.rakuten.com", thema: netzausruester}
+  - {name: "Amdocs", domain: "amdocs.com", thema: netzausruester}
+  - {name: "Netcracker", domain: "netcracker.com", thema: netzausruester}
+  - {name: "Cisco Service Provider", domain: "cisco.com", thema: netzausruester}
+  - {name: "CommScope", domain: "commscope.com", thema: netzausruester}
+  - {name: "Corning Optical", domain: "corning.com", thema: netzausruester}
+  - {name: "Viavi Solutions", domain: "viavisolutions.com", thema: netzausruester}
+  - {name: "Keysight", domain: "keysight.com", thema: netzausruester}
+  - {name: "Radisys", domain: "radisys.com", thema: netzausruester}
+  - {name: "Parallel Wireless", domain: "parallelwireless.com", thema: netzausruester}
+  - {name: "JMA Wireless", domain: "jmawireless.com", thema: netzausruester}
+  - {name: "Fujitsu Network", domain: "fujitsu.com", thema: netzausruester}
+  - {name: "NEC Networks", domain: "nec.com", thema: netzausruester}
+
+  # ===========================================================================
+  # GERAETE, CHIPS UND MODEMS (heute 9 bzw. 4 Quellen)
+  # ===========================================================================
+  - {name: "Qualcomm", domain: "qualcomm.com", thema: chips}
+  - {name: "MediaTek", domain: "mediatek.com", thema: chips}
+  - {name: "Broadcom", domain: "broadcom.com", thema: chips}
+  - {name: "Marvell", domain: "marvell.com", thema: chips}
+  - {name: "Analog Devices", domain: "analog.com", thema: chips}
+  - {name: "Skyworks", domain: "skyworksinc.com", thema: chips}
+  - {name: "Qorvo", domain: "qorvo.com", thema: chips}
+  - {name: "TSMC", domain: "tsmc.com", thema: chips}
+  - {name: "Samsung Semiconductor", domain: "semiconductor.samsung.com", thema: chips}
+  - {name: "SK hynix", domain: "skhynix.com", thema: chips}
+  - {name: "Micron", domain: "micron.com", thema: chips}
+  - {name: "AMD", domain: "amd.com", thema: chips}
+  - {name: "Apple Newsroom", domain: "apple.com", thema: geraete}
+  - {name: "Samsung Mobile", domain: "news.samsung.com", thema: geraete}
+  - {name: "Xiaomi", domain: "mi.com", thema: geraete}
+  - {name: "OnePlus", domain: "oneplus.com", thema: geraete}
+  - {name: "Oppo", domain: "oppo.com", thema: geraete}
+  - {name: "Motorola / Lenovo", domain: "motorola.com", thema: geraete}
+  - {name: "Nothing", domain: "nothing.tech", thema: geraete}
+  - {name: "Honor", domain: "hihonor.com", thema: geraete}
+  - {name: "Fairphone", domain: "fairphone.com", thema: geraete}
+  - {name: "Garmin", domain: "garmin.com", thema: geraete}
+
+  # ===========================================================================
+  # SATELLIT UND NTN (heute genau 1 Quelle - die duennste Stelle im Bestand)
+  # ===========================================================================
+  - {name: "SpaceX Starlink", domain: "spacex.com", thema: satellit}
+  - {name: "AST SpaceMobile", domain: "ast-science.com", thema: satellit}
+  - {name: "Iridium", domain: "iridium.com", thema: satellit}
+  - {name: "Globalstar", domain: "globalstar.com", thema: satellit}
+  - {name: "Viasat", domain: "viasat.com", thema: satellit}
+  - {name: "SES", domain: "ses.com", thema: satellit}
+  - {name: "Intelsat", domain: "intelsat.com", thema: satellit}
+  - {name: "Eutelsat / OneWeb", domain: "eutelsat.com", thema: satellit}
+  - {name: "Telesat", domain: "telesat.com", thema: satellit}
+  - {name: "Amazon Leo / Kuiper", domain: "aboutamazon.com", thema: satellit}
+  - {name: "Skylo", domain: "skylo.tech", thema: satellit}
+  - {name: "Omnispace", domain: "omnispace.com", thema: satellit}
+  - {name: "Lynk Global", domain: "lynk.world", thema: satellit}
+  - {name: "ESA Telecommunications", domain: "esa.int", thema: satellit}
+
+  # ===========================================================================
+  # KI-ANBIETER (heute 8 Quellen)
+  # ===========================================================================
+  - {name: "Microsoft AI", domain: "microsoft.com", thema: ki}
+  - {name: "AWS Machine Learning", domain: "aws.amazon.com", thema: ki}
+  - {name: "IBM Research", domain: "research.ibm.com", thema: ki}
+  - {name: "Mistral AI", domain: "mistral.ai", thema: ki}
+  - {name: "Cohere", domain: "cohere.com", thema: ki}
+  - {name: "Stability AI", domain: "stability.ai", thema: ki}
+  - {name: "Databricks", domain: "databricks.com", thema: ki}
+  - {name: "Salesforce AI", domain: "salesforce.com", thema: ki}
+  - {name: "ServiceNow", domain: "servicenow.com", thema: ki}
+  - {name: "Palantir", domain: "palantir.com", thema: ki}
+
+  # ===========================================================================
+  # TOWER, GLASFASER, RECHENZENTREN
+  # Neue Kategorie. Sie entscheiden ueber die Kostenseite des Netzbetriebs und
+  # ueber die Verfuegbarkeit von Standorten - fuer einen Betreiber naeher am
+  # Geschaeft als mancher Chiphersteller. Ob sie taugt, sagt die Trefferquote.
+  # ===========================================================================
+  - {name: "Cellnex", domain: "cellnex.com", thema: infrastruktur}
+  - {name: "American Tower", domain: "americantower.com", thema: infrastruktur}
+  - {name: "Crown Castle", domain: "crowncastle.com", thema: infrastruktur}
+  - {name: "SBA Communications", domain: "sbasite.com", thema: infrastruktur}
+  - {name: "Vantage Towers", domain: "vantagetowers.com", thema: infrastruktur}
+  - {name: "IHS Towers", domain: "ihstowers.com", thema: infrastruktur}
+  - {name: "Helios Towers", domain: "heliostowers.com", thema: infrastruktur}
+  - {name: "INWIT", domain: "inwit.it", thema: infrastruktur}
+  - {name: "Equinix", domain: "equinix.com", thema: infrastruktur}
+  - {name: "Digital Realty", domain: "digitalrealty.com", thema: infrastruktur}
+  - {name: "Vantage Data Centers", domain: "vantage-dc.com", thema: infrastruktur}
+  - {name: "Openreach", domain: "openreach.com", thema: infrastruktur}
+  - {name: "CityFibre", domain: "cityfibre.com", thema: infrastruktur}
+  - {name: "Deutsche Glasfaser", domain: "deutsche-glasfaser.de", thema: infrastruktur}
+  - {name: "OXG Glasfaser", domain: "oxg.de", thema: infrastruktur}
+  - {name: "Zayo", domain: "zayo.com", thema: infrastruktur}
+  - {name: "Colt Technology", domain: "colt.net", thema: infrastruktur}
+  - {name: "euNetworks", domain: "eunetworks.com", thema: infrastruktur}
+
+  # ===========================================================================
+  # MVNO- UND eSIM-PLATTFORMEN
+  # Neue Kategorie. eSIM und Reise-Datenpakete sind genau die Stelle, an der
+  # Betreibern Umsatz wegbricht - und die Anbieter melden ihre Deals selbst.
+  # ===========================================================================
+  - {name: "Airalo", domain: "airalo.com", thema: mvno}
+  - {name: "Holafly", domain: "holafly.com", thema: mvno}
+  - {name: "Truphone / 1GLOBAL", domain: "1global.com", thema: mvno}
+  - {name: "Gigs", domain: "gigs.com", thema: mvno}
+  - {name: "Twilio", domain: "twilio.com", thema: mvno}
+  - {name: "Sinch", domain: "sinch.com", thema: mvno}
+  - {name: "Infobip", domain: "infobip.com", thema: mvno}
+  - {name: "Syniverse", domain: "syniverse.com", thema: mvno}
+  - {name: "BICS", domain: "bics.com", thema: mvno}
+  - {name: "Telna", domain: "telna.com", thema: mvno}
+  - {name: "Transatel", domain: "transatel.com", thema: mvno}
+  - {name: "Thales Digital Identity", domain: "thalesgroup.com", thema: mvno}
+  - {name: "Giesecke+Devrient", domain: "gi-de.com", thema: mvno}
+  - {name: "IDEMIA", domain: "idemia.com", thema: mvno}
+  - {name: "Kaleyra", domain: "kaleyra.com", thema: mvno}
+  - {name: "Google Fi", domain: "fi.google.com", thema: mvno}
+  - {name: "Mint Mobile", domain: "mintmobile.com", thema: mvno}
+  - {name: "Lycamobile", domain: "lycamobile.com", thema: mvno}

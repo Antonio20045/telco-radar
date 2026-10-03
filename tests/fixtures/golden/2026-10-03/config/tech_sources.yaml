@@ -1,0 +1,52 @@
+themen:
+  chips:
+    beschreibung: Modem- und SoC-Generationen legen Jahre im Voraus fest, welche Netzfunktionen
+      (5G-SA, NTN, RedCap) ueberhaupt in Geraeten ankommen.
+    name: Chips & Modems
+    quellen: []
+  geraete:
+    beschreibung: Was ein Endgeraet kann, entscheidet, was ein Betreiber verkaufen
+      kann - von eSIM ueber Satellitenfunk bis zu KI-Funktionen, die Datenvolumen
+      erzeugen.
+    name: Geräte
+    quellen:
+    - name: Apple
+      type: rss
+      url: https://www.apple.com/newsroom/rss-feed.rss
+  infrastruktur:
+    beschreibung: Die Eigentuemer der passiven Infrastruktur - Funktuerme, Glasfasernetze
+      und Rechenzentren. Sie bestimmen die Kostenseite und das Tempo des Netzausbaus,
+      ohne selbst Endkunden zu haben.
+    name: Türme, Glasfaser & Rechenzentren
+    quellen: []
+  ki:
+    beschreibung: Die Anbieter der Modelle, die Betreiber in Tarife, Kundenservice
+      und Netzbetrieb einbauen. Sie bestimmen, was ein "KI-Tarif" ueberhaupt enthalten
+      kann und was er kostet.
+    name: KI-Anbieter
+    quellen:
+    - name: OpenAI
+      type: rss
+      url: https://openai.com/news/rss.xml
+  mvno:
+    beschreibung: 'Anbieter ohne eigenes Netz, die Betreibern Erloese abnehmen: eSIM-
+      und Reisedatenpakete, Nachrichtenplattformen (CPaaS) und netzuebergreifende
+      IoT-Konnektivitaet.'
+    name: MVNO, eSIM & Plattformen
+    quellen: []
+  netzausruester:
+    beschreibung: Ericsson, Nokia, Huawei & Co. bauen die Netze, ueber die alles laeuft.
+      Ihre Ankuendigungen zeigen Monate vorher, welche Funktionen Betreiber als naechstes
+      ausrollen koennen.
+    name: Netzausrüster
+    quellen: []
+  regulierung:
+    beschreibung: Frequenzvergaben, Fusionsentscheidungen, Roaming- und KI-Regeln
+      setzen den Rahmen, in dem sich jedes Angebot bewegen muss.
+    name: Regulierung & Verbände
+    quellen: []
+  satellit:
+    beschreibung: Direct-to-Cell verschiebt gerade die Grenze zwischen Mobilfunk und
+      Satellit - und damit die Frage, wofuer Kunden ihren Betreiber brauchen.
+    name: Satellit & NTN
+    quellen: []

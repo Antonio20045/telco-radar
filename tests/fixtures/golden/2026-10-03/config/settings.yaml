@@ -1,0 +1,114 @@
+aenderungsradar_aktiv: false
+analyst_batch_workers: 1
+analyst_model: claude-sonnet-5
+anker_mechanik_model: claude-haiku-4-5-20251001
+anker_redaktion_model: claude-sonnet-5
+bedrock_analyst_model: ''
+bedrock_editor_model: ''
+bedrock_model_chain:
+- anthropic.claude-sonnet-5
+- anthropic.claude-sonnet-4-6
+- anthropic.claude-opus-4-6-v1
+- anthropic.claude-sonnet-4-5-20250929-v1:0
+- anthropic.claude-haiku-4-5-20251001-v1:0
+cluster_llm_pruefung: true
+cluster_max_llm_pruefungen: null
+collect_host_max_parallel: 2
+collect_host_min_interval_seconds: 0.5
+collect_max_workers: 1
+ct_radar_aktiv: false
+ctm_belegpruefung: true
+deepseek_analyst_model: deepseek-v4-pro
+deepseek_api_base: https://api.deepseek.com
+deepseek_editor_model: deepseek-v4-pro
+deepseek_mechanik_model: deepseek-v4-flash
+editor_max_highlights: 0
+editor_model: claude-sonnet-5
+editor_model_fallback: true
+editor_modus: auto
+editor_zweistufig_ab_meldungen: 120
+focus_competitors:
+- aliases:
+  - Telekom
+  - T-Mobile
+  - T-Systems
+  - Magenta
+  name: Deutsche Telekom
+- aliases:
+  - O2
+  - Telefónica
+  - Telefonica
+  - Movistar
+  - Virgin Media O2
+  name: Telefónica / O2
+- aliases:
+  - 1&1
+  - 1und1
+  - United Internet
+  - Drillisch
+  name: 1&1
+geraete_enabled: false
+geraete_frist_sekunden: 600
+http:
+  image_timeout_seconds: 17
+  max_entries_per_feed: 60
+  max_links_per_newsroom: 30
+  render_timeout_seconds: 16
+  timeout_seconds: 20
+  user_agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML,
+    like Gecko) Chrome/126.0 Safari/537.36
+job_frist_sekunden: 10800
+lieferzeit_radar_aktiv: false
+llm_api_base: https://integrate.api.nvidia.com/v1
+llm_budget_usd: 1.5
+llm_max_workers: 1
+llm_preise:
+  claude-haiku-4-5:
+    aus: 5.0
+    ein: 1.0
+  claude-haiku-4-5-20251001:
+    aus: 5.0
+    ein: 1.0
+  claude-sonnet-5:
+    aus: 10.0
+    ein: 2.0
+  deepseek-v4-flash:
+    aus: 0.28
+    ein: 0.14
+  deepseek-v4-pro:
+    aus: 0.87
+    ein: 0.435
+llm_provider: deepseek
+lookback_days: 3
+max_items_per_region: 0
+model: claude-sonnet-5
+newsletter_dienst_url: https://telco-radar-signup.onrender.com
+openai_analyst_model: deepseek-ai/deepseek-v4-flash
+openai_editor_model: deepseek-ai/deepseek-v4-flash
+promo_enabled: false
+promo_score:
+  highlight_enter: 68
+  highlight_exit: 60
+  weights:
+    campaign: 0.1
+    depth: 0.25
+    lever: 0.3
+    momentum: 0.15
+    reach: 0.2
+publish_requires_editorial_briefing: false
+quellen_quarantaene_nach_laeufen: 6
+report_language: de
+reported_topics_memory: 300
+tarif_radar_aktiv: false
+uebersetzung_artikelabruf: true
+uebersetzung_enabled: true
+uebersetzung_frist_sekunden: 600
+uebersetzung_max_je_lauf: 60
+veroeffentlichung_reserve_sekunden: 420
+versand:
+  mail_aktiv: true
+  site_url: https://telco-radar.onrender.com
+  teams_aktiv: true
+  wochentag: 0
+vorsortierung_enabled: true
+vorsortierung_frist_sekunden: 480

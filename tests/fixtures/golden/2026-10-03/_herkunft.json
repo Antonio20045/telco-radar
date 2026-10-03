@@ -1,0 +1,32 @@
+{
+ "bestand": "tests/fixtures/bestand/2026-10-03",
+ "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+ "eintraege": [
+  {
+   "abgeleitet_aus": "zwei Wiedergaben der Aufnahme, gleiche Seiten",
+   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "datei": "erwartet.json",
+   "filter": null,
+   "sha256_roh": "6ca1080085f14809c9e7b582624f3c2d943184f1e1097e7f573c21dcd297f013"
+  },
+  {
+   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "datei": "http.jsonl.gz",
+   "filter": null,
+   "quelle": "goldener Lauf 2026-10-03T15:53:29+00:00, Lauf 37134812406",
+   "sha256_roh": "26560110e85f370aa60c958134c1c34e20a4039db72888694a4ae533d3b1a7e8"
+  },
+  {
+   "commit": "0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+   "datei": "llm.jsonl.gz",
+   "filter": null,
+   "quelle": "goldener Lauf 2026-10-03T15:53:29+00:00, Lauf 37134812406",
+   "sha256_roh": "2c407aecd0964c157732929ea449e999ac274339536f0d4544b7b3807bb5559c"
+  }
+ ],
+ "lauf": "37134812406",
+ "umgebung": [
+  "LLM_API_KEY"
+ ],
+ "zeit": "2026-10-03T15:53:29+00:00"
+}
