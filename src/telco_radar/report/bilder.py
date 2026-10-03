@@ -52,6 +52,8 @@ _UA = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/126.0 Safari/537.36"
 )
+_KOPF = {"User-Agent": _UA}
+TRANSPORT: httpx.BaseTransport | None = None  # Naht, gesetzt von naehte.Naehte
 _ERLAUBTE_TYPEN = ("image/jpeg", "image/png", "image/webp", "image/avif", "image/jpg")
 
 # Wie viele Meldungen gleichzeitig bearbeitet werden. Jede kostet bis zu
@@ -93,7 +95,6 @@ _OG_RE = (
     ),
 )
 # Logos, Zaehlpixel und Platzhalter sehen aus wie Bilder und sind keine.
-#
 # "share-image" und "default-image" standen bis zum 06.08.2026 mit in dieser
 # Liste. Das war ein Denkfehler: `og:image` IST per Definition das
 # Share-Bild, und mehrere Redaktionssysteme benennen die Datei genau so.
@@ -358,7 +359,6 @@ def _eine_meldung(
     if not kandidaten:
         return z
 
-    # Die Groesse entscheidet - nicht, ob das Bild aus dem Feed kam.
     url, daten, w, hh = max(kandidaten, key=lambda k: k[2])
     if w < _MIND_BREITE:
         z["zu_klein"] += 1
@@ -400,7 +400,7 @@ def hole_bilder(highlights: list[dict], root: Path, gross_bis_rang: int = 40) ->
 
     bilanz: Counter = Counter()
     with httpx.Client(
-        headers={"User-Agent": _UA}, timeout=_TIMEOUT, follow_redirects=True
+        headers=_KOPF, timeout=_TIMEOUT, follow_redirects=True, transport=TRANSPORT
     ) as client:
 
         def arbeite(paar: tuple[int, dict]) -> Counter:

@@ -21,3 +21,7 @@ pruefen:
 .PHONY: stand
 stand:
 	.venv/bin/python scripts/stand.py
+
+.PHONY: golden-aufnehmen
+golden-aufnehmen:
+	PYTHONPATH=src .venv/bin/python scripts/golden_aufnehmen.py

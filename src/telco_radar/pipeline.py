@@ -14,8 +14,9 @@ import sys
 import time
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from functools import partial
 from itertools import zip_longest
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
 from .analyze import editor
@@ -40,6 +41,7 @@ from .collect import collect_all, tag_news_regions
 from .config import is_theme_key, load_config
 from .dedupe import ReportedTopics, SeenStore, filter_fresh
 from .models import Item
+from .naehte import PRODUKTION, Naehte
 from .quellen_register import Quellenregister, quellen_der_config
 from .report import bilder as report_bilder
 from .report import diff_bilder
@@ -578,13 +580,18 @@ def _interleave_by_source(items: list[Item]) -> list[Item]:
 
 
 def run(
-    root: Path, use_llm: bool | None = None, lookback_days: int | None = None
+    root: Path,
+    use_llm: bool | None = None,
+    lookback_days: int | None = None,
+    naehte: Naehte = PRODUKTION,
 ) -> tuple[Path, list[Ausfall]]:
     """Execute one full radar run.
 
     Returns the report path and the parts of the site that were not rebuilt."""
-    t0 = time.monotonic()
-    started_at = datetime.now(timezone.utc)
+    uhr = naehte.setzen() or partial(datetime.now, timezone.utc)
+    stoppuhr = naehte.stoppuhr or time.monotonic
+    t0 = stoppuhr()
+    started_at = uhr()
     cfg = load_config(root)
     lookback = lookback_days or cfg.lookback_days
     language = LANGUAGES.get(cfg.settings.get("report_language", "de"), "Deutsch")
@@ -629,7 +636,7 @@ def run(
     # 0 (oder fehlend) heisst: keine Kappung - jede neue Meldung wird bewertet.
     max_items = int(cfg.settings.get("max_items_per_region", 0) or 0) or None
 
-    today = date.today()
+    today = started_at.date()
     today_iso = today.isoformat()
 
     state_dir = root / "data" / "state"
@@ -642,7 +649,7 @@ def run(
         phases.append({"name": name, "seconds": round(seconds, 1), "detail": detail})
 
     # ------------------------------------------------------------- collect
-    tc = time.monotonic()
+    tc = stoppuhr()
     register = Quellenregister(state_dir / "quellen_register.json")
     items, source_results = collect_all(cfg, register=register)
     tag_news_regions(items, cfg.operators)
@@ -652,7 +659,6 @@ def run(
     # Pressemitteilung kommuniziert: eine geaenderte Option, ein neuer
     # Anschlusspreis, ein still verschwundener Aktionstarif stehen nur auf der
     # Tarifseite. Newsmonitoring erwischt das strukturell nicht.
-    #
     # Die gefundenen Aenderungen gehen als normale Meldungen weiter - durch
     # Delta-Schicht, Clustering, Analyst, CTM-Linse und Bericht. Sie tragen
     # eine eigene `id` (aus URL plus Inhalt der Aenderung), sonst haette der
@@ -733,7 +739,7 @@ def run(
     n_fail = len(failed)
     phase(
         "Sammeln",
-        time.monotonic() - tc,
+        stoppuhr() - tc,
         f"{len(source_results) - n_quarantaene} Quellen abgefragt, "
         f"{len(items)} Meldungen gefunden"
         + (f", {n_quarantaene} stillgelegt" if n_quarantaene else ""),
@@ -748,7 +754,7 @@ def run(
     )
 
     # -------------------------------------------------------------- dedupe
-    td = time.monotonic()
+    td = stoppuhr()
     seen = SeenStore(state_dir / "seen.jsonl")
     first_run = len(seen) == 0
     new_items = filter_fresh(seen.filter_new(items), lookback)
@@ -776,7 +782,7 @@ def run(
     register.speichern()
     phase(
         "Nur Neues",
-        time.monotonic() - td,
+        stoppuhr() - td,
         f"{len(new_items)} neue Meldungen (Gedaechtnis: {len(seen)} bekannt)",
     )
     log.info(
@@ -792,7 +798,6 @@ def run(
     # der Ausgabe vom 07.08. standen zwei Varianten derselben rumaenischen
     # Spamfilter-Ankuendigung auf Platz 2 und Platz 5 der Spalte "Was wichtig
     # ist". Hier wird daraus EINE Meldung mit mehreren Belegen.
-    #
     # Die Reihenfolge ist wichtig: sortiert wird VOR dem Gruppieren nach
     # Datum absteigend, damit die frischeste Meldung eines Ereignisses es
     # anfuehrt und die aelteren als Belege darunterstehen.
@@ -800,7 +805,7 @@ def run(
     if use_llm is None:
         use_llm = llm_available()
 
-    tk = time.monotonic()
+    tk = stoppuhr()
     cluster_store = clustering.ClusterStore(state_dir / "clusters.jsonl")
     gruppen = clustering.gruppiere(
         sorted(new_items, key=_sort_key, reverse=True),
@@ -814,7 +819,7 @@ def run(
     # (clustering.SCHWELLE_SICHER) - also beim Nachdruck derselben Meldung,
     # nicht bei einer Entwicklung des Themas. Alles darunter bleibt eine
     # eigene Meldung: eine falsche Verbindung ist schlimmer als keine.
-    jetzt = datetime.now(timezone.utc)
+    jetzt = uhr()
     nachklapp: list[clustering.Gruppe] = []
     aktuelle: list[clustering.Gruppe] = []
     for g in gruppen:
@@ -836,7 +841,7 @@ def run(
     zusammengefasst = len(new_items) - len(vertreter_items)
     phase(
         "Ereignisse buendeln",
-        time.monotonic() - tk,
+        stoppuhr() - tk,
         f"{len(vertreter_items)} Ereignisse aus {len(new_items)} Meldungen"
         + (f", {len(nachklapp)} Nachklapp" if nachklapp else ""),
     )
@@ -863,19 +868,19 @@ def run(
     # Seen-Store: es wurde bewusst verworfen, nicht verpasst (der Unterschied
     # zu `ungelesene_meldungen` weiter unten). Alle Sicherungen stehen im
     # Modulkopf von analyze/vorsortierung.py.
-    tvs = time.monotonic()
+    tvs = stoppuhr()
     items_by_region, vorsortierung_bilanz = vorsortieren(
         items_by_region,
         settings=cfg.settings,
         root=root,
         model=mechanik_model,
         use_llm=bool(use_llm and new_items),
-        verstrichen=time.monotonic() - t0,
+        verstrichen=stoppuhr() - t0,
     )
     if vorsortierung_bilanz:
         phase(
             "Vorsortieren",
-            time.monotonic() - tvs,
+            stoppuhr() - tvs,
             f"{vorsortierung_bilanz['verworfen']} von "
             f"{vorsortierung_bilanz['angeboten']} aussortiert, "
             f"{vorsortierung_bilanz['durchlass']} direkt durchgelassen",
@@ -887,7 +892,7 @@ def run(
         max_entries=int(cfg.settings.get("reported_topics_memory", 300)),
     )
 
-    ta = time.monotonic()
+    ta = stoppuhr()
     regional: dict[str, dict] = {}
     analyst_telemetry: list[dict] = []
     # Regionen, deren Analyse vollstaendig ausgefallen ist. Ihre Meldungen
@@ -1064,7 +1069,7 @@ def run(
             )
     phase(
         "Bewerten & Schreiben",
-        time.monotonic() - ta,
+        stoppuhr() - ta,
         f"{sum(len(r.get('highlights') or []) for r in regional.values())} "
         f"bewertete Meldungen"
         if use_llm
@@ -1079,7 +1084,7 @@ def run(
     # Originaltext: sobald das System folgert statt zusammenzufasst, ist ein
     # plausibel klingender Fehler das eigentliche Risiko, und ein
     # ungeprueft veroeffentlichter Folgerungssatz waere genau das.
-    tctm = time.monotonic()
+    tctm = stoppuhr()
     ctm_bilanz: dict = {}
     beleg_bilanz: dict = {}
     try:
@@ -1110,7 +1115,7 @@ def run(
         log.error("CTM-Linse uebersprungen: %s", exc)
     phase(
         "Einordnen für uns",
-        time.monotonic() - tctm,
+        stoppuhr() - tctm,
         f"{ctm_bilanz.get('direkt', 0)} direkt handlungsrelevant, "
         f"{beleg_bilanz.get('belegt', 0)} belegte Folgerungssätze",
     )
@@ -1122,7 +1127,7 @@ def run(
     # ------------------------------------------------ competitor deep-dives
     competitor_profiles: list[dict] = []
     if use_llm and cfg.focus_competitors:
-        tcomp = time.monotonic()
+        tcomp = stoppuhr()
         try:
             # Das Analystenmodell des AKTIVEN Anbieters, nicht der fest
             # verdrahtete openai-Schluessel. Solange "openai" der einzige
@@ -1150,7 +1155,7 @@ def run(
             log.error("Competitor deep-dive failed: %s", exc)
         phase(
             "Wettbewerber-Analyse",
-            time.monotonic() - tcomp,
+            stoppuhr() - tcomp,
             f"{len(competitor_profiles)} Profile "
             f"({sum(len(c.get('moves') or []) for c in competitor_profiles)} Moves)",
         )
@@ -1198,7 +1203,7 @@ def run(
     # 193 Meldungen wurden nie auch nur gefragt. Ein Fehlschlag bleibt
     # folgenlos: der Satz kommt ohne Bild aus (viele Fachpresseseiten weisen
     # den direkten Abruf mit 403 ab).
-    tbild = time.monotonic()
+    tbild = stoppuhr()
     alle_highlights = [h for r in regional.values() for h in r.get("highlights", [])]
     try:
         bild_bilanz = report_bilder.hole_bilder(alle_highlights, root)
@@ -1208,7 +1213,7 @@ def run(
     n_bilder = bild_bilanz.get("geladen", 0)
     phase(
         "Bilder",
-        time.monotonic() - tbild,
+        stoppuhr() - tbild,
         f"{n_bilder} von {len(alle_highlights)} Meldungen mit Bild",
     )
 
@@ -1265,7 +1270,7 @@ def run(
         added = diff_curator.curate(
             flat_new,
             diff_store,
-            date.today().isoformat(),
+            today_iso,
             model=mechanik_model,
             use_llm=bool(use_llm and new_items),
         )
@@ -1288,7 +1293,7 @@ def run(
             os.environ.get("BRAVE_API_KEY", ""),
             mechanik_model,
             bool(use_llm),
-            date.today().isocalendar()[1],
+            today.isocalendar()[1],
         )
     except Exception as exc:  # noqa: BLE001
         log.error("Kategorie-Sweep uebersprungen: %s", exc)
@@ -1327,12 +1332,10 @@ def run(
     # Wettbewerber an GERAETEN fuehren und was sie kosten. Wie der Promo-Zweig
     # eine Nebenstufe mit eigenem try/except - aber mit einem echten
     # Zeitbudget, denn der Kernlauf liegt bereits bei rund 27 Minuten.
-    #
     # Der Tageslauf startet um 08:30 UTC. Zwei Haendler erlauben Abrufe laut
     # eigener robots.txt nur zwischen 02:00 und 08:00; sie werden hier
     # uebersprungen (und dabei ausdruecklich NICHT gealtert) und vom
     # naechtlichen Lauf .github/workflows/geraete.yml nachgeholt.
-    #
     # DIE HARTE LEHRE AUS LAUF 31422689829 (10.08.2026)
     # ------------------------------------------------
     # Die Stufe hatte ihr eigenes Budget - und trotzdem hat sie den ganzen
@@ -1343,7 +1346,6 @@ def run(
     # erfolgreichen Minuten veroeffentlicht worden: kein Bericht, keine
     # Website, kein Deploy. Ein eigenes Zeitbudget schuetzt nur, wenn es
     # gegen die verbleibende Jobzeit gerechnet wird - nicht gegen sich selbst.
-    #
     # Deshalb zwei Sicherungen. Erstens ist die Stufe im Wochenlauf AUS
     # (`geraete_enabled: false`): sie hat mit `.github/workflows/geraete.yml`
     # einen eigenen naechtlichen Job, der sie taeglich und im Besuchsfenster
@@ -1351,7 +1353,7 @@ def run(
     # bekommt sie nur, was der Job noch uebrig hat, und laeuft gar nicht
     # erst an, wenn das Rendern dadurch in Gefahr geraet.
     geraete_bilanz: dict = {}
-    _budget = geraete_budget(cfg.settings, time.monotonic() - t0)
+    _budget = geraete_budget(cfg.settings, stoppuhr() - t0)
     if _budget is None:
         if cfg.settings.get("geraete_enabled", False):
             log.warning(
@@ -1486,7 +1488,7 @@ def run(
     stats |= promo_stats(promo_result)
 
     # ------------------------------------------------------- run log (transparency)
-    duration = time.monotonic() - t0
+    duration = stoppuhr() - t0
     # Zwischenstand: die Uebersetzungsstufe laeuft nach diesem Schreibvorgang
     # und wird unten nachgetragen. Das Feld steht trotzdem schon hier, damit
     # es auch dann im Bericht steht, wenn eine spaetere Stufe abbricht.
@@ -1497,7 +1499,7 @@ def run(
         kind_counts[r["kind"]] += 1
     run_log = {
         "started_at": started_at.isoformat(),
-        "finished_at": datetime.now(timezone.utc).isoformat(),
+        "finished_at": uhr().isoformat(),
         "duration_seconds": round(duration, 1),
         "used_llm": bool(use_llm and new_items),
         "editor_used": editor_used,
@@ -1553,7 +1555,6 @@ def run(
     # die zwei Faelle, die dazu fuehren koennen: eine wirklich ruhige Woche
     # ohne neuen Stoff ist kein Ausfall des Analyse-Dienstes, und sollte sich
     # auch nicht so lesen.
-    #
     # `stats["bewertete"]` wird VOR der Uebernahme festgehalten - sonst
     # laese `transparenz.html` (die eine Seite, die genau das beantworten
     # soll: "kann ich dem Ding trauen?") die Zahl der UEBERNOMMENEN
@@ -1653,9 +1654,7 @@ def run(
     # gegen sich selbst. Lauf 31422689829 hat gezeigt, was die andere
     # Rechnung kostet: 45 erfolgreiche Minuten, von denen nichts
     # veroeffentlicht wurde.
-    #
     # Failsafe daneben: ein Fehler dieser Stufe darf den Bericht nie kosten.
-    #
     # Sie laeuft auf den BERICHTETEN Meldungen, nicht auf `new_items`. Das
     # war der Fehler, an dem das ganze Vorhaben still gescheitert ist: der
     # rote Link haengt an der Karte einer Meldung, und eine Karte bekommt nur,
@@ -1684,7 +1683,7 @@ def run(
             len(alle_highlights) - len(_ueb_items),
             len(alle_highlights),
         )
-    _ueb_budget = uebersetzung_stufe.budget(cfg.settings, time.monotonic() - t0)
+    _ueb_budget = uebersetzung_stufe.budget(cfg.settings, stoppuhr() - t0)
     if _ueb_budget is None:
         if cfg.settings.get("uebersetzung_enabled", True):
             log.warning(

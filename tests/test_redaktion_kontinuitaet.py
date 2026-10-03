@@ -16,7 +16,7 @@ from __future__ import annotations
 import json
 import shutil
 import socket
-from datetime import date, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -24,16 +24,11 @@ from bestand_pfad import verlinke_neben_data
 
 from telco_radar import pipeline
 from telco_radar.analyze import redaktion_kontinuitaet as rk
+from telco_radar.naehte import Naehte
 from telco_radar.report.html import render_site
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 HEUTE = date(2026, 7, 20)
-
-
-class _FesterTag(date):
-    @classmethod
-    def today(cls):
-        return HEUTE
 
 
 def _bericht(
@@ -376,7 +371,6 @@ def _kein_netz(*_args, **_kwargs):
 def test_pipeline_behaelt_redaktion_bei_leerer_quellenliste(
     leeres_projekt, monkeypatch
 ):
-    monkeypatch.setattr(pipeline, "date", _FesterTag)
     stand = (HEUTE - timedelta(days=5)).isoformat()
     reports_dir = leeres_projekt / "data" / "reports"
     reports_dir.mkdir(parents=True)
@@ -384,7 +378,11 @@ def test_pipeline_behaelt_redaktion_bei_leerer_quellenliste(
         json.dumps(_bericht(stand)), encoding="utf-8"
     )
 
-    report_path, _ = pipeline.run(leeres_projekt, use_llm=True, lookback_days=8)
+    mittag = datetime.combine(HEUTE, datetime.min.time(), UTC) + timedelta(hours=12)
+    naehte = Naehte(uhr=lambda: mittag)
+    report_path, _ = pipeline.run(
+        leeres_projekt, use_llm=True, lookback_days=8, naehte=naehte
+    )
     assert report_path.stem == HEUTE.isoformat()
 
     daten = json.loads(report_path.with_suffix(".json").read_text(encoding="utf-8"))

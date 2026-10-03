@@ -12,11 +12,13 @@ fire at once. A UA swap cannot fix a 5xx, so we do not waste a second UA on it.
 
 from __future__ import annotations
 
+import hashlib
 import logging
 import random
 import threading
 import time
 from contextlib import contextmanager
+from typing import Any
 from urllib.parse import urlsplit
 
 import httpx
@@ -83,6 +85,10 @@ def _ca_bundle():
 _UA_SWAP_STATUSES = {403, 406}  # try the other UA
 _BACKOFF_STATUSES = {429, 500, 502, 503}  # transient -> retry same UA, then give up
 _BACKOFF_WAITS = (4.0, 9.0)  # waits used *between* retries
+# Naht für den goldenen Lauf, gesetzt nur über ``naehte.Naehte.setzen``.
+Transport = httpx.BaseTransport
+TRANSPORT: Transport | None = None
+_WEG = {"content-encoding", "content-length", "transfer-encoding", "set-cookie"}
 
 
 def _ist_ehrliche_kennung(ua: str) -> bool:
@@ -236,6 +242,14 @@ def _frist_abgelaufen() -> bool:
     return ende is not None and time.monotonic() >= ende
 
 
+def _hole(url: str, **art: Any) -> httpx.Response:
+    """GET ins echte Netz, über die Naht ``TRANSPORT``, wenn sie gesetzt ist."""
+    if TRANSPORT is None:
+        return httpx.get(url, verify=_ca_bundle(), **art)
+    with httpx.Client(transport=TRANSPORT) as client:
+        return client.get(url, **art)
+
+
 def fetch(
     url: str,
     http_cfg: dict,
@@ -296,12 +310,8 @@ def fetch(
                 break
             try:
                 with _gate.slot(url):
-                    resp = httpx.get(
-                        url,
-                        timeout=timeout,
-                        headers=headers,
-                        follow_redirects=True,
-                        verify=_ca_bundle(),
+                    resp = _hole(
+                        url, timeout=timeout, headers=headers, follow_redirects=True
                     )
                 if resp.status_code in _UA_SWAP_STATUSES:
                     last_exc = httpx.HTTPStatusError(
@@ -332,3 +342,59 @@ def fetch(
         if _frist_abgelaufen():
             break
     raise last_exc if last_exc else RuntimeError(f"fetch failed: {url}")
+
+
+def anfrage_schluessel(anfrage: httpx.Request) -> tuple[str, ...]:
+    """Methode, Adresse, Kennung und Hash des Inhalts: so findet die Wiedergabe."""
+    inhalt = hashlib.sha256(anfrage.content).hexdigest()
+    kennung = anfrage.headers.get("user-agent", "")
+    return (anfrage.method, str(anfrage.url), kennung, inhalt)
+
+
+class Aufnahme(httpx.BaseTransport):
+    """Reicht jede Anfrage ins echte Netz und schreibt die Antwort auf ``band``."""
+
+    def __init__(self, band, innen: Transport | None = None) -> None:
+        self.band = band
+        self.innen = innen or httpx.HTTPTransport(verify=_ca_bundle())
+
+    def handle_request(self, request: httpx.Request) -> httpx.Response:
+        """Antwort samt Status und Köpfen, ohne Cookies und Transportköpfe."""
+        schluessel = anfrage_schluessel(request)
+        try:
+            antwort = self.innen.handle_request(request)
+            inhalt = antwort.read()
+        except httpx.HTTPError as exc:
+            self.band.merke(schluessel, {"fehler": type(exc).__name__})
+            raise
+        kopf = {k: v for k, v in antwort.headers.items() if k.lower() not in _WEG}
+        eintrag = {"status": antwort.status_code, "kopf": kopf, "inhalt": inhalt}
+        self.band.merke(schluessel, eintrag)
+        return httpx.Response(antwort.status_code, headers=kopf, content=inhalt)
+
+
+class Wiedergabe(httpx.BaseTransport):
+    """Antwortet aus ``band``; mit ``guthaben_leer`` jeder LLM-Endpunkt mit 402."""
+
+    def __init__(self, band, guthaben_leer: bool = False) -> None:
+        self.band = band
+        self.guthaben_leer = guthaben_leer
+
+    def handle_request(self, request: httpx.Request) -> httpx.Response:
+        """Die aufgenommene Antwort, ihr Fehler oder ein Verbindungsfehler."""
+        llm = request.url.path.endswith(("/completions", "/messages"))
+        if self.guthaben_leer and request.method == "POST" and llm:
+            return httpx.Response(402, json={"error": "Insufficient Balance"})
+        meldung = f"HTTP-Antwort für {request.method} {request.url}"
+        eintrag = self.band.naechste(anfrage_schluessel(request), meldung)
+        if eintrag is None:
+            raise httpx.ConnectError(f"{meldung} fehlt", request=request)
+        if "fehler" in eintrag:
+            art = getattr(httpx, eintrag["fehler"], httpx.TransportError)
+            raise art("aufgenommen", request=request)
+        return httpx.Response(
+            eintrag["status"], headers=eintrag["kopf"], content=eintrag["inhalt"]
+        )
+
+
+KEIN_BILD = httpx.MockTransport(lambda _: httpx.Response(404))

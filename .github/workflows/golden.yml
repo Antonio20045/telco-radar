@@ -1,0 +1,72 @@
+name: Goldener Lauf aufnehmen
+
+# Nimmt den goldenen Lauf auf (scripts/golden_aufnehmen.py): wenige Quellen,
+# echtes LLM, feste Uhr. Nur von Hand, nur von Antonio. Die Aufnahme haengt
+# immer als Artefakt am Lauf, auch wenn die Freigabe scheitert; committet wird
+# nur eine freigegebene Aufnahme. Beruehrt data/ und site/ nicht und loest
+# keinen Render-Deploy aus.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: golden
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  aufnahme:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Aufnehmen und freigeben
+        shell: bash
+        env:
+          PYTHONPATH: src
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+        run: python scripts/golden_aufnehmen.py 2>&1 | tee golden.log
+
+      - name: Aufnahme als Artefakt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-aufnahme-${{ github.run_id }}
+          path: |
+            tests/fixtures/golden/
+            golden.log
+          if-no-files-found: warn
+
+      - name: Commit der freigegebenen Aufnahme
+        run: |
+          git config user.name "telco-radar-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add tests/fixtures/golden/
+          python scripts/waechter_leck.py
+          git commit -m "golden: Aufnahme $(date -u +%F)"
+          pushed=0
+          for attempt in 1 2 3; do
+            if git pull --rebase origin "$GITHUB_REF_NAME" \
+             && git push origin "HEAD:$GITHUB_REF_NAME"; then
+              pushed=1
+              break
+            fi
+            git rebase --abort || echo "kein Rebase offen"
+            echo "push rejected (attempt $attempt) - retrying"; sleep 5
+          done
+          if [ "$pushed" -ne 1 ]; then
+            echo "Aufnahme nicht gepusht; sie liegt als Artefakt am Lauf."
+            exit 1
+          fi

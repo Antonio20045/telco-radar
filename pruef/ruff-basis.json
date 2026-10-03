@@ -479,9 +479,8 @@
  "src/telco_radar/pipeline.py": {
   "C901": 1,
   "D103": 1,
-  "DTZ011": 3,
   "I001": 1,
-  "UP017": 3
+  "UP017": 1
  },
  "src/telco_radar/promo_bilder.py": {
   "D103": 1,

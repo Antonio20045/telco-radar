@@ -24,6 +24,7 @@ import json
 import logging
 import os
 import time
+from collections.abc import Callable
 
 import httpx
 
@@ -33,6 +34,9 @@ ANTHROPIC_URL = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_VERSION = "2023-06-01"
 DEFAULT_TEMPERATURE = 0.3
 BEDROCK_DEFAULT_REGION = "us-east-1"
+# Nähte für den goldenen Lauf, gesetzt nur über ``naehte.Naehte.setzen``.
+TRANSPORT: httpx.BaseTransport | None = None
+CLIENT: Callable[[str, str, str, int, int], str] | None = None
 
 
 def _bedrock_region() -> str:
@@ -100,7 +104,6 @@ def active_backend() -> str:
 
 # Client errors that will never succeed on retry (bad key, bad request, bad model)
 # Endgueltige Antworten: hier wird NICHT wiederholt.
-#
 # 402 steht als Netz mit drin, abgefangen wird es aber schon eine Zeile
 # vorher (als LLMModelUnavailable, damit die Anbieterkette weiterlaeuft).
 # Sein Fehlen hat am 15.08.2026 einen ganzen Lauf gekostet: DeepSeeks
@@ -111,7 +114,6 @@ def active_backend() -> str:
 # Meldungen bewertet, Editor im Notfall-Digest, 0 Uebersetzungen (allein dort
 # 32 Versuche je Artikel und 889s). Der Lauf dauerte 151,7 statt 80 Minuten
 # und sah dabei aus wie eine duenne Nachrichtenwoche.
-#
 # Dieselbe Begruendung wie bei `_is_daily_quota`: ein leeres Konto wird beim
 # 32. Versuch nicht voller.
 _FATAL_STATUSES = {400, 401, 402, 403, 404, 405, 422}
@@ -136,7 +138,6 @@ DEFAULT_CALL_BUDGET = 300.0
 #          ~24s of backoff on exactly this.
 #   slow   a read timeout burns the full HTTP timeout with nothing to show.
 #          The old policy happily spent 3x180s = 9.4 min on it, per stage.
-#
 # So: retry the cheap failures generously, the slow ones barely at all.
 MAX_SLOW_FAILURES = 2
 CHEAP_BACKOFF_SECONDS = (1, 2, 3, 5, 5, 8, 8, 10)
@@ -472,9 +473,8 @@ def _post_with_retries(url, payload, headers, retries, parse):
         attempt += 1
         started = time.monotonic()
         try:
-            resp = httpx.post(
-                url, json=payload, headers=headers, timeout=http_timeout()
-            )
+            post = httpx.Client(transport=TRANSPORT).post if TRANSPORT else httpx.post
+            resp = post(url, json=payload, headers=headers, timeout=http_timeout())
             if resp.status_code == 402:
                 # Leeres Guthaben ist eine Ablehnung des ANBIETERS, kein
                 # defekter Request: ein anderes Modell desselben Kontos
@@ -567,7 +567,6 @@ def _complete_openai(
     }
     if "deepseek" in model.lower():
         # NVIDIA DeepSeek NIM: turn off the reasoning trace (clean output, cheaper)
-        #
         # ACHTUNG: das wirkt NUR auf NVIDIAs NIM-Endpunkt. Laeuft der Lauf
         # gegen DeepSeeks EIGENE API (api.deepseek.com, siehe
         # config/settings.yaml llm_provider: deepseek), wird der Parameter
@@ -735,7 +734,7 @@ def complete(
         if position:
             log.warning("Falling back to %s", candidate)
         try:
-            return _dispatch(system, user, candidate, max_tokens, retries)
+            return (CLIENT or _dispatch)(system, user, candidate, max_tokens, retries)
         except LLMModelUnavailable as exc:
             _DEAD_MODELS.add(candidate)
             last_exc = exc

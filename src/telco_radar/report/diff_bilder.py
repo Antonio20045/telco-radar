@@ -178,6 +178,7 @@ def beschaffe(
             headers={"User-Agent": report_bilder._UA},
             timeout=_TIMEOUT,
             follow_redirects=True,
+            transport=report_bilder.TRANSPORT,
         ) as client:
 
             def arbeite(url: str) -> tuple[str, dict]:
