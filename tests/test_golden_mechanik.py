@@ -116,3 +116,18 @@ def test_produktion_setzt_jede_naht_zurueck():
 
     assert PRODUKTION.setzen() is None
     assert (http.TRANSPORT, llm.TRANSPORT, llm.CLIENT) == (None, None, None)
+
+
+def test_umleitung_wird_aufgenommen_und_wiedergegeben(tmp_path):
+    def umleiten(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/alt":
+            return httpx.Response(301, headers={"location": QUELLE})
+        return _quelle(request)
+
+    band = golden.Band()
+    Naehte(transport=http.Aufnahme(band, httpx.MockTransport(umleiten))).setzen()
+    assert http.fetch("https://quelle.example/alt", {}, schnell=True).text == "<rss/>"
+    Naehte(transport=http.Wiedergabe(band)).setzen()
+
+    assert http.fetch("https://quelle.example/alt", {}, schnell=True).text == "<rss/>"
+    assert band.fehlend == []

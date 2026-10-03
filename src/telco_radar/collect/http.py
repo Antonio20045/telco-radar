@@ -346,7 +346,7 @@ def fetch(
 
 def anfrage_schluessel(anfrage: httpx.Request) -> tuple[str, ...]:
     """Methode, Adresse, Kennung und Hash des Inhalts: so findet die Wiedergabe."""
-    inhalt = hashlib.sha256(anfrage.content).hexdigest()
+    inhalt = hashlib.sha256(anfrage.read()).hexdigest()
     kennung = anfrage.headers.get("user-agent", "")
     return (anfrage.method, str(anfrage.url), kennung, inhalt)
 

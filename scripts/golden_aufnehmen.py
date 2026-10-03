@@ -122,6 +122,8 @@ def aufnehmen(
                 pipeline.run(wurzel, use_llm=True, naehte=naehte)
         finally:
             PRODUKTION.setzen()
+    if not any("antwort" in e for liste in antworten.eintraege.values() for e in liste):
+        sys.exit("Keine einzige LLM-Antwort; ein Ausfall ist kein goldener Lauf")
     for schluessel in [k for k in netz.eintraege if k[1].endswith(LLM_PFADE)]:
         del netz.eintraege[schluessel]
     golden.schreibe_band(ordner / golden.HTTP_DATEI, netz)
