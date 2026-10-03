@@ -52,6 +52,15 @@ QUELLTEXT = tuple(
 )
 _STDLIB = sysconfig.get_path("stdlib")
 STDLIB = tuple({f"{ort}{os.sep}" for ort in (_STDLIB, str(Path(_STDLIB).resolve()))})
+IMPORT_RAHMEN = frozenset(
+    {"get_code", "exec_module", "_load_unlocked", "_find_and_load"}
+)
+RENDER_RAHMEN = frozenset({"_load_template"})
+SHELLS = frozenset({"sh", "bash", "zsh", "dash"})
+LESER_IM_KIND = frozenset(
+    {"cat", "head", "tail", "less", "more", "grep", "egrep", "rg", "sed", "awk"}
+    | {"wc", "diff", "cmp", "strings", "xxd", "od", "cut", "sort", "uniq", "git"}
+)
 BIBLIOTHEKEN = tuple(
     {f"{sysconfig.get_path(art)}{os.sep}" for art in ("purelib", "platlib")}
 )
@@ -125,18 +134,46 @@ def _gesperrt(name: str, gesperrt: tuple[str, ...] = GESPERRT) -> str | None:
 
 
 def _liest_der_test_selbst() -> str | None:
-    """Nennt die Testdatei, wenn der nächste Rahmen außerhalb der Standardbibliothek
-    ein Test ist; ein Import oder eine Bibliothek wie Jinja liest für den Code."""
+    """Nennt die Testdatei, wenn der Zugriff aus ihr kommt: über Standardbibliothek
+    und Bibliotheken hinweg, außer ein Import oder das Rendern einer Vorlage liest."""
     rahmen = sys._getframe(2)
     while rahmen is not None:
         name = rahmen.f_code.co_filename
+        funktion = rahmen.f_code.co_name
         if name.startswith("<frozen importlib"):
-            return None
-        if not name.startswith(("<", *STDLIB)) or name.startswith(BIBLIOTHEKEN):
+            if funktion in IMPORT_RAHMEN:
+                return None
+        elif name.startswith(BIBLIOTHEKEN):
+            if funktion in RENDER_RAHMEN:
+                return None
+        elif not name.startswith(("<", *STDLIB)):
             if name.startswith(TESTS) and not name.endswith(f"{os.sep}conftest.py"):
                 return Path(os.path.relpath(name, WURZEL)).as_posix()
             return None
         rahmen = rahmen.f_back
+    return None
+
+
+def _kind_liest_quelltext(argumente: tuple[object, ...]) -> str | None:
+    """Ein Lesewerkzeug wie ``cat`` oder ``git show``, das ein Test auf Quelltext
+    ansetzt; ein Skript auszuführen ist kein Lesen."""
+    _, befehl, ordner, _ = (*argumente, None, None, None, None)[:4]
+    teile = befehl if isinstance(befehl, list | tuple) else [befehl]
+    worte = [
+        wort
+        for teil in teile
+        if isinstance(teil, str | bytes | os.PathLike)
+        for wort in os.fsdecode(teil).split()
+    ]
+    if worte and os.path.basename(worte[0]) in SHELLS and "-c" in worte:
+        worte = worte[worte.index("-c") + 1 :]
+    if not worte or os.path.basename(worte[0]) not in LESER_IM_KIND:
+        return None
+    basis = os.fsdecode(ordner) if ordner is not None else os.getcwd()
+    for wort in worte[1:]:
+        ort = os.path.join(basis, wort.split(":", 1)[-1])
+        if (pfad := _gesperrt(ort, QUELLTEXT)) is not None:
+            return pfad
     return None
 
 
@@ -196,6 +233,13 @@ def _hermetik(ereignis: str, argumente: tuple[object, ...]) -> None:
         if pfad is not None and (datei := _liest_der_test_selbst()) is not None:
             relativ = os.path.relpath(pfad, WURZEL)
             _verstoss(f"{REGEL_QUELLTEXT} ({datei} las {relativ})")
+    if (
+        ereignis == "subprocess.Popen"
+        and (pfad := _kind_liest_quelltext(argumente))
+        and (datei := _liest_der_test_selbst()) is not None
+    ):
+        relativ = os.path.relpath(pfad, WURZEL)
+        _verstoss(f"{REGEL_QUELLTEXT} ({datei} las {relativ})")
     if ereignis in DATEI_EREIGNISSE or ereignis == "subprocess.Popen":
         if ereignis == "subprocess.Popen":
             pfad = _kindprozess_pfad(argumente)

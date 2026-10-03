@@ -12,22 +12,22 @@ SAMPLE_FEED = """<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
     <title>Sample Telco News</title>
-    <link>https://example-telconews.com</link>
+    <link>https://telconews.test</link>
     <item>
       <title>Vodafone launches new eSIM roaming pass for travellers</title>
-      <link>https://example-telconews.com/2026/07/vodafone-esim-roaming-pass?utm_source=rss</link>
+      <link>https://telconews.test/2026/07/vodafone-esim-roaming-pass?utm_source=rss</link>
       <pubDate>Tue, 14 Jul 2026 09:00:00 GMT</pubDate>
       <description>Vodafone introduced a daily eSIM roaming pass.</description>
     </item>
     <item>
       <title>Jio unveils AI-powered family plan with cloud gaming bundle</title>
-      <link>https://example-telconews.com/2026/07/jio-ai-family-plan</link>
+      <link>https://telconews.test/2026/07/jio-ai-family-plan</link>
       <pubDate>Mon, 13 Jul 2026 14:30:00 GMT</pubDate>
       <description>Reliance Jio announced a new family tariff.</description>
     </item>
     <item>
       <title>Old story that should be filtered by freshness</title>
-      <link>https://example-telconews.com/2024/01/old-story</link>
+      <link>https://telconews.test/2024/01/old-story</link>
       <pubDate>Mon, 01 Jan 2024 08:00:00 GMT</pubDate>
       <description>Ancient news.</description>
     </item>
@@ -53,12 +53,12 @@ SAMPLE_NEWSROOM = """<!DOCTYPE html>
     </article>
     <article>
       <span class="date">10 Jul 2026</span>
-      <a href="https://www.example-telco.com/news/2026/07/example-telco-partners-with-streamco-for-bundled-entertainment">
+      <a href="https://www.telco.test/news/2026/07/example-telco-partners-with-streamco-for-bundled-entertainment">
         Example Telco partners with StreamCo for bundled entertainment offer
       </a>
     </article>
     <article>
-      <a href="https://othersite.com/news/should-be-skipped-external-domain-article-here">
+      <a href="https://anderseite.test/news/should-be-skipped-external-domain-article-here">
         External article that must be skipped because of the domain rule
       </a>
     </article>
@@ -80,7 +80,7 @@ SAMPLE_CARD_NEWSROOM = """<!DOCTYPE html>
 <body>
   <nav>
     <a href="/about-example">About Example</a>
-    <a href="mailto:media@example-telco.com">media@example-telco.com</a>
+    <a href="mailto:media@telco.test">media@telco.test</a>
   </nav>
   <main>
     <a class="card card--wide" href="/content/example-telco-summer-offer/">
@@ -98,7 +98,7 @@ SAMPLE_CARD_NEWSROOM = """<!DOCTYPE html>
 def test_rss_parsing():
     raw = SAMPLE_FEED.encode("utf-8")
     src = Source(
-        type="rss", url="https://example-telconews.com/feed", name="Sample Telco News"
+        type="rss", url="https://telconews.test/feed", name="Sample Telco News"
     )
     items = parse_feed_bytes(raw, src, "global", None, "industry_news")
     assert len(items) == 3
@@ -111,13 +111,13 @@ def test_rss_parsing():
 
 def test_rss_tracking_params_do_not_change_id():
     raw = SAMPLE_FEED.encode("utf-8")
-    src = Source(type="rss", url="https://example-telconews.com/feed", name="S")
+    src = Source(type="rss", url="https://telconews.test/feed", name="S")
     items = parse_feed_bytes(raw, src, "global", None, "industry_news")
     from telco_radar.models import Item
 
     clean = Item(
         title=items[0].title,
-        url="https://example-telconews.com/2026/07/vodafone-esim-roaming-pass",
+        url="https://telconews.test/2026/07/vodafone-esim-roaming-pass",
         source_name="S",
     )
     assert items[0].id == clean.id  # utm_source stripped before hashing
@@ -126,7 +126,7 @@ def test_rss_tracking_params_do_not_change_id():
 def test_newsroom_parsing():
     html = SAMPLE_NEWSROOM
     src = Source(
-        type="newsroom", url="https://www.example-telco.com/news", name="Example Telco"
+        type="newsroom", url="https://www.telco.test/news", name="Example Telco"
     )
     items = parse_newsroom_html(html, src, "europe", "Example Telco", "operator")
     titles = [i.title for i in items]
@@ -137,14 +137,14 @@ def test_newsroom_parsing():
     # date extracted from URL path /2026/07/
     assert all(i.published is not None and i.published.year == 2026 for i in items)
     # relative link resolved against source URL
-    assert items[0].url.startswith("https://www.example-telco.com/")
+    assert items[0].url.startswith("https://www.telco.test/")
 
 
 def test_newsroom_respects_item_selector():
     html = SAMPLE_NEWSROOM
     src = Source(
         type="newsroom",
-        url="https://www.example-telco.com/news",
+        url="https://www.telco.test/news",
         name="Example Telco",
         item_selector="footer",
     )
@@ -159,7 +159,7 @@ def test_newsroom_item_selector_bypasses_url_keyword_heuristic():
     html = SAMPLE_CARD_NEWSROOM
     src = Source(
         type="newsroom_js",
-        url="https://www.example-telco.com/press-browser/",
+        url="https://www.telco.test/press-browser/",
         name="Example Telco",
         item_selector="a.card",
     )
@@ -172,7 +172,7 @@ def test_newsroom_item_selector_still_applies_skip_hints():
     html = SAMPLE_CARD_NEWSROOM
     src = Source(
         type="newsroom_js",
-        url="https://www.example-telco.com/press-browser/",
+        url="https://www.telco.test/press-browser/",
         name="Example Telco",
         item_selector="nav a",
     )

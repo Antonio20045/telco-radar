@@ -16,6 +16,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import pytest
 
@@ -27,6 +28,7 @@ from service.signup import tokens  # noqa: E402
 from service.signup.ratelimit import IPBremse  # noqa: E402
 
 WURZEL = Path(__file__).resolve().parents[1]
+ECHTER_DISPATCH = app_mod._dispatch
 
 KEY = "test-token-key"
 PEPPER = "test-pepper"
@@ -496,6 +498,38 @@ def test_das_dispatch_ziel_ist_das_leere_inbox_repo(monkeypatch):
     assert ziele[0].startswith("https://api.github.com/repos/")
     assert ziele[0].endswith("/telco-radar-inbox/dispatches")
     assert "telco-radar-mail" not in ziele[0]
+
+
+def test_jeder_weg_durch_den_dienst_spricht_nur_mit_github(dienst, monkeypatch):
+    """Anmelden, Bestätigen und Abmelden mit dem echten ``_dispatch``: jeder
+    Abruf geht an api.github.com; ein Versand an einen Mailanbieter auf
+    anderem Weg als ``urlopen`` scheitert an der Netzsperre der Tests."""
+    ziele = []
+
+    class Antwort:
+        status = 204
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            return False
+
+    def urlopen(anfrage, timeout=None):
+        ziele.append((anfrage.full_url, json.loads(anfrage.data)))
+        return Antwort()
+
+    monkeypatch.setattr(app_mod, "_dispatch", ECHTER_DISPATCH)
+    monkeypatch.setattr(app_mod.urllib.request, "urlopen", urlopen)
+    abmeldung = tokens.schreibe(KEY, tokens.ZWECK_ABMELDUNG, {"sub_id": "sub_1"})
+    assert dienst.get("/gesund").status_code == 200
+    assert _anmeldung(dienst).status_code == 202
+    bestaetigung = ziele[0][1]["client_payload"]["token"]
+    assert "Angemeldet" in dienst.get(f"/confirm/{bestaetigung}").text
+    assert "Abgemeldet" in dienst.get(f"/unsubscribe/{abmeldung}").text
+    ereignisse = [nutzlast["event_type"] for _, nutzlast in ziele]
+    assert ereignisse == ["send_doi", "confirm", "unsubscribe"]
+    assert {urlsplit(url).hostname for url, _ in ziele} == {"api.github.com"}
 
 
 def test_alle_antworten_tragen_die_sicherheitskopfzeilen(dienst):

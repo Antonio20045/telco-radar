@@ -37,7 +37,7 @@ def _e(titel: str, summary: str = "", **kw) -> dict:
         "operator": kw.pop("operator", ""),
         "category": kw.pop("category", ""),
         "source_label": kw.pop("quelle", "presse"),
-        "url": kw.pop("url", f"https://x.de/{abs(hash(titel)) % 10000}"),
+        "url": kw.pop("url", f"https://meldung.test/{abs(hash(titel)) % 10000}"),
         "date": kw.pop("date", "2026-08-01"),
     }
     d.update(kw)
@@ -198,8 +198,8 @@ def test_antwort_ist_gedeckelt(index):
 
 def test_dubletten_erscheinen_einmal():
     doppelt = [
-        _e("A", "Wechselbonus", url="https://x.de/1"),
-        _e("B", "Wechselbonus", url="https://x.de/1"),
+        _e("A", "Wechselbonus", url="https://meldung.test/1"),
+        _e("B", "Wechselbonus", url="https://meldung.test/1"),
     ]
     antwort = frage(ArchivIndex(doppelt), "Wechselbonus", mind_score=OHNE_SCHWELLE)
     assert len(antwort.belege) == 1
@@ -207,8 +207,8 @@ def test_dubletten_erscheinen_einmal():
 
 def test_bei_gleichstand_zuerst_das_juengere():
     gleich = [
-        _e("Alt", "Wechselbonus", url="https://x.de/1", date="2026-01-01"),
-        _e("Neu", "Wechselbonus", url="https://x.de/2", date="2026-08-01"),
+        _e("Alt", "Wechselbonus", url="https://meldung.test/1", date="2026-01-01"),
+        _e("Neu", "Wechselbonus", url="https://meldung.test/2", date="2026-08-01"),
     ]
     antwort = frage(ArchivIndex(gleich), "Wechselbonus", mind_score=OHNE_SCHWELLE)
     assert antwort.belege[0].titel == "Neu"
@@ -386,10 +386,13 @@ def test_js_fassung_nutzt_dieselben_konstanten(suchseite):
     viele = (
         ARCHIV
         + [
-            _e(f"Telekom Preisaktion Nummer {i}", url=f"https://x.de/p{i}")
+            _e(f"Telekom Preisaktion Nummer {i}", url=f"https://meldung.test/p{i}")
             for i in range(ad.MAX_BELEGE + 3)
         ]
-        + [_e(f"Netzausbau Region {i}", url=f"https://x.de/n{i}") for i in range(40)]
+        + [
+            _e(f"Netzausbau Region {i}", url=f"https://meldung.test/n{i}")
+            for i in range(40)
+        ]
     )
     for archiv in (ARCHIV, viele):
         idx = ArchivIndex(archiv)

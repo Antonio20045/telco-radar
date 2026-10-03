@@ -890,3 +890,27 @@ def test_gleichnamiges_modul_unter_src_verdeckt_das_leiterplugin_nicht(
     assert [z.split(" - ")[0] for z in ergebnis.zeilen] == [
         "FAILED tests/test_rot.py::test_kaputt"
     ]
+
+
+@pytest.mark.parametrize(("vertraege", "gruen"), [([], True), (["Vertrag x"], False)])
+def test_ein_gebrochener_vertrag_macht_stufe_null_rot_und_schreibt_keine_basis(
+    monkeypatch, vertraege, gruen
+):
+    aufrufe = []
+
+    def waechter(wurzel, privat, schreiben):
+        aufrufe.append(schreiben)
+        return [], []
+
+    monkeypatch.setattr(
+        pruefleiter,
+        "_lauf",
+        lambda log, befehl, zusatz=None: subprocess.CompletedProcess(befehl, 0, "[]"),
+    )
+    monkeypatch.setattr(pruefleiter.waechter_vertraege, "pruefe", lambda w: vertraege)
+    monkeypatch.setattr(pruefleiter.waechter, "pruefe", waechter)
+    monkeypatch.setattr(pruefleiter.waechter, "anker_verschiebungen", lambda w: [])
+    ergebnis = pruefleiter.stufe_waechter(None)
+    assert ergebnis.gruen is gruen
+    assert ergebnis.zeilen == vertraege
+    assert aufrufe == [gruen]

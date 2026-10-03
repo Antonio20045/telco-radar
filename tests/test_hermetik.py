@@ -278,7 +278,8 @@ def _quelltext_probe(tmp_path, rumpf):
     tests = tmp_path / "tests"
     tests.mkdir()
     (tests / "test_probe.py").write_text(
-        "import inspect, shutil\nfrom pathlib import Path\n\n\n"
+        "import importlib.util, inspect, pkgutil, shutil, subprocess\n"
+        "import jinja2\nfrom pathlib import Path\n\n\n"
         f"def test_x(w, ziel):\n    {rumpf}\n"
     )
     return _lauf(
@@ -308,6 +309,32 @@ def _quelltext_probe(tmp_path, rumpf):
             "shutil.copy(w / 'src/telco_radar/report/templates/style.css', ziel)",
             "src/telco_radar/report/templates/style.css",
         ),
+        (
+            "importlib.util.find_spec('telco_radar.dedupe').loader"
+            ".get_data(str(w / 'src/telco_radar/dedupe.py'))",
+            "src/telco_radar/dedupe.py",
+        ),
+        (
+            "pkgutil.get_data('telco_radar.report', 'templates/app.js')",
+            "src/telco_radar/report/templates/app.js",
+        ),
+        (
+            "jinja2.FileSystemLoader(w / 'src/telco_radar/report/templates')"
+            ".get_source(None, '_explorer.html.j2')",
+            "src/telco_radar/report/templates/_explorer.html.j2",
+        ),
+        (
+            "subprocess.run(['cat', 'src/telco_radar/dedupe.py'], cwd=w)",
+            "src/telco_radar/dedupe.py",
+        ),
+        (
+            "subprocess.run('grep -c def scripts/waechter.py', shell=True, cwd=w)",
+            "scripts/waechter.py",
+        ),
+        (
+            "subprocess.run(['git', 'show', 'HEAD:CLAUDE.md'], cwd=w)",
+            "CLAUDE.md",
+        ),
     ],
 )
 def test_quelltext_als_text_lesen_scheitert_mit_regel(tmp_path, rumpf, pfad):
@@ -334,6 +361,10 @@ def test_inspect_getsource_scheitert_mit_regel(tmp_path):
         "(w / 'tests/fixtures/tarife/_herkunft.json').read_text()",
         "__import__('telco_radar.report.html', fromlist=['x'])"
         ".schreibe_statische_dateien(ziel)",
+        "jinja2.Environment(loader=jinja2.FileSystemLoader("
+        "w / 'src/telco_radar/report/templates')).get_template('_explorer.html.j2')",
+        "subprocess.run(['ls', 'src'], cwd=w, check=True)",
+        "subprocess.run(['git', 'status', '--short'], cwd=ziel)",
     ],
 )
 def test_code_der_selbst_liest_und_daten_bleiben_offen(tmp_path, rumpf):
