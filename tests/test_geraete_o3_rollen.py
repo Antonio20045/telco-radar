@@ -28,9 +28,9 @@ from __future__ import annotations
 
 import json
 import pathlib
-import re
 
 import pytest
+from bestand_pfad import abbild
 from bs4 import BeautifulSoup
 
 from telco_radar.report.html import render_site
@@ -41,7 +41,7 @@ WURZEL = pathlib.Path(__file__).resolve().parents[1]
 @pytest.fixture(scope="module")
 def site(tmp_path_factory) -> pathlib.Path:
     ziel = tmp_path_factory.mktemp("o3-rollen") / "site"
-    render_site(ziel, WURZEL / "data" / "reports")
+    render_site(ziel, abbild(ziel.parent))
     return ziel
 
 

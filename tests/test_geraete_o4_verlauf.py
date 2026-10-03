@@ -30,6 +30,7 @@ import json
 import pathlib
 
 import pytest
+from bestand_pfad import ZUSTAND, abbild
 from bs4 import BeautifulSoup
 
 from telco_radar.report.html import render_site
@@ -40,7 +41,7 @@ WURZEL = pathlib.Path(__file__).resolve().parents[1]
 @pytest.fixture(scope="module")
 def site(tmp_path_factory) -> pathlib.Path:
     ziel = tmp_path_factory.mktemp("o4-verlauf") / "site"
-    render_site(ziel, WURZEL / "data" / "reports")
+    render_site(ziel, abbild(ziel.parent))
     return ziel
 
 
@@ -117,11 +118,10 @@ def test_der_beginn_der_tco_historie_ist_der_echte(geraete):
     verlauf = geraete.select_one("#tafel-verlauf")
     text = " ".join(verlauf.get_text(" ", strip=True).split())
     tage = set()
-    pfad = WURZEL / "data" / "state" / "geraete_tco_historie.jsonl"
-    if pfad.exists():
-        for zeile in pfad.read_text(encoding="utf-8").splitlines():
-            if zeile.strip():
-                tage.add(json.loads(zeile).get("datum"))
+    pfad = ZUSTAND / "geraete_tco_historie.jsonl"
+    for zeile in pfad.read_text(encoding="utf-8").splitlines():
+        if zeile.strip():
+            tage.add(json.loads(zeile).get("datum"))
     # Der Reiter fragt nach dem Barpreis - im Titel (S1) und ohne jeden
     # TCO-Historie-Absatz mehr.
     # Seit 28.09.2026 benennt der REITER die Frage („Ohne Vertrag"); die
@@ -135,8 +135,7 @@ def test_der_beginn_der_tco_historie_ist_der_echte(geraete):
         "der TCO-Historie-Absatz ist zurückgekehrt (E3/S1: Doppel-"
         "Darstellung zur Zeitreihe des Vergleichs-Reiters)"
     )
-    if not tage:
-        pytest.skip("keine TCO-Historie im Bestand")
+    assert tage, "keine TCO-Historie im Schnappschuss"
     seit = min(tage)
     # Dasselbe KURZ-Format wie die Datumsachse der Zeitreihe („12.9.");
     # die Messtag-Zeile darueber ist am 28.09.2026 gefallen, die erste

@@ -51,10 +51,10 @@ DIE DREI REGELN, AN DENEN DIESES PAKET SCHEITERN KANN
 """
 
 import gzip
-import json
 from pathlib import Path
 
 import pytest
+from bestand_pfad import ZUSTAND, lese_wurzel
 
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
 from telco_radar.collect.geraete import (
@@ -104,7 +104,7 @@ def _saetze():
 
 @pytest.fixture(scope="module")
 def katalog():
-    return lade_katalog(_WURZEL)
+    return lade_katalog(lese_wurzel())
 
 
 @pytest.fixture(scope="module")
@@ -534,7 +534,7 @@ def test_der_ganze_weg_bis_zum_buendel_mit_echtem_bestand():
     „1&1-tarif_id löst nie auf ein Datenvolumen auf" traf die Listung ohne
     tarif_id, nicht diesen Weg. Der aufgelöste Tarif trägt 10 GB und damit
     das Band XS: die Voraussetzung für Radar-Paare."""
-    bestand = Tarifbestand.aus_datei(_WURZEL / "data" / "state" / "tarife.jsonl")
+    bestand = Tarifbestand.aus_datei(ZUSTAND / "tarife.jsonl")
     rohsaetze = [
         {**s, "anbieter": "1&1", "sku_id": f"sku-{i}", "quelle_url": s["url"]}
         for i, s in enumerate(_saetze())

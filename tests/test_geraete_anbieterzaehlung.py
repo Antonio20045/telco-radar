@@ -28,12 +28,12 @@ import pathlib
 import re
 
 import pytest
+from bestand_pfad import abbild
 from bs4 import BeautifulSoup
+from test_geraete_tco_zustand import _baue
 
 from telco_radar.report import geraete_tco_grafik as grafik
 from telco_radar.report.html import render_site
-
-from test_geraete_tco_zustand import _baue
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 
@@ -50,7 +50,7 @@ _OPTION_RE = re.compile(r"\d+\s*Anbieter")
 @pytest.fixture(scope="module")
 def seite(tmp_path_factory) -> BeautifulSoup:
     site = tmp_path_factory.mktemp("f5-anbieterzaehlung") / "site"
-    render_site(site, WURZEL / "data" / "reports")
+    render_site(site, abbild(site.parent))
     return BeautifulSoup(
         (site / "geraete.html").read_text(encoding="utf-8"), "html.parser"
     )

@@ -9,15 +9,13 @@ from __future__ import annotations
 
 import json
 import shutil
-from pathlib import Path
 
 import pytest
+from bestand_pfad import BERICHTE, verlinke_neben_data
 
 from telco_radar.report import uebersetzung_view as uv
-from telco_radar.report.html import render_site, _env
-from telco_radar.uebersetzung.store import UebersetzungsStore, Uebersetzung, text_hash
-
-WURZEL = Path(__file__).resolve().parents[1]
+from telco_radar.report.html import _env, render_site
+from telco_radar.uebersetzung.store import Uebersetzung, UebersetzungsStore, text_hash
 
 
 # ------------------------------------------------------------------- Schluessel
@@ -130,9 +128,7 @@ def gerendert(tmp_path_factory):
     Link haengt an der URL-Zuordnung, und die trifft nur, wenn beide Seiten
     dieselbe Adresse fuehren.
     """
-    reports = sorted((WURZEL / "data" / "reports").glob("*.json"))
-    if not reports:
-        pytest.skip("keine Berichte im Repo")
+    reports = sorted(BERICHTE.glob("*.json"))
     daten = json.loads(reports[-1].read_text(encoding="utf-8"))
     ziel = None
     for region in (daten.get("regions") or {}).values():
@@ -142,12 +138,12 @@ def gerendert(tmp_path_factory):
                 break
         if ziel:
             break
-    if not ziel:
-        pytest.skip("keine Meldung mit URL")
+    assert ziel, "keine Meldung mit URL im Schnappschuss"
 
     basis = tmp_path_factory.mktemp("site")
-    shutil.copytree(WURZEL / "data" / "reports", basis / "data" / "reports")
+    shutil.copytree(BERICHTE, basis / "data" / "reports")
     (basis / "data" / "state").mkdir(parents=True, exist_ok=True)
+    verlinke_neben_data(basis)
     store = UebersetzungsStore(basis / "data" / "state" / "uebersetzungen.jsonl")
     store.add(
         Uebersetzung(
@@ -169,7 +165,7 @@ def gerendert(tmp_path_factory):
 
     from telco_radar.config import load_config
 
-    cfg = load_config(WURZEL)
+    cfg = load_config(basis)
     render_site(basis / "site", basis / "data" / "reports", cfg)
     return basis / "site", ziel
 
@@ -245,12 +241,11 @@ def test_die_archivwoche_verlinkt_mit_der_richtigen_tiefe(tmp_path_factory):
     haengt es vom Zufall der Gewichtung ab, ob der Aufmacher einen Link
     traegt, und der Test pruefte mal etwas und mal nichts.
     """
-    reports = sorted((WURZEL / "data" / "reports").glob("*.json"))
-    if not reports:
-        pytest.skip("keine Berichte im Repo")
+    reports = sorted(BERICHTE.glob("*.json"))
     basis = tmp_path_factory.mktemp("site_alle")
-    shutil.copytree(WURZEL / "data" / "reports", basis / "data" / "reports")
+    shutil.copytree(BERICHTE, basis / "data" / "reports")
     (basis / "data" / "state").mkdir(parents=True, exist_ok=True)
+    verlinke_neben_data(basis)
     store = UebersetzungsStore(basis / "data" / "state" / "uebersetzungen.jsonl")
     daten = json.loads(reports[-1].read_text(encoding="utf-8"))
     n = 0
@@ -275,13 +270,12 @@ def test_die_archivwoche_verlinkt_mit_der_richtigen_tiefe(tmp_path_factory):
                     herkunft="artikel",
                 )
             )
-    if not n:
-        pytest.skip("keine Meldung mit URL")
+    assert n, "keine Meldung mit URL im Schnappschuss"
     store.speichern()
 
     from telco_radar.config import load_config
 
-    render_site(basis / "site", basis / "data" / "reports", load_config(WURZEL))
+    render_site(basis / "site", basis / "data" / "reports", load_config(basis))
 
     archivseite = basis / "site" / "reports" / f"{daten['date']}.html"
     assert archivseite.exists()
@@ -359,9 +353,7 @@ def titelseite_voll(tmp_path_factory):
     erscheinen kann - unabhaengig davon, welche Meldung dieser Woche gerade
     fremdsprachig ist.
     """
-    reports = sorted((WURZEL / "data" / "reports").glob("*.json"))
-    if not reports:
-        pytest.skip("keine Berichte im Repo")
+    reports = sorted(BERICHTE.glob("*.json"))
     daten = json.loads(reports[-1].read_text(encoding="utf-8"))
     urls = [
         h["url"]
@@ -369,12 +361,12 @@ def titelseite_voll(tmp_path_factory):
         for h in (region.get("highlights") or [])
         if h.get("url")
     ]
-    if len(urls) < 8:
-        pytest.skip("zu wenige Meldungen fuer die Zaehlung")
+    assert len(urls) >= 8, "zu wenige Meldungen fuer die Zaehlung"
 
     basis = tmp_path_factory.mktemp("titelseite")
-    shutil.copytree(WURZEL / "data" / "reports", basis / "data" / "reports")
+    shutil.copytree(BERICHTE, basis / "data" / "reports")
     (basis / "data" / "state").mkdir(parents=True, exist_ok=True)
+    verlinke_neben_data(basis)
     store = UebersetzungsStore(basis / "data" / "state" / "uebersetzungen.jsonl")
     for u in urls:
         store.add(
@@ -394,7 +386,7 @@ def titelseite_voll(tmp_path_factory):
 
     from telco_radar.config import load_config
 
-    render_site(basis / "site", basis / "data" / "reports", load_config(WURZEL))
+    render_site(basis / "site", basis / "data" / "reports", load_config(basis))
     return (basis / "site" / "index.html").read_text(encoding="utf-8")
 
 

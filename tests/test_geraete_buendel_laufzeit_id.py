@@ -29,14 +29,11 @@ from __future__ import annotations
 import json
 import pathlib
 
-import pytest
+from bestand_pfad import ZUSTAND
 
 from telco_radar.analyze.tco_store import TcoDB, basis_aus_satz, id_aus_satz
 from telco_radar.report import geraete_zeitreihe
 from telco_radar.tco_model import Buendel, buendel_id
-
-_WURZEL = pathlib.Path(__file__).resolve().parent.parent
-_STATE = _WURZEL / "data" / "state"
 
 SKU = "apple-iphone-17-256gb-schwarz"
 TARIF = "O2 Mobile Klein"
@@ -315,20 +312,16 @@ def test_eine_zeile_ohne_zuordenbares_buendel_bleibt_ohne_punkt(tmp_path):
 # --------------------------------------------------------------------------
 
 
-@pytest.mark.skipif(
-    not (_STATE / "geraete_tco_historie.jsonl").exists(),
-    reason="ohne Bestand keine Gegenprobe",
-)
 def test_am_echten_bestand_verliert_die_migration_keine_messung():
-    """(c) des Auftrags, gemessen am 21.09.2026: 3854 Historienzeilen,
-    720 Buendel, 9 Messtage, und JEDE Zeile findet ihr Buendel im Stand.
+    """(c) des Auftrags am Schnappschuss: 2942 Historienzeilen, 476 Buendel,
+    22 Messtage, und JEDE Zeile findet ihr Buendel im Stand.
 
-    Die Zahlen stehen als UNTERGRENZEN da (die Historie waechst jede
-    Nacht) - aber die Quote steht hart: keine einzige Zeile darf ihre
-    Zuordnung verlieren. Ohne die untere Grenze waere dieser Test gruen,
-    auch wenn der Lookup ins Leere liefe.
+    Die Zahlen sind die des Schnappschusses (Historie gefiltert auf vier
+    Geraete), und die Quote steht hart: keine einzige Zeile darf ihre
+    Zuordnung verlieren. Ohne die Zaehlung waere dieser Test gruen, auch
+    wenn der Lookup ins Leere liefe.
     """
-    stand = json.loads((_STATE / "geraete_tco.json").read_text(encoding="utf-8"))
+    stand = json.loads((ZUSTAND / "geraete_tco.json").read_text(encoding="utf-8"))
     je_id, je_basis = {}, {}
     for b in stand.get("buendel") or []:
         bid = id_aus_satz(b)
@@ -339,7 +332,9 @@ def test_am_echten_bestand_verliert_die_migration_keine_messung():
     zeilen = zugeordnet = 0
     buendel, tage = set(), set()
     for zeile in (
-        (_STATE / "geraete_tco_historie.jsonl").read_text(encoding="utf-8").splitlines()
+        (ZUSTAND / "geraete_tco_historie.jsonl")
+        .read_text(encoding="utf-8")
+        .splitlines()
     ):
         if not zeile.strip():
             continue
@@ -352,7 +347,7 @@ def test_am_echten_bestand_verliert_die_migration_keine_messung():
         if bid in je_id or basis_aus_satz(satz) in je_basis:
             zugeordnet += 1
 
-    assert zeilen >= 3854 and len(buendel) >= 720 and len(tage) >= 9
+    assert (zeilen, len(buendel), len(tage)) == (2942, 476, 22)
     assert zugeordnet == zeilen, (
         f"{zeilen - zugeordnet} von {zeilen} Historienzeilen finden nach "
         f"der Lesemigration kein Buendel mehr"

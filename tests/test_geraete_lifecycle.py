@@ -11,12 +11,16 @@ from datetime import date, timedelta
 from pathlib import Path
 
 import pytest
+from bestand_pfad import ZUSTAND, lese_wurzel
 
+# Privat, und bewusst: die Zuordnung einer Zeile zu ihrem Regalplatz haengt
+# an genau dieser Ableitung. Wer sie im Test nachbaut, prueft seinen Nachbau.
 from telco_radar.analyze.geraete_lifecycle import (
     MIND_PUNKTE,
     MIND_TAGE_JE_GERAET,
     MIND_TERMINE_JE_GERAET,
     MIND_WOCHEN,
+    _zustand_etikett,
     auswertung,
     listungsdauer,
     nachfolger_effekt,
@@ -24,10 +28,6 @@ from telco_radar.analyze.geraete_lifecycle import (
     preisverfall,
     verweildauer_nach_nachfolger,
 )
-
-# Privat, und bewusst: die Zuordnung einer Zeile zu ihrem Regalplatz haengt
-# an genau dieser Ableitung. Wer sie im Test nachbaut, prueft seinen Nachbau.
-from telco_radar.analyze.geraete_lifecycle import _zustand_etikett
 from telco_radar.analyze.geraete_store import (
     STATUS_AKTIV,
     STATUS_AUSGELISTET,
@@ -1124,8 +1124,8 @@ def test_je_anbieter_eine_eigene_nachfolger_zeile():
 # --------------------------------------------------------------------------
 
 _WURZEL = Path(__file__).resolve().parents[1]
-_DB = _WURZEL / "data" / "state" / "geraete_db.json"
-_HISTORIE = _WURZEL / "data" / "state" / "geraete_preise.jsonl"
+_DB = ZUSTAND / "geraete_db.json"
+_HISTORIE = ZUSTAND / "geraete_preise.jsonl"
 
 
 def _termine_im_fenster(erster, letzter, anzahl=MIND_TERMINE_JE_GERAET):
@@ -1196,7 +1196,7 @@ def _echter_bestand(nachtlauf: bool = False, laeufe_ueberschreiben=None):
     """
     db = GeraeteDB(_DB)
     historie = Preishistorie(_HISTORIE)
-    katalog = lade_katalog(_WURZEL)
+    katalog = lade_katalog(lese_wurzel())
     alle = [dict(e) for e in db.eintraege()]
     punkte = historie.alle_punkte()
     termine_je_anbieter, laeufe_je_anbieter = {}, {}
@@ -1225,7 +1225,6 @@ def _echter_bestand(nachtlauf: bool = False, laeufe_ueberschreiben=None):
     return alle, punkte, katalog, termine_je_anbieter, laeufe_je_anbieter
 
 
-@pytest.mark.skipif(not _DB.exists(), reason="kein Geraete-Bestand im Checkout")
 def test_jede_lifecycle_zeile_des_echten_bestands_nimmt_die_schwelle():
     """Was am echten Bestand gilt, egal wie lange schon gemessen wird.
 
@@ -1270,7 +1269,6 @@ def test_jede_lifecycle_zeile_des_echten_bestands_nimmt_die_schwelle():
     assert all(t["modelle_anzahl"] >= t["generationen"] for t in a["portfolio"])
 
 
-@pytest.mark.skipif(not _DB.exists(), reason="kein Geraete-Bestand im Checkout")
 def test_ein_simulierter_nachtlauf_erzeugt_keine_nullzeilen():
     """Der Waechter fuer den Zustand von MORGEN - seit P5 (18.09.2026) der
     Tag nach dem juengsten last_verified des Bestands (siehe
@@ -1336,7 +1334,6 @@ def test_ein_simulierter_nachtlauf_erzeugt_keine_nullzeilen():
     ]
 
 
-@pytest.mark.skipif(not _DB.exists(), reason="kein Geraete-Bestand im Checkout")
 def test_ohne_vollstaendigen_lauf_wird_nichts_zugerechnet():
     """B2 am echten Bestand: ein Anbieter ohne vollstaendigen Lauf.
 
@@ -1397,7 +1394,6 @@ def _eigene_messtage(gruppe, punkte) -> int:
     return len(tage)
 
 
-@pytest.mark.skipif(not _DB.exists(), reason="kein Geraete-Bestand im Checkout")
 def test_ein_prueftermin_ausserhalb_des_fensters_traegt_keine_zeile():
     """Fall (d), ergebnisoffen geprueft: KEIN Fehler im Produktionscode.
 

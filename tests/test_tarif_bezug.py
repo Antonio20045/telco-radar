@@ -12,11 +12,12 @@ import json
 from pathlib import Path
 
 import pytest
+from bestand_pfad import ZUSTAND
 
 from telco_radar.analyze.tarif_referenzen import aus_bestand
 from telco_radar.collect.tarif_crawler import tarif_id
 from telco_radar.tarif_bezug import Bezug, Tarifbestand
-from telco_radar.tarif_model import HOCH, MITTEL
+from telco_radar.tarif_model import HOCH, MITTEL, ist_zurueckgezogen
 from telco_radar.tco_model import SimOnlyReferenz
 
 _WURZEL = Path(__file__).parent.parent
@@ -28,7 +29,7 @@ _WURZEL = Path(__file__).parent.parent
 _FIXTURE = _WURZEL / "tests" / "fixtures" / "tarife" / "bestand_2026-09-04.jsonl"
 # Der AUSGELIEFERTE Bestand. Genau EIN Test sieht ihn an, und der prueft
 # das Abnahmekriterium der Phase 6, nicht das Verhalten des Codes.
-_BESTAND = _WURZEL / "data" / "state" / "tarife.jsonl"
+_BESTAND = ZUSTAND / "tarife.jsonl"
 
 
 def _satz(anbieter: str, name: str, grundgebuehr=None, **kw) -> dict:
@@ -449,20 +450,33 @@ def test_der_ausgelieferte_bestand_erfuellt_das_abnahmekriterium():
 def test_fixture_und_betriebsdatei_sind_dasselbe_format():
     """Sonst prueft die halbe Datei ein Format, das es nicht gibt.
 
+    Die Marke eines zurueckgezogenen Tarifs (`tarif_model.ist_zurueckgezogen`)
+    traegt nur dessen Zeile; laufende Tarife haben genau die Felder der Fixture.
+
     Die Fixture ist eine Kopie vom 04.09.2026 und darf im Aufbau nicht von
     der Datei abweichen, die der Sammler wirklich schreibt - dieselbe
     Ueberlegung wie beim Test, der PDF und Textfixture gegeneinander haelt.
     """
 
-    def felder(pfad):
-        zeilen = [
+    def zeilen(pfad):
+        return [
             json.loads(z)
             for z in pfad.read_text(encoding="utf-8").splitlines()
             if z.strip()
         ]
-        return set().union(*(set(z) for z in zeilen)) if zeilen else set()
 
-    assert felder(_FIXTURE) == felder(_BESTAND)
+    def felder(saetze):
+        return set().union(*(set(z) for z in saetze)) if saetze else set()
+
+    bestand = zeilen(_BESTAND)
+    laufend = [z for z in bestand if not ist_zurueckgezogen(z)]
+    zurueckgezogen = [z for z in bestand if ist_zurueckgezogen(z)]
+    assert len(zurueckgezogen) == 2
+    assert felder(zeilen(_FIXTURE)) == felder(laufend)
+    assert felder(zurueckgezogen) - felder(laufend) == {
+        "zurueckgezogen_am",
+        "zurueckgezogen_grund",
+    }
 
 
 def test_das_geraeteblatt_eines_tarifs_ist_keine_zweite_referenz():

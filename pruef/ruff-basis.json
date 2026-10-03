@@ -785,9 +785,6 @@
  "tests/test_geraete_aktionen.py": {
   "I001": 1
  },
- "tests/test_geraete_anbieterzaehlung.py": {
-  "I001": 1
- },
  "tests/test_geraete_autoerkennung.py": {
   "E741": 5,
   "F841": 1,
@@ -806,12 +803,6 @@
   "B007": 1,
   "F401": 1,
   "I001": 1
- },
- "tests/test_geraete_buendel_congstar.py": {
-  "F401": 1
- },
- "tests/test_geraete_buendel_einsundeins.py": {
-  "F401": 1
  },
  "tests/test_geraete_buendel_kopf_zeitraum.py": {
   "I001": 1
@@ -885,8 +876,7 @@
   "I001": 1
  },
  "tests/test_geraete_lifecycle.py": {
-  "E731": 1,
-  "I001": 1
+  "E731": 1
  },
  "tests/test_geraete_methodik_umzug.py": {
   "E501": 10,
@@ -906,16 +896,10 @@
   "B007": 1,
   "I001": 1
  },
- "tests/test_geraete_o3_rollen.py": {
-  "F401": 1
- },
  "tests/test_geraete_o3_rollen_browser.py": {
   "B007": 1,
   "E501": 2,
   "F401": 1,
-  "I001": 1
- },
- "tests/test_geraete_o4_export.py": {
   "I001": 1
  },
  "tests/test_geraete_o4_verlauf_browser.py": {
@@ -997,9 +981,6 @@
  },
  "tests/test_geraete_tco_historie.py": {
   "F841": 1
- },
- "tests/test_geraete_tco_orakel.py": {
-  "I001": 1
  },
  "tests/test_geraete_tco_terminologie.py": {
   "F401": 2,
@@ -1206,8 +1187,7 @@
   "I001": 1
  },
  "tests/test_uebersetzung_seite.py": {
-  "E501": 2,
-  "I001": 1
+  "E501": 2
  },
  "tests/test_versand.py": {
   "F401": 1
@@ -1224,10 +1204,6 @@
   "F401": 1
  },
  "tests/test_wettbewerbsradar.py": {
-  "B905": 1,
-  "I001": 1
- },
- "tests/test_wettbewerbsradar_alarme.py": {
-  "I001": 1
+  "B905": 1
  }
 }

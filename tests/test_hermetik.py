@@ -153,11 +153,10 @@ def test_umwege_ueber_proc_chdir_und_kindprozess_scheitern(zugriff, pfad):
 
 
 def test_verweis_auf_den_bestand_ueber_symlink_scheitert(tmp_path):
-    ziel = os.path.relpath(WURZEL / "data", tmp_path)
     lauf = _lauf(
         f"""
         zeiger = Path({str(tmp_path / "zeiger")!r})
-        os.symlink({ziel!r}, zeiger)
+        os.symlink(os.path.relpath(hermetik.GESPERRT[0], zeiger.parent), zeiger)
         (zeiger / 'state/seen.jsonl').read_bytes()
         """
     )

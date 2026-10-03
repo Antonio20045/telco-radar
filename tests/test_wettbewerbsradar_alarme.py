@@ -24,10 +24,12 @@ import pathlib
 
 import pytest
 import yaml
+from bestand_pfad import ZUSTAND, lese_wurzel
 from bs4 import BeautifulSoup
 
 from telco_radar.geraete_config import lade_katalog, lade_quellen
-from telco_radar.report import geraete_view, geraete_radar as wr
+from telco_radar.report import geraete_radar as wr
+from telco_radar.report import geraete_view
 from telco_radar.report.html import render_site
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
@@ -362,11 +364,8 @@ def test_der_aufklapper_steht_nicht_zweite_mal_auf_dem_radar(tmp_path):
 
 @pytest.fixture(scope="module")
 def echt():
-    state = WURZEL / "data" / "state"
-    if not (state / "geraete_db.json").exists():
-        pytest.skip("kein Gerätebestand im Checkout")
     view = geraete_view.aufbereiten(
-        state, lade_quellen(WURZEL), lade_katalog(WURZEL), heute=""
+        ZUSTAND, lade_quellen(WURZEL), lade_katalog(lese_wurzel()), heute=""
     )
     radar = wr.radar(
         view["tco"],
@@ -382,8 +381,7 @@ def test_am_echten_bestand_traegt_der_radar_alle_alarmzeilen(echt):
     die volle Liste. Ein Umzug, der nur die sichtbaren Zeilen nimmt,
     verlöre den Rest still."""
     alarme = echt["view"]["alarme"]
-    if not alarme["gesamt"]:
-        pytest.skip("Bestand ohne Alarmzeile")
+    assert alarme["gesamt"], "Schnappschuss ohne Alarmzeile, der Test prüfte nichts"
     ueber = echt["radar"]["alarme"]
     assert ueber["gesamt"] == alarme["gesamt"]
     assert len(ueber["sichtbar"]) + len(ueber["rest"]) == alarme["gesamt"]
@@ -391,7 +389,6 @@ def test_am_echten_bestand_traegt_der_radar_alle_alarmzeilen(echt):
 
 def test_am_echten_bestand_traegt_der_radar_die_sortimentsluecke(echt):
     ohne = echt["view"]["vergleich"]["ohne_vertrag"]
-    if not ohne["ohne_vodafone_gesamt"]:
-        pytest.skip("Bestand ohne Sortimentslücke")
+    assert ohne["ohne_vodafone_gesamt"], "Schnappschuss ohne Sortimentslücke"
     assert echt["radar"]["ohne_vodafone_gesamt"] == ohne["ohne_vodafone_gesamt"]
     assert len(echt["radar"]["ohne_vodafone"]) == len(ohne["ohne_vodafone"])

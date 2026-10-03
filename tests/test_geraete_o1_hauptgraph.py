@@ -29,6 +29,7 @@ import json
 import pathlib
 
 import pytest
+from bestand_pfad import ZUSTAND, lese_wurzel
 
 from telco_radar.geraete_config import lade_katalog
 from telco_radar.report import geraete_tco_band as bandmod
@@ -37,7 +38,6 @@ from telco_radar.tarif_bezug import Tarifbestand
 from telco_radar.tco_model import Buendel, SimOnlyReferenz
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
-ZUSTAND = WURZEL / "data" / "state"
 
 
 # --------------------------------------------------------------------------
@@ -82,7 +82,7 @@ def bestand():
         for r in tco["sim_only"]
     ]
     return karten.modelle(
-        buendel, db["listungen"], referenzen, tarife, lade_katalog(WURZEL)
+        buendel, db["listungen"], referenzen, tarife, lade_katalog(lese_wurzel())
     )
 
 
@@ -285,9 +285,9 @@ def test_die_luecke_nennt_namen_ohne_einzelsaetze():
             "grundgebuehr": 29.95,
         },
     }
-    modell = karten.modelle(buendel, listungen, [], tarife, lade_katalog(WURZEL))[
-        "modelle"
-    ][0]
+    modell = karten.modelle(
+        buendel, listungen, [], tarife, lade_katalog(lese_wurzel())
+    )["modelle"][0]
     balken = _baender(modell, tarife)[0]["balken"]
     assert [z["anbieter"] for z in balken["zeilen"]] == ["o2"]
     assert balken["luecke"]["nur_erneuert"] == ["Telekom"]
@@ -311,7 +311,7 @@ def _aufbereitung():
         tco["buendel"],
         tco["sim_only"],
         db["listungen"],
-        lade_katalog(WURZEL),
+        lade_katalog(lese_wurzel()),
         tarife=tarife,
     )
 

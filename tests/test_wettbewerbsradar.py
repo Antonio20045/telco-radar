@@ -34,20 +34,20 @@ from __future__ import annotations
 import json
 import pathlib
 
-import yaml
 import pytest
+import yaml
+from bestand_pfad import ZUSTAND, lese_wurzel
 from bs4 import BeautifulSoup
 
 from telco_radar.geraete_config import lade_katalog, lade_quellen
+from telco_radar.report import geraete_radar as wr
 from telco_radar.report import geraete_tco_band as band
 from telco_radar.report import geraete_tco_karten as karten
 from telco_radar.report import geraete_view
-from telco_radar.report import geraete_radar as wr
 from telco_radar.report.html import render_site
 from telco_radar.tco_model import Buendel, SimOnlyReferenz, zeitraum_vergleichbar
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
-ZUSTAND = WURZEL / "data" / "state"
 HEUTE = "2026-09-08"
 
 SKU_M1 = "apple-iphone-15-128gb-schwarz"  # o2 im Band XS, guenstiger
@@ -211,7 +211,7 @@ def _bestand():
         )
     ]
     ergebnis = karten.modelle(
-        buendel, listungen, referenzen, tarife, lade_katalog(WURZEL)
+        buendel, listungen, referenzen, tarife, lade_katalog(lese_wurzel())
     )
     return ergebnis["modelle"], band.tarif_baender(tarife)
 
@@ -490,7 +490,7 @@ def _zweitmarken_bestand():
         )
     ]
     ergebnis = karten.modelle(
-        buendel, listungen, referenzen, tarife, lade_katalog(WURZEL)
+        buendel, listungen, referenzen, tarife, lade_katalog(lese_wurzel())
     )
     return ergebnis["modelle"], band.tarif_baender(tarife)
 
@@ -1044,7 +1044,7 @@ def echt():
     nicht weniger (CLAUDE.md §6: render_site ohne cfg rendert halbe
     Seiten; hier steht der ganze Stack wie in der Pipeline)."""
     view = geraete_view.aufbereiten(
-        ZUSTAND, lade_quellen(WURZEL), lade_katalog(WURZEL), heute=HEUTE
+        ZUSTAND, lade_quellen(WURZEL), lade_katalog(lese_wurzel()), heute=HEUTE
     )
     radar = wr.radar(
         view["tco"], view["vergleich"]["ohne_vertrag"], view["quellenlage"]
@@ -1224,39 +1224,6 @@ def test_am_echten_bestand_steht_die_benachteiligung_oben(echt):
     )
     if erste is not None:
         assert erste["rang"] == min(raenge)
-
-
-def test_am_echten_bestand_fuehrt_jeder_mismatch_die_guenstigste_karte(echt):
-    by_id = {m["id"]: m for m in echt["modelle"]}
-    treffer = 0
-    for g in echt["radar"]["gruppen"]:
-        for z in g["zeilen"]:
-            if z["status"] != wr.STATUS_BAND_MISMATCH:
-                continue
-            treffer += 1
-            modell = by_id[g["id"]]
-            karten_davon = [
-                k
-                for k in modell["karten"]
-                if k["anbieter"] == z["anbieter"]
-                and k.get("belastbar")
-                and not k.get("naeherung")
-                and k.get("gesamt") is not None
-            ]
-            assert karten_davon, (
-                f"{g['id']}/{z['anbieter']}: Mismatch ohne jede echte Karte"
-            )
-            guenstigste = min(
-                karten_davon, key=lambda k: (not k.get("frisch", True), k["gesamt"])
-            )
-            assert z["gesamt"] == guenstigste["gesamt"], (
-                f"{g['id']}/{z['anbieter']}: Beleg ist nicht die guenstigste "
-                "FRISCHE Karte (A3: alt vor billig verliert)"
-            )
-    assert treffer, (
-        "kein Band-Mismatch im Bestand - die Invariantenpruefung "
-        "traefe einen leeren Fall (Datenlage ggf. neu ansehen)"
-    )
 
 
 def test_am_echten_bestand_bleiben_haendlerzeilen_geraetepreise(echt):

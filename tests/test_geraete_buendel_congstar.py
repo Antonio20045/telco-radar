@@ -37,10 +37,10 @@ n × recurring.discounted == total` ist Bedingung, nicht Protokoll.
 """
 
 import gzip
-import json
 from pathlib import Path
 
 import pytest
+from bestand_pfad import ZUSTAND, lese_wurzel
 
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
 from telco_radar.collect.geraete import (
@@ -81,7 +81,7 @@ def _saetze():
 
 @pytest.fixture(scope="module")
 def katalog():
-    return lade_katalog(_WURZEL)
+    return lade_katalog(lese_wurzel())
 
 
 @pytest.fixture(scope="module")
@@ -383,7 +383,7 @@ def test_die_rate_haengt_am_tarif_wie_die_seite_es_sagt():
 
 
 def test_alle_acht_tarife_der_produktseite_loesen_gegen_den_echten_bestand():
-    bestand = Tarifbestand.aus_datei(_WURZEL / "data" / "state" / "tarife.jsonl")
+    bestand = Tarifbestand.aus_datei(ZUSTAND / "tarife.jsonl")
     ergaenze_pib_slug(bestand)
     rohsaetze = [
         {
@@ -630,7 +630,7 @@ def test_der_ganze_weg_bis_zum_buendel_mit_echtem_bestand():
     """Ende zu Ende gegen den echten tarife.jsonl-Bestand: die 36 Sätze
     der M-Fixture (P0-B2a: 18 × 2 Laufzeiten) lösen nach der Brücke alle
     auf (M und M Flex über den Namen, die Brücke stört das nicht)."""
-    bestand = Tarifbestand.aus_datei(_WURZEL / "data" / "state" / "tarife.jsonl")
+    bestand = Tarifbestand.aus_datei(ZUSTAND / "tarife.jsonl")
     ergaenze_pib_slug(bestand)
     rohsaetze = [
         {**s, "anbieter": "congstar", "sku_id": f"sku-{i}", "quelle_url": s["url"]}

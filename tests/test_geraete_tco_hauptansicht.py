@@ -22,6 +22,7 @@ import pathlib
 import re
 
 import pytest
+from bestand_pfad import ZUSTAND, lese_wurzel
 
 from telco_radar.geraete_config import lade_katalog
 from telco_radar.report import geraete_tco_grafik as grafik
@@ -30,7 +31,6 @@ from telco_radar.tarif_bezug import Tarifbestand
 from telco_radar.tco_model import Buendel, SimOnlyReferenz
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
-ZUSTAND = WURZEL / "data" / "state"
 
 
 @pytest.fixture(scope="module")
@@ -71,7 +71,7 @@ def bestand():
         for r in tco["sim_only"]
     ]
     return karten.modelle(
-        buendel, db["listungen"], referenzen, tarife, lade_katalog(WURZEL)
+        buendel, db["listungen"], referenzen, tarife, lade_katalog(lese_wurzel())
     )
 
 
@@ -165,7 +165,7 @@ def _naeherungs_modell():
         }
     }
     ergebnis = karten.modelle(
-        buendel, listungen, referenzen, tarife, lade_katalog(WURZEL)
+        buendel, listungen, referenzen, tarife, lade_katalog(lese_wurzel())
     )
     modell = ergebnis["modelle"][0]
     # Gegenprobe: der Fall stellt sich WIRKLICH - eine echte Naeherungskarte.
@@ -385,7 +385,8 @@ def test_antwortzeile_der_tarifgewinner_ist_kein_naeherungsangebot(bestand):
 
 
 def test_die_rechenprobe_steht_auf_der_karte(bestand):
-    """iPhone 17 Pro 256 GB bei o2 - dieselben Betraege wie im Rechenkern.
+    """iPhone 17 Pro 256 GB bei o2 im Tarif L Plus (19,99 EUR, Zuzahlung
+    1,00 EUR, 36 Raten zu 36,50 EUR) - dieselben Betraege wie im Rechenkern.
 
     A1 (20.09.2026): die Leitzahl heisst "Kosten über 24 Monate" und
     rechnet ALLE Geräteraten der eigenen Laufzeit. o2s Raten laufen 36
@@ -393,13 +394,18 @@ def test_die_rechenprobe_steht_auf_der_karte(bestand):
     1.794,76 EUR; die 12 Raten nach Monat 24 (438,00 EUR) stehen als
     `offen_nach_24` daneben und `gezahlt_nach_24` traegt die alte
     24-Monates-Summe weiter."""
-    karte = [
+    (karte,) = [
         k
         for k in _modell(bestand, "apple-iphone-17-pro-256")["karten"]
         if k["anbieter"] == "o2"
-    ][0]
+        and k["sku_id"] == "apple-iphone-17-pro-256gb-silber"
+        and k["tarif"] == "O2 Mobile L Plus mit 150 GB+ (24 Mon.)"
+        and k["raten_laufzeit"] == 36
+    ]
+    assert (karte["zuzahlung"], karte["rate"], karte["monatlich"]) == (1.0, 36.5, 19.99)
+    assert karte["anschlusspreis"] == 0.0
     assert karte["label"] == "Kosten über 24 Monate"
-    assert karte["gesamt"] == 1794.76
+    assert karte["gesamt"] == round(1.0 + 36 * 36.5 + 24 * 19.99, 2) == 1794.76
     assert karte["schnitt_monat"] == 74.78
     assert karte["gezahlt_nach_24"] == 1356.76
     assert karte["offen_nach_24"] == 438.00
@@ -470,11 +476,11 @@ def test_eins_und_eins_wird_nicht_in_tarif_und_geraet_zerlegt(bestand):
     unsere Rechnung. Die beiden EINMALIGEN Posten der Karte (S2-C:
     Geräte-Einmalzahlung und Bereitstellungsgebühr) sind KEINE Aufteilung
     - sie stehen neben dem Bündelpreis, nicht in ihm."""
-    karte = [
+    (karte,) = [
         k
         for k in _modell(bestand, "apple-iphone-17-pro-256")["karten"]
-        if k["anbieter"] == "1&1"
-    ][0]
+        if k["anbieter"] == "1&1" and k["tarif"] == "1&1 All-Net-Flat S"
+    ]
     assert karte["buendel_monatlich"] == 44.99
     assert karte["monatlich"] is None and karte["rate"] is None
     assert [p["kategorie"] for p in karte["bestandteile"]] == [
@@ -579,15 +585,26 @@ def test_die_beschriftung_der_referenz_aendert_kein_delta(bestand):
     wieder mit ALLEN Geraeteraten (und Referenz-Buendeln ihrer eigenen
     Laufzeit), beide Werte sind neu gemessen."""
 
-    def delta(mid, anbieter):
-        return [
-            k["delta"]
+    def delta(mid, tarif):
+        (betrag,) = {
+            k["delta"]["betrag"]
             for k in _modell(bestand, mid)["karten"]
-            if k["anbieter"] == anbieter and k["zustand"] == "neu"
-        ][0]
+            if k["anbieter"] == "o2" and k["zustand"] == "neu" and k["tarif"] == tarif
+        }
+        return betrag
 
-    assert delta("apple-iphone-17-pro-256", "o2")["betrag"] == -161.04
-    assert delta("apple-iphone-15-128", "o2")["betrag"] == -349.05
+    assert _modell(bestand, "apple-iphone-17-pro-256")["referenz"]["gesamt"] == 1955.80
+    assert _modell(bestand, "apple-iphone-15-128")["referenz"]["gesamt"] == 1469.80
+    assert (
+        delta("apple-iphone-17-pro-256", "O2 Mobile L Plus mit 150 GB+ (24 Mon.)")
+        == round(1794.76 - 1955.80, 2)
+        == -161.04
+    )
+    assert (
+        delta("apple-iphone-15-128", "O2 Mobile on Demand M Plus mit 50 GB+ (24 Mon.)")
+        == round(1120.75 - 1469.80, 2)
+        == -349.05
+    )
     for modell in bestand["modelle"]:
         ref = modell["referenz"]
         if not ref or ref.get("aus_buendel"):
@@ -1073,7 +1090,7 @@ def test_geraet_aus_sku_loest_ueber_den_katalog():
     Bindestrich. Die Faelle, an denen ein Schnitt scheitern wuerde: Pro
     gegen Pro Max, Pro gegen Pro Fold, 16 gegen 16e, Farbe mit
     Bindestrich, Zustandssuffix."""
-    katalog = lade_katalog(WURZEL)
+    katalog = lade_katalog(lese_wurzel())
     f = karten.geraet_aus_sku
     assert f(_SKU_OHNE_LISTUNG, katalog) == ("apple-iphone-16-pro-max", 256)
     assert f("apple-iphone-16-pro-256gb-titan-weiss", katalog) == (
@@ -1108,7 +1125,7 @@ def test_ein_buendel_ohne_listung_steht_unter_seinem_katalognamen():
     keine Listung im Geraetebestand und stand als Modell "ohne-geraet" im
     Auswahlfeld, als Ueberschrift und als `data-modell`."""
     ergebnis = karten.modelle(
-        [_buendel_ohne_listung()], [], [], {}, lade_katalog(WURZEL)
+        [_buendel_ohne_listung()], [], [], {}, lade_katalog(lese_wurzel())
     )
     assert ergebnis["ohne_zuordnung"] == []
     assert [m["id"] for m in ergebnis["modelle"]] == ["apple-iphone-16-pro-max-256"]
@@ -1129,7 +1146,7 @@ def test_ein_buendel_ohne_katalogtreffer_faellt_benannt_heraus():
         [],
         [],
         {},
-        lade_katalog(WURZEL),
+        lade_katalog(lese_wurzel()),
     )
     assert ergebnis["modelle"] == [] and ergebnis["gesamt"] == 0
     assert len(ergebnis["ohne_zuordnung"]) == 1
@@ -1192,11 +1209,20 @@ def test_die_referenz_des_iphone_17_ist_die_aktuelle_messung(bestand):
         for k in modell["karten"]
         if k["anbieter"] == "Vodafone" and k["tarif"] == "Mobil XS"
     ]
-    assert len(xs) == 1, "vier Farben, ein Slot: eine Karte"
-    assert xs[0]["gesamt"] == 1847.8
-    # Die Karte des Slots traegt dieselbe Messung wie das Blatt des
-    # Modells - ohne festes Datum, dieselbe Begruendung.
-    assert xs[0]["abgerufen_am"] == ref["tarif_abgerufen_am"]
+    # Fuenf Farben, je Ratenlaufzeit ein Slot: eine Karte je Laufzeit.
+    assert sorted(k["raten_laufzeit"] for k in xs) == [12, 24, 36]
+    for k, rate in zip(
+        sorted(xs, key=lambda k: k["raten_laufzeit"]), (90.0, 45.0, 30.0), strict=True
+    ):
+        assert (k["zuzahlung"], k["rate"], k["monatlich"]) == (1.0, rate, 31.95)
+        assert (
+            k["gesamt"]
+            == round(1.0 + k["raten_laufzeit"] * rate + 24 * 31.95, 2)
+            == 1847.8
+        )
+        # Die Karte des Slots traegt dieselbe Messung wie das Blatt des
+        # Modells - ohne festes Datum, dieselbe Begruendung.
+        assert k["abgerufen_am"] == ref["tarif_abgerufen_am"]
     # Gegenprobe 1: die Geist-Messung vom 06.09. verdraengt KEIN aktuelles
     # Angebot mehr (ihre Zahl taucht auf keiner Vodafone-Karte des Modells).
     assert all(
@@ -1291,7 +1317,9 @@ def test_ein_eigenes_buendel_verdraengt_die_naeherung():
             abgerufen_am="2026-09-04",
         )
     ]
-    ergebnis = karten.modelle(buendel, listungen, referenzen, {}, lade_katalog(WURZEL))
+    ergebnis = karten.modelle(
+        buendel, listungen, referenzen, {}, lade_katalog(lese_wurzel())
+    )
     modell = ergebnis["modelle"][0]
     vodafone = [k for k in modell["karten"] if k["anbieter"] == "Vodafone"]
     assert len(vodafone) == 1, "Vodafone steht je Modell genau einmal"

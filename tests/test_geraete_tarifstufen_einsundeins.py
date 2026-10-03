@@ -27,6 +27,7 @@ import gzip
 from pathlib import Path
 
 import pytest
+from bestand_pfad import ZUSTAND
 
 from telco_radar.analyze.tco_buendel import aus_rohsaetzen
 from telco_radar.collect.geraete import ADAPTER
@@ -296,7 +297,7 @@ def test_ein_zweiter_lauf_verdoppelt_nichts():
 
 
 def test_jeder_gelieferte_tarif_loest_im_echten_bestand_auf():
-    bestand = Tarifbestand.aus_datei(_WURZEL / "data" / "state" / "tarife.jsonl")
+    bestand = Tarifbestand.aus_datei(ZUSTAND / "tarife.jsonl")
     saetze = _basis()
     E.ergaenze_tarifstufen(_Hole(), {}, saetze)
     bilanz = aus_rohsaetzen(saetze, bestand, "2026-09-29")

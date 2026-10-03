@@ -21,6 +21,8 @@ import math
 from datetime import datetime, timezone
 from pathlib import Path
 
+from bestand_pfad import ZUSTAND
+
 from telco_radar.collect.tarif_crawler import TarifSpeicher, sammle
 from telco_radar.report import geraete_tco_band as band
 from telco_radar.report.tarife_view import lade_staende
@@ -175,9 +177,7 @@ def test_katalog_und_chip_tragen_die_leiter():
 def test_leiter_am_echten_bestand():
     """Gegenprobe gegen die Datei selbst, ohne `tarifleiter`: jede Stufe ist
     genau ein Vodafone-Satz "mit Smartphone", mit seinem Volumen."""
-    bestand = Tarifbestand.aus_datei(
-        WURZEL / "data" / "state" / "tarife.jsonl"
-    ).je_id_aktuell
+    bestand = Tarifbestand.aus_datei(ZUSTAND / "tarife.jsonl").je_id_aktuell
     erwartet = {}
     for satz in bestand.values():
         name = satz.get("name") or ""

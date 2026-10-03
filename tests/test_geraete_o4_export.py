@@ -25,10 +25,11 @@ import pathlib
 import re
 
 import pytest
+from bestand_pfad import ZUSTAND, abbild
 from bs4 import BeautifulSoup
 
-from telco_radar.report.html import render_site
 from telco_radar.report.geraete_export import SPALTE_UEBER_24, SPALTE_UEBER_LAUFZEIT
+from telco_radar.report.html import render_site
 from telco_radar.tco_model import TCO_HORIZONT as _O4_HORIZONT
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
@@ -95,7 +96,7 @@ SPALTEN_TCO = [
 @pytest.fixture(scope="module")
 def site(tmp_path_factory) -> pathlib.Path:
     ziel = tmp_path_factory.mktemp("o4-export") / "site"
-    render_site(ziel, WURZEL / "data" / "reports")
+    render_site(ziel, abbild(ziel.parent))
     return ziel
 
 
@@ -147,7 +148,7 @@ def radar(site) -> BeautifulSoup:
 
 @pytest.fixture(scope="module")
 def store() -> dict:
-    return json.loads((WURZEL / "data" / "state" / "geraete_tco.json").read_text())
+    return json.loads((ZUSTAND / "geraete_tco.json").read_text())
 
 
 # --------------------------------------------------------------------------
@@ -291,7 +292,7 @@ def test_die_band_spalte_ist_gefuellt_wo_ein_band_ist(tco_csv, store):
     from telco_radar.tarif_bezug import Tarifbestand
 
     bands = geraete_tco_band.tarif_baender(
-        Tarifbestand.aus_datei(WURZEL / "data" / "state" / "tarife.jsonl").je_id
+        Tarifbestand.aus_datei(ZUSTAND / "tarife.jsonl").je_id_aktuell
     )
     erwartet_mit_band = sum(1 for b in store["buendel"] if bands.get(b.get("tarif_id")))
     _, zeilen = tco_csv

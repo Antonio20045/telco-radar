@@ -20,6 +20,7 @@ from copy import deepcopy
 from pathlib import Path
 
 import pytest
+from bestand_pfad import ZUSTAND, lese_wurzel
 
 from telco_radar.geraete_config import lade_katalog
 from telco_radar.report.geraete_bereinigung import _zwillingsschluessel, bereinige
@@ -425,7 +426,7 @@ def test_ein_leerer_bestand_bleibt_leer():
 
 
 def _echter_bestand():
-    db = json.loads((_WURZEL / "data" / "state" / "geraete_db.json").read_text())
+    db = json.loads((ZUSTAND / "geraete_db.json").read_text())
     return [
         e
         for e in db["listungen"]
@@ -465,7 +466,7 @@ def test_die_kette_der_auslieferung_nimmt_nur_weg_was_sie_meldet():
        kann Zeilen kosten, nie welche schaffen.
     """
     sichtbar = _echter_bestand()
-    bericht = pruefe(sichtbar, lade_katalog(_WURZEL))
+    bericht = pruefe(sichtbar, lade_katalog(lese_wurzel()))
     geprueft = bericht["sauber"]
     fertig = bereinige(geprueft)
 
@@ -546,7 +547,7 @@ def test_die_kette_haelt_ihre_zwei_zahlen_an_einer_gestellten_lage():
     ]
 
     sichtbar = [zwilling_alt, zwilling_neu, *doppel, *varianten]
-    bericht = pruefe(sichtbar, lade_katalog(_WURZEL))
+    bericht = pruefe(sichtbar, lade_katalog(lese_wurzel()))
     fertig = bereinige(bericht["sauber"])
 
     assert (len(sichtbar), len(bericht["sauber"]), len(fertig)) == (6, 4, 3)
@@ -704,7 +705,7 @@ def test_am_echten_bestand_bleibt_die_klammerfarbe_unversehrt():
     (Leitplanke: Tests, die den Bestand verankern, fallen mit neuen Daten).
     Die Behauptung ist dieselbe - `bereinige` laesst die Klammerfarbe
     stehen -, nur haengt sie nicht mehr am Listungsstatus."""
-    db = json.loads((_WURZEL / "data" / "state" / "geraete_db.json").read_text())
+    db = json.loads((ZUSTAND / "geraete_db.json").read_text())
     zeile = [
         e
         for e in db["listungen"]

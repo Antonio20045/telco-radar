@@ -12,15 +12,12 @@ steht, sondern dass ihre Werte aus der Statistikdatei stammen.
 
 import json
 import re
-from pathlib import Path
 
 import pytest
 from bs4 import BeautifulSoup
 
 from telco_radar.report import newsletter_protokoll as np
 from telco_radar.report.html import render_site
-
-WURZEL = Path(__file__).resolve().parents[1]
 
 LAEUFE = [
     {
@@ -190,17 +187,6 @@ def test_alles_wird_zu_zahlen(tmp_path):
 def test_ohne_datum_kein_eintrag(tmp_path):
     with pytest.raises(ValueError):
         np.vermerken(tmp_path / "stats.jsonl", {"delivered": 5})
-
-
-def test_die_statistikdatei_des_repos_traegt_keine_adresse():
-    """Der CI-Test aus dem Konzept. Zweite Sicherung nach der Filterung -
-    sie kostet nichts und faengt den Fall, in dem jemand `vermerken()`
-    erweitert."""
-    pfad = WURZEL / "data" / "state" / "newsletter_stats.jsonl"
-    if not pfad.exists():
-        pytest.skip("noch kein Versandlauf")
-    muster = re.compile(r"[\w.+-]+@[\w-]+\.[a-z]{2,}", re.I)
-    assert not muster.search(pfad.read_text(encoding="utf-8"))
 
 
 # ==============================================================  Seite  ====

@@ -18,6 +18,7 @@ import json
 import pathlib
 
 import pytest
+from bestand_pfad import ZUSTAND, lese_wurzel
 
 from telco_radar.geraete_config import lade_katalog
 from telco_radar.report import geraete_tco_band as band
@@ -26,7 +27,6 @@ from telco_radar.tarif_bezug import Tarifbestand
 from telco_radar.tco_model import Buendel, SimOnlyReferenz
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
-ZUSTAND = WURZEL / "data" / "state"
 
 # Der Vorgabefall aus BRIEF_GRAPH1: dasselbe Modell, das die Hauptansicht
 # ohne Klick zeigt (`geraete_tco_karten.LEITFRAGE_MODELL`).
@@ -44,26 +44,35 @@ def tarife():
 
 
 def test_drei_echte_tarifsaetze_treffen_ihre_stufe(tarife):
-    """Beispiele aus dem echten Bestand, seit P3-E1 gegen die Vodafone-
-    Tarifleiter: ein unbegrenzter Tarif faellt heraus (Vodafone XL traegt
-    kein erhobenes Volumen), Vodafone-Tarife gehen ueber ihren Namen in
-    ihre Stufe, ein 150-GB-Tarif in die naechste Stufe L (120 GB)."""
+    """Beispiele aus dem Schnappschuss, gegen die Vodafone-Tarifleiter: ein
+    unbegrenzter Tarif faellt in die Stufe XL, weil Vodafone XL selbst als
+    unbegrenzt erhoben ist (`band_von_gb`), Vodafone-Tarife gehen ueber ihren
+    Namen in ihre Stufe, ein 150-GB-Tarif in die naechste Stufe L (120 GB)."""
     leiter = band.tarifleiter(tarife)
-    assert leiter, "keine Vodafone-Tarifleiter im Bestand"
+    assert [(s.key, s.gb) for s in leiter] == [
+        ("xs", 15.0),
+        ("s", 30.0),
+        ("m", 60.0),
+        ("l", 120.0),
+        ("xl", float("inf")),
+    ]
     index = band.tarif_baender(tarife, leiter)
     faelle = [
-        ("o2:o2-mobile-unlimited-m-flex", None),  # unbegrenzt (Infinity)
+        ("o2:o2-mobile-unlimited-m-flex", "xl"),  # unbegrenzt (Infinity)
         ("vodafone:vodafone-mobil-xs", "xs"),  # 18 GB, ueber den Namen
         ("vodafone:vodafone-mobil-m", "m"),  # 60 GB
         ("o2:o2-mobile-l", "l"),  # 150 GB
     ]
-    geprueft = 0
-    for tarif_id, erwartet in faelle:
-        if tarif_id not in tarife:
-            continue  # Tarifbestand kann sich zwischen Laeufen leicht verschieben
-        geprueft += 1
-        assert index.get(tarif_id) == erwartet, tarif_id
-    assert geprueft >= 3, "weniger als drei der Beispiel-Tarife im Bestand"
+    assert [(t, index.get(t)) for t, _ in faelle] == faelle
+
+
+def test_unbegrenzt_bleibt_ohne_band_solange_vodafone_xl_begrenzt_ist(tarife):
+    """Gegenprobe zu XL: Ohne unbegrenzte Vodafone-Stufe hat ein unbegrenzter
+    Tarif keine Stufe, statt in die groesste endliche zu rutschen."""
+    leiter = tuple(s for s in band.tarifleiter(tarife) if s.key != "xl")
+    index = band.tarif_baender(tarife, leiter)
+    assert index.get("o2:o2-mobile-unlimited-m-flex") is None
+    assert index.get("o2:o2-mobile-l") == "l"
 
 
 # --------------------------------------------------------------------------
@@ -114,7 +123,7 @@ def bestand():
         for r in tco["sim_only"]
     ]
     modelle = karten.modelle(
-        buendel, db["listungen"], referenzen, tarife, lade_katalog(WURZEL)
+        buendel, db["listungen"], referenzen, tarife, lade_katalog(lese_wurzel())
     )
     leiter = band.tarifleiter(tarife)
     return {
@@ -228,7 +237,9 @@ def test_leerzustand_modell_ohne_buendel_in_keinem_band(bestand, tarife):
                 abgerufen_am="2026-09-08",
             )
         ]
-        modelle = karten.modelle(buendel, [listung], [], tarife, lade_katalog(WURZEL))
+        modelle = karten.modelle(
+            buendel, [listung], [], tarife, lade_katalog(lese_wurzel())
+        )
         assert modelle["modelle"], "das konstruierte Modell muss entstehen"
         return modelle["modelle"][0]
 

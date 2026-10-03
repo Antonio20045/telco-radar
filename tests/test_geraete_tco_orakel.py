@@ -29,19 +29,12 @@ from __future__ import annotations
 import json
 import pathlib
 
-import pytest
+from bestand_pfad import ZUSTAND
 
 from telco_radar.report import geraete_tco_karten as karten
-from telco_radar.tco_model import Buendel, TCO_HORIZONT, tco_24
+from telco_radar.tco_model import TCO_HORIZONT, Buendel, tco_24
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
-ZUSTAND = WURZEL / "data" / "state"
-
-BESTAND_DA = (
-    (ZUSTAND / "geraete_tco.json").exists()
-    and (ZUSTAND / "geraete_db.json").exists()
-    and (ZUSTAND / "tarife.jsonl").exists()
-)
 
 
 def _tarife() -> dict:
@@ -69,7 +62,6 @@ def _barpreise_neu() -> dict:
     return beste
 
 
-@pytest.mark.skipif(not BESTAND_DA, reason="kein ausgelieferter Bestand")
 def test_keine_leitzahl_unter_dem_eigenen_barpreis():
     """Das Orakel: 697 vergleichbare Bündel, 0 Verletzungen.
 
@@ -136,7 +128,6 @@ def _buendel_aus_satz(satz: dict) -> Buendel | None:
         return None
 
 
-@pytest.mark.skipif(not BESTAND_DA, reason="kein ausgelieferter Bestand")
 def test_widerspruch_pib_und_shopmessung_festgehaltene_messung():
     """Der Pruefer-Befund vom 20.09.2026 (schwere "hoch"), festgehalten als
     Messung gegen das echte Blatt im ausgelieferten Tarifbestand:
@@ -184,7 +175,6 @@ def test_widerspruch_pib_und_shopmessung_festgehaltene_messung():
     assert kennzahl.gesamt != 2249.79
 
 
-@pytest.mark.skipif(not BESTAND_DA, reason="kein ausgelieferter Bestand")
 def test_kein_tarifposten_wider_die_gemessene_monatsrate():
     """Das Rechenbarkeits-Orakel ueber den GANZEN Bestand: der Tarifposten
     einer Leitzahl ist entweder flach die gemessene Monatsrate oder
@@ -241,7 +231,6 @@ def test_kein_tarifposten_wider_die_gemessene_monatsrate():
     )
 
 
-@pytest.mark.skipif(not BESTAND_DA, reason="kein ausgelieferter Bestand")
 def test_der_pflichtfall_steht_wirklich_im_bestand():
     """Die Zahl des Auftrags kommt nicht aus dem Kopf: congstar fuehrt das
     iPhone 17 Pro 256 GB zur Allnet Flat XS mit genau den Posten des
