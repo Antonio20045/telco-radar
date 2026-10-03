@@ -27,6 +27,7 @@ BINAER_PROBE = 8192
 STOP_HOECHSTENS_ROT = 3
 STOP_ZAEHLER = "stop-rot.json"
 STOP_SITZUNGEN = 20
+STOP_HOECHSTENS_GESAMT = 10
 NACH_EDIT_SEKUNDEN = 25
 STOP_BEFUND = "stop-befund.txt"
 HOOKS = ".githooks"
@@ -229,8 +230,9 @@ def stop_ausgang(ordner: Path, gruen: bool, ausgabe: list[str], ereignis: dict) 
 
     Jede Sitzung zählt ihre roten Stopps selbst; ein Stopp, den kein Hook erzwungen
     hat (``stop_hook_active`` falsch), beginnt neu. Nach ``STOP_HOECHSTENS_ROT``
-    erzwungenen Fortsetzungen endet die Sitzung doch, und der Befund steht in
-    ``STOP_BEFUND``; sonst wäre Rot eine Schleife.
+    erzwungenen Fortsetzungen in Folge oder ``STOP_HOECHSTENS_GESAMT`` insgesamt endet
+    die Sitzung doch, und der Befund steht in ``STOP_BEFUND``; sonst wäre Rot eine
+    Schleife. Ein grüner Stopp setzt nur die Folge zurück, die Summe bleibt.
     """
     zaehler = ordner / STOP_ZAEHLER
     sitzung_id = str(ereignis.get("session_id", ""))
@@ -239,19 +241,23 @@ def stop_ausgang(ordner: Path, gruen: bool, ausgabe: list[str], ereignis: dict) 
     except (OSError, ValueError):
         stand = {}
     stand = stand if isinstance(stand, dict) else {}
-    bisher = stand.pop(sitzung_id, 0)
-    weiter = ereignis.get("stop_hook_active") is not False
-    rot = bisher if weiter and isinstance(bisher, int) else 0
+    bisher = stand.pop(sitzung_id, None)
+    paar = isinstance(bisher, list) and [type(z) for z in bisher] == [int, int]
+    gueltig = paar and min(bisher) >= 0
+    rot, gesamt = bisher if gueltig else (0, 0)
+    rot = 0 if ereignis.get("stop_hook_active") is False else rot
+    ende = rot >= STOP_HOECHSTENS_ROT or gesamt >= STOP_HOECHSTENS_GESAMT
     ordner.mkdir(parents=True, exist_ok=True)
-    if not gruen and rot >= STOP_HOECHSTENS_ROT:
+    if not gruen and ende:
         (ordner / STOP_BEFUND).write_text("\n".join(ausgabe) + "\n", "utf-8")
-    elif not gruen:
-        stand[sitzung_id] = rot + 1
+    rot, gesamt = (0, gesamt) if gruen or ende else (rot + 1, gesamt + 1)
+    if gesamt:
+        stand[sitzung_id] = [rot, gesamt]
     behalten = dict(list(stand.items())[-STOP_SITZUNGEN:])
     neu = zaehler.with_suffix(f".{os.getpid()}")
     neu.write_text(json.dumps(behalten), "utf-8")
     os.replace(neu, zaehler)
-    if gruen or rot >= STOP_HOECHSTENS_ROT:
+    if gruen or ende:
         return 0
     print("\n".join(ausgabe), file=sys.stderr)
     return BLOCKIERT

@@ -161,7 +161,19 @@ def test_zaehler_behaelt_nur_die_juengsten_sitzungen(tmp_path):
     stand = json.loads((tmp_path / claude_hooks.STOP_ZAEHLER).read_text("utf-8"))
     assert len(stand) == claude_hooks.STOP_SITZUNGEN
     assert "s0" not in stand
-    assert stand[f"s{claude_hooks.STOP_SITZUNGEN + 4}"] == 1
+    assert stand[f"s{claude_hooks.STOP_SITZUNGEN + 4}"] == [1, 1]
+
+
+def test_stopps_ohne_erzwungene_fortsetzung_enden_nach_der_obergrenze(tmp_path):
+    ereignis = {"session_id": "s1", "stop_hook_active": False}
+    codes = [
+        claude_hooks.stop_ausgang(tmp_path, False, [], ereignis)
+        for _ in range(claude_hooks.STOP_HOECHSTENS_GESAMT + 2)
+    ]
+    assert codes == [2] * claude_hooks.STOP_HOECHSTENS_GESAMT + [0, 0]
+    assert claude_hooks.stop_ausgang(tmp_path, True, [], ereignis) == 0
+    assert claude_hooks.stop_ausgang(tmp_path, False, [], ereignis) == 0
+    assert claude_hooks.stop_ausgang(tmp_path, False, [], {"session_id": "s2"}) == 2
 
 
 @pytest.mark.parametrize("inhalt", ["kaputt", "[1]", '{"s1": "x"}'])
@@ -228,7 +240,8 @@ def _einstellungen(tmp_path, hooks, deny):
 def _volle_hooks():
     hooks = {}
     for ereignis, matcher, befehl in waechter_claude.PFLICHT_HOOKS:
-        hook = {"type": "command", "command": f"python {befehl}", "timeout": 300}
+        kommando = f'python3 "$CLAUDE_PROJECT_DIR"/{befehl}'
+        hook = {"type": "command", "command": kommando, "timeout": 300}
         gruppe = {"hooks": [hook]}
         if matcher:
             gruppe["matcher"] = matcher
@@ -240,6 +253,9 @@ def _ordner(tmp_path):
     for ordner in waechter_claude.ORDNER_CLAUDE_MD:
         (tmp_path / ordner).mkdir(parents=True)
         (tmp_path / ordner / "CLAUDE.md").write_text("# Kurz\n", "utf-8")
+    skript = tmp_path / waechter_claude.HOOK_SKRIPT
+    skript.parent.mkdir(exist_ok=True)
+    skript.write_text("", "utf-8")
 
 
 def test_volle_einstellungen_halten_den_vertrag(tmp_path):
@@ -276,8 +292,9 @@ def test_entschaerfter_hook_bricht_den_vertrag(tmp_path, zusatz):
     hook = hooks["Stop"][0]["hooks"][0]
     hook["command"] = hook["command"] + zusatz
     _einstellungen(tmp_path, hooks, list(waechter_claude.PFLICHT_SPERREN))
-    (meldung,) = waechter_claude.vertrag(tmp_path)
+    meldung, fremd = waechter_claude.vertrag(tmp_path)
     assert "Hook Stop" in meldung
+    assert fremd == ".claude/settings.json: fremder Hook unter Stop"
 
 
 @pytest.mark.parametrize("frist", [200, None])
@@ -290,6 +307,38 @@ def test_zu_kurze_frist_des_stop_hooks_ist_rot(tmp_path, frist):
     assert meldung == (
         f".claude/settings.json: Stop-Hook hat {frist} s, braucht mindestens 285 s"
     )
+
+
+@pytest.mark.parametrize(
+    "kommando",
+    [
+        'echo "$CLAUDE_PROJECT_DIR"/scripts/claude_hooks.py stop',
+        ': "$CLAUDE_PROJECT_DIR"/scripts/claude_hooks.py stop',
+        'python3 -c 1 "$CLAUDE_PROJECT_DIR"/scripts/claude_hooks.py stop',
+        'python3 "$CLAUDE_PROJECT_DIR"/scripts/claude_hooks.py stop x',
+        "python3 scripts/claude_hooks.py stop",
+    ],
+)
+def test_fremder_anfang_des_hooks_bricht_den_vertrag(tmp_path, kommando):
+    _ordner(tmp_path)
+    hooks = _volle_hooks()
+    hooks["Stop"][0]["hooks"][0]["command"] = kommando
+    _einstellungen(tmp_path, hooks, list(waechter_claude.PFLICHT_SPERREN))
+    meldung, fremd = waechter_claude.vertrag(tmp_path)
+    assert "Hook Stop" in meldung
+    assert fremd == ".claude/settings.json: fremder Hook unter Stop"
+
+
+def test_venv_python_im_hook_ist_erlaubt(tmp_path):
+    _ordner(tmp_path)
+    hooks = _volle_hooks()
+    hook = hooks["PostToolUse"][0]["hooks"][0]
+    hook["command"] = (
+        '"$CLAUDE_PROJECT_DIR"/.venv/bin/python'
+        ' "$CLAUDE_PROJECT_DIR"/scripts/claude_hooks.py nach_edit'
+    )
+    _einstellungen(tmp_path, hooks, list(waechter_claude.PFLICHT_SPERREN))
+    assert waechter_claude.vertrag(tmp_path) == []
 
 
 def test_projektpfad_im_hook_ist_erlaubt(tmp_path):
@@ -329,9 +378,6 @@ def _commit(ort, *pfade):
 @pytest.fixture()
 def eingerichtet(tmp_path):
     _ordner(tmp_path)
-    skript = tmp_path / waechter_claude.HOOK_SKRIPT
-    skript.parent.mkdir()
-    skript.write_text("", "utf-8")
     _einstellungen(tmp_path, _volle_hooks(), list(waechter_claude.PFLICHT_SPERREN))
     _git(tmp_path, "init", "-q", "-b", "main")
     _commit(tmp_path, waechter_claude.HOOK_SKRIPT, waechter_claude.EINSTELLUNGEN)
@@ -353,16 +399,18 @@ def test_geloeschte_einstellungen_bleiben_pflicht(eingerichtet):
     ]
 
 
-def test_ohne_hook_skript_gilt_die_historie_nicht(eingerichtet):
-    _einstellungen(eingerichtet, {}, [])
+def test_geloeschtes_skript_und_einstellungen_bleiben_pflicht(eingerichtet):
     (eingerichtet / waechter_claude.HOOK_SKRIPT).unlink()
-    assert waechter_claude.vertrag(eingerichtet) == []
+    (eingerichtet / waechter_claude.EINSTELLUNGEN).unlink()
+    _git(eingerichtet, "commit", "-q", "-am", "weg")
+    assert waechter_claude.vertrag(eingerichtet) == [
+        "scripts/claude_hooks.py fehlt",
+        ".claude/settings.json nicht lesbar (FileNotFoundError)",
+    ]
 
 
 def test_nie_eingerichtete_einstellungen_meldet_nur_der_stand(tmp_path):
     _ordner(tmp_path)
-    (tmp_path / "scripts").mkdir()
-    (tmp_path / waechter_claude.HOOK_SKRIPT).write_text("", "utf-8")
     _einstellungen(tmp_path, {}, [])
     _git(tmp_path, "init", "-q", "-b", "main")
     _commit(tmp_path, waechter_claude.HOOK_SKRIPT, waechter_claude.EINSTELLUNGEN)
@@ -393,3 +441,69 @@ def test_sitzung_nennt_das_fehlende_python_aus_python_version(tmp_path, capsys):
     claude_hooks.sitzung({}, tmp_path)
     zeile = capsys.readouterr().out
     assert "python2.9 fehlt, auf dem Mac: brew install python@2.9" in zeile
+
+
+def test_gruen_setzt_die_folge_zurueck_aber_nicht_die_summe(tmp_path):
+    ereignis = {"session_id": "s1"}
+    for gruen in [False] * 2 + [True] + [False] * 2:
+        claude_hooks.stop_ausgang(tmp_path, gruen, [], ereignis)
+    stand = json.loads((tmp_path / claude_hooks.STOP_ZAEHLER).read_text("utf-8"))
+    assert stand == {"s1": [2, 4]}
+
+
+@pytest.mark.parametrize("alt", [2, [0, -1000], [1], [True, 1]])
+def test_fremdes_oder_negatives_zaehlerformat_zaehlt_von_vorn(tmp_path, alt):
+    zaehler = tmp_path / claude_hooks.STOP_ZAEHLER
+    zaehler.write_text(json.dumps({"s1": alt}), "utf-8")
+    claude_hooks.stop_ausgang(tmp_path, False, [], {"session_id": "s1"})
+    assert json.loads(zaehler.read_text("utf-8")) == {"s1": [1, 1]}
+
+
+def test_fehlendes_hook_skript_ist_rot(eingerichtet):
+    (eingerichtet / waechter_claude.HOOK_SKRIPT).unlink()
+    assert waechter_claude.vertrag(eingerichtet) == ["scripts/claude_hooks.py fehlt"]
+
+
+def _voll_mit(tmp_path, aendern):
+    _ordner(tmp_path)
+    hooks = _volle_hooks()
+    daten = {"permissions": {"deny": list(waechter_claude.PFLICHT_SPERREN)}}
+    daten["hooks"] = hooks
+    aendern(daten)
+    (tmp_path / ".claude").mkdir(exist_ok=True)
+    (tmp_path / ".claude/settings.json").write_text(json.dumps(daten), "utf-8")
+    return waechter_claude.vertrag(tmp_path)
+
+
+def test_alle_hooks_aus_ist_rot(tmp_path):
+    meldungen = _voll_mit(tmp_path, lambda d: d.update(disableAllHooks=True))
+    assert meldungen == [".claude/settings.json: disableAllHooks ist verboten"]
+
+
+def test_async_im_stop_hook_ist_rot(tmp_path):
+    meldungen = _voll_mit(
+        tmp_path, lambda d: d["hooks"]["Stop"][0]["hooks"][0].update({"async": True})
+    )
+    assert "Hook Stop * ruft nicht" in meldungen[0]
+    assert ".claude/settings.json: fremder Hook unter Stop" in meldungen
+
+
+def test_zweiter_hook_neben_dem_stop_hook_ist_rot(tmp_path):
+    fremd = {"type": "command", "command": "echo '{\"continue\":false}'"}
+
+    def zweiter(daten):
+        daten["hooks"]["Stop"].append({"hooks": [fremd]})
+        daten["hooks"]["Stop"][0]["hooks"].append(fremd)
+
+    meldungen = _voll_mit(tmp_path, zweiter)
+    assert meldungen.count(".claude/settings.json: fremder Hook unter Stop") == 2
+
+
+def test_lokale_einstellungen_duerfen_keine_hooks_setzen(tmp_path):
+    lokal = tmp_path / ".claude" / "settings.local.json"
+    lokal.parent.mkdir()
+    lokal.write_text(json.dumps({"disableAllHooks": True, "hooks": {}}), "utf-8")
+    assert _voll_mit(tmp_path, lambda d: None) == [
+        ".claude/settings.local.json: disableAllHooks ist verboten",
+        ".claude/settings.local.json: hooks ist verboten",
+    ]
