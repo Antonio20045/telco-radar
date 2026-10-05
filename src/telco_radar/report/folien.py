@@ -39,6 +39,8 @@ import re
 from dataclasses import dataclass, field
 from datetime import datetime
 
+from . import anbieter_farben as farben
+
 log = logging.getLogger(__name__)
 
 MAX_TITEL = 68
@@ -215,8 +217,8 @@ _KOPF = """<!DOCTYPE html>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {{
-    --vf-red:#e60000; --vf-red-deep:#ac1811; --vf-ink:#25282b;
-    --vf-mute:#7e7e7e; --vf-canvas:#ffffff; --vf-neutral:#f2f2f2;
+    --vf-red:{rot}; --vf-red-deep:{rot_tief}; --vf-ink:{tinte};
+    --vf-mute:{grau}; --vf-canvas:{flaeche}; --vf-neutral:{neutral};
     --font-display:'Inter','Helvetica Neue',Arial,sans-serif;
     --slide-w:1920px; --slide-h:1080px;
     --ease:cubic-bezier(0.22,1,0.36,1);
@@ -324,7 +326,7 @@ def baue(report: dict, *, titel: str = "") -> str:
         raise ValueError("Platzhalter ueber Budget: " + ", ".join(ueber))
 
     gesamt = 4
-    teile = [_KOPF.format(titel=_e(satz.titel))]
+    teile = [_KOPF.format(titel=_e(satz.titel), **farben.FOLIEN)]
 
     teile.append(
         _folie(

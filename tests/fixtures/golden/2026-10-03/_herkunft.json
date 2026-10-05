@@ -1,25 +1,25 @@
 {
- "abgeleitet_aus": "Aufnahme aus Lauf 37134812406, Code 0796a38867c9a9a1580c1bbdf6cc4ccb4b7c655a",
+ "abgeleitet_aus": "Aufnahme aus Lauf 37134812406, Code 4fc90be1be2e385f40b6bd733a2246fb1580eb16",
  "bestand": "tests/fixtures/bestand/2026-10-03",
- "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+ "commit": "369661c01e6b9f9a3de11e5db23dd5091a60a363",
  "eintraege": [
   {
    "abgeleitet_aus": "zwei Wiedergaben der Aufnahme, gleiche Seiten",
-   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "369661c01e6b9f9a3de11e5db23dd5091a60a363",
    "datei": "erwartet.json",
    "filter": null,
-   "sha256_roh": "67ea81d9dcb2c903ce079710b7ab107777a05eb6b3f1cb217beb97a0ce6ccd41"
+   "sha256_roh": "61492555f7dd08fd86317882421a73fc06ce70fdc8dd3f807a7caea167cfaed5"
   },
   {
    "abgeleitet_aus": "goldener Lauf 2026-10-03T15:53:29+00:00, Lauf 37134812406",
-   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "369661c01e6b9f9a3de11e5db23dd5091a60a363",
    "datei": "http.jsonl.gz",
    "filter": null,
    "sha256_roh": "283a968edaa58c5432d8780fc73c83dadf05961b5c70a22a82e3602a86d48b47"
   },
   {
    "abgeleitet_aus": "goldener Lauf 2026-10-03T15:53:29+00:00, Lauf 37134812406",
-   "commit": "4fc90be1be2e385f40b6bd733a2246fb1580eb16",
+   "commit": "369661c01e6b9f9a3de11e5db23dd5091a60a363",
    "datei": "llm.jsonl.gz",
    "filter": null,
    "sha256_roh": "2c407aecd0964c157732929ea449e999ac274339536f0d4544b7b3807bb5559c"
@@ -27,12 +27,7 @@
  ],
  "lauf": "37134812406",
  "llm": "jede LLM-Anfrage abgelehnt, aufgenommen ist der Weg ohne LLM",
- "luecken": [
-  "HTTP-Antwort für GET https://newsroom.vodafone.de/rss fehlt, neu aufnehmen mit make golden-aufnehmen",
-  "HTTP-Antwort für GET https://unternehmen.vodafone.de/newsroom/rss fehlt, neu aufnehmen mit make golden-aufnehmen",
-  "HTTP-Antwort für GET https://www.telekom.com/en/investor-relations.rss.feed.427676.xml fehlt, neu aufnehmen mit make golden-aufnehmen",
-  "HTTP-Antwort für GET https://www.telekom.com/service/rss/427676/feed.rss fehlt, neu aufnehmen mit make golden-aufnehmen"
- ],
+ "luecken": [],
  "umgebung": [
   "LLM_API_KEY"
  ],

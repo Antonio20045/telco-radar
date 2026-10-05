@@ -20,9 +20,7 @@ dass hoechstens ein bis zwei Meldungen im Monat durchkommen: Stufe 3
 stark schwankenden Meldungszahlen (642 am 6.8., 124 am 4.8.) waere jeder
 niedrigere Schwellenwert innerhalb von zwei Wochen stummgeschaltet - und ein
 stummgeschalteter Kanal ist schlimmer als keiner, weil er den Eindruck von
-Zustellung erweckt.
-
-Was hier ausdruecklich NICHT passiert: jeden Lauf verschicken.
+Zustellung erweckt. Was hier ausdruecklich NICHT passiert: jeden Lauf verschicken.
 
 Zustellgedaechtnis
 ------------------
@@ -44,6 +42,8 @@ from email.message import EmailMessage
 from pathlib import Path
 
 import httpx
+
+from .report import anbieter_farben as farben
 
 log = logging.getLogger(__name__)
 
@@ -201,37 +201,37 @@ def baue_mail(report: dict, site_url: str = SITE_URL) -> tuple[str, str, str]:
     if zeilen:
         punkte = "".join(
             f'<li style="margin:0 0 16px"><div style="font-size:16px;'
-            f'line-height:1.45;color:#14120f">{esc(h.get("ctm_satz"))}</div>'
-            f'<div style="font-size:12px;color:#8a8479;margin-top:4px">'
+            f'line-height:1.45;color:{farben.TINTE}">{esc(h.get("ctm_satz"))}</div>'
+            f'<div style="font-size:12px;color:{farben.TINTE_4};margin-top:4px">'
             f"{esc(h.get('operator') or h.get('source'))} · "
-            f'<a href="{esc(h.get("url"))}" style="color:#5e594f">'
+            f'<a href="{esc(h.get("url"))}" style="color:{farben.TINTE_3}">'
             f"{esc(h.get('headline') or h.get('title'))}</a></div></li>"
             for h in zeilen
         )
         inhalt = (
             f'<p style="font-size:11px;letter-spacing:.09em;'
-            f'text-transform:uppercase;color:#8a8479;margin:0 0 10px">'
+            f'text-transform:uppercase;color:{farben.TINTE_4};margin:0 0 10px">'
             f'In zwei Minuten</p><ol style="padding-left:18px;margin:0">'
             f"{punkte}</ol>"
         )
     else:
         inhalt = (
-            '<p style="font-size:16px;color:#33302a;margin:0">Diese '
+            f'<p style="font-size:16px;color:{farben.TINTE_2};margin:0">Diese '
             "Woche gab es keine Meldung mit direktem Bezug zum eigenen "
             "Portfolio.</p>"
         )
 
     html = (
         "<div style=\"font-family:Georgia,'Source Serif 4',serif;"
-        'max-width:620px;margin:0 auto;padding:24px;background:#f6f4ee">'
-        f'<div style="border-top:3px solid #14120f;padding-top:10px;'
+        f'max-width:620px;margin:0 auto;padding:24px;background:{farben.PAPIER}">'
+        f'<div style="border-top:3px solid {farben.TINTE};padding-top:10px;'
         f'margin-bottom:22px"><div style="font-size:22px;font-weight:700">'
-        f'Telco Radar</div><div style="font-size:11px;color:#8a8479;'
+        f'Telco Radar</div><div style="font-size:11px;color:{farben.TINTE_4};'
         f'letter-spacing:.06em">Ausgabe vom {esc(datum)}</div></div>'
         f"{inhalt}"
-        f'<p style="margin:26px 0 0;border-top:1px solid #e6e2d8;'
+        f'<p style="margin:26px 0 0;border-top:1px solid {farben.LINIE_2};'
         f'padding-top:12px;font-size:12px">'
-        f'<a href="{esc(site_url)}/" style="color:#e60000">Ganze Ausgabe '
+        f'<a href="{esc(site_url)}/" style="color:{farben.VODAFONE_ROT}">Ganze Ausgabe '
         f"öffnen</a></p></div>"
     )
     return betreff, text, html

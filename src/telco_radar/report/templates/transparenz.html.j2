@@ -362,8 +362,8 @@
 
 {% if news_sources %}
 <div class="card tan" style="margin-top:20px">
-  <h2 style="margin:0 0 6px;font-size:17px;font-weight:700;color:#201a16">Telco-Fachpresse <span class="rubrik-zahl">zweite Ebene · {{ news_sources | length }} Feeds</span></h2>
-  <p style="margin:0 0 16px;font-size:13.5px;color:#8a8070;max-width:700px">Ergänzende Signal-Ebene zur Abdeckung bot-geblockter Betreiber – immer als Fachpresse gekennzeichnet, nie als offizielle Quelle.</p>
+  <h2 style="margin:0 0 6px;font-size:17px;font-weight:700;color:{{ hausfarbe.titel }}">Telco-Fachpresse <span class="rubrik-zahl">zweite Ebene · {{ news_sources | length }} Feeds</span></h2>
+  <p style="margin:0 0 16px;font-size:13.5px;color:{{ hausfarbe.notiz }};max-width:700px">Ergänzende Signal-Ebene zur Abdeckung bot-geblockter Betreiber – immer als Fachpresse gekennzeichnet, nie als offizielle Quelle.</p>
   <div class="pill-cloud">
     {% for s in news_sources %}
     <a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.name }}</a>

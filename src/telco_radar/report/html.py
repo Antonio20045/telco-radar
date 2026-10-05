@@ -70,18 +70,7 @@ RELEVANCE_LABELS = {
     1: "Randnotiz",
     0: "Unbewertet",
 }
-CATEGORY_COLORS = {
-    "Produktlaunch": "#e60000",
-    "Tarif/Pricing": "#ac1811",
-    "Kampagne": "#c2185b",
-    "Partnerschaft": "#3860be",
-    "Netz/Technologie": "#5a6b9e",
-    "Regulierung": "#8a7a2f",
-    "M&A": "#25282b",
-    "Finanzen": "#7e7e7e",
-    "Sonstiges": "#a8a8a8",
-    "Unbewertet": "#c4c4c4",
-}
+CATEGORY_COLORS = _anbieter_farben.KATEGORIE_FARBEN
 MONTHS_DE = [
     "Januar",
     "Februar",
@@ -1139,7 +1128,9 @@ def _prep_competitors(report: dict) -> list[dict]:
             if _is_suppressed_source(m):
                 continue
             m["domain"] = urlsplit(m.get("url") or "").netloc.removeprefix("www.")
-            m["color"] = CATEGORY_COLORS.get(m.get("category"), "#7e7e7e")
+            m["color"] = CATEGORY_COLORS.get(
+                m.get("category"), _anbieter_farben.GRAU_MITTEL
+            )
             moves.append(m)
         c["moves"] = moves
         c["anker"] = _wb_anker(c.get("name") or "")
@@ -1167,6 +1158,7 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     _wurzel = getattr(cfg, "root", None) or reports_dir.parent.parent
     ausfaelle: list[Ausfall] = ohne_konfiguration(_wurzel)
     env.globals["ausfaelle"] = ausfaelle
+    env.globals["hausfarbe"] = _anbieter_farben.TRANSPARENZ
     site_dir.mkdir(parents=True, exist_ok=True)
     (site_dir / "reports").mkdir(exist_ok=True)
     folien_dir = site_dir / "folien"

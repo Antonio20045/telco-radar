@@ -54,7 +54,7 @@
          data-delta="{% if k.delta %}{{ k.delta.betrag if k.delta.betrag is not none else k.delta.monatlich }}{% endif %}"
          data-einmalig="{{ k.zuzahlung if k.zuzahlung is not none else '' }}"
          {# D3, PUNKT 3: die Anbieterfarbe steht wirklich an der Zeile.
-            `var(--anb,#57534a)` (Name, 3px-Randstreifen, Zerlegungsbalken)
+            `var(--anb, Rückfall)` (Name, 3px-Randstreifen, Zerlegungsbalken)
             hatte hier bislang KEINEN Custom-Property-Wert und fiel darum
             immer auf den grauen Rückfall zurück, obwohl die Regel dafür
             längst existiert. `anb_klasse` als KLASSE ginge nicht - der

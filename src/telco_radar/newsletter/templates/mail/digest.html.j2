@@ -29,7 +29,7 @@
 <meta name="supported-color-schemes" content="light dark">
 <title>{{ betreff }}</title>
 </head>
-<body style="margin:0;padding:0;background:#f6f4ee;color:#141414">
+<body style="margin:0;padding:0;background:{{ mailfarbe.papier }};color:{{ mailfarbe.tinte }}">
 {#- Die Vorschauzeile: was die Liste unter dem Betreff anreisst. Ohne sie
     steht dort der Anfang des Kopfbereichs, also die Marke ein zweites
     Mal. -#}
@@ -37,20 +37,20 @@
 {{ items[0].titel if items else chrome.kopf.untertitel }}
 </div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-       style="background:#f6f4ee;border-collapse:collapse">
+       style="background:{{ mailfarbe.papier }};border-collapse:collapse">
 <tr><td align="center" style="padding:24px 12px">
 <table role="presentation" width="{{ breite }}" cellpadding="0" cellspacing="0" border="0"
-       style="width:100%;max-width:{{ breite }}px;background:#fffdf8;border-collapse:collapse">
+       style="width:100%;max-width:{{ breite }}px;background:{{ mailfarbe.flaeche }};border-collapse:collapse">
 <tr><td style="padding:26px 24px 0 24px">
 
   {#- ---------------------------------------------------------- Kopf -#}
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
          style="border-collapse:collapse">
-    <tr><td align="center" style="padding:0 0 16px 0;border-bottom:3px solid #141414">
-      <div style="font:700 26px/1.1 Georgia,'Times New Roman',Times,serif;color:#141414">{{ chrome.kopf.titel }}</div>
-      <div style="font:700 10px/1.4 Arial,Helvetica,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6b6b6b;padding-top:7px">{{ chrome.kopf.untertitel }} &middot; {{ chrome.kopf.ausgabe | replace('{datum}', datum_de) }}</div>
+    <tr><td align="center" style="padding:0 0 16px 0;border-bottom:3px solid {{ mailfarbe.tinte }}">
+      <div style="font:700 26px/1.1 Georgia,'Times New Roman',Times,serif;color:{{ mailfarbe.tinte }}">{{ chrome.kopf.titel }}</div>
+      <div style="font:700 10px/1.4 Arial,Helvetica,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:{{ mailfarbe.grau }};padding-top:7px">{{ chrome.kopf.untertitel }} &middot; {{ chrome.kopf.ausgabe | replace('{datum}', datum_de) }}</div>
     </td></tr>
-    <tr><td style="padding:20px 0 2px 0;font:400 14px/1.55 Georgia,'Times New Roman',Times,serif;color:#141414">{{ chrome.anrede }} {{ einleitung }}</td></tr>
+    <tr><td style="padding:20px 0 2px 0;font:400 14px/1.55 Georgia,'Times New Roman',Times,serif;color:{{ mailfarbe.tinte }}">{{ chrome.anrede }} {{ einleitung }}</td></tr>
   </table>
 
   {#- -------------------------------------------------- Geraeteblock -#}
@@ -61,27 +61,27 @@
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
          style="border-collapse:collapse">
     <tr><td style="padding:20px 0 4px 0">
-      <div style="font:700 11px/1.4 Arial,Helvetica,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#6b6b6b">{{ bewegung.titel }}{% if bewegung.zeitraum %} &middot; {{ bewegung.zeitraum }}{% endif %}</div>
+      <div style="font:700 11px/1.4 Arial,Helvetica,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:{{ mailfarbe.grau }}">{{ bewegung.titel }}{% if bewegung.zeitraum %} &middot; {{ bewegung.zeitraum }}{% endif %}</div>
     </td></tr>
     {% if bewegung.ausfall %}
-    <tr><td style="padding:6px 0 14px 0;font:400 14px/1.55 Georgia,'Times New Roman',Times,serif;color:#3a3a3a">{{ bewegung.ausfall }}</td></tr>
+    <tr><td style="padding:6px 0 14px 0;font:400 14px/1.55 Georgia,'Times New Roman',Times,serif;color:{{ mailfarbe.text }}">{{ bewegung.ausfall }}</td></tr>
     {% elif bewegung.leer %}
-    <tr><td style="padding:6px 0 14px 0;font:400 14px/1.55 Georgia,'Times New Roman',Times,serif;color:#3a3a3a">{{ bewegung.leer }}</td></tr>
+    <tr><td style="padding:6px 0 14px 0;font:400 14px/1.55 Georgia,'Times New Roman',Times,serif;color:{{ mailfarbe.text }}">{{ bewegung.leer }}</td></tr>
     {% endif %}
     {% for z in bewegung.zeilen %}
-    <tr><td style="padding:12px 0 12px 0;{% if not loop.first %}border-top:1px solid #ddd8cc{% endif %}">
-      <div style="font:700 11px/1.4 Arial,Helvetica,sans-serif;letter-spacing:.04em;padding-bottom:4px"><span style="color:{{ z.farbe }}">{{ z.anbieter }}</span> <span style="color:#6b6b6b">&middot;</span> <span style="color:#141414">{{ z.geraet }}</span> <span style="color:#6b6b6b">&middot;</span> <span style="color:#6b6b6b">{{ z.band }}</span></div>
-      <div style="padding-bottom:4px"><span style="font:700 24px/1.2 Georgia,'Times New Roman',Times,serif;color:#141414">{{ z.betrag }}</span> <span style="font:400 14px/1.4 Georgia,'Times New Roman',Times,serif;color:#141414">{{ z.richtung }}</span></div>
-      <div style="font:400 13px/1.5 Georgia,'Times New Roman',Times,serif;color:#3a3a3a"><span>{{ z.vorher }}</span> &middot; <span>{{ z.jetzt }}</span> &middot; <span>{{ z.bewegt }}</span></div>
+    <tr><td style="padding:12px 0 12px 0;{% if not loop.first %}border-top:1px solid {{ mailfarbe.linie }}{% endif %}">
+      <div style="font:700 11px/1.4 Arial,Helvetica,sans-serif;letter-spacing:.04em;padding-bottom:4px"><span style="color:{{ z.farbe }}">{{ z.anbieter }}</span> <span style="color:{{ mailfarbe.grau }}">&middot;</span> <span style="color:{{ mailfarbe.tinte }}">{{ z.geraet }}</span> <span style="color:{{ mailfarbe.grau }}">&middot;</span> <span style="color:{{ mailfarbe.grau }}">{{ z.band }}</span></div>
+      <div style="padding-bottom:4px"><span style="font:700 24px/1.2 Georgia,'Times New Roman',Times,serif;color:{{ mailfarbe.tinte }}">{{ z.betrag }}</span> <span style="font:400 14px/1.4 Georgia,'Times New Roman',Times,serif;color:{{ mailfarbe.tinte }}">{{ z.richtung }}</span></div>
+      <div style="font:400 13px/1.5 Georgia,'Times New Roman',Times,serif;color:{{ mailfarbe.text }}"><span>{{ z.vorher }}</span> &middot; <span>{{ z.jetzt }}</span> &middot; <span>{{ z.bewegt }}</span></div>
       <div style="font:700 12px/1.4 Arial,Helvetica,sans-serif;padding-top:6px">
-        <a href="{{ z.link }}" style="color:#e60000;text-decoration:none">{{ chrome.bewegung.link_seite }} &rsaquo;</a>
-        {%- if z.quelle %}&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="{{ z.quelle }}" style="color:#6b6b6b;text-decoration:none">{{ z.quelle_text }} &rsaquo;</a>{% endif %}
-        {%- if z.eigen_quelle %}&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="{{ z.eigen_quelle }}" style="color:#6b6b6b;text-decoration:none">{{ z.eigen_quelle_text }} &rsaquo;</a>{% endif %}
+        <a href="{{ z.link }}" style="color:{{ mailfarbe.rot }};text-decoration:none">{{ chrome.bewegung.link_seite }} &rsaquo;</a>
+        {%- if z.quelle %}&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="{{ z.quelle }}" style="color:{{ mailfarbe.grau }};text-decoration:none">{{ z.quelle_text }} &rsaquo;</a>{% endif %}
+        {%- if z.eigen_quelle %}&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="{{ z.eigen_quelle }}" style="color:{{ mailfarbe.grau }};text-decoration:none">{{ z.eigen_quelle_text }} &rsaquo;</a>{% endif %}
       </div>
     </td></tr>
     {% endfor %}
     {% if bewegung.weitere %}
-    <tr><td style="padding:0 0 14px 0;font:700 12px/1.4 Arial,Helvetica,sans-serif"><a href="{{ bewegung.seite }}" style="color:#e60000;text-decoration:none">{{ bewegung.weitere }} &rsaquo;</a></td></tr>
+    <tr><td style="padding:0 0 14px 0;font:700 12px/1.4 Arial,Helvetica,sans-serif"><a href="{{ bewegung.seite }}" style="color:{{ mailfarbe.rot }};text-decoration:none">{{ bewegung.weitere }} &rsaquo;</a></td></tr>
     {% endif %}
   </table>
   {% endif %}
@@ -91,24 +91,24 @@
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
          style="border-collapse:collapse">
     {% for it in items %}
-    <tr><td style="padding:18px 0 16px 0;{% if not loop.first %}border-top:1px solid #ddd8cc{% endif %}">
+    <tr><td style="padding:18px 0 16px 0;{% if not loop.first %}border-top:1px solid {{ mailfarbe.linie }}{% endif %}">
       {#- Der additive Stichworttreffer sagt, warum er hier steht. Ohne
           diese Zeile ist er fuer den Leser unerklaerlich - und genau daran
           entscheidet sich, ob Stichwort-Abos als nuetzlich oder als kaputt
           empfunden werden. -#}
       {% if it.stichwort %}
-      <div style="font:700 11px/1.4 Arial,Helvetica,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#e60000;padding-bottom:5px">{{ chrome.stichwort_marker | replace('{stichwort}', it.stichwort) }}</div>
+      <div style="font:700 11px/1.4 Arial,Helvetica,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:{{ mailfarbe.rot }};padding-bottom:5px">{{ chrome.stichwort_marker | replace('{stichwort}', it.stichwort) }}</div>
       {% endif %}
       {% if it.absender %}
-      <div style="font:700 11px/1.4 Arial,Helvetica,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#6b6b6b;padding-bottom:5px">{{ it.absender }}</div>
+      <div style="font:700 11px/1.4 Arial,Helvetica,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:{{ mailfarbe.grau }};padding-bottom:5px">{{ it.absender }}</div>
       {% endif %}
-      <div style="font:700 18px/1.3 Georgia,'Times New Roman',Times,serif;color:#141414;padding-bottom:6px">{{ it.titel }}</div>
+      <div style="font:700 18px/1.3 Georgia,'Times New Roman',Times,serif;color:{{ mailfarbe.tinte }};padding-bottom:6px">{{ it.titel }}</div>
       {% if it.text %}
-      <div style="font:400 14px/1.55 Georgia,'Times New Roman',Times,serif;color:#3a3a3a;padding-bottom:9px">{{ it.text }}</div>
+      <div style="font:400 14px/1.55 Georgia,'Times New Roman',Times,serif;color:{{ mailfarbe.text }};padding-bottom:9px">{{ it.text }}</div>
       {% endif %}
       <div style="font:700 12px/1.4 Arial,Helvetica,sans-serif">
-        <a href="{{ it.url }}" style="color:#e60000;text-decoration:none">{{ chrome.link_quelle }} &rsaquo;</a>
-        {%- if it.anker %}&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="{{ it.anker }}" style="color:#6b6b6b;text-decoration:none">{{ chrome.link_bericht }} &rsaquo;</a>{% endif %}
+        <a href="{{ it.url }}" style="color:{{ mailfarbe.rot }};text-decoration:none">{{ chrome.link_quelle }} &rsaquo;</a>
+        {%- if it.anker %}&nbsp;&nbsp;&middot;&nbsp;&nbsp;<a href="{{ it.anker }}" style="color:{{ mailfarbe.grau }};text-decoration:none">{{ chrome.link_bericht }} &rsaquo;</a>{% endif %}
       </div>
     </td></tr>
     {% endfor %}
@@ -118,22 +118,22 @@
   {#- ----------------------------------------------------- Schlussweg -#}
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
          style="border-collapse:collapse">
-    <tr><td style="padding:14px 0 0 0;border-top:1px solid #ddd8cc">
-      <div style="font:400 13px/1.5 Georgia,'Times New Roman',Times,serif;color:#3a3a3a">{{ chrome.schluss }}</div>
-      <div style="font:700 13px/1.4 Arial,Helvetica,sans-serif;padding-top:6px"><a href="{{ bericht_url }}" style="color:#e60000;text-decoration:none">{{ chrome.schluss_link }} &rsaquo;</a></div>
+    <tr><td style="padding:14px 0 0 0;border-top:1px solid {{ mailfarbe.linie }}">
+      <div style="font:400 13px/1.5 Georgia,'Times New Roman',Times,serif;color:{{ mailfarbe.text }}">{{ chrome.schluss }}</div>
+      <div style="font:700 13px/1.4 Arial,Helvetica,sans-serif;padding-top:6px"><a href="{{ bericht_url }}" style="color:{{ mailfarbe.rot }};text-decoration:none">{{ chrome.schluss_link }} &rsaquo;</a></div>
     </td></tr>
   </table>
 
   {#- ---------------------------------------------------------- Fuss -#}
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
          style="border-collapse:collapse">
-    <tr><td style="padding:26px 0 26px 0;font:400 11px/1.6 Arial,Helvetica,sans-serif;color:#6b6b6b">
-      <div style="border-top:3px solid #141414;padding-top:14px">{{ chrome.fuss.warum | replace('{seit_datum}', seit_datum) }}</div>
-      <div style="padding-top:8px">{{ chrome.fuss.abmelden_satz }} <a href="{{ abmelde_url }}" style="color:#e60000">{{ chrome.fuss.abmelden }}</a></div>
+    <tr><td style="padding:26px 0 26px 0;font:400 11px/1.6 Arial,Helvetica,sans-serif;color:{{ mailfarbe.grau }}">
+      <div style="border-top:3px solid {{ mailfarbe.tinte }};padding-top:14px">{{ chrome.fuss.warum | replace('{seit_datum}', seit_datum) }}</div>
+      <div style="padding-top:8px">{{ chrome.fuss.abmelden_satz }} <a href="{{ abmelde_url }}" style="color:{{ mailfarbe.rot }}">{{ chrome.fuss.abmelden }}</a></div>
       <div style="padding-top:8px">
-        <a href="{{ impressum_url }}" style="color:#6b6b6b">{{ chrome.fuss.impressum }}</a>
+        <a href="{{ impressum_url }}" style="color:{{ mailfarbe.grau }}">{{ chrome.fuss.impressum }}</a>
         &nbsp;&middot;&nbsp;
-        <a href="{{ datenschutz_url }}" style="color:#6b6b6b">{{ chrome.fuss.datenschutz }}</a>
+        <a href="{{ datenschutz_url }}" style="color:{{ mailfarbe.grau }}">{{ chrome.fuss.datenschutz }}</a>
       </div>
       <div style="padding-top:8px">{{ chrome.fuss.automatisch }}</div>
     </td></tr>

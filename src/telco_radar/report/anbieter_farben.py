@@ -1,4 +1,7 @@
-"""DIE EINE Quelle der Anbieterfarben (Phase P2, Paket D1).
+"""DIE EINE Quelle der Anbieterfarben (Phase P2, Paket D1) und der Hausfarben.
+
+Ausser hier steht eine Hex-Farbe nur noch im `:root` von `style.css`; Python,
+Mail und Vorlagen lesen die benannten Konstanten unten (Stufe 0 zaehlt nach).
 
 Vorher gab es DREI, und sie widersprachen sich:
 
@@ -119,6 +122,71 @@ def _stil(
     )
 
 
+VODAFONE_ROT = "#e60000"
+ROT_TIEF = "#ac1811"
+VIOLETT = "#7b3fe4"
+BEERE = "#c2185b"
+GRUEN = "#2f8f5b"
+OCKER = "#c98a00"
+BLAU = "#3860be"
+TUERKIS = "#0d9488"
+ROSTBRAUN = "#b5551d"
+LILA = "#8a2be2"
+ORANGE = "#e07a00"
+PETROL = "#2b7a9e"
+TAUBENBLAU = "#5a6b9e"
+OLIV = "#8a7a2f"
+ANTHRAZIT = "#25282b"
+GRAU_MITTEL = "#7e7e7e"
+GRAU_HELL = "#a8a8a8"
+GRAU_BLASS = "#c4c4c4"
+WEISS = "#ffffff"
+GRAU_FLAECHE = "#f2f2f2"
+PAPIER = "#f6f4ee"
+PAPIER_HELL = "#fffdf8"
+TINTE = "#14120f"
+TINTE_2 = "#33302a"
+TINTE_3 = "#5e594f"
+TINTE_4 = "#8a8479"
+LINIE_2 = "#e6e2d8"
+MAIL_SCHWARZ = "#141414"
+MAIL_TEXT = "#3a3a3a"
+MAIL_GRAU = "#6b6b6b"
+MAIL_LINIE = "#ddd8cc"
+TITEL_BRAUN = "#201a16"
+NOTIZ_GRAU = "#8a8070"
+
+KATEGORIE_FARBEN = {
+    "Produktlaunch": VODAFONE_ROT,
+    "Tarif/Pricing": ROT_TIEF,
+    "Kampagne": BEERE,
+    "Partnerschaft": BLAU,
+    "Netz/Technologie": TAUBENBLAU,
+    "Regulierung": OLIV,
+    "M&A": ANTHRAZIT,
+    "Finanzen": GRAU_MITTEL,
+    "Sonstiges": GRAU_HELL,
+    "Unbewertet": GRAU_BLASS,
+}
+FOLIEN = {
+    "rot": VODAFONE_ROT,
+    "rot_tief": ROT_TIEF,
+    "tinte": ANTHRAZIT,
+    "grau": GRAU_MITTEL,
+    "flaeche": WEISS,
+    "neutral": GRAU_FLAECHE,
+}
+MAIL = {
+    "papier": PAPIER,
+    "flaeche": PAPIER_HELL,
+    "tinte": MAIL_SCHWARZ,
+    "text": MAIL_TEXT,
+    "grau": MAIL_GRAU,
+    "linie": MAIL_LINIE,
+    "rot": VODAFONE_ROT,
+}
+TRANSPARENZ = {"titel": TITEL_BRAUN, "notiz": NOTIZ_GRAU}
+
 GRAU_SERVICE = "#4a463e"
 GRAU_HAENDLER = "#a8a297"
 
@@ -140,7 +208,7 @@ LUECKE = Anbieterstil(
 
 
 ANBIETER_FARBE: dict[str, Anbieterstil] = {
-    "vodafone": _stil("vodafone", "#e60000", "voll", "kreis", eigen=True),
+    "vodafone": _stil("vodafone", VODAFONE_ROT, "voll", "kreis", eigen=True),
     "telekom": _stil("telekom", "#e20074", "voll", "quadrat"),
     "o2": _stil("o2", "#0019a5", "voll", "dreieck"),
     "1&1": _stil("1-1", "#2f7fd1", "gestrichelt", "raute"),

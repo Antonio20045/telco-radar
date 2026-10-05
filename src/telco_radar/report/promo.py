@@ -23,8 +23,7 @@ je Marke stehen ALLE ihre Aktionen in EINEM Raster:
     BLOECKE   Je Marke ein Block: Rubrikleiste mit Markenname, darunter die
               staerkste Aktion als grosse Karte und die uebrigen als
               kleinere Karten derselben Form. Kein "oben die Auswahl, unten
-              der Rest" mehr - jede Aktion steht genau einmal, bei ihrer
-              Marke.
+              der Rest" mehr - jede Aktion steht einmal, bei ihrer Marke.
     EIGEN     Vodafone am Ende, als Vergleichsanker markiert.
 
 Sichtbarkeits-/Persistenzregel (siehe analyze/promo_store.py:mark_stale):
@@ -45,13 +44,14 @@ import re
 from datetime import datetime, timedelta
 
 from ..analyze.begriffe import MECHANICS
+from . import anbieter_farben as farben
 from .suchindex import marken_anker
 from ..analyze.promo_store import _same_offer
 
 TIER_LABEL = {1: "Netzbetreiber", 2: "Discount- und Zweitmarke"}
-TIER_COLOR = {1: "#3860be", 2: "#e07a00"}
+TIER_COLOR = {1: farben.BLAU, 2: farben.ORANGE}
 RANG_UNGESETZT = 900
-_OWN_COLOR = "#e60000"
+_OWN_COLOR = farben.VODAFONE_ROT
 _RETIRED_STATUS = "ausgelaufen"
 _SICHTBAR = ("aktiv", "evtl. ausgelaufen")
 
@@ -443,7 +443,7 @@ def prepare_promo_view(db_entries: list[dict], sources: list, latest_date: str) 
                 "tier_label": TIER_LABEL.get(src.tier, ""),
                 "color": _OWN_COLOR
                 if src.internal_reference
-                else TIER_COLOR.get(src.tier, "#3860be"),
+                else TIER_COLOR.get(src.tier, farben.BLAU),
                 "group": src.group,
                 "url": src.url,
                 "internal_reference": src.internal_reference,

@@ -107,7 +107,6 @@ src/telco_radar/models.py uhr 1
 src/telco_radar/newsletter/filters.py uhr 2
 src/telco_radar/newsletter/store.py uhr 2
 src/telco_radar/newsletter/subscription.py uhr 1
-src/telco_radar/newsletter/templates/mail/digest.html.j2 hexfarbe 38
 src/telco_radar/newsletter/versand.py uhr 1
 src/telco_radar/pipeline.py breite-ausnahme 21
 src/telco_radar/pipeline.py noqa:BLE001 21
@@ -125,8 +124,6 @@ src/telco_radar/report/diff_bilder.py breite-ausnahme 1
 src/telco_radar/report/diff_bilder.py dateizugriff 3
 src/telco_radar/report/diff_bilder.py noqa:BLE001 1
 src/telco_radar/report/diff_bilder.py uhr 2
-src/telco_radar/report/differentiation.py hexfarbe 12
-src/telco_radar/report/folien.py hexfarbe 6
 src/telco_radar/report/fruehwarnung.py dateizugriff 1
 src/telco_radar/report/geraete_bewegung.py breite-ausnahme 1
 src/telco_radar/report/geraete_bewegung.py noqa:BLE001 1
@@ -136,17 +133,12 @@ src/telco_radar/report/geraete_view.py noqa:BLE001 1
 src/telco_radar/report/geraete_zeitreihe.py dateizugriff 2
 src/telco_radar/report/html.py breite-ausnahme 5
 src/telco_radar/report/html.py dateizugriff 35
-src/telco_radar/report/html.py hexfarbe 11
 src/telco_radar/report/html.py noqa:BLE001 5
 src/telco_radar/report/html.py uhr 1
 src/telco_radar/report/luecken.py dateizugriff 1
 src/telco_radar/report/newsletter_protokoll.py dateizugriff 2
-src/telco_radar/report/promo.py hexfarbe 4
 src/telco_radar/report/rechtstexte.py dateizugriff 2
 src/telco_radar/report/tarife_view.py dateizugriff 1
-src/telco_radar/report/templates/_geraete_buendel.html.j2 hexfarbe 1
-src/telco_radar/report/templates/style.css hexfarbe 36
-src/telco_radar/report/templates/transparenz.html.j2 hexfarbe 2
 src/telco_radar/uebersetzung/sprache.py breite-ausnahme 2
 src/telco_radar/uebersetzung/sprache.py noqa:BLE001 2
 src/telco_radar/uebersetzung/stufe.py breite-ausnahme 1
@@ -156,7 +148,6 @@ src/telco_radar/uebersetzung/uebersetzer.py breite-ausnahme 1
 src/telco_radar/uebersetzung/uebersetzer.py noqa:BLE001 1
 src/telco_radar/uebersetzung/volltext.py breite-ausnahme 2
 src/telco_radar/uebersetzung/volltext.py noqa:BLE001 2
-src/telco_radar/versand.py hexfarbe 10
 src/telco_radar/versand.py uhr 3
 tests/test_diff_bilder.py noqa:ANN002 1
 tests/test_diff_bilder.py noqa:ANN003 1

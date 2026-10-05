@@ -4,16 +4,16 @@ Clustert die (vom Analyse-Agenten bewerteten) Meldungen der letzten Wochen nach
 Differenzierungs-Hebeln, mit denen sich Wettbewerber im Endkundengeschaeft abheben -
 externe Services UND Value-Add-Versprechen (Garantie, Geraete-Programme,
 Versicherung, Perks). Bewusst KEIN Netz-/5G-Ausbau, kein Broadband-Infrastruktur.
-
-Alles zur Render-Zeit in Python (kein LLM). Anzeige durchgehend Deutsch. Zusaetzlich
-liefert jede Kategorie eine evergreen Inspirations-Tafel (Vorbilder + Impuls fuer
-Vodafone) - so traegt die Seite auch in einer ruhigen Nachrichtenwoche.
+Alles zur Render-Zeit in Python (kein LLM), Anzeige Deutsch. Jede Kategorie hat eine
+Inspirations-Tafel (Vorbilder + Impuls fuer Vodafone), auch fuer ruhige Wochen.
 """
 
 from __future__ import annotations
 
 import re
 from urllib.parse import urlsplit
+
+from . import anbieter_farben as farben
 
 NON_DIFF_CATEGORIES = {
     "Tarif/Pricing",
@@ -47,7 +47,7 @@ DIFF_THEMES = [
     {
         "key": "garantie",
         "label": "Garantie & Service-Versprechen",
-        "color": "#e60000",
+        "color": farben.VODAFONE_ROT,
         "blurb": '„Sorglos"-Versprechen differenzieren ohne Preisnachlass und zahlen '
         "voll auf Vertrauen ein: verlaengerte Garantie, Akkutausch, Preis-, "
         "Netz- und Zufriedenheitsgarantien.",
@@ -102,7 +102,7 @@ DIFF_THEMES = [
     {
         "key": "geraete",
         "label": "Geräte-Programme & Zubehör",
-        "color": "#ac1811",
+        "color": farben.ROT_TIEF,
         "blurb": "Der Gerätekauf als Bindungsanker: jährliches Upgrade, faire "
         "Inzahlungnahme, refurbished, exklusive Geräte und gebündeltes "
         "Zubehör – Value ohne Preiskampf.",
@@ -156,7 +156,7 @@ DIFF_THEMES = [
     {
         "key": "ki",
         "label": "KI & Assistenten",
-        "color": "#7b3fe4",
+        "color": farben.VIOLETT,
         "blurb": "Wettbewerber verschenken eine kostenpflichtige Premium-KI oder bauen "
         "sie fest ins Gerät ein und machen den Assistenten zum Tarif-Vorteil.",
         "anchors": [
@@ -210,7 +210,7 @@ DIFF_THEMES = [
     {
         "key": "entertainment",
         "label": "Entertainment & Streaming",
-        "color": "#c2185b",
+        "color": farben.BEERE,
         "blurb": "Streaming, Sport- und TV-Rechte als Bindungsanker. Die Besten "
         "bündeln nicht nur ein Abo, sondern ein Aggregator-Erlebnis.",
         "anchors": [
@@ -272,7 +272,7 @@ DIFF_THEMES = [
     {
         "key": "security",
         "label": "Security & Betrugsschutz",
-        "color": "#2f8f5b",
+        "color": farben.GRUEN,
         "blurb": "Schutz vor Betrug, Spam und Deepfakes wird vom Add-on zum Marken-"
         "Asset – oft kostenlos und automatisch im Netz.",
         "anchors": [
@@ -326,7 +326,7 @@ DIFF_THEMES = [
     {
         "key": "fintech",
         "label": "Fintech & Payment",
-        "color": "#c98a00",
+        "color": farben.OCKER,
         "blurb": "Wallet, Kredit, Versicherung und Banking direkt in der Telco-App – "
         "in Wachstumsmärkten die stärksten Ökosysteme überhaupt.",
         "anchors": [
@@ -379,7 +379,7 @@ DIFF_THEMES = [
     {
         "key": "superapp",
         "label": "Super-App & Ökosystem",
-        "color": "#3860be",
+        "color": farben.BLAU,
         "blurb": "Die Telco-App wird von der Selfcare-App zur Alltags-Plattform mit "
         "eingebauten Partner-Diensten.",
         "anchors": [
@@ -436,7 +436,7 @@ DIFF_THEMES = [
     {
         "key": "cloud",
         "label": "Cloud & Speicher",
-        "color": "#0d9488",
+        "color": farben.TUERKIS,
         "blurb": "Kostenloser, oft datensouveräner Cloud-Speicher als Tarif-Extra – "
         "günstig und ein guter Bindungsanker.",
         "anchors": [
@@ -474,7 +474,7 @@ DIFF_THEMES = [
     {
         "key": "smarthome",
         "label": "Smart Home & IoT",
-        "color": "#b5551d",
+        "color": farben.ROSTBRAUN,
         "blurb": "Sicherheit und Steuerung fürs Zuhause am Anschluss – margenstark und "
         "bindet den ganzen Haushalt.",
         "anchors": [
@@ -517,7 +517,7 @@ DIFF_THEMES = [
     {
         "key": "gaming",
         "label": "Gaming",
-        "color": "#8a2be2",
+        "color": farben.LILA,
         "blurb": "Cloud-Gaming als greifbarer Netz-Beweis – niedrige Latenz wird zum "
         "Erlebnis statt zur Technik-Folie.",
         "anchors": [
@@ -562,7 +562,7 @@ DIFF_THEMES = [
     {
         "key": "loyalty",
         "label": "Loyalty & Perks",
-        "color": "#e07a00",
+        "color": farben.ORANGE,
         "blurb": "Erlebnis-Perks und exklusive Vorverkäufe machen das tägliche "
         "App-Öffnen zur Gewohnheit – Bindung über Nutzen.",
         "anchors": [
@@ -608,7 +608,7 @@ DIFF_THEMES = [
     {
         "key": "health",
         "label": "Health & Wellbeing",
-        "color": "#2b7a9e",
+        "color": farben.PETROL,
         "blurb": "Telemedizin und Wellbeing als Differenzierung mit Nutzenversprechen – "
         "in Wachstumsmärkten erprobt.",
         "anchors": [

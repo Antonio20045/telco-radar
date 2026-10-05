@@ -32,7 +32,7 @@ from pathlib import Path
 import yaml
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from ..report.anbieter_farben import farbe_fuer
+from ..report.anbieter_farben import MAIL, farbe_fuer
 from ..textwerkzeug import saetze as _saetze
 from .filters import Treffer
 
@@ -315,6 +315,7 @@ def baue(
             chrome["einleitung_filter"] if mit_filter else chrome["einleitung_alles"]
         ),
         "breite": BREITE,
+        "mailfarbe": MAIL,
     }
     env = _env()
     return Nachricht(
