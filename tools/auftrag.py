@@ -150,8 +150,7 @@ def _ausfuehren(befehl: list[str], ort: Path) -> tuple[int, str]:
 
 
 def _leiter(wurzel: Path, ort: Path, art: str) -> tuple[int, str]:
-    python = str(wurzel / ".venv/bin/python")
-    return _ausfuehren([python, "scripts/pruefleiter.py", f"--{art}"], ort)
+    return prozess_.leiter(wurzel, ort, art, BASEN)
 
 
 def _abnahme(lauf: Lauf) -> tuple[int, str]:

@@ -63,6 +63,8 @@ if voll and os.environ.get("ERSATZ_VOLL_ROT"):
 if sys.argv[1] == "--statisch" and os.environ.get("ERSATZ_STATISCH_ROT"):
     print("src/x.py:1 [arg-type] Typfehler")
     sys.exit(1)
+if sys.argv[1] == "--statisch" and os.environ.get("ERSATZ_STATISCH_BASIS"):
+    Path("pruef/basis ä.txt").write_text("1\\n")
 if sys.argv[1] == "--statisch":
     sys.exit(0)
 befehl = [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", "tests"]
@@ -488,6 +490,19 @@ def test_typfehler_im_bau_ist_eine_rote_runde_vor_dem_merge(repo, monkeypatch):
     assert "statische Leiter rot (Exit 1)" in notiz
     assert "[arg-type] Typfehler" in notiz
     assert _git(repo, "rev-parse", "main") == vorher
+
+
+def test_gesenkte_basis_im_worktree_ist_keine_aenderung_des_baus(repo, monkeypatch):
+    (repo / "pruef").mkdir()
+    (repo / "pruef/basis ä.txt").write_text("2\n")
+    _git(repo, "add", "--", "pruef")
+    _git(repo, "commit", "-q", "-m", "Basis")
+    _leiter_voll(repo)
+    monkeypatch.setenv("ERSATZ_STATISCH_BASIS", "1")
+
+    assert _starte(repo) == auftrag.Ende.GEMERGT
+
+    assert _git(repo, "show", "main:pruef/basis ä.txt") == "2"
 
 
 def test_hoechstens_zwei_auftraege_und_kein_gleicher_bereich(repo, capsys):

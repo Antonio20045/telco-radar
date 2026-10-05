@@ -65,3 +65,16 @@ def _ausfuehren(
             with contextlib.suppress(ProcessLookupError):
                 os.killpg(lauf.pid, signal.SIGKILL)
     return subprocess.CompletedProcess(befehl, lauf.returncode, aus, fehler)
+
+
+def leiter(wurzel: Path, ort: Path, art: str, basen: str) -> tuple[int, str]:
+    """Führt die Prüfleiter mit dem Python des Hauptbaums in ``ort`` aus.
+
+    Außerhalb des Hauptbaums stehen die Basen danach wieder auf dem Commit, weil
+    eine gesenkte Basis erst die Leiter auf ``main`` schreibt.
+    """
+    python = str(wurzel / ".venv/bin/python")
+    lauf = starten([python, "scripts/pruefleiter.py", f"--{art}"], ort)
+    if ort != wurzel:
+        starten(["git", "checkout", "-q", "--", basen], ort)
+    return lauf.returncode, lauf.stdout + lauf.stderr
