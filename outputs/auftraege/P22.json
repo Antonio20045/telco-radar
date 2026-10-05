@@ -1,0 +1,32 @@
+{
+  "id": "P22",
+  "art": "umbau",
+  "ziel": "Adapter, registriere, umgesetzte_methoden, ADAPTER und GeraeteAbrufFehler ziehen aus collect/geraete/__init__.py in das neue Modul collect/geraete/basis.py; die vier gleichen _preis aus vodafone.py, o2.py, congstar.py und telekom.py werden die eine Funktion _preis in basis.py. Die sechs Adapter (vodafone, o2, telekom, congstar, einsundeins, saturn) importieren aus dem Paket nur noch .basis statt aus dem Paket-__init__; das __init__ reicht alle Namen für Bestandsimporte weiter und behält _registriere_anbieter_adapter vorerst an seiner Stelle. Der Abnahmetest hält heute fest, was gleich bleiben muss: dieselben Methoden in umgesetzte_methoden(), dieselbe Klasse GeraeteAbrufFehler mit status für jeden Adapter, und dasselbe Ergebnis von _preis je Adapter für Zahl, Zahl als Text, Komma-Text, None, leeren Text, Liste und Dict.",
+  "bereich": "src/telco_radar/collect/geraete/",
+  "erwarteteDateien": [
+    "src/telco_radar/collect/geraete/basis.py",
+    "src/telco_radar/collect/geraete/__init__.py",
+    "src/telco_radar/collect/geraete/vodafone.py",
+    "src/telco_radar/collect/geraete/o2.py",
+    "src/telco_radar/collect/geraete/congstar.py",
+    "src/telco_radar/collect/geraete/telekom.py",
+    "src/telco_radar/collect/geraete/einsundeins.py",
+    "src/telco_radar/collect/geraete/saturn.py"
+  ],
+  "vorbild": "src/telco_radar/collect/geraete/robots.py",
+  "seite": [],
+  "datenquelle": {
+    "dateien": [],
+    "botCommit": null,
+    "schnappschuss": null
+  },
+  "abnahme": "tests/test_geraete_basis.py",
+  "abhaengigVon": [],
+  "migration": null,
+  "wasDarfNiePassieren": {
+    "wiederholung": "ein zweiter Import des Pakets registriert keinen Adapter doppelt und ändert umgesetzte_methoden() nicht",
+    "gleichzeitig": "jeder Adapter wirft weiter dieselbe Klasse GeraeteAbrufFehler, die sammle_anbieter fängt; es entsteht keine zweite Klasse gleichen Namens",
+    "zeitueberschreitung": "basis.py ruft kein Netz und liest keine Datei",
+    "abbruch": "ein nicht lesbarer Preis bleibt None und wird nie 0"
+  }
+}
