@@ -27,6 +27,8 @@ Spalte „verschiedene Angebote“: Paare aktiver Einträge mit gleichem Schlüs
 | **Konditionen (alle Zahlen der Beschreibung)** | **0** | 11 / 29 |
 | normalisierter Titel | 0 | 2 / 29 |
 
+Roh gezählt (Paket 21 nachgemessen) sind es unter den 105 aktiven 61 Paare mit gleicher Marke und Zielseite und 38 mit gleichem `mechanic`; die Tabelle zieht davon die von Hand als dasselbe Angebot bestimmten Paare ab. Mit Konditionen teilen sich auch roh nur die zwei bekannten Paare einen Schlüssel, ein drittes doppelt aktives Angebot gibt es nicht.
+
 Verworfen: „eine Zielseite, ein Angebot, solange kein Lauf zwei liefert“ legt 20 weitere Gruppen zusammen, darunter drei mit verschiedenen aktiven Angeboten (Telekom-PlusKarten, congstar Handys, winSIM Tarife). Lebenszeiten als Trennung (nie zusammenlegen, was sich zeitlich überlappt) vereint ohne zweites Merkmal nur 15 der 29 Paare, weil dasselbe Angebot oft im selben Lauf von zwei Quellseiten kommt.
 
 ## Ergebnis auf dem Schnappschuss
