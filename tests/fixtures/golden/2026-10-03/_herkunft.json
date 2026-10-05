@@ -27,7 +27,12 @@
  ],
  "lauf": "37134812406",
  "llm": "jede LLM-Anfrage abgelehnt, aufgenommen ist der Weg ohne LLM",
- "luecken": [],
+ "luecken": [
+  "HTTP-Antwort für GET https://newsroom.vodafone.de/rss fehlt, neu aufnehmen mit make golden-aufnehmen",
+  "HTTP-Antwort für GET https://unternehmen.vodafone.de/newsroom/rss fehlt, neu aufnehmen mit make golden-aufnehmen",
+  "HTTP-Antwort für GET https://www.telekom.com/en/investor-relations.rss.feed.427676.xml fehlt, neu aufnehmen mit make golden-aufnehmen",
+  "HTTP-Antwort für GET https://www.telekom.com/service/rss/427676/feed.rss fehlt, neu aufnehmen mit make golden-aufnehmen"
+ ],
  "umgebung": [
   "LLM_API_KEY"
  ],
