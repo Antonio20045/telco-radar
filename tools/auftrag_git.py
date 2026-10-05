@@ -5,6 +5,9 @@ from __future__ import annotations
 import fcntl
 import hashlib
 import importlib
+import os
+import posixpath
+import subprocess
 from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
@@ -85,3 +88,24 @@ def committen(ort: Path, titel: str, pfade: list[str]) -> None:
 def veraendert(ort: Path, summen: dict[str, str]) -> list[str]:
     """Pfade, deren Prüfsumme nicht mehr der in ``summen`` gleicht."""
     return [p for p, s in pruefsummen(ort, summen).items() if s != summen[p]]
+
+
+def genau_committen(ort: Path, titel: str, pfade: list[str]) -> str:
+    """Committet genau ``pfade`` auf HEAD; sonst der Grund samt Ausgabe."""
+    _git(ort, "read-tree", "HEAD")
+    _git(ort, "add", "--", *pfade)
+    umgebung = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    befehl = ["git", "commit", "-q", "-m", titel]
+    lauf = subprocess.run(befehl, cwd=ort, env=umgebung, capture_output=True, text=True)
+    if lauf.returncode:
+        return f"Commit abgelehnt (Exit {lauf.returncode})\n{lauf.stdout}{lauf.stderr}"
+    drin = _git(ort, "diff", "-z", "--name-only", "--no-renames", "HEAD~1", "HEAD")
+    if abweichung := sorted({p for p in drin.split("\0") if p} ^ set(pfade)):
+        return f"Commit weicht von den geprüften Pfaden ab: {', '.join(abweichung)}"
+    return ""
+
+
+def ueberschneiden(eins: str, zwei: str) -> bool:
+    """Ob zwei Bereiche denselben Pfad treffen, nach Normalisierung."""
+    a, b = posixpath.normpath(eins), posixpath.normpath(zwei)
+    return a == b or a.startswith(b + "/") or b.startswith(a + "/")

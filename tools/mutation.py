@@ -151,6 +151,15 @@ def kurzname(mutant: str) -> str:
 
 def probe(ort: Path, basis: str, protokoll: Path, frist: float = FRIST) -> Probe:
     """Lässt mutmut auf den geänderten Funktionen von ``basis..HEAD`` laufen."""
+    try:
+        return _probe(ort, basis, protokoll, frist)
+    except subprocess.CalledProcessError as fehler:
+        befehl = " ".join(map(str, fehler.cmd[:2]))
+        grund = (fehler.stderr or "").strip()[:120]
+        return Probe(fehler.returncode, 0.0, f"entfällt: {befehl} scheiterte ({grund})")
+
+
+def _probe(ort: Path, basis: str, protokoll: Path, frist: float) -> Probe:
     start = time.monotonic()
 
     def ende(code: int | str, text: str) -> Probe:

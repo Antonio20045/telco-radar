@@ -136,6 +136,11 @@ else:
         haupt = Path(os.environ["TELCO_AUFTRAG"]).parents[3]
         (haupt / "scripts/pruefleiter.py").write_text("raise SystemExit(0)\\n")
         subprocess.run(["git", "-C", str(haupt), "commit", "-qam", "Agent"], check=True)
+    if modus == "gestaged":
+        for name in ("src/telco_radar/sonst.py", "tests/test_alt.py"):
+            Path(name).write_text("X = 1\\n")
+            subprocess.run(["git", "add", "--", name], check=True)
+            Path(name).unlink()
     if modus == "parallel":
         notiz = Path(os.environ["TELCO_AUFTRAG"]).parents[3] / "outputs/auftraege"
         notiz.mkdir(parents=True, exist_ok=True)
@@ -447,6 +452,9 @@ def test_hoechstens_zwei_auftraege_und_kein_gleicher_bereich(repo, capsys):
         ({"bereich": "src/telco_radar/"}, "bereich ist kein Unterordner"),
         ({"bereich": "src/telco_radar/rechnen"}, "bereich ist kein Unterordner"),
         ({"bereich": "src/telco_radar/fehlt.py"}, "bereich ist kein Unterordner"),
+        ({"bereich": "src/telco_radar/../../tests/"}, "bereich ist kein Unterordner"),
+        ({"bereich": "src/telco_radar/./"}, "bereich ist kein Unterordner"),
+        ({"bereich": "src/telco_radar//rechnen/"}, "bereich ist kein Unterordner"),
         (
             {"bereich": "src/telco_radar/rechnen/kern.txt"},
             "bereich ist kein Unterordner",
@@ -710,3 +718,34 @@ def test_kostendatei_mit_unbekannter_spalte_bleibt_unveraendert(tmp_path):
         auftrag.format_.kosten_schreiben([zeile], tmp_path)
 
     assert datei.read_text() == alt
+
+
+def test_gestagte_dateien_ausserhalb_der_pruefung_kommen_nicht_in_den_commit(repo):
+    assert _starte(repo, "gestaged") == auftrag.Ende.GEMERGT
+
+    assert _git(repo, "ls-tree", "main", "src/telco_radar/sonst.py") == ""
+    assert _git(repo, "ls-tree", "main", "tests/test_alt.py") == ""
+    assert "x * 2" in _git(repo, "show", "main:src/telco_radar/rechnen/kern.py")
+
+
+def test_commit_mit_anderen_dateien_als_geprueft_ist_rot(repo):
+    haken = Path(_git(repo, "rev-parse", "--git-common-dir"))
+    haken = (haken if haken.is_absolute() else repo / haken) / "hooks/pre-commit"
+    haken.write_text("#!/bin/sh\necho x > extra.txt\ngit add extra.txt\n")
+    haken.chmod(0o755)
+
+    assert _starte(repo) == auftrag.Ende.NOTIZ
+
+    assert "extra.txt" in (repo / auftrag.AUFTRAEGE / "A1-notiz.md").read_text()
+    assert _git(repo, "ls-tree", "main", "extra.txt") == ""
+
+
+def test_bereich_mit_punkt_im_pfad_ueberschneidet_sich(repo):
+    ziel = repo.parent / "telco-radar-wt" / "B1"
+    _git(repo, "worktree", "add", "-q", "-b", "auftrag/B1", str(ziel))
+    lauf = auftrag.Lauf(repo, dict(AUFTRAG), ["agent"])
+    lauf.datei("").parent.joinpath("B1").mkdir(parents=True)
+    fremd = AUFTRAG | {"bereich": "src/telco_radar/./rechnen/kern.py"}
+    lauf.datei("").parent.joinpath("B1/auftrag.json").write_text(json.dumps(fremd))
+
+    assert "Bereich überschneidet sich mit Auftrag B1" in auftrag.sperren(lauf)

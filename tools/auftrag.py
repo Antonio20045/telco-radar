@@ -127,7 +127,7 @@ def sperren(lauf: Lauf) -> list[str]:
         fremd = (
             json.loads(datei.read_text("utf-8"))["bereich"] if datei.is_file() else ""
         )
-        if fremd and (eigener.startswith(fremd) or fremd.startswith(eigener)):
+        if fremd and git_.ueberschneiden(eigener, fremd):
             gruende.append(f"Bereich überschneidet sich mit Auftrag {anderer.name}")
     return gruende
 
@@ -248,9 +248,7 @@ def _testphase(lauf: Lauf) -> str:
 
 
 def _commit(lauf: Lauf, titel: str, dateien: list[str]) -> str:
-    _git(lauf.wt, "add", "--", *dateien)
-    code, ausgabe = _ausfuehren(["git", "commit", "-q", "-m", titel], lauf.wt)
-    return f"Commit abgelehnt (Exit {code})\n{_tail(ausgabe)}" if code else ""
+    return _tail(git_.genau_committen(lauf.wt, titel, dateien))
 
 
 def _urteil(lauf: Lauf, runde: int, code: int, summe: dict[str, str]) -> str:

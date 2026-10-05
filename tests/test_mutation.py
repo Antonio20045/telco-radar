@@ -205,3 +205,9 @@ def test_stand_schritt_6_verlangt_eine_mutationsprobe_mit_zeit_oder_grund(
     gruende = stand.mutationsprobe()
 
     assert (gruende == []) is erfuellt, gruende
+
+
+def test_probe_nennt_einen_git_fehler_statt_abzubrechen(tmp_path):
+    probe = mutation.probe(tmp_path, "HEAD~1", tmp_path / "mutation.log")
+
+    assert probe.ergebnis.startswith("entfällt: git diff scheiterte"), probe.ergebnis

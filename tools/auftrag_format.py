@@ -105,6 +105,9 @@ def formatfehler(auftrag: object, wurzel: Path) -> list[str]:
     modul = bereich.endswith(".py") and (wurzel / bereich).is_file()
     im_bereich = bereich.startswith(BEREICH_WURZEL) and bereich != BEREICH_WURZEL
     im_bereich &= ordner or modul
+    im_bereich &= all(
+        teil not in {"", ".", ".."} for teil in bereich.removesuffix("/").split("/")
+    )
     pruefungen = {
         "id nur aus Buchstaben, Ziffern, - und _": ID_MUSTER.fullmatch(auftrag["id"]),
         f"art ist weder {' noch '.join(ARTEN)}": art in ARTEN,
