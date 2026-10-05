@@ -22,13 +22,13 @@ ALLE_SCHLUESSEL = ("AWS_BEARER_TOKEN_BEDROCK", "LLM_API_KEY", "ANTHROPIC_API_KEY
 @pytest.fixture(autouse=True)
 def _sauber(monkeypatch):
     llm.reset_model_health()
-    llm._FALLBACKS.clear()
+    llm.LlmSitzung().aktivieren()
     llm.kosten_reset()
     llm.budget_setzen(0, {})
     monkeypatch.delenv("LLM_API_BASE", raising=False)
     yield
     llm.reset_model_health()
-    llm._FALLBACKS.clear()
+    llm.LlmSitzung().aktivieren()
     llm.kosten_reset()
     llm.budget_setzen(0, {})
 

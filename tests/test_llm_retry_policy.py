@@ -170,7 +170,7 @@ def test_ein_402_laesst_die_anbieterkette_weiterlaufen(monkeypatch, _fast):
 
     monkeypatch.setattr(llm, "_dispatch", _dispatch)
     monkeypatch.setattr(llm, "_chain_from", lambda m: ["erstes", "zweites"])
-    llm._DEAD_MODELS.clear()
+    llm.reset_model_health()
     try:
         out = llm.complete("s", "u", "erstes", max_tokens=100, retries=3)
         assert out == "vom zweiten Anbieter"
@@ -180,4 +180,4 @@ def test_ein_402_laesst_die_anbieterkette_weiterlaufen(monkeypatch, _fast):
             "sonst steht der Befund nicht auf transparenz.html"
         )
     finally:
-        llm._DEAD_MODELS.clear()
+        llm.reset_model_health()

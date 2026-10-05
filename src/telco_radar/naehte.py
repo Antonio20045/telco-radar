@@ -12,12 +12,9 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 
-from .analyze import llm
+from .analyze.llm_sitzung import LlmClient, LlmSitzung
 from .collect import http
 from .report import bilder
-
-LlmClient = Callable[[str, str, str, int, int], str]
-"""``(system, user, modell, max_tokens, versuche) -> Antworttext``."""
 
 
 @dataclass(frozen=True)
@@ -32,10 +29,12 @@ class Naehte:
     stoppuhr: Callable[[], float] | None = None
 
     def setzen(self) -> Callable[[], datetime] | None:
-        """Setzt Netz und LLM-Client und gibt die Uhr zurück, ``None`` heißt Wanduhr."""
+        """Setzt Netz und eine frische LLM-Sitzung und gibt die Uhr zurück.
+
+        ``None`` als Uhr heißt Wanduhr.
+        """
         http.TRANSPORT = self.transport
-        llm.TRANSPORT = self.transport
-        llm.CLIENT = self.llm_client
+        LlmSitzung(naehte=self).aktivieren()
         bilder.TRANSPORT = self.bilder
         return self.uhr
 

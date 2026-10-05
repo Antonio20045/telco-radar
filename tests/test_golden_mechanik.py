@@ -103,7 +103,6 @@ def test_anderer_aufnahmetag_ist_ein_anderer_schluessel():
 def test_leeres_guthaben_trifft_den_llm_endpunkt_mit_402(monkeypatch):
     monkeypatch.setenv("LLM_API_KEY", "golden-wiedergabe")
     monkeypatch.setenv("LLM_API_BASE", "https://llm.example/v1")
-    monkeypatch.setattr(llm, "_DEAD_MODELS", set())
     Naehte(transport=http.Wiedergabe(golden.Band(), guthaben_leer=True)).setzen()
 
     with pytest.raises(llm.LLMModelUnavailable, match="402"):
@@ -121,7 +120,8 @@ def test_produktion_setzt_jede_naht_zurueck():
     ).setzen()
 
     assert PRODUKTION.setzen() is None
-    assert (http.TRANSPORT, llm.TRANSPORT, llm.CLIENT) == (None, None, None)
+    sitzung = llm.LlmSitzung.aktive()
+    assert (http.TRANSPORT, sitzung.transport, sitzung.client) == (None, None, None)
 
 
 def test_umleitung_wird_aufgenommen_und_wiedergegeben(tmp_path):

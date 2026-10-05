@@ -513,7 +513,7 @@ def _zusatzsammler(
         "ct": (
             "ct_radar_aktiv",
             "CT-Radar",
-            lambda: ct_log.sammle(root, http, modell=ct_modell),
+            lambda: ct_log.sammle(root, http, modell=ct_modell, komplett=llm.complete),
         ),
     }
     items: list[Item] = []

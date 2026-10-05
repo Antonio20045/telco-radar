@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import datetime as dt
 import glob
+import importlib.util
 import json
 import os
 import sys
@@ -269,6 +270,16 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     for item in items:
         if "chromium" in getattr(item, "fixturenames", ()):
             item.add_marker(pytest.mark.browser)
+
+
+@pytest.fixture(autouse=True)
+def _frische_llm_sitzung():
+    """Jeder Test beginnt ohne Ketten, Verbrauch und tote Modelle anderer Tests."""
+    if importlib.util.find_spec("telco_radar") is None:
+        return
+    from telco_radar.analyze.llm_sitzung import LlmSitzung
+
+    LlmSitzung().aktivieren()
 
 
 @pytest.fixture(autouse=True)

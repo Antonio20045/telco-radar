@@ -29,6 +29,7 @@ from waechter_regeln import (
     waechter_zaehlung,
 )
 from waechter_tests import TESTS_BASIS, tests_zaehlung
+from waechter_zustand import modulzustand
 
 WURZEL = Path(__file__).resolve().parents[1]
 RIESEN_BASIS = "pruef/riesendateien.txt"
@@ -84,6 +85,7 @@ def pruefe(
     ]
     rot += lecks(wurzel)
     rot += leere_tests(wurzel)
+    rot += modulzustand(wurzel)
     paare = [
         (RIESEN_BASIS, riesendateien(wurzel)),
         (PRIVAT_BASIS, privat),

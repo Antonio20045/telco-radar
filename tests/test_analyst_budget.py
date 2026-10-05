@@ -59,7 +59,7 @@ def _stapelweise(monkeypatch) -> list[int]:
 def test_eine_ueberschrittene_schwelle_stoppt_keinen_stapel(monkeypatch):
     """Die Zusicherung, um die es geht: der Lauf liest zu Ende."""
     llm.budget_setzen(0.000001, {"m": {"ein": 1000.0, "aus": 1000.0}})
-    llm._VERBRAUCH["m"] = {
+    llm.LlmSitzung.aktive().verbrauch["m"] = {
         "aufrufe": 1,
         "prompt_tokens": 1_000_000,
         "completion_tokens": 1_000_000,

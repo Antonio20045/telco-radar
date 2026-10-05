@@ -14,10 +14,10 @@ from telco_radar.analyze import llm
 
 @pytest.fixture(autouse=True)
 def _sauberer_zustand():
-    llm._FALLBACKS.clear()
+    llm.LlmSitzung().aktivieren()
     llm.reset_model_health()
     yield
-    llm._FALLBACKS.clear()
+    llm.LlmSitzung().aktivieren()
     llm.reset_model_health()
 
 
@@ -102,7 +102,7 @@ def test_gesetzter_vorzug_schlaegt_die_kette():
     """editor->analyst wird von der Kette nicht ueberschrieben."""
     llm.set_fallback("gross", "klein")
     llm.set_model_chain(["gross", "mittel"])
-    assert llm._FALLBACKS["gross"] == "klein"
+    assert llm.LlmSitzung.aktive().ausweich["gross"] == "klein"
 
 
 @pytest.mark.parametrize(

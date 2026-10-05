@@ -243,7 +243,7 @@ def analyze_region(
 
     `ausweich` ist der Anker DIESER Stufe - das Modell, das einspringt, wenn
     das Primaermodell hart gescheitert ist (leeres Guthaben, toter Endpunkt).
-    Er wird je AUFRUF mitgegeben statt in `llm._FALLBACKS` registriert, weil
+    Er wird je AUFRUF mitgegeben statt in `llm.LlmSitzung.ausweich` registriert, weil
     Analyst und Redaktion sich in jeder heutigen Anbieter-Konfiguration
     denselben Modellnamen teilen ("deepseek-v4-pro") und eine Registrierung
     am Namen deshalb nur EINEN Anker fuer beide kennt. Der Analyst macht die

@@ -24,9 +24,11 @@ import json
 import logging
 import os
 import time
-from collections.abc import Callable
 
 import httpx
+
+from ..textwerkzeug import extract_json as extract_json
+from .llm_sitzung import LlmSitzung
 
 log = logging.getLogger(__name__)
 
@@ -34,8 +36,6 @@ ANTHROPIC_URL = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_VERSION = "2023-06-01"
 DEFAULT_TEMPERATURE = 0.3
 BEDROCK_DEFAULT_REGION = "us-east-1"
-TRANSPORT: httpx.BaseTransport | None = None
-CLIENT: Callable[[str, str, str, int, int], str] | None = None
 
 
 def _bedrock_region() -> str:
@@ -99,7 +99,7 @@ def active_backend() -> str:
     return "none"
 
 
-_FATAL_STATUSES = {400, 401, 402, 403, 404, 405, 422}
+_FATAL_STATUSES = frozenset({400, 401, 402, 403, 404, 405, 422})
 
 DEFAULT_HTTP_TIMEOUT = 180.0
 
@@ -109,12 +109,9 @@ MAX_SLOW_FAILURES = 2
 CHEAP_BACKOFF_SECONDS = (1, 2, 3, 5, 5, 8, 8, 10)
 LANGSAM_AB_ANTEIL_TIMEOUT = 0.5
 
-_FALLBACKS: dict[str, str] = {}
 
-_VERBRAUCH: dict[str, dict[str, int]] = {}
-_PREISE: dict[str, dict[str, float]] = {}
-_BUDGET_USD: float | None = None
-_DEAD_MODELS: set[str] = set()
+def _s() -> LlmSitzung:
+    return LlmSitzung.aktive()
 
 
 class _FatalHTTP(Exception):
@@ -178,7 +175,7 @@ def call_budget() -> float:
 def set_fallback(model: str, fallback: str) -> None:
     """Register `fallback` as the stand-in for `model`."""
     if model and fallback and model != fallback:
-        _FALLBACKS[model] = fallback
+        _s().ausweich[model] = fallback
 
 
 def set_model_chain(models: list[str]) -> str:
@@ -196,7 +193,7 @@ def set_model_chain(models: list[str]) -> str:
         if name and name not in ordered:
             ordered.append(name)
     for current, following in zip(ordered, ordered[1:]):
-        _FALLBACKS.setdefault(current, following)
+        _s().ausweich.setdefault(current, following)
     return ordered[0] if ordered else ""
 
 
@@ -207,14 +204,14 @@ def _chain_from(model: str) -> list[str]:
     while current and current not in seen:
         chain.append(current)
         seen.add(current)
-        current = _FALLBACKS.get(current, "")
+        current = _s().ausweich.get(current, "")
     return chain
 
 
 def _kette(model: str, ausweich: str = "") -> list[str]:
     """Die Modellkette DIESES Aufrufs - registrierte Kette oder Sonderweg.
 
-    `_FALLBACKS` haengt am MODELLNAMEN, nicht an der Rolle des Aufrufers, und
+    `LlmSitzung.ausweich` haengt am MODELLNAMEN, nicht an der Rolle des Aufrufers, und
     das ist genau dann zu grob, wenn zwei Rollen dasselbe Modell fahren. In
     jeder heutigen Anbieter-Konfiguration ist `analyst_model ==
     editor_model` ("deepseek-v4-pro"), also kann es fuer diesen Namen nur
@@ -244,12 +241,12 @@ def _kette(model: str, ausweich: str = "") -> list[str]:
 
 def reset_model_health() -> None:
     """Forget which models failed. Only needed by tests."""
-    _DEAD_MODELS.clear()
+    _s().tote_modelle.clear()
 
 
 def dead_models() -> set[str]:
     """Models that stopped answering during this run (for the run protocol)."""
-    return set(_DEAD_MODELS)
+    return set(_s().tote_modelle)
 
 
 def _zaehle_usage(model: str, data: dict) -> None:
@@ -278,7 +275,7 @@ def _zaehle_usage(model: str, data: dict) -> None:
         + int(usage.get("cache_read_input_tokens") or 0)
         + int(usage.get("cache_creation_input_tokens") or 0)
     )
-    eintrag = _VERBRAUCH.setdefault(
+    eintrag = _s().verbrauch.setdefault(
         model, {"aufrufe": 0, "prompt_tokens": 0, "completion_tokens": 0}
     )
     eintrag["aufrufe"] += 1
@@ -288,7 +285,7 @@ def _zaehle_usage(model: str, data: dict) -> None:
 
 def _usd(model: str, prompt_tokens: int, completion_tokens: int) -> float | None:
     """USD-Schaetzung, oder None fuer ein Modell ohne Preiszeile."""
-    preis = _PREISE.get(model)
+    preis = _s().preise.get(model)
     if not preis:
         return None
     return (
@@ -300,13 +297,13 @@ def _usd(model: str, prompt_tokens: int, completion_tokens: int) -> float | None
 def _summe_usd() -> float:
     return sum(
         _usd(name, v["prompt_tokens"], v["completion_tokens"]) or 0.0
-        for name, v in _VERBRAUCH.items()
+        for name, v in _s().verbrauch.items()
     )
 
 
 def kosten_reset() -> None:
     """Zaehler leeren. Ein Lauf zaehlt seinen eigenen Verbrauch."""
-    _VERBRAUCH.clear()
+    _s().verbrauch.clear()
 
 
 def budget_setzen(usd_limit: float | None, preistabelle: dict | None = None) -> None:
@@ -315,18 +312,18 @@ def budget_setzen(usd_limit: float | None, preistabelle: dict | None = None) -> 
     Warnschwelle, nicht Not-Aus: der Zaehler greift NIE in den Lauf ein
     (Antonios Entscheidung vom 27.08.2026). Siehe budget_ueberschritten().
     """
-    global _BUDGET_USD
+    sitzung = _s()
     try:
         limit = float(usd_limit or 0)
     except (TypeError, ValueError):
         limit = 0.0
-    _BUDGET_USD = limit if limit > 0 else None
-    _PREISE.clear()
+    sitzung.budget_usd = limit if limit > 0 else None
+    sitzung.preise.clear()
     for name, preis in (preistabelle or {}).items():
         if not isinstance(preis, dict):
             continue
         try:
-            _PREISE[str(name)] = {
+            sitzung.preise[str(name)] = {
                 "ein": float(preis.get("ein", preis.get("input", 0)) or 0),
                 "aus": float(preis.get("aus", preis.get("output", 0)) or 0),
             }
@@ -351,14 +348,15 @@ def budget_ueberschritten() -> bool:
     Ein Modell ohne Preiszeile geht mit 0 $ ein - geraten wird nichts. Die
     Luecke steht als `ohne_preis` im Kostenblock und faellt am Token-Ist auf.
     """
-    return bool(_BUDGET_USD) and _summe_usd() >= _BUDGET_USD
+    budget = _s().budget_usd
+    return bool(budget) and _summe_usd() >= budget
 
 
 def kosten_stand() -> dict:
     """Was der Lauf bisher verbraucht hat - je Modell, in Token und USD."""
     modelle: dict[str, dict] = {}
     ohne_preis: list[str] = []
-    for name, v in sorted(_VERBRAUCH.items()):
+    for name, v in sorted(_s().verbrauch.items()):
         usd = _usd(name, v["prompt_tokens"], v["completion_tokens"])
         modelle[name] = {**v, "usd": None if usd is None else round(usd, 4)}
         if usd is None:
@@ -367,7 +365,7 @@ def kosten_stand() -> dict:
         "modelle": modelle,
         "summe_usd": round(_summe_usd(), 4),
         "ohne_preis": ohne_preis,
-        "budget_usd": _BUDGET_USD,
+        "budget_usd": _s().budget_usd,
         "budget_ueberschritten": budget_ueberschritten(),
     }
 
@@ -418,7 +416,8 @@ def _post_with_retries(url, payload, headers, retries, parse):
         attempt += 1
         started = time.monotonic()
         try:
-            post = httpx.Client(transport=TRANSPORT).post if TRANSPORT else httpx.post
+            transport = _s().transport
+            post = httpx.Client(transport=transport).post if transport else httpx.post
             resp = post(url, json=payload, headers=headers, timeout=http_timeout())
             if resp.status_code == 402:
                 raise LLMModelUnavailable(
@@ -611,7 +610,8 @@ def complete(
     registrierten Kette zu folgen - siehe `_kette`. Der Analyst braucht das,
     weil er sich seinen Modellnamen mit der Redaktion teilt.
     """
-    chain = [m for m in _kette(model, ausweich) if m not in _DEAD_MODELS]
+    sitzung = _s()
+    chain = [m for m in _kette(model, ausweich) if m not in sitzung.tote_modelle]
     if not chain:
         chain = [model]
     last_exc: Exception | None = None
@@ -620,9 +620,10 @@ def complete(
         if position:
             log.warning("Falling back to %s", candidate)
         try:
-            return (CLIENT or _dispatch)(system, user, candidate, max_tokens, retries)
+            aufruf = sitzung.client or _dispatch
+            return aufruf(system, user, candidate, max_tokens, retries)
         except LLMModelUnavailable as exc:
-            _DEAD_MODELS.add(candidate)
+            sitzung.tote_modelle.add(candidate)
             last_exc = exc
             log.warning(
                 "Model %s is not usable on this account - skipping it "
@@ -632,21 +633,8 @@ def complete(
         except LLMFatalError:
             raise
         except RuntimeError as exc:
-            _DEAD_MODELS.add(candidate)
+            sitzung.tote_modelle.add(candidate)
             last_exc = exc
             log.warning("Model %s did not answer (%s)", candidate, str(exc)[:160])
 
     raise last_exc if last_exc else RuntimeError(f"no model answered for {model}")
-
-
-def extract_json(text: str):
-    """Parse JSON from an LLM response, tolerating markdown fences."""
-    text = text.strip()
-    if text.startswith("```"):
-        text = text.split("\n", 1)[1] if "\n" in text else text
-        if text.rstrip().endswith("```"):
-            text = text.rstrip()[:-3]
-    start = min((i for i in (text.find("{"), text.find("[")) if i >= 0), default=-1)
-    if start > 0:
-        text = text[start:]
-    return json.loads(text)

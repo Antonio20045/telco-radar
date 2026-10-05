@@ -17,12 +17,12 @@ FLASH = "deepseek-ai/deepseek-v4-flash"
 @pytest.fixture(autouse=True)
 def _clean_state(monkeypatch):
     llm.reset_model_health()
-    llm._FALLBACKS.clear()
+    llm.LlmSitzung().aktivieren()
     monkeypatch.setenv("LLM_API_KEY", "test-key")
     monkeypatch.setenv("LLM_API_BASE", "https://example.invalid/v1")
     yield
     llm.reset_model_health()
-    llm._FALLBACKS.clear()
+    llm.LlmSitzung().aktivieren()
 
 
 def _stub(monkeypatch, dead: set[str]) -> list[str]:
@@ -97,7 +97,7 @@ def test_fataler_fehler_loest_keinen_fallback_aus(monkeypatch):
 def test_set_fallback_ignoriert_selbstreferenz():
     llm.set_fallback(PRO, PRO)
     llm.set_fallback(PRO, "")
-    assert llm._FALLBACKS == {}
+    assert llm.LlmSitzung.aktive().ausweich == {}
 
 
 def test_http_timeout_ist_konfigurierbar(monkeypatch):
