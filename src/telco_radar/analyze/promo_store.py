@@ -6,13 +6,8 @@ branch (raw signal vs. curated display):
   SnapshotStore  data/state/promo_snapshots.json - one content hash per
                  SEITE (Marke + URL), used ONLY to detect "did this page
                  change since last run". Never shown on the site, never fed
-                 to the LLM by itself. Bis zum 08.08.2026 lag hier ein Hash
-                 je MARKE - das ging, solange eine Marke genau eine Seite
-                 hatte. Mit mehreren Seiten je Marke (siehe promo_config.py)
-                 wuerde ein Marken-Hash die Seiten gegeneinander ausspielen:
-                 jede Seite haette den Hash der zuletzt abgerufenen
-                 ueberschrieben und damit jede andere dauerhaft als
-                 "veraendert" gemeldet.
+                 to the LLM by itself. Je Seite, weil eine Marke mehrere
+                 Seiten hat (promo_config.py).
 
   PromoDB        data/state/promo_db.json - the curated, versioned list of
                  extracted promotions actually shown on the site, with
@@ -34,12 +29,25 @@ towards retirement. Nothing is ever deleted from the JSON itself.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import logging
 import re
 from pathlib import Path
 from typing import NamedTuple
+
+from .promo_schluessel import (
+    ID_FELD,
+    ID_SCHLUESSEL,
+    Schluessel,
+    entry_id,
+    id_aus_schluessel,
+    migriere,
+    rang,
+    schluessel,
+    schluessel_eintrag,
+)
+
+__all__ = ["PromoDB", "SnapshotStore", "UpsertBilanz", "entry_id", "snapshot_key"]
 
 log = logging.getLogger(__name__)
 
@@ -151,13 +159,6 @@ class SnapshotStore:
         )
 
 
-def entry_id(brand: str, headline: str) -> str:
-    basis = (
-        f"{(brand or '').strip().lower()}|{' '.join((headline or '').lower().split())}"
-    )
-    return hashlib.sha1(basis.encode("utf-8")).hexdigest()[:16]
-
-
 class PromoDB:
     """Versionierte, kuratierte Promo-Datenbank (data/state/promo_db.json)."""
 
@@ -169,29 +170,26 @@ class PromoDB:
             try:
                 raw = json.loads(self.path.read_text(encoding="utf-8"))
                 self.updated = raw.get("updated")
-                for e in raw.get("entries", []):
-                    eid = e.get("id") or entry_id(
-                        e.get("brand", ""), e.get("headline", "")
-                    )
-                    if eid:
-                        self.entries[eid] = e
+                roh = raw.get("entries", [])
+                if raw.get(ID_FELD) == ID_SCHLUESSEL:
+                    self.entries = {e["id"]: e for e in roh if e.get("id")}
+                else:
+                    self.entries = migriere(roh)
             except (json.JSONDecodeError, OSError):
                 log.warning("promo_db.json unlesbar - starte leer")
 
     def __len__(self) -> int:
         return len(self.entries)
 
-    def _find_existing_id(self, brand: str, headline: str) -> str | None:
-        """Sucht unter den bestehenden Eintraegen derselben Marke nach einem,
-        der laut _same_offer() dieselbe Aktion ist, nur umformuliert -
-        Sicherheitsnetz fuer entry_id(), dessen exakter Text-Hash bei jeder
-        Umformulierung (z. B. ein ergaenztes "und 300 EUR Rabatt") eine neue
-        ID erzeugen wuerde, obwohl es dasselbe Angebot ist. Gibt bei mehreren
-        Kandidaten den textlich aehnlichsten zurueck."""
-        norm_brand = brand.strip().lower()
+    def _find_existing_id(
+        self, stamm: Schluessel, headline: str, vergeben: set[str]
+    ) -> str | None:
+        """Rückfall nach dem Schlüssel: unter den noch nicht vergebenen
+        Einträgen derselben Marke und Zielseite der laut _same_offer()
+        textlich ähnlichste."""
         best_id, best_overlap = None, 0.0
         for eid, e in self.entries.items():
-            if (e.get("brand") or "").strip().lower() != norm_brand:
+            if eid in vergeben or schluessel_eintrag(e)[:2] != stamm[:2]:
                 continue
             existing_headline = e.get("headline") or ""
             if not _same_offer(headline, existing_headline):
@@ -204,81 +202,116 @@ class PromoDB:
     def upsert(
         self, items: list[dict], today: str, source_url: str = ""
     ) -> "UpsertBilanz":
-        """Neue Aktionen aufnehmen bzw. bekannte re-verifizieren (gleicher
-        Brand + gleiche oder nur umformulierte Kernaussage taucht im neuen
-        Snapshot wieder auf - siehe _find_existing_id()).
+        """Neue Aktionen aufnehmen, bekannte bestätigen; gibt die
+        `UpsertBilanz` zurück. Ihre IDs gehen als checked_ids an mark_stale().
+        *source_url* ist die gelesene Seite, mark_stale() altert nur deren
+        Angebote.
 
-        Gibt eine `UpsertBilanz` zurueck: NEU aufgenommene Eintraege, IDs
-        aller in diesem Aufruf gesehenen Eintraege, und die Zahl der
-        BESTAETIGTEN (bekannt, `last_verified` auf heute gesetzt). Die letzte
-        Zahl ist nicht Beiwerk: das Laufprotokoll sprach von "aktualisierten"
-        Angeboten und meinte die NEUEN - in einer ruhigen Woche steht dort
-        also "0 Angebote aktualisiert", waehrend in Wahrheit siebzig
-        Aktionen bestaetigt wurden. Genau umgekehrt sieht ein stiller
-        Totalausfall der Extraktion (alles bestaetigt nichts, nichts neu)
-        exakt wie eine ruhige Woche aus.
-
-        Die IDs muessen mark_stale() als checked_ids uebergeben werden,
-        NICHT ein frisch aus den rohen Item-Headlines berechneter
-        entry_id() - sonst wuerde ein per Umformulierung wiedererkannter,
-        hier bereits aktualisierter Eintrag im selben Atemzug faelschlich als
-        Fehltreffer gezaehlt.
-
-        *source_url*: die SEITE, auf der diese Angebote gerade gefunden
-        wurden. Sie wird am Eintrag festgehalten, weil mark_stale() sie
-        braucht: seit eine Marke mehrere Seiten hat, darf ein Angebot von
-        Seite A nicht in Richtung "beendet" ruecken, nur weil Seite B neu
-        gelesen wurde und es dort naturgemaess nicht steht."""
-        new = 0
-        bestaetigt = 0
-        matched_ids: set[str] = set()
+        Abgleich: zuerst gleicher Schlüssel und gleiche Überschrift, dann
+        gleicher Schlüssel, dann _same_offer unter derselben Marke und
+        Zielseite. Ein Eintrag wird je Aufruf höchstens einmal bestätigt; ein
+        weiteres Angebot mit gleichem Schlüssel bekommt die nächste
+        Laufnummer, dieselbe Überschrift zweimal ist ein Angebot."""
+        angebote: list[tuple[dict, str, Schluessel, tuple[Schluessel, str]]] = []
         for it in items:
             brand = (it.get("brand") or "").strip()
             headline = (it.get("headline") or "").strip()
             if not brand or not headline:
                 continue
-            eid = entry_id(brand, headline)
-            if eid not in self.entries:
-                fuzzy_id = self._find_existing_id(brand, headline)
-                if fuzzy_id is not None:
-                    eid = fuzzy_id
-            if eid in self.entries:
-                bestaetigt += 1
-                e = self.entries[eid]
-                e["headline"] = headline
-                e["last_verified"] = today
-                e["status"] = "aktiv"
-                e["missed_checks"] = 0
-                e.pop("stale_since", None)
-                if source_url:
-                    e["source_url"] = source_url
-                if it.get("description"):
-                    e["description"] = it["description"]
-                if it.get("valid_until"):
-                    e["valid_until"] = it["valid_until"]
-                if it.get("url"):
-                    e["url"] = it["url"]
-                if it.get("image_url"):
-                    e["image_url"] = it["image_url"]
-            else:
-                self.entries[eid] = {
-                    "id": eid,
-                    "brand": brand,
-                    "tier": it.get("tier"),
-                    "headline": headline,
-                    "description": it.get("description", ""),
-                    "valid_until": it.get("valid_until"),
-                    "url": it.get("url", ""),
-                    "image_url": it.get("image_url"),
-                    "source_url": source_url,
-                    "first_seen": today,
-                    "last_verified": today,
-                    "status": "aktiv",
-                    "missed_checks": 0,
-                }
-                new += 1
-            matched_ids.add(eid)
-        return UpsertBilanz(new, matched_ids, bestaetigt)
+            stamm = schluessel(brand, it.get("url"), source_url, it.get("description"))
+            angebote.append(
+                (it, headline, stamm, (stamm, _normalize_headline(headline)))
+            )
+        nach_stamm: dict[Schluessel, list[str]] = {}
+        for eid, e in self.entries.items():
+            nach_stamm.setdefault(schluessel_eintrag(e), []).append(eid)
+        vergeben: set[str] = set()
+        im_aufruf: dict[tuple[Schluessel, str], str] = {}
+        for _, _, stamm, kopf in angebote:
+            gleich = [
+                eid
+                for eid in nach_stamm.get(stamm, [])
+                if eid not in vergeben and self._kopf(eid) == kopf[1]
+            ]
+            if gleich and kopf not in im_aufruf:
+                eid = max(gleich, key=lambda k: rang(self.entries[k]))
+                vergeben.add(eid)
+                im_aufruf[kopf] = eid
+        neu_ids: set[str] = set()
+        for it, headline, stamm, kopf in angebote:
+            if kopf in im_aufruf:
+                continue
+            frei = [eid for eid in nach_stamm.get(stamm, []) if eid not in vergeben]
+            treffer = self._gleicher_schluessel(frei, headline)
+            if treffer is None:
+                treffer = self._find_existing_id(stamm, headline, vergeben)
+            if treffer is None:
+                treffer = self._lege_an(it, headline, stamm, today, source_url)
+                neu_ids.add(treffer)
+            vergeben.add(treffer)
+            im_aufruf[kopf] = treffer
+        for it, headline, _, kopf in angebote:
+            eid = im_aufruf[kopf]
+            if eid not in neu_ids:
+                self._bestaetige(self.entries[eid], it, headline, today, source_url)
+        return UpsertBilanz(len(neu_ids), vergeben, len(vergeben - neu_ids))
+
+    def _gleicher_schluessel(self, frei: list[str], headline: str) -> str | None:
+        """Unter freien Einträgen gleichen Schlüssels zuerst _same_offer, dann
+        aktiv, dann zuletzt bestätigt."""
+        if not frei:
+            return None
+        return max(
+            frei,
+            key=lambda k: (
+                _same_offer(headline, self.entries[k].get("headline") or ""),
+                *rang(self.entries[k]),
+            ),
+        )
+
+    def _kopf(self, eid: str) -> str:
+        return _normalize_headline(self.entries[eid].get("headline") or "")
+
+    def _lege_an(
+        self, it: dict, headline: str, stamm: Schluessel, today: str, source_url: str
+    ) -> str:
+        """Neuer Eintrag mit der kleinsten freien Laufnummer seines Schlüssels."""
+        laufnummer = 1
+        while id_aus_schluessel(stamm, laufnummer) in self.entries:
+            laufnummer += 1
+        eid = id_aus_schluessel(stamm, laufnummer)
+        self.entries[eid] = {
+            "id": eid,
+            "brand": (it.get("brand") or "").strip(),
+            "tier": it.get("tier"),
+            "headline": headline,
+            "description": it.get("description", ""),
+            "valid_until": it.get("valid_until"),
+            "url": it.get("url", ""),
+            "image_url": it.get("image_url"),
+            "source_url": source_url,
+            "first_seen": today,
+            "last_verified": today,
+            "status": "aktiv",
+            "missed_checks": 0,
+        }
+        return eid
+
+    @staticmethod
+    def _bestaetige(
+        e: dict, it: dict, headline: str, today: str, source_url: str
+    ) -> None:
+        """Wiedergefunden: aktiv, Fehltreffer zurück, Felder aufgefrischt."""
+        e["headline"] = headline
+        e["last_verified"] = today
+        e["status"] = "aktiv"
+        e["missed_checks"] = 0
+        e.pop("stale_since", None)
+        if source_url:
+            e["source_url"] = source_url
+        for feld in ("description", "valid_until", "url", "image_url"):
+            if it.get(feld):
+                e[feld] = it[feld]
 
     def mark_stale(
         self,
@@ -353,6 +386,7 @@ class PromoDB:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         payload = {
             "updated": today,
+            ID_FELD: ID_SCHLUESSEL,
             "entries": sorted(
                 self.entries.values(),
                 key=lambda e: (e.get("brand") or "", e.get("first_seen") or ""),
