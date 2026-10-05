@@ -1,0 +1,32 @@
+{
+  "id": "T3",
+  "art": "verhalten",
+  "ziel": "PromoDB.upsert legt zwei Angebote derselben Marke und Zielseite nicht zusammen, wenn ihre Überschriften Zahlen tragen und keine davon teilen (10 GB Bonus und 20 GB Bonus bei leerer Beschreibung bleiben zwei Einträge); und ein Wiederfund ohne URL und ohne source_url bestätigt den bekannten Eintrag derselben Marke mit gleichen Konditionen und passender Überschrift, statt einen zweiten aktiven anzulegen, und lässt dessen gespeicherten Link stehen",
+  "bereich": "src/telco_radar/analyze/",
+  "erwarteteDateien": [
+    "src/telco_radar/analyze/promo_store.py"
+  ],
+  "vorbild": "src/telco_radar/analyze/promo_store.py",
+  "seite": [
+    "promo/index.html"
+  ],
+  "datenquelle": {
+    "dateien": [
+      "data/state/promo_db.json"
+    ],
+    "botCommit": "9a9b683",
+    "schnappschuss": "tests/fixtures/bestand/2026-10-03/"
+  },
+  "abnahme": "tests/test_promo_abgleich.py",
+  "erwarteterFehler": "10 GB und 20 GB zusammengelegt",
+  "abhaengigVon": [
+    "T1"
+  ],
+  "migration": null,
+  "wasDarfNiePassieren": {
+    "wiederholung": "dieselben Angebote zweimal ergeben beim zweiten Aufruf keinen neuen Eintrag; die Migration des Schnappschusses bleibt bei 294 IDs und 103 aktiven (tests/test_promo_identitaet.py bleibt grün)",
+    "gleichzeitig": "zwei Angebote eines Aufrufs mit gleichem Schlüssel und anderer Überschrift bleiben zwei Einträge",
+    "zeitueberschreitung": "eine nicht gelesene Seite altert keinen ihrer Einträge",
+    "abbruch": "upsert schreibt nichts auf die Platte; nur save() schreibt"
+  }
+}
