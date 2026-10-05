@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 import sys
 
-from telco_radar import pipeline
+from telco_radar import collect, pipeline
 
 AUS = {
     "lieferzeit_radar_aktiv": False,
@@ -19,6 +19,7 @@ def test_kaputter_sammlerimport_ueberspringt_nur_diesen_sammler(
     tmp_path, monkeypatch, caplog
 ):
     monkeypatch.setitem(sys.modules, "telco_radar.collect.lieferzeit", None)
+    monkeypatch.delattr(collect, "lieferzeit", raising=False)
     settings = {**AUS, "lieferzeit_radar_aktiv": True}
 
     with caplog.at_level(logging.ERROR, logger="telco_radar"):
