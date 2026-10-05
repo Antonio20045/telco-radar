@@ -77,12 +77,6 @@ modules =
     telco_radar.collect.geraete.saturn
 
 ignore_imports =
-    telco_radar.collect.geraete -> telco_radar.collect.geraete.congstar
-    telco_radar.collect.geraete -> telco_radar.collect.geraete.einsundeins
-    telco_radar.collect.geraete -> telco_radar.collect.geraete.o2
-    telco_radar.collect.geraete -> telco_radar.collect.geraete.saturn
-    telco_radar.collect.geraete -> telco_radar.collect.geraete.telekom
-    telco_radar.collect.geraete -> telco_radar.collect.geraete.vodafone
 
 [importlinter:contract:orakel]
 name = Orakel rechnen ohne den Code, den sie pruefen

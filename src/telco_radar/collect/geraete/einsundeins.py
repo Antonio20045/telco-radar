@@ -170,7 +170,7 @@ from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 
-from . import GeraeteAbrufFehler
+from .basis import GeraeteAbrufFehler
 from ...tarif_model import zahl
 from ..tarif_ldjson import ld_json_bloecke
 

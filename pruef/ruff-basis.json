@@ -272,13 +272,12 @@
  },
  "src/telco_radar/collect/geraete/__init__.py": {
   "C901": 1,
-  "D103": 2,
   "E501": 1,
   "E741": 3,
   "SIM102": 2,
   "UP017": 3,
   "UP035": 1,
-  "UP045": 16
+  "UP045": 9
  },
  "src/telco_radar/collect/geraete/autoerkennung.py": {
   "SIM905": 1,
@@ -287,7 +286,7 @@
  "src/telco_radar/collect/geraete/congstar.py": {
   "C901": 1,
   "I001": 1,
-  "UP045": 7
+  "UP045": 6
  },
  "src/telco_radar/collect/geraete/einsundeins.py": {
   "C901": 2,
@@ -298,7 +297,7 @@
  "src/telco_radar/collect/geraete/o2.py": {
   "C901": 2,
   "I001": 1,
-  "UP045": 20
+  "UP045": 19
  },
  "src/telco_radar/collect/geraete/robots.py": {
   "C901": 1,
@@ -315,13 +314,13 @@
  },
  "src/telco_radar/collect/geraete/telekom.py": {
   "I001": 1,
-  "UP045": 9
+  "UP045": 8
  },
  "src/telco_radar/collect/geraete/vodafone.py": {
   "C901": 1,
   "I001": 1,
   "UP035": 1,
-  "UP045": 11
+  "UP045": 10
  },
  "src/telco_radar/collect/http.py": {
   "C901": 1,

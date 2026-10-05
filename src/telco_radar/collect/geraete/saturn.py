@@ -88,7 +88,7 @@ import logging
 import re
 from urllib.parse import urljoin
 
-from . import GeraeteAbrufFehler
+from .basis import GeraeteAbrufFehler
 from .strukturdaten import produkte_aus_ldjson
 
 log = logging.getLogger(__name__)

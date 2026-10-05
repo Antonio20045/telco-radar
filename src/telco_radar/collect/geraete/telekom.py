@@ -273,7 +273,7 @@ from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 
-from . import GeraeteAbrufFehler
+from .basis import GeraeteAbrufFehler, _preis
 from ...geraete_model import probe_geht_auf
 
 from ...tco_model import laufzeit_in_monaten
@@ -527,13 +527,6 @@ def _gleich(a: Optional[float], b: Optional[float]) -> bool:
     if a is None or b is None:
         return False
     return abs(float(a) - float(b)) < 0.005
-
-
-def _preis(wert) -> Optional[float]:
-    try:
-        return float(wert)
-    except (TypeError, ValueError):
-        return None
 
 
 def _selected_plan(product_list: dict) -> dict:

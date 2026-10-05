@@ -231,7 +231,7 @@ import logging
 import re
 from typing import Optional
 
-from . import GeraeteAbrufFehler
+from .basis import GeraeteAbrufFehler, _preis
 from ...geraete_model import probe_geht_auf
 
 from ...tco_model import (
@@ -431,13 +431,6 @@ _PLAN_START_RE = re.compile(r'\{"id":\d+,"type":"POSTPAID","title":"')
 _PIB_NR_RE = re.compile(r"Produktinformationsblatt_(\d+)\.pdf")
 
 _RATENLAUFZEITEN = (24, 36)
-
-
-def _preis(wert) -> Optional[float]:
-    try:
-        return float(wert)
-    except (TypeError, ValueError):
-        return None
 
 
 def _planvarianten(nutzlast: str) -> list[dict]:

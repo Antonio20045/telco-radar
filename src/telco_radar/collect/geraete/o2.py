@@ -79,7 +79,7 @@ import logging
 import re
 from typing import Optional
 
-from . import GeraeteAbrufFehler
+from .basis import GeraeteAbrufFehler, _preis
 from ...geraete_model import probe_geht_auf
 
 log = logging.getLogger(__name__)
@@ -100,13 +100,6 @@ _BUENDEL_RE = re.compile(r"\bmit\b", re.IGNORECASE)
 
 
 _RATEN_RE = re.compile(r"-(?P<raten>\d+)x\w+$")
-
-
-def _preis(wert) -> Optional[float]:
-    try:
-        return float(wert)
-    except (TypeError, ValueError):
-        return None
 
 
 def _laufzeit(

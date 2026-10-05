@@ -13,7 +13,7 @@ import subprocess
 from collections.abc import Callable
 from pathlib import Path
 
-VERWAIST = re.compile(r"^No matches for ignored import (\S+) -> (\S+?)\.?$", re.M)
+VERWAIST = re.compile(r"^No matches for ignored import\s+(\S+)\s+->\s+(\S+?)\.?$", re.M)
 AUSNAHMEN = "ignore_imports"
 
 

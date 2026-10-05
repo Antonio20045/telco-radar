@@ -156,7 +156,7 @@ import time
 from typing import Callable, Optional
 from urllib.parse import urlsplit
 
-from . import GeraeteAbrufFehler
+from .basis import GeraeteAbrufFehler, _preis
 
 from ...tco_model import laufzeit_in_monaten
 
@@ -280,13 +280,6 @@ def lies(text: str, url: str = "") -> list[dict]:
             }
         )
     return out
-
-
-def _preis(wert) -> Optional[float]:
-    try:
-        return float(wert)
-    except (TypeError, ValueError):
-        return None
 
 
 def _gleich(a: Optional[float], b: Optional[float]) -> bool:

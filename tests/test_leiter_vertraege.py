@@ -156,6 +156,20 @@ def test_meldung_von_lint_imports_wird_zur_ausnahme():
     ]
 
 
+def test_umbrochene_meldung_von_lint_imports_wird_zur_ausnahme():
+    ausgabe = (
+        "No matches for ignored import telco_radar.collect.geraete -> \n"
+        "telco_radar.collect.geraete.saturn.\n"
+        "No matches for ignored import\n"
+        "telco_radar.collect.geraete -> telco_radar.collect.geraete.o2.\n"
+    )
+
+    assert leiter_vertraege.verwaiste_ausnahmen(ausgabe) == [
+        "telco_radar.collect.geraete -> telco_radar.collect.geraete.saturn",
+        "telco_radar.collect.geraete -> telco_radar.collect.geraete.o2",
+    ]
+
+
 def test_nur_tatsaechlich_gestrichene_ausnahmen_werden_gemeldet(tmp_path):
     pfad = tmp_path / ".importlinter"
     pfad.write_text("ignore_imports =\n    c -> d\n# kommentar\n    e -> f\n", "utf-8")
