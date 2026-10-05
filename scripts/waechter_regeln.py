@@ -222,7 +222,7 @@ def kommentar_dateien(wurzel: Path) -> list[str]:
 def _codes_je_datei(datei: tuple[str, str]) -> list[str]:
     pfad, text = datei
     codes = list(_kommentar_codes(text))
-    codes += ["kommentar"] * len(waechter_kommentare.freie_kommentare(text))
+    codes += ["kommentar"] * len(waechter_kommentare.freie_kommentare(text, pfad))
     try:
         codes += _ast_codes(pfad, ast.parse(text))
     except SyntaxError:

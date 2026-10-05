@@ -31,21 +31,23 @@ class SyntaxbaumGeaendert(Exception):
 
 def neuer_kommentar(kommentar: str) -> str | None:
     """Der Kommentar, der stehen bleibt, oder ``None``, wenn er ganz wegfällt."""
-    if kommentare.ist_erlaubter_kommentar(kommentar, 0):
+    if kommentare.ist_erlaubter_kommentar(kommentar, 0, ""):
         return kommentar
     vorn = kommentare.SCHALTER_VORN.match(kommentar)
     return vorn.group(0).rstrip() if vorn else None
 
 
 class _Loescher(cst.CSTTransformer):
-    def __init__(self) -> None:
+    def __init__(self, pfad: str) -> None:
         super().__init__()
+        self.pfad = pfad
         self.shebang: cst.EmptyLine | None = None
         self.geloescht = 0
 
     def visit_Module(self, node: cst.Module) -> None:
         kopf = node.header[0] if node.header else None
-        if kopf and kopf.comment and kopf.comment.value.startswith(kommentare.SHEBANG):
+        wert = kopf.comment.value if kopf and kopf.comment else ""
+        if kommentare.ist_erlaubter_kommentar(wert, 1, self.pfad):
             self.shebang = kopf
 
     def leave_EmptyLine(
@@ -107,7 +109,7 @@ def loesche(text: str, pfad: str, wurzel: Path) -> Ergebnis:
     """Löscht die Kommentare eines Quelltexts; scheitert bei geändertem Syntaxbaum.
 
     Ordnet die Importsortierung Namen um, bleibt es bei ``ruff format`` allein."""
-    loescher = _Loescher()
+    loescher = _Loescher(pfad)
     roh = cst.parse_module(text).visit(loescher).code
     if not loescher.geloescht:
         return Ergebnis(text, 0)

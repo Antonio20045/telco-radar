@@ -15,7 +15,7 @@ Qualität entsteht durch Mechanik, nicht durch Anweisungstext. Sechs Schichten n
 - Lokal ist nichts eine harte Grenze. Absicherung ist Erkennung: Nach jedem grünen Volllauf ein Stempel mit `git rev-parse HEAD^{tree}` unter `.git/pruefleiter/gruen/`; `make stand` und SessionStart melden Commits auf `origin/main` ohne Stempel, `tools/auftrag.py` startet dann nicht.
 - Eine Python-Version: `.python-version` = 3.11, `python-version-file` in allen Workflows, ruff `target-version = "py311"`.
 - `render_site` gibt die nicht gebauten Teile zurück; ist die Liste nicht leer, endet der Workflow-Schritt rot, die Seite nennt den Ausfall. Der Render-Hook versucht dreimal und sucht danach das Tagesdatum im Live-HTML.
-- Kommentare: kein `#`-Kommentar außer `noqa: CODE`, `type: ignore[code]`, `pragma: no cover`; Docstrings nur an öffentlichen Namen, ein bis drei Sätze; nie Datum, Name, Phasenkürzel oder „CLAUDE.md §“. Wissen zieht in einen Test mit sprechendem Namen, eine benannte Konstante, die Commit-Nachricht oder `outputs/`; Workflow-Wissen nach `docs/betrieb.md`.
+- Kommentare: kein `#`-Kommentar außer `noqa: CODE` und `type: ignore[code]` (ohne Coverage-Werkzeug im Repo ist `pragma: no cover` wirkungslos und verboten, Paket 19); Docstrings nur an öffentlichen Namen, ein bis drei Sätze; nie Datum, Name, Phasenkürzel oder „CLAUDE.md §“. Wissen zieht in einen Test mit sprechendem Namen, eine benannte Konstante, die Commit-Nachricht oder `outputs/`; Workflow-Wissen nach `docs/betrieb.md`.
 - IDs nie aus Titeltext. Die Uhr liest nur `pipeline.run` und `run_geraete_stage`, einmal, in UTC. Kein `except Exception` mit Leerwert: benannte Ausnahme oder benannter Ausfall auf der Seite.
 
 ## Prüfleiter

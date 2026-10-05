@@ -304,7 +304,7 @@ def bewerte(funde: list[Fund], modell: str, *, komplett=None) -> list[Fund]:
     """
     if not funde:
         return funde
-    if komplett is None:  # pragma: no cover
+    if komplett is None:
         from ..analyze.llm import complete as komplett
 
     from ..analyze.llm import extract_json

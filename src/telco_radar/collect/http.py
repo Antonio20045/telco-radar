@@ -47,7 +47,7 @@ def _ca_bundle():
         import certifi
 
         return certifi.where()
-    except ImportError:  # pragma: no cover
+    except ImportError:
         log.warning("certifi fehlt - benutze den Zertifikatsspeicher des Systems")
         return True
 

@@ -60,7 +60,7 @@ class Ergebnis:
 class Transport:
     """Die Schnittstelle. `send(nachricht, an) -> Ergebnis`."""
 
-    def send(self, nachricht: Nachricht, an: str) -> Ergebnis:  # pragma: no cover
+    def send(self, nachricht: Nachricht, an: str) -> Ergebnis:
         raise NotImplementedError
 
 

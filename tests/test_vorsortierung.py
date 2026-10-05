@@ -354,7 +354,7 @@ def test_schalter_ist_vorgabemaessig_an_und_abschaltbar():
 
 
 def test_abgeschaltet_geht_alles_unveraendert_durch(monkeypatch):
-    def fake_complete(system, user, model, max_tokens):  # pragma: no cover
+    def fake_complete(system, user, model, max_tokens):
         raise AssertionError("die abgeschaltete Stufe darf nicht rufen")
 
     monkeypatch.setattr(vs, "complete", fake_complete)

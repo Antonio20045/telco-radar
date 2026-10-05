@@ -148,7 +148,7 @@ def _hooks() -> list[str]:
 def freie_kommentare() -> int:
     """Zählt die ``#``-Kommentare, die Stufe 0 als ``kommentar`` meldet."""
     return sum(
-        len(waechter_kommentare.freie_kommentare((W / p).read_text(encoding="utf-8")))
+        len(waechter_kommentare.freie_kommentare((W / p).read_text("utf-8"), p))
         for p in waechter_regeln.kommentar_dateien(W)
     )
 

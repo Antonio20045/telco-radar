@@ -320,7 +320,7 @@ def baue(report: dict, *, titel: str = "") -> str:
     """
     satz = inhalt(report, titel=titel)
     ueber = satz.ueberlaeufe()
-    if ueber:  # pragma: no cover
+    if ueber:
         raise ValueError("Platzhalter ueber Budget: " + ", ".join(ueber))
 
     gesamt = 4

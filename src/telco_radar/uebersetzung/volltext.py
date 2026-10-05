@@ -60,7 +60,7 @@ def _extrahiere(html: str) -> str:
     """
     try:
         import trafilatura
-    except ImportError:  # pragma: no cover
+    except ImportError:
         log.warning(
             "trafilatura ist nicht installiert - der Artikelabruf "
             "faellt aus, der Feed-Weg laeuft weiter."
