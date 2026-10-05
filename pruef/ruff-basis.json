@@ -162,9 +162,7 @@
  "src/telco_radar/analyze/category_sweep.py": {
   "D103": 1,
   "DTZ011": 1,
-  "E501": 4,
-  "F401": 1,
-  "TID251": 3
+  "E501": 4
  },
  "src/telco_radar/analyze/clustering.py": {
   "B007": 1,
@@ -186,8 +184,6 @@
  },
  "src/telco_radar/analyze/diff_curator.py": {
   "D102": 1,
-  "F401": 1,
-  "I001": 1,
   "UP015": 1
  },
  "src/telco_radar/analyze/diff_db.py": {
@@ -266,8 +262,6 @@
  },
  "src/telco_radar/collect/ct_log.py": {
   "D102": 5,
-  "F401": 1,
-  "TID251": 1,
   "UP017": 1
  },
  "src/telco_radar/collect/geraete/__init__.py": {
@@ -342,9 +336,7 @@
  "src/telco_radar/collect/newsroom.py": {
   "C901": 1,
   "D103": 1,
-  "F401": 1,
   "SIM103": 1,
-  "TID251": 1,
   "UP017": 7
  },
  "src/telco_radar/collect/newsroom_js.py": {
@@ -420,7 +412,6 @@
  "src/telco_radar/geraete_pipeline.py": {
   "C901": 1,
   "I001": 1,
-  "TID251": 1,
   "UP017": 2,
   "UP035": 1,
   "UP045": 7
