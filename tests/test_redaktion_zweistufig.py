@@ -16,12 +16,12 @@ import json
 import pytest
 
 from telco_radar.analyze import editor
+from telco_radar.analyze.bewertung import redaktion_zweistufig as _redaktion_zweistufig
 from telco_radar.analyze.editor import (
     EditorialBriefingError,
     synthesize_zweistufig,
     validate_editorial_briefing,
 )
-from telco_radar.pipeline import _redaktion_zweistufig
 
 
 def _highlight(titel: str, betreiber: str, relevanz: int = 4) -> dict:

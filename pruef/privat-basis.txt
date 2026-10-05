@@ -65,7 +65,6 @@ tests/test_promo_seite.py PLC2701 3
 tests/test_promo_snapshot.py PLC2701 1
 tests/test_promo_view.py PLC2701 8
 tests/test_provider_auswahl.py PLC2701 2
-tests/test_redaktion_zweistufig.py PLC2701 1
 tests/test_render_ausfall.py PLC2701 1
 tests/test_seiten_zahlen.py PLC2701 48
 tests/test_tarif_crawler.py PLC2701 1

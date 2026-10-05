@@ -14,33 +14,31 @@ import sys
 import time
 from collections import Counter, defaultdict
 from collections.abc import Callable
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial
 from itertools import zip_longest
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import TypeVar
 
+from .analyze import bewertung as bewertung_mod
 from .analyze import editor
 from .analyze import clustering
 from .analyze import ctm as ctm_mod
-from .analyze import faithfulness
-from .analyze.agents import analyze_region
-from .analyze import competitors as competitor_mod
-from .analyze import diff_curator
+from .analyze import einordnung as einordnung_mod
 from .analyze import category_sweep
 from .analyze import differentiation_editor
 from .analyze.begriffe import THEME_LABEL
 from .analyze.diff_curator import DiffStore
 from .analyze.diff_db import DiffDB
-from .analyze import highlight_topics
 from .analyze import redaktion_kontinuitaet
 from .analyze import vorsortierung as vorsortierung_mod
 from .uebersetzung import stufe as uebersetzung_stufe
 from .analyze import llm
 from .analyze.llm import llm_available, active_backend
+from .analyze.takt import Takt
 from .collect import collect_all, tag_news_regions
-from .config import Config, is_theme_key, load_config
+from .config import Config, load_config
 from .dedupe import ReportedTopics, SeenStore, filter_fresh
 from .models import Item
 from .naehte import PRODUKTION, Naehte
@@ -53,6 +51,8 @@ from .report.ausfall import Ausfall
 from .report.html import render_site
 
 log = logging.getLogger("telco_radar")
+
+T = TypeVar("T")
 
 LANGUAGES = {"de": "Deutsch", "en": "English"}
 
@@ -237,18 +237,6 @@ def _protokolliere_kosten(kosten: dict) -> None:
             kosten.get("summe_usd", 0.0),
             kosten["budget_usd"],
         )
-
-
-def _redaktion_zweistufig(settings: dict, bewertete: int) -> bool:
-    modus = str(settings.get("editor_modus", "auto") or "auto").lower()
-    if modus == "zweistufig":
-        return True
-    if modus == "einstufig":
-        return False
-    if modus != "auto":
-        log.warning("Unbekannter editor_modus %r - benutze auto", modus)
-    schwelle = int(settings.get("editor_zweistufig_ab_meldungen", 120) or 120)
-    return bewertete >= schwelle
 
 
 def zu_merkende_meldungen(
@@ -719,6 +707,72 @@ def _gesehen_merken(
     )
 
 
+def _abgesichert(aufgabe: Callable[[], T], bei_fehler: Callable[[Exception], T]) -> T:
+    try:
+        return aufgabe()
+    except Exception as exc:  # noqa: BLE001
+        return bei_fehler(exc)
+
+
+@dataclass(frozen=True)
+class Vorsortierung:
+    """Ergebnis der Phase Vorsortieren: Meldungen je Bereich und ihre Bilanz."""
+
+    items_by_region: dict[str, list[Item]]
+    bilanz: dict
+
+
+def _vorsortieren(
+    buendel: Buendel,
+    cfg: Config,
+    root: Path,
+    mechanik_model: str,
+    use_llm: bool,
+    t0: float,
+    stoppuhr: Callable[[], float],
+    phase: Callable[[str, float, str], None],
+) -> Vorsortierung:
+    tvs = stoppuhr()
+    items_by_region, bilanz = vorsortieren(
+        buendel.items_by_region,
+        settings=cfg.settings,
+        root=root,
+        model=mechanik_model,
+        use_llm=use_llm,
+        verstrichen=stoppuhr() - t0,
+    )
+    if bilanz:
+        phase(
+            "Vorsortieren",
+            stoppuhr() - tvs,
+            f"{bilanz['verworfen']} von {bilanz['angeboten']} aussortiert, "
+            f"{bilanz['durchlass']} direkt durchgelassen",
+        )
+    return Vorsortierung(items_by_region, bilanz)
+
+
+def _bilder(
+    regional: dict[str, dict],
+    root: Path,
+    stoppuhr: Callable[[], float],
+    phase: Callable[[str, float, str], None],
+) -> list[dict]:
+    tbild = stoppuhr()
+    alle_highlights = [h for r in regional.values() for h in r.get("highlights", [])]
+    try:
+        bild_bilanz = report_bilder.hole_bilder(alle_highlights, root)
+    except Exception as exc:  # noqa: BLE001
+        log.error("Bildbeschaffung fehlgeschlagen: %s", exc)
+        bild_bilanz = {}
+    phase(
+        "Bilder",
+        stoppuhr() - tbild,
+        f"{bild_bilanz.get('geladen', 0)} von {len(alle_highlights)} "
+        "Meldungen mit Bild",
+    )
+    return alle_highlights
+
+
 def run(
     root: Path,
     use_llm: bool | None = None,
@@ -735,7 +789,6 @@ def run(
     modelle = _modelle_waehlen(cfg.settings)
     analyst_model, editor_model = modelle.analyst, modelle.editor
     mechanik_model, anker = modelle.mechanik, modelle.anker
-    max_items = int(cfg.settings.get("max_items_per_region", 0) or 0) or None
     today = started_at.date()
     today_iso = today.isoformat()
     state_dir = root / "data" / "state"
@@ -754,314 +807,53 @@ def run(
     buendel = _buendeln(
         new_items, cfg, state_dir, mechanik_model, use_llm, uhr, stoppuhr, phase
     )
-    tvs = stoppuhr()
-    items_by_region, vorsortierung_bilanz = vorsortieren(
-        buendel.items_by_region,
-        settings=cfg.settings,
-        root=root,
-        model=mechanik_model,
-        use_llm=bool(use_llm and new_items),
-        verstrichen=stoppuhr() - t0,
+    mit_llm = bool(use_llm and new_items)
+    vorsortierung = _vorsortieren(
+        buendel, cfg, root, mechanik_model, mit_llm, t0, stoppuhr, phase
     )
-    if vorsortierung_bilanz:
-        phase(
-            "Vorsortieren",
-            stoppuhr() - tvs,
-            f"{vorsortierung_bilanz['verworfen']} von "
-            f"{vorsortierung_bilanz['angeboten']} aussortiert, "
-            f"{vorsortierung_bilanz['durchlass']} direkt durchgelassen",
-        )
-
     topics_store = ReportedTopics(
         state_dir / "reported_topics.jsonl",
         max_entries=int(cfg.settings.get("reported_topics_memory", 300)),
     )
-
-    ta = stoppuhr()
-    regional: dict[str, dict] = {}
-    analyst_telemetry: list[dict] = []
-    unanalysierte_regionen: set[str] = set()
-    ungelesene_meldungen: set[str] = set()
-    editor_used = False
-    if use_llm and new_items:
-        llm_workers = int(cfg.settings.get("llm_max_workers", 4))
-        batch_workers = int(cfg.settings.get("analyst_batch_workers", 1) or 1)
-
-        def _analyze_one(region_key, region_items):
-            region_name = cfg.bereich_names.get(region_key, region_key)
-            try:
-                res = analyze_region(
-                    region_name,
-                    region_items,
-                    model=analyst_model,
-                    language=language,
-                    max_items=max_items,
-                    is_theme=is_theme_key(region_key),
-                    batch_workers=batch_workers,
-                    ausweich=modelle.anker_mechanik,
-                )
-                tel = dict(res.get("_telemetry", {}))
-                tel["region"] = region_name
-                if tel.get("batches") and not tel.get("batches_ok"):
-                    unanalysierte_regionen.add(region_key)
-                return region_name, res, tel
-            except Exception as exc:  # noqa: BLE001
-                log.error(
-                    "Analyst %s failed: %s - falling back to raw list", region_name, exc
-                )
-                unanalysierte_regionen.add(region_key)
-                fallback = {
-                    "region_summary": "",
-                    "highlights": [
-                        {
-                            "title": i.title,
-                            "operator": i.operator or "",
-                            "url": i.url,
-                            "category": "Sonstiges",
-                            "relevance": 2,
-                            "summary": i.summary[:200],
-                            "why_it_matters": "",
-                        }
-                        for i in region_items[:10]
-                    ],
-                }
-                return region_name, fallback, None
-
-        with ThreadPoolExecutor(max_workers=max(1, llm_workers)) as _pool:
-            _futs = [
-                _pool.submit(_analyze_one, rk, ri) for rk, ri in items_by_region.items()
-            ]
-            for _fut in as_completed(_futs):
-                region_name, res, tel = _fut.result()
-                ungelesene_meldungen.update(res.pop("_ungelesen", []) or [])
-                regional[region_name] = res
-                if tel is not None:
-                    analyst_telemetry.append(tel)
-        themen_mit_inhalt = [
-            cfg.theme_names[tk]
-            for tk in cfg.theme_names
-            if regional.get(cfg.theme_names[tk], {}).get("highlights")
-        ]
-        bewertete = sum(len(r.get("highlights") or []) for r in regional.values())
-        zweistufig = _redaktion_zweistufig(cfg.settings, bewertete)
-        try:
-            if zweistufig:
-                body, covered = editor.synthesize_zweistufig(
-                    regional,
-                    topics_store.recent(),
-                    model=editor_model,
-                    language=language,
-                    themenbereiche=themen_mit_inhalt,
-                    workers=int(cfg.settings.get("llm_max_workers", 4)),
-                )
-            else:
-                body, covered = editor.synthesize(
-                    regional,
-                    topics_store.recent(),
-                    model=editor_model,
-                    language=language,
-                    highlight_budget=int(
-                        cfg.settings.get("editor_max_highlights", 0) or 0
-                    ),
-                    themenbereiche=themen_mit_inhalt,
-                )
-            editor_used = True
-        except Exception as exc:  # noqa: BLE001
-            if cfg.settings.get("publish_requires_editorial_briefing", True):
-                raise RuntimeError(
-                    "Editorial synthesis failed; refusing to publish a raw "
-                    "source digest. The previous briefing remains live."
-                ) from exc
-            log.warning(
-                "Editorial synthesis failed (%s); publishing a labelled "
-                "source-linked fallback digest",
-                str(exc)[:180],
-            )
-            fallback, covered = editor.build_digest(
-                items_by_region,
-                cfg.bereich_names,
-                llm_was_available=False,
-                include_note=False,
-            )
-            body = (
-                "## Redaktions-Fallback\n\n"
-                "> Die aktuelle Quellenliste konnte wegen einer vorübergehenden "
-                "Störung des Analyse-Dienstes nicht redaktionell verdichtet "
-                "werden. Die Links und Meldungen stammen trotzdem aus diesem "
-                "Lauf; die automatische Redaktion wird im nächsten Lauf erneut "
-                "versucht.\n\n" + fallback
-            )
-            editor_used = False
-    else:
-        if (
-            new_items
-            and not llm_was_explicitly_disabled
-            and cfg.settings.get("publish_requires_editorial_briefing", True)
-        ):
-            raise RuntimeError(
-                "No editorial model is available; refusing to publish a raw "
-                "source digest. The previous briefing remains live."
-            )
-        if use_llm and not new_items:
-            log.info("No new items - writing empty briefing")
-        for region_key, region_items in items_by_region.items():
-            region_name = cfg.bereich_names.get(region_key, region_key)
-            regional[region_name] = {
-                "region_summary": "",
-                "highlights": [
-                    {
-                        "title": i.title,
-                        "operator": i.operator or i.source_name,
-                        "url": i.url,
-                        "category": "Unbewertet",
-                        "relevance": None,
-                        "summary": i.summary[:220],
-                        "why_it_matters": "",
-                    }
-                    for i in (
-                        region_items if not max_items else region_items[:max_items]
-                    )
-                ],
-            }
-        body, covered = editor.build_digest(
-            items_by_region, cfg.bereich_names, llm_was_available=bool(use_llm)
-        )
-        if neuheit.first_run:
-            body = (
-                "> **Erster Lauf (Baseline):** Alle Quellen wurden initial "
-                "eingelesen. Ab dem naechsten Lauf erscheinen nur noch "
-                "wirklich neue Meldungen.\n\n" + body
-            )
-    phase(
-        "Bewerten & Schreiben",
-        stoppuhr() - ta,
-        f"{sum(len(r.get('highlights') or []) for r in regional.values())} "
-        f"bewertete Meldungen"
-        if use_llm
-        else "ohne KI (Roh-Digest)",
+    takt = Takt(stoppuhr, phase, _abgesichert)
+    bewertung = bewertung_mod.bewerten(
+        cfg,
+        vorsortierung.items_by_region,
+        (new_items, neuheit.first_run),
+        (use_llm, llm_was_explicitly_disabled),
+        (analyst_model, editor_model, modelle.anker_mechanik),
+        language,
+        topics_store.recent,
+        takt,
     )
-
-    tctm = stoppuhr()
-    ctm_bilanz: dict = {}
-    beleg_bilanz: dict = {}
-    try:
-        fokus = ctm_mod.lade_fokus(root)
-        for region_name, r in regional.items():
-            for h in r.get("highlights", []):
-                h.setdefault("region", region_name)
-        alle = [h for r in regional.values() for h in r.get("highlights", [])]
-        ctm_bilanz = ctm_mod.veredle(alle, fokus)
-        beleg_bilanz = faithfulness.pruefe(
-            alle,
-            model=mechanik_model,
-            use_llm=bool(
-                use_llm and new_items and cfg.settings.get("ctm_belegpruefung", True)
-            ),
-        )
-        log.info(
-            "CTM-Linse: %d direkt / %d uebertragbar / %d Kontext / "
-            "%d Hintergrund | Saetze: %d belegt, %d verworfen",
-            ctm_bilanz.get("direkt", 0),
-            ctm_bilanz.get("uebertragbar", 0),
-            ctm_bilanz.get("kontext", 0),
-            ctm_bilanz.get("hintergrund", 0),
-            beleg_bilanz.get("belegt", 0),
-            ctm_bilanz.get("saetze_verworfen", 0) + beleg_bilanz.get("verworfen", 0),
-        )
-    except Exception as exc:  # noqa: BLE001
-        log.error("CTM-Linse uebersprungen: %s", exc)
-    phase(
-        "Einordnen für uns",
-        stoppuhr() - tctm,
-        f"{ctm_bilanz.get('direkt', 0)} direkt handlungsrelevant, "
-        f"{beleg_bilanz.get('belegt', 0)} belegte Folgerungssätze",
+    regional, body, covered = bewertung.regional, bewertung.body, bewertung.covered
+    editor_used = bewertung.editor_used
+    einordnung = einordnung_mod.einordnen(
+        regional, cfg, root, mechanik_model, mit_llm, takt
     )
-
-    for r in regional.values():
-        r.pop("_telemetry", None)
-
+    ctm_bilanz, beleg_bilanz = einordnung.ctm, einordnung.beleg
     competitor_profiles: list[dict] = []
     if use_llm and cfg.focus_competitors:
-        tcomp = stoppuhr()
-        try:
-            comp_model = editor_model or analyst_model
-            competitor_profiles = competitor_mod.analyze_all(
-                cfg.focus_competitors,
-                sammlung.items,
-                comp_model,
-                language,
-                max_workers=int(cfg.settings.get("llm_max_workers", 4)),
-            )
-        except Exception as exc:  # noqa: BLE001
-            log.error("Competitor deep-dive failed: %s", exc)
-        phase(
-            "Wettbewerber-Analyse",
-            stoppuhr() - tcomp,
-            f"{len(competitor_profiles)} Profile "
-            f"({sum(len(c.get('moves') or []) for c in competitor_profiles)} Moves)",
+        competitor_profiles = einordnung_mod.wettbewerber(
+            cfg,
+            sammlung.items,
+            editor_model or analyst_model,
+            language,
+            takt,
         )
 
     by_url = {i.url: i for i in new_items}
     _belege_anhaengen(regional, by_url, buendel)
 
-    tbild = stoppuhr()
-    alle_highlights = [h for r in regional.values() for h in r.get("highlights", [])]
-    try:
-        bild_bilanz = report_bilder.hole_bilder(alle_highlights, root)
-    except Exception as exc:  # noqa: BLE001
-        log.error("Bildbeschaffung fehlgeschlagen: %s", exc)
-        bild_bilanz = {}
-    n_bilder = bild_bilanz.get("geladen", 0)
-    phase(
-        "Bilder",
-        stoppuhr() - tbild,
-        f"{n_bilder} von {len(alle_highlights)} Meldungen mit Bild",
+    alle_highlights = _bilder(regional, root, stoppuhr, phase)
+    einordnung_mod.themen_und_moves(
+        regional,
+        cfg,
+        (state_dir, reports_dir, today_iso),
+        (editor_model or analyst_model, mechanik_model),
+        mit_llm,
+        takt,
     )
-
-    try:
-        themen_bilanz = highlight_topics.pflege_highlight_themen(
-            alle_highlights,
-            state_dir,
-            today_iso,
-            model=editor_model or analyst_model,
-            use_llm=bool(use_llm and new_items),
-            reports_dir=reports_dir,
-        )
-        log.info(
-            "Highlight-Themen: %d aktiv, %d Kandidat(en), neu: %s, beendet: %s",
-            themen_bilanz["aktiv"],
-            themen_bilanz["kandidaten"],
-            ", ".join(themen_bilanz["neu"]) or "keins",
-            ", ".join(themen_bilanz["beendet"]) or "keins",
-        )
-    except Exception as exc:  # noqa: BLE001
-        log.error("Highlight-Themen uebersprungen: %s", exc)
-
-    try:
-        themen_namen = set(cfg.theme_names.values())
-        flat_new = []
-        for region_name, r in regional.items():
-            if region_name in themen_namen:
-                continue
-            for h in r.get("highlights", []):
-                hh = dict(h)
-                hh["region"] = region_name
-                flat_new.append(hh)
-        diff_store = DiffStore(state_dir / "differentiation.jsonl")
-        added = diff_curator.curate(
-            flat_new,
-            diff_store,
-            today_iso,
-            model=mechanik_model,
-            use_llm=bool(use_llm and new_items),
-        )
-        log.info(
-            "Differenzierung: %d neue Move(s) aufgenommen (Speicher: %d)",
-            len(added),
-            len(diff_store),
-        )
-    except Exception as exc:  # noqa: BLE001
-        log.error("Differenzierungs-Kurator uebersprungen: %s", exc)
 
     try:
         category_sweep.run_sweep(
@@ -1189,22 +981,22 @@ def run(
         "started_at": started_at.isoformat(),
         "finished_at": uhr().isoformat(),
         "duration_seconds": round(duration, 1),
-        "used_llm": bool(use_llm and new_items),
+        "used_llm": mit_llm,
         "editor_used": editor_used,
         "models": {
-            "analyst": analyst_model if (use_llm and new_items) else None,
+            "analyst": analyst_model if mit_llm else None,
             "editor": editor_model if editor_used else None,
-            "mechanik": mechanik_model if (use_llm and new_items) else None,
+            "mechanik": mechanik_model if mit_llm else None,
             "unavailable": sorted(llm.dead_models()) or None,
             "anker": anker or None,
         },
         "kosten": kosten,
-        "vorsortierung": vorsortierung_bilanz or None,
+        "vorsortierung": vorsortierung.bilanz or None,
         "phases": phases,
         "source_summary": sammlung.zusammenfassung(),
         "register": neuheit.register_zusammenfassung,
         "sources": sammlung.sortiert(),
-        "analysts": analyst_telemetry,
+        "analysts": bewertung.analyst_telemetry,
     }
 
     stats["bewertete"] = redaktion_kontinuitaet.bewertete_meldungen(
@@ -1227,7 +1019,7 @@ def run(
 
     report_json = {
         "date": today.isoformat(),
-        "generated_with_llm": bool(use_llm and new_items),
+        "generated_with_llm": mit_llm,
         "stats": stats,
         "briefing_md": body,
         "regions": regional,
@@ -1246,7 +1038,11 @@ def run(
     log.info("Report written: %s (+ .json), run took %.1fs", report_path, duration)
 
     _gesehen_merken(
-        neuheit, buendel, ungelesene_meldungen, unanalysierte_regionen, today_iso
+        neuheit,
+        buendel,
+        bewertung.ungelesene_meldungen,
+        bewertung.unanalysierte_regionen,
+        today_iso,
     )
     if covered and editor_used:
         topics_store.add(covered, today.isoformat())
