@@ -276,6 +276,18 @@ def test_fehlender_stop_hook_und_fehlende_sperre_sind_rot(tmp_path):
     ]
 
 
+@pytest.mark.parametrize(
+    "sperre", ["Edit(scripts/claude_rolle.py)", "Edit(.claude/agents/**)"]
+)
+def test_rollenregel_und_agenten_ohne_sperre_sind_rot(tmp_path, sperre):
+    _ordner(tmp_path)
+    deny = [s for s in waechter_claude.PFLICHT_SPERREN if s != sperre]
+    _einstellungen(tmp_path, _volle_hooks(), deny)
+    assert waechter_claude.vertrag(tmp_path) == [
+        f".claude/settings.json: Sperre {sperre} fehlt"
+    ]
+
+
 def test_falscher_matcher_zaehlt_nicht(tmp_path):
     _ordner(tmp_path)
     hooks = _volle_hooks()
