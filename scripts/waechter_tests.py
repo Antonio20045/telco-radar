@@ -36,7 +36,6 @@ NETZ_FREIGABEN = frozenset(
 HERMETIK_NAMEN = frozenset(
     {"_aktiv", "_altlasten", "_verstoesse", "_gemeldet", "_hermetik", "conftest"}
 )
-# Die Tests der Hermetik und der Leiter legen selbst eine conftest.py an.
 HERMETIK_ERLAUBT = frozenset({"tests/test_hermetik.py", "tests/test_pruefleiter.py"})
 PLAYWRIGHT_START = frozenset({"sync_playwright", "async_playwright"})
 VERSTECKT = "test-versteckt"
@@ -45,12 +44,10 @@ NAMENSRAEUME = frozenset({"globals", "vars", "locals"})
 DUNDER_NAMENSRAEUME = frozenset({"__globals__", "__builtins__"})
 FREIE_DEKORATOREN = ("pytest.mark.", "pytest.fixture")
 VERSTECK_NAMEN = frozenset({"__test__", "allow_module_level"})
-# Vorgabe von pytest für norecursedirs und python_files.
 NICHT_GESAMMELT = ("*.egg", ".*", "_darcs", "build", "CVS", "dist", "node_modules")
 NICHT_GESAMMELT += ("venv", "{arch}")
 TESTDATEIEN = ("test_*.py", "*_test.py")
 TESTNAME = "testname"
-# Die Kanarie der Leiter sammelt nur ``-o python_files``, sie bleibt verborgen.
 VERSTECKT_ERLAUBT = frozenset({"tests/kanarie_leiter.py"})
 
 

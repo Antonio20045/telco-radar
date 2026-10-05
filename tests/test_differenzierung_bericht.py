@@ -61,8 +61,6 @@ def test_die_neue_gliederung_wird_in_drei_teile_zerlegt():
     ]
     assert set(t["einordnung"]) == {"ki", "garantie"}
     assert t["einordnung"]["ki"].startswith("Indien treibt das Feld")
-    # Nichts bleibt fuer den Aufklapper uebrig - der Bericht steht verteilt
-    # auf der Seite, nicht zusaetzlich als Block.
     assert t["alt_md"] == ""
 
 

@@ -50,38 +50,18 @@ from ..analyze.promo_store import _same_offer
 
 TIER_LABEL = {1: "Netzbetreiber", 2: "Discount- und Zweitmarke"}
 TIER_COLOR = {1: "#3860be", 2: "#e07a00"}
-# Wo eine Marke ohne gepflegten `rang` einsortiert wird: hinter jede
-# gepflegte, dort nach Tier und Reichweite. Eine neu eingetragene Marke
-# verschwindet damit nicht, sie draengelt sich nur nicht nach vorn.
 RANG_UNGESETZT = 900
 _OWN_COLOR = "#e60000"
 _RETIRED_STATUS = "ausgelaufen"
 _SICHTBAR = ("aktiv", "evtl. ausgelaufen")
 
-# Die harte Aussage eines Angebots: Preis, Datenmenge, Bandbreite, Rabatt.
-# Genau das gehoert auf eine Schriftkachel - "20 GB fuer 6,99 €" sagt in
-# zwei Zahlen, worum es geht. Bis zum 08.08.2026 stand dort die MECHANIK
-# ("Wechsel- oder Altgeraetpraemie"), und weil vier Marken dieselbe fahren,
-# standen vier identische Kacheln nebeneinander - das liest sich als Fehler,
-# nicht als Gestaltung.
-# Die abschliessende Grenze ist nicht kosmetisch: ohne sie schnitt "EUR"
-# mitten aus "1 Euro einmalig" ein "1 Eur" heraus, und genau so stand es am
-# 08.08.2026 als Schriftkachel auf der Otelo-Karte.
 _ZAHL_RE = re.compile(
     r"\d[\d.,]*\s?(?:€|Euro|EUR|%|GB|TB|MBit/s|Mbit/s|MB/s|MB|Cent)"
     r"(?![A-Za-zÄÖÜäöüß])",
     re.I,
 )
-# Wo eine Ueberschrift ihren ersten Sinnabschnitt beendet. Nur zum
-# ABTRENNEN, nie zum Abschneiden mitten im Wort - die Kachel traegt kein
-# "…" (CLAUDE.md §5: keine gekuerzten Ueberschriften).
 _KLAUSEL_RE = re.compile(r"\s*[:–—(]\s*|,\s+")
-# Wo der Kern einer Ueberschrift endet und ihre Naeherbestimmung beginnt:
-# "Junge-Leute-Rabatt AUF Magenta Mobil Young 5G Tarife". Erst hier, nach
-# der Zeichensetzung - eine Praeposition ist die schwaechere Grenze.
 _NAEHER_RE = re.compile(r"\s+(?:auf|für|fuer|mit|bei|ohne|zum|zur|im|in|von)\s+")
-# Laenger gesetzt wirkt eine Kachel nicht mehr wie ein Motiv, sondern wie
-# ein zweiter Absatz.
 _KACHEL_MAX = 34
 
 
@@ -141,9 +121,6 @@ def _kachel_kandidaten(offer: dict, mechanik: str) -> list[str]:
     erster = _KLAUSEL_RE.split(headline)[0].strip()
     if len(erster) > _KACHEL_MAX:
         erster = _NAEHER_RE.split(erster)[0].strip()
-    # Die ganze Ueberschrift taugt nicht als Kachel: sie steht zwei Zeilen
-    # tiefer noch einmal, und dieselbe Aussage zweimal untereinander liest
-    # sich als Panne. Ein AUSSCHNITT ist etwas anderes - er hebt hervor.
     if erster and erster != headline and len(erster) <= _KACHEL_MAX:
         kandidaten.append(erster)
     if mechanik and mechanik != "sonstiges":
@@ -182,10 +159,6 @@ def _entdoppele_kacheln(karten: list[dict]) -> None:
         vergeben.add(k["kachel"])
 
 
-# Ab diesem Seitenverhaeltnis ist ein Bild ein Banner und kein Motiv. 2,2
-# liegt bewusst ueber 16:9 (1,78) und unter dem flachsten echten Foto im
-# Bestand vom 08.08.2026 (800x419 = 1,91): beschnitten wuerden sonst auch
-# gewoehnliche Querformate.
 _PANORAMA_AB = 2.2
 
 
@@ -259,8 +232,6 @@ def _ohne_dubletten(sichtbar: list[dict]) -> list[dict]:
         if zwilling is None:
             behalten.append(eintrag)
             continue
-        # Das Motiv der Dublette gehoert derselben Aktion - es faellt nicht
-        # weg, nur weil die andere Schreibweise gewinnt.
         if eintrag.get("image") and not zwilling.get("image"):
             for feld in ("image", "image_w", "image_h", "image_kind"):
                 if eintrag.get(feld) is not None:
@@ -280,23 +251,13 @@ def _karte(brand: dict, offer: dict) -> dict:
         "highlight": bool(offer.get("highlight")),
         "reason": offer.get("score_reason") or "",
         "mechanic": mechanik,
-        # `kachel` ist die Vorauswahl; _entdoppele_kacheln() entscheidet
-        # innerhalb des Markenblocks endgueltig.
         "kachel": kandidaten[0],
         "kachel_kandidaten": kandidaten,
         "frist": offer.get("valid_until") or "",
         "bild": f"images/{offer['image']}" if offer.get("image") else "",
         "bild_w": offer.get("image_w"),
         "bild_h": offer.get("image_h"),
-        # Ein Werbebanner ist kein Bildausschnitt. Ein 1280x410-Motiv im
-        # 16:9-Kasten formatfuellend zu beschneiden schneidet genau die
-        # Haelfte weg, in der die Aussage steht - bei simplytel blieb blaue
-        # Flaeche uebrig und die FRITZ!Box stand am Rand. Solche Formate
-        # werden deshalb vollstaendig gezeigt, nicht beschnitten.
         "bild_panorama": _ist_panorama(offer.get("image_w"), offer.get("image_h")),
-        # "motiv" = das Buehnenbild der Aktionsseite, nicht das Bild GENAU
-        # dieses Angebots (siehe promo_bilder.zuordnen). Die Karte schreibt
-        # das dazu, statt eine Verbindung zu behaupten, die nicht belegt ist.
         "bild_ist_motiv": offer.get("image_kind") == "motiv",
     }
 
@@ -339,20 +300,7 @@ def _mechanik_balken(marken: list[dict]) -> list[dict]:
     ]
 
 
-# Was die grosse Flaeche verlangt. Sie ist bei 1440 px Fensterbreite 579 px
-# breit; auf dem Schirm, auf dem diese Seite gelesen wird (MacBook, zwei
-# Geraetepixel je CSS-Pixel), sind das 1158 echte Pixel. Ein 620-px-Motiv
-# dort ist nicht hochskaliert im Sinne von Kriterium 6 - es ist trotzdem
-# unscharf, und genau so sah Antonio es am 16.08.2026. Unterhalb dieser
-# Breite fuehrt die Aktion ihren Block weiterhin an, aber in der kleinen
-# Flaeche: das Motiv bleibt, die Unschaerfe geht.
 LEAD_MIND_BREITE = 900
-# Ab wie vielen weiteren Karten die Aufmacherkarte zwei Rasterzeilen hoch
-# steht. Zwei Zeilen brauchen VIER volle Zellen daneben (2 Spalten x 2
-# Zeilen) - mit drei blieb am 27.08.2026 die Zelle unten rechts leer (ALDI
-# TALK, live gemessen). Darunter bleibt neben ihr eine Zelle leer - und eine
-# Luecke MITTEN im Raster ist genau das "kreuz und quer", das diese Fassung
-# abstellt.
 _HOCH_AB_WEITEREN = 4
 
 
@@ -402,8 +350,6 @@ def gewichte(block: dict) -> None:
     """
     lead = block.get("lead")
     weitere = len(block["karten"]) - 1
-    # Eine Schriftkachel ist Text und in jeder Groesse scharf - nur ein
-    # Rasterbild muss die Flaeche fuellen koennen.
     bildtauglich = bool(lead) and (
         not lead["bild"] or (lead["bild_w"] or 0) >= LEAD_MIND_BREITE
     )
@@ -467,10 +413,6 @@ def prepare_promo_view(db_entries: list[dict], sources: list, latest_date: str) 
         e["fading"] = e.get("status") == "evtl. ausgelaufen"
         by_brand_raw.setdefault(e.get("brand") or "", []).append(e)
 
-    # Nur tatsaechlich gecrawlte Quellen (kind: static/js) werden gezeigt -
-    # dokumentierte Sonderfaelle (kind: skip, z. B. Deutsche Glasfaser) haben
-    # keinen Snapshot-Versuch und saehen faelschlich wie eine geprueft-leere
-    # Marke aus. Sie stehen auf der Quellen-Unterseite.
     crawlable = [s for s in sources if getattr(s, "crawlable", True)]
 
     marken: list[dict] = []
@@ -497,10 +439,6 @@ def prepare_promo_view(db_entries: list[dict], sources: list, latest_date: str) 
                 "name": src.name,
                 "tier": src.tier,
                 "rang": _rang(src),
-                # Sprungziel fuer die Dossier-Suche: ein Treffer vom Typ "Aktion"
-                # verlinkt hierher. Die Rechnung steht in report/suchindex.py -
-                # dort wird der Link geschrieben, hier der Anker gesetzt, und wenn
-                # die zwei auseinanderlaufen, springt die Suche ins Leere.
                 "anker": marken_anker(src.name),
                 "tier_label": TIER_LABEL.get(src.tier, ""),
                 "color": _OWN_COLOR
@@ -517,23 +455,8 @@ def prepare_promo_view(db_entries: list[dict], sources: list, latest_date: str) 
             }
         )
 
-    # Wettbewerber mit sichtbarem Angebot zuerst, dann nach Anbieterrang;
-    # Vodafones eigene Referenzkarte immer als letzte.
     marken.sort(key=lambda b: (b["internal_reference"], not b["has_offers"], b["rang"]))
 
-    # ----------------------------------------------------------- Bloecke
-    # Je Marke ein Block, WICHTIGSTER ANBIETER ZUERST (siehe _rang).
-    #
-    # Bis zum 08.08.2026 sortierte hier der Score der staerksten Aktion. Das
-    # war eine Rangliste der Angebote, keine des Marktes, und sie hing an
-    # einem einzigen Lauf: die Telekom stand auf Platz zehn, weil ihre
-    # JS-Seiten an dem Tag nur zwei Angebote hergaben, waehrend Otelo mit
-    # einer starken Freundschaftswerbung die Seite anfuehrte. Wer wissen
-    # will, was die Telekom macht, soll nicht scrollen muessen - und die
-    # Reihenfolge soll nicht jede Woche eine andere sein.
-    #
-    # Der Score ordnet weiterhin INNERHALB einer Marke (siehe
-    # _sortierschluessel) und traegt die Hervorhebung "wichtig".
     bloecke = [
         _block(b) for b in marken if b["has_offers"] and not b["internal_reference"]
     ]
@@ -544,36 +467,22 @@ def prepare_promo_view(db_entries: list[dict], sources: list, latest_date: str) 
     )
     eigen = _block(eigene_marke) if eigene_marke else None
 
-    # Alle Wettbewerberkarten in Seitenreihenfolge - die Grundlage, gegen die
-    # die Wahrheitstests rechnen ("jede sichtbare Aktion genau einmal").
     karten = [k for b in bloecke for k in b["karten"]]
     alle_karten = karten + (eigen["karten"] if eigen else [])
-    # Erst die Motive entdoppeln, dann die Kacheln: die erste Runde kann
-    # einer Karte ihr Bild nehmen, und die wird dadurch zur Schriftkachel.
     _entdoppele_bilder(alle_karten)
     for block in bloecke + ([eigen] if eigen else []):
         _entdoppele_kacheln(block["karten"])
-        # Nach dem Entdoppeln, nicht davor: eine Aufmacherkarte, die hier ihr
-        # Motiv verloren hat, ist eine Schriftkachel und darf die grosse
-        # Flaeche wieder tragen.
         gewichte(block)
 
     ohne_aktion = [b for b in marken if not b["has_offers"]]
 
     return {
-        # Alle beobachteten Marken in Anzeigereihenfolge - die Grundlage,
-        # gegen die die Wahrheitstests rechnen. Die Seite zeigt sie in zwei
-        # Gruppen, weil "hier laeuft gerade nichts" eine Zeile ist und keine
-        # Kachel; die Zaehlung darf davon nicht abhaengen.
         "brands": marken,
         "bloecke": bloecke,
         "ohne_aktion": ohne_aktion,
         "karten": karten,
         "eigen": eigen,
         "mechaniken": _mechanik_balken(marken),
-        # Wie viele der gezeigten Karten ein echtes Kampagnenbild tragen. Die
-        # Zahl haengt am Abnahmekriterium der Seite (scripts/pruefe_portal.py)
-        # und wird in tests/test_promo_seite.py gegen die Daten gehalten.
         "mit_bild": sum(1 for k in alle_karten if k["bild"]),
         "bilder_gesamt": sum(1 for b in marken for e in b["active"] if e.get("image")),
         "highlight_count": sum(1 for k in karten if k["highlight"]),

@@ -18,7 +18,6 @@ abgesichert.
 
 from telco_radar.report.html import render_site
 
-# Die vier Seiten der Marktrecherche nach dem Redesign.
 SEITEN = (
     "index.html",
     "meldungen.html",
@@ -36,14 +35,12 @@ def test_die_suchseite_traegt_das_dossier_und_referenziert_den_index(tmp_path):
     render_site(site_dir, reports_dir, cfg=None)
 
     suche = (site_dir / "suche.html").read_text(encoding="utf-8")
-    # Das Feld und die Behaelter, die app.js fuellt.
     assert 'id="dossier-input"' in suche
     assert 'id="dossier-bilanz"' in suche
     assert 'id="dossier-treffer"' in suche
-    assert 'id="dossier-verlauf"' in suche  # die Entwicklung ueber Monate
+    assert 'id="dossier-verlauf"' in suche
     assert 'id="dossier-filter"' in suche
 
-    # search_index.json entsteht daneben und ist das, was app.js laedt.
     assert (site_dir / "search_index.json").exists()
     app_js = (site_dir / "app.js").read_text(encoding="utf-8")
     assert "search_index.json" in app_js
@@ -67,7 +64,6 @@ def test_die_suche_steht_nicht_mehr_am_fuss_der_meldungsseite(tmp_path):
         "Im Gesamtarchiv suchen",
     ):
         assert tot not in meldungen, tot
-    # Und kein toter CSS-Block zurueckgeblieben.
     assert "meldungen-suche" not in (site_dir / "style.css").read_text(encoding="utf-8")
 
 
@@ -145,12 +141,9 @@ def test_navigation_hat_fuenf_eintraege(tmp_path):
         "transparenz.html",
     ):
         assert f'href="{ziel}"' in nav
-    # Die Rubrik heisst "Quellen" - "Transparenz" war Behoerdendeutsch.
     assert ">Quellen</a>" in nav
     assert ">Transparenz</a>" not in nav
     assert nav.count("<a ") == 5
-    # Die aufgeloesten Seiten duerfen nicht mehr in der Navigation stehen -
-    # und die zwei unter der Schwelle ebenfalls nicht.
     for weg in (
         "bericht.html",
         "archive.html",
@@ -195,23 +188,16 @@ def test_alte_dateinamen_leiten_weiter(tmp_path):
 
     render_site(site_dir, reports_dir, cfg=None)
 
-    # `suche.html` steht NICHT mehr darunter: der Name ist seit dem
-    # 08.08.2026 wieder eine echte Seite - ein Lesezeichen darauf landet also
-    # dort, wo es immer hinwollte.
     erwartet = {
         "bericht.html": "index.html",
         "archive.html": "meldungen.html#archiv",
         "protokoll.html": "transparenz.html",
         "sources.html": "transparenz.html#bestand",
-        # Seit dem 08.08.2026 gibt es die Seite wieder, die dieser Name
-        # meint - die Weiterleitung zeigt wieder dorthin statt auf den
-        # Kurzverweis der Titelseite.
         "wettbewerber.html": "wettbewerb.html",
     }
     for alt, ziel in erwartet.items():
         html = (site_dir / alt).read_text(encoding="utf-8")
         assert f'content="0; url={ziel}"' in html
-        # Auch ohne Meta-Refresh muss man weiterkommen.
         assert f'href="{ziel}"' in html
 
 

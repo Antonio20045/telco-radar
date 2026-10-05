@@ -73,7 +73,6 @@ from .geraete_bereinigung import zustand_der_zeile
 from .geraete_radar import STATUS_VERGLEICHBAR
 from .geraete_tco_band import band_label
 
-# Mit BOM, damit Excel UTF-8 erkennt.
 KODIERUNG = "utf-8-sig"
 TRENNER = ";"
 
@@ -109,64 +108,6 @@ SPALTEN_HISTORIE = [
     "Quelle",
 ]
 
-# O4 (STRATEGIE_GERAETE_OPTIK §3): der TCO-Gesamtexport. Die Spalten der
-# Bündel-Zeile stehen im Auftrag; drei kommen ehrlich dazu:
-#   * "Art" - die Datei trägt Bündel- UND SIM-only-Zeilen, und zwei
-#     Zeilentypen ohne Unterscheidungsmerkmal sind in Excel eine Tabelle,
-#     die man nicht filtern kann.
-#   * "Zustand" - ein erneuertes Gerät ist ein anderer Preis (B1). Ohne
-#     die Spalte stünde ein Gebrauchtpreis als Neupreis in der Datei -
-#     derselbe Fehlertyp, der aktuell_csv die ZustandsABLEITUNG brachte.
-#   * "Bündel/Monat EUR" - 1&1 nennt EINEN Monatsbetrag für Tarif und
-#     Gerät (§ 13.2 der Strategie). Ihn auf Tarif/Monat oder Geräterate
-#     zu verteilen wäre eine Rechnung dieses Projekts und keine Angabe
-#     des Anbieters; ohne die Spalte wäre die Zeile stumm.
-#   * "SKU-ID" (A4, 20.09.2026) - ohne sie kollabierten Vodafone-Farb-
-#     varianten zu byte-identischen Zeilen (live: 156): Modell, Speicher
-#     und alle Preise sind je Farbe gleich, nur die SKU trennt sie. Sie
-#     steht LETZT, am selben Ort wie in SPALTEN_AKTUELL - dort sind die
-#     IDs auch am Ende - und ist Teil des Bündelschlüssels, trennt also
-#     JEDES Paar, nicht nur das heutige. "Eine Zeile je Bündel" bleibt:
-#     der Export filtert nicht selbst.
-#
-# P0-B-h4 (BEFUND HOCH, 21.09.2026): DER SPALTENKOPF LUEGT FUER 70 ZEILEN.
-# "Kosten über 24 Monate EUR" stand fest, fuer jede Zeile, waehrend 74
-# Buendel des Bestands (`buendel_monatlich`, 1&1) ihre Summe ueber 36
-# Monate tragen (`Tco.leitzahl_monate`, P0-B-h1). "Laufzeit Monate" daneben
-# ist die RATENlaufzeit und nicht der Zeitraum der Leitzahl - bei congstar
-# laufen 36 Raten in einer 24-Monats-Leitzahl, das eine sagt nichts ueber
-# das andere. H4 stellte den Zeitraum als EIGENE Spalte GLEICH DANEBEN
-# ("Leitzahl-Zeitraum Monate", direkt aus `Tco.leitzahl_monate` gelesen),
-# liess den alten Kopf aber unangetastet stehen - der Widerspruch war
-# damit SICHTBAR (36 neben "Kosten über 24 Monate EUR"), nicht behoben.
-#
-# P0-B (22.09.2026, LEAD): ZWEI KOEPFE, EIN WERT - und jeder Kopf ist fuer
-# jede Zahl unter ihm WAHR. "Kosten über 24 Monate EUR" traegt eine Zahl nur
-# noch, wenn ihr Zeitraum auch 24 Monate ist; alle anderen stehen unter
-# "Kosten über die Bündellaufzeit EUR", daneben ihr Zeitraum in
-# "Leitzahl-Zeitraum Monate". Der alte Kopf behaelt damit seinen Namen als
-# Fremdschluessel und bekommt eine ENGERE, dafuer richtige Bedeutung; keine
-# Zeile verliert ihren Wert (`_leitzahl_spalten`).
-#
-# Der Weg dorthin ist dokumentiert, weil er zweimal falsch abgebogen ist:
-# H4 stellte den Zeitraum nur DANEBEN und liess den Kopf luegen; z3 baute
-# eine zweite Wertspalte, nannte sie "Kosten über 24 Monate EUR (eigener
-# Zeitraum)" - ein Name, der sich selbst widerspricht - und fuellte sie
-# genau fuer die 74 Zeilen NICHT, fuer die sie gedacht war, waehrend der
-# alte Kopf den 36-Monats-Betrag weitertrug. Die damalige Begruendung war
-# richtig beobachtet und falsch gefolgert. Richtig war: der alte Kopf ist
-# ein Fremdschluessel, den zwoelf Proben in tests/test_geraete_o4_export.py
-# und tests/test_seiten_zahlen.py per `DictReader` lesen. Falsch war der
-# Schluss, ihn deshalb luegen zu lassen - ein Kopf, der seine Zahlen falsch
-# beschreibt, ist kein Fremdschluessel, sondern eine Falle. Er behaelt jetzt
-# seinen NAMEN und bekommt eine engere Bedeutung, und die Leser bekommen
-# EINEN gemeinsamen Leseweg (`leitzahl_aus_zeile`), statt den Spaltennamen
-# zwoelfmal abzuschreiben.
-#
-# Die zwei Koepfe als Namen, damit kein Leser sie abschreibt. Ein Test, der
-# "Kosten über 24 Monate EUR" als Zeichenkette in sich traegt, ist eine
-# zweite Definition derselben Spalte (Clean Code 7) - und genau daran ist
-# diese Spalte zweimal falsch abgebogen.
 SPALTE_UEBER_24 = "Kosten über 24 Monate EUR"
 SPALTE_UEBER_LAUFZEIT = "Kosten über die Bündellaufzeit EUR"
 
@@ -230,23 +171,6 @@ SPALTEN_TCO = [
     "SKU-ID",
 ]
 
-# O4: der Radar-Export - TCO-24 der Netzbetreiber UND Händler-Barpreis in
-# EINER Datei. Die Abweichungsspalte ist der KONSUMENT derselben Rechnung,
-# die der Radar-Reiter zeigt (`report/geraete_radar.py`): diese Datei
-# rechnet keine einzige Prozentzahl selbst, sie liest sie aus der
-# Aufbereitung, die auch die Seite rendert - zwei Rechnungen fuer dieselbe
-# Zahl sind zwei Zahlen (CLAUDE.md §6).
-#
-# E5 (AUFTRAG_GERAETE_EINE_SEITE_V2 §7, 17.09.2026): die PREIS-ALARME
-# kommen als dritte Zeilenart dazu - der Radar-Reiter trägt seit E3 drei
-# Sektionen (Alarme / Abweichung / Händler), und eine Datei, die zwei von
-# dreien deckt, lässt die Frage "welcher Wettbewerb ist günstiger?" in der
-# anderen Beantwortung aus. Die Alarmzeilen stehen ERSTEN in der Datei,
-# dieselbe Reihenfolge wie die Sektionen der Seite. Ihre Abweichung ist
-# der BETRAG ohne Vorzeichen - dieselbe Sprache wie die Alarmtabelle
-# (E3-Fix B2: jede Alarmzeile ist per Definition ein Wettbewerber-Vorteil,
-# ein Minuszeichen trüge nichts bei); Status trägt die ALARM-STUFE
-# (Kritisch/Mittel/Gering), nicht den Vergleichsstatus der TCO-Zeilen.
 SPALTEN_RADAR = [
     "Art",
     "Modell",
@@ -265,14 +189,6 @@ SPALTEN_RADAR = [
     "Quelle",
 ]
 
-# P3 (Strategie Geraete v3, 17.09.2026): der Katalog auf MODELL-Ebene hat
-# zwei Ansichten (Einzelgeraepreis / TCO) - jede bekommt IHRE Datei, kein
-# Formatmix. `geraete-aktuell.csv` bleibt der Listungs-Export (E5-Regel:
-# 4/4 Zahlensektionen bleiben exportierbar; die Modell-Tabelle kommt als
-# Ansichts-Export DAZU). Dieselbe Disziplin wie oben: die zwei Preisformen
-# der Barpreis-Ansicht stehen in EIGENEN Spalten ("Ab-Preis EUR" gegen
-# "Nur im Bündel ab EUR/Monat") und schließen einander je Zeile aus - eine
-# Rate steht nie in einer Preisspalte, die einen Kassenpreis nennt.
 SPALTEN_MODELL_BARPREIS = [
     "Hersteller",
     "Modell",
@@ -288,10 +204,6 @@ SPALTEN_MODELL_BARPREIS = [
     "Quelle",
 ]
 
-# Die TCO-Ansicht: eine Zeile je Modell, die Leitzahl des besten
-# vergleichbaren Angebots. Eine Zeile ohne Zahl traegt ihren Grund in der
-# Statusspalte statt einer geratenen - dieselbe Sprache wie die
-# Radar-Datei. Abweichung nur mit Vodafone-Referenz (delta_kurz-Regel).
 SPALTEN_MODELL_TCO = [
     "Hersteller",
     "Modell",
@@ -307,19 +219,6 @@ SPALTEN_MODELL_TCO = [
     "Quelle",
 ]
 
-# Die drei Zeilenarten der Radar-Datei - dieselben Wörter, mit denen die
-# Sektionen der Seite überschrieben sind (S3). Ein zweites Wort für dieselbe
-# Art wäre ein zweites Etikett für eine Sache.
-#
-# P0-B-z3 (BEFUND 2, 22.09.2026): ART_NETZ trug bis hierhin fest "...
-# Kosten über 24 Monate" - eine Zeitraumangabe fuer die GANZE Sektion,
-# obwohl 47 von 97 1&1-Zeilen (Bestand 22.09.2026, Grund-Text
-# "Die Zahl von 1&1 trägt 36 Monate ...") in derselben Sektion mit der
-# eigenen Preisart "Kosten über die Bündellaufzeit" daneben stehen -
-# derselbe Fehlertyp wie Befund 1, eine Spalte weiter links. "Netzbetreiber"
-# ist die Sektion (wer nach "Art" filtert, bekommt die Wettbewerber-Zeilen),
-# der Zeitraum steht dort, wo er stimmt: in der Preisart-Zelle jeder
-# einzelnen Zeile (`_preisart_netz`).
 ART_ALARM = "Preis-Alarm"
 ART_NETZ = "Netzbetreiber"
 ART_HAENDLER = "Händler Barpreis"
@@ -503,34 +402,6 @@ def _alarm_zeilen(alarme: dict) -> list[list[str]]:
     return ausgabe
 
 
-# P0-B-h4 (BEFUND HOCH, 21.09.2026): die Preisart-Zelle der Netzbetreiber-
-# Zeilen behauptete fest "Kosten über 24 Monate" - auch fuer eine Zeile,
-# deren eigener "Grund" daneben einen ANDEREN Zeitraum nennt ("Die Zahl
-# von 1&1 trägt 36 Monate, die Vodafone-Zahl 24 Monate ..."). Gemessen am
-# Bestand vom 21.09.2026: 70 1&1-Zeilen tragen so einen Widerspruch in
-# derselben Zeile - alle Zeilen mit `buendel_monatlich` (§ 13.2), keine
-# davon mit dem Status "vergleichbar".
-#
-# P0-B-z3 (BEFUND 4, 22.09.2026): `gruppe["vodafone"]["monate"]` ist der
-# Zeitraum der REFERENZ dieses Geraets (`geraete_radar._vodafone_basis`,
-# Vodafones GUENSTIGSTES eigenes Bündel) - nicht zwangslaeufig der
-# Zeitraum, gegen den DIESE Zeile tatsaechlich geprüft wurde. Bei einem
-# gemeinsamen Tarifband (`_paar_zeile`) vergleicht `geraete_radar.py`
-# gegen Vodafones GÜNSTIGSTE KARTE IN DIESEM BAND, nicht gegen die
-# Referenz - zwei verschiedene Vodafone-Karten, potenziell mit
-# verschiedenem `leitzahl_monate`. Diese Datei bekommt diesen
-# Karten-Zeitraum nicht mitgeliefert (er steht in `geraete_radar.py`
-# nicht im Rückgabe-Wörterbuch, und diese Datei ist nicht die ihre,
-# CLAUDE.md-Auftrag: nur `geraete_export.py`) - er wird hier deshalb NICHT
-# geraten. Gemessen am Bestand vom 22.09.2026: von 61 Zeilen mit Status
-# "vergleichbar" tragen 33 einen ANDEREN `vf_gesamt` als
-# `gruppe["vodafone"]["gesamt"]` (z. B. Apple iPhone 17 Pro 256 GB/
-# congstar: Zeile 2.435,80 EUR gegen Referenz 1.955,80 EUR) - fuer genau
-# diese Zeilen war der Zeitraum der Referenz bisher eine Behauptung ueber
-# eine andere Zahl. Nur wenn `vf_gesamt` GENAU der Referenz-Betrag ist,
-# steht fest, dass dieselbe Vodafone-Karte verglichen wurde (die Referenz
-# IST die Vodafone-Karte, die `_zeile_fuer_anbieter` ohne gemeinsames Band
-# gegenrechnet) - nur dann wird ihr Zeitraum genannt.
 def _preisart_netz(z: dict, gruppe: dict) -> str:
     """Preisart einer Netzbetreiber-Zeile - nur mit Zeitraum, wo er BELEGT ist.
 
@@ -552,17 +423,6 @@ def _preisart_netz(z: dict, gruppe: dict) -> str:
     return "Kosten über die Bündellaufzeit"
 
 
-# P0-B-z3 (BEFUND 3, 22.09.2026): `geraete_radar.netzbetreiber_gruppen`
-# traegt fuer ein Geraet OHNE Vodafone-Basis (`basis is None`) den Grund
-# NUR an der GRUPPE (`vodafone_grund`, z. B. "Keine Vodafone-Kosten über
-# 24 Monate für dieses Gerät erhoben – kein Bündel und kein eigener
-# Barpreis."), nicht an jeder ihrer Zeilen (`geraete_radar.py:429`,
-# `"grund": ""` fest). Gemessen am Bestand vom 22.09.2026: 96 Zeilen ohne
-# Abweichung UND ohne eigenen Grund - eine stille Lücke (Clean Code 5).
-# `geraete_radar.py` ist nicht diese Datei (CLAUDE.md-Auftrag: nur
-# `geraete_export.py`); der Gruppen-Grund liegt aber schon in `g` vor,
-# wenn die Zeile hier ankommt - kein zweiter Weg, keine neue Ableitung,
-# nur ein GELESENER Fallback auf das, was die Gruppe ohnehin schon sagt.
 def _grund_netz(z: dict, g: dict) -> str:
     """Der Grund einer Netzbetreiber-Zeile - nie eine stille Lücke.
 
@@ -711,15 +571,8 @@ def modell_tco_csv(modelle: list) -> tuple[str, int]:
                 m.get("tco_anbieter") or "",
                 _zahl(m.get("tco_monat")),
                 _zahl(m.get("tco_delta")),
-                # Klartext statt Rohschluessel (S4-1 der P3-Code-Pruefung):
-                # dieselbe Bezeichnung wie der Chip der Vergleichsansicht und
-                # die Band-Spalte des Katalogs - ein "xs" in der Spalte
-                # waere eine zweite Sprache fuer dieselbe Sache (O4-Regel).
                 _prozent(m.get("tco_delta_prozent")),
                 band_label(m.get("tco_band")),
-                # Zwei sich ausschliessende Leergruende, EINE Statusspalte:
-                # tco_leer steht nur ohne Leitzahl, tco_delta_leer nur mit
-                # Leitzahl (A2-Nachbesserung 20.09.2026).
                 m.get("tco_leer") or m.get("tco_delta_leer") or "",
                 beleg.get("abgerufen_am", ""),
                 beleg.get("quelle_url", ""),
@@ -860,9 +713,6 @@ def schreibe_exporte(
     inhalt_r, zeilen_r = radar_csv(radar or {})
     (ordner / "wettbewerbsradar.csv").write_text(inhalt_r, encoding=KODIERUNG)
 
-    # P3: die beiden Ansichten des Modell-Katalogs - je Ansicht EINE Datei
-    # (kein Formatmix, dieselbe Regel wie oben). Auch leer zulässig: dann
-    # entstehen sie mit Kopfzeile und Null Zeilen.
     inhalt_mb, zeilen_mb = modell_barpreis_csv(modelle or [])
     (ordner / "geraete-modell-barpreis.csv").write_text(inhalt_mb, encoding=KODIERUNG)
     inhalt_mt, zeilen_mt = modell_tco_csv(modelle or [])

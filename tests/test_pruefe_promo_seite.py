@@ -26,11 +26,6 @@ sys.modules["pruefe_promo_seite"] = pp
 _spec.loader.exec_module(pp)
 
 
-# Ein Text, der alle Formkriterien erfuellt: lang genug, viele verschiedene
-# Angebotssignale, eindeutig Mobilfunk. Der Fuellteil ist bewusst wortREICH:
-# der Ueberlappungswert verweigert die Auskunft, wenn eine der beiden Seiten
-# unter MIN_WOERTER_VERGLEICH eigene Woerter hat - eine echte Aktionsseite
-# liegt bei mehreren hundert, ein viermal wiederholter Absatz nicht.
 GUT = (
     "Handytarife Aktion Sommer. Allnet Flat mit 30 GB fuer 19,99 EUR "
     "monatlich statt 29,99 EUR. Wechselbonus 50 EUR fuer Neukunden mit "
@@ -76,7 +71,6 @@ def _fehler(ergebnis) -> set[str]:
     return {k["name"] for k in ergebnis["kriterien"] if not k["ok"]}
 
 
-# --------------------------------------------------------------- Grundfall
 def test_gute_seite_besteht():
     assert _pruefe()["pass"] is True
 
@@ -93,7 +87,6 @@ def test_abrufmisserfolg_ist_ein_durchfaller_kein_absturz():
     assert _fehler(e) == {"abrufbar"}
 
 
-# ---------------------------------------------------------- Einzelkriterien
 def test_zu_wenig_text_faellt_durch():
     e = _pruefe(snap=_snap("Aktion 19,99 EUR monatlich 30 GB Rabatt"))
     assert "genug Text" in _fehler(e)
@@ -150,7 +143,6 @@ def test_schraegstrich_und_www_taeuschen_die_dublettenpruefung_nicht():
     assert "noch nicht konfiguriert" in _fehler(e)
 
 
-# ------------------------------------------------- Kriterium 7: Eigenstaendig
 def test_dublette_einer_bestehenden_seite_faellt_durch():
     e = _pruefe(bestand=_bestand(seiten={"https://marke.test/aktionen": GUT}))
     assert "eigenstaendig" in _fehler(e)
@@ -173,9 +165,6 @@ def test_seite_die_eine_bestehende_enthaelt_faellt_durch():
 
 
 def test_wirklich_andere_seite_besteht():
-    # Wortreich genug fuer einen belastbaren Vergleich (echte Aktionsseiten
-    # liegen bei mehreren hundert verschiedenen Woertern) und inhaltlich
-    # klar etwas anderes als GUT.
     anders = (
         "Prepaid Startpaket ohne Vertrag. 10 GB fuer 7,99 EUR im Monat, "
         "Guthaben aufladen im Laden. Aktion: doppeltes Datenvolumen "
@@ -225,7 +214,6 @@ def test_zu_duenne_seiten_gelten_als_nicht_vergleichbar():
     assert "eigenstaendig" in _fehler(e)
 
 
-# ------------------------------------------------- Kriterium 8: zweimal stabil
 def test_zweiter_leerer_abruf_faellt_durch():
     """Die Lehre aus newswire.ca im Presse-Zweig, hier mit anderer Folge: ein
     leerer Abruf schiebt saemtliche Angebote dieser Seite in Richtung
@@ -243,7 +231,6 @@ def test_ohne_zweiten_abruf_gibt_es_das_kriterium_nicht():
     assert {k["nr"] for k in _pruefe()["kriterien"]} == {1, 2, 3, 4, 5, 6, 7}
 
 
-# ------------------------------------------------------------- Hilfsfunktionen
 def test_angebotsbreite_zaehlt_verschiedene_werte():
     preise, gb = pp.angebotsbreite("9,99 € und 9,99 € und 19,99 EUR, 30 GB, 5 GB")
     assert (preise, gb) == (2, 2)

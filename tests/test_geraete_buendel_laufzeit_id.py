@@ -39,9 +39,6 @@ SKU = "apple-iphone-17-256gb-schwarz"
 TARIF = "O2 Mobile Klein"
 TARIF_ID = "o2:klein"
 
-# Die ID, wie sie VOR B1 entstand - vier Segmente, ohne Laufzeit. Sie steht
-# hier als Zeichenkette und nicht als Aufruf von `buendel_id`: der Punkt
-# dieser Tests ist genau, dass die alte FORM noch zugeordnet wird.
 ALT_ID = f"buendel--o2--{SKU}--o2-mobile-klein"
 
 
@@ -62,11 +59,6 @@ def _buendel(rate: float, laufzeit: int) -> Buendel:
         quelle_url="https://example.de/o2/17",
         abgerufen_am="2026-09-20",
     )
-
-
-# --------------------------------------------------------------------------
-# 1. Der Stand: derselbe Eintrag, nicht ein zweiter
-# --------------------------------------------------------------------------
 
 
 def _alter_stand(tmp_path: pathlib.Path, laufzeit: int = 36) -> pathlib.Path:
@@ -186,10 +178,6 @@ def test_eine_unbekannte_id_form_wird_benannt_und_nicht_verworfen(tmp_path, capl
     )
 
 
-# --------------------------------------------------------------------------
-# 2. Die Zeitreihe: alte und neue Zeile in DERSELBEN Reihe
-# --------------------------------------------------------------------------
-
 _TCO_SICHT = {
     "modelle": [{"id": "apple-iphone-17-256", "karten": [{"sku_id": SKU}]}],
     "band_je_tarif": {TARIF_ID: "klein"},
@@ -222,7 +210,6 @@ def _reihe(
     """Die Messungen je Tag fuer (Modell, Band, o2) aus diesen Zeilen."""
     state = tmp_path / "state"
     state.mkdir(exist_ok=True)
-    # Der Stand tragt die HEUTIGE ID - so schreibt ihn `TcoDB.save` seit B1.
     (state / "geraete_tco.json").write_text(
         json.dumps(
             {
@@ -275,7 +262,6 @@ def test_die_laufzeit_der_zeile_entscheidet_nicht_die_vorgabe(tmp_path):
     assert id_aus_satz(
         _historie_zeile(ALT_ID, "2026-09-19", 52.5, laufzeit=12)
     ) == buendel_id(SKU, "o2", TARIF, 12)
-    # und der laufzeitfreie Teil ist der gemeinsame Nenner beider Varianten
     assert basis_aus_satz({"id": ALT_ID, "laufzeit_monate": 12}) == basis_aus_satz(
         {"id": buendel_id(SKU, "o2", TARIF, 36), "laufzeit_monate": 36}
     )
@@ -305,11 +291,6 @@ def test_eine_zeile_ohne_zuordenbares_buendel_bleibt_ohne_punkt(tmp_path):
     fremd = buendel_id("apple-iphone-99-1tb-gold", "o2", TARIF, 36)
     tage = _reihe(tmp_path, [_historie_zeile(fremd, "2026-09-19", 18.0)])
     assert tage == {}
-
-
-# --------------------------------------------------------------------------
-# 3. Gegenprobe am ECHTEN Bestand
-# --------------------------------------------------------------------------
 
 
 def test_am_echten_bestand_verliert_die_migration_keine_messung():

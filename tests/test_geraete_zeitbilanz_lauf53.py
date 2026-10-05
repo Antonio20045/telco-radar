@@ -61,22 +61,16 @@ def _fixture(name: str) -> str:
     return pfad.read_text(encoding="utf-8")
 
 
-# --------------------------------------------------------------------------
-# Die neun Ersatzanbieter VOR congstar - Kosten je Anbieter aus dem Befund
-# vom 24.09.2026 (siehe Modulkopf). Wo der Log nur eine Gruppe nennt
-# ("Saturn+Vodafone bis ~07:45"), ist die Summe gemessen, die Aufteilung
-# zwischen beiden ist eine plausible Naeherung - fuer die Zeitbilanz vor
-# congstar zaehlt nur die SUMME.
 _FUELLER_KOSTEN = [
     ("Telekom", 1, 52.0),
     ("Saturn", 2, 240.0),
     ("Vodafone", 2, 240.0),
-    ("ElectronicPartner", 3, 201.0),  # 07:45:30-07:48:51
-    ("Medimax", 3, 141.0),  # 07:48:51-07:51:12
+    ("ElectronicPartner", 3, 201.0),
+    ("Medimax", 3, 141.0),
     ("o2", 3, 50.0),
-    ("1&1", 4, 53.0),  # o2+1&1 zusammen 103s (07:51:12-07:52:55)
-    ("mobilcom-debitel", 4, 284.0),  # 07:52:55-07:57:39
-    ("ALDI TALK", 33, 5.0),  # laeuft NACH congstar, kostet kaum etwas
+    ("1&1", 4, 53.0),
+    ("mobilcom-debitel", 4, 284.0),
+    ("ALDI TALK", 33, 5.0),
 ]
 
 
@@ -110,9 +104,6 @@ def _congstar_anbieter() -> Anbieter:
     return treffer[0]
 
 
-# Was EIN Abruf gegen congstar in der Zeitbilanz kostet - etwas oberhalb
-# des gemessenen Schnitts (120s / 56 Seiten = 2,14s), damit der Test nicht
-# guenstiger rechnet als die Messung.
 _KOSTEN_JE_ABRUF_CONGSTAR = 2.2
 
 
@@ -134,8 +125,6 @@ def _congstar_bilanz(monkeypatch, frist_sekunden: float):
 
     sitemap = next(e for e in congstar.einstiege if e.kind == "sitemap")
     sitemap_url = sitemap.url
-    # Seit 29.09.2026 kommen die Buendel von den Produktseiten (volle
-    # Tarifmatrix je Geraet); die vier Tarifseiten sind keine Einstiege mehr.
     assert not [e for e in congstar.einstiege if e.kind == "buendel"]
 
     sitemap_text = _fixture("congstar_sitemap_devices.xml")

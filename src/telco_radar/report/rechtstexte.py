@@ -40,15 +40,8 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-# Der Platzhalter traegt geschweifte Klammern, damit er in gerendertem HTML
-# genauso auffaellt wie in der Quelldatei. Bewusst KEINE Jinja-Syntax mit
-# Leerzeichen - diese Dateien laufen nie durch Jinja, und ein Muster, das wie
-# eine Vorlage aussieht, laedt genau dazu ein, es eines Tages doch durch eine
-# zu schicken.
 _PLATZHALTER = re.compile(r"\{\{([A-ZÄÖÜ_]+)\}\}")
 
-# Was ein offener Platzhalter im Text anstelle seiner selbst zeigt. Der Leser
-# soll sehen, dass etwas fehlt - nicht eine Zeile, die zufaellig kurz aussieht.
 _LUECKENTEXT = "— noch nicht eingetragen —"
 
 SEITEN = {
@@ -90,10 +83,6 @@ def lade(root: Path, schluessel: str) -> Rechtstext | None:
     roh = datei.read_text(encoding="utf-8")
     luecken = sorted(set(_PLATZHALTER.findall(roh)))
     text = _PLATZHALTER.sub(_LUECKENTEXT, roh)
-    # Die Ueberschrift der Datei faellt weg: die Vorlage setzt den Titel als
-    # <h1>, und `_md_to_html()` kennt `h1` gar nicht (die Zeile wuerde als
-    # nackter Text im Fliesstext stehen). Der Titel der Seite steht in
-    # SEITEN - eine Ueberschrift an zwei Orten waeren zwei Titel.
     text = re.sub(r"\A#\s+.*\n+", "", text)
     return Rechtstext(
         schluessel=schluessel, titel=titel, markdown=text, luecken=luecken
@@ -130,9 +119,6 @@ def offene_stellen(root: Path) -> list[tuple[str, str]]:
             continue
         offen.extend((schluessel, name) for name in text.luecken)
     return offen
-
-
-# ------------------------------------------------------------ Einwilligung --
 
 
 @dataclass

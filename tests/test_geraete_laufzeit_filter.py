@@ -42,11 +42,6 @@ def _k(anbieter, tarif, lz, zustand="neu"):
     }
 
 
-# --------------------------------------------------------------------------
-# Python: wer steht unter welcher Wahl
-# --------------------------------------------------------------------------
-
-
 def test_jede_wahl_zeigt_je_angebot_genau_eine_zeile():
     cs24, cs36 = _k("congstar", "XS", 24), _k("congstar", "XS", 36)
     o2 = _k("o2", "M", 36)
@@ -61,7 +56,6 @@ def test_jede_wahl_zeigt_je_angebot_genau_eine_zeile():
     assert vf12["laufzeit_sichtbar"] == "12"
     assert vf24["laufzeit_sichtbar"] == "24 36"
     assert ref["laufzeit_sichtbar"] == "", "ohne Raten gehoert sie zu keiner Wahl"
-    # Gegenprobe: je Wahl und Angebot genau EINE Zeile.
     for lz in ("12", "24", "36"):
         je_angebot: dict = {}
         for k in alle[:-1]:
@@ -90,12 +84,7 @@ def test_fehlt_die_standardlaufzeit_gilt_die_naechste_kuerzere():
     assert karten.LAUFZEIT_STANDARD == 24
 
 
-# --------------------------------------------------------------------------
-# Browser
-# --------------------------------------------------------------------------
-
 _GERAET = "apple-iphone-17-pro"
-# (anbieter, tarif_id, tarif, laufzeit, rate, aktionen)
 _BUENDEL = [
     (
         "congstar",
@@ -180,7 +169,6 @@ def _baue(tmp_path):
         encoding="utf-8",
     )
     tarife = {tid: (a, tarif) for a, tid, tarif, *_ in _BUENDEL}
-    # P3-E1: die Testleiter (XS 5 / M 36 / L 85 GB) legt 15 GB in XS.
     (state / "tarife.jsonl").write_text(
         "\n".join(
             json.dumps(t)
@@ -256,8 +244,6 @@ def seite(_browser_seite, request):
         s.close()
 
 
-# Sichtbarkeit wird im Browser GEMESSEN (Boxhoehe), nicht am Attribut -
-# CLAUDE.md, Tests und Abnahme.
 _SICHTBAR = """() => Array.from(document.querySelectorAll('#gr-bnd-gruppe .gr-bnd'))
   .filter(z => z.getBoundingClientRect().height > 0)
   .map(z => z.dataset.anbieter + ' ' + z.querySelector('.gr-bnd-raten')
@@ -317,7 +303,6 @@ def test_der_trade_in_steht_neben_der_leitzahl_und_im_rechenweg(seite):
         zeile.query_selector(".gr-bnd-aktion").inner_text()
         == "bis −324,00 € mit Altgerät"
     )
-    # Die Leitzahl ist die ohne Eintausch: 1 + 24 x 41,25 + 24 x 24.
     assert "1.567,00 €" in zeile.query_selector(".gr-bnd-tco").inner_text()
     zeile.query_selector("summary").click()
     seite.wait_for_timeout(150)
@@ -328,7 +313,6 @@ def test_der_trade_in_steht_neben_der_leitzahl_und_im_rechenweg(seite):
         .get_attribute("href")
         .startswith("https://www.congstar.de/")
     )
-    # Gegenprobe: die 36-Monats-Zeile ohne Aktion traegt keinen Ueberhang.
     _waehle(seite, "36")
     ohne = seite.query_selector(
         "#gr-bnd-gruppe .gr-bnd[data-anbieter='congstar']:not([hidden])"

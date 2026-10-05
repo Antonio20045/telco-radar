@@ -50,15 +50,10 @@ from telco_radar.tco_model import Buendel, SimOnlyReferenz, zeitraum_vergleichba
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 HEUTE = "2026-09-08"
 
-SKU_M1 = "apple-iphone-15-128gb-schwarz"  # o2 im Band XS, guenstiger
-SKU_M2 = "apple-iphone-15-256gb-schwarz"  # o2 im Band XS, teurer
-SKU_M3 = "apple-iphone-16-pro-max-256gb-schwarz"  # o2 nur in der Stufe L
-SKU_M4 = "apple-iphone-15-512gb-schwarz"  # ohne Vodafone-Basis
-
-
-# --------------------------------------------------------------------------
-# Konstruierte Faelle: echter Weg ueber karten.modelle()
-# --------------------------------------------------------------------------
+SKU_M1 = "apple-iphone-15-128gb-schwarz"
+SKU_M2 = "apple-iphone-15-256gb-schwarz"
+SKU_M3 = "apple-iphone-16-pro-max-256gb-schwarz"
+SKU_M4 = "apple-iphone-15-512gb-schwarz"
 
 
 def _tarife() -> list[dict]:
@@ -81,7 +76,6 @@ def _tarife() -> list[dict]:
             "fundstellen": {},
         }
 
-    # vf:xs mit abgedeckten Phasen (die Naehrung rechnet phasengewichtet)
     xs = satz("Vodafone", "Vodafone Mobil XS", "vf:xs", 18, 29.95)
     xs["preisphasen"] = [
         {"von_monat": 1, "bis_monat": 24, "betrag": 29.95},
@@ -89,11 +83,6 @@ def _tarife() -> list[dict]:
     ]
     return [
         xs,
-        # P3-E1: die Vodafone-Tarifleiter "mit Smartphone" - XS 18,
-        # M 60, L 100 GB. Damit liegen die Stufen, wo die alten festen
-        # Baender lagen: 10/12/18 GB in XS, 40/60 GB in M, 80/100 GB
-        # in L (80 GB liegt je 20 GB von M und L, Gleichstand zaehlt
-        # zur groesseren Stufe).
         satz("Vodafone", "Vodafone Mobil XS mit Smartphone", "vf:xs-sp", 18, 29.95),
         satz("Vodafone", "Vodafone Mobil M mit Smartphone", "vf:m-sp", 60, 39.95),
         satz("Vodafone", "Vodafone Mobil L mit Smartphone", "vf:l-sp", 100, 49.95),
@@ -172,13 +161,6 @@ def _bestand():
         _listung("o2", SKU_M4, 649.00),
     ]
     buendel = [
-        # M1: Vodafone hat ZWEI echte Bündel (vf:xs in XS, vf:m in M),
-        # o2 führt XS (ZWEI Tarife: o2:k und o2:k2 - derselbe
-        # Dedupe-Schluessel wie eine Farbe, also wirklich zwei Karten im
-        # SELBEN Band) UND M. GEMEINSAME Stufen sind XS und M
-        # - RAD-1b: JEDE gemeinsame Karte wird ein Paar, die XS-Zeilen
-        # rechnen gegen die VF-Karte in Stufe XS, die M-Zeile gegen
-        # die in Stufe M.
         _buendel(
             SKU_M1, "vf:xs", "Vodafone Mobil XS", 29.95, 30.0, anbieter="Vodafone"
         ),
@@ -186,18 +168,9 @@ def _bestand():
         _buendel(SKU_M1, "o2:k", "O2 Mobile S", 9.99, 1.0),
         _buendel(SKU_M1, "o2:k2", "O2 Mobile S Plus", 12.99, 1.5),
         _buendel(SKU_M1, "o2:m", "O2 Mobile M", 19.99, 2.0),
-        # M2: KEIN echtes VF-Bündel, nur die Näherung (Barpreis plus
-        # SIM-only-Referenz) im Band XS - o2 im selben Band, deutlich
-        # teurer -> POSITIVE Abweichung ueber den Basis-Pfad.
         _buendel(SKU_M2, "o2:k", "O2 Mobile S", 49.99, 80.0, laufzeit=36),
-        # M3: zwei o2-Buendel in ZWEI Tarifen der Stufe L (derselbe
-        # Tarifname wuerde im Dedupe-Schluessel kollidieren) - Vodafone
-        # fuehrt das Geraet nur im Band XS -> Band-Mismatch, die
-        # GUENSTIGSTE der beiden Karten ist die Belegzeile.
         _buendel(SKU_M3, "o2:g", "O2 Mobile L", 39.99, 5.0, zuzahlung=0.0),
         _buendel(SKU_M3, "o2:g2", "O2 Mobile L Plus", 44.99, 5.0, zuzahlung=50.0),
-        # M4: o2-Buendel im Band M, aber KEIN Vodafone-Preis -> keine
-        # Basis, keine Abweichung, trotzdem alle drei Zeilen.
         _buendel(SKU_M4, "o2:m", "O2 Mobile M", 19.99, 10.0),
     ]
     referenzen = [
@@ -262,14 +235,12 @@ def test_sortierung_negativste_abweichung_zuerst():
 
     raenge = [g["rang"] for g in alle]
     assert raenge == sorted(raenge), "Gruppen muessen aufsteigend nach Rang stehen"
-    # Der konstruierte Fall: M1 (negativ) vor M2 (positiv) vor M3/M4 (inf).
     ids = [g["id"] for g in alle if g["rang"] != float("inf")]
     assert ids.index("apple-iphone-15-128") < ids.index("apple-iphone-15-256")
 
     for g in alle:
         werte = [z["prozent"] for z in g["zeilen"] if z["prozent"] is not None]
         assert werte == sorted(werte), f"Zeilen in {g['id']} unsortiert"
-        # Zeilen ohne Zahl stehen HINTER jeder Zeile mit Zahl.
         erste_luecke = next(
             (i for i, z in enumerate(g["zeilen"]) if z["prozent"] is None),
             len(g["zeilen"]),
@@ -296,9 +267,6 @@ def test_kein_buendel_nennt_alle_drei_wettbewerber():
         if g["vodafone"] is None:
             assert len(g["zeilen"]) == 3, gid
 
-    # Die zwei konstruierten Lueckenfaelle: ohne o2-Karte ueberhaupt
-    # (M1: Telekom und 1&1) und ohne Vodafone-Basis (M4: alle drei ohne
-    # Abweichung, weil es nichts gibt, wogegen man rechnen koennte).
     m1 = gruppen["apple-iphone-15-128"]
     telekom = next(z for z in m1["zeilen"] if z["anbieter"] == "Telekom")
     assert telekom["status"] == wr.STATUS_KEIN_BUENDEL
@@ -373,9 +341,6 @@ def test_zwei_karten_im_selben_band_werden_zwei_paare():
         and z["status"] == wr.STATUS_VERGLEICHBAR
     ]
     assert len(paare_klein) >= 2, f"nur {len(paare_klein)} Paar-Zeilen in der Stufe XS"
-    # Jede Zeile nennt IHRE Karte: die Gesamtbeträge der Zeilen sind
-    # genau die der Karten (beide Richtungen - keine Karte doppelt,
-    # keine Karte vergessen).
     assert {z["gesamt"] for z in paare_klein} == {k["gesamt"] for k in karten_klein}
     assert len({z["tarif"] for z in paare_klein}) == len(paare_klein), (
         "Paare ohne unterscheidbaren Tarif - die Spalte taugte nichts"
@@ -405,11 +370,9 @@ def test_vergleichbarkeit_nur_im_gemeinsamen_band():
         assert z["vf_gesamt"] is not None
         vf_echt = (je_band.get(z["band"]) or {}).get("Vodafone")
         if vf_echt is not None and vf_echt.get("vergleichbar", True):
-            # Paar-Pfad: Gegenkarte ist Vodafones Karte in diesem Band.
             paar_pfad += 1
             assert z["vf_gesamt"] == vf_echt["gesamt"]
         else:
-            # Basis-Pfad: die Zeile ist im Band der Vodafone-Basis.
             basis_pfad += 1
             assert z["band"] == g["vodafone"]["band"]
             assert z["vf_gesamt"] == g["vodafone"]["gesamt"]
@@ -417,11 +380,6 @@ def test_vergleichbarkeit_nur_im_gemeinsamen_band():
         "beide Pfade muessen konstruiert eintreten, sonst prueft die Verzweigung nichts"
     )
 
-    # RAD-1b: MEHRERE gemeinsame Bänder liefern MEHRERE Paare - M1 hat
-    # Klein und Mittel gemeinsam, also steht eine o2-Zeile je Band, und
-    # JEDE rechnet gegen die VF-Karte IHRES Bandes (Klein gegen die
-    # günstigste VF-Karte Klein - das ist zugleich die Basis -, Mittel
-    # gegen die VF-Karte Mittel, nicht gegen die billigere Basis).
     m1 = gruppen["apple-iphone-15-128"]
     o2_zeilen = [
         z
@@ -446,8 +404,6 @@ def _zweitmarken_bestand():
     exakte Anbietermenge der drei Netzbetreiber fest, und genau die ist
     der Zustand VOR der Zweitmarkenregel."""
     tarife = {t["tarif_id"]: t for t in _tarife()}
-    # congstar-Tarif im Band XS (10 GB, wie o2:k) - dasselbe Band wie
-    # vf:xs, also entsteht das Paar auf dem gemeinsamen Band-Pfad.
     tarife["cs:s"] = {
         "anbieter": "congstar",
         "name": "Allnet Flat S",
@@ -475,8 +431,6 @@ def _zweitmarken_bestand():
         _buendel(
             SKU_M2, "vf:xs", "Vodafone Mobil XS", 29.95, 40.0, anbieter="Vodafone"
         ),
-        # M4 ohne jeden Vodafone-Preis: der Basis-los-Zweig. congstar MIT
-        # Karte - auch hier zaehlt die Karte, nicht die Marke.
         _buendel(SKU_M4, "cs:s", "Allnet Flat S", 12.0, 10.0, anbieter="congstar"),
     ]
     referenzen = [
@@ -506,8 +460,6 @@ def test_zweitmarke_steht_nur_mit_karte_da():
     modelle, band_je_tarif = _zweitmarken_bestand()
     gruppen = {g["id"]: g for g in wr.netzbetreiber_gruppen(modelle, band_je_tarif)}
 
-    # Gegenproben: die Fixture loest beide Faelle wirklich aus (Lektion
-    # aus dem Adapter-Befund - eine Fixture ohne den Fall beweist nichts).
     m1_modell = next(m for m in modelle if m["id"] == "apple-iphone-15-128")
     assert any(k["anbieter"] == "congstar" for k in m1_modell["karten"]), (
         "Fixture prueft nichts: congstar-Karte auf M1 fehlt"
@@ -515,7 +467,6 @@ def test_zweitmarke_steht_nur_mit_karte_da():
     m2_modell = next(m for m in modelle if m["id"] == "apple-iphone-15-256")
     assert not any(k["anbieter"] == "congstar" for k in m2_modell["karten"])
 
-    # M1: Paar im gemeinsamen Band XS, mit Tarif und Beleg.
     m1 = gruppen["apple-iphone-15-128"]
     assert m1["vodafone"] is not None
     congstar = [z for z in m1["zeilen"] if z["anbieter"] == "congstar"]
@@ -526,14 +477,10 @@ def test_zweitmarke_steht_nur_mit_karte_da():
     assert congstar[0]["prozent"] is not None
     assert congstar[0]["quelle_url"].endswith("/cs:s/" + SKU_M1)
 
-    # M2: congstar-Karte fehlt -> KEINE Zeile, kein Platzhalter. Die drei
-    # Netzbetreiber stehen da wie bisher.
     m2 = gruppen["apple-iphone-15-256"]
     assert "congstar" not in {z["anbieter"] for z in m2["zeilen"]}
     assert set(wr.NETZ_WETTBEWERBER) <= {z["anbieter"] for z in m2["zeilen"]}
 
-    # M4: keine VF-Basis - congstar trotzdem mit ZAHL (seine guenstigste
-    # Karte), die Netzbetreiber ohne.
     m4 = gruppen["apple-iphone-15-512"]
     assert m4["vodafone"] is None
     zeilen_congstar = [z for z in m4["zeilen"] if z["anbieter"] == "congstar"]
@@ -546,11 +493,6 @@ def test_zweitmarke_steht_nur_mit_karte_da():
         nb = next(z for z in m4["zeilen"] if z["anbieter"] == a)
         assert nb["status"] == wr.STATUS_KEIN_BUENDEL
         assert nb["gesamt"] is None
-
-
-# --------------------------------------------------------------------------
-# Haendler und nicht Erhebbare (reine Leseschichten)
-# --------------------------------------------------------------------------
 
 
 def _vergleich_fixture() -> dict:
@@ -574,9 +516,6 @@ def _vergleich_fixture() -> dict:
                         "url": "https://example.de/saturn",
                         "abgerufen_am": HEUTE,
                     },
-                    # Ein Netzbetreiber ist kein Haendler - seine TCO steht in der
-                    # anderen Sektion, hier hat er nichts verloren (§3: Zahlen,
-                    # nie vermischt).
                     {
                         "typ": "netzbetreiber",
                         "laden": "o2",
@@ -615,7 +554,6 @@ def test_haendler_vergleichen_nur_geraetepreise():
             (z["preis"] - z["vodafone_preis"]) / z["vodafone_preis"] * 100, 1
         )
     assert zeilen[0]["prozent"] < 0 < zeilen[1]["prozent"]
-    # Aufsteigend: der guenstigste Haendler (die Meldung) zuerst.
     assert [z["prozent"] for z in zeilen] == sorted(z["prozent"] for z in zeilen)
 
 
@@ -662,16 +600,12 @@ def test_nicht_erhobene_wettbewerber_stehen_namentlich_dabei():
     darin."""
     fehlt = wr.nicht_erhebbar(_quellenlage_fixture())
     namen = [f["anbieter"] for f in fehlt]
-    assert namen == ["Amazon", "Euronics", "MediaMarkt", "expert"]  # sortiert
+    assert namen == ["Amazon", "Euronics", "MediaMarkt", "expert"]
     for f in fehlt:
         assert f["grund"], f"{f['anbieter']} ohne Grund"
     assert "Saturn" not in namen
     assert "o2" not in namen
 
-
-# --------------------------------------------------------------------------
-# Das gerenderte Artefakt (tmp_path, eigene Konfiguration nach §8)
-# --------------------------------------------------------------------------
 
 _KATALOG = {
     "geraete": [
@@ -686,8 +620,6 @@ _KATALOG = {
     ]
 }
 _FARBEN = {"farben": {"schwarz": ["Schwarz", "Black"]}}
-# Die vier nicht erhebbaren Haendler des §8 stehen WOERTLICH in der
-# Konfiguration - genau wie im echten config/geraete_quellen.yaml.
 _QUELLEN = {
     "anbieter": [
         {
@@ -793,7 +725,6 @@ def _seite(tmp_path: pathlib.Path) -> dict[str, str]:
         _listung("Vodafone", SKU_M1, 709.90),
         _listung("Saturn", SKU_M1, 679.90),
     ]
-    # Saturn ist Haendler - derselbe Anbietertyp wie im echten Bestand.
     listungen[1]["anbieter_typ"] = "handel"
     (state / "geraete_db.json").write_text(
         json.dumps(
@@ -952,9 +883,6 @@ def test_auf_der_seite_fehlt_kein_netzbetreiber(tmp_path):
     die Modell-Liste mit ihren Aufklappzeilen der Ort - derselbe Test
     auch in tests/test_geraete_radar_tafel.py.)"""
     suppe = BeautifulSoup(_tafel(_seite(tmp_path)), "html.parser")
-    # `.gr-a-zeile` ist auf dieser Seite MEHRDEUTIG (Alarm- und Modell-
-    # Listen-Zeilen) - der Selektor steht im Kontext der Abweichungs-
-    # Sektion, sonst griffe er die Alarmtabelle (CLAUDE.md-Klassen-Falle).
     gruppen = suppe.select("#wr-abweichung tr.gr-a-zeile[data-auf]")
     assert gruppen, "keine Modell-Zeile gerendert - Test prueft nichts"
     for z in gruppen:
@@ -982,8 +910,6 @@ def test_die_seite_zeigt_den_tarif_jeder_karte(tmp_path):
     assert "O2 Mobile S" in tarife, (
         "der Tarif der o2-Karte steht nicht in der Tarif-Spalte"
     )
-    # Zeilen ohne Karte tragen keinen Tarif - dort steht das Gedankenstrich-
-    # Zeichen, nie ein leerer Pfad.
     assert all(t for t in tarife), "leere Tarif-Zelle gerendert"
 
 
@@ -1019,8 +945,6 @@ def test_die_geraeteseite_traegt_den_fusslink(tmp_path):
     dieselbe Antwort (Navigation 8 → 7)."""
     seiten = _seite(tmp_path)
     geraete = BeautifulSoup(seiten["geraete.html"], "html.parser")
-    # Seit 28.09.2026 traegt der Reiter „Übersicht" den Weg selbst; der
-    # doppelte Fusslink auf dieselbe Tafel ist gefallen.
     knopf = geraete.select_one('.gr-reiter button[data-tafel="tafel-radar"]')
     assert knopf is not None, "geraete.html springt nicht in den Radar-Reiter"
     assert geraete.select_one("#tafel-radar") is not None
@@ -1031,11 +955,6 @@ def test_die_geraeteseite_traegt_den_fusslink(tmp_path):
         if a.get("href") == "wettbewerbsradar.html"
     ]
     assert not navlinks, "die Navigation verlinkt noch die Alt-URL statt des Reiters"
-
-
-# --------------------------------------------------------------------------
-# Der echte Bestand: Invarianten, keine Tageszaehlungen
-# --------------------------------------------------------------------------
 
 
 @pytest.fixture(scope="module")
@@ -1066,10 +985,6 @@ def test_am_echten_bestand_nennt_jede_gruppe_alle_drei_wettbewerber(echt):
     vorher war congstar Bestandteil dieser Gleichung, weil er leer war."""
     gruppen = echt["radar"]["gruppen"]
     assert gruppen, "kein Modell im Bestand - der Test pruefte nichts"
-    # Die Gruppe selbst traegt KEINE karten (nur id/titel/.../zeilen) - die
-    # Karten haengen am MODELL. Der Lookup laeuft ueber die Modell-ID, und
-    # die Zuordnung wird gegenzaehlt (CLAUDE.md §6: ein Lookup, der ins
-    # Leere geht, ist gruen und prueft nichts).
     modelle_je_id = {m["id"]: m for m in echt["modelle"]}
     assert len(modelle_je_id) == len(echt["modelle"])
     zugeordnet = [modelle_je_id.get(g["id"]) for g in gruppen]
@@ -1168,8 +1083,6 @@ def test_am_echten_bestand_steht_jedes_band_paar_auf_der_seite(echt):
     assert gezeichnet == paare, (
         f"{paare - gezeichnet} Paare im Bestand fehlen auf der Seite"
     )
-    # Gegenprobe zur Sperre: jede gesperrte Karte steht MIT GRUND da -
-    # ein stiller Verlust waere derselbe Befund mit anderem Vorzeichen.
     assert fremder_zeitraum, (
         "keine Karte mit fremdem Zeitraum im Bestand - die Gegenprobe prueft nichts"
     )
@@ -1201,10 +1114,6 @@ def test_am_echten_bestand_ist_jede_zahl_gegen_die_vf_zahl_im_selben_band(echt):
         modell = by_id[g["id"]]
         je_band = band.karten_je_band(modell, echt["band_je_tarif"])
         vf_echt = (je_band.get(z["band"]) or {}).get("Vodafone")
-        # Dieselbe Bedingung wie die Auswahlregel im Radar: nur eine
-        # VERGLEICHBARE (neues Geraet) VF-Karte eroeffnet den Paar-Pfad -
-        # eine refurbished VF-Karte im Slot wuerde sonst die Invariante
-        # gegen einen korrekt ueber die Basis gerechneten Zeile drehen.
         if vf_echt is not None and vf_echt.get("vergleichbar", True):
             assert z["vf_gesamt"] == vf_echt["gesamt"]
         else:
@@ -1248,23 +1157,6 @@ def test_am_echten_bestand_stehen_die_vier_nicht_erhebbaren(echt):
     assert {"Amazon", "MediaMarkt", "expert", "Euronics"} <= namen, namen
     for f in echt["radar"]["nicht_erhebbar"]:
         assert f["grund"], f"{f['anbieter']} ohne Grund"
-
-
-# ==========================================================================
-# P0-B-h3 (21.09.2026, Befund 1): DAS HORIZONT-TOR IM RADAR
-#
-# `_zeile_fuer_anbieter` und `_paar_zeile` bildeten `prozent` ohne einen
-# Blick auf den Zeitraum der zwei Zahlen. Gemessen am gerenderten Bestand
-# vom 21.09.2026: 26 Radarzeilen trugen ein Vorzeichen fuer ein Angebot,
-# dessen Buendelzeile auf DERSELBEN Seite "andere Laufzeit" sagte -
-# darunter Google Pixel 11 512 GB mit data-s-prozent="-0.7" bei
-# data-s-gesamt="1835.54" (1&1, 36 Monate) gegen data-s-vf="1847.8"
-# (Vodafone, 24 Monate). Allein die zwoelf Tarifmonate jenseits des
-# Horizonts sind groesser als dieses Delta.
-#
-# Gefragt wird DIE EINE Regel (`tco_model.zeitraum_vergleichbar`) - kein
-# zweites Tor daneben.
-# ==========================================================================
 
 
 def _h3_karte(anbieter, gesamt, monate, tarif_id="o2:k"):
@@ -1311,13 +1203,9 @@ def test_h3_kein_vorzeichen_gegen_eine_basis_mit_anderem_zeitraum():
     )
     assert zeile["prozent"] is None, "ueber zwei Zeitraeume gibt es kein Vorzeichen"
     assert zeile["status"] == wr.STATUS_NICHT_VERGLEICHBAR
-    # Der Strich heisst auf dieser Seite "kein Angebot" (A2) - hier IST
-    # ein Angebot, und die Zahl bleibt mit Beleg stehen.
     assert zeile["gesamt"] == 1835.54 and zeile["vf_gesamt"] == 1847.80
     assert zeile["quelle_url"] and zeile["abgerufen_am"]
-    # Der Grund NENNT beide Zeitraeume (nie eine stille Null).
     assert "36 Monate" in zeile["grund"] and "24 Monate" in zeile["grund"]
-    # Gegenprobe: dieselben Zahlen ueber denselben Zeitraum sind ein Paar.
     gleich = wr._zeile_fuer_anbieter(
         "1&1", _h3_karte("1&1", 1835.54, 24), _h3_basis(1847.80, 24), {"o2:k": "xs"}
     )
@@ -1338,7 +1226,6 @@ def test_h3_kein_vorzeichen_zwischen_zwei_karten_mit_anderem_zeitraum():
     assert zeile["prozent"] is None
     assert zeile["status"] == wr.STATUS_NICHT_VERGLEICHBAR
     assert "36 Monate" in zeile["grund"] and "24 Monate" in zeile["grund"]
-    # Gegenprobe: gleicher Zeitraum, dasselbe Zahlenpaar -> Vorzeichen.
     gleich = wr._paar_zeile("1&1", "xs", _h3_karte("1&1", 1299.54, 24), vf)
     assert gleich["status"] == wr.STATUS_VERGLEICHBAR
     assert gleich["prozent"] == -9.4
@@ -1370,7 +1257,6 @@ def test_h3_ein_fremder_zeitraum_faellt_aus_der_rangfolge():
     assert zeile["prozent"] is None and zeile["prozent_text"] == ""
     assert zeile["euro"] is None, "auch kein Euro-Abstand ueber zwei Zeitraeume"
     assert zeile["luecke"] == "nicht vergleichbar"
-    # Der Grund steht in der Aufklappzeile - vollstaendig, nicht gekappt.
     assert "36 Monate" in zeile["gruppe_zeilen"][0]["grund"]
 
 
@@ -1395,9 +1281,6 @@ def test_h3_am_echten_bestand_traegt_keine_prozentzahl_zwei_zeitraeume(echt):
                 f"{g['id']}/{z['anbieter']}: keine Karte zu {z['gesamt']} - "
                 "der Lookup greift ins Leere"
             )
-            # Die Vodafone-Gegenzahl der Zeile, gesucht ueber ihren Betrag:
-            # entweder eine eigene Karte (Paar-Pfad) oder die Basis des
-            # Modells (Referenz-Pfad).
             vf = [
                 k
                 for k in modell["karten"]

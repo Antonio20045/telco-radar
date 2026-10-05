@@ -19,21 +19,9 @@ from .newsroom_js import collect_newsroom_js
 log = logging.getLogger(__name__)
 
 
-# Harte Frist je Quelle. Im Lauf #75 brauchte EINE tote Quelle (KT, mit
-# timeout_seconds: 30 und der vollen Retry-Leiter) 302,6 s - und die gesamte
-# Sammelphase dauerte 303,7 s. Bei 1000 Quellen hilft keine Parallelitaet
-# gegen den langsamsten Einzelfall, also bekommt jede Quelle einen Deckel.
-# 75 s lassen einer wirklich langsamen Quelle zwei volle Versuche mit 30 s.
 _QUELLEN_FRIST = 75.0
 
 
-# Gleichzeitige Headless-Browser. Anders als ein HTTP-Abruf ist ein
-# newsroom_js-Abruf NICHT reine Wartezeit: jeder startet einen Chromium und
-# rendert eine Seite, und der GitHub-Runner hat zwei Kerne. Im Diagnoselauf
-# #74 (05.08.2026) fiel bei 64 Workern Viettel mit "Page.goto: Timeout 16000ms
-# exceeded" aus, das bei 8 Workern durchlief - die Seite war nicht langsamer,
-# der Rechner war voll. Die Zahl der Worker darf also steigen, die Zahl
-# gleichzeitiger Renderings nicht.
 _JS_GLEICHZEITIG = threading.BoundedSemaphore(4)
 
 
@@ -58,14 +46,8 @@ def _dispatch(
     else:
         items = collect_newsroom(source, region, operator, origin, http_cfg)
     if source.exclude_url_pattern:
-        # e.g. Verizon mirrors 7 of every 25 releases in Spanish under
-        # /about/news/es/ - a different URL, so the seen-store treats it as a
-        # separate story and the same news enters the report twice.
         drop = re.compile(source.exclude_url_pattern)
         items = [i for i in items if not drop.search(i.url)]
-    # Zentral statt in jedem Collector: die Trefferquote je KANAL braucht die
-    # Quellen-URL, und ein Betreiber mit Newsroom plus Investor Relations
-    # traegt in beiden denselben source_name.
     for item in items:
         item.source_url = source.url
     return items
@@ -122,22 +104,11 @@ def collect_all(
         for src in op.crawled_sources:
             jobs.append((src, op.region_key, op.name, "operator"))
     for src in cfg.news_sources:
-        # Eine regionale Fachpressequelle berichtet ueber ihre Region, auch
-        # wenn keine Ueberschrift einen Betreibernamen nennt. Ohne diese
-        # Vorgabe landete alles unter "Global" - Lauf #75 schloss Europa mit
-        # NULL bewerteten Meldungen ab, waehrend Global 62 von 92 bekam.
         jobs.append((src, src.region or "global", None, "industry_news"))
-    # Themenquellen laufen unter ihrem Themenschluessel als "Region" - so
-    # bekommt jedes Themenfeld einen eigenen Analysten, ohne dass die
-    # Regionslogik der Watchlist es fuer einen Betreiber haelt.
     for src in cfg.tech_sources:
         if src.crawlable:
             jobs.append((src, src.theme, src.name, "tech_watch"))
 
-    # Stillgelegte Quellen ueberspringen. Das ist bei 1000 Quellen kein
-    # Komfort, sondern Laufzeit: eine tote Quelle, die in jeden Timeout
-    # laeuft, kostet mehr als eine lebende. Der Bewaehrungsabruf (siehe
-    # quellen_register.py) holt sie regelmaessig zurueck in die Liste.
     uebersprungen: list[dict] = []
     if register is not None:
         aktiv = []
@@ -182,7 +153,7 @@ def collect_all(
         try:
             got = _collect_source(src, region, operator, origin, http_cfg)
             return got, time.monotonic() - t0, None
-        except Exception as exc:  # noqa: BLE001 - resilience by design
+        except Exception as exc:  # noqa: BLE001
             return None, time.monotonic() - t0, exc
 
     items: list[Item] = []
@@ -252,8 +223,6 @@ def collect_all(
     return items, results
 
 
-# Single words that are too ambiguous in headlines to identify an operator
-# on their own (multi-word terms containing them are still fine).
 _AMBIGUOUS_TERMS = {
     "spark",
     "tim",

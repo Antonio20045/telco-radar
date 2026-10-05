@@ -66,11 +66,6 @@ def _bericht(**kw) -> dict:
     return d
 
 
-# --------------------------------------------------------------------------- #
-# Kuerzen: Modelltext, der ueberlaeuft, wird nicht durchgereicht
-# --------------------------------------------------------------------------- #
-
-
 def test_kuerze_bleibt_unter_der_grenze():
     lang = "Wort " * 100
     assert len(kuerze(lang, 40)) <= 40
@@ -90,11 +85,6 @@ def test_kuerze_zieht_leerraum_zusammen():
 
 def test_kuerze_vertraegt_none():
     assert kuerze(None, 10) == ""
-
-
-# --------------------------------------------------------------------------- #
-# Die Budgets werden eingehalten - das ist die Zusage dieses Moduls
-# --------------------------------------------------------------------------- #
 
 
 def test_kein_platzhalter_reisst_sein_budget():
@@ -172,11 +162,6 @@ def test_ueberlauf_bricht_hart_ab(monkeypatch):
         )
 
 
-# --------------------------------------------------------------------------- #
-# Sortierung und Herkunft der Texte
-# --------------------------------------------------------------------------- #
-
-
 def test_ctm_bezug_bestimmt_die_reihenfolge():
     satz = inhalt(_bericht())
     assert satz.was_passiert[0].startswith("Telekom bündelt")
@@ -239,17 +224,10 @@ def test_kaputte_relevanz_kippt_die_sortierung_nicht():
     assert inhalt(bericht).was_passiert[0] == "B"
 
 
-# --------------------------------------------------------------------------- #
-# Die Quellenfolie ist Pflicht
-# --------------------------------------------------------------------------- #
-
-
 def test_quellenfolie_ist_immer_da():
     """baue() hat keinen Schalter dafuer, und das ist Absicht: das ganze
     Projekt haengt an der Nachpruefbarkeit jeder Aussage."""
     deck = baue(_bericht())
-    # Nicht auf den Klartext der Headline pruefen: _akzent() setzt ein Wort
-    # in ein <span>, und dann steht die Zeile nicht mehr am Stueck da.
     assert '<ul class="quellen">' in deck
     assert "steht in einer der oben verlinkten Quellen" in deck
     assert 'href="https://example.de/a"' in deck
@@ -268,16 +246,9 @@ def test_jede_meldung_der_folien_hat_ihre_quelle():
         assert url in deck
 
 
-# --------------------------------------------------------------------------- #
-# Das Deck als Datei
-# --------------------------------------------------------------------------- #
-
-
 def test_deck_ist_eine_datei_ohne_fremde_abhaengigkeiten():
     deck = baue(_bericht())
     assert deck.startswith("<!DOCTYPE html>")
-    # Inter per Google Fonts ist in der Design-Spezifikation ausdruecklich
-    # vorgesehen; sonst nichts Fremdes.
     fremde = [
         z
         for z in deck.splitlines()

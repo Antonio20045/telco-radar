@@ -45,7 +45,7 @@ def test_viele_billige_503_werden_durchgehalten(monkeypatch, _fast):
 
     def post(url, **kw):
         calls["n"] += 1
-        _fast["t"] += 0.4  # ein 503 kommt sofort zurueck
+        _fast["t"] += 0.4
         if calls["n"] <= 6:
             return _resp(503, BUSY)
         return _resp(200, '{"choices":[{"message":{"content":"fertig"}}]}')
@@ -64,7 +64,7 @@ def test_langsame_timeouts_brechen_schnell_ab(monkeypatch, _fast):
 
     def post(url, **kw):
         calls["n"] += 1
-        _fast["t"] += 180.0  # volles HTTP-Timeout verbrannt
+        _fast["t"] += 180.0
         raise httpx.ReadTimeout("The read operation timed out")
 
     monkeypatch.setattr(llm.httpx, "post", post)
@@ -105,7 +105,6 @@ def test_timeout_default_ist_nicht_mehr_gesenkt(monkeypatch):
     assert llm.call_budget() == 300.0
 
 
-# ------------------------------------------------- Leeres Guthaben (402)
 BEZAHLUNG = (
     '{"error":{"message":"Insufficient Balance","type":'
     '"unknown_error","code":"invalid_request_error"}}'
@@ -126,7 +125,7 @@ def test_ein_402_wird_nicht_ein_einziges_mal_wiederholt(monkeypatch, _fast):
 
     def post(url, **kw):
         calls["n"] += 1
-        _fast["t"] += 0.8  # ein 402 kommt sofort zurueck: "billig"
+        _fast["t"] += 0.8
         return _resp(402, BEZAHLUNG)
 
     monkeypatch.setattr(llm.httpx, "post", post)

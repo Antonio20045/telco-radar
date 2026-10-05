@@ -44,8 +44,6 @@ from pathlib import Path
 from ..textwerkzeug import begriffs_muster
 from .config import DIMENSIONEN, NewsletterKatalog
 
-# ============================================================  Eintraege  ===
-
 
 @dataclass
 class Eintrag:
@@ -64,12 +62,12 @@ class Eintrag:
     text: str
     url: str
     absender: str = ""
-    region: str = ""  # Schluessel, nicht Label
+    region: str = ""
     ressort: str = ""
     betreiber: str = ""
-    gewicht: int = 0  # groesser = wichtiger; sortiert die Ausgabe
+    gewicht: int = 0
     datum: str = ""
-    anker: str = ""  # Sprungziel im Webbericht
+    anker: str = ""
 
     @property
     def suchtext(self) -> str:
@@ -86,21 +84,18 @@ class Treffer:
     """Ein Eintrag samt der Begruendung, warum er in dieser Ausgabe steht."""
 
     eintrag: Eintrag
-    grund: str  # "filter" | "stichwort"
-    stichwort: str = ""  # nur bei grund == "stichwort"
+    grund: str
+    stichwort: str = ""
 
     @property
     def ueber_stichwort(self) -> bool:
         return self.grund == "stichwort"
 
 
-# ===========================================================  Stichwoerter ==
-
-
 @dataclass(frozen=True)
 class Stichwort:
     term: str
-    mode: str = "word"  # "word" | "phrase"
+    mode: str = "word"
 
     def muster(self) -> re.Pattern | None:
         if self.mode == "phrase":
@@ -136,10 +131,6 @@ def stichwort_fehler(term: str, katalog: NewsletterKatalog) -> str:
     t = (term or "").strip()
     if not t:
         return "Das Stichwort ist leer."
-    # Gemessen wird das LAENGSTE Wort, nicht die ganze Eingabe: "5G in
-    # Afrika" ist als Phrase lang genug, aber sein kuerzestes Wort ist zwei
-    # Zeichen - und die Wortgrenze traegt trotzdem, weil die ganze Phrase
-    # zusammen gesucht wird.
     laengstes = max((len(w) for w in t.split()), default=0)
     if laengstes < katalog.grenzen.min_stichwort_laenge:
         return (
@@ -170,16 +161,10 @@ def lies_stichwoerter(roh) -> list[Stichwort]:
         term = term.strip()
         if not term:
             continue
-        # Die Betriebsart wird abgeleitet, wenn sie fehlt: alles mit
-        # Zwischenraum ist eine Phrase. Ein Abonnent, der "Fixed Wireless
-        # Access" eintippt, meint nicht drei Stichwoerter.
         if mode not in {"word", "phrase"}:
             mode = "phrase" if " " in term else "word"
         aus.append(Stichwort(term=term, mode=mode))
     return aus
-
-
-# ==============================================================  Filter  ====
 
 
 @dataclass
@@ -217,8 +202,6 @@ def lies_filtersatz(roh: dict, katalog: NewsletterKatalog) -> Filtersatz:
     for dimension in DIMENSIONEN:
         feld = FELD_JE_DIMENSION[dimension]
         gewaehlt = [str(k).strip() for k in (roh.get(feld) or []) if str(k).strip()]
-        # Reihenfolge und Doppelungen sind fuer die Auswahl bedeutungslos -
-        # und sie duerfen den Segmentschluessel nicht veraendern.
         werte[dimension] = tuple(sorted(set(gewaehlt)))
     return Filtersatz(
         **werte,
@@ -234,7 +217,7 @@ def _dimension_trifft(
     eintrag: Eintrag,
     katalog: NewsletterKatalog,
 ) -> bool:
-    if not gewaehlt:  # leer heisst alles
+    if not gewaehlt:
         return True
     if dimension == "bereiche":
         return eintrag.bereich in gewaehlt
@@ -248,10 +231,6 @@ def _dimension_trifft(
                 erlaubt.update(auswahl.ressorts)
         return eintrag.ressort in erlaubt
     if dimension == "wettbewerber":
-        # Betreiberfeld ODER Ueberschrift. Ohne den zweiten Weg waere jede
-        # branchenweite Meldung ("Branche", leeres Betreiberfeld) fuer jeden
-        # Wettbewerbsfilter unsichtbar - und das sind genau die Meldungen,
-        # in denen drei Anbieter gleichzeitig vorkommen.
         heu = f"{eintrag.betreiber}\n{eintrag.titel}"
         for key in gewaehlt:
             auswahl = katalog.finde("wettbewerber", key)
@@ -290,8 +269,6 @@ def waehle(
             gesehen.add(eintrag.id)
             ueber_filter.append(Treffer(eintrag=eintrag, grund="filter"))
             continue
-        # Additiv: was die Filter ausgeschlossen haben, kann ein eigenes
-        # Stichwort trotzdem hereinholen - mit Begruendung.
         for stichwort in satz.stichwoerter:
             if stichwort.trifft(eintrag.suchtext):
                 gesehen.add(eintrag.id)
@@ -308,19 +285,6 @@ def waehle(
     ueber_filter.sort(key=_rang)
     ueber_stichwort.sort(key=_rang)
     return (ueber_filter + ueber_stichwort)[:deckel]
-
-
-# ==============================  Trefferzahl-Vorschau und ihr Index  =======
-# Die Anmeldeseite ist statisch und kann kein Python aufrufen; der
-# Signup-Dienst hat die Berichtsarchive nicht. Die Vorschau zaehlt deshalb im
-# BROWSER gegen eine Indexdatei, die die Pipeline bei jedem Lauf mitschreibt.
-#
-# Der Index bildet `Wort -> Zahl der MELDUNGEN, die es enthalten` ab, nicht
-# die Zahl der Vorkommen. Das ist die Zahl, nach der ein Mensch fragt ("wie
-# viele Mails bekomme ich davon"), und nur so stimmen Browser und
-# `vorschau()` ueberein. Ein Test haelt beide gegeneinander - sonst
-# antwortet die Seite anders als der Test und beide sind fuer sich gruen
-# (dieselbe Falle wie beim Archiv-Dialog in app.js).
 
 
 def _bericht_dateien(reports_dir: Path, tage: int, heute: date | None = None):
@@ -375,28 +339,9 @@ def vorschau(
     )
 
 
-# Rueckwaertskompatibler englischer Name - so steht er im Konzept (N2).
 preview_keyword = vorschau
 
 
-# Der Tokenizer des Index - und warum es NICHT `textwerkzeug.wortmenge()` ist.
-#
-# `wortmenge()` laesst den Bindestrich INNERHALB eines Wortes zu
-# (`WORT_RE = [\w][\w-]{3,}`): "Tarif-Rabatt" ist dort EIN Wort. Das ist fuer
-# den roten Faden richtig - zusammengesetzte Begriffe sind dort das
-# aussagekraeftigere Signal.
-#
-# Der Stichwort-Matcher sieht denselben Text anders: er behandelt den
-# Bindestrich als WORTGRENZE, damit "Netzausbau" in "Glasfaser-Netzausbau"
-# trifft. Gemessen am 11.08.2026: fuer "tarif" zaehlte der Index 6 Meldungen,
-# `vorschau()` fand 13 - die sieben Differenz waren "Tarif-Rabatt",
-# "Tarif-Aktion" und Geschwister. Die Vorschau haette also die Haelfte
-# unterschlagen, und der Test dagegen waere gruen geblieben, wenn er
-# dieselbe Rechnung zweimal gemacht haette.
-#
-# `\w{4,}` liefert genau die maximalen Wortzeichen-Laeufe - und ein solcher
-# Lauf IST ein Wort nach der Grenzdefinition des Matchers. Damit stimmen
-# beide Rechnungen ueberein, und ein Test misst das im echten Browser.
 _INDEX_WORT = re.compile(r"\w{4,}", re.UNICODE)
 
 
@@ -427,8 +372,6 @@ def _neuester_bericht(reports_dir: Path) -> date | None:
     try:
         return date.fromisoformat(max(stems))
     except ValueError:
-        # Ein Stamm, der wie ein Datum aussieht und keiner ist: der Anker
-        # faellt auf die Wanduhr zurueck, statt den ganzen Index zu kosten.
         return None
 
 
@@ -450,13 +393,11 @@ def baue_stichwort_index(
     texte = _texte_aus_berichten(reports_dir, tage, heute)
     zaehler: dict[str, int] = {}
     for text in texte:
-        for wort in _index_woerter(text):  # Menge: EINE Meldung zaehlt 1
+        for wort in _index_woerter(text):
             zaehler[wort] = zaehler.get(wort, 0) + 1
     return {
         "stand": (heute or date.today()).isoformat(),
         "tage": tage,
         "meldungen": len(texte),
-        # Sortiert nach Haeufigkeit: die Datei wird von Menschen gelesen,
-        # wenn die Vorschau einmal etwas Unerwartetes sagt.
         "woerter": dict(sorted(zaehler.items(), key=lambda kv: (-kv[1], kv[0]))),
     }

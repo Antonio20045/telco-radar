@@ -34,8 +34,6 @@ HINWEIS = "neu aufnehmen mit make golden-aufnehmen"
 HERKUNFT = "_herkunft.json"
 HTTP_DATEI = "http.jsonl.gz"
 LLM_DATEI = "llm.jsonl.gz"
-# Alles, was der Lauf aus der Umgebung liest. Die Wiedergabe setzt nur die
-# Schlüssel, die bei der Aufnahme da waren, und zwar mit einem Ersatzwert.
 UMGEBUNG = (
     "LLM_API_KEY",
     "LLM_API_BASE",

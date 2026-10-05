@@ -121,11 +121,6 @@ def _antwort(*eintraege, zustand="BUNDLE"):
     )
 
 
-# --------------------------------------------------------------------------
-# Die gemessene Antwort
-# --------------------------------------------------------------------------
-
-
 def test_sechsundsechzig_buendel_aus_achtundachtzig_eintraegen():
     """22 der 88 sind Geraet PLUS Zubehoer und fallen heraus."""
     roh = json.loads(_katalog())
@@ -151,8 +146,6 @@ def test_die_aufteilung_ergibt_wieder_den_monatsbetrag():
     """
     je_sku = {h["externalId"]: h for h in json.loads(_katalog())["hardware"]}
     saetze = _saetze()
-    # Die Zeile, ohne die dieser Test nichts prueft: trifft der Schluessel
-    # nicht, ist die Schleife leer und `assert` in ihr nie ausgefuehrt.
     assert len(saetze) == 66
     for satz in saetze:
         h = je_sku[satz["sku"]]
@@ -186,14 +179,7 @@ def test_die_fixture_ist_der_unveraenderte_abruf():
     assert hashlib.sha256(roh).hexdigest() == eintrag[0]["sha256_roh"]
     assert len(roh) == eintrag[0]["bytes_roh"] == 583104
     assert eintrag[0]["http_status"] == 200
-    # Die Adresse unterscheidet sich von der produktiven NUR im fehlenden
-    # `?hwOnly=true` - beide gibt /e-shop/ selbst aus.
     assert eintrag[0]["url"] == _URL
-
-
-# --------------------------------------------------------------------------
-# Was NICHT hereinkommt
-# --------------------------------------------------------------------------
 
 
 def test_eine_hw_only_antwort_wirft_statt_leer_zu_liefern():
@@ -229,10 +215,10 @@ def test_ohne_tarifnamen_kein_buendel():
 @pytest.mark.parametrize(
     "feld,wert",
     [
-        ("geraet_mtl", "30.0"),  # Summe trifft monthlyPrice nicht mehr
+        ("geraet_mtl", "30.0"),
         ("tarif_mtl", "10.0"),
-        ("anzahlung", "5"),  # widerspricht oneTimePrice
-        ("anschluss_track", "0.0"),  # widerspricht activationFee
+        ("anzahlung", "5"),
+        ("anschluss_track", "0.0"),
     ],
 )
 def test_ein_trackingblock_der_der_preisstruktur_widerspricht_faellt(feld, wert):
@@ -261,11 +247,6 @@ def test_eine_laufzeit_die_nicht_aufgeht_faellt():
     """`anzahlung + n x monatlich == totalPrice`, sonst kein Satz."""
     assert lies_buendel(_antwort(_eintrag(gesamt=1500.0))) == []
     assert lies_buendel(_antwort(_eintrag(dauer="ohne Angabe"))) == []
-
-
-# --------------------------------------------------------------------------
-# Vom Rohsatz zum Buendel
-# --------------------------------------------------------------------------
 
 
 def _bestand():
@@ -302,11 +283,6 @@ def _rohsatz(**kw):
         "anschlusspreis": 39.99,
         "laufzeit_monate": 36,
         "quelle_url": "https://www.o2online.de/e-shop/apple/x-details",
-        # `lies_buendel` setzt dieses Flag auf JEDEM echten Rohsatz (o2
-        # nennt seinen eigenen Nachlass einen Rabatt) - der Standard
-        # hier bildet das nach. Seit P0-B-fix1 WERTET diese Stufe es
-        # nicht mehr aus: o2s -5 EUR sind kein bedingter Nachlass,
-        # sondern der Preis (Modulkopf `tco_buendel.py`).
         "tarif_rabatt_beleg": True,
     }
     satz.update(kw)
@@ -320,8 +296,6 @@ def test_der_slug_traegt_die_zuordnung():
     buendel = bilanz.buendel[0]
     assert buendel.tarif_id == "o2:o2-mobile-on-demand-m"
     assert buendel.tarif_id_guete == HOCH
-    # Der NAME bleibt der des Anbieters - laufen die zwei auseinander, ist
-    # genau das die Auskunft.
     assert buendel.tarif_name.startswith("O2 Mobile on Demand M Plus")
 
 
@@ -401,17 +375,13 @@ def test_kein_rabatt_wird_aus_der_simonly_kachel_gebaut():
     """
     bilanz = aus_rohsaetzen([_rohsatz()], _bestand(), "2026-09-04")
     buendel = bilanz.buendel[0]
-    # Der Bezug loest weiterhin auf - gegen die 19,99-EUR-Kachel.
     assert buendel.tarif_id == "o2:o2-mobile-on-demand-m"
     assert buendel.tarif_id_guete == HOCH
     assert _bestand().je_id[buendel.tarif_id]["grundgebuehr"] == 19.99
-    # Und traegt trotzdem den gemessenen Betrag, ohne Rabatt daneben.
     assert buendel.tarif_monatlich == pytest.approx(14.99, abs=0.005)
     assert buendel.rabatte == []
     assert tco_24(buendel).rabatte_offen == 0.0
 
-    # Ohne den Beleg gilt derselbe Betrag - die Stufe kennt das Flag nicht
-    # mehr, das Ergebnis darf also nicht davon abhaengen.
     ohne_beleg = aus_rohsaetzen(
         [_rohsatz(tarif_rabatt_beleg=False)], _bestand(), "2026-09-04"
     ).buendel[0]
@@ -440,18 +410,13 @@ def test_ein_rohsatz_ohne_laufzeit_verschmilzt_nicht_mit_dem_24er_angebot():
     ohne, echt = bilanz.buendel
     assert ohne.laufzeit_monate is None
     assert echt.laufzeit_monate == 24
-    # Zwei Schluessel, und der eine sagt offen, was fehlt.
     assert ohne.id != echt.id
     assert ohne.id.endswith("--" + LAUFZEIT_LUECKE)
     assert echt.id.endswith("--24m")
-    # Und die Kennzahl raet nicht: die Ratensumme fehlt als BENANNTE
-    # Luecke, die Karte traegt keine Zahl (Regel 9).
     tco = tco_24(ohne)
     assert POSTEN_LAUFZEIT in tco.luecken
     assert not tco.belastbar
     assert tco.restbetrag is None
-    # Gegenprobe: 24 x 34,00 EUR Raten stehen in KEINEM Bestandteil - die
-    # geratene Laufzeit haette 816,00 EUR in die Summe geschrieben.
     assert all("Geräteraten" not in name for name in tco.bestandteile)
     assert tco_24(echt).belastbar
 
@@ -463,10 +428,6 @@ def test_der_ganze_weg_an_der_echten_antwort():
         for i, s in enumerate(_saetze())
     ]
     bilanz = aus_rohsaetzen(roh, _bestand(), "2026-09-04")
-    # 66 von 66. Bis zum 29.09.2026 waren es 65: der Tarif "O2 Mobile on
-    # Demand M" (ohne "Plus") traegt keinen Kachel-Slug und loeste nicht
-    # auf. Sein Buendel-Slug ist die Tarif-ID der Kachel
-    # (`Tarifbestand._slug_ist_tarif_id`).
     assert len(bilanz.buendel) == 66
     assert bilanz.ohne_tarif == 0
     assert {b.tarif_id for b in bilanz.buendel if "Plus" not in b.tarif_name} == {

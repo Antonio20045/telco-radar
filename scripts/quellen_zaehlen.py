@@ -171,6 +171,4 @@ if __name__ == "__main__":
     try:
         raise SystemExit(main())
     except BrokenPipeError:
-        # `... | head` schliesst die Pipe - kein Fehler, sondern der Normalfall
-        # beim Nachschauen.
         raise SystemExit(0)

@@ -37,14 +37,7 @@ from telco_radar.report.html import render_site
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 
-# Alles, was nach einer Zahl mit Wort "Anbieter" aussieht - O1 entfernt
-# dieses Muster vollstaendig aus der Vergleichsansicht.
 _OPTION_RE = re.compile(r"\d+\s*Anbieter")
-
-
-# --------------------------------------------------------------------------
-# Am echten Bestand: die ganze Seite, gerendert gegen data/state + config
-# --------------------------------------------------------------------------
 
 
 @pytest.fixture(scope="module")
@@ -69,9 +62,6 @@ def test_keine_dropdown_option_nennt_eine_anbieterzahl_mehr(seite):
     des Radars wählen darüber EIN Modell; eine doppelte ID nähme der
     Browser als erste, und der Link zeigte ein anderes Gerät, als sein
     Radar-Block versprach."""
-    # E2: der Selektor ist das Suchfeld - waehlbar ist, was der Zeitreihen-
-    # Knoten als erlaubt traegt. Dieselben Zusicherungen am neuen Ort:
-    # keine Anbieterzahl im NAMEN, eindeutige IDs fuer den Deep-Link.
     import json
 
     knoten = json.loads(seite.select_one("#gr-zeitreihe-daten").get_text())
@@ -103,8 +93,6 @@ def test_der_startzustand_ist_derselbe_im_knoten_und_im_serverblock(seite):
     titel = knoten["titel"][vorgabe]
     antwort = seite.select_one("#tafel-tco .gr-zr-antwort")
     assert antwort is not None, "der Server-Startblock fehlt"
-    # Der Antwort-Satz nennt das Startgeraet beim Kurznamen - der Titel
-    # ist "Hersteller Modell Speicher GB"; geprueft wird das Modellstück.
     modell_stueck = (
         " ".join(titel.split()[1:-2]) if titel.split()[-1] == "GB" else titel
     )
@@ -121,10 +109,6 @@ def test_modell_ohne_zeitreihe_steht_ohne_widerspruch_da(tmp_path):
     s = _baue(tmp_path, graphloses_modell=True)
     graphlos = "apple-iphone-16-pro-max-256"
 
-    # E2: ein Modell ohne Bündel-Band ist in der Zeitreihen-Ansicht nicht
-    # wählbar (erlaubt leer) - es hat keinen Graph-Zustand und keine
-    # Band-Zeilen. Der Katalog zeigt seine Listungen; die Modell-Liste der
-    # Seite kommt mit E3 (S2: die Abweichungstabelle).
     import json
 
     knoten = json.loads(s.select_one("#gr-zeitreihe-daten").get_text())
@@ -132,11 +116,6 @@ def test_modell_ohne_zeitreihe_steht_ohne_widerspruch_da(tmp_path):
         "das bandlose Modell duerfte nicht wählbar sein"
     )
     assert graphlos not in {e["id"] for e in knoten["suchindex"]}
-
-
-# --------------------------------------------------------------------------
-# Die eine Rechnung: `zeitreihe()` liefert ihre Reihenzahl als Feld
-# --------------------------------------------------------------------------
 
 
 def _reihe(anbieter, punkte):

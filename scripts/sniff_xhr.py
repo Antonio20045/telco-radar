@@ -100,7 +100,6 @@ def sniff(url: str, timeout_s: float, ua: str) -> None:
                 )
             except Exception as exc:  # noqa: BLE001
                 print(f"  goto FAILED: {type(exc).__name__}: {exc}")
-            # Click common cookie-consent buttons in case they block XHRs.
             for sel in (
                 "#onetrust-accept-btn-handler",
                 'button:has-text("Accept")',

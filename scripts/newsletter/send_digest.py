@@ -110,9 +110,6 @@ def main(argv=None) -> int:
 
     plan = v.baue_sendeplan(datum, segmente)
     if args.stufe == "plan":
-        # Stufe 1: den Plan schreiben und pushen, BEVOR die erste Mail
-        # rausgeht. Ohne ihn weiss ein Wiederanlauf nach einem
-        # Runner-Absturz nicht, was er eigentlich vorhatte.
         Path(args.plan).parent.mkdir(parents=True, exist_ok=True)
         Path(args.plan).write_text(
             json.dumps(
@@ -123,8 +120,6 @@ def main(argv=None) -> int:
             encoding="utf-8",
         )
         _zahl("Sendeplan", f"{len(plan)} Posten geschrieben")
-        # Der Waechter laeuft schon HIER mit: ein Lauf, der das Limit
-        # reissen wuerde, soll abbrechen, bevor irgendetwas gepusht ist.
         try:
             rest = v.pruefe_limit(len(plan), Path(args.send_log))
             _zahl("Abstand zum Tageslimit", rest)
@@ -133,7 +128,6 @@ def main(argv=None) -> int:
             return 2
         return 0
 
-    # Stufe 2: rendern und zustellen.
     nachrichten = {}
     for segment in voll:
         erstes_abo = store.finde(segment.abo_ids[0])
@@ -150,11 +144,6 @@ def main(argv=None) -> int:
             bewegung=bericht.get("geraete_bewegung"),
         )
 
-    # Die Abmelde-URL traegt ein signiertes Token je Abo, ist also je
-    # Empfaenger verschieden. GERENDERT wurde trotzdem nur einmal je Segment
-    # - personalisiert wird durch Ersetzen der Platzhalter-URL, und das
-    # kostet nichts. `versende()` sucht die Nachricht zuerst unter dem vollen
-    # Sendeschluessel und faellt sonst auf den Segmentschluessel zurueck.
     adressen = {a.id: a.email for a in abos}
     je_posten = _personalisiert(nachrichten, plan, _abmeldelinks(abos, basis), basis)
 
@@ -173,9 +162,6 @@ def main(argv=None) -> int:
     protokoll = st.lies_jsonl(Path(args.send_log))
 
     def anhaengen(posten):
-        # Stufe 2 der Idempotenz. Im echten Workflow ersetzt der Aufrufer
-        # das durch einen Contents-API-Aufruf mit `sha`-Vorbedingung: bei
-        # paralleler Aenderung schlaegt der FEHL statt zu ueberschreiben.
         protokoll.append(posten.as_dict())
         st.schreibe_jsonl(Path(args.send_log), protokoll)
 
@@ -223,13 +209,9 @@ def _testausgabe(
 
     block = bericht.get("geraete_bewegung")
     if block is None:
-        # Ein Bericht von vor P4 traegt den Block nicht. Der Test soll ihn
-        # trotzdem zeigen: gerechnet aus dem Geraetestand DIESES Checkouts,
-        # genau wie der naechste Radar-Lauf es tut.
         block = geraete_bewegung.fuer_bericht(
             WURZEL, date.fromisoformat(datum), WURZEL / "data" / "reports"
         )
-    # Der Test zeigt den Block immer, auch an einem Freitag.
     block = dict(block, im_newsletter=True)
     adresse = os.environ.get("TEST_EMPFAENGER", "").strip()
     if not adresse and not args.dry_run:
@@ -265,7 +247,6 @@ def _testausgabe(
         )
     )
     ergebnis = transport.send(nachricht, adresse or "trocken@example.invalid")
-    # Ein Trockenlauf stellt nichts zu; das Log darf es nicht behaupten.
     if not ergebnis.ok:
         stand = f"gescheitert ({ergebnis.status})"
     elif args.dry_run:
@@ -291,10 +272,6 @@ def _abmeldelinks(abos, basis: str) -> dict:
         token = tokens.schreibe(
             key, tokens.ZWECK_ABMELDUNG, {"sub_id": abo.id, "addr_hmac": abo.email_hmac}
         )
-        # Nicht `basis`: das ist die Website. `/unsubscribe/...` ist eine
-        # Route des Signup-Dienstes. Derselbe Fehler wie beim
-        # Bestaetigungslink, nur faellt er spaeter auf - erst wenn sich
-        # jemand abmelden will und ein 404 bekommt.
         dienst = os.environ.get(
             "DIENST_BASE_URL", "https://telco-radar-signup.onrender.com"
         ).rstrip("/")

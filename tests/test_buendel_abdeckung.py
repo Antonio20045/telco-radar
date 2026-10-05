@@ -72,7 +72,6 @@ def test_anbieter_ohne_buendel_ist_rot_auch_ohne_vortag():
         "updated": TAG,
         "buendel": [
             _buendel("A", "apple-iphone-18-pro-256gb-polar"),
-            # B hat nur ein altes Bündel - am Messtag nichts.
             _buendel("B", "apple-iphone-18-pro-256gb-polar", tag="2026-02-01"),
         ],
     }

@@ -79,13 +79,6 @@ Rules:
 """
 
 
-# Themenfelder (config/tech_sources.yaml) sind KEINE Wettbewerber. Nvidia,
-# Qualcomm, die GSMA oder Ofcom mit dem Regionalprompt zu bewerten liefert
-# systematisch falsche Antworten: das Modell versucht dann, einen Chiphersteller
-# als Konkurrenten von Vodafone einzuordnen ("Preisdruck, den Vodafone kontern
-# muss"), obwohl die richtige Frage lautet, was ein Zulieferer-, Geraete- oder
-# Regulierungsschritt fuer den Netzbetrieb, das Endkundenangebot und die
-# Kostenseite bedeutet. Deshalb ein eigener Prompt mit eigenem Bewertungsmassstab.
 TECH_ANALYST_SYSTEM = """\
 You are a senior technology analyst inside Vodafone Group's strategy team.
 Vodafone is a global telecommunications operator (mobile, broadband,
@@ -153,17 +146,6 @@ Rules:
 """
 
 
-# --------------------------------------------------------------- CTM-Linse
-# Die zweite Bewertungsachse. Sie steht als EIN Textbaustein in beiden
-# Prompts, weil sie in beiden dasselbe bedeuten muss: eine Chipmeldung und
-# eine Tarifmeldung werden nach demselben Massstab gefragt, "ist das fuer ein
-# deutsches Endkunden-Portfolio handlungsrelevant?".
-#
-# Stufe 3 steht bewusst NICHT zur Wahl: sie wird in analyze/ctm.py
-# deterministisch vergeben (Heimatmarkt-Marke plus Endkundenthema). Ein
-# Modell, das seinen eigenen Massstab jeden Lauf neu auslegt, taugt nicht als
-# Sortierkriterium - und die Erfahrung mit dem Promo-Score sagt, dass genau
-# der gerechnete Anteil ihn stabil macht.
 CTM_FELDER = """\
 "ctm_bezug": <0, 1 oder 2 - wie unmittelbar diese Meldung ein deutsches
         Endkunden-Portfolio (Tarife, Optionen, Geraete, Logistik) beruehrt:
@@ -184,11 +166,6 @@ CTM_FELDER = """\
         eines dieser Woerter benutzen: moeglich / wahrscheinlich / sehr
         wahrscheinlich. Sonst leer lassen.>\""""
 
-# Was im Feld "text" steht - als EIN Textbaustein in beiden Prompts, aus
-# demselben Grund wie CTM_FELDER: die acht Themenfelder bekommen dieselbe
-# Nutzlast, und ein Hinweis, der nur im Regionalprompt steht, gilt fuer die
-# Haelfte der Analysten nicht. Ein guter Teil der textlosen Newsroom-Quellen
-# sitzt gerade dort.
 TEXTFELD = """\
 The "text" field carries the article text as far as it was available - often
 the full body, sometimes only a teaser, and for some sources it is EMPTY
@@ -203,48 +180,10 @@ put a number in "summary" or in any other field, it must be a number you
 actually read - a later automatic check compares your fields against each
 other and silently drops what it cannot verify."""
 
-# Meldungen je LLM-Aufruf.
-#
-# 24 statt 15 seit dem 27.08.2026, und der Grund ist ein Kostengrund: die
-# Denkspur von deepseek-v4-pro faellt je AUFRUF an (~8-9k Token, als Ausgabe
-# abgerechnet) und haengt kaum an der Stapelgroesse. Ein Drittel weniger
-# Aufrufe ist damit rund ein Drittel weniger Denkspur - ohne dass eine
-# einzige Meldung schlechter gelesen wuerde. Das ist Antonios Antwort auf die
-# 1,95 $ vom 27.08.2026: gespart wird an den Token, nicht am Urteil (der
-# Wechsel des Analysten auf flash wurde am selben Tag erneut abgelehnt).
-#
-# Das AUSGABE-Budget waechst mit (ANALYST_MAX_TOKENS): die Antwort traegt je
-# behaltener Meldung ~190 Token, und ein Budget, das vor der Antwort
-# aufgebraucht ist, kostet den ganzen Stapel (Laeufe #83-85, #97).
 BATCH_SIZE = 24
 
-# Ausgabebudget eines Analysten-Stapels.
-#
-# 16000 war die Untergrenze fuer 15 Meldungen: ~8-9k Denkspur plus Antwort.
-# Mit 24 Meldungen waechst nur der Antwortteil, die Denkspur nicht - deshalb
-# 26000 und nicht 16000 * 24/15.
 ANALYST_MAX_TOKENS = 26000
 
-# Wie viel Text der Analyst je Meldung zu sehen bekommt.
-#
-# Bis zum 15.08.2026 waren es `summary[:300]` - und bei 52 der 164 crawlbaren
-# Quellen ist `summary` leer (`parse_newsroom_html` setzt das Feld nicht).
-# Knapp ein Drittel des Bestands wurde also allein aus der UEBERSCHRIFT
-# bewertet, eingeordnet, kategorisiert und im Wochenbericht beschrieben.
-# Dabei lag der Artikeltext bei jeder dritten Meldung schon ungenutzt am
-# Item: `content:encoded` wird seit dem 13.08.2026 nach `Item.volltext`
-# gelesen, aber diese Nutzlast hier hat ihn nie weitergegeben.
-#
-# Gemessen am 15.08.2026 ueber 267 Eintraege aus 12 Fachpressequellen:
-# 30,0 % tragen Feed-Volltext (Median 2000 Zeichen, p90 5302), und der
-# Teaser selbst ist im Median 206 Zeichen lang - `[:300]` schnitt also auch
-# dort, wo Text da war, jede zweite laengere Zusammenfassung mitten im Satz
-# ab.
-#
-# Die Grenze ist eine EINGABE-Rechnung, keine Ausgabe-Rechnung: ein Stapel
-# sind 15 Meldungen, also hoechstens 15 x 2500 = 37 500 Zeichen ~ 10k
-# Tokens Eingabe. Das Ausgabebudget (8000) bleibt unberuehrt, weil der
-# Analyst weiterhin nur seine Bewertung schreibt.
 ANALYST_TEXT_ZEICHEN = 2500
 
 
@@ -273,9 +212,6 @@ def _items_payload(items: list[Item]) -> str:
                 "source": item.source_name,
                 "date": item.published.date().isoformat() if item.published else None,
                 "url": item.url,
-                # "text", nicht "snippet": das Feld traegt seit dem 15.08.2026
-                # bis zu ANALYST_TEXT_ZEICHEN Zeichen Artikeltext. Unter dem
-                # alten Namen wuerde es der naechste Leser wieder kappen.
                 "text": analyst_text(item),
             }
         )
@@ -335,25 +271,11 @@ def analyze_region(
     batches = [capped[i : i + BATCH_SIZE] for i in range(0, len(capped), BATCH_SIZE)]
 
     def _ein_stapel(n: int, batch: list[Item]) -> dict | None:
-        # Hier steht bewusst KEINE Kostenpruefung. Der Zaehler aus llm.py
-        # zaehlt und warnt, er greift nicht ein (Antonios Entscheidung vom
-        # 27.08.2026): ein Lauf, der auf halber Strecke aufhoert zu lesen,
-        # sieht aus wie eine duenne Nachrichtenwoche - genau das Bild, das
-        # die degenerierten 402-Laeufe vom 15.-27.08. abgegeben haben. Die
-        # harte Grenze ist das Guthaben des Anbieters selbst; stirbt es,
-        # faengt der Anker die sichtbaren Stufen.
         user = (
             f"NEW items for region {region_name} "
             f"(batch {n}/{len(batches)}, {len(batch)} items):\n" + _items_payload(batch)
         )
         try:
-            # Grosszuegig, nicht knapp: am 18.08.2026 dachte deepseek-v4-pro
-            # je Stapel ~31.000 Zeichen Denkspur und war mit 8000 fertig,
-            # BEVOR die Antwort begann (finish_reason=length) - 41 von ~60
-            # Stapeln fielen so aus, und der Lauf sah aus wie eine duenne
-            # Woche. Dieselbe Fehlerklasse wie CLAUDE.md §6 (Laeufe #83-85).
-            # Die Denkspur wird als Ausgabe abgerechnet, das Budget muss
-            # Denken PLUS Antwort tragen.
             raw = complete(
                 system,
                 user,
@@ -374,8 +296,6 @@ def analyze_region(
 
     if batch_workers > 1 and len(batches) > 1:
         with ThreadPoolExecutor(max_workers=batch_workers) as pool:
-            # Reihenfolge erhalten: der Bericht sortiert zwar nach Relevanz,
-            # aber ein Lauf soll bei gleicher Eingabe dieselbe Ausgabe liefern.
             ergebnisse = list(
                 pool.map(
                     lambda p: _ein_stapel(p[0], p[1]),
@@ -388,13 +308,6 @@ def analyze_region(
     highlights: list[dict] = []
     summaries: list[str] = []
     batches_ok = 0
-    # Meldungen aus gescheiterten Stapeln. Sie hat kein Analyst gesehen und
-    # sie duerfen deshalb NICHT in den Seen-Store - sonst gelten sie als
-    # erledigt und werden nie wieder gesammelt. Der Schutz aus Lauf #64 wirkte
-    # nur, wenn eine Region KOMPLETT ausfiel; im Lauf #67 (04.08.2026)
-    # scheiterten 2 von 3 Stapeln des Themenfelds KI-Anbieter und 1 von 2 bei
-    # Regulierung - rund 33 Meldungen wanderten ungelesen in den Store. Mit
-    # mehr Quellen gibt es mehr Stapel und damit mehr solcher Teilausfaelle.
     ungelesen: list[str] = []
     for result, batch in zip(ergebnisse, batches):
         if result is None:

@@ -23,7 +23,6 @@ WURZEL = Path(__file__).resolve().parents[1]
 HERKUNFT = "_herkunft.json"
 BOT = "telco-radar-bot"
 DATEN = "data/"
-# Was render_site aus dem Bestand liest, ohne Bilder; die Historie nur für vier Geräte.
 STANDARD_DATEIEN = (
     "data/state/diff_bilder.json",
     "data/state/differentiation.jsonl",

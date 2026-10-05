@@ -112,11 +112,6 @@ def farben():
     return lade_farben(_WURZEL)
 
 
-# ==========================================================================
-# lies_buendel(): Struktur der Sätze
-# ==========================================================================
-
-
 def test_drei_saetze_je_speichergroesse_und_eine_je_farbe():
     """Die Karte trägt 9 Schlüssel ohne Zubehör-Segment (3 Farben × 3
     Speicher); je Speichergröße bleibt EIN Satz - der Preis ist bei jeder
@@ -157,14 +152,8 @@ def test_der_iphone_satz_nach_rechnung():
     assert s["buendel_monatlich"] == 44.99
     assert tco.gesamt == pytest.approx(36 * 44.99)
     assert tco.restbetrag == pytest.approx(12 * 44.99)
-    # P0-B-h1: Ø/Monat teilt die Summe durch den Zeitraum, den sie
-    # TRAEGT - hier 36 Monate, denn der eine Bündelbetrag laeuft 36 Mal.
-    # Bis hierher stand hier `round(36 * 44.99 / 24, 2)` = 67,48 € und
-    # damit die Rechnung des Befunds: 67,48 × 36 = 2.429,28 €, eine Zahl
-    # aus keiner Definition. Der Zeitraum steht am Datensatz.
     assert tco.leitzahl_monate == 36
     assert tco.monatlich == pytest.approx(round(36 * 44.99 / 36, 2))
-    # Die Gegenrechnung, die auf jeder Zeile aufgehen muss.
     assert tco.monatlich * tco.leitzahl_monate == pytest.approx(tco.gesamt)
     assert tco.belastbar
 
@@ -193,12 +182,9 @@ def test_zubehoer_schluessel_verfallen_ueber_die_form():
     Preis der NIEDRIGERE wäre. Gegenprobe an der echten Fixture: kein Satz
     trägt einen der Zubehör-Beträge."""
     saetze = _saetze()
-    zubehoer = {5399, 4999, 6099, 5699, 6799, 6399}  # Cent, gemessen
+    zubehoer = {5399, 4999, 6099, 5699, 6799, 6399}
     for s in saetze:
         assert round(s["buendel_monatlich"] * 100) not in zubehoer
-    # Und der konstruierte Fall: ein Zubehör-Key mit STOLZ niedrigem Preis
-    # verführt - er fällt trotzdem, weil das Anführungszeichen direkt
-    # hinter der Speicherzahl gefordert wird.
     seite = (
         "<script>function setHwdPrices() { hwdVariantsPrices = {"
         "'product-SCHWARZ-128': [1599,],"
@@ -214,11 +200,6 @@ def test_zubehoer_schluessel_verfallen_ueber_die_form():
     assert satz[0]["buendel_monatlich"] == 15.99
 
 
-# ==========================================================================
-# S2-C: die Geräte-Einmalzahlung (`hwdVariantsOneOffPaymentFees`)
-# ==========================================================================
-
-
 def test_die_einmalzahlung_je_variante_aus_der_echten_seite():
     """S2-C, Kriterium 1b: `hwdVariantsOneOffPaymentFees` steht in
     DEMSELBEN Response wie die Preiskarte, geschlüsselt über dieselben
@@ -229,7 +210,6 @@ def test_die_einmalzahlung_je_variante_aus_der_echten_seite():
         (512, 450.0),
         (1024, 530.0),
     ]
-    # Zweite echte Seite: die A57-Fixture, 140/160 €
     saetze = lies_buendel(
         _fixture("einsundeins_produktseite_galaxy_a57.html.gz"), url=_A57_URL
     )
@@ -312,11 +292,6 @@ def test_die_einmalzahlung_steht_in_der_leitzahl():
     tco_offen = tco_24(ohne_zuzahlung)
     assert POSTEN_ZUZAHLUNG in tco_offen.luecken
     assert tco_offen.gesamt == pytest.approx(36 * 44.99 + 39.9)
-
-
-# ==========================================================================
-# S2-C: die Bereitstellungsgebühr aus dem Tarifdetails-Iframe
-# ==========================================================================
 
 
 def test_tarifdetails_adresse_kommt_aus_dem_data_iframe_attribut():
@@ -421,11 +396,6 @@ def test_nur_einsundeins_saetze_werden_angefasst():
     assert "anschlusspreis" not in fremd
 
 
-# ==========================================================================
-# S2-C: gemessene Bündel schlagen die Listungs-Brücke desselben Angebots
-# ==========================================================================
-
-
 def test_die_listung_verdraengt_das_gemessene_buendel_nicht(katalog):
     """Der Befund des ersten Renderns nach S2-C: 1&1 steht dasselbe Angebot
     ZWEIMAL im Bestand - als Listung (nur der Monatsbetrag, aus der Zeit
@@ -473,8 +443,6 @@ def test_die_listung_verdraengt_das_gemessene_buendel_nicht(katalog):
     assert karten[0]["zuzahlung"] == 360.0
     assert karten[0]["anschlusspreis"] == 39.9
     assert karten[0]["tarif_id"] == "11:1-1-all-net-flat-s"
-    # Gegenprobe: OHNE gemessenes Bündel bleibt die Listung die Karte -
-    # die Brücke steht weiter (derselbe Aufruf, leerer erster Parameter).
     nur_listung = modelle([], [listung], referenzen=[], tarife={}, katalog=katalog)
     karten2 = [
         k for m in nur_listung["modelle"] for k in m["karten"] if k["anbieter"] == "1&1"
@@ -521,11 +489,6 @@ def test_ohne_tarifnamen_gibt_es_keinen_satz():
         "<script>window.currentHardwareOfferDuration = '36';</script>"
     )
     assert lies_buendel(seite, url="x") == []
-
-
-# ==========================================================================
-# Der Weg in den Bestand: aus_rohsaetzen() gegen den echten tarife.jsonl
-# ==========================================================================
 
 
 def test_der_ganze_weg_bis_zum_buendel_mit_echtem_bestand():
@@ -583,7 +546,6 @@ def test_aus_rohsaetzen_reicht_buendel_monatlich_durch():
     )
     assert len(bilanz.buendel) == 1
     assert bilanz.buendel[0].buendel_monatlich == 44.99
-    # A1: alle 36 Bündelraten zaehlen - 36 x 44,99 (vorher 24 x 44,99).
     assert tco_24(bilanz.buendel[0]).gesamt == pytest.approx(1619.64)
 
 
@@ -593,11 +555,6 @@ def test_der_zustand_kommt_als_neu_aus_dem_titelweg(katalog, farben):
     Erkennung (kein Kennzeichen in Titel/Farbe/Hinweis -> neu). Ein
     Bündel ohne belegten Zustand wäre in der Tafel nicht vergleichbar
     (QA-Befund B1)."""
-    # Die echte A57-Seite, NUR der Farbschlüssel der 128-GB-Zeile trägt ein
-    # Kennzeichen (o2 schreibt "erneuert" genauso in die Farbe). Der 256-GB-
-    # Satz bleibt sauber - ein Lauf zeigt damit beide Richtungen: ohne
-    # Kennzeichen wird "neu" GELEITET (Titelweg), nicht vergeblich
-    # weggefasst, und mit Kennzeichen wäre ein fester "neu"-Default rot.
     seite = _fixture("einsundeins_produktseite_galaxy_a57.html.gz").replace(
         "AWESOME_GRAY-128", "GRAU_ERNEUERT-128"
     )
@@ -614,15 +571,8 @@ def test_der_zustand_kommt_als_neu_aus_dem_titelweg(katalog, farben):
     )
     assert bilanz.status == "ok"
     assert [b["zustand"] for b in bilanz.buendel] == ["refurbished", "neu"]
-    # Der Zustand ist dieselbe Erkennung, aus der die `-refurbished`-Strecke
-    # der SKU entsteht - ohne sie wäre die Tafel-Zeile nicht vergleichbar.
     assert "refurbished" in bilanz.buendel[0]["sku_id"]
     assert "refurbished" not in bilanz.buendel[1]["sku_id"]
-
-
-# ==========================================================================
-# Die Verdrahtung: sammle_anbieter() auf den Produktseiten des Ernte-Wegs
-# ==========================================================================
 
 
 def _anbieter():
@@ -669,8 +619,8 @@ def test_sammle_liefert_listung_und_buendel_aus_einer_antwort(katalog, farben):
     )
     assert bilanz.status == "ok"
     assert abrufe == [_A57_URL]
-    assert len(bilanz.listungen) == 1  # die vorausgewählte Variante
-    assert len(bilanz.buendel) == 2  # 128 GB und 256 GB
+    assert len(bilanz.listungen) == 1
+    assert len(bilanz.buendel) == 2
     b = bilanz.buendel[0]
     assert b["anbieter"] == "1&1"
     assert b["tarif_name"] == "1&1 All-Net-Flat S"
@@ -682,19 +632,8 @@ def test_sammle_liefert_listung_und_buendel_aus_einer_antwort(katalog, farben):
 def test_adapter_registry_traegt_den_buendelhaken():
     adapter = ADAPTER["einsundeins_buendel"]
     assert adapter.lies_buendel is not None
-    # Die zweite Lesart läuft auf den Produktseiten des Ernte-Wegs MIT -
-    # die Bündel stehen in derselben Antwort, ein eigener `kind: buendel`-
-    # Einstieg (o2/Telekom/congstar) wäre ein zweiter Abruf derselben
-    # Adresse. Der Tarifname steht in derselben Antwort, deshalb braucht
-    # 1&1 anders als Vodafone keinen `loese_tarifnamen`-Haken.
     assert adapter.buendel_auf_produktseite is True
     assert adapter.loese_tarifnamen is None
-    # S2-C: der BETRAGS-Haken - die Bereitstellungsgebühr steht erst im
-    # Tarifdetails-Iframe, einer eigenen, von der Geräteseite verlinkten
-    # Adresse. Er läuft über dieselbe Stelle der Pipeline wie Vodafones
-    # `loese_tarifnamen`: NACH dem Sammeln, VOR `aus_rohsaetzen`. Seit
-    # 29.09.2026 laeuft davor die Herleitung der Tarifstufen im selben
-    # Haken (`test_geraete_tarifstufen_einsundeins.py`).
     from telco_radar.collect.geraete.einsundeins import ergaenze_buendel
 
     assert adapter.ergaenze_buendel is ergaenze_buendel

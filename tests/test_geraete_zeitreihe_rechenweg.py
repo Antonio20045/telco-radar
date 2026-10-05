@@ -36,9 +36,6 @@ from telco_radar.tco_model import tco_24
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 
-# Die o2-Zeile des Bestands (12.09.2026, samsung-galaxy-s23): die Rechnung
-# aus vergleich.md - 37 + 39,99 + 24 × 14,99 + 24 × 19,00 = 892,75 - mit
-# gekappter Rate (24 von 36). Wörtlich aus der Historie kopiert.
 O2_MESSUNG = {
     "id": "buendel--o2--samsung-galaxy-s23-128gb-rosa--o2-mobile-on-demand-m-plus-mit-50-gb-24-mon",
     "datum": "2026-09-12",
@@ -57,8 +54,6 @@ O2_MESSUNG = {
     "gesamt": 892.75,
 }
 
-# Die 1&1-Zeile desselben Messtags: die ZUSAMMEN-Form (ein Bündelmonats-
-# preis, § 13.2) - 420 + 39,90 + 24 × 49,99 = 1.659,66.
 EINS_EINS_MESSUNG = {
     "id": "buendel--1-1--apple-iphone-17-pro-max-256gb-silber--1-1-all-net-flat-s",
     "datum": "2026-09-12",
@@ -88,11 +83,6 @@ def _messung(satz, *, anbieter="o2", tarif="O2 Mobile on Demand M Plus"):
     return {"satz": dict(satz), "stand": stand}
 
 
-# --------------------------------------------------------------------------
-# Die Postenliste - nachgebaut aus der Zeile, Summe == eingefrorene Zahl
-# --------------------------------------------------------------------------
-
-
 def test_die_posten_der_o2_messung_ergeben_die_heutige_summe():
     """A1: das Panel zerlegt die HEUTIGE Rechnung - alle 36 Raten -
     und geht mit ihr auf (37 + 39,99 + 24 × 14,99 + 36 × 19,00)."""
@@ -100,7 +90,6 @@ def test_die_posten_der_o2_messung_ergeben_die_heutige_summe():
     assert r is not None
     assert round(sum(p["betrag"] for p in r["posten"]), 2) == 1120.75
     assert r["gesamt"] == 1120.75
-    # Gegenprobe: die eingefrorene 892,75 der Kappungsformel ist es NICHT.
     assert r["gesamt"] != O2_MESSUNG["gesamt"]
 
 
@@ -164,20 +153,6 @@ def test_boni_erscheinen_nicht_die_historie_hat_keine():
     assert "Bonus" not in text and "Rabatt" not in text
 
 
-# --------------------------------------------------------------------------
-# A1 (20.09.2026): der GRAPH haengt am Stand des Markts, nicht am Stand der
-# Formel. Die Historie traegt eingefrorene `gesamt`-Werte der ALTEN (auf 24
-# Monate gekappten) Rechnung - die Punkte und die Auswahl des guenstigsten
-# Bündels je Tag werden mit der HEUTIGEN Leitzahl neu gerechnet:
-#
-#   o2:   37 + 39,99 + 24 × 14,99 + 36 × 19,00 = 1.120,75 (statt 892,75)
-#   1&1:  420 + 39,90 + 36 × 49,99          = 2.259,54 (statt 1.659,66)
-#
-# Der eingefrorene Wert bleibt unangetastet (Historie wird nie umge-
-# schrieben); nur die Anzeige rechnet neu.
-# --------------------------------------------------------------------------
-
-
 def test_die_serie_rechnet_die_punkte_mit_der_heutigen_leitzahl():
     """Der Punkt der o2-Messung ist die NEU gerechnete 1.120,75 - nicht die
     eingefrorene 892,75 der gekappten Rechnung."""
@@ -205,10 +180,7 @@ def test_die_zusammenform_behaelt_ihre_kurve_und_nennt_ihren_zeitraum():
     messungen = {("m", "b"): {"1&1": {"2026-09-12": m}}}
     assert zr._messwert(m) == (2259.54, 36)
     assert zr._serien_aus(messungen) == {("m", "b"): {"1&1": [("2026-09-12", 2259.54)]}}
-    # Der Zeitraum JE KURVE - aus derselben Lesung, nicht nachgerechnet.
     assert zr._zeitraeume_aus(messungen) == {("m", "b"): {"1&1": [36]}}
-    # Gegenrechnung, dass keine Zahl verbogen wird: die Kennzahl selbst
-    # ist unveraendert 2.259,54 EUR ueber 36 Monate.
     kennzahl = tco_24(zr._buendel_aus_messung(m))
     assert (kennzahl.gesamt, kennzahl.leitzahl_monate) == (2259.54, 36)
     assert kennzahl.gesamt == round(420.0 + 39.90 + 36 * 49.99, 2)
@@ -250,8 +222,6 @@ def test_die_auswahl_des_guenstigsten_buendels_je_tag_rechnet_neu(tmp_path):
     sagt B (979,75 < 1.120,75, weil B die kürzere Rate hat). Gewählt wird
     nach der HEUTIGEN Rechnung - sonst klänge der Graph von einer Formel,
     die es nicht mehr gibt."""
-    # B: 400 + 39,99 + 24 × 14,99 + 24 × 5,00 = 919,75 (alt eingefroren),
-    #    heute: 400 + 39,99 + 24 × 14,99 + 36 × 5,00 = 979,75
     b_satz = dict(
         O2_MESSUNG,
         id="buendel--o2--samsung-galaxy-s23-128gb-rosa--b",
@@ -289,8 +259,6 @@ def test_die_auswahl_des_guenstigsten_buendels_je_tag_rechnet_neu(tmp_path):
     }
     messungen = zr._messungen(tmp_path, tco)
     assert zr._serien_aus(messungen) == {("m", "b"): {"o2": [("2026-09-12", 979.75)]}}
-    # Gegenprobe: die eingefrorene Zahl bleibt in der Historien-Zeile
-    # stehen - nichts wird umgeschrieben, nur die Anzeige rechnet neu.
     zeilen = [
         json.loads(z)
         for z in (tmp_path / "geraete_tco_historie.jsonl")
@@ -353,11 +321,6 @@ def test_zwei_messungen_ohne_laufzeit_am_selben_tag_verlieren_keine_zahlweise(tm
     )
 
 
-# --------------------------------------------------------------------------
-# Der Template-Block - die gesetzte Rechung als Markup
-# --------------------------------------------------------------------------
-
-
 def test_der_block_zeigt_das_mal_muster_und_die_summe():
     """design.md Regel 6: die Rechung ist GESETZT („70,00 € × 24 =
     1 680 €"), keine prose Erklärung - und die Werte genau dieser
@@ -368,12 +331,6 @@ def test_der_block_zeigt_das_mal_muster_und_die_summe():
     assert "= <b>1.120,75 €</b>" in html
     assert "Kosten über 24 Monate" in html
     assert "TCO-24" not in html
-
-
-# --------------------------------------------------------------------------
-# P1-Fix (17.09.2026, Sicht-A2/A3 + Code-S3-1): Quittungs-Panel - Balken,
-# Restschuld, Farbpunkt, 12-px-Regel
-# --------------------------------------------------------------------------
 
 
 def test_jeder_posten_traegt_seinen_anteil_als_balken():
@@ -393,8 +350,6 @@ def test_jeder_posten_traegt_seinen_anteil_als_balken():
         erwartet = f"{p['betrag'] / r['gesamt'] * 100:.1f}%"
         assert i.get("style") == f"width:{erwartet}", i.get("style")
         breiten.append(float(i["style"].split(":")[1].rstrip("%")))
-    # Der Tarifposten (359,76 von 892,75) ist breiter als die Zuzahlung
-    # (37,00 von 892,75) - die Balken unterscheiden sich sichtbar.
     assert breiten[2] > breiten[0]
 
 
@@ -409,7 +364,6 @@ def test_die_restschuld_steht_in_der_rechnung_wenn_die_rate_laenger_laeuft():
     html = zr._rechung_html("o2", _messung(O2_MESSUNG))
     assert "davon nach Monat 24 noch zu zahlen: 12 × 19,00 €" in html
     assert "= 228,00 €" in html
-    # zusammen-Form (1&1): der Bündelbetrag laeuft weiter, derselbe Satz
     r11 = zr._rechung(
         _messung(EINS_EINS_MESSUNG, anbieter="1&1", tarif="1&1 All-Net-Flat S")
     )
@@ -422,7 +376,6 @@ def test_die_restschuld_steht_in_der_rechnung_wenn_die_rate_laenger_laeuft():
         "1&1", _messung(EINS_EINS_MESSUNG, anbieter="1&1", tarif="1&1 All-Net-Flat S")
     )
     assert "davon nach Monat 24 noch zu zahlen: 12 × 49,99 € = 599,88 €" in html11
-    # 24 Monate: keine Zeile
     kurz = dict(
         O2_MESSUNG,
         laufzeit_monate=24,
@@ -505,8 +458,6 @@ def test_der_block_traegt_anbieter_messtag_und_beleg_dieses_tages():
     html = zr._rechenwege_html({"o2": {"2026-09-12": _messung(O2_MESSUNG)}}, [])
     assert "data-anb='o2'" in html and "data-m='2026-09-12'" in html
     assert "Messung vom 12. September 2026" in html
-    # Der Beleg nennt das Abrufdatum der MESSUNG, nicht das von heute -
-    # genau das war die Lücke des statischen „So gerechnet"-Satzes.
     assert "abgerufen 12.09.2026" in html
     assert "https://www.o2online.de/e-shop/samsung/s23" in html
 
@@ -539,7 +490,6 @@ def test_die_naeherung_bekommt_einen_benannten_leerzustand():
     text = leer.get_text(" ", strip=True)
     assert "Referenzrechnung, kein Angebot" in text
     assert "keine Messung je Messtag" in text
-    # kein erfundener Posten im Leerzustand:
     assert leer.select(".gr-zr-posten") == []
 
 
@@ -585,11 +535,6 @@ def test_zwei_preisformen_am_selben_tag_bleiben_zwei_templates():
         (t["data-anb"], t["data-m"]) for t in suppe.select("template[data-anb][data-m]")
     }
     assert paare == {("o2", "2026-09-12"), ("1&1", "2026-09-12")}
-
-
-# --------------------------------------------------------------------------
-# Das SVG - jeder Punkt findet seinen Rechenweg
-# --------------------------------------------------------------------------
 
 
 def _serien():
@@ -663,7 +608,6 @@ def test_zwei_zeitraeume_stehen_an_den_kurven_und_in_der_beschriftung():
     suppe = BeautifulSoup(svg, "html.parser")
     etiketten = [t.get_text(strip=True) for t in suppe.select("text.gr-zr-mon")]
     assert sorted(etiketten) == ["24 Mon.", "36 Mon."], etiketten
-    # Die Kurve selbst ist da: zwei Punkte je Anbieter.
     assert len(suppe.select("circle.gr-zr-punkt[data-anb='1&1']")) == 2
 
 
@@ -696,7 +640,6 @@ def test_ein_einzelmesstag_traegt_einen_halo_und_heisst_erstmals():
     assert len(suppe.select("circle.gr-zr-halo")) == 1
     titel = suppe.select_one("circle.gr-zr-hit > title").get_text(strip=True)
     assert titel == "o2 · 12.9. · 893 € · erstmals gemessen"
-    # Drei Messungen: kein Halo, kein „erstmals" mehr
     svg3 = zr._svg(
         {"o2": [["2026-09-12", 892.75], ["2026-09-13", 890.0], ["2026-09-14", 891.0]]},
         True,
@@ -705,11 +648,6 @@ def test_ein_einzelmesstag_traegt_einen_halo_und_heisst_erstmals():
     suppe3 = BeautifulSoup(svg3, "html.parser")
     assert suppe3.select("circle.gr-zr-halo") == []
     assert "erstmals" not in svg3
-
-
-# --------------------------------------------------------------------------
-# Integration - First Paint und Fragment tragen dieselben Vorlagen
-# --------------------------------------------------------------------------
 
 
 @pytest.fixture(scope="module")
@@ -767,7 +705,7 @@ def test_im_fragment_findet_jeder_kreis_sein_template(gerendert):
     for block in lager:
         kreise, vorlagen = _treffer_und_vorlagen(block)
         if not kreise:
-            continue  # Paar ohne Serie (ehrlicher Leer-Satz)
+            continue
         assert kreise <= vorlagen, (
             f"{block.get('data-modell')}/{block.get('data-band')}: "
             f"Kreise ohne Vorlage: {kreise - vorlagen}"

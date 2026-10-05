@@ -20,7 +20,6 @@ import pruefstempel
 from leiter_befunde import Ergebnis, rote_zeilen
 
 GANZE_DATEI = ""
-# Namen, die pytest für die ganze Datei liest; geändert treffen sie jeden Test.
 DATEIWEIT = frozenset(
     {
         "pytestmark",
@@ -105,7 +104,6 @@ def geaenderte_zeilen(wurzel: Path, datei: str) -> set[int] | None:
     zeilen: set[int] = set()
     for start, anzahl in HUNK.findall(unterschied):
         erste, menge = int(start), 1 if anzahl == "" else int(anzahl)
-        # Eine reine Löschung (Menge 0) trifft die Zeilen davor und danach.
         zeilen |= set(range(erste, erste + menge)) if menge else {erste, erste + 1}
     return zeilen
 
@@ -125,7 +123,6 @@ def tests_in_zeilen(baum: ast.Module, zeilen: set[int]) -> list[str] | None:
         if not namen or hook or namen & DATEIWEIT or _ist_autouse(knoten):
             return None
         geaendert |= namen
-    # Hilfen, die geänderte Namen nutzen, sind selbst geändert, bis zum Fixpunkt.
     while neu := {
         n
         for k in hilfen

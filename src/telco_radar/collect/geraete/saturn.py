@@ -95,20 +95,6 @@ log = logging.getLogger(__name__)
 
 _STATE_MARK = "window.__PRELOADED_STATE__ = "
 
-# Die Farbe steht in JEDEM beobachteten Titel zwischen der Speicherangabe
-# und dem optionalen SIM-Zusatz ("... 256 GB Tiefblau Dual SIM", "... 1 TB
-# Himmelblau" ohne Zusatz bei iPhone Air). Sie wird HIER strukturiert
-# gelesen und NICHT dem generischen Titel-Rueckfall ueberlassen
-# (`geraete_model.farbe_aus_titel`): dessen Mustersuche vergleicht
-# ASCII-gefaltete Schreibweisen ("weiss") gegen den UNGEFALTETEN Titeltext
-# und findet "Weiß" deshalb nie - ein Befund an echten Daten (fuenf von
-# fuenf Farbvarianten der Seite /de/brand/apple/iphone/iphone-17 wurden
-# richtig gelesen, "Weiß" fiel auf "ohne-farbe"). Die Farbe hier
-# strukturiert weiterzugeben, statt den fehleranfaelligen Rueckfall zu
-# durchlaufen, ist dieselbe Rangfolge, die jeder andere Adapter mit einem
-# eigenen Farbfeld schon befolgt (Teil C1: strukturierte Daten schlagen
-# Textextraktion). `normalisiere_farbe` faltet danach korrekt (ueber
-# `geraete_model.normalisiere`, das "ß" -> "ss" abbildet).
 _FARBE_RE = re.compile(
     r"\b\d+\s*(?:GB|TB)\b\s+(?P<farbe>.+?)"
     r"(?:\s+(?:Dual SIM|Single SIM|eSIM))?\s*$",
@@ -140,8 +126,6 @@ def _preloaded_state(html: str) -> dict:
     raw = html[start:end].rstrip()
     if raw.endswith(";"):
         raw = raw[:-1]
-    # Die Nutzlast traegt teils das JS-Literal "undefined", das kein
-    # gueltiges JSON ist - siehe Spike-Skript, derselbe Kunstgriff.
     raw = re.sub(r":undefined", ":null", raw)
     try:
         daten = json.loads(raw)
@@ -180,8 +164,6 @@ def _preisfeatures(state: dict) -> list[dict]:
                 "currency": val.get("currency"),
                 "installment_present": (val.get("price") or {}).get("installment")
                 is not None,
-                # `None` heisst "die Quelle nennt es nicht" und ist ausdruecklich
-                # NICHT dasselbe wie `False` - siehe Modulkopf, fail closed.
                 "is_marketplace": val.get("isProductOfTypeMarketplace"),
             }
         )
@@ -247,12 +229,6 @@ def lies(text: str, url: str = "") -> list[dict]:
 
         schluessel = (titel.strip().lower(), preis)
         if ld_json_index and schluessel not in ld_json_index:
-            # Die Gegenprobe schlaegt fehl: der Apollo-Preis findet keine
-            # Entsprechung im UNABHAENGIGEN ld+json-Block derselben Seite.
-            # Der Preis bleibt trotzdem in der Ausgabe - der Apollo-Cache
-            # ist die einzige Quelle mit dem Marktplatz-Feld, ihn deswegen
-            # zu verwerfen waere die Gegenprobe wichtiger zu nehmen als den
-            # eigentlichen Pflichtfilter. Der Befund soll aber auffallen.
             log.warning(
                 "Saturn: %r (%.2f EUR) aus dem Apollo-Cache ohne "
                 "Entsprechung im ld+json-ItemList derselben Seite (%s)",

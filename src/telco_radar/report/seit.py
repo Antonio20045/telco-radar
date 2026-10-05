@@ -19,8 +19,6 @@ Ueberlegung wie beim Zwei-Minuten-Pfad, der bei leerer Lage ganz wegfaellt.
 
 from __future__ import annotations
 
-# Wie viele Zeilen die Spalte hoechstens traegt. Drei, weil sie neben einer
-# Ueberschrift steht und nicht neben ihr herunterlaufen darf.
 MAX_ZEILEN = 3
 
 
@@ -49,9 +47,6 @@ def fuer_differenzierung(diff: dict) -> dict:
 def fuer_promo(promo_view: dict) -> dict:
     """Neue und ausgelaufene Aktionen. Beides ist eine Bewegung des Marktes -
     eine ausgelaufene Aktion sagt so viel wie eine neue."""
-    # Gezaehlt wird auf den ANGEBOTEN, nicht auf den Karten: `neu` und der
-    # Status stehen dort (prepare_promo_view stempelt sie beim Aufbereiten),
-    # die Karte traegt nur, was sie anzeigt.
     angebote = [k.get("offer") or {} for k in (promo_view.get("karten") or [])]
     neu = sum(1 for a in angebote if a.get("neu"))
     weg = sum(

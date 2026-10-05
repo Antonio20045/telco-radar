@@ -76,50 +76,13 @@ from ..geraete_model import (
     zustand_aus_titel,
 )
 
-# Ab dieser Spanne ueber die FARBEN eines Geraets wird der Fall berichtet -
-# nicht aussortiert. Kein Farbaufschlag ist ein Viertel des Geraetepreises;
-# wenn doch, soll ihn jemand ansehen statt ihn zu verlieren. Gemessen am
-# Bestand vom 29.08.2026 lagen die echten Farbpreise bei 5,7 bis 21,6 %.
 FARBSPANNE_GRENZE = 0.25
 
-# Und ab dieser Spanne ist es kein Farbaufschlag mehr, sondern ein falsch
-# gelesenes Feld - die Gruppe wird entfernt.
-#
-# Diese zweite Grenze ist am 30.08.2026 nachgetragen worden, und ihr Fehlen
-# war ein echter Rueckschritt: mit dem Wegfall der alten Spannengrenze hatte
-# die `min`-Auswahl UEBER FARBEN HINWEG gar keinen Filter mehr, und CLAUDE.md
-# sagt dazu einen Satz - "Der niedrigste Preis ist der wahrscheinlichste
-# Fehler. Jede `min`-Auswahl braucht einen Filter davor." Nachgestellt: ein
-# o2-Lockpreis von 1,00 EUR in anderer Farbe ueberlebte und gewann den
-# Vergleich, waehrend die Quellenseite daneben "die Farben liegen 89800 %
-# auseinander - gezeigt" schrieb.
-#
-# Sie steht bei 100 %, nicht bei 30 %: ein Geraet, das in einer Farbe doppelt
-# so viel kostet wie in einer anderen, ist keine Farbvariante mehr. Alles
-# darunter wird berichtet und BLEIBT - "kein Farbaufschlag ist ein Viertel
-# des Geraetepreises; wenn doch, will ich es sehen, nicht geloescht
-# bekommen". Gemessen lagen echte Farbpreise bei 5,7 bis 21,6 %.
 FARBSPANNE_UNMOEGLICH = 1.00
 
-# Abweichung vom Median, ab der ein Preis als Ausreisser gilt.
 AUSREISSER_ANTEIL = 0.60
 MIN_ANGEBOTE_FUER_MEDIAN = 3
 
-# DIESELBE Sichtbarkeitsmenge wie Vergleich, Katalog und Preisgrafik. Sie
-# stand hier bis zum 30.08.2026 auf ("aktiv", "beobachtet") - und
-# "beobachtet" ist gar kein Status dieses Stores, den gibt es nur als
-# "aktiv", "vermutlich ausgelistet" und "ausgelistet".
-#
-# Die Folge war nicht kosmetisch: eine Listung auf "vermutlich ausgelistet"
-# wurde von dieser Pruefung NIE angesehen, stand aber sehr wohl im Vergleich
-# (`geraete_vergleich._SICHTBAR`). Genau so kam am 30.08.2026 der
-# o2-Gebrauchtpreis fuer das Galaxy S25 (577 EUR, falsch als "neu"
-# gespeichert) auf die LIVE-Seite zurueck und stand dort als "KRITISCH,
-# 32,1 % guenstiger" - derselbe Fehler, den B1 beseitigt hatte, durch eine
-# Hintertuer, die niemand gemessen hatte.
-#
-# Eine Pruefung kann nicht schuetzen, was sie nicht sieht. Ihre Menge muss
-# deshalb mindestens so weit sein wie die der Verbraucher.
 _SICHTBAR = (STATUS_AKTIV, STATUS_VERMUTLICH)
 
 
@@ -285,11 +248,6 @@ def _farbspannen(eintraege: list, katalog) -> tuple[set, list]:
             e.get("speicher_gb"),
             e.get("zustand") or "neu",
         )
-        # Der Beispieleintrag wird beim AUFBAU mitgefuehrt, nicht hinterher
-        # gesucht. Die erste Fassung suchte ihn per `next()` ueber Anbieter
-        # und Geraet - ohne Speicher und Zustand, also aus einer anderen
-        # Gruppe: der Befund trug "Galaxy S26 128 GB" und die Preise der
-        # 256-GB-Gruppe daneben.
         beispiele.setdefault(schluessel, e)
         farbe = _farbe(e)
         preise = gruppen.setdefault(schluessel, {})
@@ -347,8 +305,6 @@ def _speicherinversionen(eintraege: list, katalog) -> tuple[set, list]:
             teuer = min(_preis(e) for e in stufen[kleiner])
             if billig >= teuer:
                 continue
-            # Beide Stufen fliegen: die Inversion sagt, dass EINE von beiden
-            # falsch gelesen ist, aber nicht welche.
             raus.update(_schluessel(e) for e in stufen[kleiner] + stufen[groesser])
             befunde.append(
                 {
@@ -374,7 +330,6 @@ def _ausreisser(eintraege: list, katalog) -> tuple[set, list]:
 
     raus, befunde = set(), []
     for _gruppenschluessel, gruppe in gruppen.items():
-        # Unter drei Angeboten ist der Median keiner (siehe Protokoll).
         if len(gruppe) < MIN_ANGEBOTE_FUER_MEDIAN:
             continue
         mitte = median([_preis(e) for e in gruppe])
@@ -384,14 +339,6 @@ def _ausreisser(eintraege: list, katalog) -> tuple[set, list]:
             abweichung = abs(_preis(e) - mitte) / mitte
             if abweichung <= AUSREISSER_ANTEIL:
                 continue
-            # BERICHTET, nicht entfernt. Ein Doppelpreis und eine
-            # Speicherinversion sind Selbstwidersprueche - der Datensatz
-            # widerspricht sich selbst, und welche Zahl stimmt, sagt er
-            # nicht. Ein Ausreisser ist etwas anderes: er widerspricht dem
-            # MARKT, nicht sich selbst. Ein Discounter, der wirklich 60 %
-            # unter dem Median liegt, ist genau das Signal, wegen dem diese
-            # Seite existiert - ihn als Datenfehler zu loeschen hiesse, den
-            # Befund gegen die Erwartung zu verwerfen.
             befunde.append(
                 {
                     "art": "ausreisser",
@@ -452,8 +399,6 @@ def pruefe(eintraege: list, katalog=None) -> dict:
     """
     kandidaten = [e for e in eintraege if _vergleichbar(e)]
 
-    # Die ENTFERNENDEN Pruefungen laufen nacheinander; jede sieht nur, was
-    # die vorige uebrig gelassen hat.
     raus: set = set()
     befunde: list = []
     uebrig = kandidaten
@@ -469,33 +414,11 @@ def pruefe(eintraege: list, katalog=None) -> dict:
         if weg:
             uebrig = [e for e in uebrig if _schluessel(e) not in weg]
 
-    # Die MELDENDE Pruefung rechnet ueber das, was UEBRIG ist - nicht ueber
-    # alle Kandidaten.
-    #
-    # Beide Richtungen sind einmal gebaut und wieder verworfen worden, und
-    # die Abwaegung ist die: ueber alle Kandidaten gerechnet ziehen genau
-    # die Zeilen den Median, die die Pruefungen gerade als kaputt entfernt
-    # haben - ein 1-Euro-Lockpreis oder ein falsch gespeicherter
-    # Gebrauchtpreis. Dann steht neben einer gesunden Zeile "ungewoehnlich
-    # grosser Abstand - Quelle pruefen", und der Leser soll eine Zahl
-    # anzweifeln, die stimmt.
-    #
-    # Der Preis dafuer: faellt eine Gruppe durch die Streichungen unter drei
-    # Angebote, wird ihr Median gar nicht mehr gerechnet und eine auffaellige
-    # Zeile bleibt unmarkiert. Das ist hinnehmbar, weil es dieselbe Aussage
-    # ist, die `_ausreisser` ohnehin trifft: unter drei Angeboten ist der
-    # Median kein Median, sondern einer der beiden Werte. Ein Fehlalarm auf
-    # einer richtigen Zahl waere teurer als eine ausgebliebene Markierung.
     _, ausreisser = _ausreisser(uebrig, katalog)
     befunde.extend(ausreisser)
 
     sauber = [e for e in eintraege if _schluessel(e) not in raus]
     entfernt = [b for b in befunde if b["entfernt"]]
-    # Die Zeilen, die stehen bleiben und trotzdem einen Blick verdienen. Ein
-    # Ausreisser ist der Befund, wegen dem diese Seite existiert - ein
-    # Discounter 60 % unter dem Median ist das Signal, nicht der Fehler. Er
-    # wird deshalb nicht geloescht, sondern an seiner Vergleichszeile
-    # markiert, damit ein Mensch die Quelle aufruft und entscheidet.
     auffaellig = {
         b["listung_id"]: b
         for b in befunde
@@ -520,12 +443,6 @@ def pruefe(eintraege: list, katalog=None) -> dict:
             "farbspannen": sum(1 for b in befunde if b["art"] == "farbspanne"),
             "ausreisser": sum(1 for b in befunde if b["art"] == "ausreisser"),
             "befunde": len(befunde),
-            # ZWEI verschiedene Zahlen, und sie duerfen nicht denselben Namen
-            # bekommen: `aussortiert` sind die LISTUNGEN, die aus Vergleich
-            # und Grafik fallen, `entfernt` die BEFUNDE, die das ausgeloest
-            # haben. Ein Doppelpreis ist ein Befund und zwei Listungen - die
-            # Seite meldete deshalb "2 aus dem Vergleich genommen", waehrend
-            # die Listungszahl daneben um 4 fiel.
             "entfernt": len(entfernt),
         },
     }

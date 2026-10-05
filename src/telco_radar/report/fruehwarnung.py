@@ -40,8 +40,6 @@ log = logging.getLogger(__name__)
 
 AKTIV, BEOBACHTET, RUHEND = "aktiv", "beobachtet", "ruhend"
 
-# Wie viele Belege je Indikator gezeigt werden. Mehr als zwei macht aus dem
-# Board eine zweite Meldungsliste.
 MAX_BELEGE = 2
 
 
@@ -65,8 +63,6 @@ class Indikator:
             return False
         if not self._marke:
             return True
-        # Die Marke darf im Absenderfeld ODER im Text stehen: eine
-        # Fachpressemeldung ueber die Telekom traegt sie oft nur im Titel.
         absender = str(h.get("operator") or h.get("source") or "").lower()
         return any(p.search(absender) or p.search(text) for p in self._marke)
 
@@ -164,7 +160,6 @@ def aufbereiten(wochen: list[dict], root: Path) -> dict:
                 "frage": frage.frage,
                 "warum": frage.warum,
                 "indikatoren": zeilen,
-                # Der Zustand der FRAGE ist der staerkste ihrer Indikatoren.
                 "zustand": (
                     AKTIV
                     if any(z["zustand"] == AKTIV for z in zeilen)
@@ -175,9 +170,6 @@ def aufbereiten(wochen: list[dict], root: Path) -> dict:
             }
         )
 
-    # Aktive Fragen zuerst, ruhende zuletzt - aber ALLE bleiben stehen. Eine
-    # Frage, zu der seit Wochen nichts kommt, ist beantwortet, und genau das
-    # soll man sehen koennen.
     rang = {AKTIV: 0, BEOBACHTET: 1, RUHEND: 2}
     ausgabe.sort(key=lambda f: rang[f["zustand"]])
     return {

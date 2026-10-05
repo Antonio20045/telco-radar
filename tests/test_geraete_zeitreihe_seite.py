@@ -58,11 +58,6 @@ def tafel(suppe):
     return suppe.select_one("#tafel-tco")
 
 
-# --------------------------------------------------------------------------
-# §3.4 - der Zeitreihen-Graph ersetzt alle frueheren Graph-Formen
-# --------------------------------------------------------------------------
-
-
 def test_der_startzustand_steht_serverseitig_als_svg(tafel):
     svg = tafel.select_one("svg.gr-zr")
     assert svg is not None
@@ -98,25 +93,16 @@ def test_der_glossar_und_wie_gerechnet_sind_weg(suppe, tafel):
     assert "Wie gerechnet?" not in text
 
 
-# --------------------------------------------------------------------------
-# §4.2 - Wahl-Leiste, Antwort-Satz, Graph - in dieser Reihenfolge
-# --------------------------------------------------------------------------
-
-
 def test_zwischen_wahl_leiste_und_graph_steht_nur_der_antwort_satz(tafel):
     wahl = tafel.select_one(".gr-zr-wahl")
     kacheln = tafel.select_one(".gr-zr-kacheln")
     antwort = tafel.select_one(".gr-zr-antwort")
     graph = tafel.select_one(".gr-zr-graph")
     assert all(e is not None for e in (wahl, antwort, graph))
-    # DOM-Reihenfolge: Wahl < Kacheln < Antwort < Graph (§4.2) - nichts
-    # Unbenanntes darf dazwischenrutschen.
     positionen = [
         e.sourceline for e in (wahl, kacheln, antwort, graph) if e is not None
     ]
     assert positionen == sorted(positionen)
-    # Der Antwort-Satz ist das EINZIGE Element zwischen Wahl-Leiste bzw.
-    # Kacheln und dem Graphen, das kein Aufklapper und keine Tabelle ist.
     zwischen = [
         e
         for e in tafel.select(".gr-zr-wahl ~ *")
@@ -153,7 +139,6 @@ def test_jede_karte_traegt_preis_und_anbieter_punkte(tafel):
         assert bande, "Karte ohne Band-Spans"
         sichtbar = [s for s in bande if not s.has_attr("hidden")]
         assert sichtbar, "kein Band-Span sichtbar"
-        # Alle sichtbaren Preislagen zugleich: eine Karte zeigt EIN Band.
         preise = k.select(".gr-zr-k-preis")
         assert preise, "Karte ohne Preis-Gruppe"
         if not k.select_one(".gr-zr-k-leer"):
@@ -164,7 +149,6 @@ def test_jede_karte_traegt_preis_und_anbieter_punkte(tafel):
             monat = k.select_one(".gr-zr-k-monat")
             assert monat is not None and "€/Monat" in monat.get_text()
         assert k.select(".gr-zr-k-punkte i"), "Karte ohne Anbieter-Punkte"
-        # Eine Bewegung steht nur, wenn sich etwas bewegt hat (28.09.2026).
         delta = k.select_one(".gr-zr-k-delta")
         assert delta is None or (
             "€" in delta.get_text()
@@ -181,18 +165,13 @@ def test_kein_weiterer_aufklapper_ueber_dem_graphen(tafel):
     graph = tafel.select_one(".gr-zr-graph")
     for details in tafel.select("details"):
         if details.select_one(".gr-zr-graph") is not None:
-            continue  # der Fuss-Aufklapper umfasst mehr
+            continue
         vor_graph = details.sourceline < graph.sourceline if graph else False
         inhalt = " ".join(details.get_text(" ", strip=True).split())[:60]
         if vor_graph and "gr-bnd" not in (details.get("class") or []):
             assert "gr-zr-rechnung" in (details.get("class") or []), (
                 f"unerwarteter Aufklapper ueber dem Graphen: {inhalt}"
             )
-
-
-# --------------------------------------------------------------------------
-# §3.1c - der Fuss-Aufklapper "Massstab & Datenlage"
-# --------------------------------------------------------------------------
 
 
 def test_der_fuss_aufklapper_heisst_massstab_und_datenlage(tafel):
@@ -212,11 +191,6 @@ def test_die_buendel_zeilen_bleiben_unter_dem_graphen(tafel):
     assert tafel.select(".gr-bnd .gr-bnd-rw"), (
         "der Rechenweg-Aufklapper je Zeile fehlt (§3.1b)"
     )
-
-
-# --------------------------------------------------------------------------
-# Der Client-Knoten - Interaktion ohne Zahlen
-# --------------------------------------------------------------------------
 
 
 def test_der_zeitreihe_knoten_traegt_startzustand_und_suchindex(suppe):
@@ -262,8 +236,6 @@ def test_das_fragment_traegt_alle_pare_und_den_startzustand(tmp_path_factory):
     inhalt = fragment.read_text(encoding="utf-8")
     frag = BeautifulSoup(inhalt, "html.parser")
     lager = frag.select(".gr-zr-lager")
-    # ALLE Paare - auch die des Startzustands: der Rueckweg nach einem
-    # Wechsel hat genau EINE Quelle (kein Vorgabe-Klon, keine S2-Falle).
     paare = {(l.get("data-modell"), l.get("data-band")) for l in lager}
     assert ("apple-iphone-17-pro-256", "xs") in paare
     assert ("apple-iphone-17-pro-256", "m") in paare

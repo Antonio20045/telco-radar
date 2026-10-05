@@ -165,7 +165,7 @@ def _rahmen_bewegung():
         muster = re.escape(satz)
         for name, ersatz in platz.items():
             muster = muster.replace(re.escape(name), ersatz)
-        assert "\\{" not in muster, satz  # jeder Platzhalter belegt
+        assert "\\{" not in muster, satz
         aus.append(re.compile("^" + muster + "$"))
     return aus
 
@@ -178,7 +178,6 @@ def _erfunden(html, bericht):
     for b in _bloecke(html):
         if unbedenklich.match(b) or b in quelle or any(m.match(b) for m in rahmen):
             continue
-        # Zeilen aus mehreren Rahmenteilen, wie im Treue-Test nebenan.
         rest = b
         for m in sorted(rahmen, key=lambda p: -len(p.pattern)):
             rest = re.sub(m.pattern.strip("^$"), " ", rest)
@@ -223,7 +222,6 @@ def _zahlen(text):
 def test_die_zahlen_der_zeile_kommen_aus_dem_block():
     soup = BeautifulSoup(_nachricht().html, "html.parser")
     text = soup.get_text(" ")
-    # o2: Abstand -600 -> -840, Aenderung 240; Telekom: 300 -> 420, 120.
     for erwartet in (
         "240 € zugunsten von o2",
         "vorher 600 € günstiger als Vodafone",
@@ -311,15 +309,10 @@ def test_der_block_steht_nur_in_der_ersten_ausgabe_der_woche():
     assert "GERÄTE" in _nachricht().text
 
 
-# ---------------------------------------------------------- Testversand
-
-
 def _send(tmp_path, *extra, env=None):
     bericht = tmp_path / "bericht.json"
     bericht.write_text(json.dumps(BERICHT, ensure_ascii=False))
     store = tmp_path / "store.jsonl"
-    # Ohne GITHUB_ACTIONS: dort gibt das Skript `::add-mask::` aus (eigener
-    # Test unten), und der Test haengt nicht davon ab, wo er laeuft.
     umgebung = {
         k: v
         for k, v in os.environ.items()

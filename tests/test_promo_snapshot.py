@@ -196,11 +196,6 @@ def test_extract_hero_image_returns_none_without_meta_tags():
     assert extract_hero_image(html, "https://example.test/") is None
 
 
-# --------------------------------------------------------- Bildkandidaten
-# Die Grundlage der Bebilderung: was hier nicht als Kandidat herauskommt,
-# kann promo_bilder.py keinem Angebot zuordnen.
-
-
 def test_extract_image_candidates_findet_bild_mit_anker_und_kontext():
     html = """
     <body><main>
@@ -215,9 +210,6 @@ def test_extract_image_candidates_findet_bild_mit_anker_und_kontext():
     assert len(kand) == 1
     assert kand[0]["src"] == "https://marke.test/media/allnet-m-kampagne.jpg"
     assert kand[0]["anchor"] == "https://marke.test/tarife/allnet-m/"
-    # Der Kontext traegt BEIDES: alt-Text und die naechste Ueberschrift. Der
-    # alt-Text allein reicht oft nicht ("Frau mit Smartphone" sagt nichts
-    # ueber das Angebot), die Ueberschrift allein fehlt bei vielen Kacheln.
     assert "Frau mit Smartphone" in kand[0]["context"]
     assert "125 GB" in kand[0]["context"]
 

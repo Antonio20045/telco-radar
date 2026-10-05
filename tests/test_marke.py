@@ -26,8 +26,6 @@ from telco_radar.report.html import render_site
 
 MARKE = "Vodafone Product and Services Insights"
 
-# Alle Seiten, die base.html.j2 erben. promo/ liegt eine Ebene tiefer und
-# traegt denselben Kopf - genau dort faellt ein halber Rename auf.
 SEITEN = (
     "index.html",
     "meldungen.html",
@@ -68,16 +66,12 @@ def test_jede_seite_traegt_den_namen_im_titel(tmp_path):
     ohne = []
     for name in SEITEN:
         datei = site_dir / name
-        if not datei.exists():  # geraete.html haengt an Daten
+        if not datei.exists():
             continue
         titel = re.search(
             r"<title>(.*?)</title>", datei.read_text(encoding="utf-8"), re.S
         )
         assert titel, name
-        # Die Unterseiten der Promo Uebersicht und der Marktrecherche tragen
-        # ihre eigene Ueberschrift im Titel ("Promo Uebersicht - Quellen").
-        # Sie muessen den Markennamen nicht wiederholen; der Kopf tut es.
-        # Wer ihn aber traegt, traegt ihn vollstaendig.
         text = titel.group(1)
         if "Insights" in text and MARKE not in text:
             ohne.append((name, text.strip()))
@@ -94,8 +88,6 @@ def test_der_zeitungskopf_liest_den_vollen_namen(tmp_path):
             continue
         assert _kopftext(datei.read_text(encoding="utf-8")) == MARKE, name
         gepruefte += 1
-    # Ohne diese Zeile prueft der Test nichts, wenn render_site die Namen
-    # aendert - dieselbe Falle wie am 09.08.2026 beim Schlagzeilen-Lookup.
     assert gepruefte >= 8, f"nur {gepruefte} Seiten geprueft"
 
 
@@ -109,8 +101,6 @@ def test_der_kopf_behaelt_seinen_kursiven_akzent(tmp_path):
     roh = kopf.group(1)
     assert "<em>Insights</em>" in roh
     assert '<span class="brand-zusatz">Product and Services</span>' in roh
-    # Reihenfolge: der Zusatz steht ZWISCHEN "Vodafone" und "Insights" - als
-    # Anhaengsel hinter dem kursiven Wort waere es ein anderer Name.
     assert roh.index("brand-zusatz") < roh.index("<em>")
 
 
@@ -180,11 +170,6 @@ def test_kein_alter_name_mehr_in_den_vorlagen(tmp_path):
     assert not reste, f"alter Name uebrig: {reste}"
 
 
-# ==========================================  Der Kopf und die Schriftbreite ==
-# Der teuerste Fehler dieser Kopfleiste ist nicht, dass sie zu breit ist -
-# sondern dass ihre Breite gegen EINE Schrift kalibriert war.
-
-
 def test_der_kopf_laeuft_auch_mit_breiterer_schrift_nicht_aus_dem_bild(
     tmp_path, chromium
 ):
@@ -225,10 +210,6 @@ def test_der_kopf_laeuft_auch_mit_breiterer_schrift_nicht_aus_dem_bild(
             page = chromium.new_page(viewport={"width": 390, "height": 844})
             try:
                 page.goto(f"http://127.0.0.1:{port}/index.html")
-                # Der Aufschlag macht den Namen breiter, ohne eine bestimmte
-                # Schrift vorauszusetzen. 3 px je Zeichen sind rund 40 % mehr
-                # Breite - deutlich mehr, als eine Serife gegenueber ihrer
-                # Rueckfallschrift ausmacht.
                 page.add_style_tag(
                     content=(f".brand-name{{letter-spacing:{aufschlag}px}}")
                 )
@@ -253,14 +234,11 @@ def test_der_kopf_laeuft_auch_mit_breiterer_schrift_nicht_aus_dem_bild(
         if m["doc"] > m["fenster"] + 1
     ]
     assert not schuldig, schuldig
-    # ... und der Kopf selbst bleibt im Bild.
     ragt = [
         f"+{a} px: Kopf endet bei {m['kopf']} px"
         for a, m in gemessen.items()
         if m["kopf"] > m["fenster"] + 1
     ]
     assert not ragt, ragt
-    # Gegenprobe: der Aufschlag hat wirklich etwas veraendert - sonst misst
-    # der Test dreimal dasselbe.
     breiten = {m["kopf"] for m in gemessen.values()}
     assert len(breiten) > 1, f"Aufschlag ohne Wirkung: {gemessen}"

@@ -27,10 +27,6 @@ log = logging.getLogger(__name__)
 
 DIMENSIONEN = ("bereiche", "regionen", "wettbewerber", "kategorien")
 
-# Die Namen, unter denen eine Dimension im Abo-Datensatz steht. Englisch,
-# weil sie im JSON eines Abos landen und dort neben `email`, `filters` und
-# `state` stehen - ein halb uebersetztes Schema ist schlimmer als ein ganz
-# englisches oder ein ganz deutsches.
 FELD_JE_DIMENSION = {
     "bereiche": "branches",
     "regionen": "regions",

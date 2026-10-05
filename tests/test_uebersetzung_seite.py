@@ -18,7 +18,6 @@ from telco_radar.report.html import _env, render_site
 from telco_radar.uebersetzung.store import Uebersetzung, UebersetzungsStore, text_hash
 
 
-# ------------------------------------------------------------------- Schluessel
 def test_die_id_kommt_aus_der_normalisierten_url():
     """Premortem 6: der Dateiname folgt der Item-ID, nicht dem Titel.
 
@@ -39,7 +38,6 @@ def test_die_id_stimmt_mit_der_des_items_ueberein():
     assert uv.id_fuer_url(url) == Item(title="t", url=url, source_name="q").id
 
 
-# ------------------------------------------------------------------ Zuordnung
 def _store(tmp_path, **kw):
     store = UebersetzungsStore(tmp_path / "uebersetzungen.jsonl")
     basis = dict(
@@ -75,7 +73,6 @@ def test_zuordnung_zeigt_auf_den_richtigen_pfad(tmp_path):
     assert zuordnung[url] == f"uebersetzung/{uv.id_fuer_url(url)}.html"
 
 
-# ---------------------------------------------------------------- Die Seite
 def _seite(tmp_path) -> str:
     store = _store(tmp_path)
     seite = uv.seiten(store)[0]
@@ -83,9 +80,6 @@ def _seite(tmp_path) -> str:
     env.globals.setdefault("geraete_verlinkt", False)
     env.globals.setdefault("newsletter_verlinkt", False)
     env.globals.setdefault("rechtstexte_verlinkt", set())
-    # Genau die Felder, die render_site() uebergibt - als handverlesene
-    # Liste liefe der Test irgendwann gegen eine andere Vorlage als die
-    # Website.
     return env.get_template("uebersetzung.html.j2").render(
         prefix="../",
         u=seite["u"],
@@ -119,7 +113,6 @@ def test_der_originaltitel_bleibt_sichtbar(tmp_path):
     assert "Titulo original" in _seite(tmp_path)
 
 
-# ------------------------------------------------- Gegen die gerenderte Site
 @pytest.fixture(scope="module")
 def gerendert(tmp_path_factory):
     """Eine echte Site mit EINER eingespielten Uebersetzung.
@@ -194,7 +187,6 @@ def test_eine_meldung_ohne_uebersetzung_traegt_keinen_link(gerendert):
     """Sonst wirkt die Funktion kaputt - Premortem 4, von der anderen Seite."""
     site, ziel = gerendert
     html = (site / "meldungen.html").read_text(encoding="utf-8")
-    # Genau EINE Meldung hat eine Uebersetzung bekommen.
     assert html.count('class="ueb-link"') == 1
 
 
@@ -206,8 +198,6 @@ def test_der_explorer_bekommt_die_uebersetzung_mitgeliefert(gerendert):
     Suche im HTML wuerde das nie melden.
     """
     site, ziel = gerendert
-    # Der Explorer steht auf den ARCHIVWOCHEN (reports/<datum>.html), nicht
-    # auf meldungen.html - dort listet die Seite ihre Meldungen als HTML.
     seiten = [
         p
         for p in sorted((site / "reports").glob("*.html"))
@@ -284,7 +274,6 @@ def test_die_archivwoche_verlinkt_mit_der_richtigen_tiefe(tmp_path_factory):
     assert 'href="../uebersetzung/' in html, (
         "die Archivwoche verlinkt ohne ../ und zeigt damit ins Leere"
     )
-    # Und die Startseite dieselbe Meldung OHNE das ../
     start = (basis / "site" / "index.html").read_text(encoding="utf-8")
     assert 'href="uebersetzung/' in start
 
@@ -295,11 +284,9 @@ def test_das_stylesheet_kennt_den_roten_link(gerendert):
 
     css = (site / "style.css").read_text(encoding="utf-8")
     assert ".ueb-link" in css
-    # Der Rotwert wird NICHT neu erfunden, sondern aus der Variablen geholt.
     regel = re.search(r"\.ueb-link a\{([^}]*)\}", css)
     assert regel, "die Regel .ueb-link a fehlt"
     assert "var(--red)" in regel.group(1)
-    # Und nirgends im Uebersetzungsblock steht ein eigener Farbwert.
     block = css[
         css.index(
             "/* =====================================================  UEBERSETZUNG = */"
@@ -344,7 +331,6 @@ def test_sprachen_ohne_isch_bleiben_unveraendert():
     assert sprachname_dativ("tr") == "Türkischen"
 
 
-# --------------------------------------------- Die Titelseite, alle Gewichte
 @pytest.fixture(scope="module")
 def titelseite_voll(tmp_path_factory):
     """Jede berichtete Meldung bekommt eine Uebersetzung.

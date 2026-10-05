@@ -61,8 +61,6 @@ def test_leere_antwort_mit_denkspur_nennt_das_token_budget(monkeypatch):
             "system", "user", "deepseek-v4-pro", max_tokens=1800, retries=2
         )
     text = str(fehler.value)
-    # Die Meldung muss die drei Dinge nennen, die man zum Handeln braucht:
-    # dass nur gedacht wurde, wie knapp das Budget war, und was zu tun ist.
     assert "Denkspur" in text
     assert "1800" in text
     assert "erhoehen" in text

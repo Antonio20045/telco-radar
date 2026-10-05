@@ -32,9 +32,6 @@ from pathlib import Path
 
 import yaml
 
-# Etikett der Leitseite, wenn die YAML keins nennt. Steht so auf der
-# Quellen-Unterseite - "Uebersicht" beschreibt, was sie ist: die Seite, die
-# der Anbieter selbst als Einstieg in seine Aktionen fuehrt.
 _LEITSEITE_LABEL = "Übersicht"
 
 
@@ -49,7 +46,7 @@ class PromoPage:
     """
 
     url: str
-    kind: str = "static"  # static | js | skip
+    kind: str = "static"
     label: str = ""
     note: str = ""
 
@@ -63,34 +60,12 @@ class PromoSource:
     name: str
     url: str
     tier: int = 2
-    kind: str = "static"  # static | js | skip  (Art der LEITSEITE)
-    group: str = ""  # Mutter-/Markenfamilie, sofern bekannt
+    kind: str = "static"
+    group: str = ""
     internal_reference: bool = False
     note: str = ""
-    # Achse C des Wichtigkeits-Scores (analyze/promo_ranker.py): Marktreich-
-    # weite der Marke, 1-3. Bewusst ein eigenes Feld statt einer Ableitung
-    # aus dem Tier - eine Handelsmarke wie ALDI TALK erreicht deutlich mehr
-    # Menschen als eine reine Online-Zweitmarke, obwohl beide Tier 2 sind.
-    # Fehlt das Feld, faellt promo_ranker.reach_axis() auf das Tier zurueck.
     reach: int | None = None
-    # Platz in der Anbieter-Rangfolge (1 = wichtigster). Antonio am
-    # 08.08.2026: "die groessten Anbieter wie Telekom etc. an erster Stelle,
-    # soll also nach Wichtigkeit der Anbieter geordnet werden." Bis dahin
-    # sortierte die Uebersicht die Marken nach dem Score ihrer staerksten
-    # Aktion - eine Rangliste der ANGEBOTE, keine des Marktes: Otelo stand
-    # oben und die Telekom auf Platz zehn, weil ihre JS-Seiten in dem Lauf
-    # nur zwei Angebote hergaben.
-    #
-    # Bewusst ein gepflegtes Feld und keine Rechnung: Marktgewicht steht in
-    # keiner Zahl dieses Projekts. Fehlt es, wird aus tier und reach ein
-    # Rang abgeleitet (siehe report/promo.RANG_UNGESETZT), die Marke faellt
-    # dann hinter jede gepflegte.
     rang: int | None = None
-    # Die WEITEREN Seiten dieser Marke (YAML: `pages:`). Die Leitseite steht
-    # NICHT hier drin - sie kommt aus url/kind und wird von `pages` unten
-    # vorangestellt. Getrennt gehalten, damit ein Bestandseintrag ohne
-    # `pages:` unveraendert weiterlaeuft und `url` weiterhin eindeutig "die
-    # Seite, auf die die Marke verlinkt wird" bedeutet.
     extra_pages: list[PromoPage] = field(default_factory=list)
 
     @property

@@ -36,8 +36,6 @@ from telco_radar.geraete_pipeline import run_geraete_stage
 from telco_radar.report import geraete_view
 from telco_radar.report.html import _env
 
-# Die Fixtures des Pipeline-Tests sind der kuerzeste Weg zu einem Lauf mit
-# echtem Store - Uebung dieses Repos (siehe test_geraete_stille_tage.py).
 from test_geraete_pipeline import _SEITEN, _hole, _jetzt, _root
 
 _LOGGER = "telco_radar.geraete_pipeline"
@@ -51,11 +49,6 @@ def _tag(n: int) -> str:
     """Fixtures setzen ihr Datum selbst (CLAUDE.md Regel 11) - kein
     `date.today()`, nirgends."""
     return f"2026-09-{n:02d}"
-
-
-# --------------------------------------------------------------------------
-# Regel 1: ein Tag reicht
-# --------------------------------------------------------------------------
 
 
 def test_wer_gestern_lieferte_und_heute_nichts_liefert_alarmiert(tmp_path):
@@ -80,11 +73,6 @@ def test_ein_unveraenderter_tag_alarmiert_nicht(tmp_path):
     db.protokolliere_lauf("o2", _tag(1), funde=84, vollstaendig=True)
     db.protokolliere_lauf("o2", _tag(2), funde=84, vollstaendig=True)
     assert db.ausfall_alarme(heute=_tag(2)) == []
-
-
-# --------------------------------------------------------------------------
-# Regel 2: die Schwelle
-# --------------------------------------------------------------------------
 
 
 def test_die_schwelle_steht_auf_dreissig_prozent():
@@ -124,11 +112,6 @@ def test_ein_kleiner_rueckgang_alarmiert_nicht(tmp_path):
 
 def test_ein_zuwachs_alarmiert_nicht(tmp_path):
     assert _rueckgang(tmp_path, 100, 140) == []
-
-
-# --------------------------------------------------------------------------
-# Regel 3: "nicht gelesen" ist kein Ausfall
-# --------------------------------------------------------------------------
 
 
 def test_wer_nicht_gelesen_wurde_ist_kein_ausfall(tmp_path):
@@ -177,11 +160,6 @@ def test_ein_nicht_gelesener_tag_zaehlt_auch_nicht_als_vortag(tmp_path):
     ]
 
 
-# --------------------------------------------------------------------------
-# Regel 4: ohne Vortag kein Alarm - und trotzdem kein "in Ordnung"
-# --------------------------------------------------------------------------
-
-
 def test_ohne_vortagsdaten_kein_alarm(tmp_path):
     db = _db(tmp_path)
     db.protokolliere_lauf("1&1", _tag(1), funde=0, vollstaendig=True)
@@ -211,11 +189,6 @@ def test_anhaltende_stille_wiederholt_sich_nicht_taeglich(tmp_path):
     assert db.stille_tage("o2") == 3
 
 
-# --------------------------------------------------------------------------
-# Buendel sind Zeilen - der Telekom-Fall
-# --------------------------------------------------------------------------
-
-
 def test_buendel_zaehlen_als_zeilen(tmp_path):
     """Die Telekom liefert ausschliesslich Buendel und keine einzige
     Listung. An `funde` allein gemessen waere sie jeden Tag still - und
@@ -228,11 +201,6 @@ def test_buendel_zaehlen_als_zeilen(tmp_path):
     db.protokolliere_lauf("Telekom", _tag(3), funde=0, vollstaendig=True, buendel=0)
     alarme = db.ausfall_alarme(heute=_tag(3))
     assert [(a.anbieter, a.zeilen_vortag) for a in alarme] == [("Telekom", 9)]
-
-
-# --------------------------------------------------------------------------
-# Was der Alarm NICHT tut
-# --------------------------------------------------------------------------
 
 
 def test_der_alarm_loest_nichts_aus(tmp_path):
@@ -292,11 +260,6 @@ def test_der_altbestand_gilt_als_gelesen(tmp_path):
     assert db.letzter_messtag() == _tag(2)
 
 
-# --------------------------------------------------------------------------
-# Ende zu Ende: der abgeschaltete Collector
-# --------------------------------------------------------------------------
-
-
 def test_ein_abgeschalteter_collector_loest_den_alarm_aus(tmp_path, caplog):
     """DAS TOR DIESER PHASE. Tag 1 liefert zwei Listungen, an Tag 2
     antwortet keine einzige Seite mehr - genau der Zustand, in dem 50
@@ -315,7 +278,6 @@ def test_ein_abgeschalteter_collector_loest_den_alarm_aus(tmp_path, caplog):
     ) in caplog.text
     assert [a["anbieter"] for a in bilanz["abdeckung_alarme"]] == ["Haendler"]
     assert bilanz["abdeckung_alarme"][0]["kurz"] == "heute nicht erfasst"
-    # Der Alarm ist Meldung, kein Griff: nichts ist gealtert.
     assert bilanz["gealtert"] == 0
 
 
@@ -350,7 +312,7 @@ def test_ausserhalb_der_besuchszeit_bleibt_der_waechter_still(tmp_path, caplog):
     with caplog.at_level(logging.WARNING, logger=_LOGGER):
         bilanz = run_geraete_stage(root, {}, "2026-08-12", jetzt=_jetzt(8), hole=hole)
     medimax = [a for a in bilanz["anbieter"] if a["anbieter"] == "Haendler"][0]
-    assert medimax["listungen"] == 0  # nichts geholt
+    assert medimax["listungen"] == 0
     assert bilanz["abdeckung_alarme"] == []
     assert "Geraeteradar-Abdeckung" not in caplog.text
 
@@ -367,11 +329,6 @@ def test_ein_uebersprungener_anbieter_alarmiert_nie(tmp_path):
         "nicht gelesen",
     ]
     assert db.ausfall_alarme(heute="2026-08-12") == []
-
-
-# --------------------------------------------------------------------------
-# Der Alarm auf der Seite
-# --------------------------------------------------------------------------
 
 
 def _seitenzeile(tmp_path):
@@ -396,7 +353,6 @@ def test_der_alarm_steht_auf_der_quellenseite(tmp_path):
     zeilen = _seitenzeile(tmp_path)
     assert zeilen["Haendler"]["abdeckung"]["kurz"] == "heute nicht erfasst"
     assert "11.08.2026" in zeilen["Haendler"]["abdeckung"]["satz"]
-    # Gegenprobe: der uebersprungene Anbieter traegt KEINE leere Huelle.
     assert zeilen["Plattform"]["abdeckung"] is None
 
 
@@ -404,8 +360,6 @@ def test_die_vorlage_zeigt_heute_nicht_erfasst(tmp_path):
     """Gemessen am echten Makro, nicht am Datensatz: die Zeile der
     Quellenseite traegt den Satz und den roten Punkt."""
     zeilen = _seitenzeile(tmp_path)
-    # Die Vorlage erbt von `base.html.j2` und braucht darum ihren Rahmen -
-    # gemessen wird trotzdem das ECHTE Makro, nicht eine Kopie davon.
     modul = (
         _env()
         .get_template("geraete_quellen.html.j2")
@@ -429,14 +383,8 @@ def test_die_vorlage_zeigt_heute_nicht_erfasst(tmp_path):
     html = modul.zeile(zeilen["Haendler"])
     assert "heute nicht erfasst" in html
     assert "sdot fail" in html
-    # Gegenprobe: ohne Alarm steht der Dauerzustand da, nicht der Satz.
     ohne = modul.zeile(zeilen["Plattform"])
     assert "heute nicht erfasst" not in ohne
-
-
-# --------------------------------------------------------------------------
-# Die Mail
-# --------------------------------------------------------------------------
 
 
 def test_die_mail_traegt_jeden_alarm_und_keine_zugangsdaten(tmp_path):
@@ -454,7 +402,6 @@ def test_die_mail_traegt_jeden_alarm_und_keine_zugangsdaten(tmp_path):
         assert alarm.satz in text
         assert alarm.anbieter in html
     assert "geraete-quellen.html" in text and "geraete-quellen.html" in html
-    # Der Betreff sortiert den groessten Einbruch nach vorn.
     assert text.index("Telekom") < text.index("o2")
 
 
@@ -507,19 +454,6 @@ def test_ein_zustellfehler_wird_nicht_geschluckt(tmp_path, monkeypatch):
     db.protokolliere_lauf("o2", _tag(2), funde=0, vollstaendig=True)
     with pytest.raises(versand.VersandFehler):
         sende_alarm_mail(db.ausfall_alarme(heute=_tag(2)), _tag(2))
-
-
-# --------------------------------------------------------------------------
-# Regel 5: "teilweise gelesen" ist weder "nicht angefasst" noch "gelesen"
-#
-# Der Befund (S2-1): ein EINZIGER am Fenster abgewiesener Abruf setzte
-# `bilanz.ausserhalb_besuchszeit`, und daraus wurde fuer den GANZEN
-# Anbieter NICHT_GELESEN - auch wenn er vier Produktseiten gelesen und
-# drei Listungen geliefert hatte. Der Waechter war damit fuer medimax und
-# ep.de im Regelfall blind, denn genau diese zwei haengen an ihrem
-# Fenster. "Gar nicht angefasst" und "teilweise gelesen, Tuer ging zu"
-# sind zwei Auskuenfte, und nur die erste ist keine Aussage.
-# --------------------------------------------------------------------------
 
 
 def _bilanz(**kw):
@@ -606,17 +540,6 @@ def test_der_zustand_heisst_genau_so():
     assert TEILGELESEN == "teilweise gelesen"
 
 
-# --------------------------------------------------------------------------
-# Der dritte Seitenzustand: "heute nicht gelesen" (S2-2)
-#
-# `liefert` kommt aus dem BESTAND. Ein Anbieter, den der Lauf heute gar
-# nicht erreicht hat, bekam damit einen gruenen Punkt und das Wort
-# "liefert" - eine Entwarnung, die niemand gemessen hat. Der dritte
-# Zustand kommt aus DERSELBEN Definition wie der Waechter: dem
-# Lesezustand des Bezugstags.
-# --------------------------------------------------------------------------
-
-
 def _quellenlage_ausserhalb(tmp_path):
     """Tag 1 liefert, an Tag 2 verbietet die robots.txt den Abruf."""
     from telco_radar.geraete_config import lade_katalog, lade_quellen
@@ -676,7 +599,6 @@ def test_die_kennzahl_zaehlt_nur_wer_heute_gelesen_wurde(tmp_path):
     gerenderten Zeilen, nicht am Datensatz."""
     quellenlage = _quellenlage_ausserhalb(tmp_path)
     zeilen = {z["name"]: z for z in quellenlage["zeilen"]}
-    # Die Lage: der Bestand SAGT "liefert", gelesen hat heute niemand.
     assert zeilen["Haendler"]["liefert"] is True
     assert zeilen["Haendler"]["heute_luecke"] is True
     makro = _quellenmakro()
@@ -728,8 +650,6 @@ def test_wer_heute_nicht_gelesen_wurde_bekommt_keinen_gruenen_punkt(tmp_path):
         )
     )
     html = modul.zeile(zeilen["Haendler"])
-    # Gegenprobe: der Bestand SAGT weiter "liefert" - genau daher kam der
-    # gruene Punkt.
     assert zeilen["Haendler"]["liefert"] is True
     assert zeilen["Haendler"]["abdeckung"] is None
     assert "sdot ok" not in html
@@ -777,11 +697,6 @@ def _seitenzeile_gelesen(tmp_path):
         heute="2026-08-12",
     )
     return {z["name"]: z for z in daten["quellenlage"]["zeilen"]}
-
-
-# --------------------------------------------------------------------------
-# Das Journal liest, was dasteht - und erfindet nichts
-# --------------------------------------------------------------------------
 
 
 def test_ein_unlesbarer_messtag_wird_nicht_erfunden(tmp_path, caplog):
@@ -852,20 +767,6 @@ def test_heute_nicht_gelesen_sagt_auch_seit_wann(tmp_path):
     assert "zuletzt vollständig gelesen am 11.08.2026" in html
 
 
-# --------------------------------------------------------------------------
-# Regel 6: der Waechter wird weder zum Postfachfilter noch stumm (S2-B)
-#
-# Gemessen ueber 45 simulierte Tage: ein vollstaendiger Tag, danach nur
-# noch Teiltage. Bis hierher meldete der Waechter denselben Befund an 29
-# Tagen hintereinander - jeder mit eigener Mail -, und ab Teiltag 31 fiel
-# der letzte vollstaendige Tag aus dem 30-Tage-Journal: keine
-# Vergleichsbasis, kein Alarm, dauerhaft. Ein echter Totalausfall an Tag
-# 45 loeste damit nichts mehr aus. Erst laut bis zur Unbrauchbarkeit,
-# dann stumm - genau die Fehlerklasse, gegen die dieser Waechter gebaut
-# ist.
-# --------------------------------------------------------------------------
-
-
 def _datum(n: int) -> str:
     """Tag n einer Simulation ab dem 01.09.2026 - auch ueber den
     Monatswechsel hinaus. Fest verankert, kein `date.today()`
@@ -915,10 +816,7 @@ def test_dieselbe_lage_wird_nicht_neunundzwanzig_mal_gemeldet(tmp_path):
     Ein Kanal, der 29 Mails mit demselben Satz schickt, ist nach der
     dritten ein Postfachfilter."""
     _, gemeldet = _fuenfundvierzig_tage(tmp_path)
-    # Der Wechsel an Tag 2, danach ein Wiederholungstag je Woche.
     assert [n for n in gemeldet if n <= 30] == [2, 6, 13, 20, 27]
-    # Und ueber alle 45 Tage: nie zwei Meldungen derselben Lage dicht
-    # hintereinander - ausser beim echten Wechsel an Tag 45.
     assert len(gemeldet) <= 8
 
 
@@ -931,36 +829,18 @@ def test_der_waechter_verstummt_nicht_wenn_die_basis_aus_dem_journal_faellt(tmp_
     from telco_radar.analyze.geraete_store import LESEFEHLER
 
     db, gemeldet = _fuenfundvierzig_tage(tmp_path)
-    # Die Gegenprobe zur Lage: es GIBT keine Vergleichsbasis mehr.
     assert [m.tag for m in db.messtage("Haendler") if m.vergleichsbasis] == []
-    # Nach dem Wegfall der Basis bleibt der Kanal laut - regelmaessig,
-    # nicht taeglich: nie laenger als eine Woche am Stueck still.
     spaete = sorted(n for n in gemeldet if n > 30)
     assert spaete
     assert max(b - a for a, b in zip([30] + spaete, spaete + [45])) <= 7
     spaet = gemeldet[spaete[0]][0]
-    # Den neuen Namen erst hier holen - ein ImportError beim Einsammeln
-    # waere kein roter Test (siehe Kopf dieser Datei).
     from telco_radar.analyze.geraete_store import ALARM_OHNE_BASIS
 
     assert spaet.art == ALARM_OHNE_BASIS
     assert spaet.vortag is None and spaet.zeilen_vortag is None
-    # UND der Totalausfall an Tag 45 ist ein eigener, sofortiger Befund -
-    # ein Zustandswechsel wartet auf keine Sperre.
     assert 45 in gemeldet
     assert gemeldet[45][0].zeilen == 0
     assert gemeldet[45][0].zustand == LESEFEHLER
-
-
-# --------------------------------------------------------------------------
-# Ein Lesefehler MIT Zeilen ist eine Beobachtung (S2-C)
-#
-# `Messtag.beobachtet` liest `zustand == GELESEN or zeilen > 0`. Der zweite
-# Zweig war ungeprueft: gestrichen blieben alle 231 Geraete-Tests gruen,
-# obwohl ein abgebrochener Tag mit 100 gelesenen Zeilen still seine Rolle
-# als Vergleichsbasis verliert und der Vergleich auf einen aelteren Tag
-# springt.
-# --------------------------------------------------------------------------
 
 
 def test_ein_lesefehler_mit_zeilen_bleibt_die_vergleichsbasis(tmp_path):
@@ -975,5 +855,4 @@ def test_ein_lesefehler_mit_zeilen_bleibt_die_vergleichsbasis(tmp_path):
     assert messtag.beobachtet is True and messtag.vergleichsbasis is True
     db.protokolliere_lauf("o2", _tag(3), funde=0, vollstaendig=True)
     alarme = db.ausfall_alarme(heute=_tag(3))
-    # Verglichen wird mit dem 02. (100 Zeilen), nicht mit dem 01. (50).
     assert [(a.vortag, a.zeilen_vortag) for a in alarme] == [(_tag(2), 100)]

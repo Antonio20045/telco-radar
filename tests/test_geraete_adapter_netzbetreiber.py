@@ -58,11 +58,6 @@ def _listung(satz, anbieter, katalog, farben, basis=""):
     )
 
 
-# ==========================================================================
-# Vodafone
-# ==========================================================================
-
-
 def test_vodafone_erntet_nur_ids_die_die_liste_selbst_nennt():
     """Die Regel "nur verlinkte Adressen, nie hochgezaehlte IDs" (§ 87b UrhG)
     gilt auch, wenn die Adressen in einer JSON-Nutzlast statt in `<a href>`
@@ -78,8 +73,6 @@ def test_vodafone_erntet_nur_ids_die_die_liste_selbst_nennt():
     }
     assert ids == echte, "es wird genau das geerntet, was die Liste nennt"
     assert all(u.startswith("https://api.vodafone.de/") for u in urls)
-    # Die Pflichtparameter muessen mit - ohne sie antwortet die
-    # Schnittstelle mit HTTP 400 und nennt das fehlende Feld beim Namen.
     assert all(
         "businessTransaction=newContract" in u and "salesChannel=Online.Consumer" in u
         for u in urls
@@ -90,10 +83,7 @@ def test_vodafone_liest_den_preis_ohne_vertrag_je_variante(katalog, farben):
     saetze = vodafone.lies(_fixture("vodafone_virtualitem.json"))
     assert saetze, "die Detailnutzlast traegt Varianten"
     preise = sorted({s["preis"] for s in saetze})
-    # Gemessen am echten Abruf: 999,90 EUR fuer 256 GB, 1129,90 fuer 512 GB.
     assert preise == [999.9, 1129.9], preise
-    # Und NICHT die Buendelzahl: die Liste fuehrt dasselbe Geraet mit 1 EUR
-    # Anzahlung. Genau die haelt der Lockpreis-Waechter seit dem 10.08. raus.
     assert 1.0 not in preise
 
 
@@ -112,7 +102,6 @@ def test_vodafone_baut_den_titel_aus_dem_modellnamen_nicht_aus_dem_label(katalog
     assert all(erkenne_geraet(s["titel"], katalog) is not None for s in saetze), [
         s["titel"] for s in saetze
     ]
-    # Gegenprobe: aus dem ROHEN label faende die Erkennung nichts.
     schlecht = [x for x in labels if "Pixel Hibiscus" in x][0]
     assert erkenne_geraet(schlecht, katalog) is None
 
@@ -160,7 +149,6 @@ def test_vodafone_quelle_zeigt_auf_die_menschenseite(katalog, farben):
     assert saetze
     for s in saetze:
         assert s["url"].startswith("https://www.vodafone.de/privat/handys/"), s["url"]
-    # Und er ueberlebt den urljoin des Collectors gegen die API-Adresse.
     from urllib.parse import urljoin
 
     api = (
@@ -186,11 +174,6 @@ def test_vodafone_terabyte_wird_richtig_umgerechnet():
     assert saetze[0]["speicher_gb"] == 1024
 
 
-# ==========================================================================
-# o2
-# ==========================================================================
-
-
 def test_o2_liest_den_geraetepreis_und_nicht_die_anzahlung(katalog, farben):
     saetze = o2.lies(_fixture("o2_katalog.json"))
     assert saetze
@@ -199,7 +182,6 @@ def test_o2_liest_den_geraetepreis_und_nicht_die_anzahlung(katalog, farben):
     assert anzahlungen & {1, 7.0}, "die Fixture muss Anzahlungen enthalten"
     for s in saetze:
         assert s["preis"] > 100, f"{s['titel']}: {s['preis']} ist eine Anzahlung"
-    # Der Preis ist nachrechenbar: Anzahlung plus 24 Monatsraten.
     fuer_titel = {h["description"]: h["price"] for h in roh}
     for s in saetze:
         p = next(v for k, v in fuer_titel.items() if s["titel"].startswith(k))
@@ -260,26 +242,17 @@ def test_o2_quelle_zeigt_auf_die_seite_ohne_tarif():
     assert any("ohne-tarif=ja" in s["url"] for s in saetze)
 
 
-# ==========================================================================
-# Der Katalog gegen die LIVE-Namen der zwei Quellen
-# ==========================================================================
-
-
 @pytest.mark.parametrize(
     "titel,erwartet",
     [
-        # Die 800-Euro-Saegezahn-Falle vom 10.08.2026, jetzt vierfach:
         ("Google Pixel 11 Pro XL", "google-pixel-11-pro-xl"),
         ("Google Pixel 11 Pro Fold", "google-pixel-11-pro-fold"),
         ("Google Pixel 11 Pro", "google-pixel-11-pro"),
         ("Google Pixel 11", "google-pixel-11"),
-        # Dieselbe Falle bei Xiaomi: "Pro Max" darf nicht auf "Pro" fallen.
         ("Xiaomi Redmi Note 17 Pro Max 5G", "xiaomi-redmi-note-17-pro-max"),
         ("Xiaomi Redmi Note 17 Pro 5G", "xiaomi-redmi-note-17-pro"),
-        # und bei Samsung
         ("Samsung Galaxy Z Fold8 Ultra", "samsung-galaxy-z-fold8-ultra"),
         ("Samsung Galaxy Z Fold8", "samsung-galaxy-z-fold8"),
-        # Schreibweisen, die die zwei Quellen unterschiedlich fuehren
         ("Samsung Galaxy S26+", "samsung-galaxy-s26-plus"),
         ("Samsung Galaxy A57 5G", "samsung-galaxy-a57"),
         ("Fairphone (Gen.6)", "fairphone-6"),
@@ -314,34 +287,19 @@ def test_die_erkennung_folgt_dem_katalog_nicht_der_geraeteklasse(katalog):
     keinen Eintrag (keine Listung, kein Bündel). Und ohne Eintrag fällt
     ein iPad-Titel auf KEIN iPhone: die Erkennung rät nie fuzzig auf ein
     anderes Gerät."""
-    # Der Stand-Commit-Fall: der Auto-Eintrag wird erkannt (Vorher-rot:
-    # derselbe Titel stand in der alten None-Liste dieses Tests).
     tab = erkenne_geraet("Samsung Galaxy Tab S11 Ultra", katalog)
     assert tab is not None, "Auto-Eintrag Galaxy Tab S11 Ultra wird nicht erkannt"
     assert tab.device_id == "samsung-galaxy-tab-s11-ultra", tab.device_id
     assert tab.auto, "der Stand-Commit-Fall ist ein Auto-Eintrag"
 
-    # Router bleiben draußen - kein Katalog-Eintrag, nichts, was sie
-    # stellen könnte.
     for titel in ("Vodafone GigaCube 5G", "ZTE U60 Pro 5G MiFi-Router"):
         assert erkenne_geraet(titel, katalog) is None, titel
 
-    # Ohne eigenen Eintrag trifft ein iPad-Titel NICHT ein iPhone - die
-    # Erkennung fällt nie fuzzig auf ein anderes Gerät. (Das iPad selbst
-    # steht heute in der Unbekannten-Liste; sein Anker ist P5-Auftrag 3.
-    # Sobald er landet, ist die Zeile einfach erfüllt - der Test pinnt
-    # die Lücke bewusst NICHT fest.)
     for titel in ("iPad Pro 13 (2025)", "Apple iPad (2025)"):
         treffer = erkenne_geraet(titel, katalog)
         assert treffer is None or "ipad" in treffer.device_id, (
             f"{titel!r} fiel fuzzig auf {treffer.device_id}"
         )
-
-
-# ==========================================================================
-# Kopfzeilen: die zwei Schnittstellen verlangen sie, und ohne sie
-# antworten sie mit 404 statt mit Daten
-# ==========================================================================
 
 
 def test_pflichtkopfzeilen_erreichen_den_abruf(katalog, farben):
@@ -398,7 +356,7 @@ def test_ohne_konfigurierte_kopfzeilen_bleibt_der_alte_vertrag_gueltig(katalog, 
     from telco_radar.collect.geraete.robots import RobotsWaechter
     from telco_radar.geraete_config import Anbieter, Einstieg
 
-    def hole(url):  # EIN Parameter, wie ueberall sonst
+    def hole(url):
         if url.endswith("/robots.txt"):
             return (200, "User-agent: *\n")
         return (200, _fixture("o2_katalog.json"))
@@ -434,9 +392,6 @@ def test_der_rohsatz_zaehler_trennt_zwei_ausfaelle(katalog, farben):
     from telco_radar.collect.geraete import sammle_anbieter
     from telco_radar.collect.geraete.robots import RobotsWaechter
     from telco_radar.geraete_config import Anbieter, Einstieg
-
-    # Ein Katalog, den KEINES der Geraete trifft - die Seite gibt sehr wohl
-    # Preissaetze her.
     from telco_radar.geraete_model import Katalog
 
     leer = Katalog(geraete=[])

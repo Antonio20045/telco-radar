@@ -43,13 +43,7 @@ from .subscription import Abo, als_dict, aus_dict, jetzt
 
 log = logging.getLogger(__name__)
 
-# Wie lange eine Adresse nach einer Bestaetigungsmail gesperrt ist. Der
-# Schutz gegen die Mailbomben-Nutzung, bei der jemand ein fremdes Postfach
-# ueber ein offenes Formular zumuellt.
 DOI_SPERRE_STUNDEN = 24
-
-
-# ==========================================================  JSONL lesen  ==
 
 
 def lies_jsonl(pfad: Path) -> list[dict]:
@@ -90,9 +84,6 @@ def schreibe_jsonl(pfad: Path, zeilen) -> None:
         ),
         encoding="utf-8",
     )
-
-
-# ======================================================  Zusammenfuehren  ==
 
 
 def _zeitstempel(datensatz: dict) -> str:
@@ -138,11 +129,7 @@ def zusammenfuehren(unsere: list[dict], fremde: list[dict]) -> list[dict]:
         )
         if meins > seins:
             nach_id[schluessel] = datensatz
-    # Stabil nach id: der Store wird gepusht und mit sich selbst verglichen.
     return [nach_id[k] for k in sorted(nach_id)]
-
-
-# ============================================================  Der Store  ==
 
 
 class AboStore:
@@ -153,7 +140,6 @@ class AboStore:
         self.katalog = katalog
         self._roh: list[dict] = lies_jsonl(self.pfad)
 
-    # -- lesen ------------------------------------------------------------
     @property
     def roh(self) -> list[dict]:
         return list(self._roh)
@@ -180,7 +166,6 @@ class AboStore:
                 return aus_dict(datensatz, self.katalog)
         return None
 
-    # -- schreiben --------------------------------------------------------
     def setze(self, abo: Abo) -> None:
         datensatz = als_dict(abo)
         for i, vorhanden in enumerate(self._roh):
@@ -203,18 +188,12 @@ class AboStore:
         schreibe_jsonl(self.pfad, self._roh)
 
 
-# =====================================  Die 24-Stunden-Sperre je Adresse ===
-# HIER liegt der Mailbomben-Schutz, nicht im Signup-Dienst. Dessen Zaehler
-# ist nach jedem Spin-down und jedem Deploy leer - wer ihn dort einbaut,
-# baut ihn an der einzigen Stelle ein, an der er sicher nicht wirkt.
-
-
 def doi_gesperrt(
     log_pfad: Path, adress_kennwert: str, *, heute: datetime | None = None
 ) -> bool:
     """Hat diese Adresse in den letzten 24 Stunden schon eine Mail bekommen?"""
     if not adress_kennwert:
-        return True  # ohne Kennwert keine Mail
+        return True
     grenze = (heute or datetime.now(timezone.utc)) - timedelta(hours=DOI_SPERRE_STUNDEN)
     for eintrag in lies_jsonl(log_pfad):
         if eintrag.get("addr_hmac") != adress_kennwert:
@@ -274,7 +253,7 @@ def doi_aufraeumen(
             if wann.tzinfo is None:
                 wann = wann.replace(tzinfo=timezone.utc)
         except ValueError:
-            continue  # unlesbar -> weg
+            continue
         if wann > grenze:
             behalten.append(eintrag)
     if len(behalten) != len(eintraege):

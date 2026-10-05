@@ -31,7 +31,6 @@ from __future__ import annotations
 
 from urllib.parse import urlsplit
 
-# Die drei Bereiche. Die Reihenfolge ist die der Filterleiste.
 BEREICHE = (
     ("bericht", "Meldungen"),
     ("differenzierung", "Differenzierung"),
@@ -73,10 +72,6 @@ def eintrag_bericht(h: dict, report_date: str) -> dict:
         "operator": _text(h.get("operator") or h.get("source_label")),
         "region": _text(h.get("region")),
         "category": _text(h.get("ressort_label") or h.get("category")),
-        # Das Datum der MELDUNG, nicht der Ausgabe - eine Chronik, die nach
-        # Ausgabetagen sortiert, zeigt vier Ereignisse desselben Tages, die in
-        # Wahrheit drei Wochen auseinanderliegen. Fehlt es, traegt der
-        # Ausgabetag den Eintrag; ohne Datum faellt er aus dem Verlauf.
         "date": _text(h.get("date")) or report_date,
         "relevance": h.get("relevance") or 0,
         "source_label": _text(
@@ -99,9 +94,6 @@ def eintrag_differenzierung(e: dict, hebel_label: str) -> dict:
         "region": _text(e.get("region")),
         "category": _text(hebel_label or theme),
         "date": _text(e.get("first_seen") or e.get("last_verified")),
-        # Die Bibliothek bewertet nicht nach Dringlichkeit. 3 heisst hier
-        # "beobachten" und haelt die Beispiele in der Chronik zwischen den
-        # dringenden und den beilaeufigen Meldungen.
         "relevance": 3,
         "source_label": _text(e.get("source") or _domain(e.get("url"))),
         "url": e.get("url") or "",
@@ -166,8 +158,6 @@ def bauen(
     out: list[dict] = []
     for woche in wochen:
         for h in woche.get("highlights") or []:
-            # `why_it_matters` ist die interne Analystennotiz und gehoert nicht
-            # in eine Datei, die der Browser laedt.
             oeffentlich = {k: v for k, v in h.items() if k != "why_it_matters"}
             out.append(eintrag_bericht(oeffentlich, woche["date"]))
     for e in diff_bestand or []:
@@ -208,7 +198,6 @@ def haeufigste_absender(index: list[dict], anzahl: int = 12) -> list[str]:
         if e.get("kind") == "promo":
             continue
         name = e.get("operator") or ""
-        # Sammelbezeichnungen sind kein Absender, nach dem man sucht.
         if len(name) < 3 or name.lower() in {"branche", "diverse", "mehrere"}:
             continue
         zaehler[name] += 1

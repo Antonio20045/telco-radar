@@ -82,10 +82,6 @@ from .tarif_pdf import dokument_hash
 
 log = logging.getLogger(__name__)
 
-# "1&1 All-Net-Flat M 50 GB" -> 50.0. Der Wert steht in der `description`,
-# und nur dort - der `name` traegt ihn nicht. Absichtlich ohne "MB": ein
-# Tarif dieses Marktes wird in GB beworben, und eine MB-Zahl in einer
-# Produktbeschreibung ist eher eine Drosselgeschwindigkeit als ein Volumen.
 _VOLUMEN_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*GB\b", re.I)
 
 
@@ -197,18 +193,12 @@ def tarif_aus_knoten(
     if betrag is None:
         return None
 
-    # Der Rohtext IST der Knoten. Damit steht jede Fundstelle unten
-    # woertlich darin, und `pruefe_belege()` prueft eine echte Zusage.
     rohtext = json.dumps(knoten, ensure_ascii=False)
     tarif = Tarif(
         anbieter=anbieter,
         abgerufen_am=abgerufen_am,
         rohtext=rohtext,
         preistyp=PREISTYP_LIVE_SHOP,
-        # Die Seite, auf der die Zahl stand. `offers.url` waere
-        # verlockend, ist aber der Bestellweg und nicht die
-        # Fundstelle - 1&1 setzt dort dieselbe Adresse fuer alle
-        # sieben Tarife.
         dokument_url=seiten_url,
     )
     tarif.setze("name", name, _ausschnitt(knoten, "name"), HOCH)
@@ -224,10 +214,6 @@ def tarif_aus_knoten(
             HOCH,
         )
 
-    # Der Fingerabdruck haengt am KNOTEN, nicht an der Seite. Sieben
-    # Tarife auf einer Seite haetten sonst denselben Hash: eine Aenderung
-    # an einem einzigen liesse alle sieben als geaendert gelten, und der
-    # Diff liefe fuer sechs Tarife, die sich nicht bewegt haben.
     hash_ = dokument_hash(rohtext)
     tarif.dokument_hash = hash_
     return tarif, hash_
@@ -251,10 +237,6 @@ def tarife_aus_html(
                 continue
             tarif, hash_ = ergebnis
             if hash_ in gesehen:
-                # Derselbe Knoten zweimal in derselben Seite. Kommt vor,
-                # wenn ein Shop denselben Graphen fuer Kopf- und Fussteil
-                # ausliefert - zwei Saetze waeren dann eine Dublette und
-                # kein zweiter Tarif.
                 continue
             gesehen.add(hash_)
             out.append((tarif, hash_))

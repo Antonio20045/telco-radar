@@ -61,9 +61,6 @@ def _h(
     }
 
 
-# ---------------------------------------------------------------- Aufnahme
-
-
 def test_der_kurzpfad_nimmt_hoechstens_drei_zeilen():
     """Fuenf waren es, drei sind es. Die Zahl steht am Aufrufer (html.py),
     nicht in der Voreinstellung: die Mail hat viel Platz und wenig Gewicht,
@@ -92,8 +89,6 @@ def test_stufe_zwei_ohne_zahl_kommt_nicht_hinein():
         summary="Der Anbieter hat einen neuen Tarif angekündigt.",
     )
     assert ctm.zwei_minuten([ohne], 3, nur_belegt=True) == []
-    # Ohne die Verschaerfung bleibt es beim alten Verhalten - die Mail
-    # nutzt denselben Aufruf und soll sich nicht mitaendern.
     assert ctm.zwei_minuten([ohne], 3) == [ohne]
 
 
@@ -177,9 +172,6 @@ def test_ohne_einen_einzigen_eintrag_entfaellt_der_kasten():
     assert ctm.zwei_minuten(hs, 3, nur_belegt=True) == []
 
 
-# ------------------------------------------------------------- Darstellung
-
-
 def baue_seite(tmp_path: Path, datum: str = AUSGABE) -> Path:
     """Rendert die ECHTE Ausgabe in einen eigenen Baum und liefert site/.
 
@@ -226,8 +218,6 @@ def _kurzpfad_saetze(soup: BeautifulSoup) -> list[str]:
 def test_der_kasten_steht_in_der_spalte_nicht_ueber_der_seite(tmp_path):
     soup = _render(tmp_path)
     assert soup.select_one(".front-wichtig .kurzpfad") is not None
-    # ... und nirgends sonst: eine zweite Fassung ausserhalb der Spalte
-    # waere genau die Verdopplung, die hier abgeraeumt wurde.
     assert len(soup.select(".kurzpfad")) == 1
 
 
@@ -262,7 +252,6 @@ def test_die_foliensatz_zeile_steht_am_fuss_des_berichts(tmp_path):
     zeile = soup.select_one(".folienlink")
     assert zeile is not None
     assert zeile.select_one("a")["href"].endswith(f"folien/{AUSGABE}.html")
-    # Im Bericht, nicht davor.
     bericht = soup.select_one("#der-wochenbericht")
     assert bericht is not None and zeile in bericht.find_all(class_="folienlink")
     prosa = soup.select_one(".prose")
@@ -311,10 +300,6 @@ def test_keine_meldung_steht_zweimal_in_der_rechten_spalte(tmp_path):
 
     gesperrt = [h["url"] for h in ctm.kurzpfad(hs)]
     assert gesperrt, "der Testfall braucht einen belegten Kurzpfad"
-    # Die Gegenprobe im selben Test: ohne Sperre steht die Meldung zweimal.
-    # Ohne sie wäre nicht zu sehen, ob die Zusicherung greift oder ob der
-    # Fall gar nicht erst eintritt - genau so war dieser Test zuerst gebaut,
-    # und er war grün, bevor er etwas prüfte.
     ohne = html._titelseite(hs, None)
     assert {h["url"] for h in ohne["wichtig"]} & set(gesperrt), (
         "der Testfall löst die Dublette gar nicht aus"
@@ -367,9 +352,6 @@ def test_mail_und_seite_zeigen_dieselben_zeilen():
     seite = [h["url"] for h in ctm.kurzpfad(html._flatten(daten))]
     mail = [h["url"] for h in versand.zwei_minuten_zeilen(daten)]
     assert seite and mail == seite
-
-
-# -------------------------------------------------------------- Die Achse
 
 
 def test_die_digest_spalte_folgt_der_ctm_achse(tmp_path):
@@ -445,8 +427,6 @@ def test_breko_steht_nicht_vor_den_meldungen_mit_hoeherem_ctm_bezug(tmp_path):
     absender = [(h.get("operator") or h.get("source_label") or "") for h in spalte]
     titel = [h.get("schlagzeile") or h.get("title") for h in spalte]
 
-    # Der Befund vom 8. August, in seiner strengeren Fassung: keine
-    # BREKO-Zeile steht vor einer Meldung mit hoeherem CTM-Bezug.
     stufen = [int(h.get("ctm_bezug") or 0) for h in spalte]
     for platz, ab in enumerate(absender):
         if ab != "BREKO":
@@ -455,17 +435,6 @@ def test_breko_steht_nicht_vor_den_meldungen_mit_hoeherem_ctm_bezug(tmp_path):
             f"BREKO auf Platz {platz + 1} vor {titel[platz + 1 :]}"
         )
 
-    # Und der Grund, warum BREKO diese Spalte anfuehren DARF: die Meldungen
-    # mit direktem Portfoliobezug stehen nicht dahinter, sondern in den zwei
-    # obersten Bildstufen oder VOR ihr in derselben Spalte.
-    #
-    # Gemessen wird OHNE `belegt` - und das ist der Kern dieser Fassung.
-    # Der naheliegende Weg waere, die Zusicherung dem Kurzpfad zu
-    # ueberlassen: er steht ueber derselben Spalte und `gesperrt` haelt
-    # seine Meldungen aus dem Digest heraus. Der Kurzpfad nimmt aber nur
-    # Meldungen mit einem GEPRUEFTEN Folgerungssatz, und ueber die 17
-    # archivierten Ausgaben gemessen ist er in 16 leer. Ein Test, der ihn
-    # mitgibt, prueft den Normalfall also gerade nicht.
     ohne_kurzpfad = html._titelseite(highlights, None)
     zwei_stufen = {
         h.get("url")
@@ -485,7 +454,6 @@ def test_breko_steht_nicht_vor_den_meldungen_mit_hoeherem_ctm_bezug(tmp_path):
         assert h.get("url") in zeilen, (
             f"Stufe-3-Meldung ohne Platz: {h.get('schlagzeile')}"
         )
-        # Vor jeder Meldung mit geringerem Bezug.
         platz = zeilen.index(h.get("url"))
         davor = [int(z.get("ctm_bezug") or 0) for z in ohne_kurzpfad["wichtig"][:platz]]
         assert all(s >= ctm.DIREKT for s in davor), (

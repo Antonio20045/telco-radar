@@ -58,11 +58,6 @@ def festnetz() -> Tarif:
     return lies_text(text("o2_home_l_flex"))
 
 
-# --------------------------------------------------------------------------- #
-# Telekom MagentaMobil Basic - der vollstaendige Fall
-# --------------------------------------------------------------------------- #
-
-
 def test_basic_anbieter_und_name(basic):
     assert basic.anbieter == "Telekom"
     assert basic.name == "MagentaMobil Basic"
@@ -121,11 +116,6 @@ def test_basic_ist_keine_quarantaene(basic):
     assert not basic.ist_quarantaene
 
 
-# --------------------------------------------------------------------------- #
-# MagentaMobil L - dasselbe Layout, andere Zahlen. Faengt Ueberanpassung ab.
-# --------------------------------------------------------------------------- #
-
-
 def test_l_zahlen(gross):
     assert gross.grundgebuehr == 59.95
     assert gross.datenvolumen_gb == 80.0
@@ -162,11 +152,6 @@ def test_basic_und_l_unterscheiden_sich_wirklich(basic, gross):
     assert basic.datenvolumen_gb != gross.datenvolumen_gb
 
 
-# --------------------------------------------------------------------------- #
-# o2 Mobile Unlimited M Flex - kein Volumen, keine Bindung, keine Staffel
-# --------------------------------------------------------------------------- #
-
-
 def test_unlimited_preis_und_name(unlimited):
     assert unlimited.anbieter == "o2"
     assert unlimited.grundgebuehr == 39.99
@@ -195,11 +180,6 @@ def test_unlimited_hat_keine_geraetestaffel(unlimited):
     assert unlimited.geraetepreisstaffel == []
 
 
-# --------------------------------------------------------------------------- #
-# o2 Home L Flex - drei Produktvarianten in EINEM Dokument
-# --------------------------------------------------------------------------- #
-
-
 def test_festnetz_nimmt_den_groessten_maximalwert(festnetz):
     """Das Dokument beschreibt 175/250/300 in einem PDF.
 
@@ -226,11 +206,6 @@ def test_festnetz_zero_width_space_bricht_die_laufzeit_nicht(festnetz):
 
 def test_festnetz_erkennt_telefonie_flat(festnetz):
     assert festnetz.allnet_flat is True
-
-
-# --------------------------------------------------------------------------- #
-# Die Regel, die das Modell traegt: kein Wert ohne Beleg
-# --------------------------------------------------------------------------- #
 
 
 @pytest.mark.parametrize(
@@ -273,11 +248,6 @@ def test_setze_ohne_beleg_setzt_nichts():
     assert "grundgebuehr" not in t.confidence
 
 
-# --------------------------------------------------------------------------- #
-# Quarantaene statt falscher Zahlen
-# --------------------------------------------------------------------------- #
-
-
 def test_unbekanntes_layout_geht_in_quarantaene():
     t = lies_text("Irgendein Flyer ohne jede Tarifangabe.\nRuf uns an!")
     assert t.ist_quarantaene
@@ -301,11 +271,6 @@ def test_kennzeichen_erkennt_tarifdokumente(basic):
     assert ist_tarifdokument(text("telekom_magentamobil_basic"))
     assert ist_tarifdokument("Vertragszusammenfassung nach EU-Verordnung")
     assert not ist_tarifdokument("Allgemeine Geschäftsbedingungen")
-
-
-# --------------------------------------------------------------------------- #
-# Hilfsteile
-# --------------------------------------------------------------------------- #
 
 
 @pytest.mark.parametrize(
@@ -337,7 +302,6 @@ def test_dokument_hash_haengt_am_inhalt():
 def test_preisphase_zaehlt_monate():
     assert Preisphase(1, 6, 9.99).monate(24) == 6
     assert Preisphase(7, None, 29.99).monate(24) == 18
-    # Eine Phase, die ueber das Vertragsende hinausreicht, wird gekappt.
     assert Preisphase(1, 36, 10.0).monate(24) == 24
 
 
@@ -352,11 +316,6 @@ def test_als_dict_laesst_den_rohtext_weg(basic):
     assert "rohtext" not in d
     assert d["grundgebuehr"] == 24.95
     assert d["fundstellen"]["grundgebuehr"]
-
-
-# --------------------------------------------------------------------------- #
-# Die PDF-Schale
-# --------------------------------------------------------------------------- #
 
 
 @pytest.mark.skipif(
@@ -377,19 +336,6 @@ def test_fehlendes_pdftotext_wirft_klar(monkeypatch, tmp_path):
     monkeypatch.setattr(tarif_pdf.shutil, "which", lambda _: None)
     with pytest.raises(PDFNichtLesbar, match="poppler"):
         tarif_pdf.text_aus_pdf(tmp_path / "x.pdf")
-
-
-# --------------------------------------------------------------------------- #
-# Die senkrechte Tabellenform: Vodafone und congstar
-#
-# Nachgetragen am 04.09.2026. Die drei Fixtures sind Originaldokumente
-# desselben Tages: zwei von Vodafone (Mobil M ohne und mit Smartphone), eins
-# von congstar (Allnet Flat L). Bis dahin las der Extraktor bei BEIDEN
-# Anbietern keinen einzigen Preis - Vodafone, weil seine Preistabelle
-# senkrecht steht und keinen Bezeichner "Entgelt fuer das Komplettprodukt"
-# traegt; congstar, weil sein Bezeichner den Produktnamen enthaelt
-# ("Entgelt Allnet Flat L (ohne Endgeraet)").
-# --------------------------------------------------------------------------- #
 
 
 @pytest.fixture(scope="module")
@@ -522,8 +468,6 @@ def test_eine_geratene_phasenzuordnung_wird_nicht_abgelegt():
     )
     t = lies_text(roh)
     assert t.grundgebuehr == 49.95
-    # Die Ersatzphase aus `lies_text` - eine Phase ueber die ganze Laufzeit,
-    # nicht drei erfundene.
     assert t.preisphasen == [Preisphase(von_monat=1, bis_monat=None, betrag=49.95)]
 
 
@@ -550,9 +494,6 @@ def test_eine_gestaffelte_tabelle_ergibt_verschieden_hohe_phasen():
         Preisphase(von_monat=1, bis_monat=6, betrag=19.95),
         Preisphase(von_monat=7, bis_monat=None, betrag=49.95),
     ]
-    # Die Grundgebuehr ist der Preis der ERSTEN Phase, nicht der hoechste
-    # und nicht der Durchschnitt. Was ueber die Laufzeit daraus wird,
-    # rechnet `report/effektivpreis.py` - an EINER Stelle.
     assert t.grundgebuehr == 19.95
 
 
@@ -619,9 +560,6 @@ def test_ein_vierwochenpreis_ist_kein_monatspreis():
     )
     t = lies_text(roh)
     assert t.grundgebuehr is None
-    # Ohne Preis UND ohne Laufzeit ist es fuer dieses Modell kein Tarif -
-    # es faellt in die Quarantaene statt mit einer Monatszahl in die
-    # Datenbank, die keine ist.
     assert t.ist_quarantaene
 
 

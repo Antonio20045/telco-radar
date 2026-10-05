@@ -32,7 +32,7 @@ from telco_radar.report import geraete_tco_karten
 from telco_radar.report.html import render_site
 
 HEUTE = "2026-09-24"
-ALT_ABGERUFEN = "2026-09-15"  # 9 Tage vor HEUTE, > ALT_AB_TAGEN (3)
+ALT_ABGERUFEN = "2026-09-15"
 
 _KATALOG = {
     "geraete": [
@@ -88,11 +88,6 @@ _QUELLEN = {
 DEVICE = "apple-iphone-17-pro"
 SPEICHER = 256
 
-# (anbieter, tarif_id, tarif, rate, abgerufen_am) - Vodafone/Telekom
-# WORTGETREU aus der Lead-Meldung (24.09.2026, iPhone 17 Pro 256 GB, Band
-# Klein), congstar/1&1 ebenso (Tarifname "Allnet Flat XS Flex" dort real
-# gemessen) - dieselben Zeilen, an denen die Preiszelle vor dem Grid-Fix
-# je nach Zeile neben dem Namen ODER eine Zeile tiefer stand.
 _BUENDEL = [
     ("Vodafone", "vf:klein", "Vodafone Mobil XS", 26.0, HEUTE),
     ("Telekom", "tk:klein", "MagentaMobil XS", 24.0, ALT_ABGERUFEN),
@@ -324,9 +319,7 @@ def test_das_abzeichen_steht_auf_einer_zeile(zeilen):
     passt auf EINE Zeile (Rechteckhoehe ~ eine Zeilenhoehe), nicht auf
     zwei bis vier enge Zeilen gestapelt."""
     mit_marke = [z for z in zeilen if z["marke"]]
-    assert len(mit_marke) == 1, (
-        zeilen
-    )  # Telekom (Vodafones „unser Angebot" ist am 28.09.2026 gefallen)
+    assert len(mit_marke) == 1, zeilen
     for z in mit_marke:
         assert z["markeHoehe"] <= z["zeilenhoehe"] * 1.5, (
             f"das Abzeichen steht nicht auf einer Zeile: {z}"

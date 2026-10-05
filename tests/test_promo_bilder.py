@@ -28,7 +28,6 @@ def _angebot(
     return {"id": eid, "headline": headline, "description": description, "url": url}
 
 
-# ----------------------------------------------------------- die Stufen
 def test_der_anker_schlaegt_alles_andere():
     """Stufe 1: das Bild steht im Link des Angebots. Das ist keine
     Heuristik, sondern die Struktur der Seite."""
@@ -100,7 +99,6 @@ def test_ein_wort_das_ueberall_steht_belegt_gar_nichts():
     )
 
 
-# ---------------------------------------------------------- die Vergabe
 def test_jedes_bild_wird_hoechstens_einmal_vergeben():
     """Zwei Kacheln nebeneinander mit demselben Motiv lesen sich als
     Fehler; im Zweifel ist eine Zeile die ehrlichere Darstellung."""
@@ -159,8 +157,6 @@ def test_jede_aktionsseite_vergibt_ihr_eigenes_motiv():
         dict(_kand("https://marke.test/b/prepaid.jpg", hint_w=1600), page=prepaid),
     ]
     zuordnung = promo_bilder.zuordnen(angebote, kandidaten)
-    # Das staerkste Angebot JE SEITE - a2 geht leer aus, sein Seitenmotiv
-    # ist an a1 vergeben.
     assert sorted(zuordnung) == ["a1", "a3"]
     assert zuordnung["a1"]["quellen"] == ["https://marke.test/b/handy.jpg"]
     assert zuordnung["a3"]["quellen"] == ["https://marke.test/b/prepaid.jpg"]
@@ -256,7 +252,6 @@ def test_ohne_kandidaten_bleibt_die_zuordnung_leer():
     assert promo_bilder.zuordnen([], [_kand("https://marke.test/b/x.jpg")]) == {}
 
 
-# ------------------------------------------------------------ der Abruf
 def test_hole_bilder_stempelt_die_felder_ein(tmp_path, monkeypatch):
     monkeypatch.setattr(
         promo_bilder,

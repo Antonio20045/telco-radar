@@ -37,21 +37,9 @@ from datetime import date, timedelta
 from typing import Optional
 from xml.sax.saxutils import escape
 
-# DIE EINE Regel, ob zwei Leitzahlen ueber denselben Zeitraum laufen
-# (P0-B-h1). Diese Datei rechnet Geometrie und leitet keine Regel ab -
-# sie fragt dieselbe Funktion wie Buendelzeile, Katalog und Radar.
 from ..tco_model import zeitraum_vergleichbar
 
-# Die Zeichenflaeche. 1180 px ist die Breite, die die Seite hergibt
-# (1184 px Satzspiegel) - dieselbe Zahl wie bei der geloeschten
-# Positionskarte, und aus demselben Grund gemessen statt geraten.
 BREITE = 1180
-# Die linke Spalte traegt Anbieter UND Tarifnamen. 300 px, weil der
-# laengste Tarif des Bestands ("O2 Mobile on Demand M Plus mit 50 GB+
-# (24 Mon.)", 47 Zeichen) bei 10,5 px Schriftgroesse rund 245 px misst.
-# Ein Etikett, das nicht passt, wuerde sonst abgeschnitten - und eine
-# abgeschnittene Beschriftung ist auf dieser Seite ein Mangel, kein
-# Kompromiss.
 LINKS = 300
 RAND_RECHTS = 30
 BALKEN_HOEHE = 26
@@ -60,11 +48,6 @@ GRUPPE_KOPF = 34
 GRUPPE_ABSTAND = 18
 ACHSE_HOEHE = 26
 
-# Die Deckkraft je Kostenart. Die FARBE gehoert dem Anbieter (CSS-Klasse
-# `gr-anb--<slug>`, dieselbe auf Karten, Balken und in der Legende); die
-# Kostenart unterscheidet sich in der Deckkraft. So bleibt die
-# Anbieterfarbe ueber alle Grafiken und Tabellen der Seite konsistent
-# (C.3), ohne dass jede Kombination eine eigene Farbe braucht.
 DECKKRAFT = {
     "einmalig": 1.0,
     "tarif": 0.62,
@@ -97,11 +80,6 @@ def euro(betrag: Optional[float]) -> str:
 
 def _t(text) -> str:
     return escape(str(text))
-
-
-# --------------------------------------------------------------------------
-# G1 - der TCO-Vergleich
-# --------------------------------------------------------------------------
 
 
 def _gruppen(karten: list) -> list:
@@ -177,17 +155,11 @@ def balken(modell: dict) -> str:
     if zeilen_gesamt < 2:
         return ""
 
-    # Gemessen wird der GEZEICHNETE Balken, nicht die Leitzahl: ein Bonus
-    # wird als abgezogenes Stueck AN das Balkenende gezeichnet, der Stapel
-    # ist also so lang wie die Summe seiner positiven Posten. Gegen
-    # `gesamt` skaliert liefe ein Angebot mit hohem Bonus aus dem Bild.
     hoechst = max(
         sum(max(0.0, p.get("betrag") or 0.0) for p in (k.get("bestandteile") or []))
         for g in gruppen
         for k in g["karten"]
     )
-    # Ein bisschen Luft rechts, damit der Betrag hinter dem laengsten
-    # Balken noch Platz hat.
     hoechst = hoechst * 1.18
     referenz = modell.get("referenz")
 
@@ -198,12 +170,6 @@ def balken(modell: dict) -> str:
     hoehe = int(hoehe)
 
     name = modell.get("name") or ""
-    # DIE UEBERSCHRIFT NENNT DIE ZEITRAEUME, DIE DIE BALKEN TRAGEN
-    # (P0-B-h3, Befund 2). Bis hierher stand hier die feste 24, waehrend
-    # ein Balken derselben Grafik 36 Monate Tarif und Geraet fuehrte -
-    # fuer einen Screenreader war das die GANZE Grafik in einem falschen
-    # Satz. Die Zeitraeume kommen aus den Gruppen, also aus den Zahlen
-    # selbst; jede Gruppe nennt ihren eigenen darunter noch einmal.
     titel = f"Kosten über {_monate_wort(gruppen)} Monate für {_t(name)} je Anbieter"
     teile = [
         f'<svg class="gr-g1" viewBox="0 0 {BREITE} {hoehe}" '
@@ -215,21 +181,10 @@ def balken(modell: dict) -> str:
     y = 0.0
     for gruppe in gruppen:
         laufzeit = gruppe["monate"]
-        # S-Q4: der Gruppenkopf nennt den ZEITRAUM DER ZAHLEN DIESER
-        # GRUPPE ("gerechnet über N Monate"), keine Bindung - die Karten
-        # daneben nennen die Bindungen selbst (Tarif bindet 24,
-        # Geräteraten laufen 36). "{N} Monate Bindung" waere derselbe
-        # Widerspruch, nur in der Grafik.
-        #
-        # P0-B-h3: N ist wieder eine echte Unterscheidung. Seit TCO24-1
-        # war es fuer jede Karte die 24 der Rechnung; jetzt ist es
-        # `leitzahl_monate`, und der Kopf trennt die Zeitraeume wirklich
-        # (Regel 2 des Modulkopfs).
         teile.append(
             f'<text class="gr-g1-gruppe" x="0" y="{y + 20:.0f}">'
             f"gerechnet über {laufzeit} Monate</text>"
         )
-        # Die eigene Nulllinie der Gruppe (A5.4).
         oben = y + GRUPPE_KOPF - 6
         unten = oben + len(gruppe["karten"]) * (BALKEN_HOEHE + BALKEN_ABSTAND)
         teile.append(
@@ -238,25 +193,8 @@ def balken(modell: dict) -> str:
         )
         y += GRUPPE_KOPF
 
-        # Die Referenzlinie - nur in der Gruppe, deren Zeitraum sie
-        # traegt. Gefragt wird mit DER EINEN Regel des Projekts
-        # (`tco_model.zeitraum_vergleichbar`, P0-B-h1/h3): ein unbekannter
-        # Zeitraum ist nie gleich, und eine Nulllinie quer zu ihrer
-        # Gruppe waere genau der Massstab, den Befund 2 meint. Verglichen
-        # wird der Zeitraum der REFERENZZAHL gegen den der Gruppe - bis
-        # hierher stand rechts die Tariflaufzeit der Karten (konstant 24).
         if referenz and zeitraum_vergleichbar(referenz.get("monate"), laufzeit):
             x = LINKS + _skala(referenz["gesamt"], hoechst)
-            # DAS ETIKETT KIPPT NACH LINKS, wenn es sonst aus dem Bild
-            # liefe. Die Referenz ist regelmaessig der teuerste Balken -
-            # rechtsbuendig gesetzt stand "Vodafone-Referenz 2.278,10 €"
-            # zur Haelfte ausserhalb der Zeichenflaeche. Eine Beschriftung,
-            # die nicht ganz da ist, ist keine.
-            # UND SIE SAGT, WORAUS SIE BESTEHT, wo ihre Bindung nicht die
-            # der Gruppe ist (F-R2-2): die Linie steht in der 36-Monats-
-            # Gruppe, gerechnet sind Barkauf plus 24 Tarifmonate. Ohne den
-            # Zusatz liest sich "Vodafone-Referenz 1.428,70 EUR" unter dem
-            # Kopf "gerechnet über 36 Monate" als 36-Monats-Zahl.
             tarif_monate = referenz.get("tarif_monate")
             text = f"Vodafone-Referenz {euro(referenz['gesamt'])}"
             if (
@@ -265,8 +203,6 @@ def balken(modell: dict) -> str:
                 and referenz.get("geraet_betrag") is not None
             ):
                 text += f" · Barkauf + {tarif_monate} Monate Tarif"
-            # ~6,6 px je Zeichen bei 12 px Grotesk - grosszuegig gerundet,
-            # damit der Kipp-Punkt eher zu frueh als zu spaet greift.
             rechts = x + 5 + int(len(text) * 6.6) > BREITE
             teile.append(
                 f'<line class="gr-g1-ref" x1="{x:.1f}" y1="{y - 8:.0f}" '
@@ -279,10 +215,6 @@ def balken(modell: dict) -> str:
 
         for karte in gruppe["karten"]:
             slug = anbieter_slug(karte["anbieter"])
-            # DAS ZUSTANDSETIKETT STEHT AM BALKEN, nicht nur an der Karte:
-            # der Balken wird fuer sich gelesen, und ein unbeschrifteter
-            # kurzer Balken eines erneuerten Geraets liest sich als das
-            # guenstigste Angebot (QA-Befund B1, H5).
             etikett = karte.get("zustand_etikett") or ""
             teile.append(
                 f'<text class="gr-g1-anbieter" x="0" y="{y + 13:.0f}">'
@@ -305,9 +237,6 @@ def balken(modell: dict) -> str:
             for posten in karte.get("bestandteile") or []:
                 betrag = posten.get("betrag") or 0.0
                 if betrag <= 0:
-                    # Ein Bonus ist negativ und wird als eigener Balken
-                    # UNTER der Nulllinie gezeichnet - nicht als Luecke im
-                    # Stapel, wo er wie ein fehlender Posten aussaehe.
                     continue
                 breite = _skala(betrag, hoechst)
                 if breite <= 0:
@@ -334,17 +263,10 @@ def balken(modell: dict) -> str:
                     f"<title>Bonus {_t(bonus['name'])} "
                     f"−{_t(euro(bonus['betrag']))}</title></rect>"
                 )
-            # S4 / C.1: das Euro-Delta zur Referenz steht IN der Grafik, am
-            # Balken - dieselbe Zahl wie auf der Karte (`_delta`), nicht
-            # neu gerechnet. Nur bei gleicher Laufzeit gibt es einen
-            # Euro-Betrag; sonst bleibt der Balken beim Betrag.
             delta = karte.get("delta") or {}
             delta_text = ""
             if delta.get("betrag") is not None:
                 zeichen = "−" if delta.get("guenstiger") else "+"
-                # A2 (20.09.2026): ein Abstand unter der Wesentlichkeits-
-                # schwelle ist eine Annäherung - "≈" davor, derselbe echte
-                # Betrag. Der Strich blieb dem "kein Angebot" vorbehalten.
                 ungefaehr = "≈ " if delta.get("ungefaehr") else ""
                 delta_text = (
                     f' <tspan class="gr-g1-delta">'
@@ -384,17 +306,6 @@ def legende(modell: dict) -> list:
     return arten
 
 
-# --------------------------------------------------------------------------
-# G0 - die Zeitreihe im Hauptbild (BRIEF_ZEITREIHE, 05.09.2026)
-# --------------------------------------------------------------------------
-#
-# Der Hauptgraph der Hauptansicht: je gewaehltem Geraet eine Linie je
-# Anbieter, Gerätepreis ueber die Zeit. Anders als G2 (Marktueberblick
-# ueber ALLE Modelle, gedeckelt auf fuenf bewegte Reihen) zeigt dieser Graph
-# GENAU EIN Geraet mit ALLEN seinen Anbietern (bis `MAX_LINIEN` aus
-# `geraete_verlauf`, Vodafone nie verdraengt) - dieselbe Aufgabenteilung wie
-# zwischen G1 (ein Geraet) und der Alarmtabelle (der ganze Markt).
-
 G0_BREITE = 1180
 G0_HOEHE = 300
 G0_LINKS = 76
@@ -402,40 +313,8 @@ G0_UNTEN = 34
 G0_OBEN = 16
 G0_RECHTS = 210
 
-# Ab wie vielen Tagen zwischen zwei aufeinanderfolgenden Messpunkten
-# DERSELBEN Linie aus einer Verbindung eine SAMMELLUECKE wird. Die
-# Sammlung laeuft taeglich (der bestaetigte Punkt haengt sich an
-# `last_verified` jedes Laufs); ein bestaetigter Preis, der zwei bis fuenf
-# Tage keine neue Zeile schreibt, ist normale Kadenz - eine Woche ganz ohne
-# jede Bestaetigung ist keine Verzoegerung mehr, sondern ein Ausfall der
-# Sammlung. Am gemessenen Bestand (05.09.2026) unterscheidet das die
-# echten Luecken (19 Tage) sauber von den kurzen Abstaenden derselben
-# Woche (2 bis 5 Tage) - mit jeder Schwelle zwischen zwei und achtzehn
-# Tagen waere das Ergebnis heute gleich, aber diese ist die, die eine
-# Woche ganz ohne Bestaetigung als das behandelt, was sie ist.
 G0_LUECKE_TAGE = 7
 
-# Die Marker-SYMBOLe je Serie (F-4b, Optik-Schritt 5, 09.09.2026). Farbe
-# allein trennt die Reihen nicht sicher: congstar-Gelb auf hellem Papier
-# bleibt schwach, und Telekom-Magenta neben Marken-Rot (F-4d) bleibt in
-# derselben Farbfamilie haengen. Ein Symbol je Reihenposition - Kreis,
-# Quadrat, Dreieck, Raute, Ring, Kreuz, Dreieck runter, Sechseck -
-# unterscheidet die Reihen auch ohne jede Farbwahrnehmung; nach dem
-# achten wiederholt sich die Folge (mehr als acht Linien zeigt G0 nicht).
-#
-# VIER BAUBEDINGUNGEN, alle ausbestellt gegen die Modultests:
-#  - Position 0 ist der KREIS und bleibt `<circle>` - die Tests der
-#    Zeitreihe zaehlen Einzel-Punkte als `<circle>`, und jede einzelne
-#    ihrer Testreihen steht auf Position 0.
-#  - KEIN Symbol ist ein `<path>` - `test_..._nur_die_gegebenen_preise`
-#    liest das ERSTE `d="` der Grafik als Linienpfad, und die
-#    Linien-Zaehlung `svg.count("<path")` wuerde Kreuze mitzaehlen.
-#  - KEIN Symbol traegt ein `transform` - der Browser-Test verbietet
-#    gedrehten Text auf der ganzen Seite, und Rotation waere die nahe
-#    liegende Bauart fuer Dreieck runter.
-#  - Vodafone steht ueberall auf Position 0 (die Eigen-Reihe sortiert
-#    sich vor alle anderen), der Kreis ist damit die Form des eigenen
-#    Angebots - und hat dieselbe Ausnahme wie die rote Farbe.
 G0_SYMBOLE = (
     "kreis",
     "quadrat",
@@ -522,8 +401,6 @@ def _symbol_form(
     if art == "ring":
         return f'<circle{k} cx="{x:.1f}" cy="{y:.1f}" r="{4.0 * s:.1f}">{t}</circle>'
     if art == "kreuz":
-        # Ein KREUZ als 12-Punkte-Polygon (Plus-Form) - kein `<path>`
-        # (Baubedingung 2) und keine Rotation (Baubedingung 3).
         d, b = 2.0 * s, 6.0 * s
         punkte = [
             (x, y - b),
@@ -550,7 +427,6 @@ def _symbol_form(
             f"{x + 5.6 * s:.1f},{y - 4.4 * s:.1f} "
             f'{x - 5.6 * s:.1f},{y - 4.4 * s:.1f}">{t}</polygon>'
         )
-    # sechseck: sechs Punkte auf einem Kreis, bei 0/60/... Grad
     punkte = [
         (
             x + 5.4 * s * math.cos(math.radians(w)),
@@ -615,20 +491,14 @@ def _achsenmarken(tief: float, hoch: float) -> list[float]:
     spanne = max(hoch - tief, 1e-9)
     roh = spanne / 4
     mag = 10 ** math.floor(math.log10(roh)) if roh > 0 else 1.0
-    # Alle Kandidaten, auch die UNTER der Rohweite: bei weiten Spannen
-    # erreicht der groebste schoene Schritt ueber der Rohweite oft nur
-    # zwei Marken (Band "Mittel": 500 auf 1.280 €) - dann gliedert der
-    # naechst feinere die Achse besser. Die Obergrenze ist die Rohweite
-    # mit einem Drittel Luft (eine 50-€-Stufe auf der Rohweite 42 €
-    # traegt vier Marken und liest sich besser als sieben 25er).
     stufen = [
         s for s in (mag, 2 * mag, 2.5 * mag, 5 * mag, 10 * mag) if s <= roh * 1.35
     ] or [mag]
-    for stufe in reversed(stufen):  # groebster Schritt zuerst
+    for stufe in reversed(stufen):
         marken = _marken_fuer(stufe)
         if len(marken) >= 4:
             return marken
-    for stufe in stufen:  # aufsteigend: zwei Marken reichen
+    for stufe in stufen:
         marken = _marken_fuer(stufe)
         if len(marken) >= 2:
             return marken
@@ -788,8 +658,6 @@ def zeitreihe(
     tief, hoch = min(alle_preise), max(alle_preise)
     if hoch <= tief:
         hoch = tief + 1.0
-    # Etwas Luft nach oben und unten - dieselbe Rechnung wie G2, damit kein
-    # Punkt auf der Achse klebt.
     polster = (hoch - tief) * 0.12
     tief, hoch = tief - polster, hoch + polster
 
@@ -801,10 +669,6 @@ def zeitreihe(
         hoehe = G0_HOEHE - G0_OBEN - G0_UNTEN
         return round(G0_HOEHE - G0_UNTEN - (preis - tief) / (hoch - tief) * hoehe, 1)
 
-    # F-5 (05.09.2026): DIE EINE ZAEHLWEISE fuer "Anbieter" auf dieser Tafel
-    # - Preispunkte-Reihen der Zeitreihe, PM-vorgegeben. Das Auswahl-Dropdown
-    # (`geraete.html.j2`) uebernimmt genau diese Zahl aus dem Rueckgabewert
-    # statt sie ein zweites Mal zu zaehlen (keine duplizierte Rechnung).
     anbieterzahl = len(reihen)
     teile = [
         f'<svg class="{_t(klasse)}" viewBox="0 0 {G0_BREITE} {G0_HOEHE}" '
@@ -816,12 +680,6 @@ def zeitreihe(
         _symbole_defs(),
     ]
 
-    # Y-Achse: Marken in runden Schritten (F-4c) - berechnet aus der
-    # echten Spanne, aber auf Werten, die man absprechen kann. Die
-    # Annotation der Spanne steht UEBER der Zeichenflaeche (y=12, das
-    # Bild beginnt bei y=16): ausserhalb des Plotbereichs kann sie mit
-    # keiner Datenlinie kollidieren - dieselbe Vorsicht wie bei den
-    # Einzel-Punkt-Beschriftungen unten.
     marken = _achsenmarken(tief, hoch)
     texte = _achsenformat(marken)
     for marke, beschriftung in zip(marken, texte):
@@ -837,8 +695,6 @@ def zeitreihe(
         f'text-anchor="start">{_t(_spanne_text(tief, hoch))}</text>'
     )
 
-    # X-Achse: Wochenraster kurzfristig, Monatsraster ab drei Monaten -
-    # dieselbe Regel wie G2.
     schritt = 7 if spanne_tage <= 92 else 30
     marke = von
     gesetzt = []
@@ -857,9 +713,6 @@ def zeitreihe(
             f"{tag.strftime('%d.%m.')}</text>"
         )
 
-    # Die Sammelluecke bekommt ein Feld im Bild - sonst ist der leere Raum
-    # zwischen zwei Rasterlinien nicht von einer ruhigen Woche zu
-    # unterscheiden.
     for lo, hi in luecken:
         x1, x2 = x(lo), x(hi)
         teile.append(
@@ -872,13 +725,6 @@ def zeitreihe(
         )
 
     linien = []
-    # F-4e (Optik-Schritt 5, 09.09.2026): die "Serie startet"-Beschriftungen
-    # werden NICHT mehr sofort gezeichnet, sondern erst gesammelt und nach
-    # allen Daten platziert - die Platzierung braucht die Geometrie ALLER
-    # Reihen, und am 08.09. kollidierten im Band-Graphen zwei Beschriftungen
-    # mit 5,4 px Abstand (1&1 und congstar, beide bei ~1.110 €) miteinander
-    # und mit den Punkten darunter. Gesammelt wird hier, gezeichnet wird
-    # weiter unten - dieselbe Reihenfolge, in der die Reihen entstehen.
     daten_punkte: list[tuple[float, float]] = []
     daten_strecken: list[tuple[float, float, float, float]] = []
     annotationen: list[tuple[int, str, float, float, str]] = []
@@ -897,13 +743,6 @@ def zeitreihe(
         if not punkte:
             continue
 
-        # In LAEUFE zerlegen: getrennt an jeder Luecke DIESER Linie - Regel
-        # 2 des Modulkopfs ("Linien enden und beginnen neu"). Gerechnet wird
-        # gegen den Abstand der Linie SELBST, nicht gegen die Luecken des
-        # ganzen Geraets: ein Anbieter, der zwischen zwei eigenen Punkten
-        # laenger schweigt als `G0_LUECKE_TAGE`, hat fuer diese Spanne
-        # keinen Beleg - unabhaengig davon, ob ein anderer Anbieter in der
-        # Zwischenzeit gemessen wurde.
         laeufe = [[punkte[0]]]
         for (t0, _), (t1, b1) in zip(punkte, punkte[1:]):
             if (t1 - t0).days > G0_LUECKE_TAGE:
@@ -916,13 +755,6 @@ def zeitreihe(
                     f"{'M' if i == 0 else 'L'}{x(t)} {y(b)}"
                     for i, (t, b) in enumerate(lauf)
                 )
-                # F-4d: die eigene Reihe traegt MEHR GEWICHT (3 statt 2 px
-                # Strichstaerke) - dieselbe Auszeichnung wie im
-                # interaktiven Chart (`r.eigen ? 3 : 2` in app.js). Rot ist
-                # auf diesem Portal die Farbe des eigenen Angebots (Logo,
-                # "unser Angebot"-Badge) - mit gleicher Strichstaerke las
-                # sich Telekom-Magenta als zweite rote Linie, mit mehr
-                # Gewicht bleibt Rot die Eine und Magenta die Andere.
                 eigen_klasse = " gr-g0-linie--eigen" if reihe.get("eigen") else ""
                 teile.append(
                     f'<path class="gr-g0-linie{eigen_klasse} '
@@ -945,12 +777,6 @@ def zeitreihe(
                 )
                 daten_punkte.append((x(t), y(b)))
                 if einzeln:
-                    # KEIN NACKTER PUNKT (BRIEF_FADEN, 05.09.2026): ein
-                    # einzelner Messpunkt ohne Beschriftung liest sich als
-                    # "keine Werte" - Antonios QA-Befund 3 an Telekoms
-                    # Einzelpunkt vom 05.09.2026. Die Beschriftung nennt das
-                    # Datum, nicht nur die Existenz einer Serie - derselbe
-                    # Belegzwang wie am Tooltip.
                     annotationen.append(
                         (
                             nr,
@@ -961,11 +787,6 @@ def zeitreihe(
                         )
                     )
 
-        # Die Legende traegt das Symbol NEBEN dem Namen (F-4b): dieselbe
-        # Form wie der Datenpunkt der Reihe, per `<use>` aus den `<defs>`
-        # - ein eigenes Element wuerde in den `<circle>`-Zaehlungen der
-        # Modultests mitzaehlen. Der Ring braucht seine eigene Klasse
-        # (Strich statt Fuellung), dieselbe wie am Datenpunkt.
         legende_y = 22 + nr * 20
         art = G0_SYMBOLE[nr % len(G0_SYMBOLE)]
         variante = " gr-g0-legendesymbol--ring" if art == "ring" else ""
@@ -987,30 +808,12 @@ def zeitreihe(
                 "bis": punkte[-1][0].isoformat(),
                 "von_de": punkte[0][0].strftime("%d.%m.%Y"),
                 "bis_de": punkte[-1][0].strftime("%d.%m.%Y"),
-                # O4 (STRATEGIE_GERAETE_OPTIK §3): die BETRAEGE der
-                # Reihe - fuer die Wertetabelle unter der Grafik
-                # (Entwurf §2: "Werte des Verlaufs als Tabelle").
-                # Erst- und Letztpreis aus denselben Punkten, die
-                # auch gezeichnet werden, plus ihrer Differenz -
-                # keine zweite Menge und kein eigener Rundungsweg
-                # (derselbe Fehlertyp wie zwei Rechnungen fuer
-                # dieselbe Zahl).
                 "von_preis": punkte[0][1],
                 "bis_preis": punkte[-1][1],
                 "delta": round(punkte[-1][1] - punkte[0][1], 2),
             }
         )
 
-    # F-4e: PLATZIERUNG DER BESCHRIFTUNGEN - jede gegen die Geometrie des
-    # ganzen Bildes. Eine Kandidatenbox (geschaetzte Textbreite bei 12 px
-    # Sans, rund 6,3 px je Zeichen) gilt als frei, wenn sie im Plot
-    # bleibt, keine bereits platzierte Beschriftung schneidet, keinen
-    # Messpunkt (mit Rand) ueberdeckt und keine Linie kreuzt (Strecken
-    # werden an 8-px-Schritten gesampelt). Zuerst UEBER dem Punkt, dann
-    # DARUNTER, dann weiter weg; der Anker bleibt wie bisher von der
-    # Bildhaelfte abhaengig und kippt nur, wenn die Box sonst aus dem
-    # Bild liefe. Passt kein Kandidat, gewinnt der mit den wenigsten
-    # Verstoesen - eine engere Lage ist ehrlicher als keine.
     belegt: list[tuple[float, float, float, float]] = []
 
     def _verstoesse(box) -> int:
@@ -1043,7 +846,7 @@ def zeitreihe(
         breite = len(text) * 6.3 + 8
         mitte_x = G0_LINKS + (G0_BREITE - G0_LINKS - G0_RECHTS) / 2
         seiten = ("end", "start") if px > mitte_x else ("start", "end")
-        bester = None  # (verstoesse, seite, tx, ty, box)
+        bester = None
         for seite in seiten:
             for dy in (-17, 21, -31, 35, -45, 49):
                 tx = px - 9 if seite == "end" else px + 9
@@ -1067,11 +870,6 @@ def zeitreihe(
         )
 
     teile.append("</svg>")
-    # DIE CHART-CHROME-ZEILE ENTSTEHT HIER UND NICHT IN DER VORLAGE - eine
-    # einzige Zeichenkette statt einer Rechnung aus Datumsfiltern im
-    # Template, damit kein zweiter Ort je einen abweichenden Wortlaut
-    # erzeugen kann (Kriterium 3 des Auftrags: "kein Fliesstext" ausser
-    # GENAU diesem einen Satz).
     chrome = (
         f"Sammlung läuft · {len(tage)} "
         f"{'Messtag' if len(tage) == 1 else 'Messtage'} · "

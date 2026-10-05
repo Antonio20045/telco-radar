@@ -48,13 +48,6 @@ def _zr_fragment(tmp_path: pathlib.Path) -> list:
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 
 
-# --------------------------------------------------------------------------
-# Eine eigene Fixture für die Ohne-Tarifband-Gruppe: unbegrenzte Tarife,
-# Tarife ohne Volumen und ein Händler-Barpreis - die drei Lager, die nach
-# dem Entwurf als KOMPAKTE Gruppe unter der Band-Tabelle stehen, nicht als
-# Mischkarten im Band.
-# --------------------------------------------------------------------------
-
 _KATALOG = {
     "geraete": [
         {
@@ -219,10 +212,7 @@ def _baue_ohne_band(tmp_path: pathlib.Path) -> BeautifulSoup:
     buendel = [
         _buendel("o2", "o2:klein", "O2 Mobile Klein", 10),
         _buendel("Vodafone", "vf:klein", "Vodafone Mobil XS", 18, rate=26.0),
-        # Unbegrenzt: außerhalb der Bänder (§ 7) - Zeile der eigenen Gruppe.
         _buendel("o2", "o2:unlimited", "O2 Unlimited", math.inf),
-        # 1&1 ohne tarif_id (wie im echten Bestand: 1&1-Tarife stehen
-        # nicht im Tarifbestand) - kein Datenvolumen, also kein Band.
         {
             **_buendel("1&1", "", "1&1 All-Net-Flat S", None),
             "tarif_monatlich": None,
@@ -274,11 +264,6 @@ def _text(el) -> str:
     return " ".join(el.get_text(" ", strip=True).split())
 
 
-# --------------------------------------------------------------------------
-# Die Zeilen-Struktur (Auftrag 1)
-# --------------------------------------------------------------------------
-
-
 def test_je_buendel_eine_zeile_mit_vier_kernangaben_und_aufklapper(tmp_path):
     """Jedes Bündel des Vorgabemodells ist EINE Zeile: Anbieter, Tarif mit
     Volumen, Kosten über 24 Monate, Δ zur Vodafone-Referenz, Gerät ohne
@@ -325,8 +310,6 @@ def test_die_zeilen_stehen_nach_gesamtkosten_sortiert(tmp_path):
     for z in s.select("#gr-bndliste .gr-bnd"):
         roh = z.get("data-gesamt")
         werte.append(float(roh) if roh else None)
-    # Gegenprobe gegen den leeren Lookup: eine leere Liste waere immer
-    # sortiert (CLAUDE.md 6 - dieselbe Falle wie der Titel-Lookup).
     assert werte, "keine Zeile in der Bandliste - der Test misst nichts"
     assert werte == sorted(werte), werte
 
@@ -347,11 +330,6 @@ def test_keine_karten_und_keine_kartenklappe_mehr(tmp_path):
         "'Alle Bündel als Tabelle' steht noch als eigene Tabelle"
     )
     assert tafel.select_one("table.gr-ttab--leit") is None
-
-
-# --------------------------------------------------------------------------
-# A6 - kein Datenverlust, gezählt vorher (Aufbereitung) gegen nachher (Seite)
-# --------------------------------------------------------------------------
 
 
 def _vorgabe_daten(root: pathlib.Path) -> dict:
@@ -402,16 +380,10 @@ def test_jede_zeile_traegt_rechenweg_pflichtzeile_und_belege(tmp_path):
     zeilen = s.select("#tafel-tco .gr-bnd")
     assert zeilen
     for z in zeilen:
-        # P4-Fix (Sicht-Pruefung 18.09.): der Inhalt steht im
-        # <template>-Pool und wird beim Oeffnen montiert - der Test liest
-        # die Vorlage (BS4 sieht template-Inhalt im Baum), nicht das
-        # (serverseitig leere) Montageziel.
         rw = z.select_one("template.gr-bnd-rw-vorlage")
         assert rw is not None
         posten = rw.select(".gr-tposten li")
         assert posten, f"{z.get('data-anbieter')}: Rechenweg ohne Posten"
-        # vorlage_text (nicht _text): BS4 versteckt template-Inhalt
-        # vor get_text - der Rechenweg liegt seit dem P4-Fix dort.
         assert "nach 24 Monaten gezahlt" in vorlage_text(rw), (
             f"{z.get('data-anbieter')}: Pflichtzeile fehlt"
         )
@@ -432,8 +404,6 @@ def test_der_zustand_steht_auf_der_zeile(tmp_path):
     assert erneuert is not None
     assert _text(erneuert.select_one(".gr-bnd-an")).endswith("erneuert")
     assert erneuert.select_one(".gr-kk-marke--zustand") is not None
-    # Und die Gegenprobe am selben Bestand: die neu-Zeile trägt KEIN
-    # Etikett - sonst wäre 'erneuert' kein Etikett, sondern Zierat.
     neu = tafel.select_one('.gr-bnd[data-anbieter="o2"][data-zustand="neu"]')
     assert neu is not None
     assert neu.select_one(".gr-kk-marke--zustand") is None
@@ -450,11 +420,6 @@ def test_die_referenz_nennt_ihre_naehrung_im_rechenweg(tmp_path):
     rw = vorlage_text(ref.select_one("template.gr-bnd-rw-vorlage"))
     assert "noch nicht erhoben" in rw
     assert "weist zu diesem Gerät keinen Bündelpreis aus" not in tafel.get_text(" ")
-
-
-# --------------------------------------------------------------------------
-# Auftrag 2 - "Beschaffung läuft" und leere Platzhalter weg
-# --------------------------------------------------------------------------
 
 
 def test_beschaffung_laeuft_steht_nicht_mehr_in_der_leseflaeche(tmp_path):
@@ -479,8 +444,6 @@ def test_keine_leeren_platzhalterkarten_mehr(tmp_path):
     tafel = s.select_one("#tafel-tco")
     assert not tafel.select(".gr-kkarte--leer")
     assert "noch kein Bündelpreis erhoben" not in tafel.get_text(" ")
-    # Die Legende formuliert die Lücke je Band - Namen, kein Satz je
-    # Anbieter (das war der O1-Befund: 145 Einzelizeilen).
     legende = _text(tafel.select_one(".gr-lueckenzeile"))
     assert legende.count("Kein Bündel") <= 1
     assert ". ." not in legende
@@ -505,11 +468,6 @@ def test_die_lueckensaetze_des_fragments_bleiben_fuer_das_umschalten(tmp_path):
         )
 
 
-# --------------------------------------------------------------------------
-# Auftrag 3 - die kompakte Gruppe "Ohne Tarifband"
-# --------------------------------------------------------------------------
-
-
 def test_ohne_tarifband_ist_eigene_gruppe_unter_der_bandliste(tmp_path):
     """Unbegrenzte Tarife und Tarife ohne erhobenes Volumen stehen in
     einer klar getrennten Gruppe UNTER der Band-Tabelle - als Zeilen
@@ -524,11 +482,7 @@ def test_ohne_tarifband_ist_eigene_gruppe_unter_der_bandliste(tmp_path):
     assert len(zeilen) == 2, "o2 Unlimited und 1&1 stehen ohne Band"
     tarife = [_text(z.select_one(".gr-bnd-tarif")) for z in zeilen]
     assert any("unbegrenzt" in t for t in tarife), tarife
-    # Keine Zeile der Gruppe trägt ein Band-Attribut - sonst klänge sie an
-    # die Band-Auswahl mit an.
     assert all(z.get("data-band") is None for z in zeilen)
-    # Und die Gruppe steht NACH der Bandliste: select() liefert in
-    # Dokumentreihenfolge.
     reihenfolge = [
         el.get("id") or "gr-bndliste"
         for el in tafel.select("#gr-bndliste, #gr-ohneband")
@@ -549,9 +503,6 @@ def test_haendler_barpreise_stehen_kompakt_mit_beleg(tmp_path):
     assert "ohne Vertrag" in saturn
     assert zeilen[0].select_one("a[href]") is not None, "ohne Beleglink"
     assert "abgerufen" in saturn
-    # Amazon und Expert: kein Preis, keine Zeile - und seit E2 auch keine
-    # Einzelnennung in einer Legende (Antonio 9b.7: nichts heisst nicht
-    # einzeln). Der Lückensatz nennt nur den Bündel-Anbieterkreis.
     assert "Amazon" not in _text(gruppe)
     assert "Expert" not in _text(gruppe)
     tafel_text = _text(s.select_one("#tafel-tco"))
@@ -568,11 +519,6 @@ def test_die_bandliste_traegt_ihr_band_als_attribut(tmp_path):
         assert z.get("data-band") in ("xs", "m", "l"), z.get("data-band")
 
 
-# --------------------------------------------------------------------------
-# A2 - die Anzahl der Aufklapper
-# --------------------------------------------------------------------------
-
-
 def test_deutlich_weniger_als_hundert_aufklapper(tmp_path):
     """A2: <details> gesamt in der Vergleichsansicht deutlich unter 100 -
     Rechenweg je Zeile, 'Wie gerechnet?', Maßstab, Datenlage. Gemessen an
@@ -582,18 +528,10 @@ def test_deutlich_weniger_als_hundert_aufklapper(tmp_path):
     tafel = s.select_one("#tafel-tco")
     anzahl = len(tafel.select("details"))
     assert anzahl < 100, f"{anzahl} <details> in der Vergleichsansicht"
-    # Und die Mischkarte ist wirklich weg: keine Karte, keine Klappe.
     assert anzahl <= 4 + 3 * 3, (
         f"{anzahl} Aufklapper - mehr als Wie-gerechnet + Maßstab + "
         "Datenlage + Rest + Rechenwege je Zeile"
     )
-
-
-# --------------------------------------------------------------------------
-# Auftrag 4/5 - Alarmtabelle und "Bei Wettbewerbern gelistet" sind WEG
-# ( ihr neuer Ort ist wettbewerbsradar.html - dort hält
-#   tests/test_wettbewerbsradar_alarme.py beide fest. )
-# --------------------------------------------------------------------------
 
 
 def test_keine_alarmtabelle_mehr_auf_der_geraeteseite(tmp_path):

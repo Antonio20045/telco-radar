@@ -103,8 +103,6 @@ def test_ruhende_fragen_bleiben_stehen(tmp_path):
 
 
 def test_aktive_fragen_stehen_oben(tmp_path):
-    # Die zweite Frage muss VOR `fenster_ausgaben` stehen - danach ist die
-    # Liste `fragen` beendet und ein weiterer Eintrag waere ungueltiges YAML.
     root = _konfig(
         tmp_path,
         EINE_FRAGE.replace(
@@ -123,9 +121,6 @@ def test_aktive_fragen_stehen_oben(tmp_path):
     )
     assert v["fragen"][0]["zustand"] == F.AKTIV
     assert v["fragen"][-1]["zustand"] == F.RUHEND
-
-
-# ------------------------------------------------------------- Trennschaerfe
 
 
 def test_die_marke_schraenkt_ein(tmp_path):
@@ -173,9 +168,6 @@ def test_ohne_konfiguration_kein_board(tmp_path):
 
 def test_ohne_ausgaben_kein_board(tmp_path):
     assert F.aufbereiten([], _konfig(tmp_path, EINE_FRAGE))["aktiv"] is False
-
-
-# ------------------------------------------------------------ ausgelieferte
 
 
 def test_die_ausgelieferten_fragen_sind_falsifizierbar():

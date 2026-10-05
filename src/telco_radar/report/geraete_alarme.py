@@ -45,28 +45,11 @@ from __future__ import annotations
 
 from typing import Optional
 
-# Die Grenzen der vier Stufen, in Prozent Abstand zu unserem Preis.
 KRITISCH_AB = 10.0
 MITTEL_AB = 3.0
 
-# Wie viele Zeilen ohne Aufklappen sichtbar sind. Die Zahl deckelt die
-# Seitenhoehe STRUKTURELL: ohne Deckel haengt sie am Datenbestand, und zwei
-# zusaetzliche Zeilen kippten den Abnahmetest, ohne dass sich eine Zeile Code
-# aendert.
-#
-# Bis zum 17.09.2026 stand sie auf 12 - gerechnet fuer eine Tafel, die die
-# Alarmtabelle ALLEINE trug (68 px je Zeile, 3000-px-Budget des Auftrags).
-# Seit E3 Schritt 2 steht die Tabelle als ERSTE von DREI Sektionen im
-# Radar-Reiter der EINEN Geräteseite (Alarme / Modell-Liste / Händler);
-# alle drei teilen sich dasselbe Budget EINER Tafel, und Kriterium 11b misst
-# die GANZE Seite. Am echten Bestand gemessen (17.09.2026): die Seite mass
-# mit 6 sichtbaren Zeilen 3216 px - mit 5 bleibt sie unter 3000 px. Der
-# Rest steht hinter dem Knopf "alle N anzeigen", nichts geht verloren.
 SICHTBAR_MAX = 5
 
-# Reihenfolge, Beschriftung und Farbe der vier Stufen. Die Farben stehen als
-# CSS-Variablen im Stylesheet; hier steht nur ihr Name, damit Kachel und
-# Pille dieselbe Quelle haben.
 STUFEN = (
     ("kritisch", "Kritisch", "10 % oder mehr günstiger als wir"),
     ("mittel", "Mittel", "3 bis 10 % günstiger"),
@@ -199,21 +182,13 @@ def zeilen(vergleich: dict, auffaellig: Optional[dict] = None) -> dict:
                 "stufe_name": dict((s, n) for s, n, _ in STUFEN)[stufe],
                 "alle": alle,
                 "anzahl_alle": len(alle),
-                # Die Markierung haengt am guenstigsten Wettbewerber: er traegt
-                # die Zahl, die in der Zeile steht.
                 "auffaellig": bool(bester and auffaellig.get(bester.get("listung_id"))),
             }
         )
 
-    # Nach dem PROZENTABSTAND, absteigend. Zeilen ohne Rueckstand stehen
-    # nicht in der Tabelle - sie sind die Kachel "Bestpreis".
     mit_rueckstand = [z for z in gebaut if z["stufe"] != "bestpreis"]
     mit_rueckstand.sort(key=lambda z: -(z["prozent"] or 0))
 
-    # Die Filterlisten kommen aus den ANGEZEIGTEN Zeilen, nicht aus dem
-    # Gesamtbestand: ein Auswahlfeld, das eine Marke anbietet, zu der die
-    # Tabelle keine Zeile hat, fuehrt zu einer leeren Tabelle und sieht wie
-    # ein Fehler aus.
     return {
         "kacheln": kacheln(roh),
         "marken": sorted({z["hersteller"] for z in mit_rueckstand if z["hersteller"]}),

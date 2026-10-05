@@ -87,6 +87,16 @@ def test_gruende_nennen_die_gemessenen_zahlen(projekt):
     assert "src/telco_radar/report/html.py fehlt" in offen["9 Lader, render_site"]
 
 
+def test_kommentarabbau_zaehlt_freie_kommentare_ohne_basis(projekt):
+    assert stand.offen()["7 Kommentarabbau"] == []
+    (projekt / "src").mkdir()
+    (projekt / "src/a.py").write_text("x = 1  # noqa: E501\n", "utf-8")
+    assert stand.offen()["7 Kommentarabbau"] == []
+    (projekt / "tests").mkdir()
+    (projekt / "tests/test_a.py").write_text("# Wissen\nx = 1  # mehr\n", "utf-8")
+    assert stand.offen()["7 Kommentarabbau"] == ["freie Kommentare 2, Ziel 0"]
+
+
 def test_hermetische_tests_nennen_umgehungen_und_laufzeit(projekt):
     assert stand.offen()["4 Hermetische Tests"] == [
         "chromium-eigenes in Tests 1, Ziel 0",

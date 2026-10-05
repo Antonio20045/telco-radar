@@ -39,20 +39,11 @@ import hmac
 import json
 import time
 
-# Getrennte Zwecke, getrennte Schluesselableitung. Ohne das
-# Zweck-Praefix waere eine Nonce aus `/form-token` ein gueltiges
-# Bestaetigungstoken - dieselbe Signatur, dieselbe Nutzlastform, und der
-# Angreifer braeuchte den Schluessel gar nicht.
 ZWECK_NONCE = "nonce"
 ZWECK_BESTAETIGUNG = "confirm"
 ZWECK_ABMELDUNG = "unsubscribe"
 
-# 72 Stunden fuer den Bestaetigungslink. Kuerzer waere unhoeflich (jemand
-# meldet sich Freitagabend an), laenger macht ein abgefangenes Token
-# unnoetig lange brauchbar.
 TTL_BESTAETIGUNG = 72 * 3600
-# Die Nonce des Formulars: mindestens zwei Sekunden alt (schneller fuellt
-# kein Mensch ein Formular aus) und hoechstens zwei Stunden.
 NONCE_MIN = 2
 NONCE_MAX = 2 * 3600
 ZUKUNFT_TOLERANZ_SEKUNDEN = 60
@@ -77,9 +68,6 @@ def _unb64(text: str) -> bytes:
 
 
 def _signatur(key: str, zweck: str, koerper: bytes) -> str:
-    # Der Zweck geht in die SIGNATUR ein, nicht nur in die Nutzlast: sonst
-    # liesse sich ein gueltiges Token durch Umschreiben eines Feldes fuer
-    # einen anderen Endpunkt verwenden.
     nachricht = zweck.encode("ascii") + b"." + koerper
     return _b64(hmac.new(key.encode("utf-8"), nachricht, hashlib.sha256).digest())
 
@@ -121,9 +109,6 @@ def lies(
     alter = (jetzt if jetzt is not None else time.time()) - float(daten.get("iat") or 0)
     if alter > max_alter:
         raise TokenFehler("abgelaufen")
-    # Eine Nutzlast aus der Zukunft ist entweder eine verstellte Uhr oder ein
-    # Versuch, den Ablauf auszuhebeln. Eine Minute Toleranz fuer den ersten
-    # Fall, mehr nicht.
     if alter < -ZUKUNFT_TOLERANZ_SEKUNDEN:
         raise TokenFehler("Zukunft")
     if alter < min_alter:

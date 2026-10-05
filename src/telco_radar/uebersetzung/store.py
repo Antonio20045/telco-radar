@@ -47,7 +47,7 @@ class Uebersetzung:
     modell: str = ""
     erstellt_am: str = ""
     zeichen_original: int = 0
-    herkunft: str = ""  # "feed" | "artikel"
+    herkunft: str = ""
 
     @property
     def zeichen(self) -> int:

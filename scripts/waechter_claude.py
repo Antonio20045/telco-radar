@@ -20,11 +20,8 @@ PROJEKT = '"$CLAUDE_PROJECT_DIR"'
 LOKAL = ".claude/settings.local.json"
 ALLE_AUS = "disableAllHooks"
 HOOK_FELDER = frozenset({"type", "command", "timeout"})
-# ``env`` könnte PATH oder PYTHONPATH umbiegen und den Hook-Ausgang fälschen.
 VERBOTEN = frozenset({ALLE_AUS, "env"})
-# Sekunden je Unterbefehl; ``make venv`` im Sitzungsstart braucht am längsten.
 MINDESTFRIST = {"sitzung": 300, "befehl": 5, "datei_lesen": 5, "nach_edit": 30}
-# Erlaubte Aufrufer eines Hooks; danach folgt genau Skriptpfad und Unterbefehl.
 AUFRUFER = ("python3", f"{PROJEKT}/.venv/bin/python")
 PFLICHT_HOOKS = (
     ("SessionStart", "", f"{HOOK_SKRIPT} sitzung"),

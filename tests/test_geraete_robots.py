@@ -51,9 +51,6 @@ def _um(stunde: int, minute: int = 0) -> datetime:
     return datetime(2026, 8, 11, stunde, minute, tzinfo=timezone.utc)
 
 
-# --------------------------------------------------------------------------
-
-
 def test_host_ohne_www():
     assert host_von("https://www.medimax.de/c/116/x") == "medimax.de"
     assert (
@@ -69,7 +66,7 @@ def test_produktstrecke_ist_erlaubt_warenkorb_nicht():
     )
     assert r.erlaubt("https://www.medimax.de/p/1518897/galaxy-a57-5g")
     assert not r.erlaubt("https://www.medimax.de/cart")
-    assert not r.erlaubt("https://www.medimax.de/de/cart")  # /*/cart
+    assert not r.erlaubt("https://www.medimax.de/de/cart")
 
 
 def test_stern_und_endanker():
@@ -146,18 +143,12 @@ def test_ohne_besuchszeit_gilt_immer():
 
 def test_nur_der_stern_block_gilt_uns():
     r = lies_robots(_MEDIMAX)
-    # MJ12bot ist komplett gesperrt - das darf uns nicht treffen.
     assert r.erlaubt("https://www.medimax.de/p/1")
 
 
 def test_mehrere_user_agent_zeilen_hintereinander_bilden_eine_gruppe():
     r = lies_robots("User-agent: Googlebot\nUser-agent: *\nDisallow: /geheim\n")
     assert not r.erlaubt("https://x.de/geheim")
-
-
-# --------------------------------------------------------------------------
-# Der Waechter
-# --------------------------------------------------------------------------
 
 
 def _waechter(antworten):
@@ -178,7 +169,6 @@ def test_gesperrter_pfad_wird_nicht_abgerufen():
     )
     darf, grund = w.darf("https://x.de/shop/handy", _um(12))
     assert darf is False and "gesperrt" in grund
-    # Es wurde ausschliesslich die robots.txt geholt, nicht die Seite.
     assert aufrufe == ["https://x.de/robots.txt"]
 
 
@@ -187,7 +177,6 @@ def test_ausserhalb_der_besuchszeit_ist_kein_fehler_sondern_ein_grund():
     darf, grund = w.darf("https://www.medimax.de/p/1", _um(8, 30))
     assert darf is False
     assert "Besuchszeit" in grund and "02:00-08:00" in grund and "08:30" in grund
-    # Im Fenster derselbe Pfad: erlaubt.
     assert w.darf("https://www.medimax.de/p/1", _um(3, 0))[0] is True
 
 

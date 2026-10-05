@@ -84,16 +84,6 @@ from ...geraete_model import probe_geht_auf
 
 log = logging.getLogger(__name__)
 
-# "privatkunden-google-pixel-11-pro-xl-256gb-canyon-24xhigh"
-#   -> Speicher 256, Farbe "canyon"
-# Der Modellname kommt NICHT von hier, sondern aus `description` - der
-# Angebotsname ist ein Slug, und aus einem Slug ein Modell zu raten ist
-# genau die Titel-Hasherei, die Teil E verbietet.
-#
-# TERABYTE (29.09.2026): "privatkunden-apple-iphone-18-pro-1tb-burgunder-
-# 36xhigh". Ohne die Einheit fielen 1 TB und 2 TB beide auf
-# `ohne-speicher` und damit auf DIESELBE sku_id - zwei Preise, ein
-# Schluessel. Gezaehlt wird wie in `geraete_model` (1 TB = 1024 GB).
 _OFFER_RE = re.compile(
     r"^[a-z]+-(?P<slug>.+?)-(?P<zahl>\d+)(?P<einheit>gb|tb)-(?P<farbe>.+?)"
     r"-\d+x\w+$"
@@ -106,18 +96,9 @@ def _speicher(m) -> Optional[int]:
     return int(m.group("zahl")) * (1024 if m.group("einheit") == "tb" else 1)
 
 
-# Ein Zubehoerbuendel erkennt man am " mit " im ANGEBOTSNAMEN. Gemessen an
-# den 93 Eintraegen vom 28.08.2026: 18 Treffer, alle echt (Watch, Buds,
-# Headphone, Pad, Tab). Geprueft wird auf `description` UND `offerName` -
-# "Xiaomi 17 Ultra mit Redmi Pad 2" traegt das Wort nur in der Beschreibung.
 _BUENDEL_RE = re.compile(r"\bmit\b", re.IGNORECASE)
 
 
-# Die Ratenzahl steht am Ende des Angebotsnamens: "...-mitternacht-24xhigh".
-# Bewusst ein EIGENER Ausdruck neben `_OFFER_RE` und nicht dessen Gruppe:
-# `_OFFER_RE` verlangt den ganzen Slug samt Speicher und Farbe. Ein Eintrag,
-# dessen Name davon abweicht, verliert dann Speicher und Farbe - er soll
-# deswegen aber nicht auch noch seine Preisform verlieren.
 _RATEN_RE = re.compile(r"-(?P<raten>\d+)x\w+$")
 
 
@@ -175,7 +156,7 @@ def lies(text: str, url: str = "") -> list[dict]:
         if not modell:
             continue
         if _BUENDEL_RE.search(modell) or _BUENDEL_RE.search(angebot):
-            continue  # Geraet plus Zubehoer, siehe Modulkopf
+            continue
 
         preisblock = h.get("price") or {}
         preis = _preis(preisblock.get("totalPrice"))
@@ -190,9 +171,6 @@ def lies(text: str, url: str = "") -> list[dict]:
         monatsrate = _preis(preisblock.get("monthlyPrice"))
         laufzeit = _laufzeit(angebot, anzahlung, monatsrate, preis)
 
-        # Die Seite, die ein Mensch aufrufen kann - sie traegt in ihrer
-        # eigenen Adresse `ohne-tarif=ja`, also genau die Preisart, die hier
-        # gespeichert wird.
         ziel = (
             (h.get("detailWwwAbsoluteCall") or {}).get("constantPayload") or {}
         ).get("link") or {}
@@ -203,11 +181,8 @@ def lies(text: str, url: str = "") -> list[dict]:
                     for x in (modell, f"{speicher} GB" if speicher else "", farbe)
                     if x
                 ),
-                # E4-Auto-Erkennung: der strukturierte NAME (Feld `description`),
-                # getrennt vom zusammengesetzten Titel.
                 "strukturierter_name": modell,
                 "preis": preis,
-                # Die Preisform, aus der Quelle gelesen - siehe Modulkopf.
                 "anzahlung": anzahlung if laufzeit else None,
                 "monatsrate": monatsrate if laufzeit else None,
                 "laufzeit_monate": laufzeit,
@@ -225,112 +200,8 @@ def lies(text: str, url: str = "") -> list[dict]:
     return out
 
 
-# --------------------------------------------------------------------------
-# DER BUENDELKATALOG - dieselbe Adresse, ein Parameter weniger
-# --------------------------------------------------------------------------
-# GEMESSEN AM 04.09.2026
-# ----------------------
-# `/e-shop/` gibt die Katalogadresse in ZWEI Fassungen aus, beide woertlich
-# in seiner eigenen Nutzlast:
-#
-#     .../__not-specified__?hwOnly=true     95 Geraete OHNE Tarif
-#     .../__not-specified__                 88 Geraete MIT Tarif
-#
-# Es ist derselbe Pfad und derselbe Umschalter, den die Seite ihren Lesern
-# anbietet: die Antwort sagt selbst, in welchem Zustand sie steht
-# (`hwCatalogSwitcherStateValue.hwOnlyOrBundleState` = `HW_ONLY` bzw.
-# `BUNDLE`, `showSwitcher: true`). Es wird also kein Parameter erraten und
-# keine Kombinatorik durchprobiert - die zweite Adresse steht in der
-# Konfiguration, weil o2 sie in seiner ersten ausliefert.
-#
-# Der Buendeleintrag traegt, was ein `tco_model.Buendel` braucht:
-#
-#     price.oneTimePrice     1,00 EUR   Geraetezuzahlung
-#     price.monthlyPrice    60,49 EUR   Geraeterate PLUS Tarif, zusammen
-#     price.activationFee   39,99 EUR   Anschlusspreis
-#     rateDurationValue     36 Monate   Laufzeit der Geraeteraten
-#     bundle.tariffName     "O<sub>2</sub> Mobile L Plus mit 150 GB+ (24 Mon.)"
-#     bundle.tariffOfferName "privatkunden-o2-mobile-l-plus-online-hwv"
-#
-# DIE AUFTEILUNG STEHT IM TRACKINGBLOCK - UND SIE WIRD NACHGERECHNET
-# ------------------------------------------------------------------
-# `monthlyPrice` ist die SUMME aus Geraeterate und Tarif. Getrennt stehen
-# die zwei nur in `ecommerceProductValue.attributes`, dem Block, mit dem die
-# Seite ihre Webanalyse fuettert:
-#
-#     metric3  "40.5"   Geraet mtl.
-#     metric2  "19.99"  Tarif mtl.
-#     metric5  "1"      Anzahlung
-#     metric4  "0.0"    Anschlusspreis
-#     dimension59 "o2-mobile-l-plus"   der Tarif-Slug
-#
-# Ein Trackingfeld ist kein Preisfeld, und deshalb wird ihm hier nichts
-# geglaubt, was sich nicht gegen die TYPISIERTEN Zahlen derselben Antwort
-# nachrechnen laesst. Drei Proben, alle drei Bedingung:
-#
-#     metric3 + metric2 == price.monthlyPrice
-#     metric5           == price.oneTimePrice
-#     metric4           == price.activationFee
-#
-# Ueber die 66 Buendel des Messtags gehen alle drei bei 66 von 66 auf. Geht
-# eine nicht auf, wird der Satz verworfen - ein Trackingblock, der der
-# Preisstruktur widerspricht, ist keine Messung, sondern ein geaendertes
-# Nutzlastformat.
-#
-# Zusaetzlich gegengeprueft an den Produktseiten, die o2 selbst verlinkt:
-# acht `-details?tarif=...`-Seiten tragen serverseitig einen
-# `pdp:PriceSummaryValue` mit den Zeilen "Geraet mtl. (36 Raten)" und
-# "Tarif mtl. (Mindestlaufzeit 24 Monate)". Bei sieben von acht (die achte
-# fuehrt der Katalog unter anderem Namen) stimmen die Betraege auf den Cent
-# mit metric3/metric2 ueberein. Die Detailseiten werden im Betrieb NICHT
-# abgerufen: 66 Seiten a rund 950 KB waeren 63 MB je Nacht fuer eine
-# Aufteilung, die schon in der einen Katalogantwort steht.
-#
-# WAS DER TARIFBETRAG IST - UND WAS NICHT (Stand P0-B-h5, 21.09.2026)
-# ------------------------------------------------------------------------
-# 19,99 EUR (Beispiel "O2 Mobile on Demand M Plus") ist der Tarifpreis IN
-# DIESEM BUENDEL. Die SIM-only-Kachel DESSELBEN Tarifs (aufgeloest ueber
-# den Slug, siehe `tco_buendel.py`) nennt je Geraet 19,99/24,99/... EUR,
-# und o2 nennt die Differenz auf der Produktseite selbst "einen
-# attraktiven monatlichen Rabatt auf deinen Tarif". Der Betrag ist
-# gemessen: bei diesem Geraeteratenplan 19,99 statt 24,99 SIM-only, also
-# -5,00 EUR im Monat.
-#
-# DIESE DIFFERENZ IST DER PREIS UND KEIN ABZUG. Das ist die Lesart seit
-# P0-B-fix1 und sie steht ausgeschrieben in `analyze/tco_buendel.py`
-# ("KEIN BETRAG WIRD UMGERECHNET"): "der Anbieter sagt Rabatt" ist nicht
-# dasselbe wie "bedingter Nachlass". Wer die -5,00 EUR als
-# `tco_model.Rabatt` neben den Betrag legt, weist eine Ersparnis aus, die
-# mit diesem Ratenplan niemand mehr holen kann, und hebt die Leitzahl
-# aller 72 o2-Buendel um 120,00 bis 276,00 EUR, ohne dass sich ein
-# o2-Preis geaendert hat. Genau das war fuer einen Tag eingebaut und ist
-# zurueckgenommen.
-#
-# Dieser Adapter speichert deshalb den GEMESSENEN Buendelbetrag
-# (`tarif_monatlich`, das, was fuer DIESES Buendel zu zahlen ist) und
-# rechnet nichts um. Er fuehrt dazu auch KEIN Deutungsflag mehr: bis
-# P0-B-h5 hing an jedem Rohsatz ein `tarif_rabatt_beleg=True`, dessen
-# einziger Leser mit der Ruecknahme entfallen war. Ein Feld ohne Leser,
-# dessen Beschreibung eine Vertragsstelle nennt, die es nicht mehr gibt,
-# ist die Bauanleitung fuer denselben Fehler - der BETRAG gehoert
-# dokumentiert (oben), die Deutung nicht in ein Datenfeld.
-#
-# Was der SIM-only-Preis desselben Tarifs leistet, leistet er anderswo:
-# als Massstab in `analyze/tarif_referenzen.py` und als Geraeteanteil in
-# `tco_model.geraeteanteil()` - dort steht die Differenz als Differenz.
-#
-# Die Zubehoerbuendel werden mit derselben Regel verworfen wie im
-# Geraetekatalog (` mit ` in Beschreibung oder Angebotsname): 22 der 88.
-# Ihr Preis gilt fuer Geraet PLUS Zubehoer, und was der Zubehoerteil ist,
-# steht nirgends.
-
-# "36 Monate" - mit geschuetztem Leerzeichen in der Quelle.
 _DAUER_RE = re.compile(r"(\d+)")
 
-# Die Trackingfelder tragen HTML: "O<sub>2</sub> Mobile L Plus mit 150 GB+".
-# Der Tarifname wandert in `Buendel.tarif_name` und von dort auf die Seite;
-# ein `<sub>` im Datenfeld waere dort entweder sichtbares Markup oder eine
-# stille Abhaengigkeit von der Escaping-Regel der Vorlage.
 _TAG_RE = re.compile(r"<[^>]+>")
 
 
@@ -364,13 +235,11 @@ def _buendelsatz(h: dict, proben: Optional[dict] = None) -> Optional[dict]:
     if not modell:
         return None
     if _BUENDEL_RE.search(modell) or _BUENDEL_RE.search(angebot):
-        return None  # Geraet plus Zubehoer
+        return None
 
     buendel = h.get("bundle") or {}
     tarif_name = _ohne_markup(buendel.get("tariffName") or "")
     if not tarif_name:
-        # Ohne Tarif ist eine Buendelzahl bedeutungslos - dieselbe Regel
-        # wie in `geraete_model.Listung` und `tco_model.Buendel`.
         return None
 
     preisblock = h.get("price") or {}
@@ -383,18 +252,6 @@ def _buendelsatz(h: dict, proben: Optional[dict] = None) -> Optional[dict]:
     geraet_rate = _preis(werte.get("metric3"))
     tarif_rate = _preis(werte.get("metric2"))
 
-    # DIE PROVIDER-PROBE - Existenz-Schwelle ueber die Feldstruktur. Sie
-    # zaehlt JE Kandidat, ob die drei Feldebenen noch da sind und
-    # zusammenpassen; ein fehlender Referenzbetrag (oneTimePrice weg,
-    # activationFee weg) ist dabei eine GESCHEITERTE Probe, kein
-    # ungeeigneter Kandidat - genau das Verschwinden soll sie ja melden.
-    # Dasselbe gilt fuer monthlyPrice SELBST (S2-1 der P5-Codepruefung):
-    # fehlt die Referenz, entfaellt der Satz als "monthlyPrice"-Ebene -
-    # die metric-Vergleiche sind ohne Referenz nicht pruefbar und werden
-    # nicht zusätzlich als gescheitert gezaehlt (die Ebene, die weg ist,
-    # heisst der Grund). Zaehlung VOR der Laufzeitprobe: die Probe misst
-    # die Felder, nicht die Satzannahme (dafuer steht die Buendelzeile
-    # der Pipeline).
     if proben is not None:
         proben["kandidaten"] = int(proben.get("kandidaten", 0)) + 1
         fehlend: list[str] = []
@@ -424,14 +281,10 @@ def _buendelsatz(h: dict, proben: Optional[dict] = None) -> Optional[dict]:
     dauer = _DAUER_RE.search(str(h.get("rateDurationValue") or ""))
     laufzeit = int(dauer.group(1)) if dauer else None
     if laufzeit is None or not probe_geht_auf(anzahlung, monatlich, laufzeit, gesamt):
-        # Dieselbe Probe wie beim Geraetekatalog, hier auf der Summe aus
-        # Rate und Tarif. Geht sie nicht auf, stimmt die Laufzeit nicht -
-        # und ohne Laufzeit ist eine Monatszahl keine Aussage.
         return None
 
     if geraet_rate is None or tarif_rate is None:
         return None
-    # Die drei Proben aus dem Modulkopf. Sie sind Bedingung, nicht Protokoll.
     if not _gleich(geraet_rate + tarif_rate, monatlich):
         return None
     if not _gleich(_preis(werte.get("metric5")), anzahlung):
@@ -453,14 +306,8 @@ def _buendelsatz(h: dict, proben: Optional[dict] = None) -> Optional[dict]:
         "farbe": farbe,
         "speicher_gb": speicher,
         "sku": str(h.get("externalId") or "").strip(),
-        # Der Hardware-Angebotsname (Speicher, Farbe, Ratenzahl) - der
-        # Schluessel, ueber den `fuehre_zusammen` dasselbe Buendel aus der
-        # Vertiefung erkennt.
         "angebot": angebot,
         "tarif_name": tarif_name,
-        # Der Slug, ueber den `tarif_bezug.ueber_slug` aufloest. Er steht im
-        # Katalog am Buendel und in der SIM-only-Kachel am Link "Handy
-        # hinzufuegen" - o2 stellt die Verbindung her, nicht dieses Modul.
         "tarif_slug": str(werte.get("dimension59") or "").strip(),
         "tarif_monatlich": tarif_rate,
         "geraet_zuzahlung": anzahlung,
@@ -469,10 +316,6 @@ def _buendelsatz(h: dict, proben: Optional[dict] = None) -> Optional[dict]:
         "laufzeit_monate": laufzeit,
         "url": str(ziel.get("uri") or "").strip(),
         "quelle": "o2_buendel",
-        # Kein Deutungsflag zum Tarifbetrag - siehe Modulkopf "WAS DER
-        # TARIFBETRAG IST - UND WAS NICHT". `tarif_monatlich` oben IST der
-        # Preis dieses Buendels; die -5,00 EUR gegenueber der
-        # SIM-only-Kachel sind Teil davon und kein Abzug daneben.
     }
 
 
@@ -521,75 +364,7 @@ def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> lis
     return out
 
 
-# --------------------------------------------------------------------------
-# DIE VERTIEFUNG - jede Tarifstufe, jeder Speicher, jede Ratenlaufzeit
-# --------------------------------------------------------------------------
-# GEMESSEN AM 29.09.2026
-# ----------------------
-# Der Buendelkatalog nennt je Geraet EIN Buendel: einen Speicher, einen
-# Tarif (meist "O2 Mobile on Demand M Plus"), 36 Raten. Die Produktseite,
-# die der Katalog selbst verlinkt (`detailWwwAbsoluteCall`), traegt in
-# ihrem `<script id="pageValue">` die GANZE Auswahl, die ein Kunde dort
-# umschalten kann - und fuer jeden Schalter die Adresse, die die Seite
-# beim Klick selbst laedt:
-#
-#     hardware.storageOptions[].selectCall.link.uri     Speicher
-#     hardware.paymentOptions[].selectCall.link.uri     24 / 36 Raten
-#     tariff.tariffOptions[].selectCall.link.uri        12 Tarife
-#
-# Alle drei zeigen auf GET /e-shop/rest/configuration/<id> (Medientyp
-# `application/vnd.commerce.message+json`, `mediaType` am Link selbst),
-# und die Antwort ist dieselbe `pdp:PageValue`-Nutzlast wie auf der
-# Produktseite. Gefolgt wird NUR, was eine Antwort selbst verlinkt - keine
-# Adresse wird gebaut, keine ID gezaehlt. robots.txt (`User-agent: *`)
-# sperrt /e-shop/rest/ nicht, siehe Modulkopf.
-#
-# WAS EINE ANTWORT TRAEGT
-# -----------------------
-# * fuer den AUSGEWAEHLTEN Tarif die volle Aufteilung in der
-#   Preiszusammenfassung, die der Kunde sieht: "Geraet mtl. (36 Raten)",
-#   "Tarif mtl.", "Geraet Anzahlung", "einmaliger Anschlusspreis" (der
-#   Trackingblock metric2-5 kann davon abweichen, siehe `_gemessen`);
-# * fuer JEDEN der zwoelf Tarife `monthlyCharges` - Geraeterate PLUS
-#   Tarifbetrag, als typisierte Zahl.
-#
-# Die Aufteilung der ANDEREN elf Tarife steht nicht in der Antwort. Jeden
-# einzeln abzurufen hiesse 12 x Speicher x Laufzeit Abrufe je Geraet -
-# rund 2.400 Abrufe a 420 KB, gut anderthalb Stunden je Nacht.
-#
-# DIE ZWEI BEFUNDE, AUF DENEN DIE ABLEITUNG STEHT - UND IHRE PROBEN
-# -----------------------------------------------------------------
-# 29.09.2026, je 12 Tarife x 2 Laufzeiten fuer iPhone 17 Pro 256 GB und
-# Xiaomi 17 512 GB, dazu 12 Tarife fuer Galaxy A56 128 GB (60 Antworten):
-#
-# 1. Geraeterate und Anzahlung haengen NICHT am Tarif. Bei jedem Geraet
-#    und jeder Laufzeit standen dieselben zwei Zahlen unter allen zwoelf
-#    Tarifen (iPhone 17 Pro, 36 Raten: 36,50 / 1,00 EUR) - es ist der
-#    getrennte Ratenkaufvertrag. Der Rabatt steckt im TARIF, und der IST
-#    geraete- und laufzeitabhaengig (on Demand M Plus: 14,99 beim iPhone,
-#    8,49 beim Xiaomi 17 mit 36 Raten, 14,99 mit 24 Raten). Also
-#        tarif(T) = monthlyCharges(T) - Geraeterate
-#    mit der Rate DERSELBEN Antwort. In allen 60 Antworten ging das fuer
-#    den ausgewaehlten Tarif auf den Cent auf.
-# 2. Der Anschlusspreis haengt nur am Tarif (39,99 oder 0,00 EUR) - bei
-#    allen drei Geraeten, beiden Laufzeiten und allen 93 Katalogeintraegen.
-#
-# Beides wird JEDE NACHT neu gemessen und ist Bedingung, nicht Annahme:
-# die REFERENZ ist ein vollstaendiger Tarifdurchlauf (11 Abrufe) am ersten
-# vertieften Geraet. Nur wenn dort Rate und Anzahlung unter allen Tarifen
-# gleich sind und jede Einzelprobe aufgeht, wird ueberhaupt abgeleitet;
-# Slug und Anschlusspreis je Tarif kommen aus derselben Referenz. Jede
-# weitere Antwort prueft ihren EIGENEN ausgewaehlten Tarif gegen die
-# Referenz (Slug und Anschluss gleich) - faellt das durch, liefert sie nur
-# ihren direkt gemessenen Satz.
-#
-# ABRUFE JE LAUF: je Katalogbuendel 1 Produktseite plus (Speicher x
-# Laufzeiten - 1) Konfigurationsantworten, einmal 11 fuer die Referenz.
-
 _TIEF_QUELLE = "o2_tarifwahl"
-# Markiert einen Tarifbetrag, der als monthlyCharges(T) minus gemessener
-# Geraeterate derselben Antwort entsteht - nicht direkt abgelesen. Reist
-# bis in den Bestand (`tco_model.Buendel.herleitung`).
 HERLEITUNG_TARIFSUMME = "tarifsumme_minus_geraeterate"
 
 _PAGE_VALUE_RE = re.compile(
@@ -771,9 +546,6 @@ def _rohsatz(
         "geraet_monatsrate": g["rate"],
         "anschlusspreis": anschluss,
         "laufzeit_monate": g["laufzeit"],
-        # Die Produktseite, von der aus diese Auswahl erreicht wurde. Die
-        # Konfigurationsantwort selbst nennt keine eigene Seitenadresse,
-        # und eine Adresse zu BAUEN waere geraten.
         "url": url,
         "quelle": _TIEF_QUELLE,
     }
@@ -889,8 +661,6 @@ def vertiefe_buendel(
         if start is None:
             continue
         _zaehle(z, "geraete")
-        # Speicher x Laufzeit: jede Antwort, die ein Kunde hier ueber die
-        # zwei Schalter erreicht - und nur ueber deren eigene Links.
         speicherseiten = [start]
         for option in (start.get("hardware") or {}).get("storageOptions") or []:
             if option.get("selected") or not _link(option) or not weiter():
@@ -928,7 +698,7 @@ def vertiefe_buendel(
         for pv in antworten:
             angebot = str((pv.get("hardware") or {}).get("offerName") or "")
             if angebot in gesehen:
-                continue  # derselbe Speicher ueber zwei Katalogeintraege
+                continue
             gesehen.add(angebot)
             out.extend(saetze_aus_konfiguration(pv, basis, referenz, url, z))
     return out

@@ -28,9 +28,6 @@ def _antwort(urteile):
     return json.dumps({"urteile": urteile})
 
 
-# ------------------------------------------------- Stufe 1: Zahlen im Code
-
-
 def test_erfundene_zahl_faellt_ohne_modellaufruf(monkeypatch):
     monkeypatch.setattr(
         F,
@@ -67,9 +64,6 @@ def test_gerundete_zahl_gilt_als_gedeckt(monkeypatch):
     assert h.get("ctm_satz")
 
 
-# --------------------------------------- Stufe 3: das Sicherheitswort im Code
-
-
 def test_sehr_wahrscheinlich_ueber_einer_absicht_faellt(monkeypatch):
     monkeypatch.setattr(
         F,
@@ -95,9 +89,6 @@ def test_sehr_wahrscheinlich_ueber_einer_entscheidung_bleibt(monkeypatch):
     assert h.get("ctm_satz")
 
 
-# ------------------------------------------------------ Stufe 2: das Modell
-
-
 def test_unbelegter_satz_wird_entfernt_und_begruendet(monkeypatch):
     monkeypatch.setattr(
         F,
@@ -111,9 +102,6 @@ def test_unbelegter_satz_wird_entfernt_und_begruendet(monkeypatch):
     assert "ctm_satz" not in h
     assert h["ctm_satz_verworfen"] == "Markt verwechselt"
     assert bilanz["gruende"]["Markt verwechselt"] == 1
-
-
-# ------------------------------------------------------------- fail closed
 
 
 def test_ohne_modell_erscheint_kein_folgerungssatz():
@@ -162,8 +150,6 @@ def test_stapel_bleiben_klein(monkeypatch):
         return _antwort([{"id": r["id"], "belegt": True} for r in rows])
 
     monkeypatch.setattr(F, "complete", fake)
-    # Ohne Ziffern im Satz - sonst faengt ihn schon die Zahlenpruefung ab,
-    # und der Stapel erreicht das Modell gar nicht.
     hs = [
         _h(
             "Drückt unsere Preisuntergrenze deutlich nach unten, Fall "

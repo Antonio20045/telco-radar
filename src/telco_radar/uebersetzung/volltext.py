@@ -25,21 +25,10 @@ from ..collect.http import fetch
 
 log = logging.getLogger(__name__)
 
-# Ab wie vielen Zeichen ein Text als Artikel gilt. Absolut gemessen, nicht
-# als Vielfaches des Teasers: digi.no lieferte 141 Zeichen hinter einer
-# Paywall gegen 45 Zeichen Teaser - als Faktor waeren das "3,1x laenger"
-# und damit ein Treffer, absolut sind es zwei Saetze. Genau daran stirbt
-# das Feature laut Premortem 1: Antonio klickt, bekommt drei Saetze, klickt
-# nie wieder.
 MINDESTLAENGE = 1200
 
-# UND er muss deutlich mehr bieten als das, was ohnehin schon auf der Karte
-# steht. Ein Extrakt, der den Teaser nur wiederholt, ist kein Angebot.
 MINDESTFAKTOR = 1.5
 
-# Ein Artikel jenseits dieser Groesse ist fast immer eine Sammelseite
-# (Liveticker, Jahresrueckblick, Themenarchiv) und keine Meldung. Ihn zu
-# uebersetzen kostet ein Vielfaches und liefert nichts, was ein Leser will.
 HOECHSTLAENGE = 60000
 
 
@@ -48,9 +37,9 @@ class VolltextErgebnis:
     """Was der Beschaffungsversuch ergeben hat."""
 
     text: str = ""
-    herkunft: str = ""  # "feed" | "artikel"
-    grund: str = ""  # warum es NICHTS gab (leer, wenn text gesetzt)
-    status: int = 0  # HTTP-Status des Artikelabrufs, 0 = nicht abgerufen
+    herkunft: str = ""
+    grund: str = ""
+    status: int = 0
 
     @property
     def erfolg(self) -> bool:
@@ -71,7 +60,7 @@ def _extrahiere(html: str) -> str:
     """
     try:
         import trafilatura
-    except ImportError:  # pragma: no cover - haengt an der Installation
+    except ImportError:  # pragma: no cover
         log.warning(
             "trafilatura ist nicht installiert - der Artikelabruf "
             "faellt aus, der Feed-Weg laeuft weiter."
@@ -84,7 +73,7 @@ def _extrahiere(html: str) -> str:
             )
             or ""
         )
-    except Exception as exc:  # noqa: BLE001 - eine Bibliothek darf nichts kosten
+    except Exception as exc:  # noqa: BLE001
         log.debug("trafilatura scheiterte: %s", exc)
         return ""
     return text.strip()
@@ -113,7 +102,6 @@ def hole_volltext(item, http_cfg: dict, artikelabruf: bool = True) -> VolltextEr
     """
     teaser = (item.summary or "").strip()
 
-    # 1. Was der Feed schon mitgebracht hat (collect/rss.py, content:encoded).
     if item.volltext and len(item.volltext) >= MINDESTLAENGE:
         if len(item.volltext) <= HOECHSTLAENGE:
             return VolltextErgebnis(text=item.volltext, herkunft="feed")
@@ -126,7 +114,6 @@ def hole_volltext(item, http_cfg: dict, artikelabruf: bool = True) -> VolltextEr
     if not item.url:
         return VolltextErgebnis(grund="keine Artikeladresse")
 
-    # 2. Die Artikelseite selbst.
     try:
         resp = fetch(item.url, http_cfg)
     except Exception as exc:  # noqa: BLE001

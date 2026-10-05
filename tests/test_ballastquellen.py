@@ -18,7 +18,6 @@ from telco_radar.config import load_config
 
 REPO = Path(__file__).resolve().parents[1]
 
-# Name -> vorher gemessene neue Meldungen (Strategie 2026-08-27, §2 E9).
 BALLASTQUELLEN = {
     "PLDT": 31,
     "AIS": 13,
@@ -36,9 +35,6 @@ BALLASTQUELLEN = {
 def _operatoren_nach_name() -> dict:
     cfg = load_config(REPO)
     op = {o.name: o for o in cfg.operators}
-    # Der Lookup muss wirklich treffen - sonst prueft der Test unten nichts
-    # (dieselbe Falle wie beim Faden-Test in CLAUDE.md §6: ein Lookup ins
-    # Leere ist gruen und beweist nichts).
     assert len(op) == len(cfg.operators), "doppelte Betreibernamen in der Watchlist"
     return op
 

@@ -59,26 +59,13 @@ from __future__ import annotations
 
 from typing import Optional
 
-# Die Adressen, die `base.html.j2` bewusst von aussen holt. Kein Muster
-# wie "alles mit https": ein falscher absoluter Link auf eine eigene
-# Datei soll weiterhin auffallen.
 FREMDE_HERKUNFT = (
     "https://fonts.googleapis.com/",
     "https://fonts.gstatic.com/",
 )
 
-# Welche Konsolentypen ueberhaupt zaehlen. `error` ist der offensichtliche;
-# `assert` ist Chromiums Typ fuer `console.assert(false, ...)` und wurde bis
-# zum 21.09.2026 stillschweigend verworfen (gemessen in echtem Chromium:
-# `console.assert(false, "x")` -> type == "assert", NICHT "error").
-# `warning` und `log` zaehlen nicht - eine Warnung ist kein Bruch.
 ZAEHLENDE_TYPEN = ("error", "assert")
 
-# Nur ein NETZfehler wird befreit. Chromium stellt sie als `net::ERR_...`
-# in den Text des Konsoleneintrags; ein HTTP-Status steht dort im
-# Klartext ("responded with a status of 400"). Der Unterschied ist der
-# ganze Punkt: das eine ist die Sandbox, das andere ein Fehler auf
-# unserer Seite.
 _NETZFEHLER = "net::ERR_"
 
 
@@ -88,7 +75,6 @@ def _fremder_netzfehler(text: str, herkunft: Optional[dict]) -> bool:
         return False
     url = herkunft.get("url") if isinstance(herkunft, dict) else None
     if not url:
-        # Keine Herkunft heisst nicht "von aussen".
         return False
     return any(url.startswith(ort) for ort in FREMDE_HERKUNFT)
 
@@ -113,9 +99,6 @@ def konsole_sammeln(seite) -> list:
     liest sie nach seinen Klicks, nicht vorher.
     """
     fehler: list = []
-    # Mit Kanalmarke: bei rotem Test ist sonst nicht zu sehen, ob die
-    # Konsole gemeckert oder ob etwas GEWORFEN hat - und genau dieser
-    # Unterschied ist der Grund, warum es diese Datei gibt.
     seite.on(
         "console",
         lambda m: (

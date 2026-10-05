@@ -20,12 +20,8 @@ from __future__ import annotations
 import re
 
 from bs4 import BeautifulSoup
-
 from test_geraete_tco_zustand import _baue
 
-# Wortlaut wie im Auftrag benannt (BRIEF_RAHMEN, Kriterium 1). Die
-# typografischen Anfuehrungszeichen sind Absicht - so steht der Satz im
-# Repo, ein glatter Apostroph traefe ihn nicht.
 VERBOTSMARKER = (
     "Gerechnet wird",
     "Die Grenze:",
@@ -44,11 +40,6 @@ def _ohne_details(suppe: BeautifulSoup) -> str:
     for block in kopie.find_all("details"):
         block.decompose()
     return kopie.get_text(" ")
-
-
-# --------------------------------------------------------------------------
-# Kriterium 1: Erklaertexte raus
-# --------------------------------------------------------------------------
 
 
 def test_keine_erklaerung_steht_ausserhalb_einer_aufklappung(tmp_path):
@@ -93,7 +84,6 @@ def test_wie_gerechnet_ist_weg_so_gerechnet_steht_genau_einmal(tmp_path):
     assert rechnung[0].select_one("summary").get_text(strip=True) == "So gerechnet"
     assert "Kosten über 24 Monate" in rechnung[0].get_text(" ")
     assert "TCO-24" not in rechnung[0].get_text(" ")
-    # Die alte seitenweite Aufklappung bleibt verboten.
     assert tafel.select_one("#gr-tco-wie") is None
 
 
@@ -131,8 +121,6 @@ def test_die_buendel_stehen_als_zeilen_unter_dem_graphen(tmp_path):
     s = _baue(tmp_path, graphloses_modell=True)
     tafel = s.select_one("#tafel-tco")
     assert tafel is not None
-    # E2: die Tabelle hängt an ihrem eigenen Abschnitt, nicht mehr am
-    # Modellblock-Div (der ist mit der Zeitreihe gefallen).
     block = tafel.select_one("#gr-buendel")
     assert block is not None, "der Test prüft nichts ohne Bündel-Abschnitt"
     assert block.select_one("details.gr-karten-auf") is None, (
@@ -145,19 +133,10 @@ def test_die_buendel_stehen_als_zeilen_unter_dem_graphen(tmp_path):
         assert not zeile.has_attr("open"), (
             f"{zeile.get('data-anbieter')}: Zeile steht offen im HTML"
         )
-    # Keine Zähler in der Überschrift der Tabelle - eine Klammer, die
-    # anders zählt als der Bestand darunter, bleibt verboten (O1-Regel,
-    # jetzt an der Tabelle; der Modellname mit seiner GB-Zahl ist kein
-    # Zähler).
     titel = block.select_one("#gr-bnd-titel")
     assert titel is not None
     assert "Karten" not in titel.get_text(), titel.get_text()
     assert not re.search(r"\(\d+", titel.get_text()), titel.get_text()
-
-
-# --------------------------------------------------------------------------
-# Kriterium 2: Haendler als benannte Luecke
-# --------------------------------------------------------------------------
 
 
 def test_haendler_ohne_preis_stehen_nicht_einzeln(tmp_path):
@@ -189,20 +168,6 @@ def test_die_grafik_nennt_nur_buendel_anbieter(tmp_path):
         for name in HAENDLER:
             assert name not in text, f"{name} steht in der Lücken-Zeile"
         assert legende.find("svg") is None
-
-
-# --------------------------------------------------------------------------
-# Kriterium 3: die Seitenueberschrift
-#
-# BRIEF_FADEN (05.09.2026, PM/Seneca): die Frage-Ueberschrift aus
-# BRIEF_RAHMEN ist gescheitert (Antonio: "Digga, spinnst du?" - flapsig,
-# "ich" mehrdeutig) und weicht der sachlichen "Gerätepreise im Vergleich".
-# Seit 28.09.2026 nur noch "Gerätepreise": "Vergleich" war zugleich der Name
-# eines Reiters (Antonio fand keinen roten Faden).
-# Dieser Test hielt bis dahin die AELTERE Entscheidung fest; er haelt jetzt
-# die neuere - derselbe Vorgang wie bei jeder umgekehrten Regel dieses
-# Projekts (CLAUDE.md §6: "eine falsche Vorgabe kassiert").
-# --------------------------------------------------------------------------
 
 
 def test_die_ueberschrift_ist_sachlich_nicht_die_gescheiterte_frage(tmp_path):

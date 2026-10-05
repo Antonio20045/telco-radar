@@ -74,9 +74,6 @@ def _vertieft(mitschnitt, weiter=None, zaehler=None):
     )
 
 
-# --------------------------------------------------------------- Umfang
-
-
 def test_zwoelf_tarife_zwei_speicher_zwei_laufzeiten(mitschnitt):
     saetze = _vertieft(mitschnitt)
     kombis = {(s["speicher_gb"], s["laufzeit_monate"], s["tarif_slug"]) for s in saetze}
@@ -84,14 +81,12 @@ def test_zwoelf_tarife_zwei_speicher_zwei_laufzeiten(mitschnitt):
     assert {s["speicher_gb"] for s in saetze} == {256, 512}
     assert {s["laufzeit_monate"] for s in saetze} == {24, 36}
     assert len({s["tarif_slug"] for s in saetze}) == 12
-    # Gegenprobe: der alte Stand kannte genau ein Buendel fuer dieses Geraet.
     assert len(_katalogsaetze(mitschnitt)) == 1
 
 
 def test_abrufe_je_geraet_und_nur_verlinkte_adressen(mitschnitt):
     protokoll = []
     o2.vertiefe_buendel(_hole_aus(mitschnitt, protokoll), _katalogsaetze(mitschnitt))
-    # 1 Produktseite + 1 Speicher + 2 Laufzeitschalter + 11 Referenztarife
     assert len(protokoll) == 15
     assert all(u in mitschnitt["antworten"] for u in protokoll)
     assert all(u.startswith("https://www.o2online.de/") for u in protokoll)
@@ -108,9 +103,6 @@ def test_jeder_satz_traegt_seine_posten(mitschnitt):
             assert isinstance(s[feld], float), (feld, s)
         assert s["tarif_name"] and s["tarif_slug"]
         assert s["url"].startswith("https://www.o2online.de/e-shop/")
-
-
-# ------------------------------------------------ gemessene Einzelwerte
 
 
 def _satz(saetze, speicher, laufzeit, slug):
@@ -138,7 +130,6 @@ def test_iphone_17_pro_256_zwei_tarife_gegen_die_seite(mitschnitt):
     ) == (36.5, 39.99, 1.0, 0.0)
     s = _satz(saetze, 256, 36, "o2-mobile-s")
     assert (s["tarif_monatlich"], s["anschlusspreis"]) == (14.99, 39.99)
-    # 24 Raten: eigene Rate und eigene Anzahlung, derselbe Tarifbetrag
     s24 = _satz(saetze, 256, 24, "o2-mobile-unlimited-m-plus")
     assert (
         s24["geraet_monatsrate"],
@@ -155,9 +146,6 @@ def test_512_gb_hat_eigene_rate_und_anzahlung(mitschnitt):
         _satz(saetze, 256, 36, "o2-mobile-unlimited-m-plus")["geraet_monatsrate"]
         == 36.5
     )
-
-
-# ---------------------------------------------------- die Ableitung
 
 
 def test_abgeleiteter_tarifbetrag_trifft_die_messung(xiaomi):
@@ -207,7 +195,6 @@ def test_tarifabhaengige_rate_verhindert_jede_ableitung(xiaomi):
     seiten = copy.deepcopy(
         [pv for pv in xiaomi if pv["hardware"]["offerName"].endswith("-36xhigh")]
     )
-    # Eine Antwort mit anderer Rate, in sich stimmig (Probe geht auf).
     pv = seiten[1]
     attr = pv["ecommerceProductValue"]["attributes"]
     attr["metric3"] = str(float(attr["metric3"]) + 1)
@@ -245,9 +232,6 @@ def test_widerspricht_die_antwort_der_referenz_wird_nicht_abgeleitet(mitschnitt)
     z = {}
     assert len(o2.saetze_aus_konfiguration(start, {}, referenz, "u", z)) == 1
     assert z["referenz_widerspricht"] == 1
-
-
-# ------------------------------------------------ Frist und Zusammenfuehren
 
 
 def test_ohne_zeit_kein_abruf(mitschnitt):
@@ -327,9 +311,6 @@ def test_der_sammler_vertieft_und_vergibt_die_sku(mitschnitt):
     assert all(b["anbieter"] == "o2" for b in bilanz.buendel)
 
 
-# ------------------------------------------------ iPhone 18 Pro: TB, Tracking
-
-
 def test_terabyte_bekommt_eigenen_speicher():
     """Vor dem Fix fielen 1 TB und 2 TB beide auf `speicher_gb=None` -
     zwei Preise auf einer sku_id `...-ohne-speicher-ohne-farbe`."""
@@ -359,9 +340,6 @@ def test_die_preiszusammenfassung_schlaegt_den_trackingblock():
         s[0]["tarif_monatlich"],
         s[0]["laufzeit_monate"],
     ) == (65.0, 24.99, 24)
-
-
-# ------------------------------------------------ Tarifbezug
 
 
 def _bestand():
@@ -425,7 +403,6 @@ def test_plus_wird_nie_auf_den_tarif_ohne_plus_geraten():
         is None
     )
     assert b.loese("o2", "x", slug="o2-mobile-unlimited") is None
-    # Der Kachel-Slug bleibt der staerkere Weg
     bezug = b.loese("o2", "x", slug="o2-mobile-unlimited-m-plus")
     assert bezug.tarif_id == "o2:o2-mobile-unlimited-m"
     assert "SIM-only-Kachel" in bezug.grund

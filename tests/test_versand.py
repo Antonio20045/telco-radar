@@ -40,9 +40,6 @@ def _h(**kw):
     return basis
 
 
-# ------------------------------------------------------------------- Inhalt
-
-
 def test_die_mail_zeigt_genau_den_zwei_minuten_pfad():
     """Eine Mail, die etwas anderes hervorhebt als die Seite, auf die sie
     verlinkt, ist schlimmer als keine Mail - deshalb dieselbe Funktion."""
@@ -59,7 +56,7 @@ def test_die_mail_zeigt_genau_den_zwei_minuten_pfad():
     )
     betreff, text, html = versand.baue_mail(r)
     assert "Preisuntergrenze" in text and "Anschlusspreis" in text
-    assert "Jio" not in text  # Stufe 1 gehoert nicht hinein
+    assert "Jio" not in text
     assert "https://x.test/1" in text
     assert "telco-radar.onrender.com" in text
 
@@ -87,22 +84,19 @@ def test_html_wird_maskiert():
     assert "&lt;script&gt;" in html
 
 
-# ------------------------------------------------------------------ Schwelle
-
-
 def test_teams_nur_bei_beiden_bedingungen():
     r = _report(
         [
-            _h(url="https://x.test/a", ctm_bezug=3, relevance=5),  # ja
-            _h(url="https://x.test/b", ctm_bezug=3, relevance=4),  # nein
-            _h(url="https://x.test/c", ctm_bezug=2, relevance=5),  # nein
+            _h(url="https://x.test/a", ctm_bezug=3, relevance=5),
+            _h(url="https://x.test/b", ctm_bezug=3, relevance=4),
+            _h(url="https://x.test/c", ctm_bezug=2, relevance=5),
         ]
     )
     assert [h["url"] for h in versand.ausnahmen(r)] == ["https://x.test/a"]
 
 
 def test_mail_nur_am_versandtag():
-    assert versand.ist_versandtag(date(2026, 8, 10), 0)  # ein Montag
+    assert versand.ist_versandtag(date(2026, 8, 10), 0)
     assert not versand.ist_versandtag(date(2026, 8, 11), 0)
 
 
@@ -118,16 +112,13 @@ def test_kein_versandtag_heisst_keine_mail(tmp_path, monkeypatch):
     assert "kein Versandtag" in bilanz["mail"]
 
 
-# ------------------------------------------------------- Zustellgedaechtnis
-
-
 def test_dieselbe_ausgabe_geht_nur_einmal_hinaus(tmp_path, monkeypatch):
     gesendet = []
     monkeypatch.setattr(
         versand, "sende_mail", lambda *a, **k: gesendet.append(1) or "ok"
     )
     cfg = {"versand": {"mail_aktiv": True, "teams_aktiv": False}}
-    r = _report([_h()], datum="2026-08-10")  # Montag
+    r = _report([_h()], datum="2026-08-10")
     versand.versende(tmp_path, r, cfg)
     versand.versende(tmp_path, r, cfg)
     assert len(gesendet) == 1
@@ -140,16 +131,12 @@ def test_dieselbe_ausnahme_geht_nur_einmal_hinaus(tmp_path, monkeypatch):
     )
     cfg = {"versand": {"mail_aktiv": False, "teams_aktiv": True}}
     versand.versende(tmp_path, _report([_h()]), cfg)
-    # zweiter Lauf, dieselbe Meldung plus eine neue
     versand.versende(tmp_path, _report([_h(), _h(url="https://x.test/neu")]), cfg)
     assert len(gesendet) == 2
     buch = json.loads(
         (tmp_path / "data" / "state" / "versand.json").read_text(encoding="utf-8")
     )
     assert set(buch["teams"]) == {"https://x.test/1", "https://x.test/neu"}
-
-
-# ----------------------------------------------------------- Fehlerverhalten
 
 
 def test_fehlende_zugangsdaten_werden_gemeldet_nicht_verschwiegen(monkeypatch):
@@ -188,5 +175,4 @@ def test_trockenlauf_verschickt_nichts(tmp_path, monkeypatch):
         trocken=True,
     )
     assert "trocken" in bilanz["mail"]
-    # ... und merkt sich nichts, sonst bliebe der echte Versand aus.
     assert not (tmp_path / "data" / "state" / "versand.json").exists()

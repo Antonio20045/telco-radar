@@ -87,9 +87,6 @@ def _nachricht(**kw):
     return r.baue(treffer, **vorgabe)
 
 
-# ==============================================  DER TREUE-TEST  ===========
-
-
 def _bloecke(html: str) -> list[str]:
     """Jeder sichtbare Textblock der Mail, einzeln."""
     from bs4 import Doctype
@@ -130,7 +127,6 @@ def test_jeder_inhaltstragende_block_steht_so_im_bericht():
     nachricht = _nachricht()
     quelle = _quelltext()
     rahmen = _erlaubte_rahmen()
-    # Zeichen, die keine Aussage sind: Trennzeichen, Nummerierung, URLs.
     unbedenklich = re.compile(
         r"^(?:[\W\d\s]|https?://|&\w+;|Zur Quelle|Im Wochenbericht)+$"
     )
@@ -144,11 +140,6 @@ def test_jeder_inhaltstragende_block_steht_so_im_bericht():
             continue
         if any(m.match(block) for m in rahmen):
             continue
-        # Zusammengesetzte Zeilen: eine Zeile darf aus mehreren erlaubten
-        # Teilen bestehen ("Guten Tag, diese Meldungen passen …", oder Kicker
-        # plus Ausgabedatum in einer Zeile). Abgezogen wird mit demselben
-        # Muster, das auch den Platzhalter kennt - sonst bliebe "Ausgabe vom
-        # {datum}" als vermeintlich erfundener Satz stehen.
         rest = block
         for m in sorted(rahmen, key=lambda p: -len(p.pattern)):
             rest = re.sub(m.pattern.strip("^$"), " ", rest)
@@ -266,9 +257,6 @@ def test_der_renderer_laeuft_ohne_modellschicht():
     assert gegenprobe.returncode != 0
 
 
-# ==================================================  E-Mail-Handwerk  ======
-
-
 def test_das_html_haelt_sich_an_email_recht():
     """Outlook rendert mit der Word-Engine: kein Flexbox, kein Grid, keine
     externen Stylesheets, keine Web Fonts, kein Hintergrundbild."""
@@ -285,7 +273,6 @@ def test_das_html_haelt_sich_an_email_recht():
     )
     for muster in verboten:
         assert muster not in html, muster
-    # ... und positiv: Tabellenlayout mit Inline-CSS.
     soup = BeautifulSoup(html, "html.parser")
     assert soup.find("table") is not None
     assert soup.select_one("style") is None
@@ -327,8 +314,6 @@ def test_fremde_ueberschriften_werden_escaped():
 def test_die_textfassung_ist_eigenstaendig_und_kein_html_strip():
     text = _nachricht().text
     assert "<" not in text and "&amp;" not in text
-    # Nummerierung, Absender in Klammern, Links auf eigener Zeile - Merkmale,
-    # die ein Strip aus dem HTML nicht hergibt.
     assert re.search(r"^1\. Telekom senkt Preise", text, re.M)
     assert "[Mobile World Live]" in text
     assert re.search(r"^\s+Zur Quelle: https://", text, re.M)
@@ -343,9 +328,6 @@ def test_beide_fassungen_tragen_dieselben_meldungen():
         assert eintrag.titel in nachricht.text
         assert eintrag.url in nachricht.html
         assert eintrag.url in nachricht.text
-
-
-# ==============================================  Links und Abmeldung  ======
 
 
 def test_jeder_eintrag_verlinkt_quelle_und_bericht():
@@ -379,9 +361,6 @@ def test_impressum_und_datenschutz_stehen_im_fuss():
     assert f"{BASIS}/datenschutz.html" in nachricht.text
 
 
-# ================================================  Stichwort-Markierung  ===
-
-
 def _marker(stichwort: str) -> str:
     """Die Markierung aus chrome.yaml, nicht abgeschrieben.
 
@@ -403,7 +382,6 @@ def test_ein_stichworttreffer_sagt_warum_er_dasteht():
 
 def test_ein_filtertreffer_traegt_keine_markierung():
     nachricht = _nachricht()
-    # Der Rumpf der Markierung, ohne das Stichwort selbst.
     rumpf = r.lade_chrome()["stichwort_marker"].split("{")[0].rstrip(": ")
     assert rumpf not in nachricht.html
 
@@ -435,9 +413,6 @@ def test_ein_wechsel_des_stichworts_wird_wieder_genannt():
     assert _marker("Satellit") in html
 
 
-# ==========================================================  Betreff  ======
-
-
 def test_der_betreff_traegt_die_staerkste_schlagzeile():
     """Nicht "Ihr Newsletter" - der Betreff ist die einzige Zeile, die JEDER
     Empfaenger sieht, auch der, der nicht oeffnet."""
@@ -452,7 +427,7 @@ def test_der_betreff_bleibt_unter_achtzig_zeichen():
     treffer[0].eintrag.titel = "Ein " + "sehr " * 30 + "langer Titel"
     b = _nachricht(treffer=treffer).betreff
     assert len(b) <= 78
-    assert not b.endswith("seh")  # an der Wortgrenze gekuerzt
+    assert not b.endswith("seh")
 
 
 def test_der_betreff_traegt_keinen_markennamen():
@@ -461,9 +436,6 @@ def test_der_betreff_traegt_keinen_markennamen():
     chrome = r.lade_chrome()
     assert chrome["absender_name"] == "Telco Radar"
     assert "Vodafone" not in _nachricht().betreff
-
-
-# =========================================================  Transport  =====
 
 
 def test_der_trockenlauf_verschickt_nichts_und_merkt_sich_alles():

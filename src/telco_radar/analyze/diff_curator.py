@@ -32,8 +32,6 @@ from .llm import complete, extract_json
 
 log = logging.getLogger(__name__)
 
-# Felder eines Highlights, die für Anzeige (build_differentiation) UND Speicher
-# gebraucht werden.
 _KEEP_FIELDS = (
     "title",
     "summary",
@@ -47,11 +45,7 @@ _KEEP_FIELDS = (
     "source",
 )
 
-# Ab dieser Bewertung (1–5) gilt ein klassifizierter Move als aufnahmewürdig,
-# wenn kein LLM-Kurator läuft. Unbewertete Items (relevance None, z. B. --no-llm)
-# werden ebenfalls behalten, damit der Speicher nie leer bleibt.
 MIN_RELEVANCE = 3
-# Obergrenze je Hebel im Speicher, damit die Datei über Jahre nicht ausufert.
 MAX_PER_THEME = 60
 
 
@@ -121,7 +115,6 @@ class DiffStore:
             )
             for r in recs_sorted[:MAX_PER_THEME]:
                 keep_ids.add(r["id"])
-        # Reihenfolge (Aufnahme-Reihenfolge) beibehalten, nur gekappte entfernen.
         self._order = [i for i in self._order if i in keep_ids]
         self._by_id = {i: self._by_id[i] for i in self._order}
         self.path.parent.mkdir(parents=True, exist_ok=True)

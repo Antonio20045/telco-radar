@@ -35,8 +35,6 @@ from telco_radar.uebersetzung.store import UebersetzungsStore
 
 from test_uebersetzung import ENGLISCH, SPANISCH, _item
 
-# Deutscher Fliesstext ab 200 Zeichen - vorgefiltert, kein Kandidat, egal ob
-# vor oder nach dem 27.08.2026.
 DEUTSCH = (
     "Die Bundesnetzagentur hat mitgeteilt, dass die Vergabe der Frequenzen "
     "im kommenden Jahr stattfinden soll. Die Behoerde nannte dabei weder "
@@ -62,7 +60,6 @@ def _highlight(item: Item, **kw) -> dict:
     return h
 
 
-# ------------------------------------------------- Nur berichtete Meldungen
 def test_nur_berichtete_meldungen_kommen_in_die_stufe():
     """Der Fehler, der das ganze Vorhaben unsichtbar gemacht hat."""
     berichtet = _item(url="https://beispiel.test/a/1", volltext=SPANISCH)
@@ -98,7 +95,6 @@ def test_die_reihenfolge_folgt_dem_bericht():
     """Schneidet Deckel oder Frist, faellt die unwichtigste Meldung weg."""
     items = [_item(url=f"https://beispiel.test/a/{i}") for i in range(4)]
     by_url = {i.url: i for i in items}
-    # Der Bericht sortiert nach Relevanz - die Stufe darf nicht umsortieren.
     reihenfolge = [items[2], items[0], items[3], items[1]]
 
     raus = stufe_mod.berichtete_items([_highlight(i) for i in reihenfolge], by_url)
@@ -141,15 +137,12 @@ def test_die_spracherkennung_bekommt_das_item_nicht_das_highlight():
     [raus] = stufe_mod.berichtete_items([h], {item.url: item})
 
     assert raus.volltext == SPANISCH
-    # Gegenprobe, dass der Fall wirklich eintritt: die deutsche Fassung des
-    # Analysten ist lang genug, dass die Vorauswahl auf ihr messen WUERDE.
     from telco_radar.uebersetzung.sprache import ist_fremdsprachig
 
     assert not ist_fremdsprachig(h["summary"] * 3, h["title"])[0]
     assert ist_fremdsprachig(raus.volltext, raus.title)[0]
 
 
-# ------------------------------------------------------------- Der Deckel
 def test_der_deckel_schneidet_erst_nach_dem_scan(tmp_path, monkeypatch):
     """887 von 944 Meldungen wurden am 14.08.2026 nie angesehen.
 
@@ -279,9 +272,6 @@ def test_deckel_kommt_aus_settings_und_faellt_auf_sechzig_zurueck(
     assert bilanz["ueber_deckel"] == 0
     assert bilanz["uebersetzt"] == 50
 
-    # Ein expliziter Wert aus settings gewinnt weiterhin gegen die Vorgabe.
-    # Eigener Store-Pfad, sonst gelten die 50 Meldungen von oben schon als
-    # "schon uebersetzt" und die Vorauswahl sieht sie nie wieder an.
     bilanz_explizit = stufe_mod.lauf(
         items,
         tmp_path / "explizit",
@@ -300,10 +290,6 @@ def test_ueber_deckel_zaehlt_nur_was_wirklich_wegfaellt(tmp_path, monkeypatch):
     monkeypatch.setattr(
         stufe_mod, "hole_volltext", lambda item, *a, **k: _feed_ergebnis(item)
     )
-    # Fuenf spanische, zwei deutsche. Die deutschen werden vorgefiltert und
-    # stehen deshalb NICHT ueber dem Deckel. (Bis zum 27.08.2026 stand hier
-    # Englisch - seit MUTTERSPRACHEN nur noch "de" enthaelt, waere ein
-    # englisches Beispiel selbst sicher fremdsprachig, siehe der Test unten.)
     items = [
         _item(url=f"https://beispiel.test/es/{i}", volltext=SPANISCH) for i in range(5)
     ]
@@ -339,7 +325,6 @@ def test_die_protokollzeile_nennt_die_angebotene_menge():
     assert "berichteten Meldungen" in stufe_mod.protokollzeile(bilanz)
 
 
-# ------------------------------------------------- Was der Analyst zu sehen bekommt
 def test_der_analyst_sieht_den_volltext_nicht_nur_die_ueberschrift():
     """52 der 164 crawlbaren Quellen liefern kein `summary`.
 
@@ -357,7 +342,6 @@ def test_der_analyst_sieht_deutlich_mehr_als_dreihundert_zeichen():
     assert len(SPANISCH) > 300, "sonst prueft der Test die Kappung nicht"
     item = _item(volltext=SPANISCH)
     snippet = json.loads(agents._items_payload([item]))[0]["text"]
-    # Vollstaendig, nicht bei 300 Zeichen abgeschnitten.
     assert snippet == SPANISCH.strip()
     assert len(snippet) > 300
 
@@ -409,11 +393,8 @@ def test_ein_stapel_bleibt_im_eingabebudget():
         for i in range(agents.BATCH_SIZE)
     ]
     nutzlast = agents._items_payload(items)
-    # Je Meldung der gekappte Text plus die Metafelder.
     obergrenze = agents.BATCH_SIZE * (agents.ANALYST_TEXT_ZEICHEN + 500)
     assert len(nutzlast) < obergrenze, (
         "ein Stapel darf das Eingabefenster nicht sprengen"
     )
-    # Und absolut: ~4 Zeichen je Token, die konfigurierten Modelle tragen
-    # 1M Kontext - ein Stapel muss weit darunter bleiben.
     assert len(nutzlast) < 200_000

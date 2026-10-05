@@ -86,11 +86,6 @@ def _bericht(
     return d
 
 
-# --------------------------------------------------------------------------- #
-# 1. Die reine Logik
-# --------------------------------------------------------------------------- #
-
-
 def test_bewertete_meldungen_zaehlt_ueber_alle_regionen():
     bericht = _bericht("2026-08-01", highlights=[{"url": "a"}, {"url": "b"}])
     assert rk.bewertete_meldungen(bericht) == 2
@@ -129,8 +124,6 @@ def test_letzte_gueltige_redaktion_findet_den_juengsten_treffer(tmp_path):
     assert treffer is not None
     assert treffer["date"] == "2026-08-15"
 
-    # Vor dem 08-10 gesucht: der 08-15er zaehlt nicht, der 08-05er ist
-    # ungueltig, uebrig bleibt der 08-01er.
     treffer2 = rk.letzte_gueltige_redaktion(reports, "2026-08-10")
     assert treffer2["date"] == "2026-08-01"
 
@@ -139,7 +132,6 @@ def test_letzte_gueltige_redaktion_ohne_treffer_ist_none(tmp_path):
     reports = tmp_path / "reports"
     reports.mkdir()
     assert rk.letzte_gueltige_redaktion(reports, "2026-08-01") is None
-    # Auch wenn es Berichte gibt, aber keiner davon gueltig ist.
     (reports / "2026-07-01.json").write_text(
         json.dumps(_bericht("2026-07-01", editor_used=False)), encoding="utf-8"
     )
@@ -153,7 +145,6 @@ def test_uebernehmen_greift_nur_bei_null_bewerteten_meldungen(tmp_path):
         json.dumps(_bericht("2026-08-01")), encoding="utf-8"
     )
 
-    # Die aktuelle Runde hat selbst etwas geliefert - nichts wird ersetzt.
     eigene = [{"url": "https://example.de/heute", "title": "Heute"}]
     regional, body, comp, ausfall = rk.uebernehmen(
         {"Europa": {"highlights": eigene}},
@@ -194,18 +185,12 @@ def test_uebernehmen_ohne_vorgeschichte_bleibt_unveraendert(tmp_path):
     assert body == ""
 
 
-# --------------------------------------------------------------------------- #
-# 2. Das Rendern: Kriterium 1 + 2 des Briefs
-# --------------------------------------------------------------------------- #
-
-
 def test_titelseite_zeigt_die_uebernommene_redaktion_mit_stand(tmp_path):
     reports = tmp_path / "data" / "reports"
     reports.mkdir(parents=True)
     (reports / "2026-08-01.json").write_text(
         json.dumps(_bericht("2026-08-01")), encoding="utf-8"
     )
-    # Die leere Runde, schon so geschrieben wie pipeline.py es taete.
     ausfall = {
         "stand": "2026-08-01",
         "grund": "es gab in dieser Runde keine neuen Meldungen zu bewerten",
@@ -219,14 +204,10 @@ def test_titelseite_zeigt_die_uebernommene_redaktion_mit_stand(tmp_path):
     render_site(site, reports)
     html = (site / "index.html").read_text(encoding="utf-8")
 
-    # Kriterium 1: der alte Aufmacher UND der alte Wochenbericht stehen da.
     assert "Testbetreiber senkt Preis" in html
     assert "Der Testbetreiber hat den Preis gesenkt" in html
-    # Kriterium 1 (Stand:) UND 2 (Ehrlichkeit): das Datum der echten
-    # Redaktion steht sichtbar, zweimal (Aufmacher-Bereich + Wochenbericht).
     assert html.count("Stand: 1. August 2026") == 2
     assert "es gab in dieser Runde keine neuen Meldungen" in html
-    # Und NICHT die alten, ehrlosen Leerzustaende.
     assert "Diese Woche keine priorisierte Meldung" not in html
     assert "Redaktions-Fallback" not in html
     assert "Roh-Digest" not in html
@@ -244,7 +225,7 @@ def test_transparenzseite_behauptet_keine_bewertung_die_nicht_stattfand(tmp_path
     leer = _bericht("2026-08-10", highlights=[], redaktion_ausfall=ausfall)
     leer["regions"] = json.loads((reports / "2026-08-01.json").read_text())["regions"]
     leer["run"]["editor_used"] = False
-    leer["stats"]["bewertete"] = 0  # was pipeline.py VOR der Uebernahme setzt
+    leer["stats"]["bewertete"] = 0
     (reports / "2026-08-10.json").write_text(json.dumps(leer), encoding="utf-8")
 
     site = tmp_path / "site"
@@ -255,9 +236,6 @@ def test_transparenzseite_behauptet_keine_bewertung_die_nicht_stattfand(tmp_path
     assert "<b>1</b><span>davon relevant</span>" not in transparenz
 
     index = (site / "index.html").read_text(encoding="utf-8")
-    # "1 relevante Meldungen aus 12 neuen" waere zwei Zahlen aus zwei
-    # verschiedenen Laeufen in einem Satz - die 12 sind von HEUTE (stats.new
-    # der Fixture), die uebernommene Meldung ist von der Ausgabe vom 1.8.
     assert "relevante Meldungen</b>" in index
     assert "aus 12 neuen" not in index
 
@@ -315,17 +293,10 @@ def test_meldungenseite_zeigt_die_uebernommene_redaktion_mit_stand(tmp_path):
     render_site(site, reports)
     meldungen = (site / "meldungen.html").read_text(encoding="utf-8")
 
-    # Die Ueberschrift traegt weiterhin das Datum der HEUTIGEN (leeren) Runde -
-    # sie ist keine Falschaussage, solange der Hinweis daneben steht.
     assert "Ausgabe vom 10. August 2026" in meldungen
     assert "Stand: 1. August 2026" in meldungen
     assert "es gab in dieser Runde keine neuen Meldungen" in meldungen
     assert "Testbetreiber senkt Preis" in meldungen
-
-
-# --------------------------------------------------------------------------- #
-# 3. pipeline.run() mit quellen=[] - die im Brief verlangte Simulation
-# --------------------------------------------------------------------------- #
 
 
 @pytest.fixture()
@@ -336,8 +307,6 @@ def leeres_projekt(tmp_path, monkeypatch):
     settings += (
         "\nfocus_competitors: []\npromo_enabled: false\n"
         "geraete_enabled: false\ncrawl_newsrooms: false\n"
-        # Die Nebenstufen lesen eigene Konfigurationen (Tarifseiten, CT-Log,
-        # Warenkoerbe) und gingen sonst ins Netz; ohne Netz hing der Test.
         "lieferzeit_radar_aktiv: false\naenderungsradar_aktiv: false\n"
         "tarif_radar_aktiv: false\nct_radar_aktiv: false\n"
     )
@@ -351,8 +320,6 @@ def leeres_projekt(tmp_path, monkeypatch):
     (tmp_path / "config" / "tech_sources.yaml").write_text(
         "themen: {}\n", encoding="utf-8"
     )
-    # Kein API-Schluessel in der Umgebung - die Runde darf keinen echten
-    # Netzaufruf machen, auch keinen versehentlichen.
     for var in (
         "ANTHROPIC_API_KEY",
         "OPENAI_API_KEY",
@@ -386,15 +353,11 @@ def test_pipeline_behaelt_redaktion_bei_leerer_quellenliste(
     assert report_path.stem == HEUTE.isoformat()
 
     daten = json.loads(report_path.with_suffix(".json").read_text(encoding="utf-8"))
-    # Kriterium 3: kein Datenverlust - die alte Ausgabe liegt unveraendert
-    # weiter im Archiv.
     alte = json.loads((reports_dir / f"{stand}.json").read_text())
     assert rk.bewertete_meldungen(alte) == 1
 
-    # Die HEUTIGE Runde hat 0 bewertete Meldungen (echte, ehrliche Zahlen)…
     assert daten["stats"]["new"] == 0
     assert daten["run"]["editor_used"] is False
-    # … und trotzdem eine Titelseite mit Redaktion, uebernommen mit Hinweis.
     assert daten["redaktion_ausfall"]["stand"] == stand
     assert rk.bewertete_meldungen(daten) == 1
 

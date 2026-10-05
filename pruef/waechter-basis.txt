@@ -131,12 +131,9 @@ src/telco_radar/report/fruehwarnung.py dateizugriff 1
 src/telco_radar/report/geraete_bewegung.py breite-ausnahme 1
 src/telco_radar/report/geraete_bewegung.py noqa:BLE001 1
 src/telco_radar/report/geraete_export.py dateizugriff 6
-src/telco_radar/report/geraete_radar.py hexfarbe 3
-src/telco_radar/report/geraete_verlauf.py hexfarbe 1
 src/telco_radar/report/geraete_view.py breite-ausnahme 1
 src/telco_radar/report/geraete_view.py noqa:BLE001 1
 src/telco_radar/report/geraete_zeitreihe.py dateizugriff 2
-src/telco_radar/report/geraete_zeitreihe.py hexfarbe 2
 src/telco_radar/report/html.py breite-ausnahme 5
 src/telco_radar/report/html.py dateizugriff 35
 src/telco_radar/report/html.py hexfarbe 11
@@ -165,7 +162,6 @@ tests/test_diff_bilder.py noqa:ANN002 1
 tests/test_diff_bilder.py noqa:ANN003 1
 tests/test_differentiation_editor.py noqa:B018 1
 tests/test_differentiation_editor.py noqa:BLE001 3
-tests/test_geraete_adapter_congstar.py noqa:alle 1
 tests/test_geraete_besuchsfenster.py noqa:BLE001 1
 tests/test_seen_store_format.py noqa:E402 1
 tests/test_signup_service.py noqa:E402 4

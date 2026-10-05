@@ -8,10 +8,6 @@ from __future__ import annotations
 
 import re
 
-# Geschlossene Mechanik-Liste fuer Achse D. Bewusst klein und trennscharf:
-# die Achse zaehlt, wie viele ANDERE Marken gerade dieselbe Mechanik fahren,
-# und das funktioniert nur mit einem festen Vokabular. Alles, was nicht
-# eindeutig passt, faellt auf "sonstiges" und traegt damit nichts bei.
 MECHANICS: dict[str, str] = {
     "wechselpraemie": "Wechsel- oder Altgerätprämie",
     "geraetesubvention": "Gerät vergünstigt",
@@ -24,18 +20,8 @@ MECHANICS: dict[str, str] = {
     "sonstiges": "sonstiges",
 }
 
-# Der Digest ist KEIN Redaktionstext, und er darf auch nicht so aussehen.
-# Bis zum 07.08.2026 stand er unter derselben Ueberschrift und in derselben
-# Form wie die Prosa des Editors - die Promo-Uebersicht schnitt daraus ihren
-# Vorspann und zeigte am 06.08. "ALDI TALK imoo Kinder-Smartwatch kaufen + 2
-# MovieChoice-Kinogutscheine ALDI TALK - imoo Kinder-Smartwatch kaufen + 2
-# MovieChoice-Kinogutscheine ." - derselbe Titel zweimal, mit freistehendem
-# Punkt. Der Fehler lag nicht im Schnitt, sondern hier: der Titel stand
-# zweimal in der Zeile (einmal blank, einmal als Linktext), und nichts sagte
-# der Seite, dass sie keine Saetze vor sich hat.
 DIGEST_MARKER = "Für diesen Lauf liegt kein Redaktionstext vor."
 
-# Hebel-Definitionen (Key -> Anzeige) — Reihenfolge = Anzeige-Reihenfolge.
 THEMES = [
     ("ki", "KI & Assistenten"),
     ("entertainment", "Entertainment & Streaming"),
@@ -52,9 +38,6 @@ THEMES = [
 ]
 THEME_LABEL = dict(THEMES)
 
-# Wie viele Suchwoerter eine neue Meldung treffen muss, um einem Thema
-# zugeordnet zu werden. Eins reicht nicht: "Samsung" allein zieht jede
-# Geraetemeldung des Herstellers in den Launch der Z-Fold-Reihe.
 MIND_TREFFER = 2
 
 

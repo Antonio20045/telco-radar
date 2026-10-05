@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """E4 Auto-Erkennung: neue Katalog-Eintraege aus strukturierten Live-Namen.
 
 Antonio, 16.09.2026 (AUFTRAG_GERAETE_EINE_SEITE_V2.md, Paragraf 9a): „wenn
@@ -66,26 +65,10 @@ from ...geraete_model import (
 
 log = logging.getLogger(__name__)
 
-# Ein Name braucht mindestens zwei Wortmarken, um ein GERAET zu benennen -
-# eine einzige Marke ist zu duenn als Identitaet fuer eine device_id.
 _MINDEST_MARKEN = 2
 
-# Speichersegmente im NAMEN (mit Einheit - "iPhone 18 Pro 256 GB" ist auch
-# als Namensfeld denkbar, Vodafones `label` traegt aehnliches). Ohne Einheit
-# wird NICHT geschaelt: "Galaxy A57" ist der NAME, nicht 57 GB.
 _SPEICHER_SEGMENT = re.compile(r"\b\d{1,4}\s*(?:gb|tb)\b", re.IGNORECASE)
 
-# Funkfaehigkeits-Anhaengsel im NAMEN sind keine IDENTITAET (E4-P1): o2
-# schreibt den Zusatz in das description-Feld („Xiaomi Redmi Note 17 Pro
-# Max 5G", tests/fixtures/geraete/o2_katalog.json), Telekom `name` und
-# Vodafone `modelName` nennen dasselbe Geraet ohne. Sie wie das
-# Speichersegment zu schaelen haelt die device_id ueber Anbieter und
-# Naechte stabil - ohne diese Schaellung entstand der zweite Eintrag STILL
-# (ohne Meldung an die Arbeitsliste), sobald o2 zuerst angelegt hatte (der
-# Telekom-202-Ausfall in Actions ist dokumentierte Realitaet) und ein
-# spaeterer Anbieter das Geraet ohne Zusatz nannte. Zwei device_ids fuer
-# ein Geraet sind die Saegezahn-Klasse, gegen die die ganze ID-Regel
-# gebaut ist.
 _FUNK_WORTE = frozenset("5g 4g lte".split())
 _FUNK_ZUSATZ = re.compile(
     r"\b(?:" + "|".join(sorted(_FUNK_WORTE)) + r")\b", re.IGNORECASE
@@ -124,19 +107,6 @@ def _serien_anker(katalog: Katalog) -> dict:
     return {s: originals[next(iter(h))] for s, h in kandidaten.items() if len(h) == 1}
 
 
-# FESTE FAMILIEN-ANKER (P5/E3, gemessen 17.09.2026): Vodafone nennt seine
-# iPads im strukturierten Namen OHNE Hersteller-Praefix - `modelName` ist
-# „iPad Pro 11 (2025)", „iPad (2025)", „iPad Pro 11 2024" (data/state/
-# geraete_unbekannt.jsonl vom 17.09., quelle vodafone_buendel/vodafone_api).
-# Die Serie „iPad" stand in KEINEM Katalog-Eintrag (Hand wie Auto - der
-# Hand-Katalog verfolgte bewusst keine Tablets), also griff der Serien-Anker
-# nie: die Anker-Luecke aus auto-doku.md. Diese Familien sind keine Raterei,
-# sondern Markennamen EINES Herstellers: iPad, Watch und AirPods sind
-# Apple-Serien. Watch- und AirPods-Nennungen MIT Praefix liefen ohnehin ueber
-# den Praefix-Pfad (17.09.: Watch S12, AirPods 5, auto-angelegt); der
-# Familien-Anker traegt nur den Namen OHNE Praefix nach - kuenftige iPads
-# („iPad Air", „iPad mini", „iPad Pro 14") werden damit automatisch
-# Katalog-Eintraege, ohne dass jemand den Katalog anfasst.
 _FESTE_FAMILIEN = {
     "ipad": "Apple",
     "watch": "Apple",
@@ -165,7 +135,7 @@ def _anker_treffer(
     if treffer is not None:
         return treffer
     if any(normalisiere(serie_aus_modell(g.modell)) == serie for g in katalog.geraete):
-        return None  # der Katalog kennt die Reihe - er entscheidet
+        return None
     return _FESTE_FAMILIEN.get(serie.split("-")[0])
 
 
@@ -194,7 +164,7 @@ def schale(name: str, katalog: Katalog) -> Optional[tuple]:
         serie = normalisiere(serie_aus_modell(name))
         treffer = _anker_treffer(serie, anker, katalog)
         if treffer is None:
-            return None  # kein Hersteller, nichts geraten
+            return None
         hersteller, rest = treffer, name
 
     rest = _SPEICHER_SEGMENT.sub(" ", rest)
@@ -255,7 +225,7 @@ def kollidiert_fuzzy(modell: str, katalog: Katalog) -> Optional[str]:
     n = len(marken)
     for bestehend in katalog.geraete:
         if bestehend.auto:
-            continue  # nur der Hand-Katalog schlaegt
+            continue
         for schreibweise in bestehend.schreibweisen:
             andere = wortmarken(schreibweise)
             if (
@@ -330,11 +300,6 @@ def lege_an(
         len(stufen),
     )
     return geraet
-
-
-# --------------------------------------------------------------------------
-# Persistenz der Auto-Eintraege (STATE, nicht Config)
-# --------------------------------------------------------------------------
 
 
 def lade_auto_zusaetze(root: Path, katalog: Katalog) -> int:
@@ -438,23 +403,6 @@ def speichere_auto_zusaetze(root: Path, katalog: Katalog) -> int:
     return len(eintraege)
 
 
-# --------------------------------------------------------------------------
-# Persistenz unbekannter Titel und Farben
-# --------------------------------------------------------------------------
-
-# Tarif-Rauschen in der Arbeitsliste (P5/E3, gemessen 17.09.2026): ALDI TALK
-# liefert je Lauf drei Tarifpakete als „Geraet" in den strukturierten Daten
-# mit - „Tarif S", „Tarif M", „Tarif L" (quelle microdata). In der Liste vom
-# 17.09. stehen sie als 3 Zeilen mit Haeufigkeitssumme 87 von 284 und machen
-# den Fruehindikator aus FM 1 taub: wer die Liste nach Anker-Luecken liest
-# (iPad-Titel, „HMD Fusion X1"), sortiert erst an 29-mal demselben Tarifnamen
-# vorbei. Ein Titel ist Rauschen, wenn er das Wort „Tarif" traegt UND keine
-# Ziffer - jedes Geraet benennt sich ueber Modellnummer, Speicher, Jahr oder
-# Groesse; „Tarif S" hat nichts davon. Der einzige ziffernlose GERAETEtitel
-# des Bestands („Oakley Meta - HSTN Prizm Polarized (AI Glasses)") traegt das
-# Wort „Tarif" nicht - die UND-Verknuepfung haelt ihn raus. Zusammengesetzte
-# Tarifnamen („Tarifpaket M") bleiben bewusst stehen: das Wort grenzt nicht,
-# und lieber bleibt Rauschen stehen, als dass ein Geraet verschwindet.
 _TARIF_WORT = re.compile(r"\btarif\b", re.IGNORECASE)
 
 
@@ -507,9 +455,7 @@ def persistiere_unbekannte(root: Path, eintraege: list, heute: str) -> int:
                 if z.strip()
             ]
         except (json.JSONDecodeError, ValueError):
-            zeilen = []  # kaputte Datei: neu anfangen ist besser
-            # als stehenbleiben - die Haeufigkeit ist eine Zaehlung, keine
-            # Buchfuehrung mit Rechtsfolge.
+            zeilen = []
     bereinigt = sum(1 for z in zeilen if _ist_tarif_eintrag(z))
     zeilen = [z for z in zeilen if not _ist_tarif_eintrag(z)]
     neue = [e for e in eintraege if not _ist_tarif_eintrag(e)]

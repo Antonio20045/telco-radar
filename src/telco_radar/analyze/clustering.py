@@ -78,45 +78,22 @@ from .llm import complete, extract_json
 
 log = logging.getLogger(__name__)
 
-# Harte Grenze. Alles darueber sind zwei Ereignisse, auch wenn die Woerter
-# uebereinstimmen (Ankuendigung und Verkaufsstart derselben Sache).
 ZEITFENSTER_STUNDEN = 72
 
-# Ab hier gilt ein Paar allein ueber die Woerter als dasselbe Ereignis.
 SCHWELLE_SICHER = 0.50
-# Mit einer geteilten kennzeichnenden Zahl reicht deutlich weniger - eine
-# gemeinsame "1 GW" oder "34,95 EUR" ist ein staerkerer Beleg als zehn
-# gemeinsame Allerweltswoerter. Gemessen an der Ausgabe vom 07.08.2026: die
-# drei Indosat-Meldungen teilen 17 % ihrer Woerter und die Zahl "1 GW".
 SCHWELLE_MIT_ZAHL = 0.16
-# Darunter beginnt der Graubereich, den das Modell entscheidet. Noch tiefer
-# lohnt die Frage nicht: unter 0,12 gemeinsamer Woerter bei verschiedenen
-# Sprachen entscheidet das Modell auf gut Glueck.
 SCHWELLE_GRAU = 0.12
 
-# Wie viele Zweifelsfaelle je Lauf ans Modell gehen duerfen. Die Stufe soll
-# Geld SPAREN; ein Lauf, der 300 Ja/Nein-Fragen stellt, tut das Gegenteil.
 MAX_LLM_PRUEFUNGEN = 40
 
-# Obergrenze der Seltenheitsrechnung auf den TITELWOERTERN. Ein Anteil allein
-# (`len // 8`) waechst mit dem Stapel und laesst bei einem normalen Lauf
-# (~890 Meldungen) Woerter wie "network" oder "mobile" als "selten" gelten -
-# die Messung steht in `_seltene_titelworte`.
 SELTENHEITS_OBERGRENZE = 40
 
-# Ab wie vielen Mitgliedern eine Gruppe keine weiteren mehr aufnimmt. Eine
-# echte Ereignis-Gruppe hat drei bis fuenf Quellen; alles darueber ist der
-# Verdacht, dass ein zu allgemeiner Akteur ("Nvidia", "KI") gerade alles
-# einsammelt.
 MAX_MITGLIEDER = 8
 PRUEF_MAX_TOKENS = 16000
 
 _WORT = re.compile(r"[a-z0-9äöüß]+")
 
-# Stoppwoerter in allen Sprachen, in denen die Quellen senden (seit Session 5
-# auch fr/es/it/pt). Eine gemeinsame "the" beweist nichts.
 _STOPP = {
-    # de
     "der",
     "die",
     "das",
@@ -172,7 +149,6 @@ _STOPP = {
     "kann",
     "koennen",
     "können",
-    # en
     "the",
     "and",
     "for",
@@ -206,7 +182,6 @@ _STOPP = {
     "announcement",
     "reports",
     "report",
-    # es / pt / it / fr
     "para",
     "por",
     "con",
@@ -237,17 +212,8 @@ _STOPP = {
     "sobre",
 }
 
-# Wortendungen, die eine Form von ihrer Grundform trennen. Bewusst KEIN echter
-# Stemmer: der wuerde eine Abhaengigkeit einziehen und bei Eigennamen
-# ("Starlink" -> "Starlin") mehr kaputtmachen als er hilft. Nur die drei
-# Endungen, die im Deutschen und Englischen dieselbe Sache verschieden
-# aussehen lassen.
 _ENDUNGEN = ("en", "es", "er", "s")
 
-# Zahl mit optionaler Einheit. Sie ist der staerkste billige Beleg, den eine
-# Ueberschrift hergibt: "1-GW-KI-Fabrik" und "1-GW-Rechenzentrum" meinen
-# dasselbe Rechenzentrum, "800 Mio. Dollar" steht in beiden Meldungen ueber
-# dieselbe Finanzierung.
 _ZAHL = re.compile(
     r"(\d+(?:[.,]\d+)*)\s*[-\s]?\s*"
     r"(gw|mw|kw|tb|gb|mb|gbit|mbit|mhz|ghz|khz|mrd|mio|bn|billion|billionen|"
@@ -269,13 +235,6 @@ _EINHEIT_GLEICH = {
     "prozent": "%",
 }
 
-# Woerter, die als Akteur nichts unterscheiden. Sie stehen in englischen
-# Schlagzeilen gross und wandern damit sonst in die Akteursliste - "Zayo Teams
-# with NVIDIA" und "AT&T Bets on 5G" saehen ueber "Teams"/"Bets" verwandt aus.
-# Die eigentliche Sicherung ist die Seltenheitsrechnung in `gruppiere()`;
-# diese Liste faengt die Faelle ab, in denen ein Stapel zu klein ist, als dass
-# die Haeufigkeit etwas aussagt (und den Weg ueber `ClusterStore.zuordnen`,
-# wo es gar keinen Stapel gibt).
 _KEIN_AKTEUR = {
     "team",
     "teams",
@@ -423,7 +382,6 @@ def zahlenmenge(text: str) -> frozenset[str]:
         if blank.isdigit() and 1900 <= int(blank) <= 2100 and len(blank) == 4:
             continue
         if not einheit:
-            # Ohne Einheit nur, wenn der Wert fuer sich selten ist.
             if ("," not in wert and "." not in wert) and len(blank) < 4:
                 continue
         out.add(f"{wert.replace('.', '')}{einheit}")
@@ -436,10 +394,6 @@ def _jaccard(a: frozenset[str], b: frozenset[str]) -> float:
     schnitt = len(a & b)
     if not schnitt:
         return 0.0
-    # Gegen die KLEINERE Menge, nicht gegen die Vereinigung. Dieselbe Lehre wie
-    # beim Abnahme-Check der Quellen (Session 5): eine kurze Schlagzeile, die
-    # vollstaendig in einer laengeren steckt, ist dieselbe Meldung - gegen die
-    # Vereinigung gerechnet saehe sie nur halb so aehnlich aus.
     return schnitt / min(len(a), len(b))
 
 
@@ -451,11 +405,7 @@ class _Profil:
     worte: frozenset[str]
     zahlen: frozenset[str]
     akteure: frozenset[str]
-    # Der Betreiber aus dem gleichnamigen Feld - der EINE Name, den die
-    # Konfiguration verantwortet und nicht der Grossschreibung entnommen ist.
     betreiber: frozenset[str] = frozenset()
-    # Titelwoerter, die im Stapel selten sind (`_seltene_titelworte`). Traegt
-    # die quellenuebergreifende Pruefung, wenn kein Akteur erkannt wurde.
     selten: frozenset[str] = frozenset()
 
     @classmethod
@@ -465,9 +415,6 @@ class _Profil:
         akteure: frozenset[str] | None = None,
         selten: frozenset[str] | None = None,
     ) -> "_Profil":
-        # Der Titel traegt das Ereignis, die Zusammenfassung traegt die Zahlen.
-        # Beide zusammen fuer die Woerter waere falsch: ein langer Teaser
-        # verduennt jede Aehnlichkeit.
         text = item.title
         worte = wortmenge(text)
         return cls(
@@ -507,12 +454,6 @@ def akteur_kandidaten(item: Item) -> frozenset[str]:
             for w in _WORT.findall(item.operator.lower())
             if len(w) >= 3 and w not in _STOPP
         }
-    # Auch das erste Wort. Es sieht nach Satzanfang aus und ist in einer
-    # Schlagzeile fast immer der Handelnde: "SpaceX small cell plan ...",
-    # "Zayo teams with Nvidia ...", "Indosat launches ...". Solange es
-    # uebersprungen wurde, verlor genau die Meldung ihren Akteur, die ihn am
-    # deutlichsten nennt. Gegen deutsche Satzanfaenge schuetzen _STOPP und
-    # _KEIN_AKTEUR, gegen alles Uebrige die Seltenheitsrechnung.
     worte = re.findall(r"[A-Za-zÄÖÜäöü][\w&.\-]+", item.title or "")
     for w in worte:
         if not w[0].isupper():
@@ -611,25 +552,6 @@ def _urteil(a: _Profil, b: _Profil) -> tuple[str, float]:
         if not (a.betreiber & b.betreiber):
             return "verschieden", 0.0
     elif not (a.akteure & b.akteure):
-        # Kein GEMEINSAMER Akteur. Drei Bedingungen muessen zusammenkommen,
-        # damit die Titelaehnlichkeit ueberhaupt geprueft wird - und die
-        # erste ist die wichtigste:
-        #
-        # 1. Mindestens eine Seite hat GAR KEINEN erkannten Akteur. Genau das
-        #    ist der Fall, fuer den dieser Pfad gebaut wurde: "EE" hat zwei
-        #    Buchstaben und faellt durch die Laengenpruefung in
-        #    `akteur_kandidaten` (siehe Modulkopf, "Cluster-Luecke vom
-        #    27.08.2026"). Tragen BEIDE Seiten Akteure und teilen sie keinen,
-        #    ist das keine Erkennungsluecke, sondern eine Aussage: es sind
-        #    zwei verschiedene Handelnde. Ohne diese Bedingung buendelte der
-        #    Pfad jedes Paar mit gleicher Satzschablone - nachgemessen am
-        #    27.08.2026 galten "Zain launches eSIM roaming bundle for
-        #    travellers" und "Batelco launches eSIM roaming bundle for
-        #    tourists" als DASSELBE Ereignis (Aehnlichkeit 0,60 ueber
-        #    "esim"/"roaming"/"bundle"), also zwei Wettbewerber als einer.
-        # 2. Verschiedene Quellen - eine Redaktion, die zweimal dasselbe
-        #    Schema fuellt, ist kein Beleg.
-        # 3. Ein gemeinsames SELTENES Titelwort (`_seltene_titelworte`).
         if (
             (a.akteure and b.akteure)
             or a.item.source_name == b.item.source_name
@@ -668,14 +590,10 @@ class Gruppe:
 
     vertreter: Item
     mitglieder: list[Item] = field(default_factory=list)
-    # Die seltenen Namen des Vertreters. Sie stehen hier, weil der Speicher
-    # sie braucht: `zuordnen()` hat beim naechsten Lauf keinen Stapel mehr,
-    # ueber den sich Seltenheit berechnen liesse.
     akteure: frozenset[str] = frozenset()
 
     @property
     def id(self) -> str:
-        # Aus der kanonischen URL, nie aus dem Titel - siehe Modulkopf.
         return hashlib.sha256(
             normalize_url(self.vertreter.url).encode("utf-8")
         ).hexdigest()[:16]
@@ -719,7 +637,6 @@ def _frage_modell(a: Item, b: Item, model: str) -> bool:
         },
         ensure_ascii=False,
     )
-    # Denkspur plus Antwort (Laeufe #83-85), siehe Protokoll.
     roh = complete(_PRUEF_SYSTEM, user, model=model, max_tokens=PRUEF_MAX_TOKENS)
     return bool(extract_json(roh).get("gleich"))
 
@@ -756,15 +673,6 @@ def gruppiere(
     """
     gruppen: list[Gruppe] = []
     profile: list[_Profil] = []
-    # (Rang, ZIELGRUPPE, Profil) - die Gruppe als OBJEKT, nicht als Index.
-    #
-    # Der Index war ein Fehler, und zwar einer, der nur mit Modell auftritt:
-    # die Schleife unten loest zusammengelegte Gruppen mit `gruppen.pop(i)`
-    # auf, und das verschiebt jeden gespeicherten Index oberhalb von i um
-    # eins. Ein spaeterer Zweifelsfall zeigte danach auf die falsche Gruppe -
-    # und wenn genug gepoppt war, ins Leere: Lauf #86 ist mit
-    # "IndexError: list index out of range" gestorben, nachdem die Stufe
-    # lokal nur mit `--no-llm` gelaufen war.
     grau: list[tuple[float, Gruppe, _Profil]] = []
 
     akteure = _seltene_akteure([akteur_kandidaten(i) for i in items])
@@ -799,16 +707,10 @@ def gruppiere(
         profile.append(p)
 
     if use_llm and model and grau:
-        # Die aussichtsreichsten Zweifelsfaelle zuerst - der Deckel schneidet
-        # dann die schwaechsten ab, nicht die zufaellig letzten.
         grau.sort(key=lambda t: -t[0])
         zusammengelegt = 0
         gefragt = 0
         for wert, ziel, p in grau[: _deckel(len(items), max_llm_pruefungen)]:
-            # Die Zielgruppe kann in einer frueheren Runde selbst aufgeloest
-            # und in eine andere gehaengt worden sein. Dann ist sie kein
-            # gueltiges Ziel mehr - ihr etwas anzuhaengen hiesse, es in eine
-            # Gruppe zu legen, die niemand mehr zurueckgibt.
             if not any(g is ziel for g in gruppen):
                 continue
             if len(ziel.mitglieder) + 1 >= MAX_MITGLIEDER:
@@ -824,8 +726,6 @@ def gruppiere(
                     str(exc)[:120],
                 )
                 continue
-            # Der Zweifelsfall hat oben eine eigene Gruppe bekommen; die wird
-            # jetzt aufgeloest und ihr Inhalt umgehaengt.
             for i, g in enumerate(gruppen):
                 if g.vertreter.id == p.item.id:
                     ziel.mitglieder.append(g.vertreter)

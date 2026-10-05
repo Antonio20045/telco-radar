@@ -247,9 +247,6 @@ def test_beide_auswahlen_stehen_sichtbar_nebeneinander(_seite):
         "#gr-zr-baender button", "(es) => es.map(e => e.dataset.band)"
     )
     assert set(knoepfe) == {"xs", "m", "l"}
-    # "L" hat fuer dieses Modell kein Buendel und ist deshalb DEAKTIVIERT
-    # (Angebot, nicht Existenz der Option) - dieselbe Regel wie am alten
-    # <select>, jetzt an den Knoepfen.
     disabled = _seite.eval_on_selector_all(
         "#gr-zr-baender button",
         "(es) => es.filter(e => e.disabled).map(e => e.dataset.band)",
@@ -262,13 +259,11 @@ def test_bandwechsel_schaltet_den_richtigen_graphen_sichtbar(_seite):
     bauen, setzt app.js den fertigen Graph-Zustand des gewählten Bands
     (Antwort-Satz, Messtag-Zeile, SVG) aus dem Fragment ein - derselbe
     Nutzereffekt, eine Quelle, keine Zahl im Client."""
-    # Ausgangslage: das erste verfuegbare Band (Klein) ist gerendert.
     antwort = _seite.eval_on_selector(
         "#tafel-tco .gr-zr-antwort", "(e) => e.textContent"
     )
     assert "XS" in antwort, antwort
 
-    # Umschalten auf Mittel.
     waehle_band(_seite, "m")
     _seite.wait_for_timeout(400)
     antwort = _seite.eval_on_selector(
@@ -279,8 +274,6 @@ def test_bandwechsel_schaltet_den_richtigen_graphen_sichtbar(_seite):
         "#gr-zr-baender button[data-band='m']", "e => e.getAttribute('aria-pressed')"
     )
     assert knopf == "true", "der Mittel-Knopf ist nicht gedrückt"
-    # Die Panels des alten Bands existieren nicht mehr - der Graph ist
-    # EIN Zustand, kein Stapel verdeckter Panels (A2 weiter).
     assert _seite.eval_on_selector_all("#tafel-tco .gr-tband", "e => e.length") == 0, (
         "die alten Band-Panels stehen noch im Dokument"
     )

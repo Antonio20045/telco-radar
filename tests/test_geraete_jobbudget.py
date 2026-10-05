@@ -35,8 +35,6 @@ def test_der_fall_des_gescheiterten_laufs_faengt_gar_nicht_erst_an():
     Budget los."""
     verstrichen = 44 * 60 + 39
     assert geraete_budget(_AN, verstrichen) is None
-    # Gegenprobe, dass der Fall ohne die Sicherung wirklich eintraete: das
-    # eigene Budget der Stufe ist groesser als die ganze Restzeit des Jobs.
     rest_im_job = _AN["job_frist_sekunden"] - verstrichen
     assert _AN["geraete_frist_sekunden"] > rest_im_job
 
@@ -58,7 +56,7 @@ def test_genau_an_der_schwelle_wird_noch_gelaufen():
 
 def test_ausgeschaltet_heisst_ausgeschaltet():
     assert geraete_budget({**_AN, "geraete_enabled": False}, 0.0) is None
-    assert geraete_budget({}, 0.0) is None  # Vorgabe ist AUS
+    assert geraete_budget({}, 0.0) is None
 
 
 def test_die_ausgelieferte_konfiguration_haelt_die_stufe_aus_dem_wochenlauf():

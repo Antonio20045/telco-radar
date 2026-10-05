@@ -76,11 +76,11 @@ def test_internal_reference_excluded_from_competitor_counts_but_still_shown():
     sources = [_src("congstar"), _src("Vodafone Deutschland", internal_reference=True)]
     entries = [_entry(brand="congstar"), _entry(brand="Vodafone Deutschland")]
     view = prepare_promo_view(entries, sources, "2026-07-25")
-    assert view["brands_tracked"] == 1  # Vodafone selbst zaehlt nicht
+    assert view["brands_tracked"] == 1
     assert view["brands_active"] == 1
     assert view["active_total"] == 1
     names = {b["name"] for b in view["brands"]}
-    assert "Vodafone Deutschland" in names  # wird trotzdem angezeigt
+    assert "Vodafone Deutschland" in names
     vf = next(b for b in view["brands"] if b["name"] == "Vodafone Deutschland")
     assert vf["internal_reference"] is True
 
@@ -138,8 +138,6 @@ def test_brand_with_only_grace_entries_does_not_sort_as_empty():
         _entry(brand="klarmobil", headline="Vermutlich weg", status="evtl. ausgelaufen")
     ]
     view = prepare_promo_view(entries, sources, "2026-07-25")
-    # klarmobil hat ein sichtbares (wenn auch verblassendes) Angebot,
-    # congstar gar keins - klarmobil soll deshalb zuerst stehen.
     assert view["brands"][0]["name"] == "klarmobil"
 
 
@@ -153,12 +151,6 @@ def test_neu_badge_uses_ten_day_cutoff():
     by_headline = {e["headline"]: e for e in view["brands"][0]["active"]}
     assert by_headline["Frisch"]["neu"] is True
     assert by_headline["Alt"]["neu"] is False
-
-
-# ---------------------------------------------------------------- Bilder
-# Das Bild haengt seit dem 07.08.2026 am ANGEBOT, nicht an der Marke: eine
-# Marke hat bis zu acht Aktionen, und ein Screenshot ihrer Startseite als
-# Bild fuer jede einzelne davon beantwortet die Frage der Seite nicht.
 
 
 def test_das_bild_kommt_vom_angebot_nicht_von_der_marke():
@@ -197,13 +189,6 @@ def test_ein_seitenmotiv_wird_als_solches_gekennzeichnet():
     entries = [_scored(headline="A", score=80, image="x-1280.jpg")]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert view["karten"][0]["bild_ist_motiv"] is False
-
-
-# ---------------------------------------------------------------- Karten
-# Je Wettbewerber EINE Karte: seine staerkste sichtbare Aktion. Die Auswahl
-# WELCHE stark ist trifft analyze/promo_ranker.py (Score + Hysterese) - hier
-# wird nur geprueft, dass die Anzeige das Ergebnis respektiert und nichts
-# eigenes dazuerfindet.
 
 
 def _scored(
@@ -297,7 +282,6 @@ def test_die_bloecke_stehen_nach_dem_rang_des_anbieters():
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert [b["name"] for b in view["bloecke"]] == ["klarmobil", "congstar", "Blau"]
     assert [b["top_score"] for b in view["bloecke"]] == [40, 99, 88]
-    # ... und innerhalb von congstar steht die staerkere Aktion vorn.
     congstar = view["bloecke"][1]
     assert [k["offer"]["headline"] for k in congstar["karten"]] == ["B", "A"]
 
@@ -369,7 +353,6 @@ def test_das_eigene_angebot_steht_in_einem_eigenen_block():
     assert [b["name"] for b in view["bloecke"]] == ["congstar"]
     assert view["eigen"]["name"] == "Vodafone Deutschland"
     assert view["eigen"]["lead"]["offer"]["headline"] == "Eigenes"
-    # ... und faellt aus der Wettbewerbszaehlung heraus.
     assert [k["brand"]["name"] for k in view["karten"]] == ["congstar"]
 
 
@@ -393,14 +376,7 @@ def test_marken_ohne_aktion_stehen_getrennt_und_zaehlen_nicht_mit():
     view = prepare_promo_view([_scored(brand="congstar")], sources, "2026-07-25")
     assert [b["name"] for b in view["bloecke"]] == ["congstar"]
     assert [b["name"] for b in view["ohne_aktion"]] == ["klarmobil"]
-    assert view["brands_tracked"] == 2  # beobachtet werden beide
-
-
-# ------------------------------------------------------- Motiv & Kachel
-# Was eine Karte anstelle eines Bildes zeigt - und was sie NICHT zweimal
-# zeigt. Antonio am 08.08.2026: "Viele Karten sind Schriftkacheln mit
-# identischem Text ('Wechsel- oder Altgeraetpraemie' x4) - sieht nach Fehler
-# aus."
+    assert view["brands_tracked"] == 2
 
 
 def test_die_schriftkachel_traegt_die_zahlen_des_angebots():
@@ -431,8 +407,6 @@ def test_die_schriftkachel_faellt_erst_auf_den_kern_der_ueberschrift_zurueck():
         )
         == "Junge-Leute-Rabatt"
     )
-    # Die GANZE Ueberschrift taugt nicht - sie steht zwei Zeilen tiefer noch
-    # einmal, und dieselbe Aussage zweimal untereinander liest sich als Panne.
     assert (
         _kachel_text({"headline": "Dauerhaft mehr Daten"}, "mehr Datenvolumen")
         == "mehr Datenvolumen"
@@ -462,7 +436,6 @@ def test_kein_motiv_steht_zweimal_auf_der_seite():
     view = prepare_promo_view(entries, sources, "2026-07-25")
     bilder = [k["bild"] for k in view["karten"] if k["bild"]]
     assert bilder == ["images/x-1280.jpg"]
-    # Das staerkste Angebot behaelt es, die schwaecheren werden Textkarten.
     nach_titel = {k["offer"]["headline"]: k for k in view["karten"]}
     assert nach_titel["B"]["bild"] == "" and nach_titel["B"]["bild_w"] is None
     assert view["mit_bild"] == 1
@@ -476,14 +449,9 @@ def test_ein_banner_wird_als_banner_erkannt_und_nicht_beschnitten():
     entries[0].update({"image_w": 1280, "image_h": 410})
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert view["karten"][0]["bild_panorama"] is True
-    # Ein gewoehnliches Querformat bleibt eins (800x419 = 1,91).
     entries[0].update({"image_w": 800, "image_h": 419})
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert view["karten"][0]["bild_panorama"] is False
-
-
-# ------------------------------------------------------------- Mechaniken
-# "Was der Markt gerade faehrt" - die Balken zaehlen MARKEN, nicht Angebote.
 
 
 def test_mechanik_balken_zaehlen_marken_nicht_angebote():
@@ -497,8 +465,6 @@ def test_mechanik_balken_zaehlen_marken_nicht_angebote():
     ]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     balken = {m["label"]: m for m in view["mechaniken"]}
-    # Drei Aktionen EINER Marke sind eine Kampagne, zwei Aktionen ZWEIER
-    # Marken sind ein Trend - deshalb steht die Wechselpraemie vorn.
     assert view["mechaniken"][0]["label"] == "Wechsel- oder Altgerätprämie"
     assert balken["Wechsel- oder Altgerätprämie"]["marken"] == 2
     assert balken["mehr Datenvolumen"]["marken"] == 1
@@ -512,11 +478,6 @@ def test_mechanik_sonstiges_taucht_nicht_als_balken_auf():
     entries = [_scored(mechanic="sonstiges")]
     view = prepare_promo_view(entries, sources, "2026-07-25")
     assert view["mechaniken"] == []
-
-
-# --------------------------------------------------- Dubletten & Kacheln
-# Zwei Karten, die dieselbe Aktion zeigen, und zwei Kacheln mit demselben
-# Text nebeneinander - beides liest sich als Fehler, nicht als Angebot.
 
 
 def test_dasselbe_angebot_steht_nur_einmal_im_block():
@@ -614,13 +575,6 @@ def test_der_rang_kommt_aus_der_konfiguration():
     assert _rang(_src("Gepflegt", tier=2, rang=9)) < _rang(_src("Ohne Rang", tier=1))
 
 
-# --------------------------------------------------------------------------
-# Die Gewichtung der Aufmacherkarte (16.08.2026). Sie haengt an zwei Zahlen -
-# der Motivbreite und der Zahl der uebrigen Karten -, und beide werden HIER
-# gerechnet, nicht in der Vorlage.
-# --------------------------------------------------------------------------
-
-
 def _mit_bild(brand, headline, breite, score):
     e = _entry(brand=brand, headline=headline)
     e.update(
@@ -652,7 +606,7 @@ def test_ein_zu_schmales_motiv_traegt_die_grosse_flaeche_nicht():
             _mit_bild("congstar", "Zweite", 1280, 40),
         ]
     )
-    assert block["lead"]["offer"]["headline"] == "Schmal"  # Reihenfolge bleibt
+    assert block["lead"]["offer"]["headline"] == "Schmal"
     assert block["lead_gross"] is False
     assert block["lead_hoch"] is False
 
@@ -680,8 +634,6 @@ def test_zwei_zeilen_hoch_erst_ab_vier_weiteren_karten():
     MITTEN im Raster eine Luecke - genau das "kreuz und quer", das diese
     Fassung abstellt. Bis zum 27.08.2026 reichten drei weitere Karten, und
     ALDI TALK zeigte live genau die leere Zelle unten rechts."""
-    # Zwei weitere Karten fuellen die einzeilige Aufmacherkarte VOLLSTAENDIG
-    # (Spalte 3+4) - anders als bei genau einer (siehe Test daneben).
     zwei = _block_mit_weiteren(2)
     assert zwei["lead_gross"] is True and zwei["lead_hoch"] is False
     drei = _block_mit_weiteren(3)
@@ -733,22 +685,15 @@ def test_die_gewichtung_wird_nach_dem_entdoppeln_neu_gerechnet():
     """
     doppelt = [_mit_bild("congstar", "Stark", 1280, 90)]
     schmal = _mit_bild("klarmobil", "Dieselbe Datei", 620, 95)
-    schmal["image"] = "Stark.jpg"  # dasselbe Motiv
+    schmal["image"] = "Stark.jpg"
     doppelt.append(schmal)
     view = prepare_promo_view(
         doppelt, [_src("congstar", rang=1), _src("klarmobil", rang=2)], "2026-07-25"
     )
     bloecke = {b["name"]: b for b in view["bloecke"]}
-    # Der Fall tritt wirklich ein: die zweite Karte hat ihr Bild verloren.
     assert bloecke["klarmobil"]["lead"]["bild"] == ""
-    # ... und traegt die grosse Flaeche deshalb wieder.
     assert bloecke["klarmobil"]["lead_gross"] is True
     assert bloecke["congstar"]["lead"]["bild"] and bloecke["congstar"]["lead_gross"]
-
-
-# --------------------------------------------------------------------------
-# Die Entdopplung darf keine ZWEI Angebote zusammenwerfen (29.08.2026)
-# --------------------------------------------------------------------------
 
 
 def test_zwei_mechaniken_sind_zwei_angebote_auch_bei_aehnlicher_ueberschrift():
@@ -770,7 +715,6 @@ def test_zwei_mechaniken_sind_zwei_angebote_auch_bei_aehnlicher_ueberschrift():
         "headline": "Partnerkarte: 11 € Rabatt auf Allnet Flat M",
         "mechanic": "preisnachlass",
     }
-    # Die Voraussetzung des Falls: der Wortvergleich haelt sie fuer gleich.
     assert _same_offer(geraet["headline"], partner["headline"]) is True, (
         "ohne diesen Fehltreffer prueft der Test nichts"
     )

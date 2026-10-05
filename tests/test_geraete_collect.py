@@ -147,11 +147,6 @@ def _jetzt(stunde=3):
     return datetime(2026, 8, 11, stunde, 0, tzinfo=timezone.utc)
 
 
-# --------------------------------------------------------------------------
-# Preise lesen
-# --------------------------------------------------------------------------
-
-
 @pytest.mark.parametrize(
     "roh,erwartet",
     [
@@ -161,7 +156,7 @@ def _jetzt(stunde=3):
         ("1.099,00", 1099.0),
         ("1.099", 1099.0),
         ("189,99", 189.99),
-        ("1.234.567,89", 1234567.89 if False else None),  # ueber der Obergrenze
+        ("1.234.567,89", 1234567.89 if False else None),
         ("349,00 €", 349.0),
         ("", None),
         (None, None),
@@ -178,7 +173,7 @@ def test_deutscher_tausenderpunkt_wird_nicht_zum_dezimaltrenner():
     """ "1.099" ist 1099 Euro und nicht 1,099 Euro - der Fehler, der einen
     Flaggschiffpreis in die Entry-Spalte der Positionskarte schiebt."""
     assert lies_preis("1.099") == 1099.0
-    assert lies_preis("1.99") == 1.99  # zwei Nachkommastellen: Dezimal
+    assert lies_preis("1.99") == 1.99
 
 
 @pytest.mark.parametrize(
@@ -197,8 +192,6 @@ def test_verfuegbarkeit(wert, erwartet):
 
 
 def test_ausverkauft_ist_keine_auslistung():
-    # Teil F: eine Verfuegbarkeitsstufe ist kein Portfolio-Ende. Das Wort
-    # "ausgelistet" darf aus einer einzelnen Seite gar nicht entstehen.
     werte = {
         verfuegbarkeit_aus_schema(w)
         for w in ("InStock", "OutOfStock", "SoldOut", "Discontinued", "BackOrder")
@@ -210,11 +203,6 @@ def test_lockpreis_erkannt():
     assert ist_lockpreis(1.0) and ist_lockpreis(0.99)
     assert not ist_lockpreis(189.99)
     assert not ist_lockpreis(None)
-
-
-# --------------------------------------------------------------------------
-# Strukturierte Daten
-# --------------------------------------------------------------------------
 
 
 def test_ldjson_produkt():
@@ -308,11 +296,6 @@ def test_kaputtes_shopify_json_wirft_statt_leer_zurueckzugeben():
         produkte_aus_shopify("<html>Fehlerseite</html>")
 
 
-# --------------------------------------------------------------------------
-# Linkernte
-# --------------------------------------------------------------------------
-
-
 _KLARMOBIL_KAT = "klarmobil_kategorie_handy_kaufen.html.gz"
 _CONGSTAR_SITEMAP = "congstar_sitemap_devices.xml"
 
@@ -337,7 +320,7 @@ def test_fremde_domain_faellt_raus():
     """Dieselbe echte Seite verlinkt auch www.freenet.de, www.facebook.com und
     weitere fremde Hosts; ohne Muster bleibt nur www.klarmobil.de."""
     html = _echt(_KLARMOBIL_KAT)
-    assert 'href="https://www.freenet.de' in html  # Gegenprobe: es gibt sie
+    assert 'href="https://www.freenet.de' in html
     links = ernte_links(html, _herkunft_url(_KLARMOBIL_KAT), "")
     assert links
     assert {urlparse(link).netloc for link in links} == {"www.klarmobil.de"}
@@ -392,10 +375,6 @@ def test_sitemap_ohne_muster_nimmt_alles_der_domain():
     assert roh.count("<loc>https://www.congstar.de/") == roh.count("<loc>") == 55
     assert len(links) == 55
 
-
-# --------------------------------------------------------------------------
-# Ein Anbieter, Ende zu Ende
-# --------------------------------------------------------------------------
 
 _ROBOTS_FREI = (200, "User-agent: *\nDisallow: /cart\n")
 
@@ -463,7 +442,7 @@ def test_ende_zu_ende_ergibt_belegte_listungen():
     bilanz = _lauf()
     assert bilanz.status == "ok"
     assert bilanz.produkte_abgerufen == 3
-    assert len(bilanz.listungen) == 2  # die Huelle liefert nichts
+    assert len(bilanz.listungen) == 2
     a57, iphone = bilanz.listungen
     assert a57.sku_id == "samsung-galaxy-a57-128gb-blau"
     assert a57.preis_ohne_vertrag == 349.0
@@ -490,7 +469,6 @@ def test_es_wird_nur_abgerufen_was_verlinkt_war():
     bilanz = _lauf(seiten=seiten, protokoll=protokoll)
     assert bilanz.nicht_verlinkt == []
     assert falle not in protokoll
-    # Gegenprobe: die Falle war wirklich erreichbar.
     assert falle in seiten
 
 
@@ -549,8 +527,6 @@ def test_gesperrter_pfad_wird_nicht_abgerufen():
     )
     assert [u for u in protokoll if "/p/" in u] == []
     assert bilanz.listungen == []
-    # Die Kategorieseite war lesbar, aber keins ihrer Produkte - sie gilt
-    # deshalb NICHT als vollstaendig gelesen.
     assert bilanz.gelesene_einstiege == set()
 
 
@@ -646,11 +622,6 @@ def test_deaktivierter_anbieter_behaelt_seinen_grund():
     assert "API" in bilanz.grund
 
 
-# --------------------------------------------------------------------------
-# Alle Anbieter
-# --------------------------------------------------------------------------
-
-
 def test_sammle_geht_alle_anbieter_durch_und_meldet_jeden():
     quellen = QuellenConfig(
         anbieter=[
@@ -680,16 +651,9 @@ def test_sammle_geht_alle_anbieter_durch_und_meldet_jeden():
         "Nur-SIM",
     }
     assert len(ergebnis["listungen"]) == 2
-    # Kein Anbieter faellt stillschweigend weg: jeder nicht gelaufene nennt
-    # einen Grund (Akzeptanzkriterium Teil E).
     for b in ergebnis["anbieter"]:
         if b.status != "ok":
             assert b.grund
-
-
-# --------------------------------------------------------------------------
-# Die Befunde des Reviews vom 10.08.2026
-# --------------------------------------------------------------------------
 
 
 def test_abgeschnittene_seite_gilt_nicht_als_gelesen():
@@ -703,7 +667,6 @@ def test_abgeschnittene_seite_gilt_nicht_als_gelesen():
     assert bilanz.produkte_abgerufen == 2
     assert bilanz.gelesene_einstiege == set()
     assert bilanz.vollstaendig is False
-    # Und der Deckel meldet sich - keine stille Kappung (CLAUDE.md §6).
     assert bilanz.gedeckelt and "3 Adressen" in bilanz.gedeckelt[0]
 
 
@@ -714,15 +677,15 @@ def test_ein_gedeckelter_anbieter_heisst_nicht_kein_einstieg_lesbar():
     erreicht. Wer das Protokoll liest, muss den Unterschied sehen; sonst
     sucht die naechste Session einen Ausfall, den es nicht gibt."""
     bilanz = _lauf(_anbieter(max_produkte=2))
-    assert bilanz.status == "fehler"  # richtig: nichts darf altern
+    assert bilanz.status == "fehler"
     assert "kein Einstieg lesbar" not in bilanz.grund
-    assert "3 Adressen" in bilanz.grund  # der Deckel steht drin
+    assert "3 Adressen" in bilanz.grund
 
 
 def test_kein_einstieg_lesbar_bleibt_fuer_den_echten_ausfall():
     """Gegenprobe: wenn die Einstiegsseite wirklich nicht kommt, soll genau
     das dastehen - und nicht ploetzlich eine Deckelmeldung."""
-    bilanz = _lauf(seiten={})  # die Einstiegsseite antwortet 404
+    bilanz = _lauf(seiten={})
     assert bilanz.status == "fehler"
     assert bilanz.produkte_abgerufen == 0
     assert "HTTP 404" in bilanz.grund
@@ -730,7 +693,6 @@ def test_kein_einstieg_lesbar_bleibt_fuer_den_echten_ausfall():
 
 
 def test_unter_dem_deckel_gilt_die_seite_weiterhin_als_gelesen():
-    # Gegenprobe: die Sperre darf den Normalfall nicht lahmlegen.
     bilanz = _lauf(_anbieter(max_produkte=50))
     assert bilanz.gedeckelt == []
     assert bilanz.vollstaendig is True
@@ -775,11 +737,6 @@ def test_unbekannte_farbe_der_quelle_landet_in_der_arbeitsliste():
     assert "Desert Mocha" in bilanz.unbekannte_farben
 
 
-# --------------------------------------------------------------------------
-# Das Zeitbudget ist keine gemeinsame Weide (Diagnose G0 vom 28.08.2026)
-# --------------------------------------------------------------------------
-
-
 def test_ein_grosser_anbieter_laesst_den_naechsten_nicht_verhungern(monkeypatch):
     """Der Befund: freenet (Rang 4, ueber 70 Produktseiten mal Crawl-Abstand)
     verbrauchte das gesamte 1500-s-Budget, und ALDI TALK stand ab dem
@@ -808,7 +765,7 @@ def test_ein_grosser_anbieter_laesst_den_naechsten_nicht_verhungern(monkeypatch)
     seiten.update({f"https://www.gross.test/p/{i}": produkt for i in range(20)})
 
     def hole(url):
-        uhr["t"] += 30.0  # jeder Abruf kostet 30 Sekunden
+        uhr["t"] += 30.0
         if url.endswith("/robots.txt"):
             return _ROBOTS_FREI
         return (200, seiten[url]) if url in seiten else (404, "")
@@ -894,8 +851,6 @@ def test_bei_knappem_budget_verhungert_nicht_jeder_ausser_dem_letzten(monkeypatc
             return _ROBOTS_FREI
         return (200, seiten[url]) if url in seiten else (404, "")
 
-    # 240 s fuer vier Anbieter: nicht genug fuer alle, aber die ersten
-    # muessen etwas bekommen - nicht null.
     ergebnis = sammle(
         QuellenConfig(anbieter=anbieter),
         _KATALOG,

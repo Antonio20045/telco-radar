@@ -39,11 +39,6 @@ from telco_radar.uebersetzung.store import Uebersetzung, UebersetzungsStore, tex
 
 REPO = Path(__file__).resolve().parents[1]
 
-# Eine Zeile Text bei 11.5 px in der Grotesk. Zwei Zeilen waeren rund 28 px -
-# die Grenze liegt bewusst dazwischen und nicht auf einem exakten Wert: die
-# echte Schrift laedt in der Sandbox nicht, gemessen wird also die
-# Ruecklaufschrift, und eine Kalibrierung auf eine Schrift ist eine Wette
-# (siehe CLAUDE.md zum Zeitungskopf).
 HOECHSTHOEHE = 22
 
 
@@ -130,8 +125,6 @@ def _links(_site, chromium):
             seite = chromium.new_page(viewport={"width": 1440, "height": 900})
             try:
                 seite.goto(f"{wurzel}/{seite_name}", wait_until="load")
-                # Die Ressortbloecke sind <details> und liefern zugeklappt
-                # keine Masse.
                 seite.evaluate(
                     "document.querySelectorAll('details').forEach(d=>d.open=true)"
                 )

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """E4 Auto-Erkennung: neue Katalog-Eintraege aus strukturierten Live-Namen.
 
 Beleg ist der Telekom-Tageslauf vom 15.09.2026: die Kategorieseite lieferte
@@ -67,7 +66,6 @@ def _telekom_html(*eintraege):
     return "<script>window.__INITIAL_STATE__ = " + json.dumps(daten) + ";</script>"
 
 
-# Der 15.09.-Beleg: das iPhone-Duo, das der Katalog noch nicht kannte.
 _BELEG_HTML = _telekom_html(
     _eintrags("iPhone 18 Pro", "polar-256-gb", 40.0, 1440.0, "hw-18-pro"),
     _eintrags("iPhone 18 Pro Max", "schwarz-512-gb", 45.0, 1620.0, "hw-18-pro-max"),
@@ -92,8 +90,6 @@ def _mini_katalog() -> Katalog:
                 speicher=[128, 256],
             ),
             Geraet(hersteller="Apple", modell="iPhone 16", generation=16),
-            # Ein Xiaomi-Modell, damit „Xiaomi" als Hersteller-Praefix bekannt
-            # ist (die Schaellung kennt nur Katalog-Hersteller - nichts geraten).
             Geraet(hersteller="Xiaomi", modell="Redmi Note 17", generation=17),
         ]
     )
@@ -131,11 +127,6 @@ def _sammle(html, katalog):
     )
 
 
-# ==========================================================================
-# Der Beleg-Fall, Ende zu Ende (rot vor gruen bewiesen)
-# ==========================================================================
-
-
 def test_beleg_iphone_18_duo_wird_automatisch_angelegt():
     """Der 15.09.-Lauf, nachgebaut: statt Verwurf + Protokollzeile
     entstehen Katalog-Eintraege, und die Listungen sind SOFORT dabei -
@@ -144,10 +135,6 @@ def test_beleg_iphone_18_duo_wird_automatisch_angelegt():
     bilanz = _sammle(_BELEG_HTML, katalog)
 
     assert bilanz.status == "ok"
-    # ZWEI Eintraege: „Pro Max" ist ein eigenes Geraet, kein Modellzusatz
-    # des schon angelegten „Pro" (die _MODELLZUSATZ-Sperre haette beide
-    # unter „iPhone 18 Pro" verschmolzen - dieselbe Falle wie „Pixel 10
-    # Pro Fold" gegen „Pixel 10 Pro").
     ids = sorted(l.device_id for l in bilanz.listungen)
     erwartung = sorted(
         [device_id("Apple", "iPhone 18 Pro"), device_id("Apple", "iPhone 18 Pro Max")]
@@ -156,15 +143,9 @@ def test_beleg_iphone_18_duo_wird_automatisch_angelegt():
 
     eintrag = katalog.nach_id(device_id("Apple", "iPhone 18 Pro"))
     assert eintrag is not None
-    # Der Marker: ISO-Datum des anlegenden Laufs.
     assert eintrag.auto == _HEUTE
-    # NICHTS wird geraten: marktstart und vorgaenger bleiben leer (ein
-    # leeres marktstart schaltet die Nachfolger-Analyse ab - ein geratenes
-    # Datum waere schlimmer, CLAUDE.md-Katalogregel).
     assert eintrag.marktstart == ""
     assert eintrag.vorgaenger == ""
-    # generation NUR bei eindeutiger Serie: „iPhone" ist als Apple-Serie im
-    # Katalog bekannt, die Zahl innerhalb der Serie ist 18.
     assert eintrag.generation == 18
     assert katalog.nach_id(device_id("Apple", "iPhone 18 Pro Max")).auto == _HEUTE
 
@@ -187,14 +168,7 @@ def test_beleg_listung_traegt_speicher_und_farbe():
     bilanz = _sammle(_BELEG_HTML, katalog)
     pro = [l for l in bilanz.listungen if l.speicher_gb == 256]
     assert len(pro) == 1 and pro[0].farbe_roh == "polar"
-    # Der Auto-Eintrag kennt die gemessene Stufe: sie ist der Filter, gegen
-    # den ein spaeterer Titel ohne strukturiertes Speicherfeld gelesen wird.
     assert katalog.nach_id(device_id("Apple", "iPhone 18 Pro")).speicher == [256]
-
-
-# ==========================================================================
-# Die Regeln der Anlage
-# ==========================================================================
 
 
 def test_hand_eintrag_schlaegt_auto():
@@ -209,8 +183,6 @@ def test_hand_eintrag_schlaegt_auto():
         generation=18,
     )
     katalog.ergaenze(hand)
-    # Nur das Pro-Geraet: der Pro Max steht weiterhin NICHT im Katalog und
-    # wuerde die Aussage verwaessernn (er wird zu Recht auto-angelegt).
     html = _telekom_html(
         _eintrags("iPhone 18 Pro", "polar-256-gb", 40.0, 1440.0, "hw-18-pro")
     )
@@ -260,9 +232,6 @@ def test_hersteller_pruefix_wird_geschaelt():
     bilanz = _sammle(html, katalog)
     eintrag = katalog.nach_id(device_id("Apple", "iPhone 18 Air"))
     assert eintrag is not None and eintrag.auto == _HEUTE
-    # „Air" traegt keine Zahl innerhalb einer NEUEN Serie? Doch: die Serie
-    # ist „iPhone" und bekannt - die Zahl ist 18. Aber der NAME dieser
-    # Variante endet auf „Air" - generation bleibt die der Serie.
     assert eintrag.generation == 18
 
 
@@ -289,20 +258,13 @@ def test_wortmarken_kollision_verhindert_die_anlage():
         autoerkennung.lege_an("iPhone 18 Pro", katalog, _HEUTE, speicher_gb=256)
         is not None
     )
-    # „iPhone 18 Pro" noch einmal: keine zweite Anlage, derselbe Eintrag.
     zweite = autoerkennung.lege_an("iPhone 18 Pro", katalog, _HEUTE, speicher_gb=512)
     assert zweite.device_id == device_id("Apple", "iPhone 18 Pro")
     assert len([g for g in katalog.geraete if g.auto]) == 1
-    # Die zweite Stufe erweitert die speicher-Liste DES Auto-Eintrags.
     assert sorted(katalog.nach_id(device_id("Apple", "iPhone 18 Pro")).speicher) == [
         256,
         512,
     ]
-
-
-# ==========================================================================
-# Persistenz
-# ==========================================================================
 
 
 def test_unbekannte_titel_und_farben_werden_gezaehlt(tmp_path):
@@ -366,7 +328,6 @@ def test_hand_schlaegt_auto_beim_laden(tmp_path):
     autoerkennung.lege_an("iPhone 18 Pro", katalog, _HEUTE, speicher_gb=256)
     autoerkennung.speichere_auto_zusaetze(tmp_path, katalog)
 
-    # Der Mensch pflegt dasselbe Geraet von Hand in die Config.
     hand_besitzend = _mini_katalog()
     hand_besitzend.ergaenze(
         Geraet(
@@ -380,11 +341,6 @@ def test_hand_schlaegt_auto_beim_laden(tmp_path):
     treffer = hand_besitzend.nach_id(device_id("Apple", "iPhone 18 Pro"))
     assert treffer.marktstart == "2026-09-19" and treffer.auto == ""
     assert len([g for g in hand_besitzend.geraete if g.auto]) == 0
-
-
-# ==========================================================================
-# Nur strukturierte Felder loesen die Anlage aus
-# ==========================================================================
 
 
 def test_ohne_strukturiertes_namensfeld_gibt_es_keine_anlage():
@@ -414,8 +370,6 @@ def test_die_drei_adapter_nennen_ihr_namensfeld():
         "iPhone 18 Pro Max",
     ]
 
-    # o2: der Name steht in `description`, der Titel wird daraus MIT
-    # Speicher und Farbe aus dem Angebots-Slug zusammengesetzt.
     o2_json = json.dumps(
         {
             "hardware": [
@@ -432,7 +386,6 @@ def test_die_drei_adapter_nennen_ihr_namensfeld():
     assert o2_saetze[0]["strukturierter_name"] == "Apple iPhone 18 Pro"
     assert o2_saetze[0]["titel"] == "Apple iPhone 18 Pro 256 GB polar"
 
-    # Vodafone: der Name steht in `modelName` der Detailnutzlast.
     vf_json = json.dumps(
         {
             "modelName": "APPLE IPHONE 18 PRO",
@@ -457,11 +410,6 @@ def test_die_drei_adapter_nennen_ihr_namensfeld():
     )
     vf_saetze = vodafone.lies(vf_json, "https://api.vodafone.de/x")
     assert vf_saetze[0]["strukturierter_name"] == "APPLE IPHONE 18 PRO"
-
-
-# ==========================================================================
-# Kollisionswaechter: die Modellzusatz-Falle (E4-Regeln, Bau 2)
-# ==========================================================================
 
 
 def _katalog_mit_pixel() -> Katalog:
@@ -598,11 +546,6 @@ def test_verwurf_gleicher_device_id_beim_laden_protokolliert(tmp_path, caplog):
     assert len([g for g in hand.geraete if g.auto]) == 0
 
 
-# ==========================================================================
-# EINE Quelle der Wahrheit: lade_katalog merged die Auto-Eintraege
-# ==========================================================================
-
-
 def test_lade_katalog_liefert_den_gemergten_katalog(tmp_path):
     """Der Render-Pfad (report/html.py) laedt den Katalog ueber
     geraete_config.lade_katalog - ohne den Merge wuerde der Lauf Listungen
@@ -648,21 +591,6 @@ def test_lade_katalog_liefert_den_gemergten_katalog(tmp_path):
     assert geladen.nach_id(device_id("Apple", "iPhone 17")).auto == ""
 
 
-# ==========================================================================
-# E4-P1: Funk-Anhaengsel - dieselbe Nennung mit und ohne „5G"
-# ==========================================================================
-# o2 schreibt die Funkfaehigkeit in das description-Feld („Xiaomi Redmi
-# Note 17 Pro Max 5G", tests/fixtures/geraete/o2_katalog.json); Telekom
-# `name` und Vodafone `modelName` nennen dasselbe Geraet ohne Zusatz
-# („Apple iPhone 17 Pro Max", „Google Pixel 11"). Im SELBEN Lauf schuetzt
-# heute die Config-Reihenfolge - der Bruch kam ueber NAECHEST Naechte: legt
-# o2 zuerst/allein an (der Telekom-202-Ausfall in Actions ist dokumentierte
-# Realitaet) und nennt ein spaeterer strukturierter Anbieter das Geraet
-# ohne Zusatz, entsteht der zweite Eintrag STILL, ohne Signal an die
-# Arbeitsliste. Zwei device_ids fuer ein Geraet sind die Saegezahn-Klasse,
-# gegen die die ganze ID-Regel gebaut ist.
-
-
 def test_funk_anhang_wird_aus_dem_modellnamen_geschaelt():
     """Der Zusatz ist keine Identitaet: 5G/4G/LTE werden wie das
     Speichersegment aus dem Modellnamen geschaelt - aus beiden Nennungen
@@ -680,7 +608,6 @@ def test_funk_anhang_wird_aus_dem_modellnamen_geschaelt():
         "Xiaomi",
         "Redmi Note 18",
     )
-    # Nennung OHNE Zusatz bleibt unberuehrt (Telekom `name`-Schreibweise).
     assert autoerkennung.schale("Redmi Note 18 Pro Max", katalog) == (
         "Xiaomi",
         "Redmi Note 18 Pro Max",
@@ -833,21 +760,6 @@ def test_stamm_eines_hand_eintrags_mit_funkzusatz_wird_nicht_angelegt(caplog):
     assert "nicht angelegt" in caplog.text
 
 
-# ==========================================================================
-# P5/E3: Tarif-Rauschen aus der Arbeitsliste (FM 1 - Fruehindikator)
-# ==========================================================================
-# ALDI TALK liefert je Lauf drei Tarifpakete als „Geraet" in den strukturierten
-# Daten mit („Tarif S", „Tarif M", „Tarif L", quelle microdata). Am 17.09.2026
-# standen sie als 3 Zeilen mit Haeufigkeitssumme 87 von 284 in
-# data/state/geraete_unbekannt.jsonl (je 29 Zaehlungen - der Auftrag nennt
-# „87 von 284 Zeilen" und meint diese Vorkommen). Die Liste ist der
-# Fruehindikator fuer Anker-Luecken (FM 1); Rauschen macht sie taub. Alle
-# Titel dieser Sektion sind die gespeicherten ECHTEN der Datei vom 17.09. -
-# einzeln hierher kopiert und als Ganzes als Fixture
-# tests/fixtures/geraete/unbekannte_titel_2026-09-17.jsonl (145 Titel-Zeilen,
-# Herkunft in _herkunft.json). NICHTS ist erfunden.
-
-
 def test_tarif_titel_erkennen():
     """Die Regel selbst, an den echten Werten: Wort ‚Tarif' UND keine Ziffer.
     Der einzige ziffernlose Geraetetitel des Bestands (Oakley, ld+json von
@@ -856,8 +768,6 @@ def test_tarif_titel_erkennen():
     assert autoerkennung.ist_tarif_titel("Tarif S")
     assert autoerkennung.ist_tarif_titel("Tarif M")
     assert autoerkennung.ist_tarif_titel("Tarif L")
-    # Echte Geraetetitel der selben Liste bleiben stehen - auch die von
-    # ALDI TALK selbst (derselbe Anbieter wie das Rauschen).
     assert not autoerkennung.ist_tarif_titel(
         "MOTOROLA moto g86 5G, 256 GB, Spellbound (XT2527-2)"
     )
@@ -923,7 +833,6 @@ def test_tarif_titel_werden_nicht_gespeichert(tmp_path):
         "SONIM XP400, 128 GB, Schwarz",
         "Glacier Blue",
     }
-    # Kein Tarifname steht irgendwo in der Liste.
     assert all("Tarif" not in z["wert"] for z in zeilen)
 
 
@@ -982,7 +891,6 @@ def test_bestaende_werden_beim_naechsten_schreiben_bereinigt(tmp_path):
         encoding="utf-8",
     )
 
-    # Der naechste Lauf meldet EINE neue echte Farbe (Polar, iPhone 18).
     autoerkennung.persistiere_unbekannte(
         tmp_path,
         [
@@ -999,8 +907,6 @@ def test_bestaende_werden_beim_naechsten_schreiben_bereinigt(tmp_path):
     zeilen = [json.loads(z) for z in pfad.read_text().splitlines() if z]
     assert len(zeilen) == 3
     assert {z["wert"] for z in zeilen} == {"iPad Pro 11 (2025)", "Burgunder", "Polar"}
-    # Die gezaehlte Haeufigkeit der Rausch-Zeilen (29 je, Summe 87) verhindert
-    # nicht ihr Verschwinden - sie war eine Zaehlung, keine Buchfuehrung.
     assert all("Tarif" not in z["wert"] for z in zeilen)
 
 
@@ -1015,35 +921,20 @@ def test_ueber_den_ganzen_echten_bestand_vom_17_09():
         .splitlines()
         if z.strip()
     ]
-    assert len(zeilen) == 145  # die Fixture ist der ganze Bestand
+    assert len(zeilen) == 145
 
     rauschen = [z for z in zeilen if autoerkennung.ist_tarif_titel(z["wert"])]
     assert sorted(z["wert"] for z in rauschen) == ["Tarif L", "Tarif M", "Tarif S"]
     assert {z["anbieter"] for z in rauschen} == {"ALDI TALK"}
     assert sum(z.get("haeufigkeit", 0) for z in rauschen) == 87
 
-    # Jeder andere Titel bleibt stehen - 142 von 145.
     assert len(zeilen) - len(rauschen) == 142
-    # Die ziffernlosen Geraetetitel des Bestands tragen kein ‚Tarif' und
-    # fallen nicht durch die UND-Regel:
     for titel in (
         "Oakley Meta - HSTN Prizm Polarized (AI Glasses)",
         "motorola edge 70",
     ):
         assert any(z["wert"] == titel for z in zeilen)
         assert not autoerkennung.ist_tarif_titel(titel)
-
-
-# ==========================================================================
-# P5/E3: Feste Familien-Anker - iPad, Watch, AirPods ohne Praefix
-# ==========================================================================
-# Vodafone nennt seine iPads im strukturierten Namen OHNE Hersteller-Praefix
-# (`modelName`: „iPad Pro 11 (2025)", „iPad (2025)", „iPad Pro 11 2024" -
-# data/state/geraete_unbekannt.jsonl vom 17.09.). Die Serie „iPad" stand in
-# keinem Katalog-Eintrag, also griff der Serien-Anker nie: die Anker-Luecke
-# aus auto-doku.md. iPad, Watch und AirPods sind Apple-Serien - der feste
-# Familien-Anker ist Markennamen-Fakt, keine Raterei, und greift NUR, wo der
-# Katalog die Reihe nicht kennt (Hand schlaegt Auto bleibt).
 
 
 def test_ipad_ohne_hersteller_praefix_wird_ueber_familien_anker_angelegt():
@@ -1061,7 +952,6 @@ def test_ipad_ohne_hersteller_praefix_wird_ueber_familien_anker_angelegt():
     assert eintrag.modell == "iPad Pro 11 (2025)"
     assert eintrag.device_id == device_id("Apple", "iPad Pro 11 (2025)")
     assert eintrag.auto == "2026-09-18"
-    # Auto-Regeln unveraendert: marktstart und vorgaenger bleiben leer.
     assert eintrag.marktstart == "" and eintrag.vorgaenger == ""
 
 

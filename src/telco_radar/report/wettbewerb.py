@@ -46,22 +46,9 @@ from urllib.parse import urlsplit
 from ..analyze.begriffe import MECHANICS
 from ..textwerkzeug import ohne_vodafone_teil
 
-# Wie viele Aktionen je Wettbewerber auf der Seite stehen. Der Rest steht
-# vollstaendig auf der Promo Uebersicht, dorthin verweist die Zeile darunter.
 _MAX_AKTIONEN = 3
-# Wie viele Wochen der Themenverlauf zurueckreicht. Vier Profile zeigen die
-# Verschiebung ("Ende Juli Router und Streaming, jetzt Glasfaser und Joyn"),
-# ohne dass unter jedem Wettbewerber eine halbe Seite Etiketten steht.
 _MAX_THEMENWOCHEN = 3
 _MAX_THEMEN_JE_WOCHE = 6
-# Wie viele Meldungen des laufenden Monats gleich offen stehen. Antonio am
-# 08.08.2026: "mach Wettbewerb das Layout besser, sodass man nicht so viel
-# runterscrollen muss." Der Monat mit 30 Meldungen war 2600 px hoch, drei
-# Wettbewerber darunter machten eine Seite von 6777 px - man scrollte sieben
-# Bildschirmhoehen, um den zweiten Wettbewerber ueberhaupt zu sehen. Zwoelf
-# Meldungen sind in zwei Spalten sechs Zeilen: genug, um den Monat zu
-# erfassen, wenig genug, dass der naechste Wettbewerber in Sichtweite bleibt.
-# Der Rest steht vollstaendig einen Klick weiter - nichts faellt weg.
 _OFFEN_JE_MONAT = 12
 
 _TRACKING = ("utm_", "fbclid", "gclid", "mc_cid", "mc_eid")
@@ -104,9 +91,6 @@ def _klartext(text: str) -> str:
     return " ".join(html_lib.unescape(text or "").split())
 
 
-# Die Notiz ohne den Vodafone-Ratschlag. Die Regel selbst und ihr
-# Handwerkszeug stehen in textwerkzeug - dieselbe Frage stellt sich auf der
-# Differenzierungs-Seite noch einmal, dort nur mit einer anderen Antwort.
 _ohne_vodafone_teil = ohne_vodafone_teil
 
 
@@ -191,12 +175,6 @@ def _aktion(eintrag: dict) -> dict:
 def _chronik_eintrag(
     datum: str, rubrik: str, titel: str, url: str, note: str, quelle: str, herkunft: str
 ) -> dict:
-    # `tag` steht als Zeilenmarke ueber der Schlagzeile ("7.8."). Bis zum
-    # 08.08.2026 stand dort nur die Tageszahl, und sie wurde bei
-    # Wiederholung ausgeblendet - das ging, solange die Chronik EINE Spalte
-    # war. In zwei Spalten (siehe die Vorlage) zerreisst ein Spaltenumbruch
-    # jede solche Gruppe: oben in Spalte zwei stuenden Meldungen ohne Datum.
-    # Jede Zeile traegt ihr Datum deshalb selbst, dafuer kurz und leise.
     return {
         "datum": datum,
         "monat": datum[:7],
@@ -235,8 +213,6 @@ def _nach_monaten(eintraege: list[dict]) -> list[dict]:
                 "monat": monat,
                 "eintraege": eintraege_monat,
                 "n": len(eintraege_monat),
-                # Der offene Monat zeigt seinen Anfang und haelt den
-                # Rest bereit, siehe _OFFEN_JE_MONAT.
                 "offen": eintraege_monat[:_OFFEN_JE_MONAT],
                 "rest": eintraege_monat[_OFFEN_JE_MONAT:],
             }
@@ -258,9 +234,6 @@ def _hebel_je_wettbewerber(bestand, muster, theme_label: dict) -> list[dict]:
         absender = " ".join(
             str(e.get("operator") or e.get("company") or e.get("source") or "").split()
         ).lower()
-        # Der Name muss am ANFANG des Absenders stehen - dieselbe Regel wie
-        # in `_gehoert_dazu`. Ohne sie zog der Alias "Telekom" auch
-        # "A1 Telekom Austria" und "Turk Telekom" in dieses Profil.
         if not (absender and any(p.match(absender) for p in muster)):
             continue
         key = str(e.get("theme") or "")
@@ -278,10 +251,6 @@ def _hebel_je_wettbewerber(bestand, muster, theme_label: dict) -> list[dict]:
         )
         h["n"] += 1
         if not h["beispiel"]:
-            # `what` ist das Feld der Differenzierungs-Bibliothek ("was
-            # dieser Anbieter tut"); `headline`/`summary` gibt es dort NICHT -
-            # ohne diese Zuordnung blieb die Beispielzeile leer, und der
-            # Hebel stand als nackte Zahl da.
             h["beispiel"] = " ".join(
                 str(
                     e.get("what")
@@ -337,13 +306,6 @@ def build_wettbewerb_view(
         fehler, fehler_datum = "", ""
         for woche in wochen:
             datum = woche["date"]
-            # Die Meldungen der Woche ZUERST, die Profil-Moves danach: beide
-            # Quellen nennen dieselbe Meldung, aber die Meldung traegt die
-            # vom Analysten geschriebene deutsche Schlagzeile, der Move die
-            # Originalueberschrift des Feeds ("DT has 'not yet decided' on EU
-            # gigafactory bid"). Fuer eine Leserschaft ohne
-            # Technikhintergrund ist das der ganze Unterschied. Das Datum
-            # bleibt davon unberuehrt - es ist in beiden Faellen dasselbe.
             for h in woche.get("highlights") or []:
                 if not _gehoert_dazu(h, muster):
                     continue
@@ -384,8 +346,6 @@ def build_wettbewerb_view(
                             ],
                         }
                     )
-                # Der Fehler des JEWEILS letzten Laufs - ein Teilausfall
-                # darf nicht aussehen wie ein ruhiger Wettbewerber.
                 fehler, fehler_datum = (profil.get("error") or ""), datum
                 for m in profil.get("moves") or []:
                     url = m.get("url") or ""
@@ -402,10 +362,6 @@ def build_wettbewerb_view(
                         "profil",
                     )
 
-        # Neueste Woche zuerst, und nur so weit zurueck, wie eine
-        # Entwicklung ablesbar ist. Die oberste Zeile IST der aktuelle Stand -
-        # sie ein zweites Mal als Etikettenreihe daneben zu setzen, waere
-        # dieselbe Information in zwei Formen.
         themen_verlauf = list(reversed(themen_verlauf))[:_MAX_THEMENWOCHEN]
 
         marken = _marken(promo_sources, muster)
@@ -431,8 +387,6 @@ def build_wettbewerb_view(
                 "fehler_datum": fehler_datum,
                 "monate": _nach_monaten(eintraege),
                 "n_chronik": len(eintraege),
-                # Seit wann diese Chronik reicht - das Datum der AELTESTEN
-                # Aufnahme, nicht der Beobachtungsbeginn des Projekts.
                 "seit": min((e["datum"] for e in eintraege), default=""),
                 "aktionen": [_aktion(e) for e in angebote[:_MAX_AKTIONEN]],
                 "aktionen_n": len(angebote),
@@ -443,11 +397,6 @@ def build_wettbewerb_view(
             }
         )
 
-    # Offene Flanken: Hebel, die ein ANDERER Fokus-Wettbewerber zieht und
-    # dieser nicht. Erst im Nachgang berechenbar - vorher steht nicht fest,
-    # was die anderen ziehen. Bewusst nur gegen die Fokus-Wettbewerber und
-    # nicht gegen den Weltbestand: "Telkomsel hat das auch" ist im deutschen
-    # Markt keine Flanke.
     alle_hebel = {
         h["key"]: h["label"] for c in wettbewerber for h in c.get("hebel") or []
     }
@@ -470,14 +419,6 @@ def build_wettbewerb_view(
 
     return {
         "wettbewerber": wettbewerber,
-        # Der Ausgabetag der juengsten Woche - mehr braucht der Seitenkopf
-        # nicht. Ein "seit ..." und eine Zahl der Ausgaben standen hier
-        # ebenfalls; beide sagt die Kopfzeile jedes Wettbewerbers genauer
-        # ("56 Meldungen seit 16. Juli 2026"), und was keine Vorlage liest,
-        # wird in dieser Codebasis nicht berechnet.
         "stand": wochen[-1]["date"] if wochen else "",
-        # Ohne Promo-Konfiguration (render_site() ohne cfg) gibt es keine
-        # Aktionslage - dann zeigt die Seite die Spalte gar nicht, statt
-        # "keine Aktion bestaetigt" zu behaupten, wo nichts geprueft wurde.
         "promo_bekannt": bool(promo_sources),
     }

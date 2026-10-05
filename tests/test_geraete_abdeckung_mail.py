@@ -77,11 +77,6 @@ def _faengt_mail(monkeypatch) -> list:
     return gesendet
 
 
-# --------------------------------------------------------------------------
-# Fall 1: kein Messtag
-# --------------------------------------------------------------------------
-
-
 def test_ohne_messtag_meldet_der_schritt_einen_ausfall(tmp_path, monkeypatch, caplog):
     """Ein Bestand ohne einen einzigen Messtag ist keine Entwarnung. Der
     Schritt geht rot aus und sagt warum - sonst ist der Tag, an dem der
@@ -94,13 +89,7 @@ def test_ohne_messtag_meldet_der_schritt_einen_ausfall(tmp_path, monkeypatch, ca
     assert code != 0
     assert code == mail.EXIT_KEIN_MESSTAG
     assert "keinen Messtag" in caplog.text
-    # Gegenprobe: es ist auch keine Mail hinausgegangen.
     assert gesendet == []
-
-
-# --------------------------------------------------------------------------
-# Fall 2: ein Alarm liegt vor
-# --------------------------------------------------------------------------
 
 
 def test_mit_alarm_geht_genau_eine_mail_hinaus_und_der_schritt_ist_gruen(
@@ -113,11 +102,9 @@ def test_mit_alarm_geht_genau_eine_mail_hinaus_und_der_schritt_ist_gruen(
     assert code == 0
     assert len(gesendet) == 1
     betreff, text, _, trocken = gesendet[0]
-    # OHNE `--trocken` geht die Mail WIRKLICH hinaus.
     assert trocken is False
     assert "02.09.2026" in betreff
     assert "Haendler: heute nicht erfasst" in text
-    # Derselbe Satz steht im Protokoll - drei Kanaele, eine Wortform.
     assert "Haendler: heute nicht erfasst" in caplog.text
 
 
@@ -128,11 +115,6 @@ def test_ohne_alarm_geht_keine_mail_hinaus(tmp_path, monkeypatch):
     gesendet = _faengt_mail(monkeypatch)
     assert mail.main(["--root", str(root)]) == 0
     assert gesendet == []
-
-
-# --------------------------------------------------------------------------
-# Fall 3: die Zustellung scheitert
-# --------------------------------------------------------------------------
 
 
 def test_ein_zustellfehler_faellt_mit_rueckgabecode_zwei(tmp_path, monkeypatch, caplog):
@@ -151,12 +133,6 @@ def test_ein_zustellfehler_faellt_mit_rueckgabecode_zwei(tmp_path, monkeypatch, 
     assert code == mail.EXIT_NICHT_ZUGESTELLT
     assert "NICHT zugestellt" in caplog.text
     assert "SMTP_HOST fehlt" in caplog.text
-
-
-# --------------------------------------------------------------------------
-# Fall 3b: der Kanal ist gar nicht erst eingerichtet (P1/C2-Nachtrag,
-# 24.09.2026) - NICHT dieselbe Fehlerklasse wie Fall 3 oben.
-# --------------------------------------------------------------------------
 
 
 def test_fehlende_smtp_secrets_faellen_nur_als_warnung_nicht_rot(
@@ -180,7 +156,6 @@ def test_fehlende_smtp_secrets_faellen_nur_als_warnung_nicht_rot(
         code = mail.main(["--root", str(root)])
     assert code == 0
     assert code == mail.EXIT_OK
-    # Die GitHub-Annotation steht auf stdout, nicht nur im Log.
     ausgabe = capsys.readouterr().out
     assert "::warning::" in ausgabe
     assert "NICHT zugestellt" in ausgabe
@@ -220,11 +195,6 @@ def test_mit_trocken_wird_nichts_verschickt(tmp_path, monkeypatch):
     assert gesendet[0][3] is True
 
 
-# --------------------------------------------------------------------------
-# Fall 4: ein Anbieter, den die Konfiguration nicht mehr kennt
-# --------------------------------------------------------------------------
-
-
 def test_ein_nicht_konfigurierter_anbieter_loest_keine_mail_aus(tmp_path, monkeypatch):
     """`nur` grenzt auf die Anbieter der Konfiguration ein. Ein Anbieter,
     der aus `geraete_quellen.yaml` gefallen ist, wird nicht mehr
@@ -236,12 +206,10 @@ def test_ein_nicht_konfigurierter_anbieter_loest_keine_mail_aus(tmp_path, monkey
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
     db.protokolliere_lauf("Haendler", _tag(1), funde=20, vollstaendig=True)
     db.protokolliere_lauf("Haendler", _tag(2), funde=20, vollstaendig=True)
-    # "Gespenst" steht nicht in der Konfiguration des Testwurzelordners.
     db.protokolliere_lauf("Gespenst", _tag(1), funde=40, vollstaendig=True)
     db.protokolliere_lauf("Gespenst", _tag(2), funde=0, vollstaendig=True)
     db.save(_tag(2))
     gesendet = _faengt_mail(monkeypatch)
     assert mail.main(["--root", str(root)]) == 0
     assert gesendet == []
-    # Gegenprobe: der Alarm selbst ist da - nur eben nicht fuer diesen Lauf.
     assert [a.anbieter for a in db.ausfall_alarme(heute=_tag(2))] == ["Gespenst"]

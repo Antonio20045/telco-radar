@@ -144,9 +144,6 @@ def _jetzt(stunde=3):
     return datetime(2026, 8, 11, stunde, 0, tzinfo=timezone.utc)
 
 
-# --------------------------------------------------------------------------
-
-
 def test_lauf_schreibt_datenbank_und_historie(tmp_path):
     root = _root(tmp_path)
     bilanz = run_geraete_stage(root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole())
@@ -358,12 +355,6 @@ def test_teillauf_mit_listungen_landet_in_der_messtermin_buchfuehrung(tmp_path):
     muss als Messtermin verbucht werden, ohne als vollstaendiger Lauf zu
     zaehlen."""
     root = _root(tmp_path)
-    # Eine der Produktseiten faellt AUS - HTTP 500, also "nicht gelesen"
-    # und nicht "gibt es nicht". Der Einstieg gilt damit als unvollstaendig
-    # gelesen (status fehler), genau die mobilcom-Lage. Mit 404 waere es
-    # seit dem 22.09.2026 eine tote Adresse und damit eine benannte
-    # Luecke - der Test haette dann die Leseschwelle gemessen statt des
-    # Teillaufs, um den es hier geht.
     kaputt = "https://www.haendler.test/p/1514200/huelle-iphone-17"
     run_geraete_stage(
         root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole(serverfehler={kaputt})
@@ -406,8 +397,6 @@ def test_die_hole_fabrik_gibt_den_statuscode_zurueck_statt_zu_werfen():
     echt = http_modul.fetch
     http_modul.fetch = _werfen
     try:
-        # Die Fabrik bindet `fetch` beim ERZEUGEN, nicht beim Aufruf - sie
-        # muss also nach dem Austausch gebaut werden.
         status, text = _hole_fabrik({"timeout_seconds": 5})(
             "https://api.example.de/robots.txt"
         )
@@ -450,15 +439,6 @@ def test_ein_host_ohne_robots_txt_wird_abgefragt_statt_uebersprungen(tmp_path):
         http_modul.fetch = echt
     assert bilanz["listungen"] == 2, bilanz["anbieter"]
 
-
-# --------------------------------------------------------------------------
-# Der Massstab aus dem Tarifbestand (Phase 6, 04.09.2026)
-#
-# Die Stufe schreibt seit heute `data/state/geraete_tco.json` mit - die
-# SIM-only-Referenzen, ohne die ein Geraeteanteil nicht bestimmbar ist.
-# Sie steht NACH `db.save()`: ein Messtag ist nicht nachholbar, ein
-# Massstab schon (Lehre aus Lauf 31422689829).
-# --------------------------------------------------------------------------
 
 _TARIFE = [
     {
@@ -507,7 +487,6 @@ def test_der_lauf_schreibt_die_sim_only_referenzen(tmp_path):
         (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
     )
     namen = [r["tarif_name"] for r in tco["sim_only"]]
-    # Der Festnetztarif ist KEIN Massstab fuer ein Smartphone-Buendel.
     assert namen == ["MagentaMobil L"]
     assert tco["sim_only"][0]["tarif_id"] == "telekom:magentamobil-l"
     assert tco["sim_only"][0]["tarif_sim_only_monatlich"] == 59.95
@@ -543,8 +522,8 @@ def test_ein_leerer_tarifbestand_loescht_den_massstab_nicht(tmp_path):
     tco = json.loads(
         (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
     )
-    assert len(tco["sim_only"]) == 1  # noch da
-    assert bilanz["sim_only_referenzen"] == 0  # aber nicht geschrieben
+    assert len(tco["sim_only"]) == 1
+    assert bilanz["sim_only_referenzen"] == 0
 
 
 def test_ein_verschwundener_tarif_verschwindet_aus_dem_massstab(tmp_path):
@@ -590,18 +569,8 @@ def test_ein_fehler_beim_massstab_kostet_den_messtag_nicht(tmp_path, monkeypatch
     assert bilanz["status"] == "ok"
     assert bilanz["listungen"] > 0
     assert (root / "data" / "state" / "geraete_db.json").exists()
-    # Und die Bilanz behauptet NICHT, geschrieben zu haben - das ist der
-    # einzige Fall, fuer den dieser Zaehler gebaut ist.
     assert bilanz["sim_only_referenzen"] == 0
 
-
-# --------------------------------------------------------------------------
-# Buendel: die zweite Lesart, die an der Listungsstrecke vorbeigeht
-# --------------------------------------------------------------------------
-# `kind: buendel` liest dieselbe Nutzlastform auf Geraet-plus-Tarif statt
-# auf Listungen. Die Saetze landen in `geraete_tco.json` und NICHT in
-# `geraete_db.json` - ein Buendelmonatspreis in der Spalte eines
-# Kassenpreises war der Befund, mit dem dieses Vorhaben angefangen hat.
 
 _O2_BUENDEL_URL = "https://www.o2online.de/e-shop/rest/catalog/buendel"
 
@@ -736,19 +705,10 @@ def test_ein_buendel_einstieg_schreibt_die_tco_datei_und_keine_listung(tmp_path)
     assert satz["tarif_id"] == "o2:o2-mobile-on-demand-m"
     assert satz["geraet_zuzahlung"] == 1.0
     assert satz["geraet_monatsrate"] == 34.0
-    # DER GEMESSENE BUENDELTARIFPREIS, unveraendert (P0-B-fix1). B2b hatte
-    # ihn fuer einen Tag durch die SIM-only-Grundgebuehr desselben Tarifs
-    # (19,99 EUR, `_O2_TARIFE` oben) ersetzt und die Differenz als nicht
-    # eingerechneten Rabatt daneben gelegt - die Leitzahl aller 72
-    # o2-Buendel stieg dadurch um 120,00 bis 276,00 EUR, ohne dass sich
-    # ein o2-Preis geaendert hatte. o2s -5 EUR sind kein bedingter
-    # Nachlass, sondern der Preis (Modulkopf `analyze/tco_buendel.py`).
     assert satz["tarif_monatlich"] == 14.99
     assert satz["rabatte"] == []
     assert satz["anschlusspreis"] == 39.99
     assert satz["laufzeit_monate"] == 36
-    # Kein Geraet in `geraete_db.json`: der Buendelbetrag hat in der
-    # Preisspalte nichts verloren.
     assert (
         not (root / "data" / "state" / "geraete_db.json").exists()
         or json.loads(
@@ -809,8 +769,6 @@ def test_eine_unlesbare_buendelantwort_schreibt_nichts_und_altert_nicht(tmp_path
     assert bilanz["rohbuendel"] == 0
     o2 = [a for a in bilanz["anbieter"] if a["anbieter"] == "o2"][0]
     assert "HW_ONLY" in o2["grund"]
-    # Der Bestand von gestern steht unveraendert - Buendel werden
-    # aufgefrischt, nicht ersetzt.
     tco = json.loads(
         (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
     )
@@ -826,8 +784,6 @@ def test_ein_geaenderter_buendelpreis_frischt_den_satz_auf(tmp_path):
         {},
         "2026-09-05",
         jetzt=_jetzt(),
-        # 30,00 statt 34,00 Geraeterate: Summe und Gesamtbetrag ziehen mit,
-        # sonst faellt der Satz an seiner eigenen Rechenprobe.
         hole=_o2_hole(_o2_antwort(monatlich=44.99, gesamt=1620.64)),
     )
     assert bilanz["buendel"] == 1 and bilanz["buendel_neu"] == 0
@@ -868,7 +824,6 @@ def test_ein_kollidierender_satz_bekommt_keinen_historienpunkt(tmp_path):
         root, {}, "2026-08-11", jetzt=_jetzt(), hole=_hole(seiten)
     )
     assert bilanz["status"] == "ok"
-    # Die Kollision tritt wirklich ein - sonst misst der Test nichts.
     assert bilanz["kollisionen"] == 1
     assert bilanz["preispunkte"] == 1
 
@@ -887,14 +842,6 @@ def test_ein_kollidierender_satz_bekommt_keinen_historienpunkt(tmp_path):
     assert zeilen[0]["listung_id"] == eintrag["id"]
     assert zeilen[0]["preis_ohne_vertrag"] == eintrag["preis_ohne_vertrag"]
 
-
-# --------------------------------------------------------------------------
-# S-5 (09.09.2026): die 1&1-SIM-only-Messung im Referenzblock
-# --------------------------------------------------------------------------
-# `sammle_simonly` holt die SIM-only-Seite des Anbieters samt der je Kachel
-# verlinkten Tarifdetails. Diese Tests pruefen die STEUERLOGIK in der
-# Pipeline - der Collector selbst steht in
-# tests/test_tarif_einsundeins_simonly.py mit der echten Seiten-Fixture.
 
 import gzip as _gzip
 
@@ -973,8 +920,6 @@ def test_simonly_messung_ersetzt_die_bestandsableitung(tmp_path, monkeypatch):
     assert s["volumen_gb"] == 10.0
     assert s["tarif_sim_only_monatlich"] == 14.99
     assert [rab["name"] for rab in s["rabatte"]]
-    # Der Telekom-Satz ist unberuehrt auf seiner Pflichtblatt-Quelle
-    # stehen geblieben - kein 1&1-Handgriff darf ihn anfassen.
     assert (
         nach_name["MagentaMobil L"]["quelle_url"]
         == "https://www.telekom.de/pib/magentamobil-l"
@@ -1002,8 +947,6 @@ def test_simonly_messung_ersetzt_nur_was_sie_misst(tmp_path, monkeypatch):
         (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
     )
     nach_name = {r["tarif_name"]: r for r in tco["sim_only"]}
-    # Der gemessene Tarif ist von der Messung, der ungemessene vom
-    # Bestand - und beide sind DA.
     assert nach_name["1&1 All-Net-Flat S"]["quelle_url"] == _SIMONLY_URL
     assert (
         nach_name["1&1 Alt-Tarif"]["quelle_url"] == "https://www.1und1.de/handytarife"
@@ -1046,9 +989,6 @@ def test_scoped_lauf_datiert_keine_fremdanbieter_und_ruft_sie_nicht_ab(
     monkeypatch.setattr(tarif_einsundeins_simonly, "_ABSTAND_SEKUNDEN", 0.0)
     root = _mit_tarifen(_root(tmp_path), _EINSUND_EINS)
 
-    # Erster Lauf ohne Scope (die 1&1-Seite ist hier nicht einmal
-    # erreichbar - die Messung schlaegt fehl, die Bestandsableitung
-    # bleibt, beide Referenzen entstehen mit dem Laufdatum).
     run_geraete_stage(root, {}, "2026-09-14", jetzt=_jetzt(), hole=_hole())
     tco = json.loads(
         (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
@@ -1057,9 +997,6 @@ def test_scoped_lauf_datiert_keine_fremdanbieter_und_ruft_sie_nicht_ab(
     assert vorher["1&1 All-Net-Flat S"]["last_verified"] == "2026-09-14"
     assert vorher["MagentaMobil L"]["last_verified"] == "2026-09-14"
 
-    # Zweiter Lauf MIT Scope auf Telekom - und mit Recorder an `hole`:
-    # kein einziger Abruf darf hinausgehen, der nicht Telekom/Haendler
-    # gilt (insbesondere keiner gegen 1und1.de).
     abrufe: list = []
     run_geraete_stage(
         root,
@@ -1073,8 +1010,6 @@ def test_scoped_lauf_datiert_keine_fremdanbieter_und_ruft_sie_nicht_ab(
         (root / "data" / "state" / "geraete_tco.json").read_text(encoding="utf-8")
     )
     nachher = {r["tarif_name"]: r for r in tco["sim_only"]}
-    # Der Fremde bleibt bytegleich auf seinem alten Stand - kein
-    # last_verified von heute, keine neue Ableitung, keine Loeschung.
     assert nachher["1&1 All-Net-Flat S"] == vorher["1&1 All-Net-Flat S"]
     assert nachher["MagentaMobil L"]["last_verified"] == "2026-09-15"
     assert not [url for url in abrufe if "1und1" in url]

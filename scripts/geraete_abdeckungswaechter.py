@@ -48,7 +48,6 @@ def main(argv=None) -> int:
         with open(zusammenfassung, "a", encoding="utf-8") as f:
             f.write(text)
     for befund in ergebnis.befunde:
-        # Eine Annotation je Befund: sie steht oben auf der Laufseite.
         print(f"::error::{befund.text}")
     return EXIT_ROT if ergebnis.rot else EXIT_GRUEN
 

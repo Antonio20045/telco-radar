@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """VERALTET - config/watchlist.yaml wird direkt gepflegt (siehe Sperre unten).
 
 Urspruenglich der Generator fuer die Watchlist.
@@ -25,9 +24,7 @@ REGION_NAMES = {
     "oceania": "Ozeanien",
 }
 
-# region, name, country, website, aliases, kind, crawl_url, press_url, note, plan
 M = [
-    # ---------------- EUROPE ----------------
     (
         "europe",
         "Vodafone Group",
@@ -316,7 +313,6 @@ M = [
         "JS-gerendert",
         "",
     ),
-    # ---------------- NORTH AMERICA ----------------
     (
         "north_america",
         "Verizon",
@@ -437,7 +433,6 @@ M = [
         "403 Bot-Sperre",
         "403. Plan: Playwright über Residential-Proxy; bis dahin Referenz.",
     ),
-    # ---------------- LATIN AMERICA ----------------
     (
         "latin_america",
         "América Móvil",
@@ -522,7 +517,6 @@ M = [
         "statisch, 44 Artikel-Links",
         "",
     ),
-    # ---------------- AFRICA & MIDDLE EAST ----------------
     (
         "africa_middle_east",
         "MTN Group",
@@ -667,7 +661,6 @@ M = [
         "JS-gerendert",
         "",
     ),
-    # ---------------- ASIA ----------------
     (
         "asia",
         "KDDI",
@@ -932,7 +925,6 @@ M = [
         "JS-gerendert (Investor SET)",
         "",
     ),
-    # ---------------- OCEANIA ----------------
     (
         "oceania",
         "Telstra",
@@ -1070,7 +1062,6 @@ def build_doc():
         "**Primärquelle jedes Betreibers ist seine eigene Domain** — keine Dritt-Medien, keine "
         "Stichwort-Nachrichtensuche. Telco-Fachpresse ist eine separate, klar gekennzeichnete zweite Ebene.\n"
     )
-    # summary counts
     from collections import Counter
 
     c = Counter(
@@ -1121,7 +1112,6 @@ def build_doc():
                 f"| {name} | {country} | {website} | {press} | {feed} | {KIND_LABEL[kind]} | {note} |"
             )
         lines.append("")
-    # plans section
     lines.append("## Bot-geblockte Betreiber — dokumentierter Plan (Phase 2)\n")
     lines.append(
         "Diese Betreiber liefern automatisierten Clients 403/307 bzw. eine Bot-Wall. Die offizielle "
@@ -1137,12 +1127,6 @@ def build_doc():
 
 
 if __name__ == "__main__":
-    # Die Tabelle M oben ist seit dem Reparatur-Durchgang vom Juli 2026 nicht
-    # mehr aktuell, und sie kann die inzwischen noetigen Felder gar nicht
-    # ausdruecken: item_selector, link_template, timeout_seconds,
-    # allow_short_titles. Ein Lauf wuerde config/watchlist.yaml ueberschreiben
-    # und damit die geprueften Reparaturen mehrerer Sessions loeschen.
-    # config/watchlist.yaml ist die Wahrheitsquelle - dort direkt editieren.
     if "--force" not in sys.argv:
         print(__doc__)
         print(

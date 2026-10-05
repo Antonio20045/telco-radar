@@ -28,7 +28,6 @@ from telco_radar.uebersetzung import volltext as volltext_mod
 from telco_radar.uebersetzung.store import UebersetzungsStore, Uebersetzung, text_hash
 
 
-# --------------------------------------------------------------- Fixtures
 SPANISCH = (
     "SpaceX ha conseguido algo extraordinariamente dificil, hacer que lanzar "
     "satelites parezca sencillo. La cadencia de lanzamientos de la compania y "
@@ -57,7 +56,6 @@ def _item(**kw):
     return Item(**basis)
 
 
-# ------------------------------------------------------------- Spracherkennung
 def test_spanischer_fliesstext_wird_erkannt():
     fremd, kuerzel, _ = sprache_mod.ist_fremdsprachig(SPANISCH)
     assert fremd is True
@@ -126,7 +124,6 @@ def test_sprachname_faellt_auf_das_kuerzel_zurueck():
     assert sprache_mod.sprachname("xx") == "XX"
 
 
-# ------------------------------------------------------------------ Volltext
 def test_feedvolltext_wird_ohne_abruf_genommen():
     item = _item(volltext="x" * 2000, summary="kurz")
     ergebnis = volltext_mod.hole_volltext(item, {}, artikelabruf=False)
@@ -152,7 +149,6 @@ def test_zu_kurzer_extrakt_bekommt_keinen_link(monkeypatch):
     ergebnis = volltext_mod.hole_volltext(item, {})
     assert ergebnis.erfolg is False
     assert "zu kurz" in ergebnis.grund
-    # Gegenprobe: als Faktor gerechnet HAETTE der Fall bestanden.
     assert 141 > volltext_mod.MINDESTFAKTOR * 45
 
 
@@ -202,7 +198,6 @@ def test_abgeschalteter_artikelabruf_ruft_nicht_ab(monkeypatch):
     assert ergebnis.erfolg is False
 
 
-# ---------------------------------------------------------------- Uebersetzer
 def test_zusammenfassung_statt_uebersetzung_faellt_durch(monkeypatch):
     """Der Auftrag lautet vollstaendig, nicht kurz."""
     monkeypatch.setattr(u_mod.llm, "complete", lambda *a, **k: "Zu kurz.")
@@ -237,13 +232,11 @@ def test_langer_artikel_wird_abschnittsweise_uebersetzt(monkeypatch):
 
     def _complete(system, user, *a, **k):
         aufrufe.append(user)
-        # Wie ein echtes Modell: nur den Artikeltext zurueck, ohne die
-        # Kopfzeile und ohne den Abschnittshinweis.
         return user.split(")\n\n", 1)[-1].split(":\n\n", 1)[-1]
 
     monkeypatch.setattr(u_mod.llm, "complete", _complete)
-    absatz = "Satz. " * 200  # ~1200 Zeichen
-    text = "\n\n".join([absatz] * 10)  # ~12 000 Zeichen -> mehrere Abschnitte
+    absatz = "Satz. " * 200
+    text = "\n\n".join([absatz] * 10)
     _, absaetze = u_mod.uebersetze(text, "es", "modell")
     assert len(aufrufe) > 1, "der Text haette gebuendelt werden muessen"
     assert len(absaetze) == 10, "kein Absatz darf verloren gehen"
@@ -275,7 +268,6 @@ def test_gescheiterter_titel_kostet_nicht_die_uebersetzung(monkeypatch):
     assert absaetze
 
 
-# --------------------------------------------------------------------- Store
 def test_store_haelt_je_meldung_genau_einen_stand(tmp_path):
     pfad = tmp_path / "u.jsonl"
     store = UebersetzungsStore(pfad)
@@ -315,7 +307,6 @@ def test_kaputte_zeile_kostet_nicht_den_bestand(tmp_path):
     assert len(UebersetzungsStore(pfad)) == 1
 
 
-# --------------------------------------------------------------------- Stufe
 def test_budget_rechnet_gegen_die_restzeit_des_jobs():
     """Die Lehre aus Lauf 31422689829 - gegen den JOB, nicht gegen sich selbst."""
     settings = {
@@ -324,9 +315,7 @@ def test_budget_rechnet_gegen_die_restzeit_des_jobs():
         "uebersetzung_frist_sekunden": 600,
     }
     assert stufe_mod.budget(settings, 100) == 600.0
-    # Nur noch 380 s bis zur Reserve -> weniger als die eigene Frist.
     assert stufe_mod.budget(settings, 2200) == pytest.approx(380.0)
-    # Die Reserve ist angebrochen -> gar nicht erst anfangen.
     assert stufe_mod.budget(settings, 2590) is None
 
 

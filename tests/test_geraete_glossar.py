@@ -108,11 +108,6 @@ def _baue_mit_referenzen(tmp_path, weitere: int):
     )
 
 
-# --------------------------------------------------------------------------
-# 1. Das Klapplabel (portiert: Massstabs-Klappen statt Kartenklappe)
-# --------------------------------------------------------------------------
-
-
 def test_das_klapplabel_nennt_handlung_und_zahl(tmp_path):
     """Jede Klappe, die eine MENGE verbergen, traegt "<N> <Ding> anzeigen"
     - die Zahl als nackter Text direkt vor dem Wort (das Abnahmekriterium
@@ -120,11 +115,6 @@ def test_das_klapplabel_nennt_handlung_und_zahl(tmp_path):
     O3-Struktur sind das der Tarifmassstab und seine innere Klappe; die
     Kartenklappe, fuer die SQ67 die Regel erfand, ist mit O2 gefallen."""
     s = _baue_mit_referenzen(tmp_path, weitere=4)
-    # E2 (§3.1c): die zwei Fuss-Aufklapper (Massstab, Datenlage) sind EIN
-    # Aufklapper "Massstab & Datenlage" - der NAME ist Antonios Wortlaut
-    # und traegt keine Zahl. Die SQ67-Regel (Zahl + Handlung) lebt an der
-    # Stelle weiter, an der sie erfunden wurde: die Zahl steht im ersten
-    # Satz des Inhalts und zaehlt die Zeilen beider Tabellen.
     klappe = s.select_one("details#gr-massstab-datenlage")
     assert klappe is not None, (
         "die Fixture traegt keine Massstabs-Klappe (keine Referenzen)"
@@ -204,11 +194,6 @@ def test_app_js_setzt_keine_klapplabels_mehr_nach(tmp_path, chromium):
     assert "Anbieterangebote anzeigen" not in koerper
 
 
-# --------------------------------------------------------------------------
-# 2. Die Paradox-Zeile (portiert: Rechenweg der Buendel-Zeile)
-# --------------------------------------------------------------------------
-
-
 def _zeilen_mit_zwei_preisen(soup):
     """Belastbare Zeilen, die einen GERAETEPREIS tragen (Barpreis oder
     Finanzierungssumme) - nur sie zeigen das Paradox zweier Zahlen. Die
@@ -241,9 +226,6 @@ def test_jede_zeile_mit_zwei_preisen_traegt_die_paradox_zeile(tmp_path):
         )
         text = re.sub(r"\s+", " ", vorlage_text(paradox))
         assert "Gerät" in text and "Tarif" in text, text
-        # Die Zeile steht DIREKT unter den zwei Zahlen des Rechenwegs:
-        # nach der Leitzeile (TCO gesamt), vor der Oe-Bindungszeile -
-        # nicht erst am Ende hinter Belegen und Luecken.
         html = str(zeile)
         assert (
             html.index("gr-bnd-rw-z")
@@ -253,17 +235,11 @@ def test_jede_zeile_mit_zwei_preisen_traegt_die_paradox_zeile(tmp_path):
             f"Zeile {zeile.get('data-anbieter')}: Paradox-Zeile steht "
             "nicht zwischen Leitzahl und Bau-Zeile"
         )
-        # Sichtbar ohne WEITEREN Klick: kein eigener <details>-Block
-        # zwischen Zeilengrenze und Satz - die Zeile selbst ist der EINE
-        # Aufklapper, der sie sichtbar macht.
         for ahne in paradox.parents:
             if ahne.name == "details":
                 assert "gr-bnd" in (ahne.get("class") or []), (
                     "die Paradox-Zeile steckt in einer weiteren Aufklappung"
                 )
-    # Gegenprobe gegen die Lookup-Falle: die 1&1-Zeile der Fixture hat
-    # KEINEN Geraetepreis (nur den kombinierten Monatspreis, 13.2) und
-    # damit keine zwei Zahlen - sie darf die Erklaerzeile nicht tragen.
     eins_und_eins = [
         z for z in s.select("#tafel-tco .gr-bnd") if z.get("data-anbieter") == "1&1"
     ]
@@ -316,11 +292,6 @@ def test_die_paradox_zeile_nennt_den_zeitraum_ihrer_raten(tmp_path):
     assert geprueft, "keine Zeile mit Erklearzeile - der Test prueft nichts"
 
 
-# --------------------------------------------------------------------------
-# 3. Das Glossar
-# --------------------------------------------------------------------------
-
-
 def test_das_glossar_ist_endgueltig_weg(tmp_path):
     """Antonio (16.09.2026, §3.1 AUFTRAG_GERAETE_EINE_SEITE_V2): „Ich will
     den Abschnitt Begriffe erklärt: weg." - das Glossar ist ENDE, ebenso
@@ -348,8 +319,6 @@ def test_der_antwort_satz_und_die_wahl_leiste_erklaeren_die_begriffe(tmp_path):
     knoepfe = {
         k.get_text(" ", strip=True): k for k in tafel.select("#gr-zr-baender button")
     }
-    # P3-E1: die Knöpfe sind die Stufen der Vodafone-Tarifleiter und
-    # nennen ihr Volumen (Testleiter: XS 5 GB, M 36 GB).
     assert any("5 GB" in text for text in knoepfe), (
         "die Band-Knöpfe nennen kein Datenvolumen"
     )

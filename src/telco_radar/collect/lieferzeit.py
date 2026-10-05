@@ -60,23 +60,15 @@ log = logging.getLogger(__name__)
 
 HOCH, MITTEL, NIEDRIG = "hoch", "mittel", "niedrig"
 
-# Mehr als das ist keine Lieferzeit mehr, sondern eine Vorbestellung mit
-# offenem Termin oder ein Lesefehler. Solche Werte gehen in Quarantaene.
 MAX_PLAUSIBLE_TAGE = 90
 
-# Ab wann ein Sprung als Lagerengpass gilt - das eigentliche Signal, auf das
-# es ankommt. "2-3 Werktage" auf "mehrere Wochen" ist die Meldung, nicht die
-# absolute Zahl.
 ENGPASS_AB_TAGEN = 10
 ENGPASS_SPRUNG = 5
 
-# Wie viele Beobachtungen je Produkt und Anbieter aufbewahrt werden. Eine
-# Zeitreihe braucht Tiefe, eine JSON-Datei im Repo braucht ein Ende.
 MAX_HISTORIE = 120
 
 _ENTFERNEN = ("script", "style", "noscript", "svg", "iframe")
 
-# "1-3 Werktage", "2 bis 4 Werktagen", "ca. 14 Tage"
 _SPANNE = re.compile(
     r"(\d{1,3})\s*(?:-|–|bis)\s*(\d{1,3})\s*(Werktage[n]?|Tage[n]?|Wochen?)", re.I
 )
@@ -92,8 +84,6 @@ _NICHT_LIEFERBAR = re.compile(
     re.I,
 )
 
-# Der Kontext, in dem eine Zahl ueberhaupt eine Lieferzeit sein KANN. Ohne
-# ihn liest der Regex "24 Monate Laufzeit" als Lieferzeit.
 _KONTEXT = re.compile(r"(liefer|versand|zustell|ankunft|verf[üu]gbar|lager)", re.I)
 
 _TAGE_JE_EINHEIT = {"woche": 7, "wochen": 7}
@@ -108,14 +98,14 @@ class Beobachtung:
     anbieter: str
     url: str
     zeitstempel: str
-    verfuegbarkeit: str = ""  # "sofort" | "verzoegert" | "nein" | ""
-    lieferzeit_roh: str = ""  # der Originaltext, immer mitgefuehrt
+    verfuegbarkeit: str = ""
+    lieferzeit_roh: str = ""
     tage_min: int | None = None
     tage_max: int | None = None
-    methode: str = ""  # jsonld | selektor | text
+    methode: str = ""
     belastbarkeit: str = NIEDRIG
     plz: str = ""
-    quarantaene: str = ""  # Grund, wenn nicht veroeffentlicht
+    quarantaene: str = ""
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -183,9 +173,6 @@ def lade_warenkorb(root: Path) -> Warenkorb:
                     )
                 )
     return korb
-
-
-# ------------------------------------------------------------- Extraktion
 
 
 def aus_jsonld(html: str) -> tuple[str, int | None, int | None] | None:
@@ -261,10 +248,6 @@ def aus_text(text: str) -> tuple[str, str, int | None, int | None] | None:
     """
     if not text:
         return None
-    # Getrennt wird an Zeilen und Trennzeichen, NICHT am Punkt: "Nicht auf
-    # Lager (Lieferzeit ca. 14 Tage)" zerfiel dabei am "ca." in zwei Teile,
-    # und der erste las sich als "auf Lager" - also als sofort lieferbar,
-    # wo das Gegenteil dasteht.
     for satz in re.split(r"[\n]+|\s*[·|]\s*", text):
         if not _KONTEXT.search(satz):
             continue
@@ -335,13 +318,9 @@ def beobachte(
 
     if b.tage_max is not None and b.tage_max > MAX_PLAUSIBLE_TAGE:
         b.quarantaene = f"{b.tage_max} Tage - unplausibel"
-    # Ein Platzhalter, der durchgerutscht ist, ist keine Messung.
     if "{" in b.lieferzeit_roh or "}" in b.lieferzeit_roh:
         b.quarantaene = "Platzhalter statt Wert (Seite baut per JavaScript auf)"
     return b
-
-
-# ------------------------------------------------------------------ Speicher
 
 
 class Lieferzeitspeicher:

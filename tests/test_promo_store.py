@@ -69,10 +69,10 @@ def test_upsert_recognises_reworded_headline_as_same_offer(tmp_path):
         [_item(headline="iPhone 17 Pro mit Unlimited-Datenvolumen und 300 € Rabatt")],
         "2026-07-28",
     )
-    assert n == 0  # kein zweiter Eintrag
+    assert n == 0
     assert len(db) == 1
     entry = list(db.entries.values())[0]
-    assert entry["first_seen"] == "2026-07-27"  # Historie bleibt erhalten
+    assert entry["first_seen"] == "2026-07-27"
     assert entry["last_verified"] == "2026-07-28"
     assert entry["status"] == "aktiv"
     assert (
@@ -107,7 +107,7 @@ def test_mark_stale_flags_but_does_not_delete(tmp_path):
     by_headline = {e["headline"]: e for e in db.entries.values()}
     assert by_headline["Alte Aktion"]["status"] == "evtl. ausgelaufen"
     assert by_headline["Neue Aktion"]["status"] == "aktiv"
-    assert len(db) == 2  # nichts geloescht
+    assert len(db) == 2
 
 
 def test_mark_stale_needs_two_consecutive_misses_before_retiring(tmp_path):
@@ -125,7 +125,7 @@ def test_mark_stale_needs_two_consecutive_misses_before_retiring(tmp_path):
     entry = db.entries[entry_id("congstar", "Alte Aktion")]
     assert entry["status"] == "ausgelaufen"
     assert entry["missed_checks"] == 2
-    assert len(db) == 1  # weiterhin nichts geloescht
+    assert len(db) == 1
 
 
 def test_reconfirmation_resets_missed_checks(tmp_path):
@@ -172,12 +172,9 @@ def test_upsert_stores_image_url_on_new_entry(tmp_path):
 def test_upsert_updates_image_url_on_reverify_but_keeps_old_if_missing(tmp_path):
     db = PromoDB(tmp_path / "db.json")
     db.upsert([_item(image_url="https://example.test/first.jpg")], "2026-07-04")
-    # Re-verified later without a fresh image (e.g. og:image tag disappeared) -
-    # the previously known image must not be silently dropped.
     db.upsert([_item(image_url=None)], "2026-07-25")
     entry = list(db.entries.values())[0]
     assert entry["image_url"] == "https://example.test/first.jpg"
-    # A genuinely new image on re-verify does update it.
     db.upsert([_item(image_url="https://example.test/second.jpg")], "2026-08-01")
     entry = list(db.entries.values())[0]
     assert entry["image_url"] == "https://example.test/second.jpg"
@@ -189,13 +186,9 @@ def test_upsert_updates_url_on_reverify_but_keeps_old_if_missing(tmp_path):
     live forever, even once better deep links start being extracted."""
     db = PromoDB(tmp_path / "db.json")
     db.upsert([_item(url="https://example.test/deep-link-1")], "2026-07-04")
-    # Re-verified later without a resolved deep link (e.g. the LLM did not
-    # pick a candidate this run) - the previously known deep link must not
-    # be silently dropped back to empty.
     db.upsert([_item(url="")], "2026-07-25")
     entry = list(db.entries.values())[0]
     assert entry["url"] == "https://example.test/deep-link-1"
-    # A genuinely new/updated deep link on re-verify does update it.
     db.upsert([_item(url="https://example.test/deep-link-2")], "2026-08-01")
     entry = list(db.entries.values())[0]
     assert entry["url"] == "https://example.test/deep-link-2"

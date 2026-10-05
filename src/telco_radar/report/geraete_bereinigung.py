@@ -149,13 +149,6 @@ from ..geraete_model import (
     zustand_aus_feldern,
 )
 
-# Die zwei Felder, aus denen Anzeige und Export ihre Farbe bauen - beide mit
-# demselben Ausdruck `farbe_normalisiert or farbe_roh`
-# (`geraete_view._katalog_zeile()`, `geraete_export.aktuell_csv()`). Beide
-# werden bereinigt, obwohl heute nur `farbe_roh` ein Zustandswort traegt:
-# fuellt der naechste Adapter das kanonische Feld mit "grau erneuert", stuende
-# das Wort ueber den Vorrang der ersten Haelfte sofort wieder auf der Seite,
-# und die Bereinigung saehe von aussen aus, als haette sie ausgesetzt.
 FARBFELDER = ("farbe_normalisiert", "farbe_roh")
 
 
@@ -229,9 +222,6 @@ def _ohne_zwillinge(eintraege: list[dict]) -> list[dict]:
     gruppen: dict[tuple, list[dict]] = {}
     for eintrag in eintraege:
         gruppen.setdefault(_zwillingsschluessel(eintrag), []).append(eintrag)
-    # `dict` haelt die Einfuegereihenfolge, also die der Eingabe - auch wenn
-    # ein spaeterer Zwilling den frueheren verdraengt hat. Der Platz gehoert
-    # dem Paar, nicht dem Gewinner.
     return [_verschmolzen(gruppe) for gruppe in gruppen.values()]
 
 
@@ -260,8 +250,6 @@ def _verschmolzen(gruppe: list[dict]) -> dict:
             sieger = kandidat
     if len(gruppe) == 1:
         return sieger
-    # Die Gruppenmitglieder sind bereits unsere eigenen Kopien (Schritt 1),
-    # geschrieben wird also nie in den Store.
     daten = [e.get("first_seen") for e in gruppe if e.get("first_seen")]
     if daten:
         sieger["first_seen"] = min(daten)
@@ -289,10 +277,6 @@ def _zwillingsschluessel(eintrag: dict) -> tuple:
         eintrag.get("anbieter"),
         eintrag.get("device_id"),
         eintrag.get("speicher_gb"),
-        # Auf den Kopien von Schritt 1 ist das der festgeschriebene Wert;
-        # die Funktion ist auf ihnen idempotent. Sie steht hier trotzdem und
-        # nicht als `eintrag["zustand"]`, damit der Schluessel auch dann
-        # stimmt, wenn ihn jemand auf rohe Store-Eintraege anwendet.
         zustand_der_zeile(eintrag),
         eintrag.get("preis_ohne_vertrag"),
         eintrag.get("zuzahlung"),

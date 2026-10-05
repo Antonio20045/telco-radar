@@ -86,11 +86,6 @@ def _e(
     }
 
 
-# --------------------------------------------------------------------------
-# Die zwei Regressionsfaelle aus dem Auftrag
-# --------------------------------------------------------------------------
-
-# (Geraet, Speicher, Gebrauchtpreis, Farbschreibweise, echter Neupreis)
 _FAELLE = [
     ("samsung-galaxy-s25", 128, 577.0, "grau erneuert", 883.0),
     ("apple-iphone-14-pro", 128, 577.0, "space schwarz erneuert", 1225.0),
@@ -153,11 +148,6 @@ def test_ein_ausschliesslich_gebraucht_gelistetes_geraet_faellt_auch():
     assert pruefe(eintraege, _KATALOG)["sauber"] == []
 
 
-# --------------------------------------------------------------------------
-# Die Farbe als Vergleichsschluessel
-# --------------------------------------------------------------------------
-
-
 def test_ein_kuerzel_am_ende_macht_keine_zweite_farbe():
     """ "pistachio" und "pistachio bk" sind ein Geraet (Auftrag, Abschnitt 1).
     Als zwei Farben gelesen waeren die 144 EUR Abstand ein legitimer
@@ -199,14 +189,8 @@ def test_die_rohschreibweise_traegt_den_schluessel():
     assert farbschluessel("schwarz", "Obsidian") != farbschluessel(
         "schwarz", "Mitternacht"
     )
-    # Ohne Rohschreibweise traegt die kanonische Farbe weiter.
     assert farbschluessel("navy", "") == farbschluessel("navy", "")
     assert farbschluessel("navy", "") == "navy"
-
-
-# --------------------------------------------------------------------------
-# Der ausgelieferte Datensatz
-# --------------------------------------------------------------------------
 
 
 def test_der_gepruefte_datensatz_traegt_keine_widersprueche_mehr():
@@ -225,7 +209,6 @@ def test_der_gepruefte_datensatz_traegt_keine_widersprueche_mehr():
     ]
     sauber = pruefe(bestand, _KATALOG)["sauber"]
 
-    # Gegenprobe: der Fall tritt wirklich ein, sonst misst der Test nichts.
     assert len(sauber) < len(bestand), "die Pruefung greift gar nicht"
 
     je_farbe: dict[tuple, set] = {}
@@ -246,11 +229,6 @@ def test_der_gepruefte_datensatz_traegt_keine_widersprueche_mehr():
         sortiert = sorted(stufen)
         for klein, gross in zip(sortiert, sortiert[1:]):
             assert stufen[gross] >= stufen[klein], "Speicherinversion geblieben"
-
-
-# --------------------------------------------------------------------------
-# Der Zustand steht nicht immer im Titel
-# --------------------------------------------------------------------------
 
 
 @pytest.mark.parametrize(
@@ -310,10 +288,6 @@ def test_ein_unklares_kennzeichen_wird_nicht_zu_neu_geraten():
         erg = geraete_vergleich.vergleich(eintraege, _KATALOG)
         return {a["anbieter"] for z in erg["zeilen"] for a in z.get("guenstiger", [])}
 
-    # Gegenprobe zuerst: als Neugeraet WUERDE o2 den Vergleich gewinnen. Ohne
-    # sie misst der Test nur, dass ein Schluessel fehlt - genau die Falle aus
-    # CLAUDE.md, in die die erste Fassung dieses Tests auch gelaufen ist
-    # (sie fragte nach "alle", und den Schluessel gibt es nicht).
     assert guenstiger("neu") == {"o2"}, "die Fixture spannt den Fall nicht auf"
     assert guenstiger("unbekannt") == set(), (
         "der niedrigste Preis ist der wahrscheinlichste Fehler - ein Zustand, "
@@ -321,10 +295,6 @@ def test_ein_unklares_kennzeichen_wird_nicht_zu_neu_geraten():
     )
     assert guenstiger("refurbished") == set()
 
-
-# --------------------------------------------------------------------------
-# Der Weg vom Schema bis zur Listung
-# --------------------------------------------------------------------------
 
 _LDJSON = """<html><head><script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Product",
@@ -432,11 +402,9 @@ def test_ein_entfernter_muellpreis_zieht_den_median_nicht():
         _e("samsung-galaxy-s25", 899.0, "navy", kennung="a", anbieter="A"),
         _e("samsung-galaxy-s25", 879.0, "navy", kennung="b", anbieter="B"),
         _e("samsung-galaxy-s25", 909.0, "navy", kennung="c", anbieter="C"),
-        # Lockpreis in anderer Farbe: fliegt an der Unmoeglichkeitsgrenze.
         _e("samsung-galaxy-s25", 1.0, "schwarz", kennung="lock", anbieter="A"),
     ]
     erg = pruefe(eintraege, _KATALOG)
-    # Gegenprobe: der Lockpreis fliegt wirklich, sonst misst der Test nichts.
     assert "lock" not in {e["id"] for e in erg["sauber"]}
     assert erg["auffaellig"] == {}, (
         "eine gesunde Zeile ist als Ausreisser markiert - der Median hat den "

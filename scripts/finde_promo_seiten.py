@@ -53,10 +53,6 @@ from telco_radar.collect.http import fetch  # noqa: E402
 from telco_radar.config import load_config  # noqa: E402
 from telco_radar.promo_config import _normalize_url, load_promo_config  # noqa: E402
 
-# Woerter, die im PFAD einer URL auf eine Aktionsseite hindeuten. Der Pfad ist
-# das verlaesslichere Signal als der Linktext: Linktexte sind Werbesprache
-# ("Jetzt zugreifen"), Pfade sind von Redaktionssystemen vergeben und folgen
-# der Struktur des Angebots.
 PFAD_SIGNALE = {
     "aktion": 3,
     "aktionen": 3,
@@ -102,8 +98,6 @@ PFAD_SIGNALE = {
     "guenstig": 1,
     "günstig": 1,
 }
-# Woerter im Linktext. Schwaecher gewichtet als der Pfad, aber sie fangen die
-# Faelle, in denen der Pfad nur eine Kampagnen-ID ist.
 TEXT_SIGNALE = (
     "aktion",
     "angebot",
@@ -122,9 +116,6 @@ TEXT_SIGNALE = (
     "gb ",
 )
 
-# Pfade, die NIE eine Aktionsseite sind. Ohne diese Liste erntet Stufe 1 vor
-# allem Rechtstexte und Servicebereiche - die tragen dieselben Werbewoerter im
-# Fliesstext und wuerden den Check anschliessend teuer beschaeftigen.
 PFAD_SPERRE = re.compile(
     r"/(agb|impressum|datenschutz|widerruf|rechtliche|legal|cookie|"
     r"kundencenter|mein[-_]?|login|anmelden|registrier|warenkorb|checkout|"
@@ -133,12 +124,8 @@ PFAD_SPERRE = re.compile(
     r"netzabdeckung|verfuegbarkeit|störung|stoerung|blog/autor)",
     re.I,
 )
-# Dateiendungen, die keine Seite sind.
 ENDUNG_SPERRE = re.compile(r"\.(pdf|jpe?g|png|gif|svg|webp|zip|xml|css|js)$", re.I)
 
-# Kandidatenpfade fuer Stufe 2. Reihenfolge = Wahrscheinlichkeit, gemessen an
-# den 15 bereits konfigurierten Seiten (dort dominieren /angebote, /aktionen,
-# /handytarife und /deals).
 KANDIDATENPFADE = (
     "/aktionen",
     "/angebote",
@@ -164,8 +151,6 @@ KANDIDATENPFADE = (
     "/angebote/aktionen",
     "/top-angebote",
 )
-# Deckel je Marke und Stufe. Ein Kandidat kostet spaeter einen vollen
-# Pruefabruf - Breite ist gewollt, Beliebigkeit nicht.
 MAX_JE_MARKE = 12
 
 
@@ -198,9 +183,6 @@ def _tauglich(url: str, basis_host: str) -> bool:
         return False
     if PFAD_SPERRE.search(t.path or "") or ENDUNG_SPERRE.search(t.path or ""):
         return False
-    # Sehr tiefe Pfade sind fast immer einzelne Produkt-Detailseiten (ein
-    # Geraet, eine SKU). Die gehoeren als Tiefenlink an ein Angebot, nicht als
-    # eigene Quelle in die Konfiguration.
     return len([s for s in (t.path or "").split("/") if s]) <= 3
 
 
@@ -262,7 +244,6 @@ def probiere_pfade(
             return None
         if getattr(resp, "status_code", 0) != 200:
             return None
-        # Eine Weiterleitung auf die Startseite ist ein Treffer ohne Inhalt.
         ziel = _saeubere(str(getattr(resp, "url", url)))
         if urlsplit(ziel).path.strip("/") == "":
             return None
@@ -317,10 +298,6 @@ def suche_fuer_marke(
         {
             "marke": src.name,
             "url": k["url"],
-            # Die Art der Leitseite ist die beste verfuegbare Annahme fuer eine
-            # weitere Seite derselben Marke: JS-Rendering ist eine Eigenschaft
-            # des Frontends, nicht der einzelnen Seite. Der Abnahme-Check misst
-            # danach ohnehin nach, ob unter dieser Annahme Text herauskommt.
             "kind": src.kind,
             "punkte": k["punkte"],
             "stufe": k["stufe"],

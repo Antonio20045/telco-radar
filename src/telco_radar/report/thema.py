@@ -23,16 +23,6 @@ from urllib.parse import urlsplit
 
 from ..analyze.begriffe import MIND_TREFFER, suchmuster, treffer
 
-# Ab welcher Bildbreite ein Bild in Aufmacher oder zweite Reihe darf.
-# Gemessen an der gerenderten Seite bei 1440 px: der Aufmacher stellt sein
-# Bild 502 px breit dar, die zweite Reihe 552 bis 579 px. Alles darunter
-# waere ein hochskaliertes Bild - der sichtbarste Teil des Befunds vom
-# 06.08.2026 und Abnahmekriterium 6 (scripts/pruefe_portal.py).
-#
-# Kleiner als die 800 px der Titelseite, und das ist Absicht: eine
-# Themenseite hat nur die Meldungen dieses einen Ereignisses, ihre Positionen
-# sind schmaler, und ein Aufmacher ohne Bild ist schlechter als einer mit
-# einem Bild, das seine Position gerade traegt.
 MIND_BREITE_BILD = 600
 MAX_AKTIONEN = 6
 
@@ -98,20 +88,12 @@ def build_thema_view(thema: dict, promo_entries=()) -> dict:
     `items` bereits um fehlende Bilddateien bereinigt sind (das macht
     render_site, wie bei den Wochenausgaben auch).
     """
-    # Spaet importiert: report/html.py baut diese Ansicht auf, ein Import auf
-    # Modulebene waere ein Ring. `_schlagzeile()` ist die eine Stelle, die
-    # entscheidet, welche Ueberschrift eine Meldung traegt - sie darf hier
-    # nicht ein zweites Mal entstehen (Regel 3 des Designbriefs).
     from .html import _schlagzeile
 
     meldungen = []
     for item in thema.get("items") or []:
         m = dict(item)
         m["schlagzeile"] = _schlagzeile(item)
-        # Die Quelle faellt auf die Domain zurueck, wie `source_label` in
-        # `_flatten()`. Ohne diesen Rueckfall stand unter dem Aufmacher
-        # "Bild:" ohne Namen dahinter - manche Meldungen tragen kein
-        # `source`, weil ihre Quelle keinen Anzeigenamen liefert.
         m["quelle"] = item.get("source") or urlsplit(
             item.get("url") or ""
         ).netloc.removeprefix("www.")
@@ -120,16 +102,10 @@ def build_thema_view(thema: dict, promo_entries=()) -> dict:
 
     aufmacher = None
     if meldungen:
-        # Das breiteste Bild fuehrt, aber nur wenn es die Position traegt;
-        # sonst fuehrt die dringendste Meldung. Die Reihenfolge im Speicher
-        # ist bereits nach Dringlichkeit sortiert.
         bebildert = [m for m in meldungen if _bildbreite(m) >= MIND_BREITE_BILD]
         aufmacher = max(bebildert, key=_bildbreite) if bebildert else meldungen[0]
 
     rest = [m for m in meldungen if m is not aufmacher]
-    # In die zweite Reihe zuerst, was ein tragfaehiges Bild hat - sonst steht
-    # neben dem Aufmacher zweimal nur Text, waehrend weiter unten Bilder in
-    # Zeilen verpuffen. Innerhalb beider Gruppen bleibt die Dringlichkeit.
     zwei = (
         [m for m in rest if _bildbreite(m) >= MIND_BREITE_BILD]
         + [m for m in rest if _bildbreite(m) < MIND_BREITE_BILD]

@@ -46,7 +46,7 @@ import httpx
 
 log = logging.getLogger(__name__)
 
-_MAX_BYTES = 6_000_000  # Rohdaten; verkleinert wird danach
+_MAX_BYTES = 6_000_000
 _TIMEOUT = 10.0
 _MIND_BYTES_BILD = 2_000
 _UA = (
@@ -54,32 +54,16 @@ _UA = (
     "(KHTML, like Gecko) Chrome/126.0 Safari/537.36"
 )
 _KOPF = {"User-Agent": _UA}
-TRANSPORT: httpx.BaseTransport | None = None  # Naht, gesetzt von naehte.Naehte
+TRANSPORT: httpx.BaseTransport | None = None
 _ERLAUBTE_TYPEN = ("image/jpeg", "image/png", "image/webp", "image/avif", "image/jpg")
 
-# Wie viele Meldungen gleichzeitig bearbeitet werden. Jede kostet bis zu
-# drei Abrufe (Artikelseite + zwei Bilder); 12 gleichzeitig halten die
-# Sammelzeit bei ~190 Meldungen im Bereich einer Minute, ohne dass eine
-# einzelne Domain unter Dauerfeuer kommt.
 _GLEICHZEITIG = 12
 
-# Zielmasse. Der Aufmacher steht bei 1440 px Fensterbreite rund 620 px
-# breit, auf einem Retina-Schirm sind das 1240 echte Pixel - darueber
-# hinaus sieht niemand einen Unterschied.
 _BREIT_GROSS = 1280
-# Das Listenbild steht bei 800, nicht bei 700: eine Meldung von Rang 60 kann
-# als Ressortaufmacher rund 380 px breit stehen, auf Retina also 760 echte
-# Pixel. Bei 700 waeren genau die Ressortaufmacher wieder hochskaliert - der
-# Fehler, den diese Datei gerade behebt, nur eine Ebene tiefer.
 _BREIT_KLEIN = 800
 _JPEG_QUALITAET = 78
-# Ab hier lohnt der zusaetzliche Abruf der Artikelseite nicht mehr: das
-# Feed-Bild ist bereits gross genug fuer jede Position auf der Seite.
 _GUT_GENUG = 1000
-# Darunter ist ein Bild als Bild wertlos - es waere in jeder Position
-# hochskaliert. Lieber Textsatz.
 _MIND_BREITE = 400
-# Was der Aufmacher und die zweite Reihe verlangen (Abnahmekriterium 3).
 MIND_BREITE_GROSS = 800
 
 _OG_RE = (
@@ -95,11 +79,6 @@ _OG_RE = (
         r'<meta[^>]+name=["\']twitter:image["\'][^>]+content=["\']([^"\']+)', re.I
     ),
 )
-# Logos, Zaehlpixel und Platzhalter sehen aus wie Bilder und sind keine.
-# "share-image" und "default-image" standen bis zum 06.08.2026 mit in dieser
-# Liste. Das war ein Denkfehler: `og:image` IST per Definition das
-# Share-Bild, und mehrere Redaktionssysteme benennen die Datei genau so.
-# Seit die Groesse gemessen wird, braucht es diesen Verdacht nicht mehr.
 _MUELL = re.compile(
     r"(logo|sprite|favicon|/icons?[-_/.]|placeholder|avatar|1x1|"
     r"pixel|spacer|blank)",
@@ -123,8 +102,6 @@ def og_bild(seiten_url: str, client: httpx.Client) -> str:
         r = client.get(seiten_url, follow_redirects=True)
         if r.status_code != 200 or "html" not in r.headers.get("content-type", ""):
             return ""
-        # Nur der Kopfbereich - og:image steht im <head>, und manche
-        # Artikelseiten sind mehrere Megabyte gross.
         kopf = r.text[:200_000]
         for muster in _OG_RE:
             m = muster.search(kopf)
@@ -146,7 +123,7 @@ def _hol(bild_url: str, client: httpx.Client) -> bytes:
         typ = r.headers.get("content-type", "").split(";")[0].strip().lower()
         if typ not in _ERLAUBTE_TYPEN or len(r.content) > _MAX_BYTES:
             return b""
-        if len(r.content) < _MIND_BYTES_BILD:  # Zaehlpixel oder kaputter Platzhalter
+        if len(r.content) < _MIND_BYTES_BILD:
             return b""
         return r.content
     except (httpx.HTTPError, OSError) as exc:
@@ -164,17 +141,10 @@ def masse(daten: bytes) -> tuple[int, int]:
 
         with Image.open(io.BytesIO(daten)) as im:
             return im.size
-    except Exception:  # noqa: BLE001 - jedes kaputte Bild faellt hier durch
+    except Exception:  # noqa: BLE001
         return (0, 0)
 
 
-# Ein Bild, dessen Pixel praktisch alle denselben Wert haben, zeigt nichts.
-# Gemessen an den 15 Promo-Screenshots vom 07.08.2026: der leere
-# telekom-deutschland.jpg hat eine Standardabweichung von exakt 0,00, der
-# naechstflaue (otelo.jpg, eine dunkle Seite) 38,67. Dazwischen liegt kein
-# Grenzfall, die Schwelle ist also unkritisch gewaehlt. Ueber die Dateigroesse
-# ginge es auch (6 KB gegen 58-114 KB), aber die haengt an der
-# JPEG-Qualitaet; der Bildinhalt tut das nicht.
 _MIND_STREUUNG = 6.0
 
 
@@ -200,7 +170,7 @@ def auf_weiss(im):
         grund = Image.new("RGB", rgba.size, (255, 255, 255))
         grund.paste(rgba, mask=rgba.split()[-1])
         return grund
-    return im.convert("RGB")  # Palette, Graustufe, CMYK
+    return im.convert("RGB")
 
 
 def ist_leer(daten: bytes) -> bool:
@@ -223,7 +193,7 @@ def ist_leer(daten: bytes) -> bool:
         with Image.open(io.BytesIO(daten)) as im:
             grau = auf_weiss(im).convert("L")
             return ImageStat.Stat(grau).stddev[0] < _MIND_STREUUNG
-    except Exception:  # noqa: BLE001 - unlesbar zeigt auch nichts
+    except Exception:  # noqa: BLE001
         return True
 
 
@@ -236,7 +206,7 @@ def _schreibe(daten: bytes, ziel: Path, max_breite: int) -> tuple[int, int]:
     from PIL import Image
 
     with Image.open(io.BytesIO(daten)) as im:
-        im = auf_weiss(im)  # PNG mit Alpha, Palette, CMYK
+        im = auf_weiss(im)
         if im.width > max_breite:
             hoehe = max(1, round(im.height * max_breite / im.width))
             im = im.resize((max_breite, hoehe), Image.LANCZOS)
@@ -287,7 +257,7 @@ def lade_und_lege_ab(
         return None
     try:
         breite, hoehe = _schreibe(daten, fertig, max_breite)
-    except Exception as exc:  # noqa: BLE001 - ein kaputtes Bild kippt keinen Lauf
+    except Exception as exc:  # noqa: BLE001
         log.debug("Bild konnte nicht abgelegt werden (%s): %s", bild_url, exc)
         return None
     return fertig.name, breite, hoehe
@@ -301,11 +271,6 @@ def _eine_meldung(
     Setzt bei Erfolg h["image"], h["image_w"], h["image_h"].
     """
     z: Counter = Counter(geprueft=1)
-    # Ein Bild aus einem FRUEHEREN Lauf muss weg, bevor der neue Versuch
-    # laeuft. Sonst ueberlebt eine Meldung, deren Bild diesmal nicht zu
-    # holen war, mit dem alten Dateinamen - und der zeigt auf eine Datei,
-    # die `raeume_auf()` beim naechsten Mal loescht. Genau so entstanden am
-    # 06.08.2026 vier Meldungen mit `image`, aber ohne `image_w`.
     for feld in ("image", "image_w", "image_h"):
         h.pop(feld, None)
 
@@ -317,8 +282,6 @@ def _eine_meldung(
     kandidaten: list[tuple[str, bytes, int, int]] = []
 
     if feed_url:
-        # Ein Kandidat, den ein frueherer Lauf schon abgelegt hat, muss nicht
-        # erneut durchs Netz - der Dateiname haengt an URL und Zielbreite.
         fertig = ordner / _dateiname(feed_url, max_breite)
         if fertig.exists():
             w, hh = masse(fertig.read_bytes())
@@ -365,7 +328,7 @@ def _eine_meldung(
     try:
         ziel = ordner / _dateiname(url, max_breite)
         breite, hoehe = _schreibe(daten, ziel, max_breite)
-    except Exception as exc:  # noqa: BLE001 - ein kaputtes Bild kippt keinen Lauf
+    except Exception as exc:  # noqa: BLE001
         log.debug("Bild konnte nicht abgelegt werden (%s): %s", url, exc)
         z["schreibfehler"] += 1
         return z

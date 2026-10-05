@@ -81,10 +81,7 @@ def test_themen_sind_keine_betreiber(tmp_path):
     cfg = load_config(_projekt(tmp_path))
 
     assert [op.name for op in cfg.operators] == ["Example Telco"]
-    # Kein Themenschluessel taucht als Region auf ...
     assert not any(is_theme_key(k) for k in cfg.region_names)
-    # ... aber bereich_names kennt beides, denn jedes Themenfeld bekommt einen
-    # eigenen Analysten wie eine Region.
     assert set(cfg.bereich_names) == set(cfg.region_names) | set(cfg.theme_names)
     assert not (set(cfg.region_names) & set(cfg.theme_names))
 
@@ -130,7 +127,6 @@ def test_collect_all_nimmt_themenquellen_mit(tmp_path, monkeypatch):
         "thema:regulierung",
         "tech_watch",
     )
-    # Betreiber- und Fachpressequellen laufen unveraendert weiter
     assert ("https://example.com/feed", "europe", "operator") in gesehen
     assert ("https://presse.example/feed", "global", "industry_news") in gesehen
     assert len(items) == len(results) == 5

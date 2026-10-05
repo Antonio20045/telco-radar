@@ -86,9 +86,6 @@ def main() -> int:
         print("\n--trocken: Bericht nicht geaendert.")
         return 0
 
-    # Das Laufprotokoll muss mitziehen. Sonst steht auf transparenz.html
-    # weiter "31 von 40 Meldungen mit Bild", waehrend die Seite 147 zeigt -
-    # genau die Sorte Zahl, die dieses Projekt nicht dulden darf.
     phasen = ((bericht.get("run") or {}).get("phases")) or []
     for phase in phasen:
         if phase.get("name") == "Bilder":

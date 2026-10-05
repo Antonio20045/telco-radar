@@ -60,8 +60,6 @@ def dienst(monkeypatch):
 
 def _anmeldung(klient, **kw):
     nonce = klient.get("/form-token").json()["nonce"]
-    # Die Nonce hat ein MINDESTALTER von zwei Sekunden. Statt zu warten wird
-    # sie mit einem Ausstellungszeitpunkt in der Vergangenheit gebaut.
     nonce = tokens.schreibe(KEY, tokens.ZWECK_NONCE, {}, jetzt=JETZT - 30)
     koerper = {
         "email": "vorname@beispiel.test",
@@ -76,9 +74,6 @@ def _anmeldung(klient, **kw):
     }
     koerper.update(kw)
     return klient.post("/subscribe", json=koerper)
-
-
-# ==============================================================  Token  ====
 
 
 def test_ein_verfaelschtes_token_faellt_durch():
@@ -177,9 +172,6 @@ def test_die_nutzlast_ueberlebt_den_umweg():
     assert {k: zurueck[k] for k in daten} == daten
 
 
-# =========================================================  form-token  ====
-
-
 def test_form_token_liefert_eine_pruefbare_nonce(dienst):
     antwort = dienst.get("/form-token")
     assert antwort.status_code == 200
@@ -193,9 +185,6 @@ def test_form_token_liefert_eine_pruefbare_nonce(dienst):
     )
     assert "iat" in daten
     assert antwort.headers["Referrer-Policy"] == "no-referrer"
-
-
-# ==========================================================  subscribe  ====
 
 
 def test_eine_saubere_anmeldung_loest_send_doi_aus(dienst):
@@ -285,16 +274,13 @@ def test_ip_und_browser_reisen_im_token_mit(dienst):
         max_alter=tokens.TTL_BESTAETIGUNG,
     )
     assert daten["ip_hmac"] and daten["ua_hmac"] and daten["addr_hmac"]
-    # ... und zwar als HMAC mit Pepper, nicht als blanker Hash und erst recht
-    # nicht im Klartext. Ein blanker SHA-256 ueber eine IPv4 ist auf einem
-    # Notebook in Sekunden zurueckgerechnet.
     import hashlib
+
     from telco_radar.newsletter.subscription import adress_kennwert
 
     assert all(len(daten[f]) == 64 for f in ("ip_hmac", "ua_hmac", "addr_hmac"))
     assert daten["addr_hmac"] == adress_kennwert(PEPPER, "vorname@beispiel.test")
     assert daten["addr_hmac"] != hashlib.sha256(b"vorname@beispiel.test").hexdigest()
-    # Die Adresse selbst steht NUR im Feld `email` - nirgends sonst.
     ohne_email = {k: v for k, v in daten.items() if k != "email"}
     assert "beispiel.test" not in json.dumps(ohne_email)
 
@@ -363,9 +349,6 @@ def test_die_domainliste_weist_neutral_ab(dienst, monkeypatch):
     assert len(dienst.gesendet) == 1
 
 
-# ============================================================  confirm  ====
-
-
 def test_confirm_loest_das_ereignis_aus_und_bestaetigt(dienst):
     _anmeldung(dienst)
     token = dienst.gesendet[0][1]["token"]
@@ -397,9 +380,6 @@ def test_das_token_steht_im_pfad_und_nicht_in_der_query(dienst):
     _anmeldung(dienst)
     url = dienst.gesendet[0][1]["confirm_url"]
     assert "?" not in url and "/confirm/" in url
-
-
-# ========================================================  unsubscribe  ====
 
 
 def test_unsubscribe_bestaetigt_sofort(dienst):
@@ -436,9 +416,6 @@ def test_ein_abmeldelink_laeuft_nicht_ab(dienst):
         jetzt=JETZT - 3 * 365 * 24 * 3600,
     )
     assert "Abgemeldet" in dienst.get(f"/unsubscribe/{alt}").text
-
-
-# ============================  die drei tragenden Zusicherungen  ===========
 
 
 def test_der_dienst_schreibt_nichts_auf_die_platte(dienst, tmp_path, monkeypatch):
@@ -545,9 +522,6 @@ def test_alle_antworten_tragen_die_sicherheitskopfzeilen(dienst):
         assert kopf["Cache-Control"] == "no-store"
 
 
-# =========================================================  IP-Bremse  =====
-
-
 def test_die_bremse_vergisst_nach_dem_fenster():
     b = IPBremse(erlaubt=2, fenster=100)
     assert b.erlaubt_jetzt("a", jetzt=0)
@@ -571,21 +545,6 @@ def test_die_bremse_waechst_nicht_unbegrenzt():
         b.erlaubt_jetzt(f"ip-{i}", jetzt=i)
     assert len(b._spuren) <= 50
 
-
-# ================================================================  CORS  ====
-# Die Seite und dieser Dienst liegen auf VERSCHIEDENEN Hosts
-# (telco-radar.onrender.com gegen telco-radar-signup.onrender.com). Jeder
-# Formularaufruf ist damit cross-origin, und ohne die Middleware ist das
-# Formular im Browser tot, waehrend der Dienst per curl korrekt antwortet -
-# gemessen am 13.08.2026 auf der Live-Instanz:
-#
-#   GET  /form-token   -> 200, aber ohne `Access-Control-Allow-Origin`
-#   OPTIONS /subscribe -> 405, der Preflight faellt durch
-#
-# Die drei Tests hier schicken deshalb einen `Origin`-Header und pruefen die
-# ANTWORTKOPFZEILEN. Ein Test, der einfach POSTet, ist gruen, egal wie die
-# Middleware steht: TestClient spricht denselben Origin und erzwingt CORS
-# ueberhaupt nicht. Genau daran ist der Fehler vorbeigekommen.
 
 EIGENE_SEITE = "https://telco-radar.onrender.com"
 

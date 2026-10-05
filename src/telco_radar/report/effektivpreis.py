@@ -47,7 +47,6 @@ from typing import Optional
 from ..tarif_model import Preisphase, Tarif
 from ..tco_model import phasensumme as _phasensumme
 
-# Der gemeinsame Nenner jedes Vergleichs. Siehe Modul-Docstring.
 VERGLEICHSMONATE = 24
 DROSSEL_UNBRAUCHBAR_KBIT = 1000
 
@@ -58,7 +57,7 @@ class Qualitaetsflag:
 
     schluessel: str
     text: str
-    gut: Optional[bool] = None  # True gut, False schlecht, None neutral
+    gut: Optional[bool] = None
 
 
 @dataclass
@@ -102,9 +101,6 @@ def _flags(tarif: Tarif) -> list[Qualitaetsflag]:
         flags.append(Qualitaetsflag("volumen", f"{menge} GB Datenvolumen", None))
 
     if tarif.drossel_down is not None:
-        # Unter 1 MBit/s ist die Verbindung fuer die meisten Anwendungen
-        # unbrauchbar - das ist der Unterschied zwischen "langsamer" und
-        # "vorbei", und er gehoert neben den Preis.
         hart = tarif.drossel_down < DROSSEL_UNBRAUCHBAR_KBIT
         wert = (
             f"{tarif.drossel_down / 1000:g} MBit/s"
@@ -121,11 +117,6 @@ def _flags(tarif: Tarif) -> list[Qualitaetsflag]:
     if tarif.laufzeit_monate == 0:
         flags.append(Qualitaetsflag("laufzeit", "Ohne Mindestlaufzeit", True))
     elif tarif.laufzeit_monate:
-        # S-Q4: "Mindestlaufzeit", nicht "Bindung" - die Seite rechnet ueber
-        # 24 Monate (ihren Horizont), und ein blosses "N Monate Bindung"
-        # waere von derselben Zahl nicht mehr davon zu unterscheiden. Die
-        # Mindestlaufzeit ist die des Tarifs, das Wort dafuer steht auch im
-        # Abschnitt "Was diese Zahlen nicht koennen".
         flags.append(
             Qualitaetsflag(
                 "laufzeit", f"{tarif.laufzeit_monate} Monate Mindestlaufzeit", False
@@ -156,9 +147,6 @@ def rechne(
     else:
         ergebnis.bestandteile["Monatsentgelte"] = grund
 
-    # Fehlt eine Komponente, wird sie als LUECKE vermerkt und nicht als 0
-    # angenommen. "Nicht bekannt" und "kostenlos" sind zwei verschiedene
-    # Aussagen, und nur eine davon ist belegt.
     if tarif.anschlusspreis is not None:
         ergebnis.bestandteile["Anschlusspreis"] = tarif.anschlusspreis
     elif tarif.anschlusspreis_nach_erstattung is not None:
@@ -185,11 +173,6 @@ def rechne(
         else:
             ergebnis.preis_je_gb = round(ergebnis.monatlich / tarif.datenvolumen_gb, 3)
     return ergebnis
-
-
-# --------------------------------------------------------------------------- #
-# Die Fair-Value-Linie der Positionskarte
-# --------------------------------------------------------------------------- #
 
 
 def regression(punkte: list[tuple[float, float]]) -> Optional[tuple[float, float]]:

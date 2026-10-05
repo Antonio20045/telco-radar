@@ -44,19 +44,11 @@ import re
 from dataclasses import dataclass, field
 from typing import Iterable, Optional
 
-# Verfuegbarkeitsstufen einer Listung.
-#
-# "ausgelistet" steht bewusst NICHT darunter, obwohl der Auftragstext es in
-# derselben Aufzaehlung nennt: Auslistung ist kein Zustand, den eine
-# Produktseite meldet, sondern eine Schlussfolgerung aus MEHREREN Laeufen
-# (analyze/geraete_store.py, Zwei-Stufen-Logik). Waeren beide dasselbe Feld,
-# machte ein "Voruebergehend nicht lieferbar" das Geraet zum Portfolio-Ende -
-# und genau davor warnt Teil F des Auftrags.
 VERFUEGBARKEITEN = (
     "lieferbar",
     "vorbestellbar",
-    "ausverkauft",  # dauerhaft weg beim Haendler, Seite lebt noch
-    "nicht_lieferbar",  # voruebergehend, Nachschub angekuendigt
+    "ausverkauft",
+    "nicht_lieferbar",
     "unbekannt",
 )
 
@@ -66,16 +58,8 @@ STATUS_AKTIV = "aktiv"
 STATUS_VERMUTLICH = "vermutlich ausgelistet"
 STATUS_AUSGELISTET = "ausgelistet"
 
-# Belegstufen, gleiche Skala wie collect/lieferzeit.py:
-#   hoch    strukturierte Daten (ld+json, API)
-#   mittel  gezielter Selektor / JSON-Endpunkt der Seite
-#   niedrig aus dem Fliesstext geklaubt
 CONFIDENCE = ("hoch", "mittel", "niedrig")
 
-# Speicherstufen, die es bei Smartphones wirklich gibt. Der Filter ist die
-# billigste und zuverlaessigste Abgrenzung gegen den Arbeitsspeicher: "12 GB
-# RAM / 512 GB" nennt zwei Zahlen mit derselben Einheit, aber nur eine davon
-# ist eine Speicherstufe.
 _SPEICHER_STUFEN = (32, 64, 128, 256, 512, 1024, 2048)
 
 _UMLAUTE = str.maketrans(
@@ -100,28 +84,6 @@ _UMLAUTE = str.maketrans(
     }
 )
 
-# Woerter, die einen Titel zu Zubehoer machen. Eine Kategorieseite eines
-# Elektronikhaendlers mischt Huellen, Schutzglas und Ladekabel unter die
-# Geraete; ohne diesen Filter stuende eine 9,99-Euro-Huelle als Preispunkt
-# des iPhone 17 Pro Max in der Positionskarte. Geprueft wird WORTWEISE - ein
-# Teilkettenfilter haette "Showcase" zu "Case" gemacht (dieselbe Lehre wie
-# beim CT-Rauschfilter, CLAUDE.md §6).
-#
-# ZWEI LISTEN, und die Trennung ist teuer erkauft. Eine einzige, breite Liste
-# hat im Review echte Geraete verworfen:
-#     "Apple iPhone 16 Pro Max 256GB Titanschwarz, ohne Netzteil"
-#     "Motorola moto g85 5G 256 GB, 5000 mAh Akku"
-#     "Xiaomi 15 Ultra 512GB, 6,73 Zoll AMOLED Display"
-# "ohne Netzteil" ist im deutschen Handel eine Pflichtangabe, "Akku" und
-# "Display" stehen regelmaessig in Mittelklassetiteln. Deshalb:
-#
-#   _ZUBEHOER_IMMER  Woerter, die in keinem Geraetetitel vorkommen. Sie
-#                    verwerfen den Titel, wo immer sie stehen.
-#   _ZUBEHOER_DAVOR  Woerter, die ein Geraet BEGLEITEN koennen. Sie verwerfen
-#                    nur, wenn sie VOR dem Modellnamen stehen - so heisst
-#                    naemlich ein Zubehoertitel ("Ladekabel USB-C fuer
-#                    iPhone 17"), waehrend die Beigabe hinten steht
-#                    ("iPhone 16 128 GB inkl. Ladekabel").
 _ZUBEHOER_IMMER = frozenset(
     """
 huelle huellen huellenset case cases cover schutzhuelle schutzglas panzerglas
@@ -137,25 +99,11 @@ ersatzakku ersatzdisplay folie aufkleber skin simkarte
 """.split()
 )
 
-# Woerter, die aus einem Modellnamen ein ANDERES Modell machen. Steht so ein
-# Wort direkt hinter einem Katalogtreffer, ohne selbst dazuzugehoeren, ist die
-# Zuordnung nicht belegbar - dann wird nichts zugeordnet.
-#
-# Der Fall, der das erzwungen hat: "Google Pixel 10 Pro Fold 256 GB" traf den
-# Katalogeintrag "Pixel 10 Pro". Beide Geraete beim selben Haendler ergaben
-# dieselbe listung_id, und weil sie rund 800 Euro auseinanderliegen, schrieb
-# die Preishistorie bei JEDEM Lauf zwei Aenderungspunkte hin und zurueck - eine
-# dauerhafte Saegezahnkurve, die wie ein wilder Preiskampf aussieht.
 _MODELLZUSATZ = frozenset(
     """
 pro max plus ultra mini air fold flip lite neo note fe edge se xl active
 """.split()
 )
-
-
-# --------------------------------------------------------------------------
-# Normalisierung
-# --------------------------------------------------------------------------
 
 
 def normalisiere(text: str) -> str:
@@ -187,26 +135,16 @@ def wortmarken(text: str) -> list[str]:
     roh = re.sub(r"[^a-z0-9]+", " ", vorbereitet.lower().translate(_UMLAUTE))
     marken: list[str] = []
     for wort in roh.split():
-        # Buchstaben->Ziffer trennen, Ziffer->Buchstabe nicht.
         for teil in re.findall(r"[a-z]+|[0-9]+[a-z]*", wort):
             marken.append(teil)
     return marken
 
 
-# Binnenmajuskel: "ProMax" -> "Pro Max". Der Vorname bleibt ab zwei Zeichen -
-# "iPhone" darf NICHT zu "i Phone" zerfallen, sonst faende der Katalog seine
-# eigenen Modellnamen nicht mehr. Gilt fuer Katalog und Titel gleichermassen,
-# ist also folgenlos, solange sie konsistent ist.
 _BINNENMAJUSKEL = re.compile(r"(?<=[a-z]{2})(?=[A-Z][a-z])")
 
 
 def _binnenmajuskel(text: str) -> str:
     return _BINNENMAJUSKEL.sub(" ", text or "")
-
-
-# --------------------------------------------------------------------------
-# Die IDs
-# --------------------------------------------------------------------------
 
 
 def device_id(hersteller: str, modell: str) -> str:
@@ -248,16 +186,9 @@ def listung_id(sku: str, anbieter: str) -> str:
     return f"{normalisiere(anbieter)}--{sku}"
 
 
-# --------------------------------------------------------------------------
-# Speicher und Farbe aus einem Titel
-# --------------------------------------------------------------------------
-
 _SPEICHER_RE = re.compile(r"(\d{1,4})\s*(gb|tb)\b", re.IGNORECASE)
 _RAM_WORT = re.compile(r"\b(ram|arbeitsspeicher)\b", re.IGNORECASE)
 _ARBEITSSPEICHER_WORT = re.compile(r"\barbeitsspeicher\b", re.IGNORECASE)
-# Trennzeichen zwischen zwei Angaben desselben Titels. Nur bis dahin wird
-# rueckwaerts nach "Arbeitsspeicher" gesucht - sonst faellt in
-# "12 GB RAM / 512 GB" auch die zweite Zahl, weil das RAM davor steht.
 _TRENNER = re.compile(r"[/,|·+():\[\]]")
 
 
@@ -306,10 +237,6 @@ def speicher_aus_titel(
     text = titel or ""
     vorheriges_ende = 0
     for m in _SPEICHER_RE.finditer(text):
-        # Die Grenze der Rueckwaertssuche wandert mit JEDER Groessenangabe
-        # weiter, auch mit einer verworfenen: "12 GB RAM 512 GB" nennt die
-        # zwei Angaben ohne Trennzeichen hintereinander, und ohne diese
-        # Grenze faende die zweite das "RAM" der ersten.
         ab, vorheriges_ende = vorheriges_ende, m.end()
         wert = int(m.group(1))
         if m.group(2).lower() == "tb":
@@ -321,8 +248,6 @@ def speicher_aus_titel(
         gefunden.add(wert)
     if len(gefunden) == 1:
         return gefunden.pop()
-    # Mehrdeutig: nur die im Katalog gepflegten Stufen zaehlen noch. Bleibt
-    # auch dann mehr als eine uebrig, wird nichts geraten.
     eng = gefunden & bevorzugt
     return eng.pop() if len(eng) == 1 else None
 
@@ -336,26 +261,6 @@ def normalisiere_farbe(roh: str, tabelle: dict) -> Optional[str]:
     return tabelle.get(normalisiere(roh))
 
 
-# Ein Kuerzel am Ende einer Farbschreibweise ist keine eigene Farbe. o2
-# fuehrt dasselbe Galaxy S26 FE als "pistachio" und "pistachio bk" - zwei
-# Adressen, 144 Euro Abstand, beide ohne Vertrag. Als zwei Farben gelesen ist
-# das ein legitimer Farbaufschlag und der Vergleich nimmt kommentarlos die
-# 667 Euro; als EINE Farbe gelesen ist es ein Widerspruch, den die
-# Doppelpreisregel faengt.
-#
-# Warum das hier steht und nicht in `config/farben.yaml`: eine neue
-# Farbzuordnung aendert die `sku_id`. Der Altbestand gaelte als ausgelistet
-# und entstuende als neue Listung - eine Datenwanderung, die Listungsdauer
-# und Preisverlauf jedes betroffenen Geraets auf null zuruecksetzt. Der
-# Schluessel wird deshalb beim LESEN gerechnet und beruehrt den Store nicht.
-#
-# Gestrichen wird nur ein Kuerzel OHNE VOKAL. Die erste Fassung strich jedes
-# Anhaengsel bis drei Zeichen, und das trifft echte Farbwoerter: "titan rot"
-# wurde "titan", "ocean ice" wurde "ocean", "midnight sky" wurde "midnight".
-# Seit der Doppelpreis ohne Spannengrenze entfernt, kostet so eine
-# Verwechslung BEIDE Zeilen. Ein Kuerzel ohne Vokal ist in keiner Sprache ein
-# Farbwort; "bk", "gr", "blk" fallen, "rot", "red", "ice", "sky", "jet"
-# bleiben stehen.
 _VOKALE = set("aeiouyäöü")
 
 
@@ -428,7 +333,7 @@ def farbe_aus_titel(titel: str, tabelle: dict) -> tuple[str, Optional[str]]:
             continue
         nachbarn = [treffer.group("vor"), treffer.group("nach")]
         if any(n and normalisiere(n) in farbwoerter for n in nachbarn):
-            continue  # Bruchstueck einer laengeren Farbe
+            continue
         kern = re.search(
             r"[\s\-]*".join(re.escape(w) for w in woerter), titel, re.IGNORECASE
         )
@@ -436,26 +341,6 @@ def farbe_aus_titel(titel: str, tabelle: dict) -> tuple[str, Optional[str]]:
     return ("", None)
 
 
-# Ein gebrauchtes Geraet ist nicht dasselbe Produkt wie ein neues, auch wenn
-# der Modellname derselbe ist - freenet fuehrt bereits eine eigene
-# "-refurbished"-Strecke. Ohne diese Dimension teilten sich beide dieselbe
-# listung_id, und der Preisverlauf sprang zwischen Neu- und Gebrauchtpreis.
-#
-# Mehrwortmuster stehen BINDESTRICHVERBUNDEN ("wie-neu"), weil sie ueber
-# `normalisiere` laufen - dort wird jede Folge von Nicht-Alphanumerik zu
-# einem Bindestrich. Als "wie neu" geschrieben landete das Muster im
-# Einzelwort-Zweig und wurde gegen eine Menge einzelner Wortmarken geprueft,
-# in der ein Zwei-Wort-String nie vorkommen kann: die Zeile stand da und
-# konnte nicht treffen.
-#
-# "erneuert" ist am 29.08.2026 dazugekommen und war der teuerste Eintrag der
-# Liste. o2 kennzeichnet dieselbe Gebrauchtstrecke in ZWEI Schreibweisen -
-# "Apple iPhone 14 (gebraucht) ..." und "Apple iPhone 14 Pro (erneuert) ...".
-# Acht von zehn Geraeten trugen "(gebraucht)" und waren richtig erkannt; die
-# zwei mit "(erneuert)" liefen als NEUgeraet mit, unterboten mit ihrem
-# Gebrauchtpreis den Vodafone-Neupreis und standen als Sieger in der
-# Vergleichstabelle. Ein Gebrauchtpreis, der einen Neupreis schlaegt, ist
-# dieselbe Fehlerklasse wie die Buendelzahl, die einen Geraetepreis schlaegt.
 _ZUSTAENDE = (
     (
         "refurbished",
@@ -477,11 +362,6 @@ _ZUSTAENDE = (
 )
 
 
-# Kennzeichen, die im deutschen Handel je nach Haendler Verschiedenes heissen.
-# Sie auf "refurbished" zu raten waere genauso falsch wie sie als neu zu
-# fuehren - beides ist eine Aussage, die die Quelle nicht deckt. Sie ergeben
-# deshalb "unbekannt", und "unbekannt" faellt aus Preisvergleich und
-# Preisgrafik heraus (siehe VERGLEICHBARE_ZUSTAENDE).
 _UNSICHER = (
     "neuwertig",
     "retoure",
@@ -492,21 +372,10 @@ _UNSICHER = (
     "geprueft-und-zertifiziert",
 )
 
-# Ab welcher Laenge ein Zustandsmarker auch gebeugt treffen darf. Acht
-# Zeichen halten "erneuert" (8) und "gebraucht" (9) drin und "refurb" (6)
-# draussen.
 _BEUGBAR_AB = 8
 
-# Welche Zustaende in einer Preisaussage GEGENEINANDER stehen duerfen. Neu-,
-# Gebraucht- und B-Warenpreis sind drei verschiedene Preise; die Vergleichs-
-# tabelle und die Positionskarte zeigen nur den ersten.
 VERGLEICHBARE_ZUSTAENDE = ("", "neu")
 
-# Alle gueltigen Werte von `Listung.zustand`. Seit der Zustand ueber die
-# SICHTBARKEIT in Vergleich und Preisgrafik entscheidet (fail closed), laesst
-# ein Adapter, der "Neu" oder "new" liefert, seine Listungen stillschweigend
-# aus beiden Preisaussagen fallen - ohne Log, ohne Befund im Pruefbericht.
-# Deshalb wird der Wert geprueft wie `verfuegbarkeit` und `anbieter_typ`.
 ZUSTAENDE = ("neu", "refurbished", "b-ware", "unbekannt")
 
 
@@ -528,10 +397,6 @@ def serie_aus_modell(modell: str) -> str:
     selbst die Reihe ("iPhone Air").
     """
     teile = []
-    # Der Bindestrich trennt wie ein Leerzeichen: "Pixel-11 Pro" ergab sonst
-    # die Baureihe "Pixel-11 Pro", also eine eigene Reihe je Variante - dann
-    # ist jede Variante ihre eigene "aktuelle Generation", der Filter wird
-    # zum No-Op und `portfolio_tiefe` zaehlt Varianten als Jahrgaenge.
     for wort in re.split(r"[\s\-]+", (modell or "").strip()):
         if not wort:
             continue
@@ -541,17 +406,9 @@ def serie_aus_modell(modell: str) -> str:
                 teile.append(treffer.group(1))
             break
         teile.append(wort.strip("()"))
-    # Faellt nichts ab - ein Name, der mit einer Ziffer beginnt, oder einer
-    # ganz ohne Ziffer -, ist der Name SELBST die Reihe. Das ist der ehrliche
-    # Rueckfall: eine geratene Reihe wuerde zwei Produktlinien zusammenwerfen,
-    # und das ist teurer als eine Reihe je Modell.
     return " ".join(teile).strip() or (modell or "").strip()
 
 
-# Womit die Teile eines mehrteiligen Kennzeichens im Text verbunden sein
-# duerfen. Der Handel schreibt dasselbe Wort als "B-Ware", "B Ware" und
-# "2. Wahl"; `normalisiere()` faltet all das ohnehin auf einen Bindestrich,
-# die Wortliste in `_ZUSTAENDE` steht deshalb in dieser einen Schreibweise.
 _ZUSTAND_TRENNER = r"[\s._\-]+"
 
 
@@ -605,9 +462,6 @@ def ohne_zustandswort(farbe: str) -> str:
     roh = (farbe or "").strip()
     if not roh:
         return roh
-    # Auch die UNKLAREN Kennzeichen: "schwarz neuwertig" ergibt zwar
-    # `zustand="unbekannt"`, aber "neuwertig" ist trotzdem keine Farbe und
-    # hat in der sku_id nichts verloren.
     woerter = [w for _, gruppe in _ZUSTAENDE for w in gruppe] + list(_UNSICHER)
     rest = roh
     getroffen = 0
@@ -619,14 +473,8 @@ def ohne_zustandswort(farbe: str) -> str:
             flags=re.IGNORECASE,
         )
         getroffen += treffer
-    # KEIN Kennzeichen gefunden: die Farbe geht unveraendert zurueck. Siehe
-    # Docstring - alles andere waere eine Aenderung an Daten, ueber die diese
-    # Funktion nichts weiss.
     if not getroffen:
         return roh
-    # Was ein gestrichenes Wort an Klammern und Kommas zuruecklaesst, ist
-    # keine Farbe: "Schwarz (gebraucht)" wurde sonst zu "Schwarz ( )" - und
-    # landete genau so im Farbbericht, den diese Funktion sauber halten soll.
     rest = re.sub(r"\(\s*\)|\[\s*\]", " ", rest)
     rest = re.sub(r"\s+", " ", rest).strip(" -,;/()[]")
     return rest or roh
@@ -656,15 +504,6 @@ def zustand_aus_titel(titel: str) -> str:
             return f"-{wort}-" in f"-{text}-"
         if wort in marken:
             return True
-        # Gebeugte Formen. Ein Kategoriepfad heisst "Gebrauchte Handys",
-        # nicht "gebraucht", und eine Rubrik "Erneuerte Geraete" - seit der
-        # Zustand auch aus dem Pfad gelesen wird, gehen sonst genau die
-        # Felder leer aus, wegen derer er dort gelesen wird.
-        #
-        # Angehaengt werden nur die deutschen Endungen, und nur an Marker ab
-        # `_BEUGBAR_AB` Zeichen. Ohne die Laengengrenze faenge "refurb" das
-        # Wort "refurbe" - und vor allem waere die Regel eine Praefixsuche,
-        # die frueher oder spaeter ein harmloses laengeres Wort trifft.
         if len(wort) < _BEUGBAR_AB:
             return False
         return any(
@@ -675,41 +514,22 @@ def zustand_aus_titel(titel: str) -> str:
         for wort in woerter:
             if trifft(wort):
                 return name
-    # Erst NACH den eindeutigen Kennzeichen: "iPhone 17 neuwertig
-    # refurbished" ist refurbished, nicht unbekannt. Eine eindeutige Angabe
-    # wird durch eine unklare daneben nicht wieder unklar.
     for wort in _UNSICHER:
         if trifft(wort):
             return "unbekannt"
     return "neu"
 
 
-# --------------------------------------------------------------------------
-# Geraet und Katalog
-# --------------------------------------------------------------------------
-
-
 @dataclass
 class Geraet:
     hersteller: str
     modell: str
-    marktstart: str = ""  # YYYY-MM-DD, Marktstart des Modells
+    marktstart: str = ""
     generation: Optional[int] = None
-    # Modellname des Vorgaengers, wie er im Katalog steht. Das Feld, an dem
-    # die ganze Lifecycle-Auswertung haengt: ohne gepflegte Kette gibt es
-    # keine Nachfolger-Analyse.
     vorgaenger: str = ""
-    segment: str = ""  # flagship | premium | mid | entry
+    segment: str = ""
     speicher: list = field(default_factory=list)
     aliase: list = field(default_factory=list)
-    # E4-Auto-Erkennung: ISO-Datum des Laufs, der diesen Eintrag aus einem
-    # STRUKTURIERTEN Live-Namen angelegt hat (Telekom `name`, o2
-    # `description`, Vodafone `modelName` - nie aus einem Haendlertitel).
-    # Leer = Hand-Eintrag aus config/geraete_katalog.yaml. Auto-Eintraege
-    # leben im STATE (data/state/geraete_katalog_auto.json); uebernimmt sie
-    # ein Mensch in die Config, schlaegt der Hand-Eintrag beim Laden. Die
-    # device_id bleibt darueber stabil - sie haengt an Hersteller+Modell,
-    # nicht am Weg des Eintrags in den Katalog.
     auto: str = ""
 
     @property
@@ -743,10 +563,6 @@ class Katalog:
                 )
             gesehen[g.device_id] = f"{g.hersteller} {g.modell}"
         self._index = {g.device_id: g for g in self.geraete}
-        # Erkennungstabelle: Wortmarkenfolge -> Geraet. Laengste zuerst,
-        # damit "iPhone 17 Pro Max" vor "iPhone 17 Pro" und "iPhone 17"
-        # greift - ohne diese Reihenfolge liefe die ganze Pro-Max-Klasse
-        # unter dem kuerzesten Namen.
         muster: list[tuple[list, Geraet]] = []
         belegt: dict[tuple, Geraet] = {}
         for g in self.geraete:
@@ -758,12 +574,7 @@ class Katalog:
                 vorher = belegt.get(schluessel)
                 if vorher is not None:
                     if vorher.device_id == g.device_id:
-                        continue  # derselbe Eintrag, doppelt genannt
-                    # Zwei VERSCHIEDENE Geraete mit derselben Wortmarkenfolge:
-                    # die Erkennung waere ab hier zufaellig. Genau so ist der
-                    # Alias "Galaxy S25+" entstanden - das Pluszeichen
-                    # ueberlebt die Normalisierung nicht, und der Alias fiel
-                    # mit dem Modell "Galaxy S25" zusammen.
+                        continue
                     raise ValueError(
                         f"Schreibweise {s!r} ist nach der Normalisierung nicht "
                         f"unterscheidbar: {vorher.hersteller} {vorher.modell} "
@@ -801,7 +612,7 @@ class Katalog:
             schluessel = tuple(marken)
             vorher = belegt.get(schluessel)
             if vorher is not None and vorher is not geraet:
-                return False  # nicht unterscheidbar, siehe __post_init__
+                return False
             belegt[schluessel] = geraet
             neu.append((marken, geraet))
         self.geraete.append(geraet)
@@ -910,20 +721,15 @@ def erkenne_geraet(titel: str, katalog: Katalog) -> Optional[Geraet]:
     marken = wortmarken(titel)
     if not marken or any(m in _ZUBEHOER_IMMER for m in marken):
         return None
-    for nadel, geraet in katalog._muster:  # nach Laenge absteigend sortiert
+    for nadel, geraet in katalog._muster:
         for start in _fundstellen(marken, nadel):
             danach = marken[start + len(nadel) :]
             if danach and danach[0] in _MODELLZUSATZ:
-                continue  # der Titel meint ein anderes Modell
+                continue
             if _ist_zubehoer(marken, ab=start):
                 continue
             return geraet
     return None
-
-
-# --------------------------------------------------------------------------
-# SKU und Listung
-# --------------------------------------------------------------------------
 
 
 @dataclass
@@ -939,9 +745,6 @@ class Sku:
 _DATUM_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
-# Der Cent, um den eine Geldrechnung dieses Moduls danebenliegen darf.
-# Groesser gewaehlt waere die Rechenprobe keine Probe mehr, kleiner
-# scheiterte sie an der Rundung auf zwei Nachkommastellen (G26).
 TOLERANZ_EURO = 0.01
 
 
@@ -1105,18 +908,9 @@ class Listung:
     preis_mit_vertrag_ab: Optional[float] = None
     zuzahlung: Optional[float] = None
     tarif_referenz: str = ""
-    # WIE die Zahl in `preis_ohne_vertrag` zustande kommt. Bei o2 und der
-    # Telekom ist sie kein Barpreis, sondern die Summe aus Anzahlung und n
-    # Monatsraten - dieselbe Spalte, andere Groesse. Diese drei Felder sind
-    # die Kennzeichnung, und sie kommen aus der Quelle: `oneTimePrice`,
-    # `monthlyPrice` und die Ratenzahl aus dem Angebotsnamen. Wer sie leer
-    # laesst, behauptet nichts - dann steht die Zahl wie bisher da.
     anzahlung: Optional[float] = None
     monatsrate: Optional[float] = None
     laufzeit_monate: Optional[int] = None
-    # 0.0 heisst BELEGT null Prozent, None heisst unbekannt - der
-    # Unterschied, den `effektivpreis.py:33-39` fuer den Anschlusspreis
-    # schon macht: eine fehlende Angabe ist nicht dasselbe wie eine Null.
     zins_effektiv: Optional[float] = None
     verfuegbarkeit: str = "unbekannt"
     confidence: str = "mittel"
@@ -1124,13 +918,8 @@ class Listung:
     farbe_roh: str = ""
     farbe_normalisiert: Optional[str] = None
     ean: str = ""
-    zustand: str = "neu"  # neu | refurbished | b-ware | unbekannt
+    zustand: str = "neu"
     titel_roh: str = ""
-    # Die Einstiegsseite, auf der dieses Geraet gefunden wurde. Sie ist der
-    # Schluessel der Auslistungslogik: gealtert wird nur, was auf einer
-    # WIRKLICH GELESENEN Seite fehlte. Ohne dieses Feld ruecken bei jedem
-    # Teilausfall die Geraete der ausgefallenen Seite Richtung "ausgelistet"
-    # (dieselbe Falle wie promo_store.mark_stale/gepruefte_seiten).
     einstieg_url: str = ""
 
     def __post_init__(self):
@@ -1174,16 +963,8 @@ class Listung:
                 )
         if self.zins_effektiv is not None:
             self.zins_effektiv = float(self.zins_effektiv)
-            # Dieselbe Sicherung wie bei den Preisfeldern darueber. Ein
-            # negativer Effektivzins waere eine Ratenzahlung, bei der der
-            # Anbieter draufzahlt - im Zweifel ein Vorzeichenfehler in der
-            # Quelle, und der gehoert nicht unbemerkt auf die Seite.
             if self.zins_effektiv < 0:
                 raise ValueError(f"negativer zins_effektiv: {self.zins_effektiv}")
-        # Teil C4: "iPhone fuer 1 Euro" ist ohne den Tarif dahinter eine Zahl
-        # ohne Bedeutung. JEDE Buendelzahl braucht ihren Tarif - auch
-        # `preis_mit_vertrag_ab`, sonst waere sie das Schlupfloch, durch das
-        # der Lockpreis doch auf die Seite kaeme.
         for feld in ("zuzahlung", "preis_mit_vertrag_ab"):
             if (
                 getattr(self, feld) is not None
@@ -1314,24 +1095,9 @@ def lies_listung(
         farbe_roh, kanonisch = farbe_aus_titel(titel, farben)
 
     gid = geraet.device_id
-    # Der Zustand wird aus ALLEN verfuegbaren Signalen abgeleitet, nicht nur
-    # aus dem Titel: eine Quelle, die Farbe strukturiert liefert, traegt das
-    # Kennzeichen unter Umstaenden NUR dort ("grau erneuert"). Das Farbfeld
-    # gehoert deshalb in die Pruefung - ein Zustand, den nur eine Spalte
-    # kennt, ist trotzdem ein Zustand. `zustand_hinweis` traegt, was die
-    # Quelle sonst noch weiss: `itemCondition` aus dem ld+json, den
-    # Kategoriepfad, die Rubrik einer Gebrauchtstrecke.
     zustand = zustand_aus_feldern(titel, farbe_roh, zustand_hinweis, quelle_url)
-    # ERST lesen, DANN streichen: die Farbe ist bei manchen Quellen der
-    # einzige Traeger des Kennzeichens. Umgekehrt haette die Zerlegung das
-    # Signal geloescht, bevor es jemand gelesen hat.
     farbe_roh = ohne_zustandswort(farbe_roh) if farbe_roh else farbe_roh
     kanonisch = normalisiere_farbe(farbe_roh, farben) if farbe_roh else None
-    # Unbekannte Farbe: die Rohschreibweise traegt die ID. Der Preis dafuer
-    # ist, dass zwei unbekannte Schreibweisen derselben Farbe zwei SKUs
-    # ergeben - das ist ehrlicher als sie zusammenzuwerfen, und der
-    # Farbbericht am Seitenende sagt, welche Zeile in config/farben.yaml
-    # fehlt.
     sid = sku_id(gid, speicher_gb, kanonisch or farbe_roh or None, zustand)
 
     return Listung(

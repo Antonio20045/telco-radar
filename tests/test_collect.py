@@ -6,8 +6,6 @@ from telco_radar.collect.newsroom import parse_newsroom_html
 from telco_radar.collect.rss import parse_feed_bytes
 from telco_radar.config import Source
 
-# Sichtbar konstruierte Eingaben fuer die generischen RSS- und Newsroom-
-# Parser; alle Domains sind Beispieldomains.
 SAMPLE_FEED = """<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
@@ -120,7 +118,7 @@ def test_rss_tracking_params_do_not_change_id():
         url="https://telconews.test/2026/07/vodafone-esim-roaming-pass",
         source_name="S",
     )
-    assert items[0].id == clean.id  # utm_source stripped before hashing
+    assert items[0].id == clean.id
 
 
 def test_newsroom_parsing():
@@ -131,12 +129,10 @@ def test_newsroom_parsing():
     items = parse_newsroom_html(html, src, "europe", "Example Telco", "operator")
     titles = [i.title for i in items]
 
-    assert len(items) == 2  # external domain, short link, footer links skipped
+    assert len(items) == 2
     assert any("Unlimited 5G+" in t for t in titles)
     assert any("StreamCo" in t for t in titles)
-    # date extracted from URL path /2026/07/
     assert all(i.published is not None and i.published.year == 2026 for i in items)
-    # relative link resolved against source URL
     assert items[0].url.startswith("https://www.telco.test/")
 
 
@@ -149,13 +145,10 @@ def test_newsroom_respects_item_selector():
         item_selector="footer",
     )
     items = parse_newsroom_html(html, src, "europe", "Example Telco", "operator")
-    assert items == []  # footer links are all skip-hinted or too short
+    assert items == []
 
 
 def test_newsroom_item_selector_bypasses_url_keyword_heuristic():
-    # Some CMS card layouts (e.g. Presspage) use opaque slugs with no
-    # news/press/media keyword in the path - only a configured item_selector
-    # can tell these apart from navigation, since the URL heuristic can't.
     html = SAMPLE_CARD_NEWSROOM
     src = Source(
         type="newsroom_js",
@@ -177,12 +170,10 @@ def test_newsroom_item_selector_still_applies_skip_hints():
         item_selector="nav a",
     )
     items = parse_newsroom_html(html, src, "europe", "Example Telco", "operator")
-    assert items == []  # mailto: link is still skip-hinted even with a selector
+    assert items == []
 
 
 def test_newsroom_parses_ordinal_day_month_year_dates():
-    # UK-style press dates ("28th May 2026") appear as plain surrounding text,
-    # not in the URL - seen on threemediacentre.co.uk press-release cards.
     html = """
     <article><a href="/news/example-telco-launches-a-thing">Example Telco launches a thing</a>
       <span>Press release 28th May 2026</span></article>
@@ -233,7 +224,6 @@ def test_url_date_ignores_numeric_id_after_a_year_in_the_slug():
     from telco_radar.collect.newsroom import _date_from_url
 
     assert _date_from_url("https://x.test/detail/fifa-wm-2030-1116606") == (None, False)
-    # real date paths keep working
     assert _date_from_url("https://x.test/news/2026/07/31/foo") == (
         datetime(2026, 7, 31, tzinfo=timezone.utc),
         True,
@@ -265,7 +255,6 @@ def test_newsroom_reads_aem_datamodel_article_list():
         "https://www.optus.com.au/about/media-centre/media-releases/2026/07/world-first"
     )
     assert items[0].published is not None
-    # the printed label wins over curatorAsDate (which is a day earlier in UTC)
     assert items[0].published.date().isoformat() == "2026-07-07"
     assert items[0].summary == "A trial."
 
@@ -277,16 +266,15 @@ def test_dates_in_local_languages_are_parsed():
     from telco_radar.collect.newsroom import _date_from_text
 
     cases = {
-        "24 Temmuz 2026": (2026, 7, 24),  # tr
-        "30 de julho de 2026": (2026, 7, 30),  # pt
-        "5 Agustus 2026": (2026, 8, 5),  # id
-        "1. Oktober 2026": (2026, 10, 1),  # de
-        "3 avril 2026": (2026, 4, 3),  # fr
-        "20 Jul 2026": (2026, 7, 20),  # en, unveraendert
+        "24 Temmuz 2026": (2026, 7, 24),
+        "30 de julho de 2026": (2026, 7, 30),
+        "5 Agustus 2026": (2026, 8, 5),
+        "1. Oktober 2026": (2026, 10, 1),
+        "3 avril 2026": (2026, 4, 3),
+        "20 Jul 2026": (2026, 7, 20),
     }
     for text, (y, m, d) in cases.items():
         assert _date_from_text(text) == datetime(y, m, d, tzinfo=timezone.utc), text
-    # a word that is not a month must stay unparsed
     assert _date_from_text("15 Werke 2026") is None
 
 
@@ -345,10 +333,8 @@ def test_leading_date_label_is_stripped_from_title():
         )
         == "Students from Kiambu National Polytechnic gain skills"
     )
-    # a year inside a real headline must not be treated as a label
     headline = "Vodafone launches 5G in 2026 across ten more cities right now"
     assert _strip_leading_date_label(headline, when) == headline
-    # undated items keep their title - the label is the only date they have
     assert (
         _strip_leading_date_label("Jul 31, 2026 Something happened here ok", None)
         == "Jul 31, 2026 Something happened here ok"
@@ -412,7 +398,7 @@ def test_rss_refetches_when_the_body_is_not_a_feed():
     finally:
         http_mod.fetch, rss_mod._PARSE_RETRY_WAIT = original_fetch, original_wait
 
-    assert len(calls) == 2  # first body was not a feed
+    assert len(calls) == 2
     assert [i.title for i in items] == ["FCC opens C-band proceeding"]
 
 
@@ -448,16 +434,8 @@ def test_parent_site_never_widens_to_a_public_suffix():
 
     assert _parent_site("investors.att.com") == "att.com"
     assert _parent_site("www.tim.com.br") == "tim.com.br"
-    assert _parent_site("tim.com.br") == ""  # would be com.br
+    assert _parent_site("tim.com.br") == ""
     assert _parent_site("att.com") == ""
-
-
-# ---------------------------------------------------- Datum aus dem Link
-# Ein Feed ohne pubDate ist kein Sonderfall: der RSS-Feed der
-# Bundesnetzagentur - der Regulierer des Marktes, in dem die Kollegin
-# arbeitet - traegt weder pubDate noch dc:date. Alle 50 Meldungen galten
-# damit als undatiert, und undatiert heisst faktisch unsichtbar: sie
-# sortieren ans Ende und der Abnahme-Check lehnt die Quelle zu Recht ab.
 
 
 def test_datum_kommt_notfalls_aus_dem_link():

@@ -65,21 +65,13 @@ from dataclasses import dataclass
 
 log = logging.getLogger(__name__)
 
-# Strichstaerke in Pixeln. Die eigene Linie traegt mehr Gewicht - Rot ist
-# auf diesem Portal die Farbe des eigenen Angebots, und mit gleicher
-# Staerke liest sich Telekom-Magenta als zweite rote Linie.
 BREITE_EIGEN = 3
 BREITE_ANDERE = 2
 
-# Die Strichmuster als SVG-`stroke-dasharray`. Vier benannte Arten, nicht
-# mehr: ab der fuenften ist ein Muster nicht mehr als Muster erkennbar,
-# sondern nur noch "irgendwie gestrichelt".
 STRICHMUSTER = {
     "voll": "none",
     "gestrichelt": "7 4",
     "gepunktet": "2 4",
-    # Sparsamer als "gepunktet" und nur fuer die LUECKE: eine Linie, die
-    # sichtbar weniger Substanz hat als jede andere im Bild.
     "luecke": "1 6",
 }
 
@@ -127,28 +119,12 @@ def _stil(
     )
 
 
-# Die zwei Neutraltoene fuer Service-Provider und Haendler.
 GRAU_SERVICE = "#4a463e"
 GRAU_HAENDLER = "#a8a297"
 
-# Die Farbe der benannten Luecke. Bewusst ein DRITTER Neutralton, keine
-# Markenfarbe - sie soll wie ein Platzhalter aussehen, weil sie einer
-# ist. Der Vorgaenger-Entwurf hatte hier den ALTEN Haendlerton `#8a8479`
-# stehen lassen (unrevidiert uebernommen); gemessen mit dem
-# `dataviz`-Validator lag der gegen Telekom bei ΔE 1,6 unter simulierter
-# Deuteranopie - weit unter der 6,0-Untergrenze, also praktisch dieselbe
-# Farbe. `#c2bcaf` ist der hellste Ton, der das Gesamtpaket wieder ueber
-# die CVD-Zielschwelle 8,0 hebt (gemessen: schwierigstes Paar danach ist
-# GRAU_HAENDLER/LUECKE bei ΔE 8,2 protan) - auch er bleibt der
-# Normalsicht-Schwelle 15 nahe, deshalb traegt die Luecke zusaetzlich ihr
-# EIGENES Strichmuster ("luecke") und ihre EIGENE Markerform ("kreuz"),
-# die kein anderer Eintrag dieser Tabelle teilt.
 LUECKE_FARBE = "#c2bcaf"
 LUECKE_NAME_ZUSATZ = "Farbe nicht hinterlegt"
 
-# Der Stil eines Anbieters, den diese Tabelle nicht kennt. Er wird NIE
-# geraten und nie aus dem Namen gerechnet - er ist immer dieser eine, und
-# `stil_fuer()` protokolliert jeden Fall.
 LUECKE = Anbieterstil(
     slug="ohne-farbe",
     farbe=LUECKE_FARBE,
@@ -163,21 +139,11 @@ LUECKE = Anbieterstil(
 )
 
 
-# Schluessel ist der KLEINGESCHRIEBENE Anbietername, wie ihn die Adapter
-# liefern. Die Markerformen sind so vergeben, dass kein Grauton die Form
-# der Telekom (Quadrat) traegt: Magenta und Grau sind das rechnerisch
-# zweitschwierigste Paar der Palette, dort muss die FORM tragen. Das
-# Kreuz gehoert allein der Luecke.
 ANBIETER_FARBE: dict[str, Anbieterstil] = {
-    # Wir. Rot, 3 px, und die Reihenfolge stellt es immer nach vorn.
     "vodafone": _stil("vodafone", "#e60000", "voll", "kreis", eigen=True),
-    # Netzbetreiber
     "telekom": _stil("telekom", "#e20074", "voll", "quadrat"),
     "o2": _stil("o2", "#0019a5", "voll", "dreieck"),
     "1&1": _stil("1-1", "#2f7fd1", "gestrichelt", "raute"),
-    # Zweitmarke: die Linie traegt das congstar-Schwarz, der Marker das
-    # congstar-Gelb. Gelb allein waere auf hellem Papier unsichtbar,
-    # deshalb bekommt der Marker den schwarzen Rand der Linie.
     "congstar": _stil(
         "congstar",
         "#121212",
@@ -186,17 +152,9 @@ ANBIETER_FARBE: dict[str, Anbieterstil] = {
         marker_farbe="#ffed00",
         marker_rand="#121212",
     ),
-    # Service-Provider: grau GEPUNKTET. Sie verkaufen fremde Netze - eine
-    # eigene Marke im Bild waere eine Aussage, die sie nicht haben.
     "mobilcom-debitel": _stil("mobilcom-debitel", GRAU_SERVICE, "gepunktet", "ring"),
     "freenet": _stil("freenet", GRAU_SERVICE, "gepunktet", "dreieck--runter"),
     "aldi talk": _stil("aldi-talk", GRAU_SERVICE, "gepunktet", "sechseck"),
-    # Haendler: grau DURCHGEZOGEN, unterschieden allein durch die
-    # Markerform - so verlangt es der Auftrag. Saturn kam beim Rendern
-    # gegen den echten Bestand dazu (`anbieter_typ: handel` in
-    # `geraete_db.json`, wie Medimax) - vorher stand es als benannte
-    # Luecke da, obwohl es ein bekannter Haendler ist; die Kategorie ist
-    # belegt, keine geratene Farbe.
     "medimax": _stil("medimax", GRAU_HAENDLER, "voll", "raute"),
     "electronicpartner": _stil("electronicpartner", GRAU_HAENDLER, "voll", "dreieck"),
     "saturn": _stil("saturn", GRAU_HAENDLER, "voll", "sechseck"),
@@ -250,13 +208,6 @@ def legendenname(anbieter: str) -> str:
     return f"{anbieter} ({stil.name_zusatz})" if stil.name_zusatz else anbieter
 
 
-# --------------------------------------------------------------------------
-# Das Stylesheet
-# --------------------------------------------------------------------------
-
-# Der Platzhalter in `templates/style.css`. Fehlt er, ist die Seite ohne
-# Anbieterfarben gerendert worden - das faellt sonst erst am Screenshot
-# auf, und dann heisst es "alles grau" statt "eine Zeile fehlt".
 MARKE = "/* @@ANBIETER-FARBEN@@ */"
 
 

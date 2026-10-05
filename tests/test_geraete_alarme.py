@@ -61,16 +61,11 @@ def _zeile(
     }
 
 
-# --------------------------------------------------------------------------
-# Die vier Stufen
-# --------------------------------------------------------------------------
-
-
 @pytest.mark.parametrize(
     "prozent,erwartet",
     [
         (41.3, "kritisch"),
-        (10.0, "kritisch"),  # die Grenze gehoert der schaerferen Stufe
+        (10.0, "kritisch"),
         (9.99, "mittel"),
         (3.0, "mittel"),
         (2.99, "gering"),
@@ -90,11 +85,11 @@ def test_die_kacheln_summieren_sich_auf_die_verglichenen():
     """Eine Kachel, die anders zaehlt als der Satz darunter, ist der
     Fehlertyp aus CLAUDE.md 6."""
     zeilen = [
-        _zeile(unser=1000.0, fremd=800.0),  # kritisch
-        _zeile(unser=1000.0, fremd=950.0),  # mittel
-        _zeile(unser=1000.0, fremd=990.0),  # gering
+        _zeile(unser=1000.0, fremd=800.0),
+        _zeile(unser=1000.0, fremd=950.0),
+        _zeile(unser=1000.0, fremd=990.0),
         _zeile(unser=1000.0, fremd=1100.0),
-    ]  # bestpreis
+    ]
     erg = al.zeilen({"zeilen": zeilen})
     gezaehlt = {k["schluessel"]: k["zahl"] for k in erg["kacheln"]}
     assert gezaehlt == {"kritisch": 1, "mittel": 1, "gering": 1, "bestpreis": 1}
@@ -112,11 +107,6 @@ def test_ein_geraet_ohne_wettbewerber_ist_kein_bestpreis():
     assert gezaehlt["bestpreis"] == 1, "nur die verglichene Zeile zaehlt"
     assert erg["verglichen"] == 1
     assert erg["ohne_wettbewerber"] == 1
-
-
-# --------------------------------------------------------------------------
-# Die Tabelle
-# --------------------------------------------------------------------------
 
 
 def test_zeilen_ohne_rueckstand_stehen_nicht_in_der_tabelle():
@@ -138,8 +128,8 @@ def test_sortiert_wird_nach_prozent_nicht_nach_euro():
     """15 Euro sind bei einem 200-Euro-Geraet viel und bei einem
     2000-Euro-Geraet nichts. Ein 300-Euro-Abstand auf ein 3000-Euro-Geraet
     ist ein kleinerer Rueckstand als 100 Euro auf 400."""
-    gross_in_euro = _zeile(unser=3000.0, fremd=2700.0, modell="A")  # 10 %
-    gross_in_prozent = _zeile(unser=400.0, fremd=300.0, modell="B")  # 25 %
+    gross_in_euro = _zeile(unser=3000.0, fremd=2700.0, modell="A")
+    gross_in_prozent = _zeile(unser=400.0, fremd=300.0, modell="B")
     erg = al.zeilen({"zeilen": [gross_in_euro, gross_in_prozent]})
     assert [z["modell"] for z in erg["sichtbar"]] == ["B", "A"]
     assert erg["sichtbar"][0]["euro"] < erg["sichtbar"][1]["euro"], (
@@ -176,11 +166,6 @@ def test_ein_angebot_ohne_preis_reisst_die_sortierung_nicht():
     zeile["teurer"] = [_angebot("freenet", None), _angebot("expert", None)]
     erg = al.zeilen({"zeilen": [zeile]})
     assert len(erg["sichtbar"][0]["alle"]) == 4
-
-
-# --------------------------------------------------------------------------
-# Ausreisser und Notzustand
-# --------------------------------------------------------------------------
 
 
 def test_ein_ausreisser_wird_an_seiner_zeile_markiert():

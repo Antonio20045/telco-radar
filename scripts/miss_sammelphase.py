@@ -73,8 +73,6 @@ def _messung(cfg, workers: int, host_parallel: int, host_interval: float) -> dic
             }
             for r in langsam
         ],
-        # Hochrechnung auf 1000 Quellen bei gleicher Arbeitszeit je Quelle und
-        # gleicher effektiver Parallelitaet.
         "hochrechnung_1000_min": round(
             (arbeit / len(results) * 1000) / max(1.0, arbeit / wanduhr) / 60, 1
         )

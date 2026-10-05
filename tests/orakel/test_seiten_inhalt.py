@@ -52,9 +52,6 @@ def highlight(
     return h
 
 
-# 12 relevante Meldungen, davon 8 mit relevance >= 4: mehr als der Deckel von
-# sechs, den html.py auf die Signalliste legt - sonst wuerde der Test die
-# Kappung gar nicht sehen.
 HIGHLIGHTS = (
     [highlight(i, 5) for i in range(4)]
     + [highlight(i, 4) for i in range(4, 8)]
@@ -62,10 +59,6 @@ HIGHLIGHTS = (
 )
 NEU_GESAMMELT = 426
 
-# Eine Ausgabe in der Groessenordnung einer echten (193 Meldungen am
-# 06.08.2026): genug Meldungen fuer alle vier Gewichtsstufen der Titelseite
-# UND fuer Ressortbloecke danach. Mit den zwoelf oben ist die Titelseite
-# schon vor den Ressorts leergeraeumt - dann pruefte kein Test das Raster.
 KATEGORIEN = [
     "Netz/Technologie",
     "Tarif/Pricing",
@@ -81,9 +74,6 @@ PORTAL = [
         100 + i,
         5 - (i % 3),
         KATEGORIEN[i % len(KATEGORIEN)],
-        # jede zweite Meldung mit Bild, davon jede vierte zu klein
-        # fuer eine grosse Position - genau die Mischung, in der sich
-        # die Auswahl bewaehren muss
         image_w=(0 if i % 2 else (520 if i % 4 == 2 else 1200)),
     )
     for i in range(48)
@@ -105,10 +95,6 @@ def render(
 ):
     from telco_radar.report.bilder import bildordner
 
-    # data/reports/ wie im echten Projekt: render_site() leitet den
-    # Bildordner ueber `reports_dir.parent.parent` her. Lag der Bericht flach
-    # unter tmp_path, zeigte das auf das GEMEINSAME pytest-Wurzelverzeichnis -
-    # und ein Test sah die Bilddateien eines anderen.
     reports = tmp_path / "data" / "reports"
     reports.mkdir(parents=True)
     hs = HIGHLIGHTS if highlights is None else highlights
@@ -124,11 +110,6 @@ def render(
     }
     if kosten is not None:
         run["kosten"] = kosten
-    # Die Bilddateien muessen wirklich existieren: render_site() streicht
-    # jeden `image`-Verweis, zu dem keine Datei mehr im Bildordner liegt
-    # (sonst zeigen Archivwochen leere Kaesten, nachdem raeume_auf() ihre
-    # Bilder geloescht hat). Ohne diese Dateien pruefte der Bildtest unten
-    # eine Seite ganz ohne Bilder - also nichts.
     if bilder_anlegen:
         ordner = bildordner(reports.parent.parent)
         ordner.mkdir(parents=True, exist_ok=True)
@@ -211,14 +192,12 @@ def lies_seite(site, name: str) -> str:
     return (site / name).read_text(encoding="utf-8")
 
 
-# --------------------------------------------------------------- Protokoll
 def test_protokoll_trennt_gesammelt_von_bewertet(tmp_path):
     """Die beiden Zahlen duerfen nicht unter EIN Label fallen."""
     html = lies_seite(render(tmp_path), "transparenz.html")
 
     assert f"<b>{NEU_GESAMMELT}</b><span>neue Meldungen gelesen</span>" in html
     assert f"<b>{len(HIGHLIGHTS)}</b><span>davon relevant</span>" in html
-    # Der alte, falsche Text darf nicht zurueckkommen.
     assert f"<b>{NEU_GESAMMELT}</b><span>neue Meldungen bewertet</span>" not in html
 
 
@@ -235,10 +214,6 @@ def test_protokoll_erklaert_nichts_wenn_es_nichts_zu_erklaeren_gibt(tmp_path):
     assert "gekappt wird nichts" not in html
 
 
-# ------------------------------------------------------------------ Kosten
-# Antonio zahlt die API privat. Bis zum 27.08.2026 stand nirgends, was ein
-# Lauf verbraucht - der Lauf vom 27.08. kostete 1,95 $, und es war hinterher
-# nicht zu sagen, an welcher Stufe.
 KOSTEN = {
     "modelle": {
         "deepseek-v4-flash": {
@@ -268,7 +243,7 @@ def test_transparenz_nennt_kosten_und_token_je_modell(tmp_path):
     assert "66" in html
     assert "1.200.000" in html and "300.000" in html
     assert "0.25 $" in html
-    assert "1.50 $" in html  # die Erwartung je Lauf
+    assert "1.50 $" in html
 
 
 def test_transparenz_beziffert_ein_modell_ohne_preis_nicht(tmp_path):
@@ -300,11 +275,6 @@ def test_ohne_kostenblock_bleibt_die_seite_wie_vorher(tmp_path):
     assert "Was dieser Lauf verbraucht hat" not in html
 
 
-# ------------------------------------------------------------------- Promo
-# E10b (27.08.2026, Strategie 2026-08-27 B6): der Promo-Ausfall seit dem
-# 14.08.2026 (LLM-Extraktion scheiterte an leerem API-Guthaben) stand bis
-# dahin in KEINER Statistik - `stats` kannte kein `promo_*`-Feld, nur das
-# Actions-Log, das niemand liest.
 PROMO_STATS = {
     "new": NEU_GESAMMELT,
     "promo_seiten_gelesen": 41,
@@ -344,7 +314,7 @@ def test_transparenz_verschweigt_null_extraktionsfehler(tmp_path):
     ohne_fehler = {**PROMO_STATS, "promo_extraktion_fehler": 0}
     html = lies_seite(render(tmp_path, stats=ohne_fehler), "transparenz.html")
     assert "gescheiterter Extraktion" not in html
-    assert "41 Aktionsseiten gelesen" in html  # der Rest der Zeile bleibt
+    assert "41 Aktionsseiten gelesen" in html
 
 
 def test_ohne_promo_stats_bleibt_die_seite_wie_vorher(tmp_path):
@@ -397,7 +367,6 @@ def test_geloeschtes_bild_hinterlaesst_keinen_leeren_kasten(tmp_path):
     for name in ("index.html", "meldungen.html", "reports/2026-08-05.html"):
         html = lies_seite(site, name)
         assert "images/bild" not in html, f"{name} verweist auf ein fehlendes Bild"
-    # Gegenprobe: mit vorhandenen Dateien stehen die Bilder auch da.
     assert "images/bild" in lies_seite(
         render(tmp_path / "mit", highlights=PORTAL), "index.html"
     )
@@ -415,7 +384,6 @@ def test_site_images_sammelt_nicht(tmp_path):
 
     site = render(tmp_path, highlights=PORTAL)
     (site / "images" / "aus-einem-alten-lauf.jpg").write_bytes(b"alt")
-    # Zweiter Renderlauf mit unveraendertem Bildordner.
     render_site(site, tmp_path / "data" / "reports")
 
     assert not (site / "images" / "aus-einem-alten-lauf.jpg").exists()
@@ -461,9 +429,6 @@ def test_meldungsseite_zeigt_wirklich_alle_meldungen(tmp_path):
     site = render(tmp_path, highlights=PORTAL)
     soup = BeautifulSoup(lies_seite(site, "meldungen.html"), "html.parser")
     assert len(soup.select(".mressort .meldung")) == len(PORTAL)
-    # Die Gesamtzahl steht seit dem 08.08.2026 nicht mehr als Satz im Kopf
-    # ("138 Meldungen in 7 Ressorts ..."), sondern nur noch verteilt an den
-    # Ressorts. Auch verteilt muss sie aufgehen.
     aus_ressorts = [
         int(re.search(r"\d+", z.get_text(" ", strip=True)).group())
         for z in soup.select(".mressort > summary .rubrik-zahl")
@@ -486,12 +451,6 @@ def test_meldungsseite_traegt_den_entfernten_filter_nicht_mehr(tmp_path):
     ):
         assert rest not in html, f"Rest des Filters auf der Seite: {rest}"
     assert rest not in lies_seite(site, "app.js")
-    # Die wochenuebergreifende Suche stand hier bis zum 08.08.2026 ganz
-    # unten. Sie ist nicht geloescht, sondern eine eigene Seite geworden
-    # (suche.html, als Dossier gebaut - siehe tests/test_suche_page.py):
-    # das Topbar-Formular fuehrte auf diese Seite, und die Treffer standen
-    # nach rund 2400 px. Antonio: "Ich verstehe nicht, warum ich da
-    # weitergeleitet werde."
     assert "suche-input" not in html
     assert 'action="suche.html"' in html
 
@@ -512,19 +471,12 @@ def test_meldungsseite_gruppiert_und_gewichtet(tmp_path):
     assert all(sec.name == "details" for sec in ressorts), (
         "Die Ressortbloecke sind nicht aufklappbar"
     )
-    # Jedes Ressort fuehrt mit genau einem Aufmacher ...
     for sec in ressorts:
         assert len(sec.select(".mlead")) == 1
-    # ... und mindestens eines nutzt alle drei Gewichtungen.
     assert any(
         sec.select(".mlead") and sec.select(".mzwei") and sec.select(".mz")
         for sec in ressorts
     )
-    # Die Ressortzahlen der Uebersicht summieren sich auf die Gesamtzahl.
-    # (Bis zum 07.08.2026 stand diese Zahl in einer Sprungleiste; die war
-    # die Kruecke einer zu langen Seite und ist mit ihr weggefallen. Seit
-    # dem 08.08.2026 steht sie EINMAL je Kachel, im Link darunter - vorher
-    # einmal als Chip neben der Rubrik und ein zweites Mal im Link.)
     links = soup.select(".rkachel .rkachel-alle")
     assert len(links) == len(soup.select(".rkachel"))
     aus_kacheln = [
@@ -542,8 +494,6 @@ def test_wochenseite_traegt_die_explorer_daten_nicht_mehr(tmp_path):
     Er gehoert auf meldungen.html, nicht auf die Landeseite."""
     site = render(tmp_path)
     assert 'id="explorer-data"' not in lies_seite(site, "index.html")
-    # Die Meldungsseite rendert die Meldungen serverseitig als Zeitungsseite,
-    # der Explorer lebt nur noch auf den Archivwochen.
     assert 'id="explorer-data"' not in lies_seite(site, "meldungen.html")
     assert 'id="explorer-data"' in lies_seite(site, "reports/2026-08-05.html")
 
@@ -555,7 +505,6 @@ def test_interne_einordnung_verlaesst_die_seite_nicht(tmp_path):
         assert "Interne Einordnung." not in lies_seite(site, name)
 
 
-# ------------------------------------------------------------- Wettbewerber
 GESCHEITERT = [
     {
         "name": "Deutsche Telekom",
@@ -592,7 +541,6 @@ def test_gescheiterte_analyse_sagt_dass_sie_gescheitert_ist(tmp_path):
     html = lies_seite(render(tmp_path, competitors=GESCHEITERT), "index.html")
     assert "ist gescheitert" in html
     assert "entsteht beim nächsten Lauf" not in html
-    # Und die Seite gibt zu, dass die Zuordnung funktioniert hat.
     assert "16 Treffer" in html
 
 
@@ -612,7 +560,6 @@ def test_ohne_profile_kein_leerer_block(tmp_path):
     assert "ist gescheitert" not in html
 
 
-# ------------------------------------------------- Sprungnavigation (Etappe 2)
 def test_bericht_bekommt_ein_inhaltsverzeichnis_mit_ankern(tmp_path):
     """2863 Woerter in elf Abschnitten standen als ein Block ohne Einstieg
     da. Jede Ueberschrift braucht einen Anker, damit man aus einer Mail in
@@ -620,8 +567,6 @@ def test_bericht_bekommt_ein_inhaltsverzeichnis_mit_ankern(tmp_path):
     html = lies_seite(render(tmp_path), "index.html")
 
     assert '<nav class="toc"' in html
-    # Beide Abschnitte der Fixture ("Auf einen Blick", "Europa") tauchen als
-    # Anker UND als Sprungziel auf.
     for titel, anker in (("Auf einen Blick", "auf-einen-blick"), ("Europa", "europa")):
         assert f'href="#{anker}"' in html
         assert f'<h2 id="{anker}">{titel}</h2>' in html
@@ -632,7 +577,6 @@ def test_lesezeit_wird_genannt(tmp_path):
     assert "Lesezeit ca." in html
 
 
-# ------------------------------------------- Quellenbilanz des Laufprotokolls
 QUELLEN = [
     {
         "name": "A",
@@ -719,9 +663,6 @@ def test_gescheiterte_quellen_werden_gezaehlt(tmp_path):
     render_site(site, reports)
     html = (site / "transparenz.html").read_text(encoding="utf-8")
 
-    # 1 ok / 1 leer / 2 gescheitert - die Quarantaene zaehlt nicht als
-    # abgefragt, sonst sieht die Bilanz besser aus, je mehr Quellen
-    # aufgegeben wurden.
     assert "<b>1 / 1 / 2</b><span>ok / leer / fehlgeschlagen</span>" in html
     assert "<b>4</b><span>Quellen abgefragt</span>" in html
     assert "nicht erreichbar (2)" in html
@@ -740,7 +681,6 @@ def test_archivkopie_gibt_sich_als_archiv_zu_erkennen(tmp_path):
     assert "Archivierter Bericht" not in start
 
 
-# ---------------------------------------------- Titelseite: keine Dubletten
 @pytest.mark.parametrize("hs", [HIGHLIGHTS, PORTAL], ids=["klein", "portal"])
 def test_keine_meldung_steht_zweimal_auf_der_titelseite(tmp_path, hs):
     """Der Aufmacher wird fuer die Anzeige kopiert. Wurde er danach ueber
@@ -832,16 +772,11 @@ def test_teilausfall_der_wettbewerber_wird_benannt(tmp_path):
         },
     ]
     html = lies_seite(render(tmp_path, competitors=gemischt), "index.html")
-    assert "Profiltext." in html  # das gelungene Profil
-    assert "Telefónica / O2 und 1&amp;1" in html  # die gescheiterten
+    assert "Profiltext." in html
+    assert "Telefónica / O2 und 1&amp;1" in html
     assert "2 von 3 Profilen" in html
 
 
-# ------------------------------------------------------- Der rote Faden
-# Antonio am 07.08.2026: "der rote Faden fehlt mir noch ueberall." Die
-# Titelseite sortierte nach Dringlichkeit, der Bericht nach dem Urteil der
-# Chefredaktion - beide fuehrten mit einer anderen Geschichte. Die Kopplung
-# ist jetzt gebaut, also gehoert sie auch gehalten.
 FADEN_BRIEFING = """## Auf einen Blick
 - Quasarnetz kuendigt ein Kleinzellennetz an und greift damit die
   etablierten Mobilfunker an.
@@ -867,9 +802,6 @@ def faden_highlights(quasar_relevance: int = 5) -> list[dict]:
     meint. Damit misst derselbe Aufbau beide Seiten der Regel: bei
     Gleichstand ordnet der Faden, darunter schlaegt ihn der Rang."""
     hs = list(PORTAL)
-    # Dieselbe Bewertung wie Quasarnetz, aber im Bericht kommt sie nicht
-    # vor: die Meldung, die OHNE Faden den Aufmacher bekaeme (sie steht
-    # vorn in der Liste, und `nimm` geht die Liste der Reihe nach durch).
     hs.insert(
         0,
         dict(
@@ -914,7 +846,6 @@ def test_der_vorspann_ueber_der_ausgabe_ist_weg(tmp_path, undefiniert):
     soup = BeautifulSoup(lies_seite(site, "index.html"), "html.parser")
     assert soup.select_one(".front-faden") is None, "Der Vorspann steht noch da"
     assert "Worum es diese Woche geht" not in lies_seite(site, "index.html")
-    # Der Bericht steht direkt darunter und traegt seine Sprungmarke weiter.
     assert soup.select_one("#der-wochenbericht")
     assert "front-faden" not in lies_seite(site, "style.css")
 
@@ -923,7 +854,6 @@ def test_der_vorspann_ueber_der_ausgabe_ist_weg(tmp_path, undefiniert):
     _gegenprobe_aufzeichnung(undefiniert, "briefing_lead")
 
 
-# ------------------------------------------------- Was die Seite NICHT mehr traegt
 def test_die_datumszeile_ist_auf_keiner_seite_mehr_da(tmp_path, undefiniert):
     """Abnahmekriterium 1. Antonio: "Loesch diese Zeile, das ist unnoetig."
 
@@ -943,8 +873,6 @@ def test_die_datumszeile_ist_auf_keiner_seite_mehr_da(tmp_path, undefiniert):
         assert "dateline" not in seite, f"Datumszeile noch auf {name}"
         assert "Quellen beobachtet" not in seite
     assert "dateline" not in lies_seite(site, "style.css")
-    # Und keine Vorlage fragt die Werte noch ab - sie werden nicht mehr
-    # berechnet, ein Zugriff waere also still leer statt laut falsch.
     for tot in ("ausgabe_datum", "ausgabe_quellen"):
         assert tot not in undefiniert, f"eine Vorlage liest die tote Variable {tot}"
         _gegenprobe_aufzeichnung(undefiniert, tot)
@@ -962,18 +890,10 @@ def test_die_wochenseite_traegt_die_doppelten_formen_nicht_mehr(tmp_path):
     index = lies_seite(site, "index.html")
     assert "Zahlen der Woche" not in index
     assert "Auswertung je Bereich" not in index
-    # ... aber die Frage, die sie beantworteten, hat weiterhin einen Ort.
     assert "Auswertung je Bereich" in lies_seite(site, "transparenz.html")
-    # Die Zahl "davon N zum sofortigen Ansehen" ist am 08.08.2026 gefallen:
-    # sie stand an jeder betroffenen Meldung ohnehin als Prioritaet 5/5.
     assert "zum sofortigen Ansehen" not in index
 
 
-# ------------------------------------------------------ Die Wettbewerbsseite
-# Sie zeigt zwei Zahlen: den Umfang der Chronik ("56 Meldungen seit 16. Juli
-# 2026") und den Umfang je Monatsgruppe. Beide sind Aggregate ueber ALLE
-# Wochen des Archivs - genau die Sorte Zahl, die still falsch wird, wenn
-# jemand die Gruppierung anfasst.
 def test_die_chronik_zaehlt_was_sie_zeigt(tmp_path):
     site = render(tmp_path, competitors=GELUNGEN)
     soup = BeautifulSoup(lies_seite(site, "wettbewerb.html"), "html.parser")
@@ -982,12 +902,8 @@ def test_die_chronik_zaehlt_was_sie_zeigt(tmp_path):
     zeilen = abschnitt.select(".wb-zeile")
     kopf = " ".join(abschnitt.select_one(".rubrik-zahl").get_text().split())
     assert kopf.startswith(f"{len(zeilen)} Meldung"), kopf
-    # Der Bericht ist der einzige im Archiv - also datiert die Chronik auf
-    # seinen Tag, nicht auf den heutigen.
     assert kopf.endswith("seit 5. August 2026"), kopf
 
-    # Die Monatszahlen summieren sich auf dieselbe Zahl (offener Monat plus
-    # jeder zugeklappte).
     monate = [int(m.get_text(strip=True)) for m in abschnitt.select(".wb-monat span")]
     assert sum(monate) == len(zeilen)
 
@@ -1014,18 +930,11 @@ def test_der_kurzverweis_zeigt_jeden_wettbewerber_mit_profil(tmp_path):
 
     mit_profil = [c for c in gemischt if c["summary"]]
     assert len(soup.select(".wb-kurz-zeile")) == len(mit_profil)
-    # ... und der Ausfall des anderen wird weiterhin benannt.
     assert "1 von 2 Profilen" in lies_seite(
         render(tmp_path / "b", competitors=gemischt), "index.html"
     )
 
 
-# --------------------------------------------------- Die Themenseiten (temp.)
-# Sie zeigen drei Zahlen: die Zahl der Meldungen des Themas (zweimal - im
-# Seitenkopf und als Zaehler ueber der Zeilenliste), die Zahl der beteiligten
-# Quellen und das Datum, seit dem das Thema laeuft. Alle drei sind Aggregate
-# ueber den Themenspeicher, nicht ueber die Wochenausgabe - also genau die
-# Sorte Zahl, die still falsch wird, sobald jemand die Zuordnung anfasst.
 THEMA = {
     "slug": "starlink-plant-eigenes-mobilfunknetz",
     "title": "Starlink plant eigenes Mobilfunknetz",
@@ -1080,9 +989,6 @@ def test_die_themenseite_zaehlt_was_sie_zeigt(tmp_path):
         f"aus {len(quellen)} Quellen"
     ), lage
 
-    # Die Zahl im Kopf ist die einzige auf der Seite - und sie stimmt: jede
-    # Meldung des Themas steht genau einmal darunter, verteilt auf Aufmacher,
-    # zweite Reihe und Zeilenliste.
     schlagzeilen = [e.get_text(" ", strip=True) for e in soup.select(".szl")]
     assert len(schlagzeilen) == len(set(schlagzeilen)) == len(THEMA["items"])
     assert len(soup.select(".tm-zeile")) == len(THEMA["items"]) - 3
@@ -1116,16 +1022,6 @@ def test_ohne_aktives_thema_steht_kein_band_und_keine_seite(tmp_path):
     assert "fokusband" not in lies_seite(site, "index.html")
 
 
-# ------------------------------------------------- Die Differenzierungs-Seite
-# Sie zeigt seit dem 08.08.2026 nur noch EINE Zahl: je Hebel, wie viele
-# Beispiele darunter stehen. Die alte Statuszeile ("51 Beispiele in der
-# Bibliothek · 12 von 12 Hebeln aktiv · 5 neu") ist genau das Zahlenrauschen,
-# das Antonio moniert hat - sie ist ersatzlos weg.
-#
-# Der zweite, wichtigere Punkt hier ist kein Layout-, sondern ein
-# Inhaltsfehler: die Seite las bis dahin nur `differentiation_db.json` (den
-# Web-Sweep). `differentiation.jsonl` (der Kurator ueber den woechentlichen
-# Presse-Crawl) wurde jede Woche gefuellt und nie angezeigt.
 DIFF_DB = [
     {
         "id": f"https://sweep{i}.example.com/x",
@@ -1198,7 +1094,6 @@ def test_die_differenzierung_zeigt_BEIDE_speicher(tmp_path):
     hauptzeilen = {e.get_text(" ", strip=True) for e in soup.select(".dzk-what")}
     assert "Sweep-Beispiel 0 als Zusatzleistung." in hauptzeilen
     assert "Presse-Beispiel 0 als Zusatzleistung." in hauptzeilen
-    # Die Hauptzeile ist der deutsche Satz, nicht der mehrsprachige Rohtitel.
     assert not any("Original headline" in z for z in hauptzeilen)
 
 
@@ -1217,7 +1112,6 @@ def test_jeder_hebel_zaehlt_was_unter_ihm_steht(tmp_path):
         assert zahl == f"{len(karten)} Beispiel{'e' if len(karten) != 1 else ''}", key
         gesehen[key] = len(karten)
     assert gesehen == erwartet
-    # Und jedes Beispiel steht in der Bibliothek genau EINMAL.
     quellen = [
         a["href"]
         for abschnitt in soup.select(".dz-hebel")
@@ -1269,8 +1163,6 @@ def test_neu_auf_dem_radar_zeigt_nur_junge_funde(tmp_path):
     site = _mit_differenzierung(tmp_path)
     soup = BeautifulSoup(lies_seite(site, "differenzierung.html"), "html.parser")
     radar = soup.select(".dz-radar .dzk")
-    # Nur die zwei Presse-Eintraege sind juenger als zehn Tage (Ausgabe vom
-    # 5.8., first_seen 4.8.); die Sweep-Eintraege stammen vom 15.6.
     assert len(radar) == len(DIFF_STORE)
     assert (
         soup.select_one(".dz-radar .rubrik h2").get_text(strip=True)
@@ -1324,8 +1216,6 @@ def test_der_differenzierungsbericht_bleibt_erhalten(tmp_path):
     assert "Ein Absatz des Essays." in essay.get_text(" ", strip=True)
 
 
-# ---- Der Umbau vom 08.08.2026 (Antonio: "total unuebersichtlich, keine
-# Bilder, es ist schwer zu verstehen ... viel besser sein analytisch").
 def test_jede_karte_der_differenzierung_traegt_ein_motiv(tmp_path):
     """Bild ODER Schriftkachel - nie ein leerer Kasten. Dieselbe Regel wie
     auf der Promo Uebersicht (Abnahmekriterium 8c). Die Zeilen sind bewusst
@@ -1375,7 +1265,6 @@ def test_das_marktbild_zaehlt_was_die_bibliothek_zeigt(tmp_path):
     gesamt = marktbild.select_one(".rubrik-zahl").get_text(" ", strip=True)
     assert gesamt == f"{len(DIFF_DB) + len(DIFF_STORE)} Beispiele"
 
-    # Der Hebel-Balken je Hebel gegen die Rubrikzahl desselben Hebels.
     balken = {
         li.select_one(".dz-balken-name").get_text(strip=True): int(
             li.select_one(".dz-balken-n").get_text(strip=True)
@@ -1492,31 +1381,19 @@ def test_keine_karte_der_differenzierung_raet_vodafone_etwas(tmp_path):
     assert karten
     for karte in karten:
         text = " ".join(karte.get_text(" ", strip=True).split())
-        if beobachtung[:40] in text:  # der Gegenfall - er DARF matchen
+        if beobachtung[:40] in text:
             continue
         for muster in rat:
             assert not muster.search(text), text
 
-    # Der Gegenfall steht wirklich noch da, ungekuerzt.
     assert beobachtung in lies_seite(site, "differenzierung.html")
-    # Und die reine Empfehlung hat ihre Karte nicht mitgenommen.
     zweitzeilen = len(soup.select(".dz-hebel .dzk-why"))
     assert len(soup.select(".dz-hebel .dzk")) == 4 and zweitzeilen == 3
 
 
-# ------------------------------------------- Der Beruhigungs-Durchgang (A)
-# Antonio am 08.08.2026: "Die Seite wirkt unruhig, weil ueberall so viele
-# Kommentare sind - zum Beispiel '138 Meldungen in sieben Ressorts, jede
-# Kachel zeigt ...'. Mehr roter Faden, einfacher zu lesen."
-#
-# Was daraufhin gestrichen wurde, hat je einen Test - sonst kommt es beim
-# naechsten Umbau unbemerkt zurueck.
 def test_keine_seite_erklaert_ihre_eigene_bedienung(tmp_path):
     """Saetze, die beschreiben, was ein Klick tut, statt etwas auszusagen."""
     site = render(tmp_path, highlights=PORTAL, competitors=GELUNGEN)
-    # "beim Anklicken" kam am 11.08.2026 auf der Geraeteseite dazu und ist
-    # dieselbe Sorte Satz: er beschreibt eine Handlung, statt etwas
-    # auszusagen. Die Seite fehlte in dieser Liste, also fing sie ihn nicht.
     verboten = (
         "Jede Kachel zeigt",
         "klappt das",
@@ -1535,7 +1412,6 @@ def test_keine_seite_erklaert_ihre_eigene_bedienung(tmp_path):
         text = lies_seite(site, name)
         for satz in verboten:
             assert satz not in text, f"{name} erklaert seine Bedienung: {satz}"
-    # Auch nicht aus dem Skript nachgereicht.
     assert "Suchbegriff eingeben" not in lies_seite(site, "app.js")
 
 
@@ -1562,7 +1438,6 @@ def test_archivzeile_nennt_nur_die_neuen_meldungen(tmp_path):
         felder = [s["class"][0] for s in z.select("span")]
         assert felder == ["list-row-date", "list-row-new"], felder
     assert "gesammelt" not in lies_seite(site, "meldungen.html")
-    # Die verbliebene Zahl stimmt mit dem Bericht ueberein.
     assert f"{NEU_GESAMMELT} neue Meldungen" in zeilen[0].get_text(" ", strip=True)
 
 
@@ -1578,20 +1453,10 @@ def test_zaehlwerte_tragen_ueberall_dieselbe_klasse(tmp_path):
         "wettbewerb.html",
     ):
         assert "count-badge" not in lies_seite(site, name), name
-    # Im Stylesheet ohne Kommentare - dass dort steht, WORAUS `rubrik-zahl`
-    # hervorging, ist Dokumentation und keine Regel.
     css = re.sub(r"(?s)/\*.*?\*/", "", lies_seite(site, "style.css"))
     assert "count-badge" not in css
-    # ... und die Klasse wird auch wirklich benutzt.
     soup = BeautifulSoup(lies_seite(site, "meldungen.html"), "html.parser")
     assert soup.select(".rubrik-zahl")
-
-
-# =========================================================== CTM-Linse ====
-# Die zweite Bewertungsachse (analyze/ctm.py) und der Zwei-Minuten-Pfad.
-# Beides sind ZAHLEN und REIHENFOLGEN auf der Seite - also gehoert es hierhin
-# und nicht in einen Modultest: dass `veredle()` richtig rechnet, sagt noch
-# nicht, dass die Startseite das Ergebnis auch zeigt.
 
 
 def _ctm_highlight(i, *, ctm_bezug, relevance=3, satz=None, operator=None):
@@ -1632,7 +1497,6 @@ def test_zwei_minuten_steht_in_der_spalte_ueber_was_wichtig_ist(tmp_path):
     soup = BeautifulSoup(html, "html.parser")
     spalte = soup.select_one(".front-wichtig")
     assert spalte.select_one(".kurzpfad") is not None
-    # Der Kurzpfad zuerst, die Digest-Spalte darunter.
     rubriken = [h2.get_text(strip=True) for h2 in spalte.select("h2")]
     assert rubriken[:2] == ["In zwei Minuten", "Was wichtig ist"]
 
@@ -1708,7 +1572,6 @@ def test_alte_ausgaben_ohne_ctm_feld_behalten_ihre_reihenfolge(tmp_path):
         for z in zeilen
         if re.search(r"Meldung (\d+)", z)
     ]
-    # HIGHLIGHTS: 0-3 tragen Prioritaet 5, 4-7 die 4, 8-11 die 3.
     stark = [n for n in nummern if n < 4]
     schwach = [n for n in nummern if n >= 8]
     assert stark and schwach
@@ -1750,6 +1613,4 @@ def test_belege_eines_ereignisses_stehen_unter_der_meldung(tmp_path):
     belege = soup.select_one(".mz-belege")
     assert belege is not None
     assert len(belege.select("a")) == 2
-    # Ein Link im Link waere ungueltiges HTML - die Belege muessen ausserhalb
-    # des Meldungslinks stehen.
     assert belege.find_parent("a") is None

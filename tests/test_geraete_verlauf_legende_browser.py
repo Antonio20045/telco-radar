@@ -55,7 +55,6 @@ def test_telekom_ist_magenta_in_der_legende(seite):
     assert erwartet.lower() == "#e20074", (
         f"anbieter_farben.py hat sich geaendert: {erwartet!r}"
     )
-    # rgb(226, 0, 116) == #e20074
     assert farbe.replace(" ", "") in ("rgb(226,0,116)", "rgba(226,0,116,1)"), (
         f"die Legendenfarbe ist nicht Telekom-Magenta: {farbe!r}"
     )

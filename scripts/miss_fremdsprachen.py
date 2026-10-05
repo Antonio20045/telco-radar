@@ -64,7 +64,6 @@ def main() -> int:
         anzahl = 0
         for h in meldungen(pfad):
             titel = h.get("title") or ""
-            # NICHT h["summary"] - das ist die deutsche Analystenfassung.
             teaser = ""
             if not titel:
                 continue

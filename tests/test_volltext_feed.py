@@ -99,7 +99,6 @@ def test_das_laengste_content_element_gewinnt():
     assert len(_eins(roh).volltext) >= VOLLTEXT_MINDESTLAENGE
 
 
-# ------------------------------------------------------------------- Modell
 def test_item_dict_runde_haelt_die_neuen_felder():
     item = Item(
         title="t",

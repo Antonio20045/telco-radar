@@ -53,25 +53,15 @@ import re
 from collections import Counter
 from dataclasses import dataclass, field
 
-# BM25-Parameter. k1 steuert, wie stark Mehrfachnennungen zaehlen, b, wie
-# stark lange Dokumente bestraft werden. Die Werte sind die ueblichen; die
-# Eintraege hier sind kurz und aehnlich lang, also haengt wenig daran.
 K1 = 1.5
 B = 0.75
 
-# Unterhalb davon gilt eine Frage als unbeantwortet. Gemessen an echten
-# Fragen gegen das Archiv: eine Frage mit einem passenden seltenen Begriff
-# kommt deutlich darueber, eine Frage ohne jeden Bezug bleibt bei 0.
 MIND_SCORE = 1.0
 
-# Wie viele Belege eine Antwort traegt. Mehr ist keine Antwort mehr,
-# sondern wieder eine Trefferliste.
 MAX_BELEGE = 8
 
 _WORT = re.compile(r"[a-zA-ZäöüßÄÖÜ0-9]{2,}")
 
-# Deutsche Stoppwoerter. Sie tragen keine Frage und wuerden bei kurzen
-# Eintraegen die Rangfolge dominieren.
 STOPP = {
     "der",
     "die",
@@ -305,7 +295,6 @@ def frage(
         )
         return antwort
 
-    # Absteigend nach Score, bei Gleichstand die juengere Meldung zuerst.
     bewertet.sort(key=lambda t: (-t[0], _sortdatum(index.eintraege[t[2]])))
     gesehen: set[str] = set()
     for score, treffer, i in bewertet:

@@ -48,16 +48,9 @@ from .transport import Ergebnis, Transport
 
 log = logging.getLogger(__name__)
 
-# Brevos hartes Tageslimit ist 300. Der Waechter arbeitet gegen 280 - die
-# Reserve faengt die Bestaetigungsmails von Neuanmeldungen desselben Tages
-# ab, die aus einem anderen Workflow kommen und im Sendeprotokoll des
-# Versands gar nicht auftauchen.
 TAGESLIMIT = 300
 SCHWELLE = 280
 
-# 30 Mails je Minute. Nicht wegen einer Ratengrenze, sondern weil ein
-# gleichmaessiger Strom bei Empfaenger-Gateways anders bewertet wird als
-# zweihundert Zustellungen in acht Sekunden.
 RATE_JE_MINUTE = 30
 
 
@@ -81,7 +74,7 @@ class Sendeschluessel:
 @dataclass
 class Planposten:
     schluessel: Sendeschluessel
-    status: str = "geplant"  # geplant | gesendet | dauerhaft_fehl
+    status: str = "geplant"
     message_id: str = ""
     at: str = ""
 
@@ -114,9 +107,6 @@ def baue_sendeplan(datum: str, segmente: list[Segment]) -> list[Planposten]:
             )
     plan.sort(key=lambda p: str(p.schluessel))
     return plan
-
-
-# ==========================================  Was schon zugestellt wurde  ===
 
 
 def bereits_zugestellt(log_pfad: Path) -> set[str]:
@@ -174,9 +164,6 @@ def pruefe_limit(
     return schwelle - summe
 
 
-# ===============================================================  Versand ==
-
-
 @dataclass
 class Lauf:
     """Was ein Versandlauf getan hat - die Zahlen fuer die Statuszeile."""
@@ -232,28 +219,17 @@ def versende(
         segmente=len({p.schluessel.segment for p in plan}),
     )
 
-    # Der Waechter zaehlt die OFFENEN - was schon draussen ist, geht nicht
-    # noch einmal aufs Kontingent.
     lauf.abstand_zum_limit = pruefe_limit(
         len(offen), log_pfad, heute=heute, schwelle=schwelle
     )
 
     pause = 60.0 / rate_je_minute if rate_je_minute > 0 else 0.0
     for i, posten in enumerate(offen):
-        # Zwei Schluessel, und der genauere gewinnt. Gerendert wird EINMAL je
-        # Segment - das ist der ganze Sinn der Segmentierung -, aber die
-        # Abmelde-URL traegt ein Token je Abo. Der Aufrufer legt die
-        # personalisierte Fassung deshalb unter dem vollen Sendeschluessel
-        # ab; wo es nichts zu personalisieren gibt (Tests, Trockenlauf),
-        # reicht der Segmentschluessel.
         nachricht = nachrichten.get(str(posten.schluessel)) or nachrichten.get(
             posten.schluessel.segment
         )
         adresse = adressen.get(posten.schluessel.abo)
         if nachricht is None or not adresse:
-            # Ein Abo ohne Adresse ist abgemeldet, ein Segment ohne Nachricht
-            # war leer. Beides ist kein Fehler - aber es gehoert ins Log,
-            # sonst versucht es jeder Wiederanlauf erneut.
             posten.status = "dauerhaft_fehl"
             posten.at = jetzt()
             lauf.dauerhaft_fehl.append(posten.schluessel.abo)
@@ -271,9 +247,6 @@ def versende(
             lauf.dauerhaft_fehl.append(posten.schluessel.abo)
             lauf.fehler += 1
         else:
-            # Wiederholbar: NICHT ins Log. Der naechste Lauf findet den
-            # Posten als `geplant` ohne Bestaetigung und versucht es erneut -
-            # genau dafuer ist der Sendeplan da.
             lauf.fehler += 1
             log.warning(
                 "Zustellung fehlgeschlagen (wiederholbar), Status %s", ergebnis.status
@@ -286,11 +259,6 @@ def versende(
     return lauf
 
 
-# =========================================================  Bounce-Abgleich
-
-# Ein Hard Bounce oder eine Beschwerde schaltet SOFORT ab. Soft Bounces erst
-# nach fuenf in Folge: ein volles Postfach ist in drei Tagen wieder leer, und
-# wer dafuer eine lebende Adresse wegwirft, verliert einen Leser fuer immer.
 HARTE_EREIGNISSE = {
     "hard_bounce",
     "hardBounce",

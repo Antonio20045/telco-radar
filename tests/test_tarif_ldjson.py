@@ -68,11 +68,6 @@ def _knoten(
     )
 
 
-# --------------------------------------------------------------------------
-# Die gemessene Seite
-# --------------------------------------------------------------------------
-
-
 def test_die_sieben_tarife_der_seite():
     gefunden = _tarife()
     assert [(t.name, t.grundgebuehr) for t, _ in gefunden] == [
@@ -98,8 +93,6 @@ def test_das_datenvolumen_kommt_aus_der_beschreibung():
     nach_name = {t.name: t.datenvolumen_gb for t, _ in _tarife()}
     assert nach_name["1&1 All-Net-Flat S"] == 10.0
     assert nach_name["1&1 All-Net-Flat L"] == 150.0
-    # "1&1 Unlimited XL" nennt in seiner description keine GB-Zahl. Dann
-    # steht dort nichts - nicht "unbegrenzt", nicht 0.
     assert nach_name["1&1 Unlimited XL"] is None
 
 
@@ -145,11 +138,6 @@ def test_der_fingerabdruck_haengt_am_knoten_und_nicht_an_der_seite():
 
 def test_kein_tarif_geraet_in_quarantaene():
     assert all(not t.ist_quarantaene for t, _ in _tarife())
-
-
-# --------------------------------------------------------------------------
-# Abgrenzung und Ausfaelle
-# --------------------------------------------------------------------------
 
 
 def test_ein_geraet_ist_kein_tarif():

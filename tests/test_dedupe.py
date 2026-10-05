@@ -30,7 +30,6 @@ def test_seen_store_roundtrip(tmp_path):
     assert store.filter_new([a, b]) == [a, b]
     store.add([a])
 
-    # reload from disk -> a is known, b is new
     store2 = SeenStore(store_path)
     assert store2.filter_new([a, b]) == [b]
     assert len(store2) == 1
@@ -40,7 +39,7 @@ def test_filter_new_dedupes_within_run(tmp_path):
     store = SeenStore(tmp_path / "seen.jsonl")
     a1 = _item("Same story", "https://x.com/news/a?utm_source=feed1")
     a2 = _item("Same story again", "https://x.com/news/a?utm_source=feed2")
-    assert len(store.filter_new([a1, a2])) == 1  # same normalized URL
+    assert len(store.filter_new([a1, a2])) == 1
 
 
 def test_filter_fresh():
@@ -64,4 +63,4 @@ def test_reported_topics_memory(tmp_path):
     )
 
     reloaded = ReportedTopics(path, max_entries=2)
-    assert reloaded.recent() == ["Jio: AI plan", "MTN: MoMo"]  # capped at 2
+    assert reloaded.recent() == ["Jio: AI plan", "MTN: MoMo"]

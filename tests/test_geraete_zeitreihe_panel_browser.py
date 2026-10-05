@@ -112,12 +112,6 @@ def telefon(_browser_seite):
         yield paar
 
 
-# Ein UEBERLAPPUNGSFREIER Kurvenpunkt: benachbarte Trefferflaechen (r=12)
-# koennen sich ueberdecken, wenn zwei Anbieter am selben Tag wenige Pixel
-# auseinander liegen - dann gewinnt der Browser den obersten Kreis. Der
-# Test klickt nur auf Flaechen, deren Mitte wirklich zum eigenen Kreis
-# gehoert (document.elementFromPoint), sonst messte er einen anderen als
-# den erwaehnten.
 _FREIER_PUNKT = """(anb) => {
   const frei = [];
   document.querySelectorAll('circle.gr-zr-hit[data-m]').forEach(c => {
@@ -155,9 +149,6 @@ def _freier_punkt(seite, anb=None):
     scroll_into_view_if_needed unterstuetzt SVG-Kindkreise nicht.
     """
     adresse = "circle.gr-zr-hit[data-m]" + (f"[data-anb='{anb}']" if anb else "")
-    # Der LETZTE Kreis im DOM gehoert zum (per CSS versteckten) schmalen
-    # SVG - scrollIntoView auf ein unsichtbares Element wirkt nicht. Ziel
-    # ist der letzte KREIS MIT Flaeche, also der sichtbaren Variante.
     seite.eval_on_selector_all(
         adresse,
         "els => { const da = els.filter("
@@ -179,8 +170,6 @@ def _kopf(seite) -> str:
 
 def test_klick_auf_den_punkt_oeffnet_das_panel_dieser_messung(schreibtisch):
     seite, _fehler = schreibtisch
-    # Waechter: die o2-Serie hat MEHRERE Messtage (Fixture: drei) - nur dann
-    # ist 'genau diese Messung' eine echte Unterscheidung.
     tage = seite.eval_on_selector_all(
         ".gr-zr-rechnungen template[data-anb='o2']",
         "els => els.map(e => e.getAttribute('data-m'))",
@@ -193,11 +182,7 @@ def test_klick_auf_den_punkt_oeffnet_das_panel_dieser_messung(schreibtisch):
 
     assert _panel_offen(seite)
     assert ziel["anb"] in _kopf(seite)
-    # Die Werte GENAU dieser Messung: der Panel-Inhalt ist der Klon des
-    # Templates derselben (Anbieter, Messtag)-Kombination.
     assert seite.evaluate(_PANEL_EQ_TEMPLATE, ziel) is True
-    # Das ×-Muster der gesetzten Rechung (design.md Regel 6) - mindestens
-    # ein Posten traegt "ANZAHL × BETRAG".
     posten = seite.eval_on_selector_all(
         "#gr-zr-panel li.gr-zr-posten .gr-zr-pr", "els => els.map(e => e.textContent)"
     )
@@ -217,8 +202,6 @@ def test_der_aktive_punkt_ist_in_beiden_svg_markiert(schreibtisch):
         "e.getAttribute('data-m'), "
         "getComputedStyle(e).strokeWidth])",
     )
-    # BEIDE SVG-Varianten (breit + schmal; eine ist per CSS versteckt)
-    # tragen die Markierung - sonst verschwaende sie beim Umklappen.
     assert aktiv == [
         [ziel["anb"], ziel["m"], "2.8px"],
         [ziel["anb"], ziel["m"], "2.8px"],
@@ -228,18 +211,12 @@ def test_der_aktive_punkt_ist_in_beiden_svg_markiert(schreibtisch):
 def test_klick_auf_die_preiszahl_oeffnet_den_rechenweg_des_anbieters(schreibtisch):
     seite, _fehler = schreibtisch
     satz = seite.inner_text("#gr-zr-antwort")
-    # Waechter: der Satz nennt den Guenstigsten im festen Wortlaut, an dem
-    # die Anbietererkennung haengt (drei Formen aus _antwort_html).
     assert "1&1 am günstigsten:" in satz, satz
     seite.locator("#gr-zr-antwort b.gr-zr-zahl").first.click()
     seite.wait_for_timeout(300)
 
     assert _panel_offen(seite)
     assert "1&1" in _kopf(seite)
-    # Die Preiszahl nennt den Stand von HEUTE - es gibt kein Template zu
-    # "heute"; geoeffnet wird der LETZTE Messtag der Serie. 1&1 hat in der
-    # Fixture genau einen (2026-09-12), damit ist "letzter" hier hart
-    # geprueft und nicht Verhandlungssache der Reihenfolge.
     erwartet = {"anb": "1&1", "m": "2026-09-12"}
     assert seite.evaluate(_PANEL_EQ_TEMPLATE, erwartet) is True
     assert "12. September 2026" in _kopf(seite)
@@ -247,7 +224,6 @@ def test_klick_auf_die_preiszahl_oeffnet_den_rechenweg_des_anbieters(schreibtisc
 
 def test_derselbe_klick_schliesst_ein_anderer_wechselt(schreibtisch):
     seite, _fehler = schreibtisch
-    # Oeffnen per Preiszahl (deterministisch, unabhaengig vom Scroll).
     seite.locator("#gr-zr-antwort b.gr-zr-zahl").first.click()
     seite.wait_for_timeout(250)
     assert _panel_offen(seite)
@@ -255,8 +231,6 @@ def test_derselbe_klick_schliesst_ein_anderer_wechselt(schreibtisch):
     seite.wait_for_timeout(200)
     assert not _panel_offen(seite)
 
-    # Wechsel: Panel per Preiszahl auf, dann einen ANDEREN Anbieter-Punkt
-    # klicken - die Messung wechselt, das Panel bleibt offen.
     seite.locator("#gr-zr-antwort b.gr-zr-zahl").first.click()
     seite.wait_for_timeout(250)
     vorher = _kopf(seite)
@@ -274,8 +248,6 @@ def test_der_schliessen_knopf_und_die_tastatur_oeffnen_und_schliessen(schreibtis
     seite, _fehler = schreibtisch
     ziel = _freier_punkt(seite, "o2")
     assert ziel
-    # Tastatur: Fokus auf die Trefferflaeche, Enter oeffnet (der Kreis
-    # traegt role=button und tabindex aus app.js).
     seite.evaluate(
         "(z) => document.querySelector("
         '"circle.gr-zr-hit[data-anb=\'" + z.anb + "\'][data-m=\'" + z.m'
@@ -286,8 +258,6 @@ def test_der_schliessen_knopf_und_die_tastatur_oeffnen_und_schliessen(schreibtis
     seite.wait_for_timeout(250)
     assert _panel_offen(seite)
     assert ziel["anb"] in _kopf(seite)
-    # Der ×-Knopf des Panels schliesst (Delegation - er entsteht mit jedem
-    # Rechenweg neu).
     seite.locator("#gr-zr-panel .gr-zr-zu").click()
     seite.wait_for_timeout(200)
     assert not _panel_offen(seite)
@@ -298,8 +268,6 @@ def test_der_modellwechsel_schliesst_das_panel(schreibtisch):
     seite.locator("#gr-zr-antwort b.gr-zr-zahl").first.click()
     seite.wait_for_timeout(250)
     assert _panel_offen(seite)
-    # Bandwechsel laedt einen anderen Graphen - das Panel der ALTEN Messung
-    # darf nicht unter dem neuen stehen bleiben.
     seite.locator("#gr-zr-baender button[data-band='m']").click()
     seite.wait_for_timeout(500)
     assert not _panel_offen(seite)
@@ -331,14 +299,6 @@ def test_keine_konsolenfehler_bei_den_klicks(schreibtisch):
     seite.locator("#gr-zr-panel .gr-zr-zu").click()
     seite.wait_for_timeout(150)
     assert not fehler, fehler
-
-
-# --------------------------------------------------------------------------
-# P1-Fix (17.09.2026): die Auflagen der Sicht-Pruefung - Karten-Preis als
-# dritter Eingang (A1), bandgekoppelte Karten (B2), Leer-Hinweis statt
-# Vodafone-Naherung fuer FREMDE Messungen (Code-S3-2), 12-px-Regel im
-# geoeffneten Panel (Code-S3-1).
-# --------------------------------------------------------------------------
 
 
 def test_klick_auf_den_karten_preis_oeffnet_den_rechenweg(schreibtisch):
@@ -391,7 +351,6 @@ def test_klick_auf_den_preis_einer_fremden_karte_waehlt_und_oeffnet(schreibtisch
     )
     assert _panel_offen(seite)
     assert anb in _kopf(seite)
-    # das Paar ist gewechselt: die URL nennt Modell und Band des Klicks
     url = seite.evaluate("location.search")
     assert "band=" + band in url
 
@@ -417,7 +376,6 @@ def test_der_bandwechsel_stellt_auch_die_karten_um(schreibtisch):
     assert vorher != nachher, (
         f"die Karte zeigt nach dem Bandwechsel denselben Preis ({vorher})"
     )
-    # Die Bandlage der Karte ist die gewaehlte
     band = aktiv.locator(".gr-zr-k-band:not([hidden])").first
     assert band.get_attribute("data-band") == "m"
 

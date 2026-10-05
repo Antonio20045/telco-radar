@@ -115,8 +115,6 @@ def test_jeder_messtag_traegt_trotzdem_eine_rasterlinie(tmp_path):
     bleibt als Rasterlinie je Messtag stehen."""
     root = _dichte_seite(tmp_path, breit=False)
     svg = (root / "index.html").read_text(encoding="utf-8")
-    # eine Rasterlinie je Messtag PLUS die y-Rasterlinien - untere Grenze
-    # reicht: mindestens 12 vertikale x1==x2 Linien.
     import re
 
     linien = re.findall(

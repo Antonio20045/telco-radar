@@ -131,11 +131,6 @@ def _lauf(seiten: dict, antwort=None):
     )
 
 
-# --------------------------------------------------------------------------
-# 1. Neun tote Adressen kippen keinen gelesenen Lauf
-# --------------------------------------------------------------------------
-
-
 def test_tote_produktadressen_kippen_einen_gelesenen_lauf_nicht():
     """Der gemessene Fall, nachgebaut: 45 Adressen, 9 davon tot, 36
     gelesen. Vor dem Fix: Status `fehler`, `vollstaendig` False, null
@@ -146,8 +141,6 @@ def test_tote_produktadressen_kippen_einen_gelesenen_lauf_nicht():
     assert bilanz.status == "ok"
     assert bilanz.produkte_abgerufen == 36
     assert bilanz.produkte_versucht == 45
-    # Die Luecke ist BENANNT und nicht stillschweigend 0 (Clean Code 3):
-    # jede tote Adresse steht mit ihrem Statuscode da.
     assert len(bilanz.tote_adressen) == 9
     assert all("HTTP 404" in eintrag for eintrag in bilanz.tote_adressen)
     assert "/p/900/weg" in bilanz.tote_adressen[0]
@@ -160,11 +153,6 @@ def test_ohne_tote_adressen_bleibt_die_liste_leer():
     assert bilanz.tote_adressen == []
     assert bilanz.produkte_versucht == 36
     assert bilanz.vollstaendig is True
-
-
-# --------------------------------------------------------------------------
-# 2. Die Schwelle - und die Grenze genau
-# --------------------------------------------------------------------------
 
 
 def test_die_schwelle_ist_eine_benannte_konstante():
@@ -192,7 +180,6 @@ def test_unter_der_schwelle_ist_der_lauf_unvollstaendig():
     assert bilanz.gelesene_einstiege == set()
     assert bilanz.vollstaendig is False
     assert bilanz.status == "fehler"
-    # Und das Protokoll sagt, woran es lag - nicht "kein Einstieg lesbar".
     assert "4 von 10 Produktadressen tot" in bilanz.grund
     assert "kein Einstieg lesbar" not in bilanz.grund
 
@@ -203,11 +190,6 @@ def test_eine_tote_adresse_unter_zwei_reisst_die_schwelle():
     dass ein Test faellt."""
     bilanz = _lauf(_seiten(lebend=1, tot=1))
     assert bilanz.vollstaendig is False
-
-
-# --------------------------------------------------------------------------
-# 3. Nur eine Antwort des Anbieters ist eine tote Adresse
-# --------------------------------------------------------------------------
 
 
 def test_ein_serverfehler_ist_keine_tote_adresse():
@@ -259,11 +241,6 @@ def test_eine_robots_sperre_ist_keine_tote_adresse():
     assert bilanz.gelesene_einstiege == set()
 
 
-# --------------------------------------------------------------------------
-# 4. Der Einstieg selbst bleibt ein Fehler
-# --------------------------------------------------------------------------
-
-
 def test_ein_toter_einstieg_bleibt_ein_fehler():
     """Die Lockerung gilt fuer PRODUKTADRESSEN. Antwortet die
     Einstiegsseite selbst 404, ist der Anbieter ungelesen - sonst waere
@@ -276,10 +253,6 @@ def test_ein_toter_einstieg_bleibt_ein_fehler():
     assert bilanz.produkte_versucht == 0
     assert "HTTP 404" in bilanz.grund
 
-
-# --------------------------------------------------------------------------
-# 5. Die Zahl steht im Protokoll und auf der Quellenseite
-# --------------------------------------------------------------------------
 
 _QUELLEN_MIT_TOTER_ADRESSE = {
     "anbieter": [
@@ -338,7 +311,6 @@ def test_der_lauf_zaehlt_wieder_als_vollstaendiger_lauf(tmp_path):
     gebucht = db.laufbilanz("Haendler")
     assert gebucht["laeufe"] == 1
     assert gebucht["letzter_lauf"] == "2026-08-11"
-    # Und die Luecke ist gebucht, nicht verschwiegen.
     assert gebucht["tote_adressen"] == 9
     satz = [a for a in bilanz["anbieter"] if a["anbieter"] == "Haendler"][0]
     assert satz["status"] == "ok"
@@ -408,11 +380,6 @@ def test_ohne_tote_adressen_steht_keine_null_auf_der_seite(tmp_path):
     assert zeile["tote_satz"] == ""
 
 
-# --------------------------------------------------------------------------
-# 6. Der Lesezustand: GELESEN, nicht TEILGELESEN
-# --------------------------------------------------------------------------
-
-
 def test_tote_adressen_ergeben_gelesen_und_nicht_teilgelesen(tmp_path):
     """Kein ZWEITER Teilzustand neben dem des Abdeckungswaechters
     (Clean Code 7). TEILGELESEN heisst "abgebrochen, was durchkam ist
@@ -440,11 +407,6 @@ def test_unter_der_schwelle_ist_der_tag_ein_lesefehler(tmp_path):
     root, _ = _stufe(tmp_path, "2026-08-11", lebend=6, tot=4)
     db = GeraeteDB(root / "data" / "state" / "geraete_db.json")
     assert db.messtage("Haendler")[-1].zustand == LESEFEHLER
-
-
-# --------------------------------------------------------------------------
-# 7. Was KEINE tote Adresse ist - die Wege, die keinen Statuscode haben
-# --------------------------------------------------------------------------
 
 
 def test_eine_abweisung_der_abrufschleuse_hat_keinen_statuscode():
@@ -477,8 +439,6 @@ def test_die_besuchszeit_beendet_den_lauf_ohne_tote_adresse():
 
     seiten = _seiten(lebend=6, tot=0)
     robots = "User-agent: *\nCrawl-delay: 0\nVisit-time: 0200-0800\n"
-    # Die ersten Abrufe liegen im Fenster, danach ist es 09:00 - eine Uhr,
-    # die waehrend des Laufs weiterlaeuft, und genau das tut sie in echt.
     takte = {"n": 0}
 
     def uhr():
@@ -546,10 +506,6 @@ def test_eine_202_challenge_ist_keine_tote_adresse():
     assert bilanz.vollstaendig is True
 
 
-# --------------------------------------------------------------------------
-# 8. Mehrere Einstiege: die Schwelle rechnet je Einstieg
-# --------------------------------------------------------------------------
-
 _EINSTIEG_ZWEI = "https://www.haendler.test/c/117/handys"
 
 
@@ -596,11 +552,6 @@ def test_nur_der_einstieg_mit_zu_vielen_toten_adressen_faellt_aus():
     assert len(bilanz.tote_adressen) == 4
     assert f"{_EINSTIEG}: 4 von 10 Produktadressen tot" in bilanz.grund
     assert _EINSTIEG_ZWEI not in bilanz.grund
-
-
-# --------------------------------------------------------------------------
-# 9. "Nicht gemessen" steht auch im PROTOKOLL als Luecke (Clean Code 3)
-# --------------------------------------------------------------------------
 
 
 def test_ein_lauf_ohne_produktseiten_bucht_auch_im_protokoll_keine_null(tmp_path):

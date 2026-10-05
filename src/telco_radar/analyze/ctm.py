@@ -57,9 +57,6 @@ from pathlib import Path
 
 import yaml
 
-# Die Zahlenrechnung des Prueflaufs (faithfulness), nicht eine zweite daneben.
-# Ob eine Zahl "aus der Quelle" stammt, muss hier dasselbe heissen wie dort -
-# sonst laesst der Kasten eine Zeile zu, die die Belegpruefung verworfen haette.
 from ..textwerkzeug import begriffs_muster, ungedeckte_zahl
 
 log = logging.getLogger(__name__)
@@ -82,20 +79,10 @@ STUFEN_ERKLAERUNG = {
     0: "Infrastruktur, Geschäftskunden oder Kapitalmarkt ohne Endkundenbezug.",
 }
 
-# Maximale Laenge des CTM-Satzes in Woertern. Kein Schnitt - ein zu langer
-# Satz wird VERWORFEN, nicht gekuerzt. Ein Halbsatz mit "…" ist in dieser
-# Codebasis schon zweimal als Fehler benannt worden.
 MAX_WOERTER = 28
 
-# Eine Zahl, die als eigenes Wort steht - fuer die Aufnahmeregel des
-# Kurzpfads (siehe `hat_zahl_aus_der_quelle`). Die Rechnung des Prueflaufs
-# selbst bleibt bewusst weiter gefasst: dort geht es darum, ob eine Ziffer
-# erfunden ist, und da zaehlt auch die im Modellnamen.
 _ECHTE_ZAHL = re.compile(r"(?<![\w.,])\d+(?:[.,]\d+)*(?![\w])")
 
-# Woerter, an denen ein Satz als Wiederholung statt als Konsequenz erkennbar
-# ist. Sie sind nicht verboten, sie reichen nur nicht: ein Satz, der KEINES
-# der Konsequenzmuster traegt, faellt.
 _KONSEQUENZ = re.compile(
     r"(drück|druck|zwing|erfordert?|verlangt|müssen wir|müssten wir|"
     r"brauchen wir|bräuchte|unsere[nrms]?\b|unser\b|eigene[nrms]?\b|"
@@ -105,7 +92,6 @@ _KONSEQUENZ = re.compile(
     re.I,
 )
 
-# Reine Beobachtungssaetze, die nichts fuer das eigene Haus folgern.
 _LEERFORMEL = re.compile(
     r"^(das zeigt|dies zeigt|zeigt,? dass|ein weiterer schritt|"
     r"unterstreicht|verdeutlicht|bestätigt den trend|passt in den trend)",
@@ -124,10 +110,6 @@ class CtmFokus:
     vergleichbare_maerkte: list[str] = field(default_factory=list)
     sicherheitsskala: list[dict] = field(default_factory=list)
 
-    # Vorberechnete Suchmuster. Ein Markenname darf nicht mitten in einem
-    # anderen Wort treffen: ohne Wortgrenze fand "O2" jedes "CO2", und "Blau"
-    # jedes "blauen Licht". Dieselbe Lehre wie beim Promo-Zweig, wo "EUR" ohne
-    # Wortgrenze aus "1 Euro einmalig" die Kachel "1 Eur" schnitt.
     _heimat_re: re.Pattern | None = None
     _nachbar_re: re.Pattern | None = None
 
@@ -287,8 +269,6 @@ def veredle(highlights: list[dict], fokus: CtmFokus) -> dict:
                 bilanz["saetze_verworfen"] += 1
                 bilanz["gruende"][grund] = bilanz["gruende"].get(grund, 0) + 1
         else:
-            # Unter Stufe 2 gibt es keinen Satz. Nicht aus Sparsamkeit: ein
-            # Konsequenzsatz zu einer Meldung ohne Konsequenz ist erfunden.
             h.pop("ctm_satz", None)
 
         bilanz[
@@ -329,11 +309,6 @@ def hat_zahl_aus_der_quelle(h: dict) -> bool:
     return ungedeckte_zahl(satz, quelle) is None
 
 
-# Der Zuschnitt des Kurzpfads. Er steht HIER und nicht bei seinem Aufrufer,
-# weil ihn zwei Aufrufer haben: die Startseite und die Montagsmail. Zwei
-# Zahlenpaare an zwei Orten waren am 09.08.2026 kurz davor, aus einer
-# Auswahl zwei zu machen - und eine Mail, die etwas anderes hervorhebt als
-# die Seite, auf die sie verlinkt, ist schlimmer als keine Mail.
 KURZPFAD_ZEILEN = 3
 KURZPFAD_WOERTER = 20
 
@@ -391,11 +366,6 @@ def zwei_minuten(
     """
     out: list[dict] = []
     gesehen: set[str] = set()
-    # Warum eine Zeile NICHT dasteht. Ohne diese Zaehler sagt ein leerer
-    # Kasten nur "nichts gefunden" - und ob nichts kam oder ob zwanzig
-    # Saetze an der Wortgrenze hingen, liesse sich hinterher nicht mehr
-    # beantworten. Dieselbe Ueberlegung wie bei `veredle()`, die ihre
-    # verworfenen Saetze samt Grund ins Laufprotokoll gibt.
     gefallen = {"zu lang": 0, "ohne Zahl aus der Quelle": 0}
 
     def zugelassen(h: dict) -> bool:

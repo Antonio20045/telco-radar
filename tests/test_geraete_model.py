@@ -39,12 +39,6 @@ from telco_radar.geraete_model import (
     zustand_aus_titel,
 )
 
-# --------------------------------------------------------------------------
-# Ein kleiner Katalog, der die drei Fallen enthaelt, an denen eine naive
-# Erkennung scheitert: eine Modellfamilie mit gemeinsamem Praefix
-# (iPhone 17 / 17 Pro / 17 Pro Max), zwei Hersteller mit derselben Ziffer
-# und ein Geraet, dessen Name eine angeklebte Ziffer traegt (Fold7).
-# --------------------------------------------------------------------------
 _KATALOG = Katalog(
     geraete=[
         Geraet(
@@ -111,11 +105,6 @@ _FARBEN = {
 }
 
 
-# --------------------------------------------------------------------------
-# Normalisierung
-# --------------------------------------------------------------------------
-
-
 def test_normalisiere_faltet_umlaute_und_sonderzeichen():
     assert normalisiere("Titan Natur") == "titan-natur"
     assert normalisiere("Grün / Größe") == "gruen-groesse"
@@ -124,31 +113,17 @@ def test_normalisiere_faltet_umlaute_und_sonderzeichen():
 
 
 def test_wortmarken_trennen_angeklebte_ziffern_nach_buchstaben():
-    # "Fold7" und "Fold 7" muessen dieselbe Marke ergeben, sonst findet der
-    # Katalogeintrag "Galaxy Z Fold 7" die Haendlerschreibweise nie.
     assert wortmarken("Galaxy Z Fold7") == wortmarken("Galaxy Z Fold 7")
     assert wortmarken("Galaxy S25 Ultra") == ["galaxy", "s", "25", "ultra"]
 
 
 def test_wortmarken_lassen_ziffer_buchstabe_zusammen():
-    # Umgekehrt darf "3a" NICHT zu "3" + "a" zerfallen: sonst matcht der
-    # Katalogeintrag "Nothing Phone 3" auf das "Nothing Phone (3a)" und
-    # zwei verschiedene Geraete bekaemen dieselbe ID.
     assert "3a" in wortmarken("Nothing Phone (3a) Pro")
     assert "3" not in wortmarken("Nothing Phone (3a) Pro")
-    # Dasselbe schuetzt "5G" davor, als Ziffer 5 gelesen zu werden.
     assert "5g" in wortmarken("iPhone 17 Pro 5G")
 
 
-# --------------------------------------------------------------------------
-# Die ID-Regel
-# --------------------------------------------------------------------------
-
-
 def test_ids_sind_lesbar_und_nicht_gehasht():
-    # Klartext statt Hash, dieselbe Begruendung wie bei data/state/ct_seen.jsonl:
-    # es sind hunderte Zeilen, nicht Millionen, und der Klartext ist die halbe
-    # Diagnose.
     d = device_id("Apple", "iPhone 17 Pro Max")
     assert d == "apple-iphone-17-pro-max"
     s = sku_id(d, 256, "titan-natur")
@@ -212,8 +187,6 @@ def test_geaenderter_produkttitel_ergibt_keine_neue_id():
     )
     assert alt is not None and neu is not None
     assert alt.listung_id == neu.listung_id
-    # Gegenprobe, damit der Test nicht durch einen leeren Vergleich gruen
-    # wird: die Titel sind wirklich verschieden.
     assert alt.titel_roh != neu.titel_roh
 
 
@@ -231,11 +204,6 @@ def test_verschiedene_speicher_sind_verschiedene_skus():
         for gb in (256, 512, 1024)
     }
     assert len(ids) == 3
-
-
-# --------------------------------------------------------------------------
-# Geraeteerkennung
-# --------------------------------------------------------------------------
 
 
 def test_laengster_treffer_gewinnt():
@@ -277,9 +245,6 @@ def test_zubehoer_ist_kein_geraet(titel):
 
 
 def test_zubehoerwort_im_geraetetitel_verwirft_nicht():
-    # Gegenprobe: "Case" faellt, "Displayschutz ab Werk" im Fliesstext eines
-    # echten Geraetetitels darf es nicht - deshalb steht der Filter auf
-    # eigenen Woertern, nicht auf Teilketten.
     g = erkenne_geraet("Apple iPhone 17 Pro Max 256 GB Showcase-Modell", _KATALOG)
     assert g is not None and g.modell == "iPhone 17 Pro Max"
 
@@ -301,19 +266,11 @@ def test_unbekanntes_geraet_wird_nicht_erfunden():
 
 
 def test_teiltreffer_ueber_wortgrenze_zaehlt_nicht():
-    # "17" allein darf "iPhone 17" nicht ausloesen. Der Titel darf dafuer
-    # KEIN Zubehoerwort enthalten, sonst faellt er schon dort durch und der
-    # Test prueft die Wortfolgenpruefung gar nicht.
     from telco_radar.geraete_model import _ist_zubehoer
 
     titel = "Apple Watch Series 17 GPS 42 mm"
     assert not _ist_zubehoer(wortmarken(titel))
     assert erkenne_geraet(titel, _KATALOG) is None
-
-
-# --------------------------------------------------------------------------
-# Speicher
-# --------------------------------------------------------------------------
 
 
 @pytest.mark.parametrize(
@@ -334,14 +291,11 @@ def test_arbeitsspeicher_ist_kein_speicher():
 
 
 def test_5g_ist_keine_speichergroesse():
-    # Der Fall muss eine ECHTE Groessenangabe enthalten, sonst prueft er
-    # nichts: ein Titel ohne "GB" kann die Regex ohnehin nicht treffen.
     assert speicher_aus_titel("iPhone 17 Pro 5G 256 GB") == 256
     assert wortmarken("iPhone 17 Pro 5G")[-1] == "5g"
 
 
 def test_zwei_verschiedene_groessen_im_titel_ergeben_keine_vermutung():
-    # Eine Sammelseite "256 GB / 512 GB" darf keinen Wert raten.
     assert speicher_aus_titel("iPhone 17 Pro Max 256 GB / 512 GB") is None
 
 
@@ -349,11 +303,6 @@ def test_1024_gb_und_1_tb_sind_derselbe_wert():
     assert speicher_aus_titel("Galaxy S25 Ultra 1024 GB") == speicher_aus_titel(
         "Galaxy S25 Ultra 1 TB"
     )
-
-
-# --------------------------------------------------------------------------
-# Farben
-# --------------------------------------------------------------------------
 
 
 def test_farbnormalisierung_fasst_schreibweisen_zusammen():
@@ -414,11 +363,6 @@ def test_farbe_aus_titel_gibt_die_rohschreibweise_zurueck():
 
 def test_farbe_aus_titel_ohne_treffer():
     assert farbe_aus_titel("Apple iPhone 17 Pro Max 256 GB", _FARBEN) == ("", None)
-
-
-# --------------------------------------------------------------------------
-# Listung: die harten Zusicherungen
-# --------------------------------------------------------------------------
 
 
 def test_listung_ohne_quelle_laesst_sich_nicht_bauen():
@@ -539,8 +483,6 @@ def test_preisart_ohne_vertrag():
 
 
 def test_listung_ohne_jeden_preis_ist_erlaubt_aber_kennzeichnet_sich():
-    # Ein Geraet kann gelistet und gerade nicht bepreist sein
-    # ("demnaechst verfuegbar"). Das ist eine Listung, aber kein Preis.
     l = Listung(
         sku_id="x",
         device_id="x",
@@ -570,11 +512,6 @@ def test_sku_aus_listung():
     assert s.sku_id == l.sku_id and s.speicher_gb == 256 and s.ean == "0194253000000"
 
 
-# --------------------------------------------------------------------------
-# Katalog: die Vorgaengerkette
-# --------------------------------------------------------------------------
-
-
 def test_vorgaengerkette_wird_auf_device_ids_aufgeloest():
     g = _KATALOG.nach_id("apple-iphone-17-pro-max")
     assert g.vorgaenger_device_id == "apple-iphone-16-pro-max"
@@ -587,8 +524,6 @@ def test_vorgaengerkette_wird_auf_device_ids_aufgeloest():
 
 
 def test_vorgaenger_ausserhalb_des_katalogs_bleibt_leer():
-    # "iPhone 16" steht nicht im Katalog - die Kette bricht, und das darf
-    # nicht als Treffer durchgehen.
     assert _KATALOG.vorgaenger_von("apple-iphone-17") is None
     assert _KATALOG.nach_id("apple-iphone-17").vorgaenger_device_id == "apple-iphone-16"
 
@@ -604,11 +539,6 @@ def test_katalog_weist_doppelte_geraete_ab():
             ]
         )
 
-
-# --------------------------------------------------------------------------
-# Die Befunde des Reviews vom 10.08.2026, jeder mit seinem Reproduktionsfall.
-# Gegen den Stand VOR den Korrekturen faellt jeder dieser Tests durch.
-# --------------------------------------------------------------------------
 
 _KATALOG_REVIEW = Katalog(
     geraete=[
@@ -669,7 +599,6 @@ def test_ein_modellzusatz_hinter_dem_treffer_verwirft_die_zuordnung(titel):
 
 
 def test_ohne_zusatz_greift_derselbe_titel_weiterhin():
-    # Gegenprobe: die Sperre darf nicht den Normalfall verwerfen.
     g = erkenne_geraet("Google Pixel 10 Pro 256 GB Moonstone", _KATALOG_REVIEW)
     assert g is not None and g.modell == "Pixel 10 Pro"
 
@@ -685,7 +614,6 @@ def test_binnenmajuskel_wird_getrennt():
     """ "ProMax" zerfiel nicht, der Titel lief als "iPhone 17"."""
     g = erkenne_geraet("Apple iPhone 17 ProMax 256GB Titannatur", _KATALOG_REVIEW)
     assert g is not None and g.modell == "iPhone 17 Pro Max"
-    # ... und "iPhone" darf dabei NICHT zu "i Phone" zerfallen.
     assert wortmarken("iPhone")[0] == "iphone"
 
 
@@ -718,7 +646,6 @@ def test_ram_ohne_trennzeichen_verschluckt_den_speicher_nicht():
     assert speicher_aus_titel("Samsung Galaxy S25 Ultra 12 GB RAM 512 GB") == 512
     assert speicher_aus_titel("Galaxy S25 Ultra 512 GB / 12 GB RAM") == 512
     assert speicher_aus_titel("Arbeitsspeicher: 12 GB, Speicher 512 GB") == 512
-    # Gegenprobe: eine reine RAM-Angabe bleibt eine RAM-Angabe.
     assert speicher_aus_titel("Galaxy S25 Ultra 8 GB RAM") is None
 
 
@@ -730,11 +657,9 @@ def test_katalogstufen_sind_eine_vorliebe_kein_filter():
 
 
 def test_mehrdeutigkeit_wird_ueber_die_katalogstufen_aufgeloest():
-    # Zwei Werte, aber nur einer steht im Katalog: dann ist es dieser.
     assert (
         speicher_aus_titel("iPhone 17 mit 64 GB oder 256 GB", erlaubt=[256, 512]) == 256
     )
-    # Zwei Werte, beide im Katalog: es wird nichts geraten.
     assert speicher_aus_titel("iPhone 17 256 GB / 512 GB", erlaubt=[256, 512]) is None
 
 
@@ -752,10 +677,7 @@ def test_farbbruchstueck_wird_nicht_kanonisiert():
         "rose": "rosa",
     }
     assert farbe_aus_titel("Handy in Black Titanium", tabelle)[1] == "titan-schwarz"
-    # "Titanium Black" kennt die Tabelle nicht - dann gibt es keine Farbe,
-    # statt das Bruchstueck "Black" zu nehmen.
     assert farbe_aus_titel("Handy in Titanium Black", tabelle)[1] is None
-    # "Rose Gold" ist weder Rose noch Gold.
     assert farbe_aus_titel("Handy in Rose Gold", tabelle) == ("", None)
 
 
@@ -803,30 +725,17 @@ def test_vertragspreis_ohne_tarifbezug_wird_abgewiesen():
         )
 
 
-# --------------------------------------------------------------------------
-# Zustand: die Preisdimension, die am 29.08.2026 den Vergleich verdreht hat
-# --------------------------------------------------------------------------
-
-
 @pytest.mark.parametrize(
     "titel,erwartet",
     [
-        # o2 kennzeichnet seine Gebrauchtstrecke in ZWEI Schreibweisen. Die
-        # Stichwortliste kannte am 29.08.2026 nur die erste - und genau die zwei
-        # Geraete, die o2 "(erneuert)" nennt, liefen als Neugeraet mit und
-        # gewannen damit den Preisvergleich gegen Vodafone.
         ("Apple iPhone 14 (gebraucht) 128 GB mitternacht erneuert", "refurbished"),
         ("Apple iPhone 14 Pro (erneuert) 128 GB space schwarz erneuert", "refurbished"),
         ("Samsung Galaxy S25 (erneuert) 128 GB grau erneuert", "refurbished"),
         ("Apple iPhone 16 (gebraucht) 128 GB blau erneuert", "refurbished"),
-        # "wie neu" stand in der Liste und konnte nie treffen: ein Zwei-Wort-
-        # String wurde gegen eine Menge einzelner Wortmarken geprueft.
         ("Apple iPhone 13 wie neu 128 GB", "refurbished"),
         ("Apple iPhone 15 renewed 128 GB", "refurbished"),
         ("Apple iPhone 15 generalueberholt 128 GB", "refurbished"),
         ("Samsung Galaxy S24 B-Ware 128 GB", "b-ware"),
-        # Gegenprobe: ein Neugeraet bleibt neu. "Neuheit" und "erneuerbar"
-        # duerfen nicht anschlagen - deshalb Wortmarken statt Teilketten.
         ("Apple iPhone 17 256 GB Titannatur", "neu"),
         ("Samsung Galaxy S25 Neuheit 128 GB", "neu"),
     ],
@@ -1031,10 +940,7 @@ def test_eine_leere_farbe_reisst_den_nachtlauf_nicht(farbe):
         ("Schwarz (gebraucht)", "Schwarz"),
         ("schwarz, refurbished", "schwarz"),
         ("space schwarz erneuert", "space schwarz"),
-        # Ein unklares Kennzeichen gehoert genauso wenig in die Farbe wie ein
-        # eindeutiges - sonst traegt die sku_id "neuwertig" als Farbe.
         ("schwarz neuwertig", "schwarz"),
-        # Gegenprobe: eine echte Farbe wird nicht angetastet.
         ("Erneuerbar-Gruen", "Erneuerbar-Gruen"),
         ("gebrauchtgrau", "gebrauchtgrau"),
         ("sunset-gold", "sunset-gold"),
@@ -1047,13 +953,6 @@ def test_ohne_zustandswort_raeumt_auch_die_interpunktion_ab(roh, erwartet):
 @pytest.mark.parametrize(
     "farbe",
     [
-        # Der Fall, der die Regel erzwungen hat: `.strip(" -,;/()[]")` lief bis
-        # zum 31.08.2026 unbedingt und machte hieraus "Silver Shadow (Enterprise
-        # Edition" - eine geoeffnete Klammer, die nie geschlossen wird. Die Zeile
-        # steht so im Livebestand (mobilcom-debitel, Galaxy S25 128 GB) und im
-        # CSV-Export. Solange nur `lies_listung` diese Funktion rief, fiel es
-        # nicht auf; seit `report.geraete_bereinigung` den GANZEN Bestand
-        # hindurchschickt, waere es ausgeliefert worden.
         "Silver Shadow (Enterprise Edition)",
         "Blau [Sondermodell]",
         "Grau,",
@@ -1072,12 +971,6 @@ def test_eine_farbe_ohne_kennzeichen_kommt_zeichengenau_zurueck(farbe):
 @pytest.mark.parametrize(
     "roh,erwartet",
     [
-        # Jedes mehrteilige Kennzeichen der Wortliste einzeln, in beiden
-        # Schreibweisen des Handels. Bis zum 31.08.2026 traf KEINES davon: der
-        # Musterbau zerlegte sein eigenes Ergebnis zu `b[\s[\s-]]ware`, einer
-        # Zeichenklasse plus einem literalen "]". Sechs von neun Kennzeichen
-        # waren damit tot, und aufgefallen ist es nicht, weil der Livebestand
-        # zufaellig nur die einwortigen "erneuert" und "gebraucht" fuehrt.
         ("Schwarz B-Ware", "Schwarz"),
         ("Schwarz B Ware", "Schwarz"),
         ("Schwarz wie-neu", "Schwarz"),
@@ -1149,15 +1042,8 @@ def test_die_baureihe_wird_aus_dem_modellnamen_gelesen(modell, serie):
 @pytest.mark.parametrize(
     "modell,serie",
     [
-        # Der Bindestrich trennt wie ein Leerzeichen. Ohne das wäre
-        # "Pixel-11 Pro" seine eigene Baureihe, jede Variante wäre "aktuelle
-        # Generation", der Filter ein No-Op und `portfolio_tiefe` zählte
-        # Varianten als Jahrgänge.
         ("Pixel-11 Pro", "Pixel"),
         ("Galaxy-S26-Ultra", "Galaxy S"),
-        # Rückfall: ein Name, der mit einer Ziffer beginnt, und einer ganz ohne
-        # Ziffer sind selbst die Reihe. Eine geratene Reihe würfe zwei
-        # Produktlinien zusammen, und das ist teurer.
         ("5G Phone X", "5G Phone X"),
         ("Rugged Phone", "Rugged Phone"),
         ("17", "17"),

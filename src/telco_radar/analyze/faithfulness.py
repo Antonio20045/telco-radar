@@ -37,7 +37,7 @@ from .llm import complete, extract_json
 
 log = logging.getLogger(__name__)
 
-STAPEL = 10  # Saetze je Pruefaufruf
+STAPEL = 10
 PRUEF_MAX_TOKENS = 16000
 
 _SICHERHEIT = ("sehr wahrscheinlich", "wahrscheinlich", "möglich")
@@ -123,8 +123,6 @@ def pruefe(highlights: list[dict], *, model: str, use_llm: bool) -> dict:
         bilanz["verworfen"] += 1
         bilanz["gruende"][grund] = bilanz["gruende"].get(grund, 0) + 1
 
-    # ---- Stufe 1 und 3 rechnet der Code. Sie kosten nichts und fangen den
-    # haeufigsten Fehler, bevor ein Modellaufruf ihn beurteilen muss.
     offen = []
     for h in kandidaten:
         quelle = f"{h.get('title') or ''} {h.get('summary') or ''}"
@@ -141,12 +139,10 @@ def pruefe(highlights: list[dict], *, model: str, use_llm: bool) -> dict:
         return bilanz
 
     if not use_llm or not model:
-        # Fail closed: ungeprueft erscheint kein Folgerungssatz.
         for h in offen:
             verwirf(h, "nicht geprüft (kein Modell verfügbar)")
         return bilanz
 
-    # ---- Stufe 2: traegt die Quelle die Folgerung?
     for start in range(0, len(offen), STAPEL):
         stapel = offen[start : start + STAPEL]
         nutzlast = json.dumps(
@@ -162,9 +158,6 @@ def pruefe(highlights: list[dict], *, model: str, use_llm: bool) -> dict:
             ensure_ascii=False,
         )
         try:
-            # 8000 ist die Untergrenze, die sich bewaehrt hat (Laeufe #83-85):
-            # ein denkendes Modell ist mit einem kleineren Budget fertig,
-            # bevor die Antwort anfaengt, und liefert einen leeren String.
             roh = complete(_SYSTEM, nutzlast, model=model, max_tokens=PRUEF_MAX_TOKENS)
             urteile = {
                 int(u.get("id", -1)): u

@@ -61,11 +61,6 @@ def _eins(geraete):
     return geraete[0]
 
 
-# --------------------------------------------------------------------------
-# Die Messpunkte
-# --------------------------------------------------------------------------
-
-
 def test_der_bestaetigungstag_verlaengert_die_kurve():
     """Die Historie traegt nur AENDERUNGSpunkte. Ohne `last_verified` endet
     jede Linie am Tag ihrer letzten Aenderung und behauptet damit, das Geraet
@@ -128,11 +123,6 @@ def test_gebrauchtgeraete_stehen_nicht_in_derselben_kurve():
     assert g["min"] == 899.0 and g["max"] == 899.0
 
 
-# --------------------------------------------------------------------------
-# Die Linien
-# --------------------------------------------------------------------------
-
-
 def test_hoechstens_acht_linien():
     """Mehr Anbieter kann ein Mensch in einem Liniendiagramm nicht
     auseinanderhalten, und die Legende waere laenger als das Bild."""
@@ -158,7 +148,6 @@ def test_der_eigene_anbieter_faellt_nie_aus_der_kappung():
     namen = [r["anbieter"] for r in g["reihen"]]
     assert "Vodafone" in namen, namen
     assert namen[0] == "Vodafone", "der eigene Anbieter steht zuerst"
-    # Gegenprobe: ohne die Ausnahme haette er wirklich weichen muessen.
     ohne = v.geraete_mit_verlauf(listungen[:-1], hist, _KATALOG)[0]
     assert len(ohne["reihen"]) == v.MAX_LINIEN
 
@@ -229,11 +218,6 @@ def test_die_telekom_farbe_ist_magenta_nicht_gruen():
     assert telekom["farbe"] != "#217a3c", "das ist die alte Hash-Gruen-Farbe"
 
 
-# --------------------------------------------------------------------------
-# Die Tabelle unter dem Diagramm
-# --------------------------------------------------------------------------
-
-
 def test_ohne_zweiten_messpunkt_gibt_es_keine_veraenderung():
     """ "-0,00 EUR" und "0 Tage" sind keine Auskunft. Der Auftrag verbietet
     Zeilen, die nichts sagen - hier steht dann ein Strich."""
@@ -276,11 +260,6 @@ def test_die_tabelle_sortiert_nach_preis():
         )
     )
     assert [z["anbieter"] for z in g["aktuell"]] == ["Vodafone", "o2", "freenet"]
-
-
-# --------------------------------------------------------------------------
-# Die Bilanz
-# --------------------------------------------------------------------------
 
 
 def test_die_messtermine_werden_gerechnet_und_nicht_behauptet():
@@ -326,11 +305,9 @@ def test_ein_anbieter_behaelt_seine_farbe_ueber_geraete_hinweg():
     drei Farben, und `#2b5bd7` hiess beim einen Geraet "o2" und beim
     naechsten "mobilcom-debitel"."""
     hist = _Historie()
-    # Geraet A: o2 hat mehr Punkte, steht also zuerst.
     a = v.geraete_mit_verlauf(
         [_l("x", "o2", 800.0), _l("y", "freenet", 810.0)], hist, _KATALOG
     )[0]
-    # Geraet B: die Reihenfolge dreht sich um.
     b = v.geraete_mit_verlauf(
         [_l("x", "freenet", 700.0), _l("y", "o2", 710.0), _l("z", "ALDI TALK", 690.0)],
         hist,
@@ -369,8 +346,6 @@ def test_zwei_bekannte_anbieter_eines_diagramms_sehen_nie_gleich_aus():
     assert len(set(stile)) == len(stile), list(
         zip([r["anbieter"] for r in g["reihen"]], stile)
     )
-    # Gegenprobe: die drei Service-Provider TEILEN wirklich eine Farbe -
-    # sonst prueft der Test oben nichts an der Stelle, an der es zaehlt.
     service_farben = {
         r["farbe"]
         for r in g["reihen"]
@@ -416,10 +391,8 @@ def test_zwei_preise_an_einem_tag_sind_eine_messluecke_kein_punkt():
         }
     )
     listungen = [_l("a", "ALDI TALK", 155.0, last_verified="2026-08-29")]
-    # Kein Punkt - auch nicht der bestaetigte aus der Datenbank.
     assert v._punkte(listungen, hist) == []
     assert v.geraete_mit_verlauf(listungen, hist, _KATALOG) == []
-    # Aber die Luecke ist benannt, mit beiden Betraegen.
     assert v.mehrdeutige_tage(listungen, hist) == [
         {
             "anbieter": "ALDI TALK",
@@ -428,7 +401,6 @@ def test_zwei_preise_an_einem_tag_sind_eine_messluecke_kein_punkt():
             "betraege": {"2026-08-29": [129.0, 155.0]},
         }
     ]
-    # Und ein zweiter, eindeutiger Tag derselben Listung bleibt erhalten.
     hist2 = _Historie(
         {
             "a": [
@@ -443,11 +415,6 @@ def test_zwei_preise_an_einem_tag_sind_eine_messluecke_kein_punkt():
         ("2026-08-30", 129.0),
         ("2026-08-31", 129.0),
     ]
-
-
-# --------------------------------------------------------------------------
-# NACHBESSERUNG 30.08.2026: Messtermine je Geraet
-# --------------------------------------------------------------------------
 
 
 def test_jedes_geraet_nennt_seine_eigenen_messtermine():
@@ -495,6 +462,4 @@ def test_die_schwelle_fuers_diagramm_steht_im_modul():
         == v.DIAGRAMM_AB_TERMINEN
     )
     assert v.leer()["diagramm_ab_terminen"] == v.DIAGRAMM_AB_TERMINEN
-    # Der Leerzustand muss DIESELBEN Schluessel tragen wie der Normalfall -
-    # ein fehlender ist in Jinja kein Fehler, sondern eine stumm leere Seite.
     assert set(v.leer()) == set(v.aufbereiten([], _Historie(), _KATALOG))

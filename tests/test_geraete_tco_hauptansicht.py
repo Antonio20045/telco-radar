@@ -148,8 +148,6 @@ def _naeherungs_modell():
             quelle_url="https://vodafone.invalid/pib-xs",
             abgerufen_am="2026-09-08",
         ),
-        # Der teurere Tarif darf nicht gewinnen - die Referenz ist der
-        # GUENSTIGSTE eigene Tarif (konservative Wahl).
         SimOnlyReferenz(
             anbieter="Vodafone",
             tarif_name="Vodafone Mobil S",
@@ -168,16 +166,10 @@ def _naeherungs_modell():
         buendel, listungen, referenzen, tarife, lade_katalog(lese_wurzel())
     )
     modell = ergebnis["modelle"][0]
-    # Gegenprobe: der Fall stellt sich WIRKLICH - eine echte Naeherungskarte.
     assert any(k["naeherung"] for k in modell["karten"]), (
         "die Fixture erzeugt keine Naeherungskarte - der Test prueft nichts"
     )
     return modell
-
-
-# --------------------------------------------------------------------------
-# Die Karten
-# --------------------------------------------------------------------------
 
 
 def test_die_leitfrage_des_lastenhefts_ist_die_vorgabe(bestand):
@@ -225,8 +217,6 @@ def test_telekom_steht_ueberall_mit_ihrem_datenstand(bestand):
                 assert karte["leer_grund"].strip()
                 for jargon in ("GitHub Actions", "202-Challenge", "Phase T"):
                     assert jargon not in karte["leer_grund"]
-    # Lookup-Zeile: ein Test, der nur einen der zwei Zustaende trifft,
-    # prueft nicht, was er behauptet - der Bestand traegt beide.
     assert mit_zahl, "keine belastbare Telekom-Karte im Bestand"
     assert leer, "kein Telekom-Leerzustand im Bestand"
 
@@ -281,13 +271,7 @@ def test_antwortzeile_nennt_je_metrik_die_guenstigste_zahl_mit_anbieter(bestand)
     assert antwort["geraetepreis_anbieter"] == "Saturn"
     assert antwort["tarif_gesamt"] == 1459.0
     assert antwort["tarif_anbieter"] == "congstar"
-    # Gegenprobe: die zwei Gewinner sind wirklich verschiedene Anbieter -
-    # sonst prueft der Test nur eine Zahl, nicht die Unabhaengigkeit der
-    # zwei Metriken.
     assert antwort["geraetepreis_anbieter"] != antwort["tarif_anbieter"]
-    # Vodafones Karte bleibt trotzdem eine gueltige Kandidatin fuer den
-    # Geraetepreis (ihr Barpreis ist real gemessen) - sie fuehrt nur nicht
-    # mehr, seit Saturn guenstiger ist.
     vodafone = next(k for k in modell["karten"] if k["anbieter"] == "Vodafone")
     assert vodafone["naeherung"] is False
     assert vodafone["geraetepreis"] == 1199.90
@@ -325,9 +309,6 @@ def test_antwortzeile_bezieht_haendler_ohne_buendel_ins_minimum_ein(bestand):
                 f"{modell['id']}: Antwortzeile {antwort['geraetepreis']} "
                 f"> {name} {eintrag['preis']}"
             )
-    # Gegenprobe: der Testlauf hat wirklich mindestens einen Haendlerpreis
-    # gesehen - sonst prueft die Schleife oben nichts (Saturn fuehrt am
-    # echten Bestand vom 05.09.2026 mindestens ein Modell).
     assert geprueft > 0
 
 
@@ -351,8 +332,6 @@ def test_antwortzeile_bleibt_unveraendert_ohne_haendlerpreise(bestand):
     assert all(v is None for v in haendler.values()), (
         "die Gegenprobe braucht ein Modell ohne Haendlerpreis"
     )
-    # Unveraendert: der guenstigste Kartenanbieter fuehrt weiter, exakt wie
-    # vor der Erweiterung.
     antwort = modell["antwort"]
     guenstigste_karte = min(
         (
@@ -445,19 +424,6 @@ def test_der_geraetepreis_fuehrt_wo_er_ausgewiesen_ist(bestand):
         "1&1 nennt nur einen Buendelpreis - eine Aufteilung waere erfunden"
     )
 
-    # Gegenprobe auf dem ganzen Bestand: wo ein Geraetepreis ausgewiesen
-    # ist, ist er nie groesser als das, was am Ende insgesamt fuer das
-    # Geraet bezahlt wird - TCO-24 (`gesamt`) PLUS der nach 24 Monaten noch
-    # offene Geraete-Restbetrag (`offen_nach_24`).
-    #
-    # TICKET TCO24-1 (08.09.2026): `geraetepreis` ist die VOLLE
-    # Finanzierungssumme (Zuzahlung + alle Raten der eigenen Laufzeit,
-    # ungekappt - Katalog D: "X € in 36 Raten"), `gesamt` dagegen ist die
-    # auf 24 Monate GEKAPPTE TCO. Bei Raten ueber 24 Monate ist `gesamt`
-    # deshalb kleiner als der volle Geraetepreis - genau dafuer gibt es
-    # `offen_nach_24` (die restlichen Raten, Abnahmekriterium 2): addiert
-    # man sie zurueck, ist die Summe wieder mindestens der Geraetepreis
-    # (die Differenz ist der 24-Monats-Tarifanteil, der oben draufkommt).
     geprueft = 0
     for m in bestand["modelle"]:
         for k in m["karten"]:
@@ -500,7 +466,6 @@ def test_die_vodafone_referenz_ist_als_gerechnet_gekennzeichnet():
     karte = [k for k in modell["karten"] if k["naeherung"]][0]
     ref = modell["referenz"]
     assert karte["anbieter"] == "Vodafone"
-    # Beide Summanden sind gemessen, gerechnet ist nur ihre Summe.
     assert karte["gesamt"] == round(ref["tarif_summe"] + ref["geraet_betrag"], 2)
     assert karte["gesamt"] == 1379.66
     assert ref["tarif_quelle_url"] and ref["geraet_quelle_url"]
@@ -555,10 +520,6 @@ def test_die_spanne_des_bandes_ist_die_der_angebote():
         if k["belastbar"] and not k["naeherung"] and k["vergleichbar"]
     ]
     assert modell["spanne"] == [min(angebote), max(angebote)] == [1680.76, 1680.76]
-    # A1: die Referenz (1.379,66, Barkauf plus Tarif) liegt seit der
-    # Vollrechnung UNTER dem einzigen Angebot (1.680,76) - und taucht
-    # trotzdem nicht in der Spanne auf. Vorher lag sie darueber; beide
-    # Lagen beweisen denselben Satz: die Spanne meint die Angebote.
     assert ref["gesamt"] < max(angebote)
 
 
@@ -633,9 +594,6 @@ def test_g1_hat_fuer_die_referenz_keine_zweite_bindungsgruppe_mehr():
     svg = grafik.balken(_naeherungs_modell())
     assert "gerechnet über 24 Monate" in svg
     assert "36 Monate Bindung" not in svg
-    # S-Q4 (09.09.2026): der Gruppenkopf nennt den RECHNUNGSHORIZONT,
-    # keine Bindung - "Bindung" nennen nur noch Tarif und Geraeteraten
-    # selbst (auf den Karten daneben).
     assert "Monate Bindung" not in svg
     assert "Barkauf" not in svg
     assert svg.count("gr-g1-null") == 1
@@ -698,7 +656,6 @@ def test_das_delta_nennt_referenztarif_und_datum(bestand):
     assert deltas, "kein einziges Delta - der Test prueft nichts"
     for d in deltas:
         assert d["referenz_tarif"] and d["referenz_datum"]
-        # Euro primaer, Prozent sekundaer - aber nur bei gleicher Laufzeit.
         if d["gleiche_laufzeit"]:
             assert d["betrag"] is not None
         else:
@@ -727,15 +684,8 @@ def test_der_effektivpreis_nennt_seinen_barpreis(bestand):
     for k in mit_eff:
         assert k["eff_basis"]["betrag"] > 0
         assert k["eff_basis"]["quelle_url"], "ein Barpreis ohne Beleg"
-        # Ein FREMDER Barpreis muss seinen Anbieter nennen - sonst stuende
-        # eine Zahl von Vodafone in einer Rechnung ueber 1&1.
         if k["eff_basis"]["fremd"]:
             assert k["eff_basis"]["anbieter"]
-
-
-# --------------------------------------------------------------------------
-# G1
-# --------------------------------------------------------------------------
 
 
 def test_g1_entsteht_erst_ab_zwei_zahlen(bestand):
@@ -818,8 +768,6 @@ def test_g1_trennt_die_laufzeiten_mit_eigener_nulllinie():
     svg = grafik.balken(modell)
     assert svg.count("gr-g1-null") == 2, "je Laufzeitgruppe eine Nulllinie"
     assert "gerechnet über 24 Monate" in svg and "gerechnet über 36 Monate" in svg
-    # Die Ueberschrift der GANZEN Grafik nennt beide Zeitraeume - eine
-    # feste 24 ueber einem 36-Monats-Balken war Befund 2.
     assert 'aria-label="Kosten über 24 und 36 Monate für Testgerät je Anbieter"' in svg
 
 
@@ -842,10 +790,6 @@ def test_g1_gruppiert_am_zeitraum_der_leitzahl_nicht_an_der_tariflaufzeit(bestan
             continue
         for g in gruppen:
             geprueft += 1
-            # `g.get(...)` mit dem alten Schluessel als Rueckfall: gegen
-            # den alten Stand soll dieser Test an der AUSSAGE scheitern
-            # (Balken ueber 36 Monate unter dem Kopf 24), nicht an einem
-            # umbenannten Feld.
             monate = g.get("monate", g.get("laufzeit"))
             if monate != 24:
                 gruppen_mit_36 += 1
@@ -872,8 +816,6 @@ def test_g1_nennt_in_ueberschrift_und_gruppenkopf_den_echten_zeitraum(bestand):
         svg = grafik.balken(modell)
         if not svg:
             continue
-        # Die Zeitraeume, die die BALKEN tragen - aus den Karten, nicht
-        # aus der Gruppierung (die ist der Prueflaufgegenstand).
         monate = sorted(
             {
                 k["leitzahl_monate"]
@@ -939,8 +881,6 @@ def test_die_balkenlaenge_entspricht_dem_betrag(bestand):
     svg = grafik.balken(modell)
     assert svg, "kein G1 fuer dieses Modell - der Test prueft nichts"
 
-    # Segmente je Reihe (gleiches y) summieren; den Betrag der Reihe aus
-    # ihrem eigenen Etikett lesen (steht 18 px unter dem Reihenanfang).
     breite_je_y: dict[float, float] = {}
     for treffer in re.finditer(
         r'<rect class="gr-g1-seg[^"]*"[^>]*y="([\d.]+)"[^>]*'
@@ -1000,8 +940,6 @@ def test_ein_bonus_verkuerzt_den_balken_statt_ihn_zu_verlaengern():
             }
             for b in boni
         ]
-        # `leitzahl_monate` wie auf einer echten Karte (P0-B-h1) - die
-        # Grafik gruppiert daran (P0-B-h3).
         return {
             "anbieter": name,
             "tarif": "T",
@@ -1027,13 +965,6 @@ def test_ein_bonus_verkuerzt_den_balken_statt_ihn_zu_verlaengern():
     assert grafik.euro(950.0) in svg
 
 
-# P2 (Antonio F4, 17.09.2026): Der G2-Abschnitt (7 Tests) ist MIT DEM
-# G2-Block gefallen - `geraete_tco_grafik.historie/_ereignisse/_reihenrang/
-# MAX_REIHEN` existieren nicht mehr. Bewusst: die Information "groesste
-# Bewegung des Markts" steht in der Radar-Tafel und im Modell-Waehler
-# (befunde/preisverlauf.md, Strategie P2).
-
-
 def test_die_anbieterfarbe_traegt_denselben_slug_ueberall(bestand):
     """C.3: eine Anbieterfarbe, konsistent ueber alle Grafiken und Karten."""
     karte = [
@@ -1042,9 +973,6 @@ def test_die_anbieterfarbe_traegt_denselben_slug_ueberall(bestand):
         if k["anbieter"] == "1&1"
     ][0]
     assert karte["slug"] == grafik.anbieter_slug("1&1") == "1-1"
-    # Bis P2 lief der Graph-Beleg ueber die G2-Historie; seit ihrem Fall
-    # ueber die Zeitreihe (G0) - dieselbe Slug-Klasse am Linien-Pfad.
-    # (Reihen-Form wie `geraete_verlauf._reihen`: anbieter, farbe, punkte.)
     reihen = [
         {
             "anbieter": "1&1",
@@ -1058,10 +986,6 @@ def test_die_anbieterfarbe_traegt_denselben_slug_ueberall(bestand):
     ]
     assert "gr-anb--1-1" in grafik.zeitreihe(reihen)["svg"]
 
-
-# --------------------------------------------------------------------------
-# F-R2-3: kein Slug als Geraetename
-# --------------------------------------------------------------------------
 
 _SKU_OHNE_LISTUNG = "apple-iphone-16-pro-max-256gb-titan-weiss"
 
@@ -1114,7 +1038,6 @@ def test_geraet_aus_sku_loest_ueber_den_katalog():
         "apple-iphone-16",
         None,
     )
-    # Kein Treffer: fremde ID, oder eine Katalog-ID ohne Speichersegment.
     assert f("fremdmarke-modell-128gb-rot", katalog) == ("", None)
     assert f("apple-iphone-16-pro-max-titan-weiss", katalog) == ("", None)
     assert f("", katalog) == ("", None) and f(_SKU_OHNE_LISTUNG, None) == ("", None)
@@ -1194,10 +1117,6 @@ def test_die_referenz_des_iphone_17_ist_die_aktuelle_messung(bestand):
     ref = modell["referenz"]
     assert ref["tarif"] == "Mobil XS"
     assert ref["gesamt"] == 1847.8
-    # Datumlos (Regel 11): die Referenz ist die NEUESTE eigene Messung -
-    # ihr Datum ist das Maximum ueber die Vodafone-Karten des Modells und
-    # wandert mit dem Bot-Stand mit; der 20.09. waere beim naechsten
-    # Stand rot gewesen.
     assert ref["tarif_abgerufen_am"] == max(
         k["abgerufen_am"]
         for k in modell["karten"]
@@ -1209,7 +1128,6 @@ def test_die_referenz_des_iphone_17_ist_die_aktuelle_messung(bestand):
         for k in modell["karten"]
         if k["anbieter"] == "Vodafone" and k["tarif"] == "Mobil XS"
     ]
-    # Fuenf Farben, je Ratenlaufzeit ein Slot: eine Karte je Laufzeit.
     assert sorted(k["raten_laufzeit"] for k in xs) == [12, 24, 36]
     for k, rate in zip(
         sorted(xs, key=lambda k: k["raten_laufzeit"]), (90.0, 45.0, 30.0), strict=True
@@ -1220,18 +1138,12 @@ def test_die_referenz_des_iphone_17_ist_die_aktuelle_messung(bestand):
             == round(1.0 + k["raten_laufzeit"] * rate + 24 * 31.95, 2)
             == 1847.8
         )
-        # Die Karte des Slots traegt dieselbe Messung wie das Blatt des
-        # Modells - ohne festes Datum, dieselbe Begruendung.
         assert k["abgerufen_am"] == ref["tarif_abgerufen_am"]
-    # Gegenprobe 1: die Geist-Messung vom 06.09. verdraengt KEIN aktuelles
-    # Angebot mehr (ihre Zahl taucht auf keiner Vodafone-Karte des Modells).
     assert all(
         k.get("abgerufen_am") != "2026-09-06"
         for k in modell["karten"]
         if k["anbieter"] == "Vodafone"
     )
-    # Gegenprobe 2: die Referenz ist die guenstigste EIGENE Karte - das
-    # Blatt des Modells sagt dasselbe wie die Karten darunter.
     eigene = [
         k["gesamt"]
         for k in modell["karten"]
@@ -1290,10 +1202,6 @@ def test_ein_eigenes_buendel_verdraengt_die_naeherung():
             "quelle_url": "https://vodafone.invalid/p",
             "abgerufen_am": "2026-09-04",
         },
-        # Seit dem 04.09.2026 (B1) gilt ein Buendel ohne belegten
-        # Zustand als "unbekannt" und steht ausserhalb des
-        # Vergleichs - ein Delta bekommt nur ein belegtes
-        # Neugeraet. Die o2-Listung derselben SKU belegt ihn.
         {
             "id": "o2--sku-1",
             "sku_id": "sku-1",
@@ -1325,6 +1233,5 @@ def test_ein_eigenes_buendel_verdraengt_die_naeherung():
     assert len(vodafone) == 1, "Vodafone steht je Modell genau einmal"
     assert not vodafone[0]["naeherung"], "das eigene Buendel schlaegt die Rechnung"
     assert modell["referenz"]["gesamt"] == vodafone[0]["gesamt"]
-    # Und das Delta des Wettbewerbers rechnet gegen genau diese Zahl.
     o2 = [k for k in modell["karten"] if k["anbieter"] == "o2"][0]
     assert o2["delta"]["betrag"] == round(o2["gesamt"] - vodafone[0]["gesamt"], 2)

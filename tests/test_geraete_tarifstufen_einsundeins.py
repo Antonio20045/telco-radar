@@ -106,17 +106,11 @@ def _satz(saetze, titel_teil, tarif):
     return treffer[0]
 
 
-# ==========================================================================
-# Die Lesarten
-# ==========================================================================
-
-
 def test_die_uebersichten_verlinken_sieben_geraeteraster():
     adressen = set()
     for url in (_ANF, _UNL):
         adressen.update(E.tarifraster_adressen(_fixture(_netz()[url]), url))
     assert adressen == {f"https://mobile.1und1.de/smartphones-{t}" for t in _RASTER}
-    # Die Warenkorb-Parameter reisen nicht mit.
     assert not any("?" in a for a in adressen)
 
 
@@ -162,8 +156,6 @@ def test_die_geraeteseite_nennt_vorauswahl_und_angezeigten_preis():
     assert all(
         s["angezeigt_monatlich"] is None for s in iphone if not s["vorausgewaehlt"]
     )
-    # S26 Ultra: die Seite ZEIGT 44,99 (mit vorab angehakten Galaxy Buds 4),
-    # die Preiskarte nennt 42,99 für das Gerät allein.
     s26 = next(
         s
         for s in saetze
@@ -173,19 +165,11 @@ def test_die_geraeteseite_nennt_vorauswahl_und_angezeigten_preis():
     assert s26["buendel_monatlich"] == 42.99
 
 
-# ==========================================================================
-# ergaenze_tarifstufen()
-# ==========================================================================
-
-
 def test_alle_tarife_mal_alle_speichergroessen():
     saetze = _basis()
     hole = _Hole()
     neu = E.ergaenze_tarifstufen(hole, {}, saetze)
-    # iPhone 18 Pro 4 Größen, S26 Ultra 3 Größen, sechs einheitliche Tarife
-    # ausser dem Default: 7 x 5 = 35; dazu Unlimited XL je Gerät 1 Satz.
     assert neu == 7 * 5 + 2
-    # Abrufe: zwei Übersichten, sieben Raster.
     assert len(hole.abgerufen) == 9
     tarife = {s["tarif_name"] for s in saetze}
     assert tarife == {
@@ -202,11 +186,9 @@ def test_alle_tarife_mal_alle_speichergroessen():
 def test_der_aufschlag_kommt_auf_die_preiskarte_der_groesse():
     saetze = _basis()
     E.ergaenze_tarifstufen(_Hole(), {}, saetze)
-    # 512 GB im Default-Tarif 56,99 (Preiskarte) + Aufschlag M 5,00.
     m512 = _satz(saetze, "iPhone 18 Pro 512 GB", "1&1 All-Net-Flat M")
     assert m512["buendel_monatlich"] == 61.99
     assert m512["laufzeit_monate"] == 36
-    # Die Einmalzahlung steht nur fuer den Default-Tarif auf der Seite.
     assert m512["geraet_zuzahlung"] is None
     assert (
         _satz(saetze, "iPhone 18 Pro 512 GB", "1&1 All-Net-Flat S")["geraet_zuzahlung"]
@@ -215,7 +197,6 @@ def test_der_aufschlag_kommt_auf_die_preiskarte_der_groesse():
     assert m512["tarif_slug"] == "tariff-anf-m-mvl"
     assert m512["herleitung"] == E.HERLEITUNG_TARIFAUFSCHLAG
     assert m512["quelle_url"] == "https://mobile.1und1.de/smartphones-all-net-flat-m"
-    # Die vorausgewählte Größe trifft das Raster selbst (54,99).
     assert (
         _satz(saetze, "iPhone 18 Pro 256 GB", "1&1 All-Net-Flat M")["buendel_monatlich"]
         == 54.99
@@ -226,7 +207,6 @@ def test_der_aufschlag_kommt_auf_die_preiskarte_der_groesse():
         ]
         == 64.99
     )
-    # Gegenprobe: der Default-Satz bleibt unangetastet.
     s512 = _satz(saetze, "iPhone 18 Pro 512 GB", "1&1 All-Net-Flat S")
     assert s512["buendel_monatlich"] == 56.99
     assert "herleitung" not in s512
@@ -280,7 +260,6 @@ def test_eine_unstimmige_gegenprobe_kostet_nur_dieses_geraet():
         for s in saetze
         if s.get("herleitung") and s["hw_id"] == "hw-apple-iphone-18-pro"
     ]
-    # Gegenprobe: das andere Gerät bekommt seine Tarife.
     assert [
         s
         for s in saetze
@@ -303,8 +282,6 @@ def test_jeder_gelieferte_tarif_loest_im_echten_bestand_auf():
     bilanz = aus_rohsaetzen(saetze, bestand, "2026-09-29")
     assert bilanz.ohne_tarif == 0, bilanz.offene_tarife
     assert len(bilanz.buendel) == len(saetze) == 7 + 37
-    # Gegenprobe: der Name MIT Volumenklammer löst nicht auf - ohne die
-    # Bereinigung wären die Sätze verworfen worden.
     assert bestand.loese("1&1", "1&1 All-Net-Flat M (50 GB)", mit_geraet=True) is None
 
 
@@ -323,7 +300,6 @@ def test_der_haken_setzt_danach_die_gebuehr_auf_alle_tarife(monkeypatch):
     gesetzt = E.ergaenze_buendel(hole_mit_iframe, {}, saetze)
     assert gesetzt == len(saetze) == 44
     assert {s["anschlusspreis"] for s in saetze} == {39.9}
-    # Ein Tarifdetails-Abruf je Tarif-Slug: sieben.
     assert len([u for u in hole.abgerufen if "/details-" in u]) == 7
 
 

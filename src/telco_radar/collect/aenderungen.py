@@ -66,25 +66,10 @@ from .http import fetch
 
 log = logging.getLogger(__name__)
 
-# Wie viele Wertfragmente eine Seite hoechstens beisteuert. Eine
-# Tarifuebersicht hat ein paar Dutzend Preise; wer tausend liefert, liefert
-# eine Preisliste des ganzen Shops - und dann ist der Diff wieder Rauschen.
 MAX_WERTE = 400
 
-# Wie viele Werte eine Seite mindestens hergeben muss, damit ihr Diff etwas
-# bedeutet. GEMESSEN am 08.08.2026 ueber alle 16 konfigurierten Seiten: eine
-# Tarifuebersicht, die ihre Preistabelle wirklich im HTML ausliefert, bringt
-# 16 bis 54 Werte (o2 54, 1&1 29, blau 28, klarmobil 16). Wo nur eine
-# Handvoll herauskommt, stammen sie aus dem FLIESSTEXT drumherum
-# ("...sparst du 10 %", "...bis zu 1 GB") - die Preistabelle selbst baut
-# JavaScript auf. Ein Diff darauf meldet Textaenderungen als
-# Preisaenderungen, und das ist genau die Falschmeldung, die den Kanal
-# unbrauchbar macht.
 MIND_WERTE = 10
 
-# Ab wie vielen Aenderungen eine Seite als "umgebaut" gilt und NICHT gemeldet
-# wird. Ein Relaunch ist keine Preisaenderung; ihn als vierzig Meldungen
-# auszugeben ist die sicherste Art, den Kanal unbrauchbar zu machen.
 MAX_AENDERUNGEN_JE_SEITE = 12
 
 _ENTFERNEN = (
@@ -99,16 +84,12 @@ _ENTFERNEN = (
     "form",
 )
 
-# Zahlenwerte, auf die es ankommt. Bewusst mit Einheit: eine nackte Zahl auf
-# einer Webseite ist eine Artikelnummer, ein Zaehler oder eine Jahreszahl.
 _WERT = re.compile(
     r"(\d{1,4}(?:[.,]\d{1,2})?)\s?"
     r"(€|EUR|Euro|GB|MB|TB|Mbit/s|MBit/s|GBit/s|Gbit/s|Monate?|Tage?|%)",
     re.I,
 )
 
-# Was NIE eine Aenderung im Sinne dieses Radars ist. Ohne diese Liste meldet
-# jeder Abruf eine Aenderung, weil die Seite die Uhrzeit ausgibt.
 _RAUSCHEN = (
     re.compile(r"\b\d{1,2}[.:]\d{2}\s*(Uhr|h)\b", re.I),
     re.compile(r"\b\d{1,2}\.\d{1,2}\.\d{2,4}\b"),
@@ -328,11 +309,6 @@ def sammle(
             log.info("Tarifseite %s nicht lesbar: %s", seite.url, str(exc)[:120])
             continue
         if len(aktuell) < MIND_WERTE:
-            # Zu wenige Werte heisst: die Preistabelle baut JavaScript auf,
-            # und was hier ankommt, ist der Fliesstext drumherum. Die Seite
-            # als "alles entfallen" zu melden waere die teuerste
-            # Falschmeldung, die dieser Radar produzieren kann; ihren
-            # Prosa-Diff zu melden die zweitteuerste.
             bilanz["ohne_werte"] += 1
             log.info(
                 "Tarifseite %s liefert nur %d Werte (Preistabelle "
@@ -354,7 +330,6 @@ def sammle(
             continue
         a = Aenderung(seite=seite, dazu=dazu, weg=weg)
         if a.n > MAX_AENDERUNGEN_JE_SEITE:
-            # Ein Relaunch ist keine Preisaenderung.
             bilanz["umgebaut"] += 1
             log.info(
                 "Tarifseite %s: %d Wertaenderungen - sieht nach Umbau "

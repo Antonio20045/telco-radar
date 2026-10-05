@@ -56,12 +56,6 @@ from telco_radar.geraete_fragment import (  # noqa: E402
 
 MB = 1024 * 1024
 
-# ---------------------------------------------------------------------------
-# Die Empfehlung ist TEXT, kein Schalter: die Deckel-Entscheidung traegt
-# Antonio/der PM am 01.10. (14 Tage echte Messdaten). Sie steht hier im
-# Quelltext, damit sie in jedem Output lesbar ist und nicht in einem
-# Archiv-Dokument vergilbt. NICHTS davon ist gebaut.
-# ---------------------------------------------------------------------------
 EMPFEHLUNG = """\
 Empfehlung (PM-6, Entscheidung 01.10.2026 - NICHT gebaut, dieses Skript setzt keinen Deckel):
   A) Zeitreihen-Fragment auf die letzten N Messtage begrenzen (z. B. N=30):
@@ -106,7 +100,6 @@ def bericht(root: Path, heute: date | None = None, grenze: int = GRENZE_BYTES) -
     )
     zeilen.append("")
 
-    # --- Messtage: die gemessene Reihe, aus der die Rate kommt.
     zeilen.append("Messtage (gemessen):")
     zeilen.append("  Datum        Paare neu   Paare kumulativ")
     kumulativ = 0
@@ -127,7 +120,6 @@ def bericht(root: Path, heute: date | None = None, grenze: int = GRENZE_BYTES) -
         )
     zeilen.append("")
 
-    # --- Fragmente: Bytes, gzip, Bytes je Messpaar.
     zeilen.append(f"Fragmente (gemessen):")
     by_name = {f.name: f for f in fragmente}
     zeitreihe = by_name.get(ZEITREIHE_NAME)
@@ -155,14 +147,13 @@ def bericht(root: Path, heute: date | None = None, grenze: int = GRENZE_BYTES) -
     )
     zeilen.append("")
 
-    # --- Prognose: linear ab dem letzten Messtag, pro Fragment-Grenze.
     if not bestand.tage:
         zeilen.append("Prognose: keine Historie - nichts zu projizieren.")
         zeilen.append("")
         zeilen.append(EMPFEHLUNG)
         return "\n".join(zeilen)
     anker = bestand.anker
-    assert anker is not None  # tage nicht leer, siehe Zweig oben
+    assert anker is not None
     if zeitreihe is None or rate is None or rate <= 0:
         zeilen.append(
             "Prognose: unmoeglich - "
@@ -213,9 +204,6 @@ def bericht(root: Path, heute: date | None = None, grenze: int = GRENZE_BYTES) -
         )
     buendel = by_name.get(BUNDEL_NAME)
     if buendel:
-        # Das Buendel-Fragment waechst mit MODELLTIEFEN, nicht mit Messtagen:
-        # die Paar-Prognose traf es nicht. Zu seinem heutigen Stand gegen
-        # dieselbe Grenze gerechnet, nur damit die Summe ehrlich bleibt.
         if buendel.bytes > grenze:
             zeilen.append(
                 f"  Buendel-Fragment: {_mb(buendel.bytes)} - Grenze "

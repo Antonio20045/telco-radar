@@ -27,18 +27,10 @@ _ROOT = Path(__file__).resolve().parents[1]
 def _schreibe(tmp_path: Path, name: str, daten) -> Path:
     (tmp_path / "config").mkdir(exist_ok=True)
     (tmp_path / "config" / name).write_text(
-        # sort_keys=False: die Reihenfolge der YAML ist bei der Farbtabelle
-        # bedeutungstragend ("die erste gewinnt"), ein sortierender Dump
-        # wuerde genau das wegsortieren.
         yaml.safe_dump(daten, allow_unicode=True, sort_keys=False),
         encoding="utf-8",
     )
     return tmp_path
-
-
-# --------------------------------------------------------------------------
-# Loader-Verhalten
-# --------------------------------------------------------------------------
 
 
 def test_fehlende_dateien_sind_kein_fehler(tmp_path):
@@ -89,9 +81,6 @@ def test_farbtabelle_kennt_ihre_eigenen_schluessel(tmp_path):
 
 
 def test_widersprechende_farbschreibweise_gewinnt_nicht_zweimal(tmp_path):
-    # Dieselbe Schreibweise unter zwei kanonischen Farben: die erste gewinnt,
-    # und es wird gemeldet. Still ueberschreiben waere schlimmer - dann
-    # haengt die Zuordnung an der Reihenfolge der YAML.
     _schreibe(
         tmp_path,
         "farben.yaml",
@@ -160,8 +149,6 @@ def test_deaktivierter_anbieter_ist_nicht_crawlbar_behaelt_aber_seinen_grund(tmp
     a = lade_quellen(tmp_path).anbieter[0]
     assert a.crawlbar is False
     assert a.grund
-    # Er faellt NICHT aus der Konfiguration - sonst verschwaende er
-    # stillschweigend von der Quellenseite.
     assert lade_quellen(tmp_path).anbieter
 
 
@@ -187,11 +174,6 @@ def test_seiten_zahl_zaehlt_nur_was_wirklich_abgefragt_wird(tmp_path):
     assert lade_quellen(tmp_path).seiten_zahl == 2
 
 
-# --------------------------------------------------------------------------
-# Die ausgelieferten Dateien
-# --------------------------------------------------------------------------
-
-
 def test_ausgelieferter_katalog_laedt_und_ist_eindeutig():
     """Katalog.__post_init__ wirft bei doppelter device_id UND bei zwei
     Geraeten mit derselben Wortmarkenfolge. Dass die Datei laedt, ist also
@@ -214,8 +196,6 @@ def test_jede_vorgaengerkette_zeigt_auf_ein_geraet_im_katalog():
 
 
 def test_katalog_hat_ueberhaupt_gepflegte_ketten():
-    # Gegenprobe zum Test darueber: der waere auch gruen, wenn KEIN Geraet
-    # einen Vorgaenger traegt.
     katalog = lade_katalog(lese_wurzel())
     mit_kette = [g for g in katalog.geraete if g.vorgaenger]
     assert len(mit_kette) >= 10
@@ -249,8 +229,6 @@ def test_katalog_erkennt_echte_haendlertitel():
     for titel, erwartet in faelle.items():
         g = erkenne_geraet(titel, katalog)
         erkannt[titel] = g.modell if g else None
-    # Ohne diese Zeile waere der Test auch dann gruen, wenn der Lookup ins
-    # Leere liefe (CLAUDE.md §6).
     assert len(erkannt) == len(faelle)
     assert erkannt == faelle
 
@@ -298,8 +276,6 @@ def test_ausgelieferte_quellen_laden_und_haben_jeden_pflichtwert():
     for a in quellen.anbieter:
         assert a.methode in METHODEN
         assert a.typ in ("handel", "netzbetreiber", "discount")
-        # Kein Anbieter verschwindet stillschweigend: wer nicht abgefragt
-        # wird, sagt warum (Akzeptanzkriterium aus Teil E).
         if not a.crawlbar:
             assert a.grund, f"{a.name} ist nicht crawlbar, nennt aber keinen Grund"
 
@@ -341,17 +317,6 @@ def test_alle_drei_beobachtungsebenen_sind_besetzt(stufe):
     assert [a for a in quellen.anbieter if a.typ == stufe]
 
 
-# --------------------------------------------------------------------------
-# Die aus dem Berichtsarchiv belegten Marktstarts (31.08.2026)
-# --------------------------------------------------------------------------
-#
-# Diese Daten sind Handarbeit: sie stammen aus `data/reports/*.json`, und die
-# Belege stehen woertlich ueber den Eintraegen in `config/geraete_katalog.yaml`.
-# Sie stehen hier fest, weil ein versehentlich ueberschriebenes Datum NICHTS
-# kaputtmacht, was auffaellt - es verschiebt nur jede Verweildauer und jedes
-# 30/60/90-Tage-Fenster, und die Zahlen sehen danach genauso plausibel aus.
-
-# device_id -> (marktstart, Beleg in Kurzform)
 BELEGTE_MARKTSTARTS = {
     "google-pixel-11": ("2026-08-20", "Vodafone UK / Three UK, 20.08.2026"),
     "google-pixel-11-pro": ("2026-08-20", "Vodafone UK / Three UK, 20.08.2026"),
@@ -365,14 +330,11 @@ BELEGTE_MARKTSTARTS = {
     "samsung-galaxy-z-flip8": ("2026-08-07", "Samsung Newsroom, 'ab dem 7. August'"),
 }
 
-# Was an derselben Stelle NICHT stehen darf. Beides sind Daten, die im
-# Archiv prominenter auftreten als der Verkaufsstart - und beide wuerden die
-# Verweildauer systematisch zu lang und den Preisverfall zu frueh rechnen.
 VORSTELLUNGSTERMINE = {
-    "google-pixel-11": "2026-08-12",  # Vorstellung der Pixel-11-Reihe
+    "google-pixel-11": "2026-08-12",
     "google-pixel-11-pro": "2026-08-12",
     "google-pixel-11-pro-xl": "2026-08-12",
-    "samsung-galaxy-z-fold8": "2026-07-22",  # Galaxy Unpacked July 2026
+    "samsung-galaxy-z-fold8": "2026-07-22",
     "samsung-galaxy-z-flip8": "2026-07-22",
 }
 
@@ -422,9 +384,7 @@ def test_die_belegten_daten_schalten_die_nachfolger_analyse_wirklich_ein():
         for g in katalog.geraete
         if g.device_id in BELEGTE_MARKTSTARTS and g.vorgaenger
     ]
-    # Ohne diese Zeile waere der Test auch dann gruen, wenn `vorgaenger`
-    # ueberall leer waere und die Schleife nichts durchliefe.
-    assert len(ketten) == 6, ketten  # alle ausser dem Fold8 Ultra ohne Kette
+    assert len(ketten) == 6, ketten
     for _, nachfolger in ketten:
         vorgaenger = next(
             v
@@ -462,11 +422,6 @@ def test_ein_nachfolger_startet_nie_vor_seinem_vorgaenger():
             f"{nachfolger.modell} ({nachfolger.marktstart}) startet nicht nach "
             f"{vorgaenger.modell} ({vorgaenger.marktstart})"
         )
-
-
-# --------------------------------------------------------------------------
-# Die Buendel-Lesart in der ausgelieferten Konfiguration
-# --------------------------------------------------------------------------
 
 
 def test_buendel_ist_eine_crawlbare_einstiegsart():

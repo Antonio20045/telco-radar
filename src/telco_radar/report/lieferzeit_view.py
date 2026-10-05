@@ -18,8 +18,6 @@ from __future__ import annotations
 
 from datetime import datetime
 
-# Wie viele Messpunkte die Zeitreihe je Paar zeigt. Genug fuer einen Verlauf,
-# wenig genug fuer eine Zeile.
 MAX_PUNKTE = 14
 
 
@@ -74,9 +72,6 @@ def aufbereiten(daten: dict, korb, heute: str = "") -> dict:
                     "gemessen": ((letzte or {}).get("zeitstempel") or "")[:10],
                     "url": (letzte or {}).get("url") or "",
                     "verlauf": verlauf,
-                    # Der Sprung, auf den es ankommt - berechnet aus derselben
-                    # Reihe, damit die Seite nicht auf ein Feld angewiesen ist,
-                    # das ein Lauf gesetzt haben muss.
                     "engpass": _engpass(verlauf),
                 }
             )

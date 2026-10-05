@@ -75,11 +75,6 @@ def _reihe(anbieter, punkte, farbe="#123456", eigen=False):
     }
 
 
-# --------------------------------------------------------------------------
-# reihen_fuer_listungen - die Filterung vor der Grafik
-# --------------------------------------------------------------------------
-
-
 def test_reihen_fuer_listungen_laesst_gebrauchte_geraete_weg():
     hist = _Historie({"a": [{"datum": "2026-08-29", "preis_ohne_vertrag": 900.0}]})
     listungen = [_l("a", "o2", 899.0, zustand="refurbished")]
@@ -115,11 +110,6 @@ def test_reihen_fuer_listungen_baut_reihen_aus_listung_und_historie():
     assert [p["datum"] for p in reihen[0]["punkte"]] == ["2026-08-29", "2026-09-05"]
 
 
-# --------------------------------------------------------------------------
-# a) Linien nur ab zwei Messpunkten
-# --------------------------------------------------------------------------
-
-
 def test_ein_anbieter_mit_zwei_punkten_bekommt_eine_linie():
     reihen = [_reihe("o2", [("2026-08-29", 1315.0), ("2026-09-05", 1315.0)])]
     ergebnis = grafik.zeitreihe(reihen)
@@ -143,14 +133,8 @@ def test_gemischte_reihen_zeigen_linie_und_punkt_nebeneinander():
     ]
     ergebnis = grafik.zeitreihe(reihen)
     assert ergebnis["svg"].count("<path") == 1
-    # Zwei Linien in der Beleg-Liste, aber nur eine mit >1 Punkt.
     linien = {l["anbieter"]: l["punkte"] for l in ergebnis["linien"]}
     assert linien == {"o2": 2, "Telekom": 1}
-
-
-# --------------------------------------------------------------------------
-# b) Eine Sammelluecke wird nicht ueberbrueckt
-# --------------------------------------------------------------------------
 
 
 def test_die_19_tage_luecke_wird_nicht_ueberbrueckt():
@@ -162,12 +146,6 @@ def test_die_19_tage_luecke_wird_nicht_ueberbrueckt():
     ]
     ergebnis = grafik.zeitreihe(reihen)
     assert "<path" not in ergebnis["svg"]
-    # Neukalibriert am 09.09.2026 (Optik-Schritt 5, F-4b): Daten-Punkte
-    # sind seitdem Marken-SYMBOLE (Kreis, Quadrat, Dreieck, ...), nicht
-    # mehr durchgaengig `<circle>` - gezaehlt wird das Klassenpraefix
-    # `gr-g0-punkt`, das nur Daten-Punkte tragen (Legenden-Symbole sind
-    # `<use class="gr-g0-legendesymbol…">`, defs-Formen tragen gar keine
-    # Klasse). Vorher: `svg.count("<circle")`.
     assert ergebnis["svg"].count('class="gr-g0-punkt ') == 2
     assert ergebnis["svg"].count("gr-g0-punkt--einzeln") == 2
 
@@ -198,8 +176,6 @@ def test_drei_punkte_mit_luecke_ergeben_zwei_getrennte_laeufe():
     ergebnis = grafik.zeitreihe(reihen)
     assert ergebnis["svg"].count("<path") == 1
     assert ergebnis["svg"].count("gr-g0-punkt--einzeln") == 1
-    # Neukalibriert am 09.09.2026 (F-4b): Symbole statt fester Kreise -
-    # siehe test_die_19_tage_luecke_wird_nicht_ueberbrueckt.
     assert ergebnis["svg"].count('class="gr-g0-punkt ') == 3
 
 
@@ -218,19 +194,12 @@ def test_keine_luecke_ohne_grossen_abstand():
     assert "gr-g0-luecke" not in ergebnis["svg"]
 
 
-# --------------------------------------------------------------------------
-# c) Die Y-Achse rechnet aus den echten Daten
-# --------------------------------------------------------------------------
-
-
 def test_die_achse_traegt_den_echten_minimal_und_maximalpreis():
     """Fuenf Marken zwischen (Minimum - Polster) und (Maximum + Polster) -
     keine feste Konstante, keine gerundeten 0/1000/… ausser sie treffen
     zufaellig genau."""
     reihen = [_reihe("o2", [("2026-08-29", 1000.0), ("2026-09-05", 1300.0)])]
     ergebnis = grafik.zeitreihe(reihen)
-    # Die Spanne 1000-1300 mit 12% Polster ergibt tief=964, hoch=1336 -
-    # keine der fuenf Marken faellt auf einen glatten Hunderterwert.
     assert "1.000 €" not in ergebnis["svg"]
     assert "1.300 €" not in ergebnis["svg"]
 
@@ -258,17 +227,10 @@ def test_eine_flache_reihe_bekommt_trotzdem_eine_spanne():
     assert "<svg" in ergebnis["svg"]
 
 
-# --------------------------------------------------------------------------
-# d) Ein Punkt bleibt ein Punkt
-# --------------------------------------------------------------------------
-
-
 def test_genau_ein_messpunkt_erzeugt_keine_linie_im_ganzen_bild():
     reihen = [_reihe("Telekom", [("2026-09-05", 1197.0)])]
     ergebnis = grafik.zeitreihe(reihen)
     assert "<path" not in ergebnis["svg"]
-    # Neukalibriert am 09.09.2026 (F-4b): Symbole statt fester Kreise -
-    # siehe test_die_19_tage_luecke_wird_nicht_ueberbrueckt.
     assert ergebnis["svg"].count('class="gr-g0-punkt ') == 1
     assert ergebnis["messtage"] == 1
     assert ergebnis["seit"] == "2026-09-05"
@@ -279,16 +241,6 @@ def test_ohne_jeden_messpunkt_gibt_es_keine_grafik():
     assert ergebnis["hat_daten"] is False
     assert ergebnis["svg"] == ""
     assert ergebnis["chrome"] == ""
-
-
-# --------------------------------------------------------------------------
-# Kein nackter Punkt (BRIEF_FADEN, 05.09.2026, Kriterium 5)
-#
-# Antonios QA-Befund 3: "Telekoms Einzel-Punkt im Zeitreihen-Graph liest
-# sich als 'keine Werte' - die ehrliche Luecke sieht aus wie ein Defekt."
-# Ein einzelner Messpunkt bekommt seitdem eine sichtbare Beschriftung am
-# Punkt statt nur einem Tooltip.
-# --------------------------------------------------------------------------
 
 
 def test_ein_einzelner_messpunkt_traegt_eine_sichtbare_beschriftung():
@@ -335,11 +287,6 @@ def test_gemischte_reihen_beschriften_nur_den_einzelnen_punkt():
     assert "Serie startet · 1. Messpunkt 05.09.2026" in ergebnis["svg"]
 
 
-# --------------------------------------------------------------------------
-# Die Chart-Chrome-Zeile - kein Fliesstext, ein einziger Satz
-# --------------------------------------------------------------------------
-
-
 def test_die_chrome_zeile_nennt_messtage_und_das_erste_datum():
     reihen = [
         _reihe("mobilcom-debitel", [("2026-08-10", 1299.0), ("2026-09-05", 1299.0)]),
@@ -347,7 +294,6 @@ def test_die_chrome_zeile_nennt_messtage_und_das_erste_datum():
         _reihe("congstar", [("2026-09-03", 1225.0)]),
     ]
     ergebnis = grafik.zeitreihe(reihen)
-    # Vier verschiedene Tage insgesamt: 10.08., 29.08., 03.09., 05.09.
     assert ergebnis["messtage"] == 4
     assert ergebnis["seit"] == "2026-08-10"
     assert ergebnis["chrome"] == "Sammlung läuft · 4 Messtage · seit 10.08.2026"
@@ -380,15 +326,9 @@ def test_die_chrome_zeile_ist_der_einzige_satz_im_belegtext():
     }
     assert ergebnis["linien"][0]["von_de"] == "29.08.2026"
     assert ergebnis["linien"][0]["bis_de"] == "05.09.2026"
-    # O4: Erst- und Letztpreis aus denselben Punkten, die gezeichnet werden
     assert ergebnis["linien"][0]["von_preis"] == 1315.0
     assert ergebnis["linien"][0]["bis_preis"] == 1310.0
     assert ergebnis["linien"][0]["delta"] == -5.0
-
-
-# --------------------------------------------------------------------------
-# Keine erfundenen Zwischenpunkte
-# --------------------------------------------------------------------------
 
 
 def test_es_werden_nur_die_gegebenen_preise_gezeichnet():
@@ -396,9 +336,6 @@ def test_es_werden_nur_die_gegebenen_preise_gezeichnet():
     keine dritte, interpolierte Koordinate dazwischen."""
     reihen = [_reihe("o2", [("2026-08-29", 1315.0), ("2026-09-05", 1310.0)])]
     ergebnis = grafik.zeitreihe(reihen)
-    # Neukalibriert am 09.09.2026 (F-4b): der Linienpfad wird per Regex am
-    # `gr-g0-linie`-Element gelesen - das naive `split('d="')` traf seit
-    # den Symbol-defs (`id="gr-sym-kreis"`) die id statt des Pfades.
     import re as _re
 
     treffer = _re.search(r'class="gr-g0-linie[^"]*" d="([^"]+)"', ergebnis["svg"])

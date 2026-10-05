@@ -97,9 +97,6 @@ def katalog():
     return lade_katalog(lese_wurzel())
 
 
-# =====================================  Veroeffentlichungsschwelle  ========
-
-
 def test_das_fixture_stellt_beide_zustaende_wirklich_her(tmp_path):
     """Die Zusicherung unter der Zusicherung.
 
@@ -176,7 +173,6 @@ def test_oberhalb_der_schwelle_nimmt_die_seite_entgegen(tmp_path_factory):
     )
     assert not soup.select_one("#nl-submit").has_attr("disabled")
     assert soup.select_one("form#nl-form").get("data-gesperrt") is None
-    # Der Sperrkasten im <noscript> bleibt - er beschreibt einen anderen Fall.
     assert soup.select_one("form .nl-gesperrt") is None
 
 
@@ -211,10 +207,8 @@ def test_der_fehlende_dienst_steht_ueber_dem_formular(tmp_path_factory):
     kasten = soup.select_one(".nl-gesperrt")
     assert kasten is not None, "kein Hinweis auf den fehlenden Dienst"
     assert "noch nicht möglich" in kasten.get_text()
-    # Der Kasten steht VOR dem Formular - im Dokument und damit auf der Seite.
     reihenfolge = [t.name for t in soup.select(".nl-gesperrt, form#nl-form")]
     assert reihenfolge and reihenfolge[0] == "div", reihenfolge
-    # Und er beschreibt den richtigen Grund: die Rechtstexte sind vollstaendig.
     assert "Impressum" not in kasten.get_text()
 
 
@@ -225,14 +219,10 @@ def test_mit_dienst_url_steht_kein_sperrkasten_mehr(tmp_path_factory):
     soup = BeautifulSoup(
         (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
     )
-    # Der Kasten im <noscript> beschreibt einen anderen Fall und bleibt.
     ausserhalb = [
         k for k in soup.select(".nl-gesperrt") if not k.find_parent("noscript")
     ]
     assert ausserhalb == []
-
-
-# ================================================  Inhalt des Formulars  ===
 
 
 def test_alle_vier_dimensionen_stehen_auf_der_seite(tmp_path_factory, katalog):
@@ -255,9 +245,6 @@ def test_neben_jeder_dimension_steht_dass_leer_alles_heisst(tmp_path_factory):
     soup = BeautifulSoup(
         (site / "newsletter.html").read_text(encoding="utf-8"), "html.parser"
     )
-    # Nur die vier Dimensionsbloecke - der Stichwortblock traegt denselben
-    # Hinweistext-Stil, sagt aber etwas anderes (Stichwoerter sind ADDITIV,
-    # dort waere "leer heisst alles" schlicht falsch).
     hinweise = [
         h.get_text(" ", strip=True)
         for h in soup.select('.nl-block:has(input[type="checkbox"]) .nl-hinweis')
@@ -337,9 +324,6 @@ def test_ohne_javascript_ist_wenigstens_sichtbar_dass_es_ihn_gibt(tmp_path_facto
     assert "JavaScript" in html.split("<noscript>")[1].split("</noscript>")[0]
 
 
-# ===============================================  Die Abschlussseiten  =====
-
-
 def test_die_abschlussseiten_sind_statisch_und_ohne_dienst(tmp_path, tmp_path_factory):
     """DER Punkt: wer auf den Abmeldelink klickt, waehrend Render die
     Instanz schlafen laesst, wartet sonst eine Minute vor einem Spinner - und
@@ -350,14 +334,10 @@ def test_die_abschlussseiten_sind_statisch_und_ohne_dienst(tmp_path, tmp_path_fa
         datei = site / name
         assert datei.exists(), name
         html = datei.read_text(encoding="utf-8")
-        # Kein fetch, kein Verweis auf den Dienst - die Seite steht sofort.
         assert "fetch(" not in html
         assert "onrender.com/subscribe" not in html
     abgemeldet = (site / "newsletter-abgemeldet.html").read_text(encoding="utf-8")
     assert "gelöscht" in abgemeldet
-
-
-# =====================================  Vorschau: Browser gegen Python  ====
 
 
 def _index_zum_stichtag(site):
@@ -394,7 +374,6 @@ def test_der_index_liegt_neben_der_seite(tmp_path, tmp_path_factory):
     site = _projekt_kopie(tmp_path, tmp_path_factory, vollstaendig=True)
     index, _reports, _stand = _index_zum_stichtag(site)
     assert index["woerter"] and index["meldungen"] > 0
-    # Das Formular zeigt auf genau diesen relativen Pfad.
     assert "data/keyword-index.json" in (site / "app.js").read_text(encoding="utf-8")
 
 
@@ -419,7 +398,6 @@ def test_die_browser_vorschau_sagt_dasselbe_wie_python(
     seite = chromium.new_page()
     try:
         seite.goto("file://" + str((site / "newsletter.html").resolve()))
-        # Die Rechnung des Browsers, mit dem Index aus der Datei gefuettert.
         im_browser = seite.evaluate(
             """([idx, term, minLaenge]) => {
                  const teile = term.toLowerCase().split(/\\s+/)

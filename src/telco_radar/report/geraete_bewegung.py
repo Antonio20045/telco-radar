@@ -45,29 +45,21 @@ from datetime import date, timedelta
 
 from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
 
-# Die Schwellen aus dem Auftrag P4: mehr als 50 EUR ODER mehr als 5 Prozent.
 BEWEGUNG_EURO = 50.0
 BEWEGUNG_PROZENT = 5.0
-# Das Fenster ist immer eine Woche - unabhängig vom Wochentag des Laufs.
 FENSTER_TAGE = 7
-# Eine Messung darf bis zu so viele Tage vor dem gesuchten Tag liegen.
-# congstar wird nicht jede Nacht vollständig gelesen (Lücken am 18./19.09.).
 TOLERANZ_TAGE = 3
-# Höchstens so viele Zeilen im Block; der Rest wird gezählt.
 MAX_ZEILEN = 5
 
 EIGEN = "Vodafone"
 
 log = logging.getLogger(__name__)
 
-# Die Ausfallgruende, wie sie in der Mail stehen - ohne Technik; das
-# Genaue steht im Protokoll des Laufs.
 AUSFALL_KEINE_MESSUNG = "keine Messung in der Gerätehistorie"
 AUSFALL_NICHT_PRUEFBAR = "kein Vergleich mit Vodafone war prüfbar"
 AUSFALL_AUFBEREITUNG = "die Gerätedaten ließen sich nicht aufbereiten"
 AUSFALL_VERALTET = "die letzte Vodafone-Messung vom {tag} ist veraltet"
 
-# Die Gründe für „ohne Aussage", benannt statt still verworfen.
 GRUND_MESSUNG = "messung_fehlt"
 GRUND_WECHSEL = "angebotswechsel"
 GRUND_ZEITRAUM = "anderer_zeitraum"
@@ -250,8 +242,6 @@ def fuer_bericht(root, heute: date, reports_dir) -> dict:
             exc,
         )
         block = ausfall(AUSFALL_AUFBEREITUNG)
-    # Frisch muss VODAFONES Messung sein: ein frischer Stichtag der
-    # Wettbewerber verdeckte sonst einen stehengebliebenen eigenen Adapter.
     eigen = block.get("eigen_stichtag")
     if not block.get("error") and (
         not eigen or date.fromisoformat(eigen) < heute - timedelta(days=TOLERANZ_TAGE)

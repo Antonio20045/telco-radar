@@ -58,8 +58,6 @@ from .tarif_pdf import dokument_hash, ist_tarifdokument, lies_text, text_aus_pdf
 
 log = logging.getLogger(__name__)
 
-# Felder, deren Aenderung eine Meldung wert ist. Die Reihenfolge ist die
-# Reihenfolge im Meldungstext.
 BEOBACHTET = (
     "grundgebuehr",
     "anschlusspreis",
@@ -74,10 +72,6 @@ BEOBACHTET = (
     "allnet_flat",
 )
 
-# Das KLEINGEDRUCKTE (A9): Felder, die sich aendern koennen, ohne dass der
-# Preis sich bewegt - und die deshalb sonst niemandem auffallen. Genau das
-# ist der Grund fuer diesen Radar: eine Drosselgrenze von 80 GB auf 50 GB bei
-# gleichem Preis ist eine Preiserhoehung, die nirgends als solche auftaucht.
 KLEINGEDRUCKT = (
     "datenvolumen_gb",
     "drossel_down",
@@ -118,47 +112,17 @@ EINHEIT = {
 }
 
 
-# Die zwei Lesarten einer Tarifquelle.
-#
-# `dokumente`  Der urspruengliche und weiterhin der Regelfall: von der
-#              Einstiegsseite werden VERLINKTE Pflichtdokumente geholt und
-#              durch `tarif_pdf` gelesen.
-# `ldjson`     Die Einstiegsseite IST die Nutzlast: ihre strukturierten
-#              Daten nach schema.org tragen die Tarife selbst. Kein Link
-#              wird geerntet, keine zweite Adresse abgerufen - dieselbe
-#              Bauart wie `direkt=True` im Geraetezweig.
 METHODE_DOKUMENTE = "dokumente"
 METHODE_LDJSON = "ldjson"
-# `kacheln`  Wie `ldjson` - die Einstiegsseite IST die Nutzlast -, nur ohne
-#            strukturierte Daten: gelesen werden die Preiskacheln, die der
-#            Anbieter selbst als solche auszeichnet. Gebaut fuer o2, dessen
-#            Tarifseite genau ein ld+json traegt (eine BreadcrumbList) und
-#            dessen uebrige Pflichtblaetter unter `/assets/` liegen - einem
-#            Pfad, den die fuer uns gueltige robots-Gruppe sperrt.
 METHODE_KACHELN = "kacheln"
-# `telekom_kacheln`  Wie `kacheln`, nur fuer ein anderes Markup: die
-#            Telekom zeichnet ihre Tarife nicht als strukturiertes
-#            Web-Component-Attribut aus (wie o2), sondern als
-#            React-CSS-Modul-Klassen (`TariffTileModified_...`). Eigener
-#            Extraktor, weil das Muster ein anderes ist - siehe
-#            `tarif_telekom_kacheln.py` fuer die Messung und die Regel,
-#            warum der DURCHGESTRICHENE Preis zaehlt und nicht der grosse
-#            "Ø"-Kombipreis.
 METHODE_TELEKOM_KACHELN = "telekom_kacheln"
 
-# Die Lesarten, deren Einstiegsseite selbst die Nutzlast ist: kein Link
-# wird geerntet, keine zweite Adresse geholt. Sie teilen sich denselben
-# Sammelweg und unterscheiden sich nur im Extraktor.
 _SEITEN_LESARTEN = {
     METHODE_LDJSON: tarif_ldjson.tarife_aus_html,
     METHODE_KACHELN: tarif_kacheln.tarife_aus_html,
     METHODE_TELEKOM_KACHELN: tarif_telekom_kacheln.tarife_aus_html,
 }
 
-# Die GEBAUTEN Methoden - eine einzige Liste, gegen die sich Konfiguration
-# und Test messen. Sie steht hier und nicht im Test, damit eine neu gebaute
-# Lesart nicht an zwei Stellen nachgetragen werden muss (und die zweite
-# vergessen wird).
 METHODEN = (METHODE_DOKUMENTE, *sorted(_SEITEN_LESARTEN))
 
 
@@ -168,21 +132,9 @@ class Quelle:
     einstieg: list[str] = field(default_factory=list)
     pfadmuster: list[str] = field(default_factory=list)
     bevorzugt: list[str] = field(default_factory=list)
-    # P3-E1 (28.09.2026): Dokumente, die der Anbieter noch verlinkt, aber
-    # nicht mehr verkauft. Gesucht wird wie bei `bevorzugt` in Adresse UND
-    # Linkbeschriftung. Ein ausgeschlossenes Dokument wird nicht geholt,
-    # und sein Stand im Bestand wird als zurueckgezogen markiert - er
-    # bliebe sonst als "aktueller" Tarif stehen.
     ausschliessen: list[str] = field(default_factory=list)
     max_dokumente: int = 5
     methode: str = METHODE_DOKUMENTE
-    # Per-Anbieter-Override des Absenders (BRIEF_TELEKOM_TAEGLICH_R3_E4).
-    # `config/settings.yaml -> http.user_agent` ist die globale Kennung fuer
-    # alle 196 Quellen dieses Projekts; sie hier zu aendern traefe jeden
-    # anderen Anbieter mit. Eine Quelle, die stattdessen den ehrlichen
-    # `TelcoRadar/1.0`-Absender tragen soll, bekommt das Feld hier gesetzt -
-    # ohne Zeile in `tarif_quellen.yaml` bleibt es `None` und `http_cfg`
-    # unveraendert.
     user_agent: str | None = None
 
 
@@ -231,11 +183,6 @@ def lade_quellen(root: Path) -> list[Quelle]:
                 bevorzugt=[str(b).lower() for b in (q.get("bevorzugt") or [])],
                 ausschliessen=[str(a).lower() for a in (q.get("ausschliessen") or [])],
                 max_dokumente=int(q.get("max_dokumente") or 5),
-                # Eine unbekannte Methode wird NICHT stillschweigend zur
-                # Vorgabe gemacht. Sie faellt in `sammle()` als Fehler auf -
-                # ein Tippfehler in der Konfiguration soll nicht dazu fuehren,
-                # dass eine Shop-Seite als Dokumentverzeichnis gelesen wird und
-                # null Links liefert.
                 methode=str(q.get("methode") or METHODE_DOKUMENTE).strip(),
                 user_agent=(str(q["user_agent"]) if q.get("user_agent") else None),
             )
@@ -253,13 +200,6 @@ def tarif_id(anbieter: str, name: str) -> str:
     """
     name = re.sub(r"\((?:19|20)\d{2}\)", " ", name or "")
     name = re.sub(r"\b(?:19|20)\d{2}\b", " ", name)
-    # Die Dokumentgattung in Klammern gehoert nicht zum Tarifnamen.
-    # congstar schreibt "Allnet Flat L (Postpaid Mobilfunk)", die Telekom
-    # "MagentaMobil L (Mobilfunk)" - beides ist eine Einordnung des
-    # BLATTES, keine Produktbezeichnung. Ohne "Postpaid"/"Prepaid" in
-    # dieser Zeile hiess congstars stabiler Schluessel
-    # `congstar:allnet-flat-l-postpaid-mobilfunk`, und eine Tarifangabe
-    # "Allnet Flat L" von einer Produktseite traf ihn nie.
     name = re.sub(
         r"\((?:(?:Post|Pre)paid\s+)?(?:Mobilfunk|Festnetz)\)", " ", name, flags=re.I
     )
@@ -306,7 +246,6 @@ def _ankerpaare(html: str, basis: str, muster: list[str]) -> list[tuple[str, str
         pfad = urlsplit(voll).path.lower()
         if muster and not any(m in pfad for m in muster):
             continue
-        # Die Einstiegsseite selbst ist kein Dokument.
         if voll.rstrip("/") == basis.rstrip("/"):
             continue
         if voll not in gesehen:
@@ -335,10 +274,6 @@ def linktexte(html: str, basis: str, muster: list[str]) -> dict[str, str]:
     return {url: text for url, text in _ankerpaare(html, basis, muster) if text}
 
 
-# Der Slug eines Telekom-Dokuments endet auf dem Vermarktungsdatum:
-# `magentamobil-l-20240801`. Bewusst nur vierstellige Jahre ab 2000 -
-# dieselbe Ueberlegung wie beim Datum aus dem Link in `collect/rss.py`:
-# ein sechsstelliges Muster faende jede Artikelnummer.
 _VERMARKTUNGSDATUM = re.compile(r"-(20\d{6})$")
 
 
@@ -391,12 +326,6 @@ def _sortiere(
         return links
     texte = texte or {}
 
-    # Je Wunsch ein Fach, plus eins fuer alles Uebrige. Innerhalb eines
-    # Fachs bleibt die SEITENREIHENFOLGE: vorher entschied das Alphabet,
-    # und das ist hier keine Ordnung, sondern eine Muenze - congstar stellt
-    # seine laufenden Tarife nach oben, und
-    # `Produktinformationsblatt_549.pdf` steht alphabetisch vor `_9001.pdf`,
-    # ohne dass die Zahl etwas bedeutet.
     faecher: list[list[str]] = [[] for _ in range(len(bevorzugt) + 1)]
     for url in links:
         klein = url.lower() + " " + texte.get(url, "").lower()
@@ -407,14 +336,6 @@ def _sortiere(
         else:
             faecher[-1].append(url)
 
-    # REIHUM, nicht Fach fuer Fach. Der Unterschied ist am 04.09.2026
-    # gemessen worden: `magentamobil-s-` trifft neun Dokumente (der Tarif,
-    # seine Flex-, Young-, Friends- und Happy-Varianten), und weil sie alle
-    # vor dem ersten M-Dokument standen, brachte ein Deckel von zwoelf
-    # NEUNMAL MagentaMobil S und kein einziges Mal M, L, XL oder Basic.
-    # Ein Wunschzettel, dessen erster Punkt den ganzen Einkauf frisst, ist
-    # keiner - dieselbe Ueberlegung wie `_interleave_by_source` in der
-    # Pipeline.
     sortiert: list[str] = []
     for runde in range(max((len(f) for f in faecher[:-1]), default=0)):
         for fach in faecher[:-1]:
@@ -460,8 +381,6 @@ class TarifSpeicher:
         satz = self.letzter(tid)
         if satz is not None:
             satz["abgerufen_am"] = wann
-            # Wieder gelesen heisst wieder im Sortiment: ein frueherer
-            # Rueckzug (`ziehe_zurueck`) gilt nicht mehr.
             satz.pop("zurueckgezogen_am", None)
             satz.pop("zurueckgezogen_grund", None)
 
@@ -528,26 +447,12 @@ def vergleiche(alt: dict, neu: Tarif) -> list[Feldaenderung]:
     """Was sich zwischen zwei Staenden geaendert hat, feldweise."""
     aenderungen = []
     for feld in BEOBACHTET:
-        # Der leere String ist ein FEHLENDER Wert, kein Wert. `volumen_
-        # automatik` faengt als "" an; ohne diese Zeile meldete jeder erste
-        # Vergleich eine Aenderung "nicht angegeben -> nicht angegeben".
         a = alt.get(feld)
         n = getattr(neu, feld, None)
         a = None if a == "" else a
         n = None if n == "" else n
-        # Ein Feld, das der Extraktor diesmal NICHT gefunden hat, ist keine
-        # Aenderung - es ist ein Ausfall. Als "80 GB -> nicht angegeben" zu
-        # melden waere die haeufigste Falschmeldung dieses Radars.
         if n is None and a is not None:
             continue
-        # "Nicht angegeben -> unbegrenzt" beim Datenvolumen ist keine
-        # Tarifaenderung (P3, 28.09.2026): bis dahin schrieb die o2-Kachel
-        # "Unbegrenzt" als None, und das Vodafone-XL-Blatt ("Unlimitierte
-        # Highspeed-Daten") las der Extraktor nicht. Der erste Stand nach
-        # der Umstellung waere sonst eine falsche Meldung. Ein neu
-        # hinzugekommenes Feld zaehlt sonst weiter
-        # (`test_neu_hinzugekommenes_feld_zaehlt`), und "100 GB ->
-        # unbegrenzt" bleibt eine Aenderung.
         if feld == "datenvolumen_gb" and a is None and n == float("inf"):
             continue
         if a is None and n is None:
@@ -581,8 +486,6 @@ def als_item(tarif: Tarif, aenderungen: list[Feldaenderung], stand: datetime) ->
     preis = [a for a in aenderungen if a.feld in PREISFELDER]
     dokument = tarif.preistyp != PREISTYP_LIVE_SHOP
     quelle_kurz = "Produktinformationsblatt" if dokument else "Shop-Seite"
-    # Mit Praeposition, damit beide Saetze deutsch bleiben: "im
-    # Produktinformationsblatt" gegen "auf der Shop-Seite".
     quelle_wo = "im Produktinformationsblatt" if dokument else "auf der Shop-Seite"
     quelle_satz = (
         "Quelle ist das gesetzlich vorgeschriebene Produktinformationsblatt."
@@ -620,14 +523,8 @@ def als_item(tarif: Tarif, aenderungen: list[Feldaenderung], stand: datetime) ->
         operator=tarif.anbieter,
         published=stand,
         summary=(einleitung + liste + ". " + quelle_satz)[:900],
-        # `origin` bleibt der Name des ZWEIGS und nicht der der Quellenart:
-        # er sagt der Pipeline, welcher Sammler die Meldung erzeugt hat.
-        # Ein zweiter Wert waere ein zweiter Zweig, den niemand kennt.
         origin="tarif_dokument",
         source_url=tarif.dokument_url,
-        # Aus Tarif UND Dokument-Hash: zwei Aenderungen desselben Tarifs
-        # muessen zwei Meldungen sein, sonst haelt der Seen-Store die zweite
-        # fuer die schon berichtete erste.
         id=dokument_hash(kennung)[:16],
     )
 
@@ -659,30 +556,6 @@ def uebernimm_stand(
     """
     tid = tarif_id(tarif.anbieter, tarif.name)
 
-    # ZWEI LESARTEN SIND ZWEI ZEITREIHEN, KEINE ZWEI FASSUNGEN.
-    #
-    # Live gemessen am 04.09.2026: o2s Produktinformationsblatt und o2s
-    # SIM-only-Kachel nennen beide "O2 Mobile Unlimited M Flex" - dieselbe
-    # Tarif-ID, zwei voellig verschiedene Quellen. Ohne diese Zeilen wurde
-    # der Kachelsatz zur naechsten FASSUNG des Blattes, und `vergleiche`
-    # meldete als Tarifaenderung, was in Wahrheit der Unterschied zwischen
-    # einem PDF und einer Werbeseite ist (das Blatt nennt eine
-    # Mindestlaufzeit, die Flex-Kachel keine).
-    #
-    # Genau dagegen ist `preistyp` gebaut: "Beide duerfen auseinanderlaufen;
-    # die Abweichung ist die Auskunft, nicht der Fehler." Eine gemeinsame
-    # Zeitreihe kann das nicht abbilden - in ihr ueberschreibt die eine
-    # Lesart die andere.
-    #
-    # Der Zusatz ist der PREISTYP und nicht ein Hash: er ist je Quelle
-    # konstant, also bleibt der Schluessel ueber die Laeufe stabil. Ein
-    # Inhaltshash (wie beim Fall darunter) waere hier falsch - er aenderte
-    # sich mit jeder Preisaenderung, und die Zeitreihe zerfiele in
-    # Einzelsaetze.
-    #
-    # Wer zuerst da war, behaelt den kurzen Schluessel. Das ist keine
-    # Rangfolge, sondern Bestandsschutz: die vorhandene Zeitreihe soll
-    # nicht umziehen.
     vorheriger = speicher.letzter(tid)
     if (
         vorheriger is not None
@@ -698,15 +571,6 @@ def uebernimm_stand(
         tid = f"{tid}#{tarif.preistyp}"
 
     if tid in im_lauf and im_lauf[tid] != herkunft:
-        # ZWEI verschiedene Funde mit derselben Titelzeile im SELBEN Lauf.
-        # Live gemessen am 08.08.2026: o2 fuehrt `o2-home-l-flex` und
-        # `o2-home-l-175-flex` als getrennte PDFs, beide mit der
-        # Ueberschrift "O2 Home L 175/250/300 Flex". Ohne Unterscheidung
-        # waere das zweite eine neue Fassung des ersten - und der Diff
-        # meldete bei jedem Lauf abwechselnd hin und her.
-        #
-        # Zwei Staende NACHEINANDER sind eine Versionsfolge, zwei im
-        # selben Lauf sind zwei Produkte.
         tid = f"{tid}#{dokument_hash(herkunft)[:8]}"
     im_lauf[tid] = herkunft
     satz = tarif.als_dict()
@@ -731,8 +595,6 @@ def uebernimm_stand(
     aenderungen = vergleiche(vorher, tarif)
     speicher.ergaenze(satz)
     if not aenderungen:
-        # Neuer Hash, gleiche Werte: der Anbieter hat das Layout
-        # angefasst, nicht den Tarif. Keine Meldung.
         bilanz["unveraendert"] += 1
         return
     bilanz["geaendert"] += 1
@@ -758,10 +620,8 @@ def _hole_dokument(url: str, http_cfg: dict, hole) -> tuple[str, str] | None:
             f.flush()
             text = text_aus_pdf(Path(f.name))
     elif "html" in typ:
-        # Manche Anbieter legen die Vertragszusammenfassung als HTML ab.
         text = BeautifulSoup(antwort.text, "html.parser").get_text("\n")
     elif "text" in typ:
-        # Reiner Text kommt selten vor, ist aber schon fertig.
         text = antwort.text
     else:
         return None
@@ -818,12 +678,6 @@ def _sammle_seite(
             abgerufen_am=jetzt.date().isoformat(),
         )
         if not gefunden:
-            # Derselbe Befund wie eine Einstiegsseite ohne Dokumentlink,
-            # und er muss genauso laut sein: eine Seite, die 200 und 450 KB
-            # liefert und trotzdem keinen Tarif hergibt, hat entweder ihr
-            # Format geaendert oder eine Challenge ausgeliefert. Ohne
-            # Status und Groesse in der Zeile ist das nicht zu
-            # unterscheiden (die Telekom-Lehre vom 04.09.2026).
             bilanz["ohne_links"] += 1
             log.warning(
                 "Tarifquelle %s (%s): HTTP %s, %d Bytes, aber KEIN "
@@ -844,8 +698,6 @@ def _sammle_seite(
                 )
                 continue
             bilanz["gelesen"] += 1
-            # Die Herkunft ist hier der Fingerabdruck des Knotens: alle
-            # Tarife dieser Seite teilen sich ihre Adresse.
             uebernimm_stand(
                 tarif,
                 hash_,
@@ -889,13 +741,9 @@ def sammle(
     besucht: list[str] = []
     erlaubt: set[str] = set()
     items: list[Item] = []
-    # Welche Tarif-ID in DIESEM Lauf schon von welcher Adresse kam.
     im_lauf: dict[str, str] = {}
 
     for quelle in quellen:
-        # Per-Anbieter-Override, NICHT die globale Konfiguration: eine
-        # Quelle mit `user_agent:` bekommt ihre eigene Kopie von `http_cfg`,
-        # jede andere Quelle sieht `http_cfg` unveraendert.
         quelle_cfg = (
             {**http_cfg, "user_agent": quelle.user_agent}
             if quelle.user_agent
@@ -917,9 +765,6 @@ def sammle(
             )
             continue
         if quelle.methode != METHODE_DOKUMENTE:
-            # Eine unbekannte Methode wird laut, nicht still: sonst faellt
-            # ein Tippfehler in der Konfiguration erst auf, wenn jemand
-            # merkt, dass ein Anbieter seit Wochen nichts mehr liefert.
             bilanz["fehler"] += 1
             log.warning(
                 "Tarifquelle %s: unbekannte methode %r - uebersprungen (bekannt: %s)",
@@ -937,10 +782,6 @@ def sammle(
                 besucht.append(einstieg)
                 antwort = hole(einstieg, quelle_cfg)
                 gefunden = dokumentlinks(antwort.text, einstieg, quelle.pfadmuster)
-                # setdefault statt update: innerhalb einer Seite gewinnt
-                # der ERSTE Linktext, ueber mehrere Einstiegsseiten soll
-                # dasselbe gelten. Mit `update` gewaenne dort der letzte -
-                # zwei Regeln fuer dieselbe Frage.
                 for adresse, beschriftung in linktexte(
                     antwort.text, einstieg, quelle.pfadmuster
                 ).items():
@@ -950,15 +791,6 @@ def sammle(
                 log.info("Tarifquelle %s nicht lesbar: %s", einstieg, str(exc)[:120])
                 continue
             if not gefunden:
-                # Eine Einstiegsseite ohne einen einzigen Dokumentlink ist
-                # der lauteste Befund dieses Sammlers - und er war bis zum
-                # 04.09.2026 vollkommen stumm. Genau so ist die Telekom
-                # zwei Monate lang als "liefert nichts" gefuehrt worden:
-                # ihre Seite antwortet aus GitHub Actions mit einer
-                # Challenge (HTTP 202, rund 2 KB), die kein Fehler ist und
-                # keinen Link enthaelt. Aus derselben Sandbox heraus
-                # liefert dieselbe Adresse 200 und 1114 Links. Ohne Status
-                # und Groesse in der Zeile ist das nicht zu unterscheiden.
                 bilanz["ohne_links"] += 1
                 log.warning(
                     "Tarifquelle %s (%s): HTTP %s, %d Bytes, aber "
@@ -972,10 +804,6 @@ def sammle(
             erlaubt.update(gefunden)
             links.extend(gefunden)
 
-        # `verlinkt` zaehlt, was nach der Auswahl "juengste Fassung" noch
-        # in Frage kommt - nicht, was auf der Seite stand. Die rohe Zahl
-        # steht in der Protokollzeile der Einstiegsseite; hier interessiert,
-        # aus wie vielen Kandidaten der Deckel schneidet.
         vor_auswahl = len(links)
         links = juengste_fassung(links)
         if vor_auswahl != len(links):
@@ -1026,12 +854,6 @@ def sammle(
                 text, url=url, hash_=hash_, abgerufen_am=jetzt.date().isoformat()
             )
             if not tarif.anbieter:
-                # Der Anbieter aus der Config, nicht aus dem Dokument.
-                # Deshalb OHNE Fundstelle und bewusst nicht ueber setze():
-                # die Belegpflicht gilt fuer das, was im Dokument steht, und
-                # dieser Wert steht dort gerade nicht. Ihn mit einer
-                # erfundenen Fundstelle zu versehen waere genau die
-                # Unehrlichkeit, gegen die pruefe_belege() gebaut ist.
                 tarif.anbieter = quelle.anbieter
             if tarif.ist_quarantaene:
                 bilanz["quarantaene"] += 1
@@ -1039,8 +861,6 @@ def sammle(
                 continue
             bilanz["gelesen"] += 1
 
-            # Die Adresse ist die Herkunft des Dokuments - siehe
-            # `uebernimm_stand`.
             uebernimm_stand(
                 tarif,
                 hash_,

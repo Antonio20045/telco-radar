@@ -30,17 +30,10 @@ from __future__ import annotations
 
 from collections import defaultdict
 
-# Wie viele Monate der Verlauf zeigt. Sechs sind ein halbes Jahr und passen
-# als Balkenreihe nebeneinander.
 MAX_MONATE = 6
 
-# Unter so vielen Aufnahmen im Monat ist der Anteil eines einzelnen Hebels
-# Rauschen. Der Monat steht trotzdem im Verlauf - er wird nur nicht fuer die
-# Aussage "waechst/kippt" herangezogen.
 _MIND_JE_MONAT = 5
 
-# Um wie viele Prozentpunkte sich ein Anteil verschieben muss, damit es eine
-# Bewegung heisst. Darunter ist es dieselbe Lage in anderer Rundung.
 _SCHWELLE_PUNKTE = 5.0
 
 MONATE_DE = [
@@ -78,8 +71,6 @@ def aufbereiten(bestand: list[dict], theme_label: dict[str, str]) -> dict:
 
     monate = sorted(je_monat)[-MAX_MONATE:]
     if len(monate) < 2:
-        # Ein einzelner Monat ist kein Verlauf. Lieber nichts zeigen als eine
-        # Linie mit einem Punkt.
         return {"aktiv": False, "monate": [], "reihen": [], "waechst": [], "kippt": []}
 
     gesamt = {m: sum(je_monat[m].values()) for m in monate}
@@ -112,9 +103,6 @@ def aufbereiten(bestand: list[dict], theme_label: dict[str, str]) -> dict:
         )
     reihen.sort(key=lambda r: -r["gesamt"])
 
-    # Die Bewegung: letzter belastbarer Monat gegen den Durchschnitt der
-    # belastbaren Monate davor. Gegen den VORMONAT allein zu rechnen macht
-    # jede Schwankung zur Nachricht.
     waechst, kippt = [], []
     if len(belastbar) >= 2:
         letzter = belastbar[-1]
@@ -152,7 +140,6 @@ def aufbereiten(bestand: list[dict], theme_label: dict[str, str]) -> dict:
         "reihen": reihen[:8],
         "waechst": waechst[:3],
         "kippt": kippt[:3],
-        # Damit die Seite den Vorbehalt nennen kann, statt ihn zu verschweigen.
         "duenne_monate": [_monat_label(m) for m in monate if m not in belastbar],
         "mind_je_monat": _MIND_JE_MONAT,
     }

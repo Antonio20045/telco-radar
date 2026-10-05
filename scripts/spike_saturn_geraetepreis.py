@@ -56,14 +56,6 @@ from datetime import datetime, timezone
 UA = "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
 DEFAULT_URL = "https://www.saturn.de/de/category/_apple-iphone-17-pro-701440.html"
 
-# Robots.txt (gelesen UND als /tmp/saturn_robots_check.txt gespeichert am
-# 05.09.2026, User-agent: *) sperrt fuer uns exakt diese zwei
-# GraphQL-Operationen. Nichts sonst auf /de/category/..., /de/brand/... oder
-# /de/product/... ist gesperrt. Die Liste unten ist die VOLLSTAENDIGE
-# Disallow-Liste der "*"-Gruppe (nicht nur ein Auszug) - Block-Regex UND
-# Audit-Funktion lesen aus GENAU dieser einen Liste, damit beide nie
-# auseinanderlaufen. Robots-Wildcards ("*") werden zu Regex-".*", der Rest
-# wird woertlich (escaped) genommen.
 _TABU_OPS = ("GetPaidBundles", "GetFreeBundles")
 _ROBOTS_DISALLOW_PATTERNS = (
     "/cdn-cgi/bm/cv/",
@@ -267,8 +259,6 @@ def _dedupe_by_product_id(features: list[dict]) -> tuple[list[dict], list[str]]:
         if pid in seen:
             if pid not in dup_ids:
                 dup_ids.append(pid)
-            # Den Eintrag MIT Ratenplan bevorzugen (das ist die vollstaendigere
-            # Fassung derselben Zahl, kein zweiter Preis).
             if f["installment_present"] and not seen[pid]["installment_present"]:
                 seen[pid] = f
         else:
@@ -373,15 +363,6 @@ def run_browser(url: str, screenshot_path: str, network_log_path: str) -> int:
                     blocked_calls.append(f"tabu-op:{op}: {req_url}")
                     route.abort()
                     return
-                # Review-Befund (05.09.2026): eine PASSIVE Seitenlast loest im
-                # Hintergrund von sich aus Requests auf mehrere disallow'te
-                # Pfade aus (Cloudflare-Challenge-Skript, ein Chat-Ping unter
-                # /api/v1/msg, ein Tracking-Cookie unter /public/setCookie/) -
-                # das ist keine Handlung dieses Skripts, aber es sind Requests
-                # UNSERES Clients, also werden sie ebenso abgefangen wie die
-                # zwei GraphQL-Tabu-Operationen. "Nur beobachten" reicht nicht,
-                # sobald man weiss, dass es sie gibt. _matched_disallow prueft
-                # gegen die VOLLE Disallow-Liste, nicht nur einen Auszug.
                 hit = _matched_disallow(req_url)
                 if hit:
                     blocked_calls.append(f"disallow:{hit}: {req_url}")
@@ -389,14 +370,6 @@ def run_browser(url: str, screenshot_path: str, network_log_path: str) -> int:
                     return
                 route.continue_()
 
-            # Ein Route-Matcher auf "**/*" loeste unter Playwright 1.61 +
-            # Python 3.14 einen internen Fehler in route.continue_() fuer
-            # bestimmte Ressourcentypen aus (Bibliotheksfehler, kein
-            # Robots-Thema). Deshalb ein enger Regex, gebaut aus GENAU
-            # derselben Disallow-Liste wie _matched_disallow() (kein
-            # zweiter, von Hand gepflegter Auszug, der auseinanderlaufen
-            # koennte) plus "graphql" fuer die zwei benannten Tabu-Ops -
-            # nicht jede Schriftart/jedes Bild der Seite.
             _route_alternatives = ["graphql"] + [
                 re.escape(p).replace(r"\*", ".*") for p in _ROBOTS_DISALLOW_PATTERNS
             ]
@@ -414,11 +387,6 @@ def run_browser(url: str, screenshot_path: str, network_log_path: str) -> int:
                     all_xhr.append(
                         {"url": resp.url, "status": resp.status, "ctype": ctype}
                     )
-                # GraphQL-Antworten werden UNABHAENGIG vom Resource-Type
-                # gezaehlt (Review-Befund: Playwright klassifiziert nicht
-                # jeden GraphQL-Aufruf als "xhr"/"fetch"), damit
-                # graphql_response_count mit graphql_requests_seen_by_handler
-                # zusammenpasst und ein Statuscode != 200 nicht durchrutscht.
                 if is_graphql:
                     body_preview = None
                     body_len = None
@@ -453,9 +421,6 @@ def run_browser(url: str, screenshot_path: str, network_log_path: str) -> int:
             except Exception as exc:  # noqa: BLE001
                 nav_error = f"{type(exc).__name__}: {exc}"
 
-            # Cookie-Banner: ein paar neutrale Versuche (kein Tarnungstrick,
-            # nur die auf der Seite sichtbaren Knoepfe) - ohne Wegklicken
-            # bleibt darunterliegender Inhalt teils verdeckt.
             for sel in (
                 "button:has-text('Alle zulassen')",
                 "button:has-text('Alle akzeptieren')",
@@ -468,23 +433,17 @@ def run_browser(url: str, screenshot_path: str, network_log_path: str) -> int:
                 except Exception:
                     continue
 
-            # Netzruhe: aktiv warten statt fest zu schlafen. Wird das
-            # 20s-Fenster nicht erreicht (Saturn haelt oft eine Hintergrund-
-            # Verbindung offen - Chat/Tracking-Ping), ist das ein ECHTER
-            # Befund und wird als solcher im Report festgehalten, nicht
-            # stillschweigend durch die Wartezeit unten kaschiert.
             try:
                 page.wait_for_load_state("networkidle", timeout=20000)
             except Exception as exc:  # noqa: BLE001
                 idle_error = f"{type(exc).__name__}: {exc}"
-                page.wait_for_timeout(5000)  # letzte Chance fuer nachlaufende Requests
+                page.wait_for_timeout(5000)
 
             page.wait_for_timeout(2000)
 
             html = page.content()
             title_text = page.title()
 
-            # Screenshot als Gegenprobe-Beleg.
             try:
                 page.screenshot(path=screenshot_path, full_page=False)
             except Exception as exc:  # noqa: BLE001
@@ -501,10 +460,6 @@ def run_browser(url: str, screenshot_path: str, network_log_path: str) -> int:
     ld_json_items = _extract_ld_json_itemlist(html) if html else []
     robots_audit_hits = _audit_robots([r["url"] for r in all_xhr])
     non_200 = [r for r in (all_xhr + graphql_responses) if r["status"] != 200]
-    # Dubletten (eine URL kann in beiden Listen stehen, wenn sie sowohl
-    # xhr/fetch typisiert ist als auch "graphql" im Pfad traegt) werden
-    # ueber (url, status) entfernt - sonst zaehlt ein einzelner
-    # Nicht-200-Request doppelt.
     seen_keys = set()
     non_200_dedup = []
     for r in non_200:

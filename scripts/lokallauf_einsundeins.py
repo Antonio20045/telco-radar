@@ -90,7 +90,7 @@ def _hole_mit_beleg(beleg: list):
         }
         try:
             antwort = _echter_fetch(url, http_cfg, *args, **kwargs)
-        except Exception as exc:  # noqa: BLE001 - protokollieren, dann weiterwerfen
+        except Exception as exc:  # noqa: BLE001
             resp = getattr(exc, "response", None)
             eintrag["status"] = getattr(resp, "status_code", None)
             eintrag["user_agent"] = (
@@ -142,9 +142,6 @@ def main() -> None:
     heute = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     beleg: list[dict] = []
 
-    # Der Haken wird VOR dem Patchen gebaut: seine Closure hält dann den
-    # ECHTEN fetch fest, und das Patchen des Modul-Attributs kann ihn nicht
-    # auf sich selbst zeigen lassen (dieselbe Zeile wie bei B2/B3).
     _patch_fetch = _hole_mit_beleg(beleg)
     _echter_fetch = _http_mod.fetch
     _http_mod.fetch = _patch_fetch

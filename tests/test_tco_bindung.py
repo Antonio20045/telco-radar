@@ -55,7 +55,6 @@ def test_die_rechenprobe_des_auftrags_geht_auf():
     e = tco_bindung(o2_iphone17pro())
     assert e.bindung == 36, "die LAENGERE Bindung fuehrt die Karte (A5.5)"
     assert e.tarif_bindung == 24 and e.raten_laufzeit == 36
-    # 0,00 + 1,00 + 24 x 19,99 (479,76) + 36 x 36,50 (1314,00)
     assert e.gesamt == 1794.76
     assert e.schnitt_monat == 49.85
     assert e.label == "TCO-36"
@@ -65,9 +64,7 @@ def test_die_rechenprobe_des_auftrags_geht_auf():
 def test_die_leitfrage_wird_woertlich_beantwortet():
     """A5.2: was nach 24 Monaten gezahlt ist, und was dann noch offen ist."""
     e = tco_bindung(o2_iphone17pro())
-    # 0,00 + 1,00 + 24 x 19,99 + 24 x 36,50
     assert e.gezahlt_nach_24 == 1356.76
-    # zwoelf offene Geraeteraten
     assert e.offen_nach_24 == 438.00
     assert round(e.gezahlt_nach_24 + e.offen_nach_24, 2) == e.gesamt
 
@@ -174,8 +171,6 @@ def test_ein_belegter_bonus_wird_abgezogen_und_einzeln_genannt():
     assert e.boni_abzug == 50.0
     assert e.boni[0]["name"] == "Wechselbonus"
     assert e.gesamt == round(1794.76 - 50.0, 2) == 1744.76
-    # Der Abzug steht als eigener, negativer Posten - genau das braucht die
-    # Balkengrafik fuer ihr Bonussegment.
     assert any(
         p["kategorie"] == "bonus" and p["betrag"] == -50.0 for p in e.bestandteile
     )
@@ -195,7 +190,6 @@ def test_ein_bonus_innerhalb_der_ersten_24_monate_mindert_auch_die_leitfrage():
 
 def test_der_effektivpreis_braucht_einen_belegten_barpreis():
     e = tco_bindung(o2_iphone17pro())
-    # 49,85 - 1249,00 / 36 = 49,85 - 34,6944 = 15,16
     assert effektiv_ohne_geraet(e, 1249.00) == 15.16
     assert effektiv_ohne_geraet(e, None) is None
 
@@ -248,9 +242,6 @@ def test_am_echten_bestand_traegt_jede_o2_zeile_ihre_zwei_laufzeiten():
         )
         e = tco_bindung(b)
         assert e.belastbar, f"{satz['id']} nicht belastbar: {e.luecken}"
-        # Seit der o2-Vertiefung (29.09.2026) liefert o2 24 UND 36 Raten.
-        # Die Bindung ist die gemessene Ratenlaufzeit, die Restschuld nach
-        # Monat 24 ihre offenen Raten - bei 24 Raten 0,00 EUR.
         laufzeit = satz["laufzeit_monate"]
         assert laufzeit in (24, 36), satz["id"]
         assert e.bindung == laufzeit and e.tarif_bindung == 24

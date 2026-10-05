@@ -32,9 +32,6 @@ def test_fallback_is_a_report_with_source_links():
     assert "## Das Bild" in report
     assert "## Muster" in report
     assert "## Einordnung" in report
-    # Die alte Gliederung ist weg: "Konkrete Entwicklungen" war die
-    # Aufzaehlung, die auf der Seite schon als Karten steht, und
-    # "Quellenbasis" fuehrte dieselben Quellen ein drittes Mal auf.
     assert "## Konkrete Entwicklungen" not in report
     assert "## Quellenbasis" not in report
     assert "[Telekom – example.com](https://example.com/move)" in report
@@ -73,7 +70,7 @@ def test_ein_absatz_in_aufzaehlungslaenge_wird_abgelehnt():
 def test_ein_bericht_ohne_belegte_beispiele_bleibt_gueltig():
     """Eine leere Bibliothek darf keinen Fehler werfen - die Seite steht
     dann mit dem gerechneten Marktbild."""
-    validate_briefing.__doc__  # noqa: B018 - nur Dokumentationsbezug
+    validate_briefing.__doc__  # noqa: B018
     report = build_digest([], {})
     assert "## Das Bild" in report and "## Einordnung" in report
 

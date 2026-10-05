@@ -234,8 +234,6 @@ from typing import Optional
 from . import GeraeteAbrufFehler
 from ...geraete_model import probe_geht_auf
 
-# DIE EINE STELLE, die entscheidet, ob ein Rohwert eine Ratenlaufzeit IST
-# (Clean Code 1): dieselbe Pruefung, die `buendel_id` und `Buendel` lesen.
 from ...tco_model import (
     AKTION_ANSCHLUSS_ERLASSEN,
     AKTION_GERAETERABATT,
@@ -246,26 +244,12 @@ from ...tco_model import (
 
 log = logging.getLogger(__name__)
 
-# Jedes Fragment ist EIN JS-Stringliteral: `[1,"...escaped..."]`. Die
-# Escapes (\", \\, \n, \uXXXX) folgen derselben Grammatik wie JSON-Strings,
-# darum genuegt `json.loads` auf dem ganzen Array - kein eigener Entschaerfer
-# noetig. Die Alternative "|\\." im Zeichensatz laesst ein `\"` NICHT als
-# Ende des Strings gelten; ohne sie schnitte die erste escapte Anfuehrung
-# jedes Fragment vorzeitig ab.
 _PUSH_RE = re.compile(r'self\.__next_f\.push\((\[\d+,"(?:[^"\\]|\\.)*"\])\)')
 
-# Der Anfang eines Variantenobjekts: `id` und `gtin` stehen NUR dort
-# zusammen - Zahlweisen-Knoten tragen `id` (eine kleine Ganzzahl wie 510),
-# aber kein `gtin`.
 _VARIANTE_START_RE = re.compile(r'\{"id":\d+,"gtin":"')
 
-# Congstars Verfuegbarkeitswerte, gemessen an den vier Belegdateien
-# (IN_STOCK, PRE_MARKETING). Ein unbekannter Wert faellt auf "unbekannt" -
-# geraten wird nichts.
 _VERFUEGBARKEIT = {
     "IN_STOCK": "lieferbar",
-    # "wieder lieferbar in 5-6 Wochen" im begleitenden infoText - das ist
-    # eine angekuendigte Nachlieferung, kein dauerhafter Abgang.
     "PRE_MARKETING": "nicht_lieferbar",
     "OUT_OF_STOCK": "ausverkauft",
     "DISCONTINUED": "ausverkauft",
@@ -358,7 +342,7 @@ def _ist_ohne_vertrag(zahlweise: dict) -> bool:
     """
     wert = zahlweise.get("contractDuration")
     if isinstance(wert, bool):
-        return False  # "ja" ist keine Dauer
+        return False
     try:
         return float(wert) == 0.0
     except (TypeError, ValueError):
@@ -411,9 +395,6 @@ def lies(text: str, url: str = "") -> list[dict]:
             continue
         preis = _einmalpreis(v)
         if preis is None:
-            # Keine Einmalkauf-Zahlweise ohne Vertrag - BENANNT, nicht
-            # still: faellt das Feld `contractDuration` oder sein Typ
-            # einmal aus, verliert diese Seite sonst lautlos alle Saetze.
             log.info(
                 "congstar: Variante %r ohne Einmalkauf-Zahlweise "
                 "(ONE_TIME_PURCHASE mit contractDuration 0) - kein "
@@ -422,11 +403,6 @@ def lies(text: str, url: str = "") -> list[dict]:
             )
             continue
 
-        # Derselbe Helfer wie im Buendel-Pfad (`_speicher_gb`: referenceGB
-        # vor size): das 1-TB-Geraet traegt size=1, und size allein waere
-        # "1 GB" - live gemessen als Phantom-Modellzeile "Apple iPhone 18
-        # Pro 1 GB" in Katalog und beiden Modell-Exporten (P5-Live-
-        # Pruefung, Rest R1, 18.09.2026).
         speicher_gb = _speicher_gb(v.get("memory"))
 
         farbe = str((v.get("color") or {}).get("name") or "").strip()
@@ -442,13 +418,7 @@ def lies(text: str, url: str = "") -> list[dict]:
                 "ean": str(v.get("gtin") or "").strip(),
                 "farbe": farbe,
                 "speicher_gb": speicher_gb,
-                # Der einzige Traeger des Zustands bei congstar - anders als bei
-                # o2 (§29.08.2026) steht er hier NICHT in der Farbe, sondern in
-                # einem eigenen strukturierten Feld. Beides landet gleichwertig
-                # in der Pruefung, siehe Docstring.
                 "zustand_hinweis": str(v.get("condition") or ""),
-                # Die abgerufene Seite IST die Menschenseite - kein separater
-                # Beleglink noetig, siehe Modulkopf.
                 "url": url,
                 "quelle": "congstar_next",
             }
@@ -456,27 +426,10 @@ def lies(text: str, url: str = "") -> list[dict]:
     return out
 
 
-# --------------------------------------------------------------------------
-# DER BUENDELKATALOG - die Tarifseite, siehe Modulkopf (B3, 08.09.2026)
-# --------------------------------------------------------------------------
-
-# Der Anfang eines PlanVariant-Objekts: `type` UND `title` zusammen stehen
-# nur dort - Geraeteobjekte tragen `category`, Zahlweisen gar keinen Titel.
 _PLAN_START_RE = re.compile(r'\{"id":\d+,"type":"POSTPAID","title":"')
 
-# ".../Produktinformationsblatt_540.pdf" -> "540". Der Pfad davor variiert
-# (/fileadmin/produktinformationsblatt/ wie auch /fileadmin/files_congstar/
-# documents/PIBs/2026/congstar/ - gemessen im Bestand 08.09.2026), deshalb
-# steht das Muster auf dem DATEINAMEN und nicht auf einem Verzeichnis -
-# dieselbe Lehre wie beim congstar-Block in `config/tarif_quellen.yaml`.
 _PIB_NR_RE = re.compile(r"Produktinformationsblatt_(\d+)\.pdf")
 
-# Die Ratenlaufzeiten, die erhoben werden - siehe Modulkopf
-# ("ZWEI ZAHLWEISEN, EIN SAETZ", P0-B2a: beide, nicht mehr nur eine).
-# GEMESSEN an der gespeicherten Tarifseite: genau diese zwei stehen dort.
-# Es ist eine Positivliste, und `_buendelzahlweisen()` protokolliert jede
-# Dauer, die sie nicht enthaelt - eine 12- oder 48-Monats-Zahlweise soll
-# auffallen und nicht lautlos fehlen (FIX3).
 _RATENLAUFZEITEN = (24, 36)
 
 
@@ -524,18 +477,10 @@ def _pib_nummer(plan: dict) -> str:
     return treffer.group(1)
 
 
-# "... bis zum 29.09.2026 ..." -> das Aktionsende. Nur ein Datum, das der
-# Anbieter selbst nennt; eines, das so weit weg liegt, dass es keins ist
-# ("30.12.2050"), bleibt trotzdem stehen - geraten wird hier nichts.
 _BIS_ZUM_RE = re.compile(r"bis zum (\d{1,2})\.(\d{1,2})\.(\d{4})")
 
-# Die Bedingung der TRADE_IN-Zahlweise. congstar nennt sie in der Nutzlast
-# nur als `subtype`, ohne Fussnote - der Satz beschreibt den Subtyp und
-# behauptet nichts darueber hinaus (auch nicht, was `penaltyAmount` heisst).
 TRADE_IN_BEDINGUNG = "nur mit Eintausch eines Altgeräts"
 
-# Rundungsspielraum der Trade-in-Probe: unter einem halben Cent ist eine
-# Differenz Gleitkomma, kein anderer Betrag.
 _TRADE_IN_TOLERANZ_EUR = 0.005
 
 
@@ -644,23 +589,19 @@ def _buendelzahlweisen(variante: dict, url: str = "") -> dict:
     Betraege, Probe geht nicht auf. Die Positivliste ist damit sichtbar und
     nicht mehr still (FIX3, 21.09.2026)."""
     gefunden: dict = {}
-    # TRADE_IN wird kein eigener Satz, aber seine Aktion haengt am Satz
-    # derselben Laufzeit (P3-E3) - deshalb hier nach Dauer gemerkt.
     trade_in: dict = {}
     for zahlweise in (variante.get("prices") or {}).get("paymentVariants") or []:
         if not isinstance(zahlweise, dict):
             continue
         if zahlweise.get("type") != "INSTALLMENT_PLAN":
-            continue  # ONE_TIME_PURCHASE ist der Barpreis (lies, oben)
+            continue
         subtyp = str(zahlweise.get("subtype") or "").upper()
         if subtyp == "TRADE_IN":
             dauer_ti = laufzeit_in_monaten(zahlweise.get("contractDuration"))
             if dauer_ti is not None:
                 trade_in.setdefault(dauer_ti, zahlweise)
         if subtyp != "UNSPECIFIED":
-            continue  # TRADE_IN setzt die Einnahme eines Altgeraets voraus
-        # Die Dauer wird als ZAHL gelesen, nicht am JSON-Typ gemessen:
-        # "36" ist dieselbe Laufzeit wie 36 (Modulkopf, FIX3).
+            continue
         dauer = laufzeit_in_monaten(zahlweise.get("contractDuration"))
         if dauer is None:
             log.info(
@@ -734,9 +675,6 @@ def _speicher_gb(memory) -> Optional[int]:
     return None
 
 
-# `proben` ist die Schnittstelle der Provider-Probe (FM-2, P5 - siehe
-# Adapter-Docstring in collect/geraete/__init__.py); dieser Adapter
-# traegt keine Feld-Proben hinein.
 def _json_unter(nutzlast: str, schluessel: str):
     """Der Wert des ersten `"schluessel":{...}` oder `"schluessel":[...]`
     der Nutzlast, geparst - oder None.
@@ -882,8 +820,6 @@ def _saetze_eines_plans(plan: dict, url: str, quelle: str) -> list[dict]:
     preise = plan.get("prices") or {}
     tarif_monatlich = _preis((preise.get("recurring") or {}).get("discounted"))
     if tarif_monatlich is None:
-        # Ohne Tarifpreis ist keine Buendelaussage moeglich - derselbe
-        # Grund wie beim Telekom-selectedPlan ohne recurringFee.
         log.info(
             "congstar-Buendel: PlanVariant %r ohne Tarifpreis - uebersprungen",
             tarif_name,
@@ -891,9 +827,6 @@ def _saetze_eines_plans(plan: dict, url: str, quelle: str) -> list[dict]:
         return out
     anschluss = _preis((preise.get("activation") or {}).get("discounted"))
     tarif_slug = _pib_nummer(plan)
-    # Die Aktionen des TARIFS (P3-E3): Grundpreisnachlass und
-    # geschenkter Bereitstellungspreis - beide in `discounted` schon
-    # enthalten, also `eingerechnet`.
     tarif_aktionen = _rabatt_aktionen(
         preise.get("recurring"), AKTION_TARIFRABATT, url
     ) + _rabatt_aktionen(preise.get("activation"), AKTION_ANSCHLUSS_ERLASSEN, url)
@@ -901,10 +834,6 @@ def _saetze_eines_plans(plan: dict, url: str, quelle: str) -> list[dict]:
     for geraet in plan.get("devices") or []:
         if not isinstance(geraet, dict):
             continue
-        # JE SPEICHERGROESSE (UND ZUSTAND) EIN SATZ: die Zahlweise ist
-        # bei jeder Farbe derselben Groesse identisch (gemessen an allen
-        # vier Tarifseiten); die erste Variante mit lesbarer Zahlweise
-        # vertritt den Satz - dedupliziert, wie der Auftrag es verlangt.
         gesehen: set = set()
         for variante in geraet.get("variants") or []:
             if not isinstance(variante, dict):
@@ -924,11 +853,6 @@ def _saetze_eines_plans(plan: dict, url: str, quelle: str) -> list[dict]:
             sku = str(variante.get("id") or "").strip()
             ean = str(variante.get("gtin") or "").strip()
             zustand_hinweis = str(variante.get("condition") or "")
-            # JEDE erlaubte Zahlweise (24 UND 36 Monate) wird ein
-            # eigener Satz mit eigener `laufzeit_monate` - der
-            # Bestandsschluessel traegt seit B1 die Laufzeit
-            # (`tco_model.buendel_id`), die Zahlweisen ueberschreiben
-            # sich also nicht mehr.
             for laufzeit in sorted(formen):
                 form = formen[laufzeit]
                 out.append(
@@ -938,27 +862,17 @@ def _saetze_eines_plans(plan: dict, url: str, quelle: str) -> list[dict]:
                         "speicher_gb": speicher,
                         "sku": sku,
                         "ean": ean,
-                        # Dasselbe rohe `condition`-Feld wie im Listungsweg -
-                        # die Einordnung leistet `zustand_aus_feldern` ueber
-                        # `lies_listung`, siehe Docstring von `lies()`.
                         "zustand_hinweis": zustand_hinweis,
                         "tarif_name": tarif_name,
-                        # Die Pflichtblattnummer, siehe Modulkopf ("DER SLUG
-                        # IST DIE NUMMER DES PFLICHTBLATTS").
                         "tarif_slug": tarif_slug,
                         "tarif_monatlich": tarif_monatlich,
                         "geraet_zuzahlung": form["zuzahlung"],
                         "geraet_monatsrate": form["rate"],
                         "anschlusspreis": anschluss,
                         "laufzeit_monate": laufzeit,
-                        # P3-E3: was an diesem Preis haengt (Tarif und
-                        # Geraet) und was er mit Eintausch noch wird.
                         "aktionen": [
                             dict(a) for a in tarif_aktionen + form["aktionen"]
                         ],
-                        # Die gelesene Seite (Produkt- oder Tarifseite) ist
-                        # die Seite, auf der diese Zahlen stehen - dieselbe
-                        # Regel wie bei der Telekom-Kategorie.
                         "url": url,
                         "quelle": quelle,
                     }

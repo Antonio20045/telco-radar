@@ -48,10 +48,6 @@ def main() -> int:
     promo_cfg = load_promo_config(root)
     http_cfg = load_config(root).settings.get("http", {})
 
-    # Geprueft wird je SEITE, nicht je Marke: seit dem 08.08.2026 hat eine
-    # Marke mehrere (siehe config/promo_sources.yaml). Eine Marke, deren
-    # Leitseite laeuft und deren drei weitere Seiten tot sind, saehe sonst
-    # gesund aus.
     seiten = [(s, p) for s in promo_cfg.sources for p in s.pages]
     print(f"{'STATUS':7} {'CHARS':>6}  {'TIER':4} {'NAME':24} URL")
     print("-" * 110)

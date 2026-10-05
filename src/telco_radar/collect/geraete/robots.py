@@ -51,9 +51,6 @@ log = logging.getLogger(__name__)
 
 _VISIT_RE = re.compile(r"^\s*(\d{4})\s*-\s*(\d{4})\s*$")
 
-# Zeitrechnung des Besuchsfensters. `Visit-time` steht in Minuten seit
-# Mitternacht UTC, die Frist des Collectors in Sekunden - die Umrechnung
-# gehoert an genau eine Stelle und traegt einen Namen (Clean Code 8).
 _SEKUNDEN_JE_MINUTE = 60.0
 _MINUTEN_JE_STUNDE = 60
 _MINUTEN_JE_TAG = 24 * _MINUTEN_JE_STUNDE
@@ -91,9 +88,9 @@ class Regelwerk:
     disallow: list = field(default_factory=list)
     allow: list = field(default_factory=list)
     crawl_delay: Optional[float] = None
-    visit_von: Optional[int] = None  # Minuten seit Mitternacht UTC
+    visit_von: Optional[int] = None
     visit_bis: Optional[int] = None
-    abrufbar: bool = True  # robots.txt selbst erreichbar?
+    abrufbar: bool = True
     fehler: str = ""
 
     def erlaubt(self, url: str) -> bool:
@@ -118,7 +115,6 @@ class Regelwerk:
         minute = jetzt.hour * _MINUTEN_JE_STUNDE + jetzt.minute
         if self.visit_von <= self.visit_bis:
             return self.visit_von <= minute < self.visit_bis
-        # ueber Mitternacht, z.B. 2200-0600
         return minute >= self.visit_von or minute < self.visit_bis
 
     def restzeit_im_fenster(self, jetzt: datetime) -> Optional[float]:
@@ -148,8 +144,6 @@ class Regelwerk:
         )
         bis = float(self.visit_bis)
         if bis <= minute_jetzt:
-            # Fenster ueber Mitternacht (z.B. 2200-0600) und wir stehen im
-            # Abendteil: das Ende liegt am naechsten Tag.
             bis += _MINUTEN_JE_TAG
         return (bis - minute_jetzt) * _SEKUNDEN_JE_MINUTE
 
@@ -173,7 +167,7 @@ def lies_robots(text: str) -> Regelwerk:
     """
     regeln = Regelwerk()
     trifft_uns = False
-    gruppenkopf = False  # stehen wir gerade in einer Folge von User-agent-Zeilen?
+    gruppenkopf = False
     for rohzeile in (text or "").splitlines():
         zeile = rohzeile.split("#", 1)[0].strip()
         if not zeile or ":" not in zeile:
@@ -192,7 +186,7 @@ def lies_robots(text: str) -> Regelwerk:
         if not trifft_uns:
             continue
         if feld == "disallow":
-            if wert:  # "Disallow:" ohne Wert erlaubt alles
+            if wert:
                 regeln.disallow.append(wert)
         elif feld == "allow":
             if wert:
@@ -203,8 +197,6 @@ def lies_robots(text: str) -> Regelwerk:
             except ValueError:
                 pass
         elif feld == "request-rate":
-            # "1/10" = eine Seite je 10 Sekunden. Wirkt wie eine Crawl-delay
-            # und wird als solche gefuehrt; der groessere Wert gewinnt.
             m = re.match(r"^\s*(\d+)\s*/\s*(\d+)", wert)
             if m and int(m.group(1)) > 0:
                 abstand = float(m.group(2)) / float(m.group(1))
@@ -241,20 +233,16 @@ class RobotsWaechter:
         try:
             status, text = self._hole(robots_url)
         except Exception as exc:  # noqa: BLE001
-            # Kein Ergebnis heisst nicht "erlaubt". Ein Netzfehler an dieser
-            # Stelle darf nicht dazu fuehren, dass wir loslaufen.
             regeln = Regelwerk(
                 abrufbar=False, fehler=f"{type(exc).__name__}: {str(exc)[:120]}"
             )
             self._cache[host] = regeln
             return regeln
         if status in (401, 403):
-            # Wer uns die robots.txt verweigert, verweigert uns die Seite.
             regeln = Regelwerk(
                 abrufbar=False, fehler=f"robots.txt nicht lesbar (HTTP {status})"
             )
         elif status == 404 or status == 410:
-            # Keine robots.txt = keine Einschraenkung. So steht es im Entwurf.
             regeln = Regelwerk()
         elif 200 <= status < 300:
             regeln = lies_robots(text)

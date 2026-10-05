@@ -82,9 +82,9 @@ def test_totalausfall_merkt_gar_nichts():
 @pytest.mark.parametrize(
     "batches,batches_ok,gilt_als_ausgefallen",
     [
-        (4, 0, True),  # jeder Stapel gescheitert
-        (4, 1, False),  # teilweise durch - der Rest ist der alte Kompromiss
-        (0, 0, False),  # nichts zu tun, kein Ausfall
+        (4, 0, True),
+        (4, 1, False),
+        (0, 0, False),
         (1, 1, False),
     ],
 )

@@ -41,9 +41,6 @@ def _mini(html: str) -> BeautifulSoup:
     return BeautifulSoup(html, "html.parser")
 
 
-# ---- 1. Fließtext-Deckel: die Zählweise -------------------------------
-
-
 def test_deckel_zaehlt_sichtbare_und_aufklapp_absaetze():
     """FM 4 nennt den Preis-Klick den Härtetest - "gerät er zum
     Textblock, ist FM 4 sofort zurück". Deshalb zählt der Deckel Text
@@ -88,9 +85,6 @@ def test_jeder_reiter_hat_einen_deckel():
     erwartet = ["tafel-tco", "tafel-radar", "tafel-verlauf", "tafel-katalog"]
     assert sorted(pp._FLIESSTEXT_DECKEL) == sorted(erwartet)
     assert all(w > 0 for w in pp._FLIESSTEXT_DECKEL.values())
-
-
-# ---- 2. Kein Fließblock unter Grafiken --------------------------------
 
 
 def test_absatz_nach_svg_wird_gemessen():
@@ -150,9 +144,6 @@ def test_die_200_zeichen_grenze_ist_genau_der_datenblock_fall():
     assert pp.max_absatz_nach_svg(soup.select_one("#t"))[0] > pp._MAX_ABSATZ_NACH_SVG
 
 
-# ---- 3. Klickbarkeit zeigt sich (echter Browser, echte style.css) -----
-
-
 def _style(ordner: Path) -> str:
     """Das Stylesheet, wie die Website es ausliefert."""
     from telco_radar.report.html import schreibe_statische_dateien
@@ -207,8 +198,5 @@ def test_je_summary_der_geraeteseite_zeiger_und_caret(seite, tmp_path):
     for e in ergebnis["inTafel"]:
         assert e["cursor"] == "pointer", ergebnis
         assert e["caret"] is True, ergebnis
-    # .mressort trägt sein EIGENES ▾ (Vor-P4-Regel) - unangetastet.
     assert all(c not in ("none", "") for c in ergebnis["mressort"]), ergebnis
-    # Und das nackte summary außerhalb bleibt, wie es war - die Regel
-    # greift nur innerhalb der Geräteseiten-Tafeln.
     assert ergebnis["nackt"]["caret"] is False, ergebnis

@@ -50,7 +50,6 @@ from orakel.test_seiten_inhalt import (
 from telco_radar.report.html import render_site
 
 
-# ------------------------------------------------------------------ Bericht
 def test_die_titelseite_traegt_die_ressortbloecke_nicht_mehr(tmp_path):
     """Antonio am 07.08.2026: "die haben genau das Gleiche, habe ich ja auf
     der naechsten Unterseite bei Meldungen. Das ist unnoetig, das ist doppelt
@@ -70,8 +69,6 @@ def test_die_titelseite_traegt_die_ressortbloecke_nicht_mehr(tmp_path):
     assert not soup.select(".ressort"), "Ressortbloecke noch auf der Titelseite"
     assert "Alle Signale dieser Woche" not in lies_seite(site, "index.html")
 
-    # Die Gliederung selbst ist nicht verschwunden - sie steht dort, wo die
-    # Frage nach der Einzelmeldung gestellt wird, und dort vollstaendig.
     bericht = json.loads(
         (tmp_path / "data" / "reports" / "2026-08-05.json").read_text(encoding="utf-8")
     )
@@ -80,10 +77,6 @@ def test_die_titelseite_traegt_die_ressortbloecke_nicht_mehr(tmp_path):
     assert len(meldungen.select(".mressort")) == len(echt)
     assert len(meldungen.select(".mressort .meldung")) == len(PORTAL)
 
-    # Und keine tote Rechnung zurueckgelassen: was keine Vorlage mehr liest,
-    # wird auch nicht mehr berechnet (dieselbe Regel wie bei der
-    # Datumszeile - diese Codebasis hat schon einmal sechs solcher Werte
-    # mitgeschleppt).
     assert "ressorts" not in _titelseite(_flatten(bericht))
     assert ".ressort-raster" not in lies_seite(site, "style.css")
 
@@ -125,20 +118,16 @@ def test_meldungsseite_zeigt_jedes_ressort_in_der_uebersicht(tmp_path):
     assert len(kacheln) == len(echt), "Nicht jedes Ressort hat eine Kachel"
     for kachel, r in zip(kacheln, echt):
         assert kachel.select_one(".rubrik h2").get_text(strip=True) == r["label"]
-        # Zwei bis drei Meldungen je Kachel - ein Etikett allein waere ein
-        # Inhaltsverzeichnis, keine Uebersicht.
         stuecke = kachel.select(".rk-stueck")
         assert 2 <= len(stuecke) <= 3 or len(stuecke) == r["n"], (
             f"{r['label']}: {len(stuecke)} Meldungen in der Kachel"
         )
-        # ... und genau EINE Geste in die Tiefe.
         alle = kachel.select("a.rkachel-alle")
         assert len(alle) == 1
         assert alle[0]["href"] == f"#ressort-{r['key']}"
         assert soup.select_one(f"details#ressort-{r['key']}") is not None
 
 
-# ------------------------------------------------- Modellwahl je Anbieter
 @pytest.mark.parametrize(
     "anbieter,erwartet_analyst,erwartet_editor",
     [
@@ -206,8 +195,6 @@ def test_mechanik_stufen_haben_ein_eigenes_guenstiges_modell():
         _mechanik_modell(settings, "anthropic", "claude-sonnet-5") == "claude-sonnet-5"
     )
     assert _mechanik_modell({}, "deepseek", "deepseek-v4-pro") == "deepseek-v4-pro"
-    # Und die echte Konfiguration traegt den Eintrag wirklich - eine Zahl
-    # in der Doku ist erst wahr, wenn ein Test sie gegen die Daten haelt.
     from pathlib import Path
 
     import yaml
@@ -235,7 +222,6 @@ def test_gleichnamige_abschnitte_bekommen_verschiedene_anker():
     assert 'id="global"' in html and 'id="global-2"' in html
 
 
-# ------------------------------- Vodafone-Filter: Rat weg, Befund bleibt
 def test_ratschlag_faellt_der_befund_im_selben_absatz_bleibt():
     """Der sechste falsche Wert - diesmal ein fehlender.
 
@@ -279,7 +265,6 @@ def test_absatz_ohne_vodafone_bleibt_unveraendert():
     assert _strip_vodafone_advice(text) == text
 
 
-# ------------------------------------------------ Waechter gegen toten Code
 def test_dash_liefert_nur_was_die_vorlage_auch_benutzt(tmp_path):
     """Bis zum Redesign berechnete _stats() sechs Werte, die in KEINER
     Vorlage vorkamen (sov, pricing, deals, risks, chances, n_competitors) -
@@ -305,7 +290,7 @@ def test_dash_liefert_nur_was_die_vorlage_auch_benutzt(tmp_path):
     dash = _stats(report)
     assert set(dash) == {"tech_radar"}
     assert all(set(t) == {"theme", "n", "w"} for t in dash["tech_radar"])
-    assert _flatten(report)  # Gegenprobe: die Fixture ist nicht leer
+    assert _flatten(report)
 
 
 def test_schlagzeile_bricht_nicht_mitten_im_wort(tmp_path):
@@ -344,7 +329,6 @@ def test_satztrenner_bricht_nicht_an_einer_datumszahl():
     assert _first_sentence(text, 150) == (
         "AST SpaceMobile hat am 5. August 2026 drei Satelliten gestartet."
     )
-    # Gegenprobe: ein echtes Satzende wird weiterhin erkannt.
     assert _first_sentence("Erster Satz. Zweiter Satz.", 150) == "Erster Satz."
 
 
@@ -425,8 +409,6 @@ def test_die_titelseite_fuehrt_mit_dem_bericht(tmp_path):
             "regions": {"Europa": {"highlights": faden_highlights()}},
         }
     )
-    # Die Voraussetzung des Falls, ausgeschrieben: gleicher Rang, damit der
-    # Test nicht heimlich nur die Sortierung misst.
     rang = {h["operator"]: _rangschluessel(h) for h in hs}
     assert rang["Quasarnetz"] == rang["Blaulicht"] == rang["Tarifwerk"]
 
@@ -435,10 +417,7 @@ def test_die_titelseite_fuehrt_mit_dem_bericht(tmp_path):
     assert "Quasarnetz" in front["aufmacher"]["schlagzeile"], (
         f"Aufmacher folgt dem Bericht nicht: {front['aufmacher']['schlagzeile']}"
     )
-    # Beide Fuehrungssaetze stehen oberhalb der Falz.
     assert front["faden_oben"] == 2
-    # Gegenprobe: OHNE Faden fuehrt die Seite mit der Dringlichkeit, und die
-    # zeigt bei Gleichstand auf die erste Meldung der Liste.
     assert "Quasarnetz" not in _titelseite(hs)["aufmacher"]["schlagzeile"]
 
 
@@ -478,8 +457,6 @@ def test_der_faden_zieht_keine_schwaechere_meldung_nach_vorn(tmp_path):
         "der Faden hat eine schwaecher bewertete Meldung nach vorn gezogen: "
         f"{aufmacher['schlagzeile']}"
     )
-    # Und positiv: der Aufmacher traegt den besten Rang, den eine Meldung
-    # mit grossem Bild ueberhaupt hat.
     from telco_radar.report.bilder import MIND_BREITE_GROSS
     from telco_radar.report.html import _bildbreite
 
@@ -520,7 +497,7 @@ def test_die_bildstufen_stehen_in_der_rangfolge():
     for datei in sorted(ARCHIV.glob("*.json")):
         hs = _flatten(json.loads(datei.read_text(encoding="utf-8")))
         if len(hs) < 14:
-            continue  # zu klein fuer alle Stufen
+            continue
         front = _titelseite(hs)
         oben = ([front["aufmacher"]] if front["aufmacher"] else []) + list(
             front["zwei"]
@@ -529,7 +506,6 @@ def test_die_bildstufen_stehen_in_der_rangfolge():
         if not gross:
             continue
         schwaechste = min(_rangschluessel(h) for h in gross)
-        # Wer den Absenderdeckel schon ausgeschoepft hat, darf hinten stehen.
         voll = set()
         for h in oben:
             kw = _kennwoerter(h.get("operator") or h.get("source_label") or "")
@@ -580,16 +556,6 @@ def test_die_spalte_nimmt_den_bildstufen_keine_bessere_meldung_weg(tmp_path):
         _titelseite,
     )
 
-    # Der Zuschnitt der Ausgabe vom 15.08.2026, nachgebaut: drei Meldungen
-    # fuer Aufmacher und zweite Reihe, danach fuenf mit Prioritaet 3 und
-    # sieben mit Prioritaet 2 - alle mit grossem Bild. Die Spalte hat sieben
-    # Plaetze; zieht sie zuerst, raeumt sie damit jede Prioritaet 3 ab, und
-    # in die vier Kacheln fallen die Zweier. Jede Meldung braucht einen
-    # eigenen Absender - und zwar einen, der kein gemeinsames Wort mit den
-    # anderen teilt: "Anbieter 701" und "Anbieter 702" sind fuer
-    # `_kennwoerter` DERSELBE Absender (die Ziffern sind zu kurz fuer das
-    # Wortmuster), dann greift der Deckel statt der Rangfolge, und der Test
-    # misst etwas anderes als er behauptet.
     namen = [
         "Quasarnetz",
         "Tarifwerk",
@@ -651,17 +617,6 @@ def test_ohne_belegbaren_faden_bleibt_die_alte_reihenfolge(tmp_path):
     assert front["aufmacher"] is not None
 
 
-# ==========================================================================
-# P1/F3 (A3, 17.09.2026): die Zahlen auf den MODELL-KARTEN des
-# Vergleichs-Reiters. Die Karte ist der Schnelleingang der Tafel und
-# traegt drei Zahlen (ab-Preis, Ø/Monat, Bewegungs-Delta) - jede wird
-# gegen einen ZWEITEN Aufbereitungs-Lauf ueber denselben Bestand gehalten
-# (Seite gegen Daten, nicht Vorlage gegen sich selbst). get_text OHNE
-# Trenner: der Trenner machte aus "24" und "54 Modelle" einmal "2454"
-# (30.08.2026) - derselbe Fehlertyp wie der Anlass dieser Datei.
-# ==========================================================================
-
-
 def _geraete_kartenzahl_site(tmp_path):
     from test_geraete_zeitreihe_ansicht import HEUTE as ZR_HEUTE
     from test_geraete_zeitreihe_ansicht import _baue
@@ -712,8 +667,6 @@ def test_die_kartenzahlen_stehen_wortlich_auf_der_seite(tmp_path):
     for k in aufbereitung["kacheln"]:
         text = text_je_id[k["id"]]
         assert k["kurz"] in text, f"Name fehlt auf der Karte {k['id']}"
-        # P1-Fix (Sicht-B2): die Zahlen stehen JE BAND auf der Karte - jede
-        # Bandlage muss wortlich da sein (get_text liest hidden mit).
         assert set(k["baender"]), f"Karte {k['id']} ohne Band-Werte"
         for band, s in k["baender"].items():
             if s["ab"]:
@@ -724,8 +677,6 @@ def test_die_kartenzahlen_stehen_wortlich_auf_der_seite(tmp_path):
                     assert s["ab_monat"] in text, (
                         f"Ø/Monat {s['ab_monat']} ({band}) fehlt auf {k['id']}"
                     )
-            # 28.09.2026: die Bewegung steht nur noch, wenn sich wirklich
-            # etwas bewegt hat; „±0 € in N Tagen" bleibt von der Karte weg.
             if s["delta_text"] and s["delta_richtung"] != "gleich":
                 assert s["delta_text"] in text, (
                     f"Bewegung {s['delta_text']} ({band}) fehlt auf {k['id']}"
@@ -797,19 +748,6 @@ def test_die_katalog_leitzahl_ist_der_guenstigste_zeilenpreis(tmp_path):
     )
 
 
-# ==========================================================================
-# P1/F2 (A4, 17.09.2026): die Zahlen der RECHENWEG-VORLAGEN (Panel-Posten).
-# Jeder Kurvenpunkt und die Preiszahl oeffnen auf Klick die Rechung genau
-# dieser Messung; die Posten stehen serverseitig als <template> im First
-# Paint. Auch diese Zahlen gelten erst, wenn ein Test sie gegen die Daten
-# haelt: jede Zahl der Seite muss im ZWEITEN Aufbereitungs-Lauf ueber
-# denselben Bestand stehen (die Vorlage darf nichts selbst rechnen oder
-# formatieren). Dass die Posten die eingefrorene Leitzahl ergeben, hat
-# A1 in test_geraete_zeitreihe_rechenweg.py nachgerechnet (2562/2562 am
-# echten Bestand) - hier wird nur die SEITE gegen die Aufbereitung gehalten.
-# ==========================================================================
-
-
 def test_die_panel_posten_kommen_aus_der_aufbereitung(tmp_path):
     import re as _re
 
@@ -823,10 +761,6 @@ def test_die_panel_posten_kommen_aus_der_aufbereitung(tmp_path):
         (site / "data" / "geraete-zeitreihe.html").read_text("utf-8"), "html.parser"
     ).select("template[data-anb]")
     assert fragment, "das Zeitreihen-Fragment traegt keine Vorlagen"
-    # Wächter (§6): der Lookup darf nicht teilweise treffen. Der First
-    # Paint traegt NUR das Startpaar, das Fragment ALLE Paare - beide
-    # Zahlen muessen gegen die Aufbereitung stimmen, sonst waere der
-    # Zahl-Vergleich darunter grün, ohne etwas zu prüfen.
     start = aufbereitung["start_block"]
     assert start is not None, "die Aufbereitung nennt kein Startpaar"
     vorlagen_start = start["rechenweg_html"].count("<template")
@@ -842,9 +776,6 @@ def test_die_panel_posten_kommen_aus_der_aufbereitung(tmp_path):
     )
     quelle = "\n".join(p["rechenweg_html"] for p in aufbereitung["paare"])
     assert quelle, "die Aufbereitung liefert keine Rechenweg-Zeichen"
-    # Gegenprobe im selben Test (§6): eine Zusicherung, die nichts
-    # ausschließt, prüft nichts - ein erfundener Betrag darf nie
-    # durchgehen.
     assert "999999,99 €" not in quelle
     for t in list(first_paint) + list(fragment):
         for zahl in _re.findall(r"[0-9][0-9.,]*", t.get_text(" ", strip=True)):
@@ -852,18 +783,6 @@ def test_die_panel_posten_kommen_aus_der_aufbereitung(tmp_path):
                 f"Zahl {zahl!r} im Rechenweg-Panel kommt nicht aus der "
                 f"Aufbereitung (Vorlage gerechnet statt gesetzt?)"
             )
-
-
-# ==========================================================================
-# P3 (Strategie Geraete v3, 18.09.2026): die Zahlen des GERÄTEKATALOGS
-# auf Modellebene. DIE EINE REGEL des Auftrags: keine Katalogzeile sagt
-# "ohne Preis" - jede Modellzeile trägt einen Barpreis ("ab X € bei Y")
-# oder den benannten Bündel-Zustand ("nur im Bündel, ab X €/Monat"), und
-# die 1&1-Listungszeilen tragen ihre Bündel-Angabe im Aufklapper.
-# Gemessen wird an der GERENDERTEN Seite gegen einen ZWEITEN Aufbereitungs-
-# lauf über denselben Bestand - Zahlen OHNE get_text-Trenner gelesen
-# (derselbe Fehlertyp wie "2454 Modelle", 30.08.2026).
-# ==========================================================================
 
 
 def _geraete_katalog_site(tmp_path):
@@ -966,12 +885,6 @@ def _geraete_katalog_site(tmp_path):
         e.update(kw)
         return e
 
-    # Galaxy S26 Ultra NUR bei 1&1 und OHNE Barpreis - die Modellzeile
-    # muss "nur im Bündel" sagen, ihre Aufklapperzeile die Bündel-Angabe.
-    # Die 1&1-Listung traegt ihren Bündel-Monatspreis WIE IM ECHTEN
-    # BESTAND selbst (`preis_mit_vertrag_ab` + `tarif_referenz`, § 13.2):
-    # genau daraus liest der S2-1-Fallback, wenn der Bündel-Store
-    # unlesbar ist (siehe Test weiter unten).
     listungen = [
         _listung("A-Laden", "apple-x", 256, 1000.0),
         _listung("B-Laden", "apple-x", 256, 1100.0),
@@ -1002,10 +915,6 @@ def _geraete_katalog_site(tmp_path):
 
     def _buendel(anbieter, device, speicher, tarif, monat, komplett):
         sku = f"{device}-{speicher}gb-{anbieter.lower().replace('&', '')}"
-        # `komplett`: ein Bündel MIT Aufteilung in Tarifpreis und Geräte-
-        # rate (so rechnet die TCO-Ansicht Karten). Sonst nennt der Satz
-        # nur den Bündel-Monatspreis - 1&1-Regel § 13.2: EIN Betrag, und
-        # beides nebeneinander verwirft der TCO-Leser zu Recht.
         b = {
             "id": f"buendel--{anbieter.lower()}--{sku}",
             "sku_id": sku,
@@ -1063,8 +972,6 @@ def _geraete_katalog_site(tmp_path):
             "grundgebuehr": b["tarif_monatlich"],
             "mindestlaufzeit_monate": 24,
             "rabattphasen": [],
-            # P3-E1: ein Volumen plus Testleiter, damit die Band-Spalte
-            # eine Stufe hat (10 GB -> XS der Testleiter).
             "datenvolumen_gb": 10,
             "quelle_url": b["quelle_url"],
             "abgerufen_am": "2026-09-17",
@@ -1095,12 +1002,6 @@ def _geraete_katalog_site(tmp_path):
     )
     (reports / "2026-09-17.md").write_text("# B\n", encoding="utf-8")
     site = root / "site"
-    # BEWUSST ohne cfg (S4-4 der P3-Code-Pruefung): geraete.html braucht
-    # keines - aber NUR hier. render_site() OHNE cfg rendert sonst eine
-    # still halbe Seite (CLAUDE.md §6: transparenz.html verliert seinen
-    # Quellenbestand, wettbewerb.html den halben Inhalt). Wer diese Zeile
-    # in eine Welt mit watchlist/news_sources KOPIERT, kopiert die Falle -
-    # dort `load_config(root)` mitgeben.
     render_site(site, reports)
     g = geraete_view.aufbereiten(
         state, lade_quellen(root), lade_katalog(root), heute="2026-09-17"
@@ -1127,8 +1028,6 @@ def test_keine_katalogzeile_sagt_ohne_preis(tmp_path):
     assert "ohne Preis" not in tafel.get_text(), (
         'eine Zeile des Katalogs sagt "ohne Preis"'
     )
-    # Gegenprobe im selben Test: die 1&1-Zeile ist DA und hat keinen
-    # Barpreis - der Zustand, der das Wort frueher ausgeloest hat.
     ohne_barpreis = [m for m in g["katalog_modelle"] if m["ab_preis"] is None]
     assert ohne_barpreis, "die Fixture spannt den Fall nicht auf"
     nur_buendel = [m for m in ohne_barpreis if m["nur_buendel"]]
@@ -1149,7 +1048,6 @@ def test_der_buendel_zustand_steht_wortlich_auf_der_seite(tmp_path):
     assert f"ab {erwartet_monat} €/Monat" in text_seite, (
         f"der Bündel-Monatspreis {erwartet_monat} fehlt wortlich"
     )
-    # Der Beleg der Modellzeile ist verlinkt (Belegzwang).
     modellzeile = next(
         z
         for z in suppe.select("#gr-katalogtabelle .gr-k-zeile")
@@ -1159,8 +1057,6 @@ def test_der_buendel_zustand_steht_wortlich_auf_der_seite(tmp_path):
     assert modell["buendel_beleg"]["quelle_url"] in links, (
         f"der Bündel-Beleg fehlt unter den Links der Modellzeile: {links}"
     )
-    # Und die AUFKLAPPERZEILE derselben 1&1-Listung traegt ihre Angabe
-    # samt Tarifnamen - dieselbe Zahl, derselbe Beleg.
     auf = suppe.select_one(f"#{modellzeile['data-auf']}")
     zeilen = [
         r
@@ -1196,12 +1092,6 @@ def test_jede_preisspalte_hat_genau_ein_format(tmp_path):
         for z, t in zip(zellen, texte):
             for b in betrag.findall(t):
                 if b.endswith("/Monat"):
-                    # Der Monatsbetrag ist die benannte Bündel-Angabe. In
-                    # der MODELL-Zelle braucht er sein Kennwort "nur im
-                    # Bündel" (sonst waere er ein nackter Preis unter
-                    # Einmalbeträgen); in der LISTUNGS-Zeile des Auf-
-                    # klappers steht er mit "ab"-Vorspann und Tarifnamen
-                    # - genau die 1&1-Regel des P3-Auftrags.
                     if kennwort_nötig:
                         assert "nur im Bündel" in t, (
                             f"{name}: Monatsbetrag {b!r} ohne das "
@@ -1216,9 +1106,6 @@ def test_jede_preisspalte_hat_genau_ein_format(tmp_path):
                         "Format (deutsch, zwei Dezimalstellen)"
                     )
 
-    # Ansicht Einzelgerätpreis: Modell-Preiszelle, Spannen-Zelle und die
-    # Listungs-Preiszellen des Aufklappers - je EIN Format. Die Spanne
-    # "X – Y" besteht aus zwei Beträgen, die JEDEM dem Muster folgen.
     _pruefe(
         [z.select("td.gr-sp--barpreis")[0] for z in zeilen],
         "der Einzelgerätepreis-Spalte",
@@ -1240,9 +1127,6 @@ def test_jede_preisspalte_hat_genau_ein_format(tmp_path):
         "der Aufklapper-Preisspalte",
         kennwort_nötig=False,
     )
-    # Ansicht Gesamtkosten: TCO-24-Zelle und Ø €/Monat-Zelle. Der
-    # Monatsbetrag trägt seinen Zusatz "/Monat" - ein EINMALBETrag in der
-    # Monats-Spalte waere die schlimmere Vermischung.
     _pruefe(
         [
             z.select("td.gr-sp--tco")[0]
@@ -1258,9 +1142,6 @@ def test_jede_preisspalte_hat_genau_ein_format(tmp_path):
     ]
     if monat_zellen:
         _pruefe(monat_zellen, "der Ø €/Monat-Spalte", kennwort_nötig=False)
-        # EIN Format heisst auch: eine Einheiten-Schreibweise je Spalte.
-        # Die Ø-Spalte trägt ihre Einheit im KOPF ("Ø €/Monat") und ihre
-        # Beträge ohne Zusatz - gemischt waere der Fehlertyp.
         schreibweisen = {
             b.endswith("/Monat")
             for z in monat_zellen
@@ -1288,8 +1169,6 @@ def test_die_modellzahl_steht_an_allen_orten_derselben_zahl(tmp_path):
     assert len(supe := suppe.select("#gr-katalogtabelle .gr-a-auf")) == len(modelle), (
         "Aufklapperzahl != Modellzahl"
     )
-    # Und die Listungen summieren zurück: jede Listung des Bestands steht
-    # GENAU EINMAL in einem Aufklapper.
     aufklappzeilen = suppe.select("#gr-katalogtabelle .gr-k-listungen tr td")
     anzahl_listungszeilen = sum(
         1
@@ -1325,9 +1204,6 @@ def test_der_katalog_uebersteht_einen_unlesbaren_tco_store(tmp_path):
     assert "ohne Preis" not in tafel.get_text(), (
         'der unlesbare Store darf keine Zeile auf "ohne Preis" fallen lassen'
     )
-    # Die Bündel-Angabe steht noch da - jetzt aus der LISTUNG gelesen:
-    # derselbe Monatspreis (die 1&1-Listung traegt ihn selbst), der Beleg
-    # ist der Quelllink DER LISTUNG statt des Stores.
     text = tafel.get_text()
     assert "nur im Bündel" in text
     erwartet = f"{mit_store['buendel_monat']:.2f}".replace(".", ",")
@@ -1383,8 +1259,6 @@ def test_die_delta_spalte_benennt_ihren_leergrund(tmp_path):
     suppe = _katalog_suppe(site)
     zeilen = suppe.select("#gr-katalogtabelle .gr-k-zeile")
     je_modell = {z.get("data-s-geraet"): z for z in zeilen}
-    # apple-x: Bündel MIT Aufteilung -> TCO-Zahl, aber keine Referenz in
-    # der Fixture (kein Vodafone-Anbieter) -> "keine Referenz".
     apple = je_modell["Apple X 256 GB"]
     delta_apple = apple.select("td.gr-sp--tco")[2]
     assert "keine Referenz" in delta_apple.get_text(), (
@@ -1392,18 +1266,11 @@ def test_die_delta_spalte_benennt_ihren_leergrund(tmp_path):
         f"{delta_apple.get_text()!r}"
     )
     assert delta_apple.select_one("[title]"), "der Grund steht nicht im title der Zelle"
-    # samsung: TCO aus dem 1&1-Monatspreis (32,99 × 24 + 1 Zuzahlung),
-    # ebenfalls ohne Referenz - dasselbe Etikett.
     samsung = je_modell["Samsung Galaxy S26 Ultra 256 GB"]
     assert "keine Referenz" in samsung.select("td.gr-sp--tco")[2].get_text()
-    # pixel: KEIN Bündel -> die TCO-Zelle nennt ihren eigenen Grund
-    # ("kein Bündel gemessen"), die Delta-Zelle bleibt "–" - zwei
-    # Stummen, aber nur eine braucht das Etikett.
     pixel = je_modell["Google Pixel 11 128 GB"]
     assert "kein Bündel gemessen" in pixel.select("td.gr-sp--tco")[0].get_text()
     assert pixel.select("td.gr-sp--tco")[2].get_text().strip() == "–"
-    # Gegenprobe an der Aufbereitung: die Unterscheidung ist Datenlage,
-    # nicht Vorlage - apple traegt tco_ab ohne delta_kurz.
     a = next(m for m in g["katalog_modelle"] if "Apple X" in m["titel"])
     assert a["tco_ab"] is not None and a["tco_delta_kurz"] is None
 
@@ -1423,8 +1290,6 @@ def test_ein_haendler_heisst_in_der_spanne_ein_preis(tmp_path):
     assert pixel.select("td.gr-sp--barpreis")[2].get_text().strip() == "ein Preis", (
         "ein Händler, aber keine Aussage in der Zelle"
     )
-    # Gegenprobe: Apple hat ZWEI Händler mit wesentlichem Abstand (1000
-    # gegen 1100) - dort steht die echte Spanne, nicht das Etikett.
     apple = je_modell["Apple X 256 GB"]
     spannen_text = apple.select("td.gr-sp--barpreis")[2].get_text()
     assert "1.000,00 € – 1.100,00 €" in spannen_text, (
@@ -1436,7 +1301,6 @@ def test_ein_haendler_heisst_in_der_spanne_ein_preis(tmp_path):
 _PF_MECHANIK_HEUTE = "2026-09-20"
 _PF_CS_FIXTURE = "congstar_tarifseite_allnet_flat_m.html.gz"
 _PF_CS_URL = "https://www.congstar.de/handytarife/allnet-flat-tarife/allnet-flat-m/"
-# Das Geraet des Abrufs, an dem beide Zahlweisen desselben Tarifs stehen.
 _PF_CS_TITEL = "Apple iPhone 17 Pro 512 GB cosmic orange"
 _PF_CS_TARIF = "Allnet Flat M"
 _PF_CS_BLATT = "congstar:allnet-flat-m"
@@ -1488,10 +1352,6 @@ def _pf_wegwerf_wurzel(tmp_path, buendel, blatt: dict, leiter: bool = True):
 
     state = tmp_path / "data" / "state"
     state.mkdir(parents=True, exist_ok=True)
-    # P3-E1: ohne Vodafone-Tarifleiter gibt es keine Stufe und damit
-    # keinen Startblock (`vorgabe` leer) - die Mechanik braucht eine Leiter.
-    # Die Testleiter (XS 5 / M 36 / L 85 GB) legt Allnet Flat M (125 GB)
-    # in Stufe L; die Zahlen dieses Tests haengen an keiner Stufe.
     from tarifleiter_testbestand import mit_leiter
 
     (state / "tarife.jsonl").write_text(
@@ -1620,8 +1480,6 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
         for s in lies_buendel(antwort, url=_PF_CS_URL)
         if s["titel"] == _PF_CS_TITEL and s["tarif_name"] == _PF_CS_TARIF
     ]
-    # Gegenprobe am Adapter: ohne zwei Laufzeiten im ABRUF prueft der Rest
-    # nichts (die Fixture waere getauscht worden).
     assert {s["laufzeit_monate"] for s in rohsaetze} == {24, 36}, (
         f"der gespeicherte Abruf {_PF_CS_FIXTURE} belegt nicht beide "
         f"Laufzeiten fuer {_PF_CS_TITEL}/{_PF_CS_TARIF}: "
@@ -1681,9 +1539,6 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
         f"die zwei Zeilen nennen nicht 24 und 36 Raten, sondern {sorted(je_laufzeit)}"
     )
 
-    # Jede Zeile traegt IHRE Zahlen - Rate, Ratenzahl, Restschuld. Soll
-    # aus der EINEN Definition dieses Abschnitts (`pf_leitzahl_cent`),
-    # gerechnet auf dem ROHSATZ des Adapters, nicht auf der Seite.
     for satz in rohsaetze:
         laufzeit = satz["laufzeit_monate"]
         zeile = je_laufzeit[laufzeit]
@@ -1693,9 +1548,6 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
             soll,
             f"congstar {_PF_CS_TARIF}, {laufzeit} Raten",
         )
-        # Der Betrag in der Schreibweise der Seite - aus Cent, nicht aus
-        # einer Fliesskomma-Formatierung (Geld rechnet dieser Abschnitt in
-        # ganzen Cent, siehe `gw_cent`).
         rate_cent = gw_cent(satz["geraet_monatsrate"])
         rate = f"{rate_cent // 100},{rate_cent % 100:02d}"
         assert f"in {laufzeit} Raten à {rate} €" in zeile["bau"], (
@@ -1708,8 +1560,6 @@ def test_pf_beide_ratenlaufzeiten_eines_congstar_abrufs_werden_zwei_zeilen(
         f"{je_laufzeit[36]['gesamt_cent']}"
     )
 
-    # Die Restschuld trennt die zwei Zeilen: 12 Raten a 33,50 EUR bleiben
-    # nach Monat 24 offen, bei 24 Raten nichts.
     inline = (site / "geraete.html").read_text(encoding="utf-8")
     offen = re.findall(r"danach noch offen: ([\d.,]+) € \((\d+) Geräteraten\)", inline)
     assert offen == [("402,00", "12")], (
@@ -1752,7 +1602,6 @@ def test_pf_ohne_tarifleiter_nennt_die_seite_den_grund(tmp_path, bestand):
         Tarifbestand([blatt]),
         _PF_MECHANIK_HEUTE,
     )
-    # Gegenprobe: ohne Buendel waere der Messreihen-Satz sogar richtig.
     assert bilanz.buendel, "kein Buendel aus dem gespeicherten Abruf"
 
     site = _pf_wegwerf_wurzel(tmp_path, bilanz.buendel, blatt, leiter=False)

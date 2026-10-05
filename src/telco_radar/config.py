@@ -12,29 +12,8 @@ import yaml
 log = logging.getLogger(__name__)
 
 
-# --------------------------------------------------------------------------- #
-# Source kinds. EVERY crawlable operator source points at the operator's OWN
-# official domain. Third-party telco trade press is a separate, explicitly
-# labelled second layer (see news_sources.yaml) - never an operator's primary
-# source.
-#
-#   rss         : RSS/Atom feed on the operator's domain (httpx + feedparser)
-#   json_api    : the operator newsroom's own JSON news API (httpx + json)
-#   newsroom    : operator press page whose article links are already in the
-#                 static HTML (httpx)
-#   newsroom_js : operator press page that is JavaScript-rendered -> crawled
-#                 with a headless browser (Playwright) in the run environment
-#   official    : operator press page that is bot-blocked / not yet crawlable;
-#                 shown as a VERIFIED reference link only (NOT crawled), always
-#                 with a documented plan to enable crawling later
-# --------------------------------------------------------------------------- #
 _CRAWLED_KINDS = {"rss", "json_api", "newsroom", "newsroom_js"}
 
-# Praefix der Pseudo-Regionsschluessel, unter denen die Themenfelder durch die
-# Pipeline laufen. Ein Themenfeld bekommt damit einen eigenen Analysten (wie
-# eine Region), ohne dass die Regionslogik der Watchlist es je fuer einen
-# Betreiber haelt: Alias-Tagging und Rundlauf-Sortierung fassen nur an, was
-# unter einem echten Regionsschluessel steht.
 THEME_PREFIX = "thema:"
 
 
@@ -44,59 +23,22 @@ def is_theme_key(key: str) -> bool:
 
 @dataclass
 class Source:
-    type: str  # yaml source type == kind (rss|json_api|newsroom|newsroom_js|official)
+    type: str
     url: str
     name: str = ""
-    item_selector: str | None = None  # optional CSS selector for newsroom pages
-    kind: str = ""  # display/crawl kind (see above); defaults from type
-    label: str = ""  # human label for the source card
-    plan: str = ""  # for 'official' sources: why not yet crawled + the plan
-    link_template: str | None = None  # json_api: build item URL from a record
-    # field when the payload has no direct url/link field, e.g. only a slug
-    # ("https://example.com/news?slug={slug}"). Formatted with str.format_map
-    # against the raw record dict.
-    headers: dict | None = None  # extra HTTP headers for this source, e.g. the
-    # public client apikey a newsroom's own JSON API expects (Verizon). Not a
-    # secret of ours - it is embedded in the operator's public page.
-    exclude_url_pattern: str | None = None  # drop items whose URL matches this
-    # regex. Some newsrooms mirror every release in a second language under a
-    # path like /news/es/, which would otherwise enter as a separate item.
-    timeout_seconds: float | None = None  # per-source HTTP timeout override,
-    # for hosts that are simply slow to reach from the CI runner (KT's Korean
-    # API ran into the global 20s connect timeout in 3 of 9 runs).
-    # news_sources.yaml only: die Region, in der eine Fachpressequelle
-    # BERICHTET, wenn die Ueberschrift keinen Betreiber nennt.
-    #
-    # Warum es das braucht: `tag_news_regions()` ordnet eine Fachpressemeldung
-    # nur dann einer Region zu, wenn ein Betreibername in der Ueberschrift
-    # steht. Alles andere landet unter "Global". Solange alle 14 Feeds
-    # englischsprachig und weltweit waren, war das richtig. Seit Session 5
-    # stehen dort deutsche, franzoesische, spanische, italienische und
-    # portugiesische Feeds - und Lauf #75 schloss EUROPA MIT NULL bewerteten
-    # Meldungen ab, waehrend "Global" 62 von 92 bekam. Je mehr regionale
-    # Quellen dazukommen, desto leerer wird der Regionsteil.
-    #
-    # Ein Betreibername in der Ueberschrift schlaegt diese Vorgabe weiterhin:
-    # eine Meldung ueber Verizon in einem deutschen Feed gehoert nach
-    # Nordamerika, nicht nach Europa.
+    item_selector: str | None = None
+    kind: str = ""
+    label: str = ""
+    plan: str = ""
+    link_template: str | None = None
+    headers: dict | None = None
+    exclude_url_pattern: str | None = None
+    timeout_seconds: float | None = None
     region: str = ""
-    theme: str = ""  # tech_sources.yaml only: the theme key this source feeds
-    # ("ki", "geraete", "chips", ...). Operators carry a region instead; a
-    # theme source has no region, which is exactly why it lives in its own
-    # file and not in the watchlist (see config/tech_sources.yaml).
-    # Redaktionelle Angaben, die bei der ABNAHME der Quelle bekannt sind und
-    # nicht gemessen werden koennen. Bei 130 Quellen reichte dafuer ein
-    # deutscher Kommentar im YAML; bei 1000 nicht mehr, weil dann niemand mehr
-    # nachlesen kann, woher eine Quelle stammt und ob sie je geprueft wurde.
-    # Das Gegenstueck - seit wann bekannt, wann zuletzt geliefert - pflegt die
-    # Pipeline in data/state/quellen_register.json.
-    herkunft: str = ""  # z. B. "muster:cision", "rel=alternate", "Recherche"
-    abgenommen: str = ""  # ISO-Datum des bestandenen Abnahme-Checks
-    allow_short_titles: bool = False  # newsroom(_js): explicit opt-in to drop
-    # the 25-char title-length floor down to 6, for sources whose real
-    # content is legitimately terse (e.g. RNS/regulatory-announcement
-    # tables like "Q1 Results") - NOT a general item_selector relaxation,
-    # since that would also let short nav-link text ("About Us") through.
+    theme: str = ""
+    herkunft: str = ""
+    abgenommen: str = ""
+    allow_short_titles: bool = False
 
     def __post_init__(self) -> None:
         if not self.kind:
@@ -138,11 +80,6 @@ class Config:
     news_sources: list[Source]
     region_names: dict[str, str]
     focus_competitors: list[dict] = field(default_factory=list)
-    # Themenfelder (config/tech_sources.yaml): KI-Anbieter, Geraete, Chips,
-    # Netzausruester, Satellit, Regulierung. Kein Betreiber, keine Region -
-    # deshalb eine eigene Liste und ein eigener Namensraum. Die Schluessel
-    # tragen das Praefix THEME_PREFIX, damit sie sich in items_by_region nie
-    # mit einem Regionsschluessel der Watchlist ueberschneiden koennen.
     tech_sources: list[Source] = field(default_factory=list)
     theme_names: dict[str, str] = field(default_factory=dict)
 
@@ -173,8 +110,6 @@ def load_config(root: Path) -> Config:
     watchlist = _load_yaml(cfg_dir / "watchlist.yaml")
     news = _load_yaml(cfg_dir / "news_sources.yaml")
 
-    # Optional extra operators (kept in a separate file so the main watchlist
-    # stays clean). Merged by region key.
     extra = _load_yaml(cfg_dir / "watchlist_extra.yaml")
     if extra.get("regions"):
         base_regions = watchlist.setdefault("regions", {})
@@ -225,13 +160,6 @@ def load_config(root: Path) -> Config:
                 )
             )
 
-    # `kind` steuert BEIDES: welcher Collector laeuft (collect/__init__.py) und
-    # wie die Quelle auf der Website beschriftet wird. Bis 08/2026 stand hier
-    # fest "trade_press" - was funktionierte, solange jede Fachpressequelle ein
-    # RSS-Feed war, weil collect_rss beide Werte annimmt. Beim Quellen-Ausbau
-    # ist die erste Fachpresse mit JSON-API dazugekommen (Capacity Media), und
-    # die lief damit in den RSS-Parser: "unparseable feed: syntax error". Der
-    # Typ gewinnt jetzt, "trade_press" bleibt nur der Normalfall RSS.
     news_sources = []
     for s in news.get("news_sources") or []:
         stype = s.get("type", "rss")
@@ -253,9 +181,6 @@ def load_config(root: Path) -> Config:
                 abgenommen=str(s.get("abgenommen", "") or ""),
             )
         )
-    # Eine Vorgabe-Region, die es gar nicht gibt, waere ein eigener
-    # Analysten-Bereich mit einem Tippfehler als Namen. Lieber laut hier als
-    # still im Bericht.
     for s in news_sources:
         if s.region and s.region not in region_names:
             log.warning(

@@ -185,7 +185,6 @@ def main() -> int:
         results = {}
         for fut in as_completed(futures):
             results[futures[fut]] = fut.result()
-    # print in the original job order for stable diffs
     for op, _src in jobs:
         for line in results.get(op.name, []):
             print(line)

@@ -80,8 +80,6 @@ def _browser_seite(tmp_path_factory, chromium):
 @contextlib.contextmanager
 def _ansicht(_browser_seite, breite=1440, hoehe=900, touch=False):
     browser, basis = _browser_seite
-    # touch=True (E2-F3): erst ein Kontext mit has_touch kann tap() senden -
-    # die Mobil-Tests gehen den echten Fingerweg, nicht den Mausklick.
     context = browser.new_context(
         viewport={"width": breite, "height": hoehe}, has_touch=touch
     )
@@ -105,11 +103,6 @@ def schreibtisch(_browser_seite):
 def telefon(_browser_seite):
     with _ansicht(_browser_seite, 390, 844, touch=True) as paar:
         yield paar
-
-
-# --------------------------------------------------------------------------
-# Die Falz auf dem Telefon (Kriterium 11c, hier an der Fixture)
-# --------------------------------------------------------------------------
 
 
 def test_am_telefon_steht_die_antwort_ueber_der_falz(telefon):
@@ -274,19 +267,9 @@ def test_die_aktive_karte_ist_deutlich_markiert(schreibtisch):
     )
 
 
-# --------------------------------------------------------------------------
-# Konsole
-# --------------------------------------------------------------------------
-
-
 def test_keine_javascript_fehler_auf_der_startansicht(schreibtisch):
     s, fehler = schreibtisch
     assert fehler == [], f"Konsolenfehler: {fehler[:3]}"
-
-
-# --------------------------------------------------------------------------
-# Das Suchfeld - Antonios Beispiel
-# --------------------------------------------------------------------------
 
 
 def test_die_vorschau_kommt_ab_zwei_zeichen_und_bleibt_klein(schreibtisch):
@@ -366,8 +349,6 @@ def test_nach_der_auswahl_ist_die_vorschau_zu(telefon):
         "#gr-zr-vorschau", "e => Math.round(e.getBoundingClientRect().height)"
     )
     assert hoehe == 0, f"die Vorschau steht offen ({hoehe} px) nach Auswahl"
-    # Der Band-Knopfe muss ohne Umweg treffbar sein: der Klick wartet
-    # kurze Zeit - ein Overlay davor waere der Timeout.
     s.tap("#gr-zr-baender button[data-band='m']", timeout=4000)
     s.wait_for_timeout(500)
     antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
@@ -396,11 +377,6 @@ def test_die_kachel_waehlt_das_geraet(schreibtisch):
     assert "iPhone 17 Pro" in s.eval_on_selector(
         "#tafel-tco .gr-zr-antwort", "e => e.textContent"
     )
-
-
-# --------------------------------------------------------------------------
-# Band-Wahl und Deep-Link
-# --------------------------------------------------------------------------
 
 
 def test_der_bandwechsel_liefert_den_graphen_des_bandes(schreibtisch):
@@ -450,11 +426,6 @@ def test_der_modellwechsel_holt_den_graphen_aus_dem_fragment(schreibtisch):
     assert s.query_selector("#tafel-tco svg.gr-zr circle.gr-zr-punkt")
 
 
-# Die Bündel-Tabelle unter dem Graph - Titel und Zeilen meinen dasselbe Band
-# (Wahrheitstest zur QA-Zurückweisung E2-F1, 17.09.2026)
-# --------------------------------------------------------------------------
-
-
 def test_der_bandtitel_und_die_sichtbaren_zeilen_meinen_dasselbe_band(schreibtisch):
     """E2-F1 wurde mit dieser Messung ZURÜCKGEWIESEN: der QA las `innerText`
     über ALLE .gr-bnd-Zeilen (auch die per `hidden` versteckten - innerText
@@ -478,9 +449,6 @@ def test_der_bandtitel_und_die_sichtbaren_zeilen_meinen_dasselbe_band(schreibtis
     assert zeilen, "keine Bündel-Zeilen im DOM"
     sichtbar = [z for z in zeilen if z["sichtbar"]]
     assert sichtbar, "im Band-Zustand ist keine Zeile sichtbar"
-    # JEDE sichtbare Zeile MIT data-band gehört zum gewählten Band - der
-    # Titel „Alle Bündel im Band M" darf nichts anderes überstehen
-    # haben. Zeilen OHNE data-band sind die §7-Gruppe „Ohne Tarifband".
     for z in sichtbar:
         if z["ohneband"]:
             assert z["band"] is None, "eine Band-Zeile steht in der Ohne-Band-Gruppe"
@@ -488,18 +456,11 @@ def test_der_bandtitel_und_die_sichtbaren_zeilen_meinen_dasselbe_band(schreibtis
             assert z["band"] == "m", (
                 f"sichtbare Zeile mit data-band={z['band']!r} unter dem Titel 'Band M'"
             )
-    # und umgekehrt: jede Zeile eines ANDEREN Bands ist wirklich weg
     for z in zeilen:
         if z["band"] not in (None, "m"):
             assert not z["sichtbar"], (
                 f"Zeile data-band={z['band']!r} ist sichtbar geblieben"
             )
-
-
-# --------------------------------------------------------------------------
-# --------------------------------------------------------------------------
-# Die Schrift im Graphen
-# --------------------------------------------------------------------------
 
 
 def test_keine_schrift_unter_zwoelf_pixel_im_sichtbaren_graphen(schreibtisch):
@@ -530,14 +491,6 @@ def test_keine_schrift_unter_zwoelf_pixel_im_sichtbaren_graphen(schreibtisch):
     assert befund["neben"] == [], f"Meta-Etikett unter 10 px: {befund['neben'][:4]}"
 
 
-# --------------------------------------------------------------------------
-# Wahl-Helfer fuer die uebrigen Geraete-Browsertests (E2): der alte
-# Modell-<select> ist weg - Modellwahl ueber das Suchfeld (Enter waehlt den
-# ersten Treffer; Titel sind eindeutig), Bandwahl ueber die Knoepfe. Beide
-# Wege sind die echten Bedienelemente der Seite, keine Testklopfer.
-# --------------------------------------------------------------------------
-
-
 def waehle_modell(s, mid: str) -> None:
     titel = s.eval_on_selector(
         "#gr-zeitreihe-daten",
@@ -555,22 +508,12 @@ def waehle_band(s, band: str) -> None:
     s.wait_for_timeout(500)
 
 
-# --------------------------------------------------------------------------
-# P2/D2: Endlabels statt Legende - auf breit ersetzen die Namen am
-# Linienende die HTML-Legende ganz (dieselbe Aussage nicht zweimal); auf
-# schmal bleibt sie stehen, sie traegt dort die "ab/zuletzt"-Werte, die
-# das schmale Bild selbst nicht zeigt.
-# --------------------------------------------------------------------------
-
-
 def test_die_legende_weicht_den_endlabels_auf_dem_schreibtisch(schreibtisch):
     s, _ = schreibtisch
     anzeige = s.eval_on_selector(
         "#tafel-tco .gr-zr-legende", "el => getComputedStyle(el).display"
     )
     assert anzeige == "none", f"Legende zeigt sich trotz Endlabels: {anzeige}"
-    # Die Endlabels selbst stehen im SVG - die Aussage bleibt sichtbar,
-    # nur nicht zweimal.
     namen = s.eval_on_selector_all(
         "#tafel-tco svg.gr-zr--breit text.gr-zr-name", "els => els.length"
     )
@@ -583,15 +526,6 @@ def test_die_legende_bleibt_auf_dem_telefon(telefon):
         "#tafel-tco .gr-zr-legende", "el => getComputedStyle(el).display"
     )
     assert anzeige != "none", "Legende fehlt mobil - dort traegt sie ab/zuletzt"
-
-
-# P2/D4b: der aktive Navigationseintrag ("Geräte") steht auf dem Telefon
-# beim Laden im Bild - vorher stand er bei x=536-620 komplett ausserhalb
-# des 390-px-Viewports, und "Differenzierung" davor war 20 px abgeschnitten.
-# Diese kleine Test-Fixture rendert den Eintrag "Geräte" selbst NICHT (die
-# `geraete_verlinkt`-Sichtbarkeitsschwelle greift nicht), deshalb steht die
-# Messung dafuer eigenstaendig in `test_navigation_aktiver_eintrag_browser.
-# py` - hier nur der Scroll-Hinweis der Reiterleiste dieser Seite selbst.
 
 
 def test_die_reiterleiste_braucht_keinen_scroll_mehr(telefon):
@@ -612,15 +546,6 @@ def test_die_reiterleiste_braucht_keinen_scroll_mehr(telefon):
         f"> clientWidth {breiten['cw']}"
     )
 
-
-# --------------------------------------------------------------------------
-# C4 (QA-Fix 24.09.2026): DAS ENDLABEL RAGT NICHT AUS DEM SVG. Mobil (390 px)
-# lief "UNSER ANGEBOT" (und jedes andere Endlabel) rechts aus dem SVG-
-# Rechteck - der Fix (`geraete_zeitreihe._svg`) haengt jedes Endlabel
-# rechtsbuendig an einem FESTEN X (`ENDLABEL_RAND` vom rechten Bildrand),
-# statt am Linienende zu beginnen und mit der Textbreite nach rechts zu
-# wachsen: die rechte Kante bleibt im SVG, unabhaengig von der Glyphenbreite.
-# --------------------------------------------------------------------------
 
 _ENDLABEL_SEL = ".gr-zr-name, .gr-zr-chip, .gr-zr-datum, .gr-zr-mon"
 
@@ -687,15 +612,6 @@ def test_endlabel_bleibt_im_svg_auch_bei_verbreitertem_text(telefon):
             f"Endlabel {l['text']!r} ragt bei verbreitertem Text rechts "
             f"aus dem SVG: {l} gegen SVG-rechts {lage['svgRechts']}"
         )
-
-
-# --------------------------------------------------------------------------
-# C5 (QA-Fix 24.09.2026): KEIN REITER WIRD ABGESCHNITTEN. Mobil (390 px) war
-# "GERÄTEKATALOG" als "GERÄTEKATAL" zu sehen. `.gr-reiter button` ist
-# `flex:0 0 auto` mit `white-space:nowrap` (style.css) - jeder Reiter ist so
-# breit wie sein Text, die Leiste selbst rollt (`overflow-x:auto`), statt den
-# Text zu kappen. Gemessen im echten Chromium, nicht am Quelltext.
-# --------------------------------------------------------------------------
 
 
 def test_kein_reitertext_wird_abgeschnitten(telefon):

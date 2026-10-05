@@ -36,19 +36,9 @@ import yaml
 
 from ..geraete_model import normalisiere
 
-# Anteil der Kombinationen des vorigen Messtags, der fehlen darf, bevor der
-# Lauf rot wird. Ein Anbieter nimmt jede Woche einzelne Farben aus dem
-# Programm; ein Zehntel auf einen Schlag ist ein Erfassungsfehler.
 KOMBI_VERLUST_ANTEIL = 0.10
-# Unter so vielen verlorenen Kombinationen schlägt der Anteil nicht an: bei
-# einem Anbieter mit zwölf Bündeln wären zwei ausgelaufene Farben sonst rot.
 KOMBI_VERLUST_MINDEST = 5
-# Relative Änderung der Leitzahl, ab der ein Sprung gemeldet wird. Eine
-# Aktion senkt die Kosten über 24 Monate selten um mehr als ein Viertel;
-# ein Sprung darüber ist zuerst ein Verdacht auf ein geändertes Feld.
 PREISSPRUNG_ANTEIL = 0.25
-# So viele Beispiele je Befund stehen im Bericht; die Zahl davor ist immer
-# vollständig.
 BEISPIELE = 8
 
 _SKU_MUSTER = re.compile(r"^(?P<modell>.+?)-(?P<speicher>\d+gb|ohne-speicher)-")
@@ -65,7 +55,6 @@ class Befund:
 class Abdeckung:
     messtag: Optional[str]
     vortag: Optional[str]
-    # (modell, anbieter) -> {"speicher": set, "tarife": set, "laufzeiten": set}
     matrix: dict = field(default_factory=dict)
     anbieter_zahl: dict = field(default_factory=dict)
     luecken: dict = field(default_factory=dict)

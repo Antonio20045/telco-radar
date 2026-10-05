@@ -64,7 +64,6 @@ def test_zweite_stufe_versucht_das_tote_modell_nicht_erneut(monkeypatch):
     for _ in range(4):
         assert llm.complete("sys", "user", PRO) == f"antwort von {FLASH}"
 
-    # genau ein Fehlversuch auf PRO, danach direkt FLASH
     assert calls.count(PRO) == 1
     assert calls.count(FLASH) == 4
     assert llm.dead_models() == {PRO}

@@ -89,11 +89,6 @@ def _kachel(
     )
 
 
-# --------------------------------------------------------------------------
-# Die gemessene Seite
-# --------------------------------------------------------------------------
-
-
 def test_die_zwoelf_kacheln_der_seite():
     """Zwoelf Tarife, jeder mit Name und Betrag - so gemessen am 04.09.2026."""
     tarife = [t for t, _ in _tarife()]
@@ -153,13 +148,7 @@ def test_der_kachelpreis_trifft_das_produktinformationsblatt():
         if satz.get("tarif_id") == "o2:o2-mobile-unlimited-m-flex":
             aus_blatt = satz
     assert aus_blatt is not None, "der PIB-Satz ist aus dem Bestand verschwunden"
-    # Der Satz ist vom 10.06.2026 und traegt das Feld `preistyp` noch gar
-    # nicht - es gibt es erst seit dem 04.09.2026. Genau dafuer ist sein
-    # Vorgabewert gemacht: ein Bestandssatz bleibt beim Wiedereinlesen das,
-    # was er war.
     assert aus_blatt.get("preistyp", "dokument") == "dokument"
-    # Das Blatt traegt die Jahreszahl im Namen, die Kachel nicht - und
-    # genau die wirft `tarif_id` weg. Sonst waeren es zwei Tarife.
     assert aus_blatt["name"] == "O2 Mobile Unlimited M Flex (2026)"
 
     aus_kachel = [t for t, _ in _tarife() if t.name == "O2 Mobile Unlimited M Flex"]
@@ -243,11 +232,6 @@ def test_die_fixture_ist_der_unveraenderte_abruf():
     assert len(roh) == eintrag[0]["bytes_roh"] == 210306
     assert eintrag[0]["http_status"] == 200
     assert eintrag[0]["url"] == _URL
-
-
-# --------------------------------------------------------------------------
-# Was NICHT hereinkommt
-# --------------------------------------------------------------------------
 
 
 def test_ein_werbeteaser_ohne_bestellweg_ist_kein_tarif():

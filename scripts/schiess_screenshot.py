@@ -46,7 +46,6 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO / "src"))
 
-# Dieselben zwei Formate wie in tests/test_falz_browser.py und im Auftrag.
 FORMATE = [("schreibtisch", 1440, 900), ("telefon", 390, 844)]
 
 
@@ -106,27 +105,6 @@ def _rendern(ziel: Path) -> Path:
     return ziel
 
 
-# Gemessen wird je FLAECHE, und die Geometrie kommt aus ihren
-# data-Attributen. Der erste Anlauf las sie aus dem Modul nach - und zwar aus
-# den CHIP-Flaechen, waehrend er die Punkte BEIDER Formen einsammelte. Weil
-# die Bandform einen anderen unteren Rand hat (148 statt 70), haette das
-# ~20 % Abweichung gemeldet, die es nicht gibt, sobald ein Bandpunkt ein
-# Etikett traegt. Dieselbe Lehre wie bei `pruefe_portal.py`: die Zahl gehoert
-# dorthin, wo sie entsteht.
-# Die Etikettengegenprobe ist am 30.08.2026 entfallen, mit der Grafik, die
-# sie vermass: sie rechnete aus jeder Etikettenhoehe den Preis zurueck und
-# hielt ihn gegen `data-preis`. Die Positionskarte ist geloescht - es gibt
-# keine `.gr-punkt` mehr, aus deren Geometrie sich etwas zurueckrechnen
-# liesse, und der Import von `geraete_karte` warf hier zuletzt einen
-# ImportError, den nur niemand sah, weil die Messung vorher leer zurueckkam.
-#
-# Was an ihre Stelle tritt, misst dieselbe Sorte Fehler an der neuen Seite:
-# `tests/test_geraete_reiter_browser.py` prueft im echten Chromium, dass kein
-# gedrehter Text, keine Schrift unter 12 px und keine mit "..." gekuerzte
-# Beschriftung dasteht. Dieses Skript bleibt, wofuer es sonst da ist -
-# fotografieren, damit ein Mensch hinsieht.
-
-
 def main() -> int:
     ap = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
@@ -179,8 +157,6 @@ def main() -> int:
             for name, breite, hoehe in FORMATE:
                 seite = browser.new_page(viewport={"width": breite, "height": hoehe})
                 seite.goto(f"{wurzel}/{args.seite}", wait_until="networkidle")
-                # Ohne das Durchscrollen bleiben lazy geladene Bilder leer -
-                # dieselbe Vorsichtsmassnahme wie in pruefe_portal.py.
                 seite.evaluate("window.scrollTo(0, document.body.scrollHeight)")
                 seite.wait_for_timeout(400)
                 seite.evaluate("window.scrollTo(0, 0)")

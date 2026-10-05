@@ -51,8 +51,6 @@ def attempt(model: str, payload: dict, label: str) -> dict:
             out["detail"] = f"HTTP {r.status_code}: {r.text[:200]}"
             return out
         data = r.json()
-        # Eine 200er Antwort ist NICHT automatisch ein Erfolg: der Endpunkt
-        # liefert gelegentlich leere choices oder eine Fehlerstruktur mit 200.
         if "error" in data:
             out["detail"] = f"HTTP 200 mit Fehlerobjekt: {str(data['error'])[:200]}"
             return out
@@ -113,8 +111,8 @@ def main() -> None:
         sys.exit(1)
     print(f"Endpunkt: {BASE} | Key-Laenge {len(KEY)}")
 
-    full = editor_payload()  # 6 Regionen, 15 Items, 300 Themen
-    slim = editor_payload(6, 8, 60)  # gekuerzt: weniger Items und Themen
+    full = editor_payload()
+    slim = editor_payload(6, 8, 60)
 
     print("\n" + "=" * 78)
     print("FLASH mit dem echten Editor-Prompt - die offene Frage")

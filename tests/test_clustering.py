@@ -35,9 +35,6 @@ def _gruppen_mit_mehreren(gruppen):
     return [g for g in gruppen if g.mitglieder]
 
 
-# --------------------------------------------------------------- Wortmengen
-
-
 def test_zahlen_mit_einheit_werden_normalisiert():
     z = C.zahlenmenge("Indosat launches 1 GW AI infra play with $800M backing")
     assert "1gw" in z
@@ -58,9 +55,6 @@ def test_wortmenge_wirft_stoppwoerter_aus_allen_sprachen():
     worte = C.wortmenge("Digi lanza un nuevo servicio para las llamadas")
     assert "digi" in worte and "llamada" in worte
     assert "las" not in worte and "para" not in worte
-
-
-# ------------------------------------------------ deterministischer Vorfilter
 
 
 def test_zayo_dreifachmeldung_wird_ein_ereignis():
@@ -177,9 +171,6 @@ def test_vertreter_ist_die_erste_meldung_der_eingabe():
     assert gruppen[0].vertreter.url == "https://a.test/1"
 
 
-# --------------------------------------------------------- ID und Stabilitaet
-
-
 def test_id_kommt_aus_der_url_nicht_aus_dem_titel():
     """Ein aus dem Titel gehashter Schluessel ist beim naechsten Lauf ein
     anderer, sobald eine Redaktion ihre Ueberschrift nachtraeglich aendert."""
@@ -195,9 +186,6 @@ def test_id_kommt_aus_der_url_nicht_aus_dem_titel():
         )
     )
     assert a.id == b.id
-
-
-# ----------------------------------------------------------- LLM-Graubereich
 
 
 def test_digi_landet_im_graubereich_und_wird_zusammengelegt():
@@ -217,7 +205,7 @@ def test_digi_landet_im_graubereich_und_wird_zusammengelegt():
             stunden=20,
         ),
     ]
-    assert len(C.gruppiere(items)) == 2  # ohne Modell: zwei Meldungen
+    assert len(C.gruppiere(items)) == 2
 
     gefragt = []
 
@@ -295,9 +283,6 @@ def test_deckel_waechst_mit_der_meldungsmenge():
     assert C._deckel(2000, 5) == 5
 
 
-# --------------------------------------------------------------- ClusterStore
-
-
 def test_store_erkennt_den_nachdruck_eines_ereignisses(tmp_path):
     store = C.ClusterStore(tmp_path / "clusters.jsonl")
     g = C.Gruppe(
@@ -365,11 +350,6 @@ def test_store_zaehlt_mitglieder_ueber_laeufe_hinweg(tmp_path):
     assert rec["letztes_datum"] == "2026-08-08"
 
 
-# ------------------------------------------------------------- echte Ausgabe
-
-# --------------------------------------------- Schutz des Seen-Stores
-
-
 def test_beleg_faellt_mit_seinem_vertreter_aus_dem_seen_store():
     """Die dritte Schutzstufe. Ohne sie waeren gebuendelte Meldungen der
     teuerste Fall ueberhaupt: der Vertreter kaeme im naechsten Lauf wieder,
@@ -382,11 +362,9 @@ def test_beleg_faellt_mit_seinem_vertreter_aus_dem_seen_store():
     alle = [v, beleg, unbeteiligt]
     zuordnung = {v.id: v, beleg.id: v, unbeteiligt.id: unbeteiligt}
 
-    # Der Stapel des Vertreters ist gescheitert.
     merken = zu_merkende_meldungen(alle, zuordnung, {v.id}, set())
     assert [i.url for i in merken] == ["https://c.test/3"]
 
-    # Ohne Ausfall wird alles gemerkt - auch die Belege.
     merken = zu_merkende_meldungen(alle, zuordnung, set(), set())
     assert len(merken) == 3
 
@@ -404,9 +382,6 @@ def test_beleg_faellt_mit_der_region_seines_vertreters():
         [v, beleg], {v.id: v, beleg.id: v}, set(), {"global"}
     )
     assert merken == []
-
-
-# ------------------------------------------------------------- echte Ausgabe
 
 
 @pytest.mark.parametrize(
@@ -522,9 +497,6 @@ def test_ee_slicing_dubletten_der_ausgabe_vom_27_august_werden_ein_ereignis():
             stunden=6,
         ),
     ]
-    # Gegenprobe: eine fuenfte, ebenfalls echte EE-Meldung aus demselben
-    # Zeitfenster - aber ueber ein anderes Thema (kein Slicing). Sie darf
-    # NICHT mit hineinrutschen, sonst waere die neue Regel zu grob.
     ryanair = _item(
         "EE has flown the Ryanair model into 5G",
         url="https://www.lightreading.com/5g/ee-has-flown-the-ryanair-model-into-5g",
@@ -532,11 +504,6 @@ def test_ee_slicing_dubletten_der_ausgabe_vom_27_august_werden_ein_ereignis():
         stunden=8,
     )
 
-    # Die Testvoraussetzung, ausgeschrieben: ohne diese Zeile pruefte der
-    # Test nicht die Luecke, die er beheben soll, sondern etwas anderes -
-    # der "Fall ohne Fix" muss hier wirklich vorliegen (kein Betreiber, kein
-    # erkannter Akteur), sonst haette schon der bestehende Akteursabgleich
-    # gegriffen.
     p0, p1 = C._Profil.von(slicing[0]), C._Profil.von(slicing[1])
     assert not p0.betreiber and not p1.betreiber
     assert not (p0.akteure & p1.akteure), (
@@ -565,11 +532,6 @@ def test_ee_slicing_dubletten_der_ausgabe_vom_27_august_werden_ein_ereignis():
     )
 
 
-# --------------------------------------------------------------------------- #
-# Der Absturz aus Lauf #86
-# --------------------------------------------------------------------------- #
-
-
 def test_zusammenlegen_verschiebt_keine_offenen_zweifelsfaelle(monkeypatch):
     """Lauf #86 starb mit "IndexError: list index out of range".
 
@@ -582,9 +544,6 @@ def test_zusammenlegen_verschiebt_keine_offenen_zweifelsfaelle(monkeypatch):
     Lokal war das unsichtbar: die Stufe laeuft nur mit Modell, und alle
     lokalen Laeufe waren `--no-llm`.
     """
-    # Zwoelf Themen zu je zwei Meldungen: die Paare liegen im Graubereich,
-    # die Themen untereinander sind verschieden. So bleiben die Gruppen klein
-    # genug, dass MAX_MITGLIEDER die Schleife nicht vorher abwuergt.
     worte = [
         "alpha beta gamma delta",
         "epsilon zeta eta theta",
@@ -606,10 +565,6 @@ def test_zusammenlegen_verschiebt_keine_offenen_zweifelsfaelle(monkeypatch):
                 )
             )
 
-    # Die Reihenfolge der Zweifelsfaelle entscheidet, ob der Fehler auftritt:
-    # es muss zuerst ein FRUEHER Index aufgeloest werden, damit die spaeteren
-    # danebenzeigen. Der echte Rang haengt an den Profilen, hier wird er
-    # deshalb erzwungen.
     monkeypatch.setattr(
         C, "_grau_rang", lambda a, b, w: 1000.0 - abs(hash(a.item.url)) % 1000
     )
@@ -617,7 +572,6 @@ def test_zusammenlegen_verschiebt_keine_offenen_zweifelsfaelle(monkeypatch):
 
     gruppen = C.gruppiere(items, model="m", use_llm=True, max_llm_pruefungen=500)
 
-    # Kein Absturz - und jede Meldung ist genau einmal vertreten.
     gesehen = [g.vertreter.id for g in gruppen] + [
         m.id for g in gruppen for m in g.mitglieder
     ]

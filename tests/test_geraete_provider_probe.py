@@ -39,15 +39,8 @@ import logging
 from telco_radar.collect.geraete.o2 import lies_buendel
 from telco_radar.geraete_pipeline import melde_proben, run_geraete_stage
 
-# Repo-Uebung fuer Testfixtures ueber Modulgrenzen (siehe
-# test_eine_seite_querlinks.py & Co.).
 from test_geraete_buendel_o2 import _antwort, _eintrag, _katalog, _URL
 from test_geraete_pipeline import _jetzt
-
-
-# --------------------------------------------------------------------------
-# Die gemessene Antwort
-# --------------------------------------------------------------------------
 
 
 def test_die_gemessene_antwort_besteht_alle_proben():
@@ -70,11 +63,6 @@ def test_die_protokollzeile_hat_ihren_festen_wortlaut(caplog):
         "Geraeteradar-Probe: o2 liefert 66 von 66 erwarteten Saetzen "
         "noch ihre Felder (100 %)"
     ) in caplog.text
-
-
-# --------------------------------------------------------------------------
-# Der Fall, fuer den die Probe gebaut ist
-# --------------------------------------------------------------------------
 
 
 def _antwort_ohne_metric3(n=2):
@@ -136,12 +124,6 @@ def test_ohne_kandidaten_steht_keine_zeile(caplog):
     assert "Geraeteradar-Probe" not in caplog.text
 
 
-# --------------------------------------------------------------------------
-# S2-1 der P5-Codepruefung: der Totaltod des Referenzfeldes, an der
-# gespeicherten ECHTEN Antwort gemessen (88 Eintraege, 66 Buendel)
-# --------------------------------------------------------------------------
-
-
 def _katalog_ohne_monthlyprice() -> str:
     """Die echte Antwort vom 04.09. mit EINER Operation: `price.monthlyPrice`
     komplett entfernt - der Schnittstellen-Umbau der P5-Codepruefung,
@@ -183,11 +165,6 @@ def test_ein_einzelfehler_ist_keine_perfektion(caplog):
     assert "(99 %)" in caplog.text
     assert "100 %" not in caplog.text
     assert caplog.records[-1].levelname == "WARNING"
-
-
-# --------------------------------------------------------------------------
-# Ende-zu-Ende: der Collector reicht die Zaehler durch
-# --------------------------------------------------------------------------
 
 
 def test_der_lauf_traegt_die_probe_in_seine_bilanz(tmp_path, caplog):

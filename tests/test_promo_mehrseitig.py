@@ -31,7 +31,6 @@ LEIT = "https://marke.test/aktionen"
 ZWEIT = "https://marke.test/handys"
 
 
-# --------------------------------------------------------------- Konfiguration
 def _yaml_schreiben(tmp_path, text: str):
     (tmp_path / "config").mkdir(exist_ok=True)
     (tmp_path / "config" / "promo_sources.yaml").write_text(text, encoding="utf-8")
@@ -72,8 +71,6 @@ brands:
     )
     src = cfg.sources[0]
     assert [p.url for p in src.pages] == [LEIT, ZWEIT]
-    # kind gilt je Seite, nicht je Marke: eine statische Unterseite unter einer
-    # JS-gerenderten Leitseite ist der Normalfall, kein Sonderfall.
     assert [p.kind for p in src.pages] == ["js", "static"]
     assert src.pages[1].label == "Handys"
     assert cfg.page_count == 2
@@ -119,17 +116,14 @@ brands:
     assert cfg.crawled_sources == [src]
 
 
-# ----------------------------------------------------------- SnapshotStore
 def test_jede_seite_hat_ihren_eigenen_aenderungsstand(tmp_path):
     store = SnapshotStore(tmp_path / "snap.json")
     a, b = snapshot_key("Marke", LEIT), snapshot_key("Marke", ZWEIT)
     store.update(a, "hash-a", "2026-08-08")
-    # Die zweite Seite derselben Marke darf davon nichts wissen.
     assert store.changed(b, "hash-b") is True
     store.update(b, "hash-b", "2026-08-08")
     assert store.changed(a, "hash-a") is False
     assert store.changed(b, "hash-b") is False
-    # ... und keine der beiden darf die andere ueberschrieben haben.
     assert store.changed(a, "hash-b") is True
 
 
@@ -146,7 +140,6 @@ def test_alter_markenschluessel_gilt_einmalig_weiter(tmp_path):
     key = snapshot_key("Marke", LEIT)
     assert store.changed(key, "alt", legacy_key="Marke") is False
     assert store.changed(key, "neu", legacy_key="Marke") is True
-    # Eine ZWEITE Seite darf den alten Markenschluessel nicht erben.
     assert store.changed(snapshot_key("Marke", ZWEIT), "alt") is True
 
 
@@ -161,7 +154,6 @@ def test_prune_raeumt_alte_und_entfernte_schluessel_weg(tmp_path):
     assert store.changed(snapshot_key("Marke", LEIT), "alt", legacy_key="Marke") is True
 
 
-# ---------------------------------------------------------------- mark_stale
 def _db_mit_zwei_seiten(tmp_path) -> PromoDB:
     db = PromoDB(tmp_path / "db.json")
     db.upsert(
@@ -207,7 +199,6 @@ def test_angebot_der_gelesenen_seite_altert_weiterhin(tmp_path):
     status = {e["headline"]: e["status"] for e in db.entries.values()}
     assert status["Rabatt auf Geraete"] == "evtl. ausgelaufen"
     assert status["Bonus auf der Leitseite"] == "aktiv"
-    # zweiter Fehltreffer in Folge -> beendet
     db.mark_stale(
         "Marke", set(), "2026-08-09", gepruefte_seiten={ZWEIT}, leitseite=LEIT
     )
@@ -243,7 +234,6 @@ def test_ohne_seitenangabe_gilt_das_alte_verhalten(tmp_path):
     assert all(e["status"] == "evtl. ausgelaufen" for e in db.entries.values())
 
 
-# ------------------------------------------------------------------ Aufmass
 def test_die_echte_konfiguration_hat_mehrere_seiten_je_marke():
     """Haelt die Zahl auf der Quellen-Unterseite gegen die Konfiguration. Eine
     Zahl auf der Seite ist erst wahr, wenn ein Test sie gegen die Daten haelt
@@ -256,11 +246,8 @@ def test_die_echte_konfiguration_hat_mehrere_seiten_je_marke():
         "Mindestens eine Marke muss mehr als ihre Leitseite haben - sonst ist "
         "die Rubrik auf dem Stand vor dem 08.08.2026"
     )
-    # Kein Duplikat ueber die gesamte Konfiguration: dieselbe URL zweimal
-    # abgefragt kostet je Lauf einen LLM-Aufruf und bringt nichts.
     alle = [p.url for s in cfg.sources for p in s.pages]
     assert len(alle) == len(set(alle))
-    # Jede Marke traegt eine Leitseite, und die steht vorn.
     for s in cfg.sources:
         assert s.pages[0].url == s.url
 
@@ -309,8 +296,6 @@ brands:
         },
     )
 
-    # Ausgangslage wie vor der Umstellung: EIN Hash, unter dem reinen
-    # Markenschluessel, und er passt zum aktuellen Text der Leitseite.
     zustand = tmp_path / "data" / "state"
     zustand.mkdir(parents=True)
     (zustand / "promo_snapshots.json").write_text(
@@ -322,23 +307,18 @@ brands:
 
     ergebnis = promo_pipeline.run_promo_stage(tmp_path, {}, use_llm=False, model="x")
 
-    # Die Leitseite wurde korrekt als unveraendert erkannt ...
     status = {r["url"]: r["status"] for r in ergebnis["sources"]}
     assert status[LEIT] == "unveraendert"
     assert status[ZWEIT] == "changed_no_llm"
 
-    # ... und trotzdem steht ihr Hash jetzt unter dem SEITENschluessel.
     gespeichert = json.loads((zustand / "promo_snapshots.json").read_text())
     assert snapshot_key("Marke", LEIT) in gespeichert
     assert gespeichert[snapshot_key("Marke", LEIT)]["hash"] == content_hash(
         seiten[LEIT]
     )
-    # Der alte Markenschluessel ist weg (prune), und er fehlt niemandem mehr.
     assert "Marke" not in gespeichert
     assert len(gespeichert) == 2
 
-    # Gegenprobe: ein zweiter Lauf ohne Aenderung darf NICHTS mehr als
-    # veraendert melden - genau das war vorher kaputt.
     zweiter = promo_pipeline.run_promo_stage(tmp_path, {}, use_llm=False, model="x")
     assert {r["status"] for r in zweiter["sources"]} == {"unveraendert"}
 
@@ -394,14 +374,12 @@ brands:
             PromoExtractionError("HTTPError: 529 overloaded")
         ),
     )
-    # Die Bewertung braucht hier kein Modell.
     monkeypatch.setattr(promo_pipeline.promo_ranker, "score_all", lambda *a, **k: {})
 
     ergebnis = promo_pipeline.run_promo_stage(tmp_path, {}, use_llm=True, model="x")
 
     assert ergebnis["extraktion_fehlgeschlagen"] == 1
     assert ergebnis["sources"][0]["status"] == "extraktion_fehlgeschlagen"
-    # Und das Entscheidende: das Angebot steht unveraendert da.
     danach = PromoDB(zustand / "promo_db.json")
     eintrag = next(iter(danach.entries.values()))
     assert eintrag["status"] == "aktiv"

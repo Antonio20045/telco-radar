@@ -40,11 +40,6 @@ from telco_radar.tco_model import Buendel, SimOnlyReferenz
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 
 
-# --------------------------------------------------------------------------
-# Fixtures
-# --------------------------------------------------------------------------
-
-
 @pytest.fixture(scope="module")
 def bestand():
     """Der ECHTE Bestand aus data/state - dieselbe Quelle wie die Seite."""
@@ -113,11 +108,6 @@ def _mit_zwei_anbietern(bestand):
     pytest.fail("kein Modell×Band mit zwei Zeilen im Bestand")
 
 
-# --------------------------------------------------------------------------
-# Regel 1: Ordnung, Breite, Δ - gegen den echten Bestand
-# --------------------------------------------------------------------------
-
-
 def test_die_zeilen_stehen_nach_gesamtkosten_sortiert(bestand):
     """Der günstigste Anbieter zuerst (O1-Auftrag: "sortierte horizontale
     Balken (günstigster zuerst)"). Die alte Band-Werteliste ordnete den
@@ -139,8 +129,6 @@ def test_der_laengste_balken_ist_hundert_prozent(bestand):
     teuerster = max(zeilen, key=lambda z: z["gesamt"])
     guenstigste = min(zeilen, key=lambda z: z["gesamt"])
     assert guenstigste["breite"] < teuerster["breite"]
-    # Proportionalität: breite/gesamt weicht um weniger als einen Prozentpunkt
-    # ab (Rundung auf eine Dezimalstelle).
     bezug = 100.0 / max(z["gesamt"] for z in zeilen)
     for z in zeilen:
         assert abs(z["breite"] - z["gesamt"] * bezug) < 0.1
@@ -194,8 +182,6 @@ def test_die_werte_sind_cent_genau_gedruckt(bestand):
     modell, tarife, band = _mit_zwei_anbietern(bestand)
     for z in band["balken"]["zeilen"]:
         assert z["gesamt_text"].endswith(" €")
-        # Zwei Nachkommastellen, Tausenderpunkt - das `euro`-Format des
-        # Portals, nicht eine zweite Beschriftung.
         assert (
             z["gesamt_text"]
             == f"{z['gesamt']:,.2f}".replace(",", "#")
@@ -203,11 +189,6 @@ def test_die_werte_sind_cent_genau_gedruckt(bestand):
             .replace("#", ".")
             + " €"
         )
-
-
-# --------------------------------------------------------------------------
-# Regel 2: keine Näherung, kein erneuertes Gerät als Zeile
-# --------------------------------------------------------------------------
 
 
 def test_naeherung_und_erneuerte_stehen_nie_als_zeile(bestand):
@@ -228,9 +209,6 @@ def test_die_luecke_nennt_namen_ohne_einzelsaetze():
     Einzelsätze der alten Band-Panels entfallen mit dem Graph - ein Name
     pro fehlendem Anbieter, gruppiert nach Grund."""
     buendel = [
-        # Ein echtes o2-Bündel im Band XS und ein ERNEUERTES Telekom-
-        # Bündel im selben Band: o2 trägt die Zeile, Telekom steht als
-        # "nur erneuert" in der Lücke, 1&1 und Vodafone als "kein Bündel".
         Buendel(
             sku_id="apple-iphone-17-pro-256gb-schwarz",
             anbieter="o2",
@@ -277,7 +255,6 @@ def test_die_luecke_nennt_namen_ohne_einzelsaetze():
     tarife = {
         "o2:klein": {"datenvolumen_gb": 10},
         "tk:klein": {"datenvolumen_gb": 15},
-        # P3-E1: die Stufe, in die beide fallen - Vodafone XS.
         "vf:xs-sp": {
             "anbieter": "Vodafone",
             "datenvolumen_gb": 15,
@@ -292,11 +269,6 @@ def test_die_luecke_nennt_namen_ohne_einzelsaetze():
     assert [z["anbieter"] for z in balken["zeilen"]] == ["o2"]
     assert balken["luecke"]["nur_erneuert"] == ["Telekom"]
     assert sorted(balken["luecke"]["kein_buendel"]) == ["1&1", "Vodafone", "congstar"]
-
-
-# --------------------------------------------------------------------------
-# Der JSON-Knoten für den Selektor: alle Modelle, dieselben Zahlen
-# --------------------------------------------------------------------------
 
 
 def _aufbereitung():

@@ -31,24 +31,6 @@ BROWSER_UA = (
 )
 BOT_UA = "TelcoRadar/1.0 (+https://github.com/Antonio20045/telco-radar)"
 
-# Kopfzeilen, die ein echter Chrome mitschickt und ein Skript typischerweise
-# nicht. Manche Bot-Abwehr (Cloudflare "Bot Fight Mode", Akamai) prueft genau
-# das Fehlen der Client-Hints, nicht den User-Agent.
-#
-# GEMESSEN am 08.08.2026 gegen die drei Quellen, die im Lauf vom 07.08. mit
-# 403 ausgefallen waren: ISPreview UK und MediaNama antworten mit diesem
-# Satz - und uebrigens auch ohne ihn - mit 200; ihr Ausfall war also nicht
-# der User-Agent. **Telecompetitor antwortet auf JEDE Variante mit 403** -
-# voller Client-Hint-Satz, nackter Browser-UA, Googlebot-UA, HTTP/2, ohne
-# Referer. Das ist eine Sperre gegen den IP-Bereich, keine gegen den
-# Absender; kein Kopfzeilentrick loest sie. Die Quarantaene mit
-# Bewaehrungsabruf (quellen_register.py) ist dafuer die richtige Antwort und
-# steht schon.
-#
-# Der Satz bleibt trotzdem: er kostet nichts, er ist ehrlich (er behauptet
-# nichts, was der Abruf nicht waere - ein Programm, das eine oeffentliche
-# Seite liest), und er hilft bei der Sorte Abwehr, die nur auf fehlende
-# Client-Hints prueft.
 _CLIENT_HINTS = {
     "sec-ch-ua": '"Chromium";v="126", "Not.A/Brand";v="24"',
     "sec-ch-ua-mobile": "?0",
@@ -60,32 +42,19 @@ _CLIENT_HINTS = {
 }
 
 
-# --------------------------------------------------------------------------- #
-# Wurzelzertifikate
-#
-# Der Lauf vom 07.08.2026 meldete fuer die NTIA (US-Fernmeldebehoerde)
-# CERTIFICATE_VERIFY_FAILED. Das ist kein Problem der Quelle - dieselbe URL
-# antwortet aus der Sandbox mit 200 und 126 KB. Es ist der Zertifikatsspeicher
-# des Containers: welche Wurzeln dort liegen, haengt am Basis-Image des
-# Runners und aendert sich, ohne dass jemand etwas an diesem Projekt tut.
-#
-# Deshalb explizit das Buendel von `certifi` statt "was das System gerade hat".
-# Faellt certifi aus (nicht installiert), bleibt es beim Systemspeicher - eine
-# fehlende Abhaengigkeit darf keine Sammelphase kippen.
 def _ca_bundle():
     try:
         import certifi
 
         return certifi.where()
-    except ImportError:  # pragma: no cover - certifi steht in requirements.txt
+    except ImportError:  # pragma: no cover
         log.warning("certifi fehlt - benutze den Zertifikatsspeicher des Systems")
         return True
 
 
-_UA_SWAP_STATUSES = {403, 406}  # try the other UA
-_BACKOFF_STATUSES = {429, 500, 502, 503}  # transient -> retry same UA, then give up
-_BACKOFF_WAITS = (4.0, 9.0)  # waits used *between* retries
-# Naht für den goldenen Lauf, gesetzt nur über ``naehte.Naehte.setzen``.
+_UA_SWAP_STATUSES = {403, 406}
+_BACKOFF_STATUSES = {429, 500, 502, 503}
+_BACKOFF_WAITS = (4.0, 9.0)
 Transport = httpx.BaseTransport
 TRANSPORT: Transport | None = None
 _WEG = {"content-encoding", "content-length", "transfer-encoding", "set-cookie"}
@@ -110,27 +79,6 @@ def _ist_ehrliche_kennung(ua: str) -> bool:
     zueinander zu aendern.
     """
     return (ua or "").startswith("TelcoRadar/1.0")
-
-
-# --------------------------------------------------------------------------- #
-# Host-Drosselung
-#
-# Die Sammelphase ist fast reine Wartezeit auf fremde Server und skaliert
-# deshalb mit der Parallelitaet - 130 Quellen bei 8 Workern brauchten 325 s,
-# 1000 Quellen waeren bei gleicher Einstellung 42 min und damit allein schon
-# ueber dem Job-Timeout. Der Ausweg ist aber NICHT einfach ein groesserer
-# Worker-Pool: bei 1000 Quellen liegen zwangslaeufig mehrere Quellen auf
-# derselben Domain (blog.google hat heute schon drei), und viele gleichzeitige
-# Verbindungen zum selben Host provozieren 429/403. Eine gedrosselte Quelle
-# kostet dann drei Versuche mit 4 s und 9 s Backoff - die Parallelitaet macht
-# den Lauf langsamer, nicht schneller.
-#
-# Deshalb: global viele Verbindungen, je Host hoechstens `max_parallel`
-# gleichzeitig und dazwischen ein Mindestabstand. Das Gate sitzt bewusst hier
-# in fetch() und nicht in collect_all(), damit auch die Wiederholungen der
-# Collectors (rss.py holt bei kaputtem XML bis zu drei Mal) und die
-# Folgeabrufe der Newsroom-Parser mitgezaehlt werden.
-# --------------------------------------------------------------------------- #
 
 
 class HostGate:
@@ -165,10 +113,6 @@ class HostGate:
         sem.acquire()
         try:
             if self.min_interval:
-                # Der Abstand gilt zwischen zwei STARTS zum selben Host. Die
-                # Wartezeit laeuft unter dem Host-Lock, damit sich zwei Threads
-                # nicht denselben Zeitpunkt teilen und doch gleichzeitig
-                # losziehen.
                 with gate:
                     zuletzt = self._last.get(host)
                     jetzt = time.monotonic()
@@ -183,9 +127,6 @@ class HostGate:
             sem.release()
 
 
-# Ein Prozess, ein Gate. Standard ist bewusst wirkungslos (unbegrenzt), damit
-# Tests und Einzelabrufe ohne Konfiguration genau so laufen wie bisher; die
-# Pipeline setzt es aus settings.yaml.
 _gate = HostGate(max_parallel=1_000_000, min_interval=0.0)
 
 
@@ -204,24 +145,6 @@ def configure_throttle(max_parallel: int, min_interval: float) -> HostGate:
 def active_gate() -> HostGate:
     return _gate
 
-
-# --------------------------------------------------------------------------- #
-# Frist je QUELLE
-#
-# Die Ausdauer von fetch() (zwei User-Agents, drei Versuche, 4 s und 9 s
-# Backoff) ist richtig - aber sie multipliziert sich mit dem Timeout der
-# Quelle. KT hat timeout_seconds: 30 eingetragen, weil sein koreanischer
-# Endpunkt langsam zu erreichen ist; im Lauf #75 war er ganz tot, und die
-# Leiter brauchte 302,6 s, um das festzustellen. Die gesamte Sammelphase
-# dauerte 303,7 s - EINE Quelle war die Wanduhr.
-#
-# Bei 167 Quellen ist das aergerlich, bei 1000 ist es der Deckel: die
-# Parallelitaet hilft nicht gegen den langsamsten Einzelfall. Deshalb bekommt
-# jede Quelle eine harte Frist; ist sie abgelaufen, wird nicht mehr
-# wiederholt. Das Timeout des einzelnen Versuchs bleibt davon unberuehrt -
-# eine langsame, aber lebende Quelle darf ihre 30 s haben, sie bekommt sie nur
-# nicht sechsmal.
-# --------------------------------------------------------------------------- #
 
 _frist = threading.local()
 
@@ -274,10 +197,6 @@ def fetch(
     uas = (primary,) if schnell else (primary, fallback)
     wartezeiten = (0.0,) if schnell else (0.0, *_BACKOFF_WAITS)
 
-    # A same-origin Referer mimics a normal in-site navigation. Most sources
-    # do not care, but some AEM/CMS "public" backend servlets (e.g. stc's
-    # bin/public/assets) reject requests with no Referer at all as a light
-    # CSRF/hotlink guard - sending one costs nothing and fixes those.
     site_root = f"{urlsplit(url).scheme}://{urlsplit(url).netloc}/"
 
     last_exc: Exception | None = None
@@ -286,21 +205,13 @@ def fetch(
             "User-Agent": ua,
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,"
             "application/rss+xml;q=0.9,application/atom+xml;q=0.9,*/*;q=0.8",
-            # Deutsch zuerst. Die Quellenliste ist seit Session 5 mehrsprachig,
-            # und eine Seite, die nach Accept-Language ausliefert, gab bisher
-            # ihre englische Fassung heraus - auch bei einer deutschen Quelle.
             "Accept-Language": "de-DE,de;q=0.9,en;q=0.8",
             "Referer": site_root,
         }
-        # Nur mit dem Browser-UA. Client-Hints unter einer ehrlichen Kennung
-        # waeren ein Widerspruch in sich: der eine Kopf sagt "ich bin ein
-        # Programm", der andere "ich bin Chrome" - und das gilt fuer JEDE
-        # ehrliche Kennung, nicht nur die eine feste `BOT_UA`-Zeichenkette.
         if not _ist_ehrliche_kennung(ua):
             headers.update(_CLIENT_HINTS)
         if extra_headers:
             headers.update(extra_headers)
-        # attempt 0 immediate, then one retry per backoff wait
         for wait in wartezeiten:
             if wait:
                 if _frist_abgelaufen():
@@ -319,20 +230,19 @@ def fetch(
                         request=resp.request,
                         response=resp,
                     )
-                    break  # try the other UA (no backoff)
+                    break
                 if resp.status_code in _BACKOFF_STATUSES:
                     last_exc = httpx.HTTPStatusError(
                         f"status {resp.status_code}",
                         request=resp.request,
                         response=resp,
                     )
-                    continue  # transient -> back off and retry same UA
+                    continue
                 resp.raise_for_status()
                 return resp
             except httpx.HTTPError as exc:
                 last_exc = exc
                 continue
-        # if the last failure was a transient 5xx/429, a UA swap won't help
         if (
             isinstance(last_exc, httpx.HTTPStatusError)
             and last_exc.response is not None

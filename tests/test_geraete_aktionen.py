@@ -66,11 +66,6 @@ def _art(satz, art):
     return gefunden[0]
 
 
-# --------------------------------------------------------------------------
-# Adapter: congstar-Tarifseite
-# --------------------------------------------------------------------------
-
-
 def test_trade_in_ist_die_differenz_der_zwei_gesamtbetraege(saetze_m):
     """iPhone 17 Pro 512 GB, ANF M: ohne Eintausch 1303 in beiden
     Zahlweisen, mit Eintausch 1033 (36 Raten) bzw. 919 (24 Raten) - die
@@ -83,8 +78,6 @@ def test_trade_in_ist_die_differenz_der_zwei_gesamtbetraege(saetze_m):
     assert t36["eingerechnet"] is False and t24["eingerechnet"] is False
     assert t36["bedingung"] == congstar.TRADE_IN_BEDINGUNG
     assert t36["quelle_url"] == TARIFSEITE_M
-    # Gegenprobe: der BUENDELPREIS bleibt der ohne Eintausch (33,50 x 36 +
-    # 97 = 1303), die Trade-in-Rate (26,00) steht nirgends im Satz.
     assert s36["geraet_monatsrate"] == 33.5
     assert s36["geraet_zuzahlung"] + 36 * s36["geraet_monatsrate"] == 1303
 
@@ -100,8 +93,6 @@ def test_die_eingerechneten_nachlaesse_tragen_ihre_fussnote(saetze_m):
     assert tarif["gueltig_bis"] == "2026-09-29"
     anschluss = _art(s, AKTION_ANSCHLUSS_ERLASSEN)
     assert anschluss["betrag"] == 15.0 and anschluss["eingerechnet"] is True
-    # Gegenprobe: der geschenkte Anschlusspreis steht im Satz als 0, nicht
-    # als 15 - "eingerechnet" heisst, er ist schon abgezogen.
     assert s["anschlusspreis"] == 0.0
 
 
@@ -141,7 +132,6 @@ def test_ein_trade_in_dessen_probe_nicht_aufgeht_wird_verworfen():
     variante["prices"]["paymentVariants"][1]["benefit"]["amount"] = 50
     formen = congstar._buendelzahlweisen(variante, "https://x.de/t")
     assert formen[24]["aktionen"] == []
-    # Die Zahlweise selbst bleibt - der Preis haengt nicht an der Aktion.
     assert formen[24]["rate"] == 10
 
 
@@ -153,11 +143,6 @@ def test_produktseite_iphone17_liefert_den_vorlagefall():
     formen = congstar._buendelzahlweisen(variante, "https://www.congstar.de/x/")
     trade_in = [a for a in formen[36]["aktionen"] if a["art"] == AKTION_TRADE_IN]
     assert [a["betrag"] for a in trade_in] == [162.0]
-
-
-# --------------------------------------------------------------------------
-# Datenmodell
-# --------------------------------------------------------------------------
 
 
 def _aktion(**kw):
@@ -233,15 +218,8 @@ def test_der_speicher_fuehrt_die_aktionen_hin_und_zurueck(tmp_path):
     assert eintrag["aktionen"][0]["betrag"] == 324.0
     [zurueck] = _aus_speicher([eintrag], Buendel, _BUENDEL_FELDER)
     assert zurueck.aktionen == b.aktionen
-    # Gegenprobe: ein Lauf OHNE die Aktion loescht sie - sie steht nicht
-    # weiter im Bestand, nur weil sie gestern da war.
     db2.upsert_buendel([_buendel()], today="2026-09-29")
     assert db2.buendel()[0]["aktionen"] == []
-
-
-# --------------------------------------------------------------------------
-# Karte
-# --------------------------------------------------------------------------
 
 
 def test_der_ueberhang_ist_die_groesste_nicht_eingerechnete_aktion():
@@ -265,7 +243,6 @@ def test_der_ueberhang_ist_die_groesste_nicht_eingerechnete_aktion():
         "Geräterabatt im Tarif",
         "Grundpreisnachlass",
     ]
-    # Einen Tag nach dem genannten Ende ist der Grundpreisnachlass weg.
     liste, _ = karten.aktionen_der_karte(b, "2026-09-30")
     assert "Grundpreisnachlass" not in [a["name"] for a in liste]
 

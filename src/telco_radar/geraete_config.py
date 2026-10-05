@@ -26,15 +26,6 @@ from .geraete_model import Geraet, Katalog, normalisiere
 
 log = logging.getLogger(__name__)
 
-# Wie eine Quelle beschafft wird - die Rangfolge aus Teil C1 des Auftrags,
-# beste zuerst. `deaktiviert` ist ein vollwertiges Ergebnis, kein Mangel:
-# eine ehrliche Luecke ist besser als eine Zahl, der niemand trauen kann.
-# `json_endpunkt` ist bewusst KEIN Adaptername, sondern eine Diagnose: fuenf
-# Anbieter tragen ihn und meinen fuenf voellig verschiedene Nutzlasten
-# (Nuxt-Referenzarray, __PRELOADED_STATE__, productDetailsData, ng-state,
-# INITIAL_STATE). Wer ihn als eine Methode implementiert haette, haette alle
-# fuenf gleichzeitig scharf geschaltet. Ein gebauter Adapter bekommt deshalb
-# einen EIGENEN Namen - dann sagt die Konfiguration, was wirklich gelesen wird.
 METHODEN = (
     "api",
     "ldjson",
@@ -52,16 +43,10 @@ METHODEN = (
     "deaktiviert",
 )
 
-# Diese zwei sind gueltige Messergebnisse und keine Fehlkonfiguration, aber
-# es gibt nichts abzurufen. `kein_hardware` heisst "gemessen: der Anbieter
-# verkauft keine Geraete" - genau der Befund, der in der Zeile "Ohne
-# Hardware-Vermarktung beobachtet" sichtbar bleiben soll.
 _NICHT_CRAWLBAR = ("deaktiviert", "kein_hardware")
 
 ANBIETER_TYPEN = ("handel", "netzbetreiber", "discount")
 
-# Voreinstellung der Host-Bremse je Anbieter. Bewusst konservativ: dieses
-# Radar fragt Produktseiten fremder Shops ab, nicht Presse-Feeds.
 _RATE_LIMIT_STANDARD = 2.0
 _MAX_PRODUKTE_STANDARD = 60
 
@@ -77,28 +62,12 @@ class Einstieg:
 
     url: str
     label: str = ""
-    kind: str = "static"  # static | sitemap | shopify | js
-    # Nur Links, deren Adresse das enthaelt. Ein String ODER eine Liste von
-    # Strings, die ALLE enthalten sein muessen (UND) - die Liste braucht es,
-    # weil freenets Sitemap unter dem Geraetemuster auch Tablets fuehrt und
-    # jede dieser Seiten Crawl-delay-Sekunden kostet, ohne den Katalog
-    # treffen zu koennen.
+    kind: str = "static"
     pfadmuster: object = ""
-    # Das Gegenstueck: Links, deren Adresse EINEN dieser Teilstrings
-    # enthaelt, werden nicht abgerufen. congstars Geraete-Sitemap fuehrt
-    # unter /geraete/ auch Uhren, Kopfhoerer und Tablets (gemessen
-    # 29.09.2026: 13 von 56 Adressen) - jede davon kostet einen Abruf von
-    # rund 900 KB, ohne je ein Smartphone-Buendel zu liefern.
     ohne_pfadmuster: tuple = ()
 
     @property
     def crawlable(self) -> bool:
-        # `EINSTIEG_ARTEN` und nicht eine zweite Aufzaehlung: die erste
-        # Fassung dieser Zeile listete die Arten noch einmal auf, und eine
-        # neu ergaenzte Art waere damit als "nicht crawlbar" durchgefallen -
-        # der Anbieter haette seinen Einstieg verloren, ohne dass jemand
-        # den Grund erfaehrt (dieselbe Fehlerklasse, gegen die die Warnung
-        # in `_parse_einstiege` gebaut ist).
         return self.kind in EINSTIEG_ARTEN
 
 
@@ -107,56 +76,20 @@ class Anbieter:
     name: str
     typ: str = "handel"
     gruppe: str = ""
-    netz: str = ""  # nur bei typ=discount: in wessen Netz
-    rang: int = 99  # gepflegt, nicht gerechnet (wie promo rang)
-    # `rang` ist DIE REIHENFOLGE AUF DER SEITE (Marktgewicht, s.o.) - der
-    # Sammler sortierte bis zum 24.09.2026 trotzdem danach, und das war die
-    # zweite Ursache des Verhungerns von Lauf 52/53 (siehe collect/geraete/
-    # __init__.py, `sammle()`): eine Aenderung an der Anzeige-Reihenfolge
-    # haette ungewollt die Crawl-Reihenfolge mitgezogen und umgekehrt - zwei
-    # Zustaendigkeiten in einem Feld (vgl. Clean-Code-Referenz P2/G17).
-    # `sammelrang` ist die Trennung: LEER (Vorgabe) heisst "wie `rang`", nur
-    # congstar hat bisher einen eigenen Wert (siehe die YAML-Datei und den
-    # Befund zu Lauf 52/53).
+    netz: str = ""
+    rang: int = 99
     sammelrang: Optional[int] = None
     methode: str = "ldjson"
     aktiv: bool = True
-    grund: str = ""  # WARUM nicht aktiv - steht auf der Quellenseite
-    eigen: bool = False  # Vodafone: eigene Referenz, kein Wettbewerber
-    # Der LADEN hinter dem Namen. mobilcom-debitel und freenet sind derselbe
-    # Shop unter zwei Marken - die Positionskarte darf sie nicht als zwei
-    # Wettbewerber fuehren, sonst steht dasselbe Sortiment zweimal
-    # nebeneinander und der Preisvergleich vergleicht einen Laden mit sich
-    # selbst. Dasselbe gilt fuer MediaMarkt und Saturn (Ceconomy).
-    #
-    # `gruppe` taugt dafuer NICHT: klarmobil traegt ebenfalls `gruppe:
-    # freenet`, ist aber ein anderer Laden mit eigenem Sortiment. Aus der
-    # Gruppe abgeleitet stuende dort "freenet (klarmobil)". Deshalb wird der
-    # Laden ausdruecklich gesetzt, nicht erraten.
-    shop: str = ""  # leer = der Anbieter ist sein eigener Laden
-    anzeige: str = ""  # leer = der Name steht fuer sich
+    grund: str = ""
+    eigen: bool = False
+    shop: str = ""
+    anzeige: str = ""
     basis_url: str = ""
     max_produkte: int = _MAX_PRODUKTE_STANDARD
     rate_limit_sekunden: float = _RATE_LIMIT_STANDARD
     hinweis: str = ""
-    # Zusaetzliche HTTP-Kopfzeilen fuer die Abrufe DIESES Anbieters. Zwei
-    # Schnittstellen brauchen sie und beide sagen es selbst: o2 antwortet auf
-    # `Accept: application/json` mit einer Weiterleitung ins 404 und verlangt
-    # `application/vnd.commerce.message+json`, Vodafones Schnittstelle
-    # verlangt den oeffentlichen Browser-Schluessel als `x-api-key`. Beides
-    # steht in der jeweils eigenen oeffentlichen Seite, es ist kein Geheimnis
-    # und keine Umgehung.
     kopfzeilen: dict = field(default_factory=dict)
-    # Ein PER-ANBIETER-UEBERSCHREIBER fuer den User-Agent, leer = das
-    # globale `http_cfg` (config/settings.yaml, Antonios Entscheidung E-1)
-    # gilt wie ueberall sonst. Gebaut fuer Saturn (BRIEF_SATURN_ADAPTER_R2,
-    # 05.09.2026, Evaluator-Befund an R1): die globale Chrome-Kennung ging
-    # dort als PRIMARY hinaus, obwohl der Bericht eine ehrliche Kennung
-    # behauptete - eine Konfigurationszeile, die NUR diesen einen Anbieter
-    # betrifft, statt der globalen `settings.yaml`, die Antonio vorbehalten
-    # bleibt. `collect.geraete.sammle_anbieter` reicht den Wert an
-    # `hole()` weiter, das daraus ein eigenes `http_cfg` fuer GENAU diese
-    # Abrufe baut - `fetch()` selbst bleibt unveraendert aufgerufen.
     user_agent: str = ""
     einstiege: list = field(default_factory=list)
 
@@ -209,9 +142,6 @@ class QuellenConfig:
             if a.schluessel == schluessel:
                 return a
         return None
-
-
-# --------------------------------------------------------------------------
 
 
 def lade_katalog(root: Path) -> Katalog:
@@ -273,9 +203,6 @@ def lade_katalog(root: Path) -> Katalog:
                 )
             )
         katalog = Katalog(geraete=geraete)
-    # Lazy import: collect.geraete importiert seinerseits dieses Modul nicht,
-    # aber das Paket-__init__ zieht httpx/bs4 - das gehoert nicht an die
-    # Ladezeit dieser (leichtgewichtigen) Konfigurationsschicht.
     from .collect.geraete import autoerkennung
 
     autoerkennung.lade_auto_zusaetze(Path(root), katalog)
@@ -317,10 +244,6 @@ def lade_farben(root: Path) -> dict:
     return tabelle
 
 
-# `buendel` ist keine dritte Abrufart, sondern eine zweite LESART: die
-# Antwort wird nicht auf Listungen, sondern auf Geraet-plus-Tarif-Buendel
-# gelesen und landet in `geraete_tco.json`. Der Adapter muss dafuer ein
-# `lies_buendel` mitbringen; hat er keins, sagt die Bilanz das.
 EINSTIEG_ARTEN = ("static", "sitemap", "shopify", "js", "buendel")
 
 
@@ -333,9 +256,6 @@ def _parse_einstiege(raw_liste, basis_url: str, anbieter: str = "") -> list:
         url = str(e.get("url") or "").strip()
         if not url:
             continue
-        # Relative Adresse gegen die Basis aufloesen - sonst reichte der
-        # Loader sie unaufgeloest an den Collector durch, und der Abruf
-        # scheiterte mit einer Meldung, die nach Netzfehler aussieht.
         if basis_url and not url.lower().startswith(("http://", "https://")):
             url = urljoin(basis_url.rstrip("/") + "/", url.lstrip("/"))
         schluessel = url.rstrip("/").lower()
@@ -344,9 +264,6 @@ def _parse_einstiege(raw_liste, basis_url: str, anbieter: str = "") -> list:
         gesehen.add(schluessel)
         kind = str(e.get("kind") or "static").strip()
         if kind not in EINSTIEG_ARTEN:
-            # Nicht still verwerfen: ein Tippfehler hier nimmt dem Anbieter
-            # seine einzige Einstiegsseite, und er faellt danach als
-            # "nicht crawlbar" durch, ohne dass jemand den Grund erfaehrt.
             log.warning(
                 "geraete_quellen: %s hat Einstieg %s mit unbekannter "
                 "Art %r - als static gefuehrt",
@@ -437,11 +354,6 @@ def lade_quellen(root: Path) -> QuellenConfig:
         basis_url = str(a.get("basis_url") or "").strip()
         name = str(a["name"]).strip()
         einstiege = _parse_einstiege(a.get("einstiege"), basis_url, name)
-        # Ein Anbieter, der abgefragt werden SOLL, aber keine brauchbare
-        # Einstiegsseite hat, bekommt hier seinen Grund. Sonst stuende er auf
-        # der Quellenseite ohne Erklaerung - und die Zusicherung "kein
-        # Anbieter verschwindet stillschweigend" haenge allein an einem Test
-        # gegen die ausgelieferte Datei.
         if aktiv and methode not in _NICHT_CRAWLBAR and not einstiege:
             grund = grund or (
                 "keine Einstiegsseite konfiguriert - der Anbieter wird nicht abgefragt"

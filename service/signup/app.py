@@ -50,10 +50,6 @@ from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 
-# Der Dienst lebt im selben Repo wie die Pipeline, laeuft aber als eigener
-# Prozess. Der Pfad macht `telco_radar.newsletter` importierbar, ohne dass
-# der Dienst das Paket installieren muss - auf Render ist das Repo einfach
-# ausgecheckt.
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from telco_radar.newsletter.config import lade_katalog  # noqa: E402
@@ -67,16 +63,6 @@ log = logging.getLogger("signup")
 
 WURZEL = Path(__file__).resolve().parents[2]
 
-# Die neutrale Antwort. Ein Satz, der nichts darueber verraet, ob die Adresse
-# bekannt ist, ob sie sich schon einmal abgemeldet hat oder ob heute schon
-# eine Bestaetigungsmail an sie ging.
-#
-# Die schuetzende Eigenschaft ist die GLEICHHEIT ueber alle Zweige - Honeypot,
-# IP-Bremse, abgelehnte Nonce, Domainliste, Erfolg -, nicht der Konjunktiv.
-# Bis zum 13.08.2026 stand hier "Wenn alles stimmt, ist eine Bestaetigungsmail
-# unterwegs"; der Vorbehalt las sich fuer den Angemeldeten wie ein Zweifel an
-# seiner eigenen Eingabe und half niemandem. Wer hier umformuliert, darf nur
-# eines nicht tun: die Antwort vom Ausgang abhaengig machen.
 NEUTRAL = (
     "Gleich kommt eine E-Mail. Klick den Link darin — erst dann bist du angemeldet."
 )
@@ -93,20 +79,12 @@ class Einstellungen:
         self.token_key = _env("SIGNUP_TOKEN_KEY")
         self.pepper = _env("SIGNUP_PEPPER")
         self.github_token = _env("GITHUB_DISPATCH_TOKEN")
-        # Das LEERE Dispatch-Repo, nicht der Store. Siehe Modulkopf.
         self.dispatch_repo = _env(
             "GITHUB_DISPATCH_REPO", "Antonio20045/telco-radar-inbox"
         )
         self.basis_url = _env(
             "SITE_BASE_URL", "https://telco-radar.onrender.com"
         ).rstrip("/")
-        # Die Adresse DIESES Dienstes - nicht die der Website. Der
-        # Unterschied ist keine Feinheit: `/confirm/...` und
-        # `/unsubscribe/...` sind Routen hier, die Website ist eine Static
-        # Site und kennt sie nicht. Bis zum 13.08.2026 baute der
-        # Bestaetigungslink auf `SITE_BASE_URL` - jede Bestaetigungsmail
-        # fuehrte damit auf ein 404, und die Anmeldung konnte niemand
-        # abschliessen.
         self.dienst_url = _env(
             "DIENST_BASE_URL", "https://telco-radar-signup.onrender.com"
         ).rstrip("/")
@@ -124,37 +102,6 @@ einstellungen = Einstellungen()
 bremse = IPBremse()
 katalog = lade_katalog(WURZEL)
 
-# ------------------------------------------------------------------ CORS ----
-# Die Seite liegt auf telco-radar.onrender.com, dieser Dienst auf
-# telco-radar-signup.onrender.com. JEDER Aufruf des Formulars ist damit
-# cross-origin - und ohne diese Middleware ist das Formular im Browser tot,
-# waehrend der Dienst per curl tadellos antwortet:
-#
-#   GET  /form-token  -> 200, aber ohne `Access-Control-Allow-Origin`;
-#                        der Browser verwirft die Antwort.
-#   OPTIONS /subscribe -> 405, der Preflight faellt durch, der POST wird
-#                        nie abgeschickt.
-#
-# Nichts davon steht in einem Protokoll: der Dienst hat ja korrekt
-# geantwortet. Gefunden am 13.08.2026, nachdem Antonio auf der fertigen
-# Seite keine Anmeldemoeglichkeit fand.
-#
-# Warum kein Test das gesehen hat: FastAPIs TestClient spricht denselben
-# Origin und erzwingt CORS ueberhaupt nicht. Ein Test, der einfach POSTet,
-# ist deshalb gruen, egal wie die Middleware steht. Der Test dazu schickt
-# einen `Origin`-Header und prueft die ANTWORTKOPFZEILEN.
-#
-# Bewusst kein "*": dieser Dienst nimmt Anmeldungen entgegen, und eine
-# fremde Seite soll das Formular nicht in ihrem Namen abschicken koennen.
-# Erlaubt ist die eigene Seite - dieselbe Adresse, die auch die
-# Bestaetigungslinks traegt, also genau eine Stelle zum Pflegen.
-#
-# Die Liste traegt NEBEN `SITE_BASE_URL` die bekannte Produktionsadresse.
-# Das ist keine Verdopplung, sondern der Schutz gegen den einen Fehler, den
-# man von aussen nicht sieht: steht `SITE_BASE_URL` im Render-Dienst falsch
-# oder gar nicht, dann greift die Freigabe stillschweigend nicht - der
-# Preflight antwortet brav 200, nur eben ohne Kopf, und das Formular ist
-# wieder tot. `/gesund` gibt die Liste deshalb aus.
 ERLAUBTE_HERKUENFTE = sorted(
     {einstellungen.basis_url, "https://telco-radar.onrender.com"}
 )
@@ -164,15 +111,9 @@ app.add_middleware(
     allow_origins=ERLAUBTE_HERKUENFTE,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["content-type"],
-    # Es gibt weder Cookie noch Auth-Header; alles reist signiert im Token.
-    # `allow_credentials=True` waere hier nicht nur unnoetig, sondern wuerde
-    # die Herkunftspruefung des Browsers aufweichen.
     allow_credentials=False,
     max_age=3600,
 )
-
-
-# ------------------------------------------------------------- Handwerk ----
 
 
 def _absender(anfrage: Request) -> str:
@@ -187,8 +128,6 @@ def _absender(anfrage: Request) -> str:
 
 
 def _sicherheitskopfzeilen(antwort: Response) -> Response:
-    # `no-referrer`: sonst reist das Bestaetigungstoken beim naechsten Klick
-    # im Referer mit, und dann steht eine Adresse in fremden Zugriffslogs.
     antwort.headers["Referrer-Policy"] = "no-referrer"
     antwort.headers["X-Content-Type-Options"] = "nosniff"
     antwort.headers["Cache-Control"] = "no-store"
@@ -249,9 +188,6 @@ def _seite(titel: str, text: str, *, ziel: str = "") -> HTMLResponse:
     )
 
 
-# --------------------------------------------------------- die Endpunkte ---
-
-
 @app.get("/gesund")
 def gesund() -> dict:
     """Ob der Dienst sich fuer einsatzbereit haelt - ohne Geheimnisse.
@@ -310,21 +246,14 @@ async def subscribe(anfrage: Request) -> JSONResponse:
     if not isinstance(daten, dict):
         daten = {}
 
-    # 1. Honeypot. Ein Feld, das kein Mensch ausfuellt, weil er es nicht
-    #    sieht. Wer es ausfuellt, bekommt dieselbe neutrale Antwort wie alle
-    #    anderen - eine erkennbare Ablehnung waere eine Bauanleitung.
     if str(daten.get("website") or "").strip():
         log.info("Honeypot ausgeloest")
         return neutral()
 
-    # 2. Die IP-Bremse. Erste Bremse, KEINE Schutzmassnahme (siehe
-    #    ratelimit.py): der Zaehler ist nach jedem Spin-down leer.
     if not bremse.erlaubt_jetzt(_absender(anfrage)):
         log.info("IP-Bremse hat gegriffen")
         return neutral(429)
 
-    # 3. Die signierte Nonce. Mindestalter zwei Sekunden - schneller fuellt
-    #    kein Mensch ein Formular aus.
     try:
         tokens.lies(
             einstellungen.token_key,
@@ -340,17 +269,12 @@ async def subscribe(anfrage: Request) -> JSONResponse:
     adresse = sub.normalisiere_adresse(str(daten.get("email") or ""))
     filter_roh = daten.get("filters") or {}
 
-    # 4. Form der Eingaben. Fehler kommen als LISTE zurueck, damit jemand mit
-    #    drei falschen Stichwoertern das in einem Durchgang erfaehrt.
     fehler = sub.pruefe_anmeldung(adresse, filter_roh, katalog)
     if fehler:
         return _sicherheitskopfzeilen(
             JSONResponse({"status": "fehler", "fehler": fehler}, status_code=400)
         )
 
-    # 5. Die Einwilligung. Ohne Haekchen keine Anmeldung, und die FASSUNG
-    #    muss die sein, die das Formular gezeigt hat - eine Zustimmung zu
-    #    einem Text, den der Nutzer nie gesehen hat, ist keine.
     fassung = rechtstexte.aktuelle_einwilligung(WURZEL)
     if not daten.get("consent") or fassung is None:
         return _sicherheitskopfzeilen(
@@ -360,15 +284,10 @@ async def subscribe(anfrage: Request) -> JSONResponse:
             )
         )
 
-    # 6. Die Domain-Allowlist. Steht auf leer (Festlegung 3) und wird
-    #    trotzdem ausgewertet, damit das Umschalten eine Zeile bleibt. Ein
-    #    Abgewiesener bekommt die NEUTRALE Antwort - sonst waere die Liste
-    #    von aussen auslesbar.
     if not sub.erlaubt_nach_domainliste(adresse, einstellungen.erlaubte_domains):
         log.info("Domain nicht in der Allowlist")
         return neutral()
 
-    # 7. Das Token. Hier stecken alle Angaben drin - und NUR hier.
     bestaetigung = tokens.schreibe(
         einstellungen.token_key,
         tokens.ZWECK_BESTAETIGUNG,
@@ -377,9 +296,6 @@ async def subscribe(anfrage: Request) -> JSONResponse:
             "filters": _sauberer_filter(filter_roh),
             "consent_version": fassung.version,
             "consent_hash": fassung.hash,
-            # Die Kennwerte reisen MIT. Beim Bestaetigen gibt es die
-            # Anmeldeanfrage nicht mehr; erst dort gebildet, stuende im
-            # Protokoll die IP des Klicks statt die der Einwilligung.
             "ip_hmac": sub.kennwert(einstellungen.pepper, _absender(anfrage)),
             "ua_hmac": sub.kennwert(
                 einstellungen.pepper, anfrage.headers.get("user-agent", "")
@@ -393,15 +309,11 @@ async def subscribe(anfrage: Request) -> JSONResponse:
         {
             "token": bestaetigung,
             "token_id": tokens.token_id(bestaetigung),
-            # Der Kennwert reist AUCH ausserhalb des Tokens mit: `doi.yml` prueft
-            # damit die 24-Stunden-Sperre, ohne das Token entpacken zu muessen.
             "addr_hmac": sub.adress_kennwert(einstellungen.pepper, adresse),
             "confirm_url": f"{einstellungen.dienst_url}/confirm/{bestaetigung}",
         },
     )
     if not ok:
-        # Ehrlich bleiben: wenn der Weiterreichweg klemmt, kommt keine Mail,
-        # und der Nutzer wartet sonst vergeblich auf sie.
         return _sicherheitskopfzeilen(
             JSONResponse(
                 {
@@ -445,9 +357,6 @@ def confirm(token: str) -> HTMLResponse:
             "addr_hmac": daten.get("addr_hmac", ""),
         },
     )
-    # Die Seite bestaetigt SOFORT, auch wenn der Dispatch klemmt. Der
-    # Workflow ist wiederholbar; ein Nutzer, der vor einer Fehlerseite steht,
-    # klickt den Link ein zweites Mal - und das erzeugt dann zwei Abos.
     return _sicherheitskopfzeilen(
         _seite(
             "Angemeldet",

@@ -60,8 +60,6 @@ def _token(pfad: str, zweck: str, max_alter: int) -> dict:
     try:
         daten = tokens.lies(key, zweck, roh, max_alter=max_alter)
     except tokens.TokenFehler as fehler:
-        # Kein Detail nach aussen: ob ein Token abgelaufen oder gefaelscht
-        # war, geht niemanden etwas an, der das Log lesen kann.
         raise SystemExit(f"::error::Token abgelehnt ({fehler}).") from fehler
     maskiere(str(daten.get("email") or ""))
     return daten
@@ -70,9 +68,6 @@ def _token(pfad: str, zweck: str, max_alter: int) -> dict:
 def _zahl(name: str, wert) -> None:
     """Eine Zeile fuers Actions-Log. ZAHLEN, keine Adressen."""
     print(f"{name}: {wert}", flush=True)
-
-
-# ----------------------------------------------------------------- doi -----
 
 
 def befehl_doi(args) -> int:
@@ -90,8 +85,6 @@ def befehl_doi(args) -> int:
     doi_log = Path(args.doi_log)
 
     if st.doi_gesperrt(doi_log, kennwert):
-        # STILLSCHWEIGEND. Eine Rueckmeldung waere ein Weg, herauszufinden,
-        # ob eine Adresse gerade angeschrieben wurde.
         _zahl("DOI", "gesperrt (24-Stunden-Regel)")
         return 0
 
@@ -113,9 +106,6 @@ def befehl_doi(args) -> int:
         betreff="Bitte bestätigen: Telco Radar",
         html=_doi_html(bestaetigen, basis),
         text=_doi_text(bestaetigen, basis),
-        # KEIN List-Unsubscribe: es gibt noch kein Abo, von dem man sich
-        # abmelden koennte. Ein Header, der auf eine leere Handlung zeigt,
-        # ist schlimmer als keiner.
         headers={},
     )
 
@@ -132,9 +122,6 @@ def befehl_doi(args) -> int:
     ergebnis = transport.send(nachricht, adresse)
     _zahl("DOI", "versendet" if ergebnis.ok else f"gescheitert ({ergebnis.status})")
     if ergebnis.ok:
-        # Vermerkt wird NUR bei Erfolg: eine gescheiterte Mail darf die
-        # Adresse nicht 24 Stunden sperren, sonst kommt der Nutzer beim
-        # zweiten Versuch nicht durch und weiss nicht warum.
         st.doi_vermerken(doi_log, kennwert, token_id=args.token_id)
     st.doi_aufraeumen(doi_log)
     return 0 if ergebnis.ok else 1
@@ -179,9 +166,6 @@ def _doi_text(bestaetigen: str, basis: str) -> str:
     )
 
 
-# ------------------------------------------------------------- confirm -----
-
-
 def befehl_confirm(args) -> int:
     """Erst hier entsteht ein Abonnement - und das vollstaendige Protokoll."""
     daten = _token(args.token_datei, tokens.ZWECK_BESTAETIGUNG, tokens.TTL_BESTAETIGUNG)
@@ -194,8 +178,6 @@ def befehl_confirm(args) -> int:
     if not sub.ist_adresse(adresse):
         raise SystemExit("::error::Token ohne brauchbare Adresse.")
 
-    # Die Domain-Allowlist wird HIER ausgewertet, nicht nur im Dienst: der
-    # Dienst kann ausgetauscht werden, der Store nicht.
     erlaubte = [
         d for d in os.environ.get("ERLAUBTE_DOMAINS", "").split(",") if d.strip()
     ]
@@ -208,20 +190,13 @@ def befehl_confirm(args) -> int:
 
     vorhanden = store.finde_ueber_kennwert(kennwert)
     if vorhanden and vorhanden.state == "active":
-        # Zweimal geklickt. Kein Fehler und kein zweites Abo - der Nutzer
-        # sieht auf beiden Seiten "Angemeldet", und das stimmt.
         _zahl("Bestaetigung", "bereits aktiv")
         return 0
 
-    # Der Wortlaut, dem zugestimmt wurde. Er kommt aus dem TOKEN, nicht aus
-    # der heutigen Datei: eine Behoerde fragt nach dem Text von damals.
     version = str(daten.get("consent_version") or "")
     fassung = rechtstexte.einwilligung(WURZEL, version)
     hash_im_token = str(daten.get("consent_hash") or "")
     if fassung is not None and fassung.hash != hash_im_token:
-        # Der Text hat sich seit der Anmeldung geaendert. Der Nachweis
-        # bleibt trotzdem gueltig - er belegt den Hash von DAMALS. Es
-        # gehoert nur ins Protokoll, damit es niemanden ueberrascht.
         _zahl("Einwilligung", f"Fassung {version} hat sich seither geändert")
 
     abo = vorhanden or sub.Abo(id=sub.neue_id(), email=adresse)
@@ -263,9 +238,6 @@ def _iso(iat) -> str:
         return sub.jetzt()
 
 
-# --------------------------------------------------------- unsubscribe -----
-
-
 def befehl_unsubscribe(args) -> int:
     """Widerruf: Zustand setzen, ADRESSE LOESCHEN, Kennwert behalten.
 
@@ -281,8 +253,6 @@ def befehl_unsubscribe(args) -> int:
         str(daten.get("addr_hmac") or "")
     )
     if abo is None:
-        # Schon abgemeldet oder nie da gewesen. Kein Fehler: der Nutzer hat
-        # auf der Seite bereits "Abgemeldet" gelesen, und das stimmt.
         _zahl("Abmeldung", "kein Abo gefunden")
         return 0
     store.setze(abo.abgemeldet())
@@ -292,18 +262,12 @@ def befehl_unsubscribe(args) -> int:
     return 0
 
 
-# ---------------------------------------------------------------- main -----
-
-
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__)
     unter = p.add_subparsers(dest="befehl", required=True)
 
     for name in ("doi", "confirm", "unsubscribe"):
         u = unter.add_parser(name)
-        # Ueber eine DATEI, nicht ueber ein Argument: eine Kommandozeile
-        # steht in der Prozessliste und im Actions-Log, und im Token steckt
-        # die Adresse.
         u.add_argument("--token-datei", required=True)
         u.add_argument("--token-id", default="")
         u.add_argument("--store", default="store/subscribers.jsonl")

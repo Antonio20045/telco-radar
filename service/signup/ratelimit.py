@@ -29,10 +29,6 @@ class IPBremse:
     def __init__(self, erlaubt: int = 5, fenster: int = 600, max_absender: int = 5000):
         self.erlaubt = erlaubt
         self.fenster = fenster
-        # Deckel gegen den einfachsten Speicherangriff: ohne ihn legt eine
-        # Anfrageflut mit wechselnden Absendern die Instanz lahm, und dafuer
-        # braucht es nicht einmal boese Absicht - ein Proxy mit rotierenden
-        # Adressen reicht.
         self.max_absender = max_absender
         self._spuren: dict[str, deque] = {}
 
@@ -50,9 +46,6 @@ class IPBremse:
     def _aufraeumen(self, jetzt: float) -> None:
         if len(self._spuren) <= self.max_absender:
             return
-        # Alles wegwerfen, was aus dem Fenster gelaufen ist. Reicht das
-        # nicht, faellt der aelteste Rest mit - eine zu grosszuegige Bremse
-        # ist besser als eine Instanz, die nicht mehr antwortet.
         veraltet = [
             a for a, s in self._spuren.items() if not s or jetzt - s[-1] > self.fenster
         ]

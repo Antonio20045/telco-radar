@@ -52,7 +52,6 @@ from telco_radar.tco_model import (
 
 _WURZEL = Path(__file__).parent.parent
 
-# Das Rechenbeispiel des Auftrags: 1 EUR + 24 x 30 EUR = 721 EUR.
 _ANZAHLUNG, _RATE, _GESAMT = 1.0, 30.0, 721.0
 
 
@@ -62,9 +61,6 @@ def _buendel(**kw) -> Buendel:
         sku_id="apple-iphone-14-128gb-mitternacht",
         anbieter="o2",
         tarif_name="o2 Mobile M",
-        # Seit Phase 6 traegt ein Buendel den Fremdschluessel auf
-        # `data/state/tarife.jsonl` - ohne ihn nimmt `TcoDB` einen
-        # Geraetepreis nicht mehr auf.
         tarif_id="o2:o2-mobile-m",
         tarif_id_guete="hoch",
         tarif_monatlich=29.99,
@@ -92,11 +88,6 @@ def _referenz(**kw) -> SimOnlyReferenz:
     )
     felder.update(kw)
     return SimOnlyReferenz(**felder)
-
-
-# --------------------------------------------------------------------------
-# Die Preisform als eigene Groesse
-# --------------------------------------------------------------------------
 
 
 def test_die_ratenzahlung_rechnet_ihren_gesamtbetrag_selbst():
@@ -142,15 +133,9 @@ def test_ohne_rate_gibt_es_keine_halbe_finanzierung():
     assert _buendel(geraet_monatsrate=None).geraeteraten is None
 
 
-# --------------------------------------------------------------------------
-# TCO-24: die Leitzahl
-# --------------------------------------------------------------------------
-
-
 def test_die_tco_summiert_tarif_geraet_und_anschluss():
     ergebnis = tco_24(_buendel())
     assert ergebnis.horizont == TCO_HORIZONT
-    # 29,99 x 24 = 719,76 | 1,00 | 30,00 x 24 = 720,00 | 39,99
     assert ergebnis.bestandteile == {
         "Tarif über 24 Monate": 719.76,
         "Gerätezuzahlung": 1.0,
@@ -159,7 +144,7 @@ def test_die_tco_summiert_tarif_geraet_und_anschluss():
     }
     assert ergebnis.gesamt == 1480.75
     assert ergebnis.leitzahl_monate == 24
-    assert ergebnis.monatlich == 61.7  # 1480,75 / 24, kaufmaennisch
+    assert ergebnis.monatlich == 61.7
     assert ergebnis.restbetrag == 0.0
 
 
@@ -188,12 +173,9 @@ def test_der_monatsschnitt_teilt_durch_den_zeitraum_der_eigenen_summe():
         )
     )
     assert ergebnis.gesamt == 2019.54
-    # DER ZEITRAUM STEHT AM DATENSATZ - jeder Leser nimmt ihn von hier.
     assert ergebnis.leitzahl_monate == 36
-    assert ergebnis.monatlich == 56.1  # 2.019,54 / 36
+    assert ergebnis.monatlich == 56.1
     assert ergebnis.monatlich != 84.15, "das ist 2.019,54 / 24 (der Befund)"
-    # Die Gegenrechnung, die auf JEDER Zeile aufgehen muss: Ø x Zeitraum
-    # ist die Summe (eine Cent-Rundung je Monat erlaubt).
     assert (
         abs(ergebnis.monatlich * ergebnis.leitzahl_monate - ergebnis.gesamt)
         <= ergebnis.leitzahl_monate * 0.01
@@ -340,22 +322,6 @@ def test_geld_wird_auf_zwei_stellen_gerundet():
     assert ergebnis.monatlich == 20.01
 
 
-# --------------------------------------------------------------------------
-# A1 (20.09.2026): die Leitzahl heisst "Kosten ueber 24 Monate" und rechnet
-# ALLE Geräteraten hinein - auch die Restschuld nach Monat 24.
-#
-#   Kosten über 24 Monate = Anzahlung + 24 Monate Tarif (phasengewichtet,
-#   wenn das Pflichtdokument Preisphasen nennt) + alle Geräteraten der
-#   eigenen Laufzeit + Anschlusspreis
-#
-# Bis dahin kappte `tco_24` die Raten bei 24 Monaten - der CHECK24-Vorwurf
-# aus § 5.4 der Strategie, nur mit einem Ausweis daneben. Die Restschuld
-# ist keine Fussnote mehr, sondern Teil der Zahl: wer 36 Raten schuldet,
-# hat nach 24 Monaten noch 12 offen, und auch die gehoeren in die Kosten
-# ueber 24 Monate (als noch GESCHULDETER Betrag, siehe `restbetrag`).
-# --------------------------------------------------------------------------
-
-
 def test_der_pflichtfall_des_auftrags_congstar_xs_ergibt_1459_euro():
     """A1, wortgerecht: congstar Allnet Flat XS zum iPhone 17 Pro 256 GB -
     1 € Anzahlung, 15 € Tarif, 36 Raten à 30,50 €, kein Anschlusspreis.
@@ -384,11 +350,9 @@ def test_der_pflichtfall_des_auftrags_congstar_xs_ergibt_1459_euro():
         "Geräteraten über 36 Monate": 1098.0,
         "Anschlusspreis": 0.0,
     }
-    # Die Restschuld ist IN der Leitzahl und zusaetzlich ausgewiesen:
-    # 12 Raten à 30,50 € sind nach Monat 24 noch zu zahlen.
     assert ergebnis.restbetrag == 366.0
     assert round(ergebnis.gesamt - ergebnis.restbetrag, 2) == 1093.0
-    assert ergebnis.monatlich == 60.79  # 1.459,00 / 24
+    assert ergebnis.monatlich == 60.79
 
 
 def test_tarifphasen_werden_phasengewichtet_gerechnet():
@@ -402,8 +366,7 @@ def test_tarifphasen_werden_phasengewichtet_gerechnet():
     ]
     ergebnis = tco_24(_buendel(tarif_monatlich=20.0, tarif_phasen=phasen))
     assert ergebnis.bestandteile["Tarif über 24 Monate"] == 360.0
-    assert ergebnis.gesamt == 1120.99  # 1 + 360 + 720 + 39,99
-    # Ohne Phasen gilt derselbe Tarifpreis flach - die Gegenprobe.
+    assert ergebnis.gesamt == 1120.99
     flat = tco_24(_buendel(tarif_monatlich=20.0))
     assert flat.bestandteile["Tarif über 24 Monate"] == 480.0
 
@@ -440,11 +403,6 @@ def test_phasensumme_wohnt_im_modul_der_leitzahl():
     )
     assert phasensumme([Preisphase(1, 6, 9.99)], 24) == round(6 * 9.99 + 18 * 9.99, 2)
     assert phasensumme([], 24) is None
-
-
-# --------------------------------------------------------------------------
-# SIM-only-Referenz und effektiver Geraetepreis
-# --------------------------------------------------------------------------
 
 
 def test_der_geraeteanteil_ist_die_differenz_der_zwei_tco():
@@ -499,8 +457,8 @@ def test_keine_differenz_ueber_zwei_verschiedene_zeitraeume():
         ),
         _referenz(),
     )
-    assert ergebnis.tco_buendel == 2019.63  # 360 + 36 x 44,99 + 39,99
-    assert ergebnis.tco_sim_only == 519.75  # 24 x 19,99 + 39,99
+    assert ergebnis.tco_buendel == 2019.63
+    assert ergebnis.tco_sim_only == 519.75
     assert UNGLEICHER_ZEITRAUM in ergebnis.luecken
     assert ergebnis.betrag is None
     assert ergebnis.belastbar is False
@@ -588,7 +546,6 @@ def test_das_geraeteblatt_ist_derselbe_vertrag():
         ),
     )
     assert ergebnis.betrag is not None
-    # Gegenprobe: das Geraeteblatt einer anderen Stufe bleibt fremd.
     with pytest.raises(ValueError, match="Tarifen"):
         geraeteanteil(
             _buendel(
@@ -618,8 +575,6 @@ def test_zwei_namen_fuer_denselben_tarif_rechnen_trotzdem():
         _referenz(tarif_name="O2 Mobile on Demand M"),
     )
     assert ergebnis.betrag is not None
-    # Gegenprobe, dass der Fall ohne die Regel wirklich eintraete: ohne IDs
-    # auf beiden Seiten faellt derselbe Aufruf wieder auf den Namen zurueck.
     with pytest.raises(ValueError, match="Tarifen"):
         geraeteanteil(
             _buendel(tarif_id="", tarif_name="O2 Mobile on Demand M Plus mit 50 GB+"),
@@ -631,9 +586,6 @@ def test_ohne_ids_bleibt_der_name_die_pruefung():
     """Der Rueckfall fuer Saetze, die keinen Fremdschluessel tragen."""
     ergebnis = geraeteanteil(_buendel(tarif_id=""), _referenz(tarif_id=""))
     assert ergebnis.betrag is not None
-    # Eine HALB gefuellte Paarung faellt ebenfalls auf den Namen zurueck -
-    # ein Vergleich "ID gegen nichts" waere immer ungleich und schaltete
-    # den Geraeteanteil stillschweigend ab.
     ergebnis = geraeteanteil(_buendel(), _referenz(tarif_id=""))
     assert ergebnis.betrag is not None
 
@@ -650,11 +602,6 @@ def test_die_sim_only_referenz_rechnet_ueber_denselben_weg():
 def test_ein_buendel_ohne_geraet_hat_keinen_geraeteanteil():
     with pytest.raises(ValueError, match="ohne Geraet"):
         geraeteanteil(_referenz().als_buendel(), _referenz())
-
-
-# --------------------------------------------------------------------------
-# Die Zusicherungen des Modells
-# --------------------------------------------------------------------------
 
 
 def test_ein_buendel_ohne_tarif_ist_keins():
@@ -688,11 +635,6 @@ def test_das_buendel_hat_kein_feld_fuer_einen_barpreis():
     assert not hasattr(_buendel(), "preis_ohne_vertrag")
 
 
-# --------------------------------------------------------------------------
-# IDs: eine eigene Namensmenge
-# --------------------------------------------------------------------------
-
-
 def test_die_ids_sagen_im_klartext_was_sie_sind():
     assert (
         buendel_id("apple-iphone-14-128gb-mitternacht", "o2", "o2 Mobile M", 36)
@@ -715,7 +657,6 @@ def test_eine_fehlende_laufzeit_steht_offen_in_der_id():
     assert ohne != buendel_id(
         "apple-iphone-14-128gb-mitternacht", "o2", "o2 Mobile M", 24
     )
-    # Auch eine unmoegliche Laufzeit wird benannt, nicht gerundet.
     assert buendel_id("x", "o2", "M", 0).endswith("--" + LAUFZEIT_LUECKE)
 
 
@@ -772,18 +713,14 @@ def test_ein_buendel_ohne_laufzeit_traegt_die_luecke_statt_einer_zahl():
     )
     assert ohne.laufzeit_monate is None
     assert ohne.id.endswith("--" + LAUFZEIT_LUECKE)
-    # Die Ratenzahlung ist ohne ihre Monatszahl kein Ratengeschaeft.
     assert ohne.geraeteraten is None
 
     tco = tco_24(ohne)
     assert POSTEN_LAUFZEIT in tco.luecken
-    # Die RATE ist gemessen - benannt wird deshalb die Laufzeit, nicht sie.
     assert POSTEN_RATE not in tco.luecken
     assert not tco.belastbar
     assert tco.restbetrag is None
     assert all("Geräteraten" not in name for name in tco.bestandteile)
-    # 20,00 x 24 Tarif + 0,00 Zuzahlung + 39,99 Anschluss = 519,99 EUR;
-    # die 816,00 EUR geratener Raten sind NICHT darin.
     assert tco.gesamt == pytest.approx(519.99, abs=0.005)
 
     kennzahl = tco_bindung(ohne)
@@ -819,10 +756,6 @@ def test_ein_buendelmonatspreis_ohne_laufzeit_ergibt_keine_summe():
     assert POSTEN_LAUFZEIT in kennzahl.luecken
     assert not kennzahl.belastbar
     assert kennzahl.bindung is None
-    # `tco_bindung` fuehrt die Zuzahlung der Buendelform nicht als Posten
-    # (eigener Befund, nicht dieser hier) - uebrig bleibt der
-    # Anschlusspreis. Entscheidend ist, dass die 1079,76 EUR der
-    # geratenen 24 Monate NICHT darin stehen.
     assert kennzahl.gezahlt_nach_24 == pytest.approx(39.99, abs=0.005)
 
 
@@ -872,8 +805,6 @@ def test_zwei_ratenlaufzeiten_zum_selben_tarif_sind_zwei_buendel():
     )
     assert kurz.id != lang.id
     assert kurz.id.endswith("--24m") and lang.id.endswith("--36m")
-    # Und der laufzeitfreie Teil ist derselbe: es ist DASSELBE Angebot in
-    # zwei Zahlweisen.
     assert buendel_id_ohne_laufzeit(kurz.id) == buendel_id_ohne_laufzeit(lang.id)
 
 
@@ -884,12 +815,9 @@ def test_die_lesemigration_haelt_eine_alte_id_am_selben_buendel():
     assert buendel_id_aktuell(alt, 36) == buendel_id(
         "apple-iphone-14-128gb-mitternacht", "o2", "o2 Mobile M", 36
     )
-    # Eine ID, die das Segment schon traegt, bleibt unveraendert.
     heute = buendel_id("apple-iphone-14-128gb-mitternacht", "o2", "o2 Mobile M", 36)
     assert buendel_id_aktuell(heute, 36) == heute
-    # Eine fehlende Laufzeit am Altsatz wird benannt, nicht geraten.
     assert buendel_id_aktuell(alt, None).endswith("--" + LAUFZEIT_LUECKE)
-    # Und eine Form, die weder alt noch neu ist, wird NICHT erfunden.
     assert buendel_id_aktuell("o2--apple-iphone-14", 24) is None
     assert buendel_id_aktuell("", 24) is None
 
@@ -908,11 +836,6 @@ def test_keine_neue_id_kann_eine_listung_id_treffen():
     ]
     assert len(set(ids)) == len(ids)
     assert [len(i.split("--")) for i in ids] == [2, 2, 2, 5, 3]
-
-
-# --------------------------------------------------------------------------
-# Der Bestand - und dass er den bestehenden nicht anfasst
-# --------------------------------------------------------------------------
 
 
 def test_der_bestand_nimmt_buendel_und_referenzen_auf(tmp_path):
@@ -945,8 +868,6 @@ def test_der_scope_veraendert_und_loescht_keine_fremdanbieter(tmp_path):
     db.setze_referenzen([_referenz(), telekom], "2026-09-14")
     fremd_vorher = {r["id"]: r for r in db.referenzen()}[_referenz().id]
 
-    # Scoped-Ersetzung NUR mit dem Telekom-Satz in der Menge - die o2-
-    # Referenz fehlt, darf dadurch weder datiert noch entfernt werden.
     _, entfernt = db.ersetze_referenzen(
         [
             _referenz(
@@ -966,8 +887,6 @@ def test_der_scope_veraendert_und_loescht_keine_fremdanbieter(tmp_path):
     assert nachher[telekom.id]["last_verified"] == "2026-09-15"
     assert nachher[telekom.id]["tarif_sim_only_monatlich"] == 49.95
 
-    # Gegenprobe: OHNE Scope loescht dieselbe Menge den Fremden -
-    # genau deshalb gehoert der Scope in jeden Einzelanbieter-Lauf.
     _, entfernt_ohne = db.ersetze_referenzen([telekom], "2026-09-15")
     assert entfernt_ohne == 1
     assert _referenz().id not in {r["id"] for r in db.referenzen()}
@@ -1040,10 +959,6 @@ def test_nur_echte_buendel_kommen_in_den_bestand(tmp_path):
     with pytest.raises(TypeError):
         db.upsert_buendel([{"anbieter": "o2"}], "2026-09-03")
 
-
-# --------------------------------------------------------------------------
-# Migration: der bestehende Bestand bleibt unangetastet
-# --------------------------------------------------------------------------
 
 _ALTBESTAND = {
     "updated": "2026-09-03",
@@ -1138,7 +1053,6 @@ def test_die_neuen_datensaetze_lassen_listungen_und_historie_unberuehrt(tmp_path
     assert db_pfad.read_bytes() == vorher_db, "geraete_db.json angefasst"
     assert jsonl.read_bytes() == vorher_jsonl, "Preishistorie angefasst"
 
-    # Und die IDs beider Bestaende beruehren sich nicht.
     bestand = GeraeteDB(db_pfad)
     listungen = {e["id"] for e in bestand.eintraege()}
     neue = {e["id"] for e in tco.buendel()} | {e["id"] for e in tco.referenzen()}
@@ -1189,11 +1103,6 @@ def test_der_echte_bestand_behaelt_jede_id_und_jeden_betrag(tmp_path):
     assert original.read_bytes() == unberuehrt, "Schnappschuss angefasst"
 
 
-# --------------------------------------------------------------------------
-# Der Fremdschluessel (Phase 6, Abnahmekriterium 3)
-# --------------------------------------------------------------------------
-
-
 def test_ein_geraetepreis_ohne_tarif_id_kommt_nicht_in_den_bestand(tmp_path):
     """ "Kein Buendelpreis im Bestand ohne aufloesbaren tarif_id."
 
@@ -1205,8 +1114,6 @@ def test_ein_geraetepreis_ohne_tarif_id_kommt_nicht_in_den_bestand(tmp_path):
     db = TcoDB(tmp_path / "geraete_tco.json")
     with pytest.raises(ValueError, match="ohne aufloesbaren Tarif"):
         db.upsert_buendel([_buendel(tarif_id="")], "2026-09-04")
-    # Und die Gegenprobe: MIT Schluessel geht dasselbe Buendel durch.
-    # Ohne sie bewiese der Test nur, dass irgendetwas wirft.
     neu, _ = db.upsert_buendel([_buendel()], "2026-09-04")
     assert neu == 1
 

@@ -257,9 +257,6 @@ def test_der_kicker_bricht_auf_dem_telefon_nicht_um(telefon):
         f"der Kicker ist {box['kh']} px hoch bei {box['lh']} px Zeilenhöhe "
         "- er bricht um"
     )
-    # Das Datum endet rechtsbündig an derselben Kante wie der Kopf
-    # (Grid-Spalte, justify-self:end) - es steht UNTER der Schlagzeile,
-    # nicht mehr am Flex-Grund neben dem Text-Block.
     assert box["breite"] - box["drechts"] <= 2, (
         f"Datumszeile endet {box['breite'] - box['drechts']} px vor der "
         "rechten Kopf-Kante"

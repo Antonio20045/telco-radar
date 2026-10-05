@@ -117,9 +117,6 @@ _REQUIRED_HEADINGS = (
     "## muster",
     "## einordnung",
 )
-# Ab hier ist ein Absatz keine Prosa mehr, sondern eine Aufzaehlung mit
-# Semikolons. Gemessen ohne die Markdown-Links, sonst schlaegt schon ein
-# normaler Absatz mit drei Belegen an.
 _MAX_ABSATZ_ZEICHEN = 1200
 _FORBIDDEN_EDITORIAL_PHRASES = (
     "fuer vodafone",
@@ -170,12 +167,6 @@ def validate_briefing(markdown: str) -> None:
         raise DifferentiationBriefingError(
             "Differenzierungsbericht enthaelt eine Vodafone-Empfehlung"
         )
-    # Der Rueckfall in die Aufzaehlung ist der wahrscheinlichste Fehlgriff:
-    # das Modell bekommt 71 Beispiele geliefert und die alte Fassung hat sie
-    # brav alle in einen Absatz gehaengt (gemessen am Bericht vom 07.08.2026:
-    # 2 100 Zeichen in einem einzigen Absatz, zwoelf Moves mit Semikolon
-    # getrennt). Ein Absatz dieser Laenge ist auf der Seite kein Text mehr,
-    # sondern eine Wand - und genau der Zustand, den diese Gliederung ersetzt.
     zu_lang = [
         a
         for a in re.split(r"\n\s*\n", _without_links(markdown))
@@ -281,7 +272,6 @@ def build_digest(entries: list[dict], theme_labels: dict[str, str]) -> str:
             "## Einordnung\n\n"
         )
 
-    # Je Hebel: die Beispiele, die Anbieter, und ein Beleg je Anbieter.
     je_hebel: dict[str, list[dict]] = {}
     for e in ordered:
         je_hebel.setdefault(e.get("theme") or "", []).append(e)
@@ -331,7 +321,6 @@ def build_digest(entries: list[dict], theme_labels: dict[str, str]) -> str:
     for key, items in nach_groesse[:3]:
         anbieter = {n for e in items for n in _anbieter(e)}
         if len(anbieter) < 2:
-            # Ein Hebel, den nur ein Anbieter zieht, ist kein Muster.
             continue
         gefunden = True
         zeilen.append(
@@ -358,14 +347,10 @@ def build_digest(entries: list[dict], theme_labels: dict[str, str]) -> str:
     zeilen += ["## Einordnung", ""]
     for key, items in nach_groesse:
         if len(items) < 2:
-            # Ein einzelnes Beispiel steht als Karte, es braucht keinen
-            # Einordnungssatz, der es bloss wiederholt.
             continue
         anbieter = sorted({n for e in items for n in _anbieter(e)})
         genannt = anbieter[:4]
         if len(anbieter) > 4:
-            # Als eigenes Glied der Aufzaehlung, nicht angehaengt - sonst
-            # steht dort "A, B und C und 3 weiteren".
             genannt = genannt + [f"{len(anbieter) - 4} weiteren"]
         zeilen.append(f"### {label(key)}")
         zeilen.append("")

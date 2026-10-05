@@ -28,14 +28,7 @@ from telco_radar.tco_model import Buendel, SimOnlyReferenz
 
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 
-# Der Vorgabefall aus BRIEF_GRAPH1: dasselbe Modell, das die Hauptansicht
-# ohne Klick zeigt (`geraete_tco_karten.LEITFRAGE_MODELL`).
 VORGABE_MODELL = "apple-iphone-17-pro-256"
-
-
-# --------------------------------------------------------------------------
-# (a) Bandableitung aus echten tarife.jsonl-Datenvolumina
-# --------------------------------------------------------------------------
 
 
 @pytest.fixture(scope="module")
@@ -58,10 +51,10 @@ def test_drei_echte_tarifsaetze_treffen_ihre_stufe(tarife):
     ]
     index = band.tarif_baender(tarife, leiter)
     faelle = [
-        ("o2:o2-mobile-unlimited-m-flex", "xl"),  # unbegrenzt (Infinity)
-        ("vodafone:vodafone-mobil-xs", "xs"),  # 18 GB, ueber den Namen
-        ("vodafone:vodafone-mobil-m", "m"),  # 60 GB
-        ("o2:o2-mobile-l", "l"),  # 150 GB
+        ("o2:o2-mobile-unlimited-m-flex", "xl"),
+        ("vodafone:vodafone-mobil-xs", "xs"),
+        ("vodafone:vodafone-mobil-m", "m"),
+        ("o2:o2-mobile-l", "l"),
     ]
     assert [(t, index.get(t)) for t, _ in faelle] == faelle
 
@@ -73,11 +66,6 @@ def test_unbegrenzt_bleibt_ohne_band_solange_vodafone_xl_begrenzt_ist(tarife):
     index = band.tarif_baender(tarife, leiter)
     assert index.get("o2:o2-mobile-unlimited-m-flex") is None
     assert index.get("o2:o2-mobile-l") == "l"
-
-
-# --------------------------------------------------------------------------
-# (b)-(d) Modell x Band am echten Bestand
-# --------------------------------------------------------------------------
 
 
 @pytest.fixture(scope="module")
@@ -103,9 +91,6 @@ def bestand():
             quelle_url=satz.get("quelle_url", ""),
             abgerufen_am=satz.get("abgerufen_am", ""),
         )
-        # Dieselbe Anreicherung wie `geraete_tco_view.aufbereiten`: die
-        # Tarifbindung steht nicht in der Geraetenutzlast, sondern im
-        # Tarifbestand (A5.5).
         satz_tarif = tarife.get(b.tarif_id) or {}
         if satz_tarif.get("laufzeit_monate"):
             b.tarif_bindung_monate = int(satz_tarif["laufzeit_monate"])
@@ -155,11 +140,8 @@ def test_vorgabefall_zeigt_genau_die_anbieter_mit_echten_buendeln(bestand):
     for key, eintrag in je_band.items():
         linien_anbieter = {l["anbieter"] for l in eintrag["grafik"]["linien"]}
         fehlend_anbieter = {f["anbieter"] for f in eintrag["fehlend"]}
-        # Jeder erwartete Anbieter steht GENAU EINMAL: entweder als Linie
-        # oder als benannte Luecke, nie beides und nie keins von beiden.
         assert linien_anbieter | fehlend_anbieter == set(band.ERWARTETE_ANBIETER)
         assert not (linien_anbieter & fehlend_anbieter)
-        # Nur ECHTE Buendel zeichnen eine Linie - keine Naeherungskarte.
         for k in modell["karten"]:
             if k["anbieter"] in linien_anbieter and k.get("naeherung"):
                 assert False, "eine Naeherungskarte darf keine Linie tragen"
@@ -185,7 +167,6 @@ def test_telekom_congstar_und_11_stehen_als_benannte_luecke(bestand):
     for eintrag in baender:
         gezeichnet = set(je_band.get(eintrag["key"]) or {})
         namen = {f["anbieter"] for f in eintrag["fehlend"]}
-        # gezeichnet ODER benannt - niemand wird still weggelassen
         assert gezeichnet | namen >= set(band.ERWARTETE_ANBIETER), (
             f"Band {eintrag['key']}: {set(band.ERWARTETE_ANBIETER) - gezeichnet - namen} fehlt still"
         )
@@ -257,11 +238,6 @@ def test_leerzustand_modell_ohne_buendel_in_keinem_band(bestand, tarife):
     assert band.baender_fuer_modell(
         mit_band, bestand["band_je_tarif"], leiter=bestand["leiter"]
     ), "Gegenprobe: die All-Net-Flat S (10 GB) muss Stufe XS gebaeren"
-
-
-# --------------------------------------------------------------------------
-# (c) Kein TCO-36 im gerenderten Artefakt
-# --------------------------------------------------------------------------
 
 
 def test_kein_tco36_in_keinem_bandgraphen(bestand):

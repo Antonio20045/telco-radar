@@ -40,8 +40,6 @@ log = logging.getLogger(__name__)
 
 JA, NEIN, OFFEN = "ja", "nein", "offen"
 
-# Ab wie vielen verschiedenen Wettbewerbern ein unbesetzter Hebel ein weisser
-# Fleck ist. Einer ist ein Einzelfall, zwei sind eine Bewegung.
 MIND_WETTBEWERBER = 2
 
 
@@ -53,7 +51,6 @@ class EigeneHebel:
 
     def zustand(self, key: str) -> str:
         eintrag = self.hebel.get(key) or {}
-        # Ohne Datum keine Aussage - egal, was dasteht.
         if not (eintrag.get("stand") or "").strip():
             return OFFEN
         wert = str(eintrag.get("wir_haben") or OFFEN).strip().lower()
@@ -131,15 +128,12 @@ def bauen(
             "stand": eigene.stand(key),
         }
         vergleich.append(zeile)
-        # Ein weisser Fleck ist ein gepflegtes "nein" gegen mehrere
-        # Wettbewerber - nie ein "offen".
         if zustand == NEIN and n_wettbewerber >= MIND_WETTBEWERBER:
             flecken.append(zeile)
 
     flecken.sort(key=lambda z: (-z["n_wettbewerber"], z["label"]))
     vergleich.sort(key=lambda z: (-z["n_wettbewerber"], z["label"]))
 
-    # Der Direktvergleich: was der genannte Wettbewerber je Hebel hat.
     gegner = eigene.direktvergleich
     gegner_hebel = []
     if gegner:
@@ -175,7 +169,5 @@ def bauen(
         "gegner_hebel": gegner_hebel,
         "n_erfasst": eigene.erfasst,
         "n_hebel": len(eigene.hebel),
-        # Solange nichts erfasst ist, sagt die Seite das - statt zwoelf
-        # weisse Flecken zu behaupten, die niemand geprueft hat.
         "unvollstaendig": eigene.erfasst < len(eigene.hebel),
     }

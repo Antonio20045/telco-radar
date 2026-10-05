@@ -42,11 +42,6 @@ def _antwort(titel: list[str]) -> str:
 def test_gescheiterter_stapel_meldet_seine_meldungen_als_ungelesen(monkeypatch):
     def fake_complete(system, user, model, max_tokens, ausweich=""):
         rows = json.loads(user.split("\n", 1)[1])
-        # Der mittlere Stapel scheitert - genau der Fall aus Lauf #67.
-        # Die Nummer wird aus BATCH_SIZE GERECHNET: als Literal "15" zeigte
-        # sie nach der Erhoehung auf 24 (27.08.2026) auf die Mitte des
-        # ERSTEN Stapels, und der Test prueft dann etwas anderes, als er
-        # behauptet.
         if rows[0]["title"] == f"Meldung {agents.BATCH_SIZE}":
             raise RuntimeError("provider overloaded")
         return _antwort([r["title"] for r in rows])
@@ -56,7 +51,6 @@ def test_gescheiterter_stapel_meldet_seine_meldungen_als_ungelesen(monkeypatch):
     res = agents.analyze_region("KI-Anbieter", items, model="m", is_theme=True)
 
     ungelesen = set(res["_ungelesen"])
-    # Genau die Meldungen des gescheiterten Stapels, keine anderen.
     assert len(ungelesen) == agents.BATCH_SIZE
     mittlere = {i.id for i in items[agents.BATCH_SIZE : 2 * agents.BATCH_SIZE]}
     assert ungelesen == mittlere
@@ -84,12 +78,10 @@ def test_pipeline_haelt_ungelesene_meldungen_aus_dem_seen_store(tmp_path):
     ungelesen = {i.id for i in alle[15:30]}
     store = SeenStore(tmp_path / "seen.jsonl")
 
-    # Genau die Zeile aus pipeline.py, die den Schutz umsetzt.
     zu_merken = [i for i in alle if i.region not in set() and i.id not in ungelesen]
     store.add(zu_merken)
 
     assert len(store) == 30
     wieder = SeenStore(tmp_path / "seen.jsonl")
-    # Der naechste Lauf bietet die ungelesenen Meldungen erneut an ...
     neu = wieder.filter_new(alle)
     assert {i.id for i in neu} == ungelesen

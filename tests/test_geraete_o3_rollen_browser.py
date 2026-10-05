@@ -37,13 +37,6 @@ from test_geraete_browser_fixture import (
 )
 from test_geraete_zeitreihe_browser import waehle_band, waehle_modell
 
-# DREI Modelle mit eigenen Bündeln — je Modell eine andere Anbietermenge,
-# damit der Test misst, dass die Zeilen MITGEWECHSELT werden (S3), nicht
-# nur sichtbar bleiben:
-#   apple-iphone-17-pro 256 (VORGABE): o2 klein, Vodafone klein (Referenz),
-#       congstar mittel, o2 unbegrenzt (ohne Band)
-#   samsung-galaxy-s26 256:            1&1 klein
-#   google-pixel-11 256:               congstar klein, o2 mittel
 _BUENDEL = [
     ("apple-iphone-17-pro", 256, "o2", "o2:klein", "O2 Mobile Klein", 10, 18.0),
     ("apple-iphone-17-pro", 256, "Vodafone", "vf:klein", "Vodafone Mobil XS", 18, 26.0),
@@ -196,11 +189,6 @@ def _zeilen_anbieter(s):
     )
 
 
-# --------------------------------------------------------------------------
-# A (S3): Modellwechsel zeigt EIGENE Zeilen
-# --------------------------------------------------------------------------
-
-
 def test_rueckwechsel_nach_deep_link_zeigt_die_vorgabezeilen(seite):
     """S2 (O3-Evaluation): der Vorgabe-Klon wurde bislang erst IM Vorgabe-
     Durchlauf von `setzeBuendel` gezogen - bei einem Deep-Link auf ein
@@ -218,10 +206,6 @@ def test_rueckwechsel_nach_deep_link_zeigt_die_vorgabezeilen(seite):
     assert len(ursprung) == 4, (
         f"die Vorgabe-Fixture trägt 4 Zeilen, nicht {len(ursprung)}"
     )
-    # Der Deep-Link, wie ihn jeder Radar-Querlink setzt. Die URL wird NEU
-    # gebaut: seit E2 schreibt die Seite ihren Zustand als ?modell=&band=
-    # zurück, und ein Anhängen hinter die bestehende Query ließe den
-    # ERSTEN modell-Parameter gewinnen.
     seite.goto(
         seite.url.split("?")[0] + "?modell=samsung-galaxy-s26-256",
         wait_until="networkidle",
@@ -231,7 +215,6 @@ def test_rueckwechsel_nach_deep_link_zeigt_die_vorgabezeilen(seite):
         "#gr-buendel .gr-bnd", "e => e.map(z => z.dataset.gesamt)"
     )
     assert len(fremd) == 1, f"Deep-Link zeigt nicht das Fremdmodell: {fremd}"
-    # Rückkehr zum Vorgabegerät - der eine Schritt, der den Klon brauchte:
     waehle_modell(seite, "apple-iphone-17-pro-256")
     seite.wait_for_timeout(300)
     danach = seite.eval_on_selector_all(
@@ -252,9 +235,6 @@ def test_der_modellwechsel_zeigt_die_eigenen_zeilen(seite, mid, erwartet):
     assert seite.eval_on_selector("#gr-buendel", "e => !e.hidden")
     anbieter = set(_zeilen_anbieter(seite))
     assert anbieter == erwartet, f"{mid}: {sorted(anbieter)} statt {sorted(erwartet)}"
-    # Der Tabellentitel nennt das GEWÄHLTE Gerät (die Fixture kennt die
-    # Katalogeinträge nicht - der Titel trägt dann die device-id, die
-    # enthält den Modell-Slug immer).
     titel = seite.eval_on_selector("#gr-bnd-titel", "e => e.textContent")
     assert mid.split("-256")[0].replace("-", " ") in " ".join(titel.lower().split()), (
         titel
@@ -283,8 +263,6 @@ def test_der_deep_link_oeffnet_das_angegebene_modell(ctx):
             wait_until="networkidle",
         )
         s.wait_for_timeout(300)
-        # E2: der Wert steht nicht mehr in einem <select>, sondern im
-        # Zeitreihen-Knoten UND in der URL (Deep-Link wird zurueckgeschrieben).
         assert "modell=google-pixel-11-256" in s.url
         antwort = s.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.textContent")
         assert "Pixel 11" in antwort, antwort
@@ -314,9 +292,6 @@ def test_der_querlink_des_radars_deep_linket(ctx):
         s.wait_for_timeout(300)
         gewollt = ziel.split("modell=", 1)[1].split("&", 1)[0]
         assert f"modell={gewollt}" in s.url
-        # Der Antwort-Satz nennt das Geraet OHNE Hersteller-Praefix und
-        # GB-Zahl ("iPhone 17 Pro") - die starke Aussage ist ohnehin die
-        # Zeilenmenge: die Tabelle zeigt das GERAET des Links.
         assert set(_zeilen_anbieter(s)) == _ERWARTET[gewollt], (
             gewollt,
             sorted(_zeilen_anbieter(s)),
@@ -325,18 +300,12 @@ def test_der_querlink_des_radars_deep_linket(ctx):
         s.close()
 
 
-# --------------------------------------------------------------------------
-# C: sortierbare Bündeltabelle
-# --------------------------------------------------------------------------
-
-
 def test_die_sortierung_ordnet_ohne_reload(seite):
     """C: TCO-24 (Server-Default, bleibt), Δ und Anbieter sortierbar per
     Kopfknopf — ohne Reload. Ein gesetztes window-Flag überlebt nur ohne
     Navigation. Gemessen wird die BANDLISTE (`#gr-bndliste`): die
     Ohne-Band-Gruppe darunter ist eine eigene Liste mit eigenem Kopf."""
     seite.evaluate("window.__o3_kein_reload = 1")
-    # Voraussetzung: mehr als eine sichtbare Zeile, Default nach TCO-24
     werte = seite.eval_on_selector_all(
         "#gr-bndliste .gr-bnd:not([hidden])",
         "e => e.map(z => parseFloat(z.dataset.gesamt))",
@@ -349,9 +318,6 @@ def test_die_sortierung_ordnet_ohne_reload(seite):
     namen = seite.eval_on_selector_all(
         "#gr-bndliste .gr-bnd:not([hidden])", "e => e.map(z => z.dataset.anbieter)"
     )
-    # localeCompare('de') im Browser - alphabetisch, nicht nach Codepoint
-    # (sonst stünde 'Vodafone' vor 'congstar'; Python sorted() misst das
-    # anders als der Leser liest).
     assert namen == sorted(namen, key=str.lower), (
         f"Anbieter-Sortierung greift nicht: {namen}"
     )
@@ -380,13 +346,7 @@ def test_die_delta_sortierung_stellt_den_guenstigsten_nach_vorn(seite):
     zahlwerte = [d for d in deltas if d is not None]
     assert zahlwerte, "keine Zeile mit Δ in der Fixture"
     assert zahlwerte == sorted(zahlwerte), deltas
-    # Die Zeilen OHNE Δ stehen am Ende, nicht in der Mitte.
     assert deltas[len(zahlwerte) :] == [None] * (len(deltas) - len(zahlwerte)), deltas
-
-
-# --------------------------------------------------------------------------
-# B: Reiter, Verlauf, Falz, Querscroll
-# --------------------------------------------------------------------------
 
 
 def test_der_verlaufs_reiter_ist_erreichbar(seite):
@@ -475,7 +435,6 @@ def test_die_frage_der_uebersicht_steht_am_telefon_in_hoechstens_zwei_zeilen(ctx
                   zahl: parseFloat(getComputedStyle(z).fontSize)};
         }""")
         assert m is not None, "Frage oder Leitzahl fehlt"
-        # Gegenprobe: die Zeilenhöhe ist gemessen, nicht 'normal' (NaN).
         assert m["zeile"] > 0, m
         assert m["hoehe"] <= 2 * m["zeile"] + 2, m
         assert m["zahl"] > m["frage"], m
@@ -537,7 +496,6 @@ def test_die_balkenwerte_links_laufen_nicht_in_die_modellnamen(ctx):
             svg,
         )
         assert ueber, "keine Grafik auf der Seite"
-        # Gegenprobe: die Werte sind wirklich gesetzt und sichtbar breit.
         assert all(z["breit"] > 20 for z in ueber), ueber
         for z in ueber:
             assert z["wert"] >= z["name"], ueber
@@ -569,7 +527,6 @@ def test_jede_buendelzeile_traegt_genau_ein_aufklappzeichen(ctx, breite):
                     chev: chev ? getComputedStyle(chev).display : 'none'};
           })"""
         m = s.evaluate(lies)
-        # Gegenprobe: es gibt sichtbare Bündelzeilen.
         assert m, "keine sichtbare Bündelzeile"
         for z in m:
             assert z["inhalt"] == '"+"', z
@@ -616,8 +573,6 @@ def test_der_zweite_preis_der_buendelzeile_ist_am_telefon_benannt(ctx, breite):
         quer = s.evaluate("document.documentElement.scrollWidth")
         assert quer <= breite, f"die Seite rollt waagerecht: {quer} px"
         zahlen = [z for z in m if z["text"].endswith("€")]
-        # Gegenprobe: es gibt Barpreis-Zeilen (die Finanzierungs-Variante
-        # hält test_geraete_tco_terminologie am Markup fest).
         assert zahlen, m
         for z in m:
             assert z["ueber"] <= 1, z
@@ -679,8 +634,6 @@ def test_der_katalog_steht_am_telefon_als_karten(ctx):
         for z in (z for z in m["zeilen"] if z["an"]):
             assert all(d == "none" for d in z["bar"]), z
             assert all(d == "block" for d in z["tco"]), z
-        # Die Leitzahl der Kostenansicht trägt ihren Spaltennamen - ohne
-        # Kopf läse sich „ab 1.459 €" wie der Einzelgerätpreis.
         etikett = s.evaluate("""() => getComputedStyle(document.querySelector(
           '#gr-katalogtabelle tr.gr-a-zeile td.gr-sp--tco'), '::before').content""")
         kopf = s.evaluate("""() => document.querySelector(
@@ -745,7 +698,6 @@ def test_aufgeklappte_katalogkarte_rollt_in_sich_und_ziel_ist_markiert(ctx):
         s.goto(f"{wurzel}/geraete.html#tafel-katalog", wait_until="load")
         s.click(".gr-reiter [data-tafel=tafel-katalog]")
         s.wait_for_timeout(300)
-        # Enter statt Klick: die Mitte der Karte kann ein Link sein.
         s.focus("#gr-katalogtabelle tbody tr.gr-a-zeile:not(.gr-k--ohne-details)")
         s.keyboard.press("Enter")
         s.wait_for_timeout(200)
@@ -760,11 +712,9 @@ def test_aufgeklappte_katalogkarte_rollt_in_sich_und_ziel_ist_markiert(ctx):
                   seite: document.documentElement.scrollWidth};
         }""")
         assert m["auf"] != "none", m
-        assert m["liste"] > m["box"], m  # Gegenprobe: es gibt etwas zu rollen
+        assert m["liste"] > m["box"], m
         assert m["tabelle"] <= m["box"] + 1, m
         assert m["seite"] <= 390, m
-        # Luft über dem Modellnamen: sonst klebt er an der Linie der
-        # vorigen Karte (eine spezifischere padding-Regel schluckte sie).
         oben = s.evaluate("""() => parseFloat(getComputedStyle(document.querySelector(
           '#gr-katalogtabelle tr.gr-a-zeile > td')).paddingTop)""")
         assert oben >= 8, oben
@@ -778,7 +728,6 @@ def test_aufgeklappte_katalogkarte_rollt_in_sich_und_ziel_ist_markiert(ctx):
                   abstand: text - td.getBoundingClientRect().left};
         }""")
         assert ziel["vorher"] == "none" and ziel["nachher"] != "none", ziel
-        # Der 3-px-Balken darf den Text nicht überdecken.
         assert ziel["abstand"] >= 6, ziel
     finally:
         s.close()
@@ -815,10 +764,6 @@ def test_details_ueber_der_falz_bleibt_es_hoechstens_einer(ctx):
         try:
             s.goto(f"{wurzel}/geraete.html", wait_until="load")
             s.wait_for_timeout(400)
-            # Buendelzeilen (`details.gr-bnd`) sind Tabellenzeilen, keine
-            # Aufklapper: seit die Kopfzeilen kuerzer sind (28.09.2026),
-            # rueckt die erste Zeile der Buendeltafel an 1440 px in die
-            # Falz. Gezaehlt werden die Aufklapper fuer Erklaerung/Datenlage.
             zahl = s.evaluate(
                 "[...document.querySelectorAll('details:not(.gr-bnd)')]"
                 ".filter(d => { const r = d.getBoundingClientRect();"

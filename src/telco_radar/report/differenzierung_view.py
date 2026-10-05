@@ -74,37 +74,16 @@ from ..models import normalize_url
 from ..textwerkzeug import ohne_vodafone_rat
 from .differentiation import DIFF_THEMES
 
-# Wie lange ein Eintrag als "neu" gilt, gerechnet ab dem Stand der Ausgabe.
-# Zehn Tage, weil die Pipeline zweimal die Woche laeuft: ein Fund bleibt so
-# ueber mindestens zwei Ausgaben sichtbar und verschwindet nicht, bevor ihn
-# jemand gesehen hat.
 NEU_TAGE = 10
-# Wie viele Karten oben stehen. Drei, seit sie ein Bild tragen und in voller
-# Breite stehen - sechs Bildkarten waeren wieder eine Kachelwand, nur bunter.
 MAX_NEU = 3
-# Die Gewichtung innerhalb eines Hebels: ein Aufmacher, dann GENAU EINE Reihe
-# Karten, dann Zeilen. Drei Karten sind bei 1440 px diese eine Reihe. Mit
-# fuenf war die Seite 15 100 px hoch - Bilder machen eine Karte dreimal so
-# hoch wie das Textkaertchen von vorher, also muessen es weniger Karten
-# werden, nicht gleich viele mit Bild.
 KARTEN_JE_HEBEL = 3
-# Was am Stueck sichtbar bleibt, bevor der Rest in den Aufklapper geht. Der
-# groesste Hebel hatte am 08.08.2026 17 Beispiele - als 17 Kaertchen war er
-# allein zwei Bildschirme hoch.
 ZEILEN_OFFEN = 5
 
-# Was ein Hebel ueberhaupt bedeutet, in einem Satz. Quelle ist bewusst
-# `DIFF_THEMES` (report/differentiation.py) - dort steht schon die Farbe des
-# Hebels, und eine Erklaerung, die an einem zweiten Ort gepflegt wird, sagt
-# nach dem dritten Hebel etwas anderes als die Klassifikation.
 HEBEL_ERKLAERUNG = {
     t["key"]: " ".join(str(t.get("blurb") or "").split()) for t in DIFF_THEMES
 }
 
 
-# Woerter, nach denen ein Punkt KEIN Satzende ist. Ohne diese Liste endete
-# "AT&T Guarantee: Gutschriften bei Ausfaellen, auf rund 50 Mio. Kunden
-# ausgeweitet." nach "50 Mio." - drei von 51 Bestandssaetzen traf das.
 _ABKUERZUNGEN = {
     "Mio",
     "Mrd",
@@ -151,8 +130,6 @@ def erster_satz(text: str) -> str:
     for treffer in _MOEGLICHES_SATZENDE.finditer(text):
         wort = _LETZTES_WORT.search(text[: treffer.start()])
         wort = wort.group(0) if wort else ""
-        # Einzelbuchstaben und Versalien sind Initialen oder Kuerzel
-        # ("z.B.", "U.S."), kein Satzende.
         if len(wort) < 2 or wort.isupper() or wort in _ABKUERZUNGEN:
             continue
         return text[: treffer.end()]
@@ -188,14 +165,11 @@ def _aus_store(e: dict) -> dict:
         "operator": _text(e.get("operator")),
         "region": _text(e.get("region")),
         "what": erster_satz(e.get("summary")) or _text(e.get("title")),
-        # Erst den Rat streichen, dann kuerzen: steht der Ratschlag im
-        # ERSTEN Satz, nimmt die umgekehrte Reihenfolge den Befund mit.
         "why": erster_satz(ohne_vodafone_rat(e.get("why_it_matters"))),
         "url": e.get("url") or "",
         "source": _domain(e.get("url")) or _text(e.get("source")),
         "date": e.get("date") or "",
         "first_seen": e.get("first_seen") or "",
-        # Der Presse-Zweig verifiziert nicht nach; der Fund IST die Pruefung.
         "last_verified": e.get("first_seen") or "",
         "herkunft": "presse",
     }
@@ -250,9 +224,6 @@ def kachelwort(e: dict) -> str:
     name = _text(e.get("operator"))
     if not name:
         return _text(e.get("source")) or "Beispiel"
-    # Mehrfach-Absender ("Deutsche Telekom, e&, Singtel Group, SK Telecom,
-    # SoftBank") sind auf einer Kachel nicht lesbar - dann steht dort der
-    # erste und die Zahl der uebrigen.
     teile = [t.strip() for t in name.split(",") if t.strip()]
     if len(teile) > 1:
         return f"{teile[0]} +{len(teile) - 1}"
@@ -363,8 +334,6 @@ def _gewichten(eintraege: list[dict], schon_oben: set | None = None) -> dict:
         None,
     )
     rest = [e for e in eintraege if e is not lead]
-    # Ohne Aufmacher ruecken die Karten eine Reihe hoch: der Abschnitt hat
-    # dann sechs statt fuenf Karten, nicht eine Luecke.
     deckel = KARTEN_JE_HEBEL if lead else KARTEN_JE_HEBEL + 1
     karten = rest[:deckel]
     zeilen = rest[deckel:]
@@ -419,8 +388,6 @@ def aufbereiten(
         e["kachelwort"] = kachelwort(e)
 
     label_map = dict(themes)
-    # Erst die Etiketten, dann die Radar-Karten, dann die Gewichtung: die
-    # Gewichtung eines Hebels muss wissen, was oben schon gross steht.
     for e in bestand:
         key = e.get("theme")
         e["hebel_label"] = label_map.get(key, "")
@@ -431,8 +398,6 @@ def aufbereiten(
     ]
     rueckfall = not neu
     if rueckfall:
-        # Eine ruhige Woche darf die Seite nicht enthaupten. Dann stehen oben
-        # die zuletzt nachgeprueften Beispiele - und die Ueberschrift sagt es.
         neu = sorted(
             bestand,
             key=lambda e: (e.get("last_verified") or "", e.get("first_seen") or ""),
@@ -448,8 +413,6 @@ def aufbereiten(
             reverse=True,
         )
         if not eintraege:
-            # Ein Hebel ohne Beispiel steht nicht auf der Seite. "Noch keine
-            # bestaetigten Beispiele" war zwoelfmal derselbe leere Kasten.
             continue
         hebel.append(
             {
