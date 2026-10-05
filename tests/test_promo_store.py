@@ -3,7 +3,7 @@
 Offline: kein Netz/LLM noetig.
 """
 
-from telco_radar.analyze.promo_store import PromoDB, SnapshotStore, entry_id
+from telco_radar.analyze.promo_store import PromoDB, SnapshotStore
 
 
 def _item(
@@ -25,6 +25,11 @@ def _item(
     }
 
 
+def _eintrag(db, headline):
+    (treffer,) = [e for e in db.entries.values() if e["headline"] == headline]
+    return treffer
+
+
 def test_snapshot_store_change_detection(tmp_path):
     store = SnapshotStore(tmp_path / "snap.json")
     assert store.changed("congstar", "hash1") is True
@@ -39,7 +44,7 @@ def test_promo_db_upsert_and_dedup(tmp_path):
     db = PromoDB(tmp_path / "db.json")
     n, ids, _ = db.upsert([_item(), _item()], "2026-07-25")
     assert n == 1 and len(db) == 1
-    assert ids == {entry_id("congstar", "10 GB Bonus")}
+    assert ids == {_eintrag(db, "10 GB Bonus")["id"]}
 
 
 def test_promo_db_reverify_keeps_first_seen(tmp_path):
@@ -87,12 +92,14 @@ def test_upsert_does_not_merge_similar_but_distinct_offers(tmp_path):
     nicht ineinanderfallen, nur weil die Umformulierungs-Erkennung sonst zu
     grosszuegig waere."""
     db = PromoDB(tmp_path / "db.json")
-    db.upsert([_item(headline="10 GB Bonus")], "2026-07-27")
-    n, ids, _ = db.upsert([_item(headline="20 GB Bonus")], "2026-07-28")
+    zehn = _item(headline="10 GB Bonus", description="10 GB Bonus")
+    zwanzig = _item(headline="20 GB Bonus", description="20 GB Bonus")
+    db.upsert([zehn], "2026-07-27")
+    n, ids, _ = db.upsert([zwanzig], "2026-07-28")
     assert n == 1
     assert len(db) == 2
     assert len(ids) == 1
-    assert ids == {entry_id("congstar", "20 GB Bonus")}
+    assert ids == {_eintrag(db, "20 GB Bonus")["id"]}
 
 
 def test_mark_stale_flags_but_does_not_delete(tmp_path):
@@ -102,7 +109,7 @@ def test_mark_stale_flags_but_does_not_delete(tmp_path):
     db.upsert(
         [_item(headline="Alte Aktion"), _item(headline="Neue Aktion")], "2026-07-25"
     )
-    still_running = {entry_id("congstar", "Neue Aktion")}
+    still_running = {_eintrag(db, "Neue Aktion")["id"]}
     db.mark_stale("congstar", still_running, "2026-08-01")
     by_headline = {e["headline"]: e for e in db.entries.values()}
     assert by_headline["Alte Aktion"]["status"] == "evtl. ausgelaufen"
@@ -118,11 +125,9 @@ def test_mark_stale_needs_two_consecutive_misses_before_retiring(tmp_path):
     db = PromoDB(tmp_path / "db.json")
     db.upsert([_item(headline="Alte Aktion")], "2026-07-25")
     db.mark_stale("congstar", set(), "2026-08-01")
-    assert (
-        db.entries[entry_id("congstar", "Alte Aktion")]["status"] == "evtl. ausgelaufen"
-    )
+    assert _eintrag(db, "Alte Aktion")["status"] == "evtl. ausgelaufen"
     db.mark_stale("congstar", set(), "2026-08-08")
-    entry = db.entries[entry_id("congstar", "Alte Aktion")]
+    entry = _eintrag(db, "Alte Aktion")
     assert entry["status"] == "ausgelaufen"
     assert entry["missed_checks"] == 2
     assert len(db) == 1
@@ -135,13 +140,13 @@ def test_reconfirmation_resets_missed_checks(tmp_path):
     db = PromoDB(tmp_path / "db.json")
     db.upsert([_item(headline="Aktion")], "2026-07-25")
     db.mark_stale("congstar", set(), "2026-08-01")
-    assert db.entries[entry_id("congstar", "Aktion")]["status"] == "evtl. ausgelaufen"
+    assert _eintrag(db, "Aktion")["status"] == "evtl. ausgelaufen"
     db.upsert([_item(headline="Aktion")], "2026-08-08")
-    entry = db.entries[entry_id("congstar", "Aktion")]
+    entry = _eintrag(db, "Aktion")
     assert entry["status"] == "aktiv"
     assert entry["missed_checks"] == 0
     db.mark_stale("congstar", set(), "2026-08-15")
-    assert db.entries[entry_id("congstar", "Aktion")]["status"] == "evtl. ausgelaufen"
+    assert _eintrag(db, "Aktion")["status"] == "evtl. ausgelaufen"
 
 
 def test_by_brand_groups(tmp_path):
@@ -180,15 +185,9 @@ def test_upsert_updates_image_url_on_reverify_but_keeps_old_if_missing(tmp_path)
     assert entry["image_url"] == "https://example.test/second.jpg"
 
 
-def test_upsert_updates_url_on_reverify_but_keeps_old_if_missing(tmp_path):
-    """The actual bug behind claude/promo-tiefenlinks-konzept.md Premortem e:
-    without this, a fixed brand-overview URL set on first sighting would
-    live forever, even once better deep links start being extracted."""
+def test_upsert_ohne_url_leert_keinen_gespeicherten_link(tmp_path):
     db = PromoDB(tmp_path / "db.json")
     db.upsert([_item(url="https://example.test/deep-link-1")], "2026-07-04")
     db.upsert([_item(url="")], "2026-07-25")
-    entry = list(db.entries.values())[0]
-    assert entry["url"] == "https://example.test/deep-link-1"
-    db.upsert([_item(url="https://example.test/deep-link-2")], "2026-08-01")
-    entry = list(db.entries.values())[0]
-    assert entry["url"] == "https://example.test/deep-link-2"
+    links = [e["url"] for e in db.entries.values()]
+    assert "https://example.test/deep-link-1" in links

@@ -29,7 +29,7 @@
       "Laufnummer: 1, ab 2 nur für gleichzeitig gelesene Angebote mit gleichem Schlüssel"
     ],
     "id": "sha1 der vier Teile, 16 Hexzeichen; die ID entsteht einmal beim Anlegen und bleibt, auch wenn ein bestätigter Eintrag später eine andere description bekommt",
-    "abgleich": "upsert sucht zuerst den Eintrag mit gleichem Schlüssel, danach wie bisher _same_offer, aber nur unter Einträgen derselben Marke und Zielseite; ein Eintrag wird je Aufruf höchstens einmal bestätigt, ein zweites Angebot desselben Aufrufs mit gleichem Schlüssel bekommt die nächste Laufnummer",
+    "abgleich": "upsert sucht zuerst den Eintrag mit gleichem Schlüssel, danach wie bisher _same_offer, aber nur unter Einträgen derselben Marke und Zielseite; ein Eintrag wird je Aufruf höchstens einmal bestätigt, ein zweites Angebot desselben Aufrufs mit gleichem Schlüssel und anderer Überschrift bekommt die nächste Laufnummer; dieselbe Überschrift zweimal im selben Aufruf ist ein Angebot",
     "gemessen": "outputs/auftraege/T1-entwurf.md"
   },
   "gruppen": [
