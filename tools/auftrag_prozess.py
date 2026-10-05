@@ -25,12 +25,17 @@ def starten(
     """Führt ``befehl`` aus; danach endet jeder Prozess seiner Gruppe.
 
     Ein Hintergrundprozess, der in der Gruppe bleibt, kann so nach dem Ende nichts
-    mehr ändern. Bei ``frist`` wirft der Aufruf ``subprocess.TimeoutExpired``.
+    mehr ändern. Python schreibt keinen Bytecode in den Baum; gitignorierter Bytecode
+    fiele sonst aus dem Zaun. Bei ``frist`` wirft der Aufruf
+    ``subprocess.TimeoutExpired``.
     """
+    umgebung = (ohne_git() if umgebung is None else umgebung) | {
+        "PYTHONDONTWRITEBYTECODE": "1"
+    }
     with subprocess.Popen(
         befehl,
         cwd=ort,
-        env=ohne_git() if umgebung is None else umgebung,
+        env=umgebung,
         stdin=subprocess.DEVNULL if eingabe is None else subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,

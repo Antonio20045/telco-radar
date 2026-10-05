@@ -30,6 +30,7 @@ pruefer_ = importlib.import_module("auftrag_pruefer")
 rolle_ = importlib.import_module("claude_rolle")
 git_ = importlib.import_module("auftrag_git")
 prozess_ = importlib.import_module("auftrag_prozess")
+zaun_ = importlib.import_module("auftrag_zaun")
 mutation_ = importlib.import_module("mutation")
 AUFTRAEGE, KOSTEN, GEMERGT = format_.AUFTRAEGE, format_.KOSTEN, format_.GEMERGT
 
@@ -76,6 +77,7 @@ class Lauf:
     agent: list[str]
     zeilen: list[dict[str, object]] = field(default_factory=list)
     start: str = ""
+    zaun: dict[str, str] = field(default_factory=dict)
 
     @property
     def wt(self) -> Path:
@@ -195,6 +197,8 @@ def _ausserhalb(lauf: Lauf, rolle: str) -> str:
     fremd = [p for p in alt + neu if rolle_.verstoss(ziel, lauf.wt, Path(p), p in neu)]
     if git_.kopf(lauf.wt) != (f"refs/heads/{ZWEIG}{lauf.auftrag['id']}", lauf.start):
         fremd.append("HEAD (eigener Commit oder Zweig)")
+    if zaun := zaun_.verletzt(lauf.zaun, zaun_.stand(lauf.wt, lauf.wurzel)):
+        return f"Zaun verletzt, Hauptbaum prüfen: {', '.join(zaun)}"
     return f"Rolle {rolle} darf nicht ändern: {', '.join(sorted(fremd))}" * bool(fremd)
 
 
@@ -260,7 +264,7 @@ def _urteil(lauf: Lauf, runde: int, code: int, summe: dict[str, str]) -> str:
     code, ausgabe = _leiter(lauf.wurzel, lauf.wt, "schnell")
     if code != GRUEN:
         return f"schnelle Leiter rot (Exit {code})\n{_tail(ausgabe)}"
-    if befund := _pruefer(lauf, runde):
+    if befund := _pruefer(lauf, runde) or _ausserhalb(lauf, "bau"):
         return befund
     nachricht = lauf.datei(LAUFDATEIEN["TELCO_COMMIT_NACHRICHT"])
     rot = lauf.datei(ROT_BELEG)
@@ -341,6 +345,7 @@ def _ablauf(lauf: Lauf) -> tuple[Ende, list[str]]:
     code, ausgabe = _ausfuehren(["make", "venv"], lauf.wt)
     if code:
         return Ende.VORAUSSETZUNG, [f"make venv: Exit {code}\n{_tail(ausgabe)}"]
+    lauf.zaun = zaun_.stand(lauf.wt, lauf.wurzel)
     if befund := _testphase(lauf):
         return Ende.NOTIZ, [befund]
     ende, befunde = _bauphase(lauf)

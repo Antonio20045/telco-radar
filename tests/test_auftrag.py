@@ -161,6 +161,17 @@ else:
         vorlage = (Path(__file__).parent / modus).read_text()
         Path(vorlagen[modus]).write_text(vorlage)
         Path(vorlagen[modus]).chmod(0o755)
+    gemeinsam = Path(os.environ["TELCO_AUFTRAG"]).parents[2]
+    if modus == "zaun_pyc":
+        Path("scripts/__pycache__").mkdir(exist_ok=True)
+        Path("scripts/__pycache__/pruefleiter.cpython-311.pyc").write_bytes(b"x")
+    if modus == "zaun_config":
+        subprocess.run(["git", "config", "--local", "zaun.probe", "1"], check=True)
+    if modus == "zaun_hook":
+        (gemeinsam / "hooks/post-merge").write_text("#!/bin/sh\\n")
+    if modus == "zaun_venv":
+        python = gemeinsam.parent / ".venv/bin/python"
+        python.write_text(python.read_text() + "# vom Bauagenten\\n")
     if modus == "kind":
         leer = subprocess.DEVNULL
         kind = subprocess.Popen(["sleep", "600"], stdout=leer, stderr=leer, stdin=leer)
@@ -860,3 +871,22 @@ def test_kindprozesse_des_agenten_enden_mit_ihm(repo):
         return
     os.kill(pid, 9)
     raise AssertionError(f"Kindprozess {pid} lebt nach dem Auftrag weiter")
+
+
+@pytest.mark.parametrize(
+    ("modus", "pfad"),
+    [
+        ("zaun_pyc", "wt:scripts/__pycache__/pruefleiter.cpython-311.pyc"),
+        ("zaun_config", "git:config"),
+        ("zaun_hook", "git:hooks/post-merge"),
+        ("zaun_venv", "haupt:.venv/bin/python"),
+    ],
+)
+def test_schreiben_ausserhalb_des_zauns_ist_eine_rote_runde(repo, modus, pfad):
+    vorher = _git(repo, "rev-parse", "main")
+
+    assert _starte(repo, modus) == auftrag.Ende.NOTIZ
+
+    notiz = (repo / auftrag.AUFTRAEGE / "A1-notiz.md").read_text()
+    assert f"Zaun verletzt, Hauptbaum prüfen: {pfad}" in notiz
+    assert _git(repo, "rev-parse", "main") == vorher
