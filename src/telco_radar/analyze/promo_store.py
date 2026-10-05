@@ -31,10 +31,15 @@ from __future__ import annotations
 
 import json
 import logging
-import re
 from pathlib import Path
 from typing import NamedTuple
 
+from .promo_kopf import (
+    _normalize_headline,
+    _same_offer,
+    _word_overlap,
+    _zahlen_widersprechen,
+)
 from .promo_schluessel import (
     ID_FELD,
     ID_SCHLUESSEL,
@@ -69,40 +74,18 @@ class UpsertBilanz(NamedTuple):
     bestaetigt: int = 0
 
 
-_FUZZY_HEADLINE_THRESHOLD = 0.6
-
-
-def _normalize_headline(headline: str) -> str:
-    return " ".join((headline or "").lower().split())
-
-
-def _numbers(text: str) -> set[str]:
-    return set(re.findall(r"\d+", text or ""))
-
-
-def _word_overlap(headline_a: str, headline_b: str) -> float:
-    words_a = set(_normalize_headline(headline_a).split())
-    words_b = set(_normalize_headline(headline_b).split())
-    if not words_a or not words_b:
-        return 0.0
-    return len(words_a & words_b) / min(len(words_a), len(words_b))
-
-
-def _same_offer(headline_a: str, headline_b: str) -> bool:
-    """Heuristik fuer 'gleiches Angebot, nur anders formuliert'. Wort-
-    Ueberlappung allein reicht nicht: "10 GB Bonus" und "20 GB Bonus" teilen
-    sich fast alle Woerter, sind aber verschiedene Angebote - deshalb
-    zusaetzlich ein Zahlen-Waechter: enthalten beide Headlines Zahlen (GB,
-    Euro-Betraege, Alters-/Preisgrenzen - genau das, was ein Angebot von
-    einem sonst fast gleich klingenden anderen unterscheidet) und haben sie
-    KEINE einzige davon gemeinsam, ist es kein Match, egal wie aehnlich der
-    Text sonst ist."""
-    if _word_overlap(headline_a, headline_b) < _FUZZY_HEADLINE_THRESHOLD:
-        return False
-    nums_a, nums_b = _numbers(headline_a), _numbers(headline_b)
-    if nums_a and nums_b and nums_a.isdisjoint(nums_b):
-        return False
-    return True
+def _kandidaten(
+    stamm: Schluessel, nach_stamm: dict[Schluessel, list[str]]
+) -> list[str]:
+    """Einträge gleichen Schlüssels; ohne Zielseite gleicher Marke und Konditionen."""
+    if stamm[1]:
+        return nach_stamm.get(stamm, [])
+    return [
+        eid
+        for k, ids in nach_stamm.items()
+        if k[0] == stamm[0] and k[2] == stamm[2]
+        for eid in ids
+    ]
 
 
 def snapshot_key(brand: str, url: str) -> str:
@@ -186,10 +169,11 @@ class PromoDB:
     ) -> str | None:
         """Rückfall nach dem Schlüssel: unter den noch nicht vergebenen
         Einträgen derselben Marke und Zielseite der laut _same_offer()
-        textlich ähnlichste."""
+        textlich ähnlichste; ohne Zielseite zählt nur die Marke."""
+        laenge = 2 if stamm[1] else 1
         best_id, best_overlap = None, 0.0
         for eid, e in self.entries.items():
-            if eid in vergeben or schluessel_eintrag(e)[:2] != stamm[:2]:
+            if eid in vergeben or schluessel_eintrag(e)[:laenge] != stamm[:laenge]:
                 continue
             existing_headline = e.get("headline") or ""
             if not _same_offer(headline, existing_headline):
@@ -211,7 +195,10 @@ class PromoDB:
         gleicher Schlüssel, dann _same_offer unter derselben Marke und
         Zielseite. Ein Eintrag wird je Aufruf höchstens einmal bestätigt; ein
         weiteres Angebot mit gleichem Schlüssel bekommt die nächste
-        Laufnummer, dieselbe Überschrift zweimal ist ein Angebot."""
+        Laufnummer, dieselbe Überschrift zweimal ist ein Angebot. Nennen
+        beide Überschriften Zahlen ohne gemeinsame, sind es zwei Angebote.
+        Ohne Link und gelesene Seite gelten alle Einträge gleicher Marke und
+        Konditionen als gleicher Schlüssel, aber nur bei _same_offer."""
         angebote: list[tuple[dict, str, Schluessel, tuple[Schluessel, str]]] = []
         for it in items:
             brand = (it.get("brand") or "").strip()
@@ -230,7 +217,7 @@ class PromoDB:
         for _, _, stamm, kopf in angebote:
             gleich = [
                 eid
-                for eid in nach_stamm.get(stamm, [])
+                for eid in _kandidaten(stamm, nach_stamm)
                 if eid not in vergeben and self._kopf(eid) == kopf[1]
             ]
             if gleich and kopf not in im_aufruf:
@@ -241,8 +228,10 @@ class PromoDB:
         for it, headline, stamm, kopf in angebote:
             if kopf in im_aufruf:
                 continue
-            frei = [eid for eid in nach_stamm.get(stamm, []) if eid not in vergeben]
-            treffer = self._gleicher_schluessel(frei, headline)
+            frei = [
+                eid for eid in _kandidaten(stamm, nach_stamm) if eid not in vergeben
+            ]
+            treffer = self._gleicher_schluessel(frei, headline, not stamm[1])
             if treffer is None:
                 treffer = self._find_existing_id(stamm, headline, vergeben)
             if treffer is None:
@@ -256,18 +245,27 @@ class PromoDB:
                 self._bestaetige(self.entries[eid], it, headline, today, source_url)
         return UpsertBilanz(len(neu_ids), vergeben, len(vergeben - neu_ids))
 
-    def _gleicher_schluessel(self, frei: list[str], headline: str) -> str | None:
-        """Unter freien Einträgen gleichen Schlüssels zuerst _same_offer, dann
-        aktiv, dann zuletzt bestätigt."""
+    def _gleicher_schluessel(
+        self, frei: list[str], headline: str, nur_aehnliche: bool
+    ) -> str | None:
+        """Unter freien Einträgen gleichen Schlüssels ohne Zahlenwiderspruch
+        zuerst _same_offer, dann aktiv, dann zuletzt bestätigt; mit
+        *nur_aehnliche* nur Einträge mit _same_offer."""
+        aehnlich = {
+            k: _same_offer(headline, self.entries[k].get("headline") or "")
+            for k in frei
+        }
+        frei = [
+            k
+            for k in frei
+            if (aehnlich[k] or not nur_aehnliche)
+            and not _zahlen_widersprechen(
+                headline, self.entries[k].get("headline") or ""
+            )
+        ]
         if not frei:
             return None
-        return max(
-            frei,
-            key=lambda k: (
-                _same_offer(headline, self.entries[k].get("headline") or ""),
-                *rang(self.entries[k]),
-            ),
-        )
+        return max(frei, key=lambda k: (aehnlich[k], *rang(self.entries[k])))
 
     def _kopf(self, eid: str) -> str:
         return _normalize_headline(self.entries[eid].get("headline") or "")
