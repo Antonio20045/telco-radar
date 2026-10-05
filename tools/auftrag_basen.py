@@ -8,6 +8,7 @@ danach wieder auf dem Startcommit; jede Lockerung bleibt ein Befund.
 
 from __future__ import annotations
 
+import configparser
 import importlib
 from pathlib import Path
 
@@ -34,7 +35,12 @@ def bereinigen(ort: Path, start: str, pfade: list[str]) -> tuple[list[str], list
             continue
         datei = ort / pfad
         neu = datei.read_text(encoding="utf-8") if datei.is_file() else ""
-        if zeilen := vergleich(alt, neu):
+        try:
+            zeilen = vergleich(alt, neu)
+        except (ValueError, TypeError, configparser.Error) as fehler:
+            lockerer.append(f"{pfad} nicht lesbar: {type(fehler).__name__}: {fehler}")
+            continue
+        if zeilen:
             lockerer += [f"{pfad} lockerer: {zeile}" for zeile in zeilen]
             continue
         prozess_.starten(["git", "checkout", "-q", start, "--", pfad], ort)

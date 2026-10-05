@@ -225,3 +225,26 @@ def test_von_der_leiter_gestrichene_ausnahme_kommt_auf_main(repo, monkeypatch):
     assert "a.alt -> b.alt" not in vertrag
     assert "a.bleibt -> b.bleibt" in vertrag
     assert _git(repo, "log", "-1", "--format=%s") == "auftrag(A1): Basen der Leiter"
+
+
+def test_rote_abnahme_laesst_die_erwarteten_seiten_unberuehrt(repo):
+    _mit_golden(repo)
+    vorher = _git(repo, "rev-parse", "main")
+
+    assert _starte(repo, "rot") == auftrag.Ende.NOTIZ
+
+    assert "Abnahmetest rot" in (repo / auftrag.AUFTRAEGE / "A1-notiz.md").read_text()
+    wt = repo.parent / "telco-radar-wt" / "A1"
+    assert _git(wt, "status", "--porcelain", "--", GOLDEN) == ""
+    assert _git(repo, "rev-parse", "main") == vorher
+
+
+def test_kaputte_basis_ist_ein_befund(repo, monkeypatch):
+    _committen(repo, {"pruef/tests-anzahl.txt": "5\n"}, "Testanzahl")
+    kaputt = ["pruef/tests-anzahl.txt", "abc\n"]
+    monkeypatch.setenv("ERSATZ_BAU_DATEI", json.dumps(kaputt))
+
+    assert _starte(repo) == auftrag.Ende.NOTIZ
+
+    notiz = (repo / auftrag.AUFTRAEGE / "A1-notiz.md").read_text()
+    assert "pruef/tests-anzahl.txt nicht lesbar: ValueError" in notiz
