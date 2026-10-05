@@ -42,6 +42,8 @@ PLAYWRIGHT_START = frozenset({"sync_playwright", "async_playwright"})
 VERSTECKT = "test-versteckt"
 SETZEN = frozenset({"setattr", "delattr"})
 NAMENSRAEUME = frozenset({"globals", "vars", "locals"})
+DUNDER_NAMENSRAEUME = frozenset({"__globals__", "__builtins__"})
+FREIE_DEKORATOREN = ("pytest.mark.", "pytest.fixture")
 VERSTECK_NAMEN = frozenset({"__test__", "allow_module_level"})
 # Vorgabe von pytest für norecursedirs und python_files.
 NICHT_GESAMMELT = ("*.egg", ".*", "_darcs", "build", "CVS", "dist", "node_modules")
@@ -124,11 +126,11 @@ def _versteck_codes(baum: ast.AST) -> list[str]:
     }
     codes = [VERSTECKT] * sum(map(lambda k: _ueberschreibt(k, module), ast.walk(baum)))
     for knoten in ast.walk(baum):
-        if (
-            isinstance(knoten, ast.Call)
-            and getattr(knoten.func, "id", None) in NAMENSRAEUME
-        ):
+        if _greift_in_namensraum(knoten):
             codes.append(VERSTECKT)
+        if isinstance(knoten, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef):
+            fremd = [d for d in knoten.decorator_list if not _freier_dekorator(d)]
+            codes += [VERSTECKT] * len(fremd) * knoten.name.lower().startswith("test")
         name = getattr(knoten, "id", None) or getattr(knoten, "attr", None)
         if isinstance(knoten, ast.Constant) and isinstance(knoten.value, str):
             name = knoten.value
@@ -139,6 +141,27 @@ def _versteck_codes(baum: ast.AST) -> list[str]:
         if isinstance(knoten, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef):
             codes += [TESTNAME] * knoten.name.lower().startswith("test")
     return codes
+
+
+def _greift_in_namensraum(knoten: ast.AST) -> bool:
+    """``globals``, ``vars`` oder ``locals`` als Name (Aufruf oder Alias), aus
+    ``builtins`` oder als Import, ``__globals__`` und ``__builtins__``."""
+    if isinstance(knoten, ast.Name):
+        return knoten.id in NAMENSRAEUME | DUNDER_NAMENSRAEUME
+    if isinstance(knoten, ast.Attribute):
+        return knoten.attr in DUNDER_NAMENSRAEUME or (
+            knoten.attr in NAMENSRAEUME
+            and getattr(knoten.value, "id", None) in {"builtins", "__builtins__"}
+        )
+    if isinstance(knoten, ast.alias):
+        return knoten.name.rsplit(".", 1)[-1] in NAMENSRAEUME | {"builtins"}
+    return False
+
+
+def _freier_dekorator(dekorator: ast.expr) -> bool:
+    """Ein Dekorator an einem Test darf ihn markieren, nicht ersetzen."""
+    name = ast.unparse(getattr(dekorator, "func", dekorator))
+    return name.startswith(FREIE_DEKORATOREN)
 
 
 def _ueberschreibt(knoten: ast.AST, module: set[str]) -> bool:

@@ -178,7 +178,25 @@ def test_gelesenes_testmodul_zaehlt_nicht(projekt):
         "def test_a():\n    assert 0\n\n\nsetattr(test_a, '__te' + 'st__', False)\n",
         "import sys\n\nsetattr(sys.modules[__name__], 'test_a', None)\n",
         "import sys\n\nsys.modules['test_alt'].test_a = None\n",
+        "def h():\n    pass\n\n\nh.__globals__['test_a'] = None\n",
+        "g = globals\n\n\ndef test_a():\n    assert 0\n\n\ng()['test_a'] = None\n",
+        "import builtins\n\nbuiltins.globals()['test_a'] = None\n",
+        "from builtins import globals as g\n\ng()['test_a'] = None\n",
+        "__builtins__['glob' + 'als']()['test_a'] = None\n",
+        "def weg(f):\n    return lambda: None\n\n\n@weg\ndef test_a():\n    assert 0\n",
+        "import functools\n\n\n@functools.cache\ndef test_a():\n    assert 0\n",
+        "def weg(k):\n    return None\n\n\n@weg\nclass TestA:\n    pass\n",
     ],
 )
 def test_umgebogener_namensraum_zaehlt(projekt, text):
     assert ("tests/test_x.py", "test-versteckt") in _zaehle(projekt, text)
+
+
+def test_markierende_dekoratoren_und_fremde_globals_zaehlen_nicht(projekt):
+    text = (
+        "import pytest\n\n\n@pytest.fixture\ndef wert():\n    return 1\n\n\n"
+        "@pytest.mark.parametrize('x', [1])\n@pytest.mark.langsam\n"
+        "def test_a(x, wert):\n    assert x == wert\n\n\n"
+        "def test_b(env):\n    env.globals.setdefault('a', 1)\n    assert env\n"
+    )
+    assert _zaehle(projekt, text) == {}
