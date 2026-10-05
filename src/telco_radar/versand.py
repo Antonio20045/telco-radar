@@ -49,11 +49,8 @@ log = logging.getLogger(__name__)
 
 SITE_URL = "https://telco-radar.onrender.com"
 
-# Montag=0 ... Sonntag=6. Montagfrueh ist der Zeitpunkt, an dem jemand die
-# Woche plant - eine Freitagsmail liest niemand mehr.
 STANDARD_WOCHENTAG = 0
 
-# Die Ausnahme-Schwelle fuer Teams. Beide Bedingungen, nicht eine.
 TEAMS_CTM = 3
 TEAMS_PRIORITAET = 5
 
@@ -75,9 +72,6 @@ class VersandNichtEingerichtet(VersandFehler):
     (wie dieses, solange niemand sie eintraegt) darf nicht jeden Tag rot
     laufen - ein Signal, das IMMER an ist, ist keins mehr, und ein echter
     Zustellfehler waere davon nicht mehr zu unterscheiden."""
-
-
-# --------------------------------------------------------------- Gedaechtnis
 
 
 class Zustellbuch:
@@ -104,9 +98,6 @@ class Zustellbuch:
         self.pfad.write_text(
             json.dumps(self.daten, ensure_ascii=False, indent=1), encoding="utf-8"
         )
-
-
-# ------------------------------------------------------------------ Inhalte
 
 
 def _highlights(report: dict) -> list[dict]:
@@ -196,7 +187,6 @@ def baue_mail(report: dict, site_url: str = SITE_URL) -> tuple[str, str, str]:
             for i, h in enumerate(zeilen, 1)
         )
     else:
-        # Ein Befund, keine Luecke - und er wird als Befund geschrieben.
         rumpf = (
             "Diese Woche gab es keine Meldung mit direktem Bezug zum "
             "eigenen Portfolio. Die Ausgabe steht trotzdem online."
@@ -281,9 +271,6 @@ def baue_teams_karte(
     }
 
 
-# ------------------------------------------------------------------ Zustellen
-
-
 def sende_mail(betreff: str, text: str, html: str, *, trocken: bool = False) -> str:
     """Verschickt ueber SMTP. Zugangsdaten kommen aus der Umgebung.
 
@@ -346,9 +333,6 @@ def sende_teams(karte: dict, *, trocken: bool = False) -> str:
     return "zugestellt"
 
 
-# ------------------------------------------------------------------ Steuerung
-
-
 def ist_versandtag(heute: date, wochentag: int) -> bool:
     return heute.weekday() == int(wochentag)
 
@@ -372,7 +356,6 @@ def versende(
     ausgabe = str(report.get("date") or date.today().isoformat())
     site_url = str(versand_cfg.get("site_url") or SITE_URL)
 
-    # ---- Mail: feste Kadenz.
     if versand_cfg.get("mail_aktiv", True):
         wochentag = int(versand_cfg.get("wochentag", STANDARD_WOCHENTAG))
         try:
@@ -393,7 +376,6 @@ def versende(
                 bilanz["mail"] = f"FEHLER: {exc}"
                 log.error("Mailversand: %s", exc)
 
-    # ---- Teams: nur die Ausnahme, und jede Meldung genau einmal.
     if versand_cfg.get("teams_aktiv", True):
         treffer = [
             h
@@ -426,6 +408,7 @@ def versende(
 def main(argv: list[str] | None = None) -> int:
     import argparse
     import sys
+
     from .config import load_config
 
     p = argparse.ArgumentParser(

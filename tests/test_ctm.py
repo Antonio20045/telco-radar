@@ -33,9 +33,6 @@ def _h(**kw):
     return basis
 
 
-# ------------------------------------------------------- Stufe 3 im Code
-
-
 def test_telekom_flat_ist_direkt(fokus):
     """Der Fall aus dem Dokument: preisrelevant, deutscher Markt - und stand
     trotzdem klein in der dritten Reihe."""
@@ -86,9 +83,6 @@ def test_markenname_trifft_nicht_mitten_im_wort(fokus):
     assert ctm.deterministische_stufe(h, fokus) is None
 
 
-# ------------------------------------------------- Zusammenspiel mit dem Modell
-
-
 def test_das_modell_kann_stufe_3_nicht_wegnehmen(fokus):
     h = _h(
         title="Telekom senkt Preis für Allnet-Flat",
@@ -131,9 +125,6 @@ def test_bilanz_zaehlt_die_stufen(fokus):
     ]
     bilanz = ctm.veredle(hs, fokus)
     assert bilanz["direkt"] == 1 and bilanz["hintergrund"] == 1
-
-
-# ------------------------------------------------------------- der Satz
 
 
 @pytest.mark.parametrize(
@@ -191,9 +182,6 @@ def test_verworfene_saetze_stehen_mit_grund_in_der_bilanz(fokus):
     assert bilanz["gruende"]
 
 
-# ------------------------------------------------------- Zwei-Minuten-Pfad
-
-
 def test_zwei_minuten_nimmt_nur_geprueftes():
     hs = [
         _h(
@@ -202,7 +190,7 @@ def test_zwei_minuten_nimmt_nur_geprueftes():
             relevance=5,
             ctm_satz="Drückt unsere Preisuntergrenze deutlich nach unten.",
         ),
-        _h(title="B", ctm_bezug=3, relevance=5),  # ohne Satz
+        _h(title="B", ctm_bezug=3, relevance=5),
         _h(title="C", ctm_bezug=1, relevance=5, ctm_satz="Egal welcher Satz."),
     ]
     pfad = ctm.zwei_minuten(hs)
@@ -253,14 +241,11 @@ def test_zwei_minuten_hoert_bei_fuenf_zeilen_auf():
     assert len(ctm.zwei_minuten(hs)) == 5
 
 
-# ------------------------------------------------------------ Konfiguration
-
-
 def test_fehlende_konfiguration_legt_nichts_lahm(tmp_path):
     leer = ctm.lade_fokus(tmp_path)
     h = _h(title="Telekom senkt Preise", operator="Telekom", category="Tarif/Pricing")
     assert ctm.deterministische_stufe(h, leer) is None
-    ctm.veredle([h], leer)  # darf nicht werfen
+    ctm.veredle([h], leer)
     assert h["ctm_bezug"] in (0, 1, 2, 3)
 
 

@@ -23,7 +23,6 @@ import socket
 import threading
 
 import pytest
-
 from browser_konsole import konsole_sammeln
 from test_geraete_zeitreihe_browser import _baue_site
 
@@ -79,8 +78,6 @@ def test_der_sprung_stellt_reiter_modell_und_band_ein(paar):
     die URL trägt ?modell= und &band= (die Deep-Link-Mechanik von E2), und
     der Bündel-Titel nennt das GEWÄHLTE Modell - nicht das Startgerät."""
     _radar_zeigen(paar)
-    # Der Modell-Wechsel ist asynchron (Fragment): auf das Erscheinen des
-    # Titels warten, nicht auf eine feste Zahl von Millisekunden.
     links = paar.query_selector_all("#wr-abweichung a.gr-sprung[data-band]")
     assert links, "keine vergleichbare Zeile mit Band-Sprung in der Fixture"
     ziel_id = links[0].get_attribute("data-modell")
@@ -130,14 +127,6 @@ def test_alle_reiter_bleiben_ohne_js_fehler(paar):
     assert not fehler, fehler
 
 
-# ==========================================================================
-# P4 SCHRITT 2c (STRATEGIE_GERAETE_V3, 18.09.2026): die ZWEITE Kante des
-# roten Fadens - Radar -> KATALOG -> Zeitreihe am EINEN Schluessel, und
-# der Ansichts-Deep-Link ?ansicht= (P3-Rest). Statische Haelfte:
-# tests/test_geraete_faden_schluessel.py.
-# ==========================================================================
-
-
 def test_der_katalog_sprung_legt_filter_und_zeile_frei(paar):
     """Klick auf „im Katalog“ einer Radar-Modellzeile: der Katalog-Reiter
     ist aktiv, die Zielzeile (derselbe `modell_schluessel` wie data-modell
@@ -146,8 +135,6 @@ def test_der_katalog_sprung_legt_filter_und_zeile_frei(paar):
     legt Filter und Deckel frei, statt an einer unsichtbaren Zeile zu
     enden."""
     paar.goto(paar.url.split("#")[0].split("?")[0], wait_until="load")
-    # Filter am KATALOG setzen (Samsung), der Sprung zielt auf ein Apple-
-    # Modell - ohne Freilegen waere die Zeile versteckt.
     paar.click('.gr-reiter button[data-tafel="tafel-katalog"]')
     paar.select_option('#tafel-katalog select[data-filter="marke"]', label="Samsung")
     _radar_zeigen(paar)
@@ -176,8 +163,6 @@ def test_der_katalog_sprung_legt_filter_und_zeile_frei(paar):
         "e => e.classList.contains('gr-k-ziel')",
     )
     assert markiert is True, "die Zielzeile ist nicht markiert"
-    # Der Filter ist zurueckgesetzt - der Leser sieht, was die Tabelle
-    # gerade zeigt (dieselbe Regel wie der Filterleisten-Etikett-Satz).
     wert = paar.eval_on_selector(
         '#tafel-katalog select[data-filter="marke"]', "e => e.value"
     )
@@ -207,8 +192,6 @@ def test_der_katalog_graph_sprung_waehlt_das_modell(paar):
         == "true"
     ), "der Vergleichs-Reiter ist nach dem Sprung nicht aktiv"
     assert f"modell={ziel}" in paar.url, paar.url
-    # Das Suchfeld nennt das gewaehlte Modell (Kacheln sind nur
-    # Schnelleingang - das Ziel kann ausserhalb der 6 liegen).
     feld = paar.eval_on_selector("#gr-zr-suche", "e => e.value")
     assert feld and feld.strip(), "das Suchfeld nennt kein gewaehltes Modell"
 
@@ -239,7 +222,6 @@ def test_ansicht_deep_link_schaltet_und_ueberlebt(paar):
     assert "ansicht=" not in paar.url, (
         f"ansicht-Parameter bleibt nach barpreis-Klick stehen: {paar.url}"
     )
-    # Modellwechsel der Zeitreihe: modell/band kommen dazu, ansicht bleibt
     paar.click('.gr-kansicht button[data-ansicht="tco"]')
     paar.wait_for_timeout(80)
     paar.click('.gr-reiter button[data-tafel="tafel-tco"]')
@@ -249,6 +231,4 @@ def test_ansicht_deep_link_schaltet_und_ueberlebt(paar):
     assert "ansicht=tco" in paar.url, (
         f"ansicht-Parameter geht beim Band-/Modellwechsel verloren: {paar.url}"
     )
-    # Aufraeumen: URL ohne Parameter, damit nachfolgende Tests ein
-    # sauberes Startgeraett sehen (die Fixture hat Modulgueltigkeit).
     paar.goto(basis, wait_until="load")

@@ -16,7 +16,6 @@ import pytest
 
 from telco_radar.analyze import llm
 
-
 ALLE_SCHLUESSEL = ("AWS_BEARER_TOKEN_BEDROCK", "LLM_API_KEY", "ANTHROPIC_API_KEY")
 
 
@@ -34,7 +33,6 @@ def _sauber(monkeypatch):
     llm.budget_setzen(0, {})
 
 
-# ============================================================ (a) Routing
 def test_dispatch_schickt_ein_claude_modell_an_anthropic(monkeypatch):
     """Der Kern von E2: das MODELL entscheidet, nicht die Umgebung.
 
@@ -102,7 +100,6 @@ def test_ohne_anthropic_schluessel_bleibt_alles_beim_alten(monkeypatch):
     assert gewaehlt == ["_complete_openai"]
 
 
-# ================================================ (b) Der Schluessel bleibt
 def test_deepseek_loescht_den_anthropic_schluessel_nicht_mehr(monkeypatch):
     """Ohne diesen Schluessel in der Umgebung ist der Anker nicht erreichbar -
     llm._dispatch fragt genau danach."""
@@ -116,11 +113,9 @@ def test_deepseek_loescht_den_anthropic_schluessel_nicht_mehr(monkeypatch):
         {"deepseek_api_base": "https://deepseek.invalid", "llm_provider": "deepseek"}
     )
     assert os.environ.get("ANTHROPIC_API_KEY") == "test-anthropic_api_key"
-    # Die Schluessel der VERLIERER verschwinden weiterhin.
     assert "AWS_BEARER_TOKEN_BEDROCK" not in os.environ
 
 
-# ==================================================== (c) Die Ankerketten
 def _anker(**settings):
     from telco_radar.pipeline import _registriere_anker
 
@@ -161,7 +156,6 @@ def test_ein_totes_primaermodell_landet_wirklich_beim_anker(monkeypatch):
     monkeypatch.setattr(llm, "_dispatch", fake)
 
     assert llm.complete("s", "u", "pro") == "antwort von claude-sonnet-5"
-    # Zweite Stufe: das tote Modell wird nicht noch einmal gefragt.
     assert llm.complete("s", "u", "pro") == "antwort von claude-sonnet-5"
     assert versucht == ["pro", "claude-sonnet-5", "claude-sonnet-5"]
 
@@ -218,7 +212,6 @@ def test_kein_anker_haengt_hinter_einem_anker():
     assert llm._chain_from("pro") == ["pro", "claude-sonnet-5"]
 
 
-# ------------------------------------------- (d) Der Anker JE AUFRUF
 def test_der_analyst_endet_bei_haiku_und_die_redaktion_bei_sonnet(monkeypatch):
     """Der Kern von Befund 1: `_FALLBACKS` haengt am MODELLNAMEN, und in jeder
     heutigen Anbieter-Konfiguration ist analyst_model == editor_model. Der
@@ -239,12 +232,10 @@ def test_der_analyst_endet_bei_haiku_und_die_redaktion_bei_sonnet(monkeypatch):
 
     monkeypatch.setattr(llm, "_dispatch", fake)
 
-    # Der Analyst nennt seinen Anker je Aufruf.
     assert (
         llm.complete("s", "u", modell, ausweich="claude-haiku-4-5-20251001")
         == "antwort von claude-haiku-4-5-20251001"
     )
-    # Die Redaktion folgt der registrierten Kette und bleibt gross.
     assert llm.complete("s", "u", modell) == "antwort von claude-sonnet-5"
     assert versucht == [modell, "claude-haiku-4-5-20251001", "claude-sonnet-5"]
 
@@ -318,15 +309,12 @@ def test_gleicher_analyst_und_editor_name_bekommt_den_redaktionsanker():
     )
     assert llm._chain_from("deepseek-v4-pro") == ["deepseek-v4-pro", "claude-sonnet-5"]
     assert gesetzt["deepseek-v4-pro"] == "claude-sonnet-5"
-    # Ein WIRKLICH eigener Mechanik-Name behaelt trotzdem seinen eigenen,
-    # billigeren Anker - die Kollision betrifft nur den geteilten Namen.
     assert llm._chain_from("deepseek-v4-flash") == [
         "deepseek-v4-flash",
         "claude-haiku-4-5-20251001",
     ]
 
 
-# ==================================================== (e) Der Kostenzaehler
 def _openai_antwort(prompt=1000, completion=2000, inhalt="ok"):
     return {
         "choices": [{"message": {"content": inhalt}, "finish_reason": "stop"}],
@@ -358,7 +346,6 @@ def test_kosten_summieren_usage_je_modell(monkeypatch):
     assert eintrag["aufrufe"] == 2
     assert eintrag["prompt_tokens"] == 2000
     assert eintrag["completion_tokens"] == 4000
-    # 2000 * 0,14/1M + 4000 * 0,28/1M
     assert eintrag["usd"] == pytest.approx(0.00140)
     assert stand["summe_usd"] == pytest.approx(0.00140)
 
@@ -431,11 +418,11 @@ def test_die_warnschwelle_schlaegt_erst_bei_erreichung_an(monkeypatch):
     llm.budget_setzen(1.0, {"m": {"ein": 0.0, "aus": 1.0}})
     _als_antwort(monkeypatch, _openai_antwort(0, 400_000))
 
-    llm._complete_openai("s", "u", "m", 100, 1)  # 0,40 $
+    llm._complete_openai("s", "u", "m", 100, 1)
     assert not llm.budget_ueberschritten()
-    llm._complete_openai("s", "u", "m", 100, 1)  # 0,80 $
+    llm._complete_openai("s", "u", "m", 100, 1)
     assert not llm.budget_ueberschritten()
-    llm._complete_openai("s", "u", "m", 100, 1)  # 1,20 $
+    llm._complete_openai("s", "u", "m", 100, 1)
     assert llm.budget_ueberschritten()
     assert llm.kosten_stand()["budget_ueberschritten"] is True
 

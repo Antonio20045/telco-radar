@@ -52,12 +52,9 @@ from .effektivpreis import VERGLEICHSMONATE, Effektivpreis, rechne, regression
 
 log = logging.getLogger(__name__)
 
-# Zeichenflaeche der Positionskarte.
 BREITE, HOEHE = 760, 420
 RAND_L, RAND_R, RAND_O, RAND_U = 58, 18, 18, 44
 
-# Der eigene Konzern wird hervorgehoben - die Karte beantwortet "wo stehen
-# WIR", nicht "wie sieht der Markt aus".
 EIGEN = {"vodafone", "otelo"}
 
 
@@ -101,7 +98,6 @@ def lade_staende(pfad: Path) -> list[dict]:
             continue
         if isinstance(satz, dict) and satz.get("tarif_id"):
             neueste[satz["tarif_id"]] = satz
-    # P3-E1: ein zurueckgezogener Tarif ist kein Tarif von heute.
     return [satz for satz in neueste.values() if not ist_zurueckgezogen(satz)]
 
 
@@ -127,8 +123,6 @@ def _zeile(satz: dict) -> dict:
         "url": tarif.dokument_url,
         "stand": tarif.versionsstand or tarif.abgerufen_am or "",
         "eigen": (tarif.anbieter or "").strip().lower() in EIGEN,
-        # Nur gesetzt, wenn _bevorzuge_live_shop() ein Pflichtdokument
-        # mit derselben Titelzeile zurueckgestuft hat.
         "referenz_url": satz.get("_referenz_url") or "",
         "referenz_stand": satz.get("_referenz_stand") or "",
     }
@@ -162,11 +156,6 @@ def _bevorzuge_live_shop(staende: list[dict]) -> list[dict]:
         if not live or not dokument:
             ergebnis.extend(staende_der_gruppe)
             continue
-        # Beide Lesarten vorhanden: die Live-Saetze bleiben, jeder
-        # Dokument-Satz wird zu einer Referenz auf dem ERSTEN Live-Satz -
-        # zwei Flex-Fassungen desselben Namens gibt es hier nicht, aber
-        # zwei Dokument-Versionen (alt/neu) waeren sonst zwei Referenzen
-        # auf derselben Zeile.
         primaer = live[0]
         for d in dokument:
             url = str(d.get("dokument_url") or "")
@@ -197,9 +186,6 @@ def _karte(zeilen: list[dict]) -> dict:
 
     xs = [z["volumen"] for z in punkte]
     ys = [z["effektiv"] for z in punkte]
-    # Die Achsen beginnen bei null: eine abgeschnittene Preisachse laesst
-    # kleine Unterschiede riesig aussehen. Bei einem Preisvergleich ist das
-    # keine Gestaltungsfrage.
     x_max = max(xs) * 1.08 or 1
     y_max = max(ys) * 1.15 or 1
 
@@ -214,8 +200,6 @@ def _karte(zeilen: list[dict]) -> dict:
     if gerade:
         a, b = gerade
         y0, y1 = a, a + b * x_max
-        # Nur zeichnen, wenn die Gerade im Bild bleibt - eine Linie, die
-        # oben aus dem Rahmen laeuft, behauptet mehr als die Daten hergeben.
         if 0 <= y0 <= y_max and 0 <= y1 <= y_max:
             linie = {
                 "x1": round(px(0), 1),
@@ -280,12 +264,6 @@ def aufbereiten(state_pfad: Path, quellen=None, heute: str = "") -> dict:
     konfiguriert = sorted({q.anbieter for q in (quellen or [])})
     fehlend = [a for a in konfiguriert if a not in vorhanden]
 
-    # DAS KOPFDATUM IST DAS DATUM DES NEUESTEN TARIFSATZES, nicht das des
-    # letzten Wochenberichts (QA-Befund F3, Abnahmekriterium G7): `html.py`
-    # reicht `heute=latest["date"]` durch, und am 04.09.2026 stand damit
-    # "Stand 2026-09-02" ueber 44 Saetzen, die alle `abgerufen_am:
-    # 2026-09-04` trugen. `heute` bleibt der Rueckfall fuer einen Bestand
-    # ohne Abrufdatum.
     abgerufen = [str(s.get("abgerufen_am") or "") for s in staende]
     stand = max((a for a in abgerufen if a), default=heute)
 
@@ -296,13 +274,6 @@ def aufbereiten(state_pfad: Path, quellen=None, heute: str = "") -> dict:
         "horizont": VERGLEICHSMONATE,
         "hat_daten": bool(zeilen),
         "stand": stand,
-        # Die Bilanz zaehlt, was ihr Etikett sagt (S-Q2): "in der Karte"
-        # sind die Punkte der Karte (bekanntes, begrenztes Volumen UND
-        # rechenbarer Preis), "ohne Anschlusspreis" zaehlt genau diese
-        # eine Luecke. Die Cashback-Luecke zaehlt hier NICHT mit - sie
-        # traegt JEDES Produktinformationsblatt (S-Q2-Befund: 52 von 52),
-        # sie ist eine Eigenschaft der Dokumentenart und keine Aussage
-        # ueber diesen Bestand. Sie steht als Satz im Hinweis.
         "bilanz": {
             "tarife": len(zeilen),
             "anbieter": len(vorhanden),

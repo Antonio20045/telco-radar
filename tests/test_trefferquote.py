@@ -79,8 +79,8 @@ def test_nenner_sind_die_neuen_nicht_die_gesammelten():
         )
     ]
     nach_name, _, _ = tq.auswerten(berichte)
-    assert nach_name["Statisch"].trefferquote == 0.5  # 1 von 2 neuen
-    assert nach_name["Schnell"].trefferquote == 0.05  # 1 von 20 neuen
+    assert nach_name["Statisch"].trefferquote == 0.5
+    assert nach_name["Schnell"].trefferquote == 0.05
 
 
 def test_trefferquote_ohne_neue_meldungen_ist_undefiniert():
@@ -174,7 +174,7 @@ def test_kanaltabelle_ueberspringt_laeufe_ohne_quellen_url():
         "2026-07-01",
         [_quelle("Alpha", "https://a.de/news", count=10, new=5)],
         [_highlight("Alpha", "https://a.de/1")],
-    )  # ohne source_url
+    )
     neu = _bericht(
         "2026-08-05",
         [_quelle("Alpha", "https://a.de/news", count=10, new=5)],

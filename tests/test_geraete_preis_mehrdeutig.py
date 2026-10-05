@@ -45,29 +45,19 @@ def _p(datum, betrag):
     return {"datum": datum, "preis_ohne_vertrag": betrag}
 
 
-# --------------------------------------------------------------------------
-# Die eine Regel
-# --------------------------------------------------------------------------
-
-
 def test_messtage_trennt_eindeutige_und_mehrdeutige_tage():
     eindeutig, mehrdeutig = verlauf.messtage(
         [
             _p("2026-08-29", 129.0),
             _p("2026-08-29", 155.0),
             _p("2026-08-30", 129.0),
-            _p("2026-08-30", 129.0),  # derselbe Preis zweimal
+            _p("2026-08-30", 129.0),
             _p("2026-08-31", 159.0),
             _p("2026-09-01", None),
         ]
     )
     assert eindeutig == {"2026-08-30": 129.0, "2026-08-31": 159.0}
     assert mehrdeutig == {"2026-08-29": [129.0, 155.0]}
-
-
-# --------------------------------------------------------------------------
-# Die gerenderte Seite: der Wähler aus derselben Quelle
-# --------------------------------------------------------------------------
 
 
 def _historie_gestellt(o2_doppelt: bool) -> list:
@@ -131,7 +121,6 @@ def test_die_seite_benennt_die_messluecke_statt_sie_zu_zeichnen(tmp_path):
         }
     ]
 
-    # Gegenprobe: ohne den zweiten Preis je Tag ist o2 eine normale Reihe.
     s2 = _baue(tmp_path / "gegen", erneuert=False, punkte=_historie_gestellt(False))
     daten2 = json.loads(s2.select_one("#gr-verlaufdaten").get_text())
     (geraet2,) = [g for g in daten2 if g["id"] == "apple-iphone-15-128"]

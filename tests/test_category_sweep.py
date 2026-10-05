@@ -31,7 +31,7 @@ def test_reverify_updates_last_verified(tmp_path):
     db.upsert([_item("https://a.test/1")], "2026-07-01")
     db.save("2026-07-01")
     db2 = DiffDB(p)
-    db2.upsert([_item("https://a.test/1")], "2026-07-21")  # gleiche URL erneut gesehen
+    db2.upsert([_item("https://a.test/1")], "2026-07-21")
     assert len(db2) == 1
     assert list(db2.entries.values())[0]["last_verified"] == "2026-07-21"
     assert list(db2.entries.values())[0]["first_seen"] == "2026-07-01"
@@ -63,7 +63,7 @@ def test_rotation_covers_all_over_weeks():
     seen = set()
     for w in range(0, 6):
         seen.update(rotation_slice(w, per_run=4))
-    assert seen == keys  # nach wenigen Wochen sind alle Hebel dran
+    assert seen == keys
 
 
 def test_seed_db_loads():

@@ -45,14 +45,6 @@ from telco_radar.report.html import render_site
 
 REPO = Path(__file__).resolve().parents[1]
 
-# Zwanzig Geraete, nicht zwei. Die erste Fassung hatte zwei - damit greift
-# `SICHTBAR_MAX` (15) nie, "alle anzeigen" steht nicht auf der Seite, und der
-# Test dafuer uebersprang sich selbst. Ein Skip sieht im Protokoll aus wie ein
-# Erfolg (CLAUDE.md 6).
-#
-# Zwei Hersteller im Wechsel, damit der Markenfilter wirklich trennt, und je
-# Geraet ein guenstigerer Wettbewerber, damit jede Zeile in die Alarmtabelle
-# kommt.
 _MODELLE = [
     (f"iPhone 1{n}" if n % 2 else f"Galaxy S2{n}", "Apple" if n % 2 else "Samsung")
     for n in range(20)
@@ -106,17 +98,6 @@ def _kennung(modell: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", modell.lower()).strip("-")
 
 
-# SECHS Tage, nicht vier. Mit genau `DIAGRAMM_AB_TERMINEN` Messtagen faellt
-# JEDE Verengung des Zeitraums unters Gatter - und damit war
-# `test_die_tabelle_zeigt_dieselben_anbieter_wie_das_diagramm` nicht mehr
-# formulierbar: es gab keine Lage mehr, in der ein Anbieter aus einem
-# VERENGTEN, aber noch gezeichneten Fenster faellt. Mit sechs Tagen bleibt
-# nach der Verengung auf vier ein Diagramm stehen, und die alte
-# Gleichheitspruefung greift wieder.
-#
-# Der 03. und der 04.08. liegen bewusst in DERSELBEN Kalenderwoche: daran
-# haengt der Test, dass der Rasterschalter die Zahl der Messtermine nicht
-# veraendert.
 _MESSTAGE = (
     "2026-08-03",
     "2026-08-04",
@@ -127,16 +108,6 @@ _MESSTAGE = (
 )
 
 
-# Medimax wird NUR an den ersten zwei Tagen gesehen.
-#
-# Ohne diese Ungleichheit hat jede Listung dieselben sechs Messtage, und dann
-# faellt beim Verengen des Zeitraums NIE ein Anbieter aus dem Bild - die
-# Zusicherung "Legende und Tabelle nennen dieselben Anbieter" ist damit nicht
-# ausloesbar, und `test_die_tabelle_zeigt_dieselben_anbieter_wie_das_diagramm`
-# war gruen, auch wenn die Tabelle wieder ueber den vollen Zeitraum rechnete
-# (nachgeprueft: der eingebaute alte Fehler blieb unentdeckt). Ein Anbieter,
-# der frueh verschwindet, ist ausserdem der Normalfall dieses Radars -
-# mobilcom-debitel hoerte am 21.08. auf zu liefern.
 _NUR_FRUEH = "Medimax"
 
 
@@ -152,11 +123,6 @@ def _listung(anbieter, typ, sku, preis, gid, speicher=256):
         "farbe_roh": "Titannatur",
         "farbe_normalisiert": "titan-natur",
         "zustand": "neu",
-        # `last_verified` MUSS zum letzten Messtag des Anbieters passen:
-        # `geraete_verlauf._punkte` haengt daran den Bestaetigungstag an und
-        # verlaengert die Kurve bis dorthin. Mit einem festen 11.08. fuer
-        # alle bekam Medimax trotz seiner zwei Messtage einen dritten Punkt
-        # mitten im verengten Fenster - und fiel deshalb nie heraus.
         "first_seen": "2026-08-01",
         "last_verified": (_MESSTAGE[1] if anbieter == _NUR_FRUEH else _MESSTAGE[-1]),
         "status": "aktiv",
@@ -184,7 +150,6 @@ def _bestand():
     for i, (modell, _marke) in enumerate(_MODELLE):
         gid = f"{'apple' if i % 2 else 'samsung'}-{_kennung(modell)}"
         eigen = 1000.0 + i
-        # 0,5 % bis 20 % Abstand, im Wechsel Netzbetreiber und Fachhandel.
         fremd = round(eigen * (1 - (0.005 + i * 0.011)), 2)
         zeilen.append(_listung("Vodafone", "netzbetreiber", f"vf-{i}", eigen, gid))
         wer, typ = ("o2", "netzbetreiber") if i % 2 else ("Medimax", "handel")
@@ -203,21 +168,6 @@ _DB = {
 }
 
 
-# Der TCO-Bestand der Fixture.
-#
-# Bis zum 04.09.2026 gab es ihn nicht, und das machte den Reiter "Was kostet
-# es" zur halb ungeprueften Seite: ohne `geraete_tco.json` startet `TcoDB`
-# leer, `referenzen()` und `buendel()` geben `[]`, und damit rendern ZWEI der
-# drei Tabellen dieses Reiters ueberhaupt nicht - die SIM-only-Referenzen
-# (Makro, zweimal aufgerufen) und die Leitzahl-Tabelle. Der Breitentest
-# darunter wurde allein von der dritten rot, und die Behaelter der zwei
-# anderen waren von keinem Test der Suite gedeckt.
-#
-# 14 Referenzen, weil `REFERENZEN_SICHTBAR` bei 12 deckelt: so entsteht auch
-# der Aufklapper "Die uebrigen N Tarife" und mit ihm der ZWEITE Aufruf des
-# Makros. Vier Buendel mit Tarifgrundpreis UND Geraeterate, damit
-# `tco_24()` belastbar rechnet und die Leitzahl-Tabelle Zeilen bekommt -
-# der Zustand, den Phase 4 herstellen wird.
 _TCO_REFERENZEN = [
     {
         "id": f"simonly--{a.lower()}--tarif-{i}",
@@ -256,33 +206,13 @@ _TCO_BUENDEL = [
         "last_verified": "2026-09-04",
     }
     for i, (anb, sku) in enumerate(
-        # ZWEI ANBIETER ZU DEMSELBEN GERAET: `vf-1` und `o2-1` gehoeren
-        # beide zur `device_id` mit Index 1 (siehe `_bestand`). Mit vier
-        # verschiedenen Geraeten haette JEDES Modell nur einen Balken, G1
-        # entstuende nach C.1 gar nicht - und der Browser-Test daneben
-        # pruefte eine Grafik, die es nicht gibt.
         [("Vodafone", "vf-1"), ("o2", "o2-1"), ("Vodafone", "vf-3"), ("o2", "o2-3")]
     )
 ]
 
 _TCO = {"updated": "2026-09-04", "buendel": _TCO_BUENDEL, "sim_only": _TCO_REFERENZEN}
 
-# DER TARIFBESTAND GEHOERT ZUR FIXTURE, seit die Leitzahl ueber die BINDUNG
-# rechnet (Phase R): die Mindestlaufzeit des Tarifs steht in `tarife.jsonl`
-# und in keiner Geraetenutzlast. Ohne diese Datei traegt jedes Buendel die
-# Luecke "Tarifbindung", keine Karte ist belastbar - und die ganze
-# Hauptansicht der Seite waere von keinem Browser-Test gedeckt. Dieselbe
-# Falle wie das fehlende `geraete_tco.json` am 04.09.2026, eine Ebene
-# weiter.
-#
-# Die Preisphase mit `bis_monat: 24` und die zweite ab 25 sind kein
-# Beiwerk: an ihnen haengt die Zeile "ab Monat 25" (Katalog D).
 _TARIFE = [
-    # O1 (11.09.2026): `datenvolumen_gb` je Tarif (10 + 10*i verteilt die
-    # 14 Tarife ueber alle drei Baender) - ohne Volumen hat kein Modell ein
-    # Band und der Graph der Vergleichsansicht waere von keinem dieser
-    # Tests gedeckt (derselbe Fixture-Fehler wie das fehlende
-    # `geraete_tco.json` am 04.09.2026, eine Ebene weiter).
     {
         "anbieter": a,
         "name": f"{a} Tarif {i}",
@@ -315,8 +245,6 @@ def _historie():
                     "device_id": e["device_id"],
                     "anbieter": e["anbieter"],
                     "datum": tag,
-                    # Ein leicht fallender Preis: eine echte Bewegung, damit die
-                    # Spalte "Veraenderung" etwas zu sagen hat.
                     "preis_ohne_vertrag": round(
                         e["preis_ohne_vertrag"] + (3 - i) * 5.0, 2
                     ),
@@ -325,21 +253,6 @@ def _historie():
                 }
             )
     return zeilen
-
-
-# Vier Messtage je Listung (30.08.2026).
-#
-# Bis dahin lief diese Fixture mit einer LEEREN Preishistorie: jede Listung
-# hatte genau einen Messtag, den aus `last_verified`. Das reichte, solange
-# jedes gewaehlte Geraet ein Diagramm bekam - seit ein Verlauf erst ab
-# `DIAGRAMM_AB_TERMINEN` Messterminen gezeichnet wird (zwei Punkte sind eine
-# Gerade, und eine Gerade durch zwei Punkte sieht aus wie ein Trend), stand
-# hier kein SVG mehr, und vier Tests massen einen Leerzustand statt der
-# Grafik, die sie pruefen sollen.
-#
-# Die Tage liegen bewusst in DREI Kalenderwochen: der 03. und der 04.08.
-# fallen in dieselbe: daran laesst sich zeigen, dass der Rasterschalter die
-# Zahl der MESSTERMINE nicht veraendert.
 
 
 @contextlib.contextmanager
@@ -359,11 +272,8 @@ def _server(site: Path):
         httpd.shutdown()
 
 
-# Die Grenze aus dem Auftrag: jeder Reiter bleibt unter drei Bildschirmen.
 MAX_HOEHE = 3000
 
-# Keine Beschriftung unter dieser Groesse. Die alte Grafik hatte 236 Texte
-# darunter, auf einem 390-px-Telefon real 2,7 CSS-Pixel.
 MIN_SCHRIFT = 12
 
 
@@ -457,10 +367,6 @@ def _seite(tmp_path_factory, chromium):
         "\n".join(json.dumps(z) for z in _historie()) + "\n", encoding="utf-8"
     )
     (state / "geraete_tco.json").write_text(json.dumps(_TCO), encoding="utf-8")
-    # E2: die TCO-HISTORIE - ohne sie haette die Hauptansicht dieser
-    # Fixture keine Zeitreihe (nur den Leer-Satz), und der Pflichtgrafik-
-    # Test pruefte einen Leerzustand. Drei Messtage fuer die ersten zwei
-    # Bündel des Bestands.
     _tco_historie = []
     for b in _TCO["buendel"][:2]:
         for tag, gesamt in (
@@ -515,11 +421,6 @@ def _sichtbare_marken(seite, wurzel="#tafel-tco"):
     )
 
 
-# --------------------------------------------------------------------------
-# Die drei Regeln, die ueber allem stehen
-# --------------------------------------------------------------------------
-
-
 def test_die_startansicht_traegt_genau_die_pflichtgrafik(_seite):
     """UMGEKEHRT SEIT PHASE R, dann UMGEKEHRT SEIT BRIEF_FADEN.
 
@@ -543,23 +444,16 @@ def test_die_startansicht_traegt_genau_die_pflichtgrafik(_seite):
     geloeschte Positionskarte: kein Bild mit allen Geraeten in einer
     Flaeche, keine gedrehten Etiketten.
     """
-    # E2 dreht auch diese Zeile: die Zeitreihe IST ein SVG (Antonios
-    # Graph-Entscheidung). Verboten bleibt jedes ANDERE SVG der Tafel -
-    # G0 gehoert in den Verlaufs-Reiter, G1 ist ersatzlos gefallen.
     fremde = _seite.eval_on_selector_all("#tafel-tco svg:not(.gr-zr)", "e => e.length")
     assert fremde == 0, f"{fremde} SVGs ausser der Zeitreihe in der Tafel"
     assert _seite.eval_on_selector_all("#tafel-tco svg.gr-zr", "e => e.length") >= 1, (
         "die Zeitreihe des gewaehlten Modells steht nicht da"
     )
-    # Genau EIN sichtbares Bild: die breite und die schmale Variante
-    # stehen im DOM, das Mediaquery zeigt eine (Spezifitaets-Falle, siehe
-    # style.css) - ein zweites SICHTBARES waere der alte Panel-Stapel.
     sichtbar = _seite.eval_on_selector_all(
         "#tafel-tco svg.gr-zr",
         "e => e.filter(s => s.getBoundingClientRect().width > 0).length",
     )
     assert sichtbar == 1, f"{sichtbar} sichtbare Graph-Bilder statt einem"
-    # Kein Rest der geloeschten Preisgrafik.
     assert (
         _seite.eval_on_selector_all(
             "#tafel-tco .gr-punkt, #tafel-tco .gr-etikett, #tafel-tco .gr-band",
@@ -567,11 +461,6 @@ def test_die_startansicht_traegt_genau_die_pflichtgrafik(_seite):
         )
         == 0
     )
-    # O2 (11.09.2026): die Alarmtabelle ist AUS der Vergleichsansicht auf
-    # den Wettbewerbs-Radar gezogen - hier steht keine `.gr-alarm`-Tabelle
-    # mehr. Der flache Katalog in Reiter 2 teilt sich Aussehen und
-    # Filterlogik weiterhin mit ihr (auf dem Radar), und genau das haelt
-    # `test_wettbewerbsradar_alarme.py` am neuen Ort fest.
     assert _seite.eval_on_selector_all("#tafel-tco .gr-alarm", "e => e.length") == 0
 
 
@@ -602,10 +491,6 @@ def test_keine_beschriftung_unter_zwoelf_pixeln(_seite, tid):
     """
     _seite.click(f".gr-reiter button[data-tafel='{tid}']")
     _seite.wait_for_timeout(60)
-    # E2: die Meta-Etiketten des GENEHMIGTEN Zeitreihen-Prototyps (kleiner
-    # Erst-Wert, "unser Angebot"-Chip, Abrufdatum am Linienende) stehen
-    # bewusst bei 10-11 px - sie stuetzen, sie tragen keine Information
-    # allein (Antonios Graph-Entscheidung schlaegt hier die alte Regel).
     zu_klein = _seite.evaluate(f"""() => Array.from(
         document.querySelectorAll('#{tid} *')).filter(el =>
           el.textContent.trim()
@@ -627,11 +512,6 @@ def test_keine_beschriftung_wird_mit_punkten_abgeschnitten(_seite):
         ).length""")
     assert gekuerzt == 0
     assert "…" not in _seite.eval_on_selector("#tafel-tco", "e => e.innerText")
-
-
-# --------------------------------------------------------------------------
-# Die Reiter
-# --------------------------------------------------------------------------
 
 
 def test_der_reiter_blendet_ohne_neuladen_um(_seite):
@@ -659,9 +539,6 @@ def test_die_reiterleiste_traegt_vier_knoepfe_ohne_link(_seite):
     knoepfe = _seite.eval_on_selector_all(
         ".gr-reiter button[data-tafel]", "e => e.map(x => x.getAttribute('data-tafel'))"
     )
-    # 28.09.2026 (Antonio: „ich verstehe den Unterschied zwischen
-    # Vergleich und Preisverlauf nicht"): die Reiter heissen nach dem,
-    # was sie messen, und die zwei Ein-Geraet-Reiter stehen nebeneinander.
     assert knoepfe == ["tafel-tco", "tafel-verlauf", "tafel-radar", "tafel-katalog"]
     beschriftung = _seite.eval_on_selector_all(
         ".gr-reiter button", "e => e.map(x => x.textContent.trim())"
@@ -702,11 +579,6 @@ def test_jeder_reiter_bleibt_unter_drei_bildschirmen(_seite, tid):
     _seite.wait_for_timeout(60)
     hoehe = _seite.evaluate("document.documentElement.scrollHeight")
     assert hoehe < MAX_HOEHE, f"{tid}: {hoehe} px"
-
-
-# --------------------------------------------------------------------------
-# Filter, Suche, Aufklapper
-# --------------------------------------------------------------------------
 
 
 def _radar_url(seite):
@@ -780,8 +652,6 @@ def test_der_markenfilter_laesst_nur_die_passende_zeile(_seite):
     marken = _sichtbare_marken(_seite, "#wr-alarme")
     assert marken, "keine Zeile sichtbar - der Test misst nichts"
     assert set(marken) == {"Samsung"}, marken
-    # Gegenprobe: ohne Filter sind BEIDE Marken da, sonst traefe der Filter
-    # eine Fixture, die ohnehin nur Samsung kennt.
     _seite.select_option("#wr-alarme [data-filter='marke']", "")
     _seite.wait_for_timeout(60)
     assert set(_sichtbare_marken(_seite, "#wr-alarme")) == {"Apple", "Samsung"}
@@ -791,10 +661,6 @@ def test_ein_aktiver_filter_ist_rot_hinterlegt(_seite):
     """ "Aktive Filter werden rot hinterlegt mit weisser Schrift." Sie
     veraendern, was darunter steht, und das muss man sehen, ohne die Auswahl
     zu lesen."""
-    # Der eigene Ausgangszustand. Die erste Fassung verliess sich darauf,
-    # dass der Test davor "Samsung" gewaehlt hatte - einzeln ausgefuehrt fiel
-    # sie durch, und zwei Tests weiter unten steht der Kommentar, warum man
-    # das nicht tut.
     _radar_frisch(_seite)
     _seite.select_option("#wr-alarme [data-filter='marke']", "Samsung")
     _seite.wait_for_timeout(60)
@@ -812,12 +678,6 @@ def test_ein_aktiver_filter_ist_rot_hinterlegt(_seite):
 
 def test_die_suche_grenzt_ein(_seite):
     _radar_frisch(_seite)
-    # E3 (17.09.2026): zuerst "alle anzeigen" - sonst misst der Test den
-    # DECKEL gegen die Treffer, nicht die Suche gegen den Bestand. Mit dem
-    # Alarm-Deckel bei 12 war "vorher" zufaellig groesser als die Treffer-
-    # zahl; seit E3 teilen sich drei Sektionen das Budget EINER Tafel und
-    # der Deckel steht bei 5 - Suche und Deckel lieferten dann gleich viele
-    # sichtbare Zeilen, und der Test pruefte nichts mehr.
     mehr = _seite.query_selector("#gr-mehr")
     if mehr:
         mehr.click()
@@ -849,9 +709,6 @@ def test_eine_leere_auswahl_zeigt_einen_satz_statt_einer_leeren_flaeche(_seite):
 def test_der_klick_auf_eine_zeile_zeigt_alle_anbieter(_seite):
     """Ohne Klick steht die Anbieterliste NICHT da - sonst waere die Tabelle
     dreimal so hoch."""
-    # Der eigene Ausgangszustand, nicht der des vorigen Tests: ein Test, der
-    # auf dem Aufraeumen eines anderen sitzt, faellt aus, sobald der andere
-    # ausfaellt - und meldet dann etwas, das mit ihm nichts zu tun hat.
     _radar_frisch(_seite)
     zeile = "#wr-alarme .gr-a-zeile:not([hidden])"
     aufklapper = _seite.eval_on_selector(zeile, "e => '#' + e.dataset.auf")
@@ -863,11 +720,6 @@ def test_der_klick_auf_eine_zeile_zeigt_alle_anbieter(_seite):
         f"{aufklapper} .gr-a-liste li", "e => e.length"
     )
     assert eintraege >= 2, "der Aufklapper zeigt unseren Preis und den fremden"
-
-
-# --------------------------------------------------------------------------
-# "Alle anzeigen" - und was danach passiert
-# --------------------------------------------------------------------------
 
 
 def test_der_filter_wirkt_auch_nach_alle_anzeigen(_seite):
@@ -902,16 +754,12 @@ def test_ein_aufklapper_verschwindet_mit_seiner_zeile(_seite):
     _radar_frisch(_seite)
     zeile = "#wr-alarme .gr-a-zeile:not([hidden])"
     aufklapper = _seite.eval_on_selector(zeile, "e => '#' + e.dataset.auf")
-    # Der Klick TOGGELT. Die Fixture hat Modulgueltigkeit, ein Test davor kann
-    # denselben Aufklapper schon geoeffnet haben - dann klappt ein blinder
-    # Klick ihn zu, und der Test misst das Gegenteil dessen, was er behauptet.
     if (
         _seite.eval_on_selector(aufklapper, "e => getComputedStyle(e).display")
         == "none"
     ):
         _seite.click(f"{zeile} .gr-a-modell")
         _seite.wait_for_timeout(60)
-    # Gegenprobe: er ist wirklich offen, sonst misst der Test nichts.
     assert (
         _seite.eval_on_selector(aufklapper, "e => getComputedStyle(e).display")
         != "none"
@@ -982,8 +830,6 @@ def test_kein_aufklapper_steht_offen(_seite):
     vermass. Die Hoehenmessung allein ersetzt ihn nicht: sie laeuft auf einer
     Fixture, in der ein offenes `<details>` fast nichts kostet.
     """
-    # NICHT ueber `_frisch`, aber mit expliziter Adresse: die gemeinsame
-    # Seite kann nach einem Alarmtest gerade die RADAR-Seite zeigen.
     _seite.goto(_seite.url.rsplit("/", 1)[0] + "/geraete.html", wait_until="load")
     _seite.wait_for_timeout(60)
     for tid in ("tafel-tco", "tafel-katalog", "tafel-verlauf", "tafel-portfolio"):
@@ -1033,18 +879,6 @@ def test_die_seite_traegt_das_echte_abrufdatum(_seite):
     )
 
 
-# --------------------------------------------------------------------------
-# Reiter 3: das einzige Diagramm der Seite
-#
-# Diese Tests sind am 30.08.2026 nachgetragen worden, nachdem der Review
-# festgestellt hat, dass KEIN Test je in `#gr-vsuche` tippt: der ganze
-# Reiter war ungeprueft, waehrend seine Modul-Docstring das Gegenteil
-# behauptete. Die drei harten Regeln des Auftrags leben in `app.js` und sind
-# nur im Browser sichtbar - CLAUDE.md §6: "Eine Grafik ist erst fertig, wenn
-# sie jemand ANGESEHEN hat."
-# --------------------------------------------------------------------------
-
-
 def _waehle_geraet(seite, begriff="galaxy"):
     """Ein Geraet im Suchfeld auswaehlen. Gibt False, wenn die Fixture keins
     hergibt - dann darf der Aufrufer nicht schweigend durchlaufen."""
@@ -1073,12 +907,8 @@ def test_ohne_klick_steht_das_diagramm_des_ersten_geraets_da(_seite):
     _zeige_tafel(_seite, "tafel-verlauf")
     _seite.wait_for_timeout(200)
     assert _seite.eval_on_selector_all("#gr-vbild svg", "e => e.length") == 1
-    # Das vorausgewählte Gerät erreicht die Diagramm-Schwelle: die Fixture
-    # legt sechs Messtage an, das erste der Liste ist damit zeichnungsfähig.
     punkte = _seite.eval_on_selector_all("#gr-vbild .gr-vpunkt", "e => e.length")
     assert punkte >= 4, f"Auto-Auswahl zeichnet nur {punkte} Punkte"
-    # Das Suchfeld nennt das gezeichnete Gerät - sonst stünde ein Bild da,
-    # ohne dass der Leser wüsste, wessen Preis er sieht.
     feldwert = _seite.eval_on_selector("#gr-vsuche", "e => e.value")
     assert feldwert, "das Suchfeld nennt das vorausgewählte Gerät nicht"
     assert (
@@ -1087,12 +917,6 @@ def test_ohne_klick_steht_das_diagramm_des_ersten_geraets_da(_seite):
     ), "mit Auto-Vorauswahl steht der Leer-Satz nicht im Ausgangszustand"
 
 
-# SICHTBARKEIT, NICHT DAS ATTRIBUT (P4b, Re-Check 18.09.2026): die erste
-# Fassung dieses Tests assertete `e.hidden` - und war gruen, waehrend die
-# Leitzahl sichtbar stehenblieb, weil `.gr-leit{display:flex}` das
-# Browser-[hidden] uebersteuerte. Ein Test, der die Zusicherung nicht
-# wirklich prueft, prueft nichts (CLAUDE.md 6). Gemessen wird computed
-# display UND Boxhoehe - das, was der Leser sieht.
 _LEERZUSTAND_MESSUNG = """() => {
   const erg = {};
   for (const id of ['gr-vleit', 'gr-vkacheln']) {
@@ -1123,8 +947,6 @@ def test_die_leitzahl_und_die_kacheln_schweigen_in_beiden_leerzustaenden(_seite)
     _frisch(_seite)
     _zeige_tafel(_seite, "tafel-verlauf")
     _seite.wait_for_timeout(200)
-    # Gegenprobe: mit Auto-Vorauswahl sind Leitzahl UND Kacheln DA (sonst
-    # misst der Test einen Leerzustand, der nie gefüllt war).
     anfang = _seite.evaluate(_LEERZUSTAND_MESSUNG)
     assert anfang["gr-vleit"] and anfang["gr-vleit"]["sichtbar"], (
         "Fixture-Voraussetzung: die Leitzahl steht im Ausgangszustand"
@@ -1133,7 +955,6 @@ def test_die_leitzahl_und_die_kacheln_schweigen_in_beiden_leerzustaenden(_seite)
         "Fixture-Voraussetzung: die Kachelreihe steht im Ausgangszustand"
     )
 
-    # 1) Suchfeld ohne Treffer: Rückbau - Leitzahl und Kachelzahlen weg.
     _seite.fill("#gr-vsuche", "zzzz")
     _seite.wait_for_timeout(150)
     assert "Kein Gerät gefunden." in _seite.inner_text("#tafel-verlauf")
@@ -1148,7 +969,6 @@ def test_die_leitzahl_und_die_kacheln_schweigen_in_beiden_leerzustaenden(_seite)
         f"Geräts (display:{weg['gr-vkacheln']['display']}) - leer heißt leer"
     )
 
-    # 2) Leeres Zeitfenster: derselbe Rückbau über den anderen Pfad.
     _frisch(_seite)
     _zeige_tafel(_seite, "tafel-verlauf")
     _seite.wait_for_timeout(200)
@@ -1195,7 +1015,6 @@ def test_ein_deep_link_schlaegt_die_auto_vorauswahl(_seite):
         "der Deep-Link waehlt nicht sein Geraet"
     )
 
-    # Unbekannte id: still aufs erste Geraet, kein Bruch.
     _seite.goto(
         _seite.url.rsplit("/", 1)[0] + "/geraete.html?modell=gibtesnicht-999",
         wait_until="load",
@@ -1205,8 +1024,6 @@ def test_ein_deep_link_schlaegt_die_auto_vorauswahl(_seite):
     assert (
         _seite.eval_on_selector("#gr-vsuche", "e => e.value") == geraete[0]["label"]
     ), "eine unbekannte id muss still aufs erste Geraet fallen"
-    # Die module-weite Seite fuer die Folgetests zuruecklassen: ohne
-    # Parameter, Vergleichs-Reiter aktiv (Ladezustand).
     _frisch(_seite)
 
 
@@ -1214,7 +1031,6 @@ def test_nach_der_auswahl_steht_genau_ein_diagramm_fuer_ein_geraet(_seite):
     _frisch(_seite)
     assert _waehle_geraet(_seite), "die Fixture liefert kein waehlbares Geraet"
     assert _seite.eval_on_selector_all("#gr-vbild svg", "e => e.length") == 1
-    # Eine Linie JE ANBIETER, und die Legende nennt genau diese.
     legende = _seite.eval_on_selector_all(".gr-vlegende-teil", "e => e.length")
     assert legende > 0
     assert legende <= 8, "hoechstens acht Linien"
@@ -1251,13 +1067,6 @@ def test_die_achse_erfindet_keinen_preis(_seite):
     ein Preis, den es im Datensatz nicht gibt."""
     _frisch(_seite)
     assert _waehle_geraet(_seite)
-    # DEUTSCHE SCHREIBWEISE LESEN, nicht `parseFloat`. Die Achse schreibt
-    # wie der Rest der Seite ("1.099,00 €"), und `parseFloat("1.099")` ist
-    # 1,099 - der Test meldete damit eine Achse ausserhalb der Daten, die es
-    # nicht gab. Beim Bauen ist daraufhin einmal die SEITE angepasst worden
-    # (Achse ohne Tausendertrenner); das war die falsche Richtung, und der
-    # Reviewer hat es gemeldet: ein schwacher Testparser darf nicht
-    # bestimmen, wie die Seite aussieht.
     achse = _seite.eval_on_selector_all(
         ".gr-vsvg text",
         "e => e.filter(t => t.textContent.includes('€'))"
@@ -1313,7 +1122,6 @@ def test_die_tabelle_zeigt_dieselben_anbieter_wie_das_diagramm(_seite):
             )
         )
 
-    # 1. Volles Fenster: das Diagramm steht, und beide nennen dasselbe.
     assert _seite.is_visible("#gr-vbild svg"), (
         "ohne Diagramm prueft der erste Zweig nichts"
     )
@@ -1323,29 +1131,12 @@ def test_die_tabelle_zeigt_dieselben_anbieter_wie_das_diagramm(_seite):
         len(voll)
     )
 
-    # 2. Fenster VERENGT, aber noch ueber der Schwelle: das Diagramm bleibt
-    #    stehen, ein frueher Anbieter faellt heraus - und Legende und
-    #    Tabelle muessen weiter dieselben nennen.
-    #
-    #    Das ist die urspruengliche Zusicherung dieses Tests, und sie war
-    #    kurzzeitig verloren: mit genau `DIAGRAMM_AB_TERMINEN` Messtagen in
-    #    der Fixture fiel JEDE Verengung unters Gatter, es gab kein
-    #    Diagramm mehr und folglich keine Legende zum Vergleichen. Der
-    #    Ersatz war gegen den alten Fehler blind - eine Tabelle, die wieder
-    #    ueber den vollen Zeitraum rechnete, waere gruen geblieben. Die
-    #    Fixture hat deshalb sechs Messtage.
     _seite.fill("#gr-vvon", _MESSTAGE[2])
     _seite.wait_for_timeout(200)
     assert _seite.is_visible("#gr-vbild svg"), (
         "nach der Verengung auf vier Messtage muss das Diagramm stehen "
         "bleiben - sonst prueft dieser Zweig die Gleichheit gar nicht"
     )
-    # GEGENPROBE AN DER LEGENDE, nicht an der Tabelle. Die Legende entsteht
-    # aus den gezeichneten Reihen; die Tabelle ist der Verdaechtige dieses
-    # Tests. Haengt die Gegenprobe an der Tabelle, meldet ein Fehler in
-    # genau ihr "der Test kann den Fall nicht ausloesen" - also den falschen
-    # Grund. Es MUSS beim Verengen einer herausfallen, sonst ist die
-    # Gleichheit darunter trivial erfuellt.
     im_bild = legende()
     assert im_bild < voll, (
         f"beim Verengen faellt kein Anbieter aus dem BILD ({im_bild} von "
@@ -1372,8 +1163,6 @@ def test_die_tabelle_zeigt_dieselben_anbieter_wie_das_diagramm(_seite):
         f"die Tabelle nennt ein Datum, das im Bild nicht vorkommt: {tage - fenster}"
     )
 
-    # 3. Fenster auf EINEN Tag: unter der Schwelle, also kein Bild - die
-    #    Tabelle bleibt und folgt weiter dem Filter.
     bis = _seite.eval_on_selector("#gr-vbis", "e => e.value")
     _seite.fill("#gr-vvon", bis)
     _seite.wait_for_timeout(200)
@@ -1586,11 +1375,6 @@ def test_kein_kachelbetrag_bricht_um(_umgebung):
             s.close()
 
 
-# ==========================================================================
-# NACHBESSERUNG 30.08.2026 - im echten Chromium, weil es im HTML nicht steht
-# ==========================================================================
-
-
 def test_die_kachel_und_der_satz_nennen_dieselbe_zahl(_seite):
     """Antonios Befund: "Die Kachel sagt 4 Messpunkte, der Satz darunter
     5 Messtermine."
@@ -1614,7 +1398,6 @@ def test_die_kachel_und_der_satz_nennen_dieselbe_zahl(_seite):
     satz = (_seite.text_content("#gr-vstand") or "").strip()
     assert f"{aus_kachel} Messtermine" in satz, (satz, aus_kachel)
     assert ".." not in satz, f"doppelter Satzpunkt: {satz!r}"
-    # Der Gattersatz schweigt hier - sonst stuende dieselbe Zahl zweimal.
     assert not _seite.is_visible("#gr-vzukurz")
 
 
@@ -1629,9 +1412,6 @@ def test_das_raster_veraendert_die_zahl_der_messtermine_nicht(_seite):
     _frisch(_seite)
     assert _waehle_geraet(_seite)
 
-    # Gegenprobe: zwei Messtage MUESSEN in dieselbe Woche fallen, sonst
-    # koennte die Rasterung die Zahl gar nicht veraendern und der Test
-    # prueft eine Regel, die nicht greifen kann.
     from datetime import date
 
     wochen = {date.fromisoformat(t).isocalendar()[:2] for t in _MESSTAGE}
@@ -1662,9 +1442,6 @@ def test_das_raster_veraendert_die_zahl_der_messtermine_nicht(_seite):
         _seite.click(f'.gr-vknopf[data-raster="{raster}"]')
         _seite.wait_for_timeout(150)
         assert termine() == str(len(_MESSTAGE)), f"{raster}: {termine()}"
-        # KEIN DIAGRAMM OHNE LINIE. Entweder es steht eins da und traegt
-        # wenigstens eine Linie, oder es steht keins da - ein leeres Bild
-        # ist genau das, wogegen das Gatter gebaut ist.
         z = bild()
         assert not z["sichtbar"] or z["linien"] > 0, (
             f"{raster}: Diagramm ohne eine einzige Linie - {z}"
@@ -1772,9 +1549,6 @@ def test_eine_verdeckte_linie_wird_sichtbar_gemacht(_eigene_seite):
                  schneidetKreis: schneidet,
                  halo: getComputedStyle(t).paintOrder };
     }""")
-    # M: NAHE, nicht exakt auf der Hoehe - ein Versatz (nicht der Fehler
-    # der geloeschten Positionskarte, der bis zu 235 px betrug) UND keine
-    # Ueberschneidung mit einem Punkt-Kreis.
     assert 6 < lage["abstand"] <= 26, (
         f"das Etikett steht {lage['abstand']} px vom eigenen Punkt - "
         f"erwartet ein bewusster Versatz (22 px), keine 0 und keine 235"
@@ -1879,7 +1653,6 @@ def test_unter_vier_messterminen_steht_kein_diagramm(_seite):
     assert "2 Messtermine" in hinweis, hinweis
     assert "ab 4" in hinweis, hinweis
     assert ".." not in hinweis, f"doppelter Satzpunkt: {hinweis!r}"
-    # Und die Zahl steht nur EINMAL da.
     assert not _seite.is_visible("#gr-vstand")
     assert _seite.is_visible("#gr-vtabelle table"), (
         "die Tabelle ersetzt das Diagramm, sie verschwindet nicht mit ihm"
@@ -1978,12 +1751,9 @@ def test_die_sortierung_vergibt_den_zeilendeckel_neu(_seite):
             schluessel,
         )
 
-    # Gegenprobe: der Deckel muss ueberhaupt greifen, sonst ist der Fall
-    # nicht ausloesbar und der Test gruen ohne Aussage.
     assert len(sichtbar("sEuro")) < len(alle("sEuro")), (
         "kein Deckel aktiv - dann prueft dieser Test nichts"
     )
-    # Und die zwei Ordnungen muessen sich unterscheiden.
     nach_prozent = sorted(alle("sProzent"), reverse=True)
     assert nach_prozent != sorted(alle("sEuro"), reverse=True), (
         "Prozent und Euro ordnen gleich - der Fall ist nicht ausloesbar"
@@ -2060,8 +1830,6 @@ def test_die_achse_beschriftet_keine_zwei_linien_gleich(_eigene_seite):
         f"zwei Hilfslinien mit demselben Text: {achse}"
     )
 
-    # Und keine Marke liegt ausserhalb der Daten - die Regel von 30.08.2026
-    # gilt weiter, sie wird nur genauer beschriftet.
     werte = [
         float(
             t.replace("\u00a0", "")
@@ -2107,35 +1875,13 @@ def test_die_preiskacheln_stehen_so_im_datensatz(_seite):
     kachel_max = euro_zu_zahl(_seite.text_content("#gr-vmax"))
     assert kachel_min == min(werte), (kachel_min, min(werte))
     assert kachel_max == max(werte), (kachel_max, max(werte))
-    # Gegenprobe: die zwei Kacheln müssen sich unterscheiden, sonst sagt der
-    # Test nichts darüber, ob min und max verwechselt sind.
     assert kachel_min != kachel_max, (
         "alle Preise gleich - der Test kann eine Verwechslung nicht sehen"
     )
 
 
-# --------------------------------------------------------------------------
-# B5 (31.08.2026): "Standardansicht nach Hersteller und Aktualitaet
-# sortiert, vorgefiltert auf Zustand = neu, erste Bildschirmseite zeigt
-# mindestens drei Hersteller."
-#
-# EIGENE Seite, EIGENER Bestand - nicht `_seite`/`_KATALOG`. Die gemeinsame
-# Fixture kennt nur zwei Hersteller (Apple/Samsung im Wechsel); die
-# Zusicherung "mindestens drei Hersteller ohne Scrollen" ist mit ihr gar
-# nicht auslösbar. Ein eigener Bau ist hier billiger als ein Fixture-Umbau,
-# der Dutzende andere Tests (Alarmstufen, Markenfilter) mitreissen wuerde.
-# --------------------------------------------------------------------------
-
 _B5_HERSTELLER = ("Apple", "Samsung", "Google", "Xiaomi")
 
-# SIEBEN Geraete je Hersteller, nicht zwei (Nachbesserung, 31.08.2026,
-# B7 der Zurueckweisung Runde 2). Mit zwei Geraeten je Hersteller passt
-# schon eine REINE Gruppierung (kein Reihum) in die sichtbaren acht Zeilen
-# und schliesst alle vier Hersteller ein - der Mutationstest "Reihum
-# entfernen" faellt an keinem der beiden Tests auf, die genau das pruefen
-# sollen sollen. Mit sieben Geraeten fuellt "Apple" allein die ganze
-# sichtbare Flaeche, und nur ein echtes Reihum zeigt einen zweiten
-# Hersteller.
 _B5_KATALOG = {
     "geraete": [
         {
@@ -2167,12 +1913,6 @@ _B5_QUELLEN = {
 def _b5_listung(
     modell: str, hersteller: str, preis: float, zustand: str = "neu"
 ) -> dict:
-    # `device_id()` aus `geraete_model`, NICHT eine eigene Nachbildung: eine
-    # zweite Rechnung fuer dieselbe ID lief hier schon einmal auseinander
-    # (Xiaomi/Redmi-Fall der ersten Nachbesserung) - `device_id()` kuerzt
-    # den Hersteller aus dem Modellnamen, wenn er ihn bereits traegt
-    # ("Apple Modell 1" -> "apple-modell-1", NICHT
-    # "apple-apple-modell-1"), und genau das tat diese Fixture nicht.
     from telco_radar.geraete_model import device_id
 
     gid = device_id(hersteller, modell)
@@ -2273,13 +2013,6 @@ def _b5_frisch(_b5_seite):
     seite.goto(f"{_b5_seite['basis']}/geraete.html", wait_until="load")
     seite.click(".gr-reiter button[data-tafel='tafel-katalog']")
     seite.wait_for_timeout(80)
-    # "Erste Bildschirmseite" gilt AB DEM REITER, nicht ab dem Seitenkopf:
-    # der Zeitungskopf plus die Reihen der Titelseite darueber sind ein
-    # Preis, den jede Unterseite dieser Site einmal zahlt, unabhaengig von
-    # der Sortierung DIESES Reiters. Ohne den Scroll misst der Test, ob der
-    # Zeitungskopf kurz ist - nicht, ob der Katalog es ist. An der echten
-    # Ausgabe gemessen: ohne Scroll passt GAR KEINE Zeile mehr ins Bild (der
-    # Kopf allein braucht ueber 840 px), mit Scroll zum Reiter acht.
     seite.eval_on_selector(".gr-reiter", "e => e.scrollIntoView({block:'start'})")
     seite.wait_for_timeout(80)
     return seite
@@ -2335,12 +2068,6 @@ def test_der_ansichtsregler_steht_von_anfang_an_auf_barpreis(_b5_seite):
     aktive = [z for z in zustaende if z["aktiv"]]
     assert len(aktive) == 1 and aktive[0]["ansicht"] == "barpreis", zustaende
     assert aktive[0]["gedrueckt"] == "true", zustaende
-    # Die Tabelle steht auf Barpreis: die Barpreis-Spalten sind sichtbar,
-    # die TCO-Spalten nicht (die Umschaltung passiert ueber die Klasse
-    # `gr-katalog--tco`, kein Reload, kein zweites Rendering). Gemessen an
-    # den ZELLEN der ersten Modellzeile (`z.cells`) - ein td-Selektor
-    # griffe auch in die geschlossenen Aufklapper-Tabellen hinein, deren
-    # Zellen tragen ihre eigene display-Eigenschaft weiter.
     sichtbar = seite.eval_on_selector(
         "#gr-katalogtabelle .gr-k-zeile",
         "z => Array.from(z.cells)"
@@ -2369,16 +2096,6 @@ def test_die_vorbelegung_versteckt_serverseitig_keine_zeile(_b5_seite):
     assert ueberschrift == str(_b5_modellzahl()), ueberschrift
 
 
-# Die MESSREGEL des Rot-Deckels (P4b, Re-Check 18.09.2026). Bis hierhin war
-# der Deckel nirgends als Regel genagelt - deshalb konnten fix.md („Katalog
-# 5") und die Realitaet (12 vollrote Elemente) auseinanderlaufen, ohne dass
-# ein Test es meldete. Die Ursache des Falls: `.src-table a{color:var(--red)}`
-# (Spezifitaet 0-1-1) schlug `.gr-sprung` (0-1-0) - elf Sprung-Links standen
-# VOLLROT da, obwohl die P4-Regel „grau, Rot erst im Hover" im Stylesheet
-# stand. Gezaehlt wird am GERENDERTEN Katalog (computed styles, echte
-# Chromium-Rechnung), der Farbwert aus der CSS-Konstante gelesen - ein
-# hardcoded rgb(230,0,0) wuerde mit einer Umbenennung der Konstanten still
-# verrosten.
 _ROT_ZAEHLER = """() => {
   const probe = document.createElement('span');
   probe.style.color = 'var(--red)';
@@ -2419,15 +2136,10 @@ def test_der_rotdeckel_des_katalogs_ist_eine_messregel(_seite):
     _frisch(_seite)
     _zeige_tafel(_seite, "tafel-katalog")
     _seite.wait_for_timeout(150)
-    # Fixture-Wache: ohne Sprung-Links pruefte der zweite Assert nichts
-    # (die Entsättigung ist an genau dieser Link-Klasse gebunden).
     spruenge = _seite.eval_on_selector_all(
         "#gr-katalogtabelle a.gr-sprung", "e => e.length"
     )
     assert spruenge >= 1, "kein gr-sprung im Katalog der Fixture"
-    # Gegenprobe des Zaehlers selbst: ein gestellt rotes Element muss
-    # gezaehlt werden - sonst zaehlte die Regel still nichts (derselbe
-    # Grundsatz wie beim Lookup ins Leere: gruen waere beweislos).
     _seite.evaluate(
         """() => {
           const tafel = document.getElementById('tafel-katalog');
@@ -2445,7 +2157,6 @@ def test_der_rotdeckel_des_katalogs_ist_eine_messregel(_seite):
     _seite.evaluate(
         "() => document.querySelector('#tafel-katalog [data-rotprobe]').remove()"
     )
-    # Die eigentlichen Zusicherungen (ohne das Gegenprobe-Element).
     erg = _seite.evaluate(_ROT_ZAEHLER)
     assert not any("gegenprobe" in e["text"] for e in erg["elemente"]), (
         "die Gegenprobe klebt noch in der Tafel"
@@ -2462,15 +2173,6 @@ def test_der_rotdeckel_des_katalogs_ist_eine_messregel(_seite):
         f"{erg['n']} vollrote Elemente im initialen Katalog (Deckel 10): "
         f"{erg['elemente'][:6]}"
     )
-
-
-# --------------------------------------------------------------------------
-# B2/B3 der Zurueckweisung (31.08.2026): der Deckel folgt der Sortierung,
-# nicht der Position. Seit P3 wird nach der MODELLZEILE sortiert (Bis-P3:
-# Spalte "Zustand" der Listungstabelle) - der Reproduktionskern bleibt:
-# zwei Klicks auf einen Spaltenkopf, der Deckel darf nicht kollabieren,
-# und der "alle anzeigen"-Knopf liefert seine genannte Zahl.
-# --------------------------------------------------------------------------
 
 
 def _b5_modellzahl() -> int:
@@ -2546,22 +2248,10 @@ def test_b3_alle_anzeigen_liefert_was_der_knopf_verspricht(_b5_seite):
     )
 
 
-# --------------------------------------------------------------------------
-# B4/B5/B7 der Zurueckweisung (31.08.2026): der Quelllink im Anker - auf
-# der grossen, gemeinsamen Fixture (`_seite`), nicht auf der B5-eigenen:
-# diese drei Zusicherungen sind unabhaengig von Herstellervielfalt oder
-# Filterzustand und gelten fuer BEIDE Tabellen des echten Bestands.
-# --------------------------------------------------------------------------
-
-
 @pytest.mark.parametrize(
     "tafel,anker",
     [
         ("wr-alarme", "#wr-alarme .gr-a-quelle"),
-        # P3: die ANBIETERZELLE des Katalogs lebt im Zeilen-Aufklapper
-        # (`gr-k-listungen`) - in der Haupttabelle ist der Anker Teil der
-        # PREISzelle ("ab X € bei Y↗"), dort steht der Betrag vor dem Anker,
-        # was keine Rueckabwicklung ist (dafuer der eigene Test darunter).
         ("tafel-katalog", "#tafel-katalog .gr-k-listungen .gr-a-quelle"),
     ],
 )
@@ -2623,16 +2313,11 @@ def test_p3_der_anker_der_modellzeile_traegt_den_haendlernamen(_seite):
     )
     assert ergebnisse, "keine belegten Modellzeilen-Anker in der Fixture"
     for e in ergebnisse:
-        # Whitespace normalisieren: zwischen "bei" und dem Namen steht die
-        # Jinja-Einrueckung im Markup - fuer den LESER ist das ein Leer-
-        # zeichen, fuer textContent ein Zeilenumbruch.
         anker = " ".join(e["ankerText"].split())
         assert anker.startswith("bei ") and len(anker) > len("bei "), (
             f"der Anker nennt den Haendler nicht beim Namen: {anker!r}"
         )
         assert e["href"] and e["href"] != "#", f"Modellzeilen-Anker ohne Ziel: {e!r}"
-        # Der BETRAG steht in derselben Zelle (vor dem Anker) - die Zeile
-        # zeigt Preis UND Haendler zusammen, beide belegt.
         assert "€" in e["zelle"], e["zelle"]
 
 
@@ -2710,18 +2395,6 @@ def test_b5_enter_auf_dem_fokussierten_quelllink_wird_nicht_verhindert(_seite, t
         f"{tafel}: Enter auf dem Link wird verhindert - die Tastatur "
         "kann ihn nicht ausloesen"
     )
-
-
-# --------------------------------------------------------------------------
-# P1 (dritte Nachbesserung, 31.08.2026): Rueckweisung des Coordinators.
-# "Deine Fixture hat den Fall zweimal nicht ausgeloest." Beide vorigen
-# Fassungen bauten ihre EIGENE, kleine Fixture - und beide Male kam die
-# Datenlage der SYNTHETISCHEN Fixture zufaellig anders heraus als die der
-# ECHTEN Daten (erst zwei Geraete je Hersteller, dann sieben Geraete je
-# Hersteller statt sieben FARBEN eines einzigen Geraets). Dieser Test misst
-# deshalb direkt gegen `data/state/geraete_db.json` und
-# `config/geraete_katalog.yaml` - keine eigene Erfindung mehr dazwischen.
-# --------------------------------------------------------------------------
 
 
 @pytest.fixture(scope="module")
@@ -2804,9 +2477,6 @@ def test_p1_die_erste_seite_zeigt_mindestens_drei_hersteller_an_echten_daten(
         "Dieser Test misst nichts, solange das nicht stimmt."
     )
 
-    # JETZT die eigentliche Zusicherung, im echten Chromium auf den echten
-    # Daten - genau der Ort, an dem der Coordinator den Fehler zweimal
-    # gefunden hat, nachdem zwei synthetische Fixtures ihn verfehlten.
     marken = _echte_seite.eval_on_selector_all(
         "#gr-katalogtabelle .gr-a-zeile",
         "e => e.filter(x => getComputedStyle(x).display !== 'none')"
@@ -2840,9 +2510,6 @@ def test_p1_der_deckel_zaehlt_modelle_ohne_alle_anzeigen(_echte_seite):
         f"{len(zeilen)} sichtbare Modellzeilen ohne 'alle anzeigen', "
         f"Deckel ist {geraete_view.KATALOG_SICHTBAR}"
     )
-    # Und es sind MODELLZEILEN, keine Listungen: kein Geraet-Speicher-Paar
-    # kommt zweimal vor (die 24 Zeilen des iPhone 17 Pro haetten bis P3
-    # als 24 Zeilen gezaehlt).
     from collections import Counter
 
     doppel = {g: n for g, n in Counter(zeilen).items() if n > 1}
@@ -2868,7 +2535,7 @@ def test_p3_wertlose_sortierung_steht_unten_nicht_oben(_seite):
     _seite.wait_for_timeout(80)
     _seite.click("#gr-kmehr")
     _seite.wait_for_timeout(120)
-    for _ in range(2):  # 1. Klick: absteigend, 2. Klick: aufsteigend
+    for _ in range(2):
         _seite.click('#gr-katalogtabelle .gr-sort[data-sort="spanne"]')
         _seite.wait_for_timeout(120)
         lage = _seite.eval_on_selector_all(
@@ -2920,16 +2587,12 @@ def test_p3_der_ansichtwechsel_nimmt_die_sortierung_mit(_seite):
     _seite.wait_for_timeout(80)
     _seite.click("#gr-kmehr")
     _seite.wait_for_timeout(120)
-    # Achtung: das Attribut heisst data-s-GERAET - `dataset.geraet` laese
-    # sich still zu null auf JEDE Zeile auslesen, und der Vergleich unten
-    # vergliche zwei leere Listen (die "Test prueft nichts"-Falle).
     anfangs = _seite.eval_on_selector_all(
         "#gr-katalogtabelle .gr-a-zeile",
         "z => z.map(r => r.getAttribute('data-s-geraet'))",
     )
     assert all(anfangs), "kein Modellname an den Zeilen - der Test misst nichts"
 
-    # --- Fall 1: Hauptpreisspalte wird gemappt (preis -> tco).
     _seite.click('#gr-katalogtabelle .gr-sort[data-sort="preis"]')
     _seite.wait_for_timeout(120)
     _seite.click("#tafel-katalog .gr-kansicht button[data-ansicht='tco']")
@@ -2950,8 +2613,6 @@ def test_p3_der_ansichtwechsel_nimmt_die_sortierung_mit(_seite):
         }
       """,
     )
-    # Der aktive Sortierkopf ist JETZT der TCO-Kopf - sichtbar und mit
-    # Pfeil - und die TCO-Werte stehen monoton (Erstklick = absteigend).
     aktiv = _seite.eval_on_selector(
         "#gr-katalogtabelle thead .gr-sort[data-vor]",
         """
@@ -2972,8 +2633,6 @@ def test_p3_der_ansichtwechsel_nimmt_die_sortierung_mit(_seite):
         f"TCO-Werte nach dem Wechsel unsortiert: {lage['werte']}"
     )
 
-    # --- Fall 2: eine Spalte OHNE Entsprechung (delta nur in der
-    # TCO-Ansicht) faellt auf die Server-Ordnung zurueck.
     _seite.click('#gr-katalogtabelle .gr-sort[data-sort="delta"]')
     _seite.wait_for_timeout(120)
     _seite.click("#tafel-katalog .gr-kansicht button[data-ansicht='barpreis']")
@@ -2992,15 +2651,6 @@ def test_p3_der_ansichtwechsel_nimmt_die_sortierung_mit(_seite):
         "nach dem Wechsel steht nicht die Server-Ordnung: "
         f"{jetzt[:4]} statt {anfangs[:4]}"
     )
-
-
-# --------------------------------------------------------------------------
-# Der Bestpreis-Stempel (04.09.2026, idealo-Muster)
-#
-# Die Kachel "Niedrigster Preis" sagt, WIE tief es war. Der Stempel sagt,
-# WANN - und das ist die einzige der beiden Auskuenfte, die nur das Bild
-# geben kann.
-# --------------------------------------------------------------------------
 
 
 def _probe_mit_tiefpunkt(tage, tiefster: int):
@@ -3079,7 +2729,6 @@ def test_der_bestpreis_stempel_nennt_den_tag_und_nicht_den_preis(_eigene_seite):
     assert "700" not in text and "€" not in text, (
         f"der Stempel wiederholt den Preis der Kachel nicht: {text!r}"
     )
-    # Der zweite Messtag der Fixture, in der Schreibweise der Seite.
     tag, monat = tage[1].split("-")[2], tage[1].split("-")[1]
     assert f"{int(tag)}.{int(monat)}." in text, (
         f"der Stempel nennt den billigsten Tag: {text!r} (erwartet {tage[1]})"
@@ -3135,8 +2784,6 @@ def test_der_bestpreis_stempel_bleibt_im_bild(_eigene_seite, tiefster):
                  breite: svg.viewBox.baseVal.width };
     }""")
     if lage is None:
-        # Faellt der Tiefpunkt im Wochenraster mit einem Nachbarn zusammen,
-        # ist die Reihe flach und traegt zu Recht keinen Stempel.
         pytest.skip("in diesem Raster gibt es keinen eigenen Tiefpunkt")
     assert lage["links"] >= 0, f"das Etikett beginnt im Bild: {lage}"
     assert lage["rechts"] <= lage["breite"], f"und endet darin: {lage}"
@@ -3192,19 +2839,11 @@ def test_jede_breite_tabelle_liegt_in_ihrem_rollbehaelter(_seite):
                      .map(t => ({klassen: t.className,
                                  drin: !!t.closest('.gr-scroll')}))"""
     )
-    # Ohne diese Zeile prueft der Test bei leerem Reiter nichts und ist
-    # trotzdem gruen - dieselbe Falle wie der Lookup, der 0 von 7 traf.
-    # P2 (17.09.2026): es sind noch DREI Tabellen - die vierte war die
-    # G2-Tabelle des Verlaufs-Reiters und ist mit dem Block gefallen.
     assert len(tabellen) >= 3, (
         f"die Fixture muss alle Tabellen des TCO-Reiters zeigen: {tabellen}"
     )
     ohne = [t["klassen"] for t in tabellen if not t["drin"]]
     assert not ohne, f"Tabellen ohne Rollbehaelter: {ohne}"
-    # P2-Fix (Code-Prüfung S4-3): die dynamische Verlaufstabelle trägt nicht
-    # `gr-ttab` (sie rollt im eigenen Behälter `#gr-vtabelle`, nicht in
-    # `.gr-scroll`) - die REGEL gilt für sie genauso: jede breite Tabelle
-    # dieser Seite rollt in sich, nie die ganze Seite.
     verlauf = _seite.evaluate(
         """() => Array.from(document.querySelectorAll('#gr-vtabelle table'))
                      .map(t => ({klassen: t.className,
@@ -3215,26 +2854,6 @@ def test_jede_breite_tabelle_liegt_in_ihrem_rollbehaelter(_seite):
     )
     ohne_v = [t["klassen"] for t in verlauf if not t["drin"]]
     assert not ohne_v, f"Verlaufstabellen ohne Rollbehaelter: {ohne_v}"
-
-
-# ==========================================================================
-# PHASE R - die TCO-Hauptansicht im echten Browser (04.09.2026)
-#
-# Diese Faelle stehen hier und nicht im Modultest, weil sie erst im Browser
-# entstehen: die Modellauswahl blendet um, ohne zu laden. Ein HTML-Test
-# saehe dabei nur Markup.
-#
-# DIE BALKENLAENGE (G1) IST SEIT BRIEF_FADEN (05.09.2026) NICHT MEHR HIER:
-# G1 wird in dieser Ansicht nicht mehr gerendert (Kriterium 1), und seine
-# Geometrie ist ohnehin SERVERGERECHNET, keine Browser-Layoutfrage - die
-# Zusicherung steht jetzt statisch in
-# `tests/test_geraete_tco_hauptansicht.py::test_die_balkenlaenge_entspricht_dem_betrag`.
-#
-# O2 (11.09.2026): die Karten sind TABILLENZEILEN geworden (`.gr-bnd`), und
-# die JS-Sortierung samt Sortier-/Filter-Control ist entfallen (§4
-# Entscheidung 3) - die Zeilen stehen serverseitig nach TCO-24. Geprueft
-# wird jetzt ebendiese Ordnung im Browser.
-# ==========================================================================
 
 
 def test_die_zeilen_stehen_nach_tco24_sortiert(_seite):
@@ -3256,8 +2875,6 @@ def test_die_modellauswahl_blendet_ohne_neuladen_um(_seite):
     und die Bündel-Zeilen desselben Modells - ohne Neuladen, mit demselben
     Markup wie der Server-Render (kein Client-Renderer, keine Zahl im
     Client)."""
-    # Die Seite ist modulweit geteilt; unter pytest-xdist lief hier zuvor
-    # ein Test, der einen anderen Reiter offen liess (auch auf main rot).
     _zeige_tafel(_seite, "tafel-tco")
     auswahl = _seite.eval_on_selector(
         "#gr-zeitreihe-daten", "k => Object.keys(JSON.parse(k.textContent).erlaubt)"
@@ -3294,18 +2911,6 @@ def test_jede_zeile_mit_zahl_beantwortet_die_leitfrage(_seite):
                      && !z.querySelector('.gr-kk-24'))
         .map(z => z.getAttribute('data-anbieter'))""")
     assert fehlend == []
-
-
-# ==========================================================================
-# O2 (11.09.2026): die Bündel-Zeilen - Nachfolger der OPTIK-6-Klappe
-#
-# Die Klappe ist entfallen (die Karte ist eine Zeile geworden, jede mit
-# ihrem EIGENEN kleinen Aufklapper; Sortier- und Anbieterfilter-Controls
-# sind mit ihr gegangen, §4 Entscheidung 3). Was von den OPTIK-6-Tests
-# bleibt, ist das, was 11b NICHT messen kann: dass die Zeilen geschlossen
-# starten (kein `open`-Attribut im HTML) und dass ihr Öffnen ohne EINEN
-# Netzwerkabruf sichtbar wird (statisch im Dokument, reines UI).
-# ==========================================================================
 
 
 def test_die_buendelzeilen_starten_geschlossen(_seite):
@@ -3362,8 +2967,6 @@ def test_die_buendelzeile_oeffnet_ohne_netzwerk(_seite):
         _seite.wait_for_timeout(200)
     finally:
         _seite.remove_listener("request", _zaehle)
-        # Den Ausgangszustand zurueckgeben: die Seite hat Modulgueltigkeit,
-        # und ein spaeterer Test misst sonst eine aufgeklappte Zeile.
         _seite.evaluate(
             "() => document.querySelectorAll('.gr-bnd')"
             ".forEach(z => { z.open = false; })"
@@ -3382,17 +2985,11 @@ def test_die_alt_url_landet_im_radar_reiter(_umgebung):
     Deep-Link-Form (?modell=…&band=…); entscheidend ist der AKTIVE
     Reiter, nicht der Hash in der Adresszeile."""
     browser, adresse = _umgebung
-    # `_umgebung` traegt die VOLLE Adresse der Modulseite - inklusive des
-    # ?modell-Deep-Links, den app.js per replaceState hineingeschrieben
-    # hat. Als Basis einer neuen Adresse wuerde daraus ein Phantom-Pfad
-    # (.../geraete.html?modell=.../wettbewerbsradar.html), den der
-    # Testserver mit der UNVERANDERTEN Geräteseite beantwortet - der Test
-    # mässe dann den Deep-Link, nicht die Weiterleitung.
     basis = adresse.rsplit("/", 1)[0]
     seite = browser.new_page(viewport={"width": 1440, "height": 900})
     try:
         seite.goto(f"{basis}/wettbewerbsradar.html", wait_until="load")
-        seite.wait_for_timeout(1000)  # Meta-Refresh 0s + Reiter-Schaltung
+        seite.wait_for_timeout(1000)
         assert "geraete.html" in seite.url, (
             f"der Meta-Refresh hat nicht weitergeleitet: {seite.url}"
         )

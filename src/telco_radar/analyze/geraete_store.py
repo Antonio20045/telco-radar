@@ -44,127 +44,29 @@ from ..geraete_model import (
 
 log = logging.getLogger(__name__)
 
-# Ab wie vielen Laeufen ohne einen einzigen Fund ein Anbieter als "vermarktet
-# keine Hardware" gilt. Drei, nicht einer: nach einem leeren Lauf ist die
-# wahrscheinlichere Erklaerung eine kaputte Quelle, und ein Anbieter, der zu
-# Unrecht als SIM-only gefuehrt wird, verschwindet aus der Geraeteuebersicht,
-# ohne dass jemand es merkt.
 _LAEUFE_BIS_SIM_ONLY = 3
 
-# --------------------------------------------------------------------------
-# ABDECKUNGSWAECHTER (P1/C2, 22.09.2026)
-# --------------------------------------------------------------------------
-# Die Schwelle hiess bis heute AUSFALL_TAGE = 7: ein Anbieter galt als
-# still, wenn er SIEBEN beobachtete Tage lang nichts lieferte. Gemessen an
-# der Wirklichkeit war das zu langsam und zu grob - 50 Laeufe von
-# `geraete.yml` waren gruen, darunter die sechs Tage, an denen die Telekom
-# nichts geliefert hat. Ein Ausfall, der erst nach einer Woche laut wird,
-# ist kein Waechter, sondern ein Nachruf. Verglichen wird deshalb mit dem
-# VORTAG (genauer: mit dem letzten Messtag davor, siehe
-# `GeraeteDB.ausfall_alarme`).
-#
-# Die vier Lesezustaende stehen im Bestand, weil die Zeilenzahl allein die
-# entscheidende Frage nicht beantwortet: 0 Zeilen heisst entweder "gelesen,
-# nichts gefunden" - das ist ein Ausfall - oder "gar nicht angefasst" - und
-# das ist keine Aussage, sondern eine Luecke (CLAUDE.md Clean Code 4 und 6).
-GELESEN = "gelesen"  # Einstieg vollstaendig gelesen
-NICHT_GELESEN = "nicht gelesen"  # nicht angefasst: Besuchszeit, nicht
-# crawlbar, kein Adapter
-LESEFEHLER = "lesefehler"  # Leseversuch gescheitert oder abgebrochen
+GELESEN = "gelesen"
+NICHT_GELESEN = "nicht gelesen"
+LESEFEHLER = "lesefehler"
 
-# DER VIERTE ZUSTAND (S2-1, 22.09.2026). Bis hierher machte EIN einziger am
-# Besuchsfenster abgewiesener Abruf den GANZEN Anbieter zu NICHT_GELESEN -
-# auch den, der vier Produktseiten gelesen und drei Listungen geliefert
-# hatte. Damit fiel er ganz aus dem Vergleich, und der Waechter war fuer
-# medimax.de und ep.de im REGELFALL blind: genau diese zwei haengen jede
-# Nacht an ihrem Fenster. "Gar nicht angefasst" und "teilweise gelesen,
-# dann ging die Tuer zu" sind zwei Auskuenfte. Der Teiltag bleibt im
-# Vergleich (er kann heute ausfallen wie jeder andere), taugt aber nicht
-# als VERGLEICHSBASIS: was bis zum Fensterende durchkam, ist nicht das
-# Sortiment (siehe `Messtag.vergleichsbasis`).
-#
-# DER PREIS DIESER REGEL, damit ihn niemand suchen muss: haengt ein
-# Anbieter MEHRERE Tage hintereinander an seinem Fenster, bleibt er jeden
-# dieser Tage ein Befund (die Basis ist ja der letzte vollstaendige Tag).
-# Das ist gewollt - ein halb gelesener Anbieter ist eine halbe Abdeckung,
-# und die gehoert gemeldet. GEMELDET wird sie deshalb trotzdem nicht
-# taeglich: dafuer sorgt die Wiederholungssperre in
-# `GeraeteDB.abdeckungsalarm` (S2-B).
 TEILGELESEN = "teilweise gelesen"
 
-# Die drei Alarmarten. Alle sind MELDUNG und greifen in nichts ein.
-ALARM_AUSFALL = "ausfall"  # gestern Zeilen, heute keine
-ALARM_RUECKGANG = "rueckgang"  # heute deutlich weniger Zeilen
-# DIE DRITTE ART (S2-B, 22.09.2026). Ein Vergleich, der keine Basis mehr
-# hat, ist kein ruhiger Tag - er ist ein blinder Waechter, und das ist
-# selbst eine meldepflichtige Lage. Ohne diese Art verstummte der Kanal
-# dauerhaft, sobald der letzte vollstaendig gelesene Tag aus dem Journal
-# fiel: ein Anbieter, der nur noch Teiltage liefert, hat nach
-# `_FUND_HISTORIE_TAGE` Tagen keine Basis mehr, und ein echter
-# Totalausfall danach loeste nichts mehr aus.
-ALARM_OHNE_BASIS = "ohne_basis"  # seit Tagen kein vollstaendiger Tag
-# DIE VIERTE ART (S2-2, 22.09.2026). Seit tote Produktadressen eine
-# benannte Luecke sind und keinen Lauf mehr kippen
-# (`collect.geraete._MINDESTANTEIL_GELESENER_PRODUKTSEITEN`), kann ein
-# Anbieter Nacht fuer Nacht knapp unter der Schwelle bleiben und trotzdem
-# verschwinden: 24 % tote Adressen je Nacht reissen weder die Schwelle
-# (sie laesst jede vierte zu) noch `ABDECKUNG_RUECKGANG` (der vergleicht
-# mit GESTERN, und 24 % sind weniger als 30 %). Nach fuenf Naechten sind
-# 0,76^5 = 24 % des Sortiments uebrig, und kein Kanal hat angeschlagen -
-# laut wuerde es erst bei null Zeilen (`ALARM_AUSFALL`), also als Nachruf.
-# Diese Art meldet deshalb den VERLAUF: nicht "heute weniger als gestern",
-# sondern "seit dem aeltesten Messtag im Fenster ist zu viel weg".
-ALARM_EROSION = "erosion"  # Sortiment broeselt ueber Tage weg
+ALARM_AUSFALL = "ausfall"
+ALARM_RUECKGANG = "rueckgang"
+ALARM_OHNE_BASIS = "ohne_basis"
+ALARM_EROSION = "erosion"
 
-# Ab welchem ANTEIL Rueckgang gegenueber dem letzten Liefertag gemeldet
-# wird. 0.30 und ECHT groesser: Sortiments- und Verfuegbarkeitsrauschen
-# liegt darunter, der Verlust einer Kategorieseite darueber.
 ABDECKUNG_RUECKGANG = 0.30
 
-# IN WELCHEM ABSTAND EIN BLEIBENDER BEFUND ERNEUT GEMELDET WIRD (S2-B,
-# 22.09.2026). Gemessen ueber 45 simulierte Tage: ein vollstaendiger Tag,
-# danach nur Teiltage - der Waechter meldete denselben Satz an 29 Tagen
-# hintereinander, jeden mit eigener Mail. Ein Kanal, der das tut, ist nach
-# der dritten Mail ein Postfachfilter und damit so stumm wie einer, der
-# nie meldet. Gemeldet wird deshalb beim ZUSTANDSWECHSEL und sonst an
-# jedem siebten KALENDERTAG (`_ist_wiederholungstag`). Sieben, weil der
-# Job taeglich laeuft: eine Woche unveraenderter Lage ist die naechste
-# Nachfrage wert, ein Tag nicht.
 _ALARM_WIEDERHOLUNG_TAGE = 7
 
-# Ab wie vielen BEOBACHTETEN Tagen ohne einen einzigen vollstaendig
-# gelesenen Tag die fehlende Vergleichsbasis selbst gemeldet wird
-# (`ALARM_OHNE_BASIS`). Drei, nicht einer: ein einzelner Teiltag ist der
-# Regelfall an einem Besuchsfenster und noch keine Luecke - drei
-# beobachtete Tage ohne vollstaendigen Abruf sind eine.
 _OHNE_BASIS_TAGE = 3
 
-# Ueber wie viele MESSTAGE MIT ADRESSAUSKUNFT der Erosionsalarm zurueck
-# vergleicht. Sieben, weil der Job taeglich laeuft: eine Woche ist der
-# Horizont, in dem die Frage "seit wann eigentlich" noch beantwortbar ist,
-# und derselbe Abstand, in dem ein bleibender Befund erneut gemeldet wird
-# (`_ALARM_WIEDERHOLUNG_TAGE`). Gezaehlt werden Tage MIT Auskunft und nicht
-# Kalendertage: ein Anbieter, der drei Naechte an seinem Besuchsfenster
-# haengt, verliert dadurch seine Vergleichsbasis nicht.
-#
-# Gemessen an der Schwelle: bei 25 % toten Adressen je Nacht - genau dem,
-# was `_MINDESTANTEIL_GELESENER_PRODUKTSEITEN` gerade noch durchlaesst -
-# ist nach zwei Naechten mehr als `ABDECKUNG_RUECKGANG` weg. Das Fenster
-# ist also nicht die Nachweisgrenze, sondern der Rand, bis zu dem auch
-# eine LANGSAMERE Erosion (ab rund 5 % je Nacht) noch auffaellt.
 _EROSION_FENSTER_TAGE = 7
 
-# Wie viele Tage die Fund-Historie je Anbieter behaelt. Der Waechter
-# vergleicht mit dem Vortag und braucht davon genau einen; der Rest traegt
-# die Wiederholungssperre, die fehlende Vergleichsbasis und den
-# Diagnose-Rand nach hinten (`stille_tage`, die Frage "seit wann eigentlich").
-# Gemessen am geschriebenen State (`indent=1`, Eintragsform
-# [Tag, Funde, Zustand, Buendel]): 30 Eintraege kosten rund 1,6 kB je
-# Anbieter (~53 Byte je Eintrag), ueber alle neun Anbieter also unter
-# 20 kB - ein Bruchteil einer einzigen Listung.
 _FUND_HISTORIE_TAGE = 30
 
-# Die Felder, deren Aenderung einen neuen Historienpunkt rechtfertigt.
 _HISTORIENFELDER = (
     "preis_ohne_vertrag",
     "uvp",
@@ -174,15 +76,8 @@ _HISTORIENFELDER = (
     "verfuegbarkeit",
 )
 
-# Welche davon ueberhaupt ein Preis sind - der allererste Messpunkt einer
-# Listung wird nur geschrieben, wenn EINER davon einen Wert hat. Frueher
-# stand hier nur `preis`/`uvp`, und eine Listung, deren einziger Preis ein
-# Vertragspreis ist, bekam nie einen Historienpunkt.
 _PREISFELDER = ("preis_ohne_vertrag", "uvp", "preis_mit_vertrag_ab", "zuzahlung")
 
-# Die Felder, die die PREISFORM von `preis_ohne_vertrag` beschreiben. Sie
-# gehoeren zusammen und zu genau der Zahl, mit der sie gemessen wurden -
-# siehe `GeraeteDB.upsert`.
 _PREISFORMFELDER = ("anzahlung", "monatsrate", "laufzeit_monate", "zins_effektiv")
 
 
@@ -212,19 +107,6 @@ class Messtag:
     funde: int
     buendel: int
     zustand: str
-    # Die zwei ADRESSZAHLEN dieses Tages - die Groesse, in der die
-    # Leseschwelle der Sammelstufe rechnet
-    # (`collect.geraete._MINDESTANTEIL_GELESENER_PRODUKTSEITEN`), und
-    # deshalb die einzige, in der sich ihr Verlauf ehrlich vergleichen
-    # laesst. `versucht` sind die Produktadressen, an denen der Lauf
-    # wirklich war, `tote` die davon, die der Anbieter selbst als nicht
-    # mehr vorhanden beantwortet hat (HTTP 404/410).
-    #
-    # `tote is None` heisst "dieser Tag sagt dazu nichts" - ein Altbestand
-    # ohne die Felder, ein uebersprungener Anbieter, ein Adapter ohne
-    # Produktseiten. Keine 0: eine 0 waere die Auskunft "versucht, keine
-    # war tot" und damit eine Entwarnung, die niemand gemessen hat
-    # (CLAUDE.md Clean Code 3).
     versucht: int = 0
     tote: Optional[int] = None
 
@@ -308,28 +190,11 @@ class Abdeckungsalarm:
     tag: str
     zeilen: int
     zustand: str
-    # Die drei Vergleichsfelder sind `None`, wenn es KEINE Vergleichsbasis
-    # gibt (`ALARM_OHNE_BASIS`) - eine benannte Luecke, keine 0 und kein
-    # erfundener Tag (Clean Code 3). Bei den beiden anderen Arten sind sie
-    # immer gefuellt.
     vortag: Optional[str]
     zeilen_vortag: Optional[int]
-    # Anteil 0..1, und zwar der Groesse, die DIESE Alarmart misst: bei
-    # `ALARM_AUSFALL`/`ALARM_RUECKGANG` die Zeilen, bei `ALARM_EROSION`
-    # die gelesenen Produktadressen. Welche gemeint ist, sagt `satz` mit
-    # Worten - hier steht nur die Zahl, damit `prozent` und die Sortierung
-    # eine einzige Rechnung haben.
     rueckgang: Optional[float]
     stille_tage: int
-    # Wie viele beobachtete Tage in Folge ohne einen einzigen vollstaendig
-    # gelesenen Tag - nur bei `ALARM_OHNE_BASIS` eine Aussage.
     ohne_basis_tage: int = 0
-    # Die gelesenen PRODUKTADRESSEN heute und am Bezugstag - nur bei
-    # `ALARM_EROSION` eine Aussage, sonst `None`. Eigene Felder und nicht
-    # `zeilen`/`zeilen_vortag` mitbenutzt: Adressen und Zeilen sind zwei
-    # Groessen (45 Adressen trugen 133 Listungen), und ein Feld, das mal
-    # das eine und mal das andere bedeutet, ist genau die Verwechslung,
-    # gegen die diese Alarmart gebaut wurde.
     adressen: Optional[int] = None
     adressen_vortag: Optional[int] = None
 
@@ -473,17 +338,9 @@ def _als_listung(x) -> Listung:
     if isinstance(x, Listung):
         return x
     felder = dict(x)
-    # Fehlende Pflichtfelder ausdruecklich leer setzen, statt Python einen
-    # TypeError werfen zu lassen: der Aufrufer soll den SATZ hoeren, der die
-    # Regel nennt ("kein Preis ohne Beleg"), nicht eine Signaturmeldung.
     felder.setdefault("quelle_url", "")
     felder.setdefault("abgerufen_am", "")
     return Listung(**felder)
-
-
-# --------------------------------------------------------------------------
-# Aktueller Stand
-# --------------------------------------------------------------------------
 
 
 class GeraeteDB:
@@ -499,10 +356,6 @@ class GeraeteDB:
         self._eintraege: dict[str, dict] = {}
         self._anbieter: dict[str, dict] = {}
         self.updated = ""
-        # Eine unlesbare Datei ist NICHT dasselbe wie "noch nichts gefunden".
-        # Ohne dieses Feld schriebe die Seite "Der Geraetezweig laeuft, hat
-        # aber noch keine Listung aufgenommen" - der Fallstrick aus
-        # CLAUDE.md §6, nur eine Ebene hoeher.
         self.lesbar = True
         if self.path.exists():
             try:
@@ -516,8 +369,6 @@ class GeraeteDB:
                 if e.get("id"):
                     self._eintraege[e["id"]] = e
             self._anbieter = dict(roh.get("anbieter") or {})
-
-    # -------------------------------------------------------------- lesen
 
     def eintraege(self, status: Optional[Iterable[str]] = None) -> list[dict]:
         werte = list(self._eintraege.values())
@@ -575,8 +426,6 @@ class GeraeteDB:
             passend.append(e)
         return passend[0] if len(passend) == 1 else None
 
-    # ------------------------------------------------------------ schreiben
-
     def upsert(self, listungen, today: str) -> tuple[int, set]:
         """Listungen aufnehmen oder auffrischen.
 
@@ -588,12 +437,6 @@ class GeraeteDB:
         neu = 0
         gesehen: set[str] = set()
         self.kollisionen = []
-        # Die ROHSAETZE, die dieser Aufruf wegen einer Kollision NICHT
-        # eingetragen hat. Der Aufrufer braucht sie, um fuer sie auch keine
-        # Historie zu schreiben - sonst entsteht genau die Saegezahnkurve,
-        # die der Kommentar unten verhindern will, nur eine Stufe spaeter
-        # (QA-Befund B2, 04.09.2026: ALDI TALKs Galaxy A17 sprang in
-        # `geraete_preise.jsonl` jeden Tag zwischen 129 und 159 EUR).
         self.uebergangen: list = []
         for roh in listungen:
             listung = _als_listung(roh)
@@ -605,12 +448,6 @@ class GeraeteDB:
                     eintrag = verwandt
                     lid = eintrag["id"]
             if lid in gesehen:
-                # Zwei Saetze DESSELBEN Laufs auf einer ID. Das kann nur
-                # heissen, dass zwei Artikel nicht unterscheidbar waren (etwa
-                # zwei Farben, die die Quelle diesmal nicht mitgeliefert hat).
-                # Der zweite wird NICHT eingetragen - sonst schriebe die
-                # Historie in jedem Lauf zwei Aenderungspunkte hin und zurueck
-                # und die Kurve saehe aus wie ein Preiskampf.
                 self.kollisionen.append((lid, listung.titel_roh))
                 self.uebergangen.append(roh)
                 continue
@@ -631,16 +468,6 @@ class GeraeteDB:
                     "first_seen": today,
                     "status": STATUS_AKTIV,
                     "missed_checks": 0,
-                    # Der Einfuehrungspreis - der erste Preis, den dieses
-                    # Radar je fuer diese Listung gesehen hat. Bewusst NICHT
-                    # der UVP: gemessen wird, was der Anbieter verlangt hat,
-                    # nicht was der Hersteller empfiehlt.
-                    #
-                    # Mit seiner PREISART daneben: ein Einfuehrungspreis von
-                    # 1449 Euro ohne Vertrag und eine spaetere Zuzahlung von
-                    # 49,95 Euro ergaeben sonst 96,6 Prozent "Preisverfall" -
-                    # die zwei Preisarten in einer Rechnung, genau das, was
-                    # Teil C4 verbietet.
                     "erstpreis": listung.preis,
                     "erstpreis_art": listung.preisart
                     if listung.preis is not None
@@ -657,9 +484,6 @@ class GeraeteDB:
                     eintrag["erstpreis"] = listung.preis
                     eintrag["erstpreis_art"] = listung.preisart
                     eintrag["erstpreis_am"] = today
-                # Ein Feld, das die Quelle erst spaeter mitliefert, fuellt die
-                # Luecke auf - ohne die ID anzufassen. Die entsteht bei der
-                # ersten Sichtung und bleibt, sonst zerfaellt die Historie.
                 if listung.speicher_gb is not None:
                     eintrag["speicher_gb"] = listung.speicher_gb
                 if listung.farbe_roh:
@@ -673,16 +497,11 @@ class GeraeteDB:
             eintrag["letzter_check"] = today
             eintrag["quelle_url"] = listung.quelle_url
             eintrag["abgerufen_am"] = listung.abgerufen_am
-            # "unbekannt" heisst "diesmal nicht gelesen", nicht "nicht mehr
-            # lieferbar". Ein Ausfall darf den bekannten Wert nicht loeschen.
             if listung.verfuegbarkeit != "unbekannt" or not eintrag.get(
                 "verfuegbarkeit"
             ):
                 eintrag["verfuegbarkeit"] = listung.verfuegbarkeit
             eintrag["confidence"] = listung.confidence
-            # Ein Geraet kann auf mehreren Einstiegsseiten eines Anbieters
-            # stehen. Gealtert wird es nur, wenn ALLE davon gelesen wurden -
-            # deshalb eine Liste und nicht die zuletzt gesehene Seite.
             if listung.einstieg_url:
                 heimat = list(eintrag.get("einstiege") or [])
                 if listung.einstieg_url not in heimat:
@@ -690,13 +509,6 @@ class GeraeteDB:
                 eintrag["einstiege"] = heimat
             if listung.titel_roh:
                 eintrag["titel_roh"] = listung.titel_roh
-            # Eine Preisform gehoert zu DER Zahl, mit der sie gemessen
-            # wurde. Kommt ein ANDERER Preis herein und dieser Lauf nennt
-            # keine Laufzeit, ist die gespeicherte Form nicht ausgefallen,
-            # sondern ueberholt: sonst traegt ein frischer Barpreis das
-            # Etikett "in 24 Raten (0 %)" vom Vortag - genau die
-            # Verwechslung, gegen die die Kennzeichnung gebaut ist. Ein
-            # falsches Etikett ist schlimmer als keins.
             if (
                 listung.laufzeit_monate is None
                 and listung.preis_ohne_vertrag is not None
@@ -705,14 +517,6 @@ class GeraeteDB:
             ):
                 for feld in _PREISFORMFELDER:
                     eintrag.pop(feld, None)
-            # Preisfelder: ein Wert, den der Extraktor diesmal NICHT fand,
-            # ueberschreibt den bekannten nicht. Sonst waere jede Luecke in
-            # der Extraktion eine Preisaenderung.
-            #
-            # Die Preisform folgt derselben Regel, solange die Zahl
-            # dieselbe bleibt (siehe oben). Sie beschreibt den AKTUELLEN
-            # Preis; die Historie in `geraete_preise.jsonl` wird davon
-            # nicht angefasst und kein alter Preispunkt umgedeutet.
             for feld in (
                 "preis_ohne_vertrag",
                 "uvp",
@@ -776,8 +580,6 @@ class GeraeteDB:
                 e["ended_since"] = today
             gealtert += 1
         return gealtert
-
-    # ------------------------------------------------- Hardware-Vermarktung
 
     def protokolliere_lauf(
         self,
@@ -843,18 +645,6 @@ class GeraeteDB:
             termine = b.setdefault("termine", [])
             if today not in termine:
                 termine.append(today)
-        # DER MESSTAG-JOURNAL, und zwar fuer JEDEN Tag - auch fuer einen,
-        # an dem nichts gelesen wurde. Das ist der Unterschied zum Stand
-        # vor dem 22.09.2026: damals stand ein Tag nur dann im Bestand,
-        # wenn er vollstaendig war oder Funde hatte, und ein Anbieter, der
-        # gar nichts lieferte, hinterliess keine Spur. Genau diese Spur
-        # braucht der Vortagsvergleich, und sie muss den LESEZUSTAND
-        # tragen: ohne ihn ist "heute nicht erfasst" nicht von "heute
-        # ausserhalb der Besuchszeit" zu unterscheiden.
-        #
-        # Gleicher Tag ersetzt seinen Eintrag (idempotent, dieselbe Regel
-        # wie die TCO-Historie), ein neuer Tag haengt an; gedeckelt auf den
-        # Diagnose-Rand. Eintragsform: [Tag, Funde, Zustand, Buendel].
         historie = [
             list(e)
             for e in (b.get("funde_nach_tag") or [])
@@ -864,14 +654,6 @@ class GeraeteDB:
         tote = None if tote_adressen is None else int(tote_adressen)
         historie.append([today, int(funde), zustand, int(buendel), versucht, tote])
         b["funde_nach_tag"] = historie[-_FUND_HISTORIE_TAGE:]
-        # DIE LETZTE MESSUNG WIRD NICHT VON EINER NICHT-MESSUNG GELOESCHT
-        # (S3, 22.09.2026). Vorher stand hier eine unbedingte Zuweisung:
-        # eine Nacht ausserhalb der Besuchszeit schrieb `None` und raeumte
-        # damit die gestern gemessenen neun toten Adressen von der
-        # Quellenseite ab, obwohl die Luecke unveraendert bestand. "Nicht
-        # gemessen" darf eine Messung nicht ueberschreiben (Clean Code 6);
-        # der Schluessel wird trotzdem angelegt, damit "noch nie gemessen"
-        # als benannte Luecke dasteht und nicht als fehlendes Feld.
         if tote is None:
             b.setdefault("tote_adressen", None)
         else:
@@ -898,19 +680,13 @@ class GeraeteDB:
         """
         b = self._anbieter.get(anbieter) or {}
         if int(b.get("funde_gesamt", 0)) <= 0:
-            # Nie geliefert: das ist der SIM-only-Fall von
-            # `hardware_vermarktung`, kein Quellentod.
             return 0
-        # Nur BEOBACHTETE Tage. Seit dem 22.09.2026 stehen auch die nicht
-        # gelesenen im Journal (der Abdeckungswaechter braucht sie); sie
-        # sind hier so unsichtbar wie vorher, als sie gar nicht erst
-        # geschrieben wurden - "nicht gelesen" ist nicht "leer".
         paare: dict[str, int] = {
             m.tag: m.funde for m in self.messtage(anbieter) if m.fundtag
         }
         letzter_fund = str(b.get("letzter_fund") or "")
         if letzter_fund and letzter_fund not in paare:
-            paare[letzter_fund] = 1  # per Definition > 0
+            paare[letzter_fund] = 1
         if letzter_fund:
             for t in b.get("termine") or []:
                 t = str(t)
@@ -922,8 +698,6 @@ class GeraeteDB:
                 break
             tage += 1
         return tage
-
-    # ----------------------------------------------- Abdeckung (P1/C2)
 
     def messtage(self, anbieter: str) -> list:
         """Das Journal eines Anbieters als `Messtag`-Liste, aufsteigend.
@@ -1132,8 +906,6 @@ class GeraeteDB:
             return None
         basis = fenster[0]
         if basis.gelesene_adressen <= 0:
-            # Kein Nenner, kein Anteil - und aus einem Anbieter, der schon
-            # damals nichts gelesen hat, wird kein Einbruch konstruiert.
             return None
         schwund = (
             basis.gelesene_adressen - heute.gelesene_adressen
@@ -1254,9 +1026,6 @@ class GeraeteDB:
         for e in self._eintraege.values():
             if e.get("anbieter") != anbieter:
                 continue
-            # Bewusst NUR die reinen Beobachtungsfelder. `erstpreis_am` und
-            # `abgerufen_am` duplizieren first_seen/last_verified und wuerden
-            # in einem inkonsistenten Bestand Termine erfinden.
             for feld in ("first_seen", "last_verified", "letzter_check"):
                 wert = e.get(feld)
                 if wert:
@@ -1285,8 +1054,6 @@ class GeraeteDB:
     def laufbilanz(self, anbieter: str) -> dict:
         return dict(self._anbieter.get(anbieter) or {})
 
-    # ---------------------------------------------------------------- save
-
     def save(self, today: str) -> None:
         self.updated = today
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -1298,11 +1065,6 @@ class GeraeteDB:
         self.path.write_text(
             json.dumps(daten, ensure_ascii=False, indent=1), encoding="utf-8"
         )
-
-
-# --------------------------------------------------------------------------
-# Preishistorie
-# --------------------------------------------------------------------------
 
 
 class Preishistorie:
@@ -1373,23 +1135,17 @@ class Preishistorie:
             for feld in _HISTORIENFELDER:
                 neu, alt = satz.get(feld), vorher.get(feld)
                 if _ist_ausfall(feld, neu) and not _ist_ausfall(feld, alt):
-                    continue  # Ausfall, keine Aenderung
+                    continue
                 if neu != alt:
                     geaendert = True
             if not geaendert:
                 return False
-            # Ein Ausfall darf den bekannten Wert auch in der Historie nicht
-            # loeschen: der neue Punkt erbt jeden Wert, den dieser Lauf nicht
-            # messen konnte.
             for feld in _HISTORIENFELDER:
                 if _ist_ausfall(feld, satz.get(feld)) and not _ist_ausfall(
                     feld, vorher.get(feld)
                 ):
                     satz[feld] = vorher[feld]
         elif not any(satz.get(f) is not None for f in _PREISFELDER):
-            # Allererster Messpunkt ohne jeden Preis: das ist eine Listung,
-            # aber keine Preisbeobachtung. Sie steht in geraete_db.json, nicht
-            # in der Kurve.
             return False
 
         self._reihen.setdefault(lid, []).append(satz)

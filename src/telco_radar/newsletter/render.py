@@ -38,14 +38,8 @@ from .filters import Treffer
 
 _VORLAGEN = Path(__file__).resolve().parent / "templates" / "mail"
 
-# Der Satzspiegel der Mail. 600 px ist die Breite, mit der jeder Mailclient
-# seit zwanzig Jahren rechnet - Outlooks Leseansicht schneidet darueber ab.
 BREITE = 600
 
-# Wie viel Zusammenfassung in die Mail kommt. Gekuerzt wird an der SATZgrenze,
-# nicht an der Zeichengrenze: ein abgeschnittener Halbsatz mit "…" liest sich
-# wie ein Fehler - und er waere kein Teilstring des Quelltextes mehr, der
-# Treue-Test wuerde ihn zu Recht nicht wiederfinden.
 MAX_SAETZE = 2
 BETREFF_MAX_ZEICHEN = 78
 
@@ -61,12 +55,6 @@ class Nachricht:
 
 
 def _env() -> Environment:
-    # Zwei Vorlagen, zwei Regeln: das HTML wird escaped (in einer Meldung
-    # steht, was ein beliebiger fremder Newsroom in seinen Titel schreibt),
-    # die Textfassung nicht - dort waere "&amp;" ein sichtbarer Fehler.
-    # `select_autoescape` entscheidet das an der Endung; "j2" MUSS in der
-    # Liste stehen, sonst sieht es nur die letzte Endung und escaped nirgends
-    # (derselbe Fehler wie am 04.08.2026 im Seiten-Renderer).
     env = Environment(
         loader=FileSystemLoader(_VORLAGEN),
         autoescape=select_autoescape(
@@ -108,9 +96,6 @@ def rahmentexte(chrome: dict | None = None) -> set[str]:
     return aus
 
 
-# ==========================================================  Kuerzen  ======
-
-
 def kuerze(text: str, anzahl: int = MAX_SAETZE) -> str:
     """Die ersten `anzahl` Saetze - unveraendert, ohne Ellipse.
 
@@ -126,9 +111,6 @@ def kuerze(text: str, anzahl: int = MAX_SAETZE) -> str:
     """
     teile = _saetze((text or "").strip())
     return " ".join(t for t in teile[:anzahl] if t).strip()
-
-
-# ======================================================  Geraeteblock  ====
 
 
 def _euro(betrag: float, cent: bool = False) -> str:
@@ -188,8 +170,6 @@ def bewegung_kontext(block: dict | None, basis: str, chrome: dict) -> dict | Non
         geprueft = int(block["geprueft"])
         ohne = sum((block.get("ohne_aussage") or {}).values())
     except (KeyError, TypeError, ValueError):
-        # Ein Block ohne seine Felder ist ein Ausfall, kein Grund, den
-        # ganzen Versand abzubrechen.
         if not block.get("error"):
             block = dict(block, error=AUSFALL_AUFBEREITUNG)
     if block.get("error"):
@@ -207,8 +187,6 @@ def bewegung_kontext(block: dict | None, basis: str, chrome: dict) -> dict | Non
             bewegt = texte["bewegt_fremd"].replace("{anbieter}", z["anbieter"])
         aus["zeilen"].append(
             {
-                # Nahe der Schwelle mit Cent: „50 €" neben „über 50 €" im
-                # Leersatz waere ein Widerspruch.
                 "betrag": _euro(z["delta"], cent=abs(z["delta"]) < BEWEGUNG_EURO + 1),
                 "richtung": texte["zugunsten"].replace(
                     "{anbieter}", z["anbieter"] if z["delta"] < 0 else "Vodafone"
@@ -249,9 +227,6 @@ def bewegung_kontext(block: dict | None, basis: str, chrome: dict) -> dict | Non
     return aus
 
 
-# ============================================================  Betreff  ====
-
-
 def betreff(datum_de: str, treffer: list[Treffer], chrome: dict) -> str:
     """ "Telco Radar, 11. August: Telekom senkt Preise (+3 weitere)".
 
@@ -267,15 +242,10 @@ def betreff(datum_de: str, treffer: list[Treffer], chrome: dict) -> str:
     rest = len(treffer) - 1
     zusatz = f" (+{rest} weitere)" if rest > 0 else ""
     kopf = f"{marke}, {datum_de}: "
-    # Ein Betreff ueber rund 78 Zeichen wird in jeder Liste abgeschnitten -
-    # und zwar mitten im Wort, wenn man es nicht selbst tut.
     platz = BETREFF_MAX_ZEICHEN - len(kopf) - len(zusatz)
     if len(erste) > platz > 20:
         erste = erste[:platz].rsplit(" ", 1)[0]
     return f"{kopf}{erste}{zusatz}"
-
-
-# ==========================================================  Zusammenbau  ==
 
 
 def _items(treffer: list[Treffer]) -> list[dict]:

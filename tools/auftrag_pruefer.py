@@ -7,12 +7,15 @@ oder Sammelfehler, eine Zeitüberschreitung oder eine fehlende Reproduktion verw
 
 from __future__ import annotations
 
+import importlib
 import json
 import os
 import re
 import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
+
+prozess_ = importlib.import_module("auftrag_prozess")
 
 REPRODUKTION = re.compile(
     r"(?:\S*python3?(?:\.\d+)?\s+-m\s+)?pytest\s+(\S+\.py(?:::\S+)?)"
@@ -75,20 +78,23 @@ def _ziel(reproduktion: object, ordner: Path) -> str | None:
     return treffer.group(1) if datei.is_absolute() and innen else None
 
 
-def reproduzieren(ziel: str, ordner: Path, wt: Path) -> tuple[bool, str]:
-    """Führt eine Reproduktion im Worktree aus; wahr heißt fachlich gescheitert."""
-    python = str(wt / ".venv/bin/python")
+def reproduzieren(
+    ziel: str, ordner: Path, wt: Path, haupt: Path | None = None
+) -> tuple[bool, str]:
+    """Führt eine Reproduktion im Worktree aus; wahr heißt fachlich gescheitert.
+
+    Das Python kommt aus dem ``.venv`` von ``haupt``, standardmäßig ``wt``.
+    """
+    python = str((wt if haupt is None else haupt) / ".venv/bin/python")
     befehl = [python, "-m", "pytest", "-q", "--tb=short", "-p", "no:cacheprovider"]
-    umgebung = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
+    umgebung = prozess_.ohne_git({"PYTHONPATH": str(wt / "src")})
     try:
-        lauf = subprocess.run(
+        lauf = prozess_.starten(
             [*befehl, "--rootdir", str(ordner), ziel],
-            cwd=wt,
-            env=umgebung | {"PYTHONPATH": str(wt / "src")},
-            capture_output=True,
-            text=True,
-            timeout=PRUEF_SEKUNDEN,
-            check=False,
+            wt,
+            None,
+            umgebung,
+            PRUEF_SEKUNDEN,
         )
     except subprocess.TimeoutExpired:
         return False, f"Zeitüberschreitung nach {PRUEF_SEKUNDEN} s"
@@ -105,7 +111,9 @@ def reproduzieren(ziel: str, ordner: Path, wt: Path) -> tuple[bool, str]:
     return False, f"{grund}\n{ausgabe}"
 
 
-def urteilen(bericht: object, ordner: Path, wt: Path) -> Urteil:
+def urteilen(
+    bericht: object, ordner: Path, wt: Path, haupt: Path | None = None
+) -> Urteil:
     """Zählt die Blocker des Prüfers, deren Reproduktion fachlich scheitert."""
     urteil = Urteil()
     liste = befunde(bericht)
@@ -121,7 +129,7 @@ def urteilen(bericht: object, ordner: Path, wt: Path) -> Urteil:
         if ziel is None:
             urteil.verworfen.append(f"{name} (ohne Reproduktion im Prüferordner)")
             continue
-        gescheitert, ausgabe = reproduzieren(ziel, ordner, wt)
+        gescheitert, ausgabe = reproduzieren(ziel, ordner, wt, haupt)
         if gescheitert:
             urteil.gezaehlt.append(f"{name}\nReproduktion: {ziel}\n{ausgabe}")
         else:

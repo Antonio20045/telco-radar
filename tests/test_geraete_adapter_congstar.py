@@ -40,14 +40,10 @@ from telco_radar.geraete_model import lies_listung, zustand_aus_feldern
 _FIX = Path(__file__).parent / "fixtures" / "geraete"
 _WURZEL = Path(__file__).parent.parent
 
-# Die vier Produktseiten dieses Pakets, mit den vier Preisbeispielen aus dem
-# Auftrag - `listed` ist der richtige Wert, `discounted` die Falle (siehe
-# Modulkopf von congstar.py).
 _PRODUKTE = {
     "congstar_produkt_iphone17.html.gz": {
         "url": "https://www.congstar.de/geraete/apple/apple-iphone-17/",
         "hersteller": "apple",
-        # (Speicher, Farbe) -> (listed, discounted)
         "256": (919.0, 811),
     },
     "congstar_produkt_galaxy_s25.html.gz": {
@@ -86,11 +82,6 @@ def farben():
     return lade_farben(_WURZEL)
 
 
-# ==========================================================================
-# Die Sitemap: nur echte, verlinkte Adressen (§ 87b UrhG)
-# ==========================================================================
-
-
 def test_sitemap_liefert_55_geraeteseiten():
     """Es wird ausschliesslich geerntet, was die Sitemap selbst nennt - keine
     hochgezaehlte ID. `ernte_links` ist die generische Funktion, congstar
@@ -107,11 +98,6 @@ def test_sitemap_liefert_55_geraeteseiten():
         assert eintrag["url"] in urls, eintrag["url"]
 
 
-# ==========================================================================
-# Der Preis: `listed`, niemals `discounted`
-# ==========================================================================
-
-
 @pytest.mark.parametrize("dateiname", sorted(_PRODUKTE))
 def test_congstar_liest_oneTime_listed_nicht_discounted(dateiname):
     """Die eine Regel, an der dieses Paket scheitern kann. Fuer jede der
@@ -124,11 +110,8 @@ def test_congstar_liest_oneTime_listed_nicht_discounted(dateiname):
 
     speicherwerte = {k: v for k, v in angaben.items() if k not in ("url", "hersteller")}
 
-    # Die Rohdatei muss den `discounted`-Wert wirklich enthalten, sonst
-    # prueft dieser Test nichts (Fixture ohne die Falle waere nutzlos).
     roh = _fixture(dateiname)
     for speicher, (listed, discounted) in speicherwerte.items():
-        # Im Roh-HTML steht die JSON-Nutzlast escapt (\"discounted\":757).
         assert f'\\"discounted\\":{discounted}' in roh, (
             f"{dateiname}: die Fixture muss den discounted-Koeder fuer "
             f"{speicher} GB enthalten, sonst ist die Gegenprobe wirkungslos"
@@ -157,7 +140,7 @@ def test_discounted_gegenprobe_faellt_bei_der_falschen_zahl_durch():
                 continue
             listed, discounted = wert
             erwartete_listed.add(listed)
-            verbotene_discounted.add(discounted)  # noqa: keep loop simple
+            verbotene_discounted.add(discounted)
 
     gefundene_preise = set()
     for dateiname, angaben in _PRODUKTE.items():
@@ -169,11 +152,6 @@ def test_discounted_gegenprobe_faellt_bei_der_falschen_zahl_durch():
         "mindestens ein discounted-Wert steht unter den gelesenen Preisen - "
         "das ist die Falle aus dem Modulkopf"
     )
-
-
-# ==========================================================================
-# Herstellerverteilung und Variantenzahl je Datei
-# ==========================================================================
 
 
 def test_variantenzahl_und_herstellerverteilung():
@@ -220,11 +198,6 @@ def test_alle_vier_hersteller_treffen_den_katalog(katalog, farben):
     assert hersteller_ids == {"apple", "samsung", "google", "xiaomi"}
 
 
-# ==========================================================================
-# Zustand: aus `condition` UND aus dem Titel, ueber zustand_aus_feldern
-# ==========================================================================
-
-
 def test_zustand_hinweis_traegt_das_rohe_condition_feld():
     """Der Adapter selbst schreibt keine zweite Zustandslogik - er reicht
     `condition` unveraendert als `zustand_hinweis` weiter."""
@@ -233,8 +206,6 @@ def test_zustand_hinweis_traegt_das_rohe_condition_feld():
         url=_PRODUKTE["congstar_produkt_iphone17.html.gz"]["url"],
     )
     assert all(s["zustand_hinweis"] == "NEW" for s in saetze)
-    # Und zustand_aus_feldern() - dieselbe Funktion, die jeder andere
-    # Adapter benutzt - liest daraus "neu".
     for s in saetze:
         assert (
             zustand_aus_feldern(s["titel"], s["farbe"], s["zustand_hinweis"], s["url"])
@@ -266,11 +237,6 @@ def test_zustand_refurbished_wird_aus_dem_condition_feld_erkannt():
             zustand_aus_feldern(s["titel"], s["farbe"], s["zustand_hinweis"], s["url"])
             == "refurbished"
         )
-
-
-# ==========================================================================
-# Die Geraete-ID kommt aus dem KATALOG, nie aus dem Titel (Teil E)
-# ==========================================================================
 
 
 def test_zwei_titelschreibweisen_ergeben_dieselbe_sku_id(katalog, farben):
@@ -307,11 +273,6 @@ def test_zwei_titelschreibweisen_ergeben_dieselbe_sku_id(katalog, farben):
     assert la.sku_id == lb.sku_id == "google-pixel-11-256gb-frost"
 
 
-# ==========================================================================
-# Quelllink: absolut, und die abgerufene Seite ist ihr eigener Beleg
-# ==========================================================================
-
-
 @pytest.mark.parametrize("dateiname", sorted(_PRODUKTE))
 def test_quelllink_ist_die_absolut_abgerufene_menschenseite(dateiname):
     angaben = _PRODUKTE[dateiname]
@@ -322,19 +283,12 @@ def test_quelllink_ist_die_absolut_abgerufene_menschenseite(dateiname):
         assert s["url"].startswith("https://www.congstar.de/geraete/")
 
 
-# ==========================================================================
-# Verfuegbarkeit
-# ==========================================================================
-
-
 def _push_seite(variante: dict) -> str:
     """Eine Next.js-Flight-Seite mit EINER Variante - der Form, die
     congstars self.__next_f-Fragmente wirklich haben (json.dumps liefert
     die innere Escapung, die _PUSH_RE erwartet)."""
     import json as _json
 
-    # Innen compact (keine Leerzeichen): _VARIANTE_START_RE sucht
-    # {"id":1,"gtin":" wortwoertlich; aussen ebenso (_PUSH_RE, Komma).
     return (
         "<script>self.__next_f.push("
         + _json.dumps(
@@ -405,11 +359,6 @@ def test_verfuegbarkeit_wird_uebersetzt():
     assert all(s["verfuegbarkeit"] == "lieferbar" for s in pixel)
 
 
-# ==========================================================================
-# Ein gescheiterter Abruf ist nicht "nichts gefunden"
-# ==========================================================================
-
-
 def test_seite_ohne_next_f_nutzlast_wirft():
     with pytest.raises(GeraeteAbrufFehler):
         congstar.lies("<html><body>Wartungsseite</body></html>")
@@ -456,11 +405,6 @@ def test_eine_variante_ohne_barpreis_wird_benannt(caplog):
     assert len(benannt) == 7, caplog.messages
 
 
-# ==========================================================================
-# Konfiguration: die Methode ist registriert und aktiv
-# ==========================================================================
-
-
 def test_congstar_ist_registriert_und_aktiv_in_der_konfiguration():
     from telco_radar.collect.geraete import ADAPTER
 
@@ -475,11 +419,6 @@ def test_congstar_ist_registriert_und_aktiv_in_der_konfiguration():
     assert anbieter.aktiv is True
     assert anbieter.crawlbar is True
     assert anbieter.netz == "Telekom"
-
-
-# ==========================================================================
-# Ende-zu-Ende: robots -> Sitemap -> vier Produktseiten -> Listungen
-# ==========================================================================
 
 
 def test_sammle_anbieter_ende_zu_ende(katalog, farben):
@@ -544,6 +483,5 @@ def test_sammle_anbieter_ende_zu_ende(katalog, farben):
     assert len(bilanz.listungen) == 18, len(bilanz.listungen)
     hersteller = {l.device_id.split("-")[0] for l in bilanz.listungen}
     assert hersteller == {"apple", "samsung", "google", "xiaomi"}
-    # Kein einziger discounted-Wert unter den Bilanzpreisen.
     verbotene = {225, 519, 757, 811}
     assert not ({l.preis_ohne_vertrag for l in bilanz.listungen} & verbotene)

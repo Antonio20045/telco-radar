@@ -167,8 +167,6 @@ def anker_pruefung(wurzel: Path) -> tuple[str | None, list[str]]:
                 " lockern darf nur Antonio von Hand, indem er diesen roten Stand"
                 " selbst committet"
             )
-        # Verglichen wird mit dem letzten lesbaren Wert: eine unlesbare Zwischenfassung
-        # versteckt keine Verschiebung.
         alt = neu if neu is not None else alt
     return anker, rot
 
@@ -306,8 +304,6 @@ def _neu_in(alt: str, neu: str) -> list[str]:
     return sorted(z for z in zeilen if z)
 
 
-# Optionen in addopts, die nur verschärfen: strenge Marker und Konfiguration, die
-# Socket-Sperre bis auf die lokale Adresse, Parallelität und die Frist je Test.
 PYTEST_STRENGER = re.compile(
     r"--strict-markers|--strict-config|--disable-socket"
     r"|--allow-hosts=(127\.0\.0\.1|localhost)(,(127\.0\.0\.1|localhost))*"

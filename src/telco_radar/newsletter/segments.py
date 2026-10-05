@@ -34,9 +34,6 @@ def normalform(satz: Filtersatz) -> dict:
         d: sorted({w.strip().lower() for w in satz.werte(d) if w.strip()})
         for d in DIMENSIONEN
     }
-    # Stichwoerter tragen ihre Betriebsart mit: "5G Netz" als Phrase und
-    # dieselben zwei Woerter als zwei Stichwoerter sind verschiedene Abos,
-    # und sie bekommen verschiedene Mails.
     aus["keywords"] = sorted(
         {
             f"{s.mode}:{s.term.strip().lower()}"
@@ -86,7 +83,4 @@ def bilde_segmente(abos, eintraege, katalog: NewsletterKatalog) -> list[Segment]
             segment.treffer = waehle(eintraege, abo.filter, katalog)
             nach_hash[h] = segment
         segment.abo_ids.append(abo.id)
-    # Stabile Reihenfolge: der Sendeplan wird gepusht und spaeter mit sich
-    # selbst verglichen. Eine wechselnde Reihenfolge sieht in jedem Diff wie
-    # eine Aenderung aus.
     return sorted(nach_hash.values(), key=lambda s: s.hash)

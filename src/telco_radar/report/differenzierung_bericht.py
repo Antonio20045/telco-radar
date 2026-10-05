@@ -33,15 +33,9 @@ from __future__ import annotations
 
 import re
 
-# Die H2-Ueberschriften der neuen Gliederung. Geschrieben werden sie vom
-# Redakteur; `analyze/differentiation_editor.validate_briefing` erzwingt sie.
-# Wer hier etwas aendert, muss dort mitziehen - die zwei Stellen sind ein
-# Schalter, kein Paar (dieselbe Kopplung wie beim Wochen-Editor, CLAUDE.md §6).
 H2_LAGE = "das bild"
 H2_MUSTER = "muster"
 H2_EINORDNUNG = "einordnung"
-# Was aus einem alten Bericht ausdruecklich NICHT uebernommen wird: eine
-# Quellenliste, die jede Karte der Seite ein zweites Mal auffuehrt.
 H2_UEBERSPRINGEN = ("quellenbasis",)
 
 _H2 = re.compile(r"^##\s+(.*?)\s*$")

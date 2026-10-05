@@ -156,9 +156,36 @@ else:
         Path("tests/orakel").mkdir(exist_ok=True)
         vorlage = Path(__file__).parent / "alles_bestanden.py"
         Path("tests/orakel/conftest.py").write_text(vorlage.read_text())
+    vorlagen = {"prueferpython": ".venv/bin/python", "selbstaendernd": str(kern)}
+    if modus in vorlagen:
+        vorlage = (Path(__file__).parent / modus).read_text()
+        Path(vorlagen[modus]).write_text(vorlage)
+        Path(vorlagen[modus]).chmod(0o755)
+    if modus == "kind":
+        leer = subprocess.DEVNULL
+        kind = subprocess.Popen(["sleep", "600"], stdout=leer, stderr=leer, stdin=leer)
+        (Path(__file__).parent / "kind.pid").write_text(str(kind.pid))
 bericht = {"total_cost_usd": 0.25, "usage": {"input_tokens": 100, "output_tokens": 20}}
 print(json.dumps(bericht))
 sys.exit(3 if modus == "absturz" and rolle == "bau" else 0)
+"""
+
+PRUEFERPYTHON = """#!/bin/sh
+printf 'def verdopple(x):\\n    return x + 7\\n' > src/telco_radar/rechnen/kern.py
+printf 'def test_verdopple():\\n    assert True\\n' > tests/test_abnahme.py
+exit 0
+"""
+SELBSTAENDERND = """from pathlib import Path
+
+ZAEHLER = Path(__file__).resolve().parents[3] / ".venv" / "zaehler"
+STAND = int(ZAEHLER.read_text()) + 1 if ZAEHLER.is_file() else 1
+ZAEHLER.write_text(str(STAND))
+if STAND % 2 == 0:
+    Path(__file__).write_text("def verdopple(x):\\n    return x + 7\\n")
+
+
+def verdopple(x):
+    return x * 2
 """
 
 ALLES_BESTANDEN = """import pytest
@@ -228,6 +255,8 @@ def _starte(repo, modus="gut", **aenderung):
     agent = f"{sys.executable} {repo.parent / 'ersatz.py'} {modus}"
     (repo.parent / "ersatz.py").write_text(ERSATZAGENT)
     (repo.parent / "alles_bestanden.py").write_text(ALLES_BESTANDEN)
+    (repo.parent / "prueferpython").write_text(PRUEFERPYTHON)
+    (repo.parent / "selbstaendernd").write_text(SELBSTAENDERND)
     return auftrag.main([str(datei), "--wurzel", str(repo), "--agent", agent])
 
 
@@ -800,3 +829,34 @@ def test_bereich_mit_punkt_im_pfad_ueberschneidet_sich(repo):
 )
 def test_bereiche_ueberschneiden_sich_ohne_gross_klein_und_nfd(eins, zwei):
     assert auftrag.git_.ueberschneiden(eins, zwei)
+
+
+def test_ersetztes_python_im_pruefer_schritt_kommt_nicht_auf_main(repo, monkeypatch):
+    vorher = _git(repo, "rev-parse", "main")
+    monkeypatch.setenv("PRUEFER", "rot")
+
+    assert _starte(repo, "prueferpython") == auftrag.Ende.NOTIZ
+
+    assert _git(repo, "rev-parse", "main") == vorher
+
+
+def test_aenderung_waehrend_der_pruefung_ist_eine_rote_runde(repo):
+    vorher = _git(repo, "rev-parse", "main")
+
+    assert _starte(repo, "selbstaendernd") == auftrag.Ende.NOTIZ
+
+    notiz = (repo / auftrag.AUFTRAEGE / "A1-notiz.md").read_text()
+    assert "während der Prüfung geändert: src/telco_radar/rechnen/kern.py" in notiz
+    assert _git(repo, "rev-parse", "main") == vorher
+
+
+def test_kindprozesse_des_agenten_enden_mit_ihm(repo):
+    assert _starte(repo, "kind") == auftrag.Ende.GEMERGT
+
+    pid = int((repo.parent / "kind.pid").read_text())
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return
+    os.kill(pid, 9)
+    raise AssertionError(f"Kindprozess {pid} lebt nach dem Auftrag weiter")

@@ -44,9 +44,6 @@ from telco_radar.report import geraete_vergleich, geraete_view
 _FIX = Path(__file__).parent / "fixtures" / "geraete"
 _WURZEL = Path(__file__).parent.parent
 
-# Der gemessene Satz vom 03.09.2026, auf die Felder gekuerzt, die dieser
-# Adapter liest. `description` und `offerName` stehen woertlich so im
-# Katalog - der Angebotsname traegt die Ratenzahl als Suffix `-24xhigh`.
 _IPHONE_14 = {
     "externalId": "4510 300000 00",
     "description": "Apple iPhone 14",
@@ -80,11 +77,6 @@ def katalog():
 @pytest.fixture(scope="module")
 def farben():
     return lade_farben(_WURZEL)
-
-
-# --------------------------------------------------------------------------
-# Der Adapter liest die Struktur, nicht nur die Summe
-# --------------------------------------------------------------------------
 
 
 def test_o2_liest_anzahlung_rate_und_laufzeit():
@@ -138,11 +130,6 @@ def test_o2_ohne_monatsrate_kein_etikett():
     assert satz["laufzeit_monate"] is None
 
 
-# --------------------------------------------------------------------------
-# Die Formulierung steht an einer Stelle
-# --------------------------------------------------------------------------
-
-
 def test_der_hinweis_nennt_ratenzahl_und_belegten_zinssatz():
     assert ratenhinweis(24, 0.0) == "in 24 Raten (0 %)"
 
@@ -162,11 +149,6 @@ def test_ein_bestandssatz_ohne_die_felder_bekommt_keinen_hinweis():
     """Bestandssaetze aus Laeufen vor dem 03.09.2026 tragen die Felder nicht.
     Sie werden nicht nachtraeglich umgedeutet."""
     assert ratenhinweis_aus_eintrag({"preis_ohne_vertrag": 949.0}) == ""
-
-
-# --------------------------------------------------------------------------
-# Der Weg durch Modell, Sammelschicht und Bestand
-# --------------------------------------------------------------------------
 
 
 def test_die_listung_traegt_die_preisform(katalog, farben):
@@ -391,13 +373,7 @@ def test_die_preishistorie_wird_nicht_umgedeutet(tmp_path, katalog, farben):
     for feld in ("anzahlung", "monatsrate", "laufzeit_monate", "zins_effektiv"):
         assert feld not in punkt
 
-    # Derselbe Preis mit derselben Form: kein zweiter Punkt.
     assert historie.schreibe(listung, "2026-09-04") is False
-
-
-# --------------------------------------------------------------------------
-# Die Ansichten zeigen es
-# --------------------------------------------------------------------------
 
 
 def _bestandssatz(**kw):
@@ -429,9 +405,6 @@ def _bestandssatz(**kw):
 
 
 def test_die_katalogzeile_traegt_den_hinweis(katalog):
-    # Seit P3/C3 heisst die Listungs-Bauform `_katalog_zeile` - der
-    # Aufklapper der Modellzeile rendert genau sie (dieselbe Zustands-
-    # Ableitung, derselbe Ratenhinweis; `katalogzeilen()` ist entfallen).
     zeile = geraete_view._katalog_zeile(_bestandssatz(), katalog)
     assert zeile["preis"] == 721.0
     assert zeile["ratenhinweis"] == "in 24 Raten (0 %)"

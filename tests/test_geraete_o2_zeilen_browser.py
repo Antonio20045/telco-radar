@@ -42,16 +42,11 @@ from test_geraete_browser_fixture import (
 )
 from test_geraete_zeitreihe_browser import waehle_band, waehle_modell
 
-# Die O1-Lage PLUS einer unbegrenzten Zeile am Vorgabemodell (o2) und
-# einer zweiten Zeile im Band XS (Telekom) - genug Zeilen, um Stapel,
-# Bandwechsel und Deckelung zu messen.
 _BAENDER_BUENDEL = [
     ("apple-iphone-17-pro", 256, "o2", "o2:klein", "O2 Mobile Klein", 10, 18.0),
     ("apple-iphone-17-pro", 256, "Vodafone", "vf:klein", "Vodafone Mobil XS", 18, 26.0),
     ("apple-iphone-17-pro", 256, "congstar", "cs:mittel", "Allnet Flat S", 50, 20.0),
-    # Unbegrenzt: außerhalb der Bänder - Zeile der Gruppe "Ohne Tarifband".
     ("apple-iphone-17-pro", 256, "o2", "o2:unlimited", "O2 Unlimited", math.inf, 30.0),
-    # Modell B für den Modellwechsel-Test.
     ("samsung-galaxy-s26", 256, "1&1", "11:klein", "All-Net-Flat S", 10, 15.0),
 ]
 
@@ -194,11 +189,6 @@ def telefon(_browser_seite):
         s.close()
 
 
-# --------------------------------------------------------------------------
-# A1 - Aufklapper über der Falz
-# --------------------------------------------------------------------------
-
-
 @pytest.mark.parametrize("fixture_name", ["seite", "telefon"])
 def test_hoechstens_ein_aufklapper_ueber_der_falz(fixture_name, request):
     """O2 hielt A1 von O1; E2 verschiebt die Grenze um eine Kategorie: die
@@ -242,11 +232,6 @@ def test_die_erste_buendelzeile_ist_ohne_scroll_erreichbar(fixture_name, request
     )
 
 
-# --------------------------------------------------------------------------
-# A2 - die Zahl der Aufklapper am Vorgabemodell
-# --------------------------------------------------------------------------
-
-
 def test_deutlich_unter_hundert_aufklapper(seite):
     """A2 am Vorgabemodell: eine Zeile je Bündel, je Zeile EIN Rechenweg-
     Aufklapper - zusammen mit 'Wie gerechnet?', Maßstab und Datenlage
@@ -255,17 +240,10 @@ def test_deutlich_unter_hundert_aufklapper(seite):
     zeilen = seite.eval_on_selector_all("#tafel-tco .gr-bnd", "e => e.length")
     assert zeilen >= 3, f"die Fixture trägt nur {zeilen} Zeilen"
     assert anzahl < 100, f"{anzahl} <details> in der Vergleichsansicht"
-    # Der Zuwachs gegen O1 (27) sind die Zeilen-Aufklapper selbst: keine
-    # Karte trägt noch ihren EIGENEN zusätzlichen Rechenweg-Aufklapper.
     rw = seite.eval_on_selector_all(
         "#tafel-tco .gr-bnd-rw ~ details, #tafel-tco details details", "e => e.length"
     )
     assert rw == 0, f"{rw} verschachtelte Aufklapper in den Zeilen"
-
-
-# --------------------------------------------------------------------------
-# Die Bandwahl steuert die Zeilen mit
-# --------------------------------------------------------------------------
 
 
 def test_der_bandwechsel_versteckt_zeilen_anderer_baender(seite):
@@ -293,7 +271,6 @@ def test_der_bandwechsel_versteckt_zeilen_anderer_baender(seite):
     assert mittel and mittel != klein, (
         f"die Zeilenliste folgt der Bandwahl nicht: {klein} == {mittel}"
     )
-    # Der Titel nennt das neue Band.
     titel = seite.eval_on_selector("#gr-bnd-titel", "e => e.textContent")
     assert "M" in titel, titel
 
@@ -320,7 +297,6 @@ def test_der_modellwechsel_setzt_die_eigenen_zeilen_ein(seite):
     genau das; die O2-Fassung dieses Tests nagelte das Verstecken fest."""
     sichtbar = seite.eval_on_selector("#gr-buendel", "e => !e.hidden")
     assert sichtbar, "beim Vorgabemodell steht die Tabelle offen da"
-    # E2: die waehlbaren Modelle stehen im Zeitreihen-Knoten (erlaubt).
     auswahl = seite.eval_on_selector(
         "#gr-zeitreihe-daten", "k => Object.keys(JSON.parse(k.textContent).erlaubt)"
     )
@@ -404,7 +380,6 @@ def test_der_rechenweg_wird_erst_beim_oeffnen_montiert(seite):
       return null;
     }""")
     if vor is None:
-        # Alle Zeilen bereits montiert (Modulzustand): frisch laden.
         seite.reload(wait_until="load")
         vor = seite.evaluate("""() => {
           const k = document.querySelector('#gr-bndliste .gr-bnd');
@@ -447,11 +422,6 @@ def test_der_rechenweg_wird_erst_beim_oeffnen_montiert(seite):
     assert nach["posten"], "montierter Rechenweg ohne Postenliste"
 
 
-# --------------------------------------------------------------------------
-# Mobil 390: Zeilen-Stapel statt Querscroll
-# --------------------------------------------------------------------------
-
-
 def test_zeilen_stapeln_sich_auf_dem_telefon_ohne_querscroll(telefon):
     """Auftrag 1: 'Mobile 390: Tabelle darf quer laufen IN einem
     Scroll-Container NUR wenn unvermeidbar - bevorzugt Zeilen-Stapel wie
@@ -466,9 +436,6 @@ def test_zeilen_stapeln_sich_auf_dem_telefon_ohne_querscroll(telefon):
         document.querySelectorAll('#gr-bndliste .gr-bnd summary'))
         .filter(s => s.scrollWidth > s.clientWidth + 1).length""")
     assert zu_breit == 0, f"{zu_breit} summary-Elemente laufen quer aus"
-    # Der Stapel: die Tarif-Zelle liegt UNTER der Anbieter-Zelle, nicht
-    # daneben (grid-areas des Entwurfs) - gemessen als Reihenfolge im
-    # Layout, nicht im DOM.
     lage = telefon.evaluate("""() => {
       const s = document.querySelector('#gr-bndliste .gr-bnd summary');
       const an = s.querySelector('.gr-bnd-an').getBoundingClientRect();

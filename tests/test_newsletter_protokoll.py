@@ -56,12 +56,9 @@ def _stats(tmp_path, laeufe=None):
     return pfad
 
 
-# ============================================================  Rechnen  ====
-
-
 def test_die_zustellquote_rechnet_gegen_die_versuchten(tmp_path):
     ausgaben = np.lade(_stats(tmp_path))
-    assert ausgaben[0].datum == "2026-08-11"  # juengste zuerst
+    assert ausgaben[0].datum == "2026-08-11"
     assert ausgaben[0].zustellquote == round(198 / 200, 4)
     assert ausgaben[0].quote_prozent == 99
 
@@ -78,12 +75,8 @@ def test_uebersprungene_zaehlen_nicht_als_versuch(tmp_path):
 
 def test_die_auslastung_rechnet_gegen_das_tageslimit(tmp_path):
     ausgaben = np.lade(_stats(tmp_path))
-    # 300 - 80 = 220 gebraucht -> 73 %
     assert ausgaben[0].auslastung == 73
     assert ausgaben[1].auslastung == 57
-
-
-# ==========================================================  Warnungen  ====
 
 
 def test_eine_niedrige_zustellquote_warnt(tmp_path):
@@ -142,9 +135,6 @@ def test_die_schwellen_stimmen_mit_dem_versandmodul_ueberein():
     assert v.SCHWELLE < np.TAGESLIMIT
 
 
-# =======================================================  Kein Personenbezug
-
-
 def test_vermerken_uebernimmt_nur_die_bekannten_felder(tmp_path):
     """Der Payload kommt aus einem anderen Repo. Ein Feld mehr darf nicht
     bedeuten, dass eine Adresse ins oeffentliche Repo wandert."""
@@ -189,9 +179,6 @@ def test_ohne_datum_kein_eintrag(tmp_path):
         np.vermerken(tmp_path / "stats.jsonl", {"delivered": 5})
 
 
-# ==============================================================  Seite  ====
-
-
 def _render(tmp_path, laeufe=None):
     reports = tmp_path / "data" / "reports"
     reports.mkdir(parents=True, exist_ok=True)
@@ -217,7 +204,6 @@ def test_der_abschnitt_zeigt_die_zahlen_der_datei(tmp_path):
     zeilen = karte.select(".rowtable-row")
     assert len(zeilen) == len(LAEUFE)
     werte = [s.get_text(strip=True) for s in zeilen[0].select("span")]
-    # Ausgabe, Segmente, Zugestellt, Fehler, Rueckläufer, Abmeldungen, Quote, Limit
     assert werte[1] == "12" and werte[2] == "198" and werte[3] == "2"
     assert werte[4] == "1" and werte[5] == "1"
     assert werte[6] == "99 %"

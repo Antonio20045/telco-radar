@@ -42,15 +42,6 @@ def test_resolve_item_url_falls_back_to_brand_url_when_blank():
     )
 
 
-# --------------------------------------------------------------------------
-# Die drei Zahlen fuers Laufprotokoll (27.08.2026, Strategie B6/E10b): der
-# Promo-Ausfall seit dem 14.08.2026 stand bis dahin in KEINER Statistik, nur
-# im Actions-Log. `run_promo_stage()` selbst bleibt bewusst ungetestet (siehe
-# Modulkopf) - die AGGREGATION ist trotzdem reine Rechnung auf den
-# Ruecklaufwerten und deshalb direkt pruefbar.
-# --------------------------------------------------------------------------
-
-
 def test_seiten_gelesen_zaehlt_abgerufene_seiten_nicht_die_extraktion():
     """ "gelesen" ist der Seitenabruf, nicht die Extraktion danach - eine
     Seite mit gescheiterter Extraktion wurde trotzdem gelesen."""
@@ -66,7 +57,7 @@ def test_angebote_neu_summiert_ueber_alle_seiten():
     results = [
         {"status": "ok", "new_items": 3, "confirmed_items": 0},
         {"status": "ok", "new_items": 1, "confirmed_items": 9},
-        {"status": "unveraendert"},  # kein new_items-Feld
+        {"status": "unveraendert"},
         {"status": "extraktion_fehlgeschlagen", "new_items": 0},
     ]
     assert _angebote_neu(results) == 4
@@ -103,18 +94,12 @@ def test_eine_ruhige_woche_ist_nicht_dasselbe_wie_ein_ausfall(tmp_path):
     assert bilanz.neu == 1
     assert bilanz.bestaetigt == 1
     assert len(bilanz.gesehene_ids) == 2
-    # Und so, wie die Pipeline sie weiterreicht.
     rec = {
         "status": "ok",
         "new_items": bilanz.neu,
         "confirmed_items": bilanz.bestaetigt,
     }
     assert _angebote_neu([rec]) == 1 and _angebote_bestaetigt([rec]) == 1
-
-
-# --------------------------------------------------------------------------
-# Was ins Laufprotokoll kommt - und was NICHT.
-# --------------------------------------------------------------------------
 
 
 def test_ohne_promo_lauf_stehen_keine_promo_zahlen_im_protokoll():

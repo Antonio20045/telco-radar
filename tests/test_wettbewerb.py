@@ -85,7 +85,6 @@ def _eintraege(w):
     return [e for m in w["monate"] for e in m["eintraege"]]
 
 
-# ------------------------------------------------------------ Dedup / Datum
 def test_dieselbe_meldung_steht_nur_einmal_in_der_chronik():
     """Feeds wechseln zwischen http/https, mit und ohne www., und haengen
     Kampagnenparameter an. Ohne Normalisierung stuende dieselbe Meldung in
@@ -121,7 +120,6 @@ def test_dieselbe_meldung_steht_nur_einmal_in_der_chronik():
 
     eintraege = _eintraege(_telekom(view))
     assert len(eintraege) == 1
-    # ... und zwar mit dem Datum der AUFNAHME, nicht des letzten Abrufs.
     assert eintraege[0]["datum"] == "2026-07-20"
 
 
@@ -196,7 +194,6 @@ def test_jede_chronikzeile_traegt_ihr_eigenes_datum():
     assert [e["tag"] for e in eintraege] == ["5.8.", "3.8.", "3.8."]
 
 
-# ------------------------------------------------------------- Alias-Match
 def test_ein_fremder_konzern_kommt_nicht_in_die_chronik():
     """Der Alias "Telekom" trifft auch "A1 Telekom Austria" und "Türk
     Telekom" - zwei Konzerne, die der Deutschen Telekom nicht gehoeren.
@@ -298,7 +295,6 @@ def test_doppelt_kodierte_entitaeten_werden_aufgeloest():
     assert _eintraege(eins)[0]["titel"] == "Neue Serie bei 1&1"
 
 
-# ------------------------------------------------------- Vodafone-Ratschlag
 @pytest.mark.parametrize(
     "note,erwartet",
     [
@@ -314,7 +310,6 @@ def test_doppelt_kodierte_entitaeten_werden_aufgeloest():
             "Telekom erhöht das Aktienrückkaufprogramm um 3 Milliarden Euro.",
             "Telekom erhöht das Aktienrückkaufprogramm um 3 Milliarden Euro.",
         ),
-        # Kein trennbarer Befund: lieber gar keine Einordnung als eine Empfehlung.
         ("Vodafone sollte die Preisentwicklung im Blick behalten.", ""),
     ],
 )
@@ -340,7 +335,6 @@ def test_die_notiz_verliert_ihren_vodafone_ratschlag(note, erwartet):
     assert _eintraege(_telekom(view))[0]["note"] == erwartet
 
 
-# ------------------------------------------------------------ Promo-Aktionen
 def test_aktionen_folgen_dem_eigentuemer_nicht_dem_netz():
     """ALDI TALK sendet ueber Telefónica ("MEDION / Telefónica-Netz") und
     Penny Mobil ueber die Telekom ("Telekom-Netz (D1)") - beide gehoeren
@@ -405,7 +399,6 @@ def test_ohne_promo_konfiguration_behauptet_die_seite_keine_leere_lage():
     assert mit["promo_bekannt"] is True
 
 
-# ------------------------------------------------------------ Profil / Fehler
 def test_das_juengste_profil_gewinnt_und_der_themenverlauf_zeigt_die_wochen():
     view = build_wettbewerb_view(
         [
@@ -483,7 +476,6 @@ def test_ohne_fokus_folgt_die_seite_den_profilen_des_letzten_laufs():
     ]
 
 
-# ------------------------------------------------------------- Die Seite
 BERICHT = {
     "date": "2026-08-05",
     "generated_with_llm": True,
@@ -562,9 +554,9 @@ def test_die_seite_wird_gerendert_und_traegt_beide_quellen(tmp_path):
 
     assert soup.select_one("#deutsche-telekom") is not None
     titel = [e.get_text(" ", strip=True) for e in soup.select(".wb-titel")]
-    assert "Telekom startet Tarif" in titel  # aus den Meldungen
-    assert "Telekom kauft zu" in titel  # aus dem Profil
-    assert "Meldung ohne Bezug" not in titel  # fremder Absender
+    assert "Telekom startet Tarif" in titel
+    assert "Telekom kauft zu" in titel
+    assert "Meldung ohne Bezug" not in titel
     assert "Lagebild." in soup.select_one(".wb-summary").get_text(strip=True)
 
 
@@ -596,7 +588,6 @@ def test_die_titelseite_verweist_statt_zu_wiederholen(tmp_path):
     assert len(zeilen) == 1
     assert zeilen[0].select_one("a")["href"] == "wettbewerb.html#deutsche-telekom"
     assert "Lagebild." in zeilen[0].get_text(" ", strip=True)
-    # Die Chronik selbst steht NICHT ein zweites Mal auf der Titelseite.
     assert "Telekom kauft zu" not in index
 
 
@@ -691,13 +682,6 @@ def test_stillgelegte_quellen_erreichen_die_chronik_nicht(tmp_path):
     assert "Deal bei inside digital" not in html
 
 
-# ------------------------------------------------- Hoehe der Seite (Layout)
-# Antonio am 08.08.2026: "mach Wettbewerb das Layout besser, sodass man nicht
-# so viel runterscrollen muss." Die Seite war 6777 px hoch, allein der
-# laufende Monat der Telekom 2600 davon. Die Gegenmassnahmen sind messbar,
-# also werden sie gemessen - und keine davon darf eine Meldung verlieren.
-
-
 def _bericht_mit_moves(n: int) -> dict:
     moves = [
         {
@@ -730,7 +714,6 @@ def test_der_laufende_monat_zeigt_seinen_anfang_und_haelt_den_rest_bereit():
     assert august["n"] == 30
     assert len(august["offen"]) == 12
     assert len(august["rest"]) == 18
-    # Zusammen sind es wieder alle, in derselben Reihenfolge.
     assert august["offen"] + august["rest"] == august["eintraege"]
 
 
@@ -742,7 +725,7 @@ def test_keine_meldung_geht_beim_einklappen_verloren(tmp_path):
         (site / "wettbewerb.html").read_text(encoding="utf-8"), "html.parser"
     )
     abschnitt = soup.select_one("section.wb")
-    assert len(abschnitt.select(".wb-zeile")) == 21  # 20 Moves + die Meldung
+    assert len(abschnitt.select(".wb-zeile")) == 21
     rest = abschnitt.select_one("details.wb-mehr-monat")
     assert rest is not None
     assert len(rest.select(".wb-zeile")) == 21 - 12

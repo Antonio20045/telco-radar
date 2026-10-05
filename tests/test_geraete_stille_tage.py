@@ -43,11 +43,6 @@ def _nulltage(db, n, start=2, erster="2026-09-01", funde=3):
         db.protokolliere_lauf("o2", f"2026-09-{tag:02d}", funde=0, vollstaendig=True)
 
 
-# --------------------------------------------------------------------------
-# Die Zaehlung
-# --------------------------------------------------------------------------
-
-
 def test_null_tage_werden_gezaehlt(tmp_path):
     db = _db(tmp_path)
     _nulltage(db, 7)
@@ -83,9 +78,6 @@ def test_nie_gelieferte_anbieter_sind_nicht_still(tmp_path):
         )
     assert db.stille_tage("winSIM") == 0
     assert db.ausfall_alarme(heute="2026-09-11") == []
-    # Gegenprobe: derselbe Anbieter mit EINEM Liefertag davor alarmiert
-    # sehr wohl - ohne sie pruefte die Zeile darueber nur, dass die
-    # Fixture nichts hergibt (CLAUDE.md Regel 10).
     db.protokolliere_lauf("winSIM", "2026-09-12", funde=5, vollstaendig=True)
     db.protokolliere_lauf("winSIM", "2026-09-13", funde=0, vollstaendig=True)
     assert [a.anbieter for a in db.ausfall_alarme(heute="2026-09-13")] == ["winSIM"]
@@ -126,11 +118,6 @@ def test_ein_teillauf_mit_funden_bricht_die_stille(tmp_path):
     _nulltage(db, 3)
     db.protokolliere_lauf("o2", "2026-09-05", funde=7, vollstaendig=False)
     assert db.stille_tage("o2") == 0
-
-
-# --------------------------------------------------------------------------
-# Altbestand und Zaehlfuehrung
-# --------------------------------------------------------------------------
 
 
 def _altbestand(tmp_path, termine, letzter_fund, funde_gesamt=100):
@@ -203,12 +190,8 @@ def test_gleicher_tag_ersetzt_seinen_eintrag(tmp_path):
     db.protokolliere_lauf("o2", "2026-09-01", funde=3, vollstaendig=True)
     db.protokolliere_lauf("o2", "2026-09-01", funde=0, vollstaendig=True)
     assert db.laufbilanz("o2")["funde_nach_tag"] == erwartet
-    # Der ersetzte Tag zaehlt als EIN stiller Tag, nicht als zwei - und
-    # `letzter_fund` (09-01, aus dem ersten Lauf) bleibt der Anker.
     assert db.stille_tage("o2") == 1
     db.save("2026-09-01")
     wieder = GeraeteDB(tmp_path / "geraete_db.json")
     assert wieder.laufbilanz("o2")["funde_nach_tag"] == erwartet
-    # Und der wieder eingelesene Tag sagt nichts ueber Adressen - keine 0,
-    # sondern eine benannte Luecke.
     assert wieder.messtage("o2")[-1].gelesene_adressen is None

@@ -36,9 +36,6 @@ def _listung(
     device=None,
     **kw,
 ):
-    # Das Geraet wird aus der SKU abgeleitet, sonst traegt jede Testlistung
-    # dieselbe device_id - und der Verwandtenabgleich (`_finde_verwandten`)
-    # legte zwei absichtlich verschiedene Artikel zusammen.
     return Listung(
         sku_id=sku,
         device_id=device or sku.split("-256gb")[0],
@@ -51,11 +48,6 @@ def _listung(
         einstieg_url=einstieg,
         **{"speicher_gb": 256, **kw},
     )
-
-
-# --------------------------------------------------------------------------
-# Aufnahme
-# --------------------------------------------------------------------------
 
 
 def test_neue_listung_wird_aufgenommen(tmp_path):
@@ -76,7 +68,7 @@ def test_dieselbe_listung_zweimal_ist_kein_neuzugang(tmp_path):
     e = db.eintraege()[0]
     assert e["preis_ohne_vertrag"] == 1399.0
     assert e["first_seen"] == "2026-08-10" and e["last_verified"] == "2026-08-17"
-    assert e["erstpreis"] == 1449.0  # der Einfuehrungspreis bleibt stehen
+    assert e["erstpreis"] == 1449.0
 
 
 def test_listung_ohne_quelle_kommt_gar_nicht_in_den_store(tmp_path):
@@ -114,11 +106,6 @@ def test_kaputte_datei_startet_leer_statt_zu_werfen(tmp_path):
     assert GeraeteDB(pfad).eintraege() == []
 
 
-# --------------------------------------------------------------------------
-# Zwei-Stufen-Auslistung
-# --------------------------------------------------------------------------
-
-
 def test_ein_fehltreffer_listet_nicht_aus(tmp_path):
     db = GeraeteDB(tmp_path / "geraete_db.json")
     _, gesehen = db.upsert([_listung()], "2026-08-10")
@@ -154,7 +141,7 @@ def test_ein_ausgelistetes_geraet_altert_nicht_weiter(tmp_path):
     for tag in ("2026-08-17", "2026-08-24", "2026-08-31"):
         db.mark_stale("expert", set(), tag, {"https://e.de/handys"})
     e = db.eintraege()[0]
-    assert e["ended_since"] == "2026-08-24"  # nicht 08-31
+    assert e["ended_since"] == "2026-08-24"
     assert e["missed_checks"] == 2
 
 
@@ -171,17 +158,14 @@ def test_ungelesene_einstiegsseite_altert_ihre_geraete_nicht(tmp_path):
         ],
         "2026-08-10",
     )
-    # Nur /handys wurde diesmal gelesen; /tarife ist ausgefallen.
     db.mark_stale("expert", set(), "2026-08-17", {"https://e.de/handys"})
     nach_einstieg = {e["einstiege"][0]: e["status"] for e in db.eintraege()}
-    assert len(nach_einstieg) == 2  # sonst prueft der Vergleich nichts
+    assert len(nach_einstieg) == 2
     assert nach_einstieg["https://e.de/handys"] == STATUS_VERMUTLICH
     assert nach_einstieg["https://e.de/tarife"] == STATUS_AKTIV
 
 
 def test_ohne_angabe_gelesener_einstiege_altert_alles(tmp_path):
-    # Der Aufrufer sagt damit ausdruecklich "ich habe diesen Anbieter
-    # vollstaendig gelesen".
     db = GeraeteDB(tmp_path / "geraete_db.json")
     db.upsert(
         [
@@ -203,11 +187,6 @@ def test_fremder_anbieter_bleibt_unberuehrt(tmp_path):
     nach_anbieter = {e["anbieter"]: e["status"] for e in db.eintraege()}
     assert len(nach_anbieter) == 2
     assert nach_anbieter["Euronics"] == STATUS_AKTIV
-
-
-# --------------------------------------------------------------------------
-# Preishistorie
-# --------------------------------------------------------------------------
 
 
 def test_erste_messung_schreibt_eine_zeile(tmp_path):
@@ -322,11 +301,6 @@ def test_buendelpreis_und_ladenpreis_stehen_getrennt_in_der_historie(tmp_path):
     assert zeile["tarif_referenz"] == "MagentaMobil M"
 
 
-# --------------------------------------------------------------------------
-# Hardware-Vermarktung: ein abgeleiteter Befund, kein gepflegtes Feld
-# --------------------------------------------------------------------------
-
-
 def test_anbieter_ohne_funde_gilt_erst_nach_mehreren_laeufen_als_sim_only(tmp_path):
     """Viele Zweitmarken vermarkten ausschliesslich SIM-only. Das ist selbst
     ein Befund - aber erst, wenn er mehrfach gemessen wurde. Nach EINEM
@@ -360,11 +334,6 @@ def test_laufbilanz_ueberlebt_das_speichern(tmp_path):
     assert GeraeteDB(pfad).hardware_vermarktung("congstar") == "ja"
 
 
-# --------------------------------------------------------------------------
-# Die Befunde des Reviews vom 10.08.2026
-# --------------------------------------------------------------------------
-
-
 def test_fehlendes_farbfeld_spaltet_die_identitaet_nicht(tmp_path):
     """Befund 2, der teuerste am Store: Lauf 1 liest `color` aus dem ld+json,
     Lauf 2 nicht. Die Farbe steckt in der sku_id, also entstand eine NEUE ID -
@@ -389,9 +358,9 @@ def test_fehlendes_farbfeld_spaltet_die_identitaet_nicht(tmp_path):
     assert neu == 0, "der Ausfall des Farbfeldes hat ein Phantomgeraet erzeugt"
     assert len(db.eintraege()) == 1
     e = db.eintraege()[0]
-    assert e["id"] == mit.listung_id  # die ID von der ersten Sichtung
+    assert e["id"] == mit.listung_id
     assert e["preis_ohne_vertrag"] == 1399.0
-    assert e["farbe_normalisiert"] == "titan-natur"  # nicht geloescht
+    assert e["farbe_normalisiert"] == "titan-natur"
     db.mark_stale("expert", gesehen, "2026-08-17", {"https://e.de/handys"})
     assert db.eintraege()[0]["status"] == STATUS_AKTIV
 
@@ -410,7 +379,7 @@ def test_nachgeliefertes_farbfeld_fuellt_die_luecke_ohne_die_id_zu_aendern(tmp_p
     neu, _ = db.upsert([mit], "2026-08-17")
     assert neu == 0 and len(db.eintraege()) == 1
     e = db.eintraege()[0]
-    assert e["id"] == ohne.listung_id  # die ID bleibt, sie ist ein Schluessel
+    assert e["id"] == ohne.listung_id
     assert e["farbe_normalisiert"] == "titan-natur"
 
 
@@ -463,8 +432,6 @@ def test_bei_zwei_kandidaten_wird_nichts_geraten(tmp_path):
         ],
         "2026-08-17",
     )
-    # Zwei Kandidaten - die Zuordnung ist nicht belegbar, also ein eigener
-    # Eintrag statt einer geratenen Verschmelzung.
     assert neu == 1 and len(db.eintraege()) == 3
 
 
@@ -519,7 +486,6 @@ def test_unbekannte_verfuegbarkeit_ueberschreibt_den_bekannten_wert_nicht(tmp_pa
 
 
 def test_ein_echter_verfuegbarkeitswechsel_wird_weiterhin_geschrieben(tmp_path):
-    # Gegenprobe zum Test darueber.
     h = Preishistorie(tmp_path / "geraete_preise.jsonl")
     h.schreibe(_listung(verfuegbarkeit="lieferbar"), "2026-08-10")
     assert (
@@ -598,17 +564,6 @@ def test_erster_messpunkt_auch_bei_reinem_vertragspreis(tmp_path):
     assert h.reihe(l.listung_id)[0]["preis_mit_vertrag_ab"] == 1.0
 
 
-# --------------------------------------------------------------------------
-# Messtermine: die Diagnose G0 vom 28.08.2026
-# --------------------------------------------------------------------------
-# Die Seite meldete nach 17 Tagen und vier echten Pruefterminen "bisher
-# 1 Messtermin", und die Lifecycle-Auswertung sperrte 84 von 85 Listungen aus.
-# Zwei Ursachen, beide hier festgenagelt: die Laufbilanz verbuchte nur
-# VOLLSTAENDIGE Laeufe (mobilcom-debitel wurde am Zeitbudget nie fertig und
-# fehlte komplett), und die Messtermin-Zaehlung hing an der Preishistorie,
-# die bei unveraendertem Preis schweigt.
-
-
 def test_teillauf_mit_funden_zaehlt_als_messtermin_aber_nicht_als_lauf(tmp_path):
     db = GeraeteDB(tmp_path / "geraete_db.json")
     db.protokolliere_lauf(
@@ -617,7 +572,6 @@ def test_teillauf_mit_funden_zaehlt_als_messtermin_aber_nicht_als_lauf(tmp_path)
     b = db.laufbilanz("mobilcom-debitel")
     assert b.get("laeufe", 0) == 0, "ein Teillauf ist kein vollstaendiger Lauf"
     assert "2026-08-21" in db.messtermine("mobilcom-debitel")
-    # Funde aus einem Teillauf sind echte Funde - die Marke vermarktet Hardware.
     assert db.hardware_vermarktung("mobilcom-debitel") == "ja"
 
 
@@ -639,8 +593,6 @@ def test_messtermine_lesen_den_altbestand_aus_den_listungsdaten(tmp_path):
     db = GeraeteDB(tmp_path / "geraete_db.json")
     db.upsert([_listung(anbieter="mobilcom-debitel")], "2026-08-10")
     db.upsert([_listung(anbieter="mobilcom-debitel", tag="2026-08-14")], "2026-08-14")
-    # Die Bilanz absichtlich loeschen - so sieht der Altbestand aus, dessen
-    # Laeufe vor der Termine-Buchfuehrung lagen.
     db._anbieter.clear()
     assert db.messtermine("mobilcom-debitel") == ["2026-08-10", "2026-08-14"]
 

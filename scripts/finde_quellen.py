@@ -75,17 +75,10 @@ from telco_radar.collect.http import configure_throttle, fetch  # noqa: E402
 from telco_radar.config import load_config  # noqa: E402
 from telco_radar.models import normalize_url  # noqa: E402
 
-# Kurze Zeitgrenze mit Absicht: in einer Breitensuche sind die meisten
-# geprobten Adressen 404, und ein Server, der 8 s fuer eine Feed-Datei
-# braucht, wird auch im Lauf zum Problem. Ein Timeout kostet hier das
-# Sechsfache eines Treffers (zwei User-Agents x drei Versuche).
 HTTP_CFG = {"timeout_seconds": 8}
 DROSSEL_PARALLEL_JE_HOST = 4
 DROSSEL_PAUSE_SEKUNDEN = 0.15
 
-# Pfade, die in dieser Branche ueberdurchschnittlich oft ein Feed sind.
-# Reihenfolge = Trefferwahrscheinlichkeit; die Liste bleibt bewusst kurz,
-# jeder Eintrag kostet einen Abruf je Ziel.
 KANDIDATENPFADE = (
     "/feed",
     "/rss",
@@ -103,9 +96,6 @@ KANDIDATENPFADE = (
     "/en/feed",
     "/de/feed",
     "/wp-json/wp/v2/posts?per_page=25&_embed=1",
-    # Weitere Muster, die im Bestand nachweislich vorkommen bzw. bei
-    # Telco-Newsrooms ueberdurchschnittlich oft treffen. Jeder Eintrag kostet
-    # einen Abruf je Ziel - die Liste bleibt deshalb kurz und begruendet.
     "/news/feed/",
     "/press/feed",
     "/presse/feed",
@@ -122,12 +112,8 @@ KANDIDATENPFADE = (
     "/blog/index.xml",
 )
 
-# Unterpfade, die AN DIE GENANNTE SEITE gehaengt werden (nicht an die Domain).
 _SEITEN_SUFFIXE = ("/feed", "/rss", "/feed/", "/rss.xml", "?format=feed&type=rss")
 
-# Newsroom-Pfade, die auf einer blossen Domain ueberhaupt erst gesucht werden
-# muessen: bei --firmen ist nur "telenor.no" bekannt, nicht wo dort die
-# Pressemeldungen liegen. Die rel=alternate-Suche braucht aber eine Seite.
 NEWSROOM_PFADE = (
     "",
     "/news",
@@ -159,8 +145,6 @@ def _ist_feed_inhalt(text: str, content_type: str) -> str:
     if "xml" in ct and ("<item" in text[:6000] or "<entry" in text[:6000]):
         return "rss"
     if kopf.startswith(("[", "{")) and ("json" in ct or True):
-        # Nur als json_api melden, wenn ueberhaupt mehrere Datensaetze
-        # drinstehen - eine Fehlerseite in JSON ist kein Feed.
         if (
             text.count('"title"') >= 3
             or text.count('"headline"') >= 3
@@ -200,7 +184,6 @@ def _aus_html(seite: str) -> list[str]:
                 or "format=feed" in href.lower()
             ):
                 gefunden.append(urljoin(str(resp.url), href))
-    # Reihenfolge erhalten, Dubletten raus
     return list(dict.fromkeys(gefunden))
 
 
@@ -234,20 +217,17 @@ def _ziel_bearbeiten(ziel: dict, bekannt: set[str] | None = None) -> list[dict]:
         with ThreadPoolExecutor(max_workers=8) as pool:
             return [r for r in pool.map(_pruefe_url, urls) if r]
 
-    # --- Stufe 1: was die Seiten selbst angeben
     angegeben: list[str] = []
     with ThreadPoolExecutor(max_workers=6) as pool:
         for gefunden in pool.map(_aus_html, seiten):
             angegeben.extend(gefunden)
     gefunden = _pruefe_viele(angegeben)
 
-    # --- Stufe 2: die ueblichen Pfade auf der Domain
     if not gefunden:
         gefunden = _pruefe_viele(
             [b + p for b in sorted(basen) for p in KANDIDATENPFADE]
         )
 
-    # --- Stufe 3: /feed & Co. an den genannten Seitenpfaden
     if not gefunden:
         gefunden = _pruefe_viele(
             [s.rstrip("/") + suffix for s in seiten for suffix in _SEITEN_SUFFIXE]
@@ -290,11 +270,6 @@ def ziele_aus_watchlist(root: Path) -> list[dict]:
         for src in op.sources:
             seiten.append(src.url)
         if op.website:
-            # Nur die Wurzel, NICHT die geratenen Newsroom-Pfade: die
-            # bestehende Quellen-URL zeigt bereits auf den Newsroom, und
-            # rel=alternate steht bei fast jedem CMS im <head> jeder Seite.
-            # Dreizehn Ratepfade je Firma waren der Grund, warum ein
-            # Durchgang ueber 112 Betreiber nicht fertig wurde.
             basis = (
                 op.website
                 if op.website.startswith("http")
@@ -445,8 +420,6 @@ def main(argv: list[str] | None = None) -> int:
                 for g in gefunden:
                     print(f"       {g['type']:9} {g['url']}")
             alle.extend(gefunden)
-            # Nach jedem Ziel sichern: bei 800 Zielen ist ein Abbruch die
-            # Regel, nicht die Ausnahme.
             if args.cache and fertig % 10 == 0:
                 args.cache.write_text(
                     yaml.safe_dump(
@@ -457,7 +430,6 @@ def main(argv: list[str] | None = None) -> int:
                     encoding="utf-8",
                 )
 
-    # Dubletten unter den Funden selbst (mehrere Ziele finden denselben Feed)
     einmalig: dict[str, dict] = {}
     for k in alle:
         einmalig.setdefault(_schluessel(k["url"]), k)

@@ -40,13 +40,8 @@ _LDJSON_RE = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 
-# Unterhalb dieser Grenze ist eine Zahl in der Spalte "Preis ohne Vertrag"
-# keine Preisangabe, sondern ein Buendel-Lockpreis. Gemessen an echten
-# Datensaetzen: WinSIM price=1, o2 price="1.00", Blau price="1.00".
 _LOCKPREIS_GRENZE = 30.0
 
-# Obergrenze gegen offensichtlichen Datenmuell (ein Cent-Preis mal 100, ein
-# Bundle-Gesamtpreis). Faltbare liegen bei 2000-2500 Euro, also grosszuegig.
 _PREIS_OBERGRENZE = 10000.0
 
 _VERFUEGBARKEIT = {
@@ -77,17 +72,6 @@ def verfuegbarkeit_aus_schema(wert) -> str:
     return _VERFUEGBARKEIT.get(schluessel, "unbekannt")
 
 
-# schema.org kennt vier Zustaende. Sie werden HIER auf unser Vokabular
-# abgebildet und nicht der Wortliste in `geraete_model._ZUSTAENDE`
-# ueberlassen: dort stuende "used" als Einzelwort und traefe jeden englischen
-# Titel, der es beilaeufig benutzt.
-#
-# Gemessen am 30.08.2026, vor dieser Zeile: `UsedCondition` - der
-# schema.org-Standardbegriff fuer Gebrauchtware - ergab `zustand="neu"`, und
-# ein Shop, der seinen Gebrauchtbestand KORREKT auszeichnet, lieferte seinen
-# Gebrauchtpreis in den Neupreisvergleich. `RefurbishedCondition` traf nur
-# zufaellig, weil die Binnenmajuskel den Begriff zerlegt; kleingeschrieben
-# fiel auch der durch.
 _SCHEMA_ZUSTAND = {
     "usedcondition": "gebraucht",
     "refurbishedcondition": "refurbished",
@@ -154,11 +138,6 @@ def ist_lockpreis(preis: Optional[float]) -> bool:
     return preis is not None and preis < _LOCKPREIS_GRENZE
 
 
-# --------------------------------------------------------------------------
-# Stufe 1: JSON-LD
-# --------------------------------------------------------------------------
-
-
 def _knoten(wurzel):
     """Alle dicts eines JSON-Baums, flach. Iterativ, damit ein tief
     verschachtelter @graph nicht die Rekursionsgrenze reisst - dieselbe
@@ -205,11 +184,6 @@ def _aus_produktknoten(knoten: dict) -> Optional[dict]:
         "preis": preis,
         "waehrung": str(angebot.get("priceCurrency") or "").upper(),
         "verfuegbarkeit": verfuegbarkeit_aus_schema(angebot.get("availability")),
-        # schema.org kennt den Zustand als `itemCondition`
-        # (".../RefurbishedCondition"). Er steht am Produkt ODER am Angebot,
-        # je nachdem, wie der Shop sein Schema baut.
-        # Produkt UND Angebot: schema.org verortet den Zustand ueblicherweise
-        # am Angebot, viele Shops setzen ihn ans Produkt.
         "zustand_hinweis": (
             zustand_aus_schema(knoten.get("itemCondition"))
             or zustand_aus_schema(angebot.get("itemCondition"))
@@ -251,11 +225,6 @@ def produkte_aus_ldjson(html: str) -> list[dict]:
     return gefunden
 
 
-# --------------------------------------------------------------------------
-# Stufe 2: Microdata
-# --------------------------------------------------------------------------
-
-
 def _itemprop(wurzel, name: str) -> str:
     knoten = wurzel.find(attrs={"itemprop": name})
     if knoten is None:
@@ -291,8 +260,6 @@ def produkte_aus_microdata(html: str) -> list[dict]:
                 "verfuegbarkeit": verfuegbarkeit_aus_schema(
                     _itemprop(quelle, "availability")
                 ),
-                # `quelle` ist das Angebot, sobald eins da ist - der Zustand kann
-                # aber am Produkt haengen. Beide fragen, wie im ld+json-Pfad.
                 "zustand_hinweis": (
                     zustand_aus_schema(_itemprop(quelle, "itemCondition"))
                     or zustand_aus_schema(_itemprop(produkt, "itemCondition"))

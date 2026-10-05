@@ -27,10 +27,6 @@ from telco_radar.tarif_bezug import Tarifbestand
 
 from test_geraete_tco_zustand import HEUTE, SKU_NEU, _buendel, _referenzen, _tarife
 
-# ==========================================================================
-# Die reine Funktion
-# ==========================================================================
-
 
 def test_ohne_jede_listung_ist_jeder_haendler_none():
     ergebnis = _haendler_ohne_buendel_preise([])
@@ -111,11 +107,6 @@ def test_ein_haendler_ausserhalb_der_liste_wird_ignoriert():
     ergebnis = _haendler_ohne_buendel_preise(listungen)
     assert set(ergebnis) == set(HAENDLER_OHNE_BUENDEL)
     assert all(v is None for v in ergebnis.values())
-
-
-# ==========================================================================
-# Der ganze Weg: `geraete_tco_view.aufbereiten()`
-# ==========================================================================
 
 
 def _katalog():

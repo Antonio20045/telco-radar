@@ -158,17 +158,10 @@ from urllib.parse import urlsplit
 
 from . import GeraeteAbrufFehler
 
-# DIE EINE STELLE, die entscheidet, ob ein Rohwert eine Ratenlaufzeit IST
-# (Clean Code 1) - dieselbe Pruefung, die `buendel_id` und `Buendel` lesen.
-# Eine eigene `int()`-Zeile hier waere eine zweite, schwaechere Definition:
-# sie wuerde 24,5 still auf 24 abschneiden.
 from ...tco_model import laufzeit_in_monaten
 
 log = logging.getLogger(__name__)
 
-# Die zwei Pflichtparameter. Ohne sie antwortet die Schnittstelle mit
-# HTTP 400 und nennt das fehlende Feld beim Namen - beide Werte stammen aus
-# dem Skriptbuendel der Seite, nicht aus einem Versuch.
 _PARAMETER = "businessTransaction=newContract&salesChannel=Online.Consumer"
 
 _GB_RE = re.compile(r"(\d+)\s*(GB|TB)", re.IGNORECASE)
@@ -244,18 +237,6 @@ def lies(text: str, url: str = "") -> list[dict]:
     if not modell:
         raise GeraeteAbrufFehler("Geraetedetail ohne modelName")
 
-    # Die Produktseite, die ein Mensch aufrufen kann. Der rohe
-    # Schnittstellenaufruf waere als Quellenlink wertlos: die Seite
-    # verspricht zu jeder Zahl einen nachpruefbaren Beleg, und niemand
-    # prueft eine JSON-Antwort mit Schluessel nach.
-    #
-    # ABSOLUT, und zwar auf www.vodafone.de. Die Nutzlast nennt den Pfad
-    # relativ ("/privat/handys/iphone-15.html"), und der Collector loest ihn
-    # gegen die QUELLE auf - das ist hier api.vodafone.de. Im ersten Lauf
-    # standen deshalb 150 Quelllinks auf "https://api.vodafone.de/privat/
-    # handys/..." in der Datenbank und im CSV-Export: Adressen, die es nicht
-    # gibt. Kein Test hat das gemeldet; aufgefallen ist es beim Lesen der
-    # exportierten Tabelle.
     hubpage = str(_pfad(knoten, "hubpage", "href") or "").strip()
     if hubpage.startswith("/"):
         hubpage = "https://www.vodafone.de" + hubpage
@@ -278,25 +259,15 @@ def lies(text: str, url: str = "") -> list[dict]:
             continue
         speicher = _speicher_gb(str(_pfad(atom, "capacity", "displayLabel") or ""))
         farbe = str(_pfad(atom, "color", "displayLabel") or "").strip()
-        # Der Titel wird aus MODELL, Speicher und Farbe gebaut, nicht aus
-        # `label` uebernommen: dort steht "Google Pixel Hibiscus (256 GB)" -
-        # ohne die Generation, weil die Farbe den Modellnamen verdraengt hat.
-        # Aus so einem Titel findet die Geraeteerkennung ihren Katalogeintrag
-        # nicht mehr.
         titel = " ".join(
             x for x in (modell, f"{speicher} GB" if speicher else "", farbe) if x
         )
         out.append(
             {
                 "titel": titel,
-                # E4-Auto-Erkennung: der strukturierte NAME (Feld `modelName`),
-                # getrennt vom zusammengesetzten Titel.
                 "strukturierter_name": modell,
                 "preis": float(preis),
                 "waehrung": "EUR",
-                # `shippingInfo` nennt einen Liefertermin, wenn es einen gibt.
-                # Daraus "lieferbar" zu machen waere eine Behauptung ueber den
-                # Lagerbestand, die dort nicht steht.
                 "verfuegbarkeit": (
                     "lieferbar" if _pfad(atom, "shippingInfo", "date") else "unbekannt"
                 ),
@@ -309,11 +280,6 @@ def lies(text: str, url: str = "") -> list[dict]:
             }
         )
     return out
-
-
-# --------------------------------------------------------------------------
-# BUENDELPREISE - siehe Modulkopf, Abschnitt B1
-# --------------------------------------------------------------------------
 
 
 def _preis(wert) -> Optional[float]:
@@ -390,7 +356,7 @@ def _letztes_phasenende(komposition: dict) -> Optional[int]:
             laufzeit_in_monaten(p.get("recurrenceEnd")) for p in _perioden(komposition)
         )
         if ende is not None
-    ]  # None = offene Phase, kein Ende
+    ]
     return max(enden) if enden else None
 
 
@@ -447,9 +413,6 @@ def _buendelsatz_aus_komposition(
     Modulkopf (die Rechenprobe entscheidet, nicht `financingType`)."""
     hash_ = str(komposition.get("offerCoreHash") or "").strip()
     if not hash_:
-        # Ohne `offerCoreHash` gibt es keinen Schluessel, ueber den
-        # `loese_tarifnamen()` je einen Tarifnamen findet - der Satz waere
-        # ein Buendel ohne benennbaren Tarif.
         log.info(
             "Vodafone-Buendel: Komposition ohne offerCoreHash "
             "(financingType %r) - verworfen",
@@ -478,8 +441,6 @@ def _buendelsatz_aus_komposition(
     h_monat = _preis(_pfad(hardware, "month", "withoutDiscounts", "gross"))
     h_einmalig = _preis(_pfad(hardware, "onetime", "withoutDiscounts", "gross"))
     if t_monat is None:
-        # Ohne Tarifrate keine Buendelaussage - und der Ausfall wird
-        # benannt, nicht verschluckt.
         log.info(
             "Vodafone-Buendel: Komposition %s ohne Tarif-Monatsrate - verworfen", hash_
         )
@@ -488,8 +449,6 @@ def _buendelsatz_aus_komposition(
     if h_monat is not None and _gleich(t_monat + h_monat, gesamt):
         geraet_monatsrate = h_monat
     elif _gleich(t_monat, gesamt):
-        # "financingType": "sub" - das Geraet steckt vollstaendig im
-        # Tarifpreis, eine separate Rate wird nicht berechnet (Modulkopf).
         geraet_monatsrate = None
     else:
         log.info(
@@ -500,12 +459,10 @@ def _buendelsatz_aus_komposition(
             h_monat,
             gesamt,
         )
-        return None  # Summe geht nicht auf - verwerfen
+        return None
 
     laufzeit = _laufzeit(komposition, geraet_monatsrate)
     if laufzeit is None:
-        # BENANNTE LUECKE statt stillem Verlust: hier verschwindet ein
-        # gemessenes Angebot, und der Grund steht im Protokoll.
         log.info(
             "Vodafone-Buendel: Komposition %s ohne bestimmbare "
             "Ratenlaufzeit (financingDuration %r, Geraeterate %r, "
@@ -532,11 +489,7 @@ def _buendelsatz_aus_komposition(
         "strukturierter_name": modell,
         "farbe": farbe,
         "speicher_gb": speicher,
-        # Vodafones `hardwareId` - der Schluessel, ueber den
-        # `loese_tarifnamen()` spaeter die Tarifschnittstelle je Geraet
-        # GENAU EINMAL befragt (nicht je Rohsatz).
         "sku": hardware_id,
-        # Kein Klarname in dieser Antwort (siehe Modulkopf) - nicht raten.
         "tarif_name": "",
         "tarif_slug": hash_,
         "tarif_monatlich": t_monat,
@@ -549,9 +502,6 @@ def _buendelsatz_aus_komposition(
     }
 
 
-# `proben` ist die Schnittstelle der Provider-Probe (FM-2, P5 - siehe
-# Adapter-Docstring in collect/geraete/__init__.py); dieser Adapter
-# traegt keine Feld-Proben hinein.
 def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> list[dict]:
     """Aus DERSELBEN Detailnutzlast, die `lies()` liest, die Buendelsaetze.
 
@@ -590,11 +540,6 @@ def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> lis
             if satz is not None:
                 out.append(satz)
     return out
-
-
-# --------------------------------------------------------------------------
-# TARIFNAMEN AUFLOESEN - siehe Modulkopf, Abschnitt B1
-# --------------------------------------------------------------------------
 
 
 def _buendel_aus_tarifantwort(text: str) -> dict:
@@ -648,18 +593,8 @@ def _hash_namen_aus_tarifantwort(text: str) -> dict:
     }
 
 
-# Derselbe Mindestabstand wie `rate_limit_sekunden` des Anbieters in
-# `geraete_quellen.yaml` (2s) - diese Aufloesung ist ein ZUSAETZLICHER
-# GET-Strom gegen denselben Host und soll ihn nicht haerter treffen als
-# der Hauptabruf.
 _TARIF_RATE_LIMIT = 2.0
 
-# Wie viele `hardwareId` ein Abruf der Tarifschnittstelle hoechstens traegt.
-# Der Parameter ist dort als LISTE typisiert (HTTP 400 nennt ihn woertlich
-# "Required request parameter 'hardwareId' for method parameter type List"),
-# gemessen am 29.09.2026: 16 Ids des iPhone 18 Pro in einem Abruf, 684 kB,
-# HTTP 200, 16 Eintraege. Der Deckel teilt einen groesseren Satz in mehrere
-# Abrufe, er schneidet keinen ab.
 _IDS_JE_ABRUF = 16
 
 
@@ -714,9 +649,6 @@ def _alle_angebote(vorlage: dict, hwid: str, angebote: list) -> list:
         )
         if satz is None:
             continue
-        # Tarif und Laufzeit sind der Buendelschluessel
-        # (`tco_model.buendel_id`); ein zweites Angebot mit demselben Paar
-        # ueberschriebe das erste still.
         paar = (name, satz["laufzeit_monate"])
         if paar in gesehen:
             log.warning(
@@ -807,9 +739,6 @@ def loese_tarifnamen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> int:
 
     neu: list = []
     gesetzt = 0
-    # "Nicht gelesen" ist nicht "leer" (Clean Code 6): hat fuer eine
-    # Variante keine Kombination der Tarifschnittstelle ihre Probe
-    # bestanden, bleibt ihre Vorschau stehen und geht den Hash-Weg unten.
     ersetzt: dict[str, list] = {}
     for hwid in list(vollstaendig):
         saetze = _alle_angebote(vorschau[hwid][0], hwid, vollstaendig[hwid])
@@ -829,7 +758,7 @@ def loese_tarifnamen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> int:
                 saetze = ersetzt[hwid]
                 neu.extend(saetze)
                 gesetzt += len(saetze)
-            continue  # die uebrige Vorschau faellt weg
+            continue
         if (
             r.get("quelle") == "vodafone_buendel"
             and not str(r.get("tarif_name") or "").strip()

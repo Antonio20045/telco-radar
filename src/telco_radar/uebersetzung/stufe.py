@@ -33,8 +33,6 @@ from .volltext import hole_volltext
 
 log = logging.getLogger(__name__)
 
-# Unter so viel Restzeit faengt die Stufe gar nicht erst an. Ein einzelner
-# Artikel braucht einen Abruf plus ein bis drei Modellaufrufe.
 MINDESTBUDGET = 60.0
 DECKEL_VORGABE = 60
 
@@ -114,11 +112,6 @@ def _kandidaten(
         if len(probe) >= 200:
             fremd, kuerzel, _ = ist_fremdsprachig(probe, item.title)
             if not fremd:
-                # Vorgefiltert OHNE Abruf und ohne Modellaufruf - das ist der
-                # Sinn dieser Stufe. Es muss trotzdem gezaehlt werden: ein
-                # Protokoll, das "0 uebersetzt, 0 uebersprungen" meldet,
-                # laesst offen, ob nichts fremdsprachig war oder ob die
-                # Vorauswahl gar nicht erst gelaufen ist.
                 if bilanz is not None:
                     bilanz["vorgefiltert"] += 1
                     bilanz["gruende"][
@@ -148,21 +141,10 @@ def lauf(
     t0 = time.monotonic()
     heute = heute or date.today()
     root = Path(root)
-    # Erst materialisieren, dann zaehlen. `len()` auf einem Generator wirft
-    # einen TypeError, und weil die Bilanz ganz oben gebaut wird, faellt die
-    # Stufe dann VOR dem ersten Artikel - die Pipeline fangt das und
-    # protokolliert "Uebersetzung uebersprungen: TypeError". Die Stufe
-    # verschwindet also lautlos, und die Zusicherung "wirft nichts" waere von
-    # der Aufrufseite her gebrochen.
     items = list(items)
     store = UebersetzungsStore(root / "data" / "state" / "uebersetzungen.jsonl")
     http_cfg = dict(settings.get("http", {}) or {})
     artikelabruf = bool(settings.get("uebersetzung_artikelabruf", True))
-    # Vorgabe 60 (bis 27.08.2026: 40) - seit Englisch mituebersetzt wird
-    # (sprache.MUTTERSPRACHEN), wuchs der Kandidatenstrom von ~83 auf ~226
-    # je Lauf. Der Deckel schneidet weiterhin nach Berichtsrang, die
-    # wichtigsten zuerst - er wird nicht mitgezogen, weil "mehr Kandidaten"
-    # nicht "jeder bekommt eine Uebersetzung" heissen muss.
     deckel = int(settings.get("uebersetzung_max_je_lauf", DECKEL_VORGABE))
 
     bilanz = {
@@ -184,11 +166,6 @@ def lauf(
     }
 
     kandidaten = _kandidaten(items, store, deckel, bilanz)
-    # `sicher_fremd` zaehlt ALLE erkannt fremdsprachigen, auch die, die der
-    # Deckel wegschneidet - ein "davon" waere hier falsch, weil die Zahl
-    # groesser sein kann als die der Kandidaten. Bei 193 berichteten
-    # Meldungen und Deckel 40 ist genau das die Zeile, an der sonst niemand
-    # mehr ablesen kann, wie viele sichere Treffer wirklich bearbeitet werden.
     log.info(
         "Uebersetzung: %d berichtete Meldungen -> %d Kandidaten "
         "(erkannt fremdsprachig insgesamt: %d, ueber dem Deckel %d: %d), "
@@ -214,7 +191,7 @@ def lauf(
         bilanz["geprueft"] += 1
         try:
             _einer(item, store, http_cfg, artikelabruf, modell, heute, bilanz)
-        except Exception as exc:  # noqa: BLE001 - ein Artikel kostet nie den Lauf
+        except Exception as exc:  # noqa: BLE001
             bilanz["gescheitert"] += 1
             bilanz["gruende"][f"Fehler: {type(exc).__name__}"] += 1
             log.warning("Uebersetzung fehlgeschlagen (%s): %s", item.url[:70], exc)
@@ -233,10 +210,6 @@ def _einer(item, store, http_cfg, artikelabruf, modell, heute, bilanz) -> None:
         bilanz["gruende"][ergebnis.grund or "kein Volltext"] += 1
         return
 
-    # Die ENTSCHEIDENDE Erkennung - auf dem Fliesstext, nicht auf dem
-    # Titel und nicht auf dem Teaser. Ein Feed kann eine englische
-    # Zusammenfassung zu einem spanischen Artikel tragen, und andersherum
-    # sortiert ein kurzer Teaser einen englischen Artikel als fremd ein.
     fremd, kuerzel, _ = ist_fremdsprachig(ergebnis.text, item.title)
     if not fremd:
         bilanz["uebersprungen"] += 1
@@ -296,11 +269,6 @@ def protokollzeile(bilanz: dict) -> str:
         f"Bestand {bilanz['bestand']}, {bilanz['sekunden']}s"
     ]
     if bilanz.get("ueber_deckel"):
-        # "nicht bearbeitet", nicht "nicht angesehen": angesehen wird seit dem
-        # 15.08.2026 ALLES, der Deckel schneidet erst danach. Die alte
-        # Formulierung war die Zahl, an der der Fehler zu erkennen war
-        # (`ueber_deckel: 887` bei 40 bearbeiteten) - sie darf jetzt nicht
-        # dasselbe Wort fuer etwas anderes benutzen.
         teile.append(f" [DECKEL: {bilanz['ueber_deckel']} nicht bearbeitet]")
     if bilanz.get("frist_erreicht"):
         teile.append(" [FRIST ERREICHT]")

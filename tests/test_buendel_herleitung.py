@@ -65,7 +65,6 @@ def test_herleitung_reist_vom_rohsatz_bis_in_bestand_und_historie(tmp_path):
         je_sku["apple-iphone-17-256gb-schwarz"]["herleitung"]
         == "tarifsumme_minus_geraeterate"
     )
-    # Gegenprobe: gemessen bleibt leer, nicht None und nicht geraten.
     assert je_sku["apple-iphone-17-512gb-schwarz"]["herleitung"] == ""
     historie = (tmp_path / "historie.jsonl").read_text(encoding="utf-8")
     assert '"herleitung": "tarifsumme_minus_geraeterate"' in historie

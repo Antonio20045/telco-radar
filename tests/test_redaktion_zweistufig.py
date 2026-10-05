@@ -116,7 +116,7 @@ def antworten(monkeypatch):
 def test_ein_aufruf_je_bereich_plus_chefredaktion(antworten):
     regional = _regional({"Europa": 3, "Asien": 2, "Nordamerika": 1})
     synthesize_zweistufig(regional, [], model="m", workers=3)
-    assert len(antworten) == 4  # 3 Bereiche + 1 Chef
+    assert len(antworten) == 4
 
 
 def test_chefredaktion_sieht_die_rohliste_nicht(antworten):
@@ -146,8 +146,6 @@ def test_chefeingabe_waechst_mit_bereichen_nicht_mit_meldungen(antworten):
     viel_mehr_meldungen = chefeingabe(_regional({"Europa": 60}))
     mehr_bereiche = chefeingabe(_regional({"Europa": 5, "Asien": 5, "Afrika": 5}))
 
-    # zwoelfmal so viele Meldungen, aber die Eingabe waechst hoechstens um die
-    # fuenf staerksten je Bereich - Bereiche dagegen schlagen voll durch
     assert viel_mehr_meldungen < klein * 2
     assert mehr_bereiche > klein * 2
 
@@ -166,7 +164,7 @@ def test_bereichsredakteur_bekommt_nur_seinen_bereich(antworten):
 def test_bericht_haelt_die_pflichtgliederung_ein(antworten):
     regional = _regional({"Europa": 2, "Asien": 1})
     markdown, _ = synthesize_zweistufig(regional, [], model="m")
-    validate_editorial_briefing(markdown)  # wirft sonst
+    validate_editorial_briefing(markdown)
     for pflicht in (
         "## Auf einen Blick",
         "## Das Wichtigste",
@@ -194,7 +192,6 @@ def test_themenfelder_stehen_gemeinsam_unter_einer_ueberschrift(antworten):
     )
 
     assert "## Technologie, Geräte & Regulierung" in markdown
-    # Themenfelder als H3 darunter, Regionen als H2 darueber
     assert "### KI & Modelle" in markdown
     assert "## Europa" in markdown
     assert (
@@ -289,7 +286,7 @@ def test_bereiche_ohne_meldungen_bekommen_keinen_redakteur(antworten):
     regional = _regional({"Europa": 2})
     regional["Ozeanien"] = {"region_summary": "", "highlights": []}
     synthesize_zweistufig(regional, [], model="m")
-    assert len(antworten) == 2  # Europa + Chef, nicht Ozeanien
+    assert len(antworten) == 2
     assert "## Ozeanien" not in antworten[-1]["user"]
 
 
@@ -298,18 +295,15 @@ def test_ohne_bewertete_meldungen_wird_geworfen(antworten):
         synthesize_zweistufig({"Europa": {"highlights": []}}, [], model="m")
 
 
-# ------------------------------------------------------------ Modus-Schalter
-
-
 @pytest.mark.parametrize(
     "settings,bewertete,erwartet",
     [
-        ({}, 36, False),  # heutiger Lauf
-        ({}, 650, True),  # 1000-Quellen-Lauf
-        ({"editor_zweistufig_ab_meldungen": 10}, 10, True),  # Schwelle inklusive
+        ({}, 36, False),
+        ({}, 650, True),
+        ({"editor_zweistufig_ab_meldungen": 10}, 10, True),
         ({"editor_modus": "zweistufig"}, 1, True),
         ({"editor_modus": "einstufig"}, 5000, False),
-        ({"editor_modus": "quatsch"}, 36, False),  # faellt auf auto zurueck
+        ({"editor_modus": "quatsch"}, 36, False),
     ],
 )
 def test_moduswahl(settings, bewertete, erwartet):

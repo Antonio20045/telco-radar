@@ -97,7 +97,6 @@ def sammle_kandidaten(cfg, http_cfg, nur_fremd: bool, deckel: int):
             treffer.extend(teil)
             if len(treffer) >= deckel * 3:
                 break
-    # Je Quelle hoechstens einen - sonst misst die Stichprobe ein Layout.
     je_quelle: dict[str, dict] = {}
     for t in treffer:
         je_quelle.setdefault(t["quelle"], t)

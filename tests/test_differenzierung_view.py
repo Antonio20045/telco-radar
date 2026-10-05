@@ -66,7 +66,6 @@ def auf(db=None, store=None, stichtag=STICHTAG):
     return view.aufbereiten(db or [], store or [], THEMES, stichtag, FARBEN)
 
 
-# --------------------------------------------------------------- der Merge
 def test_beide_speicher_landen_im_bestand():
     """Der eigentliche Befund: der Kurator lief jede Woche umsonst."""
     d = auf([db_eintrag()], [store_eintrag()])
@@ -94,15 +93,12 @@ def test_dedupe_ueber_die_normalisierte_url_nicht_die_rohe():
     assert d["gesamt"] == 1
 
 
-# ------------------------------------------------ Mapping der Store-Felder
 def test_store_eintrag_wird_auf_die_kartenform_gebracht():
     d = auf([], [store_eintrag()])
     e = d["bestand"][0]
     assert e["operator"] == "Telkomsel"
     assert e["region"] == "Asien"
     assert e["theme"] == "gaming"
-    # Domain aus der URL - der Store fuehrt dort ein Quellen-LABEL
-    # ("Telkomsel"), die Karte zeigt aber die Domain wie ueberall sonst.
     assert e["source"] == "b.example.com"
 
 
@@ -128,8 +124,6 @@ def test_why_kommt_aus_why_it_matters():
 @pytest.mark.parametrize(
     "text,erwartet",
     [
-        # Ein Punkt in einer Zahlangabe ist kein Satzende - drei von 51
-        # Bestandssaetzen haben genau diese Form.
         (
             "Gutschriften bei Ausfaellen, auf rund 50 Mio. Kunden ausgeweitet.",
             "Gutschriften bei Ausfaellen, auf rund 50 Mio. Kunden ausgeweitet.",
@@ -156,7 +150,6 @@ def test_erster_satz_endet_nie_mit_auslassungspunkten():
     assert view.erster_satz(lang).endswith("muss.")
 
 
-# ---------------------------------------------------------- die Neu-Regel
 def test_neu_gilt_zehn_tage_ab_dem_stand_der_ausgabe():
     frisch = db_eintrag(id="f", url="https://f.example.com/", first_seen="2026-08-05")
     alt = db_eintrag(id="a", url="https://a2.example.com/", first_seen="2026-06-01")
@@ -198,7 +191,6 @@ def test_hoechstens_drei_karten_stehen_oben():
     assert len(auf(viele)["neu"]) == view.MAX_NEU == 3
 
 
-# ------------------------------------------------------------- die Hebel
 def test_hebel_ohne_eintraege_erscheinen_nicht():
     """Zwoelfmal "Noch keine bestaetigten Beispiele" war zwoelfmal derselbe
     leere Kasten."""
@@ -233,7 +225,6 @@ def test_jeder_hebel_traegt_zahl_farbe_und_etikett():
     d = auf([db_eintrag(), db_eintrag(id="z", url="https://z.example.com/")])
     h = d["hebel"][0]
     assert (h["n"], h["farbe"], h["label"]) == (2, "#7b3fe4", "KI & Assistenten")
-    # Die Karten oben mischen die Hebel und muessen ihren selbst benennen.
     assert all(e["hebel_label"] == "KI & Assistenten" for e in h["eintraege"])
 
 
@@ -266,12 +257,6 @@ def test_kaputter_stichtag_macht_niemanden_neu():
     assert d["neu_ist_rueckfall"] is True
 
 
-# ------------------------------------- beobachtend statt empfehlend (§8)
-# Beide Speicher liefern Begruendungen, die Vodafone etwas RATEN - der
-# Kurator-Prompt fragt ausdruecklich danach ("why it matters"). Auf der
-# oeffentlichen Seite hat das nichts verloren (CLAUDE.md §8). Die Regel und
-# ihre Begruendung stehen in textwerkzeug.ohne_vodafone_rat; hier steht, dass
-# die Karten sie wirklich anwenden.
 def test_die_begruendung_verliert_ihren_vodafone_ratschlag():
     e = auf(
         [

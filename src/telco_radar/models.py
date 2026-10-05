@@ -9,7 +9,6 @@ from datetime import datetime, timezone
 from typing import Optional
 from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
 
-# Query params that never identify content (tracking noise)
 _TRACKING_PARAMS = re.compile(r"^(utm_|fbclid|gclid|mc_|ref$|source$)", re.I)
 
 
@@ -39,47 +38,10 @@ class Item:
     operator: Optional[str] = None
     published: Optional[datetime] = None
     summary: str = ""
-    origin: str = "operator"  # "operator" | "industry_news" | "tech_watch"
-    # URL der QUELLE (nicht der Meldung). source_name traegt nur den
-    # Anzeigenamen, und der ist bei einem Betreiber mit mehreren Kanaelen fuer
-    # alle gleich - die Trefferquote je Kanal waere ohne dieses Feld nicht
-    # berechenbar. Wird zentral in collect/_collect_source gestempelt, damit
-    # kein Collector es vergessen kann.
+    origin: str = "operator"
     source_url: str = ""
-    # Bild-URL aus dem Feed-Eintrag (media:content, media:thumbnail,
-    # enclosure oder erstes <img> im Text). Kostet keinen zusaetzlichen
-    # Abruf und funktioniert auch bei Seiten, die einen direkten Aufruf mit
-    # 403 abweisen. Leer ist der Normalfall - report/bilder.py versucht dann
-    # og:image, und ein Layout ohne Bild muss trotzdem tragen.
     image_url: str = ""
-    # Der ARTIKELTEXT, wenn er beschafft werden konnte - ungekappt.
-    #
-    # Bewusst ein eigenes Feld neben `summary`, nicht dessen Verlaengerung:
-    # `summary` bleibt bei 600 Zeichen und ist das, was der Bericht und die
-    # Karten zeigen.
-    #
-    # **Seit dem 15.08.2026 liest der Analyst dieses Feld mit** -
-    # `agents.analyst_text()` nimmt den laengeren von `volltext` und
-    # `summary` und kappt bei 2500 Zeichen. Bis dahin stand hier, ein
-    # Volltext in den Stapel-Prompts waere "der Nebeneffekt, den niemand
-    # bestellt hat"; er ist jetzt ausdruecklich bestellt, weil 52 der 164
-    # crawlbaren Quellen kein `summary` liefern und der Analyst dort allein
-    # aus der Ueberschrift bewertet hat. Die Entscheidung hat ihre eigene
-    # Token-Rechnung, und sie steht in `ANALYST_TEXT_ZEICHEN`.
-    #
-    # Gemessen am 13.08.2026 ueber 1329 Feed-Eintraege: 40,6 % tragen ihren
-    # Volltext schon im Feed (meist in content:encoded, das bis dahin
-    # niemand gelesen hat), die anderen 59,4 % brauchen den Abruf der
-    # Artikelseite. **Nur der Feed-Weg fuellt dieses Feld** -
-    # `collect/newsroom.py` setzt es nicht, der Abruf der Artikelseite
-    # geschieht erst in der Uebersetzungsstufe und damit NACH der Analyse.
-    # Fuer die textlosen Newsroom-Quellen bleibt es deshalb beim Titel.
     volltext: str = ""
-    # Die erkannte Sprache des Originals als ISO-639-1-Kuerzel, oder "" wenn
-    # sie sich nicht sicher bestimmen liess. NIE auf dem Titel gemessen -
-    # eine Ueberschrift besteht groesstenteils aus Eigennamen, und darauf
-    # raet jede Erkennung: "AT&T, Ericsson demonstrate drone-sensing 5G
-    # capabilities" gilt titelweise als franzoesisch.
     sprache: str = ""
     id: str = field(default="")
 
@@ -109,10 +71,6 @@ class Item:
             summary=d.get("summary", ""),
             origin=d.get("origin", "operator"),
             source_url=d.get("source_url", ""),
-            # `image_url` fehlte hier bis zum 13.08.2026: ein aus einem Dict
-            # wiederhergestelltes Item verlor sein Feed-Bild lautlos, und
-            # `to_dict` hatte es korrekt geschrieben. Kein Test hat das
-            # gemeldet, weil beide Richtungen nur einzeln geprueft wurden.
             image_url=d.get("image_url", ""),
             volltext=d.get("volltext", ""),
             sprache=d.get("sprache", ""),

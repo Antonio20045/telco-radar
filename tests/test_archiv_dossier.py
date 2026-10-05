@@ -83,11 +83,6 @@ def index() -> ArchivIndex:
     return ArchivIndex(ARCHIV)
 
 
-# --------------------------------------------------------------------------- #
-# Die Zusage des Auftrags
-# --------------------------------------------------------------------------- #
-
-
 def test_frage_ohne_treffer_erfindet_nichts(index):
     """DER Test dieses Moduls.
 
@@ -132,11 +127,6 @@ def test_frage_ohne_begriffe(index):
     assert "keine durchsuchbaren Begriffe" in antwort.begruendung
 
 
-# --------------------------------------------------------------------------- #
-# BM25: seltene Woerter tragen die Frage
-# --------------------------------------------------------------------------- #
-
-
 def test_seltener_begriff_schlaegt_haeufigen(index):
     """ "Wie hat sich der Preis unbegrenzter Tarife entwickelt" enthaelt vier
     haeufige und zwei seltene Woerter - nur die seltenen tragen die Frage."""
@@ -167,13 +157,6 @@ def test_haeufiges_wort_bekommt_kein_negatives_gewicht():
     assert all(b.score > 0 for b in antwort.belege)
 
 
-# Die folgenden vier Tests messen die RANGFOLGE, nicht die Schwelle, und
-# arbeiten dafuer mit winzigen Korpora. Dort steht der Suchbegriff in jedem
-# Eintrag, also ist sein IDF-Gewicht korrekterweise nahe null und der Score
-# bleibt unter MIND_SCORE. Am echten Bestand (737 Eintraege) erreichen echte
-# Fragen 6 bis 9 Punkte und eine Unsinnsfrage exakt 0 - die Schwelle wird
-# deshalb hier ausgeschaltet und in test_mind_score_ist_wirksam sowie
-# test_frage_ohne_treffer_erfindet_nichts eigens geprueft.
 OHNE_SCHWELLE = 0.0
 
 
@@ -183,11 +166,6 @@ def test_lange_eintraege_werden_nicht_bevorzugt():
     idx = ArchivIndex([kurz, lang])
     antwort = frage(idx, "Wechselbonus", mind_score=OHNE_SCHWELLE)
     assert antwort.belege[0].titel == "Wechselbonus"
-
-
-# --------------------------------------------------------------------------- #
-# Form der Antwort
-# --------------------------------------------------------------------------- #
 
 
 def test_antwort_ist_gedeckelt(index):
@@ -223,7 +201,7 @@ def test_verlauf_zaehlt_die_monate(index):
 
 def test_als_dict_ist_json_faehig(index):
     d = als_dict(frage(index, "Wechselbonus"))
-    json.dumps(d)  # wirft, wenn etwas nicht serialisierbar ist
+    json.dumps(d)
     assert d["gefunden"] is True
     assert d["belege"][0]["url"].startswith("https://")
 
@@ -238,11 +216,6 @@ def test_mind_score_ist_wirksam(index):
     """Ohne Schwelle kaeme auf jede Frage irgendetwas zurueck."""
     streng = frage(index, "Türme", mind_score=99.0)
     assert not streng.gefunden
-
-
-# --------------------------------------------------------------------------- #
-# Gegen den echten Suchindex
-# --------------------------------------------------------------------------- #
 
 
 def test_laeuft_gegen_den_echten_bestand():
@@ -262,20 +235,13 @@ def test_laeuft_gegen_den_echten_bestand():
     assert eintraege
 
     idx = ArchivIndex(eintraege)
-    # Eine Frage, zu der es nichts geben kann.
     leer = frage(idx, "Unterwasserarchäologie im Bodensee")
     assert not leer.gefunden
 
-    # Eine Frage aus dem Bestand selbst muss sich finden.
     ein_titel = eintraege[0]["title"]
     treffer = frage(idx, ein_titel)
     assert treffer.gefunden
     assert any(b.titel == ein_titel for b in treffer.belege)
-
-
-# --------------------------------------------------------------------------- #
-# Python und Browser muessen dasselbe antworten
-# --------------------------------------------------------------------------- #
 
 
 @contextlib.contextmanager

@@ -36,8 +36,6 @@ from telco_radar.report.html import render_site
 
 from test_geraete_zeitreihe_ansicht import HEUTE, _baue, _sku
 
-# Dasselbe Auto-Eintrag-Format wie in test_geraete_zeitreihe_ansicht: State,
-# nicht Config - der Produktionsweg der E4-Auto-Erkennung.
 _AUTO_EINTRAG = {
     "hersteller": "Apple",
     "modell": "iPad Pro 13",
@@ -94,11 +92,6 @@ def _baue_buendel_modell(
 
     tco = json.loads((state / "geraete_tco.json").read_text(encoding="utf-8"))
     buendel_id = f"buendel--o2--{_sku(_GID, _SPEICHER)}--{_TARIF_ID}"
-    # Das Bündel im Store entsteht nur, wenn es Messungen gibt - die
-    # bündellose Lage (Watches/Tabs/AirPods) hat KEIN Bündel, nur die
-    # Listung. (Ein Bündel OHNE Messtag wäre eine dritte, eigene Lage -
-    # nach der Heimregel "Tag 1 ist gespeichert" kommt sie im Bestand
-    # nicht vor.)
     if messtage:
         tco["buendel"].append(
             {
@@ -218,11 +211,6 @@ def _katalog_zeile(suppe, mid: str):
     )
 
 
-# ==========================================================================
-# (a) Der KATALOG: Bündel ODER Listung genügt
-# ==========================================================================
-
-
 def test_buendel_ohne_listung_mit_einem_mestag_steht_im_katalog(tmp_path):
     """DER gemessene Fall des 17.09. (iPhone 18: 105 Bündel, keine Listung)
     als Fixture: ein Auto-Modell mit EINEM Bündel-Messtag und ohne jede
@@ -245,8 +233,6 @@ def test_buendel_ohne_listung_mit_einem_mestag_steht_im_katalog(tmp_path):
     assert zeile["hat_buendel"] is True
     assert zeile["zr"] is False, "ein Messtag ist keine waehlbare Reihe"
     assert zeile["listungen"] == 0 and zeile["zeilen"] == []
-    # Die Händler-Spalte nennt die Bündel-Anbieter, nicht "0 Händler" -
-    # das widerspraeche der eigenen Preiszelle ("nur im Bündel bei o2").
     assert zeile["anbieter"] == ["o2"]
     assert zeile["anbieterzahl"] == 1
 
@@ -268,11 +254,8 @@ def test_buendel_ohne_listung_gerendert_luecke_statt_totem_link(tmp_path):
         "toter Graph-Sprung auf ein nicht waehlbares Modell"
     )
     assert "noch keine Zeitreihe" in text
-    # keine Detailzeile: data-auf trifft ins Leere (app.js bewacht das mit
-    # `if (p.auf)`), und die Zeile zeigt keinen Aufklapp-Zeiger.
     assert suppe.select_one(f"#{zeile.get('data-auf')}") is None
     assert "gr-k--ohne-details" in (zeile.get("class") or [])
-    # Gegenprobe der Regel: das Modell steht in KEINEM Wahl-Eingang.
     erlaubt = {k for k, v in daten["erlaubt"].items() if v}
     assert _MID not in erlaubt
     assert _MID not in {m["id"] for m in daten["suchindex"]}
@@ -302,12 +285,6 @@ def test_ab_dem_zweiten_mestag_ist_das_modell_waehlbar_und_verlinkt(tmp_path):
     assert (
         next(z for z in g["katalog_modelle"] if z["schluessel"] == _MID)["zr"] is True
     )
-
-
-# ==========================================================================
-# (b) Die Zeitreihen-WAHL: erst ab 2 Bündel-Messtagen - und die 12
-#     bündellosen Auto-Modelle (Watches, Tabs, AirPods) bleiben draussen
-# ==========================================================================
 
 
 def test_buendelloses_auto_modell_mit_listung_steht_nur_im_katalog(tmp_path):
@@ -347,11 +324,6 @@ def test_buendelloses_auto_modell_mit_listung_steht_nur_im_katalog(tmp_path):
     assert gerendert.select_one("a.gr-sprung") is None
 
 
-# ==========================================================================
-# (c) R3 der P5-Live-Pruefung: der Neu-Hinweis am Ort der Wahl
-# ==========================================================================
-
-
 def test_wahl_knoten_traegt_die_neuen_modelle_mit_datum(tmp_path):
     """Der Wahl-Knoten (#gr-zeitreihe-daten) traegt die "noch keine
     Zeitreihe"-Modelle - hat_buendel und nicht zr, GELESEN aus denselben
@@ -368,8 +340,6 @@ def test_wahl_knoten_traegt_die_neuen_modelle_mit_datum(tmp_path):
     assert "iPad Pro 13" in n["titel"]
     assert n["iso"] == HEUTE, n
     assert n["datum"] == "16. September", n
-    # Gegenproben: WAHLBARE Modelle stehen nicht im Neu-Hinweis, und das
-    # buendellose Pixel (Listung ohne Bündel) ebenso wenig.
     erlaubt = {k for k, v in daten["erlaubt"].items() if v}
     assert not (erlaubt & {x["id"] for x in neu})
     assert all("google-pixel-11" not in x["id"] for x in neu)

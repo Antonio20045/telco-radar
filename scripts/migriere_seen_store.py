@@ -141,7 +141,6 @@ def main(argv: list[str] | None = None) -> int:
 
     text = schreibe_v2(saetze, v2_hashes)
 
-    # --- Nachpruefung: die MENGE der Hashes muss identisch sein
     vorher = {r["id"] for r in saetze} | set(v2_hashes)
     nachher = {
         z.strip()

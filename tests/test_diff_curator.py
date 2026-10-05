@@ -30,7 +30,7 @@ def test_store_add_and_dedup(tmp_path):
         url="http://a.test/1",
     )
     added = curate([hl, dict(hl)], store, "2026-07-20", use_llm=False)
-    assert len(added) == 1  # dieselbe URL nur einmal
+    assert len(added) == 1
     assert len(store) == 1
     assert store.entries()[0]["theme"] == "ki"
     assert store.entries()[0]["first_seen"] == "2026-07-20"
@@ -77,8 +77,6 @@ def test_relevance_threshold(tmp_path):
 
 
 def test_unrated_items_kept(tmp_path):
-    # --no-llm-Modus: relevance None -> trotzdem behalten, damit die Bibliothek
-    # nie leer bleibt.
     store = DiffStore(tmp_path / "d.jsonl")
     hl = _hl(
         title="Operator gives free Spotify to customers",
@@ -104,9 +102,8 @@ def test_persistence_across_weeks(tmp_path):
         "2026-07-13",
         use_llm=False,
     )
-    # Neue Woche, neue Store-Instanz aus derselben Datei:
     week2 = DiffStore(p)
-    assert len(week2) == 1  # alter Move ueberlebt
+    assert len(week2) == 1
     added = curate(
         [
             _hl(
@@ -118,8 +115,8 @@ def test_persistence_across_weeks(tmp_path):
         "2026-07-20",
         use_llm=False,
     )
-    assert len(added) == 1 and len(week2) == 2  # beide Wochen vorhanden
-    assert len(DiffStore(p)) == 2  # dauerhaft geschrieben
+    assert len(added) == 1 and len(week2) == 2
+    assert len(DiffStore(p)) == 2
 
 
 def test_store_caps_per_theme(tmp_path):
@@ -134,4 +131,4 @@ def test_store_caps_per_theme(tmp_path):
         for i in range(MAX_PER_THEME + 15)
     ]
     curate(many, store, "2026-07-20", use_llm=False)
-    assert len(store) == MAX_PER_THEME  # gedeckelt, waechst nicht endlos
+    assert len(store) == MAX_PER_THEME

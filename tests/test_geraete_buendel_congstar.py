@@ -89,11 +89,6 @@ def farben():
     return lade_farben(_WURZEL)
 
 
-# ==========================================================================
-# lies_buendel(): Struktur der Sätze
-# ==========================================================================
-
-
 def test_achtunddreissig_saetze_aus_zwei_planvarianten_neun_speichern_zwei_laufzeiten():
     """Je PlanVariant (M und M Flex) 4 Geräte mit zusammen 9
     Speichergrößen - Farbvarianten sind dedupliziert, wie der Auftrag es
@@ -107,8 +102,6 @@ def test_achtunddreissig_saetze_aus_zwei_planvarianten_neun_speichern_zwei_laufz
         je_tarif.setdefault(s["tarif_name"], []).append(s)
     assert set(je_tarif) == {"Allnet Flat M", "Allnet Flat M Flex"}
     assert all(len(v) == 18 for v in je_tarif.values())
-    # Keine Dublette je (Tarif, Variante, Laufzeit): 4 Geräte mit zusammen
-    # 9 Speichergrößen (256/512/1024 kommen je bei mehreren Geräten vor).
     for v in je_tarif.values():
         assert len({s["sku"] for s in v}) == 9
         assert len({(s["sku"], s["laufzeit_monate"]) for s in v}) == 18
@@ -177,10 +170,6 @@ def test_jede_ratenform_geht_gegen_die_rohantwort_auf():
     from telco_radar.collect.geraete.congstar import _nutzlast, _planvarianten
 
     text = _fixture("congstar_tarifseite_allnet_flat_m.html.gz")
-    # Der Lookup Schluessel ist (Plan, Variante): dieselbe Variante steht in
-    # BEIDEN PlanVarianten einer Seite - mit verschiedenen Zahlweisen (M
-    # subventioniert die Rate staerker als M Flex). Nur ueber die Variante
-    # zu schluesseln naehme die Zahlweise des LETZTEN Plans.
     roh_je_plan_sku: dict[tuple[str, str], dict] = {}
     for plan in _planvarianten(_nutzlast(text)):
         pid = str(plan.get("id"))
@@ -190,7 +179,7 @@ def test_jede_ratenform_geht_gegen_die_rohantwort_auf():
     assert len(roh_je_plan_sku) >= 58, "Varianten-Lookup leer - Test prüft nichts"
 
     saetze = _saetze()
-    assert len(saetze) == 36  # die Lookup-Zeile
+    assert len(saetze) == 36
     for s in saetze:
         variante = roh_je_plan_sku[(s["tarif_slug"], s["sku"])]
         zahlweise = next(
@@ -223,11 +212,6 @@ def test_der_zustand_reist_als_condition_feld_mit():
     assert all(s["zustand_hinweis"] == "NEW" for s in saetze)
 
 
-# ==========================================================================
-# Was verworfen wird - und was wirft
-# ==========================================================================
-
-
 def test_kaputte_nutzlast_wirft():
     with pytest.raises(GeraeteAbrufFehler):
         lies_buendel("gar kein html")
@@ -246,17 +230,6 @@ def test_eine_seite_ohne_matrix_und_ohne_plan_wirft():
     with pytest.raises(GeraeteAbrufFehler, match="keine Buendelantwort"):
         lies_buendel(kaputt, url=_IPHONE17_URL)
 
-
-# ==========================================================================
-# Die PRODUKTseite traegt die ganze Tarifmatrix (29.09.2026)
-# ==========================================================================
-#
-# `congstar_produkt_iphone17_20260929.html.gz` und
-# `congstar_produkt_pixel11pro_20260929.html.gz` sind gespeicherte echte
-# Abrufe vom 29.09.2026 (HTTP 200, TelcoRadar/1.0, reiner GET) von
-# /geraete/apple/apple-iphone-17/ und /geraete/google/google-pixel-11-pro/.
-# Bis dahin warf `lies_buendel` auf jeder Produktseite und congstar lieferte
-# nur die vier Aufmachergeraete der Tarifseiten als Buendel (10 SKUs).
 
 _IPHONE17_HEUTE = "congstar_produkt_iphone17_20260929.html.gz"
 _PIXEL11PRO_HEUTE = "congstar_produkt_pixel11pro_20260929.html.gz"
@@ -297,8 +270,6 @@ def test_die_produktseite_liefert_jeden_tarif_jeden_speicher_jede_laufzeit():
         assert kombis == erwartet, name
         assert len(saetze) == 32, name
         assert all(s["quelle"] == "congstar_produktseite" for s in saetze)
-        # Jede PlanVariant verlinkt ihr eigenes Pflichtblatt - die Bruecke
-        # zum Tarifbestand (Modulkopf) steht an jedem Satz.
         assert all(s["tarif_slug"] for s in saetze)
 
 
@@ -487,8 +458,6 @@ def test_eine_laufzeit_als_zeichenkette_ist_dieselbe_laufzeit(caplog):
         saetze = lies_buendel(als_text, url=_M_URL)
     assert len(saetze) == 36
     assert {s["laufzeit_monate"] for s in saetze} == {24, 36}
-    # Und die Laufzeit steht als ZAHL im Satz, nicht als Zeichenkette -
-    # `buendel_id` und die Etiketten rechnen mit ihr.
     assert all(isinstance(s["laufzeit_monate"], int) for s in saetze)
     assert not [m for m in caplog.messages if "uebergangen" in m], caplog.messages
 
@@ -507,11 +476,6 @@ def test_trade_in_wird_nicht_als_normaler_kauf_gehoben():
         '\\"subtype\\":\\"UNSPECIFIED\\"', '\\"subtype\\":\\"TRADE_IN\\"'
     )
     assert lies_buendel(nur_trade, url=_M_URL) == []
-
-
-# ==========================================================================
-# Die PIB-Nummern-Brücke: tarif_slug -> buendel_slug am Bestandssatz
-# ==========================================================================
 
 
 def _bestand_mit_gb_namen():
@@ -652,11 +616,6 @@ def test_der_ganze_weg_bis_zum_buendel_mit_echtem_bestand():
     assert b.laufzeit_monate == 36
 
 
-# ==========================================================================
-# Die Verdrahtung: sammle_anbieter() am kind:buendel-Einstieg
-# ==========================================================================
-
-
 def _congstar_anbieter():
     return Anbieter(
         name="congstar",
@@ -729,9 +688,6 @@ def test_der_zustand_eines_buendels_kommt_aus_dem_condition_feld(katalog, farben
 def test_adapter_registry_traegt_congstars_buendelhaken():
     adapter = ADAPTER["congstar_next"]
     assert adapter.lies_buendel is not None
-    # Der Tarifname steht in derselben Antwort (prefetchedPlan.variants[].
-    # title) - congstar braucht anders als Vodafone keinen Haken für die
-    # Namensauflösung nach dem Sammeln, derselbe Grund wie bei der Telekom.
     assert adapter.loese_tarifnamen is None
 
 
@@ -820,11 +776,7 @@ def test_die_sitemap_holt_keine_uhren_kopfhoerer_oder_tablets(katalog, farben):
 
 def test_die_konfiguration_liest_buendel_von_den_produktseiten():
     anbieter = _congstar_aus_konfiguration()
-    # Die Tarifseiten fuehren nur vier Aufmachergeraete - sie sind durch
-    # die Produktseiten vollstaendig abgedeckt und keine Einstiege mehr.
     assert [e for e in anbieter.einstiege if e.kind == "buendel"] == []
     sitemap = [e for e in anbieter.einstiege if e.kind == "sitemap"]
     assert len(sitemap) == 1 and sitemap[0].ohne_pfadmuster
-    # Der ehrliche Absender ist per Anbieter überschrieben (B2-Muster) -
-    # sonst gingen die Produktseiten mit der globalen Chrome-Kennung hinaus.
     assert anbieter.user_agent.startswith("TelcoRadar/1.0")

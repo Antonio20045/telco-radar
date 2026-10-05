@@ -86,45 +86,27 @@ _QUELLEN = {
     ]
 }
 
-# (device_id, speicher, anbieter, tarif_id, tarif, gb, rate)
 _BUENDEL = [
-    # iPhone 17 Pro, Band XS: VIER Anbieter - das wird der Startzustand.
     ("apple-iphone-17-pro", 256, "o2", "o2:klein", "O2 Mobile Klein", 10, 18.0),
     ("apple-iphone-17-pro", 256, "congstar", "cs:klein", "Allnet Flat XS", 15, 22.0),
     ("apple-iphone-17-pro", 256, "Vodafone", "vf:klein", "Vodafone Mobil XS", 18, 26.0),
     ("apple-iphone-17-pro", 256, "1&1", "11:klein", "All-Net-Flat S", 8, 15.0),
-    # iPhone 17 Pro, Band M: nur congstar - Telekom fehlt hier ganz
-    # (hat KARTE in keinem Band -> "gar kein Bündel").
     ("apple-iphone-17-pro", 256, "congstar", "cs:mittel", "Allnet Flat S", 50, 20.0),
-    # Galaxy S26, Band XS: nur 1&1.
     ("samsung-galaxy-s26", 256, "1&1", "11:klein", "All-Net-Flat S", 10, 15.0),
-    # Galaxy S26, Band L: Telekom - der Lueckenfall "kein Bündel in
-    # diesem Band, aber klein 1&1" fuer das iPhone. (Telekom-Karte hier,
-    # damit Telekom nicht "gar kein Bündel" fuer die S26 ist.)
     ("samsung-galaxy-s26", 256, "Telekom", "tk:klein", "MagentaMobil S", 10, 19.0),
 ]
 
-# (buendel-index aus _BUENDEL, farb-suffix, tag, geräterate) - die Historie.
-# o2 traegt an 2026-09-13 ZWEI Saetze (Farben) - das guenstigste gewinnt.
-# Seit A1 rechnet die Zeitreihe jeden Punkt mit der HEUTIGEN Formel aus den
-# Rohfeldern der Zeile neu; die Fixture schreibt deshalb JEDE Zeile mit
-# ihrer eigenen Rate, und `gesamt` entsteht aus derselben Formel wie die
-# Aufbereitung sie rechnet (1 EUR Zuzahlung + 24x20 EUR Tarif + 24x Rate).
-# Wuerden alle Zeilen dieselbe Rate tragen, kollabierte jede Serie auf
-# EINEN Betrag und Minimum, Front und Delta praegten nichts mehr.
 _HISTORIE = [
     (0, "", "2026-09-12", 18.0),
     (0, "", "2026-09-13", 17.0),
-    (0, "-blau", "2026-09-13", 19.0),  # zweite Farbe: verworfen (937,00)
+    (0, "-blau", "2026-09-13", 19.0),
     (0, "", "2026-09-14", 18.0),
     (1, "", "2026-09-12", 22.0),
-    # congstar fehlt am 13. UND 14. nicht - aber der 13. fehlt: Luecke.
     (1, "", "2026-09-14", 22.0),
     (1, "", "2026-09-15", 22.0),
     (2, "", "2026-09-12", 26.0),
     (2, "", "2026-09-13", 25.5),
     (2, "", "2026-09-14", 25.75),
-    # 1&1: nur EIN Messtag - ein Punkt, keine Linie.
     (3, "", "2026-09-12", 15.0),
     (4, "", "2026-09-12", 20.0),
     (4, "", "2026-09-13", 19.5),
@@ -308,23 +290,11 @@ def _paar(ansicht, modell_band):
     return None
 
 
-# --------------------------------------------------------------------------
-# Der Startzustand - aus den Daten, nicht hardcodiert
-# --------------------------------------------------------------------------
-
-
 def test_der_startzustand_hat_die_meisten_anbieter_dann_punkte(ansicht):
-    # iPhone 17 Pro x klein: 4 Anbieter, 9 Punkte - gegenueber S26 x klein
-    # (1 Anbieter) und apple x mittel (1 Anbieter). Die alte Vorgabe aus
-    # `geraete_tco_karten` (die meisten Bündel-Anbieter) trifft hier
-    # dasselbe Geraet, aber die RECHNUNG ist eine andere: sie zaehlt
-    # Historie-Anbieter und -Punkte.
     assert ansicht["start"] == {"modell": "apple-iphone-17-pro-256", "band": "xs"}
 
 
 def test_der_startzustand_ist_deterministisch(tmp_path):
-    # Gleiche Ausbeute, zwei Kandidaten: der aufsteigende Schluessel bricht
-    # den Gleichstand - kein Wuerfeln je Rendern.
     root, state = _baue(tmp_path)
     g = geraete_view.aufbereiten(
         state, lade_quellen(root), lade_katalog(root), heute=HEUTE
@@ -339,21 +309,10 @@ def test_der_startblock_ist_das_startpaar(ansicht):
     assert ansicht["start_block"]["band"] == ansicht["start"]["band"]
 
 
-# --------------------------------------------------------------------------
-# Die Serien - guenstigstes Buendel je Tag, nichts interpoliert
-# --------------------------------------------------------------------------
-
-
 def test_zwei_buendel_desselben_tages_zaehlen_das_minimum(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     svg = paar["svg_breit"]
     suppe = __import__("bs4").BeautifulSoup(svg, "html.parser")
-    # o2 am 13.9. in ZWEI Farbsaetzen: 17 EUR Rate (889,00 EUR) und 19 EUR
-    # (937,00 EUR) - das guenstigste gewinnt. Der 13.9.-Punkt sitzt damit
-    # WEITER UNTEN im Bild als der vom 12.9. (18 EUR = 913,00 EUR), hat
-    # also die GROESSERE Y-Koordinate; haette der 937,00-er Satz gewonnen,
-    # laege er darueber. Der verworfene Betrag steht nie als Label, der
-    # des LETZTEN Punkts (913,00 am 14.9.) steht als Label.
     werte = {t.get_text(strip=True) for t in suppe.select("text.gr-zr-wert")}
     assert "913 €" in werte
     assert "937 €" not in werte
@@ -369,22 +328,17 @@ def test_zwei_buendel_desselben_tages_zaehlen_das_minimum(ansicht):
 def test_unter_zwei_punkten_gibt_es_keinen_linienzug(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     suppe = __import__("bs4").BeautifulSoup(paar["svg_breit"], "html.parser")
-    # 1&1 hat genau einen Messtag (12.9.): ein Kreis, kein Pfad - Luecken
-    # sind Informationen, nichts wird interpoliert.
     punkte_1u1 = [
         c for c in suppe.select("circle.gr-zr-punkt") if c.get("fill") == "#2f7fd1"
     ]
     pfade = suppe.select("path.gr-zr-linie")
     assert len(punkte_1u1) == 1
-    # 4 Anbieter, aber nur 3 mit >= 2 Punkten -> hoechstens 3 Linien.
     assert len(pfade) == 3
 
 
 def test_der_fehlende_messtag_bleibt_punktlos(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     suppe = __import__("bs4").BeautifulSoup(paar["svg_breit"], "html.parser")
-    # congstar fehlt am 13.9. - an der X-Position des 13.9. steht kein
-    # congstar-Punkt (gelber Marker #ffed00 auf der schwarzen Linie).
     xticks = {
         t.get_text(strip=True): float(t["x"]) for t in suppe.select("text.gr-zr-xtick")
     }
@@ -395,16 +349,10 @@ def test_der_fehlende_messtag_bleibt_punktlos(ansicht):
     assert all(abs(float(c["cx"]) - x13) > 0.5 for c in congstar)
 
 
-# --------------------------------------------------------------------------
-# Die Achsen - echte Messtage, echte Datumsabstaende
-# --------------------------------------------------------------------------
-
-
 def test_die_x_achse_traegt_die_echten_messtage_als_ticks(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     suppe = __import__("bs4").BeautifulSoup(paar["svg_breit"], "html.parser")
     texte = [t.get_text(strip=True) for t in suppe.select("text.gr-zr-xtick")]
-    # Union der Messtage DIESER Serien: 12., 13., 14., 15.9.
     assert texte == ["12.9.", "13.9.", "14.9.", "15.9."]
 
 
@@ -416,7 +364,6 @@ def test_die_x_abstaende_sind_datumsabstaende_keine_ordinalachse(ansicht):
     }
     eins = xticks["13.9."] - xticks["12.9."]
     zwei = xticks["15.9."] - xticks["13.9."]
-    # Ein Tag Abstand gegen zwei Tage Abstand: der doppelte Weg.
     assert zwei == pytest.approx(2 * eins, abs=1.0)
 
 
@@ -427,17 +374,9 @@ def test_die_y_achse_traegt_betraege_als_ticks(ansicht):
     assert texte and all(t.endswith("€") for t in texte)
 
 
-# --------------------------------------------------------------------------
-# Antwort-Satz, Messtag-Zeile, Lueckensatz
-# --------------------------------------------------------------------------
-
-
 def test_der_antwort_satz_nennt_die_leitzahl_beim_namen(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     text = __import__("re").sub(r"<[^>]+>", "", paar["antwort_html"])
-    # Seit A1 ist der Name der Leitzahl seine eigene Aufloesung: „Kosten
-    # über 24 Monate" steht im Satz, das Kuerzel TCO-24 taucht nirgends
-    # mehr auf der Seite auf.
     assert "Kosten über 24 Monate" in text, text
     assert "TCO-24" not in text, text
 
@@ -475,33 +414,19 @@ def test_der_antwort_satz_polt_den_abstand_zur_referenz_richtig(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     text = __import__("re").sub(r"<[^>]+>", "", paar["antwort_html"])
     leit = __import__("re").sub(r"<[^>]+>", "", paar["leitzahl_html"] or "")
-    # Zahl und Richtung getrennt geprueft: Der Tag-Strip klebt das Ende
-    # der <b>-Zahl an den Anfang des Labels ("€unter") - ein schwacher
-    # Parser darf die Aussage nicht zerlegen (Lehre B6, 30.08.2026).
     assert "264,00 €" in leit, (text, leit)
-    # Das Label nennt den Anbieter der Zahl: "1&1 unter Vodafone (…)".
-    # Roh geprüft: "&amp;" hält zugleich das Escaping des Namens fest.
     assert "1&amp;1 unter Vodafone (1.105,00 €)" in leit, (text, leit)
     assert "über Vodafone" not in leit, leit
     assert "über der Vodafone-Referenz" not in text, text
 
 
 def test_der_antwort_satz_endet_auf_genau_einem_punkt(ansicht):
-    # Der Startzustand laeuft durch den Referenz-Zweig (1&1 am
-    # guenstigsten, Vodafone-Referenz als LEITZAHL ueber dem Satz) -
-    # genau der Pfad, der live auf ").." endete: die Anhaengsel in
-    # _antwort_html schliessen den Satz selbst, der Abschluss der
-    # Funktion setzte einen ZWEITEN Punkt dahinter. Der Satzschluss-
-    # punkt steht genau EINMAL, an keiner Stelle ein "..".
     saetze = {
         f"{p['modell']}/{p['band']}": __import__("re")
         .sub(r"<[^>]+>", "", p["antwort_html"])
         .strip()
         for p in ansicht["paare"]
     }
-    # Scharfheits-Beweis (P4/D4): die Fixture enthaelt wirklich einen
-    # Fall mit Leitzahl (sonst pruefte der Test einen leeren Fall) - das
-    # Delta ist der Pfad mit den Anhaengseln, die den ".."-Fehler trugen.
     assert any(p["leitzahl_html"] for p in ansicht["paare"]), (
         "kein Paar mit Leitzahl - die Fixture prueft den Delta-Fall nicht"
     )
@@ -510,8 +435,6 @@ def test_der_antwort_satz_endet_auf_genau_einem_punkt(ansicht):
         assert not text.endswith(".."), schluessel
         assert ").." not in text, schluessel
 
-
-# --- E5: der Antwort-Satz nennt den Hersteller aus dem Katalog ----------
 
 _ZEILE = {
     "anbieter": "o2",
@@ -527,10 +450,6 @@ def _text(html):
 
 
 def test_der_antwort_satz_nennt_den_hersteller_wenn_der_katalog_ihn_kennt():
-    # Xiaomi 17: die Kachel-Logik (_kurz_name) schneidet den Hersteller ab
-    # und laesst "17" - im Fliesstext liest sich "Beim 17 im Band M"
-    # als Zahl ohne Bezug. Der Satz praefigiert den Hersteller aus dem
-    # Katalog-Eintrag des Modells.
     modell = {
         "id": "xiaomi-17",
         "titel": "Xiaomi 17",
@@ -542,8 +461,6 @@ def test_der_antwort_satz_nennt_den_hersteller_wenn_der_katalog_ihn_kennt():
 
 
 def test_ohne_katalog_hersteller_bleibt_der_kurzname_geraten_wird_nichts():
-    # Fehlt der Hersteller im Eintrag, bleibt es beim Kurznamen - E5-Regel:
-    # Quelle ist der Katalog-/Auto-Eintrag, keine Vermutung.
     modell = {"id": "17", "titel": "17", "hersteller": "", "speicher": None}
     html = geraete_zeitreihe._antwort_html(modell, "m", [dict(_ZEILE)], {"label": "M"})
     assert "Beim 17 im Band M" in _text(html), _text(html)
@@ -551,9 +468,6 @@ def test_ohne_katalog_hersteller_bleibt_der_kurzname_geraten_wird_nichts():
 
 
 def test_der_antwort_satz_mit_hersteller_die_kachel_ohne(ansicht):
-    # Die Trennung ist die Regel: der SATZ nennt "Apple iPhone 17 Pro",
-    # die KACHEL-Vorschau bleibt kurz ("iPhone 17 Pro") - dieselbe
-    # Aufbereitung, zwei Lesarten je Ort.
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     assert "Beim Apple iPhone 17 Pro im Band XS" in _text(paar["antwort_html"]), _text(
         paar["antwort_html"]
@@ -562,10 +476,6 @@ def test_der_antwort_satz_mit_hersteller_die_kachel_ohne(ansicht):
 
 
 def test_ein_lueckensatz_mit_alternativbaendern_statt_zeilen(ansicht):
-    # Band MITTEL des iPhone: congstar allein; o2, 1&1 und Vodafone fehlen
-    # hier, haben aber Klein-Buendel - der EINE Satz nennt sie mit Namen
-    # und Alternativ-Band samt Betrag in Klammern. Telekom hat fuer das
-    # iPhone gar kein Buendel (Antonio 9b.7: nichts heisst nicht einzeln).
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "m"))
     luecke = paar["luecke_text"]
     assert luecke
@@ -577,25 +487,14 @@ def test_ein_lueckensatz_mit_alternativbaendern_statt_zeilen(ansicht):
 
 def test_der_lueckensatz_nennt_nur_anbieter_ohne_zeile(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
-    # 1&1, congstar, Vodafone, o2 stehen als Zeile - sie stehen NICHT in
-    # der Luecke.
     for name in ("1&1", "congstar"):
         assert name not in paar["luecke_text"]
-
-
-# --------------------------------------------------------------------------
-# Belege - echte URL je Anbieter am Linienende
-# --------------------------------------------------------------------------
 
 
 def test_jede_linie_endet_in_einem_beleglink_mit_datum(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     suppe = __import__("bs4").BeautifulSoup(paar["svg_breit"], "html.parser")
     links = suppe.select("a.gr-zr-link")
-    # B-Fix (Review 24.09.2026, S1): JEDER Anbieter bekommt ein Endlabel -
-    # auch 1&1 mit genau EINEM Messtag hier (siehe
-    # `test_auch_ein_punkt_anbieter_bekommt_ein_endlabel`). Vier Anbieter,
-    # vier Beleg-Links.
     assert len(links) == 4
     for a in links:
         href = a.get("href") or ""
@@ -676,16 +575,11 @@ def test_kein_beleglink_ohne_echte_url(tmp_path):
         assert (a_tag.get("href") or "").startswith("https://")
 
 
-# --------------------------------------------------------------------------
-# Suchvorschau und Kacheln - deterministisch, ohne Preise im Client
-# --------------------------------------------------------------------------
-
-
 def test_der_suchindex_ist_deterministisch_vorsortiert(ansicht):
     idx = ansicht["suchindex"]
     schluessel = [(-e["band_zahl"], -e["anbieter_zahl"], e["titel"]) for e in idx]
     assert schluessel == sorted(schluessel)
-    assert len(idx) == 2  # zwei Modelle mit Karten/Zeilen
+    assert len(idx) == 2
 
 
 def _erweitere_um_modelle(root, n: int) -> None:
@@ -831,7 +725,6 @@ def test_der_client_knoten_traegt_keine_preise(ansicht):
     assert '"gesamt"' not in daten and '"tco"' not in daten, (
         "keine Preisfelder im Client-Knoten"
     )
-    # Die Vorschau-Angaben je Modell: Titel + Zaehlungen, kein Betrag.
     for eintrag in ansicht["daten"]["suchindex"]:
         assert set(eintrag) <= {
             "id",
@@ -861,17 +754,13 @@ def test_die_karte_traegt_preis_und_anbieter_punkte(ansicht):
     assert k["id"] == "apple-iphone-17-pro-256"
     assert set(k["baender"]) == {"xs", "m"}
     klein = k["baender"]["xs"]
-    # 1&1-Buendel Band XS: 1 € Zuzahlung + 24×20 € Tarif + 24×15 € Rate
     assert klein["ab"] == "841,00 €"
     assert klein["ab_monat"] == "35,04 €/Monat"
     assert klein["anb"] == "1&1"
     assert klein["punkte_html"].count("<i") == 4
     assert "#e60000" in klein["punkte_html"], "Vodafone-Punkt in Hausfarbe"
     assert "#0019a5" in klein["punkte_html"], "o2-Punkt in Hausfarbe"
-    # Reihenfolge der Punkte = ANBIETER_FOLGE (Netzbetreiber zuerst)
     assert klein["anbieter_text"] == "Vodafone, o2, 1&1, congstar"
-    # Dasselbe Mass im ANDEREN Band: congstar ist dort der einzige echte
-    # Anbieter - Kartenpreis und Punkte folgen dem Band, nicht dem Leit-Paar
     mittel = k["baender"]["m"]
     assert mittel["anb"] == "congstar"
     assert mittel["ab"] == "961,00 €"
@@ -902,9 +791,9 @@ def test_das_karten_delta_ist_die_bewegung_des_fuehrenden_anbieters(ansicht_stat
     for zeile in pfad.read_text(encoding="utf-8").splitlines():
         satz = json.loads(zeile)
         if not satz["tarif_id"].endswith(":klein"):
-            continue  # die Karte zeigt Band XS
+            continue
         if satz["id"] not in anbieter_je_id:
-            continue  # Farbdublette ohne Store-Satz
+            continue
         je = je_anbieter.setdefault(anbieter_je_id[satz["id"]], {})
         if satz["datum"] not in je or satz["gesamt"] < je[satz["datum"]]:
             je[satz["datum"]] = satz["gesamt"]
@@ -951,9 +840,6 @@ def test_bewegung_traegt_alle_richtungen():
         {"a": [["2026-09-12", 100.0], ["2026-09-13", 100.0]]}
     )
     assert gleich == {"text": "±0 € in 1 Tag", "richtung": "gleich"}
-    # A2: fuehrt am letzten Tag ein Anbieter, der am ersten FEHLT (b: 90),
-    # gibt es KEINE Bewegung. Die Front haette b (90) gegen a (100)
-    # gestellt - zwei Angebote gegeneinander, keine Preisaenderung.
     front = geraete_zeitreihe._bewegung(
         {
             "a": [["2026-09-12", 100.0], ["2026-09-13", 110.0]],
@@ -971,17 +857,12 @@ def test_wechselt_der_guenstigste_anbieter_ohne_preisaenderung_gibt_es_keine_bew
     nur je ANBIETER: der Fuehrende am letzten Messtag (1&1) fehlt am
     ersten, also gibt es fuer ihn keine Bewegung - keinesfalls die
     Differenz der zwei Angebote."""
-    # Der Produktionsfall in Zahlen: congstar 1.009 EUR (12.9.),
-    # 1&1 1.396 EUR (18.9.) - 387 EUR Front-Differenz, null Preisaenderung.
     assert (
         geraete_zeitreihe._bewegung(
             {"congstar": [["2026-09-12", 1009.0]], "1&1": [["2026-09-18", 1396.0]]}
         )
         is None
     )
-    # Dieselbe Fehlerklasse, andersherum: der bisher Fuehrende bleibt
-    # weiter gemessen und unveraendert, ein NOCH guenstigerer Anbieter
-    # kommt hinzu - die Front faellt, kein Preis hat sich bewegt.
     assert (
         geraete_zeitreihe._bewegung(
             {
@@ -998,7 +879,6 @@ def test_die_bewegung_misst_den_fuehrenden_anbieter_an_beiden_endtagen():
     und letztem Messtag ist die Bewegung - inklusive Gleichstand und
     Gleichstands-Tie-break ueber die Anbieterfolge (deterministisch, kein
     Wuerfeln je Rendern)."""
-    # b fuehrt am letzten Tag (94 < 95) und stand am ersten bei 90: +4.
     steigt = geraete_zeitreihe._bewegung(
         {
             "a": [["2026-09-12", 100.0], ["2026-09-13", 95.0]],
@@ -1006,9 +886,6 @@ def test_die_bewegung_misst_den_fuehrenden_anbieter_an_beiden_endtagen():
         }
     )
     assert steigt == {"text": "↑ +4 € in 1 Tag", "richtung": "steigt"}
-    # o2 ist am letzten Tag die einzige (und damit fuehrende) Messung;
-    # 1&1 war am ersten guenstiger, fehlt aber am letzten - o2s eigene
-    # Reihe ist unveraendert: ±0, nicht 1&1s niedrigerer alter Preis.
     gleich = geraete_zeitreihe._bewegung(
         {
             "o2": [["2026-09-12", 100.0], ["2026-09-13", 100.0]],
@@ -1016,9 +893,6 @@ def test_die_bewegung_misst_den_fuehrenden_anbieter_an_beiden_endtagen():
         }
     )
     assert gleich == {"text": "±0 € in 1 Tag", "richtung": "gleich"}
-    # Gleichstand am letzten Tag (beide 100): die ANBIETER_FOLGE bricht
-    # den Tie - o2 (Position 3) vor 1&1 (Position 4). Die Bewegung ist
-    # o2s eigene (120 -> 100), nicht 1&1s (80 -> 100).
     tie = geraete_zeitreihe._bewegung(
         {
             "1&1": [["2026-09-12", 80.0], ["2026-09-13", 100.0]],
@@ -1046,8 +920,6 @@ def test_die_schmalvariante_zeigt_dieselben_werte_weniger_labels(ansicht):
     paar = _paar(ansicht, ("apple-iphone-17-pro-256", "xs"))
     breit = __import__("bs4").BeautifulSoup(paar["svg_breit"], "html.parser")
     schmal = __import__("bs4").BeautifulSoup(paar["svg_schmal"], "html.parser")
-    # Punkte und X-Ticks identisch (dieselben Messungen), Erst-Werte-Labels
-    # nur auf dem breiten Bild.
     assert len(schmal.select("circle.gr-zr-punkt")) == len(
         breit.select("circle.gr-zr-punkt")
     )
@@ -1056,14 +928,6 @@ def test_die_schmalvariante_zeigt_dieselben_werte_weniger_labels(ansicht):
     )
     assert len(schmal.select(".gr-zr-wert--erst")) == 0
 
-
-# ==========================================================================
-# E4-Sichtbarkeit: Auto-Eintraege in der WAHL erst ab 2 Messtagen
-# (Bau 2). Der Katalog-Reiter zeigt sie ab Tag 1, die Listung existiert
-# ab Tag 1 - die Zeitreihe ist eine TCO-Aussage, und ein Messtag ist noch
-# keine (PM-Vorgabe E4; Bestaetigung ueber zwei Naechte, bevor ein Gerät
-# die Auswahl füllt).
-# ==========================================================================
 
 _AUTO_EINTRAG = {
     "hersteller": "Apple",
@@ -1182,18 +1046,11 @@ def test_auto_modell_mit_einem_mestag_steht_nicht_in_der_wahl(tmp_path):
     assert all(k["id"] != "apple-iphone-18-pro-256" for k in a["kacheln"])
     assert a["start"]["modell"] != "apple-iphone-18-pro-256"
 
-    # Der KATALOG-Reiter zeigt ihn ab Tag 1 (Listung existiert ab Tag 1):
-    # eine Quelle der Wahrheit, zwei Sichtbarkeitsregeln. Seit P3 ist der
-    # Katalog eine Zeile je Modell - der Listungs-Bestand lebt im
-    # Aufklapper derselben Modellzeile.
     assert any(
         z["modell"] == "iPhone 18 Pro" and z["listungen"] >= 1
         for z in g["katalog_modelle"]
     )
 
-    # Gegenprobe: ein HAND-Eintrag mit EINEM Messtag bleibt waehlbar -
-    # die Regel gilt nur fuer Auto-Eintraege (Galaxy S26 hat hier genau
-    # einen Messtag, 2026-09-12, und steht heute in der Wahl).
     assert "samsung-galaxy-s26-256" in ids
 
 
@@ -1206,23 +1063,6 @@ def test_auto_modell_mit_zwei_mestagen_steht_in_der_wahl(tmp_path):
     ids = {m["id"] for m in a["suchindex"]}
     assert "apple-iphone-18-pro-256" in ids
     assert any(p["modell"] == "apple-iphone-18-pro-256" for p in a["paare"])
-
-
-# ==========================================================================
-# P0-B-h3 (21.09.2026, Befund 3): EIN GRAPH, EIN ZEITRAUM
-#
-# Der Graph traegt EINE Y-Achse und die Beschriftung "Kosten über 24
-# Monate je Messtag und Anbieter" - und fuehrte darin die 1&1-Serie mit
-# rund 2.020 EUR als 36-Monats-Summe (ein Monatsbetrag fuer Tarif UND
-# Geraet, § 13.2). Auf einer Achse ist das keine teurere Zahl, sondern
-# eine laengere Laufzeit: dieselbe Aussage, die derselbe Stand an der
-# Buendelzeile als unbelegt aussortiert.
-#
-# Die Sprache ist die der Buendelzeile: die Zahl verschwindet nicht, sie
-# steht BENANNT daneben (harte Regel 9, A2 - der Strich heisst "kein
-# Angebot"). Ein zweiter Graph waere keine Loesung: die Startansicht
-# traegt genau EIN svg.gr-zr (test_geraete_reiter_browser).
-# ==========================================================================
 
 
 def _h3_karte(anbieter, gesamt, monate, band="xs", frisch=True):
@@ -1259,12 +1099,9 @@ def test_h3_eine_36_monats_karte_ist_keine_zeile_dieser_tafel():
     }
     satz = geraete_zeitreihe._band_zeilen(modell)["xs"]
     assert [z["anbieter"] for z in satz["zeilen"]] == ["Vodafone"]
-    # Sie ist nicht weg, sie liegt im eigenen Eimer - MIT ihrem Zeitraum.
     assert [(k["anbieter"], k["leitzahl_monate"]) for k in satz["fremd"]] == [
         ("1&1", 36)
     ]
-    # Kein Delta ueber zwei Zeitraeume: Vodafone fuehrt selbst, also gibt
-    # es keine Leitzahl-Zeile (vorher: 1.433,80 - 1.299,54 = 134,26 EUR).
     assert geraete_zeitreihe._leitzahl_html(satz["zeilen"]) is None
     text = _text(
         geraete_zeitreihe._antwort_html(
@@ -1380,8 +1217,6 @@ def test_z1_der_alternativ_betrag_nennt_seinen_abweichenden_zeitraum():
     luecken = geraete_zeitreihe._luecken([{"anbieter": "Vodafone"}], karten, "xs")
     text = geraete_zeitreihe._luecke_text(luecken, {})
     assert "1&1 (M 2.019,54 € über 36 Monate)" in text, text
-    # Gegenprobe: beim Zeitraum des Satzes selbst bleibt die Angabe weg -
-    # eine 24 hinter jeder Zahl waere dieselbe Aussage zweimal.
     karten24 = [
         _h3_karte("1&1", 1700.00, 24, band="m"),
         _h3_karte("Vodafone", 1433.80, 24, band="xs"),
@@ -1424,15 +1259,10 @@ def test_z1_die_bewegung_geht_nie_ueber_zwei_zeitraeume():
         "text": "↓ −50 € in 3 Tagen",
         "richtung": "sinkt",
     }
-    # Gegenprobe, dass der Unterschied am Tor haengt und nicht an den
-    # Zahlen: OHNE Zeitraum-Wissen fuehrt 1&1 - genau die Rangfolge, die
-    # der alte Stand gemeldet hat.
     assert geraete_zeitreihe._bewegung(serien) == {
         "text": "±0 € in 3 Tagen",
         "richtung": "gleich",
     }
-    # Und wechselt der Fuehrende selbst die Laufzeit, ist die Stufe in
-    # seiner Kurve keine Preisaenderung: kein Delta (Clean Code 4).
     assert (
         geraete_zeitreihe._bewegung(
             {"1&1": [("2026-09-12", 1000.0), ("2026-09-15", 1500.0)]}, {"1&1": [24, 36]}
@@ -1469,12 +1299,6 @@ def test_z1_der_fremde_zeitraum_hat_sein_eigenes_kachel_feld(tmp_path):
     assert kachel["ab"] is None, "kein Betrag ohne vergleichbaren Zeitraum"
 
 
-# ==========================================================================
-# P1-Fix (Review 24.09.2026, Punkt D): Gleichstand zweier Ratenlaufzeiten
-# verliert die zweite Zahlweise nicht mehr still.
-# ==========================================================================
-
-
 def _p1_zeile(bid, datum, laufzeit, rate):
     return {
         "id": bid,
@@ -1485,11 +1309,6 @@ def _p1_zeile(bid, datum, laufzeit, rate):
         "geraet_monatsrate": rate,
         "laufzeit_monate": laufzeit,
         "anschlusspreis": 0.0,
-        # 24 Monate x 30 EUR == 36 Monate x 20 EUR == 720 EUR
-        # Geraeteanteil; TCO-24 (Tarif 24x20 + Geraet) ist fuer beide
-        # Zahlweisen also 1.200,00 EUR - genau der Gleichstand, den der
-        # Befund beschreibt (congstar: 24 UND 36 Raten zum selben
-        # `gesamt`).
         "gesamt": 1200.0,
         "quelle_url": "https://example.de/congstar",
         "abgerufen_am": datum,
@@ -1533,11 +1352,6 @@ def _p1_state(tmp_path):
     (state / "geraete_tco_historie.jsonl").write_text(
         "\n".join(json.dumps(z) for z in zeilen) + "\n", encoding="utf-8"
     )
-    # DIESELBE Karte dient beiden Zwecken: `_messungen` findet ueber ihre
-    # `sku_id` das Modell, `_band_zeilen`/`_luecken` brauchen dieselbe
-    # Karte vollstaendig (Anbieter, Band, Betrag) fuer eine echte
-    # Bandzeile - sonst bleibt "xs" unwaehlbar und `aufbereiten()` baut
-    # kein Paar.
     karte = _h3_karte("congstar", 1200.0, 24)
     karte["sku_id"] = "sku-x"
     tco = {
@@ -1557,11 +1371,8 @@ def test_p1_gleichstand_zweier_ratenlaufzeiten_verliert_die_zweite_nicht(tmp_pat
     state, tco = _p1_state(tmp_path)
     messungen = geraete_zeitreihe._messungen(state, tco)
     slot = messungen[("modell-x", "xs")]["congstar"]["2026-09-22"]
-    # Die KUERZERE Ratenlaufzeit gewinnt den Punkt - sie hat keine
-    # Restschuld nach TCO_HORIZONT.
     assert slot["laufzeit"] == 24
     assert slot["wert"] == 1200.0
-    # Die 36er-Zahlweise wird NICHT verschwiegen.
     assert slot["weitere_laufzeiten"] == [36]
 
 

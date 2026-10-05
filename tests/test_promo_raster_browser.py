@@ -48,11 +48,6 @@ from telco_radar.report.promo import prepare_promo_view
 
 REPO = Path(__file__).resolve().parents[1]
 
-# Zwei Karten derselben Reihe duerfen sich um diesen Betrag unterscheiden.
-# Nicht null: die Rueckfallschrift der Sandbox und die echte Source Serif 4
-# runden Zeilenhoehen verschieden, und eine Kalibrierung auf eine Schrift
-# waere eine Wette (CLAUDE.md zum Zeitungskopf). Der Fehler, um den es geht,
-# war 110 px gross.
 TOLERANZ = 4
 
 
@@ -114,8 +109,6 @@ def _bloecke(tmp_path_factory, chromium):
         seite = chromium.new_page(viewport={"width": 1440, "height": 900})
         try:
             seite.goto(f"{wurzel}/promo/index.html", wait_until="networkidle")
-            # Ohne Durchscrollen bleiben die `loading="lazy"`-Bilder
-            # ungeladen, und `naturalWidth` ist dann 0.
             seite.evaluate(
                 "async()=>{for(let y=0;y<document.body.scrollHeight;y+=600)"
                 "{window.scrollTo(0,y);await new Promise(r=>setTimeout(r,50));}"
@@ -195,19 +188,6 @@ def test_jede_karte_traegt_ein_motiv(_bloecke):
     ohne = [b["marke"] for b in _bloecke for k in b["karten"] if not k["motiv_hoehe"]]
     assert not ohne, f"Karten ohne Motiv: {sorted(set(ohne))}"
 
-
-# --------------------------------------------------------------------------
-# Leere Rasterzellen bei genau EINER bzw. genau DREI weiteren Karten
-# (27.08.2026, live gemessen: PremiumSIM, simplytel je 1 leere Spalte,
-# ALDI TALK 1 leere Zelle unten rechts). `report/promo.gewichte()` rechnet
-# die Gewichte seitdem gegen die tatsaechliche Kartenzahl - dieser Test
-# misst das Ergebnis am echten Raster, nicht nur an den beiden Booleans, mit
-# denen Python rechnet.
-#
-# Kuenstliche Bloecke statt `data/state/promo_db.json`: der reale Bestand
-# hat nicht garantiert Marken mit genau diesen Kartenzahlen, und der Test
-# darf nicht vom Zufall des naechsten Laufs abhaengen.
-# --------------------------------------------------------------------------
 
 _MESSUNG_RASTER = """() => {
   const bloecke = [];

@@ -84,11 +84,6 @@ def _beide_bleiben(a, b):
     )
 
 
-# --------------------------------------------------------------------------
-# 1. Die Farbe ohne Zustandswort
-# --------------------------------------------------------------------------
-
-
 def test_das_zustandswort_faellt_aus_der_rohfarbe():
     (raus,) = bereinige([_e(farbe_roh="space schwarz erneuert")])
     assert raus["farbe_roh"] == "space schwarz"
@@ -108,9 +103,6 @@ def test_das_zustandswort_faellt_auch_aus_der_kanonischen_farbe():
     "farbe",
     [
         "Titanium Black",
-        # Der Fall, an dem die unbedingte Interpunktionsreinigung eine Farbe
-        # beschaedigt hat, die nie ein Kennzeichen trug. Steht so im Livebestand
-        # (mobilcom-debitel, Galaxy S25 128 GB).
         "Silver Shadow (Enterprise Edition)",
         "Blau/Grau",
         "sunset-gold",
@@ -128,11 +120,6 @@ def test_eine_farbe_die_nur_aus_dem_zustandswort_besteht_bleibt_stehen():
     festgehalten, weil die Anzeige sonst eine leere Zelle zeigte."""
     (raus,) = bereinige([_e(farbe_roh="erneuert")])
     assert raus["farbe_roh"] == "erneuert"
-
-
-# --------------------------------------------------------------------------
-# 2. Zwillinge - und die Reihenfolge der zwei Schritte
-# --------------------------------------------------------------------------
 
 
 def test_der_zwilling_einer_umbenannten_listung_faellt_weg():
@@ -173,8 +160,6 @@ def test_der_aktive_eintrag_ueberlebt_den_gealterten():
         kennung="alt",
     )
     neu = _e(farbe_roh="blau", status="aktiv", abgerufen="2026-08-29", kennung="neu")
-    # Das juengere Datum liegt absichtlich beim GEALTERTEN: sonst gewaenne
-    # der aktive Eintrag auch ohne die Statusregel.
     for reihenfolge in ([alt, neu], [neu, alt]):
         (raus,) = bereinige(reihenfolge)
         assert raus["id"] == "neu"
@@ -224,11 +209,6 @@ def test_eine_einzelne_listung_bekommt_kein_zwillingsfeld():
     zusammengefasst wurde."""
     (raus,) = bereinige([_e()])
     assert "zwilling_ids" not in raus
-
-
-# --------------------------------------------------------------------------
-# Die neun Bestandteile des Schluessels, je einer je Test
-# --------------------------------------------------------------------------
 
 
 def test_zwei_anbieter_sind_zwei_angebote():
@@ -323,11 +303,6 @@ def test_zwei_farben_sind_zwei_angebote():
     _beide_bleiben(_e(farbe_roh="Salbei"), _e(farbe_roh="Nebelblau"))
 
 
-# --------------------------------------------------------------------------
-# Die Falle: echte Farbvarianten
-# --------------------------------------------------------------------------
-
-
 def test_fuenf_vodafone_farbvarianten_ueberleben_alle():
     """Vodafone fuehrt das iPhone 17 256 GB in fuenf Farben zu identischen
     949,90 EUR - unter EINER Produktadresse. Die naheliegende
@@ -368,11 +343,6 @@ def test_eine_farbvariante_ueberlebt_neben_einem_zwillingspaar():
     raus = bereinige([alt, neu, andere])
     assert len(raus) == 2
     assert _farben(raus) == ["blau", "schwarz"]
-
-
-# --------------------------------------------------------------------------
-# Der Store bleibt unangetastet
-# --------------------------------------------------------------------------
 
 
 def test_die_eingabe_wird_nicht_veraendert():
@@ -418,11 +388,6 @@ def test_die_reihenfolge_der_eingabe_bleibt():
 
 def test_ein_leerer_bestand_bleibt_leer():
     assert bereinige([]) == []
-
-
-# --------------------------------------------------------------------------
-# Gegen die echten Daten
-# --------------------------------------------------------------------------
 
 
 def _echter_bestand():
@@ -517,9 +482,6 @@ def test_die_kette_haelt_ihre_zwei_zahlen_an_einer_gestellten_lage():
         url=url,
         kennung="o2-neu",
     )
-    # Zwei Preise fuer dieselbe Farbe desselben Geraets: ein Widerspruch mit
-    # sich selbst, den `pruefe()` als Doppelpreis herauswirft - beide
-    # Haelften, weil der Datensatz nicht sagt, welche stimmt.
     doppel = [
         _e(
             gid="apple-iphone-16",
@@ -631,7 +593,6 @@ def test_der_zwilling_faellt_und_die_echte_ware_daneben_bleibt():
     assert [e["id"] for e in weg] == ["o2-alt"]
     assert {e["anbieter"] for e in weg} == {"o2"}
 
-    # Gegenprobe: ohne die Zwillingseigenschaft faellt keine Zeile.
     kein_zwilling = [
         {**alt, "preis_ohne_vertrag": 399.0},
         neu,

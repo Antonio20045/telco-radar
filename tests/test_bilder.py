@@ -102,8 +102,6 @@ def test_ein_grosses_feedbild_erspart_den_abruf_der_artikelseite(tmp_path):
     client = _client(
         {
             "https://example.com/gross-im-feed.jpg": _bild_antwort(_jpeg(1400, 800)),
-            # Die Artikelseite ist absichtlich NICHT hinterlegt: wird sie doch
-            # abgerufen, kommt 404 und `kein_og` steht in der Bilanz.
         }
     )
     with client:
@@ -167,7 +165,6 @@ def test_share_image_ist_kein_muell():
     Muellfilter genau die weg."""
     assert bilder._taugt("https://example.com/media/share-image-12345.jpg")
     assert bilder._taugt("https://example.com/default-image/artikel.jpg")
-    # Was weiterhin faellt:
     assert not bilder._taugt("https://example.com/assets/logo.png")
     assert not bilder._taugt("https://example.com/img/1x1.gif")
 
@@ -196,6 +193,7 @@ def _png_mit_transparenz(breite=600, hoehe=400) -> bytes:
     """Ein Freisteller, wie ihn jede Tarifseite traegt: farbiges Motiv auf
     DURCHSICHTIGEM Grund."""
     import io as _io
+
     from PIL import Image
 
     im = Image.new("RGBA", (breite, hoehe), (0, 0, 0, 0))
@@ -230,6 +228,7 @@ def test_ist_leer_misst_die_abgelegte_fassung():
     """Gemessen wird, was auf der Seite landet - also mit Transparenz auf
     Weiss. Ein leerer durchsichtiger Rahmen ist leer, ein Freisteller nicht."""
     import io as _io
+
     from PIL import Image
 
     puffer = _io.BytesIO()

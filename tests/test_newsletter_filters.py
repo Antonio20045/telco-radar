@@ -64,9 +64,6 @@ def _eintrag(
     )
 
 
-# ==================================================  Verknuepfungsregel  ===
-
-
 def test_leere_auswahl_heisst_alles(katalog):
     """Die Erwartung fast aller Nutzer - und die gefaehrlichste Zeile des
     Pakets, wenn sie falsch herum gebaut ist."""
@@ -113,9 +110,6 @@ def test_ein_unbekannter_schluessel_gilt_nicht_als_leer(katalog):
     assert waehle([_eintrag(1, region="europa")], satz, katalog) == []
 
 
-# =====================================================  Wettbewerber  ======
-
-
 def test_wettbewerber_trifft_ueber_das_betreiberfeld(katalog):
     satz = Filtersatz(wettbewerber=("telekom",))
     treffer = waehle(
@@ -155,9 +149,6 @@ def test_die_marke_trifft_nicht_als_teilwort(katalog):
     assert (
         waehle([_eintrag(1, titel="Telekommunikation in Ghana")], satz, katalog) == []
     )
-
-
-# =======================================================  Stichwoerter  ====
 
 
 def test_stichwoerter_sind_additiv_und_begruendet(katalog):
@@ -282,14 +273,10 @@ def test_stichwoerter_sehen_nur_titel_und_zusammenfassung():
     assert not Stichwort("Telekom").trifft(e.suchtext)
 
 
-# ============================================================  Deckel  =====
-
-
 def test_die_ausgabe_ist_auf_acht_eintraege_gedeckelt(katalog):
     eintraege = [_eintrag(i, gewicht=100 - i) for i in range(20)]
     treffer = waehle(eintraege, Filtersatz(), katalog)
     assert len(treffer) == katalog.grenzen.max_eintraege == 8
-    # ... und zwar die wichtigsten.
     assert [t.eintrag.id for t in treffer] == [f"e{i}" for i in range(8)]
 
 
@@ -297,9 +284,6 @@ def test_mehr_als_zehn_stichwoerter_werden_beschnitten(katalog):
     roh = {"keywords": [f"Stichwort{i:02d}" for i in range(25)]}
     satz = lies_filtersatz(roh, katalog)
     assert len(satz.stichwoerter) == katalog.grenzen.max_stichwoerter == 10
-
-
-# =====================================  Vorschau und ihr Browser-Index  ====
 
 
 @pytest.fixture()
@@ -337,7 +321,6 @@ def archiv(tmp_path):
         ],
     )
     bericht("2026-08-05", [("Netzausbau in Bayern", "Weiterer Ausbau.")])
-    # Aelter als das Fenster - darf NICHT mitzaehlen.
     bericht("2026-05-01", [("Netzausbau im Frühjahr", "Alt.")])
     return reports
 
@@ -414,14 +397,8 @@ def test_der_index_zaehlt_an_jedem_rebuild_tag_dieselbe_zahl(archiv, monkeypatch
         f"rechnen verschieden: {ergebnisse[0]['meldungen']} gegen "
         f"{ergebnisse[1]['meldungen']} Meldungen"
     )
-    # Die Zahl ist die der DATENLAGE, nicht irgendeine zwischen zwei
-    # Wanduhren: der juengste Bericht (08-08) ist der Anker, sein Fenster
-    # [07-09, ...] traegt beide Berichte, der Mai-Bericht bleibt draussen.
     assert ergebnisse[0]["meldungen"] == 3
     assert ergebnisse[0]["stand"] == "2026-08-08"
-
-
-# ==========================================================  Katalog  ======
 
 
 def test_die_kategorien_zeigen_auf_echte_ressorts():
@@ -449,8 +426,6 @@ def test_die_regionen_zeigen_auf_echte_regionen():
 
     katalog = lade_katalog(WURZEL)
     cfg = load_config(WURZEL)
-    # `region_name` ist der deutsche Name - genau der, der im Bericht-JSON
-    # als Schluessel der `regions`-Tabelle steht.
     echte = {region_schluessel(op.region_name) for op in cfg.operators}
     gewaehlt = katalog.schluessel("regionen") - {"global"}
     assert echte, "keine Betreiber geladen - der Test prueft sonst nichts"

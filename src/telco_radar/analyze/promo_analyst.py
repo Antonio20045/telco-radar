@@ -42,22 +42,6 @@ class PromoExtractionError(RuntimeError):
     """
 
 
-# Harte Obergrenze pro SEITE und Lauf, unabhaengig davon, ob die
-# Prompt-Anweisung (keine SKU-fuer-SKU-Liste) tatsaechlich befolgt wird - eine
-# Karte mit 20 Einzelgeraete-Eintraegen ist nicht "auf einen Blick" lesbar.
-# Nimmt bewusst die ERSTEN Eintraege (das Modell wird angewiesen, die
-# wichtigsten/unterschiedlichsten Aktionen zuerst zu nennen), nicht die
-# groessten - eine harte Kappung ohne Rangfolge waere willkuerlich.
-#
-# Von 8 auf 6 gesenkt am 08.08.2026, weil sich die BEZUGSGROESSE geaendert
-# hat: bis dahin hatte jede Marke genau eine Seite, die Zahl war also zugleich
-# die Obergrenze je Marke. Seit eine Marke mehrere Seiten hat (O2 hat sieben),
-# multipliziert sie sich - 7 x 8 waeren 56 Zeilen unter einem Absender, und
-# der Markenblock auf der Uebersicht listet sie alle. 6 je Seite ist reichlich
-# fuer eine einzelne Aktionsseite (die meisten fuehren zwei bis vier klar
-# unterscheidbare Aktionen) und haelt die Summe je Marke im Lesbaren. Der
-# eigentliche Schutz gegen Wiederholungen sitzt ohnehin eine Schicht tiefer:
-# PromoDB.upsert erkennt dasselbe Angebot auf zwei Seiten als einen Eintrag.
 _MAX_ENTRIES_PER_PAGE = 6
 
 _EXTRACT_SYSTEM = """\
@@ -105,10 +89,6 @@ zeigt, gib [] zurueck. Antworte AUSSCHLIESSLICH mit einem JSON-Array, kein
 weiterer Text.
 """
 
-# Nur angehaengt, wenn tatsaechlich Link-Kandidaten vorliegen (siehe
-# extract_promos). Getrennt vom Basis-Prompt, damit ein Aufruf ohne
-# Kandidaten (z. B. Fallback, aeltere Tests) den Prompt nicht unnoetig
-# aufblaeht oder ein Feld erwaehnt, das es dann gar nicht geben kann.
 _LINK_SELECTION_INSTRUCTIONS = """
 
 Zusaetzlich bekommst du unten eine NUMMERIERTE LISTE echter Links von dieser

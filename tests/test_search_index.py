@@ -113,7 +113,6 @@ def test_search_index_is_empty_when_theres_nothing_to_index():
     assert suchindex.bauen([], [], {}) == []
 
 
-# ------------------------------------------------ was am 08.08.2026 dazukam
 def test_die_ueberschrift_ist_die_der_seiten_nicht_der_zusammenfassungssatz():
     """`schlagzeile` ist die Zeile, die der Rest des Portals zeigt
     (html._schlagzeile). Der Index las bis zum 08.08.2026 `de_title` - also

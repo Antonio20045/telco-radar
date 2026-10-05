@@ -79,7 +79,7 @@ def _hole_mit_beleg(beleg: list):
         }
         try:
             antwort = _echter_fetch(url, http_cfg, *args, **kwargs)
-        except Exception as exc:  # noqa: BLE001 - protokollieren, dann weiterwerfen
+        except Exception as exc:  # noqa: BLE001
             resp = getattr(exc, "response", None)
             eintrag["status"] = getattr(resp, "status_code", None)
             eintrag["user_agent"] = (
@@ -118,17 +118,6 @@ def main() -> None:
     heute = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     beleg: list[dict] = []
 
-    # Der Haken wird VOR dem Patchen gebaut: seine Closure hält dann den
-    # ECHTEN fetch fest (dieselbe Zeile wie bei B2/B3/B4). Und er sitzt auf
-    # dem Modul-Attribut, BEVOR `_hole_fabrik` seinen `from .collect.http
-    # import fetch` ausfuehrt - sonst ginge der Abruf am Beleg vorbei.
-    #
-    # DIE VIERTE KOPIE DIESES HAKENS (Review B6): lokallauf_telekom,
-    # lokallauf_congstar und lokallauf_einsundeins tragen dieselbe. Sie ist
-    # bewusst kopiert und nicht ausgelagert - die drei Skripte teilen sich
-    # keine Importbasis, und ein gemeinsames Modul waere ein Umbau der
-    # Laufzeuge ueber drei fertige Auftraege hinweg. Wer den Haken aendert,
-    # aendert ihn an allen vier Stellen; diese Zeile ist der Hinweis dafuer.
     _patch_fetch = _hole_mit_beleg(beleg)
     _echter_fetch = _http_mod.fetch
     _http_mod.fetch = _patch_fetch
@@ -155,9 +144,6 @@ def main() -> None:
             )
     finally:
         _http_mod.fetch = _echter_fetch
-        # Der Beleg wird AUCH bei einem Absturz geschrieben: die robots-
-        # Abrufe stehen dann bereits in der Liste, und ein gescheiterter
-        # Lauf ohne Laufzeitbeleg ist nicht mehr nachvollziehbar.
         unehrlich = [e for e in beleg if not _ist_ehrliche_kennung(e.get("user_agent"))]
         beleg_datei = root / "outputs" / f"beleg-einsundeins-simonly-{heute}.json"
         beleg_datei.parent.mkdir(parents=True, exist_ok=True)

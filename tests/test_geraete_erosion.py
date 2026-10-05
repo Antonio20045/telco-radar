@@ -91,23 +91,14 @@ def _bestand(tmp_path, naechte) -> GeraeteDB:
     return GeraeteDB(pfad)
 
 
-# Der gemessene Fall, Nacht fuer Nacht: die toten Adressen der Vornacht
-# fallen aus der Sitemap, die naechste Nacht verliert wieder rund ein
-# Viertel. Die Zeilen (rund drei je Seite) gehen im selben Takt zurueck -
-# jeder EINZELNE Tagesschritt bleibt unter 30 %.
 _FUENF_NAECHTE = [
-    (_tag(1), 45, 0, 133),  # der letzte heile Tag
-    (_tag(2), 45, 11, 100),  # 24,4 % tot - Schwelle haelt (0,756)
-    (_tag(3), 34, 8, 77),  # 23,5 % tot
-    (_tag(4), 26, 6, 59),  # 23,1 % tot
-    (_tag(5), 20, 5, 44),  # 25,0 % tot - genau an der Schwelle
-    (_tag(6), 15, 3, 36),  # 20,0 % tot
+    (_tag(1), 45, 0, 133),
+    (_tag(2), 45, 11, 100),
+    (_tag(3), 34, 8, 77),
+    (_tag(4), 26, 6, 59),
+    (_tag(5), 20, 5, 44),
+    (_tag(6), 15, 3, 36),
 ]
-
-
-# --------------------------------------------------------------------------
-# 1. Der Fall aus dem Review: fuenf Naechte a 24 %
-# --------------------------------------------------------------------------
 
 
 def test_kein_einzelner_tagesschritt_reisst_eine_der_alten_schwellen(tmp_path):
@@ -148,8 +139,6 @@ def test_fuenf_naechte_a_vierundzwanzig_prozent_loesen_alarm_aus(tmp_path):
     }
     laut = sorted(tag for tag, alarm in gemeldet.items() if alarm is not None)
     assert laut, "kein einziger Befund in fuenf Naechten mit 24 % Schwund"
-    # Und zwar frueh: spaetestens in der dritten Nacht, mit noch 26 von
-    # 45 gelesenen Seiten - nicht erst bei null.
     assert laut[0] <= _tag(3)
 
     from telco_radar.analyze.geraete_store import ALARM_EROSION
@@ -180,11 +169,6 @@ def test_der_befund_nennt_adressen_und_bezugstag(tmp_path):
     from telco_radar.analyze.geraete_store import ALARM_EROSION
 
     assert alarm.art == ALARM_EROSION
-
-
-# --------------------------------------------------------------------------
-# 2. Eine STABILE Luecke ist keine Erosion
-# --------------------------------------------------------------------------
 
 
 def test_dieselben_neun_toten_adressen_jede_nacht_alarmieren_nicht(tmp_path):
@@ -256,11 +240,6 @@ def test_der_altbestand_ohne_adressfelder_alarmiert_nicht(tmp_path):
     assert db.abdeckungsalarm(_ANBIETER, _tag(3)) is None
 
 
-# --------------------------------------------------------------------------
-# 3. S2-1: die Einheit der Schwelle - und was sie wirklich nach unten haelt
-# --------------------------------------------------------------------------
-
-
 def test_der_waechter_rechnet_in_zeilen_die_schwelle_in_adressen(tmp_path):
     """Das Gegenbeispiel, an dem die alte Begruendung der 0,75 zerbricht.
 
@@ -329,8 +308,5 @@ def test_der_vergleich_endet_am_rand_des_fensters(tmp_path):
     naechte = [(_tag(1), 45, 0, 133)]
     naechte += [(_tag(n), 30, 0, 90) for n in range(2, 10)]
     db = _bestand(tmp_path, naechte)
-    # Solange der heile Tag im Fenster steht (Naechte 2 bis 7), ist der
-    # Schwund 33 % und damit ein Befund.
     assert db.abdeckungsalarm(_ANBIETER, _tag(2)) is not None
-    # Nacht 9 sieht nur noch die Tage 3 bis 9 - alle mit 30 Adressen.
     assert db.abdeckungsalarm(_ANBIETER, _tag(9)) is None

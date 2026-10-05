@@ -59,14 +59,10 @@ from . import (
     geraete_zeitreihe,
 )
 
-# MonatNamen der Katalog-Datumsformatierung - keine zweite Tabelle (driftet).
 from .geraete_tco_band import _MONATE, band_label
 from ..analyze import geraete_lifecycle
 from ..analyze.tco_store import TcoDB
 
-# Der Zeitraum der TCO-Spalte und DIE EINE Regel, ob zwei Leitzahlen
-# gegeneinander gestellt werden duerfen (P0-B-h1) - der Katalog leitet
-# beides nicht ab, er liest es.
 from ..tco_model import TCO_HORIZONT, zeitraum_vergleichbar
 from ..tarif_bezug import Tarifbestand
 from .ausfall import Ausfall
@@ -80,119 +76,20 @@ from ..analyze.geraete_store import (
 
 log = logging.getLogger(__name__)
 
-# Die Positionskarte ist am 30.08.2026 GELOESCHT worden, nicht umgebaut.
-# Sie zeigte 59 Geraete mal vier Anbietern in einem Bild - 114 senkrecht
-# gedrehte Achsenbeschriftungen, 155 von 164 Punkten ohne Beschriftung - und
-# drei Umschalter boten drei Ansichten derselben unlesbaren Grafik an. Ein
-# Filter darauf haette den Fehler nicht behoben, sondern verkleinert.
-#
-# Was sie zeigen sollte, zeigt jetzt eine Tabelle (`geraete_alarme.py`).
-# Ein Diagramm gibt es nur noch eines, es steht in "Preisverlauf", und es
-# zeigt genau EIN Geraet.
 
 _SICHTBAR = (STATUS_AKTIV, STATUS_VERMUTLICH)
 
-# Wie weit "diese Woche" zurueckreicht. Bewusst weiter als sieben Tage: der
-# Bericht erscheint zweimal woechentlich, und ein ausgefallener naechtlicher
-# Lauf darf eine echte Bewegung nicht verschlucken.
 FENSTER_TAGE = 14
 ZEITREIHE_TEIL = "Zeitreihe der Geräteseite"
 
-# Ab wann "neu im Regal" eine Marktbewegung meint und nicht die eigene
-# Messdauer (30.08.2026).
-#
-# Die Karte meldete "59 Geraete neu im Regal" - bei 59 beobachteten Geraeten.
-# Beides stimmte: die Preishistorie war 20 Tage alt, also war JEDES erfasste
-# Geraet innerhalb des Fensters erstmals gesehen worden. Der Satz sagte
-# damit nichts ueber den Markt, sondern ueber den Startzeitpunkt dieses
-# Radars - und stand als Aussage ueber den Markt da.
-#
-# Unterhalb dieser Schwelle sagt die Karte deshalb EINEN Satz und zeigt
-# keine Tabelle: die Zahl der erstmals erfassten Geraete gehoert in den
-# Nebensatz, wo sie hingehoert, und die eine echte Preisaenderung steht
-# ausgeschrieben daneben. Vier Wochen sind kein gerechneter Wert, sondern
-# der Punkt, ab dem "seit der letzten Ausgabe" und "seit Messbeginn" nicht
-# mehr dasselbe sind.
 VORLAUF_TAGE = 28
 
-# Wie viele Zeilen die zwei Lifecycle-Listen ohne Aufklappen zeigen
-# (30.08.2026).
-#
-# GERECHNET, nicht gegriffen, und zwar an einer Fixture, die die Datenlage
-# in etwa zwei Wochen vorwegnimmt: "Verweildauer im Regal" und
-# "Preisverfall" stehen heute leer, weil die Historie zu duenn ist. Sobald
-# sie sich einschalten, traegt jede Liste rund 51 px je Zeile - mit zwoelf
-# bzw. ungedeckelt zusammen 1234 px, und der Portfolio-Reiter misst dann
-# 3328 statt 2384 px. Die Grenze des Auftrags liegt bei 3000.
-#
-# Das ist dieselbe Fehlerklasse wie bei `KATALOG_SICHTBAR`: ein Deckel in
-# ZEILEN ist immer nur ein Stellvertreter fuer eine Grenze in PIXELN, und
-# eine Liste ohne Deckel haengt am Datenbestand. Sechs Zeilen kosten je
-# Liste rund 310 px; der Rest steht zugeklappt darunter und ist nicht
-# geloescht.
 LIFECYCLE_SICHTBAR = 6
 
-# Die Nachfolger-Tabelle bekommt ihren EIGENEN Deckel, nicht LIFECYCLE_SICHTBAR
-# (B4/B4-Nachbesserung der Zurueckweisung vom 31.08.2026) - und er steht auf
-# NULL. Das ist keine Verlegenheitsloesung, sondern das Ergebnis einer
-# Messreihe, nicht einer Vermutung:
-#
-#   dauern+trends bei je 6 Zeilen (LIFECYCLE_SICHTBAR), Nachfolger LEER:
-#                                                          2672-2759 px
-#   + Nachfolger-Ueberschrift, Erklaersatz, Tabellenkopf (fester Aufschlag,
-#     entsteht mit der ERSTEN Zeile ueberhaupt):                  ~188 px
-#   + je Zeile (echtes Chromium, Playwright-Bounding-Box):          ~55 px
-#
-# Bei 328 px Rest bis zur 3000-px-Grenze reicht das fuer den Aufschlag
-# allein - und schon EINE sichtbare Zeile reisst sie in der Kombination mit
-# sechs vollen dauern/trends-Zeilen (gemessen: 2964-3050 px, abhaengig vom
-# Gesamtbestand). `dauern` und `trends` sind eigene, laengst ausgelieferte
-# Merkmale und werden hier NICHT enger gestellt, um dieser Tabelle Platz zu
-# verschaffen - das waere eine Nebenwirkung auf ein fremdes Merkmal fuer
-# einen Fall, der noch nicht eingetreten ist.
-#
-# Bei NULL sichtbaren Zeilen zeigt der Reiter deshalb GAR KEINE Tabelle
-# oberhalb der Falz dieser Sektion - nur den Erklaersatz und darunter EINEN
-# Aufklapper mit der vollstaendigen Tabelle (siehe Vorlage). Das ist
-# dieselbe Regel wie bei jedem anderen Aufklapper dieser Seite: der Rest
-# ist zugeklappt, nicht geloescht - hier ist der "Rest" nur ausnahmsweise
-# alles.
 NACHFOLGER_SICHTBAR = 0
 
 EIGEN = ("vodafone",)
 
-# --------------------------------------------------------------------------
-# Die Veroeffentlichungsschwelle (CLAUDE.md §5)
-# --------------------------------------------------------------------------
-# Sie stand bis zum 11.08.2026 NUR im Test - und das war der Fehler daran:
-# eine Schwelle, die nur ein Test kennt, kann die Navigation nicht schalten.
-# Ein Mensch musste die Seite von Hand eintragen, und solange er das nicht
-# tat, war sie fuer jeden Leser unsichtbar. Genau so ist es gekommen: die
-# Seite stand live, war vollstaendig, und niemand konnte sie finden.
-#
-# Jetzt rechnet der Code sie, `base.html.j2` fragt sie ab, und der Test
-# prueft BEIDE Zweige - unterhalb der Schwelle nicht verlinkt, oberhalb
-# verlinkt.
-#
-# ZU DEN ZAHLEN. Anbieter steht auf DREI - dem Wert des Bauauftrags.
-#
-# Am 11.08.2026 stand er kurzzeitig auf zwei, mit der Begruendung, die Seite
-# beantworte ihre erste und zweite Frage ("was fuehrt der Wettbewerb", "wo
-# steht ein Geraet im Preis") auch mit zwei Laeden vollstaendig. Antonio hat
-# das kassiert, nachdem er die Seite live gesehen hatte: sie soll nicht
-# angezeigt werden, solange sie so aussieht.
-#
-# Er hat recht, und die Zahl macht es deutlicher als jede Erklaerung: von den
-# zwei "Anbietern" traegt einer 84 von 85 Listungen. Die dritte Frage - "was
-# kostet dasselbe Geraet bei wem" - ist die, wegen der diese Seite existiert,
-# und mit einem echten Laden kann sie niemand beantworten. Eine Seite, die
-# ihre Luecke beziffert, luegt zwar nicht; aber eine Marktuebersicht, die den
-# Markt nicht zeigt, gehoert deshalb noch lange nicht in die Navigation.
-#
-# Die Seite wird weiter gebaut, getestet und ist ueber ihren direkten Link
-# erreichbar - dieselbe Regel wie bei tarife.html und lieferzeit.html
-# (CLAUDE.md §5). Sobald ein dritter Laden liefert, traegt sie sich selbst
-# wieder ein; es braucht dafuer keine Handarbeit und keinen zweiten Ort.
 SCHWELLE_ANBIETER = 3
 SCHWELLE_HERSTELLER = 2
 SCHWELLE_SKUS = 20
@@ -218,11 +115,6 @@ SEGMENT_LABEL = {
 
 def _ist_eigen(anbieter: str) -> bool:
     return (anbieter or "").strip().lower() in EIGEN
-
-
-# --------------------------------------------------------------------------
-# "Was diese Woche auffaellt"
-# --------------------------------------------------------------------------
 
 
 def zahlen_im_text(text: str) -> set:
@@ -366,47 +258,6 @@ def _spaeterer_tag(erster: str, zweiter: str) -> str:
     return zweiter if b > a else erster
 
 
-# --------------------------------------------------------------------------
-# Der Hinweis, wenn "Was der Nachfolger mit dem Preis macht" leer ist
-# --------------------------------------------------------------------------
-# P3 (31.08.2026, nach der Zurueckweisung Runde 1): die erste Fassung dieses
-# Satzes behauptete zwei Dinge, die beide nicht stimmten - beide vom Lead
-# selbst so in den Auftrag geschrieben, beide von einem adversarischen
-# Pruefer nachgemessen widerlegt:
-#
-#   (1) "die Tabelle ist leer, weil kein Nachfolger ins Messfenster faellt".
-#       Falsch: sie ist leer, weil `geraete_lifecycle._belastbar` VOR der
-#       Nachfolger-Frage greift - 21 Tage Listungsdauer, und am 31.08.2026
-#       erreicht KEINE der 370 Listungen mehr als 20. Ein einziger
-#       Nachtlauf (last_verified +1) laesst 69 davon kippen; der Satz muss
-#       also den echten Riegel nennen (die Beobachtungsdauer), nicht einen
-#       erfundenen (die Terminlage der Nachfolger).
-#   (2) "mehr Katalogpflege loest das nicht". Falsch: 13 der 59 beobachteten
-#       Geraete haben einen Nachfolger im Katalog OHNE `marktstart`
-#       (Pixel 10 -> Pixel 11 z.B.), waehrend nur 4 ein Datum tragen. Ein
-#       fehlendes Datum ist ein Pflegeruecktand, kein Naturgesetz - die
-#       Behauptung des Gegenteils war unbelegt und stand trotzdem als
-#       Tatsachensatz auf der Seite (derselbe Fehler wie unten bei "waehrend
-#       Vodafone ersetzt").
-#
-# Diese Fassung nennt deshalb ausschliesslich Groessen, die aus den Daten
-# UND den oeffentlichen Konstanten von `geraete_lifecycle` kommen
-# (`MIND_TAGE_JE_GERAET`, `listungsdauer()`) - nichts wird mehr geschaetzt
-# oder behauptet. Auch die alte Zusatzzeile ("kam vor ueber eineinhalb
-# Jahren auf den Markt") ist gestrichen: sie waehlte nur unter den VIER
-# datierten Ketten und verschwieg damit die 13 undatierten, die dem Leser
-# ein falsches Bild gaben ("der Katalog kennt nur alte Nachfolger" - er
-# kennt vor allem gar keine Daten). `_zeitraum_grob()` faellt mit ihr weg;
-# die Funktion rundete an vier von fuenf Stufengrenzen falsch auf (549 Tage
-# waeren als "ueber zwei Jahren" gemeldet worden) und wurde von keinem Test
-# aufgerufen - eine ungetestete Rundungsfunktion, die niemand mehr braucht.
-#
-# Und: KEINE Tatsachenbehauptung ueber das Verhalten von Vodafone oder dem
-# Wettbewerb mehr. Vodafone fuehrt das iPhone 15 selbst 710 Tage nach dem
-# Start des iPhone 16 - also laenger als jeder andere gemessene Fall. Die
-# Sektion stellt die Frage, sie beantwortet sie nicht vorab.
-
-
 def _nachfolger_leer_hinweis(eintraege: list, katalog, nachfolger: list) -> str:
     """Warum "Was der Nachfolger mit dem Preis macht" heute leer ist - und
     wann sie es nicht mehr sein wird. Siehe Kommentar oben.
@@ -423,12 +274,6 @@ def _nachfolger_leer_hinweis(eintraege: list, katalog, nachfolger: list) -> str:
     dauern_alle = [d for d in dauern_alle if d is not None]
     laengste = max(dauern_alle) if dauern_alle else 0
 
-    # B7 der Zurueckweisung: "seit dem 10.08.2026" stand hier UND im
-    # "duenn"-Hinweis direkt darueber, wortgleich. `laengste` faellt heute
-    # (20 Tage) zufaellig mit der dortigen Beobachtungsspanne zusammen - eine
-    # zweite Formulierung derselben Zahl waere derselbe Fehler in neuer
-    # Verkleidung. Berichtet wird deshalb der ABSTAND zur Schwelle, eine Zahl,
-    # die an KEINER anderen Stelle der Seite steht.
     abstand = grenze - laengste
     if abstand > 0:
         dauer_satz = (
@@ -441,11 +286,6 @@ def _nachfolger_leer_hinweis(eintraege: list, katalog, nachfolger: list) -> str:
             "Listung bereits erreicht."
         )
 
-    # Geraete mit einem Nachfolger im Katalog, dem das Marktstart-Datum
-    # fehlt - der Beleg gegen "mehr Katalogpflege loest das nicht" (siehe
-    # Kommentar oben). Gezaehlt wird je GERAET, nicht je Listung: ein
-    # Katalogeintrag fehlt einmal, unabhaengig davon, bei wie vielen
-    # Anbietern er beobachtet wird.
     geraete_ids = sorted({e.get("device_id") for e in eintraege if e.get("device_id")})
     ohne_datum = 0
     for gid in geraete_ids:
@@ -516,10 +356,6 @@ def _auffaellig(
     stand leer da, obwohl frische Daten vorlagen. Als Bezug gilt deshalb der
     spaetere der beiden Tage.
     """
-    # Ueber `_tag()`, nicht ueber rohe Zeichenketten: ein kaputtes `datum`
-    # ("unbekannt") sortiert lexikalisch hinter jedes ISO-Datum, wuerde
-    # Bezugstag und liesse `_im_fenster` fuer ALLES falsch werden - die
-    # ganze Sektion verschwaende lautlos.
     juengste = sorted(
         d for d in (_tag(p.get("datum")) for p in historie.alle_punkte()) if d
     )
@@ -552,9 +388,6 @@ def _auffaellig(
         )
     bewegungen.sort(key=lambda b: -abs(b["delta"]))
 
-    # Ein Fenster, kein Stichtag. Der naechtliche Lauf schreibt an sechs von
-    # sieben Tagen ein Datum, das nie ein Renderdatum ist - mit `== heute`
-    # tauchte nur auf, was der Bericht selbst gefunden hat.
     neu_gelistet = [e for e in eintraege if _im_fenster(e.get("first_seen", ""), heute)]
     verschwunden = [
         e
@@ -563,14 +396,6 @@ def _auffaellig(
         and _im_fenster(e.get("ended_since", ""), heute)
     ]
 
-    # W3 (29.08.2026): die Karte sagte "267 Geraete neu im Regal", waehrend
-    # die Seite daneben 59 beobachtete Geraete auswies. Gezaehlt wurden
-    # LISTUNGEN - dasselbe Geraet bei vier Anbietern in acht Farben sind 32
-    # Listungen und EIN Geraet. Eine Kennzahl, die groesser ist als ihre
-    # eigene Grundgesamtheit, macht jede andere Zahl der Seite unglaubwuerdig.
-    #
-    # Beide Zahlen bleiben stehen, sie heissen nur richtig: `*_geraete`
-    # traegt den Satz, die Listungszahl bleibt fuer die Tabelle darunter.
     neu_geraete = {e.get("device_id") for e in neu_gelistet if e.get("device_id")}
     weg_geraete = {e.get("device_id") for e in verschwunden if e.get("device_id")}
 
@@ -588,22 +413,8 @@ def _auffaellig(
         }
     )
 
-    # Gibt es ueberhaupt einen Vorlauf zum Vergleichen? Dann zeigt die Karte,
-    # was neu ERFASST wurde, und sagt das auch so - "keine Auffaelligkeiten"
-    # ist etwas anderes als "noch nichts zu vergleichen".
-    #
-    # Gefragt wird die LAUFBILANZ, nicht die Preishistorie. Die erste Fassung
-    # zaehlte Messtage in `geraete_preise.jsonl` - und die Datei traegt nur
-    # Aenderungspunkte: ein Anbieter, der wegbricht, schreibt gar keine mehr,
-    # waehrend `mark_stale` seine Listungen altert. Genau dann haette die
-    # Kachel "ausgelistet" den Einbruch gezeigt und war ausgeblendet.
     ohne_vorlauf = laeufe < 2
 
-    # WIE LANGE MESSEN WIR SCHON? Der Vorlauf entscheidet, ob "neu im Regal"
-    # eine Marktbewegung meint oder nur den Startzeitpunkt dieses Radars.
-    # Gerechnet gegen die aelteste Messung, nicht gegen `first_seen`: ein
-    # Geraet, das erst gestern in den Katalog kam, verkuerzt den Vorlauf der
-    # ganzen Sektion nicht.
     seit = juengste[0] if juengste else None
     bezug_tag = _tag(heute)
     vorlauf_tage = (
@@ -611,22 +422,6 @@ def _auffaellig(
     )
     kurzer_vorlauf = vorlauf_tage < VORLAUF_TAGE
 
-    # DREI LAGEN, NICHT ZWEI - und die erste ist nicht die zweite.
-    #
-    #   `ohne_vorlauf`  : es gibt ueberhaupt keinen frueheren Stand (erster
-    #                     oder zweiter Lauf). Dann ist "neu im Regal" nicht
-    #                     nur schief, es ist unbelegbar, und die Karte sagt
-    #                     genau das.
-    #   `kurzer_vorlauf`: es gibt einen Vergleichsstand, aber er reicht nur
-    #                     ueber wenige Tage. "59 Geraete neu im Regal" bei 59
-    #                     beobachteten ist dann eine Aussage ueber die
-    #                     Messdauer und keine ueber den Markt.
-    #   sonst           : der Normalfall, mit Tabelle.
-    #
-    # Die erste Fassung dieser Aenderung hatte die zwei ersten Lagen
-    # zusammengeworfen - und damit den Satz "es gibt noch keinen frueheren
-    # Stand, gegen den sich vergleichen liesse" abgeschafft, den B7 Punkt 3
-    # ausdruecklich verlangt. Ein bestehender Test hat das gemeldet.
     saetze = []
     if ohne_vorlauf:
         for b in bewegungen[:5]:
@@ -644,24 +439,7 @@ def _auffaellig(
                 f"den sich vergleichen ließe."
             )
     elif kurzer_vorlauf and (neu_geraete or bewegungen or weg_geraete):
-        # EIN SATZ STATT EINER TABELLE.
-        #
-        # Die Bedingung `neu_geraete or bewegungen` ist nicht kosmetisch:
-        # ohne sie stuende in einer ruhigen Woche "Seit dem 10.08. wurden 0
-        # Geraete erstmals erfasst; eine Preisaenderung ist dabei nicht
-        # aufgefallen." - ein Satz, der nichts sagt, und die Rubrik "Was
-        # diese Woche auffaellt" haette damit IMMER Inhalt. Vorher
-        # verschwand sie in diesem Fall ganz (`hat_daten` blieb falsch), und
-        # das ist die richtige Antwort: keine Zeile, die nichts sagt. Unter vier Wochen Vorlauf ist die
-        # Zahl der erstmals erfassten Geraete eine Aussage ueber uns und
-        # nicht ueber den Markt - sie steht deshalb im Nebensatz, und die
-        # Preisaenderungen, die es wirklich gab, stehen ausgeschrieben
-        # daneben statt als Tabelle mit Kopfzeile und einer Datenzeile.
-        # Numerus: "wurden 1 Gerät erstmals erfasst" ist falsch, und der
-        # Fall tritt in einer ruhigen Woche als erster ein.
         wieviel = len(neu_geraete)
-        # "4.8.", nicht "4.08." - dieselbe Schreibweise wie `tagDE` in
-        # app.js und wie die Chronik der Wettbewerbsseite ("7.8.").
         kopf = f"Seit dem {seit.day}.{seit.month}. " if seit else "Bisher "
         satz = (
             f"{kopf}{'wurde' if wieviel == 1 else 'wurden'} {wieviel} "
@@ -682,24 +460,10 @@ def _auffaellig(
             )
             satz += wieviele + ": " + "; ".join(teile)
             if len(bewegungen) > 3:
-                # DIE RESTZAHL MUSS ANGEMELDET SEIN. Sie ist gerechnet
-                # (`len - 3`) und stand nicht in `erlaubt`; der Waechter
-                # verwarf den Satz fail closed, und weil dieser Zweig KEINE
-                # Tabelle mehr zeigt, blieb die Rubrik danach vollstaendig
-                # leer - Ueberschrift ohne Inhalt. Ausgeloest ab der vierten
-                # Preisbewegung einer Nacht, sobald kein Eigenname die Zahl
-                # zufaellig deckt.
                 erlaubt.add(len(bewegungen) - 3)
                 satz += f" und {len(bewegungen) - 3} weitere"
             satz += "."
         saetze.append(satz)
-        # EINE AUSLISTUNG IST DAS STAERKSTE SIGNAL DIESER SEITE und darf
-        # nicht daran haengen, wie lange wir schon messen. Der erste Anlauf
-        # dieses Zweiges kannte nur `neu_geraete` und `bewegungen`: zehn aus
-        # dem Regal gefallene Geraete standen nirgends, waehrend der Satz
-        # daneben "eine Preisaenderung ist dabei nicht aufgefallen" meldete.
-        # Genau der Einbruch, den der Kommentar bei `ohne_vorlauf` als Grund
-        # fuer die Laufbilanz nennt.
         if weg_geraete:
             saetze.append(
                 f"{len(weg_geraete)} "
@@ -726,17 +490,9 @@ def _auffaellig(
                 f"aus dem Portfolio gefallen."
             )
 
-    # Das Datum im Kopfsatz ist so wenig eine Behauptung ueber den Markt wie
-    # ein Eigenname - aber der Waechter prueft JEDE Zahl, und ohne diese
-    # Anmeldung verwuerfe er den einen Satz, den die Karte dann noch hat.
-    # Dieselbe Mechanik wie `zahlen_der_namen`, und aus demselben Grund
-    # ausdruecklich statt stillschweigend.
     if kurzer_vorlauf and not ohne_vorlauf and seit:
         erlaubt |= zahlen_im_text(f"{seit.day}.{seit.month}.")
 
-    # Fail closed: ein Satz, dessen Zahlen nicht im Datensatz stehen,
-    # erscheint nicht. Heute kann das nicht passieren - morgen, mit einem
-    # Editor davor, schon.
     geprueft = [s for s in saetze if pruefe_zahlen(s, erlaubt)]
     if len(geprueft) != len(saetze):
         log.warning(
@@ -750,11 +506,6 @@ def _auffaellig(
         "neu_gelistet_geraete": len(neu_geraete),
         "verschwunden": len(verschwunden),
         "verschwunden_geraete": len(weg_geraete),
-        # UNTER VIER WOCHEN VORLAUF KEINE TABELLE. Sie trug am 30.08.2026
-        # eine Kopfzeile mit sieben Spalten und GENAU EINE Datenzeile - der
-        # Satz darueber sagt dasselbe in einer Zeile und ohne, dass jemand
-        # sieben Spaltenkoepfe liest, um eine Zahl zu finden. Die Bewegungen
-        # sind nicht verloren: sie stehen ausgeschrieben im Satz.
         "bewegungen": [] if kurzer_vorlauf else bewegungen[:12],
         "neu": [
             {
@@ -780,10 +531,6 @@ def _auffaellig(
             }
             for e in verschwunden[:12]
         ],
-        # AN DAS, WAS WIRKLICH AUF DIE SEITE KOMMT. `bewegungen` ist die
-        # lokale, ungefilterte Liste; im kurzen Vorlauf wird sie oben auf
-        # [] gesetzt, und `geprueft` kann der Zahlenwaechter leeren. Beides
-        # zusammen ergab eine Rubrik, die rendert und nichts enthaelt.
         "hat_daten": bool(geprueft or (bewegungen and not kurzer_vorlauf)),
         "ohne_vorlauf": ohne_vorlauf,
         "kurzer_vorlauf": kurzer_vorlauf,
@@ -791,29 +538,6 @@ def _auffaellig(
     }
 
 
-# --------------------------------------------------------------------------
-# SKU-Matrix
-# --------------------------------------------------------------------------
-
-# Wie viele Katalogzeilen ohne Aufklappen stehen. GERECHNET wie
-# `geraete_alarme.SICHTBAR_MAX`, am 30.08.2026 im echten Chromium gegen den
-# ECHTEN Bestand: mit 25 Zeilen mass der Reiter 3353 px, mit 18 noch 3304,
-# mit 12 dann 2- statt 3-tausender.
-#
-# Warum 18 nicht reichte, obwohl die Rechnung "68 px je Zeile" es hergab:
-# eine Zeilenhoehe ist keine Konstante. Der naechtliche Lauf brachte 360
-# statt 352 Listungen, und mit ihnen laengere Modellnamen - dieselbe
-# Zeilenzahl wurde hoeher. Ein Deckel in ZEILEN ist immer nur ein Stellver-
-# treter fuer eine Grenze in PIXELN; er braucht deshalb Reserve, nicht die
-# knappste Zahl, die heute gerade passt. Dieselbe Fehlerklasse wie die
-# Datums-Zeitbomben, nur ueber den Bestand statt ueber die Uhr.
-#
-# Die Zahl steht hier und nicht in der Vorlage, damit ein Test sie gegen die
-# gemessene Hoehe halten kann.
-# Seit P3 zaehlt der Deckel MODELLZEILEN - `BLOCK_SICHTBAR` (zwei Zeilen je
-# Geraete-Block, P1 31.08.2026) ist mit der Listungs-Tabelle entfallen: ein
-# Modell IST jetzt eine Zeile, seine Farb- und Anbieter-Varianten stehen im
-# Zeilen-Aufklapper, und dort gibt es keinen sichtbaren Platz zu verteilen.
 KATALOG_SICHTBAR = 12
 
 
@@ -832,19 +556,6 @@ def _katalog_betrag(z: dict):
     return float("inf")
 
 
-# Segmentrang fuer den Vergleich UEBER Baureihen hinweg (B1-Nachbesserung,
-# 31.08.2026). `generation` ist NUR innerhalb einer Baureihe eine Zahl
-# (Galaxy A57 traegt 57, Galaxy S26 traegt 26) - eine erste Fassung
-# sortierte trotzdem flach nach `-generation` ueber den ganzen Hersteller,
-# und reproduzierte damit exakt den Fehler vom 29.08.2026, den der Auftrag
-# wortwoertlich als Warnung nennt: Samsungs erste Bildschirmseite fuehrte
-# mit einer Galaxy A57, das Flaggschiff S26 stand auf Platz fuenf.
-#
-# `segment` ist das Feld, das der Katalog PFLEGT und das ueber Baureihen
-# hinweg VERGLEICHBAR ist (flagship/premium/mid/entry) - anders als die
-# Generation ist es keine Zahl, die an ihrer Baureihe haengt. Es fuehrt die
-# Blockreihenfolge; die Generation zaehlt erst DANACH, und dann nur noch
-# INNERHALB derselben Baureihe (siehe `_katalog_block_schluessel`).
 _SEGMENT_RANG = {"flagship": 0, "premium": 1, "mid": 2, "entry": 3}
 
 
@@ -903,24 +614,10 @@ def _katalog_zeile(e: dict, katalog) -> dict:
     """
     g = katalog.nach_id(e.get("device_id")) if katalog else None
     preis = e.get("preis_ohne_vertrag")
-    # Der Zustand wird ABGELEITET, nicht aus dem Store uebernommen.
-    # Sonst steht in dieser Tabelle "space schwarz erneuert - Zustand
-    # neu", waehrend der Pruefbericht zwei Reiter weiter "refurbished"
-    # sagt: die Seite widerspraeche sich selbst, und der Store ist die
-    # schwaechere Quelle - er traegt seinen alten Wert bis zum naechsten
-    # erfolgreichen Crawl.
-    #
-    # Gerufen wird die EINE Ableitung (`geraete_bereinigung`), nicht eine
-    # eigene Fassung davon. Auf dem Bestand ist sie ohnehin schon
-    # gelaufen und hat ihr Ergebnis in die Kopie geschrieben - das ist
-    # der Grund, warum diese Zeile auch bei einer Farbe funktioniert,
-    # aus der das Kennzeichen gerade entfernt wurde.
     zustand = geraete_bereinigung.zustand_der_zeile(e)
     return {
         "modell": g.modell if g else (e.get("device_id") or "?"),
         "hersteller": g.hersteller if g else "",
-        # Nur fuer die Standardsortierung (Block/Baureihe/Segment) -
-        # keine eigene Spalte.
         "generation": g.generation if g else None,
         "serie": serie_aus_modell(g.modell) if g else "",
         "segment": g.segment if g else "",
@@ -941,51 +638,11 @@ def _katalog_zeile(e: dict, katalog) -> dict:
     }
 
 
-# --------------------------------------------------------------------------
-# P3 (Strategie Geraete v3, 17.09.2026): der Katalog auf MODELL-Ebene.
-#
-# `katalogzeilen()` - die flache LISTUNGS-Tabelle mit Bloecken, Interleave
-# je Anbieter im Block und `BLOCK_SICHTBAR` - ist mit P3/C3 (18.09.2026)
-# ersatzlos entfallen: der Reiter rendert `katalog_modellzeilen()`, und die
-# Listungs-Zeilen leben im Aufklapper JE MODELL (Bauform `_katalog_zeile`,
-# dort nach `_katalog_zeile_schluessel` sortiert). Die Sortier-Regeln, die
-# die alte Ebene trugen (B1/B5/B6/B9 der Zurueckweisung vom 31.08.2026),
-# stehen seit C1 in den Docstrings von `katalog_modellzeilen()` und
-# `_interleave_modelle_je_hersteller()` - eine Ebene hoeher, dort wo sie
-# heute gerechnet werden. Zweite Rechnung fuer dieselbe Tabelle waere
-# zwoelf Zeilen toter Kontext pro Rendern (E5-Regel).
-# --------------------------------------------------------------------------
-
-
-# --------------------------------------------------------------------------
-# P3 (Strategie Geraete v3, 17.09.2026): der Katalog auf MODELL-Ebene
-# --------------------------------------------------------------------------
-
-# Die beiden benannten Leerzustaende der TCO-Spalte. sichtbarer Text traegt
-# Umlaute - nicht die ASCII-Umschrift der Kommentare (dieselbe Lehre wie
-# bei der Uebersetzungsseite).
 TCO_LEER_KEIN_BUNDEL = "kein Bündel gemessen"
 TCO_LEER_KEIN_VERGLEICHBARES = "kein vergleichbares Bündel gemessen"
-# A3 (STRATEGIE GERAETE V4, 20.09.2026): der dritte Zustand - Bündel gibt
-# es, aber keines mit aktuellem Abruf. „kein Bündel gemessen“ waere hier
-# gelogen (harte Regel 9), und der alte Preis darf nicht als heutiger
-# stehen.
 TCO_LEER_NUR_ALT = "kein aktueller Bündel-Stand"
-# P0-B-h2: der vierte Zustand - Bündel gibt es, aktuell und vergleichbar,
-# aber KEINES ueber den Zeitraum dieser Spalte. Gemessen am Bestand vom
-# 21.09.2026: acht Modelle (z. B. Apple iPhone 15 256 GB, Nothing Phone
-# (4a) Pro 128 GB) haben nur ein 1&1-Buendel, dessen Leitzahl 36 Monate
-# traegt. Bis hierher stand deren 36-Monats-Summe unter dem Kopf "Kosten
-# über 24 Monate" und sortierte gegen echte 24-Monats-Zahlen; sie ist
-# richtig gerechnet, aber sie ist keine Zahl dieser Spalte.
 TCO_LEER_ANDERE_LAUFZEIT = f"kein Bündel über {TCO_HORIZONT} Monate"
 
-# Die benannten Leerzustaende der DELTA-Zelle (A2-Nachbesserung,
-# Pruef-Befund 20.09.2026). Zwei verschiedene Stummen, zwei Etiketten:
-# fehlt VODAFONE, fehlt die Referenz; fehlt nur der WETTBEWERBER neben
-# einem eigenen Angebot, liegt die Luecke beim Wettbewerb - die Referenz
-# ist dann das eigene Angebot selbst (derselbe Fehlertyp wie die beiden
-# TCO-Leerzustaende: eine Ursache, ein Name).
 TCO_DELTA_LEER_KEINE_REFERENZ = "keine Referenz"
 TCO_DELTA_GRUND_KEINE_REFERENZ = (
     "Vodafone listet dieses Modell nicht - deshalb ist kein Abstand "
@@ -996,40 +653,15 @@ TCO_DELTA_GRUND_KEIN_WETTBEWERBER = (
     "Vodafone listet dieses Modell, aber kein Wettbewerber-Angebot ist "
     "vergleichbar erhoben - deshalb ist kein Abstand berechenbar"
 )
-# P0-B-h2: der dritte Stumme dieser Zelle war der STRICH - und der heisst
-# auf dieser Seite "kein Angebot" (A2). Ein Wettbewerber-Angebot, dessen
-# Leitzahl einen anderen Zeitraum traegt als die Referenz, ist kein
-# fehlendes Angebot: es ist gemessen und unvergleichbar. Die Buendelzeile
-# sagt dazu seit P0-B-fix2 "andere Laufzeit" samt Satz
-# (`geraete_tco_karten.delta_zustand`) - DIESE Zelle sagt jetzt dasselbe,
-# aus derselben Definition (Clean Code 7), statt zu schweigen. Das WORT
-# steht deshalb nicht hier, sondern in `DELTA_ANDERE_LAUFZEIT` dort.
-# Gemessen am Bestand vom 21.09.2026: 25 stumme Zellen, davon 23 mit
-# genau diesem Zustand (z. B. Apple iPhone 17 Pro Max 512 GB, dessen
-# Zelle bis P0-B-fix2 "+341,74 € · +14,5 %" behauptete).
-# Der Rueckfalltext unten gilt nur, wo die Karte ihren Satz nicht
-# mitbringt - stumm bleibt die Zelle nie (harte Regel 9).
 TCO_DELTA_GRUND_ANDERE_LAUFZEIT = (
     "Das günstigste Wettbewerber-Angebot trägt einen anderen Zeitraum als "
     "die Vodafone-Referenz - über zwei Laufzeiten gibt es keinen Abstand"
 )
-# Der vierte Stumme, beim Messen von P0-B-h2 gefunden: die Referenz
-# EXISTIERT, ist aber nicht aktuell erhoben - `geraete_tco_karten.modelle`
-# gibt sie dann keiner Karte als Massstab (S2-1), und keine Karte des
-# Modells traegt ein Delta. Gemessen am 21.09.2026: Google Pixel 11 Pro
-# Fold 256 GB (o2 2.380,75 EUR, Vodafone-Naeherung aus altem Barpreis).
-# "kein Wettbewerber-Angebot" waere dort falsch (o2 und 1&1 stehen da),
-# "keine Referenz" auch. Dieselbe Sprache wie `TCO_LEER_NUR_ALT`: die
-# Luecke liegt beim STAND, nicht beim Bestand.
 TCO_DELTA_LEER_ALTE_REFERENZ = "kein aktueller Referenz-Stand"
 TCO_DELTA_GRUND_ALTE_REFERENZ = (
     "Die Vodafone-Referenz ist nicht aktuell erhoben - ein Abstand gegen "
     "sie wäre kein Abstand von heute"
 )
-# Die zweite Wand (S3c): ein Traeger MIT dem Zeitraum der Spalte, dem
-# trotzdem kein Abstand anhaengt. Nach dem Filter unten kann das nicht
-# mehr vorkommen - und WENN doch, steht der Zustand als Wort in der Zelle
-# und nicht als Strich.
 TCO_DELTA_LEER_UNBESTIMMT = "Abstand unbestimmt"
 TCO_DELTA_GRUND_UNBESTIMMT = (
     "Zu diesem Wettbewerber-Angebot ist kein Abstand zur Vodafone-Referenz gerechnet"
@@ -1083,10 +715,6 @@ def _buendel_je_anbieter_modell(
             if not geraet[0]:
                 continue
             mid = geraete_tco_karten.modell_schluessel(*geraet)
-        # JEDES aufloesbare Bündel traegt sein Geraet bei - auch eines, dessen
-        # SKU eine Listung hat: `hat_buendel` der Katalog-Zeile haengt an
-        # dieser Menge (iPhone 18 am 17.09.: 58 Listungen UND 105 Bündel
-        # auf denselben SKUs, unter der Auto-Messtag-Schwelle der Wahl).
         geraet_je_mid.setdefault(mid, {"device_id": geraet[0], "speicher": geraet[1]})
         monat = b.get("buendel_monatlich")
         if monat is None:
@@ -1201,13 +829,6 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
             "tco_leer": TCO_LEER_KEIN_BUNDEL,
             **leer_delta,
         }
-    # A3: NUR FRISCHE Karten stellen die Spalte (`frisch`, dieselbe
-    # Definition wie die Tafel - Clean Code 7). Der Pool OHNE die
-    # Frische entscheidet danach, ob die Lücke "kein vergleichbares
-    # Bündel" oder "kein aktueller Stand" heißt. EINE Filterreihe, aus
-    # der die andere ABGELEITET ist (S3e, Diff-Prüfung 21.09.2026): zwei
-    # nebeneinander geschriebene Listen mit denselben Feldern driften
-    # auseinander, sobald eine ein Feld mehr bekommt.
     pool = [
         k
         for k in modell_tco.get("karten") or []
@@ -1218,13 +839,6 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
     ]
     kandidaten = [k for k in pool if k.get("frisch", True)]
     if not kandidaten:
-        # Ein Bündel ohne vergleichbare Karte ist KEIN "kein Bündel": das
-        # Modell hat eines, nur keine belastbare Neu-Geraete-Rechnung
-        # (gemessener Fall: Galaxy S24 Ultra 512, einzige Karte erneuert).
-        # Zwei Leerzustaende statt einem - dieselbe Lehre wie "keine
-        # Angabe" gegen "nicht gemessen" bei den Tarifen. Und seit A3 ein
-        # dritter: alles da, nur alt - dann heißt die Lücke beim Stand,
-        # nicht beim Bestand.
         leer = TCO_LEER_NUR_ALT if pool else TCO_LEER_KEIN_VERGLEICHBARES
         return {
             "tco_ab": None,
@@ -1236,28 +850,12 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
             "tco_leer": leer,
             **leer_delta,
         }
-    # DER ZEITRAUM DER SPALTE (P0-B-h2). Hier stand der Kommentar "ein
-    # Filter auf `karte['laufzeit'] == 24` ist bewusst NICHT gebaut ...
-    # wird `laufzeit` je wieder variabel, MUSS an dieser Stelle auf 24
-    # gefiltert werden". Genau das ist eingetreten - nur nicht an
-    # `laufzeit` (der Tariflaufzeit der Rechnung, weiter konstant 24),
-    # sondern am ZEITRAUM DER LEITZAHL: `leitzahl_monate` ist seit
-    # P0-B-h1 die eine Zahl, die sagt, was `gesamt` traegt, und sie ist
-    # bei einem zusammengelegten Buendelmonatspreis 36. Gefiltert wird
-    # mit der EINEN Vergleichsregel des Projekts
-    # (`tco_model.zeitraum_vergleichbar`): ein unbekannter Zeitraum ist
-    # NIE gleich und faellt heraus, statt als 24 zu gelten.
     vergleichbare = [
         k
         for k in kandidaten
         if zeitraum_vergleichbar(k.get("leitzahl_monate"), TCO_HORIZONT)
     ]
     if not vergleichbare:
-        # Gemessene, aktuelle Buendel - aber keines ueber den Zeitraum
-        # dieser Spalte (8 Modelle am 21.09.2026, alle nur mit einem
-        # 1&1-Buendel ueber 36 Monate). Die Zahl steht mit ihrem eigenen
-        # Etikett in der Vergleichsansicht; HIER waere sie eine
-        # 36-Monats-Summe unter einem 24-Monats-Kopf.
         return {
             "tco_ab": None,
             "tco_anbieter": None,
@@ -1269,20 +867,12 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
             **leer_delta,
         }
     bester = min(vergleichbare, key=lambda k: k["gesamt"])
-    # Der TRAEGER des Abstands: das guenstigste FREMDE Angebot. Nur wo
-    # der Wettbewerb selbst fuehrt, ist der Traeger zugleich das beste
-    # Angebot - dann sind Leitzahl und Abstand eine Karte wie bisher.
     fremde = [k for k in vergleichbare if not k.get("eigen")]
     traeger = (
         bester
         if not bester.get("eigen")
         else (min(fremde, key=lambda k: k["gesamt"]) if fremde else None)
     )
-    # Die fremden Angebote, die der Zeitraum der Spalte ausschliesst -
-    # aus DERSELBEN Kandidatenmenge, nur die andere Seite des Filters
-    # (Clean Code 7: eine Definition, zwei Lesarten). Sie sind der Grund,
-    # aus dem die Δ-Zelle leer bleibt, und deshalb steht ihr Zustand
-    # darin statt eines Strichs.
     im_zeitraum = {id(k) for k in vergleichbare}
     andere_laufzeit = [
         k for k in kandidaten if not k.get("eigen") and id(k) not in im_zeitraum
@@ -1291,48 +881,21 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
     if traeger is not None and traeger.get("delta_kurz"):
         delta_leer, delta_leer_grund = None, None
     elif referenz is None:
-        # OHNE Referenz gibt es keinen Abstand, gleich wie viele
-        # Wettbewerber-Angebote daneben stehen - das ist die Bedingung,
-        # die `TCO_DELTA_GRUND_KEIN_WETTBEWERBER` unten voraussetzt
-        # ("Vodafone listet dieses Modell, aber ..."). Deshalb steht die
-        # Frage seit P0-B-h2 VOR den beiden Wettbewerber-Zustaenden.
         delta_leer = TCO_DELTA_LEER_KEINE_REFERENZ
         delta_leer_grund = TCO_DELTA_GRUND_KEINE_REFERENZ
     elif not geraete_tco_karten.referenz_ist_frisch(referenz, heute):
-        # GELESEN, nicht nachgerechnet: dieselbe Funktion, mit der
-        # `geraete_tco_karten.modelle` entscheidet, ob die Referenz
-        # ueberhaupt Massstab eines Deltas sein darf (S2-1). Ist sie es
-        # nicht, traegt KEINE Karte des Modells ein Delta - und der Grund
-        # ist der Stand der Referenz, nicht der Wettbewerb.
         delta_leer = TCO_DELTA_LEER_ALTE_REFERENZ
         delta_leer_grund = TCO_DELTA_GRUND_ALTE_REFERENZ
     elif traeger is None and andere_laufzeit:
-        # Ein Wettbewerber-Angebot GIBT es - nur nicht ueber den Zeitraum
-        # der Referenz. Der Strich hiess hier "kein Angebot" (A2) und war
-        # damit die falsche Aussage (P0-B-h2, Befund 2). Kurz und Satz
-        # kommen aus der Karte selbst, also aus derselben Definition, die
-        # die Buendelzeile beschriftet (`geraete_tco_karten.delta_zustand`)
-        # - zwei Formulierungen fuer denselben Zustand waeren zwei
-        # Zustaende.
         zustand = (
             min(andere_laufzeit, key=lambda k: k["gesamt"]).get("delta_zustand") or {}
         )
         delta_leer = zustand.get("kurz") or geraete_tco_karten.DELTA_ANDERE_LAUFZEIT
         delta_leer_grund = zustand.get("satz") or TCO_DELTA_GRUND_ANDERE_LAUFZEIT
     elif traeger is None:
-        # Vodafone fuehrt, und KEIN Wettbewerber ist vergleichbar erhoben
-        # (4 Zeilen des Bestands am 20.09.) - die Referenz existiert, die
-        # Luecke liegt beim Wettbewerb.
         delta_leer = TCO_DELTA_LEER_KEIN_WETTBEWERBER
         delta_leer_grund = TCO_DELTA_GRUND_KEIN_WETTBEWERBER
     else:
-        # Ein Traeger MIT dem Zeitraum der Spalte und ohne Abstand: seit
-        # dem Filter oben tragen Traeger und Referenz denselben Zeitraum,
-        # und damit rechnet `geraete_tco_karten._delta` einen Betrag (auch
-        # eine Annaeherung ist einer). Bleibt die Zelle doch leer, steht
-        # der Zustand der Karte darin - und wenn sie keinen nennt, dieser
-        # Name. Ein Strich waere hier "kein Angebot" (A2) und damit
-        # wieder die falsche Aussage.
         zustand = traeger.get("delta_zustand") or {}
         delta_leer = zustand.get("kurz") or TCO_DELTA_LEER_UNBESTIMMT
         delta_leer_grund = zustand.get("satz") or TCO_DELTA_GRUND_UNBESTIMMT
@@ -1344,8 +907,6 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
         "tco_delta": delta.get("betrag"),
         "tco_delta_prozent": delta.get("prozent"),
         "tco_delta_kurz": (traeger or {}).get("delta_kurz"),
-        # Der Traeger des Abstands, wo er ein ANDERES Angebot ist als das
-        # der Leitzahl - der title der Zelle nennt ihn.
         "tco_delta_anbieter": (
             traeger.get("anbieter")
             if bester.get("eigen") and traeger is not None
@@ -1354,8 +915,6 @@ def _tco_spalte(modell_tco: dict | None, heute: str = "") -> dict:
         "tco_delta_leer": delta_leer,
         "tco_delta_leer_grund": delta_leer_grund,
         "tco_band": bester.get("band"),
-        # Der Name der Stufe ("XS") aus derselben Ableitung wie Chip und
-        # Export - die Vorlage formatiert ihn nicht selbst.
         "tco_band_label": band_label(bester.get("band")),
         "tco_beleg": {
             "quelle_url": bester.get("quelle_url", ""),
@@ -1484,9 +1043,6 @@ def katalog_modellzeilen(
     )
     tco_je_id = {m.get("id"): m for m in (tco_modelle or [])}
 
-    # Schritt 1: Listungszeilen (dieselbe Bauform wie Reiter 2) je Modell
-    # gruppieren. Der Schluessel ist derselbe wie in der TCO-Ansicht -
-    # EINE Modellmenge, nicht 111 gegen 97 mit zwei Schluesseln.
     gruppen: dict[str, dict] = {}
     for e in eintraege:
         zeile = _katalog_zeile(e, katalog)
@@ -1511,19 +1067,6 @@ def katalog_modellzeilen(
         g["eintraege"].append(e)
         g["zeilen"].append(zeile)
 
-    # P5-AUFTRAG 1 (STRATEGIE_GERAETE_V3, 18.09.2026): SICHTBARKEIT FOLGT DEN
-    # DATEN, NICHT DEM WEG - Buendel ODER Listung genuegt. Ein Geraet, das
-    # nur im Buendel verkauft wird (gemessener Fall: das iPhone 18 kam am
-    # 17.09. mit 105 Buendeln an, die erste Listung stand noch nicht; die
-    # iPad-Titel stehen heute noch in der Unbekannten-Liste), bekam KEINE
-    # Katalog-Zeile - der Radar nannte es "nicht im Katalog", obwohl der
-    # Bestand es laengst trug. Diese Modelle bekommen ihre Gruppe aus dem
-    # Bündel-Store: Felder, die nur eine Listung fuellen kann (ab-Preis,
-    # Farben, Listungs-Aufklapper), bleiben ehrlich leer, und die
-    # Preiszelle traegt die Bündel-Angabe ("nur im Bündel", derselbe Zweig
-    # wie die 1&1-Zeilen). Ein Modell OHNE Listung UND OHNE Bündel bleibt
-    # draussen - ohne Daten keine Zeile, das ist dieselbe Regel in der
-    # anderen Richtung.
     for mid, geraet in buendel_geraete.items():
         if mid in gruppen:
             continue
@@ -1546,19 +1089,6 @@ def katalog_modellzeilen(
         zeilen = sorted(gruppe["zeilen"], key=_katalog_zeile_schluessel)
         eintraege_modell = gruppe["eintraege"]
 
-        # Schritt 2: der ab-Preis - min ueber die NEU-Barpreise je Anbieter.
-        # Je Anbieter zuerst das Minimum (fuenf Farben eines Ladens sind
-        # fuenfmal derselbe Preis, `_guenstigstes_je_laden`-Lehre), dann das
-        # Gesamt-Minimum MIT Beleg: Betrag, Link, Abrufdatum.
-        #
-        # A3: FRISCHE Belege zuerst - `ist_frisch`, dieselbe Definition
-        # wie die Tafel (Clean Code 7). Ein alter Beleg stellt kein "ab"
-        # und keine Spanne von heute. Nur wenn GAR kein frischer Beleg
-        # existiert, faellt die Zeile nicht auf "ohne Preis" zurueck,
-        # sondern zeigt den letzten Stand MIT Marke (`ab_alt`, harte
-        # Regel 9: es IST ein Preis da, nur kein aktueller) - die
-        # Bündel-Angabe (Schritt 5) greift dann nicht, denn es gibt
-        # Barpreis-Belege, nur keine frischen.
         je_anbieter: dict[str, dict] = {}
         je_anbieter_alt: dict[str, dict] = {}
         for e in eintraege_modell:
@@ -1576,19 +1106,8 @@ def katalog_modellzeilen(
                     ziel[anbieter] = beleg
         auswahl = je_anbieter or je_anbieter_alt
         ab_beleg = min(auswahl.values(), key=lambda b: b["betrag"]) if auswahl else None
-        # Der benannte Zustand "nichts aktuelles, aber ein letzter Stand":
-        # die Vorlage graut den ab-Preis aus und haengt die Marke daran
-        # (`geraete_tco_karten.alt_marke_fuer` - derselbe Satz wie an der
-        # Bündelzeile, eine Stelle).
         ab_alt = bool(je_anbieter_alt) and not je_anbieter
 
-        # Schritt 3: die Spanne - nur wenn WESSENTLICH verschieden. Dieselbe
-        # Schwelle wie der Preisvergleich (ODER, nicht UND: bei 200 EUR sind
-        # 15 EUR viel und 3 Prozent wenig, bei 2000 umgekehrt). Ein
-        # Farbaufschlag von 5 EUR ist keine Spanne, die jemand lesen will.
-        # A3: gerechnet ueber DIESELBE Auswahl wie der ab-Preis (`auswahl`)
-        # - ein alter Anbieter stand sonst als Spannengrenze da, obwohl
-        # sein "ab" schon herausgefallen ist.
         spanne: list = []
         if len(auswahl) >= 2 and ab_beleg is not None:
             betraege = [b["betrag"] for b in auswahl.values()]
@@ -1599,10 +1118,6 @@ def katalog_modellzeilen(
             ):
                 spanne = [round(von, 2), round(bis, 2)]
 
-        # Schritt 4: die Bündel-Angabe an den Zeilen OHNE Preis (die 37
-        # 1&1-Zeilen). Der Monatspreis kommt aus dem Bündel-Store desselben
-        # Anbieters, derselben Modellmenge - nie aus der Listung allein,
-        # denn der Beleg (Quelle, Datum) haengt am Bündel.
         anbieter_mit_buendel = {}
         for z in zeilen:
             if z["preis"] is not None or z["zuzahlung"] is not None:
@@ -1618,13 +1133,6 @@ def katalog_modellzeilen(
             z["buendel_abgerufen_am"] = treffer["abgerufen_am"]
             anbieter_mit_buendel[treffer["anbieter"]] = treffer
 
-        # Schritt 5: der Bündel-Zustand der MODELLZEILE - nur wenn es
-        # keinen Barpreis gibt (gemessener Fall: Nothing Phone 4a Pro, nur
-        # 1&1). Ein Modell MIT Barpreis braucht ihn nicht: sein Preis steht
-        # da, das Bündel steht in der TCO-Ansicht. P5-Auftrag 1: bei einem
-        # Modell OHNE Listung gibt es keine zeilen ohne Preis, denen man
-        # die Angabe anhaengen koennte - der Pool kommt dann direkt aus
-        # dem Bündel-Store desselben Modells.
         buendel_angabe = None
         if ab_beleg is None:
             pool = (
@@ -1635,18 +1143,11 @@ def katalog_modellzeilen(
             if pool:
                 buendel_angabe = min(pool, key=lambda b: b["monat"])
 
-        # Schritt 6: die TCO-Felder aus der TCO-Aufbereitung (nur Wahl des
-        # besten Angebots, keine Rechnung - siehe `_tco_spalte`).
         name = gruppe["modell"]
         if gruppe["speicher"]:
             name = f"{name} {int(gruppe['speicher'])} GB"
-        # `heute` ist die Uhr dieser Zeile (A3) - dieselbe, mit der oben
-        # die Frische der Listungen und der Karten gemessen wird.
         tco_felder = _tco_spalte(tco_je_id.get(mid), heute)
 
-        # Die Händler-Spalte zaehlt, WER das Geraet fuehrt. Ohne Listung
-        # (P5-Auftrag 1) sind das die Bündel-Anbieter - "0 Händler" neben
-        # "nur im Bündel bei congstar" widerspraeche der eigenen Zelle.
         listen_anbieter = sorted({z["anbieter"] for z in zeilen if z["anbieter"]})
         if not listen_anbieter:
             listen_anbieter = sorted(
@@ -1656,20 +1157,7 @@ def katalog_modellzeilen(
         ergebnis.append(
             {
                 "schluessel": mid,
-                # P4 Schritt 2c: trifft der Graph-Sprung der Zeitreihe dieses
-                # Modell? (Siehe Docstring zu `zr_erlaubt` - gelesen, nie
-                # nachgerechnet.) Das Feld ist Teil des EINEN Schluesselraums:
-                # Katalog und Radar tragen denselben `modell_schluessel`, und
-                # `zr` sagt, ob der zweite Reiter (Vergleichs-Zeitreihe) zum
-                # selben Modell fuehrt.
                 "zr": bool(zr_erlaubt and zr_erlaubt.get(mid)),
-                # P5-Auftrag 1: hat dieses Modell ein Bündel (gleich welcher
-                # SKU)? Die Vorlage entscheidet daran die Luecke "noch keine
-                # Zeitreihe" - ein Modell MIT Bündel, das (noch) nicht waehlbar
-                # ist, hat eine Zeitreihe, die MIT DEM NAECHSTEN Messtag
-                # beginnt; eines ohne Bündel nennt die TCO-Spalte den Grund
-                # ("kein Bündel gemessen"), dort waere der Satz die zweite
-                # Aussage fuer dieselbe Tatsache.
                 "hat_buendel": mid in buendel_geraete,
                 "device_id": gruppe["device_id"],
                 "modell": gruppe["modell"],
@@ -1679,14 +1167,9 @@ def katalog_modellzeilen(
                 "serie": gruppe["serie"],
                 "segment": gruppe["segment"],
                 "speicher": gruppe["speicher"],
-                # ---- Ansicht Einzelgeraepreis ----
                 "ab_preis": ab_beleg["betrag"] if ab_beleg else None,
                 "ab_anbieter": ab_beleg["anbieter"] if ab_beleg else None,
                 "ab_beleg": ab_beleg,
-                # A3: der ab-Preis dieses Modells ist ein LETZTER STAND, kein
-                # aktueller (kein frischer Beleg seit ALT_AB_TAGEN). Die
-                # Zeile bleibt mit Preis, Anbieter und Datum - ausgegraut,
-                # mit Marke - und zaehlt nicht in die Leitzahl des Katalogs.
                 "ab_alt": ab_alt,
                 "ab_alt_marke": (
                     geraete_tco_karten.alt_marke_fuer(ab_beleg.get("abgerufen_am", ""))
@@ -1697,7 +1180,6 @@ def katalog_modellzeilen(
                 "anbieter": listen_anbieter,
                 "farben": sorted({z["farbe"] for z in zeilen if z["farbe"]}),
                 "spanne": spanne,
-                # ---- Bündel-Zustand (statt "ohne Preis") ----
                 "nur_buendel": buendel_angabe is not None,
                 "buendel_monat": buendel_angabe["monat"] if buendel_angabe else None,
                 "buendel_anbieter": (
@@ -1712,20 +1194,12 @@ def katalog_modellzeilen(
                     if buendel_angabe
                     else None
                 ),
-                # ---- Ansicht TCO ----
                 **tco_felder,
-                # ---- Aufklapper (Listungs-Ebene, nichts geloescht) ----
                 "zeilen": zeilen,
                 "listungen": len(zeilen),
             }
         )
 
-    # Schritt 7: Ordnung und Deckel - dieselben Regeln wie Reiter 2, nur
-    # eine Ebene hoeher: Modellzeilen je Hersteller reihum
-    # (`_interleave_modelle_je_hersteller`, B5), innerhalb des Herstellers
-    # nach Segment/Baureihe/Generation (`_katalog_block_schluessel`, B1).
-    # Der Zeilendeckel `KATALOG_SICHTBAR` zaehlt Modelle - eine Zeile je
-    # Modell, ein Block-Deckel darueber gibt es seit P3 nicht mehr.
     ergebnis = _interleave_modelle_je_hersteller(ergebnis)
     sichtbar_zaehler = 0
     for z in ergebnis:
@@ -1733,14 +1207,6 @@ def katalog_modellzeilen(
         if not z["zeilen_rest"]:
             sichtbar_zaehler += 1
     return ergebnis
-
-
-# `_matrix()` ist am 30.08.2026 geloescht worden, mit der Sektion, die es
-# fuellte; die flache Listungs-Tabelle (`katalogzeilen`, 30.08.-18.09.2026)
-# ist ihrerseits mit P3 der Modell-Tabelle gewichen. Eine Rechnung weiter
-# laufen zu lassen und von keiner Vorlage lesen zu lassen waere derselbe
-# Befund wie `UEBERSICHT_MAX_ZEILEN` beim Review davor: lebendig klingende
-# Begruendung, keine Wirkung.
 
 
 def _heute_luecke(db: GeraeteDB, name: str, bezugstag, liefert: bool) -> bool:
@@ -1838,22 +1304,7 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
     """
     mit_daten = {e.get("anbieter") for e in eintraege}
     bekannt = {a.name for a in quellen.anbieter}
-    # DER ABDECKUNGSWAECHTER (P1/C2) - dieselbe Funktion, die der Lauf
-    # fuer Protokoll und Mail ruft. Die Seite rechnet nichts nach und
-    # fuehrt keine zweite Liste; sie zeigt, was der Waechter sagt
-    # (Clean Code 7). OHNE `heute`: Bezug ist der letzte MESSTAG des
-    # Bestands, nicht das Berichtsdatum der Seite - die Geraetedaten sind
-    # regelmaessig neuer als der juengste Bericht (siehe `_bewegung`), und
-    # ein Alarm, der am Berichtsdatum haengt, verschwaende genau an dem
-    # Tag, an dem er entsteht.
     alarme = {a.anbieter: a.als_dict() for a in db.ausfall_alarme()}
-    # DER DRITTE SEITENZUSTAND (S2-2). `liefert` kommt aus dem BESTAND und
-    # sagt nichts darueber, ob der Lauf den Anbieter HEUTE erreicht hat -
-    # ein Anbieter ausserhalb seiner Besuchszeit bekam so einen gruenen
-    # Punkt und das Wort "liefert", eine Entwarnung, die niemand gemessen
-    # hat. Gefragt wird derselbe Bezugstag wie oben und dieselbe
-    # Definition, die der Waechter benutzt (`GeraeteDB.lesezustand`, keine
-    # zweite Liste - Clean Code 7).
     bezugstag = db.letzter_messtag()
     zeilen, ohne_hardware = [], []
     for a in sorted(quellen.anbieter, key=lambda x: (x.rang, x.name)):
@@ -1881,33 +1332,11 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
             "heute_luecke": _heute_luecke(db, a.name, bezugstag, a.name in mit_daten),
             "hardware_vermarktung": vermarktung,
             "bilanz": db.laufbilanz(a.name),
-            # Der Satz zum dritten Zustand: "heute nicht gelesen" allein
-            # laesst die naechste Frage offen - seit wann?
             "heute_satz": _heute_satz(db.laufbilanz(a.name)),
-            # Die benannte Luecke der Quelle: tote Produktadressen aus der
-            # Sitemap bzw. Kategorieseite des Anbieters.
             "tote_satz": _tote_satz(db.laufbilanz(a.name)),
-            # Der Alarm ODER `None` - nie ein leeres dict: "kein Alarm"
-            # heisst hier "keine Aussage", und eine leere Huelle in der
-            # Vorlage sieht aus wie eine Entwarnung (Clean Code 3).
             "abdeckung": alarme.get(a.name),
         }
-        # Der gruene Punkt als FERTIGE Entscheidung - Vorlage und Kennzahl
-        # lesen dasselbe Feld, statt die Reihenfolge je zweimal zu bauen.
         satz["liefert_heute"] = _liefert_heute(satz)
-        # GENAU DREI ZUSTAENDE, und keiner davon heisst "gemessen, aber ohne
-        # Adapter". Diese vierte Kategorie ist am 30.08.2026 abgeschafft
-        # worden, weil sie nichts aussagte: sie stand fuer "koennte man
-        # bauen" und blieb stehen, ohne dass jemand entschied.
-        #
-        # Der mittlere Zustand heisst "ohne_daten" und nicht "gesperrt", und
-        # das ist keine Wortklauberei: Medimax und ElectronicPartner sind
-        # AKTIV, tragen einen Adapter und werden jede Nacht abgerufen - sie
-        # finden nur seit sechzehn Naechten nichts. Als "gesperrt" gefuehrt
-        # behauptete die Seite eine Sperre, die es nicht gibt, und der
-        # eigentliche Befund (ein kaputter Extraktor) verschwand hinter dem
-        # falschen Etikett. Der Auftrag nennt beide Faelle nebeneinander:
-        # "technisch gesperrt, begruendet" und "ohne Fund, Ursache X".
         satz["zustand"] = (
             "liefert"
             if satz["liefert"]
@@ -1920,10 +1349,6 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
         else:
             zeilen.append(satz)
 
-    # Ein Anbieter, der in der Datenbank steht, aber nicht (mehr) in der
-    # Konfiguration: umbenannt, entfernt, vertippt. Die Datenbank loescht per
-    # Design nie, also bleibt er da - und faellt sonst genau unter dem Satz
-    # durch, der verspricht, dass kein Anbieter stillschweigend fehlt.
     for name in sorted(n for n in mit_daten if n and n not in bekannt):
         fremd = {
             "name": name,
@@ -1957,26 +1382,8 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
     return {
         "zeilen": zeilen,
         "ohne_hardware": ohne_hardware,
-        # Die groesste Zahl des Bereichs, und sie liest denselben
-        # Lesezustand wie Punkt und Waechter (`_liefert_heute`) - aus dem
-        # Bestand gezaehlt stand sie als Entwarnung ueber Zeilen, die
-        # "heute nicht gelesen" tragen (S2-A).
         "liefernd": sum(1 for z in zeilen if z["liefert_heute"]),
-        # Der Nenner der Zeile "N von M liefern Daten" muss zu den ZEILEN
-        # passen, die darunter stehen - sonst steht ueber 21 Zeilen die Zahl
-        # 23 (der Fehlertyp aus CLAUDE.md §6).
         "aufgefuehrt": len(zeilen),
-        # Die drei Zustaende als Zahlen. Sie muessen sich auf `konfiguriert`
-        # summieren - eine vierte Kategorie kann damit nicht unbemerkt
-        # zurueckwachsen, und genau davon kam dieser Abschnitt.
-        #
-        # Gezaehlt wird nur, was KONFIGURIERT ist. `zeilen` traegt zusaetzlich
-        # die Anbieter, die in der Datenbank stehen und nicht (mehr) in der
-        # Konfiguration - umbenannt oder entfernt. Sie mitzuzaehlen liesse die
-        # Summe ueber `konfiguriert` steigen, und die Seite meldete "5 von 4
-        # konfigurierten Anbietern liefern". Der Zweig existiert genau fuer
-        # diesen Fall; ihn in die Invariante zu ziehen hiesse, sie beim
-        # ersten Umbenennen zu brechen.
         "liefernd_konfiguriert": sum(
             1 for z in zeilen if z["liefert"] and z["name"] in bekannt
         ),
@@ -1987,11 +1394,6 @@ def _quellenlage(quellen, db: GeraeteDB, eintraege: list) -> dict:
         "unbekannt": [n for n in sorted(mit_daten) if n and n not in bekannt],
         "seiten": quellen.seiten_zahl,
     }
-
-
-# --------------------------------------------------------------------------
-# Der Einstieg
-# --------------------------------------------------------------------------
 
 
 def leer(fehler: str = "") -> dict:
@@ -2019,10 +1421,6 @@ def leer(fehler: str = "") -> dict:
             "hersteller": 0,
             "schwelle_erreicht": False,
         },
-        # Der Notzustand muss JEDES Feld tragen, das die Vorlage liest -
-        # genau dafuer gibt es ihn. Die Alarme kommen aus derselben Funktion
-        # wie im Normalfall, damit die zwei Schluesselmengen nicht
-        # auseinanderlaufen koennen (ein Test haelt sie gegeneinander).
         "alarme": geraete_alarme.leer(),
         "segmente": [],
         "segment_label": SEGMENT_LABEL,
@@ -2032,10 +1430,6 @@ def leer(fehler: str = "") -> dict:
         "zeitreihe": geraete_zeitreihe.leer(),
         "ausfaelle": [],
         "katalog_modelle": [],
-        # P4-Fix (Sicht-Pruefung 18.09.): die Katalog-Leitzahl auch im
-        # Notzustand - der Schluesselmengen-Test haelt Normal- und Not-
-        # zustand gegeneinander, und die Vorlage fragt das Feld bedingungs-
-        # los ab (None laesst die Leitzahl weg, der Leer-Satz traegt).
         "katalog_ab_preis": None,
         "katalog_sichtbar": KATALOG_SICHTBAR,
         "lifecycle_sichtbar": LIFECYCLE_SICHTBAR,
@@ -2174,43 +1568,15 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
     state_dir = Path(state_dir)
     db = GeraeteDB(state_dir / "geraete_db.json")
     historie = Preishistorie(state_dir / "geraete_preise.jsonl")
-    # Der Buendelbestand ist eine EIGENE Datei und heute nicht vorhanden -
-    # `TcoDB` faengt das ab und startet leer (`analyze/tco_store`). Er wird
-    # hier gelesen und nicht in `geraete_pipeline`, weil dieser Reiter beim
-    # RENDERN entsteht: er hat keinen eigenen State und keine LLM-Stufe,
-    # dieselbe Bauform wie `report/wettbewerb.py`.
     tco_db = TcoDB(state_dir / "geraete_tco.json")
-    # DER TARIFBESTAND GEHOERT ZUR TCO-ANSICHT, nicht nur zum Tarifzweig:
-    # er traegt die MINDESTLAUFZEIT des Tarifs, und ohne sie ist keine
-    # Leitzahl rechenbar. o2 bindet den Tarif 24 Monate und finanziert das
-    # Geraet ueber 36 - wer die zwei gleichsetzt, addiert zwoelf
-    # Tarifmonate, die niemand schuldet (A5.5). Fehlt die Datei, bleibt
-    # `je_id` leer und die Karten sagen ihre Luecke.
     tarifbestand = Tarifbestand.aus_datei(state_dir / "tarife.jsonl")
     alle = db.eintraege()
     sichtbar = [e for e in alle if e.get("status") in _SICHTBAR]
 
-    # ZWEI MENGEN, und jede Zeile darunter sagt, welche sie meint (siehe
-    # `bestand_und_belastbar`):
-    #
-    #   `bestand`   was es GIBT - bereinigt, aber ungeprueft. Regal,
-    #               Farbbericht, CSV, Betriebszahlen.
-    #   `belastbar` was gegeneinander gerechnet werden DARF. Vergleich,
-    #               Alarme, Preisverlauf, Lifecycle.
-    #
-    # `sichtbar` bleibt der ROHBESTAND und hat genau noch einen Verbraucher:
-    # die Veroeffentlichungsschwelle (siehe unten). Eine
-    # Datenqualitaetsheuristik darf keine Navigation schalten.
     pruefung, bestand, belastbar = bestand_und_belastbar(sichtbar, katalog)
 
-    # Laden und Anzeigename je Anbieter. Zwei Marken desselben Shops
-    # (mobilcom-debitel/freenet) muessen EINE Spalte werden, sonst vergleicht
-    # die Karte einen Laden mit sich selbst.
     laden = {a.name: (a.shop or a.name) for a in getattr(quellen, "anbieter", [])}
     anzeige = {a.name: (a.anzeige or a.name) for a in getattr(quellen, "anbieter", [])}
-    # Der Anzeigename haengt am LADEN, nicht am Markennamen: die Spalte heisst
-    # nach dem Shop, und der Shop traegt den Namen, unter dem seine Quelle
-    # erreichbar ist.
     anzeige.update(
         {
             (a.shop or a.name): (a.anzeige or a.name)
@@ -2241,9 +1607,6 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
                 "preis": float(preis),
                 "speicher": speicher,
                 "farbe": e.get("farbe_normalisiert") or e.get("farbe_roh") or "",
-                # Ein refurbished Geraet ist nicht dasselbe Angebot wie ein neues
-                # - es gehoert in den Aggregationsschluessel, sonst schluckt der
-                # niedrigere Preis den hoeheren.
                 "zustand": e.get("zustand") or "neu",
                 "verfuegbarkeit": e.get("verfuegbarkeit", "unbekannt"),
                 "url": e.get("quelle_url", ""),
@@ -2254,12 +1617,6 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
             }
         )
 
-    # Die aktuelle Generation JE BAUREIHE, nicht je Hersteller. `generation`
-    # ist die Nummer innerhalb einer Reihe: Samsungs Galaxy A57 traegt 57,
-    # die Galaxy S26 traegt 26, das Galaxy Z Fold8 traegt 8. Je Hersteller
-    # verglichen gewinnt die A-Reihe - die Standardansicht zeigte am
-    # 29.08.2026 drei Galaxy A57 und keine einzige S26, also das aktuelle
-    # Flaggschiff nicht. Der Filter blendet weiterhin, er rechnet nicht neu.
     for p in punkte_ohne_vertrag:
         p["serie"] = serie_aus_modell(p.get("modell") or "")
     hoechste: dict[tuple, int] = {}
@@ -2273,13 +1630,6 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
             "generation"
         ] == hoechste.get((p["hersteller"], p["serie"]))
 
-    # Wie oft ist der Geraetezweig ueberhaupt schon gelaufen? Das ist die
-    # Frage hinter "gibt es einen frueheren Stand" - und sie wird an den
-    # MESSTERMINEN beantwortet, nicht an der Preishistorie (die traegt nur
-    # Aenderungspunkte und schweigt, wenn sich nichts aendert) und nicht an
-    # `laeufe` (das zaehlt nur VOLLSTAENDIGE Laeufe - mobilcom-debitel wird
-    # jede Nacht bestaetigt und war dort trotzdem nie verbucht, weil sein
-    # Lauf am Zeitbudget nie fertig wurde).
     punkte_alle = historie.alle_punkte()
     termine_je_anbieter: dict[str, list] = {}
     laeufe_je_anbieter: dict[str, int] = {}
@@ -2308,10 +1658,6 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         laeufe_je_anbieter=laeufe_je_anbieter,
         termine_je_anbieter=termine_je_anbieter,
     )
-    # P3: der Satz, der die leere Nachfolger-Sektion erklaert, und der Beleg
-    # dafuer, wie viel einer gefuellten Zeile wirklich gemessen ist. Beides
-    # entsteht HIER und nicht in `geraete_lifecycle.auswertung` - dort
-    # arbeitet parallel ein anderes Paket an der Rechnung selbst.
     lifecycle = {
         **lifecycle,
         "nachfolger": _mit_beobachtungsbeleg(lifecycle["nachfolger"]),
@@ -2320,20 +1666,8 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         ),
     }
 
-    # Das ECHTE Abrufdatum. Faellt der naechtliche Lauf zwei Wochen aus,
-    # behaelt die Datenbank ihre alten Werte - die Legende darf trotzdem
-    # nicht den Berichtstag behaupten. Auf einer Seite, deren Verkaufsargument
-    # der Belegzwang ist, ist das die teuerste Sorte falscher Zahl.
-    # Auf dem BESTAND, nicht auf dem Rohbestand: der Kopf sagt "Preise vom
-    # ...", und gemeint sind die Preise, die auf dieser Seite stehen. Eine
-    # zusammengefasste Zwillingshaelfte darf das Datum nicht setzen.
     abrufdaten = sorted(e.get("abgerufen_am") for e in bestand if e.get("abgerufen_am"))
 
-    # Gezaehlt werden LAEDEN, nicht Marken. Die dritte Frage der Seite lautet
-    # "was kostet dasselbe Geraet bei wem" - und zwei Marken desselben Shops
-    # (mobilcom-debitel/freenet) beantworten sie nicht. Mit Marken gezaehlt
-    # schaltete sich der Navigationseintrag mit "2 Anbietern" frei, waehrend
-    # nur EIN Laden lieferte.
     def _laeden(menge):
         return {laden.get(e.get("anbieter"), e.get("anbieter")) for e in menge}
 
@@ -2344,95 +1678,35 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
             if g and g.hersteller
         }
 
-    # DIE VEROEFFENTLICHUNGSSCHWELLE RECHNET GEGEN DEN ROHBESTAND - als
-    # einzige Zahl dieser Funktion. Bis zum 29.08.2026 nahm sie die
-    # Spaltenzahl der Herstelleransicht, und die hing an der
-    # Plausibilitaetspruefung. Damit haette ein Anbieter, der an einem Tag
-    # seine Farbvarianten mit weiten Farbabstaenden bepreist, den
-    # Navigationseintrag "Geraete" auf JEDER Seite verschwinden lassen -
-    # ohne Fehler, ohne Warnung, und niemand faende die Seite mehr. Eine
-    # Datenqualitaetsheuristik darf keine Navigation schalten (CLAUDE.md §6).
-    # Das gilt fuer die Bereinigung genauso: sie kann heute keinen Anbieter
-    # verlieren (ein Zwillingspaar laesst immer einen Ueberlebenden), aber
-    # eine Schwelle, die sich auf diese Eigenschaft verlaesst, ist keine.
     erreicht = schwelle_erreicht(
         anbieter=len(_laeden(sichtbar)),
         skus=len({e.get("sku_id") for e in sichtbar}),
         hersteller=len(_hersteller(sichtbar)),
     )
 
-    # Die Betriebszahlen am Fuss der Seite stehen in EINEM Satz ("N Geraete
-    # in M Varianten, zusammen L Listungen bei A Anbietern") - sie muessen
-    # also aus EINER Menge kommen, und zwar aus der, die die Seite zeigt.
     laeden_mit_daten = _laeden(bestand)
     hersteller_mit_daten = _hersteller(bestand)
 
-    # Reiter 1. Die Alarmtabelle liest den fertigen Vergleich - sie rechnet
-    # keine Zahl zweimal (CLAUDE.md 6: zwei Rechnungen fuer dieselbe Zahl
-    # sind zwei Zahlen). Die Ausreisser-Markierung kommt aus der Pruefung:
-    # ein Ausreisser wird gemeldet statt geloescht, und gemeldet heisst DORT
-    # sichtbar, wo jemand die Zahl liest.
     vergleich = geraete_vergleich.beide_preisarten(belastbar, katalog, laeden=laden)
     alarme = geraete_alarme.zeilen(
         vergleich["ohne_vertrag"], pruefung.get("auffaellig")
     )
 
-    # E2 (16.09.2026): die TCO-ZEITREIHE der Hauptansicht - eigene
-    # Aufbereitung (Modell x Band x Anbieter x Messtag aus der rohen
-    # Historie) aus DEMSELBEN tco-Dict wie die Bündel-Zeilen (keine zweite
-    # Rechnung für dieselben Zahlen), eigener Fehlertopf: ein kaputter
-    # Graph darf die GERAETESEITE nicht kosten, die übrigen Reiter bleiben
-    # lesbar (dieselbe Auffanglogik wie beim Export weiter unten).
-    #
-    # A3-Nachbesserung (Pruefer 20.09.2026, "hoch"): Der Bezug der
-    # Alterung ist der SPAETERE zweier Uhren, nicht der Berichtstag.
-    # `heute` kommt aus `render_site` und ist das Datum des juengsten
-    # RADAR-Berichts (Mi/Fr) - aber die Geräteseite rendert TAEGLICH
-    # (`geraete.yml`, 02:17 UTC) und fasst die Berichte nicht an. Am
-    # 20.09.2026 stand der juengste Bericht auf dem 16.09.: mit ihm als
-    # `heute` waren alle sechs Telekom-Buendel vom 15.09. "einen Tag alt"
-    # und fuehrten frisch Antwortzeile und Spanne - die 3-Tage-Regel war
-    # regelmäßig (So-Mi) wirkungslos. Der Buendel-Store schreibt bei
-    # JEDEM nächtlichen Lauf sein eigenes `updated`; derselbe Gedanke wie
-    # in `_auffaellig` ("Als Bezug gilt deshalb der spaetere der beiden
-    # Tage"). Ohne `heute` (lokaler Aufruf, alte Tests) altert weiter
-    # nichts - der Berichtstag bleibt die einzige Uhr, die der Aufruf
-    # stellt.
     tco_heute = _spaeterer_tag(heute, tco_db.updated) if heute else ""
-    # A3-Nachbesserung (Pruefer 20.09.2026, "hoch"): dieselbe Uhrregel fuer
-    # den KATALOG - sein "ab" liest LISTUNGEN, und deren Store
-    # (geraete_db.json) schreibt sein eigenes `updated` bei jedem
-    # naechtlichen Lauf. Der spaetere von Berichtstag und Bestands-Stand
-    # stellt die Uhr fuer die Frische der ab-Auswahl.
     bestand_heute = _spaeterer_tag(heute, db.updated) if heute else ""
     tco = geraete_tco_view.aufbereiten(
         tco_db.buendel(),
         tco_db.referenzen(),
         belastbar,
         katalog,
-        # B3 (21.09.2026): `je_id_aktuell`, nicht `je_id` - ein Buendel
-        # loest immer auf den BARE `tarif_id` auf, und der bare Schluessel
-        # gehoert oft dem Pflichtdokument (Bestandsschutz der Zeitreihe,
-        # `tarif_bezug.Tarifbestand`). `je_id_aktuell` traegt dort die
-        # Live-Shop-Lesart, wo es sie gibt - dieselbe Regel wie fuer die
-        # SIM-only-Referenz nebenan.
         lesbar=tco_db.lesbar,
         tarife=tarifbestand.je_id_aktuell,
-        # O4: der Anbietertyp fuer die Spalte des TCO-Exports (der
-        # Store traegt ihn nicht) und die Lage der Buendel-Historie
-        # fuer den ehrlichen Satz im Verlaufs-Reiter.
         anbieter_typen={a.name: a.typ for a in quellen.anbieter},
         tco_historie=tco_db.historie_lage(),
-        # A3: der Bezugstag schaltet die Alterung ein - ohne ihn altert
-        # nichts (`geraete_tco_karten.ist_frisch`).
         heute=tco_heute,
     )
     ausfaelle: list[Ausfall] = []
     try:
-        # A1: derselbe Tarifbestand wie die Tafel - die Punkte der Historie
-        # rechnet die Zeitreihe mit der HEUTIGEN Leitzahl, phasengewichtet
-        # ueber dieselben Phasen (`phasen_fuer_buendel`, ohne Widerspruch
-        # zur Messung).
         zeitreihe = geraete_zeitreihe.aufbereiten(
             state_dir, tco, tarife=tarifbestand.je_id_aktuell
         )
@@ -2443,44 +1717,22 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         zeitreihe = geraete_zeitreihe.leer()
         ausfaelle.append(Ausfall.aus_ausnahme(ZEITREIHE_TEIL, exc))
 
-    # P4 Schritt 2c (18.09.2026): die WAHL-Menge der Zeitreihe (Modell ->
-    # nicht-leere Bänder-Liste), gelesen aus DEMSELBEN Knoten, aus dem
-    # app.js waehlt - der Katalog-Graph-Sprung darf nur stehen, wo der
-    # Sprung auch trifft. Ein Modell ohne Bündel oder unter der Auto-
-    # Messtag-Schwelle ist dort nicht waehlbar; sein Link waere ein toter.
     zr_erlaubt = {
         k: b
         for k, b in ((zeitreihe.get("daten") or {}).get("erlaubt") or {}).items()
         if b
     }
 
-    # P4-Fix (Sicht-Pruefung 18.09., Falz 1): die Leitzahl des KATALOGS -
-    # der guenstigste Einzelgeraetepreis des Regals, EINE Rechnung an
-    # EINER Stelle (`katalog_leitzahl`, aus denselben Modellzeilen, die
-    # die Tabelle rendert - die Vorlage zeigt, sie aggregiert nicht). Der
-    # Katalog war der einzige Reiter ohne Falz-Antwort: die groesste
-    # Schrift seiner Tafel war die h2.
     katalog_modelle = katalog_modellzeilen(
         bestand,
         katalog,
         (tco or {}).get("modelle"),
         tco_db.buendel() if tco_db.lesbar else _buendel_aus_listungen(bestand),
         zr_erlaubt=zr_erlaubt,
-        # A3: die Uhr der ab-Auswahl - der spaetere von Berichtstag und
-        # Bestands-Stand (siehe `bestand_heute` oben).
         heute=bestand_heute,
     )
     katalog_ab_preis = katalog_leitzahl(katalog_modelle)
 
-    # P5-LIVE-PRUEFUNG R3 (18.09.2026): Wer im Zeitreihen-Suchfeld nach
-    # einem Modell sucht, das der Katalog kennt, die WAHL aber noch nicht
-    # (Bündel mit erst einem Messtag - der iPhone-18-Fall des 17.09.),
-    # bekam "kein Treffer" ohne ein Wort. Der Grund steht an der Katalog-
-    # zeile, aber der Leser steht am Suchfeld. Der Wahl-Knoten traegt
-    # deshalb dieselben "noch keine Zeitreihe"-Modelle (hat_buendel und
-    # nicht zr - GELESEN aus denselben Zeilen, nicht nachgerechnet) mit
-    # Titel und fruehestem Belegdatum; app.js zeigt daraus EINE Zeile,
-    # nur bei 0 Treffern und Katalog-Treffer fuer denselben Begriff.
     katalog_neu = []
     for m in katalog_modelle:
         if not m.get("hat_buendel") or m.get("zr"):
@@ -2505,24 +1757,7 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         "tco": tco,
         "zeitreihe": zeitreihe,
         "ausfaelle": ausfaelle,
-        # Der Verlauf rechnet auf `belastbar`, nicht auf `sichtbar`: ein
-        # falsch gespeicherter Gebrauchtpreis in derselben Kurve ist ein
-        # zweites Produkt in einer Linie, und der Sprung dazwischen saehe
-        # aus wie ein Preissturz. Am Galaxy S25 128 GB gemessen macht das
-        # den Unterschied zwischen "577-899 EUR" und "850-899 EUR".
         "verlauf": geraete_verlauf.aufbereiten(belastbar, historie, katalog),
-        # P3: der Katalog auf MODELL-Ebene - die Datenquelle fuer EINE
-        # Tabelle mit Umschalter Einzelgeraepreis/TCO. Er zeigt den
-        # BESTAND und nicht `belastbar`: eine refurbished Zeile gehoert
-        # nicht in den Vergleich, aber sehr wohl in den Aufklapper des
-        # Katalogs - und ebenso die zwei Haelften eines Doppelpreises.
-        # Er entsteht aus DEMSELBEN Bestand und DEMSELBEN TCO-Dict wie
-        # alles andere auf dieser Seite - keine zweite Rechnung, keine
-        # zweite Modellmenge. Ist der Bündel-Store UNLESBAR, liest die
-        # Bündel-Angabe die Listung selbst (S2-1 der P3-Code-Pruefung):
-        # `buendel()` wuerde still [] liefern, und die 1&1-Zeilen fielen
-        # auf "ohne Preis" zurueck - DIE P3-REGEL gilt auch im Fehlerfall
-        # (dieselbe Auffanglogik wie `lesbar=` zwei Aufrufe darueber).
         "katalog_modelle": katalog_modelle,
         "katalog_ab_preis": katalog_ab_preis,
         "katalog_sichtbar": KATALOG_SICHTBAR,
@@ -2530,10 +1765,6 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
         "nachfolger_sichtbar": NACHFOLGER_SICHTBAR,
         "pruefung": pruefung["zahlen"],
         "pruefbefunde": pruefung["befunde"],
-        # `bereinige()` leert eine nicht leere Menge nie (jede
-        # Zwillingsgruppe behaelt einen Ueberlebenden), die zwei Ausdruecke
-        # sind also gleichwertig - gefragt wird trotzdem die Menge, die die
-        # Seite zeigt.
         "hat_daten": bool(bestand),
         "stand": heute,
         "abgerufen_bis": abrufdaten[-1] if abrufdaten else "",
@@ -2548,13 +1779,6 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
             "ausgelistet": sum(
                 1 for e in alle if e.get("status") == STATUS_AUSGELISTET
             ),
-            # Ohne einen frueheren Stand ist "0 ausgelistet" keine Aussage,
-            # sondern eine Selbstverstaendlichkeit - die Kachel bleibt weg,
-            # bis es etwas zu vergleichen gibt. Steht dort eine Zahl groesser
-            # null, ist sie IMMER eine Aussage und wird gezeigt.
-            # Die Regel steht an EINER Stelle: `_auffaellig` rechnet sie,
-            # hier wird sie gelesen. Zweimal gerechnet liefen Satz und Kachel
-            # beim naechsten Umbau auseinander, ohne dass etwas rot wird.
             "ohne_vorlauf": auffaellig["ohne_vorlauf"],
             "preispunkte": historie.punkte_gesamt,
             "hersteller": len(hersteller_mit_daten),
@@ -2567,34 +1791,10 @@ def aufbereiten(state_dir: Path, quellen, katalog, heute: str = "") -> dict:
             {p["speicher"] for p in punkte_ohne_vertrag if p["speicher"]}
         ),
         "auffaellig": auffaellig,
-        # Fuer den CSV-Gesamtexport (report/geraete_export.py). Er entsteht
-        # in `render_site`, weil er in `site/` schreibt und diese Funktion
-        # bewusst KEINEN Schreibzugriff hat - aber er RECHNET seine Menge
-        # nicht mehr selbst, er bekommt sie von hier.
-        #
-        # Der Schluessel hiess `alle_eintraege` (er trug den Rohbestand),
-        # dann `export_bestand` (er trug die belastbare Menge). Beide Namen
-        # sagten nicht, was drin ist, und der zweite hat die zwei
-        # S26-FE-Zeilen aus der CSV entfernt, waehrend zwei Saetze der Seite
-        # das Gegenteil versprachen. Jetzt heisst er wie die Menge:
-        # `bestand`, gelesen von `geraete_export.schreibe_exporte`.
         "bestand": bestand,
-        # Die Historie bleibt vollstaendig; `historie_csv` schneidet sie auf
-        # die Listungen des Bestands zu. Der Zuschnitt gehoert dorthin, wo
-        # die zwei Dateien nebeneinander entstehen.
         "alle_punkte": punkte_alle,
         "katalog_obj": katalog,
-        # G2: der Preisvergleich gegen die eigene Listung. Er bekommt die
-        # LADEN-Abbildung mit, sonst zaehlte mobilcom-debitel neben freenet
-        # als zweiter guenstigerer Anbieter - derselbe Shop, zweimal.
         "vergleich": vergleich,
         "lifecycle": lifecycle,
-        # Beide auf dem BESTAND. Die Quellenseite nennt je Anbieter eine
-        # Geraetezahl, die neben derselben Zahl auf `geraete.html` steht -
-        # aus zwei Mengen gerechnet waeren es zwei Zahlen.
-        # Die Arbeitsliste fuer `config/farben.yaml` steht seit dem 03.09.2026
-        # NICHT mehr auf dieser Seite: sie zaehlt der naechtliche Lauf ins
-        # Protokoll (`Geraeteradar: unbekannte Farbschreibweisen ...`),
-        # bereinigt um Zustandswoerter an der Quelle (geraete_model).
         "quellenlage": _quellenlage(quellen, db, bestand),
     }

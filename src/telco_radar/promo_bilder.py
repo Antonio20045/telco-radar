@@ -73,25 +73,11 @@ from .report.bilder import _UA, _taugt, lade_und_lege_ab
 
 log = logging.getLogger(__name__)
 
-# Zielbreite. Die groesste Position der Promo-Uebersicht ist der Aufmacher
-# mit rund 620 px bei 1440 px Fensterbreite; auf einem Retina-Schirm sind
-# das 1240 echte Pixel. Es gibt hier keine zweite, kleinere Stufe wie bei
-# der Marktrecherche: die Seite zeigt hoechstens ein paar Dutzend Bilder,
-# nicht 190, der Repo-Ballast ist also kein Thema.
 BREITE = 1280
-# Darunter ist ein Bild als Bild wertlos - es waere in jeder Position
-# hochskaliert. Etwas strenger als bei der Marktrecherche (400): eine
-# Aktionsseite hat genug Kandidaten, und die schmalen sind hier fast immer
-# Geraete-Freisteller oder Zahlungsart-Icons.
 MIND_BREITE = 500
 KANDIDATEN_JE_ANGEBOT = 3
 
-# Wortkram fuer die Textstufe.
 _WORT_RE = re.compile(r"[A-Za-zÄÖÜäöüß0-9]{3,}")
-# Woerter, die auf jeder Tarifseite stehen und deshalb nichts unterscheiden.
-# Bewusst kurz gehalten: die Haeufigkeitsgewichtung unten entwertet haeufige
-# Woerter ohnehin: diese Liste faengt nur die ab, die auf EINER Seite selten
-# und trotzdem bedeutungslos sind.
 _STOPP = {
     "und",
     "der",
@@ -127,38 +113,15 @@ _STOPP = {
     "neue",
     "neuen",
 }
-# Ab welchem Gewicht eine Textuebereinstimmung als Beleg gilt. Ein einzelnes
-# Wort, das auf der Seite nur einmal vorkommt, ergibt 1.0; zwei Woerter, die
-# je viermal vorkommen, ergeben 0.5. Die Schwelle verlangt also entweder ein
-# wirklich seltenes Wort oder mehrere halbwegs seltene.
 _MIND_GEWICHT = 0.9
-# Woerter, die in mehr als diesem Anteil der Bildkontexte einer Seite
-# vorkommen, zaehlen gar nicht erst.
 _ZU_HAEUFIG = 0.5
 
-# Stufe 4 (siehe zuordnen()): das Seitenmotiv. Ab dieser angekuendigten
-# Breite gilt ein Bild als Buehnenbild und nicht als Beiwerk. 0 heisst "die
-# Seite sagt nichts ueber die Breite" und faellt NICHT durch - gemessen wird
-# beim Download ohnehin, und gerade die grossen Buehnenbilder tragen oft
-# keine width-Angabe (otelo.de: vier Kandidaten, alle ohne Angabe, alle
-# 1920 px breit).
 _MOTIV_MIND_BREITE = 700
-# Bilder, die auf jeder Tarifseite stehen und nie eine Aktion zeigen. Der
-# Muellfilter in report/bilder.py greift ueber die URL (logo, sprite,
-# favicon); Testsiegel heissen aber nach ihrem Herausgeber
-# ("csm_tuev-saarland", "csm_focus-money"). Sie sind ueber ihren alt-Text zu
-# fassen, und der ist bei Siegeln zuverlaessig gesetzt - er ist ihr Zweck.
 _SIEGEL_RE = re.compile(
     r"(siegel|testsieg|auszeichnung|ausgezeichnet|bewertung|tüv|tuev|"
     r"note\s+sehr\s+gut|leserwahl|award)",
     re.I,
 )
-# Pflichtgrafiken. Sie sind gross, scharf, hochformatig und stehen bei jedem
-# Geraeteangebot - der Bildholer nimmt sie deshalb bereitwillig, und auf der
-# Uebersicht stand am 16.08.2026 das EU-Energielabel eines Galaxy S26 als
-# Motiv einer winSIM-Aktion (1200x2401, im 16:9-Ausschnitt eine bunte
-# Balkenleiter). Anders als ein Testsiegel steht es nicht im alt-Text,
-# sondern im Pfad: kein Haendler nennt diese Datei anders.
 _KEIN_MOTIV_RE = re.compile(
     r"(energielabel|energy[-_]?label|energieeffizienz|eprel|"
     r"produktdatenblatt|datenblatt)",
@@ -206,8 +169,6 @@ def rangfolge(
     bewertet: list[tuple[float, dict]] = []
     for kand in kandidaten:
         anker = (kand.get("anchor") or "").strip()
-        # Die Breitenangabe der Seite ist nur ein Tiebreaker (und oft 0) -
-        # gemessen wird beim Download.
         breiten_bonus = min(0.49, (kand.get("hint_w") or 0) / 4000)
         if ziel and anker:
             if anker == ziel:
@@ -288,9 +249,6 @@ def _seitenmotive(
         )
 
     for seite, seiten_kandidaten in nach_seite.items():
-        # Kein `page` an den Kandidaten (Bestand, Tests): dann ist "die
-        # Seite" die Marke, und es bleibt bei einem Motiv - genau das
-        # Verhalten von vor dem 08.08.2026.
         if seite:
             passend = [
                 a for a in angebote if (a.get("source_url") or leitseite) == seite
@@ -302,14 +260,10 @@ def _seitenmotive(
         )
         if ziel is None:
             continue
-        # Dokumentreihenfolge, nicht Groesse: das Buehnenbild steht oben auf
-        # der Seite, die 1920 px breiten Testsiegel stehen unten.
         motive = [k["src"] for k in seiten_kandidaten if _taugt_als_motiv(k)]
         if not motive:
             continue
         ergebnis[ziel["id"]] = {"quellen": motive[:3], "art": "motiv"}
-        # Vergeben ist vergeben: sonst steht dasselbe Motiv auf der naechsten
-        # Seite noch einmal, und zwei gleiche Kacheln lesen sich als Fehler.
         vergeben.update(motive[:3])
 
 
@@ -344,11 +298,6 @@ def zuordnen(
     """
     if not angebote or not kandidaten:
         return {}
-    # Logos, Zaehlpixel und Platzhalter sehen aus wie Bilder und sind keine.
-    # Aussortiert wird HIER und nicht erst beim Abruf: sonst verbraucht das
-    # Markenlogo, das auf jeder Seite ganz oben steht, den Kandidatenplatz
-    # des Buehnenbilds (gemessen bei ALDI TALK - `aldilogo.png` stand vor
-    # dem Back2School-Motiv und gewann Stufe 4).
     kandidaten = [
         k
         for k in kandidaten
@@ -357,9 +306,6 @@ def zuordnen(
     if not kandidaten:
         return {}
     haeufigkeit = _haeufigkeiten(kandidaten)
-    # Alle (Angebot, Kandidat)-Paare mit Beleg, staerkster zuerst. Die
-    # Angebotsreihenfolge entscheidet nur bei exakt gleicher Guete - dann
-    # bekommt das hoeher bewertete Angebot das Bild.
     paare: list[tuple[float, int, str, dict]] = []
     for rang, angebot in enumerate(angebote):
         eid = angebot.get("id") or ""
@@ -375,15 +321,12 @@ def zuordnen(
         src = kand.get("src") or ""
         if not src or src in vergeben:
             continue
-        # Der erste Kandidat kann beim Abruf durchfallen (zu klein, 403,
-        # kaputt); ein zweiter Versuch ist billiger als eine leere Kachel.
         eintrag = ergebnis.setdefault(eid, {"quellen": [], "art": "angebot"})
         if len(eintrag["quellen"]) >= KANDIDATEN_JE_ANGEBOT:
             continue
         eintrag["quellen"].append(src)
         vergeben.add(src)
 
-    # ---- Stufe 4: das Buehnenbild JE AKTIONSSEITE, siehe _seitenmotive().
     _seitenmotive(angebote, kandidaten, vergeben, ergebnis, leitseite)
     return ergebnis
 
@@ -415,8 +358,6 @@ def hole_bilder(
             quellen = wahl.get("quellen") or []
             art = wahl.get("art") or "angebot"
             bilanz["geprueft"] += 1
-            # Unveraendert und schon da: nichts tun. Der Abruf ist der teure
-            # Teil, und eine Aktionsseite wechselt ihr Motiv selten.
             if (
                 eintrag.get("image_src") in quellen
                 and eintrag.get("image")
@@ -432,7 +373,7 @@ def hole_bilder(
                     treffer = lade_und_lege_ab(
                         quelle, ordner, BREITE, client, mind_breite=MIND_BREITE
                     )
-                except Exception as exc:  # noqa: BLE001 - ein Bild kippt keinen Lauf
+                except Exception as exc:  # noqa: BLE001
                     log.debug("Promo-Bild %s: %s", quelle, exc)
                     treffer = None
                 if treffer:

@@ -28,8 +28,6 @@ from telco_radar.report.html import render_site
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 HEUTE = "2026-09-11"
 
-# Drei Modelle, drei Lagen. Das Vorgabemodell ist das Leitfrage-Gerät
-# (`geraete_tco_karten.LEITFRAGE_MODELL`), sobald es zwei Anbieter hat.
 _KATALOG = {
     "geraete": [
         {
@@ -81,18 +79,12 @@ _QUELLEN = {
     ]
 }
 
-# (device_id, speicher, anbieter, tarif_id, tarif, gb, rate)
 _BAENDER_BUENDEL = [
-    # Modell A, Band Klein: drei Anbieter, Vodafone ist das teuerste und
-    # damit die Referenz UNTER den Zeilen (o2/congstar tragen negatives Δ).
     ("apple-iphone-17-pro", 256, "o2", "o2:klein", "O2 Mobile Klein", 10, 18.0),
     ("apple-iphone-17-pro", 256, "congstar", "cs:klein", "Allnet Flat XS", 15, 22.0),
     ("apple-iphone-17-pro", 256, "Vodafone", "vf:klein", "Vodafone Mobil XS", 18, 26.0),
-    # Modell A, Band Mittel: nur congstar - Vodafone fehlt, keine Δ-Angabe.
     ("apple-iphone-17-pro", 256, "congstar", "cs:mittel", "Allnet Flat S", 50, 20.0),
-    # Modell B, Band Klein: nur 1&1.
     ("samsung-galaxy-s26", 256, "1&1", "11:klein", "All-Net-Flat S", 10, 15.0),
-    # Modell C: Bündel in einem Tarif OHNE Datenvolumen - kein Band.
     ("google-pixel-11", 128, "o2", "o2:ohne", "O2 Mobile Flex", None, 18.0),
 ]
 
@@ -142,8 +134,6 @@ def _baue(tmp_path: pathlib.Path):
         )
     state = root / "data" / "state"
     state.mkdir(parents=True)
-    # Barpreise fuer die Antwortzeile - nur bei zweien, damit der Test auch
-    # den Leerzustand einer Zahl sieht (Modell C ohne jeden Barpreis).
     listungen = [
         _listung("Vodafone", "apple-iphone-17-pro", 256, 1199.90),
         _listung("o2", "apple-iphone-17-pro", 256, 1099.00),

@@ -84,9 +84,6 @@ def paar(tmp_path_factory, chromium):
 
 
 def _suche(seite, begriff):
-    # Das Suchfeld lebt im VERGLEICHs-Reiter - nach dem Sprungtest steht
-    # der Katalog aktiv, und fill() auf ein unsichtbares Feld laeuft in
-    # einen Timeout. Erst zurueckschalten, dann tippen.
     knopf = seite.query_selector('.gr-reiter button[data-tafel="tafel-tco"]')
     if knopf and knopf.get_attribute("aria-selected") != "true":
         knopf.click()

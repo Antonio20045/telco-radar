@@ -136,7 +136,7 @@ def _hole_mit_beleg(beleg: list):
         }
         try:
             antwort = _echter_fetch(url, http_cfg, *args, **kwargs)
-        except Exception as exc:  # noqa: BLE001 - protokollieren, dann weiterwerfen
+        except Exception as exc:  # noqa: BLE001
             resp = getattr(exc, "response", None)
             eintrag["status"] = getattr(resp, "status_code", None)
             eintrag["user_agent"] = (
@@ -298,7 +298,6 @@ def main() -> None:
     exit_status = 0
 
     try:
-        # --- T1: Tarife, mit Laufzeitbeleg --------------------------------
         log.info("=== T1: Telekom-Tarife (Pflichtdokumente + Shop-Kacheln) ===")
         tarif_crawler.lade_quellen = _nur_telekom_tarife(tarif_crawler.lade_quellen)
         items, bilanz_tarife = tarif_crawler.sammle(
@@ -307,22 +306,12 @@ def main() -> None:
         log.info("T1-Bilanz: %s", bilanz_tarife)
         log.info("Meldungen: %d", len(items))
 
-        # --- Laufzeitbeleg (T1) -------------------------------------------- #
-        # Kriterium 2/3 des Auftrags: nicht Code-Plausibilitaet, sondern die
-        # tatsaechlich beim echten Abruf gesendete Kennung, gemessen an
-        # `resp.request.headers`. Ehrlich heisst hier: beginnt mit
-        # "TelcoRadar/1.0" - alles andere ist eine Browser- oder sonstige
-        # Fremdkennung und wird als Befund ausgewiesen, nicht verschwiegen.
         _schreibe_beleg(root, "beleg-telekom-lokallauf", heute, beleg, log)
 
-        # --- T2: Geraete, seit B2 mit eigenem Laufzeitbeleg -----------------
         log.info("=== T2: Telekom-Geraetekategorie ===")
         beleg_t2: list[dict] = []
         from telco_radar.collect import http as _http_mod
 
-        # Der Haken wird VOR dem Patchen gebaut: seine Closure haelt dann den
-        # ECHTEN fetch fest, und das Patchen des Modul-Attributs kann ihn nicht
-        # auf sich selbst zeigen lassen.
         _patch_fetch = _hole_mit_beleg(beleg_t2)
         _echter_fetch = _http_mod.fetch
         _http_mod.fetch = _patch_fetch
@@ -330,12 +319,6 @@ def main() -> None:
             geraete_pipeline.lade_quellen = _nur_telekom_geraete(
                 geraete_config.lade_quellen
             )
-            # referenz_anbieter={"Telekom"}: der Lauf schreibt NUR Telekom in
-            # die SIM-only-Referenzen und ruft die 1&1-SIM-only-Messung nicht
-            # auf (Befund Runde 2, 15.09.2026: ohne den Scope datierte der
-            # Lauf 35 Fremd-Referenzen neu und lud 1&1). Der Name ist der
-            # Anbietername aus dem Tarifbestand (tarife.jsonl), nicht der
-            # aus geraete_quellen.yaml - beide sind hier "Telekom".
             bilanz_geraete = geraete_pipeline.run_geraete_stage(
                 root,
                 http_cfg,
@@ -363,9 +346,6 @@ def main() -> None:
         exit_status = 1
         raise
     finally:
-        # Der Manifest gehoert zu JEDEM Lauf - auch zum gescheiterten
-        # (exit_status=1). Ein Nachtrag von Hand, wie ihn Runde 2 fuer den
-        # Lauf vom 15.09.2026 leisten musste, soll nicht wieder noetig sein.
         _schreibe_manifest(
             root,
             heute,

@@ -87,13 +87,11 @@ def test_gleiche_bewegung_auf_beiden_seiten_ist_keine():
 
 @pytest.mark.parametrize("neu, gemeldet", [(1450.0, False), (1449.99, True)])
 def test_die_euroschwelle_ist_echt_groesser(neu, gemeldet):
-    # 50,00 EUR bei 2.000 EUR sind 2,5 % - nur die Euroschwelle zaehlt.
     b = _block({"Vodafone": _vf(), "o2": _reihe("o2-m", {VON: 1500.0, BIS: neu})})
     assert bool(b["zeilen"]) is gemeldet
 
 
 def test_die_prozentschwelle_greift_unter_fuenfzig_euro():
-    # 45 EUR gegen eine Vodafone-Leitzahl von 800 EUR sind 5,6 %.
     b = _block(
         {
             "Vodafone": _vf({VON: 800.0, BIS: 800.0}),
@@ -101,7 +99,6 @@ def test_die_prozentschwelle_greift_unter_fuenfzig_euro():
         }
     )
     assert [z["delta"] for z in b["zeilen"]] == [-45.0]
-    # 39 EUR sind 4,9 % - keine Meldung.
     b = _block(
         {
             "Vodafone": _vf({VON: 800.0, BIS: 800.0}),
@@ -117,7 +114,6 @@ def test_ohne_pruefbaren_vergleich_ein_ausfall_statt_ruhe():
     b = _block({"o2": _reihe("o2-m", {VON: 1500.0, BIS: 1400.0})})
     assert b["error"] == gb.AUSFALL_NICHT_PRUEFBAR
     assert b["ohne_aussage"] == {gb.GRUND_MESSUNG: 1}
-    # Gegenprobe: ein pruefbarer Vergleich ohne Bewegung ist kein Ausfall.
     b = _block({"Vodafone": _vf(), "o2": _reihe("o2-m", {VON: 1500.0, BIS: 1500.0})})
     assert b["error"] is None and b["geprueft"] == 1
     assert b["eigen_stichtag"] == BIS
@@ -216,12 +212,9 @@ def test_die_gescheiterte_zeitreihe_traegt_einen_ausfall():
     assert zr.leer()["bewegung_woche"]["error"]
 
 
-# ------------------------------------------------- Woche und Berichts-JSON
-
-
 def test_nur_die_erste_ausgabe_der_woche_zeigt_den_block(tmp_path):
-    (tmp_path / "2026-09-30.json").write_text("{}")  # Mi, KW 40
-    (tmp_path / "2026-09-25.json").write_text("{}")  # Fr, KW 39
+    (tmp_path / "2026-09-30.json").write_text("{}")
+    (tmp_path / "2026-09-25.json").write_text("{}")
     assert gb.erste_ausgabe_der_woche(tmp_path, date(2026, 9, 30))
     assert not gb.erste_ausgabe_der_woche(tmp_path, date(2026, 10, 2))
     (tmp_path / "differenzierung.json").write_text("{}")
@@ -260,7 +253,6 @@ def test_fuer_bericht_prueft_die_frische_der_vodafone_messung(monkeypatch, tmp_p
     b = gb.fuer_bericht(tmp_path, date(2026, 9, 30), tmp_path)
     assert b["error"] == ("die letzte Vodafone-Messung vom 20.09.2026 ist veraltet")
     assert b["im_newsletter"] is True
-    # Gegenprobe: drei Tage alt ist noch frisch.
     _patch(monkeypatch, _aufbereitet(_frisch("2026-09-27")))
     assert gb.fuer_bericht(tmp_path, date(2026, 9, 30), tmp_path)["error"] is None
 
@@ -272,13 +264,9 @@ def test_fuer_bericht_wirft_nie_und_nennt_den_grund(monkeypatch, tmp_path, caplo
     _patch(monkeypatch, kaputt)
     b = gb.fuer_bericht(tmp_path, date(2026, 9, 30), tmp_path)
     assert b["error"] == gb.AUSFALL_AUFBEREITUNG and b["zeilen"] == []
-    # Der Ausfall steht in der Mail (Regel 9) - und das Genaue im Protokoll.
     assert b["im_newsletter"] is True
     assert "KeyError" in caplog.text
-    json.dumps(b)  # steht so im Berichts-JSON
-
-
-# ------------------------------------------- Verdrahtung mit echter Zeitreihe
+    json.dumps(b)
 
 
 def test_die_zeitreihe_liefert_den_block_aus_ihrer_historie(tmp_path):
@@ -287,6 +275,7 @@ def test_die_zeitreihe_liefert_den_block_aus_ihrer_historie(tmp_path):
     am 08.09. um 3 EUR Rate teurer (24 x 3 = 72 EUR), Vodafone und congstar
     unveraendert."""
     from test_geraete_zeitreihe_ansicht import _baue
+
     from telco_radar.geraete_config import lade_katalog, lade_quellen
     from telco_radar.report import geraete_view
 
@@ -321,7 +310,7 @@ def test_die_zeitreihe_liefert_den_block_aus_ihrer_historie(tmp_path):
         "2026-09-15",
         "2026-09-08",
     )
-    assert b["geprueft"] == 2  # o2 und congstar gegen Vodafone, klein
+    assert b["geprueft"] == 2
     [z] = b["zeilen"]
     assert (z["anbieter"], z["delta"], z["fremd_delta"], z["eigen_delta"]) == (
         "o2",

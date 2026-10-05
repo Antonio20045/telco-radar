@@ -107,10 +107,6 @@ def _karte(
     leitzahl_monate=TCO_HORIZONT,
     delta_zustand=None,
 ):
-    # `leitzahl_monate` ist der ZEITRAUM, den `gesamt` traegt (P0-B-h1) -
-    # jede echte Karte aus `geraete_tco_karten.modelle()` traegt ihn, und
-    # die TCO-Spalte des Katalogs filtert darauf (P0-B-h2). Vorgabe ist
-    # der Zeitraum der Spalte; eine Karte mit 36 setzt ihn selbst.
     return {
         "anbieter": anbieter,
         "gesamt": gesamt,
@@ -125,21 +121,12 @@ def _karte(
         "eigen": eigen,
         "leitzahl_monate": leitzahl_monate,
         "delta_zustand": delta_zustand,
-        # Die TARIFLAUFZEIT der Rechnung (auf jeder echten Karte 24,
-        # `geraete_tco_karten.LAUFZEIT`) - nicht der Zeitraum der
-        # Leitzahl. `_delta_faellig` liest sie, damit die Tests den
-        # benannten Zustand aus der EINEN Definition holen koennen.
         "laufzeit": TCO_HORIZONT,
         "frisch": True,
         "quelle_url": f"https://example.de/{anbieter}",
         "sku_id": "s",
         "abgerufen_am": "2026-09-17",
     }
-
-
-# ---------------------------------------------------------------------------
-# DIE EINE REGEL: keine Modellzeile ohne Preisform
-# ---------------------------------------------------------------------------
 
 
 def test_eine_zeile_je_modell_mit_ab_preis_und_beleg():
@@ -167,19 +154,16 @@ def test_eine_zeile_je_modell_mit_ab_preis_und_beleg():
             farbe_normalisiert="blau",
             farbe_roh="Blau",
         ),
-        # Ein ANDERES Modell (anderer Speicher) ist eine zweite Zeile.
         _listung("A", "Apple", "Apple X", "512gb-schwarz", 1200.0, speicher=512),
     ]
     zeilen = geraete_view.katalog_modellzeilen(eintraege, _katalog())
     assert len(zeilen) == 2, "je (Geraet, Speicher) eine Modellzeile"
     zeile = next(z for z in zeilen if z["speicher"] == 256)
-    # Je Anbieter das Minimum (A: 1000, B: 990), dann das Gesamt-Minimum.
     assert zeile["ab_preis"] == 990.0
     assert zeile["ab_anbieter"] == "B"
     assert zeile["ab_beleg"]["quelle_url"].endswith("/B/256gb-schwarz-b")
     assert zeile["ab_beleg"]["abgerufen_am"] == "2026-09-17"
     assert zeile["anbieterzahl"] == 2
-    # Der Aufklapper traegt ALLE fuenf... vier Listungen des Modells.
     assert zeile["listungen"] == 4
     assert len(zeile["zeilen"]) == 4
 
@@ -200,7 +184,6 @@ def test_refurbished_stellt_keinen_ab_preis_b1():
         f"der refurbished Preis darf den ab-Preis nicht stellen: {zeile['ab_preis']}"
     )
     assert zeile["ab_anbieter"] == "A"
-    # Die erneuerte Zeile bleibt im Aufklapper, mit Etikett.
     erneuert = [z for z in zeile["zeilen"] if z["zustand"] == "refurbished"]
     assert len(erneuert) == 1
 
@@ -222,8 +205,6 @@ def test_nur_im_buendel_statt_ohne_preis():
     assert zeile["buendel_monat"] == 32.99
     assert zeile["buendel_anbieter"] == "1&1"
     assert zeile["buendel_beleg"]["quelle_url"].endswith("/buendel")
-    # Die Listungs-Zeile im Aufklapper traegt dieselbe Angabe - "ohne
-    # Preis" existiert auf dieser Ebene nicht mehr.
     (aufklapp,) = zeile["zeilen"]
     assert aufklapp["preis"] is None
     assert aufklapp["buendel_monat"] == 32.99
@@ -306,8 +287,6 @@ def test_unlesbarer_store_fraegt_die_listungen_ab_s2_1():
             tarif_referenz="1&1 All-Net S",
             preis_mit_vertrag_ab=32.99,
         ),
-        # Mit Barpreis: braucht keinen Fallback und liefert keinen
-        # Satz (eine Listung MIT Preis ist kein Bündel-Hinweis).
         _listung("A", "Apple", "Apple X", "256gb-a", 999.0),
     ]
     saetze = geraete_view._buendel_aus_listungen(eintraege)
@@ -321,8 +300,6 @@ def test_unlesbarer_store_fraegt_die_listungen_ab_s2_1():
             "abgerufen_am": "2026-09-17",
         }
     ]
-    # Und durch die Modellzeile gerechnet: "nur im Bündel" statt "ohne
-    # Preis", mit dem Beleg DER LISTUNG.
     zeilen = geraete_view.katalog_modellzeilen(
         eintraege, _katalog(), tco_modelle=[], buendel=saetze
     )
@@ -333,11 +310,6 @@ def test_unlesbarer_store_fraegt_die_listungen_ab_s2_1():
         "die 1&1-Aufklapperzeile fällt ohne Store auf 'ohne Preis' zurück"
     )
     assert ohne[0]["buendel_url"] == eintraege[0]["quelle_url"]
-
-
-# ---------------------------------------------------------------------------
-# Spanne und Ordnung
-# ---------------------------------------------------------------------------
 
 
 def test_spanne_nur_wenn_wesentlich():
@@ -380,11 +352,6 @@ def test_deckel_zaehlt_modelle_nicht_listungen():
     assert sum(1 for z in zeilen if not z["zeilen_rest"]) == 3
 
 
-# ---------------------------------------------------------------------------
-# Die TCO-Ansicht
-# ---------------------------------------------------------------------------
-
-
 def test_tco_felder_waehlen_das_beste_vergleichbare_angebot():
     mid = modell_schluessel(device_id("Apple", "Apple X"), 256)
     tco = [
@@ -399,7 +366,6 @@ def test_tco_felder_waehlen_das_beste_vergleichbare_angebot():
                     delta={"betrag": -100.0, "prozent": 9.1},
                     delta_kurz="−100,00 € · −9,1 %",
                 ),
-                # Billiger, aber ERNEUERT - darf nicht gewinnen (B1).
                 _karte("o2", 900.0, zustand="refurbished", vergleichbar=False),
             ],
         )
@@ -429,24 +395,12 @@ def test_tco_delta_nur_mit_referenz():
     assert zeilen[0]["tco_ab"] == 1000.0
 
 
-# ---------------------------------------------------------------------------
-# Der TRAEGER des Deltas (A2-Nachbesserung, Pruef-Befund 20.09.2026):
-# Gewann das EIGENE Buendel das Minimum der Zeile, behauptete die Delta-
-# Zelle "keine Referenz" - obwohl die TCO-Zelle derselben Zeile "bei
-# Vodafone" sagte. 20 von 48 "keine Referenz"-Zeilen des Bestands waren
-# eigene Marktfuehrung, kein Referenzmangel (Galaxy A57 256: Vodafone
-# 1.199,80 EUR vor 1&1 1.207,54 EUR, Abstand +7,74 als Annaeherung).
-# ---------------------------------------------------------------------------
-
-
 def test_unser_angebot_fuehrt_der_delta_traegt_der_wettbewerber():
     mid = modell_schluessel(device_id("Apple", "Apple X"), 256)
     tco = [
         _tco_modell(
             mid,
             karten=[
-                # Das eigene Buendel IST die Referenz: _delta liefert dafuer None
-                # (B4) - trotzdem stellt es die Leitzahl der Zeile.
                 _karte("Vodafone", 1100.0, eigen=True, delta=None, delta_kurz=None),
                 _karte(
                     "1&1",
@@ -463,7 +417,6 @@ def test_unser_angebot_fuehrt_der_delta_traegt_der_wettbewerber():
     (zeile,) = zeilen
     assert zeile["tco_ab"] == 1100.0, "das eigene Angebot stellt die Leitzahl"
     assert zeile["tco_anbieter"] == "Vodafone"
-    # Der Abstand der Zelle gehoert dem guenstigsten FREMDEN Angebot.
     assert zeile["tco_delta"] == 7.74
     assert zeile["tco_delta_kurz"] == "≈ +7,74 €"
     assert zeile["tco_delta_anbieter"] == "1&1", (
@@ -539,9 +492,6 @@ def test_wettbewerber_mit_anderer_laufzeit_wird_benannt_statt_still():
     `tco_delta_leer` None und die Zelle zeigte den Strich."""
     mid = modell_schluessel(device_id("Apple", "Apple X"), 256)
     referenz = _referenz()
-    # Das echte Gegenstueck: 1&1 nennt EINEN Monatsbetrag fuer Tarif und
-    # Geraet, ueber 36 Monate - die Karte traegt deshalb 36 und bekommt
-    # von `_delta` keinen Betrag mehr.
     fremd = _karte("1&1", 1400.0, leitzahl_monate=36, delta=None, delta_kurz=None)
     fremd["delta_zustand"] = geraete_tco_karten.delta_zustand(fremd, referenz)
     assert fremd["delta_zustand"], (
@@ -560,11 +510,9 @@ def test_wettbewerber_mit_anderer_laufzeit_wird_benannt_statt_still():
     eintraege = [_listung("A", "Apple", "Apple X", "256gb-a", 1000.0)]
     zeilen = geraete_view.katalog_modellzeilen(eintraege, _katalog(), tco_modelle=tco)
     (zeile,) = zeilen
-    # Die Leitzahl bleibt die 24-Monats-Zahl des eigenen Angebots.
     assert zeile["tco_ab"] == 1100.0
     assert zeile["tco_delta"] is None
     assert zeile["tco_delta_kurz"] is None
-    # ... und die Zelle ist nicht stumm.
     assert zeile["tco_delta_leer"] == "andere Laufzeit"
     assert zeile["tco_delta_leer"] == fremd["delta_zustand"]["kurz"], (
         "dieselben Worte wie die Buendelzeile, EINE Definition"
@@ -628,8 +576,6 @@ def test_gegenprobe_die_24_monats_karte_stellt_die_spalte():
         _tco_modell(
             mid,
             karten=[
-                # Die kleinere Summe traegt 36 Monate - sie ist keine Zahl dieser
-                # Spalte und darf ihr Minimum nicht stellen.
                 _karte(
                     "1&1",
                     1115.54,
@@ -659,7 +605,6 @@ def test_gegenprobe_die_24_monats_karte_stellt_die_spalte():
     assert zeile["tco_anbieter"] == "o2"
     assert zeile["tco_monat"] == 52.08
     assert zeile["tco_leer"] is None
-    # Der Abstand gehoert derselben Karte - und er bleibt eine Zahl.
     assert zeile["tco_delta"] == -50.0
     assert zeile["tco_delta_kurz"] == "−50,00 € · −3,8 %"
     assert zeile["tco_delta_leer"] is None
@@ -679,8 +624,6 @@ def test_alte_referenz_traegt_ihren_eigenen_grund():
 
     Gegen den Stand vor P0-B-h2 ROT: dort war `tco_delta_leer` None."""
     mid = modell_schluessel(device_id("Apple", "Apple X"), 256)
-    # Die Naeherung ist nur frisch, wenn BEIDE Belege frisch sind - hier
-    # sind beide vom 01.08., der Bestand vom 17.09.
     referenz = {
         "gesamt": 1300.0,
         "monate": TCO_HORIZONT,
@@ -716,8 +659,6 @@ def test_tco_leerzustaende_benannt():
     ]
     apple_id = modell_schluessel(device_id("Apple", "Apple X"), 256)
     pixel_id = modell_schluessel(device_id("Google", "Pixel 11"), 256)
-    # Apple: Bündel da, aber KEINE vergleichbare Karte (nur erneuert).
-    # Pixel: gar kein Bündel. Samsung: gesund.
     tco = [
         _tco_modell(
             apple_id,
@@ -748,11 +689,6 @@ def test_ohne_tco_aufbereitung_bleibt_der_katalog_lesbar():
     zeilen = geraete_view.katalog_modellzeilen(eintraege, _katalog())
     assert zeilen[0]["ab_preis"] == 1000.0
     assert zeilen[0]["tco_leer"] == "kein Bündel gemessen"
-
-
-# ---------------------------------------------------------------------------
-# Der Ansichts-Export
-# ---------------------------------------------------------------------------
 
 
 def _beispiel_zeilen():
@@ -797,7 +733,6 @@ def test_modell_barpreis_csv_eine_preisform_je_zeile(tmp_path):
     assert pixel[kopf.index("Nur im Bündel ab EUR/Monat")] == "32,99"
     assert pixel[kopf.index("Ab-Preis EUR")] == ""
     assert pixel[kopf.index("Bündel-Anbieter")] == "1&1"
-    # Niemals beide Preisformen in EINER Zeile.
     for z in zeilen[1:]:
         assert not (
             z[kopf.index("Ab-Preis EUR")]
@@ -816,9 +751,6 @@ def test_modell_tco_csv_traegt_den_grund_statt_einer_luecke(tmp_path):
     pixel = next(z for z in zeilen[1:] if z[1] == "Pixel 11")
     assert apple[kopf.index("TCO ab EUR")] == "1000,00"
     assert apple[kopf.index("Abweichung zu Vodafone EUR")] == "-100,00"
-    # Klartext wie auf der Seite (S4-1): der Chip der Vergleichsansicht
-    # sagt "XS", nicht "xs" - zwei Sprachen fuer dieselbe Sache
-    # waeren der O4-Befund wieder.
     assert apple[kopf.index("Tarifband")] == "XS"
     assert apple[kopf.index("Status")] == ""
     assert pixel[kopf.index("TCO ab EUR")] == ""
@@ -856,9 +788,6 @@ def test_modell_tco_csv_nennt_den_delta_leergrund(tmp_path):
     assert daten[kopf.index("Abweichung zu Vodafone EUR")] == "7,74"
     assert daten[kopf.index("Status")] == ""
 
-    # Und die Luecke ohne Wettbewerb: Leitzahl da, Abstand ohne Etikett
-    # waere stumm - der Grund heisst beim Wettbewerb, nicht bei der
-    # Referenz.
     tco_allein = [
         _tco_modell(
             mid,

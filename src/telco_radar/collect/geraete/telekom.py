@@ -276,18 +276,12 @@ from bs4 import BeautifulSoup
 from . import GeraeteAbrufFehler
 from ...geraete_model import probe_geht_auf
 
-# DIE EINE STELLE, die entscheidet, ob ein Rohwert eine Ratenlaufzeit IST
-# (Clean Code 1): dieselbe Pruefung, die `buendel_id` und `Buendel` lesen.
 from ...tco_model import laufzeit_in_monaten
 
 log = logging.getLogger(__name__)
 
 _STATE_RE = re.compile(r"window\.__INITIAL_STATE__\s*=\s*")
 
-# "tiefblau-256-gb" -> Farbe "tiefblau", Speicher 256.
-# Die Einheit steht am Ende und wird gebraucht: "silber-1-tb" ist 1 TB und
-# nicht 1 GB, und eine Zahl ohne ihre Einheit zu lesen waere derselbe
-# Fehler wie ein Preis ohne seine Preisform.
 _VARIANTE_RE = re.compile(r"^(?P<farbe>.+)-(?P<zahl>\d+)-(?P<einheit>gb|tb)$", re.I)
 
 
@@ -387,9 +381,6 @@ def _preisformen(preis: dict) -> list[dict]:
                 plan,
             )
             continue
-        # `laufzeit_in_monaten` ist DIE EINE STELLE, die entscheidet, ob ein
-        # Rohwert eine Ratenlaufzeit IST (Clean Code 1) - eine eigene
-        # `int()`-Zeile schnitte 24,5 still auf 24 ab.
         laufzeit = laufzeit_in_monaten(plan.get("numberOfInstallments"))
         try:
             monatsrate = float(plan.get("recurringPrice"))
@@ -397,9 +388,6 @@ def _preisformen(preis: dict) -> list[dict]:
         except (TypeError, ValueError):
             monatsrate = gesamt = None
         if laufzeit is None or monatsrate is None or gesamt is None:
-            # BENANNT, nicht still: die Listung waehlt ihren Traeger aus
-            # `formen` (siehe `_listungsplan`), ein lautlos verlorener Plan
-            # verschoebe also Preis und Laufzeit der Listung.
             log.info(
                 "Telekom: Ratenplan ohne lesbare Bestandteile "
                 "(Raten %r, Rate %r, Gesamt %r) - uebergangen",
@@ -430,12 +418,6 @@ def _preisformen(preis: dict) -> list[dict]:
     return formen
 
 
-# Die Regel aus dem Modulkopf ("EINE LISTUNG IST DAS GERAET") - EINMAL
-# formuliert, damit Protokoll und Auswahl nicht auseinanderlaufen koennen.
-# Sie sortiert nach dem GESAMTBETRAG, weil der Gesamtbetrag die Zahl ist,
-# die diese Auswahl bestimmt (`preis_ohne_vertrag`); die Laufzeit ist nur
-# der Gleichstandsbrecher. Bis P0-B-h5 stand es umgekehrt - siehe
-# Modulkopf "DIE REGEL IST EINE WAHL".
 _LISTUNGSPLAN_REGEL = "hoechster Gesamtbetrag, bei Gleichstand laengste Ratenlaufzeit"
 
 
@@ -471,9 +453,6 @@ def _listungsplan(formen: list[dict], name: str) -> dict:
     fehlt, steht heute nur im Log (Modulkopf, offene Luecke zu Regel 9).
     """
     traeger = max(formen, key=lambda f: (f["gesamt"], f["laufzeit_monate"]))
-    # `is not`, nicht `!=`: zwei Plaene mit gleichen Betraegen sind zwei
-    # Plaene. Ein Vergleich auf Gleichheit schluckte den zweiten aus dem
-    # Protokoll - genau das Verschwinden, das diese Zeile verhindern soll.
     uebergangen = [f for f in formen if f is not traeger]
     if uebergangen:
         log.info(
@@ -506,10 +485,6 @@ def lies(text: str, url: str = "") -> list[dict]:
             continue
         formen = _preisformen(eintrag.get("price") or {})
         if not formen:
-            # Kein Etikett heisst hier: kein Satz. Anders als bei o2, wo
-            # eine unetikettierte Zahl immer noch ein `totalPrice` ist,
-            # gibt es bei der Telekom NUR den Ratengesamtbetrag - ohne
-            # seine Bestandteile waere er ein Barpreis, der er nicht ist.
             log.info("Telekom: %r ohne nachrechenbare Ratenform - verworfen", name)
             continue
         farbe, speicher = _variante(str(eintrag.get("variantSlug") or ""))
@@ -518,25 +493,15 @@ def lies(text: str, url: str = "") -> list[dict]:
         )
         adresse = _passende_adresse(eintrag, links)
         sku = str(eintrag.get("id") or "").strip()
-        # EIN Geraet, EINE Listung - und der Plan, der sie traegt, wird
-        # benannt ausgewaehlt statt von der Reihenfolge bestimmt (siehe
-        # `_listungsplan` und Modulkopf). Ein eigener Satz je Plan
-        # kollidierte in `GeraeteDB.upsert` unter derselben `listung_id`.
         form = _listungsplan(formen, name)
         out.append(
             {
                 "titel": titel,
-                # Der strukturierte NAME (Feld `name`), unveraendert - die
-                # einzige Grundlage der E4-Auto-Erkennung. Der TITEL darueber
-                # ist zusammengesetzt (Name + Speicher + Farbe) und wuerde
-                # als Namensquelle Saegezahn-IDs erzeugen ("iPhone 18 Pro
-                # polar").
                 "strukturierter_name": name,
                 "preis": form["gesamt"],
                 "anzahlung": form["anzahlung"],
                 "monatsrate": form["monatsrate"],
                 "laufzeit_monate": form["laufzeit_monate"],
-                # Die Seite nennt keinen Zinssatz. `None` heisst unbekannt.
                 "zins_effektiv": None,
                 "waehrung": "EUR",
                 "verfuegbarkeit": (
@@ -554,12 +519,6 @@ def lies(text: str, url: str = "") -> list[dict]:
             }
         )
     return out
-
-
-# --------------------------------------------------------------------------
-# DER BUENDELKATALOG - dieselbe Seite mit tariffId-Parameter (B2, siehe
-# Modulkopf)
-# --------------------------------------------------------------------------
 
 
 def _gleich(a: Optional[float], b: Optional[float]) -> bool:
@@ -618,9 +577,6 @@ def _plan_preise(plan: dict) -> tuple[Optional[float], Optional[float]]:
     return anschluss, monatlich
 
 
-# `proben` ist die Schnittstelle der Provider-Probe (FM-2, P5 - siehe
-# Adapter-Docstring in collect/geraete/__init__.py); dieser Adapter
-# traegt keine Feld-Proben hinein.
 def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> list[dict]:
     """Die Kategorieseite MIT Tariffilter in Buendel-Rohsaetze zerlegen.
 
@@ -639,8 +595,6 @@ def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> lis
     tarif_name = str(plan.get("name") or "").strip()
     anschluss, tarif_monatlich = _plan_preise(plan)
     if tarif_monatlich is None:
-        # Ohne Tarif-Monatsgebuehr ist kein Buendel benennbar - der Satz
-        # waere eine Zuzahlung ohne die Gegenleistung, die sie erkauft.
         raise GeraeteAbrufFehler(
             f"Telekom-selectedPlan {tarif_name!r} ohne recurringFee - "
             "keine Buendelaussage"
@@ -653,7 +607,7 @@ def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> lis
             continue
         name = str(eintrag.get("name") or "").strip()
         if not name:
-            continue  # Werbekachel, siehe Modulkopf
+            continue
 
         formen = _preisformen(eintrag.get("price") or {})
         if not formen:
@@ -662,8 +616,6 @@ def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> lis
             )
             continue
 
-        # Die zwei Proben aus dem Modulkopf: der je-Geraet-Tarifpreis muss
-        # zum selectedPlan gehoeren (ID) und ihm entsprechen (Betrag).
         geraet_tarif = (
             (eintrag.get("formattedPrices") or {}).get("recurringTariffPrice") or {}
         ).get("price") or {}
@@ -691,10 +643,6 @@ def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> lis
         )
         adresse = _passende_adresse(eintrag, links)
         sku = str(eintrag.get("id") or "").strip()
-        # JEDER Ratenplan wird ein EIGENES Buendel mit eigener
-        # `laufzeit_monate` - `tco_model.buendel_id()` traegt die Laufzeit
-        # im Schluessel, die Zahlweisen ueberschreiben sich also nicht mehr
-        # gegenseitig (B1).
         for form in formen:
             out.append(
                 {
@@ -704,8 +652,6 @@ def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> lis
                     "speicher_gb": speicher,
                     "sku": sku,
                     "tarif_name": tarif_name,
-                    # Die MF-ID des Tarifs - die Ordnung des Anbieters, siehe
-                    # Modulkopf ("WAS DER SLUG HIER IST").
                     "tarif_slug": tarif_id,
                     "tarif_monatlich": tarif_monatlich,
                     "geraet_zuzahlung": form["anzahlung"],

@@ -26,9 +26,6 @@ def _html(rumpf: str) -> str:
     return f"<html><body><main>{rumpf}</main></body></html>"
 
 
-# ------------------------------------------------------ was NICHT meldet
-
-
 def test_umsortierte_kacheln_sind_keine_aenderung():
     """Ein Anbieter, der seine Kacheln neu anordnet, aendert dieselbe
     Wertmenge - und loest deshalb nichts aus."""
@@ -75,9 +72,6 @@ def test_skripte_und_navigation_zaehlen_nicht():
     assert not any("24monate" in x for x in w)
 
 
-# ------------------------------------------------------------ was meldet
-
-
 def test_gesenkter_anschlusspreis_wird_erkannt():
     """Der Beispielfall des Auftragsdokuments."""
     alt = A.werte(A._text(_html("Anschlusspreis für Mobile M 39,99 €")))
@@ -99,9 +93,6 @@ def test_neues_datenvolumen_wird_erkannt():
     neu = A.werte(A._text(_html("Mobile M mit 40 GB")))
     dazu, weg = A.vergleiche(alt, neu)
     assert dazu and weg
-
-
-# ------------------------------------------------------------- Grundlinie
 
 
 def test_der_erste_abruf_meldet_nie(tmp_path, monkeypatch):
@@ -172,16 +163,12 @@ def test_eine_handvoll_werte_aus_dem_fliesstext_reicht_nicht(tmp_path, monkeypat
     assert bilanz["ohne_werte"] == 1 and bilanz["grundlinie"] == 0
 
 
-# ---------------------------------------------------------------- Kennung
-
-
 def test_die_kennung_kommt_aus_url_und_inhalt_nicht_aus_dem_titel():
     """Sonst haette der Seen-Store die zweite Preisaenderung derselben Seite
     fuer eine schon berichtete gehalten."""
     a = A.Aenderung(seite=SEITE, dazu=["preis|29.99€"], weg=["preis|39.99€"])
     b = A.Aenderung(seite=SEITE, dazu=["preis|19.99€"], weg=["preis|29.99€"])
     assert a.kennung() != b.kennung()
-    # ... und sie ist stabil.
     assert (
         a.kennung()
         == A.Aenderung(
@@ -191,15 +178,10 @@ def test_die_kennung_kommt_aus_url_und_inhalt_nicht_aus_dem_titel():
     assert A.als_item(a, JETZT).id == a.kennung()
 
 
-# ------------------------------------------------------------ Konfiguration
-
-
 def test_die_ausgelieferte_liste_bleibt_klein_und_deutsch():
     seiten = A.lade_seiten(Path(__file__).resolve().parents[1])
     assert 10 <= len(seiten) <= 25, "15-25 URLs, nicht mehr"
     assert all(s.url.startswith("https://") for s in seiten)
-    # Der eigene Vergleichsanker - ohne ihn ist jede Zahl der anderen ein
-    # Wert ohne Bezugsgroesse.
     assert any("vodafone" in s.marke.lower() for s in seiten)
 
 
@@ -207,9 +189,6 @@ def test_fehlende_konfiguration_legt_nichts_lahm(tmp_path):
     assert A.lade_seiten(tmp_path) == []
     items, bilanz = A.sammle(tmp_path, {}, heute=JETZT)
     assert items == [] and bilanz["seiten"] == 0
-
-
-# ------------------------------------------------------------------ Helfer
 
 
 def _viele_werte() -> str:

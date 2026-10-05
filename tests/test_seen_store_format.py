@@ -46,7 +46,6 @@ def test_neuer_store_schreibt_kompakt(tmp_path):
     assert text.startswith("#")
     hashes = [z for z in text.splitlines() if not z.startswith(("#", "@"))]
     assert hashes == [i.id for i in items]
-    # 3 Hashes + Kopfzeile + ein Zeitstempel - deutlich unter dem alten Format
     assert len(text) < 200
 
 
@@ -108,9 +107,6 @@ def test_add_ohne_neue_meldungen_schreibt_nichts(tmp_path):
     vorher = pfad.read_text()
     store.add([a])
     assert pfad.read_text() == vorher
-
-
-# --------------------------------------------------------------- Migration
 
 
 def test_migration_erhaelt_jeden_hash(tmp_path):

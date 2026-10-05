@@ -61,8 +61,6 @@ class Quellenbilanz:
     rel3: int = 0
     rel4: int = 0
     im_bericht: int = 0
-    # Kam `neu` aus dem Laufprotokoll (ab Lauf #68) oder aus dem Altbestand des
-    # Seen-Stores? Nur der erste Weg rechnet je Lauf und je Kanal.
     neu_aus_protokoll: bool = False
 
     @property
@@ -147,7 +145,6 @@ def _verbuchen(
             )
         return bilanzen[schluessel]
 
-    # --- Sammelseite: was das Laufprotokoll je Quelle festgehalten hat
     for eintrag in lauf.get("sources") or []:
         name = eintrag.get("name") or eintrag.get("url") or "?"
         url = eintrag.get("url") or ""
@@ -172,7 +169,6 @@ def _verbuchen(
             b.neu += int(eintrag.get("new") or 0)
             b.neu_aus_protokoll = True
 
-    # --- Bewertungsseite: was ein Analyst daraus aufgenommen hat
     for region in (bericht.get("regions") or {}).values():
         for h in region.get("highlights") or []:
             name = h.get("source") or ""

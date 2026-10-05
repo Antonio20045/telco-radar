@@ -29,7 +29,6 @@ import pathlib
 
 import yaml
 from bs4 import BeautifulSoup
-
 from tarifleiter_testbestand import mit_leiter
 
 from telco_radar.report import geraete_radar as wr
@@ -37,11 +36,10 @@ from telco_radar.report.html import render_site
 
 HEUTE = "2026-09-17"
 
-# Die festen Faelle (je Zeile: sku, hersteller, modell, speicher).
-SKU_IP15 = "apple-iphone-15-128gb-schwarz"  # VF + o2 klein: vergleichbar
-SKU_S26 = "samsung-galaxy-s26-256gb-schwarz"  # VF + o2 klein: vergleichbar
-SKU_X17 = "xiaomi-17-512gb-schwarz"  # nur o2: kein VF-TCO-24
-SKU_P10 = "google-pixel-10-256gb-schwarz"  # VF klein, o2 gross: Mismatch
+SKU_IP15 = "apple-iphone-15-128gb-schwarz"
+SKU_S26 = "samsung-galaxy-s26-256gb-schwarz"
+SKU_X17 = "xiaomi-17-512gb-schwarz"
+SKU_P10 = "google-pixel-10-256gb-schwarz"
 
 _FARBEN = {"farben": {"schwarz": ["Schwarz", "Black"]}}
 
@@ -72,8 +70,6 @@ def _tarife() -> list[dict]:
         {"von_monat": 1, "bis_monat": 24, "betrag": 29.95},
         {"von_monat": 25, "bis_monat": None, "betrag": 29.95},
     ]
-    # P3-E1: die Testleiter XS/M/L (5/36/85 GB) legt die Stufen dorthin,
-    # wo die alten Baender lagen - XS 10/18 GB, L 100 GB.
     return mit_leiter(
         [
             xs,
@@ -166,9 +162,6 @@ def _katalog(n_generisch: int) -> dict:
             "segment": "premium",
         },
     ]
-    # Die generischen Geraete reissen den Deckel der Modelliste - ihre Zahl
-    # haengt am Modulwert, nicht an einer abgeschriebenen Konstanten (derselbe
-    # Grund wie bei SICHTBAR_MAX in test_geraete_reiter_browser).
     for i in range(n_generisch):
         geraete.append(
             {
@@ -371,11 +364,6 @@ def _text(el) -> str:
     return " ".join(el.get_text(" ", strip=True).split())
 
 
-# --------------------------------------------------------------------------
-# S3: drei gleichwertige Sektionen, jede mit ihrem Satz
-# --------------------------------------------------------------------------
-
-
 def test_drei_sektionen_in_folge_jede_mit_ihrem_satz(tmp_path):
     """S3: Alarme / Abweichung als Modell-Liste / Händler als gleichwertiger
     Abschnitt - jede mit einem Satz, was sie misst.
@@ -392,23 +380,13 @@ def test_drei_sektionen_in_folge_jede_mit_ihrem_satz(tmp_path):
     assert tafel is not None, "#tafel-radar fehlt"
     koepfe = [_text(k) for k in tafel.select("h3.gr-unter")]
     assert len(koepfe) == 4, f"vier Sektionen erwartet, steht da: {koepfe}"
-    # 28.09.2026: erst „Mit Tarif" (die Leitzahl darueber stammt aus
-    # dieser Liste), dann die drei Barpreis-Sektionen „Ohne Vertrag" -
-    # dieselben Begriffe wie die Reiter.
     assert koepfe[0].startswith("Mit Tarif – alle Modelle"), koepfe
     assert koepfe[1].startswith("Ohne Vertrag – wo Vodafone"), koepfe
     assert koepfe[2].startswith("Ohne Vertrag – Preis-Alarme"), koepfe
     assert koepfe[3].startswith("Ohne Vertrag – Händler"), koepfe
-    # Jede Sektion erklärt in einem Satz ihre Frage - keine ohne Zweck.
     for kopf in koepfe:
         sec = kopf and suppe.find(string=kopf)
         assert sec, kopf
-
-
-# --------------------------------------------------------------------------
-# P4/D1 (STRATEGIE_GERAETE_V3, 18.09.2026): die Grafik, die Legende, der
-# Rot-Deckel
-# --------------------------------------------------------------------------
 
 
 def test_die_radar_tafel_traegt_eine_balkengrafik(tmp_path):
@@ -428,8 +406,6 @@ def test_die_radar_tafel_traegt_eine_balkengrafik(tmp_path):
     breit = tafel.select_one("svg.wr-gr--breit")
     balken = breit.select("path.wr-gr-balken")
     assert balken, "die Grafik trägt keinen Balken - der Test prüft nichts"
-    # Ein Balken trägt beide Zahlen selbst (Wert an der Spitze); der
-    # <title> nennt beide Preise der Messung (Nachprüfbarkeit).
     assert breit.select("text.wr-gr-wert"), "kein Balken trägt seinen Wert"
     titel = balken[0].select_one("title")
     assert titel is not None and "€" in titel.get_text(), (
@@ -516,8 +492,6 @@ def test_die_haendler_sektion_sagt_was_sie_misst(tmp_path):
     assert "Barpreis" in titel and "ohne Vertrag" in titel, (
         "der title-Hinweis nennt nicht das Maß (Barpreis ohne Vertrag/Tarif)"
     )
-    # Der Händler steht MIT Namen und Abweichung da - dieselbe %-Logik,
-    # nie gegen eine TCO gerechnet.
     text = _text(sec)
     assert "Saturn" in text
     assert "%" in text
@@ -564,27 +538,14 @@ def test_der_tafelkopf_polt_nur_die_sektionen_mit_vorzeichen(tmp_path):
     tafel = suppe.select_one("#tafel-radar")
     kopf = tafel.select_one("#wr-grafik .wr-grafik-bild").get("title") or ""
     assert kopf, "der Titel-Hinweis an der Balkengrafik fehlt"
-    # Die Pauschalbehauptung ('mit Vorzeichen' für alle drei) ist weg …
     assert "Die drei Sektionen messen sie" not in kopf, kopf
-    # … und die Alarme sind als BETRAG benannt, nicht als vorzeichen-
-    # behaftete Leitzahl. P4/D4 (18.09.2026) hat den Kopf von drei
-    # Sätzen auf EINEN gestrafft (Falz-Regel: vor dem ersten Datenelement
-    # höchstens EIN Satz - die Leitzahl darüber sagt die Richtung ohne
-    # Worte); der Test hält die AUSSAGE, nicht den alten Wortlaut.
     assert "als Betrag" in kopf, kopf
-    # Die Gegenseite der Zusicherung: die Alarmtabelle zeigt Beträge -
-    # jede sichtbare Prozentzahl ist positiv (Wettbewerber günstiger).
     werte = [
         float(z.get("data-s-prozent"))
         for z in tafel.select("#wr-alarme .gr-a-zeile[data-s-prozent]")
     ]
     assert werte, "Fixture ohne Alarmzeilen - der Test prüfte nichts"
     assert all(w > 0 for w in werte), werte
-
-
-# --------------------------------------------------------------------------
-# S2: die Abweichungstabelle IST die Modell-Liste
-# --------------------------------------------------------------------------
 
 
 def test_die_modelliste_zeigt_alle_modelle_ohne_stillen_deckel(tmp_path):
@@ -639,9 +600,6 @@ def test_die_modellliste_sortiert_nach_robwerten(tmp_path):
     for z in suppe.select("#wr-abweichung tr.gr-a-zeile"):
         roh = z.get("data-s-prozent", "")
         assert roh == "" or isinstance(float(roh), float)
-    # Der Prozent-ROHWERT trägt den Punkt, die ZELLE das deutsche Komma -
-    # zwei verschiedene Schreibweisen derselben Zahl sind die Regel, nicht
-    # der Zufall (die Zelle formatiert, der Rohwert sortiert).
     erste = suppe.select_one("#wr-abweichung tr.gr-a-zeile td:nth-child(2)")
     assert "," in _text(erste), "die Abweichungs-Zelle ist nicht formatiert"
 
@@ -660,8 +618,6 @@ def test_je_modellzeile_ein_sprung_in_den_graphen(tmp_path):
         href = sprung.get("href", "")
         assert "modell=" in href, href
         assert href.startswith("geraete.html") or href.startswith("?"), href
-    # Eine vergleichbare Zeile nennt ihr Band (der Graph springt direkt
-    # in das Band, in dem das Paar gerechnet wurde).
     vergleichbar = [z for z in zeilen if z.get("data-s-prozent") not in (None, "")]
     assert vergleichbar, "die Fixture trägt keine vergleichbare Zeile"
     with_band = [
@@ -695,8 +651,6 @@ def test_die_detailzeile_zeigt_alle_anbieter_der_gruppe(tmp_path):
     for z in tafel.select("tr.gr-a-zeile"):
         auf = suppe.select_one("#" + z["data-auf"])
         assert auf is not None, "Modell-Zeile ohne Detailzeile"
-        # Nur Zeilen MIT td zaehlen - der html.parser setzt die thead-Zeile
-        # der Tabelle-in-Zelle neben den tbody (Browser-Test deckt das DOM).
         namen = {
             _text(det.select("td")[0]) for det in auf.select("tr") if det.select("td")
         }
@@ -752,11 +706,6 @@ def test_die_alt_url_ist_weiterleitung_und_der_lifecycle_ist_mitgezogen(tmp_path
     )
 
 
-# --------------------------------------------------------------------------
-# Der Notzustand
-# --------------------------------------------------------------------------
-
-
 def test_leerzustand_traegt_den_modellisten_schluessel():
     """`leer()` ist der Auffangboden - fehlt der Schlüssel, wirft die
     Vorlage genau dann, wenn ohnehin etwas kaputt ist."""
@@ -782,14 +731,10 @@ def test_die_leitzahl_der_uebersicht_liest_sich_wie_die_balken(tmp_path):
     )
     gesamt = float(erste["data-s-gesamt"])
     vf = float(erste["data-s-vf"])
-    # Gegenprobe: die Fixture hat einen echten Abstand, sonst prüft der
-    # Vorzeichenvergleich unten nichts.
     assert abs(vf - gesamt) > 0.005, (vf, gesamt)
     erwartet = wr._dvorzeichen(gesamt - vf) + " €"
     assert _text(zahl) == erwartet, (_text(zahl), erwartet)
-    # Dieselbe Zahl steht in der Quellzeile direkt darunter.
     assert erwartet in _text(erste), _text(erste)
-    # Das Wort zur Zahl kommt aus derselben Differenz.
     label = suppe.select_one("#tafel-radar .gr-leit--radar .gr-leit-label")
     wort = "günstiger als" if gesamt < vf else "teurer als"
     anbieter = erste["data-s-anbieter"]
@@ -843,8 +788,6 @@ def test_die_balken_tragen_das_vorzeichen_der_seite():
         assert any(w.startswith("-280,90 €") for w in werte), werte
         assert any(w.startswith("+20,00 €") for w in werte), werte
         assert not any(w.startswith("+280,90") for w in werte), werte
-        # Richtung und Vorzeichen aus derselben Größe: negative Werte
-        # stehen links der Vodafone-Linie (Anker am Ende), positive rechts.
         for t in svg.select("text.wr-gr-wert"):
             links = t.get("text-anchor") == "end"
             assert links == _text(t).startswith("-"), (_text(t), links)

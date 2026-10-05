@@ -37,11 +37,6 @@ TAG2 = "2026-09-12"
 SKU = "apple-iphone-15-128gb-schwarz"
 
 
-# --------------------------------------------------------------------------
-# Bausteine
-# --------------------------------------------------------------------------
-
-
 def _o2(datum: str, rate: float = 20.0) -> Buendel:
     """Die aufgeteilte Preisform: Tarifgrundpreis und Geraeterate getrennt."""
     return Buendel(
@@ -123,11 +118,6 @@ def _historie(pfad: pathlib.Path) -> list[dict]:
     ]
 
 
-# --------------------------------------------------------------------------
-# Erster Lauf, zweiter Lauf, anderer Tag
-# --------------------------------------------------------------------------
-
-
 def test_erster_lauf_schreibt_je_buendel_eine_zeile(tmp_path):
     pfad = tmp_path / "geraete_tco.json"
     saetze = [_o2(TAG1), _vodafone(TAG1), _einsundeins(TAG1)]
@@ -142,9 +132,6 @@ def test_erster_lauf_schreibt_je_buendel_eine_zeile(tmp_path):
         zeile = nach_id[satz.id]
         assert zeile["datum"] == TAG1
         assert zeile["abgerufen_am"] == TAG1
-        # Die Leitzahl steht FERTIG in der Zeile: P5 zeichnet die Reihe,
-        # ohne die Rechnung des damaligen Laufs nachbauen zu muessen. Sie
-        # bleibt eine Ableitung von `tco_model` - hier nur eingefroren.
         assert zeile["gesamt"] == tco_24(satz).gesamt
 
     o2 = nach_id[_o2(TAG1).id]
@@ -163,16 +150,12 @@ def test_zweiter_lauf_am_selben_tag_ersetzt_statt_zu_duplizieren(tmp_path):
     _lauf(pfad, [_o2(TAG1), _vodafone(TAG1)], TAG1)
     historie = TcoDB(pfad).historie_path
 
-    # Derselbe Tag, dieselben Werte: die Datei bleibt wortgleich.
     identisch = historie.read_text(encoding="utf-8")
     _lauf(pfad, [_o2(TAG1), _vodafone(TAG1)], TAG1)
     assert historie.read_text(encoding="utf-8") == identisch, (
         "ein wiederholter Lauf am selben Tag darf die Historie nicht aendern"
     )
 
-    # Derselbe Tag, korrigierte Werte: die Zeile wird aktualisiert - kein
-    # zweiter Punkt fuer denselben Messtag (sonst luege die Reihe ab P5
-    # um die Zahl der Nachtlaeufe, nicht um den Markt).
     _lauf(pfad, [_o2(TAG1, rate=18.0), _vodafone(TAG1, tarif=27.95)], TAG1)
     zeilen = _historie(pfad)
     assert len(zeilen) == 2
@@ -194,8 +177,6 @@ def test_lauf_mit_anderem_datum_haengt_an_und_laesst_alte_tage_ruhen(tmp_path):
     _lauf(pfad, [_o2(TAG2, rate=18.0), _vodafone(TAG2)], TAG2)
     zeilen = _historie(pfad)
     assert len(zeilen) == 4
-    # Die Zeilen von TAG1 stehen unveraendert da - auch nach der Korrektur
-    # am folgenden Tag bleibt der gestrige Messtag der gemessene.
     assert zeilen[:2] == alte_zeilen
     assert {z["datum"] for z in zeilen[2:]} == {TAG2}
     assert (
@@ -231,11 +212,6 @@ def test_zwei_laeufe_mit_verschiedenen_daten_ergeben_zwei_punkte(tmp_path):
         assert sorted(je_id[satz.id]) == [TAG1, TAG2], satz.id
 
 
-# --------------------------------------------------------------------------
-# Die Stand-Datei und der ehrliche Anfang
-# --------------------------------------------------------------------------
-
-
 def test_die_stand_datei_bleibt_ein_satz_je_buendel(tmp_path):
     """`geraete_tco.json` behaelt seine Semantik: aktueller Stand, eine
     Messung je Buendel. Die Seite liest WEITER aus dieser Datei - die
@@ -248,8 +224,6 @@ def test_die_stand_datei_bleibt_ein_satz_je_buendel(tmp_path):
     ids = [b["id"] for b in roh["buendel"]]
     assert len(ids) == len(set(ids)) == 2
     assert roh["updated"] == TAG2
-    # Kein Historienfeld ist in den Stand gerutscht - „datum" ist der
-    # Schluessel der Historiendatei, „gesamt" ihre gerechnete Spalte.
     for eintrag in roh["buendel"]:
         assert "datum" not in eintrag
         assert "gesamt" not in eintrag
@@ -268,8 +242,6 @@ def test_die_historie_beginnt_mit_dem_ersten_lauf_nicht_in_der_vergangenheit(tmp
     db = TcoDB(pfad)
     db.upsert_buendel([_o2(TAG0)], TAG0)
     db.save(TAG0)
-    # Der simulierte Stand von frueher - ohne jede Historiendatei, so
-    # liegt das Repo vor dieser Umstellung.
     TcoDB(pfad).historie_path.unlink(missing_ok=True)
 
     _lauf(pfad, [_o2(TAG1)], TAG1)
@@ -288,10 +260,8 @@ def test_eine_unlesbare_historie_wird_nicht_angefasst(tmp_path):
     muell = "{kein json\n"
     historie.write_text(muell, encoding="utf-8")
 
-    _lauf(pfad, [_o2(TAG2)], TAG2)  # darf nicht werfen
+    _lauf(pfad, [_o2(TAG2)], TAG2)
     assert historie.read_text(encoding="utf-8") == muell, (
         "eine unlesbare Historie wird still ersatzlos ueberschrieben"
     )
-    # Der Stand ist trotzdem von heute - ein Historiesschaden kostet
-    # keinen Messtag der Gegenwart.
     assert json.loads(pfad.read_text(encoding="utf-8"))["updated"] == TAG2

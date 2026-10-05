@@ -46,13 +46,11 @@ def _satz(anbieter, name, gb, grund, tid=None):
 def _bestand(xl_gb=None) -> dict:
     """Die Vodafone-Leiter vom 25.09.2026 plus je Anbieter ein paar Saetze."""
     saetze = [
-        # Absichtlich NICHT in Leiterfolge: geordnet wird nach Grundgebuehr.
         _satz("Vodafone", "Vodafone Mobil L mit Smartphone", 120.0, 59.95),
         _satz("Vodafone", "Vodafone Mobil XS mit Smartphone", 15.0, 29.95),
         _satz("Vodafone", "Vodafone Mobil XL mit Smartphone", xl_gb, 79.95),
         _satz("Vodafone", "Vodafone Mobil M mit Smartphone", 60.0, 49.95),
         _satz("Vodafone", "Vodafone Mobil S mit Smartphone", 30.0, 39.95),
-        # Die Tarife OHNE Geraet: andere Volumen, dieselben Stufen.
         _satz(
             "Vodafone", "Vodafone Mobil XS", 18.0, 29.95, "vodafone:vodafone-mobil-xs"
         ),
@@ -71,16 +69,10 @@ def _bestand(xl_gb=None) -> dict:
     return {s["tarif_id"]: s for s in saetze}
 
 
-# --------------------------------------------------------------------------
-# Die Leiter
-# --------------------------------------------------------------------------
-
-
 def test_leiter_sind_die_vodafone_tarife_mit_smartphone_nach_preis():
     leiter = band.tarifleiter(_bestand())
     assert [s.key for s in leiter] == ["xs", "s", "m", "l", "xl"]
     assert [s.label for s in leiter] == ["XS", "S", "M", "L", "XL"]
-    # Das Volumen ist das des Blatts MIT Smartphone (XS 15, nicht 18 GB).
     assert [s.gb for s in leiter] == [15.0, 30.0, 60.0, 120.0, None]
     assert [s.bereich for s in leiter] == ["15 GB", "30 GB", "60 GB", "120 GB", ""]
 
@@ -99,29 +91,23 @@ def test_ohne_vodafone_satz_gibt_es_keine_leiter_und_einen_benannten_grund():
     assert leiter == ()
     assert band.tarif_baender(ohne) == {}
     assert band.band_leer_text(leiter) == band.LEITER_FEHLT_TEXT
-    # Gegenprobe: mit Leiter ist es der Satz "kein Buendel".
     assert band.band_leer_text(band.tarifleiter(_bestand())) == band.BAND_LEER_TEXT
-
-
-# --------------------------------------------------------------------------
-# Zuordnung
-# --------------------------------------------------------------------------
 
 
 def test_wettbewerber_fallen_in_die_naechste_stufe():
     leiter = band.tarifleiter(_bestand())
     assert band.band_von_gb(10, leiter) == "xs"
-    assert band.band_von_gb(20, leiter) == "xs"  # 5 zu 15, 10 zu 30
+    assert band.band_von_gb(20, leiter) == "xs"
     assert band.band_von_gb(25, leiter) == "s"
     assert band.band_von_gb(50, leiter) == "m"
     assert band.band_von_gb(125, leiter) == "l"
-    assert band.band_von_gb(200, leiter) == "l"  # XL hat kein Volumen
+    assert band.band_von_gb(200, leiter) == "l"
 
 
 def test_gleichstand_zaehlt_zur_groesseren_stufe():
     leiter = band.tarifleiter(_bestand())
-    assert band.band_von_gb(45, leiter) == "m"  # je 15 GB zu S und M
-    assert band.band_von_gb(22.5, leiter) == "s"  # je 7,5 GB zu XS und S
+    assert band.band_von_gb(45, leiter) == "m"
+    assert band.band_von_gb(22.5, leiter) == "s"
 
 
 def test_fehlendes_volumen_hat_keine_stufe():
@@ -138,14 +124,11 @@ def test_unbegrenzt_nur_bei_einer_unbegrenzten_vodafone_stufe():
     assert band.band_von_gb(INF, band.tarifleiter(_bestand())) is None
     leiter_inf = band.tarifleiter(_bestand(xl_gb=INF))
     assert band.band_von_gb(INF, leiter_inf) == "xl"
-    # Ein endliches Volumen landet nie auf der unbegrenzten Stufe.
     assert band.band_von_gb(10_000, leiter_inf) == "l"
 
 
 def test_vodafone_tarife_gehen_ueber_den_namen_in_ihre_stufe():
     index = band.tarif_baender(_bestand())
-    # 18 GB laege naeher an 15 als an 30, 35 GB naeher an 30 - der Name
-    # entscheidet trotzdem, und XL ohne Volumen bleibt XL.
     assert index["vodafone:vodafone-mobil-xs"] == "xs"
     assert index["vodafone:vodafone-mobil-s"] == "s"
     assert index["vodafone:vodafone-mobil-xl"] == "xl"
@@ -159,8 +142,8 @@ def test_tarif_baender_ordnet_wettbewerber_nach_volumen():
     assert index["congstar:m"] == "l"
     assert index["11:s"] == "xs"
     assert index["o2:m45"] == "m"
-    assert "telekom:xl" not in index  # unbegrenzt, XL ohne Volumen
-    assert "o2:um" not in index  # kein Volumen erhoben
+    assert "telekom:xl" not in index
+    assert "o2:um" not in index
 
 
 def test_katalog_und_chip_tragen_die_leiter():
@@ -190,10 +173,6 @@ def test_leiter_am_echten_bestand():
     preise = [s.grundgebuehr for s in leiter]
     assert preise == sorted(preise)
 
-
-# --------------------------------------------------------------------------
-# congstar: ausgeschlossene Blaetter werden zurueckgezogen
-# --------------------------------------------------------------------------
 
 EINSTIEG = "https://www.congstar.de/produktinformationsblaetter/"
 BLATT = "https://www.congstar.de/fileadmin/pib/Produktinformationsblatt_545.pdf"
@@ -265,9 +244,7 @@ def test_ausgeschlossenes_blatt_wird_nicht_geholt_und_zurueckgezogen(tmp_path):
     satz = TarifSpeicher(pfad).letzter(tid)
     assert satz["zurueckgezogen_am"] == "2026-09-28"
     assert ist_zurueckgezogen(satz)
-    # Die Zeitreihe bleibt: kein Satz geloescht, nur markiert.
     assert len(pfad.read_text(encoding="utf-8").strip().splitlines()) == 1
-    # Beide Leser lassen ihn aus.
     assert Tarifbestand.aus_datei(pfad).je_id == {}
     assert Tarifbestand.aus_datei(pfad).je_id_aktuell == {}
     assert lade_staende(pfad) == []

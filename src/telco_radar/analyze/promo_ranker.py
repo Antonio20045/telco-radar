@@ -77,19 +77,8 @@ from .llm import complete, extract_json
 
 log = logging.getLogger(__name__)
 
-# Steigt, wenn sich die Rubrik inhaltlich aendert. Alle gespeicherten
-# LLM-Achsen mit kleinerer Version werden dann beim naechsten Lauf neu
-# bewertet (und der Sprung ist im Datensatz nachvollziehbar).
-# Version 2 (27.07.2026): nach einer zweiten, unabhaengigen Bewertungsrunde
-# ueber dieselben 131 echten Angebote gescharft. Die Uebereinstimmung lag bei
-# gewichtetem Kappa 0.95 (lever) bzw. 0.92 (depth), aber die verbliebenen
-# Abweichungen konzentrierten sich auf drei erklaerbare Faelle: entfallender
-# Bereitstellungspreis, Empfehlungspraemie und 1-Euro-Anzahlung. Fuer genau
-# die steht jetzt ein verbindlicher Zweifelsfall-Block in der Rubrik.
 RUBRIC_VERSION = 2
 
-# Gewichte der fuenf Achsen. Summe muss 1.0 ergeben; ueber
-# settings.yaml -> promo_score.weights ohne Codeaenderung drehbar.
 DEFAULT_WEIGHTS: dict[str, float] = {
     "lever": 0.30,
     "depth": 0.25,
@@ -98,20 +87,13 @@ DEFAULT_WEIGHTS: dict[str, float] = {
     "campaign": 0.10,
 }
 
-# Ein-/Ausstiegsschwelle fuer die Highlight-Sektion (Hysterese-Band, siehe
-# apply_hysteresis): rein ab ENTER, raus erst unter EXIT. Verhindert, dass ein
-# Angebot direkt an der Grenze von Lauf zu Lauf flackert.
 DEFAULT_ENTER = 68
 DEFAULT_EXIT = 60
 
 _DEFAULT_MECHANIC = "sonstiges"
 
-# Achse C: Marktreichweite der Marke. Deterministisch aus der Quellen-
-# konfiguration (config/promo_sources.yaml, Feld "reach"), nicht geschaetzt.
-# Fallback aus dem Tier, falls das Feld fehlt.
 _REACH_FROM_TIER = {1: 3, 2: 2}
 
-# Achse E: ab wie vielen Tagen Restlaufzeit ein Enddatum noch als "akut" gilt.
 _URGENT_DAYS = 14
 
 _SCORE_SYSTEM = """\
@@ -187,11 +169,6 @@ Angebot, in derselben Reihenfolge und mit dem mitgelieferten Feld "id":
 [{{"id": "...", "evidence": "...", "reason": "...", "lever": 0, "depth": 0,
 "mechanic": "..."}}]
 """
-
-
-# --------------------------------------------------------------------------
-# Deterministische Achsen (C, D, E) - kein LLM, exakt reproduzierbar
-# --------------------------------------------------------------------------
 
 
 def reach_axis(source) -> int:
@@ -288,11 +265,6 @@ def campaign_axis(valid_until: str | None, today: str) -> int:
     return 3 if days <= _URGENT_DAYS else 2
 
 
-# --------------------------------------------------------------------------
-# Aggregation
-# --------------------------------------------------------------------------
-
-
 def normalise_weights(raw: dict | None) -> dict[str, float]:
     """Gewichte aus settings.yaml uebernehmen, fehlende Achsen aus den
     Defaults ergaenzen und auf Summe 1.0 normieren. Unbrauchbare Eingaben
@@ -353,11 +325,6 @@ def needs_judgement(entry: dict, model: str) -> bool:
     if int(judged.get("rubric_version") or 0) != RUBRIC_VERSION:
         return True
     return judged.get("model") != model
-
-
-# --------------------------------------------------------------------------
-# LLM-Achsen (A, B)
-# --------------------------------------------------------------------------
 
 
 def _clamp_axis(value) -> int:
@@ -462,11 +429,6 @@ def judge_offers(
     return out
 
 
-# --------------------------------------------------------------------------
-# Orchestrierung
-# --------------------------------------------------------------------------
-
-
 def apply_hysteresis(entry: dict, score: int, enter: int, exit_: int) -> bool:
     """Highlight-Zustand mit Hysterese-Band fortschreiben: rein ab *enter*,
     raus erst unter *exit_*, dazwischen bleibt der bisherige Zustand stehen.
@@ -509,10 +471,6 @@ def score_all(
     if exit_ > enter:
         exit_ = enter
 
-    # Nur Marken, die aktuell auch konfiguriert sind: die DB haelt Eintraege
-    # entfernter Quellen als totes Datum weiter vor (z. B. der 2026 gestrichene
-    # Tier-3-Zweig). Die tauchen auf der Seite nirgends auf - sie zu bewerten
-    # waere pure LLM-Verschwendung.
     by_name = {getattr(s, "name", ""): s for s in (sources or [])}
     live = [
         e
@@ -556,9 +514,6 @@ def score_all(
                         else:
                             judged_failed += 1
 
-    # Achse D braucht die Mechanik ALLER Eintraege, also erst nach der
-    # LLM-Runde - sonst wuerde ein frisch bewertetes Angebot seine eigene
-    # Marktbreite nicht sehen.
     for e in live:
         judged = e.get("judged") or {}
         if judged.get("mechanic"):
@@ -576,9 +531,6 @@ def score_all(
             "campaign": campaign_axis(e.get("valid_until"), today),
         }
         if not judged:
-            # Ohne LLM-Achsen waere der Score systematisch zu niedrig und
-            # nicht mit bewerteten Angeboten vergleichbar - dann lieber
-            # ehrlich "noch nicht bewertet" als eine irrefuehrende Zahl.
             e["score"] = None
             e["score_axes"] = {k: v for k, v in axes.items() if v is not None}
             e["highlight"] = False
@@ -592,8 +544,6 @@ def score_all(
         if e["highlight"]:
             highlights += 1
 
-    # Ausgelaufene Eintraege verlieren ihr Highlight sofort - sie sind auf
-    # der Seite ohnehin nur noch eine Fussnotenzahl.
     for e in entries:
         if e.get("status") == "ausgelaufen":
             e["highlight"] = False

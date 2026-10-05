@@ -49,8 +49,6 @@ sys.path.insert(0, str(ROOT / "src"))
 from telco_radar.analyze import editor  # noqa: E402
 from telco_radar.analyze import redaktion_kontinuitaet as rk  # noqa: E402
 
-# Dieselben zwei Formulierungen wie in pipeline.py - siehe dort fuer die
-# Unterscheidung (keine neuen Meldungen vs. eine gescheiterte Bewertung).
 _GRUND_KEIN_STOFF = "es gab keine neuen Meldungen zu bewerten"
 _GRUND_AUSFALL = "eine vorübergehende Störung des Analyse-Dienstes"
 
@@ -82,9 +80,9 @@ def main() -> int:
     for pfad in kandidaten:
         report = json.loads(pfad.read_text(encoding="utf-8"))
         if report.get("redaktion_ausfall"):
-            continue  # schon geheilt (oder ein spaeterer Lauf hat es selbst getan)
+            continue
         if rk.bewertete_meldungen(report) > 0:
-            continue  # diese Ausgabe hat selbst etwas geliefert
+            continue
 
         grund = (
             _GRUND_AUSFALL if report.get("stats", {}).get("new") else _GRUND_KEIN_STOFF
@@ -113,10 +111,6 @@ def main() -> int:
         report["briefing_md"] = body
         report["competitors"] = competitors
         report["redaktion_ausfall"] = ausfall
-        # Dieselbe ehrliche Zahl, die pipeline.py seit dem 05.09.2026 VOR der
-        # Uebernahme in stats.bewertete festhaelt (siehe html.py: n_bewertet
-        # auf transparenz.html). Hier ist sie per Vorbedingung 0 - genau das
-        # hat den Bericht erst zum Heilungskandidaten gemacht.
         report.setdefault("stats", {})["bewertete"] = 0
         pfad.write_text(
             json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8"

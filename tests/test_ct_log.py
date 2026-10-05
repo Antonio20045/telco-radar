@@ -41,17 +41,10 @@ def antwort() -> list:
     return json.loads(FIXTURE.read_text(encoding="utf-8"))
 
 
-# --------------------------------------------------------------------------- #
-# Namen aus der Antwort
-# --------------------------------------------------------------------------- #
-
-
 def test_namen_aus_echter_antwort(antwort):
     namen = namen_aus_antwort(antwort)
     assert "jamobil-news.congstar.de" in namen
     assert "adventskalender.congstar.de" in namen
-    # Die Antwort deckt auch Namen ausserhalb der abgefragten Domain ab -
-    # genau das macht sie wertvoll (congstar betreibt congstarnews.de).
     assert "pennymobil.congstarnews.de" in namen
 
 
@@ -78,10 +71,6 @@ def test_unerwartete_antwortform_wirft():
 def test_muell_in_der_liste_wird_uebersprungen():
     assert namen_aus_antwort([None, "x", {"dns_names": ["a.de"]}]) == {"a.de"}
 
-
-# --------------------------------------------------------------------------- #
-# Rauschfilter
-# --------------------------------------------------------------------------- #
 
 RAUSCHEN = ["sso", "mail", "cdn", "staging", "test", "api"]
 
@@ -133,11 +122,6 @@ def test_leere_rauschliste_filtert_nichts():
     assert not ist_technisch("sso.congstar.de", [])
 
 
-# --------------------------------------------------------------------------- #
-# Speicher und Grundlinie
-# --------------------------------------------------------------------------- #
-
-
 def test_speicher_haelt_ueber_neuladen(tmp_path):
     p = tmp_path / "ct_seen.jsonl"
     s = CTSpeicher(p)
@@ -157,11 +141,6 @@ def test_speicher_ueberliest_kaputte_zeilen(tmp_path):
     )
     s = CTSpeicher(p)
     assert s.namen("a.de") == {"x.a.de"}
-
-
-# --------------------------------------------------------------------------- #
-# hole(): der Timeout ist eine eigene Klasse, kein leeres Ergebnis
-# --------------------------------------------------------------------------- #
 
 
 class _Client:
@@ -231,11 +210,6 @@ def test_abfrage_nutzt_subdomains_und_expand():
     p = client.gesehen[0]["params"]
     assert p["include_subdomains"] == "true"
     assert p["expand"] == "dns_names"
-
-
-# --------------------------------------------------------------------------- #
-# sammle(): Grundlinie, Delta, Deckel
-# --------------------------------------------------------------------------- #
 
 
 def _repo(tmp_path: Path, domains: str, rauschen: list[str]) -> Path:
@@ -347,14 +321,7 @@ def test_echte_config_ist_ladbar():
     assert len(domains) >= 10
     assert "sso" in rauschen and "cdn" in rauschen
     assert any(d.domain == "congstar.de" for d in domains)
-    # telekom.de MUSS als gross markiert sein, sonst laeuft jeder Lauf in
-    # einen vermeidbaren Timeout.
     assert any(d.domain == "telekom.de" and d.gross for d in domains)
-
-
-# --------------------------------------------------------------------------- #
-# Modellstufe
-# --------------------------------------------------------------------------- #
 
 
 def _fund(name: str) -> Fund:
@@ -449,11 +416,6 @@ def test_ohne_modell_laeuft_die_stufe_gar_nicht(tmp_path, antwort):
     )
     assert len(items) == 1
     assert "unbestätigt" in items[0].summary
-
-
-# --------------------------------------------------------------------------- #
-# Das Item
-# --------------------------------------------------------------------------- #
 
 
 def test_item_traegt_den_vorbehalt_im_text():

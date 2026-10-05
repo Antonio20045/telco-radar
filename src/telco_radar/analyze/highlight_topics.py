@@ -48,52 +48,14 @@ from .llm import complete, extract_json
 log = logging.getLogger(__name__)
 
 
-# --- Kandidatensuche ------------------------------------------------------
-# Was eine Gruppe sein muss, um ueberhaupt gefragt zu werden. Der Schutz vor
-# der einzelnen Redaktion, die nachlegt, liegt bei MIND_QUELLEN - nicht bei
-# der Gruppengroesse. MIND_MELDUNGEN stand bis zum 17.08.2026 auf 5, und mit
-# dieser Schwelle hat die Mechanik seit ihrem Bau am 07.08. KEIN einziges
-# Thema angelegt: der Google-Pixel-11-Launch brachte am 14.08. vier
-# Highlights aus vier Quellen (darunter die Prioritaet-5-Meldung der Woche)
-# und fiel an 4 < 5. Ein Geraetelaunch erreicht in EINEM Lauf fast nie
-# fuenf bewertete Meldungen - er verteilt sich ueber Carrier-Meldungen an
-# verschiedenen Tagen. Deshalb 4, und deshalb rechnet die Kandidatensuche
-# seitdem ueber das Berichtsarchiv mit (ARCHIV_TAGE unten).
 MIND_MELDUNGEN = 4
 MIND_QUELLEN = 3
-# Wie viele Meldungen einer Gruppe aus dem AKTUELLEN Lauf stammen muessen.
-# Das Archiv (unten) verstaerkt nur, was gerade Momentum hat - es soll kein
-# Thema aus einer zwei Wochen alten Welle entstehen, zu der diese Woche
-# nichts mehr kommt. Zwei, nicht eins: dieselbe Schwelle wie MIND_ZUWACHS,
-# denn ein Thema, das nicht einmal den Zuwachs eines BESTEHENDEN Themas
-# erreichte, wuerde als frisches sofort zu altern beginnen. Ohne diese
-# Bedingung standen am Korpus vom 15.08.2026 gemessen 40 Gruppen an, die
-# meisten ohne eine einzige Meldung der laufenden Woche.
 MIND_AKTUELL = 2
 MIND_GEMEINSAM = 2
-# Ein Wort taugt nur als Bindeglied, wenn es in mindestens drei Meldungen
-# steht - zwei sind ein Zufall.
 MIND_WORTHAEUFIGKEIT = 3
 MAX_KANDIDATEN = 6
-# Zwei Wortpaare beschreiben oft dieselbe Gruppe ("samsung+galaxy" und
-# "galaxy+fold8"). Gerechnet wird gegen die KLEINERE Menge - gegen die
-# groessere gerechnet saehe eine Gruppe, die eine andere vollstaendig
-# enthaelt, wie eine eigene aus (dieselbe Lehre wie beim Abnahme-Check
-# neuer Quellen, CLAUDE.md §6).
 UEBERLAPPUNG = 0.6
 
-# --- Spezifitaet ------------------------------------------------------------
-# Woerter, die eine wiederkehrende KATEGORIE binden (Quartalsberichte), nicht
-# ein EREIGNIS. Gemessen am Korpus vom 27.08.2026: die Gruppe
-# worte=['quartal','zweiten', ...] (n=32) und eine reine Namensgruppe
-# worte=['deutsche','telekom'] (n=26, kein Wort davon benennt einen Vorgang)
-# standen vor der Apple-Keynote-Gruppe worte=['apple','iphone','september',
-# 'ultra'] (n=10, 5 Quellen, alle Schwellen erfuellt) - MAX_KANDIDATEN schnitt
-# nach roher Groesse, die Apple-Gruppe lag auf Rang 17 von 116 und wurde nie
-# vorgelegt. Bewusst OHNE Firmenliste: eine Gruppe mit hoechstens zwei
-# Bindewoertern und ganz ohne Ereignis-/Datumssprache ist unspezifisch, egal
-# ob die zwei Woerter zufaellig eine Firma buchstabieren oder etwas anderes -
-# das faengt _spezifitaet() unten pauschal ab.
 RAUSCH_WOERTER = frozenset(
     {
         "quartal",
@@ -118,11 +80,6 @@ RAUSCH_WOERTER = frozenset(
         "vierten",
     }
 )
-# Sprache, die ein Ereignis (statt einer Kategorie) benennt - dieselbe Liste
-# traegt den Spezifitaets-Bonus hier UND den Antizipations-Pfad unten
-# (_ankuendigungssprache). Monate zaehlen mit: eine Datumsangabe ist so gut
-# wie ein Eigenname ein Beleg fuer einen konkreten Vorgang statt einer
-# Dauerkategorie.
 _MONATE = (
     "januar",
     "februar",
@@ -159,20 +116,8 @@ _ANKUENDIGUNG_WOERTER = (
 )
 EREIGNIS_WOERTER = frozenset(_MONATE) | frozenset(_ANKUENDIGUNG_WOERTER)
 
-# Ein Bindewort mit einer Ziffer darin ist praktisch immer eine Modell- oder
-# Generationsbezeichnung ("pixel-11-serie", "s25", "5g") - also ein
-# Eigenname. Traegt den Produktwort-Anteil in `_spezifitaet`.
 _PRODUKTWORT = re.compile(r"\d")
 
-# --- Ankuendigungssprache ---------------------------------------------------
-# Nur das Vokabular, das nach VORNE zeigt. `vorgestellt`, `praesentiert`,
-# `unveils` und `unveiled` stehen bewusst NICHT hier: sie berichten ueber
-# etwas, das gerade stattgefunden hat, und das ist das Gegenteil dessen, was
-# der Antizipations-Pfad sucht. Am Korpus vom 27.08.2026 gemessen kam
-# `vorgestellt` fuer 31 der Treffer auf - mehr als jedes andere Wort und mehr
-# als alle Datumsangaben zusammen. Fuer den Spezifitaets-Bonus zaehlen sie
-# weiter mit (EREIGNIS_WOERTER oben): dort geht es darum, ob ein Wort einen
-# VORGANG benennt, nicht ob er noch bevorsteht.
 _VORAUS_WOERTER = tuple(
     w
     for w in _ANKUENDIGUNG_WOERTER
@@ -182,74 +127,28 @@ _ANKUENDIGUNG_WORTMUSTER = re.compile(
     r"(?<!\w)(?:" + "|".join(_VORAUS_WOERTER) + r")(?!\w)", re.IGNORECASE
 )
 
-# Eine Monatsangabe MIT Tageszahl, davor oder danach ("9. September" /
-# "September 9"). Ohne Tageszahl waere es keine Terminangabe, sondern eine
-# Zeitspanne ("im September"), und ein blosses "September 2026" faellt an
-# `\d{1,2}\b` ohnehin heraus. Die Gruppen tragen Tag und Monat heraus, denn
-# ob der Termin BEVORSTEHT, entscheidet erst `_kuenftige_datumstreffer`.
 _DATUM_MUSTER = re.compile(
     r"(?<!\w)(?P<m1>" + "|".join(_MONATE) + r")(?!\w)\s*(?P<t1>\d{1,2})\b"
     r"|\b(?P<t2>\d{1,2})\.\s*(?P<m2>" + "|".join(_MONATE) + r")(?!\w)",
     re.IGNORECASE,
 )
 
-# --- Antizipation -----------------------------------------------------------
-# Ein bevorstehendes Ereignis hat VOR dem Termin naturgemaess ein duennes
-# Echo - das Gros der Berichterstattung kommt erst MIT dem Ereignis. Deshalb
-# eine niedrigere Schwelle als die normale Kandidatensuche; die zusaetzliche
-# Bedingung (Ankuendigungssprache, siehe unten) haelt sie trotzdem eng - ohne
-# sie waere jede Drei-Meldungen-Gruppe ein Kandidat.
 MIND_MELDUNGEN_ANTIZIPATION = 3
 MIND_QUELLEN_ANTIZIPATION = 2
-# Ein einzelner beilaeufiger Datumstreffer ("... seit September im Handel")
-# ist kein bevorstehendes Ereignis - erst ein Muster ueber mehrere Meldungen.
 MIND_ANKUENDIGUNGSTREFFER = 2
-# Wie viele Antizipations-Gruppen dem Agenten HOECHSTENS zusaetzlich
-# vorgelegt werden.
-#
-# Der Pfad war bis zum 27.08.2026 ungedeckelt, und das ist keine Kleinigkeit:
-# am echten Korpus dieses Tages (1023 Meldungen aus vier Ausgaben) lieferte er
-# 28 Gruppen, die Nutzlast an den Agenten wuchs auf ueber 64 000 Zeichen, und
-# seine Antwort haette ein Objekt je Kandidat tragen muessen. Mit einem
-# Denkspur-Modell im Ruecken (~8-9k Token allein fuers Nachdenken) reisst das
-# `_TOKENS`, die Antwort bricht mitten im JSON ab, `extract_json` wirft - und
-# das Ergebnis ist NULL Themen, also genau das Gegenteil dessen, wofuer der
-# Pfad gebaut wurde. Ein Deckel, der die schwaechsten abschneidet, ist hier
-# das Gegenteil des `max_produkte`-Fehlers: gescannt und bewertet wird
-# vollstaendig, geschnitten wird erst nach der Rangfolge.
 MAX_ANTIZIPATION = 3
-# Wie weit ein genannter Termin in der Zukunft liegen darf, um noch als
-# bevorstehendes Ereignis zu zaehlen. Ein halbes Jahr - danach ist es eine
-# Roadmap-Nennung, kein Termin, auf den eine Themenseite wartet.
 ANKUENDIGUNG_HORIZONT_TAGE = 180
 
-# --- Pflege ---------------------------------------------------------------
-# Ab wie vielen neuen Meldungen ein Lauf als Zuwachs zaehlt.
 MIND_ZUWACHS = 2
 MAX_RUNS_OHNE_ZUWACHS = 4
-# Ein Thema mit `event_datum` altert erst ab diesem Abstand ZUM Termin - ein
-# bevorstehendes Ereignis hat vorher naturgemaess wenig Zuwachs, und die
-# normale Alterung wuerde es genau dann beenden, wenn es am wichtigsten wird.
 EREIGNIS_SCHUTZ_TAGE = 7
-# Obergrenze je Thema, damit ein monatelang laufendes Thema die Speicherdatei
-# nicht sprengt. Die dringendsten bleiben.
 MAX_ITEMS_JE_THEMA = 80
 
-# --- Archivfenster --------------------------------------------------------
-# Die Kandidatensuche sieht nicht nur den aktuellen Lauf, sondern auch die
-# Highlights der letzten Ausgaben aus data/reports/. Der Grund ist gemessen,
-# nicht vermutet: der Pixel-11-Launch stand am 06.08. mit EINER und am
-# 14.08. mit VIER Meldungen im Bericht - in keinem einzelnen Lauf genug fuer
-# eine Gruppe, ueber beide zusammen locker. Ein Ereignis, das sich ueber
-# Laeufe verteilt, ist der Normalfall, nicht die Ausnahme. 14 Tage decken
-# bei zwei Laeufen je Woche vier Ausgaben ab - derselbe Horizont wie
-# MAX_RUNS_OHNE_ZUWACHS.
 ARCHIV_TAGE = 14
 
 _TOKENS = 16000
 
 
-# ----------------------------------------------------------- Archivzugriff
 def _archiv_highlights(reports_dir: Path, heute: str, bekannt: set[str]) -> list[dict]:
     """Highlights der letzten Ausgaben, per URL entdoppelt gegen `bekannt`.
 
@@ -288,7 +187,6 @@ def _archiv_highlights(reports_dir: Path, heute: str, bekannt: set[str]) -> list
     return out
 
 
-# -------------------------------------------------------- Kandidatensuche
 def _text(h: dict) -> str:
     return (
         f"{h.get('headline') or ''} {h.get('operator') or ''} "
@@ -369,7 +267,6 @@ def _gruppen(
         if len(quellen - {""}) < mind_quellen:
             continue
         roh.append((set(idx), set(kombination)))
-    # Groesste zuerst: die aufnehmende Gruppe soll die umfassendere sein.
     roh.sort(key=lambda g: (-len(g[0]), sorted(g[1])))
 
     gruppen: list[dict] = []
@@ -405,9 +302,6 @@ def _kandidat_aus_gruppe(
     quellen = {(h.get("source") or "").strip() for h in items} - {""}
     if len(items) < mind_meldungen or len(quellen) < mind_quellen:
         return None
-    # Meldungen ohne _woche sind die des aktuellen Laufs - Archiv-Items tragen
-    # ihr Ausgabedatum (siehe _archiv_highlights). MIND_AKTUELL gilt fuer
-    # BEIDE Pfade unveraendert - das Archiv verstaerkt nur, es erzeugt nichts.
     aktuell = sum(1 for h in items if not h.get("_woche"))
     if aktuell < MIND_AKTUELL:
         return None
@@ -524,7 +418,7 @@ def _kuenftiger_termin(text: str, heute: date | None) -> bool:
             nummer = _MONATE.index(monat) + 1
             termin = date(heute.year, nummer, int(tag))
         except ValueError:
-            continue  # z.B. "31. Februar"
+            continue
         if termin < heute:
             try:
                 termin = date(heute.year + 1, nummer, int(tag))
@@ -673,7 +567,6 @@ def _einsortieren(thema: dict, highlights: list[dict], woche: str) -> int:
     return neu
 
 
-# ------------------------------------------------------------ Themen-Agent
 _AGENT_SYSTEM = """\
 Du entscheidest, ob eine Gruppe von Nachrichtenmeldungen ein eigenes
 EREIGNIS beschreibt, das eine temporäre Themenseite trägt.
@@ -769,7 +662,6 @@ def befrage_agent(
     return [u for u in urteile if isinstance(u, dict)]
 
 
-# ----------------------------------------------------------------- Pflege
 def _freier_slug(titel: str, vergeben: set[str]) -> str:
     basis = slug(titel)
     if basis not in vergeben:
@@ -782,17 +674,6 @@ def _freier_slug(titel: str, vergeben: set[str]) -> str:
 
 _ISO_DATUM = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
-# Wie weit ein vom Agenten genanntes `event_datum` in der Zukunft liegen darf.
-#
-# Das Datum setzt die Alterung eines Themas aus (EREIGNIS_SCHUTZ_TAGE), und
-# es kommt aus einem Modell. Ein halluziniertes "2028-09-09" ist formal ein
-# gueltiger Kalendertag und macht die Themenseite damit fuer ZWEI JAHRE
-# unsterblich - sie steht dann im Fokusband der Titelseite, ohne dass je
-# wieder eine Meldung dazu kaeme, und keine Alterung holt sie zurueck. Ein
-# Quartal ist die Spanne, in der ein Marktstart oder eine Keynote sinnvoll
-# angekuendigt wird; alles darueber ist Roadmap, nicht Termin, und wird wie
-# ein fehlendes Datum behandelt. Dasselbe gilt fuer ein Datum in der
-# VERGANGENHEIT: es kann kein bevorstehendes Ereignis mehr schuetzen.
 EVENT_HORIZONT_TAGE = 90
 
 
@@ -933,30 +814,17 @@ def pflege_highlight_themen(
     for thema in laufende:
         zuwachs[thema["slug"]] = _einsortieren(thema, highlights, heute)
 
-    # Die Kandidatensuche rechnet ueber diesen Lauf PLUS die Highlights der
-    # letzten Ausgaben (ARCHIV_TAGE): ein Ereignis verteilt sich ueber
-    # Laeufe, und eine zustandslose Suche je Lauf hat deshalb vom 07. bis
-    # zum 17.08.2026 kein einziges Thema gefunden. Der Zuwachs bestehender
-    # Themen (oben) rechnet weiterhin NUR mit dem aktuellen Lauf - sonst
-    # zaehlte jedes Archiv-Item als neue Aktivitaet und kein Thema altert.
     basis = [h for h in (highlights or []) if h.get("url")]
     if reports_dir is not None:
         basis = basis + _archiv_highlights(
             Path(reports_dir), heute, bekannt={h["url"] for h in basis}
         )
     kandidaten = finde_kandidaten(basis)
-    # Der Antizipations-Pfad konkurriert nicht um MAX_KANDIDATEN - er wird
-    # ZUSAETZLICH vorgelegt, aber nicht fuer eine Gruppe, die schon unter den
-    # Top-Kandidaten steht (sonst saehe der Agent dieselbe Gruppe zweimal).
     kandidaten = kandidaten + [
         k
         for k in finde_antizipation(basis, heute)
         if not any(_ueberschneidet(k, vorhanden) for vorhanden in kandidaten)
     ]
-    # Was ein beendetes Thema schon einmal war, wird nicht noch einmal neu
-    # entdeckt - genau dafuer bleiben beendete Themen im Speicher. Und was
-    # ein AKTIVES Thema schon traegt, wird dem Agenten nicht erneut
-    # vorgelegt.
     kandidaten = [
         k
         for k in kandidaten
@@ -992,10 +860,6 @@ def pflege_highlight_themen(
             titel = " ".join(str(u.get("titel") or "").split())
             if not titel or len(suchwoerter) < MIND_GEMEINSAM:
                 continue
-            # event_datum zaehlt nur zusammen mit "bevorstehend": true - ein
-            # Datum an einem bereits eingetretenen Ereignis darf die Alterung
-            # nicht aussetzen (der Prompt verlangt das ohnehin, hier zaehlt
-            # es doppelt).
             event_datum = (
                 _valid_iso_datum(u.get("event_datum"), heute)
                 if u.get("bevorstehend")
@@ -1008,8 +872,6 @@ def pflege_highlight_themen(
             )
             ziel = ziel or _passendes_thema(suchwoerter, laufende)
             if ziel is None and slug(titel) in vergeben:
-                # Gleicher Titel, andere Suchwoerter: das ist dasselbe Thema
-                # unter einem anderen Namen, kein zweites.
                 ziel = next((t for t in themen if t.get("slug") == slug(titel)), None)
                 if ziel is not None and ziel.get("status") != "aktiv":
                     continue
@@ -1027,8 +889,6 @@ def pflege_highlight_themen(
                     :MAX_ITEMS_JE_THEMA
                 ]
                 zuwachs[ziel["slug"]] = zuwachs.get(ziel["slug"], 0) + len(fuer_ziel)
-                # Ein Bestandsthema behaelt sein Datum - nur ein Thema OHNE
-                # eines bekommt hier eines nachgetragen.
                 if event_datum and not ziel.get("event_datum"):
                     ziel["event_datum"] = event_datum
                 continue
@@ -1048,9 +908,6 @@ def pflege_highlight_themen(
                     _item(h, h.get("_woche") or heute) for h in kandidat["items"]
                 ],
             }
-            # event_datum bleibt UNGESETZT (nicht leer), wenn der Agent keins
-            # nennt oder das Ereignis schon eingetreten ist - Bestandsthemen
-            # ohne dieses Feld verhalten sich in der Alterung unveraendert.
             if event_datum:
                 thema["event_datum"] = event_datum
             themen.append(thema)
@@ -1065,10 +922,6 @@ def pflege_highlight_themen(
             thema["runs_ohne_zuwachs"] = 0
             thema["last_active"] = heute
         elif _durch_event_geschuetzt(thema, heute):
-            # Vor einem bevorstehenden Ereignis bleibt das Thema unangetastet
-            # aktiv, egal wie viele Laeufe ohne Zuwachs vergehen - siehe
-            # _durch_event_geschuetzt. Ein Thema ohne event_datum durchlaeuft
-            # diesen Zweig nie.
             continue
         else:
             thema["runs_ohne_zuwachs"] = int(thema.get("runs_ohne_zuwachs") or 0) + 1

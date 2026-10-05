@@ -22,8 +22,6 @@ _GESAMMELT = re.compile(
 )
 _SCHLUSSZEILE = re.compile(r"^=+ (.+) in [\d.]+s(?: \([\d:]+\))? =+$", re.MULTILINE)
 _NICHT_AUSGEFUEHRT = re.compile(r"(\d+) (?:skipped|xfailed)\b")
-# Kanarien auf Bestand, Netz und Quelltext müssen an ihrer Regel aus tests/conftest.py
-# scheitern, sonst ist die Sperre dort abgeschaltet.
 HERMETIK_REGEL = "Regel hermetisch"
 VERHALTEN_REGEL = "Regel Verhalten"
 SPERR_KANARIEN = {

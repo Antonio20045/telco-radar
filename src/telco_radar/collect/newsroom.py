@@ -24,11 +24,9 @@ from ..models import Item
 
 log = logging.getLogger(__name__)
 
-# URL path fragments that indicate an article-like page
 _ARTICLE_HINTS = re.compile(
     r"(news|press|media|release|announce|story|article|aktuell|presse)", re.I
 )
-# Path fragments that indicate navigation/utility pages -> skip
 _SKIP_HINTS = re.compile(
     r"(login|signin|cookie|privacy|legal|terms|contact|careers|jobs|search|"
     r"subscribe|newsletter|archive\?|/tag/|/category/|/author/|#|mailto:|tel:|"
@@ -41,18 +39,8 @@ _SKIP_HINTS = re.compile(
     r"/social[-_]?media(?:/|$)|/press[-_]?conference[-_]?materials(?:/|$))",
     re.I,
 )
-# Binary/document file extensions. Normally skipped (they're rarely articles),
-# but some operators (e.g. TPG Telecom) publish releases as a heading + a PDF
-# download with no separate HTML article page - there the PDF *is* the
-# article, so a configured item_selector (which already narrows the DOM to
-# verified article cards) is allowed to keep them.
 _SKIP_FILE_EXT = re.compile(r"\.(pdf|jpg|jpeg|png|gif|svg|mp4|zip)$", re.I)
-# Third-party stock-exchange filing/IR vendors some operators route their
-# regulatory announcements through instead of hosting them on their own
-# domain (see the same-domain check below).
 _TRUSTED_EXTERNAL_HOSTS = {"listedcompany.com"}
-# Multi-label public suffixes: without this guard, dropping one label off
-# "tim.com.br" would leave "com.br" and match every Brazilian site.
 _PUBLIC_SUFFIXES = {
     "com.br",
     "com.au",
@@ -101,19 +89,10 @@ def _parent_site(host: str) -> str:
     return parent
 
 
-# Date patterns inside URLs, e.g. /2026/07/ or /2026-07-14- or 20260714
-# The trailing (?![0-9]) matters: without it the numeric id in a slug like
-# ".../fifa-wm-2030-1116606" parses as 16 Nov 2030, and the item is then
-# thrown away by the freshness filter as "published in the future" instead of
-# falling back to the correct date printed on the card.
 _URL_DATE = re.compile(
     r"(?:/|[-_])(20\d{2})[/\-_]?(0[1-9]|1[0-2])(?:[/\-_]?(0[1-9]|[12]\d|3[01]))?"
     r"(?![0-9])"
 )
-# The month group accepts any word, not a fixed list of English names: the
-# _MONTHS lookup below is what decides whether it really is a month, so this
-# one regex serves every language in _MONTHS. "de" between the parts covers
-# Portuguese/Spanish ("30 de julho de 2026").
 _TEXT_DATE = re.compile(
     r"\b(0?[1-9]|[12]\d|3[01])(?:st|nd|rd|th)?[./\s]+(?:de\s+)?"
     r"(0?[1-9]|1[0-2]|[^\W\d_]{3,12})[./\s,]+(?:de\s+)?(20\d{2})\b",
@@ -128,7 +107,6 @@ _TEXT_DATE_MDY = re.compile(
 _TEXT_DATE_ISO = re.compile(
     r"\b(20\d{2})[-/.](0[1-9]|1[0-2])[-/.](0[1-9]|[12]\d|3[01])\b"
 )
-# Navigation / section labels that are not articles (exact-match, lowercased).
 _JUNK_EXACT = {
     "frequently asked questions",
     "faq",
@@ -159,11 +137,6 @@ _JUNK_EXACT = {
     "media contacts",
     "regulatory news service (regulatory)",
 }
-# Navigation labels that mark a non-article link when they ARE the whole short
-# title: the label alone, optionally "of [the] <owner> newsroom|website|site"
-# and trailing punctuation.
-# A label followed by a statement ("Social media ban for kids", "FAQ: neue
-# Regeln ...") is a real headline and stays.
 _JUNK_BEGRIFF = re.compile(
     r"(?:perspectives|faqs?|frequently asked(?: questions)?|social media"
     r"|press conference materials|our reports|emergency resources?"
@@ -173,9 +146,6 @@ _JUNK_BEGRIFF = re.compile(
 )
 
 
-# Words that may stand in front of a date label without being part of the
-# headline. Anything else means the date sits INSIDE a real sentence
-# ("Vodafone announces on 15 July 2026 the launch of ...") and must stay.
 _LABEL_WORDS = {
     "press",
     "release",
@@ -227,9 +197,8 @@ def _strip_leading_date_label(
             continue
         prefix_words = re.findall(r"[^\W\d_]+", title[: m.start()])
         if any(w.lower() not in allowed for w in prefix_words):
-            continue  # the date sits inside a real sentence
+            continue
         rest = title[m.end() :]
-        # trailing time and timezone that belong to the same label
         rest = re.sub(
             r"^,?\s*\d{1,2}[:.]\d{2}\s*(?:[APap]\.?[Mm]\.?)?"
             r"\s*(?:[A-Z]{2,4})?",
@@ -249,7 +218,7 @@ def _is_junk_title(title: str) -> bool:
     if len(title) < 45 and _JUNK_BEGRIFF.fullmatch(norm):
         return True
     words = norm.split()
-    if len(words) >= 2 and len(set(words)) == 1:  # "Perspectives Perspectives"
+    if len(words) >= 2 and len(set(words)) == 1:
         return True
     return False
 
@@ -273,55 +242,41 @@ _MONTHS = {
         ]
     )
 }
-# Non-English month names, keyed by their first three letters. Only aliases
-# that don't already coincide with the English ones above are listed, and only
-# unambiguous ones - French "jui" is left out because it cannot tell juin (6)
-# from juillet (7). Without these, a newsroom that prints its date in the local
-# language ("24 Temmuz 2026", Turk Telekom) yields undated items, and undated
-# items sort below the analyst's per-region cap - the source is collected and
-# then never read.
 _MONTHS.update(
     {
         "ene": 1,
         "abr": 4,
         "ago": 8,
         "set": 9,
-        "dic": 12,  # es
+        "dic": 12,
         "fev": 2,
         "mai": 5,
         "out": 10,
-        "dez": 12,  # pt
+        "dez": 12,
         "mär": 3,
-        "okt": 10,  # de
+        "okt": 10,
         "mei": 5,
         "agu": 8,
-        "des": 12,  # id
+        "des": 12,
         "oca": 1,
         "şub": 2,
         "sub": 2,
         "nis": 4,
         "haz": 6,
-        "tem": 7,  # tr
+        "tem": 7,
         "ağu": 8,
         "eyl": 9,
         "eki": 10,
         "kas": 11,
-        "ara": 12,  # tr
+        "ara": 12,
         "fév": 2,
         "avr": 4,
         "aoû": 8,
         "aou": 8,
-        "déc": 12,  # fr
+        "déc": 12,
     }
 )
 
-# Web-component "card" widgets (seen on Modyo/Andino-based CMSs, e.g. Entel)
-# embed the whole item list as a JSON array inside a custom element attribute
-# instead of rendering plain <a> links - the markup looks like
-# <andino-card-general eds-card='[{"text": "...", "href": "...", "badge":
-# {"text": "25 Jul, 2026"}}]'></andino-card-general>. This is already present
-# in the *static* HTML (no JS needed), so a dedicated extractor - tried before
-# the generic <a>-based heuristic below - picks it up directly.
 _EMBEDDED_CARD_ATTR_RE = re.compile(r"\beds-card\s*=\s*'(\[.*?\])'", re.S)
 _TAG_RE = re.compile(r"<[^>]+>")
 _ES_DATE_RE = re.compile(r"(\d{1,2})\s+([A-Za-zÀ-ÿ]+)\.?,?\s+(\d{4})")
@@ -395,12 +350,6 @@ def _extract_embedded_cards(
     return items
 
 
-# AEM component pages (Optus, Singtel) ship their article list as an
-# HTML-escaped JSON object in a datamodel="..." attribute, with the records
-# under an "articles" key. The rendered page builds the cards from it in the
-# browser, so there are no <a> elements to scrape and a headless render is
-# defeated by the bot wall - the static HTML already holds everything. The two
-# sites use the same shape with different field names, hence the key tuples.
 _DATAMODEL_ATTR_RE = re.compile(r'\bdatamodel\s*=\s*"([^"]{200,})"')
 _DM_TITLE_KEYS = ("title", "articleHeading", "heading")
 _DM_LINK_KEYS = ("link", "pagePath", "url")
@@ -465,10 +414,6 @@ def _extract_datamodel_articles(
             if url in seen_urls:
                 continue
             seen_urls.add(url)
-            # The printed label ("15 July 2026, 08:30 AM") is the operator's
-            # own local date; curatorAsDate is the same moment in epoch ms and
-            # lands a day earlier once converted to UTC. Prefer what the site
-            # says, fall back to the timestamp.
             published = _date_from_text(_dm_first(rec, _DM_DATE_KEYS)[:60])
             if published is None:
                 published = _epoch_ms_to_date(rec.get("curatorAsDate"))
@@ -500,11 +445,6 @@ def _heading_title_for(a, item_root) -> str:
     item_selector already narrows the DOM to one container per item, so
     it's safe to fall back to the heading text for the title in that scope.
     """
-    # `item_root` is the synthetic wrapper soup built around the selected
-    # item nodes (one direct child of `item_root.div` per matched item) -
-    # stop climbing once we reach that direct child, not the shared wrapper
-    # itself, or every item would resolve to the very first heading in
-    # document order.
     boundary = getattr(item_root, "div", item_root)
     node = a
     while node.parent is not None and node.parent is not boundary:
@@ -513,10 +453,6 @@ def _heading_title_for(a, item_root) -> str:
         return ""
     headings = node.find_all(["h1", "h2", "h3", "h4", "h5", "h6"])
     if not headings:
-        # Some card layouts (e.g. Telecom Argentina) style the headline as a
-        # <p class="...title..."> instead of a semantic heading tag - only
-        # trust a <p> whose class name says "title" to avoid grabbing an
-        # unrelated body paragraph.
         headings = [
             p
             for p in node.find_all("p")
@@ -524,11 +460,6 @@ def _heading_title_for(a, item_root) -> str:
         ]
     if not headings:
         return ""
-    # A card can carry more than one heading level - e.g. e& tiles have a
-    # short <h5> category badge ("Strategy & Operations") *before* the real
-    # <h2> headline in document order. Picking the first match would grab
-    # the badge, so take the longest heading text instead - the real
-    # headline is reliably the longest string among short badges/labels.
     best = max(headings, key=lambda h: len(h.get_text(strip=True)))
     return " ".join(best.get_text(" ", strip=True).split())
 
@@ -541,7 +472,6 @@ def _date_from_url(url: str) -> tuple[datetime | None, bool]:
         has_day = m.group(3) is not None
         day = int(m.group(3)) if has_day else 1
     else:
-        # Some official press pages use /07-2026/ instead of /2026/07/.
         reverse = re.search(
             r"(?:/|[-_])(0[1-9]|1[0-2])[-_](20\d{2})"
             r"(?:[-_/](0[1-9]|[12]\d|3[01]))?",
@@ -556,9 +486,6 @@ def _date_from_url(url: str) -> tuple[datetime | None, bool]:
         parsed = datetime(year, month, day, tzinfo=timezone.utc)
     except ValueError:
         return None, False
-    # A year in the headline ("Strategie 2030") can still slip through as a
-    # date. Treat anything from the future as no date at all, so the card's
-    # own date text gets a chance instead.
     if parsed > datetime.now(timezone.utc) + timedelta(days=1):
         return None, False
     return parsed, has_day
@@ -617,10 +544,6 @@ def parse_newsroom_html(
             return embedded
 
     soup = BeautifulSoup(html, "html.parser")
-    # Screen-reader-only labels are never part of a headline. AT&T's release
-    # table repeats its column headers in every row as
-    # <span class="pr-mobi-headers">Title</span>, which ended up glued to the
-    # front of each extracted title.
     for hidden in soup.select(
         "[class*=sr-only], [class*=visually-hidden], [class*=screen-reader],"
         " [class*=mobi-header], [class*=visuallyhidden]"
@@ -649,20 +572,10 @@ def parse_newsroom_html(
         parts = urlsplit(url)
         if _SKIP_HINTS.search(url):
             continue
-        # Binary file links (PDF/etc.) are normally not articles, but some
-        # operators (e.g. TPG Telecom) publish releases as heading + PDF
-        # download with no separate HTML page - there the PDF *is* the
-        # article, so trust an explicit item_selector over this heuristic.
         if _SKIP_FILE_EXT.search(url) and not selector_matched:
             continue
         if parts.scheme not in ("http", "https"):
             continue
-        # stay on the operator's domain (subdomains allowed) - with a narrow
-        # exception for known third-party stock-exchange filing vendors,
-        # which several APAC-listed telcos (e.g. True Corporation) use to
-        # host their regulatory/SET announcements instead of their own
-        # domain. Only trusted once an explicit item_selector already
-        # verified the surrounding container is a real announcement card.
         host = parts.netloc.removeprefix("www.")
         on_domain = host == base_host or host.endswith("." + base_host)
         if not on_domain:
@@ -673,22 +586,12 @@ def parse_newsroom_html(
         )
         if not on_domain and not on_trusted_vendor:
             continue
-        # A configured item_selector already narrows the DOM to verified
-        # article containers (e.g. CMS card layouts whose URLs are opaque
-        # slugs with no news/press keyword) - trust it over the URL heuristic.
         if not selector_matched and not _ARTICLE_HINTS.search(parts.path):
             continue
-        # article pages have a real path, not just the section root
         if parts.path.rstrip("/") == urlsplit(source.url).path.rstrip("/"):
             continue
 
         title = " ".join(a.get_text(" ", strip=True).split())
-        # Some card layouts (e.g. SK Telecom) wrap the whole card - headline
-        # AND a long summary paragraph - inside one <a>, so a.get_text()
-        # returns thousands of characters and fails the length filter below.
-        # A descendant literally classed "title" is a common enough
-        # convention to check first, before falling back to the length
-        # heuristics that assume the anchor text IS the headline.
         if selector_matched and len(title) > 300:
             title_el = a.select_one(".title")
             if title_el:
@@ -699,29 +602,15 @@ def parse_newsroom_html(
                     and not _is_junk_title(narrowed)
                 ):
                     title = narrowed
-        # Cards that print a metadata line inside the same anchor (Three UK:
-        # "Press release 22nd Jul 2026 Deals <headline>") pass the length
-        # filter, so the check above never fires and the label ends up in the
-        # headline. A descendant classed heading/title is the headline itself
-        # - accept it only when it SHORTENS the title, so this can only ever
-        # narrow a card down to its own heading, never widen it.
         if selector_matched and hasattr(a, "select_one"):
             heading_el = a.select_one("[class*=heading], [class*=title]")
             if heading_el:
                 narrowed = " ".join(heading_el.get_text(" ", strip=True).split())
                 if 25 <= len(narrowed) < len(title) and not _is_junk_title(narrowed):
                     title = narrowed
-        # Some card layouts (e.g. e& newsroom) put the headline in a sibling
-        # <h1>-<h6> inside the card and reserve the anchor text for a generic
-        # "Read more"/"Load More" label - only worth searching once the
-        # selector already narrowed us to a real article container.
         if selector_matched and (
             len(title) < 25 or len(title) > 300 or _is_junk_title(title)
         ):
-            # Table-style newsrooms (AT&T's IR release list) keep the headline
-            # in a sibling cell and leave the link itself as a bare icon, so
-            # the anchor carries no text at all. Look for a title-classed
-            # element in the item's own container before the heading search.
             container = a.find_parent("tr") or a.parent
             if container is not None and hasattr(container, "select_one"):
                 cell = container.select_one("[class*=title]")
@@ -742,10 +631,6 @@ def parse_newsroom_html(
         if selector_matched and (
             len(title) < 25 or len(title) > 300 or _is_junk_title(title)
         ):
-            # Some icon-only links (e.g. Deutsche Telekom's media-link
-            # anchors) carry the real headline only in a title/aria-label
-            # attribute, often prefixed with a generic category label
-            # ("Media information: <headline>") - strip that prefix.
             attr_title = (a.get("title") or a.get("aria-label") or "").strip()
             attr_title = re.sub(r"^[\w][\w \-]{2,30}:\s*", "", attr_title)
             if (
@@ -754,12 +639,6 @@ def parse_newsroom_html(
                 and not _is_junk_title(attr_title)
             ):
                 title = attr_title
-        # nav links are short; but some real content is legitimately terse
-        # (e.g. RNS/regulatory-announcement titles like "Q1 Results") - a
-        # source explicitly opts in via allow_short_titles rather than this
-        # being a blanket relaxation for any item_selector, since most
-        # item_selector-scoped nav-link false positives (e.g. "About Us")
-        # are exactly as short.
         min_title_len = 6 if source.allow_short_titles else 25
         if len(title) < min_title_len or len(title) > 300:
             continue
@@ -772,32 +651,16 @@ def parse_newsroom_html(
         url_date, url_has_day = _date_from_url(url)
         published = url_date if url_has_day else None
         if published is None and hasattr(a, "select_one"):
-            # A descendant classed "date" (e.g. SK Telecom's "reg-date") is a
-            # precise, common convention - worth trying before the truncated
-            # whole-card text search below, which can miss a date sitting
-            # after a long summary paragraph within the same [:400] cutoff.
             date_el = a.select_one("[class*=date]")
             if date_el:
                 published = _date_from_text(date_el.get_text(" ", strip=True)[:100])
         if published is None and selector_matched and hasattr(a, "get_text"):
-            # When the selector already narrowed us to one card, the card's
-            # OWN text beats anything found by climbing upwards: Three UK's
-            # a.card elements are siblings under one div, so the parent search
-            # below handed every release the first card's date.
             published = _date_from_text(a.get_text(" ", strip=True)[:400])
         if published is None:
-            # A <tr> (e.g. RNS/regulatory-announcement tables like
-            # Investegate's) must be tried before the broader div/li/article
-            # fallback: several <a> siblings can share one outer div/table,
-            # so climbing straight past the row would give every item in
-            # that table the same (wrong) date.
             context = a.find_parent("tr") or a.find_parent(["article", "li", "div"])
             if context is not None:
                 published = _date_from_text(context.get_text(" ", strip=True)[:400])
         if published is None and selector_matched:
-            # Nearest small div (above) may sit inside the card without the
-            # date, which is often a sibling elsewhere in the same item -
-            # widen the search to the whole item container as a last resort.
             boundary = getattr(scope, "div", scope)
             node = a
             while node.parent is not None and node.parent is not boundary:
@@ -805,7 +668,7 @@ def parse_newsroom_html(
             if hasattr(node, "get_text"):
                 published = _date_from_text(node.get_text(" ", strip=True)[:600])
         if published is None:
-            published = url_date  # month precision is better than nothing
+            published = url_date
 
         title = _strip_leading_date_label(title, published, operator)
 

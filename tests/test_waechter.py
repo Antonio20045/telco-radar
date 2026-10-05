@@ -205,7 +205,6 @@ def test_von_hand_gelockerte_liste_ist_rot_im_arbeitsstand_und_committet(
     assert erwartet in rot[0]
     commit = _commit(projekt)
     assert _rot(projekt)[0].startswith(f"{pfad} lockerer ({commit[:7]}): ")
-    # Ein späterer Commit macht die Lockerung nicht wieder unsichtbar.
     _schreibe(projekt, "README", "x\n")
     _commit(projekt)
     assert len(_rot(projekt)) == 1
@@ -376,7 +375,6 @@ def test_fehlender_verlauf_ist_rot(projekt):
         (".github/workflows/a.yml", "    continue-on-error: true\n", ""),
         (".github/workflows/a.yml", "        run: make || true\n", "oder-true"),
         (".github/workflows/a.yml", "          python-version: '3.12'\n", ""),
-        # Gegen 6ceb9cd ungezählt: Abschalter von ruff, mypy und isort.
         ("src/telco_radar/a.py", "# ruff: disable[E501]\nx = 1\n", "ruff-aus:E501"),
         ("tests/test_a.py", "# ruff: disable\nx = 1\n", "ruff-aus:alle"),
         ("src/telco_radar/a.py", '# mypy: disable-error-code="misc"\n', "mypy-aus:"),
@@ -384,7 +382,6 @@ def test_fehlender_verlauf_ist_rot(projekt):
         ("src/telco_radar/a.py", "# isort: skip_file\n", "werkzeug-aus"),
         ("src/telco_radar/a.py", _OHNE_TYPCHECK.format("t.no_type_check"), "kein-"),
         ("src/telco_radar/a.py", _OHNE_TYPCHECK.format("ntc"), "kein-typcheck"),
-        # Gegen 6ceb9cd ungezählt: Plugins über globals() und addopts, Verdeckung.
         (
             "tests/conftest.py",
             'globals()["pytest_plugins"] = ["x"]\n',
@@ -395,17 +392,14 @@ def test_fehlender_verlauf_ist_rot(projekt):
         ("pyproject.toml", _PYPROJECT + _ADDOPTS.format("-p fremd"), "pytest-plugin"),
         ("pyproject.toml", _PYPROJECT + _ADDOPTS.format("-pfremd"), "pytest-plugin"),
         ("pyproject.toml", _PYPROJECT + _NATIV.format('"-p", "x"'), "pytest-plugin"),
-        # Gegen 6ceb9cd ungezählt: Eingriffe in pytest und die Leiter.
         ("tests/conftest.py", "import _pytest.assertion.rewrite\n", "leiter-eingriff"),
         ("tests/conftest.py", "def f(i, c):\n    i.obj.__code__ = c\n", "leiter-"),
         ("tests/conftest.py", "import sys\n\nsys.modules['x'].y = 1\n", "leiter-"),
         ("tests/test_a.py", "from pluggy import HookimplMarker\n", "leiter-eingriff"),
         ("tests/test_a.py", "x = __import__('_pytest.runner')\n", "leiter-eingriff"),
-        # Gegen 6ceb9cd ungezählt: weitergereichte Uhr, Uhren ohne Zeitangabe.
         ("src/telco_radar/a.py", "import time\n\njetzt = time.time\n", "uhr"),
         ("src/telco_radar/a.py", "import time\n\nx = time.localtime()\n", "uhr"),
         ("src/telco_radar/a.py", "import time\n\nx = time.strftime('%Y')\n", "uhr"),
-        # Gegen 6ceb9cd ungezählt: Uhr über Importaliase.
         ("src/telco_radar/a.py", "from time import time\nx = time()\n", "uhr"),
         ("src/telco_radar/a.py", "from time import time as t\nx = t()\n", "uhr"),
         ("src/telco_radar/a.py", "import time as t\nx = t.time_ns()\n", "uhr"),
@@ -415,6 +409,15 @@ def test_fehlender_verlauf_ist_rot(projekt):
             "from datetime import date as d\nx = d.today()\n",
             "uhr",
         ),
+        ("src/telco_radar/a.py", "x = 1  # Minuten\n", "kommentar"),
+        ("tools/a.py", "x = 1  # alt\n", "kommentar"),
+        ("tests/test_a.py", "# Zehn statt sieben\nx = 1\n", "kommentar"),
+        ("scripts/a.py", "# -*- coding: utf-8 -*-\nx = 1\n", "kommentar"),
+        ("src/telco_radar/a.py", "x = 1\n#!/bin/sh\n", "kommentar"),
+        ("src/telco_radar/a.py", "x = 1  # pragma: no cover - echt\n", "kom"),
+        ("src/telco_radar/a.py", "x = 1  # ruff ist hier nicht abgeschaltet\n", "kom"),
+        ("src/telco_radar/a.py", "x = 1  # siehe mypy: Doku\n", "kommentar"),
+        ("src/telco_radar/a.py", "# Hinweis: ruff: disable[E501] nie nutzen\n", "kom"),
     ],
 )
 def test_neuer_befund_der_waechter_basis_ist_rot(projekt, pfad, text, code):
@@ -434,6 +437,7 @@ def test_neuer_befund_der_waechter_basis_ist_rot(projekt, pfad, text, code):
         ("src/telco_radar/a.py", "x = Path('d').read_text()\n"),
         ("src/telco_radar/a.py", _VERSUCH.format("ValueError")),
         ("src/telco_radar/a.py", "x = 'kein noqa im Text'  # pragma: no cover\n"),
+        ("scripts/a.py", "#!/usr/bin/env python3\nx = 1  # pragma: no cover\n"),
         ("src/telco_radar/report/anbieter_farben.py", "ROT = '#e60000'\n"),
         ("src/telco_radar/report/a.j2", "<p>&#123; Seite#abc</p>\n"),
         ("tests/conftest.py", "def pytest_collection_modifyitems(items):\n    pass\n"),
@@ -442,13 +446,10 @@ def test_neuer_befund_der_waechter_basis_ist_rot(projekt, pfad, text, code):
         ("src/telco_radar/a.py", "from time import monotonic\nx = monotonic()\n"),
         ("src/telco_radar/a.py", "from time import sleep\nsleep(0)\n"),
         ("src/telco_radar/a.py", "def time():\n    pass\n\n\ntime()\n"),
-        ("src/telco_radar/a.py", "x = 1  # ruff ist hier nicht abgeschaltet\n"),
         ("pyproject.toml", _PYPROJECT + _ADDOPTS.format("--strict-markers")),
         ("scripts/leiter_plugin/leiter_roh.py", "x = 1\n"),
         ("src/telco_radar/a.py", "import time\n\nx = time.localtime(0)\n"),
         ("src/telco_radar/a.py", "x = tag.strftime('%Y')\n"),
-        ("src/telco_radar/a.py", "x = 1  # siehe mypy: Doku\n"),
-        ("src/telco_radar/a.py", "# Hinweis: ruff: disable[E501] nie nutzen\n"),
         ("tests/test_a.py", "import sys\n\nsys.modules['x'] = None\n"),
     ],
 )

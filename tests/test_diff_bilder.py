@@ -116,8 +116,6 @@ def test_der_fehlversuch_wird_gemerkt_und_nicht_sofort_wiederholt(
         )
     assert versuche == ["https://example.com/c"]
 
-    # Nach der Frist darf es einen zweiten Anlauf geben - Redaktionssysteme
-    # bekommen `og:image` auch nachtraeglich.
     diff_bilder.beschaffe(
         [_eintrag("https://example.com/c")],
         tmp_path,

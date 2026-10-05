@@ -25,9 +25,6 @@ from pathlib import Path
 from ..newsletter.config import FELD_JE_DIMENSION, NewsletterKatalog
 from . import rechtstexte
 
-# Der Satz, der neben jeder Dimension steht. "Leer heisst alles" ist die
-# Erwartung fast aller Nutzer - und es ist NICHT die Erwartung der anderen,
-# deshalb steht es da. Das ist keine Bedienhilfe, sondern die Regel selbst.
 _LEER = "Nichts angekreuzt = alles."
 
 HINWEISE = {
@@ -85,8 +82,6 @@ def konfiguration(katalog: NewsletterKatalog, *, dienst_url: str, frei: bool) ->
         ensure_ascii=False,
     )
 
-
-# ============================================  die zwei statischen Seiten ==
 
 _ABSCHLUSS = {
     "bestaetigt": (

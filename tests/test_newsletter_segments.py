@@ -35,9 +35,6 @@ def _abo(id_, satz):
     return sub.Abo(id=id_, email=f"{id_}@beispiel.test", filter=satz, state="active")
 
 
-# ========================================================  segment_hash  ===
-
-
 def test_der_hash_ist_stabil_gegen_reihenfolge():
     a = Filtersatz(regionen=("europa", "asien"))
     b = Filtersatz(regionen=("asien", "europa"))
@@ -85,9 +82,6 @@ def test_die_normalform_traegt_nur_die_auswahl():
         "kategorien",
         "keywords",
     }
-
-
-# =====================================================  Segmentbildung  ====
 
 
 def test_gleiche_filter_werden_ein_segment(katalog):
@@ -160,9 +154,6 @@ def test_die_reihenfolge_der_segmente_ist_stabil(katalog):
     assert erste == zweite
 
 
-# ======================================================  Abo-Datenmodell  ==
-
-
 def test_kennwerte_sind_hmac_mit_pepper():
     """Ein blanker SHA-256 ueber eine E-Mail-Adresse ist per Brute Force in
     Minuten umkehrbar - das waere keine Pseudonymisierung."""
@@ -173,8 +164,6 @@ def test_kennwerte_sind_hmac_mit_pepper():
     blank = hashlib.sha256(adresse.encode()).hexdigest()
     assert mit_pepper != blank
     assert sub.adress_kennwert("anderer", adresse) != mit_pepper
-    # ... und derselbe Pepper ergibt denselben Wert (sonst waere die
-    # 24-Stunden-Sperre wirkungslos).
     assert sub.adress_kennwert("geheim", adresse) == mit_pepper
 
 
@@ -241,9 +230,6 @@ def test_ein_nachweis_ohne_wortlaut_gilt_als_unvollstaendig():
     ).vollstaendig
 
 
-# ========================================================  Zulaessigkeit  ==
-
-
 @pytest.mark.parametrize(
     "adresse, gueltig",
     [
@@ -296,8 +282,6 @@ def test_die_domainliste_wirkt_wenn_sie_gefuellt_ist():
     assert not sub.erlaubt_nach_domainliste("a@vodafone.de.beispiel.com", erlaubt)
     assert not sub.erlaubt_nach_domainliste("a@telekom.de", erlaubt)
 
-
-# ==========================================  Uebersetzung aus den Quellen ==
 
 BERICHT = {
     "date": "2026-08-11",
@@ -354,8 +338,6 @@ def test_aus_bericht_uebersetzt_regionen_in_schluessel():
     nach_region = {e.titel: e.region for e in eintraege}
     assert nach_region["Telekom senkt Preise"] == "europa"
     assert nach_region["MTN baut aus"] == "afrika-naher-osten"
-    # Ein Themenfeld hat keine Region - es laeuft unter "global", derselben
-    # Schublade wie die weltweite Fachpresse.
     assert nach_region["Nvidia liefert"] == "global"
 
 

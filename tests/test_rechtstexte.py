@@ -52,9 +52,6 @@ def _luecke_einbauen(wurzel):
     )
 
 
-# ------------------------------------------------------------ das Modul ----
-
-
 def test_vollstaendige_texte_erreichen_die_schwelle(wurzel):
     assert rechtstexte.vollstaendig(wurzel) is True
     assert rechtstexte.offene_stellen(wurzel) == []
@@ -95,15 +92,10 @@ def test_die_eigene_ueberschrift_faellt_weg(wurzel):
     assert text.titel == "Impressum"
 
 
-# ------------------------------------------------- Einwilligungsfassungen --
-
-
 def test_einwilligung_ist_versioniert_und_nachrechenbar(wurzel):
     aktuell = rechtstexte.aktuelle_einwilligung(wurzel)
     assert aktuell.version == "2026-08-11"
     assert aktuell.hash.startswith("sha256:")
-    # Der Nachweis besteht darin, dass JEDER ihn nachrechnen kann, der den
-    # Text hat - also ohne Pepper und ohne Projektwissen.
     import hashlib
 
     erwartet = hashlib.sha256(aktuell.text.strip().encode("utf-8")).hexdigest()
@@ -126,9 +118,6 @@ def test_eine_geaenderte_fassung_faellt_am_hash_auf(wurzel):
     datei = wurzel / "content" / "consent_texts" / "2026-08-11.md"
     datei.write_text("Ich möchte den Radar. Und noch etwas.\n", encoding="utf-8")
     assert rechtstexte.aktuelle_einwilligung(wurzel).hash != vorher
-
-
-# ---------------------------------------------------------- die Seiten -----
 
 
 def _render(wurzel):
@@ -196,7 +185,6 @@ def test_die_seite_nennt_die_drei_auftragsverarbeiter(wurzel):
     personenbezogene Daten. Fehlt einer, ist die Erklaerung unvollstaendig -
     und zwar an der Stelle, an der eine Behoerde zuerst nachsieht."""
     site = _render(wurzel)
-    # Der echte Text des Repos, nicht die Fixture.
     from pathlib import Path
 
     echt = Path(__file__).resolve().parents[1]
@@ -223,7 +211,6 @@ def test_die_luecke_steht_oben_auf_der_seite(wurzel):
     kasten = soup.select_one(".rechtstext-luecke")
     assert kasten is not None
     assert "ANSCHRIFT" in kasten.get_text()
-    # ... und zwar VOR dem Fliesstext.
     koerper = soup.select_one(".rechtstext-body")
     assert kasten.sourceline < koerper.sourceline
 
@@ -250,7 +237,6 @@ def test_ohne_content_verzeichnis_kippt_keine_seite(tmp_path):
     fuss = BeautifulSoup(
         (site / "index.html").read_text(encoding="utf-8"), "html.parser"
     ).select_one(".foot-inner")
-    # Kein Link auf eine Seite, die es nicht gibt.
     assert fuss.select_one(".foot-recht") is None
 
 

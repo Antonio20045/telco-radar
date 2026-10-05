@@ -35,8 +35,8 @@ from telco_radar.report.html import render_site
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 HEUTE = "2026-09-11"
 
-SKU_M1 = "apple-iphone-15-128gb-schwarz"  # Saturn guenstiger als Vodafone
-SKU_M2 = "apple-iphone-15-256gb-schwarz"  # nur Saturn - kein Vodafone
+SKU_M1 = "apple-iphone-15-128gb-schwarz"
+SKU_M2 = "apple-iphone-15-256gb-schwarz"
 
 _KATALOG = {
     "geraete": [
@@ -146,8 +146,6 @@ def _seite(tmp_path: pathlib.Path) -> dict[str, str]:
     listungen = [
         _listung("Vodafone", SKU_M1, 709.90),
         _listung("Saturn", SKU_M1, 679.90),
-        # NUR der Wettbewerb - Vodafone führt dieses Gerät nicht: der Fall
-        # des Sortiments-Aufklappers.
         _listung("Saturn", SKU_M2, 829.00),
     ]
     (state / "geraete_db.json").write_text(
@@ -212,11 +210,6 @@ def _text(el) -> str:
     return " ".join(el.get_text(" ", strip=True).split())
 
 
-# --------------------------------------------------------------------------
-# Die Alarmtabelle auf dem Radar
-# --------------------------------------------------------------------------
-
-
 def test_die_alarmtabelle_steht_als_eigener_abschnitt_auf_dem_radar(tmp_path):
     """E3 Schritt 3 (17.09.2026): die Alt-URL ist eine Weiterleitung -
     „auf dem Radar" heißt seitdem: im Radar-REITER von geraete.html
@@ -228,8 +221,6 @@ def test_die_alarmtabelle_steht_als_eigener_abschnitt_auf_dem_radar(tmp_path):
     assert abschnitt.select_one("h3") is not None
     zeilen = abschnitt.select(".gr-a-zeile")
     assert zeilen, "keine Alarmzeile im Radar-Reiter"
-    # Der Inhalt ist der GANZE (kein Funktionsverlust): Filter, Suche,
-    # Sortierung, Zeilenaufklapper und die vier Kacheln stehen mit da.
     assert abschnitt.select_one(".gr-chips") is not None
     assert abschnitt.select_one("[data-filter='marke']") is not None
     assert abschnitt.select_one("[data-filter='suche']") is not None
@@ -294,12 +285,6 @@ def test_die_geraeteseite_traegt_keine_alarmtabelle_mehr(tmp_path):
     )
 
 
-# --------------------------------------------------------------------------
-# "Bei Wettbewerbern gelistet" - P4 Schritt 2b: im RADAR-Reiter der EINEN
-# Seite (bis E3: im Gerätekatalog-Reiter)
-# --------------------------------------------------------------------------
-
-
 def test_bei_wettbewerbern_gelistet_steht_im_geraetekatalog(tmp_path):
     """E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d) nagelte den Aufklapper auf
     den KATALOG-Reiter. P4 Schritt 2b (STRATEGIE_GERAETE_V3, 18.09.2026)
@@ -348,18 +333,9 @@ def test_der_aufklapper_steht_nicht_zweite_mal_auf_dem_radar(tmp_path):
     assert geraete.select_one("#tafel-katalog #gr-sortiment") is None, (
         "der Aufklapper steht zusätzlich im Katalog-Reiter (Doppel-Darstellung)"
     )
-    # Die Alt-URL ist Weiterleitung und trägt keine Tafel-Inhalte mehr.
     alt = _suppe(seiten, "wettbewerbsradar.html")
     assert alt.select_one("#gr-sortiment") is None
     assert alt.select_one(".wr-sektion") is None
-
-
-# --------------------------------------------------------------------------
-# Am echten Bestand: Vollständigkeit des Umzugs (keine Tageszählung - die
-# Zeilenzahl der Seite wird gegen die Aufbereitung gehalten, nicht auf eine
-# Zahl festgenagelt, die jede Nacht wächst). View-Ebene wie der `echt`-
-# Fixture der Nachbardatei: die gerenderte Form deckt die Fixture oben ab.
-# --------------------------------------------------------------------------
 
 
 @pytest.fixture(scope="module")

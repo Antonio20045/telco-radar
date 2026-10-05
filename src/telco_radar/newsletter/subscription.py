@@ -32,11 +32,6 @@ from datetime import datetime, timezone
 from .config import FELD_JE_DIMENSION, NewsletterKatalog
 from .filters import Filtersatz, Stichwort, lies_filtersatz, stichwort_fehler
 
-# Bewusst grosszuegig und bewusst kein RFC-5322-Ungetuem: die einzige Pruefung,
-# die wirklich zaehlt, ist die Bestaetigungsmail. Eine Adresse, die hier
-# durchrutscht und nicht existiert, bekommt keine Mail und wird nie ein Abo.
-# Eine gueltige Adresse, die ein zu strenges Muster abweist, ist dagegen ein
-# verlorener Abonnent, der nicht weiss warum.
 _ADRESSE = re.compile(r"^[^@\s,;<>]+@[^@\s,;<>]+\.[A-Za-z]{2,}$")
 
 ZUSTAENDE = ("pending", "active", "unsubscribed", "bounced")
@@ -150,9 +145,6 @@ class Abo:
         )
 
 
-# ==================================================  lesen und schreiben  ==
-
-
 def als_dict(abo: Abo) -> dict:
     """Die Form, die in `subscribers.jsonl` steht."""
     filters = {
@@ -208,9 +200,6 @@ def aus_dict(roh: dict, katalog: NewsletterKatalog) -> Abo:
 
 def neue_id() -> str:
     return f"sub_{uuid.uuid4().hex[:20]}"
-
-
-# =========================================================  Zulaessigkeit  ==
 
 
 def pruefe_anmeldung(
@@ -269,6 +258,4 @@ def erlaubt_nach_domainliste(adresse: str, erlaubte_domains) -> bool:
     if not domains:
         return True
     domain = normalisiere_adresse(adresse).rpartition("@")[2]
-    # Subdomains zaehlen mit: wer "vodafone.de" erlaubt, meint auch
-    # "mail.vodafone.de" - aber NICHT "vodafone.de.beispiel.com".
     return any(domain == d or domain.endswith("." + d) for d in domains)

@@ -76,7 +76,7 @@ def test_wettbewerb_zaehlt_das_datum_nicht_die_position():
     }
     zeilen = seit.fuer_wettbewerb(view, "2026-08-08")["zeilen"]
     assert zeilen[0]["n"] == 2
-    assert zeilen[1]["n"] == 2  # zwei der drei Wettbewerber betroffen
+    assert zeilen[1]["n"] == 2
 
 
 def test_hoechstens_drei_zeilen():

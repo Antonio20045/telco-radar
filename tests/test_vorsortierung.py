@@ -46,12 +46,6 @@ def _item(titel: str, n: int = 0, summary: str = "") -> Item:
     )
 
 
-# --------------------------------------------------- Mini-Lauf-Umgebung
-# Ein echter Lauf mit echter Konfiguration, aber ohne Netz und ohne Modell -
-# dieselbe Bauart wie die Ende-zu-Ende-Fixture in test_pipeline.py. Sie
-# existiert, weil `run.vorsortierung` nur an einem WIRKLICH geschriebenen
-# Bericht-JSON zu pruefen ist; eine Pruefung auf Teilzeichenketten im
-# Quelltext von `run()` bleibt gruen, wenn das Feld verschwindet.
 _FEED = """<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"><channel>
   <title>Sample Telco News</title>
@@ -76,8 +70,6 @@ _FEED = """<?xml version="1.0" encoding="UTF-8"?>
 def vorsortier_projekt(tmp_path):
     shutil.copytree(PROJECT_ROOT / "config", tmp_path / "config")
     settings = (tmp_path / "config" / "settings.yaml").read_text(encoding="utf-8")
-    # Nebenstufen aus: sie brauchen Netz oder Playwright und haben mit der
-    # gepruefen Zusicherung nichts zu tun.
     settings += (
         "\ncrawl_newsrooms: false\nauto_operator_news: false\n"
         "focus_competitors: []\npromo_enabled: false\n"
@@ -137,9 +129,6 @@ def _stub(monkeypatch, antwort):
     return gesehen
 
 
-# ------------------------------------------------------------ Grundverhalten
-
-
 def test_verworfene_meldung_erreicht_den_analysten_nicht(monkeypatch):
     items = [
         _item("Vorstand beruft neuen CFO", 1),
@@ -178,9 +167,6 @@ def sortiert(items):
     return vs.sortiere_vor(items, model="flash", fokus=FOKUS)
 
 
-# --------------------------------------------------------- (a) CTM-Durchlass
-
-
 def test_heimatmarkt_meldung_umgeht_die_vorsortierung(monkeypatch):
     """Ein Modell, das ALLES verwirft, darf die Telekom-Meldung nicht
     erreichen - sie kommt gar nicht erst zur Abstimmung."""
@@ -195,7 +181,6 @@ def test_heimatmarkt_meldung_umgeht_die_vorsortierung(monkeypatch):
     assert [i.title for i in behalten] == ["Telekom startet neuen Tarif"]
     assert bilanz.durchlass == 1
     assert bilanz.geprueft == 1
-    # Der Nachweis, dass sie nicht nur gerettet, sondern nie vorgelegt wurde.
     vorgelegt = [r["titel"] for stapel in gesehen for r in stapel]
     assert vorgelegt == ["Analystenhaus lobt eigene Studie"]
 
@@ -218,7 +203,6 @@ def test_stichwort_trifft_nur_am_wortanfang(monkeypatch):
     durchlass = vs.CtmDurchlass(FOKUS)
     assert not durchlass.trifft(_item("Inflation drueckt die Umsaetze"))
     assert durchlass.trifft(_item("Neue Flatrate fuer 20 Euro"))
-    # Nach rechts bleibt es offen: die Liste enthaelt Wortstaemme.
     assert durchlass.trifft(_item("Geraet ab heute vorbestellbar"))
 
 
@@ -235,9 +219,6 @@ def test_durchlass_liest_auch_operator_und_zusammenfassung():
     assert durchlass.trifft(
         _item("Neues Angebot im Markt", 1, summary="Die Telekom zieht nach.")
     )
-
-
-# ------------------------------------------------------- (b) Fehler-Durchlass
 
 
 def test_gescheiterter_aufruf_reicht_den_ganzen_stapel_durch(monkeypatch):
@@ -297,9 +278,6 @@ def test_nur_der_gescheiterte_stapel_geht_ungefiltert_durch(monkeypatch):
     assert (bilanz.batches, bilanz.fehler_batches) == (2, 1)
 
 
-# ------------------------------------------------ (c) kein Abbruch des Scans
-
-
 def test_jede_meldung_wird_entweder_geprueft_oder_durchgelassen(monkeypatch):
     """Der Deckel darf den SCAN nicht abbrechen - die Lehre aus `max_produkte`
     und aus dem Uebersetzungsdeckel."""
@@ -313,7 +291,6 @@ def test_jede_meldung_wird_entweder_geprueft_oder_durchgelassen(monkeypatch):
     assert bilanz.durchlass + bilanz.geprueft == bilanz.angeboten == 121
     assert len(behalten) + bilanz.verworfen == 121
     assert sum(len(s) for s in gesehen) == 120
-    # Kein Stapel groesser als der Deckel, und keiner faellt weg.
     assert [len(s) for s in gesehen] == [vs.BATCH_SIZE, vs.BATCH_SIZE, 20]
 
 
@@ -371,9 +348,6 @@ def test_fremde_nummer_in_der_antwort_wirft_nichts_weg(monkeypatch):
     assert len(behalten) == 1 and bilanz.verworfen == 0
 
 
-# ---------------------------------------------------------------- Schalter
-
-
 def test_schalter_ist_vorgabemaessig_an_und_abschaltbar():
     assert vs.ist_eingeschaltet({}) is True
     assert vs.ist_eingeschaltet({"vorsortierung_enabled": False}) is False
@@ -402,9 +376,6 @@ def test_die_echte_konfiguration_hat_den_schalter():
     assert daten["vorsortierung_enabled"] is True
 
 
-# ------------------------------------------------------ ueber alle Bereiche
-
-
 def test_bereiche_werden_getrennt_sortiert_und_die_bilanz_summiert(monkeypatch):
     _stub(
         monkeypatch,
@@ -418,8 +389,6 @@ def test_bereiche_werden_getrennt_sortiert_und_die_bilanz_summiert(monkeypatch):
     ergebnis, bilanz = vs.sortiere_regionen_vor(bereiche, model="flash", fokus=FOKUS)
 
     assert [i.title for i in ergebnis["europe"]] == ["Preis faellt"]
-    # Ein Bereich, aus dem nichts uebrig bleibt, faellt aus der Abbildung -
-    # sonst stuende er mit leerer Ueberschrift im Bericht.
     assert "thema:chips" not in ergebnis
     assert (bilanz.angeboten, bilanz.verworfen, bilanz.batches) == (3, 2, 2)
 
@@ -434,9 +403,6 @@ def test_bereiche_laufen_auch_nebenlaeufig_vollstaendig(monkeypatch):
 
     assert set(ergebnis) == set(bereiche)
     assert bilanz.angeboten == 6 and bilanz.batches == 6
-
-
-# ---------------------------------------------------------- (c) Seen-Store
 
 
 def test_aussortierte_meldung_gilt_als_gelesen(monkeypatch):
@@ -461,8 +427,6 @@ def test_aussortierte_meldung_gilt_als_gelesen(monkeypatch):
     )
     assert bilanz.verworfen == 1
 
-    # Genau die Verkettung aus pipeline.py: die Vorsortierung meldet NICHTS
-    # als ungelesen, der gescheiterte Analysten-Stapel schon.
     ungelesen = {alle[2].id}
     zu_merken = zu_merkende_meldungen(alle, {i.id: i for i in alle}, ungelesen, set())
 
@@ -470,14 +434,10 @@ def test_aussortierte_meldung_gilt_als_gelesen(monkeypatch):
         "Vorstand beruft neuen CFO",
         "Orange senkt Preise",
     }
-    # Der Aussortierte steht im Store und NICHT mehr vor dem Analysten.
     assert [i.title for i in behalten["europe"]] == [
         "Orange senkt Preise",
         "Meldung aus totem Stapel",
     ]
-
-
-# ------------------------------------------------ Einbau in den Lauf
 
 
 def _spion(monkeypatch):
@@ -571,9 +531,6 @@ def test_der_lauf_reicht_den_echten_fokus_durch(tmp_path, monkeypatch):
     assert aufrufe[0]["bereiche"]["europe"][0].title == "A"
 
 
-# ------------------------------------------------- Frist und Fehlerschutz
-
-
 def test_ein_fehler_der_stufe_kostet_keine_einzige_meldung(monkeypatch, tmp_path):
     """Die gefaehrlichste Stufe des Laufs ist die, die MELDUNGEN ENTFERNT -
     und sie steht vor dem Analysten. Faellt sie aus, muessen alle Meldungen
@@ -617,7 +574,6 @@ def test_bei_knapper_restzeit_wird_gar_nicht_erst_vorsortiert(monkeypatch, tmp_p
     )
 
     assert gefiltert == bereiche and bilanz == {} and aufrufe == []
-    # Gegenprobe: mit Luft laeuft sie ganz normal, und die Frist geht mit.
     gefiltert, bilanz = vorsortieren(
         bereiche,
         settings=settings,
@@ -637,13 +593,9 @@ def test_das_budget_rechnet_gegen_die_restzeit_des_jobs():
         "veroeffentlichung_reserve_sekunden": 420,
         "vorsortierung_frist_sekunden": 480,
     }
-    # Viel Luft: die eigene Obergrenze gewinnt.
     assert vorsortierung_budget(settings, 100) == 480
-    # Wenig Luft: die Restzeit gewinnt.
     assert vorsortierung_budget(settings, 2300) == 280
-    # Zu wenig: gar nicht anfangen.
     assert vorsortierung_budget(settings, 2560) is None
-    # Abgeschaltet bleibt abgeschaltet.
     assert vorsortierung_budget(dict(settings, vorsortierung_enabled=False), 0) is None
 
 
@@ -655,7 +607,6 @@ def test_nach_der_frist_gehen_die_restlichen_stapel_ungefiltert_durch(monkeypatc
     items = [_item(f"Meldung {n}", n) for n in range(vs.BATCH_SIZE * 3)]
     gesehen = _stub(monkeypatch, lambda rows: _antwort({r["nr"]: False for r in rows}))
 
-    # Eine Frist, die schon abgelaufen ist, BEVOR der erste Stapel laeuft.
     behalten, bilanz = vs.sortiere_vor(
         items, model="flash", fokus=FOKUS, deadline=time.monotonic() - 1
     )
@@ -664,13 +615,8 @@ def test_nach_der_frist_gehen_die_restlichen_stapel_ungefiltert_durch(monkeypatc
     assert bilanz.frist_batches == bilanz.batches == 3
     assert bilanz.verworfen == 0
 
-    # Gegenprobe: ohne Frist verwirft dieselbe Attrappe wirklich alles -
-    # sonst pruefte der Test seine eigene Fixture.
     behalten, bilanz = vs.sortiere_vor(items, model="flash", fokus=FOKUS)
     assert behalten == [] and bilanz.frist_batches == 0
-
-
-# ------------------------------------------------------- Bericht-JSON
 
 
 def test_die_bilanz_steht_im_bericht_json(vorsortier_projekt, fake_http, monkeypatch):
@@ -689,7 +635,6 @@ def test_die_bilanz_steht_im_bericht_json(vorsortier_projekt, fake_http, monkeyp
     def fake_dispatch(system, user, model, max_tokens, retries):
         if "VORSORTIERUNG" in system:
             rows = json.loads(user.split("\n", 1)[1])
-            # Alles, was "Kalenderhinweis" heisst, faellt - der Rest bleibt.
             return json.dumps(
                 [
                     {
@@ -700,9 +645,6 @@ def test_die_bilanz_steht_im_bericht_json(vorsortier_projekt, fake_http, monkeyp
                     for r in rows
                 ]
             )
-        # Jede andere Stufe bekommt eine leere, aber gueltige Antwort und
-        # faellt damit in ihren eigenen Regelbetrieb zurueck - sie sind alle
-        # failsafe. Was dieser Test prueft, ist das Feld im Bericht-JSON.
         return "{}"
 
     monkeypatch.setattr(llm, "_dispatch", fake_dispatch)

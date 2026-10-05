@@ -24,9 +24,6 @@ import threading
 
 from telco_radar.report.html import schreibe_statische_dateien
 
-# Wortgetreu die Struktur der Rubrikleiste aus `base.html.j2` (die fuenf
-# Eintraege der Marktrecherche, "Geräte" als aktiver/letzter Eintrag -
-# genau der gemeldete Fall).
 _NAV = """
 <nav class="subbar subnav" aria-label="Marktrecherche">
   <a href="index.html">Diese Woche</a>

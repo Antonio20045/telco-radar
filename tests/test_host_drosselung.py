@@ -79,7 +79,6 @@ def test_mindestabstand_zwischen_zwei_abrufen():
     gate = HostGate(max_parallel=4, min_interval=0.2)
     t0 = time.monotonic()
     _durchlauf(gate, [f"https://beispiel.de/{i}" for i in range(4)], arbeit=0.0)
-    # 4 Abrufe, 3 Abstaende a 0,2 s
     assert time.monotonic() - t0 >= 0.55
 
 
@@ -97,7 +96,6 @@ def test_slot_wird_auch_bei_fehler_freigegeben():
         with pytest.raises(RuntimeError):
             with gate.slot("https://beispiel.de/feed"):
                 raise RuntimeError("Abruf gescheitert")
-    # Wenn das Semaphor leckt, laeuft der naechste Abruf in einen Deadlock.
     with gate.slot("https://beispiel.de/feed"):
         pass
 
@@ -109,18 +107,9 @@ def test_standardgate_drosselt_nicht():
     assert active_gate().max_parallel > 1000
 
 
-# ======================================================================== #
-# Harte Frist je Quelle.
-#
-# Im Lauf #75 brauchte EINE tote Quelle (KT, timeout_seconds: 30 mal zwei
-# User-Agents mal drei Versuche plus Backoff) 302,6 s - und die gesamte
-# Sammelphase dauerte 303,7 s. Gegen den langsamsten Einzelfall hilft keine
-# Parallelitaet.
-# ======================================================================== #
-
-
 def test_frist_bricht_die_wiederholungen_ab(monkeypatch):
     import httpx
+
     from telco_radar.collect import http as http_mod
 
     versuche = []
@@ -131,7 +120,6 @@ def test_frist_bricht_die_wiederholungen_ab(monkeypatch):
         raise httpx.ConnectError("nicht erreichbar")
 
     monkeypatch.setattr(http_mod.httpx, "get", _langsam)
-    # Ohne Frist: 2 User-Agents x 3 Versuche = 6 Abrufe (plus 13 s Backoff)
     with http_mod.deadline(0.3):
         with pytest.raises(httpx.HTTPError):
             http_mod.fetch("https://tot.de/feed", {"timeout_seconds": 1})
@@ -142,6 +130,7 @@ def test_ohne_frist_bleibt_die_ausdauer_erhalten(monkeypatch):
     """Fuer eine ausgewaehlte Quelle im Lauf ist die Leiter richtig - ein
     verlorener Abruf kostet dort eine Woche."""
     import httpx
+
     from telco_radar.collect import http as http_mod
 
     versuche = []

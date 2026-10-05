@@ -59,7 +59,6 @@ def _stapelweise(monkeypatch) -> list[int]:
 def test_eine_ueberschrittene_schwelle_stoppt_keinen_stapel(monkeypatch):
     """Die Zusicherung, um die es geht: der Lauf liest zu Ende."""
     llm.budget_setzen(0.000001, {"m": {"ein": 1000.0, "aus": 1000.0}})
-    # Die Schwelle ist von der ersten gezaehlten Antwort an ueberschritten.
     llm._VERBRAUCH["m"] = {
         "aufrufe": 1,
         "prompt_tokens": 1_000_000,
@@ -109,5 +108,4 @@ def test_grosse_stapel_sparen_denkspur(monkeypatch):
     assert agents.BATCH_SIZE == 24
     assert len(aufrufe) == 3
     assert ergebnis["_telemetry"]["items_in"] == 72
-    # Das Ausgabebudget traegt Denkspur PLUS Antwort des groesseren Stapels.
     assert agents.ANALYST_MAX_TOKENS >= 16000 + 9 * 190

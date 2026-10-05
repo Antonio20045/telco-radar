@@ -28,16 +28,8 @@ log = logging.getLogger(__name__)
 
 MAX_TOKENS = 16000
 
-# Wie viele Zeichen Original in EINEN Modellaufruf gehen. Konservativ
-# gerechnet: deutscher Text ist rund 15 % laenger als englischer oder
-# spanischer, und 6000 Zeichen Original passen mit ihrer Uebersetzung
-# bequem in 8000 Tokens.
 ABSCHNITT_ZEICHEN = 6000
 
-# Unter diesem Anteil der Originallaenge gilt die Antwort als Zusammen-
-# fassung und nicht als Uebersetzung. Deutsch ist eher laenger als kuerzer
-# als die Ausgangssprachen dieses Bestands; 55 % lassen Luft fuer eine
-# knappe Sprache, schlagen aber bei einer echten Kuerzung an.
 MINDESTANTEIL = 0.55
 
 SYSTEM = """Du uebersetzt Nachrichtentexte aus der Telekommunikationsbranche \
@@ -77,7 +69,6 @@ class UebersetzungFehlgeschlagen(RuntimeError):
 
 
 _ABSATZ = re.compile(r"\n\s*\n")
-# Vorreden, die Modelle trotz klarer Anweisung gelegentlich voranstellen.
 _VORREDE = re.compile(
     r"^\s*(hier ist|hier die|uebersetzung|übersetzung|translation)\b[^\n]{0,60}?:\s*",
     re.I,

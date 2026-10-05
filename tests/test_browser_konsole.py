@@ -32,18 +32,8 @@ _STATUS_404 = (
 )
 
 
-# --------------------------------------------------------------------------
-# Der eine befreite Fall
-# --------------------------------------------------------------------------
-
-
 def test_netzfehler_beim_schriftenpaket_faellt_durch():
     assert ist_seitenfehler("error", _NETZ, {"url": _FONTS_URL}) is False
-
-
-# --------------------------------------------------------------------------
-# Was ausdruecklich NICHT befreit ist
-# --------------------------------------------------------------------------
 
 
 def test_http_status_beim_schriftendienst_bleibt_ein_fehler():
@@ -147,11 +137,6 @@ def test_liste_bleibt_kurz_und_benannt():
     )
 
 
-# --------------------------------------------------------------------------
-# Die Verdrahtung - der Teil, an dem der Reiter-Test blind war
-# --------------------------------------------------------------------------
-
-
 class _Seite:
     """Das Stueck Playwright-Seite, das `konsole_sammeln` anfasst."""
 
@@ -180,13 +165,11 @@ def test_konsole_sammeln_hoert_beide_kanaele():
     fehler = konsole_sammeln(s)
     assert set(s._horcher) == {"console", "pageerror"}
 
-    s.melde_konsole("error", _NETZ, {"url": _FONTS_URL})  # befreit
+    s.melde_konsole("error", _NETZ, {"url": _FONTS_URL})
     assert fehler == []
 
     s.melde_ausnahme("TypeError: Cannot read properties of undefined")
     s.melde_konsole("error", _STATUS_404, {"url": "http://127.0.0.1:1/app.js"})
-    # Mit Kanalmarke, damit ein roter Test sagt, WELCHER Kanal gefeuert
-    # hat - der Unterschied, um den es in dieser Datei geht.
     assert fehler == [
         "pageerror: TypeError: Cannot read properties of undefined",
         f"console: {_STATUS_404}",

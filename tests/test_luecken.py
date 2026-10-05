@@ -52,9 +52,6 @@ def _eigene(**hebel):
     )
 
 
-# ------------------------------------------------------- die eine Regel
-
-
 def test_ohne_gepflegte_liste_gibt_es_keine_luecken():
     """Zwoelf weisse Flecken zu behaupten, die niemand geprueft hat, waere
     schlimmer als gar keine Ansicht."""
@@ -118,9 +115,6 @@ def test_gepflegtes_ja_erscheint_mit_beispiel_und_datum():
     assert v["flecken"] == []
 
 
-# ------------------------------------------------------------ Sortierung
-
-
 def test_der_staerkste_fleck_steht_oben():
     v = luecken.bauen(
         _bestand(),
@@ -131,9 +125,6 @@ def test_der_staerkste_fleck_steht_oben():
         ),
     )
     assert [f["key"] for f in v["flecken"]] == ["entertainment", "ki"]
-
-
-# ---------------------------------------------------------- Direktvergleich
 
 
 def test_direktvergleich_nennt_den_beleg_des_gegners():
@@ -153,9 +144,6 @@ def test_direktvergleich_laesst_leere_zeilen_weg():
         _bestand(), LABELS, luecken.EigeneHebel(direktvergleich="Deutsche Telekom")
     )
     assert all(z["key"] in ("ki", "entertainment") for z in v["gegner_hebel"])
-
-
-# --------------------------------------------------------- Konfiguration
 
 
 def test_die_ausgelieferte_datei_ist_leer_aber_gueltig():

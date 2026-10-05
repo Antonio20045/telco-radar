@@ -25,8 +25,6 @@ NON_DIFF_CATEGORIES = {
     "Strategie",
 }
 
-# Harte Ausschluesse: Netz-/Infrastruktur, B2B/Enterprise, Konzernfinanzen. Der
-# Nutzer will Endkunden-Differenzierung, keinen 5G-/Broadband-Ausbau.
 _EXCLUDE = re.compile(
     r"ai[- ]ran|open ran|o-ran|\bv-?ran\b|\bran\b|spectrum|backbone|subsea|"
     r"data cent(er|re)|ground station|network slicing|\bslicing\b|outage|"
@@ -742,9 +740,6 @@ def build_differentiation(highlights: list[dict]) -> dict:
 
     themes = []
     for t in DIFF_THEMES:
-        # Relevanteste zuerst, Aktualität als Tiebreak: so bleibt ein starker
-        # Move (z. B. Perplexity-Bundle, 5/5) auch nach Wochen oben stehen und
-        # faellt nicht nur wegen des Datums aus der (gedeckelten) Anzeige.
         mv = sorted(
             moves_by_theme[t["key"]],
             key=lambda m: (m["rel"], m.get("date") or ""),

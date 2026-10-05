@@ -73,14 +73,8 @@ def _bericht(tmp_path, briefing_md: str = "## Auf einen Blick\n\nText.") -> str:
 
 def test_fremde_ueberschrift_landet_escaped_in_der_seite(tmp_path):
     html = _bericht(tmp_path)
-    # Entscheidend ist nicht, dass die Zeichenfolge "onerror" verschwindet -
-    # als Text ist sie harmlos -, sondern dass kein Tag daraus wird. Auf "<img"
-    # allein darf man dabei nicht pruefen: das Seitenlogo ist selbst ein
-    # img-Tag.
     assert "<img src=x" not in html
     assert "&lt;img src=x" in html
-    # Auch das Attribut darf nicht als Attribut dastehen: die
-    # Anfuehrungszeichen sind escaped, damit es Text bleibt.
     assert 'onerror="alert(1)"' not in html
     assert "onerror=&#34;alert(1)&#34;" in html
 

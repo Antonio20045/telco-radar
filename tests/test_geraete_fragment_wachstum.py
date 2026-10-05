@@ -66,8 +66,6 @@ def _fixture(root: Path) -> None:
                     }
                 )
             )
-    # Dieselbe (id, datum)-Zeile noch einmal: die Historie ersetzt beim
-    # zweiten Lauf desselben Tages - die Zaehlung muss das nachbilden.
     zeilen.append(zeilen[0])
     (zustand / "geraete_tco_historie.jsonl").write_text(
         "\n".join(zeilen) + "\n", encoding="utf-8"
@@ -82,7 +80,7 @@ def test_historie_zaehlt_idempotent_und_je_messtag(tmp_path):
     _fixture(tmp_path)
     bestand = lies_historie(tmp_path / "data" / "state" / "geraete_tco_historie.jsonl")
     assert bestand.messtage == 3
-    assert bestand.paare == 30  # die Dublette zaehlt nicht doppelt
+    assert bestand.paare == 30
     assert bestand.tage == (
         (date(2026, 9, 10), 10),
         (date(2026, 9, 11), 10),
@@ -90,8 +88,6 @@ def test_historie_zaehlt_idempotent_und_je_messtag(tmp_path):
     )
     assert bestand.anker == date(2026, 9, 12)
     assert bestand.rate_je_messtag() == 10.0
-    # Fehlt die Datei, ist das eine leere Messung und kein Fehler - der
-    # erste Lauf ohne Buendel legt sie noch nicht an.
     assert lies_historie(tmp_path / "nix.jsonl").paare == 0
 
 
@@ -103,7 +99,7 @@ def test_rate_ist_unbestimmt_mit_einem_messtag(tmp_path):
     )
     bestand = lies_historie(zustand / "geraete_tco_historie.jsonl")
     assert bestand.paare == 1
-    assert bestand.rate_je_messtag() is None  # keine Rate aus einem Punkt
+    assert bestand.rate_je_messtag() is None
 
 
 def test_prognose_formel_ceil_ab_anker():
@@ -123,14 +119,10 @@ def test_prognose_formel_ceil_ab_anker():
     assert (tage, drueber) == (497, False)
     assert grenz_datum == date(2026, 9, 12) + timedelta(days=497)
     assert grenz_datum == date(2028, 1, 22)
-    # Bruchteile aufrunden: 34 Paare an der Grenze brauchen 0,4 -> 1 Tag.
     _, tage, drueber = prognose(1_000.0, 30, 10.0, 34_000, date(2026, 9, 12))
     assert (tage, drueber) == (1, False)
-    # Ein Tag GENAU auf der Grenze gilt als gehalten, erst der naechste
-    # ueberschreitet: 40 Paare = 40.000 B -> 1 Tag.
     _, tage, _ = prognose(1_000.0, 30, 10.0, 40_000, date(2026, 9, 12))
     assert tage == 1
-    # Bereits ueberschritten: der Anker selbst, ohne Frist.
     grenz_datum, tage, drueber = prognose(1_000.0, 30, 10.0, 29_000, date(2026, 9, 12))
     assert (grenz_datum, tage, drueber) == (date(2026, 9, 12), 0, True)
 
@@ -151,12 +143,12 @@ def test_skript_rechnet_gegen_die_fixture(tmp_path, capsys):
     assert rc == 0
     text = capsys.readouterr().out
     assert "Stand 2026-09-18" in text
-    assert "2026-09-12" in text  # Anker = letzter Messtag
+    assert "2026-09-12" in text
     assert "10 Paare/Messtag" in text
-    assert "30,000 B" in text  # gemessene Fragmentgroesse
+    assert "30,000 B" in text
     assert "<-- GRENZE" in text
-    assert "erreicht am 2026-09-13" in text  # Anker + 1 Messtag
-    assert "NICHT gebaut" in text  # der Deckel ist Empfehlung
+    assert "erreicht am 2026-09-13" in text
+    assert "NICHT gebaut" in text
 
 
 def test_bericht_ist_deterministisch(tmp_path):
@@ -167,7 +159,7 @@ def test_bericht_ist_deterministisch(tmp_path):
     zweiter = modul.bericht(tmp_path, heute=date(2026, 9, 18))
     assert erster == zweiter
     assert "5-MB-Grenze" in erster
-    assert "erreicht am 2028-01-22" in erster  # 497 Messtage, s. Formeltest
+    assert "erreicht am 2028-01-22" in erster
 
 
 def test_protokollzeile_nennt_die_drei_zahlen(tmp_path):
@@ -177,8 +169,6 @@ def test_protokollzeile_nennt_die_drei_zahlen(tmp_path):
     assert protokoll_zeile(tmp_path) == (
         "Fragmentgroesse: 3 Messtage, 30 Messpaare, 517 KB Fragmente"
     )
-    # Fragmente fehlen (erster Lauf vor dem ersten Render): die Messzahlen
-    # stehen trotzdem, die Reihe reisst nicht - aber ohne Zahl kein Punkt.
     nur_state = tmp_path / "ohne_site"
     (nur_state / "data" / "state").mkdir(parents=True)
     (nur_state / "data" / "state" / "geraete_tco_historie.jsonl").write_text(
@@ -188,8 +178,6 @@ def test_protokollzeile_nennt_die_drei_zahlen(tmp_path):
         "Fragmentgroesse: 1 Messtage, 1 Messpaare, "
         "kein Fragment auf Platt (Render laeuft nach diesem Schritt)"
     )
-    # Keine Historie: KEINE Zeile - 0/0/0 waere ein vorgetaeuschter
-    # Messpunkt in der PM-6-Reihe.
     assert protokoll_zeile(tmp_path / "leer") is None
 
 

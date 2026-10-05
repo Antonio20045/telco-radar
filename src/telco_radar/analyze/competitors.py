@@ -41,20 +41,6 @@ Rules:
 """
 
 
-# Bei Reasoning-Modellen (DeepSeek V4, Claude mit adaptive thinking) zaehlt
-# das Nachdenken gegen max_tokens. Reicht das Budget nur dafuer, kommt eine
-# LEERE Antwort zurueck oder eine mitten im String abgeschnittene - beides
-# ohne Fehlermeldung des Anbieters. Der Editor steht aus genau diesem Grund
-# auf 32000 (siehe editor.py).
-#
-# Der Wettbewerber-Zweig blieb bei 3500, weil er unter dem billigen
-# flash-Modell lief. Beim ersten Lauf mit deepseek-v4-pro (06.08.2026)
-# scheiterten dadurch zwei von drei Profilen:
-#   Telefónica/O2  JSONDecodeError: Unterminated string  -> abgeschnitten
-#   1&1            JSONDecodeError: Expecting value      -> voellig leer
-# Das erzeugte Ergebnis ist klein (ein Profil, 4-8 Moves); teuer ist nur das
-# Nachdenken davor. Abgerechnet werden erzeugte Token, nicht das Budget -
-# ein grosszuegiges Limit kostet also nichts.
 COMPETITOR_MAX_TOKENS = 12000
 
 
@@ -132,11 +118,6 @@ def analyze_competitor(name, terms, items, model, language="Deutsch", max_items=
                 }
             )
     except (ValueError, RuntimeError, KeyError) as exc:
-        # Der Fehler muss die Seite erreichen. Bis zum 06.08.2026 wurde er nur
-        # geloggt, das Profil kam leer zurueck, und die Wettbewerber-Seite
-        # sagte dem Leser "entsteht beim naechsten Lauf" - obwohl der Lauf
-        # gerade stattgefunden hatte und gescheitert war. Zwei Laeufe lang
-        # (#74, #75) hat das niemand gemerkt.
         log.error("Competitor analysis failed for %s: %s", name, exc)
         result["error"] = f"{type(exc).__name__}: {exc}"
     log.info(
@@ -159,11 +140,8 @@ def analyze_all(focus, items, model, language="Deutsch", max_workers=4):
     def _one(t):
         try:
             return analyze_competitor(t[0], t[1], items, model, language)
-        except Exception as exc:  # noqa: BLE001 - one profile must not kill the rest
+        except Exception as exc:  # noqa: BLE001
             log.error("Competitor %s failed: %s", t[0], exc)
-            # Nicht None: ein verschwundenes Profil ist von "diese Woche gab
-            # es nichts" nicht zu unterscheiden. Der Platzhalter traegt den
-            # Fehler bis auf die Seite.
             return {
                 "name": t[0],
                 "n_items": 0,

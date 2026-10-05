@@ -124,9 +124,6 @@ def run_promo_stage(
 
     sources = promo_cfg.crawled_sources
     by_name = {s.name: s for s in sources}
-    # Ein Auftrag je SEITE, nicht je Marke. Die Nebenlaeufigkeit wirkt damit
-    # auch INNERHALB einer Marke - eine Marke mit fuenf Seiten haelt den Lauf
-    # nicht fuenfmal so lange auf wie eine mit einer.
     auftraege = [(src, page) for src in sources for page in src.crawled_pages]
     fetched: list[dict] = []
     with ThreadPoolExecutor(max_workers=max(1, max_workers)) as pool:
@@ -137,19 +134,8 @@ def run_promo_stage(
             fetched.append(fut.result())
     fetched.sort(key=lambda r: (r["brand"], not r["leitseite"], r["url"]))
 
-    # Bildkandidaten je Marke, aus DIESEM Abruf (siehe promo_bilder.py). Sie
-    # entstehen im selben Seitenaufruf wie Text und Links - anders als der
-    # Screenshot-Pfad davor, der je Marke einen zweiten, eigenen Chromium
-    # startete. Gesammelt wird fuer jede erfolgreich abgerufene Marke, auch
-    # fuer eine unveraenderte: ein Angebot aus einem frueheren Lauf kann
-    # sehr wohl noch ohne Bild dastehen.
     bild_kandidaten: dict[str, list[dict]] = {}
 
-    # Je Marke sammeln, was in DIESEM Lauf wirklich neu gelesen wurde:
-    # welche Seiten (URLs) und welche Angebots-IDs dabei wiedergefunden
-    # wurden. mark_stale() laeuft erst, wenn alle Seiten der Marke durch
-    # sind - sonst wuerde die erste Seite die Angebote der zweiten altern
-    # lassen, bevor diese ueberhaupt gelesen ist.
     gepruefte_seiten: dict[str, set[str]] = {}
     gesehene_ids: dict[str, set[str]] = {}
 
@@ -168,21 +154,6 @@ def run_promo_stage(
         page_url = rec["url"]
         links = rec.pop("links", [])
         image_url = rec.get("image_url")
-        # Das og:image der Seite haengt hinten an: es ist der schwaechste
-        # Kandidat (meist ein generisches Markenlogo, siehe
-        # collect/promo_snapshot.extract_hero_image), aber der einzige fuer
-        # eine Seite, aus der sich kein einziges <img> lesen laesst. Als
-        # LETZTER in der Liste kommt er nur zum Zug, wenn nichts davor
-        # taugte - genau die Rolle, die ihm zusteht.
-        # Bildkandidaten ALLER Seiten einer Marke landen in einem Topf: das
-        # Motiv eines Angebots steht nicht zwangslaeufig auf der Seite, auf
-        # der der Text gefunden wurde (eine Uebersicht zeigt die Kachel, die
-        # Detailseite den Text). promo_bilder.zuordnen() entscheidet ueber
-        # Anker und Textnaehe, nicht ueber die Herkunftsseite.
-        # `page` haelt fest, VON WELCHER Seite ein Kandidat stammt. Stufe 4
-        # der Zuordnung (promo_bilder._seitenmotive) vergibt das Buehnenbild
-        # je Seite; ohne diese Marke bekaeme eine Marke mit sieben Seiten
-        # weiterhin genau ein Motiv.
         seiten_bilder = rec.pop("images", []) + (
             [{"src": image_url, "anchor": "", "context": "", "hint_w": 0}]
             if image_url
@@ -192,21 +163,8 @@ def run_promo_stage(
             kandidat["page"] = page_url
         bild_kandidaten.setdefault(src_name, []).extend(seiten_bilder)
         key = snapshot_key(src_name, page_url)
-        # Der reine Markenschluessel ist der Stand VOR dem 08.08.2026. Er
-        # zaehlt nur fuer die Leitseite und nur so lange, bis der neue
-        # Schluessel einmal geschrieben wurde.
         legacy = src_name if rec.get("leitseite") else None
         changed = snap_store.changed(key, h, legacy_key=legacy)
-        # Den Stand IMMER unter dem SEITENschluessel festhalten, auch wenn er
-        # sich nicht geaendert hat. Das stand bis Lauf #83 hinter dem
-        # `continue` weiter unten - mit der Folge, dass genau die unveraenderte
-        # Leitseite ihren neuen Schluessel nie bekam: sie galt ueber den alten
-        # Markenschluessel als unveraendert, sprang aus der Schleife, und
-        # prune() raeumte den alten Schluessel danach weg. Ergebnis in #83:
-        # 10 der 15 Leitseiten standen anschliessend ohne Hash da und waeren
-        # in JEDEM weiteren Lauf erneut durch die LLM-Extraktion gegangen,
-        # ohne dass sich etwas geaendert hat. Ein Schreibvorgang mehr je
-        # Seite ist dagegen kostenlos.
         snap_store.update(key, h, today)
         try:
             if not changed:
@@ -214,10 +172,6 @@ def run_promo_stage(
                 results.append(rec)
                 continue
             if use_llm and text.strip():
-                # Extraktion ist Mechanik (Angebote aus HTML lesen), die
-                # Promo-Redaktion unten (promo_editor.synthesize) bleibt auf
-                # dem Redaktionsmodell - dieselbe Trennung wie in der
-                # Hauptpipeline (_mechanik_modell).
                 items = extract_promos(
                     src_name, text, extract_model or model, links=links
                 )
@@ -235,10 +189,6 @@ def run_promo_stage(
             else:
                 rec["status"] = "changed_no_llm"
         except PromoExtractionError as exc:
-            # Der Aufruf ist gescheitert, nicht die Seite. Sie kommt bewusst
-            # NICHT in gepruefte_seiten - damit laesst mark_stale ihre
-            # bestehenden Angebote unangetastet, statt sie wegen eines
-            # API-Aussetzers Richtung "ausgelaufen" zu schieben.
             rec["status"] = "extraktion_fehlgeschlagen"
             rec["error"] = str(exc)
             log.warning(
@@ -259,8 +209,6 @@ def run_promo_stage(
             )
         results.append(rec)
 
-    # Alterung erst NACH allen Seiten einer Marke, und nur fuer die Seiten,
-    # die diesmal wirklich neu gelesen wurden (siehe PromoDB.mark_stale).
     for brand, seiten in gepruefte_seiten.items():
         src = by_name.get(brand)
         db.mark_stale(
@@ -278,14 +226,6 @@ def run_promo_stage(
         log.info("Promo-Snapshots: %d veraltete Schluessel entfernt", entfernt)
     snap_store.save()
 
-    # Wichtigkeits-Score: laeuft ueber ALLE nicht-ausgelaufenen Eintraege der
-    # DB, nicht nur ueber die dieses Mal neu extrahierten - ein Angebot, das
-    # seit drei Wochen unveraendert laeuft, ist deshalb ja nicht unwichtig.
-    # Die teuren LLM-Achsen werden trotzdem nur einmal je Angebotstext
-    # angefragt und danach eingefroren (siehe promo_ranker.needs_judgement),
-    # der Dauerbetrieb kostet also nur die paar wirklich neuen Angebote.
-    # Failsafe wie ueberall hier: ein Fehler laesst die Scores unveraendert,
-    # bricht aber weder diesen Zweig noch den Gesamtlauf ab.
     score_summary: dict = {}
     try:
         score_summary = promo_ranker.score_all(
@@ -310,12 +250,6 @@ def run_promo_stage(
     except Exception as exc:  # noqa: BLE001
         log.warning("Promo-Bewertung uebersprungen: %s", str(exc)[:160])
 
-    # Kampagnenbilder: je Angebot das Motiv, das die Aktionsseite dafuer
-    # zeigt (siehe promo_bilder.py). Laeuft NACH der Bewertung, weil die
-    # Reihenfolge der Angebote entscheidet, wer ein doppelt belegtes Bild
-    # bekommt - das hoeher bewertete Angebot. Fehler je Marke werden
-    # einzeln gefangen: eine Karte ohne Bild wird eine Zeile, nie ein
-    # Abbruch.
     bilder_bilanz: Counter = Counter()
     for brand, kandidaten in bild_kandidaten.items():
         if not kandidaten:
@@ -379,10 +313,6 @@ def run_promo_stage(
         len(auftraege),
         ", ".join(f"{n}x {s}" for s, n in sorted(zaehler.items())),
     )
-    # Gescheiterte Extraktionen einzeln benennen. Ein Sammelzaehler reicht
-    # hier nicht: nach Lauf #83 war unklar, ob Telekom nichts LIEFERTE oder
-    # ob die Extraktion scheiterte - und genau diese Frage entscheidet, ob
-    # eine Quelle taugt oder nur gerade Pech hatte.
     gescheitert = [r for r in results if r.get("status") == "extraktion_fehlgeschlagen"]
     if gescheitert:
         log.warning(
@@ -393,9 +323,6 @@ def run_promo_stage(
                 f"{r['brand']} {r['url']} ({r.get('error', '')})" for r in gescheitert
             ),
         )
-    # Wie viele Seiten haben wirklich etwas beigetragen? Die Zahl beantwortet
-    # die Frage, um die es beim Ausbau geht - eine Seite, die ueber Wochen
-    # 0 Angebote liefert, ist Ballast.
     ergiebig = sum(1 for r in results if r.get("extracted"))
     log.info(
         "Promo-Ergiebigkeit: %d von %d gelesenen Seiten lieferten "
@@ -403,9 +330,6 @@ def run_promo_stage(
         ergiebig,
         zaehler.get("ok", 0),
     )
-    # Drei Zahlen fuers Laufprotokoll (pipeline.py::stats, siehe dort): der
-    # Ausfall seit dem 14.08.2026 (Strategie 2026-08-27, B6) stand sonst in
-    # KEINER Statistik, nur im Actions-Log, das niemand liest.
     return {
         "mode": mode,
         "sources": results,

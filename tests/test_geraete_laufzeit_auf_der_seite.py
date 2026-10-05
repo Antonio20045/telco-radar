@@ -67,11 +67,6 @@ def zeile_html(karte: dict) -> BeautifulSoup:
     )
 
 
-# --------------------------------------------------------------------------
-# Bausteine fuer die Kartenansicht
-# --------------------------------------------------------------------------
-
-
 def _listung(anbieter, preis, sku=SKU):
     return {
         "id": f"{anbieter.lower()}--{sku}",
@@ -231,11 +226,6 @@ def _modell(buendel, listungen=None):
     return treffer[0]
 
 
-# --------------------------------------------------------------------------
-# 1. Der Kartenschluessel traegt die GEMESSENE Ratenlaufzeit (Befund 1)
-# --------------------------------------------------------------------------
-
-
 def test_zwei_ratenlaufzeiten_desselben_tarifs_sind_zwei_zeilen():
     """Befund 1: 918,00 EUR in 24 Raten und in 36 Raten sind ZWEI
     Angebote - kein Angebot verdraengt das andere.
@@ -248,22 +238,15 @@ def test_zwei_ratenlaufzeiten_desselben_tarifs_sind_zwei_zeilen():
     cs = [k for k in modell["karten"] if k["anbieter"] == "congstar"]
     assert len(cs) == 2, "zwei Ratenlaufzeiten desselben Tarifs sind zwei Zeilen"
     assert sorted(k["raten_laufzeit"] for k in cs) == [24, 36]
-    # Dieselbe Zahl, die den Schluessel traegt, steht auch am Modell -
-    # eine zweite Definition waere eine zweite Wahrheit.
     assert modell["laufzeiten"] == [24, 36]
-    # Beide Zeilen stehen wirklich da, jede mit ihrer Ratenzahl.
     texte = [vorlage_text(zeile_html(k).select_one(".gr-kk-bau")) for k in cs]
     assert any("36 Raten à 25,50 €" in t for t in texte), texte
     assert any("24 Raten à 38,25 €" in t for t in texte), texte
 
-    # GEGENPROBE: EIN congstar-Buendel ergibt EINE Zeile - der Test zaehlt
-    # nicht einfach alles mit, was im Bestand steht.
     einzeln = _modell([_congstar(36, 25.5), _vodafone()])
     nur_eins = [k for k in einzeln["karten"] if k["anbieter"] == "congstar"]
     assert len(nur_eins) == 1
     assert nur_eins[0]["raten_laufzeit"] == 36
-    # Die 24 in dieser Liste ist die des Vodafone-Buendels, nicht eine
-    # zweite congstar-Variante.
     assert einzeln["laufzeiten"] == [24, 36]
 
 
@@ -285,11 +268,6 @@ def test_zwei_farben_derselben_laufzeit_bleiben_eine_zeile():
     assert len(cs) == 1, "zwei Farben sind EIN Angebot"
 
 
-# --------------------------------------------------------------------------
-# 3. Etikett und Delta sagen die Wahrheit (Befund 3)
-# --------------------------------------------------------------------------
-
-
 def test_ein_buendelmonatspreis_ueber_36_monate_nennt_seinen_zeitraum():
     """Befund 3a: 340,00 + 36 × 42,99 + 39,90 = 1.927,54 EUR sind KEINE
     "Kosten über 24 Monate" - in dieser Summe stecken 36 Monate Tarif und
@@ -308,9 +286,6 @@ def test_ein_buendelmonatspreis_ueber_36_monate_nennt_seinen_zeitraum():
     assert "Kosten über 24 Monate" not in text, text
     assert "Gerechnet über 36 Monate" in text, text
 
-    # GEGENPROBE: die aufgeteilte Form (Tarif und Rate getrennt) traegt
-    # weiter 24 - dort sind es wirklich 24 Tarifmonate, und die Raten
-    # jenseits stehen als Restschuld daneben.
     vf = next(
         k for k in modell["karten"] if k["anbieter"] == "Vodafone" and k["sku_id"]
     )
@@ -341,21 +316,15 @@ def test_ueber_zwei_zeitraeume_steht_der_zustand_statt_eines_vorzeichens():
     zeile = zeile_html(eins)
     zelle = zeile.select_one(".gr-bnd-delta")
     assert zelle.get_text(strip=True) == "andere Laufzeit"
-    # Kein Zahlenwert: kein Δ-Praefix und KEIN Sortierschluessel - die
-    # Zeile faellt aus der Rangfolge nach Δ heraus.
     assert "gr-bnd-delta--wert" not in (zelle.get("class") or [])
     assert zeile.select_one(".gr-bnd")["data-delta"] == ""
     assert "über der Vodafone-Referenz" not in vorlage_text(zeile)
     assert "unter der Vodafone-Referenz" not in vorlage_text(zeile)
-    # Der Satz steht als benannte Luecke im Rechenweg - zurueckgenommen,
-    # nicht als lauter Delta-Satz in Alarmfarbe (`gr-kk-delta`).
     assert zeile.select_one(".gr-kk-delta") is None
     assert (
         vorlage_text(zeile.select_one(".gr-kk-luecke")) == eins["delta_zustand"]["satz"]
     )
 
-    # GEGENPROBE: die 24-Monats-Zeile desselben Modells bekommt ihr Delta
-    # wie bisher - mit Betrag, Prozent und Vorzeichen.
     modell2 = _modell([_congstar(36, 25.5), _vodafone()])
     cs = next(k for k in modell2["karten"] if k["anbieter"] == "congstar")
     assert cs["leitzahl_monate"] == 24
@@ -364,11 +333,6 @@ def test_ueber_zwei_zeitraeume_steht_der_zustand_statt_eines_vorzeichens():
     assert cs["delta"]["gleiche_laufzeit"] is True
     zeile2 = zeile_html(cs)
     assert zeile2.select_one(".gr-bnd")["data-delta"] == str(cs["delta"]["betrag"])
-
-
-# --------------------------------------------------------------------------
-# 4. Kein Lesepfad raet mehr eine 24 (Befund 4)
-# --------------------------------------------------------------------------
 
 
 def test_eine_listung_ohne_laufzeit_bekommt_keine_geratene_24():
@@ -401,8 +365,6 @@ def test_eine_listung_ohne_laufzeit_bekommt_keine_geratene_24():
     assert "Ratenlaufzeit" in karte["luecken"]
     assert karte["gesamt"] is None
     assert karte["label"] == "Kosten – Laufzeit nicht gemessen"
-    # Regel 9: die Zeile zeigt den Ausfall, statt "nichts gefunden"
-    # vorzutaeuschen.
     text = vorlage_text(zeile_html(karte))
     assert "keine belastbare Zahl" in text
     assert karte["leer_grund"] == (
@@ -411,7 +373,6 @@ def test_eine_listung_ohne_laufzeit_bekommt_keine_geratene_24():
     ), karte["leer_grund"]
     assert karte["leer_grund"] in text, "der Grund steht auf der Zeile"
 
-    # GEGENPROBE: MIT gemessener Laufzeit rechnet derselbe Weg wie immer.
     mit = karten.buendel_aus_listungen([dict(listung, laufzeit_monate=24)])[0]
     assert mit.laufzeit_monate == 24
     karte_mit = karten._karte(
@@ -464,10 +425,8 @@ def test_eine_rate_ohne_laufzeit_wirft_keinen_typeerror():
     )
     assert karte["belastbar"] is False
     assert "Ratenlaufzeit" in karte["luecken"]
-    # Und die Zeile rendert (kein halbes Dokument).
     assert "keine belastbare Zahl" in vorlage_text(zeile_html(karte))
 
-    # GEGENPROBE: mit Laufzeit steht die Ratensumme da wie immer.
     b.laufzeit_monate = 36
     karte36 = karten._karte(
         b,
@@ -481,10 +440,6 @@ def test_eine_rate_ohne_laufzeit_wirft_keinen_typeerror():
     assert karte36["raten_summe"] == 1098.0
     assert karte36["offene_raten"] == 12
 
-
-# --------------------------------------------------------------------------
-# 2. + 4. Die Zeitreihe: unbekannte ID-Form und ungeratene Laufzeit
-# --------------------------------------------------------------------------
 
 _KATALOG = {
     "geraete": [
@@ -652,9 +607,6 @@ def test_eine_unbekannte_id_form_behaelt_ihre_messungen(tmp_path):
     assert gemessen["punkte"] == 3, "drei Messtage, drei Punkte"
     assert gemessen["kreise"] >= 3, "die Punkte stehen auch im Bild"
 
-    # GEGENPROBE: dieselbe Lage mit einer ID der HEUTIGEN Form ergibt
-    # genau dasselbe Bild - der Test misst die Zuordnung, nicht die
-    # Fixture.
     root2, state2 = _zeitreihe_wurzel(
         tmp_path / "bekannt", "buendel--o2--" + SKU + "--o2-mobile-m--24m"
     )
@@ -713,8 +665,6 @@ def test_eine_historienzeile_ohne_laufzeit_wird_nicht_auf_24_geraten(tmp_path):
         is None
     )
 
-    # GEGENPROBE: MIT gemessener Laufzeit rechnet dieselbe Stelle ihre
-    # drei Punkte wie immer.
     root2, state2 = _zeitreihe_wurzel(
         tmp_path / "mit", "buendel--o2--sku--o2-m", laufzeit=24
     )

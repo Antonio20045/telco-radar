@@ -42,8 +42,6 @@ class FakeBestand:
         self.lookback = 8
         self._bekannt = bekannt or {}
         self.je_operator = je_operator or {}
-        # Leer heisst "kein Index aufgebaut" - dann prueft der Check die
-        # Inhaltsdublette wie bisher live (siehe Kriterium 10).
         self.item_index = item_index or {}
 
     def kennt(self, url: str) -> str:
@@ -114,7 +112,6 @@ def test_wechselhafte_quelle_faellt_beim_zweiten_abruf_durch():
     b = _pruefe(k, gut, zweimal=True, zweite=schlecht)
     assert not b.bestanden
     assert not _grund(b, 1, "zweiter Abruf")["ok"]
-    # Ohne den zweiten Abruf haette dieselbe Quelle bestanden.
     assert _pruefe(k, gut).bestanden
 
 
@@ -153,7 +150,6 @@ def _grund(befund, nr, name_enthaelt=""):
     return treffer[0]
 
 
-# ------------------------------------------------------------------ Kriterien
 def test_gute_quelle_besteht():
     k = pq.Kandidat(
         url="https://example.com/feed",
@@ -271,8 +267,6 @@ def test_identische_titel_fallen_durch():
     b = _pruefe(k, formulare)
     assert not b.bestanden
     assert not _grund(b, 5, "unterscheidbar")["ok"]
-    # Als Navigationslabel gilt so ein Titel gerade NICHT - genau die Luecke,
-    # die dieser Check schliesst.
     assert _grund(b, 5, "echte")["ok"]
 
 
@@ -311,7 +305,6 @@ def test_bekannte_url_ist_eine_dublette():
     b = _pruefe(k, _items(12), bestand)
     assert not b.bestanden
     assert not _grund(b, 7)["ok"]
-    # Bei einer Dublette wird gar nicht erst abgerufen.
     assert b.n_items == 0
 
 
@@ -344,7 +337,7 @@ def test_newsroom_js_ist_nicht_abnehmbar():
     b = _pruefe(k, _items(30))
     assert not b.bestanden
     assert not _grund(b, 8)["ok"]
-    assert b.n_items == 0  # kein Abruf
+    assert b.n_items == 0
 
 
 def test_abrufsfehler_wird_als_fehler_gemeldet():
@@ -369,7 +362,6 @@ def test_abrufsfehler_wird_als_fehler_gemeldet():
     assert not _grund(b, 1)["ok"]
 
 
-# ---------------------------------------------------------------- Hilfsstuecke
 @pytest.mark.parametrize(
     "titel",
     [
@@ -416,16 +408,6 @@ def test_echte_ueberschrift_erkannt(titel):
 )
 def test_registrierbare_domain(host, erwartet):
     assert pq._registrable(host) == erwartet
-
-
-# =========================================================================== #
-# Massenbetrieb (Kriterium 10): Wiederaufnahme, Cache, Dubletten-Index.
-#
-# Bei 1000 Kandidaten ist der Check selbst ein Engpass. Vorher rief die
-# Inhaltsdublettenpruefung fuer JEDEN Kandidaten alle bestehenden Quellen
-# seines Betreibers live ab, und ein Abbruch nach 800 Kandidaten bedeutete,
-# von vorn anzufangen.
-# =========================================================================== #
 
 
 def _kandidat(url="https://a.de/feed", **kw):
@@ -510,7 +492,6 @@ def test_dublette_wird_gegen_den_index_erkannt(monkeypatch):
 
     dublette = [k for k in befund.kriterien if k["name"] == "keine Inhaltsdublette"]
     assert dublette and not dublette[0]["ok"]
-    # nur der Kandidat selbst wurde geholt, nicht die Vergleichsquelle
     assert abrufe == ["https://alpha.de/news"]
 
 

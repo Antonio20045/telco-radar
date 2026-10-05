@@ -123,8 +123,6 @@ def test_schaetzung_ohne_langsame_tests_und_mit_einer_sekunde_je_unbekannter_dat
     dateien = ["tests/test_a.py", "tests/neu.py"]
     abwahl = leiter_schnell.abwahl(dateien, zeiten)
     assert abwahl == ["tests/test_a.py::lang"]
-    # Der erste laufende Test von test_a kostet den teuersten schnellen
-    # (Fixture-Aufbau), der zweite seine eigene Zeit, die neue Datei eine Sekunde.
     assert leiter_schnell.schaetzung(dateien, zeiten, abwahl) == 5.0 + 5.0 + 1.0
     assert leiter_schnell.langsame(["tests/test_a.py"], zeiten) == [
         "tests/test_a.py::lang"
@@ -142,8 +140,6 @@ def test_ueber_dem_budget_laufen_die_schnellsten_und_der_rest_im_pre_push(
         "tests/test_a.py::lang": 5.1,
         "tests/test_b.py::fremd": 0.1,
     }
-    # Der Einstieg in test_a kostet 0,5 s (teuerster schnelle Test); der langsame
-    # läuft ohnehin nicht und sperrt die übrigen nicht.
     abwahl = leiter_schnell.abwahl(["tests/test_a.py"], zeiten)
     assert abwahl == ["tests/test_a.py::lang", "tests/test_a.py::zwei"]
     assert leiter_schnell.schaetzung(["tests/test_a.py"], zeiten, abwahl) == 0.9

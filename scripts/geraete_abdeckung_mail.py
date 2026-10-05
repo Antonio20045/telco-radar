@@ -52,17 +52,10 @@ from telco_radar.versand import VersandFehler, VersandNichtEingerichtet  # noqa:
 
 log = logging.getLogger("geraete_abdeckung_mail")
 
-# Die Rueckgabecodes dieses Schritts. Sie sind benannt, weil der Workflow
-# an ihnen haengt und ein Test sie festnagelt - eine nackte 2 mitten im
-# Code sagt nicht, wofuer sie steht.
-EXIT_OK = 0  # siehe RUECKGABECODES oben - deckt auch die
-# Warnung "Mailkanal nicht eingerichtet" ab
-EXIT_KEIN_MESSTAG = 1  # der Bestand kennt keinen einzigen Messtag
-EXIT_NICHT_ZUGESTELLT = 2  # Kanal eingerichtet, Zustellung dennoch gescheitert
+EXIT_OK = 0
+EXIT_KEIN_MESSTAG = 1
+EXIT_NICHT_ZUGESTELLT = 2
 
-# GitHub-Actions-Annotation (https://docs.github.com/actions/...#setting-a-warning-message):
-# auf stdout erscheint sie im Log UND in der Job-Zusammenfassung als
-# Warnung - ohne den Schritt rot zu faerben, anders als ein `log.error`.
 _GITHUB_WARNUNG_PRAEFIX = "::warning::"
 
 
@@ -84,14 +77,6 @@ def main(argv=None) -> int:
     quellen = lade_quellen(root)
     tag = db.letzter_messtag()
     if not tag:
-        # KEIN MESSTAG IST EIN AUSFALL, KEINE ENTWARNUNG. Dieser Schritt
-        # laeuft HINTER dem Lauf, der den Bestand schreibt; kennt der
-        # Bestand danach keinen einzigen Messtag, dann hat entweder der
-        # Lauf nichts geschrieben oder dieser Schritt liest den falschen
-        # Pfad. Beides ist ein Befund, und beides bleibt unsichtbar, wenn
-        # der Schritt gruen ausgeht - genau die Fehlerklasse, gegen die
-        # dieser Waechter gebaut ist ("50 Laeufe gruen, sechs Tage ohne
-        # Telekom-Zeile"). Der Schritt faellt deshalb rot aus.
         log.error(
             "Geraeteradar-Abdeckung: der Bestand unter %s kennt "
             "keinen Messtag - der Lauf hat nichts geschrieben oder "
@@ -100,19 +85,11 @@ def main(argv=None) -> int:
             db.path,
         )
         return EXIT_KEIN_MESSTAG
-    # `nur`: ein Anbieter, der aus der Konfiguration gefallen ist, wird
-    # nicht mehr beobachtet und darf keine Ewigkeitsmail ausloesen.
     alarme = db.ausfall_alarme(nur={a.name for a in quellen.anbieter}, heute=tag)
     melde_ausfall(alarme)
     try:
         log.info("%s", sende_alarm_mail(alarme, tag, trocken=args.trocken))
     except VersandNichtEingerichtet as exc:
-        # NICHT dieselbe Fehlerklasse wie ein SMTP-Fehler (P1/C2-Nachtrag,
-        # 24.09.2026): der Kanal wurde nie VERSUCHT, weil die Secrets in
-        # diesem Repo fehlen. Ein rot ausfallender Schritt an JEDEM Tag
-        # traegt keine Information mehr - der Alarm bleibt trotzdem
-        # sichtbar (Protokollzeile, `melde_ausfall` oben, Quellenseite),
-        # nur die Zustellung selbst wird nur noch als Warnung gemeldet.
         meldung = (
             f"Geraeteradar-Abdeckung: {len(alarme)} Alarme NICHT "
             f"zugestellt ({exc}) - der Mailkanal ist in diesem "
@@ -122,10 +99,6 @@ def main(argv=None) -> int:
         log.warning(meldung)
         return EXIT_OK
     except VersandFehler as exc:
-        # Weitergeben, nicht schlucken: ein EINGERICHTETER Alarmkanal, der
-        # still nicht zustellt, ist genau die Fehlerklasse, gegen die
-        # dieser Waechter gebaut ist. Der Workflow-Schritt faellt damit rot
-        # aus.
         log.error(
             "Geraeteradar-Abdeckung: %d Alarme NICHT zugestellt (%s)", len(alarme), exc
         )

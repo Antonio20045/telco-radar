@@ -81,29 +81,11 @@ from telco_radar.collect.promo_snapshot import fetch_snapshot  # noqa: E402
 from telco_radar.config import load_config  # noqa: E402
 from telco_radar.promo_config import _normalize_url, load_promo_config  # noqa: E402
 
-# --------------------------------------------------------------- Schwellen
-# Sichtbarer Text, ab dem eine Seite dem Extraktor ueberhaupt etwas bietet.
-# Gemessen an den 15 Bestandsseiten: die kleinste lieferte rund 1400 Zeichen,
-# eine reine Weiterleitungs-/Zustimmungsseite liegt bei unter 300. 500 liegt
-# sicher dazwischen und faellt nicht ueber eine schlanke Kampagnen-Landingpage.
 MIN_TEXT = 500
-# Zahl VERSCHIEDENER Angebotssignale (nicht Treffer - sonst gewinnt eine Seite
-# schon dadurch, dass sie das Wort "Angebot" vierzigmal im Menue fuehrt).
 MIN_SIGNALE = 4
-# Ab hier gilt eine Kandidatenseite als dieselbe wie eine bereits
-# konfigurierte. 0.6 ist dieselbe Schwelle wie bei promo_store._same_offer,
-# aus demselben Grund gewaehlt: gemessene Umformulierungen derselben Sache
-# lagen darueber, unabhaengige Inhalte deutlich darunter.
 MAX_UEBERLAPPUNG = 0.6
-# Unterhalb dieser Wortzahl ist der Ueberlappungswert Rauschen - zwei kurze
-# Seiten teilen sich zwangslaeufig fast nur Allerweltswoerter. Dann gilt der
-# Vergleich als NICHT durchfuehrbar, und das ist ein Durchfaller, kein PASS
-# (Lehre aus Session 5: "nicht pruefbar" ist kein Bestehen).
 MIN_WOERTER_VERGLEICH = 60
 
-# Signale eines konkreten Endkundenangebots. Bewusst grob und deutschsprachig:
-# der Check soll Markenprosa und Rechtstexte aussortieren, nicht die Qualitaet
-# des Angebots beurteilen - die bleibt Handarbeit, genau wie im Presse-Zweig.
 SIGNALE: dict[str, str] = {
     "preis": r"\d+[,.]\d{2}\s*(?:€|eur\b)|\b\d+\s*(?:€|eur)\b",
     "monatlich": r"\bmonatlich|\bpro monat\b|\bmtl\.|\b/\s*monat\b",
@@ -118,9 +100,6 @@ SIGNALE: dict[str, str] = {
     "tarif": r"\btarif|\ballnet\s*flat\b|\bflat\b|\bvertrag\b",
 }
 
-# Mobilfunk gegen Festnetz. Nicht als Verbot einzelner Woerter - eine
-# Mobilfunkseite darf DSL erwaehnen -, sondern als Uebergewicht: eine Seite,
-# auf der die Festnetzwoerter dominieren, ist eine Festnetzseite.
 MOBIL_WOERTER = (
     r"\bmobilfunk|\bhandy|\bsmartphone|\bsim\b|\besim\b|\btarif|"
     r"\ballnet|\blte\b|\b5g\b|\bprepaid|\bmobil(?:es|em)?\s+internet"
@@ -132,9 +111,6 @@ FEST_WOERTER = (
 )
 
 _WORT_RE = re.compile(r"[a-zäöüß0-9]{4,}", re.I)
-# Allerweltswoerter, die auf JEDER deutschen Anbieterseite stehen. Sie wuerden
-# den Ueberlappungswert kuenstlich hochziehen und zwei voellig verschiedene
-# Seiten derselben Marke als Dublette erscheinen lassen.
 _STOPP = {
     "auch",
     "aber",
@@ -322,21 +298,9 @@ def _pruefungen(
         "steht bereits in config/promo_sources.yaml" if schon_da else "neu",
     )
 
-    # 7: gegen JEDE bestehende Seite dieser Marke UND gegen jeden bereits
-    # angenommenen Kandidaten derselben Marke - der schlechteste Wert zaehlt.
-    # Der zweite Teil ist der wichtigere: der Sucher liefert regelmaessig
-    # Geschwisterseiten (prepaid-allnet-s/m/l/xl), die sich vom BESTAND
-    # unterscheiden, untereinander aber dasselbe Geruest zeigen. Ohne diesen
-    # Vergleich bestuenden alle vier - und die Rubrik haette vier Quellen fuer
-    # eine Information.
     vergleiche = dict(bestand.get("seiten") or {})
     vergleiche.update(bestand.get("angenommen") or {})
     if not vergleiche:
-        # Unterscheidung, die den Unterschied macht: eine Marke, die noch gar
-        # keine Seite hat, ist ein legitimer Erstfall. Eine Marke, deren
-        # konfigurierte Seiten sich nur gerade nicht ABRUFEN liessen, ist es
-        # nicht - dann ist der Vergleich nicht durchgefuehrt worden, und das
-        # gilt hier als Durchfaller. "Nicht pruefbar" ist kein PASS.
         unerreichbar = bestand.get("unerreichbar") or []
         if unerreichbar:
             kriterium(
@@ -446,12 +410,6 @@ def bewerte_kandidat(geholt: dict, bestand: dict) -> dict:
     ergebnis["zeichen"] = len(text)
     ergebnis["links"] = len(snap.get("links") or [])
     ergebnis["bilder"] = len(snap.get("images") or [])
-    # Kennzahlen, KEINE Kriterien. Am 08.08.2026 gemessen: die 15 damals
-    # konfigurierten Bestandsseiten streuten von 0 bis 16 verschiedenen
-    # Preisen - eine Schwelle daraus haette Seiten aussortiert, die genauso
-    # aussehen wie die, die schon drin sind (JS-Seiten liefern ueber reines
-    # HTTP weniger). Die Zahlen stehen deshalb als Entscheidungshilfe da,
-    # nicht als Urteil: viele Preise = Uebersicht, ein Preis = Einzeltarif.
     ergebnis["preise"] = preise
     ergebnis["volumen"] = gb
     return ergebnis
@@ -546,15 +504,6 @@ def main() -> int:
         return 2
 
     if args.statisch:
-        # Zwei Gruende, das zu tun, und beide stehen in CLAUDE.md:
-        # (1) In der Sandbox kommt Chromium nicht ins Netz - `kind: js` ist
-        #     hier grundsaetzlich nicht pruefbar, und ein ungeprueftes PASS
-        #     gibt es nicht.
-        # (2) Wichtiger: "In Session 2 waren 6 von 8 angeblich JS-toten
-        #     Quellen in Wahrheit statisch abrufbar." Eine Seite, die ueber
-        #     reines HTTP genug Text liefert, GEHOERT als static konfiguriert
-        #     - das spart je Lauf einen Chromium-Start und macht sie
-        #     ueberhaupt erst lokal nachpruefbar.
         for k in kandidaten:
             k["kind"] = "static"
     http_cfg = load_config(root).settings.get("http", {})
@@ -570,10 +519,6 @@ def main() -> int:
             )
         )
 
-    # Bewertung SEQUENTIELL, in Eingabereihenfolge (der Sucher liefert nach
-    # Punkten sortiert, der beste Kandidat einer Marke steht also vorn). Nur
-    # so kann ein angenommener Kandidat den naechsten derselben Marke als
-    # Dublette entlarven.
     leer = {"leitseite": "", "seiten": {}, "konfiguriert": set()}
     angenommen: dict[str, dict[str, str]] = {}
     ergebnisse: list[dict] = []

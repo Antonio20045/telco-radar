@@ -55,7 +55,6 @@ from telco_radar.tarif_model import HOCH
 _FIX = Path(__file__).parent / "fixtures" / "geraete"
 _WURZEL = Path(__file__).parent.parent
 
-# Die echten Werte der Fixture (MagentaMobil S, MF_17785, 08.09.2026).
 _PLAN_ID = "MF_17785"
 _PLAN_NAME = "MagentaMobil S"
 _TARIF_MONATLICH = 39.95
@@ -90,17 +89,12 @@ def _zustand(html: str) -> dict:
     return daten
 
 
-# ==========================================================================
-# lies_buendel()
-# ==========================================================================
-
-
 def test_neun_saetze_aus_neun_geraeten_und_einer_werbekachel():
     """10 Einträge, davon eine Kachel ohne `name` (tileType/höhererTariff-
     Discount) — sie wird übergangen, nicht geraten."""
     saetze = _saetze()
     assert len(saetze) == 9
-    assert len({s["titel"] for s in saetze}) == 9  # keine Dublette
+    assert len({s["titel"] for s in saetze}) == 9
 
 
 def test_jeder_satz_traegt_den_tarifnamen_aus_der_antwort():
@@ -145,11 +139,10 @@ def test_jede_ratenform_geht_gegen_die_rohantwort_auf():
     for eintrag in _zustand(html)["productList"]["data"]:
         if isinstance(eintrag, dict) and eintrag.get("id"):
             roh_je_id[str(eintrag["id"])] = eintrag
-    # 9 Einträge MIT id — die Werbekachel trägt keine.
     assert len(roh_je_id) == 9
 
     saetze = _saetze()
-    assert len(saetze) == 9  # die Lookup-Zeile (kein blinder Test)
+    assert len(saetze) == 9
     for s in saetze:
         eintrag = roh_je_id[s["sku"]]
         erste = (eintrag.get("price") or {}).get("installments")[0]
@@ -157,7 +150,6 @@ def test_jede_ratenform_geht_gegen_die_rohantwort_auf():
             "geraet_monatsrate"
         ] == pytest.approx(float(erste["totalPrice"]), abs=0.005)
         assert s["geraet_monatsrate"] == float(erste["recurringPrice"])
-        # Zweite Probe: der je-Gerät-Tarifpreis gehört zum selectedPlan.
         geraet_tarif = (
             (eintrag.get("formattedPrices") or {})
             .get("recurringTariffPrice", {})
@@ -210,7 +202,6 @@ def test_mehrere_ratenplaene_ergeben_je_ein_eigenes_buendel():
     ]
     erster = geraete[0]["price"]["installments"][0]
     assert erster["numberOfInstallments"] == 36
-    # Selbst konsistent nachgerechnet: dieselbe Anzahlung, 24 Monate.
     anzahlung = geraete[0]["price"]["upfrontPrice"]
     zweiter_plan = {
         "numberOfInstallments": 24,
@@ -230,8 +221,6 @@ def test_mehrere_ratenplaene_ergeben_je_ein_eigenes_buendel():
         float(erster["recurringPrice"])
     )
     assert nach_laufzeit[24]["geraet_monatsrate"] == pytest.approx(42.4)
-    # Tarifname und -preis bleiben fuer beide Plaene gleich - nur die
-    # Geraeteseite der Rechnung unterscheidet sich.
     assert nach_laufzeit[36]["tarif_name"] == nach_laufzeit[24]["tarif_name"]
     assert nach_laufzeit[36]["sku"] == nach_laufzeit[24]["sku"]
 
@@ -258,7 +247,6 @@ def test_ein_nicht_aufgehender_plan_faellt_einzeln_im_buendel(caplog):
         "recurringPrice": 42.4,
         "totalPrice": 1.0,
     }
-    # Selbst konsistent nachgerechnet: dieselbe Anzahlung, 24 Monate.
     anzahlung = geraete[0]["price"]["upfrontPrice"]
     gesunder_plan = {
         "numberOfInstallments": 24,
@@ -274,7 +262,6 @@ def test_ein_nicht_aufgehender_plan_faellt_einzeln_im_buendel(caplog):
     assert len(saetze) == 1
     assert saetze[0]["laufzeit_monate"] == 24
     assert saetze[0]["geraet_monatsrate"] == pytest.approx(42.4)
-    # Der kaputte Plan ist nicht still verschwunden.
     assert any(
         "ohne aufgehende" in m and "Rechenprobe" in m for m in caplog.messages
     ), caplog.messages
@@ -324,11 +311,6 @@ def test_ein_geraetepreis_der_dem_plan_widerspricht_faellt():
     assert lies_buendel(geaendert) == []
 
 
-# ==========================================================================
-# Vom Rohsatz zum echten Buendel - der Name loest im Bestand auf
-# ==========================================================================
-
-
 def _bestand_mit_magentamobil_s():
     """Der Tarifbestand, wie ihn der Tarif-Sammler aus dem Telekom-PIB
     schreibt — der Name steht wortgleich in `selectedPlan.name`."""
@@ -373,10 +355,6 @@ def test_der_beleglink_traegt_die_tariffid():
         assert "tariffId=MF_17785" in s["url"], s["url"]
 
 
-# ==========================================================================
-# Die Verdrahtung: sammle_anbieter() am kind:buendel-Einstieg
-# ==========================================================================
-
 _ROBOTS_FREI = (200, "User-agent: *\nDisallow: /is-bin/\n")
 
 
@@ -416,7 +394,7 @@ def test_sammle_anbieter_liefert_buendel_und_keine_listungen(katalog, farben):
     assert len(bilanz.buendel) == 9
     b = bilanz.buendel[0]
     assert b["anbieter"] == "Telekom"
-    assert b["sku_id"]  # über den Katalog gebildet
+    assert b["sku_id"]
     assert b["tarif_name"] == "MagentaMobil S"
     assert b["geraet_zuzahlung"] is not None
 
@@ -424,8 +402,6 @@ def test_sammle_anbieter_liefert_buendel_und_keine_listungen(katalog, farben):
 def test_adapter_registry_traegt_telekoms_buendelhaken():
     adapter = ADAPTER["telekom_kategorie"]
     assert adapter.lies_buendel is not None
-    # Der Tarifname steht in derselben Antwort — Telekom braucht anders
-    # als Vodafone keinen Haken für die Namensauflösung nach dem Sammeln.
     assert adapter.loese_tarifnamen is None
 
 
@@ -467,8 +443,6 @@ def test_der_robots_abruf_traegt_den_absender_des_anbieters(katalog, farben):
     assert bilanz.status == "ok" and bilanz.buendel
     robots = [u for u in gesehen if u.endswith("/robots.txt")]
     assert robots, "kein robots.txt-Abruf erfolgt — der Test prüft nichts"
-    # Die Lookup-Zeile: JEDER Abruf dieses Anbieters — robots.txt wie
-    # Bündelseite — mit demselben ehrlichen Absender.
     assert gesehen and all(
         ua == "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
         for ua in gesehen.values()

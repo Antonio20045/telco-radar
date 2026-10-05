@@ -23,20 +23,8 @@ from .http import BROWSER_UA
 log = logging.getLogger(__name__)
 
 _BLOCK_TYPES = {"image", "media", "font"}
-NACHLADEZEIT_MS = 9000  # feste Wartezeit fuer clientseitig nachgeladene Artikellisten
-# Stylesheets are deliberately NOT blocked: several operator sites (e.g.
-# Zain) gate their article list's data-fill on CSS-driven visibility
-# (an IntersectionObserver-style lazy load that never fires for elements
-# the browser considers invisible without layout/CSS), so blocking CSS for
-# speed silently broke content that otherwise renders fine.
+NACHLADEZEIT_MS = 9000
 
-# Common cookie-consent banner buttons across the CMP vendors telco sites
-# use (OneTrust, Cookiebot, generic). A banner can sit on top of the article
-# list and block lazy-loaded content from ever firing its fetch (some sites
-# gate the fetch behind an intersection observer the banner obscures), so
-# clicking one through - if present - happens before the content settle
-# wait below. Best-effort: every selector is tried with a short timeout and
-# failures are silently ignored, since most pages have no banner at all.
 _CONSENT_SELECTORS = (
     "#onetrust-accept-btn-handler",
     'button:has-text("Accept All")',
@@ -57,20 +45,9 @@ def render_html(url: str, timeout_s: float, ua: str) -> str:
         "--disable-dev-shm-usage",
         "--disable-gpu",
         "--disable-blink-features=AutomationControlled",
-        # Some sites (e.g. Optus) fail HTTP/2 negotiation from
-        # datacenter IPs with ERR_HTTP2_PROTOCOL_ERROR; forcing
-        # HTTP/1.1 for the whole browser session is a safe,
-        # widely-used workaround since virtually every server also
-        # speaks HTTP/1.1.
         "--disable-http2",
     ]
     launch_kwargs: dict = {"headless": True, "args": launch_args}
-    # Dev-sandbox escape hatch only: some local dev environments front all
-    # outbound traffic with a TLS-terminating proxy whose ClientHello parser
-    # chokes on Chromium's own handshake (GREASE/post-quantum extensions),
-    # resetting every connection. Unset in CI/production, so this is a no-op
-    # there. When set, point it at a local proxy that itself uses a normal
-    # TLS stack for the outbound leg (see scripts/inspect_dom.py docs).
     proxy_server = os.environ.get("PLAYWRIGHT_PROXY_SERVER")
     if proxy_server:
         launch_kwargs["proxy"] = {"server": proxy_server}
@@ -97,14 +74,8 @@ def render_html(url: str, timeout_s: float, ua: str) -> str:
                 try:
                     page.click(selector, timeout=1200)
                     break
-                except Exception:  # noqa: BLE001 - no banner, or a different one
+                except Exception:  # noqa: BLE001
                     continue
-            # A settle for client-side rendering: several operator sites lazy-
-            # load the article list itself (not just images) behind an
-            # intersection observer or a delayed XHR, so 1.8s was too short
-            # and returned near-empty cards. We deliberately do NOT wait for
-            # networkidle - many telco pages keep long-poll/analytics
-            # connections open and would burn the whole timeout budget.
             page.wait_for_timeout(NACHLADEZEIT_MS)
             return page.content()
         finally:

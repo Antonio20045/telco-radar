@@ -34,7 +34,6 @@ ANTHROPIC_URL = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_VERSION = "2023-06-01"
 DEFAULT_TEMPERATURE = 0.3
 BEDROCK_DEFAULT_REGION = "us-east-1"
-# Nähte für den goldenen Lauf, gesetzt nur über ``naehte.Naehte.setzen``.
 TRANSPORT: httpx.BaseTransport | None = None
 CLIENT: Callable[[str, str, str, int, int], str] | None = None
 
@@ -68,8 +67,6 @@ def _bedrock_profile(model: str) -> str:
 def _bedrock_url(model: str) -> str:
     from urllib.parse import quote
 
-    # ":" stays literal - it is part of the versioned model id
-    # (…-v1:0) and Bedrock does not accept it percent-encoded.
     return (
         f"https://bedrock-runtime.{_bedrock_region()}.amazonaws.com"
         f"/model/{quote(_bedrock_profile(model), safe=':')}/invoke"
@@ -102,67 +99,21 @@ def active_backend() -> str:
     return "none"
 
 
-# Client errors that will never succeed on retry (bad key, bad request, bad model)
-# Endgueltige Antworten: hier wird NICHT wiederholt.
-# 402 steht als Netz mit drin, abgefangen wird es aber schon eine Zeile
-# vorher (als LLMModelUnavailable, damit die Anbieterkette weiterlaeuft).
-# Sein Fehlen hat am 15.08.2026 einen ganzen Lauf gekostet: DeepSeeks
-# Guthaben war 26 Minuten nach dem Start aufgebraucht, und weil 402 nicht als
-# endgueltig galt, lief es durch den Wiederholungspfad wie ein
-# voruebergehender Kapazitaetsengpass - **1245 Wiederholungen** ueber die
-# restlichen zwei Stunden, 45 gescheiterte Analysten-Stapel, 20 von 810
-# Meldungen bewertet, Editor im Notfall-Digest, 0 Uebersetzungen (allein dort
-# 32 Versuche je Artikel und 889s). Der Lauf dauerte 151,7 statt 80 Minuten
-# und sah dabei aus wie eine duenne Nachrichtenwoche.
-# Dieselbe Begruendung wie bei `_is_daily_quota`: ein leeres Konto wird beim
-# 32. Versuch nicht voller.
 _FATAL_STATUSES = {400, 401, 402, 403, 404, 405, 422}
 
-# Read timeout for a single request. Measured on 2026-07-25 against
-# integrate.api.nvidia.com with the real editor prompt: a served request answers
-# in 8-21s, so 180s is generous. Lowering this to 75s (as an earlier attempt did)
-# only turns slow successes into failures - it does not help.
 DEFAULT_HTTP_TIMEOUT = 180.0
 
-# Wall clock for ONE logical completion, across all its retries. Replaces the
-# old "fixed number of attempts" budget, which behaved completely differently
-# depending on whether the failures were instant or slow.
 DEFAULT_CALL_BUDGET = 300.0
 
-# The two failure modes cost wildly different amounts of time, and the old code
-# treated them the same - which was the actual bug behind runs #29-#34:
-#
-#   cheap  HTTP 503 "ResourceExhausted: Worker local total request limit
-#          reached" comes back in 0.3-0.4s. It means "busy, ask again", and
-#          retrying is nearly free. The old policy gave up after 3 tries and
-#          ~24s of backoff on exactly this.
-#   slow   a read timeout burns the full HTTP timeout with nothing to show.
-#          The old policy happily spent 3x180s = 9.4 min on it, per stage.
-# So: retry the cheap failures generously, the slow ones barely at all.
 MAX_SLOW_FAILURES = 2
 CHEAP_BACKOFF_SECONDS = (1, 2, 3, 5, 5, 8, 8, 10)
 LANGSAM_AB_ANTEIL_TIMEOUT = 0.5
 
-# model -> stand-in, consulted only after the preferred model failed hard.
 _FALLBACKS: dict[str, str] = {}
 
-# Was dieser Lauf verbraucht hat, je Modell-ID.
-#
-# Der Zaehler sitzt hier und nirgends sonst, weil `usage` nur an dieser einen
-# Stelle vorbeikommt. Bis zum 27.08.2026 wurde es ausschliesslich im
-# Fehlerfall gelesen; die einzige Kostenaussage des Projekts war
-# scripts/kostenrechnung.py, eine Hochrechnung aus Zeichenzahlen, die die
-# Denkspur gar nicht kennt. Der Lauf vom 27.08. kostete 1,95 $, und niemand
-# konnte sagen wofuer.
 _VERBRAUCH: dict[str, dict[str, int]] = {}
-# Modell-ID -> {"ein": USD je 1M Eingabetoken, "aus": USD je 1M Ausgabetoken}.
-# Kommt aus der Konfiguration (settings llm_preise); ein Modell ohne Zeile
-# wird gezaehlt, aber nicht beziffert - geraten wird nie.
 _PREISE: dict[str, dict[str, float]] = {}
 _BUDGET_USD: float | None = None
-# Models that already failed hard in this process. Later stages skip them
-# instead of retrying, so a dead model costs the run ONE timeout budget
-# rather than one per stage.
 _DEAD_MODELS: set[str] = set()
 
 
@@ -190,10 +141,6 @@ class LLMModelUnavailable(LLMFatalError):
     """
 
 
-# Substrings that identify a per-MODEL access rejection rather than a broken
-# request. Kept narrow on purpose: a genuinely malformed payload or a bad key
-# must stay fatal, otherwise the run would walk the whole chain failing the
-# same way each time.
 _MODEL_ACCESS_MARKERS = (
     "is not available for this account",
     "invalid_payment_instrument",
@@ -305,7 +252,6 @@ def dead_models() -> set[str]:
     return set(_DEAD_MODELS)
 
 
-# --------------------------------------------------------------- Kosten
 def _zaehle_usage(model: str, data: dict) -> None:
     """Den Verbrauch EINER Antwort mitschreiben.
 
@@ -327,8 +273,6 @@ def _zaehle_usage(model: str, data: dict) -> None:
     aus = usage.get("completion_tokens")
     if aus is None:
         aus = usage.get("output_tokens") or 0
-    # Anthropic weist Cache-Treffer getrennt aus; sie sind Eingabe und
-    # wuerden sonst gar nicht auftauchen.
     ein = (
         int(ein)
         + int(usage.get("cache_read_input_tokens") or 0)
@@ -477,14 +421,6 @@ def _post_with_retries(url, payload, headers, retries, parse):
             post = httpx.Client(transport=TRANSPORT).post if TRANSPORT else httpx.post
             resp = post(url, json=payload, headers=headers, timeout=http_timeout())
             if resp.status_code == 402:
-                # Leeres Guthaben ist eine Ablehnung des ANBIETERS, kein
-                # defekter Request: ein anderes Modell desselben Kontos
-                # scheitert gleich, ein Modell bei einem anderen Anbieter
-                # nicht. Deshalb dieselbe Klasse wie eine Zugriffsablehnung -
-                # das Modell gilt fuer den Rest des Laufs als tot, die Kette
-                # geht weiter, und `dead_models()` bringt den Befund auf
-                # transparenz.html. Als LLMFatalError waere der Lauf hier zu
-                # Ende, ohne den zweiten Anbieter auch nur zu fragen.
                 raise LLMModelUnavailable(
                     f"HTTP 402 Payment Required (Guthaben aufgebraucht): "
                     f"{resp.text[:200]}"
@@ -492,12 +428,6 @@ def _post_with_retries(url, payload, headers, retries, parse):
             if resp.status_code in _FATAL_STATUSES:
                 raise _FatalHTTP(f"HTTP {resp.status_code}: {resp.text[:300]}")
             if _is_daily_quota(resp):
-                # Bedrock answers a spent DAILY token allowance with the same
-                # 429 it uses for "slow down a moment". Retrying that one is
-                # pointless by definition - and expensive: the cheap-failure
-                # path would spend the full call budget (300s) on it, per
-                # stage. Give up on this model at once so the run either falls
-                # back or publishes the digest in seconds instead of hours.
                 raise RuntimeError(f"daily token quota exhausted: {resp.text[:200]}")
             if resp.status_code in (429, 529) or resp.status_code >= 500:
                 raise httpx.HTTPStatusError(
@@ -508,7 +438,6 @@ def _post_with_retries(url, payload, headers, retries, parse):
             resp.raise_for_status()
             return parse(resp.json())
         except _FatalHTTP as exc:
-            # no point retrying - surface immediately so the run fails fast
             if _is_model_access_error(str(exc)):
                 log.warning("Model not usable on this account: %s", str(exc)[:300])
                 raise LLMModelUnavailable(f"model not available: {exc}")
@@ -517,7 +446,6 @@ def _post_with_retries(url, payload, headers, retries, parse):
         except (httpx.HTTPError, json.JSONDecodeError, KeyError, IndexError) as exc:
             last_err = exc
             elapsed = time.monotonic() - started
-            # Schnell zurueck = Kapazitaetssignal, nochmal fragen.
             if elapsed >= http_timeout() * LANGSAM_AB_ANTEIL_TIMEOUT:
                 slow_failures += 1
                 if slow_failures >= max(1, min(retries, MAX_SLOW_FAILURES)):
@@ -565,13 +493,6 @@ def _complete_openai(
         "temperature": DEFAULT_TEMPERATURE,
     }
     if "deepseek" in model.lower():
-        # NVIDIA DeepSeek NIM: turn off the reasoning trace (clean output, cheaper)
-        # ACHTUNG: das wirkt NUR auf NVIDIAs NIM-Endpunkt. Laeuft der Lauf
-        # gegen DeepSeeks EIGENE API (api.deepseek.com, siehe
-        # config/settings.yaml llm_provider: deepseek), wird der Parameter
-        # ignoriert - das Modell denkt trotzdem, und die Denkspur kommt in
-        # einem eigenen Feld zurueck. Siehe parse() unten, warum das teuer
-        # werden kann.
         payload["chat_template_kwargs"] = {"thinking": False}
     headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
 
@@ -581,23 +502,6 @@ def _complete_openai(
         inhalt = nachricht.get("content", "") or ""
         if inhalt.strip():
             return inhalt
-        # Leere Antwort trotz HTTP 200. Bei einem Reasoning-Modell heisst das
-        # fast immer dasselbe: das Token-Budget ist in der Denkspur
-        # aufgebraucht worden, bevor die eigentliche Antwort anfing.
-        #
-        # Aufgefallen in Lauf #84: dort scheiterten GENAU die Stufen mit
-        # kleinem Budget - Promo-Extraktion (1800), Kategorie-Sweep (2000),
-        # Promo-Bewertung (2200), Promo-Redaktion (3200) -, waehrend Analyst
-        # (8000) und Redaktion (32000) sauber durchliefen. 15 von 19
-        # gelesenen Promo-Seiten fielen so aus. Der Aufrufer sah davon nur
-        # einen "JSONDecodeError: Expecting value: line 1 column 1" auf einem
-        # leeren String und musste raten, ob die Quelle nichts hergab oder
-        # der Aufruf scheiterte.
-        #
-        # Deshalb hier eine Fehlermeldung, die den Grund benennt. Bewusst ein
-        # ValueError: der Retry-Wrapper oben faengt ihn NICHT, und das ist
-        # richtig - ein zu kleines Budget wird beim vierten Versuch nicht
-        # groesser, die Wiederholung waere nur teurer.
         denkspur = (
             nachricht.get("reasoning_content") or nachricht.get("reasoning") or ""
         )
@@ -650,8 +554,6 @@ def _complete_bedrock(
     key = os.environ.get("AWS_BEARER_TOKEN_BEDROCK")
     if not key:
         raise RuntimeError("AWS_BEARER_TOKEN_BEDROCK is not set")
-    # The model is addressed by URL here, so the body carries the Bedrock API
-    # version in its place - sending "model" as well is rejected.
     payload = {
         "anthropic_version": BEDROCK_API_VERSION,
         "max_tokens": max_tokens,
@@ -671,19 +573,6 @@ def _complete_bedrock(
 
 
 def _dispatch(system: str, user: str, model: str, max_tokens: int, retries: int) -> str:
-    # Der Anthropic-Anker wird je MODELL geroutet, nicht je Prozess.
-    #
-    # Bis zum 27.08.2026 waehlte diese Funktion das Backend EINMAL aus der
-    # Umgebung, und pipeline.py loeschte dafuer den Anthropic-Schluessel.
-    # Ein DeepSeek-Lauf mit leerem Guthaben hatte damit strukturell keinen
-    # Ausweg: sieben Laeufe in Folge (15.-27.08.2026) endeten ohne
-    # Redaktion, ohne Uebersetzung und ohne Promo-Extraktion, obwohl das
-    # Anthropic-Secret im Workflow ankam.
-    #
-    # Eine Claude-Modell-ID gehoert zur Anthropic-API, egal welcher Anbieter
-    # den Rest des Laufs bedient - und nur so kann eine Fallback-Kette bei
-    # einem anderen Anbieter enden. Bedrock-IDs tragen das Praefix
-    # "anthropic." und werden von der Regel nicht getroffen.
     if model.startswith("claude") and os.environ.get("ANTHROPIC_API_KEY"):
         return _complete_anthropic(system, user, model, max_tokens, retries)
     if _use_bedrock():
@@ -724,8 +613,6 @@ def complete(
     """
     chain = [m for m in _kette(model, ausweich) if m not in _DEAD_MODELS]
     if not chain:
-        # every link died earlier in this run - try the preferred one anyway so
-        # the caller gets a real error rather than an IndexError
         chain = [model]
     last_exc: Exception | None = None
 

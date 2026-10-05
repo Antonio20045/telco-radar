@@ -56,9 +56,6 @@ def _validate(cfg) -> dict[str, str]:
         except Exception as exc:  # noqa: BLE001
             text = str(exc)
             if "BrowserType.launch" in text or "Executable doesn't exist" in text:
-                # Sandbox ohne Headless-Browser: das sagt nichts ueber die
-                # Quelle aus, in GitHub Actions laeuft sie normal. Als Fehler
-                # ins Dokument zu schreiben waere schlicht falsch.
                 return (
                     name,
                     source.url,

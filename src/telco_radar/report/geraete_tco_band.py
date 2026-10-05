@@ -55,25 +55,9 @@ from .geraete_tco_karten import ANBIETER_REIHENFOLGE, HAENDLER_OHNE_BUENDEL
 
 log = logging.getLogger(__name__)
 
-# P3-E1 (28.09.2026): die Tarifleiter. Bis hierher standen drei feste
-# Baender (bis 20 GB, 21 bis 60 GB, ueber 60 GB) - eine Einteilung, die kein
-# Anbieter verkauft. Jetzt ist die Leiter das Sortiment, gegen das die
-# Seite vergleicht: die Vodafone-Tarife "mit Smartphone" aus
-# `tarife.jsonl`, je Lauf neu abgeleitet (Stand 25.09.2026: XS 15 GB,
-# S 30 GB, M 60 GB, L 120 GB, XL unbegrenzt ab dem Tariflauf nach P3,
-# vorher ohne erhobenes Volumen). Ein Wettbewerber
-# faellt in die Stufe des naechstgelegenen Vodafone-Volumens.
-#
-# Die Stufe traegt den Namen, den Vodafone ihr gibt ("XS"), der Schluessel
-# ist derselbe Name klein geschrieben ("xs") - `band_label` kehrt das um,
-# ohne dass ein Leser die Leiter kennen muss.
 _VODAFONE_MIT_SMARTPHONE = re.compile(
     r"^Vodafone Mobil (?P<stufe>[A-Z]{1,4}) mit Smartphone$"
 )
-# Vodafones eigene Tarife werden ueber den NAMEN zugeordnet, nicht ueber
-# das Volumen: "Vodafone Mobil XS" (ohne Geraet, 18 GB) ist die Stufe XS,
-# auch wenn ihr Volumen naeher an einer anderen laege. Und "Vodafone Mobil
-# XL" gehoert zu XL, auch solange sein Volumen nicht erhoben ist.
 _VODAFONE_STUFE = re.compile(
     r"^Vodafone Mobil (?P<stufe>[A-Z]{1,4})(?: mit Smartphone)?$"
 )
@@ -83,11 +67,11 @@ _VODAFONE_STUFE = re.compile(
 class Stufe:
     """Eine Sprosse der Tarifleiter: ein Vodafone-Tarif "mit Smartphone"."""
 
-    key: str  # "xs"
-    label: str  # "XS"
-    gb: Optional[float]  # erhobenes Volumen, inf = unbegrenzt, None = fehlt
+    key: str
+    label: str
+    gb: Optional[float]
     tarif_id: str
-    name: str  # "Vodafone Mobil XS mit Smartphone"
+    name: str
     grundgebuehr: Optional[float]
 
     @property
@@ -96,14 +80,6 @@ class Stufe:
         return gb_text(self.gb)
 
 
-# Dieselben Anbieter wie die vier festen Karten der Hauptansicht
-# (`geraete_tco_karten.ANBIETER_REIHENFOLGE`), UM CONGSTAR ERWEITERT: die
-# Hauptansicht laesst congstar bewusst weg ("eine leere Zeile fuer jede
-# denkbare Zweitmarke waere eine Wand aus Luecken"), aber BRIEF_GRAPH1
-# nennt es ausdruecklich als eigene benannte Luecke neben Telekom und 1&1 -
-# der Datenlage-Absatz zaehlt fuenf Anbieter, nicht vier. Ein weggelassener
-# Anbieter sieht auf dieser Seite aus wie einen, den es nicht gibt
-# (CLAUDE.md, dieselbe Regel wie B.2.5 im Lastenheft).
 ERWARTETE_ANBIETER = ANBIETER_REIHENFOLGE + ("congstar",)
 
 
@@ -260,8 +236,6 @@ def gb_text(gb) -> str:
         return ""
     if math.isinf(wert):
         return "unbegrenzt"
-    # :g laesst 18.0 zu "18" werden und haelt 7.5 als "7.5" - die Seite
-    # schreibt Nachkommastellen nur, wenn das Erhobene sie hat.
     return f"{wert:g} GB"
 
 
@@ -314,10 +288,6 @@ def alle_karten_je_band(
     Geraet in ZWEI Tarifen desselben Bandes fuehrt (Telekom XS/S/M alle
     im Band Klein), hat auch ZWEI Vergleichspaare, nicht eines.
     """
-    # Nur ECHTE Buendel (Regel 2 des Modulkopfs) - die Naeherungskarte ist
-    # kein Angebot. Und seit A3 nur FRISCHE: Balken-JSON und Radar lesen
-    # hier ihre guenstigste Karte je Anbieter, und ein altes Angebot ist
-    # keine Zahl von heute (`geraete_tco_karten.ist_frisch`, Clean Code 7).
     echte = [
         k
         for k in (modell.get("karten") or [])
@@ -331,7 +301,7 @@ def alle_karten_je_band(
     for k in echte:
         band = band_je_tarif.get(k.get("tarif_id") or "")
         if not band:
-            continue  # kein Datenvolumen erhoben oder unbegrenzt
+            continue
         je_band.setdefault(band, {}).setdefault(k["anbieter"], []).append(k)
     for je_anbieter in je_band.values():
         for karten in je_anbieter.values():
@@ -349,10 +319,6 @@ def karten_je_band(modell: dict, band_je_tarif: dict) -> dict[str, dict]:
     von hier - keine zweite Gruppierung fuer dieselbe Frage.
     """
     alle = alle_karten_je_band(modell, band_je_tarif)
-    # Die GUENSTIGSTE Karte dieses Anbieters in diesem Band traegt die
-    # Linie - dieselbe Wahl wie ueberall auf dieser Seite (ein
-    # Anbieter, eine Zahl je Ort). `alle_karten_je_band` sortiert nach
-    # Gesamt, also ist ks[0] genau diese Karte.
     return {
         band: {anbieter: ks[0] for anbieter, ks in je_anbieter.items()}
         for band, je_anbieter in alle.items()
@@ -370,11 +336,6 @@ def anbieter_mit_irgendeinem_buendel(modell: dict) -> set:
     }
 
 
-# --------------------------------------------------------------------------
-# O1 (STRATEGIE_GERAETE_OPTIK, 11.09.2026): der EINE Balkengraph
-# --------------------------------------------------------------------------
-
-
 def _minus(zahl: float) -> str:
     """Das echte Minus (U+2212), nicht der Bindestrich der Tastatur.
 
@@ -385,12 +346,6 @@ def _minus(zahl: float) -> str:
     return f"{abs(zahl):,.2f}".replace(",", "#").replace(".", ",").replace("#", ".")
 
 
-# Der Beginn der Beschaffung bei Händlern ohne Tarifbündel - dieselbe
-# Konstante, die bis O1 als `haendler_seit` in der Vorlage stand. Sie ist
-# hierher gezogen, weil die Legendenzeile des Graphen sie jetzt im
-# Python-Satz trägt (F-6: "Beschaffung läuft" allein wirkte unfertig statt
-# geplant - der Beginn der Beschaffung ist belegt, ein Lieferdatum wäre
-# erfunden).
 HAENDLER_SEIT = "2026-09-05"
 
 _MONATE = (
@@ -477,13 +432,12 @@ def _balken(
         der Karten ist ein Maßstab und wird nicht heimlich zur Referenz
         des Graphen.
     """
-    # Zeilen: die guenstigste vergleichbare (NEUE) Karte je Anbieter.
     zeilen_je_anbieter: dict[str, dict] = {}
     erneuert: set[str] = set()
     for anbieter, karten in je_anbieter.items():
         neu = [k for k in karten if k.get("vergleichbar")]
         if neu:
-            zeilen_je_anbieter[anbieter] = neu[0]  # sortiert nach gesamt
+            zeilen_je_anbieter[anbieter] = neu[0]
         else:
             erneuert.add(anbieter)
 
@@ -510,12 +464,8 @@ def _balken(
                 "eigen": _eigen(anbieter),
                 "tarif": karte.get("tarif", ""),
                 "gb": gb_text((gb_je_tarif or {}).get(karte.get("tarif_id") or "")),
-                # DSELBE Zahl wie Karte und Tabelle - `gesamt` ist schon
-                # `tco_24().gesamt` (Regel 1 des Modulkopfs).
                 "gesamt": karte["gesamt"],
                 "gesamt_text": geraete_tco_grafik.euro(karte["gesamt"]),
-                # Balkenbreite proportional zum Wert; der laengste ist 100 %
-                # (gesetzt, sobald alle Zeilen stehen - siehe unten).
                 "breite": 0.0,
                 "delta_euro": delta_euro,
                 "delta_prozent": delta_prozent,
@@ -529,9 +479,6 @@ def _balken(
     for z in zeilen:
         z["breite"] = round(z["gesamt"] / maximum * 100, 1) if maximum else 0.0
 
-    # Die EINE Legendenzeile: Namen, gruppiert nach Grund - kein Satz je
-    # Anbieter mehr (die 145 "fuehrt kein Buendel in diesem Band"-
-    # Einzelizeilen der alten Band-Panels entfallen mit dem Graphen).
     ohne = sorted(
         a
         for a in ERWARTETE_ANBIETER
@@ -540,10 +487,6 @@ def _balken(
     haendler = sorted(
         h for h in HAENDLER_OHNE_BUENDEL if not (haendler_preise or {}).get(h)
     )
-    # Der fertige Satz der EINEN Legendenzeile - in Python gebaut, weil
-    # Vorlage UND app.js ihn nur setzen (keine zweite Satzbaustelle im
-    # Browser). Keine Lücke, keine Zeile - dann steht auch kein leeres
-    # "Kein Bündel:" mit Doppelpunkt ohne Namen da.
     teile = []
     if ohne:
         teile.append("Kein Bündel in diesem Band: " + ", ".join(ohne))
@@ -588,13 +531,6 @@ def _unterzeile(balken: dict) -> str:
     )
 
 
-# Der Leerlauf des Graphen für ein Modell ohne ein einziges Band - der
-# Satz steht hier EINMAL und wird von Vorlage und `app.js` nur gesetzt
-# (derselben Regel wie die Übersetzungs-Linkbeschriftung: steht ein Text
-# zweimal im Code, hält ihn ein Test zusammen - hier hält ihn der Test an
-# genau dieser Konstanten).
-# Die Leiter selbst fehlt: dann gibt es fuer KEIN Geraet eine Stufe, und
-# der Grund ist die Erhebung, nicht das Sortiment (Regel 9 aus CLAUDE.md).
 LEITER_FEHLT_TEXT = (
     "Vodafone-Tarifleiter nicht erhoben – ohne sie gibt es "
     "keine Tarifstufen zum Vergleich."
@@ -665,11 +601,7 @@ def baender_fuer_modell(
         key, label, bereich = stufe.key, stufe.label, stufe.bereich
         karten_je_anbieter = je_band.get(key)
         if not karten_je_anbieter:
-            continue  # kein einziges Buendel in diesem Band
-        # DSELBE Ordnung wie die Reihen der Grafik: der eigene Anbieter
-        # zuerst, dann nach Name - Werteliste und Chart nennen dieselben
-        # Anbieter in derselben Reihenfolge, sonst sucht der Leser eine
-        # Zahl an der falschen Stelle.
+            continue
         geordnet = sorted(
             karten_je_anbieter.items(), key=lambda kv: (not _eigen(kv[0]), kv[0])
         )
@@ -680,10 +612,6 @@ def baender_fuer_modell(
             for a in ERWARTETE_ANBIETER
             if a not in vorhanden
         ]
-        # O1: der EINE Balkengraph dieses Bandes. Die Händlerpreise stehen
-        # am Modell (`geraete_tco_view` setzt sie VOR den Bändern) - ein
-        # Händler mit Preis gehört nicht in die Legende, er steht als
-        # Händlerkarte in der Kartenklappe.
         balken = _balken(
             alle_je_band.get(key) or {},
             gb_je_tarif,
@@ -707,17 +635,11 @@ def baender_fuer_modell(
                         "gb": gb_text(
                             (gb_je_tarif or {}).get(karte.get("tarif_id") or "")
                         ),
-                        # DSELBE Zahl wie Graph, Karte und Tabelle - `gesamt` ist
-                        # schon `tco_24().gesamt` (Regel 1 des Modulkopfs).
                         "gesamt": karte["gesamt"],
                         "abgerufen_am": karte.get("abgerufen_am", ""),
                     }
                     for anbieter, karte in geordnet
                 ],
-                # ---- O1 (11.09.2026): der EINE Balkengraph ----------------
-                # `grafik`/`werte`/`fehlend` bleiben gefuellt: Deren Renderer
-                # ist in der Vorlage gekappt (O1), die Felder bleiben fuer
-                # O4 erreichbar - dieselbe Kappe wie bei G1 (BRIEF_FADEN).
                 "balken": balken,
                 "unterzeile": _unterzeile(balken),
                 "chip": _chip(stufe),

@@ -32,9 +32,6 @@ _TITLE_KEYS = (
     "alternative",
 )
 _URL_KEYS = ("newsUrl", "url", "link", "href", "path")
-# Ordered by trust: an explicit publication date beats a generic "created"/
-# "updated" timestamp, which for some CMSes is the day an editor touched the
-# record rather than the day the release went out.
 _DATE_KEYS = (
     "newsDate",
     "date",
@@ -72,19 +69,11 @@ _DATE_FORMATS = (
 
 _TAG_RE = re.compile(r"<[^>]+>")
 
-# Records are read up to MAX_RECORDS, then sorted newest-first and cut to
-# MAX_ITEMS, so a long unsorted archive still yields its newest releases.
 MAX_RECORDS = 400
 MAX_ITEMS = 40
 _EPOCH = datetime(1970, 1, 1, tzinfo=timezone.utc)
 
 
-# Some CMS content-fragment models (e.g. stc's press-release fragments) use
-# a generic "call to action" label as the subtitle/title field on older
-# records instead of the real headline ({"articleSubtitle": "Details", ...})
-# - the real headline for those records is only recoverable from a longer
-# text field (description/body), never from this field, so treat these
-# values as absent rather than returning a useless title.
 _TITLE_PLACEHOLDERS = {
     "details",
     "read more",
@@ -101,17 +90,10 @@ def _first(d: dict, keys, skip_values: frozenset[str] = frozenset()) -> str:
         v = d.get(k)
         if isinstance(v, str) and v.strip() and v.strip().lower() not in skip_values:
             return v.strip()
-        # WordPress REST API (wp-json/wp/v2/posts and friends) nests text
-        # fields as {"rendered": "..."} instead of a bare string, e.g.
-        # {"title": {"rendered": "Headline"}}. Unwrap that shape too.
         if isinstance(v, dict):
             rendered = v.get("rendered")
             if isinstance(rendered, str) and rendered.strip():
                 return " ".join(_TAG_RE.sub(" ", rendered).split())
-    # Gatsby GraphQL nodes (e.g. Charter Communications' page-data static
-    # query dumps) compute derived values - notably the page path/URL - into
-    # a nested "fields" object instead of a top-level key, e.g.
-    # {"title": "...", "fields": {"url": "/newsroom/..."}}. Check there too.
     fields = d.get("fields")
     if isinstance(fields, dict):
         for k in keys:
@@ -138,10 +120,6 @@ def _split_date(rec: dict) -> str:
     return ""
 
 
-# Some APIs don't hand back a clean date string but a composite label, e.g.
-# Vodafone Idea's {"newsDate": "Tamil Nadu | 10 Jun, 2026"}. Pulling the date
-# out of the surrounding text is the difference between a dated item and one
-# that sinks to the bottom of the analyst queue.
 _EMBEDDED_DATE_RES = (
     re.compile(r"(\d{4})-(\d{2})-(\d{2})"),
     re.compile(r"(\d{1,2})\s+([A-Za-z]{3,9})\.?,?\s+(\d{4})"),
@@ -190,11 +168,10 @@ def _parse_date(raw: str) -> datetime | None:
             )
         except ValueError:
             continue
-    try:  # leading YYYY-MM-DD (also covers ISO stamps with millis/offset)
+    try:
         return datetime.strptime(raw[:10], "%Y-%m-%d").replace(tzinfo=timezone.utc)
     except ValueError:
         pass
-    # last resort: a date embedded in a longer label
     for pattern in _EMBEDDED_DATE_RES:
         m = pattern.search(raw)
         if not m:
@@ -232,7 +209,7 @@ def _find_record_lists(node, depth: int = 0, max_depth: int = 8) -> list[list[di
             1, len(dict_items) // 2
         ):
             found.append(dict_items)
-            return found  # a matched list's own items aren't recursed into
+            return found
         for item in node:
             found.extend(_find_record_lists(item, depth + 1, max_depth))
     elif isinstance(node, dict):
@@ -251,8 +228,6 @@ def _records(payload) -> list[dict]:
             val = payload.get(key)
             if isinstance(val, list):
                 return [r for r in val if isinstance(r, dict)]
-    # Fallback: recursively hunt for record-shaped lists anywhere in the
-    # payload (grouped/nested APIs) and merge them, de-duplicating by title.
     merged: list[dict] = []
     seen_titles: set[str] = set()
     for lst in _find_record_lists(payload):
@@ -272,17 +247,9 @@ def parse_json_bytes(
     payload = json.loads(raw)
     site_root = f"{urlsplit(source.url).scheme}://{urlsplit(source.url).netloc}"
     items: list[Item] = []
-    # Do NOT cap before sorting: an API's natural record order is not
-    # necessarily chronological. stc returns 281 releases whose first 40 are
-    # from 2021/2022, so the newsroom looked four years stale while the 2026
-    # releases sat further down the same response.
     for rec in _records(payload)[:MAX_RECORDS]:
         title = _first(rec, _TITLE_KEYS, skip_values=_TITLE_PLACEHOLDERS)
         if not title:
-            # The title field held only a generic CTA label (or was empty) -
-            # some records' only readable headline is a short HTML-wrapped
-            # description (e.g. stc's press-release fragments), so strip
-            # tags and use that as a last resort before giving up.
             desc_raw = _first(rec, _DESC_KEYS)
             if desc_raw:
                 title = " ".join(_TAG_RE.sub(" ", unescape(desc_raw)).split())
@@ -290,11 +257,6 @@ def parse_json_bytes(
             continue
         rel = ""
         if source.link_template:
-            # A configured link_template always wins over a raw url/link
-            # field: some APIs expose a bare slug under a key that *looks*
-            # like a URL (e.g. Iliad's "url": "free-max-plan-...") which
-            # would otherwise be resolved against the wrong host (the API's,
-            # not the public site's) by the generic urljoin below.
             try:
                 rel = source.link_template.format_map(rec)
             except (KeyError, IndexError):

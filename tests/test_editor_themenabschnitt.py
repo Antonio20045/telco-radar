@@ -51,7 +51,6 @@ def test_mit_themen_ist_der_abschnitt_pflicht():
         )
     assert "technologie" in str(exc.value).lower()
 
-    # Mit Abschnitt geht derselbe Bericht durch.
     editor.validate_editorial_briefing(
         MIT_THEMEN, frozenset({editor.THEMEN_UEBERSCHRIFT})
     )
@@ -73,8 +72,6 @@ def test_synthesize_setzt_abschnitt_nur_bei_themen(monkeypatch):
         REGIONAL, [], model="m", themenbereiche=["KI-Anbieter", "Chips & Modems"]
     )
     assert "## Technologie, Geräte & Regulierung" in gesehen[-1]
-    # Die aktiven Themenfelder stehen namentlich im Prompt, damit der Editor
-    # weiss, worueber er den Abschnitt schreibt.
     assert "KI-Anbieter" in gesehen[-1] and "Chips & Modems" in gesehen[-1]
 
 
@@ -92,4 +89,4 @@ def test_fehlender_themenabschnitt_loest_korrekturversuch_aus(monkeypatch):
     )
 
     assert "## Technologie, Geräte & Regulierung" in markdown
-    assert not antworten  # beide Versuche wurden gebraucht
+    assert not antworten

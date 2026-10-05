@@ -23,30 +23,13 @@ import glob
 import json
 from pathlib import Path
 
-# Preise je 1 Mio Token, Stand 08/2026 (api-docs.deepseek.com). DeepSeek
-# kuendigt zu Pekinger Stosszeiten (9-12 und 14-18 Uhr) doppelte Preise an -
-# der Cron laeuft um 08:30 UTC, also 16:30 Peking und damit MITTEN in der
-# zweiten Stosszeit. Deshalb wird beides ausgewiesen.
 PREISE = {
     "deepseek-v4-flash": {"ein": 0.14, "aus": 0.28},
     "deepseek-v4-pro": {"ein": 0.435, "aus": 0.87},
 }
 ZEICHEN_JE_TOKEN = 4
 
-# Aus dem Analysten-Prompt (analyze/agents.py) und einem echten Lauf gemessen.
-ANALYST_SYSTEM_TOKEN = 1200  # ANALYST_SYSTEM/TECH_ANALYST_SYSTEM (mit TEXTFELD)
-# Titel + Betreiber + Quelle + Datum + `text`.
-#
-# Seit dem 15.08.2026 traegt `text` bis zu ANALYST_TEXT_ZEICHEN (2500)
-# Zeichen Artikeltext statt 300 - der Wert stand vorher bei 120 und war damit
-# rund fuenffach zu niedrig. Gerechnet aus der Messung vom 15.08.2026 ueber
-# 267 Feed-Eintraege: 30 % tragen Feed-Volltext (Median 2000 Zeichen, auf
-# 2500 gekappt), die uebrigen ihren Teaser (Median 206). Im Mittel also rund
-# 800 Zeichen je Meldung, bei 4 Zeichen je Token gut 200 plus die Metafelder.
-#
-# Es bleibt eine EINGABE-Rechnung, und Eingabe ist die billige Haelfte: der
-# Aufschlag sind bei 1000 Meldungen je Lauf einige Cent im Monat. Wer die
-# Grenze in agents.py anhebt, zieht diesen Wert mit.
+ANALYST_SYSTEM_TOKEN = 1200
 ANALYST_JE_MELDUNG_TOKEN = 260
 ANALYST_AUSGABE_JE_HIGHLIGHT = 190
 BATCH_SIZE = 15
@@ -74,7 +57,6 @@ def rechne(
     zeichen_je_meldung: int = 716,
 ) -> dict:
     """Ein Lauf, aufgeschluesselt nach Posten."""
-    # --- Analysten (flash): ein Aufruf je Stapel a 15 Meldungen
     stapel = max(1, round(neue_meldungen / BATCH_SIZE + 0.49))
     analyst_ein = (
         stapel * ANALYST_SYSTEM_TOKEN + neue_meldungen * ANALYST_JE_MELDUNG_TOKEN
@@ -82,10 +64,7 @@ def rechne(
     analyst_aus = bewertete * ANALYST_AUSGABE_JE_HIGHLIGHT
     analyst = _kosten("deepseek-v4-flash", analyst_ein, analyst_aus)
 
-    # --- Redaktion (pro)
     if zweistufig:
-        # Stufe 1: je Bereich nur SEINE Meldungen; Stufe 2 nur die
-        # Kurzfassungen und fuenf Meldungen je Bereich.
         bereich_ein = bewertete * zeichen_je_meldung / ZEICHEN_JE_TOKEN + bereiche * 700
         bereich_aus = bereiche * 700
         chef_ein = bereiche * (150 + 5 * zeichen_je_meldung / ZEICHEN_JE_TOKEN) + 900
@@ -149,9 +128,6 @@ def main(argv: list[str] | None = None) -> int:
     ist = rechne(ist_quellen, ist_neu, ist_bewertet, ist_bereiche, zweistufig=False)
     ziel_neu = je_quelle_neu * args.quellen
     ziel_bewertet = ziel_neu * bewertungsquote
-    # Mehr Quellen heissen nicht mehr Regionen, aber mehr Themenfelder. Zwei
-    # neue Kategorien sind in dieser Session dazugekommen; 16 Bereiche sind
-    # eine vorsichtige Annahme.
     ziel_bereiche = ZIEL_BEREICHE
     ziel_einstufig = rechne(
         args.quellen, ziel_neu, ziel_bewertet, ziel_bereiche, zweistufig=False

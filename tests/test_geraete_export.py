@@ -74,11 +74,6 @@ def _lies(inhalt: str) -> list:
     return list(csv.reader(io.StringIO(inhalt), delimiter=";"))
 
 
-# ==========================================================================
-# Excel im deutschen Gebietsschema
-# ==========================================================================
-
-
 def test_die_datei_traegt_ein_bom(tmp_path):
     angaben = ex.schreibe_exporte(tmp_path, [_e()], [_p()], _KATALOG)
     roh = (tmp_path / "exporte" / "geraete-aktuell.csv").read_bytes()
@@ -114,11 +109,6 @@ def test_umlaute_ueberleben_den_umweg(tmp_path):
         encoding="utf-8-sig"
     )
     assert "grün" in text
-
-
-# ==========================================================================
-# Der Inhalt
-# ==========================================================================
 
 
 def test_der_aktuelle_export_traegt_alle_geforderten_spalten(tmp_path):
@@ -226,7 +216,6 @@ def test_die_historie_nennt_hersteller_und_modell_statt_nur_kennungen(tmp_path):
     kopf = zeilen[0]
     assert zeilen[1][kopf.index("Hersteller")] == "Apple"
     assert zeilen[1][kopf.index("Modell")] == "iPhone 17 Pro Max"
-    # Aelteste Messung zuerst - eine Historie liest man vorwaerts.
     assert zeilen[1][kopf.index("Datum")] == "2026-08-21"
     assert zeilen[2][kopf.index("Datum")] == "2026-08-29"
 
@@ -245,7 +234,7 @@ def test_die_zeilenzahl_stimmt_mit_der_datei_ueberein(tmp_path):
         ("historie", "geraete-historie.csv"),
     ):
         text = (tmp_path / "exporte" / name).read_text(encoding="utf-8-sig")
-        echte = len(_lies(text)) - 1  # ohne Kopfzeile
+        echte = len(_lies(text)) - 1
         assert angaben[schluessel]["zeilen"] == echte, name
 
 
@@ -265,24 +254,6 @@ def test_ein_semikolon_im_text_zerreisst_die_zeile_nicht(tmp_path):
     )
     assert len(zeilen[1]) == len(ex.SPALTEN_AKTUELL)
     assert zeilen[1][ex.SPALTEN_AKTUELL.index("Farbe")] == "blau; matt"
-
-
-# ==========================================================================
-# DIE VERKETTUNG: Seite und Export lesen denselben Bestand
-# ==========================================================================
-# Der Fehler, wegen dem es diesen Abschnitt gibt: `/geraete.html` schickte
-# seinen Bestand durch die Plausibilitaetspruefung, `geraete-aktuell.csv`
-# nicht. Zwei o2-Listungen, deren Rohfelder sie als gebraucht ausweisen,
-# standen deshalb im Export mit `Zustand = neu` - wer die Datei in Excel auf
-# "neu" filtert, bekam zwei Gebrauchtpreise als Neupreise.
-#
-# Seit dem 31.08.2026 sind es ZWEI Mengen, und der Export liest die groessere
-# (`geraete_view.bestand_und_belastbar`): den Bestand, nicht die geprueften
-# Zeilen. Die Pruefung entscheidet, was gegeneinander gerechnet werden darf,
-# nicht was es gibt - die Ueberkorrektur hatte das o2-Doppelpreispaar aus der
-# Datei genommen, auf die der Pruefbericht namentlich verweist. Die
-# Zusicherung dieses Abschnitts ist deshalb enger geworden: nicht "die
-# Giftzeile fehlt", sondern "die Giftzeile sagt, was sie ist".
 
 
 def _gebraucht_aber_als_neu_gespeichert():
@@ -356,11 +327,8 @@ def test_die_pruefung_laeuft_vor_der_bereinigung():
         "die gesunde Zeile darf die Pruefung nicht mitnehmen"
     )
 
-    # In der richtigen Reihenfolge wird der Befund auch GEMELDET - er steht
-    # als Zeile im Pruefbericht auf /geraete-quellen.html.
     assert _pruefung["zahlen"]["zustand_veraltet"] >= 1
 
-    # Gegenprobe 1: vertauscht - erst bereinigen, dann pruefen.
     andersherum = geraete_pruefung.pruefe(
         geraete_bereinigung.bereinige([gesund, gift]), _KATALOG
     )
@@ -373,9 +341,6 @@ def test_die_pruefung_laeuft_vor_der_bereinigung():
         "meldet, ist der Fehler, den beim naechsten Mal niemand findet"
     )
 
-    # Gegenprobe 2: ohne das Wort in der Farbe laesst die Pruefung die Zeile
-    # stehen. Sie entfernt sie also wirklich WEGEN des Wortes, und nicht aus
-    # einem anderen Grund, den dieser Fall zufaellig mittraegt.
     ohne_wort = dict(
         gift, farbe_roh="Space Schwarz", farbe_normalisiert="space schwarz"
     )
@@ -410,7 +375,6 @@ def test_kein_gebrauchtpreis_steht_als_neupreis_in_der_datei(tmp_path):
         [gesund, gift], _KATALOG
     )
 
-    # 1. Der Bestand: beide Zeilen, und die Giftzeile sagt, was sie ist.
     angaben = ex.schreibe_exporte(tmp_path, bestand, [], _KATALOG)
     assert angaben["aktuell"]["zeilen"] == 2
     zeilen = _lies(
@@ -424,13 +388,11 @@ def test_kein_gebrauchtpreis_steht_als_neupreis_in_der_datei(tmp_path):
     for zeile in zeilen[1:]:
         if zeile[kopf.index("Preis EUR")] == "577,00":
             assert zeile[kopf.index("Zustand")] == "refurbished", zeile
-            # Und das Kennzeichen steht nicht mehr in der Farbspalte.
             assert "erneuert" not in zeile[kopf.index("Farbe")].lower()
             break
     else:
         raise AssertionError("die Giftzeile fehlt in der Datei")
 
-    # 2. Die belastbare Menge: die Giftzeile ist gar nicht darin.
     angaben = ex.schreibe_exporte(tmp_path, belastbar, [], _KATALOG)
     assert angaben["aktuell"]["zeilen"] == 1
     zeilen = _lies(
@@ -462,15 +424,6 @@ def test_die_historie_fuehrt_nur_listungen_des_bestands(tmp_path):
     assert gefuehrt == {_e()["id"]}
 
 
-# ==========================================================================
-# P3 (18.09.2026): die beiden MODELL-Exporte des Katalogs - eine Datei je
-# Ansicht (Barpreis / TCO), eine Zeile je MODELL. E5-Regel: der Katalog
-# ist eine eigene Zahlensektion und damit exportierbar wie die anderen
-# vier; `geraete-aktuell.csv` bleibt der LISTUNGS-Export mit allen
-# Farben und Anbietern.
-# ==========================================================================
-
-
 def _modellzeilen(eintraege):
     return geraete_view.katalog_modellzeilen(eintraege, _KATALOG)
 
@@ -496,7 +449,7 @@ def test_die_modell_exports_nennen_die_modellzahl(tmp_path):
         ("modell_tco", "geraete-modell-tco.csv"),
     ):
         text = (tmp_path / "exporte" / name).read_text(encoding="utf-8-sig")
-        echte = len(_lies(text)) - 1  # ohne Kopfzeile
+        echte = len(_lies(text)) - 1
         assert angaben[schluessel]["zeilen"] == echte == len(modelle), (
             f"{name}: Knopf nennt {angaben[schluessel]['zeilen']}, Datei "
             f"hat {echte}, Modellzahl ist {len(modelle)}"

@@ -90,14 +90,6 @@ short topic strings (operator + subject) for every item you covered, so the
 system can remember them and never repeat them.
 """
 
-# Eigener Abschnitt fuer die Themenfelder (config/tech_sources.yaml). Ohne ihn
-# verteilt der Editor Nvidia-, Qualcomm- und Ofcom-Meldungen auf die
-# Regionsabschnitte, wo sie zwischen den Betreibermeldungen untergehen und den
-# Bericht zur Linkliste machen - genau das, was der Auftrag verhindern will.
-# Der Abschnitt kommt NUR in den Prompt, wenn dieser Lauf auch Themenmeldungen
-# hat; sonst wuerde eine Pflicht-Ueberschrift verlangt, zu der es nichts zu
-# schreiben gibt. Deshalb haengen Prompt und Pflichtpruefung am selben Schalter
-# (siehe validate_editorial_briefing).
 THEMEN_ABSCHNITT = """
 ## Technologie, Geräte & Regulierung
 The theme sections below ("{themen}") are NOT operators - they are suppliers,
@@ -110,24 +102,9 @@ pick what actually moves a network operator. Never present these companies as
 Vodafone's competitors.
 """
 
-# Ueberschrift dieses Abschnitts, normalisiert wie in
-# validate_editorial_briefing (klein, Umlaute aufgeloest).
 THEMEN_UEBERSCHRIFT = "## technologie, geraete & regulierung"
 
 
-# The editor sees EVERY assessed item by default (0 = no limit). A weekly
-# briefing that silently skips half the week is not a briefing, and there is
-# no second chance: the seen-store marks every new item as known, so whatever
-# the editor never sees never comes back.
-#
-# The cost is input length. Measured against a real analyst run: ~750
-# characters per assessed item, so a 362-item week is roughly 265 KB or ~68k
-# tokens of editor input. That needs a model with a large context window -
-# claude-sonnet-5 (200k) handles it, the deepseek-v4-flash configured for the
-# free NVIDIA endpoint does not. If a provider forces a smaller prompt, set
-# editor_max_highlights in settings.yaml; the selection below then keeps the
-# strongest per region, round-robin, so one busy region cannot crowd out the
-# rest - but that is a fallback, not the intended mode.
 EDITOR_HIGHLIGHT_BUDGET = 0
 
 
@@ -178,7 +155,6 @@ def synthesize(
     Lauf bewertete Meldungen haben (z. B. ["KI & Modelle", "Netzausruester"]).
     Ist die Liste leer, verhaelt sich der Editor exakt wie vorher.
     """
-    # strip internal telemetry before handing the analyses to the editor
     clean = {
         rn: {k: v for k, v in r.items() if not k.startswith("_")}
         for rn, r in regional.items()
@@ -203,9 +179,6 @@ def synthesize(
         )
     user = json.dumps(payload, ensure_ascii=False)
     n_highlights = sum(len(r.get("highlights") or []) for r in clean.values())
-    # Printed on every run: with no cap the editor prompt grows with the week,
-    # and this is the number that decides whether the configured model can
-    # still take it (~4 characters per token).
     log.info(
         "Editor prompt: %d highlights, %.0f KB (~%dk tokens), model=%s",
         n_highlights,
@@ -224,11 +197,6 @@ def synthesize(
     try:
         return _ein_versuch(system, user, model, pflicht)
     except EditorialBriefingError as exc:
-        # Der Wochenbericht ist das Herzstueck der Seite. Ihn beim ersten
-        # Formfehler wegzuwerfen und stattdessen den Roh-Digest zu
-        # veroeffentlichen, ist die teuerste moegliche Reaktion - der Inhalt
-        # war ja da, nur die Gliederung stimmte nicht. Also einmal gezielt
-        # nachfassen, mit den Ueberschriften woertlich im Auftrag.
         log.warning("Editor-Ausgabe abgelehnt (%s) - ein Korrekturversuch", exc)
         nachfassen = NACHFASSEN[exc.grund]
         if exc.grund == "gliederung" and themen:
@@ -236,7 +204,6 @@ def synthesize(
         return _ein_versuch(system + nachfassen, user, model, pflicht)
 
 
-# Wird nur an den zweiten Versuch angehaengt, passend zum Ablehnungsgrund.
 NACHFASSEN = {
     "gliederung": """
 
@@ -268,21 +235,6 @@ passiert ist, nicht, was jemand daraus machen soll.
 """,
 }
 
-# Am echten Editor-Prompt aus Lauf #65 gemessen (155 Meldungen, 34k Token
-# Eingabe), gegen deepseek-v4-pro:
-#   8000  erster Versuch voellig leer, zweiter Versuch bricht vor dem letzten
-#         Abschnitt ab ("## Muster der Woche" fehlte).
-# Drei Posten teilen sich dieses Budget, und die ersten beiden werden bei
-# einer Aufgabe dieser Groesse leicht unterschaetzt:
-#   1. das Nachdenken des Modells - bei Reasoning-Modellen (DeepSeek V4,
-#      Claude mit adaptive thinking) zaehlt es gegen max_tokens. Reicht das
-#      Budget nur dafuer, kommt eine voellig LEERE Antwort zurueck, ohne
-#      Fehler. Genau so sahen die Fehlschlaege in den Laeufen #63 und #65 aus.
-#   2. die Themenliste hinter ===TOPICS===, ein Eintrag je behandelter
-#      Meldung - bei 155 Meldungen allein mehrere tausend Token.
-#   3. der Bericht selbst, unter ~1900 Woertern also ~3000 Token.
-# 32000 gibt allen dreien Luft. Kosten spielen dabei keine Rolle: abgerechnet
-# werden erzeugte Token, nicht das Budget.
 EDITOR_MAX_TOKENS = 32000
 
 
@@ -302,9 +254,6 @@ def _ein_versuch(
         except json.JSONDecodeError:
             log.warning("Editor topic list unparseable - continuing without")
     markdown = markdown.strip()
-    # Ein Modell, das die Gliederung sonst richtig hat, packt die Antwort
-    # gelegentlich in einen Markdown-Codeblock. Dann beginnt keine Zeile mit
-    # "## " und der Bericht faellt aus formalen Gruenden durch.
     if markdown.startswith("```"):
         markdown = markdown.split("\n", 1)[-1]
         if markdown.rstrip().endswith("```"):
@@ -341,12 +290,6 @@ def validate_editorial_briefing(
     missing = required - headings
     if missing or "## wochenueberblick" in headings:
         detail = ", ".join(sorted(missing)) or "Roh-Digest erkannt"
-        # Was der Editor STATTDESSEN geliefert hat, gehoert in die Meldung.
-        # Im Lauf vom 04.08.2026 fehlten alle vier Pflicht-Ueberschriften,
-        # auch die erste - damit war aus dem Protokoll nicht zu erkennen, ob
-        # das Modell andere Titel waehlte, die Antwort abgeschnitten wurde
-        # oder etwas ganz anderes zurueckkam. Ohne diese Zeilen bleibt nur
-        # Raten.
         gefunden = ", ".join(sorted(headings)[:8]) or "keine H2-Ueberschrift"
         anfang = " ".join(markdown[:300].split())
         raise EditorialBriefingError(
@@ -363,9 +306,6 @@ def validate_editorial_briefing(
         pos = lowered.find(phrase)
         if pos < 0:
             continue
-        # Die Fundstelle mitgeben: ohne sie ist nicht zu unterscheiden, ob das
-        # Modell wirklich einen Empfehlungsteil geschrieben hat oder ob eine
-        # harmlose Formulierung die Regel ausloest.
         stelle = " ".join(markdown[max(0, pos - 80) : pos + 120].split())
         raise EditorialBriefingError(
             f"Editor output contains Vodafone recommendations "
@@ -373,31 +313,6 @@ def validate_editorial_briefing(
             grund="empfehlungen",
         )
 
-
-# =========================================================================== #
-# Zweistufige Redaktion
-#
-# Warum (AUFTRAG_SKALIERUNG_1000.md 3.2): heute bekommt der Editor in EINEM
-# Aufruf alle bewerteten Meldungen. Bei 1000 Quellen waeren das hochgerechnet
-# ~650 Meldungen, ~477 KB, ~122k Token. Das passt formal in das Kontextfenster
-# der konfigurierten Modelle und ist trotzdem der falsche Weg:
-#   * ein Modell, das 650 Meldungen zu 1900 Woertern verdichten soll, schreibt
-#     Brei - es kann nicht mehr abwaegen, sondern nur noch aufzaehlen;
-#   * ein einziger fehlgeschlagener Aufruf kostet den ganzen Wochenbericht;
-#   * die Latenz eines 120k-Token-Calls ist nach oben offen.
-#
-# Deshalb zwei Stufen:
-#   1. Bereichsredakteure - einer je Region und je Themenfeld, parallel. Jeder
-#      sieht NUR seinen Bereich, schreibt dessen fertigen Abschnitt und eine
-#      Kurzfassung von 3-5 Saetzen.
-#   2. Chefredaktion - bekommt NUR die Kurzfassungen und die staerksten
-#      Meldungen je Bereich, nie die Rohliste. Schreibt "Auf einen Blick",
-#      "Das Wichtigste", "Die wichtigsten Signale" und "Muster der Woche".
-#
-# Damit haengt die Eingabelaenge der Chefredaktion an der Zahl der BEREICHE,
-# nicht an der Zahl der Meldungen. Die Bereichsabschnitte werden unter den
-# Chefteil montiert, nicht neu geschrieben.
-# =========================================================================== #
 
 BEREICH_SYSTEM = """\
 You are the section editor for "{bereich}" in the weekly "Telco Radar"
@@ -486,21 +401,10 @@ After the Markdown, output the line ===TOPICS=== followed by a JSON array of
 short topic strings for every item you covered.
 """
 
-# Ueberschrift, unter der ALLE Themenfelder gemeinsam stehen. Der Auftrag will
-# einen Abschnitt, nicht sechs verstreute - und validate_editorial_briefing
-# verlangt genau diese Zeile, wenn es in diesem Lauf Themenmeldungen gibt.
 THEMEN_H2 = "## Technologie, Geräte & Regulierung"
 
-# Ein Bereichsabschnitt ist kurz; die Chefredaktion laeuft ueber _ein_versuch()
-# und teilt sich das grosse Budget (EDITOR_MAX_TOKENS) mit dem einstufigen
-# Editor - dieselbe Aufgabe, dieselbe Denk- und Themenlistenlast.
 BEREICH_MAX_TOKENS = 16000
 
-# Wie viele Meldungen eines Bereichs die Chefredaktion zu sehen bekommt. Der
-# ganze Sinn der zweiten Stufe ist, dass ihre Eingabe an der Zahl der BEREICHE
-# haengt und nicht an der Zahl der Meldungen - eine Obergrenze je Bereich ist
-# deshalb keine Kappung des Berichts, sondern der Mechanismus selbst. Die
-# uebrigen Meldungen stehen vollstaendig im Bereichsabschnitt und im JSON.
 CHEF_MELDUNGEN_JE_BEREICH = 5
 
 
@@ -581,10 +485,7 @@ def _ein_bereich(
 ) -> dict:
     """Einen Bereichsredakteur laufen lassen. Faellt nie hart aus."""
     highlights = daten.get("highlights") or []
-    # Themenfelder stehen als H3 unter der gemeinsamen H2; Regionen sind H2.
     ueberschrift = "###" if ist_thema else "##"
-    # Ein grosser Bereich darf laenger schreiben als ein kleiner - sonst
-    # bekommt Europa mit 40 Meldungen so viel Platz wie Ozeanien mit zweien.
     woerter = max(120, min(600, 60 + 25 * len(highlights)))
     system = BEREICH_SYSTEM.format(
         bereich=bereich, language=language, ueberschrift=ueberschrift, woerter=woerter
@@ -666,11 +567,9 @@ def synthesize_zweistufig(
 
     regionen = [e for e in ergebnisse if not e["ist_thema"]]
     themenfelder = [e for e in ergebnisse if e["ist_thema"]]
-    # Der groesste Bereich zuerst - er traegt die Woche.
     regionen.sort(key=lambda e: -e["anzahl"])
     themenfelder.sort(key=lambda e: -e["anzahl"])
 
-    # ------------------------------------------------------- Chefredaktion
     chef_eingabe = json.dumps(
         {
             "bereiche": [
@@ -696,7 +595,7 @@ def synthesize_zweistufig(
     )
 
     system = CHEF_SYSTEM.format(language=language)
-    pflicht = frozenset()  # der Themenabschnitt wird montiert, nicht geschrieben
+    pflicht = frozenset()
     try:
         chefteil, chef_topics = _ein_versuch(system, chef_eingabe, model, pflicht)
     except EditorialBriefingError as exc:
@@ -706,10 +605,6 @@ def synthesize_zweistufig(
             system + nachfassen, chef_eingabe, model, pflicht
         )
 
-    # ---------------------------------------------------------- Montage
-    # Die Bereichsabschnitte kommen ZWISCHEN "Die wichtigsten Signale" und
-    # "Muster der Woche": die Muster sollen die Woche abschliessen, nicht
-    # mitten im Bericht stehen.
     kopf, muster = _teile_am_muster(chefteil)
     teile = [kopf.strip(), ""]
     teile += [e["abschnitt"].strip() + "\n" for e in regionen]
@@ -726,7 +621,6 @@ def synthesize_zweistufig(
     topics = list(chef_topics)
     for e in ergebnisse:
         topics.extend(e["topics"])
-    # Reihenfolge erhalten, Dubletten raus (Chef und Bereich nennen dasselbe).
     gesehen: set[str] = set()
     topics = [t for t in topics if not (t in gesehen or gesehen.add(t))]
     return markdown, topics
@@ -769,8 +663,6 @@ def build_digest(
     elif not include_note:
         lines = ["## Roh-Digest (ohne redaktionelle Verdichtung)", ""]
     elif llm_available():
-        # A key IS configured - the provider just did not answer. Claiming a
-        # missing key here put a false statement on the public report page.
         lines = [
             "## Roh-Digest (ohne redaktionelle Verdichtung)",
             "",

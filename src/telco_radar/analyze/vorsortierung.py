@@ -67,29 +67,12 @@ from .llm import complete, extract_json
 
 log = logging.getLogger(__name__)
 
-# Meldungen je Aufruf. Gross, weil die Aufgabe klein ist: eine Zeile Antwort je
-# Meldung. Der Denkspur-Anteil faellt je AUFRUF an - dieselbe Rechnung, die die
-# Analysten-Stapel am 27.08.2026 von 15 auf 24 gehoben hat, nur ohne die
-# Ausgabelast eines vollen Bewertungsobjekts.
 BATCH_SIZE = 50
 
-# Ausgabebudget. 16000 wie bei den anderen Mechanik-Stufen und NICHT knapper:
-# auch flash schreibt eine Denkspur, und sie wird als Ausgabe abgerechnet. Ein
-# Budget, das vor der Antwort aufgebraucht ist, kostet den ganzen Stapel und
-# sieht dabei aus wie eine leere Antwort (Laeufe #83-85, #97).
 MAX_TOKENS = 16000
 
-# Wie viel Text je Meldung mitgeht. Der Analyst bekommt 2500 Zeichen, weil er
-# Zahlen, Preise und Daten daraus zitiert. Hier geht es nur um die Frage "ist
-# das ueberhaupt eine Meldung" - dafuer reicht der Anfang, und 50 x 400 Zeichen
-# sind rund 5k Token Eingabe je Aufruf.
 TEXT_ZEICHEN = 400
 
-# So viele Aussortierte werden mit Grund festgehalten - fuer den Messauftrag
-# aus dem Premortem (Strategie §3.1): nach dem ersten gesunden Lauf eine
-# Stichprobe lesen und pruefen, ob eine dabei ist, die in den Bericht gehoert
-# haette. Ohne diese Liste im Bericht-JSON ist die Frage nach dem Lauf nicht
-# mehr zu beantworten.
 STICHPROBE = 20
 
 
@@ -166,15 +149,11 @@ class Bilanz:
     """
 
     angeboten: int = 0
-    durchlass: int = 0  # per CTM-Treffer an der Stufe vorbei
-    geprueft: int = 0  # dem Modell wirklich vorgelegt
+    durchlass: int = 0
+    geprueft: int = 0
     verworfen: int = 0
     batches: int = 0
-    fehler_batches: int = 0  # Stapel, die ungefiltert durchgereicht wurden
-    # Stapel, die wegen der Frist gar nicht mehr gefragt wurden. Eigener
-    # Zaehler, nicht zu `fehler_batches` addiert: "der Anbieter antwortete
-    # nicht" und "uns lief die Zeit weg" sind zwei verschiedene Befunde, und
-    # nur der erste ist ein Grund, an der Quelle nachzusehen.
+    fehler_batches: int = 0
     frist_batches: int = 0
     stichprobe: list[dict] = field(default_factory=list)
 
@@ -227,9 +206,6 @@ def _nutzlast(nummeriert: list[tuple[int, Item]]) -> str:
     )
 
 
-# Was als "verwirf das" gilt. Alles andere - auch eine fehlende, leere oder
-# unverstaendliche Angabe - behaelt die Meldung. Die Richtung ist Absicht: ein
-# Modell, das sich unklar ausdrueckt, darf keine Meldung kosten.
 _VERWURF_WORTE = {"false", "nein", "no", "0", "verwerfen", "drop", "raus"}
 
 
@@ -273,7 +249,7 @@ def _ein_stapel(
         parsed = extract_json(
             complete(VORSORTIERER_SYSTEM, user, model=model, max_tokens=MAX_TOKENS)
         )
-    except Exception as exc:  # noqa: BLE001 - Fehler-Durchlass, siehe Modulkopf
+    except Exception as exc:  # noqa: BLE001
         log.warning(
             "Vorsortierung: Stapel mit %d Meldungen gescheitert (%s) - "
             "alle gehen ungefiltert zum Analysten",

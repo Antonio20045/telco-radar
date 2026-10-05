@@ -66,11 +66,6 @@ def radar(site) -> BeautifulSoup:
     return BeautifulSoup(str(tafel), "html.parser")
 
 
-# --------------------------------------------------------------------------
-# B1: Reiterleiste und Rollen
-# --------------------------------------------------------------------------
-
-
 def test_die_reiterfolge_ist_vergleich_radar_verlauf_katalog(geraete):
     """E3 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1d) ersetzt den O3-Quasi-Reiter
     (Link auf wettbewerbsradar.html) durch eine echte Tafel DIESER Seite:
@@ -93,9 +88,6 @@ def test_die_reiterfolge_ist_vergleich_radar_verlauf_katalog(geraete):
     assert geraete.select_one(".gr-reiter a") is None, (
         "die Reiterleiste trägt noch einen Link statt der vier Tafeln"
     )
-    # Die RADAR-TAFEL existiert und ist lebendig verknüpft: Knopf UND
-    # Panel, kein toter Tab-Body (die O3-Lektion, jetzt für die vierte
-    # Tafel - ihr Inhalt montiert E3 Schritt 2 in #gr-radar-inhalt).
     assert geraete.select_one("#tafel-radar") is not None, "#tafel-radar fehlt"
     assert geraete.select_one("#gr-radar-inhalt") is not None, (
         "der Montagepunkt #gr-radar-inhalt fehlt"
@@ -143,13 +135,6 @@ def test_tafel_portfolio_ist_weg(geraete):
     assert geraete.select_one(".gr-reiter [data-tafel='tafel-portfolio']") is None, (
         "ein fünfter Reiter-Knopf auf die tote Portfolio-Tafel"
     )
-    # Die Portfolio-Sektionen stehen je an ihrem Ort, nirgendwo sonst:
-    # Lifecycle im Radar-Reiter; die Wochenkarte #wr-bewegungen seit
-    # P4 Schritt 2a (STRATEGIE_GERAETE_V3, 18.09.2026) im REITER
-    # PREISVERLAUF - „letzte 14 Tage Preisbewegungen" ist eine Verlaufs-
-    # frage. Ihr alter Assert schrieb ihr den Radar-Ort fest und war
-    # gegen den verschobenen Stand ROT (Vorher-rot bewiesen), seither
-    # dreht er mit.
     erwartet = {"#lifecycle": "tafel-radar", "#wr-bewegungen": "tafel-verlauf"}
     for anker, tafel in erwartet.items():
         treffer = geraete.select(anker)
@@ -197,11 +182,6 @@ def test_was_diese_woche_auffaellt_steht_im_preisverlauf(geraete):
     assert "Was diese Woche auffällt" in text
 
 
-# --------------------------------------------------------------------------
-# B5: Querlink je Radar-Geräteblock
-# --------------------------------------------------------------------------
-
-
 def test_je_radar_gruppe_ein_querlink_mit_deep_link(radar, geraete):
     """B5, E3-Fassung: Jede Modell-Zeile der Abweichungsliste verlinkt auf
     DIESELBE Modell-ID, die der Selektor der Geräteseite trägt — sonst
@@ -211,28 +191,17 @@ def test_je_radar_gruppe_ein_querlink_mit_deep_link(radar, geraete):
     mit ihren Zeilen der Ort.) Die Gegenprobe ist Teil des Tests
     (CLAUDE.md §6: ein Lookup, der nichts trifft, ist grün und prüft
     nichts)."""
-    # E2: der Selektor ist das Suchfeld; wählbar ist, was der Zeitreihen-
-    # Knoten als erlaubt traegt (derselben Quelle, aus der app.js waehlt).
     ids_selektor = set(
         json.loads(geraete.select_one("#gr-zeitreihe-daten").get_text())["erlaubt"]
     )
     links = radar.select("#wr-abweichung a.gr-sprung[href^='geraete.html?modell=']")
     assert links, "kein Sprung-Link in der Modell-Liste des Radars"
-    # 28.09.2026: der Link nennt den Reiter, in den er springt („Mit
-    # Tarif →"), statt „im Graph ansehen" - seit „Ohne Vertrag" ebenfalls
-    # einen Graphen hat, war „der Graph" zweideutig.
     katalog = geraete.select("#gr-katalogtabelle a.gr-sprung")
-    # Gegenprobe: beide Tabellen tragen Sprung-Links.
     assert katalog, "kein Sprung-Link im Katalog"
     texte = {a.get_text(strip=True) for a in list(links) + katalog}
     assert all(t.startswith("Mit Tarif") for t in texte), texte
-    # Die Modellzahl steht an der Katalog-Überschrift, nicht noch einmal
-    # im Leitzahl-Label.
     label = geraete.select_one("#tafel-katalog .gr-leit--katalog .gr-leit-label")
     assert label is not None and not any(ch.isdigit() for ch in label.get_text()), label
-    # Das Band (&band=klein) gehört zum Link, nicht zur Modell-ID - vor dem
-    # Vergleich gegen den Selektor abgeschnitten, sonst träfe der Lookup
-    # nie zu und wäre grün, ohne etwas zu prüfen.
     fehlende = [
         a.get("href")
         for a in links
@@ -241,17 +210,6 @@ def test_je_radar_gruppe_ein_querlink_mit_deep_link(radar, geraete):
     assert not fehlende, (
         f"Querlinks auf Modell-IDs außerhalb des Selektors: {fehlende[:5]}"
     )
-    # JEDE Modell-Zeile trägt ihren Sprung ODER die benannte Luecke -
-    # sichtbare wie die hinter dem Aufklapper (alle stehen im DOM, der
-    # Deckel kappt nur die Ansicht).
-    #
-    # P4-Fix (Sicht-Pruefung 18.09.): bis hierher verlangte der Test einen
-    # Link auf JEDER Zeile - das war die Vor-P4-Welt, und sie WAR der
-    # vorbestehende Rot ("iPhone-18-Querlinks"): 10 Zeilen der echten
-    # Seite verlinkten Modelle ausserhalb des Selektors, der Deep-Link
-    # fiel still aufs Vorgabegeraet. Der Link steht seit dem Fix nur auf
-    # der Wahlmenge (der erste Assert dieses Tests), jede Zeile ausserhalb
-    # nennt die Luecke "noch keine Zeitreihe" - keinen dritten Zustand.
     zeilen = radar.select("#wr-abweichung tr.gr-a-zeile[data-auf]")
     assert zeilen, "keine Modell-Zeile im Radar - der Test prüft nichts"
     ohne = [
@@ -266,11 +224,6 @@ def test_je_radar_gruppe_ein_querlink_mit_deep_link(radar, geraete):
         )
     ]
     assert not ohne, f"{len(ohne)} Modell-Zeilen ohne Sprung und ohne benannte Lücke"
-
-
-# --------------------------------------------------------------------------
-# B6: tarife.html erreichbar
-# --------------------------------------------------------------------------
 
 
 def test_tarife_ist_vom_radar_verlinkt(radar):
@@ -288,11 +241,6 @@ def test_tarife_bleibt_von_der_geraeteseite_verlinkt(geraete):
     assert geraete.select_one("a[href$='tarife.html']") is not None
 
 
-# --------------------------------------------------------------------------
-# A (S3): das Bündel-Fragment — Zeilen für JEDES wählbare Gerät
-# --------------------------------------------------------------------------
-
-
 def test_das_buendel_fragment_existiert_fuer_alle_anderen_modelle(site, geraete):
     """A: Die Zeilen aller Nicht-Vorgabemodelle stehen in einem eigenen
     Fragment unter site/data/ — NICHT in der Seite selbst. O1 hat die
@@ -307,8 +255,6 @@ def test_das_buendel_fragment_existiert_fuer_alle_anderen_modelle(site, geraete)
     assert len(container) >= 80, (
         f"nur {len(container)} Modell-Container im Fragment (88 Modelle)"
     )
-    # Das Vorgabemodell steht SCHON auf der Seite - im Fragment würde es
-    # doppelt (52 KB am echten Bestand).
     vorgabe = json.loads(geraete.select_one("#gr-zeitreihe-daten").text)["vorgabe"]
     ids = {c.get("data-modell") for c in container}
     assert vorgabe not in ids, "das Vorgabemodell steht doppelt"
@@ -357,11 +303,6 @@ def test_die_sortierkoepfe_stehen_ueber_der_bandliste(geraete):
     assert arten == {"tco", "delta", "anbieter"}, arten
     assert "Kosten mit Tarif" in beschriftungen and "Anbieter" in beschriftungen
     assert "Monate" not in beschriftungen, beschriftungen
-
-
-# --------------------------------------------------------------------------
-# D: O1/O2-Restpunkte
-# --------------------------------------------------------------------------
 
 
 def test_der_karten_hinweis_ist_weg(geraete):

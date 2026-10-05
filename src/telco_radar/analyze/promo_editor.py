@@ -126,10 +126,6 @@ def _payload(entries: list[dict]) -> str:
             "seit": e.get("first_seen") or "",
             "geprueft": e.get("last_verified") or "",
         }
-        # Wichtigkeits-Score aus analyze/promo_ranker.py, sofern schon
-        # bewertet. Nur ein Hinweis fuer die Gewichtung im Text - der Editor
-        # soll die Zahl selbst NICHT nennen (die Rangfolge steht sichtbar
-        # oben auf der Seite, im Fliesstext waere sie nur Ballast).
         if e.get("score") is not None:
             row["wichtigkeit"] = e["score"]
         rows.append(row)
@@ -141,10 +137,6 @@ def synthesize(entries: list[dict], model: str, language: str = "Deutsch") -> st
     active = [e for e in entries if e.get("status") == "aktiv"]
     if not active:
         return build_digest(entries)
-    # Wichtigste zuerst in den Prompt: bei ~70 aktiven Aktionen und begrenztem
-    # Kontext entscheidet die Reihenfolge mit darueber, worueber der Text
-    # ueberhaupt schreibt. Unbewertete Eintraege bleiben hinten, statt sie zu
-    # verwerfen - sie sind nicht unwichtig, nur noch nicht beurteilt.
     active = sorted(
         active,
         key=lambda e: (e.get("score") is not None, e.get("score") or 0),

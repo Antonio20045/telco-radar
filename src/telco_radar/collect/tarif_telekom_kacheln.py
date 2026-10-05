@@ -88,10 +88,6 @@ from .tarif_pdf import dokument_hash
 
 log = logging.getLogger(__name__)
 
-# Der aeussere Kachel-Wrapper: genau EIN CSS-Modul-Hash-Suffix, keine
-# weitere Teilbezeichnung. Die Unterknoten ("...__hero__27i7x",
-# "...__strike-price__3Py6_") tragen zusaetzlich einen Teilnamen und werden
-# von diesem Muster bewusst NICHT getroffen.
 _TILE_RE = re.compile(r"^TariffTileModified_TariffTileModified__[A-Za-z0-9]+$")
 _NAME_WRAPPER_RE = re.compile(r"TariffTile__name-wrapper")
 _STRIKE_RE = re.compile(r"strike-price-value")

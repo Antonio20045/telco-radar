@@ -29,7 +29,6 @@ from telco_radar.tco_model import (
     tco_24,
 )
 
-# Das Rechenbeispiel des Auftrags: 1 EUR + 24 x 30 EUR = 721 EUR.
 _ANZAHLUNG, _RATE = 1.0, 30.0
 _SKU = "apple-iphone-14-128gb-mitternacht"
 
@@ -65,11 +64,6 @@ def _referenz(**kw) -> SimOnlyReferenz:
     return SimOnlyReferenz(**felder)
 
 
-# --------------------------------------------------------------------------
-# 1/2/3: die Zahl, ihre Bestandteile - und wann es keine Zahl geben darf
-# --------------------------------------------------------------------------
-
-
 def test_ohne_tarifpreis_zeigt_die_zeile_keine_zahl_obwohl_tco_24_eine_liefert():
     """`tco_24` liefert fuer ein Buendel ohne Tarifgrundpreis sehr wohl ein
     `gesamt` (den Geraetebetrag) - Regel 2 des Modulkopfs verlangt, dass die
@@ -95,7 +89,6 @@ def test_ein_vollstaendiges_buendel_ergibt_leitzahl_und_monatsbetrag():
     ergebnis = aufbereiten([b], [], [], katalog=None)
     zeile = ergebnis["zeilen"][0]
     assert zeile["belastbar"] is True
-    # Die View rechnet nicht selbst nach - dieselbe Zahl wie `tco_24`.
     assert zeile["gesamt"] == roh.gesamt == 1480.75
     assert zeile["monatlich"] == roh.monatlich == 61.7
 
@@ -121,19 +114,10 @@ def test_jede_luecke_traegt_ihre_phase():
         assert (eintrag["phase"] or "").strip() != ""
 
 
-# --------------------------------------------------------------------------
-# 5: Restbetrag jenseits des Horizonts
-# --------------------------------------------------------------------------
-
-
 def test_der_restbetrag_steht_nur_jenseits_des_horizonts():
     lang = aufbereiten([_buendel(laufzeit_monate=36)], [], [], katalog=None)
     assert lang["zeilen"][0]["restbetrag"] == 360.0, "12 offene Raten a 30 EUR"
 
-    # 0.0 UND NICHT None: die Raten laufen genau ueber den Horizont, es ist
-    # nichts offen - das ist eine Messung. None hiesse "nicht gemessen", und
-    # die zwei auseinanderzuhalten ist die Grundregel dieses Zweigs
-    # (`tco_model`: "0.0 ist ein GEMESSENER Betrag und keine Luecke").
     kurz = aufbereiten([_buendel(laufzeit_monate=24)], [], [], katalog=None)
     assert kurz["zeilen"][0]["restbetrag"] == 0.0
 
@@ -146,11 +130,6 @@ def test_ohne_gemessene_rate_ist_der_restbetrag_eine_luecke():
     eine Konstante ist."""
     ohne = aufbereiten([_buendel(geraet_monatsrate=None)], [], [], katalog=None)
     assert ohne["zeilen"][0]["restbetrag"] is None
-
-
-# --------------------------------------------------------------------------
-# 6: das Euro-Delta - nur wenn BEIDE Seiten belastbar sind
-# --------------------------------------------------------------------------
 
 
 def test_delta_mit_zwei_belastbaren_seiten_traegt_die_richtige_differenz():
@@ -190,11 +169,6 @@ def test_delta_bleibt_leer_bei_verschiedener_sku_id():
     assert ergebnis["delta"] == []
 
 
-# --------------------------------------------------------------------------
-# 7: der Geraeteanteil braucht die passende SIM-only-Referenz
-# --------------------------------------------------------------------------
-
-
 def test_der_geraeteanteil_steht_mit_passender_referenz():
     b, ref = _buendel(), _referenz()
     erwartet = geraeteanteil(b, ref)
@@ -207,11 +181,6 @@ def test_der_geraeteanteil_steht_mit_passender_referenz():
 def test_der_geraeteanteil_bleibt_leer_ohne_passende_referenz():
     zeile = aufbereiten([_buendel()], [], [], katalog=None)["zeilen"][0]
     assert zeile["geraeteanteil"] is None
-
-
-# --------------------------------------------------------------------------
-# 8/9: vom Speicher zum Datensatz
-# --------------------------------------------------------------------------
 
 
 def test_ein_store_woerterbuch_mit_betriebsfeldern_wird_gelesen():
@@ -257,11 +226,6 @@ def test_ein_kaputter_satz_kostet_keine_tafel():
     assert ergebnis["zeilen"][0]["sku_id"] == "apple-iphone-16-128gb-schwarz"
 
 
-# --------------------------------------------------------------------------
-# 10: der Geraetename kommt aus dem KATALOG, nie aus der sku_id
-# --------------------------------------------------------------------------
-
-
 def test_der_geraetename_kommt_aus_dem_katalog_nicht_aus_der_sku_id():
     """`apple-iphone-16-128gb-space-grau` traegt eine Farbe MIT Bindestrich -
     ein `sku_id.rsplit("-", 2)` schnitte an der falschen Stelle und faende
@@ -274,11 +238,6 @@ def test_der_geraetename_kommt_aus_dem_katalog_nicht_aus_der_sku_id():
         "zeilen"
     ][0]
     assert zeile["geraet"] == "iPhone 16 128 GB"
-
-
-# --------------------------------------------------------------------------
-# 11/12: die Bereitschaftstabelle - eine Auskunft ueber die Daten
-# --------------------------------------------------------------------------
 
 
 def test_die_bereitschaft_zaehlt_nur_neugeraete():
@@ -322,19 +281,9 @@ def test_die_ratenprobe_wird_gezaehlt_nicht_geraten():
     assert satz2["raten_probe_ok"] == 0, "die Probe geht bei 999 EUR nicht auf"
 
 
-# --------------------------------------------------------------------------
-# 13: der Notzustand traegt jedes Feld, das die Vorlage liest
-# --------------------------------------------------------------------------
-
-
 def test_leer_traegt_jedes_feld_das_aufbereiten_traegt():
     voll = aufbereiten([], [], [], katalog=None)
     assert set(leer().keys()) == set(voll.keys())
-
-
-# --------------------------------------------------------------------------
-# 14: Das Banner belegt beide Seiten
-# --------------------------------------------------------------------------
 
 
 def test_das_delta_traegt_beide_quelllinks():
@@ -359,11 +308,6 @@ def test_das_delta_traegt_beide_quelllinks():
     treffer = d["delta"][0]
     assert treffer["quelle_url"] == "https://o2.example/geraet"
     assert treffer["eigen_quelle_url"] == "https://vodafone.example/geraet"
-
-
-# --------------------------------------------------------------------------
-# 15: "Was noch fehlt" wird gerechnet, nicht hingeschrieben
-# --------------------------------------------------------------------------
 
 
 def test_ein_gemessener_posten_steht_nicht_mehr_unter_was_noch_fehlt():
@@ -428,14 +372,8 @@ def test_bei_zwei_eigenen_buendeln_gilt_das_guenstigere():
     assert len(eigene) == 2, "beide eigenen Buendel stehen in der Tafel"
 
     assert len(d["delta"]) == 1, d["delta"]
-    # Der guenstigere Tarif: 24 x 19,99 statt 24 x 49,99.
     assert d["delta"][0]["eigen_tarif"] == "GigaMobil S", d["delta"][0]
     assert d["delta"][0]["eigen"] == min(z["gesamt"] for z in eigene)
-
-
-# --------------------------------------------------------------------------
-# Die Befunde des Reviews vom 04.09.2026
-# --------------------------------------------------------------------------
 
 
 def test_eine_listung_mit_raten_ohne_barpreis_kostet_nicht_die_seite():
@@ -552,11 +490,6 @@ def test_ein_buendel_ohne_listung_heisst_nicht_fragezeichen():
     assert d["zeilen"][0]["geraet"] == "apple-iphone-99-256gb-blau"
 
 
-# --------------------------------------------------------------------------
-# Der Massstab aus dem Tarifbestand (Phase 6)
-# --------------------------------------------------------------------------
-
-
 def _ref(anbieter="Telekom", tarif="MagentaMobil L", monatlich=59.95, **kw):
     felder = dict(
         anbieter=anbieter,
@@ -583,7 +516,6 @@ def test_die_tafel_zeigt_den_tarifpreis_auch_ohne_ein_einziges_buendel():
     assert d["referenzen_gesamt"] == 1
     zeile = d["referenzen"][0]
     assert zeile["monatlich"] == 59.95
-    # Ueber den Horizont gerechnet - im MODUL, nicht in der Vorlage.
     assert zeile["ueber_horizont"] == round(59.95 * TCO_HORIZONT, 2)
     assert zeile["quelle_url"]
 
@@ -602,8 +534,6 @@ def test_der_massstab_rechnet_wie_die_buendelleitzahl():
     zeile = d["referenzen"][0]
     erwartet = tco_24(ref.als_buendel())
     assert zeile["ueber_horizont"] == erwartet.gesamt
-    # 59,95 EUR/Monat * 24 Monate + 39,99 EUR Anschlusspreis = 1478,79 EUR
-    # (die alte Tafelzahl ohne Anschlusspreis: 1438,80 EUR).
     assert zeile["ueber_horizont"] == round(59.95 * TCO_HORIZONT + 39.99, 2)
 
 
@@ -620,7 +550,7 @@ def test_die_referenztabelle_beschriftet_ihren_beleg_nach_der_quellenart():
         [
             _ref(tarif="A", quelle_art="dokument", quelle_url="https://x.de/pib"),
             _ref(tarif="B", quelle_art="live_shop", quelle_url="https://x.de/shop"),
-            _ref(tarif="C", quelle_url="https://x.de/alt"),  # kein quelle_art
+            _ref(tarif="C", quelle_url="https://x.de/alt"),
         ],
         [],
         None,
@@ -653,8 +583,6 @@ def test_ein_belegter_anschlusspreis_schliesst_auch_diesen_posten():
         ]
     }
     assert POSTEN_ANSCHLUSS not in mit
-    # 0.0 ist ein gemessener Betrag und keine Luecke - dieselbe Regel wie
-    # ueberall in diesem Zweig.
     null = {
         p["name"]
         for p in aufbereiten([], [_ref(anschlusspreis=0.0)], [], None)["offene_posten"]
@@ -729,14 +657,6 @@ def test_eine_referenz_ohne_betrag_macht_den_tarifpreis_nicht_erledigt():
     assert POSTEN_TARIF in {p["name"] for p in d["offene_posten"]}
 
 
-# --------------------------------------------------------------------------
-# Der Massstab ueber den Fremdschluessel
-# --------------------------------------------------------------------------
-# `sim_only_id` schluesselt auf den NAMEN, und bei o2 heisst derselbe Tarif
-# auf den zwei Seiten verschieden. Ohne den zweiten Index bliebe der
-# Geraeteanteil fuer jedes o2-Buendel leer.
-
-
 def _o2_buendel(**kw):
     satz = {
         "id": "buendel--o2--iphone--plus",
@@ -796,9 +716,6 @@ def test_der_massstab_wird_ueber_den_tarif_id_gefunden():
     """
     daten = aufbereiten([_o2_buendel()], [_o2_referenz()], _o2_listung(), katalog=None)
     zeile = daten["zeilen"][0]
-    # A1 (alle Raten der eigenen Laufzeit):
-    # 1,00 + 24 x 14,99 Tarif + 36 x 34,00 Geräteraten + 39,99 = 1624,75
-    # SIM-only: 24 x 19,99 + 39,99 = 519,75  ->  Differenz 1105,00
     assert abs(zeile["gesamt"] - 1624.75) < 0.005
     assert abs(zeile["geraeteanteil"] - 1105.0) < 0.005
 
@@ -867,14 +784,8 @@ def test_der_name_schlaegt_den_fremdschluessel():
     daten = aufbereiten(
         [_o2_buendel()], [gleichnamig, _o2_referenz()], _o2_listung(), katalog=None
     )
-    # Ueber den Namen: SIM-only 24 x 9,99 + 39,99 = 279,75 -> 1345,00
-    # (1624,75 laut Rechnung im Schluessel-Test, A1 mit allen 36 Raten)
     assert abs(daten["zeilen"][0]["geraeteanteil"] - 1345.0) < 0.005
 
-
-# --------------------------------------------------------------------------
-# QA-Fix 20.09.2026 (Pruefer-Befund "hoch"): Blatt gegen Messung
-# --------------------------------------------------------------------------
 
 _PIB_MOBIL_XS = {
     "anbieter": "Vodafone",
@@ -939,7 +850,7 @@ def test_widerspruch_zwischen_blatt_und_messung_entscheidet_die_messung():
     )["zeilen"][0]
     assert zeile["belastbar"] is True
     posten = {p["name"]: p["betrag"] for p in zeile["bestandteile"]}
-    assert posten["Tarif über 24 Monate"] == 766.8  # 24 x 31,95
+    assert posten["Tarif über 24 Monate"] == 766.8
     assert zeile["gesamt"] == 2297.79
     assert zeile["gesamt"] != 2249.79
 

@@ -41,8 +41,6 @@ from telco_radar.collect.http import fetch  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 BEKANNT = {"de", "en"}
-# Ab hier gilt ein Teaser als "mehr als ein Anreisser". Die Kappung steht bei
-# 600; alles darunter ist ohnehin kein Volltext.
 VOLLTEXT_AB = 1200
 
 
@@ -108,7 +106,7 @@ def miss_quelle(src, http_cfg) -> dict | None:
                 "url": src.url,
                 "fehler": f"unparseable: {feed.bozo_exception}",
             }
-    except Exception as exc:  # noqa: BLE001 - Diagnose, kein Produktionspfad
+    except Exception as exc:  # noqa: BLE001
         return {
             "name": src.name,
             "url": src.url,
@@ -206,7 +204,6 @@ def main() -> int:
     hat_c = sum(1 for x in alle if x["content"] > 0)
     c_voll = sum(1 for x in alle if x["content"] >= VOLLTEXT_AB)
     teaser_voll = sum(1 for x in alle if x["teaser"] >= VOLLTEXT_AB)
-    # Was ein Weg WIRKLICH einbringt: Volltext aus Feed, egal welches Feld.
     aus_feed = sum(1 for x in alle if max(x["teaser"], x["content"]) >= VOLLTEXT_AB)
 
     def zeile(text, wert):

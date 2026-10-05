@@ -176,14 +176,8 @@ from ..tarif_ldjson import ld_json_bloecke
 
 log = logging.getLogger(__name__)
 
-# "iPhone 17 Pro mit 1&1 All-Net-Flat S" -> "1&1 All-Net-Flat S".
-# Bewusst gierig bis zum Zeilenende: der Tarifname traegt selbst Leerzeichen
-# und Bindestriche, und ein sparsames Muster schnitte ihn nach dem ersten
-# Wort ab. `&amp;` kommt vor, weil dieselbe Beschreibung auch in HTML-Text
-# steht.
 _TARIF_RE = re.compile(r"\bmit\s+(?P<tarif>\S.*?)\s*$", re.I)
 
-# window.currentProductVariants[window.productId] = { 'color': 'X', ... }
 _VARIANTE_RE = re.compile(
     r"window\.currentProductVariants\s*\[[^\]]+\]\s*=\s*\{(?P<rumpf>[^}]*)\}", re.S
 )
@@ -193,9 +187,6 @@ _LAUFZEIT_RE = re.compile(
     r"window\.currentHardwareOfferDuration\s*=\s*['\"](?P<monate>\d+)['\"]"
 )
 
-# schema.org/InStock -> lieferbar. Nur die Zustaende, die 1&1 wirklich
-# ausliefert, werden uebersetzt; alles andere ist `unbekannt` und behauptet
-# nichts.
 _LAGER = {
     "instock": "lieferbar",
     "preorder": "vorbestellbar",
@@ -235,8 +226,6 @@ def laufzeit_monate(html: str) -> Optional[int]:
     return monate if monate > 0 else None
 
 
-# Die Kachelueberschrift eines Geraets im Katalograster. Genau diese Klasse
-# traegt die 42 Produktadressen der Kategorieseite - und NUR sie.
 _KACHEL_KLASSE = "hardware-box__heading"
 
 
@@ -289,10 +278,6 @@ def ernte(text: str, basis_url: str, pfadmuster="", kind: str = "") -> list[str]
         gesehen.add(ziel)
         out.append(ziel)
     if not out:
-        # Kein Wurf: eine leere Ernte ist im Sammler ein eigener,
-        # sichtbarer Zustand ("0 Listungen aus 1 Seite"). Eine Ausnahme
-        # machte daraus einen Abruffehler und verwechselte "Seite gelesen,
-        # Raster leer" mit "Seite nicht gelesen".
         log.warning(
             "1&1: %s traegt keine %s-Kachel (%d Bytes) - "
             "Raster leer oder Markup geaendert",
@@ -303,38 +288,16 @@ def ernte(text: str, basis_url: str, pfadmuster="", kind: str = "") -> list[str]
     return out
 
 
-# --------------------------------------------------------------------------
-# DER BUENDELKATALOG - die Preiskarte der Geräteseite (B4, siehe Modulkopf)
-# --------------------------------------------------------------------------
-
-# Der Anfang der serverseitig gerenderten Preiskarte. Ihr Objekt enthaelt
-# keine verschachtelten Klammern - der Schnitt am ersten `};` nach dem
-# Anfang ist deshalb sicher (und der JS-Quelltext der Seite nutzt dieselbe
-# Form an jedem Gerät).
 _PREISKARTE_ANFANG = "hwdVariantsPrices = {"
 
-# Ein SCHLUESSEL der Preiskarte ohne Zubehoer-Segment:
-# `'product-COSMIC_ORANGE-256': [ 4499, ]`. Das `-bundle-…`-Segment steht
-# ZWISCHEN Speicher und schliessendem Anfuehrungszeichen - das Muster
-# fordert das Anfuehrungszeichen direkt hinter der Speicherzahl und
-# verwirft die Zubehoer-Schluessel deshalb ueber ihre FORM, nicht ueber
-# ihren (hoeheren) Betrag.
 _PREISKARTE_SCHLUESSEL = re.compile(
     r"'product-(?P<farbe>[A-Z0-9_]+)-(?P<gb>\d+)':\s*\[\s*(?P<cents>\d+)"
 )
 
-# Der Tarifname des Bündels, wie die Seite ihn neben dem Preis setzt.
 _TARIF_SPAN_RE = re.compile(r'<span id="tariff-description">([^<]*)</span>')
 
-# Die Slug des Tarifs aus dem Tarifdetails-Link, den die Seite selbst
-# setzt (`data-iframe="…?chosenTariff=tariff-anf-s-mvl&…"`).
 _SLUG_RE = re.compile(r"[?&]chosenTariff=([A-Za-z0-9_.-]+)")
 
-# Der Tarifdetails-Link der Seite (S2-C). Das Attribut nennt die Adresse,
-# die der Anbieter selbst fuer die Tarifdetails setzt - relativ, deshalb
-# wird sie gegen die Geräteseite aufgeloest. Erstes Vorkommen: die Seite
-# setzt denselben Link mehrfach (Konfigurator und Fußnote), und sie sind
-# identisch.
 _TARIFDETAILS_RE = re.compile(r'data-iframe="(/details-[^"]+)"')
 
 
@@ -354,22 +317,8 @@ def _preiskarte(text: str) -> str:
     return text[anfang:ende]
 
 
-# --------------------------------------------------------------------------
-# DIE EINMALZAHLUNG - `hwdVariantsOneOffPaymentFees` (S2-C, Modulkopf)
-# --------------------------------------------------------------------------
-
-# Anfang und Schluss derselben Form wie bei der Preiskarte: das Objekt
-# enthaelt keine verschachtelten Klammern, der Schnitt am ersten `};` ist
-# sicher. Der Block steht hinter `currentHardwareOfferDuration === '36'`
-# - fehlt er, gibt es die Einmalzahlung bei diesem Angebot nicht, und
-# KEIN Feld wird gefuellt.
 _EINMALZAHLUNG_ANFANG = "hwdVariantsOneOffPaymentFees = {"
 
-# `'product-COSMIC_ORANGE-256': "360,–"` - dieselbe SCHLUESSELFORM wie die
-# Preiskarte (Zubehoer-Schluessel fallen damit ueber ihre Form, das
-# Anfuehrungszeichen direkt hinter der Speicherzahl), der Wert ist ein
-# deutscher Betrag ALS ZEICHENKETTE. `zahl()` nimmt ihm En-Gedankenstrich
-# und Waehrungszeichen ab.
 _EINMALZAHLUNG_SCHLUESSEL = re.compile(
     r"[\"']product-(?P<farbe>[A-Z0-9_]+)-(?P<gb>\d+)[\"']\s*:\s*"
     r"[\"'](?P<wert>[^\"']*)[\"']"
@@ -418,9 +367,6 @@ def _tarifname(text: str) -> str:
     return ""
 
 
-# `proben` ist die Schnittstelle der Provider-Probe (FM-2, P5 - siehe
-# Adapter-Docstring in collect/geraete/__init__.py); dieser Adapter
-# traegt keine Feld-Proben hinein.
 def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> list[dict]:
     """Aus einer Geräteseite je SPEICHERGROESSE einen Bündel-Rohsatz.
 
@@ -460,14 +406,8 @@ def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> lis
     dauer = laufzeit_monate(text)
 
     marke, name = _marke_name(text)
-    # Die Einmalzahlung desselben Angebots (S2-C, Modulkopf): leer ist
-    # ein gueltiger Zustand - der Block steht hinter `=== '36'`.
     einmalzahlungen = _einmalzahlungen(text)
     tarifdetails = _tarifdetails_url(text, url)
-    # Fuer die Tarifstufen (29.09.2026, `ergaenze_tarifstufen`): die
-    # Geraete-ID der Seite verbindet sie mit den Tarifrastern, und die
-    # vorausgewaehlte Groesse samt dem Preis, den die Seite beim Laden
-    # ZEIGT, ist die Gegenprobe gegen das Raster des Default-Tarifs.
     hw_id = _hw_id(text)
     vorauswahl = variante(text).get("size") or ""
     angezeigt = _angezeigter_preis(text, hw_id)
@@ -481,10 +421,6 @@ def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> lis
         vorher = gesehen.get(gb)
         if vorher is not None:
             if vorher[1] != betrag:
-                # Gemessen kommt das nicht vor (zehn Seiten, je Farbe
-                # derselbe Preis) - sollte eine Seite es doch tun, steht
-                # es im Protokoll und der ERSTE Eintrag bleibt, statt
-                # still die billigste Farbe zu nehmen.
                 log.warning(
                     "1&1: %s trägt zwei Preise für %d GB (%.2f und "
                     "%.2f) - der erste bleibt",
@@ -496,11 +432,7 @@ def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> lis
             continue
         gesehen[gb] = (farbe, betrag)
         if not name:
-            continue  # ohne Gerätname kein Titel, also kein Satz
-        # DIE EINMALZAHLUNG DES GERAETS, geschluesselt ueber dieselbe
-        # Rohschreibweise wie die Preiskarte. Fehlt der Schlussel, bleibt
-        # das Feld leer - der Betrag einer ANDEREN Farbe derselben Groesse
-        # waere eine Annahme, keine Messung.
+            continue
         einmalzahlung = einmalzahlungen.get((farbe_roh, gb))
         if einmalzahlungen and einmalzahlung is None:
             log.info(
@@ -514,28 +446,15 @@ def lies_buendel(text: str, url: str = "", proben: Optional[dict] = None) -> lis
             {
                 "hw_id": hw_id,
                 "vorausgewaehlt": vorausgewaehlt,
-                # Nur am vorausgewaehlten Satz: der Preis, den die Seite beim
-                # Laden zeigt - MIT einem vorab angehakten Zubehoer-Bundle
-                # (`data-auto-add="true"`, gemessen am Galaxy S26 Ultra: 44,99
-                # gezeigt, 42,99 in der Preiskarte). Er ist KEIN Buendelpreis
-                # und geht in keinen Betrag ein - nur in die Gegenprobe.
                 "angezeigt_monatlich": angezeigt if vorausgewaehlt else None,
                 "titel": " ".join(x for x in (marke, name, f"{gb} GB", farbe) if x),
                 "farbe": farbe,
                 "speicher_gb": gb,
                 "tarif_name": tarif,
-                # Die Ordnung des Anbieters aus dem Tarifdetails-Link (Modulkopf)
                 "tarif_slug": tarif_slug,
-                # § 13.2: EIN Betrag für Tarif und Gerät - keine Aufspaltung
-                # ohne Beleg (der Datalayer widerspricht sich selbst, Modulkopf).
                 "buendel_monatlich": betrag,
-                # S2-C: die Geräte-Einmalzahlung dieser Variante bei der
-                # 36-Monats-Finanzierung - None heisst "nicht genannt", nicht
-                # "kostet nichts".
                 "geraet_zuzahlung": einmalzahlung,
                 "laufzeit_monate": dauer,
-                # Der Tarifdetails-Link des ANBIETERS, fuer die
-                # Bereitstellungsgebühr (siehe ergaenze_bereitstellungsgebuehr).
                 "tarifdetails_url": tarifdetails,
                 "url": url,
                 "quelle": "einsundeins_buendel",
@@ -563,22 +482,8 @@ def _marke_name(text: str) -> tuple[str, str]:
     return "", ""
 
 
-# --------------------------------------------------------------------------
-# DIE BEREITSTELLUNGSGEBUEHR aus dem Tarifdetails-Iframe (S2-C, Modulkopf)
-# --------------------------------------------------------------------------
-
-# Mindestabstand zweier Abrufe derselben Domain - dieselbe Zahl wie der
-# `rate_limit_sekunden` des Anbieters in geraete_quellen.yaml und wie
-# Vodafones Tarif-Haken (`_TARIF_RATE_LIMIT`).
 _GEBUEHR_ABSTAND = 2.0
 
-# Die Gebühr steht in der Tariftabelle des Iframes, wortgleich beim
-# Anbieter (Modulkopf). Gesucht wird der Betrag hinter "Tarif MIT
-# Smartphone" - das Bündel hat immer ein Gerät; der ohne-Smartphone-Preis
-# gehoert zum SIM-only-Tarif und steht im Tarifbestand, nicht hier.
-# Das Fenster begrenzt den Satz auf die Zeilen NACH der Überschrift,
-# damit nicht ein "Tarif mit Smartphone" aus einem anderen Abschnitt
-# Treffer wird.
 _GEBUEHR_FENSTER = 2000
 _BEREITSTELLUNGS_RE = re.compile(r"Einmalige Bereitstellungsgebühr")
 _MIT_SMARTPHONE_RE = re.compile(r"Tarif mit Smartphone:?\s*</strong>\s*([^<]{1,40})")
@@ -636,7 +541,6 @@ def ergaenze_bereitstellungsgebuehr(
     Bündel des Laufs nicht kosten. Zurueck kommt die Zahl der Saetze mit
     neu gesetzter Gebühr.
     """
-    # Ein Vertreter je Slug: die erste `tarifdetails_url` dieses Slugs.
     vertreter: dict[str, str] = {}
     for satz in rohbuendel or []:
         if satz.get("quelle") != "einsundeins_buendel":
@@ -698,81 +602,15 @@ def ergaenze_bereitstellungsgebuehr(
     return gesetzt
 
 
-# --------------------------------------------------------------------------
-# DIE TARIFSTUFEN (29.09.2026): Tarifuebersicht -> Geraeteraster je Tarif
-# --------------------------------------------------------------------------
-#
-# WAS GEMESSEN IST (29.09.2026, HTTP-GET, Absender TelcoRadar/1.0)
-# ----------------------------------------------------------------
-# Die Geraeteseite preist NUR den Default-Tarif (All-Net-Flat S), mit und
-# ohne `?chosenTariff=` byte-gleich im Preis (Modulkopf). Der Tarifwechsel
-# der Seite ("Weiter zur Tarifauswahl") ist ein Warenkorb-Schritt
-# (`add-to-cart-button`, `startPageFlowId=f2-ssc-hw-private`) - eine
-# Bestellstrecke, die hier nicht betreten wird. Serverseitig da ist etwas
-# anderes: die Tarifuebersichten `/all-net-flat-vergleich` und
-# `/unbegrenztes-datenvolumen` verlinken je Tarif "Mit Handy weiter" auf
-# ein GERAETERASTER dieses Tarifs (`targetpage="//mobile.1und1.de/
-# smartphones-all-net-flat-m?..."`, dazu `-s`, `-l`, `smartphones-
-# unlimited-s/-m/-l` und `/smartphones-unlimited-xl`). Jedes Raster traegt
-# fuer alle 43 Geraete EINEN Monatspreis (die vorausgewaehlte Variante),
-# den Tarifnamen ("Inkl. 1&1 All-Net-Flat M (50 GB)") und die Laufzeit
-# (`data-hardware-months="36"`). robots.txt: keiner dieser Pfade ist
-# gesperrt.
-#
-# DIE RECHNUNG, UND WARUM SIE KEINE ANNAHME IST
-# ---------------------------------------------
-# Rasterpreis(Tarif T) minus Rasterpreis(All-Net-Flat S) ist am 29.09.2026
-# fuer ALLE 43 Geraete derselbe Betrag: M +5,00, L +10,00, Unlimited S
-# +5,00, M +10,00, L +15,00 - bei Geraeten von 19,99 bis 69,99 EUR. Der
-# Tarifaufschlag haengt also nicht am Geraet, und damit auch nicht an
-# seiner Speichergroesse. Nur dann (`einheitlich`) wird er auf JEDE
-# Speichergroesse der Geraeteseite uebertragen:
-#
-#     Buendel(Groesse, T) = Preiskarte(Groesse, S) + Aufschlag(T, Geraet)
-#
-# Der Aufschlag ist je Geraet GEMESSEN (zwei Rasterpreise desselben
-# Geraets), nicht der Mittelwert. Das Raster selbst wird NICHT als
-# Buendelpreis uebernommen: es zeigt den Preis MIT einem vorab angehakten
-# Zubehoer-Bundle (Galaxy S26 Ultra: Raster S 44,99, Preiskarte 42,99 -
-# `data-auto-add="true"`), und Buendel aus Geraet plus Zubehoer werden
-# verworfen (CLAUDE.md, Geraeteradar). Die Differenz zweier Raster traegt
-# dasselbe Zubehoer auf beiden Seiten und hebt es auf.
-#
-# Unlimited XL ist NICHT einheitlich (Apple +25,00, alle anderen +30,00):
-# dort haengt der Aufschlag am Geraet, und ob er an der Speichergroesse
-# haengt, sagt keine serverseitige Zahl. Ein solcher Tarif bekommt nur
-# den Satz der VORAUSGEWAEHLTEN Groesse (fuer die der Aufschlag genau
-# gemessen ist), und seine Geraete-Einmalzahlung bleibt offen - die
-# Einmalzahlungs-Karte der Seite gehoert zum Default-Tarif.
-#
-# DIE GEGENPROBE je Geraet: der Rasterpreis im Default-Tarif muss dem
-# Preis gleichen, den die Geraeteseite beim Laden zeigt, und die Raster-
-# laufzeit der der Seite. Sonst sind Raster und Seite nicht dasselbe
-# Angebot, und das Geraet bekommt keinen weiteren Tarif.
-#
-# DIE LAUFZEIT: Alle Raster und alle Geraeteseiten nennen 36 Monate
-# ("24 + 12", `/handyvertrag`). Die 24-Monats-Finanzierung waehlt man erst
-# im Warenkorb (`hwDurationsAvailable`) - serverseitig steht sie nirgends.
-# Sie bleibt eine benannte Luecke, statt geraten zu werden.
-
-# Die zwei Tarifuebersichten, von denen die Raster verlinkt sind. Jede
-# Geraeteseite verlinkt sie in ihrer Hauptnavigation ("1&1 Unlimited
-# Tarife", "1&1 All-Net-Flat mit 10, 50 oder 150 GB").
 TARIFUEBERSICHTEN = (
     "https://mobile.1und1.de/all-net-flat-vergleich",
     "https://mobile.1und1.de/unbegrenztes-datenvolumen",
 )
 
-# "Mit Handy weiter": `targetpage="//mobile.1und1.de/smartphones-…?…"`
-# oder relativ `targetpage="/smartphones-unlimited-xl?"`. Die Anfrage-
-# parameter (`tariffChangeUrl`, `optionalPrecedingDocuments`) fuehren nur
-# den Warenkorb zurueck und werden nicht mitgeschickt.
 _RASTER_LINK_RE = re.compile(
     r'targetpage="(?P<ziel>(?://mobile\.1und1\.de)?/smartphones-[a-z0-9-]+)'
 )
 
-# Der Tarifdetails-Link je Tarifkachel der Uebersicht: `data-iframe` mit
-# `chosenTariff=` und `title="Tarifdetails <Tarifname>"` im selben Tag.
 _TAG_RE = re.compile(r"<(?:a|span)\b[^>]*>", re.S)
 _ATTR_RE = re.compile(r'([\w-]+)="([^"]*)"')
 
@@ -785,9 +623,6 @@ _RASTER_TARIF_RE = re.compile(r"Inkl\.\s*([^<]+)")
 
 _KLAMMERZUSATZ_RE = re.compile(r"\s*\([^()]*\)\s*$")
 
-# So viele Geraete muessen Default- und Tarifraster gemeinsam fuehren, bevor
-# ein gleicher Aufschlag als "einheitlich" gilt und auf alle Speichergroessen
-# uebertragen wird. Gemessen am 29.09.2026: 43 gemeinsame Geraete je Raster.
 _MINDEST_GERAETE_EINHEITLICH = 5
 HERLEITUNG_TARIFAUFSCHLAG = "tarifaufschlag_aus_tarifraster"
 
@@ -986,8 +821,6 @@ def ergaenze_tarifstufen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> 
             for hw, preis in gelesen["preise"].items()
             if hw in basisraster["preise"]
         }
-        # Einheitlich heisst: an genug Geraeten gemessen gleich. Ein
-        # einziges gemeinsames Geraet waere trivial "einheitlich".
         einheitlich = (
             len(aufschlaege) >= _MINDEST_GERAETE_EINHEITLICH
             and len(set(aufschlaege.values())) == 1
@@ -1029,11 +862,6 @@ def ergaenze_tarifstufen(hole: Callable, kopfzeilen: dict, rohbuendel: list) -> 
                         "tarifdetails_url": detail_url,
                         "buendel_monatlich": round(cent / 100.0, 2),
                         "laufzeit_monate": monate,
-                        # Die Einmalzahlungs-Karte der Geraeteseite gehoert zum
-                        # Default-Tarif, und das Raster nennt keine. Ein
-                        # einheitlicher MONATSaufschlag sagt nichts ueber die
-                        # Einmalzahlung eines anderen Tarifs - sie bleibt eine
-                        # benannte Luecke (Clean Code 3), nicht uebertragen.
                         "geraet_zuzahlung": None,
                         "herleitung": HERLEITUNG_TARIFAUFSCHLAG,
                         "url": adresse,
@@ -1088,10 +916,6 @@ def lies(text: str, url: str = "") -> list[dict]:
 
         tarif = _tarif_aus_beschreibung(knoten.get("description"))
         if not tarif:
-            # Eine Buendelzahl ohne ihren Tarif ist bedeutungslos, und
-            # `Listung.__post_init__` wuerde sie ohnehin zurueckweisen.
-            # Hier faellt sie mit einer Zeile im Protokoll, statt weiter
-            # unten mit einer Ausnahme.
             log.info(
                 "1&1: %s nennt keinen Tarif in der Beschreibung (%r) - "
                 "Buendelpreis verworfen",
@@ -1119,16 +943,12 @@ def lies(text: str, url: str = "") -> list[dict]:
                     )
                     if x
                 ),
-                # KEIN Barpreis. 1&1 verkauft Geraete nur im Tarifbund; die
-                # Spalte bleibt leer, statt eine Zahl zu bekommen, die es
-                # nicht gibt.
                 "preis": None,
                 "monatspreis": monatspreis,
                 "tarif": tarif,
                 "laufzeit_monate": laufzeit,
                 "waehrung": str(angebot.get("priceCurrency") or "EUR").upper(),
                 "verfuegbarkeit": _verfuegbarkeit(angebot.get("availability")),
-                # Die Kennung, die die Seite selbst fuehrt.
                 "sku": str(knoten.get("sku") or "").strip(),
                 "ean": str(knoten.get("gtin13") or knoten.get("gtin") or "").strip(),
                 "farbe": farbe,

@@ -49,7 +49,6 @@ WURZEL = pathlib.Path(__file__).resolve().parents[1]
 DEVICE = "apple-iphone-17-pro"
 MODELL = "apple-iphone-17-pro-256"
 
-# Derselbe Pflichtfall wie am echten Bestand (siehe Modulkopf).
 ZUZAHLUNG = 1.0
 TARIF_MONATLICH = 15.0
 RATEN = {24: 45.75, 36: 30.50}
@@ -81,9 +80,6 @@ def _congstar_buendel(laufzeit: int) -> dict:
 
 
 def _vodafone_buendel() -> dict:
-    # Deutlich teurer als congstar (Δ > 15 EUR UND > 3 %), damit die
-    # Wesentlichkeitsschwelle (`geraete_vergleich.WESENTLICH_*`) sicher
-    # greift und ein echtes Δ entsteht.
     return {
         "id": f"buendel--vodafone--{_sku(DEVICE, 256)}--vf-xs--24",
         "sku_id": _sku(DEVICE, 256),
@@ -186,10 +182,6 @@ def _congstar_zeilen(html: str) -> dict:
         text = " ".join(re.sub(r"<[^>]+>", " ", kopf).split())
         if "Allnet Flat XS Flex" in text:
             continue
-        # `data-laufzeit` traegt die TARIFlaufzeit (immer 24, siehe
-        # `_geraete_buendel.html.j2`) - die RATENlaufzeit steht in
-        # `k.raten_laufzeit`; unterschieden wird hier ueber den
-        # eindeutigen Rechenweg-Text ("24 Raten"/"36 Raten").
         n = 36 if "36 Raten" in text else 24 if "24 Raten" in text else None
         assert n is not None, f"keine Ratenzahl in der Zeile: {text!r}"
         out[n] = (opentag, text, body)
@@ -239,9 +231,6 @@ def test_punkt1_zeilen_sind_zugeklappt_unterscheidbar(site):
     assert "Restschuld" not in text24, (
         f"24-Raten-Zeile (0 EUR Restschuld) nennt trotzdem eine Restschuld: {text24!r}"
     )
-    # Gegenprobe: beide Leitzahlen bleiben gleich (congstar finanziert
-    # zum Nulltarif) - der Unterschied ist NUR die Ratenzahl/Restschuld,
-    # nicht ein zweiter, unbeabsichtigter Textdrift.
     assert (
         f"{SOLL_GESAMT:,.2f}".replace(",", "#").replace(".", ",").replace("#", ".")
         + " €"
@@ -362,9 +351,6 @@ def test_punkt3_anbieterfarbe_steht_an_der_zeile(site):
             f"Custom-Property-Wert {erwartet!r} (sonst bleibt die "
             "Anbieterfarbe der graue Rueckfall)"
         )
-        # GEGENPROBE (Regel 5 des Orakeltests): das class-Attribut bleibt
-        # UNVERAENDERT "gr-bnd" - eine zusaetzliche Klasse haette den
-        # Orakeltest zerstoert (`class="gr-bnd"` woertlich gesucht).
         assert re.search(r'class="gr-bnd"', opentag), (
             f"{n} Raten: das class-Attribut ist nicht mehr woertlich "
             f'"gr-bnd" - der Orakeltest wuerde brechen: {opentag!r}'
@@ -431,13 +417,6 @@ def test_punkt4_restschuld_ist_schraffiertes_segment(site):
             )
 
 
-# --------------------------------------------------------------------------
-# Mutationsproben (CLAUDE.md-Auftrag): je Kernaenderung eine Probe, dass
-# der Test wirklich SCHEITERT, wenn die Zahl falsch waere - sonst ist er
-# nur ein grüner Test, der nichts prüft.
-# --------------------------------------------------------------------------
-
-
 def test_mutationsprobe_punkt1_erkennt_wortgleiche_zeilen():
     """`test_punkt1_...` MUSS scheitern, wenn zwei Texte wortgleich sind
     (die Ur-Form des Befunds) - eine direkte Mutationsprobe der
@@ -463,32 +442,18 @@ def test_mutationsprobe_punkt4_erkennt_falsche_segmentsumme():
     ]
     seg = zerlegung_balken(bestandteile, restbetrag=366.0, gesamt=1459.0)
     assert round(sum(s["betrag"] for s in seg), 2) == pytest.approx(1459.0)
-    # MUTATION: ein Segmentbetrag wird verfaelscht - die Summenprobe muss
-    # das erkennen.
     kaputt = [dict(s) for s in seg]
     kaputt[0]["betrag"] += 10.0
     assert round(sum(s["betrag"] for s in kaputt), 2) != pytest.approx(1459.0)
 
-
-# --------------------------------------------------------------------------
-# REVIEW-FIX S2 (blockierend): die Hauptzahl ignorierte die Wesentlich-
-# keits-Schwelle. Eine EIGENE, kleine Fixture mit einem Abstand UNTER der
-# Schwelle (`geraete_vergleich.WESENTLICH_EURO`/`_PROZENT`) - die
-# Hauptfixture des Moduls (`_vodafone_buendel`) vermeidet diesen Fall
-# absichtlich (Δ > 15 € UND > 3 %, siehe deren Kommentar), darum ein
-# eigenes Modell (Samsung Galaxy S26, im gemeinsamen `_KATALOG` bereits
-# vorhanden) statt einer dritten congstar-Zeile am iPhone 17 Pro - zwei
-# congstar-Zeilen mit derselben Ratenzahl (24) fuer dasselbe Geraet
-# wuerden sich im Lookup (`_congstar_zeilen`) gegenseitig ueberschreiben.
-# --------------------------------------------------------------------------
 
 DEVICE_U = "samsung-galaxy-s26"
 ZUZAHLUNG_U = 455.00
 TARIF_MONATLICH_U = 15.0
 RATE_U = 45.75
 SOLL_GESAMT_U = 1913.00
-SOLL_REFERENZ_GESAMT_U = 1 + 24 * 26.0 + 24 * 54.0  # 1.921,00 €
-SOLL_ABSTAND_U = round(SOLL_REFERENZ_GESAMT_U - SOLL_GESAMT_U, 2)  # 8,00 €
+SOLL_REFERENZ_GESAMT_U = 1 + 24 * 26.0 + 24 * 54.0
+SOLL_ABSTAND_U = round(SOLL_REFERENZ_GESAMT_U - SOLL_GESAMT_U, 2)
 
 
 def _congstar_buendel_ungefaehr() -> dict:
@@ -515,10 +480,6 @@ def _congstar_buendel_ungefaehr() -> dict:
 
 
 def _vodafone_buendel_ungefaehr() -> dict:
-    # Dieselben Vodafone-Zahlen wie die Hauptfixture (`_vodafone_buendel`) -
-    # nur SOLL_GESAMT_U der congstar-Zeile ist so gewaehlt, dass der
-    # Abstand zu dieser Referenz (8,00 €) unter BEIDEN Schwellen bleibt
-    # (< 15 € UND < 3 % von 1.921,00 €).
     return {
         "id": f"buendel--vodafone--{_sku(DEVICE_U, 256)}--vf-xs-u--24",
         "sku_id": _sku(DEVICE_U, 256),
@@ -599,13 +560,6 @@ def test_review_fix_s2_delta_spalte_behauptet_keine_fuehrerschaft(site_ungefaehr
     )
 
 
-# --------------------------------------------------------------------------
-# REVIEW-FIX S3 (mitgenommen): `zerlegung_balken()` reine Funktionstests,
-# ohne vollen Seitenaufbau - Punkt 1 (Truthiness statt `is not None`) und
-# Punkt 2 (kein 0,00-€-Phantomsegment).
-# --------------------------------------------------------------------------
-
-
 def test_review_fix_s3_1_restbetrag_none_erzeugt_keinen_phantom_split():
     """`restbetrag=None` heisst "nicht bestimmbar" (Clean Code 3) - KEIN
     Split, keine erfundene Restschuld von 0,00 €. Gegenprobe: eine ECHTE,
@@ -630,7 +584,6 @@ def test_review_fix_s3_1_restbetrag_none_erzeugt_keinen_phantom_split():
     seg_null = zerlegung_balken(bestandteile, restbetrag=0.0, gesamt=1360.0)
     assert not any(s["offen"] for s in seg_null)
 
-    # Gegenprobe: eine echte, gemessene Restschuld > 0 splittet weiterhin.
     seg_echt = zerlegung_balken(bestandteile, restbetrag=200.0, gesamt=1360.0)
     offen = [s for s in seg_echt if s["offen"]]
     assert len(offen) == 1 and offen[0]["betrag"] == pytest.approx(200.0), (

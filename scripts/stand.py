@@ -24,6 +24,7 @@ import claude_rolle
 import pruefstempel
 import waechter
 import waechter_claude
+import waechter_kommentare
 import waechter_regeln
 import waechter_tests
 
@@ -142,6 +143,14 @@ def _hooks() -> list[str]:
     if lauf.stdout.strip() != HOOKS:
         gruende.append(f"core.hooksPath ist nicht {HOOKS} (make einrichten)")
     return gruende
+
+
+def freie_kommentare() -> int:
+    """Zählt die ``#``-Kommentare, die Stufe 0 als ``kommentar`` meldet."""
+    return sum(
+        len(waechter_kommentare.freie_kommentare((W / p).read_text(encoding="utf-8")))
+        for p in waechter_regeln.kommentar_dateien(W)
+    )
 
 
 def ungepruefte() -> list[str]:
@@ -343,7 +352,7 @@ def offen() -> dict[str, list[str]]:
         + rollen_sperren()
         + echter_auftrag()
         + mutationsprobe(),
-        "7 Kommentarabbau": _fehlt("pruef/kommentar-basis.txt"),
+        "7 Kommentarabbau": _mehr("freie Kommentare", freie_kommentare()),
         "8 Promo-IDs": _fehlt("outputs/auftraege/T1.json", "tests/orakel"),
         "9 Lader, render_site": _mehr("Hex-Farben", summe.get("hexfarbe", 0))
         + _mehr("report-rechnet-nur", _ausnahmen("report-rechnet-nur"), 3)

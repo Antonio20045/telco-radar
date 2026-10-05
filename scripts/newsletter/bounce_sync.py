@@ -66,7 +66,6 @@ def main(argv=None) -> int:
     if not ereignisse:
         return 0
 
-    # message_id -> abo_id, aus dem Sendeprotokoll.
     zuordnung = {
         str(e.get("message_id")): str(e.get("sub"))
         for e in st.lies_jsonl(Path(args.send_log))
@@ -101,15 +100,9 @@ def main(argv=None) -> int:
         abo.bounce_hard += 1
         abo.bounce_last = ergebnis.letzter_zeitpunkt
         abo.state = "bounced"
-        # Die Adresse faellt hier NICHT weg. Ein Hard Bounce ist kein
-        # Widerruf - der Betroffene hat nichts erklaert, sein Postfach war
-        # nur nicht erreichbar. Wer sie loescht, kann eine
-        # Fehlklassifizierung nie mehr zuruecknehmen.
         store.setze(abo)
     store.speichern()
 
-    # Der zuletzt verarbeitete Zeitpunkt - sonst laufen Ereignisse doppelt,
-    # und ein zweimal gezaehlter Soft Bounce schaltet eine lebende Adresse ab.
     if ergebnis.letzter_zeitpunkt:
         stand_pfad.parent.mkdir(parents=True, exist_ok=True)
         stand_pfad.write_text(

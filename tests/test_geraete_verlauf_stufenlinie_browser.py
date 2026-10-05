@@ -42,14 +42,11 @@ SPEICHER = 256
 ANBIETER = "o2"
 LISTUNG_ID = f"{ANBIETER.lower()}--{_sku(DEVICE, SPEICHER)}"
 
-# (datum, preis) - Abstaende: 10 Tage (Grenzfall, durchgezogen), 11 Tage
-# (Grenzfall, gepunktet), 10 Tage (durchgezogen). Vier Punkte erreichen
-# `DIAGRAMM_AB_TERMINEN` (4), das Gatter oeffnet.
 _PUNKTE = [
     ("2026-08-01", 999.00),
-    ("2026-08-11", 949.00),  # +10 Tage seit 08-01 -> NICHT ueber der Schwelle
-    ("2026-08-22", 899.00),  # +11 Tage seit 08-11 -> UEBER der Schwelle
-    ("2026-09-01", 850.00),  # +10 Tage seit 08-22 -> NICHT ueber der Schwelle
+    ("2026-08-11", 949.00),
+    ("2026-08-22", 899.00),
+    ("2026-09-01", 850.00),
 ]
 
 
@@ -66,10 +63,6 @@ def _baue(tmp_path):
         )
     state = root / "data" / "state"
     state.mkdir(parents=True)
-    # DIESELBE Listung wie `_listung()`, nur mit `last_verified` auf dem
-    # LETZTEN Messpunkt (statt HEUTE) - sonst fuegt `_punkte()` einen
-    # fuenften, unkontrollierten Bestaetigungstag bei HEUTE hinzu und der
-    # sorgfaeltig gebaute 10/11/10-Tage-Rhythmus stimmt nicht mehr.
     letzt_datum, letzt_preis = _PUNKTE[-1]
     listung = _listung(ANBIETER, DEVICE, SPEICHER, letzt_preis)
     listung["last_verified"] = letzt_datum
@@ -173,9 +166,6 @@ def _browser_ctx(tmp_path_factory, chromium):
 
 @pytest.fixture(scope="module")
 def _browser_paar(tmp_path_factory, chromium):
-    # EIN Playwright-Start je Sitzung (Fixture `chromium`): ein zweiter,
-    # gleichzeitig offener stoesst auf "Sync API inside the asyncio loop"
-    # (siehe `test_ohne_attribut_keine_ausnahme_und_keine_luecken_punktierung`).
     with _browser_ctx(tmp_path_factory, chromium) as (wurzel, browser):
         yield wurzel, browser
 
@@ -262,10 +252,6 @@ def test_der_abschnitt_ueber_der_schwelle_ist_gepunktet_der_andere_nicht(seite):
     """E (Grenzfall): 10 Tage bleiben durchgezogen, 11 Tage sind gepunktet -
     am selben Diagramm, nicht in zwei Fixtures."""
     pfade = _pfade(seite)
-    # Drei Verbindungen zwischen vier Punkten: 10, 11, 10 Tage. Bei einer
-    # Messluecke > Schwelle zerfaellt der Zug in einzelne Laeufe (siehe
-    # `linienLaeufe()`); erwartet werden hier zwei durchgezogene Abschnitte
-    # (08-01..08-11, 08-22..09-01) und EIN gepunkteter (08-11..08-22).
     luecken = [p for p in pfade if p["luecke"]]
     durchgezogen = [p for p in pfade if not p["luecke"]]
     assert len(luecken) == 1, (
@@ -273,19 +259,11 @@ def test_der_abschnitt_ueber_der_schwelle_ist_gepunktet_der_andere_nicht(seite):
         f"gefunden {len(luecken)}: {pfade}"
     )
     assert durchgezogen, "kein durchgezogener Abschnitt gefunden"
-    # Der gepunktete Abschnitt traegt wirklich ein Punkt-/Strichmuster -
-    # nicht nur die Klasse, auch das gerechnete `stroke-dasharray` (die CSS-
-    # Regel fuer `--anb-strich` darf ihn nicht mit "none" ueberschreiben,
-    # siehe `style.css` `.gr-vlinie:not(...):not(.gr-vlinie--luecke)`).
     for p in luecken:
         muster = p["dasharray"]
         assert muster and muster != "none", (
             f"der gepunktete Abschnitt traegt kein Strichmuster: {p!r}"
         )
-    # GEGENPROBE: ein durchgezogener 10-Tage-Abschnitt traegt KEINE
-    # eigene Luecken-Klasse (er darf natuerlich die normale Anbieter-
-    # Strichart tragen, o2 ist "gepunktet" in `anbieter_farben.py` -
-    # deshalb wird hier nur die KLASSE geprueft, nicht das Muster selbst).
     for p in durchgezogen:
         assert not p["luecke"], p
 

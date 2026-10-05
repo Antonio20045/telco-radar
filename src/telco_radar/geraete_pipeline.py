@@ -56,15 +56,11 @@ from .collect.geraete.congstar import ergaenze_pib_slug
 from .collect.tarif_einsundeins_simonly import ANBIETER as SIMONLY_ANBIETER
 from .collect.tarif_einsundeins_simonly import sammle as sammle_simonly
 
-# PM-6 (P5): nur fuer die Protokollzeile 'Fragmentgroesse:' - rein lesend,
-# kein eigener Importpfad in die Collector/Store-Schichten.
 from . import geraete_fragment
 from .geraete_config import lade_farben, lade_katalog, lade_quellen
 
 log = logging.getLogger(__name__)
 
-# Voreinstellung des Zeitbudgets; geraete.yml uebergibt FRIST_TAGESLAUF (Stufe 0
-# haelt beide Werte des Workflows daran). Zehn Sekunden je Abruf.
 FRIST_STANDARD = 900.0
 FRIST_TAGESLAUF = 1500.0
 UNBEKANNTE_TITEL_MAX = 40
@@ -99,42 +95,14 @@ def _hole_fabrik(http_cfg: dict) -> Callable:
     def hole(
         url: str, kopfzeilen: Optional[dict] = None, user_agent: Optional[str] = None
     ):
-        # `user_agent` ist der PER-ANBIETER-UEBERSCHREIBER (Anbieter.
-        # user_agent, siehe geraete_config.py) - er baut ein EIGENES
-        # http_cfg nur fuer diesen Aufruf, das globale `http_cfg` (aus
-        # config/settings.yaml, Entscheidung E-1) bleibt fuer jeden anderen
-        # Anbieter unangetastet. `fetch()` sieht davon nichts Neues: es
-        # bekommt schlicht ein `http_cfg`, dessen `user_agent` schon den
-        # honoreichen Wert traegt, und leitet daraus PRIMARY/Fallback wie
-        # immer ab.
         cfg = http_cfg if not user_agent else {**http_cfg, "user_agent": user_agent}
         try:
             antwort = fetch(url, cfg, extra_headers=kopfzeilen or None)
         except httpx.HTTPStatusError as exc:
-            # Der Statuscode IST hier die Auskunft - 404 heisst etwas
-            # anderes als 403, und beide etwas anderes als "kein Netz".
             return (exc.response.status_code, exc.response.text)
         return (antwort.status_code, antwort.text)
 
     return hole
-
-
-# --------------------------------------------------------------------------
-# FM-2 / P1-C2: Quellentod darf nicht still bleiben
-# --------------------------------------------------------------------------
-# Zwei Meldungen, beide ohne Nebenwirkung - kein Anbieter wird gealtert,
-# geloescht oder angefasst. Der Abdeckungswaechter vergleicht die Zeilen
-# jedes Anbieters mit seinem Vortag (`GeraeteDB.ausfall_alarme`), die
-# Provider-Probe zaehlt je Abruf, wie viele der erwarteten Saetze ihre
-# Feldebenen noch tragen (Praezedenz Phase S: metric3+metric2 ==
-# monthlyPrice, damals 66/66).
-#
-# DREI KANAELE STATT EINEM (22.09.2026). Bis hierher stand der Alarm nur
-# im Actions-Log, und das Log liest niemand: 50 Laeufe waren gruen,
-# darunter die sechs Tage ohne eine einzige Telekom-Zeile. Der Alarm geht
-# jetzt zusaetzlich auf die Quellenseite (`report/geraete_view.py`) und
-# per Mail hinaus (`sende_alarm_mail`, Versandschritt in geraete.yml).
-# Alle drei sagen denselben Satz - er entsteht einmal, im Alarmobjekt.
 
 
 def _abdeckungszustand(bilanz) -> str:
@@ -198,9 +166,6 @@ def _abdeckungszustand(bilanz) -> str:
     if bilanz.status in ("uebersprungen", "nicht_umgesetzt"):
         return NICHT_GELESEN
     if getattr(bilanz, "ausserhalb_besuchszeit", False):
-        # "Gar nicht angefasst" heisst: keine gelesene Einstiegsseite,
-        # keine Listung, kein Buendelsatz. Alles drei, nicht nur die
-        # Listungen - die Telekom liefert ausschliesslich Buendel.
         gelesen = bilanz.gelesene_einstiege or bilanz.listungen or bilanz.buendel
         return TEILGELESEN if gelesen else NICHT_GELESEN
     return GELESEN if bilanz.vollstaendig else LESEFEHLER
@@ -313,9 +278,6 @@ def melde_proben(bilanzen: list) -> None:
         if not erwartete:
             continue
         bestanden = int(proben.get("bestanden", 0))
-        # Abrunden, NICHT runden: nur exakt bestanden == erwartete heisst
-        # "100 %" - bei 199 von 200 als "100 %" zu melden waere Perfektion
-        # fuer einen Einzelfehler (S3 der P5-Codepruefung).
         prozent = int(100.0 * bestanden / erwartete)
         ebenen = ", ".join(
             f"{wert}x {name}"
@@ -375,28 +337,12 @@ def nachsammle_buendel(
         adapter = ADAPTER.get(anbieter.methode) if anbieter else None
         if adapter is None:
             continue
-        # Ein Waechter je Anbieter: er fragt jede robots.txt genau einmal
-        # und haelt sie fuer die Dauer dieser Haken im Cache. Der
-        # robots-Abruf traegt den Absender DIESES Anbieters, wenn er einen
-        # eigenen hat (B2, 08.09.2026 - dieselbe Regel wie im Collector;
-        # 1&1 ist genau so ein Anbieter UND traegt einen Haken). Was der
-        # Haken danach selbst abruft, geht weiter mit den Kopfzeilen
-        # hinaus, die er bisher schon gesetzt hat - hier wird der
-        # Torwaechter nachgeruestet, nicht die Anfrage umgebaut.
         user_agent = (getattr(anbieter, "user_agent", "") or "").strip()
-        # `ua=user_agent` bindet den Wert DIESES Durchlaufs - eine
-        # Lambda, die die Schleifenvariable liest, traegt sonst den
-        # Absender des letzten Anbieters.
         waechter = RobotsWaechter(
             hole=(lambda url, ua=user_agent: hole(url, user_agent=ua))
             if user_agent
             else hole
         )
-        # DIE HAKEN-ABRUFE TRAGEN DENSELBEN ABSENDER (29.09.2026). Bis
-        # hierher ging nur der robots-Abruf mit dem Absender des Anbieters
-        # hinaus; was der Haken selbst holte, trug die globale Kennung aus
-        # settings.yaml. Seit 1&1s Haken neun Seiten mehr holt
-        # (Tarifstufen), waere das der groessere Teil seiner Abrufe.
         hole_anbieter = (
             (
                 lambda url, *args, ua=user_agent, **kwargs: hole(
@@ -462,20 +408,11 @@ def run_geraete_stage(
     und 1&1 abgerufen (Befund Runde 2, outputs/telekom-taeglich-2026-09-15.md).
     """
     beginn = time.monotonic()
-    # `x or y` ist hier verboten (Clean Code 3): ein aufrufender Test, der
-    # den Laufbeginn bewusst auf Mitternacht UTC legt, uebergibt einen
-    # datetime, der falsy sein KANN - und bekaeme dann still die echte
-    # Uhr. Seit die Uhr je Abruf gegen das Besuchsfenster rechnet, waere
-    # das kein Schoenheitsfehler mehr, sondern eine falsche Fensterprobe.
     if jetzt is None:
         jetzt = datetime.now(timezone.utc)
     root = Path(root)
 
     katalog = lade_katalog(root)
-    # E4-Auto-Erkennung: lade_katalog MERGED die Auto-Eintraege aus dem
-    # STATE dazu (eine Quelle der Wahrheit - die Seite laedt denselben
-    # Weg); der Hand-Eintrag schlaegt (gleiche device_id bleibt beim
-    # Config-Eintrag, der Rest faellt an den Kollisionswaechter).
     auto_vorher = len([g for g in katalog.geraete if g.auto])
     farben = lade_farben(root)
     quellen = lade_quellen(root)
@@ -504,23 +441,12 @@ def run_geraete_stage(
         anbieter = quellen.nach_name(bilanz.name)
         neu, gesehen = db.upsert(bilanz.listungen, heute)
         neu_gesamt += neu
-        # NUR WAS DIE DATENBANK GENOMMEN HAT, BEKOMMT EINEN HISTORIENPUNKT.
-        # `upsert` verwirft den zweiten Satz derselben ID (zwei Artikel,
-        # die die Zuordnung nicht unterscheiden konnte) - und diese Schleife
-        # schrieb ihn bis zum 04.09.2026 trotzdem in die Historie. Ergebnis:
-        # ALDI TALKs "Galaxy A17 LTE + Starter Kit" (129 EUR) und "Galaxy
-        # A17 5G" (159 EUR) treffen beide den Katalogeintrag "Galaxy A17",
-        # teilen sich eine Listungs-ID, und `geraete_preise.jsonl` trug je
-        # Tag zwei Zeilen: 13 von 15 Pfeilen in G2 zeigten eine
-        # Preisaenderung, die nie stattgefunden hat (QA-Befund B2).
         uebergangen = {id(x) for x in getattr(db, "uebergangen", [])}
         for listung in bilanz.listungen:
             if id(listung) in uebergangen:
                 continue
             if historie.schreibe(listung, heute):
                 punkte += 1
-        # Ueber ALLE Anbieter sammeln: `db.kollisionen` gilt je Aufruf, und
-        # am Ende der Schleife stand nur die Liste des letzten Anbieters.
         kollisionen.extend(getattr(db, "kollisionen", []))
         if bilanz.vollstaendig:
             leitseite = (
@@ -535,22 +461,6 @@ def run_geraete_stage(
                 gelesene_einstiege=bilanz.gelesene_einstiege,
                 leitseite=leitseite,
             )
-        # Die Buchfuehrung unterscheidet zwei Dinge, die vorher in einem
-        # Handgriff steckten: `laeufe` (zaehlt nur VOLLSTAENDIGE Laeufe -
-        # ein ausgefallener Abruf darf keine Marke zum SIM-only-Anbieter
-        # erklaeren) und die MESSTERMINE (jeder Tag, an dem Listungen
-        # wirklich gesehen wurden, auch in einem Teillauf). mobilcom-debitel
-        # bestaetigte jede Nacht seine Listungen, wurde am Zeitbudget aber
-        # nie fertig - und fehlte deshalb komplett in der Bilanz.
-        #
-        # SEIT DEM 22.09.2026 OHNE VORBEDINGUNG (P1/C2): protokolliert wird
-        # JEDER Anbieter, auch der, der nichts geliefert hat. Die alte
-        # Bedingung `vollstaendig or listungen` liess genau den Fall
-        # spurlos, um den es beim Abdeckungswaechter geht - ein Anbieter,
-        # der heute ausfaellt, hinterliess keinen Messtag und war vom
-        # Vortag nicht zu unterscheiden. `laeufe` und `termine` bleiben an
-        # ihre alten Bedingungen gebunden (im Store), nur das Journal
-        # bekommt jeden Tag.
         versucht, tote = _adressbilanz(bilanz)
         db.protokolliere_lauf(
             bilanz.name,
@@ -573,18 +483,10 @@ def run_geraete_stage(
                 "gelesen": len(bilanz.gelesene_einstiege),
                 "produkte_abgerufen": bilanz.produkte_abgerufen,
                 "rohsaetze": bilanz.rohsaetze,
-                # FM-2: die Zaehler der Provider-Probe (leer, wenn der Adapter
-                # keine kennt) - gemeldet wird sie unten, siehe `melde_proben`.
                 "proben": dict(bilanz.proben),
                 "gedeckelt": bilanz.gedeckelt,
                 "vollstaendig": bilanz.vollstaendig,
                 "nicht_verlinkt": bilanz.nicht_verlinkt,
-                # Die tote-Adressen-Zahl gehoert ins Protokoll und nicht nur
-                # ins Log: sie ist der Grund, warum ein Lauf mit Luecken
-                # trotzdem vollstaendig heisst, und ohne sie sieht eine
-                # veraltete Sitemap wie ein sauberer Lauf aus. Dieselben zwei
-                # Werte wie im Bestand, aus derselben Rechnung - zwei
-                # Ausdruecke waeren zwei Wahrheiten (Clean Code 7).
                 "produkte_versucht": versucht,
                 "tote_adressen": tote,
             }
@@ -593,40 +495,6 @@ def run_geraete_stage(
     historie.save()
     db.save(heute)
 
-    # --- Der Massstab aus dem Tarifbestand - und die Buendel dazu.
-    #
-    # `geraete_tco.json` gab es bis zum 04.09.2026 nicht: null Buendel, null
-    # SIM-only-Referenzen, also keine einzige rechenbare TCO. Seit dem
-    # 04.09.2026 stehen BEIDE Seiten: die Referenzen aus `tarife.jsonl`
-    # (was ein Tarif OHNE Geraet kostet) und die Buendel aus den
-    # Buendel-Einstiegen der Anbieter (`kind: buendel`).
-    #
-    # Sie stehen in DIESER Reihenfolge, und das ist keine Kosmetik: ein
-    # Buendel ohne aufloesbaren Tarif wird verworfen, und aufloesen kann
-    # nur, wer den Tarifbestand gelesen hat. Beides braucht denselben
-    # `Tarifbestand`, er wird deshalb einmal geladen.
-    #
-    # Das steht HIER und nicht im Renderer. Eine Zahl, die beim Rendern
-    # entsteht, ist keine Messung, sondern eine Ableitung - und zwei
-    # Ableitungen derselben Zahl an zwei Orten sind zwei Zahlen. Der
-    # naechtliche Lauf ist der Ort, an dem der Geraetebestand entsteht;
-    # die Referenzen gehoeren in dieselbe Datei und denselben Commit.
-    #
-    # TARIFNAMEN AUFLOESEN, BEVOR DER TARIFBESTAND BEFRAGT WIRD (B1,
-    # 05.09.2026): manche Anbieter (Vodafone) nennen in ihrer Buendelantwort
-    # keinen Klarnamen, nur einen Hash - ein zweiter, GEZIELTER Abruf je
-    # Geraet (nicht je Rohsatz) kann ihn nachliefern (siehe
-    # `vodafone.loese_tarifnamen`). Das gehoert hierher und nicht in den
-    # Adapter: ein `lies_buendel()` bleibt ein reiner Text-zu-Daten-
-    # Uebersetzer ohne eigenes Netz, diese Stufe darf zusaetzliche GETs
-    # machen. Ein Fehler hier darf den Geraetebestand nicht kosten - er
-    # ist zu diesem Zeitpunkt schon gespeichert.
-    #
-    # S2-C (09.09.2026): dieselbe Stelle traegt jetzt auch den
-    # BETRAGS-Haken `Adapter.ergaenze_buendel` (1&1: die
-    # Bereitstellungsgebuehr steht erst im Tarifdetails-Iframe). Beide
-    # Haken laufen NACH dem Sammeln und VOR `aus_rohsaetzen` - was sie
-    # an die Rohsaetze schreiben, landet im selben Zug im Bestand.
     nachsammle_buendel(ergebnis["anbieter"], quellen, hole)
 
     rohbuendel = [
@@ -639,31 +507,10 @@ def run_geraete_stage(
     geschrieben = False
     try:
         bestand = Tarifbestand.aus_datei(zustand / "tarife.jsonl")
-        # DIE CONGSTAR-BRUECKE (B3, 08.09.2026): congstar nummeriert Tarif
-        # und Pflichtblatt mit derselben Zahl (PlanVariant 540 verlinkt
-        # Produktinformationsblatt_540.pdf, der Bestandssatz desselben
-        # Tarifs traegt dieselbe Adresse). Die Nummer ist das Pendant zum
-        # "Handy hinzufügen"-Slug der o2-Kachel: der Anbieter stellt die
-        # Verbindung her, dieses Modul liest sie nur nach - am Bestandssatz
-        # und am Buendel-Rohsatz (congstar.lies_buendel). Ohne sie fielen
-        # vier der acht congstar-PlanVarianten unter "ohne aufloesbaren
-        # Tarif", weil der Seiten-Titel ("Allnet Flat S") und der Blattname
-        # ("Allnet Flat S mit GB+") sich ueber den Namen nie treffen.
-        # Zur Laufzeit und nicht dauerhaft am Bestand: die Zeitreihe in
-        # tarife.jsonl bleibt unberuehrt.
         ergaenze_pib_slug(bestand)
         tarife = len(bestand)
         referenzen = aus_bestand(bestand)
         if not referenzen:
-            # "NICHT GELESEN" IST NICHT "LEER". `Tarifbestand.aus_datei`
-            # wirft bei fehlender Datei nicht, sondern liefert einen leeren
-            # Bestand - ein Baseline-Reset, ein Merge-Konflikt oder ein
-            # Wettlauf mit `radar.yml` saehe damit aus wie "es gibt keine
-            # Tarife mehr", und `ersetze_referenzen` loeschte den ganzen
-            # Massstab. Dieselbe Fehlerklasse wie bei
-            # `promo_store.mark_stale` ohne `gepruefte_seiten` und beim
-            # `PromoExtractionError`, beide in CLAUDE.md § 6 als teuer
-            # dokumentiert.
             log.warning(
                 "Tarif-Referenzen: der Tarifbestand liefert keine "
                 "einzige Referenz (%d Saetze gelesen) - der "
@@ -671,29 +518,7 @@ def run_geraete_stage(
                 tarife,
             )
         else:
-            # S-5 (09.09.2026): 1&1-SIM-only-Referenzen von der SIM-only-Seite
-            # des Anbieters. Bis heute entstanden sie als Ableitung aus dem
-            # ld+json von `/handytarife` (der Seite MIT Handy) - Name und
-            # Grundgebuehr, ohne Phase, Volumen oder Anschlusspreis. Die
-            # dedizierte Messung (`collect/tarif_einsundeins_simonly.py`)
-            # traegt all das und ersetzt deswegen fuer DIESEN Anbieter die
-            # Bestandsableitung in der Ersetzungsmenge - dieselbe Logik wie
-            # `_bevorzugt_live` in `tarif_referenzen`: von zwei Lesarten
-            # desselben Tarifs gewinnt die bessere Messung, die schlechtere
-            # bleibt im Tarifbestand stehen.
-            #
-            # Misslingt die Messung (Netz, robots, Parse), bleiben die
-            # Bestandsreferenzen von ganz oben in der Menge - ein Ausfall
-            # darf den Massstab nicht leeren. Und der Merge steht UNTER
-            # dem Leere-Waechter von eben: waere der Tarifbestand selbst
-            # unlesbar, duerfen auch die gemessenen 1&1-Saetze keinen
-            # TEILBESTAND schreiben, der die Fremd-Referenzen beim
-            # Ersetzen loescht.
             try:
-                # Der Scope entscheidet auch ueber DIESEN Abruf: ein
-                # Lokallauf, der 1&1 nicht misst, ruft 1&1 auch nicht ab
-                # (Befund Runde 2: 10 Requests an 1und1.de aus dem
-                # Telekom-Lauf vom 15.09.2026).
                 if (
                     referenz_anbieter is not None
                     and SIMONLY_ANBIETER not in referenz_anbieter
@@ -710,16 +535,6 @@ def run_geraete_stage(
                     exc,
                 )
             if simonly_refs:
-                # NUR ERSETZEN, WAS DIE MESSUNG AUCH MISST (Review B3,
-                # 09.09.2026): Wirft das Kreuzzeug einzelne Tarife weg
-                # (Kachel und ld+json uneinig) oder verliert eine Kachel
-                # ihren Titel, wuerde ein pauschaler Anbieter-Filter genau
-                # diese aus der Ersetzungsmenge nehmen - und
-                # `ersetze_referenzen` LOESCHT ihre Bestandssaetze. Die
-                # Bündel dieser Tarife verloeren still ihren Massstab.
-                # Ein Tarif, den die Messung nicht hergibt, behaelt deshalb
-                # seine Bestandsableitung; die Zahl der Rueckfaelle steht
-                # im Protokoll.
                 gemessen = {r.tarif_name for r in simonly_refs}
                 zurueckgefallen = sum(
                     1
@@ -740,9 +555,6 @@ def run_geraete_stage(
                     f", {zurueckgefallen} nur im Bestand" if zurueckgefallen else "",
                 )
             tco = TcoDB(zustand / "geraete_tco.json")
-            # ERSETZEN, nicht ergaenzen: die Referenzen sind abgeleitet und
-            # entstehen bei jedem Lauf neu. Ergaenzt wuechse der Bestand bei
-            # jeder Umbenennung eines Tarifs - siehe `ersetze_referenzen`.
             _, entfernt = tco.ersetze_referenzen(
                 referenzen, heute, anbieter=referenz_anbieter
             )
@@ -752,25 +564,12 @@ def run_geraete_stage(
                     entfernt,
                 )
             if rohbuendel:
-                # AUFFRISCHEN, nicht ersetzen - anders als die Referenzen.
-                # Ein Buendel ist eine MESSUNG an einer Anbieterseite, keine
-                # Ableitung aus dem Tarifbestand; faellt der Abruf einer
-                # Nacht aus, darf sein Verschwinden nicht als "gibt es nicht
-                # mehr" gelten. Dieselbe Haltung wie bei `GeraeteDB`, die
-                # nichts loescht.
                 buendelbilanz = aus_rohsaetzen(rohbuendel, bestand, heute)
                 if buendelbilanz.buendel:
                     neue_buendel, _ = tco.upsert_buendel(buendelbilanz.buendel, heute)
             tco.save(heute)
-            # ERST HIER. `save()` kann werfen (Platte, Rechte, Pfad), und
-            # der Auffangboden unten faengt das ab - eine Bilanz, die schon
-            # vorher "25 Referenzen" meldet, ist genau im einzigen Fall
-            # blind, fuer den sie gebaut ist.
             geschrieben = True
     except Exception as exc:  # noqa: BLE001
-        # Ein Fehler hier darf den Geraetebestand nicht kosten - der ist
-        # zu diesem Zeitpunkt schon gespeichert, und ein Messtag ist nicht
-        # nachholbar (Lauf 31422689829).
         log.warning("SIM-only-Referenzen nicht geschrieben: %s", exc)
     log.info(
         "Tarif-Referenzen: %d SIM-only-Referenzen aus %d Tarifen%s",
@@ -778,10 +577,6 @@ def run_geraete_stage(
         tarife,
         "" if geschrieben else " - NICHT GESCHRIEBEN",
     )
-    # Die Buendelzeile steht AUCH da, wenn nichts ankam: "0 von 0" heisst
-    # "kein Anbieter liefert Buendel", "0 von 63" heisst "der Tarifbestand
-    # traegt ihre Tarife nicht" - zwei ganz verschiedene Arbeitslisten, und
-    # ohne beide Zahlen sind sie nicht zu unterscheiden.
     log.info(
         "Buendel: %d von %d Rohsaetzen uebernommen (%d neu)%s%s",
         len(buendelbilanz.buendel) if buendelbilanz else 0,
@@ -794,8 +589,6 @@ def run_geraete_stage(
     )
 
     if kollisionen:
-        # Die Arbeitsliste fuer den Katalog: zwei Artikel auf einer ID sind
-        # zwei Produkte, die der Katalog nicht auseinanderhaelt.
         log.warning(
             "Geraeteradar: %d Kollisionen - zwei Artikel desselben "
             "Laufs auf einer Listungs-ID, der zweite ist weder "
@@ -804,9 +597,6 @@ def run_geraete_stage(
             "; ".join(f"{lid} <- {titel!r}" for lid, titel in kollisionen[:12]),
         )
 
-    # E4-AUTO-ERKENNUNG: den gewachsenen Katalog und die unbekannten
-    # Titel/Farben persistieren. Beides ist STATE und wird vom Lauf
-    # geschrieben (geraete.yml committet ihn mit) - nie von Hand gepflegt.
     auto_eintraege = [g for g in katalog.geraete if g.auto]
     auto_neu = max(0, len(auto_eintraege) - auto_vorher)
     if auto_eintraege:
@@ -846,20 +636,13 @@ def run_geraete_stage(
         "unbekannte_farben": sorted(
             {f for b in ergebnis["anbieter"] for f in b.unbekannte_farben}
         )[:40],
-        # Zwei Zahlen, nicht eine: `rohbuendel` sagt, was die Anbieter
-        # geliefert haben, `buendel` was davon einen Tarif im Bestand hat.
         "rohbuendel": len(rohbuendel),
         "buendel": len(buendelbilanz.buendel) if buendelbilanz else 0,
         "buendel_neu": neue_buendel,
         "buendel_ohne_tarif": buendelbilanz.ohne_tarif if buendelbilanz else 0,
         "kollisionen": len(kollisionen),
-        # E4-Auto-Erkennung: wie viele Katalog-Eintraege der Lauf selbst
-        # angelegt hat, und wie gross der Auto-Bestand danach ist.
         "auto_neu": auto_neu,
         "auto_eintraege": len(auto_eintraege),
-        # Der Massstab aus dem Tarifbestand - in der Bilanz, damit ein
-        # stiller Ausfall auffaellt. Steht hier 0, waehrend `tarife.jsonl`
-        # gefuellt ist, hat der Schreibversuch geworfen.
         "sim_only_referenzen": len(referenzen) if geschrieben else 0,
         "tarife_im_bestand": tarife,
         "sekunden": round(time.monotonic() - beginn, 1),
@@ -877,10 +660,6 @@ def run_geraete_stage(
     )
     for satz in bilanzen:
         if satz["status"] != "ok":
-            # Die Zahlen gehoeren in DIESE Zeile. Ein Anbieter, der 84
-            # Listungen liefert und trotzdem "fehler" heisst, ist erklaerbar
-            # (der Einstieg galt als unvollstaendig gelesen) - aber nur, wenn
-            # das Protokoll die 84 auch nennt.
             log.info(
                 "Geraeteradar: %s -> %s, %d Listungen aus %d Produktseiten "
                 "(%d Preissaetze gelesen) (%s)",
@@ -892,12 +671,6 @@ def run_geraete_stage(
                 satz["grund"][:160],
             )
         if satz["tote_adressen"]:
-            # EIGENE ZEILE, und zwar auch fuer einen Anbieter mit Status
-            # "ok": genau dort steht sie sonst nirgends. Ein Lauf, der als
-            # vollstaendig gebucht wird, obwohl ein Teil seiner Quelle ins
-            # Leere zeigt, muss das sagen - sonst waechst die Luecke still,
-            # bis sie die Schwelle reisst und der Anbieter ueber Nacht als
-            # Ausfall dasteht.
             log.info(
                 "Geraeteradar: %s -> %d von %d Produktadressen tot "
                 "(HTTP 404/410, von der Quelle selbst verlinkt), %d "
@@ -908,29 +681,11 @@ def run_geraete_stage(
                 satz["produkte_abgerufen"],
                 "vollständig" if satz["vollstaendig"] else "unvollständig",
             )
-    # FM-2 / P1-C2: Quellentod darf nicht still bleiben. Beide Meldungen
-    # greifen in nichts ein - der Alarm altert nicht und loest nichts (die
-    # Auslistung bleibt allein an `vollstaendig` gebunden), die Probe
-    # ebensowenig. `nur` begrenzt auf DIESEN Lauf: ein nicht mehr
-    # konfigurierter Anbieter wird nicht mehr beobachtet und darf keine
-    # Ewigkeitsmeldung geben.
-    #
-    # `heute` wird ausdruecklich uebergeben: der Lauf fragt nach SEINEM
-    # Tag, nicht nach dem juengsten im Bestand. Ein Lauf, der einen
-    # nachgereichten aelteren Tag schreibt, soll auch dessen Abdeckung
-    # beurteilen.
     alarme = db.ausfall_alarme(nur={satz["anbieter"] for satz in bilanzen}, heute=heute)
     melde_ausfall(alarme)
-    # In die Bilanz, nicht nur ins Log: der Tageslauf gibt sie an
-    # `run_geraete_stage`s Aufrufer zurueck (der Wochenlauf legt sie in
-    # `stats` ab), und ein Alarm, der nur im Log steht, ist beim naechsten
-    # Blick auf die Seite nicht mehr da.
     bilanz["abdeckung_alarme"] = [a.als_dict() for a in alarme]
     melde_proben(bilanzen)
     if bilanz["unbekannte_titel"]:
-        # Die Arbeitsliste fuer config/geraete_katalog.yaml. Sie stand bisher
-        # nur in der Rueckgabe - und der naechtliche Lauf gibt an niemanden
-        # zurueck, sein einziger Kanal ist dieses Protokoll.
         log.info(
             "Geraeteradar: %d Titel ohne Katalogtreffer (Arbeitsliste "
             "fuer config/geraete_katalog.yaml): %s",
@@ -943,15 +698,6 @@ def run_geraete_stage(
             "fuer config/farben.yaml): %s",
             ", ".join(bilanz["unbekannte_farben"]),
         )
-    # Zwei Katalog-Arbeitslisten: Modelle ohne belegtes Marktstartdatum
-    # (ohne sie gibt es keine Nachfolger-Analyse) und Vorgaenger-Bezuege,
-    # die auf kein Katalogmodell zeigen (Konfigurationsfehler). Beide
-    # standen bis zum 03.09.2026 als Absaetze in der Sektion "Datenbasis
-    # und Luecken" auf geraete.html - Antonio hat die Sektion kassiert,
-    # und das Protokoll ist seit je der Kanal fuer Arbeitslisten des
-    # naechtlichen Laufs. Der MARKTSTART ist der eine Punkt, den nur ein
-    # Mensch schliessen kann; ohne diese Zeile waere die Liste still
-    # verschwunden.
     ohne_start = [g.modell for g in katalog.geraete if not g.marktstart]
     if ohne_start:
         log.info(
@@ -973,18 +719,6 @@ def run_geraete_stage(
             "config/geraete_katalog.yaml: %s",
             " | ".join(ohn_kette[:25]),
         )
-    # PM-6 / P5 Auftrag 4 (18.09.2026): die taegliche Fragmentgroesse als
-    # EINE einzeilige Protokollzeile - die drei Zahlen (Messtage, Messpaare,
-    # Fragment-KB), aus EINER Quelle wie das Skript
-    # (scripts/geraete_fragment_wachstum.py liest dieselbe Funktion). Sie
-    # ist der Fruehindikator aus Premortem FM 3: das Zeitreihen-Fragment
-    # waechst mit jedem Messtag, und die Deckel-Entscheidung vom 01.10.
-    # braucht die Reihe, nicht einen einzelnen Schaetzwert. Bewusst ans ENDE
-    # und bewusst NUR LESEND: die Historie ist zu diesem Punkt frisch
-    # geschrieben, die Fragmente auf Platt stammen vom letzten Render (der
-    # Render-Schritt des Workflows laeuft NACH diesem Schritt) - die Zeile
-    # nennt das selbst. Fehlt die Historie, bleibt die Zeile weg (kein
-    # Messpunkt 0/0/0).
     zeile = geraete_fragment.protokoll_zeile(root)
     if zeile:
         log.info("%s", zeile)

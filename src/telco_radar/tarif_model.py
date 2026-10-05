@@ -42,31 +42,10 @@ import re
 from dataclasses import dataclass, field, asdict
 from typing import Optional
 
-# Die Felder, ohne die ein Dokument kein auswertbarer Tarif ist. Ein PIB ohne
-# Preis UND ohne Laufzeit ist ein Deckblatt, eine AGB-Seite oder ein Layout,
-# das dieser Extraktor nicht kennt.
 PFLICHTFELDER = ("grundgebuehr", "laufzeit_monate")
 
 HOCH, MITTEL, NIEDRIG = "hoch", "mittel", "niedrig"
 
-# WOHER DER PREIS KOMMT - und warum das ein eigenes Feld ist.
-#
-# Bis zum 04.09.2026 stammte jeder Satz in `tarife.jsonl` aus einem
-# Pflichtdokument nach § 1 TK-TransparenzV. Das ist die belastbarste Quelle
-# dieses Marktes, aber nicht die aktuellste: das Blatt traegt den
-# Vermarktungsstand, die Shop-Seite den heutigen Aktionspreis. Beide sind
-# richtig, und sie duerfen auseinanderlaufen.
-#
-# Sie in dieselbe Spalte zu schreiben, ohne den Unterschied mitzufuehren,
-# waere derselbe Fehler wie o2s Ratengesamtbetrag neben freenets Barpreis
-# (`geraete_model.Ratenzahlung`): gleiche Optik, andere Groesse. Deshalb
-# traegt jeder Satz, woher seine Zahl kommt.
-#
-# `dokument`   Produktinformationsblatt / Vertragszusammenfassung. Der
-#              Vorgabewert - jeder Bestandssatz aus der Zeit davor ist das.
-# `live_shop`  Strukturierte Daten einer Shop-Seite (schema.org). Der Preis,
-#              den der Anbieter heute bewirbt, ohne gesetzliche
-#              Wahrheitsbewehrung und ohne die Pflichtfelder des Blattes.
 PREISTYP_DOKUMENT = "dokument"
 PREISTYP_LIVE_SHOP = "live_shop"
 PREISTYPEN = (PREISTYP_DOKUMENT, PREISTYP_LIVE_SHOP)
@@ -108,14 +87,6 @@ def zeitreihen_basis(tid: str) -> str:
     return tid[: -len(zusatz)] if tid.endswith(zusatz) else tid
 
 
-# DAS GERAETEBLATT EINES TARIFS (P3, 28.09.2026). Vodafone veroeffentlicht
-# jeden Tarif zweimal: als reines Tarifblatt ("Vodafone Mobil M") und mit
-# der Geraetestaffel ("Vodafone Mobil M mit Smartphone") - derselbe Vertrag,
-# zwei Blaetter, derselbe Preis ohne Geraet. EINE Stelle fuer den Zusatz:
-# `ist_geraeteblatt_von` ist die Regel: `analyze/tarif_referenzen` streicht
-# damit die Dublette unter den SIM-only-Massstaeben, `tarif_bezug` haengt
-# ein Buendel an das Geraeteblatt, und `vertrag_basis` fuehrt beide IDs auf
-# denselben Vertrag zurueck.
 GERAETEBLATT_ZUSATZ = re.compile(r"\s+mit\s+(?:Smartphone|Handy|Endger[aä]t)\s*$", re.I)
 _GERAETEBLATT_ID = re.compile(r"-mit-(?:smartphone|handy|endgeraet)$")
 
@@ -177,8 +148,8 @@ class Preisphase:
     und nicht zwei Felder. Ein Tarif mit drei Phasen kommt vor.
     """
 
-    von_monat: int  # 1-basiert, einschliesslich
-    bis_monat: Optional[int]  # einschliesslich; None = bis Vertragsende
+    von_monat: int
+    bis_monat: Optional[int]
     betrag: float
 
     def monate(self, laufzeit: int) -> int:
@@ -200,9 +171,8 @@ class Tarif:
 
     anbieter: str = ""
     name: str = ""
-    art: str = ""  # "mobilfunk" | "festnetz" | ""
+    art: str = ""
 
-    # --- Preis
     grundgebuehr: Optional[float] = None
     grundgebuehr_nach_rabatt: Optional[float] = None
     preisphasen: list[Preisphase] = field(default_factory=list)
@@ -210,45 +180,28 @@ class Tarif:
     anschlusspreis_nach_erstattung: Optional[float] = None
     geraetepreisstaffel: list[Geraetepreis] = field(default_factory=list)
 
-    # --- Leistung
     datenvolumen_gb: Optional[float] = None
     volumen_automatik: str = ""
-    speed_down_max: Optional[float] = None  # MBit/s
+    speed_down_max: Optional[float] = None
     speed_up_max: Optional[float] = None
-    drossel_down: Optional[float] = None  # KBit/s
+    drossel_down: Optional[float] = None
     drossel_up: Optional[float] = None
     allnet_flat: Optional[bool] = None
     sms_flat: Optional[bool] = None
 
-    # --- Vertrag
     laufzeit_monate: Optional[int] = None
     kuendigungsfrist_monate: Optional[int] = None
-    # Unter welchem Slug der Anbieter DENSELBEN Tarif im Geraetebuendel
-    # fuehrt. Kein Leistungsmerkmal, sondern ein Fremdschluessel: o2 nennt
-    # seinen Tarif in der SIM-only-Kachel "O2 Mobile on Demand M" und im
-    # Geraetekatalog "O<sub>2</sub> Mobile on Demand M Plus mit 50 GB+
-    # (24 Mon.)" - die zwei Namen treffen sich nie, der Slug
-    # (`o2-mobile-on-demand-m-plus`) steht auf BEIDEN Seiten und wird von
-    # o2 selbst gesetzt. `tarif_bezug.ueber_slug` loest damit auf; leer
-    # heisst "der Anbieter stellt diese Verbindung nicht her".
     buendel_slug: str = ""
 
-    # --- Herkunft
     dokument_url: str = ""
     dokument_hash: str = ""
     versionsstand: str = ""
     abgerufen_am: str = ""
     rohtext: str = ""
-    # Aus welcher Art Quelle der Preis stammt (siehe PREISTYPEN oben). Der
-    # Vorgabewert ist `dokument`, damit jeder Bestandssatz aus der Zeit vor
-    # dem 04.09.2026 beim Wiedereinlesen genau das bleibt, was er war.
     preistyp: str = PREISTYP_DOKUMENT
 
-    # --- Nachweis
-    confidence: dict = field(default_factory=dict)  # feld -> hoch/mittel/niedrig
-    fundstellen: dict = field(default_factory=dict)  # feld -> Textzeile
-
-    # ------------------------------------------------------------------ #
+    confidence: dict = field(default_factory=dict)
+    fundstellen: dict = field(default_factory=dict)
 
     def setze(self, feld: str, wert, beleg: str, guete: str = HOCH) -> None:
         """Einen Wert MIT Beleg setzen. Der einzige vorgesehene Weg.
@@ -305,9 +258,6 @@ class Tarif:
 
     def als_dict(self) -> dict:
         d = asdict(self)
-        # Der Rohtext ist der Beleg, aber er gehoert nicht in jede Zeile der
-        # Zeitreihe - er verdoppelt die Datei und aendert sich mit jedem
-        # Zeilenumbruch des Anbieters.
         d.pop("rohtext", None)
         return d
 
@@ -346,7 +296,6 @@ def zahl(roh: str) -> Optional[float]:
     s = re.sub(r"[^\d,.\-]", "", s)
     if not s:
         return None
-    # Tausenderpunkt nur, wenn danach genau drei Ziffern stehen.
     s = re.sub(r"\.(?=\d{3}(?:\D|$))", "", s)
     s = s.replace(",", ".")
     try:

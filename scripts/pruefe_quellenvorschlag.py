@@ -64,38 +64,13 @@ from telco_radar.collect.http import configure_throttle  # noqa: E402
 from telco_radar.config import Source, load_config  # noqa: E402
 from telco_radar.models import normalize_url  # noqa: E402
 
-# --------------------------------------------------------------------------- #
-# Schwellen aus AUFTRAG_QUELLEN_AUSBAU.md Abschnitt 4. Bewusst hier als
-# Konstanten und nicht als CLI-Schalter: wer sie senken will, soll das im Diff
-# begruenden muessen.
-# --------------------------------------------------------------------------- #
-MIN_ITEMS = 5  # Kriterium 2
-MIN_DATED_SHARE = 0.80  # Kriterium 3
-MIN_FRESH = 1  # Kriterium 4
-MAX_NAV_SHARE = 0.20  # Kriterium 5: Anteil verdaechtiger "Titel"
-# Kriterium 5, zweite Haelfte: Anteil VERSCHIEDENER Titel. Gemessen am
-# SEC-EDGAR-Feed von AT&T, der technisch sauber 40 datierte Meldungen liefert -
-# alle mit dem Titel "8-K - Current report". Formal Ueberschriften, inhaltlich
-# Formularbezeichnungen: der Analyst kann daraus nichts machen und im Bericht
-# stuenden 40 identische Zeilen. Die Navigationslabel-Regel greift dort nicht,
-# weil so ein Titel weder kurz noch ein Menuepunkt ist.
+MIN_ITEMS = 5
+MIN_DATED_SHARE = 0.80
+MIN_FRESH = 1
+MAX_NAV_SHARE = 0.20
 MIN_DISTINCT_SHARE = 0.60
-# Kriterium 7: ab diesem Anteil gemeinsamer Meldungs-URLs gilt eine Quelle als
-# derselbe Inhalt unter anderem Pfad - also als Dublette, nicht als zweite Quelle.
-#
-# Gerechnet wird gegen die KLEINERE der beiden Mengen (Ueberdeckungskoeffizient
-# |A geschnitten B| / min(|A|,|B|)), nicht gegen die Kandidatenmenge. Der
-# Unterschied ist nicht akademisch: libertyglobal.com/wp-json liefert 25
-# Meldungen und enthaelt alle 10 des konfigurierten libertyglobal.com/feed.
-# Gegen die Kandidatenmenge gerechnet waeren das 40 % - unauffaellig, obwohl
-# die bestehende Quelle vollstaendig darin aufgeht. Gegen die kleinere Menge
-# sind es 100 %, und das ist die richtige Antwort: eine Obermenge derselben
-# Meldungen ist eine Dublette, keine zweite Quelle.
 MAX_ITEM_OVERLAP = 0.70
 
-# Verbreitungsdienste, die als Fremddomain ausdruecklich erlaubt sind
-# (Kriterium 6) - sie sind der offizielle Kanal des Unternehmens, nicht
-# Presse-ueber-das-Unternehmen. Trotzdem gehoert die Begruendung ins YAML.
 ERLAUBTE_FREMDDOMAINS = {
     "cision.com",
     "news.cision.com",
@@ -111,8 +86,6 @@ ERLAUBTE_FREMDDOMAINS = {
     "sec.gov",
 }
 
-# Kriterium 5: Navigationslabels, Rubrikenzeilen, Cookie-Banner. Ein "Titel",
-# der komplett so aussieht, ist keine Ueberschrift.
 _NAV_WORTE = re.compile(
     r"^(mehr( erfahren| anzeigen| lesen)?|weiterlesen|read more|learn more|more"
     r"|news|newsroom|press|presse|pressemitteilungen|media|medien|kontakt"
@@ -126,7 +99,6 @@ _NAV_WORTE = re.compile(
     r"|zustimmen|ablehnen|reject|einstellungen|settings|details)\.?$",
     re.IGNORECASE,
 )
-# Reine Datumszeilen ("12.03.2026", "March 12, 2026", "2026-03-12")
 _NUR_DATUM = re.compile(
     r"^\W*(\d{1,2}[./-]\d{1,2}[./-]\d{2,4}|\d{4}-\d{2}-\d{2}"
     r"|(jan|feb|m(a|ä)r|apr|ma(i|y)|jun|jul|aug|sep|o(k|c)t|nov|de(z|c))"
@@ -179,9 +151,6 @@ def _ist_navigationslabel(titel: str) -> bool:
         return True
     if _NUR_DATUM.match(t):
         return True
-    # Sehr kurz UND wenige Woerter: typisch fuer Menuepunkte. Der Collector
-    # laesst so etwas nur mit allow_short_titles durch - genau dort muss der
-    # Check also nochmal hinschauen.
     if len(t) < 25 and len(t.split()) <= 3:
         return True
     return False
@@ -193,10 +162,10 @@ class Kandidat:
     type: str = "newsroom"
     operator: str = ""
     thema: str = ""
-    name: str = ""  # Anzeigename einer Themenquelle ("OpenAI")
+    name: str = ""
     label: str = ""
     begruendung: str = ""
-    website: str = ""  # erwartete Unternehmensdomain (Kriterium 6)
+    website: str = ""
     item_selector: str | None = None
     link_template: str | None = None
     headers: dict | None = None
@@ -205,10 +174,7 @@ class Kandidat:
     allow_short_titles: bool = False
     ausnahme_frische: str = ""
     ausnahme_domain: str = ""
-    # Rein beschreibende Felder. Sie beeinflussen die Pruefung nicht, werden
-    # aber mit ins Ergebnis geschrieben, damit aus der bestandenen Liste ohne
-    # zweiten Durchgang ein Watchlist-Eintrag werden kann.
-    kanal: str = ""  # IR | Technik-Blog | Landesgesellschaft | Produkt
+    kanal: str = ""
     neuer_betreiber: bool = False
     country: str = ""
     region: str = ""
@@ -294,40 +260,17 @@ class Befund:
         }
 
 
-# --------------------------------------------------------------------------- #
-# Bestand: alles, was schon konfiguriert ist. Gegen diesen Index laeuft die
-# Dublettenpruefung (Kriterium 7).
-# --------------------------------------------------------------------------- #
 class Bestand:
     def __init__(self, root: Path):
         self.root = root
-        self.nach_url: dict[str, str] = {}  # normalisierte URL -> Beschreibung
+        self.nach_url: dict[str, str] = {}
         self.je_operator: dict[str, list[Source]] = {}
-        # Kriterium 10: Meldungs-URLs der BESTEHENDEN Quellen, einmal
-        # eingesammelt statt je Kandidat neu. Vorher rief die
-        # Inhaltsdublettenpruefung fuer jeden Kandidaten alle Quellen seines
-        # Betreibers live ab - bei 1000 Kandidaten waeren das mehrere tausend
-        # zusaetzliche Abrufe gegen dieselben Server, also genau der Weg in
-        # 429/403. Leer heisst "nicht aufgebaut": dann faellt die Pruefung auf
-        # den alten Live-Weg zurueck.
-        #
-        # Geschluesselt nach DOMAIN, nicht nach Betreiber. Der Grund ist teuer
-        # gelernt: die Betreiberschluesselung liess Themenquellen komplett
-        # ungeprueft durch, weil sie gar keinen Betreiber tragen. Im ersten
-        # Massendurchgang bestanden dadurch 15 von 34 Kandidaten, die in
-        # Wahrheit nur URL-Varianten bereits konfigurierter Quellen waren -
-        # newsroom.arm.com/feed neben newsroom.arm.com/rss, apple.com/
-        # newsroom/rss-feed.rss/rss neben .../rss-feed.rss. Ueber die Domain
-        # greift die Pruefung fuer JEDEN Kandidaten, mit und ohne Betreiber.
         self.item_index: dict[str, dict[str, set[str]]] = {}
         self.alle_quellen: list[Source] = []
-        # Domains, auf denen ueberhaupt schon eine Quelle konfiguriert ist.
-        # Gebraucht, um "keine Vergleichsquelle" von "Vergleichsquelle war
-        # beim Indexbau tot" zu unterscheiden - siehe Kriterium 7b.
         self.domains_mit_quelle: set[str] = set()
         try:
             cfg = load_config(root)
-        except Exception:  # noqa: BLE001 - der Check soll auch ohne Config laufen
+        except Exception:  # noqa: BLE001
             self.http_cfg: dict = {}
             return
         self.http_cfg = cfg.settings.get("http", {}) or {}
@@ -347,8 +290,6 @@ class Bestand:
         self.domains_mit_quelle = {
             _registrable(_host(s.url)) for s in self.alle_quellen
         }
-        # Themenquellen liegen in einer eigenen Datei (siehe tech_sources.yaml);
-        # sie zaehlen fuer die Dublettenpruefung genauso.
         tech = self.root / "config" / "tech_sources.yaml"
         if tech.exists():
             roh = yaml.safe_load(tech.read_text(encoding="utf-8")) or {}
@@ -361,8 +302,6 @@ class Bestand:
 
     def kennt(self, url: str) -> str:
         return self.nach_url.get(normalize_url(url), "")
-
-    # ------------------------------------------------------------- Index
 
     def baue_item_index(self, workers: int = 12, cache: Path | None = None) -> int:
         """Einmal alle bestehenden Quellen abrufen und ihre Meldungs-URLs merken.
@@ -391,8 +330,8 @@ class Bestand:
                     src, "europe", src.name or None, "operator", self.http_cfg
                 )
                 return schluessel, src.url, {normalize_url(i.url) for i in items}
-            except Exception:  # noqa: BLE001 - eine tote Quelle ist kein Grund
-                return schluessel, src.url, set()  # den Check abzubrechen
+            except Exception:  # noqa: BLE001
+                return schluessel, src.url, set()
 
         with ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
             for schluessel, url, urls in pool.map(_hole, self.alle_quellen):
@@ -425,8 +364,6 @@ def _pruefe_einen(
     b = Befund(kandidat=kand)
     http_cfg = bestand.http_cfg
 
-    # --- Kriterium 8 zuerst: newsroom_js ist in der Sandbox nicht pruefbar,
-    # also auch nicht abnehmbar. Kein Abruf noetig.
     if kand.type == "newsroom_js":
         b.pruefe(
             8,
@@ -440,7 +377,6 @@ def _pruefe_einen(
         return b
     b.pruefe(8, "kein newsroom_js", True, kand.type)
 
-    # --- Kriterium 7a: exakte Dublette gegen den Bestand (URL-normalisiert)
     treffer = bestand.kennt(kand.url)
     if not b.pruefe(
         7,
@@ -451,13 +387,10 @@ def _pruefe_einen(
         b.bestanden = False
         return b
 
-    # --- Kriterium 6: eigene Domain
     kand_host = _host(kand.url)
     kand_dom = _registrable(kand_host)
     erwartet = _registrable(_host(kand.website or ""))
     if not erwartet:
-        # Ohne hinterlegte Unternehmenswebsite (Themenquellen) kann nur gegen
-        # bekannte Verbreitungsdienste geprueft werden.
         domain_ok = kand_dom not in ERLAUBTE_FREMDDOMAINS or bool(kand.ausnahme_domain)
         detail = (
             f"{kand_dom} (keine Vergleichs-Website hinterlegt)"
@@ -484,7 +417,6 @@ def _pruefe_einen(
         )
     b.pruefe(6, "eigene Domain", domain_ok, detail)
 
-    # --- Kriterium 1: Abruf ueber den echten Projekt-Collector
     region = "global" if kand.thema else "europe"
     origin = "tech_watch" if kand.thema else "operator"
     try:
@@ -498,15 +430,6 @@ def _pruefe_einen(
         return b
     b.pruefe(1, "Abruf ueber collect_source", True, f"{len(items)} Meldungen")
 
-    # --- Kriterium 1b: derselbe Abruf ein zweites Mal.
-    # Am 04.08.2026 teuer gelernt: newswire.ca lieferte im Einzelabruf 23 von
-    # 23 Meldungen SAUBER DATIERT und beim naechsten Abruf 30 Meldungen ganz
-    # OHNE Datum - dasselbe Kartenlayout, einmal mit und einmal ohne
-    # Zeitstempel. Eine undatierte Meldung sortiert ans Ende und wird faktisch
-    # nie bewertet; eine Quelle, die das bei jedem zweiten Abruf tut, ist
-    # unbrauchbar, besteht aber jeden Check, der nur einmal hinsieht.
-    # Nur fuer geparste Seiten sinnvoll - ein RSS-Feed hat das Problem nicht -,
-    # und nur auf Wunsch, weil es jeden Abruf verdoppelt.
     if zweimal and kand.type in ("newsroom", "json_api"):
         try:
             zweite = collect_source(
@@ -539,7 +462,6 @@ def _pruefe_einen(
     b.n_frisch = sum(-1 <= i.age_days(jetzt) <= lookback for i in datiert)
     b.titelprobe = [i.title for i in items[:3]]
 
-    # --- Kriterium 2: genug Meldungen
     b.pruefe(
         2,
         f">= {MIN_ITEMS} Meldungen",
@@ -547,7 +469,6 @@ def _pruefe_einen(
         f"{len(items)} Meldungen",
     )
 
-    # --- Kriterium 3: Datumsanteil
     anteil = (len(datiert) / len(items)) if items else 0.0
     b.pruefe(
         3,
@@ -562,7 +483,6 @@ def _pruefe_einen(
         ),
     )
 
-    # --- Kriterium 4: Frische ODER belegte Ausnahme
     frisch_ok = b.n_frisch >= MIN_FRESH or bool(kand.ausnahme_frische)
     b.pruefe(
         4,
@@ -576,7 +496,6 @@ def _pruefe_einen(
         ),
     )
 
-    # --- Kriterium 5: echte Ueberschriften
     verdaechtig = [i.title for i in items if _ist_navigationslabel(i.title)]
     nav_anteil = (len(verdaechtig) / len(items)) if items else 1.0
     b.pruefe(
@@ -587,7 +506,6 @@ def _pruefe_einen(
         + (f", z. B. {verdaechtig[:3]}" if verdaechtig else ""),
     )
 
-    # --- Kriterium 5b: Titel muessen sich unterscheiden
     verschieden = len({" ".join(i.title.lower().split()) for i in items})
     anteil_verschieden = (verschieden / len(items)) if items else 0.0
     b.pruefe(
@@ -604,15 +522,10 @@ def _pruefe_einen(
         ),
     )
 
-    # --- Kriterium 7b: Inhaltsdublette gegen die bestehenden Quellen desselben
-    # Betreibers. Zwei Pfade derselben Seite sind EINE Quelle.
     if ueberlappung_pruefen and items:
         eigene = {normalize_url(i.url) for i in items}
         schlimmste = 0.0
         wer = ""
-        # Gegen den einmal aufgebauten Index, wenn es ihn gibt (Kriterium 10);
-        # sonst wie bisher live. Der Live-Weg bleibt fuer Einzelpruefungen -
-        # dort kostet ein Index mehr, als er spart.
         indiziert = getattr(bestand, "item_index", {}).get(kand_dom) or (
             bestand.item_index.get(kand.operator) if kand.operator else None
         )
@@ -644,13 +557,6 @@ def _pruefe_einen(
             if ueberlappung > schlimmste:
                 schlimmste, wer = ueberlappung, quelle_url
 
-        # Wenn auf dieser Domain schon eine Quelle konfiguriert ist, aber
-        # keine davon Meldungen zum Vergleich lieferte, ist die Dublette NICHT
-        # geprueft - und dann darf der Kandidat auch nicht bestehen. Genau so
-        # rutschte overons.kpn/nieuws/feed/en/feed/ durch: die konfigurierte
-        # Quelle .../nieuws/feed/en war beim Indexbau leer, der Vergleich fiel
-        # still aus, und derselbe Feed waere ein zweites Mal eingetragen
-        # worden. "Nicht pruefbar" ist kein PASS.
         unpruefbar = verglichen == 0 and kand_dom in getattr(
             bestand, "domains_mit_quelle", set()
         )
@@ -680,9 +586,6 @@ def lade_kandidaten(pfad: Path, root: Path) -> list[Kandidat]:
     else:
         eintraege = roh.get("kandidaten") or roh.get("candidates") or []
 
-    # Betreiber-Websites aus der Watchlist nachschlagen, damit der
-    # Domain-Check (Kriterium 6) auch dann greift, wenn der Vorschlag nur den
-    # Betreibernamen nennt.
     websites: dict[str, str] = {}
     try:
         cfg = load_config(root)
@@ -813,9 +716,6 @@ def main(argv: list[str] | None = None) -> int:
     bestand = Bestand(root)
     lookback = args.lookback or getattr(bestand, "lookback", 8)
 
-    # Ohne Drosselung wuerden 24 gleichzeitige Pruefungen bei einer Welle von
-    # Kandidaten derselben Firma auf denselben Server einschlagen - und der
-    # Check wuerde 429 als "Quelle taugt nichts" protokollieren.
     configure_throttle(2, 0.5)
 
     if args.url:
@@ -846,7 +746,6 @@ def main(argv: list[str] | None = None) -> int:
     else:
         p.error("Entweder eine Kandidatendatei oder --url angeben")
 
-    # --- Wiederaufnahme: was der Cache schon kennt, wird nicht neu geholt
     cache = {} if args.erneut_pruefen else lade_cache(args.cache)
     aus_cache = [
         cache[_cache_schluessel(k)] for k in kandidaten if _cache_schluessel(k) in cache
@@ -858,7 +757,6 @@ def main(argv: list[str] | None = None) -> int:
             f"Cache ({args.cache}), {len(offen)} werden geprueft"
         )
 
-    # --- Index der bestehenden Quellen: einmal, nicht je Kandidat
     if offen and not args.no_overlap:
         n = bestand.baue_item_index(workers=max(8, args.workers), cache=args.index)
         print(f"Dubletten-Index: {n} bestehende Quellen erfasst")
@@ -911,8 +809,6 @@ def main(argv: list[str] | None = None) -> int:
     print("-" * 140)
     print(f"{len(bestanden)}/{len(ergebnisse)} bestanden")
 
-    # Woran die Durchgefallenen gescheitert sind - bei 1000 Kandidaten ist das
-    # die einzige Zeile, die man wirklich liest.
     if len(bestanden) < len(ergebnisse):
         gruende: dict[str, int] = {}
         for d in ergebnisse:

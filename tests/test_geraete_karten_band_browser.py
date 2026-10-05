@@ -157,10 +157,6 @@ def _buendel(
 
 
 def _tarif(anbieter, tarif_id, tarif_name, gb, betrag):
-    # A1: Liegt eine Preisphase vor, rechnet die Leitzahl PHASENGEWICHTET
-    # und ignoriert tarif_monatlich des Buendels - deshalb traegt jede
-    # Phase denselben Betrag wie ihr Buendel-Tarif, sonst waere jede Zahl
-    # dieser Fixture nur ueber die Phase erklaerbar.
     return {
         "anbieter": anbieter,
         "name": tarif_name,
@@ -190,8 +186,6 @@ def _baue(tmp_path: pathlib.Path):
         )
     state = root / "data" / "state"
     state.mkdir(parents=True)
-    # congstar und 1&1 haben KEINE Listung: congstars Gerätepreis kann damit
-    # nur aus Zuzahlung + Raten kommen - der TCO-1-Fall.
     listungen = [_listung("o2", 999.0), _listung("Vodafone", 1049.0)]
     (state / "geraete_db.json").write_text(
         json.dumps(
@@ -212,9 +206,6 @@ def _baue(tmp_path: pathlib.Path):
         _buendel(
             "Vodafone", "vodafone:mittel", "Vodafone Mittel", tarif=26.99, rate=15.0
         ),
-        # 36 Monate Raten, keine eigene Listung -> Finanzierungssumme
-        # 1,00 + 36 x 25,00 = 901,00 EUR; Kosten über 24 Monate (A1, alle
-        # Raten der eigenen Laufzeit) = 1 + 24x24 + 36x25 = 1.477,00 EUR
         _buendel(
             "congstar",
             "congstar:allnet-m",
@@ -226,7 +217,6 @@ def _baue(tmp_path: pathlib.Path):
         _buendel(
             "o2", "o2:unlimited", "O2 Unlimited", tarif=34.99, rate=30.0, laufzeit=36
         ),
-        # Tarif steht NICHT in tarife.jsonl -> kein Datenvolumen -> kein Band
         _buendel("1&1", "einsundeins:flox", "1&1 Flex", tarif=39.99, rate=20.0),
     ]
     (state / "geraete_tco.json").write_text(
@@ -236,8 +226,6 @@ def _baue(tmp_path: pathlib.Path):
     tarife = [
         _tarif("o2", "o2:klein", "O2 Mobile Klein", 18.0, 24.99),
         _tarif("Vodafone", "vodafone:mittel", "Vodafone Mittel", 40.0, 26.99),
-        # Unbegrenzt liegt außerhalb aller Bänder (§7) - json schreibt dafuer
-        # Infinity, genau wie der echte Tarifbestand.
         _tarif("o2", "o2:unlimited", "O2 Unlimited", math.inf, 34.99),
         _tarif("congstar", "congstar:allnet-m", "Allnet Flat M", 25.0, 24.00),
     ]
@@ -310,11 +298,6 @@ def _sichtbare_anbieter(seite):
     )
 
 
-# --------------------------------------------------------------------------
-# Auftrag 2: die Bandwahl filtert die Kartenansicht
-# --------------------------------------------------------------------------
-
-
 def test_die_zeilenliste_aendert_sich_bei_bandwechsel(_seite):
     """UX-1: bis P1 zeigte die Klappe bei jedem Band dieselben Karten aller
     Bänder gemischt. Seit O2 zeigt die Zeilenliste die Bündel des
@@ -323,8 +306,6 @@ def test_die_zeilenliste_aendert_sich_bei_bandwechsel(_seite):
     _seite.wait_for_timeout(120)
     klein = _sichtbare_anbieter(_seite)
     assert "o2" in klein, f"Band XS zeigt keine o2-Karte: {klein}"
-    # congstar führt nur ein Mittel-Band-Bündel - in Klein gehört sie nicht
-    # in die Auswahl des Bands.
     assert "congstar" not in klein, klein
 
     waehle_band(_seite, "m")
@@ -368,11 +349,6 @@ def test_jede_bandzeile_traegt_ihre_gb_angabe(_seite):
         )
 
 
-# --------------------------------------------------------------------------
-# Auftrag 1: Karten ohne Band als eigene, klar markierte Gruppe
-# --------------------------------------------------------------------------
-
-
 def test_zeilen_ohne_tarifband_bilden_eine_markierte_gruppe(_seite):
     """§7: Unbegrenzte Tarife und Tarife ohne erhobenes Volumen fallen aus
     dem Bandraster - seit O2 stehen sie in der eigenen Gruppe 'Ohne
@@ -409,11 +385,6 @@ def test_zeilen_ohne_tarifband_bilden_eine_markierte_gruppe(_seite):
     assert lage["nachDerBandliste"], "die Gruppe steht nicht hinter der Bandliste"
 
 
-# --------------------------------------------------------------------------
-# Auftrag 3: TCO-24 ohne Hover, Desktop und Mobil
-# --------------------------------------------------------------------------
-
-
 def test_die_tco_werte_des_bands_stehen_ohne_hover_im_dom(_seite):
     """UX-5, E2-Fassung: die exakten Werte stehen als TEXT im DOM - im
     Antwort-Satz (der beste des Bands) und auf jeder Bündel-Zeile. Das
@@ -430,8 +401,6 @@ def test_die_tco_werte_des_bands_stehen_ohne_hover_im_dom(_seite):
     waehle_band(_seite, "m")
     _seite.wait_for_timeout(250)
     tafel = _seite.eval_on_selector("#tafel-tco", "e => e.innerText")
-    # Vodafone: 1 + 24x26,99 + 24x15 = 1.008,76 - congstar (A1, 36 Raten):
-    # 1 + 24x24 + 36x25 = 1.477,00
     assert "1.008,76" in tafel and "1.477,00" in tafel, tafel[:200]
 
 
@@ -451,10 +420,6 @@ def test_der_antwort_satz_nennt_die_zahl_der_guenstigsten_zeile(_seite):
               anbieter: bnd.map(z => z.dataset.anbieter)};
     }""")
     assert lage["anbieter"], "keine sichtbaren Bündel-Zeilen im Band"
-    # Der ERSTE Betrag nach dem ersten Doppelpunkt ist die Leitzahl des
-    # Satzes - der Satzanfang nennt Geraet und Band und enthaelt selber
-    # Ziffern ("iPhone 17 Pro 256 GB"), die keine Betragsparser fuettern
-    # duerfen.
     from re import search
 
     nach_doppelpunkt = lage["antwort"].split(":", 1)[1]
@@ -485,11 +450,6 @@ def test_mobil_bleibt_ohne_querscroll_und_mit_werteliste_lesbar(_seite):
         seite.close()
 
 
-# --------------------------------------------------------------------------
-# Auftrag 4: congstar trennt Finanzierungssumme und Gerätepreis (§3)
-# --------------------------------------------------------------------------
-
-
 def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(_seite):
     """TCO-1: auf der congstar-Karte stand die tarifabhängige Summe aus
     Zuzahlung und allen Raten unter „Gerätepreis“. §3 verlangt zwei Zahlen,
@@ -498,8 +458,6 @@ def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(_seite):
     benannte Lücke, weil congstar dazu nichts gemessen hat."""
     waehle_band(_seite, "m")
     _seite.wait_for_timeout(120)
-    # Der Rechenweg steht im geschlossenen Aufklapper - innerText zeigt ihn
-    # nur, wenn die Zeile offen ist (Transitivitaet der <details>-Regel).
     congstar = _seite.eval_on_selector(
         "#gr-bndliste .gr-bnd[data-anbieter='congstar'][data-band='m']",
         """e => {
@@ -519,18 +477,12 @@ def test_die_finanzierungssumme_heisst_so_und_nicht_geraetepreis(_seite):
     _seite.evaluate(
         "() => document.querySelectorAll('.gr-bnd').forEach(z => { z.open = false; })"
     )
-    # 1,00 € Zuzahlung + 36 x 25,00 € Raten - die Spalte heißt die Zahl
-    # beim Namen (Finanzierung), nicht "Gerätepreis".
     assert "Finanzierung" in congstar["bar"], congstar["bar"]
     assert "901,00" in congstar["bar"], congstar["bar"]
     assert "Gerätepreis" not in congstar["bar"], congstar["bar"]
-    # Die Zeile behauptet keinen REINEN Gerätepreis ohne Vertrag - die
-    # Lücke steht im Rechenweg benannt da.
     assert "nicht erhoben" in congstar["rw"], (
         "der Rechenweg nennt die Lücke beim Gerätepreis ohne Vertrag nicht"
     )
-    # Die Leitzahl („Kosten über 24 Monate", alle 36 Raten) bleibt die
-    # zweite, getrennte Zahl: 1 + 24x24 Tarif + 36x25 Raten = 1.477,00.
     assert (
         "Kosten über 24 Monate" in congstar["summary"]
         and "1.477,00" in congstar["summary"]
@@ -548,8 +500,6 @@ def test_ein_gemessener_barpreis_fuehrt_weiter_als_geraetepreis(_seite):
         "e => ({bar: e.querySelector('.gr-bnd-bar').textContent,"
         "          text: e.innerText})",
     )
-    # Ein gemessener Barpreis steht OHNE Finanzierungs-Etikett in der
-    # Spalte - nur die tarifabhängige Summe heißt Finanzierung.
     assert "Finanzierung" not in o2["bar"], o2["bar"]
     assert "999,00" in o2["bar"], o2["bar"]
     assert "999,00" in o2["text"], o2["text"]
@@ -570,11 +520,6 @@ def test_der_antwort_satz_nennt_keine_finanzierungssumme_als_geraetepreis(_seite
     )
 
 
-# --------------------------------------------------------------------------
-# Randnotiz aus der Audit-Gegenprobe: doppelt-escaped Tooltips heilen
-# --------------------------------------------------------------------------
-
-
 def test_der_graph_traegt_keine_tooltips_mehr(_seite):
     """E2: der Graph ist ein SVG - und trägt KEIN <title>: jeder Wert
     steht als <text> im Bild (am letzten und ersten Punkt), der beste
@@ -588,6 +533,4 @@ def test_der_graph_traegt_keine_tooltips_mehr(_seite):
     )
     antwort = _seite.eval_on_selector("#tafel-tco .gr-zr-antwort", "e => e.innerText")
     assert "€" in antwort, f"Antwort ohne gedruckten Wert: {antwort!r}"
-    # Mit Historie zeigt auch das SVG gedruckte Werte; ohne Historie
-    # (diese Fixture) trägt der Antwort-Satz sie allein.
     assert werte >= 0

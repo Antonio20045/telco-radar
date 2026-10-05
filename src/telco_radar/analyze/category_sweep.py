@@ -29,7 +29,6 @@ from .llm import complete, extract_json
 log = logging.getLogger(__name__)
 
 
-# Suchanfragen je Kategorie für den Brave-Sweep (bewusst breit, LLM filtert danach).
 CATEGORY_QUERIES = {
     "ki": [
         "telecom operator free AI assistant Perplexity OR Gemini OR Copilot included mobile plan"
@@ -155,9 +154,6 @@ def _llm_extract(theme_key: str, results: list[dict], model: str) -> list[dict]:
     return out
 
 
-# Rotationsprinzip: pro Lauf nur einen Teil der Kategorien aktiv sweepen, damit
-# das Anfragevolumen (und die Kosten) klein bleiben; über mehrere Wochen sind alle
-# einmal dran. Reihenfolge = THEMES; Offset aus der ISO-Woche.
 def rotation_slice(week: int, per_run: int = 4) -> list[str]:
     keys = [k for k, _ in THEMES]
     start = (week * per_run) % len(keys)

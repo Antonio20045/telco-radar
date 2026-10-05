@@ -101,17 +101,6 @@ from ..tco_model import (
 
 log = logging.getLogger(__name__)
 
-# Die Felder eines Buendels, die eine Messung sind - sie werden gemeinsam
-# geschrieben, siehe Modulkopf.
-# `buendel_monatlich` und `tarif_bindung_monate` STEHEN HIER MIT, seit es
-# sie gibt (Phase R). Diese Liste ist eine POSITIVLISTE - dieselbe Falle
-# wie `_items_payload` in `analyze/agents.py`: ein neues Feld am Datensatz
-# landet hier NICHT von selbst, und ein Buendel, dessen einziger Preis der
-# Buendelmonatsbetrag ist (1&1), waere beim Ablegen still preislos
-# geworden.
-# `zustand` seit dem 04.09.2026 (QA-Befund B1): der Geraetezustand ist eine
-# Preisdimension, und ein Buendel, das ihn nicht mitfuehrt, sieht in der
-# Tafel aus wie ein Neugeraet.
 _MESSFELDER = (
     "tarif_id",
     "tarif_id_guete",
@@ -128,10 +117,6 @@ _MESSFELDER = (
     "herleitung",
 )
 
-# `bindung_monate` und `volumen_gb` seit S-5 (09.09.2026): dieselbe
-# Positivliste-Pflicht wie bei `_MESSFELDER` - ein Messfeld, das hier
-# fehlt, wuerde beim naechsten Lauf still geleert, obwohl die Quelle es
-# weiterhin nennt.
 _REFERENZ_MESSFELDER = (
     "tarif_id",
     "tarif_id_guete",
@@ -144,9 +129,6 @@ _REFERENZ_MESSFELDER = (
     "volumen_gb",
 )
 
-# Die Append-Historie liegt NEBEN der Stand-Datei (P2, 11.09.2026) - siehe
-# Modulkopf. Ihr Name ist fest, weil der naechtliche Lauf sie namentlich
-# committet (.github/workflows/geraete.yml).
 _HISTORIE_NAME = "geraete_tco_historie.jsonl"
 
 
@@ -215,14 +197,7 @@ class TcoDB:
         self._buendel: dict[str, dict] = {}
         self._referenzen: dict[str, dict] = {}
         self.updated = ""
-        # Die Messungen dieses PROZESSES, noch nicht geschrieben: der
-        # Schluessel ist (buendel_id, datum), ein zweiter Upsert am selben
-        # Tag ersetzt den ersten - dieselbe Idempotenz, die beim
-        # Zusammenfuehren mit der Datei gilt.
         self._historie_pendente: dict[tuple[str, str], dict] = {}
-        # Eine unlesbare Datei ist NICHT dasselbe wie "noch nichts gefunden" -
-        # dieselbe Unterscheidung wie in `GeraeteDB` und aus demselben Grund:
-        # sonst meldet die Seite eine leere Datenlage, wo ein Lesefehler war.
         self.lesbar = True
         if not self.path.exists():
             return
@@ -233,21 +208,10 @@ class TcoDB:
             self.lesbar = False
             return
         self.updated = roh.get("updated", "")
-        # LESEMIGRATION B1: ein Eintrag von vor dem 21.09.2026 traegt eine
-        # ID ohne Laufzeitsegment. Er wird unter seiner HEUTIGEN ID
-        # weitergefuehrt (`id_aus_satz`) und behaelt damit sein
-        # `first_seen`; ohne das entstuende derselbe Bestand beim naechsten
-        # Lauf ein zweites Mal daneben, und die Tafel zeigte jedes Angebot
-        # doppelt. Die DATEI wird davon nicht angefasst - sie bekommt die
-        # neuen IDs erst durch das naechste regulaere `save()`.
         migriert = 0
         for eintrag in roh.get("buendel") or []:
             bid = id_aus_satz(eintrag)
             if bid is None:
-                # Nicht zuordenbar: der Eintrag bleibt unter seiner
-                # gespeicherten ID im Bestand stehen (verworfen wird er
-                # nicht - "Scheitern ist kein leeres Ergebnis"), und
-                # `id_aus_satz` hat ihn benannt protokolliert.
                 if eintrag.get("id"):
                     self._buendel[eintrag["id"]] = eintrag
                 continue
@@ -267,8 +231,6 @@ class TcoDB:
         for eintrag in roh.get("sim_only") or []:
             if eintrag.get("id"):
                 self._referenzen[eintrag["id"]] = eintrag
-
-    # -------------------------------------------------------------- lesen
 
     def buendel(self) -> list[dict]:
         return sorted(
@@ -319,9 +281,6 @@ class TcoDB:
                     continue
                 if satz.get("datum"):
                     tage.add(str(satz["datum"]))
-                # Dieselbe Lesemigration wie im Stand: eine Zeile von vor
-                # B1 und eine von heute sind DASSELBE Buendel und duerfen
-                # die Zahl im Verlaufs-Reiter nicht verdoppeln.
                 bid = id_aus_satz(satz) if satz.get("id") else None
                 if bid:
                     ids.add(bid)
@@ -333,8 +292,6 @@ class TcoDB:
             "buendel": len(ids),
         }
 
-    # ------------------------------------------------------------ schreiben
-
     def upsert_buendel(self, buendel, today: str) -> tuple[int, set]:
         """Buendel aufnehmen oder auffrischen.
 
@@ -344,32 +301,14 @@ class TcoDB:
         """
         neu = 0
         gesehen: set[str] = set()
-        # VOLLSTAENDIG PRUEFEN, BEVOR ETWAS GESCHRIEBEN WIRD. Ein Wurf
-        # mitten in der Schleife liesse die schon aufgenommenen Buendel im
-        # Speicher stehen - ein Aufrufer, der die Ausnahme faengt und
-        # `save()` ruft, schriebe einen halben Messtag in die Datei. Ein
-        # Adapter uebergibt seine achtzig Buendel in EINEM Aufruf.
         for satz in buendel:
             if not isinstance(satz, Buendel):
                 raise TypeError(f"kein Buendel: {type(satz).__name__}")
             if (
                 satz.geraet_zuzahlung is not None
                 or satz.geraet_monatsrate is not None
-                # Ein Buendelmonatspreis IST ein Geraetepreis - er
-                # traegt Tarif und Geraet in einer Zahl. Ohne ihn hier
-                # haette ein 1&1-Satz die Regel unterlaufen und einen
-                # Preis ohne nachschlagbaren Tarif abgelegt.
                 or satz.buendel_monatlich is not None
             ) and not (satz.tarif_id or "").strip():
-                # Phase 6, Abnahmekriterium 3: kein Buendelpreis im Bestand
-                # ohne aufloesbaren Tarif. Die Regel steht HIER und nicht im
-                # Datensatz, weil "im Bestand" genau diese Datei meint - ein
-                # Buendel zu bauen und festzustellen, dass sein Tarif nicht
-                # aufloest, ist ein gueltiger Zwischenschritt; es
-                # ABZULEGEN waere eine Zahl, deren Bezugsgroesse niemand
-                # nachschlagen kann. Dieselbe Haltung wie
-                # `geraete_model.Listung`, die eine Zuzahlung ohne
-                # `tarif_referenz` gar nicht erst entstehen laesst.
                 raise ValueError(
                     f"Geraetepreis ohne aufloesbaren Tarif: {satz.id} "
                     f"(tarif_name={satz.tarif_name!r}). Ein Buendelpreis "
@@ -392,15 +331,8 @@ class TcoDB:
             gesehen.add(bid)
             self._schreibe_messung(eintrag, satz, _MESSFELDER)
             eintrag["rabatte"] = [asdict(r) for r in satz.rabatte]
-            # P3-E3: die Aktionen gehoeren zur Messung dieses Tages und
-            # werden wie `rabatte` jedes Mal ganz ersetzt - eine Aktion, die
-            # heute nicht mehr auf der Seite steht, steht auch hier nicht.
             eintrag["aktionen"] = [asdict(a) for a in satz.aktionen]
             eintrag["last_verified"] = today
-            # Dieselbe Messung auch fuer die Historie vormerken - am `today`
-            # dieses Aufrufs, nicht am `save()`-Datum: die Zeile gehoert dem
-            # Lauf, der sie gemessen hat. Der Schluessel ersetzt bei
-            # wiederholtem Upsert denselben Tag still (idempotent).
             self._historie_pendente[(bid, today)] = self._historie_zeile(satz, today)
         return neu, gesehen
 
@@ -470,10 +402,6 @@ class TcoDB:
         Ersetzen: innerhalb des Scopes gilt weiterhin die volle Semantik,
         inklusive Wegnehmen umbenannter Tarife.
         """
-        # AUFFRISCHEN, dann wegnehmen - nicht leeren und neu befuellen.
-        # Beim Leeren verloere jede Referenz ihr `first_seen`, und dann
-        # waere jede von ihnen bei jedem Lauf "seit heute bekannt";
-        # ausserdem zaehlte `neu` jedes Mal den ganzen Bestand.
         neu = self.setze_referenzen(referenzen, today, anbieter=anbieter)
         gewuenscht = {satz.id for satz in referenzen}
         veraltet = [
@@ -509,8 +437,6 @@ class TcoDB:
             zeile[feld] = getattr(satz, feld)
         zeile["gesamt"] = tco_24(satz).gesamt
         return zeile
-
-    # ---------------------------------------------------------------- save
 
     def save(self, today: str) -> bool:
         """Schreibt die Datei - aber nur, wenn sie etwas zu sagen hat.
@@ -576,20 +502,13 @@ class TcoDB:
                 or not (satz.get("datum") or "").strip()
                 for satz in saetze
             ):
-                # Eine Zeile ohne Schluessel liesse sich nicht zusammen-
-                # fuehren; sie ueberspringen hiesse sie loeschen.
                 log.warning(
                     "%s enthaelt Zeilen ohne (id, datum) - Historie NICHT angefasst",
                     self.historie_path.name,
                 )
                 return False
             for satz in saetze:
-                # Bestehende Reihenfolge bleibt stehen; ein Doppel-Schluessel
-                # aus frueheren Laeufen haelt den INHALT des letzten.
                 zusammen[(satz["id"], satz["datum"])] = satz
-        # Die Messungen dieses Laufs ERSETZEN einen gleichschluessigen Tag
-        # an dessen Stelle und neue Tage haengen hinten an - alte Tage
-        # bleiben in Inhalt und Stellung unveraendert.
         zusammen.update(self._historie_pendente)
         self.historie_path.parent.mkdir(parents=True, exist_ok=True)
         self.historie_path.write_text(

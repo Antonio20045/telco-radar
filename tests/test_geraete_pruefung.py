@@ -62,11 +62,6 @@ def _e(
     }
 
 
-# --------------------------------------------------------------------------
-# Doppelpreis
-# --------------------------------------------------------------------------
-
-
 def test_zwei_preise_fuer_dieselbe_farbe_fliegen_aus_dem_vergleich():
     """Dieselbe Farbe kann nicht zwei Preise haben. Welcher der beiden
     stimmt, sagt der Datensatz nicht - also darf keiner verglichen werden.
@@ -135,11 +130,6 @@ def test_neu_und_refurbished_sind_kein_doppelpreis():
     assert len(erg["sauber"]) == 2
 
 
-# --------------------------------------------------------------------------
-# Speicherinversion
-# --------------------------------------------------------------------------
-
-
 def test_mehr_speicher_darf_nicht_billiger_sein():
     eintraege = [_e(speicher=256, preis=1081.0), _e(speicher=512, preis=745.0)]
     erg = pruefe(eintraege, _KATALOG)
@@ -169,11 +159,6 @@ def test_eine_inversion_ueber_zwei_zustaende_ist_keine():
     ]
     erg = pruefe(eintraege, _KATALOG)
     assert erg["zahlen"]["speicherinversionen"] == 0
-
-
-# --------------------------------------------------------------------------
-# Ausreisser
-# --------------------------------------------------------------------------
 
 
 def test_ein_ausreisser_wird_gemeldet_aber_nicht_geloescht():
@@ -222,11 +207,6 @@ def test_die_ausreisserschwelle_ist_nicht_scharf_genug_fuer_rabatte():
     assert AUSREISSER_ANTEIL >= 0.5
 
 
-# --------------------------------------------------------------------------
-# Was die Pruefung NICHT tun darf
-# --------------------------------------------------------------------------
-
-
 def test_der_eingabedatensatz_bleibt_unveraendert():
     """Aussortiert wird fuer Vergleich und Grafik - CSV-Export und
     SKU-Ansicht sehen weiterhin alles."""
@@ -248,11 +228,6 @@ def test_ein_sauberer_datensatz_meldet_nichts():
     assert len(erg["sauber"]) == 3
 
 
-# --------------------------------------------------------------------------
-# W3: keine Kennzahl darf groesser sein als die Zahl beobachteter Geraete
-# --------------------------------------------------------------------------
-
-
 def test_die_wochenkarte_zaehlt_geraete_und_nicht_listungen():
     """Die Seite meldete am 29.08.2026 "267 Geraete neu im Regal" bei 59
     beobachteten Geraeten. Gezaehlt wurden Listungen - 267 neue GERAETE kann
@@ -263,8 +238,6 @@ def test_die_wochenkarte_zaehlt_geraete_und_nicht_listungen():
     from telco_radar.report.geraete_view import _auffaellig
     from telco_radar.analyze.geraete_store import Preishistorie
 
-    # Ein Geraet, drei Anbieter, alle im Fenster erstmals gesehen: das sind
-    # drei Listungen und EIN Geraet.
     eintraege = [
         {
             **_e(anbieter=n),
@@ -404,7 +377,6 @@ def test_keine_kennzahl_ist_groesser_als_die_zahl_beobachteter_geraete():
             ),
         ]
     )
-    # Zwei Geraete, vier Anbieter, acht Farben: 64 Listungen, 2 Geraete.
     eintraege = []
     for gid in ("samsung-galaxy-s25", "samsung-galaxy-s26"):
         for anbieter in ("o2", "Vodafone", "freenet", "ALDI TALK"):

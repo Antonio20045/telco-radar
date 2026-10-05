@@ -84,7 +84,6 @@ class SeenStore:
                         self._letzter_stempel = line[1:]
                         continue
                     if line.startswith("{"):
-                        # Altbestand (v1). Wird gelesen, aber nie geschrieben.
                         try:
                             self._seen.add(json.loads(line)["id"])
                         except (json.JSONDecodeError, KeyError):

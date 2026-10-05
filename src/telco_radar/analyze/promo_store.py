@@ -61,15 +61,6 @@ class UpsertBilanz(NamedTuple):
     bestaetigt: int = 0
 
 
-# Ab diesem Wort-Ueberlappungswert gilt eine neu extrahierte Ueberschrift als
-# dieselbe Aktion wie ein bestehender Eintrag, nur umformuliert - siehe
-# _same_offer(). Ueberlappungs-Koeffizient (gemeinsame Woerter / Woerter der
-# kuerzeren Headline) statt reiner Zeichen-Aehnlichkeit, weil generische, aber
-# UNTERSCHIEDLICHE Kurz-Headlines ("Alte Aktion" / "Neue Aktion") sich
-# zeichenweise taeuschend aehnlich sind, obwohl sie kaum Woerter teilen. An
-# echten Produktivdaten beobachtete Umformulierungen derselben Aktion lagen
-# bei 0.67-1.0 Ueberlappung; unabhaengige Aktionen derselben Marke lagen bei
-# 0.0-0.5. 0.6 liegt sicher dazwischen.
 _FUZZY_HEADLINE_THRESHOLD = 0.6
 
 

@@ -44,18 +44,10 @@ from pathlib import Path
 
 log = logging.getLogger(__name__)
 
-# Die PM-6-Entscheidungsgrenze: 5 MB ROHBYTES je Fragment (nicht gzip -
-# das SVG-Markup ist so repetitiv, dass gzip es auf ~4,5 % staucht; die
-# 5 MB sind eine Grenze fuer Repository und Browser-Parsing, nicht fuer
-# die Leitung). Eine Grenze der SUMME beider Fragmente waere heute schon
-# ueberschritten (5,1 MB) und wuerde die Entscheidung unmoeglich machen.
 GRENZE_BYTES = 5_000_000
 
-# Wie weit die Prognosetabelle reicht, wenn die Grenze vorher nicht fällt.
 HORIZONT_TAGE = 60
 
-# Fixe Tagesabstaende der Prognosetabelle (plus der Tag der Grenze selbst,
-# falls er innerhalb des Horizonts liegt).
 PROGNOSE_SCHRITTE = (1, 2, 3, 7, 14, 30, 60)
 
 ZEITREIHE_NAME = "geraete-zeitreihe.html"
@@ -134,8 +126,6 @@ def lies_historie(pfad: Path) -> Bestand:
             tag = date.fromisoformat(str(datum))
         except ValueError:
             continue
-        # Idempotenz der Historie nachbilden: derselbe (id, datum)-Schluessel
-        # ersetzt seine Zeile in der Datei - hier zaehlt er genau einmal.
         if (str(bid), str(datum)) in paare:
             continue
         paare.add((str(bid), str(datum)))
@@ -201,7 +191,7 @@ def prognose(
     paare_grenze = grenze / bytes_je_paar
     if paare_grenze <= paare:
         return anker, 0, True
-    tage = -(-(paare_grenze - paare) // rate)  # ceil ohne float-Rundung
+    tage = -(-(paare_grenze - paare) // rate)
     return anker + timedelta(days=int(tage)), int(tage), False
 
 

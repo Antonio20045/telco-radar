@@ -78,7 +78,7 @@ def test_keine_leitzahl_unter_dem_eigenen_barpreis():
     verletzungen = []
     for satz in tco.get("buendel") or []:
         if satz.get("rabatte"):
-            continue  # belegter Rabatt darf unterbieten
+            continue
         if (satz.get("zustand") or "") and satz["zustand"] != "neu":
             continue
         b = _buendel_aus_satz(satz)
@@ -96,8 +96,6 @@ def test_keine_leitzahl_unter_dem_eigenen_barpreis():
         geprueft += 1
         if kennzahl.gesamt < barpreis:
             verletzungen.append((satz.get("id"), kennzahl.gesamt, barpreis))
-    # Gegenprobe: der Lauf hat wirklich eine Vergleichsmenge gesehen -
-    # sonst waere die Zusicherung gruen, ohne etwas geprueft zu haben.
     assert geprueft >= 600, f"unerwartet duenne Vergleichsmenge: {geprueft} Bündel"
     assert verletzungen == [], (
         f"{len(verletzungen)} Leitzahlen unter dem eigenen Barpreis, "
@@ -139,13 +137,6 @@ def test_widerspruch_pib_und_shopmessung_festgehaltene_messung():
     Bis zum Fix entschieden die Phasen des Blatts den Widerspruch still
     fuer sich: 2.249,79 EUR auf der Karte, 718,80 EUR im Posten - neben
     einer Bauteilezeile, die 'monatlich 31,95 EUR' sagte."""
-    # Der Befundsfall als festgehaltene Messung vom 20.09.2026, nicht als
-    # Suche im Bestand: seit P3 (28.09.) haengen Vodafone-Buendel am Blatt
-    # "mit Smartphone", und seit dem 29.09. liest der Adapter alle Tarife
-    # neu - ein Lookup im taeglich wechselnden Bestand liefe ins Leere.
-    # Echt bleibt das Blatt: es kommt weiter aus dem ausgelieferten
-    # Tarifbestand, und die Gegenprobe darunter haelt fest, dass es Phasen
-    # hat.
     tarife = _tarife()
     satz = {
         "anbieter": "Vodafone",
@@ -161,8 +152,6 @@ def test_widerspruch_pib_und_shopmessung_festgehaltene_messung():
     }
     b = _buendel_aus_satz(satz)
     assert b is not None
-    # Gegenprobe: das Blatt HAT Phasen, der Konflikt ist real - sonst
-    # pruefte dieser Test den unstrittigen Fall.
     blatt = karten.phasen_aus_tarifsatz(tarife.get(b.tarif_id) or {})
     assert blatt, "das Blatt des Befundsfall hat keine Phasen mehr"
     b.tarif_phasen = karten.phasen_fuer_buendel(
@@ -220,7 +209,7 @@ def test_kein_tarifposten_wider_die_gemessene_monatsrate():
             <= max(betraege) + karten._PREIS_TOLERANZ
         ):
             mit_phasen += 1
-            continue  # das Blatt beschreibt dieses Angebot: erlaubt
+            continue
         konflikte += 1
         assert tarifposten == round(TCO_HORIZONT * messung, 2), (
             f"{satz.get('id')}: Tarifposten {tarifposten} wider die Messung {messung}"

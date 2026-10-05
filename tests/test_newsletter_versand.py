@@ -56,9 +56,6 @@ def _segment(h, abos, n_treffer=1):
     return Segment(hash=h, filter=Filtersatz(), abo_ids=list(abos), treffer=treffer)
 
 
-# ==============================================================  Store  ====
-
-
 def test_eine_kaputte_zeile_kippt_nicht_den_ganzen_verteiler(tmp_path, caplog):
     """Eine halb geschriebene Zeile darf nicht dazu fuehren, dass ein Lauf
     den GANZEN Verteiler fuer leer haelt und ihn neu schreibt."""
@@ -67,8 +64,6 @@ def test_eine_kaputte_zeile_kippt_nicht_den_ganzen_verteiler(tmp_path, caplog):
     with caplog.at_level("ERROR"):
         zeilen = st.lies_jsonl(pfad)
     assert [z["id"] for z in zeilen] == ["a", "b"]
-    # ... und der Inhalt der kaputten Zeile steht NICHT im Log - dort stuende
-    # sonst eine Adresse.
     assert "KAPUTT" not in caplog.text
 
 
@@ -84,7 +79,6 @@ def test_zusammenfuehren_laesst_den_juengeren_satz_gewinnen():
         "bounce": {"last": "2026-08-10T00:00:00Z"},
     }
     assert st.zusammenfuehren([alt], [neu])[0]["state"] == "unsubscribed"
-    # ... und zwar unabhaengig von der Reihenfolge der Argumente.
     assert st.zusammenfuehren([neu], [alt])[0]["state"] == "unsubscribed"
 
 
@@ -145,9 +139,6 @@ def test_ein_abo_ist_ueber_seinen_kennwert_auffindbar(tmp_path, katalog):
     assert store.aktive() == []
 
 
-# =================================  Die 24-Stunden-Sperre (Mailbomben) =====
-
-
 def test_dieselbe_adresse_bekommt_in_24_stunden_nur_eine_mail(tmp_path):
     """DER Mailbomben-Schutz. Er liegt hier und nicht im Signup-Dienst: dort
     ist der Zaehler nach jedem Spin-down leer, man muesste 16 Minuten
@@ -158,7 +149,6 @@ def test_dieselbe_adresse_bekommt_in_24_stunden_nur_eine_mail(tmp_path):
     assert st.doi_gesperrt(pfad, kennwert, heute=heute) is False
     st.doi_vermerken(pfad, kennwert, zeitpunkt="2026-08-11T09:00:00Z")
     assert st.doi_gesperrt(pfad, kennwert, heute=heute) is True
-    # ... und eine ANDERE Adresse ist nicht gesperrt.
     assert st.doi_gesperrt(pfad, "anderer", heute=heute) is False
 
 
@@ -197,9 +187,6 @@ def test_das_doi_log_wird_aufgeraeumt(tmp_path):
     assert [e["addr_hmac"] for e in st.lies_jsonl(pfad)] == ["neu"]
 
 
-# ==========================================================  Sendeplan  ====
-
-
 def test_der_sendeplan_ist_deterministisch():
     """Beim Wiederanlauf muss derselbe Plan herauskommen - sonst haelt der
     Lauf seinen eigenen Plan fuer einen fremden und verschickt alles neu."""
@@ -223,9 +210,6 @@ def test_ein_leeres_segment_kommt_nicht_in_den_plan():
 def test_der_schluessel_traegt_datum_segment_und_abo():
     plan = v.baue_sendeplan("2026-08-11", [_segment("hh", ["s1"])])
     assert str(plan[0].schluessel) == "2026-08-11|hh|s1"
-
-
-# ==========================================================  Idempotenz  ===
 
 
 def _log(pfad, *posten):
@@ -257,7 +241,6 @@ def test_ein_wiederanlauf_versendet_nichts_doppelt(tmp_path):
     )
     assert erster.zugestellt == 3
 
-    # Der Wiederanlauf: derselbe Plan, dasselbe Log.
     transport = Trockenlauf()
     plan2 = v.baue_sendeplan("2026-08-11", [_segment("h", ["a", "b", "c"])])
     zweiter = v.versende(
@@ -389,9 +372,6 @@ def test_ein_abo_ohne_adresse_gilt_als_erledigt(tmp_path):
     assert protokoll[0].status == "dauerhaft_fehl"
 
 
-# =======================================================  Limit-Waechter  ==
-
-
 def test_der_waechter_bricht_vor_dem_teilversand_ab(tmp_path):
     """Ein stiller Teilversand, bei dem die halbe Liste die Ausgabe bekommt
     und die andere nicht, ist der schlimmste moegliche Ausgang."""
@@ -411,7 +391,7 @@ def test_der_waechter_addiert_was_heute_schon_raus_ist(tmp_path):
         ],
     )
     assert v.heute_versendet(log_pfad, heute="2026-08-11") == 270
-    v.pruefe_limit(10, log_pfad, heute="2026-08-11")  # 280, passt
+    v.pruefe_limit(10, log_pfad, heute="2026-08-11")
     with pytest.raises(v.LimitGerissen):
         v.pruefe_limit(11, log_pfad, heute="2026-08-11")
 
@@ -503,9 +483,6 @@ def test_der_waechter_laeuft_vor_der_ersten_zustellung(tmp_path):
     assert transport.versendet == []
 
 
-# ==========================================================  Drosselung  ===
-
-
 def test_der_versand_wird_gedrosselt():
     """Ein gleichmaessiger Strom wird bei Empfaenger-Gateways anders bewertet
     als zweihundert Zustellungen in acht Sekunden."""
@@ -520,12 +497,7 @@ def test_der_versand_wird_gedrosselt():
         rate_je_minute=30,
         schlafen=pausen.append,
     )
-    # Zwei Pausen bei drei Zustellungen - nach der letzten wird nicht mehr
-    # gewartet.
     assert pausen == [2.0, 2.0]
-
-
-# =======================================================  Bounce-Abgleich ==
 
 
 def test_ein_hard_bounce_schaltet_sofort_ab():
@@ -605,9 +577,6 @@ def test_die_zustellquote_rechnet_gegen_die_versuchten():
     assert v.zustellquote(v.Lauf(datum="x")) == 1.0
 
 
-# ==========================  Keine Adresse im oeffentlichen Repo  ==========
-
-
 def test_keine_jsonl_im_repo_enthaelt_ein_adressmuster():
     """Ein Commit mit einer Adressliste ist ueber Git-Historie und Forks
     dauerhaft oeffentlich - und ein meldepflichtiger Vorfall nach Art. 33
@@ -615,8 +584,6 @@ def test_keine_jsonl_im_repo_enthaelt_ein_adressmuster():
     import re
 
     muster = re.compile(r"[\w.+-]+@[\w-]+\.[a-z]{2,}", re.I)
-    # Die eigene Adresse des Absenders steht bewusst in den Rechtstexten und
-    # im Absender - sie ist kein Abonnent.
     erlaubt = {"antonio.fotiadis.francisco@gmail.com", "noreply@anthropic.com"}
     getrackt = subprocess.run(
         ["git", "ls-files", "-z", "--", "*.jsonl"],

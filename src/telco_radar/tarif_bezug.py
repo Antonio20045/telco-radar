@@ -76,8 +76,6 @@ from .tarif_model import (
 
 log = logging.getLogger(__name__)
 
-# Wie genau ein Betrag treffen muss. Ein Cent ist kein Rundungsfehler,
-# sondern ein anderer Preis; die Toleranz faengt nur die Gleitkommadarstellung.
 _CENT = 0.005
 
 
@@ -97,8 +95,6 @@ def _ohne_marke(tid: str, anbieter: str) -> str:
     return f"{kopf}:{rumpf}"
 
 
-# Der einzige Anbieter, fuer den "Buendel-Slug == Tarif-ID des Bestands"
-# gemessen ist (29.09.2026, `Tarifbestand._slug_ist_tarif_id`).
 _SLUG_ALS_ID_ANBIETER = "o2"
 
 
@@ -209,8 +205,6 @@ class Tarifbestand:
         for satz in saetze:
             if isinstance(satz, dict) and satz.get("tarif_id"):
                 self.je_id[satz["tarif_id"]] = satz
-        # P3-E1: ein zurueckgezogener Tarif (juengster Stand traegt den
-        # Rueckzug) ist kein Bezugsziel mehr.
         self.je_id = {
             tid: satz
             for tid, satz in self.je_id.items()
@@ -223,12 +217,6 @@ class Tarifbestand:
             self.je_id_aktuell[kern] = _aktuelle_lesart(
                 self.je_id_aktuell.get(kern), satz
             )
-        # Zweite Passe (FIX4): dieselbe gewaehlte Lesart je Vertrag auch
-        # unter JEDER Zeitreihen-ID erreichbar machen, die zu ihrem baren
-        # Schluessel gehoert - nicht nur unter dem baren selbst. Ohne sie
-        # ging jeder Nachschlag mit einer `#live_shop`-tarif_id (die fuenf
-        # SIM-only-Referenzen aus B3) ins Leere, obwohl `je_id_aktuell`
-        # fuer denselben Vertrag laengst die richtige Lesart trug.
         for tid in self.je_id:
             self.je_id_aktuell[tid] = self.je_id_aktuell[zeitreihen_basis(tid)]
 
@@ -244,8 +232,6 @@ class Tarifbestand:
                 try:
                     saetze.append(json.loads(zeile))
                 except json.JSONDecodeError:
-                    # Eine kaputte Zeile ist kein Grund, den Bestand
-                    # wegzuwerfen - dieselbe Haltung wie in TarifSpeicher.
                     continue
         return cls(saetze)
 
@@ -263,8 +249,6 @@ class Tarifbestand:
             if tarif_id(s.get("anbieter", ""), "") == marke
         ]
 
-    # ------------------------------------------------------------- Namen
-
     def ueber_namen(self, anbieter: str, referenz: str) -> Optional[Bezug]:
         """Der Weg mit Guete `hoch`.
 
@@ -277,17 +261,6 @@ class Tarifbestand:
         gesucht = tarif_id(anbieter, referenz)
         satz = self.je_id.get(gesucht)
         if satz is None:
-            # Zweiter Versuch OHNE Markennamen, und zwar auf BEIDEN Seiten.
-            #
-            # Die Marke steht mal hier, mal dort: Vodafone nennt seinen
-            # Tarif im PIB "Vodafone Mobil M", auf der Produktseite steht
-            # "Mobil M" - bei Telekom und congstar ist es genau umgekehrt
-            # ("MagentaMobil L" im Blatt, "Telekom MagentaMobil L" auf der
-            # Seite). Die erste Fassung dieser Funktion loeste nur die eine
-            # Richtung auf, und das war ausgerechnet die seltenere: fuer
-            # congstar und Telekom haette Phase 4 damit KEINEN einzigen
-            # Buendelpreis speichern koennen, weil `TcoDB.upsert_buendel`
-            # ohne `tarif_id` wirft.
             kern = _ohne_marke(gesucht, anbieter)
             for tid, kandidat in self.je_id.items():
                 if _ohne_marke(tid, anbieter) == kern:
@@ -302,8 +275,6 @@ class Tarifbestand:
             guete=HOCH,
             grund=f"Name im Produktinformationsblatt: {satz.get('name', '')}",
         )
-
-    # -------------------------------------------------------------- Slug
 
     def ueber_slug(self, anbieter: str, slug: str) -> Optional[Bezug]:
         """Der Weg mit Guete `hoch` - ueber den Slug des Anbieters selbst.
@@ -404,8 +375,6 @@ class Tarifbestand:
             ),
         )
 
-    # ------------------------------------------------------------ Betrag
-
     def ueber_betrag(self, anbieter: str, betrag: Optional[float]) -> Optional[Bezug]:
         """Der Weg mit Guete `mittel` - und nur bei EINDEUTIGKEIT.
 
@@ -442,8 +411,6 @@ class Tarifbestand:
                 f"genau einen Tarif dieses Anbieters"
             ),
         )
-
-    # ------------------------------------------------------------ beides
 
     def geraeteblatt(self, bezug: Bezug) -> Bezug:
         """Das Geraeteblatt desselben Tarifs, wenn es genau eines gibt.

@@ -55,8 +55,6 @@ STDLIB = tuple({f"{ort}{os.sep}" for ort in (_STDLIB, str(Path(_STDLIB).resolve(
 IMPORT_RAHMEN = frozenset(
     {"get_code", "exec_module", "_load_unlocked", "_find_and_load"}
 )
-# Eine Bibliothek, die selbst Quelltext liest (Vorlagen rendern, Aufrufstapel für
-# Fehlermeldungen), ist kein Lesen des Tests; nur ihre Ladefunktionen reichen durch.
 LESE_RAHMEN = frozenset({"get_source", "get_data", "open_resource", "read_text"})
 SHELLS = frozenset({"sh", "bash", "zsh", "dash"})
 LESER_IM_KIND = frozenset(
@@ -95,8 +93,6 @@ CHROMIUM_ORTE = (
     str(Path.home() / ".cache/ms-playwright" / "chromium*/chrome-linux*/chrome"),
     "/Applications/Chromium.app/Contents/MacOS/Chromium",
 )
-# Chromium löst keinen Namen außer localhost auf und schickt alles, was nicht lokal
-# ist, an einen toten Proxy; 127.0.0.1 umgeht den Proxy von selbst.
 CHROMIUM_NUR_LOKAL = (
     "--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE localhost, EXCLUDE 127.0.0.1",
     "--proxy-server=http://127.0.0.1:9",
@@ -258,10 +254,7 @@ def _hermetik(ereignis: str, argumente: tuple[object, ...]) -> None:
             _verstoss(f"{REGEL_NETZ} ({_testdatei() or 'unbekannt'} wollte {host})")
 
 
-# Ein pytest im Kindprozess erbt die Variable des Elternlaufs; sie gilt hier nicht.
 os.environ.pop("PYTEST_CURRENT_TEST", None)
-# Ein lokaler Proxy würde jeden Abruf über 127.0.0.1 leiten und so an der Sperre
-# vorbeiführen; ohne ihn löst der Client den Namen selbst auf und scheitert hier.
 for _variable in [v for v in os.environ if v.lower() in PROXY_VARIABLEN]:
     del os.environ[_variable]
 sys.addaudithook(_hermetik)

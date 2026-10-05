@@ -100,37 +100,19 @@ from typing import Optional
 
 from . import geraete_tco_band, geraete_tco_karten
 
-# DIE EINE REGEL, ob zwei Leitzahlen gegeneinander gestellt werden duerfen
-# (P0-B-h1). Dieses Modul leitet sie nicht ab, es liest sie - genau wie
-# der Katalog (`geraete_view`) und die Buendelzeile
-# (`geraete_tco_karten.gleicher_horizont`).
 from ..tco_model import zeitraum_vergleichbar
 
-# Die drei Netzbetreiber-Wettbewerber - dieselbe Menge, die
-# `geraete_tco_karten.modelle()` ohnehin immer (mit oder ohne Zahl) neben
-# Vodafone fuehrt.
 NETZ_WETTBEWERBER = tuple(
     a for a in geraete_tco_karten.ANBIETER_REIHENFOLGE if a != "Vodafone"
 )
 
-# Zweitmarken mit Bündelerhebung (B3, siehe Modulkopf "WETTBEWERBERKREIS"):
-# Zeile NUR, wo sie eine Karte haben - kein Platzhalter, wo sie keine haben.
 ZWEITMARKEN_MIT_BUENDEL = ("congstar",)
 
-# Der Kreis, der Paare bilden KANN (Platzhalter macht allein der
-# Netzbetreiber-Kreis, siehe netzbetreiber_gruppen).
 ALLE_WETTBEWERBER = NETZ_WETTBEWERBER + ZWEITMARKEN_MIT_BUENDEL
 
 STATUS_VERGLEICHBAR = "vergleichbar"
 STATUS_BAND_MISMATCH = "band_mismatch"
 STATUS_KEIN_BUENDEL = "kein_buendel"
-# "nicht vergleichbar" heisst: eine Zahl IST gemessen, sie darf aber nicht
-# gegen die Vodafone-Zahl gestellt werden. Bis P0-B-h3 war das nur der
-# erneuerte Zustand (refurbished); seither faellt auch eine Zahl mit
-# ANDEREM ZEITRAUM darunter - der Grund je Zeile sagt, welcher der zwei
-# Faelle vorliegt. EIN Status, weil die Ansicht ihn ueberall gleich
-# behandelt (grau, kein Vorzeichen, kein Rang) und Seite, Aufklapper und
-# CSV dieselbe Menge lesen (Clean Code 7).
 STATUS_NICHT_VERGLEICHBAR = "nicht_vergleichbar"
 
 
@@ -160,37 +142,11 @@ def _grund_anderer_zeitraum(
     )
 
 
-# Wie viele Geraete-Gruppen ohne Aufklappen sichtbar sind. NICHTS wird
-# geloescht - der Rest steht im DOM hinter einem <details> (Test c: nicht
-# erhebbare/unvergleichbare Zeilen duerfen nie verschwinden, auch nicht
-# hinter einer Kappung).
 SICHTBAR_MAX = 15
-# E3/S3: 6 statt 20 - die Händler-Sektion ist seit E3 die DRITTE von drei
-# gleichwertigen Sektionen der Radar-Tafel und teilt deren 3000-px-Budget
-# (am echten Bestand: 20 Zeilen massen 993 px allein, die ganze Seite mit
-# 8 Zeilen 3216 px). Der Rest steht im Aufklapper "Alle N Händler-Zeilen",
-# nichts geht verloren.
 HAENDLER_SICHTBAR_MAX = 6
 
-# E3/S2: der Deckel der MODELL-LISTE im Radar-Reiter von geraete.html.
-# Dieselbe Bauform wie `SICHTBAR_MAX` (nichts geloescht, Rest hinter dem
-# Knopf "alle N anzeigen"), aber ein EIGENER Wert: die drei Sektionen des
-# Radar-Reiters teilen sich DAS Hoehenbudget EINER Tafel (Kriterium 11b
-# misst die Seite, nicht die Sektion). Am echten Bestand gemessen
-# (17.09.2026, 88 Modelle, Zeile ~78 px wegen der Δ-Zweizeiligkeit):
-# 6 Zeilen massen die Seite auf 3216 px - mit 5 bleibt sie unter 3000 px.
 MODELLISTE_SICHTBAR = 5
 
-# P4/D1 (STRATEGIE_GERAETE_V3, 18.09.2026): wie viele Balken die GRAFIK
-# der Radar-Tafel traegt. Der Deckel ist eine HOEHEN-Rechnung, keine
-# Daten-Grenze: 12 Reihen zu 30 px ergeben 360 px Plot plus Kopf - die
-# Grafik steht damit samt Ueberschrift ueber der Falz eines 900-px-
-# Schirms, und am Telefon (schmale Variante, 40 px je Reihe) bleibt sie
-# unter 500 px. Am echten Bestand (18.09.2026) haengt die Wahl nicht an
-# einem inhaltlichen Bruch: Die Plaetze 12 bis 16 tragen +150,90 € bis
-# +110,90 €, alle dieselbe Richtung - die 13. Zeile haette der Grafik
-# Laenge gegeben, keine Aussage. Der Rest steht in der Tabelle im
-# Aufklapper unter der Grafik (nichts streichen).
 GRAFIK_MAX = 12
 
 
@@ -223,11 +179,6 @@ def _vodafone_basis(modell: dict, band_je_tarif: dict) -> Optional[dict]:
     band = band_je_tarif.get(ref.get("tarif_id") or "")
     return {
         "gesamt": ref["gesamt"],
-        # DER ZEITRAUM, DEN DIE BASISZAHL TRAEGT (P0-B-h1/h3) - gelesen,
-        # nicht abgeleitet: `_referenz_aus_buendel` setzt ihn aus
-        # `Tco.leitzahl_monate` des eigenen Buendels, `_vodafone_referenz`
-        # aus ihren Tarifmonaten. Ohne ihn koennte diese Datei kein
-        # Vorzeichen verantworten (siehe `_zeile_fuer_anbieter`).
         "monate": ref.get("monate"),
         "tarif": ref.get("tarif", ""),
         "naeherung": not bool(ref.get("aus_buendel")),
@@ -261,17 +212,6 @@ def _zeile_fuer_anbieter(
             or f"Für dieses Modell ist bei {anbieter} kein Bündel erhoben.",
             **_beleg("", ""),
         }
-    # A3-Nachbesserung (Pruefer 20.09.2026, "hoch"): Eine ALTE Karte ist
-    # keine Zahl von heute - sie darf als BELEG neben der Zeile stehen
-    # (mit Quelle und Abrufdatum), aber weder Prozent noch Vergleichspaar
-    # tragen. Dieser Zweig ist der Weg, auf dem eine alte Karte den Radar
-    # erreicht: `alle_karten_je_band` filtert frisch, `uebrig` (die
-    # guenstigste Karte je Anbieter fuer den Band-Mismatch-Beleg) nicht.
-    # Am echten Bestand 20.09. zeichnete der Radar so sieben Telekom-
-    # Paarzeilen aus fuenf Tage alten Karten, obwohl deren frische
-    # Auswahl leer war. Gelesen wird das `frisch`-Feld der Karte - DIE
-    # eine Definition aus `geraete_tco_karten.ist_frisch` (Clean Code 7),
-    # hier wird nichts zweitgerechnet.
     if karte.get("frisch") is False:
         return {
             "anbieter": anbieter,
@@ -281,10 +221,6 @@ def _zeile_fuer_anbieter(
             "tarif": karte.get("tarif", ""),
             "band": None,
             "band_label": "",
-            # S3e (Diff-Prüfung 21.09.2026): der or-Fallback war tot -
-            # `alt_marke_fuer` liefert für ein unlesbares Datum
-            # selbst den „unbekannt"-Satz, es gibt keinen Produktions-
-            # pfad, der hier einen leeren String hinterlegt.
             "grund": karte.get("alt_marke", ""),
             **_beleg(karte.get("quelle_url", ""), karte.get("abgerufen_am", "")),
         }
@@ -326,17 +262,6 @@ def _zeile_fuer_anbieter(
             **_beleg(karte.get("quelle_url", ""), karte.get("abgerufen_am", "")),
         }
 
-    # DAS HORIZONT-TOR, aus derselben Quelle wie an der Buendelzeile
-    # (P0-B-h3, Befund 1). Bis hierher rechnete die naechste Zeile das
-    # Prozent ohne jeden Blick auf den Zeitraum: 1&1s Buendelzahl traegt
-    # 36 Monate Tarif UND Geraet, die Vodafone-Basis 24 - gemessen am
-    # Bestand vom 21.09.2026 trugen 26 Radarzeilen ein Vorzeichen gegen
-    # eine Zahl, deren eigene Buendelzeile daneben "andere Laufzeit"
-    # sagte (Samsung Galaxy A17 128 GB: -24,7 % / 727,54 gegen 965,80).
-    # Allein die zwoelf Tarifmonate jenseits des Horizonts sind groesser
-    # als jedes hier ausgewiesene Delta. Die Zahl BLEIBT stehen (sie ist
-    # richtig gemessen), nur Vorzeichen und Rang fallen weg - mit
-    # benanntem Grund, nie als stille Null.
     if not zeitraum_vergleichbar(karte.get("leitzahl_monate"), basis.get("monate")):
         return {
             "anbieter": anbieter,
@@ -394,11 +319,6 @@ def _paar_zeile(anbieter: str, band: str, wb_karte: dict, vf_karte: dict) -> dic
             ),
             **_beleg(wb_karte.get("quelle_url", ""), wb_karte.get("abgerufen_am", "")),
         }
-    # DASSELBE TOR wie in `_zeile_fuer_anbieter` und an der Buendelzeile
-    # (P0-B-h3): hier stehen ZWEI Karten gegeneinander, gelesen werden
-    # also zwei `leitzahl_monate` - die Regel dazu ist dieselbe eine
-    # (`tco_model.zeitraum_vergleichbar`). Ein Paar im selben Tarifband
-    # ist noch kein Paar ueber denselben Zeitraum.
     if not zeitraum_vergleichbar(
         wb_karte.get("leitzahl_monate"), vf_karte.get("leitzahl_monate")
     ):
@@ -507,8 +427,6 @@ def netzbetreiber_gruppen(
                     "grund": "",
                     **_beleg("", ""),
                 }
-                # Zweitmarken auch hier nur MIT Karte (B3, kein
-                # Platzhalter - siehe der Kommentar unten).
                 for a in ALLE_WETTBEWERBER
                 if a in NETZ_WETTBEWERBER or a in hat_karte
             ]
@@ -532,21 +450,8 @@ def netzbetreiber_gruppen(
             continue
         zeilen = []
         for a in ALLE_WETTBEWERBER:
-            # ZWEITMARKEN OHNE PLATZHALTER (B3): congstar ist kein
-            # Vollsortimenter - führt er das Gerät nicht im Bündel, bleibt
-            # die Zeile ganz aus (kein kein_buendel-Platzhalter, siehe
-            # Modulkopf). Die Netzbetreiber stehen IMMER da.
             if a not in NETZ_WETTBEWERBER and a not in hat_karte:
                 continue
-            # ALLE gemeinsamen Baender, ALLE Karten: ein Anbieter, der das
-            # Geraet in ZWEI Tarifen desselben Bandes fuehrt, hat auch
-            # ZWEI Vergleichspaare (RAD-1b; am Bestand gemessen: Telekom
-            # XS/S/M alle im Band Klein - vorher stand nur die guenstigste
-            # der drei, 18 von 51 Paaren fehlten auf der Seite). Die
-            # VF-Gegenkarte bleibt die GUENSTIGSTE VF-Karte des Bandes -
-            # die fuer Vodafone konservative Wahl (eine Behauptung "VF ist
-            # X % teurer" muss auch gegen VF's billigstes Angebot im Band
-            # halten).
             gemeinsam = {
                 b: je
                 for b, je in alle_je_band.items()
@@ -594,9 +499,6 @@ def netzbetreiber_gruppen(
     return gruppen
 
 
-# E3/S2: das Lueckenwort je Gruppen-Status. Es benennt, WARUM keine Zahl
-# steht, statt eine leere Zelle zu zeigen - ein Modell ohne Vergleich ist
-# eine Aussage (und der Grund steht wortreich in der Detailzeile).
 _LUECKE_WORT = {
     STATUS_BAND_MISMATCH: "kein gemeinsames Band",
     STATUS_KEIN_BUENDEL: "kein Bündel erhoben",
@@ -660,23 +562,6 @@ def modellliste(gruppen: list[dict]) -> dict:
             if g["vodafone"] is None:
                 luecke = "keine Vodafone-Kosten über 24 Monate erhoben"
             else:
-                # DER SPEZIFISCHSTE Grund gewinnt - Platzhalter-
-                # kein_buendel-Zeilen stehen in fast jeder Gruppe daneben
-                # und wuerden jeden anderen ueberdecken.
-                #
-                # P0-B-h3: `nicht_vergleichbar` steht jetzt VOR
-                # `band_mismatch`. Es ist der engste der drei Faelle: es
-                # gibt eine gemessene Karte IM gemeinsamen Band, nur darf
-                # sie nicht gegen die Vodafone-Zahl gestellt werden
-                # (anderer Zeitraum, erneuertes Geraet, alter Stand).
-                # "kein gemeinsames Band" waere daneben wahr, aber es
-                # meint einen ANDEREN Anbieter derselben Gruppe. Am
-                # Bestand vom 21.09.2026 gemessen: mit der alten
-                # Reihenfolge trugen 22 der 26 neu benannten Zeilen
-                # "nicht vergleichbar" und 5 "kein gemeinsames Band";
-                # mit dieser Reihenfolge 28 und 3 (die 4. war schon
-                # vorher eine Mismatch-Zeile mit einer unvergleichbaren
-                # Karte daneben).
                 luecke = "kein Vergleich"
                 for status in (
                     STATUS_NICHT_VERGLEICHBAR,
@@ -694,9 +579,6 @@ def modellliste(gruppen: list[dict]) -> dict:
                 "titel": g["titel"],
                 "hersteller": g["hersteller"],
                 "speicher": g["speicher"],
-                # Der TITEL traegt die GB-Stufe meist schon („Xiaomi 17 512 GB")
-                # - die Klein-Zeile der Zeile wuerde sie ein zweites Mal setzen
-                # („512 GB 512 GB", dieselbe Fehlerklasse wie „2454 Modelle").
                 "speicher_klein": (
                     ""
                     if g["speicher"] and f"{g['speicher']} GB" in (g["titel"] or "")
@@ -704,16 +586,10 @@ def modellliste(gruppen: list[dict]) -> dict:
                 ),
                 "prozent": paar["prozent"] if paar else None,
                 "euro": (paar["gesamt"] - paar["vf_gesamt"]) if paar else None,
-                # Fertige deutsche Zeichenketten fuer die Zelle - die Vorlage
-                # formatiert keine Zahl (S4; und ein zweiter Formatierer im
-                # Template waere die zweite Stelle fuer dieselbe Zahl).
                 "prozent_text": (_dvorzeichen(paar["prozent"], 1) if paar else ""),
                 "euro_text": (
                     _dvorzeichen(paar["gesamt"] - paar["vf_gesamt"]) if paar else ""
                 ),
-                # Das Wort zur Zahl, aus DERSELBEN Differenz wie `euro_text`
-                # (nicht aus der gerundeten Prozentzahl): die Leitzahl der
-                # Übersicht sagt damit, wer günstiger ist, ohne Erklärsatz.
                 "richtung": (
                     _richtung(paar["gesamt"] - paar["vf_gesamt"]) if paar else ""
                 ),
@@ -725,10 +601,6 @@ def modellliste(gruppen: list[dict]) -> dict:
                 "quelle_url": (paar or {}).get("quelle_url", ""),
                 "abgerufen_am": (paar or {}).get("abgerufen_am", ""),
                 "luecke": luecke,
-                # Das Band des Paares - der Sprung in den Graphen landet direkt
-                # im Band, in dem die Abweichung gerechnet wurde (Deep-Link
-                # ?modell=…&band=…). Ohne Paar bleibt es leer und der Graph
-                # waehlt selbst sein erlaubtes Band.
                 "sprung_band": sprung_band,
                 "vodafone": g["vodafone"],
                 "vodafone_grund": g["vodafone_grund"],
@@ -741,35 +613,6 @@ def modellliste(gruppen: list[dict]) -> dict:
         "rest": zeilen[MODELLISTE_SICHTBAR:],
         "gesamt": len(zeilen),
     }
-
-
-# ---------------------------------------------------------------------------
-# P4/D1 (STRATEGIE_GERAETE_V3, 18.09.2026): die Balkengrafik der Radar-Tafel
-#
-# DIE FRAGE DES REITERS - "Bei welchem Geraet ist Vodafone teurer als der
-# Wettbewerb?" - liest sich bis P4 nur als 746-Zeilen-Wand (design.md:
-# "100 % Tabelle, 0 % Grafik, 727 rot eingefaerbte Elemente"). Die Grafik
-# zeigt dieselbe Zahl als BILD: EIN Balken je Modell(-Speicher)-Zeile,
-# Laenge = Abstand in Euro zum Vodafone-Preis, Nulllinie = Vodafone.
-#
-# Barpreis-Ebene wie die Alarmtabelle (nur vergleichbare Neugeraete, ohne
-# Vertrag): gelesen werden die fertigen `zeilen` aus
-# `geraete_vergleich.vergleich(..., preisart=OHNE_VERTRAG)` - KEINE zweite
-# Preisrechnung, nur die Auswahl des Gegenstuecks je Zeile:
-#   delta > 0 VF-Preis minus GUENSTIGSTEN Wettbewerber (VF teuerer),
-#   delta < 0 VF-Preis minus guenstigsten der TEUEREREN (VF guenstiger).
-# Preisgleichheit ist kein Abstand (STRIKT-Regel des Vergleichs) und
-# faellt heraus.
-#
-# FARBE NACH RICHTUNG (Rot-Deckel, design.md Regel 4): Balken Richtung
-# "Wettbewerber guenstiger" in Ink, Richtung "Vodafone guenstiger" in
-# Blau (--al-bestpreis, die Positiv-Farbe dieser Tafel); ROT traegt
-# genau EIN Balken - der groesste Abstand ZUUNGUNSTEN Vodafones (der
-# schaerfste Befund). Ist kein solcher Fall im Bestand, gibt es keinen
-# roten Balken - Rot ist Akzent, keine Flaeche. Die Farben prueft der
-# Palette-Validator: #e60000/#2b5bd7 gegen #f6f4ee, CVD dE 29,4 (protan),
-# Kontrast >= 3:1 (beide PASS, 18.09.2026).
-# ---------------------------------------------------------------------------
 
 
 def _x(text: object) -> str:
@@ -868,20 +711,9 @@ def _grafik_svg(
     Rechenvorschrift): der linke Arm ergibt sich aus dem groessten
     Abstand nach links, derselbe Massstab wie rechts.
     """
-    # Gezeichnet UND beschriftet wird in der Zeichenregel der Seite
-    # (negativ = Wettbewerber guenstiger, wie Modell-Liste, Händler und
-    # die Δ-Spalte „Mit Tarif"): ein guenstigerer Wettbewerber steht links
-    # der Vodafone-Linie mit negativem Wert. `delta` aus grafik_zeilen()
-    # rechnet VF − Wettbewerber und wird hier EINMAL gedreht, damit
-    # Richtung, Farbe und Beschriftung aus derselben Groesse kommen (bis
-    # 28.09.2026 stand „+280,90 €" unter einer Leitzahl „-50,4 %").
     zeilen = [{**z, "delta": -z["delta"], "prozent": -z["prozent"]} for z in zeilen]
     n = len(zeilen)
     if breit:
-        # Der LINKE Arm traegt seit 28.09.2026 den Regelfall (Wettbewerber
-        # guenstiger) mit Wert UND Laden - er bekommt den breitesten Raum
-        # („-1.012,50 € · ElectronicPartner" misst ~170 px und darf nicht
-        # in die Namensspalte laufen).
         w, name_breite, wert_raum, neg_raum = 1120, 158, 158, 190
         reihen_hoehe, balken_hoehe, kopf, fuss = 30, 14, 30, 12
     else:
@@ -890,10 +722,6 @@ def _grafik_svg(
     h = kopf + n * reihen_hoehe + fuss
     max_abs = max((abs(z["delta"]) for z in zeilen), default=1.0) or 1.0
     neg_arm = max((abs(z["delta"]) for z in zeilen if z["delta"] < 0), default=0.0)
-    # Schmal beginnt die Nulllinie mit Einsatz (10 statt 2): eine 1,5-px-
-    # Haarlinie direkt an der Kante ist auf dem Telefon unsichtbar (am
-    # Screenshot vom 18.09.2026 nachgesehen), mit Einsatz liest sie sich
-    # als Achse. Breit steht sie ohnehin frei hinter der Namensspalte.
     start = (2 if breit else 10) + neg_raum * (neg_arm > 0)
     verfuegbar = w - 6 - wert_raum - start
     if breit:
@@ -921,9 +749,6 @@ def _grafik_svg(
         )
         + "'>"
     )
-    # Die EINE Nulllinie mit dem EINEN Etikett (Auftrag P4/D1): kein
-    # Raster und keine zweite Achse - jeder Balken traegt seinen Wert
-    # selbst als Beschriftung, die Nulllinie ist die Referenz.
     anker = " text-anchor='middle'" if breit else ""
     teile.append(
         f"<line class='wr-gr-null' x1='{x0:.1f}' y1='{kopf - 8}' "
@@ -1041,11 +866,6 @@ def grafik(vergleich_ohne_vertrag: dict, n: int = GRAFIK_MAX) -> dict:
     if spitze_kandidat is not None:
         schluessel = (spitze_kandidat["device_id"], spitze_kandidat["speicher"])
         if not any((z["device_id"], z["speicher"]) == schluessel for z in gewaehlt):
-            # P4-Fix (Code-Pruefung S4): n<=0 (ein kuenftiger Aufrufer)
-            # wuerde `gewaehlt[-1]` auf einer LEEREN Liste lesen -
-            # IndexError statt Leerzustand. Produktion ruft ohne n
-            # (Bestand >= 1), aber die Spitze gehoert auch ins entleerte
-            # Bild: dann IST sie die einzige Zeile.
             if gewaehlt:
                 gewaehlt[-1] = spitze_kandidat
             else:
@@ -1056,10 +876,6 @@ def grafik(vergleich_ohne_vertrag: dict, n: int = GRAFIK_MAX) -> dict:
         spitze = {
             "device_id": spitze_kandidat["device_id"],
             "speicher": spitze_kandidat["speicher"],
-            # Der Schluessel fuer die Vorlage: dieselbe Normalisierung
-            # wie in der Alarm-Zeile (None -> ''), sonst traegt die
-            # Spitzen-Markierung an einem Modell ohne Speicherangabe
-            # vorbei ("...|None" trifft nie).
             "schluessel": (
                 f"{spitze_kandidat['device_id'] or ''}|"
                 f"{spitze_kandidat['speicher'] or ''}"
@@ -1178,11 +994,7 @@ def radar(
         "gruppen": gruppen,
         "gruppen_sichtbar": gruppen[:SICHTBAR_MAX],
         "gruppen_rest": gruppen[SICHTBAR_MAX:],
-        # E3/S2: die Modell-Liste des Radar-Reiters - aus denselben Gruppen
-        # abgeleitet, keine zweite Rechnung.
         "modelliste": modellliste(gruppen),
-        # P4/D1: die Balkengrafik - servergerendertes SVG ueber den
-        # Tabellen, aus denselben Vergleichszeilen wie die Alarmtabelle.
         "grafik": grafik(vergleich_ohne_vertrag),
         "haendler": haendler,
         "haendler_sichtbar": haendler[:HAENDLER_SICHTBAR_MAX],
@@ -1191,26 +1003,12 @@ def radar(
         "hat_daten": bool(gruppen),
         "hat_vergleichbare_zeilen": hat_vergleichbare or bool(haendler),
         "anbieter_erwartet": list(NETZ_WETTBEWERBER),
-        # O2: die Alarmtabelle - VOLLSTAENDIG durchgereicht (der Deckel
-        # kappt nur die Ansicht, `sichtbar` + `rest` ist die ganze Liste).
         "alarme": alarme if alarme is not None else _alarme_leer(),
-        # O2: der Sortiments-Aufklapper - "gelistet, aber nicht bei uns"
-        # ist die Sortimentshaelfte derselben Radar-Frage.
         "ohne_vodafone": ohne,
         "ohne_vodafone_gesamt": (vergleich_ohne_vertrag or {}).get(
             "ohne_vodafone_gesamt", len(ohne)
         ),
-        # O3: die Portfolio-Abschnitte der Geräteseite (Lifecycle,
-        # Wochenkarte) - als GANZES durchgereicht, keine zweite Rechnung;
-        # `render_site` baut das Dict aus denselben Feldern, die die alte
-        # Tafel #tafel-portfolio las (Antonios Entscheidung, Strategie
-        # §5.2: Portfolio-Fragen gehören auf die Portfolio-Seite).
         "portfolio": portfolio if portfolio is not None else _portfolio_leer(),
-        # O4: der Radar-Export. Der Notzustand steht HIER (die Vorlage darf
-        # nie auf einen fehlenden Schluessel treffen, dieselbe Lehre wie bei
-        # `_alarme_leer`); `render_site` ueberschreibt ihn nach dem Schreiben
-        # der Datei mit deren ECHTEN Angaben - Zeilenzahl und Groesse
-        # kommen aus der Datei, nicht aus einer Rechnung.
         "export": {"datei": "", "zeilen": 0, "bytes": 0},
     }
 
@@ -1256,7 +1054,5 @@ def leer() -> dict:
         "ohne_vodafone": [],
         "ohne_vodafone_gesamt": 0,
         "portfolio": _portfolio_leer(),
-        # O4: der Radar-Export - Notzustand mit denselben Schlüsseln,
-        # damit die Vorlage nie auf ein fehlendes Feld trifft.
         "export": {"datei": "", "zeilen": 0, "bytes": 0},
     }

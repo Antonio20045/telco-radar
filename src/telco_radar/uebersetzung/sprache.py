@@ -27,37 +27,12 @@ import re
 
 log = logging.getLogger(__name__)
 
-# Sprachen, fuer die es KEINE Uebersetzung gibt: nur noch die Zielsprache
-# selbst. Bis zum 27.08.2026 stand hier auch "en" - mit der Annahme, das
-# Zielpublikum lese Englisch ohnehin. Gemessen am Lauf vom 27.08.2026 waren
-# 143 von 163 vorgefilterten Meldungen englisch; die Zielgruppe (deutsche
-# Manager ohne sicheres Englisch, siehe CLAUDE.md §1) ist damit falsch
-# geschnitten. Englisch ist jetzt eine Fremdsprache wie jede andere.
 MUTTERSPRACHEN = frozenset({"de"})
 
-# Unter so vielen Zeichen wird gar nicht erst gemessen. py3langid liefert
-# auch fuer drei Woerter ein Ergebnis - nur eben ein geratenes.
 MINDESTZEICHEN = 200
 
-# Wie sicher sich die Erkennung sein muss. py3langid gibt ein normalisiertes
-# Mass zwischen 0 und 1 zurueck; darunter gilt der Text als unbestimmt.
 MINDESTSICHERHEIT = 0.90
 
-# Anzeigenamen der Sprachen, die in den Messungen vom 13.08.2026 wirklich
-# vorkamen, plus die naheliegenden Nachbarn. Eine unbekannte Sprache
-# bekommt ihr Kuerzel als Namen - das ist haesslich, aber ehrlich, und es
-# faellt beim Lesen der Seite sofort auf.
-# Die Liste traegt zwei Saetze auf jeder Uebersetzungsseite ("Maschinelle
-# Uebersetzung aus dem ...") UND die Sprachangabe an der Meldungskarte. Ein
-# fehlender Code faellt deshalb nicht aus, sondern erscheint als Kuerzel in
-# Grossbuchstaben - "aus dem EN".
-#
-# Genau das war bis zum 27.08.2026 der Regelfall: "en" und "de" fehlten,
-# obwohl Englisch die mit Abstand haeufigste Ausgangssprache des Bestands ist
-# (die Sprachpruefung laesst eine englische Meldung nur dann bis hierher
-# durch, wenn der Leser eine deutsche Fassung bekommt). Ein Code, der nie
-# uebersetzt wird, gehoert trotzdem hier hinein: die Namen werden auch fuer
-# die reine ANZEIGE der erkannten Sprache gebraucht.
 SPRACHNAMEN = {
     "ar": "Arabisch",
     "bg": "Bulgarisch",
@@ -145,7 +120,7 @@ def _langid():
         from py3langid.langid import LanguageIdentifier, MODEL_FILE
 
         _ERKENNER = LanguageIdentifier.from_pickled_model(MODEL_FILE, norm_probs=True)
-    except Exception:  # noqa: BLE001 - fehlende Bibliothek ODER Modelldatei
+    except Exception:  # noqa: BLE001
         _ERKENNER = None
     return _ERKENNER
 
@@ -170,7 +145,7 @@ def erkenne_sprache(text: str, titel: str = "") -> tuple[str, float]:
     probe = f"{titel.strip()}. {text}" if titel.strip() else text
     try:
         kuerzel, wert = erkenner.classify(probe[:4000])
-    except Exception as exc:  # noqa: BLE001 - eine Bibliothek darf den Lauf nicht kosten
+    except Exception as exc:  # noqa: BLE001
         log.warning("Spracherkennung fehlgeschlagen: %s", exc)
         return "", 0.0
     sicherheit = float(wert)

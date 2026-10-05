@@ -36,9 +36,6 @@ def _entry(
     return e
 
 
-# --------------------------------------------------------------- Achse C
-
-
 def test_reach_axis_uses_explicit_config_value():
     assert pr.reach_axis(_src("ALDI TALK", tier=2, reach=2)) == 2
     assert pr.reach_axis(_src("simplytel", tier=2, reach=1)) == 1
@@ -58,9 +55,6 @@ def test_reach_axis_clamps_out_of_range_config():
     assert pr.reach_axis(_src("X", reach=-4)) == 0
 
 
-# --------------------------------------------------------------- Achse D
-
-
 def test_momentum_counts_other_brands_not_own():
     entries = [
         _entry("1", brand="A", mechanic="wechselpraemie"),
@@ -68,8 +62,6 @@ def test_momentum_counts_other_brands_not_own():
         _entry("3", brand="B", mechanic="wechselpraemie"),
     ]
     index = pr.mechanic_brand_index(entries)
-    # A sieht nur B, nicht sich selbst - zwei eigene Angebote derselben
-    # Mechanik duerfen die eigene Marktbreite nicht aufblasen.
     assert pr.momentum_axis("wechselpraemie", "A", index) == 1
 
 
@@ -105,9 +97,6 @@ def test_mechanic_index_skips_retired_entries():
     assert index == {"zugabe": {"A"}}
 
 
-# --------------------------------------------------------------- Achse E
-
-
 @pytest.mark.parametrize(
     "raw,expected",
     [
@@ -133,9 +122,6 @@ def test_campaign_axis_survives_broken_today():
 def test_parse_valid_until_rejects_impossible_dates():
     assert pr.parse_valid_until("32.13.2026") is None
     assert pr.parse_valid_until("kein Datum") is None
-
-
-# ------------------------------------------------------------ Aggregation
 
 
 def test_composite_is_absolute_not_relative():
@@ -174,9 +160,6 @@ def test_normalise_weights_falls_back_on_unusable_config():
     assert (
         pr.normalise_weights({k: 0 for k in pr.DEFAULT_WEIGHTS}) == pr.DEFAULT_WEIGHTS
     )
-
-
-# -------------------------------------------------------- Score-Caching
 
 
 def test_needs_judgement_for_unscored_entry():
@@ -224,9 +207,6 @@ def test_score_basis_ignores_whitespace_but_not_wording():
     assert pr.score_basis(a) != pr.score_basis(c)
 
 
-# ----------------------------------------------------------- Hysterese
-
-
 def test_hysteresis_enters_above_threshold():
     assert pr.apply_hysteresis({}, 70, 68, 60) is True
 
@@ -245,9 +225,6 @@ def test_retired_offer_is_never_a_highlight():
         pr.apply_hysteresis({"highlight": True, "status": "ausgelaufen"}, 99, 68, 60)
         is False
     )
-
-
-# ------------------------------------------------- LLM-Achsen (judge_offers)
 
 
 class _FakeComplete:
@@ -359,9 +336,6 @@ def test_judge_offers_without_entries_makes_no_call(monkeypatch):
     assert fake.calls == []
 
 
-# ------------------------------------------------------------- score_all
-
-
 def test_score_all_without_llm_leaves_entries_unscored():
     """Ohne LLM-Achsen waere ein Score nicht mit bewerteten Angeboten
     vergleichbar - dann lieber ehrlich None als eine zu niedrige Zahl."""
@@ -395,7 +369,6 @@ def test_score_all_scores_and_highlights(monkeypatch):
         model="m",
         use_llm=True,
     )
-    # lever 3, depth 3, reach 3, momentum 0 (allein), campaign 3
     assert entry["score"] == pr.composite(
         {"lever": 3, "depth": 3, "reach": 3, "momentum": 0, "campaign": 3}
     )
@@ -485,7 +458,7 @@ def test_score_all_uses_configured_weights_and_thresholds(monkeypatch):
         use_llm=True,
         settings=settings,
     )
-    assert entry["score"] == 100  # reach/momentum/campaign ausgeblendet
+    assert entry["score"] == 100
     assert entry["highlight"] is True
     assert (summary["enter"], summary["exit"]) == (90, 80)
 

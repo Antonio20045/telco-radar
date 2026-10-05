@@ -50,7 +50,7 @@ class Ergebnis:
     message_id: str = ""
     status: int = 0
     fehler: str = ""
-    dauerhaft: bool = False  # True = nicht wiederholen, Empfaenger markieren
+    dauerhaft: bool = False
 
     @property
     def wiederholbar(self) -> bool:
@@ -77,9 +77,6 @@ class Trockenlauf(Transport):
 
     def send(self, nachricht: Nachricht, an: str) -> Ergebnis:
         self.versendet.append((an, nachricht))
-        # Eine Kennung, die wie eine echte aussieht, aber erkennbar keine
-        # ist: ein Trockenlauf darf im Sendeprotokoll nie mit einem echten
-        # Versand verwechselt werden.
         return Ergebnis(ok=True, message_id=f"trocken-{len(self.versendet)}")
 
 
@@ -107,13 +104,6 @@ class BrevoTransport(Transport):
             "htmlContent": nachricht.html,
             "textContent": nachricht.text,
         }
-        # `headers` nur mitschicken, wenn wirklich einer drinsteht. Ein leeres
-        # Objekt beantwortet Brevo mit HTTP 400 - und genau daran scheiterte
-        # am 13.08.2026 jede Bestaetigungsmail: die DOI-Mail setzt bewusst
-        # keinen List-Unsubscribe (es gibt noch kein Abo), schickte das leere
-        # Feld aber trotzdem mit. Der Testversand hatte einen Header und kam
-        # deshalb durch - der Unterschied war unsichtbar, bis man beide
-        # Nutzlasten nebeneinanderlegte.
         if nachricht.headers:
             nutzlast["headers"] = dict(nachricht.headers)
         return nutzlast
@@ -125,9 +115,6 @@ class BrevoTransport(Transport):
             if letzte.ok or letzte.dauerhaft:
                 return letzte
             if versuch < self.versuche:
-                # Rueckwaerts wachsende Wartezeit. Bei 429 ist die Gegenseite
-                # ueberlastet oder das Kontingent erschoepft - schnelles
-                # Nachfassen macht beides schlimmer.
                 time.sleep(min(2**versuch, WARTEZEIT_MAX_SEKUNDEN))
         return letzte
 
@@ -152,21 +139,12 @@ class BrevoTransport(Transport):
                 )
         except urllib.error.HTTPError as fehler:
             text = fehler.read().decode("utf-8", "replace")[:300]
-            # 429 ist die Ratengrenze und voruebergehend, 5xx ebenso. Alles
-            # andere im 4xx-Bereich ist eine Aussage ueber DIESE Anfrage und
-            # wird beim vierten Versuch nicht wahrer.
             dauerhaft = 400 <= fehler.code < 500 and fehler.code != 429
             if fehler.code == 401:
                 text += (
                     " | Erste Ursache: Brevo-Keys verfallen nach 90 "
                     "Tagen ohne Nutzung (docs/mail-setup.md 3.2)."
                 )
-            # Im Log steht der Code und der Text der API - NIE die Adresse.
-            # Der Grund gehoert ins Protokoll, die Adresse nicht. Brevo
-            # nennt in `code`/`message` die verletzte Regel; Adressen darin
-            # werden vor der Ausgabe unkenntlich gemacht. Ohne diese Zeile
-            # stand am 13.08.2026 nur "HTTP 400 (dauerhaft)" im Log, und die
-            # Ursache war eine Stunde Suche wert.
             try:
                 d = json.loads(text or "{}")
                 grund = f"{d.get('code', '?')}: {d.get('message', '')}"

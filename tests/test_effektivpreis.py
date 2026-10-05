@@ -30,11 +30,6 @@ def _tarif(**kw) -> Tarif:
     return t
 
 
-# --------------------------------------------------------------------------- #
-# Der Fall, wegen dem es dieses Modul gibt
-# --------------------------------------------------------------------------- #
-
-
 def test_rabattphasen_ergeben_den_durchschnitt():
     """ "6 Monate 9,99 €, danach 29,99 €" ist weder 9,99 € noch 29,99 €.
 
@@ -73,7 +68,6 @@ def test_drei_phasen():
             Preisphase(13, None, 39.99),
         ]
     )
-    # 3x0 + 9x19,99 + 12x39,99 = 179,91 + 479,88 = 659,79 -> 27,49
     e = rechne(t, cashback=0, wechselbonus=0)
     assert e.monatlich == 27.49
 
@@ -86,11 +80,6 @@ def test_luecke_in_den_phasen_laeuft_zum_letzten_preis_weiter():
     """Eine Phase, die den Horizont nicht ausfuellt: der letzte bekannte
     Preis ist der Normalpreis, nicht der Rabattpreis."""
     assert phasensumme([Preisphase(1, 12, 10.0)], 24) == 240.0
-
-
-# --------------------------------------------------------------------------- #
-# Einmalkosten und der gemeinsame Nenner
-# --------------------------------------------------------------------------- #
 
 
 def test_anschlusspreis_verteilt_sich_auf_den_horizont():
@@ -129,11 +118,6 @@ def test_flex_tarif_rechnet_gegen_denselben_horizont():
     assert flex.horizont == VERGLEICHSMONATE
 
 
-# --------------------------------------------------------------------------- #
-# Fehlt etwas, ist es eine Luecke - keine Null
-# --------------------------------------------------------------------------- #
-
-
 def test_fehlender_anschlusspreis_ist_eine_luecke():
     """ "Nicht bekannt" und "kostenlos" sind zwei verschiedene Aussagen, und
     nur eine davon ist belegt."""
@@ -158,11 +142,6 @@ def test_vollstaendiger_tarif_ist_belastbar():
         _tarif(grundgebuehr=20.0, anschlusspreis=0.0), cashback=0, wechselbonus=0
     )
     assert e.belastbar and e.luecken == []
-
-
-# --------------------------------------------------------------------------- #
-# Die drei Werte: der Preis allein reicht nicht
-# --------------------------------------------------------------------------- #
 
 
 def test_preis_je_gb_wird_ausgewiesen():
@@ -217,11 +196,6 @@ def test_unbegrenzt_ergibt_preis_je_gb_null():
     assert e.preis_je_gb == 0.0
 
 
-# --------------------------------------------------------------------------- #
-# Die Fair-Value-Linie
-# --------------------------------------------------------------------------- #
-
-
 def test_regression_findet_die_gerade():
     a, b = regression([(0.0, 1.0), (1.0, 3.0), (2.0, 5.0)])
     assert round(a, 3) == 1.0 and round(b, 3) == 2.0
@@ -241,11 +215,6 @@ def test_regression_ignoriert_unendlich():
         regression([(0.0, 1.0), (1.0, 3.0), (2.0, 5.0), (float("inf"), 9.0)])
         is not None
     )
-
-
-# --------------------------------------------------------------------------- #
-# Die Seite
-# --------------------------------------------------------------------------- #
 
 
 def _state(tmp_path: Path, saetze: list[dict]) -> Path:
@@ -309,8 +278,6 @@ def test_unbegrenzte_tarife_stehen_nicht_in_der_wolke(tmp_path):
             _satz("t:u", "o2", "Unlimited", 50.0, None, datenvolumen_gb=None),
         ],
     )
-    # Unendlich kommt aus JSON nicht heil zurueck - der Extraktor setzt inf,
-    # json macht daraus Infinity. Hier direkt gesetzt:
     saetze = json.loads(
         "[" + ",".join(p.read_text(encoding="utf-8").splitlines()) + "]"
     )
@@ -400,18 +367,11 @@ def test_die_bilanz_zaehlt_was_ihr_etikett_sagt(tmp_path):
     eine Zahl, die wie ein Defekt klänge und keine wäre).
     """
     saetze = [
-        # mit Volumen, mit Anschlusspreis: der einzige Punkt der Karte
         _satz("t:a", "Telekom", "A", 20.0, 10.0),
-        # mit Volumen, OHNE Anschlusspreis: Punkt, aber Lücke gezählt
         _satz("t:b", "o2", "B", 30.0, 20.0, anschlusspreis=None),
-        # ohne Volumenangabe: Zeile in der Tabelle, kein Ort auf der Achse
         _satz("t:c", "o2", "C", 25.0, None, anschlusspreis=None),
-        # ohne Grundpreis: nicht belastbar, deshalb kein Punkt - obwohl
-        # das Volumen bekannt ist. Genau das ist der zweite Grund, warum
-        # die Karte anders zählt als die Tabelle.
         _satz("t:d", "Telekom", "D", None, 5.0, grundgebuehr=None, preisphasen=[]),
     ]
-    # Unbegrenzt kommt aus JSON nicht heil zurück (siehe Test oben).
     saetze.append(json.loads(json.dumps(_satz("t:u", "o2", "Unlimited", 40.0, None))))
     saetze[-1]["datenvolumen_gb"] = float("inf")
     p = _state(tmp_path, saetze)
@@ -423,8 +383,6 @@ def test_die_bilanz_zaehlt_was_ihr_etikett_sagt(tmp_path):
     assert bilanz["ohne_volumen"] == 1, "nur C nennt kein Volumen"
     assert bilanz["unbegrenzt"] == 1
     assert bilanz["belastbar"] == 4, "D hat keinen Grundpreis"
-    # Die Cashback-Lücke tragen alle fünf - und keine der vier Zahlen
-    # oben zählt sie. Genau deshalb steht sie als Satz im Hinweis.
     assert all(
         "Cashback/Wechselbonus" in z["luecken"]
         for z in tarife_view.aufbereiten(p, [])["zeilen"]

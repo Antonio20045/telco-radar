@@ -79,12 +79,6 @@ _STRIP_TAGS = (
 _WS_RE = re.compile(r"[ \t]+")
 _BLANK_RE = re.compile(r"\n{3,}")
 
-# Meta tags that commonly carry a page's representative campaign visual, in
-# priority order. Deliberately page-level only (one "hero" image per brand
-# snapshot) - matching individual offers to individual images on a page we
-# do not control would need per-brand selector tuning or vision extraction,
-# far more fragile than this one well-supported convention. A missing/failed
-# image is never an error: the template falls back to a colour tile.
 _IMG_META = (
     ("property", "og:image:secure_url"),
     ("property", "og:image"),
@@ -92,27 +86,10 @@ _IMG_META = (
     ("name", "twitter:image:src"),
 )
 
-# Upper bound on link candidates handed to the LLM per brand: a page can have
-# hundreds of anchors, and every candidate costs prompt tokens. 30 is
-# generous for the handful of genuinely distinct offers a promo page shows
-# (see promo_analyst._MAX_ENTRIES_PER_PAGE=6) while keeping the prompt
-# bounded even on a link-heavy page.
 _MAX_LINK_CANDIDATES = 30
-# Containers whose own text is a reasonable last-resort context for a link
-# that has neither useful anchor text nor a nearby heading.
 _LINK_CONTAINER_TAGS = ("article", "li", "div", "section")
 
-# Bildkandidaten (siehe extract_image_candidates). Eine Aktionsseite traegt
-# deutlich mehr Bilder als brauchbare Links - Geraetefotos, Testimonials,
-# Netzkarten -, und die Zuordnung unten waehlt daraus. 60 ist grosszuegig
-# genug fuer die groesste gemessene Seite (winSIM: 66 <img>, davon 25 ueber
-# 400 px) und deckelt trotzdem eine Seite mit tausend Produktkacheln.
 _MAX_IMAGE_CANDIDATES = 60
-# Tags, die fuer die BILDsuche stehen bleiben duerfen. Anders als bei Text
-# und Links bleibt <header> hier drin: das Kampagnenmotiv einer Aktionsseite
-# steht sehr oft genau dort (o2online.de, otelo.de, congstar.de - alle drei
-# fuehren mit einem Buehnenbild im Kopfbereich). Wer header mitentfernt,
-# wirft zuerst das beste Bild der Seite weg.
 _IMG_STRIP_TAGS = (
     "script",
     "style",
@@ -125,16 +102,8 @@ _IMG_STRIP_TAGS = (
 )
 _IMG_SRC_ATTRS = ("src", "data-src", "data-lazy-src", "data-original", "data-image-src")
 _IMG_SRCSET_ATTRS = ("srcset", "data-srcset")
-# Dateiendungen, die als Bild taugen. Ein Pfad ohne Endung (CDN mit
-# Query-Parametern) faellt NICHT durch - der Download misst ohnehin nach.
 _IMG_BAD_SUFFIX = (".svg", ".gif")
 _SKIP_HREF_PREFIXES = ("#", "javascript:", "mailto:", "tel:")
-# Tracking/campaign query params seen on real deep links during the
-# promo-tiefenlinks-konzept.md research (ALDI TALK's FF_* funnel tracker,
-# generic utm_*). Stripped ONLY for the internal content_hash() signature
-# below - the displayed/stored URL keeps these untouched, because they can
-# be functional (see the konzept doc Premortem c: O2's own ratenzahlung/
-# zielgruppe params are not tracking, they select the actual tariff variant).
 _HASH_TRACKING_PARAM_RE = re.compile(r"^(utm_|ff_)", re.I)
 
 
@@ -240,7 +209,7 @@ def extract_link_candidates(
             if len(seen) >= max_candidates:
                 break
         return [{"href": href, "text": text} for href, text in seen.items()]
-    except Exception:  # noqa: BLE001 - additive signal, must never break the fetch
+    except Exception:  # noqa: BLE001
         log.info("Link-Kandidaten-Extraktion fehlgeschlagen fuer %s", base_url)
         return []
 
@@ -298,9 +267,6 @@ def _bild_quelle(img) -> tuple[str, int]:
     kandidaten = [(u, w) for u, w in kandidaten if u]
     if not kandidaten:
         return "", 0
-    # Eine angekuendigte Breite schlaegt eine unbekannte; unter mehreren
-    # gewinnt die groesste. Gemessen wird spaeter trotzdem mit Pillow -
-    # das hier ist nur die Vorauswahl.
     breiteste = max(kandidaten, key=lambda k: k[1])
     if breiteste[1]:
         return breiteste
@@ -378,7 +344,7 @@ def extract_image_candidates(
             if len(gesehen) >= max_candidates:
                 break
         return list(gesehen.values())
-    except Exception:  # noqa: BLE001 - additives Signal, darf den Abruf nie kippen
+    except Exception:  # noqa: BLE001
         log.info("Bild-Kandidaten-Extraktion fehlgeschlagen fuer %s", base_url)
         return []
 
@@ -421,25 +387,6 @@ def fetch_snapshot(url: str, kind: str, http_cfg: dict) -> dict:
         "links": extract_link_candidates(html, url),
         "images": extract_image_candidates(html, url),
     }
-
-
-# Hier standen bis zum 07.08.2026 `_dismiss_cookie_banner()` und
-# `capture_hero_image()`: je Marke ein eigener Chromium-Start, der die
-# Aktionsseite mit echten Bildern und Schriften laed, ein Cookie-Banner
-# wegzuklicken versucht und dann 1280x720 aus dem Viewport schneidet.
-#
-# Das Ergebnis war messbar schlecht. Von den 15 aufgenommenen Screenshots
-# zeigten zwei das Cookie-Banner statt der Aktion (1&1, congstar - der
-# Klickversuch trifft laengst nicht jede Zustimmungsschicht), einer war
-# eine weisse Flaeche, und ALLE hatten dasselbe Grundproblem: eine ganze
-# Webseite, auf Kachelbreite verkleinert, zeigt keine Aktion, sondern ein
-# Muster. Antonio: "Bei vielen sieht man nur die Cookies. Und so ein
-# Screenshot hilft ueberhaupt nicht."
-#
-# Ersetzt durch extract_image_candidates() oben plus promo_bilder.py: das
-# Kampagnenmotiv, das die Aktionsseite selbst zeigt - dieselbe Loesung, mit
-# der die Marktrecherche seit dem 06.08.2026 bebildert wird. Nebenbei faellt
-# damit ein Chromium-Start je Marke weg.
 
 
 def content_hash(text: str, links: list[dict] | None = None) -> str:

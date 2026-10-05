@@ -67,28 +67,18 @@ def test_operator_items_untouched():
     assert item.operator == "Vodafone Group"
 
 
-# ------------------------------------- Vorgabe-Region fuer Fachpressequellen
-# Der erste der vier Schritte aus CLAUDE.md §9. Lauf #75 schloss EUROPA MIT
-# NULL bewerteten Meldungen ab, waehrend "Global" 62 von 92 bekam: seit
-# Session 5 stehen deutsche, franzoesische, spanische und italienische Feeds
-# in der Liste, und `tag_news_regions` ordnet eine Fachpressemeldung nur zu,
-# wenn ein BETREIBERNAME in der Ueberschrift steht.
-
-
 def test_regionale_fachpresse_landet_in_ihrer_region():
     from pathlib import Path
+
     from telco_radar.config import load_config
 
     cfg = load_config(Path(__file__).resolve().parents[1])
     nach_region = {}
     for s in cfg.news_sources:
         nach_region.setdefault(s.region or "global", []).append(s.name)
-    # Genau die Quellen, wegen derer der Regionsteil leer blieb.
     assert "teltarif" in nach_region.get("europe", [])
     assert "TeleSemana (LatAm)" in nach_region.get("latin_america", [])
     assert "Telecom Review Africa" in nach_region.get("africa_middle_east", [])
-    # Die weltweiten Fachmedien bleiben global - eine Vorgabe fuer sie waere
-    # eine Behauptung.
     assert "Light Reading" in nach_region.get("global", [])
 
 
@@ -131,6 +121,7 @@ def test_unbekannte_vorgabe_region_wird_verworfen(tmp_path):
     einem Tippfehler als Namen."""
     import shutil
     from pathlib import Path
+
     from telco_radar.config import load_config
 
     wurzel = Path(__file__).resolve().parents[1]

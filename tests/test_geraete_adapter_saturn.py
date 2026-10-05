@@ -66,11 +66,6 @@ def farben():
     return lade_farben(_WURZEL)
 
 
-# ==========================================================================
-# Die Markenseite ohne Marktplatz-Mix: vier Saturn-eigene Preise
-# ==========================================================================
-
-
 def test_iphone17pro_liefert_die_vier_saturn_eigenen_preise(iphone17pro_html):
     """Spike-Gegenprobe: Tiefblau 256 GB kostet 1.179,00 EUR, UVP-Streichpreis
     1.299,00 EUR (nicht Teil der Rueckgabe, siehe Modulkopf - kein Adapter
@@ -95,13 +90,8 @@ def test_iphone17pro_jede_zeile_traegt_ihre_eigene_produktseite(iphone17pro_html
     Markenseite - eine spezifischere Adresse fuer denselben Preis."""
     saetze = saturn.lies(iphone17pro_html, _URL_17_PRO)
     urls = {s["url"] for s in saetze}
-    assert len(urls) == 4  # vier verschiedene Produktseiten
+    assert len(urls) == 4
     assert _URL_17_PRO not in urls
-
-
-# ==========================================================================
-# Abnahmekriterium 2: der Marktplatz-Filter
-# ==========================================================================
 
 
 def test_iphone17_hat_zwoelf_gelistete_aber_nur_fuenf_saturn_eigene(iphone17_html):
@@ -115,7 +105,6 @@ def test_iphone17_hat_zwoelf_gelistete_aber_nur_fuenf_saturn_eigene(iphone17_htm
     fremd = [f for f in alle if f["is_marketplace"] is True]
     assert len(eigen) == 5
     assert len(fremd) == 7
-    # Der teuerste Fremdanbieter (Media-Reich GmbH) - siehe Spike-Tabelle.
     assert any(f["amount"] == 2036.0 for f in fremd)
 
 
@@ -127,7 +116,6 @@ def test_iphone17_lies_verwirft_alle_marktplatz_angebote(iphone17_html):
     assert len(saetze) == 5
     preise = {s["preis"] for s in saetze}
     assert preise == {939.99}
-    # Keiner der sieben bekannten Fremdanbieter-Preise darf durchrutschen.
     fremdpreise = {1084.06, 1142.41, 1319.37, 2036.0, 1095.0, 1102.0, 1080.0}
     assert not (preise & fremdpreise)
 
@@ -168,16 +156,9 @@ def test_dedupe_behaelt_den_eintrag_mit_ratenplan():
     ergebnis = saturn._dedupe_by_product_id([ohne_raten, mit_raten])
     assert len(ergebnis) == 1
     assert ergebnis[0]["apollo_key"] == "b"
-    # Reihenfolge darf das Ergebnis nicht aendern.
     ergebnis2 = saturn._dedupe_by_product_id([mit_raten, ohne_raten])
     assert len(ergebnis2) == 1
     assert ergebnis2[0]["apollo_key"] == "b"
-
-
-# ==========================================================================
-# Die Farbe: strukturiert aus dem Titel gelesen, nicht dem generischen
-# Rueckfall ueberlassen
-# ==========================================================================
 
 
 def test_farbe_mit_umlaut_wird_richtig_gelesen(iphone17_html):
@@ -189,8 +170,6 @@ def test_farbe_mit_umlaut_wird_richtig_gelesen(iphone17_html):
     saetze = saturn.lies(iphone17_html, _URL_17)
     weiss = next(s for s in saetze if "Weiß" in s["titel"])
     assert weiss["farbe"] == "Weiß"
-    # Der Befund, der die Sonderbehandlung rechtfertigt: der generische
-    # Rueckfall waere hier leer ausgegangen.
     assert farbe_aus_titel(weiss["titel"], lade_farben(_WURZEL)) == ("", None)
 
 
@@ -212,11 +191,6 @@ def test_farbe_landet_als_kanonische_farbe_in_der_sku(katalog, farben):
     assert listung is not None
     assert listung.farbe_normalisiert == "weiss"
     assert listung.sku_id == "apple-iphone-17-256gb-weiss"
-
-
-# ==========================================================================
-# Ehrliche Ausfaelle
-# ==========================================================================
 
 
 def test_ohne_preloaded_state_wirft():
@@ -243,11 +217,6 @@ def test_leere_apollo_state_liefert_leere_liste_kein_fehler():
     kein Abruffehler."""
     html = '<script>window.__PRELOADED_STATE__ = {"apolloState": {}};</script>'
     assert saturn.lies(html, _URL_17) == []
-
-
-# ==========================================================================
-# Der ganze Weg, mit der AUSGELIEFERTEN Konfiguration
-# ==========================================================================
 
 
 def test_landet_als_listung_im_bestand(
@@ -291,11 +260,6 @@ def test_landet_als_listung_im_bestand(
     assert treffer.confidence == "hoch"
     assert treffer.abgerufen_am == "2026-09-05"
     assert treffer.quelle_url.startswith("https://www.saturn.de/de/product/")
-    # R2-Regressionstest (EVAL_saturn-adapter-r1.md Befund 1): der
-    # Anbieter reicht seine ehrliche Kennung an JEDEN Markenseiten-Abruf
-    # weiter - unabhaengig davon, was `http_cfg` global traegt (das ist
-    # hier `hole()`s Sache, siehe test_saturn_ua_ist_primary_auch_bei_
-    # globaler_chrome_konfiguration unten fuer die Kopfzeilenprobe).
     assert (
         gesehene_user_agents
         == ["TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"] * 2
@@ -319,28 +283,13 @@ def test_die_ausgelieferte_konfiguration_haelt_was_der_hinweis_verspricht():
     assert anbieter.grund == ""
     assert "05.09.2026" in anbieter.hinweis
     assert "isProductOfTypeMarketplace" in anbieter.hinweis
-    # R2 (EVAL_saturn-adapter-r1.md Befund 1): die ausgelieferte
-    # Konfiguration traegt die per-Anbieter-Kennung, unabhaengig davon, was
-    # config/settings.yaml global sagt.
     assert (
         anbieter.user_agent
         == "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
     )
-    # Start-Scope laut Auftrag: alle Apple-iPhone-Serien des Katalogs.
     assert len(anbieter.einstiege) == 17
     assert all("/de/brand/apple/iphone/" in e.url for e in anbieter.einstiege)
 
-
-# ==========================================================================
-# R2: die ehrliche Kennung als PRIMARY - der belegte UA auf Kopfzeilenebene
-# ==========================================================================
-# EVAL_saturn-adapter-r1.md Befund 1 (Schwere 1): R1 behauptete im Bericht,
-# `collect.http.fetch` sende `TelcoRadar/1.0 (+https://telco-radar.
-# onrender.com/ueber)` - tatsaechlich ging als PRIMARY die volle
-# Chrome-Vortaeuschung aus config/settings.yaml:549 hinaus, weil der Adapter
-# das globale `http_cfg` unveraendert benutzte. Diese Tests messen die
-# WIRKLICH GESENDETE Kopfzeile auf httpx-Ebene, nicht nur, was der Code
-# behauptet zu tun - genau der Punkt, an dem R1 widerlegt wurde.
 
 _CHROME_UA_R1 = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
@@ -376,8 +325,6 @@ def test_saturn_ua_ist_primary_auch_bei_globaler_chrome_konfiguration(monkeypatc
 
     monkeypatch.setattr(httpx, "get", fake_get)
 
-    # Das globale http_cfg, wie es aus config/settings.yaml kommt - Chrome,
-    # exakt der Wert, den der Evaluator gegen R1 nachgemessen hat.
     http_cfg = {"user_agent": _CHROME_UA_R1}
     hole = _hole_fabrik(http_cfg)
 
@@ -458,15 +405,7 @@ def test_saturn_anbieter_reicht_seine_ehrliche_kennung_bis_zur_kopfzeile(monkeyp
         jetzt=datetime(2026, 9, 5, 12, tzinfo=UTC),
     )
 
-    assert bilanz.status == "leer"  # leere Apollo-State, kein Fehler
-    assert len(gesehene_kopfzeilen) == 2  # robots.txt + eine Markenseite
-    # Robots.txt-Abruf UND Markenseiten-Abruf: BEIDE mit der ehrlichen
-    # Kennung des Anbieters. Bis B2 (08.09.2026) ging robots.txt mit der
-    # globalen Chrome-Konfiguration hinaus - der T2-Laufzeitbeleg der
-    # Telekom-Erhebung hat genau das als Befund gemeldet (1 von 7 Requests,
-    # `outputs/beleg-telekom-geraete-2026-09-08.json`), und der Beleg der
-    # Erhebung verlangt 100 %. Der robots-Abruf gehört zum Crawl DIESES
-    # Anbieters; Anbieter OHNE Override bleiben bei der globalen Kennung
-    # (PM-Entscheidung zu settings.yaml steht aus).
-    assert gesehene_kopfzeilen[0]["User-Agent"] == _EHRLICHE_UA  # robots.txt
-    assert gesehene_kopfzeilen[1]["User-Agent"] == _EHRLICHE_UA  # Markenseite
+    assert bilanz.status == "leer"
+    assert len(gesehene_kopfzeilen) == 2
+    assert gesehene_kopfzeilen[0]["User-Agent"] == _EHRLICHE_UA
+    assert gesehene_kopfzeilen[1]["User-Agent"] == _EHRLICHE_UA

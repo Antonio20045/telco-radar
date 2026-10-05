@@ -70,9 +70,6 @@ _QUELLEN = {
 DEVICE = "apple-iphone-17"
 SPEICHER = 256
 
-# (anbieter, [(datum, preis), ...]) - identisch zu den 16 Messterminen des
-# realen iPhone 17 256 GB (sechs Anbieter, zehn Termine je Reihe gemischt,
-# 16 EINDEUTIGE Tage insgesamt - "16 Messtermine").
 _REIHEN = [
     (
         "Vodafone",
@@ -182,9 +179,6 @@ def _baue(tmp_path):
     (state / "geraete_preise.jsonl").write_text(
         "\n".join(preiszeilen) + "\n", encoding="utf-8"
     )
-    # KEIN Bündel noetig - der Verlaufs-Reiter braucht nur Listungen und
-    # Preishistorie; ein leeres TCO-Bündel haelt das Gatter der Tafel 1
-    # (Vergleich) aus dem Weg, ohne diesen Test zu verkomplizieren.
     (state / "geraete_tco.json").write_text(
         json.dumps({"updated": HEUTE, "buendel": [], "sim_only": []}), encoding="utf-8"
     )

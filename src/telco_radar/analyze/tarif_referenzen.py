@@ -76,24 +76,7 @@ from ..tco_model import SimOnlyReferenz
 
 log = logging.getLogger(__name__)
 
-# Ein Festnetzanschluss ist kein Massstab fuer ein Smartphone-Buendel.
 _UNGEEIGNET = ("festnetz",)
-
-# Vodafone veroeffentlicht jeden Tarif ZWEIMAL: einmal als reines
-# Tarifblatt ("Vodafone Mobil M") und einmal mit der Geraetestaffel
-# ("Vodafone Mobil M mit Smartphone"). Beide nennen denselben Preis ohne
-# Geraet - es ist derselbe Tarif, zweimal beschrieben.
-#
-# Als zwei Referenzen stuende derselbe Massstab zweimal untereinander, mit
-# demselben Betrag. Das ist keine Auskunft, sondern eine Dublette.
-#
-# Die Regel ist ENG gefasst, und das ist Absicht: es faellt nur weg, was
-# woertlich denselben Namen PLUS einen Hardware-Zusatz traegt UND denselben
-# Betrag nennt. "MagentaMobil S" und "MagentaMobil S Flex" haben ebenfalls
-# denselben Preis und sind trotzdem zwei Tarife (der eine mit
-# Mindestlaufzeit, der andere ohne) - eine Regel ueber Namenspraefixe
-# haette den zweiten geloescht.
-# Die Regel selbst: `tarif_model.ist_geraeteblatt_von`.
 
 
 def _bevorzugt_live(saetze: list[dict]) -> list[dict]:
@@ -117,9 +100,6 @@ def aus_bestand(bestand: Tarifbestand) -> list[SimOnlyReferenz]:
     """
     saetze = _bevorzugt_live(bestand.saetze())
 
-    # Satz je (Anbieter, Tarifname) - fuer die Dublettenregel unten.
-    # Verglichen wird auf Kleinschreibung: der Zusatz steht auf beiden
-    # Blaettern gleich, der Name selbst nicht immer.
     je_name: dict[tuple[str, str], dict] = {}
     for satz in saetze:
         je_name[
@@ -145,8 +125,6 @@ def aus_bestand(bestand: Tarifbestand) -> list[SimOnlyReferenz]:
             (anbieter.lower(), GERAETEBLATT_ZUSATZ.sub("", name).lower())
         )
         if tarifblatt is not None and ist_geraeteblatt_von(satz, tarifblatt):
-            # Das Buendelblatt desselben Tarifs. Sein Datensatz bleibt im
-            # Bestand - nur als MASSSTAB waere er eine Dublette.
             log.debug(
                 "SIM-only-Referenz uebersprungen: %r ist das Geraeteblatt von %r",
                 name,
@@ -156,9 +134,6 @@ def aus_bestand(bestand: Tarifbestand) -> list[SimOnlyReferenz]:
         referenz = SimOnlyReferenz(
             anbieter=anbieter,
             tarif_name=name,
-            # Die Referenz KOMMT aus dem Bestand - ihr Schluessel ist damit
-            # der des Datensatzes, nicht das Ergebnis einer Suche. Guete
-            # `hoch`: hier wird nichts zugeordnet, hier wird gelesen.
             tarif_id=satz.get("tarif_id", ""),
             tarif_id_guete=HOCH,
             tarif_sim_only_monatlich=betrag,
@@ -171,19 +146,6 @@ def aus_bestand(bestand: Tarifbestand) -> list[SimOnlyReferenz]:
             abgerufen_am=satz.get("abgerufen_am", ""),
             quelle_art=satz.get("preistyp") or PREISTYP_DOKUMENT,
         )
-        # ZWEI TARIFE MIT DERSELBEN TITELZEILE ergeben eine ID.
-        # `SimOnlyReferenz.id` ist (Anbieter, Tarifname) - live gemessen
-        # fuehrt o2 `o2-home-l-flex` und `o2-home-l-175-flex` als getrennte
-        # PDFs mit derselben Ueberschrift (CLAUDE.md § 6). Der Tarifspeicher
-        # trennt sie ueber einen Hash-Zusatz an der `tarif_id`, dieser
-        # Schluessel kann das nicht.
-        #
-        # Ohne die Sperre uebernaehme `TcoDB` den ZWEITEN Satz und behielte
-        # dabei den Schluessel des ersten - die Zeile truege dann einen
-        # Betrag aus dem einen und einen `tarif_id` aus dem anderen
-        # Dokument. Der erste gewinnt und der zweite wird gemeldet: ein
-        # Massstab, dessen Beleg auf ein anderes Blatt zeigt, ist schlimmer
-        # als ein fehlender.
         if referenz.id in gesehen:
             log.warning(
                 "SIM-only-Referenz %s doppelt: %r und %r tragen "

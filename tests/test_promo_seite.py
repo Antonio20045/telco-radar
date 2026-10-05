@@ -45,8 +45,6 @@ class _Quelle:
         self.group = ""
         self.internal_reference = internal_reference
         self.crawlable = crawlable
-        # Platz in der Anbieter-Rangfolge - er ordnet die Seite seit dem
-        # 08.08.2026 (siehe report/promo._rang).
         self.rang = rang
         self.reach = None
 
@@ -101,7 +99,6 @@ def _view(eintraege=None):
     return prepare_promo_view(eintraege or EINTRAEGE, QUELLEN, "2026-08-06")
 
 
-# ----------------------------------------------------------------- Zahlen
 def test_die_kennzahlen_stimmen_mit_den_daten_ueberein():
     """Die Zahlen, mit denen die Seite rechnet - sie muessen zaehlbar sein.
     Im Kopf steht seit dem 08.08.2026 keine davon mehr (Antonio: die vielen
@@ -115,11 +112,7 @@ def test_die_kennzahlen_stimmen_mit_den_daten_ueberein():
     ]
     assert view["active_total"] == len(aktive)
     assert view["brands_active"] == len({e["brand"] for e in aktive})
-    # Vodafone zaehlt nicht als beobachteter Wettbewerber.
     assert view["brands_tracked"] == len(MARKEN)
-    # highlight_count zaehlt die hervorgehobenen KARTEN - seit dem
-    # Markenraster steht jede sichtbare Aktion als Karte da, nicht nur die
-    # staerkste je Marke.
     assert view["highlight_count"] == len([e for e in EINTRAEGE if e.get("highlight")])
 
 
@@ -178,7 +171,7 @@ def test_das_bild_gehoert_zum_angebot_und_kennzeichnet_sein_belegniveau():
     assert nach_id["id1"]["bild"] == "images/bild-1-1280.jpg"
     assert nach_id["id1"]["bild_ist_motiv"] is False
     assert nach_id["id4"]["bild_ist_motiv"] is True
-    assert nach_id["id5"]["bild"] == ""  # kein Beleg, keine Behauptung
+    assert nach_id["id5"]["bild"] == ""
     assert view["mit_bild"] == 2
 
 
@@ -215,7 +208,6 @@ def test_das_eigene_angebot_bleibt_ausserhalb_der_wertung():
     assert all(not k["brand"]["internal_reference"] for k in view["karten"])
 
 
-# ------------------------------------------------------------ leeres Bild
 def test_ein_leerer_screenshot_wird_erkannt():
     """Der schaerfste Einzelbefund vom 07.08.2026: das einzige Bild der
     ganzen Seite war eine weisse 1280x720-Flaeche. Masse und Dateityp waren
@@ -236,7 +228,6 @@ def test_ein_leerer_screenshot_wird_erkannt():
     assert ist_leer(als_jpeg(weiss)) is True
     assert ist_leer(b"kein Bild") is True
 
-    # Gegenprobe: ein Bild mit Inhalt faellt nicht durch.
     import random
 
     rnd = random.Random(1)
@@ -266,7 +257,6 @@ def test_die_echten_screenshots_bestehen_die_pruefung():
     )
 
 
-# ------------------------------------------------------------- Vorspann
 def test_ein_digest_wird_nicht_als_analyse_ausgegeben():
     """Der Fehler vom 06.08.2026, an seiner Wurzel: faellt der Promo-Editor
     aus, schreibt `build_digest()` eine Liste von Angebotstiteln unter
@@ -277,11 +267,8 @@ def test_ein_digest_wird_nicht_als_analyse_ausgegeben():
     from telco_radar.report.html import _promo_lead
 
     digest = build_digest([_angebot(1, "Alpha Mobil")])
-    # Der Titel steht genau EINMAL in der Zeile, nicht blank und nochmal als
-    # Linktext.
-    assert digest.count("Aktion 1 von Alpha Mobil") == 2  # Text + Quellenbasis
+    assert digest.count("Aktion 1 von Alpha Mobil") == 2
     assert "Aktion 1 von Alpha Mobil [" not in digest
-    # Und der Vorspann erkennt, dass das keine Analyse ist.
     assert _promo_lead(digest) == ""
 
 
@@ -315,7 +302,6 @@ def test_eine_klein_geschriebene_marke_beendet_den_vorspann_trotzdem():
         _promo_lead(prosa)
         == "Die Rabattschlacht hat eine neue Eskalationsstufe erreicht."
     )
-    # Und die Abkuerzungsbremse haelt weiter: der Punkt in "z. B." ist keiner.
     kurz = (
         "## Was diese Woche auffaellt\n\nMehrere Marken, z. B. congstar, "
         "senken den Preis. Danach mehr Text.\n"
@@ -323,7 +309,6 @@ def test_eine_klein_geschriebene_marke_beendet_den_vorspann_trotzdem():
     assert _promo_lead(kurz) == "Mehrere Marken, z. B. congstar, senken den Preis."
 
 
-# ------------------------------------------------- die gerenderte Seite
 @pytest.fixture
 def promo_site(tmp_path):
     """Rendert die echte Seite mit der echten Konfiguration und dem echten
@@ -376,7 +361,6 @@ def test_kein_angebotstitel_steht_zweimal_hintereinander(promo_site):
     for block in soup.select(".promo-method-body, .paufmacher, .pz"):
         text = " ".join(block.get_text(" ", strip=True).split())
         assert " ." not in text, f"Freistehender Punkt: {text[:90]}"
-    # Keine Schlagzeile der Seite steht doppelt in derselben Kachel.
     for kachel in soup.select(".pmarke"):
         titel = [a.get_text(" ", strip=True) for a in kachel.select(".szl")]
         assert len(titel) == len(set(titel)), f"Doppelter Titel: {titel}"
@@ -432,7 +416,6 @@ def test_die_zahl_der_marktlage_stimmt_mit_der_datenbank(promo_site):
         }
         assert gezaehlt == len(marken), f"{label}: {gezaehlt} statt {len(marken)}"
 
-    # Und keine Zahlenzeile mehr im Kopf.
     assert "laufende Aktionen bei" not in soup.get_text(" ")
 
 
@@ -444,12 +427,6 @@ def test_die_seite_zeigt_kein_motiv_zweimal(promo_site):
     )
     quellen = [img["src"] for img in soup.select(".pk-bild img[src]")]
     assert len(quellen) == len(set(quellen)), "Ein Motiv steht mehrfach auf der Seite"
-    # Dasselbe fuer die Schriftkacheln: identischer Text auf zwei Kacheln
-    # war der zweite Befund ("Wechsel- oder Altgeraetpraemie" x4) - und zwar
-    # JE MARKENBLOCK. Seit dem 08.08.2026 traegt jede Karte ohne Motiv eine
-    # Kachel, und ueber 13 Bloecke hinweg kosten zwei verschiedene Angebote
-    # zweier verschiedener Anbieter nun einmal beide "10 €". Nebeneinander
-    # stehen sie nie; als Fehler liest sich nur die Wiederholung IM Block.
     assert soup.select(".pmarke .pk-bild--typo"), "keine Schriftkachel, nichts geprueft"
     for block in soup.select(".pmarke"):
         kacheln = [
@@ -520,7 +497,6 @@ def test_jede_karte_traegt_ein_motiv(promo_site):
         if not k.select_one(".pk-bild")
     ]
     assert not ohne, f"{len(ohne)} Karten ohne Motiv, z. B. {ohne[:3]}"
-    # ... und keine Kachel ist leer.
     for kasten in soup.select(".pk-bild"):
         assert kasten.select_one("img") or kasten.get_text(strip=True)
 
@@ -543,7 +519,6 @@ def test_die_marken_stehen_in_der_reihenfolge_der_konfiguration(promo_site):
     rang = {s.name: s.rang for s in cfg.sources}
     wettbewerber = [n for n in gezeigt if not n.startswith("Vodafone")]
     assert wettbewerber == sorted(wettbewerber, key=lambda n: rang[n])
-    # Die eigene Marke steht am Ende, nicht an ihrem Rang.
     assert (
         not gezeigt
         or gezeigt[-1].startswith("Vodafone")
@@ -561,6 +536,5 @@ def test_jede_marke_der_konfiguration_hat_einen_eindeutigen_rang():
     raenge = [s.rang for s in cfg.sources]
     assert all(r for r in raenge), [s.name for s in cfg.sources if not s.rang]
     assert len(set(raenge)) == len(raenge), sorted(raenge)
-    # Die Netzbetreiber stehen vorn - das ist die erste Regel der Rangfolge.
     mno = [s.rang for s in cfg.sources if s.tier == 1]
     assert max(mno) < min(s.rang for s in cfg.sources if s.tier != 1)

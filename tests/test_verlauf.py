@@ -77,9 +77,7 @@ def test_ein_duenner_monat_traegt_keine_aussage():
         LABELS,
     )
     assert "Aug 26" in v["duenne_monate"]
-    # Der duenne Monat steht im Gitter ...
     assert [m["label"] for m in v["monate"]][-1] == "Aug 26"
-    # ... aber er traegt keine Bewegungsaussage.
     assert v["waechst"] == [] and v["kippt"] == []
 
 
@@ -96,7 +94,7 @@ def test_gemessen_wird_gegen_den_durchschnitt_nicht_gegen_den_vormonat():
         _bestand(
             **{
                 "2026_05": {"ki": 10, "gaming": 10},
-                "2026_06": {"ki": 2, "gaming": 18},  # Ausreisser nach unten
+                "2026_06": {"ki": 2, "gaming": 18},
                 "2026_07": {"ki": 10, "gaming": 10},
                 "2026_08": {"ki": 10, "gaming": 10},
             }
@@ -109,9 +107,6 @@ def test_gemessen_wird_gegen_den_durchschnitt_nicht_gegen_den_vormonat():
     gemeldet = next(
         (abs(e["delta"]) for e in v["waechst"] + v["kippt"] if e["key"] == "ki"), 0.0
     )
-    # Der Ausreisser liegt zwei Monate zurueck; gegen den Vormonat waere
-    # jetzt Ruhe, gegen den Durchschnitt ist der Rueckstand noch sichtbar -
-    # und das ist die ehrlichere Aussage.
     assert gegen_vormonat == 0.0
     assert 0 < gemeldet <= 15.0
 

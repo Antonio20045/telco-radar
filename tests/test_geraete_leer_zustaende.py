@@ -108,8 +108,6 @@ DATEIEN = (
     "geraete-historie.csv",
     "geraete-tco.csv",
     "wettbewerbsradar.csv",
-    # P3: die zwei Modell-Exporte des Katalogs (je Ansicht eine
-    # Datei, eine Zeile je Modell)
     "geraete-modell-barpreis.csv",
     "geraete-modell-tco.csv",
 )
@@ -243,9 +241,6 @@ def ohne_alarm(tmp_path_factory) -> BeautifulSoup:
     return BeautifulSoup(seite["html"], "html.parser")
 
 
-# ---- 1. Zeitreihe/TCO-Vergleich ohne Bündel -------------------------------
-
-
 def test_zeitreihe_ohne_buendel_nennt_den_leerzustand(ohne_alarm):
     """Der Vergleichs-Reiter sagt BENANNT, dass es nichts zu rechnen
     gibt - kein still leeres Wahl-Schuld-Feld, keine leere Gruppe.
@@ -264,9 +259,6 @@ def test_zeitreihe_ohne_buendel_nennt_den_leerzustand(ohne_alarm):
     assert not ohne_alarm.select("#gr-zr-gruppe .gr-zr-antwort"), (
         "ohne Bündel steht ein Antwort-Satz da - gerechnet aus nichts"
     )
-
-
-# ---- 2. Radar ohne Alarme ---------------------------------------------------
 
 
 def test_radar_ohne_alarme_nennt_den_leerzustand(ohne_alarm):
@@ -299,12 +291,7 @@ def test_radar_ohne_alarme_nennt_den_leerzustand(ohne_alarm):
     assert "ein Wettbewerber günstiger" in _text(leer_satz), (
         "der Leer-Satz nennt nicht den Grund (kein Wettbewerber günstiger)"
     )
-    # Der Satz NENNT die Vergleichsmenge - die Tafel ist nicht leer,
-    # weil nichts gemessen wurde.
     assert "stehen einem Wettbewerber gegenüber" in _text(sektion)
-
-
-# ---- 3. Radar ohne Abweichungszeilen ---------------------------------------
 
 
 def test_radar_ohne_abweichung_nennt_den_leerzustand(ohne_alarm):
@@ -326,9 +313,6 @@ def test_radar_ohne_abweichung_nennt_den_leerzustand(ohne_alarm):
     )
 
 
-# ---- 4. Katalog leer -------------------------------------------------------
-
-
 def test_katalog_leer_nennt_den_leerzustand(leer, ohne_alarm):
     """Ohne jeden Bestand sagt die SEITE benannt, dass nichts erfasst
     ist (die Reiter-Tafeln fehlen dann alle - der Leerzustand ist der
@@ -343,8 +327,6 @@ def test_katalog_leer_nennt_den_leerzustand(leer, ohne_alarm):
         "der Katalog trägt Zeilen, obwohl kein Bestand da ist"
     )
 
-    # Gegenprobe am Bestand MIT Zeilen: der Leer-Satz der Tafel ist
-    # versteckt (Filter-Satz), die Tabelle trägt ihre Zeile.
     satz = ohne_alarm.select_one("#tafel-katalog .gr-a-leer")
     assert satz is not None, "der Filter-Leersatz fehlt am vollen Katalog"
     assert satz.has_attr("hidden"), (
@@ -355,9 +337,6 @@ def test_katalog_leer_nennt_den_leerzustand(leer, ohne_alarm):
         "der Katalog trägt keine Zeile, obwohl der Bestand eine hat - "
         "Lookup ins Leere, der Test würde sonst nichts prüfen"
     )
-
-
-# ---- 5. Export ohne Zeilen -------------------------------------------------
 
 
 def test_export_ohne_zeilen_nennt_die_null(leer):
@@ -377,7 +356,6 @@ def test_export_ohne_zeilen_nennt_die_null(leer):
         assert "0" in a.get_text(), (
             f"Link ohne Null neben der Zeilenzahl: {a.get_text(strip=True)}"
         )
-    # Sechs Links, sechs verschiedene Dateien - keine fehlt, keine doppelt.
     ziele = {a.get("href") for a in links}
     assert ziele == {f"exporte/{n}" for n in DATEIEN}, ziele
 

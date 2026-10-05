@@ -32,9 +32,6 @@ from pathlib import Path
 
 log = logging.getLogger(__name__)
 
-# Aus versand.py gespiegelt, damit die Seite nicht das Versandmodul importieren
-# muss (das lebt im Lauf, nicht im Renderer). Ein Test haelt beide gegeneinander
-# - zwei Zahlen fuer dasselbe Limit waeren zwei Limits.
 TAGESLIMIT = 300
 WARNUNG_AB_ANTEIL = 0.80
 MIN_ZUSTELLQUOTE = 0.95
@@ -141,8 +138,6 @@ def aufbereiten(pfad: Path, *, grenze: int = 12) -> dict:
         "vorhanden": bool(ausgaben),
         "ausgaben": ausgaben,
         "tageslimit": TAGESLIMIT,
-        # Die Warnungen der JUENGSTEN Ausgabe stehen oben. Aeltere Warnungen
-        # sind Geschichte; wer sie sucht, liest die Tabelle.
         "warnungen": ausgaben[0].warnungen if ausgaben else [],
         "summe_zugestellt": sum(a.zugestellt for a in ausgaben),
     }

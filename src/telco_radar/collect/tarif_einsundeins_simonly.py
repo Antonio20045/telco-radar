@@ -78,29 +78,16 @@ log = logging.getLogger(__name__)
 
 SEITEN_URL = "https://www.1und1.de/handytarife-ohne-handy"
 
-# Der Absender dieses Laufs (BRIEF S-5). Er weicht vom Per-Anbieter-
-# Override im Geraetezweig nur im Kontakt-Zusatz ab - beide sind
-# ehrliche Kennungen im Sinne von `collect.http._ist_ehrliche_kennung`.
 USER_AGENT = "TelcoRadar/1.0 (+https://telco-radar.onrender.com/ueber)"
 
 ANBIETER = "1&1"
 
-# Kein Crawl-delay in den robots beider Domains - der Abstand ist unsere
-# eigene Zurueckhaltung, dieselbe wie bei der Bereitstellungsgebuehr im
-# Geraetezweig (`einsundeins._GEBUEHR_ABSTAND`).
 _ABSTAND_SEKUNDEN = 2.0
 
-# "10 GB pro Monat" -> 10.0. "Unlimited pro Monat" trifft das Muster
-# nicht - unbegrenztes Volumen ist keine GB-Zahl und wird nicht zu einer
-# gemacht (die Referenz traegt dann kein `volumen_gb`).
 _VOLUMEN_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*GB\b", re.I)
 
-# "3 Monate je 9,99 €" -> (3, 9.99)
 _AKTION_RE = re.compile(r"(\d+)\s*Monate?\s+je\s*([0-9][0-9.,]*)")
 
-# Im Tarifdetails-Dokument (S2-C hat die Zeile "Tarif mit Smartphone"
-# schon im Geraetezweig; hier ist die OHNE-Smartphone-Zeile die richtige
-# - eine SIM-only-Referenz hat kein Geraet).
 _GEBUEHR_RE = re.compile(r"Einmalige Bereitstellungsgebühr")
 _OHNE_SMARTPHONE_RE = re.compile(r"Tarif ohne Smartphone:?\s*</strong>\s*([^<]{1,40})")
 _GEBUEHR_FENSTER = 2000
@@ -189,8 +176,6 @@ def kacheln(html: str) -> list[dict]:
             else ""
         )
         if not name:
-            # Ohne kanonischen Namen keine stabile `sim_only_id` - der
-            # Slug allein ist eine interne Abkuerzung, kein Name.
             continue
         preis = _preis_aus_kachel(kachel)
         fußtext = kachel.select_one(".price__bottom-text")
@@ -200,10 +185,6 @@ def kacheln(html: str) -> list[dict]:
             "dauerpreis": preis,
             "volumen_gb": None,
             "aktion": None,
-            # Das Etikett "DAUERHAFT" sagt, dass der Kachelpreis kein
-            # befristeter ist. Eine Kachel MIT Aktionsphase traegt es
-            # nicht - ihr Dauerpreis steht daneben, die Phase im
-            # `text-with-bg-secondary`-Kasten.
             "dauerhaft": fußtext is not None
             and "DAUERHAFT" in fußtext.get_text("", True),
             "details_url": details_url,
@@ -226,9 +207,6 @@ def kacheln(html: str) -> list[dict]:
             vorher.get(f) != eintrag.get(f)
             for f in ("name", "dauerpreis", "aktion", "volumen_gb")
         ):
-            # Der ganze Messwert, nicht nur der Preis: dieselbe Kachel mit
-            # einer ANDEREN Aktionsphase oder einem anderen Volumen ist
-            # genausowenig eindeutig wie mit einem anderen Preis.
             mehrdeutig.add(slug)
     for slug in mehrdeutig:
         log.warning(
@@ -284,10 +262,6 @@ def referenzen_aus_html(
             log.info("1&1 SIM-only: Kachel %r nennt keinen Preis - bleibt weg", name)
             continue
         if zeuge is None:
-            # Das Kreuzzeug ist weg (ld+json-Namen driften von den
-            # Kacheltiteln) - der Preis steht dann allein. Er bleibt
-            # stehen, aber der Verfall der Gegenprobe wird gemeldet, sonst
-            # faelle er erst auf, wenn er laengst nichts mehr absichert.
             log.warning(
                 "1&1 SIM-only: kein ld+json-Zeuge fuer %r - Kachelpreis ungegengeprobt",
                 name,
@@ -356,9 +330,6 @@ def sammle(
     Bestaende verlieren.
     """
     if abstand_sekunden is None:
-        # Erst zur LAUFZEIT aufloesen: ein Test, der den Abstand auf 0
-        # stellt, tut das am Modul-Attribut - ein Default, der die Zahl
-        # zur Definitionszeit einfriert, wuerde das still ignorieren.
         abstand_sekunden = _ABSTAND_SEKUNDEN
     protokoll = {"seite": "", "details": 0, "details_gescheitert": 0, "ohne_details": 0}
     if robots is None:

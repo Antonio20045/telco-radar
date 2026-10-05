@@ -82,7 +82,7 @@ def test_ein_erfolg_setzt_die_fehlserie_zurueck(tmp_path):
     r = Quellenregister(tmp_path / "reg.json")
     for tag in range(1, 6):
         _lauf(r, tag, status="fail", count=0, new=0, error="403")
-    _lauf(r, 6)  # ein Erfolg
+    _lauf(r, 6)
     assert r.eintrag("https://a.de/feed").fehlserie == 0
     for tag in range(7, 12):
         _lauf(r, tag, status="fail", count=0, new=0)
@@ -104,7 +104,6 @@ def test_bewaehrungsabruf_nach_zehn_laeufen(tmp_path):
         _lauf(r, tag, status="fail", count=0, new=0)
     assert not r.wird_abgerufen("https://a.de/feed")
 
-    # Laeufe, in denen die Quelle gar nicht vorkommt (weil uebersprungen)
     for _ in range(PROBE_ALLE_LAEUFE):
         r.verbuche_lauf([], "2026-09-01")
     assert r.wird_abgerufen("https://a.de/feed") is True
@@ -185,9 +184,6 @@ def test_redaktionelle_angaben_kommen_aus_der_konfiguration(tmp_path):
     )
     e = r.eintrag("https://a.de/feed")
     assert e.herkunft == "muster:cision" and e.abgenommen == "2026-08-05"
-
-
-# ------------------------------------------------- Zusammenspiel mit collect
 
 
 class _Cfg:

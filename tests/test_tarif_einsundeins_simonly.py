@@ -48,7 +48,6 @@ _SLUG_XL = (
     "tariff-anf-xxl-unlimited-xl-ovl-bundle-tariff-anf-xxl-unlimited-xl-ovl-oos-group-1"
 )
 
-# (Name, Monatspreis, Volumen in GB oder None, Aktionsphase oder None)
 _ERWARTET = [
     ("1&1 All-Net-Flat S", 14.99, 10.0, (3, 9.99)),
     ("1&1 All-Net-Flat M", 14.99, 50.0, None),
@@ -72,9 +71,6 @@ def _details_anf_s() -> str:
         _FIX / "1und1_details_all_net_flat_s.html.gz", "rt", encoding="utf-8"
     ) as fh:
         return fh.read()
-
-
-# ------------------------------------------------------------- die Kacheln
 
 
 def test_die_echte_seite_liefert_alle_sieben_tarife():
@@ -115,9 +111,6 @@ def test_eine_leere_oder_unlesbare_seite_liefert_keine_kacheln():
     assert kacheln("<html><body>Wartung</body></html>") == []
 
 
-# ---------------------------------------------------------- die Referenzen
-
-
 def test_referenzen_treffen_die_ids_und_preise_des_bestands():
     """Abnahmekriterium 3: die neuen Saetze muessen auf DENSELBEN Schluesseln
     stehen wie die bestehenden 1&1-Referenzen, sonst waeren es neue Tarife
@@ -154,8 +147,6 @@ def test_die_ids_treffen_den_tarifbestand_des_repos():
             bestand[satz.get("name", "")] = satz.get("tarif_id", "")
     refs = referenzen_aus_html(_seite(), abgerufen_am="2026-09-09")
     zugeordnet = {r.tarif_name: r for r in refs if r.tarif_name in bestand}
-    # Die Zaehlung NAGELT den Join fest: ohne sie faende der Test auch bei
-    # null Treffern dieselbe (leere) Menge "uebereinstimmend".
     assert len(zugeordnet) == len(refs) == 7
     for name, r in zugeordnet.items():
         assert r.tarif_id == bestand[name]
@@ -182,7 +173,7 @@ def test_anschlusspreis_kommt_nur_aus_dem_eigenen_tarifdetails():
     s = next(r for r in mit if r.tarif_name == "1&1 All-Net-Flat S")
     assert s.anschlusspreis == 19.90
     m = next(r for r in mit if r.tarif_name == "1&1 All-Net-Flat M")
-    assert m.anschlusspreis is None  # dessen Details wurden nicht mitgegeben
+    assert m.anschlusspreis is None
 
 
 def test_aktionsphase_ist_ein_rabatt_und_kein_preis():
@@ -196,9 +187,7 @@ def test_aktionsphase_ist_ein_rabatt_und_kein_preis():
     assert rabatt.von_monat == 1
     assert rabatt.bis_monat == 3
     assert "9,99" in rabatt.name
-    assert rabatt.betrag_monatlich is None  # kein Abgleich zur Kennzahl
-    # Der Referenzpreis bleibt der Dauerpreis - 24 Monate zu einem
-    # 3-Monats-Aktionspreis zu rechnen waere die falsche Zahl.
+    assert rabatt.betrag_monatlich is None
     assert s.tarif_sim_only_monatlich == 14.99
 
 
@@ -216,10 +205,7 @@ def test_widerspruch_zwischen_kachel_und_ldjson_laesst_den_tarif_weg():
     refs = referenzen_aus_html(seite, abgerufen_am="2026-09-09")
     namen = {r.tarif_name for r in refs}
     assert "1&1 All-Net-Flat S" not in namen
-    assert "1&1 All-Net-Flat M" in namen  # unberuehrt
-
-
-# ----------------------------------------------------------------- sammle
+    assert "1&1 All-Net-Flat M" in namen
 
 
 class _Attrappe:
@@ -249,10 +235,7 @@ def test_sammle_holt_details_nur_fuer_verlinkte_slug_adressen():
     refs, protokoll = sammle(attrappe, "2026-09-09", abstand_sekunden=0)
     assert len(refs) == 7
     assert protokoll["details"] == 1
-    assert protokoll["details_gescheitert"] == 6  # Messgrenze, kein Preis
-    # Nur verlinkte Adressen (§ 87b): jeder Abruf ist die Seite selbst,
-    # eine robots.txt oder eine Details-Adresse aus einem data-iframe
-    # derselben Antwort - nichts kombiniert, nichts hochgezaehlt.
+    assert protokoll["details_gescheitert"] == 6
     erlaubt = {
         SEITEN_URL,
         "https://www.1und1.de/robots.txt",

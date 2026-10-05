@@ -40,7 +40,6 @@ _ROBOTS_MIT_FENSTER = (
 )
 
 
-# Ein Abruf, wie ihn die Testattrappe sieht: Adresse UND Wanduhrzeit.
 _Abruf = namedtuple("_Abruf", "url zeit")
 
 
@@ -58,7 +57,7 @@ class _Laufzeit:
     Latenz, die der Test ihm gibt.
     """
 
-    NULLPUNKT = 1000.0  # ein beliebiger, aber fester Startwert
+    NULLPUNKT = 1000.0
 
     def __init__(self, latenz: float = 0.0):
         self.t = self.NULLPUNKT
@@ -112,9 +111,6 @@ def _lauf(
     protokoll: list = []
 
     def hole(url):
-        # Jeder Abruf wird MIT SEINER WANDUHRZEIT protokolliert. Nur so laesst
-        # sich die eigentliche Regel pruefen ("kein Abruf ausserhalb des
-        # Fensters") statt eines ihrer Symptome.
         protokoll.append(
             _Abruf(
                 url,
@@ -157,11 +153,6 @@ def _ausserhalb(protokoll, regeln) -> list:
     ]
 
 
-# --------------------------------------------------------------------------
-# Die Restzeit des Fensters
-# --------------------------------------------------------------------------
-
-
 def test_restzeit_ohne_fenster_ist_none_und_nicht_null():
     """Clean Code 3: "kein Fenster" ist ein fehlender Wert, keine Null.
     Eine 0.0 hiesse hier "Tuer zu" und wuerde jeden Anbieter ohne
@@ -189,11 +180,6 @@ def test_restzeit_ueber_mitternacht():
     assert r.restzeit_im_fenster(_um(12, 0)) == 0.0
 
 
-# --------------------------------------------------------------------------
-# DER KERNTEST
-# --------------------------------------------------------------------------
-
-
 def test_fenster_geht_waehrend_des_laufs_zu(monkeypatch):
     """Start INNERHALB des Fensters, Abruf AUSSERHALB.
 
@@ -205,9 +191,6 @@ def test_fenster_geht_waehrend_des_laufs_zu(monkeypatch):
     """
     bilanz, protokoll, _ = _lauf(monkeypatch, start=_um(7, 57), delay=600)
 
-    # Gegenprobe zuerst: der Einstieg selbst lag noch im Fenster und WURDE
-    # geholt. Ohne diese Zeile waere der Test auch dann gruen, wenn die
-    # Fixture gar nichts liefert (CLAUDE.md Regel 10).
     assert _EINSTIEG in _adressen(protokoll)
 
     assert _produktabrufe(protokoll) == []
@@ -242,11 +225,6 @@ def test_die_uhr_wandert_mit_der_wartezeit_nicht_mit_dem_datumsstempel(monkeypat
     assert {l.abgerufen_am for l in bilanz.listungen} == {"2026-08-11"}
 
 
-# --------------------------------------------------------------------------
-# Teilweise gelesen
-# --------------------------------------------------------------------------
-
-
 def test_teilweise_gelesen_altert_nur_die_wirklich_gelesene_seite(monkeypatch):
     """Zwei Einstiege, das Fenster geht zwischen ihnen zu.
 
@@ -267,8 +245,6 @@ def test_teilweise_gelesen_altert_nur_die_wirklich_gelesene_seite(monkeypatch):
         ]
     )
 
-    # 07:30, und jeder Seitenabruf kostet 300 s: der erste Einstieg (1 + 3
-    # Seiten) ist um 07:50 fertig, mitten im zweiten geht um 08:00 die Tuer zu.
     bilanz, protokoll, _ = _lauf(
         monkeypatch,
         start=_um(7, 30),
@@ -282,13 +258,7 @@ def test_teilweise_gelesen_altert_nur_die_wirklich_gelesene_seite(monkeypatch):
     assert zweiter not in bilanz.gelesene_einstiege
     assert bilanz.ausserhalb_besuchszeit is True
     assert bilanz.vollstaendig is False
-    # Gegenprobe: der erste Einstieg wurde wirklich zu Ende gelesen.
     assert bilanz.produkte_abgerufen >= 3
-
-
-# --------------------------------------------------------------------------
-# Der Deckel auf das Fensterende
-# --------------------------------------------------------------------------
 
 
 def test_fensterfrist_deckelt_auf_das_fensterende(monkeypatch):
@@ -357,7 +327,7 @@ def test_fristablauf_am_fenster_heisst_besuchszeit_und_nicht_budget(monkeypatch)
         seiten=seiten,
         anbieter=anbieter,
         frist_bis=10_000_000.0,
-    )  # Budget im Ueberfluss
+    )
 
     assert bilanz.status == "frist"
     assert "Besuchszeit" in bilanz.grund
@@ -404,17 +374,10 @@ def test_kein_einziger_abruf_verlaesst_das_fenster(monkeypatch):
     regeln = lies_robots(_ROBOTS_MIT_FENSTER.format(delay=0))
 
     assert _ausserhalb(protokoll, regeln) == []
-    # Gegenproben: es wurde ueberhaupt gecrawlt, und der Lauf hat das
-    # Fenster wirklich ueberdauert - sonst prueft die Zeile darueber nichts.
     assert len(_produktabrufe(protokoll)) == 3
     assert bilanz.gelesene_einstiege == {_EINSTIEG}
     assert zweiter not in _adressen(protokoll)
     assert bilanz.ausserhalb_besuchszeit is True
-
-
-# --------------------------------------------------------------------------
-# Was der Abdeckungswaechter aus einem Teillauf macht
-# --------------------------------------------------------------------------
 
 
 def test_der_teillauf_am_fenster_gilt_als_teilweise_gelesen(monkeypatch):
@@ -452,24 +415,11 @@ def test_der_teillauf_am_fenster_gilt_als_teilweise_gelesen(monkeypatch):
         anbieter=anbieter,
     )
 
-    # Die Messung selbst - ohne sie prueft die Zeile darunter nichts.
     assert bilanz.status == "frist"
     assert len(bilanz.listungen) == 3 and bilanz.produkte_abgerufen == 4
     assert bilanz.ausserhalb_besuchszeit is True
     assert _abdeckungszustand(bilanz) == TEILGELESEN
 
-
-# --------------------------------------------------------------------------
-# DIE ZUSAGE GILT AUCH NACH DER SAMMELPHASE (S2-3)
-#
-# Die Nachbearbeitungs-Haken der Adapter (`loese_tarifnamen`,
-# `ergaenze_buendel`) rufen selbst ab - und bekamen bis zum 22.09.2026 das
-# ROHE `hole`: ohne Disallow, ohne Crawl-delay, ohne Fensterpruefung. Sie
-# laufen NACH `sammle()`, also an der Stelle, an der der Lauf am weitesten
-# fortgeschritten ist und ein Fenster am ehesten zu ist. Die Zusage "die
-# Fensterpruefung gilt JE ABRUF" (Modulkopf des Collectors,
-# geraete.yml) galt fuer sie nicht.
-# --------------------------------------------------------------------------
 
 _HAKEN_ERLAUBT = "https://api.vodafone.de/glados/v2/tariff/v2/hardware?id=1"
 _HAKEN_GESPERRT = "https://api.vodafone.de/intern/tariff"
@@ -537,8 +487,6 @@ def test_der_nachbearbeitungs_haken_haelt_disallow_ein(monkeypatch):
     nicht aus einem Haken heraus."""
     protokoll, fehler = _nachsammeln(monkeypatch, "User-agent: *\nDisallow: /intern\n")
 
-    # Gegenprobe zuerst: die erlaubte Adresse ging hinaus. Ohne sie waere
-    # der Test auch dann gruen, wenn der Haken gar nicht laeuft.
     assert _HAKEN_ERLAUBT in protokoll
     assert _HAKEN_GESPERRT not in protokoll
     assert [u for u, _ in fehler] == [_HAKEN_GESPERRT]
@@ -556,7 +504,6 @@ def test_der_nachbearbeitungs_haken_haelt_die_besuchszeit_ein(monkeypatch):
     assert _HAKEN_GESPERRT not in protokoll
     assert [u for u, _ in fehler] == [_HAKEN_ERLAUBT, _HAKEN_GESPERRT]
     assert "Besuchszeit" in fehler[0][1]
-    # Gegenprobe: im Fenster geht dieselbe Adresse hinaus.
     protokoll, fehler = _nachsammeln(
         monkeypatch, "User-agent: *\nVisit-time: 0200-0800\n", start=_um(3, 0)
     )
@@ -600,7 +547,6 @@ def test_die_haken_abrufe_tragen_den_absender_des_anbieters(monkeypatch):
         uhr=lambda: _um(3, 0),
     )
     assert absender[_HAKEN_ERLAUBT] == "TelcoRadar/1.0 (+probe)"
-    # Gegenprobe: ohne eigenen Absender bleibt es beim Aufruf ohne.
     absender.clear()
     anbieter = _anbieter(name="Vodafone", basis_url="https://www.vodafone.de")
     P.nachsammle_buendel(

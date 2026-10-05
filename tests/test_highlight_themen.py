@@ -53,7 +53,6 @@ def _meldung(
     return h
 
 
-# Ein Ereignis: sechs Meldungen aus vier Quellen ueber denselben Launch.
 LAUNCH = [
     _meldung(
         "https://a.example/1",
@@ -82,9 +81,6 @@ LAUNCH = [
     ),
     _meldung("https://b.example/6", "Galaxy Fold8 startet in Korea", "Quelle B"),
 ]
-# Rauschen: eine normale Ausgabe ohne gemeinsames Ereignis. Bewusst mit
-# verschiedenen Woertern - eine Ausgabe, in der zwoelf Meldungen denselben
-# Satzbau haben, pruefte den Haeufigkeitsdeckel statt der Gruppenbildung.
 _RAUSCHTITEL = [
     "Regulierer versteigert Frequenzen im Sechs-Gigahertz-Band",
     "Betreiber Alpha meldet Gewinnsprung im zweiten Quartal",
@@ -129,8 +125,6 @@ def agent(monkeypatch):
     aufrufe: list[str] = []
 
     def stelle(antwort):
-        # Bei jeder neuen Antwort von vorn zaehlen: sonst prueft ein Test,
-        # ob der Agent NICHT gefragt wurde, gegen die Aufrufe des Laufs davor.
         aufrufe.clear()
 
         def fake(system, user, model, max_tokens=0, **_):
@@ -145,7 +139,6 @@ def agent(monkeypatch):
     return stelle
 
 
-# ------------------------------------------------------- Kandidatensuche
 def test_kandidatensuche_findet_das_ereignis():
     gruppen = ht.finde_kandidaten(LAUNCH + RAUSCHEN)
     assert len(gruppen) == 1
@@ -188,14 +181,10 @@ def test_kandidatensuche_verlangt_genug_meldungen():
     assert {h["url"] for h in vier[0]["items"]} == {h["url"] for h in LAUNCH[:4]}
 
 
-# ------------------------------------------------------- Suchwortzuordnung
 def test_zuordnung_verlangt_zwei_suchwoerter():
     muster = ht.suchmuster(["Samsung", "Fold8", "Galaxy"])
     assert ht.treffer("Samsung stellt Galaxy Fold8 vor", muster) == 3
-    # Ein einzelner Treffer reicht nicht - sonst zieht "Samsung" jede
-    # Geraetemeldung des Herstellers in den Launch.
     assert ht.treffer("Samsung meldet Quartalszahlen", muster) < ht.MIND_TREFFER
-    # Wortgrenzen: "Foldables" ist nicht "Fold8", "Galaxys" schon.
     assert ht.treffer("Neue Foldables am Markt", muster) == 0
     assert ht.treffer("samsung und galaxy klein geschrieben", muster) == 2
 
@@ -222,7 +211,6 @@ def test_neue_meldungen_wandern_per_suchwort_ins_thema(tmp_path, agent):
     assert "https://e.example/9" in urls and "https://f.example/10" in urls
     assert "https://g.example/11" not in urls
     assert thema["last_active"] == "2026-08-11"
-    # Die Woche steht an der Meldung - ein Thema laeuft ueber mehrere Ausgaben.
     assert {i["week"] for i in thema["items"]} == {"2026-08-07", "2026-08-11"}
 
 
@@ -237,7 +225,6 @@ def test_dieselbe_meldung_kommt_nicht_zweimal_ins_thema(tmp_path, agent):
     assert len(urls) == len(set(urls)) == len(LAUNCH)
 
 
-# ------------------------------------------------- Archiv ueber die Laeufe
 def _bericht(reports_dir, datum: str, highlights: list[dict]) -> None:
     reports_dir.mkdir(parents=True, exist_ok=True)
     (reports_dir / f"{datum}.json").write_text(
@@ -258,7 +245,6 @@ def test_ereignis_ueber_zwei_laeufe_wird_gefunden(tmp_path, agent):
     _bericht(reports, "2026-08-07", [LAUNCH[3]])
 
     aufrufe = agent(_urteil())
-    # Ohne Archiv: drei Meldungen des laufenden Laufs sind zu wenig.
     bilanz = ht.pflege_highlight_themen(
         LAUNCH[:3] + RAUSCHEN, tmp_path, "2026-08-14", model="m", use_llm=True
     )
@@ -283,7 +269,7 @@ def test_ereignis_ueber_zwei_laeufe_wird_gefunden(tmp_path, agent):
 
 def test_archiv_aelter_als_das_fenster_zaehlt_nicht(tmp_path, agent):
     reports = tmp_path / "reports"
-    _bericht(reports, "2026-07-20", [LAUNCH[3]])  # 25 Tage vor "heute"
+    _bericht(reports, "2026-07-20", [LAUNCH[3]])
     aufrufe = agent(_urteil())
     bilanz = ht.pflege_highlight_themen(
         LAUNCH[:3] + RAUSCHEN,
@@ -352,11 +338,9 @@ def test_der_seltenheitsdeckel_rechnet_je_ausgabe():
     bleibt der Deckel im kalibrierten Band."""
     assert ht._seltenheitsdeckel(610, 1) == 122
     assert ht._seltenheitsdeckel(610, 7) == 17
-    # Untergrenze: doppelte Mindestgruppe, auch bei winzigen Ausgaben.
     assert ht._seltenheitsdeckel(10, 1) == 2 * ht.MIND_MELDUNGEN
 
 
-# --------------------------------------------------------------- Spezifitaet
 def test_spezifitaet_gewichtet_ereignis_vor_rauschen():
     """Der Befund vom 27.08.2026: worte=['quartal','zweiten',...] (reines
     Finanzrauschen) hatte keinen Punktabzug gegenueber worte=['apple',
@@ -367,8 +351,6 @@ def test_spezifitaet_gewichtet_ereignis_vor_rauschen():
     doppelt."""
     assert ht._spezifitaet(["quartal", "zweiten"]) == 0.0
     assert ht._spezifitaet(["halbjahr", "ergebnis", "prozent"]) == 0.0
-    # Zwei Woerter ohne jede Ereignis-/Datumssprache: eine Firma, kein
-    # Vorgang - ohne dass das Modul eine Firmenliste braucht.
     assert ht._spezifitaet(["deutsche", "telekom"]) == 0.1
     apple = ht._spezifitaet(["apple", "iphone", "september", "ultra"])
     samsung = ht._spezifitaet(["samsung", "fold8", "galaxy"])
@@ -441,8 +423,6 @@ def test_grosse_finanzgruppen_verdraengen_die_produktgruppe_nicht():
     produkt_urls = {h["url"] for h in produktgruppe}
     treffer = [g for g in gruppen if produkt_urls <= {h["url"] for h in g["items"]}]
     assert len(treffer) == 1, "die Produktgruppe muss unter den Top-6 stehen"
-    # Und die reinste Rauschgruppe (nur die zwei Finanzwoerter als Bindeglied)
-    # steht NICHT vor ihr - hier faellt sie sogar ganz heraus.
     quartal_dabei = [g for g in gruppen if set(g["worte"]) == {"quartal", "zweiten"}]
     assert (
         quartal_dabei == []
@@ -450,7 +430,6 @@ def test_grosse_finanzgruppen_verdraengen_die_produktgruppe_nicht():
     )
 
 
-# ------------------------------------------------------------- Antizipation
 _ANKUENDIGUNG = [
     _meldung(
         "https://k.example/1",
@@ -543,8 +522,6 @@ def test_hoechstens_drei_antizipationsgruppen_werden_vorgelegt():
         for nr, marke in enumerate(marken)
         for m in _ankuendigungsgruppe(nr, marke, 5 + nr)
     ]
-    # Die Voraussetzung ausgeschrieben: OHNE Deckel waeren es wirklich mehr
-    # als drei - sonst pruefte der Test seine eigene Fixture.
     gefunden = [g for g in ht.finde_antizipation(roh, "2026-09-20")]
     assert (
         len(
@@ -575,7 +552,6 @@ def test_eine_vergangene_datumsangabe_ist_kein_bevorstehendes_ereignis():
         for k in range(3)
     ]
     assert ht.finde_antizipation(rueckblick, "2026-08-27") == []
-    # Gegenprobe: derselbe Text mit einem noch bevorstehenden Termin.
     assert ht._kuenftiger_termin("Termin am 12. September", date(2026, 8, 27))
     assert not ht._kuenftiger_termin("Termin am 12. August", date(2026, 8, 27))
 
@@ -638,7 +614,6 @@ def test_antizipation_konkurriert_nicht_um_max_kandidaten(tmp_path, agent):
         model="m",
         use_llm=True,
     )
-    # Beide Kandidaten wurden vorgelegt - der Agent sah zwei, nicht einen.
     payload = json.loads(aufrufe[0])
     assert len(payload["kandidaten"]) == 2
     assert payload["kandidaten"][1]["bevorstehendes_ereignis"] is True
@@ -648,7 +623,6 @@ def test_antizipation_konkurriert_nicht_um_max_kandidaten(tmp_path, agent):
     assert "event_datum" not in themen["samsung-galaxy-fold8-kommt"]
 
 
-# ------------------------------------------------------------- Alterung
 def _lauf_ohne_zuwachs(tmp_path, agent, datum):
     agent(json.dumps([]))
     return ht.pflege_highlight_themen(
@@ -671,7 +645,6 @@ def test_thema_endet_nach_vier_laeufen_ohne_zuwachs(tmp_path, agent):
     bilanz = _lauf_ohne_zuwachs(tmp_path, agent, "2026-08-21")
     assert bilanz["beendet"] == ["samsung-galaxy-fold8-kommt"]
     assert ts.lade_themen(tmp_path) == []
-    # Beendet heisst nicht geloescht: der Speicher bleibt das Gedaechtnis.
     store = ts.lade_store(tmp_path)
     assert [t["status"] for t in store["topics"]] == ["beendet"]
 
@@ -683,15 +656,12 @@ def test_beendetes_thema_wird_nicht_neu_entdeckt(tmp_path, agent):
         _lauf_ohne_zuwachs(tmp_path, agent, datum)
     assert ts.lade_themen(tmp_path) == []
 
-    # Dieselben Meldungen noch einmal - und der Agent wuerde wieder
-    # zustimmen. Der Speicher darf sie trotzdem nicht als neu ausgeben.
     aufrufe = agent(_urteil())
     bilanz = ht.pflege_highlight_themen(
         LAUNCH, tmp_path, "2026-09-01", model="m", use_llm=True
     )
     assert bilanz["neu"] == []
     assert ts.lade_themen(tmp_path) == []
-    # Der Agent wurde gar nicht erst gefragt - der Kandidat war schon weg.
     assert aufrufe == []
 
 
@@ -761,15 +731,10 @@ def test_ein_halluziniertes_event_datum_macht_kein_thema_unsterblich(tmp_path, a
     agent(_urteil_bevorstehend("2028-09-09"))
     ht.pflege_highlight_themen(LAUNCH, tmp_path, "2026-08-27", model="m", use_llm=True)
     thema = ts.lade_store(tmp_path)["topics"][0]
-    # Gar nicht erst uebernommen: ein Termin jenseits des Horizonts ist
-    # Roadmap, kein Termin.
     assert "event_datum" not in thema
 
-    # Und selbst als BESTANDSdatum - etwa aus einem Lauf vor dieser Regel -
-    # schuetzt es nicht mehr.
     thema["event_datum"] = "2028-09-09"
     assert ht._durch_event_geschuetzt(thema, "2026-08-27") is False
-    # Die normale Alterung greift damit wieder.
     for datum in ("2026-08-31", "2026-09-03", "2026-09-07"):
         assert _lauf_ohne_zuwachs(tmp_path, agent, datum)["beendet"] == []
     assert _lauf_ohne_zuwachs(tmp_path, agent, "2026-09-10")["beendet"] == [
@@ -809,7 +774,6 @@ def test_thema_ohne_event_datum_altert_wie_bisher(tmp_path, agent):
     assert ht._durch_event_geschuetzt(thema, "2099-01-01") is False
 
 
-# ------------------------------------------------------------- Failsafe
 def test_ohne_llm_entsteht_kein_thema(tmp_path):
     bilanz = ht.pflege_highlight_themen(
         LAUNCH + RAUSCHEN, tmp_path, "2026-08-07", use_llm=False
@@ -823,10 +787,6 @@ def test_gescheiterter_agent_legt_nichts_an_pflegt_aber_weiter(tmp_path, agent):
     ht.pflege_highlight_themen(LAUNCH, tmp_path, "2026-08-07", model="m", use_llm=True)
 
     agent(RuntimeError("Anbieter antwortet nicht"))
-    # Der Nachschlag traegt ZWEI Dinge: neue Fold8-Meldungen (die per
-    # Suchwort ins bestehende Thema wandern und deshalb KEINEN neuen
-    # Kandidaten mehr bilden - _schon_erfasst) und ein zweites, fremdes
-    # Ereignis, das dem gescheiterten Agenten als Kandidat vorliegt.
     nachschlag = [
         _meldung("https://e.example/9", "Galaxy Fold8 nun auch in Indien", "Quelle E"),
         _meldung(
@@ -867,8 +827,6 @@ def test_gescheiterter_agent_legt_nichts_an_pflegt_aber_weiter(tmp_path, agent):
     assert bilanz["neu"] == []
     assert "error" in bilanz
     thema = ts.lade_themen(tmp_path)[0]
-    # Die Pflege braucht kein Modell - ein Aussetzer des Anbieters darf ein
-    # laufendes Thema nicht altern lassen, obwohl neue Meldungen da waren.
     assert "https://e.example/9" in {i["url"] for i in thema["items"]}
     assert thema["runs_ohne_zuwachs"] == 0
 
@@ -902,7 +860,6 @@ def test_zwei_urteile_mit_denselben_suchwoertern_ergeben_ein_thema(tmp_path, age
     assert len(ts.lade_store(tmp_path)["topics"]) == 1
 
 
-# ------------------------------------------------------------ Slug/Anker
 def test_slug_ist_stabil_und_kommt_aus_dem_titel():
     """Die Seite heisst nach ihrem Titel, und zwar in jedem Lauf gleich -
     der Link steht in Mails."""
@@ -915,7 +872,6 @@ def test_slug_ist_stabil_und_kommt_aus_dem_titel():
     assert slug("Samsung Galaxy Fold8 kommt") == slug(" samsung  galaxy fold8 kommt ")
 
 
-# --------------------------------------------------------------- Rendern
 def _projekt(tmp_path, highlights):
     """Ein Projektverzeichnis mit einer Ausgabe und den Bilddateien dazu."""
     from telco_radar.report.bilder import bildordner
@@ -970,10 +926,8 @@ def test_aktives_thema_bekommt_eine_seite_ein_beendetes_nicht(tmp_path, agent):
 
     soup = BeautifulSoup(seite.read_text(encoding="utf-8"), "html.parser")
     assert soup.select_one("h1").get_text(strip=True) == "Samsung Galaxy Fold8 kommt"
-    # Jede Meldung des Themas steht auf der Seite, keine doppelt.
     schlagzeilen = [e.get_text(" ", strip=True) for e in soup.select(".szl")]
     assert len(schlagzeilen) == len(LAUNCH) == len(set(schlagzeilen))
-    # Die Titelseite fuehrt hin - und zwar nur sie, nicht die Archivwoche.
     assert "thema/samsung-galaxy-fold8-kommt.html" in (site / "index.html").read_text(
         encoding="utf-8"
     )
@@ -981,8 +935,6 @@ def test_aktives_thema_bekommt_eine_seite_ein_beendetes_nicht(tmp_path, agent):
         site / "reports" / "2026-08-07.html"
     ).read_text(encoding="utf-8")
 
-    # Endet das Thema, verschwindet die Seite - der Ordner spiegelt den
-    # Speicher, wie site/images/ auch.
     for datum in ("2026-08-11", "2026-08-14", "2026-08-18", "2026-08-21"):
         agent(json.dumps([]))
         ht.pflege_highlight_themen(
@@ -1027,7 +979,6 @@ def test_themenseite_zeigt_nur_belegbare_aktionen(tmp_path, agent):
         },
     ]
     view = build_thema_view(thema, angebote)
-    # Nur A: B trifft ein einziges Suchwort, C laeuft nicht mehr.
     assert [a["url"] for a in view["aktionen"]] == ["https://promo.example/a"]
 
 
@@ -1073,7 +1024,6 @@ def test_kein_zu_kleines_bild_in_einer_grossen_position(tmp_path, agent):
     assert "image" not in view["aufmacher"], "nur das Bild faellt weg"
     assert all("image" not in h for h in view["zwei"])
 
-    # Gegenprobe: ein tragfaehiges Bild bleibt und fuehrt.
     agent(_urteil())
     breit = (
         schmal[:3]

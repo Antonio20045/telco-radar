@@ -38,16 +38,8 @@ from pathlib import Path
 
 log = logging.getLogger(__name__)
 
-# Nach so vielen Laeufen ohne eine einzige Meldung geht eine Quelle in
-# Quarantaene. 6 sind bei zwei Laeufen die Woche drei Wochen - lang genug,
-# dass ein Relaunch, eine Sommerpause oder eine zeitweise Sperre nicht sofort
-# zur Stilllegung fuehrt, kurz genug, dass tote Quellen nicht ein halbes Jahr
-# Laufzeit kosten.
 QUARANTAENE_NACH_LAEUFEN = 6
 
-# Wie oft eine stillgelegte Quelle einen Bewaehrungsabruf bekommt. 10 Laeufe
-# sind rund fuenf Wochen: teuer genug, um sich zu lohnen, selten genug, um bei
-# 1000 Quellen nicht ins Gewicht zu fallen.
 PROBE_ALLE_LAEUFE = 10
 
 
@@ -58,10 +50,8 @@ class Quelleneintrag:
     origin: str = ""
     kind: str = ""
     region: str = ""
-    # aus der YAML uebernommen (redaktionell, nicht gemessen)
     herkunft: str = ""
     abgenommen: str = ""
-    # gemessen
     erster_lauf: str = ""
     letzter_lauf: str = ""
     letzter_erfolg: str = ""
@@ -72,7 +62,6 @@ class Quelleneintrag:
     fehlserie: int = 0
     quarantaene_seit: str = ""
     quarantaene_grund: str = ""
-    # Laeufe seit dem letzten Bewaehrungsabruf (nur waehrend Quarantaene)
     seit_probe: int = 0
 
     @property
@@ -108,8 +97,6 @@ class Quellenregister:
     def eintrag(self, url: str) -> Quelleneintrag | None:
         return self.eintraege.get(url)
 
-    # ------------------------------------------------------------ Abrufen
-
     def wird_abgerufen(self, url: str) -> bool:
         """False nur fuer stillgelegte Quellen ausserhalb ihres Bewaehrungslaufs."""
         e = self.eintraege.get(url)
@@ -119,8 +106,6 @@ class Quellenregister:
 
     def stillgelegte(self) -> list[Quelleneintrag]:
         return [e for e in self.eintraege.values() if e.in_quarantaene]
-
-    # ---------------------------------------------------- Lauf verbuchen
 
     def verbuche_lauf(
         self,
@@ -166,7 +151,6 @@ class Quellenregister:
                 e.fehlserie = 0
                 e.seit_probe = 0
                 if e.in_quarantaene:
-                    # Ein einziger Erfolg genuegt. Die Quelle lebt.
                     e.quarantaene_seit = ""
                     e.quarantaene_grund = ""
                     rehabilitiert.append(url)
@@ -187,12 +171,10 @@ class Quellenregister:
                     )
                     neu_stillgelegt.append(url)
 
-        # Nicht abgerufene (stillgelegte) Quellen: Zaehler zur naechsten Probe
         for url, e in self.eintraege.items():
             if url not in abgerufen and e.in_quarantaene:
                 e.seit_probe += 1
 
-        # Redaktionelle Angaben aus der Konfiguration nachziehen
         for url, angaben in (quellen_der_config or {}).items():
             e = self.eintraege.get(url)
             if e is not None:

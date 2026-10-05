@@ -92,43 +92,15 @@ from telco_radar.report.bilder import (  # noqa: E402
     ist_leer,
 )
 
-# Die Falz: was ein Leser bei 1440x900 ohne Scrollen sieht. 900 ist die
-# konservative Annahme - ein 16:9-Notebook mit Browserleisten.
 _FALZ = 900
 _BREITE = 1440
 _MIND_OBEN = 6
-# Der Zeitungskopf (Kriterium 12). Die Marke steht hier als EIN String, damit
-# eine halb durchgezogene Umbenennung auffaellt - am 11.08.2026 stand sie an
-# elf Stellen in den Vorlagen. Der zulaessige Versatz aus der Mitte ist
-# gemessen: der Kopf sass schon vor der Umbenennung 38 px links (bei 1440) und
-# 68 px bei 1180, weil die rechte Spalte breiter ist als die leere linke. 90
-# px lassen dem laengeren Namen Luft, ohne den zweiten Fehlerfall (169 px)
-# durchzulassen.
 _MOBIL_BREITE = 390
 _MARKE = "Vodafone Product and Services Insights"
 _MAX_KOPF_VERSATZ = 90
-# Der Anteil bebilderter Meldungen. Bis zum 07.08.2026 stand hier die
-# absolute Zahl 110, kalibriert an der Ausgabe vom 6.8. mit 193 Meldungen
-# (= 57 %). Eine kleinere Ausgabe fiel damit durch, obwohl sich nichts
-# verschlechtert hatte: die Ausgabe vom 7.8. hatte 107 von 138 mit Bild -
-# also 77 %, deutlich BESSER, und trotzdem "durchgefallen". Gemessen wird
-# jetzt die Quote, die das Kriterium immer gemeint hat.
 _MIND_BILDQUOTE = 57
-# Abnahmekriterium der Promo Uebersicht: mindestens 10 verschiedene echte
-# Bilder. Die Zahl stammt vom 07.08.2026, als 15 Screenshots vorlagen und
-# genau EINER auf der Seite ankam - und der war leer. Seit dem Umbau sind es
-# keine Screenshots mehr, sondern die Kampagnenmotive der Aktionsseiten
-# (promo_bilder.py); die Schwelle bleibt, weil sie dasselbe misst: kommt das,
-# was beschafft wurde, auch auf der Seite an?
 _MIND_PROMO_BILDER = 10
-# Abnahme der Differenzierungs-Seite. Gemessen am Bestand vom 08.08.2026
-# bekommen 35 von 71 Beispielen ein Bild (5 geerbt aus dem Wochenbericht, 30
-# per og:image) - die Schwelle liegt bewusst darunter, weil die Ausbeute an
-# fremden Seiten haengt und nicht am Code. Der harte Teil ist die zweite
-# Zahl: KEINE Karte ohne Motiv.
 _MIND_DIFF_BILDQUOTE = 25
-# Abnahme der Suchseite: so viele Treffer muss ein Begriff bringen, der im
-# Archiv nachweislich vorkommt (gewaehlt wird der haeufigste Absender).
 _MIND_DOSSIER_TREFFER = 5
 _CHROMIUM = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
 
@@ -207,45 +179,14 @@ def _haeufigster_absender(site: Path) -> str:
         e.get("operator") or "" for e in index if e.get("kind") != "promo"
     )
     for name, _ in zaehler.most_common():
-        # Ein Wort reicht: die Suche verknuepft mehrere Woerter mit UND, und
-        # "O2 / Telefónica Deutschland" faende dann nur sich selbst.
         erstes = name.split()[0] if name else ""
         if len(erstes) >= 4:
             return erstes
     return ""
 
 
-# Hoechste zulaessige Seitenhoehe je Reiter, auf _BREITE gemessen. Der
-# Auftrag: "Jeder Reiter bleibt unter 3 Bildschirmen." Die alte Seite war
-# 18.412 px hoch.
 _MAX_REITERHOEHE = 3000
 
-# ---- Fliessttext-Deckel je Reiter der Geraeteseite (P4/D3, 18.09.2026).
-# FM 4 der Strategie: "Text kriecht zurueck" - Antonio: "Ich will keinen
-# Text sehen. Alles so unruhig." Gezaehlt wird der Leerraum-normalisierte
-# Text aller <p> EINER Tafel, INKLUSIVE Aufklapp-Text (details, JS-
-# Aufklappzeilen): FM 4 sagt ausdruecklich, der Preis-Klick (P1) sei der
-# Haertetest - "geraet er zum Textblock, ist FM 4 sofort zurueck", und ein
-# Deckel, der nur den ersten Bildschirm misst, saehe genau diesen
-# Rueckschlag nicht. Nie sichtbar und nicht gezaehlt: <template>-Inhalte
-# (der Rechenweg-Pool von P1 wird erst per Klick zum DOM montiert).
-# Die Grenzen sind am Befund des 17.09. kalibriert (design.md mass mit
-# derselben Menge: Vergleich 18 388 Z, Radar 8 359 Z - der Vor-P4-Stand,
-# als die Reiter Erklaerprosa trugen):
-#   Radar 6000: faellt mit der P4-Balkengrafik, die die 48-fache
-#     "Vodafone-Basis"-Zeile zu EINER Legende macht (-6 300 Z), auf rund
-#     2 600 Z - knapp gruen, weitere Prosa kippt.
-#   Preisverlauf 2500: der mit P2 gefallene 1813-Zeichen-Datenblock allein
-#     haette diesen Deckel zu drei Vierteln gefuellt - genau die Grenze,
-#     die einen zweiten solchen Block verbeugt.
-#   Katalog 2500: eine Tabelle, keine Erzaehlung; der Stand vom 18.09.
-#     liegt bei 377 Z.
-#   Vergleich 6000: traegt heute 18 100 Z, fast alles in den 20 Tarif-
-#     Rechenweg-Aufklappern (je ~500 Z "Gerechnet ueber ..." plus Posten).
-#     Der Reiter wird erst gruen, wenn dieser Text dem P1-Panel-Weg als
-#     <template> folgt oder gekuerzt ist - der Deckel zeigt den Hebel,
-#     das ist seine Aufgabe (die Entscheidung steht beim Lead/P5, nicht
-#     in diesem Kriterium).
 _FLIESSTEXT_DECKEL = {
     "tafel-tco": 6000,
     "tafel-radar": 6000,
@@ -258,10 +199,6 @@ _REITER_NAMEN = {
     "tafel-verlauf": "Preisverlauf",
     "tafel-katalog": "Katalog",
 }
-# design.md Regel 8: "Kein Fliesstblock unter Grafiken" - Kurvendaten
-# gehoeren in Tooltip/Legende, nicht in Text. Der 1813-Zeichen-Datenblock
-# unter dem (mit P2 gefallenen) G2-Graph war der Fall; 200 Zeichen lassen
-# eine Bildunterschrift zu, aber keinen Datenblock.
 _MAX_ABSATZ_NACH_SVG = 200
 
 
@@ -374,14 +311,6 @@ def _reiterhoehen(seite, wurzel: str, b: Bilanz) -> None:
         + (f" - ZU HOCH: {'; '.join(zu_hoch)}" if zu_hoch else ""),
     )
 
-    # E2 (16.09.2026): DIE ANTWORT DER HAUPTANSICHT UEBER DER TELEFON-FALZ
-    # - am ECHTEN Bestand gemessen, nicht an der Fixture der Browsertests
-    # (deren kuerzere Namen lassen die Zeilen niedriger enden). Gemessen
-    # wird der ANTWORT-SATZ und der GRAPHKOPF (Messtag-Zeile): wer ein
-    # Geraet waehlt, muss ohne Scrollen lesen, was es kostet und welche
-    # Tage der Graph zeigt - der Graph selbst beginnt unterhalb. Ohne
-    # Antwort-Satz (Seite ohne jeden Bestand) entfaellt die Messung ohne
-    # Mangel: ein Leerzustand hat keine Falzfrage.
     mobil = seite.context.browser.new_page(
         viewport={"width": _MOBIL_BREITE, "height": 844}
     )
@@ -483,15 +412,6 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
     except ImportError:
         b.prueft(None, "Browser-Messungen (playwright fehlt)")
         return
-    # Die zwei festen Pfade sind Linux (Sandbox bzw. Runner). Findet keiner
-    # etwas, wird Playwright SELBST gefragt, statt die Messung abzusagen:
-    # `executable_path=None` heisst "nimm den Browser, den du verwaltest" -
-    # genau den, den `tests/test_geraete_reiter_browser.py` benutzt. Ohne
-    # diesen Rueckfall meldete das Skript auf einem Mac "kein Chromium
-    # gefunden" und uebersprang fuenf Kriterien, waehrend die Browsertests
-    # derselben Arbeitskopie liefen. Ein uebersprungenes Kriterium sieht in
-    # der Bilanz aus wie ein bestandenes - dieselbe Lehre wie beim
-    # Chromium-Schritt in `ci.yml` (09.08.2026).
     pfad = None
     if Path(_CHROMIUM).exists():
         pfad = _CHROMIUM
@@ -506,9 +426,6 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
         try:
             browser = p.chromium.launch(executable_path=pfad)
         except Exception as exc:  # noqa: BLE001
-            # Der Grund gehoert in die Bilanz. "Kein Chromium" und "Chromium
-            # startet nicht" sind zwei verschiedene Befunde, und der zweite
-            # ist ohne seinen Text nicht zu beheben.
             b.prueft(None, f"Browser-Messungen ({type(exc).__name__})")
             return
         seite = browser.new_page(viewport={"width": _BREITE, "height": _FALZ})
@@ -547,16 +464,11 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
             f"1. Oberhalb der Falz: {oben} Geschichten (>= {_MIND_OBEN})",
         )
 
-        # Kriterium 6 gilt fuer beide Seiten - ein hochskaliertes Bild ist
-        # der sichtbarste Teil des Befunds vom 06.08.2026.
         schlimmster = 0
         wo = ""
         themenseiten = [
             f"thema/{p.name}" for p in sorted((site / "thema").glob("*.html"))
         ]
-        # Seit dem 08.08.2026 auch die Differenzierungs- und die Suchseite:
-        # beide zeigen seither Bilder, und beide setzen sie in Positionen,
-        # die es vorher nicht gab (Hebel-Aufmacher, Dossier-Aufmacher).
         for name in (
             "index.html",
             "meldungen.html",
@@ -585,13 +497,6 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
             + (f" ({wo})" if schlimmster > 0 else ""),
         )
 
-        # ---- Kriterium 7: alle Ressorts ohne Scrollen
-        # Bis zum 07.08.2026 stand hier "die erste Meldung beginnt vor der
-        # Falz" - das war zu wenig. Die Seite war 12 249 px hoch, und wer
-        # wissen wollte, was unter "Geld & Uebernahmen" steht, scrollte acht
-        # Bildschirmhoehen. Gemessen wird jetzt die Oberkante der LETZTEN
-        # Ressortkachel: liegt sie unter der Falz, sieht der Leser die ganze
-        # Gliederung, ohne zu scrollen.
         seite.goto(f"{wurzel}/meldungen.html")
         seite.wait_for_timeout(500)
         kacheln = seite.evaluate(
@@ -606,13 +511,6 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
             f"({len(kacheln)} Ressorts, < {_FALZ})",
         )
 
-        # ---- Kriterium 10: die Suchseite liefert ein Dossier
-        #
-        # Sie muss im BROWSER gemessen werden: bis auf das Suchfeld entsteht
-        # alles in app.js, nachdem search_index.json geladen ist. Eine
-        # statische Pruefung des HTML saehe nur leere Behaelter - genau die
-        # Sorte Pruefung, die am 06.08.2026 sechs falsche Zahlen durchgelassen
-        # hat.
         if not begriff:
             b.prueft(None, "10. Suchseite (kein Begriff im Index)")
         else:
@@ -643,16 +541,6 @@ def _browser_messungen(site: Path, b: Bilanz) -> None:
                 f"{gemessen['abgeschnitten']} abgeschnittene Schlagzeilen",
             )
 
-        # ---- Kriterium 12: der Zeitungskopf traegt den ganzen Namen
-        #
-        # Gemessen wird auf BEIDEN Breiten, und das ist der Punkt: der Name
-        # "Vodafone Product and Services Insights" ist 373 statt 214 px breit,
-        # und auf dem Telefon lief er in der ersten Fassung 61 px aus dem
-        # Bild - die ganze Seite liess sich seitwaerts schieben. Geprueft
-        # wird deshalb dreierlei: der Kopf steht vollstaendig im Bild, die
-        # Seite hat keinen Seitwaertslauf, und der Kopf sitzt nicht weiter
-        # aus der Mitte als _MAX_KOPF_VERSATZ. Die dritte Zahl ist die, an
-        # der eine Schriftvergroesserung zuerst auffaellt.
         kopf: dict = {}
         for breite, hoehe in ((_BREITE, _FALZ), (_MOBIL_BREITE, 844)):
             klein = browser.new_page(viewport={"width": breite, "height": hoehe})
@@ -729,7 +617,6 @@ def main() -> int:
 
     b = Bilanz()
 
-    # ---- Kriterium 2: Bilder je Meldung (aus der Berichtsdatei)
     berichte = sorted(
         f
         for f in (root / "data" / "reports").glob("*.json")
@@ -758,7 +645,6 @@ def main() -> int:
         (site / "meldungen.html").read_text(encoding="utf-8"), "html.parser"
     )
 
-    # ---- Kriterium 3: keine kleinen Bilder in grossen Positionen
     gross = index.select(".aufmacher-bild img, .reihe-zwei .stueck-bild img")
     zu_klein = [img for img in gross if int(img.get("width") or 0) < MIND_BREITE_GROSS]
     b.prueft(
@@ -767,12 +653,8 @@ def main() -> int:
         f"davon unter {MIND_BREITE_GROSS} px: {len(zu_klein)}",
     )
 
-    # ---- Kriterium 4: Ressorts, Gewichtung, und keine verlorene Meldung
     ressorts = meldungen.select(".mressort")
     stufen = all(sec.select(".mlead") for sec in ressorts)
-    # Die Ressortzahl steht seit dem 08.08.2026 EINMAL je Kachel, im Link in
-    # die Tiefe ("alle 29 Meldungen"). Vorher stand sie zusaetzlich als Chip
-    # neben der Rubrik - dieselbe Zahl zweimal in einer Kachel.
     summe = sum(
         int(m.group())
         for x in meldungen.select(".rkachel .rkachel-alle")
@@ -785,24 +667,6 @@ def main() -> int:
         f"Ressortzahlen {summe}, gerendert {gerendert}, Daten {len(hs)}",
     )
 
-    # ---- Kriterium 5: keine abgeschnittene Schlagzeile
-    # Seit dem 08.08.2026 auch auf der Wettbewerbsseite: ihre Chronik zieht
-    # Ueberschriften aus zwei Quellen (Meldung und Analysten-Move), und die
-    # zweite hat keinen Rueckfall, falls ein Feed gekuerzt liefert.
-    # Seit dem 08.08.2026 auch auf den temporaeren Themenseiten: sie ziehen
-    # ihre Ueberschriften aus dem Themenspeicher, also aus Meldungen, die
-    # mehrere Wochen alt sein koennen - genau dort verschwindet ein Feld
-    # unbemerkt.
-    # Seit dem 08.08.2026 auch auf der Differenzierungs-Seite: ihre Karten
-    # ziehen die Hauptzeile aus zwei Speichern, und der Presse-Zweig liefert
-    # rohe Zusammenfassungen - genau dort entsteht ein halber Satz.
-    # Und seit dem 10.08.2026 die Geraeteseite. Geprueft wird dort genau
-    # eine Stelle: die Saetze der Karte "Was diese Woche auffaellt" tragen
-    # `szl`. Die Etiketten der Positionskarte kuerzt `_kurz()` bewusst mit
-    # "…" - sie liegen in `.gr-etikett`, tragen kein `szl` und sind hier
-    # richtigerweise nicht gemeint. Wer eine Seite mit Schlagzeilen
-    # ergaenzt und sie hier vergisst, prueft sie nie: genau dieser Zuschnitt
-    # hat am 08.08.2026 37 Karten ohne Motiv gedeckt.
     seiten = [index, meldungen]
     for weitere in [
         site / "wettbewerb.html",
@@ -823,7 +687,6 @@ def main() -> int:
         f"5. Schlagzeilen geprueft: {alle}, abgeschnitten: {len(abgeschnitten)}",
     )
 
-    # ---- Kriterium 8: die Promo Uebersicht zeigt echte Bilder
     promo_datei = site / "promo" / "index.html"
     if not promo_datei.exists():
         b.prueft(None, "8. Promo Uebersicht (nicht gerendert)")
@@ -855,16 +718,6 @@ def main() -> int:
             f"8b. Leere Bilder ausgeliefert: {len(leer)}"
             + (f" ({', '.join(leer)})" if leer else ""),
         )
-        # 8c: JEDE Karte traegt ein Motiv - ein Kampagnenbild oder eine
-        # Schriftkachel -, und nirgends steht ein leerer Bildkasten.
-        #
-        # Bis zum 08.08.2026 galt das nur fuer die grossen Karten; die
-        # kleinen ohne belegtes Bild waren "reine Textkarten, das ist die
-        # Absicht". Gemessen an der Ausgabe vom 8.8. traf das 37 von 77
-        # Karten, und weil eine Rasterzeile so hoch ist wie ihre hoechste
-        # Karte, stand neben jedem Bild eine handbreite Luecke. Antonio:
-        # "da fehlen bei einigen Aktionen die Bilder, das wirkt so richtig
-        # scheisse." Die Absicht war falsch, das Kriterium hat sie gedeckt.
         karten = promo.select(".promo-karten .pkarte")
         ohne_motiv = [k for k in karten if not k.select_one(".pk-bild")]
         leere_kaesten = [
@@ -878,21 +731,11 @@ def main() -> int:
             f"{len(karten)}, leere Bildkaesten: {len(leere_kaesten)}",
         )
 
-    # ---- Kriterium 9: die Differenzierungs-Seite zeigt Bilder, und JEDE
-    # Karte traegt ein Motiv.
-    #
-    # Der Befund vom 08.08.2026: 77 Karten, null Bilder, 9060 px Seitenhoehe.
-    # Antonio: "Es ist total unuebersichtlich, sich das anzugucken. Keine
-    # Bilder, es ist schwer zu verstehen." Gemessen werden beide Haelften der
-    # Antwort - die Ausbeute (haengt an fremden Seiten, deshalb eine Quote)
-    # und die Luecke (haengt am Code, deshalb hart auf null).
     dz_datei = site / "differenzierung.html"
     if not dz_datei.exists():
         b.prueft(None, "9. Differenzierung (nicht gerendert)")
     else:
         dz = BeautifulSoup(dz_datei.read_text(encoding="utf-8"), "html.parser")
-        # Die Zeilen sind die dritte Gewichtsstufe und tragen bewusst kein
-        # Motiv - genau wie die Zeilen der Meldungsseite.
         karten = [
             k for k in dz.select(".dzk") if "dzk--zeile" not in (k.get("class") or [])
         ]
@@ -913,9 +756,6 @@ def main() -> int:
             f"mit Bild ({quote} %, >= {_MIND_DIFF_BILDQUOTE} %), "
             f"{len(ohne_motiv)} ohne Motiv, {len(leere_kaesten)} leere Kaesten",
         )
-        # 9b: die Auswertung steht VOR den Beispielen und nennt dieselben
-        # Zahlen wie die Rubriken darunter - sonst hat die Seite zwei
-        # Wahrheiten (der Fehlertyp vom 06.08.2026).
         marktbild = dz.select_one(".dz-marktbild")
         balken = {
             li.select_one(".dz-balken-name").get_text(strip=True): int(
@@ -937,32 +777,8 @@ def main() -> int:
             + (f" ({', '.join(falsch)})" if falsch else ""),
         )
 
-    # ---- Kriterium 11: die Reiter des Geraeteradars
-    #
-    # Die Positionskarte ist am 30.08.2026 GELOESCHT worden - 59 Geraete mal
-    # vier Anbietern in einem Bild, 114 senkrecht gedrehte
-    # Achsenbeschriftungen, 155 von 164 Punkten ohne Beschriftung. Dieses
-    # Kriterium hat sie bis dahin vermessen (Preis aus Etikettenhoehe
-    # zurueckgerechnet); jetzt prueft es, dass sie WEG ist und dass die
-    # Tabelle, die sie ersetzt, ihre Belege traegt.
-    #
-    # E2 (AUFTRAG_GERAETE_EINE_SEITE_V2 §1a, 16.09.2026): DIE HAUPTANSICHT
-    # IST DIE TCO-ZEITREIHE - ein SVG-Koordinatensystem mit Y=EUR-Ticks,
-    # X=echten Messtagen, je Anbieter eine Linie mit einem Punkt je
-    # Messung (Antonio: „Den Graphen finde ich gut."). Bis E2 pruefte
-    # dieses Kriterium den HTML/CSS-Balken (O1) und verbot JEDES SVG in
-    # der Vergleichsansicht - die Erwartung folgt dem Auftrag, nicht
-    # umgekehrt. Die drei Verbote aus Abschnitt 0 des alten Auftrags (kein
-    # gedrehter Text, keine Schrift unter 12 px, keine "..."-Beschriftung)
-    # werden im echten Chromium gemessen -
-    # `tests/test_geraete_reiter_browser.py` und
-    # `tests/test_geraete_zeitreihe_browser.py`.
     gr_datei = site / "geraete.html"
     if not gr_datei.exists():
-        # KEIN "uebersprungen": render_site() erzeugt diese Seite immer,
-        # notfalls mit ihrem Fehlerzustand. Fehlt sie ganz, ist etwas
-        # kaputt - und ein Totalausfall, der als "nicht pruefbar" durchgeht,
-        # ist genau die Sorte gruener Lauf, vor der CLAUDE.md §6 warnt.
         b.prueft(False, "11. Geraeteradar: geraete.html fehlt ganz")
     else:
         gr = BeautifulSoup(gr_datei.read_text(encoding="utf-8"), "html.parser")
@@ -975,18 +791,7 @@ def main() -> int:
             if gr.select(tot):
                 maengel.append(f"Reste der geloeschten Preisgrafik: {tot}")
 
-        # VIER TAFELN AUF EINER SEITE (E3, AUFTRAG_GERAETE_EINE_SEITE_V2
-        # §1d): "Vergleich", "Radar", "Preisverlauf" und "Gerätekatalog"
-        # sind Knöpfe DIESER Seite. Bis E3 stand der Radar als LINK in der
-        # Leiste (O3-Quasi-Reiter, Seitenwechsel auf wettbewerbsradar.
-        # html); E3 ersetzt ihn durch die Tafel - deshalb ist jetzt auch
-        # der Link verboten, sonst böte die Leiste neben der Tafel noch
-        # einen Seitenwechsel an. Die Portfolio-Tafel bleibt GANZ weg; ein
-        # wiederauferstandenes #tafel-portfolio wäre die nächste tote
-        # Tafel.
         reiter = [k.get("data-tafel") for k in gr.select(".gr-reiter [data-tafel]")]
-        # 28.09.2026: die zwei Ein-Geraet-Reiter („Mit Tarif", „Ohne
-        # Vertrag") stehen nebeneinander, danach Übersicht und Katalog.
         erwartet = ["tafel-tco", "tafel-verlauf", "tafel-radar", "tafel-katalog"]
         if reiter != erwartet:
             maengel.append(f"Reiter {reiter} statt {erwartet}")
@@ -1005,10 +810,6 @@ def main() -> int:
                 "- seine Abschnitte gehören auf den Radar (O3)"
             )
 
-        # E2: DER EINE Graph der Hauptansicht ist DIE ZEITREIHE - SVG mit
-        # Koordinatensystem, Punkten je Messung und echten Messtag-Ticks.
-        # Die Balkenform (O1) ist ersetzt, nicht daneben gestellt: ihre
-        # Reste (.gr-hgraph, .gr-bz, .gr-balkenliste) sind verboten.
         if start is not None and start.select_one("svg.gr-zr") is None:
             maengel.append(
                 "die TCO-Zeitreihe (svg.gr-zr) fehlt in der Hauptansicht (E2)"
@@ -1030,13 +831,6 @@ def main() -> int:
                 if start.select(tot):
                     maengel.append(f"Rest der bis E2 ersetzten Form: {tot}")
         verlaufflaeche = gr.select_one("#tafel-verlauf")
-        # P2 (Antonio F4, 17.09.2026): G2 ist GEFALLEN - der feste Markt-
-        # Graph des Reiters zeigte in der heutigen Datenlage zwei echte
-        # Kurven von einem Anbieter unter fünf Linien, mit vier Text-
-        # blöcken daneben („mehr Text als Graf"); seine Frage beantworten
-        # der Modell-Wähler und die Radar-Tafel. Inhalt des Reiters ist
-        # der Wähler: sein Datenknoten muss dastehen - oder der ehrliche
-        # Leerzustand (KEIN Mangel ohne Messreihen, C.2).
         if (
             verlaufflaeche is not None
             and verlaufflaeche.select_one("#gr-verlaufdaten") is None
@@ -1046,8 +840,6 @@ def main() -> int:
                 "die Gerätedaten des Preisverlaufs "
                 "(#gr-verlaufdaten) fehlen im Verlaufs-Reiter"
             )
-        # Und kehrt der G2-Block zurück, ist die Doppel-Darstellung zurück
-        # (derselbe Schutz wie beim G0-Block darunter).
         if (
             verlaufflaeche is not None
             and verlaufflaeche.select_one("svg.gr-g2") is not None
@@ -1057,14 +849,6 @@ def main() -> int:
                 "zurückgekehrt - der Reiter trägt den Modell-"
                 "Wähler als alleinige Grafik (F4)"
             )
-        # E3-Fix (QA 17.09.2026): G0 ist aus dem Verlaufs-Reiter GEFALLEN.
-        # Der Reiter trug ZWEI Barpreis-Grafiken desselben Geräts - der
-        # G0-Block oben (gesteuert von der Modellwahl des VERGLEICHS-
-        # Reiters) und die eigene Geräteauswahl unten; wählte der Leser
-        # hier ein Gerät, zeigte der obere Block weiterhin das des anderen
-        # Reiters (Doppel-Darstellung und zweite Graph-Form, §4.6/§4.8).
-        # Das Kriterium kehrt die alte O4-Regel um: kehrt der Block zurück,
-        # ist die Doppel-Darstellung zurück.
         if (
             verlaufflaeche is not None
             and verlaufflaeche.select_one("#gr-g0-lager, svg.gr-g0") is not None
@@ -1075,46 +859,25 @@ def main() -> int:
                 "Barpreis-Auswahl (Doppel-Darstellung, §4.6/4.8)"
             )
 
-        # Die Pflichtzeile aus A5.2 - Antonios Leitfrage, woertlich
-        # beantwortet. Seit O2 (11.09.2026) steht sie im Rechenweg-Aufklapper
-        # JEDER Bündel-Zeile mit einer Zahl.
         if (
             start is not None
             and start.select(".gr-bnd[data-gesamt]")
             and not start.select(".gr-bnd .gr-kk-24")
         ):
             maengel.append("keine Bündelzeile beantwortet 'nach 24 Monaten gezahlt'")
-        # KEIN Mangel, wenn der Datensatz fehlt: die Vorlage rendert ihn nur
-        # bei `verlauf.hat_daten`, und das rechnet auf den GEPRUEFTEN
-        # Eintraegen. Ein Bestand, der nur gebrauchte Geraete oder nur
-        # Buendelpreise traegt, erzeugt einen ehrlichen Leerzustand - ihn als
-        # Durchfaller zu melden ist derselbe Fehler wie Kriterium 4 nach
-        # einem --no-llm-Lauf.
         verlauf = gr.select_one("#tafel-verlauf")
         verlauf_leer = (
             verlauf is not None and verlauf.select_one("#gr-verlaufdaten") is None
         )
 
-        # Kein gedrehter Text - hier als Attribut, im Browser als gerechnete
-        # Transformation.
         for el in gr.find_all(attrs={"transform": True}):
             if "rotate" in (el.get("transform") or ""):
                 maengel.append("gedrehte Beschriftung im Dokument")
                 break
 
-        # O2 (11.09.2026) stand die Alarmtabelle auf dem WETTBEWERBS-RADAR;
-        # seit E3 Schritt 3 (17.09.2026) ist der Radar der Reiter "Radar"
-        # DIESER Seite - die Alt-URL ist eine Weiterleitung. Beleg- und
-        # Kachel-Zaehlung lesen deshalb dieselbe Suppe wie alles
-        # Strukturelle darueber: eine Seite, eine Quelle der Wahrheit.
         radar_seite = gr
         zeilen = radar_seite.select("#wr-alarme .gr-a-zeile")
         if not zeilen:
-            # NICHT einfach ueberspringen: die strukturelle Haelfte dieses
-            # Kriteriums - "die Grafik ist WEG" - gilt auch ohne Daten. Sie
-            # im Skip-Zweig zu verwerfen hiesse, dass ein
-            # wiederauferstandenes `.gr-punkt` nach einem --no-llm-Lauf als
-            # "uebersprungen" durchginge.
             if maengel:
                 b.prueft(False, "11. Geraeteradar: " + "; ".join(maengel))
             else:
@@ -1126,12 +889,6 @@ def main() -> int:
                     + ")",
                 )
         else:
-            # Jede Zeile traegt Quelle UND Abrufdatum - der Belegzwang ist das
-            # Verkaufsargument dieser Seite.
-            # `.gr-a-datum` und nicht `.gr-a-klein`: die zweite Klasse
-            # steht ZWEIMAL in der Zeile (Speichergroesse und Abrufdatum).
-            # Damit war die Datumshaelfte des Belegzwangs wirkungslos - mit
-            # geleerter Datumsspalte meldete die Pruefung null Verstoesse.
             ohne_beleg = [
                 z
                 for z in zeilen
@@ -1140,8 +897,6 @@ def main() -> int:
                     and z.select_one(".gr-a-datum")
                 )
             ]
-            # Jede Zeile hat ihren Aufklapper, und der zeigt mehr als einen
-            # Anbieter - sonst waere der Klick eine Handlung ohne Ergebnis.
             ohne_aufklapper = [
                 z for z in zeilen if radar_seite.find(id=z.get("data-auf")) is None
             ]
@@ -1150,19 +905,12 @@ def main() -> int:
             if ohne_aufklapper:
                 maengel.append(f"{len(ohne_aufklapper)} Zeilen ohne Aufklapper")
 
-            # Die vier Kacheln zaehlen genau die verglichenen Kombinationen.
-            # Eine Kachel, die anders zaehlt als der Satz darunter, ist der
-            # Fehlertyp aus CLAUDE.md 6.
             kacheln = radar_seite.select(".gr-chips .gr-chip b")
             summe = sum(
                 int(k.get_text(strip=True))
                 for k in kacheln
                 if k.get_text(strip=True).isdigit()
             )
-            # `start` kann None sein - dann ist die Tafel umbenannt worden,
-            # und das ist ein Durchfaller, kein Absturz. Die erste Fassung
-            # rief hier `.get_text()` darauf auf und riss das ganze Skript
-            # mit einem AttributeError ab.
             alarm_abschnitt = radar_seite.select_one("#wr-alarme")
             satz = (
                 " ".join(alarm_abschnitt.get_text(" ", strip=True).split())
@@ -1176,10 +924,6 @@ def main() -> int:
                     f"die Kacheln zaehlen {summe}, der Satz darunter etwas anderes"
                 )
 
-            # Der Grund gehoert IN die Zeile. Als eigener `print` danach
-            # ging er in der gepufferten Ausgabe verloren, und das Kriterium
-            # meldete "DURCHGEFALLEN" neben seinem Erfolgstext - unbrauchbar
-            # fuer den, der es liest.
             b.prueft(
                 not maengel,
                 f"11. Geraeteradar: {len(zeilen)} Alarmzeilen, "
@@ -1189,11 +933,6 @@ def main() -> int:
                 else "11. Geraeteradar: " + "; ".join(maengel[:5]),
             )
 
-        # ---- Kriterium 13: Fliessttext-Deckel je Reiter (P4/D3, FM 4).
-        # Messmenge und Kalibrierung stehen im Kommentar zu
-        # _FLIESSTEXT_DECKEL; gezaehlt wird statisch am gerenderten HTML,
-        # deterministisch und ohne Browser - dieselbe Zahl, gegen die der
-        # pytest tests/test_geraete_textdeckel.py die Zaehlfunktion haelt.
         werte, zuviel = [], []
         for tid, deckel in _FLIESSTEXT_DECKEL.items():
             tafel = gr.select_one(f"#{tid}")
@@ -1211,10 +950,6 @@ def main() -> int:
             + (f" - ZU VIEL TEXT: {'; '.join(zuviel)}" if zuviel else ""),
         )
 
-        # ---- Kriterium 14: kein Fliesstblock unter Grafiken
-        # (design.md Regel 8). Der 1813-Zeichen-Datenblock unter dem mit
-        # P2 gefallenen G2-Graph war der Fall; die Grenze haelt ihn draussen,
-        # sobald er zurueckkehrte - in welcher Tafel auch immer.
         block_max, block_wo = 0, ""
         for tid in _FLIESSTEXT_DECKEL:
             tafel = gr.select_one(f"#{tid}")

@@ -58,8 +58,8 @@ from telco_radar.report.html import _env
 from telco_radar.tco_model import Buendel, SimOnlyReferenz
 
 HEUTE = "2026-09-20"
-TAG_3 = "2026-09-17"  # Grenzfall: 3 Tage alt -> noch frisch
-TAG_4 = "2026-09-16"  # 4 Tage alt -> alt (jenseits der 3-Tage-Grenze)
+TAG_3 = "2026-09-17"
+TAG_4 = "2026-09-16"
 SKU = "apple-iphone-17-pro-256gb-schwarz"
 BAND_MITTEL = {"o2:l": "m", "vf:m": "m", "tk:m": "m"}
 
@@ -144,11 +144,6 @@ def _karte(modell, anbieter):
     return treffer[0]
 
 
-# --------------------------------------------------------------------------
-# Die Grenze selbst
-# --------------------------------------------------------------------------
-
-
 def test_die_grenze_liegt_bei_drei_tagen():
     """TAG_3 ist frisch, TAG_4 ist alt - der Grenzfall des Auftrags.
 
@@ -166,7 +161,6 @@ def test_die_grenze_liegt_bei_drei_tagen():
     assert karten.alter_in_tagen(TAG_4, HEUTE) == 4
     assert karten.ist_frisch(TAG_3, HEUTE) is True
     assert karten.ist_frisch(TAG_4, HEUTE) is False
-    # Gegenprobe: null Tage (heute abgerufen) ist frisch.
     assert karten.ist_frisch(HEUTE, HEUTE) is True
 
 
@@ -193,11 +187,6 @@ def test_ohne_heute_gibt_es_keine_alterung():
     assert modell["spanne"] == [1200.76, 1320.76]
 
 
-# --------------------------------------------------------------------------
-# Der Pflichtfall: alt fällt aus ab, Delta und Ranking, Zeile bleibt
-# --------------------------------------------------------------------------
-
-
 def test_altes_angebot_faellt_aus_ab_delta_und_ranking():
     """DIE PFLICHTZAHL: Vodafone frisch 1.224,76 EUR führt, obwohl das
     ALTE o2-Angebot mit 1.200,76 EUR billiger ist. Die o2-ZEILE bleibt
@@ -205,12 +194,10 @@ def test_altes_angebot_faellt_aus_ab_delta_und_ranking():
     Platz in der Rangfolge."""
     modell = _modell(_standard())
     o2 = _karte(modell, "o2")
-    # Die Zeile bleibt - mit ihrem Datum und ihrer Marke.
     assert o2["belastbar"] and o2["gesamt"] == 1200.76
     assert o2["abgerufen_am"] == TAG_4
     assert o2["frisch"] is False
     assert o2["alt_marke"] == "kein aktueller Stand seit 16.09.2026"
-    # ... aber ohne Delta und außerhalb jedes Rankings.
     assert o2["delta"] is None
     assert [k["anbieter"] for k in modell["karten"]] == [
         "Vodafone",
@@ -218,17 +205,13 @@ def test_altes_angebot_faellt_aus_ab_delta_und_ranking():
         "o2",
         "1&1",
     ]
-    # Die Antwortzeile führt das frische Angebot.
     assert modell["antwort"]["tarif_anbieter"] == "Vodafone"
     assert modell["antwort"]["tarif_gesamt"] == 1224.76
     assert modell["spanne"] == [1224.76, 1320.76]
     assert modell["bundle_anbieter"] == ["Telekom", "Vodafone"]
-    # Das Delta der frischen Wettbewerber rechnet weiter - gegen die
-    # frische Referenz: 1.320,76 - 1.224,76 = 96,00.
     telekom = _karte(modell, "Telekom")
     assert telekom["frisch"] is True
     assert telekom["delta"]["betrag"] == 96.00
-    # Und das Modell ist nicht "alles alt" - der Hinweis bleibt aus.
     assert modell["alles_alt"] is False
     assert modell["alt_hinweis"] == ""
 
@@ -263,11 +246,6 @@ def test_unbekanntes_datum_faellt_aus_dem_ranking():
     assert modell["antwort"]["tarif_anbieter"] == "Vodafone"
 
 
-# --------------------------------------------------------------------------
-# „alles alt“: sichtbar statt „nichts gefunden“
-# --------------------------------------------------------------------------
-
-
 def _alles_alt(o2=TAG_4, vodafone="2026-09-15", telekom=TAG_4):
     return karten.modelle(
         [_o2(o2), _vodafone(vodafone), _telekom(telekom)],
@@ -284,11 +262,8 @@ def test_alles_alt_nennt_den_letzten_stand_mit_datum():
     letzten Stand MIT Datum, statt „nichts gefunden“ vorzutäuschen."""
     modell = _modell(_alles_alt())
     assert modell["alles_alt"] is True
-    # Der letzte Stand ist der späteste Abruf: 16.09.2026 (o2/Telekom),
-    # Vodafone ist älter (15.09.) und darf den Satz nicht stellen.
     assert modell["alt_seit"] == TAG_4
     assert "Kein aktueller Bündel-Stand seit dem 16.09.2026" in modell["alt_hinweis"]
-    # Alles fällt aus der Bewertung - ohne Zeile zu verlieren.
     assert modell["antwort"]["tarif_gesamt"] is None
     assert modell["antwort"]["tarif_anbieter"] is None
     assert modell["spanne"] == []
@@ -299,7 +274,6 @@ def test_alles_alt_nennt_den_letzten_stand_mit_datum():
         assert karte["frisch"] is False
         assert karte["gesamt"] is not None, f"{anbieter}: Zeile verloren"
         assert karte["delta"] is None
-    # Die Marke an der ältesten Zeile nennt ihr Datum.
     assert _karte(modell, "o2")["alt_marke"] == "kein aktueller Stand seit 16.09.2026"
     assert (
         _karte(modell, "Vodafone")["alt_marke"]
@@ -318,11 +292,6 @@ def test_alles_alt_ohne_datum_nennt_unbekannt():
         assert "unbekannt" in _karte(modell, anbieter)["alt_marke"]
 
 
-# --------------------------------------------------------------------------
-# Band, Balken und Radar: dieselbe Auswahl
-# --------------------------------------------------------------------------
-
-
 def test_band_und_radar_rechnen_nur_mit_frischen_karten():
     """Clean Code 7 an der zweiten Auswahl: Balken-JSON und Radar lesen
     `alle_karten_je_band` - das alte o2-Angebot darf dort nicht als
@@ -332,8 +301,6 @@ def test_band_und_radar_rechnen_nur_mit_frischen_karten():
     assert sorted(alle["m"]) == ["Telekom", "Vodafone"]
     beste = geraete_tco_band.karten_je_band(modell, BAND_MITTEL)
     assert beste["m"]["Vodafone"]["gesamt"] == 1224.76
-    # Gegenprobe: der günstigste Wert DES BANDES ist der frische - nicht
-    # das alte 1.200,76-Angebot von o2.
     assert min(k["gesamt"] for ks in alle["m"].values() for k in ks) == 1224.76
 
 
@@ -346,8 +313,6 @@ def test_katalog_spalte_nennt_den_zustand_wenn_alles_alt_ist():
     assert spalte["tco_ab"] is None
     assert spalte["tco_leer"] == geraete_view.TCO_LEER_NUR_ALT
     assert spalte["tco_leer"] == "kein aktueller Bündel-Stand"
-    # Gegenprobe am gemischten Modell: die Spalte nimmt das frische
-    # Angebot (1.224,76), NICHT das billigere alte (1.200,76).
     gemischt = _modell(_standard())
     assert geraete_view._tco_spalte(gemischt)["tco_ab"] == 1224.76
 
@@ -397,8 +362,6 @@ def test_buendelzeilen_sortieren_alte_nach_hinten():
         },
     ]
     tarife = {tid: {"datenvolumen_gb": 30} for tid in BAND_MITTEL}
-    # P3-E1: ohne Vodafone-Tarifleiter gaebe es keine Stufe - eine
-    # einzige Stufe genuegt, alle drei Tarife fallen hinein.
     tarife["vf:m-sp"] = {
         "anbieter": "Vodafone",
         "name": "Vodafone Mobil M mit Smartphone",
@@ -417,11 +380,6 @@ def test_buendelzeilen_sortieren_alte_nach_hinten():
     o2 = next(k for k in modell["zeilen_band"] if k["anbieter"] == "o2")
     assert o2["frisch"] is False
     assert o2["gesamt"] == 1200.76
-
-
-# --------------------------------------------------------------------------
-# Die Zeitreihe: Band bleibt wählbar, Satz und Kachel sagen den Stand
-# --------------------------------------------------------------------------
 
 
 def _tco_dict(modell):
@@ -446,12 +404,9 @@ def test_zeitreihe_band_mit_nur_alten_angeboten_bleibt_waehlbar(tmp_path):
     paar = next(p for p in zr["paare"] if p["modell"] == mid)
     assert "kein aktueller Stand" in paar["antwort_html"]
     assert "16.09.2026" in paar["antwort_html"]
-    # Die Kachel zeigt keinen „ab“-Preis, sondern den alten Stand.
     kachel = zr["kacheln"][0]["baender"]["m"]
     assert kachel["ab"] is None
     assert kachel["alt_text"] == "kein aktueller Stand seit 16.09.2026"
-    # Die Lücke nennt die drei Anbieter beim alten Stand; 1&1 und
-    # congstar führen das Gerät gar nicht im Bündel (keine Karte).
     assert paar["luecke_text"] is not None
     assert "Kein aktueller Stand: Telekom, Vodafone, o2." in paar["luecke_text"]
     assert "1&1, congstar führen das Gerät gar nicht im Bündel." in paar["luecke_text"]
@@ -485,11 +440,6 @@ def test_band_zeilen_trennen_frisch_und_alt():
     assert [k["anbieter"] for k in satz["alt"]] == ["o2"]
 
 
-# --------------------------------------------------------------------------
-# Das Markup der Zeile
-# --------------------------------------------------------------------------
-
-
 def test_die_alte_zeile_traegt_marke_und_klasse():
     """Die Vorlage graut die alte Zeile aus und setzt die Marke mit
     Datum - gerendert am echten Makro (nicht am String-Attribut)."""
@@ -499,7 +449,6 @@ def test_die_alte_zeile_traegt_marke_und_klasse():
     assert "gr-bnd--alt" in html
     assert "gr-kk-marke--alt" in html
     assert "kein aktueller Stand seit 16.09.2026" in html
-    # Gegenprobe: die frische Zeile trägt keine der beiden.
     frisch = _karte(_modell(_standard()), "Vodafone")
     html = modul.buendelzeile(frisch)
     assert "gr-bnd--alt" not in html
@@ -516,7 +465,6 @@ def test_die_gruppe_nennt_den_alten_stand_ueber_den_zeilen():
     modell["haendler_ohne_buendel"] = {}
     html = modul.buendelgruppe(modell)
     assert "Kein aktueller Bündel-Stand seit dem 16.09.2026" in html
-    # Gegenprobe: das gemischte Modell nennt den Satz nicht.
     gemischt = _modell(_standard())
     gemischt["zeilen_band"] = [k for k in gemischt["karten"] if k.get("sku_id")]
     gemischt["zeilen_ohne_band"] = []
@@ -524,27 +472,8 @@ def test_die_gruppe_nennt_den_alten_stand_ueber_den_zeilen():
     assert "Kein aktueller Bündel-Stand" not in modul.buendelgruppe(gemischt)
 
 
-# ==========================================================================
-# Die VERDRAHTUNG (Prüfer-Befund "hoch", 20.09.2026): Der Bezugstag darf
-# nicht der Berichtstag sein. `render_site` gibt das Datum des jüngsten
-# RADAR-Berichts als `heute` weiter (Mi/Fr) - aber die Geräteseite rendert
-# TÄGLICH (`geraete.yml`, 02:17 UTC) und fasst die Berichte nicht an.
-# Produktionsbeweis 20.09.: Bestand `updated=2026-09-20`, jüngster Bericht
-# 16.09. - mit ihm als `heute` waren die Telekom-Bündel vom 15.09. "einen
-# Tag alt" und führten frisch Antwortzeile und Spanne; die 3-Tage-Regel
-# war regelmäßig (So-Mi) wirkungslos. Der Bezug ist deshalb der SPÄTERE
-# der beiden Uhren (Berichtstag und `updated` des Bündel-Stores) - derselbe
-# Gedanke wie `_auffaellig` ("Als Bezug gilt deshalb der spätere der
-# beiden Tage"). Der Test geht durch `render_site`, weil der Fehler in der
-# Verdrahtung saß, nicht in der Rechnung: html.py -> aufbereiten ->
-# geraete_tco_view -> karten.
-# ==========================================================================
-
-REPORT_STAND = "2026-09-16"  # Mi/Fr-Radar: jüngster Bericht am 20.09.
-BUENDEL_STAND = "2026-09-20"  # der tägliche Lauf schreibt sein eigenes Datum
-# Der Telekom-Abruf muss vom STAND aus alt sein (5 Tage), vom BERICHTSTAG
-# aus aber frisch (1 Tag) - nur so prüft der Fall, dass die spätere Uhr
-# entscheidet. Der 15.09. ist der ECHTE Telekom-Messtag des Bestands.
+REPORT_STAND = "2026-09-16"
+BUENDEL_STAND = "2026-09-20"
 TELEKOM_ABRUF = "2026-09-15"
 
 _SKU = "apple-x-256gb-schwarz"
@@ -725,8 +654,6 @@ def _buendel_welt(tmp_path):
         encoding="utf-8",
     )
     (reports / f"{REPORT_STAND}.md").write_text("# B\n", encoding="utf-8")
-    # Derselbe `heute`, den `render_site` aus reports[0]["date"] durchreicht
-    # (html.py) - der Test stellt die Uhr NICHT freundlicher als Produktion.
     g = geraete_view.aufbereiten(
         state, lade_quellen(root), lade_katalog(root), heute=REPORT_STAND
     )
@@ -746,9 +673,6 @@ def test_spaeterer_tag_liest_nur_lesbare_uhren():
     zählt nicht (Clean Code 4) - er wird nie durch den anderen ersetzt
     und ersetzt nie selbst den anderen."""
     assert geraete_view._spaeterer_tag(REPORT_STAND, BUENDEL_STAND) == BUENDEL_STAND
-    # Gegenprobe: ein Bericht NEUER als der Stock (radar.yml läuft, der
-    # nächtliche Lauf nicht) - dann altert der Stock ehrlich gegen den
-    # Berichtstag.
     assert geraete_view._spaeterer_tag(BUENDEL_STAND, REPORT_STAND) == BUENDEL_STAND
     assert geraete_view._spaeterer_tag(REPORT_STAND, "kaputt") == REPORT_STAND
     assert geraete_view._spaeterer_tag("", BUENDEL_STAND) == BUENDEL_STAND
@@ -773,7 +697,6 @@ def test_berichtstag_allein_macht_kein_angebot_frisch(tmp_path):
     assert modell["antwort"]["tarif_gesamt"] == 1320.76
     assert modell["spanne"] == [1320.76, 1320.76]
     assert modell["bundle_anbieter"] == ["Vodafone"]
-    # Gegenprobe: das Modell ist NICHT "alles alt" - Vodafone ist frisch.
     assert modell["alles_alt"] is False
 
 
@@ -786,9 +709,6 @@ def test_render_site_traegt_die_marke_in_die_seite(tmp_path):
     root, _ = _buendel_welt(tmp_path)
     html = _weltsite(root)
     assert "kein aktueller Stand seit 15.09.2026" in html
-    # Gegenprobe im selben Test: der "alles alt"-Satz der Gruppe steht
-    # NICHT - die Marke kommt von der einzelnen Zeile, nicht vom
-    # Notzustand des Modells.
     assert "Kein aktueller Bündel-Stand" not in html
 
 
@@ -801,7 +721,6 @@ def test_gleiche_uhren_altern_nicht_ueber_die_grenze(tmp_path):
     import json
 
     root, _ = _buendel_welt(tmp_path)
-    # Beide Uhren auf den 20.09., Telekom auf den 17.09. - Tag 3.
     pfad = root / "data" / "state" / "geraete_tco.json"
     roh = json.loads(pfad.read_text(encoding="utf-8"))
     roh["buendel"][0]["abgerufen_am"] = "2026-09-17"
@@ -837,11 +756,6 @@ def test_gleiche_uhren_altern_nicht_ueber_die_grenze(tmp_path):
     assert modell["antwort"]["tarif_gesamt"] == 1080.76
 
 
-# --------------------------------------------------------------------------
-# Der Wettbewerbs-Radar: eine alte Karte ist Beleg, kein Paar
-# --------------------------------------------------------------------------
-
-
 def test_radar_zeigt_alte_karte_als_beleg_nicht_als_paar():
     """A3-Nachbesserung am Radar: `alle_karten_je_band` filtert frisch,
     aber der Band-Mismatch-Belegpfad (`uebrig` -> `_zeile_fuer_anbieter`)
@@ -851,11 +765,6 @@ def test_radar_zeigt_alte_karte_als_beleg_nicht_als_paar():
     „vergleichbar" noch Prozent (Vorgabe 1: aus jeder Bewertung)."""
     from telco_radar.report import geraete_radar as radar_modul
 
-    # `leitzahl_monate` an der Karte und `monate` an der Basis wie am
-    # echten Bestand (P0-B-h1/h3): der Radar vergleicht seit P0-B-h3 nur
-    # ueber denselben Zeitraum, und ein unbekannter Zeitraum ist nie
-    # gleich - eine Fixture ohne die zwei Felder pruefte das Tor, nicht
-    # die Frische.
     karte = {
         "belastbar": True,
         "gesamt": 1080.76,
@@ -884,11 +793,8 @@ def test_radar_zeigt_alte_karte_als_beleg_nicht_als_paar():
     assert zeile["status"] == radar_modul.STATUS_NICHT_VERGLEICHBAR
     assert zeile["prozent"] is None
     assert zeile["grund"] == "kein aktueller Stand seit 15.09.2026"
-    # Der Beleg bleibt: Quelle und Abrufdatum stehen weiter an der Zeile.
     assert zeile["quelle_url"] == "https://t.invalid/x"
     assert zeile["abgerufen_am"] == "2026-09-15"
-    # Gegenprobe: dieselbe Karte frisch ist ein Paar MIT Prozent
-    # (1.080,76 gegen 1.320,76 = -18,2 % - Telekom billiger).
     frisch = {**karte, "frisch": True, "alt_marke": ""}
     frisch_zeile = radar_modul._zeile_fuer_anbieter(
         "Telekom", frisch, basis, {"tk:m": "m"}
@@ -897,20 +803,9 @@ def test_radar_zeigt_alte_karte_als_beleg_nicht_als_paar():
     assert frisch_zeile["prozent"] == -18.2
 
 
-# ==========================================================================
-# Die NACHBESSERUNG "ab-Auswahl" (Prüfer-Befund "hoch", 20.09.2026):
-# Dieselbe Frische-Definition (`ist_frisch`, Clean Code 7) gilt für den
-# ab-Preis des KATALOGS. Gemessene Fälle der gerenderten Seite:
-# "ab 1.299,00 EUR bei mobilcom-debitel, 14. August 2026" (37 Tage,
-# status aktiv) und "ab 289,00 EUR bei Medimax, 6. September 2026"
-# unterbot das frische ElectronicPartner-Angebot (299,00 EUR vom
-# 19.09.). Ein alter Wert fällt aus "ab" und Spanne heraus - oder, wo
-# es keinen frischen gibt, trägt die Marke (harte Regel 9).
-# ==========================================================================
-
-MEDIMAX_TAG = "2026-09-06"  # 14 Tage - der gemessene Fall
-EP_TAG = "2026-09-19"  # 1 Tag - das frische Gegenstück
-DEBITEL_TAG = "2026-08-14"  # 37 Tage - der gemessene Pixel-Fall
+MEDIMAX_TAG = "2026-09-06"
+EP_TAG = "2026-09-19"
+DEBITEL_TAG = "2026-08-14"
 
 
 def _listung_mit_preis(
@@ -951,11 +846,8 @@ def test_katalog_ab_nimmt_den_frischen_beleg_nicht_den_billigeren_alten():
     assert zeile["ab_anbieter"] == "ElectronicPartner"
     assert zeile["ab_alt"] is False
     assert zeile["ab_alt_marke"] == ""
-    # Nur ein frischer Anbieter -> keine Spanne (keine zweite Zahl von
-    # heute), obwohl zwei Händler das Gerät führen.
     assert zeile["spanne"] == []
     assert zeile["anbieterzahl"] == 2
-    # Die alte Zeile bleibt im Aufklapper, mit ihrem Datum.
     assert sorted(z["anbieter"] for z in zeile["zeilen"]) == [
         "ElectronicPartner",
         "Medimax",
@@ -974,8 +866,6 @@ def test_katalog_ab_ohne_frischen_beleg_zeigt_den_letzten_stand():
     assert zeile["ab_anbieter"] == "mobilcom-debitel"
     assert zeile["ab_alt"] is True
     assert zeile["ab_alt_marke"] == "kein aktueller Stand seit 14.08.2026"
-    # KEIN Rückfall auf "nur im Bündel" - es GIBT Barpreis-Belege, nur
-    # keine frischen.
     assert zeile["nur_buendel"] is False
     assert geraete_view.katalog_leitzahl([zeile]) is None
 
@@ -1014,8 +904,6 @@ def test_katalog_ab_grenzfall_tag_drei_fuehrt_tag_vier_nicht():
     assert zeile["ab_preis"] == 999.0
     assert zeile["ab_anbieter"] == "Expert"
     assert zeile["ab_alt"] is False
-    # Gegenprobe: fällt auch der Tag-3-Beleg auf Tag 4, bleibt das "ab"
-    # als letzter Stand stehen - mit Marke.
     beides_alt = _katalogzeilen(
         [
             _listung_mit_preis("Saturn", 899.0, TAG_4),
@@ -1059,9 +947,6 @@ def test_render_site_traegt_die_katalog_marke_in_die_seite(tmp_path):
     html = _weltsite(root)
     assert "gr-k-ab--alt" in html
     assert "kein aktueller Stand seit 14.08.2026" in html
-    # Die Leitzahl des Regals fehlt: ihr Block ist der EINSTE mit der
-    # Klasse `gr-leit--katalog` (die Wortwahl "günstigster" allein taugt
-    # nicht als Gegenprobe - sie steht auch am Tabellenkopf des Vergleichs).
     assert "gr-leit--katalog" not in html
 
 
@@ -1101,7 +986,6 @@ def test_alters_haendlerpreis_fuehrt_die_antwortzeile_nicht():
     )["modelle"][0]
     assert alt["antwort"]["geraetepreis"] == 1249.0
     assert alt["antwort"]["geraetepreis_anbieter"] == "Vodafone"
-    # Gegenprobe am Grenzfall: Tag 3 ist frisch - Saturn führt (1199).
     listungen[1]["abgerufen_am"] = TAG_3
     frisch = karten.modelle(
         [_vodafone(), _telekom()], listungen, [], {}, _katalog(), heute=HEUTE
@@ -1110,15 +994,9 @@ def test_alters_haendlerpreis_fuehrt_die_antwortzeile_nicht():
     assert frisch["antwort"]["geraetepreis_anbieter"] == "Saturn"
 
 
-# ==========================================================================
-# Die zweite Prüfrunde (diff-reviewer, 21.09.2026): 3×S2 (blockierend)
-# und 3×S3. Jeder Test hier war gegen den zurückgewiesenen Stand ROT;
-# die Repro-Zahlen des Prüfers stehen in den Fixtures.
-# ==========================================================================
-
-VF_BARPREIS_ALT = "2026-09-08"  # 12 Tage vor HEUTE - der S2-1-Repro
-TELEKOM_ALT = "2026-09-15"  # 5 Tage: Telekoms altes Klein-Bündel
-TELEKOM_FRISCH = "2026-09-19"  # 1 Tag: Telekoms frisches Groß-Bündel
+VF_BARPREIS_ALT = "2026-09-08"
+TELEKOM_ALT = "2026-09-15"
+TELEKOM_FRISCH = "2026-09-19"
 
 
 def _telekom_zwei_baender():
@@ -1145,9 +1023,6 @@ def _telekom_zwei_baender():
         _katalog(),
         heute=HEUTE,
     )
-
-
-# ---- S2-1: die Näherung altert über ihre beiden Belege --------------------
 
 
 def _naeherung_welt():
@@ -1205,21 +1080,14 @@ def test_eine_alte_naeherung_ist_keine_zahl_von_heute():
     assert naeherung["gesamt"] == 1598.76
     assert naeherung["frisch"] is False
     assert naeherung["alt_marke"] == "kein aktueller Stand seit 08.09.2026"
-    # Die Karte bleibt stehen (Regel 9) - aber der alte Barpreis führt
-    # NICHT die Antwortzeile: es gibt keinen frischen Gerätepreis.
     assert modell["antwort"]["geraetepreis"] is None
     assert modell["antwort"]["geraetepreis_anbieter"] is None
-    # Und kein frisches Delta rechnet gegen die alte Referenz - der
-    # Tarif-Teil der Antwortzeile bleibt, Telekom ist frisch.
     telekom = _karte(modell, "Telekom")
     assert telekom["gesamt"] == 1440.76
     assert telekom["frisch"] is True
     assert telekom["delta"] is None
     assert modell["antwort"]["tarif_gesamt"] == 1440.76
     assert modell["antwort"]["tarif_anbieter"] == "Telekom"
-
-
-# ---- S2-2: der Radar-Beleg je Anbieter nimmt die FRISCHE Karte -------------
 
 
 def test_radar_beleg_nimmt_die_frische_karte_nicht_die_alte_billige():
@@ -1236,9 +1104,6 @@ def test_radar_beleg_nimmt_die_frische_karte_nicht_die_alte_billige():
     assert set(beste) == {"Telekom"}
     assert beste["Telekom"]["gesamt"] == 1440.76
     assert beste["Telekom"]["abgerufen_am"] == TELEKOM_FRISCH
-
-
-# ---- S2-3: keine falsche Existenzaussage in der Zeitreihe ------------------
 
 
 def test_zeitreihe_nennt_den_alten_stand_statt_ein_buendel_abzustreiten(tmp_path):
@@ -1266,12 +1131,7 @@ def test_zeitreihe_nennt_den_alten_stand_statt_ein_buendel_abzustreiten(tmp_path
     paar = next(p for p in zr["paare"] if p["band"] == "xs")
     assert "Kein aktueller Stand: Telekom" in paar["luecke_text"]
     assert "Kein Bündel in diesem Band: Telekom" not in paar["luecke_text"]
-    # Die alte Karte des Bandes bleibt sichtbar: der Satz über den
-    # Zeilen nennt den letzten Stand MIT Datum.
     assert "15.09.2026" in paar["antwort_html"]
-
-
-# ---- S3b: `abgerufen_am: null` ist unbekannt, kein Notzustand --------------
 
 
 def test_abgerufen_am_none_ist_unbekannt_kein_crash():
@@ -1293,9 +1153,6 @@ def test_abgerufen_am_none_ist_unbekannt_kein_crash():
     o2 = _karte(modell, "o2")
     assert o2["frisch"] is False
     assert o2["alt_marke"] == "kein aktueller Stand – Abrufdatum unbekannt"
-
-
-# ---- S3c: ein Berichts-JSON ohne "date" bringt das Rendern nicht um --------
 
 
 def test_bericht_ohne_datumfeld_rendert_statt_zu_crashen(tmp_path):
@@ -1327,9 +1184,6 @@ def test_bericht_ohne_datumfeld_rendert_statt_zu_crashen(tmp_path):
     assert "KeyError" not in html
 
 
-# ---- S3d (Pin): die Wochenkarte hängt an der Berichts-Uhr ------------------
-
-
 def test_wochenkarte_rechnet_gegen_den_berichtstag(tmp_path):
     """S3d: seit der A3-Verdrahtung rechnet „Was diese Woche auffällt“
     gegen den BERICHTSTAG (und `geraete_lifecycle` über dieselbe Leitung)
@@ -1344,7 +1198,7 @@ def test_wochenkarte_rechnet_gegen_den_berichtstag(tmp_path):
     pfad = root / "data" / "state" / "geraete_db.json"
     roh = json.loads(pfad.read_text(encoding="utf-8"))
     for e in roh["listungen"]:
-        e["first_seen"] = "2026-09-03"  # 13 Tage vor REPORT_STAND
+        e["first_seen"] = "2026-09-03"
     pfad.write_text(json.dumps(roh), encoding="utf-8")
     assert "erstmals erfasst" in _weltsite(root)
     reports = root / "data" / "reports"

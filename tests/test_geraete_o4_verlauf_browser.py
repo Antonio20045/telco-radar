@@ -43,7 +43,6 @@ from test_geraete_browser_fixture import (
 )
 from test_geraete_zeitreihe_browser import waehle_modell
 
-# (device_id, speicher, anbieter, tarif_id, tarif, gb, rate)
 _BUENDEL = [
     ("apple-iphone-17-pro", 256, "o2", "o2:klein", "O2 Mobile Klein", 10, 18.0),
     ("apple-iphone-17-pro", 256, "Vodafone", "vf:klein", "Vodafone Mobil XS", 18, 26.0),
@@ -51,11 +50,7 @@ _BUENDEL = [
     ("google-pixel-11", 128, "o2", "o2:ohne", "O2 Mobile Flex", None, 18.0),
 ]
 
-# Messpunkte VOR dem heutigen Bestätigungsstand (last_verified=HEUTE):
-# das Vorgabemodell bekommt zwei Anbieter mit je einer Änderung, das
-# S26-Modell einen einzigen Bestätigungspunkt.
 _PUNKTE = [
-    # (listung_id, datum, preis)
     ("o2--apple-iphone-17-pro-256gb-schwarz", "2026-08-20", 1149.00),
     ("o2--apple-iphone-17-pro-256gb-schwarz", "2026-09-01", 1099.00),
     ("vodafone--apple-iphone-17-pro-256gb-schwarz", "2026-08-20", 1199.90),
@@ -80,9 +75,6 @@ def _baue(tmp_path):
         _listung("Vodafone", "apple-iphone-17-pro", 256, 1199.90),
         _listung("o2", "apple-iphone-17-pro", 256, 1099.00),
         _listung("1&1", "samsung-galaxy-s26", 256, 1049.00),
-        # Ein Barpreis OHNE Buendel in einem Tarifband (Pixel 11 hat nur
-        # den o2-Tarif ohne erhobenes Volumen) - der Fall des Deep-Link-
-        # Tests unten.
         _listung("o2", "google-pixel-11", 128, 899.00),
     ]
     (state / "geraete_db.json").write_text(
@@ -225,12 +217,9 @@ def test_kein_zweites_barpreisbild_und_die_eigene_wahl_zaehlt(lage):
     lässt es unberührt."""
     wurzel, seite = lage
     _oeffne_verlauf(wurzel, seite)
-    # 1. Kein G0-Block mehr - auf der ganzen Seite, nicht nur unsichtbar.
     assert seite.evaluate("() => document.querySelector('#gr-g0-lager')") is None, (
         "der G0-Block steht noch im Verlaufs-Reiter (Doppel-Darstellung)"
     )
-    # 2. Die eigene Auswahl wählt das VORGABEMODELL (iPhone 17 Pro 256):
-    #    zwei Anbieter, vier Messtage - der Graph entsteht.
     seite.fill("#gr-vsuche", "iPhone 17 Pro")
     seite.wait_for_timeout(150)
     seite.click("#gr-vtreffer li:first-child")
@@ -245,11 +234,6 @@ def test_kein_zweites_barpreisbild_und_die_eigene_wahl_zaehlt(lage):
     assert zustand["svg"], "die eigene Auswahl zeichnet keinen Graphen"
     assert not zustand["g0"], zustand
     assert zustand["kacheln"], zustand
-    # 3. EIN GERAET FUER BEIDE REITER (28.09.2026, Antonio: „ich verstehe
-    #    den Unterschied zwischen Vergleich und Preisverlauf nicht"). Der
-    #    QA-Fall von E3 bleibt ausgeschlossen - es gibt weiter nur EIN
-    #    Barpreis-Bild -, aber die Wahl im Reiter „Mit Tarif" gilt jetzt
-    #    auch hier: wer dort ein Geraet waehlt, sieht es hier ohne Vertrag.
     seite.click('.gr-reiter [data-tafel="tafel-tco"]')
     seite.wait_for_timeout(120)
     waehle_modell(seite, "samsung-galaxy-s26-256")
@@ -266,8 +250,6 @@ def test_kein_zweites_barpreisbild_und_die_eigene_wahl_zaehlt(lage):
     assert "Galaxy S26" in nachher["feld"], (
         f'der Reiter „Ohne Vertrag" zeigt nicht das Geraet aus „Mit Tarif": {nachher}'
     )
-    # Genau EIN Bild - oder, bei zu wenigen Messterminen, der benannte
-    # Satz statt eines Bildes; nie beides, nie keins von beiden.
     assert (nachher["bilder"] == 1) != nachher["zukurz"], nachher
 
 

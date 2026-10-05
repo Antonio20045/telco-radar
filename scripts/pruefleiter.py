@@ -57,9 +57,6 @@ MAX_ROT_ZEILEN = 60
 TEST_FRIST_SEKUNDEN = 300
 STUFE_FRIST_SEKUNDEN = 1800
 NACHLAUF_SEKUNDEN = 10
-# Präfixe der Variablen, die pytest, ruff, mypy oder Python selbst lesen und mit denen
-# sich Tests abwählen, Regeln lockern oder die Ausgabe für die Auswertung verbiegen
-# ließe (PYTEST_ADDOPTS, PYTEST_PLUGINS, RUFF_*, MYPYPATH, PYTHON*, Farben, GIT_*).
 _FREMDE_UMGEBUNG = (
     "PYTEST_",
     "PYTHON",
@@ -177,7 +174,6 @@ def stufe_tests(log: TextIO) -> Ergebnis:
         leiter_pytest.PLUGIN,
     ]
     with tempfile.TemporaryDirectory() as ordner:
-        # Das Plugin zuerst: Ein gleichnamiges Modul unter src/ verdeckt es nicht.
         pfade = os.pathsep.join(map(str, (leiter_pytest.PLUGIN_ORDNER, WURZEL / "src")))
         zusatz = {
             leiter_pytest.ROH_VARIABLE: ordner,
@@ -359,8 +355,6 @@ def _lauf(
     zusatz: Mapping[str, str] | None = None,
     frist: int | None = None,
 ) -> subprocess.CompletedProcess[str]:
-    # Eigene Prozessgruppe: Bei überschrittener Frist sterben auch die Worker von
-    # pytest-xdist, sonst hielten sie die Pipes offen und die Leiter hinge mit.
     with subprocess.Popen(
         befehl,
         cwd=WURZEL,
@@ -378,7 +372,6 @@ def _lauf(
             try:
                 stdout, stderr = prozess.communicate(timeout=NACHLAUF_SEKUNDEN)
             except subprocess.TimeoutExpired:
-                # Ein Enkel in eigener Sitzung hält die Pipe; die Ausgabe ist verloren.
                 stdout, stderr = "", ""
             stderr += f"\nabgebrochen nach {frist or STUFE_FRIST_SEKUNDEN} s\n"
         lauf = subprocess.CompletedProcess(befehl, prozess.wait(), stdout, stderr)

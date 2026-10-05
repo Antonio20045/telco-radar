@@ -119,7 +119,6 @@ _KANARIE = (
     f"FAILED {pruefleiter.KANARIE}::test_quelltext_muss_scheitern - Regel Verhalten\n"
 )
 _KOPF = "==== short test summary info ====\n" + _KANARIE
-# Die Hermetik aus tests/conftest.py; Angriffe im Wegwerfprojekt hängen sich dahinter.
 _HERMETIK = Path(__file__).with_name("conftest.py").read_text("utf-8")
 
 
@@ -435,7 +434,6 @@ def test_geloeschter_test_macht_die_teststufe_rot(kleines_projekt, tmp_path):
         ergebnis = pruefleiter.stufe_tests(log)
     assert not ergebnis.gruen
     assert ergebnis.zeilen[0].startswith("7 Tests gesammelt, erwartet mindestens 8")
-    # Gegenprobe: mit beiden grünen Tests als Untergrenze ist dieselbe Suite grün.
     (tmp_path / "pruef" / "tests-anzahl.txt").write_text("4\n", "utf-8")
     with (tmp_path / "log").open("a") as log:
         assert pruefleiter.stufe_tests(log).gruen
@@ -570,7 +568,6 @@ def test_conftest_die_scheitern_zu_bestanden_umschreibt_macht_die_stufe_rot(
     assert ergebnis.zeilen == [
         "tests/kanarie_leiter.py: Ergebnisse werden umgeschrieben oder abgewählt"
     ]
-    # Gegenprobe: ohne den Hook ist der rote Test rot gemeldet, nicht der Kanarienvogel.
     (kleines_projekt / "tests" / "conftest.py").write_text(_HERMETIK, "utf-8")
     (kleines_projekt / "tests" / "test_rot.py").unlink()
     (tmp_path / "pruef" / "tests-anzahl.txt").write_text("4\n", "utf-8")
@@ -688,7 +685,6 @@ def test_abgewaehlter_roter_test_macht_die_teststufe_rot(
     assert ergebnis.zeilen == [
         "tests/test_rot.py::test_kaputt: steht im Repo, lief aber nicht (abgewählt)"
     ]
-    # Gegenprobe: ohne den roten Test ist dieselbe Auswahl grün.
     (kleines_projekt / "tests" / "test_rot.py").unlink()
     with (tmp_path / "log").open("a") as log:
         assert pruefleiter.stufe_tests(log).gruen

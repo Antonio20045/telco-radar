@@ -37,9 +37,6 @@ from telco_radar.report.html import render_site
 BERICHT_DIR = BILDER_BESTAND / "reports"
 AUSGABE = "2026-08-08"
 
-# Dieselben zwei Formate, die im Auftrag stehen. Das Telefon ist das
-# strengere: dort liegt die rechte Spalte UNTER dem Aufmacher, der Kasten
-# kann die Schlagzeile also nur noch verdraengen, wenn er ueber ihr steht.
 FORMATE = [("Schreibtisch", 1440, 900), ("Telefon", 390, 844)]
 
 
@@ -105,8 +102,6 @@ def _gemessen(tmp_path_factory, chromium):
             seite = chromium.new_page(viewport={"width": breite, "height": hoehe})
             try:
                 seite.goto(f"{wurzel}/index.html", wait_until="load")
-                # Ohne das misst die Pruefung die Platzhalterhoehe der
-                # noch nicht geladenen Bilder oberhalb der Falz.
                 seite.wait_for_timeout(400)
                 szl = seite.locator(".aufmacher .szl").first
                 werte[name] = {

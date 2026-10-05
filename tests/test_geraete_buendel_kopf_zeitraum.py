@@ -50,18 +50,6 @@ WURZEL = pathlib.Path(__file__).resolve().parents[1]
 DEVICE = "apple-iphone-17-pro"
 MODELL = "apple-iphone-17-pro-256"
 
-# VIER Anbieter in EINEM Band (Klein, alle Tarife unter 20 GB) - drei mit
-# getrennter Rate (24 Monate) und 1&1 mit EINEM Monatsbetrag fuer Tarif und
-# Geraet ueber 36 Monate. Die Betraege sind so gewaehlt, dass die
-# 36-Monats-Summe MITTEN in die 24-Monats-Reihe faellt:
-#
-#   congstar  1 + 24 x 10,00 + 24 x 24,99 =   840,76 EUR   (24 Mon.)
-#   o2        1 + 24 x 18,00 + 24 x 24,99 = 1.032,76 EUR   (24 Mon.)
-#   1&1       100 + 36 x 30,00            = 1.180,00 EUR   (36 Mon.)
-#   Vodafone  1 + 24 x 26,00 + 24 x 24,99 = 1.224,76 EUR   (24 Mon.)
-#
-# Eine Sortierung nach dem Betrag allein schiebt 1&1 also zwischen o2 und
-# Vodafone - das ist der Befund, und daran wird gemessen.
 _RATEN = [
     ("o2", "o2:klein", "O2 Mobile Klein", 10, 18.0),
     ("congstar", "cs:klein", "Allnet Flat XS", 15, 10.0),
@@ -136,8 +124,6 @@ def _baue(tmp_path: pathlib.Path) -> pathlib.Path:
             "tarif_name": tarif,
             "tarif_id": tarif_id,
             "tarif_id_guete": "hoch",
-            # EIN Betrag fuer Tarif UND Geraet (§ 13.2) - kein `tarif_monatlich`,
-            # keine `geraet_monatsrate`.
             "buendel_monatlich": monatlich,
             "tarif_bindung_monate": 24,
             "geraet_zuzahlung": zuzahlung,
@@ -222,11 +208,6 @@ def _etikett_monate(zeile) -> int | None:
     return int(text.split()[2])
 
 
-# --------------------------------------------------------------------------
-# Die Fixture selbst - ohne diese Gegenprobe prueft der Rest nichts
-# --------------------------------------------------------------------------
-
-
 def test_die_fixture_mischt_wirklich_zwei_zeitraeume(suppe):
     """GEGENPROBE zu allem, was folgt: vier Zeilen in EINEM Band, drei mit
     24 und eine mit 36 Monaten - und die 36er faellt nach Betrag MITTEN in
@@ -238,15 +219,8 @@ def test_die_fixture_mischt_wirklich_zwei_zeitraeume(suppe):
     assert betraege == pytest.approx(_SOLL), betraege
     monate = {z["data-anbieter"]: _etikett_monate(z) for z in zeilen}
     assert monate == {"congstar": 24, "o2": 24, "Vodafone": 24, "1&1": 36}, monate
-    # Nach Betrag allein stuende 1&1 an Platz 3 von 4 - nicht am Rand, wo
-    # eine Gruppierung ohnehin landet.
     rang = sorted(betraege, key=lambda a: betraege[a])
     assert rang == ["congstar", "o2", "1&1", "Vodafone"], rang
-
-
-# --------------------------------------------------------------------------
-# 1. Der Spaltenkopf behauptet keinen Zeitraum, den er nicht halten kann
-# --------------------------------------------------------------------------
 
 
 def test_der_spaltenkopf_der_buendeltafel_nennt_keine_monatszahl(suppe):
@@ -261,13 +235,9 @@ def test_der_spaltenkopf_der_buendeltafel_nennt_keine_monatszahl(suppe):
     beschriftung = f"{text} {knopf.get('aria-label', '')}"
     assert "Monate" not in beschriftung, beschriftung
     assert "24" not in beschriftung and "36" not in beschriftung, beschriftung
-    # Die Spalte ist trotzdem benannt - und mit demselben Wort, mit dem der
-    # Rechenweg jeder Zeile die Zahl erklaert ("mit Tarif").
     assert text == "Kosten mit Tarif", text
     assert knopf.get("aria-label"), "der Knopf braucht seine Vorlesehilfe"
 
-    # GEGENPROBE: der Zeitraum ist nicht verschwunden, er steht an JEDER
-    # Zahl - und zwar der gemessene.
     monate = sorted({_etikett_monate(z) for z in _zeilen(suppe)})
     assert monate == [24, 36], monate
 
@@ -288,11 +258,6 @@ def test_auch_die_gruppe_ohne_tarifband_nennt_die_spalte_ohne_zeitraum(site):
     assert all("Kosten mit Tarif" in t for t in texte), texte
 
 
-# --------------------------------------------------------------------------
-# 2. Der Zeitraum steht als Attribut an der Zeile - gelesen, nicht gebaut
-# --------------------------------------------------------------------------
-
-
 def test_jede_zeile_traegt_ihren_zeitraum_als_sortiergruppe(suppe):
     """`data-leitzahl-monate` ist das Feld, das app.js liest - es MUSS
     dieselbe Zahl sein, die das Etikett derselben Zeile nennt (eine
@@ -305,8 +270,6 @@ def test_jede_zeile_traegt_ihren_zeitraum_als_sortiergruppe(suppe):
     paare = [(z.get("data-leitzahl-monate"), _etikett_monate(z)) for z in zeilen]
     assert all(a for a, _e in paare), paare
     assert all(int(a) == e for a, e in paare), paare
-    # GEGENPROBE: `data-laufzeit` taugt nicht als Gruppe - es ist die
-    # Tariflaufzeit der Rechnung und ueberall 24.
     assert {z.get("data-laufzeit") for z in zeilen} == {"24"}, [
         z.get("data-laufzeit") for z in zeilen
     ]
@@ -359,14 +322,7 @@ def test_ohne_gemessenen_zeitraum_bleibt_die_sortiergruppe_leer():
     ).select_one(".gr-bnd")
     assert zeile.get("data-leitzahl-monate") == "", zeile.attrs
     assert zeile.get("data-gesamt") == "", zeile.attrs
-    # GEGENPROBE: die Zeile steht da, mit ihrem Grund - sie wird nicht
-    # weggelassen, nur weil sie keinen Zeitraum hat.
     assert "Kein Bündel erhoben" in "".join(zeile.find_all(string=True))
-
-
-# --------------------------------------------------------------------------
-# 3. Die Sortierung im echten Chromium
-# --------------------------------------------------------------------------
 
 
 @contextlib.contextmanager
@@ -415,15 +371,12 @@ def test_die_sortierung_stellt_zwei_zeitraeume_nicht_in_einen_rang(seite):
     seite.wait_for_timeout(120)
     reihe = _reihe(seite)
     assert [z[0] for z in reihe] == ["congstar", "o2", "Vodafone", "1&1"], reihe
-    # Erst der Zeitraum, dann der Betrag INNERHALB des Zeitraums.
     assert [z[1] for z in reihe] == ["24", "24", "24", "36"], reihe
     je_zeitraum = {}
     for _a, mon, betrag in reihe:
         je_zeitraum.setdefault(mon, []).append(betrag)
     for mon, betraege in je_zeitraum.items():
         assert betraege == sorted(betraege), (mon, betraege)
-    # NICHTS WIRD GEKAPPT: die Zeile mit dem anderen Zeitraum steht weiter
-    # da, mit ihrer Zahl und ihrem Etikett.
     assert len(reihe) == 4, reihe
     etikett = seite.eval_on_selector_all(
         "#gr-bndliste .gr-bnd:not([hidden]) .gr-bnd-label",
@@ -475,11 +428,6 @@ def test_die_anbieter_sortierung_bleibt_eine_reine_namensfolge(seite):
     namen = [z[0] for z in _reihe(seite)]
     assert namen == sorted(namen, key=str.lower), namen
     assert namen[0] == "1&1", namen
-
-
-# --------------------------------------------------------------------------
-# 4. MITNEHMEN: kein Rueckfall auf die Konstante 24 im Markup
-# --------------------------------------------------------------------------
 
 
 def _zeile_text(karte: dict) -> str:
@@ -559,8 +507,6 @@ def test_ohne_gemessene_ratenzahl_steht_keine_24_im_paradox_satz():
     assert "alle 24 Geräteraten" not in text, text
     assert "Anzahl nicht gemessen" in text, text
 
-    # GEGENPROBE: die GEMESSENE Ratenzahl steht da, und zwar sie selbst -
-    # 36 Raten bleiben 36, nicht 24.
     text36 = _zeile_text(_finanzierungskarte(36))
     assert "alle 36 Geräteraten" in text36, text36
     assert "Anzahl nicht gemessen" not in text36, text36

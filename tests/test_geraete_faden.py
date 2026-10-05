@@ -25,15 +25,8 @@ erneuert, Vodafone als Referenzrechnung.
 from __future__ import annotations
 
 import pytest
-
 from bs4 import BeautifulSoup
-
 from test_geraete_tco_zustand import _baue
-
-
-# --------------------------------------------------------------------------
-# Kriterium 1: G0 ist die einzige Grafik je Modellblock
-# --------------------------------------------------------------------------
 
 
 def test_der_eine_graph_ist_die_zeitreihe(tmp_path):
@@ -54,11 +47,6 @@ def test_der_eine_graph_ist_die_zeitreihe(tmp_path):
     assert svgs, "die Zeitreihe fehlt"
     for svg in svgs:
         assert svg.select("circle.gr-zr-punkt"), "SVG ohne Messpunkte"
-
-
-# --------------------------------------------------------------------------
-# Kriterium 2: die Antwortzeile steht zwischen Auswahl und Graph
-# --------------------------------------------------------------------------
 
 
 def test_antwortzeile_steht_zwischen_auswahl_und_graph(tmp_path):
@@ -99,25 +87,10 @@ def test_der_antwort_satz_nennt_anbieter_und_die_leitzahl(tmp_path):
     )
 
 
-# --------------------------------------------------------------------------
-# Kriterium 3: die Titelzeile - siehe `test_geraete_rahmen.py`
-# (`test_die_ueberschrift_ist_sachlich_nicht_die_gescheiterte_frage`)
-# --------------------------------------------------------------------------
-
-
 def test_der_seitentitel_ist_sachlich(tmp_path):
     s = _baue(tmp_path)
     titel = s.select_one("title").get_text(strip=True)
     assert titel.endswith("· Gerätepreise")
-
-
-# --------------------------------------------------------------------------
-# Kriterium 4 (O2, 11.09.2026): die Alarm-Kacheln und -Tabelle stehen auf
-# dem WETTBEWERBS-RADAR, nicht mehr auf der Geräteseite - ihr neuer Ort
-# hält tests/test_wettbewerbsradar_alarme.py fest. Hier bleibt die Regel,
-# dass die Vergleichsansicht sie NICHT mehr trägt (kein Doppelt), und dass
-# der Tarifmaßstab weiterhin hinter einer Aufklappung steht.
-# --------------------------------------------------------------------------
 
 
 def test_die_vergleichsansicht_traegt_keine_alarmtafel_mehr(tmp_path):
@@ -137,8 +110,6 @@ def test_der_tarifmassstab_steht_in_einer_aufklappung(tmp_path):
     hinter einer eigenen, geschlossenen Aufklappung."""
     s = _baue(tmp_path)
     tafel = s.select_one("#tafel-tco")
-    # E2: der Massstab wohnt im EINEN Fuss-Aufklapper "Massstab &
-    # Datenlage" (§3.1c) - zwei eigene Aufklapper waeren die Verdopplung.
     massstab = tafel.select_one("#gr-massstab-datenlage")
     if massstab is None or massstab.select_one(".gr-ttab--simonly") is None:
         pytest.skip("keine Referenzen im Bestand der Fixture")
@@ -165,12 +136,6 @@ def test_die_buendel_zeilen_stehen_ausserhalb_jeder_aufklappung(tmp_path):
             elter = elter.parent
 
 
-# --------------------------------------------------------------------------
-# Kriterium 5: Einzel-Punkt-Anbieter - Verdrahtung im HTML
-# (die Rechnung selbst: tests/test_geraete_zeitreihe.py)
-# --------------------------------------------------------------------------
-
-
 def test_haendler_ohne_preis_stehen_nicht_einzeln_da(tmp_path):
     """E2 (Antonio 9b.7 + §3.1): die 'Beschaffung läuft'-Legende ist mit
     der Balkenform gefallen. Ein Händler OHNE Preis ist kein Bündel-
@@ -186,11 +151,6 @@ def test_haendler_ohne_preis_stehen_nicht_einzeln_da(tmp_path):
     assert "Beschaffung läuft" not in text
     for name in ("Amazon", "Expert"):
         assert name not in text, f"{name} steht einzeln in der Lesefläche"
-
-
-# --------------------------------------------------------------------------
-# Kriterium 6: die Reiterleiste (E3: vier echte Tafeln auf EINER Seite)
-# --------------------------------------------------------------------------
 
 
 def test_die_reiterleiste_traegt_vergleich_radar_verlauf_katalog(tmp_path):
@@ -227,7 +187,5 @@ def test_die_portfolio_tafel_ist_weg(tmp_path):
     assert radar is not None, "#tafel-radar fehlt - der Test prüft nichts"
     lifecycle = radar.select_one("#lifecycle")
     if lifecycle is not None:
-        # Die Fixture kann einen Leerzustand rendern (kein Lifecycle-Satz);
-        # steht die Sektion, steht sie IM Radar-Reiter und zugeklappt.
         details = lifecycle.select_one("details.gr-auf")
         assert details is not None and not details.get("open")

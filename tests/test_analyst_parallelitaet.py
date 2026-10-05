@@ -65,8 +65,6 @@ def test_parallele_stapel_laufen_wirklich_gleichzeitig(monkeypatch):
         with sperre:
             gleichzeitig += 1
             hoechststand = max(hoechststand, gleichzeitig)
-        # Blockiert, bis drei Stapel gleichzeitig hier stehen. Bei serieller
-        # Abarbeitung laeuft die Barriere in ihren Timeout.
         tor.wait()
         with sperre:
             gleichzeitig -= 1

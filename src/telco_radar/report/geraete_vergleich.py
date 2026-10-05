@@ -47,31 +47,9 @@ from ..geraete_model import (
     ratenhinweis_aus_eintrag,
 )
 
-# Ab wann ein Preisunterschied ein BEFUND ist und kein Rundungsrauschen.
-# Am 29.08.2026 standen 62 Zeilen auf der Seite, davon 36 "niemand
-# guenstiger" und Dutzende mit -0,90 EUR (freenet fuehrt dasselbe Geraet fuer
-# 1199,00 statt 1199,90). Wer wissen will, wo wir teurer sind, scrollte durch
-# zwanzig Bildschirme, um sechs Zeilen zu finden.
-#
-# ODER, nicht UND: bei einem 200-Euro-Geraet sind 15 Euro viel und 3 Prozent
-# wenig, bei einem 2000-Euro-Geraet umgekehrt. Eine Grenze allein liesse je
-# nach Preisklasse das Falsche durch.
-#
-# Nichts wird geloescht - `zeilen` bleibt die Vollansicht, `rest` steht auf
-# der Seite hinter einem Aufklapper.
 WESENTLICH_PROZENT = 3.0
 WESENTLICH_EURO = 15.0
 
-# Wie viele Zeilen die alte Vergleichsuebersicht ohne Aufklappen zeigte.
-#
-# ACHTUNG, wer die Seitenhoehe deckeln will: das ist seit dem 30.08.2026
-# NICHT mehr diese Zahl. Die Vergleichssektion ist durch die Alarmtabelle
-# ersetzt, und deren Deckel heisst `report/geraete_alarme.SICHTBAR_MAX`.
-# Hier standen bis dahin siebzehn Zeilen Begruendung, dass diese Konstante
-# die Seite kurz haelt, samt Verweis auf einen Test, den es nicht mehr gibt -
-# eine lebendig klingende Erklaerung an einer Schraube, die nichts mehr
-# bewegt. `vergleich()` rechnet `wesentlich`/`rest` weiter aus (und Tests
-# halten die Rechnung fest), aber KEINE Vorlage liest sie.
 UEBERSICHT_MAX_ZEILEN = 14
 
 
@@ -84,19 +62,11 @@ def ist_wesentlich(zeile: dict) -> bool:
     ) >= WESENTLICH_EURO
 
 
-# Wie in `geraete_view`: Vodafone ist die eigene Referenz, kein Wettbewerber.
 EIGEN = ("vodafone",)
 
-# Ohne Vertrag und mit Vertrag - die zwei Achsen, die nie zusammenfliessen.
 OHNE_VERTRAG = "ohne_vertrag"
 MIT_VERTRAG = "mit_vertrag"
 
-# Ein sichtbarer Bestand ist einer, der noch im Regal steht. Ein
-# ausgelistetes Geraet gehoert nicht in einen Preisvergleich von heute.
-# Aus EINER Quelle, nicht abgeschrieben. Am 30.08.2026 standen hier und in
-# `geraete_pruefung` zwei verschiedene Tupel, und eine Listung auf
-# "vermutlich ausgelistet" fiel genau durch die Luecke dazwischen: geprueft
-# wurde sie nie, gezeigt schon.
 _SICHTBAR = (STATUS_AKTIV, STATUS_VERMUTLICH)
 
 
@@ -126,10 +96,6 @@ def _preis(eintrag: dict) -> tuple[Optional[float], str]:
     if ohne is not None:
         return float(ohne), OHNE_VERTRAG
     zuzahlung = eintrag.get("zuzahlung")
-    # Eine Zuzahlung OHNE Tarifreferenz ist nach der Disziplin dieses
-    # Projekts kein Preis. `Listung.__post_init__` faengt das schon ab -
-    # hier steht es noch einmal, weil diese Funktion auch rohe dicts aus
-    # der Zustandsdatei sieht.
     if zuzahlung is not None and (eintrag.get("tarif_referenz") or "").strip():
         return float(zuzahlung), MIT_VERTRAG
     return None, ""
@@ -154,18 +120,9 @@ def _angebot(eintrag: dict, laeden: Optional[dict] = None) -> dict:
         "abgerufen_am": eintrag.get("abgerufen_am") or "",
         "farbe": eintrag.get("farbe_normalisiert") or eintrag.get("farbe_roh") or "",
         "tarif": (eintrag.get("tarif_referenz") or "").strip(),
-        # Wie diese Zahl zustande kommt: "in 24 Raten (0 %)" bei o2, leer bei
-        # einem Barpreis. Der Text kommt aus dem Modell, damit Alarmtabelle,
-        # Katalog und jede spaetere Ansicht dieselbe Formulierung benutzen.
         "ratenhinweis": ratenhinweis_aus_eintrag(eintrag),
-        # Ein Kampfpreis auf ein nicht lieferbares Geraet ist ein anderer
-        # Sachverhalt als einer auf ein lieferbares. Die Alarmtabelle zeigt
-        # das als eigene Spalte, statt beides gleich aussehen zu lassen.
         "verfuegbarkeit": eintrag.get("verfuegbarkeit") or "unbekannt",
         "zustand": eintrag.get("zustand") or "neu",
-        # Traegt die Markierung des Pruefberichts an die Zeile: ein Ausreisser
-        # wird gemeldet statt geloescht, und gemeldet heisst DORT sichtbar,
-        # wo jemand die Zahl liest.
         "listung_id": eintrag.get("id") or "",
     }
 
@@ -209,14 +166,6 @@ def vergleich(
         preis, art = _preis(e)
         if preis is None or art != preisart:
             continue
-        # W1.1, Evaluation vom 29.08.2026: der Vergleich zeigt NUR
-        # Neugeraete. Bis dahin bildete jeder Zustand seine eigene Zeile -
-        # arithmetisch richtig, auf der Seite aber nicht zu unterscheiden,
-        # und ein falsch erkannter Zustand schlug voll durch: ein o2-Geraet
-        # fuer 577 EUR ("grau erneuert") stand als Sieger gegen Vodafones
-        # Neupreis von 849,90 EUR. "unbekannt" faellt aus demselben Grund
-        # heraus - ein nicht bestimmter Zustand wird nicht als neu
-        # angenommen. Beides bleibt im CSV-Export und in der SKU-Ansicht.
         if (e.get("zustand") or "neu") not in VERGLEICHBARE_ZUSTAENDE:
             continue
         schluessel = (
@@ -248,24 +197,6 @@ def vergleich(
 
         vodafone = _guenstigstes_je_laden(eigene, laeden)
         if not vodafone:
-            # ZWEI verschiedene Faelle, und sie duerfen nicht denselben Satz
-            # bekommen:
-            #
-            #   `eigene` leer          Vodafone fuehrt das Geraet nicht. Das
-            #                          ist selbst ein Befund und gehoert in
-            #                          die Luecken-Liste.
-            #   `eigene` da, unbelegt  Vodafone fuehrt es sehr wohl, nur ohne
-            #                          Quelle oder Abrufdatum. "Bei Vodafone
-            #                          nicht gelistet" waere dann eine
-            #                          FALSCHE Aussage ueber das eigene
-            #                          Portfolio - die Zeile entfaellt
-            #                          stillschweigend, der Vergleich auch.
-            #
-            # Der zweite Fall kann aus der Pipeline nicht entstehen
-            # (`Listung.__post_init__` erzwingt Quelle und Abrufdatum zu
-            # jedem Preis). Er steht hier trotzdem, weil diese Funktion auch
-            # rohe dicts aus der Zustandsdatei sieht - und weil ein falscher
-            # Satz ueber das eigene Regal teurer ist als eine fehlende Zeile.
             if wettbewerb and not eigene:
                 ohne_vodafone.append(
                     {
@@ -278,7 +209,6 @@ def vergleich(
             continue
 
         eigen = vodafone[0]
-        # STRIKT guenstiger: Preisgleichheit ist kein Preisvorteil.
         guenstiger = [a for a in wettbewerb if a["preis"] < eigen["preis"]]
         teurer = [a for a in wettbewerb if a["preis"] >= eigen["preis"]]
 
@@ -301,18 +231,10 @@ def vergleich(
             )
         zeilen.append(zeile)
 
-    # Groesster Abstand zuerst; Zeilen ohne guenstigeren Wettbewerber danach,
-    # nach Modell sortiert. Sie verschwinden NICHT - "nirgends guenstiger"
-    # ist die Auskunft, wegen der man eine Vergleichsliste liest.
     zeilen.sort(key=lambda z: (-(z["differenz"] or 0), z["modell"], z["speicher"] or 0))
     ohne_vodafone.sort(key=lambda z: (-z["anzahl"], z["modell"]))
 
     mit_vorteil = [z for z in zeilen if z["anzahl_guenstiger"]]
-    # Eine Zeile ist eine (Modell, Speicher)-Kombination, KEIN Geraet: das
-    # iPhone 17 mit 256 und mit 512 GB sind zwei Zeilen und ein Geraet. Als
-    # "62 Geraete im Vergleich" stand darueber eine Zahl, die groesser war
-    # als die 59 beobachteten Geraete daneben - dieselbe Fehlerklasse wie
-    # "267 Geraete neu im Regal" (W3), nur eine Sektion weiter.
     geraete = len({z["device_id"] for z in zeilen})
     alle_wesentlich = [z for z in zeilen if ist_wesentlich(z)]
     wesentlich = alle_wesentlich[:UEBERSICHT_MAX_ZEILEN]
@@ -329,9 +251,6 @@ def vergleich(
         "ohne_vodafone": ohne_vodafone[:15],
         "ohne_vodafone_gesamt": len(ohne_vodafone),
         "groesste_differenz": mit_vorteil[0]["differenz"] if mit_vorteil else None,
-        # Die Seite blendet die Sektion aus, solange es nichts zu vergleichen
-        # gibt. Ein leerer Kasten mit Ueberschrift sagt "kaputt", nicht
-        # "noch keine Daten".
         "hat_daten": bool(zeilen or ohne_vodafone),
         "hat_vodafone": bool(zeilen),
     }
@@ -345,8 +264,5 @@ def beide_preisarten(eintraege: list, katalog, laeden: Optional[dict] = None) ->
         "ohne_vertrag": ohne,
         "mit_vertrag": mit,
         "hat_daten": ohne["hat_daten"] or mit["hat_daten"],
-        # Welche Achse die Seite zuerst zeigt: die mit Daten. Ohne diese
-        # Zeile stuende bei einem reinen Buendel-Bestand die leere Achse
-        # oben und die volle im zugeklappten Umschalter.
         "standard": OHNE_VERTRAG if ohne["hat_daten"] else MIT_VERTRAG,
     }

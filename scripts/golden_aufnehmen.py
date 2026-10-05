@@ -37,8 +37,6 @@ WURZEL = Path(__file__).resolve().parents[1]
 ZIEL = WURZEL / "tests" / "fixtures" / "golden"
 BESTAND = "tests/fixtures/bestand/2026-10-03"
 ERWARTET = "erwartet.json"
-# Wenige Quellen, die über collect.http laufen, und keine Stufe mit eigenem Netzweg:
-# klein genug für das Repo, groß genug, dass jede LLM-Stufe etwas bekommt.
 BETREIBER = {"Vodafone Deutschland", "Deutsche Telekom", "O2 Telefónica Deutschland"}
 FACHPRESSE = {"teltarif", "Telecom Handel"}
 THEMENQUELLEN = {"OpenAI", "Apple"}

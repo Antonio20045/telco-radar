@@ -52,12 +52,6 @@ def geraete(site) -> BeautifulSoup:
     )
 
 
-# --------------------------------------------------------------------------
-# E3-Fix: der Reiter trägt GENAU EIN Barpreis-Bild-System (die eigene
-# Auswahl) - kein G0-Block mehr
-# --------------------------------------------------------------------------
-
-
 def test_der_verlaufs_reiter_traegt_keine_zweite_barpreis_grafik(geraete):
     """G0 und die eigene Auswahl unten zeichneten beide den Barpreis
     desselben Geräts über dieselbe Zeitachse (§4.6/§4.8 - keine Doppel-
@@ -102,11 +96,6 @@ def test_nur_die_zeitreihe_ist_svg_in_der_vergleichsansicht(geraete):
         )
 
 
-# --------------------------------------------------------------------------
-# Ehrliche Hinweise nach dem Entwurf
-# --------------------------------------------------------------------------
-
-
 def test_der_beginn_der_tco_historie_ist_der_echte(geraete):
     """E3 (S1) hat den TCO-Historie-Absatz dieses Reiters FALLEN lassen:
     Seit E2 ist die TCO-Zeitreihe die Hauptansicht des Vergleichs-Reiters,
@@ -122,10 +111,6 @@ def test_der_beginn_der_tco_historie_ist_der_echte(geraete):
     for zeile in pfad.read_text(encoding="utf-8").splitlines():
         if zeile.strip():
             tage.add(json.loads(zeile).get("datum"))
-    # Der Reiter fragt nach dem Barpreis - im Titel (S1) und ohne jeden
-    # TCO-Historie-Absatz mehr.
-    # Seit 28.09.2026 benennt der REITER die Frage („Ohne Vertrag"); die
-    # zweite Ueberschrift darunter („Barpreis-Verlauf") ist gefallen.
     knopf = geraete.select_one('.gr-reiter [data-tafel="tafel-verlauf"]')
     assert knopf is not None
     assert knopf.get_text(" ", strip=True) == "Ohne Vertrag", (
@@ -137,9 +122,6 @@ def test_der_beginn_der_tco_historie_ist_der_echte(geraete):
     )
     assert tage, "keine TCO-Historie im Schnappschuss"
     seit = min(tage)
-    # Dasselbe KURZ-Format wie die Datumsachse der Zeitreihe („12.9.");
-    # die Messtag-Zeile darueber ist am 28.09.2026 gefallen, die erste
-    # Achsenbeschriftung nennt den Beginn.
     _y, m, d = seit.split("-")
     erwartet = f"{int(d)}.{int(m)}."
     vergleich = geraete.select_one("#tafel-tco")

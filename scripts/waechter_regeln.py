@@ -16,6 +16,7 @@ from collections import Counter
 from collections.abc import Iterable, Iterator
 from pathlib import Path
 
+import waechter_kommentare
 import waechter_speicher
 
 RIESEN_GRENZE = 400
@@ -23,7 +24,6 @@ CODE_ORDNER = ("src/**/*", "scripts/**/*", "tools/**/*", "service/**/*")
 _RUFF_MYPY = {"pyproject.toml", "ruff.toml", ".ruff.toml", "mypy.ini", ".mypy.ini"}
 _PYTEST = {"pytest.ini", ".pytest.ini", "pytest.toml", ".pytest.toml", "tox.ini"}
 _PYTHON = {"conftest.py", "sitecustomize.py", "usercustomize.py", "setup.cfg"}
-# Ein Modul namens wie das Plugin der Leiter verdeckt es auf dem Suchpfad.
 _PLUGIN = "leiter_roh"
 KONFIG_NAMEN = frozenset(
     {*_RUFF_MYPY, *_PYTEST, *_PYTHON, ".importlinter", f"{_PLUGIN}.py", _PLUGIN}
@@ -59,9 +59,8 @@ _WERKZEUG_AUS = re.compile(
 _RUFF_AUS = re.compile(r"^#\s*ruff:\s*disable\b(?:\[([^\]]*)\])?", re.I | re.M)
 _MYPY_AUS = re.compile(r"^#\s*mypy:\s*(?!ignore-errors)(.*)", re.I | re.M)
 _ABSCHALTER = (_NOQA, _TYPE_IGNORE, _WERKZEUG_AUS, _RUFF_AUS, _MYPY_AUS)
+KOMMENTAR_ORDNER = (*CODE_ORDNER, "tests/**/*")
 _KEIN_TYPCHECK = frozenset({"no_type_check", "no_type_check_decorator"})
-# Wanduhren, aufgelöst über die Importe der Datei: ``from time import time as t``
-# macht aus ``t()`` den Aufruf ``time.time``.
 _UHREN = frozenset(
     {
         "time.time",
@@ -75,7 +74,6 @@ _UHREN = frozenset(
 _UHR_OHNE_ZEIT = frozenset(
     {"time.localtime", "time.gmtime", "time.ctime", "time.asctime"}
 )
-# Eingriffe in pytest oder die Leiter selbst; erlaubt nur in den Dateien der Leiter.
 _EINGRIFF_MODULE = ("_pytest", "pluggy", "leiter_roh")
 _EINGRIFF_TEXTE = frozenset({"leiter_roh", "TELCO_LEITER_ROH"})
 EINGRIFF_ERLAUBT = (
@@ -84,7 +82,6 @@ EINGRIFF_ERLAUBT = (
     "scripts/waechter_regeln.py",
 )
 ANKER_NAME = "ANKER"
-# Zusammengesetzt, damit diese Datei die eigene Regel nicht auslöst.
 _PLUGINS = "_".join(("pytest", "plugins"))
 
 Schluessel = tuple[str, str]
@@ -145,7 +142,6 @@ def _plugin_optionen(wurzel: Path) -> int:
         return 0
     pytest = werkzeuge.get("pytest", {})
     anzahl = 0
-    # pytest liest addopts aus [tool.pytest.ini_options] und aus [tool.pytest] selbst.
     for optionen in (
         pytest.get("ini_options", {}).get("addopts", ""),
         pytest.get("addopts", ""),
@@ -218,9 +214,15 @@ def _mypy_aus(einstellung: str) -> Iterator[str]:
             yield f"mypy-aus:{name.strip()}"
 
 
+def kommentar_dateien(wurzel: Path) -> list[str]:
+    """Die Python-Dateien, deren Kommentare das Löschwerkzeug und Stufe 0 behandeln."""
+    return [p for p, _ in _dateien(wurzel, KOMMENTAR_ORDNER, {".py"})]
+
+
 def _codes_je_datei(datei: tuple[str, str]) -> list[str]:
     pfad, text = datei
     codes = list(_kommentar_codes(text))
+    codes += ["kommentar"] * len(waechter_kommentare.freie_kommentare(text))
     try:
         codes += _ast_codes(pfad, ast.parse(text))
     except SyntaxError:

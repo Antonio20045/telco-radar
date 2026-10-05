@@ -46,8 +46,6 @@ _SLUG_MAP = str.maketrans(
     {"ä": "ae", "ö": "oe", "ü": "ue", "ß": "ss", "Ä": "ae", "Ö": "oe", "Ü": "ue"}
 )
 
-# Vier Zeichen Mindestlaenge: kuerzer sind im Deutschen fast nur Fuellwoerter
-# ("der", "und", "mit"), und die traegt der Haeufigkeitsdeckel ohnehin aus.
 WORT_RE = re.compile(r"[\wÄÖÜäöüß][\wÄÖÜäöüß-]{3,}")
 
 
@@ -79,29 +77,6 @@ def gewicht(woerter, haeufigkeit: dict[str, int]) -> float:
     return round(sum(1.0 / haeufigkeit[w] for w in woerter if haeufigkeit.get(w)), 6)
 
 
-# ============================================  Begriffe an Wortgrenzen  ====
-# Vier Stellen im Projekt suchen einen Begriff im Fliesstext - die CTM-Linse
-# (Heimatmarkt-Marken), das Fruehwarn-Board (Indikatoren), die
-# Wettbewerbsseite (Aliase) und seit dem 11.08.2026 die Newsletter-Filter
-# (Stichwoerter der Abonnenten). Alle vier brauchen dieselbe Antwort auf
-# dieselbe Frage, und die Frage ist im Deutschen nicht trivial:
-#
-#   * "Netzausbau" MUSS in "Glasfaser-Netzausbau" treffen. Ein Bindestrich
-#     ist kein Wortzeichen, `(?<!\w)` laesst ihn also von selbst durch.
-#   * "Netz" darf NICHT in "Netzwerkkarte" untergehen. Rechts steht ein
-#     Wortzeichen, `(?!\w)` verhindert den Treffer.
-#   * "spark" darf nicht in "Sparkasse", "globe" nicht in "Globetrotter",
-#     "orange" nicht in "Orangensaft" treffen - dieselbe rechte Grenze.
-#
-# Was diese Regel BEWUSST nicht kann: die deutsche Beugung. "Netzausbaus"
-# (Genitiv) trifft nicht. Eine optionale Endung `s|es|n|en` waere schnell
-# geschrieben und faengt sich sofort einen neuen Falschtreffer ein -
-# "Orange" + "n" ist "Orangen". Erst messen, dann verschaerfen.
-#
-# `kein_punkt_davor` blendet zusaetzlich Domainnamen aus: ohne das trifft
-# "o2" auch in "example.o2" und die Marke steht in jeder Fussnote.
-
-
 def begriffs_muster(begriffe, *, kein_punkt_davor: bool = False):
     """Ein Muster, das JEDEN der Begriffe an Wortgrenzen findet - oder None.
 
@@ -117,10 +92,6 @@ def begriffs_muster(begriffe, *, kein_punkt_davor: bool = False):
     return re.compile(davor + "(" + "|".join(teile) + r")(?!\w)", re.I)
 
 
-# ======================================  beobachtend statt empfehlend  ====
-# Abkuerzungen, deren Punkt kein Satzende ist. Ohne diesen Schutz zerlegt der
-# Satztrenner "z. B. Vodafone kann ..." in zwei Teile und wirft den halben
-# Satz weg.
 ABKUERZUNGEN = (
     "z. B.",
     "z.B.",
@@ -143,19 +114,9 @@ ABKUERZUNGEN = (
     "Dr.",
 )
 _SATZ_GRENZE = re.compile(r"(?<=[.!?])\s+(?=[«\"„*\[(A-ZÄÖÜ])")
-# Trennzeichen INNERHALB eines Satzes. Ein deutscher Analystensatz stellt
-# Befund und Folgerung regelmaessig so gegenueber: "Telkomsel macht seine App
-# zur Content-Plattform – ein Trend, den Vodafone beobachten sollte."
 _KLAUSEL = re.compile(r"\s*([–—;:])\s+")
-# "Vodafone" als eigenes Wort. Der Blick nach LINKS ist der Punkt: er haelt
-# "MeinVodafone" heraus (ein Produktname, kein Adressat).
 NENNT_VODAFONE = re.compile(r"(?<!\w)vodafone", re.I)
-# Wem ein Rat gilt. Neben Vodafone auch das Wir der eigenen Redaktion - im
-# Bestand steht "Wir sollten prüfen, ob wir mit anderen Anbietern gemeinsame
-# Warnsysteme etablieren", und das ist derselbe Fehler in der ersten Person.
 _ADRESSAT = re.compile(r"(?<!\w)(?:vodafones?|wir|uns|unser\w*)(?!\w)", re.I)
-# Verben, die man EMPFIEHLT. Bewusst nur die Grundform: "Vodafone bündelt
-# bislang nur lose Add-ons" ist eine Feststellung, "bündeln" waere ein Rat.
 _RAT_VERBEN = re.compile(
     r"(?<!\w)(?:pr(?:ü|ue)fen|bewerten|evaluieren|erw(?:ä|ae)gen|adaptieren|"
     r"kopieren|(?:ü|ue)bertragen|nachziehen|gegenhalten|kontern|"
@@ -164,38 +125,15 @@ _RAT_VERBEN = re.compile(
     r"schaffen|erg(?:ä|ae)nzen)(?!\w)",
     re.I,
 )
-# "Vorlage fuer Vodafone: ..." raet, ohne ein Verb zu brauchen - alle vier
-# Faelle im Bestand vom 08.08.2026 haben genau diese Form. Bewusst NICHT das
-# blosse "für Vodafone" (so steht es in `_ADVICE_PHRASES` des Wochenberichts):
-# "für Vodafone entsteht Druck" ist eine Folge, kein Rat.
 _RAT_MARKER = re.compile(
     r"(?<!\w)(?:vorlage|vorbild|modell|blaupause|anregung|impuls|lehre)"
     r"\W+f(?:ü|ue)r\W+vodafones?(?!\w)",
     re.I,
 )
-# Der deutsche Telegrammstil einer Empfehlung: der Satz endet auf dem blossen
-# Infinitiv ("Eigene Vodafone-Familie – das Mini-App-Modell nach Europa
-# übertragen."). Kein Teilsatz traegt hier Vodafone UND Verb, die Empfehlung
-# steht ueber die Trennstelle hinweg.
 _RAT_SCHLUSS = re.compile(_RAT_VERBEN.pattern + r"\s*[.!?]?$", re.I)
-# Trennzeichen der Wettbewerber-Notiz. Anders als `_KLAUSEL`: ohne
-# Doppelpunkt, dafuer mit dem freistehenden Bindestrich ("an - Vodafone") -
-# ein Bindestrich ohne Leerzeichen ist keiner ("Wi-Fi-7-Router").
 _NOTIZ_TRENNER = re.compile(r"\s*[;–—]\s+|\s+-\s+")
 
 
-# Das deutsche Ordinaldatum ist der zweite Fall, an dem der Satztrenner
-# zerbricht - und er ist haeufiger als jede Abkuerzung. "Gueltig bis 12.
-# September 2026" hat nach dem Punkt ein Leerzeichen und danach einen
-# Grossbuchstaben, also genau das Muster eines Satzendes; der Trenner machte
-# daraus "Gueltig bis 12." und "September 2026". Gemessen am 11.08.2026 in
-# der Ausgabe vom 8.: die Mail zeigte "Aktion gueltig bis 12." als ganzen
-# Satz, und derselbe Schnitt trifft `_strip_vodafone_advice` im Wochenbericht
-# - dort faellt dann eine Satzhaelfte als vermeintlicher Rat weg.
-#
-# Geschuetzt wird BEWUSST nur vor einem Monatsnamen und nicht vor jedem
-# Grossbuchstaben: "Die Zahl stieg auf 12. Vodafone reagierte." ist ein
-# echtes Satzende, und eine Regel, die es verschluckt, waere die teurere.
 _MONATE = (
     "Januar",
     "Februar",
@@ -258,12 +196,6 @@ def _wieder_zusammen(teile: list[str], trenner: list[str], behalten: list[int]) 
         if not stueck:
             continue
         if not text:
-            # Ein Teilsatz, dem sein Anfang fehlt, ergibt keinen Satz. Nur der
-            # erste Teil darf immer stehen; jeder spaetere muss selbst gross
-            # anfangen oder hinter einem Doppelpunkt stehen - der kuendigt im
-            # Deutschen eine vollstaendige Aussage an. Ohne diese Bedingung
-            # blieb von "..., ob ein Produkt - etwa ueber die Vodacom-Gruppe -
-            # schnell umsetzbar ist" die Mitte uebrig.
             if i and not (
                 stueck[:1].isupper() or stueck[:1].isdigit() or trenner[i - 1] == ":"
             ):
@@ -304,8 +236,6 @@ def ohne_vodafone_rat(text: str) -> str:
         rest = _wieder_zusammen(teile, trenner, behalten)
         if not rest:
             continue
-        # Der Telegrammstil-Rat ueberlebt die Teilsatz-Pruefung, weil er
-        # Adressat und Verb auf zwei Teilsaetze verteilt.
         if _ADRESSAT.search(rest) and _RAT_SCHLUSS.search(rest):
             continue
         if not rest.endswith((".", "!", "?", ")", '"', "“")):
@@ -339,9 +269,6 @@ def ohne_vodafone_teil(note: str) -> str:
     return ""
 
 
-# Zahlen im Satz, die belegt sein muessen. Prozentangaben, Preise, Volumen.
-# Einstellige Zahlen bleiben aussen vor: "5G", "die ersten drei" und
-# Aufzaehlungen sind keine Behauptung ueber die Quelle.
 _ZAHL_IM_SATZ = re.compile(r"\d+(?:[.,]\d+)*")
 MIND_ZIFFERN_BELEGPFLICHT = 2
 
@@ -356,9 +283,6 @@ def ungedeckte_zahl(satz: str, quelle: str) -> str | None:
         normal = roh.replace(".", "").replace(",", ".")
         if len(normal.replace(".", "")) < MIND_ZIFFERN_BELEGPFLICHT:
             continue
-        # "35 Euro" deckt "34,95 Euro" nicht ab, aber "5G" deckt "5G" ab -
-        # verglichen wird der reine Zahlenwert, gerundete Naeherungen zaehlen
-        # als gedeckt, wenn die Quelle denselben Betrag ganzzahlig enthaelt.
         if normal in quelle_zahlen:
             continue
         try:

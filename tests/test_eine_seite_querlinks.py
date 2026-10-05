@@ -21,10 +21,6 @@ from pathlib import Path
 
 from test_geraete_seite import _baue
 
-# Ein Verweis auf die Alt-URL - egal ob href, src oder action, doppelte oder
-# einfache Anfuehrungszeichen, mit Prefix (../ aus Archivwochen, / absolut)
-# oder Suffix (#anker, ?query). Die Weiterleitungsdatei selbst ist die
-# einzige erlaubte Ausnahme: SIE darf (und muss) auf geraete.html zeigen.
 _ALT_URL = re.compile(
     r"""(?:href|src|action)=["'][^"']*wettbewerbsradar\.html[^"']*["']"""
 )

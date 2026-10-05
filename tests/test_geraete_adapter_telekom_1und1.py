@@ -92,11 +92,6 @@ def farben():
     return lade_farben(_WURZEL)
 
 
-# ==========================================================================
-# Telekom - die Kategorieseite IST die Nutzlast
-# ==========================================================================
-
-
 def test_telekom_liest_die_zehn_geraete_der_kategorieseite(telekom_html):
     saetze = telekom.lies(telekom_html, _TELEKOM_URL)
     assert len(saetze) == 10
@@ -227,11 +222,6 @@ def _telekom_mit_zweitem_plan(
     return f"<script>window.__INITIAL_STATE__ = {json.dumps(daten)};</script>"
 
 
-# Der EINE Fall, der die alte Auswahlregel von der neuen trennt: ein
-# 24-Monats-Plan, der TEURER ist als der echte 36er (99 + 24 × 46,00 =
-# 1203,00 gegen 99 + 36 × 30,50 = 1197,00). "Längste Laufzeit zuerst"
-# wählte hier 1197,00 - den NIEDRIGEREN Betrag. Synthetisch, und das
-# sagt es: kein echter Abruf trägt zwei Pläne.
 _TEURER_24ER = {
     "numberOfInstallments": 24,
     "recurringPrice": 46.0,
@@ -265,10 +255,6 @@ def test_telekom_mehrere_ratenplaene_ergeben_genau_eine_listung(
     assert saetze[0]["preis"] == 1197.0
     assert saetze[0]["monatsrate"] == 30.5
     assert saetze[0]["anzahlung"] == 99.0
-    # Der übergangene Plan steht im Protokoll, samt Regel - und das
-    # Protokoll behauptet nicht, er sei woanders erfasst: auf DIESER Seite
-    # ist er es nicht (`lies_buendel` sieht die "ohne Vertrag"-Nutzlast
-    # nie, sie trägt keinen `selectedPlan`).
     protokoll = [m for m in caplog.messages if "Ratenplaene" in m]
     assert len(protokoll) == 1, caplog.messages
     assert "2 Ratenplaene" in protokoll[0]
@@ -309,8 +295,6 @@ def test_telekom_beide_ratenplaene_werden_gemessen_bevor_einer_gewaehlt_wird(
     assert nach_laufzeit[36]["gesamt"] == 1197.0
     assert nach_laufzeit[24]["gesamt"] == 1155.0
     assert nach_laufzeit[24]["monatsrate"] == 44.0
-    # Beide gehen rechnerisch auf - sonst wäre der eine kein übergangener
-    # Plan, sondern ein verworfener (anderer Zweig, anderes Protokoll).
     for f in formen:
         assert probe_geht_auf(
             f["anzahlung"], f["monatsrate"], f["laufzeit_monate"], f["gesamt"]
@@ -349,8 +333,6 @@ def test_telekom_die_listung_traegt_den_hoechsten_gesamtbetrag(telekom_html, zue
     assert saetze[0]["laufzeit_monate"] == 24
     assert saetze[0]["monatsrate"] == 46.0
     assert saetze[0]["anzahlung"] == 99.0
-    # Und die Regel steht an EINER Stelle, in der Reihenfolge, in der sie
-    # rechnet - sonst sagt das Protokoll etwas anderes als die Auswahl.
     assert telekom._LISTUNGSPLAN_REGEL.startswith("hoechster Gesamtbetrag")
 
 
@@ -384,14 +366,10 @@ def test_telekom_der_uebergangene_plan_steht_mit_seinen_betraegen_im_protokoll(
     zeilen = [m for m in caplog.messages if "Ratenplaene" in m]
     assert len(zeilen) == 1, caplog.messages
     zeile = zeilen[0]
-    # Der TRÄGER mit seinen Beträgen (der 24er zu 1.203,00 €).
     assert "24 Monate: 99.00 + 24 x 46.00 = 1203.00 EUR" in zeile, zeile
-    # Und der ÜBERGANGENE mit seinen - die Zahlen, die sonst verloren sind.
     assert "36 Monate: 99.00 + 36 x 30.50 = 1197.00 EUR" in zeile, zeile
-    # Samt Regel, und samt der Aussage, dass die Regel eine Wahl ist.
     assert telekom._LISTUNGSPLAN_REGEL in zeile
     assert "eine WAHL und keine Messung" in zeile
-    # Das Protokoll behauptet NICHT, der Plan sei woanders erfasst.
     assert "NICHT erfasst" in zeile
     assert "auch nicht im Buendelpfad" in zeile
     with pytest.raises(GeraeteAbrufFehler):
@@ -595,9 +573,6 @@ def test_telekom_landet_als_listung_mit_preisform_im_bestand(
     anbieter.einstiege = [e for e in anbieter.einstiege if e.kind != "buendel"]
     anbieter.rate_limit_sekunden = 0
 
-    # Der ECHTEN Konfiguration folgt der ehrliche Absender: Telekom
-    # traegt seit B2 einen `user_agent`-Override, und `hole()` bekommt
-    # ihn als drittes Argument (derselbe Vertrag wie beim Saturn-Adapter).
     def hole(url, kopfzeilen=None, user_agent=None):
         if url.endswith("/robots.txt"):
             return (200, "User-agent: *\nDisallow: /is-bin/intershop.static/\n")
@@ -613,18 +588,11 @@ def test_telekom_landet_als_listung_mit_preisform_im_bestand(
         datetime(2026, 9, 4, 3, tzinfo=UTC),
     )
     assert bilanz.status == "ok"
-    # `direkt=True`: die Kategorieseite ist die Nutzlast, es wird KEINE
-    # Produktseite nachgeladen.
     assert [u for u in bilanz.besucht if not u.endswith("robots.txt")] == [_TELEKOM_URL]
     assert len(bilanz.listungen) == 10
     for listung in bilanz.listungen:
         assert listung.ratenhinweis == "in 36 Raten"
         assert listung.ratenzahlung is not None
-
-
-# ==========================================================================
-# 1&1 - der Monatspreis des Buendels
-# ==========================================================================
 
 
 def test_einsundeins_erntet_nur_die_katalogkacheln(ee_kategorie):
@@ -763,9 +731,6 @@ def test_einsundeins_landet_als_buendellistung_im_bestand(
         RobotsWaechter(hole=hole),
         datetime(2026, 9, 4, 3, tzinfo=UTC),
     )
-    # 42 Kacheln, alle abgerufen - der Deckel von 45 greift nicht. Die
-    # einzige benannte Luecke sind die 41 Stub-Seiten ohne Buendelkatalog
-    # (seit 29.09.2026 gezaehlt statt nur protokolliert).
     assert bilanz.gedeckelt == ["41 Produktseiten ohne lesbare Buendel"]
     treffer = [l for l in bilanz.listungen if l.quelle_url == _EE_PRODUKT]
     assert len(treffer) == 1
@@ -787,8 +752,5 @@ def test_die_ausgelieferte_konfiguration_haelt_was_der_hinweis_verspricht():
         assert anbieter.aktiv is True, name
         assert anbieter.crawlbar is True, name
         assert anbieter.methode == methode, name
-        # `grund` beantwortet "warum NICHT aktiv" - die Frage stellt sich
-        # nicht mehr. Der Messstand steht in `hinweis` und damit weiterhin
-        # auf der Quellenseite.
         assert anbieter.grund == "", name
         assert "04.09.2026" in anbieter.hinweis, name

@@ -44,74 +44,16 @@ from .anbieter_farben import stil_fuer
 from .geraete_zeitreihe import LUECKE_TAGE_SCHWELLE
 from ..geraete_model import VERGLEICHBARE_ZUSTAENDE
 
-# Hoechstens acht Linien. Mehr Anbieter als das kann ein Mensch in einem
-# Liniendiagramm nicht auseinanderhalten, und die Legende darunter waere
-# laenger als das Bild.
 MAX_LINIEN = 8
 
-# Hoechstens acht waagerechte Datumsbeschriftungen. Diese Grenze ist der
-# Grund, warum die Achse lesbar bleibt: sie ist der Ersatz fuer die 114
-# gedrehten Etiketten der geloeschten Grafik. Weitere Messpunkte werden
-# GEZEICHNET, nur nicht beschriftet - eine Luecke ist ehrlich, ein gedrehtes
-# Etikett ist eine Zumutung.
 MAX_DATUMSMARKEN = 8
 
 
-# Ab wie vielen MESSTERMINEN ueberhaupt ein Diagramm gezeichnet wird
-# (30.08.2026).
-#
-# Der Verlauf des Pixel 10 Pro 128 GB stand am 30.08. mit zwei Datumsmarken
-# (10.8. und 30.8.) und nichts dazwischen auf der Seite: eine Achse, zwei
-# Punkte, eine Gerade. Das war die ehrliche Datenlage - nur wurde sie als
-# vollwertiges Diagramm praesentiert, mit Rasterlinien, Legende und einer
-# Spalte "Veraenderung", die bei allen drei Anbietern auf "-" stand.
-#
-# Unter dieser Schwelle steht deshalb die Tabelle allein, mit einem Satz
-# darueber, der die Zahl der Messtermine nennt. Vier ist der Punkt, ab dem
-# eine Linie mehr zeigt als ihre zwei Enden - nicht die Schwelle, ab der
-# eine Aussage ueber Preisverfall traegt, das sind die zwoelf Wochen
-# darueber.
 DIAGRAMM_AB_TERMINEN = 4
 
-# Ab wie vielen MESSTERMINEN der Satz unter dem Diagramm ("liegen 16
-# Messtermine vor, vom 10.8. bis zum 24.9.") SCHWEIGT (QA-Fix 24.09.2026).
-#
-# Unterhalb dieser Zahl nennt er eine Auskunft, die die Kachel
-# "Messtermine" nicht hat - die SPANNE - und ist bei einer noch duennen
-# Reihe die richtige Ergaenzung. Darueber (am iPhone 17 256 GB standen 16
-# Messtermine) doppelt er nur noch wortgleich die Kachel-Zahl, ohne neue
-# Auskunft. Der Wert liegt ueber DIAGRAMM_AB_TERMINEN: zwischen vier und
-# hier ist die Reihe kurz genug, dass die Spanne selbst noch etwas sagt.
 VERLAUF_SATZ_MAX_TERMINE = 8
 
-# Wie nah zwei Linien beieinander liegen duerfen, bevor die verdeckte
-# eigens sichtbar gemacht wird - als Anteil der gezeichneten Preisspanne.
-#
-# Am Pixel 10 Pro gemessen: Vodafone 1099,90 EUR, mobilcom-debitel 1099,00 EUR,
-# Achse von 793 bis 1100 EUR. Neunzig Cent auf 307 Euro Spanne sind 0,3
-# Prozent der Hoehe, also weniger als ein Pixel - die Vodafone-Linie stand
-# in der Legende und war im Bild nicht vorhanden. Eine Linie, die die
-# Legende nennt und das Bild nicht zeigt, ist schlimmer als keine Legende.
 LINIEN_ABSTAND = 0.02
-
-# A/E (QA-Fix 24.09.2026): DIE MESSLUECKEN-SCHWELLE DES SERVER-CHARTS
-# (TCO-Zeitreihe, `geraete_zeitreihe.LUECKE_TAGE_SCHWELLE`) IST HIER
-# GELESEN, NICHT NEU GESETZT - derselbe Grund wie bei `LINIEN_ABSTAND`
-# zwei Zeilen oben: eine zweite Zahl fuer dieselbe Regel waere die
-# Fehlerklasse aus CLAUDE.md 6. Der Barpreis-Verlauf dieses Reiters
-# zeichnet ueber eine Luecke jenseits dieser Schwelle GENAUSO gepunktet
-# wie der TCO-Server-Chart, statt eine schraege durchgezogene Linie ueber
-# stille Tage zu behaupten.
-
-# Die Farbe kommt aus der EINEN Quelle (P2/D1, `anbieter_farben.py`), nicht
-# mehr aus einer Hash-Palette. Die alte Fassung vergab sie nach
-# `md5(anbietername) % 7` aus sieben neutralen Toenen - die Telekom bekam
-# damit `#217a3c` (Gruen) und stand GRUEN im Preisverlauf, waehrend dieselbe
-# Telekom in der TCO-Zeitreihe (`geraete_zeitreihe.py`) MAGENTA war: eine
-# Hash-Palette kennt keine Marke, sie raet eine Farbe (Clean Code 3
-# verbietet genau das). `stil_fuer()` liefert jetzt Farbe, Strichart und
-# Markerform fuer denselben Anbieter ueberall gleich; ein unbekannter
-# Anbieter bekommt die benannte Luecke, nie eine geratene Farbe.
 
 
 def _eigen(anbieter: str) -> bool:
@@ -198,9 +140,6 @@ def _punkte(listungen: list, historie) -> list[dict]:
     """
     punkte = []
     for e in listungen:
-        # Mehrdeutige Tage fallen HERAUS - siehe `messtage`. Auch der
-        # Bestaetigungspunkt: an einem Tag mit zwei Preisen ist der Preis
-        # in der Datenbank einer von beiden, und welcher, sagt niemand.
         eindeutig, mehrdeutig = messtage(historie.reihe(e.get("id") or ""))
         for datum, preis in sorted(eindeutig.items()):
             punkte.append(
@@ -222,26 +161,6 @@ def _punkte(listungen: list, historie) -> list[dict]:
                     "art": "bestaetigt",
                 }
             )
-    # Je (Anbieter, Tag) genau ein Punkt: zwei Farben desselben Geraets sind
-    # zwei Listungen, aber EIN Preis auf der Kurve.
-    #
-    # DER BESTAETIGTE PREIS SCHLAEGT DEN HISTORIENEINTRAG, und erst danach
-    # entscheidet der niedrigere. "Der niedrigste Preis ist der
-    # wahrscheinlichste Fehler; jede min-Auswahl braucht einen Filter davor"
-    # (CLAUDE.md §6) - hier stand ein nacktes Minimum ueber alles.
-    #
-    # Der Fall ist nicht hypothetisch: `aldi-talk--samsung-galaxy-a17-128gb-
-    # schwarz` traegt am 29.08.2026 ZWEI Historienzeilen, 129,00 und 155,00
-    # EUR, weil zwei Produkte (LTE und 5G) unter derselben listung_id
-    # laufen. `geraete_pruefung` meldet das als Doppelpreis - aber sie
-    # filtert EINTRAEGE, und die Historie zu einem ueberlebenden Eintrag
-    # wird roh gelesen. Der Befund erreicht die Kurve also nie. Mit dem
-    # bestaetigten Preis als Vorfahrt zeichnet die Linie wenigstens den Wert,
-    # den die Datenbank fuer dieses Geraet kennt.
-    # Zwischen zwei Punkten DERSELBEN Art entscheidet weiterhin der Preis:
-    # zwei bestaetigte Punkte sind zwei Farben desselben Anbieters, und der
-    # niedrigere ist der Preis, zu dem er das Geraet an dem Tag abgab. Nur
-    # zwischen den ARTEN gibt es einen Vorrang.
     rang = {"bestaetigt": 1, "gemessen": 0}
     je_tag: dict[tuple, dict] = {}
     for p in punkte:
@@ -271,11 +190,6 @@ def _reihen(punkte: list) -> list[dict]:
     geordnet = sorted(
         je_anbieter.items(), key=lambda kv: (not _eigen(kv[0]), -len(kv[1]), kv[0])
     )
-    # Die Farbe haengt jetzt fest am NAMEN (`anbieter_farben.ANBIETER_FARBE`,
-    # zehn Marken mit je einer eigenen Farbe) - eine Kollisionsaufloesung wie
-    # zu Hash-Palette-Zeiten braucht es nicht mehr: zwei bekannte Anbieter
-    # bekommen nie dieselbe Farbe, und zwei UNBEKANNTE teilen sich bewusst
-    # dieselbe benannte Luecke (Clean Code 3/4) statt eine geratene eigene.
     reihen = []
     for name, ps in geordnet[:MAX_LINIEN]:
         stil = stil_fuer(name)
@@ -343,8 +257,6 @@ def geraete_mit_verlauf(eintraege: list, historie, katalog) -> list[dict]:
         tage = sorted({p["datum"] for r in reihen for p in r["punkte"]})
         geraete.append(
             {
-                # Die Messluecken dieses Geraets, benannt: `app.js` schreibt
-                # daraus den Satz unter die Grafik.
                 "mehrdeutig": mehrdeutige_tage(listungen, historie),
                 "id": f"{gid}-{speicher or 0}",
                 "label": _label(g, speicher),
@@ -375,15 +287,6 @@ def geraete_mit_verlauf(eintraege: list, historie, katalog) -> list[dict]:
                 "max": max(alle),
                 "anbieter": len(reihen),
                 "messpunkte": len(alle),
-                # DIE ZAHL, DIE AUF DER SEITE STEHT. Bis zum 30.08.2026 zeigte
-                # die Kachel `messpunkte` unter der Ueberschrift "Messpunkte",
-                # waehrend der Satz darunter die globalen `messtermine` nannte:
-                # "4 Messpunkte" ueber "5 Messtermine", zwei Zahlen fuer etwas,
-                # das der Leser fuer dieselbe Sache haelt. `messpunkte` zaehlt
-                # Preispunkte ueber alle Anbieter, `messtermine` zaehlt TAGE -
-                # bei drei Anbietern an zwei Tagen sind das sechs und zwei.
-                # Die Kachel zeigt jetzt die Termine, weil daran auch haengt,
-                # ob ueberhaupt ein Diagramm entsteht.
                 "messtermine": len(tage),
                 "tage": tage,
                 "aktuell": _aktuell(reihen),

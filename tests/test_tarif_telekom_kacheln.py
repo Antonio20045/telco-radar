@@ -34,11 +34,6 @@ def _tarife(html=None):
     )
 
 
-# --------------------------------------------------------------------------
-# Die gemessene Seite
-# --------------------------------------------------------------------------
-
-
 def test_die_fuenf_kacheln_der_seite():
     """Fuenf Tarife mit dem DURCHGESTRICHENEN Preis - so gemessen am 05.09.2026.
 
@@ -94,11 +89,6 @@ def test_xl_ist_unbegrenzt_die_anderen_tragen_ein_gb_volumen():
     assert by_name["MagentaMobil M"] == 50
     assert by_name["MagentaMobil S"] == 30
     assert by_name["MagentaMobil XS"] == 20
-
-
-# --------------------------------------------------------------------------
-# Gestellte Faelle
-# --------------------------------------------------------------------------
 
 
 def _kachel(

@@ -35,36 +35,6 @@ from telco_radar.tco_model import TCO_HORIZONT as _O4_HORIZONT
 WURZEL = pathlib.Path(__file__).resolve().parents[1]
 
 
-# Die Spalten der Bündel-Zeilen - Auftrag O4, wortgleich. "Art" steht
-# davor, weil die Datei Bündel- UND SIM-only-Zeilen trägt; "Zustand" und
-# "Bündel/Monat" kommen dazu, weil ein erneuertes Gerät ein anderer Preis
-# ist (B1) und 1&1 einen EINEN Monatsbetrag nennt, der nicht in
-# Tarif/Monat gehört (§ 13.2 der Strategie). Die Leitzahl-Spalte heißt
-# seit A1 wie auf der Seite "Kosten über 24 Monate" (vorher "TCO-24").
-# "SKU-ID" steht als LETZTE Spalte, am selben Ort wie in
-# geraete-aktuell.csv (die IDs stehen dort auch am Ende): ohne sie
-# kollabierten Vodafones Farbvarianten zu byte-identischen Zeilen
-# (A4, 20.09.2026: 156 in der Live-Datei) - Modell, Speicher und alle
-# Preise sind je Farbe gleich, nur die SKU (Teil des Bündelschlüssels)
-# trennt sie. Die Reihenfolge dieser Liste ist die der Datei.
-# P0-B-h4 (21.09.2026): "Leitzahl-Zeitraum Monate" kommt dazu -
-# `tco_model.Tco.leitzahl_monate`, gelesen und nicht geraten. Ohne sie
-# behauptete "Kosten über 24 Monate EUR" ihren Zeitraum fest, auch fuer
-# 74 Buendel (1&1, `buendel_monatlich`), die ihre Summe ueber 36 Monate
-# tragen - der Spaltenkopf selbst bleibt stehen (Fremdschluessel in
-# `tests/test_seiten_zahlen.py`, dort schreibgeschuetzt), aber die Zeile
-# traegt ihren echten Zeitraum jetzt daneben.
-#
-# P0-B-z3 (22.09.2026, Befund 1): eine weitere Spalte GLEICH DAVOR traegt
-# dieselbe Zahl NUR dort, wo "Leitzahl-Zeitraum Monate" wirklich
-# `TCO_HORIZONT` (24) ist - fuer die 1&1-Zeilen bleibt sie leer, statt
-# unter einem 24-Monats-Kopf zu stehen. Der alte Kopf ("Kosten über 24
-# Monate EUR") bleibt unveraendert, wortgleich und weiter voll befuellt.
-# P0-B (22.09.2026): die Leitzahl steht in EINER von ZWEI Spalten - unter
-# "Kosten über 24 Monate EUR", wenn ihr Zeitraum 24 Monate ist, sonst unter
-# "Kosten über die Bündellaufzeit EUR". Kein Test schreibt einen der beiden
-# Namen ab (Clean Code 7): die Namen kommen aus dem Modul, das sie schreibt,
-# und gelesen wird ueber DIESEN einen Weg.
 def _o4_leitzahl(zeile, idx):
     return zeile[idx[SPALTE_UEBER_24]] or zeile[idx[SPALTE_UEBER_LAUFZEIT]]
 
@@ -151,11 +121,6 @@ def store() -> dict:
     return json.loads((ZUSTAND / "geraete_tco.json").read_text())
 
 
-# --------------------------------------------------------------------------
-# geraete-tco.csv: Form
-# --------------------------------------------------------------------------
-
-
 def test_die_spalten_stehen_wie_im_auftrag(tco_csv):
     kopf, _ = tco_csv
     assert kopf == SPALTEN_TCO, kopf
@@ -205,9 +170,6 @@ def test_die_leitzahl_zeitraum_spalte_ist_die_von_tco_24(tco_csv):
     assert aufgeteilt, "keine aufgeteilte Zeile im Bestand"
     for z in aufgeteilt:
         assert z[idx["Leitzahl-Zeitraum Monate"]] == str(TCO_HORIZONT), z
-    # Die Gegenprobe des urspruenglichen Befunds: eine aufgeteilte Zeile
-    # mit LAENGEREN Geraeteraten traegt trotzdem die 24-Monats-Leitzahl -
-    # "Laufzeit Monate" und "Leitzahl-Zeitraum Monate" laufen auseinander.
     laenger = [
         z
         for z in aufgeteilt
@@ -233,11 +195,6 @@ def test_die_sim_only_leitzahl_traegt_immer_den_horizont(tco_csv):
     assert sim, "keine SIM-only-Zeile mit Leitzahl im Export"
     for z in sim:
         assert z[idx["Leitzahl-Zeitraum Monate"]] == str(TCO_HORIZONT), z
-
-
-# --------------------------------------------------------------------------
-# geraete-tco.csv: Menge - der Export filtert nicht selbst
-# --------------------------------------------------------------------------
 
 
 def test_eine_zeile_je_buendel_des_bestands(tco_csv, store):
@@ -314,8 +271,6 @@ def test_die_tco24_einer_zeile_ist_gerechnet_nach_geraten(tco_csv, store):
     def _zahl(zelle: str):
         return float(zelle.replace(".", "").replace(",", ".")) if zelle else None
 
-    # Der Store-Satz, der zu ALLEN Beträgen der Zeile passt - (Anbieter,
-    # Tarif) allein trägt mehrere Varianten desselben Geräts.
     kandidaten = [
         b
         for b in store["buendel"]
@@ -326,10 +281,6 @@ def test_die_tco24_einer_zeile_ist_gerechnet_nach_geraten(tco_csv, store):
         and b.get("geraet_monatsrate") == _zahl(probe[idx["Geräterate EUR"]])
         and b.get("buendel_monatlich") == _zahl(probe[idx["Bündel/Monat EUR"]])
     ]
-    # 1&1 führt denselben Tarif mit denselben Beträgen zu MEHREREN
-    # Geräten - die Zeile ist über die Beträge nicht eindeutig, aber alle
-    # Kandidaten rechnen dieselbe TCO (gleiche Preisfelder). Verlangt wird
-    # genau das: EIN Wert über alle Kandidaten, und der in der Zelle.
     assert kandidaten, "Stichprobe trifft keinen Satz des Stores"
     werte = set()
     for satz in kandidaten:
@@ -381,9 +332,6 @@ def test_die_tco24_einer_simonly_zeile_ist_gerechnet_nach_geraten(tco_csv, store
         "keine Referenz mit Anschlusspreis im Bestand - der Test prueft nichts"
     )
 
-    # Die Zeile, die zu ALLEN Beträgen dieses Satzes passt - dieselbe
-    # Zuordnung wie beim Bündel-Kreuzcheck; mehrere Referenzen mit
-    # denselben Beträgen muessen dieselbe Leitzahl rechnen.
     kandidaten = [
         s
         for s in store["sim_only"]
@@ -459,33 +407,23 @@ def test_zwei_farbvarianten_bleiben_zwei_zeilen():
         quelle_url="https://www.vodafone.de/mobil-m",
         abgerufen_am="2026-09-20",
     )
-    # Der Katalog bildet BEIDE SKUs auf dasselbe Modell ab - nur so ist
-    # die Modellspalte fuer das Paar identisch und die SKU das einzige
-    # Unterscheidungsmerkmal (live ist das bei jeder Farbvariante so).
     katalog = Katalog([Geraet(hersteller="Apple", modell="iPhone Air")])
 
     d = aufbereiten([blau, weiss], [referenz], [], katalog)
     inhalt, zahl = tco_csv(d["export"])
 
-    # Anzahl Zeilen == Anzahl Bündel + SIM-only im Testbestand.
     assert zahl == 3, zahl
     zeilen = list(csv.reader(io.StringIO(inhalt), delimiter=";"))[1:]
     assert len(zeilen) == 3, zeilen
-    # Gegenprobe: keine zwei Datenzeilen identisch.
     assert len({tuple(z) for z in zeilen}) == 3, zeilen
 
     idx = {name: i for i, name in enumerate(SPALTEN_TCO)}
     pa = [z for z in zeilen if z[0] == "Bündel"]
     assert len(pa) == 2, zeilen
     assert {z[idx["SKU-ID"]] for z in pa} == {blau.sku_id, weiss.sku_id}
-    # Alle ÜBRIGEN Spalten sind identisch - die SKU ist das einzige
-    # Unterscheidungsmerkmal, genau die Live-Lage der Farbvarianten.
     ohne_sku = [tuple(c for i, c in enumerate(z) if i != idx["SKU-ID"]) for z in pa]
     assert ohne_sku[0] == ohne_sku[1], ohne_sku
 
-    # SIM-only über dieselbe Rechnung wie die Bündel-Leitzahl:
-    # 39,99 EUR/Monat * 24 + 29,99 EUR Anschlusspreis = 989,75 EUR
-    # (die alte Exportzahl ohne Anschlusspreis: 959,76 EUR).
     sim = next(z for z in zeilen if z[0] == "SIM-only")
     assert _o4_leitzahl(sim, idx) == "989,75", sim
     assert sim[idx["SKU-ID"]] == "", sim
@@ -508,11 +446,6 @@ def test_erneuerte_buendel_stehen_mit_ihrem_zustand_darin(tco_csv, store):
     assert len(erneuert) == erwartet, (
         f"{len(erneuert)} Zeilen mit Zustand != neu, Bestand {erwartet}"
     )
-
-
-# --------------------------------------------------------------------------
-# Radar-Export: ein Konsument der Radar-Rechnung
-# --------------------------------------------------------------------------
 
 
 def test_der_radar_export_traegt_tco_und_haendlerzeilen(radar_csv):
@@ -584,9 +517,6 @@ def test_preisart_der_netzzeile_nennt_nur_einen_belegten_zeitraum():
 
     gruppe = {"vodafone": {"monate": 24}}
     assert _preisart_netz({"status": "vergleichbar"}, gruppe) == "Kosten über 24 Monate"
-    # Gelesen, nicht geraten: eine Referenz mit einem ANDEREN Zeitraum
-    # (kaeme aus einem echten Vodafone-Buendel, `_referenz_aus_buendel`)
-    # traegt ihre eigene Zahl, nicht die Konstante 24.
     assert (
         _preisart_netz({"status": "vergleichbar"}, {"vodafone": {"monate": 36}})
         == "Kosten über 36 Monate"
@@ -596,8 +526,6 @@ def test_preisart_der_netzzeile_nennt_nur_einen_belegten_zeitraum():
             _preisart_netz({"status": status}, gruppe)
             == "Kosten über die Bündellaufzeit"
         ), status
-    # Ohne Vodafone-Basis (kein Bündel und kein Barpreis fuer das Modell)
-    # gibt es auch keinen belegten Zeitraum.
     assert (
         _preisart_netz({"status": "kein_buendel"}, {"vodafone": None})
         == "Kosten über die Bündellaufzeit"
@@ -652,11 +580,6 @@ def test_radar_export_enthaelt_auch_die_alarmtabelle(radar_csv, geraete):
 würde an einer leeren Ausgabe grün vorbeigehen"
     )
 
-    # (modell, speicher, prozent, wettbewerbspreis, unser preis) ist der
-    # Schluessel, unter dem eine Alarmzeile eindeutig ist - am echten
-    # Bestand teilen zwei Zeilen dieselbe Zahlenkombination, nur das
-    # Geraet unterscheidet sie. Der Laden steht daneben und wird
-    # mitgeprüft.
     def _speicher(roh: str) -> str:
         return str(int(float(roh))) if roh else ""
 
@@ -687,9 +610,6 @@ würde an einer leeren Ausgabe grün vorbeigehen"
         f"Seite; nur in der Datei: {sorted(set(datei) - set(erwartet))[:3]}"
     )
 
-    # Der Laden und die Stufe stehen NAMENTLICH in der Datei - dieselben
-    # Wörter wie die Zelle der Seite (S3: ein zweites Wort für dieselbe
-    # Sache wäre ein zweites Etikett).
     for schluessel, tr in erwartet.items():
         z = datei[schluessel]
         assert z[idx["Anbieter"]] == tr["data-s-laden"], (z, tr)
@@ -711,11 +631,6 @@ def test_die_alarmzeilen_stehen_als_erster_abschnitt_der_datei(radar_csv):
     assert erste["Preis-Alarm"] < erste["Netzbetreiber"] < erste["Händler Barpreis"], (
         erste
     )
-
-
-# --------------------------------------------------------------------------
-# Export-Links: EINMAL zentral, von beiden Seiten
-# --------------------------------------------------------------------------
 
 
 def test_geraete_verlinkt_jede_datei_genau_einmal(geraete):
@@ -783,18 +698,8 @@ def test_der_radar_wird_durch_den_export_nicht_hoeher(radar):
     steht als KNOPF in der Kopfzeile, nicht als neue offene Tabelle - keine
     neue Tabellenstruktur mit mehr als zehn Zeilen."""
     for tabelle in radar.select("table"):
-        # Nur NEUE Strukturen dieses Auftrags prüfen: der Export darf
-        # keine eigene Tabelle auf der Seite aufbauen.
         if "wr-export" in (tabelle.get("class") or []):
             pytest.fail("der Export baut eine offene Tabelle auf der Radar-Seite")
-
-
-# ==========================================================================
-# P0-B-z3 (22.09.2026) - vier Befunde des Pruefers, alle in dieser Datei.
-# Ein Test je Befund, der gegen den ALTEN Stand (vor P0-B-z3) rot wird -
-# CLAUDE.md: "Neues Verhalten braucht einen Test, der gegen den alten
-# Stand rot wird."
-# ==========================================================================
 
 
 def test_jeder_kopf_traegt_nur_zahlen_die_er_richtig_beschreibt(tco_csv):
@@ -823,7 +728,6 @@ def test_jeder_kopf_traegt_nur_zahlen_die_er_richtig_beschreibt(tco_csv):
     mit_zahl = [z for z in zeilen if _o4_leitzahl(z, idx)]
     assert mit_zahl, "keine einzige Leitzahl in der Datei"
 
-    # 1) Unter dem 24-Monats-Kopf steht nur, was 24 Monate traegt.
     falsch = [
         z
         for z in mit_zahl
@@ -831,9 +735,6 @@ def test_jeder_kopf_traegt_nur_zahlen_die_er_richtig_beschreibt(tco_csv):
     ]
     assert not falsch, falsch[:4]
 
-    # 2) Und umgekehrt: was 24 Monate traegt, steht nicht in der
-    #    Laufzeitspalte. Ohne diese Haelfte waere Punkt 1 auch mit einer
-    #    Datei gruen, die ALLES in die Laufzeitspalte schreibt.
     verrutscht = [
         z
         for z in mit_zahl
@@ -843,14 +744,11 @@ def test_jeder_kopf_traegt_nur_zahlen_die_er_richtig_beschreibt(tco_csv):
     ]
     assert not verrutscht, verrutscht[:4]
 
-    # 3) Genau EINER der zwei Koepfe ist gefuellt - nie beide, nie keiner.
     doppelt = [
         z for z in mit_zahl if z[idx[SPALTE_UEBER_24]] and z[idx[SPALTE_UEBER_LAUFZEIT]]
     ]
     assert not doppelt, doppelt[:4]
 
-    # Gegenprobe, dass der Lookup nicht ins Leere greift: die Fixture
-    # traegt beide Faelle wirklich.
     zeitraeume = {int(z[zeitraum]) for z in mit_zahl if z[zeitraum]}
     assert _O4_HORIZONT in zeitraeume, zeitraeume
     assert zeitraeume - {_O4_HORIZONT}, (
@@ -894,13 +792,10 @@ def test_z3_befund4_preisart_nennt_zeitraum_nur_mit_derselben_karte(radar_csv):
     from telco_radar.report.geraete_export import _preisart_netz
 
     gruppe = {"vodafone": {"monate": 24, "gesamt": 1000.0}}
-    # Dieselbe Karte (vf_gesamt == Referenz-Gesamt): Zeitraum wird genannt.
     assert (
         _preisart_netz({"status": "vergleichbar", "vf_gesamt": 1000.0}, gruppe)
         == "Kosten über 24 Monate"
     )
-    # ANDERE Karte (vf_gesamt weicht ab, z. B. bandspezifische
-    # Vodafone-Karte aus `_paar_zeile`): kein behaupteter Zeitraum mehr.
     assert (
         _preisart_netz({"status": "vergleichbar", "vf_gesamt": 1234.56}, gruppe)
         == "Kosten über die Bündellaufzeit"

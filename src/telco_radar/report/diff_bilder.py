@@ -50,16 +50,9 @@ from . import bilder as report_bilder
 
 log = logging.getLogger(__name__)
 
-# Zielbreite. Die groesste Position der Seite ist die Radar-Karte: bei 1440 px
-# Fensterbreite rund 380 px, auf einem Retina-Schirm also 760 echte Pixel.
-# 800 deckt das ab, ohne dass der Bestand das Repo aufblaeht.
 _BREIT = 800
-# Wie viele Eintraege gleichzeitig. Der Bestand ist klein (Groessenordnung 100),
-# jeder Eintrag kostet bis zu zwei Abrufe.
 _GLEICHZEITIG = 8
 _TIMEOUT = 10.0
-# So lange gilt ein Fehlversuch. Danach darf eine Seite noch einmal gefragt
-# werden - Redaktionssysteme bekommen `og:image` auch nachtraeglich.
 _ERNEUT_NACH_TAGEN = 30
 
 
@@ -162,7 +155,6 @@ def beschaffe(
         if vorhanden and vorhanden.get("image"):
             z["bekannt"] += 1
             continue
-        # Das Bild des Wochenberichts kostet kein Netz - immer zuerst.
         geerbt = aus_berichten.get(schluessel)
         if geerbt:
             index[schluessel] = dict(geerbt, quelle="bericht")
@@ -198,7 +190,7 @@ def beschaffe(
                                 "quelle": "og",
                                 "geprueft": heute,
                             }
-                except Exception as exc:  # noqa: BLE001 - ein Bild kippt keinen Lauf
+                except Exception as exc:  # noqa: BLE001
                     log.debug("Differenzierungs-Bild fehlgeschlagen (%s): %s", url, exc)
                 return schluessel, {"geprueft": heute}
 
@@ -207,9 +199,6 @@ def beschaffe(
                     index[schluessel] = ergebnis
                     z["geladen" if ergebnis.get("image") else "kein_bild"] += 1
 
-    # Aufraeumen: was zu keinem Eintrag des Bestands mehr gehoert, fliegt aus
-    # Index UND Ordner. Ohne das waechst der Ordner mit jedem Beispiel, das die
-    # Bibliothek jemals hatte.
     gebraucht = {normalize_url(e.get("url") or "") for e in bestand}
     index = {k: v for k, v in index.items() if k in gebraucht}
     behalten = {v["image"] for v in index.values() if v.get("image")}

@@ -67,11 +67,6 @@ def _e(
     return satz
 
 
-# ==========================================================================
-# Der Kern: der guenstigste Wettbewerber steht mit NAMEN da
-# ==========================================================================
-
-
 def test_die_zeile_nennt_den_guenstigsten_wettbewerber_beim_namen():
     z = vergleich(
         [
@@ -128,19 +123,14 @@ def test_sortierung_nach_groesster_differenz():
     v = vergleich(
         [
             _e("Vodafone", preis=1349.9),
-            _e("o2", preis=1339.9),  # -10
+            _e("o2", preis=1339.9),
             _e("Vodafone", gid="google-pixel-11", preis=999.9),
-            _e("o2", gid="google-pixel-11", preis=799.9),  # -200
+            _e("o2", gid="google-pixel-11", preis=799.9),
         ],
         _KATALOG,
     )
     assert [z["modell"] for z in v["zeilen"]] == ["Pixel 11", "iPhone 17 Pro Max"]
     assert v["groesste_differenz"] == 200.0
-
-
-# ==========================================================================
-# Die Belegpflicht - die Zusicherung, die der Auftrag ausdruecklich verlangt
-# ==========================================================================
 
 
 def test_ohne_vodafone_quelle_entsteht_gar_keine_vergleichszeile():
@@ -150,10 +140,6 @@ def test_ohne_vodafone_quelle_entsteht_gar_keine_vergleichszeile():
         [_e("Vodafone", preis=1349.9, quelle_url=""), _e("o2", preis=1279.0)], _KATALOG
     )
     assert v["zeilen"] == [], "ohne Beleg keine Zeile"
-    # Und die Meldung wird NICHT zu "bei Vodafone nicht gelistet"
-    # umgedeutet: Vodafone fuehrt das Geraet sehr wohl, nur ohne Beleg. Ein
-    # falscher Satz ueber das eigene Regal ist teurer als eine fehlende
-    # Zeile. (Beim Selbstreview am 29.08.2026 gefunden.)
     assert v["ohne_vodafone"] == []
 
 
@@ -185,11 +171,6 @@ def test_jede_zeile_traegt_beide_belege():
         assert z["vodafone"]["url"] and z["vodafone"]["abgerufen_am"]
         for a in z["guenstiger"] + z["teurer"]:
             assert a["url"] and a["abgerufen_am"], a
-
-
-# ==========================================================================
-# Die zwei Preisarten - nie gegeneinander gerechnet
-# ==========================================================================
 
 
 def test_zuzahlung_wird_nie_gegen_einen_ladenpreis_verrechnet():
@@ -268,11 +249,6 @@ def test_die_vertragsachse_rechnet_fuer_sich():
     assert beide["standard"] == MIT_VERTRAG, "die Achse mit Daten steht oben"
 
 
-# ==========================================================================
-# Zustand, Laden und die Gegenrichtung
-# ==========================================================================
-
-
 def test_refurbished_schluckt_den_neupreis_nicht():
     """Dieselbe Lehre wie bei der Positionskarte: ohne den Zustand im
     Schluessel meldete die Seite einen Preisvorteil, den es nicht gibt.
@@ -295,8 +271,6 @@ def test_refurbished_schluckt_den_neupreis_nicht():
         f"nicht vergleichbare Zustände stehen in den Zeilen: {sorted(zeilen)}"
     )
     assert all(z["anzahl_guenstiger"] == 0 for z in v["zeilen"])
-    # GEGENPROBE: derselbe o2-Preis ALS NEU wird sehr wohl gezählt - ohne
-    # sie prüfte der Test nur, dass eine gefilterte Menge leer ist.
     kontrolle = vergleich(
         [_e("Vodafone", preis=1349.9), _e("o2", preis=699.0)], _KATALOG
     )
@@ -376,11 +350,6 @@ def test_ausgelistete_geraete_stehen_in_keinem_preisvergleich():
     assert v["zeilen"][0]["anzahl_guenstiger"] == 0
 
 
-# --------------------------------------------------------------------------
-# W1.1: Gebrauchtware gehoert nicht in einen Neupreis-Vergleich
-# --------------------------------------------------------------------------
-
-
 @pytest.mark.parametrize("zustand", ["refurbished", "b-ware", "unbekannt"])
 def test_nur_neugeraete_stehen_im_preisvergleich(zustand):
     """Der Befund der Evaluation vom 29.08.2026: ein o2-Gebrauchtgeraet fuer
@@ -416,11 +385,6 @@ def test_ein_neugeraet_gewinnt_weiterhin_ganz_normal():
     assert zeile["guenstiger"][0]["preis"] == 799.0
 
 
-# --------------------------------------------------------------------------
-# W2: die Tabelle zeigt Befunde, nicht Rundungsrauschen
-# --------------------------------------------------------------------------
-
-
 def test_rundungsrauschen_steht_nicht_in_der_hauptansicht():
     """62 Zeilen, davon 36 "niemand günstiger" und Dutzende mit -0,90 EUR:
     ein Manager scrollte durch 20 Bildschirme, um sechs relevante Zeilen zu
@@ -436,16 +400,15 @@ def test_rundungsrauschen_steht_nicht_in_der_hauptansicht():
     assert erg["wesentlich"] == []
     assert len(erg["rest"]) == 1
     assert erg["rest"][0]["differenz"] == 0.9
-    # Die Gesamtliste bleibt vollstaendig - `zeilen` ist die Vollansicht.
     assert len(erg["zeilen"]) == 1
 
 
 @pytest.mark.parametrize(
     "preis,wesentlich",
     [
-        (1199.0, False),  # 0,90 EUR / 0,1 % - Rauschen
-        (1184.0, True),  # 15,90 EUR ueber der absoluten Grenze
-        (1160.0, True),  # 39,90 EUR / 3,3 % - beides
+        (1199.0, False),
+        (1184.0, True),
+        (1160.0, True),
     ],
 )
 def test_die_schwelle_greift_absolut_oder_relativ(preis, wesentlich):
@@ -517,7 +480,5 @@ def test_die_uebersicht_ist_nach_oben_gedeckelt():
 
     assert len(erg["zeilen"]) == UEBERSICHT_MAX_ZEILEN + 10, "Fixture greift nicht"
     assert len(erg["wesentlich"]) == UEBERSICHT_MAX_ZEILEN
-    # Nichts geht verloren: was nicht oben steht, steht in der Vollansicht.
     assert len(erg["wesentlich"]) + len(erg["rest"]) == len(erg["zeilen"])
-    # Und gekappt wird unten, nicht oben.
     assert erg["wesentlich"][0]["differenz"] >= erg["rest"][0]["differenz"]

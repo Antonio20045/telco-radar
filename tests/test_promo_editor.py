@@ -73,4 +73,4 @@ def test_validate_briefing_accepts_well_formed_markdown():
         "[congstar – 10 GB Bonus](https://example.test/aktion)\n\n"
         "## Quellenbasis\n- [congstar – 10 GB Bonus](https://example.test/aktion)"
     )
-    validate_briefing(md)  # must not raise
+    validate_briefing(md)

@@ -67,14 +67,9 @@ log = logging.getLogger(__name__)
 
 API = "https://api.certspotter.com/v1/issuances"
 
-# Die Frist je Domain. Grosse Domains bekommen mehr, aber nicht unbegrenzt -
-# certspotter beantwortet telekom.de mit include_subdomains gar nicht.
 FRIST_NORMAL = 30.0
 FRIST_GROSS = 60.0
 
-# Mehr als das aus einem einzelnen Lauf zu melden, ist keine Frueherkennung
-# mehr, sondern ein Umbau der Namensraeume - und dann stimmt vermutlich die
-# Grundlinie nicht. Wie bei MAX_AENDERUNGEN_JE_SEITE im Aenderungsradar.
 MAX_JE_DOMAIN = 8
 
 
@@ -115,7 +110,7 @@ class Fund:
     name: str
     zuerst_gesehen: str = ""
     nicht_vor: str = ""
-    einschaetzung: str = ""  # vom Modell, leer wenn ohne
+    einschaetzung: str = ""
     begruendung: str = ""
 
     def kennung(self) -> str:
@@ -182,7 +177,6 @@ def ist_technisch(name: str, rauschen: list[str]) -> bool:
     if not rauschen:
         return False
     label = name.split(".")
-    # Nur die Praefixe pruefen, nicht die Registrierungsdomain.
     praefixe = label[:-2] if len(label) > 2 else []
     return any(teil in rauschen for teil in praefixe)
 
@@ -310,7 +304,7 @@ def bewerte(funde: list[Fund], modell: str, *, komplett=None) -> list[Fund]:
     """
     if not funde:
         return funde
-    if komplett is None:  # pragma: no cover - der echte Pfad
+    if komplett is None:  # pragma: no cover
         from ..analyze.llm import complete as komplett
 
     from ..analyze.llm import extract_json
@@ -410,8 +404,6 @@ def sammle(
             daten = hole(domain, http_cfg, client=client)
             namen = namen_aus_antwort(daten)
         except CTZeitueberschreitung as exc:
-            # Erwartbar bei grossen Domains - und ausdruecklich KEIN leeres
-            # Ergebnis. Die Grundlinie bleibt unangetastet.
             bilanz["zeitueberschreitung"] += 1
             log.info("CT-Radar: %s", exc)
             continue
@@ -435,8 +427,6 @@ def sammle(
         gefiltert = [n for n in sorted(neu) if not ist_technisch(n, rauschen)]
         bilanz["technisch"] += len(neu) - len(gefiltert)
         if len(gefiltert) > MAX_JE_DOMAIN:
-            # So viele neue Namen auf einmal sind ein Umbau des Namensraums,
-            # keine Kampagne.
             bilanz["zu_viele"] += 1
             log.info(
                 "CT-Radar: %s meldet %d neue Namen - sieht nach Umbau "

@@ -30,9 +30,6 @@ def _html(rumpf: str) -> str:
     return f"<html><body>{rumpf}</body></html>"
 
 
-# ------------------------------------------------------------- Extraktion
-
-
 @pytest.mark.parametrize(
     "text,lage,lo,hi",
     [
@@ -71,9 +68,6 @@ def test_platzhalter_gilt_nicht_als_messung():
         _html("Lieferzeit ca. {DELIVERY_TIME} Tage"), SEITE, PRODUKT, "40213", JETZT
     )
     assert b.quarantaene
-
-
-# ------------------------------------------------------------------ JSON-LD
 
 
 def test_jsonld_wird_gelesen_wenn_es_da_ist():
@@ -127,9 +121,6 @@ def test_jsonld_ohne_versanddetails_faellt_auf_den_text_zurueck():
     assert b.belastbarkeit == L.NIEDRIG
 
 
-# ---------------------------------------------------------------- Quarantaene
-
-
 def test_ohne_angabe_gibt_es_keine_zahl():
     b = L.beobachte(_html("<p>Tolles Handy</p>"), SEITE, PRODUKT, "40213", JETZT)
     assert b.quarantaene == "keine Lieferzeitangabe gefunden"
@@ -163,9 +154,6 @@ def test_quarantaene_erscheint_nicht_auf_der_seite():
     assert view["n_quarantaene"] == 1
 
 
-# ------------------------------------------------------------------ Engpass
-
-
 def test_der_sprung_ist_die_nachricht_nicht_die_zahl():
     """Manche Anbieter liefern grundsaetzlich in zehn Tagen - das ist keine
     Nachricht. Die Nachricht ist die Veraenderung."""
@@ -179,9 +167,7 @@ def test_der_sprung_ist_die_nachricht_nicht_die_zahl():
         tage_max=21,
     )
     assert L.ist_engpass(vorher, jetzt) is True
-    # Dauerhaft langsam ist kein Engpass.
     assert L.ist_engpass({"tage_max": 20}, jetzt) is False
-    # Ohne Vorwert auch nicht - der erste Messpunkt ist die Grundlinie.
     assert L.ist_engpass(None, jetzt) is False
 
 
@@ -205,9 +191,6 @@ def test_engpass_faerbt_die_zelle():
     assert view["zeilen"][0]["felder"][0]["engpass"] is True
 
 
-# ------------------------------------------------------------------ Speicher
-
-
 def test_die_zeitreihe_waechst_und_hat_ein_ende(tmp_path):
     sp = L.Lieferzeitspeicher(tmp_path / "lieferzeit.json")
     for i in range(L.MAX_HISTORIE + 20):
@@ -222,7 +205,6 @@ def test_die_zeitreihe_waechst_und_hat_ein_ende(tmp_path):
             )
         )
     assert len(sp.reihe("p", "a")) == L.MAX_HISTORIE
-    # Behalten wird das ENDE, nicht der Anfang.
     assert sp.letzte("p", "a")["tage_max"] == L.MAX_HISTORIE + 19
 
 
@@ -252,9 +234,6 @@ def test_letzte_ueberspringt_quarantaene(tmp_path):
     assert sp.letzte("p", "a")["tage_max"] == 3
 
 
-# ---------------------------------------------------------------- Ende zu Ende
-
-
 def test_ein_durchlauf_ohne_netz(tmp_path):
     (tmp_path / "config").mkdir(parents=True)
     (tmp_path / "config" / "lieferzeit_warenkorb.yaml").write_text(
@@ -276,7 +255,6 @@ def test_ein_durchlauf_ohne_netz(tmp_path):
     )
     eintrag = gespeichert["reihen"]["p|winSIM"][0]
     assert eintrag["tage_max"] == 3
-    # Der Originaltext wird IMMER mitgefuehrt - er ist der Beleg.
     assert "Werktage" in eintrag["lieferzeit_roh"]
     assert eintrag["plz"] == "40213"
 
@@ -289,11 +267,8 @@ def test_der_ausgelieferte_warenkorb_ist_klein_und_fest():
     korb = L.lade_warenkorb(Path(__file__).resolve().parents[1])
     assert korb.test_plz, "eine feste PLZ, konsistent verwendet"
     assert 2 <= len(korb.produkte) <= 6, "ein fester Warenkorb, kein Sortiment"
-    # Jedes Produkt hat EINE festgelegte Variante - sonst vergleicht der
-    # Verlauf wechselnde Konfigurationen und damit nichts.
     for p in korb.produkte:
         assert p.typ
-    # Ident-Verfahren je Anbieter: die effektive Wartezeit haengt daran.
     assert all(m.get("ident") for m in korb.anbieter_meta.values())
 
 
@@ -301,4 +276,4 @@ def test_die_seite_nennt_ihre_grenzen():
     korb = L.lade_warenkorb(Path(__file__).resolve().parents[1])
     view = V.aufbereiten({"reihen": {}}, korb)
     assert view["test_plz"] == korb.test_plz
-    assert view["aktiv"] is False  # ohne Messung keine Matrix
+    assert view["aktiv"] is False

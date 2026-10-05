@@ -63,8 +63,6 @@ def test_seiten_wie_aufgenommen_und_zweiter_lauf_ohne_neues(tmp_path):
     neu = _bericht(wurzel)["stats"]["new"]
     ungelesen = neu - (_gesehen(wurzel) - vorher)
     assert neu > 0
-    # Ohne LLM bleiben gescheiterte Stapel ungelesen und dürfen nicht als gesehen
-    # gelten; mit Antworten ist alles gelesen.
     assert (ungelesen == 0) == (golden.herkunft(AUFNAHME)["llm"] == "beantwortet")
 
     band = golden.lauf(AUFNAHME, wurzel)

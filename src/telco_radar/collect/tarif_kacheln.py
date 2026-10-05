@@ -104,25 +104,13 @@ from .tarif_pdf import dokument_hash
 
 log = logging.getLogger(__name__)
 
-# Die Auszeichnung, an der o2 eine Preiskachel erkennbar macht. Bewusst
-# eine TEILKLASSE und keine vollstaendige Klassenliste: die Kacheln tragen
-# daneben `teaser-neuro`, `teaser-highlight` und `teaser-switchable`, und
-# eine dieser Beigaben zu verlangen hiesse, an einer Designentscheidung zu
-# haengen statt an der Sache.
 _KACHEL_KLASSE = "teaser-with-price"
 
-# "15 GB+" -> 15.0. Wie in `tarif_ldjson`: nur GB, kein MB. Eine MB-Zahl in
-# einer Tarifkachel ist eine Geschwindigkeit ("5G mit max. 300 MBit/s") und
-# kein Volumen - genau deshalb wird sie hier nur im Volumenteil der
-# Ueberschrift gesucht und nicht in der ganzen Kachel.
 _VOLUMEN_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*GB\b", re.I)
-# Die Volumenzeile der Unlimited-Kacheln heisst genau "Unbegrenzt".
 _UNBEGRENZT_RE = re.compile(r"\s*(?:Unbegrenzt|Unlimited)\s*$", re.I)
 
-# "+ einm. Anschlusspreis 0,00 € statt 39,99 €" -> 0,00.
 _ANSCHLUSS_RE = re.compile(r"Anschlusspreis\D{0,10}?(\d+(?:[.,]\d+)?)", re.I)
 
-# "24 Monate" im angekreuzten Auswahlknopf.
 _LAUFZEIT_RE = re.compile(r"(\d+)\s*Monate?\b", re.I)
 
 
@@ -178,8 +166,6 @@ def _name_und_volumen(kachel) -> tuple[str, str]:
         return "", ""
     kleine = kopf.find_all("span", class_="small")
     name = _text(kleine[0]) if kleine else ""
-    # Auf einer KOPIE arbeiten: `extract()` veraendert den Baum, und die
-    # Kachel wird danach noch fuer den Rohtext gebraucht.
     kopie = BeautifulSoup(str(kopf), "html.parser")
     for span in kopie.find_all("span", class_="small"):
         span.extract()
@@ -202,7 +188,6 @@ def _laufzeit(kachel) -> tuple[Optional[int], str]:
         treffer = _LAUFZEIT_RE.search(titel)
         if treffer:
             return int(treffer.group(1)), titel
-        # "Monatlich kündbar" - eine Aussage, aber keine Monatszahl.
         return None, titel
     return None, ""
 
@@ -260,10 +245,6 @@ def tarif_aus_kachel(
     nachtext = _slot(kachel, "after")
     laufzeit, laufzeittext = _laufzeit(kachel)
 
-    # Der Rohtext IST die Kachel - plus die eine Adresse, aus der der Slug
-    # kommt. Ohne sie stuende `buendel_slug` mit einer Fundstelle da, die
-    # im Rohtext nicht vorkommt, und `pruefe_belege()` wuerde zu Recht
-    # werfen: ein Wert, dessen Beleg man nicht nachlesen kann.
     rohtext = _text(kachel)
     if slug_href:
         rohtext = f"{rohtext} | Handy hinzufügen: {slug_href}"
@@ -294,10 +275,6 @@ def tarif_aus_kachel(
     if slug:
         tarif.setze("buendel_slug", slug, f"Handy hinzufügen: {slug_href}", HOCH)
 
-    # Der Fingerabdruck haengt an der KACHEL, nicht an der Seite - genau
-    # wie in `tarif_ldjson` am Knoten. Zwoelf Tarife auf einer Seite
-    # haetten sonst denselben Hash, und eine Preisaenderung an einem
-    # einzigen liesse alle zwoelf als geaendert gelten.
     hash_ = dokument_hash(rohtext)
     tarif.dokument_hash = hash_
     return tarif, hash_
@@ -324,9 +301,6 @@ def tarife_aus_html(
             continue
         tarif, hash_ = ergebnis
         if hash_ in gesehen:
-            # Dieselbe Kachel zweimal auf derselben Seite. o2 liefert seine
-            # Tarifuebersicht in mehreren Reitern aus; zwei identische
-            # Kacheln waeren zwei Datensaetze desselben Tarifs.
             continue
         gesehen.add(hash_)
         out.append((tarif, hash_))
