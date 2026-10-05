@@ -67,6 +67,7 @@ def brave_search(
             params={"q": query, "count": count, "freshness": freshness},
             headers={"Accept": "application/json", "X-Subscription-Token": key},
             timeout=20,
+            follow_redirects=True,
         )
         antwort.raise_for_status()
         data = antwort.json()

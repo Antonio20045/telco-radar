@@ -61,3 +61,16 @@ def test_modulzustand_meldet_die_datei_und_uebergeht_fehlende(tmp_path, monkeypa
 
 def test_llm_steht_in_zustandsfrei():
     assert "src/telco_radar/analyze/llm.py" in zustand.ZUSTANDSFREI
+
+
+def test_unannotiertes_none_ist_eine_naht_und_rot():
+    funde = zustand.zustand_in("import logging\nCLIENT = None\nTRANSPORT = None\n")
+    assert funde == ["Zeile 2 bindet CLIENT", "Zeile 3 bindet TRANSPORT"]
+
+
+def test_bindungen_in_if_und_try_der_modulebene_sind_rot():
+    text = (
+        "try:\n    import certifi\nexcept ImportError:\n    cache = {}\n"
+        "if True:\n    STAND = []\nelse:\n    KLAR = 1\n"
+    )
+    assert zustand.zustand_in(text) == ["Zeile 4 bindet cache", "Zeile 6 bindet STAND"]

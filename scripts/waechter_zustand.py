@@ -3,8 +3,9 @@
 Ein Modul in ``ZUSTANDSFREI`` bindet auf Modulebene nur ``log`` und Konstanten:
 Namen mit großem Anfangsbuchstaben (ein führender Unterstrich zählt nicht) und
 einem Wert, der sich nicht ändern lässt, also Literal, Tupel, ``frozenset(...)``,
-Typangabe oder Rechnung aus Konstanten. Ein annotiertes ``= None`` ist ein Platz
-zum Umsetzen von außen und damit Zustand. ``global`` ist dort überall verboten.
+Typangabe oder Rechnung aus Konstanten. Ein ``= None`` ist ein Platz zum
+Umsetzen von außen und damit Zustand; ``if``-, ``try``- und ``with``-Blöcke
+der Modulebene zählen mit. ``global`` ist dort überall verboten.
 Den Zustand eines Laufs trägt ein Objekt, das der Aufrufer anlegt.
 """
 
@@ -38,19 +39,33 @@ def _gross(name: str) -> bool:
     return bool(kern) and kern[:1].isupper()
 
 
+def _modulebene(koerper: list[ast.stmt]) -> list[ast.stmt]:
+    """Anweisungen der Modulebene, auch in ``if``-, ``try``- und ``with``-Blöcken."""
+    flach = []
+    for knoten in koerper:
+        flach.append(knoten)
+        if isinstance(knoten, ast.If | ast.With):
+            flach += _modulebene(knoten.body + getattr(knoten, "orelse", []))
+        elif isinstance(knoten, ast.Try):
+            innen = knoten.body + knoten.orelse + knoten.finalbody
+            innen += [z for h in knoten.handlers for z in h.body]
+            flach += _modulebene(innen)
+    return flach
+
+
 def zustand_in(text: str) -> list[str]:
     """Jede Bindung auf Modulebene, die keine Konstante ist, und jedes ``global``."""
     baum = ast.parse(text)
     funde = []
-    for knoten in baum.body:
+    for knoten in _modulebene(baum.body):
         if isinstance(knoten, ast.Assign):
             ziele, wert = knoten.targets, knoten.value
         elif isinstance(knoten, ast.AnnAssign):
             ziele, wert = [knoten.target], knoten.value
-            if isinstance(wert, ast.Constant) and wert.value is None:
-                wert = None
         else:
             continue
+        if isinstance(wert, ast.Constant) and wert.value is None:
+            wert = None
         for ziel in ziele:
             name = ziel.id if isinstance(ziel, ast.Name) else ast.unparse(ziel)
             if name == "log":

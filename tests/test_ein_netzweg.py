@@ -79,3 +79,16 @@ def test_ct_log_ohne_llm_funktion_ueberspringt_die_modellstufe(tmp_path, naht):
     naht(httpx.Response(200, json=[{"dns_names": ["aktion.congstar.de"]}]))
     items, bilanz = ct_log.sammle(tmp_path, {}, modell="m")
     assert [i.title for i in items] and bilanz["meldungen"] == 1
+
+
+def test_brave_suche_folgt_weiterleitungen(monkeypatch):
+    treffer = {"web": {"results": [{"title": "T", "url": "https://a.de/y"}]}}
+
+    def antworte(anfrage: httpx.Request) -> httpx.Response:
+        if anfrage.url.path.endswith("/neu"):
+            return httpx.Response(200, json=treffer)
+        return httpx.Response(301, headers={"Location": "https://brave.invalid/neu"})
+
+    monkeypatch.setattr(http, "TRANSPORT", httpx.MockTransport(antworte))
+    ergebnis = category_sweep.brave_search("telco ki", "geheim")
+    assert [e["url"] for e in ergebnis] == ["https://a.de/y"]
