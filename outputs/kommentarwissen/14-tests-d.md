@@ -205,7 +205,7 @@ Stand: Commit aaa8b0d, 52 Dateien, 1542 Kommentarzeilen.
 - Zeile 101: "1&1 Unlimited XL" nennt in `description` keine GB-Zahl, dann steht dort nichts, nicht "unbegrenzt", nicht 0.
 
 ### `tests/test_tarif_telekom_kacheln.py`
-- nichts übernommen: nur Abschnittsüberschriften.
+- nichts übernommen: nur die Abschnittsüberschriften „Die gemessene Seite“ und „Gestellte Fälle“; die Trennung zwischen gemessener Fixture und gestellten Fällen ergibt sich aus den Testnamen.
 
 ### `tests/test_tco_bindung.py`
 - Zeile 58: 0,00 + 1,00 + 24 x 19,99 (479,76) + 36 x 36,50 (1314,00); 68: 24 x 36,50, zwölf offene Geräteraten. 177: Abzug als eigener negativer Posten, Balkengrafik braucht ihn für Bonussegment. 198: 49,85 - 1249,00/36 = 15,16. 251: seit o2-Vertiefung (29.09.2026) liefert o2 24 UND 36 Raten; Bindung = gemessene Ratenlaufzeit, Restschuld nach Monat 24 = offene Raten, bei 24 Raten 0,00 EUR.
@@ -222,7 +222,7 @@ Stand: Commit aaa8b0d, 52 Dateien, 1542 Kommentarzeilen.
 - Zeile 86: Felder genau wie render_site() übergibt, handverlesene Liste liefe irgendwann gegen andere Vorlage. 209: Explorer steht auf den Archivwochen (`reports/<datum>.html`), nicht auf meldungen.html (dort HTML-Liste). 298: Rotwert nicht neu erfunden, aus Variable geholt; im Übersetzungsblock kein eigener Farbwert.
 
 ### `tests/test_volltext_feed.py`
-- nichts übernommen: nur Abschnittsüberschrift.
+- nichts übernommen: nur die Abschnittsüberschrift „Modell“ über den Modelltests.
 
 ### `tests/test_vorsortierung.py`
 - Zeile 49: Mini-Lauf mit echter Konfiguration ohne Netz/Modell (wie E2E-Fixture in test_pipeline.py); `run.vorsortierung` nur am wirklich geschriebenen Bericht-JSON prüfbar, Teilzeichenketten-Prüfung auf Quelltext von `run()` bliebe grün, wenn das Feld verschwindet. 79: Nebenstufen aus, brauchen Netz/Playwright. 221: nach rechts offen, Liste enthält Wortstämme. 464: Verkettung aus pipeline.py, Vorsortierung meldet NICHTS als ungelesen, gescheiterter Analysten-Stapel schon; Aussortierter steht im Store und nicht mehr vor dem Analysten. 421: Bereich ohne Rest fällt aus Abbildung, sonst leere Überschrift im Bericht. 640-658: Frist: viel Luft eigene Obergrenze, wenig Luft Restzeit, zu wenig gar nicht anfangen, abgeschaltet bleibt abgeschaltet (Regel 8). 703: andere Stufen bekommen leere gültige Antwort (failsafe); geprüft wird das Feld im Bericht-JSON. Zeile 383 `# pragma: no cover` bleibt.

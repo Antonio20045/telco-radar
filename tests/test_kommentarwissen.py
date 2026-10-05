@@ -185,3 +185,97 @@ def test_unlesbare_datei_nennt_ihren_pfad(repo):
     _schreibe(repo, "x = (\n# offen\n")
     with pytest.raises(kommentarwissen.Unlesbar, match=PFAD):
         kommentarwissen.kommentierte_dateien(repo)
+
+
+UEBER_ERSTER = (
+    "# A rechnet in Cent\n"
+    "def erste():\n    return 1\n\n\n"
+    "@staticmethod\n"
+    "def zweite():\n    return 2\n"
+)
+UEBER_ZWEITER = (
+    "def erste():\n    return 1\n\n\n"
+    "# A rechnet in Cent\n"
+    "@staticmethod\n"
+    "def zweite():\n    return 2\n"
+)
+
+
+def _committe(repo):
+    _git(repo, "config", "user.name", "Mensch")
+    _git(repo, "config", "user.email", "m@example.invalid")
+    _git(repo, "commit", "-q", "-m", "Start")
+
+
+def test_leeren_und_wiederherstellen_des_abschnitts_segnet_nichts_ab(repo):
+    _protokoll(repo)
+    kommentarwissen.schreibe_abdeckung(repo)
+    _schreibe(repo, MIT_WISSEN + "# neues Wissen\n")
+    _protokoll(repo, "")
+    kommentarwissen.schreibe_abdeckung(repo)
+    _protokoll(repo)
+    kommentarwissen.schreibe_abdeckung(repo)
+    assert kommentarwissen.befunde(repo) == [
+        f"Kommentare seit der Übernahme geändert: {PFAD}"
+    ]
+
+
+def test_ohne_eintrag_wird_eine_datei_aus_der_basis_nicht_festgehalten(repo):
+    _committe(repo)
+    _schreibe(repo, MIT_WISSEN + "# neues Wissen\n")
+    _protokoll(repo)
+    anzahl, liegen = kommentarwissen.schreibe_abdeckung(repo)
+    assert (anzahl, liegen) == (
+        0,
+        [(PFAD, "kein früherer Eintrag, Kommentare schon in der Basis")],
+    )
+    assert kommentarwissen.befunde(repo) == [
+        f"Kommentare seit der Übernahme geändert: {PFAD}"
+    ]
+
+
+def test_ohne_eintrag_wird_eine_neue_datei_festgehalten(repo):
+    _committe(repo)
+    neu = "src/paket/neu.py"
+    (repo / neu).write_text("# frisches Wissen\n", encoding="utf-8")
+    _git(repo, "add", neu)
+    text = f"### `{PFAD}`\n- nichts übernommen: erzählt den Code nach\n"
+    text += f"### `{neu}`\n- frisches Wissen über die neue Datei\n"
+    (repo / "outputs/kommentarwissen/01-x.md").write_text(text, encoding="utf-8")
+    assert kommentarwissen.schreibe_abdeckung(repo)[0] == 1
+    assert set(kommentarwissen.gespeicherte_abdeckung(repo)) == {neu}
+
+
+def test_abschnitt_nach_dem_festhalten_geaendert_ist_rot(repo):
+    _protokoll(repo)
+    kommentarwissen.schreibe_abdeckung(repo)
+    _protokoll(repo, "- `GRENZE`: zehn statt sieben, nachträglich umgeschrieben")
+    assert kommentarwissen.befunde(repo) == [
+        f"Abschnitt seit dem Festhalten geändert: {PFAD}"
+    ]
+
+
+def test_kommentar_ueber_einer_funktion_gehoert_zu_ihr(repo):
+    _schreibe(repo, UEBER_ERSTER)
+    _protokoll(repo)
+    kommentarwissen.schreibe_abdeckung(repo)
+    _schreibe(repo, UEBER_ZWEITER)
+    assert kommentarwissen.befunde(repo) == [
+        f"Kommentare seit der Übernahme geändert: {PFAD}"
+    ]
+
+
+@pytest.mark.parametrize(
+    ("abschnitt", "grund"),
+    [
+        (".", "leerer Abschnitt"),
+        ("-", "leerer Abschnitt"),
+        ("```\n```", "leerer Abschnitt"),
+        ("<!-- hier steht sehr viel Text -->", "leerer Abschnitt"),
+        ("- nichts übernommen: x", "„nichts übernommen“ ohne Grund"),
+        ("nichts übernommen!", "„nichts übernommen“ ohne Grund"),
+    ],
+)
+def test_abschnitt_ohne_substanz_ist_rot(repo, abschnitt, grund):
+    _protokoll(repo, abschnitt)
+    assert kommentarwissen.befunde(repo) == [f"{grund}: {PFAD}"]

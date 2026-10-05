@@ -166,7 +166,7 @@ Stand: Commit aaa8b0d, 49 Dateien, 1543 Kommentarzeilen.
 - Zeile 64: Meldung nennt die drei Dinge zum Handeln: nur gedacht, wie knapp das Budget war, was zu tun ist.
 
 ### `tests/test_luecken.py`
-- nichts übernommen: nur Abschnittsüberschriften.
+- nichts übernommen: nur Abschnittsüberschriften („die eine Regel“, „Sortierung“, „Direktvergleich“, „Konfiguration“), die die Testnamen schon tragen.
 
 ### `tests/test_navigation_aktiver_eintrag_browser.py`
 - Zeile 27: Struktur der Rubrikleiste wortgetreu aus `base.html.j2` (fünf Einträge der Marktrecherche, „Geräte“ als aktiver letzter Eintrag, der gemeldete Fall).

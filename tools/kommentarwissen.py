@@ -29,7 +29,11 @@ WERKZEUGKOMMENTAR = re.compile(rf"#\s*(?:{SCHALTER})\s*$")
 SHEBANG = "#!"
 UEBERSCHRIFT = re.compile(r"^### `([^`]+)`\s*$")
 CODEZAUN = re.compile(r"^\s*(```|~~~)")
-NICHTS_OHNE_GRUND = re.compile(r"[-*\s]*nichts übernommen[.:\s]*", re.IGNORECASE)
+NICHTS = re.compile(r"nichts übernommen", re.IGNORECASE)
+HTML_KOMMENTAR = re.compile(r"<!--.*?-->", re.DOTALL)
+WORT = re.compile(r"\w*[^\W\d_]\w*")
+MINDESTWOERTER = 3
+BASEN = ("origin/main", "HEAD")
 MODULEBENE = "<modul>"
 
 
@@ -61,14 +65,21 @@ def _bereiche(text: str) -> list[tuple[int, int, str]]:
         baum = ast.parse(text)
     except SyntaxError as fehler:
         raise Unlesbar(str(fehler)) from fehler
+    zeilen = text.splitlines()
     bereiche: list[tuple[int, int, str]] = []
+
+    def anfang(kind: ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef) -> int:
+        zeile = min([kind.lineno, *(d.lineno for d in kind.decorator_list)])
+        while zeile > 1 and zeilen[zeile - 2].lstrip().startswith("#"):
+            zeile -= 1
+        return zeile
 
     def besuche(knoten: ast.AST, praefix: str) -> None:
         for kind in ast.iter_child_nodes(knoten):
             if isinstance(kind, ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef):
                 name = f"{praefix}{kind.name}"
                 ende = kind.end_lineno or kind.lineno
-                bereiche.append((kind.lineno, ende, name))
+                bereiche.append((anfang(kind), ende, name))
                 besuche(kind, f"{name}.")
             else:
                 besuche(kind, praefix)
@@ -123,13 +134,17 @@ def abschnitte(wurzel: Path) -> dict[str, str]:
         for zeile in protokoll.read_text(encoding="utf-8").splitlines():
             if CODEZAUN.match(zeile):
                 im_code = not im_code
-            elif not im_code and zeile.startswith("#"):
+                continue
+            if not im_code and zeile.startswith("#"):
                 treffer = UEBERSCHRIFT.match(zeile)
                 aktuell = gesammelt.setdefault(treffer[1], []) if treffer else None
                 continue
             if aktuell is not None:
                 aktuell.append(zeile)
-    return {pfad: "\n".join(z).strip() for pfad, z in gesammelt.items()}
+    return {
+        pfad: HTML_KOMMENTAR.sub("", "\n".join(z)).strip()
+        for pfad, z in gesammelt.items()
+    }
 
 
 def protokollierte(wurzel: Path) -> set[str]:
@@ -140,11 +155,11 @@ def protokollierte(wurzel: Path) -> set[str]:
 def _abschnitt_fehlt(text: str | None) -> str | None:
     if text is None:
         return "ohne Protokoll"
-    if not text:
-        return "leerer Abschnitt"
-    if NICHTS_OHNE_GRUND.fullmatch(text):
+    if len(WORT.findall(NICHTS.sub("", text))) >= MINDESTWOERTER:
+        return None
+    if NICHTS.search(text):
         return "„nichts übernommen“ ohne Grund"
-    return None
+    return "leerer Abschnitt"
 
 
 def _abdruck(text: str) -> str:
@@ -166,38 +181,86 @@ def befunde(wurzel: Path) -> list[str]:
     gespeichert = gespeicherte_abdeckung(wurzel)
     meldungen: list[str] = []
     for pfad, abdruck in kommentierte_dateien(wurzel).items():
-        if grund := _abschnitt_fehlt(texte.get(pfad)):
+        text = texte.get(pfad)
+        eintrag = gespeichert.get(pfad, {})
+        if grund := _abschnitt_fehlt(text):
             meldungen.append(f"{grund}: {pfad}")
-        elif gespeichert.get(pfad, {}).get("kommentare") != abdruck:
+        elif eintrag.get("kommentare") != abdruck:
             meldungen.append(f"Kommentare seit der Übernahme geändert: {pfad}")
+        elif eintrag.get("protokoll") != _abdruck(text or ""):
+            meldungen.append(f"Abschnitt seit dem Festhalten geändert: {pfad}")
     return meldungen
 
 
-def schreibe_abdeckung(wurzel: Path) -> tuple[int, list[str]]:
+def _basis(wurzel: Path) -> str | None:
+    for name in BASEN:
+        lauf = subprocess.run(
+            ["git", "rev-parse", "--verify", "-q", f"{name}^{{commit}}"],
+            cwd=wurzel,
+            capture_output=True,
+            text=True,
+        )
+        if lauf.returncode == 0:
+            return name
+    return None
+
+
+def neu_gegen_basis(wurzel: Path, pfad: str) -> bool:
+    """Wahr, wenn die Basis die Datei nicht kennt oder sie dort ohne Wissen ist."""
+    basis = _basis(wurzel)
+    if basis is None:
+        return True
+    lauf = subprocess.run(
+        ["git", "show", f"{basis}:{pfad}"],
+        cwd=wurzel,
+        capture_output=True,
+        text=True,
+    )
+    if lauf.returncode != 0:
+        return True
+    try:
+        return not wissenskommentare(lauf.stdout)
+    except Unlesbar:
+        return False
+
+
+def schreibe_abdeckung(wurzel: Path) -> tuple[int, list[tuple[str, str]]]:
     """Hält Dateien fest, deren Abschnitt mit den Kommentaren mitgezogen ist.
 
-    Haben sich die Kommentare einer schon festgehaltenen Datei geändert, ihr
-    Abschnitt aber nicht, bleibt der alte Stand stehen und die Datei rot.
+    Haben sich die Kommentare einer festgehaltenen Datei geändert, ihr Abschnitt
+    aber nicht, bleibt der alte Stand stehen. Ohne früheren Eintrag hält es nur
+    Dateien fest, die in der Basis fehlen oder dort ohne Kommentarwissen sind.
     """
     texte = abschnitte(wurzel)
     alt = gespeicherte_abdeckung(wurzel)
     neu: dict[str, dict[str, str]] = {}
-    liegen_geblieben: list[str] = []
+    liegen: list[tuple[str, str]] = []
     for pfad, abdruck in kommentierte_dateien(wurzel).items():
         text = texte.get(pfad)
-        if text is None or _abschnitt_fehlt(text):
-            continue
-        eintrag = {"kommentare": abdruck, "protokoll": _abdruck(text)}
         vorher = alt.get(pfad, {})
-        geaendert = bool(vorher) and vorher.get("kommentare") != abdruck
+        if _abschnitt_fehlt(text):
+            if vorher:
+                neu[pfad] = vorher
+            liegen.append((pfad, "Abschnitt fehlt oder ist leer"))
+            continue
+        eintrag = {"kommentare": abdruck, "protokoll": _abdruck(text or "")}
+        if not vorher:
+            if neu_gegen_basis(wurzel, pfad):
+                neu[pfad] = eintrag
+            else:
+                liegen.append(
+                    (pfad, "kein früherer Eintrag, Kommentare schon in der Basis")
+                )
+            continue
+        geaendert = vorher.get("kommentare") != abdruck
         if geaendert and vorher.get("protokoll") == eintrag["protokoll"]:
             neu[pfad] = vorher
-            liegen_geblieben.append(pfad)
+            liegen.append((pfad, "Abschnitt unverändert"))
             continue
         neu[pfad] = eintrag
     inhalt = json.dumps({"dateien": neu}, indent=1, sort_keys=True) + "\n"
     (wurzel / ABDECKUNG).write_text(inhalt, encoding="utf-8")
-    return len(neu) - len(liegen_geblieben), liegen_geblieben
+    return len(neu) - sum(1 for p, _ in liegen if p in neu), liegen
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -211,8 +274,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.schreiben:
         anzahl, liegen = schreibe_abdeckung(args.wurzel)
         print(f"{anzahl} Dateien festgehalten")
-        for pfad in liegen:
-            print(f"nicht festgehalten, Abschnitt unverändert: {pfad}")
+        for pfad, grund in liegen:
+            print(f"nicht festgehalten, {grund}: {pfad}")
     meldungen = befunde(args.wurzel)
     for zeile in meldungen:
         print(zeile)

@@ -129,7 +129,7 @@
    "protokoll": "d35f6b598605d41758a12cca9f1c52dbbc40c25061dae5229d88e22c30b0e7a4"
   },
   "scripts/pruefe_quellenvorschlag.py": {
-   "kommentare": "58d599b8804b6fbc9917a437523fc78c8e477ca3af932eff964d4f0045d399d3",
+   "kommentare": "d49e899b5dcc3b0207b921b6100fa3280d4092a5b6c1e1157c95bebd6a6f2316",
    "protokoll": "c569986b7f127e7c7fdf799d918a550662cf3be8b41c5df2347c5de3dee6b1c3"
   },
   "scripts/pruefleiter.py": {
@@ -213,7 +213,7 @@
    "protokoll": "68d85ec43a1b1becd2b0c7698081d8b7181bee051e2ebdbcbb0e9c17632cdfd2"
   },
   "src/telco_radar/analyze/category_sweep.py": {
-   "kommentare": "56c7789cd9f53001bc39757e883ffad8648d702f4d94923f6ae35f5f63dc4593",
+   "kommentare": "246a0ecae19030149a3ee38c504ad0e364000ec51c015b1868b0dd6d698fe2d8",
    "protokoll": "4ea9ffa4f435a2bce4801e0cea343adc04d841304e1496da6ee9c30d82ad2e2d"
   },
   "src/telco_radar/analyze/clustering.py": {
@@ -245,7 +245,7 @@
    "protokoll": "d574273d2f4d320e1a0be0a53072b41527ed3bc8781120c71de448f2b9d2ae3a"
   },
   "src/telco_radar/analyze/geraete_lifecycle.py": {
-   "kommentare": "516c18599bceb1cf443ebcb804166be756f7329d416e10e4931edfc14fa55618",
+   "kommentare": "e705409e5c770bac7fa32318a425e155e4d73bccd5fafd1e5a6bf5ca8ae503a9",
    "protokoll": "fbb360b9b460a4354a62fb6a373178925d869c0eebcab64b46ee348dafb9dd11"
   },
   "src/telco_radar/analyze/geraete_store.py": {
@@ -253,11 +253,11 @@
    "protokoll": "a8302fbee12128f5e8fb4cd2ae32a4084967ae26153fe326ae529b6ed186bda5"
   },
   "src/telco_radar/analyze/highlight_topics.py": {
-   "kommentare": "115fdac6573cbc552f59fe90e0a152eeb1b8e3702525a9541c2cdf1bc01caf58",
+   "kommentare": "4d6851e9e5cfa253950a4d06f3dbadf22f41c222fbf8359d3e96541d98e4654c",
    "protokoll": "153a229b094056525cd37164462a512bfea2539de4702ff17804ffbd4f91ff71"
   },
   "src/telco_radar/analyze/llm.py": {
-   "kommentare": "f6a8411b370b6e460154d4cef3d524220bd90e1753abceff2db97c63bc18dc72",
+   "kommentare": "fce200bd2ab6a078376f9e3cc2b0c89fc76e299f2c307d7b75dff73b95400ef0",
    "protokoll": "c1ad4b0c4858b890f3c734147efd062d309052a201e5f13643aded6f767e8b8a"
   },
   "src/telco_radar/analyze/promo_analyst.py": {
@@ -313,11 +313,11 @@
    "protokoll": "eb2b368eb7cc70cda4c43ff9615431ba74914e6fc397c29bdf24b4c7c2784c2c"
   },
   "src/telco_radar/collect/geraete/congstar.py": {
-   "kommentare": "b2d7cb51f9a3d010b3352b857b81e2b2950116361af8bafe2d91c5d431fd6bc0",
+   "kommentare": "7f27760ad7e02a00b715bef2e1cdb1b75891827cb34262ae11c970f878bdb693",
    "protokoll": "4a88456824fe9dcab9308512fbad1b943b6c3192a9332377c356b7f09aa6b7ea"
   },
   "src/telco_radar/collect/geraete/einsundeins.py": {
-   "kommentare": "5e303ed40e5633a285f72577bb9826689dc00d2ab03af1cce2a18422835b39d7",
+   "kommentare": "32511c52567a037c0ccd19d52b9e8b68d628a111641357e8983ed6c8cc3ef8d2",
    "protokoll": "014a33af33ecb1e1dd7c3ae5280809ad02b0670d51a73d3d9ac42af031735f2b"
   },
   "src/telco_radar/collect/geraete/o2.py": {
@@ -337,15 +337,15 @@
    "protokoll": "09276e24e91a5ac05dae4c6bc5f1977c9d752c67ae2f8469d006dddda1281f9f"
   },
   "src/telco_radar/collect/geraete/telekom.py": {
-   "kommentare": "8e72662d1d84d7b6723cb2c201e0ce4e8cc345bd10b773fcce36f1fb16128403",
+   "kommentare": "2f5e6ab57582b7e824e7afa2a6ea162ca4c99eb1a9ffd77a6b7e938d8cad2e48",
    "protokoll": "833c5131d1512d17ba534ddf5ae9262f53fe47114390fc84c68d76f439ce2eab"
   },
   "src/telco_radar/collect/geraete/vodafone.py": {
-   "kommentare": "c15ad0abd15c91a79ab6c34390119481262a647ad2444dcd6d80dd45e9022afc",
+   "kommentare": "5a63cac36b100a6ea18f9d2c9df493c2041453d0fbaa333c4d569098e686e80f",
    "protokoll": "3b93737b4e682d2cc0140de58b632d1352b4147a3d7018b696609b7d2adbbe5b"
   },
   "src/telco_radar/collect/http.py": {
-   "kommentare": "430714dfa7c64ab192a17434eae62d5a92ca71cd240f0e288c0a3b08ff3cd5c6",
+   "kommentare": "43d6a9f0ed6b7e9132ecffb8e548c739476af35582e6fa6e0a6d50d0d54fe2e4",
    "protokoll": "111f30d3397356d35c41f8e7c3653d1cd5850a4df51d455d8b4e50ec79c9cdb4"
   },
   "src/telco_radar/collect/json_api.py": {
@@ -449,7 +449,7 @@
    "protokoll": "b1c4d9f3932ff5a2626bd3ee78d8fc1f8b19b0e05e07972fad60b9bd431fdf08"
   },
   "src/telco_radar/newsletter/store.py": {
-   "kommentare": "efc55f597d5915c9600ebb14f3e531b20f699711951f2ed54f470fe22113fd32",
+   "kommentare": "918d66382c0b034ecdde0bb5efcb5c3b5e5cfc966bb374bc339c74512827d281",
    "protokoll": "28037767e506e3906bf00eea5ab4fef7cda1085d20fc893d393f248c97e4ed5a"
   },
   "src/telco_radar/newsletter/subscription.py": {
@@ -537,7 +537,7 @@
    "protokoll": "1a185aa606de54c0e0bed224a8d34827ba8e8c8895d5de185fe272968fc5fcf8"
   },
   "src/telco_radar/report/geraete_export.py": {
-   "kommentare": "862a5d478cb1e144eb01651d82c899f30be86c861e7c69b7cbea209d92a08662",
+   "kommentare": "f332956db09120abd93d73c4303d3714146dbfd1c5fc403be98591bca0368fc8",
    "protokoll": "4aa05fa170f184ef33e93966ffcdac0c844e43e3d545fb17cd2d604edf517149"
   },
   "src/telco_radar/report/geraete_pruefung.py": {
@@ -561,7 +561,7 @@
    "protokoll": "d7249fd04e24726e228d7daa4d22e0f258debca6638e01ac04d13a951fbd7015"
   },
   "src/telco_radar/report/geraete_tco_view.py": {
-   "kommentare": "23232f2a72da14a3ed56570c7e8effe3bdb79910e6e4c0886f2392193e0ee814",
+   "kommentare": "35fc7707a802656a1bb650443496cccba3a1c17a7f85060c0f41ba05a3be0ae3",
    "protokoll": "a3b67f42c9acf37dd17ac7cdf59e069ffb8819a7398cdec89ca13ae13df55558"
   },
   "src/telco_radar/report/geraete_vergleich.py": {
@@ -573,7 +573,7 @@
    "protokoll": "678f2015b1456f060ff4226bcf9abd321aa8cced3b6a9d42d9d28f1d89500337"
   },
   "src/telco_radar/report/geraete_view.py": {
-   "kommentare": "23e4dabe5059a8a7b0af72c312bf6f3f38f3abe746705283346a9bdccf43263c",
+   "kommentare": "f9330122552692a97918872fbdfea39cd7d88d19ea8a0a244516ea6261b9cc84",
    "protokoll": "392816d8744df12cbe44ffcd70fdbfb9215c9c5950cea9148d8f817c78a00418"
   },
   "src/telco_radar/report/geraete_zeitreihe.py": {
@@ -581,7 +581,7 @@
    "protokoll": "2406feda482c930c880f48caf03444dd23d63c798831ccd741eae360ba64aac4"
   },
   "src/telco_radar/report/html.py": {
-   "kommentare": "5895abeec64d384bea0f208adbcd9c1782cd238641a917e57806447901780fd7",
+   "kommentare": "70a508dd53706619c14ded6c01961cb32613621283311e7c374b5d0a2231fed3",
    "protokoll": "8dd901545bec8856c53fdd036ca43e4113aca0610ca29e2ec3e6e94a8ce39e57"
   },
   "src/telco_radar/report/lieferzeit_view.py": {
@@ -685,11 +685,11 @@
    "protokoll": "196b9b9461cb00dcca40615197c8f8ef59dd091f448810051d68279411b33da8"
   },
   "tests/orakel/test_geraete_bestand.py": {
-   "kommentare": "70154a4db814523bc2384f1b5154319d3ab6c4b46b2a76e0c2a1b3763e8611fe",
+   "kommentare": "d62555112e5c7384dce08be3ddcc9d0f138b315568492e9336c287bb8f0def42",
    "protokoll": "ccc37f2a373948c2bc6095316f7926697d1551a3a3fea77180a0bf417d9c7f97"
   },
   "tests/orakel/test_seiten_inhalt.py": {
-   "kommentare": "5e87c741eb8cc8b71d0cd6bfd88641b745db078cc0023225a5a7f55ac53141bb",
+   "kommentare": "1b86c05d55c1f1e201294cee1b50093d23786218963605c481716754a8c08fca",
    "protokoll": "ae1f2769df9793dba3373442ed48af061e98272ec7942409acd376033f9c2b7e"
   },
   "tests/test_aenderungsradar.py": {
@@ -773,7 +773,7 @@
    "protokoll": "4bcb11d61191b06abc3ff15e791ac0d48f33064c67e4d38dba4bbc843595f2c8"
   },
   "tests/test_differenzierung_view.py": {
-   "kommentare": "2f6f0c356d8e8ec0c57887965959d8ea0d2bd2ca66b700f4cc561a38ebc65038",
+   "kommentare": "1140aa17e080d60fd4fad7dc8f7456a0b5167c4cac815003d700945f48baffbf",
    "protokoll": "bb4ce451ef92454c1ed60e2c152f4a7880ec77b2cd15cfb04008926718391061"
   },
   "tests/test_editor_themenabschnitt.py": {
@@ -817,7 +817,7 @@
    "protokoll": "0b93244bb9fc2761fef8b2c03f88a58499dcb59097dd3a14ccaf3d3141d40209"
   },
   "tests/test_geraete_adapter_netzbetreiber.py": {
-   "kommentare": "9b144c2ce66cb1336713c83390817690955ea77f58061b7f3cefe2631c70883b",
+   "kommentare": "0c2bb75c682c66f331cfea14f7a10b542c5d72a0fd689e3a65d16c2841062266",
    "protokoll": "60a9bdefd7549e57ea52778d421f49026225322d43cb93d1abefa52fa26ac56d"
   },
   "tests/test_geraete_adapter_saturn.py": {
@@ -825,7 +825,7 @@
    "protokoll": "b4db81d3ffce97631d39fde819106bb2b62b3fef02476ad305397c033dea2d40"
   },
   "tests/test_geraete_adapter_telekom_1und1.py": {
-   "kommentare": "fb136e58ff863d67978da4aca8a70cf11604ebdd5990090c7e34fd9e61f10f29",
+   "kommentare": "41ce312428df587f6c563cc700cd7e5d7db9e4e6358dfab521119510b54a0317",
    "protokoll": "9fb19d1cb21de4a20c88ea6606842bf24b8023835177b7b0b620de1173657c2c"
   },
   "tests/test_geraete_aktionen.py": {
@@ -833,7 +833,7 @@
    "protokoll": "e61e7a93e66cd9b30e19abf6cbda8445b79687ba3d530c3776d84c5b92942824"
   },
   "tests/test_geraete_alarme.py": {
-   "kommentare": "d07e9e0959257db478e4014f86598c255def27ed6cca04d90c38168fa9718dd2",
+   "kommentare": "60f9b5f9b11b7bfb1821e721182aece55a2b796d6afd9d7ccdeb7c866308b174",
    "protokoll": "bf2b7aae655a886617a57de0d6f10231ecadb139f2ab4fac30251c54488b8c34"
   },
   "tests/test_geraete_alterungs_abzeichen_mobil_browser.py": {
@@ -849,7 +849,7 @@
    "protokoll": "3cc42e870d5131a8f452ddef59609933d85e0bd641ead3492087f084a3d4cd69"
   },
   "tests/test_geraete_bereinigung.py": {
-   "kommentare": "1c53e1707029d9ad384fbd91fc822f041574f6ad84fa38c1f54c799c30c807c2",
+   "kommentare": "25636b90770f18a6503928f662a99a3a16dc41556da423afdae105cafa62fb9a",
    "protokoll": "4bc439c7e5ba12b817abb189a51a4a30ef56496f9ed41d7ff965527ea3c21f34"
   },
   "tests/test_geraete_besuchsfenster.py": {
@@ -885,7 +885,7 @@
    "protokoll": "cb5b880664031b37e71ca1d416959c0d02294aa4348766a7685f7315a327d2e2"
   },
   "tests/test_geraete_buendel_o2.py": {
-   "kommentare": "a880074d19459807a31096acff958fb39dfa3afeea98449b4539f09a244474a6",
+   "kommentare": "337d66defda08ca20d03ab9b5f340c404dde450e2534b791cd389014bf2f047e",
    "protokoll": "4fb23b2ac3a3894843e9837918ed94bc027c7cc2f2e0d8017e16fb7a8a9d535f"
   },
   "tests/test_geraete_buendel_o2_vertiefung.py": {
@@ -905,7 +905,7 @@
    "protokoll": "c80b2773cff63a971900df4813f301ae19d6ce7da15611decd975d0fd7bc9357"
   },
   "tests/test_geraete_collect.py": {
-   "kommentare": "a34025aa9a0f096023f06690133f26e5775b2aa61bf0e27d5e8e29744c9f4588",
+   "kommentare": "537efd635b45ac3d6ec5e71eafa8b3d4cbcb0ee12846393c3d565b5f7a46bbea",
    "protokoll": "0fed6f386cb4d55bf98fc965df70fc979c1a846a3ff4c67b8ea5f721495407a0"
   },
   "tests/test_geraete_config.py": {
@@ -977,7 +977,7 @@
    "protokoll": "5f6c2ade4cb9f8ebc2283b46f87a8e254ef853a0274dc7b61160219d7bc2b240"
   },
   "tests/test_geraete_model.py": {
-   "kommentare": "b1ae865044b44944ec625c2e120e52e12a99d5dd9abab7a9d92b2ddb1f852bcb",
+   "kommentare": "199a82efadcf40fb6afd897e17f3a0d9c9bb83153be59e8290a9002160ce0323",
    "protokoll": "d6114cbb84533807634393da84d9908dd6de23beb90531c20b4827a8bd45002a"
   },
   "tests/test_geraete_o1_hauptgraph.py": {
@@ -1001,7 +1001,7 @@
    "protokoll": "27cbfaeb79d847f70c5f69e844225e3eb95acbc23a41dbb0a5c52545c2257606"
   },
   "tests/test_geraete_o4_export.py": {
-   "kommentare": "fe662ddf3dd9eb6cfb2610a1581c3969f992e57cceeafff8934d63e528b98684",
+   "kommentare": "450ee5be4426bd6d020eb518d7088dc1c941bfecabaa00b60358cc7dc4a587df",
    "protokoll": "e468ac71de874383766aeb4dbaa81081a345bd1d895f881422e37e716010b112"
   },
   "tests/test_geraete_o4_verlauf.py": {
@@ -1045,7 +1045,7 @@
    "protokoll": "4275536ad5bd4f9be0f4e1bae83057b59415eb879dc810cbec6ce776909bc6fa"
   },
   "tests/test_geraete_reiter_browser.py": {
-   "kommentare": "99bc418e091c7e677f0d90c084122b057e5cd7bf1ca327835d7b0f87d8c1e9b9",
+   "kommentare": "a78e25414c8206fe69a9178394a5dd5d70ce48efb725d49724cce905c9298429",
    "protokoll": "388bf4db8747ded61f561caddeadd20cf6624b8e74e68d388740cb899a24102a"
   },
   "tests/test_geraete_robots.py": {
@@ -1121,7 +1121,7 @@
    "protokoll": "1bebb0e665d99175dd2a252fa7d906339e814abe1b72925a5bf0855d17c8a5f9"
   },
   "tests/test_geraete_vergleich.py": {
-   "kommentare": "28318208fe30922690e3c7a7e0ac01e66ee301f7fc0f805018070131c34b46c1",
+   "kommentare": "5183a1385b8a9fb343c7fe5267bb0db817f4101eeb7fb0df1eacb4f908722ceb",
    "protokoll": "716e865a0db0c95a6ae3c75f580724d040d651828b44b7da259b3fbc53c3a2ef"
   },
   "tests/test_geraete_verlauf.py": {
@@ -1185,7 +1185,7 @@
    "protokoll": "d3376ac3cffbc0204fd568f5813f755645c6e6da2f34ffb56b6af770ffe1ac74"
   },
   "tests/test_highlight_themen.py": {
-   "kommentare": "426b5523fd86546b048a93f935fe1d851727091e8f4fe271a72beaaddafe22ff",
+   "kommentare": "e06fe85e5652738adeb2e9e71ca1c5e26fcf580c3653968a872b852c225066d8",
    "protokoll": "e29b2ce30a46b26fd55fcded14204298e928a52f56741f59e2c5d46ddd3f1f96"
   },
   "tests/test_host_drosselung.py": {
@@ -1205,7 +1205,7 @@
    "protokoll": "e82398fe7facc176f211394cfaaca69f7f74cff8849381d0c4b141a7b684814d"
   },
   "tests/test_llm_anker_und_kosten.py": {
-   "kommentare": "29ae1ca8837da8e285766f1ae10403059feb787d2fa2c0e5ee0e9f0f2a3fce44",
+   "kommentare": "56051aa8bae457f854f8e1db0a7fc3b4bb231ea82e287cefa5fba6e58711f80d",
    "protokoll": "d41dc986b21a542a439365816001c1cca922660b40be6f4c6b9b5eb900862083"
   },
   "tests/test_llm_fallback.py": {
@@ -1222,7 +1222,7 @@
   },
   "tests/test_luecken.py": {
    "kommentare": "3179db025eabc0de2af70b397cf6ce0aed3dfa59fd847403e81bf48de38fc364",
-   "protokoll": "f3bd6268bbcd38910afa3b4f45906e0df3fd77b9642b09fcda2a675fff3151cd"
+   "protokoll": "b1405548fc18555ae1c6fb8d6173f4824383c7e0858e9487623ed2b861e60aa9"
   },
   "tests/test_marke.py": {
    "kommentare": "5aef6d89257f1e5bbb0cbd50c57af9ac396f3f159b2a2b6f48ef0d82f69ab09b",
@@ -1265,7 +1265,7 @@
    "protokoll": "b31598b831b2f66eb4674121d21a67e4f7d81d473ebb22c55996cb6fc4b0f53f"
   },
   "tests/test_promo_bilder.py": {
-   "kommentare": "52bb6cb859f1c5e554c85768a06c9f3b6cc0a4e9aeee0495ae200bbacfce3169",
+   "kommentare": "570fe5f1c2e5a290eab481a57275cbab596506f657c8873422f8d329ee6a2044",
    "protokoll": "ea0b48f563541ee166b094f6539990ad715cad6867cdd6361888824ad6543c8d"
   },
   "tests/test_promo_editor.py": {
@@ -1273,7 +1273,7 @@
    "protokoll": "eef6bc3d777e8737d5dcb6ed19c749e59281b510ce30669b027252149ea3bcff"
   },
   "tests/test_promo_mehrseitig.py": {
-   "kommentare": "54c3375c3cc9702f77ae3497cf7b2d4f7d1c568d1a39d9ab3b23e3f9c858ab95",
+   "kommentare": "1c34c0817a628b29937de4aec4b502ed408228897142d8293d96fd1d064e0968",
    "protokoll": "b378c5e1eccbd3ea004f7cfecaf3cd4634f72de8d70aa461d33c8b4f99d1a8b6"
   },
   "tests/test_promo_pipeline.py": {
@@ -1289,7 +1289,7 @@
    "protokoll": "ce4694be43355488bbd2dfa30efc29f7777a59c73d4bbbe5ec8e6f67589f4ef4"
   },
   "tests/test_promo_seite.py": {
-   "kommentare": "5fae0b9f904e220cc4ead06c1b7c1137f1df38fb0961232c65fb5726dd0a667e",
+   "kommentare": "2f4b0edb0ec2da9fa27de0e2085753792ca056e88c6fbb7942d7a149ea0326c3",
    "protokoll": "d4bae44dff6a6d7d108cad6ca6afcab9f4971538b62ef504419f8594521f557d"
   },
   "tests/test_promo_snapshot.py": {
@@ -1305,11 +1305,11 @@
    "protokoll": "e6de7e46c0dae267f8d538d01a87e43fe7b0c42b25ee4a6a951bd834c6d6d58a"
   },
   "tests/test_pruefe_promo_seite.py": {
-   "kommentare": "65cd876119725e5d76d7dfc612cd5b32b84b8f95fc40af37ae49c0a0173fa2cf",
+   "kommentare": "40a9872ddb822dc28cb8aa7d4d5b36d3cea33ecd4106355a24e81824f0489de3",
    "protokoll": "0748544149fac7eeb32ccae258fc7832cdd3d5231c80f20620db1a2ac05b6058"
   },
   "tests/test_pruefe_quellenvorschlag.py": {
-   "kommentare": "faa67094b0ac14a3c6b962d32876f5f505de869a9913439edd69306514170098",
+   "kommentare": "3c1a79c66ab948ca1c1c7be28b5e62c116ea4a55d3a7beb41175d391989c9e4a",
    "protokoll": "ac1945bbb59b006b6ef3d9d321bde6d3c479c21d4a7ce8af862f8028d5bfdf5c"
   },
   "tests/test_pruefleiter.py": {
@@ -1329,11 +1329,11 @@
    "protokoll": "5da8b28693b34e77ef21cbd67d1881a317bf403ec1230672ec06bf06e988be32"
   },
   "tests/test_redaktion_zweistufig.py": {
-   "kommentare": "857f80f24b48d1d0a0254297f7d98ce46fc75cef3ed31641c9bec0d5b48dcc66",
+   "kommentare": "170f2476c0bc8f30b2f2d105c6514d3ccfc5ba1109d259fd83ce6d92dc995353",
    "protokoll": "fabba040da91b1a53d149e3f8f45e0f94bc934339dc59f4cee7cd42ca3cfdcfb"
   },
   "tests/test_search_index.py": {
-   "kommentare": "33eaa196cd89d4377d45afa22ab5097e8829f5a826d4495b2ee8cfee1724cb45",
+   "kommentare": "92b647a39784cc4402b0b0c1f5c37e23d67c7667972ada197d95dea52b508095",
    "protokoll": "1392265f21733831c64be7e34840eaa3e710b5e5097d42e237b566939989c7ce"
   },
   "tests/test_seen_store_format.py": {
@@ -1341,7 +1341,7 @@
    "protokoll": "53c487a233d8cd344918a8ac206d4182aca6814ee1d3dd55c916f55593b7f023"
   },
   "tests/test_seen_store_schutz.py": {
-   "kommentare": "f7c8de8216e050d81484e37fd13f9b1e8faa0cf05a4eeb95c5ad15a96bd1fd1e",
+   "kommentare": "d6ae1d73b0202dcadbe3ccc19b0d588a2c689c76684e861e84dd707514522019",
    "protokoll": "762a58aa8452c1fb0112321d499152209a7e379a823eec60c893a9ea78c19663"
   },
   "tests/test_seen_store_stapelschutz.py": {
@@ -1353,7 +1353,7 @@
    "protokoll": "2bbca6dc661f75b178917059fd5b986dd193957ed9d517bd379a5d252f9773eb"
   },
   "tests/test_seiten_zahlen.py": {
-   "kommentare": "2a5e940cf4a7931372f425bea9fad2583f18fc458436271a9385678c4c33ba1a",
+   "kommentare": "cc18dab01c18c31a4a77a6e290115664e1abea63b675db03b8b3f120b272067b",
    "protokoll": "b969adc8ce2b047a6dcc6862cba42a0ccbbe3d4d23d9c8a0eb5c15e755f63248"
   },
   "tests/test_signup_service.py": {
@@ -1373,7 +1373,7 @@
    "protokoll": "2d969d558769395d96765399839cb0f68a646e280c9fe705120588703e535b20"
   },
   "tests/test_tarif_bezug.py": {
-   "kommentare": "6d0b68bdcf433ee9629a17d1e51ff76fa8c1ec89c29d201105b8076db94472d9",
+   "kommentare": "0c5a95229dcdf07fe082760f97754cdeb6e8464a49d4f87d08b02eb475538b9a",
    "protokoll": "4b3edbb8203eae158481a0e9c615a3ce486be0b5902f733e8aecab089b2560c9"
   },
   "tests/test_tarif_crawler.py": {
@@ -1398,7 +1398,7 @@
   },
   "tests/test_tarif_telekom_kacheln.py": {
    "kommentare": "859547ac18985e1228b70a35de5307657206edce9ada5f6b19216b7dd19cc9f3",
-   "protokoll": "f3bd6268bbcd38910afa3b4f45906e0df3fd77b9642b09fcda2a675fff3151cd"
+   "protokoll": "00939bb6997b74424314645393b87e75634043cbb011dd0f95d26c5b3ebfa8f9"
   },
   "tests/test_tco_bindung.py": {
    "kommentare": "c23d32c8ed37756ae74c9ce93f652314ba6157921f638b884cf22f8177af6f3e",
@@ -1409,7 +1409,7 @@
    "protokoll": "0f9aa41b5307abe989fd67d111056f71fe2f0f8573574dab681419e7a3f7d989"
   },
   "tests/test_textwerkzeug.py": {
-   "kommentare": "07adc8d95d4c95c383de419cbd1e794dafe88c27339c28d7fa8c0585ea023d9b",
+   "kommentare": "8e6fb7e23a8e9b7c60bd486994215e2c9e7828c33db8e81c6a3130024c87946b",
    "protokoll": "f32984b1968a3946bf010a0f6639d8cf2bc52dd53e428c39213c09970ab5b300"
   },
   "tests/test_themenquellen.py": {
@@ -1421,11 +1421,11 @@
    "protokoll": "0678362d83e9ef7268ae9dc921104bc1571530ac3d75c6a5ad13eabda4aed344"
   },
   "tests/test_uebersetzung.py": {
-   "kommentare": "32886283c2bcddd39a6ba855684921d6160e15067b3ff8aa996e7557e754976a",
+   "kommentare": "8d1306653b0f2ba153510b64e4308034f06e02c4c6585131b393c5091f244134",
    "protokoll": "4a27dceb83312510f15025f0f2a2f54557b8fa15dcc1773db073e9b13fe1c04c"
   },
   "tests/test_uebersetzung_auswahl.py": {
-   "kommentare": "bd34b13f2b89689d593be9db42f3dbed18d42bb8bae019eda1970dc95f65ee37",
+   "kommentare": "7799911cf54787b3caf2b00809255c4f3e2a20932e871558aca14c5b91a17793",
    "protokoll": "8ac14d05ce054806857fe57aff832b1c9a1fb6265457e6962baa3d89ae139990"
   },
   "tests/test_uebersetzung_link_browser.py": {
@@ -1433,7 +1433,7 @@
    "protokoll": "b6fd09dbc7aa3d0fc1c14a99c509a4d2ba96b458333cf03484dded0b18c23572"
   },
   "tests/test_uebersetzung_seite.py": {
-   "kommentare": "b921527e635b84719f4572010813b750a68cc258471d518676e811644b1bb369",
+   "kommentare": "ad14a1a642f74d7ffa07eadf49503fa8ad7367c5f51a3f206f379b6a93633122",
    "protokoll": "496254642ed60ef10f64a07bdfc6c0497083091196e5a8fcb43267965c9a7540"
   },
   "tests/test_verlauf.py": {
@@ -1445,19 +1445,19 @@
    "protokoll": "b5b52e39b726bcb9a7542933d086f778f4864a786ad40c6c4006240ab8ebebcf"
   },
   "tests/test_volltext_feed.py": {
-   "kommentare": "e665816e74514380db3228034c80a47b7cbe1fc2883d67ced10bc73441ca8399",
-   "protokoll": "86c962f4b933179dbe0358f158f38c53838dfca9c77f67fd968a7a51d19fa075"
+   "kommentare": "edd7bbea9a9a264b3757b8edf47e4b63c9c0f32cd34fe30df06cfc8fe014d44c",
+   "protokoll": "40f57a527b52b9b7cfb901b9f095e5d71f2d51ca2b353dc39b005e6c913c1892"
   },
   "tests/test_vorsortierung.py": {
    "kommentare": "0629f85baa85448937b5e6b23bc6cb9bd44af89c71c20fc872cee54fa87fdf8f",
    "protokoll": "eaabc3b0775fa3e1c18e92a07e9046a01a8d9c232afc5f3b0239018d3e035705"
   },
   "tests/test_waechter.py": {
-   "kommentare": "3a287938aa82477f1b7a4f9993e0fdb565a83efb64da8f5dff115fb05d3af591",
+   "kommentare": "b9600f16528d71d4ae89350971276d63cafac05841fe2d6760b4702310ad0540",
    "protokoll": "1dbcd20768ac9f8c7e8c4b01bef84ceaa7123a2b2873fd495af7da4cb78ef754"
   },
   "tests/test_wettbewerb.py": {
-   "kommentare": "fb8d56312c31b4a1ea0002dd15080775ea29b2ed10cc6267a0dbde1549a4e87f",
+   "kommentare": "f2390f4d398a02038bcec61f02e6c1e1e7cd11d688f855ee0efdd3ee916e60ec",
    "protokoll": "95e43f57347b80e6726f50d07a51fff0c219999e03852e626884316033027509"
   },
   "tests/test_wettbewerbsradar.py": {
