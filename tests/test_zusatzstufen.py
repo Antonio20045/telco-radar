@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import date
+from datetime import UTC, date, datetime
 from types import SimpleNamespace
 
 import pytest
@@ -22,6 +22,7 @@ from telco_radar.report import diff_bilder
 from telco_radar.uebersetzung import stufe as uebersetzung_stufe
 
 HEUTE = date(2026, 10, 5)
+JETZT = datetime(2026, 10, 5, 9, tzinfo=UTC)
 
 
 def _takt(gefangen: list[str]) -> Takt:
@@ -122,7 +123,7 @@ def test_versandausfall_behaelt_seite_und_kosten(tmp_path, monkeypatch, _bericht
     cfg = SimpleNamespace(settings={"uebersetzung_enabled": False})
 
     ausfaelle = veroeffentlichen.nachlauf(
-        _bericht, ([], {}), cfg, tmp_path, ("m", HEUTE, 0.0), _takt(gefangen)
+        _bericht, ([], {}), cfg, tmp_path, ("m", JETZT, 0.0), _takt(gefangen)
     )
 
     assert ausfaelle == [ausfall]
@@ -159,7 +160,7 @@ def test_uebersetzung_und_aufraeumen_fallen_einzeln_aus(
     tmp_path, monkeypatch, _bericht
 ):
     monkeypatch.setattr(veroeffentlichen, "render_site", lambda *a: [])
-    monkeypatch.setattr(versand, "versende", lambda *a: {"gesendet": 0})
+    monkeypatch.setattr(versand, "versende", lambda *a, jetzt: {"gesendet": 0})
     monkeypatch.setattr(llm, "llm_available", lambda: True)
     monkeypatch.setattr(uebersetzung_stufe, "budget", lambda settings, sek: 60.0)
     monkeypatch.setattr(uebersetzung_stufe, "lauf", _wirft("uebersetzung"))
@@ -168,7 +169,7 @@ def test_uebersetzung_und_aufraeumen_fallen_einzeln_aus(
     cfg = SimpleNamespace(settings={})
 
     veroeffentlichen.nachlauf(
-        _bericht, ([], {}), cfg, tmp_path, ("m", HEUTE, 0.0), _takt(gefangen)
+        _bericht, ([], {}), cfg, tmp_path, ("m", JETZT, 0.0), _takt(gefangen)
     )
 
     assert gefangen == ["uebersetzung", "aufraeumen"]
