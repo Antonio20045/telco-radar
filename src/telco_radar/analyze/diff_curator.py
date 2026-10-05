@@ -11,7 +11,7 @@ Lösung: eine eigene, git-versionierte Gedächtnis-Schicht
 Wochen-Report-JSONs aufgehoben werden. Jede Woche prüft ein Kurator die NEUEN
 Meldungen:
   1. Vorfilter (deterministisch): dieselbe Klassifikation wie die Anzeige
-     (report/differentiation.classify) – nur echte Differenzierungs-Hebel,
+     (analyze/differenzierung_hebel.classify) – nur echte Differenzierungs-Hebel,
      keine Preis-/Netz-/B2B-Meldungen, plus eine Relevanz-Schwelle.
   2. Kurator-Agent (LLM, optional & failsafe): entscheidet je Kandidat, ob der
      Move es wert ist, dauerhaft in die Inspirations-Bibliothek aufgenommen zu
@@ -27,7 +27,7 @@ import logging
 from pathlib import Path
 
 from ..models import normalize_url
-from ..report.differentiation import classify, _THEME_BY_KEY
+from .differenzierung_hebel import classify
 from .llm import complete, extract_json
 
 log = logging.getLogger(__name__)
