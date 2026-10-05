@@ -261,9 +261,9 @@ def _urteil(lauf: Lauf, runde: int, code: int, summe: dict[str, str]) -> str:
     code, ausgabe = _abnahme(lauf)
     if code != GRUEN:
         return f"Abnahmetest rot (Exit {code})\n{_tail(ausgabe)}"
-    code, ausgabe = _leiter(lauf.wurzel, lauf.wt, "schnell")
-    if code != GRUEN:
-        return f"schnelle Leiter rot (Exit {code})\n{_tail(ausgabe)}"
+    stufen = ((a, *_leiter(lauf.wurzel, lauf.wt, a)) for a in ("schnell", "statisch"))
+    if rot := next((r for r in stufen if r[1] != GRUEN), None):
+        return f"{rot[0]}e Leiter rot (Exit {rot[1]})\n{_tail(rot[2])}"
     if befund := _pruefer(lauf, runde) or _ausserhalb(lauf, "bau"):
         return befund
     nachricht = lauf.datei(LAUFDATEIEN["TELCO_COMMIT_NACHRICHT"])

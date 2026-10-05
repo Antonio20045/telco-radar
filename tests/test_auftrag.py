@@ -60,6 +60,11 @@ if voll and os.environ.get("ERSATZ_FREMD"):
     Path("scripts/fremd.txt").write_text("von der Leiter")
 if voll and os.environ.get("ERSATZ_VOLL_ROT"):
     sys.exit(1)
+if sys.argv[1] == "--statisch" and os.environ.get("ERSATZ_STATISCH_ROT"):
+    print("src/x.py:1 [arg-type] Typfehler")
+    sys.exit(1)
+if sys.argv[1] == "--statisch":
+    sys.exit(0)
 befehl = [sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", "tests"]
 code = subprocess.run(befehl).returncode
 if code == 0 and sys.argv[1] == "--voll":
@@ -471,6 +476,18 @@ def test_rote_leiter_auf_main_setzt_main_zurueck(repo, monkeypatch):
 
     assert _git(repo, "rev-parse", "main") == vorher
     assert _git(repo, "rev-parse", "auftrag/A1") != vorher, "die Arbeit bleibt im Zweig"
+
+
+def test_typfehler_im_bau_ist_eine_rote_runde_vor_dem_merge(repo, monkeypatch):
+    vorher = _git(repo, "rev-parse", "main")
+    monkeypatch.setenv("ERSATZ_STATISCH_ROT", "1")
+
+    assert _starte(repo) == auftrag.Ende.NOTIZ
+
+    notiz = (repo / auftrag.AUFTRAEGE / "A1-notiz.md").read_text()
+    assert "statische Leiter rot (Exit 1)" in notiz
+    assert "[arg-type] Typfehler" in notiz
+    assert _git(repo, "rev-parse", "main") == vorher
 
 
 def test_hoechstens_zwei_auftraege_und_kein_gleicher_bereich(repo, capsys):
