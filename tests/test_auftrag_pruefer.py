@@ -119,3 +119,17 @@ def test_leere_befundliste_besteht(orte):
     urteil = pruefer_.urteilen(_bericht(), ordner, wt)
 
     assert urteil.befund == "" and "Verworfen:" in urteil.protokoll
+
+
+def test_reproduktion_nutzt_das_python_des_hauptbaums(orte, tmp_path):
+    wt, ordner = orte
+    haupt = tmp_path / "haupt"
+    (haupt / ".venv/bin").mkdir(parents=True)
+    (wt / ".venv/bin/python").replace(haupt / ".venv/bin/python")
+    (wt / ".venv/bin/python").write_text("#!/bin/sh\nexit 0\n")
+    (wt / ".venv/bin/python").chmod(0o755)
+    repro = f"python -m pytest {ordner}/test_rot.py::test_x"
+
+    urteil = pruefer_.urteilen(_bericht(_blocker(repro)), ordner, wt, haupt)
+
+    assert len(urteil.gezaehlt) == 1, urteil.protokoll

@@ -11,7 +11,6 @@ from __future__ import annotations
 import argparse
 import importlib
 import json
-import os
 import re
 import shlex
 import subprocess
@@ -30,6 +29,7 @@ format_ = importlib.import_module("auftrag_format")
 pruefer_ = importlib.import_module("auftrag_pruefer")
 rolle_ = importlib.import_module("claude_rolle")
 git_ = importlib.import_module("auftrag_git")
+prozess_ = importlib.import_module("auftrag_prozess")
 mutation_ = importlib.import_module("mutation")
 AUFTRAEGE, KOSTEN, GEMERGT = format_.AUFTRAEGE, format_.KOSTEN, format_.GEMERGT
 
@@ -139,16 +139,7 @@ def _tail(text: str) -> str:
 def _prozess(
     befehl: list[str], ort: Path, eingabe: str | None = None, **extra: str
 ) -> subprocess.CompletedProcess[str]:
-    umgebung = {k: v for k, v in os.environ.items() if not k.startswith("GIT_")}
-    return subprocess.run(
-        befehl,
-        cwd=ort,
-        env=umgebung | extra,
-        input=eingabe,
-        capture_output=True,
-        text=True,
-        check=False,
-    )
+    return prozess_.starten(befehl, ort, eingabe, prozess_.ohne_git(extra))
 
 
 def _ausfuehren(befehl: list[str], ort: Path) -> tuple[int, str]:
@@ -213,7 +204,7 @@ def _pruefer(lauf: Lauf, runde: int) -> str:
     code, bericht = _agent(lauf, "pruefer", runde, "", TELCO_PRUEFER_ORDNER=str(ordner))
     if git_.stand(lauf.wt, lauf.start) != vorher:
         return "Prüfer hat den Worktree geändert"
-    urteil = pruefer_.urteilen(bericht, ordner, lauf.wt)
+    urteil = pruefer_.urteilen(bericht, ordner, lauf.wt, lauf.wurzel)
     lauf.datei(f"pruefer-{runde}-urteil.txt").write_text(urteil.protokoll, "utf-8")
     return f"Prüfer Exit {code}" if code else urteil.befund
 
@@ -248,11 +239,12 @@ def _testphase(lauf: Lauf) -> str:
 
 
 def _commit(lauf: Lauf, titel: str, dateien: list[str]) -> str:
-    return _tail(git_.genau_committen(lauf.wt, titel, dateien))
+    return _tail(git_.genau_committen(lauf.wt, titel, git_.blobs(lauf.wt, dateien)))
 
 
 def _urteil(lauf: Lauf, runde: int, code: int, summe: dict[str, str]) -> str:
     alt, neu = git_.geaendert(lauf.wt, lauf.start)
+    geprueft = git_.blobs(lauf.wt, [*alt, *neu])
     zeilen = git_.produktzeilen(lauf.wt, lauf.start)
     if code:
         return f"Agent Exit {code}"
@@ -276,7 +268,11 @@ def _urteil(lauf: Lauf, runde: int, code: int, summe: dict[str, str]) -> str:
     titel = titel or f"auftrag({lauf.auftrag['id']}): {lauf.auftrag['ziel']}"
     if rot.is_file():
         titel += f"\n\nAbnahmetest vor dem Bau rot:\n{rot.read_text('utf-8')}"
-    return _commit(lauf, titel, [*alt, *neu])
+    if anders := [
+        p for p, b in git_.blobs(lauf.wt, alt + neu).items() if b != geprueft[p]
+    ]:
+        return f"während der Prüfung geändert: {', '.join(anders)}"
+    return _tail(git_.genau_committen(lauf.wt, titel, geprueft))
 
 
 def _bauphase(lauf: Lauf) -> tuple[Ende, list[str]]:
