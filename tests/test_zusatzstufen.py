@@ -15,9 +15,11 @@ from telco_radar import (
     versand,
     zusatzstufen,
 )
-from telco_radar.analyze import category_sweep, llm
+from telco_radar.analyze import category_sweep, differentiation_editor, llm
 from telco_radar.analyze.takt import Takt
+from telco_radar.report import bilder as report_bilder
 from telco_radar.report import diff_bilder
+from telco_radar.uebersetzung import stufe as uebersetzung_stufe
 
 HEUTE = date(2026, 10, 5)
 
@@ -128,3 +130,48 @@ def test_versandausfall_behaelt_seite_und_kosten(tmp_path, monkeypatch, _bericht
     geschrieben = json.loads(_bericht.json_path.read_text(encoding="utf-8"))
     assert "kosten" in geschrieben["run"]
     assert "versand" not in geschrieben["run"]
+
+
+def test_diff_bericht_faellt_auf_regelbericht_zurueck(tmp_path, monkeypatch):
+    monkeypatch.setattr(category_sweep, "run_sweep", lambda *a: None)
+    monkeypatch.setattr(diff_bilder, "beschaffe", lambda *a: {})
+    eintrag = {"id": "move-1"}
+    monkeypatch.setattr(
+        zusatzstufen, "DiffDB", lambda pfad: SimpleNamespace(entries={"a": eintrag})
+    )
+    monkeypatch.setattr(differentiation_editor, "synthesize", _wirft("synthese"))
+    monkeypatch.setattr(
+        differentiation_editor, "build_digest", lambda e, t: f"Regel {len(e)}"
+    )
+    gefangen: list[str] = []
+    cfg = SimpleNamespace(settings={"promo_enabled": False})
+
+    zusatzstufen.ausfuehren(
+        cfg, tmp_path, HEUTE, ("e", "m", "Deutsch"), True, lambda: None, _takt(gefangen)
+    )
+
+    assert gefangen == ["synthese"]
+    bericht = tmp_path / "data" / "reports" / "differenzierung" / "2026-10-05.md"
+    assert bericht.read_text(encoding="utf-8") == "Regel 1"
+
+
+def test_uebersetzung_und_aufraeumen_fallen_einzeln_aus(
+    tmp_path, monkeypatch, _bericht
+):
+    monkeypatch.setattr(veroeffentlichen, "render_site", lambda *a: [])
+    monkeypatch.setattr(versand, "versende", lambda *a: {"gesendet": 0})
+    monkeypatch.setattr(llm, "llm_available", lambda: True)
+    monkeypatch.setattr(uebersetzung_stufe, "budget", lambda settings, sek: 60.0)
+    monkeypatch.setattr(uebersetzung_stufe, "lauf", _wirft("uebersetzung"))
+    monkeypatch.setattr(report_bilder, "raeume_auf", _wirft("aufraeumen"))
+    gefangen: list[str] = []
+    cfg = SimpleNamespace(settings={})
+
+    veroeffentlichen.nachlauf(
+        _bericht, ([], {}), cfg, tmp_path, ("m", HEUTE, 0.0), _takt(gefangen)
+    )
+
+    assert gefangen == ["uebersetzung", "aufraeumen"]
+    geschrieben = json.loads(_bericht.json_path.read_text(encoding="utf-8"))
+    assert "uebersetzung" not in geschrieben["run"]
+    assert geschrieben["run"]["versand"] == {"gesendet": 0}
