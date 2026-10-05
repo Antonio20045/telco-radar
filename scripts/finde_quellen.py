@@ -80,6 +80,8 @@ from telco_radar.models import normalize_url  # noqa: E402
 # braucht, wird auch im Lauf zum Problem. Ein Timeout kostet hier das
 # Sechsfache eines Treffers (zwei User-Agents x drei Versuche).
 HTTP_CFG = {"timeout_seconds": 8}
+DROSSEL_PARALLEL_JE_HOST = 4
+DROSSEL_PAUSE_SEKUNDEN = 0.15
 
 # Pfade, die in dieser Branche ueberdurchschnittlich oft ein Feed sind.
 # Reihenfolge = Trefferwahrscheinlichkeit; die Liste bleibt bewusst kurz,
@@ -384,9 +386,7 @@ def main(argv: list[str] | None = None) -> int:
     args = p.parse_args(argv)
 
     root = args.root.resolve()
-    # Ohne Drosselung schlagen bei 16 gleichzeitigen Zielen mal eben 200
-    # Verbindungen gleichzeitig los - und mehrere davon auf denselben Server.
-    configure_throttle(4, 0.15)
+    configure_throttle(DROSSEL_PARALLEL_JE_HOST, DROSSEL_PAUSE_SEKUNDEN)
 
     ziele: list[dict] = []
     if args.ziele:

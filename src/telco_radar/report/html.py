@@ -383,13 +383,10 @@ def _flatten(report: dict) -> list[dict]:
             # beide danach; die Zuordnung darf nur an EINER Stelle stehen.
             h["ressort"] = _ressort(h)
             h["ressort_label"] = _RESSORT_LABEL[h["ressort"]]
-            # Die CTM-Linse. Berichte von vor dem 08.08.2026 tragen das Feld
-            # nicht; fuer sie gilt 1 ("Kontext"), damit eine Archivwoche ihre
-            # Reihenfolge behaelt, statt komplett auf 0 zu fallen.
             try:
                 h["ctm_bezug"] = int(h.get("ctm_bezug"))
             except (TypeError, ValueError):
-                h["ctm_bezug"] = 1
+                h["ctm_bezug"] = _CTM_BEZUG_ALTBERICHT
             h.setdefault("ctm_label", ctm.STUFEN_LABEL.get(h["ctm_bezug"], ""))
             out.append(h)
     # Sortiert wird mit demselben Schluessel wie die Titelseite
@@ -584,6 +581,8 @@ def _kennwoerter(name: str) -> frozenset[str]:
 
 # Wie oft ein Absender oberhalb der Falz vorkommen darf.
 _MAX_JE_ABSENDER = 2
+_CTM_BEZUG_ALTBERICHT = 1
+_KUERZEN_MIND_ANTEIL = 0.6
 
 # Zeilen der Digest-Spalte "Was wichtig ist". Steht als Konstante da, weil
 # die Spalte in ZWEI Schritten gefuellt wird (erst die Meldungen der Stufe
@@ -1162,7 +1161,7 @@ def _first_sentence(text, limit=170):
         return t
     schnitt = t[:limit].rstrip()
     leer = schnitt.rfind(" ")
-    if leer > limit * 0.6:  # sonst waere die Zeile unbrauchbar kurz
+    if leer > limit * _KUERZEN_MIND_ANTEIL:
         schnitt = schnitt[:leer]
     return schnitt.rstrip(" ,;:\u2013-") + "\u2026"
 

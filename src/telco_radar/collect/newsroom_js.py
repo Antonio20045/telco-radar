@@ -23,6 +23,7 @@ from .http import BROWSER_UA
 log = logging.getLogger(__name__)
 
 _BLOCK_TYPES = {"image", "media", "font"}
+NACHLADEZEIT_MS = 9000  # feste Wartezeit fuer clientseitig nachgeladene Artikellisten
 # Stylesheets are deliberately NOT blocked: several operator sites (e.g.
 # Zain) gate their article list's data-fill on CSS-driven visibility
 # (an IntersectionObserver-style lazy load that never fires for elements
@@ -104,7 +105,7 @@ def render_html(url: str, timeout_s: float, ua: str) -> str:
             # and returned near-empty cards. We deliberately do NOT wait for
             # networkidle - many telco pages keep long-poll/analytics
             # connections open and would burn the whole timeout budget.
-            page.wait_for_timeout(9000)
+            page.wait_for_timeout(NACHLADEZEIT_MS)
             return page.content()
         finally:
             browser.close()

@@ -36,6 +36,10 @@ _IST_PLATZHALTER = re.compile(
 # weltweite Fachpresse, denn genau das sind sie aus Lesersicht: Meldungen,
 # die nicht zu einem Markt gehoeren.
 _THEMENFELD_REGION = "global"
+GEWICHT_JE_CTM_STUFE = 10
+PROMO_SCORE_TEILER = 3
+PROMO_REGION = "europa"
+PROMO_RESSORT = "tarife"
 _BEKANNTE_REGIONEN = {
     "europa",
     "nordamerika",
@@ -99,7 +103,7 @@ def aus_bericht(bericht: dict, *, bericht_url: str = "") -> list[Eintrag]:
                     # Dieselbe Achse wie auf der Startseite: die CTM-Stufe VOR
                     # der Prioritaet. Eine Rangfolge, die in der Mail anders
                     # ausfaellt als auf der Seite, ist eine zweite Wahrheit.
-                    gewicht=ctm * 10 + relevanz,
+                    gewicht=ctm * GEWICHT_JE_CTM_STUFE + relevanz,
                     datum=h.get("date") or datum,
                     anker=f"{bericht_url}#{slug(region_label)}" if bericht_url else "",
                 )
@@ -137,16 +141,16 @@ def aus_promo(
                 # Die Promo-Uebersicht ist Deutschland. Eine Aktion ohne Region
                 # waere fuer jeden Regionsfilter unsichtbar - und damit fuer
                 # jeden, der Europa gewaehlt hat.
-                region="europa",
+                region=PROMO_REGION,
                 # Aktionen sind Tarif-/Angebotsmeldungen. Dasselbe Ressort, das
                 # eine Tarifmeldung auf meldungen.html bekaeme.
-                ressort="tarife",
+                ressort=PROMO_RESSORT,
                 betreiber=marke,
                 # Der Score der Promo-Bewertung reicht von 0 bis 100, das Gewicht
                 # der Meldungen von 0 bis 35. Geteilt durch drei stehen beide auf
                 # einer Skala - eine starke Aktion konkurriert dann mit einer
                 # starken Meldung, statt sie zu verdraengen.
-                gewicht=score // 3,
+                gewicht=score // PROMO_SCORE_TEILER,
                 datum=e.get("last_verified") or e.get("first_seen") or "",
                 anker=anker.get(marke, ""),
             )

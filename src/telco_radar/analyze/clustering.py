@@ -109,6 +109,7 @@ SELTENHEITS_OBERGRENZE = 40
 # Verdacht, dass ein zu allgemeiner Akteur ("Nvidia", "KI") gerade alles
 # einsammelt.
 MAX_MITGLIEDER = 8
+PRUEF_MAX_TOKENS = 16000
 
 _WORT = re.compile(r"[a-z0-9äöüß]+")
 
@@ -718,10 +719,8 @@ def _frage_modell(a: Item, b: Item, model: str) -> bool:
         },
         ensure_ascii=False,
     )
-    # 8000 ist die Untergrenze, die sich bewaehrt hat: ein kleineres Budget
-    # sieht wie eine tote Quelle aus, weil ein denkendes Modell damit fertig
-    # ist, bevor die Antwort anfaengt (Laeufe #83-85).
-    roh = complete(_PRUEF_SYSTEM, user, model=model, max_tokens=16000)
+    # Denkspur plus Antwort (Laeufe #83-85), siehe Protokoll.
+    roh = complete(_PRUEF_SYSTEM, user, model=model, max_tokens=PRUEF_MAX_TOKENS)
     return bool(extract_json(roh).get("gleich"))
 
 

@@ -343,6 +343,7 @@ def ohne_vodafone_teil(note: str) -> str:
 # Einstellige Zahlen bleiben aussen vor: "5G", "die ersten drei" und
 # Aufzaehlungen sind keine Behauptung ueber die Quelle.
 _ZAHL_IM_SATZ = re.compile(r"\d+(?:[.,]\d+)*")
+MIND_ZIFFERN_BELEGPFLICHT = 2
 
 
 def ungedeckte_zahl(satz: str, quelle: str) -> str | None:
@@ -353,7 +354,7 @@ def ungedeckte_zahl(satz: str, quelle: str) -> str | None:
     }
     for roh in _ZAHL_IM_SATZ.findall(satz or ""):
         normal = roh.replace(".", "").replace(",", ".")
-        if len(normal.replace(".", "")) <= 1:
+        if len(normal.replace(".", "")) < MIND_ZIFFERN_BELEGPFLICHT:
             continue
         # "35 Euro" deckt "34,95 Euro" nicht ab, aber "5G" deckt "5G" ab -
         # verglichen wird der reine Zahlenwert, gerundete Naeherungen zaehlen

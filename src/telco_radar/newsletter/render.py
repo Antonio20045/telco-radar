@@ -47,6 +47,7 @@ BREITE = 600
 # wie ein Fehler - und er waere kein Teilstring des Quelltextes mehr, der
 # Treue-Test wuerde ihn zu Recht nicht wiederfinden.
 MAX_SAETZE = 2
+BETREFF_MAX_ZEICHEN = 78
 
 
 @dataclass
@@ -268,7 +269,7 @@ def betreff(datum_de: str, treffer: list[Treffer], chrome: dict) -> str:
     kopf = f"{marke}, {datum_de}: "
     # Ein Betreff ueber rund 78 Zeichen wird in jeder Liste abgeschnitten -
     # und zwar mitten im Wort, wenn man es nicht selbst tut.
-    platz = 78 - len(kopf) - len(zusatz)
+    platz = BETREFF_MAX_ZEICHEN - len(kopf) - len(zusatz)
     if len(erste) > platz > 20:
         erste = erste[:platz].rsplit(" ", 1)[0]
     return f"{kopf}{erste}{zusatz}"

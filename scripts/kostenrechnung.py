@@ -50,6 +50,7 @@ ANALYST_SYSTEM_TOKEN = 1200  # ANALYST_SYSTEM/TECH_ANALYST_SYSTEM (mit TEXTFELD)
 ANALYST_JE_MELDUNG_TOKEN = 260
 ANALYST_AUSGABE_JE_HIGHLIGHT = 190
 BATCH_SIZE = 15
+ZIEL_BEREICHE = 16
 
 
 def _neuester_lauf(root: Path) -> dict:
@@ -151,7 +152,7 @@ def main(argv: list[str] | None = None) -> int:
     # Mehr Quellen heissen nicht mehr Regionen, aber mehr Themenfelder. Zwei
     # neue Kategorien sind in dieser Session dazugekommen; 16 Bereiche sind
     # eine vorsichtige Annahme.
-    ziel_bereiche = 16
+    ziel_bereiche = ZIEL_BEREICHE
     ziel_einstufig = rechne(
         args.quellen, ziel_neu, ziel_bewertet, ziel_bereiche, zweistufig=False
     )

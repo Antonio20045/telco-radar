@@ -141,6 +141,7 @@ DEFAULT_CALL_BUDGET = 300.0
 # So: retry the cheap failures generously, the slow ones barely at all.
 MAX_SLOW_FAILURES = 2
 CHEAP_BACKOFF_SECONDS = (1, 2, 3, 5, 5, 8, 8, 10)
+LANGSAM_AB_ANTEIL_TIMEOUT = 0.5
 
 # model -> stand-in, consulted only after the preferred model failed hard.
 _FALLBACKS: dict[str, str] = {}
@@ -516,10 +517,8 @@ def _post_with_retries(url, payload, headers, retries, parse):
         except (httpx.HTTPError, json.JSONDecodeError, KeyError, IndexError) as exc:
             last_err = exc
             elapsed = time.monotonic() - started
-            # A failure that came back fast is a capacity signal, not a broken
-            # request: ask again. One that ate the whole HTTP timeout is not
-            # worth repeating more than a couple of times.
-            if elapsed >= http_timeout() * 0.5:
+            # Schnell zurueck = Kapazitaetssignal, nochmal fragen.
+            if elapsed >= http_timeout() * LANGSAM_AB_ANTEIL_TIMEOUT:
                 slow_failures += 1
                 if slow_failures >= max(1, min(retries, MAX_SLOW_FAILURES)):
                     raise RuntimeError(

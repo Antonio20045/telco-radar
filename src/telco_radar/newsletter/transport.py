@@ -39,6 +39,7 @@ log = logging.getLogger(__name__)
 
 BREVO_API = "https://api.brevo.com/v3/smtp/email"
 BREVO_EVENTS = "https://api.brevo.com/v3/smtp/statistics/events"
+WARTEZEIT_MAX_SEKUNDEN = 16
 
 
 @dataclass
@@ -127,7 +128,7 @@ class BrevoTransport(Transport):
                 # Rueckwaerts wachsende Wartezeit. Bei 429 ist die Gegenseite
                 # ueberlastet oder das Kontingent erschoepft - schnelles
                 # Nachfassen macht beides schlimmer.
-                time.sleep(min(2**versuch, 16))
+                time.sleep(min(2**versuch, WARTEZEIT_MAX_SEKUNDEN))
         return letzte
 
     def _einmal(self, nachricht: Nachricht, an: str) -> Ergebnis:

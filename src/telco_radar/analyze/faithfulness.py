@@ -38,6 +38,7 @@ from .llm import complete, extract_json
 log = logging.getLogger(__name__)
 
 STAPEL = 10  # Saetze je Pruefaufruf
+PRUEF_MAX_TOKENS = 16000
 
 _SICHERHEIT = ("sehr wahrscheinlich", "wahrscheinlich", "möglich")
 
@@ -164,7 +165,7 @@ def pruefe(highlights: list[dict], *, model: str, use_llm: bool) -> dict:
             # 8000 ist die Untergrenze, die sich bewaehrt hat (Laeufe #83-85):
             # ein denkendes Modell ist mit einem kleineren Budget fertig,
             # bevor die Antwort anfaengt, und liefert einen leeren String.
-            roh = complete(_SYSTEM, nutzlast, model=model, max_tokens=16000)
+            roh = complete(_SYSTEM, nutzlast, model=model, max_tokens=PRUEF_MAX_TOKENS)
             urteile = {
                 int(u.get("id", -1)): u
                 for u in (extract_json(roh).get("urteile") or [])

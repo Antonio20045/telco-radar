@@ -103,6 +103,7 @@ FARBSPANNE_UNMOEGLICH = 1.00
 
 # Abweichung vom Median, ab der ein Preis als Ausreisser gilt.
 AUSREISSER_ANTEIL = 0.60
+MIN_ANGEBOTE_FUER_MEDIAN = 3
 
 # DIESELBE Sichtbarkeitsmenge wie Vergleich, Katalog und Preisgrafik. Sie
 # stand hier bis zum 30.08.2026 auf ("aktiv", "beobachtet") - und
@@ -373,9 +374,8 @@ def _ausreisser(eintraege: list, katalog) -> tuple[set, list]:
 
     raus, befunde = set(), []
     for _gruppenschluessel, gruppe in gruppen.items():
-        # Unter drei Angeboten ist der Median kein Median, sondern einer der
-        # beiden Werte - und jede Abweichung waere per Definition gross.
-        if len(gruppe) < 3:
+        # Unter drei Angeboten ist der Median keiner (siehe Protokoll).
+        if len(gruppe) < MIN_ANGEBOTE_FUER_MEDIAN:
             continue
         mitte = median([_preis(e) for e in gruppe])
         if not mitte:

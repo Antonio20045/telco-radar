@@ -49,6 +49,7 @@ from ..tco_model import phasensumme as _phasensumme
 
 # Der gemeinsame Nenner jedes Vergleichs. Siehe Modul-Docstring.
 VERGLEICHSMONATE = 24
+DROSSEL_UNBRAUCHBAR_KBIT = 1000
 
 
 @dataclass
@@ -104,7 +105,7 @@ def _flags(tarif: Tarif) -> list[Qualitaetsflag]:
         # Unter 1 MBit/s ist die Verbindung fuer die meisten Anwendungen
         # unbrauchbar - das ist der Unterschied zwischen "langsamer" und
         # "vorbei", und er gehoert neben den Preis.
-        hart = tarif.drossel_down < 1000
+        hart = tarif.drossel_down < DROSSEL_UNBRAUCHBAR_KBIT
         wert = (
             f"{tarif.drossel_down / 1000:g} MBit/s"
             if tarif.drossel_down >= 1000

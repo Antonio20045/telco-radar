@@ -48,6 +48,7 @@ log = logging.getLogger(__name__)
 
 _MAX_BYTES = 6_000_000  # Rohdaten; verkleinert wird danach
 _TIMEOUT = 10.0
+_MIND_BYTES_BILD = 2_000
 _UA = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/126.0 Safari/537.36"
@@ -98,9 +99,7 @@ _OG_RE = (
 # "share-image" und "default-image" standen bis zum 06.08.2026 mit in dieser
 # Liste. Das war ein Denkfehler: `og:image` IST per Definition das
 # Share-Bild, und mehrere Redaktionssysteme benennen die Datei genau so.
-# Seit die Groesse gemessen wird, braucht es diesen Verdacht auch nicht mehr
-# - ein 1200x630-Bild ist ein Artikelbild, egal wie die Datei heisst, und
-# ein 60x60-Logo faellt ohnehin durch `_MIND_BREITE`.
+# Seit die Groesse gemessen wird, braucht es diesen Verdacht nicht mehr.
 _MUELL = re.compile(
     r"(logo|sprite|favicon|/icons?[-_/.]|placeholder|avatar|1x1|"
     r"pixel|spacer|blank)",
@@ -147,7 +146,7 @@ def _hol(bild_url: str, client: httpx.Client) -> bytes:
         typ = r.headers.get("content-type", "").split(";")[0].strip().lower()
         if typ not in _ERLAUBTE_TYPEN or len(r.content) > _MAX_BYTES:
             return b""
-        if len(r.content) < 2_000:  # Zaehlpixel oder kaputter Platzhalter
+        if len(r.content) < _MIND_BYTES_BILD:  # Zaehlpixel oder kaputter Platzhalter
             return b""
         return r.content
     except (httpx.HTTPError, OSError) as exc:

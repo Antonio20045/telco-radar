@@ -55,6 +55,7 @@ TTL_BESTAETIGUNG = 72 * 3600
 # kein Mensch ein Formular aus) und hoechstens zwei Stunden.
 NONCE_MIN = 2
 NONCE_MAX = 2 * 3600
+ZUKUNFT_TOLERANZ_SEKUNDEN = 60
 
 
 class TokenFehler(Exception):
@@ -123,7 +124,7 @@ def lies(
     # Eine Nutzlast aus der Zukunft ist entweder eine verstellte Uhr oder ein
     # Versuch, den Ablauf auszuhebeln. Eine Minute Toleranz fuer den ersten
     # Fall, mehr nicht.
-    if alter < -60:
+    if alter < -ZUKUNFT_TOLERANZ_SEKUNDEN:
         raise TokenFehler("Zukunft")
     if alter < min_alter:
         raise TokenFehler("zu frisch")

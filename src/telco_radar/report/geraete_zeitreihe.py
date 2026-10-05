@@ -102,6 +102,9 @@ BREIT_W, BREIT_MIN_H = 1136, 420
 # Vodafone mit Chip) braucht Platz unter dem Plot; bei 340 ragte sie in
 # den Boden. Gemessen am echten Bestand (5 Anbieter).
 SCHMAL_W, SCHMAL_MIN_H = 358, 380
+KOPF_FREIRAUM_BREIT, KOPF_FREIRAUM_SCHMAL = 18, 10
+MASSSTAB_FREIRAUM_ANTEIL = 0.12
+TREFFERFLAECHE_RADIUS = 12
 
 # Hoechstens so viele Kacheln als Schnelleingang (§3.2: „4–6 häufigste
 # Geräte"); die Zahl ist eine Obergrenze, kein Soll.
@@ -1762,16 +1765,13 @@ def _svg(
     w = BREIT_W if breit else SCHMAL_W
     min_h = BREIT_MIN_H if breit else SCHMAL_MIN_H
     h = max(min_h, round(w * 0.42))
-    # P4b (Re-Check 18.09.2026): der Kopffreiraum des SCHMALEN Bildes stand
-    # auf 18 wie der des breiten - auf dem Telefon kosteten ihn genau die
-    # Pixel, um die der erste Kurvenpunkt unter der 844-er-Falz lag (CSS
-    # allein brachte den SVG-Top auf 820, der Punkt sass bei 853). 10 statt
-    # 18 Einheiten: der hoechste Achsen-Wert steht bei y+4 Basislinie und
-    # braucht rund 11 Einheiten, der hoechste Wert-Label des Punktes liegt
-    # ~22 Einheiten ueber dem Punkt und bleibt innerhalb der Flaeche - der
-    # 12-Prozent-Massstabs-Freiraum (y1) bleibt unangetastet. Breit
-    # unveraendert: dort traegt das Bild die Erst-Wert-Labels selbst.
-    links, rechts, oben, unten = 58, (158 if breit else 96), (18 if breit else 10), 46
+    # P4b: schmal 10 statt 18 Kopffreiraum (Wissen: outputs/kommentarwissen).
+    links, rechts, oben, unten = (
+        58,
+        (158 if breit else 96),
+        (KOPF_FREIRAUM_BREIT if breit else KOPF_FREIRAUM_SCHMAL),
+        46,
+    )
     pw, ph = w - links - rechts, h - oben - unten
 
     def x_v(iso: str) -> float:
@@ -1787,8 +1787,8 @@ def _svg(
     werte = [p for serie in anbieter_serien.values() for _d, p in serie]
     ymin, ymax = min(werte), max(werte)
     spanne = (ymax - ymin) or max(ymax * 0.05, 1.0)
-    y0 = max(0.0, ymin - spanne * 0.12)
-    y1 = ymax + spanne * 0.12
+    y0 = max(0.0, ymin - spanne * MASSSTAB_FREIRAUM_ANTEIL)
+    y1 = ymax + spanne * MASSSTAB_FREIRAUM_ANTEIL
 
     def y_v(wert: float) -> float:
         return oben + (1 - (wert - y0) / (y1 - y0)) * ph
@@ -1935,7 +1935,7 @@ def _svg(
             einmal = " · erstmals gemessen" if einzeln else ""
             teile.append(
                 f"<circle class='gr-zr-hit' cx='{x:.1f}' "
-                f"cy='{y:.1f}' r='12' fill='transparent'"
+                f"cy='{y:.1f}' r='{TREFFERFLAECHE_RADIUS}' fill='transparent'"
                 f"{daten}><title>{_esc(a)} · {_tag_monat(d)} · "
                 f"{_euro0(wert)}{einmal}</title>"
                 f"</circle>"

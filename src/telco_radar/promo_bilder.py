@@ -84,6 +84,7 @@ BREITE = 1280
 # Aktionsseite hat genug Kandidaten, und die schmalen sind hier fast immer
 # Geraete-Freisteller oder Zahlungsart-Icons.
 MIND_BREITE = 500
+KANDIDATEN_JE_ANGEBOT = 3
 
 # Wortkram fuer die Textstufe.
 _WORT_RE = re.compile(r"[A-Za-zÄÖÜäöüß0-9]{3,}")
@@ -374,11 +375,10 @@ def zuordnen(
         src = kand.get("src") or ""
         if not src or src in vergeben:
             continue
-        # Bis zu drei Kandidaten je Angebot: der erste kann beim Abruf
-        # durchfallen (zu klein, 403, kaputt), und ein zweiter Versuch ist
-        # billiger als eine leere Kachel.
+        # Der erste Kandidat kann beim Abruf durchfallen (zu klein, 403,
+        # kaputt); ein zweiter Versuch ist billiger als eine leere Kachel.
         eintrag = ergebnis.setdefault(eid, {"quellen": [], "art": "angebot"})
-        if len(eintrag["quellen"]) >= 3:
+        if len(eintrag["quellen"]) >= KANDIDATEN_JE_ANGEBOT:
             continue
         eintrag["quellen"].append(src)
         vergeben.add(src)

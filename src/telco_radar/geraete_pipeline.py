@@ -67,6 +67,7 @@ log = logging.getLogger(__name__)
 # haelt beide Werte des Workflows daran). Zehn Sekunden je Abruf.
 FRIST_STANDARD = 900.0
 FRIST_TAGESLAUF = 1500.0
+UNBEKANNTE_TITEL_MAX = 40
 
 
 def _hole_fabrik(http_cfg: dict) -> Callable:
@@ -840,9 +841,7 @@ def run_geraete_stage(
         "gealtert": gealtert_gesamt,
         "preispunkte": punkte,
         "bestand": len(db.eintraege()),
-        # Die Liste ist gedeckelt, die ZAHL ist es nicht - sonst meldet ein
-        # Lauf mit 300 unerkannten Titeln genau 40 davon und sieht harmlos aus.
-        "unbekannte_titel": ergebnis["unbekannte_titel"][:40],
+        "unbekannte_titel": ergebnis["unbekannte_titel"][:UNBEKANNTE_TITEL_MAX],
         "unbekannte_titel_gesamt": len(ergebnis["unbekannte_titel"]),
         "unbekannte_farben": sorted(
             {f for b in ergebnis["anbieter"] for f in b.unbekannte_farben}

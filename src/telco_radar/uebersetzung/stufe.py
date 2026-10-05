@@ -36,6 +36,7 @@ log = logging.getLogger(__name__)
 # Unter so viel Restzeit faengt die Stufe gar nicht erst an. Ein einzelner
 # Artikel braucht einen Abruf plus ein bis drei Modellaufrufe.
 MINDESTBUDGET = 60.0
+DECKEL_VORGABE = 60
 
 
 def budget(settings: dict, verstrichen: float) -> float | None:
@@ -162,7 +163,7 @@ def lauf(
     # je Lauf. Der Deckel schneidet weiterhin nach Berichtsrang, die
     # wichtigsten zuerst - er wird nicht mitgezogen, weil "mehr Kandidaten"
     # nicht "jeder bekommt eine Uebersetzung" heissen muss.
-    deckel = int(settings.get("uebersetzung_max_je_lauf", 60))
+    deckel = int(settings.get("uebersetzung_max_je_lauf", DECKEL_VORGABE))
 
     bilanz = {
         "geprueft": 0,
