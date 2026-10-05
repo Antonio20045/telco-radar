@@ -129,7 +129,7 @@
   "UP017": 4
  },
  "scripts/validate_sources.py": {
-  "F401": 2
+  "F401": 1
  },
  "service/__init__.py": {
   "D104": 1
@@ -161,7 +161,6 @@
  },
  "src/telco_radar/analyze/category_sweep.py": {
   "D103": 1,
-  "DTZ011": 1,
   "E501": 4
  },
  "src/telco_radar/analyze/clustering.py": {
@@ -202,7 +201,6 @@
  "src/telco_radar/analyze/geraete_lifecycle.py": {
   "C901": 1,
   "DTZ007": 1,
-  "DTZ011": 2,
   "UP045": 16
  },
  "src/telco_radar/analyze/geraete_store.py": {
@@ -256,21 +254,18 @@
  "src/telco_radar/collect/aenderungen.py": {
   "D101": 1,
   "D102": 5,
-  "D103": 1,
-  "UP017": 1
+  "D103": 1
  },
  "src/telco_radar/collect/ct_log.py": {
-  "D102": 5,
-  "UP017": 1
+  "D102": 5
  },
  "src/telco_radar/collect/geraete/__init__.py": {
   "C901": 1,
   "E501": 1,
   "E741": 3,
   "SIM102": 2,
-  "UP017": 3,
   "UP035": 1,
-  "UP045": 9
+  "UP045": 6
  },
  "src/telco_radar/collect/geraete/autoerkennung.py": {
   "SIM905": 1,
@@ -297,9 +292,8 @@
   "D102": 3,
   "D103": 1,
   "SIM105": 1,
-  "UP017": 1,
   "UP035": 1,
-  "UP045": 6
+  "UP045": 5
  },
  "src/telco_radar/collect/geraete/strukturdaten.py": {
   "D103": 1,
@@ -329,14 +323,13 @@
   "D101": 3,
   "D102": 6,
   "D103": 1,
-  "I001": 1,
-  "UP017": 1
+  "I001": 1
  },
  "src/telco_radar/collect/newsroom.py": {
   "C901": 1,
   "D103": 1,
   "SIM103": 1,
-  "UP017": 7
+  "UP017": 6
  },
  "src/telco_radar/collect/newsroom_js.py": {
   "D103": 1,
@@ -355,8 +348,7 @@
   "D101": 2,
   "D102": 5,
   "D103": 1,
-  "I001": 1,
-  "UP017": 1
+  "I001": 1
  },
  "src/telco_radar/collect/tarif_einsundeins_simonly.py": {
   "UP035": 1,
@@ -388,8 +380,7 @@
  "src/telco_radar/dedupe.py": {
   "D102": 5,
   "SIM105": 1,
-  "UP015": 2,
-  "UP017": 1
+  "UP015": 2
  },
  "src/telco_radar/geraete_config.py": {
   "D101": 2,
@@ -411,16 +402,16 @@
  "src/telco_radar/geraete_pipeline.py": {
   "C901": 1,
   "I001": 1,
-  "UP017": 2,
+  "UP017": 1,
   "UP035": 1,
   "UP045": 7
  },
  "src/telco_radar/models.py": {
   "D102": 3,
   "I001": 1,
-  "UP017": 2,
+  "UP017": 1,
   "UP037": 1,
-  "UP045": 4
+  "UP045": 3
  },
  "src/telco_radar/newsletter/config.py": {
   "D101": 2,
@@ -429,7 +420,6 @@
  "src/telco_radar/newsletter/filters.py": {
   "D101": 1,
   "D102": 5,
-  "DTZ011": 2,
   "F401": 1
  },
  "src/telco_radar/newsletter/quelle.py": {
@@ -442,7 +432,7 @@
  "src/telco_radar/newsletter/store.py": {
   "D102": 4,
   "D103": 1,
-  "UP017": 4
+  "UP017": 2
  },
  "src/telco_radar/newsletter/subscription.py": {
   "D101": 2,
@@ -458,9 +448,7 @@
  },
  "src/telco_radar/newsletter/versand.py": {
   "D101": 2,
-  "D102": 2,
-  "DTZ011": 1,
-  "F401": 2
+  "D102": 2
  },
  "src/telco_radar/pipeline.py": {
   "D103": 1,
@@ -477,15 +465,12 @@
   "UP015": 1
  },
  "src/telco_radar/promo_pipeline.py": {
-  "C901": 1,
-  "DTZ011": 1
+  "C901": 1
  },
  "src/telco_radar/quellen_register.py": {
   "C901": 1,
   "D101": 1,
   "D102": 5,
-  "DTZ011": 1,
-  "F401": 1,
   "I001": 1
  },
  "src/telco_radar/report/__init__.py": {
@@ -510,7 +495,6 @@
  "src/telco_radar/report/diff_bilder.py": {
   "C901": 1,
   "D103": 3,
-  "DTZ011": 2,
   "TID251": 1
  },
  "src/telco_radar/report/differentiation.py": {
@@ -598,7 +582,6 @@
   "B007": 1,
   "B905": 1,
   "C901": 2,
-  "DTZ011": 1,
   "E501": 2,
   "E741": 1,
   "I001": 3
@@ -662,7 +645,6 @@
   "UP037": 1
  },
  "src/telco_radar/uebersetzung/stufe.py": {
-  "DTZ011": 1,
   "F401": 1,
   "I001": 1,
   "UP034": 1
@@ -672,8 +654,7 @@
  },
  "src/telco_radar/versand.py": {
   "D102": 2,
-  "D103": 3,
-  "DTZ011": 2,
+  "D103": 2,
   "E501": 1
  },
  "tests/browser_konsole.py": {
@@ -688,7 +669,6 @@
  },
  "tests/test_collect.py": {
   "E501": 9,
-  "I001": 2,
   "UP017": 7
  },
  "tests/test_ct_log.py": {
@@ -971,8 +951,7 @@
   "I001": 1
  },
  "tests/test_newsletter_segments.py": {
-  "F401": 2,
-  "I001": 1
+  "F401": 2
  },
  "tests/test_newsletter_versand.py": {
   "UP017": 3
@@ -987,12 +966,8 @@
  "tests/test_pruefe_quellenvorschlag.py": {
   "UP017": 1
  },
- "tests/test_quellen_register.py": {
-  "I001": 1
- },
  "tests/test_sammelprotokoll.py": {
-  "F401": 1,
-  "I001": 5
+  "F401": 1
  },
  "tests/test_seen_store_schutz.py": {
   "UP017": 1
@@ -1032,9 +1007,6 @@
  "tests/test_volltext_feed.py": {
   "I001": 1,
   "UP012": 2
- },
- "tests/test_vorsortierung.py": {
-  "I001": 1
  },
  "tests/test_wettbewerb.py": {
   "F401": 1
