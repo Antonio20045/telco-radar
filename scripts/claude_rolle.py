@@ -12,14 +12,26 @@ from __future__ import annotations
 
 import json
 import os
-import re
-import shlex
 import subprocess
 import sys
 import tempfile
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
+
+from claude_rolle_shell import (
+    AWK,
+    ERLAUBT,
+    FIND_STARTET,
+    PYTHON,
+    SHELLS,
+    VARIABLEN,
+    einfache_befehle,
+    git_sperre,
+    ohne_vorsatz,
+    python_sperre,
+    schreibziele,
+)
 
 BLOCKIERT = 2
 ROLLEN = ("test", "bau", "pruefer", "entwurf", "suchen")
@@ -36,9 +48,6 @@ NIE_NEU = frozenset(
         "pyproject.toml",
     }
 )
-VORSATZ = frozenset(
-    {"env", "command", "exec", "nice", "nohup", "timeout", "time", "xargs", "sudo"}
-)
 REGEL = {
     "test": "nur neue Dateien unter tests/ und die Abnahme",
     "bau": "nur der Bereich des Auftrags und neue Dateien unter tests/",
@@ -47,42 +56,7 @@ REGEL = {
     "suchen": "nichts",
 }
 SCHREIBWERKZEUGE = frozenset({"Edit", "Write", "MultiEdit", "NotebookEdit"})
-GIT_LESEN = frozenset(
-    {"status", "diff", "log", "show", "ls-files", "rev-parse", "blame", "grep"}
-)
-GIT_OPTIONEN_MIT_WERT = frozenset({"-c", "-C", "--git-dir", "--work-tree"})
-ALLE_ZIELE = frozenset(
-    {"rm", "mv", "tee", "truncate", "touch", "chmod", "chown", "mkdir", "unlink"}
-    | {"rmdir", "shred", "patch"}
-    | {"ed", "ex", "vi", "vim", "nvim", "emacs", "nano"}
-)
-LETZTES_ZIEL = frozenset({"cp", "ln", "install", "rsync"})
-ZIEL_OPTIONEN = {
-    "cp": ("-t", "--target-directory"),
-    "mv": ("-t", "--target-directory"),
-    "ln": ("-t", "--target-directory"),
-    "install": ("-t", "--target-directory"),
-    "git": ("--output",),
-    "curl": ("-o", "--output", "--output-dir"),
-    "wget": ("-O", "--output-document", "-P", "--directory-prefix"),
-    "tar": ("-C", "--directory"),
-    "unzip": ("-d",),
-}
-HIER_AUSPACKEN = frozenset({"tar", "unzip", "wget", "curl"})
-LOESCHT = frozenset({"-delete", "-exec", "-execdir", "-fprint", "-fprintf", "-fls"})
-IM_ORT = frozenset({"sed", "perl", "ruby"})
 UNBERECHENBAR = frozenset({"eval", "source", ".", "exec"})
-UMLEITUNG = frozenset({">", ">>", ">|", "&>", "&>>"})
-KEIN_ZIEL = frozenset({"/dev/null", "/dev/stdout", "/dev/stderr"})
-TRENNZEICHEN = frozenset(";&|()\n")
-INTERPRETER = re.compile(r"^(python3?(\.\d+)?|perl|ruby|node|sh|bash|zsh)$")
-AWK = frozenset({"awk", "gawk", "mawk"})
-SCHREIB_API = re.compile(
-    r"write|open\(|unlink|rename|replace|rmtree|remove|shutil|truncate|chmod|symlink"
-    r"|subprocess|system|exec|popen|spawn|fork|__import__|importlib|pathlib|Path\b"
-    r"|eval|compile|getattr|ctypes|pty|os\.",
-    re.IGNORECASE,
-)
 GIT_SPERREN = tuple(
     f"Bash(git {befehl}*)"
     for befehl in (
@@ -189,103 +163,6 @@ def ist_neu(wurzel: Path, pfad: Path) -> bool:
     return lauf.returncode != 0
 
 
-def _befehle(text: str, tiefe: int = 3) -> list[list[str]]:
-    zerleger = shlex.shlex(text, posix=True, punctuation_chars=True)
-    zerleger.whitespace_split = True
-    try:
-        woerter = list(zerleger)
-    except ValueError:
-        woerter = text.split()
-    befehle: list[list[str]] = [[]]
-    for wort in woerter:
-        if wort and set(wort) <= TRENNZEICHEN:
-            befehle.append([])
-        else:
-            befehle[-1].append(wort)
-    innen = [w for b in befehle for w in b if tiefe and any(z.isspace() for z in w)]
-    for wort in innen:
-        befehle += _befehle(wort, tiefe - 1)
-    return [b for b in befehle if b]
-
-
-def _git_unterbefehl(argumente: list[str]) -> str | None:
-    stelle = 0
-    while stelle < len(argumente) and argumente[stelle].startswith("-"):
-        stelle += 2 if argumente[stelle] in GIT_OPTIONEN_MIT_WERT else 1
-    return argumente[stelle] if stelle < len(argumente) else None
-
-
-def _im_ort(option: str) -> bool:
-    kurz = option.startswith("-") and not option.startswith("--") and "i" in option
-    return kurz or option.startswith("--in-place")
-
-
-def _ohne_vorsatz(befehl: list[str]) -> list[str]:
-    while befehl and (Path(befehl[0]).name in VORSATZ or "=" in befehl[0]):
-        befehl = befehl[1:]
-        while befehl and (befehl[0].startswith("-") or befehl[0].isdigit()):
-            befehl = befehl[1:]
-    return befehl
-
-
-def _schreibziele(befehl: list[str]) -> list[str]:
-    name, argumente = Path(befehl[0]).name, befehl[1:]
-    ziele = [
-        folgend
-        for wort, folgend in zip(befehl, befehl[1:], strict=False)
-        if wort in UMLEITUNG
-        and folgend not in KEIN_ZIEL
-        and not folgend.startswith("&")
-    ]
-    pfade = [a for a in argumente if not a.startswith("-") and a not in UMLEITUNG]
-    pfade = [a for a in pfade if a not in ziele]
-    if name in ALLE_ZIELE:
-        ziele += pfade
-    elif name in LETZTES_ZIEL and pfade:
-        ziele.append(pfade[-1])
-    elif name in IM_ORT and any(map(_im_ort, argumente)):
-        ziele += pfade[1:] if name == "sed" else pfade
-    elif name == "dd":
-        ziele += [a[3:] for a in argumente if a.startswith("of=")]
-    elif name == "find" and LOESCHT & set(argumente):
-        ziele += pfade
-    optionen = _optionswerte(argumente, ZIEL_OPTIONEN.get(name, ()))
-    ziele += optionen
-    if name in HIER_AUSPACKEN and not optionen and _packt_hier_aus(name, argumente):
-        ziele.append(".")
-    return ziele
-
-
-def _optionswerte(argumente: list[str], optionen: tuple[str, ...]) -> list[str]:
-    werte = []
-    for stelle, wort in enumerate(argumente):
-        for option in optionen:
-            kurz = len(option) == 2 and not wort.startswith("--")
-            gebuendelt = kurz and wort.startswith("-") and wort.endswith(option[1])
-            if (wort == option or gebuendelt) and stelle + 1 < len(argumente):
-                werte.append(argumente[stelle + 1])
-            elif option.startswith("--") and wort.startswith(option + "="):
-                werte.append(wort[len(option) + 1 :])
-            elif len(option) == 2 and wort.startswith(option) and len(wort) > 2:
-                werte.append(wort[2:])
-    return werte
-
-
-def _packt_hier_aus(name: str, argumente: list[str]) -> bool:
-    if name == "tar":
-        modus = next((a for a in argumente if not a.startswith("--")), "")
-        return "x" in modus or bool({"--extract", "--get"} & set(argumente))
-    if name == "curl":
-        return any(
-            a in {"-O", "--remote-name", "--remote-name-all"}
-            or (a.startswith("-") and not a.startswith("--") and "O" in a)
-            for a in argumente
-        )
-    if name == "unzip":
-        return not {"-l", "-t", "-v", "-Z", "-p", "-z"} & set(argumente)
-    return True
-
-
 def befehl_verstoss(
     ziel: Ziel,
     wurzel: Path,
@@ -297,29 +174,51 @@ def befehl_verstoss(
     der Rolle über Umleitung, Dateibefehl oder eingebetteten Interpretercode."""
     if "`" in text or "$(" in text or "<(" in text or ">(" in text:
         return f"Rolle {ziel.rolle}: Befehlsersetzung ist gesperrt; schreib sie aus"
-    for befehl in filter(None, map(_ohne_vorsatz, _befehle(text))):
-        name = Path(befehl[0]).name
-        if name in UNBERECHENBAR or any(z in befehl[0] for z in "$`"):
-            return (
-                f"Rolle {ziel.rolle}: ein Befehl aus Variable, Ersetzung oder eval"
-                " ist gesperrt; schreib ihn aus"
-            )
-        if name == "git":
-            unter = _git_unterbefehl(befehl[1:])
-            if unter not in GIT_LESEN:
-                return f"Rolle {ziel.rolle}: git {unter} führt nur tools/auftrag.py aus"
-        if name in AWK and any(">" in w or "system" in w for w in befehl[1:]):
-            return f"Rolle {ziel.rolle}: awk mit Umleitung oder system ist gesperrt"
-        eingebettet = {"-c", "-", "-e", "<<", "<<<"} & set(befehl[1:])
-        if INTERPRETER.match(name) and eingebettet and SCHREIB_API.search(text):
-            return (
-                f"Rolle {ziel.rolle}: eingebetteter Code, der Dateien schreibt, ist"
-                " gesperrt; schreib mit Edit oder Write"
-            )
-        for pfad in _schreibziele(befehl):
-            ziel_pfad = Path(pfad) if Path(pfad).is_absolute() else ort / pfad
-            if grund := verstoss(ziel, wurzel, ziel_pfad, neu(wurzel, ziel_pfad)):
-                return grund
+    for roh, streng in einfache_befehle(text):
+        befehl, variablen = ohne_vorsatz(roh)
+        if fremd := [v for v in variablen if streng and v not in VARIABLEN]:
+            return f"Rolle {ziel.rolle}: die Variable {fremd[0]} ist gesperrt"
+        grund = befehl and _befehl_sperre(ziel, wurzel, ort, befehl, text, neu, streng)
+        if grund:
+            return grund
+    return None
+
+
+def _befehl_sperre(
+    ziel: Ziel,
+    wurzel: Path,
+    ort: Path,
+    befehl: list[str],
+    text: str,
+    neu: Callable[[Path, Path], bool],
+    streng: bool,
+) -> str | None:
+    name = Path(befehl[0]).name
+    if name in UNBERECHENBAR or any(z in befehl[0] for z in "$`"):
+        return (
+            f"Rolle {ziel.rolle}: ein Befehl aus Variable, Ersetzung oder eval"
+            " ist gesperrt; schreib ihn aus"
+        )
+    if streng and name not in ERLAUBT and not PYTHON.match(name):
+        return f"Rolle {ziel.rolle}: der Befehl {name} ist für Rollen nicht frei"
+    if name == "git" and (gesperrt := git_sperre(befehl[1:])):
+        return f"Rolle {ziel.rolle}: {gesperrt} führt nur tools/auftrag.py aus"
+    if name in AWK and any(z in w for w in befehl[1:] for z in (">", "|", "system")):
+        return f"Rolle {ziel.rolle}: awk mit Umleitung, Pipe oder system ist gesperrt"
+    if name == "find" and FIND_STARTET & set(befehl[1:]):
+        return f"Rolle {ziel.rolle}: find startet keine Befehle"
+    shell_ohne_c = name in SHELLS and "-c" not in befehl[1:]
+    if shell_ohne_c or (
+        PYTHON.match(name) and python_sperre(wurzel, ort, befehl[1:], text, neu)
+    ):
+        return (
+            f"Rolle {ziel.rolle}: {name} nur mit festen Modulen, Repo-Skripten oder"
+            " eingebettetem Code ohne Schreiben; schreib mit Edit oder Write"
+        )
+    for pfad in schreibziele(befehl):
+        ziel_pfad = Path(pfad) if Path(pfad).is_absolute() else ort / pfad
+        if grund := verstoss(ziel, wurzel, ziel_pfad, neu(wurzel, ziel_pfad)):
+            return grund
     return None
 
 
