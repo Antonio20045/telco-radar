@@ -48,7 +48,11 @@ class Item:
     def __post_init__(self) -> None:
         self.title = " ".join(self.title.split())
         if not self.id:
-            basis = normalize_url(self.url) if self.url else self.title.lower()
+            if not self.url:
+                raise ValueError(
+                    f"Item ohne URL und ohne ID: {self.title!r} ({self.source_name})"
+                )
+            basis = normalize_url(self.url)
             self.id = hashlib.sha256(basis.encode("utf-8")).hexdigest()[:16]
 
     def to_dict(self) -> dict:
