@@ -25,6 +25,7 @@ from typing import TextIO
 
 import leiter_pytest
 import leiter_schnell
+import leiter_vertraege
 import pruefstempel
 import waechter
 import waechter_vertraege
@@ -144,15 +145,23 @@ def stufe_typen(log: TextIO) -> Ergebnis:
 
 
 def stufe_schichten(log: TextIO) -> Ergebnis:
-    """Stufe 3: Jeder Vertrag aus ``.importlinter`` muss gehalten sein."""
-    lauf = _lauf(log, [str(BIN / "lint-imports"), "--no-cache"])
+    """Stufe 3: Jeder Vertrag aus ``.importlinter`` muss gehalten sein.
+
+    Verwaiste Ausnahmen streicht die Leiter selbst und prüft erneut.
+    """
+    vertraege = WURZEL / ".importlinter"
+    lauf, gestrichen = leiter_vertraege.senke(
+        vertraege, lambda: _lauf(log, [str(BIN / "lint-imports"), "--no-cache"])
+    )
+    gesenkt = [_relativ(vertraege)] if gestrichen else []
+    hinweise = [f"verwaiste Ausnahme gestrichen: {a}" for a in gestrichen]
     if lauf.returncode == 0:
-        return Ergebnis("3 Schichten", True)
+        return Ergebnis("3 Schichten", True, gesenkt=gesenkt, hinweise=hinweise)
     _, _, bericht = lauf.stdout.partition("Broken contracts")
     zeilen = [
         z for z in (bericht or lauf.stdout + lauf.stderr).splitlines() if z.strip("- ")
     ]
-    return Ergebnis("3 Schichten", False, zeilen)
+    return Ergebnis("3 Schichten", False, zeilen, gesenkt=gesenkt, hinweise=hinweise)
 
 
 def stufe_tests(log: TextIO) -> Ergebnis:
