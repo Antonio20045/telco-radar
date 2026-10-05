@@ -24,13 +24,13 @@ src/telco_radar/collect/geraete/o2.py zeilen 712
 src/telco_radar/collect/geraete/telekom.py zeilen 658
 src/telco_radar/collect/geraete/vodafone.py zeilen 770
 src/telco_radar/collect/lieferzeit.py zeilen 441
-src/telco_radar/collect/newsroom.py zeilen 682
+src/telco_radar/collect/newsroom.py zeilen 679
 src/telco_radar/collect/promo_snapshot.py zeilen 415
 src/telco_radar/collect/tarif_crawler.py zeilen 895
 src/telco_radar/collect/tarif_pdf.py zeilen 670
 src/telco_radar/geraete_model.py zeilen 1129
 src/telco_radar/geraete_pipeline.py zeilen 747
-src/telco_radar/newsletter/filters.py zeilen 403
+src/telco_radar/newsletter/filters.py zeilen 401
 src/telco_radar/pipeline.py zeilen 1016
 src/telco_radar/promo_bilder.py zeilen 417
 src/telco_radar/report/bilder.py zeilen 432
@@ -45,9 +45,9 @@ src/telco_radar/report/geraete_tco_karten.py zeilen 1646
 src/telco_radar/report/geraete_tco_view.py zeilen 816
 src/telco_radar/report/geraete_view.py zeilen 1800
 src/telco_radar/report/geraete_zeitreihe.py zeilen 2173
-src/telco_radar/report/html.py zeilen 1854
+src/telco_radar/report/html.py zeilen 1852
 src/telco_radar/report/promo.py zeilen 499
 src/telco_radar/report/wettbewerb.py zeilen 424
 src/telco_radar/tarif_bezug.py zeilen 485
 src/telco_radar/tco_model.py zeilen 1289
-src/telco_radar/versand.py zeilen 452
+src/telco_radar/versand.py zeilen 409

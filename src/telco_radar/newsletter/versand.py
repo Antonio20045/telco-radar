@@ -37,13 +37,14 @@ from __future__ import annotations
 
 import logging
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import date, datetime, timezone
+from datetime import datetime
 from pathlib import Path
 
 from .segments import Segment
 from .store import lies_jsonl
-from .subscription import jetzt
+from .subscription import zeitstempel
 from .transport import Ergebnis, Transport
 
 log = logging.getLogger(__name__)
@@ -124,18 +125,17 @@ def bereits_zugestellt(log_pfad: Path) -> set[str]:
     }
 
 
-def heute_versendet(log_pfad: Path, *, heute: str = "") -> int:
+def heute_versendet(log_pfad: Path, *, heute: str) -> int:
     """Wie viele Mails HEUTE schon draussen sind - ueber alle Ausgaben.
 
     Gezaehlt wird der Zeitpunkt der Zustellung (`at`), NICHT das
     Ausgabedatum: ein Wiederanlauf am Folgetag gehoert zum Kontingent des
     Folgetags, und eine nachgeholte Ausgabe vom Dienstag zaehlt am Mittwoch.
     """
-    tag = heute or date.today().isoformat()
     return sum(
         1
         for e in lies_jsonl(log_pfad)
-        if e.get("status") == "gesendet" and str(e.get("at") or "").startswith(tag)
+        if e.get("status") == "gesendet" and str(e.get("at") or "").startswith(heute)
     )
 
 
@@ -144,7 +144,7 @@ class LimitGerissen(RuntimeError):
 
 
 def pruefe_limit(
-    geplant: int, log_pfad: Path, *, heute: str = "", schwelle: int = SCHWELLE
+    geplant: int, log_pfad: Path, *, heute: str, schwelle: int = SCHWELLE
 ) -> int:
     """Passt der Lauf ins Tageskontingent? Gibt den Abstand zum Limit zurueck.
 
@@ -201,7 +201,7 @@ def versende(
     protokollieren=None,
     rate_je_minute: int = RATE_JE_MINUTE,
     schwelle: int = SCHWELLE,
-    heute: str = "",
+    uhr: Callable[[], datetime],
     schlafen=time.sleep,
 ) -> Lauf:
     """Den Plan abarbeiten. `protokollieren(posten)` haengt ans Log an.
@@ -220,7 +220,7 @@ def versende(
     )
 
     lauf.abstand_zum_limit = pruefe_limit(
-        len(offen), log_pfad, heute=heute, schwelle=schwelle
+        len(offen), log_pfad, heute=uhr().date().isoformat(), schwelle=schwelle
     )
 
     pause = 60.0 / rate_je_minute if rate_je_minute > 0 else 0.0
@@ -231,13 +231,13 @@ def versende(
         adresse = adressen.get(posten.schluessel.abo)
         if nachricht is None or not adresse:
             posten.status = "dauerhaft_fehl"
-            posten.at = jetzt()
+            posten.at = zeitstempel(uhr())
             lauf.dauerhaft_fehl.append(posten.schluessel.abo)
             if protokollieren:
                 protokollieren(posten)
             continue
         ergebnis: Ergebnis = transport.send(nachricht, adresse)
-        posten.at = jetzt()
+        posten.at = zeitstempel(uhr())
         if ergebnis.ok:
             posten.status = "gesendet"
             posten.message_id = ergebnis.message_id

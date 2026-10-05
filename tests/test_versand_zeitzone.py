@@ -9,13 +9,15 @@ from __future__ import annotations
 
 import json
 import socket
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 
 import httpx
 import pytest
 
 from telco_radar import versand
+
+JETZT = datetime(2026, 7, 15, 12, tzinfo=UTC)
 
 BERICHT = (
     Path(__file__).resolve().parent
@@ -39,8 +41,8 @@ def _lies(pfad: Path) -> dict:
 def test_merke_schreibt_gesendet_mit_utc(tmp_path):
     pfad = tmp_path / "versand.json"
     buch = versand.Zustellbuch(pfad)
-    buch.merke("mail", "2026-10-02", "Betreff")
-    buch.merke("teams", "https://x.test/a", "Titel")
+    buch.merke("mail", "2026-10-02", "Betreff", jetzt=JETZT)
+    buch.merke("teams", "https://x.test/a", "Titel", jetzt=JETZT)
 
     daten = _lies(pfad)
     for eintrag in (daten["mail"]["2026-10-02"], daten["teams"]["https://x.test/a"]):
@@ -56,7 +58,11 @@ def test_versende_merkt_mail_mit_utc(tmp_path, monkeypatch):
     report = json.loads(BERICHT.read_text(encoding="utf-8"))
     monkeypatch.setattr(versand, "sende_mail", lambda *a, **k: "an 1 Empfänger")
     bilanz = versand.versende(
-        tmp_path, report, {"versand": {"teams_aktiv": False}}, erzwinge=True
+        tmp_path,
+        report,
+        {"versand": {"teams_aktiv": False}},
+        erzwinge=True,
+        jetzt=JETZT,
     )
     assert bilanz["mail"] == "an 1 Empfänger"
 
@@ -73,11 +79,11 @@ def test_versende_merkt_mail_mit_utc(tmp_path, monkeypatch):
 def test_wiederholung_ersetzt_nur_den_eigenen_eintrag(tmp_path):
     pfad = tmp_path / "versand.json"
     buch = versand.Zustellbuch(pfad)
-    buch.merke("mail", "a", "erste")
-    buch.merke("mail", "b", "andere")
+    buch.merke("mail", "a", "erste", jetzt=JETZT)
+    buch.merke("mail", "b", "andere", jetzt=JETZT)
     vorher_b = _lies(pfad)["mail"]["b"]
 
-    buch.merke("mail", "a", "zweite")
+    buch.merke("mail", "a", "zweite", jetzt=JETZT)
 
     daten = _lies(pfad)
     assert daten["mail"]["a"]["notiz"] == "zweite"
@@ -89,8 +95,8 @@ def test_wiederholung_ersetzt_nur_den_eigenen_eintrag(tmp_path):
 def test_mail_und_teams_bleiben_getrennt(tmp_path):
     pfad = tmp_path / "versand.json"
     buch = versand.Zustellbuch(pfad)
-    buch.merke("mail", "x", "mail-notiz")
-    buch.merke("teams", "x", "teams-notiz")
+    buch.merke("mail", "x", "mail-notiz", jetzt=JETZT)
+    buch.merke("teams", "x", "teams-notiz", jetzt=JETZT)
 
     daten = _lies(pfad)
     assert daten["mail"]["x"]["notiz"] == "mail-notiz"
@@ -107,7 +113,7 @@ def test_merke_ruft_kein_netz(tmp_path, monkeypatch):
     monkeypatch.setattr(socket.socket, "connect", kein_netz)
     monkeypatch.setattr(socket, "create_connection", kein_netz)
 
-    versand.Zustellbuch(tmp_path / "versand.json").merke("mail", "a", "n")
+    versand.Zustellbuch(tmp_path / "versand.json").merke("mail", "a", "n", jetzt=JETZT)
 
 
 def test_schreibfehler_geht_an_den_aufrufer(tmp_path):
@@ -115,4 +121,11 @@ def test_schreibfehler_geht_an_den_aufrufer(tmp_path):
     sperre.write_text("eine Datei, kein Ordner", encoding="utf-8")
     buch = versand.Zustellbuch(sperre / "versand.json")
     with pytest.raises(OSError):
-        buch.merke("mail", "a", "n")
+        buch.merke("mail", "a", "n", jetzt=JETZT)
+
+
+def test_merke_rechnet_eine_fremde_zeitzone_nach_utc_um(tmp_path):
+    pfad = tmp_path / "versand.json"
+    sommerzeit = datetime(2026, 10, 2, 14, tzinfo=timezone(timedelta(hours=2)))
+    versand.Zustellbuch(pfad).merke("mail", "a", "n", jetzt=sommerzeit)
+    assert _lies(pfad)["mail"]["a"]["gesendet"] == "2026-10-02T12:00:00+00:00"

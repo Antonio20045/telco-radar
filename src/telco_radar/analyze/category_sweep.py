@@ -17,7 +17,6 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import date
 
 from ..collect import http
 from .begriffe import THEME_LABEL, THEMES
@@ -172,13 +171,18 @@ def sweep(
 
 
 def run_sweep(
-    state_dir, brave_key: str, model: str, use_llm: bool, week: int, per_run: int = 4
+    state_dir,
+    brave_key: str,
+    model: str,
+    use_llm: bool,
+    week: int,
+    today: str,
+    per_run: int = 4,
 ) -> None:
     """Pipeline-Einstieg: DB laden, rotierenden Sweep fahren, speichern."""
     from pathlib import Path
 
     db = DiffDB(Path(state_dir) / "differentiation_db.json")
-    today = date.today().isoformat()
     if use_llm and brave_key:
         keys = rotation_slice(week, per_run)
         try:

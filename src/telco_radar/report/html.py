@@ -1373,11 +1373,9 @@ def render_site(site_dir: Path, reports_dir: Path, cfg=None) -> list[Ausfall]:
     latest = reports[0] if reports else None
     diff_report = _load_latest_diff_report(reports_dir / "differenzierung")
 
-    from datetime import date
-
     db = DiffDB(state_dir / "differentiation_db.json")
     store = DiffStore(state_dir / "differentiation.jsonl")
-    latest_date = latest["date"] if latest else date.today().isoformat()
+    latest_date = latest["date"] if latest else ""
     theme_label_map = dict(SWEEP_THEMES)
 
     diff_teile = differenzierung_bericht.zerlegen(

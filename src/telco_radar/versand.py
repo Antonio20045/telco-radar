@@ -89,9 +89,11 @@ class Zustellbuch:
     def schon_raus(self, kanal: str, schluessel: str) -> bool:
         return schluessel in (self.daten.get(kanal) or {})
 
-    def merke(self, kanal: str, schluessel: str, notiz: str = "") -> None:
+    def merke(
+        self, kanal: str, schluessel: str, notiz: str = "", *, jetzt: datetime
+    ) -> None:
         self.daten.setdefault(kanal, {})[schluessel] = {
-            "gesendet": datetime.now(UTC).isoformat(timespec="seconds"),
+            "gesendet": jetzt.astimezone(UTC).isoformat(timespec="seconds"),
             "notiz": notiz,
         }
         self.pfad.parent.mkdir(parents=True, exist_ok=True)
@@ -344,6 +346,7 @@ def versende(
     *,
     trocken: bool = False,
     erzwinge: bool = False,
+    jetzt: datetime,
 ) -> dict:
     """Der eine Einstiegspunkt. Liefert die Bilanz fuers Laufprotokoll.
 
@@ -353,7 +356,7 @@ def versende(
     versand_cfg = dict(settings.get("versand") or {})
     bilanz: dict = {"mail": "aus", "teams": "aus"}
     buch = Zustellbuch(Path(root) / "data" / "state" / "versand.json")
-    ausgabe = str(report.get("date") or date.today().isoformat())
+    ausgabe = str(report.get("date") or jetzt.date().isoformat())
     site_url = str(versand_cfg.get("site_url") or SITE_URL)
 
     if versand_cfg.get("mail_aktiv", True):
@@ -361,7 +364,7 @@ def versende(
         try:
             heute = date.fromisoformat(ausgabe)
         except ValueError:
-            heute = date.today()
+            heute = jetzt.date()
         if not erzwinge and not ist_versandtag(heute, wochentag):
             bilanz["mail"] = f"kein Versandtag (Wochentag {wochentag})"
         elif not erzwinge and buch.schon_raus("mail", ausgabe):
@@ -371,7 +374,7 @@ def versende(
             try:
                 bilanz["mail"] = sende_mail(betreff, text, html, trocken=trocken)
                 if not trocken:
-                    buch.merke("mail", ausgabe, betreff)
+                    buch.merke("mail", ausgabe, betreff, jetzt=jetzt)
             except VersandFehler as exc:
                 bilanz["mail"] = f"FEHLER: {exc}"
                 log.error("Mailversand: %s", exc)
@@ -396,6 +399,7 @@ def versende(
                             "teams",
                             h.get("url", ""),
                             h.get("headline") or h.get("title") or "",
+                            jetzt=jetzt,
                         )
             except VersandFehler as exc:
                 bilanz["teams"] = f"FEHLER: {exc}"
@@ -403,50 +407,3 @@ def versende(
 
     log.info("Versand: Mail %s | Teams %s", bilanz["mail"], bilanz["teams"])
     return bilanz
-
-
-def main(argv: list[str] | None = None) -> int:
-    import argparse
-    import sys
-
-    from .config import load_config
-
-    p = argparse.ArgumentParser(
-        description="Wochendigest per Mail, Ausnahmen per Teams"
-    )
-    p.add_argument("--root", type=Path, default=Path("."))
-    p.add_argument(
-        "--trocken", action="store_true", help="baut alles, verschickt nichts"
-    )
-    p.add_argument(
-        "--erzwinge",
-        action="store_true",
-        help="ohne Ruecksicht auf Wochentag und Zustellbuch",
-    )
-    p.add_argument(
-        "--zeige", action="store_true", help="die Textfassung auf die Konsole"
-    )
-    args = p.parse_args(argv)
-
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
-    root = args.root.resolve()
-    berichte = sorted((root / "data" / "reports").glob("*.json"))
-    if not berichte:
-        print("Kein Bericht gefunden.", file=sys.stderr)
-        return 1
-    report = json.loads(berichte[-1].read_text(encoding="utf-8"))
-    if args.zeige:
-        print(baue_mail(report)[1])
-    bilanz = versende(
-        root,
-        report,
-        load_config(root).settings,
-        trocken=args.trocken,
-        erzwinge=args.erzwinge,
-    )
-    print(json.dumps(bilanz, ensure_ascii=False, indent=1))
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())

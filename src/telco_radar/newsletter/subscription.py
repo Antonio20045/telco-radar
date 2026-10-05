@@ -72,9 +72,9 @@ def adress_kennwert(pepper: str, adresse: str) -> str:
     return kennwert(pepper, normalisiere_adresse(adresse))
 
 
-def jetzt() -> str:
+def zeitstempel(wann: datetime) -> str:
     return (
-        datetime.now(timezone.utc)
+        wann.astimezone(timezone.utc)
         .replace(microsecond=0)
         .isoformat()
         .replace("+00:00", "Z")
@@ -129,7 +129,7 @@ class Abo:
     def aktiv(self) -> bool:
         return self.state == "active" and bool(self.email)
 
-    def abgemeldet(self, *, zeitpunkt: str = "") -> "Abo":
+    def abgemeldet(self, *, zeitpunkt: str) -> "Abo":
         """Widerruf: Zustand setzen und die ADRESSE LOESCHEN.
 
         Der Kennwert bleibt - ohne ihn wuerde dieselbe Adresse beim naechsten
@@ -141,7 +141,7 @@ class Abo:
             state="unsubscribed",
             email="",
             confirmed_at=self.confirmed_at,
-            bounce_last=zeitpunkt or jetzt(),
+            bounce_last=zeitpunkt,
         )
 
 

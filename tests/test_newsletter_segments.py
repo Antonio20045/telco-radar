@@ -12,6 +12,7 @@ from pathlib import Path
 
 import pytest
 
+from telco_radar.newsletter import subscription as sub
 from telco_radar.newsletter.config import lade_katalog
 from telco_radar.newsletter.filters import Eintrag, Filtersatz, Stichwort
 from telco_radar.newsletter.quelle import aus_bericht, aus_promo, region_schluessel
@@ -21,7 +22,6 @@ from telco_radar.newsletter.segments import (
     normalform,
     segment_hash,
 )
-from telco_radar.newsletter import subscription as sub
 
 WURZEL = Path(__file__).resolve().parents[1]
 
@@ -184,7 +184,7 @@ def test_die_abmeldung_loescht_die_adresse_und_behaelt_den_kennwert():
         state="active",
         email_hmac=sub.adress_kennwert("p", "weg@beispiel.test"),
     )
-    danach = abo.abgemeldet()
+    danach = abo.abgemeldet(zeitpunkt="2026-08-11T12:00:00Z")
     assert danach.email == ""
     assert danach.state == "unsubscribed"
     assert danach.email_hmac == abo.email_hmac
@@ -206,7 +206,7 @@ def test_ein_abo_ueberlebt_den_weg_durch_json(katalog):
             ip_hmac="x",
             user_agent_hmac="y",
         ),
-        created_at=sub.jetzt(),
+        created_at="2026-08-11T12:00:00Z",
         state="active",
     )
     zurueck = sub.aus_dict(json.loads(json.dumps(sub.als_dict(abo))), katalog)

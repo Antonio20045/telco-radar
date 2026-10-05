@@ -6,7 +6,7 @@ import json
 import logging
 from collections import Counter
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 from .analyze import editor, llm, redaktion_kontinuitaet
@@ -106,7 +106,7 @@ def nachlauf(
     berichtet: tuple[list[dict], dict[str, Item]],
     cfg: Config,
     root: Path,
-    stufe: tuple[str, date, float],
+    stufe: tuple[str, datetime, float],
     takt: Takt,
 ) -> list[Ausfall]:
     """Übersetzung, Kosten, Seite und Versand; liefert nicht gebaute Seitenteile."""
@@ -128,7 +128,9 @@ def nachlauf(
     def _versand() -> None:
         from .versand import versende
 
-        run_log["versand"] = versende(root, bericht.report_json, cfg.settings)
+        run_log["versand"] = versende(
+            root, bericht.report_json, cfg.settings, jetzt=stufe[1]
+        )
         _json_schreiben(bericht)
 
     takt.abgesichert(_versand, protokoll("Versand uebersprungen: %s", None))
@@ -145,12 +147,12 @@ def _uebersetzen(
     berichtet: tuple[list[dict], dict[str, Item]],
     cfg: Config,
     root: Path,
-    stufe: tuple[str, date, float],
+    stufe: tuple[str, datetime, float],
     takt: Takt,
     run_log: dict,
 ) -> None:
     alle_highlights, by_url = berichtet
-    mechanik_model, heute, t0 = stufe
+    mechanik_model, jetzt, t0 = stufe
     _ueb_items = uebersetzung_stufe.berichtete_items(alle_highlights, by_url)
     if len(_ueb_items) < len(alle_highlights):
         log.info(
@@ -178,7 +180,7 @@ def _uebersetzen(
             cfg.settings,
             mechanik_model,
             frist_sekunden=_ueb_budget,
-            heute=heute,
+            heute=jetzt.date(),
         )
         log.info("%s", uebersetzung_stufe.protokollzeile(bilanz))
         run_log["uebersetzung"] = {

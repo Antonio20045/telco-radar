@@ -9,12 +9,14 @@ Kanal ist schlimmer als keiner: er erweckt den Eindruck von Zustellung.
 from __future__ import annotations
 
 import json
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 import pytest
 
 from telco_radar import versand
+
+JETZT = datetime(2026, 7, 15, 12, tzinfo=UTC)
 
 
 def _report(highlights, datum="2026-08-10"):
@@ -108,6 +110,7 @@ def test_kein_versandtag_heisst_keine_mail(tmp_path, monkeypatch):
         tmp_path,
         _report([_h()], datum="2026-08-11"),
         {"versand": {"mail_aktiv": True, "teams_aktiv": False}},
+        jetzt=JETZT,
     )
     assert "kein Versandtag" in bilanz["mail"]
 
@@ -119,8 +122,8 @@ def test_dieselbe_ausgabe_geht_nur_einmal_hinaus(tmp_path, monkeypatch):
     )
     cfg = {"versand": {"mail_aktiv": True, "teams_aktiv": False}}
     r = _report([_h()], datum="2026-08-10")
-    versand.versende(tmp_path, r, cfg)
-    versand.versende(tmp_path, r, cfg)
+    versand.versende(tmp_path, r, cfg, jetzt=JETZT)
+    versand.versende(tmp_path, r, cfg, jetzt=JETZT)
     assert len(gesendet) == 1
 
 
@@ -130,8 +133,10 @@ def test_dieselbe_ausnahme_geht_nur_einmal_hinaus(tmp_path, monkeypatch):
         versand, "sende_teams", lambda *a, **k: gesendet.append(1) or "ok"
     )
     cfg = {"versand": {"mail_aktiv": False, "teams_aktiv": True}}
-    versand.versende(tmp_path, _report([_h()]), cfg)
-    versand.versende(tmp_path, _report([_h(), _h(url="https://x.test/neu")]), cfg)
+    versand.versende(tmp_path, _report([_h()]), cfg, jetzt=JETZT)
+    versand.versende(
+        tmp_path, _report([_h(), _h(url="https://x.test/neu")]), cfg, jetzt=JETZT
+    )
     assert len(gesendet) == 2
     buch = json.loads(
         (tmp_path / "data" / "state" / "versand.json").read_text(encoding="utf-8")
@@ -157,6 +162,7 @@ def test_ein_versandfehler_steht_in_der_bilanz(tmp_path, monkeypatch):
         tmp_path,
         _report([_h()], datum="2026-08-10"),
         {"versand": {"mail_aktiv": True, "teams_aktiv": False}},
+        jetzt=JETZT,
     )
     assert bilanz["mail"].startswith("FEHLER")
 
@@ -173,6 +179,7 @@ def test_trockenlauf_verschickt_nichts(tmp_path, monkeypatch):
         _report([_h()], datum="2026-08-10"),
         {"versand": {"mail_aktiv": True, "teams_aktiv": False}},
         trocken=True,
+        jetzt=JETZT,
     )
     assert "trocken" in bilanz["mail"]
     assert not (tmp_path / "data" / "state" / "versand.json").exists()

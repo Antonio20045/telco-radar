@@ -47,17 +47,23 @@ def ausfuehren(
             mechanik_model,
             use_llm,
             heute.isocalendar()[1],
+            heute.isoformat(),
         ),
         protokoll("Kategorie-Sweep uebersprungen: %s", None),
     )
-    promo = _promo(cfg, root, sprache, use_llm, takt)
+    promo = _promo(cfg, root, heute, sprache, use_llm, takt)
     geraete = _geraete(cfg, root, heute, geraete_frist(), takt)
     _differenzierung(root, heute, (editor_model, language), use_llm, takt)
     return Zusatz(promo, geraete)
 
 
 def _promo(
-    cfg: Config, root: Path, sprache: tuple[str, str, str], use_llm: bool, takt: Takt
+    cfg: Config,
+    root: Path,
+    heute: date,
+    sprache: tuple[str, str, str],
+    use_llm: bool,
+    takt: Takt,
 ) -> dict:
     if not cfg.settings.get("promo_enabled", True):
         return {}
@@ -75,6 +81,7 @@ def _promo(
             settings=cfg.settings,
             score_model=mechanik_model,
             extract_model=mechanik_model,
+            heute=heute,
         )
         log.info(
             "Promo-Uebersicht: %s (%d aktive Aktionen)",

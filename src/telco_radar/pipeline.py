@@ -968,7 +968,7 @@ def run(
         (analyse.alle_highlights, analyse.by_url),
         cfg,
         root,
-        (modelle.mechanik, today, t0),
+        (modelle.mechanik, started_at, t0),
         takt,
     )
     return bericht.report_path, ausfaelle

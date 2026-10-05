@@ -287,8 +287,9 @@ def waehle(
     return (ueber_filter + ueber_stichwort)[:deckel]
 
 
-def _bericht_dateien(reports_dir: Path, tage: int, heute: date | None = None):
-    heute = heute or date.today()
+def _bericht_dateien(reports_dir: Path, tage: int, heute: date | None):
+    if heute is None:
+        return
     grenze = (heute - timedelta(days=tage)).isoformat()
     for pfad in sorted(Path(reports_dir).glob("*.json")):
         if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", pfad.stem):
@@ -297,9 +298,7 @@ def _bericht_dateien(reports_dir: Path, tage: int, heute: date | None = None):
             yield pfad
 
 
-def _texte_aus_berichten(
-    reports_dir: Path, tage: int, heute: date | None = None
-) -> list[str]:
+def _texte_aus_berichten(reports_dir: Path, tage: int, heute: date | None) -> list[str]:
     """Ueberschrift + Zusammenfassung je Meldung der letzten `tage` Tage.
 
     Genau die Textmenge, die auch `Eintrag.suchtext` liefert - eine Vorschau,
@@ -324,7 +323,7 @@ def vorschau(
     reports_dir: Path,
     *,
     tage: int = 30,
-    heute: date | None = None,
+    heute: date,
     mode: str = "",
 ) -> int:
     """Wie viele Meldungen der letzten `tage` Tage haette dieses Stichwort
@@ -358,9 +357,8 @@ def _neuester_bericht(reports_dir: Path) -> date | None:
     30-Tage-Fenster fallen, und `meldungen` sank ohne jede Datenveraenderung
     (1716 auf 1624, fundiert im R3-Release; im Stand vom 09.09.: 1737 auf
     1241, weil die Wanduhr vier Tage hinter dem juengsten Bericht lag).
-    Am juengsten Bericht angehaengt, liefert derselbe Bestand zu jeder
-    Stunde dieselbe Zahl - das Fenster wandert nur, wenn ein neuer Bericht
-    dazu kommt.
+    Am juengsten Bericht angehaengt, liefert derselbe Bestand zu jeder Stunde
+    dieselbe Zahl; das Fenster wandert nur mit einem neuen Bericht.
     """
     stems = [
         p.stem
@@ -396,7 +394,7 @@ def baue_stichwort_index(
         for wort in _index_woerter(text):
             zaehler[wort] = zaehler.get(wort, 0) + 1
     return {
-        "stand": (heute or date.today()).isoformat(),
+        "stand": heute.isoformat() if heute else None,
         "tage": tage,
         "meldungen": len(texte),
         "woerter": dict(sorted(zaehler.items(), key=lambda kv: (-kv[1], kv[0]))),

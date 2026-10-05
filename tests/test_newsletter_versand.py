@@ -12,7 +12,7 @@ Zwei Fehler sind hier teurer als alle anderen:
 
 import json
 import subprocess
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -26,6 +26,8 @@ from telco_radar.newsletter.filters import Eintrag, Filtersatz, Treffer
 from telco_radar.newsletter.render import Nachricht
 from telco_radar.newsletter.segments import Segment
 from telco_radar.newsletter.transport import Ergebnis, Trockenlauf
+
+JETZT = datetime(2026, 7, 15, 12, tzinfo=UTC)
 
 WURZEL = Path(__file__).resolve().parents[1]
 
@@ -163,12 +165,17 @@ def test_die_sperre_laeuft_nach_24_stunden_ab(tmp_path):
 def test_ohne_kennwert_gibt_es_keine_mail(tmp_path):
     """Fail closed: ein Aufruf ohne Kennwert ist ein Programmfehler, und der
     darf keine Mail ausloesen."""
-    assert st.doi_gesperrt(tmp_path / "doi_log.jsonl", "") is True
+    assert st.doi_gesperrt(tmp_path / "doi_log.jsonl", "", heute=JETZT) is True
 
 
 def test_im_doi_log_steht_keine_adresse(tmp_path):
     pfad = tmp_path / "doi_log.jsonl"
-    st.doi_vermerken(pfad, sub.adress_kennwert("p", "wer@beispiel.test"), token_id="t1")
+    st.doi_vermerken(
+        pfad,
+        sub.adress_kennwert("p", "wer@beispiel.test"),
+        token_id="t1",
+        zeitpunkt="2026-08-11T09:00:00Z",
+    )
     inhalt = pfad.read_text(encoding="utf-8")
     assert "beispiel.test" not in inhalt
     assert set(json.loads(inhalt.strip())) == {"addr_hmac", "token_id", "at"}
@@ -238,6 +245,7 @@ def test_ein_wiederanlauf_versendet_nichts_doppelt(tmp_path):
         datum="2026-08-11",
         protokollieren=anhaengen,
         rate_je_minute=0,
+        uhr=lambda: JETZT,
     )
     assert erster.zugestellt == 3
 
@@ -252,6 +260,7 @@ def test_ein_wiederanlauf_versendet_nichts_doppelt(tmp_path):
         datum="2026-08-11",
         protokollieren=anhaengen,
         rate_je_minute=0,
+        uhr=lambda: JETZT,
     )
     assert transport.versendet == []
     assert zweiter.zugestellt == 0
@@ -286,6 +295,7 @@ def test_ein_abbruch_mitten_im_versand_wird_genau_dort_fortgesetzt(tmp_path):
             datum="2026-08-11",
             protokollieren=anhaengen,
             rate_je_minute=0,
+            uhr=lambda: JETZT,
         )
     assert len(st.lies_jsonl(log_pfad)) == 2
 
@@ -299,6 +309,7 @@ def test_ein_abbruch_mitten_im_versand_wird_genau_dort_fortgesetzt(tmp_path):
         datum="2026-08-11",
         protokollieren=anhaengen,
         rate_je_minute=0,
+        uhr=lambda: JETZT,
     )
     assert nachher.zugestellt == 1
     assert nachher.uebersprungen == 2
@@ -324,6 +335,7 @@ def test_ein_wiederholbarer_fehler_kommt_nicht_ins_log(tmp_path):
         datum="2026-08-11",
         protokollieren=protokoll.append,
         rate_je_minute=0,
+        uhr=lambda: JETZT,
     )
     assert lauf.fehler == 1 and lauf.zugestellt == 0
     assert protokoll == []
@@ -348,6 +360,7 @@ def test_ein_dauerhafter_fehler_kommt_ins_log(tmp_path):
         datum="2026-08-11",
         protokollieren=protokoll.append,
         rate_je_minute=0,
+        uhr=lambda: JETZT,
     )
     assert lauf.dauerhaft_fehl == ["a"]
     assert protokoll[0].status == "dauerhaft_fehl"
@@ -367,6 +380,7 @@ def test_ein_abo_ohne_adresse_gilt_als_erledigt(tmp_path):
         datum="2026-08-11",
         protokollieren=protokoll.append,
         rate_je_minute=0,
+        uhr=lambda: JETZT,
     )
     assert lauf.dauerhaft_fehl == ["weg"]
     assert protokoll[0].status == "dauerhaft_fehl"
@@ -446,6 +460,7 @@ def test_der_abstand_zum_limit_wird_zurueckgegeben(tmp_path):
         log_pfad=log_pfad,
         datum="2026-08-11",
         rate_je_minute=0,
+        uhr=lambda: JETZT,
     )
     assert lauf.abstand_zum_limit == v.SCHWELLE - 1
 
@@ -477,7 +492,7 @@ def test_der_waechter_laeuft_vor_der_ersten_zustellung(tmp_path):
             transport,
             log_pfad=log_pfad,
             datum="2026-08-11",
-            heute="2026-08-11",
+            uhr=lambda: datetime(2026, 8, 11, 12, tzinfo=UTC),
             rate_je_minute=0,
         )
     assert transport.versendet == []
@@ -496,6 +511,7 @@ def test_der_versand_wird_gedrosselt():
         datum="2026-08-11",
         rate_je_minute=30,
         schlafen=pausen.append,
+        uhr=lambda: JETZT,
     )
     assert pausen == [2.0, 2.0]
 

@@ -23,6 +23,7 @@ Kein Netz, kein LLM.
 from __future__ import annotations
 
 import json
+from datetime import date
 
 from telco_radar.analyze.promo_store import PromoDB, SnapshotStore, snapshot_key
 from telco_radar.promo_config import PromoPage, PromoSource, load_promo_config
@@ -305,7 +306,9 @@ brands:
         encoding="utf-8",
     )
 
-    ergebnis = promo_pipeline.run_promo_stage(tmp_path, {}, use_llm=False, model="x")
+    ergebnis = promo_pipeline.run_promo_stage(
+        tmp_path, {}, use_llm=False, model="x", heute=date(2026, 8, 11)
+    )
 
     status = {r["url"]: r["status"] for r in ergebnis["sources"]}
     assert status[LEIT] == "unveraendert"
@@ -319,7 +322,9 @@ brands:
     assert "Marke" not in gespeichert
     assert len(gespeichert) == 2
 
-    zweiter = promo_pipeline.run_promo_stage(tmp_path, {}, use_llm=False, model="x")
+    zweiter = promo_pipeline.run_promo_stage(
+        tmp_path, {}, use_llm=False, model="x", heute=date(2026, 8, 11)
+    )
     assert {r["status"] for r in zweiter["sources"]} == {"unveraendert"}
 
 
@@ -376,7 +381,9 @@ brands:
     )
     monkeypatch.setattr(promo_pipeline.promo_ranker, "score_all", lambda *a, **k: {})
 
-    ergebnis = promo_pipeline.run_promo_stage(tmp_path, {}, use_llm=True, model="x")
+    ergebnis = promo_pipeline.run_promo_stage(
+        tmp_path, {}, use_llm=True, model="x", heute=date(2026, 8, 11)
+    )
 
     assert ergebnis["extraktion_fehlgeschlagen"] == 1
     assert ergebnis["sources"][0]["status"] == "extraktion_fehlgeschlagen"
@@ -425,7 +432,9 @@ brands:
     monkeypatch.setattr(promo_pipeline, "extract_promos", lambda *a, **k: [])
     monkeypatch.setattr(promo_pipeline.promo_ranker, "score_all", lambda *a, **k: {})
 
-    promo_pipeline.run_promo_stage(tmp_path, {}, use_llm=True, model="x")
+    promo_pipeline.run_promo_stage(
+        tmp_path, {}, use_llm=True, model="x", heute=date(2026, 8, 11)
+    )
 
     danach = PromoDB(zustand / "promo_db.json")
     eintrag = next(iter(danach.entries.values()))

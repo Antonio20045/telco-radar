@@ -104,6 +104,8 @@ def run_promo_stage(
     settings: dict | None = None,
     score_model: str | None = None,
     extract_model: str | None = None,
+    *,
+    heute: date,
 ) -> dict:
     """Fuehrt den Promo-Uebersicht-Zweig aus. Gibt einen Status-Dict fuer das
     Protokoll zurueck. Wirft nur bei fatalen Konfigurationsfehlern - einzelne
@@ -113,7 +115,7 @@ def run_promo_stage(
     davon per Playwright) - gleiches Muster wie collect_all(). Diff-Check,
     LLM-Extraktion und DB-Update laufen danach sequentiell, weil sie den
     gemeinsamen State (SnapshotStore/PromoDB) mutieren."""
-    today = date.today().isoformat()
+    today = heute.isoformat()
     state_dir = root / "data" / "state"
     reports_dir = root / "data" / "reports" / "promo"
     reports_dir.mkdir(parents=True, exist_ok=True)

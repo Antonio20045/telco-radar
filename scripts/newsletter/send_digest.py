@@ -24,6 +24,7 @@ import argparse
 import json
 import os
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
 WURZEL = Path(__file__).resolve().parents[2]
@@ -121,7 +122,11 @@ def main(argv=None) -> int:
         )
         _zahl("Sendeplan", f"{len(plan)} Posten geschrieben")
         try:
-            rest = v.pruefe_limit(len(plan), Path(args.send_log))
+            rest = v.pruefe_limit(
+                len(plan),
+                Path(args.send_log),
+                heute=datetime.now(UTC).date().isoformat(),
+            )
             _zahl("Abstand zum Tageslimit", rest)
         except v.LimitGerissen as fehler:
             print(f"::error::{fehler}", flush=True)
@@ -174,6 +179,7 @@ def main(argv=None) -> int:
             log_pfad=Path(args.send_log),
             datum=datum,
             protokollieren=anhaengen,
+            uhr=lambda: datetime.now(UTC),
         )
     except v.LimitGerissen as fehler:
         print(f"::error::{fehler}", flush=True)

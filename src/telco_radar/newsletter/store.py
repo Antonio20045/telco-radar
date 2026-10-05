@@ -39,7 +39,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .config import NewsletterKatalog
-from .subscription import Abo, als_dict, aus_dict, jetzt
+from .subscription import Abo, als_dict, aus_dict
 
 log = logging.getLogger(__name__)
 
@@ -188,13 +188,11 @@ class AboStore:
         schreibe_jsonl(self.pfad, self._roh)
 
 
-def doi_gesperrt(
-    log_pfad: Path, adress_kennwert: str, *, heute: datetime | None = None
-) -> bool:
+def doi_gesperrt(log_pfad: Path, adress_kennwert: str, *, heute: datetime) -> bool:
     """Hat diese Adresse in den letzten 24 Stunden schon eine Mail bekommen?"""
     if not adress_kennwert:
         return True
-    grenze = (heute or datetime.now(timezone.utc)) - timedelta(hours=DOI_SPERRE_STUNDEN)
+    grenze = heute - timedelta(hours=DOI_SPERRE_STUNDEN)
     for eintrag in lies_jsonl(log_pfad):
         if eintrag.get("addr_hmac") != adress_kennwert:
             continue
@@ -212,7 +210,7 @@ def doi_gesperrt(
 
 
 def doi_vermerken(
-    log_pfad: Path, adress_kennwert: str, *, token_id: str = "", zeitpunkt: str = ""
+    log_pfad: Path, adress_kennwert: str, *, token_id: str = "", zeitpunkt: str
 ) -> None:
     """Den Versand einer Bestaetigungsmail festhalten.
 
@@ -224,7 +222,7 @@ def doi_vermerken(
         {
             "addr_hmac": adress_kennwert,
             "token_id": token_id,
-            "at": zeitpunkt or jetzt(),
+            "at": zeitpunkt,
         },
         ensure_ascii=False,
         sort_keys=True,
@@ -233,16 +231,14 @@ def doi_vermerken(
         datei.write(zeile + "\n")
 
 
-def doi_aufraeumen(
-    log_pfad: Path, *, tage: int = 30, heute: datetime | None = None
-) -> int:
+def doi_aufraeumen(log_pfad: Path, *, tage: int = 30, heute: datetime) -> int:
     """Alte Eintraege wegwerfen. Gibt zurueck, wie viele gefallen sind.
 
     Das Log beantwortet genau eine Frage ueber 24 Stunden; alles Aeltere ist
     eine Datensammlung ohne Zweck - und damit nach Art. 5 Abs. 1 lit. e
     DSGVO eine, die nicht sein darf.
     """
-    grenze = (heute or datetime.now(timezone.utc)) - timedelta(days=tage)
+    grenze = heute - timedelta(days=tage)
     eintraege = lies_jsonl(log_pfad)
     behalten = []
     for eintrag in eintraege:

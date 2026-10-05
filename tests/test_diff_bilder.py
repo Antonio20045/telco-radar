@@ -134,7 +134,7 @@ def test_ein_beispiel_das_die_bibliothek_verlaesst_nimmt_sein_bild_mit(
     ordner.mkdir(parents=True)
     (ordner / "alt-800.jpg").write_bytes(b"x")
     diff_bilder.schreibe_index(
-        tmp_path, {"https://example.com/weg": {"image": "alt-800.jpg"}}
+        tmp_path, {"https://example.com/weg": {"image": "alt-800.jpg"}}, "2026-08-11"
     )
     monkeypatch.setattr(diff_bilder.report_bilder, "og_bild", lambda url, client: "")
 

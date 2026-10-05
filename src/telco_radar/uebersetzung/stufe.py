@@ -135,11 +135,10 @@ def lauf(
     settings: dict,
     modell: str,
     frist_sekunden: float,
-    heute: date | None = None,
+    heute: date,
 ) -> dict:
     """Die Stufe. Gibt die Bilanz zurueck, wirft nichts."""
     t0 = time.monotonic()
-    heute = heute or date.today()
     root = Path(root)
     items = list(items)
     store = UebersetzungsStore(root / "data" / "state" / "uebersetzungen.jsonl")

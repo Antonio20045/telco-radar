@@ -28,6 +28,7 @@ import argparse
 import json
 import os
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
 WURZEL = Path(__file__).resolve().parents[2]
@@ -84,7 +85,7 @@ def befehl_doi(args) -> int:
     kennwert = str(daten.get("addr_hmac") or "")
     doi_log = Path(args.doi_log)
 
-    if st.doi_gesperrt(doi_log, kennwert):
+    if st.doi_gesperrt(doi_log, kennwert, heute=datetime.now(UTC)):
         _zahl("DOI", "gesperrt (24-Stunden-Regel)")
         return 0
 
@@ -122,8 +123,13 @@ def befehl_doi(args) -> int:
     ergebnis = transport.send(nachricht, adresse)
     _zahl("DOI", "versendet" if ergebnis.ok else f"gescheitert ({ergebnis.status})")
     if ergebnis.ok:
-        st.doi_vermerken(doi_log, kennwert, token_id=args.token_id)
-    st.doi_aufraeumen(doi_log)
+        st.doi_vermerken(
+            doi_log,
+            kennwert,
+            token_id=args.token_id,
+            zeitpunkt=sub.zeitstempel(datetime.now(UTC)),
+        )
+    st.doi_aufraeumen(doi_log, heute=datetime.now(UTC))
     return 0 if ergebnis.ok else 1
 
 
@@ -211,7 +217,7 @@ def befehl_confirm(args) -> int:
         confirm_token_id=args.token_id,
     )
     abo.created_at = abo.created_at or _iso(daten.get("iat"))
-    abo.confirmed_at = sub.jetzt()
+    abo.confirmed_at = sub.zeitstempel(datetime.now(UTC))
     abo.state = "active"
     if not abo.consent.vollstaendig:
         raise SystemExit(
@@ -235,7 +241,7 @@ def _iso(iat) -> str:
             .replace("+00:00", "Z")
         )
     except (TypeError, ValueError):
-        return sub.jetzt()
+        return sub.zeitstempel(datetime.now(UTC))
 
 
 def befehl_unsubscribe(args) -> int:
@@ -255,7 +261,7 @@ def befehl_unsubscribe(args) -> int:
     if abo is None:
         _zahl("Abmeldung", "kein Abo gefunden")
         return 0
-    store.setze(abo.abgemeldet())
+    store.setze(abo.abgemeldet(zeitpunkt=sub.zeitstempel(datetime.now(UTC))))
     store.speichern()
     _zahl("Abmeldung", "erledigt")
     _zahl("Abos aktiv", len(store.aktive()))

@@ -79,12 +79,12 @@ def lade_index(root: Path) -> dict:
     return eintraege if isinstance(eintraege, dict) else {}
 
 
-def schreibe_index(root: Path, index: dict, stand: str = "") -> None:
+def schreibe_index(root: Path, index: dict, stand: str) -> None:
     pfad = indexdatei(root)
     pfad.parent.mkdir(parents=True, exist_ok=True)
     pfad.write_text(
         json.dumps(
-            {"updated": stand or date.today().isoformat(), "bilder": index},
+            {"updated": stand, "bilder": index},
             ensure_ascii=False,
         ),
         encoding="utf-8",
@@ -130,16 +130,13 @@ def _veraltet(eintrag: dict, heute: str) -> bool:
         return True
 
 
-def beschaffe(
-    bestand: list[dict], root: Path, reports_dir: Path, heute: str = ""
-) -> dict:
+def beschaffe(bestand: list[dict], root: Path, reports_dir: Path, heute: str) -> dict:
     """Sorgt dafuer, dass moeglichst jeder Eintrag ein Bild hat.
 
     Aendert `bestand` NICHT - Ergebnis ist der Index, den `verteile()` beim
     Rendern anlegt. So bleibt die Netzarbeit in der Pipeline und das Rendern
     (auch in `scripts/pruefe_portal.py`) offline moeglich.
     """
-    heute = heute or date.today().isoformat()
     ordner = bildordner(root)
     index = lade_index(root)
     aus_berichten = bild_aus_berichten(reports_dir)
