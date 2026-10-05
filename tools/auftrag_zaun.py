@@ -1,9 +1,11 @@
 """Zaun um einen Auftrag: was ein Agent außerhalb seines Worktree-Inhalts schreibt.
 
-Überwacht werden gitignorierte Dateien im Worktree (außer Caches und ``.venv``), das
+Überwacht werden gitignorierte Dateien im Worktree (außer Caches, ``__pycache__`` und
+``.venv``), das
 ``.venv`` des Hauptbaums, mit dem das Skript urteilt, und die Teile des Git-Ordners,
 die Git-Befehle steuern. Verglichen wird die Signatur aus Modus, Größe, Inode und
-ctime; ctime lässt sich ohne Änderung der Datei nicht zurücksetzen.
+ctime; ctime lässt sich ohne Änderung der Datei nicht zurücksetzen. Bytecode im
+Worktree liest das Skript nie, weil seine Prozesse einen eigenen Bytecode-Ordner haben.
 """
 
 from __future__ import annotations
@@ -21,6 +23,7 @@ FREI = (
     ".import_linter_cache/",
     "mutants/",
 )
+BYTECODE = "__pycache__"
 GIT_TEILE = ("config", "hooks", "info")
 WORKTREE_TEILE = ("HEAD", "commondir", "gitdir", "config.worktree")
 
@@ -48,7 +51,11 @@ def _signaturen(pfad: Path, name: str) -> dict[str, str]:
 def stand(wt: Path, haupt: Path) -> dict[str, str]:
     """Signaturen aller überwachten Dateien eines Auftrags."""
     roh = _git(wt, "ls-files", "-z", "--others", "--ignored", "--exclude-standard")
-    ignoriert = [p for p in roh.split("\0") if p and not p.startswith(FREI)]
+    ignoriert = [
+        p
+        for p in roh.split("\0")
+        if p and not p.startswith(FREI) and BYTECODE not in p.split("/")
+    ]
     ergebnis: dict[str, str] = {}
     for pfad in ignoriert:
         ergebnis |= _signaturen(wt / pfad, f"wt:{pfad}")

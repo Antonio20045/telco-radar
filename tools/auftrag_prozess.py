@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import contextlib
 import os
+import shutil
 import signal
 import subprocess
+import tempfile
 from pathlib import Path
 
 
@@ -25,13 +27,28 @@ def starten(
     """Führt ``befehl`` aus; danach endet jeder Prozess seiner Gruppe.
 
     Ein Hintergrundprozess, der in der Gruppe bleibt, kann so nach dem Ende nichts
-    mehr ändern. Python schreibt keinen Bytecode in den Baum; gitignorierter Bytecode
-    fiele sonst aus dem Zaun. Bei ``frist`` wirft der Aufruf
-    ``subprocess.TimeoutExpired``.
+    mehr ändern. Python schreibt keinen Bytecode und liest ihn nur aus einem leeren
+    eigenen Ordner, nie aus einem ``__pycache__``, den ein Agent angelegt hat. Bei
+    ``frist`` wirft der Aufruf ``subprocess.TimeoutExpired``.
     """
+    bytecode = tempfile.mkdtemp(prefix="auftrag-pyc-")
     umgebung = (ohne_git() if umgebung is None else umgebung) | {
-        "PYTHONDONTWRITEBYTECODE": "1"
+        "PYTHONDONTWRITEBYTECODE": "1",
+        "PYTHONPYCACHEPREFIX": bytecode,
     }
+    try:
+        return _ausfuehren(befehl, ort, eingabe, umgebung, frist)
+    finally:
+        shutil.rmtree(bytecode, ignore_errors=True)
+
+
+def _ausfuehren(
+    befehl: list[str],
+    ort: Path,
+    eingabe: str | None,
+    umgebung: dict[str, str],
+    frist: float | None,
+) -> subprocess.CompletedProcess[str]:
     with subprocess.Popen(
         befehl,
         cwd=ort,

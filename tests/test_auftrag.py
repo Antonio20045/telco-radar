@@ -879,7 +879,6 @@ def test_kindprozesse_des_agenten_enden_mit_ihm(repo):
 @pytest.mark.parametrize(
     ("modus", "pfad"),
     [
-        ("zaun_pyc", "wt:scripts/__pycache__/pruefleiter.cpython-311.pyc"),
         ("zaun_config", "git:config"),
         ("zaun_hook", "git:hooks/post-merge"),
         ("zaun_venv", "haupt:.venv/bin/python"),

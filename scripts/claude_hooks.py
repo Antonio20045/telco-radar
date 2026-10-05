@@ -198,9 +198,7 @@ def sitzung(ereignis: dict, wurzel: Path = WURZEL) -> str | None:
             " Edit- und Stop-Hook prüfen nichts"
         )
     if (wurzel / HOOKS / "pre-commit").exists():
-        subprocess.run(
-            ["git", "config", "core.hooksPath", HOOKS], cwd=wurzel, check=False
-        )
+        _hooks_setzen(wurzel)
     else:
         zeilen.append(f"{HOOKS} fehlt, Commits laufen ohne Leiter")
     python = wurzel / ".venv" / "bin" / "python"
@@ -212,6 +210,21 @@ def sitzung(ereignis: dict, wurzel: Path = WURZEL) -> str | None:
         zeilen += [lauf.stdout.strip()] if lauf.stdout.strip() else []
     print("Telco Radar: " + ("; ".join(zeilen) or "Umgebung bereit, alles geprüft"))
     return None
+
+
+def _hooks_setzen(wurzel: Path) -> None:
+    """Setzt den Hook-Ordner nur, wenn er abweicht; ein gleicher Wert bleibt
+    unberührt, damit ``.git/config`` für den Zaun eines Auftrags gleich bleibt."""
+    schluessel = "core.hooksPath"
+    jetzt = subprocess.run(
+        ["git", "config", "--get", schluessel],
+        cwd=wurzel,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if jetzt.stdout.strip() != HOOKS:
+        subprocess.run(["git", "config", schluessel, HOOKS], cwd=wurzel, check=False)
 
 
 def _python_fehlt(wurzel: Path) -> str:
