@@ -1,0 +1,30 @@
+{
+  "id": "T2",
+  "art": "verhalten",
+  "ziel": "Ein Item ohne URL und ohne gespeicherte ID scheitert mit einem ValueError, statt seine ID aus dem Titeltext zu bilden; Items mit URL oder mit mitgegebener ID behalten ihre bisherige ID",
+  "bereich": "src/telco_radar/models.py",
+  "erwarteteDateien": [
+    "src/telco_radar/models.py"
+  ],
+  "vorbild": "src/telco_radar/models.py",
+  "seite": [],
+  "datenquelle": {
+    "dateien": [
+      "data/state/seen.jsonl"
+    ],
+    "botCommit": null,
+    "schnappschuss": "tests/fixtures/bestand/2026-10-03/"
+  },
+  "abnahme": "tests/test_item_id_ohne_titel.py",
+  "erwarteterFehler": "ID aus dem Titel",
+  "abhaengigVon": [
+    "T1"
+  ],
+  "migration": null,
+  "wasDarfNiePassieren": {
+    "wiederholung": "dieselbe URL ergibt immer dieselbe ID wie vorher (sha256 der normalisierten URL, 16 Hexzeichen); Item.from_dict mit gespeicherter ID gibt genau diese ID zurück, auch ohne URL",
+    "gleichzeitig": "zwei Items mit gleichem Titel und verschiedenen URLs bekommen zwei verschiedene IDs",
+    "zeitueberschreitung": "die ID entsteht ohne Netz und ohne Uhr",
+    "abbruch": "ein Item ohne URL und ohne ID wird nie mit einer Ersatz-ID angelegt; der ValueError geht an den Aufrufer weiter"
+  }
+}
