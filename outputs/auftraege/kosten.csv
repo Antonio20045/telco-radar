@@ -35,3 +35,8 @@ datum,auftrag,rolle,runde,agent,exit,sekunden,kosten_usd,token_ein,token_aus,mod
 2026-10-05,P22,bau,1,claude,0,290.0,1.7725468000000004,118,25392,claude-haiku-4-5-20251001 claude-opus-5-5,
 2026-10-05,P22,bau,2,claude,0,129.4,0.5302472,60,8919,claude-haiku-4-5-20251001 claude-opus-5-5,
 2026-10-05,P22,ende,0,claude,,,,,,,notiz
+2026-10-05,T3,test,1,claude,0,173.1,0.7677626,58,12061,claude-haiku-4-5-20251001 claude-opus-5-5,
+2026-10-05,T3,bau,1,claude,0,204.0,1.2586847999999997,82,18298,claude-haiku-4-5-20251001 claude-opus-5-5,
+2026-10-05,T3,pruefer,1,claude,0,148.6,0.8332829999999999,58,12438,claude-haiku-4-5-20251001 claude-opus-5-5,
+2026-10-05,T3,mutation,0,mutmut,0,17.3,,,,,"184 von 245 Mutanten erkannt, überlebt: _kandidaten#6 _kandidaten#7 _kandidaten#8 _kandidaten#9 _kandidaten#11 …"
+2026-10-05,T3,ende,0,claude,,,,,,,gemergt
