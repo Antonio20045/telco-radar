@@ -41,6 +41,8 @@
       "Edit(pruef/**)",
       "Edit(.githooks/**)",
       "Edit(.claude/settings.json)",
+      "Edit(scripts/claude_rolle.py)",
+      "Edit(.claude/agents/**)",
       "Edit(.importlinter)",
       "Edit(pyproject.toml)",
       "Edit(tests/fixtures/bestand/**)",
@@ -96,7 +98,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/.venv/bin/python \"$CLAUDE_PROJECT_DIR\"/scripts/claude_hooks.py nach_edit",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/scripts/claude_hooks.py nach_edit",
             "timeout": 30
           }
         ]
