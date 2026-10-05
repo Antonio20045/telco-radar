@@ -7,7 +7,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import json
 import logging
 import os
 import sys
@@ -22,18 +21,10 @@ from pathlib import Path
 from typing import TypeVar
 
 from .analyze import bewertung as bewertung_mod
-from .analyze import editor
 from .analyze import clustering
 from .analyze import ctm as ctm_mod
 from .analyze import einordnung as einordnung_mod
-from .analyze import category_sweep
-from .analyze import differentiation_editor
-from .analyze.begriffe import THEME_LABEL
-from .analyze.diff_curator import DiffStore
-from .analyze.diff_db import DiffDB
-from .analyze import redaktion_kontinuitaet
 from .analyze import vorsortierung as vorsortierung_mod
-from .uebersetzung import stufe as uebersetzung_stufe
 from .analyze import llm
 from .analyze.llm import llm_available, active_backend
 from .analyze.takt import Takt
@@ -44,11 +35,8 @@ from .models import Item
 from .naehte import PRODUKTION, Naehte
 from .quellen_register import Quellenregister, quellen_der_config
 from .report import bilder as report_bilder
-from .report import diff_bilder
-from .report import differenzierung_view
-from .report import geraete_bewegung
 from .report.ausfall import Ausfall
-from .report.html import render_site
+from . import veroeffentlichen, zusatzstufen
 
 log = logging.getLogger("telco_radar")
 
@@ -206,37 +194,6 @@ def _registriere_anker(
         llm.set_fallback(ende, anker)
         gesetzt[ende] = anker
     return gesetzt
-
-
-def _protokolliere_kosten(kosten: dict) -> None:
-    modelle = kosten.get("modelle") or {}
-    log.info(
-        "Kosten: %.4f $ ueber %d Aufruf(e) in %d Modell(en)%s",
-        kosten.get("summe_usd", 0.0),
-        sum(m["aufrufe"] for m in modelle.values()),
-        len(modelle),
-        f" - ohne Preiszeile: {', '.join(kosten['ohne_preis'])}"
-        if kosten.get("ohne_preis")
-        else "",
-    )
-    for name, m in modelle.items():
-        log.info(
-            "Kosten %-32s %5d Aufrufe, %9d ein / %9d aus -> %s",
-            name,
-            m["aufrufe"],
-            m["prompt_tokens"],
-            m["completion_tokens"],
-            "?" if m.get("usd") is None else f"{m['usd']:.4f} $",
-        )
-    if kosten.get("budget_ueberschritten"):
-        log.warning(
-            "Kosten: WARNSCHWELLE UEBERSCHRITTEN - %.4f $ gegen "
-            "%.2f $ (llm_budget_usd). Der Lauf wurde nicht "
-            "beschnitten; die Schwelle gehoert nachkalibriert oder "
-            "der Umfang gesenkt.",
-            kosten.get("summe_usd", 0.0),
-            kosten["budget_usd"],
-        )
 
 
 def zu_merkende_meldungen(
@@ -773,187 +730,97 @@ def _bilder(
     return alle_highlights
 
 
-def run(
+@dataclass(frozen=True)
+class Analyse:
+    """Ergebnis von Vorsortieren bis Themen: bewertete Bereiche samt Bilanzen."""
+
+    vorsortierung: Vorsortierung
+    bewertung: bewertung_mod.Bewertung
+    einordnung: einordnung_mod.Einordnung
+    wettbewerber: list[dict]
+    alle_highlights: list[dict]
+    by_url: dict[str, Item]
+    topics_store: ReportedTopics
+
+
+def _analysieren(
+    cfg: Config,
     root: Path,
-    use_llm: bool | None = None,
-    lookback_days: int | None = None,
-    naehte: Naehte = PRODUKTION,
-) -> tuple[Path, list[Ausfall]]:
-    """Execute one full radar run; returns the report path and unbuilt site parts."""
-    uhr = naehte.setzen() or partial(datetime.now, timezone.utc)
-    stoppuhr = naehte.stoppuhr or time.monotonic
-    t0 = stoppuhr()
-    started_at = uhr()
-    cfg = load_config(root)
-    language = LANGUAGES.get(cfg.settings.get("report_language", "de"), "Deutsch")
-    modelle = _modelle_waehlen(cfg.settings)
-    analyst_model, editor_model = modelle.analyst, modelle.editor
-    mechanik_model, anker = modelle.mechanik, modelle.anker
-    today = started_at.date()
-    today_iso = today.isoformat()
+    stufen: tuple[Sammlung, Neuheit, Buendel],
+    modelle: Modelle,
+    schalter: tuple[bool, bool, bool],
+    zeit: tuple[str, str, float],
+    takt: Takt,
+) -> Analyse:
+    sammlung, neuheit, buendel = stufen
+    use_llm, llm_was_explicitly_disabled, mit_llm = schalter
+    language, today_iso, t0 = zeit
     state_dir = root / "data" / "state"
-    reports_dir = root / "data" / "reports"
-    reports_dir.mkdir(parents=True, exist_ok=True)
-
-    phases: list[dict] = []
-    phase = partial(_phase_eintragen, phases)
-    sammlung = _sammeln(root, cfg, mechanik_model, use_llm, stoppuhr, phase)
-    neuheit = _nur_neues(sammlung, cfg, lookback_days, today_iso, stoppuhr, phase)
-    new_items = neuheit.new_items
-    llm_was_explicitly_disabled = use_llm is False
-    if use_llm is None:
-        use_llm = llm_available()
-
-    buendel = _buendeln(
-        new_items, cfg, state_dir, mechanik_model, use_llm, uhr, stoppuhr, phase
-    )
-    mit_llm = bool(use_llm and new_items)
     vorsortierung = _vorsortieren(
-        buendel, cfg, root, mechanik_model, mit_llm, t0, stoppuhr, phase
+        buendel, cfg, root, modelle.mechanik, mit_llm, t0, takt.stoppuhr, takt.phase
     )
     topics_store = ReportedTopics(
         state_dir / "reported_topics.jsonl",
         max_entries=int(cfg.settings.get("reported_topics_memory", 300)),
     )
-    takt = Takt(stoppuhr, phase, _abgesichert)
     bewertung = bewertung_mod.bewerten(
         cfg,
         vorsortierung.items_by_region,
-        (new_items, neuheit.first_run),
+        (neuheit.new_items, neuheit.first_run),
         (use_llm, llm_was_explicitly_disabled),
-        (analyst_model, editor_model, modelle.anker_mechanik),
+        (modelle.analyst, modelle.editor, modelle.anker_mechanik),
         language,
         topics_store.recent,
         takt,
     )
-    regional, body, covered = bewertung.regional, bewertung.body, bewertung.covered
-    editor_used = bewertung.editor_used
+    regional = bewertung.regional
     einordnung = einordnung_mod.einordnen(
-        regional, cfg, root, mechanik_model, mit_llm, takt
+        regional, cfg, root, modelle.mechanik, mit_llm, takt
     )
-    ctm_bilanz, beleg_bilanz = einordnung.ctm, einordnung.beleg
-    competitor_profiles: list[dict] = []
+    wettbewerber: list[dict] = []
     if use_llm and cfg.focus_competitors:
-        competitor_profiles = einordnung_mod.wettbewerber(
-            cfg,
-            sammlung.items,
-            editor_model or analyst_model,
-            language,
-            takt,
+        wettbewerber = einordnung_mod.wettbewerber(
+            cfg, sammlung.items, modelle.editor or modelle.analyst, language, takt
         )
-
-    by_url = {i.url: i for i in new_items}
+    by_url = {i.url: i for i in neuheit.new_items}
     _belege_anhaengen(regional, by_url, buendel)
-
-    alle_highlights = _bilder(regional, root, stoppuhr, phase)
+    alle_highlights = _bilder(regional, root, takt.stoppuhr, takt.phase)
     einordnung_mod.themen_und_moves(
         regional,
         cfg,
-        (state_dir, reports_dir, today_iso),
-        (editor_model or analyst_model, mechanik_model),
+        (state_dir, root / "data" / "reports", today_iso),
+        (modelle.editor or modelle.analyst, modelle.mechanik),
         mit_llm,
         takt,
     )
+    return Analyse(
+        vorsortierung,
+        bewertung,
+        einordnung,
+        wettbewerber,
+        alle_highlights,
+        by_url,
+        topics_store,
+    )
 
-    try:
-        category_sweep.run_sweep(
-            state_dir,
-            os.environ.get("BRAVE_API_KEY", ""),
-            mechanik_model,
-            bool(use_llm),
-            today.isocalendar()[1],
-        )
-    except Exception as exc:  # noqa: BLE001
-        log.error("Kategorie-Sweep uebersprungen: %s", exc)
 
-    promo_result: dict = {}
-    if cfg.settings.get("promo_enabled", True):
-        try:
-            from .promo_pipeline import run_promo_stage
-
-            promo_result = run_promo_stage(
-                root,
-                cfg.settings.get("http", {}),
-                bool(use_llm),
-                editor_model,
-                language=language,
-                settings=cfg.settings,
-                score_model=mechanik_model,
-                extract_model=mechanik_model,
-            )
-            log.info(
-                "Promo-Uebersicht: %s (%d aktive Aktionen)",
-                promo_result.get("mode"),
-                promo_result.get("active", 0),
-            )
-        except Exception as exc:  # noqa: BLE001
-            log.error("Promo-Uebersicht uebersprungen: %s", exc)
-
-    geraete_bilanz: dict = {}
-    _budget = geraete_budget(cfg.settings, stoppuhr() - t0)
-    if _budget is None:
-        if cfg.settings.get("geraete_enabled", False):
-            log.warning(
-                "Geraeteradar uebersprungen: zu wenig Jobzeit uebrig. "
-                "Der naechtliche Lauf holt es nach - die "
-                "Veroeffentlichung geht vor."
-            )
-    else:
-        try:
-            from .geraete_pipeline import run_geraete_stage
-
-            geraete_bilanz = run_geraete_stage(
-                root, cfg.settings.get("http", {}), today_iso, frist_sekunden=_budget
-            )
-        except Exception as exc:  # noqa: BLE001
-            log.error("Geraeteradar uebersprungen: %s", exc)
-
-    diff_report_dir = reports_dir / "differenzierung"
-    diff_report_dir.mkdir(parents=True, exist_ok=True)
-    diff_db = DiffDB(state_dir / "differentiation_db.json")
-    diff_entries = list(diff_db.entries.values())
-    theme_labels = THEME_LABEL
-    try:
-        if use_llm and diff_entries:
-            diff_body = differentiation_editor.synthesize(
-                diff_entries, theme_labels, model=editor_model, language=language
-            )
-            diff_mode = "KI-Redaktion"
-        else:
-            diff_body = differentiation_editor.build_digest(diff_entries, theme_labels)
-            diff_mode = "Regelbericht"
-    except Exception as exc:  # noqa: BLE001
-        log.warning(
-            "Differenzierungsbericht-Agent fehlgeschlagen (%s) – verwende Regelbericht",
-            str(exc)[:160],
-        )
-        diff_body = differentiation_editor.build_digest(diff_entries, theme_labels)
-        diff_mode = "Regelbericht (Fallback)"
-    diff_report_path = diff_report_dir / f"{today.isoformat()}.md"
-    diff_report_path.write_text(diff_body, encoding="utf-8")
-    log.info("Differenzierungsbericht: %s (%d Moves)", diff_mode, len(diff_entries))
-
-    try:
-        diff_store_fuer_bilder = DiffStore(state_dir / "differentiation.jsonl")
-        diff_bestand = differenzierung_view.merge(
-            diff_entries, diff_store_fuer_bilder.entries()
-        )
-        bilanz = diff_bilder.beschaffe(
-            diff_bestand, root, reports_dir, today.isoformat()
-        )
-        log.info(
-            "Differenzierungs-Bilder: %d von %d Beispielen",
-            bilanz.get("mit_bild", 0),
-            bilanz.get("bestand", 0),
-        )
-    except Exception as exc:  # noqa: BLE001
-        log.error("Differenzierungs-Bilder uebersprungen: %s", exc)
-
+def _kennzahlen(
+    cfg: Config,
+    stufen: tuple[Sammlung, Neuheit, Buendel],
+    einordnung: einordnung_mod.Einordnung,
+    zusatz: zusatzstufen.Zusatz,
+) -> dict:
+    sammlung, neuheit, buendel = stufen
+    ctm_bilanz, beleg_bilanz, geraete_bilanz = (
+        einordnung.ctm,
+        einordnung.beleg,
+        zusatz.geraete,
+    )
     stats = {
         **sammlung.kennzahlen(cfg),
-        "new": len(new_items),
+        "new": len(neuheit.new_items),
         "events": len(buendel.vertreter_items),
-        "bundled": len(new_items) - len(buendel.vertreter_items),
+        "bundled": len(neuheit.new_items) - len(buendel.vertreter_items),
         "followups": len(buendel.nachklapp),
         "ctm_direkt": ctm_bilanz.get("direkt", 0),
         "ctm_uebertragbar": ctm_bilanz.get("uebertragbar", 0),
@@ -972,147 +839,139 @@ def run(
         "regions": len(cfg.region_names) - 1,
         "themes": len(cfg.theme_names),
     }
-    stats |= promo_stats(promo_result)
+    return stats | promo_stats(zusatz.promo)
 
-    duration = stoppuhr() - t0
-    kosten = llm.kosten_stand()
 
-    run_log = {
+def _lauf_protokoll(
+    zeiten: tuple[datetime, datetime, float],
+    mit_llm: bool,
+    modelle: Modelle,
+    phases: list[dict],
+    stufen: tuple[Sammlung, Neuheit, Analyse],
+) -> dict:
+    started_at, finished_at, duration = zeiten
+    sammlung, neuheit, analyse = stufen
+    editor_used = analyse.bewertung.editor_used
+    return {
         "started_at": started_at.isoformat(),
-        "finished_at": uhr().isoformat(),
+        "finished_at": finished_at.isoformat(),
         "duration_seconds": round(duration, 1),
         "used_llm": mit_llm,
         "editor_used": editor_used,
         "models": {
-            "analyst": analyst_model if mit_llm else None,
-            "editor": editor_model if editor_used else None,
-            "mechanik": mechanik_model if mit_llm else None,
+            "analyst": modelle.analyst if mit_llm else None,
+            "editor": modelle.editor if editor_used else None,
+            "mechanik": modelle.mechanik if mit_llm else None,
             "unavailable": sorted(llm.dead_models()) or None,
-            "anker": anker or None,
+            "anker": modelle.anker or None,
         },
-        "kosten": kosten,
-        "vorsortierung": vorsortierung.bilanz or None,
+        "kosten": llm.kosten_stand(),
+        "vorsortierung": analyse.vorsortierung.bilanz or None,
         "phases": phases,
         "source_summary": sammlung.zusammenfassung(),
         "register": neuheit.register_zusammenfassung,
         "sources": sammlung.sortiert(),
-        "analysts": bewertung.analyst_telemetry,
+        "analysts": analyse.bewertung.analyst_telemetry,
     }
 
-    stats["bewertete"] = redaktion_kontinuitaet.bewertete_meldungen(
-        {"regions": regional}
-    )
-    grund = (
-        "es gab keine neuen Meldungen zu bewerten"
-        if not new_items
-        else "eine vorübergehende Störung des Analyse-Dienstes"
-    )
-    regional, body, competitor_profiles, redaktion_ausfall = (
-        redaktion_kontinuitaet.uebernehmen(
-            regional, body, competitor_profiles, reports_dir, today.isoformat(), grund
-        )
-    )
 
-    report_md = editor.report_header(today, stats) + body
-    report_path = reports_dir / f"{today.isoformat()}.md"
-    report_path.write_text(report_md, encoding="utf-8")
+def run(
+    root: Path,
+    use_llm: bool | None = None,
+    lookback_days: int | None = None,
+    naehte: Naehte = PRODUKTION,
+) -> tuple[Path, list[Ausfall]]:
+    """Execute one full radar run; returns the report path and unbuilt site parts."""
+    uhr = naehte.setzen() or partial(datetime.now, timezone.utc)
+    stoppuhr = naehte.stoppuhr or time.monotonic
+    t0 = stoppuhr()
+    started_at = uhr()
+    cfg = load_config(root)
+    language = LANGUAGES.get(cfg.settings.get("report_language", "de"), "Deutsch")
+    modelle = _modelle_waehlen(cfg.settings)
+    today = started_at.date()
+    state_dir = root / "data" / "state"
+    (root / "data" / "reports").mkdir(parents=True, exist_ok=True)
 
-    report_json = {
-        "date": today.isoformat(),
-        "generated_with_llm": mit_llm,
-        "stats": stats,
-        "briefing_md": body,
-        "regions": regional,
-        "competitors": competitor_profiles,
-        "run": run_log,
-    }
-    if redaktion_ausfall:
-        report_json["redaktion_ausfall"] = redaktion_ausfall
-    report_json["geraete_bewegung"] = geraete_bewegung.fuer_bericht(
-        root, today, reports_dir
+    phases: list[dict] = []
+    phase = partial(_phase_eintragen, phases)
+    sammlung = _sammeln(root, cfg, modelle.mechanik, use_llm, stoppuhr, phase)
+    neuheit = _nur_neues(
+        sammlung, cfg, lookback_days, today.isoformat(), stoppuhr, phase
     )
-    json_path = reports_dir / f"{today.isoformat()}.json"
-    json_path.write_text(
-        json.dumps(report_json, ensure_ascii=False, indent=1), encoding="utf-8"
-    )
-    log.info("Report written: %s (+ .json), run took %.1fs", report_path, duration)
+    llm_was_explicitly_disabled = use_llm is False
+    if use_llm is None:
+        use_llm = llm_available()
 
+    buendel = _buendeln(
+        neuheit.new_items,
+        cfg,
+        state_dir,
+        modelle.mechanik,
+        use_llm,
+        uhr,
+        stoppuhr,
+        phase,
+    )
+    mit_llm = bool(use_llm and neuheit.new_items)
+    takt = Takt(stoppuhr, phase, _abgesichert)
+    stufen = (sammlung, neuheit, buendel)
+    analyse = _analysieren(
+        cfg,
+        root,
+        stufen,
+        modelle,
+        (use_llm, llm_was_explicitly_disabled, mit_llm),
+        (language, today.isoformat(), t0),
+        takt,
+    )
+    zusatz = zusatzstufen.ausfuehren(
+        cfg,
+        root,
+        today,
+        (modelle.editor, modelle.mechanik, language),
+        bool(use_llm),
+        lambda: geraete_budget(cfg.settings, stoppuhr() - t0),
+        takt,
+    )
+    stats = _kennzahlen(cfg, stufen, analyse.einordnung, zusatz)
+    duration = stoppuhr() - t0
+    run_log = _lauf_protokoll(
+        (started_at, uhr(), duration),
+        mit_llm,
+        modelle,
+        phases,
+        (sammlung, neuheit, analyse),
+    )
+    bewertung = analyse.bewertung
+    bericht = veroeffentlichen.bericht_schreiben(
+        root,
+        today,
+        (bewertung.regional, bewertung.body, analyse.wettbewerber),
+        stats,
+        run_log,
+        mit_llm,
+        len(neuheit.new_items),
+    )
     _gesehen_merken(
         neuheit,
         buendel,
         bewertung.ungelesene_meldungen,
         bewertung.unanalysierte_regionen,
-        today_iso,
+        today.isoformat(),
     )
-    if covered and editor_used:
-        topics_store.add(covered, today.isoformat())
-    elif covered:
-        log.warning(
-            "%d Themen stammen aus dem Notfall-Digest, nicht aus der "
-            "Redaktion - sie werden NICHT als berichtet gemerkt",
-            len(covered),
-        )
-
-    uebersetzung_bilanz: dict = {}
-    _ueb_items = uebersetzung_stufe.berichtete_items(alle_highlights, by_url)
-    if len(_ueb_items) < len(alle_highlights):
-        log.info(
-            "Uebersetzung: %d von %d berichteten Meldungen ohne "
-            "zugehoeriges Item (Dubletten oder umgeschriebene Adresse)",
-            len(alle_highlights) - len(_ueb_items),
-            len(alle_highlights),
-        )
-    _ueb_budget = uebersetzung_stufe.budget(cfg.settings, stoppuhr() - t0)
-    if _ueb_budget is None:
-        if cfg.settings.get("uebersetzung_enabled", True):
-            log.warning(
-                "Uebersetzung uebersprungen: zu wenig Jobzeit uebrig. "
-                "Die Veroeffentlichung geht vor."
-            )
-    elif not llm.llm_available():
-        log.info("Uebersetzung uebersprungen: kein Modellzugang.")
-    else:
-        try:
-            uebersetzung_bilanz = uebersetzung_stufe.lauf(
-                _ueb_items,
-                root,
-                cfg.settings,
-                mechanik_model,
-                frist_sekunden=_ueb_budget,
-                heute=today,
-            )
-            log.info("%s", uebersetzung_stufe.protokollzeile(uebersetzung_bilanz))
-            run_log["uebersetzung"] = {
-                k: (dict(v) if isinstance(v, Counter) else v)
-                for k, v in uebersetzung_bilanz.items()
-            }
-        except Exception as exc:  # noqa: BLE001
-            log.error("Uebersetzung uebersprungen: %s: %s", type(exc).__name__, exc)
-
-    run_log["kosten"] = llm.kosten_stand()
-    report_json["run"] = run_log
-    _protokolliere_kosten(run_log["kosten"])
-    json_path.write_text(
-        json.dumps(report_json, ensure_ascii=False, indent=1), encoding="utf-8"
+    veroeffentlichen.themen_merken(
+        analyse.topics_store, bewertung.covered, bewertung.editor_used, today
     )
-
-    try:
-        report_bilder.raeume_auf(root, reports_dir)
-    except Exception as exc:  # noqa: BLE001
-        log.error("Bilder-Aufraeumen fehlgeschlagen: %s", exc)
-    ausfaelle = render_site(root / "site", reports_dir, cfg)
-
-    try:
-        from .versand import versende
-
-        run_log["versand"] = versende(root, report_json, cfg.settings)
-        json_path.write_text(
-            json.dumps(report_json, ensure_ascii=False, indent=1), encoding="utf-8"
-        )
-    except Exception as exc:  # noqa: BLE001
-        log.error("Versand uebersprungen: %s", exc)
-
-    return report_path, ausfaelle
+    ausfaelle = veroeffentlichen.nachlauf(
+        bericht,
+        (analyse.alle_highlights, analyse.by_url),
+        cfg,
+        root,
+        (modelle.mechanik, today, t0),
+        takt,
+    )
+    return bericht.report_path, ausfaelle
 
 
 def main(argv: list[str] | None = None) -> int:
