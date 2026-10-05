@@ -39,9 +39,7 @@ from .analyze import vorsortierung as vorsortierung_mod
 from .uebersetzung import stufe as uebersetzung_stufe
 from .analyze import llm
 from .analyze.llm import llm_available, active_backend
-from .collect import aenderungen as aenderungsradar
-from .collect import collect_all, ct_log, tag_news_regions, tarif_crawler
-from .collect import lieferzeit as lieferzeit_radar
+from .collect import collect_all, tag_news_regions
 from .config import Config, is_theme_key, load_config
 from .dedupe import ReportedTopics, SeenStore, filter_fresh
 from .models import Item
@@ -454,10 +452,8 @@ class Buendel:
         return {g.vertreter.url: g for g in self.aktuelle}
 
 
-def _phase_eintragen(
-    phases: list[dict], name: str, seconds: float, detail: str = ""
-) -> None:
-    phases.append({"name": name, "seconds": round(seconds, 1), "detail": detail})
+def _phase_eintragen(liste: list[dict], name: str, sek: float, detail: str) -> None:
+    liste.append({"name": name, "seconds": round(sek, 1), "detail": detail})
 
 
 def _modelle_waehlen(settings: dict) -> Modelle:
@@ -490,40 +486,44 @@ def _modelle_waehlen(settings: dict) -> Modelle:
     return Modelle(analyst_model, editor_model, mechanik_model, anker, anker_mechanik)
 
 
+def _hole(art: str, root: Path, http: dict, modell: str) -> tuple[list[Item], dict]:
+    if art == "lieferzeit":
+        from .collect import lieferzeit
+
+        return [], lieferzeit.sammle(root, http)
+    if art == "aenderung":
+        from .collect import aenderungen
+
+        return aenderungen.sammle(root, http)
+    if art == "tarif":
+        from .collect import tarif_crawler
+
+        return tarif_crawler.sammle(root, http)
+    from .collect import ct_log
+
+    return ct_log.sammle(root, http, modell=modell, komplett=llm.complete)
+
+
+_ZUSATZSAMMLER = {
+    "lieferzeit": ("lieferzeit_radar_aktiv", "Lieferzeit-Radar"),
+    "aenderung": ("aenderungsradar_aktiv", "Aenderungsradar"),
+    "tarif": ("tarif_radar_aktiv", "Tarif-Sammler"),
+    "ct": ("ct_radar_aktiv", "CT-Radar"),
+}
+
+
 def _zusatzsammler(
     root: Path, settings: dict, ct_modell: str
 ) -> tuple[list[Item], dict[str, dict]]:
     http = settings.get("http", {})
-    sammler = {
-        "lieferzeit": (
-            "lieferzeit_radar_aktiv",
-            "Lieferzeit-Radar",
-            lambda: ([], lieferzeit_radar.sammle(root, http)),
-        ),
-        "aenderung": (
-            "aenderungsradar_aktiv",
-            "Aenderungsradar",
-            lambda: aenderungsradar.sammle(root, http),
-        ),
-        "tarif": (
-            "tarif_radar_aktiv",
-            "Tarif-Sammler",
-            lambda: tarif_crawler.sammle(root, http),
-        ),
-        "ct": (
-            "ct_radar_aktiv",
-            "CT-Radar",
-            lambda: ct_log.sammle(root, http, modell=ct_modell, komplett=llm.complete),
-        ),
-    }
     items: list[Item] = []
     bilanzen: dict[str, dict] = {}
-    for schluessel, (schalter, name, holen) in sammler.items():
+    for schluessel, (schalter, name) in _ZUSATZSAMMLER.items():
         bilanzen[schluessel] = {}
         if not settings.get(schalter, True):
             continue
         try:
-            neue, bilanzen[schluessel] = holen()
+            neue, bilanzen[schluessel] = _hole(schluessel, root, http, ct_modell)
             items.extend(neue)
         except Exception as exc:  # noqa: BLE001
             log.error("%s uebersprungen: %s", name, exc)
