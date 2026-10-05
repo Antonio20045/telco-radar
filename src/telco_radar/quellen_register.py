@@ -32,8 +32,7 @@ from __future__ import annotations
 
 import json
 import logging
-from dataclasses import dataclass, field, asdict
-from datetime import date
+from dataclasses import dataclass, asdict
 from pathlib import Path
 
 log = logging.getLogger(__name__)
@@ -110,7 +109,7 @@ class Quellenregister:
     def verbuche_lauf(
         self,
         ergebnisse: list[dict],
-        heute: str | None = None,
+        heute: str,
         quarantaene_nach: int = QUARANTAENE_NACH_LAEUFEN,
         quellen_der_config: dict[str, dict] | None = None,
     ) -> dict:
@@ -121,7 +120,6 @@ class Quellenregister:
         stehen nicht darin - sie bekommen trotzdem ihren Zaehler hochgesetzt,
         sonst kaeme ihr Bewaehrungsabruf nie.
         """
-        heute = heute or date.today().isoformat()
         neu_stillgelegt: list[str] = []
         rehabilitiert: list[str] = []
         abgerufen: set[str] = set()

@@ -1,10 +1,12 @@
 """Tests for RSS + newsroom parsing (fixtures, no network)."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 
 from telco_radar.collect.newsroom import parse_newsroom_html
 from telco_radar.collect.rss import parse_feed_bytes
 from telco_radar.config import Source
+
+JETZT = datetime(2026, 10, 1, 12, tzinfo=UTC)
 
 SAMPLE_FEED = """<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
@@ -126,7 +128,9 @@ def test_newsroom_parsing():
     src = Source(
         type="newsroom", url="https://www.telco.test/news", name="Example Telco"
     )
-    items = parse_newsroom_html(html, src, "europe", "Example Telco", "operator")
+    items = parse_newsroom_html(
+        html, src, "europe", "Example Telco", "operator", jetzt=JETZT
+    )
     titles = [i.title for i in items]
 
     assert len(items) == 2
@@ -144,7 +148,9 @@ def test_newsroom_respects_item_selector():
         name="Example Telco",
         item_selector="footer",
     )
-    items = parse_newsroom_html(html, src, "europe", "Example Telco", "operator")
+    items = parse_newsroom_html(
+        html, src, "europe", "Example Telco", "operator", jetzt=JETZT
+    )
     assert items == []
 
 
@@ -156,7 +162,9 @@ def test_newsroom_item_selector_bypasses_url_keyword_heuristic():
         name="Example Telco",
         item_selector="a.card",
     )
-    items = parse_newsroom_html(html, src, "europe", "Example Telco", "operator")
+    items = parse_newsroom_html(
+        html, src, "europe", "Example Telco", "operator", jetzt=JETZT
+    )
     assert len(items) == 2
     assert all("/content/" in i.url for i in items)
 
@@ -169,7 +177,9 @@ def test_newsroom_item_selector_still_applies_skip_hints():
         name="Example Telco",
         item_selector="nav a",
     )
-    items = parse_newsroom_html(html, src, "europe", "Example Telco", "operator")
+    items = parse_newsroom_html(
+        html, src, "europe", "Example Telco", "operator", jetzt=JETZT
+    )
     assert items == []
 
 
@@ -179,7 +189,7 @@ def test_newsroom_parses_ordinal_day_month_year_dates():
       <span>Press release 28th May 2026</span></article>
     """
     src = Source(type="newsroom", url="https://example.com/news", name="S")
-    items = parse_newsroom_html(html, src, "europe", "Example", "operator")
+    items = parse_newsroom_html(html, src, "europe", "Example", "operator", jetzt=JETZT)
     assert len(items) == 1
     assert items[0].published.date().isoformat() == "2026-05-28"
 
@@ -192,7 +202,7 @@ def test_newsroom_skips_navigation_and_parses_common_date_formats():
       <time>July 9, 2026</time></article>
     """
     src = Source(type="newsroom", url="https://example.com/news", name="S")
-    items = parse_newsroom_html(html, src, "europe", "Example", "operator")
+    items = parse_newsroom_html(html, src, "europe", "Example", "operator", jetzt=JETZT)
     assert len(items) == 1
     assert items[0].published.date().isoformat() == "2026-07-09"
 
@@ -220,14 +230,21 @@ def test_rss_falls_back_to_human_readable_date():
 def test_url_date_ignores_numeric_id_after_a_year_in_the_slug():
     """Deutsche Telekom's ".../fifa-wm-2030-1116606" parsed as 16 Nov 2030,
     so the release was discarded as "published in the future" instead of
-    using the date printed on the card."""
+    using the date printed on the card. The future limit counts from the
+    run's start, not the wall clock."""
     from telco_radar.collect.newsroom import _date_from_url
 
-    assert _date_from_url("https://x.test/detail/fifa-wm-2030-1116606") == (None, False)
-    assert _date_from_url("https://x.test/news/2026/07/31/foo") == (
+    assert _date_from_url(
+        "https://x.test/detail/fifa-wm-2030-1116606", jetzt=JETZT
+    ) == (None, False)
+    assert _date_from_url("https://x.test/news/2026/07/31/foo", jetzt=JETZT) == (
         datetime(2026, 7, 31, tzinfo=timezone.utc),
         True,
     )
+    url = "https://x.test/news/2031/01/10/foo"
+    tag = datetime(2031, 1, 10, tzinfo=UTC)
+    assert _date_from_url(url, datetime(2031, 1, 10, 9, tzinfo=UTC)) == (tag, True)
+    assert _date_from_url(url, datetime(2031, 1, 8, 9, tzinfo=UTC)) == (None, False)
 
 
 def test_newsroom_reads_aem_datamodel_article_list():
@@ -248,7 +265,7 @@ def test_newsroom_reads_aem_datamodel_article_list():
         name="Optus",
         url="https://www.optus.com.au/about/media-centre/media-releases",
     )
-    items = parse_newsroom_html(html, src, "oceania", "Optus", "operator")
+    items = parse_newsroom_html(html, src, "oceania", "Optus", "operator", jetzt=JETZT)
     assert len(items) == 1
     assert items[0].title == "Optus completes world-first trial"
     assert items[0].url == (
@@ -283,6 +300,7 @@ def test_exclude_url_pattern_drops_language_mirrors():
     Different URL, so the seen-store counts it as a separate story and the
     same news would enter the report twice."""
     import re as _re
+
     from telco_radar.collect import _collect_source
 
     src = Source(
@@ -305,7 +323,9 @@ def test_exclude_url_pattern_drops_language_mirrors():
     original = collect_mod.collect_rss
     collect_mod.collect_rss = lambda s, r, o, g, h: parse_feed_bytes(raw, s, r, o, g)
     try:
-        items = _collect_source(src, "north_america", "Verizon", "operator", {})
+        items = _collect_source(
+            src, "north_america", "Verizon", "operator", {}, jetzt=JETZT
+        )
     finally:
         collect_mod.collect_rss = original
     assert [i.title for i in items] == ["Verizon kicks off NFL season"]
@@ -357,7 +377,7 @@ def test_datamodel_extractor_handles_alternate_field_names():
         name="Singtel",
         url="https://www.singtel.com/about-us/media-centre",
     )
-    items = parse_newsroom_html(html, src, "asien", "Singtel", "operator")
+    items = parse_newsroom_html(html, src, "asien", "Singtel", "operator", jetzt=JETZT)
     assert len(items) == 1
     assert items[0].title == "Singtel Group celebrates National Day"
     assert items[0].published == datetime(2026, 7, 24, tzinfo=timezone.utc)
@@ -420,7 +440,9 @@ def test_sibling_subdomain_and_table_layout_like_att():
         url="https://investors.att.com/news-and-events/news-releases",
         item_selector="tr[class*=yr-]",
     )
-    items = parse_newsroom_html(html, src, "north_america", "AT&T", "operator")
+    items = parse_newsroom_html(
+        html, src, "north_america", "AT&T", "operator", jetzt=JETZT
+    )
     assert len(items) == 1
     assert items[0].title == "AT&T Closes Acquisition of Spectrum Licenses"
     assert items[0].published == datetime(2026, 7, 28, tzinfo=timezone.utc)
@@ -499,7 +521,7 @@ def test_echtes_pubdate_schlaegt_den_link():
 def test_deckel_je_feed_ist_einstellbar():
     """Am 07.08.2026 lieferten die zehn ergiebigsten Quellen exakt 40
     Meldungen - also den damaligen Deckel und nicht ihren Bestand."""
-    from telco_radar.collect.rss import parse_feed_bytes, MAX_ENTRIES_PER_FEED
+    from telco_radar.collect.rss import MAX_ENTRIES_PER_FEED, parse_feed_bytes
     from telco_radar.config import Source
 
     eintraege = "".join(
@@ -532,7 +554,7 @@ def test_newsroom_verwirft_sitemap_link():
       <time>July 9, 2026</time></article>
     """
     src = Source(type="newsroom", url="https://example.com/news", name="S")
-    items = parse_newsroom_html(html, src, "europe", "Example", "operator")
+    items = parse_newsroom_html(html, src, "europe", "Example", "operator", jetzt=JETZT)
     assert [i.title for i in items] == ["New customer service launch"]
 
 
@@ -542,7 +564,7 @@ def test_newsroom_behaelt_meldung_mit_navigationswort_im_satz():
       <time>July 9, 2026</time></article>
     """
     src = Source(type="newsroom", url="https://example.com/news", name="S")
-    items = parse_newsroom_html(html, src, "europe", "Example", "operator")
+    items = parse_newsroom_html(html, src, "europe", "Example", "operator", jetzt=JETZT)
     assert [i.title for i in items] == ["Example adds 5G cells to its sitemap"]
 
 
@@ -554,7 +576,10 @@ def _newsroom_titel(*titel):
     )
     src = Source(type="newsroom", url="https://example.com/news", name="S")
     return [
-        i.title for i in parse_newsroom_html(html, src, "europe", "Example", "operator")
+        i.title
+        for i in parse_newsroom_html(
+            html, src, "europe", "Example", "operator", jetzt=JETZT
+        )
     ]
 
 

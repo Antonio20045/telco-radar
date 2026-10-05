@@ -805,7 +805,7 @@ def test_ein_einstieg_ohne_dokumentlink_meldet_sich(caplog, tmp_path):
         headers = {"content-type": "text/html"}
 
     with caplog.at_level(logging.WARNING):
-        _, bilanz = sammle(tmp_path, {}, hole=lambda u, c: Challenge())
+        _, bilanz = sammle(tmp_path, {}, hole=lambda u, c: Challenge(), jetzt=JETZT)
     assert bilanz["ohne_links"] == 1
     assert bilanz["fehler"] == 0
     assert "202" in caplog.text and "2048" in caplog.text

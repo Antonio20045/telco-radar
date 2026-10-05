@@ -11,6 +11,7 @@ zeitweise dicht war.
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime
 
 from telco_radar.collect import collect_all
 from telco_radar.config import Source
@@ -19,6 +20,8 @@ from telco_radar.quellen_register import (
     Quellenregister,
     quellen_der_config,
 )
+
+JETZT = datetime(2026, 7, 15, 12, tzinfo=UTC)
 
 
 def _ergebnis(url="https://a.de/feed", status="ok", count=5, new=2, **kw):
@@ -198,8 +201,8 @@ class _Cfg:
 
 
 def test_sammelphase_ueberspringt_stillgelegte_quellen(monkeypatch, tmp_path):
-    from telco_radar.models import Item
     import telco_radar.collect as collect_mod
+    from telco_radar.models import Item
 
     monkeypatch.setattr(
         collect_mod,
@@ -214,7 +217,7 @@ def test_sammelphase_ueberspringt_stillgelegte_quellen(monkeypatch, tmp_path):
         )
 
     items, results = collect_all(
-        _Cfg(["https://lebt.de/feed", "https://tot.de/feed"]), register=r
+        _Cfg(["https://lebt.de/feed", "https://tot.de/feed"]), register=r, jetzt=JETZT
     )
 
     assert len(items) == 1
@@ -227,5 +230,5 @@ def test_ohne_register_wird_nichts_uebersprungen(monkeypatch):
     import telco_radar.collect as collect_mod
 
     monkeypatch.setattr(collect_mod, "collect_rss", lambda *a, **k: [])
-    _, results = collect_all(_Cfg(["https://a.de/feed"]))
+    _, results = collect_all(_Cfg(["https://a.de/feed"]), jetzt=JETZT)
     assert results[0]["status"] == "empty"

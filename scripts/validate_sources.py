@@ -16,7 +16,7 @@ from __future__ import annotations
 import argparse
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
@@ -29,13 +29,16 @@ def check(source, region, operator, origin, http_cfg, lookback):
     if source.kind == "official":
         return ("SKIP", 0, 0, None, 0, "reference-only (not crawled)")
     try:
-        items = collect_source(source, region, operator, origin, http_cfg)
+        items = collect_source(
+            source, region, operator, origin, http_cfg, jetzt=datetime.now(UTC)
+        )
         dates = [i.published for i in items if i.published]
         newest = max(dates) if dates else None
         fresh = sum(
             1
             for i in items
-            if i.age_days() is not None and -1 <= i.age_days() <= lookback
+            if i.age_days(datetime.now(UTC)) is not None
+            and -1 <= i.age_days(datetime.now(UTC)) <= lookback
         )
         return ("OK" if items else "EMPTY", len(items), len(dates), newest, fresh, "")
     except Exception as exc:  # noqa: BLE001

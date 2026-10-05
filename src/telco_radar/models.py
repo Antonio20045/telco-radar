@@ -81,10 +81,9 @@ class Item:
             id=d.get("id", ""),
         )
 
-    def age_days(self, now: Optional[datetime] = None) -> Optional[float]:
+    def age_days(self, now: datetime) -> Optional[float]:
         if self.published is None:
             return None
-        now = now or datetime.now(timezone.utc)
         pub = self.published
         if pub.tzinfo is None:
             pub = pub.replace(tzinfo=timezone.utc)

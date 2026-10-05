@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import logging
 import os
+from datetime import datetime
 
 from ..config import Source
 from ..models import Item
@@ -83,7 +84,12 @@ def render_html(url: str, timeout_s: float, ua: str) -> str:
 
 
 def collect_newsroom_js(
-    source: Source, region: str, operator: str | None, origin: str, http_cfg: dict
+    source: Source,
+    region: str,
+    operator: str | None,
+    origin: str,
+    http_cfg: dict,
+    jetzt: datetime,
 ) -> list[Item]:
     timeout_s = float(
         http_cfg.get("render_timeout_seconds", http_cfg.get("timeout_seconds", 25))
@@ -91,4 +97,4 @@ def collect_newsroom_js(
     ua = http_cfg.get("user_agent", BROWSER_UA)
     max_links = int(http_cfg.get("max_links_per_newsroom", 30))
     html = render_html(source.url, timeout_s, ua)
-    return parse_newsroom_html(html, source, region, operator, origin, max_links)
+    return parse_newsroom_html(html, source, region, operator, origin, jetzt, max_links)

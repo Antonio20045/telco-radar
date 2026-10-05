@@ -99,7 +99,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -301,7 +301,7 @@ def main() -> None:
         log.info("=== T1: Telekom-Tarife (Pflichtdokumente + Shop-Kacheln) ===")
         tarif_crawler.lade_quellen = _nur_telekom_tarife(tarif_crawler.lade_quellen)
         items, bilanz_tarife = tarif_crawler.sammle(
-            root, http_cfg, hole=_hole_mit_beleg(beleg)
+            root, http_cfg, hole=_hole_mit_beleg(beleg), jetzt=datetime.now(UTC)
         )
         log.info("T1-Bilanz: %s", bilanz_tarife)
         log.info("Meldungen: %d", len(items))

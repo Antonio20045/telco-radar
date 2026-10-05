@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
 from telco_radar.dedupe import SeenStore
@@ -18,6 +19,8 @@ from telco_radar.models import Item
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import migriere_seen_store as migration  # noqa: E402
+
+JETZT = datetime(2026, 7, 15, 12, tzinfo=UTC)
 
 
 def _item(url: str, titel: str = "Eine Meldung", quelle: str = "Testquelle") -> Item:
@@ -40,7 +43,7 @@ def _v1_zeile(item: Item, stempel: str = "2026-07-17T12:00:00+00:00") -> str:
 def test_neuer_store_schreibt_kompakt(tmp_path):
     pfad = tmp_path / "seen.jsonl"
     items = [_item(f"https://beispiel.de/{i}") for i in range(3)]
-    SeenStore(pfad).add(items)
+    SeenStore(pfad).add(items, jetzt=JETZT)
 
     text = pfad.read_text(encoding="utf-8")
     assert text.startswith("#")
@@ -72,7 +75,7 @@ def test_mischbestand_aus_v1_und_v2(tmp_path):
     pfad.write_text(_v1_zeile(alt) + "\n", encoding="utf-8")
 
     neu = _item("https://beispiel.de/neu")
-    SeenStore(pfad).add([neu])
+    SeenStore(pfad).add([neu], jetzt=JETZT)
 
     wieder = SeenStore(pfad)
     assert len(wieder) == 2
@@ -92,8 +95,8 @@ def test_add_schreibt_keine_dubletten(tmp_path):
     pfad = tmp_path / "seen.jsonl"
     a = _item("https://beispiel.de/a")
     store = SeenStore(pfad)
-    store.add([a])
-    store.add([a, _item("https://beispiel.de/b")])
+    store.add([a], jetzt=JETZT)
+    store.add([a, _item("https://beispiel.de/b")], jetzt=JETZT)
     hashes = [z for z in pfad.read_text().splitlines() if not z.startswith(("#", "@"))]
     assert len(hashes) == len(set(hashes)) == 2
 
@@ -103,9 +106,9 @@ def test_add_ohne_neue_meldungen_schreibt_nichts(tmp_path):
     pfad = tmp_path / "seen.jsonl"
     a = _item("https://beispiel.de/a")
     store = SeenStore(pfad)
-    store.add([a])
+    store.add([a], jetzt=JETZT)
     vorher = pfad.read_text()
-    store.add([a])
+    store.add([a], jetzt=JETZT)
     assert pfad.read_text() == vorher
 
 
@@ -187,3 +190,11 @@ def test_migration_ist_wiederholbar(tmp_path):
     text = pfad.read_text()
     assert migration.main(["--root", str(tmp_path), "--schreiben"]) == 0
     assert pfad.read_text() == text
+
+
+def test_der_stempel_ist_die_uebergebene_zeit(tmp_path):
+    """Der Laufstempel kommt vom Aufrufer, nicht von der Wanduhr."""
+    pfad = tmp_path / "seen.jsonl"
+    SeenStore(pfad).add([_item("https://beispiel.de/s")], JETZT)
+    stempel = [z for z in pfad.read_text(encoding="utf-8").splitlines() if z[:1] == "@"]
+    assert stempel == ["@2026-07-15T12:00:00+00:00"]

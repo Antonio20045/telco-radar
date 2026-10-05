@@ -12,7 +12,6 @@ from __future__ import annotations
 import json
 import shutil
 from datetime import UTC, date, datetime
-from functools import partial
 from pathlib import Path
 
 import httpx
@@ -98,7 +97,9 @@ def fake_http(monkeypatch):
 
     monkeypatch.setattr(httpx, "get", fake_get)
     monkeypatch.setattr(
-        pipeline, "filter_fresh", partial(dedupe.filter_fresh, jetzt=JETZT)
+        pipeline,
+        "filter_fresh",
+        lambda items, tage, _jetzt: dedupe.filter_fresh(items, tage, JETZT),
     )
 
 
@@ -368,8 +369,9 @@ def test_abgeschaltet_geht_alles_unveraendert_durch(monkeypatch):
 def test_die_echte_konfiguration_hat_den_schalter():
     """Ohne Zeile in settings.yaml waere der Schalter eine Behauptung im
     Code - abgeschaltet wird er von Hand, in einer Datei, die jemand findet."""
-    import yaml
     from pathlib import Path
+
+    import yaml
 
     pfad = Path(__file__).resolve().parents[1] / "config" / "settings.yaml"
     daten = yaml.safe_load(pfad.read_text(encoding="utf-8"))

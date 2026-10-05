@@ -7,6 +7,7 @@ import re
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime
 
 from ..config import Config, Source, Operator
 from ..models import Item
@@ -26,15 +27,25 @@ _JS_GLEICHZEITIG = threading.BoundedSemaphore(4)
 
 
 def _collect_source(
-    source: Source, region: str, operator: str | None, origin: str, http_cfg: dict
+    source: Source,
+    region: str,
+    operator: str | None,
+    origin: str,
+    http_cfg: dict,
+    jetzt: datetime,
 ) -> list[Item]:
     """Dispatch a source to the right collector based on its kind."""
     with deadline(_QUELLEN_FRIST):
-        return _dispatch(source, region, operator, origin, http_cfg)
+        return _dispatch(source, region, operator, origin, http_cfg, jetzt)
 
 
 def _dispatch(
-    source: Source, region: str, operator: str | None, origin: str, http_cfg: dict
+    source: Source,
+    region: str,
+    operator: str | None,
+    origin: str,
+    http_cfg: dict,
+    jetzt: datetime,
 ) -> list[Item]:
     if source.kind in ("rss", "trade_press"):
         items = collect_rss(source, region, operator, origin, http_cfg)
@@ -42,9 +53,11 @@ def _dispatch(
         items = collect_json(source, region, operator, origin, http_cfg)
     elif source.kind == "newsroom_js":
         with _JS_GLEICHZEITIG:
-            items = collect_newsroom_js(source, region, operator, origin, http_cfg)
+            items = collect_newsroom_js(
+                source, region, operator, origin, http_cfg, jetzt
+            )
     else:
-        items = collect_newsroom(source, region, operator, origin, http_cfg)
+        items = collect_newsroom(source, region, operator, origin, http_cfg, jetzt)
     if source.exclude_url_pattern:
         drop = re.compile(source.exclude_url_pattern)
         items = [i for i in items if not drop.search(i.url)]
@@ -59,6 +72,8 @@ def collect_source(
     operator: str | None = None,
     origin: str = "operator",
     http_cfg: dict | None = None,
+    *,
+    jetzt: datetime,
 ) -> list[Item]:
     """Public entry point for a single source - same path the pipeline takes.
 
@@ -67,11 +82,11 @@ def collect_source(
     report numbers the pipeline never sees (e.g. Verizon's Spanish mirrors,
     which exclude_url_pattern drops).
     """
-    return _collect_source(source, region, operator, origin, http_cfg or {})
+    return _collect_source(source, region, operator, origin, http_cfg or {}, jetzt)
 
 
 def collect_all(
-    cfg: Config, max_workers: int | None = None, register=None
+    cfg: Config, max_workers: int | None = None, register=None, *, jetzt: datetime
 ) -> tuple[list[Item], list[dict]]:
     """Fetch every configured (crawlable) source concurrently.
 
@@ -151,7 +166,7 @@ def collect_all(
         """
         t0 = time.monotonic()
         try:
-            got = _collect_source(src, region, operator, origin, http_cfg)
+            got = _collect_source(src, region, operator, origin, http_cfg, jetzt)
             return got, time.monotonic() - t0, None
         except Exception as exc:  # noqa: BLE001
             return None, time.monotonic() - t0, exc

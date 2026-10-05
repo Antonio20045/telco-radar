@@ -55,7 +55,7 @@ import json
 import logging
 import re
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 
 import yaml
@@ -276,16 +276,13 @@ def als_item(a: Aenderung, stand: datetime) -> Item:
     )
 
 
-def sammle(
-    root: Path, http_cfg: dict, *, heute: datetime | None = None
-) -> tuple[list[Item], dict]:
+def sammle(root: Path, http_cfg: dict, *, heute: datetime) -> tuple[list[Item], dict]:
     """Alle Tarifseiten abrufen, vergleichen, Aenderungen als Items liefern.
 
     Der ERSTE Abruf einer Seite meldet nie etwas - er legt die Grundlinie.
     Ohne diese Regel bestuende die erste Ausgabe nach dem Einbau aus vierzig
     "neuen" Preisen, die alle schon immer so dastanden.
     """
-    heute = heute or datetime.now(timezone.utc)
     seiten = lade_seiten(root)
     speicher = Snapshotspeicher(Path(root) / "data" / "state" / "tarif_snapshots.json")
     bilanz = {

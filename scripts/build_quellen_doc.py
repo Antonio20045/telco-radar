@@ -20,7 +20,7 @@ from __future__ import annotations
 import argparse
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -52,7 +52,9 @@ def _validate(cfg) -> dict[str, str]:
         if source.kind == "official":
             return name, source.url, "nicht gecrawlt (Referenz)"
         try:
-            items = collect_source(source, region, name, "operator", http_cfg)
+            items = collect_source(
+                source, region, name, "operator", http_cfg, jetzt=datetime.now(UTC)
+            )
         except Exception as exc:  # noqa: BLE001
             text = str(exc)
             if "BrowserType.launch" in text or "Executable doesn't exist" in text:
@@ -69,7 +71,8 @@ def _validate(cfg) -> dict[str, str]:
         fresh = sum(
             1
             for i in items
-            if i.age_days() is not None and -1 <= i.age_days() <= lookback
+            if i.age_days(datetime.now(UTC)) is not None
+            and -1 <= i.age_days(datetime.now(UTC)) <= lookback
         )
         if not items:
             return name, source.url, "0 Meldungen"

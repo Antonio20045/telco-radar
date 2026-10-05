@@ -40,36 +40,10 @@ _SKIP_HINTS = re.compile(
 )
 _SKIP_FILE_EXT = re.compile(r"\.(pdf|jpg|jpeg|png|gif|svg|mp4|zip)$", re.I)
 _TRUSTED_EXTERNAL_HOSTS = {"listedcompany.com"}
-_PUBLIC_SUFFIXES = {
-    "com.br",
-    "com.au",
-    "co.uk",
-    "com.tr",
-    "co.za",
-    "com.mx",
-    "co.nz",
-    "com.ar",
-    "com.sa",
-    "co.ke",
-    "com.my",
-    "com.ph",
-    "com.sg",
-    "co.th",
-    "com.cn",
-    "co.jp",
-    "co.kr",
-    "com.tw",
-    "com.hk",
-    "com.eg",
-    "com.pk",
-    "co.id",
-    "com.vn",
-    "com.co",
-    "com.pe",
-    "com.ng",
-    "com.kw",
-    "com.qa",
-}
+_PUBLIC_SUFFIX = re.compile(
+    r"co\.(uk|za|nz|ke|th|jp|kr|id)"
+    r"|com\.(br|au|tr|mx|ar|sa|my|ph|sg|cn|tw|hk|eg|pk|vn|co|pe|ng|kw|qa)"
+)
 
 
 def _parent_site(host: str) -> str:
@@ -83,7 +57,7 @@ def _parent_site(host: str) -> str:
     if len(labels) < 3:
         return ""
     parent = ".".join(labels[1:])
-    if parent in _PUBLIC_SUFFIXES or len(parent.split(".")) < 2:
+    if _PUBLIC_SUFFIX.fullmatch(parent) or len(parent.split(".")) < 2:
         return ""
     return parent
 
@@ -463,7 +437,7 @@ def _heading_title_for(a, item_root) -> str:
     return " ".join(best.get_text(" ", strip=True).split())
 
 
-def _date_from_url(url: str) -> tuple[datetime | None, bool]:
+def _date_from_url(url: str, jetzt: datetime) -> tuple[datetime | None, bool]:
     """Returns (date, has_day_precision)."""
     m = _URL_DATE.search(url)
     if m:
@@ -485,7 +459,7 @@ def _date_from_url(url: str) -> tuple[datetime | None, bool]:
         parsed = datetime(year, month, day, tzinfo=timezone.utc)
     except ValueError:
         return None, False
-    if parsed > datetime.now(timezone.utc) + timedelta(days=1):
+    if parsed > jetzt + timedelta(days=1):
         return None, False
     return parsed, has_day
 
@@ -526,6 +500,7 @@ def parse_newsroom_html(
     region: str,
     operator: str | None,
     origin: str,
+    jetzt: datetime,
     max_links: int = 30,
 ) -> list[Item]:
     """Extract article-like links from a newsroom page (testable, no I/O)."""
@@ -647,7 +622,7 @@ def parse_newsroom_html(
             continue
         seen_urls.add(url)
 
-        url_date, url_has_day = _date_from_url(url)
+        url_date, url_has_day = _date_from_url(url, jetzt)
         published = url_date if url_has_day else None
         if published is None and hasattr(a, "select_one"):
             date_el = a.select_one("[class*=date]")
@@ -688,10 +663,17 @@ def parse_newsroom_html(
 
 
 def collect_newsroom(
-    source: Source, region: str, operator: str | None, origin: str, http_cfg: dict
+    source: Source,
+    region: str,
+    operator: str | None,
+    origin: str,
+    http_cfg: dict,
+    jetzt: datetime,
 ) -> list[Item]:
     from .http import fetch
 
     resp = fetch(source.url, http_cfg, source.timeout_seconds, source.headers)
     max_links = int(http_cfg.get("max_links_per_newsroom", 30))
-    return parse_newsroom_html(resp.text, source, region, operator, origin, max_links)
+    return parse_newsroom_html(
+        resp.text, source, region, operator, origin, jetzt, max_links
+    )

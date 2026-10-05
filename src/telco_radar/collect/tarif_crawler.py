@@ -43,7 +43,7 @@ import json
 import logging
 import re
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 from urllib.parse import urljoin, urlsplit
 
@@ -711,14 +711,13 @@ def _sammle_seite(
 
 
 def sammle(
-    root: Path, http_cfg: dict, *, jetzt: datetime | None = None, hole=None
+    root: Path, http_cfg: dict, *, jetzt: datetime, hole=None
 ) -> tuple[list[Item], dict]:
     """Alle Quellen crawlen, Dokumente lesen, Aenderungen melden.
 
     Der erste Lauf je Tarif legt die Grundlinie und meldet nichts - wie bei
     jedem anderen Radar dieses Projekts.
     """
-    jetzt = jetzt or datetime.now(timezone.utc)
     hole = hole or fetch
     quellen = lade_quellen(root)
     speicher = TarifSpeicher(Path(root) / "data" / "state" / "tarife.jsonl")

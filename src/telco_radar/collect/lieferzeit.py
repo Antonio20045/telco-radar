@@ -48,7 +48,7 @@ import json
 import logging
 import re
 from dataclasses import dataclass, asdict, field
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 
 import yaml
@@ -378,14 +378,11 @@ def ist_engpass(vorher: dict | None, jetzt: Beobachtung) -> bool:
     return jetzt.tage_max - int(vorher["tage_max"]) >= ENGPASS_SPRUNG
 
 
-def sammle(
-    root: Path, http_cfg: dict, *, jetzt: datetime | None = None, hole=None
-) -> dict:
+def sammle(root: Path, http_cfg: dict, *, jetzt: datetime, hole=None) -> dict:
     """Den ganzen Warenkorb messen. Liefert die Bilanz fuers Laufprotokoll.
 
     `hole` ist der Abrufer - in Tests eine Attrappe, sonst `fetch`.
     """
-    jetzt = jetzt or datetime.now(timezone.utc)
     hole = hole or (lambda url: fetch(url, http_cfg).text)
     korb = lade_warenkorb(root)
     speicher = Lieferzeitspeicher(Path(root) / "data" / "state" / "lieferzeit.json")

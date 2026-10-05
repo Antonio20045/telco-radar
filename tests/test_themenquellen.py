@@ -14,11 +14,14 @@ denen genau das haengt:
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from pathlib import Path
 
 from telco_radar.collect import collect_all, tag_news_regions
 from telco_radar.config import THEME_PREFIX, is_theme_key, load_config
 from telco_radar.models import Item
+
+JETZT = datetime(2026, 7, 15, 12, tzinfo=UTC)
 
 WATCHLIST = """
 regions:
@@ -100,7 +103,7 @@ def test_collect_all_nimmt_themenquellen_mit(tmp_path, monkeypatch):
     cfg = load_config(_projekt(tmp_path))
     gesehen: list[tuple[str, str, str]] = []
 
-    def fake_collect(source, region, operator, origin, http_cfg):
+    def fake_collect(source, region, operator, origin, http_cfg, jetzt):
         gesehen.append((source.url, region, origin))
         return [
             Item(
@@ -114,7 +117,7 @@ def test_collect_all_nimmt_themenquellen_mit(tmp_path, monkeypatch):
         ]
 
     monkeypatch.setattr("telco_radar.collect._collect_source", fake_collect)
-    items, results = collect_all(cfg, max_workers=1)
+    items, results = collect_all(cfg, max_workers=1, jetzt=JETZT)
 
     themen_jobs = {u: (r, o) for u, r, o in gesehen if o == "tech_watch"}
     assert set(themen_jobs) == {

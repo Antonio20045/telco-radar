@@ -2,7 +2,7 @@ scripts/build_sources.py zeilen 1145
 scripts/finde_quellen.py zeilen 458
 scripts/pruefe_portal.py zeilen 975
 scripts/pruefe_promo_seite.py zeilen 564
-scripts/pruefe_quellenvorschlag.py zeilen 841
+scripts/pruefe_quellenvorschlag.py zeilen 840
 scripts/quellen_trefferquote.py zeilen 433
 scripts/spike_saturn_geraetepreis.py zeilen 554
 service/signup/app.py zeilen 442
@@ -15,7 +15,7 @@ src/telco_radar/analyze/highlight_topics.py zeilen 946
 src/telco_radar/analyze/llm.py zeilen 640
 src/telco_radar/analyze/promo_ranker.py zeilen 559
 src/telco_radar/analyze/tco_store.py zeilen 521
-src/telco_radar/collect/ct_log.py zeilen 464
+src/telco_radar/collect/ct_log.py zeilen 463
 src/telco_radar/collect/geraete/__init__.py zeilen 1043
 src/telco_radar/collect/geraete/autoerkennung.py zeilen 499
 src/telco_radar/collect/geraete/congstar.py zeilen 911
@@ -23,10 +23,10 @@ src/telco_radar/collect/geraete/einsundeins.py zeilen 960
 src/telco_radar/collect/geraete/o2.py zeilen 712
 src/telco_radar/collect/geraete/telekom.py zeilen 658
 src/telco_radar/collect/geraete/vodafone.py zeilen 770
-src/telco_radar/collect/lieferzeit.py zeilen 444
-src/telco_radar/collect/newsroom.py zeilen 697
+src/telco_radar/collect/lieferzeit.py zeilen 441
+src/telco_radar/collect/newsroom.py zeilen 682
 src/telco_radar/collect/promo_snapshot.py zeilen 415
-src/telco_radar/collect/tarif_crawler.py zeilen 896
+src/telco_radar/collect/tarif_crawler.py zeilen 895
 src/telco_radar/collect/tarif_pdf.py zeilen 670
 src/telco_radar/geraete_model.py zeilen 1129
 src/telco_radar/geraete_pipeline.py zeilen 747

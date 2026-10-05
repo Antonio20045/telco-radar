@@ -7,11 +7,15 @@ und die Netzsperre der Tests sahen diese Abrufe nicht.
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
+
 import httpx
 import pytest
 
 from telco_radar.analyze import category_sweep
 from telco_radar.collect import ct_log, http
+
+JETZT = datetime(2026, 7, 15, 12, tzinfo=UTC)
 
 
 @pytest.fixture
@@ -77,7 +81,7 @@ def test_ct_log_ohne_llm_funktion_ueberspringt_die_modellstufe(tmp_path, naht):
         encoding="utf-8",
     )
     naht(httpx.Response(200, json=[{"dns_names": ["aktion.congstar.de"]}]))
-    items, bilanz = ct_log.sammle(tmp_path, {}, modell="m")
+    items, bilanz = ct_log.sammle(tmp_path, {}, modell="m", jetzt=JETZT)
     assert [i.title for i in items] and bilanz["meldungen"] == 1
 
 

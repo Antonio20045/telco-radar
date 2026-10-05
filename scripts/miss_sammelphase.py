@@ -25,6 +25,7 @@ import json
 import logging
 import sys
 import time
+from datetime import UTC, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
@@ -37,7 +38,7 @@ def _messung(cfg, workers: int, host_parallel: int, host_interval: float) -> dic
     cfg.settings["collect_host_max_parallel"] = host_parallel
     cfg.settings["collect_host_min_interval_seconds"] = host_interval
     t0 = time.monotonic()
-    items, results = collect_all(cfg, max_workers=workers)
+    items, results = collect_all(cfg, max_workers=workers, jetzt=datetime.now(UTC))
     wanduhr = time.monotonic() - t0
 
     arbeit = sum(r.get("seconds", 0.0) for r in results)

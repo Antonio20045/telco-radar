@@ -11,12 +11,15 @@ Drei Dinge haengen daran:
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
 
 from telco_radar.collect import collect_all, collect_source
 from telco_radar.config import Source
+
+JETZT = datetime(2026, 7, 15, 12, tzinfo=UTC)
 
 
 @pytest.fixture
@@ -36,8 +39,8 @@ def _gate_zuruecksetzen():
 
 
 def test_collect_source_stempelt_die_quellen_url(monkeypatch, quelle):
-    from telco_radar.models import Item
     import telco_radar.collect as collect_mod
+    from telco_radar.models import Item
 
     monkeypatch.setattr(
         collect_mod,
@@ -50,14 +53,14 @@ def test_collect_source_stempelt_die_quellen_url(monkeypatch, quelle):
             )
         ],
     )
-    items = collect_source(quelle, "europa")
+    items = collect_source(quelle, "europa", jetzt=JETZT)
     assert [i.source_url for i in items] == ["https://beispiel.de/feed"]
 
 
 def test_stempel_ueberlebt_den_ausschlussfilter(monkeypatch):
     """exclude_url_pattern laeuft NACH dem Sammeln - der Stempel danach."""
-    from telco_radar.models import Item
     import telco_radar.collect as collect_mod
+    from telco_radar.models import Item
 
     quelle = Source(
         type="rss",
@@ -73,7 +76,7 @@ def test_stempel_ueberlebt_den_ausschlussfilter(monkeypatch):
             Item(title="Spanisch", url="https://beispiel.de/es/1", source_name="B"),
         ],
     )
-    items = collect_source(quelle, "europa")
+    items = collect_source(quelle, "europa", jetzt=JETZT)
     assert len(items) == 1
     assert items[0].source_url == "https://beispiel.de/feed"
 
@@ -96,8 +99,8 @@ class _Cfg:
 
 
 def test_laufprotokoll_haelt_dauer_und_status_fest(monkeypatch):
-    from telco_radar.models import Item
     import telco_radar.collect as collect_mod
+    from telco_radar.models import Item
 
     monkeypatch.setattr(
         collect_mod,
@@ -106,7 +109,7 @@ def test_laufprotokoll_haelt_dauer_und_status_fest(monkeypatch):
             Item(title="Meldung", url="https://presse.de/1", source_name="Presse")
         ],
     )
-    items, results = collect_all(_Cfg())
+    items, results = collect_all(_Cfg(), jetzt=JETZT)
     assert len(items) == 1
     assert results[0]["status"] == "ok"
     assert results[0]["count"] == 1
@@ -122,15 +125,15 @@ def test_gescheiterte_quelle_bekommt_trotzdem_eine_dauer(monkeypatch):
         raise TimeoutError("read timeout")
 
     monkeypatch.setattr(collect_mod, "collect_rss", kaputt)
-    _, results = collect_all(_Cfg())
+    _, results = collect_all(_Cfg(), jetzt=JETZT)
     assert results[0]["status"] == "fail"
     assert "TimeoutError" in results[0]["error"]
     assert isinstance(results[0]["seconds"], float)
 
 
 def test_eine_kaputte_quelle_stoppt_den_lauf_nicht(monkeypatch):
-    from telco_radar.models import Item
     import telco_radar.collect as collect_mod
+    from telco_radar.models import Item
 
     cfg = _Cfg()
     cfg.news_sources.append(
@@ -145,14 +148,14 @@ def test_eine_kaputte_quelle_stoppt_den_lauf_nicht(monkeypatch):
         return [Item(title="Meldung", url="https://presse.de/1", source_name="Presse")]
 
     monkeypatch.setattr(collect_mod, "collect_rss", mal_so_mal_so)
-    items, results = collect_all(cfg)
+    items, results = collect_all(cfg, jetzt=JETZT)
     assert len(items) == 1
     assert sorted(r["status"] for r in results) == ["fail", "ok"]
 
 
 def test_drosselung_wird_aus_den_settings_gesetzt(monkeypatch):
-    from telco_radar.collect.http import active_gate
     import telco_radar.collect as collect_mod
+    from telco_radar.collect.http import active_gate
 
     monkeypatch.setattr(collect_mod, "collect_rss", lambda *a, **k: [])
     collect_all(
@@ -162,7 +165,8 @@ def test_drosselung_wird_aus_den_settings_gesetzt(monkeypatch):
                 "collect_host_max_parallel": 3,
                 "collect_host_min_interval_seconds": 0.25,
             }
-        )
+        ),
+        jetzt=JETZT,
     )
     assert active_gate().max_parallel == 3
     assert active_gate().min_interval == 0.25
@@ -200,6 +204,6 @@ def test_headless_renderings_werden_getrennt_begrenzt(monkeypatch):
         for i in range(12)
     ]
 
-    items, _ = collect_all(cfg)
+    items, _ = collect_all(cfg, jetzt=JETZT)
     assert len(items) == 12
     assert gleichzeitig["max"] <= 4

@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import logging
 import sys
+from datetime import UTC, datetime
 
 from telco_radar import collect, pipeline
+
+JETZT = datetime(2026, 7, 15, 12, tzinfo=UTC)
 
 AUS = {
     "lieferzeit_radar_aktiv": False,
@@ -23,7 +26,7 @@ def test_kaputter_sammlerimport_ueberspringt_nur_diesen_sammler(
     settings = {**AUS, "lieferzeit_radar_aktiv": True}
 
     with caplog.at_level(logging.ERROR, logger="telco_radar"):
-        items, bilanzen = pipeline._zusatzsammler(tmp_path, settings, "")
+        items, bilanzen = pipeline._zusatzsammler(tmp_path, settings, "", jetzt=JETZT)
 
     assert items == []
     assert bilanzen == {"lieferzeit": {}, "aenderung": {}, "tarif": {}, "ct": {}}

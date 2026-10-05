@@ -28,7 +28,7 @@ def test_seen_store_roundtrip(tmp_path):
 
     store = SeenStore(store_path)
     assert store.filter_new([a, b]) == [a, b]
-    store.add([a])
+    store.add([a], jetzt=JETZT)
 
     store2 = SeenStore(store_path)
     assert store2.filter_new([a, b]) == [b]

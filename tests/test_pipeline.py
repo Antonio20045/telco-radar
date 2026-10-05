@@ -3,7 +3,6 @@
 import json
 import shutil
 from datetime import UTC, date, datetime
-from functools import partial
 from pathlib import Path
 
 import httpx
@@ -70,7 +69,9 @@ def fake_http(monkeypatch):
     monkeypatch.setattr(httpx, "get", fake_get)
     monkeypatch.setattr(pipeline.report_bilder, "og_bild", lambda url, client: "")
     monkeypatch.setattr(
-        pipeline, "filter_fresh", partial(dedupe.filter_fresh, jetzt=JETZT)
+        pipeline,
+        "filter_fresh",
+        lambda items, tage, _jetzt: dedupe.filter_fresh(items, tage, JETZT),
     )
 
 

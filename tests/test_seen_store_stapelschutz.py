@@ -15,9 +15,12 @@ mehr solcher Teilausfaelle.
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime
 
 from telco_radar.analyze import agents
 from telco_radar.models import Item
+
+JETZT = datetime(2026, 7, 15, 12, tzinfo=UTC)
 
 
 def _items(n: int) -> list[Item]:
@@ -79,7 +82,7 @@ def test_pipeline_haelt_ungelesene_meldungen_aus_dem_seen_store(tmp_path):
     store = SeenStore(tmp_path / "seen.jsonl")
 
     zu_merken = [i for i in alle if i.region not in set() and i.id not in ungelesen]
-    store.add(zu_merken)
+    store.add(zu_merken, jetzt=JETZT)
 
     assert len(store) == 30
     wieder = SeenStore(tmp_path / "seen.jsonl")

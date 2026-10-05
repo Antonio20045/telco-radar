@@ -56,7 +56,7 @@ import json
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 
 import yaml
@@ -374,7 +374,7 @@ def sammle(
     root: Path,
     http_cfg: dict,
     *,
-    jetzt: datetime | None = None,
+    jetzt: datetime,
     modell: str = "",
     komplett: Komplett | None = None,
     client=None,
@@ -383,7 +383,6 @@ def sammle(
 
     Der erste Abruf einer Domain legt die Grundlinie und meldet nichts.
     """
-    jetzt = jetzt or datetime.now(timezone.utc)
     domains, rauschen = lade_domains(root)
     speicher = CTSpeicher(Path(root) / "data" / "state" / "ct_seen.jsonl")
     bilanz = {

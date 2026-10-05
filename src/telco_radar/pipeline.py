@@ -21,11 +21,10 @@ from pathlib import Path
 from typing import TypeVar
 
 from .analyze import bewertung as bewertung_mod
-from .analyze import clustering
+from .analyze import clustering, llm
 from .analyze import ctm as ctm_mod
 from .analyze import einordnung as einordnung_mod
 from .analyze import vorsortierung as vorsortierung_mod
-from .analyze import llm
 from .analyze.llm import llm_available, active_backend
 from .analyze.takt import Takt
 from .collect import collect_all, tag_news_regions
@@ -41,6 +40,7 @@ from . import veroeffentlichen, zusatzstufen
 log = logging.getLogger("telco_radar")
 
 T = TypeVar("T")
+Gesammelt = tuple[list[Item], dict]
 
 LANGUAGES = {"de": "Deutsch", "en": "English"}
 
@@ -431,22 +431,22 @@ def _modelle_waehlen(settings: dict) -> Modelle:
     return Modelle(analyst_model, editor_model, mechanik_model, anker, anker_mechanik)
 
 
-def _hole(art: str, root: Path, http: dict, modell: str) -> tuple[list[Item], dict]:
+def _hole(art: str, root: Path, http: dict, modell: str, jetzt: datetime) -> Gesammelt:
     if art == "lieferzeit":
         from .collect import lieferzeit
 
-        return [], lieferzeit.sammle(root, http)
+        return [], lieferzeit.sammle(root, http, jetzt=jetzt)
     if art == "aenderung":
         from .collect import aenderungen
 
-        return aenderungen.sammle(root, http)
+        return aenderungen.sammle(root, http, heute=jetzt)
     if art == "tarif":
         from .collect import tarif_crawler
 
-        return tarif_crawler.sammle(root, http)
+        return tarif_crawler.sammle(root, http, jetzt=jetzt)
     from .collect import ct_log
 
-    return ct_log.sammle(root, http, modell=modell, komplett=llm.complete)
+    return ct_log.sammle(root, http, jetzt=jetzt, modell=modell, komplett=llm.complete)
 
 
 _ZUSATZSAMMLER = {
@@ -458,7 +458,7 @@ _ZUSATZSAMMLER = {
 
 
 def _zusatzsammler(
-    root: Path, settings: dict, ct_modell: str
+    root: Path, settings: dict, ct_modell: str, jetzt: datetime
 ) -> tuple[list[Item], dict[str, dict]]:
     http = settings.get("http", {})
     items: list[Item] = []
@@ -468,7 +468,7 @@ def _zusatzsammler(
         if not settings.get(schalter, True):
             continue
         try:
-            neue, bilanzen[schluessel] = _hole(schluessel, root, http, ct_modell)
+            neue, bilanzen[schluessel] = _hole(schluessel, root, http, ct_modell, jetzt)
             items.extend(neue)
         except Exception as exc:  # noqa: BLE001
             log.error("%s uebersprungen: %s", name, exc)
@@ -480,6 +480,7 @@ def _sammeln(
     cfg: Config,
     modell: str,
     use_llm: bool | None,
+    jetzt: datetime,
     stoppuhr: Callable[[], float],
     phase: Callable[[str, float, str], None],
 ) -> Sammlung:
@@ -487,9 +488,9 @@ def _sammeln(
     tc = stoppuhr()
     state_dir = root / "data" / "state"
     register = Quellenregister(state_dir / "quellen_register.json")
-    items, source_results = collect_all(cfg, register=register)
+    items, source_results = collect_all(cfg, register=register, jetzt=jetzt)
     tag_news_regions(items, cfg.operators)
-    zusatz, bilanzen = _zusatzsammler(root, cfg.settings, ct_modell)
+    zusatz, bilanzen = _zusatzsammler(root, cfg.settings, ct_modell, jetzt)
     items.extend(zusatz)
     sammlung = Sammlung(items, source_results, register, bilanzen, state_dir)
     n_quarantaene = sammlung.zaehle("quarantaene")
@@ -515,7 +516,7 @@ def _nur_neues(
     sammlung: Sammlung,
     cfg: Config,
     lookback_days: int | None,
-    today_iso: str,
+    jetzt: datetime,
     stoppuhr: Callable[[], float],
     phase: Callable[[str, float, str], None],
 ) -> Neuheit:
@@ -523,7 +524,7 @@ def _nur_neues(
     seen = SeenStore(sammlung.state_dir / "seen.jsonl")
     first_run = len(seen) == 0
     lookback = lookback_days or cfg.lookback_days
-    new_items = filter_fresh(seen.filter_new(sammlung.items), lookback)
+    new_items = filter_fresh(seen.filter_new(sammlung.items), lookback, jetzt)
     neu_je_quelle: dict[str, int] = defaultdict(int)
     for i in new_items:
         neu_je_quelle[i.source_url] += 1
@@ -531,7 +532,7 @@ def _nur_neues(
         rec["new"] = neu_je_quelle.get(rec["url"], 0)
     register_zusammenfassung = sammlung.register.verbuche_lauf(
         sammlung.source_results,
-        today_iso,
+        jetzt.date().isoformat(),
         quarantaene_nach=int(
             cfg.settings.get("quellen_quarantaene_nach_laeufen", 6) or 6
         ),
@@ -642,7 +643,7 @@ def _gesehen_merken(
     buendel: Buendel,
     ungelesene: set[str],
     unanalysierte: set[str],
-    today_iso: str,
+    jetzt: datetime,
 ) -> None:
     zu_merken = zu_merkende_meldungen(
         neuheit.new_items, buendel.vertreter_item_von, ungelesene, unanalysierte
@@ -658,10 +659,9 @@ def _gesehen_merken(
             len(unanalysierte),
             len(ungelesene),
         )
-    neuheit.seen.add(zu_merken)
-    buendel.cluster_store.merke(
-        [g for g in buendel.aktuelle if g.vertreter.id in gemerkt], today_iso
-    )
+    neuheit.seen.add(zu_merken, jetzt)
+    aktuelle = [g for g in buendel.aktuelle if g.vertreter.id in gemerkt]
+    buendel.cluster_store.merke(aktuelle, jetzt.date().isoformat())
 
 
 def _abgesichert(aufgabe: Callable[[], T], bei_fehler: Callable[[Exception], T]) -> T:
@@ -895,10 +895,10 @@ def run(
 
     phases: list[dict] = []
     phase = partial(_phase_eintragen, phases)
-    sammlung = _sammeln(root, cfg, modelle.mechanik, use_llm, stoppuhr, phase)
-    neuheit = _nur_neues(
-        sammlung, cfg, lookback_days, today.isoformat(), stoppuhr, phase
+    sammlung = _sammeln(
+        root, cfg, modelle.mechanik, use_llm, started_at, stoppuhr, phase
     )
+    neuheit = _nur_neues(sammlung, cfg, lookback_days, started_at, stoppuhr, phase)
     llm_was_explicitly_disabled = use_llm is False
     if use_llm is None:
         use_llm = llm_available()
@@ -958,7 +958,7 @@ def run(
         buendel,
         bewertung.ungelesene_meldungen,
         bewertung.unanalysierte_regionen,
-        today.isoformat(),
+        uhr(),
     )
     veroeffentlichen.themen_merken(
         analyse.topics_store, bewertung.covered, bewertung.editor_used, today

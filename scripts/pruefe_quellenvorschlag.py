@@ -3,14 +3,12 @@
 
 Warum es dieses Skript gibt
 ---------------------------
-In frueheren Sessions haben Agents Quellen als "verifiziert" gemeldet, die
-ueber den echten Projekt-Collector 0 Meldungen lieferten: geprueft wurde mit
-einem eigenen Skript, eigenem User-Agent, eigenem Parser. Das ist der
-teuerste Fehler in diesem Projekt. Hier laeuft jeder Vorschlag deshalb durch
-GENAU den Pfad, den auch die Pipeline nimmt - `telco_radar.collect.
-collect_source(...)` - und die Kriterien aus AUFTRAG_QUELLEN_AUSBAU.md
-Abschnitt 4 werden im Code geprueft, nicht im Modell.
-
+In frueheren Sessions haben Agents Quellen als "verifiziert" gemeldet, die ueber den
+echten Projekt-Collector 0 Meldungen lieferten: geprueft wurde mit einem eigenen
+Skript, eigenem User-Agent, eigenem Parser. Das ist der teuerste Fehler in diesem
+Projekt. Hier laeuft jeder Vorschlag deshalb durch GENAU den Pfad, den auch die
+Pipeline nimmt - `telco_radar.collect.collect_source(...)` - und die Kriterien aus
+AUFTRAG_QUELLEN_AUSBAU.md Abschnitt 4 werden im Code geprueft, nicht im Modell.
 Ein Modell, das "ich habe es geprueft" sagt, zaehlt nicht. Nur ein PASS hier.
 
 Eingabe
@@ -37,8 +35,7 @@ Aufruf
 ------
     python scripts/pruefe_quellenvorschlag.py kandidaten.yaml
     python scripts/pruefe_quellenvorschlag.py kandidaten.yaml --json ergebnis.json
-    python scripts/pruefe_quellenvorschlag.py --url https://... --type rss \
-        --operator "Orange"
+    python scripts/pruefe_quellenvorschlag.py --url https://... --operator "Orange"
 
 Exit-Code 0, wenn ALLE Kandidaten bestanden haben, sonst 1.
 """
@@ -51,7 +48,8 @@ import re
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
+from functools import partial
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -59,11 +57,12 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
-from telco_radar.collect import collect_source  # noqa: E402
+from telco_radar import collect  # noqa: E402
 from telco_radar.collect.http import configure_throttle  # noqa: E402
 from telco_radar.config import Source, load_config  # noqa: E402
 from telco_radar.models import normalize_url  # noqa: E402
 
+collect_source = partial(collect.collect_source, jetzt=datetime.now(UTC))
 MIN_ITEMS = 5
 MIN_DATED_SHARE = 0.80
 MIN_FRESH = 1

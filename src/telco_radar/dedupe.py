@@ -49,7 +49,7 @@ from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 
 from .models import Item
@@ -111,7 +111,7 @@ class SeenStore:
             out.append(item)
         return out
 
-    def add(self, items: list[Item]) -> None:
+    def add(self, items: list[Item], jetzt: datetime) -> None:
         neu = []
         for item in items:
             if item.id in self._seen:
@@ -125,7 +125,7 @@ class SeenStore:
         with open(self.path, "a", encoding="utf-8") as fh:
             if neu_angelegt:
                 fh.write(KOPFZEILE)
-            fh.write("@" + datetime.now(timezone.utc).isoformat() + "\n")
+            fh.write("@" + jetzt.isoformat() + "\n")
             fh.write("".join(h + "\n" for h in neu))
 
 
@@ -158,9 +158,7 @@ class ReportedTopics:
                 fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
 
-def filter_fresh(
-    items: list[Item], lookback_days: int, jetzt: datetime | None = None
-) -> list[Item]:
+def filter_fresh(items: list[Item], lookback_days: int, jetzt: datetime) -> list[Item]:
     """Keep items published within the window; keep undated items (they are
     new by definition if they passed the seen filter). Ignore dates more than
     one day in the future because archive pages can expose scheduled items."""
