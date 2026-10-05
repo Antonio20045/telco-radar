@@ -92,10 +92,8 @@ def test_upsert_does_not_merge_similar_but_distinct_offers(tmp_path):
     nicht ineinanderfallen, nur weil die Umformulierungs-Erkennung sonst zu
     grosszuegig waere."""
     db = PromoDB(tmp_path / "db.json")
-    zehn = _item(headline="10 GB Bonus", description="10 GB Bonus")
-    zwanzig = _item(headline="20 GB Bonus", description="20 GB Bonus")
-    db.upsert([zehn], "2026-07-27")
-    n, ids, _ = db.upsert([zwanzig], "2026-07-28")
+    db.upsert([_item(headline="10 GB Bonus")], "2026-07-27")
+    n, ids, _ = db.upsert([_item(headline="20 GB Bonus")], "2026-07-28")
     assert n == 1
     assert len(db) == 2
     assert len(ids) == 1
@@ -189,5 +187,6 @@ def test_upsert_ohne_url_leert_keinen_gespeicherten_link(tmp_path):
     db = PromoDB(tmp_path / "db.json")
     db.upsert([_item(url="https://example.test/deep-link-1")], "2026-07-04")
     db.upsert([_item(url="")], "2026-07-25")
-    links = [e["url"] for e in db.entries.values()]
-    assert "https://example.test/deep-link-1" in links
+    aktiv = [e for e in db.entries.values() if e["status"] == "aktiv"]
+    assert len(db) == 1
+    assert [e["url"] for e in aktiv] == ["https://example.test/deep-link-1"]
