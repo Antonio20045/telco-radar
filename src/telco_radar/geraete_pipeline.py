@@ -88,9 +88,7 @@ def _hole_fabrik(http_cfg: dict) -> Callable:
     antwortet. Ein Host ohne robots.txt ist der Normalfall im Web, nicht
     der Sonderfall.
     """
-    import httpx
-
-    from .collect.http import fetch
+    from .collect.http import StatusFehler, fetch
 
     def hole(
         url: str, kopfzeilen: Optional[dict] = None, user_agent: Optional[str] = None
@@ -98,7 +96,7 @@ def _hole_fabrik(http_cfg: dict) -> Callable:
         cfg = http_cfg if not user_agent else {**http_cfg, "user_agent": user_agent}
         try:
             antwort = fetch(url, cfg, extra_headers=kopfzeilen or None)
-        except httpx.HTTPStatusError as exc:
+        except StatusFehler as exc:
             return (exc.response.status_code, exc.response.text)
         return (antwort.status_code, antwort.text)
 

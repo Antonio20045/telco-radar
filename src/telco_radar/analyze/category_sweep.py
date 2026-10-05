@@ -17,11 +17,9 @@ from __future__ import annotations
 
 import json
 import logging
-import os
-import urllib.parse
-import urllib.request
 from datetime import date
 
+from ..collect import http
 from .begriffe import THEME_LABEL, THEMES
 from .diff_db import DiffDB
 from .llm import complete, extract_json
@@ -63,17 +61,15 @@ def brave_search(
     """Brave Web Search -> Liste {title, url, description, age}. Failsafe: []."""
     if not key:
         return []
-    url = (
-        BRAVE_URL
-        + "?"
-        + urllib.parse.urlencode({"q": query, "count": count, "freshness": freshness})
-    )
-    req = urllib.request.Request(
-        url, headers={"Accept": "application/json", "X-Subscription-Token": key}
-    )
     try:
-        with urllib.request.urlopen(req, timeout=20) as r:
-            data = json.load(r)
+        antwort = http.get(
+            BRAVE_URL,
+            params={"q": query, "count": count, "freshness": freshness},
+            headers={"Accept": "application/json", "X-Subscription-Token": key},
+            timeout=20,
+        )
+        antwort.raise_for_status()
+        data = antwort.json()
     except Exception as exc:  # noqa: BLE001
         log.warning("Brave-Suche fehlgeschlagen (%s): %s", query[:40], str(exc)[:120])
         return []

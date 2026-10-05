@@ -173,6 +173,17 @@ def _hole(url: str, **art: Any) -> httpx.Response:
         return client.get(url, **art)
 
 
+Zeitueberschreitung = httpx.TimeoutException
+HttpFehler = httpx.HTTPError
+StatusFehler = httpx.HTTPStatusError
+
+
+def get(url: str, **art: Any) -> httpx.Response:
+    """Ein GET ohne Kennungswechsel und Backoff, über Drossel und Naht."""
+    with _gate.slot(url):
+        return _hole(url, **art)
+
+
 def fetch(
     url: str,
     http_cfg: dict,

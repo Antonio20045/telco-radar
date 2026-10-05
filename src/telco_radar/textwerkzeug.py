@@ -40,6 +40,7 @@ nicht mehr.
 
 from __future__ import annotations
 
+import json
 import re
 
 _SLUG_MAP = str.maketrans(
@@ -301,3 +302,16 @@ def _ist_zahl(text: str) -> bool:
         return True
     except ValueError:
         return False
+
+
+def extract_json(text: str):
+    """Parse JSON from an LLM response, tolerating markdown fences."""
+    text = text.strip()
+    if text.startswith("```"):
+        text = text.split("\n", 1)[1] if "\n" in text else text
+        if text.rstrip().endswith("```"):
+            text = text.rstrip()[:-3]
+    start = min((i for i in (text.find("{"), text.find("[")) if i >= 0), default=-1)
+    if start > 0:
+        text = text[start:]
+    return json.loads(text)

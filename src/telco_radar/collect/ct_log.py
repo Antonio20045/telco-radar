@@ -54,18 +54,23 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
-from dataclasses import dataclass, field
+from collections.abc import Callable
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
-import httpx
 import yaml
 
 from ..models import Item
+from ..textwerkzeug import extract_json
+from . import http
 
 log = logging.getLogger(__name__)
 
 API = "https://api.certspotter.com/v1/issuances"
+
+Komplett = Callable[[str, str, str, int], str]
+"""``(system, user, modell, max_tokens) -> Antworttext``, von außen übergeben."""
 
 FRIST_NORMAL = 30.0
 FRIST_GROSS = 60.0
@@ -254,18 +259,18 @@ def hole(domain: Domain, http_cfg: dict, *, client=None) -> list:
         if client is not None:
             antwort = client.get(API, params=params, headers=kopf, timeout=domain.frist)
         else:
-            antwort = httpx.get(
+            antwort = http.get(
                 API,
                 params=params,
                 headers=kopf,
                 timeout=domain.frist,
                 follow_redirects=True,
             )
-    except httpx.TimeoutException as exc:
+    except http.Zeitueberschreitung as exc:
         raise CTZeitueberschreitung(
             f"{domain.domain} nicht in {domain.frist:.0f}s beantwortet"
         ) from exc
-    except httpx.HTTPError as exc:
+    except http.HttpFehler as exc:
         raise CTFehler(f"{domain.domain}: {exc}") from exc
 
     if antwort.status_code == 429:
@@ -295,7 +300,7 @@ SYSTEM = (
 )
 
 
-def bewerte(funde: list[Fund], modell: str, *, komplett=None) -> list[Fund]:
+def bewerte(funde: list[Fund], modell: str, *, komplett: Komplett) -> list[Fund]:
     """Stufe 3: das Modell sortiert Infrastruktur aus.
 
     Das Modell darf WEGNEHMEN, nicht hinzufuegen. Ein Name, den es nicht
@@ -304,11 +309,6 @@ def bewerte(funde: list[Fund], modell: str, *, komplett=None) -> list[Fund]:
     """
     if not funde:
         return funde
-    if komplett is None:
-        from ..analyze.llm import complete as komplett
-
-    from ..analyze.llm import extract_json
-
     liste = "\n".join(f"- {f.name}" for f in funde)
     try:
         roh = komplett(SYSTEM, f"Neue Namen:\n{liste}", modell, 8000)
@@ -376,7 +376,7 @@ def sammle(
     *,
     jetzt: datetime | None = None,
     modell: str = "",
-    komplett=None,
+    komplett: Komplett | None = None,
     client=None,
 ) -> tuple[list[Item], dict]:
     """Alle Domains abfragen, neue Namen finden, als Items liefern.
@@ -441,7 +441,7 @@ def sammle(
                 Fund(domain=domain, name=name, zuerst_gesehen=roh, nicht_vor=tag)
             )
 
-    if funde and modell:
+    if funde and modell and komplett is not None:
         funde = bewerte(funde, modell, komplett=komplett)
 
     speicher.speichern()
