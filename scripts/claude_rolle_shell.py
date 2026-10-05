@@ -11,8 +11,6 @@ from collections.abc import Callable
 from pathlib import Path
 
 VORSATZ = frozenset({"env", "command", "nice", "nohup", "timeout", "time", "xargs"})
-# Nur diese Befehle darf eine Rolle starten; jeder andere Anfang (stdbuf, setsid,
-# flock, ionice, ein eigenes Skript …) ist gesperrt, weil er einen Befehl verbirgt.
 ERLAUBT = frozenset(
     {"cat", "head", "tail", "grep", "egrep", "rg", "find", "ls", "wc", "sort", "uniq"}
     | {"diff", "cmp", "comm", "cut", "tr", "nl", "tac", "column", "paste", "jq"}
@@ -23,11 +21,9 @@ ERLAUBT = frozenset(
     | {"cp", "mv", "ln", "install", "mkdir", "touch", "rm", "rmdir", "tee"}
     | {"truncate", "dd", "tar", "unzip", "curl", "wget"}
 )
-# Umgebungsvariablen vor einem Befehl; GIT_*, PAGER, EDITOR und Co. starten Programme.
 VARIABLEN = frozenset({"PYTHONPATH", "LANG", "LC_ALL", "TZ", "NO_COLOR", "COLUMNS"})
 PYTHON_MODULE = frozenset({"pytest", "ruff", "mypy"})
 PYTHON_SKRIPTE = ("scripts/", "tools/")
-# git-Optionen vor dem Unterbefehl, die kein Programm starten.
 GIT_OHNE_WERT = frozenset({"--no-pager", "-P", "--no-optional-locks"})
 GIT_PAGER = ("-O", "--open-files-in-pager")
 STARTER = frozenset({"sh", "bash", "zsh", "env"})
@@ -66,7 +62,6 @@ SCHREIB_API = re.compile(
     r"write|open\(|unlink|rename|replace|rmtree|remove|shutil|truncate|chmod|symlink"
     r"|subprocess|system|exec|popen|spawn|fork|__import__|importlib|pathlib|Path\b"
     r"|eval|compile|getattr|ctypes|pty|os\."
-    # Verschleierung: Dunder-Namen, Namensräume, zusammengesetzte oder kodierte Texte.
     r"|__\w+__|globals|vars\s*\(|locals|['\"]\s*\+|\+\s*['\"]|chr\s*\("
     r"|\\x|\\u|bytes|decode|codecs|base64|\.join\s*\(|format",
     re.IGNORECASE,
