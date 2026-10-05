@@ -178,6 +178,16 @@ def echter_auftrag() -> list[str]:
     return ["kein Auftrag, dessen Bau und Prüfer ein Claude-Modell bis zum Merge waren"]
 
 
+def promo_ids() -> list[str]:
+    """Verlangt den gemergten Auftrag T1 samt seiner Abnahme auf ``main``."""
+    datei = W / auftrag_format.AUFTRAEGE / "T1.json"
+    if not datei.is_file():
+        return [f"{auftrag_format.AUFTRAEGE}/T1.json fehlt"]
+    abnahme = json.loads(datei.read_text("utf-8"))["abnahme"]
+    gemergt = "T1" in auftrag_format.gemergt(W)
+    return _fehlt(abnahme) + ["Auftrag T1 nicht gemergt"] * (not gemergt)
+
+
 def mutationsprobe() -> list[str]:
     """Verlangt zu einem echten Auftrag eine Mutationsprobe mit Zeit oder Grund."""
     datei = W / auftrag_format.KOSTEN
@@ -353,7 +363,7 @@ def offen() -> dict[str, list[str]]:
         + echter_auftrag()
         + mutationsprobe(),
         "7 Kommentarabbau": _mehr("freie Kommentare", freie_kommentare()),
-        "8 Promo-IDs": _fehlt("outputs/auftraege/T1.json", "tests/orakel"),
+        "8 Promo-IDs": promo_ids() + _fehlt("tests/orakel"),
         "9 Lader, render_site": _mehr("Hex-Farben", summe.get("hexfarbe", 0))
         + _mehr("report-rechnet-nur", _ausnahmen("report-rechnet-nur"), 3)
         + _mehr("Zeilen render_site", _zeilen(html, "render_site"), 99)

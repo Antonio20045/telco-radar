@@ -99,6 +99,6 @@ Rolle per `TELCO_ROLLE` und `--settings`; `bau` darf unter `tests/` nur neue Dat
 5. **Hooks, CLAUDE.md** (P12–P13): fertig, wenn ein roter Test nicht pushbar ist, `--no-verify` scheitert, ein Push mit `-c core.hooksPath=/dev/null` als ungeprüft gemeldet wird und ein Stop mit rotem Lint weiterläuft.
 6. **Auftragsablauf** (P14–P17): fertig, wenn ein echter Auftrag vom roten Test bis zum Merge lief, jedes Grün ein vom Skript gelesener Exit-Code ist und die mutmut-Probe Zeit oder Grund liefert.
 7. **Kommentarabbau** (P18–P19): fertig, wenn die Kommentarprüfung ohne Basis grün ist und jede Datei einen unveränderten Syntaxbaum meldet.
-8. **Promo-IDs** (P20–P21): fertig, wenn die 7 Paare je einen Eintrag ergeben, alle 330 Einträge unter neuer ID lesbar sind, `models.py:88` ohne Titelrückfall auskommt und das Promo-Orakel grün ist.
+8. **Promo-IDs** (P20–P21): fertig, wenn T1-Gruppen je einen Eintrag ergeben, alle 330 Einträge unter neuer ID lesbar sind, `models.py:88` ohne Titelrückfall auskommt und das Promo-Orakel grün ist.
 9. **Lader, `render_site`** (P22–P31): fertig, wenn `report-rechnet-nur` nur noch die drei Wurzelkanten hat, `promo_bilder.py` in `collect` liegt, die Hex-Basis null ist und `render_site` unter 100 Zeilen hat.
 10. **`run`, Uhr, Fehler, Netzweg** (P32–P37): fertig, wenn `run` eine Phasenliste unter 100 Zeilen ist, Uhraufrufe nur in den zwei Einstiegspunkten stehen, `category_sweep.py` über `collect.http` geht, `llm.py` keinen veränderlichen Modulzustand hat, `wurzel-unten` ohne Ausnahme gilt und die `BLE001`-Basis halbiert ist.

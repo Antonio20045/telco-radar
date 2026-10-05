@@ -142,7 +142,7 @@ Opus misst am Schnappschuss das zweite stabile Merkmal neben Marke und Zielseite
 
 ## Paket 21 – Promo-ID Bau
 
-T1 mit Lesemigration, danach T2 für `models.py:88`. Fertig, wenn die 7 Paare je einen Eintrag ergeben, alle 330 Einträge unter neuer ID lesbar sind, der Titelrückfall fehlt und das Promo-Orakel grün ist.
+T1 mit Lesemigration, danach T2 für `models.py:88`. Fertig, wenn die 12 Gruppen aus `outputs/auftraege/T1.json` je einen Eintrag ergeben, alle 330 Einträge unter neuer ID lesbar sind, der Titelrückfall fehlt und das Promo-Orakel grün ist.
 
 ## Pakete 22–31 – Umbau `report` (Skizze)
 

@@ -263,3 +263,24 @@ def test_live_datum_test_haengt_nicht_an_der_uhr(tmp_path):
     lauf = subprocess.run(befehl, capture_output=True, text=True, env=umgebung)
     assert lauf.returncode == 0, lauf.stdout[-2000:]
     assert "6 passed" in lauf.stdout
+
+
+def test_promo_ids_sind_erst_mit_gemergtem_auftrag_t1_erfuellt(projekt):
+    (projekt / "tests/orakel").mkdir(parents=True)
+    auftraege = projekt / "outputs/auftraege"
+    auftraege.mkdir(parents=True)
+    assert stand.offen()["8 Promo-IDs"] == ["outputs/auftraege/T1.json fehlt"]
+    (auftraege / "T1.json").write_text(
+        '{"id": "T1", "abnahme": "tests/test_promo_identitaet.py"}', "utf-8"
+    )
+    assert stand.offen()["8 Promo-IDs"] == [
+        "tests/test_promo_identitaet.py fehlt",
+        "Auftrag T1 nicht gemergt",
+    ]
+    (projekt / "tests/test_promo_identitaet.py").write_text("", "utf-8")
+    (auftraege / "kosten.csv").write_text(
+        ",".join(stand.auftrag_format.SPALTEN)
+        + "\n2026-10-05,T1,ende,0,claude,0,,,,,,gemergt\n",
+        "utf-8",
+    )
+    assert stand.offen()["8 Promo-IDs"] == []

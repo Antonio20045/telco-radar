@@ -1,0 +1,253 @@
+{
+  "id": "T1",
+  "art": "verhalten",
+  "ziel": "Ein umformuliertes Angebot derselben Marke auf derselben Zielseite mit denselben Konditionen behält seine ID und ist nie zugleich aktiv und ausgelaufen",
+  "bereich": "src/telco_radar/analyze/",
+  "erwarteteDateien": [
+    "src/telco_radar/analyze/promo_store.py"
+  ],
+  "vorbild": "src/telco_radar/analyze/clustering.py",
+  "seite": [
+    "promo/index.html"
+  ],
+  "datenquelle": {
+    "dateien": [
+      "data/state/promo_db.json"
+    ],
+    "botCommit": "9a9b683",
+    "schnappschuss": "tests/fixtures/bestand/2026-10-03/"
+  },
+  "abnahme": "tests/test_promo_identitaet.py",
+  "erwarteterFehler": "lidl-jahrestarife: erwartet 1 Eintrag, erhalten 2",
+  "abhaengigVon": [],
+  "migration": "PromoDB berechnet beim Laden für jeden Eintrag den neuen Schlüssel und legt Einträge mit gleichem Schlüssel zusammen; es gewinnt der jüngere last_verified (bei Gleichstand der jüngere first_seen, dann die kleinere alte ID), die übrigen bleiben im Feld verlauf des Gewinners erhalten, und alteIds des Gewinners nennt die alten IDs aller zusammengelegten Einträge einschließlich der eigenen. Einträge mit gleichem Schlüssel, gleichem first_seen und gleicher source_url (verglichen als Text, fehlend gleich leer) sind gleichzeitig gelesen und bleiben getrennt (Laufnummer 2, 3 … nach alter ID). Jede der 330 alten IDs steht danach in genau einem alteIds.",
+  "schluessel": {
+    "teile": [
+      "Marke: brand ohne Rand, klein",
+      "Zielseite: models.normalize_url(url)",
+      "Konditionen: Menge aller Zahlen der description nach NFKC, Tausenderpunkt entfernt, Dezimalkomma als Punkt, ohne führende und abschließende Nullen (149,00 → 149, 9,50 → 9.5, 05 → 5)",
+      "Laufnummer: 1, ab 2 nur für gleichzeitig gelesene Angebote mit gleichem Schlüssel"
+    ],
+    "id": "sha1 der vier Teile, 16 Hexzeichen; die ID entsteht einmal beim Anlegen und bleibt, auch wenn ein bestätigter Eintrag später eine andere description bekommt",
+    "abgleich": "upsert sucht zuerst den Eintrag mit gleichem Schlüssel, danach wie bisher _same_offer, aber nur unter Einträgen derselben Marke und Zielseite; ein Eintrag wird je Aufruf höchstens einmal bestätigt, ein zweites Angebot desselben Aufrufs mit gleichem Schlüssel bekommt die nächste Laufnummer",
+    "gemessen": "outputs/auftraege/T1-entwurf.md"
+  },
+  "gruppen": [
+    {
+      "name": "1und1-familientarife",
+      "marke": "1&1 Mobilfunk",
+      "zielseite": "https://mobile.1und1.de/familientarife",
+      "konditionen": [],
+      "alteIds": [
+        "15735d57b5951513",
+        "790c4ab46edcb3c0"
+      ],
+      "ueberschriften": [
+        "evtl. ausgelaufen: 1&1 Familientarife: bis zu 5 Zusatzkarten günstiger",
+        "aktiv: Family-Vorteil: bis zu fünf Zusatzkarten dauerhaft günstiger"
+      ]
+    },
+    {
+      "name": "1und1-junge-leute",
+      "marke": "1&1 Mobilfunk",
+      "zielseite": "https://mobile.1und1.de/tarife-fuer-junge-leute",
+      "konditionen": [
+        "1",
+        "29"
+      ],
+      "alteIds": [
+        "5fe4db9eb5a712dd",
+        "5b1ad95d70152994"
+      ],
+      "ueberschriften": [
+        "evtl. ausgelaufen: Tarife für junge Leute unter 29: dauerhaft günstig",
+        "aktiv: Junge-Leute-Tarife: dauerhaft günstigere Konditionen"
+      ]
+    },
+    {
+      "name": "lidl-jahrestarife",
+      "marke": "Lidl Connect",
+      "zielseite": "https://www.lidl-connect.de/",
+      "konditionen": [
+        "100",
+        "149",
+        "69.99",
+        "99.99"
+      ],
+      "alteIds": [
+        "9d71dfa986538d37",
+        "42c0ad4774f86984"
+      ],
+      "ueberschriften": [
+        "evtl. ausgelaufen: Jahrestarife – einmal zahlen, ein Jahr mobil sein",
+        "aktiv: Jahrestarife: Einmal zahlen, ein Jahr mobil sein"
+      ]
+    },
+    {
+      "name": "telekom-cashback",
+      "marke": "Telekom Deutschland",
+      "zielseite": "https://www.telekom.de/shop/tarife/smartphone-tarife",
+      "konditionen": [
+        "240"
+      ],
+      "alteIds": [
+        "a79c28b519174475",
+        "7fc231d3785dc0c0",
+        "88086e25870a70a5"
+      ],
+      "ueberschriften": [
+        "ausgelaufen: Bis zu 240 € Cashback in MagentaMobil Tarifen",
+        "ausgelaufen: Bis zu 240 € Cashback in allen MagentaMobil Tarifen",
+        "aktiv: Bis zu 240 € Cashback bei MagentaMobil"
+      ]
+    },
+    {
+      "name": "telekom-pluskarten",
+      "marke": "Telekom Deutschland",
+      "zielseite": "https://www.telekom.de/shop/tarife/zusatzkarten",
+      "konditionen": [],
+      "alteIds": [
+        "9182cfc1a5b5ed35",
+        "6a8ee022223e6f6d"
+      ],
+      "ueberschriften": [
+        "evtl. ausgelaufen: PlusKarten: Familienrabatt & unbegrenztes Datenvolumen",
+        "aktiv: PlusKarten-Vorteil: Unlimited-Daten und Preisvorteil"
+      ]
+    },
+    {
+      "name": "vodafone-familycard-xl",
+      "marke": "Vodafone Deutschland",
+      "zielseite": "https://www.vodafone.de/privat/handys-tablets-tarife/zusatzkarten.html",
+      "konditionen": [
+        "24.99",
+        "39.99"
+      ],
+      "alteIds": [
+        "886c392bc4433289",
+        "449a6737e39f600f"
+      ],
+      "ueberschriften": [
+        "aktiv: FamilyCard XL Zusatzkarte mit unbegrenztem Datenvolumen",
+        "aktiv: FamilyCard XL Unlimited für 24,99 €/Monat"
+      ]
+    },
+    {
+      "name": "congstar-kennenlernen",
+      "marke": "congstar",
+      "zielseite": "https://www.congstar.de/congstar-kennenlernen/",
+      "konditionen": [],
+      "alteIds": [
+        "365d677e413a7e3f",
+        "9e9c506688d9e8b1"
+      ],
+      "ueberschriften": [
+        "ausgelaufen: congstar Kennenlernen – 1 Monat unverbindlich testen",
+        "aktiv: congstar 1 Monat unverbindlich testen"
+      ]
+    },
+    {
+      "name": "congstar-partnerkarte",
+      "marke": "congstar",
+      "zielseite": "https://www.congstar.de/partnerkarte/",
+      "konditionen": [
+        "11"
+      ],
+      "alteIds": [
+        "1d45e1771b77d972",
+        "ef70a13413b4de22"
+      ],
+      "ueberschriften": [
+        "ausgelaufen: Partnerkarte: 11 € sparen auf Allnet Flat M",
+        "aktiv: Partnerkarte: 11 € Rabatt auf Allnet Flat M"
+      ]
+    },
+    {
+      "name": "congstar-prepaid-allnet-m",
+      "marke": "congstar",
+      "zielseite": "https://www.congstar.de/prepaid/tarife/prepaid-allnet-m/",
+      "konditionen": [
+        "10",
+        "25",
+        "4"
+      ],
+      "alteIds": [
+        "67546409aa0f8b11",
+        "03e4bca3e1b19c06",
+        "c8ac71f4c90e6685"
+      ],
+      "ueberschriften": [
+        "ausgelaufen: Prepaid Allnet M für 10 € / 4 Wochen",
+        "ausgelaufen: Prepaid Allnet M für 10 € pro 4 Wochen",
+        "aktiv: Prepaid Allnet M mit 25 GB für 10 €/4 Wochen"
+      ]
+    },
+    {
+      "name": "congstar-young",
+      "marke": "congstar",
+      "zielseite": "https://www.congstar.de/young/",
+      "konditionen": [
+        "18",
+        "27"
+      ],
+      "alteIds": [
+        "84a4e51cc4cbefc8",
+        "be2c2a92a41d4d29"
+      ],
+      "ueberschriften": [
+        "ausgelaufen: Young Tarifangebot: Double your Data zum selben Preis",
+        "aktiv: Young Tarifangebot: doppeltes Datenvolumen"
+      ]
+    },
+    {
+      "name": "winsim-tablets",
+      "marke": "winSIM",
+      "zielseite": "https://www.winsim.de/",
+      "konditionen": [
+        "11",
+        "36.99",
+        "39.99",
+        "4",
+        "5"
+      ],
+      "alteIds": [
+        "189d1aad620b3801",
+        "3e8fcf37a6c0dfef"
+      ],
+      "ueberschriften": [
+        "evtl. ausgelaufen: Tablet-Bundles mit SIM-Karte ab 36,99 € monatlich",
+        "aktiv: Tablets mit Mobilfunk-SIM-Karte ab 36,99 €"
+      ]
+    },
+    {
+      "name": "winsim-unlimited",
+      "marke": "winSIM",
+      "zielseite": "https://www.winsim.de/unbegrenztes-datenvolumen",
+      "konditionen": [
+        "0",
+        "1",
+        "19.99",
+        "30",
+        "34.99"
+      ],
+      "alteIds": [
+        "248f53cbe9742b97",
+        "69837d8ae72029d6",
+        "23615f0eeb6abc31"
+      ],
+      "ueberschriften": [
+        "ausgelaufen: Unlimited on demand für 19,99 € mtl.",
+        "aktiv: Unlimited on demand für 19,99 € statt 34,99 €",
+        "aktiv: Unlimited on demand: 30 GB + unbegrenzt zubuchbar"
+      ]
+    }
+  ],
+  "aktiveNachher": 103,
+  "abnahmeEntwurf": "outputs/auftraege/T1-abnahme.py",
+  "wasDarfNiePassieren": {
+    "wiederholung": "ein zweiter Lauf mit denselben Seiten erzeugt keinen neuen Eintrag und ändert keinen Status; zweimal Laden derselben promo_db.json ergibt dieselben IDs",
+    "gleichzeitig": "zwei Angebote derselben Marke, die ein Aufruf auf derselben Seite mit gleichem Schlüssel findet, bleiben zwei Einträge",
+    "zeitueberschreitung": "eine nicht gelesene Seite altert keinen ihrer Einträge; nicht gelesen ist nicht leer",
+    "abbruch": "bricht der Lauf nach dem Lesen und vor dem Speichern ab, ist promo_db.json unverändert; die Migration schreibt nur über save()"
+  }
+}
