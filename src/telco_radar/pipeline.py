@@ -13,9 +13,11 @@ import os
 import sys
 import time
 from collections import Counter, defaultdict
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import partial
 from itertools import zip_longest
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -37,8 +39,10 @@ from .analyze import vorsortierung as vorsortierung_mod
 from .uebersetzung import stufe as uebersetzung_stufe
 from .analyze import llm
 from .analyze.llm import llm_available, active_backend
-from .collect import collect_all, tag_news_regions
-from .config import is_theme_key, load_config
+from .collect import aenderungen as aenderungsradar
+from .collect import collect_all, ct_log, tag_news_regions, tarif_crawler
+from .collect import lieferzeit as lieferzeit_radar
+from .config import Config, is_theme_key, load_config
 from .dedupe import ReportedTopics, SeenStore, filter_fresh
 from .models import Item
 from .naehte import PRODUKTION, Naehte
@@ -56,15 +60,17 @@ LANGUAGES = {"de": "Deutsch", "en": "English"}
 
 _GERAETE_MINDESTBUDGET = 240.0
 
+_STATUS_SCHLUESSEL = {
+    "ok": "ok",
+    "empty": "empty",
+    "failed": "fail",
+    "quarantaene": "quarantaene",
+}
+_STATUS_RANG = {"fail": 0, "ok": 1, "empty": 2}
+
 
 def geraete_budget(settings: dict, verstrichen: float):
-    """Wie viel Zeit die Geraetestufe im Wochenlauf noch bekommt.
-
-    `None` heisst "nicht anfangen". Gerechnet wird gegen die RESTZEIT DES
-    JOBS, nicht gegen das eigene Budget - genau daran ist Lauf 31422689829
-    gescheitert. Die Reserve gehoert dem Rendern, Committen und Deployen;
-    sie ist der Teil, den ein Nutzer zu sehen bekommt.
-    """
+    """Restzeit des Jobs für die Gerätestufe; ``None`` heißt nicht anfangen."""
     if not settings.get("geraete_enabled", False):
         return None
     rest = (
@@ -90,19 +96,6 @@ ANBIETER = ("auto", "anthropic", "bedrock", *OPENAI_KOMPATIBEL)
 
 
 def _waehle_anbieter(settings: dict) -> str:
-    """Legt den LLM-Anbieter fest und liefert seinen Namen.
-
-    "auto" behaelt die alte Reihenfolge (Bedrock > OpenAI-kompatibel >
-    Anthropic) und nimmt damit, welcher Schluessel gerade da ist. Genau das
-    ist das Problem, das llm_provider loest: solange der NVIDIA-Schluessel im
-    Repo liegt, gewinnt er, und Anthropic kaeme nie zum Zug.
-
-    Bei einer expliziten Wahl werden die Schluessel der unterlegenen Anbieter
-    aus der Prozessumgebung entfernt. Das ist noetig, weil llm.py seinen
-    Backend allein aus der Umgebung ableitet - sonst wuerde hier der eine
-    Anbieter die Modell-IDs bestimmen, waehrend dort der andere aufgerufen
-    wird. Nur die Kopie dieses Prozesses ist betroffen.
-    """
     wanted = str(settings.get("llm_provider", "auto") or "auto").lower()
     if wanted not in ANBIETER:
         log.warning("Unbekannter llm_provider %r - benutze auto", wanted)
@@ -144,15 +137,6 @@ def _waehle_anbieter(settings: dict) -> str:
 def _modelle_fuer_anbieter(
     settings: dict, anbieter: str, fallback_model: str
 ) -> tuple[str, str]:
-    """Liefert (Analystenmodell, Editormodell) des GEWAEHLTEN Anbieters.
-
-    Als eigene Funktion herausgezogen, weil das Auseinanderlaufen von
-    Anbieter und Modell-ID sich nicht selbst meldet: der Endpunkt antwortet
-    einfach mit "unbekanntes Modell", die aufrufende Stufe faengt den Fehler
-    ab, und der Lauf gilt als erfolgreich. Genau so stand die
-    Wettbewerber-Seite zwei Laeufe lang leer da (siehe unten im
-    Wettbewerber-Zweig). Jede Stufe holt ihr Modell ab jetzt hier.
-    """
     if anbieter == "bedrock":
         chain_head = llm.set_model_chain(settings.get("bedrock_model_chain") or [])
         return (
@@ -172,18 +156,6 @@ def _modelle_fuer_anbieter(
 
 
 def _mechanik_modell(settings: dict, anbieter: str, fallback: str) -> str:
-    """Das Modell der MECHANIK-Stufen (Uebersetzung, Clustering-Pruefung,
-    Beleg-Pruefung, Promo-Extraktion/-Score, Kategorie-Sweep, CT-Radar,
-    Diff-Kurator).
-
-    Diese Stufen brauchen kein Urteil, nur Fleiss - und ein Denkspur-Modell
-    wie deepseek-v4-pro bezahlt je Aufruf ~8-9k Token Nachdenken, egal wie
-    klein die Aufgabe ist (18.08.2026, der groesste Kostenposten des Laufs).
-    Der Schluessel folgt demselben Muster wie _modelle_fuer_anbieter
-    (`<anbieter>_mechanik_model`); fehlt er, laeuft alles wie bisher auf dem
-    uebergebenen Modell - ein Anbieter ohne den Eintrag verhaelt sich exakt
-    wie vor dieser Aenderung.
-    """
     return str(settings.get(f"{anbieter}_mechanik_model") or "").strip() or fallback
 
 
@@ -192,12 +164,7 @@ ANKER_MECHANIK = "claude-haiku-4-5-20251001"
 
 
 def anker_modelle(settings: dict) -> tuple[str, str]:
-    """(Redaktionsanker, Mechanikanker) - oder ("", ""), wenn abgeschaltet.
-
-    Eine Stelle, an der die zwei Namen herkommen: `_registriere_anker` haengt
-    sie an die Ketten, und der Analyst bekommt seinen ueber `ausweich=` je
-    Aufruf mitgegeben (siehe dort). Zwei Ableseorte waeren zwei Wahrheiten.
-    """
+    """(Redaktionsanker, Mechanikanker), oder ``("", "")``, wenn abgeschaltet."""
     if not settings.get("llm_anker", True):
         return "", ""
     return (
@@ -209,17 +176,6 @@ def anker_modelle(settings: dict) -> tuple[str, str]:
 def _registriere_ausweichmodell(
     settings: dict, analyst_model: str, editor_model: str
 ) -> bool:
-    """Das anbietereigene Ausweichmodell `editor -> analyst`, wenn es taugt.
-
-    Es taugt genau dann NICHT, wenn der Claude-Anker aktiv ist: Analyst und
-    Redaktion haengen am selben Anbieterkonto, ein HTTP 402 toetet beide
-    zugleich, und ein Ausweichmodell auf demselben leeren Konto ist keins.
-    Frueher hat `_registriere_anker` diese Zusicherung nachtraeglich
-    ueberschrieben - das war die Stelle, an der eine ECHTE Praeferenzkette
-    (`bedrock_model_chain`) mit ueberschrieben wurde. Die Entscheidung
-    gehoert hierher, wo bekannt ist, dass beide Modelle demselben Anbieter
-    gehoeren; `_registriere_anker` sieht nur Namen.
-    """
     if not (settings.get("editor_model_fallback", True) and analyst_model):
         return False
     if any(anker_modelle(settings)):
@@ -231,37 +187,6 @@ def _registriere_ausweichmodell(
 def _registriere_anker(
     settings: dict, analyst_model: str, editor_model: str, mechanik_model: str
 ) -> dict[str, str]:
-    """Haengt an das ENDE jeder Modellkette einen Claude-Anker.
-
-    Der Anker greift NUR, wenn das Primaermodell hart gescheitert ist - im
-    Normalfall kostet er nichts. Er existiert, weil eine Kette innerhalb
-    EINES Anbieters keine leere Kasse ueberlebt: Analyst, Redaktion und
-    Mechanik haengen am selben DeepSeek-Konto, und ein HTTP 402 toetet sie
-    zugleich.
-
-    **Ans Ende, nicht an den Kopf.** `set_fallback(modell, anker)` ersetzt den
-    Nachfolger, den `modell` schon hatte - und das ist bei einer echten
-    Praeferenzkette ein stiller Verlust: `bedrock_model_chain` registriert
-    "das beste Modell, das dieses Konto wirklich bedient" als
-    a -> b -> c, und ein Anker am Kopf wirft b und c weg, ohne dass es
-    irgendwo auffiele. Ein Bedrock-403 ("not available for this account") ist
-    gerade KEINE leere Kasse, sondern eine Aussage ueber genau ein Modell -
-    die Kette ist die Antwort darauf und muss stehen bleiben. Der Anker ist
-    das, was NACH ihr kommt.
-
-    Text entsteht in der Redaktion, deshalb endet sie in einem grossen
-    Modell; die Mechanik im kleinsten - sie macht die allermeisten Aufrufe.
-
-    In JEDER heutigen Provider-Konfiguration ist `analyst_model ==
-    editor_model` ("deepseek-v4-pro", ebenso die beiden openai_*_model), und
-    `llm._FALLBACKS` haengt am MODELLNAMEN, nicht an der Rolle des Aufrufers:
-    fuer denselben Namen kann es nur EINEN Nachfolger geben, und der gehoert
-    der Redaktion (ein ausgefallener Bericht wiegt schwerer). Der Analyst
-    bekommt seinen kleineren Anker deshalb NICHT hier, sondern je Aufruf
-    ueber `agents.analyze_region(..., ausweich=...)` - siehe `llm._kette`.
-    Genau daran hing der Fehler bis zum 27.08.2026: der Analyst, die mit
-    Abstand aufrufstaerkste Stufe, waere im Ernstfall auf Sonnet gelandet.
-    """
     redaktion, mechanik = anker_modelle(settings)
     if not (redaktion or mechanik):
         return {}
@@ -286,12 +211,6 @@ def _registriere_anker(
 
 
 def _protokolliere_kosten(kosten: dict) -> None:
-    """Was der Lauf verbraucht hat - je Modell, im Actions-Log.
-
-    Die Summe allein sagt nichts: teuer wird ein Lauf an EINER Stufe (am
-    27.08.2026 waren ~90 % der 1,95 $ der Analyst auf v4-pro), und ohne die
-    Zeile je Modell ist nicht zu sehen, an welcher.
-    """
     modelle = kosten.get("modelle") or {}
     log.info(
         "Kosten: %.4f $ ueber %d Aufruf(e) in %d Modell(en)%s",
@@ -323,19 +242,6 @@ def _protokolliere_kosten(kosten: dict) -> None:
 
 
 def _redaktion_zweistufig(settings: dict, bewertete: int) -> bool:
-    """Entscheidet, ob die zweistufige Redaktion laeuft.
-
-    Beides hat seine Groesse: bei 36 bewerteten Meldungen (Lauf #67) schreibt
-    EIN Aufruf einen besseren, zusammenhaengenderen Bericht als dreizehn, und
-    er kostet ein Zwoelftel. Ab ein paar hundert Meldungen kippt es - dann kann
-    ein einzelner Aufruf nicht mehr abwaegen, sondern nur noch aufzaehlen, und
-    ein Fehlschlag kostet den ganzen Wochenbericht.
-
-    Deshalb eine Schwelle statt einer Grundsatzentscheidung. "auto" ist der
-    Normalfall; "einstufig"/"zweistufig" erzwingen einen Modus, was der
-    Abnahme neuer Wellen dient (ein echter Lauf mit erzwungener Zweistufigkeit,
-    bevor die Meldungsmenge sie ohnehin ausloest).
-    """
     modus = str(settings.get("editor_modus", "auto") or "auto").lower()
     if modus == "zweistufig":
         return True
@@ -353,19 +259,7 @@ def zu_merkende_meldungen(
     ungelesene_meldungen: set[str],
     unanalysierte_regionen: set[str],
 ) -> list[Item]:
-    """Welche Meldungen als "gesehen" abgelegt werden duerfen.
-
-    Der Seen-Store ist ein Einbahnschild: was hineingeht, gilt als erledigt
-    und wird nie wieder gesammelt. Zwei Schutzstufen gab es dafuer schon (die
-    komplett ausgefallene Region aus Lauf #64, der einzelne gescheiterte
-    Stapel aus Lauf #67); mit dem Ereignis-Clustering kommt eine dritte dazu.
-
-    Ein BELEG wird nie einzeln bewertet - er haengt an seinem Vertreter. Ohne
-    diese Umleitung waeren gebuendelte Meldungen der teuerste Fall ueberhaupt:
-    der Vertreter kaeme beim naechsten Lauf wieder, seine drei Belege nie, und
-    das Protokoll saehe normal aus. Als eigene Funktion herausgezogen, damit
-    genau das ein Test halten kann.
-    """
+    """Welche Meldungen als gesehen gelten; ein Beleg zählt über seinen Vertreter."""
 
     def gelesen(item: Item) -> bool:
         chef = vertreter_item_von.get(item.id, item)
@@ -381,17 +275,7 @@ _VORSORTIERUNG_MINDESTBUDGET = 60.0
 
 
 def vorsortierung_budget(settings: dict, verstrichen: float) -> float | None:
-    """Wie viel Zeit die Vorsortierung bekommt, oder None fuer "nicht
-    anfangen".
-
-    Dieselbe Rechnung wie `geraete_budget()` und `uebersetzung.stufe.budget()`
-    und aus demselben Grund: gerechnet wird gegen die RESTZEIT DES JOBS, nicht
-    gegen das eigene Budget. Der Unterschied zu jenen beiden ist die
-    POSITION - die Vorsortierung steht VOR dem Analysten, also vor der
-    laengsten Stufe des Laufs. Ein festes `vorsortierung_frist_sekunden` ist
-    deshalb die eigentliche Sicherung; die Restzeit-Rechnung faengt nur den
-    Fall ab, dass der Job ohnehin schon knapp ist.
-    """
+    """Zeit für die Vorsortierung aus der Restzeit; ``None`` heißt nicht anfangen."""
     if not vorsortierung_mod.ist_eingeschaltet(settings):
         return None
     rest = (
@@ -413,24 +297,7 @@ def vorsortieren(
     use_llm: bool,
     verstrichen: float = 0.0,
 ) -> tuple[dict[str, list[Item]], dict]:
-    """Die Vorsortierung so, wie der Lauf sie aufruft - und nur deshalb eine
-    eigene Funktion: der Aufrufer sitzt mitten in `run()`, und was dort steht,
-    haelt kein Test. Dieselbe Ueberlegung wie bei `zu_merkende_meldungen`.
-
-    Ohne Modell, ohne Meldungen oder mit abgeschaltetem Schalter bleibt die
-    Abbildung unveraendert und die Bilanz leer - dann verhaelt sich der Lauf
-    exakt wie vor dem 27.08.2026.
-
-    Zwei Sicherungen liegen hier und nicht im Modul, weil nur der Lauf sie
-    kennt:
-
-    * **Das Zeitbudget** (`vorsortierung_budget`) - die Stufe steht vor dem
-      Analysten, und eine Stufe, die ihre Zeit ueberzieht, kostet nicht ein
-      paar Meldungen, sondern den Bericht (Lauf 31422689829).
-    * **Das try/except** - eine Stufe, die MELDUNGEN ENTFERNT, darf nie der
-      Grund sein, dass der Lauf ausfaellt. Faellt sie aus, gehen alle
-      Meldungen unveraendert zum Analysten; das ist teurer, aber vollstaendig.
-    """
+    """Die Vorsortierung, wie der Lauf sie aufruft; fällt sie aus, bleibt alles."""
     if not (
         use_llm and items_by_region and vorsortierung_mod.ist_eingeschaltet(settings)
     ):
@@ -462,29 +329,7 @@ def vorsortieren(
 
 
 def promo_stats(promo_result: dict) -> dict:
-    """Die Promo-Zahlen fuers Laufprotokoll - leer, wenn die Stufe nicht lief.
-
-    Bewusst in `stats`, nicht nur im Log: der Promo-Ausfall seit dem
-    14.08.2026 (43 gescheiterte Extraktionen an einem Tag) stand in KEINER
-    Statistik, weil `stats` kein `promo_*`-Feld kannte. Dieselbe Lehre wie
-    beim Geraeteradar.
-
-    Zwei Regeln, und beide unterscheiden Faelle, die sonst gleich aussehen:
-
-    1. **Kein Ergebnis, keine Felder.** Ein abgeschalteter
-       (`promo_enabled: false`) oder uebersprungener Zweig liefert `{}`, und
-       daraus wuerde ohne diese Regel "0 Aktionsseiten gelesen, 0 Angebote"
-       auf transparenz.html - die Aussage eines Totalausfalls fuer eine
-       Stufe, die es in diesem Lauf gar nicht gab. Die Seite, die Vertrauen
-       herstellen soll, darf "gab es nicht" und "hat nichts gefunden" nicht
-       verwechseln.
-    2. **Neu UND bestaetigt.** Eine ruhige Woche (nichts neu, siebzig
-       Aktionen bestaetigt) meldete als einzelne Zahl dasselbe wie ein
-       stiller Ausfall der Extraktion.
-
-    Als eigene Funktion herausgezogen, damit ein Test das halten kann -
-    dieselbe Ueberlegung wie bei `zu_merkende_meldungen` und `vorsortieren`.
-    """
+    """Die Promo-Zahlen fürs Laufprotokoll; leer, wenn die Stufe nicht lief."""
     if not promo_result:
         return {}
     return {
@@ -496,7 +341,6 @@ def promo_stats(promo_result: dict) -> dict:
 
 
 def _sort_key(item: Item):
-    """Freshest first; undated items last."""
     pub = item.published
     if pub is None:
         return (0, "")
@@ -504,17 +348,6 @@ def _sort_key(item: Item):
 
 
 def _interleave_by_source(items: list[Item]) -> list[Item]:
-    """Order a region's items so every operator gets a slot before any
-    operator gets a second one.
-
-    The analyst reads at most `max_items_per_region` items, so the order here
-    decides what is even looked at. Straight recency ordering let one
-    high-volume feed take the whole budget: in the 2026-07-31 run 220 new
-    items produced only 70 analysed ones, and the operator newsrooms - the
-    entire point of the watchlist - lost every slot to the trade press.
-    Round-robin over the sources keeps the breadth; within a source the
-    freshest item still comes first.
-    """
     buckets: dict[str, list[Item]] = defaultdict(list)
     for item in sorted(items, key=_sort_key, reverse=True):
         buckets[item.operator or item.source_name].append(item)
@@ -525,38 +358,121 @@ def _interleave_by_source(items: list[Item]) -> list[Item]:
     return out
 
 
-def run(
-    root: Path,
-    use_llm: bool | None = None,
-    lookback_days: int | None = None,
-    naehte: Naehte = PRODUKTION,
-) -> tuple[Path, list[Ausfall]]:
-    """Execute one full radar run.
+@dataclass(frozen=True)
+class Modelle:
+    """Die für einen Lauf gewählten Modelle samt Ausweich- und Ankermodellen."""
 
-    Returns the report path and the parts of the site that were not rebuilt."""
-    uhr = naehte.setzen() or partial(datetime.now, timezone.utc)
-    stoppuhr = naehte.stoppuhr or time.monotonic
-    t0 = stoppuhr()
-    started_at = uhr()
-    cfg = load_config(root)
-    lookback = lookback_days or cfg.lookback_days
-    language = LANGUAGES.get(cfg.settings.get("report_language", "de"), "Deutsch")
-    fallback_model = cfg.settings.get("model", "claude-sonnet-5")
-    anbieter = _waehle_anbieter(cfg.settings)
+    analyst: str
+    editor: str
+    mechanik: str
+    anker: dict
+    anker_mechanik: str
+
+
+@dataclass(frozen=True)
+class Sammlung:
+    """Ergebnis der Phase Sammeln: Meldungen, Quellenstatus, Zusatzbilanzen."""
+
+    items: list[Item]
+    source_results: list[dict]
+    register: Quellenregister
+    bilanzen: dict[str, dict]
+    state_dir: Path
+
+    def zaehle(self, status: str) -> int:
+        """Wie viele Quellen dieses Laufs den Status ``status`` hatten."""
+        return sum(1 for r in self.source_results if r["status"] == status)
+
+    def kennzahlen(self, cfg: Config) -> dict:
+        """Die Quellenzahlen am Anfang von ``stats`` im Berichts-JSON."""
+        return {
+            "sources_total": sum(len(op.crawled_sources) for op in cfg.operators)
+            + len(cfg.news_sources)
+            + sum(1 for s in cfg.tech_sources if s.crawlable),
+            "sources_ok": self.zaehle("ok"),
+            "sources_empty": self.zaehle("empty"),
+            "sources_failed": self.zaehle("fail"),
+            "collected": len(self.items),
+        }
+
+    def zusatz_kennzahlen(self) -> dict:
+        """Die Zahlen der Zusatzsammler für ``stats`` im Berichts-JSON."""
+        b = self.bilanzen
+        return {
+            "tarif_seiten": b["aenderung"].get("gelesen", 0),
+            "tarif_aenderungen": b["aenderung"].get("geaendert", 0),
+            "lieferzeit_gemessen": b["lieferzeit"].get("gemessen", 0),
+            "lieferzeit_engpaesse": len(b["lieferzeit"].get("engpaesse") or []),
+            "tarif_dokumente": b["tarif"].get("gelesen", 0),
+            "tarif_dokument_aenderungen": b["tarif"].get("geaendert", 0),
+            "tarif_kleingedruckt": b["tarif"].get("kleingedruckt", 0),
+            "ct_domains": b["ct"].get("gelesen", 0),
+            "ct_funde": b["ct"].get("meldungen", 0),
+            "ct_zeitueberschreitung": b["ct"].get("zeitueberschreitung", 0),
+        }
+
+    def zusammenfassung(self) -> dict:
+        """Quellenzahlen je Status und je Art für ``run.source_summary``."""
+        return {
+            "total": len(self.source_results),
+            **{k: self.zaehle(s) for k, s in _STATUS_SCHLUESSEL.items()},
+            "by_kind": dict(Counter(r["kind"] for r in self.source_results)),
+        }
+
+    def sortiert(self) -> list[dict]:
+        """Quellen für ``run.sources``: erst gescheiterte, dann nach Meldungszahl."""
+        return sorted(
+            self.source_results,
+            key=lambda r: (_STATUS_RANG.get(r["status"], 3), -r.get("count", 0)),
+        )
+
+
+@dataclass(frozen=True)
+class Neuheit:
+    """Ergebnis der Phase Nur Neues: Seen-Store, neue Meldungen, Registerbilanz."""
+
+    seen: SeenStore
+    first_run: bool
+    new_items: list[Item]
+    register_zusammenfassung: dict
+
+
+@dataclass(frozen=True)
+class Buendel:
+    """Ergebnis der Phase Bündeln: Ereignisse, Nachklapp und Meldungen je Bereich."""
+
+    cluster_store: clustering.ClusterStore
+    aktuelle: list[clustering.Gruppe]
+    nachklapp: list[clustering.Gruppe]
+    vertreter_items: list[Item]
+    vertreter_item_von: dict[str, Item]
+    items_by_region: dict[str, list[Item]]
+
+    @property
+    def belege_je_url(self) -> dict[str, clustering.Gruppe]:
+        """Die Gruppe jedes aktuellen Ereignisses unter der Adresse ihres Vertreters."""
+        return {g.vertreter.url: g for g in self.aktuelle}
+
+
+def _phase_eintragen(
+    phases: list[dict], name: str, seconds: float, detail: str = ""
+) -> None:
+    phases.append({"name": name, "seconds": round(seconds, 1), "detail": detail})
+
+
+def _modelle_waehlen(settings: dict) -> Modelle:
+    fallback_model = settings.get("model", "claude-sonnet-5")
+    anbieter = _waehle_anbieter(settings)
     analyst_model, editor_model = _modelle_fuer_anbieter(
-        cfg.settings, anbieter, fallback_model
+        settings, anbieter, fallback_model
     )
-    mechanik_model = _mechanik_modell(cfg.settings, anbieter, analyst_model)
-    ausweich_aktiv = _registriere_ausweichmodell(
-        cfg.settings, analyst_model, editor_model
-    )
-    anker_redaktion, anker_mechanik = anker_modelle(cfg.settings)
-    anker = _registriere_anker(
-        cfg.settings, analyst_model, editor_model, mechanik_model
-    )
+    mechanik_model = _mechanik_modell(settings, anbieter, analyst_model)
+    ausweich_aktiv = _registriere_ausweichmodell(settings, analyst_model, editor_model)
+    _, anker_mechanik = anker_modelle(settings)
+    anker = _registriere_anker(settings, analyst_model, editor_model, mechanik_model)
     llm.kosten_reset()
     llm.budget_setzen(
-        cfg.settings.get("llm_budget_usd", 1.5), cfg.settings.get("llm_preise") or {}
+        settings.get("llm_budget_usd", 1.5), settings.get("llm_preise") or {}
     )
     log.info(
         "LLM backend: %s | analyst=%s editor=%s mechanik=%s "
@@ -569,82 +485,69 @@ def run(
         analyst_model if ausweich_aktiv else "keins",
         ", ".join(sorted(set(anker.values()))) or "keiner",
         anker_mechanik or "keiner",
-        cfg.settings.get("llm_budget_usd", 1.5) or "keine",
+        settings.get("llm_budget_usd", 1.5) or "keine",
     )
-    max_items = int(cfg.settings.get("max_items_per_region", 0) or 0) or None
+    return Modelle(analyst_model, editor_model, mechanik_model, anker, anker_mechanik)
 
-    today = started_at.date()
-    today_iso = today.isoformat()
 
-    state_dir = root / "data" / "state"
-    reports_dir = root / "data" / "reports"
-    reports_dir.mkdir(parents=True, exist_ok=True)
+def _zusatzsammler(
+    root: Path, settings: dict, ct_modell: str
+) -> tuple[list[Item], dict[str, dict]]:
+    http = settings.get("http", {})
+    sammler = {
+        "lieferzeit": (
+            "lieferzeit_radar_aktiv",
+            "Lieferzeit-Radar",
+            lambda: ([], lieferzeit_radar.sammle(root, http)),
+        ),
+        "aenderung": (
+            "aenderungsradar_aktiv",
+            "Aenderungsradar",
+            lambda: aenderungsradar.sammle(root, http),
+        ),
+        "tarif": (
+            "tarif_radar_aktiv",
+            "Tarif-Sammler",
+            lambda: tarif_crawler.sammle(root, http),
+        ),
+        "ct": (
+            "ct_radar_aktiv",
+            "CT-Radar",
+            lambda: ct_log.sammle(root, http, modell=ct_modell),
+        ),
+    }
+    items: list[Item] = []
+    bilanzen: dict[str, dict] = {}
+    for schluessel, (schalter, name, holen) in sammler.items():
+        bilanzen[schluessel] = {}
+        if not settings.get(schalter, True):
+            continue
+        try:
+            neue, bilanzen[schluessel] = holen()
+            items.extend(neue)
+        except Exception as exc:  # noqa: BLE001
+            log.error("%s uebersprungen: %s", name, exc)
+    return items, bilanzen
 
-    phases: list[dict] = []
 
-    def phase(name: str, seconds: float, detail: str = "") -> None:
-        phases.append({"name": name, "seconds": round(seconds, 1), "detail": detail})
-
+def _sammeln(
+    root: Path,
+    cfg: Config,
+    modell: str,
+    use_llm: bool | None,
+    stoppuhr: Callable[[], float],
+    phase: Callable[[str, float, str], None],
+) -> Sammlung:
+    ct_modell = modell if (use_llm is not False and llm_available()) else ""
     tc = stoppuhr()
+    state_dir = root / "data" / "state"
     register = Quellenregister(state_dir / "quellen_register.json")
     items, source_results = collect_all(cfg, register=register)
     tag_news_regions(items, cfg.operators)
-
-    lieferzeit_bilanz: dict = {}
-    if cfg.settings.get("lieferzeit_radar_aktiv", True):
-        try:
-            from .collect import lieferzeit as lieferzeit_radar
-
-            lieferzeit_bilanz = lieferzeit_radar.sammle(
-                root, cfg.settings.get("http", {})
-            )
-        except Exception as exc:  # noqa: BLE001
-            log.error("Lieferzeit-Radar uebersprungen: %s", exc)
-
-    aenderungs_bilanz: dict = {}
-    if cfg.settings.get("aenderungsradar_aktiv", True):
-        try:
-            from .collect import aenderungen as aenderungsradar
-
-            tarif_items, aenderungs_bilanz = aenderungsradar.sammle(
-                root, cfg.settings.get("http", {})
-            )
-            items.extend(tarif_items)
-        except Exception as exc:  # noqa: BLE001
-            log.error("Aenderungsradar uebersprungen: %s", exc)
-
-    tarif_bilanz: dict = {}
-    if cfg.settings.get("tarif_radar_aktiv", True):
-        try:
-            from .collect import tarif_crawler
-
-            dokument_items, tarif_bilanz = tarif_crawler.sammle(
-                root, cfg.settings.get("http", {})
-            )
-            items.extend(dokument_items)
-        except Exception as exc:  # noqa: BLE001
-            log.error("Tarif-Sammler uebersprungen: %s", exc)
-
-    ct_bilanz: dict = {}
-    if cfg.settings.get("ct_radar_aktiv", True):
-        try:
-            from .collect import ct_log
-
-            ct_items, ct_bilanz = ct_log.sammle(
-                root,
-                cfg.settings.get("http", {}),
-                modell=(
-                    mechanik_model if (use_llm is not False and llm_available()) else ""
-                ),
-            )
-            items.extend(ct_items)
-        except Exception as exc:  # noqa: BLE001
-            log.error("CT-Radar uebersprungen: %s", exc)
-    failed = [r["url"] for r in source_results if r["status"] == "fail"]
-    n_ok = sum(1 for r in source_results if r["status"] == "ok")
-    n_empty = sum(1 for r in source_results if r["status"] == "empty")
-    n_quarantaene = sum(1 for r in source_results if r["status"] == "quarantaene")
-    n_fail = len(failed)
+    zusatz, bilanzen = _zusatzsammler(root, cfg.settings, ct_modell)
+    items.extend(zusatz)
+    sammlung = Sammlung(items, source_results, register, bilanzen, state_dir)
+    n_quarantaene = sammlung.zaehle("quarantaene")
     phase(
         "Sammeln",
         stoppuhr() - tc,
@@ -655,30 +558,41 @@ def run(
     log.info(
         "Collected %d items (%d ok / %d leer / %d fehlgeschlagen / %d stillgelegt)",
         len(items),
-        n_ok,
-        n_empty,
-        n_fail,
+        sammlung.zaehle("ok"),
+        sammlung.zaehle("empty"),
+        sammlung.zaehle("fail"),
         n_quarantaene,
     )
+    return sammlung
 
+
+def _nur_neues(
+    sammlung: Sammlung,
+    cfg: Config,
+    lookback_days: int | None,
+    today_iso: str,
+    stoppuhr: Callable[[], float],
+    phase: Callable[[str, float, str], None],
+) -> Neuheit:
     td = stoppuhr()
-    seen = SeenStore(state_dir / "seen.jsonl")
+    seen = SeenStore(sammlung.state_dir / "seen.jsonl")
     first_run = len(seen) == 0
-    new_items = filter_fresh(seen.filter_new(items), lookback)
+    lookback = lookback_days or cfg.lookback_days
+    new_items = filter_fresh(seen.filter_new(sammlung.items), lookback)
     neu_je_quelle: dict[str, int] = defaultdict(int)
     for i in new_items:
         neu_je_quelle[i.source_url] += 1
-    for rec in source_results:
+    for rec in sammlung.source_results:
         rec["new"] = neu_je_quelle.get(rec["url"], 0)
-    register_zusammenfassung = register.verbuche_lauf(
-        source_results,
+    register_zusammenfassung = sammlung.register.verbuche_lauf(
+        sammlung.source_results,
         today_iso,
         quarantaene_nach=int(
             cfg.settings.get("quellen_quarantaene_nach_laeufen", 6) or 6
         ),
         quellen_der_config=quellen_der_config(cfg),
     )
-    register.speichern()
+    sammlung.register.speichern()
     phase(
         "Nur Neues",
         stoppuhr() - td,
@@ -689,11 +603,19 @@ def run(
         len(new_items),
         len(seen),
     )
+    return Neuheit(seen, first_run, new_items, register_zusammenfassung)
 
-    llm_was_explicitly_disabled = use_llm is False
-    if use_llm is None:
-        use_llm = llm_available()
 
+def _buendeln(
+    new_items: list[Item],
+    cfg: Config,
+    state_dir: Path,
+    mechanik_model: str,
+    use_llm: bool,
+    uhr: Callable[[], datetime],
+    stoppuhr: Callable[[], float],
+    phase: Callable[[str, float, str], None],
+) -> Buendel:
     tk = stoppuhr()
     cluster_store = clustering.ClusterStore(state_dir / "clusters.jsonl")
     gruppen = clustering.gruppiere(
@@ -702,7 +624,6 @@ def run(
         use_llm=bool(use_llm and cfg.settings.get("cluster_llm_pruefung", True)),
         max_llm_pruefungen=cfg.settings.get("cluster_max_llm_pruefungen"),
     )
-
     jetzt = uhr()
     nachklapp: list[clustering.Gruppe] = []
     aktuelle: list[clustering.Gruppe] = []
@@ -711,15 +632,12 @@ def run(
             nachklapp.append(g)
         else:
             aktuelle.append(g)
-
     vertreter_items = [g.vertreter for g in aktuelle]
-    belege_je_url = {g.vertreter.url: g for g in aktuelle}
     vertreter_item_von: dict[str, Item] = {}
     for g in gruppen:
         vertreter_item_von[g.vertreter.id] = g.vertreter
         for m in g.mitglieder:
             vertreter_item_von[m.id] = g.vertreter
-    zusammengefasst = len(new_items) - len(vertreter_items)
     phase(
         "Ereignisse buendeln",
         stoppuhr() - tk,
@@ -731,19 +649,114 @@ def run(
         "%d Nachklapp zu frueher berichteten Ereignissen)",
         len(new_items),
         len(vertreter_items),
-        zusammengefasst,
+        len(new_items) - len(vertreter_items),
         len(nachklapp),
     )
-
     items_by_region: dict[str, list[Item]] = defaultdict(list)
     for item in sorted(vertreter_items, key=_sort_key, reverse=True):
         items_by_region[item.region].append(item)
     for region_key, region_items in items_by_region.items():
         items_by_region[region_key] = _interleave_by_source(region_items)
+    return Buendel(
+        cluster_store,
+        aktuelle,
+        nachklapp,
+        vertreter_items,
+        vertreter_item_von,
+        items_by_region,
+    )
 
+
+def _belege_anhaengen(
+    regional: dict[str, dict], by_url: dict[str, Item], buendel: Buendel
+) -> None:
+    for region in regional.values():
+        for h in region.get("highlights", []):
+            item = by_url.get(h.get("url", ""))
+            if item is None:
+                h.setdefault("date", None)
+                h.setdefault("source", "")
+                h.setdefault("source_url", "")
+                continue
+            h.setdefault(
+                "date", item.published.date().isoformat() if item.published else None
+            )
+            h.setdefault("source", item.source_name)
+            h.setdefault("source_url", item.source_url)
+            if getattr(item, "image_url", ""):
+                h.setdefault("image_url", item.image_url)
+            gruppe = buendel.belege_je_url.get(h.get("url", ""))
+            if gruppe is not None and gruppe.mitglieder:
+                h.setdefault("weitere_quellen", gruppe.belege())
+                h.setdefault("quellenzahl", gruppe.quellen)
+                h.setdefault("cluster_id", gruppe.id)
+
+
+def _gesehen_merken(
+    neuheit: Neuheit,
+    buendel: Buendel,
+    ungelesene: set[str],
+    unanalysierte: set[str],
+    today_iso: str,
+) -> None:
+    zu_merken = zu_merkende_meldungen(
+        neuheit.new_items, buendel.vertreter_item_von, ungelesene, unanalysierte
+    )
+    gemerkt = {i.id for i in zu_merken}
+    uebersprungen = len(neuheit.new_items) - len(zu_merken)
+    if uebersprungen:
+        log.warning(
+            "%d Meldungen NICHT als gesehen markiert (%d Region(en) "
+            "ganz ohne Analyse, %d Meldungen aus gescheiterten "
+            "Stapeln) - der naechste Lauf holt sie erneut",
+            uebersprungen,
+            len(unanalysierte),
+            len(ungelesene),
+        )
+    neuheit.seen.add(zu_merken)
+    buendel.cluster_store.merke(
+        [g for g in buendel.aktuelle if g.vertreter.id in gemerkt], today_iso
+    )
+
+
+def run(
+    root: Path,
+    use_llm: bool | None = None,
+    lookback_days: int | None = None,
+    naehte: Naehte = PRODUKTION,
+) -> tuple[Path, list[Ausfall]]:
+    """Execute one full radar run; returns the report path and unbuilt site parts."""
+    uhr = naehte.setzen() or partial(datetime.now, timezone.utc)
+    stoppuhr = naehte.stoppuhr or time.monotonic
+    t0 = stoppuhr()
+    started_at = uhr()
+    cfg = load_config(root)
+    language = LANGUAGES.get(cfg.settings.get("report_language", "de"), "Deutsch")
+    modelle = _modelle_waehlen(cfg.settings)
+    analyst_model, editor_model = modelle.analyst, modelle.editor
+    mechanik_model, anker = modelle.mechanik, modelle.anker
+    max_items = int(cfg.settings.get("max_items_per_region", 0) or 0) or None
+    today = started_at.date()
+    today_iso = today.isoformat()
+    state_dir = root / "data" / "state"
+    reports_dir = root / "data" / "reports"
+    reports_dir.mkdir(parents=True, exist_ok=True)
+
+    phases: list[dict] = []
+    phase = partial(_phase_eintragen, phases)
+    sammlung = _sammeln(root, cfg, mechanik_model, use_llm, stoppuhr, phase)
+    neuheit = _nur_neues(sammlung, cfg, lookback_days, today_iso, stoppuhr, phase)
+    new_items = neuheit.new_items
+    llm_was_explicitly_disabled = use_llm is False
+    if use_llm is None:
+        use_llm = llm_available()
+
+    buendel = _buendeln(
+        new_items, cfg, state_dir, mechanik_model, use_llm, uhr, stoppuhr, phase
+    )
     tvs = stoppuhr()
     items_by_region, vorsortierung_bilanz = vorsortieren(
-        items_by_region,
+        buendel.items_by_region,
         settings=cfg.settings,
         root=root,
         model=mechanik_model,
@@ -785,7 +798,7 @@ def run(
                     max_items=max_items,
                     is_theme=is_theme_key(region_key),
                     batch_workers=batch_workers,
-                    ausweich=anker_mechanik,
+                    ausweich=modelle.anker_mechanik,
                 )
                 tel = dict(res.get("_telemetry", {}))
                 tel["region"] = region_name
@@ -913,7 +926,7 @@ def run(
         body, covered = editor.build_digest(
             items_by_region, cfg.bereich_names, llm_was_available=bool(use_llm)
         )
-        if first_run:
+        if neuheit.first_run:
             body = (
                 "> **Erster Lauf (Baseline):** Alle Quellen wurden initial "
                 "eingelesen. Ab dem naechsten Lauf erscheinen nur noch "
@@ -974,7 +987,7 @@ def run(
             comp_model = editor_model or analyst_model
             competitor_profiles = competitor_mod.analyze_all(
                 cfg.focus_competitors,
-                items,
+                sammlung.items,
                 comp_model,
                 language,
                 max_workers=int(cfg.settings.get("llm_max_workers", 4)),
@@ -989,27 +1002,7 @@ def run(
         )
 
     by_url = {i.url: i for i in new_items}
-    for region in regional.values():
-        for h in region.get("highlights", []):
-            item = by_url.get(h.get("url", ""))
-            if item is not None:
-                h.setdefault(
-                    "date",
-                    item.published.date().isoformat() if item.published else None,
-                )
-                h.setdefault("source", item.source_name)
-                h.setdefault("source_url", item.source_url)
-                if getattr(item, "image_url", ""):
-                    h.setdefault("image_url", item.image_url)
-                gruppe = belege_je_url.get(h.get("url", ""))
-                if gruppe is not None and gruppe.mitglieder:
-                    h.setdefault("weitere_quellen", gruppe.belege())
-                    h.setdefault("quellenzahl", gruppe.quellen)
-                    h.setdefault("cluster_id", gruppe.id)
-            else:
-                h.setdefault("date", None)
-                h.setdefault("source", "")
-                h.setdefault("source_url", "")
+    _belege_anhaengen(regional, by_url, buendel)
 
     tbild = stoppuhr()
     alle_highlights = [h for r in regional.values() for h in r.get("highlights", [])]
@@ -1164,37 +1157,19 @@ def run(
     except Exception as exc:  # noqa: BLE001
         log.error("Differenzierungs-Bilder uebersprungen: %s", exc)
 
-    total_sources = (
-        sum(len(op.crawled_sources) for op in cfg.operators)
-        + len(cfg.news_sources)
-        + sum(1 for s in cfg.tech_sources if s.crawlable)
-    )
     stats = {
-        "sources_total": total_sources,
-        "sources_ok": n_ok,
-        "sources_empty": n_empty,
-        "sources_failed": n_fail,
-        "collected": len(items),
+        **sammlung.kennzahlen(cfg),
         "new": len(new_items),
-        "events": len(vertreter_items),
-        "bundled": zusammengefasst,
-        "followups": len(nachklapp),
+        "events": len(buendel.vertreter_items),
+        "bundled": len(new_items) - len(buendel.vertreter_items),
+        "followups": len(buendel.nachklapp),
         "ctm_direkt": ctm_bilanz.get("direkt", 0),
         "ctm_uebertragbar": ctm_bilanz.get("uebertragbar", 0),
         "ctm_saetze": beleg_bilanz.get("belegt", 0),
         "ctm_saetze_verworfen": (
             ctm_bilanz.get("saetze_verworfen", 0) + beleg_bilanz.get("verworfen", 0)
         ),
-        "tarif_seiten": aenderungs_bilanz.get("gelesen", 0),
-        "tarif_aenderungen": aenderungs_bilanz.get("geaendert", 0),
-        "lieferzeit_gemessen": lieferzeit_bilanz.get("gemessen", 0),
-        "lieferzeit_engpaesse": len(lieferzeit_bilanz.get("engpaesse") or []),
-        "tarif_dokumente": tarif_bilanz.get("gelesen", 0),
-        "tarif_dokument_aenderungen": tarif_bilanz.get("geaendert", 0),
-        "tarif_kleingedruckt": tarif_bilanz.get("kleingedruckt", 0),
-        "ct_domains": ct_bilanz.get("gelesen", 0),
-        "ct_funde": ct_bilanz.get("meldungen", 0),
-        "ct_zeitueberschreitung": ct_bilanz.get("zeitueberschreitung", 0),
+        **sammlung.zusatz_kennzahlen(),
         "geraete_anbieter": geraete_bilanz.get("abgefragt", 0),
         "geraete_listungen": geraete_bilanz.get("listungen", 0),
         "geraete_neu": geraete_bilanz.get("neu", 0),
@@ -1210,9 +1185,6 @@ def run(
     duration = stoppuhr() - t0
     kosten = llm.kosten_stand()
 
-    kind_counts: dict[str, int] = defaultdict(int)
-    for r in source_results:
-        kind_counts[r["kind"]] += 1
     run_log = {
         "started_at": started_at.isoformat(),
         "finished_at": uhr().isoformat(),
@@ -1229,22 +1201,9 @@ def run(
         "kosten": kosten,
         "vorsortierung": vorsortierung_bilanz or None,
         "phases": phases,
-        "source_summary": {
-            "total": len(source_results),
-            "ok": n_ok,
-            "empty": n_empty,
-            "failed": n_fail,
-            "quarantaene": n_quarantaene,
-            "by_kind": dict(kind_counts),
-        },
-        "register": register_zusammenfassung,
-        "sources": sorted(
-            source_results,
-            key=lambda r: (
-                {"fail": 0, "ok": 1, "empty": 2}.get(r["status"], 3),
-                -r.get("count", 0),
-            ),
-        ),
+        "source_summary": sammlung.zusammenfassung(),
+        "register": neuheit.register_zusammenfassung,
+        "sources": sammlung.sortiert(),
         "analysts": analyst_telemetry,
     }
 
@@ -1286,22 +1245,9 @@ def run(
     )
     log.info("Report written: %s (+ .json), run took %.1fs", report_path, duration)
 
-    zu_merken = zu_merkende_meldungen(
-        new_items, vertreter_item_von, ungelesene_meldungen, unanalysierte_regionen
+    _gesehen_merken(
+        neuheit, buendel, ungelesene_meldungen, unanalysierte_regionen, today_iso
     )
-    gemerkt = {i.id for i in zu_merken}
-    uebersprungen = len(new_items) - len(zu_merken)
-    if uebersprungen:
-        log.warning(
-            "%d Meldungen NICHT als gesehen markiert (%d Region(en) "
-            "ganz ohne Analyse, %d Meldungen aus gescheiterten "
-            "Stapeln) - der naechste Lauf holt sie erneut",
-            uebersprungen,
-            len(unanalysierte_regionen),
-            len(ungelesene_meldungen),
-        )
-    seen.add(zu_merken)
-    cluster_store.merke([g for g in aktuelle if g.vertreter.id in gemerkt], today_iso)
     if covered and editor_used:
         topics_store.add(covered, today.isoformat())
     elif covered:

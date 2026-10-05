@@ -108,8 +108,8 @@ src/telco_radar/newsletter/filters.py uhr 2
 src/telco_radar/newsletter/store.py uhr 2
 src/telco_radar/newsletter/subscription.py uhr 1
 src/telco_radar/newsletter/versand.py uhr 1
-src/telco_radar/pipeline.py breite-ausnahme 21
-src/telco_radar/pipeline.py noqa:BLE001 21
+src/telco_radar/pipeline.py breite-ausnahme 18
+src/telco_radar/pipeline.py noqa:BLE001 18
 src/telco_radar/promo_bilder.py breite-ausnahme 1
 src/telco_radar/promo_bilder.py noqa:BLE001 1
 src/telco_radar/promo_pipeline.py breite-ausnahme 5

@@ -26,6 +26,16 @@ AUFNAHME = max(
     p for p in (WURZEL / "tests" / "fixtures" / "golden").iterdir() if p.is_dir()
 )
 STOERUNG = "Störung des Analyse-Dienstes"
+PHASEN = [
+    "Sammeln",
+    "Nur Neues",
+    "Ereignisse buendeln",
+    "Vorsortieren",
+    "Bewerten & Schreiben",
+    "Einordnen für uns",
+    "Wettbewerber-Analyse",
+    "Bilder",
+]
 
 
 def _wurzel(tmp_path: Path) -> Path:
@@ -60,6 +70,7 @@ def test_seiten_wie_aufgenommen_und_zweiter_lauf_ohne_neues(tmp_path):
         p for p in erwartet.keys() | seiten.keys() if erwartet.get(p) != seiten.get(p)
     )
     assert not abweichend, f"Seiten weichen von der Aufnahme ab: {abweichend[:20]}"
+    assert [p["name"] for p in _bericht(wurzel)["run"]["phases"]] == PHASEN
     neu = _bericht(wurzel)["stats"]["new"]
     ungelesen = neu - (_gesehen(wurzel) - vorher)
     assert neu > 0
