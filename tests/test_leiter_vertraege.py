@@ -135,8 +135,9 @@ def test_streichen_beruehrt_nur_zeilen_unter_ignore_imports():
         "ignore_imports =\n    mini.a  ->  mini.b\n    mini.c -> mini.b\n"
     )
 
-    neu = leiter_vertraege.streiche(text, ["mini.a -> mini.b"])
+    neu, entfernt = leiter_vertraege.streiche(text, ["mini.a -> mini.b"])
 
+    assert entfernt == ["mini.a -> mini.b"]
     assert neu == (
         "[importlinter:contract:eins]\nsource_modules =\n    mini.a -> mini.b\n"
         "ignore_imports =\n    mini.c -> mini.b\n"
@@ -153,3 +154,21 @@ def test_meldung_von_lint_imports_wird_zur_ausnahme():
         "mini.a.z -> mini.b",
         "mini.*.y -> mini.b.c",
     ]
+
+
+def test_nur_tatsaechlich_gestrichene_ausnahmen_werden_gemeldet(tmp_path):
+    pfad = tmp_path / ".importlinter"
+    pfad.write_text("ignore_imports =\n    c -> d\n# kommentar\n    e -> f\n", "utf-8")
+    meldung = (
+        "No matches for ignored import c -> d.\nNo matches for ignored import e -> f.\n"
+    )
+    laeufe = iter([1, 1])
+
+    def pruefen():
+        return subprocess.CompletedProcess([], next(laeufe), meldung, "")
+
+    lauf, gestrichen = leiter_vertraege.senke(pfad, pruefen)
+
+    assert lauf.returncode == 1
+    assert gestrichen == ["c -> d"]
+    assert "    e -> f\n" in pfad.read_text("utf-8")

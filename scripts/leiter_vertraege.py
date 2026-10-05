@@ -22,18 +22,22 @@ def verwaiste_ausnahmen(ausgabe: str) -> list[str]:
     return [f"{quelle} -> {ziel}" for quelle, ziel in VERWAIST.findall(ausgabe)]
 
 
-def streiche(text: str, ausnahmen: list[str]) -> str:
-    """Entfernt die genannten Zeilen aus jedem ``ignore_imports``; sonst nichts."""
+def streiche(text: str, ausnahmen: list[str]) -> tuple[str, list[str]]:
+    """Entfernt die genannten Zeilen aus jedem ``ignore_imports``; sonst nichts.
+
+    Gibt den neuen Text und die tatsächlich entfernten Ausnahmen zurück.
+    """
     weg = {_normal(a) for a in ausnahmen}
-    zeilen, schluessel = [], None
+    zeilen, entfernt, schluessel = [], [], None
     for zeile in text.splitlines(keepends=True):
         eingerueckt = zeile[:1] in (" ", "\t")
         if not eingerueckt and zeile.strip():
             schluessel = zeile.partition("=")[0].strip()
         if eingerueckt and schluessel == AUSNAHMEN and _normal(zeile) in weg:
+            entfernt.append(_normal(zeile))
             continue
         zeilen.append(zeile)
-    return "".join(zeilen)
+    return "".join(zeilen), entfernt
 
 
 def senke(
@@ -50,11 +54,11 @@ def senke(
         verwaist := verwaiste_ausnahmen(lauf.stdout + lauf.stderr)
     ):
         alt = pfad.read_text(encoding="utf-8")
-        neu = streiche(alt, verwaist)
-        if neu == alt:
+        neu, entfernt = streiche(alt, verwaist)
+        if not entfernt:
             break
         pfad.write_text(neu, encoding="utf-8")
-        gestrichen += verwaist
+        gestrichen += entfernt
         lauf = pruefen()
     return lauf, gestrichen
 
