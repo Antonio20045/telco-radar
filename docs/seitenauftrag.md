@@ -7,10 +7,10 @@ Ein Seitenauftrag ändert eine Seite sichtbar und läuft über `tools/auftrag.py
 1. Einmal `make pruefen` auf dem Mac. Ohne den Stempel startet kein Auftrag („ungestempelte Commits“).
 2. Hat die Leiter dabei `.importlinter` oder Basen unter `pruef/` gesenkt, ist der Arbeitsbaum nicht sauber, und kein Auftrag startet. Dann einmal:
    `git add .importlinter pruef && git commit -m "pruef: Basen der Leiter" && git push origin main`
-3. Den Auftrag als `outputs/auftraege/<id>.json` anlegen (Felder und Beispiel unten).
-4. Starten: `.venv/bin/python tools/auftrag.py outputs/auftraege/<id>.json`
+3. Den Auftrag außerhalb des Repos anlegen, etwa als `~/auftraege/<id>.json` (Felder und Beispiel unten). Eine neue Datei im Repo macht den Arbeitsbaum unsauber, und als Commit wäre sie ungestempelt; beides sperrt den Start. Das Skript legt seine eigene Kopie im Laufordner unter `.git/` ab.
+4. Starten: `.venv/bin/python tools/auftrag.py ~/auftraege/<id>.json`
 
-Das Skript endet mit `gemergt` (Exit 0) oder legt `outputs/auftraege/<id>-notiz.md` mit dem Befund an. Höchstens zwei Aufträge laufen gleichzeitig, und ihre Bereiche dürfen sich nicht überschneiden.
+Das Skript endet mit `gemergt` (Exit 0) oder legt `outputs/auftraege/<id>-notiz.md` mit dem Befund an; vor dem nächsten Start die Notiz und die geänderte `kosten.csv` committen (danach `make pruefen`) oder verwerfen, sonst ist der Arbeitsbaum unsauber. Höchstens zwei Aufträge laufen gleichzeitig, und ihre Bereiche dürfen sich nicht überschneiden.
 
 ## Pflichtfelder
 
