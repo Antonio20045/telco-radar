@@ -223,7 +223,9 @@ Stand: Commit aaa8b0d, 49 Dateien, 1543 Kommentarzeilen.
 - Zeile 80: dünner Monat steht im Gitter, trägt aber keine Bewegungsaussage. Zeile 112: Ausreißer liegt zwei Monate zurück; gegen Vormonat Ruhe, gegen den Durchschnitt der Rückstand sichtbar (ehrlichere Aussage).
 
 ### `tests/test_versand.py`
-- nichts übernommen: Ablaufkommentare (Schwelle ja/nein, ein Montag).
+- Zustellgedächtnis bei Fehlern (Zeile 191): Scheitert die Zustellung, merkt sich der Versand nichts; sonst bliebe der echte Versand beim nächsten Lauf aus, weil die Meldung als schon zugestellt gälte.
+- Schwelle (Zeilen 96–98): Versandwürdig ist nur `ctm_bezug` 3 mit `relevance` 5; `relevance` 4 oder `ctm_bezug` 2 reichen nicht. Stufe 1 gehört nicht in die Mail (Zeile 62).
+- 10.08.2026 ist ein Montag, der Standard-Versandtag (Zeilen 105, 130).
 
 ### `tests/test_wettbewerbsradar.py`
 - Zeile 92: P3-E1 Vodafone-Tarifleiter „mit Smartphone“ XS 18, M 60, L 100 GB; Stufen liegen, wo die festen Bänder lagen (10/12/18 GB XS, 40/60 GB M, 80/100 GB L); 80 GB liegt je 20 GB von M und L, Gleichstand zur größeren Stufe.
